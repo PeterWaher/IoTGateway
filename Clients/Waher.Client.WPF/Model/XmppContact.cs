@@ -49,7 +49,9 @@ namespace Waher.Client.WPF.Model
 
 			internal set
 			{
-				this.client[this.bareJid] = value;
+				RosterItem Item = this.client[this.bareJid];
+				if (Item != value)
+					this.client[this.bareJid] = value;
 			}
 		}
 

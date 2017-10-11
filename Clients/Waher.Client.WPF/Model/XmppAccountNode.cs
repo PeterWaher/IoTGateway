@@ -346,7 +346,7 @@ namespace Waher.Client.WPF.Model
 						if (Item.IsInGroup(ConcentratorGroupName))
 							Contact = new XmppConcentrator(this, this.client, Item.BareJid);
 						else if (Item.IsInGroup(ActuatorGroupName))
-							Contact = new XmppActuator(this, this.client, Item.BareJid, Item.IsInGroup(SensorGroupName));
+							Contact = new XmppActuator(this, this.client, Item.BareJid, Item.IsInGroup(SensorGroupName), Item.IsInGroup(EventsGroupName));
 						else if (Item.IsInGroup(SensorGroupName))
 							Contact = new XmppSensor(this, this.client, Item.BareJid, Item.IsInGroup(EventsGroupName));
 						else if (Item.IsInGroup(OtherGroupName))
@@ -509,7 +509,7 @@ namespace Waher.Client.WPF.Model
 					bool SupportsEvents = e.HasFeature(SensorClient.NamespaceSensorEvents);
 
 					OldTag = Node.Tag;
-					Node = new XmppActuator(Node.Parent, this.client, Node.BareJID, IsSensor)
+					Node = new XmppActuator(Node.Parent, this.client, Node.BareJID, IsSensor, SupportsEvents)
                     {
 					    Tag = OldTag
                     };

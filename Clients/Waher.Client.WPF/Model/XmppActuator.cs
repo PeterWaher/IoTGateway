@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Xml;
-using System.Windows;
-using System.Windows.Media;
+using Waher.Content;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Control;
 using Waher.Networking.XMPP.DataForms;
@@ -16,14 +15,16 @@ namespace Waher.Client.WPF.Model
 	/// <summary>
 	/// Represents a simple XMPP actuator.
 	/// </summary>
-	public class XmppActuator : XmppContact 
+	public class XmppActuator : XmppContact
 	{
 		private bool isSensor;
+		private bool suportsEvents;
 
-		public XmppActuator(TreeNode Parent, XmppClient Client, string BareJid, bool IsSensor)
+		public XmppActuator(TreeNode Parent, XmppClient Client, string BareJid, bool IsSensor, bool SupportsEventSubscripton)
 			: base(Parent, Client, BareJid)
 		{
 			this.isSensor = IsSensor;
+			this.suportsEvents = SupportsEventSubscripton;
 		}
 
 		public override string TypeName
@@ -31,13 +32,8 @@ namespace Waher.Client.WPF.Model
 			get { return "Actuator"; }
 		}
 
-		public override bool CanReadSensorData
-		{
-			get
-			{
-				return this.isSensor;
-			}
-		}
+		public override bool CanReadSensorData => this.isSensor;
+		public override bool CanSubscribeToSensorData => this.suportsEvents;
 
 		public override SensorDataClientRequest StartSensorDataMomentaryReadout()
 		{
@@ -71,6 +67,25 @@ namespace Waher.Client.WPF.Model
 				throw new NotSupportedException();
 		}
 
+		public override SensorDataSubscriptionRequest SubscribeSensorDataMomentaryReadout(FieldSubscriptionRule[] Rules)
+		{
+			if (this.isSensor)
+			{
+				XmppAccountNode XmppAccountNode = this.XmppAccountNode;
+				SensorClient SensorClient;
+
+				if (XmppAccountNode != null && (SensorClient = XmppAccountNode.SensorClient) != null)
+				{
+					return SensorClient.Subscribe(this.RosterItem.LastPresenceFullJid, FieldType.Momentary, Rules,
+						new Duration(false, 0, 0, 0, 0, 0, 1), new Duration(false, 0, 0, 0, 0, 1, 0), false);
+				}
+				else
+					return null;
+			}
+			else
+				throw new NotSupportedException();
+		}
+
 		public override bool CanConfigure
 		{
 			get
@@ -85,10 +100,10 @@ namespace Waher.Client.WPF.Model
 			ControlClient ControlClient;
 
 			if (XmppAccountNode != null && (ControlClient = XmppAccountNode.ControlClient) != null)
-				ControlClient.GetForm(this.RosterItem.LastPresenceFullJid, "en", Callback, State);		// TODO: Localization
+				ControlClient.GetForm(this.RosterItem.LastPresenceFullJid, "en", Callback, State);      // TODO: Localization
 			else
 				throw new NotSupportedException();
 		}
-	
+
 	}
 }

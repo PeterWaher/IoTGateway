@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata minClientVersion="3.2">
     <id>Waher.Networking.XMPP.UWP</id>
-    <version>1.0.8</version>
+    <version>1.0.9</version>
     <title>Waher.Networking.XMPP.UWP</title>
     <authors>Peter Waher</authors>
     <owners>Waher Data AB</owners>
@@ -26,6 +26,7 @@ XEP-0115: Entity Capabilities
 XEP-0122: Data Forms Validation
 XEP-0128: Service Discovery Extensions
 XEP-0141: Data Forms Layout
+XEP-0184: Message Delivery Receipts
 XEP-0191: Blocking Command
 XEP-0199: XMPP Ping
 XEP-0221: Data Forms Media Element

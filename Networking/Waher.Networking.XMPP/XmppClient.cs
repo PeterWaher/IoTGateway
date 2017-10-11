@@ -196,6 +196,11 @@ namespace Waher.Networking.XMPP
 		public const string NamespaceEntityCapabilities = "http://jabber.org/protocol/caps";
 
 		/// <summary>
+		/// urn:xmpp:receipts
+		/// </summary>
+		public const string NamespaceMessageDeliveryReceipts = "urn:xmpp:receipts";
+
+		/// <summary>
 		/// Regular expression for Full JIDs
 		/// </summary>
 		public static readonly Regex FullJidRegEx = new Regex("^(?:([^@/<>'\\\"\\s]+)@)([^@/<>'\\\"\\s]+)(?:/([^<>'\\\"\\s]*))?$", RegexOptions.Singleline | RegexOptions.Compiled);
@@ -669,6 +674,7 @@ namespace Waher.Networking.XMPP
 
 			this.RegisterMessageHandler("updated", NamespaceDynamicForms, this.DynamicFormUpdatedHandler, true);
 
+			this.clientFeatures[NamespaceMessageDeliveryReceipts] = true;
 			this.clientFeatures["urn:xmpp:xdata:signature:oauth1"] = true;
 			this.clientFeatures["http://jabber.org/protocols/xdata-validate"] = true;
 			this.clientFeatures[NamespaceData] = true;
@@ -1963,6 +1969,15 @@ namespace Waher.Networking.XMPP
 						e.Content = E;
 						break;
 					}
+					else if (E.LocalName == "request" && E.NamespaceURI == NamespaceMessageDeliveryReceipts && !string.IsNullOrEmpty(e.Id))
+					{
+						RosterItem Item = this.GetRosterItem(GetBareJID(e.To));
+						if (Item != null && (Item.State == SubscriptionState.Both || Item.State == SubscriptionState.From))
+						{
+							this.SendMessage(MessageType.Normal, e.From, "<received xmlns='" + NamespaceMessageDeliveryReceipts +
+								"' id='" + XML.Encode(e.Id) + "'/>", string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
+						}
+					}
 					else
 						h = null;
 				}
@@ -2796,7 +2811,7 @@ namespace Waher.Networking.XMPP
 					};
 				}
 
-				await SslStream.AuthenticateAsClientAsync(this.host, ClientCertificates, 
+				await SslStream.AuthenticateAsClientAsync(this.host, ClientCertificates,
 					SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12, true);
 #endif
 				this.BeginWrite("<?xml version='1.0' encoding='utf-8'?><stream:stream from='" + XML.Encode(this.bareJid) + "' to='" + XML.Encode(this.domain) +

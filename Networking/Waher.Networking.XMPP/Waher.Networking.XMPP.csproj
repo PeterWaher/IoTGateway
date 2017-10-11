@@ -18,6 +18,7 @@ XEP-0115: Entity Capabilities
 XEP-0122: Data Forms Validation
 XEP-0128: Service Discovery Extensions
 XEP-0141: Data Forms Layout
+XEP-0184: Message Delivery Receipts
 XEP-0191: Blocking Command
 XEP-0199: XMPP Ping
 XEP-0221: Data Forms Media Element
@@ -38,9 +39,9 @@ XEP-0377: Spam Reporting</Description>
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>networking communication xmpp</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.0.8</AssemblyVersion>
-    <FileVersion>1.0.8</FileVersion>
-    <Version>1.0.8</Version>
+    <AssemblyVersion>1.0.9</AssemblyVersion>
+    <FileVersion>1.0.9</FileVersion>
+    <Version>1.0.9</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

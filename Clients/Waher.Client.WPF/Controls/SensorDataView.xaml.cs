@@ -377,7 +377,7 @@ namespace Waher.Client.WPF.Controls
 
 				switch (E.LocalName)
 				{
-					case "fields":
+					case "resp":
 						Tuple<List<Field>, List<ThingError>> Response = SensorClient.ParseFields(E, out bool Done);
 
 						if (Response.Item1 != null)

@@ -3,17 +3,16 @@
 		   targetNamespace="http://waher.se/Schema/SensorData.xsd"
 		   elementFormDefault="qualified"
 		   xmlns="http://waher.se/Schema/SensorData.xsd"
-		   xmlns:sd="urn:xmpp:iot:sensordata"
+		   xmlns:sd="urn:ieee:iot:sd:1.0"
 		   xmlns:mstns="http://waher.se/Schema/SensorData.xsd"
 		   xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-	<xs:import namespace="urn:xmpp:iot:sensordata"/>
+	<xs:import namespace="urn:ieee:iot:sd:1.0"/>
 	
 	<xs:element name="SensorData">
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element ref="sd:fields" minOccurs="0" maxOccurs="1"/>
-				<xs:element ref="sd:failure" minOccurs="0" maxOccurs="1"/>
+				<xs:element ref="sd:resp" minOccurs="0" maxOccurs="1"/>
 			</xs:sequence>
 			<xs:attribute name="state" type="xs:string" use="optional"/>
 			<xs:attribute name="nodesOk" type="xs:nonNegativeInteger" use="optional" default="0"/>

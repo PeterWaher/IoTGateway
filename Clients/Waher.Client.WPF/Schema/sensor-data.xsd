@@ -1,259 +1,620 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<!-- 
-© XMPP Standards Foundation, 2013-2015
-Author: Peter Waher 
--->
 <xs:schema
     xmlns:xs='http://www.w3.org/2001/XMLSchema'
-    targetNamespace='urn:xmpp:iot:sensordata'
-    xmlns='urn:xmpp:iot:sensordata'
+    targetNamespace='urn:ieee:iot:sd:1.0'
+    xmlns='urn:ieee:iot:sd:1.0'
     elementFormDefault='qualified'>
- 
-	<xs:element name='req'>
-		<xs:complexType>
-			<xs:choice minOccurs='0' maxOccurs='unbounded'>
-				<xs:element name='node'>
-					<xs:complexType>
-						<xs:attribute name='nodeId' type='xs:string' use='required'/>
-						<xs:attribute name='sourceId' type='xs:string' use='optional'/>
-						<xs:attribute name='cacheType' type='xs:string' use='optional'/>
-					</xs:complexType>
-				</xs:element>
-				<xs:element name='field'>
-					<xs:complexType>
-						<xs:attribute name='name' type='xs:string' use='required'/>
-					</xs:complexType>
-				</xs:element>
-			</xs:choice>
-			<xs:attribute name='seqnr' type='xs:int' use='required'/>
-			<xs:attributeGroup ref='fieldTypes'/>
-			<xs:attribute name='all' type='xs:boolean' use='optional' default='false'/>
-			<xs:attribute name='historical' type='xs:boolean' use='optional' default='false'/>
-			<xs:attribute name='from' type='xs:dateTime' use='optional'/>
-			<xs:attribute name='to' type='xs:dateTime' use='optional'/>
-			<xs:attribute name='when' type='xs:dateTime' use='optional'/>
-			<xs:attribute name='serviceToken' type='xs:string' use='optional'/>
-			<xs:attribute name='deviceToken' type='xs:string' use='optional'/>
-			<xs:attribute name='userToken' type='xs:string' use='optional'/>
-		</xs:complexType>
-	</xs:element>
- 
-	<xs:attributeGroup name='fieldTypes'>
-		<xs:attribute name='momentary' type='xs:boolean' use='optional' default='false'/>
-		<xs:attribute name='peak' type='xs:boolean' use='optional' default='false'/>
-		<xs:attribute name='status' type='xs:boolean' use='optional' default='false'/>
-		<xs:attribute name='computed' type='xs:boolean' use='optional' default='false'/>
-		<xs:attribute name='identity' type='xs:boolean' use='optional' default='false'/>
-		<xs:attribute name='historicalSecond' type='xs:boolean' use='optional' default='false'/>
-		<xs:attribute name='historicalMinute' type='xs:boolean' use='optional' default='false'/>
-		<xs:attribute name='historicalHour' type='xs:boolean' use='optional' default='false'/>
-		<xs:attribute name='historicalDay' type='xs:boolean' use='optional' default='false'/>
-		<xs:attribute name='historicalWeek' type='xs:boolean' use='optional' default='false'/>
-		<xs:attribute name='historicalMonth' type='xs:boolean' use='optional' default='false'/>
-		<xs:attribute name='historicalQuarter' type='xs:boolean' use='optional' default='false'/>
-		<xs:attribute name='historicalYear' type='xs:boolean' use='optional' default='false'/>
-		<xs:attribute name='historicalOther' type='xs:boolean' use='optional' default='false'/>
-	</xs:attributeGroup>
- 
-	<xs:element name='accepted'>
-		<xs:complexType>
-			<xs:attribute name='seqnr' type='xs:int' use='required'/>
-			<xs:attribute name='queued' type='xs:boolean' use='optional' default='false'/>
-		</xs:complexType>
-	</xs:element>
- 
-	<xs:element name='started'>
-		<xs:complexType>
-			<xs:attribute name='seqnr' type='xs:int' use='required'/>
-		</xs:complexType>
-	</xs:element>
+
+  <xs:element name='nd'>
+    <xs:annotation>
+      <xs:documentation>Represents a node. This element can be omitted if the device is not divided into nodes.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence minOccurs='0' maxOccurs='unbounded'>
+        <xs:element ref='ts'>
+          <xs:annotation>
+            <xs:documentation>Represents one point in time, when sensor data is available.</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+      </xs:sequence>
+      <xs:attributeGroup ref='nodeIdentity'>
+        <xs:annotation>
+          <xs:documentation>Identity of node, if relevant.</xs:documentation>
+        </xs:annotation>
+      </xs:attributeGroup>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:attributeGroup name='nodeIdentity'>
+    <xs:annotation>
+      <xs:documentation>Defines attributes for the identification of a node in a device.</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name='id' type='xs:string' use='optional'>
+      <xs:annotation>
+        <xs:documentation>Node identity. (Required)</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name='src' type='xs:string' use='optional'>
+      <xs:annotation>
+        <xs:documentation>Source identity. (Optional. Scopes the node identity.)</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name='pt' type='xs:string' use='optional'>
+      <xs:annotation>
+        <xs:documentation>Source partition. (Optional. Scopes the node identity, within a source.)</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+
+  <xs:element name='ts'>
+    <xs:annotation>
+      <xs:documentation>Represents a timestamp. This element can be omitted, if the device only reports current values.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:choice minOccurs='0' maxOccurs='unbounded'>
+        <xs:element ref='b'/>
+        <xs:element ref='d'/>
+        <xs:element ref='dt'/>
+        <xs:element ref='dr'/>
+        <xs:element ref='e'/>
+        <xs:element ref='i'/>
+        <xs:element ref='l'/>
+        <xs:element ref='q'/>
+        <xs:element ref='s'/>
+        <xs:element ref='t'/>
+        <xs:element ref='err'/>
+      </xs:choice>
+      <xs:attribute name='v' type='xs:dateTime' use='required'/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:attributeGroup name='category'>
+    <xs:annotation>
+      <xs:documentation>Combinable attributes defining the category of a field or a set of fields.</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name='m' type='xs:boolean' use='optional' default='false'>
+      <xs:annotation>
+        <xs:documentation>If the field represents a momentary value.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name='p' type='xs:boolean' use='optional' default='false'>
+      <xs:annotation>
+        <xs:documentation>If the field represents a peak value.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name='s' type='xs:boolean' use='optional' default='false'>
+      <xs:annotation>
+        <xs:documentation>If the field represents a status value.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name='c' type='xs:boolean' use='optional' default='false'>
+      <xs:annotation>
+        <xs:documentation>If the field represents a computed value.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name='i' type='xs:boolean' use='optional' default='false'>
+      <xs:annotation>
+        <xs:documentation>If the field represents an indentity value.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name='h' type='xs:boolean' use='optional' default='false'>
+      <xs:annotation>
+        <xs:documentation>If the field represents a historical value.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+
+  <xs:complexType name='field' abstract='true'>
+    <xs:annotation>
+      <xs:documentation>Base type for all data-carrying fields.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name='x' minOccurs='0' maxOccurs='1'>
+        <xs:annotation>
+          <xs:documentation>The optional x element can be used to extend the annotation of the field using custom features.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:choice>
+            <xs:any namespace='##any' minOccurs='0' maxOccurs='unbounded'>
+              <xs:annotation>
+                <xs:documentation>Any child elements can be added to the x element.</xs:documentation>
+                <xs:documentation>Only fully qualified elements (i.e. using a namespace) that have been approved by a standards group can be used for interoperable features.</xs:documentation>
+              </xs:annotation>
+            </xs:any>
+          </xs:choice>
+          <xs:anyAttribute namespace='##any'>
+            <xs:annotation>
+              <xs:documentation>Annotation of fields can be done using any attribute on the x element.</xs:documentation>
+              <xs:documentation>Only fully qualified attributes (i.e. using a namespace) that have been approved by a standards group can be used for interoperable features.</xs:documentation>
+            </xs:annotation>
+          </xs:anyAttribute>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="n" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>Name of the field.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attributeGroup ref='category'>
+      <xs:annotation>
+        <xs:documentation>Field category, defined as a set of attributes.</xs:documentation>
+      </xs:annotation>
+    </xs:attributeGroup>
+    <xs:attributeGroup ref='qos'>
+      <xs:annotation>
+        <xs:documentation>Quality of Service level for the field.</xs:documentation>
+      </xs:annotation>
+    </xs:attributeGroup>
+    <xs:attribute name="lns" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Localization namespace. Defines under what namespace localization IDs are defined.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="loc" type="Localization" use="optional">
+      <xs:annotation>
+        <xs:documentation>Localization information.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="ctr" type="xs:boolean" use="optional">
+      <xs:annotation>
+        <xs:documentation>If the field has a corresponding control parameter with the same name.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:simpleType name="Localization">
+    <xs:annotation>
+      <xs:documentation>Formatting of localization informaton.</xs:documentation>
+      <xs:documentation>Localization information is divided into steps. The steps are delimited by commas ','.</xs:documentation>
+      <xs:documentation>Each step can be of the form: 'ID', 'ID|NS' or 'ID|NS|SEED', where ID is a positive integer representing a localized string.</xs:documentation>
+      <xs:documentation>NS represents a namespace under which the ID is defined. If empty, the default namespace defined in the lns attribute will be used.</xs:documentation>
+      <xs:documentation>SEED is a seed value, that can be used to seed the localization string.</xs:documentation>
+      <xs:documentation>'%0%' in localized strings will be replaced by the previous step in the localization sequence.</xs:documentation>
+      <xs:documentation>'%1%' in localized strings will be replaced by the seed value.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:pattern value="^\d+([|][^,]*){0,2}(,\d+([|][^,]*){0,2})*$"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:attributeGroup name='qos'>
+    <xs:attribute name='ms' type='xs:boolean' use='optional' default='false'>
+      <xs:annotation>
+        <xs:documentation>Value is missing.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name='pr' type='xs:boolean' use='optional' default='false'>
+      <xs:annotation>
+        <xs:documentation>Value is in the progress of being calculated.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name='ae' type='xs:boolean' use='optional' default='false'>
+      <xs:annotation>
+        <xs:documentation>Value is an automated estimate.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name='me' type='xs:boolean' use='optional' default='false'>
+      <xs:annotation>
+        <xs:documentation>Value is a manual estimate.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name='mr' type='xs:boolean' use='optional' default='false'>
+      <xs:annotation>
+        <xs:documentation>Value is the result of a manual readout.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name='ar' type='xs:boolean' use='optional' default='false'>
+      <xs:annotation>
+        <xs:documentation>Value is the result of an automatic readout.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name='of' type='xs:boolean' use='optional' default='false'>
+      <xs:annotation>
+        <xs:documentation>The internal clock is offset more than an allowed value.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name='w' type='xs:boolean' use='optional' default='false'>
+      <xs:annotation>
+        <xs:documentation>A warning has been logged, related to the value.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name='er' type='xs:boolean' use='optional' default='false'>
+      <xs:annotation>
+        <xs:documentation>An error has been logged, related to the value.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name='so' type='xs:boolean' use='optional' default='false'>
+      <xs:annotation>
+        <xs:documentation>The value has been signed by an operator.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name='iv' type='xs:boolean' use='optional' default='false'>
+      <xs:annotation>
+        <xs:documentation>The value has been used for the creation of an invoice.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name='eos' type='xs:boolean' use='optional' default='false'>
+      <xs:annotation>
+        <xs:documentation>The value represents the last of a series of values.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name='pf' type='xs:boolean' use='optional' default='false'>
+      <xs:annotation>
+        <xs:documentation>Power failure has been registered, concerning the value.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name='ic' type='xs:boolean' use='optional' default='false'>
+      <xs:annotation>
+        <xs:documentation>The invoice created on the basis of the value, has been confirmed.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+
+  <xs:element name='q'>
+    <xs:annotation>
+      <xs:documentation>Represents a physical quantity.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base='field'>
+          <xs:attribute name="v" type="xs:double" use="required">
+            <xs:annotation>
+              <xs:documentation>Value of the physical quantity. Precision is given by the number of decimal digits.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute name="u" type="xs:string" use="optional">
+            <xs:annotation>
+              <xs:documentation>Optional unit string.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name='s'>
+    <xs:annotation>
+      <xs:documentation>Represents a string-valued field.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base='field'>
+          <xs:attribute name="v" type="xs:string" use="required">
+            <xs:annotation>
+              <xs:documentation>String value.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="b">
+    <xs:annotation>
+      <xs:documentation>Represents a boolean-valued field.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base='field'>
+          <xs:attribute name="v" type="xs:boolean" use="required">
+            <xs:annotation>
+              <xs:documentation>Boolean value.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="d">
+    <xs:annotation>
+      <xs:documentation>Represents a date-valued field.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base='field'>
+          <xs:attribute name="v" type="xs:date" use="required">
+            <xs:annotation>
+              <xs:documentation>Date value.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="dt">
+    <xs:annotation>
+      <xs:documentation>Represents a date and time-valued field.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base='field'>
+          <xs:attribute name="v" type="xs:dateTime" use="required">
+            <xs:annotation>
+              <xs:documentation>Date and time value.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="dr">
+    <xs:annotation>
+      <xs:documentation>Represents a duration-valued field.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base='field'>
+          <xs:attribute name="v" type="xs:duration" use="required">
+            <xs:annotation>
+              <xs:documentation>Duration value.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="e">
+    <xs:annotation>
+      <xs:documentation>Represents an enumeration field.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base='field'>
+          <xs:attribute name="v" type="xs:string" use="required">
+            <xs:annotation>
+              <xs:documentation>Enumeration value.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute name="t" type="xs:string" use="required">
+            <xs:annotation>
+              <xs:documentation>Enumeration type.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="i">
+    <xs:annotation>
+      <xs:documentation>Represents a 32-bit signed integer-valued field.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base='field'>
+          <xs:attribute name="v" type="xs:int" use="required">
+            <xs:annotation>
+              <xs:documentation>32-bit signed integer value.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="l">
+    <xs:annotation>
+      <xs:documentation>Represents a 64-bit signed integer-valued field.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base='field'>
+          <xs:attribute name="v" type="xs:long" use="required">
+            <xs:annotation>
+              <xs:documentation>64-bit signed integer value.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="t">
+    <xs:annotation>
+      <xs:documentation>Represents a time-valued field.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base='field'>
+          <xs:attribute name="v" type="xs:time" use="required">
+            <xs:annotation>
+              <xs:documentation>Time value.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="err">
+    <xs:annotation>
+      <xs:documentation>Represents an error that occurred during processing of the request.</xs:documentation>
+    </xs:annotation>
+    <xs:simpleType>
+      <xs:restriction base="xs:string"/>
+    </xs:simpleType>
+  </xs:element>
+
+
+  <xs:element name='req'>
+    <xs:annotation>
+      <xs:documentation>Defines a request for sensor data.</xs:documentation>
+      <xs:documentation>This element is sent in an iq get stanza.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:choice minOccurs='0' maxOccurs='unbounded'>
+        <xs:element name='nd'>
+          <xs:annotation>
+            <xs:documentation>Defines a node restriction of the request.</xs:documentation>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:attributeGroup ref='nodeIdentity'>
+              <xs:annotation>
+                <xs:documentation>Identity of node.</xs:documentation>
+              </xs:annotation>
+            </xs:attributeGroup>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name='f'>
+          <xs:annotation>
+            <xs:documentation>Defines a field restriction of the request.</xs:documentation>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:attribute name='n' type='xs:string' use='required'>
+              <xs:annotation>
+                <xs:documentation>Field name.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+      <xs:attribute name='id' type='xs:string' use='required'>
+        <xs:annotation>
+          <xs:documentation>Identity of request. Is used to match response messages to the original request.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attributeGroup ref='category'>
+        <xs:annotation>
+          <xs:documentation>Categories of fields requested.</xs:documentation>
+        </xs:annotation>
+      </xs:attributeGroup>
+      <xs:attribute name='all' type='xs:boolean' use='optional' default='false'>
+        <xs:annotation>
+          <xs:documentation>Field used to request all categories of fields.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name='from' type='xs:dateTime' use='optional'>
+        <xs:annotation>
+          <xs:documentation>The earliest timestamp requested.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name='to' type='xs:dateTime' use='optional'>
+        <xs:annotation>
+          <xs:documentation>The latest timestamp requested.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name='when' type='xs:dateTime' use='optional'>
+        <xs:annotation>
+          <xs:documentation>When the request is desired to be executed.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name='st' type='xs:string' use='optional'>
+        <xs:annotation>
+          <xs:documentation>Service token, identifying the service generating the original request.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name='dt' type='xs:string' use='optional'>
+        <xs:annotation>
+          <xs:documentation>Device token, identifying the device generating the original request.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name='ut' type='xs:string' use='optional'>
+        <xs:annotation>
+          <xs:documentation>User token, identifying the user generating the original request.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:complexType name='reqref' abstract='true'>
+    <xs:annotation>
+      <xs:documentation>Base type of all elements referring to a request.</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name='id' type='xs:string' use='required'>
+      <xs:annotation>
+        <xs:documentation>Identity of request. Is used to match response messages to the original request.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:element name='accepted'>
+    <xs:annotation>
+      <xs:documentation>Request has been accepted. Response will be sent asynchronously using asynchronous messages.</xs:documentation>
+      <xs:documentation>This element can be returned in an iq result stanza.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base='reqref'>
+          <xs:attribute name='queued' type='xs:boolean' use='optional' default='false'>
+            <xs:annotation>
+              <xs:documentation>If the request has been queued for later processing.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name='started'>
+    <xs:annotation>
+      <xs:documentation>Processing of request has been started. Response will be sent asynchronously using asynchronous messages.</xs:documentation>
+      <xs:documentation>This element can be returned in an iq result stanza, or as an asynchronous message, if the accepted element was returned as a result.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base='reqref'/>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name='resp'>
+    <xs:annotation>
+      <xs:documentation>Contains sensor data response, in response to a request.</xs:documentation>
+      <xs:documentation>This element can be returned in an iq result stanza, or as an asynchronous message, if the accepted element was returned as a result.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base='reqref'>
+          <xs:choice minOccurs='1' maxOccurs='1'>
+            <xs:element ref='nd' minOccurs='0' maxOccurs='unbounded'>
+              <xs:annotation>
+                <xs:documentation>If sensor data is being reported from a node in the device.</xs:documentation>
+              </xs:annotation>
+            </xs:element>
+            <xs:element ref='ts' minOccurs='0' maxOccurs='unbounded'>
+              <xs:annotation>
+                <xs:documentation>If sensor data is being reported from a device that is not divided into nodes.</xs:documentation>
+              </xs:annotation>
+            </xs:element>
+          </xs:choice>
+          <xs:attribute name='more' type='xs:boolean' use='optional' default='false'>
+            <xs:annotation>
+              <xs:documentation>If more data is pending for the corresponding request.</xs:documentation>
+              <xs:documentation> If attribute value is omitted, or false, response is considered to be complete.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
 
   <xs:element name='cancel'>
+    <xs:annotation>
+      <xs:documentation>Cancel a request.</xs:documentation>
+      <xs:documentation>This element is sent in an iq set stanza.</xs:documentation>
+    </xs:annotation>
     <xs:complexType>
-      <xs:attribute name='seqnr' type='xs:int' use='required'/>
+      <xs:complexContent>
+        <xs:extension base='reqref'/>
+      </xs:complexContent>
     </xs:complexType>
   </xs:element>
 
-  <xs:element name='cancelled'>
+  <xs:element name='done'>
+    <xs:annotation>
+      <xs:documentation>Request has been completed</xs:documentation>
+      <xs:documentation>This element is sent as an asynchronous message, since a response has already been returned.</xs:documentation>
+    </xs:annotation>
     <xs:complexType>
-      <xs:attribute name='seqnr' type='xs:int' use='required'/>
+      <xs:complexContent>
+        <xs:extension base='reqref'/>
+      </xs:complexContent>
     </xs:complexType>
   </xs:element>
 
-  <xs:element name='fields'>
-		<xs:complexType>
-			<xs:sequence minOccurs='0' maxOccurs='unbounded'>
-				<xs:element name='node'>
-					<xs:complexType>
-						<xs:sequence minOccurs='0' maxOccurs='unbounded'>
-							<xs:element name='timestamp'>
-								<xs:complexType>
-									<xs:choice minOccurs='0' maxOccurs='unbounded'>
-										<xs:element name='boolean' type='boolean'/>
-										<xs:element name='date' type='date'/>
-										<xs:element name='dateTime' type='dateTime'/>
-										<xs:element name='duration' type='duration'/>
-										<xs:element name='enum' type='enum'/>
-										<xs:element name='int' type='int'/>
-										<xs:element name='long' type='long'/>
-										<xs:element name='numeric' type='numeric'/>
-										<xs:element name='string' type='string'/>
-										<xs:element name='time' type='time'/>
-									</xs:choice>
-									<xs:attribute name='value' type='xs:dateTime' use='required'/>
-								</xs:complexType>
-							</xs:element>
-						</xs:sequence>
-						<xs:attribute name='nodeId' type='xs:string' use='required'/>
-						<xs:attribute name='sourceId' type='xs:string' use='optional'/>
-						<xs:attribute name='cacheType' type='xs:string' use='optional'/>
-					</xs:complexType>
-				</xs:element>
-			</xs:sequence>
-			<xs:attribute name='seqnr' type='xs:int' use='required'/>
-			<xs:attribute name='done' type='xs:boolean' use='optional' default='false'/>
-		</xs:complexType>
-	</xs:element>
- 
-	<xs:element name='failure'>
-		<xs:complexType>
-			<xs:sequence minOccurs='0' maxOccurs='unbounded'>
-				<xs:element name='error'>
-					<xs:complexType>
-						<xs:simpleContent>
-							<xs:extension base='xs:string'>
-								<xs:attribute name='nodeId' type='xs:string' use='required'/>
-								<xs:attribute name='sourceId' type='xs:string' use='optional'/>
-								<xs:attribute name='cacheType' type='xs:string' use='optional'/>
-								<xs:attribute name='timestamp' type='xs:string' use='required'/>
-							</xs:extension>
-						</xs:simpleContent>
-					</xs:complexType>
-				</xs:element>
-			</xs:sequence>
-			<xs:attribute name='seqnr' type='xs:int' use='required'/>
-			<xs:attribute name='done' type='xs:boolean' use='optional' default='false'/>
-		</xs:complexType>
-	</xs:element>
- 
-	<xs:element name='done'>
-		<xs:complexType>
-			<xs:attribute name='seqnr' type='xs:int' use='required'/>
-		</xs:complexType>
-	</xs:element>
- 
-	<xs:complexType name='field' abstract='true'>
-		<xs:attribute name="name" type="xs:string" use="required"/>
-		<xs:attributeGroup ref='fieldTypes'/>
-		<xs:attributeGroup ref='fieldQoS'/>
-		<xs:attribute name="module" type="xs:string" use="optional"/>
-		<xs:attribute name="stringIds" type="StringIds" use="optional"/>
-		<xs:attribute name="writable" type="xs:boolean" use="optional"/>
-	</xs:complexType>
- 
-	<xs:simpleType name="StringIds">
-		<xs:restriction base="xs:string">
-			<xs:pattern value="^\d+([|]\w+([.]\w+)*([|][^,]*)?)?(,\d+([|]\w+([.]\w+)*([|][^,]*)?)?)*$"/>
-		</xs:restriction>
-	</xs:simpleType>
- 
-	<xs:attributeGroup name='fieldQoS'>
-		<xs:attribute name='missing' type='xs:boolean' use='optional' default='false'/>
-		<xs:attribute name='inProgress' type='xs:boolean' use='optional' default='false'/>
-		<xs:attribute name='automaticEstimate' type='xs:boolean' use='optional' default='false'/>
-		<xs:attribute name='manualEstimate' type='xs:boolean' use='optional' default='false'/>
-		<xs:attribute name='manualReadout' type='xs:boolean' use='optional' default='false'/>
-		<xs:attribute name='automaticReadout' type='xs:boolean' use='optional' default='false'/>
-		<xs:attribute name='timeOffset' type='xs:boolean' use='optional' default='false'/>
-		<xs:attribute name='warning' type='xs:boolean' use='optional' default='false'/>
-		<xs:attribute name='error' type='xs:boolean' use='optional' default='false'/>
-		<xs:attribute name='signed' type='xs:boolean' use='optional' default='false'/>
-		<xs:attribute name='invoiced' type='xs:boolean' use='optional' default='false'/>
-		<xs:attribute name='endOfSeries' type='xs:boolean' use='optional' default='false'/>
-		<xs:attribute name='powerFailure' type='xs:boolean' use='optional' default='false'/>
-		<xs:attribute name='invoiceConfirmed' type='xs:boolean' use='optional' default='false'/>
-	</xs:attributeGroup>
- 
-	<xs:complexType name='numeric'>
-		<xs:complexContent>
-			<xs:extension base='field'>
-				<xs:attribute name="value" type="xs:double" use="required"/>
-				<xs:attribute name="unit" type="xs:string" use="required"/>
-			</xs:extension>
-		</xs:complexContent>
-	</xs:complexType>
- 
-	<xs:complexType name='string'>
-		<xs:complexContent>
-			<xs:extension base='field'>
-				<xs:attribute name="value" type="xs:string" use="required"/>
-			</xs:extension>
-		</xs:complexContent>
-	</xs:complexType>
- 
-	<xs:complexType name='boolean'>
-		<xs:complexContent>
-			<xs:extension base='field'>
-				<xs:attribute name="value" type="xs:boolean" use="required"/>
-			</xs:extension>
-		</xs:complexContent>
-	</xs:complexType>
- 
-	<xs:complexType name='date'>
-		<xs:complexContent>
-			<xs:extension base='field'>
-				<xs:attribute name="value" type="xs:date" use="required"/>
-			</xs:extension>
-		</xs:complexContent>
-	</xs:complexType>
- 
-	<xs:complexType name='dateTime'>
-		<xs:complexContent>
-			<xs:extension base='field'>
-				<xs:attribute name="value" type="xs:dateTime" use="required"/>
-			</xs:extension>
-		</xs:complexContent>
-	</xs:complexType>
- 
-	<xs:complexType name='duration'>
-		<xs:complexContent>
-			<xs:extension base='field'>
-				<xs:attribute name="value" type="xs:duration" use="required"/>
-			</xs:extension>
-		</xs:complexContent>
-	</xs:complexType>
- 
-	<xs:complexType name='enum'>
-		<xs:complexContent>
-			<xs:extension base='field'>
-				<xs:attribute name="value" type="xs:string" use="required"/>
-				<xs:attribute name="dataType" type="xs:string" use="required"/>
-			</xs:extension>
-		</xs:complexContent>
-	</xs:complexType>
- 
-	<xs:complexType name='int'>
-		<xs:complexContent>
-			<xs:extension base='field'>
-				<xs:attribute name="value" type="xs:int" use="required"/>
-			</xs:extension>
-		</xs:complexContent>
-	</xs:complexType>
- 
-	<xs:complexType name='long'>
-		<xs:complexContent>
-			<xs:extension base='field'>
-				<xs:attribute name="value" type="xs:long" use="required"/>
-			</xs:extension>
-		</xs:complexContent>
-	</xs:complexType>
- 
-	<xs:complexType name='time'>
-		<xs:complexContent>
-			<xs:extension base='field'>
-				<xs:attribute name="value" type="xs:time" use="required"/>
-			</xs:extension>
-		</xs:complexContent>
-	</xs:complexType>
- 
 </xs:schema>

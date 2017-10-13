@@ -96,6 +96,9 @@ HTTP Server
 	- XML -> HTML (via länkade XSLT)
 	- XML -> HTML via pluggbara gränssnitt som känner igen rotnamn + namespace.
 		- XMPP X-forms -> HTML-formulär
+	- POST till Markdown-sidor
+		- Decoded content i sessions-variabel.
+		- Processing i inbäddade script.
 
 Content
 	- XML

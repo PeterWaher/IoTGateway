@@ -4034,6 +4034,7 @@ namespace Waher.Content.Markdown
 						case "SCRIPT":
 						case "STRICT-TRANSPORT-SECURITY":
 						case "SUBTITLE":
+						case "SUNSET":
 						case "TITLE":
 						case "USERVARIABLE":
 						case "VARY":

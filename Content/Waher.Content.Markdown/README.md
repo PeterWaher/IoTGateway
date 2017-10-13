@@ -144,11 +144,12 @@ The following meta-data tags are transparently mapped to HTTP response headers w
 
 | Key                         | Description                                                                                                |
 |:----------------------------|:-----------------------------------------------------------------------------------------------------------|
-| Access-Control-Allow-Origin | Allows you to define a Cross-origin resource charing (CORS) header.
+| Access-Control-Allow-Origin | Allows you to define a Cross-origin resource charing (CORS) header.                                        |
 | Cache-Control               | HTTP Cache-Control header field.                                                                           |
-| Content-Security-Policy	  | Allows web clients to know what the expected behaviour of the page is.
-| Public-Key-Pins             | Tells web clients to pin a specific public key with the site, to decrease the risk of MITM attacks.
-| Strict-Transport-Security	  | Forces clients to connect to the site using a secure connection.
+| Content-Security-Policy	  | Allows web clients to know what the expected behaviour of the page is.                                     |
+| Public-Key-Pins             | Tells web clients to pin a specific public key with the site, to decrease the risk of MITM attacks.        |
+| Strict-Transport-Security	  | Forces clients to connect to the site using a secure connection.                                           |
+| Sunset                      | HTTP Sunset header field.                                                                                  |
 | Vary                        | HTTP Vary header field.                                                                                    |
 
 

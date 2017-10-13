@@ -278,6 +278,7 @@ namespace Waher.Content.Markdown.Web
 					this.CopyHttpHeader("Content-Security-Policy", Doc, Response);
 					this.CopyHttpHeader("Public-Key-Pins", Doc, Response);
 					this.CopyHttpHeader("Strict-Transport-Security", Doc, Response);
+					this.CopyHttpHeader("Sunset", Doc, Response);
 					this.CopyHttpHeader("Vary", Doc, Response);
 				}
 			}

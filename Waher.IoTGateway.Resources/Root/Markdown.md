@@ -1345,6 +1345,11 @@ Tells web clients to [pin a specific public key](https://tools.ietf.org/html/rfc
 
 [HTTP Strict Transport Security (HSTS)](https://tools.ietf.org/html/rfc6797) forces clients to connect to the site using a secure connection.
 
+### Sunset
+
+[HTTP Sunset Header](https://tools.ietf.org/html/draft-wilde-sunset-header) allows you to flag content for removal at a future point in time.
+It allows clients to prepare.
+
 ### Vary
 
 The value of this tag will be used when returning the document over an HTTP interface. The value will be literally used as a `Vary`

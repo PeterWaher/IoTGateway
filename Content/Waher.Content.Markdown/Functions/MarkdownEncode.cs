@@ -51,12 +51,18 @@ namespace Waher.Content.Markdown.Functions
 		/// <returns>Escaped text.</returns>
 		public static string EscapeText(string PlainText)
 		{
-			return CommonTypes.Escape(PlainText, specialCharacters, "\\");
+			return CommonTypes.Escape(PlainText, specialCharacters, specialCharactersEncoded);
 		}
 
 		private static readonly char[] specialCharacters = new char[]
 		{
-			'*', '_', '~', '\\', '`', '{', '}', '[', ']', '(', ')', '<', '>', '#', '+', '-', '.', '!', '"', '^', '%', '=', ':', '|'
+			'*', '_', '~', '\\', '`', '{', '}', '[', ']', '(', ')', '<', '>', '&', '#', '+', '-', '.', '!', '\'', '^', '%', '=', ':', '|'
+		};
+
+		private static readonly string[] specialCharactersEncoded = new string[]
+		{
+			"\\*", "\\_", "\\~", "\\\\", "\\`", "\\{", "\\}", "\\[", "\\]", "\\(", "\\)", "\\<", "\\>", "\\&",
+			"\\#", "\\+", "\\-", "\\.", "\\!", "\\\"", "\\^", "\\%", "\\=", "\\:", "&#124;"
 		};
 
 	}

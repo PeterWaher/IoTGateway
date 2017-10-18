@@ -1041,6 +1041,68 @@ The following functions are available in the `Waher.Content.Markdown` library.
 
 =========================================================================================================================================================
 
+Interaction with .NET Code Behind classes
+--------------------------------------------
+
+Script can interact with .NET code running in the background. There are different methods to do this:
+
+#. Referencing namespaces and types.
+#. Calling static methods on types.
+#. Creating objects.
+#. Calling methods or accessing fields or properties on .NET objects.
+
+### Referencing namespaces and types
+
+Root namespaces recognized by the type inventory are available through normal variable references:
+
+	System
+
+Sub-namespaces are accessed through the member operator `.`:
+
+	System.Collections.Generic
+
+Types in namespaces are referenced through the member operator `.` on its namespace:
+
+	System.Guid;
+	System.Collections.Generic.List
+
+Namespaces and types are values, and can be assigned to variables:
+
+	S:=System;
+	CG:=System.Collections.Generic;
+	T:=CG.List;
+
+### Calling static methods on types
+
+Static methods on types are available as method calls using the member operator `.`. Parameters in method calls can be included as parameters in the normal fashion:
+
+	ID1:=System.Guid.NewGuid();
+	System.Text.Encoding.UTF8.GetBytes(ID1.ToString())
+
+### Creating objects
+
+You can create objects using the `Create` function. The first parameter contains the class of the object you want to create. The following arguments
+contain any (optional) arguments you want to pass on to the constructor:
+
+	Create(System.String,"*",10)
+
+If the type is generic, type parameters must also be passed:
+
+	L:=Create(System.Collections.Generic.List,System.String)
+
+### Calling methods or accessing fields or properties on .NET objects
+
+You can call methods and access fields and properties on an object, using the member operator `.`:
+
+	L:=Create(System.Collections.Generic.List,System.String);
+	L.Add("Hello");
+	L.Add(" ");
+	L.Add("World!");
+	n:=L.Count;
+	L.ToArray();
+
+=========================================================================================================================================================
+
 Physical Quantities
 -----------------------
 

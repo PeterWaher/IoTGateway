@@ -21,6 +21,10 @@ namespace Waher.Utility.Install
 	/// -d APP_DATA_FOLDER   Points to the application data folder.
 	/// -s SERVER_EXE        Points to the executable file of the IoT Gateway.
 	/// -v                   Verbose mode.
+	/// -i                   Install. This the default. Switch not required.
+	/// -u                   Uninstall. Add this switch if the module is being uninstalled.
+	/// -r                   Remove files. Add this switch if you want files removed during
+	///                      uninstalltion. Default is to not remove files.
 	/// </summary>
 	class Program
 	{
@@ -36,6 +40,8 @@ namespace Waher.Utility.Install
 				string s;
 				bool Help = false;
 				bool Verbose = false;
+				bool UninstallService = false;
+				bool RemoveFiles = false;
 
 				while (i < c)
 				{
@@ -73,6 +79,18 @@ namespace Waher.Utility.Install
 								throw new Exception("Only one server application allowed.");
 							break;
 
+						case "-i":
+							UninstallService = false;
+							break;
+
+						case "-u":
+							UninstallService = true;
+							break;
+
+						case "-r":
+							RemoveFiles = true;
+							break;
+
 						case "-v":
 							Verbose = true;
 							break;
@@ -92,13 +110,20 @@ namespace Waher.Utility.Install
 					Console.Out.WriteLine("-d APP_DATA_FOLDER   Points to the application data folder.");
 					Console.Out.WriteLine("-s SERVER_EXE        Points to the executable file of the IoT Gateway.");
 					Console.Out.WriteLine("-v                   Verbose mode.");
+					Console.Out.WriteLine("-i                   Install. This the default. Switch not required.");
+					Console.Out.WriteLine("-u                   Uninstall. Add this switch if the module is being uninstalled.");
+					Console.Out.WriteLine("-r                   Remove files. Add this switch if you want files removed during");
+					Console.Out.WriteLine("                     uninstalltion. Default is to not remove files.");
 					return 0;
 				}
 
 				if (Verbose)
 					Log.Register(new Waher.Events.Console.ConsoleEventSink());
 
-				Install(ManifestFile, ServerApplication, ProgramDataFolder);
+				if (UninstallService)
+					Uninstall(ManifestFile, ServerApplication, ProgramDataFolder, RemoveFiles);
+				else
+					Install(ManifestFile, ServerApplication, ProgramDataFolder);
 
 				return 0;
 			}
@@ -173,6 +198,9 @@ namespace Waher.Utility.Install
 			string SourceFolder = Path.GetDirectoryName(ManifestFile);
 			string AppFolder = Path.GetDirectoryName(ServerApplication);
 
+			string DestManifestFileName = Path.Combine(AppFolder, Path.GetFileName(ManifestFile));
+			CopyFileIfNewer(ManifestFile, DestManifestFileName, false);
+
 			Log.Informational("Source folder: " + SourceFolder);
 			Log.Informational("App folder: " + AppFolder);
 
@@ -245,11 +273,11 @@ namespace Waher.Utility.Install
 						}
 
 						Libraries[AN.Name + "/" + AN.Version.ToString()] = new Dictionary<string, object>()
-								{
-									{ "type", "project" },
-									{ "serviceable", false },
-									{ "sha512", string.Empty }
-								};
+							{
+								{ "type", "project" },
+								{ "serviceable", false },
+								{ "sha512", string.Empty }
+							};
 					}
 
 				}
@@ -339,6 +367,148 @@ namespace Waher.Utility.Install
 					}
 				}
 			}
+		}
+
+		private static void Uninstall(string ManifestFile, string ServerApplication, string ProgramDataFolder, bool Remove)
+		{
+			// Same code as for custom action InstallManifest in Waher.IoTGateway.Installers
+
+			if (string.IsNullOrEmpty(ManifestFile))
+				throw new Exception("Missing manifest file.");
+
+			if (string.IsNullOrEmpty(ServerApplication))
+				throw new Exception("Missing server application.");
+
+			if (string.IsNullOrEmpty(ProgramDataFolder))
+			{
+				ProgramDataFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "IoT Gateway");
+				Log.Informational("Using default program data folder: " + ProgramDataFolder);
+			}
+
+			if (!File.Exists(ServerApplication))
+				throw new Exception("Server application not found: " + ServerApplication);
+
+			Log.Informational("Getting assembly name of server.");
+			AssemblyName ServerName = AssemblyName.GetAssemblyName(ServerApplication);
+			Log.Informational("Server assembly name: " + ServerName.ToString());
+
+			string DepsJsonFileName;
+
+			int i = ServerApplication.LastIndexOf('.');
+			if (i < 0)
+				DepsJsonFileName = ServerApplication;
+			else
+				DepsJsonFileName = ServerApplication.Substring(0, i);
+
+			DepsJsonFileName += ".deps.json";
+
+			Log.Informational("deps.json file name: " + DepsJsonFileName);
+
+			if (!File.Exists(DepsJsonFileName))
+				throw new Exception("Invalid server executable. No corresponding deps.json file found.");
+
+			Log.Informational("Opening " + DepsJsonFileName);
+
+			string s = File.ReadAllText(DepsJsonFileName);
+
+			Log.Informational("Parsing " + DepsJsonFileName);
+
+			Dictionary<string, object> Deps = JSON.Parse(s) as Dictionary<string, object>;
+			if (Deps == null)
+				throw new Exception("Invalid deps.json file. Unable to install.");
+
+			Log.Informational("Loading manifest file.");
+
+			XmlDocument Manifest = new XmlDocument();
+			Manifest.Load(ManifestFile);
+
+			Log.Informational("Validating manifest file.");
+
+			XmlSchema Schema = XSL.LoadSchema(typeof(Program).Namespace + ".Schema.Manifest.xsd", Assembly.GetExecutingAssembly());
+			XSL.Validate(ManifestFile, Manifest, "Module", "http://waher.se/Schema/ModuleManifest.xsd", Schema);
+
+			XmlElement Module = Manifest["Module"];
+			string AppFolder = Path.GetDirectoryName(ServerApplication);
+
+			Log.Informational("App folder: " + AppFolder);
+
+			foreach (XmlNode N in Module.ChildNodes)
+			{
+				if (N is XmlElement E && E.LocalName == "Assembly")
+				{
+					string FileName = XML.Attribute(E, "fileName");
+					string AppFileName = Path.Combine(AppFolder, FileName);
+
+					Assembly A = Assembly.LoadFrom(AppFileName);
+					AssemblyName AN = A.GetName();
+					string Key = AN.Name + "/" + AN.Version.ToString();
+
+					if (Deps != null && Deps.TryGetValue("targets", out object Obj) && Obj is Dictionary<string, object> Targets)
+					{
+						Targets.Remove(Key);
+
+						foreach (KeyValuePair<string, object> P in Targets)
+						{
+							if (P.Value is Dictionary<string, object> Target)
+							{
+								foreach (KeyValuePair<string, object> P2 in Target)
+								{
+									if (P2.Key.StartsWith(ServerName.Name + "/") &&
+										P2.Value is Dictionary<string, object> App &&
+										App.TryGetValue("dependencies", out object Obj2) &&
+										Obj2 is Dictionary<string, object> Dependencies)
+									{
+										Dependencies.Remove(AN.Name);
+										break;
+									}
+								}
+							}
+						}
+					}
+
+					if (Deps != null && Deps.TryGetValue("libraries", out object Obj3) && Obj3 is Dictionary<string, object> Libraries)
+					{
+						foreach (KeyValuePair<string, object> P in Libraries)
+						{
+							if (P.Key.StartsWith(AN.Name + "/"))
+							{
+								Libraries.Remove(P.Key);
+								break;
+							}
+						}
+					}
+
+					if (Remove)
+					{
+						RemoveFile(AppFileName);
+						if (FileName.EndsWith(".dll", StringComparison.CurrentCultureIgnoreCase))
+						{
+							string PdbFileName = FileName.Substring(0, FileName.Length - 4) + ".pdb";
+							RemoveFile(PdbFileName);
+						}
+					}
+				}
+			}
+
+			Log.Informational("Encoding JSON");
+			s = JSON.Encode(Deps, true);
+
+			Log.Informational("Writing " + DepsJsonFileName);
+			File.WriteAllText(DepsJsonFileName, s, Encoding.UTF8);
+
+			if (Path.GetDirectoryName(ManifestFile) == AppFolder)
+				RemoveFile(ManifestFile);
+		}
+
+		private static bool RemoveFile(string FileName)
+		{
+			if (!File.Exists(FileName))
+				return false;
+
+			Log.Informational("Deleting " + FileName);
+			File.Delete(FileName);
+
+			return true;
 		}
 
 	}

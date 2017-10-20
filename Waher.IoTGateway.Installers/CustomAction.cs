@@ -911,12 +911,86 @@ namespace Waher.IoTGateway.Installers
 					if (P.ExitCode != 0)
 						Session.Log("Uninstallation failed. Exit code: " + P.ExitCode.ToString());
 					else
+					{
+						Session.Log("Service uninstalled.");
+						return ActionResult.Success;
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Session.Log("Unable to uninstall service. Error reported: " + ex.Message);
+			}
+
+			return UninstallService2(Session);
+		}
+
+		public static ActionResult UninstallService2(Session Session)
+		{
+			Session.Log("Uninstalling service (method 2).");
+			try
+			{
+				string InstallDir = Session["INSTALLDIR"];
+
+				if (!InstallDir.EndsWith(new string(Path.DirectorySeparatorChar, 1)))
+					InstallDir += Path.DirectorySeparatorChar;
+
+				Session.Log("Working folder: " + InstallDir);
+
+				ProcessStartInfo ProcessInformation = new ProcessStartInfo()
+				{
+					FileName = "sc.exe",
+					Arguments = "delete \"IoT Gateway Service\"",
+					UseShellExecute = false,
+					RedirectStandardError = true,
+					RedirectStandardOutput = true,
+					WorkingDirectory = InstallDir,
+					CreateNoWindow = true,
+					WindowStyle = ProcessWindowStyle.Hidden
+				};
+
+				Process P = new Process();
+				bool Error = false;
+
+				P.ErrorDataReceived += (sender, e) =>
+				{
+					Error = true;
+					Session.Log("ERROR: " + e.Data);
+				};
+
+				P.Exited += (sender, e) =>
+				{
+					Session.Log("Process exited.");
+				};
+
+				P.OutputDataReceived += (sender, e) =>
+				{
+					Session.Log(e.Data);
+				};
+
+				P.StartInfo = ProcessInformation;
+				P.Start();
+
+				if (!P.WaitForExit(60000) || Error)
+					Session.Log("Timeout. Service did not uninstall properly.");
+				else
+				{
+					if (!P.StandardError.EndOfStream)
+						Session.Log(P.StandardError.ReadToEnd());
+
+					if (!P.StandardOutput.EndOfStream)
+						Session.Log(P.StandardOutput.ReadToEnd());
+
+					if (P.ExitCode != 0)
+						Session.Log("Uninstallation failed. Exit code: " + P.ExitCode.ToString());
+					else
 						Session.Log("Service uninstalled.");
 				}
 			}
 			catch (Exception ex)
 			{
 				Session.Log("Unable to uninstall service. Error reported: " + ex.Message);
+
 			}
 
 			return ActionResult.Success;
@@ -1045,7 +1119,29 @@ namespace Waher.IoTGateway.Installers
 					if (P.ExitCode != 0)
 						Session.Log("Stopping service failed. Exit code: " + P.ExitCode.ToString());
 					else
-						Session.Log("Service stopped.");
+					{
+						DateTime Started = DateTime.Now;
+						bool Stopped;
+
+						Session.Log("Service stop request successful. Checking process has stopped");
+
+						do
+						{
+							using (Semaphore RunningServer = new Semaphore(1, 1, "Waher.IoTGateway.Running"))
+							{
+								Stopped = RunningServer.WaitOne(1000);
+
+								if (Stopped)
+									RunningServer.Release();
+							}
+						}
+						while (!Stopped && (DateTime.Now - Started).TotalSeconds < 30);
+
+						if (Stopped)
+							Session.Log("Service stopped.");
+						else
+							throw new Exception("Service stop procedure seems to take time. Cancelling wait.");
+					}
 				}
 			}
 			catch (Exception ex)
@@ -1424,6 +1520,9 @@ namespace Waher.IoTGateway.Installers
 					using (Semaphore RunningServer = new Semaphore(1, 1, "Waher.IoTGateway.Running"))
 					{
 						Running = !RunningServer.WaitOne(1000);
+
+						if (!Running)
+							RunningServer.Release();
 					}
 
 					if (!Running)
@@ -1488,7 +1587,7 @@ namespace Waher.IoTGateway.Installers
 			Session.Log("Installing module: " + ManifestFile);
 			Session.Log("Server application: " + ServerApplication);
 			Session.Log("Program data folder: " + ProgramDataFolder);
-			
+
 			try
 			{
 				Install(Session, ManifestFile, ServerApplication, ProgramDataFolder);
@@ -1499,6 +1598,39 @@ namespace Waher.IoTGateway.Installers
 				Session.Log(ex.Message);
 				return ActionResult.Failure;
 			}
+		}
+
+		[CustomAction]
+		public static ActionResult StopServiceAndUninstallManifest(Session Session)
+		{
+			ActionResult Result = StopService(Session);
+			if (Result != ActionResult.Success)
+				return Result;
+
+			return UninstallManifest(Session);
+		}
+
+		[CustomAction]
+		public static ActionResult UninstallManifest(Session Session)
+		{
+			string ManifestFile = Path.Combine(Session["INSTALLDIR"], Session["ManifestFile"]);
+			string ServerApplication = Path.Combine(Session["INSTALLDIR"], "Waher.IoTGateway.Svc.dll");
+			string ProgramDataFolder = Session["APPDATADIR"];
+
+			Session.Log("Uninstalling module: " + ManifestFile);
+			Session.Log("Server application: " + ServerApplication);
+			Session.Log("Program data folder: " + ProgramDataFolder);
+
+			try
+			{
+				Uninstall(Session, ManifestFile, ServerApplication, ProgramDataFolder, true);
+			}
+			catch (Exception ex)
+			{
+				Session.Log(ex.Message);
+			}
+
+			return ActionResult.Success;
 		}
 
 		#region From Waher.Utility.Install
@@ -1555,8 +1687,6 @@ namespace Waher.IoTGateway.Installers
 
 			XmlDocument Manifest = new XmlDocument();
 			Manifest.Load(ManifestFile);
-
-			Session.Log("Validating manifest file.");
 
 			XmlElement Module = Manifest["Module"];
 			string SourceFolder = Path.GetDirectoryName(ManifestFile);
@@ -1721,6 +1851,143 @@ namespace Waher.IoTGateway.Installers
 					}
 				}
 			}
+		}
+
+		private static void Uninstall(Session Session, string ManifestFile, string ServerApplication, string ProgramDataFolder, bool Remove)
+		{
+			// Same code as for custom action InstallManifest in Waher.IoTGateway.Installers
+
+			if (string.IsNullOrEmpty(ManifestFile))
+				throw new Exception("Missing manifest file.");
+
+			if (string.IsNullOrEmpty(ServerApplication))
+				throw new Exception("Missing server application.");
+
+			if (string.IsNullOrEmpty(ProgramDataFolder))
+			{
+				ProgramDataFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "IoT Gateway");
+				Session.Log("Using default program data folder: " + ProgramDataFolder);
+			}
+
+			if (!File.Exists(ServerApplication))
+				throw new Exception("Server application not found: " + ServerApplication);
+
+			Session.Log("Getting assembly name of server.");
+			AssemblyName ServerName = AssemblyName.GetAssemblyName(ServerApplication);
+			Session.Log("Server assembly name: " + ServerName.ToString());
+
+			string DepsJsonFileName;
+
+			int i = ServerApplication.LastIndexOf('.');
+			if (i < 0)
+				DepsJsonFileName = ServerApplication;
+			else
+				DepsJsonFileName = ServerApplication.Substring(0, i);
+
+			DepsJsonFileName += ".deps.json";
+
+			Session.Log("deps.json file name: " + DepsJsonFileName);
+
+			if (!File.Exists(DepsJsonFileName))
+				throw new Exception("Invalid server executable. No corresponding deps.json file found.");
+
+			Session.Log("Opening " + DepsJsonFileName);
+
+			string s = File.ReadAllText(DepsJsonFileName);
+
+			Session.Log("Parsing " + DepsJsonFileName);
+
+			Dictionary<string, object> Deps = JSON.Parse(s) as Dictionary<string, object>;
+			if (Deps == null)
+				throw new Exception("Invalid deps.json file. Unable to install.");
+
+			Session.Log("Loading manifest file.");
+
+			XmlDocument Manifest = new XmlDocument();
+			Manifest.Load(ManifestFile);
+
+			XmlElement Module = Manifest["Module"];
+			string AppFolder = Path.GetDirectoryName(ServerApplication);
+
+			Session.Log("App folder: " + AppFolder);
+
+			foreach (XmlNode N in Module.ChildNodes)
+			{
+				if (N is XmlElement E && E.LocalName == "Assembly")
+				{
+					string FileName = XML.Attribute(E, "fileName");
+					string AppFileName = Path.Combine(AppFolder, FileName);
+
+					Assembly A = Assembly.LoadFrom(AppFileName);
+					AssemblyName AN = A.GetName();
+					string Key = AN.Name + "/" + AN.Version.ToString();
+
+					if (Deps != null && Deps.TryGetValue("targets", out object Obj) && Obj is Dictionary<string, object> Targets)
+					{
+						Targets.Remove(Key);
+
+						foreach (KeyValuePair<string, object> P in Targets)
+						{
+							if (P.Value is Dictionary<string, object> Target)
+							{
+								foreach (KeyValuePair<string, object> P2 in Target)
+								{
+									if (P2.Key.StartsWith(ServerName.Name + "/") &&
+										P2.Value is Dictionary<string, object> App &&
+										App.TryGetValue("dependencies", out object Obj2) &&
+										Obj2 is Dictionary<string, object> Dependencies)
+									{
+										Dependencies.Remove(AN.Name);
+										break;
+									}
+								}
+							}
+						}
+					}
+
+					if (Deps != null && Deps.TryGetValue("libraries", out object Obj3) && Obj3 is Dictionary<string, object> Libraries)
+					{
+						foreach (KeyValuePair<string, object> P in Libraries)
+						{
+							if (P.Key.StartsWith(AN.Name + "/"))
+							{
+								Libraries.Remove(P.Key);
+								break;
+							}
+						}
+					}
+
+					if (Remove)
+					{
+						RemoveFile(Session, AppFileName);
+						if (FileName.EndsWith(".dll", StringComparison.CurrentCultureIgnoreCase))
+						{
+							string PdbFileName = FileName.Substring(0, FileName.Length - 4) + ".pdb";
+							RemoveFile(Session, PdbFileName);
+						}
+					}
+				}
+			}
+
+			Session.Log("Encoding JSON");
+			s = JSON.Encode(Deps, true);
+
+			Session.Log("Writing " + DepsJsonFileName);
+			File.WriteAllText(DepsJsonFileName, s, Encoding.UTF8);
+
+			if (Path.GetDirectoryName(ManifestFile) == AppFolder)
+				RemoveFile(Session, ManifestFile);
+		}
+
+		private static bool RemoveFile(Session Session, string FileName)
+		{
+			if (!File.Exists(FileName))
+				return false;
+
+			Session.Log("Deleting " + FileName);
+			File.Delete(FileName);
+
+			return true;
 		}
 
 		#endregion

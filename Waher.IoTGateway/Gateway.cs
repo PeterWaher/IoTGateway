@@ -97,6 +97,7 @@ namespace Waher.IoTGateway
 		private static ClientEvents clientEvents = null;
 		private static Scheduler scheduler = null;
 		private static RandomNumberGenerator rnd = null;
+		private static Semaphore gatewayRunning = null;
 		private static string domain = null;
 		private static string ownerJid = null;
 		private static string appDataFolder;
@@ -116,9 +117,20 @@ namespace Waher.IoTGateway
 		/// <param name="ConsoleOutput">If console output is permitted.</param>
 		public static bool Start(bool ConsoleOutput)
 		{
-			Semaphore StartingServer = new Semaphore(1, 1, "Waher.IoTGateway");
+			gatewayRunning = new Semaphore(1, 1, "Waher.IoTGateway.Running");
+			if (!gatewayRunning.WaitOne(1000))
+				return false; // Is running in another process.
+
+			Semaphore StartingServer = new Semaphore(1, 1, "Waher.IoTGateway.Starting");
 			if (!StartingServer.WaitOne(1000))
+			{
+				gatewayRunning.Release();
+				gatewayRunning.Dispose();
+				gatewayRunning = null;
+
+				StartingServer.Dispose();
 				return false; // Being started in another process.
+			}
 
 			try
 			{
@@ -422,6 +434,10 @@ namespace Waher.IoTGateway
 			{
 				Log.Critical(ex);
 
+				gatewayRunning.Release();
+				gatewayRunning.Dispose();
+				gatewayRunning = null;
+
 				StartingServer.Release();
 				StartingServer.Dispose();
 
@@ -561,6 +577,13 @@ namespace Waher.IoTGateway
 			if (databaseProvider != null)
 				File.WriteAllText(appDataFolder + "Stop.xml", databaseProvider.ExportXml(true).Result);
 			*/
+
+			if (gatewayRunning != null)
+			{
+				gatewayRunning.Release();
+				gatewayRunning.Dispose();
+				gatewayRunning = null;
+			}
 
 			if (ibbClient != null)
 			{

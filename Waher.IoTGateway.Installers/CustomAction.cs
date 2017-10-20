@@ -1412,7 +1412,34 @@ namespace Waher.IoTGateway.Installers
 			Session.Log("Waiting for all modules to start.");
 			try
 			{
-				using (Semaphore StartingServer = new Semaphore(1, 1, "Waher.IoTGateway"))
+				DateTime Start = DateTime.Now;
+				bool Running;
+
+				Session.Log("Waiting for service to start.");
+
+				Thread.Sleep(5000);
+
+				do
+				{
+					using (Semaphore RunningServer = new Semaphore(1, 1, "Waher.IoTGateway.Running"))
+					{
+						Running = !RunningServer.WaitOne(1000);
+					}
+
+					if (!Running)
+						Thread.Sleep(1000);
+				}
+				while (!Running && (DateTime.Now - Start).TotalSeconds < 30);
+
+				if (!Running)
+				{
+					Session.Log("Could not detect a start of service. Cancelling wait and continuing.");
+					return ActionResult.Success;
+				}
+
+				Session.Log("Waiting for service startup procedure to complete.");
+
+				using (Semaphore StartingServer = new Semaphore(1, 1, "Waher.IoTGateway.Starting"))
 				{
 					if (StartingServer.WaitOne(120000))
 					{

@@ -28228,5 +28228,23 @@
         "#import": []
       }
     }
-  }
+  },
+  "logs": [
+    {
+      "code": "NU1608",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Detected package version outside of dependency constraint: Microsoft.ApplicationInsights.WindowsApps 1.1.1 requires Microsoft.ApplicationInsights (= 1.2.3) but version Microsoft.ApplicationInsights 2.4.0 was resolved.",
+      "libraryId": "Microsoft.ApplicationInsights",
+      "targetGraphs": [
+        "UAP,Version=v10.0.10240",
+        "UAP,Version=v10.0.10240/win10-arm",
+        "UAP,Version=v10.0.10240/win10-arm-aot",
+        "UAP,Version=v10.0.10240/win10-x64",
+        "UAP,Version=v10.0.10240/win10-x64-aot",
+        "UAP,Version=v10.0.10240/win10-x86",
+        "UAP,Version=v10.0.10240/win10-x86-aot"
+      ]
+    }
+  ]
 }

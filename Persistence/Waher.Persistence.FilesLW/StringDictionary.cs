@@ -452,17 +452,31 @@ namespace Waher.Persistence.Files
 		/// <returns>Enumerator</returns>
 		public async Task<ObjectBTreeFileEnumerator<KeyValuePair<string, object>>> GetEnumerator(bool Locked)
 		{
+			ObjectBTreeFileEnumerator<KeyValuePair<string, object>> Result = null;
+
 			await this.dictionaryFile.Lock();
 			try
 			{
-				return new ObjectBTreeFileEnumerator<KeyValuePair<string, object>>(this.dictionaryFile, Locked, this.recordHandler, null,
+				Result = new ObjectBTreeFileEnumerator<KeyValuePair<string, object>>(this.dictionaryFile, Locked, this.recordHandler, null,
 					this.keyValueSerializer);
-			}
-			finally
-			{
+
 				if (!Locked)
 					await this.dictionaryFile.Release();
 			}
+			catch (Exception ex)
+			{
+				if (Result != null)
+				{
+					Result.Dispose();
+					Result = null;
+				}
+				else
+					await this.dictionaryFile.Release();
+
+				System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex).Throw();
+			}
+
+			return Result;
 		}
 
 		/// <summary>

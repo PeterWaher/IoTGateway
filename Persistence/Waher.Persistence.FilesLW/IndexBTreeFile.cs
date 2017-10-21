@@ -382,18 +382,32 @@ namespace Waher.Persistence.Files
 			byte[] Key = this.recordHandler.Serialize(Guid.Empty, Object, this.genericSerializer, MissingFieldAction.First);
 			if (Key.Length > this.indexFile.InlineObjectSizeLimit)
 				return null;
+			
+			IndexBTreeFileEnumerator<T> Result = null;
 
 			await this.indexFile.Lock();
 			try
 			{
 				BlockInfo Leaf = await this.indexFile.FindLeafNodeLocked(Key);
-				return new IndexBTreeFileEnumerator<T>(this, Locked, this.recordHandler, Leaf);
-			}
-			finally
-			{
+				Result = new IndexBTreeFileEnumerator<T>(this, Locked, this.recordHandler, Leaf);
+
 				if (!Locked)
 					await this.indexFile.Release();
 			}
+			catch (Exception ex)
+			{
+				if (Result != null)
+				{
+					Result.Dispose();
+					Result = null;
+				}
+				else
+					await this.indexFile.Release();
+
+				System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex).Throw();
+			}
+
+			return Result;
 		}
 
 		/// <summary>
@@ -441,17 +455,31 @@ namespace Waher.Persistence.Files
 			if (Key.Length > this.indexFile.InlineObjectSizeLimit)
 				return null;
 
+			IndexBTreeFileEnumerator<T> Result = null;
+
 			await this.indexFile.Lock();
 			try
 			{
 				BlockInfo Leaf = await this.indexFile.FindLeafNodeLocked(Key);
-				return new IndexBTreeFileEnumerator<T>(this, Locked, this.recordHandler, Leaf);
-			}
-			finally
-			{
+				Result = new IndexBTreeFileEnumerator<T>(this, Locked, this.recordHandler, Leaf);
+
 				if (!Locked)
 					await this.indexFile.Release();
 			}
+			catch (Exception ex)
+			{
+				if (Result != null)
+				{
+					Result.Dispose();
+					Result = null;
+				}
+				else
+					await this.indexFile.Release();
+
+				System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex).Throw();
+			}
+
+			return Result;
 		}
 
 		internal static readonly Guid GuidMax = new Guid(new byte[] { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff });
@@ -501,17 +529,31 @@ namespace Waher.Persistence.Files
 			if (Key.Length > this.indexFile.InlineObjectSizeLimit)
 				return null;
 
+			IndexBTreeFileEnumerator<T> Result = null;
+
 			await this.indexFile.Lock();
 			try
 			{
 				BlockInfo Leaf = await this.indexFile.FindLeafNodeLocked(Key);
-				return new IndexBTreeFileEnumerator<T>(this, Locked, this.recordHandler, Leaf);
-			}
-			finally
-			{
+				Result = new IndexBTreeFileEnumerator<T>(this, Locked, this.recordHandler, Leaf);
+
 				if (!Locked)
 					await this.indexFile.Release();
 			}
+			catch (Exception ex)
+			{
+				if (Result != null)
+				{
+					Result.Dispose();
+					Result = null;
+				}
+				else
+					await this.indexFile.Release();
+
+				System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex).Throw();
+			}
+
+			return Result;
 		}
 
 		/// <summary>
@@ -559,17 +601,31 @@ namespace Waher.Persistence.Files
 			if (Key.Length > this.indexFile.InlineObjectSizeLimit)
 				return null;
 
+			IndexBTreeFileEnumerator<T> Result = null;
+
 			await this.indexFile.Lock();
 			try
 			{
 				BlockInfo Leaf = await this.indexFile.FindLeafNodeLocked(Key);
-				return new IndexBTreeFileEnumerator<T>(this, Locked, this.recordHandler, Leaf);
-			}
-			finally
-			{
+				Result = new IndexBTreeFileEnumerator<T>(this, Locked, this.recordHandler, Leaf);
+
 				if (!Locked)
 					await this.indexFile.Release();
 			}
+			catch (Exception ex)
+			{
+				if (Result != null)
+				{
+					Result.Dispose();
+					Result = null;
+				}
+				else
+					await this.indexFile.Release();
+
+				System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex).Throw();
+			}
+
+			return Result;
 		}
 
 	}

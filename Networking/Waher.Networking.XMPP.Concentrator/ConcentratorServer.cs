@@ -64,11 +64,10 @@ namespace Waher.Networking.XMPP.Concentrator
 			this.client.RegisterIqGetHandler("getNodeInheritance", NamespaceConcentrator, this.GetNodeInheritanceHandler, false);
 			this.client.RegisterIqGetHandler("getRootNodes", NamespaceConcentrator, this.GetRootNodesHandler, false);
 			this.client.RegisterIqGetHandler("getChildNodes", NamespaceConcentrator, this.GetChildNodesHandler, false);
-			this.client.RegisterIqGetHandler("getAncestors", NamespaceConcentrator, this.GetAncestorsHandler, false);
-			this.client.RegisterIqGetHandler("moveNodeUp", NamespaceConcentrator, this.MoveNodeUpHandler, false);
-			this.client.RegisterIqGetHandler("moveNodeDown", NamespaceConcentrator, this.MoveNodeDownHandler, false);
-			this.client.RegisterIqGetHandler("moveNodesUp", NamespaceConcentrator, this.MoveNodesUpHandler, false);
-			this.client.RegisterIqGetHandler("moveNodesDown", NamespaceConcentrator, this.MoveNodesDownHandler, false);
+			// getIndices
+			// getNodesFromIndex
+			// getNodesFromIndices
+			// getAllIndexValues
 
 			this.client.RegisterIqGetHandler("getNodeParametersForEdit", NamespaceConcentrator, this.GetNodeParametersForEditHandler, false);
 			this.client.RegisterIqGetHandler("setNodeParametersAfterEdit", NamespaceConcentrator, this.SetNodeParametersAfterEditHandler, false);
@@ -80,6 +79,8 @@ namespace Waher.Networking.XMPP.Concentrator
 			this.client.RegisterIqGetHandler("createNewNode", NamespaceConcentrator, this.CreateNewNodeHandler, false);
 			this.client.RegisterIqGetHandler("destroyNode", NamespaceConcentrator, this.DestroyNodeHandler, false);
 
+			this.client.RegisterIqGetHandler("getAncestors", NamespaceConcentrator, this.GetAncestorsHandler, false);
+
 			this.client.RegisterIqGetHandler("getNodeCommands", NamespaceConcentrator, this.GetNodeCommandsHandler, false);
 			this.client.RegisterIqGetHandler("getCommandParameters", NamespaceConcentrator, this.GetCommandParametersHandler, false);
 			this.client.RegisterIqGetHandler("executeNodeCommand", NamespaceConcentrator, this.ExecuteNodeCommandHandler, false);
@@ -89,6 +90,17 @@ namespace Waher.Networking.XMPP.Concentrator
 			this.client.RegisterIqGetHandler("getCommonCommandParameters", NamespaceConcentrator, this.GetCommonCommandParametersHandler, false);
 			this.client.RegisterIqGetHandler("executeCommonNodeCommand", NamespaceConcentrator, this.ExecuteCommonNodeCommandHandler, false);
 			this.client.RegisterIqGetHandler("executeCommonNodeQuery", NamespaceConcentrator, this.ExecuteCommonNodeQueryHandler, false);
+
+			this.client.RegisterIqGetHandler("moveNodeUp", NamespaceConcentrator, this.MoveNodeUpHandler, false);
+			this.client.RegisterIqGetHandler("moveNodeDown", NamespaceConcentrator, this.MoveNodeDownHandler, false);
+			this.client.RegisterIqGetHandler("moveNodesUp", NamespaceConcentrator, this.MoveNodesUpHandler, false);
+			this.client.RegisterIqGetHandler("moveNodesDown", NamespaceConcentrator, this.MoveNodesDownHandler, false);
+
+			// subscribe
+			// unsubscribe
+			// getDatabases
+			// getDatabaseReadoutParameters
+			// startDatabaseReadout
 		}
 
 		/// <summary>
@@ -110,12 +122,11 @@ namespace Waher.Networking.XMPP.Concentrator
 			this.client.UnregisterIqGetHandler("getNodeInheritance", NamespaceConcentrator, this.GetNodeInheritanceHandler, false);
 			this.client.UnregisterIqGetHandler("getRootNodes", NamespaceConcentrator, this.GetRootNodesHandler, false);
 			this.client.UnregisterIqGetHandler("getChildNodes", NamespaceConcentrator, this.GetChildNodesHandler, false);
-			this.client.UnregisterIqGetHandler("getAncestors", NamespaceConcentrator, this.GetAncestorsHandler, false);
+			// getIndices
+			// getNodesFromIndex
+			// getNodesFromIndices
+			// getAllIndexValues
 
-			this.client.UnregisterIqGetHandler("moveNodeUp", NamespaceConcentrator, this.MoveNodeUpHandler, false);
-			this.client.UnregisterIqGetHandler("moveNodeDown", NamespaceConcentrator, this.MoveNodeDownHandler, false);
-			this.client.UnregisterIqGetHandler("moveNodesUp", NamespaceConcentrator, this.MoveNodesUpHandler, false);
-			this.client.UnregisterIqGetHandler("moveNodesDown", NamespaceConcentrator, this.MoveNodesDownHandler, false);
 			this.client.UnregisterIqGetHandler("getNodeParametersForEdit", NamespaceConcentrator, this.GetNodeParametersForEditHandler, false);
 			this.client.UnregisterIqGetHandler("setNodeParametersAfterEdit", NamespaceConcentrator, this.SetNodeParametersAfterEditHandler, false);
 			this.client.UnregisterIqGetHandler("getCommonNodeParametersForEdit", NamespaceConcentrator, this.GetCommonNodeParametersForEditHandler, false);
@@ -126,6 +137,9 @@ namespace Waher.Networking.XMPP.Concentrator
 			this.client.UnregisterIqGetHandler("createNewNode", NamespaceConcentrator, this.CreateNewNodeHandler, false);
 			this.client.UnregisterIqGetHandler("destroyNode", NamespaceConcentrator, this.DestroyNodeHandler, false);
 
+
+			this.client.UnregisterIqGetHandler("getAncestors", NamespaceConcentrator, this.GetAncestorsHandler, false);
+
 			this.client.UnregisterIqGetHandler("getNodeCommands", NamespaceConcentrator, this.GetNodeCommandsHandler, false);
 			this.client.UnregisterIqGetHandler("getCommandParameters", NamespaceConcentrator, this.GetCommandParametersHandler, false);
 			this.client.UnregisterIqGetHandler("executeNodeCommand", NamespaceConcentrator, this.ExecuteNodeCommandHandler, false);
@@ -135,6 +149,17 @@ namespace Waher.Networking.XMPP.Concentrator
 			this.client.UnregisterIqGetHandler("getCommonCommandParameters", NamespaceConcentrator, this.GetCommonCommandParametersHandler, false);
 			this.client.UnregisterIqGetHandler("executeCommonNodeCommand", NamespaceConcentrator, this.ExecuteCommonNodeCommandHandler, false);
 			this.client.UnregisterIqGetHandler("executeCommonNodeQuery", NamespaceConcentrator, this.ExecuteCommonNodeQueryHandler, false);
+
+			this.client.UnregisterIqGetHandler("moveNodeUp", NamespaceConcentrator, this.MoveNodeUpHandler, false);
+			this.client.UnregisterIqGetHandler("moveNodeDown", NamespaceConcentrator, this.MoveNodeDownHandler, false);
+			this.client.UnregisterIqGetHandler("moveNodesUp", NamespaceConcentrator, this.MoveNodesUpHandler, false);
+			this.client.UnregisterIqGetHandler("moveNodesDown", NamespaceConcentrator, this.MoveNodesDownHandler, false);
+
+			// subscribe
+			// unsubscribe
+			// getDatabases
+			// getDatabaseReadoutParameters
+			// startDatabaseReadout
 
 			Query[] Queries;
 

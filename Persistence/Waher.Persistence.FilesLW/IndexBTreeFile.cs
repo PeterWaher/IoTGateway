@@ -287,7 +287,7 @@ namespace Waher.Persistence.Files
 		/// enumerator will cause an <see cref="InvalidOperationException"/> to be thrown.
 		/// 
 		/// If locked access is desired, the database cannot be updated, until the enumerator has been dispose. Make sure to call
-		/// the <see cref="ObjectBTreeFileEnumerator{T}.Dispose"/> method when done with the enumerator, to release the database
+		/// the <see cref="IndexBTreeFileEnumerator{T}.Dispose"/> method when done with the enumerator, to release the database
 		/// after use.</param>
 		/// <returns>An enumerator that can be used to iterate through the collection.</returns>
 		public IndexBTreeFileEnumerator<T> GetTypedEnumerator<T>(bool Locked)

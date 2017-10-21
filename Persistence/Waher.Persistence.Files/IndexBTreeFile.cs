@@ -287,7 +287,7 @@ namespace Waher.Persistence.Files
 		/// enumerator will cause an <see cref="InvalidOperationException"/> to be thrown.
 		/// 
 		/// If locked access is desired, the database cannot be updated, until the enumerator has been dispose. Make sure to call
-		/// the <see cref="ObjectBTreeFileEnumerator{T}.Dispose"/> method when done with the enumerator, to release the database
+		/// the <see cref="IndexBTreeFileEnumerator{T}.Dispose"/> method when done with the enumerator, to release the database
 		/// after use.</param>
 		/// <returns>An enumerator that can be used to iterate through the collection.</returns>
 		public IndexBTreeFileEnumerator<T> GetTypedEnumerator<T>(bool Locked)
@@ -382,18 +382,32 @@ namespace Waher.Persistence.Files
 			byte[] Key = this.recordHandler.Serialize(Guid.Empty, Object, this.genericSerializer, MissingFieldAction.First);
 			if (Key.Length > this.indexFile.InlineObjectSizeLimit)
 				return null;
+			
+			IndexBTreeFileEnumerator<T> Result = null;
 
 			await this.indexFile.Lock();
 			try
 			{
 				BlockInfo Leaf = await this.indexFile.FindLeafNodeLocked(Key);
-				return new IndexBTreeFileEnumerator<T>(this, Locked, this.recordHandler, Leaf);
-			}
-			finally
-			{
+				Result = new IndexBTreeFileEnumerator<T>(this, Locked, this.recordHandler, Leaf);
+
 				if (!Locked)
 					await this.indexFile.Release();
 			}
+			catch (Exception ex)
+			{
+				if (Result != null)
+				{
+					Result.Dispose();
+					Result = null;
+				}
+				else
+					await this.indexFile.Release();
+
+				System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex).Throw();
+			}
+
+			return Result;
 		}
 
 		/// <summary>
@@ -441,17 +455,31 @@ namespace Waher.Persistence.Files
 			if (Key.Length > this.indexFile.InlineObjectSizeLimit)
 				return null;
 
+			IndexBTreeFileEnumerator<T> Result = null;
+
 			await this.indexFile.Lock();
 			try
 			{
 				BlockInfo Leaf = await this.indexFile.FindLeafNodeLocked(Key);
-				return new IndexBTreeFileEnumerator<T>(this, Locked, this.recordHandler, Leaf);
-			}
-			finally
-			{
+				Result = new IndexBTreeFileEnumerator<T>(this, Locked, this.recordHandler, Leaf);
+
 				if (!Locked)
 					await this.indexFile.Release();
 			}
+			catch (Exception ex)
+			{
+				if (Result != null)
+				{
+					Result.Dispose();
+					Result = null;
+				}
+				else
+					await this.indexFile.Release();
+
+				System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex).Throw();
+			}
+
+			return Result;
 		}
 
 		internal static readonly Guid GuidMax = new Guid(new byte[] { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff });
@@ -501,17 +529,31 @@ namespace Waher.Persistence.Files
 			if (Key.Length > this.indexFile.InlineObjectSizeLimit)
 				return null;
 
+			IndexBTreeFileEnumerator<T> Result = null;
+
 			await this.indexFile.Lock();
 			try
 			{
 				BlockInfo Leaf = await this.indexFile.FindLeafNodeLocked(Key);
-				return new IndexBTreeFileEnumerator<T>(this, Locked, this.recordHandler, Leaf);
-			}
-			finally
-			{
+				Result = new IndexBTreeFileEnumerator<T>(this, Locked, this.recordHandler, Leaf);
+
 				if (!Locked)
 					await this.indexFile.Release();
 			}
+			catch (Exception ex)
+			{
+				if (Result != null)
+				{
+					Result.Dispose();
+					Result = null;
+				}
+				else
+					await this.indexFile.Release();
+
+				System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex).Throw();
+			}
+
+			return Result;
 		}
 
 		/// <summary>
@@ -559,17 +601,31 @@ namespace Waher.Persistence.Files
 			if (Key.Length > this.indexFile.InlineObjectSizeLimit)
 				return null;
 
+			IndexBTreeFileEnumerator<T> Result = null;
+
 			await this.indexFile.Lock();
 			try
 			{
 				BlockInfo Leaf = await this.indexFile.FindLeafNodeLocked(Key);
-				return new IndexBTreeFileEnumerator<T>(this, Locked, this.recordHandler, Leaf);
-			}
-			finally
-			{
+				Result = new IndexBTreeFileEnumerator<T>(this, Locked, this.recordHandler, Leaf);
+
 				if (!Locked)
 					await this.indexFile.Release();
 			}
+			catch (Exception ex)
+			{
+				if (Result != null)
+				{
+					Result.Dispose();
+					Result = null;
+				}
+				else
+					await this.indexFile.Release();
+
+				System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex).Throw();
+			}
+
+			return Result;
 		}
 
 	}

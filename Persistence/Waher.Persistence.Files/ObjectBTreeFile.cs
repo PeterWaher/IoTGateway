@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Runtime.ExceptionServices;
 #if NETSTANDARD1_5
 using System.Security.Cryptography;
 #endif
@@ -4798,29 +4799,29 @@ namespace Waher.Persistence.Files
             return Best;
         }
 
-#endregion
+		#endregion
 
-#region Searching
+		#region Searching
 
-        /// <summary>
-        /// Finds objects of a given class <typeparamref name="T"/>.
-        /// </summary>
-        /// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
-        /// <param name="Offset">Result offset.</param>
-        /// <param name="MaxCount">Maximum number of objects to return.</param>
-        /// <param name="Filter">Optional filter. Can be null.</param>
-        /// <param name="Locked">If locked access to the file is requested.
-        /// 
-        /// If unlocked access is desired, any change to the database will invalidate the enumerator, and further access to the
-        /// enumerator will cause an <see cref="InvalidOperationException"/> to be thrown.
-        /// 
-        /// If locked access is desired, the database cannot be updated, until the enumerator has been dispose. Make sure to call
-        /// the <see cref="ObjectBTreeFileEnumerator{T}.Dispose"/> method when done with the enumerator, to release the database
-        /// after use.</param>
-        /// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
-        /// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
-        /// <returns>Objects found.</returns>
-        public async Task<ICursor<T>> Find<T>(int Offset, int MaxCount, Filter Filter, bool Locked, params string[] SortOrder)
+		/// <summary>
+		/// Finds objects of a given class <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to return.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="Locked">If locked access to the file is requested.
+		/// 
+		/// If unlocked access is desired, any change to the database will invalidate the enumerator, and further access to the
+		/// enumerator will cause an <see cref="InvalidOperationException"/> to be thrown.
+		/// 
+		/// If locked access is desired, the database cannot be updated, until the enumerator has been disposed. Make sure to call
+		/// the <see cref="IDisposable.Dispose"/> method when done with the enumerator, to release the database
+		/// after use.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>Objects found.</returns>
+		public async Task<ICursor<T>> Find<T>(int Offset, int MaxCount, Filter Filter, bool Locked, params string[] SortOrder)
         {
             this.nrSearches++;
 
@@ -4837,49 +4838,59 @@ namespace Waher.Persistence.Files
                 Serializer.IndicesCreated = true;
             }
 
-            ICursor<T> Result;
+            ICursor<T> Result = null;
 
-            if (Filter == null)
-            {
-                Result = null;
+			try
+			{
+				if (Filter == null)
+				{
+					Result = null;
 
-                if (SortOrder.Length > 0)
-                {
-                    IndexBTreeFile Index = this.FindBestIndex(SortOrder);
+					if (SortOrder.Length > 0)
+					{
+						IndexBTreeFile Index = this.FindBestIndex(SortOrder);
 
-                    if (Index != null)
-                    {
-                        if (Index.SameSortOrder(SortOrder))
-                            Result = Index.GetTypedEnumerator<T>(Locked);
-                        else if (Index.ReverseSortOrder(SortOrder))
-                            Result = new Searching.ReversedCursor<T>(Index.GetTypedEnumerator<T>(Locked), this.timeoutMilliseconds);
-                    }
-                }
+						if (Index != null)
+						{
+							if (Index.SameSortOrder(SortOrder))
+								Result = Index.GetTypedEnumerator<T>(Locked);
+							else if (Index.ReverseSortOrder(SortOrder))
+								Result = new Searching.ReversedCursor<T>(Index.GetTypedEnumerator<T>(Locked), this.timeoutMilliseconds);
+						}
+					}
 
-                if (Result == null)
-                {
-                    this.nrFullFileScans++;
-                    Result = this.GetTypedEnumerator<T>(Locked);
+					if (Result == null)
+					{
+						this.nrFullFileScans++;
+						Result = this.GetTypedEnumerator<T>(Locked);
 
-                    if (SortOrder.Length > 0)
-                        Result = await this.Sort<T>(Result, SortOrder);
-                }
+						if (SortOrder.Length > 0)
+							Result = await this.Sort<T>(Result, SortOrder);
+					}
 
-                if (Offset > 0 || MaxCount < int.MaxValue)
-                    Result = new Searching.PagesCursor<T>(Offset, MaxCount, Result, this.timeoutMilliseconds);
-            }
-            else
-            {
-                Result = await this.ConvertFilterToCursor<T>(Filter.Normalize(), Locked);
+					if (Offset > 0 || MaxCount < int.MaxValue)
+						Result = new Searching.PagesCursor<T>(Offset, MaxCount, Result, this.timeoutMilliseconds);
+				}
+				else
+				{
+					Result = await this.ConvertFilterToCursor<T>(Filter.Normalize(), Locked);
 
-                if (SortOrder.Length > 0)
-                    Result = await this.Sort<T>(Result, SortOrder);
+					if (SortOrder.Length > 0)
+						Result = await this.Sort<T>(Result, SortOrder);
 
-                if (Offset > 0 || MaxCount < int.MaxValue)
-                    Result = new Searching.PagesCursor<T>(Offset, MaxCount, Result, this.timeoutMilliseconds);
-            }
+					if (Offset > 0 || MaxCount < int.MaxValue)
+						Result = new Searching.PagesCursor<T>(Offset, MaxCount, Result, this.timeoutMilliseconds);
+				}
+			}
+			catch (Exception ex)
+			{
+				if (Result != null)
+					Result.Dispose();
 
-            return Result;
+				ExceptionDispatchInfo.Capture(ex).Throw();
+			}
+
+			return Result;
         }
 
         private async Task<ICursor<T>> Sort<T>(ICursor<T> Result, params string[] SortOrder)

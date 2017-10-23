@@ -62,6 +62,14 @@ namespace Waher.Things
 		}
 
 		/// <summary>
+		/// Actor making the request.
+		/// </summary>
+		string Actor
+		{
+			get;
+		}
+
+		/// <summary>
 		/// Optional service token, as defined in XEP-0324.
 		/// </summary>
 		string ServiceToken

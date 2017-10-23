@@ -430,10 +430,12 @@ namespace Waher.Persistence.Files
 		/// <returns>Task object.</returns>
 		internal async Task Lock()
 		{
+			string Trace = Environment.StackTrace;
+
 			if (!await this.fileAccessSemaphore.WaitAsync(this.timeoutMilliseconds))
 				throw FilesProvider.TimeoutException(this.lockStackTrace);
 
-			this.lockStackTrace = Environment.StackTrace;
+			this.lockStackTrace = Trace;
 		}
 
 		/// <summary>

@@ -21,33 +21,33 @@
       <dependency id="Waher.Content.Xml" version="1.0.2"/>
       <dependency id="Waher.Networking" version="1.0.2"/>
       <dependency id="Waher.Networking.XMPP.UWP" version="1.0.9"/>
-      <dependency id="Waher.Networking.XMPP.Control.UWP" version="1.0.3"/>
-      <dependency id="Waher.Networking.XMPP.Sensor.UWP" version="1.0.9"/>
+      <dependency id="Waher.Networking.XMPP.Control.UWP" version="1.0.8"/>
+      <dependency id="Waher.Networking.XMPP.Sensor.UWP" version="1.0.10"/>
       <dependency id="Waher.Runtime.Cache" version="1.0.1"/>
       <dependency id="Waher.Script" version="1.0.8"/>
       <dependency id="Waher.Script.Graphs" version="1.0.6"/>
-      <dependency id="Waher.Things" version="1.0.3"/>
+      <dependency id="Waher.Things" version="1.0.4"/>
     </dependencies>
   </metadata>
   <files>
     <!-- Architecture-independent reference library for use at compile-time. -->
-    <file src="bin\Debug\Waher.Networking.XMPP.Chat.UWP.dll" target="ref\uap10.0" />
-    <file src="bin\Debug\Waher.Networking.XMPP.Chat.UWP.pdb" target="ref\uap10.0" />
+    <file src="bin\Release\Waher.Networking.XMPP.Chat.UWP.dll" target="ref\uap10.0" />
+    <file src="bin\Release\Waher.Networking.XMPP.Chat.UWP.pdb" target="ref\uap10.0" />
 
     <!-- XML documentation file goes together with the reference library. -->
-    <file src="bin\x86\Debug\Waher.Networking.XMPP.Chat.UWP.XML" target="ref\uap10.0" />
+    <file src="bin\x86\Release\Waher.Networking.XMPP.Chat.UWP.XML" target="ref\uap10.0" />
 
     <!-- Resource files go together with the reference library. -->
-    <file src="bin\Debug\Waher.Networking.XMPP.Chat.UWP.pri" target="ref\uap10.0" />
+    <file src="bin\Release\Waher.Networking.XMPP.Chat.UWP.pri" target="ref\uap10.0" />
 
     <!-- The architecture-specific files go in architecture-specific directories. -->
-    <file src="bin\x86\Debug\Waher.Networking.XMPP.Chat.UWP.dll" target="runtimes\win10-x86\lib\uap10.0" />
-    <file src="bin\x86\Debug\Waher.Networking.XMPP.Chat.UWP.pdb" target="runtimes\win10-x86\lib\uap10.0" />
+    <file src="bin\x86\Release\Waher.Networking.XMPP.Chat.UWP.dll" target="runtimes\win10-x86\lib\uap10.0" />
+    <file src="bin\x86\Release\Waher.Networking.XMPP.Chat.UWP.pdb" target="runtimes\win10-x86\lib\uap10.0" />
 
-    <file src="bin\x64\Debug\Waher.Networking.XMPP.Chat.UWP.dll" target="runtimes\win10-x64\lib\uap10.0" />
-    <file src="bin\x64\Debug\Waher.Networking.XMPP.Chat.UWP.pdb" target="runtimes\win10-x64\lib\uap10.0" />
+    <file src="bin\x64\Release\Waher.Networking.XMPP.Chat.UWP.dll" target="runtimes\win10-x64\lib\uap10.0" />
+    <file src="bin\x64\Release\Waher.Networking.XMPP.Chat.UWP.pdb" target="runtimes\win10-x64\lib\uap10.0" />
 
-    <file src="bin\arm\Debug\Waher.Networking.XMPP.Chat.UWP.dll" target="runtimes\win10-arm\lib\uap10.0" />
-    <file src="bin\arm\Debug\Waher.Networking.XMPP.Chat.UWP.pdb" target="runtimes\win10-arm\lib\uap10.0" />
+    <file src="bin\arm\Release\Waher.Networking.XMPP.Chat.UWP.dll" target="runtimes\win10-arm\lib\uap10.0" />
+    <file src="bin\arm\Release\Waher.Networking.XMPP.Chat.UWP.pdb" target="runtimes\win10-arm\lib\uap10.0" />
   </files>
 </package>

@@ -50,23 +50,23 @@ XEP-0377: Spam Reporting</summary>
   </metadata>
   <files>
     <!-- Architecture-independent reference library for use at compile-time. -->
-    <file src="bin\Debug\Waher.Networking.XMPP.UWP.dll" target="ref\uap10.0" />
-    <file src="bin\Debug\Waher.Networking.XMPP.UWP.pdb" target="ref\uap10.0" />
+    <file src="bin\Release\Waher.Networking.XMPP.UWP.dll" target="ref\uap10.0" />
+    <file src="bin\Release\Waher.Networking.XMPP.UWP.pdb" target="ref\uap10.0" />
 
     <!-- XML documentation file goes together with the reference library. -->
-    <file src="bin\x86\Debug\Waher.Networking.XMPP.UWP.XML" target="ref\uap10.0" />
+    <file src="bin\x86\Release\Waher.Networking.XMPP.UWP.XML" target="ref\uap10.0" />
 
     <!-- Resource files go together with the reference library. -->
-    <file src="bin\Debug\Waher.Networking.XMPP.UWP.pri" target="ref\uap10.0" />
+    <file src="bin\Release\Waher.Networking.XMPP.UWP.pri" target="ref\uap10.0" />
 
     <!-- The architecture-specific files go in architecture-specific directories. -->
-    <file src="bin\x86\Debug\Waher.Networking.XMPP.UWP.dll" target="runtimes\win10-x86\lib\uap10.0" />
-    <file src="bin\x86\Debug\Waher.Networking.XMPP.UWP.pdb" target="runtimes\win10-x86\lib\uap10.0" />
+    <file src="bin\x86\Release\Waher.Networking.XMPP.UWP.dll" target="runtimes\win10-x86\lib\uap10.0" />
+    <file src="bin\x86\Release\Waher.Networking.XMPP.UWP.pdb" target="runtimes\win10-x86\lib\uap10.0" />
 
-    <file src="bin\x64\Debug\Waher.Networking.XMPP.UWP.dll" target="runtimes\win10-x64\lib\uap10.0" />
-    <file src="bin\x64\Debug\Waher.Networking.XMPP.UWP.pdb" target="runtimes\win10-x64\lib\uap10.0" />
+    <file src="bin\x64\Release\Waher.Networking.XMPP.UWP.dll" target="runtimes\win10-x64\lib\uap10.0" />
+    <file src="bin\x64\Release\Waher.Networking.XMPP.UWP.pdb" target="runtimes\win10-x64\lib\uap10.0" />
 
-    <file src="bin\arm\Debug\Waher.Networking.XMPP.UWP.dll" target="runtimes\win10-arm\lib\uap10.0" />
-    <file src="bin\arm\Debug\Waher.Networking.XMPP.UWP.pdb" target="runtimes\win10-arm\lib\uap10.0" />
+    <file src="bin\arm\Release\Waher.Networking.XMPP.UWP.dll" target="runtimes\win10-arm\lib\uap10.0" />
+    <file src="bin\arm\Release\Waher.Networking.XMPP.UWP.pdb" target="runtimes\win10-arm\lib\uap10.0" />
   </files>
 </package>

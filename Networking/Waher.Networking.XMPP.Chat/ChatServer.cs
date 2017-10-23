@@ -4,10 +4,10 @@ using System.IO;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
-using System.Xml;
 using Waher.Content;
 using Waher.Content.Markdown;
 using Waher.Content.Xml;
+using Waher.Events;
 using Waher.Networking.XMPP.BitsOfBinary;
 using Waher.Networking.XMPP.Control;
 using Waher.Networking.XMPP.HttpFileUpload;
@@ -134,286 +134,293 @@ namespace Waher.Networking.XMPP.Chat
 			this.client.SendChatMessage(To, Message);
 		}
 
-		private void Client_OnChatMessage(object Sender, MessageEventArgs e)
+		private async void Client_OnChatMessage(object Sender, MessageEventArgs e)
 		{
-			Variables Variables = this.GetVariables(e.From);
-			RemoteXmppSupport Support = null;
-
-			if (this.httpUpload == null)
+			try
 			{
-				this.httpUpload = new HttpFileUploadClient(this.client);
-				this.httpUpload.Discover(null);
-			}
+				Variables Variables = this.GetVariables(e.From);
+				RemoteXmppSupport Support = null;
 
-			if (!Variables.TryGetVariable(" Support ", out Variable v) || (Support = v.ValueObject as RemoteXmppSupport) == null)
-			{
-				Support = new RemoteXmppSupport();
+				if (this.httpUpload == null)
+				{
+					this.httpUpload = new HttpFileUploadClient(this.client);
+					this.httpUpload.Discover(null);
+				}
 
+				if (!Variables.TryGetVariable(" Support ", out Variable v) || (Support = v.ValueObject as RemoteXmppSupport) == null)
+				{
+					Support = new RemoteXmppSupport();
+
+					if (e.Content != null && e.Content.LocalName == "content" && e.Content.NamespaceURI == "urn:xmpp:content" &&
+						XML.Attribute(e.Content, "type") == "text/markdown")
+					{
+						Support.Markdown = true;
+					}
+
+					Variables[" Support "] = Support;
+
+					this.client.SendServiceDiscoveryRequest(e.From, (sender, e2) =>
+					{
+						Variables Variables2 = (Variables)e2.State;
+						RemoteXmppSupport Support2 = new RemoteXmppSupport()
+						{
+							Html = e2.Features.ContainsKey("http://jabber.org/protocol/xhtml-im"),
+							ByteStreams = e2.Features.ContainsKey("http://jabber.org/protocol/bytestreams"),
+							FileTransfer = e2.Features.ContainsKey("http://jabber.org/protocol/si/profile/file-transfer"),
+							SessionInitiation = e2.Features.ContainsKey("http://jabber.org/protocol/si"),
+							InBandBytestreams = e2.Features.ContainsKey("http://jabber.org/protocol/ibb"),
+							BitsOfBinary = e2.Features.ContainsKey("urn:xmpp:bob"),
+							Markdown = Support.Markdown
+						};
+
+						Variables2[" Support "] = Support2;
+
+						List<string> Features = new List<string>()
+						{
+						"Plain text"
+						};
+
+						if (Support2.Markdown)
+							Features.Add("Markdown");
+
+						if (Support2.Html)
+							Features.Add("HTML");
+
+						if (Support2.ByteStreams)
+							Features.Add("Bytestreams");
+
+						if (Support2.FileTransfer)
+							Features.Add("File transfer");
+
+						if (Support2.SessionInitiation)
+							Features.Add("Session Initiation");
+
+						if (Support2.InBandBytestreams)
+							Features.Add("In-band byte streams");
+
+						if (Support2.BitsOfBinary)
+							Features.Add("Bits of binary");
+
+						int i = 0;
+						int c = Features.Count;
+						StringBuilder Msg = new StringBuilder("I've detected you support ");
+
+						foreach (string Feature in Features)
+						{
+							Msg.Append(Feature);
+
+							i++;
+							if (i == c)
+								Msg.Append('.');
+							else if (i == c - 1)
+								Msg.Append(" and ");
+							else if (i < c - 1)
+								Msg.Append(", ");
+						}
+
+						this.SendPlainTextChatMessage(e.From, Msg.ToString());
+
+					}, Variables);
+				}
+
+				string s = e.Body;
 				if (e.Content != null && e.Content.LocalName == "content" && e.Content.NamespaceURI == "urn:xmpp:content" &&
 					XML.Attribute(e.Content, "type") == "text/markdown")
 				{
-					Support.Markdown = true;
+					string s2 = e.Content.InnerText;
+
+					if (!string.IsNullOrEmpty(s2))
+						s = s2;
+
+					Support.Markdown |= true;
 				}
 
-				Variables[" Support "] = Support;
+				if (s == null || string.IsNullOrEmpty(s = s.Trim()))
+					return;
 
-				this.client.SendServiceDiscoveryRequest(e.From, (sender, e2) =>
+				switch (s.ToLower())
 				{
-					Variables Variables2 = (Variables)e2.State;
-					RemoteXmppSupport Support2 = new RemoteXmppSupport()
-					{
-						Html = e2.Features.ContainsKey("http://jabber.org/protocol/xhtml-im"),
-						ByteStreams = e2.Features.ContainsKey("http://jabber.org/protocol/bytestreams"),
-						FileTransfer = e2.Features.ContainsKey("http://jabber.org/protocol/si/profile/file-transfer"),
-						SessionInitiation = e2.Features.ContainsKey("http://jabber.org/protocol/si"),
-						InBandBytestreams = e2.Features.ContainsKey("http://jabber.org/protocol/ibb"),
-						BitsOfBinary = e2.Features.ContainsKey("urn:xmpp:bob"),
-						Markdown = Support.Markdown
-					};
+					case "hi":
+					case "hello":
+					case "hej":
+					case "hallo":
+					case "hola":
+						this.SendPlainTextChatMessage(e.From, "Hello. Type # to display the menu.");
+						break;
 
-					Variables2[" Support "] = Support2;
+					case "#":
+						this.ShowMenu(e.From, false, Support);
+						break;
 
-					List<string> Features = new List<string>()
-					{
-						"Plain text"
-					};
+					case "##":
+						this.ShowMenu(e.From, true, Support);
+						break;
 
-					if (Support2.Markdown)
-						Features.Add("Markdown");
-
-					if (Support2.Html)
-						Features.Add("HTML");
-
-					if (Support2.ByteStreams)
-						Features.Add("Bytestreams");
-
-					if (Support2.FileTransfer)
-						Features.Add("File transfer");
-
-					if (Support2.SessionInitiation)
-						Features.Add("Session Initiation");
-
-					if (Support2.InBandBytestreams)
-						Features.Add("In-band byte streams");
-
-					if (Support2.BitsOfBinary)
-						Features.Add("Bits of binary");
-
-					int i = 0;
-					int c = Features.Count;
-					StringBuilder Msg = new StringBuilder("I've detected you support ");
-
-					foreach (string Feature in Features)
-					{
-						Msg.Append(Feature);
-
-						i++;
-						if (i == c)
-							Msg.Append('.');
-						else if (i == c - 1)
-							Msg.Append(" and ");
-						else if (i < c - 1)
-							Msg.Append(", ");
-					}
-
-					this.SendPlainTextChatMessage(e.From, Msg.ToString());
-
-				}, Variables);
-			}
-
-			string s = e.Body;
-			if (e.Content != null && e.Content.LocalName == "content" && e.Content.NamespaceURI == "urn:xmpp:content" &&
-				XML.Attribute(e.Content, "type") == "text/markdown")
-			{
-				string s2 = e.Content.InnerText;
-
-				if (!string.IsNullOrEmpty(s2))
-					s = s2;
-
-				Support.Markdown |= true;
-			}
-
-			if (s == null || string.IsNullOrEmpty(s = s.Trim()))
-				return;
-
-			switch (s.ToLower())
-			{
-				case "hi":
-				case "hello":
-				case "hej":
-				case "hallo":
-				case "hola":
-					this.SendPlainTextChatMessage(e.From, "Hello. Type # to display the menu.");
-					break;
-
-				case "#":
-					this.ShowMenu(e.From, false, Support);
-					break;
-
-				case "##":
-					this.ShowMenu(e.From, true, Support);
-					break;
-
-				case "?":
-					this.InitReadout(e.From);
-					this.SendPlainTextChatMessage(e.From, "Readout started...");
-					this.sensorServer.DoInternalReadout(e.From, null, FieldType.AllExceptHistorical, null, DateTime.MinValue, DateTime.MaxValue,
-						this.MomentaryFieldsRead, this.MomentaryFieldsErrorsRead, new object[] { e.From, true, null, Support });
-					break;
-
-				case "??":
-					this.SendPlainTextChatMessage(e.From, "Readout started...");
-					this.InitReadout(e.From);
-					this.sensorServer.DoInternalReadout(e.From, null, FieldType.All, null, DateTime.MinValue, DateTime.MaxValue,
-						this.AllFieldsRead, this.AllFieldsErrorsRead, new object[] { e.From, true, null, Support });
-					break;
-
-				case "=":
-					if (Support.Markdown)
-					{
-						StringBuilder Markdown = new StringBuilder();
-
-						Markdown.AppendLine("|Variable|Value|");
-						Markdown.AppendLine("|:-------|:---:|");
-
-						foreach (Variable v2 in Variables)
-						{
-							string s2 = v2.ValueElement.ToString();
-							if (s2.Length > 100)
-								s2 = s2.Substring(0, 100) + "...";
-
-							s2 = s2.Replace("|", "&#124;").Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", "<br/>");
-
-							Markdown.Append('|');
-							Markdown.Append(v.Name);
-							Markdown.Append('|');
-							Markdown.Append(s2);
-							Markdown.AppendLine("|");
-
-							if (Markdown.Length > 3000)
-							{
-								this.SendMarkdownChatMessage(e.From, Markdown.ToString());
-								Markdown.Clear();
-							}
-						}
-
-						if (Markdown.Length > 0)
-							this.SendMarkdownChatMessage(e.From, Markdown.ToString());
-					}
-					else if (Support.Html)
-					{
-						StringBuilder Html = new StringBuilder();
-
-						Html.AppendLine("<table><tr><th>Variable</th><th>Value</th></tr>");
-
-						foreach (Variable v2 in Variables)
-						{
-							string s2 = v2.ValueElement.ToString();
-							if (s2.Length > 100)
-								s2 = s2.Substring(0, 100) + "...";
-
-							s2 = XML.HtmlValueEncode(s2).Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", "<br/>");
-
-							Html.Append("<tr><td>");
-							Html.Append(v.Name);
-							Html.Append("</td><td>");
-							Html.Append(s2);
-							Html.AppendLine("</td></tr>");
-						}
-
-						Html.Append("</table>");
-
-						this.SendHtmlChatMessage(e.From, Html.ToString(), null);
-					}
-					else
-					{
-						StringBuilder Text = new StringBuilder();
-
-						Text.AppendLine("Variable\tValue");
-
-						foreach (Variable v2 in Variables)
-						{
-							string s2 = v2.ValueElement.ToString();
-							if (s2.Length > 100)
-								s2 = s2.Substring(0, 100) + "...";
-
-							Text.Append(v.Name);
-							Text.Append('\t');
-							Text.AppendLine(s2);
-
-							if (Text.Length > 3000)
-							{
-								this.SendPlainTextChatMessage(e.From, Text.ToString());
-								Text.Clear();
-							}
-						}
-
-						if (Text.Length > 0)
-							this.SendPlainTextChatMessage(e.From, Text.ToString());
-					}
-					break;
-
-				default:
-					if (s.EndsWith("??"))
-					{
+					case "?":
 						this.InitReadout(e.From);
-						string Field = s.Substring(0, s.Length - 2).Trim();
-						this.SendPlainTextChatMessage(e.From, "Readout of " + Field + " started...");
-						this.sensorServer.DoInternalReadout(e.From, null, FieldType.All, null, DateTime.MinValue, DateTime.MaxValue,
-							this.AllFieldsRead, this.AllFieldsErrorsRead, new object[] { e.From, true, Field, Support });
-					}
-					else if (s.EndsWith("?"))
-					{
-						this.InitReadout(e.From);
-						string Field = s.Substring(0, s.Length - 1).Trim();
-						this.SendPlainTextChatMessage(e.From, "Readout of " + Field + " started...");
+						this.SendPlainTextChatMessage(e.From, "Readout started...");
 						this.sensorServer.DoInternalReadout(e.From, null, FieldType.AllExceptHistorical, null, DateTime.MinValue, DateTime.MaxValue,
-							this.MomentaryFieldsRead, this.MomentaryFieldsErrorsRead, new object[] { e.From, true, Field, Support });
-					}
-					else
-					{
-						int i;
+							this.MomentaryFieldsRead, this.MomentaryFieldsErrorsRead, new object[] { e.From, true, null, Support });
+						break;
 
-						if (this.controlServer != null && (i = s.IndexOf(":=")) > 0)
+					case "??":
+						this.SendPlainTextChatMessage(e.From, "Readout started...");
+						this.InitReadout(e.From);
+						this.sensorServer.DoInternalReadout(e.From, null, FieldType.All, null, DateTime.MinValue, DateTime.MaxValue,
+							this.AllFieldsRead, this.AllFieldsErrorsRead, new object[] { e.From, true, null, Support });
+						break;
+
+					case "=":
+						if (Support.Markdown)
 						{
-							string ParameterName = s.Substring(0, i).Trim();
-							string ValueStr = s.Substring(i + 2).Trim();
-							ThingReference Ref;
+							StringBuilder Markdown = new StringBuilder();
 
-							i = ParameterName.IndexOf('.');
-							if (i < 0)
-								Ref = null;
-							else
-							{
-								Ref = new ThingReference(ParameterName.Substring(0, i), string.Empty, string.Empty);
-								ParameterName = ParameterName.Substring(i + 1).TrimStart();
-							}
+							Markdown.AppendLine("|Variable|Value|");
+							Markdown.AppendLine("|:-------|:---:|");
 
-							try
+							foreach (Variable v2 in Variables)
 							{
-								ControlParameter[] Parameters = this.controlServer.GetControlParameters(Ref);
-								foreach (ControlParameter P in Parameters)
+								string s2 = v2.ValueElement.ToString();
+								if (s2.Length > 100)
+									s2 = s2.Substring(0, 100) + "...";
+
+								s2 = s2.Replace("|", "&#124;").Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", "<br/>");
+
+								Markdown.Append('|');
+								Markdown.Append(v.Name);
+								Markdown.Append('|');
+								Markdown.Append(s2);
+								Markdown.AppendLine("|");
+
+								if (Markdown.Length > 3000)
 								{
-									if (string.Compare(P.Name, ParameterName, true) != 0)
-										continue;
-
-									if (!P.SetStringValue(Ref, ValueStr))
-										throw new Exception("Unable to set control parameter value.");
-
-									this.SendPlainTextChatMessage(e.From, "Control parameter set.");
-
-									return;
+									this.SendMarkdownChatMessage(e.From, Markdown.ToString());
+									Markdown.Clear();
 								}
 							}
-							catch (Exception ex)
-							{
-								this.Error(e.From, ex.Message, Support);
-							}
-						}
 
-						this.Execute(s, e.From, Support);
-					}
-					break;
+							if (Markdown.Length > 0)
+								this.SendMarkdownChatMessage(e.From, Markdown.ToString());
+						}
+						else if (Support.Html)
+						{
+							StringBuilder Html = new StringBuilder();
+
+							Html.AppendLine("<table><tr><th>Variable</th><th>Value</th></tr>");
+
+							foreach (Variable v2 in Variables)
+							{
+								string s2 = v2.ValueElement.ToString();
+								if (s2.Length > 100)
+									s2 = s2.Substring(0, 100) + "...";
+
+								s2 = XML.HtmlValueEncode(s2).Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", "<br/>");
+
+								Html.Append("<tr><td>");
+								Html.Append(v.Name);
+								Html.Append("</td><td>");
+								Html.Append(s2);
+								Html.AppendLine("</td></tr>");
+							}
+
+							Html.Append("</table>");
+
+							this.SendHtmlChatMessage(e.From, Html.ToString(), null);
+						}
+						else
+						{
+							StringBuilder Text = new StringBuilder();
+
+							Text.AppendLine("Variable\tValue");
+
+							foreach (Variable v2 in Variables)
+							{
+								string s2 = v2.ValueElement.ToString();
+								if (s2.Length > 100)
+									s2 = s2.Substring(0, 100) + "...";
+
+								Text.Append(v.Name);
+								Text.Append('\t');
+								Text.AppendLine(s2);
+
+								if (Text.Length > 3000)
+								{
+									this.SendPlainTextChatMessage(e.From, Text.ToString());
+									Text.Clear();
+								}
+							}
+
+							if (Text.Length > 0)
+								this.SendPlainTextChatMessage(e.From, Text.ToString());
+						}
+						break;
+
+					default:
+						if (s.EndsWith("??"))
+						{
+							this.InitReadout(e.From);
+							string Field = s.Substring(0, s.Length - 2).Trim();
+							this.SendPlainTextChatMessage(e.From, "Readout of " + Field + " started...");
+							this.sensorServer.DoInternalReadout(e.From, null, FieldType.All, null, DateTime.MinValue, DateTime.MaxValue,
+								this.AllFieldsRead, this.AllFieldsErrorsRead, new object[] { e.From, true, Field, Support });
+						}
+						else if (s.EndsWith("?"))
+						{
+							this.InitReadout(e.From);
+							string Field = s.Substring(0, s.Length - 1).Trim();
+							this.SendPlainTextChatMessage(e.From, "Readout of " + Field + " started...");
+							this.sensorServer.DoInternalReadout(e.From, null, FieldType.AllExceptHistorical, null, DateTime.MinValue, DateTime.MaxValue,
+								this.MomentaryFieldsRead, this.MomentaryFieldsErrorsRead, new object[] { e.From, true, Field, Support });
+						}
+						else
+						{
+							int i;
+
+							if (this.controlServer != null && (i = s.IndexOf(":=")) > 0)
+							{
+								string ParameterName = s.Substring(0, i).Trim();
+								string ValueStr = s.Substring(i + 2).Trim();
+								ThingReference Ref;
+
+								i = ParameterName.IndexOf('.');
+								if (i < 0)
+									Ref = null;
+								else
+								{
+									Ref = new ThingReference(ParameterName.Substring(0, i), string.Empty, string.Empty);
+									ParameterName = ParameterName.Substring(i + 1).TrimStart();
+								}
+
+								try
+								{
+									ControlParameter[] Parameters = await this.controlServer.GetControlParameters(Ref);
+									foreach (ControlParameter P in Parameters)
+									{
+										if (string.Compare(P.Name, ParameterName, true) != 0)
+											continue;
+
+										if (!P.SetStringValue(Ref, ValueStr))
+											throw new Exception("Unable to set control parameter value.");
+
+										this.SendPlainTextChatMessage(e.From, "Control parameter set.");
+
+										return;
+									}
+								}
+								catch (Exception ex)
+								{
+									this.Error(e.From, ex.Message, Support);
+								}
+							}
+
+							this.Execute(s, e.From, Support);
+						}
+						break;
+				}
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
 			}
 		}
 

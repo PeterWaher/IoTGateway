@@ -25,6 +25,10 @@
     <DocumentationFile>bin\Debug\netstandard1.3\Waher.Networking.CoAP.xml</DocumentationFile>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>bin\Release\netstandard1.3\Waher.Networking.CoAP.xml</DocumentationFile>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="System.Net.NameResolution" Version="4.3.0" />
     <PackageReference Include="System.Net.NetworkInformation" Version="4.3.0" />

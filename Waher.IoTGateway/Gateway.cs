@@ -1037,7 +1037,7 @@ namespace Waher.IoTGateway
 			}
 		}
 
-		private static ControlParameter[] ControlServer_OnGetControlParameters(ThingReference NodeRef)
+		private static async Task<ControlParameter[]> ControlServer_OnGetControlParameters(ThingReference NodeRef)
 		{
 			try
 			{
@@ -1048,7 +1048,7 @@ namespace Waher.IoTGateway
 				if (!concentratorServer.TryGetDataSource(NodeRef.SourceId, out IDataSource Source))
 					return null;
 
-				Node = Source.GetNodeAsync(NodeRef).Result;
+				Node = await Source.GetNodeAsync(NodeRef);
 
 				if (Node == null)
 					return null;

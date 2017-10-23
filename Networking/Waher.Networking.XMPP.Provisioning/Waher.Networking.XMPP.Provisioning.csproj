@@ -24,6 +24,10 @@
     <DocumentationFile>bin\Debug\netstandard1.3\Waher.Networking.XMPP.Provisioning.xml</DocumentationFile>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>bin\Release\netstandard1.3\Waher.Networking.XMPP.Provisioning.xml</DocumentationFile>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="System.Security.Cryptography.X509Certificates" Version="4.3.0" />
   </ItemGroup>

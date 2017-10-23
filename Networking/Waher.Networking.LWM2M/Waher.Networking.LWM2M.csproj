@@ -25,6 +25,10 @@
     <DocumentationFile>bin\Debug\netstandard1.3\Waher.Networking.LWM2M.xml</DocumentationFile>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>bin\Release\netstandard1.3\Waher.Networking.LWM2M.xml</DocumentationFile>
+  </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\..\Content\Waher.Content\Waher.Content.csproj" />
     <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj" />

@@ -48,6 +48,10 @@ XEP-0377: Spam Reporting</Description>
     <DocumentationFile>bin\Debug\netstandard1.3\Waher.Networking.XMPP.xml</DocumentationFile>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>bin\Release\netstandard1.3\Waher.Networking.XMPP.xml</DocumentationFile>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="System.Net.Security" Version="4.3.1" />
     <PackageReference Include="System.Xml.XmlDocument" Version="4.3.0" />

@@ -25,6 +25,10 @@
     <DocumentationFile>bin\Debug\netstandard1.3\Waher.Networking.HTTP.xml</DocumentationFile>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>bin\Release\netstandard1.3\Waher.Networking.HTTP.xml</DocumentationFile>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="System.Net.NetworkInformation" Version="4.3.0" />
     <PackageReference Include="System.Net.Security" Version="4.3.1" />

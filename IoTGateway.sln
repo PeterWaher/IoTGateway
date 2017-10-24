@@ -254,6 +254,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Events.WindowsEventLo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Utility.Install", "Utilities\Waher.Utility.Install\Waher.Utility.Install.csproj", "{A9F8B7F7-671B-433F-9D8B-F3C01A64ACCF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Utility.AnalyzeDB", "Utilities\Waher.Utility.AnalyzeDB\Waher.Utility.AnalyzeDB.csproj", "{00D8B838-EB02-4873-B23F-72D7086F362D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -2188,6 +2190,26 @@ Global
 		{A9F8B7F7-671B-433F-9D8B-F3C01A64ACCF}.Release|x64.Build.0 = Release|Any CPU
 		{A9F8B7F7-671B-433F-9D8B-F3C01A64ACCF}.Release|x86.ActiveCfg = Release|Any CPU
 		{A9F8B7F7-671B-433F-9D8B-F3C01A64ACCF}.Release|x86.Build.0 = Release|Any CPU
+		{00D8B838-EB02-4873-B23F-72D7086F362D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{00D8B838-EB02-4873-B23F-72D7086F362D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{00D8B838-EB02-4873-B23F-72D7086F362D}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{00D8B838-EB02-4873-B23F-72D7086F362D}.Debug|ARM.Build.0 = Debug|Any CPU
+		{00D8B838-EB02-4873-B23F-72D7086F362D}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{00D8B838-EB02-4873-B23F-72D7086F362D}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{00D8B838-EB02-4873-B23F-72D7086F362D}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{00D8B838-EB02-4873-B23F-72D7086F362D}.Debug|x64.Build.0 = Debug|Any CPU
+		{00D8B838-EB02-4873-B23F-72D7086F362D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{00D8B838-EB02-4873-B23F-72D7086F362D}.Debug|x86.Build.0 = Debug|Any CPU
+		{00D8B838-EB02-4873-B23F-72D7086F362D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{00D8B838-EB02-4873-B23F-72D7086F362D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{00D8B838-EB02-4873-B23F-72D7086F362D}.Release|ARM.ActiveCfg = Release|Any CPU
+		{00D8B838-EB02-4873-B23F-72D7086F362D}.Release|ARM.Build.0 = Release|Any CPU
+		{00D8B838-EB02-4873-B23F-72D7086F362D}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{00D8B838-EB02-4873-B23F-72D7086F362D}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{00D8B838-EB02-4873-B23F-72D7086F362D}.Release|x64.ActiveCfg = Release|Any CPU
+		{00D8B838-EB02-4873-B23F-72D7086F362D}.Release|x64.Build.0 = Release|Any CPU
+		{00D8B838-EB02-4873-B23F-72D7086F362D}.Release|x86.ActiveCfg = Release|Any CPU
+		{00D8B838-EB02-4873-B23F-72D7086F362D}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -2284,6 +2306,7 @@ Global
 		{251A7E9E-1613-4AE8-94B9-8D4DDECCE7AD} = {8E0D8BAF-1E21-437F-9760-6117C2F49242}
 		{7D14895A-5246-4DE2-9510-356117D2D495} = {1A06B80C-EDAE-46B3-B7B3-6F641EE03BA6}
 		{A9F8B7F7-671B-433F-9D8B-F3C01A64ACCF} = {5DB13D03-2513-4181-B5BF-891A6974B4A6}
+		{00D8B838-EB02-4873-B23F-72D7086F362D} = {5DB13D03-2513-4181-B5BF-891A6974B4A6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {32CF1367-B83E-4CAD-8329-0D1C73AF59F4}

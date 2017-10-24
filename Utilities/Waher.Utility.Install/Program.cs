@@ -25,6 +25,7 @@ namespace Waher.Utility.Install
 	/// -u                   Uninstall. Add this switch if the module is being uninstalled.
 	/// -r                   Remove files. Add this switch if you want files removed during
 	///                      uninstalltion. Default is to not remove files.
+	/// -?                   Help.
 	/// </summary>
 	class Program
 	{
@@ -114,6 +115,7 @@ namespace Waher.Utility.Install
 					Console.Out.WriteLine("-u                   Uninstall. Add this switch if the module is being uninstalled.");
 					Console.Out.WriteLine("-r                   Remove files. Add this switch if you want files removed during");
 					Console.Out.WriteLine("                     uninstalltion. Default is to not remove files.");
+					Console.Out.WriteLine("-?                   Help.");
 					return 0;
 				}
 

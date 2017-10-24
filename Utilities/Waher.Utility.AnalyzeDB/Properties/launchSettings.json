@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Waher.Utility.AnalyzeDB": {
+      "commandName": "Project",
+      "commandLineArgs": "-d \"C:\\ProgramData\\IoT Gateway\\Data\" -o DB.xml -e -bs 8192 -bbs 8192 -enc UTF-8"
+    }
+  }
+}

@@ -1525,22 +1525,33 @@ namespace Waher.Persistence.Files
 		/// <returns>Asynhronous task object.</returns>
 		public async Task ExportXml(XmlWriter Output, bool Properties)
 		{
-			ObjectBTreeFile[] Files;
-			int c;
-
-			lock (this.files)
-			{
-				c = this.files.Count;
-				Files = new ObjectBTreeFile[c];
-				this.files.Values.CopyTo(Files, 0);
-			}
-
 			Output.WriteStartElement("Database", "http://waher.se/Schema/Persistence/Files.xsd");
 
-			foreach (ObjectBTreeFile File in Files)
+			foreach (ObjectBTreeFile File in this.Files)
 				await File.ExportGraphXML(Output, Properties);
 
 			Output.WriteEndElement();
+		}
+
+		/// <summary>
+		/// Available Object files.
+		/// </summary>
+		public ObjectBTreeFile[] Files
+		{
+			get
+			{
+				ObjectBTreeFile[] Files;
+				int c;
+
+				lock (this.files)
+				{
+					c = this.files.Count;
+					Files = new ObjectBTreeFile[c];
+					this.files.Values.CopyTo(Files, 0);
+				}
+
+				return Files;
+			}
 		}
 
 		/// <summary>

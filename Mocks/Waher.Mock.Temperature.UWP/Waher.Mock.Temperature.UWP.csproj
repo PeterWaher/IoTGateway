@@ -159,6 +159,10 @@
       <Project>{c6bb0dc0-5f14-4e2f-9f3a-c48ef91a3481}</Project>
       <Name>Waher.Networking.XMPP.Chat.UWP</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Networking\Waher.Networking.XMPP.Concentrator.UWP\Waher.Networking.XMPP.Concentrator.UWP.csproj">
+      <Project>{d4261f40-96a9-463d-903d-d38f30d42c3d}</Project>
+      <Name>Waher.Networking.XMPP.Concentrator.UWP</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Networking\Waher.Networking.XMPP.Control.UWP\Waher.Networking.XMPP.Control.UWP.csproj">
       <Project>{c6ba953e-a472-479f-8ba5-82bbaccc7f53}</Project>
       <Name>Waher.Networking.XMPP.Control.UWP</Name>

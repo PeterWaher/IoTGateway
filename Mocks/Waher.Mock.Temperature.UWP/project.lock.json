@@ -28339,6 +28339,9 @@
             },
             "C:\\My Projects\\IoTGateway\\Mocks\\Waher.Mock.UWP\\Waher.Mock.UWP.csproj": {
               "projectPath": "C:\\My Projects\\IoTGateway\\Mocks\\Waher.Mock.UWP\\Waher.Mock.UWP.csproj"
+            },
+            "C:\\My Projects\\IoTGateway\\Networking\\Waher.Networking.XMPP.Concentrator.UWP\\Waher.Networking.XMPP.Concentrator.UWP.csproj": {
+              "projectPath": "C:\\My Projects\\IoTGateway\\Networking\\Waher.Networking.XMPP.Concentrator.UWP\\Waher.Networking.XMPP.Concentrator.UWP.csproj"
             }
           }
         }
@@ -28395,7 +28398,7 @@
       "code": "NU1605",
       "level": "Warning",
       "warningLevel": 1,
-      "message": "Detected package downgrade: Microsoft.NETCore.UniversalWindowsPlatform from 6.0.1 to 5.4.0. Reference the package directly from the project to select a different version. \r\n Waher.Mock.Temperature.UWP -> Waher.Networking.XMPP.Chat.UWP -> Waher.Networking.XMPP.Concentrator.UWP -> Microsoft.NETCore.UniversalWindowsPlatform (>= 6.0.1) \r\n Waher.Mock.Temperature.UWP -> Microsoft.NETCore.UniversalWindowsPlatform (>= 5.4.0)",
+      "message": "Detected package downgrade: Microsoft.NETCore.UniversalWindowsPlatform from 6.0.1 to 5.4.0. Reference the package directly from the project to select a different version. \r\n Waher.Mock.Temperature.UWP -> Waher.Networking.XMPP.Concentrator.UWP -> Microsoft.NETCore.UniversalWindowsPlatform (>= 6.0.1) \r\n Waher.Mock.Temperature.UWP -> Microsoft.NETCore.UniversalWindowsPlatform (>= 5.4.0)",
       "libraryId": "Microsoft.NETCore.UniversalWindowsPlatform",
       "targetGraphs": [
         "UAP,Version=v10.0.10240",

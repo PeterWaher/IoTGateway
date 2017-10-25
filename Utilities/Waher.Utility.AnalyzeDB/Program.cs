@@ -3,6 +3,7 @@ using System.IO;
 using System.Text;
 using System.Xml;
 using Waher.Content;
+using Waher.Content.Xml;
 using Waher.Persistence;
 using Waher.Persistence.Files;
 using Waher.Persistence.Files.Statistics;
@@ -20,10 +21,10 @@ namespace Waher.Utility.AnalyzeDB
 	/// -d APP_DATA_FOLDER    Points to the application data folder.
 	/// -o OUTPUT_FILE        File name of report file.
 	/// -e                    If encryption is used by the database.
-	/// -p                    If objet properties are to be included.
 	/// -bs BLOCK_SIZE        Block size, in bytes. Default=8192.
 	/// -bbs BLOB_BLOCK_SIZE  BLOB block size, in bytes. Default=8192.
 	/// -enc ENCODING         Text encoding. Default=UTF-8
+	/// -t                    XSLT transform to use.
 	/// -?                    Help.
 	/// </summary>
 	class Program
@@ -35,6 +36,7 @@ namespace Waher.Utility.AnalyzeDB
 				Encoding Encoding = Encoding.UTF8;
 				string ProgramDataFolder = null;
 				string OutputFileName = null;
+				string XsltPath = null;
 				string s;
 				int BlockSize = 8192;
 				int BlobBlockSize = 8192;
@@ -42,7 +44,6 @@ namespace Waher.Utility.AnalyzeDB
 				int c = args.Length;
 				bool Help = false;
 				bool Encryption = false;
-				bool Properties = false;
 
 				while (i < c)
 				{
@@ -95,12 +96,15 @@ namespace Waher.Utility.AnalyzeDB
 							Encoding = Encoding.GetEncoding(args[i++]);
 							break;
 
-						case "-e":
-							Encryption = true;
+						case "-t":
+							if (i >= c)
+								throw new Exception("XSLT transform missing.");
+
+							XsltPath = args[i++];
 							break;
 
-						case "-p":
-							Properties = true;
+						case "-e":
+							Encryption = true;
 							break;
 
 						case "-?":
@@ -122,10 +126,10 @@ namespace Waher.Utility.AnalyzeDB
 					Console.Out.WriteLine("-d APP_DATA_FOLDER    Points to the application data folder.");
 					Console.Out.WriteLine("-o OUTPUT_FILE        File name of report file.");
 					Console.Out.WriteLine("-e                    If encryption is used by the database.");
-					Console.Out.WriteLine("-p                    If objet properties are to be included.");
 					Console.Out.WriteLine("-bs BLOCK_SIZE        Block size, in bytes. Default=8192.");
 					Console.Out.WriteLine("-bbs BLOB_BLOCK_SIZE  BLOB block size, in bytes. Default=8192.");
 					Console.Out.WriteLine("-enc ENCODING         Text encoding. Default=UTF-8");
+					Console.Out.WriteLine("-t                    XSLT transform to use.");
 					Console.Out.WriteLine("-?                    Help.");
 					return 0;
 				}
@@ -159,6 +163,20 @@ namespace Waher.Utility.AnalyzeDB
 						using (XmlWriter w = XmlWriter.Create(f, Settings))
 						{
 							w.WriteStartDocument();
+
+							if (string.IsNullOrEmpty(XsltPath))
+							{
+								i = ProgramDataFolder.LastIndexOf(Path.DirectorySeparatorChar);
+								if (i > 0)
+								{
+									s = Path.Combine(ProgramDataFolder.Substring(0, i), "Transforms", "DbStatXmlToHtml.xslt");
+									if (File.Exists(s))
+										XsltPath = s;
+								}
+							}
+
+							w.WriteProcessingInstruction("xml-stylesheet", "type=\"text/xsl\" href=\"" + XML.Encode(XsltPath) + "\"");
+
 							w.WriteStartElement("DatabaseStatistics", "http://waher.se/Schema/Persistence/Statistics.xsd");
 
 							foreach (ObjectBTreeFile File in FilesProvider.Files)
@@ -166,9 +184,9 @@ namespace Waher.Utility.AnalyzeDB
 								w.WriteStartElement("File");
 								w.WriteAttributeString("id", File.Id.ToString());
 								w.WriteAttributeString("collectionName", File.CollectionName);
-								w.WriteAttributeString("fileName", File.FileName);
+								w.WriteAttributeString("fileName", Path.GetRelativePath(ProgramDataFolder, File.FileName));
 								w.WriteAttributeString("blockSize", File.BlockSize.ToString());
-								w.WriteAttributeString("blobFileName", File.BlobFileName);
+								w.WriteAttributeString("blobFileName", Path.GetRelativePath(ProgramDataFolder, File.BlobFileName));
 								w.WriteAttributeString("blobBlockSize", File.BlobBlockSize.ToString());
 								w.WriteAttributeString("count", File.Count.ToString());
 								w.WriteAttributeString("encoding", File.Encoding.WebName);
@@ -183,20 +201,23 @@ namespace Waher.Utility.AnalyzeDB
 								foreach (IndexBTreeFile Index in File.Indices)
 								{
 									w.WriteStartElement("Index");
-									w.WriteAttributeString("id", Index.ObjectFile.Id.ToString());
-									w.WriteAttributeString("fileName", File.FileName);
-									w.WriteAttributeString("blockSize", File.BlockSize.ToString());
-									w.WriteAttributeString("blobFileName", File.BlobFileName);
-									w.WriteAttributeString("blobBlockSize", File.BlobBlockSize.ToString());
-									w.WriteAttributeString("count", File.Count.ToString());
-									w.WriteAttributeString("encoding", File.Encoding.WebName);
-									w.WriteAttributeString("encrypted", CommonTypes.Encode(File.Encrypted));
-									w.WriteAttributeString("inlineObjectSizeLimit", File.InlineObjectSizeLimit.ToString());
-									w.WriteAttributeString("isReadOnly", CommonTypes.Encode(File.IsReadOnly));
-									w.WriteAttributeString("timeoutMs", File.TimeoutMilliseconds.ToString());
+									w.WriteAttributeString("id", Index.IndexFile.Id.ToString());
+									w.WriteAttributeString("fileName", Path.GetRelativePath(ProgramDataFolder, Index.IndexFile.FileName));
+									w.WriteAttributeString("blockSize", Index.IndexFile.BlockSize.ToString());
+									w.WriteAttributeString("blobFileName", Index.IndexFile.BlobFileName);
+									w.WriteAttributeString("blobBlockSize", Index.IndexFile.BlobBlockSize.ToString());
+									w.WriteAttributeString("count", Index.IndexFile.Count.ToString());
+									w.WriteAttributeString("encoding", Index.IndexFile.Encoding.WebName);
+									w.WriteAttributeString("encrypted", CommonTypes.Encode(Index.IndexFile.Encrypted));
+									w.WriteAttributeString("inlineObjectSizeLimit", Index.IndexFile.InlineObjectSizeLimit.ToString());
+									w.WriteAttributeString("isReadOnly", CommonTypes.Encode(Index.IndexFile.IsReadOnly));
+									w.WriteAttributeString("timeoutMs", Index.IndexFile.TimeoutMilliseconds.ToString());
 
-									Stat = Index.ObjectFile.ComputeStatistics().Result;
-									WriteStat(w, Index.ObjectFile, Stat);
+									foreach (string Field in Index.FieldNames)
+										w.WriteElementString("Field", Field);
+
+									Stat = Index.IndexFile.ComputeStatistics().Result;
+									WriteStat(w, Index.IndexFile, Stat);
 
 									w.WriteEndElement();
 								}
@@ -224,9 +245,16 @@ namespace Waher.Utility.AnalyzeDB
 		private static void WriteStat(XmlWriter w, ObjectBTreeFile File, FileStatistics Stat)
 		{
 			w.WriteStartElement("Stat");
-			w.WriteAttributeString("avgBytesPerBlock", Stat.AverageBytesUsedPerBlock.ToString());
-			w.WriteAttributeString("avgObjSize", Stat.AverageObjectSize.ToString());
-			w.WriteAttributeString("avgObjPerBlock", Stat.AverageObjectsPerBlock.ToString());
+
+			if (!double.IsNaN(Stat.AverageBytesUsedPerBlock))
+				w.WriteAttributeString("avgBytesPerBlock", CommonTypes.Encode(Stat.AverageBytesUsedPerBlock));
+
+			if (!double.IsNaN(Stat.AverageObjectSize))
+				w.WriteAttributeString("avgObjSize", CommonTypes.Encode(Stat.AverageObjectSize));
+
+			if (!double.IsNaN(Stat.AverageObjectsPerBlock))
+				w.WriteAttributeString("avgObjPerBlock", CommonTypes.Encode(Stat.AverageObjectsPerBlock));
+
 			w.WriteAttributeString("hasComments", CommonTypes.Encode(Stat.HasComments));
 			w.WriteAttributeString("isBalanced", CommonTypes.Encode(Stat.IsBalanced));
 			w.WriteAttributeString("isCorrupt", CommonTypes.Encode(Stat.IsCorrupt));
@@ -248,6 +276,9 @@ namespace Waher.Utility.AnalyzeDB
 			w.WriteAttributeString("nrBytesUsed", Stat.NrBytesUsed.ToString());
 			w.WriteAttributeString("nrObjects", Stat.NrObjects.ToString());
 			w.WriteAttributeString("usage", CommonTypes.Encode(Stat.Usage));
+
+			if (Stat.NrBlobBytesTotal > 0)
+				w.WriteAttributeString("blobUsage", CommonTypes.Encode((100.0 * Stat.NrBlobBytesUsed) / Stat.NrBlobBytesTotal));
 
 			if (Stat.HasComments)
 			{

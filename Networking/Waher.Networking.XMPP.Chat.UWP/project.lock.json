@@ -27363,6 +27363,9 @@
             "C:\\My Projects\\IoTGateway\\Content\\Waher.Content\\Waher.Content.csproj": {
               "projectPath": "C:\\My Projects\\IoTGateway\\Content\\Waher.Content\\Waher.Content.csproj"
             },
+            "C:\\My Projects\\IoTGateway\\Events\\Waher.Events\\Waher.Events.csproj": {
+              "projectPath": "C:\\My Projects\\IoTGateway\\Events\\Waher.Events\\Waher.Events.csproj"
+            },
             "C:\\My Projects\\IoTGateway\\Runtime\\Waher.Runtime.Cache\\Waher.Runtime.Cache.csproj": {
               "projectPath": "C:\\My Projects\\IoTGateway\\Runtime\\Waher.Runtime.Cache\\Waher.Runtime.Cache.csproj"
             },
@@ -27386,9 +27389,6 @@
             },
             "C:\\My Projects\\IoTGateway\\Networking\\Waher.Networking\\Waher.Networking.csproj": {
               "projectPath": "C:\\My Projects\\IoTGateway\\Networking\\Waher.Networking\\Waher.Networking.csproj"
-            },
-            "C:\\My Projects\\IoTGateway\\Events\\Waher.Events\\Waher.Events.csproj": {
-              "projectPath": "C:\\My Projects\\IoTGateway\\Events\\Waher.Events\\Waher.Events.csproj"
             }
           }
         }

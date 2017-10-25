@@ -714,6 +714,20 @@
               <File Id='Waher.Utility.Install.pdb' Name='Waher.Utility.Install.pdb' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Install\bin\$(var.Configuration)\netcoreapp2.0\Waher.Utility.Install.pdb' Vital='yes' KeyPath='yes'/>
               <RemoveFile Id='RemoveWaher.Utility.Install.pdb' Name='Waher.Utility.Install.pdb' On='uninstall'/>
             </Component>
+            <Component Id='UtilityAnalyzeDB' Guid='86C2CA7D-73E4-44C3-96A1-CA67B79AB2CA'>
+              <File Id='Waher.Utility.AnalyzeDB.exe' Name='Waher.Utility.AnalyzeDB.exe' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.AnalyzeDB\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.AnalyzeDB.exe' Vital='yes' KeyPath='yes'/>
+              <File Id='Waher.Utility.AnalyzeDB.dll' Name='Waher.Utility.AnalyzeDB.dll' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.AnalyzeDB\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.AnalyzeDB.dll' Vital='yes'/>
+              <File Id='Waher.Utility.AnalyzeDB.deps.json' Name='Waher.Utility.AnalyzeDB.deps.json' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.AnalyzeDB\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.AnalyzeDB.deps.json' Vital='yes'/>
+              <File Id='Waher.Utility.AnalyzeDB.runtimeconfig.json' Name='Waher.Utility.AnalyzeDB.runtimeconfig.json' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.AnalyzeDB\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.AnalyzeDB.runtimeconfig.json' Vital='yes'/>
+              <RemoveFile Id='RemoveWaher.Utility.AnalyzeDB.exe' Name='Waher.Utility.AnalyzeDB.exe' On='uninstall'/>
+              <RemoveFile Id='RemoveWaher.Utility.AnalyzeDB.dll' Name='Waher.Utility.AnalyzeDB.dll' On='uninstall'/>
+              <RemoveFile Id='RemoveWaher.Utility.AnalyzeDB.deps.json' Name='Waher.Utility.AnalyzeDB.deps.json' On='uninstall'/>
+              <RemoveFile Id='RemoveWaher.Utility.AnalyzeDB.runtimeconfig.json' Name='Waher.Utility.AnalyzeDB.runtimeconfig.json' On='uninstall'/>
+            </Component>
+            <Component Id='UtilityAnalyzeDBDebugFiles' Guid='9AC27575-12C5-478C-879E-64D75041DA3E'>
+              <File Id='Waher.Utility.AnalyzeDB.pdb' Name='Waher.Utility.AnalyzeDB.pdb' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.AnalyzeDB\bin\$(var.Configuration)\netcoreapp2.0\Waher.Utility.AnalyzeDB.pdb' Vital='yes' KeyPath='yes'/>
+              <RemoveFile Id='RemoveWaher.Utility.AnalyzeDB.pdb' Name='Waher.Utility.AnalyzeDB.pdb' On='uninstall'/>
+            </Component>
             <Directory Id='Graphics' Name='Graphics'>
               <Directory Id='GraphicsEmoji1' Name='Emoji1'>
                 <Directory Id='GraphicsEmoji1Png' Name='png'>
@@ -13993,8 +14007,10 @@
               <RemoveFolder Id='RemoveTransforms' On='uninstall' />
               <File Id='EventXmlToHtml.xslt' Name='EventXmlToHtml.xslt' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Transforms\EventXmlToHtml.xslt' KeyPath='yes'/>
               <File Id='SnifferXmlToHtml.xslt' Name='SnifferXmlToHtml.xslt' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Transforms\SnifferXmlToHtml.xslt'/>
+              <File Id='DbStatXmlToHtml.xslt' Name='DbStatXmlToHtml.xslt' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Transforms\DbStatXmlToHtml.xslt'/>
               <RemoveFile Id='RemoveEventXmlToHtml.xslt' Name='EventXmlToHtml.xslt' On='uninstall'/>
               <RemoveFile Id='RemoveSnifferXmlToHtml.xslt' Name='SnifferXmlToHtml.xslt' On='uninstall'/>
+              <RemoveFile Id='RemoveDbStatXmlToHtml.xslt' Name='DbStatXmlToHtml.xslt' On='uninstall'/>
             </Component>
           </Directory>
           <Directory Id='Language' Name='Language'>
@@ -14059,11 +14075,13 @@
       </Feature>
       <Feature Id='Utilities' Title='Utilities' Description='Contains command-line utilities for management of the gateway.' Level='1'>
         <ComponentRef Id='UtilityInstall' />
+        <ComponentRef Id='UtilityAnalyzeDB' />
       </Feature>
       <Feature Id='DebugFiles' Title='Debug Files' Description='Provides debug files. This will help debugging, since it provides more information in case something goes wrong.' Level='1000'>
         <ComponentRef Id='MainDebugFiles'/>
         <ComponentRef Id='ScriptWebServiceDebugFiles'/>
         <ComponentRef Id='UtilityInstallDebugFiles' />
+        <ComponentRef Id='UtilityAnalyzeDBDebugFiles' />
       </Feature>
     </Feature>
     <WixVariable Id="WixUIBannerBmp" Value="..\..\banner.bmp" />

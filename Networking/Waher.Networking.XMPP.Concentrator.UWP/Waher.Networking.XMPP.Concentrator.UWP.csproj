@@ -1,14 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{C6BB0DC0-5F14-4E2F-9F3A-C48EF91A3481}</ProjectGuid>
+    <ProjectGuid>{D4261F40-96A9-463D-903D-D38F30D42C3D}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Waher.Networking.XMPP.Chat</RootNamespace>
-    <AssemblyName>Waher.Networking.XMPP.Chat.UWP</AssemblyName>
+    <RootNamespace>Waher.Networking.XMPP.Concentrator.UWP</RootNamespace>
+    <AssemblyName>Waher.Networking.XMPP.Concentrator.UWP</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
     <TargetPlatformVersion>10.0.10586.0</TargetPlatformVersion>
@@ -46,7 +46,6 @@
     <PlatformTarget>x86</PlatformTarget>
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <ErrorReport>prompt</ErrorReport>
-    <DocumentationFile>bin\x86\Debug\Waher.Networking.XMPP.Chat.UWP.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
     <PlatformTarget>x86</PlatformTarget>
@@ -58,7 +57,7 @@
     <PlatformTarget>x86</PlatformTarget>
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <ErrorReport>prompt</ErrorReport>
-    <DocumentationFile>bin\x86\Release\Waher.Networking.XMPP.Chat.UWP.XML</DocumentationFile>
+    <DocumentationFile>bin\x86\Release\Waher.Networking.XMPP.Concentrator.UWP.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|ARM'">
     <PlatformTarget>ARM</PlatformTarget>
@@ -104,27 +103,41 @@
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
+  <PropertyGroup>
+    <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
+  </PropertyGroup>
   <ItemGroup>
-    <!-- A reference to the entire .Net Framework and Windows SDK are automatically included -->
-    <None Include="Package.nuspec">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="project.json" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="ChatServer.cs" />
+    <Compile Include="Attributes\AlphaChannelAttribute.cs" />
+    <Compile Include="Attributes\DateOnlyAttribute.cs" />
+    <Compile Include="Attributes\DefaultLanguageAttribute.cs" />
+    <Compile Include="Attributes\HeaderAttribute.cs" />
+    <Compile Include="Attributes\MaskedAttribute.cs" />
+    <Compile Include="Attributes\OpenAttribute.cs" />
+    <Compile Include="Attributes\OptionAttribute.cs" />
+    <Compile Include="Attributes\PageAttribute.cs" />
+    <Compile Include="Attributes\RangeAttribute.cs" />
+    <Compile Include="Attributes\ReadOnlyAttribute.cs" />
+    <Compile Include="Attributes\RegularExpressionAttribute.cs" />
+    <Compile Include="Attributes\RequiredAttribute.cs" />
+    <Compile Include="Attributes\SectionAttribute.cs" />
+    <Compile Include="Attributes\TextAttribute.cs" />
+    <Compile Include="Attributes\ToolTipAttribute.cs" />
+    <Compile Include="ConcentratorServer.cs" />
+    <Compile Include="Parameters.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="Properties\Waher.Networking.XMPP.Chat.UWP.rd.xml" />
+    <EmbeddedResource Include="Properties\Waher.Networking.XMPP.Concentrator.UWP.rd.xml" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Content\Waher.Content.Emoji\Waher.Content.Emoji.csproj">
-      <Project>{f8febaef-d613-4f96-aedf-fbcb76bc1202}</Project>
-      <Name>Waher.Content.Emoji</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Content\Waher.Content.Markdown\Waher.Content.Markdown.csproj">
-      <Project>{e3533ca0-15f4-49e0-a9df-595bd5edf2dd}</Project>
-      <Name>Waher.Content.Markdown</Name>
-    </ProjectReference>
+    <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
+      <Version>6.0.1</Version>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Language\Waher.Networking.XMPP.Concentrator.en.lng">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\..\Content\Waher.Content.Xml\Waher.Content.Xml.csproj">
       <Project>{8aeeb562-a2d3-4061-8384-a9c04920e110}</Project>
       <Name>Waher.Content.Xml</Name>
@@ -137,25 +150,21 @@
       <Project>{8ae9d52d-28cd-4f83-98de-b6a016f5c7ba}</Project>
       <Name>Waher.Events</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Cache\Waher.Runtime.Cache.csproj">
-      <Project>{7d5a1c49-15e9-4e74-a7b5-3ff9b705e73f}</Project>
-      <Name>Waher.Runtime.Cache</Name>
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj">
+      <Project>{7f1b0d78-aa86-445b-9e1f-7df75b9e4c04}</Project>
+      <Name>Waher.Runtime.Inventory</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Script\Waher.Script.Graphs\Waher.Script.Graphs.csproj">
-      <Project>{9c55559b-0f46-4799-9b0a-b175389d25b0}</Project>
-      <Name>Waher.Script.Graphs</Name>
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Language\Waher.Runtime.Language.csproj">
+      <Project>{e11e0021-a85f-466b-92ab-5725c6277b6a}</Project>
+      <Name>Waher.Runtime.Language</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Script\Waher.Script\Waher.Script.csproj">
-      <Project>{c39e8f9b-1386-4cd3-bfa7-3481181d3ba1}</Project>
-      <Name>Waher.Script</Name>
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Timing\Waher.Runtime.Timing.csproj">
+      <Project>{e98a01a1-66e5-4159-9935-11a8e76f870a}</Project>
+      <Name>Waher.Runtime.Timing</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Things\Waher.Things\Waher.Things.csproj">
       <Project>{1659833d-9a9a-4147-9237-2ba8d96086bc}</Project>
       <Name>Waher.Things</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Waher.Networking.XMPP.Concentrator.UWP\Waher.Networking.XMPP.Concentrator.UWP.csproj">
-      <Project>{d4261f40-96a9-463d-903d-d38f30d42c3d}</Project>
-      <Name>Waher.Networking.XMPP.Concentrator.UWP</Name>
     </ProjectReference>
     <ProjectReference Include="..\Waher.Networking.XMPP.Control.UWP\Waher.Networking.XMPP.Control.UWP.csproj">
       <Project>{c6ba953e-a472-479f-8ba5-82bbaccc7f53}</Project>
@@ -174,13 +183,19 @@
       <Name>Waher.Networking</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Package.nuspec">
+      <SubType>Designer</SubType>
+    </None>
+  </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP.Chat\*.cs" "$(ProjectDir)" /Y
-</PreBuildEvent>
+    <PreBuildEvent>xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP.Concentrator\*.cs" "$(ProjectDir)" /Y
+xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP.Concentrator\Attributes\*.cs" "$(ProjectDir)Attributes" /S /R /Y
+xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP.Concentrator\Language\*.lng" "$(ProjectDir)Language" /S /R /Y</PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
     <PostBuildEvent>cd "$(ProjectDir)bin"

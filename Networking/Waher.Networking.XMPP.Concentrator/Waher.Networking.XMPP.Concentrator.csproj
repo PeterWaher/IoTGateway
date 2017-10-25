@@ -4,8 +4,8 @@
     <TargetFramework>netstandard1.3</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <Description>Implements the XMPP IoT concentrator extesion XEP-0326.</Description>
-    <Copyright>Copyright © Waher Data AB 2016-2017. All rights reserved.</Copyright>
+    <Description>Implements the XMPP IoT concentrator extesion XEP-0326. The concentrator interface allows a device to manage a set of internal virtual devices, all sharing the same XMPP connection.</Description>
+    <Copyright>Copyright © Waher Data AB 2017. All rights reserved.</Copyright>
     <Authors>Peter Waher</Authors>
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
@@ -16,13 +16,17 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>networking communication xmpp iot concentrator XEP-0326</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>0.1.0</AssemblyVersion>
-    <FileVersion>0.1.0</FileVersion>
-    <Version>0.1.0</Version>
+    <AssemblyVersion>0.1.1</AssemblyVersion>
+    <FileVersion>0.1.1</FileVersion>
+    <Version>0.1.1</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DocumentationFile>bin\Debug\netstandard1.3\Waher.Networking.XMPP.Concentrator.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>bin\Release\netstandard1.3\Waher.Networking.XMPP.Concentrator.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -43,6 +47,8 @@
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Language\Waher.Runtime.Language.csproj" />
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Timing\Waher.Runtime.Timing.csproj" />
     <ProjectReference Include="..\..\Things\Waher.Things\Waher.Things.csproj" />
+    <ProjectReference Include="..\Waher.Networking.XMPP.Control\Waher.Networking.XMPP.Control.csproj" />
+    <ProjectReference Include="..\Waher.Networking.XMPP.Sensor\Waher.Networking.XMPP.Sensor.csproj" />
     <ProjectReference Include="..\Waher.Networking.XMPP\Waher.Networking.XMPP.csproj" />
     <ProjectReference Include="..\Waher.Networking\Waher.Networking.csproj" />
   </ItemGroup>

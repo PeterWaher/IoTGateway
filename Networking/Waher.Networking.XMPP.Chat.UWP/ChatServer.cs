@@ -4,11 +4,13 @@ using System.IO;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
+using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Markdown;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Networking.XMPP.BitsOfBinary;
+using Waher.Networking.XMPP.Concentrator;
 using Waher.Networking.XMPP.Control;
 using Waher.Networking.XMPP.HttpFileUpload;
 using Waher.Networking.XMPP.Sensor;
@@ -37,6 +39,7 @@ namespace Waher.Networking.XMPP.Chat
 		private Cache<string, Variables> sessions;
 		private SensorServer sensorServer;
 		private ControlServer controlServer;
+		private ConcentratorServer concentratorServer;
 		private XmppClient client;
 		private BobClient bobClient;
 		private HttpFileUploadClient httpUpload = null;
@@ -88,6 +91,34 @@ namespace Waher.Networking.XMPP.Chat
 			this.bobClient = BobClient;
 			this.sensorServer = SensorServer;
 			this.controlServer = ControlServer;
+			this.concentratorServer = null;
+
+			this.client.OnChatMessage += new MessageEventHandler(Client_OnChatMessage);
+
+			this.client.RegisterFeature("urn:xmpp:iot:chat");
+			this.client.SetPresence(Availability.Chat);
+
+			this.sessions = new Cache<string, Variables>(1000, TimeSpan.MaxValue, new TimeSpan(0, 20, 0));
+			this.sessions.Removed += Sessions_Removed;
+		}
+
+		/// <summary>
+		/// Class managing a chat interface for things.
+		/// 
+		/// The chat interface is defined in:
+		/// https://github.com/joachimlindborg/XMPP-IoT/blob/master/xep-0000-IoT-Chat.xml
+		/// http://htmlpreview.github.io/?https://github.com/joachimlindborg/XMPP-IoT/blob/master/xep-0000-IoT-Chat.html
+		/// </summary>
+		/// <param name="Client">XMPP Client.</param>
+		/// <param name="BobClient">Bits-of-Binary client.</param>
+		/// <param name="ConcentratorServer">Concentrator Server.</param>
+		public ChatServer(XmppClient Client, BobClient BobClient, ConcentratorServer ConcentratorServer)
+		{
+			this.client = Client;
+			this.bobClient = BobClient;
+			this.sensorServer = ConcentratorServer.SensorServer;
+			this.controlServer = ConcentratorServer.ControlServer;
+			this.concentratorServer = ConcentratorServer;
 
 			this.client.OnChatMessage += new MessageEventHandler(Client_OnChatMessage);
 
@@ -140,6 +171,10 @@ namespace Waher.Networking.XMPP.Chat
 			{
 				Variables Variables = this.GetVariables(e.From);
 				RemoteXmppSupport Support = null;
+				SortedDictionary<int, KeyValuePair<string, object>> Menu = null;
+				IDataSource SelectedSource = null;
+				INode SelectedNode = null;
+				int i;
 
 				if (this.httpUpload == null)
 				{
@@ -147,7 +182,40 @@ namespace Waher.Networking.XMPP.Chat
 					this.httpUpload.Discover(null);
 				}
 
-				if (!Variables.TryGetVariable(" Support ", out Variable v) || (Support = v.ValueObject as RemoteXmppSupport) == null)
+				if (!Variables.TryGetVariable(" Menu ", out Variable v) || (Menu = v.ValueObject as SortedDictionary<int, KeyValuePair<string, object>>) == null)
+					Menu = null;
+
+				if (this.concentratorServer != null)
+				{
+					if (!Variables.TryGetVariable(" Source ", out v) || (SelectedSource = v.ValueObject as IDataSource) == null)
+					{
+						if (this.concentratorServer.RootDataSources.Length == 1)
+						{
+							SelectedSource = this.concentratorServer.RootDataSources[0];
+							Variables[" Source "] = SelectedSource;
+						}
+						else
+						{
+							foreach (IDataSource Source in this.concentratorServer.DataSources)
+							{
+								if (Source.SourceID == "MeteringTopology")
+								{
+									SelectedSource = Source;
+									Variables[" Source "] = SelectedSource;
+									break;
+								}
+							}
+						}
+
+						SelectedNode = null;
+						Variables[" Node "] = SelectedNode;
+					}
+
+					if (!Variables.TryGetVariable(" Node ", out v) || (SelectedNode = v.ValueObject as INode) == null)
+						SelectedNode = null;
+				}
+
+				if (!Variables.TryGetVariable(" Support ", out v) || (Support = v.ValueObject as RemoteXmppSupport) == null)
 				{
 					Support = new RemoteXmppSupport();
 
@@ -177,7 +245,7 @@ namespace Waher.Networking.XMPP.Chat
 
 						List<string> Features = new List<string>()
 						{
-						"Plain text"
+							"Plain text"
 						};
 
 						if (Support2.Markdown)
@@ -201,7 +269,7 @@ namespace Waher.Networking.XMPP.Chat
 						if (Support2.BitsOfBinary)
 							Features.Add("Bits of binary");
 
-						int i = 0;
+						i = 0;
 						int c = Features.Count;
 						StringBuilder Msg = new StringBuilder("I've detected you support ");
 
@@ -249,25 +317,38 @@ namespace Waher.Networking.XMPP.Chat
 						break;
 
 					case "#":
-						this.ShowMenu(e.From, false, Support);
+						this.ShowHelp(e.From, false, Support);
 						break;
 
 					case "##":
-						this.ShowMenu(e.From, true, Support);
+						this.ShowHelp(e.From, true, Support);
 						break;
 
 					case "?":
-						this.InitReadout(e.From);
-						this.SendPlainTextChatMessage(e.From, "Readout started...");
-						this.sensorServer.DoInternalReadout(e.From, null, FieldType.AllExceptHistorical, null, DateTime.MinValue, DateTime.MaxValue,
-							this.MomentaryFieldsRead, this.MomentaryFieldsErrorsRead, new object[] { e.From, true, null, Support });
-						break;
-
 					case "??":
-						this.SendPlainTextChatMessage(e.From, "Readout started...");
+						ThingReference ThingRef;
+						bool Full = (s == "??");
+
+						if (this.concentratorServer != null)
+						{
+							if (SelectedNode == null)
+							{
+								this.Error(e.From, "No node selected.", Support);
+								break;
+							}
+
+							ThingRef = new ThingReference(SelectedNode.NodeId, SelectedNode.SourceId, SelectedNode.Partition);
+						}
+						else
+							ThingRef = ThingReference.Empty;
+
 						this.InitReadout(e.From);
-						this.sensorServer.DoInternalReadout(e.From, null, FieldType.All, null, DateTime.MinValue, DateTime.MaxValue,
-							this.AllFieldsRead, this.AllFieldsErrorsRead, new object[] { e.From, true, null, Support });
+						this.SendPlainTextChatMessage(e.From, "Readout started...");
+						this.sensorServer.DoInternalReadout(e.From, new ThingReference[] { ThingRef },
+							Full ? FieldType.All : FieldType.AllExceptHistorical, null, DateTime.MinValue, DateTime.MaxValue,
+							Full ? (InternalReadoutFieldsEventHandler)this.AllFieldsRead : this.MomentaryFieldsRead,
+							Full ? (InternalReadoutErrorsEventHandler)this.AllFieldsErrorsRead : this.MomentaryFieldsErrorsRead,
+							new object[] { e.From, true, null, Support });
 						break;
 
 					case "=":
@@ -280,6 +361,9 @@ namespace Waher.Networking.XMPP.Chat
 
 							foreach (Variable v2 in Variables)
 							{
+								if (v2.Name.StartsWith(" "))
+									continue;
+
 								string s2 = v2.ValueElement.ToString();
 								if (s2.Length > 100)
 									s2 = s2.Substring(0, 100) + "...";
@@ -287,7 +371,7 @@ namespace Waher.Networking.XMPP.Chat
 								s2 = s2.Replace("|", "&#124;").Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", "<br/>");
 
 								Markdown.Append('|');
-								Markdown.Append(v.Name);
+								Markdown.Append(v2.Name);
 								Markdown.Append('|');
 								Markdown.Append(s2);
 								Markdown.AppendLine("|");
@@ -310,6 +394,9 @@ namespace Waher.Networking.XMPP.Chat
 
 							foreach (Variable v2 in Variables)
 							{
+								if (v2.Name.StartsWith(" "))
+									continue;
+
 								string s2 = v2.ValueElement.ToString();
 								if (s2.Length > 100)
 									s2 = s2.Substring(0, 100) + "...";
@@ -317,7 +404,7 @@ namespace Waher.Networking.XMPP.Chat
 								s2 = XML.HtmlValueEncode(s2).Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", "<br/>");
 
 								Html.Append("<tr><td>");
-								Html.Append(v.Name);
+								Html.Append(v2.Name);
 								Html.Append("</td><td>");
 								Html.Append(s2);
 								Html.AppendLine("</td></tr>");
@@ -335,11 +422,14 @@ namespace Waher.Networking.XMPP.Chat
 
 							foreach (Variable v2 in Variables)
 							{
+								if (v2.Name.StartsWith(" "))
+									continue;
+
 								string s2 = v2.ValueElement.ToString();
 								if (s2.Length > 100)
 									s2 = s2.Substring(0, 100) + "...";
 
-								Text.Append(v.Name);
+								Text.Append(v2.Name);
 								Text.Append('\t');
 								Text.AppendLine(s2);
 
@@ -355,61 +445,378 @@ namespace Waher.Networking.XMPP.Chat
 						}
 						break;
 
-					default:
-						if (s.EndsWith("??"))
+					case "/":
+						if (this.concentratorServer == null)
+							this.SendPlainTextChatMessage(e.From, "Device is not a concentrator.");
+						else if (SelectedSource == null)
+							this.SendPlainTextChatMessage(e.From, "No source selected.");
+						else
 						{
-							this.InitReadout(e.From);
-							string Field = s.Substring(0, s.Length - 2).Trim();
-							this.SendPlainTextChatMessage(e.From, "Readout of " + Field + " started...");
-							this.sensorServer.DoInternalReadout(e.From, null, FieldType.All, null, DateTime.MinValue, DateTime.MaxValue,
-								this.AllFieldsRead, this.AllFieldsErrorsRead, new object[] { e.From, true, Field, Support });
+							IEnumerable<INode> Nodes = SelectedSource.RootNodes;
+							bool First = true;
+
+							SelectedNode = null;
+							if (Nodes != null)
+							{
+								foreach (INode Node in Nodes)
+								{
+									if (First)
+									{
+										SelectedNode = Node;
+										First = false;
+									}
+									else
+									{
+										SelectedNode = null;
+										break;
+									}
+								}
+							}
+
+							await this.SelectNode(e, SelectedSource, SelectedNode, Variables, Menu, Support);
+						}
+						break;
+
+					case "//":
+						if (this.concentratorServer == null)
+							this.SendPlainTextChatMessage(e.From, "Device is not a concentrator.");
+						else
+						{
+							IEnumerable<IDataSource> Sources = this.concentratorServer.RootDataSources;
+							bool First = true;
+
+							SelectedSource = null;
+							foreach (IDataSource Source in Sources)
+							{
+								if (First)
+								{
+									SelectedSource = Source;
+									First = false;
+								}
+								else
+								{
+									SelectedSource = null;
+									break;
+								}
+							}
+
+							this.SelectSource(e, SelectedSource, Variables, Menu, Support);
+						}
+						break;
+
+					case ":=":
+						if (SelectedNode == null)
+							this.Error(e.From, "No node selected.", Support);
+						else if (SelectedNode is IActuator Actuator)
+						{
+							ControlParameter[] Parameters = Actuator.GetControlParameters();
+
+							Menu = new SortedDictionary<int, KeyValuePair<string, object>>()
+							{
+								{ -3, new KeyValuePair<string, object>(null, Parameters) },
+								{ -2, new KeyValuePair<string, object>(null, SelectedNode) },
+								{ -1, new KeyValuePair<string, object>(null, SelectedSource) },
+								{ 0, new KeyValuePair<string, object>(null, Menu) }
+							};
+
+							i = 0;
+
+							foreach (ControlParameter P in Parameters)
+							{
+								Menu[++i] = new KeyValuePair<string, object>(P.Name, P.Name + " (" +
+										P.GetStringValue(new ThingReference(SelectedNode.NodeId, SelectedNode.SourceId, SelectedNode.Partition)) + ")");
+							}
+
+							Variables[" Menu "] = Menu;
+							this.SendMenu(e.From, Menu, Support);
+						}
+						else
+							this.Error(e.From, "Selected node is not an actuator", Support);
+						break;
+
+					default:
+						if (int.TryParse(s, out i) && i >= 0 && Menu != null && Menu.TryGetValue(i, out KeyValuePair<string, object> Item) && !string.IsNullOrEmpty(Item.Key))
+						{
+							s = Item.Key;
+
+							if (i == 0)
+							{
+								Menu = Item.Value as SortedDictionary<int, KeyValuePair<string, object>>;
+								if (Menu == null)
+									this.Error(e.From, "There's no previous menu.", Support);
+								else
+								{
+									Variables[" Menu "] = Menu;
+									this.SendMenu(e.From, Menu, Support);
+								}
+							}
+							else if (Menu.TryGetValue(-2, out KeyValuePair<string, object> Obj) && Obj.Value is INode Node &&
+								Menu.TryGetValue(-1, out Obj) && Obj.Value is IDataSource Source)
+							{
+								if (Node.HasChildren)
+								{
+									foreach (INode ChildNode in await Node.ChildNodes)
+									{
+										if (ChildNode.NodeId == s)
+										{
+											await this.SelectNode(e, Source, Node, Variables, Menu, Support);
+											break;
+										}
+									}
+								}
+							}
+							else if (Menu.TryGetValue(-1, out Obj))
+							{
+								if (Obj.Value == null)
+								{
+									foreach (IDataSource RootSource in this.concentratorServer.DataSources)
+									{
+										if (RootSource.SourceID == s)
+										{
+											this.SelectSource(e, RootSource, Variables, Menu, Support);
+											break;
+										}
+									}
+								}
+								else if ((Source = Obj.Value as IDataSource) != null)
+								{
+									if (Source.HasChildren)
+									{
+										foreach (IDataSource ChildSource in Source.ChildSources)
+										{
+											if (ChildSource.SourceID == s)
+											{
+												this.SelectSource(e, ChildSource, Variables, Menu, Support);
+												s = null;
+												break;
+											}
+										}
+									}
+
+									if (!string.IsNullOrEmpty(s))
+									{
+										if (Source.RootNodes != null)
+										{
+											foreach (INode RootNode in Source.RootNodes)
+											{
+												if (RootNode.NodeId == s)
+												{
+													await this.SelectNode(e, Source, RootNode, Variables, Menu, Support);
+													break;
+												}
+											}
+										}
+									}
+								}
+							}
 						}
 						else if (s.EndsWith("?"))
 						{
+							Full = s.EndsWith("??");
 							this.InitReadout(e.From);
-							string Field = s.Substring(0, s.Length - 1).Trim();
-							this.SendPlainTextChatMessage(e.From, "Readout of " + Field + " started...");
-							this.sensorServer.DoInternalReadout(e.From, null, FieldType.AllExceptHistorical, null, DateTime.MinValue, DateTime.MaxValue,
-								this.MomentaryFieldsRead, this.MomentaryFieldsErrorsRead, new object[] { e.From, true, Field, Support });
-						}
-						else
-						{
-							int i;
+							string Field = s.Substring(0, s.Length - (Full ? 2 : 1)).Trim();
 
-							if (this.controlServer != null && (i = s.IndexOf(":=")) > 0)
+							if (this.concentratorServer != null)
 							{
-								string ParameterName = s.Substring(0, i).Trim();
-								string ValueStr = s.Substring(i + 2).Trim();
-								ThingReference Ref;
-
-								i = ParameterName.IndexOf('.');
-								if (i < 0)
-									Ref = null;
-								else
+								if (SelectedSource == null)
 								{
-									Ref = new ThingReference(ParameterName.Substring(0, i), string.Empty, string.Empty);
-									ParameterName = ParameterName.Substring(i + 1).TrimStart();
+									this.Error(e.From, "No source selected.", Support);
+									break;
 								}
 
-								try
+								INode Node;
+
+								i = Field.IndexOf('.');
+								if (i >= 0)
 								{
-									ControlParameter[] Parameters = await this.controlServer.GetControlParameters(Ref);
-									foreach (ControlParameter P in Parameters)
+									Node = await SelectedSource.GetNodeAsync(
+										new ThingReference(this.CheckMenu(Menu, Field.Substring(0, i)), SelectedSource.SourceID, string.Empty));
+									Field = this.CheckMenu(Menu, Field.Substring(i + 1));
+
+									if (Node == null)
 									{
-										if (string.Compare(P.Name, ParameterName, true) != 0)
-											continue;
-
-										if (!P.SetStringValue(Ref, ValueStr))
-											throw new Exception("Unable to set control parameter value.");
-
-										this.SendPlainTextChatMessage(e.From, "Control parameter set.");
-
-										return;
+										this.Error(e.From, "Node not found.", Support);
+										break;
 									}
 								}
-								catch (Exception ex)
+								else if ((Node = await SelectedSource.GetNodeAsync(new ThingReference(this.CheckMenu(Menu, Field),
+									SelectedSource.SourceID, string.Empty))) != null)
 								{
-									this.Error(e.From, ex.Message, Support);
+									Field = string.Empty;
+								}
+								else
+								{
+									Node = SelectedNode;
+
+									if (Node == null)
+									{
+										this.Error(e.From, "No node selected.", Support);
+										break;
+									}
+								}
+
+								ThingRef = new ThingReference(Node.NodeId, Node.SourceId, Node.Partition);
+
+								this.SendPlainTextChatMessage(e.From, "Readout of " + Field + " on " + Node.NodeId + " started...");
+								this.sensorServer.DoInternalReadout(e.From, new ThingReference[] { ThingRef },
+									Full ? FieldType.All : FieldType.AllExceptHistorical, null, DateTime.MinValue, DateTime.MaxValue,
+									Full ? (InternalReadoutFieldsEventHandler)this.AllFieldsRead : this.MomentaryFieldsRead,
+									Full ? (InternalReadoutErrorsEventHandler)this.AllFieldsErrorsRead : this.MomentaryFieldsErrorsRead,
+									new object[] { e.From, true, Field, Support });
+							}
+							else
+							{
+								this.SendPlainTextChatMessage(e.From, "Readout of " + Field + " started...");
+								this.sensorServer.DoInternalReadout(e.From, null, Full ? FieldType.All : FieldType.AllExceptHistorical,
+									null, DateTime.MinValue, DateTime.MaxValue,
+									Full ? (InternalReadoutFieldsEventHandler)this.AllFieldsRead : this.MomentaryFieldsRead,
+									Full ? (InternalReadoutErrorsEventHandler)this.AllFieldsErrorsRead : this.MomentaryFieldsErrorsRead,
+									new object[] { e.From, true, Field, Support });
+							}
+						}
+						else if (SelectedSource != null && await SelectedSource.GetNodeAsync(new ThingReference(s, SelectedSource.SourceID, string.Empty)) is INode Node)
+							await this.SelectNode(e, SelectedSource, Node, Variables, Menu, Support);
+						else
+						{
+							if (this.controlServer != null && (i = s.IndexOf(":=")) > 0)
+							{
+								string ParameterName = this.CheckMenu(Menu, s.Substring(0, i).Trim());
+								string ValueStr = s.Substring(i + 2).Trim();
+
+								if (this.concentratorServer != null)
+								{
+									if (SelectedSource == null)
+									{
+										this.Error(e.From, "No source selected.", Support);
+										break;
+									}
+
+									i = ParameterName.IndexOf('.');
+									if (i >= 0)
+									{
+										Node = await SelectedSource.GetNodeAsync(
+											new ThingReference(this.CheckMenu(Menu, ParameterName.Substring(0, i)), SelectedSource.SourceID, string.Empty));
+										ParameterName = this.CheckMenu(Menu, ParameterName.Substring(i + 1));
+									}
+									else
+									{
+										if (string.IsNullOrEmpty(ValueStr))
+										{
+											Node = await SelectedSource.GetNodeAsync(new ThingReference(this.CheckMenu(Menu, ParameterName),
+												SelectedSource.SourceID, string.Empty));
+
+											if (Node != null)
+												ParameterName = string.Empty;
+											else
+												Node = SelectedNode;
+										}
+										else
+											Node = SelectedNode;
+									}
+
+									if (Node == null && Menu != null && Menu.TryGetValue(-2, out KeyValuePair<string, object> P) && P.Value is INode Node2)
+										Node = Node2;
+
+									if (Node == null)
+										ThingRef = null;
+									else
+										ThingRef = new ThingReference(Node.NodeId, Node.SourceId, Node.Partition);
+								}
+								else
+								{
+									i = ParameterName.IndexOf('.');
+									if (i < 0)
+										ThingRef = ThingReference.Empty;
+									else
+									{
+										ThingRef = new ThingReference(this.CheckMenu(Menu, ParameterName.Substring(0, i)), string.Empty, string.Empty);
+										ParameterName = this.CheckMenu(Menu, ParameterName.Substring(i + 1).TrimStart());
+									}
+								}
+
+								if (ThingRef != null)
+								{
+									try
+									{
+										ControlParameter[] Parameters;
+
+										if (string.IsNullOrEmpty(ValueStr))
+										{
+											if (this.concentratorServer != null && SelectedSource != null && (Node = await SelectedSource.GetNodeAsync(ThingRef)) != null)
+											{
+												if (Node is IActuator Actuator)
+													Parameters = Actuator.GetControlParameters();
+												else
+													throw new Exception("Node is not an actuator.");
+											}
+											else if (SelectedNode != null)
+											{
+												if (SelectedNode is IActuator Actuator)
+												{
+													Node = SelectedNode;
+													Parameters = Actuator.GetControlParameters();
+												}
+												else
+													throw new Exception("Selected node is not an actuator.");
+											}
+											else if (this.concentratorServer != null)
+												throw new Exception("No node selected.");
+											else if (this.controlServer != null)
+											{
+												Node = null;
+												Parameters = await this.controlServer.GetControlParameters(ThingRef);
+											}
+											else
+												throw new Exception("Device not an actuator.");
+
+											Menu = new SortedDictionary<int, KeyValuePair<string, object>>()
+											{
+												{ -3, new KeyValuePair<string, object>(null, Parameters) },
+												{ -2, new KeyValuePair<string, object>(null, Node) },
+												{ -1, new KeyValuePair<string, object>(null, SelectedSource) },
+												{ 0, new KeyValuePair<string, object>(null, Menu) }
+											};
+
+											i = 0;
+
+											foreach (ControlParameter P in Parameters)
+											{
+												if (P.Name.StartsWith(ParameterName))
+													Menu[++i] = new KeyValuePair<string, object>(P.Name, P.Name + " (" + P.GetStringValue(ThingRef) + ")");
+											}
+
+											if (i == 0)
+												throw new Exception("No control parameter found starting with that name.");
+
+											Variables[" Menu "] = Menu;
+											this.SendMenu(e.From, Menu, Support);
+											break;
+										}
+										else
+										{
+											if (this.concentratorServer != null)
+												Parameters = await this.controlServer.GetControlParameters(ThingRef);
+											else
+												Parameters = await this.controlServer.GetControlParameters(ThingRef);
+
+											foreach (ControlParameter P in Parameters)
+											{
+												if (string.Compare(P.Name, ParameterName, true) != 0)
+													continue;
+
+												if (!P.SetStringValue(ThingRef, ValueStr))
+													throw new Exception("Unable to set control parameter value.");
+
+												this.SendPlainTextChatMessage(e.From, "Control parameter set.");
+												return;
+											}
+										}
+									}
+									catch (Exception ex)
+									{
+										this.Error(e.From, ex.Message, Support);
+										break;
+									}
 								}
 							}
 
@@ -421,6 +828,201 @@ namespace Waher.Networking.XMPP.Chat
 			catch (Exception ex)
 			{
 				Log.Critical(ex);
+			}
+		}
+
+		private string CheckMenu(SortedDictionary<int, KeyValuePair<string, object>> Menu, string s)
+		{
+			if (Menu != null &&
+				int.TryParse(s, out int i) &&
+				i > 0 &&
+				Menu.TryGetValue(i, out KeyValuePair<string, object> Obj) &&
+				!string.IsNullOrEmpty(Obj.Key))
+			{
+				return Obj.Key;
+			}
+			else
+				return s;
+		}
+
+		private async Task SelectNode(MessageEventArgs e, IDataSource SelectedSource, INode SelectedNode, Variables Variables,
+			SortedDictionary<int, KeyValuePair<string, object>> Menu, RemoteXmppSupport Support)
+		{
+			Variables[" Node "] = SelectedNode;
+
+			Menu = new SortedDictionary<int, KeyValuePair<string, object>>()
+			{
+				{ -2, new KeyValuePair<string, object>(null, SelectedNode) },
+				{ -1, new KeyValuePair<string, object>(null, SelectedSource) },
+				{ 0, new KeyValuePair<string, object>(null, Menu) }
+			};
+			int i = 0;
+
+			if (SelectedNode == null)
+			{
+				Menu[-1] = new KeyValuePair<string, object>(null, SelectedSource);
+
+				this.SendPlainTextChatMessage(e.From, "Root nodes of data source " + SelectedSource.SourceID + ":");
+
+				if (SelectedSource.RootNodes != null)
+				{
+					foreach (INode Node in SelectedSource.RootNodes)
+						Menu[++i] = new KeyValuePair<string, object>(Node.NodeId, Node);
+				}
+			}
+			else
+			{
+				this.SendPlainTextChatMessage(e.From, "Selecting node " + SelectedNode.NodeId + " of " + SelectedSource.SourceID + ".");
+
+				if (SelectedNode.HasChildren)
+				{
+					this.SendPlainTextChatMessage(e.From, "Child nodes:");
+
+					foreach (INode Node in await SelectedNode.ChildNodes)
+						Menu[++i] = new KeyValuePair<string, object>(Node.NodeId, Node);
+				}
+			}
+
+			if (i > 0)
+			{
+				Variables[" Menu "] = Menu;
+				this.SendMenu(e.From, Menu, Support);
+			}
+		}
+
+		private void SelectSource(MessageEventArgs e, IDataSource SelectedSource, Variables Variables, SortedDictionary<int, KeyValuePair<string, object>> Menu,
+			RemoteXmppSupport Support)
+		{
+			Variables[" Source "] = SelectedSource;
+			Menu = new SortedDictionary<int, KeyValuePair<string, object>>()
+			{
+				{ -1, new KeyValuePair<string, object>(null, SelectedSource) },
+				{ 0, new KeyValuePair<string, object>(null, Menu) }
+			};
+			int i = 0;
+
+			if (SelectedSource == null)
+			{
+				this.SendPlainTextChatMessage(e.From, "Root data sources:");
+
+				foreach (IDataSource Source in this.concentratorServer.RootDataSources)
+					Menu[++i] = new KeyValuePair<string, object>(Source.SourceID, Source);
+			}
+			else
+			{
+				this.SendPlainTextChatMessage(e.From, "Selecting data source " + SelectedSource.SourceID + ":");
+
+				if (SelectedSource.HasChildren)
+				{
+					foreach (IDataSource Source in SelectedSource.ChildSources)
+						Menu[++i] = new KeyValuePair<string, object>(Source.SourceID, Source);
+				}
+
+				if (SelectedSource.RootNodes != null)
+				{
+					foreach (INode Node in SelectedSource.RootNodes)
+						Menu[++i] = new KeyValuePair<string, object>(Node.NodeId, Node);
+				}
+			}
+
+			if (i > 0)
+			{
+				Variables[" Menu "] = Menu;
+				this.SendMenu(e.From, Menu, Support);
+			}
+		}
+
+		private void SendMenu(string To, SortedDictionary<int, KeyValuePair<string, object>> Menu, RemoteXmppSupport Support)
+		{
+			StringBuilder sb = new StringBuilder();
+			bool HasBack = false;
+
+			if (Support.Markdown)
+			{
+				foreach (KeyValuePair<int, KeyValuePair<string, object>> P in Menu)
+				{
+					if (P.Key < 0)
+						continue;
+					else if (P.Key == 0)
+						HasBack = P.Value.Value != null;
+					else
+					{
+						sb.Append(P.Key);
+						sb.Append(". ");
+
+						if (P.Value.Value != null)
+							sb.AppendLine(MarkdownDocument.Encode(P.Value.Value.ToString()));
+					}
+				}
+
+				if (HasBack)
+					sb.AppendLine("0. Back");
+
+				this.SendMarkdownChatMessage(To, sb.ToString());
+			}
+			else if (Support.Html)
+			{
+				StringBuilder Html = new StringBuilder();
+
+				Html.AppendLine("<ol>");
+
+				foreach (KeyValuePair<int, KeyValuePair<string, object>> P in Menu)
+				{
+					if (P.Key < 0)
+						continue;
+					else if (P.Key == 0)
+						HasBack = P.Value.Value != null;
+					else
+					{
+						Html.Append("<li value=\">");
+						Html.Append(P.Key);
+						Html.Append("\">");
+
+						if (P.Value.Value != null)
+							Html.Append(XML.HtmlValueEncode(P.Value.Value.ToString()));
+
+						Html.AppendLine("</li>");
+
+						sb.Append(P.Key);
+						sb.Append(". ");
+
+						if (P.Value.Value != null)
+							sb.AppendLine(P.Value.Value.ToString());
+					}
+				}
+
+				if (HasBack)
+				{
+					sb.AppendLine("0. Back");
+
+					Html.AppendLine("<li value=\"0\">Back</li>");
+					Html.AppendLine("</ol>");
+				}
+
+				this.SendHtmlChatMessage(To, Html.ToString(), sb.ToString());
+			}
+			else
+			{
+				foreach (KeyValuePair<int, KeyValuePair<string, object>> P in Menu)
+				{
+					if (P.Key < 0)
+						continue;
+					else if (P.Key == 0)
+						HasBack = P.Value.Value != null;
+					else
+					{
+						sb.Append(P.Key);
+						sb.Append(". ");
+
+						if (P.Value.Value != null)
+							sb.AppendLine(P.Value.Value.ToString());
+					}
+				}
+
+				if (HasBack)
+					sb.AppendLine("0. Back");
+
+				this.SendPlainTextChatMessage(To, sb.ToString());
 			}
 		}
 
@@ -1408,30 +2010,64 @@ namespace Waher.Networking.XMPP.Chat
 				this.SendPlainTextChatMessage(To, ErrorMessage);
 		}
 
-		private void ShowMenu(string To, bool Extended, RemoteXmppSupport Support)
+		private void ShowHelp(string To, bool Extended, RemoteXmppSupport Support)
 		{
 			StringBuilder Output = new StringBuilder();
 
 			if (Support.Markdown)
 			{
-				Output.AppendLine("|Command | Description");
-				Output.AppendLine("|---|---");
-				Output.AppendLine("|#|Displays the short version of the menu.");
-				Output.AppendLine("|##|Displays the extended version of the menu.");
+				Output.AppendLine("|Command | Description|");
+				Output.AppendLine("|---|---|");
+				Output.AppendLine("|#|Displays the short version of the menu.|");
+				Output.AppendLine("|##|Displays the extended version of the menu.|");
+
+				if (this.concentratorServer != null)
+				{
+					Output.AppendLine("|/|Selects the root node in the current data source.|");
+					Output.AppendLine("|//|Selects the root data source.|");
+					Output.AppendLine("|NODE|Selects the node \"NODE\".|");
+					Output.AppendLine("|NR|The number NR corresponds to the item in the menu last shown. The menu number can be used as a replacement for the corresponding string in all constructs.|");
+				}
 
 				if (this.sensorServer != null)
 				{
-					Output.AppendLine("|?|Reads non-historical values of the currently selected object.");
-					Output.AppendLine("|??|Performs a full readout of the currently selected object.");
-					Output.AppendLine("|FIELD?|Reads the non-historical fields that begin with \"FIELD\", of the currently selected object.");
-					Output.AppendLine("|FIELD??|Reads all values from fields that begin with \"FIELD\", of the currently selected object.");
+					if (this.concentratorServer != null)
+					{
+						Output.AppendLine("|?|Reads non-historical values of the currently selected object.|");
+						Output.AppendLine("|??|Performs a full readout of the currently selected object.|");
+						Output.AppendLine("|FIELD?|Reads the non-historical fields that begin with \"FIELD\", of the currently selected object.|");
+						Output.AppendLine("|FIELD??|Reads all values from fields that begin with \"FIELD\", of the currently selected object.|");
+						Output.AppendLine("|NODE?|Reads the non-historical fields for the node \"NODE\".|");
+						Output.AppendLine("|NODE??|Reads all values from fields for the node \"NODE\".|");
+						Output.AppendLine("|NODE.FIELD?|Reads the non-historical fields that begin with \"FIELD\", of the node \"NODE\".|");
+						Output.AppendLine("|NODE.FIELD??|Reads all values from fields that begin with \"FIELD\", of the node \"NODE\".|");
+					}
+					else
+					{
+						Output.AppendLine("|?|Reads non-historical values.|");
+						Output.AppendLine("|??|Performs a full readout.|");
+						Output.AppendLine("|FIELD?|Reads the non-historical fields that begin with \"FIELD\".|");
+						Output.AppendLine("|FIELD??|Reads all values from fields that begin with \"FIELD\".|");
+					}
 				}
 
 				if (this.controlServer != null)
-					Output.AppendLine("|PARAMETER:=VALUE|Sets the control parameter named \"PARAMETER\" to the value VALUE.");
+				{
+					Output.AppendLine("|:=|Lists available control parameters of the currently selected object.|");
 
-				Output.AppendLine("|=|Displays available variables in the session.");
-				Output.AppendLine("| |Anything else is assumed to be evaluated as a [mathematical expression](http://waher.se/Script.md)");
+					if (this.concentratorServer != null)
+					{
+						Output.AppendLine("|NODE:=|Lists available control parameters of the node \"NODE\".|");
+						Output.AppendLine("|PARAMETER:=|Displays the current value of the control parameter \"PARAMETER\" of the currently selected object.|");
+						Output.AppendLine("|PARAMETER:=VALUE|Sets the control parameter named \"PARAMETER\" of the currently selected object to the value VALUE.|");
+						Output.AppendLine("|NODE.PARAMETER:=VALUE|Sets the control parameter named \"PARAMETER\" of the node \"NODE\" to the value VALUE.|");
+					}
+					else
+						Output.AppendLine("|PARAMETER:=VALUE|Sets the control parameter named \"PARAMETER\" to the value VALUE.|");
+				}
+
+				Output.AppendLine("|=|Displays available variables in the session.|");
+				Output.AppendLine("| |Anything else is assumed to be evaluated as a [mathematical expression](http://waher.se/Script.md)|");
 
 				this.SendMarkdownChatMessage(To, Output.ToString());
 			}
@@ -1441,21 +2077,111 @@ namespace Waher.Networking.XMPP.Chat
 				Output.AppendLine("<tr><td>#</td><td>Displays the short version of the menu.</td></tr>");
 				Output.AppendLine("<tr><td>##</td><td>Displays the extended version of the menu.</td></tr>");
 
+				if (this.concentratorServer != null)
+				{
+					Output.AppendLine("<tr><td>/</td><td>Selects the root node in the current data source.</td></tr>");
+					Output.AppendLine("<tr><td>//</td><td>Selects the root data source.</td></tr>");
+					Output.AppendLine("<tr><td>NODE</td><td>Selects the node \"NODE\"</td></tr>");
+					Output.AppendLine("<tr><td>NR</td><td>The number NR corresponds to the item in the menu last shown.</td></tr>");
+				}
+
 				if (this.sensorServer != null)
 				{
-					Output.AppendLine("<tr><td>?</td><td>Reads non-historical values of the currently selected object.</td></tr>");
-					Output.AppendLine("<tr><td>??</td><td>Performs a full readout of the currently selected object.</td></tr>");
-					Output.AppendLine("<tr><td>FIELD?</td><td>Reads the non-historical fields that begin with \"FIELD\", of the currently selected object.</td></tr>");
-					Output.AppendLine("<tr><td>FIELD??</td><td>Reads all values from fields that begin with \"FIELD\", of the currently selected object.</td></tr>");
+					if (this.concentratorServer != null)
+					{
+						Output.AppendLine("<tr><td>?</td><td>Reads non-historical values of the currently selected object.</td></tr>");
+						Output.AppendLine("<tr><td>??</td><td>Performs a full readout of the currently selected object.</td></tr>");
+						Output.AppendLine("<tr><td>FIELD?</td><td>Reads the non-historical fields that begin with \"FIELD\", of the currently selected object.</td></tr>");
+						Output.AppendLine("<tr><td>FIELD??</td><td>Reads all values from fields that begin with \"FIELD\", of the currently selected object.</td></tr>");
+						Output.AppendLine("<tr><td>NODE?</td><td>Reads the non-historical fields for the node \"NODE\".</td></tr>");
+						Output.AppendLine("<tr><td>NODE??</td><td>Reads all values from fields for the node \"NODE\".</td></tr>");
+						Output.AppendLine("<tr><td>FIELD?</td><td>Reads the non-historical fields that begin with \"FIELD\", for the node \"NODE\".</td></tr>");
+						Output.AppendLine("<tr><td>FIELD??</td><td>Reads all values from fields that begin with \"FIELD\", for the node \"NODE\".</td></tr>");
+					}
+					else
+					{
+						Output.AppendLine("<tr><td>?</td><td>Reads non-historical values.</td></tr>");
+						Output.AppendLine("<tr><td>??</td><td>Performs a full readout.</td></tr>");
+						Output.AppendLine("<tr><td>FIELD?</td><td>Reads the non-historical fields that begin with \"FIELD\".</td></tr>");
+						Output.AppendLine("<tr><td>FIELD??</td><td>Reads all values from fields that begin with \"FIELD\".</td></tr>");
+					}
 				}
 
 				if (this.controlServer != null)
-					Output.AppendLine("<tr><td>PARAMETER:=VALUE</td><td>Sets the control parameter named \"PARAMETER\" to the value VALUE.</td></tr>");
+				{
+					Output.AppendLine("<tr><td>:=</td><td>Lists available control parameters of the currently selected object.</td></tr>");
+
+					if (this.concentratorServer != null)
+					{
+						Output.AppendLine("<tr><td>NODE:=</td><td>Lists available control parameters of the node \"NODE\".</td></tr>");
+						Output.AppendLine("<tr><td>PARAMETER:=</td><td>Displays the current value of the control parameter \"PARAMETER\" of the currently selected object.</td></tr>");
+						Output.AppendLine("<tr><td>PARAMETER:=VALUE</td><td>Sets the control parameter named \"PARAMETER\" of the currently selected object to the value VALUE.</td></tr>");
+						Output.AppendLine("<tr><td>NODE.PARAMETER:=</td><td>Displays the current value of the control parameter \"PARAMETER\" of the node \"NODE\".</td></tr>");
+						Output.AppendLine("<tr><td>NODE.PARAMETER:=VALUE</td><td>Sets the control parameter named \"PARAMETER\" of the node \"NODE\" to the value VALUE.</td></tr>");
+					}
+					else
+						Output.AppendLine("<tr><td>PARAMETER:=VALUE</td><td>Sets the control parameter named \"PARAMETER\" to the value VALUE.</td></tr>");
+				}
 
 				Output.AppendLine("<tr><td>=</td><td>Displays available variables in the session.</td></tr>");
 				Output.AppendLine("<tr><td> </td><td>Anything else is assumed to be evaluated as a [mathematical expression](http://waher.se/Script.md)</td></tr></table>");
 
 				this.SendHtmlChatMessage(To, Output.ToString(), null);
+			}
+			else
+			{
+				Output.AppendLine("#\tDisplays the short version of the menu.");
+				Output.AppendLine("##\tDisplays the extended version of the menu.");
+
+				if (this.concentratorServer != null)
+				{
+					Output.AppendLine("/\tSelects the root node in the current data source.");
+					Output.AppendLine("//\tSelects the root data source.");
+					Output.AppendLine("NODE\tSelects the node \"NODE\".");
+					Output.AppendLine("NR\tThe number NR corresponds to the item in the menu last shown.");
+				}
+
+				if (this.sensorServer != null)
+				{
+					if (this.concentratorServer != null)
+					{
+						Output.AppendLine("?\tReads non-historical values of the currently selected object.");
+						Output.AppendLine("??\tPerforms a full readout of the currently selected object.");
+						Output.AppendLine("FIELD?\tReads the non-historical fields that begin with \"FIELD\", of the currently selected object.");
+						Output.AppendLine("FIELD??\tReads all values from fields that begin with \"FIELD\", of the currently selected object.");
+						Output.AppendLine("NODE?\tReads the non-historical fields for the node \"NODE\".");
+						Output.AppendLine("NODE??\tReads all values from fields for the node \"NODE\".");
+						Output.AppendLine("NODE.FIELD?\tReads the non-historical fields that begin with \"FIELD\", of the node \"NODE\".");
+						Output.AppendLine("NODE.FIELD??\tReads all values from fields that begin with \"FIELD\", of the node \"NODE\".");
+					}
+					else
+					{
+						Output.AppendLine("?\tReads non-historical values.");
+						Output.AppendLine("??\tPerforms a full readout.");
+						Output.AppendLine("FIELD?\tReads the non-historical fields that begin with \"FIELD\".");
+						Output.AppendLine("FIELD??\tReads all values from fields that begin with \"FIELD\".");
+					}
+				}
+
+				if (this.controlServer != null)
+				{
+					Output.AppendLine(":=\tLists available control parameters of the currently selected object.");
+
+					if (this.concentratorServer != null)
+					{
+						Output.AppendLine("NODE:=\tLists available control parameters of the node \"NODE\".");
+						Output.AppendLine("PARAMETER:=\tDisplays the current value of the control parameter \"PARAMETER\" of the currently selected object.");
+						Output.AppendLine("PARAMETER:=VALUE\tSets the control parameter named \"PARAMETER\" of the currently selected object to the value VALUE.");
+						Output.AppendLine("NODE.PARAMETER:=VALUE\tSets the control parameter named \"PARAMETER\" of the node \"NODE\" to the value VALUE.");
+					}
+					else
+						Output.AppendLine("PARAMETER:=VALUE\tSets the control parameter named \"PARAMETER\" to the value VALUE.");
+				}
+
+				Output.AppendLine("=\tDisplays available variables in the session.");
+				Output.AppendLine(" \tAnything else is assumed to be evaluated as a [mathematical expression](http://waher.se/Script.md)");
+
+				this.SendPlainTextChatMessage(To, Output.ToString());
 			}
 
 			if (Extended)
@@ -1498,8 +2224,6 @@ namespace Waher.Networking.XMPP.Chat
 			}
 		}
 
-		// TODO: Support for concentrator.
-		// TODO: Control
 		// TODO: Configuration
 		// TODO: Provisioning
 		// TODO: Node Commands.

@@ -144,9 +144,9 @@ namespace Waher.Things
 		/// </summary>
 		/// <param name="Ref">Second thing reference.</param>
 		/// <returns>If they point to the same thing.</returns>
-		public bool SameThing(ThingReference Ref)
+		public bool SameThing(IThingReference Ref)
 		{
-			return this.nodeId == Ref.nodeId && this.sourceId == Ref.sourceId && this.partition == Ref.partition;
+			return this.nodeId == Ref.NodeId && this.sourceId == Ref.SourceId && this.partition == Ref.Partition;
 		}
 
 		/// <summary>

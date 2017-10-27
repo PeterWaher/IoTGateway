@@ -11,6 +11,7 @@ using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP;
+using Waher.Networking.XMPP.Concentrator;
 using Waher.Networking.XMPP.Control;
 using Waher.Networking.XMPP.Sensor;
 using Waher.Networking.XMPP.ServiceDiscovery;
@@ -33,6 +34,7 @@ namespace Waher.Client.WPF.Model
 		private XmppClient client;
 		private SensorClient sensorClient;
 		private ControlClient controlClient;
+		private ConcentratorClient concentratorClient;
 		private Timer connectionTimer;
 		private Exception lastError = null;
 		private string host;
@@ -111,6 +113,7 @@ namespace Waher.Client.WPF.Model
 
 			this.sensorClient = new SensorClient(this.client);
 			this.controlClient = new ControlClient(this.client);
+			this.concentratorClient = new ConcentratorClient(this.client);
 
 			this.client.Connect();
 		}
@@ -182,6 +185,18 @@ namespace Waher.Client.WPF.Model
 				this.sensorClient = null;
 			}
 
+			if (this.controlClient != null)
+			{
+				this.controlClient.Dispose();
+				this.controlClient = null;
+			}
+
+			if (this.concentratorClient != null)
+			{
+				this.concentratorClient.Dispose();
+				this.concentratorClient = null;
+			}
+
 			if (this.client != null)
 			{
 				XmppClient Client = this.client;
@@ -230,6 +245,8 @@ namespace Waher.Client.WPF.Model
 		internal static readonly BitmapImage extendedAway = new BitmapImage(new Uri("../Graphics/ExtendedAway.png", UriKind.Relative));
 		internal static readonly BitmapImage offline = new BitmapImage(new Uri("../Graphics/Offline.png", UriKind.Relative));
 		internal static readonly BitmapImage online = new BitmapImage(new Uri("../Graphics/Online.png", UriKind.Relative));
+		internal static readonly BitmapImage folderClosed = new BitmapImage(new Uri("../Graphics/folder-yellow-icon.png", UriKind.Relative));
+		internal static readonly BitmapImage folderOpen = new BitmapImage(new Uri("../Graphics/folder-yellow-open-icon.png", UriKind.Relative));
 
 		public override ImageSource ImageResource
 		{
@@ -491,7 +508,7 @@ namespace Waher.Client.WPF.Model
 				XmppContact Node = (XmppContact)e.State;
 				object OldTag;
 
-				if (e.HasFeature("urn:xmpp:iot:concentrators"))	// TODO: Change to namespace constant when Concentrator Client is implemented.
+				if (e.HasFeature(ConcentratorClient.NamespaceConcentrator))
 				{
 					OldTag = Node.Tag;
 					Node = new XmppConcentrator(Node.Parent, this.client, Node.BareJID)
@@ -746,6 +763,11 @@ namespace Waher.Client.WPF.Model
 		public ControlClient ControlClient
 		{
 			get { return this.controlClient; }
+		}
+
+		public ConcentratorClient ConcentratorClient
+		{
+			get { return this.concentratorClient; }
 		}
 	}
 }

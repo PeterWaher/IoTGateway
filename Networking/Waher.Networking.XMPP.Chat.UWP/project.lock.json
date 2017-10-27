@@ -27509,6 +27509,9 @@
             "C:\\My Projects\\IoTGateway\\Things\\Waher.Things\\Waher.Things.csproj": {
               "projectPath": "C:\\My Projects\\IoTGateway\\Things\\Waher.Things\\Waher.Things.csproj"
             },
+            "C:\\My Projects\\IoTGateway\\Networking\\Waher.Networking.XMPP.Concentrator.UWP\\Waher.Networking.XMPP.Concentrator.UWP.csproj": {
+              "projectPath": "C:\\My Projects\\IoTGateway\\Networking\\Waher.Networking.XMPP.Concentrator.UWP\\Waher.Networking.XMPP.Concentrator.UWP.csproj"
+            },
             "C:\\My Projects\\IoTGateway\\Networking\\Waher.Networking.XMPP.Control.UWP\\Waher.Networking.XMPP.Control.UWP.csproj": {
               "projectPath": "C:\\My Projects\\IoTGateway\\Networking\\Waher.Networking.XMPP.Control.UWP\\Waher.Networking.XMPP.Control.UWP.csproj"
             },
@@ -27520,9 +27523,6 @@
             },
             "C:\\My Projects\\IoTGateway\\Networking\\Waher.Networking\\Waher.Networking.csproj": {
               "projectPath": "C:\\My Projects\\IoTGateway\\Networking\\Waher.Networking\\Waher.Networking.csproj"
-            },
-            "C:\\My Projects\\IoTGateway\\Networking\\Waher.Networking.XMPP.Concentrator.UWP\\Waher.Networking.XMPP.Concentrator.UWP.csproj": {
-              "projectPath": "C:\\My Projects\\IoTGateway\\Networking\\Waher.Networking.XMPP.Concentrator.UWP\\Waher.Networking.XMPP.Concentrator.UWP.csproj"
             }
           }
         }

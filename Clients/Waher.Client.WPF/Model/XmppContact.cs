@@ -166,7 +166,7 @@ namespace Waher.Client.WPF.Model
 		{
 			get
 			{
-				return this.Availability != Availability.Offline;
+				return this.Availability == Availability.Chat;
 			}
 		}
 

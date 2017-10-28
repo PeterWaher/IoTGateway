@@ -420,7 +420,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			XmlElement E;
 			NodeInformation NodeInfo;
 
-			if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "getNodeResponse")
+			if (e.Ok && (E = e.FirstElement) != null && E.LocalName == ExpectedElement)
 				NodeInfo = this.GetNodeInformation(E, Parameters, Messages);
 			else
 			{
@@ -630,7 +630,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			XmlElement E;
 			NodeInformation[] NodeInfo;
 
-			if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "getNodesResponse")
+			if (e.Ok && (E = e.FirstElement) != null && E.LocalName == ExpectedElement)
 			{
 				List<NodeInformation> Nodes = new List<NodeInformation>();
 

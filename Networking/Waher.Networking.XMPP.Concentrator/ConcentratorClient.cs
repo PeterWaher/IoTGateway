@@ -420,7 +420,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			XmlElement E;
 			NodeInformation NodeInfo;
 
-			if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "getNodeResponse")
+			if (e.Ok && (E = e.FirstElement) != null && E.LocalName == ExpectedElement)
 				NodeInfo = this.GetNodeInformation(E, Parameters, Messages);
 			else
 			{
@@ -446,7 +446,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			string NodeId = XML.Attribute(E, "id");
 			string SourceId = XML.Attribute(E, "src");
 			string Partition = XML.Attribute(E, "pt");
-			string NodeType = XML.Attribute(E, "type");
+			string NodeType = XML.Attribute(E, "nodeType");
 			string DisplayName = XML.Attribute(E, "displayName");
 			NodeState NodeState = (NodeState)XML.Attribute(E, "state", NodeState.None);
 			string LocalId = XML.Attribute(E, "localId");
@@ -454,6 +454,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			bool HasChildren = XML.Attribute(E, "hasChildren", false);
 			bool ChildrenOrdered = XML.Attribute(E, "childrenOrdered", false);
 			bool IsReadable = XML.Attribute(E, "isReadable", false);
+			bool IsControllable = XML.Attribute(E, "isControllable", false);
 			bool HasCommands = XML.Attribute(E, "hasCommands", false);
 			string ParentId = XML.Attribute(E, "parentId");
 			string ParentPartition = XML.Attribute(E, "parentPartition");
@@ -585,7 +586,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			}
 
 			return new NodeInformation(NodeId, SourceId, Partition, NodeType, DisplayName, NodeState, LocalId, LogId, HasChildren, ChildrenOrdered,
-				IsReadable, HasCommands, ParentId, ParentPartition, LastChanged, ParameterList?.ToArray(), MessageList?.ToArray());
+				IsReadable, IsControllable, HasCommands, ParentId, ParentPartition, LastChanged, ParameterList?.ToArray(), MessageList?.ToArray());
 		}
 
 		/// <summary>
@@ -630,7 +631,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			XmlElement E;
 			NodeInformation[] NodeInfo;
 
-			if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "getNodesResponse")
+			if (e.Ok && (E = e.FirstElement) != null && E.LocalName == ExpectedElement)
 			{
 				List<NodeInformation> Nodes = new List<NodeInformation>();
 

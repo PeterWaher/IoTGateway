@@ -22,6 +22,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		private bool hasChildren;
 		private bool childrenOrdered;
 		private bool isReadable;
+		private bool isControllable;
 		private bool hasCommands;
 		private string parentId;
 		private string parentPartition;
@@ -50,7 +51,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="ParameterList">List of displayable parameters.</param>
 		/// <param name="MessageList">List of messages.</param>
 		public NodeInformation(string NodeId, string SourceId, string Partition, string NodeType, string DisplayName, NodeState NodeState,
-			string LocalId, string LogId, bool HasChildren, bool ChildrenOrdered, bool IsReadable, bool HasCommands,
+			string LocalId, string LogId, bool HasChildren, bool ChildrenOrdered, bool IsReadable, bool IsControllable, bool HasCommands,
 			string ParentId, string ParentPartition, DateTime LastChanged, Parameter[] ParameterList, Message[] MessageList)
 		{
 			this.nodeId = NodeId;
@@ -64,6 +65,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			this.hasChildren = HasChildren;
 			this.childrenOrdered = ChildrenOrdered;
 			this.isReadable = IsReadable;
+			this.isControllable = IsControllable;
 			this.hasCommands = HasCommands;
 			this.parentId = ParentId;
 			this.parentPartition = ParentPartition;
@@ -126,6 +128,11 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// If the node is readable.
 		/// </summary>
 		public bool IsReadable => this.isReadable;
+
+		/// <summary>
+		/// If the node is controllable.
+		/// </summary>
+		public bool IsControllable => this.isControllable;
 
 		/// <summary>
 		/// If the node has commands.

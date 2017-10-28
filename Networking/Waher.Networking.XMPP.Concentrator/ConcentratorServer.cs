@@ -774,14 +774,24 @@ namespace Waher.Networking.XMPP.Concentrator
 		{
 			if (Parameters)
 			{
-				foreach (Parameter P in await Node.GetDisplayableParametersAsync(Language, Caller))
-					P.Export(Xml);
+				IEnumerable<Parameter> Parameters2 = await Node.GetDisplayableParametersAsync(Language, Caller);
+
+				if (Parameters2 != null)
+				{
+					foreach (Parameter P in Parameters2)
+						P.Export(Xml);
+				}
 			}
 
 			if (Messages)
 			{
-				foreach (Message Msg in await Node.GetMessagesAsync(Caller))
-					Msg.Export(Xml);
+				IEnumerable<Message> Messages2 = await Node.GetMessagesAsync(Caller);
+
+				if (Messages2 != null)
+				{
+					foreach (Message Msg in Messages2)
+						Msg.Export(Xml);
+				}
 			}
 		}
 
@@ -3643,7 +3653,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					return null;
 
 				INode Node2 = await DataSource.GetNodeAsync(Node);
-				if (Node == null)
+				if (Node2 == null)
 					return null;
 
 				IActuator Actuator = Node2 as IActuator;

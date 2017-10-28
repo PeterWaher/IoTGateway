@@ -687,6 +687,8 @@ namespace Waher.Networking.XMPP.Control
 								return;
 							}
 
+							Parameters1 = new Dictionary<string, ControlParameter>();
+
 							foreach (ControlParameter P in Parameters)
 								Parameters1[P.Name] = P;
 						}

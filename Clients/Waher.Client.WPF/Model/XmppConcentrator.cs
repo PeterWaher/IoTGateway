@@ -15,10 +15,12 @@ namespace Waher.Client.WPF.Model
 	public class XmppConcentrator : XmppContact
 	{
 		private Dictionary<string, bool> capabilities = null;
+		private bool suportsEvents;
 
-		public XmppConcentrator(TreeNode Parent, XmppClient Client, string BareJid)
+		public XmppConcentrator(TreeNode Parent, XmppClient Client, string BareJid, bool SupportsEventSubscripton)
 			: base(Parent, Client, BareJid)
 		{
+			this.suportsEvents = SupportsEventSubscripton;
 			this.children = new SortedDictionary<string, TreeNode>()
 			{
 				{ string.Empty, new Loading(this) }
@@ -26,6 +28,11 @@ namespace Waher.Client.WPF.Model
 
 			this.CheckCapabilities();
 		}
+
+		/// <summary>
+		/// If event subscription is supported for readable nodes.
+		/// </summary>
+		public bool SupportsEvents => this.suportsEvents;
 
 		private void CheckCapabilities()
 		{
@@ -98,12 +105,78 @@ namespace Waher.Client.WPF.Model
 							this.children = Children;
 
 							this.OnUpdated();
+							this.NodesAdded(Children.Values, this);
 						}
 					}, null);
 				}
 			}
 
 			base.OnExpanded();
+		}
+
+		public void NodesAdded(IEnumerable<TreeNode> Nodes, TreeNode Parent)
+		{
+			XmppAccountNode XmppAccountNode = this.XmppAccountNode;
+			if (XmppAccountNode == null)
+				return;
+
+			Controls.ConnectionView View = XmppAccountNode.View;
+			if (View == null)
+				return;
+
+			foreach (TreeNode Node in Nodes)
+				View.NodeAdded(Parent, Node);
+		}
+
+		public void NodesRemoved(IEnumerable<TreeNode> Nodes, TreeNode Parent)
+		{
+			XmppAccountNode XmppAccountNode = this.XmppAccountNode;
+			if (XmppAccountNode == null)
+				return;
+
+			Controls.ConnectionView View = XmppAccountNode.View;
+			if (View == null)
+				return;
+
+			LinkedList<KeyValuePair<TreeNode, TreeNode>> ToRemove = new LinkedList<KeyValuePair<TreeNode, TreeNode>>();
+
+			foreach (TreeNode Node in Nodes)
+				ToRemove.AddLast(new KeyValuePair<TreeNode, TreeNode>(Parent, Node));
+
+			while (ToRemove.First != null)
+			{
+				KeyValuePair<TreeNode, TreeNode> P = ToRemove.First.Value;
+				ToRemove.RemoveFirst();
+
+				Parent = P.Key;
+				TreeNode Node = P.Value;
+
+				if (Node.HasChildren.HasValue && Node.HasChildren.Value)
+				{
+					foreach (TreeNode Child in Node.Children)
+						ToRemove.AddLast(new KeyValuePair<TreeNode, TreeNode>(Node, Child));
+				}
+
+				View.NodeRemoved(Parent, Node);
+			}
+		}
+
+		protected override void OnCollapsed()
+		{
+			base.OnCollapsed();
+
+			if (this.children == null || this.children.Count != 1 || !this.children.ContainsKey(string.Empty))
+			{
+				if (this.children != null)
+					this.NodesRemoved(this.children.Values, this);
+
+				this.children = new SortedDictionary<string, TreeNode>()
+				{
+					{ string.Empty, new Loading(this) }
+				};
+
+				this.OnUpdated();
+			}
 		}
 
 	}

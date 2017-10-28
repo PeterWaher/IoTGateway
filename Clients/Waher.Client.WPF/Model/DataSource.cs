@@ -99,6 +99,7 @@ namespace Waher.Client.WPF.Model
 								this.children = Children;
 
 								this.OnUpdated();
+								this.Concentrator?.NodesAdded(Children.Values, this);
 							}
 						}, null);
 					}
@@ -119,6 +120,7 @@ namespace Waher.Client.WPF.Model
 								this.children = Children;
 
 								this.OnUpdated();
+								this.Concentrator?.NodesAdded(Children.Values, this);
 							}
 						}, null);
 					}
@@ -134,6 +136,9 @@ namespace Waher.Client.WPF.Model
 
 			if (this.children == null || this.children.Count != 1 || !this.children.ContainsKey(string.Empty))
 			{
+				if (this.children != null)
+					this.Concentrator?.NodesRemoved(this.children.Values, this);
+
 				this.children = new SortedDictionary<string, TreeNode>()
 				{
 					{ string.Empty, new Loading(this) }

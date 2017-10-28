@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Waher.Content;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Sensor;
-using Waher.Things;
 using Waher.Things.SensorData;
 
 namespace Waher.Client.WPF.Model

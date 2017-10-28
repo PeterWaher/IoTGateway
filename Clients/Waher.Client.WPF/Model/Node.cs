@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Media;
 using System.Windows.Input;
 using System.Xml;
+using Waher.Content;
 using Waher.Networking.XMPP.Concentrator;
+using Waher.Networking.XMPP.Control;
+using Waher.Networking.XMPP.DataForms;
+using Waher.Networking.XMPP.Sensor;
+using Waher.Things;
+using Waher.Things.SensorData;
 
 namespace Waher.Client.WPF.Model
 {
@@ -104,12 +107,17 @@ namespace Waher.Client.WPF.Model
 								this.children = Children;
 
 								this.OnUpdated();
+								this.Concentrator?.NodesAdded(Children.Values, this);
 							}
 						}, null);
 					}
 					else
 					{
+						if (this.children != null)
+							this.Concentrator?.NodesRemoved(this.children.Values, this);
+
 						this.children = null;
+
 						this.OnUpdated();
 					}
 				}
@@ -124,6 +132,9 @@ namespace Waher.Client.WPF.Model
 
 			if (this.nodeInfo.HasChildren && (this.children == null || this.children.Count != 1 || !this.children.ContainsKey(string.Empty)))
 			{
+				if (this.children != null)
+					this.Concentrator?.NodesRemoved(this.children.Values, this);
+
 				this.children = new SortedDictionary<string, TreeNode>()
 				{
 					{ string.Empty, new Loading(this) }
@@ -132,5 +143,72 @@ namespace Waher.Client.WPF.Model
 				this.OnUpdated();
 			}
 		}
+
+		public override bool CanReadSensorData => this.nodeInfo.IsReadable;
+		public override bool CanSubscribeToSensorData => this.nodeInfo.IsReadable && this.Concentrator.SupportsEvents;
+
+		public override SensorDataClientRequest StartSensorDataMomentaryReadout()
+		{
+			XmppConcentrator Concentrator = this.Concentrator;
+			XmppAccountNode XmppAccountNode = Concentrator.XmppAccountNode;
+			SensorClient SensorClient;
+
+			if (XmppAccountNode != null && (SensorClient = XmppAccountNode.SensorClient) != null)
+			{
+				return SensorClient.RequestReadout(Concentrator.RosterItem.LastPresenceFullJid,
+					new ThingReference[] { new ThingReference(this.nodeInfo.NodeId, this.nodeInfo.SourceId, this.nodeInfo.ParentId) }, FieldType.Momentary);
+			}
+			else
+				return null;
+		}
+
+		public override SensorDataClientRequest StartSensorDataFullReadout()
+		{
+			XmppConcentrator Concentrator = this.Concentrator;
+			XmppAccountNode XmppAccountNode = Concentrator.XmppAccountNode;
+			SensorClient SensorClient;
+
+			if (XmppAccountNode != null && (SensorClient = XmppAccountNode.SensorClient) != null)
+			{
+				return SensorClient.RequestReadout(Concentrator.RosterItem.LastPresenceFullJid,
+					new ThingReference[] { new ThingReference(this.nodeInfo.NodeId, this.nodeInfo.SourceId, this.nodeInfo.ParentId) }, FieldType.All);
+			}
+			else
+				throw new NotSupportedException();
+		}
+
+		public override SensorDataSubscriptionRequest SubscribeSensorDataMomentaryReadout(FieldSubscriptionRule[] Rules)
+		{
+			XmppConcentrator Concentrator = this.Concentrator;
+			XmppAccountNode XmppAccountNode = Concentrator.XmppAccountNode;
+			SensorClient SensorClient;
+
+			if (XmppAccountNode != null && (SensorClient = XmppAccountNode.SensorClient) != null)
+			{
+				return SensorClient.Subscribe(Concentrator.RosterItem.LastPresenceFullJid,
+					new ThingReference[] { new ThingReference(this.nodeInfo.NodeId, this.nodeInfo.SourceId, this.nodeInfo.ParentId) }, 
+					FieldType.Momentary, Rules, new Duration(false, 0, 0, 0, 0, 0, 1), new Duration(false, 0, 0, 0, 0, 1, 0), false);
+			}
+			else
+				return null;
+		}
+
+		public override bool CanConfigure => this.nodeInfo.IsControllable;
+
+		public override void GetConfigurationForm(DataFormResultEventHandler Callback, object State)
+		{
+			XmppConcentrator Concentrator = this.Concentrator;
+			XmppAccountNode XmppAccountNode = Concentrator.XmppAccountNode;
+			ControlClient ControlClient;
+
+			if (XmppAccountNode != null && (ControlClient = XmppAccountNode.ControlClient) != null)
+			{
+				ControlClient.GetForm(Concentrator.RosterItem.LastPresenceFullJid, "en", Callback, State,
+					new ThingReference(this.nodeInfo.NodeId, this.nodeInfo.SourceId, this.nodeInfo.ParentId));
+			}
+			else
+				throw new NotSupportedException();
+		}
+
 	}
 }

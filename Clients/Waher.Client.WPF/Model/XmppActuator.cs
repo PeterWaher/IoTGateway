@@ -86,13 +86,7 @@ namespace Waher.Client.WPF.Model
 				throw new NotSupportedException();
 		}
 
-		public override bool CanConfigure
-		{
-			get
-			{
-				return true;
-			}
-		}
+		public override bool CanConfigure => true;
 
 		public override void GetConfigurationForm(DataFormResultEventHandler Callback, object State)
 		{
@@ -100,7 +94,7 @@ namespace Waher.Client.WPF.Model
 			ControlClient ControlClient;
 
 			if (XmppAccountNode != null && (ControlClient = XmppAccountNode.ControlClient) != null)
-				ControlClient.GetForm(this.RosterItem.LastPresenceFullJid, "en", Callback, State);      // TODO: Localization
+				ControlClient.GetForm(this.RosterItem.LastPresenceFullJid, "en", Callback, State);
 			else
 				throw new NotSupportedException();
 		}

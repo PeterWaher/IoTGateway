@@ -363,7 +363,7 @@ namespace Waher.Client.WPF.Model
 					if (!Contacts.ContainsKey(Item.BareJid))
 					{
 						if (Item.IsInGroup(ConcentratorGroupName))
-							Contact = new XmppConcentrator(this, this.client, Item.BareJid);
+							Contact = new XmppConcentrator(this, this.client, Item.BareJid, Item.IsInGroup(EventsGroupName));
 						else if (Item.IsInGroup(ActuatorGroupName))
 							Contact = new XmppActuator(this, this.client, Item.BareJid, Item.IsInGroup(SensorGroupName), Item.IsInGroup(EventsGroupName));
 						else if (Item.IsInGroup(SensorGroupName))
@@ -422,6 +422,11 @@ namespace Waher.Client.WPF.Model
 			}
 
 			this.OnUpdated();
+		}
+
+		public Controls.ConnectionView View
+		{
+			get { return this.connections.Owner.MainView; }
 		}
 
 		private void Client_OnRosterItemUpdated(object Sender, RosterItem Item)
@@ -512,8 +517,10 @@ namespace Waher.Client.WPF.Model
 
 				if (e.HasFeature(ConcentratorServer.NamespaceConcentrator))
 				{
+					bool SupportsEvents = e.HasFeature(SensorClient.NamespaceSensorEvents);
+
 					OldTag = Node.Tag;
-					Node = new XmppConcentrator(Node.Parent, this.client, Node.BareJID)
+					Node = new XmppConcentrator(Node.Parent, this.client, Node.BareJID, SupportsEvents)
                     {
 					    Tag = OldTag
                     };

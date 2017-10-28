@@ -41,11 +41,9 @@ namespace Waher.Runtime.Language
 		/// <returns>Language object, if found, or null if not found.</returns>
 		public static async Task<Language> GetLanguageAsync(string Code)
 		{
-			Language Result;
-
 			lock (synchObject)
 			{
-				if (languagesByCode.TryGetValue(Code, out Result))
+				if (languagesByCode.TryGetValue(Code, out Language Result))
 					return Result;
 			}
 
@@ -138,13 +136,14 @@ namespace Waher.Runtime.Language
 			}
 			else
 			{
-				Result = new Language();
-
-				Result.Code = Code;
-				Result.Name = Name;
-				Result.Flag = Flag;
-				Result.FlagWidth = FlagWidth;
-				Result.FlagHeight = FlagHeight;
+				Result = new Language()
+				{
+					Code = Code,
+					Name = Name,
+					Flag = Flag,
+					FlagWidth = FlagWidth,
+					FlagHeight = FlagHeight
+				};
 
 				lock (synchObject)
 				{

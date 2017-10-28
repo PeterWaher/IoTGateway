@@ -66,11 +66,9 @@ namespace Waher.Runtime.Language
 		/// <returns>String object, if found, or null if not found.</returns>
 		public async Task<LanguageString> GetStringAsync(int Id)
 		{
-			LanguageString Result;
-
 			lock (this.synchObject)
 			{
-				if (this.stringsById.TryGetValue(Id, out Result))
+				if (this.stringsById.TryGetValue(Id, out LanguageString Result))
 					return Result;
 			}
 
@@ -157,12 +155,13 @@ namespace Waher.Runtime.Language
 			}
 			else
 			{
-				Result = new LanguageString();
-
-				Result.NamespaceId = this.objectId;
-				Result.Id = Id;
-				Result.Value = Value;
-				Result.Untranslated = Untranslated;
+				Result = new LanguageString()
+				{
+					NamespaceId = this.objectId,
+					Id = Id,
+					Value = Value,
+					Untranslated = Untranslated
+				};
 
 				lock (synchObject)
 				{

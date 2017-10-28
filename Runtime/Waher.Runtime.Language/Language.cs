@@ -100,11 +100,9 @@ namespace Waher.Runtime.Language
 		/// <returns>Namespace object, if found, or null if not found.</returns>
 		public async Task<Namespace> GetNamespaceAsync(string Name)
 		{
-			Namespace Result;
-
 			lock (this.synchObject)
 			{
-				if (this.namespacesByName.TryGetValue(Name, out Result))
+				if (this.namespacesByName.TryGetValue(Name, out Namespace Result))
 					return Result;
 			}
 
@@ -162,9 +160,11 @@ namespace Waher.Runtime.Language
 				return Result;
 			else
 			{
-				Result = new Namespace();
-				Result.LanguageId = this.objectId;
-				Result.Name = Name;
+				Result = new Namespace()
+				{
+					LanguageId = this.objectId,
+					Name = Name
+				};
 
 				lock (synchObject)
 				{

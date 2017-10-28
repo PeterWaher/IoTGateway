@@ -521,7 +521,7 @@ namespace Waher.Things.Metering
 		/// <param name="Body">Message body.</param>
 		public Task LogErrorAsync(string Body)
 		{
-			return this.LogMessageAsync(NodeState.ErrorUnsigned, string.Empty, Body);
+			return this.LogMessageAsync(MessageType.Error, string.Empty, Body);
 		}
 
 		/// <summary>
@@ -531,7 +531,7 @@ namespace Waher.Things.Metering
 		/// <param name="Body">Message body.</param>
 		public Task LogErrorAsync(string EventId, string Body)
 		{
-			return this.LogMessageAsync(NodeState.ErrorUnsigned, EventId, Body);
+			return this.LogMessageAsync(MessageType.Error, EventId, Body);
 		}
 
 		/// <summary>
@@ -540,7 +540,7 @@ namespace Waher.Things.Metering
 		/// <param name="Body">Message body.</param>
 		public Task LogWarningAsync(string Body)
 		{
-			return this.LogMessageAsync(NodeState.WarningUnsigned, string.Empty, Body);
+			return this.LogMessageAsync(MessageType.Warning, string.Empty, Body);
 		}
 
 		/// <summary>
@@ -550,7 +550,7 @@ namespace Waher.Things.Metering
 		/// <param name="Body">Message body.</param>
 		public Task LogWarningAsync(string EventId, string Body)
 		{
-			return this.LogMessageAsync(NodeState.WarningUnsigned, EventId, Body);
+			return this.LogMessageAsync(MessageType.Warning, EventId, Body);
 		}
 
 		/// <summary>
@@ -559,7 +559,7 @@ namespace Waher.Things.Metering
 		/// <param name="Body">Message body.</param>
 		public Task LogInformationAsync(string Body)
 		{
-			return this.LogMessageAsync(NodeState.Information, string.Empty, Body);
+			return this.LogMessageAsync(MessageType.Information, string.Empty, Body);
 		}
 
 		/// <summary>
@@ -569,7 +569,7 @@ namespace Waher.Things.Metering
 		/// <param name="Body">Message body.</param>
 		public Task LogInformationAsync(string EventId, string Body)
 		{
-			return this.LogMessageAsync(NodeState.Information, EventId, Body);
+			return this.LogMessageAsync(MessageType.Information, EventId, Body);
 		}
 
 		/// <summary>
@@ -577,7 +577,7 @@ namespace Waher.Things.Metering
 		/// </summary>
 		/// <param name="Type">Type of message.</param>
 		/// <param name="Body">Message body.</param>
-		public Task LogMessageAsync(NodeState Type, string Body)
+		public Task LogMessageAsync(MessageType Type, string Body)
 		{
 			return this.LogMessageAsync(Type, string.Empty, Body);
 		}
@@ -588,10 +588,12 @@ namespace Waher.Things.Metering
 		/// <param name="Type">Type of message.</param>
 		/// <param name="EventId">Optional Event ID.</param>
 		/// <param name="Body">Message body.</param>
-		public async Task LogMessageAsync(NodeState Type, string EventId, string Body)
+		public async Task LogMessageAsync(MessageType Type, string EventId, string Body)
 		{
 			if (this.objectId == Guid.Empty)
 				throw new Exception("You can only log messages on persisted nodes.");
+
+			bool Updated = false;
 
 			foreach (MeteringMessage Message in await Database.Find<MeteringMessage>(new FilterAnd(
 				new FilterFieldEqualTo("NodeId", this.objectId),
@@ -599,47 +601,57 @@ namespace Waher.Things.Metering
 				new FilterFieldEqualTo("EventId", EventId),
 				new FilterFieldEqualTo("Body", Body))))
 			{
-				if ((Type == NodeState.None && Message.Type == NodeState.None) ||
-					(Type == NodeState.Information && Message.Type == NodeState.Information) ||
-					((Type == NodeState.WarningSigned || Type == NodeState.WarningUnsigned) && (Message.Type == NodeState.WarningSigned || Message.Type == NodeState.WarningUnsigned)) ||
-					((Type == NodeState.ErrorSigned || Type == NodeState.ErrorUnsigned) && (Message.Type == NodeState.ErrorSigned || Message.Type == NodeState.ErrorUnsigned)))
-				{
-					Message.Updated = DateTime.Now;
-					Message.Count++;
+				Message.Updated = DateTime.Now;
+				Message.Count++;
 
-					if (Type == NodeState.WarningUnsigned || Type == NodeState.ErrorUnsigned)
-						Message.Type = Type;
+				await Database.Update(Message);
+				Updated = true;
 
-					await Database.Update(Message);
-
-					return;
-				}
+				break;
 			}
 
-			MeteringMessage Msg = new MeteringMessage(this.objectId, DateTime.Now, Type, EventId, Body);
-			Msg.NodeId = this.objectId;
-			await Database.Insert(Msg);
-
-			if (Type > this.state)
+			if (!Updated)
 			{
-				this.state = Type;
-				await Database.Update(this);
-				this.RaiseUpdate();
+				MeteringMessage Msg = new MeteringMessage(this.objectId, DateTime.Now, Type, EventId, Body)
+				{
+					NodeId = this.objectId
+				};
+
+				await Database.Insert(Msg);
 			}
 
 			switch (Type)
 			{
-				case NodeState.Information:
+				case MessageType.Error:
+					if (this.state < NodeState.ErrorUnsigned)
+					{
+						this.state = NodeState.ErrorUnsigned;
+						await Database.Update(this);
+						this.RaiseUpdate();
+					}
+					break;
+
+				case MessageType.Warning:
+					if (this.state < NodeState.WarningUnsigned)
+					{
+						this.state = NodeState.WarningUnsigned;
+						await Database.Update(this);
+						this.RaiseUpdate();
+					}
+					break;
+			}
+
+			switch (Type)
+			{
+				case MessageType.Information:
 					Log.Informational(Body, this.nodeId, string.Empty, EventId, EventLevel.Minor);
 					break;
 
-				case NodeState.WarningSigned:
-				case NodeState.WarningUnsigned:
+				case MessageType.Warning:
 					Log.Warning(Body, this.nodeId, string.Empty, EventId, EventLevel.Minor);
 					break;
 
-				case NodeState.ErrorSigned:
-				case NodeState.ErrorUnsigned:
+				case MessageType.Error:
 					Log.Error(Body, this.nodeId, string.Empty, EventId, EventLevel.Minor);
 					break;
 			}

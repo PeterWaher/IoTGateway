@@ -1,5 +1,6 @@
 ﻿using System;
 using Waher.Persistence.Attributes;
+using Waher.Things.DisplayableParameters;
 
 namespace Waher.Things.Metering
 {
@@ -13,7 +14,7 @@ namespace Waher.Things.Metering
 	{
 		private Guid objectId = Guid.Empty;
 		private Guid nodeId = Guid.Empty;
-		private NodeState type = NodeState.None;
+		private MessageType type = MessageType.Information;
 		private string eventId = string.Empty;
 		private string body = string.Empty;
 		private DateTime created = DateTime.Now;
@@ -35,7 +36,7 @@ namespace Waher.Things.Metering
 		/// <param name="Type">Type of message.</param>
 		/// <param name="EventId">Optional Event ID.</param>
 		/// <param name="Body">Message body.</param>
-		public MeteringMessage(Guid NodeId, DateTime Timestamp, NodeState Type, string EventId, string Body)
+		public MeteringMessage(Guid NodeId, DateTime Timestamp, MessageType Type, string EventId, string Body)
 		{
 			this.nodeId = NodeId;
 			this.created = Timestamp;
@@ -97,7 +98,7 @@ namespace Waher.Things.Metering
 		/// Message Type
 		/// </summary>
 		[DefaultValue(NodeState.None)]
-		public NodeState Type
+		public MessageType Type
 		{
 			get { return this.type; }
 			set { this.type = value; }

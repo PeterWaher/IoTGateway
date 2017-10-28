@@ -192,5 +192,13 @@ namespace Waher.Runtime.Language
 			}
 		}
 
+		/// <summary>
+		/// <see cref="object.ToString()"/>
+		/// </summary>
+		public override string ToString()
+		{
+			return this.name;
+		}
+
 	}
 }

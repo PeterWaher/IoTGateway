@@ -23,11 +23,6 @@ namespace Waher.Networking.XMPP.Concentrator
 		private XmppClient client;
 
 		/// <summary>
-		/// urn:xmpp:iot:concentrators
-		/// </summary>
-		public const string NamespaceConcentrator = "urn:xmpp:iot:concentrators";
-
-		/// <summary>
 		/// Implements an XMPP concentrator client interface.
 		/// 
 		/// The interface is defined in XEP-0326:
@@ -57,14 +52,14 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void GetCapabilities(string To, CapabilitiesEventHandler Callback, object State)
 		{
-			this.client.SendIqGet(To, "<getCapabilities xmlns='" + NamespaceConcentrator + "'/>", (sender, e) =>
+			this.client.SendIqGet(To, "<getCapabilities xmlns='" + ConcentratorServer.NamespaceConcentrator + "'/>", (sender, e) =>
 			{
 				if (Callback != null)
 				{
 					List<string> Capabilities = new List<string>();
 					XmlElement E;
 
-					if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "getCapabilitiesResponse" && E.NamespaceURI == NamespaceConcentrator)
+					if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "getCapabilitiesResponse" && E.NamespaceURI == ConcentratorServer.NamespaceConcentrator)
 					{
 						foreach (XmlNode N in E)
 						{
@@ -95,7 +90,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void GetAllDataSources(string To, DataSourcesEventHandler Callback, object State)
 		{
-			this.client.SendIqGet(To, "<getAllDataSources xmlns='" + NamespaceConcentrator + "'/>", (sender, e) =>
+			this.client.SendIqGet(To, "<getAllDataSources xmlns='" + ConcentratorServer.NamespaceConcentrator + "'/>", (sender, e) =>
 			{
 				if (Callback != null)
 					this.DataSourcesResponse(e, "getAllDataSourcesResponse", Callback, State);
@@ -107,7 +102,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			List<DataSourceReference> DataSources = new List<DataSourceReference>();
 			XmlElement E;
 
-			if (e.Ok && (E = e.FirstElement) != null && E.LocalName == ExpectedElement && E.NamespaceURI == NamespaceConcentrator)
+			if (e.Ok && (E = e.FirstElement) != null && E.LocalName == ExpectedElement && E.NamespaceURI == ConcentratorServer.NamespaceConcentrator)
 			{
 				foreach (XmlNode N in E)
 				{
@@ -139,7 +134,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void GetRootDataSources(string To, DataSourcesEventHandler Callback, object State)
 		{
-			this.client.SendIqGet(To, "<getRootDataSources xmlns='" + NamespaceConcentrator + "'/>", (sender, e) =>
+			this.client.SendIqGet(To, "<getRootDataSources xmlns='" + ConcentratorServer.NamespaceConcentrator + "'/>", (sender, e) =>
 			{
 				if (Callback != null)
 					this.DataSourcesResponse(e, "getRootDataSourcesResponse", Callback, State);
@@ -155,7 +150,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void GetChildDataSources(string To, string SourceID, DataSourcesEventHandler Callback, object State)
 		{
-			this.client.SendIqGet(To, "<getChildDataSources xmlns='" + NamespaceConcentrator + "' src='" + XML.Encode(SourceID) + "'/>", (sender, e) =>
+			this.client.SendIqGet(To, "<getChildDataSources xmlns='" + ConcentratorServer.NamespaceConcentrator + "' src='" + XML.Encode(SourceID) + "'/>", (sender, e) =>
 			{
 				if (Callback != null)
 					this.DataSourcesResponse(e, "getChildDataSourcesResponse", Callback, State);
@@ -196,7 +191,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<containsNode xmlns='");
-			Xml.Append(NamespaceConcentrator);
+			Xml.Append(ConcentratorServer.NamespaceConcentrator);
 			Xml.Append("'");
 			this.AppendNodeAttributes(Xml, NodeID, SourceID, Partition);
 			this.AppendTokenAttributes(Xml, ServiceToken, DeviceToken, UserToken);
@@ -287,7 +282,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<containsNodes xmlns='");
-			Xml.Append(NamespaceConcentrator);
+			Xml.Append(ConcentratorServer.NamespaceConcentrator);
 			this.AppendTokenAttributes(Xml, ServiceToken, DeviceToken, UserToken);
 			Xml.Append("'>");
 
@@ -315,7 +310,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			List<bool> Responses = new List<bool>();
 			XmlElement E;
 
-			if (e.Ok && (E = e.FirstElement) != null && E.LocalName == ExpectedElement && E.NamespaceURI == NamespaceConcentrator)
+			if (e.Ok && (E = e.FirstElement) != null && E.LocalName == ExpectedElement && E.NamespaceURI == ConcentratorServer.NamespaceConcentrator)
 			{
 				foreach (XmlNode N in E)
 				{
@@ -384,7 +379,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<getNode xmlns='");
-			Xml.Append(NamespaceConcentrator);
+			Xml.Append(ConcentratorServer.NamespaceConcentrator);
 			Xml.Append("'");
 			this.AppendNodeAttributes(Xml, NodeID, SourceID, Partition);
 			this.AppendTokenAttributes(Xml, ServiceToken, DeviceToken, UserToken);
@@ -612,8 +607,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<getNodes xmlns='");
-			Xml.Append(NamespaceConcentrator);
-			Xml.Append("'");
+			Xml.Append(ConcentratorServer.NamespaceConcentrator);
 			this.AppendTokenAttributes(Xml, ServiceToken, DeviceToken, UserToken);
 			this.AppendNodeInfoAttributes(Xml, Parameters, Messages, Language);
 			Xml.Append("'>");
@@ -706,8 +700,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<getAllNodes xmlns='");
-			Xml.Append(NamespaceConcentrator);
-			Xml.Append("'");
+			Xml.Append(ConcentratorServer.NamespaceConcentrator);
 			this.AppendTokenAttributes(Xml, ServiceToken, DeviceToken, UserToken);
 			Xml.Append("' src='");
 			Xml.Append(XML.Encode(SourceID));
@@ -772,7 +765,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<getNodeInheritance xmlns='");
-			Xml.Append(NamespaceConcentrator);
+			Xml.Append(ConcentratorServer.NamespaceConcentrator);
 			Xml.Append("'");
 			this.AppendNodeAttributes(Xml, NodeID, SourceID, Partition);
 			this.AppendTokenAttributes(Xml, ServiceToken, DeviceToken, UserToken);
@@ -790,7 +783,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				List<string> BaseClasses = new List<string>();
 				XmlElement E;
 
-				if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "getNodeInheritanceResponse" && E.NamespaceURI == NamespaceConcentrator)
+				if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "getNodeInheritanceResponse" && E.NamespaceURI == ConcentratorServer.NamespaceConcentrator)
 				{
 					foreach (XmlNode N in E)
 					{
@@ -841,11 +834,10 @@ namespace Waher.Networking.XMPP.Concentrator
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<getRootNodes xmlns='");
-			Xml.Append(NamespaceConcentrator);
-			Xml.Append("'");
-			this.AppendTokenAttributes(Xml, ServiceToken, DeviceToken, UserToken);
+			Xml.Append(ConcentratorServer.NamespaceConcentrator);
 			Xml.Append("' src='");
 			Xml.Append(XML.Encode(SourceID));
+			this.AppendTokenAttributes(Xml, ServiceToken, DeviceToken, UserToken);
 			this.AppendNodeInfoAttributes(Xml, Parameters, Messages, Language);
 			Xml.Append("'/>");
 
@@ -897,7 +889,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<getChildNodes xmlns='");
-			Xml.Append(NamespaceConcentrator);
+			Xml.Append(ConcentratorServer.NamespaceConcentrator);
 			Xml.Append("'");
 			this.AppendNodeAttributes(Xml, NodeID, SourceID, Partition);
 			this.AppendTokenAttributes(Xml, ServiceToken, DeviceToken, UserToken);
@@ -952,7 +944,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<getAncestors xmlns='");
-			Xml.Append(NamespaceConcentrator);
+			Xml.Append(ConcentratorServer.NamespaceConcentrator);
 			Xml.Append("'");
 			this.AppendNodeAttributes(Xml, NodeID, SourceID, Partition);
 			this.AppendTokenAttributes(Xml, ServiceToken, DeviceToken, UserToken);

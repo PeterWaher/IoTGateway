@@ -2618,7 +2618,7 @@
           "Waher.Runtime.Inventory": "1.0.4",
           "Waher.Runtime.Language": "1.0.1",
           "Waher.Runtime.Timing": "1.0.1",
-          "Waher.Things": "1.0.5"
+          "Waher.Things": "1.0.6"
         }
       },
       "Waher.Networking.XMPP.Control.UWP/1.0.0": {
@@ -2761,7 +2761,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Things/1.0.5": {
+      "Waher.Things/1.0.6": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -5376,7 +5376,7 @@
           "Waher.Runtime.Inventory": "1.0.4",
           "Waher.Runtime.Language": "1.0.1",
           "Waher.Runtime.Timing": "1.0.1",
-          "Waher.Things": "1.0.5"
+          "Waher.Things": "1.0.6"
         }
       },
       "Waher.Networking.XMPP.Control.UWP/1.0.0": {
@@ -5519,7 +5519,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Things/1.0.5": {
+      "Waher.Things/1.0.6": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -8170,7 +8170,7 @@
           "Waher.Runtime.Inventory": "1.0.4",
           "Waher.Runtime.Language": "1.0.1",
           "Waher.Runtime.Timing": "1.0.1",
-          "Waher.Things": "1.0.5"
+          "Waher.Things": "1.0.6"
         }
       },
       "Waher.Networking.XMPP.Control.UWP/1.0.0": {
@@ -8313,7 +8313,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Things/1.0.5": {
+      "Waher.Things/1.0.6": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -10937,7 +10937,7 @@
           "Waher.Runtime.Inventory": "1.0.4",
           "Waher.Runtime.Language": "1.0.1",
           "Waher.Runtime.Timing": "1.0.1",
-          "Waher.Things": "1.0.5"
+          "Waher.Things": "1.0.6"
         }
       },
       "Waher.Networking.XMPP.Control.UWP/1.0.0": {
@@ -11080,7 +11080,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Things/1.0.5": {
+      "Waher.Things/1.0.6": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -13740,7 +13740,7 @@
           "Waher.Runtime.Inventory": "1.0.4",
           "Waher.Runtime.Language": "1.0.1",
           "Waher.Runtime.Timing": "1.0.1",
-          "Waher.Things": "1.0.5"
+          "Waher.Things": "1.0.6"
         }
       },
       "Waher.Networking.XMPP.Control.UWP/1.0.0": {
@@ -13883,7 +13883,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Things/1.0.5": {
+      "Waher.Things/1.0.6": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -16507,7 +16507,7 @@
           "Waher.Runtime.Inventory": "1.0.4",
           "Waher.Runtime.Language": "1.0.1",
           "Waher.Runtime.Timing": "1.0.1",
-          "Waher.Things": "1.0.5"
+          "Waher.Things": "1.0.6"
         }
       },
       "Waher.Networking.XMPP.Control.UWP/1.0.0": {
@@ -16650,7 +16650,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Things/1.0.5": {
+      "Waher.Things/1.0.6": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -19310,7 +19310,7 @@
           "Waher.Runtime.Inventory": "1.0.4",
           "Waher.Runtime.Language": "1.0.1",
           "Waher.Runtime.Timing": "1.0.1",
-          "Waher.Things": "1.0.5"
+          "Waher.Things": "1.0.6"
         }
       },
       "Waher.Networking.XMPP.Control.UWP/1.0.0": {
@@ -19453,7 +19453,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Things/1.0.5": {
+      "Waher.Things/1.0.6": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -28260,7 +28260,7 @@
       "path": "../../Security/Waher.Security/Waher.Security.csproj",
       "msbuildProject": "../../Security/Waher.Security/Waher.Security.csproj"
     },
-    "Waher.Things/1.0.5": {
+    "Waher.Things/1.0.6": {
       "type": "project",
       "path": "../../Things/Waher.Things/Waher.Things.csproj",
       "msbuildProject": "../../Things/Waher.Things/Waher.Things.csproj"

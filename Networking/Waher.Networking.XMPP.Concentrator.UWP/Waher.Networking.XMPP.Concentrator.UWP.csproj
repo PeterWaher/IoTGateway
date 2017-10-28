@@ -122,7 +122,18 @@
     <Compile Include="Attributes\SectionAttribute.cs" />
     <Compile Include="Attributes\TextAttribute.cs" />
     <Compile Include="Attributes\ToolTipAttribute.cs" />
+    <Compile Include="ConcentratorClient.cs" />
     <Compile Include="ConcentratorServer.cs" />
+    <Compile Include="DataSourceReference.cs" />
+    <Compile Include="Events\BooleanResponseEventArgs..cs" />
+    <Compile Include="Events\BooleanResponsesEventArgs..cs" />
+    <Compile Include="Events\BooleansResponseEventArgs..cs" />
+    <Compile Include="Events\CapabilitiesEventArgs.cs" />
+    <Compile Include="Events\DataSourcesEventArgs.cs" />
+    <Compile Include="Events\NodeInformationEventArgs.cs" />
+    <Compile Include="Events\NodesInformationEventArgs.cs" />
+    <Compile Include="Events\StringsResponseEventArgs..cs" />
+    <Compile Include="NodeInformation.cs" />
     <Compile Include="Parameters.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Properties\Waher.Networking.XMPP.Concentrator.UWP.rd.xml" />
@@ -188,6 +199,7 @@
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>
@@ -195,6 +207,7 @@
   <PropertyGroup>
     <PreBuildEvent>xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP.Concentrator\*.cs" "$(ProjectDir)" /Y
 xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP.Concentrator\Attributes\*.cs" "$(ProjectDir)Attributes" /S /R /Y
+xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP.Concentrator\Events\*.cs" "$(ProjectDir)Events" /S /R /Y
 xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP.Concentrator\Language\*.lng" "$(ProjectDir)Language" /S /R /Y</PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>

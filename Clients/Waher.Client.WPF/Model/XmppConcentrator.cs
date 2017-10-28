@@ -23,6 +23,32 @@ namespace Waher.Client.WPF.Model
 			{
 				{ string.Empty, new DataSource(this, string.Empty, "Loading...", false) }
 			};
+
+			this.CheckCapabilities();
+		}
+
+		private void CheckCapabilities()
+		{
+			if (this.capabilities == null)
+			{
+				string FullJid = this.FullJid;
+
+				if (!string.IsNullOrEmpty(FullJid))
+				{
+					this.XmppAccountNode.ConcentratorClient.GetCapabilities(FullJid, (sender, e) =>
+					{
+						if (e.Ok)
+						{
+							Dictionary<string, bool> Capabilities = new Dictionary<string, bool>();
+
+							foreach (string s in e.Capabilities)
+								Capabilities[s] = true;
+
+							this.capabilities = Capabilities;
+						}
+					}, null);
+				}
+			}
 		}
 
 		public override string TypeName
@@ -50,75 +76,30 @@ namespace Waher.Client.WPF.Model
 
 		protected override void OnExpanded()
 		{
-			string FullJid = this.FullJid;
-			if (string.IsNullOrEmpty(FullJid))
+			if (this.children != null && this.children.Count == 1 && this.children.ContainsKey(string.Empty))
 			{
-				base.OnExpanded();
-				return;
-			}
+				string FullJid = this.FullJid;
 
-			bool LoadChildren = this.children != null && this.children.Count == 1 && this.children.ContainsKey(string.Empty);
-
-			if (this.capabilities == null || LoadChildren)
-			{
-				ManualResetEvent Done1 = new ManualResetEvent(this.capabilities != null);
-				ManualResetEvent Done2 = new ManualResetEvent(!LoadChildren);
-
-				try
+				if (!string.IsNullOrEmpty(FullJid))
 				{
 					Mouse.OverrideCursor = Cursors.Wait;
 
-					if (this.capabilities == null)
+					this.XmppAccountNode.ConcentratorClient.GetRootDataSources(FullJid, (sender, e) =>
 					{
-						this.XmppAccountNode.ConcentratorClient.GetCapabilities(FullJid, (sender, e) =>
+						Mouse.OverrideCursor = null;
+
+						if (e.Ok)
 						{
-							if (e.Ok)
-							{
-								this.capabilities = new Dictionary<string, bool>();
+							SortedDictionary<string, TreeNode> Children = new SortedDictionary<string, TreeNode>();
 
-								foreach (string s in e.Capabilities)
-									this.capabilities[s] = true;
-							}
+							foreach (DataSourceReference Ref in e.DataSources)
+								Children[Ref.SourceID] = new DataSource(this, Ref.SourceID, Ref.SourceID, Ref.HasChildren);
 
-							Done1.Set();
-						}, null);
-					}
+							this.children = Children;
 
-					if (LoadChildren)
-					{
-						this.XmppAccountNode.ConcentratorClient.GetRootDataSources(FullJid, (sender, e) =>
-						{
-							if (e.Ok)
-							{
-								this.capabilities = new Dictionary<string, bool>();
-
-								SortedDictionary<string, TreeNode> Children = new SortedDictionary<string, TreeNode>();
-
-								foreach (DataSourceReference Ref in e.DataSources)
-									Children[Ref.SourceID] = new DataSource(this, Ref.SourceID, Ref.SourceID, Ref.HasChildren);
-
-								this.children = Children;
-							}
-
-							Done2.Set();
-						}, null);
-					}
-
-					if (!Done1.WaitOne(10000) || !Done2.WaitOne(10000))
-					{
-						base.OnExpanded();
-						return;
-					}
-				}
-				finally
-				{
-					Done1.Dispose();
-					Done1 = null;
-
-					Done2.Dispose();
-					Done2 = null;
-
-					Mouse.OverrideCursor = null;
+							this.OnUpdated();
+						}
+					}, null);
 				}
 			}
 

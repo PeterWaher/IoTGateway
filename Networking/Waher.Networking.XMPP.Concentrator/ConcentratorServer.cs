@@ -600,7 +600,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				XmlElement E;
 				bool Result;
 
-				Xml.Append("<containsNodeResponse xmlns='");
+				Xml.Append("<containsNodesResponse xmlns='");
 				Xml.Append(ConcentratorClient.NamespaceConcentrator);
 				Xml.Append("'>");
 
@@ -630,7 +630,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					Xml.Append("</value>");
 				}
 
-				Xml.Append("</containsNodeResponse>");
+				Xml.Append("</containsNodesResponse>");
 
 				e.IqResult(Xml.ToString());
 			}
@@ -870,29 +870,29 @@ namespace Waher.Networking.XMPP.Concentrator
 					StringBuilder Xml = new StringBuilder();
 					LinkedList<INode> Nodes = new LinkedList<INode>();
 					INode Node;
-					Type OnlyIfDerivedFrom = null;
+					LinkedList<TypeInfo> OnlyIfDerivedFrom = null;
 
 					foreach (XmlNode N in e.Query.ChildNodes)
 					{
 						if (N.LocalName == "onlyIfDerivedFrom")
 						{
-							OnlyIfDerivedFrom = Types.GetType(N.InnerText.Trim());
-							if (OnlyIfDerivedFrom == null)
+							Type T = Types.GetType(N.InnerText.Trim());
+							if (T == null)
 							{
 								e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 9, "Type not found."), e.IQ));
 								return;
 							}
+
+							if (OnlyIfDerivedFrom == null)
+								OnlyIfDerivedFrom = new LinkedList<TypeInfo>();
+
+							OnlyIfDerivedFrom.AddLast(T.GetTypeInfo());
 						}
 					}
 
-					TypeInfo OnlyIfDerivedFromTypeInfo = OnlyIfDerivedFrom.GetTypeInfo();
-
 					foreach (INode N in Source.RootNodes)
 					{
-						if (OnlyIfDerivedFrom != null && !OnlyIfDerivedFromTypeInfo.IsAssignableFrom(N.GetType().GetTypeInfo()))
-							continue;
-
-						if (await N.CanViewAsync(Caller))
+						if ((OnlyIfDerivedFrom == null || this.IsAssignableFrom(OnlyIfDerivedFrom, N)) && await N.CanViewAsync(Caller))
 							Nodes.AddLast(N);
 					}
 
@@ -909,10 +909,7 @@ namespace Waher.Networking.XMPP.Concentrator
 						{
 							foreach (INode N in await Node.ChildNodes)
 							{
-								if (OnlyIfDerivedFrom != null && !OnlyIfDerivedFromTypeInfo.IsAssignableFrom(N.GetType().GetTypeInfo()))
-									continue;
-
-								if (await N.CanViewAsync(Caller))
+								if ((OnlyIfDerivedFrom == null || this.IsAssignableFrom(OnlyIfDerivedFrom, N)) && await N.CanViewAsync(Caller))
 									Nodes.AddLast(N);
 							}
 						}
@@ -939,6 +936,22 @@ namespace Waher.Networking.XMPP.Concentrator
 			{
 				e.IqError(ex);
 			}
+		}
+
+		private bool IsAssignableFrom(IEnumerable<TypeInfo> TypeList, INode Node)
+		{
+			if (TypeList == null)
+				return true;
+
+			TypeInfo NodeType = Node.GetType().GetTypeInfo();
+
+			foreach (TypeInfo T in TypeList)
+			{
+				if (T.IsAssignableFrom(NodeType))
+					return true;
+			}
+
+			return false;
 		}
 
 		private async void GetNodeInheritanceHandler(object Sender, IqEventArgs e)

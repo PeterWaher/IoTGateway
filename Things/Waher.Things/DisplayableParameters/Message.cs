@@ -10,12 +10,33 @@ using Waher.Things;
 namespace Waher.Things.DisplayableParameters
 {
 	/// <summary>
+	/// Type of message.
+	/// </summary>
+	public enum MessageType
+	{
+		/// <summary>
+		/// Information message.
+		/// </summary>
+		Information,
+
+		/// <summary>
+		/// Warning message.
+		/// </summary>
+		Warning,
+
+		/// <summary>
+		/// Error message.
+		/// </summary>
+		Error
+	}
+
+	/// <summary>
 	/// Contains information about a message logged on a node.
 	/// </summary>
 	public class Message
 	{
 		private DateTime timestamp;
-		private NodeState type;
+		private MessageType type;
 		private string eventId;
 		private string body;
 
@@ -26,7 +47,7 @@ namespace Waher.Things.DisplayableParameters
 		/// <param name="Type">Type of message.</param>
 		/// <param name="EventId">Optional Event ID.</param>
 		/// <param name="Body">Message body.</param>
-		public Message(DateTime Timestamp, NodeState Type, string EventId, string Body)
+		public Message(DateTime Timestamp, MessageType Type, string EventId, string Body)
 		{
 			this.timestamp = Timestamp;
 			this.type = Type;
@@ -45,7 +66,7 @@ namespace Waher.Things.DisplayableParameters
 		/// <summary>
 		/// Message Type
 		/// </summary>
-		public NodeState Type
+		public MessageType Type
 		{
 			get { return this.type; }
 		}

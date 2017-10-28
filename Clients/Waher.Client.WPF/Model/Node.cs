@@ -11,31 +11,30 @@ using Waher.Networking.XMPP.Concentrator;
 namespace Waher.Client.WPF.Model
 {
 	/// <summary>
-	/// Represents a data source in a concentrator.
+	/// Represents a node in a concentrator.
 	/// </summary>
-	public class DataSource : TreeNode
+	public class Node : TreeNode
 	{
-		private string key;
-		private string header;
-		private bool hasChildSources;
+		private NodeInformation nodeInfo;
 
-		public DataSource(TreeNode Parent, string Key, string Header, bool HasChildSources)
+		public Node(TreeNode Parent, NodeInformation NodeInfo)
 			: base(Parent)
 		{
-			this.key = Key;
-			this.header = Header;
-			this.hasChildSources = HasChildSources;
+			this.nodeInfo = NodeInfo;
 
-			this.children = new SortedDictionary<string, TreeNode>()
+			if (nodeInfo.HasChildren)
 			{
-				{ string.Empty, new Loading(this) }
-			};
+				this.children = new SortedDictionary<string, TreeNode>()
+				{
+					{ string.Empty, new Loading(this) }
+				};
+			}
 		}
 
-		public override string Key => this.key;
-		public override string Header => this.header;
-		public override string ToolTip => "Data source";
-		public override string TypeName => "Data Source";
+		public override string Key => this.nodeInfo.NodeId;
+		public override string Header => this.nodeInfo.DisplayName;
+		public override string ToolTip => "Node";
+		public override string TypeName => this.nodeInfo.NodeType;
 		public override bool CanAddChildren => false;
 		public override bool CanRecycle => false;
 
@@ -43,10 +42,15 @@ namespace Waher.Client.WPF.Model
 		{
 			get
 			{
-				if (this.IsExpanded)
-					return XmppAccountNode.folderOpen;
+				if (this.nodeInfo.HasChildren)
+				{
+					if (this.IsExpanded)
+						return XmppAccountNode.folderOpen;
+					else
+						return XmppAccountNode.folderClosed;
+				}
 				else
-					return XmppAccountNode.folderClosed;
+					return XmppAccountNode.box;
 			}
 		}
 
@@ -83,28 +87,9 @@ namespace Waher.Client.WPF.Model
 				{
 					Mouse.OverrideCursor = Cursors.Wait;
 
-					if (this.hasChildSources)
+					if (this.nodeInfo.HasChildren)
 					{
-						Concentrator.XmppAccountNode.ConcentratorClient.GetChildDataSources(FullJid, this.key, (sender, e) =>
-						{
-							Mouse.OverrideCursor = null;
-
-							if (e.Ok)
-							{
-								SortedDictionary<string, TreeNode> Children = new SortedDictionary<string, TreeNode>();
-
-								foreach (DataSourceReference Ref in e.DataSources)
-									Children[Ref.SourceID] = new DataSource(this, Ref.SourceID, Ref.SourceID, Ref.HasChildren);
-
-								this.children = Children;
-
-								this.OnUpdated();
-							}
-						}, null);
-					}
-					else
-					{
-						Concentrator.XmppAccountNode.ConcentratorClient.GetRootNodes(FullJid, this.key, true, true, 
+						Concentrator.XmppAccountNode.ConcentratorClient.GetChildNodes(FullJid, this.nodeInfo, true, true,
 							"en", string.Empty, string.Empty, string.Empty, (sender, e) =>
 						{
 							Mouse.OverrideCursor = null;
@@ -122,6 +107,11 @@ namespace Waher.Client.WPF.Model
 							}
 						}, null);
 					}
+					else
+					{
+						this.children = null;
+						this.OnUpdated();
+					}
 				}
 			}
 
@@ -132,7 +122,7 @@ namespace Waher.Client.WPF.Model
 		{
 			base.OnCollapsed();
 
-			if (this.children == null || this.children.Count != 1 || !this.children.ContainsKey(string.Empty))
+			if (this.nodeInfo.HasChildren && (this.children == null || this.children.Count != 1 || !this.children.ContainsKey(string.Empty)))
 			{
 				this.children = new SortedDictionary<string, TreeNode>()
 				{

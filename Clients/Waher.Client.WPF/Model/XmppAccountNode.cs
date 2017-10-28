@@ -247,7 +247,9 @@ namespace Waher.Client.WPF.Model
 		internal static readonly BitmapImage online = new BitmapImage(new Uri("../Graphics/Online.png", UriKind.Relative));
 		internal static readonly BitmapImage folderClosed = new BitmapImage(new Uri("../Graphics/folder-yellow-icon.png", UriKind.Relative));
 		internal static readonly BitmapImage folderOpen = new BitmapImage(new Uri("../Graphics/folder-yellow-open-icon.png", UriKind.Relative));
-
+		internal static readonly BitmapImage box = new BitmapImage(new Uri("../Graphics/App-miscellaneous-icon.png", UriKind.Relative));
+		internal static readonly BitmapImage hourglass = new BitmapImage(new Uri("../Graphics/hourglass-icon.png", UriKind.Relative));
+		
 		public override ImageSource ImageResource
 		{
 			get
@@ -508,7 +510,7 @@ namespace Waher.Client.WPF.Model
 				XmppContact Node = (XmppContact)e.State;
 				object OldTag;
 
-				if (e.HasFeature(ConcentratorClient.NamespaceConcentrator))
+				if (e.HasFeature(ConcentratorServer.NamespaceConcentrator))
 				{
 					OldTag = Node.Tag;
 					Node = new XmppConcentrator(Node.Parent, this.client, Node.BareJID)

@@ -21,7 +21,7 @@ namespace Waher.Client.WPF.Model
 		{
 			this.children = new SortedDictionary<string, TreeNode>()
 			{
-				{ string.Empty, new DataSource(this, string.Empty, "Loading...", false) }
+				{ string.Empty, new Loading(this) }
 			};
 
 			this.CheckCapabilities();

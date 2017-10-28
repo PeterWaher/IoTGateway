@@ -138,6 +138,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Model\Connections.cs" />
+    <Compile Include="Model\Loading.cs" />
+    <Compile Include="Model\Node.cs" />
     <Compile Include="Model\DataSource.cs" />
     <Compile Include="Model\XmppConcentrator.cs" />
     <Compile Include="Model\XmppActuator.cs" />
@@ -352,6 +354,12 @@
   <ItemGroup>
     <Resource Include="Graphics\folder-yellow-icon.png" />
     <Resource Include="Graphics\folder-yellow-open-icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Graphics\App-miscellaneous-icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Graphics\hourglass-icon.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\..\packages\SkiaSharp.1.59.1\build\net45\SkiaSharp.targets" Condition="Exists('..\..\packages\SkiaSharp.1.59.1\build\net45\SkiaSharp.targets')" />

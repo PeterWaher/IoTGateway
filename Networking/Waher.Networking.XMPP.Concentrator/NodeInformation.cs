@@ -44,6 +44,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="HasChildren">If the node has child nodes.</param>
 		/// <param name="ChildrenOrdered">If the child nodes are ordered.</param>
 		/// <param name="IsReadable">If the node is readable.</param>
+		/// <param name="IsControllable">If the node is controllable.</param>
 		/// <param name="HasCommands">If the node has commands.</param>
 		/// <param name="ParentId">Node ID of parent node.</param>
 		/// <param name="ParentPartition">Partition of parent node.</param>

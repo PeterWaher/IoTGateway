@@ -3653,7 +3653,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					return null;
 
 				INode Node2 = await DataSource.GetNodeAsync(Node);
-				if (Node == null)
+				if (Node2 == null)
 					return null;
 
 				IActuator Actuator = Node2 as IActuator;

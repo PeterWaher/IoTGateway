@@ -206,7 +206,54 @@ namespace Waher.Client.WPF.Model
 		/// </summary>
 		protected virtual void OnExpanded()
 		{
+			this.LoadChildren();
 			this.Raise(this.Expanded);
+		}
+
+		/// <summary>
+		/// Raises the <see cref="Selected"/> event.
+		/// </summary>
+		protected override void OnSelected()
+		{
+			this.LoadChildren();
+			base.OnSelected();
+		}
+
+		/// <summary>
+		/// Method is called to make sure children are loaded.
+		/// </summary>
+		protected virtual void LoadChildren()
+		{
+			// Do nothing by default.
+		}
+
+		/// <summary>
+		/// Method is called to notify children can be unloaded.
+		/// </summary>
+		protected virtual void UnloadChildren()
+		{
+			// Do nothing by default.
+		}
+
+		/// <summary>
+		/// Method is called to notify grandchildren can be unloaded.
+		/// </summary>
+		protected virtual void UnloadGrandchildren()
+		{
+			if (this.children != null)
+			{
+				foreach (TreeNode Node in this.children.Values)
+					Node.UnloadChildren();
+			}
+		}
+
+		/// <summary>
+		/// Method is called to make sure siblings are loaded.
+		/// </summary>
+		protected virtual void LoadSiblings()
+		{
+			if (this.parent != null)
+				this.parent.LoadChildren();
 		}
 
 		/// <summary>
@@ -214,6 +261,7 @@ namespace Waher.Client.WPF.Model
 		/// </summary>
 		protected virtual void OnCollapsed()
 		{
+			this.UnloadGrandchildren();
 			this.Raise(this.Collapsed);
 		}
 

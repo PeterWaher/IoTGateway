@@ -21,12 +21,20 @@ namespace Waher.Client.WPF.Model
 		}
 
 		public override string Key => string.Empty;
-		public override string Header => "Loading...";
 		public override string ToolTip => "Items are being loaded.";
 		public override string TypeName => string.Empty;
 		public override bool CanAddChildren => false;
 		public override bool CanRecycle => false;
 		public override ImageSource ImageResource => XmppAccountNode.hourglass;
+
+		public override string Header
+		{
+			get
+			{
+				this.LoadSiblings();
+				return "Loading...";
+			}
+		}
 
 		public override void Write(XmlWriter Output)
 		{

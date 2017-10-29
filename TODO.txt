@@ -71,15 +71,10 @@ Waher.Client.WPF
 	- abstraction of selection.
 	- XEP-0324
 	- XEP-0326
-	- Roster management
-		- Borttagning av kontakter fungerar inte.
-		- När man lägger till en ny kontakt (mock.temp, services.pcsensor), presence har uppdaterats, får man inte senaste presence.
-	- Programikon
 	- Minimize to tray
 	- Autostart
 	- Tab close button
 	- Sniff window: Stop, resume.
-	- HTTPX: To embed images in markdown chat.
 	- Filnamn i alla flikar, samt korrekt hantering av Save & SaveAs.
 	- Visning av fel i avläsningsvyn.
 	- Chat:
@@ -99,9 +94,6 @@ HTTP Server
 	- POST till Markdown-sidor
 		- Decoded content i sessions-variabel.
 		- Processing i inbäddade script.
-
-Content
-	- XML
 
 Serialization
 Localization

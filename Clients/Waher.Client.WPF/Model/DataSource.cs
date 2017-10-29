@@ -73,7 +73,7 @@ namespace Waher.Client.WPF.Model
 			}
 		}
 
-		protected override void OnExpanded()
+		protected override void LoadChildren()
 		{
 			if (this.children != null && this.children.Count == 1 && this.children.ContainsKey(string.Empty))
 			{
@@ -127,12 +127,12 @@ namespace Waher.Client.WPF.Model
 				}
 			}
 
-			base.OnExpanded();
+			base.LoadChildren();
 		}
 
-		protected override void OnCollapsed()
+		protected override void UnloadChildren()
 		{
-			base.OnCollapsed();
+			base.UnloadChildren();
 
 			if (this.children == null || this.children.Count != 1 || !this.children.ContainsKey(string.Empty))
 			{

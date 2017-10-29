@@ -527,7 +527,10 @@ namespace Waher.Client.WPF.Model
 
 					this.children[Node.Key] = Node;
 
-					this.AddGroups(Node, ConcentratorGroupName);
+					if (SupportsEvents)
+						this.AddGroups(Node, ConcentratorGroupName, EventsGroupName);
+					else
+						this.AddGroups(Node, ConcentratorGroupName);
 				}
 				else if (e.HasFeature(ControlClient.NamespaceControl))
 				{
@@ -744,7 +747,10 @@ namespace Waher.Client.WPF.Model
 
 		public override bool RemoveSniffer(ISniffer Sniffer)
 		{
-			return this.client.Remove(Sniffer);
+			if (this.client == null)
+				return false;
+			else
+				return this.client.Remove(Sniffer);
 		}
 
 		public XmppClient Client

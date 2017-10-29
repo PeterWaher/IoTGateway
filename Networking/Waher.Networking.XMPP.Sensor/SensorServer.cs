@@ -535,12 +535,6 @@ namespace Waher.Networking.XMPP.Sensor
 						Partition = XML.Attribute(E, "pt");
 
 						ThingReference Ref = new ThingReference(NodeId, SourceId, Partition);
-						if (!Ref.IsEmpty)
-						{
-							throw new XMPP.StanzaErrors.BadRequestException("Device not a concentrator.", e.IQ);
-							// TODO: Concentrator-support, and check which node references are valid and which aren't.
-						}
-
 						Nodes.Add(Ref);
 						break;
 

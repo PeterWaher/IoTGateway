@@ -16,6 +16,7 @@ using Waher.Things.DisplayableParameters;
 using Waher.Things.Queries;
 using Waher.Networking.XMPP.Control;
 using Waher.Networking.XMPP.DataForms;
+using Waher.Networking.XMPP.Provisioning;
 using Waher.Networking.XMPP.Sensor;
 
 namespace Waher.Networking.XMPP.Concentrator
@@ -50,13 +51,27 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="Client">XMPP Client</param>
 		/// <param name="DataSources">Data sources.</param>
 		public ConcentratorServer(XmppClient Client, params IDataSource[] DataSources)
+			: this(Client, null, DataSources)
+		{
+		}
+
+		/// <summary>
+		/// Implements an XMPP concentrator server interface.
+		/// 
+		/// The interface is defined in XEP-0326:
+		/// http://xmpp.org/extensions/xep-0326.html
+		/// </summary>
+		/// <param name="Client">XMPP Client</param>
+		/// <param name="ProvisioningClient">Provisioning client.</param>
+		/// <param name="DataSources">Data sources.</param>
+		public ConcentratorServer(XmppClient Client, ProvisioningClient ProvisioningClient, params IDataSource[] DataSources)
 		{
 			this.client = Client;
 
-			this.sensorServer = new SensorServer(this.client, true);
+			this.sensorServer = new SensorServer(this.client, ProvisioningClient, true);
 			this.sensorServer.OnExecuteReadoutRequest += SensorServer_OnExecuteReadoutRequest;
 
-			this.controlServer = new ControlServer(this.client);
+			this.controlServer = new ControlServer(this.client, ProvisioningClient);
 			this.controlServer.OnGetControlParameters += ControlServer_OnGetControlParameters;
 
 			foreach (IDataSource DataSource in DataSources)

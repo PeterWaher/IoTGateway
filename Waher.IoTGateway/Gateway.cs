@@ -85,8 +85,6 @@ namespace Waher.IoTGateway
 		private static XmppClient xmppClient = null;
 		private static Networking.XMPP.InBandBytestreams.IbbClient ibbClient = null;
 		private static Networking.XMPP.P2P.SOCKS5.Socks5Proxy socksProxy = null;
-		private static SensorServer sensorServer = null;
-		private static ControlServer controlServer = null;
 		private static ConcentratorServer concentratorServer = null;
 		private static Timer connectionTimer = null;
 		private static X509Certificate2 certificate = null;
@@ -419,16 +417,10 @@ namespace Waher.IoTGateway
 				coapEndpoint = new CoapEndpoint();
 				Runtime.Inventory.Types.SetModuleParameter("CoAP", coapEndpoint);
 
-				sensorServer = new SensorServer(xmppClient, provisioningClient, true);
-				sensorServer.OnExecuteReadoutRequest += SensorServer_OnExecuteReadoutRequest;
-				Runtime.Inventory.Types.SetModuleParameter("Sensor", sensorServer);
-
-				controlServer = new ControlServer(xmppClient, provisioningClient);
-				controlServer.OnGetControlParameters += ControlServer_OnGetControlParameters;
-				Runtime.Inventory.Types.SetModuleParameter("Control", controlServer);
-
 				concentratorServer = new ConcentratorServer(xmppClient, new MeteringTopology());
 				Runtime.Inventory.Types.SetModuleParameter("Concentrator", concentratorServer);
+				Runtime.Inventory.Types.SetModuleParameter("Sensor", concentratorServer.SensorServer);
+				Runtime.Inventory.Types.SetModuleParameter("Control", concentratorServer.ControlServer);
 			}
 			catch (Exception ex)
 			{
@@ -607,18 +599,6 @@ namespace Waher.IoTGateway
 			{
 				thingRegistryClient.Dispose();
 				thingRegistryClient = null;
-			}
-
-			if (sensorServer != null)
-			{
-				sensorServer.Dispose();
-				sensorServer = null;
-			}
-
-			if (controlServer != null)
-			{
-				controlServer.Dispose();
-				controlServer = null;
 			}
 
 			if (concentratorServer != null)
@@ -993,78 +973,6 @@ namespace Waher.IoTGateway
 		}
 
 		// TODO: Teman: http://mmistakes.github.io/skinny-bones-jekyll/, http://jekyllrb.com/
-
-		#endregion
-
-		#region Sensors & Controllers
-
-		private static async void SensorServer_OnExecuteReadoutRequest(object Sender, SensorDataServerRequest Request)
-		{
-			try
-			{
-				DateTime TP = DateTime.Now;
-				INode Node;
-				ISensor Sensor;
-
-				foreach (ThingReference NodeRef in Request.Nodes)
-				{
-					if (!concentratorServer.TryGetDataSource(NodeRef.SourceId, out IDataSource Source))
-					{
-						Request.ReportErrors(false, new ThingError(NodeRef, TP, "Data source not found."));
-						continue;
-					}
-
-					Node = await Source.GetNodeAsync(NodeRef);
-					if (Node == null)
-					{
-						Request.ReportErrors(false, new ThingError(NodeRef, TP, "Node not found."));
-						continue;
-					}
-
-					Sensor = Node as ISensor;
-					if (Sensor == null)
-					{
-						Request.ReportErrors(false, new ThingError(NodeRef, TP, "Node not a sensor."));
-						continue;
-					}
-
-					Sensor.StartReadout(Request);
-				}
-			}
-			catch (Exception ex)
-			{
-				Log.Critical(ex);
-			}
-		}
-
-		private static async Task<ControlParameter[]> ControlServer_OnGetControlParameters(ThingReference NodeRef)
-		{
-			try
-			{
-				DateTime TP = DateTime.Now;
-				INode Node;
-				IActuator Actuator;
-
-				if (!concentratorServer.TryGetDataSource(NodeRef.SourceId, out IDataSource Source))
-					return null;
-
-				Node = await Source.GetNodeAsync(NodeRef);
-
-				if (Node == null)
-					return null;
-
-				Actuator = Node as IActuator;
-				if (Actuator == null)
-					return null;
-
-				return Actuator.GetControlParameters();
-			}
-			catch (Exception ex)
-			{
-				Log.Critical(ex);
-				return null;
-			}
-		}
 
 		#endregion
 

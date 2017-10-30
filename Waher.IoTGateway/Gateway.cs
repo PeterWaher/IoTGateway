@@ -417,7 +417,7 @@ namespace Waher.IoTGateway
 				coapEndpoint = new CoapEndpoint();
 				Runtime.Inventory.Types.SetModuleParameter("CoAP", coapEndpoint);
 
-				concentratorServer = new ConcentratorServer(xmppClient, new MeteringTopology());
+				concentratorServer = new ConcentratorServer(xmppClient, provisioningClient, new MeteringTopology());
 				Runtime.Inventory.Types.SetModuleParameter("Concentrator", concentratorServer);
 				Runtime.Inventory.Types.SetModuleParameter("Sensor", concentratorServer.SensorServer);
 				Runtime.Inventory.Types.SetModuleParameter("Control", concentratorServer.ControlServer);

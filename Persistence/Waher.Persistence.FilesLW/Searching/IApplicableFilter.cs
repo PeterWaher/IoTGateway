@@ -13,7 +13,8 @@ namespace Waher.Persistence.Files.Searching
 		/// </summary>
 		/// <param name="Object">Object.</param>
 		/// <param name="Serializer">Corresponding object serializer.</param>
+		/// <param name="Provider">Files provider.</param>
 		/// <returns>If the filter can be applied.</returns>
-		bool AppliesTo(object Object, IObjectSerializer Serializer);
+		bool AppliesTo(object Object, IObjectSerializer Serializer, FilesProvider Provider);
 	}
 }

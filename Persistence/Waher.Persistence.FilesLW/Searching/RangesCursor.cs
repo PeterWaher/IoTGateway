@@ -21,6 +21,7 @@ namespace Waher.Persistence.Files.Searching
 		private ICursor<T> currentRange;
 		private KeyValuePair<string, IApplicableFilter>[] startRangeFilters;
 		private KeyValuePair<string, IApplicableFilter>[] endRangeFilters;
+		private FilesProvider provider;
 		private int nrRanges;
 		private int limitsUpdatedAt;
 		private bool locked;
@@ -36,7 +37,9 @@ namespace Waher.Persistence.Files.Searching
 		/// <param name="Ranges">Ranges to enumerate.</param>
 		/// <param name="AdditionalFilters">Additional filters.</param>
 		/// <param name="Locked">If locked access is desired.</param>
-		public RangesCursor(IndexBTreeFile Index, RangeInfo[] Ranges, IApplicableFilter[] AdditionalFilters, bool Locked)
+		/// <param name="Provider">Files provider.</param>
+		public RangesCursor(IndexBTreeFile Index, RangeInfo[] Ranges, IApplicableFilter[] AdditionalFilters, 
+			bool Locked, FilesProvider Provider)
 		{
 			this.index = Index;
 			this.ranges = Ranges;
@@ -47,6 +50,7 @@ namespace Waher.Persistence.Files.Searching
 			this.fieldNames = Index.FieldNames;
 			this.firstAscending = this.ascending[0];
 			this.nrRanges = this.ranges.Length;
+			this.provider = Provider;
 
 			int i;
 
@@ -264,7 +268,7 @@ namespace Waher.Persistence.Files.Searching
 				{
 					foreach (IApplicableFilter Filter in this.additionalfilters)
 					{
-						if (!Filter.AppliesTo(CurrentValue, CurrentSerializer))
+						if (!Filter.AppliesTo(CurrentValue, CurrentSerializer, this.provider))
 						{
 							Ok = false;
 							break;
@@ -276,7 +280,7 @@ namespace Waher.Persistence.Files.Searching
 				{
 					foreach (KeyValuePair<string, IApplicableFilter> Filter in this.startRangeFilters)
 					{
-						if (!Filter.Value.AppliesTo(CurrentValue, CurrentSerializer))
+						if (!Filter.Value.AppliesTo(CurrentValue, CurrentSerializer, this.provider))
 						{
 							OutOfStartRangeField = Filter.Key;
 							Ok = false;
@@ -289,7 +293,7 @@ namespace Waher.Persistence.Files.Searching
 				{
 					foreach (KeyValuePair<string, IApplicableFilter> Filter in this.endRangeFilters)
 					{
-						if (!Filter.Value.AppliesTo(CurrentValue, CurrentSerializer))
+						if (!Filter.Value.AppliesTo(CurrentValue, CurrentSerializer, this.provider))
 						{
 							OutOfEndRangeField = Filter.Key;
 							Ok = false;

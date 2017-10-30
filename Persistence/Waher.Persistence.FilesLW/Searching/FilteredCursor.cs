@@ -15,6 +15,7 @@ namespace Waher.Persistence.Files.Searching
 	{
 		private ICursor<T> cursor;
 		private IApplicableFilter filter;
+		private FilesProvider provider;
 		private int timeoutMilliseconds;
 		private bool untilFirstFail;
 		private bool forward;
@@ -27,13 +28,16 @@ namespace Waher.Persistence.Files.Searching
 		/// <param name="UntilFirstFail">Only return ites until first filter failure.</param>
 		/// <param name="Forward">If <paramref name="Cursor"/> is to be processed forwards (true) or backwards (false).</param>
 		/// <param name="TimeoutMilliseconds">Time to wait to get access to underlying database.</param>
-		public FilteredCursor(ICursor<T> Cursor, IApplicableFilter Filter, bool UntilFirstFail, bool Forward, int TimeoutMilliseconds)
+		/// <param name="Provider">Files provider.</param>
+		public FilteredCursor(ICursor<T> Cursor, IApplicableFilter Filter, bool UntilFirstFail, bool Forward, int TimeoutMilliseconds,
+			FilesProvider Provider)
 		{
 			this.cursor = Cursor;
 			this.filter = Filter;
 			this.untilFirstFail = UntilFirstFail;
 			this.forward = Forward;
 			this.timeoutMilliseconds = TimeoutMilliseconds;
+			this.provider = Provider;
 		}
 
 		/// <summary>
@@ -116,8 +120,8 @@ namespace Waher.Persistence.Files.Searching
 
 				if (!this.cursor.CurrentTypeCompatible)
 					continue;
-
-				if (this.filter != null && !this.filter.AppliesTo(this.cursor.Current, this.cursor.CurrentSerializer))
+				
+				if (this.filter != null && !this.filter.AppliesTo(this.cursor.Current, this.cursor.CurrentSerializer, this.provider))
 				{
 					if (this.untilFirstFail)
 						return false;
@@ -153,7 +157,7 @@ namespace Waher.Persistence.Files.Searching
 				if (!this.cursor.CurrentTypeCompatible)
 					continue;
 
-				if (this.filter != null && !this.filter.AppliesTo(this.cursor.Current, this.cursor.CurrentSerializer))
+				if (this.filter != null && !this.filter.AppliesTo(this.cursor.Current, this.cursor.CurrentSerializer, this.provider))
 				{
 					if (this.untilFirstFail)
 						return false;

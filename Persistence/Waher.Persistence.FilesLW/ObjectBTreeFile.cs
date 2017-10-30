@@ -4980,7 +4980,7 @@ namespace Waher.Persistence.Files
                     {
                         this.nrFullFileScans++;
                         Log.Notice("Search resulted in entire file to be scanned. Consider either adding indices, or enumerate objects using an object enumerator.", this.fileName);
-                        return new Searching.FilteredCursor<T>(this.GetTypedEnumerator<T>(Locked), this.ConvertFilter(Filter), false, true, this.timeoutMilliseconds);
+                        return new Searching.FilteredCursor<T>(this.GetTypedEnumerator<T>(Locked), this.ConvertFilter(Filter), false, true, this.timeoutMilliseconds, this.provider);
                     }
 
                     Searching.RangeInfo[] RangeInfo = new Searching.RangeInfo[NrFields];
@@ -5090,9 +5090,9 @@ namespace Waher.Persistence.Files
                     if (Consistent)
                     {
                         if (AdditionalFields == null)
-                            return new Searching.RangesCursor<T>(Index, RangeInfo, null, Locked);
+                            return new Searching.RangesCursor<T>(Index, RangeInfo, null, Locked, this.provider);
                         else
-                            return new Searching.RangesCursor<T>(Index, RangeInfo, AdditionalFields.ToArray(), Locked);
+                            return new Searching.RangesCursor<T>(Index, RangeInfo, AdditionalFields.ToArray(), Locked, this.provider);
                     }
                     else
                         return new Searching.UnionCursor<T>(new Filter[0], this, Locked);   // Empty result set.
@@ -5114,7 +5114,7 @@ namespace Waher.Persistence.Files
                     {
                         this.nrFullFileScans++;
                         Log.Notice("Search resulted in entire file to be scanned. Consider either adding indices, or enumerate objects using an object enumerator.", this.fileName);
-                        return new Searching.FilteredCursor<T>(this.GetTypedEnumerator<T>(Locked), this.ConvertFilter(Filter), false, true, this.timeoutMilliseconds);
+                        return new Searching.FilteredCursor<T>(this.GetTypedEnumerator<T>(Locked), this.ConvertFilter(Filter), false, true, this.timeoutMilliseconds, this.provider);
                     }
                     else
                         return new Searching.UnionCursor<T>(ChildFilters, this, Locked);
@@ -5132,7 +5132,7 @@ namespace Waher.Persistence.Files
                     {
                         this.nrFullFileScans++;
                         Log.Notice("Search resulted in entire file to be scanned. Consider either adding indices, or enumerate objects using an object enumerator.", this.fileName);
-                        return new Searching.FilteredCursor<T>(this.GetTypedEnumerator<T>(Locked), this.ConvertFilter(Filter), false, true, this.timeoutMilliseconds);
+                        return new Searching.FilteredCursor<T>(this.GetTypedEnumerator<T>(Locked), this.ConvertFilter(Filter), false, true, this.timeoutMilliseconds, this.provider);
                     }
                     else
                         return await this.ConvertFilterToCursor<T>(NegatedFilter, Locked);
@@ -5178,44 +5178,44 @@ namespace Waher.Persistence.Files
 
                     this.nrFullFileScans++;
                     Log.Notice("Search resulted in entire file to be scanned. Consider either adding indices, or enumerate objects using an object enumerator.", this.fileName);
-                    return new Searching.FilteredCursor<T>(this.GetTypedEnumerator<T>(Locked), this.ConvertFilter(Filter), false, true, this.timeoutMilliseconds);
+                    return new Searching.FilteredCursor<T>(this.GetTypedEnumerator<T>(Locked), this.ConvertFilter(Filter), false, true, this.timeoutMilliseconds, this.provider);
                 }
 
                 if (Filter is FilterFieldEqualTo)
                 {
                     return new Searching.FilteredCursor<T>(
                         await Index.FindFirstGreaterOrEqualTo<T>(Locked, new KeyValuePair<string, object>(FilterFieldValue.FieldName, Value)),
-                        this.ConvertFilter(Filter), true, true, this.timeoutMilliseconds);
+                        this.ConvertFilter(Filter), true, true, this.timeoutMilliseconds, this.provider);
                 }
                 else if (Filter is FilterFieldNotEqualTo)
                 {
                     this.nrFullFileScans++;
                     Log.Notice("Search resulted in entire file to be scanned. Consider either adding indices, or enumerate objects using an object enumerator.", this.fileName);
-                    return new Searching.FilteredCursor<T>(this.GetTypedEnumerator<T>(Locked), this.ConvertFilter(Filter), false, true, this.timeoutMilliseconds);
+                    return new Searching.FilteredCursor<T>(this.GetTypedEnumerator<T>(Locked), this.ConvertFilter(Filter), false, true, this.timeoutMilliseconds, this.provider);
                 }
                 else if (Filter is FilterFieldGreaterOrEqualTo)
                 {
                     return new Searching.FilteredCursor<T>(
                         await Index.FindFirstGreaterOrEqualTo<T>(Locked, new KeyValuePair<string, object>(FilterFieldValue.FieldName, Value)),
-                        null, false, true, this.timeoutMilliseconds);
+                        null, false, true, this.timeoutMilliseconds, this.provider);
                 }
                 else if (Filter is FilterFieldLesserOrEqualTo)
                 {
                     return new Searching.FilteredCursor<T>(
                         await Index.FindLastLesserOrEqualTo<T>(Locked, new KeyValuePair<string, object>(FilterFieldValue.FieldName, Value)),
-                        null, false, false, this.timeoutMilliseconds);
+                        null, false, false, this.timeoutMilliseconds, this.provider);
                 }
                 else if (Filter is FilterFieldGreaterThan)
                 {
                     return new Searching.FilteredCursor<T>(
                         await Index.FindFirstGreaterThan<T>(Locked, new KeyValuePair<string, object>(FilterFieldValue.FieldName, Value)),
-                        null, false, true, this.timeoutMilliseconds);
+                        null, false, true, this.timeoutMilliseconds, this.provider);
                 }
                 else if (Filter is FilterFieldLesserThan)
                 {
                     return new Searching.FilteredCursor<T>(
                         await Index.FindLastLesserThan<T>(Locked, new KeyValuePair<string, object>(FilterFieldValue.FieldName, Value)),
-                        null, false, false, this.timeoutMilliseconds);
+                        null, false, false, this.timeoutMilliseconds, this.provider);
                 }
                 else
                     throw this.UnknownFilterType(Filter);
@@ -5233,13 +5233,13 @@ namespace Waher.Persistence.Files
                     {
                         this.nrFullFileScans++;
                         Log.Notice("Search resulted in entire file to be scanned. Consider either adding indices, or enumerate objects using an object enumerator.", this.fileName);
-                        return new Searching.FilteredCursor<T>(this.GetTypedEnumerator<T>(Locked), FilterFieldLikeRegEx2, false, true, this.timeoutMilliseconds);
+                        return new Searching.FilteredCursor<T>(this.GetTypedEnumerator<T>(Locked), FilterFieldLikeRegEx2, false, true, this.timeoutMilliseconds, this.provider);
                     }
                     else
                     {
                         return new Searching.FilteredCursor<T>(
                             await Index.FindFirstGreaterOrEqualTo<T>(Locked, new KeyValuePair<string, object>(FilterFieldLikeRegEx.FieldName, ConstantPrefix)),
-                            FilterFieldLikeRegEx2, false, true, this.timeoutMilliseconds);
+                            FilterFieldLikeRegEx2, false, true, this.timeoutMilliseconds, this.provider);
                     }
                 }
                 else

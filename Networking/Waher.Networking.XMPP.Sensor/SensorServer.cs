@@ -700,9 +700,11 @@ namespace Waher.Networking.XMPP.Sensor
 						subscriptionsByThing[Thing] = Subscriptions;
 					}
 
-					LinkedListNode<Subscription> Loop = Subscriptions.First;
+					LinkedListNode<Subscription> Next, Loop = Subscriptions.First;
 					while (Loop != null)
 					{
+						Next = Loop.Next;
+
 						if (Loop.Value.From == e.From)
 						{
 							if (Loop.Value.RemoveNode(Thing))
@@ -711,6 +713,8 @@ namespace Waher.Networking.XMPP.Sensor
 							Subscriptions.Remove(Loop);
 							break;
 						}
+
+						Loop = Next;
 					}
 
 					Subscriptions.AddLast(Subscription);

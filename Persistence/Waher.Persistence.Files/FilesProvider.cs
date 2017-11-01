@@ -919,17 +919,11 @@ namespace Waher.Persistence.Files
 				if (this.files.TryGetValue(CollectionName, out File))
 					return File;
 
-				File = new ObjectBTreeFile(s + ".btree", CollectionName, s + ".blob", this.blockSize, this.blobBlockSize,
-#if NETSTANDARD1_5
-					this, this.encoding, this.timeoutMilliseconds, this.encrypted, this.debug);
-#else
-					this, this.encoding, this.timeoutMilliseconds, this.debug);
-#endif
-
-				this.files[CollectionName] = File;
-
-				Names = new StringDictionary(s + ".names", string.Empty, CollectionName, this, false);
-				this.nameFiles[CollectionName] = Names;
+				if (!this.nameFiles.TryGetValue(CollectionName, out Names))
+				{
+					Names = new StringDictionary(s + ".names", string.Empty, CollectionName, this, false);
+					this.nameFiles[CollectionName] = Names;
+				}
 			}
 
 			try
@@ -944,17 +938,36 @@ namespace Waher.Persistence.Files
 
 			lock (this.synchObj)
 			{
-				Dictionary<string, ulong> List = new Dictionary<string, ulong>();
-				this.codeByFieldByCollection[CollectionName] = List;
-
-				Dictionary<ulong, string> List2 = new Dictionary<ulong, string>();
-				this.fieldByCodeByCollection[CollectionName] = List2;
-
-				foreach (KeyValuePair<string, object> P in Strings)
+				if (!this.codeByFieldByCollection.TryGetValue(CollectionName, out Dictionary<string, ulong> List) ||
+					!this.fieldByCodeByCollection.TryGetValue(CollectionName, out Dictionary<ulong, string> List2))
 				{
-					List[P.Key] = (ulong)P.Value;
-					List2[(ulong)P.Value] = P.Key;
+					List = new Dictionary<string, ulong>();
+					this.codeByFieldByCollection[CollectionName] = List;
+
+					List2 = new Dictionary<ulong, string>();
+					this.fieldByCodeByCollection[CollectionName] = List2;
+
+					foreach (KeyValuePair<string, object> P in Strings)
+					{
+						List[P.Key] = (ulong)P.Value;
+						List2[(ulong)P.Value] = P.Key;
+					}
 				}
+			}
+
+			lock (this.files)
+			{
+				if (this.files.TryGetValue(CollectionName, out File))
+					return File;
+
+				File = new ObjectBTreeFile(s + ".btree", CollectionName, s + ".blob", this.blockSize, this.blobBlockSize,
+#if NETSTANDARD1_5
+					this, this.encoding, this.timeoutMilliseconds, this.encrypted, this.debug);
+#else
+					this, this.encoding, this.timeoutMilliseconds, this.debug);
+#endif
+
+				this.files[CollectionName] = File;
 			}
 
 			StringBuilder sb = new StringBuilder();

@@ -153,6 +153,10 @@ namespace Waher.Script.Persistence.Functions
 				return new FilterAnd(this.Convert(And.LeftOperand, Variables), this.Convert(And.RightOperand, Variables));
 			else if (Node is Or Or)
 				return new FilterOr(this.Convert(Or.LeftOperand, Variables), this.Convert(Or.RightOperand, Variables));
+			else if (Node is Operators.Dual.And And2)
+				return new FilterAnd(this.Convert(And2.LeftOperand, Variables), this.Convert(And2.RightOperand, Variables));
+			else if (Node is Operators.Dual.Or Or2)
+				return new FilterOr(this.Convert(Or2.LeftOperand, Variables), this.Convert(Or2.RightOperand, Variables));
 			else if (Node is Not Not)
 				return new FilterNot(this.Convert(Not.Operand, Variables));
 			else if (Node is EqualTo)
@@ -196,7 +200,7 @@ namespace Waher.Script.Persistence.Functions
 				return new FilterNot(new FilterFieldLikeRegEx(FieldName, Value.ToString()));
 			}
 			else
-				throw new ScriptRuntimeException("Invalid operation for filters.", this);
+				throw new ScriptRuntimeException("Invalid operation for filters: " + Node.GetType().FullName, this);
 		}
 
 		private void CheckBinaryOperator(BinaryOperator Operator, Variables Variables, out string FieldName, out object Value)

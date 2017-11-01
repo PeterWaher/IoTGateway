@@ -6,7 +6,7 @@
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <Authors>Peter Waher</Authors>
     <Company>Waher Data AB</Company>
-    <Description>Contains script extensions for the persistence layer.</Description>
+    <Description>Contains script extensions for the persistence layer. Allows for searching for, creating, updating and deleting objects in the object database from script.</Description>
     <Product>Waher.IoTGateway</Product>
     <Copyright>Copyright © Waher Data AB 2017. All rights reserved.</Copyright>
     <PackageLicenseUrl>https://github.com/PeterWaher/IoTGateway#license</PackageLicenseUrl>
@@ -15,10 +15,10 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>script execution parsing persistence</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.0.1</AssemblyVersion>
-    <FileVersion>1.0.1</FileVersion>
+    <AssemblyVersion>1.0.2</AssemblyVersion>
+    <FileVersion>1.0.2</FileVersion>
     <PackageIconUrl>https://github.com/PeterWaher/IoTGateway/blob/master/Images/Icon.ico?raw=true</PackageIconUrl>
-    <Version>1.0.1</Version>
+    <Version>1.0.2</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

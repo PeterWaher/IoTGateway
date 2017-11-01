@@ -16,9 +16,9 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>networking communication xmpp iot concentrator XEP-0326</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>0.1.3</AssemblyVersion>
-    <FileVersion>0.1.3</FileVersion>
-    <Version>0.1.3</Version>
+    <AssemblyVersion>0.1.6</AssemblyVersion>
+    <FileVersion>0.1.6</FileVersion>
+    <Version>0.1.6</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -48,6 +48,7 @@
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Timing\Waher.Runtime.Timing.csproj" />
     <ProjectReference Include="..\..\Things\Waher.Things\Waher.Things.csproj" />
     <ProjectReference Include="..\Waher.Networking.XMPP.Control\Waher.Networking.XMPP.Control.csproj" />
+    <ProjectReference Include="..\Waher.Networking.XMPP.Provisioning\Waher.Networking.XMPP.Provisioning.csproj" />
     <ProjectReference Include="..\Waher.Networking.XMPP.Sensor\Waher.Networking.XMPP.Sensor.csproj" />
     <ProjectReference Include="..\Waher.Networking.XMPP\Waher.Networking.XMPP.csproj" />
     <ProjectReference Include="..\Waher.Networking\Waher.Networking.csproj" />

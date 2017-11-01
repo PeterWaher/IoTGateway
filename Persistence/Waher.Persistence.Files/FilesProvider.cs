@@ -729,19 +729,35 @@ namespace Waher.Persistence.Files
 
 			if (List == null)
 			{
-				await this.GetFile(Collection);
-				return await this.GetFieldCodeAsync(Collection, FieldName);
-			}
-			else
-			{
-				lock (this.files)
-				{
-					Names = this.nameFiles[Collection];
-				}
+				await this.GetFile(Collection);		// Generates structures.
 
-				Task Task = Names.AddAsync(FieldName, Result, true);    // Add asynchronously
-				return Result;
+				lock (this.synchObj)
+				{
+					if (this.codeByFieldByCollection.TryGetValue(Collection, out List))
+					{
+						if (List.TryGetValue(FieldName, out Result))
+							return Result;
+
+						List2 = this.fieldByCodeByCollection[Collection];
+
+						Result = (uint)List.Count + 1;
+
+						List[FieldName] = Result;
+						List2[Result] = FieldName;
+					}
+					else
+						throw new Exception("Internal structures not generated properly.");
+				}
 			}
+
+			lock (this.files)
+			{
+				Names = this.nameFiles[Collection];
+			}
+
+			Task Task = Names.AddAsync(FieldName, Result, true);    // Add asynchronously
+
+			return Result;
 		}
 
 		/// <summary>

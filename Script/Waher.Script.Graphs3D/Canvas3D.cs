@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Numerics;
 using SkiaSharp;
 
@@ -9,7 +10,7 @@ namespace Waher.Script.Graphs3D
 	/// </summary>
 	public class Canvas3D
 	{
-		private uint[] colors;
+		private byte[] pixels;
 		private float[] zBuffer;
 		private Matrix4x4 t;
 		private Vector4 last = Vector4.Zero;
@@ -56,18 +57,27 @@ namespace Waher.Script.Graphs3D
 			this.cy = this.h / 2;
 			this.ResetTransforms();
 
-			int i, c = this.w * this.h;
-			uint BgColor = ToUInt(BackgroundColor);
+			int i, j, c = this.w * this.h;
+			byte R = BackgroundColor.Red;
+			byte G = BackgroundColor.Green;
+			byte B = BackgroundColor.Blue;
+			byte A = BackgroundColor.Alpha;
 
-			this.colors = new uint[c];
+			this.pixels = new byte[c * 4];
 			this.zBuffer = new float[c];
 
-			for (i = 0; i < c; i++)
+			for (i = j = 0; i < c; i++)
 			{
-				this.colors[i] = BgColor;
+				this.pixels[j++] = R;
+				this.pixels[j++] = G;
+				this.pixels[j++] = B;
+				this.pixels[j++] = A;
+
 				this.zBuffer[i] = float.MaxValue;
 			}
 		}
+
+		#region Colors
 
 		private static uint ToUInt(SKColor Color)
 		{
@@ -82,6 +92,21 @@ namespace Waher.Script.Graphs3D
 			return Result;
 		}
 
+		private static SKColor ToColor(uint Color)
+		{
+			byte R = (byte)Color;
+			Color >>= 8;
+			byte G = (byte)Color;
+			Color >>= 8;
+			byte B = (byte)Color;
+			Color >>= 8;
+			byte A = (byte)Color;
+
+			return new SKColor(R, G, B, A);
+		}
+
+		#endregion
+
 		#region Bitmaps
 
 		/// <summary>
@@ -91,82 +116,47 @@ namespace Waher.Script.Graphs3D
 		public SKImage GetBitmap()
 		{
 			if (this.overSampling == 1)
-				return this.GetBitmap(this.colors);
+				return this.GetBitmap(this.pixels);
 			else
 			{
-				uint[] Colors = new uint[this.width * this.height];
+				byte[] Pixels = new byte[this.width * this.height * 4];
 				int x, y, dx, dy, p0, p, q = 0;
 				int o2 = this.overSampling * this.overSampling;
 				int h = o2 >> 1;
 				uint SumR, SumG, SumB, SumA;
-				uint Color;
 
 				for (y = 0; y < this.height; y++)
 				{
 					for (x = 0; x < this.width; x++)
 					{
 						SumR = SumG = SumB = SumA = 0;
-						p0 = ((y * this.w) + x) * this.overSampling;
+						p0 = ((y * this.w) + x) * this.overSampling * 4;
 
-						for (dy = 0; dy < this.overSampling; dy++, p0 += this.w)
+						for (dy = 0; dy < this.overSampling; dy++, p0 += this.w * 4)
 						{
-							for (dx = 0, p = p0; dx < this.overSampling; dx++, p++)
+							for (dx = 0, p = p0; dx < this.overSampling; dx++)
 							{
-								Color = this.colors[p];
-								SumR += (byte)Color;
-								Color >>= 8;
-								SumG += (byte)Color;
-								Color >>= 8;
-								SumB += (byte)Color;
-								Color >>= 8;
-								SumA += (byte)Color;
+								SumR += this.pixels[p++];
+								SumG += this.pixels[p++];
+								SumB += this.pixels[p++];
+								SumA += this.pixels[p++];
 							}
 						}
 
-						Color = (byte)((SumA + h) / o2);
-						Color <<= 8;
-						Color |= (byte)((SumB + h) / o2);
-						Color <<= 8;
-						Color |= (byte)((SumG + h) / o2);
-						Color <<= 8;
-						Color |= (byte)((SumR + h) / o2);
-
-						Colors[q++] = Color;
+						Pixels[q++] = (byte)((SumR + h) / o2);
+						Pixels[q++] = (byte)((SumG + h) / o2);
+						Pixels[q++] = (byte)((SumB + h) / o2);
+						Pixels[q++] = (byte)((SumA + h) / o2);
 					}
 				}
 
-				return this.GetBitmap(Colors);
+				return this.GetBitmap(Pixels);
 			}
 		}
 
-		private SKImage GetBitmap(uint[] Colors)
+		private SKImage GetBitmap(byte[] Pixels)
 		{
-			int c = Colors.Length << 2;
-			byte[] ByteArray = new byte[c];
-
-			if (BitConverter.IsLittleEndian)
-				Buffer.BlockCopy(Colors, 0, ByteArray, 0, c);
-			else
-			{
-				int d = Colors.Length;
-				int i, k = 0;
-				uint j;
-
-				for (i = 0; i < d; i++)
-				{
-					j = Colors[i];
-
-					ByteArray[k++] = (byte)j;
-					j >>= 8;
-					ByteArray[k++] = (byte)j;
-					j >>= 8;
-					ByteArray[k++] = (byte)j;
-					j >>= 8;
-					ByteArray[k++] = (byte)j;
-				}
-			}
-
-			using (SKData Data = SKData.CreateCopy(ByteArray))
+			using (SKData Data = SKData.CreateCopy(Pixels))
 			{
 				SKImageInfo ImageInfo = new SKImageInfo(this.width, this.height, SKColorType.Rgba8888, SKAlphaType.Premul);
 				return SKImage.FromPixelData(ImageInfo, Data, this.width << 2);
@@ -239,19 +229,28 @@ namespace Waher.Script.Graphs3D
 			{
 				this.zBuffer[p] = z;
 
+				p <<= 2;
+
 				byte A = (byte)(Color >> 24);
 				if (A == 255)
-					this.colors[p] = Color;
+				{
+					this.pixels[p++] = (byte)Color;
+					Color >>= 8;
+					this.pixels[p++] = (byte)Color;
+					Color >>= 8;
+					this.pixels[p++] = (byte)Color;
+					Color >>= 8;
+					this.pixels[p] = (byte)Color;
+				}
 				else
 				{
-					uint Color2 = this.colors[p];
 					byte R = (byte)Color;
 					byte G = (byte)(Color >> 8);
 					byte B = (byte)(Color >> 16);
-					byte A2 = (byte)(Color2 >> 24);
-					byte R2 = (byte)Color2;
-					byte G2 = (byte)(Color2 >> 8);
-					byte B2 = (byte)(Color2 >> 16);
+					byte R2 = this.pixels[p++];
+					byte G2 = this.pixels[p++];
+					byte B2 = this.pixels[p++];
+					byte A2 = this.pixels[p];
 					byte R3, G3, B3, A3;
 
 					if (A2 == 255)
@@ -273,7 +272,10 @@ namespace Waher.Script.Graphs3D
 						A3 = (byte)(255 - (((255 - A) * (255 - A2) + 128) / 255));
 					}
 
-					this.colors[p] = (uint)(((((A3 << 8) | B3) << 8) | G3) << 8) | R3;
+					this.pixels[p--] = A3;
+					this.pixels[p--] = B3;
+					this.pixels[p--] = G3;
+					this.pixels[p] = R3;
 				}
 			}
 		}
@@ -320,8 +322,8 @@ namespace Waher.Script.Graphs3D
 			if ((Mask0 & 1) != 0)
 			{
 				Delta = x1 - x0;    // Must be non-zero, or masks would have common bit.
-				y0 = y0 - x0 * (y1 - y0) / Delta;
-				z0 = z0 - x0 * (z1 - z0) / Delta;
+				y0 -= x0 * (y1 - y0) / Delta;
+				z0 -= x0 * (z1 - z0) / Delta;
 				x0 = 0;
 
 				Mask0 &= 254;
@@ -337,8 +339,8 @@ namespace Waher.Script.Graphs3D
 			if ((Mask1 & 1) != 0)
 			{
 				Delta = x0 - x1;    // Must be non-zero, or masks would have common bit.
-				y1 = y1 - x1 * (y0 - y1) / Delta;
-				z1 = z1 - x1 * (z0 - z1) / Delta;
+				y1 -= x1 * (y0 - y1) / Delta;
+				z1 -= x1 * (z0 - z1) / Delta;
 				x1 = 0;
 
 				Mask1 &= 254;
@@ -356,8 +358,8 @@ namespace Waher.Script.Graphs3D
 			if ((Mask0 & 4) != 0)
 			{
 				Delta = y1 - y0;    // Must be non-zero, or masks would have common bit.
-				x0 = x0 - y0 * (x1 - x0) / Delta;
-				z0 = z0 - y0 * (z1 - z0) / Delta;
+				x0 -= y0 * (x1 - x0) / Delta;
+				z0 -= y0 * (z1 - z0) / Delta;
 				y0 = 0;
 
 				Mask0 &= 251;
@@ -373,8 +375,8 @@ namespace Waher.Script.Graphs3D
 			if ((Mask1 & 4) != 0)
 			{
 				Delta = y0 - y1;    // Must be non-zero, or masks would have common bit.
-				x1 = x1 - y1 * (x0 - x1) / Delta;
-				z1 = z1 - y1 * (z0 - z1) / Delta;
+				x1 -= y1 * (x0 - x1) / Delta;
+				z1 -= y1 * (z0 - z1) / Delta;
 				y1 = 0;
 
 				Mask1 &= 251;
@@ -393,8 +395,8 @@ namespace Waher.Script.Graphs3D
 			{
 				Delta = x1 - x0;    // Must be non-zero, or masks would have common bit.
 				Delta2 = this.wm1 - x0;
-				y0 = y0 + Delta2 * (y1 - y0) / Delta;
-				z0 = z0 + Delta2 * (z1 - z0) / Delta;
+				y0 += Delta2 * (y1 - y0) / Delta;
+				z0 += Delta2 * (z1 - z0) / Delta;
 				x0 = this.wm1;
 
 				Mask0 &= 253;
@@ -411,8 +413,8 @@ namespace Waher.Script.Graphs3D
 			{
 				Delta = x0 - x1;    // Must be non-zero, or masks would have common bit.
 				Delta2 = this.wm1 - x1;
-				y1 = y1 + Delta2 * (y0 - y1) / Delta;
-				z1 = z1 + Delta2 * (z0 - z1) / Delta;
+				y1 += Delta2 * (y0 - y1) / Delta;
+				z1 += Delta2 * (z0 - z1) / Delta;
 				x1 = this.wm1;
 
 				Mask1 &= 253;
@@ -431,8 +433,8 @@ namespace Waher.Script.Graphs3D
 			{
 				Delta = y1 - y0;    // Must be non-zero, or masks would have common bit.
 				Delta2 = this.hm1 - y0;
-				x0 = x0 + Delta2 * (x1 - x0) / Delta;
-				z0 = z0 + Delta2 * (z1 - z0) / Delta;
+				x0 += Delta2 * (x1 - x0) / Delta;
+				z0 += Delta2 * (z1 - z0) / Delta;
 				y0 = this.hm1;
 
 				Mask0 &= 247;
@@ -449,8 +451,8 @@ namespace Waher.Script.Graphs3D
 			{
 				Delta = y0 - y1;    // Must be non-zero, or masks would have common bit.
 				Delta2 = this.hm1 - y1;
-				x1 = x1 + Delta2 * (x0 - x1) / Delta;
-				z1 = z1 + Delta2 * (z0 - z1) / Delta;
+				x1 += Delta2 * (x0 - x1) / Delta;
+				z1 += Delta2 * (z0 - z1) / Delta;
 				y1 = this.hm1;
 
 				Mask1 &= 247;
@@ -659,6 +661,293 @@ namespace Waher.Script.Graphs3D
 
 			for (i = 1; i < c; i++)
 				this.LineTo(Nodes[i], Color);
+		}
+
+		#endregion
+
+		#region Scan Lines
+
+		private void ScanLine(float x0, float y0, float z0, SKColor Color0, float x1, float z1, SKColor Color1)
+		{
+			float Delta, Delta2;
+
+			if (x1 < x0)
+			{
+				Delta = x0;
+				x0 = x1;
+				x1 = Delta;
+
+				Delta = z0;
+				z0 = z1;
+				z1 = Delta;
+
+				SKColor cl = Color0;
+				Color0 = Color1;
+				Color1 = cl;
+			}
+
+			float y1 = y0;
+			float x0b = x0;
+			float x1b = x1;
+
+			if (!this.ClipLine(ref x0, ref y0, ref z0, ref x1, ref y1, ref z1))
+				return;
+
+			if (x0 == x1)
+			{
+				if (z0 < z1)
+					this.Plot((int)(x0 + 0.5f), (int)(y0 + 0.5f), z0, ToUInt(Color0));
+				else
+					this.Plot((int)(x1 + 0.5f), (int)(y0 + 0.5f), z1, ToUInt(Color1));
+			}
+			else
+			{
+				float R0 = Color0.Red;
+				float G0 = Color0.Green;
+				float B0 = Color0.Blue;
+				float A0 = Color0.Alpha;
+				float R1 = Color1.Red;
+				float G1 = Color1.Green;
+				float B1 = Color1.Blue;
+				float A1 = Color1.Alpha;
+
+				if (x0 != x0b)
+				{
+					Delta = x0 - x0b;
+					Delta2 = x1b - x0b;
+
+					R0 += Delta * (R1 - R0) / Delta2;
+					G0 += Delta * (G1 - G0) / Delta2;
+					B0 += Delta * (B1 - B0) / Delta2;
+					A0 += Delta * (A1 - A0) / Delta2;
+				}
+
+				if (x1 != x1b)
+				{
+					Delta = x1 - x1b;
+					Delta2 = x0b - x1b;
+
+					R1 += Delta * (R0 - R1) / Delta2;
+					G1 += Delta * (G0 - G1) / Delta2;
+					B1 += Delta * (B0 - B1) / Delta2;
+					A1 += Delta * (A0 - A1) / Delta2;
+				}
+
+				Delta = x0 - (int)x0;
+				if (Delta > 0)
+				{
+					Delta2 = x1 - x0;
+					x0 -= Delta;
+					z0 -= Delta * (z1 - z0) / Delta2;
+					R0 -= Delta * (R1 - R0) / Delta2;
+					G0 -= Delta * (G1 - G0) / Delta2;
+					B0 -= Delta * (B1 - B0) / Delta2;
+					A0 -= Delta * (A1 - A0) / Delta2;
+				}
+
+				int p = (int)(y0 + 0.5f) * this.w + (int)x0;
+				int p4 = p << 2;
+				float dx = (x1 - x0);
+				float dz = (z1 - z0) / dx;
+				float dR = (R1 - R0) / dx;
+				float dG = (G1 - G0) / dx;
+				float dB = (B1 - B0) / dx;
+				float dA = (A1 - A0) / dx;
+
+				while (x0 <= x1)
+				{
+					if (z0 > 0 && z0 < this.zBuffer[p])
+					{
+						this.zBuffer[p++] = z0;
+						this.pixels[p4++] = (byte)(R0 + 0.5f);
+						this.pixels[p4++] = (byte)(G0 + 0.5f);
+						this.pixels[p4++] = (byte)(B0 + 0.5f);
+						this.pixels[p4++] = (byte)(A0 + 0.5f);
+					}
+					else
+					{
+						p++;
+						p4 += 4;
+					}
+
+					x0++;
+					z0 += dz;
+					R0 += dR;
+					G0 += dG;
+					B0 += dB;
+					A0 += dA;
+				}
+			}
+		}
+
+		#endregion
+
+		#region Polygon
+
+		private static Vector3 ToVector3(Vector4 P)
+		{
+			float w = 1.0f / P.W;
+			return new Vector3(P.X * w, P.Y * w, P.Z * w);
+		}
+
+		private static Vector3 CalcNormal(Vector3 P0, Vector3 P1, Vector3 P2)
+		{
+			return Vector3.Normalize(Vector3.Cross(P1 - P0, P2 - P0));
+		}
+
+		private bool ClipScanLine(ref float x0, ref float y0, ref float z0, ref float x1, ref float y1, ref float z1)
+		{
+			byte Mask0 = 0;
+			byte Mask1 = 0;
+			float Delta;
+			float Delta2;
+
+			if (y0 < 0)
+				Mask0 |= 4;
+			else if (y0 > this.hm1)
+				Mask0 |= 8;
+
+			if (y1 < 0)
+				Mask1 |= 4;
+			else if (y1 > this.hm1)
+				Mask1 |= 8;
+
+			if (Mask0 == 0 && Mask1 == 0)
+				return true;
+
+			if ((Mask0 & Mask1) != 0)
+				return false;
+
+			// Top edge:
+
+			if ((Mask0 & 4) != 0)
+			{
+				Delta = y1 - y0;    // Must be non-zero, or masks would have common bit.
+				x0 -= y0 * (x1 - x0) / Delta;
+				z0 -= y0 * (z1 - z0) / Delta;
+				y0 = 0;
+
+				Mask0 &= 251;
+				if (x0 < 0)
+					Mask0 |= 1;
+				else if (x0 > this.wm1)
+					Mask0 |= 2;
+
+				if ((Mask0 & Mask1) != 0)
+					return false;
+			}
+
+			if ((Mask1 & 4) != 0)
+			{
+				Delta = y0 - y1;    // Must be non-zero, or masks would have common bit.
+				x1 -= y1 * (x0 - x1) / Delta;
+				z1 -= y1 * (z0 - z1) / Delta;
+				y1 = 0;
+
+				Mask1 &= 251;
+				if (x1 < 0)
+					Mask1 |= 1;
+				else if (x1 > this.wm1)
+					Mask1 |= 2;
+
+				if ((Mask0 & Mask1) != 0)
+					return false;
+			}
+
+			// Bottom edge:
+
+			if ((Mask0 & 8) != 0)
+			{
+				Delta = y1 - y0;    // Must be non-zero, or masks would have common bit.
+				Delta2 = this.hm1 - y0;
+				x0 += Delta2 * (x1 - x0) / Delta;
+				z0 += Delta2 * (z1 - z0) / Delta;
+				y0 = this.hm1;
+
+				Mask0 &= 247;
+				if (x0 < 0)
+					Mask0 |= 1;
+				else if (x0 > this.wm1)
+					Mask0 |= 2;
+
+				if ((Mask0 & Mask1) != 0)
+					return false;
+			}
+
+			if ((Mask1 & 8) != 0)
+			{
+				Delta = y0 - y1;    // Must be non-zero, or masks would have common bit.
+				Delta2 = this.hm1 - y1;
+				x1 += Delta2 * (x0 - x1) / Delta;
+				z1 += Delta2 * (z0 - z1) / Delta;
+				y1 = this.hm1;
+
+				Mask1 &= 247;
+				if (x1 < 0)
+					Mask1 |= 1;
+				else if (x1 > this.wm1)
+					Mask1 |= 2;
+
+				if ((Mask0 & Mask1) != 0)
+					return false;
+			}
+
+			return ((Mask0 | Mask1) == 0);
+		}
+
+		public void Polygon(Vector4[] Nodes, SKColor Color)
+		{
+			int i, c = Nodes.Length;
+			if (c < 3)
+				return;
+
+			int MinY = 0;
+			int MaxY = 0;
+			int Y;
+			Vector4 P;
+
+			Nodes = (Vector4[])Nodes.Clone();
+			for (i = 0; i < c; i++)
+			{
+				Nodes[i] = P = Vector4.Transform(Nodes[i], this.t);
+
+				if (i == 0)
+					MinY = MaxY = (int)(P.Y / P.W + 0.5f);
+				else
+				{
+					Y = (int)(P.Y / P.W + 0.5f);
+
+					if (Y < MinY)
+						MinY = Y;
+					else if (Y > MaxY)
+						MaxY = Y;
+				}
+			}
+
+			int NrRecs = MaxY - MinY + 1;
+			ScanLineRec[] Recs = new ScanLineRec[NrRecs];
+
+			Vector4 Last;
+			Vector4 Current = Nodes[c - 1];
+			Vector3 N = CalcNormal(ToVector3(Nodes[0]), ToVector3(Nodes[1]), ToVector3(Current));
+
+
+			for (i = 0; i < c; i++)
+			{
+				Last = Current;
+				Current = Nodes[i];
+
+
+			}
+		}
+
+		private class ScanLineRec
+		{
+			public float x0;
+			public float z0;
+			public float x1;
+			public float z1;
+			public LinkedList<KeyValuePair<float, float>> nodes;
 		}
 
 		#endregion

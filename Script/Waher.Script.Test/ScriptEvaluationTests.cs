@@ -120,13 +120,13 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public void Test_01_Sequences()
+		public void Evaluation_Test_01_Sequences()
 		{
 			this.Test("a;b;c", c);
 		}
 
 		[TestMethod]
-		public void Test_02_ConditionalStatements()
+		public void Evaluation_Test_02_ConditionalStatements()
 		{
 			this.Test("DO ++a WHILE a<=10", 11);
 			this.Test("WHILE a<=10 DO ++a", 11);
@@ -145,14 +145,14 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public void Test_03_Lists()
+		public void Evaluation_Test_03_Lists()
 		{
 			this.Test("a,b,c", new double[] { a, b, c });
 			this.Test("a,b,,c", new object[] { a, b, null, c });
 		}
 
 		[TestMethod]
-		public void Test_04_Assignments()
+		public void Evaluation_Test_04_Assignments()
 		{
 			this.Test("x:=10;x+x", 20);
 			this.Test("a+=b;a", 11);
@@ -205,7 +205,7 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public void Test_05_IF()
+		public void Evaluation_Test_05_IF()
 		{
 			this.Test("IF a<b THEN a", a);
 			this.Test("IF a>b THEN a", null);
@@ -221,7 +221,7 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public void Test_06_Lambda()
+		public void Evaluation_Test_06_Lambda()
 		{
 			this.Test("(x->x^2)(10)", 100);
 			this.Test("((x,y)->x*y)(2,3)", 6);
@@ -248,7 +248,7 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public void Test_07_Implication()
+		public void Evaluation_Test_07_Implication()
 		{
 			this.Test("p => q", false);
 			this.Test("q => p", true);
@@ -263,7 +263,7 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public void Test_08_Equivalence()
+		public void Evaluation_Test_08_Equivalence()
 		{
 			this.Test("p <=> q", false);
 
@@ -277,7 +277,7 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public void Test_09_OR()
+		public void Evaluation_Test_09_OR()
 		{
 			this.Test("p || q", true);
 			this.Test("q || p", true);
@@ -341,7 +341,7 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public void Test_10_AND()
+		public void Evaluation_Test_10_AND()
 		{
 			this.Test("p && q", false);
 			this.Test("q && p", false);
@@ -381,7 +381,7 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public void Test_11_Membership()
+		public void Evaluation_Test_11_Membership()
 		{
 			this.Test("a AS System.Double", a);
 			this.Test("a AS System.Int32", null);
@@ -405,7 +405,7 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public void Test_12_Comparison()
+		public void Evaluation_Test_12_Comparison()
 		{
 			this.Test("a <= b", true);
 			this.Test("a <= [a,b,c]", new bool[] { true, true, true });
@@ -433,7 +433,7 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public void Test_13_Shift()
+		public void Evaluation_Test_13_Shift()
 		{
 			this.Test("a << b", 320);
 			this.Test("[1,2,3] << b", new double[] { 64, 128, 192 });
@@ -443,14 +443,14 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public void Test_14_Union()
+		public void Evaluation_Test_14_Union()
 		{
 			this.Test("{a,b,c} UNION {4,5,6}", new object[] { 5, 6, 7, 4 });
 			this.Test("{a,b,c} ∪ {4,5,6}", new object[] { 5, 6, 7, 4 });
 		}
 
 		[TestMethod]
-		public void Test_15_Intersection()
+		public void Evaluation_Test_15_Intersection()
 		{
 			this.Test("{4,5,6} INTERSECT {a,b,c}", new object[] { 5, 6 });
 			this.Test("{4,5,6} INTERSECTION {a,b,c}", new object[] { 5, 6 });
@@ -458,14 +458,14 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public void Test_16_Intervals()
+		public void Evaluation_Test_16_Intervals()
 		{
 			this.Test("1..10", new Objects.Sets.Interval(1, 10, true, true, null));
 			this.Test("1..10|0.1", new Objects.Sets.Interval(1, 10, true, true, 0.1));
 		}
 
 		[TestMethod]
-		public void Test_17_Terms()
+		public void Evaluation_Test_17_Terms()
 		{
 			this.Test("a+b", 11);
 			this.Test("[1,2,3]+a", new double[] { 6, 7, 8 });
@@ -528,7 +528,7 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public void Test_18_Factors()
+		public void Evaluation_Test_18_Factors()
 		{
 			this.Test("a*b", 30);
 			this.Test("[1,2,3]*a", new double[] { 5, 10, 15 });
@@ -598,7 +598,7 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public void Test_18_Powers()
+		public void Evaluation_Test_18_Powers()
 		{
 			this.Test("a^b", Math.Pow(5, 6));
 			this.Test("a²", 25);
@@ -612,7 +612,7 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public void Test_19_UnaryPrefixOperators()
+		public void Evaluation_Test_19_UnaryPrefixOperators()
 		{
 			this.Test("++a", 6);
 			this.Test("d:=[a,b,c];++d", new double[] { 6, 7, 8 });
@@ -639,7 +639,7 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public void Test_20_UnarySuffixOperators()
+		public void Evaluation_Test_20_UnarySuffixOperators()
 		{
 			this.Test("[a++,a]", new double[] { 5, 6 });
 			this.Test("[a--,a]", new double[] { 5, 4 });
@@ -665,7 +665,7 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public void Test_21_BinarySuffixOperators()
+		public void Evaluation_Test_21_BinarySuffixOperators()
 		{
 			this.Test("Obj:={m1:a,m2:b,m3:c};Obj.m1", a);
 			this.Test("[a,b,c].Length", 3);
@@ -706,7 +706,7 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public void Test_22_ObjectExNihilo()
+		public void Evaluation_Test_22_ObjectExNihilo()
 		{
 			Dictionary<string, IElement> Obj = new Dictionary<string, IElement>()
 			{
@@ -725,7 +725,7 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public void Test_23_Sets()
+		public void Evaluation_Test_23_Sets()
 		{
 			this.Test("S:={1,2,3};", new object[] { 1, 2, 3 });
 			this.Test("S:={DO a++ WHILE a<10};", new object[] { 5, 6, 7, 8, 9 });
@@ -736,7 +736,7 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public void Test_24_Matrices()
+		public void Evaluation_Test_24_Matrices()
 		{
 			this.Test("[[a,b,c],[b,c,a]];", new double[,] { { a, b, c }, { b, c, a } });
 			this.Test("[DO [a++,a++,a++] WHILE a<10];", new double[,] { { 5, 6, 7 }, { 8, 9, 10 } });
@@ -747,7 +747,7 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public void Test_25_Vectors()
+		public void Evaluation_Test_25_Vectors()
 		{
 			this.Test("[a,b,c];", new double[] { a, b, c });
 			this.Test("[DO a++ WHILE a<10];", new double[] { 5, 6, 7, 8, 9 });
@@ -758,26 +758,26 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public void Test_26_Parenthesis()
+		public void Evaluation_Test_26_Parenthesis()
 		{
 			this.Test("a * (b + c)", 65);
 		}
 
 		[TestMethod]
-		public void Test_27_null()
+		public void Evaluation_Test_27_null()
 		{
 			this.Test("null", null);
 		}
 
 		[TestMethod]
-		public void Test_28_StringValues()
+		public void Evaluation_Test_28_StringValues()
 		{
 			this.Test("\"Hello\\r\\n\\t\\f\\b\\a\\v\\\\\\\"\\''\"", "Hello\r\n\t\f\b\a\v\\\"\''");
 			this.Test("'Hello\\r\\n\\t\\f\\b\\a\\v\\\\\\\"\\'\"'", "Hello\r\n\t\f\b\a\v\\\"\'\"");
 		}
 
 		[TestMethod]
-		public void Test_29_BooleanValues()
+		public void Evaluation_Test_29_BooleanValues()
 		{
 			this.Test("true", true);
 			this.Test("false", false);
@@ -786,7 +786,7 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public void Test_30_DoubleValues()
+		public void Evaluation_Test_30_DoubleValues()
 		{
 			this.Test("1", 1);
 			this.Test("3.1415927", 3.1415927);
@@ -794,7 +794,7 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public void Test_31_Constants()
+		public void Evaluation_Test_31_Constants()
 		{
 			this.Test("e", Math.E);
 			this.Test("pi", Math.PI);
@@ -815,7 +815,7 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public void Test_32_BinomialCoefficients()
+		public void Evaluation_Test_32_BinomialCoefficients()
 		{
 			this.Test("c OVER a", 21);
 			this.Test("8 OVER [0,1,2,3,4,5,6,7,8]", new double[] { 1, 8, 28, 56, 70, 56, 28, 8, 1 });
@@ -824,14 +824,14 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public void Test_33_ComplexNumbers()
+		public void Evaluation_Test_33_ComplexNumbers()
 		{
 			this.Test("(1,2)", new Complex(1, 2));
 			this.Test("1+2*i", new Complex(1, 2));
 		}
 
 		[TestMethod]
-		public void Test_34_VectorFunctions()
+		public void Evaluation_Test_34_VectorFunctions()
 		{
 			this.Test("Min([2,4,1,3])", 1);
 			this.Test("Max([2,4,1,3])", 4);
@@ -860,7 +860,7 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public void Test_35_AnalyticFunctions()
+		public void Evaluation_Test_35_AnalyticFunctions()
 		{
 			this.Test("sin(5)", Math.Sin(5));
 			this.Test("cos(5)", Math.Cos(5));
@@ -929,7 +929,7 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public void Test_36_ScalarFunctions()
+		public void Evaluation_Test_36_ScalarFunctions()
 		{
 			this.Test("abs(-1)", 1);
 			this.Test("ceil(pi)", 4);
@@ -960,7 +960,7 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public void Test_37_ComplexFunctions()
+		public void Evaluation_Test_37_ComplexFunctions()
 		{
 			this.Test("Re(2+i)", 2);
 			this.Test("Im(2+i)", 1);
@@ -971,7 +971,7 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public void Test_38_Matrices()
+		public void Evaluation_Test_38_Matrices()
 		{
 			this.Test("invert(2)", 0.5);
 			this.Test("inv(2)", 0.5);
@@ -980,7 +980,7 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public void Test_39_Runtime()
+		public void Evaluation_Test_39_Runtime()
 		{
 			this.Test("exists(a)", true);
 			this.Test("exists(k)", false);
@@ -1003,7 +1003,7 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public void Test_40_Strings()
+		public void Evaluation_Test_40_Strings()
 		{
 			this.Test("Evaluate('a+b')", a + b);
 			this.Test("Eval('a+b')", a + b);
@@ -1020,7 +1020,7 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public void Test_41_DateTime()
+		public void Evaluation_Test_41_DateTime()
 		{
 			this.Test("DateTime(2016,03,05)", new DateTime(2016, 03, 05));
 			this.Test("DateTime(2016,03,05,19,15,01)", new DateTime(2016, 03, 05, 19, 15, 01));
@@ -1031,7 +1031,7 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public void Test_42_Units()
+		public void Evaluation_Test_42_Units()
 		{
 			this.Test("10 m", new PhysicalQuantity(10, new Unit(Prefix.None, new KeyValuePair<AtomicUnit, int>(new AtomicUnit("m"), 1))));
 			this.Test("10 km", new PhysicalQuantity(10, new Unit(Prefix.Kilo, new KeyValuePair<AtomicUnit, int>(new AtomicUnit("m"), 1))));
@@ -1079,7 +1079,7 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public void Test_43_MethodCall()
+		public void Evaluation_Test_43_MethodCall()
 		{
 			this.Test("DateTime(2016,3,11).AddDays(10)", new DateTime(2016, 3, 21));
 			this.Test("DateTime(2016,3,11).AddDays(1..3)", new DateTime[] { new DateTime(2016, 3, 12), new DateTime(2016, 3, 13), new DateTime(2016, 3, 14) });

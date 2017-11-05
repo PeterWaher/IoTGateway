@@ -24,7 +24,7 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public void Test_01_Plot2dCurve()
+		public void Graph2D_Test_01_Plot2dCurve()
 		{
 			this.Test("x:=-10..10|0.1;y:=sin(x);plot2dcurve(x,y)");
 			this.Test("x:=-10..10|0.1;y:=sin(x);plot2dcurve(x,y,'Blue')");
@@ -32,7 +32,7 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public void Test_02_Plot2dLine()
+		public void Graph2D_Test_02_Plot2dLine()
 		{
 			this.Test("x:=-10..10|0.1;y:=sin(x);plot2dline(x,y)");
 			this.Test("x:=-10..10|0.1;y:=sin(x);plot2dline(x,y,'Blue')");
@@ -40,7 +40,7 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public void Test_03_DateTimeAxis()
+		public void Graph2D_Test_03_DateTimeAxis()
 		{
 			this.Test("x:=0..59;t:= Now.AddSeconds(x);y:= sin(x);plot2dcurve(t,y)");
 			this.Test("x:=0..59;t:= Now.AddMinutes(x);y:= sin(x);plot2dcurve(t,y)");
@@ -52,7 +52,7 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public void Test_04_PhysicalQuantities()
+		public void Graph2D_Test_04_PhysicalQuantities()
 		{
 			this.Test("x:=-10..10|0.1;t:=DateTime(2016,3,11).AddHours(x);y:=sin(x) C;plot2dcurve(t,y)");
 		}

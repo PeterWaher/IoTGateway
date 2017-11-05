@@ -79,8 +79,8 @@ namespace Waher.Script.Test
 		[TestMethod]
 		public void Canvas3D_Test_04_Perspective()
 		{
-			Canvas3D Canvas = new Canvas3D(640, 480, 3, SKColors.White);
-			Canvas.ProjectZ(100);
+			Canvas3D Canvas = new Canvas3D(640, 480, 1, SKColors.White);
+			Canvas.ProjectZ(500);
 			this.DrawCube(Canvas);
 			this.Save(Canvas, "04.png");
 		}
@@ -88,12 +88,12 @@ namespace Waher.Script.Test
 		private void DrawCube(Canvas3D Canvas)
 		{
 			Vector4 P0 = new Vector4(-200, -200, 100, 1);
-			Vector4 P1 = new Vector4(-200, -200, 200, 1);
-			Vector4 P2 = new Vector4(200, -200, 200, 1);
+			Vector4 P1 = new Vector4(-200, -200, 300, 1);
+			Vector4 P2 = new Vector4(200, -200, 300, 1);
 			Vector4 P3 = new Vector4(200, -200, 100, 1);
 			Vector4 P4 = new Vector4(-200, 200, 100, 1);
-			Vector4 P5 = new Vector4(-200, 200, 200, 1);
-			Vector4 P6 = new Vector4(200, 200, 200, 1);
+			Vector4 P5 = new Vector4(-200, 200, 300, 1);
+			Vector4 P6 = new Vector4(200, 200, 300, 1);
 			Vector4 P7 = new Vector4(200, 200, 100, 1);
 
 			Canvas.PolyLine(new Vector4[] { P0, P1, P2, P3, P0 }, SKColors.Red);

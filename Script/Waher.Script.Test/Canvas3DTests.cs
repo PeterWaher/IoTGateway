@@ -79,13 +79,13 @@ namespace Waher.Script.Test
 		[TestMethod]
 		public void Canvas3D_Test_04_Perspective()
 		{
-			Canvas3D Canvas = new Canvas3D(640, 480, 1, SKColors.White);
+			Canvas3D Canvas = new Canvas3D(640, 480, 3, SKColors.White);
 			Canvas.ProjectZ(500);
-			this.DrawCube(Canvas);
+			this.DrawWireframeCube(Canvas);
 			this.Save(Canvas, "04.png");
 		}
 
-		private void DrawCube(Canvas3D Canvas)
+		private void DrawWireframeCube(Canvas3D Canvas)
 		{
 			Vector4 P0 = new Vector4(-200, -200, 100, 1);
 			Vector4 P1 = new Vector4(-200, -200, 300, 1);
@@ -102,6 +102,34 @@ namespace Waher.Script.Test
 			Canvas.Line(P1, P5, SKColors.Red);
 			Canvas.Line(P2, P6, SKColors.Red);
 			Canvas.Line(P3, P7, SKColors.Red);
+		}
+
+		[TestMethod]
+		public void Canvas3D_Test_05_Polygon()
+		{
+			Canvas3D Canvas = new Canvas3D(640, 480, 3, SKColors.White);
+			Canvas.ProjectZ(500);
+			this.DrawCube(Canvas);
+			this.Save(Canvas, "05.png");
+		}
+
+		private void DrawCube(Canvas3D Canvas)
+		{
+			Vector4 P0 = new Vector4(-200, -200, 100, 1);
+			Vector4 P1 = new Vector4(-200, -200, 300, 1);
+			Vector4 P2 = new Vector4(200, -200, 300, 1);
+			Vector4 P3 = new Vector4(200, -200, 100, 1);
+			Vector4 P4 = new Vector4(-200, 200, 100, 1);
+			Vector4 P5 = new Vector4(-200, 200, 300, 1);
+			Vector4 P6 = new Vector4(200, 200, 300, 1);
+			Vector4 P7 = new Vector4(200, 200, 100, 1);
+
+			Canvas.Polygon(new Vector4[] { P0, P1, P2, P3 }, new SKColor(255, 0, 0, 128));
+			Canvas.Polygon(new Vector4[] { P4, P5, P6, P7 }, new SKColor(255, 0, 0, 128));
+			Canvas.Polygon(new Vector4[] { P1, P2, P6, P5 }, new SKColor(0, 255, 0, 128));
+			Canvas.Polygon(new Vector4[] { P0, P1, P5, P4 }, new SKColor(0, 0, 255, 128));
+			Canvas.Polygon(new Vector4[] { P2, P3, P7, P6 }, new SKColor(0, 0, 255, 128));
+			Canvas.Polygon(new Vector4[] { P0, P3, P7, P4 }, new SKColor(0, 255, 0, 128));
 		}
 
 		// TODO: Clip

@@ -759,10 +759,51 @@ namespace Waher.Script.Graphs3D
 					if (z0 > 0 && z0 < this.zBuffer[p])
 					{
 						this.zBuffer[p++] = z0;
-						this.pixels[p4++] = (byte)(R0 + 0.5f);
-						this.pixels[p4++] = (byte)(G0 + 0.5f);
-						this.pixels[p4++] = (byte)(B0 + 0.5f);
-						this.pixels[p4++] = (byte)(A0 + 0.5f);
+
+						if (A0 == 255)
+						{
+							this.pixels[p4++] = (byte)(R0 + 0.5f);
+							this.pixels[p4++] = (byte)(G0 + 0.5f);
+							this.pixels[p4++] = (byte)(B0 + 0.5f);
+							this.pixels[p4++] = (byte)(A0 + 0.5f);
+						}
+						else
+						{
+							byte R = (byte)(R0 + 0.5f);
+							byte G = (byte)(G0 + 0.5f);
+							byte B = (byte)(B0 + 0.5f);
+							byte A = (byte)(A0 + 0.5f);
+							byte R2 = this.pixels[p4++];
+							byte G2 = this.pixels[p4++];
+							byte B2 = this.pixels[p4++];
+							byte A2 = this.pixels[p4];
+							byte R3, G3, B3, A3;
+
+							if (A2 == 255)
+							{
+								R3 = (byte)(((R * A + R2 * (255 - A)) + 128) / 255);
+								G3 = (byte)(((G * A + G2 * (255 - A)) + 128) / 255);
+								B3 = (byte)(((B * A + B2 * (255 - A)) + 128) / 255);
+								A3 = 255;
+							}
+							else
+							{
+								R2 = (byte)((R2 * A2 + 128) / 255);
+								G2 = (byte)((G2 * A2 + 128) / 255);
+								B2 = (byte)((B2 * A2 + 128) / 255);
+
+								R3 = (byte)(((R * A + R2 * (255 - A)) + 128) / 255);
+								G3 = (byte)(((G * A + G2 * (255 - A)) + 128) / 255);
+								B3 = (byte)(((B * A + B2 * (255 - A)) + 128) / 255);
+								A3 = (byte)(255 - (((255 - A) * (255 - A2) + 128) / 255));
+							}
+
+							this.pixels[p4--] = A3;
+							this.pixels[p4--] = B3;
+							this.pixels[p4--] = G3;
+							this.pixels[p4] = R3;
+							p4 += 4;
+						}
 					}
 					else
 					{
@@ -795,7 +836,7 @@ namespace Waher.Script.Graphs3D
 			return Vector3.Normalize(Vector3.Cross(P1 - P0, P2 - P0));
 		}
 
-		private bool ClipScanLine(ref float x0, ref float y0, ref float z0, ref float x1, ref float y1, ref float z1)
+		private bool ClipTopBottom(ref float x0, ref float y0, ref float z0, ref float x1, ref float y1, ref float z1)
 		{
 			byte Mask0 = 0;
 			byte Mask1 = 0;
@@ -912,10 +953,10 @@ namespace Waher.Script.Graphs3D
 				Nodes[i] = P = Vector4.Transform(Nodes[i], this.t);
 
 				if (i == 0)
-					MinY = MaxY = (int)(P.Y / P.W + 0.5f);
+					MinY = MaxY = (int)(this.cy - P.Y / P.W + 0.5f);
 				else
 				{
-					Y = (int)(P.Y / P.W + 0.5f);
+					Y = (int)(this.cy - P.Y / P.W + 0.5f);
 
 					if (Y < MinY)
 						MinY = Y;
@@ -924,20 +965,191 @@ namespace Waher.Script.Graphs3D
 				}
 			}
 
+			if (MaxY < 0)
+				return;
+			else if (MinY < 0)
+				MinY = 0;
+
+			if (MinY >= this.h)
+				return;
+			else if (MaxY >= this.h)
+				MaxY = this.h - 1;
+
 			int NrRecs = MaxY - MinY + 1;
 			ScanLineRec[] Recs = new ScanLineRec[NrRecs];
+			ScanLineRec Rec;
 
 			Vector4 Last;
 			Vector4 Current = Nodes[c - 1];
 			Vector3 N = CalcNormal(ToVector3(Nodes[0]), ToVector3(Nodes[1]), ToVector3(Current));
-
+			float x0, y0, z0;
+			float x1, y1, z1;
+			float w;
+			float dx, dy, dz;
 
 			for (i = 0; i < c; i++)
 			{
 				Last = Current;
 				Current = Nodes[i];
 
+				w = 1.0f / Last.W;
+				x0 = this.cx + Last.X * w;
+				y0 = this.cy - Last.Y * w;
+				z0 = Last.Z;
 
+				w = 1.0f / Current.W;
+				x1 = this.cx + Current.X * w;
+				y1 = this.cy - Current.Y * w;
+				z1 = Current.Z;
+
+				if (!this.ClipTopBottom(ref x0, ref y0, ref z0, ref x1, ref y1, ref z1))
+					continue;
+
+				if (y0 == y1)
+				{
+					this.AddNode(Recs, MinY, x0, y0, z0);
+					this.AddNode(Recs, MinY, x1, y1, z1);
+				}
+				else
+				{
+					if (y1 < y0)
+					{
+						w = x0;
+						x0 = x1;
+						x1 = w;
+
+						w = y0;
+						y0 = y1;
+						y1 = w;
+
+						w = z0;
+						z0 = z1;
+						z1 = w;
+					}
+
+					dy = y1 - y0;
+					dx = (x1 - x0) / dy;
+					dz = (z1 - z0) / dy;
+
+					w = 1 - (y0 - ((int)y0));
+					y0 += w;
+					x0 += dx * w;
+					z0 += dz * w;
+
+					y1--;
+					while (y0 <= y1)
+					{
+						this.AddNode(Recs, MinY, x0, y0, z0);
+						y0++;
+						x0 += dx;
+						z0 += dz;
+					}
+					y1++;
+
+					w = y1 - ((int)y1);
+					if (w > 0)
+					{
+						y0 += w;
+						x0 += dx * w;
+						z0 += dz * w;
+
+						this.AddNode(Recs, MinY, x0, y0, z0);
+					}
+				}
+			}
+
+			for (i = 0; i < NrRecs; i++)
+			{
+				Rec = Recs[i];
+				if (Rec == null)
+					continue;
+
+				Y = i + MinY;
+
+				// TODO: Color interpolation
+
+				if (Rec.nodes != null)
+				{
+					bool First = true;
+
+					x0 = z0 = 0;
+					foreach (KeyValuePair<float, float> Rec2 in Rec.nodes)
+					{
+						if (First)
+						{
+							First = false;
+							x0 = Rec2.Key;
+							z0 = Rec2.Value;
+						}
+						else
+						{
+							this.ScanLine(x0, Y, z0, Color, Rec2.Key, Rec2.Value, Color);
+							First = true;
+						}
+					}
+
+					if (!First)
+						this.Plot((int)(x0 + 0.5f), Y, z0, ToUInt(Color));
+				}
+				else if (Rec.x1.HasValue)
+					this.ScanLine(Rec.x0, Y, Rec.z0, Color, Rec.x1.Value, Rec.z1.Value, Color);
+				else
+					this.Plot((int)(Rec.x0 + 0.5f), Y, Rec.z0, ToUInt(Color));
+			}
+		}
+
+		private void AddNode(ScanLineRec[] Records, int MinY, float x, float y, float z)
+		{
+			int i = (int)(y + 0.5f) - MinY;
+			ScanLineRec Rec = Records[i];
+
+			if (Rec == null)
+			{
+				Records[i] = new ScanLineRec()
+				{
+					x0 = x,
+					z0 = z
+				};
+			}
+			else if (!Rec.x1.HasValue)
+			{
+				if (x < Rec.x0)
+				{
+					Rec.x1 = Rec.x0;
+					Rec.z1 = Rec.z0;
+					Rec.x0 = x;
+					Rec.z0 = z;
+				}
+				else
+				{
+					Rec.x1 = x;
+					Rec.z1 = z;
+				}
+			}
+			else
+			{
+				if (Rec.nodes == null)
+				{
+					Rec.nodes = new LinkedList<KeyValuePair<float, float>>();
+					Rec.nodes.AddLast(new KeyValuePair<float, float>(Rec.x0, Rec.z0));
+					Rec.nodes.AddLast(new KeyValuePair<float, float>(Rec.x1.Value, Rec.z1.Value));
+				}
+
+				LinkedListNode<KeyValuePair<float, float>> Loop = Rec.nodes.First;
+				LinkedListNode<KeyValuePair<float, float>> Prev = null;
+
+				while (Loop != null && Loop.Value.Key < x)
+				{
+					Prev = Loop;
+					Loop = Loop.Next;
+				}
+
+				if (Loop == null)
+					Rec.nodes.AddLast(new KeyValuePair<float, float>(x, z));
+				else if (Prev == null)
+					Rec.nodes.AddFirst(new KeyValuePair<float, float>(x, z));
+				else
+					Rec.nodes.AddAfter(Prev, new KeyValuePair<float, float>(x, z));
 			}
 		}
 
@@ -945,8 +1157,8 @@ namespace Waher.Script.Graphs3D
 		{
 			public float x0;
 			public float z0;
-			public float x1;
-			public float z1;
+			public float? x1;
+			public float? z1;
 			public LinkedList<KeyValuePair<float, float>> nodes;
 		}
 

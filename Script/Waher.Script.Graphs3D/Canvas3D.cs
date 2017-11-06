@@ -12,6 +12,11 @@ namespace Waher.Script.Graphs3D
 	{
 		private byte[] pixels;
 		private float[] zBuffer;
+		private float[] xBuf;
+		private float[] yBuf;
+		private float[] zBuf;
+		private Vector4[] normalBuf;
+		private SKColor[] colorBuf;
 		private float distance = 0;
 		private Matrix4x4 t;
 		private Vector4 last = Vector4.Zero;
@@ -66,6 +71,11 @@ namespace Waher.Script.Graphs3D
 
 			this.pixels = new byte[c * 4];
 			this.zBuffer = new float[c];
+			this.xBuf = new float[this.w];
+			this.yBuf = new float[this.w];
+			this.zBuf = new float[this.w];
+			this.normalBuf = new Vector4[this.w];
+			this.colorBuf = new SKColor[this.w];
 
 			for (i = j = 0; i < c; i++)
 			{
@@ -702,9 +712,9 @@ namespace Waher.Script.Graphs3D
 
 		#region Scan Lines
 
-		private void ScanLine(float x0, float y0, float z0, SKColor Color0, float x1, float z1, SKColor Color1)
+		private void ScanLine(float x0, float y0, float z0, float x1, float z1, Vector4 Normal, I3DShader Shader)
 		{
-			float Delta, Delta2;
+			float Delta;
 
 			if (x1 < x0)
 			{
@@ -715,10 +725,6 @@ namespace Waher.Script.Graphs3D
 				Delta = z0;
 				z0 = z1;
 				z1 = Delta;
-
-				SKColor cl = Color0;
-				Color0 = Color1;
-				Color1 = cl;
 			}
 
 			float y1 = y0;
@@ -731,97 +737,72 @@ namespace Waher.Script.Graphs3D
 			if (x0 == x1)
 			{
 				if (z0 < z1)
-					this.Plot((int)(x0 + 0.5f), (int)(y0 + 0.5f), z0, ToUInt(Color0));
+				{
+					this.Plot((int)(x0 + 0.5f), (int)(y0 + 0.5f), z0,
+						ToUInt(Shader.GetColor(x0, y0, z0, Normal)));
+				}
 				else
-					this.Plot((int)(x1 + 0.5f), (int)(y0 + 0.5f), z1, ToUInt(Color1));
+				{
+					this.Plot((int)(x1 + 0.5f), (int)(y0 + 0.5f), z1,
+						ToUInt(Shader.GetColor(x1, y0, z1, Normal)));
+				}
 			}
 			else
 			{
-				float R0 = Color0.Red;
-				float G0 = Color0.Green;
-				float B0 = Color0.Blue;
-				float A0 = Color0.Alpha;
-				float R1 = Color1.Red;
-				float G1 = Color1.Green;
-				float B1 = Color1.Blue;
-				float A1 = Color1.Alpha;
-
-				if (x0 != x0b)
-				{
-					Delta = x0 - x0b;
-					Delta2 = x1b - x0b;
-
-					R0 += Delta * (R1 - R0) / Delta2;
-					G0 += Delta * (G1 - G0) / Delta2;
-					B0 += Delta * (B1 - B0) / Delta2;
-					A0 += Delta * (A1 - A0) / Delta2;
-				}
-
-				if (x1 != x1b)
-				{
-					Delta = x1 - x1b;
-					Delta2 = x0b - x1b;
-
-					R1 += Delta * (R0 - R1) / Delta2;
-					G1 += Delta * (G0 - G1) / Delta2;
-					B1 += Delta * (B0 - B1) / Delta2;
-					A1 += Delta * (A0 - A1) / Delta2;
-				}
-
 				int ix0 = (int)(x0 + 0.5f);
 				int ix1 = (int)(x1 + 0.5f);
-
-				Delta = ix0 - x0;
-				if (Delta != 0)
-				{
-					Delta2 = x1 - x0;
-					x0 += Delta;
-					z0 += Delta * (z1 - z0) / Delta2;
-					R0 += Delta * (R1 - R0) / Delta2;
-					G0 += Delta * (G1 - G0) / Delta2;
-					B0 += Delta * (B1 - B0) / Delta2;
-					A0 += Delta * (A1 - A0) / Delta2;
-				}
-
-				int p = (int)(y0 + 0.5f) * this.w + ix0;
-				int p4 = p << 2;
 				float dx = (x1 - x0);
 				float dz = (z1 - z0) / dx;
-				float dR = (R1 - R0) / dx;
-				float dG = (G1 - G0) / dx;
-				float dB = (B1 - B0) / dx;
-				float dA = (A1 - A0) / dx;
+				int i = 0;
+				int p = (int)(y0 + 0.5f) * this.w + ix0;
+				int p4 = p << 2;
+				int c;
+				SKColor cl;
+				byte A;
+				byte R2, G2, B2, A2;
+				byte R3, G3, B3, A3;
 
 				while (ix0 <= ix1)
 				{
+					this.xBuf[i] = ix0++;
+					this.yBuf[i] = y0;
+					this.zBuf[i] = z0;
+					this.normalBuf[i++] = Normal;
+					z0 += dz;
+				}
+
+				c = i;
+				Shader.GetColors(this.xBuf, this.yBuf, this.zBuf, this.normalBuf, c, this.colorBuf);
+
+				for (i = 0; i < c; i++)
+				{
+					z0 = this.zBuf[i];
+
 					if (z0 > 0 && z0 < this.zBuffer[p])
 					{
 						this.zBuffer[p++] = z0;
 
-						if (A0 == 255)
+						cl = this.colorBuf[i];
+
+						if ((A = cl.Alpha) == 255)
 						{
-							this.pixels[p4++] = (byte)(R0 + 0.5f);
-							this.pixels[p4++] = (byte)(G0 + 0.5f);
-							this.pixels[p4++] = (byte)(B0 + 0.5f);
-							this.pixels[p4++] = (byte)(A0 + 0.5f);
+							this.pixels[p4++] = cl.Red;
+							this.pixels[p4++] = cl.Green;
+							this.pixels[p4++] = cl.Blue;
+							this.pixels[p4++] = 255;
 						}
 						else
 						{
-							byte R = (byte)(R0 + 0.5f);
-							byte G = (byte)(G0 + 0.5f);
-							byte B = (byte)(B0 + 0.5f);
-							byte A = (byte)(A0 + 0.5f);
-							byte R2 = this.pixels[p4++];
-							byte G2 = this.pixels[p4++];
-							byte B2 = this.pixels[p4++];
-							byte A2 = this.pixels[p4];
-							byte R3, G3, B3, A3;
+							R2 = this.pixels[p4++];
+							G2 = this.pixels[p4++];
+							B2 = this.pixels[p4++];
+							A2 = this.pixels[p4];
 
 							if (A2 == 255)
 							{
-								R3 = (byte)(((R * A + R2 * (255 - A)) + 128) / 255);
-								G3 = (byte)(((G * A + G2 * (255 - A)) + 128) / 255);
-								B3 = (byte)(((B * A + B2 * (255 - A)) + 128) / 255);
+								R3 = (byte)(((cl.Red * A + R2 * (255 - A)) + 128) / 255);
+								G3 = (byte)(((cl.Green * A + G2 * (255 - A)) + 128) / 255);
+								B3 = (byte)(((cl.Blue * A + B2 * (255 - A)) + 128) / 255);
 								A3 = 255;
 							}
 							else
@@ -830,9 +811,9 @@ namespace Waher.Script.Graphs3D
 								G2 = (byte)((G2 * A2 + 128) / 255);
 								B2 = (byte)((B2 * A2 + 128) / 255);
 
-								R3 = (byte)(((R * A + R2 * (255 - A)) + 128) / 255);
-								G3 = (byte)(((G * A + G2 * (255 - A)) + 128) / 255);
-								B3 = (byte)(((B * A + B2 * (255 - A)) + 128) / 255);
+								R3 = (byte)(((cl.Red * A + R2 * (255 - A)) + 128) / 255);
+								G3 = (byte)(((cl.Green * A + G2 * (255 - A)) + 128) / 255);
+								B3 = (byte)(((cl.Blue * A + B2 * (255 - A)) + 128) / 255);
 								A3 = (byte)(255 - (((255 - A) * (255 - A2) + 128) / 255));
 							}
 
@@ -848,13 +829,6 @@ namespace Waher.Script.Graphs3D
 						p++;
 						p4 += 4;
 					}
-
-					ix0++;
-					z0 += dz;
-					R0 += dR;
-					G0 += dG;
-					B0 += dB;
-					A0 += dA;
 				}
 			}
 		}
@@ -868,9 +842,10 @@ namespace Waher.Script.Graphs3D
 			return new Vector3(P.X, P.Y, P.Z);
 		}
 
-		private static Vector3 CalcNormal(Vector3 P0, Vector3 P1, Vector3 P2)
+		private static Vector4 CalcNormal(Vector3 P0, Vector3 P1, Vector3 P2)
 		{
-			return Vector3.Normalize(Vector3.Cross(P1 - P0, P2 - P0));
+			Vector3 N = Vector3.Normalize(Vector3.Cross(P1 - P0, P2 - P0));
+			return new Vector4(N.X, N.Y, N.Z, 0);
 		}
 
 		private bool ClipTopBottom(ref float x0, ref float y0, ref float z0, ref float x1, ref float y1, ref float z1)
@@ -980,7 +955,17 @@ namespace Waher.Script.Graphs3D
 		/// <param name="Color">Color</param>
 		public void Polygon(Vector4[] Nodes, SKColor Color)
 		{
-			this.Polygons(new Vector4[][] { Nodes }, Color);
+			this.Polygons(new Vector4[][] { Nodes }, new ConstantColor(Color));
+		}
+
+		/// <summary>
+		/// Draws a closed polygon.
+		/// </summary>
+		/// <param name="Nodes">Nodes.</param>
+		/// <param name="Shader">Shader.</param>
+		public void Polygon(Vector4[] Nodes, I3DShader Shader)
+		{
+			this.Polygons(new Vector4[][] { Nodes }, Shader);
 		}
 
 		/// <summary>
@@ -989,6 +974,16 @@ namespace Waher.Script.Graphs3D
 		/// <param name="Nodes">Nodes.</param>
 		/// <param name="Color">Color</param>
 		public void Polygons(Vector4[][] Nodes, SKColor Color)
+		{
+			this.Polygons(Nodes, new ConstantColor(Color));
+		}
+
+		/// <summary>
+		/// Draws a set of closed polygons. Interior polygons can be used to undraw the corresponding sections.
+		/// </summary>
+		/// <param name="Nodes">Nodes.</param>
+		/// <param name="Shader">Shader.</param>
+		public void Polygons(Vector4[][] Nodes, I3DShader Shader)
 		{
 			int j, d = Nodes.Length;
 			int i, c;
@@ -1047,7 +1042,7 @@ namespace Waher.Script.Graphs3D
 			ScanLineRec Rec;
 			Vector4 Last;
 			Vector4 Current;
-			Vector3 N;
+			Vector4 N;
 			float x0, y0, z0;
 			float x1, y1, z1;
 			float w;
@@ -1064,6 +1059,7 @@ namespace Waher.Script.Graphs3D
 
 				Last = v[c - 2];
 				Current = v[c - 1];
+
 				N = CalcNormal(ToVector3(v[0]), ToVector3(v[1]), ToVector3(Current));
 
 				if (this.distance > 0)
@@ -1138,7 +1134,7 @@ namespace Waher.Script.Graphs3D
 
 						while (iy0 <= iy1)
 						{
-							this.AddNode(Recs, MinY, x0, iy0, z0);
+							this.AddNode(Recs, MinY, x0, iy0, z0, N);
 
 							iy0++;
 							x0 += dx;
@@ -1156,7 +1152,7 @@ namespace Waher.Script.Graphs3D
 
 						while (iy0 >= iy1)
 						{
-							this.AddNode(Recs, MinY, x0, iy0, z0);
+							this.AddNode(Recs, MinY, x0, iy0, z0, N);
 
 							iy0--;
 							x0 -= dx;
@@ -1191,22 +1187,22 @@ namespace Waher.Script.Graphs3D
 						}
 						else
 						{
-							this.ScanLine(x0, Y, z0, Color, Rec2.Key, Rec2.Value, Color);
+							this.ScanLine(x0, Y, z0, Rec2.Key, Rec2.Value, Rec.n, Shader);
 							First = true;
 						}
 					}
 
 					if (!First)
-						this.Plot((int)(x0 + 0.5f), Y, z0, ToUInt(Color));
+						this.Plot((int)(x0 + 0.5f), Y, z0, ToUInt(Shader.GetColor(x0, Y, z0, Rec.n)));
 				}
 				else if (Rec.x1.HasValue)
-					this.ScanLine(Rec.x0, Y, Rec.z0, Color, Rec.x1.Value, Rec.z1.Value, Color);
+					this.ScanLine(Rec.x0, Y, Rec.z0, Rec.x1.Value, Rec.z1.Value, Rec.n, Shader);
 				else
-					this.Plot((int)(Rec.x0 + 0.5f), Y, Rec.z0, ToUInt(Color));
+					this.Plot((int)(Rec.x0 + 0.5f), Y, Rec.z0, ToUInt(Shader.GetColor(Rec.x0, Y, Rec.z0, Rec.n)));
 			}
 		}
 
-		private void AddNode(ScanLineRec[] Records, int MinY, float x, float y, float z)
+		private void AddNode(ScanLineRec[] Records, int MinY, float x, float y, float z, Vector4 N)
 		{
 			int i = (int)(y + 0.5f) - MinY;
 			ScanLineRec Rec = Records[i];
@@ -1216,7 +1212,8 @@ namespace Waher.Script.Graphs3D
 				Records[i] = new ScanLineRec()
 				{
 					x0 = x,
-					z0 = z
+					z0 = z,
+					n = N
 				};
 			}
 			else if (!Rec.x1.HasValue)
@@ -1268,6 +1265,7 @@ namespace Waher.Script.Graphs3D
 			public float? x1;
 			public float? z1;
 			public LinkedList<KeyValuePair<float, float>> nodes;
+			public Vector4 n;
 		}
 
 		#endregion

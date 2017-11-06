@@ -184,5 +184,6 @@ namespace Waher.Script.Test
 		// TODO: Light / Phong shading
 		// TODO: Proper interpolation of z
 		// TODO: Fix glitches in polygon rendering. Example: letter "d", no oversampling. (See test 7)
+		//			Probably due to roundoff errors at last pixel when drawing edges
 	}
 }

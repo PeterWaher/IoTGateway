@@ -133,5 +133,7 @@ namespace Waher.Script.Test
 		}
 
 		// TODO: Clip
+		// TODO: Light / Phong shading
+		// TODO: Proper interpolation of z
 	}
 }

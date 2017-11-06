@@ -12,6 +12,7 @@ namespace Waher.Script.Graphs3D
 	{
 		private byte[] pixels;
 		private float[] zBuffer;
+		private float distance = 0;
 		private Matrix4x4 t;
 		private Vector4 last = Vector4.Zero;
 		private int width;
@@ -172,6 +173,7 @@ namespace Waher.Script.Graphs3D
 		/// </summary>
 		public void ResetTransforms()
 		{
+			this.distance = 0;
 			this.t = new Matrix4x4(this.overSampling, 0, 0, 0, 0, this.overSampling, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
 		}
 
@@ -181,13 +183,10 @@ namespace Waher.Script.Graphs3D
 		/// <param name="Distance">Distance between projection plane and camera.</param>
 		public void ProjectZ(float Distance)
 		{
-			Matrix4x4 M = new Matrix4x4(
-				Distance, 0, 0, 0,
-				0, Distance, 0, 0,
-				0, 0, Distance, 1,
-				0, 0, 0, Distance);
+			if (Distance <= 0)
+				throw new ArgumentException("Invalid camera distance.", nameof(Distance));
 
-			this.t = M * this.t;
+			this.distance = Distance;
 		}
 
 		#endregion
@@ -211,14 +210,28 @@ namespace Waher.Script.Graphs3D
 		/// <param name="Color">Color.</param>
 		public void Plot(Vector4 Point, uint Color)
 		{
+			int x, y;
+
 			this.last = Point;
 
 			Point = Vector4.Transform(Point, this.t);
-			int x = this.cx + (int)(Point.X / Point.W + 0.5f);
-			int y = this.cy - (int)(Point.Y / Point.W + 0.5f);
+			if (Point.Z >= 0)
+			{
+				if (this.distance > 0)
+				{
+					float d = this.distance / (Point.Z + this.distance);
+					x = this.cx + (int)(Point.X * d + 0.5f);
+					y = this.cy - (int)(Point.Y * d + 0.5f);
+				}
+				else
+				{
+					x = this.cx + (int)(Point.X + 0.5f);
+					y = this.cy - (int)(Point.Y + 0.5f);
+				}
 
-			if (x >= 0 && x < this.w && y >= 0 && y < this.h)
-				this.Plot(x, y, Point.Z, Color);
+				if (x >= 0 && x < this.w && y >= 0 && y < this.h)
+					this.Plot(x, y, Point.Z, Color);
+			}
 		}
 
 		private void Plot(int x, int y, float z, uint Color)
@@ -491,19 +504,41 @@ namespace Waher.Script.Graphs3D
 
 			P0 = Vector4.Transform(P0, this.t);
 			P1 = Vector4.Transform(P1, this.t);
-			float x0 = this.cx + P0.X / P0.W;
-			float y0 = this.cy - P0.Y / P0.W;
-			float z0 = P0.Z;
-			float x1 = this.cx + P1.X / P1.W;
-			float y1 = this.cy - P1.Y / P1.W;
-			float z1 = P1.Z;
+
+			// TODO: Clip z=0
+
+			float x0, y0, z0;
+			float x1, y1, z1;
+			float temp;
+
+			if (this.distance > 0)
+			{
+				z0 = P0.Z;
+				temp = this.distance / (z0 + this.distance);
+				x0 = this.cx + P0.X * temp;
+				y0 = this.cy - P0.Y * temp;
+
+				z1 = P1.Z;
+				temp = 1.0f / (z1 + this.distance);
+				x1 = this.cx + P1.X * this.distance * temp;
+				y1 = this.cy - P1.Y * this.distance * temp;
+			}
+			else
+			{
+				x0 = this.cx + P0.X;
+				y0 = this.cy - P0.Y;
+				z0 = P0.Z;
+				x1 = this.cx + P1.X;
+				y1 = this.cy - P1.Y;
+				z1 = P1.Z;
+			}
+
 
 			if (this.ClipLine(ref x0, ref y0, ref z0, ref x1, ref y1, ref z1))
 			{
 				float dx = x1 - x0;
 				float dy = y1 - y0;
 				float dz;
-				float temp;
 
 				this.Plot((int)(x0 + 0.5f), (int)(y0 + 0.5f), z0, Color);
 
@@ -733,19 +768,22 @@ namespace Waher.Script.Graphs3D
 					A1 += Delta * (A0 - A1) / Delta2;
 				}
 
-				Delta = x0 - (int)x0;
-				if (Delta > 0)
+				int ix0 = (int)(x0 + 0.5f);
+				int ix1 = (int)(x1 + 0.5f);
+
+				Delta = ix0 - x0;
+				if (Delta != 0)
 				{
 					Delta2 = x1 - x0;
-					x0 -= Delta;
-					z0 -= Delta * (z1 - z0) / Delta2;
-					R0 -= Delta * (R1 - R0) / Delta2;
-					G0 -= Delta * (G1 - G0) / Delta2;
-					B0 -= Delta * (B1 - B0) / Delta2;
-					A0 -= Delta * (A1 - A0) / Delta2;
+					x0 += Delta;
+					z0 += Delta * (z1 - z0) / Delta2;
+					R0 += Delta * (R1 - R0) / Delta2;
+					G0 += Delta * (G1 - G0) / Delta2;
+					B0 += Delta * (B1 - B0) / Delta2;
+					A0 += Delta * (A1 - A0) / Delta2;
 				}
 
-				int p = (int)(y0 + 0.5f) * this.w + (int)x0;
+				int p = (int)(y0 + 0.5f) * this.w + ix0;
 				int p4 = p << 2;
 				float dx = (x1 - x0);
 				float dz = (z1 - z0) / dx;
@@ -754,7 +792,7 @@ namespace Waher.Script.Graphs3D
 				float dB = (B1 - B0) / dx;
 				float dA = (A1 - A0) / dx;
 
-				while (x0 <= x1)
+				while (ix0 <= ix1)
 				{
 					if (z0 > 0 && z0 < this.zBuffer[p])
 					{
@@ -811,7 +849,7 @@ namespace Waher.Script.Graphs3D
 						p4 += 4;
 					}
 
-					x0++;
+					ix0++;
 					z0 += dz;
 					R0 += dR;
 					G0 += dG;
@@ -827,8 +865,7 @@ namespace Waher.Script.Graphs3D
 
 		private static Vector3 ToVector3(Vector4 P)
 		{
-			float w = 1.0f / P.W;
-			return new Vector3(P.X * w, P.Y * w, P.Z * w);
+			return new Vector3(P.X, P.Y, P.Z);
 		}
 
 		private static Vector3 CalcNormal(Vector3 P0, Vector3 P1, Vector3 P2)
@@ -952,17 +989,17 @@ namespace Waher.Script.Graphs3D
 			{
 				Nodes[i] = P = Vector4.Transform(Nodes[i], this.t);
 
-				if (i == 0)
-					MinY = MaxY = (int)(this.cy - P.Y / P.W + 0.5f);
+				if (this.distance > 0)
+					Y = (int)(this.cy - P.Y * this.distance / (P.Z + this.distance) + 0.5f);
 				else
-				{
-					Y = (int)(this.cy - P.Y / P.W + 0.5f);
+					Y = (int)(this.cy - P.Y + 0.5f);
 
-					if (Y < MinY)
-						MinY = Y;
-					else if (Y > MaxY)
-						MaxY = Y;
-				}
+				if (i == 0)
+					MinY = MaxY = Y;
+				else if (Y < MinY)
+					MinY = Y;
+				else if (Y > MaxY)
+					MaxY = Y;
 			}
 
 			if (MaxY < 0)
@@ -973,87 +1010,130 @@ namespace Waher.Script.Graphs3D
 			if (MinY >= this.h)
 				return;
 			else if (MaxY >= this.h)
-				MaxY = this.h - 1;
+				MaxY = this.hm1;
 
 			int NrRecs = MaxY - MinY + 1;
 			ScanLineRec[] Recs = new ScanLineRec[NrRecs];
 			ScanLineRec Rec;
 
-			Vector4 Last;
+			Vector4 Last = Nodes[c - 2];
 			Vector4 Current = Nodes[c - 1];
 			Vector3 N = CalcNormal(ToVector3(Nodes[0]), ToVector3(Nodes[1]), ToVector3(Current));
 			float x0, y0, z0;
 			float x1, y1, z1;
 			float w;
 			float dx, dy, dz;
+			int iy0, iy1;
+
+			if (this.distance > 0)
+			{
+				y0 = this.cy - Last.Y * this.distance / (Last.Z + this.distance);
+				y1 = this.cy - Current.Y * this.distance / (Current.Z + this.distance);
+			}
+			else
+			{
+				y0 = this.cy - Last.Y;
+				y1 = this.cy - Current.Y;
+			}
+
+			iy0 = (int)(y0 + 0.5f);
+			iy1 = (int)(y1 + 0.5f);
+
+			int LastDir;
+			int Dir = Math.Sign(iy1 - iy0);
 
 			for (i = 0; i < c; i++)
 			{
 				Last = Current;
 				Current = Nodes[i];
 
-				w = 1.0f / Last.W;
-				x0 = this.cx + Last.X * w;
-				y0 = this.cy - Last.Y * w;
-				z0 = Last.Z;
+				if (this.distance > 0)
+				{
+					w = this.distance / (Last.Z + this.distance);
+					x0 = this.cx + Last.X * w;
+					y0 = this.cy - Last.Y * w;
+					z0 = Last.Z;
 
-				w = 1.0f / Current.W;
-				x1 = this.cx + Current.X * w;
-				y1 = this.cy - Current.Y * w;
-				z1 = Current.Z;
+					w = this.distance / (Current.Z + this.distance);
+					x1 = this.cx + Current.X * w;
+					y1 = this.cy - Current.Y * w;
+					z1 = Current.Z;
+				}
+				else
+				{
+					x0 = this.cx + Last.X;
+					y0 = this.cy - Last.Y;
+					z0 = Last.Z;
+
+					x1 = this.cx + Current.X;
+					y1 = this.cy - Current.Y;
+					z1 = Current.Z;
+				}
 
 				if (!this.ClipTopBottom(ref x0, ref y0, ref z0, ref x1, ref y1, ref z1))
 					continue;
 
-				if (y0 == y1)
+				iy0 = (int)(y0 + 0.5f);
+				iy1 = (int)(y1 + 0.5f);
+
+				LastDir = Dir;
+				Dir = Math.Sign(iy1 - iy0);
+
+				if (Dir == 0)
+					continue;
+
+				dy = y1 - y0;
+				dx = (x1 - x0) / dy;
+				dz = (z1 - z0) / dy;
+
+				w = iy0 - y0;
+				if (w != 0)
 				{
-					this.AddNode(Recs, MinY, x0, y0, z0);
-					this.AddNode(Recs, MinY, x1, y1, z1);
-				}
-				else
-				{
-					if (y1 < y0)
-					{
-						w = x0;
-						x0 = x1;
-						x1 = w;
-
-						w = y0;
-						y0 = y1;
-						y1 = w;
-
-						w = z0;
-						z0 = z1;
-						z1 = w;
-					}
-
-					dy = y1 - y0;
-					dx = (x1 - x0) / dy;
-					dz = (z1 - z0) / dy;
-
-					w = 1 - (y0 - ((int)y0));
-					y0 += w;
 					x0 += dx * w;
 					z0 += dz * w;
+				}
 
-					y1--;
-					while (y0 <= y1)
+				w = iy1 - y1;
+				if (w != 0)
+				{
+					x1 += dx * w;
+					z1 += dz * w;
+				}
+
+				if (Dir > 0)
+				{
+					if (Dir == LastDir)
 					{
-						this.AddNode(Recs, MinY, x0, y0, z0);
-						y0++;
+						iy0++;
 						x0 += dx;
 						z0 += dz;
 					}
-					y1++;
 
-					w = y1 - ((int)y1);
-					if (w > 0)
+					while (iy0 <= iy1)
 					{
-						y0 += w;
-						x0 += dx * w;
-						z0 += dz * w;
+						this.AddNode(Recs, MinY, x0, iy0, z0);
 
-						this.AddNode(Recs, MinY, x0, y0, z0);
+						iy0++;
+						x0 += dx;
+						z0 += dz;
+					}
+				}
+				else
+				{
+					if (Dir == LastDir)
+					{
+						iy0--;
+						x0 -= dx;
+						z0 -= dz;
+					}
+
+					while (iy0 >= iy1)
+					{
+						this.AddNode(Recs, MinY, x0, iy0, z0);
+
+						iy0--;
+						x0 -= dx;
+						z0 -= dz;
 					}
 				}
 			}

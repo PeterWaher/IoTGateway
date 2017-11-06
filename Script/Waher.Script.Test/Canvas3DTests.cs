@@ -132,8 +132,57 @@ namespace Waher.Script.Test
 			Canvas.Polygon(new Vector4[] { P0, P3, P7, P4 }, new SKColor(0, 255, 0, 128));
 		}
 
+		[TestMethod]
+		public void Canvas3D_Test_06_ZBuffer()
+		{
+			Canvas3D Canvas = new Canvas3D(640, 480, 3, SKColors.White);
+			Canvas.ProjectZ(500);
+			this.DrawPlanes(Canvas);
+			this.Save(Canvas, "06.png");
+		}
+
+		private void DrawPlanes(Canvas3D Canvas)
+		{
+			Canvas.Polygon(new Vector4[]
+			{
+				new Vector4(-200, 100, 100, 1),
+				new Vector4(-200, 100, 300, 1),
+				new Vector4(200, 100, 300, 1),
+				new Vector4(200, 100, 100, 1)
+			}, SKColors.Red);
+
+			Canvas.Polygon(new Vector4[]
+			{
+				new Vector4(100, -200, 100, 1),
+				new Vector4(100, -200, 300, 1),
+				new Vector4(100, 200, 300, 1),
+				new Vector4(100, 200, 100, 1)
+			}, SKColors.Green);
+
+			Canvas.Polygon(new Vector4[]
+			{
+				new Vector4(-200, -200, 200, 1),
+				new Vector4(200, -200, 200, 1),
+				new Vector4(200, 200, 200, 1),
+				new Vector4(-200, 200, 200, 1),
+			}, new SKColor(0, 0, 255, 64));
+		}
+
+		[TestMethod]
+		public void Canvas3D_Test_07_Text()
+		{
+			Canvas3D Canvas = new Canvas3D(640, 480, 3, SKColors.White);
+			Canvas.ProjectZ(500);
+			this.DrawPlanes(Canvas);
+			//Canvas.Text("d", new Vector4(-100, -100, 150, 1), "Tahoma", 100, SKColors.BlueViolet);
+			Canvas.Text("Hello World!", new Vector4(-200, -100, 150, 1), "Tahoma", 100, SKColors.BlueViolet);
+
+			this.Save(Canvas, "07.png");
+		}
+
 		// TODO: Clip
 		// TODO: Light / Phong shading
 		// TODO: Proper interpolation of z
+		// TODO: Fix glitches in polygon rendering. Example: letter "d", no oversampling. (See test 7)
 	}
 }

@@ -973,33 +973,63 @@ namespace Waher.Script.Graphs3D
 			return ((Mask0 | Mask1) == 0);
 		}
 
+		/// <summary>
+		/// Draws a closed polygon.
+		/// </summary>
+		/// <param name="Nodes">Nodes.</param>
+		/// <param name="Color">Color</param>
 		public void Polygon(Vector4[] Nodes, SKColor Color)
 		{
-			int i, c = Nodes.Length;
-			if (c < 3)
-				return;
+			this.Polygons(new Vector4[][] { Nodes }, Color);
+		}
 
+		/// <summary>
+		/// Draws a set of closed polygons. Interior polygons can be used to undraw the corresponding sections.
+		/// </summary>
+		/// <param name="Nodes">Nodes.</param>
+		/// <param name="Color">Color</param>
+		public void Polygons(Vector4[][] Nodes, SKColor Color)
+		{
+			int j, d = Nodes.Length;
+			int i, c;
 			int MinY = 0;
 			int MaxY = 0;
 			int Y;
 			Vector4 P;
+			Vector4[] v;
+			bool First = true;
 
-			Nodes = (Vector4[])Nodes.Clone();
-			for (i = 0; i < c; i++)
+			Nodes = (Vector4[][])Nodes.Clone();
+
+			d = Nodes.Length;
+			for (j = 0; j < d; j++)
 			{
-				Nodes[i] = P = Vector4.Transform(Nodes[i], this.t);
+				v = (Vector4[])Nodes[j].Clone();
+				Nodes[j] = v;
 
-				if (this.distance > 0)
-					Y = (int)(this.cy - P.Y * this.distance / (P.Z + this.distance) + 0.5f);
-				else
-					Y = (int)(this.cy - P.Y + 0.5f);
+				c = v.Length;
+				if (c < 3)
+					continue;
 
-				if (i == 0)
-					MinY = MaxY = Y;
-				else if (Y < MinY)
-					MinY = Y;
-				else if (Y > MaxY)
-					MaxY = Y;
+				for (i = 0; i < c; i++)
+				{
+					v[i] = P = Vector4.Transform(v[i], this.t);
+
+					if (this.distance > 0)
+						Y = (int)(this.cy - P.Y * this.distance / (P.Z + this.distance) + 0.5f);
+					else
+						Y = (int)(this.cy - P.Y + 0.5f);
+
+					if (First)
+					{
+						First = false;
+						MinY = MaxY = Y;
+					}
+					else if (Y < MinY)
+						MinY = Y;
+					else if (Y > MaxY)
+						MaxY = Y;
+				}
 			}
 
 			if (MaxY < 0)
@@ -1015,125 +1045,123 @@ namespace Waher.Script.Graphs3D
 			int NrRecs = MaxY - MinY + 1;
 			ScanLineRec[] Recs = new ScanLineRec[NrRecs];
 			ScanLineRec Rec;
-
-			Vector4 Last = Nodes[c - 2];
-			Vector4 Current = Nodes[c - 1];
-			Vector3 N = CalcNormal(ToVector3(Nodes[0]), ToVector3(Nodes[1]), ToVector3(Current));
+			Vector4 Last;
+			Vector4 Current;
+			Vector3 N;
 			float x0, y0, z0;
 			float x1, y1, z1;
 			float w;
 			float dx, dy, dz;
 			int iy0, iy1;
 
-			if (this.distance > 0)
+			for (j = 0; j < d; j++)
 			{
-				y0 = this.cy - Last.Y * this.distance / (Last.Z + this.distance);
-				y1 = this.cy - Current.Y * this.distance / (Current.Z + this.distance);
-			}
-			else
-			{
-				y0 = this.cy - Last.Y;
-				y1 = this.cy - Current.Y;
-			}
+				v = Nodes[j];
+				c = v.Length;
 
-			iy0 = (int)(y0 + 0.5f);
-			iy1 = (int)(y1 + 0.5f);
+				if (c < 3)
+					continue;
 
-			int LastDir;
-			int Dir = Math.Sign(iy1 - iy0);
-
-			for (i = 0; i < c; i++)
-			{
-				Last = Current;
-				Current = Nodes[i];
+				Last = v[c - 2];
+				Current = v[c - 1];
+				N = CalcNormal(ToVector3(v[0]), ToVector3(v[1]), ToVector3(Current));
 
 				if (this.distance > 0)
 				{
-					w = this.distance / (Last.Z + this.distance);
-					x0 = this.cx + Last.X * w;
-					y0 = this.cy - Last.Y * w;
-					z0 = Last.Z;
-
-					w = this.distance / (Current.Z + this.distance);
-					x1 = this.cx + Current.X * w;
-					y1 = this.cy - Current.Y * w;
-					z1 = Current.Z;
+					y0 = this.cy - Last.Y * this.distance / (Last.Z + this.distance);
+					y1 = this.cy - Current.Y * this.distance / (Current.Z + this.distance);
 				}
 				else
 				{
-					x0 = this.cx + Last.X;
 					y0 = this.cy - Last.Y;
-					z0 = Last.Z;
-
-					x1 = this.cx + Current.X;
 					y1 = this.cy - Current.Y;
-					z1 = Current.Z;
 				}
-
-				if (!this.ClipTopBottom(ref x0, ref y0, ref z0, ref x1, ref y1, ref z1))
-					continue;
 
 				iy0 = (int)(y0 + 0.5f);
 				iy1 = (int)(y1 + 0.5f);
 
-				LastDir = Dir;
-				Dir = Math.Sign(iy1 - iy0);
+				int LastDir;
+				int Dir = Math.Sign(iy1 - iy0);
 
-				if (Dir == 0)
-					continue;
-
-				dy = y1 - y0;
-				dx = (x1 - x0) / dy;
-				dz = (z1 - z0) / dy;
-
-				w = iy0 - y0;
-				if (w != 0)
+				for (i = 0; i < c; i++)
 				{
-					x0 += dx * w;
-					z0 += dz * w;
-				}
+					Last = Current;
+					Current = v[i];
 
-				w = iy1 - y1;
-				if (w != 0)
-				{
-					x1 += dx * w;
-					z1 += dz * w;
-				}
-
-				if (Dir > 0)
-				{
-					if (Dir == LastDir)
+					if (this.distance > 0)
 					{
-						iy0++;
-						x0 += dx;
-						z0 += dz;
+						w = this.distance / (Last.Z + this.distance);
+						x0 = this.cx + Last.X * w;
+						y0 = this.cy - Last.Y * w;
+						z0 = Last.Z;
+
+						w = this.distance / (Current.Z + this.distance);
+						x1 = this.cx + Current.X * w;
+						y1 = this.cy - Current.Y * w;
+						z1 = Current.Z;
+					}
+					else
+					{
+						x0 = this.cx + Last.X;
+						y0 = this.cy - Last.Y;
+						z0 = Last.Z;
+
+						x1 = this.cx + Current.X;
+						y1 = this.cy - Current.Y;
+						z1 = Current.Z;
 					}
 
-					while (iy0 <= iy1)
-					{
-						this.AddNode(Recs, MinY, x0, iy0, z0);
+					if (!this.ClipTopBottom(ref x0, ref y0, ref z0, ref x1, ref y1, ref z1))
+						continue;
 
-						iy0++;
-						x0 += dx;
-						z0 += dz;
+					iy0 = (int)(y0 + 0.5f);
+					iy1 = (int)(y1 + 0.5f);
+
+					LastDir = Dir;
+					Dir = Math.Sign(iy1 - iy0);
+
+					if (Dir == 0)
+						continue;
+
+					dy = y1 - y0;
+					dx = (x1 - x0) / dy;
+					dz = (z1 - z0) / dy;
+
+					if (Dir > 0)
+					{
+						if (Dir == LastDir)
+						{
+							iy0++;
+							x0 += dx;
+							z0 += dz;
+						}
+
+						while (iy0 <= iy1)
+						{
+							this.AddNode(Recs, MinY, x0, iy0, z0);
+
+							iy0++;
+							x0 += dx;
+							z0 += dz;
+						}
 					}
-				}
-				else
-				{
-					if (Dir == LastDir)
+					else
 					{
-						iy0--;
-						x0 -= dx;
-						z0 -= dz;
-					}
+						if (Dir == LastDir)
+						{
+							iy0--;
+							x0 -= dx;
+							z0 -= dz;
+						}
 
-					while (iy0 >= iy1)
-					{
-						this.AddNode(Recs, MinY, x0, iy0, z0);
+						while (iy0 >= iy1)
+						{
+							this.AddNode(Recs, MinY, x0, iy0, z0);
 
-						iy0--;
-						x0 -= dx;
-						z0 -= dz;
+							iy0--;
+							x0 -= dx;
+							z0 -= dz;
+						}
 					}
 				}
 			}
@@ -1150,7 +1178,7 @@ namespace Waher.Script.Graphs3D
 
 				if (Rec.nodes != null)
 				{
-					bool First = true;
+					First = true;
 
 					x0 = z0 = 0;
 					foreach (KeyValuePair<float, float> Rec2 in Rec.nodes)
@@ -1243,6 +1271,283 @@ namespace Waher.Script.Graphs3D
 		}
 
 		#endregion
+
+		#region Text
+
+		/// <summary>
+		/// Draws text on the canvas.
+		/// </summary>
+		/// <param name="Text">Text to draw.</param>
+		/// <param name="Start">Start position.</param>
+		/// <param name="FontFamily">Font family.</param>
+		/// <param name="TextSize">Text size.</param>
+		/// <param name="Color">Text color.</param>
+		public void Text(string Text, Vector4 Start, string FontFamily, float TextSize, SKColor Color)
+		{
+			this.Text(Text, Start, FontFamily, SKFontStyleWeight.Normal, SKFontStyleWidth.Normal,
+				SKFontStyleSlant.Upright, TextSize, Color);
+		}
+
+		/// <summary>
+		/// Draws text on the canvas.
+		/// </summary>
+		/// <param name="Text">Text to draw.</param>
+		/// <param name="Start">Start position.</param>
+		/// <param name="FontFamily">Font family.</param>
+		/// <param name="Weight">Font weight.</param>
+		/// <param name="TextSize">Text size.</param>
+		/// <param name="Color">Text color.</param>
+		public void Text(string Text, Vector4 Start, string FontFamily, SKFontStyleWeight Weight,
+			float TextSize, SKColor Color)
+		{
+			this.Text(Text, Start, FontFamily, Weight, SKFontStyleWidth.Normal,
+				SKFontStyleSlant.Upright, TextSize, Color);
+		}
+
+		/// <summary>
+		/// Draws text on the canvas.
+		/// </summary>
+		/// <param name="Text">Text to draw.</param>
+		/// <param name="Start">Start position.</param>
+		/// <param name="FontFamily">Font family.</param>
+		/// <param name="Weight">Font weight.</param>
+		/// <param name="Width">Font width.</param>
+		/// <param name="TextSize">Text size.</param>
+		/// <param name="Color">Text color.</param>
+		public void Text(string Text, Vector4 Start, string FontFamily, SKFontStyleWeight Weight,
+			SKFontStyleWidth Width, float TextSize, SKColor Color)
+		{
+			this.Text(Text, Start, FontFamily, Weight, Width, SKFontStyleSlant.Upright,
+				TextSize, Color);
+		}
+
+		/// <summary>
+		/// Draws text on the canvas.
+		/// </summary>
+		/// <param name="Text">Text to draw.</param>
+		/// <param name="Start">Start position.</param>
+		/// <param name="FontFamily">Font family.</param>
+		/// <param name="Weight">Font weight.</param>
+		/// <param name="Width">Font width.</param>
+		/// <param name="Slant">Font slant.</param>
+		/// <param name="TextSize">Text size.</param>
+		/// <param name="Color">Text color.</param>
+		public void Text(string Text, Vector4 Start, string FontFamily, SKFontStyleWeight Weight,
+			SKFontStyleWidth Width, SKFontStyleSlant Slant, float TextSize, SKColor Color)
+		{
+			SKPaint Paint = null;
+			SKPath Path = null;
+			SKPath Simple = null;
+			SKPath.Iterator e = null;
+			SKPoint[] Points = new SKPoint[4];
+			SKPathVerb Verb;
+
+			try
+			{
+				Paint = new SKPaint()
+				{
+					Typeface = SKTypeface.FromFamilyName(FontFamily, Weight, Width, Slant),
+					TextSize = TextSize
+				};
+
+				Path = Paint.GetTextPath(Text, 0, 0);
+				//Simple = Path.Simplify();
+
+				e = Path.CreateIterator(false);
+
+				List<Vector4> P = new List<Vector4>();
+				List<Vector4[]> v = new List<Vector4[]>();
+				float MaxX = 0;
+				float X, Y;
+				float x0, x1, x2, x3;
+				float y0, y1, y2, y3;
+				float dx, dy, t, w, d, t2, w2, t3, w3, weight;
+				int i, c;
+
+				while ((Verb = e.Next(Points)) != SKPathVerb.Done)
+				{
+					switch (Verb)
+					{
+						case SKPathVerb.Close:
+							if ((c = P.Count) > 1 && P[0] == P[c - 1])
+								P.RemoveAt(c - 1);
+
+							v.Add(P.ToArray());
+							P.Clear();
+							break;
+
+						case SKPathVerb.Move:
+							X = Points[0].X;
+							if (X > MaxX)
+							{
+								if (v.Count > 0)
+								{
+									this.Polygons(v.ToArray(), Color);
+									v.Clear();
+								}
+
+								MaxX = X;
+							}
+
+							if (P.Count > 0)
+							{
+								if ((c = P.Count) > 1 && P[0] == P[c - 1])
+									P.RemoveAt(c - 1);
+
+								v.Add(P.ToArray());
+								P.Clear();
+							}
+
+							P.Add(new Vector4(Start.X + X, Start.Y - Points[0].Y, Start.Z, 1));
+							break;
+
+						case SKPathVerb.Line:
+							X = Points[1].X;
+							if (X > MaxX)
+								MaxX = X;
+
+							P.Add(new Vector4(Start.X + X, Start.Y - Points[1].Y, Start.Z, 1));
+							break;
+
+						case SKPathVerb.Quad:
+							x0 = Points[0].X;
+							y0 = Points[0].Y;
+							if (x0 > MaxX)
+								MaxX = x0;
+
+							x1 = Points[1].X;
+							y1 = Points[1].Y;
+							if (x1 > MaxX)
+								MaxX = x1;
+
+							x2 = Points[2].X;
+							y2 = Points[2].Y;
+							if (x2 > MaxX)
+								MaxX = x2;
+
+							dx = x2 - x0;
+							dy = y2 - y0;
+
+							c = (int)Math.Ceiling(Math.Sqrt(dx * dx + dy * dy) / 5);
+							for (i = 1; i <= c; i++)
+							{
+								t = ((float)i) / c;
+								w = 1 - t;
+
+								t2 = t * t;
+								w2 = w * w;
+
+								X = w2 * x0 + 2 * t * w * x1 + t2 * x2;
+								Y = w2 * y0 + 2 * t * w * y1 + t2 * y2;
+
+								P.Add(new Vector4(Start.X + X, Start.Y - Y, Start.Z, 1));
+							}
+							break;
+
+						case SKPathVerb.Conic:
+							x0 = Points[0].X;
+							y0 = Points[0].Y;
+							if (x0 > MaxX)
+								MaxX = x0;
+
+							x1 = Points[1].X;
+							y1 = Points[1].Y;
+							if (x1 > MaxX)
+								MaxX = x1;
+
+							x2 = Points[2].X;
+							y2 = Points[2].Y;
+							if (x2 > MaxX)
+								MaxX = x2;
+
+							dx = x2 - x0;
+							dy = y2 - y0;
+
+							weight = e.ConicWeight();
+
+							c = (int)Math.Ceiling(Math.Sqrt(dx * dx + dy * dy) / 5);
+							for (i = 1; i <= c; i++)
+							{
+								t = ((float)i) / c;
+								w = 1 - t;
+
+								t2 = t * t;
+								w2 = w * w;
+
+								d = 1.0f / (w2 + 2 * weight * t * w + t2);
+								X = (w2 * x0 + 2 * weight * t * w * x1 + t2 * x2) * d;
+								Y = (w2 * y0 + 2 * weight * t * w * y1 + t2 * y2) * d;
+
+								P.Add(new Vector4(Start.X + X, Start.Y - Y, Start.Z, 1));
+							}
+							break;
+
+						case SKPathVerb.Cubic:
+							x0 = Points[0].X;
+							y0 = Points[0].Y;
+							if (x0 > MaxX)
+								MaxX = x0;
+
+							x1 = Points[1].X;
+							y1 = Points[1].Y;
+							if (x1 > MaxX)
+								MaxX = x1;
+
+							x2 = Points[2].X;
+							y2 = Points[2].Y;
+							if (x2 > MaxX)
+								MaxX = x2;
+
+							x3 = Points[3].X;
+							y3 = Points[3].Y;
+							if (x3 > MaxX)
+								MaxX = x3;
+
+							dx = x3 - x0;
+							dy = y3 - y0;
+
+							c = (int)Math.Ceiling(Math.Sqrt(dx * dx + dy * dy) / 5);
+							for (i = 1; i <= c; i++)
+							{
+								t = ((float)i) / c;
+								w = 1 - t;
+
+								t2 = t * t;
+								w2 = w * w;
+
+								t3 = t2 * t;
+								w3 = w2 * w;
+
+								X = w3 * x0 + 3 * t * w2 * x1 + 3 * t2 * w * x2 + t3 * x3;
+								Y = w3 * y0 + 3 * t * w2 * y1 + 3 * t2 * w * y2 + t3 * y3;
+
+								P.Add(new Vector4(Start.X + X, Start.Y - Y, Start.Z, 1));
+							}
+							break;
+					}
+				}
+
+				if (v.Count > 0)
+					this.Polygons(v.ToArray(), Color);
+			}
+			finally
+			{
+				if (Paint != null)
+					Paint.Dispose();
+
+				if (Path != null)
+					Path.Dispose();
+
+				if (Simple != null)
+					Simple.Dispose();
+
+				if (e != null)
+					e.Dispose();
+			}
+		}
+
+		#endregion
+
 
 	}
 }

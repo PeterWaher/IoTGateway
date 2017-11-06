@@ -231,6 +231,12 @@ namespace Waher.Networking.HTTP
 
 										this.listeners.AddLast(new KeyValuePair<TcpListener, bool>(Listener, false));
 									}
+									catch (SocketException)
+									{
+										Log.Error("Unable to open port for listening.",
+											new KeyValuePair<string, object>("Address", UnicastAddress.Address.ToString()),
+											new KeyValuePair<string, object>("Port", HttpPort));
+									}
 									catch (Exception ex)
 									{
 										Log.Critical(ex, UnicastAddress.Address.ToString() + ":" + HttpPort);
@@ -249,6 +255,12 @@ namespace Waher.Networking.HTTP
 										Task T = this.ListenForIncomingConnections(Listener, true);
 
 										this.listeners.AddLast(new KeyValuePair<TcpListener, bool>(Listener, true));
+									}
+									catch (SocketException)
+									{
+										Log.Error("Unable to open port for listening.",
+											new KeyValuePair<string, object>("Address", UnicastAddress.Address.ToString()),
+											new KeyValuePair<string, object>("Port", HttpsPort));
 									}
 									catch (Exception ex)
 									{

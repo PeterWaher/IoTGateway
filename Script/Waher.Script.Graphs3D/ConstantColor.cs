@@ -30,7 +30,7 @@ namespace Waher.Script.Graphs3D
 		/// <param name="Z">Z-coordinate.</param>
 		/// <param name="Normal">Surface normal vector.</param>
 		/// <returns>Color</returns>
-		public SKColor GetColor(float X, float Y, float Z, Vector4 Normal)
+		public SKColor GetColor(float X, float Y, float Z, Vector3 Normal)
 		{
 			return this.color;
 		}
@@ -44,7 +44,7 @@ namespace Waher.Script.Graphs3D
 		/// <param name="Normals">Normal vectors.</param>
 		/// <param name="N">Number of coordinates.</param>
 		/// <param name="Colors">Where color values will be stored.</param>
-		public void GetColors(float[] x, float[] y, float[] z, Vector4[] Normals, int N, SKColor[] Colors)
+		public void GetColors(float[] x, float[] y, float[] z, Vector3[] Normals, int N, SKColor[] Colors)
 		{
 			int i;
 

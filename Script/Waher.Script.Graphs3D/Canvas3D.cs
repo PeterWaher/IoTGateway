@@ -15,7 +15,7 @@ namespace Waher.Script.Graphs3D
 		private float[] xBuf;
 		private float[] yBuf;
 		private float[] zBuf;
-		private Vector4[] normalBuf;
+		private Vector3[] normalBuf;
 		private SKColor[] colorBuf;
 		private float distance = 0;
 		private Matrix4x4 t;
@@ -74,7 +74,7 @@ namespace Waher.Script.Graphs3D
 			this.xBuf = new float[this.w];
 			this.yBuf = new float[this.w];
 			this.zBuf = new float[this.w];
-			this.normalBuf = new Vector4[this.w];
+			this.normalBuf = new Vector3[this.w];
 			this.colorBuf = new SKColor[this.w];
 
 			for (i = j = 0; i < c; i++)
@@ -712,7 +712,7 @@ namespace Waher.Script.Graphs3D
 
 		#region Scan Lines
 
-		private void ScanLine(float x0, float y0, float z0, float x1, float z1, Vector4 Normal, I3DShader Shader)
+		private void ScanLine(float x0, float y0, float z0, float x1, float z1, Vector3 Normal, I3DShader Shader)
 		{
 			float Delta;
 
@@ -842,10 +842,9 @@ namespace Waher.Script.Graphs3D
 			return new Vector3(P.X, P.Y, P.Z);
 		}
 
-		private static Vector4 CalcNormal(Vector3 P0, Vector3 P1, Vector3 P2)
+		private static Vector3 CalcNormal(Vector3 P0, Vector3 P1, Vector3 P2)
 		{
-			Vector3 N = Vector3.Normalize(Vector3.Cross(P1 - P0, P2 - P0));
-			return new Vector4(N.X, N.Y, N.Z, 0);
+			return Vector3.Normalize(Vector3.Cross(P1 - P0, P2 - P0));
 		}
 
 		private bool ClipTopBottom(ref float x0, ref float y0, ref float z0, ref float x1, ref float y1, ref float z1)
@@ -1042,7 +1041,7 @@ namespace Waher.Script.Graphs3D
 			ScanLineRec Rec;
 			Vector4 Last;
 			Vector4 Current;
-			Vector4 N;
+			Vector3 N;
 			float x0, y0, z0;
 			float x1, y1, z1;
 			float w;
@@ -1202,7 +1201,7 @@ namespace Waher.Script.Graphs3D
 			}
 		}
 
-		private void AddNode(ScanLineRec[] Records, int MinY, float x, float y, float z, Vector4 N)
+		private void AddNode(ScanLineRec[] Records, int MinY, float x, float y, float z, Vector3 N)
 		{
 			int i = (int)(y + 0.5f) - MinY;
 			ScanLineRec Rec = Records[i];
@@ -1265,7 +1264,7 @@ namespace Waher.Script.Graphs3D
 			public float? x1;
 			public float? z1;
 			public LinkedList<KeyValuePair<float, float>> nodes;
-			public Vector4 n;
+			public Vector3 n;
 		}
 
 		#endregion

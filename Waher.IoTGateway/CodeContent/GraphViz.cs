@@ -250,9 +250,13 @@ namespace Waher.IoTGateway.CodeContent
 		/// <param name="Language">Language used.</param>
 		/// <param name="Indent">Additional indenting.</param>
 		/// <param name="Document">Markdown document containing element.</param>
-		public void GenerateHTML(StringBuilder Output, string[] Rows, string Language, int Indent, MarkdownDocument Document)
+		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
+		public bool GenerateHTML(StringBuilder Output, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
 			string FileName = this.GetFileName(Language, Rows, out string Title);
+			if (FileName == null)
+				return false;
+
 			FileName = FileName.Substring(Gateway.RootFolder.Length).Replace(Path.DirectorySeparatorChar, '/');
 
 			Output.Append("<figure>");
@@ -278,6 +282,8 @@ namespace Waher.IoTGateway.CodeContent
 			}
 
 			Output.AppendLine("</figure>");
+
+			return true;
 		}
 
 		private string GetFileName(string Language, string[] Rows, out string Title)
@@ -358,10 +364,13 @@ namespace Waher.IoTGateway.CodeContent
 		/// <param name="Language">Language used.</param>
 		/// <param name="Indent">Additional indenting.</param>
 		/// <param name="Document">Markdown document containing element.</param>
-		public void GeneratePlainText(StringBuilder Output, string[] Rows, string Language, int Indent, MarkdownDocument Document)
+		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
+		public bool GeneratePlainText(StringBuilder Output, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
 			this.GetFileName(Language, Rows, out string Title);
 			Output.AppendLine(Title);
+
+			return true;
 		}
 
 		/// <summary>
@@ -374,9 +383,12 @@ namespace Waher.IoTGateway.CodeContent
 		/// <param name="Language">Language used.</param>
 		/// <param name="Indent">Additional indenting.</param>
 		/// <param name="Document">Markdown document containing element.</param>
-		public void GenerateXAML(XmlWriter Output, XamlSettings Settings, TextAlignment TextAlignment, string[] Rows, string Language, int Indent, MarkdownDocument Document)
+		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
+		public bool GenerateXAML(XmlWriter Output, XamlSettings Settings, TextAlignment TextAlignment, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
 			string FileName = this.GetFileName(Language, Rows, out string Title);
+			if (FileName == null)
+				return false;
 
 			Output.WriteStartElement("Image");
 			Output.WriteAttributeString("Source", FileName);
@@ -385,6 +397,8 @@ namespace Waher.IoTGateway.CodeContent
 				Output.WriteAttributeString("ToolTip", Title);
 
 			Output.WriteEndElement();
+
+			return true;
 		}
 	}
 }

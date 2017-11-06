@@ -50,7 +50,8 @@ namespace Waher.Content.Markdown.Model
 		/// <param name="Language">Language used.</param>
 		/// <param name="Indent">Additional indenting.</param>
 		/// <param name="Document">Markdown document containing element.</param>
-		void GenerateHTML(StringBuilder Output, string[] Rows, string Language, int Indent, MarkdownDocument Document);
+		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
+		bool GenerateHTML(StringBuilder Output, string[] Rows, string Language, int Indent, MarkdownDocument Document);
 
 		/// <summary>
 		/// Generates Plain Text for the markdown element.
@@ -60,7 +61,8 @@ namespace Waher.Content.Markdown.Model
 		/// <param name="Language">Language used.</param>
 		/// <param name="Indent">Additional indenting.</param>
 		/// <param name="Document">Markdown document containing element.</param>
-		void GeneratePlainText(StringBuilder Output, string[] Rows, string Language, int Indent, MarkdownDocument Document);
+		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
+		bool GeneratePlainText(StringBuilder Output, string[] Rows, string Language, int Indent, MarkdownDocument Document);
 
 		/// <summary>
 		/// Generates XAML for the markdown element.
@@ -72,7 +74,8 @@ namespace Waher.Content.Markdown.Model
 		/// <param name="Language">Language used.</param>
 		/// <param name="Indent">Additional indenting.</param>
 		/// <param name="Document">Markdown document containing element.</param>
-		void GenerateXAML(XmlWriter Output, XamlSettings Settings, TextAlignment TextAlignment, string[] Rows, string Language, int Indent, 
+		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
+		bool GenerateXAML(XmlWriter Output, XamlSettings Settings, TextAlignment TextAlignment, string[] Rows, string Language, int Indent, 
 			MarkdownDocument Document);
 	}
 }

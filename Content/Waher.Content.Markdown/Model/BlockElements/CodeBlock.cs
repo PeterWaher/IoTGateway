@@ -152,8 +152,8 @@ namespace Waher.Content.Markdown.Model.BlockElements
 			{
 				try
 				{
-					this.handler.GenerateHTML(Output, this.rows, this.language, this.indent, this.Document);
-					return;
+					if (this.handler.GenerateHTML(Output, this.rows, this.language, this.indent, this.Document))
+						return;
 				}
 				catch (Exception ex)
 				{
@@ -207,8 +207,8 @@ namespace Waher.Content.Markdown.Model.BlockElements
 			{
 				try
 				{
-					this.handler.GeneratePlainText(Output, this.rows, this.language, this.indent, this.Document);
-					return;
+					if (this.handler.GeneratePlainText(Output, this.rows, this.language, this.indent, this.Document))
+						return;
 				}
 				catch (Exception ex)
 				{
@@ -247,8 +247,8 @@ namespace Waher.Content.Markdown.Model.BlockElements
 			{
 				try
 				{
-					this.handler.GenerateXAML(Output, Settings, TextAlignment, this.rows, this.language, this.indent, this.Document);
-					return;
+					if (this.handler.GenerateXAML(Output, Settings, TextAlignment, this.rows, this.language, this.indent, this.Document))
+						return;
 				}
 				catch (Exception ex)
 				{

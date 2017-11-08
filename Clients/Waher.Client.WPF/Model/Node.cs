@@ -95,7 +95,7 @@ namespace Waher.Client.WPF.Model
 						Concentrator.XmppAccountNode.ConcentratorClient.GetChildNodes(FullJid, this.nodeInfo, true, true,
 							"en", string.Empty, string.Empty, string.Empty, (sender, e) =>
 						{
-							Mouse.OverrideCursor = null;
+							MainWindow.currentInstance.Dispatcher.Invoke(() => Mouse.OverrideCursor = null);
 
 							if (e.Ok)
 							{

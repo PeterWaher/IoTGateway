@@ -87,7 +87,7 @@ namespace Waher.Client.WPF.Model
 					{
 						Concentrator.XmppAccountNode.ConcentratorClient.GetChildDataSources(FullJid, this.key, (sender, e) =>
 						{
-							Mouse.OverrideCursor = null;
+							MainWindow.currentInstance.Dispatcher.Invoke(() => Mouse.OverrideCursor = null);
 
 							if (e.Ok)
 							{
@@ -108,7 +108,7 @@ namespace Waher.Client.WPF.Model
 						Concentrator.XmppAccountNode.ConcentratorClient.GetRootNodes(FullJid, this.key, true, true, 
 							"en", string.Empty, string.Empty, string.Empty, (sender, e) =>
 						{
-							Mouse.OverrideCursor = null;
+							MainWindow.currentInstance.Dispatcher.Invoke(() => Mouse.OverrideCursor = null);
 
 							if (e.Ok)
 							{

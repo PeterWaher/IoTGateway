@@ -253,7 +253,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <summary>
 		/// Cancels the readout.
 		/// </summary>
-		public void Cancel()
+		public virtual void Cancel()
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -263,7 +263,7 @@ namespace Waher.Networking.XMPP.Sensor
 			Xml.Append(XML.Encode(this.Id));
 			Xml.Append("'/>");
 
-			this.sensorClient.Client.SendIqGet(this.RemoteJID, Xml.ToString(), this.CancelResponse, null);
+			this.sensorClient?.Client.SendIqGet(this.RemoteJID, Xml.ToString(), this.CancelResponse, null);
 		}
 
 		private void CancelResponse(object Sender, IqResultEventArgs e)

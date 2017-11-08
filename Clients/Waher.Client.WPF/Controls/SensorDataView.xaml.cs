@@ -48,9 +48,14 @@ namespace Waher.Client.WPF.Controls
 
 			if (this.request != null)
 			{
-				this.request.OnStateChanged += new SensorDataReadoutStateChangedEventHandler(Request_OnStateChanged);
-				this.request.OnFieldsReceived += new SensorDataReadoutFieldsReportedEventHandler(Request_OnFieldsReceived);
+				this.Request_OnErrorsReceived(this, Request.Errors);
 				this.request.OnErrorsReceived += new SensorDataReadoutErrorsReportedEventHandler(Request_OnErrorsReceived);
+
+				this.Request_OnFieldsReceived(this, Request.ReadFields);
+				this.request.OnFieldsReceived += new SensorDataReadoutFieldsReportedEventHandler(Request_OnFieldsReceived);
+
+				this.Request_OnStateChanged(this, Request.State);
+				this.request.OnStateChanged += new SensorDataReadoutStateChangedEventHandler(Request_OnStateChanged);
 			}
 		}
 

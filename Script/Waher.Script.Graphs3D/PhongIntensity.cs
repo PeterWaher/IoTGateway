@@ -13,6 +13,7 @@ namespace Waher.Script.Graphs3D
 		private float red;
 		private float green;
 		private float blue;
+		private float alpha;
 
 		/// <summary>
 		/// Contains information about the intensity of a light component, as used in the Phong reflection model.
@@ -21,11 +22,13 @@ namespace Waher.Script.Graphs3D
 		/// <param name="Red">Red intensity.</param>
 		/// <param name="Green">Green intensity.</param>
 		/// <param name="Blue">Blue intensity.</param>
-		public PhongIntensity(float Ambient, float Diffuse, float Specular)
+		/// <param name="Alpha">Alpha intensity.</param>
+		public PhongIntensity(float Red, float Green, float Blue, float Alpha)
 		{
-			this.red = Ambient;
-			this.green = Diffuse;
-			this.blue = Specular;
+			this.red = Red;
+			this.green = Green;
+			this.blue = Blue;
+			this.alpha = Alpha;
 		}
 
 		/// <summary>
@@ -42,5 +45,10 @@ namespace Waher.Script.Graphs3D
 		/// Blue intensity.
 		/// </summary>
 		public float Blue => this.blue;
+
+		/// <summary>
+		/// Alpha intensity.
+		/// </summary>
+		public float Alpha => this.alpha;
 	}
 }

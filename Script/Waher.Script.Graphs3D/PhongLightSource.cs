@@ -14,6 +14,7 @@ namespace Waher.Script.Graphs3D
 		private PhongIntensity diffuse;
 		private PhongIntensity specular;
 		private Vector3 position;
+		private Vector3 transformedPosition;
 
 		/// <summary>
 		/// Contains information about a light source, as used in the Phong reflection model.
@@ -22,12 +23,12 @@ namespace Waher.Script.Graphs3D
 		/// <param name="Diffuse">Diffuse intensity.</param>
 		/// <param name="Specular">Specular intensity.</param>
 		/// <param name="Position">Position of light source.</param>
-		public PhongLightSource(PhongIntensity Diffuse, PhongIntensity Specular, PhongIntensity Blue,
-			Vector3 Position)
+		public PhongLightSource(PhongIntensity Diffuse, PhongIntensity Specular, Vector3 Position)
 		{
 			this.diffuse = Diffuse;
 			this.specular = Specular;
 			this.position = Position;
+			this.transformedPosition = Position;
 		}
 
 		/// <summary>
@@ -44,5 +45,19 @@ namespace Waher.Script.Graphs3D
 		/// Position of light source..
 		/// </summary>
 		public Vector3 Position => this.position;
+
+		/// <summary>
+		/// Transformed position of light source..
+		/// </summary>
+		public Vector3 TransformedPosition => this.transformedPosition;
+
+		/// <summary>
+		/// Transforms any coordinates according to current settings in <paramref name="Canvas"/>.
+		/// </summary>
+		/// <param name="Canvas">3D Canvas</param>
+		public void Transform(Canvas3D Canvas)
+		{
+			this.transformedPosition = Canvas.Transform(this.position);
+		}
 	}
 }

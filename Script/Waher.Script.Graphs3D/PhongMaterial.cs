@@ -10,10 +10,14 @@ namespace Waher.Script.Graphs3D
 	/// </summary>
 	public class PhongMaterial
 	{
-		private float ambientReflectionConstant;
-		private float diffuseReflectionConstant;
-		private float specularReflectionConstant;
-		private float shininess;
+		private float ambientReflectionConstantFront;
+		private float diffuseReflectionConstantFront;
+		private float specularReflectionConstantFront;
+		private float shininessFront;
+		private float ambientReflectionConstantBack;
+		private float diffuseReflectionConstantBack;
+		private float specularReflectionConstantBack;
+		private float shininessBack;
 
 		/// <summary>
 		/// Contains information about a material, as used in the Phong reflection model.
@@ -26,31 +30,77 @@ namespace Waher.Script.Graphs3D
 		public PhongMaterial(float AmbientReflectionConstant,
 			float DiffuseReflectionConstant, float SpecularReflectionConstant,
 			float Shininess)
+			: this(AmbientReflectionConstant, DiffuseReflectionConstant, SpecularReflectionConstant, Shininess,
+				  AmbientReflectionConstant, DiffuseReflectionConstant, SpecularReflectionConstant, Shininess)
 		{
-			this.ambientReflectionConstant = AmbientReflectionConstant;
-			this.diffuseReflectionConstant = DiffuseReflectionConstant;
-			this.specularReflectionConstant = SpecularReflectionConstant;
-			this.shininess = Shininess;
 		}
 
 		/// <summary>
-		/// Ratio of reflection of the ambient term present in all points in the scene rendered.
+		/// Contains information about a material, as used in the Phong reflection model.
+		/// https://en.wikipedia.org/wiki/Phong_reflection_model
 		/// </summary>
-		public float AmbientReflectionConstant => this.ambientReflectionConstant;
+		/// <param name="AmbientReflectionConstantFront">Front side ratio of reflection of the ambient term present in all points in the scene rendered.</param>
+		/// <param name="DiffuseReflectionConstantFront">Front side ratio of reflection of the diffuse term of incoming light.</param>
+		/// <param name="SpecularReflectionConstantFront">Front side ratio of reflection of the specular term of incoming light.</param>
+		/// <param name="ShininessFront">Front side shininess coefficient.</param>
+		/// <param name="AmbientReflectionConstantBack">Back side ratio of reflection of the ambient term present in all points in the scene rendered.</param>
+		/// <param name="DiffuseReflectionConstantBack">Back side ratio of reflection of the diffuse term of incoming light.</param>
+		/// <param name="SpecularReflectionConstantBack">Back side ratio of reflection of the specular term of incoming light.</param>
+		/// <param name="ShininessBack">Back side shininess coefficient.</param>
+		public PhongMaterial(float AmbientReflectionConstantFront,
+			float DiffuseReflectionConstantFront, float SpecularReflectionConstantFront,
+			float ShininessFront, float AmbientReflectionConstantBack,
+			float DiffuseReflectionConstantBack, float SpecularReflectionConstantBack,
+			float ShininessBack)
+		{
+			this.ambientReflectionConstantFront = AmbientReflectionConstantFront;
+			this.diffuseReflectionConstantFront = DiffuseReflectionConstantFront;
+			this.specularReflectionConstantFront = SpecularReflectionConstantFront;
+			this.shininessFront = ShininessFront;
+			this.ambientReflectionConstantBack = AmbientReflectionConstantBack;
+			this.diffuseReflectionConstantBack = DiffuseReflectionConstantBack;
+			this.specularReflectionConstantBack = SpecularReflectionConstantBack;
+			this.shininessBack = ShininessBack;
+		}
 
 		/// <summary>
-		/// Ratio of reflection of the diffuse term of incoming light.
+		/// Front-side ratio of reflection of the ambient term present in all points in the scene rendered.
 		/// </summary>
-		public float DiffuseReflectionConstant => this.diffuseReflectionConstant;
+		public float AmbientReflectionConstantFront => this.ambientReflectionConstantFront;
 
 		/// <summary>
-		/// Ratio of reflection of the specular term of incoming light.
+		/// Front-side ratio of reflection of the diffuse term of incoming light.
 		/// </summary>
-		public float SpecularReflectionConstant => this.specularReflectionConstant;
+		public float DiffuseReflectionConstantFront => this.diffuseReflectionConstantFront;
 
 		/// <summary>
-		/// Larger for surfaces that are smoother and more mirror-like.
+		/// Front-side ratio of reflection of the specular term of incoming light.
 		/// </summary>
-		public float Shininess => this.shininess;
+		public float SpecularReflectionConstantFront => this.specularReflectionConstantFront;
+
+		/// <summary>
+		/// Front-side shininess coefficient.
+		/// </summary>
+		public float ShininessFront => this.shininessFront;
+
+		/// <summary>
+		/// Back-side ratio of reflection of the ambient term present in all points in the scene rendered.
+		/// </summary>
+		public float AmbientReflectionConstantBack => this.ambientReflectionConstantBack;
+
+		/// <summary>
+		/// Back-side ratio of reflection of the diffuse term of incoming light.
+		/// </summary>
+		public float DiffuseReflectionConstantBack => this.diffuseReflectionConstantBack;
+
+		/// <summary>
+		/// Back-side ratio of reflection of the specular term of incoming light.
+		/// </summary>
+		public float SpecularReflectionConstantBack => this.specularReflectionConstantBack;
+
+		/// <summary>
+		/// Back-side shininess coefficient.
+		/// </summary>
+		public float ShininessBack => this.shininessBack;
 	}
 }

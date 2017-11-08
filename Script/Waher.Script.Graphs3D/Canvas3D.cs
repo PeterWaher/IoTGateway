@@ -18,6 +18,7 @@ namespace Waher.Script.Graphs3D
 		private Vector3[] normalBuf;
 		private SKColor[] colorBuf;
 		private float distance = 0;
+		private Vector3 viewerPosition = Vector3.Zero;
 		private Matrix4x4 t;
 		private Vector4 last = Vector4.Zero;
 		private int width;
@@ -184,6 +185,7 @@ namespace Waher.Script.Graphs3D
 		public void ResetTransforms()
 		{
 			this.distance = 0;
+			this.viewerPosition = new Vector3(this.cx, this.cy, 0);
 			this.t = new Matrix4x4(this.overSampling, 0, 0, 0, 0, this.overSampling, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
 		}
 
@@ -197,6 +199,67 @@ namespace Waher.Script.Graphs3D
 				throw new ArgumentException("Invalid camera distance.", nameof(Distance));
 
 			this.distance = Distance;
+			this.viewerPosition = new Vector3(this.cx, this.cy, -this.distance);
+		}
+
+		/// <summary>
+		/// Distance from projection plane.
+		/// </summary>
+		public float Distance => this.distance;
+
+		/// <summary>
+		/// Viewer position.
+		/// </summary>
+		public Vector3 ViewerPosition => this.viewerPosition;
+
+		/// <summary>
+		/// Transforms a world coordinate to a display coordinate.
+		/// </summary>
+		/// <param name="Point">Point.</param>
+		/// <returns>Transformed point.</returns>
+		public Vector4 Transform(Vector4 Point)
+		{
+			float x, y;
+
+			Point = Vector4.Transform(Point, this.t);
+			if (this.distance > 0)
+			{
+				float d = this.distance / (Point.Z + this.distance);
+				x = this.cx + (int)(Point.X * d + 0.5f);
+				y = this.cy - (int)(Point.Y * d + 0.5f);
+			}
+			else
+			{
+				x = this.cx + (int)(Point.X + 0.5f);
+				y = this.cy - (int)(Point.Y + 0.5f);
+			}
+
+			return new Vector4(x, y, Point.Z, 1);
+		}
+
+		/// <summary>
+		/// Transforms a world coordinate to a display coordinate.
+		/// </summary>
+		/// <param name="Point">Point.</param>
+		/// <returns>Transformed point.</returns>
+		public Vector3 Transform(Vector3 Point)
+		{
+			float x, y;
+
+			Point = Vector3.Transform(Point, this.t);
+			if (this.distance > 0)
+			{
+				float d = this.distance / (Point.Z + this.distance);
+				x = this.cx + (int)(Point.X * d + 0.5f);
+				y = this.cy - (int)(Point.Y * d + 0.5f);
+			}
+			else
+			{
+				x = this.cx + (int)(Point.X + 0.5f);
+				y = this.cy - (int)(Point.Y + 0.5f);
+			}
+
+			return new Vector3(x, y, Point.Z);
 		}
 
 		#endregion
@@ -765,7 +828,7 @@ namespace Waher.Script.Graphs3D
 				while (ix0 <= ix1)
 				{
 					this.xBuf[i] = ix0++;
-					this.yBuf[i] = y0;
+					this.yBuf[i] = y0;      // TODO: Correct y and z values. Take projection into account.
 					this.zBuf[i] = z0;
 					this.normalBuf[i++] = Normal;
 					z0 += dz;
@@ -993,6 +1056,7 @@ namespace Waher.Script.Graphs3D
 			Vector4[] v;
 			bool First = true;
 
+			Shader.Transform(this);
 			Nodes = (Vector4[][])Nodes.Clone();
 
 			d = Nodes.Length;
@@ -1168,8 +1232,6 @@ namespace Waher.Script.Graphs3D
 					continue;
 
 				Y = i + MinY;
-
-				// TODO: Color interpolation
 
 				if (Rec.nodes != null)
 				{
@@ -1544,7 +1606,6 @@ namespace Waher.Script.Graphs3D
 		}
 
 		#endregion
-
 
 	}
 }

@@ -44,12 +44,20 @@ namespace Waher.Script.Graphs3D
 		/// <param name="Normals">Normal vectors.</param>
 		/// <param name="N">Number of coordinates.</param>
 		/// <param name="Colors">Where color values will be stored.</param>
-		public void GetColors(float[] x, float[] y, float[] z, Vector3[] Normals, int N, SKColor[] Colors)
+		public void GetColors(float[] X, float[] Y, float[] Z, Vector3[] Normals, int N, SKColor[] Colors)
 		{
 			int i;
 
 			for (i = 0; i < N; i++)
 				Colors[i] = this.color;
+		}
+
+		/// <summary>
+		/// Transforms any coordinates according to current settings in <paramref name="Canvas"/>.
+		/// </summary>
+		/// <param name="Canvas">3D Canvas</param>
+		public void Transform(Canvas3D Canvas)
+		{
 		}
 	}
 }

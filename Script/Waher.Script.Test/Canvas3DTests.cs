@@ -180,10 +180,75 @@ namespace Waher.Script.Test
 			this.Save(Canvas, "07.png");
 		}
 
+		[TestMethod]
+		public void Canvas3D_Test_08_PhongShading_NoOversampling()
+		{
+			Canvas3D Canvas = new Canvas3D(640, 480, 1, SKColors.White);
+			Canvas.ProjectZ(500);
+			this.DrawThreePlanes(Canvas);
+			this.Save(Canvas, "08.png");
+		}
+
+		[TestMethod]
+		public void Canvas3D_Test_09_PhongShading_Oversampling_2()
+		{
+			Canvas3D Canvas = new Canvas3D(640, 480, 2, SKColors.White);
+			Canvas.ProjectZ(500);
+			this.DrawThreePlanes(Canvas);
+			this.Save(Canvas, "09.png");
+		}
+
+		[TestMethod]
+		public void Canvas3D_Test_10_PhongShading_Oversampling_3()
+		{
+			Canvas3D Canvas = new Canvas3D(640, 480, 3, SKColors.White);
+			Canvas.ProjectZ(500);
+			this.DrawThreePlanes(Canvas);
+			this.Save(Canvas, "10.png");
+		}
+
+		private void DrawThreePlanes(Canvas3D Canvas)
+		{
+			PhongShader Shader = new PhongShader(
+				new PhongMaterial(1, 2, 0, 10),
+				new PhongIntensity(64, 64, 64, 255),
+				new PhongLightSource(
+					new PhongIntensity(255, 0, 0, 255),
+					new PhongIntensity(255, 255, 255, 255),
+					new Vector3(200, 200, 100)));
+					//new Vector3(400, 400, 50)));
+
+			Canvas.Polygon(new Vector4[]
+			{
+				new Vector4(-200, 200, 300, 1),
+				new Vector4(200, 200, 300, 1),
+				new Vector4(200, -200, 300, 1),
+				new Vector4(-200, -200, 300, 1)
+			}, Shader);
+			
+			Canvas.Polygon(new Vector4[]
+			{
+				new Vector4(-200, 200, 100, 1),
+				new Vector4(-200, 200, 300, 1),
+				new Vector4(-200, -200, 300, 1),
+				new Vector4(-200, -200, 100, 1)
+			}, Shader);
+
+			Canvas.Polygon(new Vector4[]
+			{
+				new Vector4(-200, -200, 300, 1),
+				new Vector4(200, -200, 300, 1),
+				new Vector4(200, -200, 100, 1),
+				new Vector4(-200, -200, 100, 1)
+			}, Shader);
+		}
+
 		// TODO: Clip
-		// TODO: Light / Phong shading
+		// TODO: Light / Phong shading with multiple light sources
 		// TODO: Proper interpolation of z
+		// TODO: Light arithmetic in un-projected coordinates.
 		// TODO: Fix glitches in polygon rendering. Example: letter "d", no oversampling. (See test 7)
 		//			Probably due to roundoff errors at last pixel when drawing edges
+		// TODO: Culling
 	}
 }

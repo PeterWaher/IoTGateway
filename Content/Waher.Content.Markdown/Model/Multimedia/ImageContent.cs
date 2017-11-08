@@ -193,21 +193,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
 						Height = Bitmap.Height;
 					}
 
-					string FileName = Path.GetTempFileName();
-					System.IO.File.WriteAllBytes(FileName, Data);
-
-					Source = FileName;
-
-					lock (synchObject)
-					{
-						if (temporaryFiles == null)
-						{
-							temporaryFiles = new Dictionary<string, bool>();
-							Log.Terminating += CurrentDomain_ProcessExit;
-						}
-
-						temporaryFiles[FileName] = true;
-					}
+					Source = GetTemporaryFile(Data);
 				}
 
 				Output.WriteStartElement("Image");
@@ -226,6 +212,30 @@ namespace Waher.Content.Markdown.Model.Multimedia
 
 				break;
 			}
+		}
+
+		/// <summary>
+		/// Stores an image in binary form as a temporary file. Files will be deleted when application closes.
+		/// </summary>
+		/// <param name="BinaryImage">Binary image.</param>
+		/// <returns>Temporary file name.</returns>
+		public static string GetTemporaryFile(byte[] BinaryImage)
+		{
+			string FileName = Path.GetTempFileName();
+			System.IO.File.WriteAllBytes(FileName, BinaryImage);
+
+			lock (synchObject)
+			{
+				if (temporaryFiles == null)
+				{
+					temporaryFiles = new Dictionary<string, bool>();
+					Log.Terminating += CurrentDomain_ProcessExit;
+				}
+
+				temporaryFiles[FileName] = true;
+			}
+
+			return FileName;
 		}
 
 		private static Dictionary<string, bool> temporaryFiles = null;

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Xml;
 using Waher.Content.Xml;
+using Waher.Networking.XMPP.BitsOfBinary;
 using Waher.Networking.XMPP.DataForms.DataTypes;
 using Waher.Networking.XMPP.DataForms.FieldTypes;
 using Waher.Networking.XMPP.DataForms.ValidationMethods;
@@ -99,6 +100,7 @@ namespace Waher.Networking.XMPP.DataForms
 		private string to;
 		private bool containsPostBackFields = false;
 		private bool hasPages = false;
+		private bool hasMedia = false;
 
 		/// <summary>
 		/// Implements support for data forms. Data Forms are defined in the following XEPs:
@@ -179,7 +181,7 @@ namespace Waher.Networking.XMPP.DataForms
 						break;
 
 					case "field":
-						Field Field = this.ParseField((XmlElement)N);
+						Field Field = this.ParseField((XmlElement)N, out Media Media);
 						Fields.Add(Field);
 
 						if (Field.PostBack)
@@ -187,6 +189,15 @@ namespace Waher.Networking.XMPP.DataForms
 
 						if (!string.IsNullOrEmpty(Field.Var))
 							this.fieldsByVar[Field.Var] = Field;
+
+						if (Media != null)
+						{
+							Field = new MediaField(this, Guid.NewGuid().ToString(), string.Empty, false,
+								null, null, string.Empty, new StringDataType(), new BasicValidation(), Media, string.Empty, false, true, false);
+							Fields.Add(Field);
+							this.fieldsByVar[Field.Var] = Field;
+							this.hasMedia = true;
+						}
 						break;
 
 					case "reported":
@@ -196,7 +207,7 @@ namespace Waher.Networking.XMPP.DataForms
 						{
 							if (N2.LocalName == "field")
 							{
-								Field = this.ParseField((XmlElement)N2);
+								Field = this.ParseField((XmlElement)N2, out Media);
 								Header.Add(Field);
 							}
 						}
@@ -211,7 +222,7 @@ namespace Waher.Networking.XMPP.DataForms
 						{
 							if (N2.LocalName == "field")
 							{
-								Field = this.ParseField((XmlElement)N2);
+								Field = this.ParseField((XmlElement)N2, out Media);
 								Record.Add(Field);
 							}
 						}
@@ -241,6 +252,74 @@ namespace Waher.Networking.XMPP.DataForms
 				this.pages = new Page[] { new Page(this, this.title, this.fields) };
 			else
 				this.pages = new Page[] { new Page(this, this.title, new ReportedReference(this)) };
+
+			if (this.hasMedia)
+			{
+				Dictionary<string, byte[]> Bob = new Dictionary<string, byte[]>(StringComparer.CurrentCultureIgnoreCase);
+
+				foreach (XmlNode N in X.ParentNode.ChildNodes)
+				{
+					if (N is XmlElement E && E.LocalName == "data" && E.NamespaceURI == BobClient.Namespace)
+					{
+						string Cid = XML.Attribute(E, "cid");
+						byte[] Bin = Convert.FromBase64String(E.InnerText);
+
+						Bob["cid:" + Cid] = Bin;
+					}
+				}
+
+				foreach (Field F in this.fields)
+				{
+					if (F is MediaField MediaField && MediaField.Media != null)
+					{
+						foreach (KeyValuePair<string, Uri> Uri in MediaField.Media.URIs)
+						{
+							switch (Uri.Value.Scheme.ToLower())
+							{
+								case "cid":
+									if (Bob.TryGetValue(Uri.Value.ToString(), out byte[] Bin))
+										MediaField.Media.Binary = Bin;
+									break;
+
+								case "data":
+									string s = Uri.Value.ToString();
+									string ContentType;
+
+									int i = s.IndexOf(':');
+									if (i > 0)
+										s = s.Substring(i + 1);
+
+									i = s.IndexOf(';');
+									if (i < 0)
+										ContentType = Uri.Key;
+									else
+									{
+										ContentType = s.Substring(0, i);
+										s = s.Substring(i + 1);
+									}
+
+									i = s.IndexOf(',');
+									if (i < 0)
+										break;
+
+									if (s.Substring(0, i) != "base64")
+										break;
+
+									s = s.Substring(i + 1);
+
+									Bin = Convert.FromBase64String(s);
+									MediaField.Media.Binary = Bin;
+									break;
+
+								case "http":
+								case "https":
+									MediaField.Media.URL = Uri.Value.ToString();
+									break;
+							}
+						}
+					}
+				}
+			}
 		}
 
 		/// <summary>
@@ -338,7 +417,7 @@ namespace Waher.Networking.XMPP.DataForms
 			this.pages = new Page[] { new Page(this, this.title, this.fields) };
 		}
 
-		private Field ParseField(XmlElement E)
+		private Field ParseField(XmlElement E, out Media Media)
 		{
 			string Label = XML.Attribute(E, "label");
 			string Type = XML.Attribute(E, "type");
@@ -349,13 +428,14 @@ namespace Waher.Networking.XMPP.DataForms
 			string DataTypeName = null;
 			DataType DataType = null;
 			ValidationMethod ValidationMethod = null;
-			Media Media = null;
 			Field Field;
 			string Error = null;
 			bool Required = false;
 			bool PostBack = false;
 			bool ReadOnly = false;
 			bool NotSame = false;
+
+			Media = null;
 
 			foreach (XmlNode N2 in E.ChildNodes)
 			{
@@ -474,7 +554,7 @@ namespace Waher.Networking.XMPP.DataForms
 					DataType = StringDataType.Instance;
 					break;
 
-				case "anyuri":
+				case "xs:anyuri":
 					DataType = AnyUriDataType.Instance;
 					break;
 
@@ -608,6 +688,9 @@ namespace Waher.Networking.XMPP.DataForms
 						Field = new MediaField(this, Var, Label, Required,
 							ValueStrings?.ToArray(), OptionStrings?.ToArray(),
 							Description, DataType, ValidationMethod, Media, Error, PostBack, ReadOnly, NotSame);
+
+						Media = null;
+						this.hasMedia = true;
 					}
 					break;
 			}
@@ -713,6 +796,14 @@ namespace Waher.Networking.XMPP.DataForms
 		/// If the form contains post-back fields.
 		/// </summary>
 		public bool ContainsPostBackFields { get { return this.containsPostBackFields; } }
+
+		/// <summary>
+		/// If the form contains media.
+		/// </summary>
+		public bool HasMedia
+		{
+			get { return this.hasMedia; }
+		}
 
 		/// <summary>
 		/// Submits the form.

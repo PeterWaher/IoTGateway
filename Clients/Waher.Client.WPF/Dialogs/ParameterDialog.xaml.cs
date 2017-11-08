@@ -168,6 +168,7 @@ namespace Waher.Client.WPF.Dialogs
 
 			Field.Validate(Field.ValueStrings);
 
+
 			if (Field is TextSingleField)
 				this.Layout(Container, (TextSingleField)Field, Form);
 			else if (Field is TextMultiField)
@@ -208,7 +209,7 @@ namespace Waher.Client.WPF.Dialogs
 			}
 
 			CheckBox CheckBox;
-			
+
 			CheckBox = new CheckBox()
 			{
 				Name = "Form_" + Field.Var,
@@ -647,8 +648,19 @@ namespace Waher.Client.WPF.Dialogs
 			{
 				BitmapImage BitmapImage = new System.Windows.Media.Imaging.BitmapImage();
 				BitmapImage.BeginInit();
-				BitmapImage.UriSource = Uri;
-				BitmapImage.EndInit();
+				try
+				{
+					if (Field.Media.Binary != null)
+						BitmapImage.UriSource = new Uri(Waher.Content.Markdown.Model.Multimedia.ImageContent.GetTemporaryFile(Field.Media.Binary));
+					else if (Uri != null)
+						BitmapImage.UriSource = Uri;
+					else if (!string.IsNullOrEmpty(Field.Media.URL))
+						BitmapImage.UriSource = new Uri(Field.Media.URL);
+				}
+				finally
+				{
+					BitmapImage.EndInit();
+				}
 
 				Image Image = new Image()
 				{

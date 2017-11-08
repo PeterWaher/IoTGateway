@@ -2671,6 +2671,7 @@ namespace Waher.Networking.XMPP
 						case "unsupported-feature": return new UnsupportedFeatureException(Msg, E);
 						case "unsupported-stanza-type": return new UnsupportedStanzaTypeException(Msg, E);
 						case "unsupported-version": return new UnsupportedVersionException(Msg, E);
+						case "xml-not-well-formed": return new NotWellFormedException(Msg, E);
 						default: return new XmppException(string.IsNullOrEmpty(Msg) ? "Unrecognized stream error returned." : Msg, E);
 					}
 				}
@@ -3358,11 +3359,13 @@ namespace Waher.Networking.XMPP
 							if (Password != null)
 							{
 								Xml.Append("<password>");
-								Xml.Append(XML.Encode(this.userName));
+								Xml.Append(XML.Encode(this.password));
 								Xml.Append("</password>");
 							}
 
-							this.SendIqSet(e.From, Xml.ToString(), this.RegistrationResultReceived, null);
+							Xml.Append("</query>");
+
+							this.SendIqSet(string.Empty, Xml.ToString(), this.RegistrationResultReceived, null);
 						}
 						return;
 					}

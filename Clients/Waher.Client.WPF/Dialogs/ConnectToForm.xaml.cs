@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using Waher.Networking.XMPP;
+using Waher.Networking.XMPP.DataForms;
 
 namespace Waher.Client.WPF.Dialogs
 {
@@ -76,7 +77,10 @@ namespace Waher.Client.WPF.Dialogs
 				typeof(App).Assembly);
 
 			if (Create)
+			{
 				this.client.AllowRegistration();
+				this.client.OnRegistrationForm += Client_OnRegistrationForm;
+			}
 
 			if (this.TrustServerCertificate.IsChecked.HasValue && this.TrustServerCertificate.IsChecked.Value)
 				this.client.TrustServer = true;
@@ -84,6 +88,19 @@ namespace Waher.Client.WPF.Dialogs
 			this.client.OnStateChanged += new StateChangedEventHandler(Client_OnStateChanged);
 			this.client.OnConnectionError += new XmppExceptionEventHandler(Client_OnConnectionError);
 			this.client.Connect();
+		}
+
+		private void Client_OnRegistrationForm(object Sender, DataForm Form)
+		{
+			Field FormType = Form["FORM_TYPE"];
+			if (FormType != null && FormType.ValueString == "urn:xmpp:captcha")
+			{
+				ParameterDialog Dialog = new ParameterDialog(Form);
+
+				MainWindow.currentInstance.Dispatcher.Invoke(() => Dialog.ShowDialog());
+			}
+			else
+				Form.Submit();
 		}
 
 		private void Client_OnStateChanged(object Sender, XmppState NewState)

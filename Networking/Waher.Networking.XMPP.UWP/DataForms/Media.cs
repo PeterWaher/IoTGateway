@@ -18,6 +18,8 @@ namespace Waher.Networking.XMPP.DataForms
 		private KeyValuePair<string, Uri>[] uris;
 		private int? width;
 		private int? height;
+		private byte[] bin = null;
+		private string url = null;
 
 		internal Media(XmlElement E)
 		{
@@ -71,5 +73,22 @@ namespace Waher.Networking.XMPP.DataForms
 		/// </summary>
 		public int? Height { get { return this.height; } }
 
+		/// <summary>
+		/// Binary content, if available in the form.
+		/// </summary>
+		public byte[] Binary
+		{
+			get { return this.bin; }
+			internal set { this.bin = value; }
+		}
+
+		/// <summary>
+		/// Any web-based URL for the media.
+		/// </summary>
+		public string URL
+		{
+			get { return this.url; }
+			internal set { this.url = value; }
+		}
 	}
 }

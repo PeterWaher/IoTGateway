@@ -273,10 +273,50 @@ namespace Waher.Networking.XMPP.DataForms
 		/// <param name="To">To where the form was sent.</param>
 		/// <param name="Fields">Data form fields.</param>
 		public DataForm(XmppClient Client, FormType Type, string From, string To, params Field[] Fields)
+			: this(Client, Type, null, null, From, To, Fields)
+		{
+		}
+
+		/// <summary>
+		/// Implements support for data forms. Data Forms are defined in the following XEPs:
+		/// 
+		/// XEP-0004: Data Forms:
+		/// http://xmpp.org/extensions/xep-0004.html
+		/// 
+		/// XEP-0122: Data Forms Validation:
+		/// http://xmpp.org/extensions/xep-0122.html
+		/// 
+		/// XEP-0141: Data Forms Layout
+		/// http://xmpp.org/extensions/xep-0141.html
+		/// 
+		/// XEP-0221: Data Forms Media Element
+		/// http://xmpp.org/extensions/xep-0221.html
+		/// 
+		/// XEP-0331: Data Forms - Color Field Types
+		/// http://xmpp.org/extensions/xep-0331.html
+		/// 
+		/// XEP-0336: Data Forms - Dynamic Forms
+		/// http://xmpp.org/extensions/xep-0336.html
+		/// 
+		/// XEP-0348: Signing Forms: 
+		/// http://xmpp.org/extensions/xep-0348.html
+		/// </summary>
+		/// <param name="Client">XMPP Client.</param>
+		/// <param name="OnSubmit">Method called when the form is submitted.</param>
+		/// <param name="OnCancel">Method called when the form is cancelled.</param>
+		/// <param name="From">From where the form came.</param>
+		/// <param name="To">To where the form was sent.</param>
+		/// <param name="Fields">Data form fields.</param>
+		public DataForm(XmppClient Client, DataFormEventHandler OnSubmit, DataFormEventHandler OnCancel, string From, string To, params Field[] Fields)
+			: this(Client, FormType.Form, OnSubmit, OnCancel, From, To, Fields)
+		{
+		}
+
+		private DataForm(XmppClient Client, FormType Type, DataFormEventHandler OnSubmit, DataFormEventHandler OnCancel, string From, string To, params Field[] Fields)
 		{
 			this.client = Client;
-			this.onSubmit = null;
-			this.onCancel = null;
+			this.onSubmit = OnSubmit;
+			this.onCancel = OnCancel;
 			this.type = Type;
 			this.from = From;
 			this.to = To;

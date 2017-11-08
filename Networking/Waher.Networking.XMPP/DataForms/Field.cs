@@ -129,7 +129,7 @@ namespace Waher.Networking.XMPP.DataForms
 		public string Error
 		{
 			get { return this.error; }
-			internal set { this.error = value; }
+			set { this.error = value; }
 		}
 
 		/// <summary>

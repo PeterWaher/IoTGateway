@@ -135,7 +135,12 @@
 			<xsl:value-of select="substring(@timestamp,12)"/>
 		</td>
 		<td>
-			<xsl:value-of select="."/>
+      <xsl:for-each select="so:Row">
+        <xsl:if test="position()>1">
+          <br/>
+        </xsl:if>
+        <xsl:value-of select="."/>
+      </xsl:for-each>
 		</td>
 	</xsl:template>
 

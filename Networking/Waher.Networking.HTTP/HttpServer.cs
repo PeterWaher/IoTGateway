@@ -395,13 +395,7 @@ namespace Waher.Networking.HTTP
 
 				this.Information("Connection accepted from " + Client.Information.RemoteAddress.ToString() + ":" + Client.Information.RemotePort + ".");
 
-				HttpClientConnection Connection = new HttpClientConnection(this, Client, DefaultBufferSize, false);
-
-				if (this.HasSniffers)
-				{
-					foreach (ISniffer Sniffer in this.Sniffers)
-						Connection.Add(Sniffer);
-				}
+				HttpClientConnection Connection = new HttpClientConnection(this, Client, DefaultBufferSize, false, this.Sniffers);
 			}
 			catch (SocketException)
 			{
@@ -439,13 +433,7 @@ namespace Waher.Networking.HTTP
 						else
 						{
 							NetworkStream Stream = Client.GetStream();
-							HttpClientConnection Connection = new HttpClientConnection(this, Client, Stream, Stream, DefaultBufferSize, false);
-
-							if (this.HasSniffers)
-							{
-								foreach (ISniffer Sniffer in this.Sniffers)
-									Connection.Add(Sniffer);
-							}
+							HttpClientConnection Connection = new HttpClientConnection(this, Client, Stream, Stream, DefaultBufferSize, false, this.Sniffers);
 						}
 					}
 					catch (SocketException)
@@ -485,7 +473,7 @@ namespace Waher.Networking.HTTP
 
 				this.Information("TLS established.");
 
-				HttpClientConnection Connection = new HttpClientConnection(this, Client, SslStream, NetworkStream, DefaultBufferSize, true);
+				HttpClientConnection Connection = new HttpClientConnection(this, Client, SslStream, NetworkStream, DefaultBufferSize, true, this.Sniffers);
 
 				if (this.HasSniffers)
 				{

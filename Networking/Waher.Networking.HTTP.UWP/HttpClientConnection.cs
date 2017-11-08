@@ -52,10 +52,12 @@ namespace Waher.Networking.HTTP
 		private bool disposed = false;
 
 #if WINDOWS_UWP
-		internal HttpClientConnection(HttpServer Server, StreamSocket Client, int BufferSize, bool Encrypted)
+		internal HttpClientConnection(HttpServer Server, StreamSocket Client, int BufferSize, bool Encrypted, params ISniffer[] Sniffers)
 #else
-		internal HttpClientConnection(HttpServer Server, TcpClient Client, Stream Stream, NetworkStream NetworkStream, int BufferSize, bool Encrypted)
+		internal HttpClientConnection(HttpServer Server, TcpClient Client, Stream Stream, NetworkStream NetworkStream, int BufferSize,
+			bool Encrypted, params ISniffer[] Sniffers)
 #endif
+			: base(Sniffers)
 		{
 			this.server = Server;
 			this.client = Client;

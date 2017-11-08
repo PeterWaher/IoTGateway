@@ -445,5 +445,13 @@ namespace Waher.Client.WPF.Model
 			throw new NotSupportedException();
 		}
 
+		/// <summary>
+		/// If it's possible to search for data on the node.
+		/// </summary>
+		public virtual bool CanSearch
+		{
+			get { return false; }
+		}
+
 	}
 }

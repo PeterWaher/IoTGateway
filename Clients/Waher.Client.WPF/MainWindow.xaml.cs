@@ -40,6 +40,7 @@ namespace Waher.Client.WPF
 		public static RoutedUICommand ReadDetailed = new RoutedUICommand("Read Detailed", "ReadDetailed", typeof(MainWindow));
 		public static RoutedUICommand SubscribeToMomentary = new RoutedUICommand("Subscribe to Momentary", "SubscribeToMomentary", typeof(MainWindow));
 		public static RoutedUICommand Configure = new RoutedUICommand("Configure", "Configure", typeof(MainWindow));
+		public static RoutedUICommand Search = new RoutedUICommand("Search", "Search", typeof(MainWindow));
 
 		internal static MainWindow currentInstance = null;
 
@@ -183,10 +184,13 @@ namespace Waher.Client.WPF
 				this.AddButton.IsEnabled = false;
 				this.DeleteButton.IsEnabled = false;
 				this.RefreshButton.IsEnabled = false;
+				this.SniffButton.IsEnabled = false;
 				this.ChatButton.IsEnabled = false;
 				this.ReadMomentaryButton.IsEnabled = false;
 				this.ReadDetailedButton.IsEnabled = false;
+				this.ConfigureButton.IsEnabled = false;
 				this.SubscribeMomentaryButton.IsEnabled = false;
+				this.SearchButton.IsEnabled = false;
 			}
 			else
 			{
@@ -199,6 +203,7 @@ namespace Waher.Client.WPF
 				this.ReadDetailedButton.IsEnabled = Node.CanReadSensorData;
 				this.ConfigureButton.IsEnabled = Node.CanConfigure;
 				this.SubscribeMomentaryButton.IsEnabled = Node.CanSubscribeToSensorData;
+				this.SearchButton.IsEnabled = Node.CanSearch;
 			}
 		}
 
@@ -714,6 +719,20 @@ namespace Waher.Client.WPF
 				MessageBox.Show(this, e.ErrorText, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
 			else
 				MessageBox.Show(this, P.ToString(), "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+		}
+
+		private void Search_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+		{
+			TreeNode Node = this.SelectedNode;
+			e.CanExecute = (Node != null && Node.CanSearch);
+		}
+
+		private void Search_Executed(object sender, ExecutedRoutedEventArgs e)
+		{
+			TreeNode Node = this.SelectedNode;
+			if (Node == null || !Node.CanSearch)
+				return;
+
 		}
 
 	}

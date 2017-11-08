@@ -13,6 +13,11 @@ using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Concentrator;
 using Waher.Networking.XMPP.Control;
+using Waher.Networking.XMPP.DataForms;
+using Waher.Networking.XMPP.DataForms.DataTypes;
+using Waher.Networking.XMPP.DataForms.FieldTypes;
+using Waher.Networking.XMPP.DataForms.ValidationMethods;
+using Waher.Networking.XMPP.Provisioning;
 using Waher.Networking.XMPP.Sensor;
 using Waher.Networking.XMPP.ServiceDiscovery;
 using Waher.Client.WPF.Dialogs;
@@ -45,6 +50,7 @@ namespace Waher.Client.WPF.Model
 		private string passwordHashMethod;
 		private bool trustCertificate;
 		private bool connected = false;
+		private bool supportsSearch = false;
 
 		/// <summary>
 		/// Class representing a normal XMPP account.
@@ -138,6 +144,7 @@ namespace Waher.Client.WPF.Model
 					}
 
 					this.CheckRoster();
+					this.SearchComponents();
 					break;
 
 				case XmppState.Offline:
@@ -249,7 +256,9 @@ namespace Waher.Client.WPF.Model
 		internal static readonly BitmapImage folderOpen = new BitmapImage(new Uri("../Graphics/folder-yellow-open-icon.png", UriKind.Relative));
 		internal static readonly BitmapImage box = new BitmapImage(new Uri("../Graphics/App-miscellaneous-icon.png", UriKind.Relative));
 		internal static readonly BitmapImage hourglass = new BitmapImage(new Uri("../Graphics/hourglass-icon.png", UriKind.Relative));
-		
+		internal static readonly BitmapImage database = new BitmapImage(new Uri("../Graphics/Database-icon_16.png", UriKind.Relative));
+		internal static readonly BitmapImage component = new BitmapImage(new Uri("../Graphics/server-components-icon_16.png", UriKind.Relative));
+
 		public override ImageSource ImageResource
 		{
 			get
@@ -333,10 +342,10 @@ namespace Waher.Client.WPF.Model
 
 		public override void Add()
 		{
-            AddContactForm Dialog = new AddContactForm()
-            {
-                Owner = this.connections.Owner
-            };
+			AddContactForm Dialog = new AddContactForm()
+			{
+				Owner = this.connections.Owner
+			};
 
 			bool? Result = Dialog.ShowDialog();
 
@@ -347,7 +356,9 @@ namespace Waher.Client.WPF.Model
 		private void CheckRoster()
 		{
 			SortedDictionary<string, TreeNode> Contacts = this.children;
+			Dictionary<string, TreeNode> Existing = new Dictionary<string, TreeNode>();
 			LinkedList<TreeNode> Added = null;
+			LinkedList<KeyValuePair<string, TreeNode>> Removed = null;
 			LinkedList<RosterItem> Resubscribe = null;
 			LinkedList<RosterItem> Reunsubscribe = null;
 
@@ -356,11 +367,11 @@ namespace Waher.Client.WPF.Model
 
 			lock (Contacts)
 			{
-				XmppContact Contact;
-
 				foreach (RosterItem Item in this.client.Roster)
 				{
-					if (!Contacts.ContainsKey(Item.BareJid))
+					if (Contacts.TryGetValue(Item.BareJid, out TreeNode Contact))
+						Existing[Item.BareJid] = Contact;
+					else
 					{
 						if (Item.IsInGroup(ConcentratorGroupName))
 							Contact = new XmppConcentrator(this, this.client, Item.BareJid, Item.IsInGroup(EventsGroupName));
@@ -401,12 +412,38 @@ namespace Waher.Client.WPF.Model
 
 				if (this.children == null)
 					this.children = Contacts;
+				else
+				{
+					foreach (KeyValuePair<string, TreeNode> P in this.children)
+					{
+						if (P.Value is XmppContact Contact &&
+							!Existing.ContainsKey(Contact.BareJID))
+						{
+							if (Removed == null)
+								Removed = new LinkedList<KeyValuePair<string, TreeNode>>();
+
+							Removed.AddLast(P);
+						}
+					}
+
+					if (Removed != null)
+					{
+						foreach (KeyValuePair<string, TreeNode> P in Removed)
+							this.children.Remove(P.Key);
+					}
+				}
 			}
 
 			if (Added != null)
 			{
 				foreach (TreeNode Node in Added)
 					this.connections.Owner.MainView.NodeAdded(this, Node);
+			}
+
+			if (Removed != null)
+			{
+				foreach (KeyValuePair<string, TreeNode> P in Removed)
+					this.connections.Owner.MainView.NodeRemoved(this, P.Value);
 			}
 
 			if (Resubscribe != null)
@@ -521,9 +558,9 @@ namespace Waher.Client.WPF.Model
 
 					OldTag = Node.Tag;
 					Node = new XmppConcentrator(Node.Parent, this.client, Node.BareJID, SupportsEvents)
-                    {
-					    Tag = OldTag
-                    };
+					{
+						Tag = OldTag
+					};
 
 					this.children[Node.Key] = Node;
 
@@ -539,9 +576,9 @@ namespace Waher.Client.WPF.Model
 
 					OldTag = Node.Tag;
 					Node = new XmppActuator(Node.Parent, this.client, Node.BareJID, IsSensor, SupportsEvents)
-                    {
-					    Tag = OldTag
-                    };
+					{
+						Tag = OldTag
+					};
 
 					this.children[Node.Key] = Node;
 
@@ -564,9 +601,9 @@ namespace Waher.Client.WPF.Model
 
 					OldTag = Node.Tag;
 					Node = new XmppSensor(Node.Parent, this.client, Node.BareJID, SupportsEvents)
-                    {
-					    Tag = OldTag
-                    };
+					{
+						Tag = OldTag
+					};
 
 					this.children[Node.Key] = Node;
 
@@ -584,9 +621,9 @@ namespace Waher.Client.WPF.Model
 				{
 					OldTag = Node.Tag;
 					Node = new XmppOther(Node.Parent, this.client, Node.BareJID)
-                    {
-					    Tag = OldTag
-                    };
+					{
+						Tag = OldTag
+					};
 
 					this.children[Node.Key] = Node;
 
@@ -662,25 +699,12 @@ namespace Waher.Client.WPF.Model
 
 		public override bool CanRecycle
 		{
-			get { return true; }
+			get { return this.client != null; }
 		}
 
 		public override void Recycle(MainWindow Window)
 		{
-			ISniffer[] Sniffers = null;
-
-			this.Removed(Window);
-
-			if (this.client != null)
-			{
-				XmppClient Client = this.client;
-				Sniffers = Client.Sniffers;
-				this.client = null;
-				Client.Dispose();
-			}
-
-			this.Init(Sniffers);
-			this.Added(Window);
+			this.client.Reconnect();
 		}
 
 		public bool IsOnline
@@ -784,5 +808,146 @@ namespace Waher.Client.WPF.Model
 		{
 			get { return this.concentratorClient; }
 		}
+
+		public void SearchComponents()
+		{
+			this.client.SendServiceDiscoveryRequest(string.Empty, (sender, e) =>
+			{
+				this.supportsSearch = e.HasFeature(XmppClient.NamespaceSearch);
+
+				if (!this.supportsSearch)
+				{
+					this.client.SendSearchFormRequest(string.Empty, (sender2, e2) =>
+					{
+						if (e2.Ok)
+							this.supportsSearch = true;
+					}, null);
+				}
+			}, null);
+
+			this.client.SendServiceItemsDiscoveryRequest(string.Empty, (sender, e) =>
+			{
+				foreach (Item Item in e.Items)
+				{
+					this.client.SendServiceDiscoveryRequest(Item.JID, (sender2, e2) =>
+					{
+						XmppComponent Component = null;
+
+						if (this.children == null)
+							this.children = new SortedDictionary<string, TreeNode>();
+
+						lock (this.children)
+						{
+							if (!this.children.ContainsKey(Item.JID))
+							{
+								if (e2.HasFeature(ThingRegistryClient.NamespaceDiscovery))
+								{
+									Component = new ThingRegistry(this, Item.JID, Item.Name, Item.Node,
+										e2.HasFeature(ProvisioningClient.NamespaceProvisioning));
+								}
+								else
+									Component = new XmppComponent(this, Item.JID, Item.Name, Item.Node);
+
+								this.children[Item.JID] = Component;
+							}
+						}
+
+						if (Component != null)
+							this.connections.Owner.MainView.NodeAdded(this, Component);
+
+					}, null);
+				}
+			}, null);
+		}
+
+		public override bool CanConfigure => this.IsOnline;
+
+		public override void GetConfigurationForm(DataFormResultEventHandler Callback, object State)
+		{
+			DataForm Form = new DataForm(this.client, this.ChangePassword, this.CancelChangePassword, this.BareJID, this.BareJID,
+				new TextPrivateField(null, "Password", "New password:", true, new string[] { string.Empty }, null,
+					"Enter new password here.", new StringDataType(), new PasswordValidation(), string.Empty, false, false, false),
+				new TextPrivateField(null, "Password2", "Retype password:", true, new string[] { string.Empty }, null,
+					"Retype password here.", new StringDataType(), new Password2Validation(), string.Empty, false, false, false))
+			{
+				Title = "Change password",
+				Instructions = new string[] { "Enter the new password you wish to use." }
+			};
+
+			Callback(this, new DataFormEventArgs(Form, new IqResultEventArgs(null, string.Empty, this.BareJID, this.BareJID, true, State)));
+		}
+
+		private class PasswordValidation : BasicValidation
+		{
+			public override void Validate(Field Field, DataType DataType, object[] Parsed, string[] Strings)
+			{
+				string Password = Strings[0];
+
+				if (Password.Length < 6)
+					Field.Error = "Password too short.";
+				else
+				{
+					bool Digits = false;
+					bool Lower = false;
+					bool Upper = false;
+
+					foreach (char ch in Password)
+					{
+						Digits |= char.IsDigit(ch);
+						Lower |= char.IsLower(ch);
+						Upper |= char.IsUpper(ch);
+					}
+
+					if (!Digits)
+						Field.Error = "Password must contain digits.";
+					else if (!Lower)
+						Field.Error = "Password must contain lower case characters.";
+					else if (!Upper)
+						Field.Error = "Password must contain upper case characters.";
+				}
+			}
+		}
+
+		private class Password2Validation : BasicValidation
+		{
+			public override void Validate(Field Field, DataType DataType, object[] Parsed, string[] Strings)
+			{
+				string Password = Strings[0];
+
+				if (Password != Field.Form["Password"].ValueString)
+					Field.Error = "Passwords don't match.";
+			}
+		}
+
+		private void ChangePassword(object Sender, DataForm Form)
+		{
+			string NewPassword = Form["Password"].ValueString;
+
+			this.client.ChangePassword(NewPassword, (sender, e) =>
+			{
+				if (e.Ok)
+				{
+					this.connections.Modified = true;
+					this.passwordHash = string.Empty;
+					this.client.Reconnect(this.client.UserName, NewPassword);
+
+					MainWindow.currentInstance.Dispatcher.Invoke(() => MessageBox.Show(MainWindow.currentInstance,
+						"Password successfully changed.", "Success", MessageBoxButton.OK, MessageBoxImage.Information));
+				}
+				else
+				{
+					MainWindow.currentInstance.Dispatcher.Invoke(() => MessageBox.Show(MainWindow.currentInstance,
+						"Unable to change password.", "Error", MessageBoxButton.OK, MessageBoxImage.Error));
+				}
+			}, null);
+		}
+
+		private void CancelChangePassword(object Sender, DataForm Form)
+		{
+		}
+
+		public override bool CanSearch => this.supportsSearch;
+
+
 	}
 }

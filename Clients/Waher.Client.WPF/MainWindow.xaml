@@ -29,6 +29,7 @@
         <CommandBinding Command="{x:Static wcw:MainWindow.ReadDetailed}" Executed="ReadDetailed_Executed" CanExecute="ReadDetailed_CanExecute" />
         <CommandBinding Command="{x:Static wcw:MainWindow.SubscribeToMomentary}" Executed="SubscribeToMomentary_Executed" CanExecute="SubscribeToMomentary_CanExecute" />
         <CommandBinding Command="{x:Static wcw:MainWindow.Configure}" Executed="Configure_Executed" CanExecute="Configure_CanExecute" />
+        <CommandBinding Command="{x:Static wcw:MainWindow.Search}" Executed="Search_Executed" CanExecute="Search_CanExecute" />
     </Window.CommandBindings>
     <Window.InputBindings>
         <KeyBinding Modifiers="Control" Key="O" Command="Open"/>
@@ -44,6 +45,7 @@
         <KeyBinding Modifiers="Control" Key="D" Command="{x:Static wcw:MainWindow.ReadDetailed}"/>
         <KeyBinding Modifiers="Control" Key="B" Command="{x:Static wcw:MainWindow.SubscribeToMomentary}"/>
         <KeyBinding Modifiers="Control" Key="Enter" Command="{x:Static wcw:MainWindow.Configure}"/>
+        <KeyBinding Modifiers="Control" Key="F" Command="{x:Static wcw:MainWindow.Search}"/>
     </Window.InputBindings>
     <DockPanel Name="DockPanel" VerticalAlignment="Stretch" Height="Auto" FocusManager.FocusedElement="{Binding ElementName=ConnectionTree}">
         <Menu Height="23" HorizontalAlignment="Left" Margin="0,0,0,0" Name="MainMenu" VerticalAlignment="Top" 
@@ -120,6 +122,12 @@
                         <Image Source="Graphics/Settings-icon_16.png" Width="16" Height="16" Style="{StaticResource ImageEnabled}"/>
                     </MenuItem.Icon>
                 </MenuItem>
+                <MenuItem/>
+                <MenuItem Name="SearchMenuItem" Header="_Search" Command="{x:Static wcw:MainWindow.Search}" IsEnabled="{Binding ElementName=SearchButton, Path=IsEnabled}">
+                    <MenuItem.Icon>
+                        <Image Source="Graphics/search_16_h.png" Width="16" Height="16" Style="{StaticResource ImageEnabled}"/>
+                    </MenuItem.Icon>
+                </MenuItem>
             </MenuItem>
             <MenuItem Name="ViewMenu" Header="_View" />
             <MenuItem Name="HelpMenu" Header="_Help" />
@@ -170,6 +178,11 @@
                 </Button>
                 <Button Name="ConfigureButton" ToolTip="Configure..." IsEnabled="False" Command="{x:Static wcw:MainWindow.Configure}">
                     <Image Source="Graphics/Settings-icon_32.png" Width="32" Height="32" Style="{StaticResource ImageEnabled}"/>
+                </Button>
+            </ToolBar>
+            <ToolBar Name="DatabaseToolBar">
+                <Button Name="SearchButton" ToolTip="Search..." IsEnabled="False" Command="{x:Static wcw:MainWindow.Search}">
+                    <Image Source="Graphics/search_32_h.png" Width="32" Height="32" Style="{StaticResource ImageEnabled}"/>
                 </Button>
             </ToolBar>
         </ToolBarTray>

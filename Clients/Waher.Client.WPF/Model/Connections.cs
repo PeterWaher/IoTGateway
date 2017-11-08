@@ -95,6 +95,7 @@ namespace Waher.Client.WPF.Model
 		public bool Modified
 		{
 			get { return this.modified; }
+			internal set{ this.modified = true; }
 		}
 
 		/// <summary>

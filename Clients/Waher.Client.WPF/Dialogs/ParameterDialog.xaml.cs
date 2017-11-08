@@ -96,6 +96,21 @@ namespace Waher.Client.WPF.Dialogs
 				else
 					TabItem = null;
 
+				if (Form.Instructions != null && Form.Instructions.Length > 0)
+				{
+					foreach (string Row in Form.Instructions)
+					{
+						TextBlock TextBlock = new TextBlock()
+						{
+							TextWrapping = TextWrapping.Wrap,
+							Margin = new Thickness(0, 5, 0, 5),
+							Text = Row
+						};
+
+						Container.Children.Add(TextBlock);
+					}
+				}
+
 				foreach (LayoutElement Element in Page.Elements)
 					this.Layout(Container, Element, Form);
 

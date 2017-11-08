@@ -137,10 +137,12 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Model\XmppComponent.cs" />
     <Compile Include="Model\Connections.cs" />
     <Compile Include="Model\Loading.cs" />
     <Compile Include="Model\Node.cs" />
     <Compile Include="Model\DataSource.cs" />
+    <Compile Include="Model\ThingRegistry.cs" />
     <Compile Include="Model\XmppConcentrator.cs" />
     <Compile Include="Model\XmppActuator.cs" />
     <Compile Include="Model\XmppOther.cs" />
@@ -242,6 +244,10 @@
     <ProjectReference Include="..\..\Networking\Waher.Networking.XMPP.Control\Waher.Networking.XMPP.Control.csproj">
       <Project>{c5151b99-69e3-4ba1-9328-fba82facf159}</Project>
       <Name>Waher.Networking.XMPP.Control</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Networking\Waher.Networking.XMPP.Provisioning\Waher.Networking.XMPP.Provisioning.csproj">
+      <Project>{3cd1a7c7-7cd1-418d-a6cd-ba057b04ea42}</Project>
+      <Name>Waher.Networking.XMPP.Provisioning</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Networking\Waher.Networking.XMPP.Sensor\Waher.Networking.XMPP.Sensor.csproj">
       <Project>{ac5aff6e-1d81-4142-95c5-472f615f3167}</Project>
@@ -360,6 +366,12 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Graphics\hourglass-icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Graphics\Database-icon_16.png" />
+    <Resource Include="Graphics\Database-icon_32.png" />
+    <Resource Include="Graphics\server-components-icon_16.png" />
+    <Resource Include="Graphics\server-components-icon_32.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\..\packages\SkiaSharp.1.59.2\build\net45\SkiaSharp.targets" Condition="Exists('..\..\packages\SkiaSharp.1.59.2\build\net45\SkiaSharp.targets')" />

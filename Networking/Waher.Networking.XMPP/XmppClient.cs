@@ -3467,6 +3467,17 @@ namespace Waher.Networking.XMPP
 		/// <param name="NewPassword">New password.</param>
 		public void ChangePassword(string NewPassword)
 		{
+			this.ChangePassword(NewPassword, null, null);
+		}
+
+		/// <summary>
+		/// Changes the password of the current user.
+		/// </summary>
+		/// <param name="NewPassword">New password.</param>
+		/// <param name="Callback">Callback method.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void ChangePassword(string NewPassword, IqResultEventHandler Callback, object State)
+		{
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<query xmlns='" + NamespaceRegister + "'><username>");
@@ -3475,7 +3486,7 @@ namespace Waher.Networking.XMPP
 			Xml.Append(XML.Encode(NewPassword));
 			Xml.Append("</password></query>");
 
-			this.SendIqSet(string.Empty, Xml.ToString(), this.ChangePasswordResult, new object[] { NewPassword, true });
+			this.SendIqSet(string.Empty, Xml.ToString(), this.ChangePasswordResult, new object[] { NewPassword, true, Callback, State });
 		}
 
 		private void ChangePasswordResult(object Sender, IqResultEventArgs e)
@@ -3483,6 +3494,8 @@ namespace Waher.Networking.XMPP
 			object[] P = (object[])e.State;
 			string NewPassword = (string)P[0];
 			bool FirstAttempt = (bool)P[1];
+			IqResultEventHandler Callback = (IqResultEventHandler)P[2];
+			object State = P[3];
 
 			if (e.Ok)
 			{
@@ -3561,6 +3574,19 @@ namespace Waher.Networking.XMPP
 				}
 
 				this.Error(e.StanzaError);
+			}
+
+			if (Callback != null)
+			{
+				try
+				{
+					e.State = State;
+					Callback(this, e);
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
 			}
 		}
 

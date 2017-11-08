@@ -95,6 +95,14 @@ namespace Waher.Script.Graphs3D
 			this.ambientAlphaBack = this.ambientReflectionConstantBack * Ambient.Alpha;
 		}
 
+		/// <summary>
+		/// Gets a color for a position.
+		/// </summary>
+		/// <param name="X">X-coordinate.</param>
+		/// <param name="Y">Y-coordinate.</param>
+		/// <param name="Z">Z-coordinate.</param>
+		/// <param name="Normal">Surface normal vector.</param>
+		/// <returns>Color</returns>
 		public SKColor GetColor(float X, float Y, float Z, Vector3 Normal)
 		{
 			Vector3 L;
@@ -283,6 +291,15 @@ namespace Waher.Script.Graphs3D
 			return new SKColor(R2, G2, B2, A2);
 		}
 
+		/// <summary>
+		/// Gets an array of colors.
+		/// </summary>
+		/// <param name="X">X-coordinates.</param>
+		/// <param name="Y">Y-coordinates.</param>
+		/// <param name="Z">Z-coordinates.</param>
+		/// <param name="Normals">Normal vectors.</param>
+		/// <param name="N">Number of coordinates.</param>
+		/// <param name="Colors">Where color values will be stored.</param>
 		public void GetColors(float[] X, float[] Y, float[] Z, Vector3[] Normals, int N, SKColor[] Colors)
 		{
 			int i;

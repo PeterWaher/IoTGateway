@@ -70,14 +70,12 @@ namespace Waher.Networking.HTTP.HeaderFields
 		public string GetBestContentType(params string[] ContentTypes)
 		{
 			ContentTypeAcceptance BestAcceptance = ContentTypeAcceptance.Wildcard;
-			ContentTypeAcceptance Acceptance;
 			string Best = null;
 			double BestQuality = 0;
-			double Quality;
-
+			
 			foreach (string ContentType in ContentTypes)
 			{
-				if (!this.IsAcceptable(ContentType, out Quality, out Acceptance, null))
+				if (!this.IsAcceptable(ContentType, out double Quality, out ContentTypeAcceptance Acceptance, null))
 					continue;
 
 				if (Quality > BestQuality || (Quality == BestQuality && Acceptance > BestAcceptance))
@@ -101,14 +99,12 @@ namespace Waher.Networking.HTTP.HeaderFields
 			params KeyValuePair<string, KeyValuePair<string, string>[]>[] ContentTypes)
 		{
 			ContentTypeAcceptance BestAcceptance = ContentTypeAcceptance.Wildcard;
-			ContentTypeAcceptance Acceptance;
 			KeyValuePair<string, KeyValuePair<string, string>[]> Best = new KeyValuePair<string, KeyValuePair<string, string>[]>(null, null);
 			double BestQuality = 0;
-			double Quality;
-
+			
 			foreach (KeyValuePair<string, KeyValuePair<string, string>[]> ContentType in ContentTypes)
 			{
-				if (!this.IsAcceptable(ContentType.Key, out Quality, out Acceptance, ContentType.Value))
+				if (!this.IsAcceptable(ContentType.Key, out double Quality, out ContentTypeAcceptance Acceptance, ContentType.Value))
 					continue;
 
 				if (Quality > BestQuality || (Quality == BestQuality && Acceptance > BestAcceptance))
@@ -129,9 +125,7 @@ namespace Waher.Networking.HTTP.HeaderFields
 		/// <returns>If content of the given type is acceptable to the client.</returns>
 		public bool IsAcceptable(string ContentType)
 		{
-			ContentTypeAcceptance Acceptance;
-			double Quality;
-			return this.IsAcceptable(ContentType, out Quality, out Acceptance, null);
+			return this.IsAcceptable(ContentType, out double Quality, out ContentTypeAcceptance Acceptance, null);
 		}
 
 		/// <summary>
@@ -142,8 +136,7 @@ namespace Waher.Networking.HTTP.HeaderFields
 		/// <returns>If content of the given type is acceptable to the client.</returns>
 		public bool IsAcceptable(string ContentType, out double Quality)
 		{
-			ContentTypeAcceptance Acceptance;
-			return this.IsAcceptable(ContentType, out Quality, out Acceptance, null);
+			return this.IsAcceptable(ContentType, out Quality, out ContentTypeAcceptance Acceptance, null);
 		}
 
 		/// <summary>
@@ -265,9 +258,11 @@ namespace Waher.Networking.HTTP.HeaderFields
 							break;
 						else if (ch == ';' || ch == ',')
 						{
-							Record = new AcceptRecord();
-							Record.Item = sb.ToString().Trim();
-							Record.Order = Order++;
+							Record = new AcceptRecord()
+							{
+								Item = sb.ToString().Trim(),
+								Order = Order++
+							};
 							sb.Clear();
 
 							if (ch == ';')
@@ -386,9 +381,11 @@ namespace Waher.Networking.HTTP.HeaderFields
 			switch (State)
 			{
 				case 0:
-					Record = new AcceptRecord();
-					Record.Item = sb.ToString().Trim();
-					Record.Order = Order++;
+					Record = new AcceptRecord()
+					{
+						Item = sb.ToString().Trim(),
+						Order = Order++
+					};
 					if (!string.IsNullOrEmpty(Record.Item))
 						Records.Add(Record);
 					break;

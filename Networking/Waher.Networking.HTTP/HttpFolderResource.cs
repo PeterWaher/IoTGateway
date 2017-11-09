@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Net;
 using Waher.Content;
 using Waher.Networking.HTTP.HeaderFields;
+using Waher.Runtime.Inventory;
 using Waher.Security;
 
 namespace Waher.Networking.HTTP
@@ -419,6 +420,35 @@ namespace Waher.Networking.HTTP
 						{
 							Acceptable = true;
 							break;
+						}
+					}
+
+					if (Converter == null)
+					{
+						IContentConverter[] Converters = InternetContent.GetConverters(ContentType);
+
+						if (Converters != null)
+						{
+							double BestQuality = 0;
+							IContentConverter Best = null;
+
+							foreach (IContentConverter Converter2 in InternetContent.Converters)
+							{
+								foreach (string ToContentType in Converter2.ToContentTypes)
+								{
+									if (Header.Accept.IsAcceptable(ToContentType, out double Quality2) && Quality > BestQuality)
+									{
+										BestQuality = Quality;
+										Best = Converter2;
+									}
+								}
+							}
+
+							if (!Acceptable || BestQuality >= Quality)
+							{
+								Acceptable = true;
+								Converter = Best;
+							}
 						}
 					}
 

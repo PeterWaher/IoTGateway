@@ -27,7 +27,7 @@ namespace Waher.Content
 			new Dictionary<string, KeyValuePair<Grade, IContentDecoder>>(StringComparer.CurrentCultureIgnoreCase);
 		private static Dictionary<string, string> contentTypeByFileExtensions = new Dictionary<string, string>(StringComparer.CurrentCultureIgnoreCase);
 		private static Dictionary<string, IContentConverter> convertersByStep = new Dictionary<string, IContentConverter>(StringComparer.CurrentCultureIgnoreCase);
-		private static Dictionary<string, LinkedList<IContentConverter>> convertersByFrom = new Dictionary<string, LinkedList<IContentConverter>>();
+		private static Dictionary<string, List<IContentConverter>> convertersByFrom = new Dictionary<string, List<IContentConverter>>();
 
 		static InternetContent()
 		{
@@ -558,7 +558,7 @@ namespace Waher.Content
 				if (convertersByStep.TryGetValue(PathKey, out Converter))
 					return Converter != null;
 
-				if (!convertersByFrom.TryGetValue(FromContentType, out LinkedList<IContentConverter> Converters))
+				if (!convertersByFrom.TryGetValue(FromContentType, out List<IContentConverter> Converters))
 					return false;
 
 				LinkedList<ConversionStep> Queue = new LinkedList<ConversionStep>();
@@ -702,13 +702,13 @@ namespace Waher.Content
 
 					foreach (string From in Converter.FromContentTypes)
 					{
-						if (!convertersByFrom.TryGetValue(From, out LinkedList<IContentConverter> List))
+						if (!convertersByFrom.TryGetValue(From, out List<IContentConverter> List))
 						{
-							List = new LinkedList<IContentConverter>();
+							List = new List<IContentConverter>();
 							convertersByFrom[From] = List;
 						}
 
-						List.AddLast(Converter);
+						List.Add(Converter);
 
 						foreach (string To in Converter.ToContentTypes)
 						{
@@ -719,6 +719,25 @@ namespace Waher.Content
 			}
 
 			converters = Converters.ToArray();
+		}
+
+		/// <summary>
+		/// Gets available converters that can convert content from a given type.
+		/// </summary>
+		/// <param name="FromContentType">From which content type converters have to convert.</param>
+		/// <returns>Available converters, or null if there are none.</returns>
+		public static IContentConverter[] GetConverters(string FromContentType)
+		{
+			lock (convertersByStep)
+			{
+				if (converters == null)
+					FindConverters();
+
+				if (!convertersByFrom.TryGetValue(FromContentType, out List<IContentConverter> Converters))
+					return null;
+
+				return Converters.ToArray();
+			}
 		}
 
 		#endregion

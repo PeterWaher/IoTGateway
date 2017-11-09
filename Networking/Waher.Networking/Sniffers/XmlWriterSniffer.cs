@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
 using System.Xml;
+using Waher.Events;
 
 namespace Waher.Networking.Sniffers
 {
@@ -177,24 +178,31 @@ namespace Waher.Networking.Sniffers
 
 			lock (this.synchObject)
 			{
-				this.BeforeWrite();
-				if (this.output != null)
+				try
 				{
-					try
+					this.BeforeWrite();
+					if (this.output != null)
 					{
-						this.output.WriteStartElement(TagName);
-						this.output.WriteAttributeString("timestamp", Encode(DateTime.Now));
+						try
+						{
+							this.output.WriteStartElement(TagName);
+							this.output.WriteAttributeString("timestamp", Encode(DateTime.Now));
 
-						foreach (string Row in GetRows(Text))
-							this.output.WriteElementString("Row", Row);
+							foreach (string Row in GetRows(Text))
+								this.output.WriteElementString("Row", Row);
 
-						this.output.WriteEndElement();
-						this.output.Flush();
+							this.output.WriteEndElement();
+							this.output.Flush();
+						}
+						finally
+						{
+							this.AfterWrite();
+						}
 					}
-					finally
-					{
-						this.AfterWrite();
-					}
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
 				}
 			}
 		}

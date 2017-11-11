@@ -43,6 +43,7 @@ namespace Waher.Client.WPF.Model
 		private Timer connectionTimer;
 		private Exception lastError = null;
 		private string host;
+		private string domain;
 		private int port;
 		private string account;
 		private string password;
@@ -51,6 +52,7 @@ namespace Waher.Client.WPF.Model
 		private bool trustCertificate;
 		private bool connected = false;
 		private bool supportsSearch = false;
+		private bool allowInsecureAuthentication = false;
 
 		/// <summary>
 		/// Class representing a normal XMPP account.
@@ -63,18 +65,20 @@ namespace Waher.Client.WPF.Model
 		/// <param name="PasswordHash">Password hash.</param>
 		/// <param name="PasswordHashMethod">Password hash method.</param>
 		/// <param name="TrustCertificate">If the server certificate should be trusted.</param>
+		/// <param name="AllowInsecureAuthentication">If insecure authentication mechanisms are to be allowed.</param>
 		public XmppAccountNode(Connections Connections, TreeNode Parent, string Host, int Port, string Account,
-			string PasswordHash, string PasswordHashMethod, bool TrustCertificate)
+			string PasswordHash, string PasswordHashMethod, bool TrustCertificate, bool AllowInsecureAuthentication)
 			: base(Parent)
 		{
 			this.connections = Connections;
-			this.host = Host;
+			this.host = this.domain = Host;
 			this.port = Port;
 			this.account = Account;
 			this.password = string.Empty;
 			this.passwordHash = PasswordHash;
 			this.passwordHashMethod = PasswordHashMethod;
 			this.trustCertificate = TrustCertificate;
+			this.allowInsecureAuthentication = AllowInsecureAuthentication;
 
 			this.Init();
 		}
@@ -84,12 +88,14 @@ namespace Waher.Client.WPF.Model
 		{
 			this.connections = Connections;
 			this.host = XML.Attribute(E, "host");
+			this.domain = XML.Attribute(E, "domain", this.host);
 			this.port = XML.Attribute(E, "port", 5222);
 			this.account = XML.Attribute(E, "account");
 			this.password = XML.Attribute(E, "password");
 			this.passwordHash = XML.Attribute(E, "passwordHash");
 			this.passwordHashMethod = XML.Attribute(E, "passwordHashMethod");
 			this.trustCertificate = XML.Attribute(E, "trustCertificate", false);
+			this.allowInsecureAuthentication = XML.Attribute(E, "allowInsecureAuthentication", false);
 
 			this.Init();
 		}
@@ -114,6 +120,13 @@ namespace Waher.Client.WPF.Model
 			this.client.OnRosterItemRemoved += new RosterItemEventHandler(Client_OnRosterItemRemoved);
 			this.client.OnRosterItemUpdated += new RosterItemEventHandler(Client_OnRosterItemUpdated);
 			this.connectionTimer = new Timer(this.CheckConnection, null, 60000, 60000);
+
+			if (this.allowInsecureAuthentication)
+			{
+				this.client.AllowPlain = true;
+				this.client.AllowCramMD5 = true;
+				this.client.AllowDigestMD5 = true;
+			}
 
 			this.client.SetPresence(Availability.Chat);
 
@@ -141,6 +154,13 @@ namespace Waher.Client.WPF.Model
 					{
 						this.passwordHash = this.client.PasswordHash;
 						this.passwordHashMethod = this.client.PasswordHashMethod;
+						this.connections.Modified = true;
+					}
+
+					if (this.domain != this.client.Domain)
+					{
+						this.domain = this.client.Domain;
+						this.connections.Modified = true;
 					}
 
 					this.CheckRoster();
@@ -165,10 +185,11 @@ namespace Waher.Client.WPF.Model
 		public string PasswordHash { get { return this.passwordHash; } }
 		public string PasswordHashMethod { get { return this.passwordHashMethod; } }
 		public bool TrustCertificate { get { return this.trustCertificate; } }
+		public bool AllowInsecureAuthentication { get { return this.allowInsecureAuthentication; } }
 
 		public override string Header
 		{
-			get { return this.account + "@" + this.host; }
+			get { return this.account + "@" + this.domain; }
 		}
 
 		public override string TypeName
@@ -231,6 +252,7 @@ namespace Waher.Client.WPF.Model
 		{
 			Output.WriteStartElement("XmppAccount");
 			Output.WriteAttributeString("host", this.host);
+			Output.WriteAttributeString("domain", this.domain);
 			Output.WriteAttributeString("port", this.port.ToString());
 			Output.WriteAttributeString("account", this.account);
 
@@ -243,6 +265,8 @@ namespace Waher.Client.WPF.Model
 			}
 
 			Output.WriteAttributeString("trustCertificate", CommonTypes.Encode(this.trustCertificate));
+			Output.WriteAttributeString("allowInsecureAuthentication", CommonTypes.Encode(this.allowInsecureAuthentication));
+
 			Output.WriteEndElement();
 		}
 

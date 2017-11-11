@@ -15,14 +15,16 @@
 	</xs:element>
 
 	<xs:complexType name="XmppAccount">
-		<xs:attribute name="host" type="xs:string" use="required"/>
-		<xs:attribute name="port" type="PortNumber" use="optional" default="5222"/>
+    <xs:attribute name="host" type="xs:string" use="required"/>
+    <xs:attribute name="port" type="PortNumber" use="optional" default="5222"/>
 		<xs:attribute name="account" type="xs:string" use="required"/>
 		<xs:attribute name="password" type="xs:string" use="optional"/>
 		<xs:attribute name="passwordHash" type="xs:string" use="optional"/>
 		<xs:attribute name="passwordHashMethod" type="xs:string" use="optional"/>
-		<xs:attribute name="trustCertificate" type="xs:boolean" use="optional" default="false"/>
-	</xs:complexType>
+    <xs:attribute name="domain" type="xs:string" use="optional"/>
+    <xs:attribute name="trustCertificate" type="xs:boolean" use="optional" default="false"/>
+    <xs:attribute name="allowInsecureAuthentication" type="xs:boolean" use="optional" default="false"/>
+  </xs:complexType>
 
 	<xs:simpleType name="PortNumber">
 		<xs:restriction base="xs:positiveInteger">

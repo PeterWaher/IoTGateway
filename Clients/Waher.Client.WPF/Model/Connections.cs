@@ -119,6 +119,8 @@ namespace Waher.Client.WPF.Model
 						w.Flush();
 					}
 				}
+
+				this.modified = false;
 			}
 		}
 

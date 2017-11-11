@@ -288,8 +288,11 @@ namespace Waher.Client.WPF.Controls
 				string PasswordHash = Dialog.PasswordHash;
 				string PasswordHashMethod = Dialog.PasswordHashMethod;
 				bool TrustCertificate = Dialog.TrustServerCertificate.IsChecked.HasValue && Dialog.TrustServerCertificate.IsChecked.Value;
+				bool AllowInsecureAuthentication = Dialog.AllowInsecureAuthentication.IsChecked.HasValue && Dialog.AllowInsecureAuthentication.IsChecked.Value;
 
-				XmppAccountNode Node = new XmppAccountNode(this.connections, null, Host, Port, Account, PasswordHash, PasswordHashMethod, TrustCertificate);
+				XmppAccountNode Node = new XmppAccountNode(this.connections, null, Host, Port, Account, PasswordHash, PasswordHashMethod, 
+					TrustCertificate, AllowInsecureAuthentication);
+
 				this.connections.Add(Node);
 				this.AddNode(Node);
 			}

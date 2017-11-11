@@ -76,6 +76,13 @@ namespace Waher.Client.WPF.Dialogs
 			this.client = new XmppClient(this.XmppServer.Text, Port, this.AccountName.Text, this.Password.Password, "en",
 				typeof(App).Assembly);
 
+			if (this.AllowInsecureAuthentication.IsChecked.HasValue && this.AllowInsecureAuthentication.IsChecked.Value)
+			{
+				this.client.AllowPlain = true;
+				this.client.AllowCramMD5 = true;
+				this.client.AllowDigestMD5 = true;
+			}
+
 			if (Create)
 			{
 				this.client.AllowRegistration();

@@ -838,6 +838,7 @@ namespace Waher.IoTGateway
 
 			using (XmppClient Client = new XmppClient(xmppClient.Host, xmppClient.Port, UserName, Password, "en", typeof(Gateway).Assembly))
 			{
+				Client.TrustServer = xmppClient.TrustServer;
 				Client.AllowCramMD5 = xmppClient.AllowCramMD5;
 				Client.AllowDigestMD5 = xmppClient.AllowDigestMD5;
 				Client.AllowPlain = xmppClient.AllowPlain;

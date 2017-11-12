@@ -835,7 +835,7 @@ namespace Waher.Client.WPF.Model
 
 		public void SearchComponents()
 		{
-			this.client.SendServiceDiscoveryRequest(string.Empty, (sender, e) =>
+			this.client.SendServiceDiscoveryRequest(this.client.Domain, (sender, e) =>
 			{
 				this.supportsSearch = e.HasFeature(XmppClient.NamespaceSearch);
 
@@ -845,11 +845,11 @@ namespace Waher.Client.WPF.Model
 					{
 						if (e2.Ok)
 							this.supportsSearch = true;
-					}, null);
+					}, null, null);
 				}
 			}, null);
 
-			this.client.SendServiceItemsDiscoveryRequest(string.Empty, (sender, e) =>
+			this.client.SendServiceItemsDiscoveryRequest(this.client.Domain, (sender, e) =>
 			{
 				foreach (Item Item in e.Items)
 				{
@@ -865,12 +865,9 @@ namespace Waher.Client.WPF.Model
 							if (!this.children.ContainsKey(Item.JID))
 							{
 								if (e2.HasFeature(ThingRegistryClient.NamespaceDiscovery))
-								{
-									Component = new ThingRegistry(this, Item.JID, Item.Name, Item.Node,
-										e2.HasFeature(ProvisioningClient.NamespaceProvisioning));
-								}
+									Component = new ThingRegistry(this, Item.JID, Item.Name, Item.Node, e2.Features);
 								else
-									Component = new XmppComponent(this, Item.JID, Item.Name, Item.Node);
+									Component = new XmppComponent(this, Item.JID, Item.Name, Item.Node, e2.Features);
 
 								this.children[Item.JID] = Component;
 							}
@@ -1068,9 +1065,6 @@ namespace Waher.Client.WPF.Model
 
 			return Request;
 		}
-
-		public override bool CanSearch => this.supportsSearch;
-
 
 	}
 }

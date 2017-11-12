@@ -32,6 +32,9 @@ using Waher.Networking.XMPP.AuthenticationErrors;
 using Waher.Networking.XMPP.StanzaErrors;
 using Waher.Networking.XMPP.StreamErrors;
 using Waher.Networking.XMPP.DataForms;
+using Waher.Networking.XMPP.DataForms.DataTypes;
+using Waher.Networking.XMPP.DataForms.FieldTypes;
+using Waher.Networking.XMPP.DataForms.ValidationMethods;
 using Waher.Networking.XMPP.ServiceDiscovery;
 using Waher.Networking.XMPP.SoftwareVersion;
 using Waher.Networking.XMPP.Search;
@@ -5428,11 +5431,12 @@ namespace Waher.Networking.XMPP
 		/// Sends a search form request
 		/// </summary>
 		/// <param name="To">Destination address.</param>
-		/// <param name="Callback">Method to call when response or error is returned.</param>
+		/// <param name="FormCallback">Method to call when search form response or error is returned.</param>
+		/// <param name="ResultCallback">Method to call when search result is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void SendSearchFormRequest(string To, SearchFormEventHandler Callback, object State)
+		public void SendSearchFormRequest(string To, SearchFormEventHandler FormCallback, SearchResultEventHandler ResultCallback, object State)
 		{
-			SendSearchFormRequest(null, To, Callback, State);
+			SendSearchFormRequest(null, To, FormCallback, ResultCallback, State);
 		}
 
 		/// <summary>
@@ -5441,10 +5445,11 @@ namespace Waher.Networking.XMPP
 		/// <param name="E2eEncryption">Optional End-to-end encryption interface. If end-to-end encryption
 		/// cannot be established, the request is sent normally.</param>
 		/// <param name="To">Destination address.</param>
-		/// <param name="Callback">Method to call when response or error is returned.</param>
+		/// <param name="FormCallback">Method to call when search form response or error is returned.</param>
+		/// <param name="ResultCallback">Method to call when search result is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void SendSearchFormRequest(IEndToEndEncryption E2eEncryption, string To,
-			SearchFormEventHandler Callback, object State)
+			SearchFormEventHandler FormCallback, SearchResultEventHandler ResultCallback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -5455,34 +5460,36 @@ namespace Waher.Networking.XMPP
 			if (E2eEncryption != null)
 			{
 				E2eEncryption.SendIqGet(this, E2ETransmission.NormalIfNotE2E, To, Xml.ToString(),
-					this.SearchFormResponse, new object[] { Callback, State });
+					this.SearchFormResponse, new object[] { FormCallback, ResultCallback, State });
 			}
 			else
-				this.SendIqGet(To, Xml.ToString(), this.SearchFormResponse, new object[] { Callback, State });
+				this.SendIqGet(To, Xml.ToString(), this.SearchFormResponse, new object[] { FormCallback, ResultCallback, State });
 		}
 
 		private void SearchFormResponse(object Sender, IqResultEventArgs e)
 		{
 			object[] P = (object[])e.State;
-			SearchFormEventHandler Callback = (SearchFormEventHandler)P[0];
-			object State = P[1];
+			SearchFormEventHandler FormCallback = (SearchFormEventHandler)P[0];
+			SearchResultEventHandler ResultCallback = (SearchResultEventHandler)P[1];
+			object State = P[2];
 			List<Item> Items = new List<Item>();
 
-			if (Callback != null)
+			if (FormCallback != null)
 			{
+				DataForm SearchForm = null;
+				string Instructions = null;
+				string First = null;
+				string Last = null;
+				string Nick = null;
+				string EMail = null;
+				bool SupportsForms = false;
+
 				if (e.Ok)
 				{
 					foreach (XmlNode N in e.Response.ChildNodes)
 					{
 						if (N.LocalName == "query")
 						{
-							DataForm SearchForm = null;
-							string Instructions = null;
-							string First = null;
-							string Last = null;
-							string Nick = null;
-							string EMail = null;
-
 							foreach (XmlNode N2 in N.ChildNodes)
 							{
 								switch (N2.LocalName)
@@ -5508,34 +5515,82 @@ namespace Waher.Networking.XMPP
 										break;
 
 									case "x":
-										SearchForm = new DataForm(this, (XmlElement)N2, null, null, e.From, e.To);
+										SearchForm = new DataForm(this, (XmlElement)N2, this.SubmitSearchDataForm, this.CancelSearchDataForm, e.From, e.To);
+										SupportsForms = true;
 										break;
-
 								}
 							}
 
-							SearchFormEventArgs e2 = new SearchFormEventArgs(this, e, Instructions, First, Last, Nick, EMail, SearchForm)
+							if (SearchForm == null)
 							{
-								State = State
-							};
+								List<Field> Fields = new List<Field>();
+								string Tooltip = "Use asterisks (*) to do wildcard searches.";
 
-							if (SearchForm != null)
-								SearchForm.State = e2;
+								if (First != null)
+								{
+									Fields.Add(new TextSingleField(null, "first", "First name:", false, new string[] { First }, null,
+										Tooltip, new StringDataType(), new BasicValidation(), string.Empty, false, false, false));
+								}
 
-							try
-							{
-								Callback(this, e2);
+								if (Last != null)
+								{
+									Fields.Add(new TextSingleField(null, "last", "Last name:", false, new string[] { Last }, null,
+										Tooltip, new StringDataType(), new BasicValidation(), string.Empty, false, false, false));
+								}
+
+								if (Nick != null)
+								{
+									Fields.Add(new TextSingleField(null, "nick", "Nick name:", false, new string[] { Nick }, null,
+										Tooltip, new StringDataType(), new BasicValidation(), string.Empty, false, false, false));
+								}
+
+								if (EMail != null)
+								{
+									Fields.Add(new TextSingleField(null, "email", "e-Mail:", false, new string[] { EMail }, null,
+										Tooltip, new StringDataType(), new BasicValidation(), string.Empty, false, false, false));
+								}
+
+								SearchForm = new DataForm(this, this.SubmitSearchDataForm, this.CancelSearchDataForm, e.From, e.To, Fields.ToArray());
+
+								if (!string.IsNullOrEmpty(Instructions))
+									SearchForm.Instructions = new string[] { Instructions };
 							}
-							catch (Exception ex)
-							{
-								this.Exception(ex);
-							}
-
-							break;
 						}
 					}
 				}
+
+				SearchFormEventArgs e2 = new SearchFormEventArgs(this, e, Instructions, First, Last, Nick, EMail, SearchForm, SupportsForms)
+				{
+					State = State
+				};
+
+				if (SearchForm != null)
+					SearchForm.State = new object[] { ResultCallback, State, e2 };
+
+				try
+				{
+					FormCallback(this, e2);
+				}
+				catch (Exception ex)
+				{
+					this.Exception(ex);
+				}
 			}
+		}
+
+		private void SubmitSearchDataForm(object Sender, DataForm Form)
+		{
+			object[] P = (object[])Form.State;
+			SearchResultEventHandler ResultCallback = (SearchResultEventHandler)P[0];
+			object State = P[1];
+			SearchFormEventArgs e = (SearchFormEventArgs)P[2];
+
+			e.SendSearchRequest(ResultCallback, State);
+		}
+
+		private void CancelSearchDataForm(object Sender, DataForm Form)
+		{
+			// Do nothing.
 		}
 
 		/// <summary>
@@ -5568,7 +5623,7 @@ namespace Waher.Networking.XMPP
 				{
 					e = e2;
 					Done.Set();
-				}, null);
+				}, null, null);
 
 				if (!Done.WaitOne(Timeout))
 					throw new TimeoutException();

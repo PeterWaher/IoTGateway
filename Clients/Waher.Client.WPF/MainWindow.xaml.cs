@@ -733,6 +733,14 @@ namespace Waher.Client.WPF
 			if (Node == null || !Node.CanSearch)
 				return;
 
+			try
+			{
+				Node.Search();
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show(this, ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+			}
 		}
 
 	}

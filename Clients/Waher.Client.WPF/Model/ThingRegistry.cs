@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
+using Waher.Networking.XMPP.Provisioning;
 
 namespace Waher.Client.WPF.Model
 {
@@ -10,10 +11,10 @@ namespace Waher.Client.WPF.Model
 	{
 		private bool supportsProvisioning;
 
-		public ThingRegistry(TreeNode Parent, string JID, string Name, string Node, bool SupportsProvisioning)
-			: base(Parent, JID, Name, Node)
+		public ThingRegistry(TreeNode Parent, string JID, string Name, string Node, Dictionary<string, bool> Features)
+			: base(Parent, JID, Name, Node, Features)
 		{
-			this.supportsProvisioning = SupportsProvisioning;
+			this.supportsProvisioning = Features.ContainsKey(ProvisioningClient.NamespaceProvisioning);
 		}
 
 		public override ImageSource ImageResource => XmppAccountNode.database;

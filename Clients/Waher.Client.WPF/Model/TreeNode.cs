@@ -453,5 +453,13 @@ namespace Waher.Client.WPF.Model
 			get { return false; }
 		}
 
+		/// <summary>
+		/// Performs a search on the node.
+		/// </summary>
+		public virtual void Search()
+		{
+			throw new NotSupportedException();
+		}
+
 	}
 }

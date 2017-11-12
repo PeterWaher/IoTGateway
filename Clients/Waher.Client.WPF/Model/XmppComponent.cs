@@ -1,25 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Media;
 using System.Xml;
+using Waher.Networking.XMPP;
+using Waher.Client.WPF.Dialogs;
 
 namespace Waher.Client.WPF.Model
 {
 	public class XmppComponent : TreeNode
 	{
+		private Dictionary<string, bool> features;
 		private string jid;
 		private string name;
 		private string node;
+		private bool canSearch;
 
-		public XmppComponent(TreeNode Parent, string JID, string Name, string Node)
+		public XmppComponent(TreeNode Parent, string JID, string Name, string Node, Dictionary<string, bool> Features)
 			: base(Parent)
 		{
 			this.jid = JID;
 			this.name = Name;
 			this.node = Node;
+			this.features = Features;
+			this.canSearch = this.features.ContainsKey(XmppClient.NamespaceSearch);
 		}
 
 		public override string Key => this.jid;
@@ -54,5 +60,36 @@ namespace Waher.Client.WPF.Model
 		{
 			// Don't output.
 		}
+
+		public XmppAccountNode Account
+		{
+			get { return this.Parent as XmppAccountNode; }
+		}
+
+		public override bool CanSearch => this.canSearch;
+
+		public override void Search()
+		{
+			this.Account?.Client?.SendSearchFormRequest(this.jid, (sender, e) =>
+			{
+				if (e.Ok)
+				{
+					MainWindow.currentInstance.Dispatcher.Invoke(() =>
+					{
+						ParameterDialog Dialog = new ParameterDialog(e.SearchForm);
+						Dialog.ShowDialog();
+					});
+				}
+				else
+				{
+					MainWindow.currentInstance.Dispatcher.Invoke(() => MessageBox.Show(MainWindow.currentInstance,
+						"Unable to get search form.", "Error", MessageBoxButton.OK, MessageBoxImage.Error));
+				}
+			}, (sender, e) =>
+			{
+			}, null);
+		}
+
+
 	}
 }

@@ -27,9 +27,10 @@ namespace Waher.Networking.XMPP.Search
 		private string last;
 		private string nick;
 		private string email;
+		private bool supportsForms;
 
 		internal SearchFormEventArgs(XmppClient Client, IqResultEventArgs e, string Instructions, string First, string Last, string Nick, string EMail,
-			DataForm SearchForm)
+			DataForm SearchForm, bool SupportsForms)
 			: base(e)
 		{
 			this.client = Client;
@@ -39,6 +40,7 @@ namespace Waher.Networking.XMPP.Search
 			this.nick = Nick;
 			this.email = EMail;
 			this.searchForm = SearchForm;
+			this.supportsForms = SupportsForms;
 		}
 
 		/// <summary>
@@ -130,6 +132,14 @@ namespace Waher.Networking.XMPP.Search
 			}
 		}
 
+		/// <summary>
+		/// If the remote end supports search forms, or if the form was constructed on the client side.
+		/// </summary>
+		public bool SupportsForms
+		{
+			get { return this.supportsForms; }
+		}
+
 		private string GetField(string FixedValue, string Var)
 		{
 			if (!string.IsNullOrEmpty(FixedValue))
@@ -155,6 +165,25 @@ namespace Waher.Networking.XMPP.Search
 				if (Field != null)
 					Field.SetValue(Value);
 			}
+
+			switch (Var)
+			{
+				case "first":
+					this.first = Value;
+					break;
+
+				case "last":
+					this.last = Value;
+					break;
+
+				case "nick":
+					this.nick = Value;
+					break;
+
+				case "email":
+					this.email = Value;
+					break;
+			}
 		}
 
 		/// <summary>
@@ -170,7 +199,7 @@ namespace Waher.Networking.XMPP.Search
 			Xml.Append(XmppClient.NamespaceSearch);
 			Xml.Append("'>");
 
-			if (this.searchForm == null)
+			if (!this.supportsForms)
 			{
 				if (!string.IsNullOrEmpty(this.first))
 				{
@@ -231,13 +260,14 @@ namespace Waher.Networking.XMPP.Search
 						{
 							if (N2.LocalName == "item")
 							{
-								Dictionary<string, string> Record = new Dictionary<string, string>();
-								Record["jid"] = XML.Attribute((XmlElement)N2, "jid");
+								Dictionary<string, string> Record = new Dictionary<string, string>()
+								{
+									{ "jid", XML.Attribute((XmlElement)N2, "jid") }
+								};
 
 								foreach (XmlNode N3 in N2.ChildNodes)
 								{
-									XmlElement E = N3 as XmlElement;
-									if (E != null)
+									if (N3 is XmlElement E)
 										Record[E.LocalName] = E.InnerText;
 								}
 
@@ -253,8 +283,10 @@ namespace Waher.Networking.XMPP.Search
 
 		private void CallResponseMethod(SearchResultEventHandler Callback, object State, List<Dictionary<string, string>> Records, IqResultEventArgs e)
 		{
-			SearchResultEventArgs e2 = new SearchResultEventArgs(Records.ToArray(), e);
-			e2.State = State;
+			SearchResultEventArgs e2 = new SearchResultEventArgs(Records.ToArray(), e)
+			{
+				State = State
+			};
 
 			if (Callback != null)
 			{
@@ -275,7 +307,7 @@ namespace Waher.Networking.XMPP.Search
 			SearchResultEventHandler Callback = (SearchResultEventHandler)P[0];
 			object State = P[1];
 			List<Dictionary<string, string>> Records = new List<Dictionary<string, string>>();
-			
+
 			if (e.Ok)
 			{
 				foreach (XmlNode N in e.Response.ChildNodes)

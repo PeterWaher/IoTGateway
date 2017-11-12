@@ -50,7 +50,7 @@ namespace Waher.Networking.XMPP.DataForms.FieldTypes
 		{
 			base.Validate(Value);
 
-			if (!this.HasError)
+			if (!this.HasError && Value != null)
 			{
 				foreach (string s in Value)
 				{

@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
 using System.Xml;
 using Waher.Networking.XMPP;
 using Waher.Client.WPF.Dialogs;
+using Waher.Client.WPF.Controls;
 
 namespace Waher.Client.WPF.Model
 {
@@ -70,7 +72,7 @@ namespace Waher.Client.WPF.Model
 
 		public override void Search()
 		{
-			this.Account?.Client?.SendSearchFormRequest(this.jid, (sender, e) =>
+			this.Account?.Client?.SendSearchFormRequest(null, this.jid, (sender, e) =>
 			{
 				if (e.Ok)
 				{
@@ -90,6 +92,18 @@ namespace Waher.Client.WPF.Model
 			{
 				if (e.Ok)
 				{
+					MainWindow.currentInstance.Dispatcher.Invoke(() =>
+					{
+						TabItem TabItem = new TabItem();
+						MainWindow.currentInstance.Tabs.Items.Add(TabItem);
+
+						SearchResultView View = new SearchResultView(e.Headers, e.Records);
+
+						TabItem.Header = "Search Result";
+						TabItem.Content = View;
+
+						MainWindow.currentInstance.Tabs.SelectedItem = TabItem;
+					});
 				}
 				else
 				{

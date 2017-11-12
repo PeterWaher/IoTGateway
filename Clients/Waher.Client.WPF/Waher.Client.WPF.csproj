@@ -75,6 +75,9 @@
     <Compile Include="Controls\ConnectionView.xaml.cs">
       <DependentUpon>ConnectionView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\SearchResultView.xaml.cs">
+      <DependentUpon>SearchResultView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\SensorDataView.xaml.cs">
       <DependentUpon>SensorDataView.xaml</DependentUpon>
     </Compile>
@@ -92,6 +95,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Controls\ConnectionView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\SearchResultView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -191,6 +198,9 @@
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <None Include="README.md" />
+    <EmbeddedResource Include="Schema\SearchResult.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Graphics\open_document_32_h.png" />
@@ -372,6 +382,11 @@
     <Resource Include="Graphics\Database-icon_32.png" />
     <Resource Include="Graphics\server-components-icon_16.png" />
     <Resource Include="Graphics\server-components-icon_32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Transforms\SearchResultToHTML.xslt">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\..\packages\SkiaSharp.1.59.2\build\net45\SkiaSharp.targets" Condition="Exists('..\..\packages\SkiaSharp.1.59.2\build\net45\SkiaSharp.targets')" />

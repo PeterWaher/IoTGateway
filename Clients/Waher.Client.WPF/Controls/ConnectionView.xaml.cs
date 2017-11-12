@@ -212,6 +212,20 @@ namespace Waher.Client.WPF.Controls
 						SensorDataView.Load(Xml, FileName);
 						break;
 
+					case "SearchResult":
+						TabItem = new TabItem();
+						this.MainWindow.Tabs.Items.Add(TabItem);
+
+						SearchResultView SearchResultView = new SearchResultView();
+
+						TabItem.Header = System.IO.Path.GetFileName(FileName);
+						TabItem.Content = SearchResultView;
+
+						this.MainWindow.Tabs.SelectedItem = TabItem;
+
+						SearchResultView.Load(Xml, FileName);
+						break;
+
 					default:
 						throw new Exception("Unrecognized file format.");
 				}

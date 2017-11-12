@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="SearchResult"
+		   targetNamespace="http://waher.se/Schema/SearchResult.xsd"
+		   elementFormDefault="qualified"
+		   xmlns="http://waher.se/Schema/SearchResult.xsd"
+		   xmlns:mstns="http://waher.se/Schema/SearchResult.xsd"
+		   xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:element name="SearchResult">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="Headers">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Header" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:attribute name="var" type="xs:string" use="required"/>
+                  <xs:attribute name="label" type="xs:string" use="required"/>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="Records">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Record" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="Field" minOccurs="0" maxOccurs="unbounded">
+                      <xs:complexType>
+                        <xs:attribute name="var" type="xs:string" use="required"/>
+                        <xs:attribute name="value" type="xs:string" use="required"/>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+</xs:schema>

@@ -41,6 +41,8 @@ namespace Waher.Client.WPF.Dialogs
 			TabItem TabItem;
 			StackPanel StackPanel;
 			ScrollViewer ScrollViewer;
+			Control First = null;
+			Control Control;
 
 			if (Form.HasPages)
 			{
@@ -112,28 +114,37 @@ namespace Waher.Client.WPF.Dialogs
 				}
 
 				foreach (LayoutElement Element in Page.Elements)
-					this.Layout(Container, Element, Form);
+				{
+					Control = this.Layout(Container, Element, Form);
+					if (First == null)
+						First = Control;
+				}
 
 				if (TabControl != null && TabControl.Items.Count == 1)
 					TabItem.Focus();
 			}
 
+			if (First != null)
+				First.Focus();
+
 			this.CheckOkButtonEnabled();
 		}
 
-		private void Layout(Panel Container, LayoutElement Element, DataForm Form)
+		private Control Layout(Panel Container, LayoutElement Element, DataForm Form)
 		{
 			if (Element is FieldReference)
-				this.Layout(Container, (FieldReference)Element, Form);
+				return this.Layout(Container, (FieldReference)Element, Form);
 			else if (Element is Networking.XMPP.DataForms.Layout.TextElement)
 				this.Layout(Container, (Networking.XMPP.DataForms.Layout.TextElement)Element, Form);
 			else if (Element is Networking.XMPP.DataForms.Layout.Section)
-				this.Layout(Container, (Networking.XMPP.DataForms.Layout.Section)Element, Form);
+				return this.Layout(Container, (Networking.XMPP.DataForms.Layout.Section)Element, Form);
 			else if (Element is ReportedReference)
 				this.Layout(Container, (ReportedReference)Element, Form);
+
+			return null;
 		}
 
-		private void Layout(Panel Container, Networking.XMPP.DataForms.Layout.Section Section, DataForm Form)
+		private Control Layout(Panel Container, Networking.XMPP.DataForms.Layout.Section Section, DataForm Form)
 		{
 			GroupBox GroupBox = new GroupBox();
 			Container.Children.Add(GroupBox);
@@ -144,8 +155,17 @@ namespace Waher.Client.WPF.Dialogs
 			GroupBox.Content = StackPanel;
 			StackPanel.Margin = new Thickness(5, 5, 5, 5);
 
+			Control First = null;
+			Control Control;
+
 			foreach (LayoutElement Element in Section.Elements)
-				this.Layout(StackPanel, Element, Form);
+			{
+				Control = this.Layout(StackPanel, Element, Form);
+				if (First == null)
+					First = Control;
+			}
+
+			return First;
 		}
 
 		private void Layout(Panel Container, Networking.XMPP.DataForms.Layout.TextElement TextElement, DataForm Form)
@@ -160,40 +180,41 @@ namespace Waher.Client.WPF.Dialogs
 			Container.Children.Add(TextBlock);
 		}
 
-		private void Layout(Panel Container, FieldReference FieldReference, DataForm Form)
+		private Control Layout(Panel Container, FieldReference FieldReference, DataForm Form)
 		{
 			Field Field = Form[FieldReference.Var];
 			if (Field == null)
-				return;
+				return null;
 
 			Field.Validate(Field.ValueStrings);
 
-
 			if (Field is TextSingleField)
-				this.Layout(Container, (TextSingleField)Field, Form);
+				return this.Layout(Container, (TextSingleField)Field, Form);
 			else if (Field is TextMultiField)
-				this.Layout(Container, (TextMultiField)Field, Form);
+				return this.Layout(Container, (TextMultiField)Field, Form);
 			else if (Field is TextPrivateField)
-				this.Layout(Container, (TextPrivateField)Field, Form);
+				return this.Layout(Container, (TextPrivateField)Field, Form);
 			else if (Field is BooleanField)
-				this.Layout(Container, (BooleanField)Field, Form);
+				return this.Layout(Container, (BooleanField)Field, Form);
 			else if (Field is ListSingleField)
-				this.Layout(Container, (ListSingleField)Field, Form);
+				return this.Layout(Container, (ListSingleField)Field, Form);
 			else if (Field is ListMultiField)
-				this.Layout(Container, (ListMultiField)Field, Form);
+				return this.Layout(Container, (ListMultiField)Field, Form);
 			else if (Field is FixedField)
 				this.Layout(Container, (FixedField)Field, Form);
 			else if (Field is HiddenField)
 				this.Layout(Container, (HiddenField)Field, Form);
 			else if (Field is JidMultiField)
-				this.Layout(Container, (JidMultiField)Field, Form);
+				return this.Layout(Container, (JidMultiField)Field, Form);
 			else if (Field is JidSingleField)
-				this.Layout(Container, (JidSingleField)Field, Form);
+				return this.Layout(Container, (JidSingleField)Field, Form);
 			else if (Field is MediaField)
 				this.Layout(Container, (MediaField)Field, Form);
+
+			return null;
 		}
 
-		private void Layout(Panel Container, BooleanField Field, DataForm Form)
+		private Control Layout(Panel Container, BooleanField Field, DataForm Form)
 		{
 			TextBlock TextBlock = new TextBlock()
 			{
@@ -232,6 +253,8 @@ namespace Waher.Client.WPF.Dialogs
 			CheckBox.Click += new RoutedEventHandler(CheckBox_Click);
 
 			Container.Children.Add(CheckBox);
+
+			return CheckBox;
 		}
 
 		private void CheckBox_Click(object sender, RoutedEventArgs e)
@@ -295,22 +318,26 @@ namespace Waher.Client.WPF.Dialogs
 			// Do nothing
 		}
 
-		private void Layout(Panel Container, JidMultiField Field, DataForm Form)
+		private Control Layout(Panel Container, JidMultiField Field, DataForm Form)
 		{
 			TextBox TextBox = this.LayoutTextBox(Container, Field);
 			TextBox.TextChanged += new TextChangedEventHandler(TextBox_TextChanged);
 			TextBox.AcceptsReturn = true;
 			TextBox.AcceptsTab = true;
 			TextBox.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
+
+			return TextBox;
 		}
 
-		private void Layout(Panel Container, JidSingleField Field, DataForm Form)
+		private Control Layout(Panel Container, JidSingleField Field, DataForm Form)
 		{
 			TextBox TextBox = this.LayoutTextBox(Container, Field);
 			TextBox.TextChanged += new TextChangedEventHandler(TextBox_TextChanged);
+
+			return TextBox;
 		}
 
-		private void Layout(Panel Container, ListMultiField Field, DataForm Form)
+		private Control Layout(Panel Container, ListMultiField Field, DataForm Form)
 		{
 			TextBlock TextBlock = new TextBlock()
 			{
@@ -361,6 +388,8 @@ namespace Waher.Client.WPF.Dialogs
 			}
 
 			GroupBox.Tag = this.LayoutErrorLabel(StackPanel, Field);
+
+			return GroupBox;
 		}
 
 		private void MultiListCheckBox_Click(object sender, RoutedEventArgs e)
@@ -423,7 +452,7 @@ namespace Waher.Client.WPF.Dialogs
 			}
 		}
 
-		private void Layout(Panel Container, ListSingleField Field, DataForm Form)
+		private Control Layout(Panel Container, ListSingleField Field, DataForm Form)
 		{
 			this.LayoutControlLabel(Container, Field);
 
@@ -471,6 +500,8 @@ namespace Waher.Client.WPF.Dialogs
 
 			Container.Children.Add(ComboBox);
 			ComboBox.Tag = this.LayoutErrorLabel(Container, Field);
+
+			return ComboBox;
 		}
 
 		private void ComboBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -820,16 +851,18 @@ namespace Waher.Client.WPF.Dialogs
 				MediaElement.SpeedRatio *= 2;
 		}
 
-		private void Layout(Panel Container, TextMultiField Field, DataForm Form)
+		private Control Layout(Panel Container, TextMultiField Field, DataForm Form)
 		{
 			TextBox TextBox = this.LayoutTextBox(Container, Field);
 			TextBox.TextChanged += new TextChangedEventHandler(TextBox_TextChanged);
 			TextBox.AcceptsReturn = true;
 			TextBox.AcceptsTab = true;
 			TextBox.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
+
+			return TextBox;
 		}
 
-		private void Layout(Panel Container, TextPrivateField Field, DataForm Form)
+		private Control Layout(Panel Container, TextPrivateField Field, DataForm Form)
 		{
 			this.LayoutControlLabel(Container, Field);
 
@@ -851,6 +884,8 @@ namespace Waher.Client.WPF.Dialogs
 
 			Container.Children.Add(PasswordBox);
 			PasswordBox.Tag = this.LayoutErrorLabel(Container, Field);
+
+			return PasswordBox;
 		}
 
 		private void PasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
@@ -883,10 +918,12 @@ namespace Waher.Client.WPF.Dialogs
 			}
 		}
 
-		private void Layout(Panel Container, TextSingleField Field, DataForm Form)
+		private Control Layout(Panel Container, TextSingleField Field, DataForm Form)
 		{
 			TextBox TextBox = this.LayoutTextBox(Container, Field);
 			TextBox.TextChanged += new TextChangedEventHandler(TextBox_TextChanged);
+
+			return TextBox;
 		}
 
 		private TextBox LayoutTextBox(Panel Container, Field Field)

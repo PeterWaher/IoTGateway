@@ -5,6 +5,9 @@ using System.Text;
 using System.Xml;
 using Waher.Content.Xml;
 using Waher.Networking.XMPP.DataForms;
+using Waher.Networking.XMPP.DataForms.DataTypes;
+using Waher.Networking.XMPP.DataForms.FieldTypes;
+using Waher.Networking.XMPP.DataForms.ValidationMethods;
 
 namespace Waher.Networking.XMPP.Search
 {
@@ -249,6 +252,7 @@ namespace Waher.Networking.XMPP.Search
 			SearchResultEventHandler Callback = (SearchResultEventHandler)P[0];
 			object State = P[1];
 			List<Dictionary<string, string>> Records = new List<Dictionary<string, string>>();
+			List<Field> Headers = new List<Field>();
 
 			if (e.Ok)
 			{
@@ -256,6 +260,9 @@ namespace Waher.Networking.XMPP.Search
 				{
 					if (N.LocalName == "query")
 					{
+						Dictionary<string, bool> HeadersSorted = new Dictionary<string, bool>();
+						string Header;
+
 						foreach (XmlNode N2 in N.ChildNodes)
 						{
 							if (N2.LocalName == "item")
@@ -268,7 +275,43 @@ namespace Waher.Networking.XMPP.Search
 								foreach (XmlNode N3 in N2.ChildNodes)
 								{
 									if (N3 is XmlElement E)
-										Record[E.LocalName] = E.InnerText;
+									{
+										Header = E.LocalName;
+										Record[Header] = E.InnerText;
+
+										if (!HeadersSorted.ContainsKey(Header))
+										{
+											HeadersSorted[Header] = true;
+
+											switch (Header)
+											{
+												case "first":
+													Headers.Add(new TextSingleField(null, Header, "First Name", false, null, null, string.Empty,
+														new StringDataType(), new BasicValidation(), string.Empty, false, false, false));
+													break;
+
+												case "last":
+													Headers.Add(new TextSingleField(null, Header, "Last Name", false, null, null, string.Empty,
+														new StringDataType(), new BasicValidation(), string.Empty, false, false, false));
+													break;
+
+												case "nick":
+													Headers.Add(new TextSingleField(null, Header, "Nick Name", false, null, null, string.Empty,
+														new StringDataType(), new BasicValidation(), string.Empty, false, false, false));
+													break;
+
+												case "email":
+													Headers.Add(new TextSingleField(null, Header, "e-Mail", false, null, null, string.Empty,
+														new StringDataType(), new BasicValidation(), string.Empty, false, false, false));
+													break;
+
+												default:
+													Headers.Add(new TextSingleField(null, Header, Header, false, null, null, string.Empty,
+														new StringDataType(), new BasicValidation(), string.Empty, false, false, false));
+													break;
+											}
+										}
+									}
 								}
 
 								Records.Add(Record);
@@ -278,12 +321,13 @@ namespace Waher.Networking.XMPP.Search
 				}
 			}
 
-			this.CallResponseMethod(Callback, State, Records, e);
+			this.CallResponseMethod(Callback, State, Records, Headers.ToArray(), e);
 		}
 
-		private void CallResponseMethod(SearchResultEventHandler Callback, object State, List<Dictionary<string, string>> Records, IqResultEventArgs e)
+		private void CallResponseMethod(SearchResultEventHandler Callback, object State, List<Dictionary<string, string>> Records,
+			Field[] Headers, IqResultEventArgs e)
 		{
-			SearchResultEventArgs e2 = new SearchResultEventArgs(Records.ToArray(), e)
+			SearchResultEventArgs e2 = new SearchResultEventArgs(Records.ToArray(), Headers, e)
 			{
 				State = State
 			};
@@ -307,6 +351,7 @@ namespace Waher.Networking.XMPP.Search
 			SearchResultEventHandler Callback = (SearchResultEventHandler)P[0];
 			object State = P[1];
 			List<Dictionary<string, string>> Records = new List<Dictionary<string, string>>();
+			List<Field> Headers = new List<Field>();
 
 			if (e.Ok)
 			{
@@ -320,11 +365,38 @@ namespace Waher.Networking.XMPP.Search
 							{
 								DataForm Form = new DataForm(this.client, (XmlElement)N2, null, null, e.From, e.To);
 								Dictionary<string, string> Record = new Dictionary<string, string>();
+								Dictionary<string, bool> HeadersSorted = new Dictionary<string, bool>();
+								string Header;
+
+								if (Form.Header != null)
+								{
+									foreach (Field F in Form.Header)
+									{
+										Header = F.Var;
+
+										if (!HeadersSorted.ContainsKey(Header))
+										{
+											HeadersSorted[Header] = true;
+											Headers.Add(F);
+										}
+									}
+								}
 
 								foreach (Field[] FormRecord in Form.Records)
 								{
 									foreach (Field FormField in FormRecord)
-										Record[FormField.Var] = FormField.ValueString;
+									{
+										Header = FormField.Var;
+										Record[Header] = FormField.ValueString;
+
+										if (!HeadersSorted.ContainsKey(Header))
+										{
+											HeadersSorted[Header] = true;
+
+											Headers.Add(new TextSingleField(null, Header, string.IsNullOrEmpty(FormField.Label) ? Header : FormField.Label,
+												false, null, null, string.Empty, new StringDataType(), new BasicValidation(), string.Empty, false, false, false));
+										}
+									}
 								}
 
 								Records.Add(Record);
@@ -334,7 +406,7 @@ namespace Waher.Networking.XMPP.Search
 				}
 			}
 
-			this.CallResponseMethod(Callback, State, Records, e);
+			this.CallResponseMethod(Callback, State, Records, Headers.ToArray(), e);
 		}
 
 		/// <summary>

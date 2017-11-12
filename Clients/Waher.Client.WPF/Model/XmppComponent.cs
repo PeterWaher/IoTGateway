@@ -83,10 +83,20 @@ namespace Waher.Client.WPF.Model
 				else
 				{
 					MainWindow.currentInstance.Dispatcher.Invoke(() => MessageBox.Show(MainWindow.currentInstance,
-						"Unable to get search form.", "Error", MessageBoxButton.OK, MessageBoxImage.Error));
+						string.IsNullOrEmpty(e.ErrorText) ? "Unable to get search form." : e.ErrorText, "Error",
+						MessageBoxButton.OK, MessageBoxImage.Error));
 				}
 			}, (sender, e) =>
 			{
+				if (e.Ok)
+				{
+				}
+				else
+				{
+					MainWindow.currentInstance.Dispatcher.Invoke(() => MessageBox.Show(MainWindow.currentInstance,
+						string.IsNullOrEmpty(e.ErrorText) ? "Unable to perform search." : e.ErrorText, "Error",
+						MessageBoxButton.OK, MessageBoxImage.Error));
+				}
 			}, null);
 		}
 

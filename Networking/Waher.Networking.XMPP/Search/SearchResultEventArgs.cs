@@ -19,11 +19,13 @@ namespace Waher.Networking.XMPP.Search
 	public class SearchResultEventArgs : IqResultEventArgs
 	{
 		private Dictionary<string, string>[] records;
+		private Field[] headers;
 
-		internal SearchResultEventArgs(Dictionary<string, string>[] Records, IqResultEventArgs e)
+		internal SearchResultEventArgs(Dictionary<string, string>[] Records, Field[] Headers, IqResultEventArgs e)
 			: base(e)
 		{
 			this.records = Records;
+			this.headers = Headers;
 		}
 
 		/// <summary>
@@ -34,5 +36,12 @@ namespace Waher.Networking.XMPP.Search
 			get { return this.records; }
 		}
 
+		/// <summary>
+		/// Headers
+		/// </summary>
+		public Field[] Headers
+		{
+			get { return this.headers; }
+		}
 	}
 }

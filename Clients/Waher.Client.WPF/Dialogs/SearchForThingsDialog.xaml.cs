@@ -19,11 +19,34 @@ using Waher.Runtime.Inventory;
 
 namespace Waher.Client.WPF.Dialogs
 {
+	public enum Operator
+	{
+		Equality = 0,
+		NonEquality = 1,
+		GreaterThan = 2,
+		GreaterThanOrEqualTo = 3,
+		LesserThan = 4,
+		LesserThanOrEqualTo = 5,
+		InRange = 6,
+		NotInRange = 7,
+		Wildcard = 8
+	}
+
+	public class Rule
+	{
+		public string Tag;
+		public Operator Operator;
+		public string Value;
+	}
+
 	/// <summary>
 	/// Interaction logic for SearchForThingsDialog.xaml
 	/// </summary>
 	public partial class SearchForThingsDialog : Window
 	{
+		private int nrRules = 1;
+		private int ruleNr = 1;
+
 		/// <summary>
 		/// Interaction logic for SearchForThingsDialog.xaml
 		/// </summary>
@@ -44,12 +67,12 @@ namespace Waher.Client.WPF.Dialogs
 
 		private void AddButton_Click(object sender, RoutedEventArgs e)
 		{
-			int i = this.SearchFields.Children.Count + 1;
-			string Suffix = i.ToString();
+			string Suffix = (++this.ruleNr).ToString();
 
 			StackPanel Panel = new StackPanel()
 			{
-				Orientation = Orientation.Horizontal
+				Orientation = Orientation.Horizontal,
+				Margin = new Thickness(0, 0, 0, 8)
 			};
 
 			ComboBox Field = new ComboBox()
@@ -82,12 +105,19 @@ namespace Waher.Client.WPF.Dialogs
 			Field.Items.Add(new ComboBoxItem() { Tag = "STREETNR", Content = "Street Number (STREETNR)" });
 			Field.Items.Add(new ComboBoxItem() { Tag = "V", Content = "Version (V)" });
 
-			Panel.Children.Add(Field);
+			StackPanel Panel2 = new StackPanel()
+			{
+				Orientation = Orientation.Vertical
+			};
+
+			Panel2.Children.Add(new Label() { Content = "Tag:" });
+			Panel2.Children.Add(Field);
+			Panel.Children.Add(Panel2);
 
 			ComboBox Operator = new ComboBox()
 			{
 				Name = "Operator" + Suffix,
-				Width = 200,
+				Width = 184,
 				IsEditable = true,
 				ToolTip = "Select search operator.",
 				SelectedIndex = 0
@@ -103,16 +133,109 @@ namespace Waher.Client.WPF.Dialogs
 			Operator.Items.Add(new ComboBoxItem() { Tag = "NotInRange", Content = "Not in range" });
 			Operator.Items.Add(new ComboBoxItem() { Tag = "Wildcard", Content = "Wildcard" });
 
-			Panel.Children.Add(Operator);
+			Panel2 = new StackPanel()
+			{
+				Orientation = Orientation.Vertical,
+				Margin = new Thickness(16, 0, 0, 0)
+			};
+
+			Panel2.Children.Add(new Label() { Content = "Operator:" });
+			Panel2.Children.Add(Operator);
+			Panel.Children.Add(Panel2);
 
 			TextBox Value = new TextBox()
 			{
 				Name = "Value" + Suffix,
-				Width = 200,
+				Width = 184,
 				ToolTip = "Select value to search on."
 			};
 
-			Panel.Children.Add(Value);
+			Panel2 = new StackPanel()
+			{
+				Orientation = Orientation.Vertical,
+				Margin = new Thickness(16, 0, 0, 0)
+			};
+
+			Panel2.Children.Add(new Label() { Content = "Value:" });
+			Panel2.Children.Add(Value);
+			Panel.Children.Add(Panel2);
+
+			Panel2 = new StackPanel()
+			{
+				Orientation = Orientation.Vertical,
+				Margin = new Thickness(16, 0, 0, 0),
+				VerticalAlignment = VerticalAlignment.Center
+			};
+
+			Button Delete = new Button()
+			{
+				Name = "Delete" + Suffix,
+				Width = 80,
+				Height = 25,
+				Padding = new Thickness(-10),
+				Content = "Delete",
+				Tag = this.ruleNr,
+			};
+
+			Delete.Click += this.Delete_Click;
+
+			Panel2.Children.Add(Delete);
+			Panel.Children.Add(Panel2);
+
+			this.SearchFields.Children.Add(Panel);
+			this.nrRules++;
 		}
+
+		private void Delete_Click(object sender, RoutedEventArgs e)
+		{
+			if (this.nrRules <= 1)
+			{
+				MessageBox.Show(this, "At least one rule must exist.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+				return;
+			}
+
+			Button Button = (Button)sender;
+			int RuleNr = int.Parse(Button.Tag.ToString());
+			StackPanel Rule = (StackPanel)(((StackPanel)Button.Parent).Parent);
+			((StackPanel)Rule.Parent).Children.Remove(Rule);
+
+			this.nrRules--;
+		}
+
+		public Rule[] GetRules()
+		{
+			List<Rule> Result = new List<Rule>();
+
+			foreach (StackPanel Rule in this.SearchFields.Children)
+			{
+				StackPanel Panel1 = (StackPanel)Rule.Children[0];
+				StackPanel Panel2 = (StackPanel)Rule.Children[1];
+				StackPanel Panel3 = (StackPanel)Rule.Children[2];
+				ComboBox Field = (ComboBox)Panel1.Children[1];
+				ComboBox Operator = (ComboBox)Panel2.Children[1];
+				TextBox Value = (TextBox)Panel3.Children[1];
+				string TagName;
+
+				TagName = Field.Text;
+				foreach (ComboBoxItem Item in Field.Items)
+				{
+					if (TagName == Item.Content.ToString())
+					{
+						TagName = Item.Tag.ToString();
+						break;
+					}
+				}
+
+				Result.Add(new Dialogs.Rule()
+				{
+					Tag = TagName,
+					Operator = (Operator)Operator.SelectedIndex,
+					Value = Value.Text
+				});
+			}
+
+			return Result.ToArray();
+		}
+
 	}
 }

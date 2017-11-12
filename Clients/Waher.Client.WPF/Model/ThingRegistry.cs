@@ -44,6 +44,7 @@ namespace Waher.Client.WPF.Model
 
 			if (Result.HasValue && Result.Value)
 			{
+				Rule[] Rules = Dialog.GetRules();
 			}
 		}
 	}

@@ -1,56 +1,68 @@
 ﻿<Window x:Class="Waher.Client.WPF.Dialogs.SearchForThingsDialog"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Search for things" Height="600" Width="600" WindowStartupLocation="CenterOwner">
+        Title="Search for things" Height="600" Width="700" WindowStartupLocation="CenterOwner">
     <DockPanel Name="DialogPanel">
-        <ScrollViewer VerticalScrollBarVisibility="Visible" DockPanel.Dock="Top" Margin="10,10,10,10">
-            <StackPanel Name="SearchFields" Orientation="Vertical">
-                <StackPanel Orientation="Horizontal">
-                    <ComboBox Name="Field1" Width="150" IsEditable="True" ToolTip="Select field to searh on.">
-                        <ComboBoxItem Tag="ALT">Altitude (ALT)</ComboBoxItem>
-                        <ComboBoxItem Tag="APT">Apartment (APT)</ComboBoxItem>
-                        <ComboBoxItem Tag="AREA">Area (AREA)</ComboBoxItem>
-                        <ComboBoxItem Tag="BLD">Building (BLD)</ComboBoxItem>
-                        <ComboBoxItem Tag="CITY">City (CITY)</ComboBoxItem>
-                        <ComboBoxItem Tag="CLASS">Class (CLASS)</ComboBoxItem>
-                        <ComboBoxItem Tag="COUNTRY">Country (COUNTRY)</ComboBoxItem>
-                        <ComboBoxItem Tag="LAT">Latitude (LAT)</ComboBoxItem>
-                        <ComboBoxItem Tag="LONG">Longitude (LONG)</ComboBoxItem>
-                        <ComboBoxItem Tag="MAN">Manufacturer (MAN)</ComboBoxItem>
-                        <ComboBoxItem Tag="MLOC">Meter Location (MLOC)</ComboBoxItem>
-                        <ComboBoxItem Tag="MNR">Meter Number (MNR)</ComboBoxItem>
-                        <ComboBoxItem Tag="MODEL">Model (MODEL)</ComboBoxItem>
-                        <ComboBoxItem Tag="NAME">Name (NAME)</ComboBoxItem>
-                        <ComboBoxItem Tag="PURL">Product URL (PURL)</ComboBoxItem>
-                        <ComboBoxItem Tag="REGION">Region (REGION)</ComboBoxItem>
-                        <ComboBoxItem Tag="ROOM">Room (ROOM)</ComboBoxItem>
-                        <ComboBoxItem Tag="SN">Serial Number (SN)</ComboBoxItem>
-                        <ComboBoxItem Tag="STREET">Street (STREET)</ComboBoxItem>
-                        <ComboBoxItem Tag="STREETNR">Street Number (STREETNR)</ComboBoxItem>
-                        <ComboBoxItem Tag="V">Version (V)</ComboBoxItem>
-                    </ComboBox>
-                    <ComboBox Name="Operator1" Width="200" ToolTip="Select search operator." SelectedIndex="0">
-                        <ComboBoxItem Tag="=">Equality (=)</ComboBoxItem>
-                        <ComboBoxItem Tag="&lt;&gt;">Non-equality (&lt;&gt;)</ComboBoxItem>
-                        <ComboBoxItem Tag="&gt;">Greater than (&gt;)</ComboBoxItem>
-                        <ComboBoxItem Tag="&gt;=">Greater than or equal to (&gt;=)</ComboBoxItem>
-                        <ComboBoxItem Tag="&lt;">Lesser than (&lt;)</ComboBoxItem>
-                        <ComboBoxItem Tag="&lt;=">Lesser than or equal to (&lt;=)</ComboBoxItem>
-                        <ComboBoxItem Tag="InRange">In range</ComboBoxItem>
-                        <ComboBoxItem Tag="NotInRange">Not in range</ComboBoxItem>
-                        <ComboBoxItem Tag="Wildcard">Wildcard</ComboBoxItem>
-                    </ComboBox>
-                    <TextBox Name="Value1" Width="200" ToolTip="Select value to search on."/>
-                </StackPanel>
-            </StackPanel>
-        </ScrollViewer>
-        <DockPanel Width="245" Height="30" DockPanel.Dock="Bottom">
-            <Button Content="Add Field" Height="23" HorizontalAlignment="Left" Name="AddButton" VerticalAlignment="Bottom" Width="75"
-                    ToolTip="Adds a search field." Margin="0,0,0,3.4" Click="AddButton_Click"/>
+        <DockPanel Width="245" Height="40" DockPanel.Dock="Bottom">
+            <Button Content="Add Field" Height="23" HorizontalAlignment="Left" Name="AddButton" VerticalAlignment="Center" Width="75"
+                    ToolTip="Adds a search field." Margin="0,0,0,0" Click="AddButton_Click"/>
             <Button Content="OK" Height="23" HorizontalAlignment="Left" Name="OkButton" VerticalAlignment="Center" Width="75" IsDefault="True" 
                     ToolTip="Applies changes and closes the dialog." Click="OkButton_Click" Margin="10,0,0,0" />
             <Button Content="Cancel" Height="23" HorizontalAlignment="Left" Name="CancelButton" Margin="10,0,0,0" VerticalAlignment="Center" Width="75"
                     ToolTip="Closes the dialog without applying changes." IsCancel="True" Click="CancelButton_Click" />
         </DockPanel>
+        <ScrollViewer VerticalScrollBarVisibility="Visible" DockPanel.Dock="Top" Margin="10,10,10,10">
+            <StackPanel Name="SearchFields" Orientation="Vertical">
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                    <StackPanel Orientation="Vertical">
+                        <Label>Tag:</Label>
+                        <ComboBox Name="Field1" Width="150" IsEditable="True" ToolTip="Select field to searh on.">
+                            <ComboBoxItem Tag="ALT">Altitude (ALT)</ComboBoxItem>
+                            <ComboBoxItem Tag="APT">Apartment (APT)</ComboBoxItem>
+                            <ComboBoxItem Tag="AREA">Area (AREA)</ComboBoxItem>
+                            <ComboBoxItem Tag="BLD">Building (BLD)</ComboBoxItem>
+                            <ComboBoxItem Tag="CITY">City (CITY)</ComboBoxItem>
+                            <ComboBoxItem Tag="CLASS">Class (CLASS)</ComboBoxItem>
+                            <ComboBoxItem Tag="COUNTRY">Country (COUNTRY)</ComboBoxItem>
+                            <ComboBoxItem Tag="LAT">Latitude (LAT)</ComboBoxItem>
+                            <ComboBoxItem Tag="LONG">Longitude (LONG)</ComboBoxItem>
+                            <ComboBoxItem Tag="MAN">Manufacturer (MAN)</ComboBoxItem>
+                            <ComboBoxItem Tag="MLOC">Meter Location (MLOC)</ComboBoxItem>
+                            <ComboBoxItem Tag="MNR">Meter Number (MNR)</ComboBoxItem>
+                            <ComboBoxItem Tag="MODEL">Model (MODEL)</ComboBoxItem>
+                            <ComboBoxItem Tag="NAME">Name (NAME)</ComboBoxItem>
+                            <ComboBoxItem Tag="PURL">Product URL (PURL)</ComboBoxItem>
+                            <ComboBoxItem Tag="REGION">Region (REGION)</ComboBoxItem>
+                            <ComboBoxItem Tag="ROOM">Room (ROOM)</ComboBoxItem>
+                            <ComboBoxItem Tag="SN">Serial Number (SN)</ComboBoxItem>
+                            <ComboBoxItem Tag="STREET">Street (STREET)</ComboBoxItem>
+                            <ComboBoxItem Tag="STREETNR">Street Number (STREETNR)</ComboBoxItem>
+                            <ComboBoxItem Tag="V">Version (V)</ComboBoxItem>
+                        </ComboBox>
+                    </StackPanel>
+                    <StackPanel Orientation="Vertical" Margin="16,0,0,0">
+                        <Label>Operator:</Label>
+                        <ComboBox Name="Operator1" Width="184" ToolTip="Select search operator." SelectedIndex="0">
+                            <ComboBoxItem Tag="=">Equality (=)</ComboBoxItem>
+                            <ComboBoxItem Tag="&lt;&gt;">Non-equality (&lt;&gt;)</ComboBoxItem>
+                            <ComboBoxItem Tag="&gt;">Greater than (&gt;)</ComboBoxItem>
+                            <ComboBoxItem Tag="&gt;=">Greater than or equal to (&gt;=)</ComboBoxItem>
+                            <ComboBoxItem Tag="&lt;">Lesser than (&lt;)</ComboBoxItem>
+                            <ComboBoxItem Tag="&lt;=">Lesser than or equal to (&lt;=)</ComboBoxItem>
+                            <ComboBoxItem Tag="InRange">In range</ComboBoxItem>
+                            <ComboBoxItem Tag="NotInRange">Not in range</ComboBoxItem>
+                            <ComboBoxItem Tag="Wildcard">Wildcard</ComboBoxItem>
+                        </ComboBox>
+                    </StackPanel>
+                    <StackPanel Orientation="Vertical" Margin="16,0,0,0">
+                        <Label>Value:</Label>
+                        <TextBox Name="Value1" Width="184" ToolTip="Select value to search on."/>
+                    </StackPanel>
+                    <StackPanel Orientation="Vertical" Margin="16,0,0,0" VerticalAlignment="Center">
+                        <Button Name="Delete1" Width="81" Height="25" Padding="-10" Click="Delete_Click" Tag="1">Delete</Button>
+                    </StackPanel>
+                </StackPanel>
+            </StackPanel>
+        </ScrollViewer>
     </DockPanel>
 </Window>

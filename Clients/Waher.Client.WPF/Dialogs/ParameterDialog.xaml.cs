@@ -1141,6 +1141,8 @@ namespace Waher.Client.WPF.Dialogs
 		private void CancelButton_Click(object sender, RoutedEventArgs e)
 		{
 			this.form.Cancel();
+
+			this.DialogResult = false;
 		}
 
 		// TODO: Color picker.

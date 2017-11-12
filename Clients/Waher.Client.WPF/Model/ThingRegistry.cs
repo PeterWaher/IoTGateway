@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
 using Waher.Networking.XMPP.Provisioning;
+using Waher.Client.WPF.Dialogs;
 
 namespace Waher.Client.WPF.Model
 {
@@ -30,5 +31,20 @@ namespace Waher.Client.WPF.Model
 			}
 		}
 
+		public override bool CanSearch => true;
+
+		public override void Search()
+		{
+			SearchForThingsDialog Dialog = new SearchForThingsDialog()
+			{
+				Owner = MainWindow.currentInstance
+			};
+
+			bool? Result = Dialog.ShowDialog();
+
+			if (Result.HasValue && Result.Value)
+			{
+			}
+		}
 	}
 }

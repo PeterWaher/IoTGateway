@@ -87,6 +87,9 @@
     </Compile>
     <Compile Include="Controls\Sniffers\SniffItem.cs" />
     <Compile Include="Controls\Sniffers\TabSniffer.cs" />
+    <Compile Include="Dialogs\SearchForThingsDialog.xaml.cs">
+      <DependentUpon>SearchForThingsDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\ParameterDialog.xaml.cs">
       <DependentUpon>ParameterDialog.xaml</DependentUpon>
     </Compile>
@@ -115,6 +118,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialogs\AddContactForm.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Dialogs\SearchForThingsDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

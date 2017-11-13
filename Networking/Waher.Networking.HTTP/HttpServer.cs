@@ -73,6 +73,7 @@ namespace Waher.Networking.HTTP
 		private Dictionary<string, Statistic> callsPerUserAgent = new Dictionary<string, Statistic>();
 		private Dictionary<string, Statistic> callsPerFrom = new Dictionary<string, Statistic>();
 		private Dictionary<string, Statistic> callsPerResource = new Dictionary<string, Statistic>();
+		private Dictionary<int, bool> failedPorts = new Dictionary<int, bool>();
 		private DateTime lastStat = DateTime.MinValue;
 		private long nrBytesRx = 0;
 		private long nrBytesTx = 0;
@@ -199,6 +200,7 @@ namespace Waher.Networking.HTTP
 							}
 							catch (Exception ex)
 							{
+								this.failedPorts[HttpPort] = true;
 								Log.Critical(ex, Profile.ProfileName);
 							}
 						}
@@ -233,12 +235,14 @@ namespace Waher.Networking.HTTP
 									}
 									catch (SocketException)
 									{
+										this.failedPorts[HttpPort] = true;
 										Log.Error("Unable to open port for listening.",
 											new KeyValuePair<string, object>("Address", UnicastAddress.Address.ToString()),
 											new KeyValuePair<string, object>("Port", HttpPort));
 									}
 									catch (Exception ex)
 									{
+										this.failedPorts[HttpPort] = true;
 										Log.Critical(ex, UnicastAddress.Address.ToString() + ":" + HttpPort);
 									}
 								}
@@ -258,12 +262,14 @@ namespace Waher.Networking.HTTP
 									}
 									catch (SocketException)
 									{
+										this.failedPorts[HttpsPort] = true;
 										Log.Error("Unable to open port for listening.",
 											new KeyValuePair<string, object>("Address", UnicastAddress.Address.ToString()),
 											new KeyValuePair<string, object>("Port", HttpsPort));
 									}
 									catch (Exception ex)
 									{
+										this.failedPorts[HttpsPort] = true;
 										Log.Critical(ex, UnicastAddress.Address.ToString() + ":" + HttpsPort);
 									}
 								}
@@ -356,7 +362,7 @@ namespace Waher.Networking.HTTP
 				{
 					if ((Listener.Value && Https) || ((!Listener.Value) && Http))
 					{
-						if (int.TryParse(Listener.Key.Information.LocalPort, out int i))
+						if (int.TryParse(Listener.Key.Information.LocalPort, out int i) && !this.failedPorts.ContainsKey(i))
 							Open[i] = true;
 					}
 				}
@@ -368,7 +374,7 @@ namespace Waher.Networking.HTTP
 					if ((Listener.Value && Https) || ((!Listener.Value) && Http))
 					{
 						IPEndPoint = Listener.Key.LocalEndpoint as IPEndPoint;
-						if (IPEndPoint != null)
+						if (IPEndPoint != null && !this.failedPorts.ContainsKey(IPEndPoint.Port))
 							Open[IPEndPoint.Port] = true;
 					}
 				}

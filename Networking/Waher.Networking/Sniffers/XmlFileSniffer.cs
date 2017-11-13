@@ -227,9 +227,13 @@ namespace Waher.Networking.Sniffers
 					{
 						File.Delete(FileName);
 					}
+					catch (IOException ex)
+					{
+						Log.Error("Unable to delete file: " + ex.Message, FileName);
+					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Critical(ex, FileName);
 					}
 				}
 			}

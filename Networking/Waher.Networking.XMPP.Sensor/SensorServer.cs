@@ -27,11 +27,10 @@ namespace Waher.Networking.XMPP.Sensor
 	/// It also supports the event subscription pattern, documented in the iot-events proto-XEP:
 	/// http://www.xmpp.org/extensions/inbox/iot-events.html
 	/// </summary>
-	public class SensorServer : IDisposable
+	public class SensorServer : XmppExtension
 	{
 		private Dictionary<string, SensorDataServerRequest> requests = new Dictionary<string, SensorDataServerRequest>();
 		private Scheduler scheduler = new Scheduler();
-		private XmppClient client;
 		private ProvisioningClient provisioningClient;
 
 		/// <summary>
@@ -63,8 +62,8 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="ProvisioningClient">Provisioning client, if sensor supports provisioning.</param>
 		/// <param name="SupportsEvents">If events are supported.</param>
 		public SensorServer(XmppClient Client, ProvisioningClient ProvisioningClient, bool SupportsEvents)
+			: base(Client)
 		{
-			this.client = Client;
 			this.provisioningClient = ProvisioningClient;
 
 			this.client.RegisterIqGetHandler("req", SensorClient.NamespaceSensorData, this.ReqHandler, true);
@@ -139,8 +138,10 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>
 		/// </summary>
-		public void Dispose()
+		public override void Dispose()
 		{
+			base.Dispose();
+
 			this.client.UnregisterIqGetHandler("req", SensorClient.NamespaceSensorData, this.ReqHandler, true);
 			this.client.UnregisterIqSetHandler("req", SensorClient.NamespaceSensorData, this.ReqHandler, false);
 			this.client.UnregisterIqGetHandler("cancel", SensorClient.NamespaceSensorData, this.CancelHandler, false);
@@ -153,12 +154,9 @@ namespace Waher.Networking.XMPP.Sensor
 		}
 
 		/// <summary>
-		/// XMPP Client
+		/// Implemented extensions.
 		/// </summary>
-		public XmppClient Client
-		{
-			get { return this.client; }
-		}
+		public override string[] Extensions => new string[] { "XEP-0323" };
 
 		private void ReqHandler(object Sender, IqEventArgs e)
 		{

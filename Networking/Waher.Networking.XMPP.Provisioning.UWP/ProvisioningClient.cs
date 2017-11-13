@@ -55,11 +55,11 @@ namespace Waher.Networking.XMPP.Provisioning
 	/// The interface is defined in XEP-0324:
 	/// http://xmpp.org/extensions/xep-0324.html
 	/// </summary>
-	public class ProvisioningClient : IDisposable
+	public class ProvisioningClient : XmppExtension
 	{
 		private Dictionary<string, CertificateUse> certificates = new Dictionary<string, CertificateUse>();
-		private XmppClient client;
 		private string provisioningServerAddress;
+		private string ownerJid = string.Empty;
 
 		/// <summary>
 		/// urn:xmpp:iot:provisioning
@@ -75,8 +75,8 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="Client">XMPP Client</param>
 		/// <param name="ProvisioningServerAddress">Provisioning Server XMPP Address.</param>
 		public ProvisioningClient(XmppClient Client, string ProvisioningServerAddress)
+			: base(Client)
 		{
-			this.client = Client;
 			this.provisioningServerAddress = ProvisioningServerAddress;
 
 			this.client.RegisterIqGetHandler("tokenChallenge", NamespaceProvisioning, this.TokenChallengeHandler, true);
@@ -95,8 +95,11 @@ namespace Waher.Networking.XMPP.Provisioning
 
 		private void Client_OnPresenceSubscribe(object Sender, PresenceEventArgs e)
 		{
-			if (e.From == this.provisioningServerAddress)
+			if (string.Compare(e.From, this.provisioningServerAddress, true) == 0 ||
+				(!string.IsNullOrEmpty(this.ownerJid) && string.Compare(e.From, this.ownerJid, true) == 0))
+			{
 				e.Accept();
+			}
 			else
 				this.IsFriend(XmppClient.GetBareJID(e.From), this.CheckIfFriendCallback, e);
 		}
@@ -120,8 +123,10 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>
 		/// </summary>
-		public void Dispose()
+		public override void Dispose()
 		{
+			base.Dispose();
+
 			this.client.UnregisterIqGetHandler("tokenChallenge", NamespaceProvisioning, this.TokenChallengeHandler, true);
 
 			this.client.UnregisterMessageHandler("unfriend", NamespaceProvisioning, this.UnfriendHandler, false);
@@ -133,12 +138,9 @@ namespace Waher.Networking.XMPP.Provisioning
 		}
 
 		/// <summary>
-		/// XMPP Client
+		/// Implemented extensions.
 		/// </summary>
-		public XmppClient Client
-		{
-			get { return this.client; }
-		}
+		public override string[] Extensions => new string[] { "XEP-0324" };
 
 		/// <summary>
 		/// Provisioning server XMPP address.
@@ -146,6 +148,15 @@ namespace Waher.Networking.XMPP.Provisioning
 		public string ProvisioningServerAddress
 		{
 			get { return this.provisioningServerAddress; }
+		}
+
+		/// <summary>
+		/// JID of owner, if known or available.
+		/// </summary>
+		public string OwnerJid
+		{
+			get { return this.ownerJid; }
+			internal set { this.ownerJid = value; }
 		}
 
 		/// <summary>

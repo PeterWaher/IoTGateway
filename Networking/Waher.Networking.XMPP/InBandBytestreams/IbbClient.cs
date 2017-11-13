@@ -13,14 +13,13 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 	/// Class sending and receiving binary streams over XMPP using XEP-0047: In-band Bytestreams:
 	/// https://xmpp.org/extensions/xep-0047.html
 	/// </summary>
-	public class IbbClient : IDisposable
+	public class IbbClient : XmppExtension
 	{
 		/// <summary>
 		/// http://jabber.org/protocol/ibb
 		/// </summary>
 		public const string Namespace = "http://jabber.org/protocol/ibb";
 
-		private XmppClient client;
 		private Cache<string, IncomingStream> cache = null;
 		private Dictionary<string, OutgoingStream> output = new Dictionary<string, OutgoingStream>();
 		private object synchObject = new object();
@@ -33,8 +32,8 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 		/// <param name="Client">XMPP Client</param>
 		/// <param name="MaxBlockSize">Maximum block size in transfer.</param>
 		public IbbClient(XmppClient Client, int MaxBlockSize)
+			: base(Client)
 		{
-			this.client = Client;
 			this.maxBlockSize = MaxBlockSize;
 
 			this.client.RegisterIqSetHandler("open", Namespace, this.OpenHandler, true);
@@ -46,8 +45,10 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>
 		/// </summary>
-		public void Dispose()
+		public override void Dispose()
 		{
+			base.Dispose();
+
 			this.client.UnregisterIqSetHandler("open", Namespace, this.OpenHandler, true);
 			this.client.UnregisterIqSetHandler("close", Namespace, this.CloseHandler, false);
 			this.client.UnregisterIqSetHandler("data", Namespace, this.DataHandler, false);
@@ -72,6 +73,11 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 				this.output = null;
 			}
 		}
+
+		/// <summary>
+		/// Implemented extensions.
+		/// </summary>
+		public override string[] Extensions => new string[] { "XEP-0047" };
 
 		/// <summary>
 		/// Opens a new binary stream.

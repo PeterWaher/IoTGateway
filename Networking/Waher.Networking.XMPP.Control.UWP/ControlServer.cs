@@ -28,11 +28,10 @@ namespace Waher.Networking.XMPP.Control
 	/// The interface is defined in the IEEE XMPP IoT extensions:
 	/// https://gitlab.com/IEEE-SA/XMPPI/IoT
 	/// </summary>
-	public class ControlServer : IDisposable
+	public class ControlServer : XmppExtension
 	{
 		private ControlParameter[] controlParameters;
 		private Dictionary<string, ControlParameter> controlParametersByName = new Dictionary<string, ControlParameter>();
-		private XmppClient client;
 		private ProvisioningClient provisioningClient;
 
 		/// <summary>
@@ -60,8 +59,8 @@ namespace Waher.Networking.XMPP.Control
 		/// <param name="Parameters">Default set of control parameters. If set of control parameters vary depending on node, leave this
 		/// field blank, and provide an event handler for the <see cref="OnGetControlParameters"/> event.</param>
 		public ControlServer(XmppClient Client, ProvisioningClient ProvisioningClient, params ControlParameter[] Parameters)
+			: base(Client)
 		{
-			this.client = Client;
 			this.provisioningClient = ProvisioningClient;
 
 			this.controlParameters = Parameters;
@@ -75,8 +74,10 @@ namespace Waher.Networking.XMPP.Control
 		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>
 		/// </summary>
-		public void Dispose()
+		public override void Dispose()
 		{
+			base.Dispose();
+
 			this.controlParameters = null;
 			this.controlParametersByName.Clear();
 
@@ -85,12 +86,9 @@ namespace Waher.Networking.XMPP.Control
 		}
 
 		/// <summary>
-		/// XMPP Client
+		/// Implemented extensions.
 		/// </summary>
-		public XmppClient Client
-		{
-			get { return this.client; }
-		}
+		public override string[] Extensions => new string[] { "XEP-0325" };
 
 		/// <summary>
 		/// Event raised when the collection of control parameters is required. If not specified, the default collection of parameters 

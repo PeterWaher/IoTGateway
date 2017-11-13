@@ -14,10 +14,8 @@ namespace Waher.Networking.XMPP.Interoperability
 	/// https://github.com/joachimlindborg/XMPP-IoT/blob/master/xep-0000-IoT-Interoperability.html
 	/// http://htmlpreview.github.io/?https://github.com/joachimlindborg/XMPP-IoT/blob/master/xep-0000-IoT-Interoperability.html
 	/// </summary>
-	public class InteroperabilityClient : IDisposable
+	public class InteroperabilityClient : XmppExtension
 	{
-		private XmppClient client;
-
 		/// <summary>
 		/// Implements the client-side for Interoperability interfaces, as defined in:
 		/// 
@@ -26,21 +24,14 @@ namespace Waher.Networking.XMPP.Interoperability
 		/// </summary>
 		/// <param name="Client">XMPP Client</param>
 		public InteroperabilityClient(XmppClient Client)
-		{
-			this.client = Client;
-		}
-
-		/// <summary>
-		/// <see cref="IDisposable.Dispose"/>
-		/// </summary>
-		public void Dispose()
+			: base(Client)
 		{
 		}
 
 		/// <summary>
-		/// XMPP Client.
+		/// Implemented extensions.
 		/// </summary>
-		public XmppClient Client { get { return this.client; } }
+		public override string[] Extensions => new string[0];
 
 		/// <summary>
 		/// Sends a request for interoperability interfaces from an entity.

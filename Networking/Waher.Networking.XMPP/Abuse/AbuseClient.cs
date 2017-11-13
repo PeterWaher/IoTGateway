@@ -31,7 +31,7 @@ namespace Waher.Networking.XMPP.Abuse
     /// <summary>
     /// Class implementing blocking (XEP-0191) and spam reporting (XEP-0377).
     /// </summary>
-    public class AbuseClient : IDisposable
+    public class AbuseClient : XmppExtension
     {
         /// <summary>
         /// urn:xmpp:blocking
@@ -54,7 +54,6 @@ namespace Waher.Networking.XMPP.Abuse
         public const string NamespaceAbuseReason = "urn:xmpp:reporting:reason:abuse:0";
 
         private SortedDictionary<string, bool> blockList = new SortedDictionary<string, bool>(StringComparer.CurrentCultureIgnoreCase);
-        private XmppClient client;
         private bool supportsBlocking = false;
         private bool supportsReporting = false;
         private bool supportsSpamReason = false;
@@ -65,8 +64,8 @@ namespace Waher.Networking.XMPP.Abuse
         /// </summary>
         /// <param name="Client">XMPP Client.</param>
         public AbuseClient(XmppClient Client)
+			: base(Client)
         {
-            this.client = Client;
             this.client.RegisterIqSetHandler("block", NamespaceBlocking, this.BlockPushHandler, true);
             this.client.RegisterIqSetHandler("unblock", NamespaceBlocking, this.UnblockPushHandler, false);
 
@@ -76,7 +75,12 @@ namespace Waher.Networking.XMPP.Abuse
             this.client.OnStateChanged += Client_OnStateChanged;
         }
 
-        private void Client_OnStateChanged(object Sender, XmppState NewState)
+		/// <summary>
+		/// Implemented extensions.
+		/// </summary>
+		public override string[] Extensions => new string[] { "XEP-0191", "XEP-0377" };
+
+		private void Client_OnStateChanged(object Sender, XmppState NewState)
         {
             switch (NewState)
             {
@@ -95,19 +99,13 @@ namespace Waher.Networking.XMPP.Abuse
         }
 
         /// <summary>
-        /// XMPP Client.
-        /// </summary>
-        public XmppClient Client
-        {
-            get { return this.client; }
-        }
-
-        /// <summary>
         /// <see cref="IDisposable.Dispose"/>
         /// </summary>
-        public void Dispose()
+        public override void Dispose()
         {
-            this.client.UnregisterIqSetHandler("block", NamespaceBlocking, this.BlockPushHandler, true);
+			base.Dispose();
+
+			this.client.UnregisterIqSetHandler("block", NamespaceBlocking, this.BlockPushHandler, true);
             this.client.UnregisterIqSetHandler("unblock", NamespaceBlocking, this.UnblockPushHandler, false);
         }
 

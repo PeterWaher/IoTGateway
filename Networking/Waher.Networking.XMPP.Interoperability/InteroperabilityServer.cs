@@ -13,14 +13,12 @@ namespace Waher.Networking.XMPP.Interoperability
 	/// https://github.com/joachimlindborg/XMPP-IoT/blob/master/xep-0000-IoT-Interoperability.html
 	/// http://htmlpreview.github.io/?https://github.com/joachimlindborg/XMPP-IoT/blob/master/xep-0000-IoT-Interoperability.html
 	/// </summary>
-	public class InteroperabilityServer : IDisposable
+	public class InteroperabilityServer : XmppExtension
 	{
 		/// <summary>
 		/// urn:xmpp:iot:interoperability
 		/// </summary>
 		public const string NamespaceInteroperability = "urn:xmpp:iot:interoperability";
-
-		private XmppClient client;
 
 		/// <summary>
 		/// Implements the server-side for Interoperability interfaces, as defined in:
@@ -30,24 +28,24 @@ namespace Waher.Networking.XMPP.Interoperability
 		/// </summary>
 		/// <param name="Client">XMPP Client</param>
 		public InteroperabilityServer(XmppClient Client)
+			: base(Client)
 		{
-			this.client = Client;
-
 			this.client.RegisterIqGetHandler("getInterfaces", NamespaceInteroperability, this.GetInterfacesHandler, true);
 		}
 
 		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>
 		/// </summary>
-		public void Dispose()
+		public override void Dispose()
 		{
+			base.Dispose();
 			this.client.UnregisterIqGetHandler("getInterfaces", NamespaceInteroperability, this.GetInterfacesHandler, true);
 		}
 
 		/// <summary>
-		/// XMPP Client.
+		/// Implemented extensions.
 		/// </summary>
-		public XmppClient Client { get { return this.client; } }
+		public override string[] Extensions => new string[0];
 
 		private void GetInterfacesHandler(object Sender, IqEventArgs e)
 		{

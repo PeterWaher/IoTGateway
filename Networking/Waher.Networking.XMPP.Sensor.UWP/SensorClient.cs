@@ -15,7 +15,7 @@ namespace Waher.Networking.XMPP.Sensor
 	/// The interface is defined in the IEEE XMPP IoT extensions:
 	/// https://gitlab.com/IEEE-SA/XMPPI/IoT
 	/// </summary>
-	public class SensorClient : IDisposable
+	public class SensorClient : XmppExtension
 	{
 		/// <summary>
 		/// urn:ieee:iot:sd:1.0
@@ -28,7 +28,6 @@ namespace Waher.Networking.XMPP.Sensor
 		public const string NamespaceSensorEvents = "urn:ieee:iot:events";
 
 		private Dictionary<string, SensorDataClientRequest> requests = new Dictionary<string, SensorDataClientRequest>();
-		private XmppClient client;
 		private object synchObj = new object();
 
 		/// <summary>
@@ -39,9 +38,8 @@ namespace Waher.Networking.XMPP.Sensor
 		/// </summary>
 		/// <param name="Client">XMPP Client</param>
 		public SensorClient(XmppClient Client)
+			: base(Client)
 		{
-			this.client = Client;
-
 			this.client.RegisterMessageHandler("started", NamespaceSensorData, this.StartedHandler, false);
 			this.client.RegisterMessageHandler("done", NamespaceSensorData, this.DoneHandler, false);
 			this.client.RegisterMessageHandler("resp", NamespaceSensorData, this.FieldsHandler, false);
@@ -50,20 +48,19 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>
 		/// </summary>
-		public void Dispose()
+		public override void Dispose()
 		{
+			base.Dispose();
+
 			this.client.UnregisterMessageHandler("started", NamespaceSensorData, this.StartedHandler, false);
 			this.client.UnregisterMessageHandler("done", NamespaceSensorData, this.DoneHandler, false);
 			this.client.UnregisterMessageHandler("resp", NamespaceSensorData, this.FieldsHandler, false);
 		}
 
 		/// <summary>
-		/// XMPP Client
+		/// Implemented extensions.
 		/// </summary>
-		public XmppClient Client
-		{
-			get { return this.client; }
-		}
+		public override string[] Extensions => new string[] { "XEP-0323" };
 
 		/// <summary>
 		/// Requests a sensor data readout.

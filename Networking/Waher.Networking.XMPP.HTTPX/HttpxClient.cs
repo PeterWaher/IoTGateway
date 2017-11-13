@@ -12,7 +12,7 @@ namespace Waher.Networking.XMPP.HTTPX
 	/// <summary>
 	/// HTTPX client.
 	/// </summary>
-	public class HttpxClient : IDisposable
+	public class HttpxClient : XmppExtension
 	{
 		/// <summary>
 		/// urn:xmpp:http
@@ -24,7 +24,6 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// </summary>
 		public const string NamespaceHeaders = "http://jabber.org/protocol/shim";
 
-		private XmppClient client;
 		private InBandBytestreams.IbbClient ibbClient = null;
 		private P2P.SOCKS5.Socks5Proxy socks5Proxy = null;
 		private IEndToEndEncryption e2e;
@@ -36,8 +35,8 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// <param name="Client">XMPP Client.</param>
 		/// <param name="MaxChunkSize">Max Chunk Size to use.</param>
 		public HttpxClient(XmppClient Client, int MaxChunkSize)
+			: base(Client)
 		{
-			this.client = Client;
 			this.e2e = null;
 			this.maxChunkSize = MaxChunkSize;
 
@@ -51,13 +50,18 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// <param name="E2e">End-to-end encryption interface.</param>
 		/// <param name="MaxChunkSize">Max Chunk Size to use.</param>
 		public HttpxClient(XmppClient Client, IEndToEndEncryption E2e, int MaxChunkSize)
+			: base(Client)
 		{
-			this.client = Client;
 			this.e2e = E2e;
 			this.maxChunkSize = MaxChunkSize;
 
 			HttpxChunks.RegisterChunkReceiver(this.client);
 		}
+
+		/// <summary>
+		/// Implemented extensions.
+		/// </summary>
+		public override string[] Extensions => new string[] { "XEP-0332" };
 
 		/// <summary>
 		/// Optional end-to-end encryption interface to use in requests.
@@ -103,8 +107,10 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>
 		/// </summary>
-		public void Dispose()
+		public override void Dispose()
 		{
+			base.Dispose();
+
 			HttpxChunks.UnregisterChunkReceiver(this.client);
 		}
 

@@ -234,6 +234,7 @@ namespace Waher.Networking.XMPP
 		private Dictionary<string, RosterItem> roster = new Dictionary<string, RosterItem>(StringComparer.CurrentCultureIgnoreCase);
 		private Dictionary<string, int> pendingAssuredMessagesPerSource = new Dictionary<string, int>();
 		private Dictionary<string, object> tags = new Dictionary<string, object>();
+		private List<IXmppExtension> extensions = new List<IXmppExtension>();
 		private AuthenticationMethod authenticationMethod = null;
 #if WINDOWS_UWP
 		private StreamSocket client = null;
@@ -6158,6 +6159,71 @@ namespace Waher.Networking.XMPP
 		public bool CanRegister
 		{
 			get { return this.canRegister; }
+		}
+
+		/// <summary>
+		/// Registers an extension with the client.
+		/// </summary>
+		/// <param name="Extension">Extension</param>
+		public void RegisterExtension(IXmppExtension Extension)
+		{
+			lock (this.extensions)
+			{
+				if (!this.extensions.Contains(Extension))
+					this.extensions.Add(Extension);
+			}
+		}
+
+		/// <summary>
+		/// Unregisters an extension on the client.
+		/// </summary>
+		/// <param name="Extension">Extension</param>
+		/// <returns>If the extension was found and unregistered.</returns>
+		public bool UnregisterExtension(IXmppExtension Extension)
+		{
+			lock (this.extensions)
+			{
+				return this.extensions.Remove(Extension);
+			}
+		}
+
+		/// <summary>
+		/// Registered extensions.
+		/// </summary>
+		public IXmppExtension[] Extensions
+		{
+			get
+			{
+				lock (this.extensions)
+				{
+					return this.extensions.ToArray();
+				}
+			}
+		}
+
+		/// <summary>
+		/// Tries to get a registered extension of a specific type from the client.
+		/// </summary>
+		/// <param name="Type">Extension type.</param>
+		/// <param name="Extension">Registered extension, if found.</param>
+		/// <returns>If a registered extension of the desired type was found.</returns>
+		public bool TryGetExtension(Type Type, out IXmppExtension Extension)
+		{
+			lock (this.extensions)
+			{
+				foreach (IXmppExtension Extension2 in this.extensions)
+				{
+					if (Extension2.GetType() == Type)
+					{
+						Extension = Extension2;
+						return true;
+					}
+				}
+			}
+
+			Extension = null;
+
+			return false;
 		}
 
 	}

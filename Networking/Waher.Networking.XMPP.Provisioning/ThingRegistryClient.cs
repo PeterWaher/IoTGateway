@@ -61,9 +61,8 @@ namespace Waher.Networking.XMPP.Provisioning
 	/// The interface is defined in XEP-0347:
 	/// http://xmpp.org/extensions/xep-0347.html
 	/// </summary>
-	public class ThingRegistryClient : IDisposable
+	public class ThingRegistryClient : XmppExtension
 	{
-		private XmppClient client;
 		private string thingRegistryAddress;
 
 		/// <summary>
@@ -80,8 +79,8 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="Client">XMPP Client</param>
 		/// <param name="ThingRegistryAddress">Thing Registry XMPP address.</param>
 		public ThingRegistryClient(XmppClient Client, string ThingRegistryAddress)
+			: base(Client)
 		{
-			this.client = Client;
 			this.thingRegistryAddress = ThingRegistryAddress;
 
 			this.client.RegisterIqSetHandler("claimed", NamespaceDiscovery, this.ClaimedHandler, true);
@@ -92,20 +91,19 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>
 		/// </summary>
-		public void Dispose()
+		public override void Dispose()
 		{
+			base.Dispose();
+
 			this.client.UnregisterIqSetHandler("claimed", NamespaceDiscovery, this.ClaimedHandler, true);
 			this.client.UnregisterIqSetHandler("removed", NamespaceDiscovery, this.RemovedHandler, false);
 			this.client.UnregisterIqSetHandler("disowned", NamespaceDiscovery, this.DisownedHandler, false);
 		}
 
 		/// <summary>
-		/// XMPP Client
+		/// Implemented extensions.
 		/// </summary>
-		public XmppClient Client
-		{
-			get { return this.client; }
-		}
+		public override string[] Extensions => new string[] { "XEP-0347" };
 
 		/// <summary>
 		/// Thing Registry XMPP address.
@@ -265,6 +263,13 @@ namespace Waher.Networking.XMPP.Provisioning
 					{
 						OwnerJid = XML.Attribute(E, "jid");
 						IsPublic = XML.Attribute(E, "public", false);
+
+						if (string.IsNullOrEmpty(NodeId) && string.IsNullOrEmpty(SourceId) && string.IsNullOrEmpty(Partition) &&
+							this.client.TryGetExtension(typeof(ProvisioningClient), out IXmppExtension Extension) &&
+							Extension is ProvisioningClient ProvisioningClient)
+						{
+							ProvisioningClient.OwnerJid = OwnerJid;
+						}
 					}
 
 					RegistrationEventArgs e2 = new RegistrationEventArgs(e, State, OwnerJid, IsPublic);
@@ -401,7 +406,15 @@ namespace Waher.Networking.XMPP.Provisioning
 			ThingReference Node;
 
 			if (string.IsNullOrEmpty(NodeId) && string.IsNullOrEmpty(SourceId) && string.IsNullOrEmpty(Partition))
+			{
 				Node = ThingReference.Empty;
+
+				if (this.client.TryGetExtension(typeof(ProvisioningClient), out IXmppExtension Extension) &&
+					Extension is ProvisioningClient ProvisioningClient)
+				{
+					ProvisioningClient.OwnerJid = OwnerJid;
+				}
+			}
 			else
 				Node = new ThingReference(NodeId, SourceId, Partition);
 
@@ -652,7 +665,16 @@ namespace Waher.Networking.XMPP.Provisioning
 					bool Disowned = false;
 
 					if (e.Ok && E != null && E.LocalName == "disowned" && E.NamespaceURI == NamespaceDiscovery)
+					{
 						Disowned = true;
+
+						if (string.IsNullOrEmpty(NodeId) && string.IsNullOrEmpty(SourceId) && string.IsNullOrEmpty(Partition) &&
+							this.client.TryGetExtension(typeof(ProvisioningClient), out IXmppExtension Extension) &&
+							Extension is ProvisioningClient ProvisioningClient)
+						{
+							ProvisioningClient.OwnerJid = string.Empty;
+						}
+					}
 
 					UpdateEventArgs e2 = new UpdateEventArgs(e, State, Disowned);
 
@@ -820,7 +842,15 @@ namespace Waher.Networking.XMPP.Provisioning
 			ThingReference Node;
 
 			if (string.IsNullOrEmpty(NodeId) && string.IsNullOrEmpty(SourceId) && string.IsNullOrEmpty(Partition))
+			{
 				Node = ThingReference.Empty;
+
+				if (this.client.TryGetExtension(typeof(ProvisioningClient), out IXmppExtension Extension) &&
+					Extension is ProvisioningClient ProvisioningClient)
+				{
+					ProvisioningClient.OwnerJid = string.Empty;
+				}
+			}
 			else
 				Node = new ThingReference(NodeId, SourceId, Partition);
 

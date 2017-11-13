@@ -12,14 +12,13 @@ namespace Waher.Networking.XMPP.BitsOfBinary
 	/// Client managing bits of binary (XEP-0231):
 	/// https://xmpp.org/extensions/xep-0231.html
 	/// </summary>
-	public class BobClient : IDisposable
+	public class BobClient : XmppExtension
 	{
 		/// <summary>
 		/// urn:xmpp:bob
 		/// </summary>
 		public const string Namespace = "urn:xmpp:bob";
 
-		private XmppClient client;
 		private string folder;
 
 		/// <summary>
@@ -29,8 +28,8 @@ namespace Waher.Networking.XMPP.BitsOfBinary
 		/// <param name="Client">XMPP Client to use.</param>
 		/// <param name="Folder">Folder to persist bits of binary data.</param>
 		public BobClient(XmppClient Client, string Folder)
+			: base(Client)
 		{
-			this.client = Client;
 			this.folder = Folder;
 
 			if (!Directory.Exists(Folder))
@@ -42,12 +41,19 @@ namespace Waher.Networking.XMPP.BitsOfBinary
 		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>
 		/// </summary>
-		public void Dispose()
+		public override void Dispose()
 		{
+			base.Dispose();
+
 			this.client.UnregisterIqGetHandler("data", Namespace, this.GetData, true);
 
 			this.DeleteAll();
 		}
+
+		/// <summary>
+		/// Implemented extensions.
+		/// </summary>
+		public override string[] Extensions => new string[] { "XEP-0231" };
 
 		/// <summary>
 		/// Stores data for access with the Bits of binary protocol.

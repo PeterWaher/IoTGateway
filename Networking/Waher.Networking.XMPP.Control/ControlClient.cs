@@ -26,14 +26,12 @@ namespace Waher.Networking.XMPP.Control
 	/// The interface is defined in the IEEE XMPP IoT extensions:
 	/// https://gitlab.com/IEEE-SA/XMPPI/IoT
 	/// </summary>
-	public class ControlClient : IDisposable
+	public class ControlClient : XmppExtension
 	{
 		/// <summary>
 		/// urn:ieee:iot:ctr:1.0
 		/// </summary>
 		public const string NamespaceControl = "urn:ieee:iot:ctr:1.0";
-
-		private XmppClient client;
 
 		/// <summary>
 		/// Implements an XMPP control client interface.
@@ -43,24 +41,14 @@ namespace Waher.Networking.XMPP.Control
 		/// </summary>
 		/// <param name="Client">XMPP Client</param>
 		public ControlClient(XmppClient Client)
-		{
-			this.client = Client;
-		}
-
-		/// <summary>
-		/// <see cref="IDisposable.Dispose"/>
-		/// </summary>
-		public void Dispose()
+			: base(Client)
 		{
 		}
 
 		/// <summary>
-		/// XMPP Client
+		/// Implemented extensions.
 		/// </summary>
-		public XmppClient Client
-		{
-			get { return this.client; }
-		}
+		public override string[] Extensions => new string[] { "XEP-0325" };
 
 		/// <summary>
 		/// Sets a control parameter in a remote actuator.

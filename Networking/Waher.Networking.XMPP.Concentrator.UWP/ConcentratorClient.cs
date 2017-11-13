@@ -18,10 +18,8 @@ namespace Waher.Networking.XMPP.Concentrator
 	/// The interface is defined in XEP-0326:
 	/// http://xmpp.org/extensions/xep-0326.html
 	/// </summary>
-	public class ConcentratorClient : IDisposable
+	public class ConcentratorClient : XmppExtension
 	{
-		private XmppClient client;
-
 		/// <summary>
 		/// Implements an XMPP concentrator client interface.
 		/// 
@@ -30,19 +28,14 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// </summary>
 		/// <param name="Client">XMPP Client.</param>
 		public ConcentratorClient(XmppClient Client)
+			: base(Client)
 		{
-			this.client = Client;
 		}
 
 		/// <summary>
-		/// <see cref="IDisposable.Dispose"/>
+		/// Implemented extensions.
 		/// </summary>
-		public void Dispose()
-		{
-			if (this.client != null)
-			{
-			}
-		}
+		public override string[] Extensions => new string[] { "XEP-0326" };
 
 		/// <summary>
 		/// Gets the capabilities of a concentrator server.

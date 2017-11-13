@@ -12,7 +12,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 	/// <summary>
 	/// Class managing a SOCKS5 proxy associated with the current XMPP server.
 	/// </summary>
-	public class Socks5Proxy : IDisposable
+	public class Socks5Proxy : XmppExtension
 	{
 		/// <summary>
 		/// http://jabber.org/protocol/bytestreams
@@ -20,7 +20,6 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		public const string Namespace = "http://jabber.org/protocol/bytestreams";
 
 		private Dictionary<string, Socks5Client> streams = new Dictionary<string, Socks5Client>();
-		private XmppClient client;
 		private IEndToEndEncryption e2e;
 		private bool hasProxy = false;
 		private string jid = null;
@@ -42,8 +41,8 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		/// <param name="Client">XMPP Client.</param>
 		/// <param name="E2E">End-to-end encryption interface.</param>
 		public Socks5Proxy(XmppClient Client, IEndToEndEncryption E2E)
+			: base(Client)
 		{
-			this.client = Client;
 			this.e2e = E2E;
 
 			this.client.RegisterIqSetHandler("query", Namespace, this.QueryHandler, true);
@@ -52,10 +51,17 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>
 		/// </summary>
-		public void Dispose()
+		public override void Dispose()
 		{
+			base.Dispose();
+
 			this.client.UnregisterIqSetHandler("query", Namespace, this.QueryHandler, true);
 		}
+
+		/// <summary>
+		/// Implemented extensions.
+		/// </summary>
+		public override string[] Extensions => new string[] { "XEP-0065" };
 
 		/// <summary>
 		/// If a SOCKS5 proxy has been detected.

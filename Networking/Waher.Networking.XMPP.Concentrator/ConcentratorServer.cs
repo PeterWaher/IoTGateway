@@ -27,14 +27,13 @@ namespace Waher.Networking.XMPP.Concentrator
 	/// The interface is defined in XEP-0326:
 	/// http://xmpp.org/extensions/xep-0326.html
 	/// </summary>
-	public class ConcentratorServer : IDisposable
+	public class ConcentratorServer : XmppExtension
 	{
 		/// <summary>
 		/// urn:xmpp:iot:concentrators
 		/// </summary>
 		public const string NamespaceConcentrator = "urn:xmpp:iot:concentrators";
 
-		private XmppClient client;
 		private Dictionary<string, IDataSource> rootDataSources = new Dictionary<string, IDataSource>();
 		private Dictionary<string, IDataSource> dataSources = new Dictionary<string, IDataSource>();
 		private Dictionary<string, Query> queries = new Dictionary<string, Query>();
@@ -65,9 +64,8 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="ProvisioningClient">Provisioning client.</param>
 		/// <param name="DataSources">Data sources.</param>
 		public ConcentratorServer(XmppClient Client, ProvisioningClient ProvisioningClient, params IDataSource[] DataSources)
+			: base(Client)
 		{
-			this.client = Client;
-
 			this.sensorServer = new SensorServer(this.client, ProvisioningClient, true);
 			this.sensorServer.OnExecuteReadoutRequest += SensorServer_OnExecuteReadoutRequest;
 
@@ -133,8 +131,10 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>
 		/// </summary>
-		public void Dispose()
+		public override void Dispose()
 		{
+			base.Dispose();
+
 			this.client.UnregisterIqGetHandler("getCapabilities", NamespaceConcentrator, this.GetCapabilitiesHandler, true);
 
 			this.client.UnregisterIqGetHandler("getAllDataSources", NamespaceConcentrator, this.GetAllDataSourcesHandler, false);
@@ -214,12 +214,9 @@ namespace Waher.Networking.XMPP.Concentrator
 		}
 
 		/// <summary>
-		/// XMPP Client
+		/// Implemented extensions.
 		/// </summary>
-		public XmppClient Client
-		{
-			get { return this.client; }
-		}
+		public override string[] Extensions => new string[] { "XEP-0326" };
 
 		/// <summary>
 		/// Sensor server.

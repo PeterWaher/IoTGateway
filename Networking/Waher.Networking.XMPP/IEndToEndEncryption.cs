@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 namespace Waher.Networking.XMPP
 {
 	/// <summary>
-	/// 
+	/// End-to-end encryption mode.
 	/// </summary>
 	public enum E2ETransmission
 	{

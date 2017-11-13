@@ -34,13 +34,12 @@ namespace Waher.Networking.XMPP.Chat
 	/// https://github.com/joachimlindborg/XMPP-IoT/blob/master/xep-0000-IoT-Chat.xml
 	/// http://htmlpreview.github.io/?https://github.com/joachimlindborg/XMPP-IoT/blob/master/xep-0000-IoT-Chat.html
 	/// </summary>
-	public class ChatServer : IDisposable
+	public class ChatServer : XmppExtension
 	{
 		private Cache<string, Variables> sessions;
 		private SensorServer sensorServer;
 		private ControlServer controlServer;
 		private ConcentratorServer concentratorServer;
-		private XmppClient client;
 		private BobClient bobClient;
 		private HttpFileUploadClient httpUpload = null;
 
@@ -86,8 +85,8 @@ namespace Waher.Networking.XMPP.Chat
 		/// <param name="SensorServer">Sensor Server. Can be null, if not supporting a sensor interface.</param>
 		/// <param name="ControlServer">Control Server. Can be null, if not supporting a control interface.</param>
 		public ChatServer(XmppClient Client, BobClient BobClient, SensorServer SensorServer, ControlServer ControlServer)
+			: base(Client)
 		{
-			this.client = Client;
 			this.bobClient = BobClient;
 			this.sensorServer = SensorServer;
 			this.controlServer = ControlServer;
@@ -113,8 +112,8 @@ namespace Waher.Networking.XMPP.Chat
 		/// <param name="BobClient">Bits-of-Binary client.</param>
 		/// <param name="ConcentratorServer">Concentrator Server.</param>
 		public ChatServer(XmppClient Client, BobClient BobClient, ConcentratorServer ConcentratorServer)
+			: base(Client)
 		{
-			this.client = Client;
 			this.bobClient = BobClient;
 			this.sensorServer = ConcentratorServer.SensorServer;
 			this.controlServer = ConcentratorServer.ControlServer;
@@ -132,10 +131,17 @@ namespace Waher.Networking.XMPP.Chat
 		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>
 		/// </summary>
-		public void Dispose()
+		public override void Dispose()
 		{
+			base.Dispose();
+
 			this.client.UnregisterFeature("urn:xmpp:iot:chat");
 		}
+
+		/// <summary>
+		/// Implemented extensions.
+		/// </summary>
+		public override string[] Extensions => new string[0];
 
 		private void SendMarkdownChatMessage(string To, string Message)
 		{

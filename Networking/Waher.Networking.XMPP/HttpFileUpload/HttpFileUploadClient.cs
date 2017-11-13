@@ -14,14 +14,13 @@ namespace Waher.Networking.XMPP.HttpFileUpload
 	/// <summary>
 	/// Class managing HTTP File uploads, as defined in XEP-0363.
 	/// </summary>
-	public class HttpFileUploadClient
+	public class HttpFileUploadClient : XmppExtension
 	{
 		/// <summary>
 		/// urn:xmpp:http:upload:0
 		/// </summary>
 		public const string Namespace = "urn:xmpp:http:upload:0";
 
-		private XmppClient client;
 		private string fileUploadJid = null;
 		private long? maxFileSize = null;
 		private bool hasSupport = false;
@@ -31,8 +30,8 @@ namespace Waher.Networking.XMPP.HttpFileUpload
 		/// </summary>
 		/// <param name="Client">XMPP Client.</param>
 		public HttpFileUploadClient(XmppClient Client)
+			: base(Client)
 		{
-			this.client = Client;
 		}
 
 		/// <summary>
@@ -42,12 +41,17 @@ namespace Waher.Networking.XMPP.HttpFileUpload
 		/// <param name="FileUploadJid">JID to upload files to.</param>
 		/// <param name="MaxFileSize">Maximum file size.</param>
 		public HttpFileUploadClient(XmppClient Client, string FileUploadJid, long? MaxFileSize)
+			: base(Client)
 		{
-			this.client = Client;
 			this.fileUploadJid = FileUploadJid;
 			this.maxFileSize = MaxFileSize;
 			this.hasSupport = !string.IsNullOrEmpty(this.fileUploadJid);
 		}
+
+		/// <summary>
+		/// Implemented extensions.
+		/// </summary>
+		public override string[] Extensions => new string[] { "XEP-0363" };
 
 		/// <summary>
 		/// Searches for HTTP File Upload support on the current broker.

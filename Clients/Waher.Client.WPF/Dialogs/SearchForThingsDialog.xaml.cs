@@ -36,7 +36,8 @@ namespace Waher.Client.WPF.Dialogs
 	{
 		public string Tag;
 		public Operator Operator;
-		public string Value;
+		public string Value1;
+		public string Value2;
 	}
 
 	/// <summary>
@@ -120,7 +121,6 @@ namespace Waher.Client.WPF.Dialogs
 			{
 				Name = "Operator" + Suffix,
 				Width = 184,
-				IsEditable = true,
 				ToolTip = "Select search operator.",
 				SelectedIndex = 0
 			};
@@ -135,6 +135,8 @@ namespace Waher.Client.WPF.Dialogs
 			Operator.Items.Add(new ComboBoxItem() { Tag = "NotInRange", Content = "Not in range" });
 			Operator.Items.Add(new ComboBoxItem() { Tag = "Wildcard", Content = "Wildcard" });
 
+			Operator.SelectionChanged += this.Operator_SelectionChanged;
+
 			Panel2 = new StackPanel()
 			{
 				Orientation = Orientation.Vertical,
@@ -145,11 +147,19 @@ namespace Waher.Client.WPF.Dialogs
 			Panel2.Children.Add(Operator);
 			Panel.Children.Add(Panel2);
 
-			TextBox Value = new TextBox()
+			TextBox Value1 = new TextBox()
 			{
-				Name = "Value" + Suffix,
+				Name = "Value" + Suffix + "_1",
 				Width = 184,
 				ToolTip = "Select value to search on.",
+				Height = this.Operator1.ActualHeight
+			};
+
+			TextBox Value2 = new TextBox()
+			{
+				Name = "Value" + Suffix + "_2",
+				Width = 84,
+				ToolTip = "Select value to search to.",
 				Height = this.Operator1.ActualHeight
 			};
 
@@ -159,9 +169,37 @@ namespace Waher.Client.WPF.Dialogs
 				Margin = new Thickness(16, 0, 0, 0)
 			};
 
-			Panel2.Children.Add(new Label() { Content = "Value:" });
-			Panel2.Children.Add(Value);
 			Panel.Children.Add(Panel2);
+
+			StackPanel Panel3 = new StackPanel()
+			{
+				Orientation = Orientation.Horizontal,
+				Width = 184
+			};
+
+			Panel2.Children.Add(Panel3);
+
+			StackPanel Panel4 = new StackPanel()
+			{
+				Orientation = Orientation.Vertical
+			};
+
+			Panel3.Children.Add(Panel4);
+
+			Panel4.Children.Add(new Label() { Content = "Value:" });
+			Panel4.Children.Add(Value1);
+
+			Panel4 = new StackPanel()
+			{
+				Orientation = Orientation.Vertical,
+				Visibility = Visibility.Hidden,
+				Margin = new Thickness(16, 0, 0, 0)
+			};
+
+			Panel3.Children.Add(Panel4);
+
+			Panel4.Children.Add(new Label() { Content = "To:" });
+			Panel4.Children.Add(Value2);
 
 			Panel2 = new StackPanel()
 			{
@@ -214,9 +252,13 @@ namespace Waher.Client.WPF.Dialogs
 				StackPanel Panel1 = (StackPanel)Rule.Children[0];
 				StackPanel Panel2 = (StackPanel)Rule.Children[1];
 				StackPanel Panel3 = (StackPanel)Rule.Children[2];
+				StackPanel Panel3_1 = (StackPanel)Panel3.Children[0];
+				StackPanel Panel3_1_1 = (StackPanel)Panel3_1.Children[0];
+				StackPanel Panel3_1_2 = (StackPanel)Panel3_1.Children[1];
 				ComboBox Field = (ComboBox)Panel1.Children[1];
 				ComboBox Operator = (ComboBox)Panel2.Children[1];
-				TextBox Value = (TextBox)Panel3.Children[1];
+				TextBox Value1 = (TextBox)Panel3_1_1.Children[1];
+				TextBox Value2 = (TextBox)Panel3_1_2.Children[1];
 				string TagName;
 
 				TagName = Field.Text;
@@ -233,12 +275,49 @@ namespace Waher.Client.WPF.Dialogs
 				{
 					Tag = TagName,
 					Operator = (Operator)Operator.SelectedIndex,
-					Value = Value.Text
+					Value1 = Value1.Text,
+					Value2 = Value2.Text
 				});
 			}
 
 			return Result.ToArray();
 		}
 
+		private void Operator_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		{
+			ComboBox Op = (ComboBox)sender;
+			Operator Op2 = (Operator)Op.SelectedIndex;
+			StackPanel Panel = (StackPanel)(Op.Parent);
+			StackPanel Rule = (StackPanel)(Panel.Parent);
+			if (Rule.Children.Count < 3)
+				return;	// Building form.
+
+			StackPanel Value = (StackPanel)(Rule.Children[2]);
+			StackPanel Values = (StackPanel)(Value.Children[0]);
+			StackPanel Value1Panel = (StackPanel)(Values.Children[0]);
+			StackPanel Value2Panel = (StackPanel)(Values.Children[1]);
+			Label Value1Label = (Label)(Value1Panel.Children[0]);
+			TextBox Value1 = (TextBox)(Value1Panel.Children[1]);
+			TextBox Value2 = (TextBox)(Value2Panel.Children[1]);
+
+			if (Op2 == Operator.InRange || Op2 == Operator.NotInRange)
+			{
+				Value1Label.Content = "From:";
+				Value1.Width = 84;
+				Value1.ToolTip = "Select value to search from.";
+				Value2Panel.Visibility = Visibility.Visible;
+			}
+			else
+			{
+				Value1Label.Content = "Value:";
+				Value1.Width = 184;
+				Value2Panel.Visibility = Visibility.Hidden;
+
+				if (Op2 == Operator.Wildcard)
+					Value1.ToolTip = "Select value to search on. Use asterisks (*) as wildcards.";
+				else
+					Value1.ToolTip = "Select value to search on.";
+			}
+		}
 	}
 }

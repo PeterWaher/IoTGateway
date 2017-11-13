@@ -70,7 +70,7 @@ namespace Waher.Client.WPF.Model
 
 				foreach (Rule Rule in Rules)
 				{
-					Numeric = CommonTypes.TryParse(Rule.Value, out double d);
+					Numeric = CommonTypes.TryParse(Rule.Value1, out double d);
 
 					switch (Rule.Operator)
 					{
@@ -78,47 +78,64 @@ namespace Waher.Client.WPF.Model
 							if (Numeric)
 								Operators.Add(new NumericTagEqualTo(Rule.Tag, d));
 							else
-								Operators.Add(new StringTagEqualTo(Rule.Tag, Rule.Value));
+								Operators.Add(new StringTagEqualTo(Rule.Tag, Rule.Value1));
 							break;
 
 						case Operator.NonEquality:
 							if (Numeric)
 								Operators.Add(new NumericTagNotEqualTo(Rule.Tag, d));
 							else
-								Operators.Add(new StringTagNotEqualTo(Rule.Tag, Rule.Value));
+								Operators.Add(new StringTagNotEqualTo(Rule.Tag, Rule.Value1));
 							break;
 
 						case Operator.GreaterThan:
 							if (Numeric)
 								Operators.Add(new NumericTagGreaterThan(Rule.Tag, d));
 							else
-								Operators.Add(new StringTagGreaterThan(Rule.Tag, Rule.Value));
+								Operators.Add(new StringTagGreaterThan(Rule.Tag, Rule.Value1));
 							break;
 
 						case Operator.GreaterThanOrEqualTo:
 							if (Numeric)
 								Operators.Add(new NumericTagGreaterThanOrEqualTo(Rule.Tag, d));
 							else
-								Operators.Add(new StringTagGreaterThanOrEqualTo(Rule.Tag, Rule.Value));
+								Operators.Add(new StringTagGreaterThanOrEqualTo(Rule.Tag, Rule.Value1));
 							break;
 
 						case Operator.LesserThan:
 							if (Numeric)
 								Operators.Add(new NumericTagLesserThan(Rule.Tag, d));
 							else
-								Operators.Add(new StringTagLesserThan(Rule.Tag, Rule.Value));
+								Operators.Add(new StringTagLesserThan(Rule.Tag, Rule.Value1));
 							break;
 
 						case Operator.LesserThanOrEqualTo:
 							if (Numeric)
 								Operators.Add(new NumericTagLesserThanOrEqualTo(Rule.Tag, d));
 							else
-								Operators.Add(new StringTagLesserThanOrEqualTo(Rule.Tag, Rule.Value));
+								Operators.Add(new StringTagLesserThanOrEqualTo(Rule.Tag, Rule.Value1));
 							break;
 
 						case Operator.InRange:
+							Numeric &= CommonTypes.TryParse(Rule.Value2, out double d2);
+
+							if (Numeric)
+								Operators.Add(new NumericTagInRange(Rule.Tag, d, true, d2, true));
+							else
+								Operators.Add(new StringTagInRange(Rule.Tag, Rule.Value1, true, Rule.Value2, true));
+							break;
+
 						case Operator.NotInRange:
+							Numeric &= CommonTypes.TryParse(Rule.Value2, out d2);
+
+							if (Numeric)
+								Operators.Add(new NumericTagNotInRange(Rule.Tag, d, true, d2, true));
+							else
+								Operators.Add(new StringTagNotInRange(Rule.Tag, Rule.Value1, true, Rule.Value2, true));
+							break;
+
 						case Operator.Wildcard:
+							Operators.Add(new StringTagLike(Rule.Tag, Rule.Value1, "*"));
 							break;
 					}
 				}

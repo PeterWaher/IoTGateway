@@ -42,7 +42,7 @@
                     </StackPanel>
                     <StackPanel Orientation="Vertical" Margin="16,0,0,0">
                         <Label>Operator:</Label>
-                        <ComboBox Name="Operator1" Width="184" ToolTip="Select search operator." SelectedIndex="0">
+                        <ComboBox Name="Operator1" Width="184" ToolTip="Select search operator." SelectedIndex="0" SelectionChanged="Operator_SelectionChanged">
                             <ComboBoxItem Tag="=">Equality (=)</ComboBoxItem>
                             <ComboBoxItem Tag="&lt;&gt;">Non-equality (&lt;&gt;)</ComboBoxItem>
                             <ComboBoxItem Tag="&gt;">Greater than (&gt;)</ComboBoxItem>
@@ -55,8 +55,16 @@
                         </ComboBox>
                     </StackPanel>
                     <StackPanel Orientation="Vertical" Margin="16,0,0,0">
-                        <Label>Value:</Label>
-                        <TextBox Name="Value1" Width="184" ToolTip="Select value to search on." Height="{Binding ActualHeight, ElementName=Operator1}"/>
+                        <StackPanel Orientation="Horizontal" Width="184">
+                            <StackPanel Orientation="Vertical">
+                                <Label>Value:</Label>
+                                <TextBox Name="Value1_1" Width="184" ToolTip="Select value to search on." Height="{Binding ActualHeight, ElementName=Operator1}"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Vertical" Margin="16,0,0,0" Visibility="Hidden">
+                                <Label>To:</Label>
+                                <TextBox Name="Value1_2" Width="84" ToolTip="Select value to search to." Height="{Binding ActualHeight, ElementName=Operator1}"/>
+                            </StackPanel>
+                        </StackPanel>
                     </StackPanel>
                     <StackPanel Orientation="Vertical" Margin="16,0,0,0" VerticalAlignment="Bottom">
                         <Button Name="Delete1" Width="81" Height="{Binding ActualHeight, ElementName=Operator1}" Padding="-10" Click="Delete_Click" Tag="1">Delete</Button>

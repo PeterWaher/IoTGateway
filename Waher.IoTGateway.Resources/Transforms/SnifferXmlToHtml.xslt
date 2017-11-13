@@ -32,6 +32,7 @@
 								border-collapse: separate;
 								border-width: 0;
 								border-spacing:0;
+								background-color:white;
 							}
 					
 							tr

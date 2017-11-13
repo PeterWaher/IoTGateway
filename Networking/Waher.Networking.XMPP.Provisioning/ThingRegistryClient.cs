@@ -955,7 +955,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// </summary>
 		/// <param name="MetaData">Meta-data to encode.</param>
 		/// <returns>IOTDISCO URI encoding the meta-data.</returns>
-		public string EncodeAsIoTDiscoURI(params MetaDataTag[] MetaData)
+		public static string EncodeAsIoTDiscoURI(params MetaDataTag[] MetaData)
 		{
 			StringBuilder Result = new StringBuilder("iotdisco:");
 			bool First = true;
@@ -976,6 +976,39 @@ namespace Waher.Networking.XMPP.Provisioning
 			}
 
 			return Result.ToString();
+		}
+
+		/// <summary>
+		/// Decodes an IoTDisco URI.
+		/// </summary>
+		/// <param name="Uri">IoTDisco URI</param>
+		/// <returns>Meta data tags.</returns>
+		public static MetaDataTag[] DecodeIoTDiscoURI(string Uri)
+		{
+			if (!Uri.StartsWith("iotdisco:", StringComparison.CurrentCultureIgnoreCase))
+				throw new ArgumentException("URI does not conform to the iotdisco URI scheme.", nameof(Uri));
+
+			List<MetaDataTag> Tags = new List<MetaDataTag>();
+
+			foreach (string Part in Uri.Substring(9).Split(';'))
+			{
+				int i = Part.IndexOf('=');
+				if (i < 0)
+					continue;
+
+				string TagName = Part.Substring(0, i);
+				string StringValue = Part.Substring(i + 1);
+
+				if (TagName.StartsWith("#") && CommonTypes.TryParse(StringValue, out double NumericValue))
+				{
+					TagName = TagName.Substring(1);
+					Tags.Add(new MetaDataNumericTag(TagName, NumericValue));
+				}
+				else
+					Tags.Add(new MetaDataStringTag(TagName, StringValue));
+			}
+
+			return Tags.ToArray();
 		}
 
 	}

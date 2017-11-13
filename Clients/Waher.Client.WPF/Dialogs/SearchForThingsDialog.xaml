@@ -56,10 +56,10 @@
                     </StackPanel>
                     <StackPanel Orientation="Vertical" Margin="16,0,0,0">
                         <Label>Value:</Label>
-                        <TextBox Name="Value1" Width="184" ToolTip="Select value to search on."/>
+                        <TextBox Name="Value1" Width="184" ToolTip="Select value to search on." Height="{Binding ActualHeight, ElementName=Operator1}"/>
                     </StackPanel>
-                    <StackPanel Orientation="Vertical" Margin="16,0,0,0" VerticalAlignment="Center">
-                        <Button Name="Delete1" Width="81" Height="25" Padding="-10" Click="Delete_Click" Tag="1">Delete</Button>
+                    <StackPanel Orientation="Vertical" Margin="16,0,0,0" VerticalAlignment="Bottom">
+                        <Button Name="Delete1" Width="81" Height="{Binding ActualHeight, ElementName=Operator1}" Padding="-10" Click="Delete_Click" Tag="1">Delete</Button>
                     </StackPanel>
                 </StackPanel>
             </StackPanel>

@@ -6,9 +6,14 @@
              xmlns:local="clr-namespace:Waher.Client.WPF.Controls"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="930">
-    <DockPanel>
-        <ListView Name="SearchResultListView" HorizontalAlignment="Left" Margin="0,0,0,0" Width="{Binding ElementName=DockPanel, Path=ActualWidth}" 
-                  ScrollViewer.VerticalScrollBarVisibility="Visible">
+    <DockPanel Name="SearchResult">
+        <ListView Name="SearchResultListView" HorizontalAlignment="Left" Margin="0,-5,0,5" Width="{Binding ActualWidth, ElementName=SearchResult}"
+                  ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.HorizontalScrollBarVisibility="Visible">
+            <ListView.Resources>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                </Style>
+            </ListView.Resources>
             <ListView.View>
                 <GridView/>
             </ListView.View>

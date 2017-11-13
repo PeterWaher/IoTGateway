@@ -82,12 +82,6 @@ namespace Waher.Client.WPF.Controls
 
 			if (this.SearchResultListView.View is GridView GridView)
 			{
-				int TotWidth = (int)this.ActualWidth;
-				if (TotWidth <= 0)
-					TotWidth = (int)(MainWindow.currentInstance.ConnectionTab.Content as ConnectionView).ActualWidth;
-
-				int ColumnWidth = (int)((TotWidth - SystemParameters.VerticalScrollBarWidth - 8) / Headers.Length);
-
 				GridView.Columns.Clear();
 
 				foreach (Field Header in this.headers)
@@ -95,8 +89,7 @@ namespace Waher.Client.WPF.Controls
 					GridView.Columns.Add(new GridViewColumn()
 					{
 						Header = Header.Label,
-						DisplayMemberBinding = new Binding(Header.Var),
-						Width = ColumnWidth
+						DisplayMemberBinding = new Binding(Header.Var)
 					});
 				}
 			}
@@ -113,7 +106,7 @@ namespace Waher.Client.WPF.Controls
 
 		public void NewButton_Click(object sender, RoutedEventArgs e)
 		{
-			this.SearchResultListView.Items.Clear();
+			this.table.Clear();
 		}
 
 		public void SaveButton_Click(object sender, RoutedEventArgs e)

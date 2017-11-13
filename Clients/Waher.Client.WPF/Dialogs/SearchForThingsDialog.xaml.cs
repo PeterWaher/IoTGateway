@@ -53,6 +53,8 @@ namespace Waher.Client.WPF.Dialogs
 		public SearchForThingsDialog()
 		{
 			InitializeComponent();
+
+			this.Field1.Focus();
 		}
 
 		private void OkButton_Click(object sender, RoutedEventArgs e)
@@ -147,7 +149,8 @@ namespace Waher.Client.WPF.Dialogs
 			{
 				Name = "Value" + Suffix,
 				Width = 184,
-				ToolTip = "Select value to search on."
+				ToolTip = "Select value to search on.",
+				Height = this.Operator1.ActualHeight
 			};
 
 			Panel2 = new StackPanel()
@@ -164,17 +167,17 @@ namespace Waher.Client.WPF.Dialogs
 			{
 				Orientation = Orientation.Vertical,
 				Margin = new Thickness(16, 0, 0, 0),
-				VerticalAlignment = VerticalAlignment.Center
+				VerticalAlignment = VerticalAlignment.Bottom
 			};
 
 			Button Delete = new Button()
 			{
 				Name = "Delete" + Suffix,
 				Width = 80,
-				Height = 25,
+				Height = this.Operator1.ActualHeight,
 				Padding = new Thickness(-10),
 				Content = "Delete",
-				Tag = this.ruleNr,
+				Tag = this.ruleNr
 			};
 
 			Delete.Click += this.Delete_Click;

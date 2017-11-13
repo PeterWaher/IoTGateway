@@ -262,5 +262,63 @@ namespace Waher.Client.WPF.Model
 				}, null);
 			}
 		}
+
+		public override bool CanAddChildren => true;
+
+		public override void Add()
+		{
+			ClaimDeviceForm Form = new ClaimDeviceForm();
+			bool? Result = Form.ShowDialog();
+
+			if (Result.HasValue && Result.Value)
+			{
+				this.registryClient.Mine(Form.MakePublic, Form.Tags, (sender, e) =>
+				{
+					if (e.Ok)
+					{
+						StringBuilder Msg = new StringBuilder();
+
+						Msg.AppendLine("Device successfully claimed.");
+						Msg.AppendLine();
+						Msg.Append("JID: ");
+						Msg.AppendLine(e.JID);
+
+						if (!e.Node.IsEmpty)
+						{
+							if (!string.IsNullOrEmpty(e.Node.NodeId))
+							{
+								Msg.Append("Node ID: ");
+								Msg.AppendLine(e.Node.NodeId);
+							}
+
+							if (!string.IsNullOrEmpty(e.Node.SourceId))
+							{
+								Msg.Append("Source ID: ");
+								Msg.AppendLine(e.Node.SourceId);
+							}
+
+							if (!string.IsNullOrEmpty(e.Node.Partition))
+							{
+								Msg.Append("Partition: ");
+								Msg.AppendLine(e.Node.Partition);
+							}
+						}
+
+						MainWindow.currentInstance.Dispatcher.Invoke(() => MessageBox.Show(MainWindow.currentInstance,
+							Msg.ToString(), "Success", MessageBoxButton.OK, MessageBoxImage.Information));
+
+						if (this.Account.Client.GetRosterItem(e.JID) == null)
+							this.Account.Client.RequestPresenceSubscription(e.JID);
+					}
+					else
+					{
+						MainWindow.currentInstance.Dispatcher.Invoke(() => MessageBox.Show(MainWindow.currentInstance,
+							string.IsNullOrEmpty(e.ErrorText) ? "Unable to claim device." : e.ErrorText, "Error",
+							MessageBoxButton.OK, MessageBoxImage.Error));
+					}
+				}, null);
+			}
+		}
+
 	}
 }

@@ -38,14 +38,14 @@ The [source code](https://github.com/PeterWaher/IoTGateway) provided in this pro
 * For **Personal evaluation**. Personal evaluation means evaluating the code, its libraries and underlying technologies, including learning 
 	about underlying technologies.
 
-* For **Academic use**. If you want to use the following code for academic use, all you need to do is to inform the author of who you are, what 
-	academic institution you work for (or study for), and in what projects you intend to use the code. All I ask in return is for an 
-	acknowledgement and visible attribution to this project, inluding a link, and that you do not redistribute the source code, or parts thereof 
-	in the solutions you develop. Any solutions developed for academic use, that become commercial, require a commercial license.
+* For **Academic use**. If you want to use the following code for academic use, all you need to do is to inform the author of who you are, 
+	what academic institution you work for (or study for), and in what projects you intend to use the code. All that is asked in return is for 
+	an acknowledgement and visible attribution to this project, inluding a link, and that you do not redistribute the source code, or parts 
+	thereof in the solutions you develop. If any solutions developed in an academic setting, become commercial, it will need a commercial license.
 
-* For **Security analysis**. If you perform any security analysis on the code, to see what security aspects the code might have,
-	all I ask is that you inform me of any findings so that any vulnerabilities might be addressed. I am thankful for any such contributions,
-	and will acknowledge them.
+* For **Security analysis**. If you perform any security analysis on the code, to see what security aspects the code might have, all that is 
+	asked of you, is that you inform the author of any findings so that any vulnerabilities might be addressed. Such contributions are much 
+	appreciated, and will be acknowledged.
 
 Commercial use of the code, in part or in full, in compiled binary form, or its source code, requires
 a **Commercial License**. Contact the author for details.

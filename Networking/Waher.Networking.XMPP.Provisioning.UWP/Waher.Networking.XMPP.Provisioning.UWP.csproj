@@ -112,6 +112,7 @@
     <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Cache\CachedQuery.cs" />
     <Compile Include="CanControlEventArgs.cs" />
     <Compile Include="CanReadEventArgs.cs" />
     <Compile Include="CertificateUse.cs" />
@@ -170,6 +171,10 @@
       <Project>{8ae9d52d-28cd-4f83-98de-b6a016f5c7ba}</Project>
       <Name>Waher.Events</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Persistence\Waher.Persistence\Waher.Persistence.csproj">
+      <Project>{0286288f-4af3-4e64-a398-24c8957ceb04}</Project>
+      <Name>Waher.Persistence</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Things\Waher.Things\Waher.Things.csproj">
       <Project>{1659833d-9a9a-4147-9237-2ba8d96086bc}</Project>
       <Name>Waher.Things</Name>
@@ -191,6 +196,7 @@
   <PropertyGroup>
     <PreBuildEvent>xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP.Provisioning\*.cs" "$(ProjectDir)" /Y
 xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP.Provisioning\SearchOperators\*.cs" "$(ProjectDir)\SearchOperators" /Y
+xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP.Provisioning\Cache\*.cs" "$(ProjectDir)\Cache" /Y
 </PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>

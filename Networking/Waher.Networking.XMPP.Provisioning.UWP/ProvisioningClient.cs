@@ -16,6 +16,9 @@ using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Networking.XMPP.StanzaErrors;
+using Waher.Networking.XMPP.Provisioning.Cache;
+using Waher.Persistence;
+using Waher.Persistence.Filters;
 using Waher.Things;
 using Waher.Things.SensorData;
 
@@ -60,6 +63,8 @@ namespace Waher.Networking.XMPP.Provisioning
 		private Dictionary<string, CertificateUse> certificates = new Dictionary<string, CertificateUse>();
 		private string provisioningServerAddress;
 		private string ownerJid = string.Empty;
+		private DateTime lastCheck = DateTime.MinValue;
+		private Duration cacheUnusedLifetime = new Duration(false, 0, 13, 0, 0, 0, 0);
 
 		/// <summary>
 		/// urn:xmpp:iot:provisioning
@@ -75,14 +80,31 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="Client">XMPP Client</param>
 		/// <param name="ProvisioningServerAddress">Provisioning Server XMPP Address.</param>
 		public ProvisioningClient(XmppClient Client, string ProvisioningServerAddress)
+			: this(Client, ProvisioningServerAddress, string.Empty)
+		{
+		}
+
+		/// <summary>
+		/// Implements an XMPP provisioning client interface.
+		/// 
+		/// The interface is defined in XEP-0324:
+		/// http://xmpp.org/extensions/xep-0324.html
+		/// </summary>
+		/// <param name="Client">XMPP Client</param>
+		/// <param name="ProvisioningServerAddress">Provisioning Server XMPP Address.</param>
+		/// <param name="OwnerJid">JID of owner, if known.</param>
+		public ProvisioningClient(XmppClient Client, string ProvisioningServerAddress, string OwnerJid)
 			: base(Client)
 		{
 			this.provisioningServerAddress = ProvisioningServerAddress;
+			this.ownerJid = OwnerJid;
 
 			this.client.RegisterIqGetHandler("tokenChallenge", NamespaceProvisioning, this.TokenChallengeHandler, true);
+			this.client.RegisterIqSetHandler("clearCache", NamespaceProvisioning, this.ClearCacheHandler, true);
 
 			this.client.RegisterMessageHandler("unfriend", NamespaceProvisioning, this.UnfriendHandler, false);
 			this.client.RegisterMessageHandler("friend", NamespaceProvisioning, this.FriendHandler, false);
+			this.client.RegisterMessageHandler("clearCache", NamespaceProvisioning, this.ClearCacheHandler, false);
 
 			this.client.OnPresenceSubscribe += Client_OnPresenceSubscribe;
 			this.client.OnPresenceUnsubscribe += Client_OnPresenceUnsubscribe;
@@ -95,9 +117,14 @@ namespace Waher.Networking.XMPP.Provisioning
 
 		private void Client_OnPresenceSubscribe(object Sender, PresenceEventArgs e)
 		{
-			if (string.Compare(e.From, this.provisioningServerAddress, true) == 0 ||
-				(!string.IsNullOrEmpty(this.ownerJid) && string.Compare(e.From, this.ownerJid, true) == 0))
+			if (string.Compare(e.From, this.provisioningServerAddress, true) == 0)
 			{
+				Log.Informational("Presence subscription from provisioning server accepted.", this.provisioningServerAddress, this.provisioningServerAddress);
+				e.Accept();
+			}
+			else if (!string.IsNullOrEmpty(this.ownerJid) && string.Compare(e.From, this.ownerJid, true) == 0)
+			{
+				Log.Informational("Presence subscription from owner accepted.", this.ownerJid, this.provisioningServerAddress);
 				e.Accept();
 			}
 			else
@@ -110,6 +137,7 @@ namespace Waher.Networking.XMPP.Provisioning
 
 			if (e2.Ok && e2.Friend)
 			{
+				Log.Informational("Presence subscription accepted.", e.FromBareJID, this.provisioningServerAddress);
 				e.Accept();
 
 				RosterItem Item = this.client.GetRosterItem(e.FromBareJID);
@@ -117,7 +145,10 @@ namespace Waher.Networking.XMPP.Provisioning
 					this.client.RequestPresenceSubscription(e.FromBareJID);
 			}
 			else
+			{
+				Log.Notice("Presence subscription declined.", e.FromBareJID, this.provisioningServerAddress);
 				e.Decline();
+			}
 		}
 
 		/// <summary>
@@ -179,9 +210,8 @@ namespace Waher.Networking.XMPP.Provisioning
 
 #if WINDOWS_UWP
 			IBuffer Buffer = Certificate.GetCertificateBlob();
-			byte[] Bin;
-
-			CryptographicBuffer.CopyToByteArray(Buffer, out Bin);
+			
+			CryptographicBuffer.CopyToByteArray(Buffer, out byte[] Bin);
 			string Base64 = System.Convert.ToBase64String(Bin);
 #else
 			byte[] Bin = Certificate.Export(X509ContentType.Cert);
@@ -348,7 +378,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="State">State object to pass to callback method.</param>
 		public void IsFriend(string JID, IsFriendCallback Callback, object State)
 		{
-			this.client.SendIqGet(this.provisioningServerAddress, "<isFriend xmlns='" + NamespaceProvisioning + "' jid='" +
+			this.CachedIqGet("<isFriend xmlns='" + NamespaceProvisioning + "' jid='" +
 				XML.Encode(JID) + "'/>", this.IsFriendCallback, new object[] { Callback, State });
 		}
 
@@ -503,7 +533,7 @@ namespace Waher.Networking.XMPP.Provisioning
 				Xml.Append("</canRead>");
 			}
 
-			this.client.SendIqGet(this.provisioningServerAddress, Xml.ToString(), (sender, e) =>
+			this.CachedIqGet(Xml.ToString(), (sender, e) =>
 			{
 				XmlElement E = e.FirstElement;
 				List<ThingReference> Nodes2 = null;
@@ -697,7 +727,7 @@ namespace Waher.Networking.XMPP.Provisioning
 				Xml.Append("</canControl>");
 			}
 
-			this.client.SendIqGet(this.provisioningServerAddress, Xml.ToString(), (sender, e) =>
+			this.CachedIqGet(Xml.ToString(), (sender, e) =>
 			{
 				XmlElement E = e.FirstElement;
 				List<ThingReference> Nodes2 = null;
@@ -761,6 +791,157 @@ namespace Waher.Networking.XMPP.Provisioning
 
 			}, null);
 		}
+
+		#region Cached queries
+
+
+		private Task CachedIqGet(string Xml, IqResultEventHandler Callback, object State)
+		{
+			return this.CachedIq(Xml, "get", Callback, State);
+		}
+
+		private Task CachedIqSet(string Xml, IqResultEventHandler Callback, object State)
+		{
+			return this.CachedIq(Xml, "set", Callback, State);
+		}
+
+		private async Task CachedIq(string Xml, string Method, IqResultEventHandler Callback, object State)
+		{
+			CachedQuery Query = await Database.FindFirstDeleteRest<CachedQuery>(new FilterAnd(
+				new FilterFieldEqualTo("Xml", Xml), new FilterFieldEqualTo("Method", Method)));
+
+			if (Query != null)
+			{
+				Query.LastUsed = DateTime.Now;
+				await Database.Update(Query);
+
+				if (Callback != null)
+				{
+					try
+					{
+						XmlDocument Doc = new XmlDocument();
+						Doc.LoadXml(Query.Response);
+
+						XmlElement E = Doc.DocumentElement;
+						string Type = XML.Attribute(E, "type");
+						string Id = XML.Attribute(E, "id");
+						string To = XML.Attribute(E, "to");
+						string From = XML.Attribute(E, "from");
+						bool Ok = (Type == "result");
+
+						IqResultEventArgs e = new IqResultEventArgs(E, Id, To, From, Ok, State);
+
+						Callback(this.client, e);
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
+				}
+			}
+			else
+			{
+				this.client.SendIq(null, this.provisioningServerAddress, Xml, "get", this.CachedIqCallback, new object[] { Callback, State, Xml, Method },
+					this.client.DefaultRetryTimeout, this.client.DefaultNrRetries,
+					this.client.DefaultDropOff, this.client.DefaultMaxRetryTimeout);
+			}
+		}
+
+		private async void CachedIqCallback(object Sender, IqResultEventArgs e)
+		{
+			try
+			{
+				object[] P = (object[])e.State;
+				IqResultEventHandler Callback = (IqResultEventHandler)P[0];
+				object State = P[1];
+				string Xml = (string)P[2];
+				string Method = (string)P[3];
+
+				CachedQuery Query = new CachedQuery()
+				{
+					Xml = Xml,
+					Method = Method,
+					Response = e.Response.OuterXml,
+					LastUsed = DateTime.Now
+				};
+
+				await Database.Insert(Query);
+
+				if (Callback != null)
+				{
+					e.State = State;
+					Callback(Sender, e);
+				}
+
+				await this.DeleteOld();
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+			}
+		}
+
+		private async Task DeleteOld()
+		{
+			DateTime Now = DateTime.Now;
+			if ((Now - this.lastCheck).TotalDays < 1)
+				return;
+
+			this.lastCheck = Now;
+
+			DateTime Limit = Now - this.cacheUnusedLifetime;
+
+			foreach (CachedQuery Query in await Database.Find<CachedQuery>(new FilterFieldLesserOrEqualTo("LastUsed", Limit)))
+				await Database.Delete(Query);
+		}
+
+		/// <summary>
+		/// Time unused rules are kept in the rule cache.
+		/// (Default is 13 months.)
+		/// </summary>
+		public Duration CacheUnusedLifetime
+		{
+			get { return this.cacheUnusedLifetime; }
+			set { this.cacheUnusedLifetime = value; }
+		}
+
+		private async void ClearCacheHandler(object Sender, IqEventArgs e)
+		{
+			try
+			{
+				if (e.From == this.provisioningServerAddress)
+				{
+					await this.ClearCache();
+					e.IqResult("<clearCacheResponse xmlns='" + NamespaceProvisioning + "'/>");
+				}
+				else
+					e.IqError(new ForbiddenException("Unauthorized sender.", e.IQ));
+			}
+			catch (Exception ex)
+			{
+				e.IqError(ex);
+			}
+		}
+
+		private async void ClearCacheHandler(object Sender, MessageEventArgs e)
+		{
+			try
+			{
+				if (e.From == this.provisioningServerAddress)
+					await this.ClearCache();
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+			}
+		}
+
+		private Task ClearCache()
+		{
+			return Database.Clear("CachedProvisioningQueries");
+		}
+
+		#endregion
 
 	}
 }

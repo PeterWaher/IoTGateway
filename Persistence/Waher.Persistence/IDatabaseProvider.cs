@@ -105,5 +105,12 @@ namespace Waher.Persistence
 		/// <returns>Task object for synchronization purposes.</returns>
 		Task Export(IDatabaseExport Output);
 
+		/// <summary>
+		/// Clears a collection of all objects.
+		/// </summary>
+		/// <param name="CollectionName">Name of collection to clear.</param>
+		/// <returns>Task object for synchronization purposes.</returns>
+		Task Clear(string CollectionName);
+
 	}
 }

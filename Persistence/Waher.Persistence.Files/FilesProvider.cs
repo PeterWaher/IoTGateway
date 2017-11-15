@@ -1671,6 +1671,17 @@ namespace Waher.Persistence.Files
 				Output.ReportException(ex);
 		}
 
+		/// <summary>
+		/// Clears a collection of all objects.
+		/// </summary>
+		/// <param name="CollectionName">Name of collection to clear.</param>
+		/// <returns>Task object for synchronization purposes.</returns>
+		public async Task Clear(string CollectionName)
+		{
+			ObjectBTreeFile File = await this.GetFile(CollectionName);
+			await File.ClearAsync();
+		}
+
 		#endregion
 
 	}

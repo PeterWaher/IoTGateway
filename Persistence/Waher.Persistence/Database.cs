@@ -130,17 +130,16 @@ namespace Waher.Persistence
 		/// Finds the first object of a given class <typeparamref name="T"/> and deletes the rest.
 		/// </summary>
 		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
-		/// <param name="Timeout">Timeout, in milliseconds.</param>
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
 		/// <returns>Objects found.</returns>
 		///	<exception cref="TimeoutException">Thrown if a response is not returned from the database within the given number of milliseconds.</exception>
-		public async static Task<T> FindFirstDeleteRest<T>(int Timeout, params string[] SortOrder)
+		public async static Task<T> FindFirstDeleteRest<T>(params string[] SortOrder)
 		{
-			return await FirstDeleteRest<T>(Timeout, await Provider.Find<T>(0, int.MaxValue, SortOrder));
+			return await FirstDeleteRest<T>(await Provider.Find<T>(0, int.MaxValue, SortOrder));
 		}
 
-		private static async Task<T> FirstDeleteRest<T>(int Timeout, IEnumerable<T> Set)
+		private static async Task<T> FirstDeleteRest<T>(IEnumerable<T> Set)
 		{
 			T Result = default(T);
 			bool First = true;
@@ -163,15 +162,14 @@ namespace Waher.Persistence
 		/// Finds objects of a given class <typeparamref name="T"/>.
 		/// </summary>
 		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
-		/// <param name="Timeout">Timeout, in milliseconds.</param>
 		/// <param name="Filter">Optional filter. Can be null.</param>
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
 		/// <returns>Objects found.</returns>
 		///	<exception cref="TimeoutException">Thrown if a response is not returned from the database within the given number of milliseconds.</exception>
-		public static async Task<T> FindFirstDeleteRest<T>(int Timeout, Filter Filter, params string[] SortOrder)
+		public static async Task<T> FindFirstDeleteRest<T>(Filter Filter, params string[] SortOrder)
 		{
-			return await FirstDeleteRest<T>(Timeout, await Provider.Find<T>(0, int.MaxValue, Filter, SortOrder));
+			return await FirstDeleteRest<T>(await Provider.Find<T>(0, int.MaxValue, Filter, SortOrder));
 		}
 
 		/// <summary>
@@ -247,6 +245,16 @@ namespace Waher.Persistence
 		public static Task Export(IDatabaseExport Output)
 		{
 			return Provider.Export(Output);
+		}
+
+		/// <summary>
+		/// Clears a collection of all objects.
+		/// </summary>
+		/// <param name="CollectionName">Name of collection to clear.</param>
+		/// <returns>Task object for synchronization purposes.</returns>
+		public static Task Clear(string CollectionName)
+		{
+			return Provider.Clear(CollectionName);
 		}
 
 	}

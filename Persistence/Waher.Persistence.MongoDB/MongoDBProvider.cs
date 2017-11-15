@@ -746,6 +746,16 @@ namespace Waher.Persistence.MongoDB
 			throw new NotImplementedException("MongoDB provider does not support the Export method.");	// TODO
 		}
 
+		/// <summary>
+		/// Clears a collection of all objects.
+		/// </summary>
+		/// <param name="CollectionName">Name of collection to clear.</param>
+		/// <returns>Task object for synchronization purposes.</returns>
+		public Task Clear(string CollectionName)
+		{
+			throw new NotImplementedException("MongoDB provider does not support the Clear method.");  // TODO
+		}
+
 		// TODO:
 		//	* Created field
 		//	* Updated field

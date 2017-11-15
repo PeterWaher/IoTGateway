@@ -586,7 +586,7 @@ namespace Waher.Networking.XMPP.Sensor
 
 			if (this.provisioningClient != null)
 			{
-				this.provisioningClient.CanRead(e.FromBareJid, FieldTypes, Nodes, Fields.Keys,
+				this.provisioningClient.CanRead(e.FromBareJid, FieldTypes, Nodes, Fields?.Keys,
 					ServiceToken.Split(space, StringSplitOptions.RemoveEmptyEntries),
 					DeviceToken.Split(space, StringSplitOptions.RemoveEmptyEntries),
 					UserToken.Split(space, StringSplitOptions.RemoveEmptyEntries),

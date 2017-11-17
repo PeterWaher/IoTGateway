@@ -25,34 +25,6 @@ using Waher.Things.SensorData;
 namespace Waher.Networking.XMPP.Provisioning
 {
 	/// <summary>
-	/// Delegate for Token callback methods.
-	/// </summary>
-	/// <param name="Sender">Sender</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate void TokenCallback(object Sender, TokenEventArgs e);
-
-	/// <summary>
-	/// Delegate for IsFriend callback methods.
-	/// </summary>
-	/// <param name="Sender">Sender</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate void IsFriendCallback(object Sender, IsFriendEventArgs e);
-
-	/// <summary>
-	/// Delegate for CanRead callback methods.
-	/// </summary>
-	/// <param name="Sender">Sender</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate void CanReadCallback(object Sender, CanReadEventArgs e);
-
-	/// <summary>
-	/// Delegate for CanControl callback methods.
-	/// </summary>
-	/// <param name="Sender">Sender</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate void CanControlCallback(object Sender, CanControlEventArgs e);
-
-	/// <summary>
 	/// Implements an XMPP provisioning client interface.
 	/// 
 	/// The interface is defined in XEP-0324:
@@ -70,6 +42,11 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// urn:xmpp:iot:provisioning
 		/// </summary>
 		public const string NamespaceProvisioning = "urn:xmpp:iot:provisioning";
+
+		/// <summary>
+		/// urn:xmpp:iot:provisioning:owner
+		/// </summary>
+		public const string NamespaceProvisioningOwner = "urn:xmpp:iot:provisioning:owner";
 
 		/// <summary>
 		/// Implements an XMPP provisioning client interface.
@@ -106,49 +83,12 @@ namespace Waher.Networking.XMPP.Provisioning
 			this.client.RegisterMessageHandler("friend", NamespaceProvisioning, this.FriendHandler, false);
 			this.client.RegisterMessageHandler("clearCache", NamespaceProvisioning, this.ClearCacheHandler, false);
 
+			this.client.RegisterMessageHandler("isFriend", NamespaceProvisioningOwner, this.IsFriendHandler, true);
+			this.client.RegisterMessageHandler("canRead", NamespaceProvisioningOwner, this.CanReadHandler, true);
+			this.client.RegisterMessageHandler("canControl", NamespaceProvisioningOwner, this.CanControlHandler, true);
+
 			this.client.OnPresenceSubscribe += Client_OnPresenceSubscribe;
 			this.client.OnPresenceUnsubscribe += Client_OnPresenceUnsubscribe;
-		}
-
-		private void Client_OnPresenceUnsubscribe(object Sender, PresenceEventArgs e)
-		{
-			e.Accept();
-		}
-
-		private void Client_OnPresenceSubscribe(object Sender, PresenceEventArgs e)
-		{
-			if (string.Compare(e.From, this.provisioningServerAddress, true) == 0)
-			{
-				Log.Informational("Presence subscription from provisioning server accepted.", this.provisioningServerAddress, this.provisioningServerAddress);
-				e.Accept();
-			}
-			else if (!string.IsNullOrEmpty(this.ownerJid) && string.Compare(e.From, this.ownerJid, true) == 0)
-			{
-				Log.Informational("Presence subscription from owner accepted.", this.ownerJid, this.provisioningServerAddress);
-				e.Accept();
-			}
-			else
-				this.IsFriend(XmppClient.GetBareJID(e.From), this.CheckIfFriendCallback, e);
-		}
-
-		private void CheckIfFriendCallback(object Sender, IsFriendEventArgs e2)
-		{
-			PresenceEventArgs e = (PresenceEventArgs)e2.State;
-
-			if (e2.Ok && e2.Friend)
-			{
-				Log.Informational("Presence subscription accepted.", e.FromBareJID, this.provisioningServerAddress);
-				e.Accept();
-
-				RosterItem Item = this.client.GetRosterItem(e.FromBareJID);
-				if (Item == null || Item.State == SubscriptionState.None || Item.State == SubscriptionState.From)
-					this.client.RequestPresenceSubscription(e.FromBareJID);
-			}
-			else
-			{
-				Log.Notice("Presence subscription declined.", e.FromBareJID, this.provisioningServerAddress);
-				e.Decline();
-			}
 		}
 
 		/// <summary>
@@ -159,13 +99,18 @@ namespace Waher.Networking.XMPP.Provisioning
 			base.Dispose();
 
 			this.client.UnregisterIqGetHandler("tokenChallenge", NamespaceProvisioning, this.TokenChallengeHandler, true);
+			this.client.UnregisterIqSetHandler("clearCache", NamespaceProvisioning, this.ClearCacheHandler, true);
 
 			this.client.UnregisterMessageHandler("unfriend", NamespaceProvisioning, this.UnfriendHandler, false);
 			this.client.UnregisterMessageHandler("friend", NamespaceProvisioning, this.FriendHandler, false);
+			this.client.UnregisterMessageHandler("clearCache", NamespaceProvisioning, this.ClearCacheHandler, false);
+
+			this.client.UnregisterMessageHandler("isFriend", NamespaceProvisioningOwner, this.IsFriendHandler, true);
+			this.client.UnregisterMessageHandler("canRead", NamespaceProvisioningOwner, this.CanReadHandler, true);
+			this.client.UnregisterMessageHandler("canControl", NamespaceProvisioningOwner, this.CanControlHandler, true);
 
 			this.client.OnPresenceSubscribe -= Client_OnPresenceSubscribe;
 			this.client.OnPresenceUnsubscribe -= Client_OnPresenceUnsubscribe;
-
 		}
 
 		/// <summary>
@@ -189,6 +134,53 @@ namespace Waher.Networking.XMPP.Provisioning
 			get { return this.ownerJid; }
 			internal set { this.ownerJid = value; }
 		}
+
+		#region Presence subscriptions
+
+		private void Client_OnPresenceUnsubscribe(object Sender, PresenceEventArgs e)
+		{
+			e.Accept();
+		}
+
+		private void Client_OnPresenceSubscribe(object Sender, PresenceEventArgs e)
+		{
+			if (string.Compare(e.From, this.provisioningServerAddress, true) == 0)
+			{
+				Log.Informational("Presence subscription from provisioning server accepted.", this.provisioningServerAddress, this.provisioningServerAddress);
+				e.Accept();
+			}
+			else if (!string.IsNullOrEmpty(this.ownerJid) && string.Compare(e.From, this.ownerJid, true) == 0)
+			{
+				Log.Informational("Presence subscription from owner accepted.", this.ownerJid, this.provisioningServerAddress);
+				e.Accept();
+			}
+			else
+				this.IsFriend(XmppClient.GetBareJID(e.From), this.CheckIfFriendCallback, e);
+		}
+
+		private void CheckIfFriendCallback(object Sender, IsFriendResponseEventArgs e2)
+		{
+			PresenceEventArgs e = (PresenceEventArgs)e2.State;
+
+			if (e2.Ok && e2.Friend)
+			{
+				Log.Informational("Presence subscription accepted.", e.FromBareJID, this.provisioningServerAddress);
+				e.Accept();
+
+				RosterItem Item = this.client.GetRosterItem(e.FromBareJID);
+				if (Item == null || Item.State == SubscriptionState.None || Item.State == SubscriptionState.From)
+					this.client.RequestPresenceSubscription(e.FromBareJID);
+			}
+			else
+			{
+				Log.Notice("Presence subscription declined.", e.FromBareJID, this.provisioningServerAddress);
+				e.Decline();
+			}
+		}
+
+		#endregion
+
+		#region Tokens
 
 		/// <summary>
 		/// Gets a token for a certicate. This token can be used to identify services, devices or users. The provisioning server will 
@@ -370,6 +362,10 @@ namespace Waher.Networking.XMPP.Provisioning
 				e.IqError(e2.ErrorElement.OuterXml);
 		}
 
+		#endregion
+
+		#region Device side
+
 		/// <summary>
 		/// Asks the provisioning server if a JID is a friend or not.
 		/// </summary>
@@ -402,7 +398,7 @@ namespace Waher.Networking.XMPP.Provisioning
 				JID = null;
 			}
 
-			IsFriendEventArgs e2 = new IsFriendEventArgs(e, State, JID, Result);
+			IsFriendResponseEventArgs e2 = new IsFriendResponseEventArgs(e, State, JID, Result);
 			try
 			{
 				Callback(this, e2);
@@ -624,7 +620,7 @@ namespace Waher.Networking.XMPP.Provisioning
 				else
 					CanRead = false;
 
-				CanReadEventArgs e2 = new CanReadEventArgs(e, State, Jid, CanRead, FieldTypes2, Nodes2?.ToArray(), Fields2?.ToArray());
+				CanReadResponseEventArgs e2 = new CanReadResponseEventArgs(e, State, Jid, CanRead, FieldTypes2, Nodes2?.ToArray(), Fields2?.ToArray());
 
 				try
 				{
@@ -777,7 +773,7 @@ namespace Waher.Networking.XMPP.Provisioning
 				else
 					CanControl = false;
 
-				CanControlEventArgs e2 = new CanControlEventArgs(e, State, Jid, CanControl,
+				CanControlResponseEventArgs e2 = new CanControlResponseEventArgs(e, State, Jid, CanControl,
 					Nodes2?.ToArray(), ParameterNames2?.ToArray());
 
 				try
@@ -792,8 +788,9 @@ namespace Waher.Networking.XMPP.Provisioning
 			}, null);
 		}
 
-		#region Cached queries
+		#endregion
 
+		#region Cached queries
 
 		private Task CachedIqGet(string Xml, IqResultEventHandler Callback, object State)
 		{
@@ -939,6 +936,59 @@ namespace Waher.Networking.XMPP.Provisioning
 		private Task ClearCache()
 		{
 			return Database.Clear("CachedProvisioningQueries");
+		}
+
+		#endregion
+
+		#region Owner side
+
+		private void IsFriendHandler(object Sender, MessageEventArgs e)
+		{
+			IsFriendEventHandler h = this.IsFriendQuestion;
+
+			if (h != null)
+			{
+				try
+				{
+					h(this, new IsFriendEventArgs(this.client, e));
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			}
+		}
+
+		/// <summary>
+		/// Event is raised when the provisioning server asks the owner if a device is allowed to accept a friendship request.
+		/// </summary>
+		public event IsFriendEventHandler IsFriendQuestion = null;
+
+		private void CanReadHandler(object Sender, MessageEventArgs e)
+		{
+			CanReadEventHandler h = this.CanReadQuestion;
+
+			if (h != null)
+			{
+				try
+				{
+					h(this, new CanReadEventArgs(this.client, e));
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			}
+		}
+
+		/// <summary>
+		/// Event is raised when the provisioning server asks the owner if a device is allowed to be read.
+		/// </summary>
+		public event CanReadEventHandler CanReadQuestion = null;
+
+		private void CanControlHandler(object Sender, MessageEventArgs e)
+		{
+			// TODO
 		}
 
 		#endregion

@@ -113,11 +113,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Cache\CachedQuery.cs" />
-    <Compile Include="CanControlEventArgs.cs" />
-    <Compile Include="CanReadEventArgs.cs" />
+    <Compile Include="CanControlResponseEventArgs.cs" />
+    <Compile Include="CanReadResponseEventArgs.cs" />
     <Compile Include="CertificateUse.cs" />
     <Compile Include="ClaimedEventArgs.cs" />
+    <Compile Include="CanReadEventArgs.cs" />
     <Compile Include="IsFriendEventArgs.cs" />
+    <Compile Include="IsFriendResponseEventArgs.cs" />
     <Compile Include="JidEventArgs.cs" />
     <Compile Include="MetaDataNumericTag.cs" />
     <Compile Include="MetaDataStringTag.cs" />
@@ -128,6 +130,8 @@
     <Compile Include="NodesEventArgs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ProvisioningClient.cs" />
+    <Compile Include="NodeQuestionEventArgs.cs" />
+    <Compile Include="QuestionEventArgs.cs" />
     <Compile Include="RegistrationEventArgs.cs" />
     <Compile Include="SearchOperators\NumericTagEqualTo.cs" />
     <Compile Include="SearchOperators\NumericTagGreaterThan.cs" />

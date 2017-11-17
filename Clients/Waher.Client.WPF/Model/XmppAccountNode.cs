@@ -35,6 +35,7 @@ namespace Waher.Client.WPF.Model
 		private const string ConcentratorGroupName = "Concentrators";
 		private const string OtherGroupName = "Others";
 
+		private LinkedList<KeyValuePair<DateTime, MessageEventArgs>> unhandledMessages = new LinkedList<KeyValuePair<DateTime, MessageEventArgs>>();
 		private Connections connections;
 		private XmppClient client;
 		private SensorClient sensorClient;
@@ -120,6 +121,7 @@ namespace Waher.Client.WPF.Model
 			this.client.OnRosterItemRemoved += new RosterItemEventHandler(Client_OnRosterItemRemoved);
 			this.client.OnRosterItemUpdated += new RosterItemEventHandler(Client_OnRosterItemUpdated);
 			this.connectionTimer = new Timer(this.CheckConnection, null, 60000, 60000);
+			this.client.OnNormalMessage += Client_OnNormalMessage;
 
 			if (this.allowInsecureAuthentication)
 			{
@@ -135,6 +137,55 @@ namespace Waher.Client.WPF.Model
 			this.concentratorClient = new ConcentratorClient(this.client);
 
 			this.client.Connect();
+		}
+
+		private void Client_OnNormalMessage(object Sender, MessageEventArgs e)
+		{
+			DateTime Now = DateTime.Now;
+			DateTime Limit = Now.AddMinutes(-1);
+
+			lock (this.unhandledMessages)
+			{
+				this.unhandledMessages.AddLast(new KeyValuePair<DateTime, MessageEventArgs>(Now, e));
+
+				while (this.unhandledMessages.First != null && this.unhandledMessages.First.Value.Key <= Limit)
+					this.unhandledMessages.RemoveFirst();
+			}
+		}
+
+		public IEnumerable<MessageEventArgs> GetUnhandledMessages(string LocalName, string Namespace)
+		{
+			LinkedListNode<KeyValuePair<DateTime, MessageEventArgs>> Loop, Next;
+			bool Found;
+
+			lock (this.unhandledMessages)
+			{
+				Loop = this.unhandledMessages.First;
+
+				while (Loop != null)
+				{
+					Next = Loop.Next;
+
+					Found = false;
+
+					foreach (XmlElement E in Loop.Value.Value.Message.ChildNodes)
+					{
+						if (E.LocalName == LocalName && E.NamespaceURI == Namespace)
+						{
+							Found = true;
+							break;
+						}
+					}
+
+					if (Found)
+					{
+						yield return Loop.Value.Value;
+						this.unhandledMessages.Remove(Loop);
+					}
+
+					Loop = Next;
+				}
+			}
 		}
 
 		private void Client_OnError(object Sender, Exception Exception)

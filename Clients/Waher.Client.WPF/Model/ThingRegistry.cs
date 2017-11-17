@@ -6,11 +6,16 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using Waher.Content;
+using Waher.Events;
+using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.DataForms.FieldTypes;
 using Waher.Networking.XMPP.Provisioning;
 using Waher.Networking.XMPP.Provisioning.SearchOperators;
+using Waher.Persistence;
+using Waher.Persistence.Filters;
 using Waher.Client.WPF.Controls;
+using Waher.Client.WPF.Controls.Questions;
 using Waher.Client.WPF.Dialogs;
 
 namespace Waher.Client.WPF.Model
@@ -19,12 +24,64 @@ namespace Waher.Client.WPF.Model
 	{
 		private bool supportsProvisioning;
 		private ThingRegistryClient registryClient;
+		private ProvisioningClient provisioningClient;
 
 		public ThingRegistry(TreeNode Parent, string JID, string Name, string Node, Dictionary<string, bool> Features)
 			: base(Parent, JID, Name, Node, Features)
 		{
 			this.supportsProvisioning = Features.ContainsKey(ProvisioningClient.NamespaceProvisioning);
 			this.registryClient = new ThingRegistryClient(this.Account.Client, JID);
+
+			if (this.supportsProvisioning)
+			{
+				XmppAccountNode Account = this.Account;
+				XmppClient Client = Account.Client;
+
+				this.provisioningClient = new ProvisioningClient(Client, JID);
+
+				this.provisioningClient.IsFriendQuestion += this.ProvisioningClient_IsFriendQuestion;
+
+				foreach (MessageEventArgs Message in Account.GetUnhandledMessages("isFriend", ProvisioningClient.NamespaceProvisioningOwner))
+				{
+					try
+					{
+						this.ProvisioningClient_IsFriendQuestion(this, new IsFriendEventArgs(Client, Message));
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
+				}
+			}
+			else
+				this.provisioningClient = null;
+		}
+
+		private async void ProvisioningClient_IsFriendQuestion(object Sender, IsFriendEventArgs e)
+		{
+			try
+			{
+				IsFriendQuestion Question = await Database.FindFirstDeleteRest<IsFriendQuestion>(new FilterAnd(
+					new FilterFieldEqualTo("Key", e.Key), new FilterFieldEqualTo("JID", e.JID)));
+
+				if (Question == null)
+				{
+					Question = new IsFriendQuestion()
+					{
+						Created = DateTime.Now,
+						Key = e.Key,
+						JID = e.JID,
+						RemoteJID = e.RemoteJID
+					};
+
+					await Database.Insert(Question);
+					await MainWindow.currentInstance.NewQuestion(Question);
+				}
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+			}
 		}
 
 		public override void Dispose()
@@ -33,6 +90,12 @@ namespace Waher.Client.WPF.Model
 			{
 				this.registryClient.Dispose();
 				this.registryClient = null;
+			}
+
+			if (this.provisioningClient != null)
+			{
+				this.provisioningClient.Dispose();
+				this.provisioningClient = null;
 			}
 
 			base.Dispose();
@@ -163,7 +226,7 @@ namespace Waher.Client.WPF.Model
 
 						if (HasNodeId)
 						{
-							Headers.Add(new TextSingleField(null, "_NodeId", "Node ID", false, null, null, string.Empty, null, null, 
+							Headers.Add(new TextSingleField(null, "_NodeId", "Node ID", false, null, null, string.Empty, null, null,
 								string.Empty, false, false, false));
 						}
 

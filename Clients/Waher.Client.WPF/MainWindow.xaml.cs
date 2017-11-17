@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Xml;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -14,9 +15,9 @@ using Waher.Networking.XMPP.Control;
 using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.Sensor;
 using Waher.Runtime.Inventory;
-using Waher.Things;
-using Waher.Things.SensorData;
+using Waher.Persistence;
 using Waher.Client.WPF.Controls;
+using Waher.Client.WPF.Controls.Questions;
 using Waher.Client.WPF.Controls.Chat;
 using Waher.Client.WPF.Controls.Sniffers;
 using Waher.Client.WPF.Dialogs;
@@ -56,6 +57,8 @@ namespace Waher.Client.WPF
 				typeof(Waher.Content.Markdown.MarkdownDocument).Assembly,
 				typeof(Waher.Content.Xml.XML).Assembly,
 				typeof(Waher.Content.Xsl.XSL).Assembly,
+				typeof(Waher.Persistence.Database).Assembly,
+				typeof(Waher.Persistence.Files.FilesProvider).Assembly,
 				typeof(Waher.Script.Expression).Assembly,
 				typeof(Waher.Script.Graphs.Graph).Assembly);
 
@@ -760,6 +763,34 @@ namespace Waher.Client.WPF
 			TabItem.Content = ScriptView;
 
 			this.Tabs.SelectedItem = TabItem;
+		}
+
+		internal async Task NewQuestion(Question Question)
+		{
+			QuestionView QuestionView = null;
+
+			foreach (TabItem TabItem in this.Tabs.Items)
+			{
+				QuestionView = TabItem.Content as QuestionView;
+				if (QuestionView != null)
+					break;
+			}
+
+			if (QuestionView == null)
+			{
+				TabItem TabItem2 = new TabItem();
+				this.Tabs.Items.Add(TabItem2);
+
+				QuestionView = new QuestionView();
+
+				TabItem2.Header = "Questions";
+				TabItem2.Content = QuestionView;
+
+				foreach (Question Question2 in await Database.Find<Question>("Created"))
+					QuestionView.NewQuestion(Question2);
+			}
+
+			QuestionView.NewQuestion(Question);
 		}
 
 	}

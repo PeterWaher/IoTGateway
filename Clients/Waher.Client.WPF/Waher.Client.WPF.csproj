@@ -103,6 +103,8 @@
     <Compile Include="Controls\ConnectionView.xaml.cs">
       <DependentUpon>ConnectionView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\Questions\IsFriendQuestion.cs" />
+    <Compile Include="Controls\Questions\Question.cs" />
     <Compile Include="Controls\Script\PrintOutput.cs" />
     <Compile Include="Controls\SearchResultView.xaml.cs">
       <DependentUpon>SearchResultView.xaml</DependentUpon>
@@ -113,6 +115,9 @@
     <Compile Include="Controls\SensorData\FieldItem.cs" />
     <Compile Include="Controls\ScriptView.xaml.cs">
       <DependentUpon>ScriptView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\QuestionView.xaml.cs">
+      <DependentUpon>QuestionView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\SnifferView.xaml.cs">
       <DependentUpon>SnifferView.xaml</DependentUpon>
@@ -145,6 +150,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Controls\ScriptView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\QuestionView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -325,6 +334,14 @@
       <Project>{9f60a3e1-ee96-4648-8970-76e67b086a63}</Project>
       <Name>Waher.Networking</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Persistence\Waher.Persistence.Files\Waher.Persistence.Files.csproj">
+      <Project>{c349595e-6578-4ffd-9456-4a5a3e52636f}</Project>
+      <Name>Waher.Persistence.Files</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Persistence\Waher.Persistence\Waher.Persistence.csproj">
+      <Project>{0286288f-4af3-4e64-a398-24c8957ceb04}</Project>
+      <Name>Waher.Persistence</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj">
       <Project>{7f1b0d78-aa86-445b-9e1f-7df75b9e4c04}</Project>
       <Name>Waher.Runtime.Inventory</Name>
@@ -460,6 +477,7 @@
   <ItemGroup>
     <EmbeddedResource Include="Transforms\ScriptToHTML.xslt" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\..\packages\SkiaSharp.1.59.2\build\net45\SkiaSharp.targets" Condition="Exists('..\..\packages\SkiaSharp.1.59.2\build\net45\SkiaSharp.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

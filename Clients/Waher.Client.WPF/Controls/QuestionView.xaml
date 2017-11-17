@@ -1,0 +1,31 @@
+﻿<UserControl x:Class="Waher.Client.WPF.Controls.QuestionView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Waher.Client.WPF.Controls"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="700">
+    <DockPanel FocusManager.FocusedElement="{Binding ElementName=QuestionListView}">
+        <ListView Name="QuestionListView" HorizontalAlignment="Left" Margin="0,0,0,0" Width="{Binding ElementName=DockPanel, Path=ActualWidth}"
+                  ScrollViewer.VerticalScrollBarVisibility="Visible">
+            <ListView.Resources>
+                <Style TargetType="{x:Type GridViewColumnHeader}">
+                    <Setter Property="HorizontalContentAlignment" Value="Left" />
+                    <Setter Property="Padding" Value="5,0,0,0" />
+                </Style>
+            </ListView.Resources>
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Date" Width="70" DisplayMemberBinding="{Binding Date}"/>
+                    <GridViewColumn Header="Time" Width="70" DisplayMemberBinding="{Binding Time}"/>
+                    <GridViewColumn Header="Question" Width="200" DisplayMemberBinding="{Binding QuestionString}"/>
+                    <GridViewColumn Header="Device" Width="150" DisplayMemberBinding="{Binding JID}"/>
+                    <GridViewColumn Header="Actor" Width="150" DisplayMemberBinding="{Binding RemoteJID}"/>
+                </GridView>
+            </ListView.View>
+        </ListView>
+        <StackPanel DockPanel.Dock="Bottom">
+        </StackPanel>
+    </DockPanel>
+</UserControl>

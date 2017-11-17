@@ -8,14 +8,21 @@ using Waher.Things.SensorData;
 namespace Waher.Networking.XMPP.Provisioning
 {
 	/// <summary>
+	/// Delegate for CanControl callback methods.
+	/// </summary>
+	/// <param name="Sender">Sender</param>
+	/// <param name="e">Event arguments.</param>
+	public delegate void CanControlCallback(object Sender, CanControlResponseEventArgs e);
+
+	/// <summary>
 	/// Event arguments for CanControl callback event arguments.
 	/// </summary>
-	public class CanControlEventArgs : NodesEventArgs
+	public class CanControlResponseEventArgs : NodesEventArgs
 	{
 		private bool canControl;
 		private string[] parameterNames;
 
-		internal CanControlEventArgs(IqResultEventArgs e, object State, string JID, bool CanControl, 
+		internal CanControlResponseEventArgs(IqResultEventArgs e, object State, string JID, bool CanControl, 
 			ThingReference[] Nodes, string[] ParameterNames)
 			: base(e, State, JID, Nodes)
 		{

@@ -41,6 +41,7 @@ namespace Waher.Client.WPF
 		public static RoutedUICommand SubscribeToMomentary = new RoutedUICommand("Subscribe to Momentary", "SubscribeToMomentary", typeof(MainWindow));
 		public static RoutedUICommand Configure = new RoutedUICommand("Configure", "Configure", typeof(MainWindow));
 		public static RoutedUICommand Search = new RoutedUICommand("Search", "Search", typeof(MainWindow));
+		public static RoutedUICommand Script = new RoutedUICommand("Script", "Script", typeof(MainWindow));
 
 		internal static MainWindow currentInstance = null;
 
@@ -436,9 +437,9 @@ namespace Waher.Client.WPF
 				}
 
 				if (c == 0)
-					this.ConnectionStatus.Content = string.Empty;
+					this.MainView.ConnectionStatus.Content = string.Empty;
 				else if (c == 1)
-					this.ConnectionStatus.Content = StateToString((XmppState)i);
+					this.MainView.ConnectionStatus.Content = StateToString((XmppState)i);
 				else
 				{
 					StringBuilder sb = new StringBuilder();
@@ -456,7 +457,7 @@ namespace Waher.Client.WPF
 						sb.Append(StateToString((XmppState)P.Key));
 					}
 
-					this.ConnectionStatus.Content = sb.ToString();
+					this.MainView.ConnectionStatus.Content = sb.ToString();
 				}
 			}
 			catch (Exception ex)
@@ -741,6 +742,24 @@ namespace Waher.Client.WPF
 			{
 				MessageBox.Show(this, ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
 			}
+		}
+
+		private void Script_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+		{
+			e.CanExecute = true;
+		}
+
+		private void Script_Executed(object sender, ExecutedRoutedEventArgs e)
+		{
+			TabItem TabItem = new TabItem();
+			this.Tabs.Items.Add(TabItem);
+
+			ScriptView ScriptView = new ScriptView();
+
+			TabItem.Header = "Script";
+			TabItem.Content = ScriptView;
+
+			this.Tabs.SelectedItem = TabItem;
 		}
 
 	}

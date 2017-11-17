@@ -226,6 +226,20 @@ namespace Waher.Client.WPF.Controls
 						SearchResultView.Load(Xml, FileName);
 						break;
 
+					case "Script":
+						TabItem = new TabItem();
+						this.MainWindow.Tabs.Items.Add(TabItem);
+
+						ScriptView ScriptView = new ScriptView();
+
+						TabItem.Header = System.IO.Path.GetFileName(FileName);
+						TabItem.Content = ScriptView;
+
+						this.MainWindow.Tabs.SelectedItem = TabItem;
+
+						ScriptView.Load(Xml, FileName);
+						break;
+
 					default:
 						throw new Exception("Unrecognized file format.");
 				}

@@ -30,6 +30,7 @@
         <CommandBinding Command="{x:Static wcw:MainWindow.SubscribeToMomentary}" Executed="SubscribeToMomentary_Executed" CanExecute="SubscribeToMomentary_CanExecute" />
         <CommandBinding Command="{x:Static wcw:MainWindow.Configure}" Executed="Configure_Executed" CanExecute="Configure_CanExecute" />
         <CommandBinding Command="{x:Static wcw:MainWindow.Search}" Executed="Search_Executed" CanExecute="Search_CanExecute" />
+        <CommandBinding Command="{x:Static wcw:MainWindow.Script}" Executed="Script_Executed" CanExecute="Script_CanExecute" />
     </Window.CommandBindings>
     <Window.InputBindings>
         <KeyBinding Modifiers="Control" Key="O" Command="Open"/>
@@ -129,7 +130,13 @@
                     </MenuItem.Icon>
                 </MenuItem>
             </MenuItem>
-            <MenuItem Name="ViewMenu" Header="_View" />
+            <MenuItem Name="ViewMenu" Header="_View">
+                <MenuItem Name="ScriptMenuItem" Header="_Script" Command="{x:Static wcw:MainWindow.Script}" IsEnabled="{Binding ElementName=ScriptButton, Path=IsEnabled}">
+                    <MenuItem.Icon>
+                        <Image Source="Graphics/pi.ico" Width="16" Height="16" Style="{StaticResource ImageEnabled}"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+            </MenuItem>
             <MenuItem Name="HelpMenu" Header="_Help" />
         </Menu>
         <ToolBarTray Name="ToolBarTray" VerticalAlignment="Top" Width="{Binding ElementName=DockPanel, Path=ActualWidth}" DockPanel.Dock="Top">
@@ -185,12 +192,12 @@
                     <Image Source="Graphics/search_32_h.png" Width="32" Height="32" Style="{StaticResource ImageEnabled}"/>
                 </Button>
             </ToolBar>
+            <ToolBar Name="UtilitiesToolBar">
+                <Button Name="ScriptButton" ToolTip="Script..." IsEnabled="True" Command="{x:Static wcw:MainWindow.Script}">
+                    <Image Source="Graphics/pi.ico" Width="32" Height="32" Style="{StaticResource ImageEnabled}"/>
+                </Button>
+            </ToolBar>
         </ToolBarTray>
-        <StatusBar Name="StatusBar" VerticalAlignment="Bottom" Width="{Binding ElementName=DockPanel, Path=ActualWidth}" DockPanel.Dock="Bottom">
-            <StatusBarItem Name="ConnectionStatus" HorizontalAlignment="Left">
-                <Label Content="Offline" />
-            </StatusBarItem>
-        </StatusBar>
         <TabControl HorizontalAlignment="Left" Margin="0,0,0,0" Name="Tabs" 
                     Width="{Binding ElementName=DockPanel, Path=ActualWidth}" SelectionChanged="Tabs_SelectionChanged">
             <TabItem Header="Connections" Name="ConnectionTab">

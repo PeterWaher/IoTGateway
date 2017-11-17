@@ -231,13 +231,13 @@ namespace Waher.Script.Lab
 							if ((ex2 = ex as AggregateException) != null)
 							{
 								foreach (Exception ex3 in ex2.InnerExceptions)
-									ScriptBlock = this.AddTextBlock(ScriptBlock, ex3.Message, Colors.Red);
+									ScriptBlock = this.AddTextBlock(ScriptBlock, ex3.Message, Colors.Red, FontWeights.Bold);
 							}
 							else
-								this.AddTextBlock(ScriptBlock, ex.Message, Colors.Red);
+								this.AddTextBlock(ScriptBlock, ex.Message, Colors.Red, FontWeights.Bold);
 						}
 						else
-							this.AddTextBlock(ScriptBlock, Ans.ToString(), Colors.Red);
+							this.AddTextBlock(ScriptBlock, Ans.ToString(), Colors.Red, FontWeights.Normal);
 					});
 				}
 				catch (Exception ex)
@@ -251,14 +251,15 @@ namespace Waher.Script.Lab
 			});
 		}
 
-		private TextBlock AddTextBlock(TextBlock ScriptBlock, string s, Color cl)
+		private TextBlock AddTextBlock(TextBlock ScriptBlock, string s, Color cl, FontWeight FontWeight)
 		{
 			TextBlock ResultBlock = new TextBlock()
 			{
 				Text = s,
 				FontFamily = new FontFamily("Courier New"),
 				Foreground = new SolidColorBrush(cl),
-				TextWrapping = TextWrapping.Wrap
+				TextWrapping = TextWrapping.Wrap,
+				FontWeight = FontWeight
 			};
 
 			ResultBlock.PreviewMouseDown += TextBlock_PreviewMouseDown;
@@ -374,7 +375,7 @@ namespace Waher.Script.Lab
 
 		internal void Print(string Output)
 		{
-			this.AddTextBlock(null, Output, Colors.Blue);
+			this.Dispatcher.Invoke(() => this.AddTextBlock(null, Output, Colors.Blue, FontWeights.Normal));
 		}
 
 		private void Window_Loaded(object sender, RoutedEventArgs e)

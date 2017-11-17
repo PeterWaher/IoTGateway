@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
-		 xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension">
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
   <Product Name="IoT Client" Version="1.0" Manufacturer="Waher Data AB" Language="1033" Codepage="1252"
 					 Id="72b6ad2d-d8a1-4d29-bcd9-971ceefc0b64" UpgradeCode="123a8d51-1558-45da-adf3-6c5fb853438c">
     <Package Id='*' Keywords='Installer' InstallScope='perMachine'

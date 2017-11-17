@@ -408,7 +408,7 @@ namespace Waher.Mock.Temperature
 					else
 					{
 						ownerJid = string.Empty;
-						SimpleXmppConfiguration.PrintQRCode(thingRegistryClient.EncodeAsIoTDiscoURI(MetaData));
+						SimpleXmppConfiguration.PrintQRCode(ThingRegistryClient.EncodeAsIoTDiscoURI(MetaData));
 					}
 				}
 			}, null);

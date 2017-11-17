@@ -382,7 +382,7 @@ namespace Waher.Mock.Lamp.UWP
 				new MetaDataNumericTag("V",1.0)
 			};
 
-			qrCodeUrl = SimpleXmppConfiguration.GetQRCodeURL(thingRegistryClient.EncodeAsIoTDiscoURI(metaData), 400, 400);
+			qrCodeUrl = SimpleXmppConfiguration.GetQRCodeURL(ThingRegistryClient.EncodeAsIoTDiscoURI(metaData), 400, 400);
 
 			thingRegistryClient.RegisterThing(metaData, (sender2, e2) =>
 			{

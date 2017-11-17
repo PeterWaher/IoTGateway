@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+		 xmlns:util="http://schemas.microsoft.com/wix/UtilExtension"
+		 xmlns:bal="http://schemas.microsoft.com/wix/BalExtension"
+		 xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension">
+	<Bundle Name="IoT Client Setup" Version="1.0" Manufacturer="Waher Data AB" 
+					UpgradeCode="2ed49d69-2085-4a7c-8749-d15bd9005e3b">
+		<BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.RtfLicense">
+			<bal:WixStandardBootstrapperApplication LicenseFile="License.rtf"
+																							SuppressOptionsUI="yes"/>
+		</BootstrapperApplicationRef>
+		<Chain>
+			<PackageGroupRef Id="NetFx462Web"/>
+      <MsiPackage SourceFile="..\..\..\Waher.IoTClient.Win32\bin\$(var.Configuration)\Waher.IoTClient.Win32.msi"
+									DisplayInternalUI="yes"/>
+		</Chain>
+	</Bundle>
+</Wix>

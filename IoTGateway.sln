@@ -264,6 +264,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Script.Graphs3D", "Sc
 EndProject
 Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "Waher.IoTClient.Win32", "Waher.IoTClient.Win32\Waher.IoTClient.Win32.wixproj", "{A1800A82-2C75-459A-9FF8-32A0C33EE8E4}"
 EndProject
+Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "Waher.IoTClient.Setup", "Waher.IoTClient.Setup\Waher.IoTClient.Setup.wixproj", "{8925180A-CE67-4DAC-99C1-F74DA4B9EE2B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -2299,6 +2301,20 @@ Global
 		{A1800A82-2C75-459A-9FF8-32A0C33EE8E4}.Release|x64.ActiveCfg = Release|x86
 		{A1800A82-2C75-459A-9FF8-32A0C33EE8E4}.Release|x86.ActiveCfg = Release|x86
 		{A1800A82-2C75-459A-9FF8-32A0C33EE8E4}.Release|x86.Build.0 = Release|x86
+		{8925180A-CE67-4DAC-99C1-F74DA4B9EE2B}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{8925180A-CE67-4DAC-99C1-F74DA4B9EE2B}.Debug|ARM.ActiveCfg = Debug|x86
+		{8925180A-CE67-4DAC-99C1-F74DA4B9EE2B}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{8925180A-CE67-4DAC-99C1-F74DA4B9EE2B}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{8925180A-CE67-4DAC-99C1-F74DA4B9EE2B}.Debug|x64.ActiveCfg = Debug|x86
+		{8925180A-CE67-4DAC-99C1-F74DA4B9EE2B}.Debug|x86.ActiveCfg = Debug|x86
+		{8925180A-CE67-4DAC-99C1-F74DA4B9EE2B}.Debug|x86.Build.0 = Debug|x86
+		{8925180A-CE67-4DAC-99C1-F74DA4B9EE2B}.Release|Any CPU.ActiveCfg = Release|x86
+		{8925180A-CE67-4DAC-99C1-F74DA4B9EE2B}.Release|ARM.ActiveCfg = Release|x86
+		{8925180A-CE67-4DAC-99C1-F74DA4B9EE2B}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{8925180A-CE67-4DAC-99C1-F74DA4B9EE2B}.Release|Mixed Platforms.Build.0 = Release|x86
+		{8925180A-CE67-4DAC-99C1-F74DA4B9EE2B}.Release|x64.ActiveCfg = Release|x86
+		{8925180A-CE67-4DAC-99C1-F74DA4B9EE2B}.Release|x86.ActiveCfg = Release|x86
+		{8925180A-CE67-4DAC-99C1-F74DA4B9EE2B}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

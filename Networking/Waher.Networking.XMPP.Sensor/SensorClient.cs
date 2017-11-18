@@ -23,9 +23,9 @@ namespace Waher.Networking.XMPP.Sensor
 		public const string NamespaceSensorData = "urn:ieee:iot:sd:1.0";
 
 		/// <summary>
-		/// urn:ieee:iot:events
+		/// urn:ieee:iot:events:1.0
 		/// </summary>
-		public const string NamespaceSensorEvents = "urn:ieee:iot:events";
+		public const string NamespaceSensorEvents = "urn:ieee:iot:events:1.0";
 
 		private Dictionary<string, SensorDataClientRequest> requests = new Dictionary<string, SensorDataClientRequest>();
 		private object synchObj = new object();

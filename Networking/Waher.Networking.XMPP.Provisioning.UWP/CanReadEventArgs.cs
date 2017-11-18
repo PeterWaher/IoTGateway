@@ -251,5 +251,7 @@ namespace Waher.Networking.XMPP.Provisioning
 				return false;
 		}
 
+		// TODO: Partial
+
 	}
 }

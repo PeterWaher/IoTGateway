@@ -391,7 +391,7 @@ namespace Waher.IoTGateway.Installers
 					Session["XMPPTHINGREGISTRY"] = string.Empty;
 				}
 
-				if (e2.Features.ContainsKey("urn:xmpp:iot:provisioning"))
+				if (e2.Features.ContainsKey("urn:ieee:iot:prov:d:1.0"))
 				{
 					Log(Session, "Provisioning server found: " + Item.JID);
 					Session["XMPPPROVISIONINGSERVER"] = Item.JID;

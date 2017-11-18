@@ -29,7 +29,7 @@ namespace Waher.Client.WPF.Model
 		public ThingRegistry(TreeNode Parent, string JID, string Name, string Node, Dictionary<string, bool> Features)
 			: base(Parent, JID, Name, Node, Features)
 		{
-			this.supportsProvisioning = Features.ContainsKey(ProvisioningClient.NamespaceProvisioning);
+			this.supportsProvisioning = Features.ContainsKey(ProvisioningClient.NamespaceProvisioningDevice);
 			this.registryClient = new ThingRegistryClient(this.Account.Client, JID);
 
 			if (this.supportsProvisioning)

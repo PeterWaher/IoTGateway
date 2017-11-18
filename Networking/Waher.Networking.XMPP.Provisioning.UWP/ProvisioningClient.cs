@@ -39,14 +39,14 @@ namespace Waher.Networking.XMPP.Provisioning
 		private Duration cacheUnusedLifetime = new Duration(false, 0, 13, 0, 0, 0, 0);
 
 		/// <summary>
-		/// urn:xmpp:iot:provisioning
+		/// urn:ieee:iot:prov:d:1.0
 		/// </summary>
-		public const string NamespaceProvisioning = "urn:xmpp:iot:provisioning";
+		public const string NamespaceProvisioningDevice = "urn:ieee:iot:prov:d:1.0";
 
 		/// <summary>
-		/// urn:xmpp:iot:provisioning:owner
+		/// urn:ieee:iot:prov:o:1.0
 		/// </summary>
-		public const string NamespaceProvisioningOwner = "urn:xmpp:iot:provisioning:owner";
+		public const string NamespaceProvisioningOwner = "urn:ieee:iot:prov:o:1.0";
 
 		/// <summary>
 		/// Implements an XMPP provisioning client interface.
@@ -76,12 +76,12 @@ namespace Waher.Networking.XMPP.Provisioning
 			this.provisioningServerAddress = ProvisioningServerAddress;
 			this.ownerJid = OwnerJid;
 
-			this.client.RegisterIqGetHandler("tokenChallenge", NamespaceProvisioning, this.TokenChallengeHandler, true);
-			this.client.RegisterIqSetHandler("clearCache", NamespaceProvisioning, this.ClearCacheHandler, true);
+			this.client.RegisterIqGetHandler("tokenChallenge", NamespaceProvisioningDevice, this.TokenChallengeHandler, true);
+			this.client.RegisterIqSetHandler("clearCache", NamespaceProvisioningDevice, this.ClearCacheHandler, true);
 
-			this.client.RegisterMessageHandler("unfriend", NamespaceProvisioning, this.UnfriendHandler, false);
-			this.client.RegisterMessageHandler("friend", NamespaceProvisioning, this.FriendHandler, false);
-			this.client.RegisterMessageHandler("clearCache", NamespaceProvisioning, this.ClearCacheHandler, false);
+			this.client.RegisterMessageHandler("unfriend", NamespaceProvisioningDevice, this.UnfriendHandler, false);
+			this.client.RegisterMessageHandler("friend", NamespaceProvisioningDevice, this.FriendHandler, false);
+			this.client.RegisterMessageHandler("clearCache", NamespaceProvisioningDevice, this.ClearCacheHandler, false);
 
 			this.client.RegisterMessageHandler("isFriend", NamespaceProvisioningOwner, this.IsFriendHandler, true);
 			this.client.RegisterMessageHandler("canRead", NamespaceProvisioningOwner, this.CanReadHandler, true);
@@ -98,12 +98,12 @@ namespace Waher.Networking.XMPP.Provisioning
 		{
 			base.Dispose();
 
-			this.client.UnregisterIqGetHandler("tokenChallenge", NamespaceProvisioning, this.TokenChallengeHandler, true);
-			this.client.UnregisterIqSetHandler("clearCache", NamespaceProvisioning, this.ClearCacheHandler, true);
+			this.client.UnregisterIqGetHandler("tokenChallenge", NamespaceProvisioningDevice, this.TokenChallengeHandler, true);
+			this.client.UnregisterIqSetHandler("clearCache", NamespaceProvisioningDevice, this.ClearCacheHandler, true);
 
-			this.client.UnregisterMessageHandler("unfriend", NamespaceProvisioning, this.UnfriendHandler, false);
-			this.client.UnregisterMessageHandler("friend", NamespaceProvisioning, this.FriendHandler, false);
-			this.client.UnregisterMessageHandler("clearCache", NamespaceProvisioning, this.ClearCacheHandler, false);
+			this.client.UnregisterMessageHandler("unfriend", NamespaceProvisioningDevice, this.UnfriendHandler, false);
+			this.client.UnregisterMessageHandler("friend", NamespaceProvisioningDevice, this.FriendHandler, false);
+			this.client.UnregisterMessageHandler("clearCache", NamespaceProvisioningDevice, this.ClearCacheHandler, false);
 
 			this.client.UnregisterMessageHandler("isFriend", NamespaceProvisioningOwner, this.IsFriendHandler, true);
 			this.client.UnregisterMessageHandler("canRead", NamespaceProvisioningOwner, this.CanReadHandler, true);
@@ -209,7 +209,7 @@ namespace Waher.Networking.XMPP.Provisioning
 			byte[] Bin = Certificate.Export(X509ContentType.Cert);
 			string Base64 = System.Convert.ToBase64String(Bin);
 #endif
-			this.client.SendIqGet(this.provisioningServerAddress, "<getToken xmlns='urn:xmpp:iot:provisioning'>" + Base64 + "</getToken>",
+			this.client.SendIqGet(this.provisioningServerAddress, "<getToken xmlns='urn:ieee:iot:prov:d:1.0'>" + Base64 + "</getToken>",
 				this.GetTokenResponse, new object[] { Certificate, Callback, State });
 		}
 
@@ -223,7 +223,7 @@ namespace Waher.Networking.XMPP.Provisioning
 #endif
 			XmlElement E = e.FirstElement;
 
-			if (e.Ok && E != null && E.LocalName == "getTokenChallenge" && E.NamespaceURI == NamespaceProvisioning)
+			if (e.Ok && E != null && E.LocalName == "getTokenChallenge" && E.NamespaceURI == NamespaceProvisioningDevice)
 			{
 				int SeqNr = XML.Attribute(E, "seqnr", 0);
 				string Challenge = E.InnerText;
@@ -241,7 +241,7 @@ namespace Waher.Networking.XMPP.Provisioning
 				string Response = System.Convert.ToBase64String(Bin);
 #endif
 
-				this.client.SendIqGet(this.provisioningServerAddress, "<getTokenChallengeResponse xmlns='urn:xmpp:iot:provisioning' seqnr='" +
+				this.client.SendIqGet(this.provisioningServerAddress, "<getTokenChallengeResponse xmlns='urn:ieee:iot:prov:d:1.0' seqnr='" +
 					SeqNr.ToString() + "'>" + Response + "</getTokenChallengeResponse>",
 					this.GetTokenChallengeResponse, P);
 			}
@@ -260,7 +260,7 @@ namespace Waher.Networking.XMPP.Provisioning
 			XmlElement E = e.FirstElement;
 			string Token;
 
-			if (e.Ok && E != null && E.LocalName == "getTokenResponse" && E.NamespaceURI == NamespaceProvisioning)
+			if (e.Ok && E != null && E.LocalName == "getTokenResponse" && E.NamespaceURI == NamespaceProvisioningDevice)
 			{
 				Token = XML.Attribute(E, "token");
 
@@ -346,7 +346,7 @@ namespace Waher.Networking.XMPP.Provisioning
 				string Response = System.Convert.ToBase64String(Bin);
 #endif
 
-				e.IqResult("<tokenChallengeResponse xmlns='" + NamespaceProvisioning + "'>" + Response + "</tokenChallengeResponse>");
+				e.IqResult("<tokenChallengeResponse xmlns='" + NamespaceProvisioningDevice + "'>" + Response + "</tokenChallengeResponse>");
 			}
 			else
 				this.client.SendIqGet(Use.RemoteCertificateJid, e.Query.OuterXml, this.ForwardedTokenChallengeResponse, e);
@@ -374,7 +374,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="State">State object to pass to callback method.</param>
 		public void IsFriend(string JID, IsFriendCallback Callback, object State)
 		{
-			this.CachedIqGet("<isFriend xmlns='" + NamespaceProvisioning + "' jid='" +
+			this.CachedIqGet("<isFriend xmlns='" + NamespaceProvisioningDevice + "' jid='" +
 				XML.Encode(JID) + "'/>", this.IsFriendCallback, new object[] { Callback, State });
 		}
 
@@ -387,7 +387,7 @@ namespace Waher.Networking.XMPP.Provisioning
 			bool Result;
 			XmlElement E = e.FirstElement;
 
-			if (e.Ok && E != null && E.LocalName == "isFriendResponse" && E.NamespaceURI == NamespaceProvisioning)
+			if (e.Ok && E != null && E.LocalName == "isFriendResponse" && E.NamespaceURI == NamespaceProvisioningDevice)
 			{
 				JID = XML.Attribute(E, "jid");
 				Result = XML.Attribute(E, "result", false);
@@ -456,7 +456,7 @@ namespace Waher.Networking.XMPP.Provisioning
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<canRead xmlns='");
-			Xml.Append(NamespaceProvisioning);
+			Xml.Append(NamespaceProvisioningDevice);
 			Xml.Append("' jid='");
 			Xml.Append(XML.Encode(RequestFromBareJid));
 
@@ -542,7 +542,7 @@ namespace Waher.Networking.XMPP.Provisioning
 				bool b;
 				bool CanRead;
 
-				if (e.Ok && E.LocalName == "canReadResponse" && E.NamespaceURI == NamespaceProvisioning)
+				if (e.Ok && E.LocalName == "canReadResponse" && E.NamespaceURI == NamespaceProvisioningDevice)
 				{
 					CanRead = XML.Attribute(E, "result", false);
 
@@ -673,7 +673,7 @@ namespace Waher.Networking.XMPP.Provisioning
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<canControl xmlns='");
-			Xml.Append(NamespaceProvisioning);
+			Xml.Append(NamespaceProvisioningDevice);
 			Xml.Append("' jid='");
 			Xml.Append(XML.Encode(RequestFromBareJid));
 
@@ -734,7 +734,7 @@ namespace Waher.Networking.XMPP.Provisioning
 				string Partition;
 				bool CanControl;
 
-				if (e.Ok && E.LocalName == "canControlResponse" && E.NamespaceURI == NamespaceProvisioning)
+				if (e.Ok && E.LocalName == "canControlResponse" && E.NamespaceURI == NamespaceProvisioningDevice)
 				{
 					CanControl = XML.Attribute(E, "result", false);
 
@@ -909,7 +909,7 @@ namespace Waher.Networking.XMPP.Provisioning
 				if (e.From == this.provisioningServerAddress)
 				{
 					await this.ClearCache();
-					e.IqResult("<clearCacheResponse xmlns='" + NamespaceProvisioning + "'/>");
+					e.IqResult("<clearCacheResponse xmlns='" + NamespaceProvisioningDevice + "'/>");
 				}
 				else
 					e.IqError(new ForbiddenException("Unauthorized sender.", e.IQ));

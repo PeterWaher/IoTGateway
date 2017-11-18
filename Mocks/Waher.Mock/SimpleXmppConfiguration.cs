@@ -431,7 +431,7 @@ namespace Waher.Mock
 							else
 								Config.thingRegistry = string.Empty;
 
-							if (e2.Features.ContainsKey("urn:xmpp:iot:provisioning") && string.IsNullOrEmpty(Config.provisioning))
+							if (e2.Features.ContainsKey("urn:ieee:iot:prov:d:1.0") && string.IsNullOrEmpty(Config.provisioning))
 								Config.provisioning = Item.JID;
 							else
 								Config.provisioning = string.Empty;
@@ -643,7 +643,7 @@ namespace Waher.Mock
 								else
 									Config.thingRegistry = string.Empty;
 
-								if (e2.Features.ContainsKey("urn:xmpp:iot:provisioning") && string.IsNullOrEmpty(Config.provisioning))
+								if (e2.Features.ContainsKey("urn:ieee:iot:prov:d:1.0") && string.IsNullOrEmpty(Config.provisioning))
 								{
 									Console.Out.WriteLine("Provisioning server found.");
 									Config.provisioning = Item.JID;

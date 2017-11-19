@@ -29,13 +29,22 @@ namespace Waher.Client.WPF.Controls
 	/// </summary>
 	public partial class QuestionView : UserControl, ITabView
 	{
-		public QuestionView()
+		private string provisioningJid;
+
+		public QuestionView(string ProvisioningJid)
 		{
+			this.provisioningJid = ProvisioningJid;
+
 			InitializeComponent();
 		}
 
 		public void Dispose()
 		{
+		}
+
+		public string ProvisioningJid
+		{
+			get { return this.provisioningJid; }
 		}
 
 		public void NewQuestion(Question Question)

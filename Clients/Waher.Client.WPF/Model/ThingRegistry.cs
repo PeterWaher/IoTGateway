@@ -59,6 +59,11 @@ namespace Waher.Client.WPF.Model
 				this.provisioningClient = null;
 		}
 
+		public bool SupportsProvisioning
+		{
+			get { return this.supportsProvisioning; }
+		}
+
 		private async void ProvisioningClient_IsFriendQuestion(object Sender, IsFriendEventArgs e)
 		{
 			try
@@ -73,7 +78,8 @@ namespace Waher.Client.WPF.Model
 						Created = DateTime.Now,
 						Key = e.Key,
 						JID = e.JID,
-						RemoteJID = e.RemoteJID
+						RemoteJID = e.RemoteJID,
+						ProvisioningJid = this.provisioningClient.ProvisioningServerAddress
 					};
 
 					await Database.Insert(Question);
@@ -101,6 +107,7 @@ namespace Waher.Client.WPF.Model
 						Key = e.Key,
 						JID = e.JID,
 						RemoteJID = e.RemoteJID,
+						ProvisioningJid = this.provisioningClient.ProvisioningServerAddress,
 						ServiceTokens = e.ServiceTokens,
 						DeviceTokens = e.DeviceTokens,
 						UserTokens = e.UserTokens,
@@ -136,6 +143,7 @@ namespace Waher.Client.WPF.Model
 						Key = e.Key,
 						JID = e.JID,
 						RemoteJID = e.RemoteJID,
+						ProvisioningJid = this.provisioningClient.ProvisioningServerAddress,
 						ServiceTokens = e.ServiceTokens,
 						DeviceTokens = e.DeviceTokens,
 						UserTokens = e.UserTokens,

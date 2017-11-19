@@ -16,6 +16,7 @@ using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.Sensor;
 using Waher.Runtime.Inventory;
 using Waher.Persistence;
+using Waher.Persistence.Filters;
 using Waher.Client.WPF.Controls;
 using Waher.Client.WPF.Controls.Questions;
 using Waher.Client.WPF.Controls.Chat;
@@ -765,32 +766,78 @@ namespace Waher.Client.WPF
 			this.Tabs.SelectedItem = TabItem;
 		}
 
-		internal async Task NewQuestion(Question Question)
+		internal Task LoadQuestions(string ProvisioningJid)
+		{
+			return this.NewQuestion(ProvisioningJid, null);
+		}
+
+		internal Task NewQuestion(Question Question)
+		{
+			return this.NewQuestion(Question.ProvisioningJid, Question);
+		}
+
+		private async Task NewQuestion(string ProvisioningJid, Question Question)
+		{
+			QuestionView QuestionView;
+			bool DoSearch;
+
+			if (Question == null)
+			{
+				QuestionView = null;
+				DoSearch = true;
+			}
+			else
+				QuestionView = this.OpenQuestionTab(ProvisioningJid, out DoSearch);
+
+			if (DoSearch)
+			{
+				bool Found = false;
+
+				foreach (Question Question2 in await Database.Find<Question>(
+					new FilterFieldEqualTo("ProvisioningJid", ProvisioningJid), "Created"))
+				{
+					if (QuestionView == null)
+						QuestionView = this.OpenQuestionTab(ProvisioningJid, out DoSearch);
+
+					QuestionView.NewQuestion(Question2);
+
+					if (Question != null)
+						Found |= Question2.ObjectId == Question.ObjectId;
+				}
+
+				if (Found)
+					return;
+			}
+
+			if (Question != null)
+				QuestionView.NewQuestion(Question);
+		}
+
+		private QuestionView OpenQuestionTab(string ProvisioningJid, out bool DoSearch)
 		{
 			QuestionView QuestionView = null;
 
 			foreach (TabItem TabItem in this.Tabs.Items)
 			{
 				QuestionView = TabItem.Content as QuestionView;
-				if (QuestionView != null)
-					break;
+				if (QuestionView != null && QuestionView.ProvisioningJid == ProvisioningJid)
+				{
+					DoSearch = false;
+					return QuestionView;
+				}
 			}
 
-			if (QuestionView == null)
-			{
-				TabItem TabItem2 = new TabItem();
-				this.Tabs.Items.Add(TabItem2);
+			TabItem TabItem2 = new TabItem();
+			this.Tabs.Items.Add(TabItem2);
 
-				QuestionView = new QuestionView();
+			QuestionView = new QuestionView(ProvisioningJid);
 
-				TabItem2.Header = "Questions";
-				TabItem2.Content = QuestionView;
+			TabItem2.Header = "Questions (" + ProvisioningJid + ")";
+			TabItem2.Content = QuestionView;
 
-				foreach (Question Question2 in await Database.Find<Question>("Created"))
-					QuestionView.NewQuestion(Question2);
-			}
+			DoSearch = true;
 
-			QuestionView.NewQuestion(Question);
+			return QuestionView;
 		}
 
 	}

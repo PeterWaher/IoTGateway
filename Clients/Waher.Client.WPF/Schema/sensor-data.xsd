@@ -505,17 +505,17 @@
       </xs:attribute>
       <xs:attribute name='st' type='xs:string' use='optional'>
         <xs:annotation>
-          <xs:documentation>Service token, identifying the service generating the original request.</xs:documentation>
+          <xs:documentation>Service tokens, separated by spaces if they are more than one, identifying the service generating the original request.</xs:documentation>
         </xs:annotation>
       </xs:attribute>
       <xs:attribute name='dt' type='xs:string' use='optional'>
         <xs:annotation>
-          <xs:documentation>Device token, identifying the device generating the original request.</xs:documentation>
+          <xs:documentation>Device tokens, separated by spaces if they are more than one, identifying the device generating the original request.</xs:documentation>
         </xs:annotation>
       </xs:attribute>
       <xs:attribute name='ut' type='xs:string' use='optional'>
         <xs:annotation>
-          <xs:documentation>User token, identifying the user generating the original request.</xs:documentation>
+          <xs:documentation>User tokens, separated by spaces if they are more than one, identifying the user generating the original request.</xs:documentation>
         </xs:annotation>
       </xs:attribute>
     </xs:complexType>

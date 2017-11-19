@@ -364,7 +364,6 @@ namespace Waher.Networking.XMPP.Search
 							if (N2.LocalName == "x")
 							{
 								DataForm Form = new DataForm(this.client, (XmlElement)N2, null, null, e.From, e.To);
-								Dictionary<string, string> Record = new Dictionary<string, string>();
 								Dictionary<string, bool> HeadersSorted = new Dictionary<string, bool>();
 								string Header;
 
@@ -384,6 +383,8 @@ namespace Waher.Networking.XMPP.Search
 
 								foreach (Field[] FormRecord in Form.Records)
 								{
+									Dictionary<string, string> Record = new Dictionary<string, string>();
+
 									foreach (Field FormField in FormRecord)
 									{
 										Header = FormField.Var;
@@ -397,9 +398,9 @@ namespace Waher.Networking.XMPP.Search
 												false, null, null, string.Empty, new StringDataType(), new BasicValidation(), string.Empty, false, false, false));
 										}
 									}
-								}
 
-								Records.Add(Record);
+									Records.Add(Record);
+								}
 							}
 						}
 					}

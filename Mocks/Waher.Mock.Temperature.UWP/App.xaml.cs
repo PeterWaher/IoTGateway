@@ -135,34 +135,34 @@ namespace Waher.Mock.Temperature.UWP
 
 				if (xmppConfiguration.Sniffer && MainPage.Sniffer != null)
 					xmppClient.Add(MainPage.Sniffer);
-
+				
 				if (!string.IsNullOrEmpty(xmppConfiguration.Events))
 					Log.Register(new XmppEventSink("XMPP Event Sink", xmppClient, xmppConfiguration.Events, false));
-
+				
 				if (!string.IsNullOrEmpty(xmppConfiguration.ThingRegistry))
 				{
 					thingRegistryClient = new ThingRegistryClient(xmppClient, xmppConfiguration.ThingRegistry);
-
+				
 					thingRegistryClient.Claimed += (sender, e) =>
 					{
 						ownerJid = e.JID;
 						Log.Informational("Thing has been claimed.", ownerJid, new KeyValuePair<string, object>("Public", e.IsPublic));
 						this.RaiseOwnershipChanged();
 					};
-
+				
 					thingRegistryClient.Disowned += (sender, e) =>
 					{
 						Log.Informational("Thing has been disowned.", ownerJid);
 						ownerJid = string.Empty;
 						this.Register();    // Will call this.OwnershipChanged() after successful registration.
 					};
-
+				
 					thingRegistryClient.Removed += (sender, e) =>
 					{
 						Log.Informational("Thing has been removed from the public registry.", ownerJid);
 					};
 				}
-
+				
 				if (!string.IsNullOrEmpty(xmppConfiguration.Provisioning))
 					provisioningClient = new ProvisioningClient(xmppClient, xmppConfiguration.Provisioning);
 
@@ -264,7 +264,7 @@ namespace Waher.Mock.Temperature.UWP
 							else
 								DayHistoricalValues.RemoveLast();
 
-								// TODO: Persistence
+							// TODO: Persistence
 
 							PeriodStart = Now.Date;
 							SumTemp = 0;
@@ -284,8 +284,8 @@ namespace Waher.Mock.Temperature.UWP
 							else
 								MinuteHistoricalValues.RemoveLast();
 
-								// TODO: Persistence
-							}
+							// TODO: Persistence
+						}
 
 						SampleTime = Now;
 
@@ -432,7 +432,7 @@ namespace Waher.Mock.Temperature.UWP
 						"XMPP.IoT.Sensor.Temperature.Max.History");
 				};
 
-                xmppClient.Connect();
+				xmppClient.Connect();
 			}
 			catch (Exception ex)
 			{
@@ -518,7 +518,7 @@ namespace Waher.Mock.Temperature.UWP
 			if (this.sensorServer != null)
 			{
 				this.sensorServer.Dispose();
-				this.sensorServer= null;
+				this.sensorServer = null;
 			}
 
 			if (this.provisioningClient != null)

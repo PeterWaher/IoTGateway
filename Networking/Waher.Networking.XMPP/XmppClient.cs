@@ -2774,31 +2774,20 @@ namespace Waher.Networking.XMPP
 				this.dataReader.DetachStream();
 				this.dataWriter.DetachStream();
 
-				try
+				if (this.trustServer)
 				{
-					await this.client.UpgradeToSslAsync(SocketProtectionLevel.Tls12, new HostName(this.host));
-					this.serverCertificate = this.client.Information.ServerCertificate;
-					this.serverCertificateValid = true;
+					this.client.Control.IgnorableServerCertificateErrors.Add(ChainValidationResult.Untrusted);
+					this.client.Control.IgnorableServerCertificateErrors.Add(ChainValidationResult.Expired);
+					this.client.Control.IgnorableServerCertificateErrors.Add(ChainValidationResult.IncompleteChain);
+					this.client.Control.IgnorableServerCertificateErrors.Add(ChainValidationResult.WrongUsage);
+					this.client.Control.IgnorableServerCertificateErrors.Add(ChainValidationResult.InvalidName);
+					this.client.Control.IgnorableServerCertificateErrors.Add(ChainValidationResult.RevocationInformationMissing);
+					this.client.Control.IgnorableServerCertificateErrors.Add(ChainValidationResult.RevocationFailure);
 				}
-				catch (Exception ex)
-				{
-					if (this.trustServer && this.client.Information.ServerCertificateErrorSeverity == SocketSslErrorSeverity.Ignorable)
-					{
-						this.client.Control.IgnorableServerCertificateErrors.Clear();
 
-						foreach (ChainValidationResult Error in this.client.Information.ServerCertificateErrors)
-							this.client.Control.IgnorableServerCertificateErrors.Add(Error);
-
-						await this.client.UpgradeToSslAsync(SocketProtectionLevel.Tls12, new HostName(this.host));
-						this.serverCertificate = this.client.Information.ServerCertificate;
-						this.serverCertificateValid = false;
-					}
-					else
-					{
-						this.ConnectionError(ex);
-						return;
-					}
-				}
+				await this.client.UpgradeToSslAsync(SocketProtectionLevel.Tls12, new HostName(this.host));
+				this.serverCertificate = this.client.Information.ServerCertificate;
+				this.serverCertificateValid = true;
 
 				this.dataReader = new DataReader(this.client.InputStream);
 				this.dataWriter = new DataWriter(this.client.OutputStream);

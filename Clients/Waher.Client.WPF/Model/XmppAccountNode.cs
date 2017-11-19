@@ -904,28 +904,42 @@ namespace Waher.Client.WPF.Model
 			{
 				foreach (Item Item in e.Items)
 				{
-					this.client.SendServiceDiscoveryRequest(Item.JID, (sender2, e2) =>
+					this.client.SendServiceDiscoveryRequest(Item.JID, async (sender2, e2) =>
 					{
-						XmppComponent Component = null;
-
-						if (this.children == null)
-							this.children = new SortedDictionary<string, TreeNode>();
-
-						lock (this.children)
+						try
 						{
-							if (!this.children.ContainsKey(Item.JID))
+							XmppComponent Component = null;
+							ThingRegistry ThingRegistry = null;
+
+							if (this.children == null)
+								this.children = new SortedDictionary<string, TreeNode>();
+
+							lock (this.children)
 							{
-								if (e2.HasFeature(ThingRegistryClient.NamespaceDiscovery))
-									Component = new ThingRegistry(this, Item.JID, Item.Name, Item.Node, e2.Features);
-								else
-									Component = new XmppComponent(this, Item.JID, Item.Name, Item.Node, e2.Features);
+								if (!this.children.ContainsKey(Item.JID))
+								{
+									if (e2.HasFeature(ThingRegistryClient.NamespaceDiscovery))
+									{
+										ThingRegistry = new ThingRegistry(this, Item.JID, Item.Name, Item.Node, e2.Features);
+										Component = ThingRegistry;
+									}
+									else
+										Component = new XmppComponent(this, Item.JID, Item.Name, Item.Node, e2.Features);
 
-								this.children[Item.JID] = Component;
+									this.children[Item.JID] = Component;
+								}
 							}
-						}
 
-						if (Component != null)
-							this.connections.Owner.MainView.NodeAdded(this, Component);
+							if (Component != null)
+								this.connections.Owner.MainView.NodeAdded(this, Component);
+
+							if (ThingRegistry != null && ThingRegistry.SupportsProvisioning)
+								await MainWindow.currentInstance.LoadQuestions(Item.JID);
+						}
+						catch (Exception ex)
+						{
+							Log.Critical(ex);
+						}
 
 					}, null);
 				}

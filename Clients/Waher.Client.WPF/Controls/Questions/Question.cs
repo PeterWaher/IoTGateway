@@ -15,8 +15,8 @@ namespace Waher.Client.WPF.Controls.Questions
 		private Guid objectId = Guid.Empty;
 		private DateTime created = DateTime.MinValue;
 		private string key = string.Empty;
-		private string jid;
-		private string remoteJid;
+		private string jid = string.Empty;
+		private string remoteJid = string.Empty;
 
 		public Question()
 		{

@@ -909,7 +909,7 @@ namespace Waher.Networking.XMPP.Provisioning
 				if (e.From == this.provisioningServerAddress)
 				{
 					await this.ClearCache();
-					e.IqResult("<clearCacheResponse xmlns='" + NamespaceProvisioningDevice + "'/>");
+					e.IqResult(string.Empty);
 				}
 				else
 					e.IqError(new ForbiddenException("Unauthorized sender.", e.IQ));
@@ -972,7 +972,7 @@ namespace Waher.Networking.XMPP.Provisioning
 			{
 				try
 				{
-					h(this, new CanReadEventArgs(this.client, e));
+					h(this, new CanReadEventArgs(this, e));
 				}
 				catch (Exception ex)
 				{
@@ -988,8 +988,25 @@ namespace Waher.Networking.XMPP.Provisioning
 
 		private void CanControlHandler(object Sender, MessageEventArgs e)
 		{
-			// TODO
+			CanControlEventHandler h = this.CanControlQuestion;
+
+			if (h != null)
+			{
+				try
+				{
+					h(this, new CanControlEventArgs(this, e));
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			}
 		}
+
+		/// <summary>
+		/// Event is raised when the provisioning server asks the owner if a device is allowed to be controlled.
+		/// </summary>
+		public event CanControlEventHandler CanControlQuestion = null;
 
 		#endregion
 

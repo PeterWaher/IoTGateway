@@ -9,110 +9,56 @@ using Waher.Things.SensorData;
 namespace Waher.Networking.XMPP.Provisioning
 {
 	/// <summary>
-	/// Delegate for CanRead callback methods.
+	/// Delegate for CanControl callback methods.
 	/// </summary>
 	/// <param name="Sender">Sender</param>
 	/// <param name="e">Event arguments.</param>
-	public delegate void CanReadEventHandler(object Sender, CanReadEventArgs e);
+	public delegate void CanControlEventHandler(object Sender, CanControlEventArgs e);
 
 	/// <summary>
-	/// Event arguments for CanRead events.
+	/// Event arguments for CanControl events.
 	/// </summary>
-	public class CanReadEventArgs : NodeQuestionEventArgs
+	public class CanControlEventArgs : NodeQuestionEventArgs
 	{
 		private ProvisioningClient provisioningClient;
-		private FieldType fieldTypes;
-		private string[] fields;
+		private string[] parameters;
 
 		/// <summary>
-		/// Event arguments for CanRead events.
+		/// Event arguments for CanControl events.
 		/// </summary>
 		/// <param name="ProvisioningClient">XMPP Provisioning Client used.</param>
 		/// <param name="e">Message with request.</param>
-		public CanReadEventArgs(ProvisioningClient ProvisioningClient, MessageEventArgs e)
+		public CanControlEventArgs(ProvisioningClient ProvisioningClient, MessageEventArgs e)
 			: base(ProvisioningClient.Client, e)
 		{
 			this.provisioningClient = ProvisioningClient;
-			this.fieldTypes = (FieldType)0;
-
-			foreach (XmlAttribute Attr in e.Content.Attributes)
-			{
-				switch (Attr.LocalName)
-				{
-					case "all":
-						if (CommonTypes.TryParse(Attr.Value, out bool b))
-							this.fieldTypes |= FieldType.All;
-						break;
-
-					case "m":
-						if (CommonTypes.TryParse(Attr.Value, out b))
-							this.fieldTypes |= FieldType.Momentary;
-						break;
-
-					case "p":
-						if (CommonTypes.TryParse(Attr.Value, out b))
-							this.fieldTypes |= FieldType.Peak;
-						break;
-
-					case "s":
-						if (CommonTypes.TryParse(Attr.Value, out b))
-							this.fieldTypes |= FieldType.Status;
-						break;
-
-					case "c":
-						if (CommonTypes.TryParse(Attr.Value, out b))
-							this.fieldTypes |= FieldType.Computed;
-						break;
-
-					case "i":
-						if (CommonTypes.TryParse(Attr.Value, out b))
-							this.fieldTypes |= FieldType.Identity;
-						break;
-
-					case "h":
-						if (CommonTypes.TryParse(Attr.Value, out b))
-							this.fieldTypes |= FieldType.Historical;
-						break;
-				}
-			}
-
-			List<string> Fields = null;
+			List<string> Parameters = null;
 
 			foreach (XmlNode N in e.Content.ChildNodes)
 			{
-				if (N is XmlElement E && E.LocalName == "f")
+				if (N is XmlElement E && E.LocalName == "p")
 				{
-					if (Fields == null)
-						Fields = new List<string>();
+					if (Parameters == null)
+						Parameters = new List<string>();
 
-					Fields.Add(XML.Attribute(E, "n"));
+					Parameters.Add(XML.Attribute(E, "n"));
 				}
 			}
 
-			if (Fields != null)
-				this.fields = Fields.ToArray();
-			else
-				this.fields = null;
+			if (Parameters != null)
+				this.parameters = Parameters.ToArray();
 		}
 
 		/// <summary>
-		/// Any field specifications of the original request. If null, all fields are requested.
+		/// Any parameter name specifications of the original request.
 		/// </summary>
-		public string[] Fields
+		public string[] Parameters
 		{
-			get { return this.fields; }
+			get { return this.parameters; }
 		}
 
 		/// <summary>
-		/// Any field types available in the original request.
-		/// </summary>
-		public FieldType FieldTypes
-		{
-			get { return this.fieldTypes; }
-		}
-
-		/// <summary>
-		/// Accept readouts from this remote JID.
+		/// Accept control operations from this remote JID.
 		/// </summary>
 		/// <param name="Callback">Callback method to call when response is received.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
@@ -123,7 +69,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		}
 
 		/// <summary>
-		/// Accept readouts from all entities of the remote domain.
+		/// Accept control operations from all entities of the remote domain.
 		/// </summary>
 		/// <param name="Callback">Callback method to call when response is received.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
@@ -134,7 +80,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		}
 
 		/// <summary>
-		/// Accept readouts from this service.
+		/// Accept control operations from this service.
 		/// </summary>
 		/// <param name="ServiceToken">Which service token is to be accepted.</param>
 		/// <param name="Callback">Callback method to call when response is received.</param>
@@ -146,7 +92,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		}
 
 		/// <summary>
-		/// Accept readouts from this device.
+		/// Accept control operations from this device.
 		/// </summary>
 		/// <param name="DeviceToken">Which device token is to be accepted.</param>
 		/// <param name="Callback">Callback method to call when response is received.</param>
@@ -158,7 +104,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		}
 
 		/// <summary>
-		/// Accept readouts from this user.
+		/// Accept control operations from this user.
 		/// </summary>
 		/// <param name="UserToken">Which user token is to be accepted.</param>
 		/// <param name="Callback">Callback method to call when response is received.</param>
@@ -170,109 +116,79 @@ namespace Waher.Networking.XMPP.Provisioning
 		}
 
 		/// <summary>
-		/// Accept partial readouts from this remote JID.
+		/// Accept partial control operations from this remote JID.
 		/// </summary>
-		/// <param name="Fields">Fields that can be read.</param>
-		/// <param name="FieldTypes">Field categories that can be read.</param>
+		/// <param name="Parameters">Parameters that can be controlled.</param>
 		/// <param name="Callback">Callback method to call when response is received.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <returns>If the response could be sent.</returns>
-		public bool AcceptPartialFromJID(string[] Fields, FieldType FieldTypes, IqResultEventHandler Callback, object State)
+		public bool AcceptPartialFromJID(string[] Parameters, IqResultEventHandler Callback, object State)
 		{
-			return this.Respond(true, this.PartialFields(Fields, FieldTypes) + "<fromJid/>", Callback, State);
+			return this.Respond(true, this.PartialParameters(Parameters) + "<fromJid/>", Callback, State);
 		}
 
 		/// <summary>
-		/// Accept partial readouts from all entities of the remote domain.
+		/// Accept partial control operations from all entities of the remote domain.
 		/// </summary>
-		/// <param name="Fields">Fields that can be read.</param>
-		/// <param name="FieldTypes">Field categories that can be read.</param>
+		/// <param name="Parameters">Parameters that can be controlled.</param>
 		/// <param name="Callback">Callback method to call when response is received.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <returns>If the response could be sent.</returns>
-		public bool AcceptPartialFromDomain(string[] Fields, FieldType FieldTypes, IqResultEventHandler Callback, object State)
+		public bool AcceptPartialFromDomain(string[] Parameters, IqResultEventHandler Callback, object State)
 		{
-			return this.Respond(true, this.PartialFields(Fields, FieldTypes) + "<fromDomain/>", Callback, State);
+			return this.Respond(true, this.PartialParameters(Parameters) + "<fromDomain/>", Callback, State);
 		}
 
 		/// <summary>
-		/// Accept partial readouts from this service.
+		/// Accept partial control operations from this service.
 		/// </summary>
-		/// <param name="Fields">Fields that can be read.</param>
-		/// <param name="FieldTypes">Field categories that can be read.</param>
+		/// <param name="Parameters">Parameters that can be controlled.</param>
 		/// <param name="ServiceToken">Which service token is to be accepted.</param>
 		/// <param name="Callback">Callback method to call when response is received.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <returns>If the response could be sent.</returns>
-		public bool AcceptPartialFromService(string[] Fields, FieldType FieldTypes, string ServiceToken, IqResultEventHandler Callback, object State)
+		public bool AcceptPartialFromService(string[] Parameters, string ServiceToken, IqResultEventHandler Callback, object State)
 		{
-			return this.Respond(true, this.PartialFields(Fields, FieldTypes) + "<fromService token='" + XML.Encode(ServiceToken) + "'/>", Callback, State);
+			return this.Respond(true, this.PartialParameters(Parameters) + "<fromService token='" + XML.Encode(ServiceToken) + "'/>", Callback, State);
 		}
 
 		/// <summary>
-		/// Accept partial readouts from this device.
+		/// Accept partial control operations from this device.
 		/// </summary>
-		/// <param name="Fields">Fields that can be read.</param>
-		/// <param name="FieldTypes">Field categories that can be read.</param>
+		/// <param name="Parameters">Parameters that can be controlled.</param>
 		/// <param name="DeviceToken">Which device token is to be accepted.</param>
 		/// <param name="Callback">Callback method to call when response is received.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <returns>If the response could be sent.</returns>
-		public bool AcceptPartialFromDevice(string[] Fields, FieldType FieldTypes, string DeviceToken, IqResultEventHandler Callback, object State)
+		public bool AcceptPartialFromDevice(string[] Parameters, string DeviceToken, IqResultEventHandler Callback, object State)
 		{
-			return this.Respond(true, this.PartialFields(Fields, FieldTypes) + "<fromDevice token='" + XML.Encode(DeviceToken) + "'/>", Callback, State);
+			return this.Respond(true, this.PartialParameters(Parameters) + "<fromDevice token='" + XML.Encode(DeviceToken) + "'/>", Callback, State);
 		}
 
 		/// <summary>
-		/// Accept partial readouts from this user.
+		/// Accept partial control operations from this user.
 		/// </summary>
-		/// <param name="Fields">Fields that can be read.</param>
-		/// <param name="FieldTypes">Field categories that can be read.</param>
+		/// <param name="Parameters">Parameters that can be controlled.</param>
 		/// <param name="UserToken">Which user token is to be accepted.</param>
 		/// <param name="Callback">Callback method to call when response is received.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <returns>If the response could be sent.</returns>
-		public bool AcceptPartialFromUser(string[] Fields, FieldType FieldTypes, string UserToken, IqResultEventHandler Callback, object State)
+		public bool AcceptPartialFromUser(string[] Parameters, string UserToken, IqResultEventHandler Callback, object State)
 		{
-			return this.Respond(true, this.PartialFields(Fields, FieldTypes) + "<fromUser token='" + XML.Encode(UserToken) + "'/>", Callback, State);
+			return this.Respond(true, this.PartialParameters(Parameters) + "<fromUser token='" + XML.Encode(UserToken) + "'/>", Callback, State);
 		}
 
-		private string PartialFields(string[] Names, FieldType FieldTypes)
+		private string PartialParameters(string[] Names)
 		{
 			StringBuilder Xml = new StringBuilder();
 
-			Xml.Append("<partial");
-
-			if (FieldTypes == FieldType.All)
-				Xml.Append(" all='true'");
-			else
-			{
-				if ((FieldTypes & FieldType.Momentary) != 0)
-					Xml.Append(" m='true'");
-
-				if ((FieldTypes & FieldType.Identity) != 0)
-					Xml.Append(" i='true'");
-
-				if ((FieldTypes & FieldType.Status) != 0)
-					Xml.Append(" s='true'");
-
-				if ((FieldTypes & FieldType.Computed) != 0)
-					Xml.Append(" c='true'");
-
-				if ((FieldTypes & FieldType.Peak) != 0)
-					Xml.Append(" p='true'");
-
-				if ((FieldTypes & FieldType.Historical) != 0)
-					Xml.Append(" h='true'");
-			}
-
-			Xml.Append(">");
+			Xml.Append("<partial>");
 
 			foreach (string Name in Names)
 			{
-				Xml.Append("<f n='");
+				Xml.Append("<p n='");
 				Xml.Append(XML.Encode(Name));
-				Xml.Append("</f>");
+				Xml.Append("</p>");
 			}
 
 			Xml.Append("</partial>");
@@ -281,7 +197,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		}
 
 		/// <summary>
-		/// Reject readouts from this remote JID.
+		/// Reject control operations from this remote JID.
 		/// </summary>
 		/// <param name="Callback">Callback method to call when response is received.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
@@ -292,7 +208,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		}
 
 		/// <summary>
-		/// Reject readouts from all entities of the remote domain.
+		/// Reject control operations from all entities of the remote domain.
 		/// </summary>
 		/// <param name="Callback">Callback method to call when response is received.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
@@ -303,7 +219,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		}
 
 		/// <summary>
-		/// Reject readouts from this service.
+		/// Reject control operations from this service.
 		/// </summary>
 		/// <param name="ServiceToken">Which service token is to be rejected.</param>
 		/// <param name="Callback">Callback method to call when response is received.</param>
@@ -315,7 +231,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		}
 
 		/// <summary>
-		/// Reject readouts from this device.
+		/// Reject control operations from this device.
 		/// </summary>
 		/// <param name="DeviceToken">Which device token is to be rejected.</param>
 		/// <param name="Callback">Callback method to call when response is received.</param>
@@ -327,7 +243,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		}
 
 		/// <summary>
-		/// Reject readouts from this user.
+		/// Reject control operations from this user.
 		/// </summary>
 		/// <param name="UserToken">Which user token is to be rejected.</param>
 		/// <param name="Callback">Callback method to call when response is received.</param>
@@ -338,11 +254,11 @@ namespace Waher.Networking.XMPP.Provisioning
 			return this.Respond(false, "<fromUser token='" + XML.Encode(UserToken) + "'/>", Callback, State);
 		}
 
-		private bool Respond(bool CanRead, string RuleXml, IqResultEventHandler Callback, object State)
+		private bool Respond(bool CanControl, string RuleXml, IqResultEventHandler Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
-			Xml.Append("<canReadRule xmlns='");
+			Xml.Append("<canControlRule xmlns='");
 			Xml.Append(ProvisioningClient.NamespaceProvisioningOwner);
 			Xml.Append("' jid='");
 			Xml.Append(XML.Encode(this.JID));
@@ -351,10 +267,10 @@ namespace Waher.Networking.XMPP.Provisioning
 			Xml.Append("' key='");
 			Xml.Append(XML.Encode(this.Key));
 			Xml.Append("' result='");
-			Xml.Append(CommonTypes.Encode(CanRead));
+			Xml.Append(CommonTypes.Encode(CanControl));
 			Xml.Append("'>");
 			Xml.Append(RuleXml);
-			Xml.Append("</canRaedRule>");
+			Xml.Append("</canControlRule>");
 
 			RosterItem Item = this.Client[this.FromBareJID];
 			if (Item.HasLastPresence && Item.LastPresence.IsOnline)

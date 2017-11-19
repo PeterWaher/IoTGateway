@@ -103,6 +103,9 @@
     <Compile Include="Controls\ConnectionView.xaml.cs">
       <DependentUpon>ConnectionView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\Questions\CanControlQuestion.cs" />
+    <Compile Include="Controls\Questions\NodeQuestion.cs" />
+    <Compile Include="Controls\Questions\CanReadQuestion.cs" />
     <Compile Include="Controls\Questions\IsFriendQuestion.cs" />
     <Compile Include="Controls\Questions\Question.cs" />
     <Compile Include="Controls\Script\PrintOutput.cs" />

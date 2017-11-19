@@ -40,6 +40,8 @@ namespace Waher.Client.WPF.Model
 				this.provisioningClient = new ProvisioningClient(Client, JID);
 
 				this.provisioningClient.IsFriendQuestion += this.ProvisioningClient_IsFriendQuestion;
+				this.provisioningClient.CanReadQuestion += this.ProvisioningClient_CanReadQuestion;
+				this.provisioningClient.CanControlQuestion += this.ProvisioningClient_CanControlQuestion;
 
 				foreach (MessageEventArgs Message in Account.GetUnhandledMessages("isFriend", ProvisioningClient.NamespaceProvisioningOwner))
 				{
@@ -72,6 +74,75 @@ namespace Waher.Client.WPF.Model
 						Key = e.Key,
 						JID = e.JID,
 						RemoteJID = e.RemoteJID
+					};
+
+					await Database.Insert(Question);
+					await MainWindow.currentInstance.NewQuestion(Question);
+				}
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+			}
+		}
+
+		private async void ProvisioningClient_CanReadQuestion(object Sender, CanReadEventArgs e)
+		{
+			try
+			{
+				CanReadQuestion Question = await Database.FindFirstDeleteRest<CanReadQuestion>(new FilterAnd(
+					new FilterFieldEqualTo("Key", e.Key), new FilterFieldEqualTo("JID", e.JID)));
+
+				if (Question == null)
+				{
+					Question = new CanReadQuestion()
+					{
+						Created = DateTime.Now,
+						Key = e.Key,
+						JID = e.JID,
+						RemoteJID = e.RemoteJID,
+						ServiceTokens = e.ServiceTokens,
+						DeviceTokens = e.DeviceTokens,
+						UserTokens = e.UserTokens,
+						FieldNames = e.Fields,
+						Categories = e.FieldTypes,
+						NodeId = e.NodeId,
+						SourceId = e.SourceId,
+						Partition = e.Partition
+					};
+
+					await Database.Insert(Question);
+					await MainWindow.currentInstance.NewQuestion(Question);
+				}
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+			}
+		}
+
+		private async void ProvisioningClient_CanControlQuestion(object Sender, CanControlEventArgs e)
+		{
+			try
+			{
+				CanControlQuestion Question = await Database.FindFirstDeleteRest<CanControlQuestion>(new FilterAnd(
+					new FilterFieldEqualTo("Key", e.Key), new FilterFieldEqualTo("JID", e.JID)));
+
+				if (Question == null)
+				{
+					Question = new CanControlQuestion()
+					{
+						Created = DateTime.Now,
+						Key = e.Key,
+						JID = e.JID,
+						RemoteJID = e.RemoteJID,
+						ServiceTokens = e.ServiceTokens,
+						DeviceTokens = e.DeviceTokens,
+						UserTokens = e.UserTokens,
+						ParameterNames = e.Parameters,
+						NodeId = e.NodeId,
+						SourceId = e.SourceId,
+						Partition = e.Partition
 					};
 
 					await Database.Insert(Question);

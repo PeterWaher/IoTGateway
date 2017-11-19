@@ -113,6 +113,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Cache\CachedQuery.cs" />
+    <Compile Include="CanControlEventArgs.cs" />
     <Compile Include="CanControlResponseEventArgs.cs" />
     <Compile Include="CanReadResponseEventArgs.cs" />
     <Compile Include="CertificateUse.cs" />

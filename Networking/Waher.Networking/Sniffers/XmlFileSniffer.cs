@@ -126,7 +126,7 @@ namespace Waher.Networking.Sniffers
 
 			string FolderName = Path.GetDirectoryName(FileName);
 
-			if (!Directory.Exists(FolderName))
+			if (!string.IsNullOrEmpty(FolderName) && !Directory.Exists(FolderName))
 			{
 				Log.Informational("Creating folder.", FolderName);
 				Directory.CreateDirectory(FolderName);

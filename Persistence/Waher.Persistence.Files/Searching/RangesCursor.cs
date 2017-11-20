@@ -202,6 +202,7 @@ namespace Waher.Persistence.Files.Searching
 							if (Range.HasMax)
 							{
 								Value = Range.Max;
+
 								if (!this.ascending[i])
 								{
 									if (StartFilters == null)
@@ -308,6 +309,225 @@ namespace Waher.Persistence.Files.Searching
 					{
 						if (this.ascending[i])
 						{
+							if (this.currentLimits[i].SetMax(FieldValue, OutOfStartRangeField != null, out Smaller) && Smaller)
+							{
+								i++;
+								this.limitsUpdatedAt = i;
+
+								while (i < this.nrRanges)
+								{
+									this.ranges[i].CopyTo(this.currentLimits[i]);
+									i++;
+								}
+							}
+						}
+						else
+						{
+							if (this.currentLimits[i].SetMin(FieldValue, OutOfStartRangeField != null, out Smaller) && Smaller)
+							{
+								i++;
+								this.limitsUpdatedAt = i;
+
+								while (i < this.nrRanges)
+								{
+									this.ranges[i].CopyTo(this.currentLimits[i]);
+									i++;
+								}
+							}
+						}
+					}
+				}
+
+				if (Ok)
+					return true;
+				else if (OutOfStartRangeField != null || OutOfEndRangeField != null)
+				{
+					this.currentRange.Dispose();
+					this.currentRange = null;
+
+					if (this.limitsUpdatedAt >= this.nrRanges)
+						return false;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Advances the enumerator to the previous element of the collection.
+		/// </summary>
+		/// <returns>true if the enumerator was successfully advanced to the previous element; false if
+		/// the enumerator has passed the beginning of the collection.</returns>
+		/// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
+		public async Task<bool> MovePreviousAsync()
+		{
+			int i;
+
+			while (true)
+			{
+				if (this.currentRange == null)
+				{
+					List<KeyValuePair<string, object>> SearchParameters = new List<KeyValuePair<string, object>>();
+					List<KeyValuePair<string, IApplicableFilter>> StartFilters = null;
+					List<KeyValuePair<string, IApplicableFilter>> EndFilters = null;
+					RangeInfo Range;
+					object Value;
+
+					for (i = 0; i < this.nrRanges; i++)
+					{
+						Range = this.currentLimits[i];
+
+						if (Range.IsPoint)
+						{
+							if (EndFilters == null)
+								EndFilters = new List<KeyValuePair<string, IApplicableFilter>>();
+
+							SearchParameters.Add(new KeyValuePair<string, object>(Range.FieldName, Range.Point));
+							EndFilters.Add(new KeyValuePair<string, IApplicableFilter>(Range.FieldName, new FilterFieldEqualTo(Range.FieldName, Range.Point)));
+						}
+						else
+						{
+							if (Range.HasMin)
+							{
+								Value = Range.Min;
+
+								if (this.ascending[i])
+								{
+									if (EndFilters == null)
+										EndFilters = new List<KeyValuePair<string, IApplicableFilter>>();
+
+									if (Range.MinInclusive)
+										EndFilters.Add(new KeyValuePair<string, IApplicableFilter>(Range.FieldName, new FilterFieldGreaterOrEqualTo(Range.FieldName, Value)));
+									else
+										EndFilters.Add(new KeyValuePair<string, IApplicableFilter>(Range.FieldName, new FilterFieldGreaterThan(Range.FieldName, Value)));
+								}
+								else
+								{
+									if (StartFilters == null)
+										StartFilters = new List<KeyValuePair<string, IApplicableFilter>>();
+
+									if (Range.MinInclusive)
+										StartFilters.Add(new KeyValuePair<string, IApplicableFilter>(Range.FieldName, new FilterFieldGreaterOrEqualTo(Range.FieldName, Value)));
+									else
+									{
+										StartFilters.Add(new KeyValuePair<string, IApplicableFilter>(Range.FieldName, new FilterFieldGreaterThan(Range.FieldName, Value)));
+
+										if (!Comparison.Increment(ref Value))
+											return false;
+									}
+
+									SearchParameters.Add(new KeyValuePair<string, object>(Range.FieldName, Value));
+								}
+							}
+
+							if (Range.HasMax)
+							{
+								Value = Range.Max;
+
+								if (this.ascending[i])
+								{
+									if (StartFilters == null)
+										StartFilters = new List<KeyValuePair<string, IApplicableFilter>>();
+
+									if (Range.MaxInclusive)
+										StartFilters.Add(new KeyValuePair<string, IApplicableFilter>(Range.FieldName, new FilterFieldLesserOrEqualTo(Range.FieldName, Value)));
+									else
+									{
+										StartFilters.Add(new KeyValuePair<string, IApplicableFilter>(Range.FieldName, new FilterFieldLesserThan(Range.FieldName, Value)));
+
+										if (!Comparison.Decrement(ref Value))
+											return false;
+									}
+
+									SearchParameters.Add(new KeyValuePair<string, object>(Range.FieldName, Value));
+								}
+								else
+								{
+									if (EndFilters == null)
+										EndFilters = new List<KeyValuePair<string, IApplicableFilter>>();
+
+									if (Range.MaxInclusive)
+										EndFilters.Add(new KeyValuePair<string, IApplicableFilter>(Range.FieldName, new FilterFieldLesserOrEqualTo(Range.FieldName, Value)));
+									else
+										EndFilters.Add(new KeyValuePair<string, IApplicableFilter>(Range.FieldName, new FilterFieldLesserThan(Range.FieldName, Value)));
+								}
+							}
+						}
+					}
+
+					if (this.firstAscending)
+						this.currentRange = await this.index.FindLastLesserOrEqualTo<T>(this.locked, SearchParameters.ToArray());
+					else
+						this.currentRange = await this.index.FindFirstGreaterOrEqualTo<T>(this.locked, SearchParameters.ToArray());
+					
+					this.startRangeFilters = StartFilters?.ToArray();
+					this.endRangeFilters = EndFilters?.ToArray();
+					this.limitsUpdatedAt = this.nrRanges;
+				}
+
+				if (!await this.currentRange.MovePreviousAsync())
+				{
+					this.currentRange.Dispose();
+					this.currentRange = null;
+
+					if (this.limitsUpdatedAt >= this.nrRanges)
+						return false;
+
+					continue;
+				}
+
+				if (!this.currentRange.CurrentTypeCompatible)
+					continue;
+
+				object CurrentValue = this.currentRange.Current;
+				IObjectSerializer CurrentSerializer = this.currentRange.CurrentSerializer;
+				string OutOfStartRangeField = null;
+				string OutOfEndRangeField = null;
+				bool Ok = true;
+				bool Smaller;
+
+				if (this.additionalfilters != null)
+				{
+					foreach (IApplicableFilter Filter in this.additionalfilters)
+					{
+						if (!Filter.AppliesTo(CurrentValue, CurrentSerializer, this.provider))
+						{
+							Ok = false;
+							break;
+						}
+					}
+				}
+
+				if (this.startRangeFilters != null)
+				{
+					foreach (KeyValuePair<string, IApplicableFilter> Filter in this.startRangeFilters)
+					{
+						if (!Filter.Value.AppliesTo(CurrentValue, CurrentSerializer, this.provider))
+						{
+							OutOfStartRangeField = Filter.Key;
+							Ok = false;
+							break;
+						}
+					}
+				}
+
+				if (this.endRangeFilters != null && OutOfStartRangeField == null)
+				{
+					foreach (KeyValuePair<string, IApplicableFilter> Filter in this.endRangeFilters)
+					{
+						if (!Filter.Value.AppliesTo(CurrentValue, CurrentSerializer, this.provider))
+						{
+							OutOfEndRangeField = Filter.Key;
+							Ok = false;
+							break;
+						}
+					}
+				}
+
+				for (i = 0; i < this.limitsUpdatedAt; i++)
+				{
+					if (CurrentSerializer.TryGetFieldValue(this.ranges[i].FieldName, CurrentValue, out object FieldValue))
+					{
+						if (this.ascending[i])
+						{
 							if (this.currentLimits[i].SetMin(FieldValue, OutOfStartRangeField != null, out Smaller) && Smaller)
 							{
 								i++;
@@ -348,17 +568,6 @@ namespace Waher.Persistence.Files.Searching
 						return false;
 				}
 			}
-		}
-
-		/// <summary>
-		/// Advances the enumerator to the previous element of the collection.
-		/// </summary>
-		/// <returns>true if the enumerator was successfully advanced to the previous element; false if
-		/// the enumerator has passed the beginning of the collection.</returns>
-		/// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
-		public Task<bool> MovePreviousAsync()
-		{
-			return this.MoveNextAsync();    // Range operator not ordered.
 		}
 
 		public IEnumerator<T> GetEnumerator()

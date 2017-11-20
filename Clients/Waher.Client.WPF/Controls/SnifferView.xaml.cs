@@ -282,7 +282,7 @@ namespace Waher.Client.WPF.Controls
 		private void UserControl_SizeChanged(object sender, SizeChangedEventArgs e)
 		{
 			if (this.SnifferListView.View is GridView GridView)
-				GridView.Columns[1].Width = this.ActualWidth - GridView.Columns[0].ActualWidth - SystemParameters.VerticalScrollBarWidth - 8;
+				GridView.Columns[1].Width = Math.Max(this.ActualWidth - GridView.Columns[0].ActualWidth - SystemParameters.VerticalScrollBarWidth - 8, 10);
 		}
 
 	}

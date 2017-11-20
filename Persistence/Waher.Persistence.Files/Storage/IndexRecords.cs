@@ -2439,7 +2439,7 @@ namespace Waher.Persistence.Files.Storage
 		public bool ReverseSortOrder(string[] ConstantFields, string[] SortOrder)
 		{
 			if (SortOrder == null)
-				return true;
+				return false;
 
 			int c = SortOrder.Length;
 			int d = this.fieldNames.Length;

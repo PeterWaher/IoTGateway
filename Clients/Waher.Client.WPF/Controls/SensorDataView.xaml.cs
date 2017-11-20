@@ -91,9 +91,9 @@ namespace Waher.Client.WPF.Controls
 		{
 			if (this.SensorDataListView.View is GridView GridView)
 			{
-				GridView.Columns[2].Width = this.ActualWidth - GridView.Columns[0].ActualWidth - GridView.Columns[1].ActualWidth -
+				GridView.Columns[2].Width = Math.Max(this.ActualWidth - GridView.Columns[0].ActualWidth - GridView.Columns[1].ActualWidth -
 					GridView.Columns[3].ActualWidth - GridView.Columns[4].ActualWidth - GridView.Columns[5].ActualWidth -
-					SystemParameters.VerticalScrollBarWidth - 8;
+					SystemParameters.VerticalScrollBarWidth - 8, 10);
 			}
 		}
 

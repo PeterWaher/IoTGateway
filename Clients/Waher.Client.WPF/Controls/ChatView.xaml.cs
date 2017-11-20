@@ -56,11 +56,11 @@ namespace Waher.Client.WPF.Controls
 		{
 			if (this.ChatListView.View is GridView GridView)
 			{
-				GridView.Columns[1].Width = this.ActualWidth - GridView.Columns[0].ActualWidth - GridView.Columns[2].ActualWidth -
-					SystemParameters.VerticalScrollBarWidth - 8;
+				GridView.Columns[1].Width = Math.Max(this.ActualWidth - GridView.Columns[0].ActualWidth - GridView.Columns[2].ActualWidth -
+					SystemParameters.VerticalScrollBarWidth - 8, 10);
 			}
 
-			this.Input.Width = this.ActualWidth - this.SendButton.ActualWidth - 16;
+			this.Input.Width = Math.Max(this.ActualWidth - this.SendButton.ActualWidth - 16, 10);
 		}
 
 		private void Send_Click(object sender, RoutedEventArgs e)

@@ -39,7 +39,7 @@ namespace Waher.Persistence.Files.Searching
 			this.forward = Forward;
 			this.timeoutMilliseconds = TimeoutMilliseconds;
 			this.provider = Provider;
-			this.constantFields = Filter.ConstantFields;
+			this.constantFields = Filter?.ConstantFields;
 		}
 
 		/// <summary>

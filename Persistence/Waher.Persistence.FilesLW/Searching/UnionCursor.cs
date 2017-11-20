@@ -128,7 +128,7 @@ namespace Waher.Persistence.Files.Searching
 					if (this.currentCursorPosition >= this.nrCursors)
 						return false;
 
-					this.currentCursor = await this.file.ConvertFilterToCursor<T>(this.childFilters[this.currentCursorPosition++], this.locked);
+					this.currentCursor = await this.file.ConvertFilterToCursor<T>(this.childFilters[this.currentCursorPosition++], this.locked, null);
 				}
 
 				if (!await this.currentCursor.MoveNextAsync())

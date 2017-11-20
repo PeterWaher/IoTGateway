@@ -903,79 +903,84 @@ namespace Waher.Networking.XMPP.Provisioning
 
 			this.client.SendIqGet(this.thingRegistryAddress, Request.ToString(), (sender, e) =>
 			{
-				List<SearchResultThing> Things = new List<SearchResultThing>();
-				List<MetaDataTag> MetaData = new List<MetaDataTag>();
-				ThingReference Node;
-				XmlElement E = e.FirstElement;
-				XmlElement E2, E3;
-				string Jid;
-				string OwnerJid;
-				string NodeId;
-				string SourceId;
-				string Partition;
-				string Name;
-				bool More = false;
-
-				if (e.Ok && E != null && E.LocalName == "found" && E.NamespaceURI == NamespaceDiscovery)
-				{
-					More = XML.Attribute(E, "more", false);
-
-					foreach (XmlNode N in E.ChildNodes)
-					{
-						E2 = N as XmlElement;
-						if (E2.LocalName == "thing" && E2.NamespaceURI == NamespaceDiscovery)
-						{
-							Jid = XML.Attribute(E2, "jid");
-							OwnerJid = XML.Attribute(E2, "owner");
-							NodeId = XML.Attribute(E2, "id");
-							SourceId = XML.Attribute(E2, "src");
-							Partition = XML.Attribute(E2, "pt");
-
-							if (string.IsNullOrEmpty(NodeId) && string.IsNullOrEmpty(SourceId) && string.IsNullOrEmpty(Partition))
-								Node = ThingReference.Empty;
-							else
-								Node = new ThingReference(NodeId, SourceId, Partition);
-
-							MetaData.Clear();
-							foreach (XmlNode N2 in E2.ChildNodes)
-							{
-								E3 = N2 as XmlElement;
-								if (E3 == null)
-									continue;
-
-								Name = XML.Attribute(E3, "name");
-
-								switch (E3.LocalName)
-								{
-									case "str":
-										MetaData.Add(new MetaDataStringTag(Name, XML.Attribute(E3, "value")));
-										break;
-
-									case "num":
-										MetaData.Add(new MetaDataNumericTag(Name, XML.Attribute(E3, "value", 0.0)));
-										break;
-								}
-							}
-
-							Things.Add(new SearchResultThing(Jid, OwnerJid, Node, MetaData.ToArray()));
-						}
-					}
-				}
-
-				if (Callback != null)
-				{
-					SearchResultEventArgs e2 = new SearchResultEventArgs(e, State, Offset, MaxCount, More, Things.ToArray());
-
-					try
-					{
-						Callback(this, e2);
-					}
-					catch (Exception ex)
-					{
-						Log.Critical(ex);
-					}
-				}
+				ParseResultSet(Offset, MaxCount, this, e, Callback, State);
 			}, null);
+		}
+
+		internal static void ParseResultSet(int Offset, int MaxCount, object Sender, IqResultEventArgs e, SearchResultEventHandler Callback, object State)
+		{
+			List<SearchResultThing> Things = new List<SearchResultThing>();
+			List<MetaDataTag> MetaData = new List<MetaDataTag>();
+			ThingReference Node;
+			XmlElement E = e.FirstElement;
+			XmlElement E2, E3;
+			string Jid;
+			string OwnerJid;
+			string NodeId;
+			string SourceId;
+			string Partition;
+			string Name;
+			bool More = false;
+
+			if (e.Ok && E != null && E.LocalName == "found" && E.NamespaceURI == NamespaceDiscovery)
+			{
+				More = XML.Attribute(E, "more", false);
+
+				foreach (XmlNode N in E.ChildNodes)
+				{
+					E2 = N as XmlElement;
+					if (E2.LocalName == "thing" && E2.NamespaceURI == NamespaceDiscovery)
+					{
+						Jid = XML.Attribute(E2, "jid");
+						OwnerJid = XML.Attribute(E2, "owner");
+						NodeId = XML.Attribute(E2, "id");
+						SourceId = XML.Attribute(E2, "src");
+						Partition = XML.Attribute(E2, "pt");
+
+						if (string.IsNullOrEmpty(NodeId) && string.IsNullOrEmpty(SourceId) && string.IsNullOrEmpty(Partition))
+							Node = ThingReference.Empty;
+						else
+							Node = new ThingReference(NodeId, SourceId, Partition);
+
+						MetaData.Clear();
+						foreach (XmlNode N2 in E2.ChildNodes)
+						{
+							E3 = N2 as XmlElement;
+							if (E3 == null)
+								continue;
+
+							Name = XML.Attribute(E3, "name");
+
+							switch (E3.LocalName)
+							{
+								case "str":
+									MetaData.Add(new MetaDataStringTag(Name, XML.Attribute(E3, "value")));
+									break;
+
+								case "num":
+									MetaData.Add(new MetaDataNumericTag(Name, XML.Attribute(E3, "value", 0.0)));
+									break;
+							}
+						}
+
+						Things.Add(new SearchResultThing(Jid, OwnerJid, Node, MetaData.ToArray()));
+					}
+				}
+			}
+
+			if (Callback != null)
+			{
+				SearchResultEventArgs e2 = new SearchResultEventArgs(e, State, Offset, MaxCount, More, Things.ToArray());
+
+				try
+				{
+					Callback(Sender, e2);
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			}
 		}
 
 		/// <summary>

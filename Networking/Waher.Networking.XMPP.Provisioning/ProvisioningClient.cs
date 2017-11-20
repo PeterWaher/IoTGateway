@@ -39,6 +39,11 @@ namespace Waher.Networking.XMPP.Provisioning
 		private Duration cacheUnusedLifetime = new Duration(false, 0, 13, 0, 0, 0, 0);
 
 		/// <summary>
+		/// urn:ieee:iot:prov:t:1.0
+		/// </summary>
+		public const string NamespaceProvisioningToken = "urn:ieee:iot:prov:t:1.0";
+
+		/// <summary>
 		/// urn:ieee:iot:prov:d:1.0
 		/// </summary>
 		public const string NamespaceProvisioningDevice = "urn:ieee:iot:prov:d:1.0";
@@ -76,12 +81,11 @@ namespace Waher.Networking.XMPP.Provisioning
 			this.provisioningServerAddress = ProvisioningServerAddress;
 			this.ownerJid = OwnerJid;
 
-			this.client.RegisterIqGetHandler("tokenChallenge", NamespaceProvisioningDevice, this.TokenChallengeHandler, true);
-			this.client.RegisterIqSetHandler("clearCache", NamespaceProvisioningDevice, this.ClearCacheHandler, true);
+			this.client.RegisterIqGetHandler("tokenChallenge", NamespaceProvisioningToken, this.TokenChallengeHandler, true);
 
+			this.client.RegisterIqSetHandler("clearCache", NamespaceProvisioningDevice, this.ClearCacheHandler, true);
 			this.client.RegisterMessageHandler("unfriend", NamespaceProvisioningDevice, this.UnfriendHandler, false);
 			this.client.RegisterMessageHandler("friend", NamespaceProvisioningDevice, this.FriendHandler, false);
-			this.client.RegisterMessageHandler("clearCache", NamespaceProvisioningDevice, this.ClearCacheHandler, false);
 
 			this.client.RegisterMessageHandler("isFriend", NamespaceProvisioningOwner, this.IsFriendHandler, true);
 			this.client.RegisterMessageHandler("canRead", NamespaceProvisioningOwner, this.CanReadHandler, true);
@@ -98,12 +102,11 @@ namespace Waher.Networking.XMPP.Provisioning
 		{
 			base.Dispose();
 
-			this.client.UnregisterIqGetHandler("tokenChallenge", NamespaceProvisioningDevice, this.TokenChallengeHandler, true);
-			this.client.UnregisterIqSetHandler("clearCache", NamespaceProvisioningDevice, this.ClearCacheHandler, true);
+			this.client.UnregisterIqGetHandler("tokenChallenge", NamespaceProvisioningToken, this.TokenChallengeHandler, true);
 
+			this.client.UnregisterIqSetHandler("clearCache", NamespaceProvisioningDevice, this.ClearCacheHandler, true);
 			this.client.UnregisterMessageHandler("unfriend", NamespaceProvisioningDevice, this.UnfriendHandler, false);
 			this.client.UnregisterMessageHandler("friend", NamespaceProvisioningDevice, this.FriendHandler, false);
-			this.client.UnregisterMessageHandler("clearCache", NamespaceProvisioningDevice, this.ClearCacheHandler, false);
 
 			this.client.UnregisterMessageHandler("isFriend", NamespaceProvisioningOwner, this.IsFriendHandler, true);
 			this.client.UnregisterMessageHandler("canRead", NamespaceProvisioningOwner, this.CanReadHandler, true);
@@ -209,7 +212,7 @@ namespace Waher.Networking.XMPP.Provisioning
 			byte[] Bin = Certificate.Export(X509ContentType.Cert);
 			string Base64 = System.Convert.ToBase64String(Bin);
 #endif
-			this.client.SendIqGet(this.provisioningServerAddress, "<getToken xmlns='urn:ieee:iot:prov:d:1.0'>" + Base64 + "</getToken>",
+			this.client.SendIqGet(this.provisioningServerAddress, "<getToken xmlns='" + NamespaceProvisioningToken + "'>" + Base64 + "</getToken>",
 				this.GetTokenResponse, new object[] { Certificate, Callback, State });
 		}
 
@@ -223,7 +226,7 @@ namespace Waher.Networking.XMPP.Provisioning
 #endif
 			XmlElement E = e.FirstElement;
 
-			if (e.Ok && E != null && E.LocalName == "getTokenChallenge" && E.NamespaceURI == NamespaceProvisioningDevice)
+			if (e.Ok && E != null && E.LocalName == "getTokenChallenge" && E.NamespaceURI == NamespaceProvisioningToken)
 			{
 				int SeqNr = XML.Attribute(E, "seqnr", 0);
 				string Challenge = E.InnerText;
@@ -241,7 +244,7 @@ namespace Waher.Networking.XMPP.Provisioning
 				string Response = System.Convert.ToBase64String(Bin);
 #endif
 
-				this.client.SendIqGet(this.provisioningServerAddress, "<getTokenChallengeResponse xmlns='urn:ieee:iot:prov:d:1.0' seqnr='" +
+				this.client.SendIqGet(this.provisioningServerAddress, "<getTokenChallengeResponse xmlns='" + NamespaceProvisioningToken + "' seqnr='" +
 					SeqNr.ToString() + "'>" + Response + "</getTokenChallengeResponse>",
 					this.GetTokenChallengeResponse, P);
 			}
@@ -260,7 +263,7 @@ namespace Waher.Networking.XMPP.Provisioning
 			XmlElement E = e.FirstElement;
 			string Token;
 
-			if (e.Ok && E != null && E.LocalName == "getTokenResponse" && E.NamespaceURI == NamespaceProvisioningDevice)
+			if (e.Ok && E != null && E.LocalName == "getTokenResponse" && E.NamespaceURI == NamespaceProvisioningToken)
 			{
 				Token = XML.Attribute(E, "token");
 
@@ -346,7 +349,7 @@ namespace Waher.Networking.XMPP.Provisioning
 				string Response = System.Convert.ToBase64String(Bin);
 #endif
 
-				e.IqResult("<tokenChallengeResponse xmlns='" + NamespaceProvisioningDevice + "'>" + Response + "</tokenChallengeResponse>");
+				e.IqResult("<tokenChallengeResponse xmlns='" + NamespaceProvisioningToken + "'>" + Response + "</tokenChallengeResponse>");
 			}
 			else
 				this.client.SendIqGet(Use.RemoteCertificateJid, e.Query.OuterXml, this.ForwardedTokenChallengeResponse, e);
@@ -360,6 +363,45 @@ namespace Waher.Networking.XMPP.Provisioning
 				e.IqResult(e2.FirstElement.OuterXml);
 			else
 				e.IqError(e2.ErrorElement.OuterXml);
+		}
+
+		/// <summary>
+		/// Gets a token for a certicate. This token can be used to identify services, devices or users. The provisioning server will 
+		/// challenge the request, and may choose to challenge it further when it is used, to make sure the sender is the correct holder
+		/// of the private certificate.
+		/// </summary>
+		/// <param name="Token">Token corresponding to the requested certificate.</param>
+		/// <param name="Callback">Callback method called, when certificate is available.</param>
+		/// <param name="State">State object that will be passed on to the callback method.</param>
+		public void GetCertificate(string Token, CertificateCallback Callback, object State)
+		{
+			this.client.SendIqGet(this.provisioningServerAddress, "<getCertificate xmlns='" + NamespaceProvisioningToken + "'>" +
+				XML.Encode(Token) + "</getCertificate>", (sender, e) =>
+				{
+					if (Callback != null)
+					{
+						try
+						{
+							byte[] Certificate;
+							XmlElement E;
+
+							if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "certificate" && E.NamespaceURI == NamespaceProvisioningToken)
+								Certificate = Convert.FromBase64String(e.FirstElement.InnerText);
+							else
+							{
+								e.Ok = false;
+								Certificate = null;
+							}
+
+							CertificateEventArgs e2 = new CertificateEventArgs(e, State, Certificate);
+							Callback(sender, e2);
+						}
+						catch (Exception ex)
+						{
+							Log.Critical(ex);
+						}
+					}
+				}, null);
 		}
 
 		#endregion
@@ -908,7 +950,7 @@ namespace Waher.Networking.XMPP.Provisioning
 			{
 				if (e.From == this.provisioningServerAddress)
 				{
-					await this.ClearCache();
+					await this.ClearInternalCache();
 					e.IqResult(string.Empty);
 				}
 				else
@@ -925,7 +967,7 @@ namespace Waher.Networking.XMPP.Provisioning
 			try
 			{
 				if (e.From == this.provisioningServerAddress)
-					await this.ClearCache();
+					await this.ClearInternalCache();
 			}
 			catch (Exception ex)
 			{
@@ -933,7 +975,7 @@ namespace Waher.Networking.XMPP.Provisioning
 			}
 		}
 
-		private Task ClearCache()
+		private Task ClearInternalCache()
 		{
 			return Database.Clear("CachedProvisioningQueries");
 		}
@@ -1007,6 +1049,84 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// Event is raised when the provisioning server asks the owner if a device is allowed to be controlled.
 		/// </summary>
 		public event CanControlEventHandler CanControlQuestion = null;
+
+		/// <summary>
+		/// Clears the rule caches of all owned devices.
+		/// </summary>
+		public void ClearDeviceCaches()
+		{
+			this.ClearDeviceCache(null, null, null);
+		}
+
+		/// <summary>
+		/// Clears the rule caches of all owned devices.
+		/// </summary>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void ClearDeviceCaches(IqResultEventHandler Callback, object State)
+		{
+			this.ClearDeviceCache(null, Callback, State);
+		}
+
+		/// <summary>
+		/// Clears the rule cache of a device.
+		/// </summary>
+		/// <param name="DeviceJID">Bare JID of device whose rule cache is to be cleared.
+		/// If null, all owned devices will get their rule caches cleared.</param>
+		public void ClearDeviceCache(string DeviceJID)
+		{
+			this.ClearDeviceCache(DeviceJID, null, null);
+		}
+
+		/// <summary>
+		/// Clears the rule cache of a device.
+		/// </summary>
+		/// <param name="DeviceJID">Bare JID of device whose rule cache is to be cleared.
+		/// If null, all owned devices will get their rule caches cleared.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void ClearDeviceCache(string DeviceJID, IqResultEventHandler Callback, object State)
+		{
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<clearCache xmlns='");
+			Xml.Append(NamespaceProvisioningOwner);
+
+			if (!string.IsNullOrEmpty(DeviceJID))
+			{
+				Xml.Append("' jid='");
+				Xml.Append(XML.Encode(DeviceJID));
+			}
+
+			Xml.Append("'/>");
+
+			this.client.SendIqSet(this.provisioningServerAddress, Xml.ToString(), Callback, State);
+		}
+
+		/// <summary>
+		/// Gets devices owned by the caller.
+		/// </summary>
+		/// <param name="Offset">Device list offset.</param>
+		/// <param name="MaxCount">Maximum number of things to return.</param>
+		/// <param name="Callback">Method to call when result has been received.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public void GetDevices(int Offset, int MaxCount, SearchResultEventHandler Callback, object State)
+		{
+			StringBuilder Request = new StringBuilder();
+
+			Request.Append("<getDevices xmlns='");
+			Request.Append(NamespaceProvisioningOwner);
+			Request.Append("' offset='");
+			Request.Append(Offset.ToString());
+			Request.Append("' maxCount='");
+			Request.Append(MaxCount.ToString());
+			Request.Append("'/>");
+
+			this.client.SendIqGet(this.provisioningServerAddress, Request.ToString(), (sender, e) =>
+			{
+				ThingRegistryClient.ParseResultSet(Offset, MaxCount, this, e, Callback, State);
+			}, null);
+		}
 
 		#endregion
 

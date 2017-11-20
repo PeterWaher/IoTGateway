@@ -116,6 +116,7 @@
     <Compile Include="CanControlEventArgs.cs" />
     <Compile Include="CanControlResponseEventArgs.cs" />
     <Compile Include="CanReadResponseEventArgs.cs" />
+    <Compile Include="CertificateEventArgs.cs" />
     <Compile Include="CertificateUse.cs" />
     <Compile Include="ClaimedEventArgs.cs" />
     <Compile Include="CanReadEventArgs.cs" />

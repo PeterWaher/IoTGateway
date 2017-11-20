@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using Waher.Content;
 using Waher.Events;
 using Waher.Networking.XMPP;
@@ -29,7 +30,7 @@ namespace Waher.Client.WPF.Model
 		public ThingRegistry(TreeNode Parent, string JID, string Name, string Node, Dictionary<string, bool> Features)
 			: base(Parent, JID, Name, Node, Features)
 		{
-			this.supportsProvisioning = Features.ContainsKey(ProvisioningClient.NamespaceProvisioningDevice);
+			this.supportsProvisioning = Features.ContainsKey(ProvisioningClient.NamespaceProvisioningOwner);
 			this.registryClient = new ThingRegistryClient(this.Account.Client, JID);
 
 			if (this.supportsProvisioning)
@@ -284,124 +285,129 @@ namespace Waher.Client.WPF.Model
 
 				this.registryClient.Search(0, 100, Operators.ToArray(), (sender, e) =>
 				{
-					if (e.Ok)
-					{
-						List<Field> Headers = new List<Field>()
-						{
-							new TextSingleField(null, "_JID", "JID", false, null, null, string.Empty, null, null, string.Empty, false, false, false)
-						};
-						List<Dictionary<string, string>> Records = new List<Dictionary<string, string>>();
-						Dictionary<string, bool> TagNames = new Dictionary<string, bool>();
-						bool HasNodeId = false;
-						bool HasSourceId = false;
-						bool HasPartition = false;
+					this.ShowResult(e);
+				}, null);
+			}
+		}
 
-						foreach (SearchResultThing Thing in e.Things)
-						{
-							HasNodeId |= !string.IsNullOrEmpty(Thing.Node.NodeId);
-							HasSourceId |= !string.IsNullOrEmpty(Thing.Node.SourceId);
-							HasPartition |= !string.IsNullOrEmpty(Thing.Node.Partition);
-						}
+		private void ShowResult(SearchResultEventArgs e)
+		{
+			if (e.Ok)
+			{
+				List<Field> Headers = new List<Field>()
+				{
+					new TextSingleField(null, "_JID", "JID", false, null, null, string.Empty, null, null, string.Empty, false, false, false)
+				};
+				List<Dictionary<string, string>> Records = new List<Dictionary<string, string>>();
+				Dictionary<string, bool> TagNames = new Dictionary<string, bool>();
+				bool HasNodeId = false;
+				bool HasSourceId = false;
+				bool HasPartition = false;
 
-						if (HasNodeId)
-						{
-							Headers.Add(new TextSingleField(null, "_NodeId", "Node ID", false, null, null, string.Empty, null, null,
-								string.Empty, false, false, false));
-						}
+				foreach (SearchResultThing Thing in e.Things)
+				{
+					HasNodeId |= !string.IsNullOrEmpty(Thing.Node.NodeId);
+					HasSourceId |= !string.IsNullOrEmpty(Thing.Node.SourceId);
+					HasPartition |= !string.IsNullOrEmpty(Thing.Node.Partition);
+				}
 
-						if (HasSourceId)
-						{
-							Headers.Add(new TextSingleField(null, "_SourceId", "Source ID", false, null, null, string.Empty, null, null,
-								string.Empty, false, false, false));
-						}
+				if (HasNodeId)
+				{
+					Headers.Add(new TextSingleField(null, "_NodeId", "Node ID", false, null, null, string.Empty, null, null,
+						string.Empty, false, false, false));
+				}
 
-						if (HasPartition)
-						{
-							Headers.Add(new TextSingleField(null, "_Partition", "Partition", false, null, null, string.Empty, null, null,
-								string.Empty, false, false, false));
-						}
+				if (HasSourceId)
+				{
+					Headers.Add(new TextSingleField(null, "_SourceId", "Source ID", false, null, null, string.Empty, null, null,
+						string.Empty, false, false, false));
+				}
 
-						foreach (SearchResultThing Thing in e.Things)
-						{
-							Dictionary<string, string> Record = new Dictionary<string, string>()
+				if (HasPartition)
+				{
+					Headers.Add(new TextSingleField(null, "_Partition", "Partition", false, null, null, string.Empty, null, null,
+						string.Empty, false, false, false));
+				}
+
+				foreach (SearchResultThing Thing in e.Things)
+				{
+					Dictionary<string, string> Record = new Dictionary<string, string>()
 							{
 								{ "_JID", Thing.Jid }
 							};
-							string Label;
+					string Label;
 
-							if (HasNodeId)
-								Record["_NodeId"] = Thing.Node.NodeId;
+					if (HasNodeId)
+						Record["_NodeId"] = Thing.Node.NodeId;
 
-							if (HasSourceId)
-								Record["_SourceId"] = Thing.Node.SourceId;
+					if (HasSourceId)
+						Record["_SourceId"] = Thing.Node.SourceId;
 
-							if (HasPartition)
-								Record["_Partition"] = Thing.Node.Partition;
+					if (HasPartition)
+						Record["_Partition"] = Thing.Node.Partition;
 
-							foreach (MetaDataTag Tag in Thing.Tags)
+					foreach (MetaDataTag Tag in Thing.Tags)
+					{
+						Record[Tag.Name] = Tag.StringValue;
+
+						if (!TagNames.ContainsKey(Tag.Name))
+						{
+							TagNames[Tag.Name] = true;
+
+							switch (Tag.Name)
 							{
-								Record[Tag.Name] = Tag.StringValue;
-
-								if (!TagNames.ContainsKey(Tag.Name))
-								{
-									TagNames[Tag.Name] = true;
-
-									switch (Tag.Name)
-									{
-										case "ALT": Label = "Altitude"; break;
-										case "APT": Label = "Apartment"; break;
-										case "AREA": Label = "Area"; break;
-										case "BLD": Label = "Building"; break;
-										case "CITY": Label = "City"; break;
-										case "CLASS": Label = "Class"; break;
-										case "COUNTRY": Label = "Country"; break;
-										case "LAT": Label = "Latitude"; break;
-										case "LONG": Label = "Longitude"; break;
-										case "MAN": Label = "Manufacturer"; break;
-										case "MLOC": Label = "Meter Location"; break;
-										case "MNR": Label = "Meter Number"; break;
-										case "MODEL": Label = "Model"; break;
-										case "NAME": Label = "Name"; break;
-										case "PURL": Label = "Product URL"; break;
-										case "REGION": Label = "Region"; break;
-										case "ROOM": Label = "Room"; break;
-										case "SN": Label = "Serial Number"; break;
-										case "STREET": Label = "Street"; break;
-										case "STREETNR": Label = "Street Number"; break;
-										case "V": Label = "Version"; break;
-										default: Label = Tag.Name; break;
-									}
-
-									Headers.Add(new TextSingleField(null, Tag.Name, Label, false, null, null, string.Empty, null, null,
-										string.Empty, false, false, false));
-								}
+								case "ALT": Label = "Altitude"; break;
+								case "APT": Label = "Apartment"; break;
+								case "AREA": Label = "Area"; break;
+								case "BLD": Label = "Building"; break;
+								case "CITY": Label = "City"; break;
+								case "CLASS": Label = "Class"; break;
+								case "COUNTRY": Label = "Country"; break;
+								case "LAT": Label = "Latitude"; break;
+								case "LONG": Label = "Longitude"; break;
+								case "MAN": Label = "Manufacturer"; break;
+								case "MLOC": Label = "Meter Location"; break;
+								case "MNR": Label = "Meter Number"; break;
+								case "MODEL": Label = "Model"; break;
+								case "NAME": Label = "Name"; break;
+								case "PURL": Label = "Product URL"; break;
+								case "REGION": Label = "Region"; break;
+								case "ROOM": Label = "Room"; break;
+								case "SN": Label = "Serial Number"; break;
+								case "STREET": Label = "Street"; break;
+								case "STREETNR": Label = "Street Number"; break;
+								case "V": Label = "Version"; break;
+								default: Label = Tag.Name; break;
 							}
 
-							Records.Add(Record);
+							Headers.Add(new TextSingleField(null, Tag.Name, Label, false, null, null, string.Empty, null, null,
+								string.Empty, false, false, false));
 						}
-
-						// TODO: Pages, if more things available.
-
-						MainWindow.currentInstance.Dispatcher.Invoke(() =>
-						{
-							TabItem TabItem = new TabItem();
-							MainWindow.currentInstance.Tabs.Items.Add(TabItem);
-
-							SearchResultView View = new SearchResultView(Headers.ToArray(), Records.ToArray());
-
-							TabItem.Header = "Search Result";
-							TabItem.Content = View;
-
-							MainWindow.currentInstance.Tabs.SelectedItem = TabItem;
-						});
 					}
-					else
-					{
-						MainWindow.currentInstance.Dispatcher.Invoke(() => MessageBox.Show(MainWindow.currentInstance,
-							string.IsNullOrEmpty(e.ErrorText) ? "Unable to perform search." : e.ErrorText, "Error",
-							MessageBoxButton.OK, MessageBoxImage.Error));
-					}
-				}, null);
+
+					Records.Add(Record);
+				}
+
+				// TODO: Pages, if more things available.
+
+				MainWindow.currentInstance.Dispatcher.Invoke(() =>
+				{
+					TabItem TabItem = new TabItem();
+					MainWindow.currentInstance.Tabs.Items.Add(TabItem);
+
+					SearchResultView View = new SearchResultView(Headers.ToArray(), Records.ToArray());
+
+					TabItem.Header = "Search Result";
+					TabItem.Content = View;
+
+					MainWindow.currentInstance.Tabs.SelectedItem = TabItem;
+				});
+			}
+			else
+			{
+				MainWindow.currentInstance.Dispatcher.Invoke(() => MessageBox.Show(MainWindow.currentInstance,
+					string.IsNullOrEmpty(e.ErrorText) ? "Unable to perform search." : e.ErrorText, "Error",
+					MessageBoxButton.OK, MessageBoxImage.Error));
 			}
 		}
 
@@ -462,5 +468,37 @@ namespace Waher.Client.WPF.Model
 			}
 		}
 
+		public override void AddContexMenuItems(ref string CurrentGroup, ContextMenu Menu)
+		{
+			base.AddContexMenuItems(ref CurrentGroup, Menu);
+
+			if (this.supportsProvisioning)
+			{
+				MenuItem Item;
+
+				this.GroupSeparator(ref CurrentGroup, "Database", Menu);
+				Menu.Items.Add(Item = new MenuItem()
+				{
+					Header = "M_y devices...",
+					IsEnabled = true,
+					Icon = new Image()
+					{
+						Source = new BitmapImage(new Uri("../Graphics/Safe-icon_16.png", UriKind.Relative)),
+						Width = 16,
+						Height = 16
+					}
+				});
+
+				Item.Click += this.MyDevices_Click;
+			}
+		}
+
+		private void MyDevices_Click(object sender, RoutedEventArgs e)
+		{
+			this.provisioningClient.GetDevices(0, 100, (sender2, e2) =>
+			{
+				this.ShowResult(e2);
+			}, null);
+		}
 	}
 }

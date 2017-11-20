@@ -567,5 +567,11 @@ namespace Waher.Client.WPF.Controls
 		{
 			this.HistoryPanel.Children.Clear();
 		}
+
+		private void Hyperlink_Click(object sender, RoutedEventArgs e)
+		{
+			string Uri = ((Hyperlink)sender).NavigateUri.ToString();
+			System.Diagnostics.Process.Start(Uri);
+		}
 	}
 }

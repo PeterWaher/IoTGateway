@@ -60,7 +60,7 @@ namespace Waher.Client.WPF.Controls
 					SystemParameters.VerticalScrollBarWidth - 8;
 			}
 
-			this.Input.Width = this.ActualWidth - EnterTextLabel.ActualWidth - this.SendButton.ActualWidth - 5;
+			this.Input.Width = this.ActualWidth - this.SendButton.ActualWidth - 16;
 		}
 
 		private void Send_Click(object sender, RoutedEventArgs e)
@@ -377,6 +377,12 @@ namespace Waher.Client.WPF.Controls
 				this.Input.Text = TextBlock.Text;
 				e.Handled = true;
 			}
+		}
+
+		private void Hyperlink_Click(object sender, RoutedEventArgs e)
+		{
+			string Uri = ((Hyperlink)sender).NavigateUri.ToString();
+			System.Diagnostics.Process.Start(Uri);
 		}
 	}
 }

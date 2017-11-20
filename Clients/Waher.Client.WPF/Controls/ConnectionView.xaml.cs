@@ -318,7 +318,7 @@ namespace Waher.Client.WPF.Controls
 				bool TrustCertificate = Dialog.TrustServerCertificate.IsChecked.HasValue && Dialog.TrustServerCertificate.IsChecked.Value;
 				bool AllowInsecureAuthentication = Dialog.AllowInsecureAuthentication.IsChecked.HasValue && Dialog.AllowInsecureAuthentication.IsChecked.Value;
 
-				XmppAccountNode Node = new XmppAccountNode(this.connections, null, Host, Port, Account, PasswordHash, PasswordHashMethod, 
+				XmppAccountNode Node = new XmppAccountNode(this.connections, null, Host, Port, Account, PasswordHash, PasswordHashMethod,
 					TrustCertificate, AllowInsecureAuthentication);
 
 				this.connections.Add(Node);
@@ -377,6 +377,26 @@ namespace Waher.Client.WPF.Controls
 		public TreeNode SelectedNode
 		{
 			get { return this.selectedNode; }
+		}
+
+		private void TreeContextMenu_ContextMenuOpening(object sender, ContextMenuEventArgs e)
+		{
+			this.PopulateConextMenu(this.TreeContextMenu);
+		}
+
+		private void ListViewContextMenu_ContextMenuOpening(object sender, ContextMenuEventArgs e)
+		{
+			this.PopulateConextMenu(this.ListViewContextMenu);
+		}
+
+		private void PopulateConextMenu(ContextMenu Menu)
+		{
+			string Group = string.Empty;
+
+			Menu.Items.Clear();
+			
+			if (this.selectedNode != null)
+				this.selectedNode.AddContexMenuItems(ref Group, Menu);
 		}
 
 	}

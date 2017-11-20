@@ -8,15 +8,15 @@
              d:DesignHeight="300" d:DesignWidth="800" SizeChanged="UserControl_SizeChanged" Focusable="True" GotFocus="UserControl_GotFocus">
     <DockPanel>
         <StackPanel DockPanel.Dock="Bottom">
-            <DockPanel Height="62">
-                <Label Name="EnterTextLabel" VerticalAlignment="Center" DockPanel.Dock="Left">Enter text:</Label>
-                <TextBox Name="Input" HorizontalAlignment="Left" VerticalAlignment="Center" Width="638" DockPanel.Dock="Left" TextWrapping="Wrap"
-                         ToolTip="Enter text to send here. You can format the text using Markdown syntax." AcceptsTab="True" Height="52" 
-                         AcceptsReturn="True" PreviewKeyDown="Input_PreviewKeyDown" />
+            <DockPanel Height="75">
+                <TextBlock DockPanel.Dock="Top" Margin="5,2,5,0">Enter text: (Markdown reference: <Hyperlink NavigateUri="https://waher.se/Markdown.md" Click="Hyperlink_Click">https://waher.se/Markdown.md</Hyperlink>)</TextBlock>
                 <Button Name="SendButton" Width="70" Height="20" Margin="5,0,0,0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
                         IsDefault="True" DockPanel.Dock="Right" Click="Send_Click">
                     <Label Padding="0">Send</Label>
                 </Button>
+                <TextBox Name="Input" Margin="5,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Width="700" DockPanel.Dock="Bottom" TextWrapping="Wrap"
+                         ToolTip="Enter text to send here. You can format the text using Markdown syntax." AcceptsTab="True" Height="50" 
+                         AcceptsReturn="True" PreviewKeyDown="Input_PreviewKeyDown" />
             </DockPanel>
         </StackPanel>
         <ListView Name="ChatListView" HorizontalAlignment="Left" Margin="0,0,0,0" Width="{Binding ElementName=DockPanel, Path=ActualWidth}" 

@@ -92,13 +92,13 @@
                         <Image Source="Graphics/refresh_document_16_h.png" Width="16" Height="16" Style="{StaticResource ImageEnabled}"/>
                     </MenuItem.Icon>
                 </MenuItem>
-                <MenuItem Name="SniffMenuItem" Header="_Sniff" Command="{x:Static wcw:MainWindow.Sniff}" IsEnabled="{Binding ElementName=SniffButton, Path=IsEnabled}">
+                <MenuItem Name="SniffMenuItem" Header="_Sniff..." Command="{x:Static wcw:MainWindow.Sniff}" IsEnabled="{Binding ElementName=SniffButton, Path=IsEnabled}">
                     <MenuItem.Icon>
                         <Image Source="Graphics/Spy-icon.png" Width="16" Height="16" Style="{StaticResource ImageEnabled}"/>
                     </MenuItem.Icon>
                 </MenuItem>
                 <MenuItem/>
-                <MenuItem Name="ChatMenuItem" Header="C_hat" Command="{x:Static wcw:MainWindow.Chat}" IsEnabled="{Binding ElementName=ChatButton, Path=IsEnabled}">
+                <MenuItem Name="ChatMenuItem" Header="C_hat..." Command="{x:Static wcw:MainWindow.Chat}" IsEnabled="{Binding ElementName=ChatButton, Path=IsEnabled}">
                     <MenuItem.Icon>
                         <Image Source="Graphics/Chat-icon_16.png" Width="16" Height="16" Style="{StaticResource ImageEnabled}"/>
                     </MenuItem.Icon>

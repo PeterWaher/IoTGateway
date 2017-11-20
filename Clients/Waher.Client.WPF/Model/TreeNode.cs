@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Text;
 using System.Xml;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using Waher.Content.Markdown;
 using Waher.Events;
 using Waher.Networking.Sniffers;
@@ -459,6 +461,191 @@ namespace Waher.Client.WPF.Model
 		public virtual void Search()
 		{
 			throw new NotSupportedException();
+		}
+
+		/// <summary>
+		/// Adds context sensitive menu items to a context menu.
+		/// </summary>
+		/// <param name="CurrentGroup">Current group.</param>
+		/// <param name="Menu">Menu being built.</param>
+		public virtual void AddContexMenuItems(ref string CurrentGroup, ContextMenu Menu)
+		{
+			if (this.CanAddChildren)
+			{
+				CurrentGroup = "Edit";
+				Menu.Items.Add(new MenuItem()
+				{
+					Header = "_Add...",
+					IsEnabled = true,
+					Command = MainWindow.Add,
+					Icon = new Image()
+					{
+						Source = new BitmapImage(new Uri("../Graphics/Add.png", UriKind.Relative)),
+						Width = 16,
+						Height = 16
+					}
+				});
+			}
+
+			if (this.Parent != null && this.Parent.CanAddChildren)
+			{
+				CurrentGroup = "Edit";
+				Menu.Items.Add(new MenuItem()
+				{
+					Header = "_Delete...",
+					IsEnabled = true,
+					Command = MainWindow.Delete,
+					Icon = new Image()
+					{
+						Source = new BitmapImage(new Uri("../Graphics/delete_32_h.png", UriKind.Relative)),
+						Width = 16,
+						Height = 16
+					}
+				});
+			}
+
+			if (this.CanRecycle)
+			{
+				this.GroupSeparator(ref CurrentGroup, "Connection", Menu);
+				Menu.Items.Add(new MenuItem()
+				{
+					Header = "_Refresh",
+					IsEnabled = true,
+					Command = MainWindow.Refresh,
+					Icon = new Image()
+					{
+						Source = new BitmapImage(new Uri("../Graphics/refresh_document_16_h.png", UriKind.Relative)),
+						Width = 16,
+						Height = 16
+					}
+				});
+			}
+
+			if (this.IsSniffable)
+			{
+				this.GroupSeparator(ref CurrentGroup, "Connection", Menu);
+				Menu.Items.Add(new MenuItem()
+				{
+					Header = "_Sniff...",
+					IsEnabled = true,
+					Command = MainWindow.Sniff,
+					Icon = new Image()
+					{
+						Source = new BitmapImage(new Uri("../Graphics/Spy-icon.png", UriKind.Relative)),
+						Width = 16,
+						Height = 16
+					}
+				});
+			}
+
+			if (this.CanChat)
+			{
+				this.GroupSeparator(ref CurrentGroup, "Communication", Menu);
+				Menu.Items.Add(new MenuItem()
+				{
+					Header = "C_hat...",
+					IsEnabled = true,
+					Command = MainWindow.Chat,
+					Icon = new Image()
+					{
+						Source = new BitmapImage(new Uri("../Graphics/Chat-icon_16.png", UriKind.Relative)),
+						Width = 16,
+						Height = 16
+					}
+				});
+			}
+
+			if (this.CanReadSensorData)
+			{
+				this.GroupSeparator(ref CurrentGroup, "Communication", Menu);
+				Menu.Items.Add(new MenuItem()
+				{
+					Header = "Read _Momentary Values...",
+					IsEnabled = true,
+					Command = MainWindow.ReadMomentary,
+					Icon = new Image()
+					{
+						Source = new BitmapImage(new Uri("../Graphics/history_16_h.png", UriKind.Relative)),
+						Width = 16,
+						Height = 16
+					}
+				});
+
+				Menu.Items.Add(new MenuItem()
+				{
+					Header = "Read _Detailed Values...",
+					IsEnabled = true,
+					Command = MainWindow.ReadDetailed,
+					Icon = new Image()
+					{
+						Source = new BitmapImage(new Uri("../Graphics/print_preview_lined_16_h.png", UriKind.Relative)),
+						Width = 16,
+						Height = 16
+					}
+				});
+			}
+
+			if (this.CanSubscribeToSensorData)
+			{
+				this.GroupSeparator(ref CurrentGroup, "Communication", Menu);
+				Menu.Items.Add(new MenuItem()
+				{
+					Header = "Su_bscribe to Momentary Values...",
+					IsEnabled = true,
+					Command = MainWindow.SubscribeToMomentary,
+					Icon = new Image()
+					{
+						Source = new BitmapImage(new Uri("../Graphics/rss-feed-icon_16.png", UriKind.Relative)),
+						Width = 16,
+						Height = 16
+					}
+				});
+			}
+
+			if (this.CanConfigure)
+			{
+				this.GroupSeparator(ref CurrentGroup, "Communication", Menu);
+				Menu.Items.Add(new MenuItem()
+				{
+					Header = "Configure _Parameters...",
+					IsEnabled = true,
+					Command = MainWindow.Configure,
+					Icon = new Image()
+					{
+						Source = new BitmapImage(new Uri("../Graphics/Settings-icon_16.png", UriKind.Relative)),
+						Width = 16,
+						Height = 16
+					}
+				});
+			}
+
+			if (this.CanSearch)
+			{
+				this.GroupSeparator(ref CurrentGroup, "Database", Menu);
+				Menu.Items.Add(new MenuItem()
+				{
+					Header = "_Search",
+					IsEnabled = true,
+					Command = MainWindow.Search,
+					Icon = new Image()
+					{
+						Source = new BitmapImage(new Uri("../Graphics/search_16_h.png", UriKind.Relative)),
+						Width = 16,
+						Height = 16
+					}
+				});
+			}
+		}
+
+		protected void GroupSeparator(ref string CurrentGroup, string Group, ContextMenu Menu)
+		{
+			if (CurrentGroup != Group)
+			{
+				if (!string.IsNullOrEmpty(CurrentGroup))
+					Menu.Items.Add(new MenuItem());
+
+				CurrentGroup = Group;
+			}
 		}
 
 	}

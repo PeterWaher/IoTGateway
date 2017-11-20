@@ -34,7 +34,7 @@ namespace Waher.Persistence.FilesLW.Test
 	public class DBFilesBinarySerializationTests
 	{
 		[TestMethod]
-		public void Test_01_Serialization()
+		public void DBFiles_BinSerialization_Test_01_Serialization()
 		{
 			BinarySerializer Serializer = new BinarySerializer(string.Empty, Encoding.UTF8, true);
 

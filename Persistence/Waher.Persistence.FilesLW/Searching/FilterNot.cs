@@ -25,6 +25,11 @@ namespace Waher.Persistence.Files.Searching
 		}
 
 		/// <summary>
+		/// Gets an array of constant fields. Can return null, if there are no constant fields.
+		/// </summary>
+		public string[] ConstantFields => null;
+
+		/// <summary>
 		/// Checks if the filter applies to the object.
 		/// </summary>
 		/// <param name="Object">Object.</param>

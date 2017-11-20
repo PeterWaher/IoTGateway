@@ -12,6 +12,8 @@ namespace Waher.Persistence.Files.Searching
 	/// </summary>
 	public class FilterFieldEqualTo : F.FilterFieldEqualTo, IApplicableFilter
 	{
+		private string[] constantFields;
+
 		/// <summary>
 		/// This filter selects objects that have a named field equal to a given value.
 		/// </summary>
@@ -20,6 +22,7 @@ namespace Waher.Persistence.Files.Searching
 		public FilterFieldEqualTo(string FieldName, object Value)
 			: base(FieldName, Value)
 		{
+			this.constantFields = new string[] { FieldName };
 		}
 
 		/// <summary>
@@ -56,5 +59,10 @@ namespace Waher.Persistence.Files.Searching
 
 		private Type prevType = null;
 		private IObjectSerializer prevSerializer = null;
+
+		/// <summary>
+		/// Gets an array of constant fields. Can return null, if there are no constant fields.
+		/// </summary>
+		public string[] ConstantFields => this.constantFields;
 	}
 }

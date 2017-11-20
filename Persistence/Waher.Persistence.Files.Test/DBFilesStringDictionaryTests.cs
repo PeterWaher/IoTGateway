@@ -27,7 +27,7 @@ namespace Waher.Persistence.FilesLW.Test
 		internal const string BlobFileName = "Data\\Dictionary.blob";
 		internal const string CollectionName = "Default";
 		internal const int BlocksInCache = 10000;
-		internal const int ObjectsToEnumerate = 10000;
+		internal const int ObjectsToEnumerate = 1000;
 
 		protected StringDictionary file;
 		protected FilesProvider provider;
@@ -88,7 +88,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_01_Set()
+		public async Task DBFiles_StringDictionary_01_Set()
 		{
 			this.file["Key1"] = "Value1";
 			this.file["Key2"] = "Value2";
@@ -102,7 +102,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_02_Add()
+		public async Task DBFiles_StringDictionary_02_Add()
 		{
 			await this.file.AddAsync("Key1", "Value1");
 			await this.file.AddAsync("Key2", "Value2");
@@ -116,7 +116,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_03_Reset()
+		public async Task DBFiles_StringDictionary_03_Reset()
 		{
 			this.file["Key1"] = "Value1_1";
 			this.file["Key2"] = "Value2_1";
@@ -141,7 +141,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 		[TestMethod]
 		[ExpectedException(typeof(ArgumentException))]
-		public async Task Test_04_Readd()
+		public async Task DBFiles_StringDictionary_04_Readd()
 		{
 			await this.file.AddAsync("Key1", "Value1_1");
 			await this.file.AddAsync("Key2", "Value2_1");
@@ -156,7 +156,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_05_Remove()
+		public async Task DBFiles_StringDictionary_05_Remove()
 		{
 			await this.file.AddAsync("Key1", "Value1_1");
 			await this.file.AddAsync("Key2", "Value2_1");
@@ -185,9 +185,9 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_06_CopyTo()
+		public async Task DBFiles_StringDictionary_06_CopyTo()
 		{
-			await this.Test_01_Set();
+			await this.DBFiles_StringDictionary_01_Set();
 
 			int c = this.file.Count;
 			AssertEx.Same(3, c);
@@ -205,7 +205,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public void Test_07_DataTypes()
+		public void DBFiles_StringDictionary_07_DataTypes()
 		{
 			Simple Obj = DBFilesBTreeTests.CreateSimple(100);
 
@@ -249,7 +249,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_08_ToArray()
+		public async Task DBFiles_StringDictionary_08_ToArray()
 		{
 			this.file["Default"] = 1UL;
 			this.file["ObjectId"] = 2UL;

@@ -35,13 +35,13 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public void Test_01_Generate1()
+		public void DBFiles_Guid_Test_01_Generate1()
 		{
 			Console.Out.WriteLine(gen.CreateGuid().ToString());
 		}
 
 		[TestMethod]
-		public void Test_02_Generate100()
+		public void DBFiles_Guid_Test_02_Generate100()
 		{
 			Guid Prev, Next;
 			int i;
@@ -61,7 +61,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public void Test_03_Generate1000000()
+		public void DBFiles_Guid_Test_03_Generate1000000()
 		{
 			Guid Prev, Next;
 			int i;

@@ -16,5 +16,13 @@ namespace Waher.Persistence.Files.Searching
 		/// <param name="Provider">Files provider.</param>
 		/// <returns>If the filter can be applied.</returns>
 		bool AppliesTo(object Object, IObjectSerializer Serializer, FilesProvider Provider);
+
+		/// <summary>
+		/// Gets an array of constant fields. Can return null, if there are no constant fields.
+		/// </summary>
+		string[] ConstantFields
+		{
+			get;
+		}
 	}
 }

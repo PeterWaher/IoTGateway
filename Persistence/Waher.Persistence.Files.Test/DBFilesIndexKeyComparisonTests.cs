@@ -40,7 +40,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public void Test_01_NumericalFields()
+		public void DBFiles_Index_KeyComparison_Test_01_NumericalFields()
 		{
 			object[,] Values = this.GetNumberValues();
 			int x, y;
@@ -65,7 +65,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public void Test_02_Serialized_NumericalFields()
+		public void DBFiles_Index_KeyComparison_Test_02_Serialized_NumericalFields()
 		{
 			object[,] Values = this.GetNumberValues();
 			int x, y;

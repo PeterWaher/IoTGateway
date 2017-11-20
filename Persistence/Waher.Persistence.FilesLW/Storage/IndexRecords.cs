@@ -2370,22 +2370,28 @@ namespace Waher.Persistence.Files.Storage
 		/// <summary>
 		/// If the index ordering corresponds to a given sort order.
 		/// </summary>
+		/// <param name="ConstantFields">Optional array of names of fields that will be constant during the enumeration.</param>
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
 		/// <returns>If the index matches the sort order. (The index ordering is allowed to be more specific.)</returns>
-		public bool SameSortOrder(params string[] SortOrder)
+		public bool SameSortOrder(string[] ConstantFields, string[] SortOrder)
 		{
+			if (SortOrder == null)
+				return true;
+
 			int c = SortOrder.Length;
-			if (c > this.fieldNames.Length)
+			int d = this.fieldNames.Length;
+			if (d < c)
 				return false;
 
-			string s;
-			int i;
+			string s, s2;
+			int i = 0;
+			int j;
 			bool Ascending;
 
-			for (i = 0; i < c; i++)
+			for (j = 0; j < c; j++)
 			{
-				s = SortOrder[i];
+				s = SortOrder[j];
 				if (s.StartsWith("-"))
 				{
 					Ascending = false;
@@ -2399,11 +2405,25 @@ namespace Waher.Persistence.Files.Storage
 						s = s.Substring(1);
 				}
 
-				if (s != this.fieldNames[i])
+				while (i < d)
+				{
+					s2 = this.fieldNames[i];
+
+					if (s == s2)
+						break;
+					else if (ConstantFields == null || Array.IndexOf<string>(ConstantFields, s2) < 0)
+						return false;
+					else
+						i++;
+				}
+
+				if (i >= d)
 					return false;
 
 				if (Ascending != this.ascending[i])
 					return false;
+
+				i++;
 			}
 
 			return true;
@@ -2412,22 +2432,28 @@ namespace Waher.Persistence.Files.Storage
 		/// <summary>
 		/// If the index ordering is a reversion of a given sort order.
 		/// </summary>
+		/// <param name="ConstantFields">Optional array of names of fields that will be constant during the enumeration.</param>
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
 		/// <returns>If the index matches the sort order. (The index ordering is allowed to be more specific.)</returns>
-		public bool ReverseSortOrder(params string[] SortOrder)
+		public bool ReverseSortOrder(string[] ConstantFields, string[] SortOrder)
 		{
+			if (SortOrder == null)
+				return true;
+
 			int c = SortOrder.Length;
-			if (c > this.fieldNames.Length)
+			int d = this.fieldNames.Length;
+			if (d < c)
 				return false;
 
-			string s;
-			int i;
+			string s, s2;
+			int i = 0;
+			int j;
 			bool Ascending;
 
-			for (i = 0; i < c; i++)
+			for (j = 0; j < c; j++)
 			{
-				s = SortOrder[i];
+				s = SortOrder[j];
 				if (s.StartsWith("-"))
 				{
 					Ascending = false;
@@ -2441,11 +2467,25 @@ namespace Waher.Persistence.Files.Storage
 						s = s.Substring(1);
 				}
 
-				if (s != this.fieldNames[i])
+				while (i < d)
+				{
+					s2 = this.fieldNames[i];
+
+					if (s == s2)
+						break;
+					else if (ConstantFields == null || Array.IndexOf<string>(ConstantFields, s2) < 0)
+						return false;
+					else
+						i++;
+				}
+
+				if (i >= d)
 					return false;
 
 				if (Ascending == this.ascending[i])
 					return false;
+
+				i++;
 			}
 
 			return true;

@@ -13,6 +13,7 @@ namespace Waher.Persistence.Files.Searching
 	public class FilterAnd : F.FilterAnd, IApplicableFilter
 	{
 		private IApplicableFilter[] applicableFilters;
+		private string[] constantFields;
 
 		/// <summary>
 		/// This filter selects objects that conform to all child-filters provided.
@@ -23,6 +24,42 @@ namespace Waher.Persistence.Files.Searching
 			: base(Filters)
 		{
 			this.applicableFilters = ApplicableFilters;
+
+			this.constantFields = null;
+
+			foreach (IApplicableFilter Filter in ApplicableFilters)
+				this.constantFields = MergeConstantFields(this.constantFields, Filter.ConstantFields);
+		}
+
+		internal static string[] MergeConstantFields(string[] ConstantFields1, string[] ConstantFields2)
+		{
+			if (ConstantFields1 == null)
+				return ConstantFields2;
+			else if (ConstantFields2 == null)
+				return ConstantFields1;
+			else
+			{
+				List<string> Union = null;
+
+				foreach (string s in ConstantFields2)
+				{
+					if (Array.IndexOf<string>(ConstantFields1, s) >= 0)
+						continue;
+
+					if (Union == null)
+					{
+						Union = new List<string>();
+						Union.AddRange(ConstantFields1);
+					}
+
+					Union.Add(s);
+				}
+
+				if (Union == null)
+					return ConstantFields1;
+				else
+					return Union.ToArray();
+			}
 		}
 
 		/// <summary>
@@ -42,5 +79,10 @@ namespace Waher.Persistence.Files.Searching
 
 			return true;
 		}
+
+		/// <summary>
+		/// Gets an array of constant fields. Can return null, if there are no constant fields.
+		/// </summary>
+		public string[] ConstantFields => this.constantFields;
 	}
 }

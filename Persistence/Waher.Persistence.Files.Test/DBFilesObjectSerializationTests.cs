@@ -76,7 +76,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public void Test_01_SimpleObject()
+		public void DBFiles_ObjSerialization_01_SimpleObject()
 		{
 			Simple Obj = new Simple()
 			{
@@ -275,7 +275,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public void Test_02_Nullable1()
+		public void DBFiles_ObjSerialization_02_Nullable1()
 		{
 			Classes.Nullable Obj = new Classes.Nullable()
 			{
@@ -414,7 +414,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public void Test_03_Nullable2()
+		public void DBFiles_ObjSerialization_03_Nullable2()
 		{
 			Classes.Nullable Obj = new Classes.Nullable()
 			{
@@ -528,7 +528,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public void Test_04_Default1()
+		public void DBFiles_ObjSerialization_04_Default1()
 		{
 			Default Obj = new Default()
 			{
@@ -668,7 +668,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public void Test_05_Default2()
+		public void DBFiles_ObjSerialization_05_Default2()
 		{
 			Default Obj = new Default()
 			{
@@ -785,7 +785,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public void Test_06_SimpleArrays()
+		public void DBFiles_ObjSerialization_06_SimpleArrays()
 		{
 			SimpleArrays Obj = new SimpleArrays()
 			{
@@ -888,7 +888,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public void Test_07_NullableArrays()
+		public void DBFiles_ObjSerialization_07_NullableArrays()
 		{
 			NullableArrays Obj = new NullableArrays()
 			{
@@ -989,7 +989,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public void Test_08_Embedded()
+		public void DBFiles_ObjSerialization_08_Embedded()
 		{
 			Container Obj = new Container()
 			{
@@ -1126,7 +1126,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public void Test_09_ObjectIdString()
+		public void DBFiles_ObjSerialization_09_ObjectIdString()
 		{
 			ObjectIdString Obj = new ObjectIdString()
 			{
@@ -1181,7 +1181,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public void Test_10_ObjectIdByteArray()
+		public void DBFiles_ObjSerialization_10_ObjectIdByteArray()
 		{
 			ObjectIdByteArray Obj = new ObjectIdByteArray()
 			{
@@ -1236,7 +1236,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public void Test_11_LocalTypeName()
+		public void DBFiles_ObjSerialization_11_LocalTypeName()
 		{
 			LocalNameSubclass1 Obj1 = new LocalNameSubclass1()
 			{
@@ -1332,7 +1332,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public void Test_12_FullTypeName()
+		public void DBFiles_ObjSerialization_12_FullTypeName()
 		{
 			FullNameSubclass1 Obj1 = new FullNameSubclass1()
 			{
@@ -1428,7 +1428,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public void Test_13_CollectionTest()
+		public void DBFiles_ObjSerialization_13_CollectionTest()
 		{
 			CollectionTest Obj = new CollectionTest()
 			{
@@ -1483,7 +1483,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public void Test_14_ArraysOfArrays()
+		public void DBFiles_ObjSerialization_14_ArraysOfArrays()
 		{
 			ArraysOfArrays Obj = new ArraysOfArrays()
 			{

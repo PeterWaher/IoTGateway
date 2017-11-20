@@ -144,23 +144,25 @@ namespace Waher.Persistence.Files.Searching
 		/// <summary>
 		/// If the index ordering corresponds to a given sort order.
 		/// </summary>
+		/// <param name="ConstantFields">Optional array of names of fields that will be constant during the enumeration.</param>
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
 		/// <returns>If the index matches the sort order. (The index ordering is allowed to be more specific.)</returns>
-		public bool SameSortOrder(params string[] SortOrder)
+		public bool SameSortOrder(string[] ConstantFields, string[] SortOrder)
 		{
-			return this.recordHandler.SameSortOrder(SortOrder);
+			return this.recordHandler.SameSortOrder(ConstantFields, SortOrder);
 		}
 
 		/// <summary>
 		/// If the index ordering is a reversion of a given sort order.
 		/// </summary>
+		/// <param name="ConstantFields">Optional array of names of fields that will be constant during the enumeration.</param>
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
 		/// <returns>If the index matches the sort order. (The index ordering is allowed to be more specific.)</returns>
-		public bool ReverseSortOrder(params string[] SortOrder)
+		public bool ReverseSortOrder(string[] ConstantFields, string[] SortOrder)
 		{
-			return this.recordHandler.ReverseSortOrder(SortOrder);
+			return this.recordHandler.ReverseSortOrder(ConstantFields, SortOrder);
 		}
 
 	}

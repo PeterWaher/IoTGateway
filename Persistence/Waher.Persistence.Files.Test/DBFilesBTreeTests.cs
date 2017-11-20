@@ -37,7 +37,7 @@ namespace Waher.Persistence.FilesLW.Test
 		internal const string BlockSizeFileName = "Data\\BlockSize.bin";
 		internal const string Folder = "Data";
 		internal const int BlocksInCache = 10000;
-		internal const int ObjectsToEnumerate = 100000;
+		internal const int ObjectsToEnumerate = 1000;
 
 		protected static Random gen = new Random();
 		protected ObjectBTreeFile file;
@@ -236,7 +236,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_01_SaveNew()
+		public async Task DBFiles_BTree_Test_01_SaveNew()
 		{
 			Simple Obj = CreateSimple(this.MaxStringLength);
 			Guid ObjectId = await this.file.SaveNewObject(Obj);
@@ -249,7 +249,7 @@ namespace Waher.Persistence.FilesLW.Test
 		[TestMethod]
 		[ExpectedException(typeof(Exception))]
 		[Ignore]
-		public async Task Test_01_X_Repeat_Test_01()
+		public async Task DBFiles_BTree_Test_01_X_Repeat_DBFiles_BTree_Test_01()
 		{
 			object LastObjectAdded = null;
 
@@ -400,7 +400,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 		[TestMethod]
 		[ExpectedException(typeof(IOException))]
-		public async Task Test_02_SaveOld()
+		public async Task DBFiles_BTree_Test_02_SaveOld()
 		{
 			Simple Obj = CreateSimple(this.MaxStringLength);
 			Guid ObjectId = await this.file.SaveNewObject(Obj);
@@ -411,7 +411,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_03_LoadUntyped()
+		public async Task DBFiles_BTree_Test_03_LoadUntyped()
 		{
 			Simple Obj = CreateSimple(this.MaxStringLength);
 			Guid ObjectId = await this.file.SaveNewObject(Obj);
@@ -446,7 +446,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_03_LoadTyped()
+		public async Task DBFiles_BTree_Test_03_LoadTyped()
 		{
 			Simple Obj = CreateSimple(this.MaxStringLength);
 			Guid ObjectId = await this.file.SaveNewObject(Obj);
@@ -460,7 +460,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_04_LoadUntyped()
+		public async Task DBFiles_BTree_Test_04_LoadUntyped()
 		{
 			Simple Obj = CreateSimple(this.MaxStringLength);
 			Guid ObjectId = await this.file.SaveNewObject(Obj);
@@ -474,7 +474,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_05_SaveNew_Multiple_NoSplit()
+		public async Task DBFiles_BTree_Test_05_SaveNew_Multiple_NoSplit()
 		{
 			await this.TestMultiple(3, true, null);
 		}
@@ -550,59 +550,59 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_06_SaveNew_Multiple_NodeSplit()
+		public async Task DBFiles_BTree_Test_06_SaveNew_Multiple_NodeSplit()
 		{
 			await this.TestMultiple(100, true, null);
 		}
 
 		[TestMethod]
-		public async Task Test_07_SaveNew_1000()
+		public async Task DBFiles_BTree_Test_07_SaveNew_1000()
 		{
 			await this.TestMultiple(1000, false, null);
 			await ExportXML(this.file, "Data\\BTree.xml");
 		}
 
 		[TestMethod]
-		public async Task Test_08_SaveNew_10000()
+		public async Task DBFiles_BTree_Test_08_SaveNew_10000()
 		{
 			await this.TestMultiple(10000, false, null);
 			await ExportXML(this.file, "Data\\BTree.xml");
 		}
 
 		[TestMethod]
-		public async Task Test_09_SaveNew_10000_Statistics()
+		public async Task DBFiles_BTree_Test_09_SaveNew_10000_Statistics()
 		{
 			await this.TestMultiple(10000, false, 100);
 		}
 
 		[TestMethod]
-		public async Task Test_10_SaveNew_100000()
+		public async Task DBFiles_BTree_Test_10_SaveNew_100000()
 		{
 			await this.TestMultiple(100000, false, null);
 		}
 
 		[TestMethod]
-		public async Task Test_11_SaveNew_100000_Statistics()
+		public async Task DBFiles_BTree_Test_11_SaveNew_100000_Statistics()
 		{
 			await this.TestMultiple(100000, false, 1000);
 		}
 
 		[TestMethod]
 		[Ignore]
-		public async Task Test_12_SaveNew_1000000()
+		public async Task DBFiles_BTree_Test_12_SaveNew_1000000()
 		{
 			await this.TestMultiple(1000000, false, null);
 		}
 
 		[TestMethod]
 		[Ignore]
-		public async Task Test_13_SaveNew_1000000_Statistics()
+		public async Task DBFiles_BTree_Test_13_SaveNew_1000000_Statistics()
 		{
 			await this.TestMultiple(1000000, false, 10000);
 		}
 
 		[TestMethod]
-		public async Task Test_14_Contains()
+		public async Task DBFiles_BTree_Test_14_Contains()
 		{
 			Simple Obj = CreateSimple(this.MaxStringLength);
 			Simple Obj2 = CreateSimple(this.MaxStringLength);
@@ -613,7 +613,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_15_Count()
+		public async Task DBFiles_BTree_Test_15_Count()
 		{
 			Simple Obj = CreateSimple(this.MaxStringLength);
 			Guid ObjectId = await this.file.SaveNewObject(Obj);
@@ -622,7 +622,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_16_Clear()
+		public async Task DBFiles_BTree_Test_16_Clear()
 		{
 			Simple Obj = CreateSimple(this.MaxStringLength);
 			Guid ObjectId = await this.file.SaveNewObject(Obj);
@@ -633,7 +633,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_17_NormalEnumeration()
+		public async Task DBFiles_BTree_Test_17_NormalEnumeration()
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 			Guid? Prev = null;
@@ -651,7 +651,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_18_TypedEnumeration()
+		public async Task DBFiles_BTree_Test_18_TypedEnumeration()
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 			Guid? Prev = null;
@@ -678,7 +678,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_19_LockedEnumeration()
+		public async Task DBFiles_BTree_Test_19_LockedEnumeration()
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 			Guid? Prev = null;
@@ -706,7 +706,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 		[TestMethod]
 		[ExpectedException(typeof(AggregateException))]
-		public async Task Test_20_UnlockedChangeEnumeration()
+		public async Task DBFiles_BTree_Test_20_UnlockedChangeEnumeration()
 		{
 			await this.CreateObjects(Math.Min(ObjectsToEnumerate, 1000));
 			Simple Obj;
@@ -723,7 +723,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_21_BackwardsEnumeration()
+		public async Task DBFiles_BTree_Test_21_BackwardsEnumeration()
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 			Guid? Prev = null;
@@ -765,7 +765,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_22_SelectIthObject()
+		public async Task DBFiles_BTree_Test_22_SelectIthObject()
 		{
 			int c = ObjectsToEnumerate;
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(c);
@@ -827,7 +827,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_23_RankObject()
+		public async Task DBFiles_BTree_Test_23_RankObject()
 		{
 			int c = ObjectsToEnumerate;
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(c);
@@ -840,7 +840,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_24_Reset()
+		public async Task DBFiles_BTree_Test_24_Reset()
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 			Guid? Prev = null;
@@ -884,7 +884,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 		[TestMethod]
 		[ExpectedException(typeof(Exception))]
-		public async Task Test_25_UpdateUnsavedObject()
+		public async Task DBFiles_BTree_Test_25_UpdateUnsavedObject()
 		{
 			Simple Obj = CreateSimple(this.MaxStringLength);
 			await this.file.UpdateObject(Obj);
@@ -892,7 +892,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 		[TestMethod]
 		[ExpectedException(typeof(KeyNotFoundException))]
-		public async Task Test_26_UpdateUnexistentObject()
+		public async Task DBFiles_BTree_Test_26_UpdateUnexistentObject()
 		{
 			Simple Obj = CreateSimple(this.MaxStringLength);
 			Obj.ObjectId = Guid.NewGuid();
@@ -900,7 +900,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_27_UpdateObject()
+		public async Task DBFiles_BTree_Test_27_UpdateObject()
 		{
 			Simple Obj = CreateSimple(this.MaxStringLength);
 			Guid ObjectId = await this.file.SaveNewObject(Obj);
@@ -925,24 +925,24 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public void Test_28_UpdateObjects_1000()
+		public void DBFiles_BTree_Test_28_UpdateObjects_1000()
 		{
-			this.Test_UpdateObjects(1000).Wait();
+			this.DBFiles_BTree_Test_UpdateObjects(1000).Wait();
 		}
 
 		[TestMethod]
-		public void Test_29_UpdateObjects_10000()
+		public void DBFiles_BTree_Test_29_UpdateObjects_10000()
 		{
-			this.Test_UpdateObjects(10000).Wait();
+			this.DBFiles_BTree_Test_UpdateObjects(10000).Wait();
 		}
 
 		[TestMethod]
-		public void Test_30_UpdateObjects_100000()
+		public void DBFiles_BTree_Test_30_UpdateObjects_100000()
 		{
-			this.Test_UpdateObjects(100000).Wait();
+			this.DBFiles_BTree_Test_UpdateObjects(100000).Wait();
 		}
 
-		private async Task Test_UpdateObjects(int c)
+		private async Task DBFiles_BTree_Test_UpdateObjects(int c)
 		{
 			Simple[] Objects = new Simple[c];
 			Simple Obj;
@@ -981,47 +981,47 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_31_DeleteObject()
+		public async Task DBFiles_BTree_Test_31_DeleteObject()
 		{
-			await this.Test_DeleteObjects(3, true);
+			await this.DBFiles_BTree_Test_DeleteObjects(3, true);
 		}
 
 		[TestMethod]
-		public async Task Test_32_DeleteObject_100()
+		public async Task DBFiles_BTree_Test_32_DeleteObject_100()
 		{
-			await this.Test_DeleteObjects(100, true);
+			await this.DBFiles_BTree_Test_DeleteObjects(100, true);
 		}
 
 		[TestMethod]
-		public async Task Test_33_DeleteObject_1000()
+		public async Task DBFiles_BTree_Test_33_DeleteObject_1000()
 		{
-			await this.Test_DeleteObjects(1000, false);
+			await this.DBFiles_BTree_Test_DeleteObjects(1000, false);
 		}
 
 		[TestMethod]
-		public async Task Test_34_DeleteObject_10000()
+		public async Task DBFiles_BTree_Test_34_DeleteObject_10000()
 		{
-			await this.Test_DeleteObjects(10000, false);
-		}
-
-		[TestMethod]
-		[Ignore]
-		public async Task Test_35_DeleteObject_100000()
-		{
-			await this.Test_DeleteObjects(100000, false);
+			await this.DBFiles_BTree_Test_DeleteObjects(10000, false);
 		}
 
 		[TestMethod]
 		[Ignore]
-		public async Task Test_36_DeleteObject_1000_UntilFailure()
+		public async Task DBFiles_BTree_Test_35_DeleteObject_100000()
+		{
+			await this.DBFiles_BTree_Test_DeleteObjects(100000, false);
+		}
+
+		[TestMethod]
+		[Ignore]
+		public async Task DBFiles_BTree_Test_36_DeleteObject_1000_UntilFailure()
 		{
 			while (true)
 			{
-				await this.Test_DeleteObjects(1000, true);
+				await this.DBFiles_BTree_Test_DeleteObjects(1000, true);
 			}
 		}
 
-		private async Task Test_DeleteObjects(int c, bool CheckForEachObject)
+		private async Task DBFiles_BTree_Test_DeleteObjects(int c, bool CheckForEachObject)
 		{
 			Random Gen = new Random();
 			Simple[] Objects = new Simple[c];

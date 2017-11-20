@@ -25,7 +25,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public void Test_01_Point()
+		public void DBFiles_Range_01_Point()
 		{
 			Assert.IsTrue(this.range.SetPoint(10));
 			Assert.IsFalse(this.range.IsRange);
@@ -33,14 +33,14 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public void Test_02_Inconsistent_Point()
+		public void DBFiles_Range_02_Inconsistent_Point()
 		{
 			Assert.IsTrue(this.range.SetPoint(10));
 			Assert.IsFalse(this.range.SetPoint(20));
 		}
 
 		[TestMethod]
-		public void Test_03_MinInclusive()
+		public void DBFiles_Range_03_MinInclusive()
 		{
 			Assert.IsTrue(this.range.SetMin(10, true, out bool Smaller));
 			Assert.IsTrue(Smaller);
@@ -50,7 +50,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public void Test_04_MinExclusive()
+		public void DBFiles_Range_04_MinExclusive()
 		{
 			Assert.IsTrue(this.range.SetMin(10, false, out bool Smaller));
 			Assert.IsTrue(Smaller);
@@ -60,7 +60,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public void Test_05_Complimentary_MinInclusive()
+		public void DBFiles_Range_05_Complimentary_MinInclusive()
 		{
 			Assert.IsTrue(this.range.SetMin(10, false, out bool Smaller));
 			Assert.IsTrue(Smaller);
@@ -74,7 +74,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public void Test_06_Complimentary_Point_MinInclusive()
+		public void DBFiles_Range_06_Complimentary_Point_MinInclusive()
 		{
 			Assert.IsTrue(this.range.SetPoint(10));
 			Assert.IsTrue(this.range.SetMin(10, true, out bool Smaller));
@@ -85,7 +85,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public void Test_07_Complimentary_Point_MinInclusive_2()
+		public void DBFiles_Range_07_Complimentary_Point_MinInclusive_2()
 		{
 			Assert.IsTrue(this.range.SetMin(10, true, out bool Smaller));
 			Assert.IsTrue(Smaller);
@@ -96,7 +96,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public void Test_08_Inconsistent_Point_MinInclusive()
+		public void DBFiles_Range_08_Inconsistent_Point_MinInclusive()
 		{
 			Assert.IsTrue(this.range.SetPoint(10));
 			Assert.IsFalse(this.range.SetMin(15, true, out bool Smaller));
@@ -104,7 +104,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public void Test_09_Inconsistent_Point_MinInclusive_2()
+		public void DBFiles_Range_09_Inconsistent_Point_MinInclusive_2()
 		{
 			Assert.IsTrue(this.range.SetMin(15, true, out bool Smaller));
 			Assert.IsTrue(Smaller);
@@ -112,7 +112,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public void Test_10_Inconsistent_Point_MinInclusive_3()
+		public void DBFiles_Range_10_Inconsistent_Point_MinInclusive_3()
 		{
 			Assert.IsTrue(this.range.SetPoint(10));
 			Assert.IsFalse(this.range.SetMin(10, false, out bool Smaller));
@@ -120,7 +120,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public void Test_11_Inconsistent_Point_MinInclusive_4()
+		public void DBFiles_Range_11_Inconsistent_Point_MinInclusive_4()
 		{
 			Assert.IsTrue(this.range.SetMin(10, false, out bool Smaller));
 			Assert.IsTrue(Smaller);
@@ -128,7 +128,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public void Test_12_MaxInclusive()
+		public void DBFiles_Range_12_MaxInclusive()
 		{
 			Assert.IsTrue(this.range.SetMax(10, true, out bool Smaller));
 			Assert.IsTrue(Smaller);
@@ -138,7 +138,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public void Test_13_MaxExclusive()
+		public void DBFiles_Range_13_MaxExclusive()
 		{
 			Assert.IsTrue(this.range.SetMax(10, false, out bool Smaller));
 			Assert.IsTrue(Smaller);
@@ -148,7 +148,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public void Test_14_Complimentary_MaxInclusive()
+		public void DBFiles_Range_14_Complimentary_MaxInclusive()
 		{
 			Assert.IsTrue(this.range.SetMax(20, false, out bool Smaller));
 			Assert.IsTrue(Smaller);
@@ -162,7 +162,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public void Test_15_Complimentary_Point_MaxInclusive()
+		public void DBFiles_Range_15_Complimentary_Point_MaxInclusive()
 		{
 			Assert.IsTrue(this.range.SetPoint(10));
 			Assert.IsTrue(this.range.SetMax(10, true, out bool Smaller));
@@ -173,7 +173,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public void Test_16_Complimentary_Point_MaxInclusive_2()
+		public void DBFiles_Range_16_Complimentary_Point_MaxInclusive_2()
 		{
 			Assert.IsTrue(this.range.SetMax(10, true, out bool Smaller));
 			Assert.IsTrue(Smaller);
@@ -184,7 +184,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public void Test_17_Inconsistent_Point_MaxInclusive()
+		public void DBFiles_Range_17_Inconsistent_Point_MaxInclusive()
 		{
 			Assert.IsTrue(this.range.SetPoint(15));
 			Assert.IsFalse(this.range.SetMax(10, true, out bool Smaller));
@@ -192,7 +192,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public void Test_18_Inconsistent_Point_MaxInclusive_2()
+		public void DBFiles_Range_18_Inconsistent_Point_MaxInclusive_2()
 		{
 			Assert.IsTrue(this.range.SetMax(10, true, out bool Smaller));
 			Assert.IsTrue(Smaller);
@@ -200,7 +200,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public void Test_19_Inconsistent_Point_MaxInclusive_3()
+		public void DBFiles_Range_19_Inconsistent_Point_MaxInclusive_3()
 		{
 			Assert.IsTrue(this.range.SetPoint(10));
 			Assert.IsFalse(this.range.SetMax(10, false, out bool Smaller));
@@ -208,7 +208,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public void Test_20_Inconsistent_Point_MaxInclusive_4()
+		public void DBFiles_Range_20_Inconsistent_Point_MaxInclusive_4()
 		{
 			Assert.IsTrue(this.range.SetMax(10, false, out bool Smaller));
 			Assert.IsTrue(Smaller);
@@ -216,7 +216,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public void Test_21_Complimentary_MinMax()
+		public void DBFiles_Range_21_Complimentary_MinMax()
 		{
 			Assert.IsTrue(this.range.SetMin(10, true, out bool Smaller));
 			Assert.IsTrue(Smaller);
@@ -230,7 +230,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public void Test_22_Complimentary_MinMax_2()
+		public void DBFiles_Range_22_Complimentary_MinMax_2()
 		{
 			Assert.IsTrue(this.range.SetMin(10, true, out bool Smaller));
 			Assert.IsTrue(Smaller);
@@ -252,7 +252,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public void Test_23_Inconsistent_MinMax()
+		public void DBFiles_Range_23_Inconsistent_MinMax()
 		{
 			Assert.IsTrue(this.range.SetMin(20, true, out bool Smaller));
 			Assert.IsTrue(Smaller);
@@ -261,7 +261,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public void Test_24_Inconsistent_MinMax_2()
+		public void DBFiles_Range_24_Inconsistent_MinMax_2()
 		{
 			Assert.IsTrue(this.range.SetMax(10, true, out bool Smaller));
 			Assert.IsTrue(Smaller);
@@ -270,7 +270,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public void Test_25_Inconsistent_MinMax_3()
+		public void DBFiles_Range_25_Inconsistent_MinMax_3()
 		{
 			Assert.IsTrue(this.range.SetMax(10, true, out bool Smaller));
 			Assert.IsTrue(Smaller);
@@ -279,7 +279,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public void Test_26_Inconsistent_MinMax_4()
+		public void DBFiles_Range_26_Inconsistent_MinMax_4()
 		{
 			Assert.IsTrue(this.range.SetMax(10, false, out bool Smaller));
 			Assert.IsTrue(Smaller);
@@ -288,7 +288,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public void Test_27_Inconsistent_MinMax_5()
+		public void DBFiles_Range_27_Inconsistent_MinMax_5()
 		{
 			Assert.IsTrue(this.range.SetMax(10, false, out bool Smaller));
 			Assert.IsTrue(Smaller);
@@ -297,7 +297,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public void Test_28_MinMax_Point()
+		public void DBFiles_Range_28_MinMax_Point()
 		{
 			Assert.IsTrue(this.range.SetMax(10, true, out bool Smaller));
 			Assert.IsTrue(Smaller);

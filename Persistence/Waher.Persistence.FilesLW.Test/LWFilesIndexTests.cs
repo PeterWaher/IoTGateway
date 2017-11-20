@@ -34,7 +34,7 @@ namespace Waher.Persistence.FilesLW.Test
 		internal const string ObjIdFileName = "Data\\LastObjectId.bin";
 		internal const string BlockSizeFileName = "Data\\BlockSize.bin";
 		internal const int BlocksInCache = 10000;
-		internal const int ObjectsToEnumerate = 10000;
+		internal const int ObjectsToEnumerate = 1000;
 
 		protected ObjectBTreeFile file;
 		protected IndexBTreeFile index1;
@@ -133,7 +133,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_01_NormalEnumeration()
+		public async Task DBFiles_Index_Test_01_NormalEnumeration()
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 			SortedDictionary<Guid, bool> Objects2 = new SortedDictionary<Guid, bool>();
@@ -184,7 +184,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_02_TypedEnumeration()
+		public async Task DBFiles_Index_Test_02_TypedEnumeration()
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 			SortedDictionary<Guid, bool> Objects2 = new SortedDictionary<Guid, bool>();
@@ -252,7 +252,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_03_LockedEnumeration()
+		public async Task DBFiles_Index_Test_03_LockedEnumeration()
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 			SortedDictionary<Guid, bool> Objects2 = new SortedDictionary<Guid, bool>();
@@ -303,7 +303,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 		[TestMethod]
 		[ExpectedException(typeof(AggregateException))]
-		public async Task Test_04_UnlockedChangeEnumeration()
+		public async Task DBFiles_Index_Test_04_UnlockedChangeEnumeration()
 		{
 			await this.CreateObjects(Math.Min(ObjectsToEnumerate, 1000));
 			Simple Obj;
@@ -320,7 +320,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_05_BackwardsEnumeration()
+		public async Task DBFiles_Index_Test_05_BackwardsEnumeration()
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 			SortedDictionary<Guid, bool> Objects2 = new SortedDictionary<Guid, bool>();
@@ -386,7 +386,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_06_SelectIthObject()
+		public async Task DBFiles_Index_Test_06_SelectIthObject()
 		{
 			int c = ObjectsToEnumerate;
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(c);
@@ -459,7 +459,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_07_RankObject()
+		public async Task DBFiles_Index_Test_07_RankObject()
 		{
 			int c = ObjectsToEnumerate;
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(c);
@@ -473,7 +473,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_08_Reset()
+		public async Task DBFiles_Index_Test_08_Reset()
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 			Simple Prev = null;
@@ -516,25 +516,25 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public void Test_09_UpdateObjects_1000()
+		public void DBFiles_Index_Test_09_UpdateObjects_1000()
 		{
-			this.Test_UpdateObjects(1000).Wait();
+			this.DBFiles_Index_Test_UpdateObjects(1000).Wait();
 		}
 
 		[TestMethod]
-		public void Test_10_UpdateObjects_10000()
+		public void DBFiles_Index_Test_10_UpdateObjects_10000()
 		{
-			this.Test_UpdateObjects(10000).Wait();
+			this.DBFiles_Index_Test_UpdateObjects(10000).Wait();
 		}
 
 		[TestMethod]
 		[Ignore]
-		public void Test_11_UpdateObjects_100000()
+		public void DBFiles_Index_Test_11_UpdateObjects_100000()
 		{
-			this.Test_UpdateObjects(100000).Wait();
+			this.DBFiles_Index_Test_UpdateObjects(100000).Wait();
 		}
 
-		private async Task Test_UpdateObjects(int c)
+		private async Task DBFiles_Index_Test_UpdateObjects(int c)
 		{
 			Dictionary<Guid, Simple> Ordered = new Dictionary<Guid, Simple>();
 			Simple[] Objects = new Simple[c];
@@ -591,38 +591,38 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_12_DeleteObject()
+		public async Task DBFiles_Index_Test_12_DeleteObject()
 		{
-			await this.Test_DeleteObjects(3);
+			await this.DBFiles_Index_Test_DeleteObjects(3);
 		}
 
 		[TestMethod]
-		public async Task Test_13_DeleteObject_100()
+		public async Task DBFiles_Index_Test_13_DeleteObject_100()
 		{
-			await this.Test_DeleteObjects(100);
+			await this.DBFiles_Index_Test_DeleteObjects(100);
 		}
 
 		[TestMethod]
-		public async Task Test_14_DeleteObject_1000()
+		public async Task DBFiles_Index_Test_14_DeleteObject_1000()
 		{
-			await this.Test_DeleteObjects(1000);
-		}
-
-		[TestMethod]
-		[Ignore]
-		public async Task Test_15_DeleteObject_10000()
-		{
-			await this.Test_DeleteObjects(10000);
+			await this.DBFiles_Index_Test_DeleteObjects(1000);
 		}
 
 		[TestMethod]
 		[Ignore]
-		public async Task Test_16_DeleteObject_100000()
+		public async Task DBFiles_Index_Test_15_DeleteObject_10000()
 		{
-			await this.Test_DeleteObjects(100000);
+			await this.DBFiles_Index_Test_DeleteObjects(10000);
 		}
 
-		private async Task Test_DeleteObjects(int c)
+		[TestMethod]
+		[Ignore]
+		public async Task DBFiles_Index_Test_16_DeleteObject_100000()
+		{
+			await this.DBFiles_Index_Test_DeleteObjects(100000);
+		}
+
+		private async Task DBFiles_Index_Test_DeleteObjects(int c)
 		{
 			Random Gen = new Random();
 			Simple[] Objects = new Simple[c];
@@ -656,7 +656,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_17_Clear()
+		public async Task DBFiles_Index_Test_17_Clear()
 		{
 			Simple Obj = DBFilesBTreeTests.CreateSimple(this.MaxStringLength);
 			Guid ObjectId = await this.file.SaveNewObject(Obj);
@@ -669,7 +669,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_18_FindFirst()
+		public async Task DBFiles_Index_Test_18_FindFirst()
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 			int i;
@@ -699,7 +699,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_19_FindLast()
+		public async Task DBFiles_Index_Test_19_FindLast()
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 			int i;
@@ -729,7 +729,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_20_Search_FilterEqualTo()
+		public async Task DBFiles_Index_Test_20_Search_FilterEqualTo()
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 
@@ -751,7 +751,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_21_Search_FilterNotEqualTo()
+		public async Task DBFiles_Index_Test_21_Search_FilterNotEqualTo()
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 
@@ -773,7 +773,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_22_Search_FilterGreaterThanOrEqualTo()
+		public async Task DBFiles_Index_Test_22_Search_FilterGreaterThanOrEqualTo()
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 
@@ -795,7 +795,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_23_Search_FilterLesserThanOrEqualTo()
+		public async Task DBFiles_Index_Test_23_Search_FilterLesserThanOrEqualTo()
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 
@@ -817,7 +817,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_24_Search_FilterGreaterThan()
+		public async Task DBFiles_Index_Test_24_Search_FilterGreaterThan()
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 
@@ -839,7 +839,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_25_Search_FilterLesserThan()
+		public async Task DBFiles_Index_Test_25_Search_FilterLesserThan()
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 
@@ -861,7 +861,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_26_Search_FilterLikeRegEx()
+		public async Task DBFiles_Index_Test_26_Search_FilterLikeRegEx()
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 
@@ -884,7 +884,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_27_Search_FilterLikeRegEx_2()
+		public async Task DBFiles_Index_Test_27_Search_FilterLikeRegEx_2()
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 
@@ -906,7 +906,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_28_Search_FilterNot_EqualTo()
+		public async Task DBFiles_Index_Test_28_Search_FilterNot_EqualTo()
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 
@@ -928,7 +928,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_29_Search_FilterNot_NotEqualTo()
+		public async Task DBFiles_Index_Test_29_Search_FilterNot_NotEqualTo()
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 
@@ -950,7 +950,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_30_Search_FilterNot_GreaterThanOrEqualTo()
+		public async Task DBFiles_Index_Test_30_Search_FilterNot_GreaterThanOrEqualTo()
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 
@@ -972,7 +972,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_31_Search_FilterNot_LesserThanOrEqualTo()
+		public async Task DBFiles_Index_Test_31_Search_FilterNot_LesserThanOrEqualTo()
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 
@@ -994,7 +994,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_32_Search_FilterNot_GreaterThan()
+		public async Task DBFiles_Index_Test_32_Search_FilterNot_GreaterThan()
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 
@@ -1016,7 +1016,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_33_Search_FilterNot_LesserThan()
+		public async Task DBFiles_Index_Test_33_Search_FilterNot_LesserThan()
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 
@@ -1038,7 +1038,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_34_Search_FilterNot_LikeRegEx()
+		public async Task DBFiles_Index_Test_34_Search_FilterNot_LikeRegEx()
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 
@@ -1060,7 +1060,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_35_Search_FilterNot_LikeRegEx_2()
+		public async Task DBFiles_Index_Test_35_Search_FilterNot_LikeRegEx_2()
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 
@@ -1082,7 +1082,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_36_Search_FilterNot_Not_EqualTo()
+		public async Task DBFiles_Index_Test_36_Search_FilterNot_Not_EqualTo()
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 
@@ -1104,7 +1104,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_37_Search_FilterOr()
+		public async Task DBFiles_Index_Test_37_Search_FilterOr()
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 
@@ -1129,7 +1129,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_38_Search_OneRange_Closed()
+		public async Task DBFiles_Index_Test_38_Search_OneRange_Closed()
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 
@@ -1154,7 +1154,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_39_Search_OneRange_Open()
+		public async Task DBFiles_Index_Test_39_Search_OneRange_Open()
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 
@@ -1179,7 +1179,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_40_Search_TwoRanges_Closed()
+		public async Task DBFiles_Index_Test_40_Search_TwoRanges_Closed()
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 			Simple Obj;
@@ -1214,7 +1214,7 @@ namespace Waher.Persistence.FilesLW.Test
 		private static readonly DateTime MaxDT = new DateTime(1990, 2, 3, 4, 5, 6);
 
 		[TestMethod]
-		public async Task Test_41_Search_TwoRanges_Open()
+		public async Task DBFiles_Index_Test_41_Search_TwoRanges_Open()
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 			Simple Obj;
@@ -1246,7 +1246,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_42_Search_TwoRanges_Open_AdditionalFilter()
+		public async Task DBFiles_Index_Test_42_Search_TwoRanges_Open_AdditionalFilter()
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 			Simple Obj;
@@ -1280,7 +1280,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_43_Search_TwoOpenRanges_MinMin()
+		public async Task DBFiles_Index_Test_43_Search_TwoOpenRanges_MinMin()
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 			Simple Obj;
@@ -1308,7 +1308,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_44_Search_TwoOpenRanges_MinMax()
+		public async Task DBFiles_Index_Test_44_Search_TwoOpenRanges_MinMax()
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 			Simple Obj;
@@ -1336,7 +1336,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_45_Search_TwoOpenRanges_MaxMin()
+		public async Task DBFiles_Index_Test_45_Search_TwoOpenRanges_MaxMin()
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 			Simple Obj;
@@ -1364,7 +1364,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_46_Search_TwoOpenRanges_MaxMax()
+		public async Task DBFiles_Index_Test_46_Search_TwoOpenRanges_MaxMax()
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 			Simple Obj;
@@ -1392,7 +1392,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_47_Search_TwoRanges_Normalization()
+		public async Task DBFiles_Index_Test_47_Search_TwoRanges_Normalization()
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 			Simple Obj;
@@ -1424,7 +1424,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_48_Search_Or_AvoidMultipleFullFileScans()
+		public async Task DBFiles_Index_Test_48_Search_Or_AvoidMultipleFullFileScans()
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 			FileStatistics StatBefore = await this.file.ComputeStatistics();
@@ -1453,7 +1453,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_49_Search_SortOrder()
+		public async Task DBFiles_Index_Test_49_Search_SortOrder()
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 			Simple Prev = null;
@@ -1494,7 +1494,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_50_Search_Paging()
+		public async Task DBFiles_Index_Test_50_Search_Paging()
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 			List<Simple> Ordered = new List<Simple>();
@@ -1532,7 +1532,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_51_Search_DefaultValue()
+		public async Task DBFiles_Index_Test_51_Search_DefaultValue()
 		{
 			SortedDictionary<Guid, Default> Objects = await this.CreateDefaultObjects(ObjectsToEnumerate);
 
@@ -1571,7 +1571,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_52_Search_MixedTypes()
+		public async Task DBFiles_Index_Test_52_Search_MixedTypes()
 		{
 			SortedDictionary<Guid, Default> Objects1 = await this.CreateDefaultObjects(ObjectsToEnumerate);
 			SortedDictionary<Guid, Simple> Objects2 = await this.CreateObjects(ObjectsToEnumerate);

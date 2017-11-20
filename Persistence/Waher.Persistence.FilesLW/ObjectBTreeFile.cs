@@ -4848,15 +4848,15 @@ namespace Waher.Persistence.Files
 				{
 					Result = null;
 
-					if (SortOrder.Length > 0)
+					if (SortOrder != null && SortOrder.Length > 0)
 					{
 						IndexBTreeFile Index = this.FindBestIndex(SortOrder);
 
 						if (Index != null)
 						{
-							if (Index.SameSortOrder(SortOrder))
+							if (Index.SameSortOrder(null, SortOrder))
 								Result = Index.GetTypedEnumerator<T>(Locked);
-							else if (Index.ReverseSortOrder(SortOrder))
+							else if (Index.ReverseSortOrder(null, SortOrder))
 								Result = new Searching.ReversedCursor<T>(Index.GetTypedEnumerator<T>(Locked), this.timeoutMilliseconds);
 						}
 					}
@@ -4866,7 +4866,7 @@ namespace Waher.Persistence.Files
 						this.nrFullFileScans++;
 						Result = this.GetTypedEnumerator<T>(Locked);
 
-						if (SortOrder.Length > 0)
+						if (SortOrder != null && SortOrder.Length > 0)
 							Result = await this.Sort<T>(Result, SortOrder);
 					}
 
@@ -4877,7 +4877,7 @@ namespace Waher.Persistence.Files
 				{
 					Result = await this.ConvertFilterToCursor<T>(Filter.Normalize(), Locked);
 
-					if (SortOrder.Length > 0)
+					if (SortOrder != null && SortOrder.Length > 0)
 						Result = await this.Sort<T>(Result, SortOrder);
 
 					if (Offset > 0 || MaxCount < int.MaxValue)
@@ -4897,9 +4897,9 @@ namespace Waher.Persistence.Files
 
         private async Task<ICursor<T>> Sort<T>(ICursor<T> Result, params string[] SortOrder)
         {
-            if (Result.SameSortOrder(SortOrder))
+            if (Result.SameSortOrder(null, SortOrder))
                 return Result;
-            else if (Result.ReverseSortOrder(SortOrder))
+            else if (Result.ReverseSortOrder(null, SortOrder))
                 return new Searching.ReversedCursor<T>(Result, this.timeoutMilliseconds);
 
             SortedDictionary<Searching.SortedCursor<T>.SortRec, Tuple<T, IObjectSerializer, Guid>> SortedObjects;

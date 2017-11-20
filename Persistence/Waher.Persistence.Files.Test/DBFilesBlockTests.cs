@@ -57,7 +57,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_01_SaveBlock()
+		public async Task DBFiles_Block_Test_01_SaveBlock()
 		{
 			byte[] Block = new byte[BlockSize];
 			int i;
@@ -69,7 +69,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_02_LoadBlock()
+		public async Task DBFiles_Block_Test_02_LoadBlock()
 		{
 			file.ClearCache();
 			byte[] Block = await file.LoadBlock(0);

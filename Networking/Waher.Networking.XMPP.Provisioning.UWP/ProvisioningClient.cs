@@ -524,7 +524,7 @@ namespace Waher.Networking.XMPP.Provisioning
 					try
 					{
 						ThingReference[] Nodes2 = Nodes as ThingReference[];
-						if (Nodes2 == null)
+						if (Nodes2 == null && Nodes != null)
 						{
 							List<ThingReference> List = new List<ThingReference>();
 							List.AddRange(Nodes);
@@ -532,7 +532,7 @@ namespace Waher.Networking.XMPP.Provisioning
 						}
 
 						string[] FieldNames2 = FieldNames as string[];
-						if (FieldNames2 == null)
+						if (FieldNames2 == null && FieldNames != null)
 						{
 							List<string> List = new List<string>();
 							List.AddRange(FieldNames);
@@ -778,7 +778,7 @@ namespace Waher.Networking.XMPP.Provisioning
 					try
 					{
 						ThingReference[] Nodes2 = Nodes as ThingReference[];
-						if (Nodes2 == null)
+						if (Nodes2 == null && Nodes != null)
 						{
 							List<ThingReference> List = new List<ThingReference>();
 							List.AddRange(Nodes);
@@ -786,7 +786,7 @@ namespace Waher.Networking.XMPP.Provisioning
 						}
 
 						string[] ParameterNames2 = ParameterNames as string[];
-						if (ParameterNames2 == null)
+						if (ParameterNames2 == null && ParameterNames != null)
 						{
 							List<string> List = new List<string>();
 							List.AddRange(ParameterNames);

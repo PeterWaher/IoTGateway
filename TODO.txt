@@ -1,7 +1,5 @@
 Client:
-* clearCache på Owner-sidan: Skicka clearCache till alla saker som tillhör ägaren.
-		// TODO: Allow owner to suggest friendships.
-* getDevices
+* Allow owner to suggest friendships.
 * getCertificate
 
 * interaction with provisioning client from chat bot

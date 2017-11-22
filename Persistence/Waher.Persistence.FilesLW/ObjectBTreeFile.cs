@@ -3634,6 +3634,11 @@ namespace Waher.Persistence.Files
                 Statistics.LogError(ex.Message);
             }
 
+			if (Statistics.NrObjects == 0)
+			{
+				Statistics.MinObjectSize = 0;
+			}
+
             return Statistics;
         }
 
@@ -4996,15 +5001,23 @@ namespace Waher.Persistence.Files
 						}
                     }
 
-                    IndexBTreeFile Index = Properties == null ? null : this.FindBestIndex(out int NrFields, Properties.ToArray());
+					IndexBTreeFile Index;
+					int NrFields;
+
+					if (Properties == null)
+					{
+						NrFields = 0;
+						Index = null;
+					}
+					else
+						Index = this.FindBestIndex(out NrFields, Properties.ToArray());
+
 					if (Index == null)
 					{
 						this.nrFullFileScans++;
 						Log.Notice("Search resulted in entire file to be scanned. Consider either adding indices, or enumerate objects using an object enumerator.", this.fileName, string.Empty, "DBOpt");
 						return new Searching.FilteredCursor<T>(this.GetTypedEnumerator<T>(Locked), this.ConvertFilter(Filter), false, true, this.timeoutMilliseconds, this.provider);
 					}
-					else
-						NrFields = 0;
 
                     Searching.RangeInfo[] RangeInfo = new Searching.RangeInfo[NrFields];
                     Dictionary<string, int> FieldOrder = new Dictionary<string, int>();

@@ -104,6 +104,12 @@
 								color:black;
 							}
 				
+							.Notice
+							{
+								background-color:lightyellow;
+								color:black;
+							}
+				
 							.Error
 							{
 								background-color:red;
@@ -163,6 +169,9 @@
         </xsl:when>
         <xsl:when test="dbstat:Stat/@hasComments='true'">
           <xsl:text>Warning</xsl:text>
+        </xsl:when>
+        <xsl:when test="../@count &gt; @count">
+          <xsl:text>Notice</xsl:text>
         </xsl:when>
         <xsl:otherwise>
           <xsl:text>Ok</xsl:text>

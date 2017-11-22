@@ -11,6 +11,12 @@ Client:
 	- Make sure icon created in start menu & on desktop.
 
 
+DB Optimizations:
+* ta hänsyn till Sort Order när man väljer Best index.
+* PagedEnumerator: Om offset, försök hoppa snabbt frammåt via rank, istället för att sekventiellt läsa in alla objekt.
+
+
+
 Plots:
 * GroupedVerticalBars(Labels,Values[,BarColor[,LineColor[,LineWidth]]])								https://en.wikipedia.org/wiki/Bar_chart		(grouped)
 * GroupedHorizontalBars(Labels,Values[,BarColor[,LineColor[,LineWidth]]])								https://en.wikipedia.org/wiki/Bar_chart		(grouped)

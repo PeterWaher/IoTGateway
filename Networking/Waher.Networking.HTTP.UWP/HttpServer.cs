@@ -446,15 +446,19 @@ namespace Waher.Networking.HTTP
 					{
 						// Ignore
 					}
+					catch (ObjectDisposedException)
+					{
+						// Ignore
+					}
+					catch (NullReferenceException)
+					{
+						// Ignore
+					}
 					catch (Exception ex)
 					{
 						Log.Critical(ex);
 					}
 				}
-			}
-			catch (SocketException)
-			{
-				// Ignore
 			}
 			catch (Exception ex)
 			{

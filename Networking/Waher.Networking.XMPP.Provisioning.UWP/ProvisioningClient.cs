@@ -416,6 +416,27 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="State">State object to pass to callback method.</param>
 		public void IsFriend(string JID, IsFriendCallback Callback, object State)
 		{
+			if ((!string.IsNullOrEmpty(this.ownerJid) && string.Compare(JID, this.ownerJid, true) == 0) ||
+				string.Compare(JID, this.provisioningServerAddress, true) == 0)
+			{
+				if (Callback != null)
+				{
+					try
+					{
+						IqResultEventArgs e0 = new IqResultEventArgs(null, string.Empty, this.client.FullJID, this.provisioningServerAddress, true, State);
+						IsFriendResponseEventArgs e = new IsFriendResponseEventArgs(e0, State, JID, true);
+
+						Callback(this.client, e);
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
+				}
+
+				return;
+			}
+
 			this.CachedIqGet("<isFriend xmlns='" + NamespaceProvisioningDevice + "' jid='" +
 				XML.Encode(JID) + "'/>", this.IsFriendCallback, new object[] { Callback, State });
 		}
@@ -495,6 +516,43 @@ namespace Waher.Networking.XMPP.Provisioning
 		public void CanRead(string RequestFromBareJid, FieldType FieldTypes, IEnumerable<ThingReference> Nodes, IEnumerable<string> FieldNames,
 			string[] ServiceTokens, string[] DeviceTokens, string[] UserTokens, CanReadCallback Callback, object State)
 		{
+			if ((!string.IsNullOrEmpty(this.ownerJid) && string.Compare(RequestFromBareJid, this.ownerJid, true) == 0) ||
+				string.Compare(RequestFromBareJid, this.provisioningServerAddress, true) == 0)
+			{
+				if (Callback != null)
+				{
+					try
+					{
+						ThingReference[] Nodes2 = Nodes as ThingReference[];
+						if (Nodes2 == null)
+						{
+							List<ThingReference> List = new List<ThingReference>();
+							List.AddRange(Nodes);
+							Nodes2 = List.ToArray();
+						}
+
+						string[] FieldNames2 = FieldNames as string[];
+						if (FieldNames2 == null)
+						{
+							List<string> List = new List<string>();
+							List.AddRange(FieldNames);
+							FieldNames2 = List.ToArray();
+						}
+
+						IqResultEventArgs e0 = new IqResultEventArgs(null, string.Empty, this.client.FullJID, this.provisioningServerAddress, true, State);
+						CanReadResponseEventArgs e = new CanReadResponseEventArgs(e0, State, RequestFromBareJid, true, FieldTypes, Nodes2, FieldNames2);
+
+						Callback(this.client, e);
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
+				}
+
+				return;
+			}
+
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<canRead xmlns='");
@@ -712,6 +770,43 @@ namespace Waher.Networking.XMPP.Provisioning
 		public void CanControl(string RequestFromBareJid, IEnumerable<ThingReference> Nodes, IEnumerable<string> ParameterNames,
 			string[] ServiceTokens, string[] DeviceTokens, string[] UserTokens, CanControlCallback Callback, object State)
 		{
+			if ((!string.IsNullOrEmpty(this.ownerJid) && string.Compare(RequestFromBareJid, this.ownerJid, true) == 0) ||
+				string.Compare(RequestFromBareJid, this.provisioningServerAddress, true) == 0)
+			{
+				if (Callback != null)
+				{
+					try
+					{
+						ThingReference[] Nodes2 = Nodes as ThingReference[];
+						if (Nodes2 == null)
+						{
+							List<ThingReference> List = new List<ThingReference>();
+							List.AddRange(Nodes);
+							Nodes2 = List.ToArray();
+						}
+
+						string[] ParameterNames2 = ParameterNames as string[];
+						if (ParameterNames2 == null)
+						{
+							List<string> List = new List<string>();
+							List.AddRange(ParameterNames);
+							ParameterNames2 = List.ToArray();
+						}
+
+						IqResultEventArgs e0 = new IqResultEventArgs(null, string.Empty, this.client.FullJID, this.provisioningServerAddress, true, State);
+						CanControlResponseEventArgs e = new CanControlResponseEventArgs(e0, State, RequestFromBareJid, true, Nodes2, ParameterNames2);
+
+						Callback(this.client, e);
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
+				}
+
+				return;
+			}
+
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<canControl xmlns='");

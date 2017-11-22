@@ -15,11 +15,11 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>persistence object database file storage</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.0.14</AssemblyVersion>
-    <FileVersion>1.0.14</FileVersion>
+    <AssemblyVersion>1.0.16</AssemblyVersion>
+    <FileVersion>1.0.16</FileVersion>
     <PreBuildEvent>xcopy "C:\My Projects\IoTGateway\Persistence\Waher.Persistence.Files\*.cs" "C:\My Projects\IoTGateway\Persistence\Waher.Persistence.FilesLW" /Y /S
 </PreBuildEvent>
-    <Version>1.0.14</Version>
+    <Version>1.0.16</Version>
     <PackageIconUrl>https://github.com/PeterWaher/IoTGateway/blob/master/Images/Icon.ico?raw=true</PackageIconUrl>
   </PropertyGroup>
 

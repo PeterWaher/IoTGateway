@@ -234,6 +234,14 @@ namespace Waher.Persistence.Files.Statistics
 					return this.minObjSize;
 				}
 			}
+
+			internal set
+			{
+				lock (this.synchObject)
+				{
+					this.minObjSize = value;
+				}
+			}
 		}
 
 		/// <summary>

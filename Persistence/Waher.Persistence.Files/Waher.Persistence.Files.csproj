@@ -15,9 +15,9 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>persistence object database enryption file storage encryption</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.0.14</AssemblyVersion>
-    <FileVersion>1.0.14</FileVersion>
-    <Version>1.0.14</Version>
+    <AssemblyVersion>1.0.16</AssemblyVersion>
+    <FileVersion>1.0.16</FileVersion>
+    <Version>1.0.16</Version>
     <PackageIconUrl>https://github.com/PeterWaher/IoTGateway/blob/master/Images/Icon.ico?raw=true</PackageIconUrl>
   </PropertyGroup>
 

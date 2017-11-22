@@ -4996,14 +4996,15 @@ namespace Waher.Persistence.Files
 						}
                     }
 
-                    int NrFields = 0;
-                    IndexBTreeFile Index = Properties == null ? null : this.FindBestIndex(out NrFields, Properties.ToArray());
-                    if (Index == null)
-                    {
-                        this.nrFullFileScans++;
-                        Log.Notice("Search resulted in entire file to be scanned. Consider either adding indices, or enumerate objects using an object enumerator.", this.fileName, string.Empty, "DBOpt");
-                        return new Searching.FilteredCursor<T>(this.GetTypedEnumerator<T>(Locked), this.ConvertFilter(Filter), false, true, this.timeoutMilliseconds, this.provider);
-                    }
+                    IndexBTreeFile Index = Properties == null ? null : this.FindBestIndex(out int NrFields, Properties.ToArray());
+					if (Index == null)
+					{
+						this.nrFullFileScans++;
+						Log.Notice("Search resulted in entire file to be scanned. Consider either adding indices, or enumerate objects using an object enumerator.", this.fileName, string.Empty, "DBOpt");
+						return new Searching.FilteredCursor<T>(this.GetTypedEnumerator<T>(Locked), this.ConvertFilter(Filter), false, true, this.timeoutMilliseconds, this.provider);
+					}
+					else
+						NrFields = 0;
 
                     Searching.RangeInfo[] RangeInfo = new Searching.RangeInfo[NrFields];
                     Dictionary<string, int> FieldOrder = new Dictionary<string, int>();

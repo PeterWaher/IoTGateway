@@ -477,6 +477,7 @@ namespace Waher.Client.WPF.Model
 				MenuItem Item;
 
 				this.GroupSeparator(ref CurrentGroup, "Database", Menu);
+
 				Menu.Items.Add(Item = new MenuItem()
 				{
 					Header = "M_y devices...",
@@ -490,6 +491,20 @@ namespace Waher.Client.WPF.Model
 				});
 
 				Item.Click += this.MyDevices_Click;
+
+				Menu.Items.Add(Item = new MenuItem()
+				{
+					Header = "_Recycle device rule caches...",
+					IsEnabled = true,
+					Icon = new Image()
+					{
+						Source = new BitmapImage(new Uri("../Graphics/Recycle-Bin-empty-icon_16.png", UriKind.Relative)),
+						Width = 16,
+						Height = 16
+					}
+				});
+
+				Item.Click += this.RecycleDeviceRuleCaches_Click;
 			}
 		}
 
@@ -498,6 +513,24 @@ namespace Waher.Client.WPF.Model
 			this.provisioningClient.GetDevices(0, 100, (sender2, e2) =>
 			{
 				this.ShowResult(e2);
+			}, null);
+		}
+
+		private void RecycleDeviceRuleCaches_Click(object sender, RoutedEventArgs e)
+		{
+			this.provisioningClient.ClearDeviceCaches((sender2, e2) =>
+			{
+				if (e2.Ok)
+				{
+					MainWindow.currentInstance.Dispatcher.Invoke(() => MessageBox.Show(MainWindow.currentInstance,
+						"The rule caches in your connected devices have been cleared.", "Success", MessageBoxButton.OK, MessageBoxImage.Information));
+				}
+				else
+				{
+					MainWindow.currentInstance.Dispatcher.Invoke(() => MessageBox.Show(MainWindow.currentInstance,
+						string.IsNullOrEmpty(e2.ErrorText) ? "Unable to clear rule caches in your connected devices." : e2.ErrorText, 
+						"Error", MessageBoxButton.OK, MessageBoxImage.Information));
+				}
 			}, null);
 		}
 	}

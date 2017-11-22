@@ -140,6 +140,9 @@ namespace Waher.Utility.AnalyzeDB
 				if (!Directory.Exists(ProgramDataFolder))
 					throw new Exception("Program data folder does not exist.");
 
+				if (!Directory.Exists(OutputFileName))
+					throw new Exception("No output filename specified.");
+
 				Types.Initialize(
 					typeof(Database).Assembly,
 					typeof(FilesProvider).Assembly);
@@ -175,7 +178,8 @@ namespace Waher.Utility.AnalyzeDB
 								}
 							}
 
-							w.WriteProcessingInstruction("xml-stylesheet", "type=\"text/xsl\" href=\"" + XML.Encode(XsltPath) + "\"");
+							if (!string.IsNullOrEmpty(XsltPath))
+								w.WriteProcessingInstruction("xml-stylesheet", "type=\"text/xsl\" href=\"" + XML.Encode(XsltPath) + "\"");
 
 							w.WriteStartElement("DatabaseStatistics", "http://waher.se/Schema/Persistence/Statistics.xsd");
 

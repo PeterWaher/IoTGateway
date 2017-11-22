@@ -4958,8 +4958,9 @@ namespace Waher.Persistence.Files
                 {
                     List<string> Properties = null;
                     LinkedList<KeyValuePair<Searching.FilterFieldLikeRegEx, string>> RegExFields = null;
+					string FieldName;
 
-                    foreach (Filter Filter2 in ChildFilters)
+					foreach (Filter Filter2 in ChildFilters)
                     {
                         if (Filter2 is FilterFieldValue)
                         {
@@ -4968,9 +4969,11 @@ namespace Waher.Persistence.Files
                                 if (Properties == null)
                                     Properties = new List<string>();
 
-                                Properties.Add(((FilterFieldValue)Filter2).FieldName);
-                            }
-                        }
+								FieldName = ((FilterFieldValue)Filter2).FieldName;
+								if (!Properties.Contains(FieldName))
+									Properties.Add(FieldName);
+							}
+						}
                         else if (Filter2 is FilterFieldLikeRegEx FilterFieldLikeRegEx)
                         {
                             Searching.FilterFieldLikeRegEx FilterFieldLikeRegEx2 = (Searching.FilterFieldLikeRegEx)this.ConvertFilter(Filter2);
@@ -4986,9 +4989,11 @@ namespace Waher.Persistence.Files
                                 if (Properties == null)
                                     Properties = new List<string>();
 
-                                Properties.Add(FilterFieldLikeRegEx2.FieldName);
-                            }
-                        }
+								FieldName = FilterFieldLikeRegEx2.FieldName;
+								if (!Properties.Contains(FieldName))
+									Properties.Add(FieldName);
+							}
+						}
                     }
 
                     int NrFields = 0;
@@ -5005,11 +5010,11 @@ namespace Waher.Persistence.Files
                     List<Searching.IApplicableFilter> AdditionalFields = null;
                     List<Filter> AdditionalFields2 = null;
                     int i = 0;
-
-                    foreach (string FieldName in Index.FieldNames)
+					
+                    foreach (string FieldName2 in Index.FieldNames)
                     {
-                        RangeInfo[i] = new Searching.RangeInfo(FieldName);
-                        FieldOrder[FieldName] = i++;
+                        RangeInfo[i] = new Searching.RangeInfo(FieldName2);
+                        FieldOrder[FieldName2] = i++;
                         if (i >= NrFields)
                             break;
                     }

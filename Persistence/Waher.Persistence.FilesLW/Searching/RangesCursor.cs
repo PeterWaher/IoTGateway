@@ -309,7 +309,7 @@ namespace Waher.Persistence.Files.Searching
 					{
 						if (this.ascending[i])
 						{
-							if (this.currentLimits[i].SetMax(FieldValue, OutOfStartRangeField != null, out Smaller) && Smaller)
+							if (this.currentLimits[i].SetMin(FieldValue, OutOfStartRangeField != null, out Smaller) && Smaller)
 							{
 								i++;
 								this.limitsUpdatedAt = i;
@@ -323,7 +323,7 @@ namespace Waher.Persistence.Files.Searching
 						}
 						else
 						{
-							if (this.currentLimits[i].SetMin(FieldValue, OutOfStartRangeField != null, out Smaller) && Smaller)
+							if (this.currentLimits[i].SetMax(FieldValue, OutOfStartRangeField != null, out Smaller) && Smaller)
 							{
 								i++;
 								this.limitsUpdatedAt = i;
@@ -528,7 +528,7 @@ namespace Waher.Persistence.Files.Searching
 					{
 						if (this.ascending[i])
 						{
-							if (this.currentLimits[i].SetMin(FieldValue, OutOfStartRangeField != null, out Smaller) && Smaller)
+							if (this.currentLimits[i].SetMax(FieldValue, OutOfStartRangeField != null, out Smaller) && Smaller)
 							{
 								i++;
 								this.limitsUpdatedAt = i;
@@ -542,7 +542,7 @@ namespace Waher.Persistence.Files.Searching
 						}
 						else
 						{
-							if (this.currentLimits[i].SetMax(FieldValue, OutOfStartRangeField != null, out Smaller) && Smaller)
+							if (this.currentLimits[i].SetMin(FieldValue, OutOfStartRangeField != null, out Smaller) && Smaller)
 							{
 								i++;
 								this.limitsUpdatedAt = i;

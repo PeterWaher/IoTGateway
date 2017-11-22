@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Events;
 using Waher.Persistence.Serialization;
 using Waher.Persistence.Files.Serialization;
 using Waher.Persistence.Files.Storage;
@@ -133,7 +134,7 @@ namespace Waher.Persistence.Files
 		/// <returns>If the object was saved in the index (true), or if the index property values of the object did not exist, or were too big to fit in an index record.</returns>
 		internal async Task<bool> SaveNewObject(Guid ObjectId, object Object, IObjectSerializer Serializer)
 		{
-			byte[] Bin = this.recordHandler.Serialize(ObjectId, Object, Serializer, MissingFieldAction.Prohibit);
+			byte[] Bin = this.recordHandler.Serialize(ObjectId, Object, Serializer, MissingFieldAction.Null);
 			if (Bin == null || Bin.Length > this.indexFile.InlineObjectSizeLimit)
 				return false;
 
@@ -163,7 +164,7 @@ namespace Waher.Persistence.Files
 		/// <returns>If the object was deleted from the index (true), or if the object did not exist in the index.</returns>
 		internal async Task<bool> DeleteObject(Guid ObjectId, object Object, IObjectSerializer Serializer)
 		{
-			byte[] Bin = this.recordHandler.Serialize(ObjectId, Object, Serializer, MissingFieldAction.Prohibit);
+			byte[] Bin = this.recordHandler.Serialize(ObjectId, Object, Serializer, MissingFieldAction.Null);
 			if (Bin == null || Bin.Length > this.indexFile.InlineObjectSizeLimit)
 				return false;
 
@@ -194,11 +195,11 @@ namespace Waher.Persistence.Files
 		/// <returns>If the object was saved in the index (true), or if the index property values of the object did not exist, or were too big to fit in an index record.</returns>
 		internal async Task<bool> UpdateObject(Guid ObjectId, object OldObject, object NewObject, IObjectSerializer Serializer)
 		{
-			byte[] OldBin = this.recordHandler.Serialize(ObjectId, OldObject, Serializer, MissingFieldAction.Prohibit);
+			byte[] OldBin = this.recordHandler.Serialize(ObjectId, OldObject, Serializer, MissingFieldAction.Null);
 			if (OldBin != null && OldBin.Length > this.indexFile.InlineObjectSizeLimit)
 				return false;
 
-			byte[] NewBin = this.recordHandler.Serialize(ObjectId, NewObject, Serializer, MissingFieldAction.Prohibit);
+			byte[] NewBin = this.recordHandler.Serialize(ObjectId, NewObject, Serializer, MissingFieldAction.Null);
 			if (NewBin != null && NewBin.Length > this.indexFile.InlineObjectSizeLimit)
 				return false;
 
@@ -310,7 +311,7 @@ namespace Waher.Persistence.Files
 			Type ObjectType = Object.GetType();
 			IObjectSerializer Serializer = this.objectFile.Provider.GetObjectSerializer(ObjectType);
 
-			byte[] Key = this.recordHandler.Serialize(ObjectId, Object, Serializer, MissingFieldAction.Prohibit);
+			byte[] Key = this.recordHandler.Serialize(ObjectId, Object, Serializer, MissingFieldAction.Null);
 			if (Key == null)
 				throw new KeyNotFoundException("Object not found.");
 
@@ -331,13 +332,20 @@ namespace Waher.Persistence.Files
 		/// <returns></returns>
 		public async Task Regenerate()
 		{
+			int c = 0;
+
 			await this.ClearAsync();
 
 			using (ObjectBTreeFileEnumerator<object> e = this.objectFile.GetTypedEnumerator<object>(true))
 			{
 				while (e.MoveNext())
+				{
+					c++;
 					await this.SaveNewObject((Guid)e.CurrentObjectId, e.Current, e.CurrentSerializer);
+				}
 			}
+
+			Log.Notice("Index regenerated.", this.indexFile.FileName, new KeyValuePair<string, object>("NrObjects", c));
 		}
 
 		/// <summary>

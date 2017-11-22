@@ -41,9 +41,9 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="From">From what time readout is to be made. Use <see cref="DateTime.MinValue"/> to specify no lower limit.</param>
 		/// <param name="To">To what time readout is to be made. Use <see cref="DateTime.MaxValue"/> to specify no upper limit.</param>
 		/// <param name="When">When the readout is to be made. Use <see cref="DateTime.MinValue"/> to start the readout immediately.</param>
-		/// <param name="ServiceToken">Optional service token, as defined in XEP-0324.</param>
-		/// <param name="DeviceToken">Optional device token, as defined in XEP-0324.</param>
-		/// <param name="UserToken">Optional user token, as defined in XEP-0324.</param>
+		/// <param name="ServiceToken">Optional service token.</param>
+		/// <param name="DeviceToken">Optional device token.</param>
+		/// <param name="UserToken">Optional user token.</param>
 		internal SensorDataRequest(string Id, string RemoteJID, string Actor, ThingReference[] Nodes, FieldType Types, string[] FieldNames, 
 			DateTime From, DateTime To, DateTime When, string ServiceToken, string DeviceToken, string UserToken)
 		{
@@ -144,17 +144,17 @@ namespace Waher.Networking.XMPP.Sensor
 		}
 
 		/// <summary>
-		/// Optional service token, as defined in XEP-0324.
+		/// Optional service token.
 		/// </summary>
 		public string ServiceToken { get { return this.serviceToken; } }
 
 		/// <summary>
-		/// Optional device token, as defined in XEP-0324.
+		/// Optional device token.
 		/// </summary>
 		public string DeviceToken { get { return this.deviceToken; } }
 
 		/// <summary>
-		/// Optional user token, as defined in XEP-0324.
+		/// Optional user token.
 		/// </summary>
 		public string UserToken { get { return this.userToken; } }
 

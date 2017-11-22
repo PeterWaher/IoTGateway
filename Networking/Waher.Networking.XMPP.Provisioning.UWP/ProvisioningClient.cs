@@ -27,8 +27,8 @@ namespace Waher.Networking.XMPP.Provisioning
 	/// <summary>
 	/// Implements an XMPP provisioning client interface.
 	/// 
-	/// The interface is defined in XEP-0324:
-	/// http://xmpp.org/extensions/xep-0324.html
+	/// The interface is defined in the IEEE XMPP IoT extensions:
+	/// https://gitlab.com/IEEE-SA/XMPPI/IoT
 	/// </summary>
 	public class ProvisioningClient : XmppExtension
 	{
@@ -56,8 +56,8 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <summary>
 		/// Implements an XMPP provisioning client interface.
 		/// 
-		/// The interface is defined in XEP-0324:
-		/// http://xmpp.org/extensions/xep-0324.html
+		/// The interface is defined in the IEEE XMPP IoT extensions:
+		/// https://gitlab.com/IEEE-SA/XMPPI/IoT
 		/// </summary>
 		/// <param name="Client">XMPP Client</param>
 		/// <param name="ProvisioningServerAddress">Provisioning Server XMPP Address.</param>
@@ -69,8 +69,8 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <summary>
 		/// Implements an XMPP provisioning client interface.
 		/// 
-		/// The interface is defined in XEP-0324:
-		/// http://xmpp.org/extensions/xep-0324.html
+		/// The interface is defined in the IEEE XMPP IoT extensions:
+		/// https://gitlab.com/IEEE-SA/XMPPI/IoT
 		/// </summary>
 		/// <param name="Client">XMPP Client</param>
 		/// <param name="ProvisioningServerAddress">Provisioning Server XMPP Address.</param>

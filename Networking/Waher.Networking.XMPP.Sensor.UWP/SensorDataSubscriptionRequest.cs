@@ -33,9 +33,9 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="MinInterval">Smallest interval for reporting events. Events are not reported more often than this limit.</param>
 		/// <param name="MaxInterval">Largest interval for reporting events. Events are not reported less often than this limit.</param>
 		/// <param name="MaxAge">Maximum age of historical data.</param>
-		/// <param name="ServiceToken">Optional service token, as defined in XEP-0324.</param>
-		/// <param name="DeviceToken">Optional device token, as defined in XEP-0324.</param>
-		/// <param name="UserToken">Optional user token, as defined in XEP-0324.</param>
+		/// <param name="ServiceToken">Optional service token.</param>
+		/// <param name="DeviceToken">Optional device token.</param>
+		/// <param name="UserToken">Optional user token.</param>
 		internal SensorDataSubscriptionRequest(string Id, SensorClient SensorClient, string RemoteJID, string Actor, ThingReference[] Nodes, 
 			FieldType Types, FieldSubscriptionRule[] FieldRules, Duration MinInterval, Duration MaxInterval, Duration MaxAge, string ServiceToken, 
 			string DeviceToken, string UserToken)

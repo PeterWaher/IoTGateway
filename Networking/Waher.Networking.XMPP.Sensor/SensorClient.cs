@@ -136,9 +136,9 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="From">From what time readout is to be made. Use <see cref="DateTime.MinValue"/> to specify no lower limit.</param>
 		/// <param name="To">To what time readout is to be made. Use <see cref="DateTime.MaxValue"/> to specify no upper limit.</param>
 		/// <param name="When">When the readout is to be made. Use <see cref="DateTime.MinValue"/> to start the readout immediately.</param>
-		/// <param name="ServiceToken">Optional service token, as defined in XEP-0324.</param>
-		/// <param name="DeviceToken">Optional device token, as defined in XEP-0324.</param>
-		/// <param name="UserToken">Optional user token, as defined in XEP-0324.</param>
+		/// <param name="ServiceToken">Optional service token.</param>
+		/// <param name="DeviceToken">Optional device token.</param>
+		/// <param name="UserToken">Optional user token.</param>
 		/// <returns>Request object maintaining the current status of the request.</returns>
 		public SensorDataClientRequest RequestReadout(string Destination, FieldType Types, string[] Fields, DateTime From, DateTime To, DateTime When,
 			string ServiceToken, string DeviceToken, string UserToken)
@@ -226,9 +226,9 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="From">From what time readout is to be made. Use <see cref="DateTime.MinValue"/> to specify no lower limit.</param>
 		/// <param name="To">To what time readout is to be made. Use <see cref="DateTime.MaxValue"/> to specify no upper limit.</param>
 		/// <param name="When">When the readout is to be made. Use <see cref="DateTime.MinValue"/> to start the readout immediately.</param>
-		/// <param name="ServiceToken">Optional service token, as defined in XEP-0324.</param>
-		/// <param name="DeviceToken">Optional device token, as defined in XEP-0324.</param>
-		/// <param name="UserToken">Optional user token, as defined in XEP-0324.</param>
+		/// <param name="ServiceToken">Optional service token.</param>
+		/// <param name="DeviceToken">Optional device token.</param>
+		/// <param name="UserToken">Optional user token.</param>
 		/// <returns>Request object maintaining the current status of the request.</returns>
 		public SensorDataClientRequest RequestReadout(string Destination, ThingReference[] Nodes, FieldType Types, string[] Fields, DateTime From, DateTime To, DateTime When,
 			string ServiceToken, string DeviceToken, string UserToken)
@@ -904,9 +904,9 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="MinInterval">Optional smallest acceptable event interval.</param>
 		/// <param name="MaxInterval">Optional largest desired event interval.</param>
 		/// <param name="MaxAge">Optional maximum age of historical data.</param>
-		/// <param name="ServiceToken">Optional service token, as defined in XEP-0324.</param>
-		/// <param name="DeviceToken">Optional device token, as defined in XEP-0324.</param>
-		/// <param name="UserToken">Optional user token, as defined in XEP-0324.</param>
+		/// <param name="ServiceToken">Optional service token.</param>
+		/// <param name="DeviceToken">Optional device token.</param>
+		/// <param name="UserToken">Optional user token.</param>
 		/// <param name="ImmediateReadout">If an immediate readout should be performed.</param>
 		/// <returns>Request object maintaining the current status of the subscription.</returns>
 		public SensorDataSubscriptionRequest Subscribe(string Destination, FieldType Types,
@@ -925,9 +925,9 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="MinInterval">Optional smallest acceptable event interval.</param>
 		/// <param name="MaxInterval">Optional largest desired event interval.</param>
 		/// <param name="MaxAge">Optional maximum age of historical data.</param>
-		/// <param name="ServiceToken">Optional service token, as defined in XEP-0324.</param>
-		/// <param name="DeviceToken">Optional device token, as defined in XEP-0324.</param>
-		/// <param name="UserToken">Optional user token, as defined in XEP-0324.</param>
+		/// <param name="ServiceToken">Optional service token.</param>
+		/// <param name="DeviceToken">Optional device token.</param>
+		/// <param name="UserToken">Optional user token.</param>
 		/// <param name="ImmediateReadout">If an immediate readout should be performed.</param>
 		/// <returns>Request object maintaining the current status of the subscription.</returns>
 		public SensorDataSubscriptionRequest Subscribe(string Destination, FieldType Types, FieldSubscriptionRule[] Fields,
@@ -1029,9 +1029,9 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="MinInterval">Optional smallest acceptable event interval.</param>
 		/// <param name="MaxInterval">Optional largest desired event interval.</param>
 		/// <param name="MaxAge">Optional maximum age of historical data.</param>
-		/// <param name="ServiceToken">Optional service token, as defined in XEP-0324.</param>
-		/// <param name="DeviceToken">Optional device token, as defined in XEP-0324.</param>
-		/// <param name="UserToken">Optional user token, as defined in XEP-0324.</param>
+		/// <param name="ServiceToken">Optional service token.</param>
+		/// <param name="DeviceToken">Optional device token.</param>
+		/// <param name="UserToken">Optional user token.</param>
 		/// <param name="ImmediateReadout">If an immediate readout should be performed.</param>
 		/// <returns>Request object maintaining the current status of the subscription.</returns>
 		public SensorDataSubscriptionRequest Subscribe(string Destination, ThingReference[] Nodes, FieldType Types,
@@ -1051,9 +1051,9 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="MinInterval">Optional smallest acceptable event interval.</param>
 		/// <param name="MaxInterval">Optional largest desired event interval.</param>
 		/// <param name="MaxAge">Optional maximum age of historical data.</param>
-		/// <param name="ServiceToken">Optional service token, as defined in XEP-0324.</param>
-		/// <param name="DeviceToken">Optional device token, as defined in XEP-0324.</param>
-		/// <param name="UserToken">Optional user token, as defined in XEP-0324.</param>
+		/// <param name="ServiceToken">Optional service token.</param>
+		/// <param name="DeviceToken">Optional device token.</param>
+		/// <param name="UserToken">Optional user token.</param>
 		/// <param name="ImmediateReadout">If an immediate readout should be performed.</param>
 		/// <returns>Request object maintaining the current status of the subscription.</returns>
 		public SensorDataSubscriptionRequest Subscribe(string Destination, ThingReference[] Nodes, FieldType Types, FieldSubscriptionRule[] Fields,

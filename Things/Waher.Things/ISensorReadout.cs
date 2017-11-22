@@ -70,7 +70,7 @@ namespace Waher.Things
 		}
 
 		/// <summary>
-		/// Optional service token, as defined in XEP-0324.
+		/// Optional service token.
 		/// </summary>
 		string ServiceToken
 		{
@@ -78,7 +78,7 @@ namespace Waher.Things
 		}
 
 		/// <summary>
-		/// Optional device token, as defined in XEP-0324.
+		/// Optional device token.
 		/// </summary>
 		string DeviceToken
 		{
@@ -86,7 +86,7 @@ namespace Waher.Things
 		}
 
 		/// <summary>
-		/// Optional user token, as defined in XEP-0324.
+		/// Optional user token.
 		/// </summary>
 		string UserToken
 		{

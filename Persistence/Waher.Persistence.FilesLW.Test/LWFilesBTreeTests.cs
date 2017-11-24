@@ -658,7 +658,7 @@ namespace Waher.Persistence.FilesLW.Test
 			Simple Obj;
 			ulong Rank = 0;
 
-			using (ObjectBTreeFileEnumerator<Simple> e = this.file.GetTypedEnumerator<Simple>(false))
+			using (ObjectBTreeFileEnumerator<Simple> e = await this.file.GetTypedEnumeratorAsync<Simple>(false))
 			{
 				while (e.MoveNext())
 				{
@@ -685,7 +685,7 @@ namespace Waher.Persistence.FilesLW.Test
 			Simple Obj;
 			ulong Rank = 0;
 
-			using (ObjectBTreeFileEnumerator<Simple> e = this.file.GetTypedEnumerator<Simple>(true))
+			using (ObjectBTreeFileEnumerator<Simple> e = await this.file.GetTypedEnumeratorAsync<Simple>(true))
 			{
 				while (e.MoveNext())
 				{
@@ -711,7 +711,7 @@ namespace Waher.Persistence.FilesLW.Test
 			await this.CreateObjects(Math.Min(ObjectsToEnumerate, 1000));
 			Simple Obj;
 
-			using (ObjectBTreeFileEnumerator<Simple> e = this.file.GetTypedEnumerator<Simple>(true))
+			using (ObjectBTreeFileEnumerator<Simple> e = await this.file.GetTypedEnumeratorAsync<Simple>(true))
 			{
 				while (e.MoveNext())
 				{
@@ -730,7 +730,7 @@ namespace Waher.Persistence.FilesLW.Test
 			Simple Obj;
 			ulong Rank = ObjectsToEnumerate;
 
-			using (ObjectBTreeFileEnumerator<Simple> e = this.file.GetTypedEnumerator<Simple>(true))
+			using (ObjectBTreeFileEnumerator<Simple> e = await this.file.GetTypedEnumeratorAsync<Simple>(true))
 			{
 				while (e.MovePrevious())
 				{
@@ -783,7 +783,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 				if (i < 10 || (gen.Next(0, 2) == 0 && i <= c - 10))
 				{
-					using (ObjectBTreeFileEnumerator<Simple> e = this.file.GetTypedEnumerator<Simple>(true))
+					using (ObjectBTreeFileEnumerator<Simple> e = await this.file.GetTypedEnumeratorAsync<Simple>(true))
 					{
 						Assert.IsTrue(await e.GoToObject((uint)i));
 
@@ -804,7 +804,7 @@ namespace Waher.Persistence.FilesLW.Test
 				}
 				else
 				{
-					using (ObjectBTreeFileEnumerator<Simple> e = this.file.GetTypedEnumerator<Simple>(true))
+					using (ObjectBTreeFileEnumerator<Simple> e = await this.file.GetTypedEnumeratorAsync<Simple>(true))
 					{
 						Assert.IsTrue(await e.GoToObject((uint)i));
 
@@ -847,7 +847,7 @@ namespace Waher.Persistence.FilesLW.Test
 			Simple Obj;
 			ulong Rank = 0;
 
-			using (ObjectBTreeFileEnumerator<Simple> e = this.file.GetTypedEnumerator<Simple>(false))
+			using (ObjectBTreeFileEnumerator<Simple> e = await this.file.GetTypedEnumeratorAsync<Simple>(false))
 			{
 				while (e.MoveNext())
 				{

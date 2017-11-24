@@ -804,6 +804,24 @@ namespace Waher.Persistence.Files.Serialization
 		}
 
 		/// <summary>
+		/// Reads a string value.
+		/// </summary>
+		/// <param name="Reader">Binary reader.</param>
+		/// <param name="FieldDataType">Field data type.</param>
+		/// <returns>String value.</returns>
+		/// <exception cref="ArgumentException">If the <paramref name="FieldDataType"/> was invalid.</exception>
+		public static byte[] ReadByteArray(BinaryDeserializer Reader, uint FieldDataType)
+		{
+			switch (FieldDataType)
+			{
+				case ObjectSerializer.TYPE_BYTEARRAY: return Reader.ReadByteArray();
+				default:
+					throw new ArgumentException("Expected a byte array value, but was a " +
+						FilesProvider.GetFieldDataTypeName(FieldDataType) + ".", nameof(FieldDataType));
+			}
+		}
+
+		/// <summary>
 		/// Reads a typed array.
 		/// </summary>
 		/// <typeparam name="T">Element type.</typeparam>

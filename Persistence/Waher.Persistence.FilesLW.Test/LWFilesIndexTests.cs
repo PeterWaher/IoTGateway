@@ -192,7 +192,7 @@ namespace Waher.Persistence.FilesLW.Test
 			Simple Obj;
 			ulong Rank = 0;
 
-			using (IndexBTreeFileEnumerator<Simple> e = this.index1.GetTypedEnumerator<Simple>(false))
+			using (IndexBTreeFileEnumerator<Simple> e = await this.index1.GetTypedEnumerator<Simple>(false))
 			{
 				while (e.MoveNext())
 				{
@@ -214,7 +214,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 			Prev = null;
 			Rank = 0;
-			using (IndexBTreeFileEnumerator<Simple> e = this.index2.GetTypedEnumerator<Simple>(false))
+			using (IndexBTreeFileEnumerator<Simple> e = await this.index2.GetTypedEnumerator<Simple>(false))
 			{
 				while (e.MoveNext())
 				{
@@ -260,7 +260,7 @@ namespace Waher.Persistence.FilesLW.Test
 			Simple Obj;
 			ulong Rank = 0;
 
-			using (IndexBTreeFileEnumerator<Simple> e = this.index1.GetTypedEnumerator<Simple>(true))
+			using (IndexBTreeFileEnumerator<Simple> e = await this.index1.GetTypedEnumerator<Simple>(true))
 			{
 				while (e.MoveNext())
 				{
@@ -282,7 +282,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 			Prev = null;
 			Rank = 0;
-			using (IndexBTreeFileEnumerator<Simple> e = this.index2.GetTypedEnumerator<Simple>(true))
+			using (IndexBTreeFileEnumerator<Simple> e = await this.index2.GetTypedEnumerator<Simple>(true))
 			{
 				while (e.MoveNext())
 				{
@@ -308,7 +308,7 @@ namespace Waher.Persistence.FilesLW.Test
 			await this.CreateObjects(Math.Min(ObjectsToEnumerate, 1000));
 			Simple Obj;
 
-			using (IndexBTreeFileEnumerator<Simple> e = this.index1.GetTypedEnumerator<Simple>(true))
+			using (IndexBTreeFileEnumerator<Simple> e = await this.index1.GetTypedEnumerator<Simple>(true))
 			{
 				while (e.MoveNext())
 				{
@@ -328,7 +328,7 @@ namespace Waher.Persistence.FilesLW.Test
 			Simple Obj;
 			ulong Rank = ObjectsToEnumerate;
 
-			using (IndexBTreeFileEnumerator<Simple> e = this.index1.GetTypedEnumerator<Simple>(true))
+			using (IndexBTreeFileEnumerator<Simple> e = await this.index1.GetTypedEnumerator<Simple>(true))
 			{
 				while (e.MovePrevious())
 				{
@@ -349,7 +349,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 			Prev = null;
 			Rank = ObjectsToEnumerate;
-			using (IndexBTreeFileEnumerator<Simple> e = this.index2.GetTypedEnumerator<Simple>(true))
+			using (IndexBTreeFileEnumerator<Simple> e = await this.index2.GetTypedEnumerator<Simple>(true))
 			{
 				while (e.MovePrevious())
 				{
@@ -405,7 +405,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 				if (i < 10 || (gen.Next(0, 2) == 0 && i <= c - 10))
 				{
-					using (IndexBTreeFileEnumerator<Simple> e = this.index1.GetTypedEnumerator<Simple>(true))
+					using (IndexBTreeFileEnumerator<Simple> e = await this.index1.GetTypedEnumerator<Simple>(true))
 					{
 						Assert.IsTrue(await e.GoToObject((uint)i));
 
@@ -426,7 +426,7 @@ namespace Waher.Persistence.FilesLW.Test
 				}
 				else
 				{
-					using (IndexBTreeFileEnumerator<Simple> e = this.index1.GetTypedEnumerator<Simple>(true))
+					using (IndexBTreeFileEnumerator<Simple> e = await this.index1.GetTypedEnumerator<Simple>(true))
 					{
 						Assert.IsTrue(await e.GoToObject((uint)i));
 
@@ -480,7 +480,7 @@ namespace Waher.Persistence.FilesLW.Test
 			Simple Obj;
 			ulong Rank = 0;
 
-			using (IndexBTreeFileEnumerator<Simple> e = this.index1.GetTypedEnumerator<Simple>(false))
+			using (IndexBTreeFileEnumerator<Simple> e = await this.index1.GetTypedEnumerator<Simple>(false))
 			{
 				while (e.MoveNext())
 				{
@@ -571,7 +571,7 @@ namespace Waher.Persistence.FilesLW.Test
 				DBFilesObjectSerializationTests.AssertEqual(Objects[i], Obj);
 			}
 
-			using (IndexBTreeFileEnumerator<Simple> e = this.index1.GetTypedEnumerator<Simple>(true))
+			using (IndexBTreeFileEnumerator<Simple> e = await this.index1.GetTypedEnumerator<Simple>(true))
 			{
 				Obj = null;
 

@@ -237,6 +237,11 @@ namespace Waher.Script.Objects
 					return true;
 				}
 			}
+			else if (DesiredType.GetTypeInfo().IsAssignableFrom(typeof(double).GetTypeInfo()))
+			{
+				Value = this.value;
+				return true;
+			}
 			else if (DesiredType == typeof(DoubleNumber))
 			{
 				Value = this;

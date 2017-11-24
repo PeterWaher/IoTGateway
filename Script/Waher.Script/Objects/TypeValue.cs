@@ -96,7 +96,12 @@ namespace Waher.Script.Objects
                 Value = this.value;
                 return true;
             }
-            else if (TI.IsAssignableFrom(typeof(TypeValue).GetTypeInfo()))
+			else if (DesiredType.GetTypeInfo().IsAssignableFrom(typeof(Type).GetTypeInfo()))
+			{
+				Value = this.value;
+				return true;
+			}
+			else if (TI.IsAssignableFrom(typeof(TypeValue).GetTypeInfo()))
             {
                 Value = this;
                 return true;

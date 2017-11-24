@@ -163,13 +163,13 @@ namespace Waher.Script.Objects
                 Value = this.value;
                 return true;
             }
-			else if (DesiredType.GetTypeInfo().IsAssignableFrom(typeof(BooleanValue).GetTypeInfo()))
+			else if (DesiredType.GetTypeInfo().IsAssignableFrom(typeof(bool).GetTypeInfo()))
 			{
-				Value = this;
-                return true;
-            }
-            else
-            {
+				Value = this.value;
+				return true;
+			}
+			else
+			{
                 Value = null;
                 return false;
             }

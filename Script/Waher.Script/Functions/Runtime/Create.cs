@@ -287,7 +287,7 @@ namespace Waher.Script.Functions.Runtime
                         E = this.parameters[i].Evaluate(Variables);
                         TV = E as TypeValue;
                         if (TV == null)
-                            throw new ScriptRuntimeException("Generic type arguments must evaluate to types to be sed.", this);
+                            throw new ScriptRuntimeException("Generic type arguments must evaluate to types to be used.", this);
 
                         if (this.genericArguments[i] != TV.Value)
                         {
@@ -319,7 +319,7 @@ namespace Waher.Script.Functions.Runtime
                             E = this.parameters[i].Evaluate(Variables);
                             TV = E as TypeValue;
                             if (TV == null)
-                                throw new ScriptRuntimeException("Generic type arguments must evaluate to types to be sed.", this);
+                                throw new ScriptRuntimeException("Generic type arguments must evaluate to types to be used.", this);
 
                             this.genericArguments[i] = TV.Value;
                         }
@@ -381,7 +381,7 @@ namespace Waher.Script.Functions.Runtime
                         if (Parameters.Length != this.nrParameters - c)
                             continue;
 
-                        for (i = c; i < Parameters.Length; i++)
+                        for (i = 0; i < Parameters.Length; i++)
                         {
                             if (!Arguments[i].TryConvertTo(Parameters[i].ParameterType, out Value))
                                 break;

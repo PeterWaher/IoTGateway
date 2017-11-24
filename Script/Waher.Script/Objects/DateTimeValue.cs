@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Reflection;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Abstraction.Elements;
 
@@ -100,8 +99,13 @@ namespace Waher.Script.Objects
                 Value = this;
                 return true;
             }
-            else
-            {
+			else if (DesiredType.GetTypeInfo().IsAssignableFrom(typeof(DateTime).GetTypeInfo()))
+			{
+				Value = this.value;
+				return true;
+			}
+			else
+			{
                 Value = null;
                 return false;
             }

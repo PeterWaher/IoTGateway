@@ -266,7 +266,7 @@ namespace Waher.Persistence.Files
 		/// <returns>An enumerator that can be used to iterate through the collection.</returns>
 		public IEnumerator<object> GetEnumerator()
 		{
-			return new IndexBTreeFileEnumerator<object>(this, false, this.recordHandler, null);
+			return new IndexBTreeFileEnumerator<object>(this, this.recordHandler);
 		}
 
 		/// <summary>
@@ -277,7 +277,7 @@ namespace Waher.Persistence.Files
 		/// <returns>An enumerator that can be used to iterate through the collection.</returns>
 		IEnumerator IEnumerable.GetEnumerator()
 		{
-			return new IndexBTreeFileEnumerator<object>(this, false, this.recordHandler, null);
+			return new IndexBTreeFileEnumerator<object>(this, this.recordHandler);
 		}
 
 		/// <summary>
@@ -293,9 +293,13 @@ namespace Waher.Persistence.Files
 		/// the <see cref="IndexBTreeFileEnumerator{T}.Dispose"/> method when done with the enumerator, to release the database
 		/// after use.</param>
 		/// <returns>An enumerator that can be used to iterate through the collection.</returns>
-		public IndexBTreeFileEnumerator<T> GetTypedEnumerator<T>(bool Locked)
+		public async Task<IndexBTreeFileEnumerator<T>> GetTypedEnumerator<T>(bool Locked)
 		{
-			return new IndexBTreeFileEnumerator<T>(this, false, this.recordHandler, null);
+			IndexBTreeFileEnumerator<T> e = new IndexBTreeFileEnumerator<T>(this, this.recordHandler);
+			if (Locked)
+				await e.Lock();
+
+			return e;
 		}
 
 		/// <summary>
@@ -336,7 +340,7 @@ namespace Waher.Persistence.Files
 
 			await this.ClearAsync();
 
-			using (ObjectBTreeFileEnumerator<object> e = this.objectFile.GetTypedEnumerator<object>(true))
+			using (ObjectBTreeFileEnumerator<object> e = await this.objectFile.GetTypedEnumeratorAsync<object>(true))
 			{
 				while (e.MoveNext())
 				{
@@ -392,17 +396,17 @@ namespace Waher.Persistence.Files
 			byte[] Key = this.recordHandler.Serialize(Guid.Empty, Object, this.genericSerializer, MissingFieldAction.First);
 			if (Key.Length > this.indexFile.InlineObjectSizeLimit)
 				return null;
-			
+
 			IndexBTreeFileEnumerator<T> Result = null;
 
-			await this.indexFile.Lock();
 			try
 			{
-				BlockInfo Leaf = await this.indexFile.FindLeafNodeLocked(Key);
-				Result = new IndexBTreeFileEnumerator<T>(this, Locked, this.recordHandler, Leaf);
+				Result = new IndexBTreeFileEnumerator<T>(this, this.recordHandler);
+				if (Locked)
+					await Result.Lock();
 
-				if (!Locked)
-					await this.indexFile.Release();
+				BlockInfo Leaf = await this.indexFile.FindLeafNodeLocked(Key);
+				Result.SetStartingPoint(Leaf);
 			}
 			catch (Exception ex)
 			{
@@ -411,8 +415,6 @@ namespace Waher.Persistence.Files
 					Result.Dispose();
 					Result = null;
 				}
-				else
-					await this.indexFile.Release();
 
 				System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex).Throw();
 			}
@@ -467,14 +469,14 @@ namespace Waher.Persistence.Files
 
 			IndexBTreeFileEnumerator<T> Result = null;
 
-			await this.indexFile.Lock();
 			try
 			{
-				BlockInfo Leaf = await this.indexFile.FindLeafNodeLocked(Key);
-				Result = new IndexBTreeFileEnumerator<T>(this, Locked, this.recordHandler, Leaf);
+				Result = new IndexBTreeFileEnumerator<T>(this, this.recordHandler);
+				if (Locked)
+					await Result.Lock();
 
-				if (!Locked)
-					await this.indexFile.Release();
+				BlockInfo Leaf = await this.indexFile.FindLeafNodeLocked(Key);
+				Result.SetStartingPoint(Leaf);
 			}
 			catch (Exception ex)
 			{
@@ -483,8 +485,6 @@ namespace Waher.Persistence.Files
 					Result.Dispose();
 					Result = null;
 				}
-				else
-					await this.indexFile.Release();
 
 				System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex).Throw();
 			}
@@ -541,14 +541,14 @@ namespace Waher.Persistence.Files
 
 			IndexBTreeFileEnumerator<T> Result = null;
 
-			await this.indexFile.Lock();
 			try
 			{
-				BlockInfo Leaf = await this.indexFile.FindLeafNodeLocked(Key);
-				Result = new IndexBTreeFileEnumerator<T>(this, Locked, this.recordHandler, Leaf);
+				Result = new IndexBTreeFileEnumerator<T>(this, this.recordHandler);
+				if (Locked)
+					await Result.Lock();
 
-				if (!Locked)
-					await this.indexFile.Release();
+				BlockInfo Leaf = await this.indexFile.FindLeafNodeLocked(Key);
+				Result.SetStartingPoint(Leaf);
 			}
 			catch (Exception ex)
 			{
@@ -557,8 +557,6 @@ namespace Waher.Persistence.Files
 					Result.Dispose();
 					Result = null;
 				}
-				else
-					await this.indexFile.Release();
 
 				System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex).Throw();
 			}
@@ -613,14 +611,14 @@ namespace Waher.Persistence.Files
 
 			IndexBTreeFileEnumerator<T> Result = null;
 
-			await this.indexFile.Lock();
 			try
 			{
-				BlockInfo Leaf = await this.indexFile.FindLeafNodeLocked(Key);
-				Result = new IndexBTreeFileEnumerator<T>(this, Locked, this.recordHandler, Leaf);
+				Result = new IndexBTreeFileEnumerator<T>(this, this.recordHandler);
+				if (Locked)
+					await Result.Lock();
 
-				if (!Locked)
-					await this.indexFile.Release();
+				BlockInfo Leaf = await this.indexFile.FindLeafNodeLocked(Key);
+				Result.SetStartingPoint(Leaf);
 			}
 			catch (Exception ex)
 			{
@@ -629,8 +627,6 @@ namespace Waher.Persistence.Files
 					Result.Dispose();
 					Result = null;
 				}
-				else
-					await this.indexFile.Release();
 
 				System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex).Throw();
 			}

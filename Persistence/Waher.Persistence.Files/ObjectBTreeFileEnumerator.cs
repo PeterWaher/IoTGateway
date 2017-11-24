@@ -34,13 +34,12 @@ namespace Waher.Persistence.Files
 		private bool hasCurrent;
 		private bool currentTypeCompatible;
 
-		internal ObjectBTreeFileEnumerator(ObjectBTreeFile File, bool Locked, IRecordHandler RecordHandler, BlockInfo StartingPoint)
-			: this(File, Locked, RecordHandler, StartingPoint, null)
+		internal ObjectBTreeFileEnumerator(ObjectBTreeFile File, IRecordHandler RecordHandler)
+			: this(File, RecordHandler, null)
 		{
 		}
 
-		internal ObjectBTreeFileEnumerator(ObjectBTreeFile File, bool Locked, IRecordHandler RecordHandler, BlockInfo StartingPoint,
-			IObjectSerializer DefaultSerializer)
+		internal ObjectBTreeFileEnumerator(ObjectBTreeFile File, IRecordHandler RecordHandler, IObjectSerializer DefaultSerializer)
 		{
 			this.file = File;
 			this.currentBlockIndex = 0;
@@ -48,9 +47,9 @@ namespace Waher.Persistence.Files
 			this.currentReader = null;
 			this.currentHeader = null;
 			this.blockUpdateCounter = File.BlockUpdateCounter;
-			this.locked = Locked;
+			this.locked = false;
 			this.recordHandler = RecordHandler;
-			this.startingPoint = StartingPoint;
+			this.startingPoint = null;
 			this.defaultSerializer = DefaultSerializer;
 			this.timeoutMilliseconds = this.file.TimeoutMilliseconds;
 
@@ -58,6 +57,25 @@ namespace Waher.Persistence.Files
 
 			if (this.defaultSerializer == null && typeof(T) != typeof(object))
 				this.defaultSerializer = this.file.Provider.GetObjectSerializer(typeof(T));
+		}
+
+		internal void SetStartingPoint(BlockInfo StartingPoint)
+		{
+			this.startingPoint = StartingPoint;
+		}
+
+		/// <summary>
+		/// Locks the underlying file (if not locked).
+		/// </summary>
+		/// <returns></returns>
+		internal async Task Lock()
+		{
+			if (!this.locked)
+			{
+				await this.file.Lock();
+				this.locked = true;
+				this.blockUpdateCounter = this.file.BlockUpdateCounter;
+			}
 		}
 
 		/// <summary>
@@ -71,13 +89,15 @@ namespace Waher.Persistence.Files
 		/// <summary>
 		/// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
 		/// </summary>
-		public async Task DisposeAsync()
+		public Task DisposeAsync()
 		{
 			if (this.locked)
 			{
-				await this.file.Release();
 				this.locked = false;
+				return this.file.Release();
 			}
+			else
+				return Task.CompletedTask;
 		}
 
 		/// <summary>

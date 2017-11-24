@@ -1606,7 +1606,7 @@ namespace Waher.Persistence.Files
 					Output.StartCollection(File.CollectionName);
 					try
 					{
-						using (ObjectBTreeFileEnumerator<GenericObject> e = File.GetTypedEnumerator<GenericObject>(true))
+						using (ObjectBTreeFileEnumerator<GenericObject> e = await File.GetTypedEnumeratorAsync<GenericObject>(true))
 						{
 							GenericObject Obj;
 

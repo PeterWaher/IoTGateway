@@ -4651,23 +4651,23 @@ namespace Waher.Persistence.Files
         /// <summary>
         /// Returns an untyped enumerator that iterates through the collection.
         /// 
-        /// For a typed enumerator, call the <see cref="GetTypedEnumerator{T}(bool)"/> method.
+        /// For a typed enumerator, call the <see cref="GetTypedEnumeratorAsync{T}(bool)"/> method.
         /// </summary>
         /// <returns>An enumerator that can be used to iterate through the collection.</returns>
         public IEnumerator<object> GetEnumerator()
         {
-            return new ObjectBTreeFileEnumerator<object>(this, false, this.recordHandler, null);
+            return new ObjectBTreeFileEnumerator<object>(this, this.recordHandler, null);
         }
 
         /// <summary>
         /// Returns an untyped enumerator that iterates through the collection.
         /// 
-        /// For a typed enumerator, call the <see cref="GetTypedEnumerator{T}(bool)"/> method.
+        /// For a typed enumerator, call the <see cref="GetTypedEnumeratorAsync{T}(bool)"/> method.
         /// </summary>
         /// <returns>An enumerator that can be used to iterate through the collection.</returns>
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return new ObjectBTreeFileEnumerator<object>(this, false, this.recordHandler, null);
+            return new ObjectBTreeFileEnumerator<object>(this, this.recordHandler, null);
         }
 
         /// <summary>
@@ -4683,9 +4683,13 @@ namespace Waher.Persistence.Files
         /// the <see cref="ObjectBTreeFileEnumerator{T}.Dispose"/> method when done with the enumerator, to release the database
         /// after use.</param>
         /// <returns>An enumerator that can be used to iterate through the collection.</returns>
-        public ObjectBTreeFileEnumerator<T> GetTypedEnumerator<T>(bool Locked)
+        public async Task<ObjectBTreeFileEnumerator<T>> GetTypedEnumeratorAsync<T>(bool Locked)
         {
-            return new ObjectBTreeFileEnumerator<T>(this, false, this.recordHandler, null);
+            ObjectBTreeFileEnumerator<T> e = new ObjectBTreeFileEnumerator<T>(this, this.recordHandler, null);
+			if (Locked)
+				await e.Lock();
+
+			return e;
         }
 
         /// <summary>
@@ -4859,17 +4863,18 @@ namespace Waher.Persistence.Files
 
 						if (Index != null)
 						{
+							
 							if (Index.SameSortOrder(null, SortOrder))
-								Result = Index.GetTypedEnumerator<T>(Locked);
+								Result = await Index.GetTypedEnumerator<T>(Locked);
 							else if (Index.ReverseSortOrder(null, SortOrder))
-								Result = new Searching.ReversedCursor<T>(Index.GetTypedEnumerator<T>(Locked), this.timeoutMilliseconds);
+								Result = new Searching.ReversedCursor<T>(await Index.GetTypedEnumerator<T>(Locked), this.timeoutMilliseconds);
 						}
 					}
 
 					if (Result == null)
 					{
 						this.nrFullFileScans++;
-						Result = this.GetTypedEnumerator<T>(Locked);
+						Result = await this.GetTypedEnumeratorAsync<T>(Locked);
 
 						if (SortOrder != null && SortOrder.Length > 0)
 							Result = await this.Sort<T>(Result, this.ConvertFilter(Filter)?.ConstantFields, SortOrder);
@@ -5016,7 +5021,7 @@ namespace Waher.Persistence.Files
 					{
 						this.nrFullFileScans++;
 						Log.Notice("Search resulted in entire file to be scanned. Consider either adding indices, or enumerate objects using an object enumerator.", this.fileName, string.Empty, "DBOpt");
-						return new Searching.FilteredCursor<T>(this.GetTypedEnumerator<T>(Locked), this.ConvertFilter(Filter), false, true, this.timeoutMilliseconds, this.provider);
+						return new Searching.FilteredCursor<T>(await this.GetTypedEnumeratorAsync<T>(Locked), this.ConvertFilter(Filter), false, true, this.timeoutMilliseconds, this.provider);
 					}
 
                     Searching.RangeInfo[] RangeInfo = new Searching.RangeInfo[NrFields];
@@ -5150,7 +5155,7 @@ namespace Waher.Persistence.Files
                     {
                         this.nrFullFileScans++;
                         Log.Notice("Search resulted in entire file to be scanned. Consider either adding indices, or enumerate objects using an object enumerator.", this.fileName, string.Empty, "DBOpt");
-                        return new Searching.FilteredCursor<T>(this.GetTypedEnumerator<T>(Locked), this.ConvertFilter(Filter), false, true, this.timeoutMilliseconds, this.provider);
+                        return new Searching.FilteredCursor<T>(await this.GetTypedEnumeratorAsync<T>(Locked), this.ConvertFilter(Filter), false, true, this.timeoutMilliseconds, this.provider);
                     }
                     else
                         return new Searching.UnionCursor<T>(ChildFilters, this, Locked);
@@ -5168,7 +5173,7 @@ namespace Waher.Persistence.Files
                     {
                         this.nrFullFileScans++;
                         Log.Notice("Search resulted in entire file to be scanned. Consider either adding indices, or enumerate objects using an object enumerator.", this.fileName, string.Empty, "DBOpt");
-                        return new Searching.FilteredCursor<T>(this.GetTypedEnumerator<T>(Locked), this.ConvertFilter(Filter), false, true, this.timeoutMilliseconds, this.provider);
+                        return new Searching.FilteredCursor<T>(await this.GetTypedEnumeratorAsync<T>(Locked), this.ConvertFilter(Filter), false, true, this.timeoutMilliseconds, this.provider);
                     }
                     else
                         return await this.ConvertFilterToCursor<T>(NegatedFilter, Locked, SortOrder);
@@ -5215,7 +5220,7 @@ namespace Waher.Persistence.Files
 
                     this.nrFullFileScans++;
                     Log.Notice("Search resulted in entire file to be scanned. Consider either adding indices, or enumerate objects using an object enumerator.", this.fileName, string.Empty, "DBOpt");
-                    return new Searching.FilteredCursor<T>(this.GetTypedEnumerator<T>(Locked), this.ConvertFilter(Filter), false, true, this.timeoutMilliseconds, this.provider);
+                    return new Searching.FilteredCursor<T>(await this.GetTypedEnumeratorAsync<T>(Locked), this.ConvertFilter(Filter), false, true, this.timeoutMilliseconds, this.provider);
                 }
 
                 if (Filter is FilterFieldEqualTo)
@@ -5233,7 +5238,7 @@ namespace Waher.Persistence.Files
                 {
                     this.nrFullFileScans++;
                     Log.Notice("Search resulted in entire file to be scanned. Consider either adding indices, or enumerate objects using an object enumerator.", this.fileName, string.Empty, "DBOpt");
-                    return new Searching.FilteredCursor<T>(this.GetTypedEnumerator<T>(Locked), this.ConvertFilter(Filter), false, true, this.timeoutMilliseconds, this.provider);
+                    return new Searching.FilteredCursor<T>(await this.GetTypedEnumeratorAsync<T>(Locked), this.ConvertFilter(Filter), false, true, this.timeoutMilliseconds, this.provider);
                 }
                 else if (Filter is FilterFieldGreaterOrEqualTo)
                 {
@@ -5275,7 +5280,7 @@ namespace Waher.Persistence.Files
                     {
                         this.nrFullFileScans++;
                         Log.Notice("Search resulted in entire file to be scanned. Consider either adding indices, or enumerate objects using an object enumerator.", this.fileName, string.Empty, "DBOpt");
-                        return new Searching.FilteredCursor<T>(this.GetTypedEnumerator<T>(Locked), FilterFieldLikeRegEx2, false, true, this.timeoutMilliseconds, this.provider);
+                        return new Searching.FilteredCursor<T>(await this.GetTypedEnumeratorAsync<T>(Locked), FilterFieldLikeRegEx2, false, true, this.timeoutMilliseconds, this.provider);
                     }
                     else
                     {

@@ -27,10 +27,10 @@ namespace Waher.Persistence.Files
 		private bool hasCurrent;
 		private bool currentTypeCompatible;
 
-		internal IndexBTreeFileEnumerator(IndexBTreeFile File, bool Locked, IndexRecords RecordHandler, BlockInfo StartingPoint)
+		internal IndexBTreeFileEnumerator(IndexBTreeFile File, IndexRecords RecordHandler)
 		{
 			this.file = File;
-			this.locked = Locked;
+			this.locked = false;
 			this.recordHandler = RecordHandler;
 			this.provider = this.file.ObjectFile.Provider;
 			this.hasCurrent = false;
@@ -39,7 +39,25 @@ namespace Waher.Persistence.Files
 			this.currentSerializer = null;
 			this.timeoutMilliseconds = File.IndexFile.TimeoutMilliseconds;
 
-			this.e = new ObjectBTreeFileEnumerator<object>(this.file.IndexFile, Locked, RecordHandler, StartingPoint);
+			this.e = new ObjectBTreeFileEnumerator<object>(this.file.IndexFile, RecordHandler);
+		}
+
+		internal void SetStartingPoint(BlockInfo StartingPoint)
+		{
+			this.e.SetStartingPoint(StartingPoint);
+		}
+
+		/// <summary>
+		/// Locks the underlying file (if not locked).
+		/// </summary>
+		/// <returns></returns>
+		internal async Task Lock()
+		{
+			if (!this.locked)
+			{
+				await this.e.Lock();
+				this.locked = true;
+			}
 		}
 
 		/// <summary>
@@ -55,11 +73,9 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		public async Task DisposeAsync()
 		{
-			if (this.locked)
-			{
-				await this.file.IndexFile.Release();
-				this.locked = false;
-			}
+			await this.e.DisposeAsync();
+			this.e = null;
+			this.locked = false;
 		}
 
 		/// <summary>

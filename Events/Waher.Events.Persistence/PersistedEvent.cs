@@ -122,6 +122,30 @@ namespace Waher.Events.Persistence
 		}
 
 		/// <summary>
+		/// First row of <see cref="Message"/>.
+		/// </summary>
+		[IgnoreMember]
+		public string MessageFirstRow
+		{
+			get
+			{
+				string s = this.message.Trim();
+				int i = this.message.IndexOf('\n');
+				int j = this.message.IndexOf('\r');
+
+				if (i < 0)
+					i = j;
+				else if (j >= 0 && j < i)
+					i = j;
+
+				if (i < 0)
+					return this.message;
+				else
+					return this.message.Substring(0, i).TrimEnd();
+			}
+		}
+
+		/// <summary>
 		/// Object related to the event.
 		/// </summary>
 		[DefaultValueStringEmpty]

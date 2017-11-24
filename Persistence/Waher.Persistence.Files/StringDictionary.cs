@@ -454,14 +454,11 @@ namespace Waher.Persistence.Files
 		{
 			ObjectBTreeFileEnumerator<KeyValuePair<string, object>> Result = null;
 
-			await this.dictionaryFile.Lock();
 			try
 			{
-				Result = new ObjectBTreeFileEnumerator<KeyValuePair<string, object>>(this.dictionaryFile, Locked, this.recordHandler, null,
-					this.keyValueSerializer);
-
-				if (!Locked)
-					await this.dictionaryFile.Release();
+				Result = new ObjectBTreeFileEnumerator<KeyValuePair<string, object>>(this.dictionaryFile, this.recordHandler, this.keyValueSerializer);
+				if (Locked)
+					await Result.Lock();
 			}
 			catch (Exception ex)
 			{
@@ -470,8 +467,6 @@ namespace Waher.Persistence.Files
 					Result.Dispose();
 					Result = null;
 				}
-				else
-					await this.dictionaryFile.Release();
 
 				System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex).Throw();
 			}

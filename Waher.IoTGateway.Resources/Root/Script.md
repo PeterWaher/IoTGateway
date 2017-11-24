@@ -1090,6 +1090,10 @@ If the type is generic, type parameters must also be passed:
 
 	L:=Create(System.Collections.Generic.List,System.String)
 
+If a generic type requires parameters in the constructor, these are passed after the type arguments:
+
+	Pair:=Create(System.Collections.Generic.KeyValuePair,System.String,System.Object,"A",3)
+
 ### Calling methods or accessing fields or properties on .NET objects
 
 You can call methods and access fields and properties on an object, using the member operator `.`:

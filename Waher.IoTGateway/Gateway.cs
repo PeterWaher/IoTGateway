@@ -141,7 +141,6 @@ namespace Waher.IoTGateway
 
 				appDataFolder += "IoT Gateway" + Path.DirectorySeparatorChar;
 
-				Log.Register(new PersistedEventLog(7, new TimeSpan(4, 15, 0)));
 				Log.Register(new XmlFileEventSink("XML File Event Sink",
 					appDataFolder + "Events" + Path.DirectorySeparatorChar + "Event Log %YEAR%-%MONTH%-%DAY%T%HOUR%.xml",
 					appDataFolder + "Transforms" + Path.DirectorySeparatorChar + "EventXmlToHtml.xslt", 7));
@@ -189,6 +188,10 @@ namespace Waher.IoTGateway
 					int.Parse(DatabaseConfig.Attributes["timeoutMs"].Value),
 					Encrypted, false);
 				Database.Register(databaseProvider);
+
+				PersistedEventLog PersistedEventLog = new PersistedEventLog(7, new TimeSpan(4, 15, 0));
+				Log.Register(PersistedEventLog);
+				PersistedEventLog.Queue(new Event(EventType.Informational, "Server starting up.", string.Empty, string.Empty, string.Empty, EventLevel.Minor, string.Empty, string.Empty, string.Empty));
 
 				xmppConfigFileName = Config.DocumentElement["XmppClient"].Attributes["configFileName"].Value;
 				if (!File.Exists(xmppConfigFileName))

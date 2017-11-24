@@ -200,7 +200,7 @@ namespace Waher.Events.Persistence
 		}
 
 		/// <summary>
-		/// Gets events relating to a specific actor between two timepoints, ordered by descending timestamp.
+		/// Gets events relating to a specific event identity between two timepoints, ordered by descending timestamp.
 		/// </summary>
 		/// <param name="Offset">Offset into result set.</param>
 		/// <param name="MaxCount">Maximum number of events to return.</param>
@@ -212,6 +212,23 @@ namespace Waher.Events.Persistence
 		{
 			return Database.Find<PersistedEvent>(Offset, MaxCount, new FilterAnd(
 				new FilterFieldGreaterOrEqualTo("EventId", EventId),
+				new FilterFieldGreaterOrEqualTo("Timestamp", From),
+				new FilterFieldLesserOrEqualTo("Timestamp", To)), "-Timestamp");
+		}
+
+		/// <summary>
+		/// Gets events relating to a specific facility between two timepoints, ordered by descending timestamp.
+		/// </summary>
+		/// <param name="Offset">Offset into result set.</param>
+		/// <param name="MaxCount">Maximum number of events to return.</param>
+		/// <param name="Facility">Facility identity.</param>
+		/// <param name="From">Return events greater than or equal to this timestamp.</param>
+		/// <param name="To">Return events lesser than or equal to this timestamp.</param>
+		/// <returns></returns>
+		public Task<IEnumerable<PersistedEvent>> GetEventsOfFacility(int Offset, int MaxCount, string Facility, DateTime From, DateTime To)
+		{
+			return Database.Find<PersistedEvent>(Offset, MaxCount, new FilterAnd(
+				new FilterFieldGreaterOrEqualTo("Facility", Facility),
 				new FilterFieldGreaterOrEqualTo("Timestamp", From),
 				new FilterFieldLesserOrEqualTo("Timestamp", To)), "-Timestamp");
 		}

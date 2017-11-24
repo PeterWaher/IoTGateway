@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using Waher.Persistence.Attributes;
 
-namespace Waher.Events
+namespace Waher.Events.Persistence
 {
 	/// <summary>
 	/// Class representing a persisted tag.
 	/// </summary>
+	[TypeName(TypeNameSerialization.None)]
 	public class PersistedTag
 	{
 		private string name = string.Empty;

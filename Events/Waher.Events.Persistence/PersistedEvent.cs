@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Waher.Persistence.Attributes;
 
-namespace Waher.Events
+namespace Waher.Events.Persistence
 {
 	/// <summary>
 	/// Class representing a persisted event.

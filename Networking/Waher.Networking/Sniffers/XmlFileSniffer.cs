@@ -196,14 +196,42 @@ namespace Waher.Networking.Sniffers
 
 			try
 			{
-				this.file = File.CreateText(s);
+				string s2 = s;
+				int i = 1;
+				int j;
+
+				while (i < 65536)
+				{
+					try
+					{
+						this.file = File.CreateText(s);
+						break;
+					}
+					catch (IOException)
+					{
+						j = s2.LastIndexOf('.');
+						if (j < 0)
+							break;
+
+						i++;
+
+						s = s2.Insert(j, " (" + i.ToString() + ")");
+					}
+				}
+
+				if (this.file == null)
+				{
+					Log.Error("Unable to create file.", s2);
+					this.output = null;
+					return;
+				}
+
 				this.lastFileName = s;
 				this.output = XmlWriter.Create(this.file, this.settings);
 			}
 			catch (Exception ex)
 			{
 				Log.Critical(ex);
-				this.file = null;
 				this.output = null;
 				return;
 			}

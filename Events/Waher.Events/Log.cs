@@ -136,7 +136,7 @@ namespace Waher.Events
 
 			foreach (IEventSink EventSink in staticSinks)
 			{
-				if (!Event.Avoid(EventSink))
+				if (!Event.ShoudAvoid(EventSink))
 				{
 					try
 					{
@@ -162,7 +162,8 @@ namespace Waher.Events
 							hasReportedErrors = true;
 						}
 
-						Event Event2 = new Event(EventType.Critical, ex, EventSink.ObjectID, string.Empty, string.Empty, EventLevel.Minor, string.Empty);
+						Event Event2 = new Event(DateTime.Now, EventType.Critical, ex.Message, EventSink.ObjectID, string.Empty, string.Empty, 
+							EventLevel.Major, string.Empty, ex.Source, ex.StackTrace);
 
 						if (Event.ToAvoid != null)
 						{

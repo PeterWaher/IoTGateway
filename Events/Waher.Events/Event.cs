@@ -205,9 +205,23 @@ namespace Waher.Events
 		/// </summary>
 		/// <param name="EventSink">Event sink</param>
 		/// <returns>If the event sink should be avoided.</returns>
-		public bool Avoid(IEventSink EventSink)
+		public bool ShoudAvoid(IEventSink EventSink)
 		{
 			return (this.toAvoid != null && this.toAvoid.Contains(EventSink));
+		}
+
+		/// <summary>
+		/// If the event sink <paramref name="EventSink"/> should be avoided when logging the event.
+		/// </summary>
+		/// <param name="EventSink">Event sink</param>
+		/// <returns>If the event sink should be avoided.</returns>
+		public void Avoid(IEventSink EventSink)
+		{
+			if (this.toAvoid == null)
+				this.toAvoid = new LinkedList<IEventSink>();
+
+			if (this.toAvoid.Contains(EventSink))
+				this.toAvoid.AddLast(EventSink);
 		}
 
 		/// <summary>

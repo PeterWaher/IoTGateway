@@ -45,6 +45,7 @@
     <ProjectReference Include="..\Content\Waher.Content.Xsl\Waher.Content.Xsl.csproj" />
     <ProjectReference Include="..\Content\Waher.Content\Waher.Content.csproj" />
     <ProjectReference Include="..\Events\Waher.Events.Files\Waher.Events.Files.csproj" />
+    <ProjectReference Include="..\Events\Waher.Events.Persistence\Waher.Events.Persistence.csproj" />
     <ProjectReference Include="..\Events\Waher.Events.XMPP\Waher.Events.XMPP.csproj" />
     <ProjectReference Include="..\Events\Waher.Events\Waher.Events.csproj" />
     <ProjectReference Include="..\Mocks\Waher.Mock\Waher.Mock.csproj" />

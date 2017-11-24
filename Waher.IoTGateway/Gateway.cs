@@ -18,6 +18,7 @@ using Waher.Content.Xml;
 using Waher.Content.Xsl;
 using Waher.Events;
 using Waher.Events.Files;
+using Waher.Events.Persistence;
 using Waher.Events.XMPP;
 using Waher.Mock;
 using Waher.Networking.CoAP;
@@ -140,6 +141,7 @@ namespace Waher.IoTGateway
 
 				appDataFolder += "IoT Gateway" + Path.DirectorySeparatorChar;
 
+				Log.Register(new PersistedEventLog(7, new TimeSpan(4, 15, 0)));
 				Log.Register(new XmlFileEventSink("XML File Event Sink",
 					appDataFolder + "Events" + Path.DirectorySeparatorChar + "Event Log %YEAR%-%MONTH%-%DAY%T%HOUR%.xml",
 					appDataFolder + "Transforms" + Path.DirectorySeparatorChar + "EventXmlToHtml.xslt", 7));

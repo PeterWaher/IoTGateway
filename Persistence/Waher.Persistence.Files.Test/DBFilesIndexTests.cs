@@ -302,7 +302,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(AggregateException))]
+		[ExpectedException(typeof(TimeoutException))]
 		public async Task DBFiles_Index_Test_04_UnlockedChangeEnumeration()
 		{
 			await this.CreateObjects(Math.Min(ObjectsToEnumerate, 1000));

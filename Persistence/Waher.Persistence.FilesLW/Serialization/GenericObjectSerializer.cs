@@ -446,71 +446,78 @@ namespace Waher.Persistence.Files.Serialization
 		/// <param name="Value">The actual object to serialize.</param>
 		public void Serialize(BinarySerializer Writer, bool WriteTypeCode, bool Embedded, object Value)
 		{
-			GenericObject TypedValue = (GenericObject)Value;
-			BinarySerializer WriterBak = Writer;
-			IObjectSerializer Serializer;
-			object Obj;
-
-			if (!Embedded)
-				Writer = new BinarySerializer(Writer.CollectionName, Writer.Encoding, true);
-
-			if (WriteTypeCode)
+			if (Value is GenericObject TypedValue)
 			{
-				if (TypedValue == null)
+				BinarySerializer WriterBak = Writer;
+				IObjectSerializer Serializer;
+				object Obj;
+
+				if (!Embedded)
+					Writer = new BinarySerializer(Writer.CollectionName, Writer.Encoding, true);
+
+				if (WriteTypeCode)
 				{
-					Writer.WriteBits(ObjectSerializer.TYPE_NULL, 6);
-					return;
+					if (TypedValue == null)
+					{
+						Writer.WriteBits(ObjectSerializer.TYPE_NULL, 6);
+						return;
+					}
+					else
+						Writer.WriteBits(ObjectSerializer.TYPE_OBJECT, 6);
 				}
+				else if (TypedValue == null)
+					throw new NullReferenceException("Value cannot be null.");
+
+				if (string.IsNullOrEmpty(TypedValue.TypeName))
+					Writer.WriteVariableLengthUInt64(0);
 				else
-					Writer.WriteBits(ObjectSerializer.TYPE_OBJECT, 6);
-			}
-			else if (TypedValue == null)
-				throw new NullReferenceException("Value cannot be null.");
+					Writer.WriteVariableLengthUInt64(this.provider.GetFieldCode(TypedValue.CollectionName, TypedValue.TypeName));
 
-			if (string.IsNullOrEmpty(TypedValue.TypeName))
-				Writer.WriteVariableLengthUInt64(0);
-			else
-				Writer.WriteVariableLengthUInt64(this.provider.GetFieldCode(TypedValue.CollectionName, TypedValue.TypeName));
+				if (Embedded)
+					Writer.WriteVariableLengthUInt64(this.provider.GetFieldCode(null, string.IsNullOrEmpty(TypedValue.CollectionName) ? this.provider.DefaultCollectionName : TypedValue.CollectionName));
 
-			if (Embedded)
-				Writer.WriteVariableLengthUInt64(this.provider.GetFieldCode(null, string.IsNullOrEmpty(TypedValue.CollectionName) ? this.provider.DefaultCollectionName : TypedValue.CollectionName));
-
-			foreach (KeyValuePair<string, object> Property in TypedValue)
-			{
-				Writer.WriteVariableLengthUInt64(this.provider.GetFieldCode(TypedValue.CollectionName, Property.Key));
-
-				Obj = Property.Value;
-				if (Obj == null)
-					Writer.WriteBits(ObjectSerializer.TYPE_NULL, 6);
-				else
+				foreach (KeyValuePair<string, object> Property in TypedValue)
 				{
-					if (Obj is GenericObject)
-						this.Serialize(Writer, true, true, Obj);
+					Writer.WriteVariableLengthUInt64(this.provider.GetFieldCode(TypedValue.CollectionName, Property.Key));
+
+					Obj = Property.Value;
+					if (Obj == null)
+						Writer.WriteBits(ObjectSerializer.TYPE_NULL, 6);
 					else
 					{
-						Serializer = this.provider.GetObjectSerializer(Obj.GetType());
-						Serializer.Serialize(Writer, true, true, Obj);
+						if (Obj is GenericObject)
+							this.Serialize(Writer, true, true, Obj);
+						else
+						{
+							Serializer = this.provider.GetObjectSerializer(Obj.GetType());
+							Serializer.Serialize(Writer, true, true, Obj);
+						}
 					}
 				}
-			}
 
-			Writer.WriteVariableLengthUInt64(0);
+				Writer.WriteVariableLengthUInt64(0);
 
-			if (!Embedded)
-			{
-				if (!TypedValue.ObjectId.Equals(Guid.Empty))
-					WriterBak.Write(TypedValue.ObjectId);
-				else
+				if (!Embedded)
 				{
-					Guid NewObjectId = ObjectBTreeFile.CreateDatabaseGUID();
-					WriterBak.Write(NewObjectId);
-					TypedValue.ObjectId = NewObjectId;
+					if (!TypedValue.ObjectId.Equals(Guid.Empty))
+						WriterBak.Write(TypedValue.ObjectId);
+					else
+					{
+						Guid NewObjectId = ObjectBTreeFile.CreateDatabaseGUID();
+						WriterBak.Write(NewObjectId);
+						TypedValue.ObjectId = NewObjectId;
+					}
+
+					byte[] Bin = Writer.GetSerialization();
+
+					WriterBak.WriteVariableLengthUInt64((ulong)Bin.Length);
+					WriterBak.WriteRaw(Bin);
 				}
-
-				byte[] Bin = Writer.GetSerialization();
-
-				WriterBak.WriteVariableLengthUInt64((ulong)Bin.Length);
-				WriterBak.WriteRaw(Bin);
+			}
+			else
+			{
+				IObjectSerializer Serializer = this.provider.GetObjectSerializer(Value.GetType());
+				Serializer.Serialize(Writer, WriteTypeCode, Embedded, Value);
 			}
 		}
 

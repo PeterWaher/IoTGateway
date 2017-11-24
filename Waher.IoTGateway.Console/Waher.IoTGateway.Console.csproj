@@ -38,6 +38,7 @@
     <ProjectReference Include="..\Content\Waher.Content.Xsl\Waher.Content.Xsl.csproj" />
     <ProjectReference Include="..\Content\Waher.Content\Waher.Content.csproj" />
     <ProjectReference Include="..\Events\Waher.Events.Console\Waher.Events.Console.csproj" />
+    <ProjectReference Include="..\Events\Waher.Events.Persistence\Waher.Events.Persistence.csproj" />
     <ProjectReference Include="..\Events\Waher.Events\Waher.Events.csproj" />
     <ProjectReference Include="..\Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj" />
     <ProjectReference Include="..\Script\Waher.Script.Persistence\Waher.Script.Persistence.csproj" />

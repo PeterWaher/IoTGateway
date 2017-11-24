@@ -10,7 +10,6 @@ namespace Waher.Events
 	[CollectionName("EventLog")]
 	[TypeName(TypeNameSerialization.None)]
 	[Index("Timestamp")]
-	[Index("Type", "Timestamp")]
 	[Index("Object", "Timestamp")]
 	[Index("Actor", "Timestamp")]
 	[Index("EventId", "Timestamp")]
@@ -28,7 +27,7 @@ namespace Waher.Events
 		private string module = string.Empty;
 		private string facility = string.Empty;
 		private string stackTrace = string.Empty;
-		private KeyValuePair<string, object>[] tags = null;
+		private PersistedTag[] tags = null;
 
 		/// <summary>
 		/// Class representing a persisted event.
@@ -57,7 +56,20 @@ namespace Waher.Events
 			if (Event.Tags == null)
 				this.tags = null;
 			else
-				this.tags = (KeyValuePair<string, object>[])Event.Tags.Clone();
+			{
+				int i, c = Event.Tags.Length;
+
+				this.tags = new PersistedTag[c];
+
+				for (i = 0; i < c; i++)
+				{
+					this.tags[i] = new PersistedTag()
+					{
+						Name = Event.Tags[i].Key,
+						Value = Event.Tags[i].Value
+					};
+				}
+			}
 		}
 
 		/// <summary>
@@ -173,7 +185,7 @@ namespace Waher.Events
 		/// Variable set of tags providing event-specific information.
 		/// </summary>
 		[DefaultValueNull]
-		public KeyValuePair<string, object>[] Tags
+		public PersistedTag[] Tags
 		{
 			get { return this.tags; }
 			set { this.tags = value; }

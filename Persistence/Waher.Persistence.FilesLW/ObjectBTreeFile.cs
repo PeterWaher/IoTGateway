@@ -4887,7 +4887,7 @@ namespace Waher.Persistence.Files
 					Result = await this.ConvertFilterToCursor<T>(Filter.Normalize(), Locked, SortOrder);
 
 					if (SortOrder != null && SortOrder.Length > 0)
-						Result = await this.Sort<T>(Result, this.ConvertFilter(Filter)?.ConstantFields, SortOrder, false);
+						Result = await this.Sort<T>(Result, this.ConvertFilter(Filter)?.ConstantFields, SortOrder, true);	// false);
 
 					if (Offset > 0 || MaxCount < int.MaxValue)
 						Result = new Searching.PagesCursor<T>(Offset, MaxCount, Result, this.timeoutMilliseconds);
@@ -5242,37 +5242,67 @@ namespace Waher.Persistence.Files
 				else
 				{
 					Searching.IApplicableFilter Filter2 = this.ConvertFilter(Filter);
-
-					if (SortOrder != null && SortOrder.Length > 0 && Index.ReverseSortOrder(Filter2.ConstantFields, SortOrder))
-					{
-						return new Searching.FilteredCursor<T>(
-							await Index.GetTypedEnumerator<T>(Locked),
-							Filter2, true, false, this.timeoutMilliseconds, this.provider);
-					}
+					bool IsSorted = (SortOrder != null && SortOrder.Length > 0);
 
 					if (Filter is FilterFieldGreaterOrEqualTo)
 					{
-						return new Searching.FilteredCursor<T>(
-							await Index.FindFirstGreaterOrEqualTo<T>(Locked, new KeyValuePair<string, object>(FilterFieldValue.FieldName, Value)),
-							null, false, true, this.timeoutMilliseconds, this.provider);
+						if (IsSorted && Index.ReverseSortOrder(Filter2.ConstantFields, SortOrder))
+						{
+							return new Searching.FilteredCursor<T>(
+								await Index.GetTypedEnumerator<T>(Locked),
+								Filter2, true, false, this.timeoutMilliseconds, this.provider);
+						}
+						else
+						{
+							return new Searching.FilteredCursor<T>(
+								await Index.FindFirstGreaterOrEqualTo<T>(Locked, new KeyValuePair<string, object>(FilterFieldValue.FieldName, Value)),
+								null, false, true, this.timeoutMilliseconds, this.provider);
+						}
 					}
 					else if (Filter is FilterFieldLesserOrEqualTo)
 					{
-						return new Searching.FilteredCursor<T>(
-							await Index.FindLastLesserOrEqualTo<T>(Locked, new KeyValuePair<string, object>(FilterFieldValue.FieldName, Value)),
-							null, false, false, this.timeoutMilliseconds, this.provider);
+						if (IsSorted && Index.SameSortOrder(Filter2.ConstantFields, SortOrder))
+						{
+							return new Searching.FilteredCursor<T>(
+								await Index.GetTypedEnumerator<T>(Locked),
+								Filter2, true, true, this.timeoutMilliseconds, this.provider);
+						}
+						else
+						{
+							return new Searching.FilteredCursor<T>(
+								await Index.FindLastLesserOrEqualTo<T>(Locked, new KeyValuePair<string, object>(FilterFieldValue.FieldName, Value)),
+								null, false, false, this.timeoutMilliseconds, this.provider);
+						}
 					}
 					else if (Filter is FilterFieldGreaterThan)
 					{
-						return new Searching.FilteredCursor<T>(
-							await Index.FindFirstGreaterThan<T>(Locked, new KeyValuePair<string, object>(FilterFieldValue.FieldName, Value)),
-							null, false, true, this.timeoutMilliseconds, this.provider);
+						if (IsSorted && Index.ReverseSortOrder(Filter2.ConstantFields, SortOrder))
+						{
+							return new Searching.FilteredCursor<T>(
+								await Index.GetTypedEnumerator<T>(Locked),
+								Filter2, true, false, this.timeoutMilliseconds, this.provider);
+						}
+						else
+						{
+							return new Searching.FilteredCursor<T>(
+								await Index.FindFirstGreaterThan<T>(Locked, new KeyValuePair<string, object>(FilterFieldValue.FieldName, Value)),
+								null, false, true, this.timeoutMilliseconds, this.provider);
+						}
 					}
 					else if (Filter is FilterFieldLesserThan)
 					{
-						return new Searching.FilteredCursor<T>(
+						if (IsSorted && Index.SameSortOrder(Filter2.ConstantFields, SortOrder))
+						{
+							return new Searching.FilteredCursor<T>(
+								await Index.GetTypedEnumerator<T>(Locked),
+								Filter2, true, true, this.timeoutMilliseconds, this.provider);
+						}
+						else
+						{
+							return new Searching.FilteredCursor<T>(
 							await Index.FindLastLesserThan<T>(Locked, new KeyValuePair<string, object>(FilterFieldValue.FieldName, Value)),
 							null, false, false, this.timeoutMilliseconds, this.provider);
+						}
 					}
 					else
 						throw this.UnknownFilterType(Filter);

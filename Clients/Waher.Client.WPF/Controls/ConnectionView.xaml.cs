@@ -21,6 +21,7 @@ using Waher.Networking;
 using Waher.Client.WPF.Model;
 using Waher.Client.WPF.Dialogs;
 using Waher.Client.WPF.Controls.Sniffers;
+using Waher.Things.DisplayableParameters;
 
 namespace Waher.Client.WPF.Controls
 {
@@ -75,15 +76,54 @@ namespace Waher.Client.WPF.Controls
 		{
 			this.ConnectionListView.Items.Clear();
 
+			GridView GridView;
+
+			if ((GridView = this.ConnectionListView.View as GridView) != null)
+			{
+				while (GridView.Columns.Count > 2)
+					GridView.Columns.RemoveAt(2);
+			}
+
 			this.selectedNode = this.ConnectionTree.SelectedItem as TreeNode;
 			if (this.selectedNode != null)
 			{
 				TreeNode[] Children = this.selectedNode.Children;
+				Dictionary<string, bool> Headers = null;
+				DisplayableParameters Parameters;
 
 				if (Children != null)
 				{
 					foreach (TreeNode Child in this.selectedNode.Children)
+					{
 						this.ConnectionListView.Items.Add(Child);
+
+						if (GridView != null)
+						{
+							Parameters = Child.DisplayableParameters;
+							if (Parameters != null)
+							{
+								foreach (Parameter P in Parameters.Ordered)
+								{
+									if (Headers == null)
+										Headers = new Dictionary<string, bool>();
+
+									if (!Headers.ContainsKey(P.Id))
+									{
+										Headers[P.Id] = true;
+
+										GridViewColumn Column = new GridViewColumn()
+										{
+											Header = P.Name,
+											Width = double.NaN,
+											DisplayMemberBinding = new Binding("DisplayableParameters[" + P.Id + "].StringValue")
+										};
+
+										GridView.Columns.Add(Column);
+									}
+								}
+							}
+						}
+					}
 				}
 			}
 
@@ -394,7 +434,7 @@ namespace Waher.Client.WPF.Controls
 			string Group = string.Empty;
 
 			Menu.Items.Clear();
-			
+
 			if (this.selectedNode != null)
 				this.selectedNode.AddContexMenuItems(ref Group, Menu);
 		}

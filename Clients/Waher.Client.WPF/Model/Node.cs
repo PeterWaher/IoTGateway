@@ -9,6 +9,7 @@ using Waher.Networking.XMPP.Control;
 using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.Sensor;
 using Waher.Things;
+using Waher.Things.DisplayableParameters;
 using Waher.Things.SensorData;
 
 namespace Waher.Client.WPF.Model
@@ -19,11 +20,17 @@ namespace Waher.Client.WPF.Model
 	public class Node : TreeNode
 	{
 		private NodeInformation nodeInfo;
+		private DisplayableParameters parameters;
 
 		public Node(TreeNode Parent, NodeInformation NodeInfo)
 			: base(Parent)
 		{
 			this.nodeInfo = NodeInfo;
+
+			if (this.nodeInfo.ParameterList == null)
+				this.parameters = null;
+			else
+				this.parameters = new DisplayableParameters(this.nodeInfo.ParameterList);
 
 			if (nodeInfo.HasChildren)
 			{
@@ -40,6 +47,7 @@ namespace Waher.Client.WPF.Model
 		public override string TypeName => this.nodeInfo.NodeType;
 		public override bool CanAddChildren => false;
 		public override bool CanRecycle => false;
+		public override DisplayableParameters DisplayableParameters => this.parameters;
 
 		public override ImageSource ImageResource
 		{
@@ -68,7 +76,7 @@ namespace Waher.Client.WPF.Model
 			{
 				TreeNode Loop = this.Parent;
 
-				while (Loop!=null)
+				while (Loop != null)
 				{
 					if (Loop is XmppConcentrator Concentrator)
 						return Concentrator;
@@ -186,7 +194,7 @@ namespace Waher.Client.WPF.Model
 			if (XmppAccountNode != null && (SensorClient = XmppAccountNode.SensorClient) != null)
 			{
 				return SensorClient.Subscribe(Concentrator.RosterItem.LastPresenceFullJid,
-					new ThingReference[] { new ThingReference(this.nodeInfo.NodeId, this.nodeInfo.SourceId, this.nodeInfo.ParentId) }, 
+					new ThingReference[] { new ThingReference(this.nodeInfo.NodeId, this.nodeInfo.SourceId, this.nodeInfo.ParentId) },
 					FieldType.Momentary, Rules, new Duration(false, 0, 0, 0, 0, 0, 1), new Duration(false, 0, 0, 0, 0, 1, 0), false);
 			}
 			else

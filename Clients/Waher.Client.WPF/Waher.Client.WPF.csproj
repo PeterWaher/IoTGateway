@@ -206,6 +206,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Model\DisplayableParameters.cs" />
     <Compile Include="Model\XmppComponent.cs" />
     <Compile Include="Model\Connections.cs" />
     <Compile Include="Model\Loading.cs" />

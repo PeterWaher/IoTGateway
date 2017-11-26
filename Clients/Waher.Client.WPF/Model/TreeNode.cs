@@ -12,6 +12,7 @@ using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP.Control;
 using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.Sensor;
+using Waher.Things.DisplayableParameters;
 
 namespace Waher.Client.WPF.Model
 {
@@ -158,6 +159,27 @@ namespace Waher.Client.WPF.Model
 		public abstract string TypeName
 		{
 			get;
+		}
+
+		/// <summary>
+		/// Gets a displayable parameter value.
+		/// </summary>
+		/// <param name="DisplayableParameter">Name of displayable parameter.</param>
+		/// <returns>Parameter value, if exists, or <see cref="string.Empty"/> if not.</returns>
+		public virtual string this[string DisplayableParameter]
+		{
+			get
+			{
+				return string.Empty;
+			}
+		}
+
+		/// <summary>
+		/// Gets available displayable parameters.
+		/// </summary>
+		public virtual DisplayableParameters DisplayableParameters
+		{
+			get { return null; }
 		}
 
 		/// <summary>

@@ -56,17 +56,17 @@
                 </ListView.Resources>
                 <ListView.View>
                     <GridView>
-                        <GridViewColumn Header="Node" Width="200">
+                        <GridViewColumn Header="Node" Width="Auto">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <DockPanel>
-                                        <Image Width="16" Height="16" Source="{Binding ImageResource}" VerticalAlignment="Center"/>
+                                        <Image Width="16" Height="16" Source="{Binding Path=ImageResource}" VerticalAlignment="Center"/>
                                         <TextBlock Text="{Binding Header}" Margin="2,0,0,0" VerticalAlignment="Center" ToolTip="{Binding ToolTip}" />
                                     </DockPanel>
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
-                        <GridViewColumn Header="Type" DisplayMemberBinding="{Binding TypeName}" Width="200"/>
+                        <GridViewColumn Header="Type" DisplayMemberBinding="{Binding Path=TypeName}" Width="Auto"/>
                     </GridView>
                 </ListView.View>
                 <ListView.ContextMenu>

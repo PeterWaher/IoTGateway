@@ -1123,22 +1123,25 @@ namespace Waher.Networking.XMPP.Concentrator
 					Xml.Append(NamespaceConcentrator);
 					Xml.Append("'>");
 
-					foreach (INode ChildNode in Source.RootNodes)
+					if (Node.HasChildren)
 					{
-						if (!await ChildNode.CanViewAsync(Caller))
-							continue;
-
-						Xml.Append("<nd");
-						await ExportAttributes(Xml, ChildNode, Language);
-
-						if (Parameters || Messages)
+						foreach (INode ChildNode in await Node.ChildNodes)
 						{
-							Xml.Append(">");
-							await this.ExportParametersAndMessages(Xml, Node, Parameters, Messages, Language, Caller);
-							Xml.Append("</nd>");
+							if (!await ChildNode.CanViewAsync(Caller))
+								continue;
+
+							Xml.Append("<nd");
+							await ExportAttributes(Xml, ChildNode, Language);
+
+							if (Parameters || Messages)
+							{
+								Xml.Append(">");
+								await this.ExportParametersAndMessages(Xml, Node, Parameters, Messages, Language, Caller);
+								Xml.Append("</nd>");
+							}
+							else
+								Xml.Append("/>");
 						}
-						else
-							Xml.Append("/>");
 					}
 
 					Xml.Append("</getChildNodesResponse>");

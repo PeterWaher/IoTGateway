@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Security.Authentication;
+using System.IO;
 using System.Net;
 using System.Net.Security;
 using System.Net.Sockets;
@@ -492,6 +493,10 @@ namespace Waher.Networking.HTTP
 				}
 			}
 			catch (SocketException)
+			{
+				Client.Dispose();
+			}
+			catch (IOException)
 			{
 				Client.Dispose();
 			}

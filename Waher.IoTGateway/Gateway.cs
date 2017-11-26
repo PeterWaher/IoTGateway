@@ -156,8 +156,8 @@ namespace Waher.IoTGateway
 					rootFolder = "Root" + Path.DirectorySeparatorChar;
 				}
 
-				Runtime.Inventory.Types.SetModuleParameter("AppData", appDataFolder);
-				Runtime.Inventory.Types.SetModuleParameter("Root", rootFolder);
+				Types.SetModuleParameter("AppData", appDataFolder);
+				Types.SetModuleParameter("Root", rootFolder);
 
 				scheduler = new Scheduler();
 				rnd = RandomNumberGenerator.Create();
@@ -220,7 +220,7 @@ namespace Waher.IoTGateway
 				xmppClient = xmppConfiguration.GetClient("en", typeof(Gateway).Assembly, false);
 				xmppClient.AllowRegistration(FormSignatureKey, FormSignatureSecret);
 				xmppClient.OnValidateSender += XmppClient_OnValidateSender;
-				Runtime.Inventory.Types.SetModuleParameter("XMPP", xmppClient);
+				Types.SetModuleParameter("XMPP", xmppClient);
 
 				if (xmppConfiguration.Sniffer)
 				{
@@ -263,10 +263,10 @@ namespace Waher.IoTGateway
 				xmppClient.OnRosterItemUpdated += XmppClient_OnRosterItemUpdated;
 
 				ibbClient = new Networking.XMPP.InBandBytestreams.IbbClient(xmppClient, MaxChunkSize);
-				Runtime.Inventory.Types.SetModuleParameter("IBB", ibbClient);
+				Types.SetModuleParameter("IBB", ibbClient);
 
 				socksProxy = new Networking.XMPP.P2P.SOCKS5.Socks5Proxy(xmppClient);
-				Runtime.Inventory.Types.SetModuleParameter("SOCKS5", socksProxy);
+				Types.SetModuleParameter("SOCKS5", socksProxy);
 
 				string CertificateLocalFileName = Config.DocumentElement["Certificate"].Attributes["configFileName"].Value;
 				string CertificateFileName;
@@ -351,7 +351,7 @@ namespace Waher.IoTGateway
 				}
 
 				webServer = new HttpServer(GetConfigPorts("HTTP"), GetConfigPorts("HTTPS"), certificate);
-				Runtime.Inventory.Types.SetModuleParameter("HTTP", webServer);
+				Types.SetModuleParameter("HTTP", webServer);
 
 				StringBuilder sb = new StringBuilder();
 
@@ -399,8 +399,8 @@ namespace Waher.IoTGateway
 				}
 
 				httpxServer = new HttpxServer(xmppClient, webServer, MaxChunkSize);
-				Runtime.Inventory.Types.SetModuleParameter("HTTPX", HttpxProxy);
-				Runtime.Inventory.Types.SetModuleParameter("HTTPXS", httpxServer);
+				Types.SetModuleParameter("HTTPX", HttpxProxy);
+				Types.SetModuleParameter("HTTPXS", httpxServer);
 
 				HttpxProxy.IbbClient = ibbClient;
 				httpxServer.IbbClient = ibbClient;
@@ -420,12 +420,12 @@ namespace Waher.IoTGateway
 				}
 
 				coapEndpoint = new CoapEndpoint();
-				Runtime.Inventory.Types.SetModuleParameter("CoAP", coapEndpoint);
+				Types.SetModuleParameter("CoAP", coapEndpoint);
 
 				concentratorServer = new ConcentratorServer(xmppClient, provisioningClient, new MeteringTopology());
-				Runtime.Inventory.Types.SetModuleParameter("Concentrator", concentratorServer);
-				Runtime.Inventory.Types.SetModuleParameter("Sensor", concentratorServer.SensorServer);
-				Runtime.Inventory.Types.SetModuleParameter("Control", concentratorServer.ControlServer);
+				Types.SetModuleParameter("Concentrator", concentratorServer);
+				Types.SetModuleParameter("Sensor", concentratorServer.SensorServer);
+				Types.SetModuleParameter("Control", concentratorServer.ControlServer);
 			}
 			catch (Exception ex)
 			{
@@ -491,7 +491,7 @@ namespace Waher.IoTGateway
 							}
 						}
 
-						Runtime.Inventory.Types.StartAllModules(int.MaxValue);
+						Types.StartAllModules(int.MaxValue);
 					}
 					finally
 					{

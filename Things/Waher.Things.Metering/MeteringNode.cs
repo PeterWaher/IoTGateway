@@ -15,7 +15,7 @@ namespace Waher.Things.Metering
 	/// <summary>
 	/// Base class for all metering nodes.
 	/// </summary>
-	[CollectionName("MeteringNodes")]
+	[CollectionName("MeteringTopology")]
 	[TypeName(TypeNameSerialization.FullName)]
 	[Index("NodeId")]
 	[Index("ParentId", "NodeId")]
@@ -52,6 +52,7 @@ namespace Waher.Things.Metering
 		/// <summary>
 		/// Object ID of parent node in persistence layer.
 		/// </summary>
+		[DefaultValueGuidEmpty]
 		public Guid ParentId
 		{
 			get { return this.parentId; }
@@ -80,6 +81,7 @@ namespace Waher.Things.Metering
 		/// <summary>
 		/// If provided, an ID for the node, but unique locally between siblings. Can be null, if Local ID equal to Node ID.
 		/// </summary>
+		[IgnoreMember]
 		public virtual string LocalId
 		{
 			get { return this.NodeId; }
@@ -88,6 +90,7 @@ namespace Waher.Things.Metering
 		/// <summary>
 		/// If provided, an ID for the node, as it would appear or be used in system logs. Can be null, if Log ID equal to Node ID.
 		/// </summary>
+		[IgnoreMember]
 		public virtual string LogId
 		{
 			get { return this.NodeId; }
@@ -105,6 +108,7 @@ namespace Waher.Things.Metering
 		/// <summary>
 		/// Optional ID of source containing node.
 		/// </summary>
+		[IgnoreMember]
 		public string SourceId
 		{
 			get { return MeteringTopology.SourceID; }
@@ -113,6 +117,7 @@ namespace Waher.Things.Metering
 		/// <summary>
 		/// Optional partition in which the Node ID is unique.
 		/// </summary>
+		[IgnoreMember]
 		public string Partition
 		{
 			get { return string.Empty; }
@@ -128,6 +133,7 @@ namespace Waher.Things.Metering
 		/// <summary>
 		/// If the source has any child sources.
 		/// </summary>
+		[IgnoreMember]
 		public bool HasChildren
 		{
 			get
@@ -142,6 +148,7 @@ namespace Waher.Things.Metering
 		/// <summary>
 		/// Child nodes. If no child nodes are available, null is returned.
 		/// </summary>
+		[IgnoreMember]
 		public Task<IEnumerable<INode>> ChildNodes
 		{
 			get
@@ -197,6 +204,7 @@ namespace Waher.Things.Metering
 		/// <summary>
 		/// If the node can be controlled.
 		/// </summary>
+		[IgnoreMember]
 		public bool IsControllable
 		{
 			get
@@ -208,6 +216,7 @@ namespace Waher.Things.Metering
 		/// <summary>
 		/// If the node can be read.
 		/// </summary>
+		[IgnoreMember]
 		public bool IsReadable
 		{
 			get
@@ -219,6 +228,7 @@ namespace Waher.Things.Metering
 		/// <summary>
 		/// When the node was last updated.
 		/// </summary>
+		[IgnoreMember]
 		public DateTime LastChanged
 		{
 			get
@@ -233,6 +243,7 @@ namespace Waher.Things.Metering
 		/// <summary>
 		/// Parent Node, or null if a root node.
 		/// </summary>
+		[IgnoreMember]
 		public IThingReference Parent
 		{
 			get
@@ -272,6 +283,7 @@ namespace Waher.Things.Metering
 		/// <summary>
 		/// If the node has registered commands or not.
 		/// </summary>
+		[IgnoreMember]
 		public virtual bool HasCommands
 		{
 			get { return false; }
@@ -280,6 +292,7 @@ namespace Waher.Things.Metering
 		/// <summary>
 		/// Available command objects. If no commands are available, null is returned.
 		/// </summary>
+		[IgnoreMember]
 		public virtual Task<IEnumerable<ICommand>> Commands
 		{
 			get
@@ -660,7 +673,7 @@ namespace Waher.Things.Metering
 		/// <summary>
 		/// Event raised when node has been updated.
 		/// </summary>
-		public EventHandler OnUpdate = null;
+		public event EventHandler OnUpdate = null;
 
 		private void RaiseUpdate()
 		{

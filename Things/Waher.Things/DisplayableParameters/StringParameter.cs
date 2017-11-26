@@ -35,6 +35,14 @@ namespace Waher.Things.DisplayableParameters
 		}
 
 		/// <summary>
+		/// Untyped parameter value
+		/// </summary>
+		public override object UntypedValue
+		{
+			get { return this.value; }
+		}
+
+		/// <summary>
 		/// Exports the parameters to XML.
 		/// </summary>
 		/// <param name="Xml">XML Output.</param>

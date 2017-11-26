@@ -43,6 +43,30 @@ namespace Waher.Things.DisplayableParameters
 		}
 
 		/// <summary>
+		/// Untyped parameter value
+		/// </summary>
+		public abstract object UntypedValue
+		{
+			get;
+		}
+
+		/// <summary>
+		/// String representation of parameter value
+		/// </summary>
+		public virtual object StringValue
+		{
+			get
+			{
+				object Obj = this.UntypedValue;
+
+				if (Obj == null)
+					return string.Empty;
+				else
+					return Obj.ToString();
+			}
+		}
+
+		/// <summary>
 		/// Exports the parameters to XML.
 		/// </summary>
 		/// <param name="Xml">XML Output.</param>

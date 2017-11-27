@@ -54,6 +54,7 @@ namespace Waher.Client.WPF.Model
 		private bool connected = false;
 		private bool supportsSearch = false;
 		private bool allowInsecureAuthentication = false;
+		private bool supportsHashes = true;
 
 		/// <summary>
 		/// Class representing a normal XMPP account.
@@ -75,9 +76,22 @@ namespace Waher.Client.WPF.Model
 			this.host = this.domain = Host;
 			this.port = Port;
 			this.account = Account;
-			this.password = string.Empty;
-			this.passwordHash = PasswordHash;
-			this.passwordHashMethod = PasswordHashMethod;
+
+			if (string.IsNullOrEmpty(PasswordHashMethod))
+			{
+				this.password = PasswordHash;
+				this.passwordHash = string.Empty;
+				this.passwordHashMethod = string.Empty;
+				this.supportsHashes = false;
+			}
+			else
+			{
+				this.password = string.Empty;
+				this.passwordHash = PasswordHash;
+				this.passwordHashMethod = PasswordHashMethod;
+				this.supportsHashes = true;
+			}
+
 			this.trustCertificate = TrustCertificate;
 			this.allowInsecureAuthentication = AllowInsecureAuthentication;
 
@@ -97,6 +111,7 @@ namespace Waher.Client.WPF.Model
 			this.passwordHashMethod = XML.Attribute(E, "passwordHashMethod");
 			this.trustCertificate = XML.Attribute(E, "trustCertificate", false);
 			this.allowInsecureAuthentication = XML.Attribute(E, "allowInsecureAuthentication", false);
+			this.supportsHashes = XML.Attribute(E, "supportsHashes", true);
 
 			this.Init();
 		}
@@ -201,7 +216,7 @@ namespace Waher.Client.WPF.Model
 					this.connected = true;
 					this.lastError = null;
 
-					if (string.IsNullOrEmpty(this.passwordHash))
+					if (this.supportsHashes && string.IsNullOrEmpty(this.passwordHash))
 					{
 						this.passwordHash = this.client.PasswordHash;
 						this.passwordHashMethod = this.client.PasswordHashMethod;
@@ -237,6 +252,7 @@ namespace Waher.Client.WPF.Model
 		public string PasswordHashMethod { get { return this.passwordHashMethod; } }
 		public bool TrustCertificate { get { return this.trustCertificate; } }
 		public bool AllowInsecureAuthentication { get { return this.allowInsecureAuthentication; } }
+		public bool SupportsHashes { get { return this.supportsHashes; } }
 
 		public override string Header
 		{
@@ -317,6 +333,9 @@ namespace Waher.Client.WPF.Model
 
 			Output.WriteAttributeString("trustCertificate", CommonTypes.Encode(this.trustCertificate));
 			Output.WriteAttributeString("allowInsecureAuthentication", CommonTypes.Encode(this.allowInsecureAuthentication));
+
+			if (!this.supportsHashes)
+				Output.WriteAttributeString("supportsHashes", CommonTypes.Encode(this.supportsHashes));
 
 			Output.WriteEndElement();
 		}

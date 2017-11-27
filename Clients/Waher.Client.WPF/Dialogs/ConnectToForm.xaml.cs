@@ -162,8 +162,17 @@ namespace Waher.Client.WPF.Dialogs
 					break;
 
 				case XmppState.Connected:
-					this.passwordHash = this.client.PasswordHash;
-					this.passwordHashMethod = this.client.PasswordHashMethod;
+					if (this.StorePassword.IsChecked.HasValue && this.StorePassword.IsChecked.Value)
+					{
+						this.passwordHash = this.Password.Password;
+						this.passwordHashMethod = string.Empty;
+					}
+					else
+					{
+						this.passwordHash = this.client.PasswordHash;
+						this.passwordHashMethod = this.client.PasswordHashMethod;
+					}
+
 					this.ConnectionState.Content = "Connected.";
 					this.CloseClient();
 					this.DialogResult = true;

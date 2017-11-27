@@ -1,7 +1,7 @@
 ﻿<Window x:Class="Waher.Client.WPF.Dialogs.ConnectToForm"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Connect to" Height="444" Width="300" WindowStartupLocation="CenterOwner">
+        Title="Connect to" Height="471" Width="300" WindowStartupLocation="CenterOwner">
     <Grid Name="FormGrid" FocusManager.FocusedElement="{Binding ElementName=XmppServer}">
         <Label Content="XMPP Server:" Height="28" HorizontalAlignment="Left" Margin="12,12,0,0" Name="label1" VerticalAlignment="Top" />
         <TextBox Height="23" HorizontalAlignment="Stretch" Margin="12,33,12,0" Name="XmppServer" VerticalAlignment="Top" 
@@ -19,12 +19,14 @@
                   VerticalAlignment="Top" IsChecked="False" ToolTip="If you trust the server certificate, inspite of it being invalid, check this box." />
         <CheckBox Content="Allow insecure authentication mechanisms." Height="16" HorizontalAlignment="Left" Margin="12,239,0,0" Name="AllowInsecureAuthentication" 
                   VerticalAlignment="Top" IsChecked="False" ToolTip="If you trust the server certificate, inspite of it being invalid, check this box." />
-        <CheckBox Content="Create account if it does not exist." Height="16" HorizontalAlignment="Left" Margin="12,266,0,0" Name="CreateAccount" 
+        <CheckBox Content="Store password instead of hash." Height="16" HorizontalAlignment="Left" Margin="12,266,0,0" Name="StorePassword" 
+                  VerticalAlignment="Top" IsChecked="False" ToolTip="If the server changes its server salt regularly, clients cannot store password hashes and must store passwords instead to be able to connect." />
+        <CheckBox Content="Create account if it does not exist." Height="16" HorizontalAlignment="Left" Margin="12,293,0,0" Name="CreateAccount" 
                   VerticalAlignment="Top" IsChecked="False" ToolTip="If you want to create the above account, if it does not exist already, check this box." Click="CreateAccount_Click" />
-        <Label Content="Retype Password:" Height="28" HorizontalAlignment="Left" Margin="12,288,0,0" Name="label5" VerticalAlignment="Top" />
-        <PasswordBox Height="23" HorizontalAlignment="Stretch" Margin="12,309,12,0" Name="RetypePassword" IsEnabled="false"
+        <Label Content="Retype Password:" Height="28" HorizontalAlignment="Left" Margin="12,315,0,0" Name="label5" VerticalAlignment="Top" />
+        <PasswordBox Height="23" HorizontalAlignment="Stretch" Margin="12,336,12,0" Name="RetypePassword" IsEnabled="false"
                      ToolTip="Retype password for account here." VerticalAlignment="Top" />
-        <DockPanel Margin="0,346,0,0" Width="160">
+        <DockPanel Margin="0,373,0,0" Width="160">
             <Button Content="Connect" Height="23" HorizontalAlignment="Left" Name="ConnectButton" VerticalAlignment="Top" Width="75" Click="ConnectButton_Click" 
                     ToolTip="Connect to the server using the information provided above. If connection is successful, the dialog closes, and the corresponding connection is established." IsDefault="True" />
             <Button Content="Cancel" Height="23" HorizontalAlignment="Left" Name="CancelButton" Margin="10,0,0,0" VerticalAlignment="Top" Width="75" Click="CancelButton_Click"

@@ -24,6 +24,7 @@
     <xs:attribute name="domain" type="xs:string" use="optional"/>
     <xs:attribute name="trustCertificate" type="xs:boolean" use="optional" default="false"/>
     <xs:attribute name="allowInsecureAuthentication" type="xs:boolean" use="optional" default="false"/>
+    <xs:attribute name="supportsHashes" type="xs:boolean" use="optional" default="true"/>
   </xs:complexType>
 
 	<xs:simpleType name="PortNumber">

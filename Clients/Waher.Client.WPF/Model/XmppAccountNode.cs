@@ -946,6 +946,8 @@ namespace Waher.Client.WPF.Model
 										ThingRegistry = new ThingRegistry(this, Item.JID, Item.Name, Item.Node, e2.Features);
 										Component = ThingRegistry;
 									}
+									else if (e2.HasFeature(EventLog.NamespaceEventLogging))
+										Component = new EventLog(this, Item.JID, Item.Name, Item.Node, e2.Features);
 									else
 										Component = new XmppComponent(this, Item.JID, Item.Name, Item.Node, e2.Features);
 

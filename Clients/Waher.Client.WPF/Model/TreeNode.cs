@@ -146,6 +146,30 @@ namespace Waher.Client.WPF.Model
 		}
 
 		/// <summary>
+		/// If the second image resource is visible or not.
+		/// </summary>
+		public virtual Visibility ImageResourceVisibility
+		{
+			get { return Visibility.Visible; }
+		}
+
+		/// <summary>
+		/// Secondary image resource for the node.
+		/// </summary>
+		public virtual ImageSource ImageResource2
+		{
+			get { return null; }
+		}
+
+		/// <summary>
+		/// If the second image resource is visible or not.
+		/// </summary>
+		public virtual Visibility ImageResource2Visibility
+		{
+			get { return Visibility.Hidden; }
+		}
+
+		/// <summary>
 		/// Tool Tip for node.
 		/// </summary>
 		public abstract string ToolTip

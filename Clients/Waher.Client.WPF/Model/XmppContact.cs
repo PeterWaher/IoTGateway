@@ -78,6 +78,22 @@ namespace Waher.Client.WPF.Model
 			}
 		}
 
+		public SubscriptionState SubscriptionState
+		{
+			get
+			{
+				XmppAccountNode AccountNode = this.XmppAccountNode;
+				if (AccountNode == null || !AccountNode.IsOnline)
+					return SubscriptionState.Unknown;
+
+				RosterItem Item = this.client[this.bareJid];
+				if (Item == null)
+					return SubscriptionState.Unknown;
+				else
+					return Item.State;
+			}
+		}
+
 		public override ImageSource ImageResource
 		{
 			get
@@ -102,6 +118,50 @@ namespace Waher.Client.WPF.Model
 					case Availability.Offline:
 					default:
 						return XmppAccountNode.offline;
+				}
+			}
+		}
+
+		public override ImageSource ImageResource2
+		{
+			get
+			{
+				switch (this.SubscriptionState)
+				{
+					case SubscriptionState.None:
+						return XmppAccountNode.none;
+
+					case SubscriptionState.From:
+						return XmppAccountNode.from;
+
+					case SubscriptionState.To:
+						return XmppAccountNode.to;
+
+					case SubscriptionState.Both:
+						return XmppAccountNode.both;
+
+					case SubscriptionState.Unknown:
+					default:
+						return null;
+				}
+			}
+		}
+
+		public override Visibility ImageResource2Visibility
+		{
+			get
+			{
+				switch (this.SubscriptionState)
+				{
+					case SubscriptionState.None:
+					case SubscriptionState.From:
+					case SubscriptionState.To:
+					case SubscriptionState.Both:
+						return Visibility.Visible;
+
+					case SubscriptionState.Unknown:
+					default:
+						return Visibility.Hidden;
 				}
 			}
 		}
@@ -168,7 +228,7 @@ namespace Waher.Client.WPF.Model
 			{
 				Availability Availability = this.Availability;
 
-				return Availability == Availability.Chat || 
+				return Availability == Availability.Chat ||
 					Availability == Availability.Online ||
 					Availability == Availability.Away ||
 					Availability == Availability.ExtendedAway;

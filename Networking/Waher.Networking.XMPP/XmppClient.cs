@@ -526,7 +526,11 @@ namespace Waher.Networking.XMPP
 
 			this.clientOS = DeviceFamily + " " + Major.ToString() + "." + Minor.ToString() + "." + Build.ToString() + "." + Revision.ToString();*/
 
+#if NETFW
+			this.clientOS = System.Environment.OSVersion.ToString();
+#else
 			this.clientOS = System.Runtime.InteropServices.RuntimeInformation.OSDescription;
+#endif
 
 			this.RegisterDefaultHandlers();
 		}

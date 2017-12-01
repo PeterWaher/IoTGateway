@@ -1221,7 +1221,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// </summary>
 		public void DeleteDeviceRules()
 		{
-			this.DeleteDeviceRule(null, string.Empty, string.Empty, string.Empty, null, null);
+			this.DeleteDeviceRules(null, string.Empty, string.Empty, string.Empty, null, null);
 		}
 
 		/// <summary>
@@ -1231,7 +1231,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void DeleteDeviceRules(IqResultEventHandler Callback, object State)
 		{
-			this.DeleteDeviceRule(null, string.Empty, string.Empty, string.Empty, Callback, State);
+			this.DeleteDeviceRules(null, string.Empty, string.Empty, string.Empty, Callback, State);
 		}
 
 		/// <summary>
@@ -1239,9 +1239,9 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// </summary>
 		/// <param name="DeviceJID">Bare JID of device whose rules are to be deleted.
 		/// If null, all owned devices will get their rules deleted.</param>
-		public void DeleteDeviceRule(string DeviceJID)
+		public void DeleteDeviceRules(string DeviceJID)
 		{
-			this.DeleteDeviceRule(DeviceJID, string.Empty, string.Empty, string.Empty, null, null);
+			this.DeleteDeviceRules(DeviceJID, string.Empty, string.Empty, string.Empty, null, null);
 		}
 
 		/// <summary>
@@ -1251,9 +1251,9 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// If null, all owned devices will get their rules deleted.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void DeleteDeviceRule(string DeviceJID, IqResultEventHandler Callback, object State)
+		public void DeleteDeviceRules(string DeviceJID, IqResultEventHandler Callback, object State)
 		{
-			this.DeleteDeviceRule(DeviceJID, string.Empty, string.Empty, string.Empty, Callback, State);
+			this.DeleteDeviceRules(DeviceJID, string.Empty, string.Empty, string.Empty, Callback, State);
 		}
 
 		/// <summary>
@@ -1266,7 +1266,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="Partition">Optional Partition of device.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void DeleteDeviceRule(string DeviceJID, string NodeId, string SourceId, string Partition, IqResultEventHandler Callback, object State)
+		public void DeleteDeviceRules(string DeviceJID, string NodeId, string SourceId, string Partition, IqResultEventHandler Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 

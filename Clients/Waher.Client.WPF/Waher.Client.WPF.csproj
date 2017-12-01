@@ -208,6 +208,7 @@
   <ItemGroup>
     <Compile Include="Model\DisplayableParameters.cs" />
     <Compile Include="Model\EventLog.cs" />
+    <Compile Include="Model\IMenuAggregator.cs" />
     <Compile Include="Model\XmppComponent.cs" />
     <Compile Include="Model\Connections.cs" />
     <Compile Include="Model\Loading.cs" />
@@ -495,6 +496,14 @@
     <Resource Include="Graphics\From.png" />
     <Resource Include="Graphics\None.png" />
     <Resource Include="Graphics\To.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Graphics\renew-icon_16.png" />
+    <Resource Include="Graphics\renew-icon_32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Graphics\Transfer-icon_16.png" />
+    <Resource Include="Graphics\Transfer-icon_32.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\..\packages\SkiaSharp.1.59.2\build\net45\SkiaSharp.targets" Condition="Exists('..\..\packages\SkiaSharp.1.59.2\build\net45\SkiaSharp.targets')" />

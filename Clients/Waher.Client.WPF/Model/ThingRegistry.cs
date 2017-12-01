@@ -21,7 +21,7 @@ using Waher.Client.WPF.Dialogs;
 
 namespace Waher.Client.WPF.Model
 {
-	public class ThingRegistry : XmppComponent
+	public class ThingRegistry : XmppComponent, IMenuAggregator
 	{
 		private bool supportsProvisioning;
 		private ThingRegistryClient registryClient;
@@ -533,5 +533,208 @@ namespace Waher.Client.WPF.Model
 				}
 			}, null);
 		}
+
+		public void AddContexMenuItems(TreeNode TreeNode, ref string CurrentGroup, ContextMenu Menu)
+		{
+			MenuItem Item;
+
+			if (TreeNode is XmppContact Contact)
+			{
+				if (this.registryClient != null)
+				{
+					Menu.Items.Add(Item = new MenuItem()
+					{
+						Header = "_Disown device...",
+						IsEnabled = true,
+						Tag = Contact,
+						Icon = new Image()
+						{
+							Source = new BitmapImage(new Uri("../Graphics/Transfer-icon_16.png", UriKind.Relative)),
+							Width = 16,
+							Height = 16
+						}
+					});
+
+					Item.Click += this.DisownDevice_Click;
+				}
+
+				if (this.provisioningClient != null)
+				{
+					Menu.Items.Add(Item = new MenuItem()
+					{
+						Header = "_Clear rule cache...",
+						IsEnabled = true,
+						Tag = Contact,
+						Icon = new Image()
+						{
+							Source = new BitmapImage(new Uri("../Graphics/Recycle-Bin-empty-icon_16.png", UriKind.Relative)),
+							Width = 16,
+							Height = 16
+						}
+					});
+
+					Item.Click += this.ClearRuleCache_Click;
+
+					Menu.Items.Add(Item = new MenuItem()
+					{
+						Header = "_Reconfigure device...",
+						IsEnabled = true,
+						Tag = Contact,
+						Icon = new Image()
+						{
+							Source = new BitmapImage(new Uri("../Graphics/renew-icon_16.png", UriKind.Relative)),
+							Width = 16,
+							Height = 16
+						}
+					});
+
+					Item.Click += this.ReconfigureDevice_Click;
+				}
+			}
+			else if (TreeNode is Node Node)
+			{
+				if (this.registryClient != null)
+				{
+					Menu.Items.Add(Item = new MenuItem()
+					{
+						Header = "_Disown device...",
+						IsEnabled = true,
+						Tag = Node,
+						Icon = new Image()
+						{
+							Source = new BitmapImage(new Uri("../Graphics/Transfer-icon_16.png", UriKind.Relative)),
+							Width = 16,
+							Height = 16
+						}
+					});
+
+					Item.Click += this.DisownDeviceNode_Click;
+				}
+
+				if (this.provisioningClient != null)
+				{
+					Menu.Items.Add(Item = new MenuItem()
+					{
+						Header = "_Reconfigure device...",
+						IsEnabled = true,
+						Tag = Node,
+						Icon = new Image()
+						{
+							Source = new BitmapImage(new Uri("../Graphics/renew-icon_16.png", UriKind.Relative)),
+							Width = 16,
+							Height = 16
+						}
+					});
+
+					Item.Click += this.ReconfigureDeviceNode_Click;
+				}
+			}
+		}
+
+		private void ClearRuleCache_Click(object sender, RoutedEventArgs e)
+		{
+			MenuItem Item = (MenuItem)sender;
+			XmppContact Contact = (XmppContact)Item.Tag;
+
+			this.provisioningClient.ClearDeviceCache(Contact.BareJID, (sender2, e2) =>
+			{
+				if (e2.Ok)
+				{
+					MainWindow.currentInstance.Dispatcher.Invoke(() => MessageBox.Show(MainWindow.currentInstance,
+						"The rule cache in " + Contact.BareJID + " has been cleared.", "Success", MessageBoxButton.OK, MessageBoxImage.Information));
+				}
+				else
+				{
+					MainWindow.currentInstance.Dispatcher.Invoke(() => MessageBox.Show(MainWindow.currentInstance,
+						string.IsNullOrEmpty(e2.ErrorText) ? "Unable to clear the rule cache in " + Contact.BareJID + "." : e2.ErrorText,
+						"Error", MessageBoxButton.OK, MessageBoxImage.Information));
+				}
+			}, null);
+		}
+
+		private void ReconfigureDevice_Click(object sender, RoutedEventArgs e)
+		{
+			MenuItem Item = (MenuItem)sender;
+			XmppContact Contact = (XmppContact)Item.Tag;
+
+			this.provisioningClient.DeleteDeviceRules(Contact.BareJID, (sender2, e2) =>
+			{
+				if (e2.Ok)
+				{
+					MainWindow.currentInstance.Dispatcher.Invoke(() => MessageBox.Show(MainWindow.currentInstance,
+						"The rules in " + Contact.BareJID + " has been deleted.", "Success", MessageBoxButton.OK, MessageBoxImage.Information));
+				}
+				else
+				{
+					MainWindow.currentInstance.Dispatcher.Invoke(() => MessageBox.Show(MainWindow.currentInstance,
+						string.IsNullOrEmpty(e2.ErrorText) ? "Unable to delete the rules in " + Contact.BareJID + "." : e2.ErrorText,
+						"Error", MessageBoxButton.OK, MessageBoxImage.Information));
+				}
+			}, null);
+		}
+
+		private void ReconfigureDeviceNode_Click(object sender, RoutedEventArgs e)
+		{
+			MenuItem Item = (MenuItem)sender;
+			Node Node = (Node)Item.Tag;
+
+			this.provisioningClient.DeleteDeviceRules(Node.Concentrator.BareJID, Node.NodeId, Node.SourceId, Node.Partition, (sender2, e2) =>
+			{
+				if (e2.Ok)
+				{
+					MainWindow.currentInstance.Dispatcher.Invoke(() => MessageBox.Show(MainWindow.currentInstance,
+						"The rules in " + Node.Header + " has been deleted.", "Success", MessageBoxButton.OK, MessageBoxImage.Information));
+				}
+				else
+				{
+					MainWindow.currentInstance.Dispatcher.Invoke(() => MessageBox.Show(MainWindow.currentInstance,
+						string.IsNullOrEmpty(e2.ErrorText) ? "Unable to delete the rules in " + Node.Header + "." : e2.ErrorText,
+						"Error", MessageBoxButton.OK, MessageBoxImage.Information));
+				}
+			}, null);
+		}
+
+		private void DisownDevice_Click(object sender, RoutedEventArgs e)
+		{
+			MenuItem Item = (MenuItem)sender;
+			XmppContact Contact = (XmppContact)Item.Tag;
+
+			this.registryClient.Disown(Contact.BareJID, (sender2, e2) =>
+			{
+				if (e2.Ok)
+				{
+					MainWindow.currentInstance.Dispatcher.Invoke(() => MessageBox.Show(MainWindow.currentInstance,
+						Contact.BareJID + " has been disowned.", "Success", MessageBoxButton.OK, MessageBoxImage.Information));
+				}
+				else
+				{
+					MainWindow.currentInstance.Dispatcher.Invoke(() => MessageBox.Show(MainWindow.currentInstance,
+						string.IsNullOrEmpty(e2.ErrorText) ? "Unable to disown " + Contact.BareJID + "." : e2.ErrorText,
+						"Error", MessageBoxButton.OK, MessageBoxImage.Information));
+				}
+			}, null);
+		}
+
+		private void DisownDeviceNode_Click(object sender, RoutedEventArgs e)
+		{
+			MenuItem Item = (MenuItem)sender;
+			Node Node = (Node)Item.Tag;
+
+			this.registryClient.Disown(Node.Concentrator.BareJID, Node.NodeId, Node.SourceId, Node.Partition, (sender2, e2) =>
+			{
+				if (e2.Ok)
+				{
+					MainWindow.currentInstance.Dispatcher.Invoke(() => MessageBox.Show(MainWindow.currentInstance,
+						Node.Header + " has been disowned.", "Success", MessageBoxButton.OK, MessageBoxImage.Information));
+				}
+				else
+				{
+					MainWindow.currentInstance.Dispatcher.Invoke(() => MessageBox.Show(MainWindow.currentInstance,
+						string.IsNullOrEmpty(e2.ErrorText) ? "Unable to disown " + Node.Header + "." : e2.ErrorText,
+						"Error", MessageBoxButton.OK, MessageBoxImage.Information));
+				}
+			}, null);
+		}
+
 	}
 }

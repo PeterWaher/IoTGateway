@@ -596,24 +596,7 @@ namespace Waher.Networking.XMPP.Provisioning
 				if (Nodes != null)
 				{
 					foreach (ThingReference Node in Nodes)
-					{
-						Xml.Append("<nd id='");
-						Xml.Append(XML.Encode(Node.NodeId));
-
-						if (!string.IsNullOrEmpty(Node.SourceId))
-						{
-							Xml.Append("' src='");
-							Xml.Append(XML.Encode(Node.SourceId));
-						}
-
-						if (!string.IsNullOrEmpty(Node.Partition))
-						{
-							Xml.Append("' pt='");
-							Xml.Append(XML.Encode(Node.Partition));
-						}
-
-						Xml.Append("'/>");
-					}
+						this.AppendNode(Xml, Node);
 				}
 
 				if (FieldNames != null)
@@ -734,6 +717,33 @@ namespace Waher.Networking.XMPP.Provisioning
 			}, null);
 		}
 
+		private void AppendNode(StringBuilder Xml, IThingReference Node)
+		{
+			Xml.Append("<nd");
+			this.AppendNodeInfo(Xml, Node.NodeId, Node.SourceId, Node.Partition);
+			Xml.Append("/>");
+		}
+
+		private void AppendNodeInfo(StringBuilder Xml, string NodeId, string SourceId, string Partition)
+		{
+			Xml.Append(" id='");
+			Xml.Append(XML.Encode(NodeId));
+
+			if (!string.IsNullOrEmpty(SourceId))
+			{
+				Xml.Append("' src='");
+				Xml.Append(XML.Encode(SourceId));
+			}
+
+			if (!string.IsNullOrEmpty(Partition))
+			{
+				Xml.Append("' pt='");
+				Xml.Append(XML.Encode(Partition));
+			}
+
+			Xml.Append('\'');
+		}
+
 		private void AppendTokens(StringBuilder Xml, string AttributeName, string[] Tokens)
 		{
 			if (Tokens != null && Tokens.Length > 0)
@@ -827,24 +837,7 @@ namespace Waher.Networking.XMPP.Provisioning
 				if (Nodes != null)
 				{
 					foreach (ThingReference Node in Nodes)
-					{
-						Xml.Append("<nd id='");
-						Xml.Append(XML.Encode(Node.NodeId));
-
-						if (!string.IsNullOrEmpty(Node.SourceId))
-						{
-							Xml.Append("' src='");
-							Xml.Append(XML.Encode(Node.SourceId));
-						}
-
-						if (!string.IsNullOrEmpty(Node.Partition))
-						{
-							Xml.Append("' pt='");
-							Xml.Append(XML.Encode(Node.Partition));
-						}
-
-						Xml.Append("'/>");
-					}
+						this.AppendNode(Xml, Node);
 				}
 
 				if (ParameterNames != null)
@@ -1223,6 +1216,76 @@ namespace Waher.Networking.XMPP.Provisioning
 			}, null);
 		}
 
+		/// <summary>
+		/// Deletes te device rules of all owned devices.
+		/// </summary>
+		public void DeleteDeviceRules()
+		{
+			this.DeleteDeviceRule(null, string.Empty, string.Empty, string.Empty, null, null);
+		}
+
+		/// <summary>
+		/// Deletes te device rules all owned devices.
+		/// </summary>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void DeleteDeviceRules(IqResultEventHandler Callback, object State)
+		{
+			this.DeleteDeviceRule(null, string.Empty, string.Empty, string.Empty, Callback, State);
+		}
+
+		/// <summary>
+		/// Deletes the rules of a device.
+		/// </summary>
+		/// <param name="DeviceJID">Bare JID of device whose rules are to be deleted.
+		/// If null, all owned devices will get their rules deleted.</param>
+		public void DeleteDeviceRule(string DeviceJID)
+		{
+			this.DeleteDeviceRule(DeviceJID, string.Empty, string.Empty, string.Empty, null, null);
+		}
+
+		/// <summary>
+		/// Deletes the rules of a device.
+		/// </summary>
+		/// <param name="DeviceJID">Bare JID of device whose rules are to be deleted.
+		/// If null, all owned devices will get their rules deleted.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void DeleteDeviceRule(string DeviceJID, IqResultEventHandler Callback, object State)
+		{
+			this.DeleteDeviceRule(DeviceJID, string.Empty, string.Empty, string.Empty, Callback, State);
+		}
+
+		/// <summary>
+		/// Deletes the rules of a device.
+		/// </summary>
+		/// <param name="DeviceJID">Bare JID of device whose rules are to be deleted.
+		/// If null, all owned devices will get their rules deleted.</param>
+		/// <param name="NodeId">Optional Node ID of device.</param>
+		/// <param name="SourceId">Optional Source ID of device.</param>
+		/// <param name="Partition">Optional Partition of device.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void DeleteDeviceRule(string DeviceJID, string NodeId, string SourceId, string Partition, IqResultEventHandler Callback, object State)
+		{
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<deleteRules xmlns='");
+			Xml.Append(NamespaceProvisioningOwner);
+
+			if (!string.IsNullOrEmpty(DeviceJID))
+			{
+				Xml.Append("' jid='");
+				Xml.Append(XML.Encode(DeviceJID));
+				Xml.Append('\'');
+			}
+
+			this.AppendNodeInfo(Xml, NodeId, SourceId, Partition);
+			Xml.Append("/>");
+
+			this.client.SendIqSet(this.provisioningServerAddress, Xml.ToString(), Callback, State);
+		}
+		
 		#endregion
 
 	}

@@ -21,13 +21,14 @@ using Waher.Networking.XMPP.Provisioning;
 using Waher.Networking.XMPP.Sensor;
 using Waher.Networking.XMPP.ServiceDiscovery;
 using Waher.Client.WPF.Dialogs;
+using System.Windows.Controls;
 
 namespace Waher.Client.WPF.Model
 {
 	/// <summary>
 	/// Class representing a normal XMPP account.
 	/// </summary>
-	public class XmppAccountNode : TreeNode
+	public class XmppAccountNode : TreeNode, IMenuAggregator
 	{
 		private const string SensorGroupName = "Sensors";
 		private const string EventsGroupName = "Events";
@@ -36,6 +37,7 @@ namespace Waher.Client.WPF.Model
 		private const string OtherGroupName = "Others";
 
 		private LinkedList<KeyValuePair<DateTime, MessageEventArgs>> unhandledMessages = new LinkedList<KeyValuePair<DateTime, MessageEventArgs>>();
+		private LinkedList<XmppComponent> components = new LinkedList<XmppComponent>();
 		private Connections connections;
 		private XmppClient client;
 		private SensorClient sensorClient;
@@ -1156,5 +1158,24 @@ namespace Waher.Client.WPF.Model
 			return Request;
 		}
 
+		public void RegisterComponent(XmppComponent Component)
+		{
+			if (!this.components.Contains(Component))
+				this.components.AddLast(Component);
+		}
+
+		public void UnregisterComponent(XmppComponent Component)
+		{
+			this.components.Remove(Component);
+		}
+
+		public void AddContexMenuItems(TreeNode Node, ref string CurrentGroup, ContextMenu Menu)
+		{
+			foreach (XmppComponent Component in this.components)
+			{
+				if (Component is IMenuAggregator MenuAggregator)
+					MenuAggregator.AddContexMenuItems(Node, ref CurrentGroup, Menu);
+			}
+		}
 	}
 }

@@ -681,6 +681,15 @@ namespace Waher.Client.WPF.Model
 					}
 				});
 			}
+
+			TreeNode Loop = this.parent;
+			while (Loop != null)
+			{
+				if (Loop is IMenuAggregator MenuAggregator)
+					MenuAggregator.AddContexMenuItems(this, ref CurrentGroup, Menu);
+
+				Loop = Loop.parent;
+			}
 		}
 
 		protected void GroupSeparator(ref string CurrentGroup, string Group, ContextMenu Menu)

@@ -28,6 +28,14 @@ namespace Waher.Client.WPF.Model
 			this.node = Node;
 			this.features = Features;
 			this.canSearch = this.features.ContainsKey(XmppClient.NamespaceSearch);
+
+			this.Account?.RegisterComponent(this);
+		}
+
+		public override void Dispose()
+		{
+			this.Account?.UnregisterComponent(this);
+			base.Dispose();
 		}
 
 		public override string Key => this.jid;

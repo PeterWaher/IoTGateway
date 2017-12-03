@@ -21,9 +21,7 @@
         <Directory Id='WaherDataAB' Name='Waher Data AB'>
           <Directory Id='INSTALLDIR' Name='IoT Client 1.0'>
             <Component Id='SystemLibraries' Guid='660e4cc3-334a-4124-bef2-fb82a4796534'>
-              <File Id='System.Xml.XmlSerializer.dll' Name='System.Xml.XmlSerializer.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Xml.XmlSerializer.dll' Vital='yes' KeyPath='yes'/>
-              <File Id='System.Xml.XPath.dll' Name='System.Xml.XPath.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Xml.XPath.dll' Vital='yes'/>
-              <File Id='System.Xml.XPath.XDocument.dll' Name='System.Xml.XPath.XDocument.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Xml.XPath.XDocument.dll' Vital='yes'/>
+              <File Id='System.Xml.XPath.XDocument.dll' Name='System.Xml.XPath.XDocument.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Xml.XPath.XDocument.dll' Vital='yes' KeyPath='yes'/>
               <File Id='System.AppContext.dll' Name='System.AppContext.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.AppContext.dll' Vital='yes'/>
               <File Id='System.Collections.Concurrent.dll' Name='System.Collections.Concurrent.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Collections.Concurrent.dll' Vital='yes'/>
               <File Id='System.Collections.dll' Name='System.Collections.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Collections.dll' Vital='yes'/>
@@ -115,8 +113,8 @@
               <File Id='System.Xml.ReaderWriter.dll' Name='System.Xml.ReaderWriter.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Xml.ReaderWriter.dll' Vital='yes'/>
               <File Id='System.Xml.XDocument.dll' Name='System.Xml.XDocument.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Xml.XDocument.dll' Vital='yes'/>
               <File Id='System.Xml.XmlDocument.dll' Name='System.Xml.XmlDocument.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Xml.XmlDocument.dll' Vital='yes'/>
-              <RemoveFile Id='RemoveSystem.Xml.XmlSerializer.dll' Name='System.Xml.XmlSerializer.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Xml.XPath.dll' Name='System.Xml.XPath.dll' On='uninstall'/>
+              <File Id='System.Xml.XmlSerializer.dll' Name='System.Xml.XmlSerializer.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Xml.XmlSerializer.dll' Vital='yes'/>
+              <File Id='System.Xml.XPath.dll' Name='System.Xml.XPath.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Xml.XPath.dll' Vital='yes'/>
               <RemoveFile Id='RemoveSystem.Xml.XPath.XDocument.dll' Name='System.Xml.XPath.XDocument.dll' On='uninstall'/>
               <RemoveFile Id='RemoveSystem.AppContext.dll' Name='System.AppContext.dll' On='uninstall'/>
               <RemoveFile Id='RemoveSystem.Collections.Concurrent.dll' Name='System.Collections.Concurrent.dll' On='uninstall'/>
@@ -209,6 +207,8 @@
               <RemoveFile Id='RemoveSystem.Xml.ReaderWriter.dll' Name='System.Xml.ReaderWriter.dll' On='uninstall'/>
               <RemoveFile Id='RemoveSystem.Xml.XDocument.dll' Name='System.Xml.XDocument.dll' On='uninstall'/>
               <RemoveFile Id='RemoveSystem.Xml.XmlDocument.dll' Name='System.Xml.XmlDocument.dll' On='uninstall'/>
+              <RemoveFile Id='RemoveSystem.Xml.XmlSerializer.dll' Name='System.Xml.XmlSerializer.dll' On='uninstall'/>
+              <RemoveFile Id='RemoveSystem.Xml.XPath.dll' Name='System.Xml.XPath.dll' On='uninstall'/>
             </Component>
             <Component Id='MicrosoftLibraries' Guid='b2fc6b57-783c-45b5-a84e-bd5f1f173506'>
               <File Id='Microsoft.Win32.Primitives.dll' Name='Microsoft.Win32.Primitives.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Microsoft.Win32.Primitives.dll' Vital='yes' />
@@ -13372,7 +13372,7 @@
         </Directory>
       </Directory>
       <Directory Id="ProgramMenuFolder" Name="Programs">
-        <Directory Id="ProgramMenuDir" Name="IoT Gateway 1.0">
+        <Directory Id="ProgramMenuDir" Name="IoT Client 1.0">
           <Component Id="ProgramMenuDir" Guid="19878820-a9d8-4f18-b148-35806cc6cc3f">
             <RemoveFolder Id='ProgramMenuDir' On='uninstall' />
             <RegistryKey Root='HKCU' Key='Software\[Manufacturer]\[ProductName]'>

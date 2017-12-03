@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Xml;
 using System.Threading;
@@ -16,6 +17,7 @@ using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.Sensor;
 using Waher.Runtime.Inventory;
 using Waher.Persistence;
+using Waher.Persistence.Files;
 using Waher.Persistence.Filters;
 using Waher.Client.WPF.Controls;
 using Waher.Client.WPF.Controls.Questions;
@@ -48,6 +50,8 @@ namespace Waher.Client.WPF
 		public static RoutedUICommand Script = new RoutedUICommand("Script", "Script", typeof(MainWindow));
 
 		internal static MainWindow currentInstance = null;
+		private static string appDataFolder = null;
+		private static FilesProvider databaseProvider = null;
 
 		public MainWindow()
 		{
@@ -65,6 +69,30 @@ namespace Waher.Client.WPF
 				typeof(Waher.Script.Expression).Assembly,
 				typeof(Waher.Script.Graphs.Graph).Assembly);
 
+			appDataFolder = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
+			if (!appDataFolder.EndsWith(new string(Path.DirectorySeparatorChar, 1)))
+				appDataFolder += Path.DirectorySeparatorChar;
+
+			appDataFolder += "IoT Client" + Path.DirectorySeparatorChar;
+
+			if (!Directory.Exists(appDataFolder))
+				Directory.CreateDirectory(appDataFolder);
+
+			Task.Run(() =>
+			{
+				try
+				{
+					databaseProvider = new FilesProvider(appDataFolder + "Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000);
+					Database.Register(databaseProvider);
+
+					this.LoadQuestions(string.Empty);
+				}
+				catch (Exception ex)
+				{
+					Dispatcher.Invoke(() => MessageBox.Show(this, ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error));
+				}
+			});
+			
 			InitializeComponent();
 
 			this.MainView.Load(this);
@@ -795,8 +823,8 @@ namespace Waher.Client.WPF
 			{
 				bool Found = false;
 
-				foreach (Question Question2 in await Database.Find<Question>(
-					new FilterFieldEqualTo("ProvisioningJid", ProvisioningJid), "Created"))
+				foreach (Question Question2 in await Database.Find<Question>())
+					//new FilterFieldEqualTo("ProvisioningJid", ProvisioningJid), "Created"))
 				{
 					if (QuestionView == null)
 						QuestionView = this.OpenQuestionTab(ProvisioningJid, out DoSearch);

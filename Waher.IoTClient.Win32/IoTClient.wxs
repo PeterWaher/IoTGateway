@@ -248,7 +248,7 @@
               <File Id='Waher.Networking.XMPP.Provisioning.dll' Name='Waher.Networking.XMPP.Provisioning.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.Provisioning.dll' Vital='yes'/>
               <File Id='Waher.Networking.XMPP.Sensor.dll' Name='Waher.Networking.XMPP.Sensor.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.Sensor.dll' Vital='yes'/>
               <File Id='Waher.Persistence.dll' Name='Waher.Persistence.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Persistence.dll' Vital='yes'/>
-              <File Id='Waher.Persistence.Files.dll' Name='Waher.Persistence.Files.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Persistence.Files.dll' Vital='yes'/>
+              <File Id='Waher.Persistence.FilesLW.dll' Name='Waher.Persistence.FilesLW.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Persistence.FilesLW.dll' Vital='yes'/>
               <File Id='Waher.Runtime.Cache.dll' Name='Waher.Runtime.Cache.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Runtime.Cache.dll' Vital='yes'/>
               <File Id='Waher.Runtime.Inventory.dll' Name='Waher.Runtime.Inventory.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Runtime.Inventory.dll' Vital='yes'/>
               <File Id='Waher.Runtime.Language.dll' Name='Waher.Runtime.Language.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Runtime.Language.dll' Vital='yes'/>
@@ -277,7 +277,7 @@
               <RemoveFile Id='RemoveWaher.Networking.XMPP.Provisioning.dll' Name='Waher.Networking.XMPP.Provisioning.dll' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Networking.XMPP.Sensor.dll' Name='Waher.Networking.XMPP.Sensor.dll' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Persistence.dll' Name='Waher.Persistence.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveWaher.Persistence.Files.dll' Name='Waher.Persistence.Files.dll' On='uninstall'/>
+              <RemoveFile Id='RemoveWaher.Persistence.FilesLW.dll' Name='Waher.Persistence.FilesLW.dll' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Runtime.Cache.dll' Name='Waher.Runtime.Cache.dll' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Runtime.Inventory.dll' Name='Waher.Runtime.Inventory.dll' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Runtime.Language.dll' Name='Waher.Runtime.Language.dll' On='uninstall'/>
@@ -309,7 +309,7 @@
               <File Id='Waher.Networking.XMPP.Sensor.xml' Name='Waher.Networking.XMPP.Sensor.xml' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.Sensor.xml' Vital='yes'/>
               <File Id='Waher.Networking.XMPP.xml' Name='Waher.Networking.XMPP.xml' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.xml' Vital='yes'/>
               <File Id='Waher.Persistence.pdb' Name='Waher.Persistence.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Persistence.pdb' Vital='yes'/>
-              <File Id='Waher.Persistence.Files.pdb' Name='Waher.Persistence.Files.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Persistence.Files.pdb' Vital='yes'/>
+              <File Id='Waher.Persistence.FilesLW.pdb' Name='Waher.Persistence.FilesLW.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Persistence.FilesLW.pdb' Vital='yes'/>
               <File Id='Waher.Runtime.Cache.pdb' Name='Waher.Runtime.Cache.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Runtime.Cache.pdb' Vital='yes'/>
               <File Id='Waher.Runtime.Inventory.pdb' Name='Waher.Runtime.Inventory.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Runtime.Inventory.pdb' Vital='yes'/>
               <File Id='Waher.Runtime.Language.pdb' Name='Waher.Runtime.Language.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Runtime.Language.pdb' Vital='yes'/>
@@ -339,7 +339,7 @@
               <RemoveFile Id='RemoveWaher.Networking.XMPP.Sensor.xml' Name='Waher.Networking.XMPP.Sensor.xml' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Networking.XMPP.xml' Name='Waher.Networking.XMPP.xml' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Persistence.pdb' Name='Waher.Persistence.pdb' On='uninstall'/>
-              <RemoveFile Id='RemoveWaher.Persistence.Files.pdb' Name='Waher.Persistence.Files.pdb' On='uninstall'/>
+              <RemoveFile Id='RemoveWaher.Persistence.FilesLW.pdb' Name='Waher.Persistence.FilesLW.pdb' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Runtime.Cache.pdb' Name='Waher.Runtime.Cache.pdb' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Runtime.Inventory.pdb' Name='Waher.Runtime.Inventory.pdb' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Runtime.Language.pdb' Name='Waher.Runtime.Language.pdb' On='uninstall'/>

@@ -206,7 +206,21 @@ namespace Waher.Persistence.Files
 
 				try
 				{
-					object Instance = Activator.CreateInstance(T);
+					ConstructorInfo DefaultConstructor = null;
+
+					foreach (ConstructorInfo CI in TI.DeclaredConstructors)
+					{
+						if (CI.GetParameters().Length == 0)
+						{
+							DefaultConstructor = CI;
+							break;
+						}
+					}
+
+					if (DefaultConstructor == null)
+						continue;
+
+					object Instance = DefaultConstructor.Invoke(Types.NoParameters);
 					S = (IObjectSerializer)Instance;
 				}
 				catch (Exception ex)
@@ -729,7 +743,7 @@ namespace Waher.Persistence.Files
 
 			if (List == null)
 			{
-				await this.GetFile(Collection);		// Generates structures.
+				await this.GetFile(Collection);     // Generates structures.
 
 				lock (this.synchObj)
 				{
@@ -1040,6 +1054,9 @@ namespace Waher.Persistence.Files
 
 			StringBuilder sb = new StringBuilder();
 
+			string s;
+			bool Exists;
+
 #if NETSTANDARD1_5
 			byte[] Hash;
 
@@ -1049,18 +1066,26 @@ namespace Waher.Persistence.Files
 				sb.Append(FieldName);
 			}
 
-			using (SHA1 Sha1 = SHA1.Create())
+			s = File.FileName + sb.ToString() + ".index";
+			Exists = System.IO.File.Exists(s);
+
+			if (Exists)		// Index file named using the Waher.Pesistence.FilesLW library.
+				sb.Insert(0, File.FileName);
+			else
 			{
-				Hash = Sha1.ComputeHash(Encoding.UTF8.GetBytes(sb.ToString()));
+				using (SHA1 Sha1 = SHA1.Create())
+				{
+					Hash = Sha1.ComputeHash(Encoding.UTF8.GetBytes(sb.ToString()));
+				}
+
+				sb.Clear();
+
+				sb.Append(File.FileName);
+				sb.Append('.');
+
+				foreach (byte b in Hash)
+					sb.Append(b.ToString("x2"));
 			}
-
-			sb.Clear();
-
-			sb.Append(File.FileName);
-			sb.Append('.');
-
-			foreach (byte b in Hash)
-				sb.Append(b.ToString("x2"));
 #else
 			sb.Append(File.FileName);
 
@@ -1072,8 +1097,8 @@ namespace Waher.Persistence.Files
 #endif
 			sb.Append(".index");
 
-			string s = sb.ToString();
-			bool Exists = System.IO.File.Exists(s);
+			s = sb.ToString();
+			Exists = System.IO.File.Exists(s);
 
 			if (!Exists && RegenerationOptions == RegenerationOptions.RegenerateIfFileNotFound)
 				Regenerate = true;

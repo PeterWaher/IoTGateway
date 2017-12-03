@@ -206,7 +206,21 @@ namespace Waher.Persistence.Files
 
 				try
 				{
-					object Instance = Activator.CreateInstance(T);
+					ConstructorInfo DefaultConstructor = null;
+
+					foreach (ConstructorInfo CI in TI.DeclaredConstructors)
+					{
+						if (CI.GetParameters().Length == 0)
+						{
+							DefaultConstructor = CI;
+							break;
+						}
+					}
+
+					if (DefaultConstructor == null)
+						continue;
+
+					object Instance = DefaultConstructor.Invoke(Types.NoParameters);
 					S = (IObjectSerializer)Instance;
 				}
 				catch (Exception ex)
@@ -729,7 +743,7 @@ namespace Waher.Persistence.Files
 
 			if (List == null)
 			{
-				await this.GetFile(Collection);		// Generates structures.
+				await this.GetFile(Collection);     // Generates structures.
 
 				lock (this.synchObj)
 				{

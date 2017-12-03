@@ -112,7 +112,7 @@ namespace Waher.Content.Markdown
 			int End = Blocks.Count - 1;
 			int i, j;
 
-			if (Settings.ParseMetaData)
+			if (Settings.ParseMetaData && Blocks.Count > 0)
 			{
 				Block = Blocks[0];
 				for (i = Block.Start; i <= Block.End; i++)

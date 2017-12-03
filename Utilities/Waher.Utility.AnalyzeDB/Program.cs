@@ -25,6 +25,7 @@ namespace Waher.Utility.AnalyzeDB
 	/// -bbs BLOB_BLOCK_SIZE  BLOB block size, in bytes. Default=8192.
 	/// -enc ENCODING         Text encoding. Default=UTF-8
 	/// -t                    XSLT transform to use.
+	/// -x                    Export contents of each collection.
 	/// -?                    Help.
 	/// </summary>
 	class Program
@@ -44,6 +45,7 @@ namespace Waher.Utility.AnalyzeDB
 				int c = args.Length;
 				bool Help = false;
 				bool Encryption = false;
+				bool Export = false;
 
 				while (i < c)
 				{
@@ -107,6 +109,10 @@ namespace Waher.Utility.AnalyzeDB
 							Encryption = true;
 							break;
 
+						case "-x":
+							Export = true;
+							break;
+
 						case "-?":
 							Help = true;
 							break;
@@ -130,6 +136,7 @@ namespace Waher.Utility.AnalyzeDB
 					Console.Out.WriteLine("-bbs BLOB_BLOCK_SIZE  BLOB block size, in bytes. Default=8192.");
 					Console.Out.WriteLine("-enc ENCODING         Text encoding. Default=UTF-8");
 					Console.Out.WriteLine("-t                    XSLT transform to use.");
+					Console.Out.WriteLine("-x                    Export contents of each collection.");
 					Console.Out.WriteLine("-?                    Help.");
 					return 0;
 				}
@@ -140,7 +147,7 @@ namespace Waher.Utility.AnalyzeDB
 				if (!Directory.Exists(ProgramDataFolder))
 					throw new Exception("Program data folder does not exist.");
 
-				if (!Directory.Exists(OutputFileName))
+				if (string.IsNullOrEmpty(OutputFileName))
 					throw new Exception("No output filename specified.");
 
 				Types.Initialize(
@@ -226,10 +233,11 @@ namespace Waher.Utility.AnalyzeDB
 									w.WriteEndElement();
 								}
 
+								if (Export)
+									File.ExportGraphXML(w, true).Wait();
+
 								w.WriteEndElement();
 							}
-
-							//FilesProvider.ExportXml(w, Properties).Wait();
 
 							w.WriteEndElement();
 							w.WriteEndDocument();

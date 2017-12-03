@@ -9,7 +9,7 @@ namespace Waher.Client.WPF.Controls.Questions
 	[CollectionName("ProvisioningQuestions")]
 	[TypeName(TypeNameSerialization.LocalName)]
 	[Index("Key")]
-	[Index("ProvisioningJid", "Created")]
+	[Index("OwnerJID", "ProvisioningJID", "Created")]
 	public abstract class Question
 	{
 		private Guid objectId = Guid.Empty;
@@ -17,6 +17,7 @@ namespace Waher.Client.WPF.Controls.Questions
 		private string key = string.Empty;
 		private string jid = string.Empty;
 		private string remoteJid = string.Empty;
+		private string ownerJid = string.Empty;
 		private string provisioningJid = string.Empty;
 
 		public Question()
@@ -59,7 +60,14 @@ namespace Waher.Client.WPF.Controls.Questions
 		}
 
 		[DefaultValueStringEmpty]
-		public string ProvisioningJid
+		public string OwnerJID
+		{
+			get { return this.ownerJid; }
+			set { this.ownerJid = value; }
+		}
+
+		[DefaultValueStringEmpty]
+		public string ProvisioningJID
 		{
 			get { return this.provisioningJid; }
 			set { this.provisioningJid = value; }

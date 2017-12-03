@@ -30,9 +30,11 @@ namespace Waher.Client.WPF.Controls
 	public partial class QuestionView : UserControl, ITabView
 	{
 		private string provisioningJid;
+		private string ownerJid;
 
-		public QuestionView(string ProvisioningJid)
+		public QuestionView(string OwnerJid, string ProvisioningJid)
 		{
+			this.ownerJid = OwnerJid;
 			this.provisioningJid = ProvisioningJid;
 
 			InitializeComponent();
@@ -40,6 +42,11 @@ namespace Waher.Client.WPF.Controls
 
 		public void Dispose()
 		{
+		}
+
+		public string OwnerJid
+		{
+			get { return this.ownerJid; }
 		}
 
 		public string ProvisioningJid

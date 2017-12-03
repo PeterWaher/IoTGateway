@@ -80,7 +80,8 @@ namespace Waher.Client.WPF.Model
 						Key = e.Key,
 						JID = e.JID,
 						RemoteJID = e.RemoteJID,
-						ProvisioningJid = this.provisioningClient.ProvisioningServerAddress
+						OwnerJID = XmppClient.GetBareJID(e.To),
+						ProvisioningJID = this.provisioningClient.ProvisioningServerAddress
 					};
 
 					await Database.Insert(Question);
@@ -108,7 +109,8 @@ namespace Waher.Client.WPF.Model
 						Key = e.Key,
 						JID = e.JID,
 						RemoteJID = e.RemoteJID,
-						ProvisioningJid = this.provisioningClient.ProvisioningServerAddress,
+						OwnerJID = XmppClient.GetBareJID(e.To),
+						ProvisioningJID = this.provisioningClient.ProvisioningServerAddress,
 						ServiceTokens = e.ServiceTokens,
 						DeviceTokens = e.DeviceTokens,
 						UserTokens = e.UserTokens,
@@ -144,7 +146,8 @@ namespace Waher.Client.WPF.Model
 						Key = e.Key,
 						JID = e.JID,
 						RemoteJID = e.RemoteJID,
-						ProvisioningJid = this.provisioningClient.ProvisioningServerAddress,
+						OwnerJID = XmppClient.GetBareJID(e.To),
+						ProvisioningJID = this.provisioningClient.ProvisioningServerAddress,
 						ServiceTokens = e.ServiceTokens,
 						DeviceTokens = e.DeviceTokens,
 						UserTokens = e.UserTokens,

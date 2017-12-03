@@ -85,7 +85,7 @@ namespace Waher.Client.WPF
 					databaseProvider = new FilesProvider(appDataFolder + "Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000);
 					Database.Register(databaseProvider);
 
-					this.LoadQuestions(string.Empty);
+					this.LoadQuestions(string.Empty, string.Empty);	// To prepare indices, etc.
 				}
 				catch (Exception ex)
 				{
@@ -796,17 +796,17 @@ namespace Waher.Client.WPF
 			this.Tabs.SelectedItem = TabItem;
 		}
 
-		internal Task LoadQuestions(string ProvisioningJid)
+		internal Task LoadQuestions(string OwnerJid, string ProvisioningJid)
 		{
-			return this.NewQuestion(ProvisioningJid, null);
+			return this.NewQuestion(OwnerJid, ProvisioningJid, null);
 		}
 
 		internal Task NewQuestion(Question Question)
 		{
-			return this.NewQuestion(Question.ProvisioningJid, Question);
+			return this.NewQuestion(Question.OwnerJID, Question.ProvisioningJID, Question);
 		}
 
-		private async Task NewQuestion(string ProvisioningJid, Question Question)
+		private async Task NewQuestion(string OwnerJid, string ProvisioningJid, Question Question)
 		{
 			QuestionView QuestionView;
 			bool DoSearch;
@@ -817,17 +817,17 @@ namespace Waher.Client.WPF
 				DoSearch = true;
 			}
 			else
-				QuestionView = this.OpenQuestionTab(ProvisioningJid, out DoSearch);
+				QuestionView = this.OpenQuestionTab(OwnerJid, ProvisioningJid, out DoSearch);
 
 			if (DoSearch)
 			{
 				bool Found = false;
 
-				foreach (Question Question2 in await Database.Find<Question>())
-					//new FilterFieldEqualTo("ProvisioningJid", ProvisioningJid), "Created"))
+				foreach (Question Question2 in await Database.Find<Question>(new FilterAnd(new FilterFieldEqualTo("OwnerJID", OwnerJid), 
+					new FilterFieldEqualTo("ProvisioningJID", ProvisioningJid)), "Created"))
 				{
 					if (QuestionView == null)
-						QuestionView = this.OpenQuestionTab(ProvisioningJid, out DoSearch);
+						QuestionView = this.OpenQuestionTab(OwnerJid, ProvisioningJid, out DoSearch);
 
 					QuestionView.NewQuestion(Question2);
 
@@ -843,14 +843,16 @@ namespace Waher.Client.WPF
 				QuestionView.NewQuestion(Question);
 		}
 
-		private QuestionView OpenQuestionTab(string ProvisioningJid, out bool DoSearch)
+		private QuestionView OpenQuestionTab(string OwnerJid, string ProvisioningJid, out bool DoSearch)
 		{
 			QuestionView QuestionView = null;
 
 			foreach (TabItem TabItem in this.Tabs.Items)
 			{
 				QuestionView = TabItem.Content as QuestionView;
-				if (QuestionView != null && QuestionView.ProvisioningJid == ProvisioningJid)
+				if (QuestionView != null &&
+					QuestionView.OwnerJid == OwnerJid && 
+					QuestionView.ProvisioningJid == ProvisioningJid)
 				{
 					DoSearch = false;
 					return QuestionView;
@@ -860,9 +862,9 @@ namespace Waher.Client.WPF
 			TabItem TabItem2 = new TabItem();
 			this.Tabs.Items.Add(TabItem2);
 
-			QuestionView = new QuestionView(ProvisioningJid);
+			QuestionView = new QuestionView(OwnerJid, ProvisioningJid);
 
-			TabItem2.Header = "Questions (" + ProvisioningJid + ")";
+			TabItem2.Header = "Questions (" + OwnerJid + ")";
 			TabItem2.Content = QuestionView;
 
 			DoSearch = true;

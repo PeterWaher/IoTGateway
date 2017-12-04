@@ -7,6 +7,8 @@ using System.Windows.Media;
 using Waher.Content.Markdown;
 using Waher.Content.Xml;
 using Waher.Networking.XMPP;
+using System.Windows.Controls;
+using System.Windows.Media.Imaging;
 
 namespace Waher.Client.WPF.Model
 {
@@ -270,5 +272,77 @@ namespace Waher.Client.WPF.Model
 			}
 		}
 
+		public override void AddContexMenuItems(ref string CurrentGroup, ContextMenu Menu)
+		{
+			base.AddContexMenuItems(ref CurrentGroup, Menu);
+
+			XmppAccountNode XmppAccountNode = this.XmppAccountNode;
+
+			if (XmppAccountNode != null && XmppAccountNode.IsOnline)
+			{
+				SubscriptionState SubscriptionState = this.SubscriptionState;
+				MenuItem MenuItem;
+				string s;
+
+				if (SubscriptionState == SubscriptionState.None || SubscriptionState == SubscriptionState.From)
+				{
+					CurrentGroup = "Subscriptions";
+
+					if (SubscriptionState == SubscriptionState.None)
+						s = "../Graphics/To.png";
+					else
+						s = "../Graphics/Both.png";
+
+					Menu.Items.Add(MenuItem = new MenuItem()
+					{
+						Header = "_Subscribe to",
+						IsEnabled = true,
+						Icon = new Image()
+						{
+							Source = new BitmapImage(new Uri(s, UriKind.Relative)),
+							Width = 16,
+							Height = 16
+						}
+					});
+
+					MenuItem.Click += Subscribe_Click;
+				}
+
+				if (SubscriptionState == SubscriptionState.To || SubscriptionState == SubscriptionState.Both)
+				{
+					CurrentGroup = "Subscriptions";
+
+					if (SubscriptionState == SubscriptionState.To)
+						s = "../Graphics/None.png";
+					else
+						s = "../Graphics/From.png";
+
+					Menu.Items.Add(MenuItem = new MenuItem()
+					{
+						Header = "_Unsubscribe from",
+						IsEnabled = true,
+						Icon = new Image()
+						{
+							Source = new BitmapImage(new Uri(s, UriKind.Relative)),
+							Width = 16,
+							Height = 16
+						}
+					});
+
+					MenuItem.Click += Unsubscribe_Click;
+				}
+
+			}
+		}
+
+		private void Subscribe_Click(object sender, RoutedEventArgs e)
+		{
+			this.XmppAccountNode?.Client?.RequestPresenceSubscription(this.bareJid);
+		}
+
+		private void Unsubscribe_Click(object sender, RoutedEventArgs e)
+		{
+			this.XmppAccountNode?.Client?.RequestPresenceUnsubscription(this.bareJid);
+		}
 	}
 }

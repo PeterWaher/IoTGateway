@@ -4269,11 +4269,19 @@ namespace Waher.Networking.XMPP
 				{
 					if (this.roster.TryGetValue(Item.BareJid, out Prev))
 					{
-						this.roster[Item.BareJid] = Item;
-						this.Information("OnRosterItemUpdated()");
-						h = this.OnRosterItemUpdated;
-						if (Prev.HasLastPresence && (Item.State == SubscriptionState.Both || Item.State == SubscriptionState.To))
-							Item.LastPresence = Prev.LastPresence;
+						if (Item.Equals(Prev))
+						{
+							h = null;
+							this.Information("Roster item identical to previous.");
+						}
+						else
+						{
+							this.roster[Item.BareJid] = Item;
+							this.Information("OnRosterItemUpdated()");
+							h = this.OnRosterItemUpdated;
+							if (Prev.HasLastPresence && (Item.State == SubscriptionState.Both || Item.State == SubscriptionState.To))
+								Item.LastPresence = Prev.LastPresence;
+						}
 					}
 					else
 					{

@@ -112,7 +112,7 @@ namespace Waher.Networking.XMPP
 					break;
 
 				case "none":
-                case "":
+				case "":
 					this.state = SubscriptionState.None;
 					break;
 
@@ -278,6 +278,57 @@ namespace Waher.Networking.XMPP
 				else
 					return this.name;
 			}
+		}
+
+		/// <summary>
+		/// <see cref="object.Equals(object)"/>
+		/// </summary>
+		public override bool Equals(object obj)
+		{
+			RosterItem Item = obj as RosterItem;
+			if (Item == null)
+				return false;
+
+			int i, c;
+
+			if (this.state != Item.state ||
+				this.pendingSubscription != Item.pendingSubscription ||
+				this.bareJid != Item.bareJid ||
+				this.name != Item.bareJid ||
+				(c = this.groups.Length) != Item.groups.Length)
+			{
+				return false;
+			}
+
+			for (i = 0; i < c; i++)
+			{
+				if (this.groups[i] != Item.groups[i])
+					return false;
+			}
+
+			return true;
+		}
+
+		/// <summary>
+		/// <see cref="object.GetHashCode()"/>
+		/// </summary>
+		public override int GetHashCode()
+		{
+			int Result = this.state.GetHashCode();
+			Result *= 33;
+			Result |= this.pendingSubscription.GetHashCode();
+			Result *= 33;
+			Result |= this.bareJid.GetHashCode();
+			Result *= 33;
+			Result |= this.name.GetHashCode();
+
+			foreach (string Group in this.groups)
+			{
+				Result *= 33;
+				Result |= Group.GetHashCode();
+			}
+
+			return Result;
 		}
 
 	}

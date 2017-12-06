@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
+using Waher.Networking.XMPP.Provisioning;
 using Waher.Persistence.Attributes;
 using Waher.Things.SensorData;
 
@@ -39,6 +41,17 @@ namespace Waher.Client.WPF.Controls.Questions
 			set { this.categories = value; }
 		}
 
-		public override string QuestionString => "Can read?";
+		public override string QuestionString => "Allowed to read?";
+
+		public override void PopulateDetailsDialog(QuestionView QuestionView, ProvisioningClient ProvisioningClient)
+		{
+			// TODO
+		}
+
+		public override bool IsResolvedBy(Question Question)
+		{
+			// TODO
+			return false;
+		}
 	}
 }

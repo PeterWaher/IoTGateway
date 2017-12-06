@@ -48,7 +48,7 @@ namespace Waher.Client.WPF.Model
 				{
 					try
 					{
-						this.ProvisioningClient_IsFriendQuestion(this, new IsFriendEventArgs(Client, Message));
+						this.ProvisioningClient_IsFriendQuestion(this, new IsFriendEventArgs(this.provisioningClient, Message));
 					}
 					catch (Exception ex)
 					{
@@ -63,6 +63,16 @@ namespace Waher.Client.WPF.Model
 		public bool SupportsProvisioning
 		{
 			get { return this.supportsProvisioning; }
+		}
+
+		public ThingRegistryClient ThingRegistryClient
+		{
+			get { return this.registryClient; }
+		}
+
+		public ProvisioningClient ProvisioningClient
+		{
+			get { return this.provisioningClient; }
 		}
 
 		private async void ProvisioningClient_IsFriendQuestion(object Sender, IsFriendEventArgs e)
@@ -85,7 +95,7 @@ namespace Waher.Client.WPF.Model
 					};
 
 					await Database.Insert(Question);
-					await MainWindow.currentInstance.NewQuestion(Question);
+					await MainWindow.currentInstance.NewQuestion(Question, this.provisioningClient);
 				}
 			}
 			catch (Exception ex)
@@ -122,7 +132,7 @@ namespace Waher.Client.WPF.Model
 					};
 
 					await Database.Insert(Question);
-					await MainWindow.currentInstance.NewQuestion(Question);
+					await MainWindow.currentInstance.NewQuestion(Question, this.provisioningClient);
 				}
 			}
 			catch (Exception ex)
@@ -158,7 +168,7 @@ namespace Waher.Client.WPF.Model
 					};
 
 					await Database.Insert(Question);
-					await MainWindow.currentInstance.NewQuestion(Question);
+					await MainWindow.currentInstance.NewQuestion(Question, this.provisioningClient);
 				}
 			}
 			catch (Exception ex)

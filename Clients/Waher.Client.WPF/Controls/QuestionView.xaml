@@ -5,10 +5,17 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Waher.Client.WPF.Controls"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="700">
+             d:DesignHeight="600" d:DesignWidth="700">
     <DockPanel FocusManager.FocusedElement="{Binding ElementName=QuestionListView}">
-        <ListView Name="QuestionListView" HorizontalAlignment="Left" Margin="0,0,0,0" Width="{Binding ElementName=DockPanel, Path=ActualWidth}"
-                  ScrollViewer.VerticalScrollBarVisibility="Visible">
+        <DockPanel DockPanel.Dock="Right" Width="300">
+            <ScrollViewer DockPanel.Dock="Top" VerticalScrollBarVisibility="Visible">
+                <StackPanel Name="Details" Orientation="Vertical" Margin="10,10,10,10">
+                </StackPanel>
+            </ScrollViewer>
+        </DockPanel>
+        <ListView Name="QuestionListView" HorizontalAlignment="Left" Margin="0,0,0,0"
+                  ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                  SelectionChanged="QuestionListView_SelectionChanged">
             <ListView.Resources>
                 <Style TargetType="{x:Type GridViewColumnHeader}">
                     <Setter Property="HorizontalContentAlignment" Value="Left" />

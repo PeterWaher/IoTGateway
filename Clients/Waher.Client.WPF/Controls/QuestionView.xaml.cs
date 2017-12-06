@@ -21,6 +21,7 @@ using Waher.Content.Xml;
 using Waher.Content.Xsl;
 using Waher.Client.WPF.Model;
 using Waher.Client.WPF.Controls.Questions;
+using Waher.Networking.XMPP.Provisioning;
 
 namespace Waher.Client.WPF.Controls
 {
@@ -29,13 +30,13 @@ namespace Waher.Client.WPF.Controls
 	/// </summary>
 	public partial class QuestionView : UserControl, ITabView
 	{
-		private string provisioningJid;
+		private ProvisioningClient provisioningClient;
 		private string ownerJid;
 
-		public QuestionView(string OwnerJid, string ProvisioningJid)
+		public QuestionView(string OwnerJid, ProvisioningClient ProvisioningClient)
 		{
 			this.ownerJid = OwnerJid;
-			this.provisioningJid = ProvisioningJid;
+			this.provisioningClient = ProvisioningClient;
 
 			InitializeComponent();
 		}
@@ -51,7 +52,7 @@ namespace Waher.Client.WPF.Controls
 
 		public string ProvisioningJid
 		{
-			get { return this.provisioningJid; }
+			get { return this.provisioningClient.ProvisioningServerAddress; }
 		}
 
 		public void NewQuestion(Question Question)
@@ -77,6 +78,14 @@ namespace Waher.Client.WPF.Controls
 		public void SaveButton_Click(object sender, RoutedEventArgs e)
 		{
 			// TODO
+		}
+
+		private void QuestionListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		{
+			this.Details.Children.Clear();
+
+			if (this.QuestionListView.SelectedItem is Question Question)
+				Question.PopulateDetailsDialog(this, this.provisioningClient);
 		}
 	}
 }

@@ -961,7 +961,7 @@ namespace Waher.Client.WPF.Model
 								this.connections.Owner.MainView.NodeAdded(this, Component);
 
 							if (ThingRegistry != null && ThingRegistry.SupportsProvisioning)
-								await MainWindow.currentInstance.LoadQuestions(this.BareJID, Item.JID);
+								await MainWindow.currentInstance.LoadQuestions(this.BareJID, ThingRegistry.ProvisioningClient);
 						}
 						catch (Exception ex)
 						{

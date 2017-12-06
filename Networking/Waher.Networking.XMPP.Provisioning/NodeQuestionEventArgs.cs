@@ -22,9 +22,9 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <summary>
 		/// Abstract base class containing event arguments for node question events.
 		/// </summary>
-		/// <param name="Client">XMPP Client used.</param>
+		/// <param name="Client">Provisioning Client used.</param>
 		/// <param name="e">Message with request.</param>
-		public NodeQuestionEventArgs(XmppClient Client, MessageEventArgs e)
+		public NodeQuestionEventArgs(ProvisioningClient Client, MessageEventArgs e)
 			: base(Client, e)
 		{
 			this.serviceTokens = XML.Attribute(e.Content, "st").Split(space, StringSplitOptions.RemoveEmptyEntries);

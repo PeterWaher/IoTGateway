@@ -8,6 +8,27 @@ using Waher.Content.Xml;
 namespace Waher.Networking.XMPP.Provisioning
 {
 	/// <summary>
+	/// Range of a rule change
+	/// </summary>
+	public enum RuleRange
+	{
+		/// <summary>
+		/// Applies to caller only.
+		/// </summary>
+		Caller,
+
+		/// <summary>
+		/// Applies to the caller domain.
+		/// </summary>
+		Domain,
+
+		/// <summary>
+		/// Appplies to all future requests.
+		/// </summary>
+		All
+	}
+
+	/// <summary>
 	/// Delegate for IsFriend callback methods.
 	/// </summary>
 	/// <param name="Sender">Sender</param>
@@ -22,9 +43,9 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <summary>
 		/// Event arguments for IsFriend events.
 		/// </summary>
-		/// <param name="Client">XMPP Client used.</param>
+		/// <param name="Client">Provisioning Client used.</param>
 		/// <param name="e">Message with request.</param>
-		public IsFriendEventArgs(XmppClient Client, MessageEventArgs e)
+		public IsFriendEventArgs(ProvisioningClient Client, MessageEventArgs e)
 			: base(Client, e)
 		{
 		}
@@ -34,45 +55,58 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// </summary>
 		/// <param name="Callback">Callback method to call when response is received.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		/// <returns>If the response could be sent.</returns>
-		public bool Accept(IqResultEventHandler Callback, object State)
+		public void Accept(IqResultEventHandler Callback, object State)
 		{
-			return this.Respond(true, Callback, State);
+			this.Respond(true, RuleRange.Caller, Callback, State);
 		}
 
 		/// <summary>
 		/// Rejects the friendship.
 		/// </summary>
-		/// <returns>If the response could be sent.</returns>
-		public bool Reject(IqResultEventHandler Callback, object State)
+		public void Reject(IqResultEventHandler Callback, object State)
 		{
-			return this.Respond(false, Callback, State);
+			this.Respond(false, RuleRange.Caller, Callback, State);
 		}
 
-		private bool Respond(bool IsFriend, IqResultEventHandler Callback, object State)
+		/// <summary>
+		/// Accepts the friendship, and similar future requests from the entire remote domain.
+		/// </summary>
+		/// <param name="Callback">Callback method to call when response is received.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public void AcceptForEntireDomain(IqResultEventHandler Callback, object State)
 		{
-			StringBuilder Xml = new StringBuilder();
+			this.Respond(true, RuleRange.Domain, Callback, State);
+		}
 
-			Xml.Append("<isFriendRule xmlns='");
-			Xml.Append(ProvisioningClient.NamespaceProvisioningOwner);
-			Xml.Append("' jid='");
-			Xml.Append(XML.Encode(this.JID));
-			Xml.Append("' remoteJid='");
-			Xml.Append(XML.Encode(this.RemoteJID));
-			Xml.Append("' key='");
-			Xml.Append(XML.Encode(this.Key));
-			Xml.Append("' result='");
-			Xml.Append(CommonTypes.Encode(IsFriend));
-			Xml.Append("'/>");
+		/// <summary>
+		/// Rejects the friendship, and similar future requests from the entire remote domain.
+		/// </summary>
+		public void RejectForEntireDomain(IqResultEventHandler Callback, object State)
+		{
+			this.Respond(false, RuleRange.Domain, Callback, State);
+		}
 
-			RosterItem Item = this.Client[this.FromBareJID];
-			if (Item.HasLastPresence && Item.LastPresence.IsOnline)
-			{
-				this.Client.SendIqSet(Item.LastPresenceFullJid, Xml.ToString(), Callback, State);
-				return true;
-			}
-			else
-				return false;
+		/// <summary>
+		/// Accepts the friendship, and all future requests.
+		/// </summary>
+		/// <param name="Callback">Callback method to call when response is received.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public void AcceptForAll(IqResultEventHandler Callback, object State)
+		{
+			this.Respond(true, RuleRange.All, Callback, State);
+		}
+
+		/// <summary>
+		/// Rejects the friendship, and all future requests.
+		/// </summary>
+		public void RejectForAll(IqResultEventHandler Callback, object State)
+		{
+			this.Respond(false, RuleRange.All, Callback, State);
+		}
+
+		private void Respond(bool IsFriend, RuleRange Range, IqResultEventHandler Callback, object State)
+		{
+			this.Client.IsFriendResponse(this.JID, this.RemoteJID, this.Key, IsFriend, Range, Callback, State);
 		}
 
 	}

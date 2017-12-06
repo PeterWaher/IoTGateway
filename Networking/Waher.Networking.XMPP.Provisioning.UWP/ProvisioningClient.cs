@@ -1080,7 +1080,7 @@ namespace Waher.Networking.XMPP.Provisioning
 			{
 				try
 				{
-					h(this, new IsFriendEventArgs(this.client, e));
+					h(this, new IsFriendEventArgs(this, e));
 				}
 				catch (Exception ex)
 				{
@@ -1093,6 +1093,42 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// Event is raised when the provisioning server asks the owner if a device is allowed to accept a friendship request.
 		/// </summary>
 		public event IsFriendEventHandler IsFriendQuestion = null;
+
+		/// <summary>
+		/// Sends a response to a previous "Is Friend" question.
+		/// </summary>
+		/// <param name="JID">JID of device asking the question.</param>
+		/// <param name="RemoteJID">JID of caller.</param>
+		/// <param name="Key">Key corresponding to request.</param>
+		/// <param name="IsFriend">If the response is yes or no.</param>
+		/// <param name="Range">The range of the response.</param>
+		/// <param name="Callback">Optional callback method to call, when response to request has been received.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void IsFriendResponse(string JID, string RemoteJID, string Key, bool IsFriend, RuleRange Range, IqResultEventHandler Callback, object State)
+		{
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<isFriendRule xmlns='");
+			Xml.Append(ProvisioningClient.NamespaceProvisioningOwner);
+			Xml.Append("' jid='");
+			Xml.Append(XML.Encode(JID));
+			Xml.Append("' remoteJid='");
+			Xml.Append(XML.Encode(RemoteJID));
+			Xml.Append("' key='");
+			Xml.Append(XML.Encode(Key));
+			Xml.Append("' result='");
+			Xml.Append(CommonTypes.Encode(IsFriend));
+
+			if (Range != RuleRange.Caller)
+			{
+				Xml.Append("' range='");
+				Xml.Append(Range.ToString());
+			}
+
+			Xml.Append("'/>");
+
+			this.client.SendIqSet(this.provisioningServerAddress, Xml.ToString(), Callback, State);
+		}
 
 		private void CanReadHandler(object Sender, MessageEventArgs e)
 		{

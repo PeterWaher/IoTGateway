@@ -30,7 +30,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="ProvisioningClient">XMPP Provisioning Client used.</param>
 		/// <param name="e">Message with request.</param>
 		public CanReadEventArgs(ProvisioningClient ProvisioningClient, MessageEventArgs e)
-			: base(ProvisioningClient.Client, e)
+			: base(ProvisioningClient, e)
 		{
 			this.provisioningClient = ProvisioningClient;
 			this.fieldTypes = (FieldType)0;
@@ -356,10 +356,10 @@ namespace Waher.Networking.XMPP.Provisioning
 			Xml.Append(RuleXml);
 			Xml.Append("</canRaedRule>");
 
-			RosterItem Item = this.Client[this.FromBareJID];
+			RosterItem Item = this.Client.Client[this.FromBareJID];
 			if (Item.HasLastPresence && Item.LastPresence.IsOnline)
 			{
-				this.Client.SendIqSet(Item.LastPresenceFullJid, Xml.ToString(), Callback, State);
+				this.Client.Client.SendIqSet(Item.LastPresenceFullJid, Xml.ToString(), Callback, State);
 				return true;
 			}
 			else

@@ -11,7 +11,7 @@ namespace Waher.Networking.XMPP.Provisioning
 	/// </summary>
 	public abstract class QuestionEventArgs : MessageEventArgs
 	{
-		private XmppClient client;
+		private ProvisioningClient client;
 		private string jid;
 		private string remoteJid;
 		private string key;
@@ -21,7 +21,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// </summary>
 		/// <param name="Client">XMPP Client used.</param>
 		/// <param name="e">Message with request.</param>
-		public QuestionEventArgs(XmppClient Client, MessageEventArgs e)
+		public QuestionEventArgs(ProvisioningClient Client, MessageEventArgs e)
 			: base(e)
 		{
 			this.client = Client;
@@ -31,9 +31,9 @@ namespace Waher.Networking.XMPP.Provisioning
 		}
 
 		/// <summary>
-		/// XMPP Client used.
+		/// Provisioning Client used.
 		/// </summary>
-		public XmppClient Client
+		public ProvisioningClient Client
 		{
 			get { return this.client; }
 		}

@@ -1152,6 +1152,190 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// </summary>
 		public event CanReadEventHandler CanReadQuestion = null;
 
+		/// <summary>
+		/// Sends a response to a previous "Can Read" question, based on the JID of the caller.
+		/// </summary>
+		/// <param name="JID">JID of device asking the question.</param>
+		/// <param name="RemoteJID">JID of caller.</param>
+		/// <param name="Key">Key corresponding to request.</param>
+		/// <param name="CanRead">If the caller is allowed to read the device.</param>
+		/// <param name="FieldTypes">Field types allowed.</param>
+		/// <param name="FieldNames">Field names allowed</param>
+		/// <param name="Callback">Optional callback method to call, when response to request has been received.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void CanReadResponseCaller(string JID, string RemoteJID, string Key, bool CanRead, FieldType FieldTypes, string[] FieldNames,
+			IqResultEventHandler Callback, object State)
+		{
+			this.CanReadResponse(JID, RemoteJID, Key, CanRead, FieldTypes, FieldNames, "<fromJid/>", Callback, State);
+		}
+
+		/// <summary>
+		/// Sends a response to a previous "Can Read" question, based on the domain of the caller.
+		/// </summary>
+		/// <param name="JID">JID of device asking the question.</param>
+		/// <param name="RemoteJID">JID of caller.</param>
+		/// <param name="Key">Key corresponding to request.</param>
+		/// <param name="CanRead">If the caller is allowed to read the device.</param>
+		/// <param name="FieldTypes">Field types allowed.</param>
+		/// <param name="FieldNames">Field names allowed</param>
+		/// <param name="Callback">Optional callback method to call, when response to request has been received.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void CanReadResponseDomain(string JID, string RemoteJID, string Key, bool CanRead, FieldType FieldTypes, string[] FieldNames,
+			IqResultEventHandler Callback, object State)
+		{
+			this.CanReadResponse(JID, RemoteJID, Key, CanRead, FieldTypes, FieldNames, "<fromDomain/>", Callback, State);
+		}
+
+		/// <summary>
+		/// Sends a response to a previous "Can Read" question, based on a service token.
+		/// </summary>
+		/// <param name="JID">JID of device asking the question.</param>
+		/// <param name="RemoteJID">JID of caller.</param>
+		/// <param name="Key">Key corresponding to request.</param>
+		/// <param name="CanRead">If the caller is allowed to read the device.</param>
+		/// <param name="FieldTypes">Field types allowed.</param>
+		/// <param name="FieldNames">Field names allowed</param>
+		/// <param name="Token">Token.</param>
+		/// <param name="Callback">Optional callback method to call, when response to request has been received.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void CanReadResponseService(string JID, string RemoteJID, string Key, bool CanRead, FieldType FieldTypes, string[] FieldNames,
+			string Token, IqResultEventHandler Callback, object State)
+		{
+			this.CanReadResponse(JID, RemoteJID, Key, CanRead, FieldTypes, FieldNames, "<fromService token='" + XML.Encode(Token) + "'/>", Callback, State);
+		}
+
+		/// <summary>
+		/// Sends a response to a previous "Can Read" question, based on a device token.
+		/// </summary>
+		/// <param name="JID">JID of device asking the question.</param>
+		/// <param name="RemoteJID">JID of caller.</param>
+		/// <param name="Key">Key corresponding to request.</param>
+		/// <param name="CanRead">If the caller is allowed to read the device.</param>
+		/// <param name="FieldTypes">Field types allowed.</param>
+		/// <param name="FieldNames">Field names allowed</param>
+		/// <param name="Token">Token.</param>
+		/// <param name="Callback">Optional callback method to call, when response to request has been received.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void CanReadResponseDevice(string JID, string RemoteJID, string Key, bool CanRead, FieldType FieldTypes, string[] FieldNames,
+			string Token, IqResultEventHandler Callback, object State)
+		{
+			this.CanReadResponse(JID, RemoteJID, Key, CanRead, FieldTypes, FieldNames, "<fromDevice token='" + XML.Encode(Token) + "'/>", Callback, State);
+		}
+
+		/// <summary>
+		/// Sends a response to a previous "Can Read" question, based on a user token.
+		/// </summary>
+		/// <param name="JID">JID of device asking the question.</param>
+		/// <param name="RemoteJID">JID of caller.</param>
+		/// <param name="Key">Key corresponding to request.</param>
+		/// <param name="CanRead">If the caller is allowed to read the device.</param>
+		/// <param name="FieldTypes">Field types allowed.</param>
+		/// <param name="FieldNames">Field names allowed</param>
+		/// <param name="Token">Token.</param>
+		/// <param name="Callback">Optional callback method to call, when response to request has been received.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void CanReadResponseUser(string JID, string RemoteJID, string Key, bool CanRead, FieldType FieldTypes, string[] FieldNames,
+			string Token, IqResultEventHandler Callback, object State)
+		{
+			this.CanReadResponse(JID, RemoteJID, Key, CanRead, FieldTypes, FieldNames, "<fromUser token='" + XML.Encode(Token) + "'/>", Callback, State);
+		}
+
+		/// <summary>
+		/// Sends a response to a previous "Can Read" question, for all future requests.
+		/// </summary>
+		/// <param name="JID">JID of device asking the question.</param>
+		/// <param name="RemoteJID">JID of caller.</param>
+		/// <param name="Key">Key corresponding to request.</param>
+		/// <param name="CanRead">If the caller is allowed to read the device.</param>
+		/// <param name="FieldTypes">Field types allowed.</param>
+		/// <param name="FieldNames">Field names allowed</param>
+		/// <param name="Callback">Optional callback method to call, when response to request has been received.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void CanReadResponseAll(string JID, string RemoteJID, string Key, bool CanRead, FieldType FieldTypes, string[] FieldNames,
+			IqResultEventHandler Callback, object State)
+		{
+			this.CanReadResponse(JID, RemoteJID, Key, CanRead, FieldTypes, FieldNames, "<all/>", Callback, State);
+		}
+
+		/// <summary>
+		/// Sends a response to a previous "Can Read" question.
+		/// </summary>
+		/// <param name="JID">JID of device asking the question.</param>
+		/// <param name="RemoteJID">JID of caller.</param>
+		/// <param name="Key">Key corresponding to request.</param>
+		/// <param name="CanRead">If the caller is allowed to read the device.</param>
+		/// <param name="FieldTypes">Field types allowed.</param>
+		/// <param name="FieldNames">Field names allowed</param>
+		/// <param name="OriginXml">Origin XML.</param>
+		/// <param name="Callback">Optional callback method to call, when response to request has been received.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		private void CanReadResponse(string JID, string RemoteJID, string Key, bool CanRead, FieldType FieldTypes, string[] FieldNames,
+			string OriginXml, IqResultEventHandler Callback, object State)
+		{
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<canReadRule xmlns='");
+			Xml.Append(ProvisioningClient.NamespaceProvisioningOwner);
+			Xml.Append("' jid='");
+			Xml.Append(XML.Encode(JID));
+			Xml.Append("' remoteJid='");
+			Xml.Append(XML.Encode(RemoteJID));
+			Xml.Append("' key='");
+			Xml.Append(XML.Encode(Key));
+			Xml.Append("' result='");
+			Xml.Append(CommonTypes.Encode(CanRead));
+			Xml.Append("'>");
+
+			if (CanRead && (FieldTypes != FieldType.All || (FieldNames != null && FieldNames.Length > 0)))
+			{
+				Xml.Append("<partial");
+
+				if (FieldTypes == FieldType.All)
+					Xml.Append(" all='true'");
+				else
+				{
+					if ((FieldTypes & FieldType.Momentary) != 0)
+						Xml.Append(" m='true'");
+
+					if ((FieldTypes & FieldType.Identity) != 0)
+						Xml.Append(" i='true'");
+
+					if ((FieldTypes & FieldType.Status) != 0)
+						Xml.Append(" s='true'");
+
+					if ((FieldTypes & FieldType.Computed) != 0)
+						Xml.Append(" c='true'");
+
+					if ((FieldTypes & FieldType.Peak) != 0)
+						Xml.Append(" p='true'");
+
+					if ((FieldTypes & FieldType.Historical) != 0)
+						Xml.Append(" h='true'");
+				}
+
+				if (FieldNames == null || FieldNames.Length == 0)
+					Xml.Append("/>");
+				else
+				{
+					Xml.Append(">");
+
+					foreach (string FieldName in FieldNames)
+					{
+						Xml.Append("<f n='");
+						Xml.Append(XML.Encode(FieldName));
+						Xml.Append("'/>");
+					}
+
+					Xml.Append("</partial>");
+				}
+			}
+
+			Xml.Append(OriginXml);
+			Xml.Append("</canReadRule>");
+
+			this.client.SendIqSet(this.provisioningServerAddress, Xml.ToString(), Callback, State);
+		}
+
 		private void CanControlHandler(object Sender, MessageEventArgs e)
 		{
 			CanControlEventHandler h = this.CanControlQuestion;
@@ -1321,7 +1505,7 @@ namespace Waher.Networking.XMPP.Provisioning
 
 			this.client.SendIqSet(this.provisioningServerAddress, Xml.ToString(), Callback, State);
 		}
-		
+
 		#endregion
 
 	}

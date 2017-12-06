@@ -38,6 +38,7 @@ namespace Waher.Client.WPF.Model
 
 		private LinkedList<KeyValuePair<DateTime, MessageEventArgs>> unhandledMessages = new LinkedList<KeyValuePair<DateTime, MessageEventArgs>>();
 		private LinkedList<XmppComponent> components = new LinkedList<XmppComponent>();
+		private Dictionary<string, List<RosterItemEventHandler>> rosterSubscriptions = new Dictionary<string, List<RosterItemEventHandler>>(StringComparer.CurrentCultureIgnoreCase);
 		private Connections connections;
 		private XmppClient client;
 		private SensorClient sensorClient;
@@ -597,6 +598,59 @@ namespace Waher.Client.WPF.Model
 				}
 				else
 					Contact.OnUpdated();
+
+				this.CheckRosterItemSubscriptions(Item);
+			}
+		}
+
+		private void CheckRosterItemSubscriptions(RosterItem Item)
+		{
+			RosterItemEventHandler[] h;
+
+			lock (this.rosterSubscriptions)
+			{
+				if (this.rosterSubscriptions.TryGetValue(Item.BareJid, out List<RosterItemEventHandler> List))
+					h = List.ToArray();
+				else
+					h = null;
+			}
+
+			if (h != null)
+			{
+				foreach (RosterItemEventHandler h2 in h)
+				{
+					try
+					{
+						h2(this, Item);
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
+				}
+			}
+		}
+
+		public void RegisterRosterEventHandler(string BareJid, RosterItemEventHandler Callback)
+		{
+			lock (this.rosterSubscriptions)
+			{
+				if (!this.rosterSubscriptions.TryGetValue(BareJid, out List<RosterItemEventHandler> h))
+				{
+					h = new List<RosterItemEventHandler>();
+					this.rosterSubscriptions[BareJid] = h;
+				}
+
+				h.Add(Callback);
+			}
+		}
+
+		public void UnregisterRosterEventHandler(string BareJid, RosterItemEventHandler Callback)
+		{
+			lock (this.rosterSubscriptions)
+			{
+				if (this.rosterSubscriptions.TryGetValue(BareJid, out List<RosterItemEventHandler> h) && h.Remove(Callback) && h.Count == 0)
+					this.rosterSubscriptions.Remove(BareJid);
 			}
 		}
 
@@ -642,6 +696,10 @@ namespace Waher.Client.WPF.Model
 					this.client.Information("Presence from same bare JID. Ignored.");
 				else
 					this.client.Error("Presence from node not found in roster: " + e.FromBareJID);
+
+				RosterItem Item = this.client[e.FromBareJID];
+				if (Item != null)
+					this.CheckRosterItemSubscriptions(Item);
 			}
 		}
 
@@ -961,7 +1019,7 @@ namespace Waher.Client.WPF.Model
 								this.connections.Owner.MainView.NodeAdded(this, Component);
 
 							if (ThingRegistry != null && ThingRegistry.SupportsProvisioning)
-								await MainWindow.currentInstance.LoadQuestions(this.BareJID, ThingRegistry.ProvisioningClient);
+								await MainWindow.currentInstance.LoadQuestions(this, ThingRegistry.ProvisioningClient);
 						}
 						catch (Exception ex)
 						{
@@ -1177,5 +1235,6 @@ namespace Waher.Client.WPF.Model
 					MenuAggregator.AddContexMenuItems(Node, ref CurrentGroup, Menu);
 			}
 		}
+
 	}
 }

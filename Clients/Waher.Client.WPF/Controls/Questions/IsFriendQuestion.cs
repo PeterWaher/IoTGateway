@@ -175,7 +175,7 @@ namespace Waher.Client.WPF.Controls.Questions
 				if (this.JID != IsFriendQuestion.JID)
 					return false;
 
-				switch (IsFriendQuestion.range)
+				switch (this.range)
 				{
 					case RuleRange.Caller:
 						return (this.RemoteJID == IsFriendQuestion.RemoteJID);

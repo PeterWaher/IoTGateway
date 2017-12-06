@@ -31,11 +31,11 @@ namespace Waher.Client.WPF.Controls
 	public partial class QuestionView : UserControl, ITabView
 	{
 		private ProvisioningClient provisioningClient;
-		private string ownerJid;
+		private XmppAccountNode owner;
 
-		public QuestionView(string OwnerJid, ProvisioningClient ProvisioningClient)
+		public QuestionView(XmppAccountNode Owner, ProvisioningClient ProvisioningClient)
 		{
-			this.ownerJid = OwnerJid;
+			this.owner = Owner;
 			this.provisioningClient = ProvisioningClient;
 
 			InitializeComponent();
@@ -43,11 +43,13 @@ namespace Waher.Client.WPF.Controls
 
 		public void Dispose()
 		{
+			foreach (Question Q in this.QuestionListView.Items)
+				Q.Dispose();
 		}
 
-		public string OwnerJid
+		public XmppAccountNode Owner
 		{
-			get { return this.ownerJid; }
+			get { return this.owner; }
 		}
 
 		public string ProvisioningJid

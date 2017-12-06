@@ -95,7 +95,7 @@ namespace Waher.Client.WPF.Model
 					};
 
 					await Database.Insert(Question);
-					await MainWindow.currentInstance.NewQuestion(Question, this.provisioningClient);
+					await MainWindow.currentInstance.NewQuestion(this.Account, Question, this.provisioningClient);
 				}
 			}
 			catch (Exception ex)
@@ -132,7 +132,7 @@ namespace Waher.Client.WPF.Model
 					};
 
 					await Database.Insert(Question);
-					await MainWindow.currentInstance.NewQuestion(Question, this.provisioningClient);
+					await MainWindow.currentInstance.NewQuestion(this.Account, Question, this.provisioningClient);
 				}
 			}
 			catch (Exception ex)
@@ -168,7 +168,7 @@ namespace Waher.Client.WPF.Model
 					};
 
 					await Database.Insert(Question);
-					await MainWindow.currentInstance.NewQuestion(Question, this.provisioningClient);
+					await MainWindow.currentInstance.NewQuestion(this.Account, Question, this.provisioningClient);
 				}
 			}
 			catch (Exception ex)
@@ -675,7 +675,7 @@ namespace Waher.Client.WPF.Model
 				if (e2.Ok)
 				{
 					MainWindow.currentInstance.Dispatcher.Invoke(() => MessageBox.Show(MainWindow.currentInstance,
-						"The rules in " + Contact.BareJID + " has been deleted.", "Success", MessageBoxButton.OK, MessageBoxImage.Information));
+						"The rules in " + Contact.BareJID + " have been deleted.", "Success", MessageBoxButton.OK, MessageBoxImage.Information));
 				}
 				else
 				{
@@ -696,7 +696,7 @@ namespace Waher.Client.WPF.Model
 				if (e2.Ok)
 				{
 					MainWindow.currentInstance.Dispatcher.Invoke(() => MessageBox.Show(MainWindow.currentInstance,
-						"The rules in " + Node.Header + " has been deleted.", "Success", MessageBoxButton.OK, MessageBoxImage.Information));
+						"The rules in " + Node.Header + " have been deleted.", "Success", MessageBoxButton.OK, MessageBoxImage.Information));
 				}
 				else
 				{

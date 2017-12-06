@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
+using Waher.Client.WPF.Model;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Provisioning;
 using Waher.Persistence;
@@ -16,7 +17,7 @@ namespace Waher.Client.WPF.Controls.Questions
 	[TypeName(TypeNameSerialization.LocalName)]
 	[Index("Key")]
 	[Index("OwnerJID", "ProvisioningJID", "Created")]
-	public abstract class Question
+	public abstract class Question : IDisposable
 	{
 		private Guid objectId = Guid.Empty;
 		private DateTime created = DateTime.MinValue;
@@ -27,6 +28,10 @@ namespace Waher.Client.WPF.Controls.Questions
 		private string provisioningJid = string.Empty;
 
 		public Question()
+		{
+		}
+
+		public virtual void Dispose()
 		{
 		}
 
@@ -126,12 +131,35 @@ namespace Waher.Client.WPF.Controls.Questions
 			}
 		}
 
+		protected void AddKeyValue(StackPanel Details, string Key, string Value)
+		{
+			TextBlock TextBlock;
+
+			Details.Children.Add(TextBlock = new TextBlock()
+			{
+				TextWrapping = TextWrapping.Wrap,
+				Margin = new Thickness(0, 6, 0, 6)
+			});
+
+			TextBlock.Inlines.Add(Key + ": ");
+			TextBlock.Inlines.Add(new Run()
+			{
+				FontWeight = FontWeights.Bold,
+				Text = Value
+			});
+		}
+
 		public async Task Processed(QuestionView QuestionView)
 		{
 			MainWindow.currentInstance.Dispatcher.Invoke(() =>
 			{
+				int i = QuestionView.QuestionListView.SelectedIndex;
+
 				QuestionView.Details.Children.Clear();
 				QuestionView.QuestionListView.Items.Remove(this);
+
+				if (i < QuestionView.QuestionListView.Items.Count)
+					QuestionView.QuestionListView.SelectedIndex = i;
 			});
 
 			await Database.Delete(this);
@@ -161,6 +189,5 @@ namespace Waher.Client.WPF.Controls.Questions
 					await Database.Delete(Question);
 			}
 		}
-
 	}
 }

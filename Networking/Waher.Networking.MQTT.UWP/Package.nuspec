@@ -16,7 +16,7 @@
     <tags>networking communication mqtt uwp</tags>
     <dependencies>
       <dependency id="Waher.Events" version="1.0.4"/>
-      <dependency id="Waher.Networking" version="1.0.3"/>
+      <dependency id="Waher.Networking" version="1.0.4"/>
     </dependencies>
   </metadata>
   <files>

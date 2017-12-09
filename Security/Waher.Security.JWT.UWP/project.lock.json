@@ -2423,7 +2423,7 @@
           "Waher.Events": "1.0.5"
         }
       },
-      "Waher.Networking/1.0.3": {
+      "Waher.Networking/1.0.4": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -4938,7 +4938,7 @@
           "Waher.Events": "1.0.5"
         }
       },
-      "Waher.Networking/1.0.3": {
+      "Waher.Networking/1.0.4": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -7489,7 +7489,7 @@
           "Waher.Events": "1.0.5"
         }
       },
-      "Waher.Networking/1.0.3": {
+      "Waher.Networking/1.0.4": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -10013,7 +10013,7 @@
           "Waher.Events": "1.0.5"
         }
       },
-      "Waher.Networking/1.0.3": {
+      "Waher.Networking/1.0.4": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -12573,7 +12573,7 @@
           "Waher.Events": "1.0.5"
         }
       },
-      "Waher.Networking/1.0.3": {
+      "Waher.Networking/1.0.4": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -15097,7 +15097,7 @@
           "Waher.Events": "1.0.5"
         }
       },
-      "Waher.Networking/1.0.3": {
+      "Waher.Networking/1.0.4": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -17657,7 +17657,7 @@
           "Waher.Events": "1.0.5"
         }
       },
-      "Waher.Networking/1.0.3": {
+      "Waher.Networking/1.0.4": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -27638,7 +27638,7 @@
       "path": "../../Events/Waher.Events.Statistics/Waher.Events.Statistics.csproj",
       "msbuildProject": "../../Events/Waher.Events.Statistics/Waher.Events.Statistics.csproj"
     },
-    "Waher.Networking/1.0.3": {
+    "Waher.Networking/1.0.4": {
       "type": "project",
       "path": "../../Networking/Waher.Networking/Waher.Networking.csproj",
       "msbuildProject": "../../Networking/Waher.Networking/Waher.Networking.csproj"

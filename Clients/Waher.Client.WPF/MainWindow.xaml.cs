@@ -368,7 +368,7 @@ namespace Waher.Client.WPF
 			e.CanExecute = this.Tabs.SelectedIndex > 0;
 		}
 
-		private void CloseTab_Executed(object sender, ExecutedRoutedEventArgs e)
+		internal void CloseTab_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
 			int i = this.Tabs.SelectedIndex;
 			if (i > 0)

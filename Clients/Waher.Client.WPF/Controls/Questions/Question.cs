@@ -154,11 +154,15 @@ namespace Waher.Client.WPF.Controls.Questions
 			MainWindow.currentInstance.Dispatcher.Invoke(() =>
 			{
 				int i = QuestionView.QuestionListView.SelectedIndex;
+				int c;
 
 				QuestionView.Details.Children.Clear();
 				QuestionView.QuestionListView.Items.Remove(this);
 
-				if (i < QuestionView.QuestionListView.Items.Count)
+				c = QuestionView.QuestionListView.Items.Count;
+				if (c == 0)
+					MainWindow.currentInstance.CloseTab_Executed(this, null);
+				else if (i < c)
 					QuestionView.QuestionListView.SelectedIndex = i;
 			});
 
@@ -183,6 +187,9 @@ namespace Waher.Client.WPF.Controls.Questions
 				{
 					foreach (Question Question in ToRemove)
 						QuestionView.QuestionListView.Items.Remove(Question);
+
+					if (QuestionView.QuestionListView.Items.Count == 0)
+						MainWindow.currentInstance.CloseTab_Executed(this, null);
 				});
 
 				foreach (Question Question in ToRemove)

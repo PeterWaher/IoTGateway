@@ -619,7 +619,7 @@ namespace Waher.Service.GPIO
 
 			this.controlServer = new ControlServer(this.xmppClient, Parameters.ToArray());
 			this.bobClient = new BobClient(this.xmppClient, Path.Combine(Path.GetTempPath(), "BitsOfBinary"));
-			this.chatServer = new ChatServer(this.xmppClient, this.bobClient, this.sensorServer, this.controlServer);
+			this.chatServer = new ChatServer(this.xmppClient, this.bobClient, this.sensorServer, this.controlServer, this.provisioningClient);
 		}
 
 		private async void UpdateMainWindow(bool LampSwitch)

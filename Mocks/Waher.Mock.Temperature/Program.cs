@@ -336,7 +336,7 @@ namespace Waher.Mock.Temperature
 					}, null, 1000 - PeriodStart.Millisecond, 1000);
 
 					BobClient BobClient = new BobClient(Client, Path.Combine(Path.GetTempPath(), "BitsOfBinary"));
-					ChatServer ChatServer = new ChatServer(Client, BobClient, SensorServer);
+					ChatServer ChatServer = new ChatServer(Client, BobClient, SensorServer, ProvisioningClient);
 
 					InteroperabilityServer InteroperabilityServer = new InteroperabilityServer(Client);
 					InteroperabilityServer.OnGetInterfaces += (sender, e) =>

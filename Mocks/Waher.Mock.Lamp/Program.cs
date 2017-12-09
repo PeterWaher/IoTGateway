@@ -174,7 +174,7 @@ namespace Waher.Mock.Lamp
 							}));
 
 					BobClient BobClient = new BobClient(Client, Path.Combine(Path.GetTempPath(), "BitsOfBinary"));
-					ChatServer ChatServer = new ChatServer(Client, BobClient, SensorServer, ControlServer);
+					ChatServer ChatServer = new ChatServer(Client, BobClient, SensorServer, ControlServer, ProvisioningClient);
 
 					InteroperabilityServer InteroperabilityServer = new InteroperabilityServer(Client);
 					InteroperabilityServer.OnGetInterfaces += (sender, e) =>

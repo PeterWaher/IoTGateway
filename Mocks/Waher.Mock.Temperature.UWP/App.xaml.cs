@@ -417,7 +417,7 @@ namespace Waher.Mock.Temperature.UWP
 				};
 
 				this.bobClient = new BobClient(this.xmppClient, Path.Combine(Path.GetTempPath(), "BitsOfBinary"));
-				this.chatServer = new ChatServer(this.xmppClient, this.bobClient, this.sensorServer);
+				this.chatServer = new ChatServer(this.xmppClient, this.bobClient, this.sensorServer, this.provisioningClient);
 
 				this.interoperabilityServer = new InteroperabilityServer(xmppClient);
 				this.interoperabilityServer.OnGetInterfaces += (sender, e) =>

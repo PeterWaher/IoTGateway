@@ -13,6 +13,7 @@ using Waher.Networking.XMPP.BitsOfBinary;
 using Waher.Networking.XMPP.Concentrator;
 using Waher.Networking.XMPP.Control;
 using Waher.Networking.XMPP.HttpFileUpload;
+using Waher.Networking.XMPP.Provisioning;
 using Waher.Networking.XMPP.Sensor;
 using Waher.Runtime.Cache;
 using Waher.Script;
@@ -40,6 +41,7 @@ namespace Waher.Networking.XMPP.Chat
 		private SensorServer sensorServer;
 		private ControlServer controlServer;
 		private ConcentratorServer concentratorServer;
+		private ProvisioningClient provisioningClient;
 		private BobClient bobClient;
 		private HttpFileUploadClient httpUpload = null;
 
@@ -54,7 +56,7 @@ namespace Waher.Networking.XMPP.Chat
 		/// <param name="BobClient">Bits-of-Binary client.</param>
 		/// <param name="SensorServer">Sensor Server. Can be null, if not supporting a sensor interface.</param>
 		public ChatServer(XmppClient Client, BobClient BobClient, SensorServer SensorServer)
-			: this(Client, BobClient, SensorServer, null)
+			: this(Client, BobClient, SensorServer, null, null)
 		{
 		}
 
@@ -69,7 +71,7 @@ namespace Waher.Networking.XMPP.Chat
 		/// <param name="BobClient">Bits-of-Binary client.</param>
 		/// <param name="ControlServer">Control Server. Can be null, if not supporting a control interface.</param>
 		public ChatServer(XmppClient Client, BobClient BobClient, ControlServer ControlServer)
-			: this(Client, BobClient, null, ControlServer)
+			: this(Client, BobClient, null, ControlServer, null)
 		{
 		}
 
@@ -85,11 +87,77 @@ namespace Waher.Networking.XMPP.Chat
 		/// <param name="SensorServer">Sensor Server. Can be null, if not supporting a sensor interface.</param>
 		/// <param name="ControlServer">Control Server. Can be null, if not supporting a control interface.</param>
 		public ChatServer(XmppClient Client, BobClient BobClient, SensorServer SensorServer, ControlServer ControlServer)
+			: this(Client, BobClient, SensorServer, ControlServer, null)
+		{
+		}
+
+		/// <summary>
+		/// Class managing a chat interface for things.
+		/// 
+		/// The chat interface is defined in:
+		/// https://github.com/joachimlindborg/XMPP-IoT/blob/master/xep-0000-IoT-Chat.xml
+		/// http://htmlpreview.github.io/?https://github.com/joachimlindborg/XMPP-IoT/blob/master/xep-0000-IoT-Chat.html
+		/// </summary>
+		/// <param name="Client">XMPP Client.</param>
+		/// <param name="BobClient">Bits-of-Binary client.</param>
+		/// <param name="ConcentratorServer">Concentrator Server.</param>
+		public ChatServer(XmppClient Client, BobClient BobClient, ConcentratorServer ConcentratorServer)
+			: this(Client, BobClient, ConcentratorServer, null)
+		{
+		}
+
+		/// <summary>
+		/// Class managing a chat interface for things.
+		/// 
+		/// The chat interface is defined in:
+		/// https://github.com/joachimlindborg/XMPP-IoT/blob/master/xep-0000-IoT-Chat.xml
+		/// http://htmlpreview.github.io/?https://github.com/joachimlindborg/XMPP-IoT/blob/master/xep-0000-IoT-Chat.html
+		/// </summary>
+		/// <param name="Client">XMPP Client.</param>
+		/// <param name="BobClient">Bits-of-Binary client.</param>
+		/// <param name="SensorServer">Sensor Server. Can be null, if not supporting a sensor interface.</param>
+		/// <param name="ProvisioningClient">Provisioning client.</param>
+		public ChatServer(XmppClient Client, BobClient BobClient, SensorServer SensorServer, ProvisioningClient ProvisioningClient)
+			: this(Client, BobClient, SensorServer, null, ProvisioningClient)
+		{
+		}
+
+		/// <summary>
+		/// Class managing a chat interface for things.
+		/// 
+		/// The chat interface is defined in:
+		/// https://github.com/joachimlindborg/XMPP-IoT/blob/master/xep-0000-IoT-Chat.xml
+		/// http://htmlpreview.github.io/?https://github.com/joachimlindborg/XMPP-IoT/blob/master/xep-0000-IoT-Chat.html
+		/// </summary>
+		/// <param name="Client">XMPP Client.</param>
+		/// <param name="BobClient">Bits-of-Binary client.</param>
+		/// <param name="ControlServer">Control Server. Can be null, if not supporting a control interface.</param>
+		/// <param name="ProvisioningClient">Provisioning client.</param>
+		public ChatServer(XmppClient Client, BobClient BobClient, ControlServer ControlServer, ProvisioningClient ProvisioningClient)
+			: this(Client, BobClient, null, ControlServer, ProvisioningClient)
+		{
+		}
+
+		/// <summary>
+		/// Class managing a chat interface for things.
+		/// 
+		/// The chat interface is defined in:
+		/// https://github.com/joachimlindborg/XMPP-IoT/blob/master/xep-0000-IoT-Chat.xml
+		/// http://htmlpreview.github.io/?https://github.com/joachimlindborg/XMPP-IoT/blob/master/xep-0000-IoT-Chat.html
+		/// </summary>
+		/// <param name="Client">XMPP Client.</param>
+		/// <param name="BobClient">Bits-of-Binary client.</param>
+		/// <param name="SensorServer">Sensor Server. Can be null, if not supporting a sensor interface.</param>
+		/// <param name="ControlServer">Control Server. Can be null, if not supporting a control interface.</param>
+		/// <param name="ProvisioningClient">Provisioning client.</param>
+		public ChatServer(XmppClient Client, BobClient BobClient, SensorServer SensorServer, ControlServer ControlServer,
+			ProvisioningClient ProvisioningClient)
 			: base(Client)
 		{
 			this.bobClient = BobClient;
 			this.sensorServer = SensorServer;
 			this.controlServer = ControlServer;
+			this.provisioningClient = ProvisioningClient;
 			this.concentratorServer = null;
 
 			this.client.OnChatMessage += new MessageEventHandler(Client_OnChatMessage);
@@ -111,12 +179,14 @@ namespace Waher.Networking.XMPP.Chat
 		/// <param name="Client">XMPP Client.</param>
 		/// <param name="BobClient">Bits-of-Binary client.</param>
 		/// <param name="ConcentratorServer">Concentrator Server.</param>
-		public ChatServer(XmppClient Client, BobClient BobClient, ConcentratorServer ConcentratorServer)
+		/// <param name="ProvisioningClient">Provisioning client.</param>
+		public ChatServer(XmppClient Client, BobClient BobClient, ConcentratorServer ConcentratorServer, ProvisioningClient ProvisioningClient)
 			: base(Client)
 		{
 			this.bobClient = BobClient;
 			this.sensorServer = ConcentratorServer.SensorServer;
 			this.controlServer = ConcentratorServer.ControlServer;
+			this.provisioningClient = ProvisioningClient;
 			this.concentratorServer = ConcentratorServer;
 
 			this.client.OnChatMessage += new MessageEventHandler(Client_OnChatMessage);
@@ -348,13 +418,36 @@ namespace Waher.Networking.XMPP.Chat
 						else
 							ThingRef = ThingReference.Empty;
 
+						ThingReference[] NodeReferences = new ThingReference[] { ThingRef };
+						FieldType FieldTypes = Full ? FieldType.All : FieldType.AllExceptHistorical;
+						InternalReadoutFieldsEventHandler FieldsHandler = Full ? (InternalReadoutFieldsEventHandler)this.AllFieldsRead : this.MomentaryFieldsRead;
+						InternalReadoutErrorsEventHandler ErrorsHandler = Full ? (InternalReadoutErrorsEventHandler)this.AllFieldsErrorsRead : this.MomentaryFieldsErrorsRead;
+
 						this.InitReadout(e.From);
 						this.SendPlainTextChatMessage(e.From, "Readout started...");
-						this.sensorServer.DoInternalReadout(e.From, new ThingReference[] { ThingRef },
-							Full ? FieldType.All : FieldType.AllExceptHistorical, null, DateTime.MinValue, DateTime.MaxValue,
-							Full ? (InternalReadoutFieldsEventHandler)this.AllFieldsRead : this.MomentaryFieldsRead,
-							Full ? (InternalReadoutErrorsEventHandler)this.AllFieldsErrorsRead : this.MomentaryFieldsErrorsRead,
-							new object[] { e.From, true, null, Support });
+
+						if (this.provisioningClient != null)
+						{
+							this.provisioningClient.CanRead(XmppClient.GetBareJID(e.From),
+								FieldTypes, NodeReferences, null, new string[0], new string[0], new string[0],
+								(sender2, e2) =>
+								{
+									if (e2.Ok && e2.CanRead)
+									{
+										this.sensorServer.DoInternalReadout(e.From, e2.Nodes, e2.FieldTypes, e2.FieldsNames,
+											DateTime.MinValue, DateTime.MaxValue, FieldsHandler, ErrorsHandler,
+											new object[] { e.From, true, null, Support });
+									}
+									else
+										this.Error(e.From, "Access denied.", Support);
+
+								}, null);
+						}
+						else
+						{
+							this.sensorServer.DoInternalReadout(e.From, NodeReferences, FieldTypes, null, DateTime.MinValue, DateTime.MaxValue,
+								FieldsHandler, ErrorsHandler, new object[] { e.From, true, null, Support });
+						}
 						break;
 
 					case "=":
@@ -516,25 +609,7 @@ namespace Waher.Networking.XMPP.Chat
 						else if (SelectedNode is IActuator Actuator)
 						{
 							ControlParameter[] Parameters = Actuator.GetControlParameters();
-
-							Menu = new SortedDictionary<int, KeyValuePair<string, object>>()
-							{
-								{ -3, new KeyValuePair<string, object>(null, Parameters) },
-								{ -2, new KeyValuePair<string, object>(null, SelectedNode) },
-								{ -1, new KeyValuePair<string, object>(null, SelectedSource) },
-								{ 0, new KeyValuePair<string, object>(null, Menu) }
-							};
-
-							i = 0;
-
-							foreach (ControlParameter P in Parameters)
-							{
-								Menu[++i] = new KeyValuePair<string, object>(P.Name, P.Name + " (" +
-										P.GetStringValue(new ThingReference(SelectedNode.NodeId, SelectedNode.SourceId, SelectedNode.Partition)) + ")");
-							}
-
-							Variables[" Menu "] = Menu;
-							this.SendMenu(e.From, Menu, Support);
+							this.ControlParametersMenu(Parameters, SelectedNode, SelectedSource, Menu, Variables, Support, e);
 						}
 						else
 							this.Error(e.From, "Selected node is not an actuator", Support);
@@ -551,10 +626,7 @@ namespace Waher.Networking.XMPP.Chat
 								if (Menu == null)
 									this.Error(e.From, "There's no previous menu.", Support);
 								else
-								{
-									Variables[" Menu "] = Menu;
-									this.SendMenu(e.From, Menu, Support);
-								}
+									this.SendMenu(e.From, Menu, Variables, Support);
 							}
 							else if (Menu.TryGetValue(-2, out KeyValuePair<string, object> Obj) && Obj.Value is INode Node &&
 								Menu.TryGetValue(-1, out Obj) && Obj.Value is IDataSource Source)
@@ -622,6 +694,10 @@ namespace Waher.Networking.XMPP.Chat
 							this.InitReadout(e.From);
 							string Field = s.Substring(0, s.Length - (Full ? 2 : 1)).Trim();
 
+							FieldTypes = Full ? FieldType.All : FieldType.AllExceptHistorical;
+							FieldsHandler = Full ? (InternalReadoutFieldsEventHandler)this.AllFieldsRead : this.MomentaryFieldsRead;
+							ErrorsHandler = Full ? (InternalReadoutErrorsEventHandler)this.AllFieldsErrorsRead : this.MomentaryFieldsErrorsRead;
+
 							if (this.concentratorServer != null)
 							{
 								if (SelectedSource == null)
@@ -664,20 +740,59 @@ namespace Waher.Networking.XMPP.Chat
 								ThingRef = new ThingReference(Node.NodeId, Node.SourceId, Node.Partition);
 
 								this.SendPlainTextChatMessage(e.From, "Readout of " + Field + " on " + Node.NodeId + " started...");
-								this.sensorServer.DoInternalReadout(e.From, new ThingReference[] { ThingRef },
-									Full ? FieldType.All : FieldType.AllExceptHistorical, null, DateTime.MinValue, DateTime.MaxValue,
-									Full ? (InternalReadoutFieldsEventHandler)this.AllFieldsRead : this.MomentaryFieldsRead,
-									Full ? (InternalReadoutErrorsEventHandler)this.AllFieldsErrorsRead : this.MomentaryFieldsErrorsRead,
-									new object[] { e.From, true, Field, Support });
+
+								NodeReferences = new ThingReference[] { ThingRef };
+
+								if (this.provisioningClient != null)
+								{
+									this.provisioningClient.CanRead(XmppClient.GetBareJID(e.From),
+										FieldTypes, NodeReferences, null, new string[0], new string[0], new string[0],
+										(sender2, e2) =>
+										{
+											if (e2.Ok && e2.CanRead)
+											{
+												this.sensorServer.DoInternalReadout(e.From, e2.Nodes, e2.FieldTypes, e2.FieldsNames,
+													DateTime.MinValue, DateTime.MaxValue, FieldsHandler, ErrorsHandler,
+													new object[] { e.From, true, Field, Support });
+											}
+											else
+												this.Error(e.From, "Access denied.", Support);
+
+										}, null);
+								}
+								else
+								{
+									this.sensorServer.DoInternalReadout(e.From, NodeReferences,
+										FieldTypes, null, DateTime.MinValue, DateTime.MaxValue, FieldsHandler, ErrorsHandler,
+										new object[] { e.From, true, Field, Support });
+								}
 							}
 							else
 							{
 								this.SendPlainTextChatMessage(e.From, "Readout of " + Field + " started...");
-								this.sensorServer.DoInternalReadout(e.From, null, Full ? FieldType.All : FieldType.AllExceptHistorical,
-									null, DateTime.MinValue, DateTime.MaxValue,
-									Full ? (InternalReadoutFieldsEventHandler)this.AllFieldsRead : this.MomentaryFieldsRead,
-									Full ? (InternalReadoutErrorsEventHandler)this.AllFieldsErrorsRead : this.MomentaryFieldsErrorsRead,
-									new object[] { e.From, true, Field, Support });
+
+								if (this.provisioningClient != null)
+								{
+									this.provisioningClient.CanRead(XmppClient.GetBareJID(e.From),
+										FieldTypes, null, null, new string[0], new string[0], new string[0],
+										(sender2, e2) =>
+										{
+											if (e2.Ok && e2.CanRead)
+											{
+												this.sensorServer.DoInternalReadout(e.From, e2.Nodes, e2.FieldTypes, e2.FieldsNames,
+													DateTime.MinValue, DateTime.MaxValue, FieldsHandler, ErrorsHandler,
+													new object[] { e.From, true, Field, Support });
+											}
+											else
+												this.Error(e.From, "Access denied.", Support);
+
+										}, null);
+								}
+								else
+								{
+									this.sensorServer.DoInternalReadout(e.From, null, FieldTypes, null, DateTime.MinValue, DateTime.MaxValue,
+										FieldsHandler, ErrorsHandler, new object[] { e.From, true, Field, Support });
+								}
 							}
 						}
 						else if (SelectedSource != null && await SelectedSource.GetNodeAsync(new ThingReference(s, SelectedSource.SourceID, string.Empty)) is INode Node)
@@ -775,27 +890,18 @@ namespace Waher.Networking.XMPP.Chat
 											else
 												throw new Exception("Device not an actuator.");
 
-											Menu = new SortedDictionary<int, KeyValuePair<string, object>>()
-											{
-												{ -3, new KeyValuePair<string, object>(null, Parameters) },
-												{ -2, new KeyValuePair<string, object>(null, Node) },
-												{ -1, new KeyValuePair<string, object>(null, SelectedSource) },
-												{ 0, new KeyValuePair<string, object>(null, Menu) }
-											};
-
-											i = 0;
+											List<ControlParameter> Parameters2 = new List<ControlParameter>();
 
 											foreach (ControlParameter P in Parameters)
 											{
 												if (P.Name.StartsWith(ParameterName))
-													Menu[++i] = new KeyValuePair<string, object>(P.Name, P.Name + " (" + P.GetStringValue(ThingRef) + ")");
+													Parameters2.Add(P);
 											}
 
-											if (i == 0)
+											if (Parameters2.Count == 0)
 												throw new Exception("No control parameter found starting with that name.");
 
-											Variables[" Menu "] = Menu;
-											this.SendMenu(e.From, Menu, Support);
+											this.ControlParametersMenu(Parameters2.ToArray(), SelectedNode, SelectedSource, Menu, Variables, Support, e);
 											break;
 										}
 										else
@@ -805,17 +911,44 @@ namespace Waher.Networking.XMPP.Chat
 											else
 												Parameters = await this.controlServer.GetControlParameters(ThingRef);
 
+											ControlParameter P0 = null;
+
 											foreach (ControlParameter P in Parameters)
 											{
-												if (string.Compare(P.Name, ParameterName, true) != 0)
-													continue;
+												if (string.Compare(P.Name, ParameterName, true) == 0)
+												{
+													P0 = P;
+													break;
+												}
+											}
 
-												if (!P.SetStringValue(ThingRef, ValueStr))
+											if (P0 == null)
+												throw new Exception("Control parameter not found.");
+
+											if (this.provisioningClient != null)
+											{
+												this.provisioningClient.CanControl(e.FromBareJID, new ThingReference[] { ThingRef },
+													new string[] { ParameterName }, new string[0], new string[0], new string[0], (sender2, e2) =>
+													{
+														if (e2.Ok && e2.CanControl)
+														{
+															if (P0.SetStringValue(ThingRef, ValueStr))
+																this.SendPlainTextChatMessage(e.From, "Control parameter set.");
+															else
+																this.Error(e.From, "Unable to set control parameter value.", Support);
+														}
+														else
+															this.Error(e.From, "Access denied.", Support);
+													}, null);
+											}
+											else
+											{
+												if (!P0.SetStringValue(ThingRef, ValueStr))
 													throw new Exception("Unable to set control parameter value.");
 
 												this.SendPlainTextChatMessage(e.From, "Control parameter set.");
-												return;
 											}
+											return;
 										}
 									}
 									catch (Exception ex)
@@ -834,6 +967,65 @@ namespace Waher.Networking.XMPP.Chat
 			catch (Exception ex)
 			{
 				Log.Critical(ex);
+			}
+		}
+
+		private void ControlParametersMenu(ControlParameter[] Parameters, INode SelectedNode, IDataSource SelectedSource,
+			SortedDictionary<int, KeyValuePair<string, object>> PrevMenu, Variables Variables, RemoteXmppSupport Support,
+			MessageEventArgs e)
+		{
+			SortedDictionary<int, KeyValuePair<string, object>> Menu = new SortedDictionary<int, KeyValuePair<string, object>>()
+			{
+				{ -3, new KeyValuePair<string, object>(null, Parameters) },
+				{ -2, new KeyValuePair<string, object>(null, SelectedNode) },
+				{ -1, new KeyValuePair<string, object>(null, SelectedSource) },
+				{ 0, new KeyValuePair<string, object>(null, PrevMenu) }
+			};
+
+			int i = 0;
+
+			if (this.provisioningClient != null)
+			{
+				int j, c = Parameters.Length;
+				string[] ParameterNames = new string[c];
+
+				for (j = 0; j < c; i++)
+					ParameterNames[j] = Parameters[j].Name;
+
+				this.provisioningClient.CanControl(e.FromBareJID, null, ParameterNames,
+					new string[0], new string[0], new string[0], (sender2, e2) =>
+					{
+						if (e2.Ok && e2.CanControl)
+						{
+							List<ControlParameter> Parameters2 = new List<ControlParameter>();
+
+							foreach (ControlParameter P in Parameters)
+							{
+								if (e2.ParameterNames == null || Array.IndexOf<string>(e2.ParameterNames, P.Name) >= 0)
+								{
+									Parameters2.Add(P);
+									Menu[++i] = new KeyValuePair<string, object>(P.Name, P.Name + " (" +
+										P.GetStringValue(new ThingReference(SelectedNode.NodeId, SelectedNode.SourceId, SelectedNode.Partition)) + ")");
+								}
+							}
+
+							Menu[-3] = new KeyValuePair<string, object>(null, Parameters2.ToArray());
+
+							this.SendMenu(e.From, Menu, Variables, Support);
+						}
+						else
+							this.Error(e.From, "Access denied.", Support);
+					}, null);
+			}
+			else
+			{
+				foreach (ControlParameter P in Parameters)
+				{
+					Menu[++i] = new KeyValuePair<string, object>(P.Name, P.Name + " (" +
+						P.GetStringValue(new ThingReference(SelectedNode.NodeId, SelectedNode.SourceId, SelectedNode.Partition)) + ")");
+				}
+
+				this.SendMenu(e.From, Menu, Variables, Support);
 			}
 		}
 
@@ -890,10 +1082,7 @@ namespace Waher.Networking.XMPP.Chat
 			}
 
 			if (i > 0)
-			{
-				Variables[" Menu "] = Menu;
-				this.SendMenu(e.From, Menu, Support);
-			}
+				this.SendMenu(e.From, Menu, Variables, Support);
 		}
 
 		private void SelectSource(MessageEventArgs e, IDataSource SelectedSource, Variables Variables, SortedDictionary<int, KeyValuePair<string, object>> Menu,
@@ -932,16 +1121,15 @@ namespace Waher.Networking.XMPP.Chat
 			}
 
 			if (i > 0)
-			{
-				Variables[" Menu "] = Menu;
-				this.SendMenu(e.From, Menu, Support);
-			}
+				this.SendMenu(e.From, Menu, Variables, Support);
 		}
 
-		private void SendMenu(string To, SortedDictionary<int, KeyValuePair<string, object>> Menu, RemoteXmppSupport Support)
+		private void SendMenu(string To, SortedDictionary<int, KeyValuePair<string, object>> Menu, Variables Variables, RemoteXmppSupport Support)
 		{
 			StringBuilder sb = new StringBuilder();
 			bool HasBack = false;
+
+			Variables[" Menu "] = Menu;
 
 			if (Support.Markdown)
 			{
@@ -2231,7 +2419,6 @@ namespace Waher.Networking.XMPP.Chat
 		}
 
 		// TODO: Configuration
-		// TODO: Provisioning
 		// TODO: Node Commands.
 		// TODO: Browsing data sources.
 		// TODO: User authentication

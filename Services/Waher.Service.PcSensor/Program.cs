@@ -314,7 +314,7 @@ namespace Waher.Service.PcSensor
 					};
 
 					BobClient BobClient = new BobClient(Client, Path.Combine(Path.GetTempPath(), "BitsOfBinary"));
-					ChatServer ChatServer = new ChatServer(Client, BobClient, SensorServer);
+					ChatServer ChatServer = new ChatServer(Client, BobClient, SensorServer, ProvisioningClient);
 
 					Client.Connect();
 

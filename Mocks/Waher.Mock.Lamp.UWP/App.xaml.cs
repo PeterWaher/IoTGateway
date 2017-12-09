@@ -258,7 +258,7 @@ namespace Waher.Mock.Lamp.UWP
 						}));
 
 				this.bobClient = new BobClient(this.xmppClient, Path.Combine(Path.GetTempPath(), "BitsOfBinary"));
-				this.chatServer = new ChatServer(xmppClient, this.bobClient, this.sensorServer, this.controlServer);
+				this.chatServer = new ChatServer(xmppClient, this.bobClient, this.sensorServer, this.controlServer, this.provisioningClient);
 
 				interoperabilityServer = new InteroperabilityServer(xmppClient);
 				interoperabilityServer.OnGetInterfaces += (sender, e) =>

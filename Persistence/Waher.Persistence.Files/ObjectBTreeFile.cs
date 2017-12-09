@@ -2295,6 +2295,8 @@ namespace Waher.Persistence.Files
 
 							await this.UpdateParentLinksLocked(0, Block);
 						}
+						else
+							this.QueueSaveBlockLocked(0, Block);
 					}
 					else
 					{

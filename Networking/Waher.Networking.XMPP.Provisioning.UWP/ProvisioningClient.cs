@@ -1286,7 +1286,7 @@ namespace Waher.Networking.XMPP.Provisioning
 			Xml.Append(CommonTypes.Encode(CanRead));
 			Xml.Append("'>");
 
-			if (FieldTypes != FieldType.All || FieldNames != null)
+			if (CanRead && (FieldTypes != FieldType.All || (FieldNames != null && FieldNames.Length > 0)))
 			{
 				Xml.Append("<partial");
 
@@ -1313,7 +1313,7 @@ namespace Waher.Networking.XMPP.Provisioning
 						Xml.Append(" h='true'");
 				}
 
-				if (FieldNames == null)
+				if (FieldNames == null || FieldNames.Length == 0)
 					Xml.Append("/>");
 				else
 				{

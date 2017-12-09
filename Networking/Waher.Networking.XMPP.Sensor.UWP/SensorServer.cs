@@ -596,28 +596,38 @@ namespace Waher.Networking.XMPP.Sensor
 						{
 							if (e2.FieldsNames != null)
 							{
-								Dictionary<string, bool> FieldNames = new Dictionary<string, bool>();
-
-								foreach (string FieldName in FieldNames.Keys)
-									FieldNames[FieldName] = true;
-
-								LinkedList<string> ToRemove = null;
-
-								foreach (string FieldName in Fields.Keys)
+								if (Fields == null)
 								{
-									if (!FieldNames.ContainsKey(FieldName))
-									{
-										if (ToRemove == null)
-											ToRemove = new LinkedList<string>();
+									Fields = new Dictionary<string, FieldSubscriptionRule>();
 
-										ToRemove.AddLast(FieldName);
-									}
+									foreach (string FieldName in e2.FieldsNames)
+										Fields[FieldName] = new FieldSubscriptionRule(FieldName);
 								}
-
-								if (ToRemove != null)
+								else
 								{
-									foreach (string FieldName in ToRemove)
-										Fields.Remove(FieldName);
+									Dictionary<string, bool> FieldNames = new Dictionary<string, bool>();
+
+									foreach (string FieldName in e2.FieldsNames)
+										FieldNames[FieldName] = true;
+
+									LinkedList<string> ToRemove = null;
+
+									foreach (string FieldName in Fields.Keys)
+									{
+										if (!FieldNames.ContainsKey(FieldName))
+										{
+											if (ToRemove == null)
+												ToRemove = new LinkedList<string>();
+
+											ToRemove.AddLast(FieldName);
+										}
+									}
+
+									if (ToRemove != null)
+									{
+										foreach (string FieldName in ToRemove)
+											Fields.Remove(FieldName);
+									}
 								}
 							}
 

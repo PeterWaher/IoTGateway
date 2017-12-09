@@ -95,7 +95,9 @@ namespace Waher.Client.WPF.Model
 					};
 
 					await Database.Insert(Question);
-					await MainWindow.currentInstance.NewQuestion(this.Account, Question, this.provisioningClient);
+
+					MainWindow.currentInstance.Dispatcher.Invoke(() =>
+						MainWindow.currentInstance.NewQuestion(this.Account, this.provisioningClient, Question));
 				}
 			}
 			catch (Exception ex)
@@ -132,7 +134,9 @@ namespace Waher.Client.WPF.Model
 					};
 
 					await Database.Insert(Question);
-					await MainWindow.currentInstance.NewQuestion(this.Account, Question, this.provisioningClient);
+
+					MainWindow.currentInstance.Dispatcher.Invoke(() =>
+						MainWindow.currentInstance.NewQuestion(this.Account, this.provisioningClient, Question));
 				}
 			}
 			catch (Exception ex)
@@ -168,7 +172,9 @@ namespace Waher.Client.WPF.Model
 					};
 
 					await Database.Insert(Question);
-					await MainWindow.currentInstance.NewQuestion(this.Account, Question, this.provisioningClient);
+
+					MainWindow.currentInstance.Dispatcher.Invoke(() =>
+						MainWindow.currentInstance.NewQuestion(this.Account, this.provisioningClient, Question));
 				}
 			}
 			catch (Exception ex)

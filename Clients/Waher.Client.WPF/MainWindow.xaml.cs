@@ -86,14 +86,15 @@ namespace Waher.Client.WPF
 					databaseProvider = new FilesProvider(appDataFolder + "Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000);
 					Database.Register(databaseProvider);
 
-					this.LoadQuestions(null, null);	// To prepare indices, etc.
+					Database.Find<Question>(new FilterAnd(new FilterFieldEqualTo("OwnerJID", string.Empty),
+						new FilterFieldEqualTo("ProvisioningJID", string.Empty)));  // To prepare indices, etc.
 				}
 				catch (Exception ex)
 				{
 					Dispatcher.Invoke(() => MessageBox.Show(this, ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error));
 				}
 			});
-			
+
 			InitializeComponent();
 
 			this.MainView.Load(this);
@@ -797,54 +798,55 @@ namespace Waher.Client.WPF
 			this.Tabs.SelectedItem = TabItem;
 		}
 
-		internal Task LoadQuestions(XmppAccountNode Owner, ProvisioningClient ProvisioningClient)
+		internal void NewQuestion(XmppAccountNode Owner, ProvisioningClient ProvisioningClient, Question Question)
 		{
-			return this.NewQuestion(Owner, ProvisioningClient, null);
-		}
+			QuestionView QuestionView = this.FindQuestionTab(Owner, ProvisioningClient);
 
-		internal Task NewQuestion(XmppAccountNode Owner, Question Question, ProvisioningClient ProvisioningClient)
-		{
-			return this.NewQuestion(Owner, ProvisioningClient, Question);
-		}
-
-		private async Task NewQuestion(XmppAccountNode Owner, ProvisioningClient ProvisioningClient, Question Question)
-		{
-			QuestionView QuestionView;
-			bool DoSearch;
-
-			if (Question == null || Owner == null)
+			if (QuestionView != null && Question != null)
 			{
-				QuestionView = null;
-				DoSearch = true;
-			}
-			else
-				QuestionView = this.OpenQuestionTab(Owner, ProvisioningClient, out DoSearch);
-
-			if (DoSearch)
-			{
-				bool Found = false;
-
-				foreach (Question Question2 in await Database.Find<Question>(new FilterAnd(new FilterFieldEqualTo("OwnerJID", Owner?.BareJID), 
-					new FilterFieldEqualTo("ProvisioningJID", ProvisioningClient?.ProvisioningServerAddress)), "Created"))
-				{
-					if (QuestionView == null)
-						QuestionView = this.OpenQuestionTab(Owner, ProvisioningClient, out DoSearch);
-
-					QuestionView.NewQuestion(Question2);
-
-					if (Question != null)
-						Found |= Question2.ObjectId == Question.ObjectId;
-				}
-
-				if (Found)
-					return;
-			}
-
-			if (Question != null)
 				QuestionView.NewQuestion(Question);
+				return;
+			}
+
+			Task.Run(async () =>
+			{
+				try
+				{
+					LinkedList<Question> Questions = new LinkedList<Question>();
+					bool Found = Question == null;
+
+					foreach (Question Question2 in await Database.Find<Question>(new FilterAnd(new FilterFieldEqualTo("OwnerJID", Owner?.BareJID),
+						new FilterFieldEqualTo("ProvisioningJID", ProvisioningClient?.ProvisioningServerAddress)), "Created"))
+					{
+						Questions.AddLast(Question2);
+
+						if (!Found)
+							Found = Question2.ObjectId == Question.ObjectId;
+					}
+
+					if (!Found)
+						Questions.AddLast(Question);
+
+					if (Questions.First != null)
+					{
+						MainWindow.currentInstance.Dispatcher.Invoke(() =>
+						{
+							if (QuestionView == null)
+								QuestionView = this.CreateQuestionTab(Owner, ProvisioningClient);
+
+							foreach (Question Question2 in Questions)
+								QuestionView.NewQuestion(Question2);
+						});
+					}
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			});
 		}
 
-		private QuestionView OpenQuestionTab(XmppAccountNode Owner, ProvisioningClient ProvisioningClient, out bool DoSearch)
+		private QuestionView FindQuestionTab(XmppAccountNode Owner, ProvisioningClient ProvisioningClient)
 		{
 			QuestionView QuestionView = null;
 
@@ -852,23 +854,25 @@ namespace Waher.Client.WPF
 			{
 				QuestionView = TabItem.Content as QuestionView;
 				if (QuestionView != null &&
-					QuestionView.Owner == Owner && 
+					QuestionView.Owner == Owner &&
 					QuestionView.ProvisioningJid == ProvisioningClient.ProvisioningServerAddress)
 				{
-					DoSearch = false;
 					return QuestionView;
 				}
 			}
 
-			TabItem TabItem2 = new TabItem();
-			this.Tabs.Items.Add(TabItem2);
+			return null;
+		}
 
-			QuestionView = new QuestionView(Owner, ProvisioningClient);
+		private QuestionView CreateQuestionTab(XmppAccountNode Owner, ProvisioningClient ProvisioningClient)
+		{
+			TabItem TabItem = new TabItem();
+			this.Tabs.Items.Add(TabItem);
 
-			TabItem2.Header = "Questions (" + Owner.BareJID + ")";
-			TabItem2.Content = QuestionView;
+			QuestionView QuestionView = new QuestionView(Owner, ProvisioningClient);
 
-			DoSearch = true;
+			TabItem.Header = "Questions (" + Owner.BareJID + ")";
+			TabItem.Content = QuestionView;
 
 			return QuestionView;
 		}

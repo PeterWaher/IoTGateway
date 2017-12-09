@@ -987,7 +987,7 @@ namespace Waher.Client.WPF.Model
 			{
 				foreach (Item Item in e.Items)
 				{
-					this.client.SendServiceDiscoveryRequest(Item.JID, async (sender2, e2) =>
+					this.client.SendServiceDiscoveryRequest(Item.JID, (sender2, e2) =>
 					{
 						try
 						{
@@ -1019,7 +1019,10 @@ namespace Waher.Client.WPF.Model
 								this.connections.Owner.MainView.NodeAdded(this, Component);
 
 							if (ThingRegistry != null && ThingRegistry.SupportsProvisioning)
-								await MainWindow.currentInstance.LoadQuestions(this, ThingRegistry.ProvisioningClient);
+							{
+								MainWindow.currentInstance.Dispatcher.Invoke(() =>
+									MainWindow.currentInstance.NewQuestion(this, ThingRegistry.ProvisioningClient, null));
+							}
 						}
 						catch (Exception ex)
 						{

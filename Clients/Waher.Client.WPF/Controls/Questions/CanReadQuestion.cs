@@ -4,8 +4,6 @@ using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Documents;
-using Waher.Client.WPF.Model;
 using Waher.Events;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Provisioning;

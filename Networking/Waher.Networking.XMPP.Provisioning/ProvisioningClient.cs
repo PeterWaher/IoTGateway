@@ -1359,6 +1359,160 @@ namespace Waher.Networking.XMPP.Provisioning
 		public event CanControlEventHandler CanControlQuestion = null;
 
 		/// <summary>
+		/// Sends a response to a previous "Can Control" question, based on the JID of the caller.
+		/// </summary>
+		/// <param name="JID">JID of device asking the question.</param>
+		/// <param name="RemoteJID">JID of caller.</param>
+		/// <param name="Key">Key corresponding to request.</param>
+		/// <param name="CanControl">If the caller is allowed to control the device.</param>
+		/// <param name="ParameterNames">Parameter names allowed</param>
+		/// <param name="Callback">Optional callback method to call, when response to request has been received.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void CanControlResponseCaller(string JID, string RemoteJID, string Key, bool CanControl, string[] ParameterNames,
+			IqResultEventHandler Callback, object State)
+		{
+			this.CanControlResponse(JID, RemoteJID, Key, CanControl, ParameterNames, "<fromJid/>", Callback, State);
+		}
+
+		/// <summary>
+		/// Sends a response to a previous "Can Control" question, based on the domain of the caller.
+		/// </summary>
+		/// <param name="JID">JID of device asking the question.</param>
+		/// <param name="RemoteJID">JID of caller.</param>
+		/// <param name="Key">Key corresponding to request.</param>
+		/// <param name="CanControl">If the caller is allowed to control the device.</param>
+		/// <param name="ParameterNames">Parameter names allowed</param>
+		/// <param name="Callback">Optional callback method to call, when response to request has been received.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void CanControlResponseDomain(string JID, string RemoteJID, string Key, bool CanControl, string[] ParameterNames,
+			IqResultEventHandler Callback, object State)
+		{
+			this.CanControlResponse(JID, RemoteJID, Key, CanControl, ParameterNames, "<fromDomain/>", Callback, State);
+		}
+
+		/// <summary>
+		/// Sends a response to a previous "Can Control" question, based on a service token.
+		/// </summary>
+		/// <param name="JID">JID of device asking the question.</param>
+		/// <param name="RemoteJID">JID of caller.</param>
+		/// <param name="Key">Key corresponding to request.</param>
+		/// <param name="CanControl">If the caller is allowed to control the device.</param>
+		/// <param name="ParameterNames">Parameter names allowed</param>
+		/// <param name="Token">Token.</param>
+		/// <param name="Callback">Optional callback method to call, when response to request has been received.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void CanControlResponseService(string JID, string RemoteJID, string Key, bool CanControl, string[] ParameterNames,
+			string Token, IqResultEventHandler Callback, object State)
+		{
+			this.CanControlResponse(JID, RemoteJID, Key, CanControl, ParameterNames, "<fromService token='" + XML.Encode(Token) + "'/>", Callback, State);
+		}
+
+		/// <summary>
+		/// Sends a response to a previous "Can Control" question, based on a device token.
+		/// </summary>
+		/// <param name="JID">JID of device asking the question.</param>
+		/// <param name="RemoteJID">JID of caller.</param>
+		/// <param name="Key">Key corresponding to request.</param>
+		/// <param name="CanControl">If the caller is allowed to control the device.</param>
+		/// <param name="ParameterNames">Parameter names allowed</param>
+		/// <param name="Token">Token.</param>
+		/// <param name="Callback">Optional callback method to call, when response to request has been received.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void CanControlResponseDevice(string JID, string RemoteJID, string Key, bool CanControl, string[] ParameterNames,
+			string Token, IqResultEventHandler Callback, object State)
+		{
+			this.CanControlResponse(JID, RemoteJID, Key, CanControl, ParameterNames, "<fromDevice token='" + XML.Encode(Token) + "'/>", Callback, State);
+		}
+
+		/// <summary>
+		/// Sends a response to a previous "Can Control" question, based on a user token.
+		/// </summary>
+		/// <param name="JID">JID of device asking the question.</param>
+		/// <param name="RemoteJID">JID of caller.</param>
+		/// <param name="Key">Key corresponding to request.</param>
+		/// <param name="CanControl">If the caller is allowed to control the device.</param>
+		/// <param name="ParameterNames">Parameter names allowed</param>
+		/// <param name="Token">Token.</param>
+		/// <param name="Callback">Optional callback method to call, when response to request has been received.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void CanControlResponseUser(string JID, string RemoteJID, string Key, bool CanControl, string[] ParameterNames,
+			string Token, IqResultEventHandler Callback, object State)
+		{
+			this.CanControlResponse(JID, RemoteJID, Key, CanControl, ParameterNames, "<fromUser token='" + XML.Encode(Token) + "'/>", Callback, State);
+		}
+
+		/// <summary>
+		/// Sends a response to a previous "Can Control" question, for all future requests.
+		/// </summary>
+		/// <param name="JID">JID of device asking the question.</param>
+		/// <param name="RemoteJID">JID of caller.</param>
+		/// <param name="Key">Key corresponding to request.</param>
+		/// <param name="CanControl">If the caller is allowed to control the device.</param>
+		/// <param name="ParameterNames">Parameter names allowed</param>
+		/// <param name="Callback">Optional callback method to call, when response to request has been received.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void CanControlResponseAll(string JID, string RemoteJID, string Key, bool CanControl, string[] ParameterNames,
+			IqResultEventHandler Callback, object State)
+		{
+			this.CanControlResponse(JID, RemoteJID, Key, CanControl, ParameterNames, "<all/>", Callback, State);
+		}
+
+		/// <summary>
+		/// Sends a response to a previous "Can Control" question.
+		/// </summary>
+		/// <param name="JID">JID of device asking the question.</param>
+		/// <param name="RemoteJID">JID of caller.</param>
+		/// <param name="Key">Key corresponding to request.</param>
+		/// <param name="CanControl">If the caller is allowed to control the device.</param>
+		/// <param name="ParameterNames">Parameter names allowed</param>
+		/// <param name="OriginXml">Origin XML.</param>
+		/// <param name="Callback">Optional callback method to call, when response to request has been received.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		private void CanControlResponse(string JID, string RemoteJID, string Key, bool CanControl, string[] ParameterNames,
+			string OriginXml, IqResultEventHandler Callback, object State)
+		{
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<canControlRule xmlns='");
+			Xml.Append(ProvisioningClient.NamespaceProvisioningOwner);
+			Xml.Append("' jid='");
+			Xml.Append(XML.Encode(JID));
+			Xml.Append("' remoteJid='");
+			Xml.Append(XML.Encode(RemoteJID));
+			Xml.Append("' key='");
+			Xml.Append(XML.Encode(Key));
+			Xml.Append("' result='");
+			Xml.Append(CommonTypes.Encode(CanControl));
+			Xml.Append("'>");
+
+			if (CanControl && ParameterNames != null && ParameterNames.Length > 0)
+			{
+				Xml.Append("<partial");
+
+				if (ParameterNames == null || ParameterNames.Length == 0)
+					Xml.Append("/>");
+				else
+				{
+					Xml.Append(">");
+
+					foreach (string ParameterName in ParameterNames)
+					{
+						Xml.Append("<p n='");
+						Xml.Append(XML.Encode(ParameterName));
+						Xml.Append("'/>");
+					}
+
+					Xml.Append("</partial>");
+				}
+			}
+
+			Xml.Append(OriginXml);
+			Xml.Append("</canControlRule>");
+
+			this.client.SendIqSet(this.provisioningServerAddress, Xml.ToString(), Callback, State);
+		}
+
+		/// <summary>
 		/// Clears the rule caches of all owned devices.
 		/// </summary>
 		public void ClearDeviceCaches()

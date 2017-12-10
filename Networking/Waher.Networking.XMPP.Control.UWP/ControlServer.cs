@@ -509,7 +509,7 @@ namespace Waher.Networking.XMPP.Control
 
 									foreach (ControlOperation Operation in Operations)
 									{
-										if (AllowedNodes != null && !AllowedNodes.ContainsKey(Operation.Node))
+										if (AllowedNodes != null && !AllowedNodes.ContainsKey(Operation.Node ?? ThingReference.Empty))
 										{
 											Restricted = true;
 											continue;

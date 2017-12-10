@@ -635,6 +635,9 @@ namespace Waher.Networking.XMPP.Control
 			{
 				LinkedList<ThingReference> Nodes = null;
 				XmlElement E;
+				string ServiceToken = XML.Attribute(e.Query, "st");
+				string DeviceToken = XML.Attribute(e.Query, "dt");
+				string UserToken = XML.Attribute(e.Query, "ut");
 
 				foreach (XmlNode N in e.Query.ChildNodes)
 				{
@@ -731,73 +734,125 @@ namespace Waher.Networking.XMPP.Control
 					Parameters = Left.ToArray();
 				}
 
-				StringBuilder Xml = new StringBuilder();
-				XmlWriter Output = XmlWriter.Create(Xml, XML.WriterSettings(false, true));
-				ThingReference FirstNode;
-
-				Output.WriteStartElement("x", XmppClient.NamespaceData);
-				Output.WriteAttributeString("xmlns", "xdv", null, XmppClient.NamespaceDataValidate);
-				Output.WriteAttributeString("xmlns", "xdl", null, XmppClient.NamespaceDataLayout);
-				Output.WriteAttributeString("xmlns", "xdd", null, XmppClient.NamespaceDynamicForms);
-
-				if (Nodes == null)
+				if (this.provisioningClient != null)
 				{
-					FirstNode = null;
-					Output.WriteElementString("title", this.client.BareJID);
+					int i, c = Parameters.Length;
+					string[] ParameterNames = new string[c];
+
+					for (i = 0; i < c; i++)
+						ParameterNames[i] = Parameters[i].Name;
+
+					this.provisioningClient.CanControl(e.FromBareJid, Nodes, ParameterNames,
+						ServiceToken.Split(space, StringSplitOptions.RemoveEmptyEntries),
+						DeviceToken.Split(space, StringSplitOptions.RemoveEmptyEntries),
+						UserToken.Split(space, StringSplitOptions.RemoveEmptyEntries),
+						(sender2, e2) =>
+						{
+							if (e2.Ok && e2.CanControl)
+							{
+								if (e2.ParameterNames != null)
+								{
+									List<ControlParameter> Parameters2 = new List<ControlParameter>();
+
+									foreach (ControlParameter P in Parameters)
+									{
+										if (Array.IndexOf<string>(e2.ParameterNames, P.Name) >= 0)
+											Parameters2.Add(P);
+									}
+
+									Parameters = Parameters2.ToArray();
+
+									if (Parameters.Length == 0)
+									{
+										e.IqError("<error type='cancel'><forbidden xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>" +
+											"<text xmlns='urn:ietf:params:xml:ns:xmpp-stanzas' xml:lang='en'>Access denied.</text></error>");
+										return;
+									}
+								}
+
+								this.ReturnForm(e, Parameters, Nodes);
+							}
+							else
+							{
+								e.IqError("<error type='cancel'><forbidden xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>" +
+									"<text xmlns='urn:ietf:params:xml:ns:xmpp-stanzas' xml:lang='en'>Access denied.</text></error>");
+							}
+						}, null);
 				}
 				else
-				{
-					FirstNode = Nodes.First.Value;
-
-					if (Nodes.First.Next == null)
-						Output.WriteElementString("title", Nodes.First.Value.NodeId);
-					else
-						Output.WriteElementString("title", Nodes.Count.ToString() + " nodes");
-				}
-
-				LinkedList<string> PagesInOrder = new LinkedList<string>();
-				Dictionary<string, LinkedList<ControlParameter>> ParametersPerPage = new Dictionary<string, LinkedList<ControlParameter>>();
-
-				foreach (ControlParameter P in Parameters)
-				{
-					if (!ParametersPerPage.TryGetValue(P.Page, out LinkedList<ControlParameter> List))
-					{
-						PagesInOrder.AddLast(P.Page);
-						List = new LinkedList<ControlParameter>();
-						ParametersPerPage[P.Page] = List;
-					}
-
-					List.AddLast(P);
-				}
-
-				foreach (string Page in PagesInOrder)
-				{
-					Output.WriteStartElement("xdl", "page", null);
-					Output.WriteAttributeString("label", Page);
-
-					foreach (ControlParameter P in ParametersPerPage[Page])
-					{
-						Output.WriteStartElement("xdl", "fieldref", null);
-						Output.WriteAttributeString("var", P.Name);
-						Output.WriteEndElement();
-					}
-
-					Output.WriteEndElement();
-				}
-
-				foreach (ControlParameter P in Parameters)
-					P.ExportToForm(Output, FirstNode);
-
-				Output.WriteEndElement();
-				Output.Flush();
-
-				e.IqResult(Xml.ToString());
+					this.ReturnForm(e, Parameters, Nodes);
 			}
 			catch (Exception ex)
 			{
 				e.IqError(ex);
 			}
 		}
+
+		private void ReturnForm(IqEventArgs e, ControlParameter[] Parameters, LinkedList<ThingReference> Nodes)
+		{
+			StringBuilder Xml = new StringBuilder();
+			XmlWriter Output = XmlWriter.Create(Xml, XML.WriterSettings(false, true));
+			ThingReference FirstNode;
+
+			Output.WriteStartElement("x", XmppClient.NamespaceData);
+			Output.WriteAttributeString("xmlns", "xdv", null, XmppClient.NamespaceDataValidate);
+			Output.WriteAttributeString("xmlns", "xdl", null, XmppClient.NamespaceDataLayout);
+			Output.WriteAttributeString("xmlns", "xdd", null, XmppClient.NamespaceDynamicForms);
+
+			if (Nodes == null)
+			{
+				FirstNode = null;
+				Output.WriteElementString("title", this.client.BareJID);
+			}
+			else
+			{
+				FirstNode = Nodes.First.Value;
+
+				if (Nodes.First.Next == null)
+					Output.WriteElementString("title", Nodes.First.Value.NodeId);
+				else
+					Output.WriteElementString("title", Nodes.Count.ToString() + " nodes");
+			}
+
+			LinkedList<string> PagesInOrder = new LinkedList<string>();
+			Dictionary<string, LinkedList<ControlParameter>> ParametersPerPage = new Dictionary<string, LinkedList<ControlParameter>>();
+
+			foreach (ControlParameter P in Parameters)
+			{
+				if (!ParametersPerPage.TryGetValue(P.Page, out LinkedList<ControlParameter> List))
+				{
+					PagesInOrder.AddLast(P.Page);
+					List = new LinkedList<ControlParameter>();
+					ParametersPerPage[P.Page] = List;
+				}
+
+				List.AddLast(P);
+			}
+
+			foreach (string Page in PagesInOrder)
+			{
+				Output.WriteStartElement("xdl", "page", null);
+				Output.WriteAttributeString("label", Page);
+
+				foreach (ControlParameter P in ParametersPerPage[Page])
+				{
+					Output.WriteStartElement("xdl", "fieldref", null);
+					Output.WriteAttributeString("var", P.Name);
+					Output.WriteEndElement();
+				}
+
+				Output.WriteEndElement();
+			}
+
+			foreach (ControlParameter P in Parameters)
+				P.ExportToForm(Output, FirstNode);
+
+			Output.WriteEndElement();
+			Output.Flush();
+
+			e.IqResult(Xml.ToString());
+		}
+
 
 	}
 }

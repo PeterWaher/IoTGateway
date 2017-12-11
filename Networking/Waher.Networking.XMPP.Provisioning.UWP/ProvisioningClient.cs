@@ -490,14 +490,7 @@ namespace Waher.Networking.XMPP.Provisioning
 				string Jid = XML.Attribute(e.Content, "jid");
 
 				if (!string.IsNullOrEmpty(Jid))
-				{
-					this.IsFriend(Jid, (sender, e2) =>
-					{
-						if (e2.Ok && e2.Friend)
-							this.client.RequestPresenceSubscription(Jid);
-
-					}, null);
-				}
+					this.client.RequestPresenceSubscription(Jid);
 			}
 		}
 
@@ -1175,12 +1168,13 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="CanRead">If the caller is allowed to read the device.</param>
 		/// <param name="FieldTypes">Field types allowed.</param>
 		/// <param name="FieldNames">Field names allowed</param>
+		/// <param name="Node">Optional node reference. Can be null or <see cref="ThingReference.Empty"/>.</param>
 		/// <param name="Callback">Optional callback method to call, when response to request has been received.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void CanReadResponseCaller(string JID, string RemoteJID, string Key, bool CanRead, FieldType FieldTypes, string[] FieldNames,
-			IqResultEventHandler Callback, object State)
+			IThingReference Node, IqResultEventHandler Callback, object State)
 		{
-			this.CanReadResponse(JID, RemoteJID, Key, CanRead, FieldTypes, FieldNames, "<fromJid/>", Callback, State);
+			this.CanReadResponse(JID, RemoteJID, Key, CanRead, FieldTypes, FieldNames, Node, "<fromJid/>", Callback, State);
 		}
 
 		/// <summary>
@@ -1192,12 +1186,13 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="CanRead">If the caller is allowed to read the device.</param>
 		/// <param name="FieldTypes">Field types allowed.</param>
 		/// <param name="FieldNames">Field names allowed</param>
+		/// <param name="Node">Optional node reference. Can be null or <see cref="ThingReference.Empty"/>.</param>
 		/// <param name="Callback">Optional callback method to call, when response to request has been received.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void CanReadResponseDomain(string JID, string RemoteJID, string Key, bool CanRead, FieldType FieldTypes, string[] FieldNames,
-			IqResultEventHandler Callback, object State)
+			IThingReference Node, IqResultEventHandler Callback, object State)
 		{
-			this.CanReadResponse(JID, RemoteJID, Key, CanRead, FieldTypes, FieldNames, "<fromDomain/>", Callback, State);
+			this.CanReadResponse(JID, RemoteJID, Key, CanRead, FieldTypes, FieldNames, Node, "<fromDomain/>", Callback, State);
 		}
 
 		/// <summary>
@@ -1210,12 +1205,13 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="FieldTypes">Field types allowed.</param>
 		/// <param name="FieldNames">Field names allowed</param>
 		/// <param name="Token">Token.</param>
+		/// <param name="Node">Optional node reference. Can be null or <see cref="ThingReference.Empty"/>.</param>
 		/// <param name="Callback">Optional callback method to call, when response to request has been received.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void CanReadResponseService(string JID, string RemoteJID, string Key, bool CanRead, FieldType FieldTypes, string[] FieldNames,
-			string Token, IqResultEventHandler Callback, object State)
+			string Token, IThingReference Node, IqResultEventHandler Callback, object State)
 		{
-			this.CanReadResponse(JID, RemoteJID, Key, CanRead, FieldTypes, FieldNames, "<fromService token='" + XML.Encode(Token) + "'/>", Callback, State);
+			this.CanReadResponse(JID, RemoteJID, Key, CanRead, FieldTypes, FieldNames, Node, "<fromService token='" + XML.Encode(Token) + "'/>", Callback, State);
 		}
 
 		/// <summary>
@@ -1228,12 +1224,13 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="FieldTypes">Field types allowed.</param>
 		/// <param name="FieldNames">Field names allowed</param>
 		/// <param name="Token">Token.</param>
+		/// <param name="Node">Optional node reference. Can be null or <see cref="ThingReference.Empty"/>.</param>
 		/// <param name="Callback">Optional callback method to call, when response to request has been received.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void CanReadResponseDevice(string JID, string RemoteJID, string Key, bool CanRead, FieldType FieldTypes, string[] FieldNames,
-			string Token, IqResultEventHandler Callback, object State)
+			string Token, IThingReference Node, IqResultEventHandler Callback, object State)
 		{
-			this.CanReadResponse(JID, RemoteJID, Key, CanRead, FieldTypes, FieldNames, "<fromDevice token='" + XML.Encode(Token) + "'/>", Callback, State);
+			this.CanReadResponse(JID, RemoteJID, Key, CanRead, FieldTypes, FieldNames, Node, "<fromDevice token='" + XML.Encode(Token) + "'/>", Callback, State);
 		}
 
 		/// <summary>
@@ -1246,12 +1243,13 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="FieldTypes">Field types allowed.</param>
 		/// <param name="FieldNames">Field names allowed</param>
 		/// <param name="Token">Token.</param>
+		/// <param name="Node">Optional node reference. Can be null or <see cref="ThingReference.Empty"/>.</param>
 		/// <param name="Callback">Optional callback method to call, when response to request has been received.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void CanReadResponseUser(string JID, string RemoteJID, string Key, bool CanRead, FieldType FieldTypes, string[] FieldNames,
-			string Token, IqResultEventHandler Callback, object State)
+			string Token, IThingReference Node, IqResultEventHandler Callback, object State)
 		{
-			this.CanReadResponse(JID, RemoteJID, Key, CanRead, FieldTypes, FieldNames, "<fromUser token='" + XML.Encode(Token) + "'/>", Callback, State);
+			this.CanReadResponse(JID, RemoteJID, Key, CanRead, FieldTypes, FieldNames, Node, "<fromUser token='" + XML.Encode(Token) + "'/>", Callback, State);
 		}
 
 		/// <summary>
@@ -1263,12 +1261,13 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="CanRead">If the caller is allowed to read the device.</param>
 		/// <param name="FieldTypes">Field types allowed.</param>
 		/// <param name="FieldNames">Field names allowed</param>
+		/// <param name="Node">Optional node reference. Can be null or <see cref="ThingReference.Empty"/>.</param>
 		/// <param name="Callback">Optional callback method to call, when response to request has been received.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void CanReadResponseAll(string JID, string RemoteJID, string Key, bool CanRead, FieldType FieldTypes, string[] FieldNames,
-			IqResultEventHandler Callback, object State)
+			IThingReference Node, IqResultEventHandler Callback, object State)
 		{
-			this.CanReadResponse(JID, RemoteJID, Key, CanRead, FieldTypes, FieldNames, "<all/>", Callback, State);
+			this.CanReadResponse(JID, RemoteJID, Key, CanRead, FieldTypes, FieldNames, Node, "<all/>", Callback, State);
 		}
 
 		/// <summary>
@@ -1280,11 +1279,12 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="CanRead">If the caller is allowed to read the device.</param>
 		/// <param name="FieldTypes">Field types allowed.</param>
 		/// <param name="FieldNames">Field names allowed</param>
+		/// <param name="Node">Optional node reference. Can be null or <see cref="ThingReference.Empty"/>.</param>
 		/// <param name="OriginXml">Origin XML.</param>
 		/// <param name="Callback">Optional callback method to call, when response to request has been received.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		private void CanReadResponse(string JID, string RemoteJID, string Key, bool CanRead, FieldType FieldTypes, string[] FieldNames,
-			string OriginXml, IqResultEventHandler Callback, object State)
+			IThingReference Node, string OriginXml, IqResultEventHandler Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -1300,47 +1300,53 @@ namespace Waher.Networking.XMPP.Provisioning
 			Xml.Append(CommonTypes.Encode(CanRead));
 			Xml.Append("'>");
 
-			if (CanRead && (FieldTypes != FieldType.All || (FieldNames != null && FieldNames.Length > 0)))
+			if (CanRead)
 			{
-				Xml.Append("<partial");
+				if (Node != null && (!string.IsNullOrEmpty(Node.NodeId) || !string.IsNullOrEmpty(Node.SourceId) || !string.IsNullOrEmpty(Node.Partition)))
+					this.AppendNode(Xml, Node);
 
-				if (FieldTypes == FieldType.All)
-					Xml.Append(" all='true'");
-				else
+				if (FieldTypes != FieldType.All || (FieldNames != null && FieldNames.Length > 0))
 				{
-					if ((FieldTypes & FieldType.Momentary) != 0)
-						Xml.Append(" m='true'");
+					Xml.Append("<partial");
 
-					if ((FieldTypes & FieldType.Identity) != 0)
-						Xml.Append(" i='true'");
-
-					if ((FieldTypes & FieldType.Status) != 0)
-						Xml.Append(" s='true'");
-
-					if ((FieldTypes & FieldType.Computed) != 0)
-						Xml.Append(" c='true'");
-
-					if ((FieldTypes & FieldType.Peak) != 0)
-						Xml.Append(" p='true'");
-
-					if ((FieldTypes & FieldType.Historical) != 0)
-						Xml.Append(" h='true'");
-				}
-
-				if (FieldNames == null || FieldNames.Length == 0)
-					Xml.Append("/>");
-				else
-				{
-					Xml.Append(">");
-
-					foreach (string FieldName in FieldNames)
+					if (FieldTypes == FieldType.All)
+						Xml.Append(" all='true'");
+					else
 					{
-						Xml.Append("<f n='");
-						Xml.Append(XML.Encode(FieldName));
-						Xml.Append("'/>");
+						if ((FieldTypes & FieldType.Momentary) != 0)
+							Xml.Append(" m='true'");
+
+						if ((FieldTypes & FieldType.Identity) != 0)
+							Xml.Append(" i='true'");
+
+						if ((FieldTypes & FieldType.Status) != 0)
+							Xml.Append(" s='true'");
+
+						if ((FieldTypes & FieldType.Computed) != 0)
+							Xml.Append(" c='true'");
+
+						if ((FieldTypes & FieldType.Peak) != 0)
+							Xml.Append(" p='true'");
+
+						if ((FieldTypes & FieldType.Historical) != 0)
+							Xml.Append(" h='true'");
 					}
 
-					Xml.Append("</partial>");
+					if (FieldNames == null || FieldNames.Length == 0)
+						Xml.Append("/>");
+					else
+					{
+						Xml.Append(">");
+
+						foreach (string FieldName in FieldNames)
+						{
+							Xml.Append("<f n='");
+							Xml.Append(XML.Encode(FieldName));
+							Xml.Append("'/>");
+						}
+
+						Xml.Append("</partial>");
+					}
 				}
 			}
 
@@ -1380,12 +1386,13 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="Key">Key corresponding to request.</param>
 		/// <param name="CanControl">If the caller is allowed to control the device.</param>
 		/// <param name="ParameterNames">Parameter names allowed</param>
+		/// <param name="Node">Optional node reference. Can be null or <see cref="ThingReference.Empty"/>.</param>
 		/// <param name="Callback">Optional callback method to call, when response to request has been received.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void CanControlResponseCaller(string JID, string RemoteJID, string Key, bool CanControl, string[] ParameterNames,
-			IqResultEventHandler Callback, object State)
+			IThingReference Node, IqResultEventHandler Callback, object State)
 		{
-			this.CanControlResponse(JID, RemoteJID, Key, CanControl, ParameterNames, "<fromJid/>", Callback, State);
+			this.CanControlResponse(JID, RemoteJID, Key, CanControl, ParameterNames, Node, "<fromJid/>", Callback, State);
 		}
 
 		/// <summary>
@@ -1396,12 +1403,13 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="Key">Key corresponding to request.</param>
 		/// <param name="CanControl">If the caller is allowed to control the device.</param>
 		/// <param name="ParameterNames">Parameter names allowed</param>
+		/// <param name="Node">Optional node reference. Can be null or <see cref="ThingReference.Empty"/>.</param>
 		/// <param name="Callback">Optional callback method to call, when response to request has been received.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void CanControlResponseDomain(string JID, string RemoteJID, string Key, bool CanControl, string[] ParameterNames,
-			IqResultEventHandler Callback, object State)
+			IThingReference Node, IqResultEventHandler Callback, object State)
 		{
-			this.CanControlResponse(JID, RemoteJID, Key, CanControl, ParameterNames, "<fromDomain/>", Callback, State);
+			this.CanControlResponse(JID, RemoteJID, Key, CanControl, ParameterNames, Node, "<fromDomain/>", Callback, State);
 		}
 
 		/// <summary>
@@ -1413,12 +1421,13 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="CanControl">If the caller is allowed to control the device.</param>
 		/// <param name="ParameterNames">Parameter names allowed</param>
 		/// <param name="Token">Token.</param>
+		/// <param name="Node">Optional node reference. Can be null or <see cref="ThingReference.Empty"/>.</param>
 		/// <param name="Callback">Optional callback method to call, when response to request has been received.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void CanControlResponseService(string JID, string RemoteJID, string Key, bool CanControl, string[] ParameterNames,
-			string Token, IqResultEventHandler Callback, object State)
+			string Token, IThingReference Node, IqResultEventHandler Callback, object State)
 		{
-			this.CanControlResponse(JID, RemoteJID, Key, CanControl, ParameterNames, "<fromService token='" + XML.Encode(Token) + "'/>", Callback, State);
+			this.CanControlResponse(JID, RemoteJID, Key, CanControl, ParameterNames, Node, "<fromService token='" + XML.Encode(Token) + "'/>", Callback, State);
 		}
 
 		/// <summary>
@@ -1430,12 +1439,13 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="CanControl">If the caller is allowed to control the device.</param>
 		/// <param name="ParameterNames">Parameter names allowed</param>
 		/// <param name="Token">Token.</param>
+		/// <param name="Node">Optional node reference. Can be null or <see cref="ThingReference.Empty"/>.</param>
 		/// <param name="Callback">Optional callback method to call, when response to request has been received.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void CanControlResponseDevice(string JID, string RemoteJID, string Key, bool CanControl, string[] ParameterNames,
-			string Token, IqResultEventHandler Callback, object State)
+			string Token, IThingReference Node, IqResultEventHandler Callback, object State)
 		{
-			this.CanControlResponse(JID, RemoteJID, Key, CanControl, ParameterNames, "<fromDevice token='" + XML.Encode(Token) + "'/>", Callback, State);
+			this.CanControlResponse(JID, RemoteJID, Key, CanControl, ParameterNames, Node, "<fromDevice token='" + XML.Encode(Token) + "'/>", Callback, State);
 		}
 
 		/// <summary>
@@ -1447,12 +1457,13 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="CanControl">If the caller is allowed to control the device.</param>
 		/// <param name="ParameterNames">Parameter names allowed</param>
 		/// <param name="Token">Token.</param>
+		/// <param name="Node">Optional node reference. Can be null or <see cref="ThingReference.Empty"/>.</param>
 		/// <param name="Callback">Optional callback method to call, when response to request has been received.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void CanControlResponseUser(string JID, string RemoteJID, string Key, bool CanControl, string[] ParameterNames,
-			string Token, IqResultEventHandler Callback, object State)
+			string Token, IThingReference Node, IqResultEventHandler Callback, object State)
 		{
-			this.CanControlResponse(JID, RemoteJID, Key, CanControl, ParameterNames, "<fromUser token='" + XML.Encode(Token) + "'/>", Callback, State);
+			this.CanControlResponse(JID, RemoteJID, Key, CanControl, ParameterNames, Node, "<fromUser token='" + XML.Encode(Token) + "'/>", Callback, State);
 		}
 
 		/// <summary>
@@ -1463,12 +1474,13 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="Key">Key corresponding to request.</param>
 		/// <param name="CanControl">If the caller is allowed to control the device.</param>
 		/// <param name="ParameterNames">Parameter names allowed</param>
+		/// <param name="Node">Optional node reference. Can be null or <see cref="ThingReference.Empty"/>.</param>
 		/// <param name="Callback">Optional callback method to call, when response to request has been received.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void CanControlResponseAll(string JID, string RemoteJID, string Key, bool CanControl, string[] ParameterNames,
-			IqResultEventHandler Callback, object State)
+			IThingReference Node, IqResultEventHandler Callback, object State)
 		{
-			this.CanControlResponse(JID, RemoteJID, Key, CanControl, ParameterNames, "<all/>", Callback, State);
+			this.CanControlResponse(JID, RemoteJID, Key, CanControl, ParameterNames, Node, "<all/>", Callback, State);
 		}
 
 		/// <summary>
@@ -1479,11 +1491,12 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="Key">Key corresponding to request.</param>
 		/// <param name="CanControl">If the caller is allowed to control the device.</param>
 		/// <param name="ParameterNames">Parameter names allowed</param>
+		/// <param name="Node">Optional node reference. Can be null or <see cref="ThingReference.Empty"/>.</param>
 		/// <param name="OriginXml">Origin XML.</param>
 		/// <param name="Callback">Optional callback method to call, when response to request has been received.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		private void CanControlResponse(string JID, string RemoteJID, string Key, bool CanControl, string[] ParameterNames,
-			string OriginXml, IqResultEventHandler Callback, object State)
+			IThingReference Node, string OriginXml, IqResultEventHandler Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -1499,24 +1512,30 @@ namespace Waher.Networking.XMPP.Provisioning
 			Xml.Append(CommonTypes.Encode(CanControl));
 			Xml.Append("'>");
 
-			if (CanControl && ParameterNames != null && ParameterNames.Length > 0)
+			if (CanControl)
 			{
-				Xml.Append("<partial");
+				if (Node != null && (!string.IsNullOrEmpty(Node.NodeId) || !string.IsNullOrEmpty(Node.SourceId) || !string.IsNullOrEmpty(Node.Partition)))
+					this.AppendNode(Xml, Node);
 
-				if (ParameterNames == null || ParameterNames.Length == 0)
-					Xml.Append("/>");
-				else
+				if (ParameterNames != null && ParameterNames.Length > 0)
 				{
-					Xml.Append(">");
+					Xml.Append("<partial");
 
-					foreach (string ParameterName in ParameterNames)
+					if (ParameterNames == null || ParameterNames.Length == 0)
+						Xml.Append("/>");
+					else
 					{
-						Xml.Append("<p n='");
-						Xml.Append(XML.Encode(ParameterName));
-						Xml.Append("'/>");
-					}
+						Xml.Append(">");
 
-					Xml.Append("</partial>");
+						foreach (string ParameterName in ParameterNames)
+						{
+							Xml.Append("<p n='");
+							Xml.Append(XML.Encode(ParameterName));
+							Xml.Append("'/>");
+						}
+
+						Xml.Append("</partial>");
+					}
 				}
 			}
 

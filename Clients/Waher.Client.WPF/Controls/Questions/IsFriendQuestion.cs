@@ -130,12 +130,30 @@ namespace Waher.Client.WPF.Controls.Questions
 				return s.Substring(i + 1);
 		}
 
-		private Task Process(bool Response, RuleRange Range)
+		private void Process(bool Response, RuleRange Range)
 		{
 			this.response = Response;
 			this.range = Range;
-			this.client.IsFriendResponse(this.JID, this.RemoteJID, this.Key, Response, Range, null, null);
-			return this.Processed(this.questionView);
+			this.client.IsFriendResponse(this.JID, this.RemoteJID, this.Key, Response, Range, this.RuleCallback, null);
+		}
+
+		private async void RuleCallback(object Sender, IqResultEventArgs e)
+		{
+			try
+			{
+				if (e.Ok)
+					await this.Processed(this.questionView);
+				else
+				{
+					MainWindow.currentInstance.Dispatcher.Invoke(() => MessageBox.Show(MainWindow.currentInstance,
+						string.IsNullOrEmpty(e.ErrorText) ? "Unable to set rule." : e.ErrorText, "Error", MessageBoxButton.OK, MessageBoxImage.Error));
+				}
+			}
+			catch (Exception ex)
+			{
+				MainWindow.currentInstance.Dispatcher.Invoke(() => MessageBox.Show(MainWindow.currentInstance,
+					ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error));
+			}
 		}
 
 		private void NoAllButton_Click(object sender, RoutedEventArgs e)

@@ -352,46 +352,59 @@ namespace Waher.Client.WPF.Controls.Questions
 				return null;
 		}
 
+		private async void RuleCallback(object Sender, IqResultEventArgs e)
+		{
+			try
+			{
+				if (e.Ok)
+					await this.Processed(this.questionView);
+				else
+				{
+					MainWindow.currentInstance.Dispatcher.Invoke(() => MessageBox.Show(MainWindow.currentInstance,
+						string.IsNullOrEmpty(e.ErrorText) ? "Unable to set rule." : e.ErrorText, "Error", MessageBoxButton.OK, MessageBoxImage.Error));
+				}
+			}
+			catch (Exception ex)
+			{
+				MainWindow.currentInstance.Dispatcher.Invoke(() => MessageBox.Show(MainWindow.currentInstance,
+					ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error));
+			}
+		}
+
 		private void NoAllButton_Click(object sender, RoutedEventArgs e)
 		{
 			this.range = OperationRange.All;
-			this.client.CanControlResponseAll(this.JID, this.RemoteJID, this.Key, false, this.GetParameters(), null, null);
-			this.Process();
+			this.client.CanControlResponseAll(this.JID, this.RemoteJID, this.Key, false, this.GetParameters(), this.GetNodeReference(), this.RuleCallback, null);
 		}
 
 		private void YesAllButton_Click(object sender, RoutedEventArgs e)
 		{
 			this.range = OperationRange.All;
-			this.client.CanControlResponseAll(this.JID, this.RemoteJID, this.Key, true, this.GetParameters(), null, null);
-			this.Process();
+			this.client.CanControlResponseAll(this.JID, this.RemoteJID, this.Key, true, this.GetParameters(), this.GetNodeReference(), this.RuleCallback, null);
 		}
 
 		private void NoDomainButton_Click(object sender, RoutedEventArgs e)
 		{
 			this.range = OperationRange.Domain;
-			this.client.CanControlResponseDomain(this.JID, this.RemoteJID, this.Key, false, this.GetParameters(), null, null);
-			this.Process();
+			this.client.CanControlResponseDomain(this.JID, this.RemoteJID, this.Key, false, this.GetParameters(), this.GetNodeReference(), this.RuleCallback, null);
 		}
 
 		private void YesDomainButton_Click(object sender, RoutedEventArgs e)
 		{
 			this.range = OperationRange.Domain;
-			this.client.CanControlResponseDomain(this.JID, this.RemoteJID, this.Key, true, this.GetParameters(), null, null);
-			this.Process();
+			this.client.CanControlResponseDomain(this.JID, this.RemoteJID, this.Key, true, this.GetParameters(), this.GetNodeReference(), this.RuleCallback, null);
 		}
 
 		private void NoButton_Click(object sender, RoutedEventArgs e)
 		{
 			this.range = OperationRange.Caller;
-			this.client.CanControlResponseCaller(this.JID, this.RemoteJID, this.Key, false, this.GetParameters(), null, null);
-			this.Process();
+			this.client.CanControlResponseCaller(this.JID, this.RemoteJID, this.Key, false, this.GetParameters(), this.GetNodeReference(), this.RuleCallback, null);
 		}
 
 		private void YesButton_Click(object sender, RoutedEventArgs e)
 		{
 			this.range = OperationRange.Caller;
-			this.client.CanControlResponseCaller(this.JID, this.RemoteJID, this.Key, true, this.GetParameters(), null, null);
-			this.Process();
+			this.client.CanControlResponseCaller(this.JID, this.RemoteJID, this.Key, true, this.GetParameters(), this.GetNodeReference(), this.RuleCallback, null);
 		}
 
 		private void NoTokenButton_Click(object sender, RoutedEventArgs e)
@@ -409,29 +422,22 @@ namespace Waher.Client.WPF.Controls.Questions
 			switch (this.range)
 			{
 				case OperationRange.ServiceToken:
-					this.client.CanControlResponseService(this.JID, this.RemoteJID, this.Key, Result, this.GetParameters(), this.parameter, null, null);
+					this.client.CanControlResponseService(this.JID, this.RemoteJID, this.Key, Result, this.GetParameters(), this.parameter, this.GetNodeReference(), this.RuleCallback, null);
 					break;
 
 				case OperationRange.DeviceToken:
-					this.client.CanControlResponseDevice(this.JID, this.RemoteJID, this.Key, Result, this.GetParameters(), this.parameter, null, null);
+					this.client.CanControlResponseDevice(this.JID, this.RemoteJID, this.Key, Result, this.GetParameters(), this.parameter, this.GetNodeReference(), this.RuleCallback, null);
 					break;
 
 				case OperationRange.UserToken:
-					this.client.CanControlResponseUser(this.JID, this.RemoteJID, this.Key, Result, this.GetParameters(), this.parameter, null, null);
+					this.client.CanControlResponseUser(this.JID, this.RemoteJID, this.Key, Result, this.GetParameters(), this.parameter, this.GetNodeReference(), this.RuleCallback, null);
 					break;
 			}
-
-			this.Process();
 		}
 
 		private void YesTokenButton_Click(object sender, RoutedEventArgs e)
 		{
 			this.TokenButtonClick(sender, e, true);
-		}
-
-		private Task Process()
-		{
-			return this.Processed(this.questionView);
 		}
 
 		public override bool IsResolvedBy(Question Question)

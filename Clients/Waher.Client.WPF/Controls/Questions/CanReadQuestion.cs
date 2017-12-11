@@ -491,46 +491,59 @@ namespace Waher.Client.WPF.Controls.Questions
 				return null;
 		}
 
+		private async void RuleCallback(object Sender, IqResultEventArgs e)
+		{
+			try
+			{
+				if (e.Ok)
+					await this.Processed(this.questionView);
+				else
+				{
+					MainWindow.currentInstance.Dispatcher.Invoke(() => MessageBox.Show(MainWindow.currentInstance,
+						string.IsNullOrEmpty(e.ErrorText) ? "Unable to set rule." : e.ErrorText, "Error", MessageBoxButton.OK, MessageBoxImage.Error));
+				}
+			}
+			catch (Exception ex)
+			{
+				MainWindow.currentInstance.Dispatcher.Invoke(() => MessageBox.Show(MainWindow.currentInstance,
+					ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error));
+			}
+		}
+
 		private void NoAllButton_Click(object sender, RoutedEventArgs e)
 		{
 			this.range = OperationRange.All;
-			this.client.CanReadResponseAll(this.JID, this.RemoteJID, this.Key, false, this.GetFieldType(), this.GetFields(), null, null);
-			this.Process();
+			this.client.CanReadResponseAll(this.JID, this.RemoteJID, this.Key, false, this.GetFieldType(), this.GetFields(), this.GetNodeReference(), this.RuleCallback, null);
 		}
 
 		private void YesAllButton_Click(object sender, RoutedEventArgs e)
 		{
 			this.range = OperationRange.All;
-			this.client.CanReadResponseAll(this.JID, this.RemoteJID, this.Key, true, this.GetFieldType(), this.GetFields(), null, null);
-			this.Process();
+			this.client.CanReadResponseAll(this.JID, this.RemoteJID, this.Key, true, this.GetFieldType(), this.GetFields(), this.GetNodeReference(), this.RuleCallback, null);
 		}
 
 		private void NoDomainButton_Click(object sender, RoutedEventArgs e)
 		{
 			this.range = OperationRange.Domain;
-			this.client.CanReadResponseDomain(this.JID, this.RemoteJID, this.Key, false, this.GetFieldType(), this.GetFields(), null, null);
-			this.Process();
+			this.client.CanReadResponseDomain(this.JID, this.RemoteJID, this.Key, false, this.GetFieldType(), this.GetFields(), this.GetNodeReference(), this.RuleCallback, null);
 		}
 
 		private void YesDomainButton_Click(object sender, RoutedEventArgs e)
 		{
 			this.range = OperationRange.Domain;
-			this.client.CanReadResponseDomain(this.JID, this.RemoteJID, this.Key, true, this.GetFieldType(), this.GetFields(), null, null);
-			this.Process();
+			this.client.CanReadResponseDomain(this.JID, this.RemoteJID, this.Key, true, this.GetFieldType(), this.GetFields(), this.GetNodeReference(), this.RuleCallback, null);
 		}
 
 		private void NoButton_Click(object sender, RoutedEventArgs e)
 		{
 			this.range = OperationRange.Caller;
-			this.client.CanReadResponseCaller(this.JID, this.RemoteJID, this.Key, false, this.GetFieldType(), this.GetFields(), null, null);
-			this.Process();
+			this.client.CanReadResponseCaller(this.JID, this.RemoteJID, this.Key, false, this.GetFieldType(), this.GetFields(), this.GetNodeReference(), this.RuleCallback, null);
 		}
 
 		private void YesButton_Click(object sender, RoutedEventArgs e)
 		{
 			this.range = OperationRange.Caller;
-			this.client.CanReadResponseCaller(this.JID, this.RemoteJID, this.Key, true, this.GetFieldType(), this.GetFields(), null, null);
-			this.Process();
+			this.client.CanReadResponseCaller(this.JID, this.RemoteJID, this.Key, true, this.GetFieldType(), this.GetFields(), this.GetNodeReference(), this.RuleCallback, null);
 		}
 
 		private void NoTokenButton_Click(object sender, RoutedEventArgs e)
@@ -548,29 +561,22 @@ namespace Waher.Client.WPF.Controls.Questions
 			switch (this.range)
 			{
 				case OperationRange.ServiceToken:
-					this.client.CanReadResponseService(this.JID, this.RemoteJID, this.Key, Result, this.GetFieldType(), this.GetFields(), this.parameter, null, null);
+					this.client.CanReadResponseService(this.JID, this.RemoteJID, this.Key, Result, this.GetFieldType(), this.GetFields(), this.parameter, this.GetNodeReference(), this.RuleCallback, null);
 					break;
 
 				case OperationRange.DeviceToken:
-					this.client.CanReadResponseDevice(this.JID, this.RemoteJID, this.Key, Result, this.GetFieldType(), this.GetFields(), this.parameter, null, null);
+					this.client.CanReadResponseDevice(this.JID, this.RemoteJID, this.Key, Result, this.GetFieldType(), this.GetFields(), this.parameter, this.GetNodeReference(), this.RuleCallback, null);
 					break;
 
 				case OperationRange.UserToken:
-					this.client.CanReadResponseUser(this.JID, this.RemoteJID, this.Key, Result, this.GetFieldType(), this.GetFields(), this.parameter, null, null);
+					this.client.CanReadResponseUser(this.JID, this.RemoteJID, this.Key, Result, this.GetFieldType(), this.GetFields(), this.parameter, this.GetNodeReference(), this.RuleCallback, null);
 					break;
 			}
-
-			this.Process();
 		}
 
 		private void YesTokenButton_Click(object sender, RoutedEventArgs e)
 		{
 			this.TokenButtonClick(sender, e, true);
-		}
-
-		private Task Process()
-		{
-			return this.Processed(this.questionView);
 		}
 
 		public override bool IsResolvedBy(Question Question)

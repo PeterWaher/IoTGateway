@@ -516,7 +516,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		public void CanRead(string RequestFromBareJid, FieldType FieldTypes, IEnumerable<ThingReference> Nodes, IEnumerable<string> FieldNames,
 			string[] ServiceTokens, string[] DeviceTokens, string[] UserTokens, CanReadCallback Callback, object State)
 		{
-			if ((!string.IsNullOrEmpty(this.ownerJid) && string.Compare(RequestFromBareJid, this.ownerJid, true) == 0) ||
+			if ((!string.IsNullOrEmpty(this.ownerJid) && string.Compare(RequestFromBareJid, this.ownerJid, true) == 0 && !this.RequestToInternalNode(Nodes)) ||
 				string.Compare(RequestFromBareJid, this.provisioningServerAddress, true) == 0)
 			{
 				if (Callback != null)
@@ -717,6 +717,20 @@ namespace Waher.Networking.XMPP.Provisioning
 			}, null);
 		}
 
+		private bool RequestToInternalNode(IEnumerable<ThingReference> Nodes)
+		{
+			if (Nodes == null)
+				return false;
+
+			foreach (ThingReference Ref in Nodes)
+			{
+				if (!Ref.IsEmpty)
+					return true;
+			}
+
+			return false;
+		}
+
 		private void AppendNode(StringBuilder Xml, IThingReference Node)
 		{
 			Xml.Append("<nd");
@@ -780,7 +794,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		public void CanControl(string RequestFromBareJid, IEnumerable<ThingReference> Nodes, IEnumerable<string> ParameterNames,
 			string[] ServiceTokens, string[] DeviceTokens, string[] UserTokens, CanControlCallback Callback, object State)
 		{
-			if ((!string.IsNullOrEmpty(this.ownerJid) && string.Compare(RequestFromBareJid, this.ownerJid, true) == 0) ||
+			if ((!string.IsNullOrEmpty(this.ownerJid) && string.Compare(RequestFromBareJid, this.ownerJid, true) == 0 && !this.RequestToInternalNode(Nodes)) ||
 				string.Compare(RequestFromBareJid, this.provisioningServerAddress, true) == 0)
 			{
 				if (Callback != null)

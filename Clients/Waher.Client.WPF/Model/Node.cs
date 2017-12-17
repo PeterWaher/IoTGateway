@@ -46,7 +46,7 @@ namespace Waher.Client.WPF.Model
 		public string Partition => this.nodeInfo.Partition;
 
 		public override string Key => this.nodeInfo.NodeId;
-		public override string Header => this.nodeInfo.DisplayName;
+		public override string Header => this.nodeInfo.LocalId;
 		public override string ToolTip => "Node";
 		public override string TypeName => this.nodeInfo.NodeType;
 		public override bool CanAddChildren => false;

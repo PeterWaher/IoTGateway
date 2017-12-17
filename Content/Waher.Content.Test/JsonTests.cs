@@ -156,5 +156,12 @@ namespace Waher.Content.Test
 			Assert.AreEqual(1, Obj["a"]);
 			Assert.AreEqual(2, Obj["b"]);
 		}
+
+		[TestMethod]
+		public void Test_21_Misc1()
+		{
+			string Json = "{\"sn\":\"20:19:AB:F4:04:51\",\"data\":{\"acc\":{\"x\":26,\"y\":32,\"z\":1012,\"unit\":\"mG\"},\"gyro\":{\"x\":1220,\"y\":-6835,\"z\":-2319,\"unit\":\"mdeg/s\"},\"mag\":{\"x\":40,\"y\":1,\"z\":-4,\"unit\":\"uT\"},\"light\":{\"value\":5483,\"unit\":\"mLux\"},\"temp\":{\"value\":50000,\"unit\":\"mCelsius\"},\"pressure\":{\"value\":98897,\"unit\":\"Pascal\"},\"humidity\":{\"value\":39,\"unit\":\"%rh\"}}}";
+			object Obj = JSON.Parse(Json);
+		}
 	}
 }

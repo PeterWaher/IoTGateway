@@ -52,7 +52,7 @@ namespace Waher.Content
 						if (ch <= ' ' || ch == 160)
 							break;
 
-						if (ch >= '0' && ch <= '9')
+						if ((ch >= '0' && ch <= '9') || (ch == '-') || (ch == '+'))
 						{
 							Start = Pos - 1;
 							State++;

@@ -190,8 +190,12 @@ namespace Waher.Client.WPF.Controls.SensorData
 		{
 			get
 			{
-				if (this.field is QuantityField)
+				if (this.field is QuantityField ||
+					this.field is Int32Field ||
+					this.field is Int64Field)
+				{
 					return "Right";
+				}
 				else if (this.field is BooleanField)
 					return "Center";
 				else

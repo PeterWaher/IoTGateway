@@ -4,7 +4,6 @@ using System.IO;
 using System.Threading;
 using Waher.Events;
 using Waher.Events.Console;
-using Waher.Events.Files;
 using Waher.IoTGateway.Svc.ServiceManagement;
 using Waher.IoTGateway.Svc.ServiceManagement.Enumerations;
 using Waher.IoTGateway.Svc.ServiceManagement.Structures;
@@ -36,8 +35,42 @@ namespace Waher.IoTGateway.Svc
 			{
 				Log.Error("Unhandled exception caught.", new KeyValuePair<string, object>("IsTerminating", e.IsTerminating));
 
-				if (e.ExceptionObject is Exception ex)
-					Log.Critical(ex);
+				if (e.IsTerminating)
+				{
+					using (StreamWriter w = File.CreateText(Path.Combine(Gateway.AppDataFolder, "UnhandledException.txt")))
+					{
+						w.Write("Type: ");
+
+						if (e.ExceptionObject != null)
+							w.WriteLine(e.ExceptionObject.GetType().FullName);
+						else
+							w.WriteLine("null");
+
+						w.Write("Time: ");
+						w.WriteLine(DateTime.Now.ToString());
+
+						w.WriteLine();
+						if (e.ExceptionObject is Exception ex)
+						{
+							w.WriteLine(ex.Message);
+							w.WriteLine();
+							w.WriteLine(ex.StackTrace);
+						}
+						else
+						{
+							if (e.ExceptionObject != null)
+								w.WriteLine(e.ExceptionObject.ToString());
+
+							w.WriteLine();
+							w.WriteLine(Environment.StackTrace);
+						}
+
+						w.Flush();
+					}
+				}
+
+				if (e.ExceptionObject is Exception ex2)
+					Log.Critical(ex2);
 				else if (e.ExceptionObject != null)
 					Log.Critical(e.ExceptionObject.ToString());
 				else

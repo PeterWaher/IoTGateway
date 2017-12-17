@@ -28160,7 +28160,8 @@
     "UAP,Version=v10.0.10586": []
   },
   "packageFolders": {
-    "C:\\Users\\Peter\\.nuget\\packages\\": {}
+    "C:\\Users\\Peter\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackagesFallback\\": {}
   },
   "project": {
     "restore": {
@@ -28171,9 +28172,13 @@
       "packagesPath": "C:\\Users\\Peter\\.nuget\\packages\\",
       "outputPath": "C:\\My Projects\\IoTGateway\\Content\\Waher.Content.Markdown.Web.UWP\\obj\\",
       "projectStyle": "ProjectJson",
+      "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackagesFallback\\"
+      ],
       "configFilePaths": [
         "C:\\Users\\Peter\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.Fallback.config"
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
@@ -28208,7 +28213,7 @@
       }
     },
     "dependencies": {
-      "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.1"
+      "Microsoft.NETCore.UniversalWindowsPlatform": "[6.0.1, )"
     },
     "frameworks": {
       "uap10.0.10586": {}

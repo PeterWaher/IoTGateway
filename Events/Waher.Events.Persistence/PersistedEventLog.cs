@@ -112,12 +112,19 @@ namespace Waher.Events.Persistence
 		public async Task<int> DeleteOld(DateTime Limit)
 		{
 			int NrEvents = 0;
+			bool Deleted;
 
-			foreach (PersistedEvent Event in await Database.Find<PersistedEvent>(new FilterFieldLesserOrEqualTo("Timestamp", Limit)))
+			do
 			{
-				await Database.Delete(Event);
-				NrEvents++;
+				Deleted = false;
+
+				foreach (PersistedEvent Event in await Database.Find<PersistedEvent>(0, 100, new FilterFieldLesserOrEqualTo("Timestamp", Limit)))
+				{
+					await Database.Delete(Event);
+					NrEvents++;
+				}
 			}
+			while (Deleted);
 
 			KeyValuePair<string, object>[] Tags = new KeyValuePair<string, object>[]
 			{

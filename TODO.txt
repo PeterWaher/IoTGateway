@@ -2,8 +2,6 @@ Client:
 * Allow owner to suggest friendships.
 * getCertificate
 
-* interaction with provisioning client from chat bot
-
 * Client install:
 	- Make sure app is started after installation
 	- Make sure icon created in start menu & on desktop.

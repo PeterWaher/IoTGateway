@@ -172,7 +172,7 @@ namespace Waher.Client.WPF.Model
 			if (XmppAccountNode != null && (SensorClient = XmppAccountNode.SensorClient) != null)
 			{
 				return SensorClient.RequestReadout(Concentrator.RosterItem.LastPresenceFullJid,
-					new ThingReference[] { new ThingReference(this.nodeInfo.NodeId, this.nodeInfo.SourceId, this.nodeInfo.ParentId) }, FieldType.Momentary);
+					new ThingReference[] { new ThingReference(this.nodeInfo.NodeId, this.nodeInfo.SourceId, this.nodeInfo.Partition) }, FieldType.Momentary);
 			}
 			else
 				return null;
@@ -187,7 +187,7 @@ namespace Waher.Client.WPF.Model
 			if (XmppAccountNode != null && (SensorClient = XmppAccountNode.SensorClient) != null)
 			{
 				return SensorClient.RequestReadout(Concentrator.RosterItem.LastPresenceFullJid,
-					new ThingReference[] { new ThingReference(this.nodeInfo.NodeId, this.nodeInfo.SourceId, this.nodeInfo.ParentId) }, FieldType.All);
+					new ThingReference[] { new ThingReference(this.nodeInfo.NodeId, this.nodeInfo.SourceId, this.nodeInfo.Partition) }, FieldType.All);
 			}
 			else
 				throw new NotSupportedException();
@@ -202,7 +202,7 @@ namespace Waher.Client.WPF.Model
 			if (XmppAccountNode != null && (SensorClient = XmppAccountNode.SensorClient) != null)
 			{
 				return SensorClient.Subscribe(Concentrator.RosterItem.LastPresenceFullJid,
-					new ThingReference[] { new ThingReference(this.nodeInfo.NodeId, this.nodeInfo.SourceId, this.nodeInfo.ParentId) },
+					new ThingReference[] { new ThingReference(this.nodeInfo.NodeId, this.nodeInfo.SourceId, this.nodeInfo.Partition) },
 					FieldType.Momentary, Rules, new Duration(false, 0, 0, 0, 0, 0, 1), new Duration(false, 0, 0, 0, 0, 1, 0), false);
 			}
 			else
@@ -220,7 +220,7 @@ namespace Waher.Client.WPF.Model
 			if (XmppAccountNode != null && (ControlClient = XmppAccountNode.ControlClient) != null)
 			{
 				ControlClient.GetForm(Concentrator.RosterItem.LastPresenceFullJid, "en", Callback, State,
-					new ThingReference(this.nodeInfo.NodeId, this.nodeInfo.SourceId, this.nodeInfo.ParentId));
+					new ThingReference(this.nodeInfo.NodeId, this.nodeInfo.SourceId, this.nodeInfo.Partition));
 			}
 			else
 				throw new NotSupportedException();

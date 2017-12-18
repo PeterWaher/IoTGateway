@@ -225,6 +225,8 @@ namespace Waher.Client.WPF.Controls
 						Rules.Add(new FieldSubscriptionRule(Field.Name, I32.Value, 1));
 					else if (Field is Int64Field I64)
 						Rules.Add(new FieldSubscriptionRule(Field.Name, I64.Value, 1));
+					else if (Field is StringField || Field is TimeField || Field is DateField || Field is DateTimeField || Field is DurationField)
+						Rules.Add(new FieldSubscriptionRule(Field.Name, string.Empty, 1));
 				}
 
 				this.request.OnStateChanged -= new SensorDataReadoutStateChangedEventHandler(Request_OnStateChanged);

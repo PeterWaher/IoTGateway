@@ -713,7 +713,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			IThingReference Parent = Node.Parent;
 			if (Parent != null)
 			{
-				Xml.Append("parentId='");
+				Xml.Append("' parentId='");
 				Xml.Append(XML.Encode(Parent.NodeId));
 
 				if (!string.IsNullOrEmpty(s = Parent.Partition))

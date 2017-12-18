@@ -73,9 +73,11 @@ namespace Waher.Client.WPF.Model
 			}
 		}
 
+		private bool loadingChildren = false;
+
 		protected override void LoadChildren()
 		{
-			if (this.children != null && this.children.Count == 1 && this.children.ContainsKey(string.Empty))
+			if (!this.loadingChildren && this.children != null && this.children.Count == 1 && this.children.ContainsKey(string.Empty))
 			{
 				string FullJid = this.Concentrator?.FullJid;
 
@@ -85,8 +87,10 @@ namespace Waher.Client.WPF.Model
 
 					if (this.hasChildSources)
 					{
+						this.loadingChildren = true;
 						Concentrator.XmppAccountNode.ConcentratorClient.GetChildDataSources(FullJid, this.key, (sender, e) =>
 						{
+							this.loadingChildren = false;
 							MainWindow.currentInstance.Dispatcher.Invoke(() => Mouse.OverrideCursor = null);
 
 							if (e.Ok)
@@ -105,9 +109,11 @@ namespace Waher.Client.WPF.Model
 					}
 					else
 					{
+						this.loadingChildren = true;
 						Concentrator.XmppAccountNode.ConcentratorClient.GetRootNodes(FullJid, this.key, true, true, 
 							"en", string.Empty, string.Empty, string.Empty, (sender, e) =>
 						{
+							this.loadingChildren = false;
 							MainWindow.currentInstance.Dispatcher.Invoke(() => Mouse.OverrideCursor = null);
 
 							if (e.Ok)

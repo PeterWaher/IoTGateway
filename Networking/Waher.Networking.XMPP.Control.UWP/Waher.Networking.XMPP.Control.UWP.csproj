@@ -123,6 +123,7 @@
     <Compile Include="ControlOperations\FormControlOperation.cs" />
     <Compile Include="ControlOperations\Int32ControlOperation.cs" />
     <Compile Include="ControlOperations\Int64ControlOperation.cs" />
+    <Compile Include="ControlOperations\MultiLineTextControlOperation.cs" />
     <Compile Include="ControlOperations\StringControlOperation.cs" />
     <Compile Include="ControlOperations\TimeControlOperation.cs" />
     <Compile Include="ControlServer.cs" />

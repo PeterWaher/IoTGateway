@@ -412,14 +412,15 @@ namespace Waher.Networking.XMPP.Control
 								if (Parameter == null)
 									return;
 
-								StringControlParameter StringControlParameter = Parameter as StringControlParameter;
-								if (StringControlParameter == null)
+								if (Parameter is StringControlParameter StringControlParameter)
+									Operations.AddLast(new StringControlOperation(Node, StringControlParameter, XML.Attribute(E, "v"), e));
+								else if (Parameter is MultiLineTextControlParameter MultiLineTextControlParameter)
+									Operations.AddLast(new MultiLineTextControlOperation(Node, MultiLineTextControlParameter, XML.Attribute(E, "v"), e));
+								else
 								{
 									ParameterWrongType(Name, e);
 									return;
 								}
-
-								Operations.AddLast(new StringControlOperation(Node, StringControlParameter, XML.Attribute(E, "v"), e));
 							}
 							break;
 

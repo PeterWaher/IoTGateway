@@ -467,10 +467,10 @@ namespace Waher.Networking.XMPP.Chat
 								if (s2.Length > 100)
 									s2 = s2.Substring(0, 100) + "...";
 
-								s2 = s2.Replace("|", "&#124;").Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", "<br/>");
+								s2 = MarkdownDocument.Encode(s2).Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", "<br/>");
 
 								Markdown.Append('|');
-								Markdown.Append(v2.Name);
+								Markdown.Append(MarkdownDocument.Encode(v2.Name));
 								Markdown.Append('|');
 								Markdown.Append(s2);
 								Markdown.AppendLine("|");
@@ -1256,10 +1256,9 @@ namespace Waher.Networking.XMPP.Chat
 				IElement Result = Exp.Root.Evaluate(Variables);
 				Variables["Ans"] = Result;
 
-				Graph G = Result as Graph;
 				SKImage Img;
 
-				if (G != null)
+				if (Result is Graph G)
 				{
 					GraphSettings Settings = new GraphSettings();
 					object Obj;

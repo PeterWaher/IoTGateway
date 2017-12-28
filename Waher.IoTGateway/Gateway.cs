@@ -92,7 +92,6 @@ namespace Waher.IoTGateway
 		private static HttpServer webServer = null;
 		private static HttpxServer httpxServer = null;
 		private static CoapEndpoint coapEndpoint = null;
-		private static FilesProvider databaseProvider;
 		private static ClientEvents clientEvents = null;
 		private static Scheduler scheduler = null;
 		private static RandomNumberGenerator rnd = null;
@@ -100,6 +99,7 @@ namespace Waher.IoTGateway
 		private static string domain = null;
 		private static string ownerJid = null;
 		private static string appDataFolder;
+		private static string runtimeFolder;
 		private static string rootFolder;
 		private static string xmppConfigFileName;
 		private static int nextServiceCommandNr = 128;
@@ -115,6 +115,16 @@ namespace Waher.IoTGateway
 		/// </summary>
 		/// <param name="ConsoleOutput">If console output is permitted.</param>
 		public static bool Start(bool ConsoleOutput)
+		{
+			return Start(ConsoleOutput, true);
+		}
+
+		/// <summary>
+		/// Starts the gateway.
+		/// </summary>
+		/// <param name="ConsoleOutput">If console output is permitted.</param>
+		/// <param name="CanCompile">If C# code compilation is permitted.</param>
+		public static bool Start(bool ConsoleOutput, bool CanCompile)
 		{
 			gatewayRunning = new Semaphore(1, 1, "Waher.IoTGateway.Running");
 			if (!gatewayRunning.WaitOne(1000))
@@ -133,8 +143,6 @@ namespace Waher.IoTGateway
 
 			try
 			{
-				Initialize();
-
 				appDataFolder = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
 				if (!appDataFolder.EndsWith(new string(Path.DirectorySeparatorChar, 1)))
 					appDataFolder += Path.DirectorySeparatorChar;
@@ -147,13 +155,27 @@ namespace Waher.IoTGateway
 
 				Log.Informational("Server starting up.");
 
+				Initialize();
+
 				beforeUninstallCommandNr = Gateway.RegisterServiceCommand(BeforeUninstall);
 
 				rootFolder = appDataFolder + "Root" + Path.DirectorySeparatorChar;
 				if (!Directory.Exists(rootFolder))
 				{
-					appDataFolder = string.Empty;
-					rootFolder = "Root" + Path.DirectorySeparatorChar;
+					string s = Path.Combine(runtimeFolder, "Root");
+					if (Directory.Exists(s))
+					{
+						CopyFolder(runtimeFolder, appDataFolder, "*.config", true);
+						CopyFolder(runtimeFolder, appDataFolder, "*.pfx", true);
+						CopyFolders(s, rootFolder, true);
+						CopyFolders(Path.Combine(runtimeFolder, "Graphics"), Path.Combine(appDataFolder, "Graphics"), true);
+						CopyFolders(Path.Combine(runtimeFolder, "Transforms"), Path.Combine(appDataFolder, "Transforms"), true);
+					}
+					else
+					{
+						appDataFolder = string.Empty;
+						rootFolder = "Root" + Path.DirectorySeparatorChar;
+					}
 				}
 
 				Types.SetModuleParameter("AppData", appDataFolder);
@@ -180,14 +202,14 @@ namespace Waher.IoTGateway
 				if (!CommonTypes.TryParse(DatabaseConfig.Attributes["encrypted"].Value, out bool Encrypted))
 					Encrypted = true;
 
-				databaseProvider = new FilesProvider(appDataFolder + DatabaseConfig.Attributes["folder"].Value,
+				FilesProvider DatabaseProvider = new FilesProvider(appDataFolder + DatabaseConfig.Attributes["folder"].Value,
 					DatabaseConfig.Attributes["defaultCollectionName"].Value,
 					int.Parse(DatabaseConfig.Attributes["blockSize"].Value),
 					int.Parse(DatabaseConfig.Attributes["blocksInCache"].Value),
 					int.Parse(DatabaseConfig.Attributes["blobBlockSize"].Value), Encoding.UTF8,
 					int.Parse(DatabaseConfig.Attributes["timeoutMs"].Value),
-					Encrypted, false);
-				Database.Register(databaseProvider);
+					Encrypted, false, CanCompile);
+				Database.Register(DatabaseProvider);
 
 				PersistedEventLog PersistedEventLog = new PersistedEventLog(7, new TimeSpan(4, 15, 0));
 				Log.Register(PersistedEventLog);
@@ -517,15 +539,16 @@ namespace Waher.IoTGateway
 		/// </summary>
 		private static void Initialize()
 		{
-			string Folder = Path.GetDirectoryName(typeof(Gateway).GetTypeInfo().Assembly.Location);
-			Directory.SetCurrentDirectory(Folder);
+			runtimeFolder = Path.GetDirectoryName(typeof(Gateway).GetTypeInfo().Assembly.Location);
+			Directory.SetCurrentDirectory(runtimeFolder);
 
-			TypesLoader.Initialize(Folder, (FileName) =>
+			TypesLoader.Initialize(runtimeFolder, (FileName) =>
 			{
 				FileName = Path.GetFileName(FileName).ToLower();
 				if (FileName.StartsWith("api-ms-win-") ||
 					FileName.StartsWith("system.") ||
 					FileName.StartsWith("microsoft.") ||
+					FileName.StartsWith("windows.") ||
 					FileName.StartsWith("waher.client.") ||
 					FileName.StartsWith("waher.utility."))
 				{
@@ -541,6 +564,8 @@ namespace Waher.IoTGateway
 					case "dbgshim.dll":
 					case "hostpolicy.dll":
 					case "hostfxr.dll":
+					case "libegl.dll":
+					case "libglesv2.dll":
 					case "libskiasharp.dll":
 					case "mscordaccore.dll":
 					case "mscordaccore_x86_x86_4.6.00001.0.dll":
@@ -561,6 +586,58 @@ namespace Waher.IoTGateway
 			});
 		}
 
+		private static bool CopyFile(string From, string To, bool OnlyIfNewer)
+		{
+			if (From == To)
+				return false;
+
+			if (!File.Exists(From))
+				return false;
+
+			if (OnlyIfNewer && File.Exists(To))
+			{
+				DateTime ToTP = File.GetLastWriteTimeUtc(To);
+				DateTime FromTP = File.GetLastWriteTimeUtc(From);
+
+				if (ToTP >= FromTP)
+					return false;
+			}
+
+			File.Copy(From, To, true);
+
+			return true;
+		}
+
+		private static void CopyFolder(string From, string To, string Mask, bool OnlyIfNewer)
+		{
+			if (Directory.Exists(From))
+			{
+				if (!Directory.Exists(To))
+					Directory.CreateDirectory(To);
+
+				string[] Files = Directory.GetFiles(From, Mask, SearchOption.TopDirectoryOnly);
+
+				foreach (string File in Files)
+				{
+					string FileName = Path.GetFileName(File);
+					CopyFile(File, Path.Combine(To, FileName), OnlyIfNewer);
+				}
+			}
+		}
+
+		private static void CopyFolders(string From, string To, bool OnlyIfNewer)
+		{
+			CopyFolder(From, To, "*.*", OnlyIfNewer);
+
+			string[] Folders = Directory.GetDirectories(From, "*.*", SearchOption.TopDirectoryOnly);
+
+			foreach (string Folder in Folders)
+			{
+				string FolderName = Path.GetFileName(Folder);
+				CopyFolders(Folder, Path.Combine(To, FolderName), OnlyIfNewer);
+			}
+		}
+
 		/// <summary>
 		/// Stops the gateway.
 		/// </summary>
@@ -569,11 +646,6 @@ namespace Waher.IoTGateway
 			IDisposable Disposable;
 
 			Log.Informational("Server shutting down.");
-
-			/*
-			if (databaseProvider != null)
-				File.WriteAllText(appDataFolder + "Stop.xml", databaseProvider.ExportXml(true).Result);
-			*/
 
 			if (gatewayRunning != null)
 			{
@@ -685,6 +757,14 @@ namespace Waher.IoTGateway
 		public static string AppDataFolder
 		{
 			get { return appDataFolder; }
+		}
+
+		/// <summary>
+		/// Runtime folder.
+		/// </summary>
+		public static string RuntimeFolder
+		{
+			get { return runtimeFolder; }
 		}
 
 		/// <summary>

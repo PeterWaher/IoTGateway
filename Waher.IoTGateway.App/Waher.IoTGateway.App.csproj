@@ -262,6 +262,19 @@
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>if not exist "$(TargetDir)AppX\Graphics" md "$(TargetDir)AppX\Graphics"
+if not exist "$(TargetDir)AppX\Highlight" md "$(TargetDir)AppX\Highlight"
+if not exist "$(TargetDir)AppX\Root" md "$(TargetDir)AppX\Root"
+if not exist "$(TargetDir)AppX\Transforms" md "$(TargetDir)AppX\Transforms"
+
+xcopy "$(TargetDir)Graphics" "$(TargetDir)AppX\Graphics" /S /Y
+xcopy "$(TargetDir)Highlight" "$(TargetDir)AppX\Highlight" /S /Y
+xcopy "$(TargetDir)Root" "$(TargetDir)AppX\Root" /S /Y
+xcopy "$(TargetDir)Transforms" "$(TargetDir)AppX\Transforms" /S /Y
+xcopy "$(TargetDir)*.config" "$(TargetDir)AppX" /Y
+xcopy "$(TargetDir)*.pfx" "$(TargetDir)AppX" /Y</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

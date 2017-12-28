@@ -1683,11 +1683,9 @@ namespace Waher.Persistence.Files
 
 		private void ReportException(Exception ex, IDatabaseExport Output)
 		{
-			AggregateException ex2;
-
 			ex = Waher.Events.Log.UnnestException(ex);
 
-			if ((ex2 = ex as AggregateException) != null)
+			if (ex is AggregateException ex2)
 			{
 				foreach (Exception ex3 in ex2.InnerExceptions)
 					Output.ReportException(ex3);

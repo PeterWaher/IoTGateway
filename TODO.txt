@@ -60,7 +60,6 @@ Change to DateTimeOffset everywhere.
 
 Installer:
 	- Optional: Waher.IoTGateway.Finder (localhost + SSDP search, IP address + name of instance (name of XMPP account)).
-	- Optional: WPF Client
 	- Custom Action
 		- stop http service, if running. (With question). Define alternative HTTP port, if not.
 
@@ -93,11 +92,6 @@ Waher.Client.WPF
 	- Chat:
 		- urn:xmpp:message-correct:0
 		- Remove smileys that begin with := (like :=L), at least if in script
-
-XMPP
-	- Provisioning
-	- Concentrator
-	- Provisioning Client via ChatServer
 
 HTTP Server
 	- Web Services

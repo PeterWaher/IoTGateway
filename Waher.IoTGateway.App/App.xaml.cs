@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.ApplicationModel;
@@ -17,7 +18,9 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using Waher.Content;
 using Waher.Events;
+using Waher.Persistence.Files;
 
 namespace Waher.IoTGateway.App
 {
@@ -129,8 +132,22 @@ namespace Waher.IoTGateway.App
 						Log.Critical("Unexpected null exception thrown.");
 				};
 
-				if (!Gateway.Start(false, false))
+				if (!Gateway.Start(false, (DatabaseConfig) =>
+				{
+					if (CommonTypes.TryParse(DatabaseConfig.Attributes["encrypted"].Value, out bool Encrypted) && Encrypted)
+						throw new Exception("Encrypted database storage not supported on this platform.");
+
+					return new FilesProvider(Gateway.AppDataFolder + DatabaseConfig.Attributes["folder"].Value,
+						DatabaseConfig.Attributes["defaultCollectionName"].Value,
+						int.Parse(DatabaseConfig.Attributes["blockSize"].Value),
+						int.Parse(DatabaseConfig.Attributes["blocksInCache"].Value),
+						int.Parse(DatabaseConfig.Attributes["blobBlockSize"].Value), Encoding.UTF8,
+						int.Parse(DatabaseConfig.Attributes["timeoutMs"].Value),
+						false);
+				}))
+				{
 					throw new Exception("Gateway being started in another process.");
+				}
 			}
 			catch (Exception ex)
 			{

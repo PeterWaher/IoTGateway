@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using System.IO;
+using System.Text;
 using System.Threading;
+using Waher.Content;
 using Waher.Events;
 using Waher.Events.Console;
+using Waher.Persistence.Files;
 
 namespace Waher.IoTGateway.Console
 {
@@ -74,7 +77,19 @@ namespace Waher.IoTGateway.Console
 						Log.Critical("Unexpected null exception thrown.");
 				};
 
-				if (!Gateway.Start(true))
+				if (!Gateway.Start(true, (DatabaseConfig) =>
+				{
+					if (!CommonTypes.TryParse(DatabaseConfig.Attributes["encrypted"].Value, out bool Encrypted))
+						Encrypted = true;
+
+					return new FilesProvider(Gateway.AppDataFolder + DatabaseConfig.Attributes["folder"].Value,
+						DatabaseConfig.Attributes["defaultCollectionName"].Value,
+						int.Parse(DatabaseConfig.Attributes["blockSize"].Value),
+						int.Parse(DatabaseConfig.Attributes["blocksInCache"].Value),
+						int.Parse(DatabaseConfig.Attributes["blobBlockSize"].Value), Encoding.UTF8,
+						int.Parse(DatabaseConfig.Attributes["timeoutMs"].Value),
+						Encrypted, false, true);
+				}))
 				{
 					System.Console.Out.WriteLine();
 					System.Console.Out.WriteLine("Gateway being started in another process.");

@@ -36,7 +36,6 @@ using Waher.Runtime.Inventory.Loader;
 using Waher.Runtime.Settings;
 using Waher.Runtime.Timing;
 using Waher.Persistence;
-using Waher.Persistence.Files;
 using Waher.Things;
 using Waher.Things.ControlParameters;
 using Waher.Things.Metering;
@@ -63,6 +62,13 @@ namespace Waher.IoTGateway
 		/// </summary>
 		Successful
 	}
+
+	/// <summary>
+	/// Delegate for callback methods used for the creation of database providers.
+	/// </summary>
+	/// <param name="Definition">XML definition of provider.</param>
+	/// <returns>Database provider.</returns>
+	public delegate IDatabaseProvider GetDatabaseProviderCallback(XmlElement Definition);
 
 	/// <summary>
 	/// Static class managing the runtime environment of the IoT Gateway.
@@ -114,17 +120,8 @@ namespace Waher.IoTGateway
 		/// Starts the gateway.
 		/// </summary>
 		/// <param name="ConsoleOutput">If console output is permitted.</param>
-		public static bool Start(bool ConsoleOutput)
-		{
-			return Start(ConsoleOutput, true);
-		}
-
-		/// <summary>
-		/// Starts the gateway.
-		/// </summary>
-		/// <param name="ConsoleOutput">If console output is permitted.</param>
-		/// <param name="CanCompile">If C# code compilation is permitted.</param>
-		public static bool Start(bool ConsoleOutput, bool CanCompile)
+		/// <param name="GetDatabaseProvider">Callback method for the creation of database provider.</param>
+		public static bool Start(bool ConsoleOutput, GetDatabaseProviderCallback GetDatabaseProvider)
 		{
 			gatewayRunning = new Semaphore(1, 1, "Waher.IoTGateway.Running");
 			if (!gatewayRunning.WaitOne(1000))
@@ -199,16 +196,7 @@ namespace Waher.IoTGateway
 				domain = Config.DocumentElement["Domain"].InnerText;
 
 				XmlElement DatabaseConfig = Config.DocumentElement["Database"];
-				if (!CommonTypes.TryParse(DatabaseConfig.Attributes["encrypted"].Value, out bool Encrypted))
-					Encrypted = true;
-
-				FilesProvider DatabaseProvider = new FilesProvider(appDataFolder + DatabaseConfig.Attributes["folder"].Value,
-					DatabaseConfig.Attributes["defaultCollectionName"].Value,
-					int.Parse(DatabaseConfig.Attributes["blockSize"].Value),
-					int.Parse(DatabaseConfig.Attributes["blocksInCache"].Value),
-					int.Parse(DatabaseConfig.Attributes["blobBlockSize"].Value), Encoding.UTF8,
-					int.Parse(DatabaseConfig.Attributes["timeoutMs"].Value),
-					Encrypted, false, CanCompile);
+				IDatabaseProvider DatabaseProvider = GetDatabaseProvider(DatabaseConfig);
 				Database.Register(DatabaseProvider);
 
 				PersistedEventLog PersistedEventLog = new PersistedEventLog(7, new TimeSpan(4, 15, 0));

@@ -162,6 +162,8 @@ namespace Waher.Runtime.Inventory.Loader
 						string s = AN.ToString();
 
 						if (s.StartsWith("System.") ||
+							s.StartsWith("Microsoft.") ||
+							s.StartsWith("Windows.") ||
 							s.StartsWith("SQLitePCLRaw.") ||
 							s.StartsWith("SkiaSharp") ||
 							s.StartsWith("Gma.QrCodeNet.Encoding") ||

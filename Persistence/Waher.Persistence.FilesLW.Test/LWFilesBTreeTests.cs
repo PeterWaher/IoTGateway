@@ -711,7 +711,7 @@ namespace Waher.Persistence.FilesLW.Test
 			await this.CreateObjects(Math.Min(ObjectsToEnumerate, 1000));
 			Simple Obj;
 
-			using (ObjectBTreeFileEnumerator<Simple> e = await this.file.GetTypedEnumeratorAsync<Simple>(true))
+			using (ObjectBTreeFileEnumerator<Simple> e = await this.file.GetTypedEnumeratorAsync<Simple>(false))
 			{
 				while (e.MoveNext())
 				{

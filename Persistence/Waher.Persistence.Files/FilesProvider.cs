@@ -80,6 +80,7 @@ namespace Waher.Persistence.Files
 		private bool debug;
 #if NETSTANDARD1_5
 		private bool encrypted;
+		private bool compiled;
 #endif
 
 		#region Constructors
@@ -104,7 +105,31 @@ namespace Waher.Persistence.Files
 		/// <param name="Encrypted">If the files should be encrypted or not.</param>
 		public FilesProvider(string Folder, string DefaultCollectionName, int BlockSize, int BlocksInCache, int BlobBlockSize,
 			Encoding Encoding, int TimeoutMilliseconds, bool Encrypted)
-			: this(Folder, DefaultCollectionName, BlockSize, BlocksInCache, BlobBlockSize, Encoding, TimeoutMilliseconds, Encrypted, false)
+			: this(Folder, DefaultCollectionName, BlockSize, BlocksInCache, BlobBlockSize, Encoding, TimeoutMilliseconds, Encrypted, false, true)
+		{
+		}
+
+		/// <summary>
+		/// Persists objects into binary files.
+		/// </summary>
+		/// <param name="Folder">Folder to store data files.</param>
+		/// <param name="DefaultCollectionName">Default collection name.</param>
+		/// <param name="BlockSize">Size of a block in the B-tree. The size must be a power of two, and should be at least the same
+		/// size as a sector on the storage device. Smaller block sizes (2, 4 kB) are suitable for online transaction processing, where
+		/// a lot of updates to the database occurs. Larger block sizes (8, 16, 32 kB) are suitable for decision support systems.
+		/// The block sizes also limit the size of objects stored directly in the file. Objects larger than
+		/// <see cref="ObjectBTreeFile.InlineObjectSizeLimit"/> bytes will be stored as BLOBs.</param>
+		/// <param name="BlocksInCache">Maximum number of blocks in in-memory cache. This cache is used by all files governed by the
+		/// database provider. The cache does not contain BLOB blocks.</param>
+		/// <param name="BlobBlockSize">Size of a block in the BLOB file. The size must be a power of two. The BLOB file will consist
+		/// of a doubly linked list of blocks of this size.</param>
+		/// <param name="Encoding">Encoding to use for text properties.</param>
+		/// <param name="TimeoutMilliseconds">Timeout, in milliseconds, to wait for access to the database layer.</param>
+		/// <param name="Encrypted">If the files should be encrypted or not.</param>
+		/// <param name="Debug">If the provider is run in debug mode.</param>
+		public FilesProvider(string Folder, string DefaultCollectionName, int BlockSize, int BlocksInCache, int BlobBlockSize,
+			Encoding Encoding, int TimeoutMilliseconds, bool Encrypted, bool Debug)
+			: this(Folder, DefaultCollectionName, BlockSize, BlocksInCache, BlobBlockSize, Encoding, TimeoutMilliseconds, Encrypted, Debug, true)
 		{
 		}
 #else
@@ -150,8 +175,9 @@ namespace Waher.Persistence.Files
 		/// <param name="TimeoutMilliseconds">Timeout, in milliseconds, to wait for access to the database layer.</param>
 		/// <param name="Encrypted">If the files should be encrypted or not.</param>
 		/// <param name="Debug">If the provider is run in debug mode.</param>
+		/// <param name="Compiled">If object serializers should be compiled or not.</param>
 		public FilesProvider(string Folder, string DefaultCollectionName, int BlockSize, int BlocksInCache, int BlobBlockSize,
-			Encoding Encoding, int TimeoutMilliseconds, bool Encrypted, bool Debug)
+			Encoding Encoding, int TimeoutMilliseconds, bool Encrypted, bool Debug, bool Compiled)
 #else
 		/// <summary>
 		/// Persists objects into binary files.
@@ -190,6 +216,7 @@ namespace Waher.Persistence.Files
 			this.serializers = new Dictionary<Type, Serialization.IObjectSerializer>();
 #if NETSTANDARD1_5
 			this.encrypted = Encrypted;
+			this.compiled = Compiled;
 #endif
 
 			if (!string.IsNullOrEmpty(this.folder) && this.folder[this.folder.Length - 1] != Path.DirectorySeparatorChar)
@@ -312,6 +339,14 @@ namespace Waher.Persistence.Files
 		public bool Encrypted
 		{
 			get { return this.encrypted; }
+		}
+
+		/// <summary>
+		/// If object serializers should be compiled or not.
+		/// </summary>
+		public bool Compiled
+		{
+			get { return this.compiled; }
 		}
 #endif
 		/// <summary>
@@ -558,8 +593,11 @@ namespace Waher.Persistence.Files
 
 			try
 			{
+#if NETSTANDARD1_5
+				Result = new ObjectSerializer(Type, this, this.debug, this.compiled);
+#else
 				Result = new ObjectSerializer(Type, this, this.debug);
-
+#endif
 				lock (this.synchObj)
 				{
 					this.serializers[Type] = Result;

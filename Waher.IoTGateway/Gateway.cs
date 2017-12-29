@@ -20,7 +20,6 @@ using Waher.Events;
 using Waher.Events.Files;
 using Waher.Events.Persistence;
 using Waher.Events.XMPP;
-using Waher.Mock;
 using Waher.Networking.CoAP;
 using Waher.Networking.HTTP;
 using Waher.Networking.Sniffers;
@@ -71,12 +70,31 @@ namespace Waher.IoTGateway
 	public delegate IDatabaseProvider GetDatabaseProviderCallback(XmlElement Definition);
 
 	/// <summary>
+	/// Delegate for callback methods used for retrieval of XMPP Client credentials.
+	/// </summary>
+	/// <param name="XmppConfigFileName">XMPP Config file name.</param>
+	/// <returns>XMPP Client Credentials.</returns>
+	public delegate XmppCredentials GetXmppClientCredentialsCallback(string XmppConfigFileName);
+
+	/// <summary>
+	/// Delegate for callback methods used to persist updated XMPP Client credentials.
+	/// </summary>
+	/// <param name="XmppConfigFileName">XMPP Config file name.</param>
+	/// <param name="Credentials">XMPP Client Credentials.</param>
+	public delegate void XmppClientCredentialsUpdated(string XmppConfigFileName, XmppCredentials Credentials);
+	
+	/// <summary>
+	/// Delegate for registration callback methods.
+	/// </summary>
+	/// <param name="MetaData">Meta data used in registration.</param>
+	/// <param name="e">Event arguments.</param>
+	public delegate void RegistrationEventHandler(MetaDataTag[] MetaData, RegistrationEventArgs e);
+
+	/// <summary>
 	/// Static class managing the runtime environment of the IoT Gateway.
 	/// </summary>
 	public static class Gateway
 	{
-		private const string FormSignatureKey = "";     // Form signature key, if form signatures (XEP-0348) is to be used during registration.
-		private const string FormSignatureSecret = "";  // Form signature secret, if form signatures (XEP-0348) is to be used during registration.
 		private const int MaxRecordsPerPeriod = 500;
 		private const int MaxChunkSize = 4096;
 
@@ -86,9 +104,10 @@ namespace Waher.IoTGateway
 		private static LinkedList<KeyValuePair<string, int>> ports = new LinkedList<KeyValuePair<string, int>>();
 		private static Dictionary<int, EventHandler> serviceCommandByNr = new Dictionary<int, EventHandler>();
 		private static Dictionary<EventHandler, int> serviceCommandNrByCallback = new Dictionary<EventHandler, int>();
-		private static SimpleXmppConfiguration xmppConfiguration;
 		private static ThingRegistryClient thingRegistryClient = null;
 		private static ProvisioningClient provisioningClient = null;
+		private static XmppCredentials xmppCredentials = null;
+		private static string xmppConfigFileName = string.Empty;
 		private static XmppClient xmppClient = null;
 		private static Networking.XMPP.InBandBytestreams.IbbClient ibbClient = null;
 		private static Networking.XMPP.P2P.SOCKS5.Socks5Proxy socksProxy = null;
@@ -107,7 +126,6 @@ namespace Waher.IoTGateway
 		private static string appDataFolder;
 		private static string runtimeFolder;
 		private static string rootFolder;
-		private static string xmppConfigFileName;
 		private static int nextServiceCommandNr = 128;
 		private static int beforeUninstallCommandNr = 0;
 		private static bool registered = false;
@@ -120,8 +138,7 @@ namespace Waher.IoTGateway
 		/// Starts the gateway.
 		/// </summary>
 		/// <param name="ConsoleOutput">If console output is permitted.</param>
-		/// <param name="GetDatabaseProvider">Callback method for the creation of database provider.</param>
-		public static bool Start(bool ConsoleOutput, GetDatabaseProviderCallback GetDatabaseProvider)
+		public static bool Start(bool ConsoleOutput)
 		{
 			gatewayRunning = new Semaphore(1, 1, "Waher.IoTGateway.Running");
 			if (!gatewayRunning.WaitOne(1000))
@@ -196,7 +213,10 @@ namespace Waher.IoTGateway
 				domain = Config.DocumentElement["Domain"].InnerText;
 
 				XmlElement DatabaseConfig = Config.DocumentElement["Database"];
-				IDatabaseProvider DatabaseProvider = GetDatabaseProvider(DatabaseConfig);
+				IDatabaseProvider DatabaseProvider = GetDatabaseProvider?.Invoke(DatabaseConfig);
+				if (DatabaseProvider == null)
+					throw new Exception("Database provider not defined. Make sure the GetDatabaseProvider event has an appropriate event handler.");
+
 				Database.Register(DatabaseProvider);
 
 				PersistedEventLog PersistedEventLog = new PersistedEventLog(7, new TimeSpan(4, 15, 0));
@@ -207,32 +227,15 @@ namespace Waher.IoTGateway
 				if (!File.Exists(xmppConfigFileName))
 					xmppConfigFileName = appDataFolder + xmppConfigFileName;
 
-				if (ConsoleOutput)
-				{
-					xmppConfiguration = SimpleXmppConfiguration.GetConfigUsingSimpleConsoleDialog(xmppConfigFileName,
-						Guid.NewGuid().ToString().Replace("-", string.Empty),   // Default user name.
-						Guid.NewGuid().ToString().Replace("-", string.Empty),   // Default password.
-						FormSignatureKey, FormSignatureSecret, typeof(Gateway).Assembly);
-				}
-				else if (File.Exists(xmppConfigFileName))
-				{
-					xmppConfiguration = new SimpleXmppConfiguration(xmppConfigFileName);
-					RuntimeSettings.Set("XMPP.CONFIG", xmppConfiguration.ExportSimpleXmppConfiguration());
-				}
-				else
-				{
-					string XmppConfig = RuntimeSettings.Get("XMPP.CONFIG", string.Empty);
-					XmlDocument Doc = new XmlDocument();
-					Doc.LoadXml(XmppConfig);
-					xmppConfiguration = new SimpleXmppConfiguration(Doc);
-				}
+				xmppCredentials = GetXmppClientCredentials?.Invoke(xmppConfigFileName);
+				if (xmppCredentials == null)
+					throw new Exception("XMPP Client Credentials not provided. Make sure the GetXmppClientCredentials event has an appropriate event handler.");
 
-				xmppClient = xmppConfiguration.GetClient("en", typeof(Gateway).Assembly, false);
-				xmppClient.AllowRegistration(FormSignatureKey, FormSignatureSecret);
+				xmppClient = new XmppClient(xmppCredentials, "en", typeof(Gateway).Assembly);
 				xmppClient.OnValidateSender += XmppClient_OnValidateSender;
 				Types.SetModuleParameter("XMPP", xmppClient);
 
-				if (xmppConfiguration.Sniffer)
+				if (xmppCredentials.Sniffer)
 				{
 					ISniffer Sniffer;
 
@@ -249,19 +252,19 @@ namespace Waher.IoTGateway
 					xmppClient.Add(Sniffer);
 				}
 
-				if (!string.IsNullOrEmpty(xmppConfiguration.Events))
-					Log.Register(new XmppEventSink("XMPP Event Sink", xmppClient, xmppConfiguration.Events, false));
+				if (!string.IsNullOrEmpty(xmppCredentials.Events))
+					Log.Register(new XmppEventSink("XMPP Event Sink", xmppClient, xmppCredentials.Events, false));
 
-				if (!string.IsNullOrEmpty(xmppConfiguration.ThingRegistry))
+				if (!string.IsNullOrEmpty(xmppCredentials.ThingRegistry))
 				{
-					thingRegistryClient = new ThingRegistryClient(xmppClient, xmppConfiguration.ThingRegistry);
+					thingRegistryClient = new ThingRegistryClient(xmppClient, xmppCredentials.ThingRegistry);
 					thingRegistryClient.Claimed += ThingRegistryClient_Claimed;
 					thingRegistryClient.Disowned += ThingRegistryClient_Disowned;
 					thingRegistryClient.Removed += ThingRegistryClient_Removed;
 				}
 
-				if (!string.IsNullOrEmpty(xmppConfiguration.Provisioning))
-					provisioningClient = new ProvisioningClient(xmppClient, xmppConfiguration.Provisioning);
+				if (!string.IsNullOrEmpty(xmppCredentials.Provisioning))
+					provisioningClient = new ProvisioningClient(xmppClient, xmppCredentials.Provisioning);
 
 				DateTime Now = DateTime.Now;
 				int MsToNext = 60000 - (Now.Second * 1000 + Now.Millisecond);
@@ -418,7 +421,7 @@ namespace Waher.IoTGateway
 				HttpxProxy.Socks5Proxy = socksProxy;
 				httpxServer.Socks5Proxy = socksProxy;
 
-				if (xmppConfiguration.Sniffer)
+				if (xmppCredentials.Sniffer)
 				{
 					ISniffer Sniffer;
 
@@ -521,6 +524,16 @@ namespace Waher.IoTGateway
 
 			return true;
 		}
+
+		/// <summary>
+		/// Event raised when the Gateway requires its database provider from the host.
+		/// </summary>
+		public static event GetDatabaseProviderCallback GetDatabaseProvider = null;
+
+		/// <summary>
+		/// Event raised when the Gateway requires its XMPP Client Credentials from the host.
+		/// </summary>
+		public static event GetXmppClientCredentialsCallback GetXmppClientCredentials = null;
 
 		/// <summary>
 		/// Initializes the inventory engine by loading available assemblies in the installation folder (top directory only).
@@ -954,8 +967,8 @@ namespace Waher.IoTGateway
 				else
 				{
 					if ((RemoteEndPoint.StartsWith("[::1]:") || RemoteEndPoint.StartsWith("127.0.0.1:")) &&
-						UserName == xmppConfiguration.Account && Password == xmppConfiguration.Password &&
-						string.IsNullOrEmpty(xmppConfiguration.PasswordType))
+						UserName == xmppCredentials.Account && Password == xmppCredentials.Password &&
+						string.IsNullOrEmpty(xmppCredentials.PasswordType))
 					{
 						Log.Notice("Successful login. Connection to XMPP broker down. Credentials matched configuration and connection made from same machine.", UserName, RemoteEndPoint, "Login", EventLevel.Minor);
 						return LoginResult.Successful;
@@ -977,15 +990,23 @@ namespace Waher.IoTGateway
 
 				xmppClient.Reconnect(UserName, PasswordHash, PasswordHashMethod);
 
-				xmppConfiguration.Account = UserName;
-				xmppConfiguration.Password = PasswordHash;
-				xmppConfiguration.PasswordType = PasswordHashMethod;
+				xmppCredentials.Account = UserName;
+				xmppCredentials.Password = PasswordHash;
+				xmppCredentials.PasswordType = PasswordHashMethod;
+				xmppCredentials.AllowRegistration = false;
+				xmppCredentials.FormSignatureKey = string.Empty;
+				xmppCredentials.FormSignatureSecret = string.Empty;
 
-				xmppConfiguration.SaveSimpleXmppConfiguration(xmppConfigFileName);
+				XmppCredentialsUpdated?.Invoke(xmppConfigFileName, xmppCredentials);
 			}
 
 			return LoginResult.Successful;
 		}
+
+		/// <summary>
+		/// Event raised when credentials have been updated.
+		/// </summary>
+		public static event XmppClientCredentialsUpdated XmppCredentialsUpdated = null;
 
 		#endregion
 
@@ -1033,13 +1054,17 @@ namespace Waher.IoTGateway
 					if (e2.IsClaimed)
 						ownerJid = e2.OwnerJid;
 					else
-					{
 						ownerJid = string.Empty;
-						SimpleXmppConfiguration.PrintQRCode(ThingRegistryClient.EncodeAsIoTDiscoURI(MetaData));
-					}
+
+					RegistrationSuccessful?.Invoke(MetaData, e2);
 				}
 			}, null);
 		}
+
+		/// <summary>
+		/// Event raised when the gateway has performed a successful registration in a thing registry.
+		/// </summary>
+		public static event RegistrationEventHandler RegistrationSuccessful = null;
 
 		internal static XmppClient XmppClient
 		{

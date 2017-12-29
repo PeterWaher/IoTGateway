@@ -16,9 +16,9 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>IoT Gateway HTTP CoAP MQTT XMPP LWM2M</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.0.4</AssemblyVersion>
-    <FileVersion>1.0.4</FileVersion>
-    <Version>1.0.4</Version>
+    <AssemblyVersion>1.0.5</AssemblyVersion>
+    <FileVersion>1.0.5</FileVersion>
+    <Version>1.0.5</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -48,7 +48,6 @@
     <ProjectReference Include="..\Events\Waher.Events.Persistence\Waher.Events.Persistence.csproj" />
     <ProjectReference Include="..\Events\Waher.Events.XMPP\Waher.Events.XMPP.csproj" />
     <ProjectReference Include="..\Events\Waher.Events\Waher.Events.csproj" />
-    <ProjectReference Include="..\Mocks\Waher.Mock\Waher.Mock.csproj" />
     <ProjectReference Include="..\Networking\Waher.Networking.CoAP\Waher.Networking.CoAP.csproj" />
     <ProjectReference Include="..\Networking\Waher.Networking.HTTP\Waher.Networking.HTTP.csproj" />
     <ProjectReference Include="..\Networking\Waher.Networking.XMPP.Concentrator\Waher.Networking.XMPP.Concentrator.csproj" />

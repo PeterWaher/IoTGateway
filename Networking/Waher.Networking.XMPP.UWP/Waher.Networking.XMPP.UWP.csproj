@@ -263,6 +263,7 @@
     <Compile Include="ValidateSenderEventArgs.cs" />
     <Compile Include="XmppClient.cs" />
     <Compile Include="XmppComponent.cs" />
+    <Compile Include="XmppCredentials.cs" />
     <Compile Include="XmppException.cs" />
     <Compile Include="XmppExtension.cs" />
     <Compile Include="XmppState.cs" />

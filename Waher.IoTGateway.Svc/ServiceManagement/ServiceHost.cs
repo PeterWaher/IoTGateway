@@ -89,22 +89,13 @@ namespace Waher.IoTGateway.Svc.ServiceManagement
 			{
 				Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
 
-				if (!Gateway.Start(true, (DatabaseConfig) =>
-				{
-					if (!CommonTypes.TryParse(DatabaseConfig.Attributes["encrypted"].Value, out bool Encrypted))
-						Encrypted = true;
+				Gateway.GetDatabaseProvider += Program.GetDatabase;
+				Gateway.GetXmppClientCredentials += Program.GetXmppClientCredentialsAsService;
+				Gateway.XmppCredentialsUpdated += Program.XmppCredentialsUpdated;
+				Gateway.RegistrationSuccessful += Program.RegistrationSuccessfulAsService;
 
-					return new FilesProvider(Gateway.AppDataFolder + DatabaseConfig.Attributes["folder"].Value,
-						DatabaseConfig.Attributes["defaultCollectionName"].Value,
-						int.Parse(DatabaseConfig.Attributes["blockSize"].Value),
-						int.Parse(DatabaseConfig.Attributes["blocksInCache"].Value),
-						int.Parse(DatabaseConfig.Attributes["blobBlockSize"].Value), Encoding.UTF8,
-						int.Parse(DatabaseConfig.Attributes["timeoutMs"].Value),
-						Encrypted, false, true);
-				}))
-				{
+				if (!Gateway.Start(true))
 					throw new Exception("Gateway being started in another process.");
-				}
 
 				ReportServiceStatus(ServiceState.Running, ServiceAcceptedControlCommandsFlags.Stop, win32ExitCode: 0, waitHint: 0);
 			}

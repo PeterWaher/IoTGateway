@@ -3,10 +3,16 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading;
+using System.Xml;
 using Waher.Content;
 using Waher.Events;
 using Waher.Events.Console;
+using Waher.Mock;
+using Waher.Networking.XMPP;
+using Waher.Networking.XMPP.Provisioning;
+using Waher.Persistence;
 using Waher.Persistence.Files;
+using Waher.Runtime.Settings;
 using Waher.IoTGateway.Svc.ServiceManagement;
 using Waher.IoTGateway.Svc.ServiceManagement.Enumerations;
 using Waher.IoTGateway.Svc.ServiceManagement.Structures;
@@ -297,19 +303,12 @@ namespace Waher.IoTGateway.Svc
 
 				Log.Register(new ConsoleEventSink(false));
 
-				if (!Gateway.Start(true, (DatabaseConfig) =>
-				{
-					if (!CommonTypes.TryParse(DatabaseConfig.Attributes["encrypted"].Value, out bool Encrypted))
-						Encrypted = true;
+				Gateway.GetDatabaseProvider += GetDatabase;
+				Gateway.GetXmppClientCredentials += GetXmppClientCredentialsAsConsole;
+				Gateway.XmppCredentialsUpdated += XmppCredentialsUpdated;
+				Gateway.RegistrationSuccessful += RegistrationSuccessfulAsConsole;
 
-					return new FilesProvider(Gateway.AppDataFolder + DatabaseConfig.Attributes["folder"].Value,
-						DatabaseConfig.Attributes["defaultCollectionName"].Value,
-						int.Parse(DatabaseConfig.Attributes["blockSize"].Value),
-						int.Parse(DatabaseConfig.Attributes["blocksInCache"].Value),
-						int.Parse(DatabaseConfig.Attributes["blobBlockSize"].Value), Encoding.UTF8,
-						int.Parse(DatabaseConfig.Attributes["timeoutMs"].Value),
-						Encrypted, false, true);
-				}))
+				if (!Gateway.Start(true))
 				{
 					System.Console.Out.WriteLine();
 					System.Console.Out.WriteLine("Gateway being started in another process.");
@@ -354,6 +353,75 @@ namespace Waher.IoTGateway.Svc
 			finally
 			{
 				Gateway.Stop();
+			}
+		}
+
+		internal static IDatabaseProvider GetDatabase(XmlElement DatabaseConfig)
+		{
+			if (!CommonTypes.TryParse(DatabaseConfig.Attributes["encrypted"].Value, out bool Encrypted))
+				Encrypted = true;
+
+			return new FilesProvider(Gateway.AppDataFolder + DatabaseConfig.Attributes["folder"].Value,
+				DatabaseConfig.Attributes["defaultCollectionName"].Value,
+				int.Parse(DatabaseConfig.Attributes["blockSize"].Value),
+				int.Parse(DatabaseConfig.Attributes["blocksInCache"].Value),
+				int.Parse(DatabaseConfig.Attributes["blobBlockSize"].Value), Encoding.UTF8,
+				int.Parse(DatabaseConfig.Attributes["timeoutMs"].Value),
+				Encrypted, false, true);
+		}
+
+		internal static XmppCredentials GetXmppClientCredentialsAsConsole(string XmppConfigFileName)
+		{
+			return SimpleXmppConfiguration.GetConfigUsingSimpleConsoleDialog(XmppConfigFileName,
+				Guid.NewGuid().ToString().Replace("-", string.Empty),   // Default user name.
+				Guid.NewGuid().ToString().Replace("-", string.Empty),   // Default password.
+				typeof(Gateway).Assembly);
+		}
+
+		internal static XmppCredentials GetXmppClientCredentialsAsService(string XmppConfigFileName)
+		{
+			XmppCredentials Result;
+
+			if (File.Exists(XmppConfigFileName))
+			{
+				Result = SimpleXmppConfiguration.Load(XmppConfigFileName);
+				RuntimeSettings.Set("XMPP.CONFIG", SimpleXmppConfiguration.ExportSimpleXmppConfiguration(Result));
+			}
+			else
+			{
+				string XmppConfig = RuntimeSettings.Get("XMPP.CONFIG", string.Empty);
+				XmlDocument Doc = new XmlDocument();
+				Doc.LoadXml(XmppConfig);
+				Result = SimpleXmppConfiguration.Load(Doc);
+			}
+
+			return Result;
+		}
+
+		internal static void XmppCredentialsUpdated(string XmppConfigFileName, XmppCredentials Credentials)
+		{
+			SimpleXmppConfiguration.SaveSimpleXmppConfiguration(XmppConfigFileName, Credentials);
+		}
+
+		internal static void RegistrationSuccessfulAsConsole(MetaDataTag[] MetaData, RegistrationEventArgs e)
+		{
+			if (!e.IsClaimed)
+				SimpleXmppConfiguration.PrintQRCode(ThingRegistryClient.EncodeAsIoTDiscoURI(MetaData));
+
+			RegistrationSuccessfulAsService(MetaData, e);
+		}
+
+		internal static void RegistrationSuccessfulAsService(MetaDataTag[] MetaData, RegistrationEventArgs e)
+		{
+			if (!e.IsClaimed)
+			{
+				string ClaimUrl = ThingRegistryClient.EncodeAsIoTDiscoURI(MetaData);
+				string FilePath = Path.Combine(Gateway.AppDataFolder, "Gateway.iotdisco");
+
+				Log.Informational("Registration successful.");
+				Log.Informational(ClaimUrl, new KeyValuePair<string, object>("Path", FilePath));
+
+				File.WriteAllText(FilePath, ClaimUrl);
 			}
 		}
 

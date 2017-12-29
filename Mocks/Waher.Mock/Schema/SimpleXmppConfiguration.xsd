@@ -91,6 +91,21 @@
 						<xs:documentation>If the roster should be requested during startup. (Default=true)</xs:documentation>
 					</xs:annotation>
 				</xs:element>
+				<xs:element name="AllowRegistration" type="xs:boolean" minOccurs="0" default="false">
+					<xs:annotation>
+						<xs:documentation>If the client is allowed to register for a new account, if the account was not found. (Default=false)</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="FormSignatureKey" type="xs:string" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Form signature key, if form signatures (XEP-0348) is to be used during registration.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="FormSignatureSecret" type="xs:string" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Form signature secret, if form signatures (XEP-0348) is to be used during registration.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>

@@ -97,8 +97,6 @@ namespace Waher.Mock.Temperature.UWP
 			this.StartSensor();
 		}
 
-		private const string FormSignatureKey = "";     // Form signature key, if form signatures (XEP-0348) is to be used during registration.
-		private const string FormSignatureSecret = "";  // Form signature secret, if form signatures (XEP-0348) is to be used during registration.
 		private const int MaxRecordsPerPeriod = 500;
 
 		private XmppClient xmppClient = null;
@@ -123,25 +121,24 @@ namespace Waher.Mock.Temperature.UWP
 			{
 				Log.Informational("Starting application.");
 
-				SimpleXmppConfiguration xmppConfiguration = SimpleXmppConfiguration.GetConfigUsingSimpleConsoleDialog("xmpp.config",
+				XmppCredentials Credentials = SimpleXmppConfiguration.GetConfigUsingSimpleConsoleDialog("xmpp.config",
 					Guid.NewGuid().ToString().Replace("-", string.Empty),   // Default user name.
 					Guid.NewGuid().ToString().Replace("-", string.Empty),   // Default password.
-					FormSignatureKey, FormSignatureSecret, typeof(App).GetTypeInfo().Assembly);
+					typeof(App).GetTypeInfo().Assembly);
 
 				Log.Informational("Connecting to XMPP server.");
 
-				xmppClient = xmppConfiguration.GetClient("en", typeof(App).GetTypeInfo().Assembly, false);
-				xmppClient.AllowRegistration(FormSignatureKey, FormSignatureSecret);
+				xmppClient = new XmppClient(Credentials, "en", typeof(App).GetTypeInfo().Assembly);
 
-				if (xmppConfiguration.Sniffer && MainPage.Sniffer != null)
+				if (Credentials.Sniffer && MainPage.Sniffer != null)
 					xmppClient.Add(MainPage.Sniffer);
 				
-				if (!string.IsNullOrEmpty(xmppConfiguration.Events))
-					Log.Register(new XmppEventSink("XMPP Event Sink", xmppClient, xmppConfiguration.Events, false));
+				if (!string.IsNullOrEmpty(Credentials.Events))
+					Log.Register(new XmppEventSink("XMPP Event Sink", xmppClient, Credentials.Events, false));
 				
-				if (!string.IsNullOrEmpty(xmppConfiguration.ThingRegistry))
+				if (!string.IsNullOrEmpty(Credentials.ThingRegistry))
 				{
-					thingRegistryClient = new ThingRegistryClient(xmppClient, xmppConfiguration.ThingRegistry);
+					thingRegistryClient = new ThingRegistryClient(xmppClient, Credentials.ThingRegistry);
 				
 					thingRegistryClient.Claimed += (sender, e) =>
 					{
@@ -163,8 +160,8 @@ namespace Waher.Mock.Temperature.UWP
 					};
 				}
 				
-				if (!string.IsNullOrEmpty(xmppConfiguration.Provisioning))
-					provisioningClient = new ProvisioningClient(xmppClient, xmppConfiguration.Provisioning);
+				if (!string.IsNullOrEmpty(Credentials.Provisioning))
+					provisioningClient = new ProvisioningClient(xmppClient, Credentials.Provisioning);
 
 				Timer ConnectionTimer = new Timer((P) =>
 				{

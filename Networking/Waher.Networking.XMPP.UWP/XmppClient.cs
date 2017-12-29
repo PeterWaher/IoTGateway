@@ -487,6 +487,65 @@ namespace Waher.Networking.XMPP
 			this.Init(AppAssembly);
 		}
 
+		/// <summary>
+		/// Manages an XMPP client connection. Implements XMPP, as defined in
+		/// https://tools.ietf.org/html/rfc6120
+		/// https://tools.ietf.org/html/rfc6121
+		/// https://tools.ietf.org/html/rfc6122
+		/// 
+		/// Extensions supported directly by client object:
+		/// 
+		/// XEP-0030: Service Discovery: http://xmpp.org/extensions/xep-0030.html
+		/// XEP-0055: Jabber Search: http://xmpp.org/extensions/xep-0055.html
+		/// XEP-0077: In-band Registration: http://xmpp.org/extensions/xep-0077.html
+		/// XEP-0092: Software Version: http://xmpp.org/extensions/xep-0092.html
+		/// XEP-0115: Entity Capabilities: http://xmpp.org/extensions/xep-0115.html
+		/// XEP-0128: Service Discovery Extensions: http://xmpp.org/extensions/xep-0128.html
+		/// XEP-0199: XMPP Ping: http://xmpp.org/extensions/xep-0199.html
+		/// 
+		/// Quality of Service: http://xmpp.org/extensions/inbox/qos.html
+		/// </summary>
+		/// <param name="Credentials">Client credentials.</param>
+		/// <param name="Language">Language Code, according to RFC 5646.</param>
+		/// <param name="AppAssembly">Application assembly.</param>
+		/// <param name="Sniffers">Sniffers.</param>
+		public XmppClient(XmppCredentials Credentials, string Language, Assembly AppAssembly, params ISniffer[] Sniffers)
+		{
+			this.host = this.domain = Credentials.Host;
+			this.port = Credentials.Port;
+			this.userName = Credentials.Account;
+
+			if (string.IsNullOrEmpty(Credentials.PasswordType))
+			{
+				this.password = Credentials.Password;
+				this.passwordHash = string.Empty;
+				this.passwordHashMethod = string.Empty;
+			}
+			else
+			{
+				this.password = string.Empty;
+				this.passwordHash = Credentials.Password;
+				this.passwordHashMethod = Credentials.PasswordType;
+			}
+
+			this.language = Language;
+			this.state = XmppState.Offline;
+			this.clientCertificate = Credentials.ClientCertificate;
+
+			this.Init(AppAssembly);
+
+			this.allowCramMD5 = Credentials.AllowCramMD5;
+			this.allowDigestMD5 = Credentials.AllowDigestMD5;
+			this.allowPlain = Credentials.AllowPlain;
+			this.allowScramSHA1 = Credentials.AllowScramSHA1;
+			this.allowEncryption = Credentials.AllowEncryption;
+			this.requestRosterOnStartup = Credentials.RequestRosterOnStartup;
+			this.trustServer = Credentials.TrustServer;
+
+			if (Credentials.AllowRegistration)
+				this.AllowRegistration(Credentials.FormSignatureKey, Credentials.FormSignatureSecret);
+		}
+
 		private void Init(Assembly Assembly)
 		{
 #if WINDOWS_UWP
@@ -737,11 +796,9 @@ namespace Waher.Networking.XMPP
 
 		private void Error(Exception Exception)
 		{
-			AggregateException ex;
-
 			Exception = Log.UnnestException(Exception);
 
-			if ((ex = Exception as AggregateException) != null)
+			if (Exception is AggregateException ex)
 			{
 				foreach (Exception ex2 in ex.InnerExceptions)
 					this.Error(ex2);

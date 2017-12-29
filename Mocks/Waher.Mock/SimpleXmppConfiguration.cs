@@ -22,9 +22,9 @@ using Waher.Networking.XMPP.ServiceDiscovery;
 namespace Waher.Mock
 {
 	/// <summary>
-	/// Class containing information about a simple XMPP connection.
+	/// Class facilitating the setup of a simple XMPP connection.
 	/// </summary>
-	public class SimpleXmppConfiguration
+	public static class SimpleXmppConfiguration
 	{
 #if !WINDOWS_UWP
 		private static readonly XmlSchema schema = XSL.LoadSchema("Waher.Mock.Schema.SimpleXmppConfiguration.xsd");
@@ -37,37 +37,12 @@ namespace Waher.Mock
 		/// </summary>
 		public const string DefaultXmppServer = "waher.se";
 
-		/// <summary>
-		/// Default XMPP Server port.
-		/// </summary>
-		public const int DefaultPort = 5222;
-
-		private string host = string.Empty;
-		private string account = string.Empty;
-		private string password = string.Empty;
-		private string passwordType = string.Empty;
-		private string thingRegistry = string.Empty;
-		private string provisioning = string.Empty;
-		private string events = string.Empty;
-		private bool sniffer = false;
-		private bool trustServer = false;
-		private bool allowCramMD5 = true;
-		private bool allowDigestMD5 = true;
-		private bool allowPlain = false;
-		private bool allowScramSHA1 = true;
-		private bool allowEncryption = true;
-		private bool requestRosterOnStartup = true;
-		private int port = DefaultPort;
-
-		private SimpleXmppConfiguration()
-		{
-		}
 
 		/// <summary>
-		/// Class containing information about a simple XMPP connection.
+		/// Loads XMPP Client credentials from a file.
 		/// </summary>
 		/// <param name="FileName">Name of file containing configuration.</param>
-		public SimpleXmppConfiguration(string FileName)
+		public static XmppCredentials Load(string FileName)
 		{
 			XmlDocument Xml = new XmlDocument();
 			using (StreamReader r = File.OpenText(FileName))
@@ -79,15 +54,15 @@ namespace Waher.Mock
 			XSL.Validate(FileName, Xml, expectedRootElement, expectedNamespace, schema);
 #endif
 
-			this.Init(Xml.DocumentElement);
+			return Init(Xml.DocumentElement);
 		}
 
-        /// <summary>
-        /// Class containing information about a simple XMPP connection.
-        /// </summary>
-        /// <param name="ObjectID">Object ID of XML document. Used in case validation warnings are found during validation.</param>
-        /// <param name="File">File containing configuration.</param>
-        public SimpleXmppConfiguration(string ObjectID, Stream File)
+		/// <summary>
+		/// Loads XMPP Client credentials from a stream.
+		/// </summary>
+		/// <param name="ObjectID">Object ID of XML document. Used in case validation warnings are found during validation.</param>
+		/// <param name="File">File containing configuration.</param>
+		public static XmppCredentials Load(string ObjectID, Stream File)
         {
             XmlDocument Xml = new XmlDocument();
             Xml.Load(File);
@@ -96,32 +71,32 @@ namespace Waher.Mock
             XSL.Validate(ObjectID, Xml, expectedRootElement, expectedNamespace, schema);
 #endif
 
-            this.Init(Xml.DocumentElement);
+            return Init(Xml.DocumentElement);
         }
 
-        /// <summary>
-        /// Class containing information about a simple XMPP connection.
-        /// </summary>
-        /// <param name="Xml">XML Document containing information.</param>
-        public SimpleXmppConfiguration(XmlDocument Xml)
+		/// <summary>
+		/// Loads XMPP Client credentials from an XML Document.
+		/// </summary>
+		/// <param name="Xml">XML Document containing information.</param>
+		public static XmppCredentials Load(XmlDocument Xml)
 		{
 #if !WINDOWS_UWP
 			XSL.Validate(string.Empty, Xml, expectedRootElement, expectedNamespace, schema);
 #endif
 
-			this.Init(Xml.DocumentElement);
+			return Init(Xml.DocumentElement);
 		}
 
 		/// <summary>
-		/// Class containing information about a simple XMPP connection.
+		/// Loads XMPP Client credentials from an XML element.
 		/// </summary>
 		/// <param name="Xml">XML element containing information.</param>
-		public SimpleXmppConfiguration(XmlElement Xml)
+		public static XmppCredentials Load(XmlElement Xml)
 		{
-			this.Init(Xml);
+			return Init(Xml);
 		}
 
-		private string AssertNotEnter(string s)
+		private static string AssertNotEnter(string s)
 		{
 			if (s.StartsWith("ENTER ", StringComparison.CurrentCultureIgnoreCase))
 				throw new Exception("XMPP configuration not correctly provided.");
@@ -129,227 +104,117 @@ namespace Waher.Mock
 			return s;
 		}
 
-		private void Init(XmlElement E)
+		private static XmppCredentials Init(XmlElement E)
 		{
+			XmppCredentials Result = new XmppCredentials();
+
 			foreach (XmlNode N in E.ChildNodes)
 			{
 				switch (N.LocalName)
 				{
 					case "Host":
-						this.host = this.AssertNotEnter(N.InnerText);
+						Result.Host = AssertNotEnter(N.InnerText);
 						break;
 
 					case "Port":
-						this.port = int.Parse(N.InnerText);
+						Result.Port = int.Parse(N.InnerText);
 						break;
 
 					case "Account":
-						this.account = this.AssertNotEnter(N.InnerText);
+						Result.Account = AssertNotEnter(N.InnerText);
 						break;
 
 					case "Password":
-						this.password = this.AssertNotEnter(N.InnerText);
-						this.passwordType = XML.Attribute((XmlElement)N, "type");
+						Result.Password = AssertNotEnter(N.InnerText);
+						Result.PasswordType = XML.Attribute((XmlElement)N, "type");
 						break;
 
 					case "ThingRegistry":
-						this.thingRegistry = this.AssertNotEnter(N.InnerText);
+						Result.ThingRegistry = AssertNotEnter(N.InnerText);
 						break;
 
 					case "Provisioning":
-						this.provisioning = this.AssertNotEnter(N.InnerText);
+						Result.Provisioning = AssertNotEnter(N.InnerText);
 						break;
 
 					case "Events":
-						this.events = this.AssertNotEnter(N.InnerText);
+						Result.Events = AssertNotEnter(N.InnerText);
 						break;
 
 					case "Sniffer":
-						if (!CommonTypes.TryParse(N.InnerText, out this.sniffer))
-							this.sniffer = false;
+						if (!CommonTypes.TryParse(N.InnerText, out bool b))
+							b = false;
+
+						Result.Sniffer = b;
 						break;
 
 					case "TrustServer":
-						if (!CommonTypes.TryParse(N.InnerText, out this.trustServer))
-							this.trustServer = false;
+						if (!CommonTypes.TryParse(N.InnerText, out b))
+							b = false;
+
+						Result.TrustServer = b;
 						break;
 
 					case "AllowCramMD5":
-						if (!CommonTypes.TryParse(N.InnerText, out this.allowCramMD5))
-							this.allowCramMD5 = false;
+						if (!CommonTypes.TryParse(N.InnerText, out b))
+							b = false;
+
+						Result.AllowCramMD5 = b;
 						break;
 
 					case "AllowDigestMD5":
-						if (!CommonTypes.TryParse(N.InnerText, out this.allowDigestMD5))
-							this.allowDigestMD5 = false;
+						if (!CommonTypes.TryParse(N.InnerText, out b))
+							b = false;
+
+						Result.AllowDigestMD5 = b;
 						break;
 
 					case "AllowPlain":
-						if (!CommonTypes.TryParse(N.InnerText, out this.allowPlain))
-							this.allowPlain = false;
+						if (!CommonTypes.TryParse(N.InnerText, out b))
+							b = false;
+
+						Result.AllowPlain = b;
 						break;
 
 					case "AllowScramSHA1":
-						if (!CommonTypes.TryParse(N.InnerText, out this.allowScramSHA1))
-							this.allowScramSHA1 = false;
+						if (!CommonTypes.TryParse(N.InnerText, out b))
+							b = false;
+
+						Result.AllowScramSHA1 = b;
 						break;
 
 					case "AllowEncryption":
-						if (!CommonTypes.TryParse(N.InnerText, out this.allowEncryption))
-							this.allowEncryption = false;
+						if (!CommonTypes.TryParse(N.InnerText, out b))
+							b = false;
+
+						Result.AllowEncryption = b;
 						break;
 
 					case "RequestRosterOnStartup":
-						if (!CommonTypes.TryParse(N.InnerText, out this.requestRosterOnStartup))
-							this.requestRosterOnStartup = false;
+						if (!CommonTypes.TryParse(N.InnerText, out b))
+							b = false;
+
+						Result.RequestRosterOnStartup = b;
+						break;
+
+					case "AllowRegistration":
+						if (!CommonTypes.TryParse(N.InnerText, out b))
+							b = false;
+
+						Result.AllowRegistration = b;
+						break;
+
+					case "FormSignatureKey":
+						Result.FormSignatureKey = AssertNotEnter(N.InnerText);
+						break;
+
+					case "FormSignatureSecret":
+						Result.FormSignatureSecret = AssertNotEnter(N.InnerText);
 						break;
 				}
 			}
-		}
 
-		/// <summary>
-		/// Host name of XMPP server.
-		/// </summary>
-		public string Host
-		{
-			get { return this.host; }
-			set { this.host = value; }
-		}
-
-		/// <summary>
-		/// Name of account on XMPP server to connect to.
-		/// </summary>
-		public string Account
-		{
-			get { return this.account; }
-			set { this.account = value; }
-		}
-
-		/// <summary>
-		/// Password of account.
-		/// </summary>
-		public string Password
-		{
-			get { return this.password; }
-			set { this.password = value; }
-		}
-
-		/// <summary>
-		/// Password type of account.
-		/// </summary>
-		public string PasswordType
-		{
-			get { return this.passwordType; }
-			set { this.passwordType = value; }
-		}
-
-		/// <summary>
-		/// JID of Thing Registry to use. Leave blank if no thing registry is to be used.
-		/// </summary>
-		public string ThingRegistry
-		{
-			get { return this.thingRegistry; }
-			set { this.thingRegistry = value; }
-		}
-
-		/// <summary>
-		/// JID of Provisioning Server to use. Leave blank if no thing registry is to be used.
-		/// </summary>
-		public string Provisioning
-		{
-			get { return this.provisioning; }
-			set { this.provisioning = value; }
-		}
-
-		/// <summary>
-		/// JID of entity to whom events should be sent. Leave blank if events are not to be forwarded.
-		/// </summary>
-		public string Events
-		{
-			get { return this.events; }
-			set { this.events = value; }
-		}
-
-		/// <summary>
-		/// If a sniffer is to be used ('true' or 'false'). If 'true', network communication will be output to the console.
-		/// </summary>
-		public bool Sniffer
-		{
-			get { return this.sniffer; }
-			set { this.sniffer = value; }
-		}
-
-		/// <summary>
-		/// Port number to use when connecting to XMPP server.
-		/// </summary>
-		public int Port
-		{
-			get { return this.port; }
-			set { this.port = value; }
-		}
-
-		/// <summary>
-		/// If the server certificate should be trusted automatically ('true'), or if a certificate validation should be done to 
-		/// test the validity of the server ('false').
-		/// </summary>
-		public bool TrustServer
-		{
-			get { return this.trustServer; }
-			set { this.trustServer = value; }
-		}
-
-		/// <summary>
-		/// If CRAM-MD5 should be allowed, during authentication.
-		/// </summary>
-		public bool AllowCramMD5
-		{
-			get { return this.allowCramMD5; }
-			set { this.allowCramMD5 = value; }
-		}
-
-		/// <summary>
-		/// If DIGEST-MD5 should be allowed, during authentication.
-		/// </summary>
-		public bool AllowDigestMD5
-		{
-			get { return this.allowDigestMD5; }
-			set { this.allowDigestMD5 = value; }
-		}
-
-		/// <summary>
-		/// If PLAIN should be allowed, during authentication.
-		/// </summary>
-		public bool AllowPlain
-		{
-			get { return this.allowPlain; }
-			set { this.allowPlain = value; }
-		}
-
-		/// <summary>
-		/// If SCRAM-SHA-1 should be allowed, during authentication.
-		/// </summary>
-		public bool AllowScramSHA1
-		{
-			get { return this.allowScramSHA1; }
-			set { this.allowScramSHA1 = value; }
-		}
-
-		/// <summary>
-		/// If encryption should be allowed or not.
-		/// </summary>
-		public bool AllowEncryption
-		{
-			get { return this.allowEncryption; }
-			set { this.allowEncryption = value; }
-		}
-
-		/// <summary>
-		/// If the roster should be requested during startup.
-		/// </summary>
-		private bool RequestRosterOnStartup
-		{
-			get { return this.requestRosterOnStartup; }
-			set { this.requestRosterOnStartup = value; }
+			return Result;
 		}
 
 		/// <summary>
@@ -359,32 +224,28 @@ namespace Waher.Mock
 		/// <param name="FileName">Name of configuration file.</param>
 		/// <param name="DefaultAccountName">Default account name.</param>
 		/// <param name="DefaultPassword">Default password.</param>
-		/// <param name="FormSignatureKey">Form signature key, if form signatures (XEP-0348) is to be used during registration.</param>
-		/// <param name="FormSignatureSecret">Form signature secret, if form signatures (XEP-0348) is to be used during registration.</param>
 		/// <param name="AppAssembly">Application assembly.</param>
 		/// <returns>Simple XMPP configuration.</returns>
-		public static SimpleXmppConfiguration GetConfigUsingSimpleConsoleDialog(string FileName, string DefaultAccountName, string DefaultPassword,
-			string FormSignatureKey, string FormSignatureSecret, Assembly AppAssembly)
+		public static XmppCredentials GetConfigUsingSimpleConsoleDialog(string FileName, string DefaultAccountName, string DefaultPassword,
+			Assembly AppAssembly)
 		{
 			try
 			{
-				return new SimpleXmppConfiguration(FileName);
+				return Load(FileName);
 			}
 			catch (Exception)
 			{
-				SimpleXmppConfiguration Config = new SimpleXmppConfiguration();
+				XmppCredentials Credentials = new XmppCredentials();
 				bool Ok;
 
-				Config.host = DefaultXmppServer;
-				Config.port = DefaultPort;
-				Config.account = DefaultAccountName;
-				Config.password = DefaultPassword;
+				Credentials.Host = DefaultXmppServer;
+				Credentials.Port = XmppCredentials.DefaultPort;
+				Credentials.Account = DefaultAccountName;
+				Credentials.Password = DefaultPassword;
 
 #if WINDOWS_UWP
-				using (XmppClient Client = new XmppClient(Config.host, Config.port, Config.account, Config.password, "en", AppAssembly))
+				using (XmppClient Client = new XmppClient(Credentials, "en", AppAssembly))
 				{
-					Client.AllowRegistration(FormSignatureKey, FormSignatureSecret);
-					Client.TrustServer = Config.trustServer;
 					Client.Connect();
 
 					ManualResetEvent Connected = new ManualResetEvent(false);
@@ -395,8 +256,8 @@ namespace Waher.Mock
 						switch (NewState)
 						{
 							case XmppState.Connected:
-								Config.password = Client.PasswordHash;
-								Config.passwordType = Client.PasswordHashMethod;
+								Credentials.Password = Client.PasswordHash;
+								Credentials.PasswordType = Client.PasswordHashMethod;
 								Connected.Set();
 								break;
 
@@ -426,20 +287,20 @@ namespace Waher.Mock
 						{
 							ServiceDiscoveryEventArgs e2 = Client.ServiceDiscovery(Item.JID, 10000);
 
-							if (e2.Features.ContainsKey("urn:xmpp:iot:discovery") && string.IsNullOrEmpty(Config.thingRegistry))
-								Config.thingRegistry = Item.JID;
+							if (e2.Features.ContainsKey("urn:xmpp:iot:discovery") && string.IsNullOrEmpty(Credentials.ThingRegistry))
+								Credentials.ThingRegistry = Item.JID;
 							else
-								Config.thingRegistry = string.Empty;
+								Credentials.ThingRegistry = string.Empty;
 
-							if (e2.Features.ContainsKey("urn:ieee:iot:prov:d:1.0") && string.IsNullOrEmpty(Config.provisioning))
-								Config.provisioning = Item.JID;
+							if (e2.Features.ContainsKey("urn:ieee:iot:prov:d:1.0") && string.IsNullOrEmpty(Credentials.Provisioning))
+								Credentials.Provisioning = Item.JID;
 							else
-								Config.provisioning = string.Empty;
+								Credentials.Provisioning = string.Empty;
 
-							if (e2.Features.ContainsKey("urn:xmpp:eventlog") && string.IsNullOrEmpty(Config.events))
-								Config.events = Item.JID;
+							if (e2.Features.ContainsKey("urn:xmpp:eventlog") && string.IsNullOrEmpty(Credentials.Events))
+								Credentials.Events = Item.JID;
 							else
-								Config.events = string.Empty;
+								Credentials.Events = string.Empty;
 						}
 					}
 					else
@@ -458,7 +319,7 @@ namespace Waher.Mock
 					Console.Out.WriteLine("To setup a connection to the XMPP network, please answer the following");
 					Console.Out.WriteLine("questions:");
 
-					Default = Config.host;
+					Default = Credentials.Host;
 					Console.Out.WriteLine();
 					Console.Out.WriteLine("What XMPP server do you want to use? Press ENTER to use " + Default);
 
@@ -466,25 +327,26 @@ namespace Waher.Mock
 					{
 						Console.ForegroundColor = ConsoleColor.White;
 						Console.Out.Write("XMPP Server: ");
-						Config.host = Console.In.ReadLine();
-						if (string.IsNullOrEmpty(Config.host))
-							Config.host = Default;
+						Credentials.Host = Console.In.ReadLine();
+						if (string.IsNullOrEmpty(Credentials.Host))
+							Credentials.Host = Default;
 
 						Console.ForegroundColor = ConsoleColor.Green;
 						Console.Out.WriteLine();
-						Console.Out.WriteLine("You've selected to use '" + Config.host + "'. Is this correct? [y/n]");
+						Console.Out.WriteLine("You've selected to use '" + Credentials.Host + "'. Is this correct? [y/n]");
 						s = Console.In.ReadLine();
 						Console.Out.WriteLine();
 					}
 					while (!s.StartsWith("y", StringComparison.InvariantCultureIgnoreCase));
 
-					Default = Config.port.ToString();
+					Default = Credentials.Port.ToString();
 					Console.ForegroundColor = ConsoleColor.Yellow;
 					Console.Out.WriteLine("What port do you want to connect to? Press ENTER to use " + Default);
 
 					do
 					{
 						Console.ForegroundColor = ConsoleColor.White;
+						int Port;
 
 						do
 						{
@@ -493,17 +355,19 @@ namespace Waher.Mock
 							if (string.IsNullOrEmpty(s))
 								s = Default;
 						}
-						while (!int.TryParse(s, out Config.port) || Config.port < 1 || Config.port > 65535);
+						while (!int.TryParse(s, out Port) || Port < 1 || Port > 65535);
+
+						Credentials.Port = Port;
 
 						Console.ForegroundColor = ConsoleColor.Green;
 						Console.Out.WriteLine();
-						Console.Out.WriteLine("You've selected to use '" + Config.port.ToString() + "'. Is this correct? [y/n]");
+						Console.Out.WriteLine("You've selected to use '" + Credentials.Port.ToString() + "'. Is this correct? [y/n]");
 						s = Console.In.ReadLine();
 						Console.Out.WriteLine();
 					}
 					while (!s.StartsWith("y", StringComparison.InvariantCultureIgnoreCase));
 
-					Default = Config.account;
+					Default = Credentials.Account;
 					Console.ForegroundColor = ConsoleColor.Yellow;
 					Console.Out.WriteLine("What account to you want to connect with? If the account does not exist,");
 					Console.Out.WriteLine("but the server supports In-band registration, the account will be created.");
@@ -517,21 +381,21 @@ namespace Waher.Mock
 						do
 						{
 							Console.Out.Write("Account: ");
-							Config.account = Console.In.ReadLine();
-							if (string.IsNullOrEmpty(Config.account))
-								Config.account = Default;
+							Credentials.Account = Console.In.ReadLine();
+							if (string.IsNullOrEmpty(Credentials.Account))
+								Credentials.Account = Default;
 						}
-						while (string.IsNullOrEmpty(Config.account));
+						while (string.IsNullOrEmpty(Credentials.Account));
 
 						Console.ForegroundColor = ConsoleColor.Green;
 						Console.Out.WriteLine();
-						Console.Out.WriteLine("You've selected to use '" + Config.account + "'. Is this correct? [y/n]");
+						Console.Out.WriteLine("You've selected to use '" + Credentials.Account + "'. Is this correct? [y/n]");
 						s = Console.In.ReadLine();
 						Console.Out.WriteLine();
 					}
 					while (!s.StartsWith("y", StringComparison.InvariantCultureIgnoreCase));
 
-					Default = Config.password;
+					Default = Credentials.Password;
 					Console.ForegroundColor = ConsoleColor.Yellow;
 					Console.Out.WriteLine("What password goes with the account? Remember that the configuration will,");
 					Console.Out.Write("be stored in a simple text file along with the application. ");
@@ -545,15 +409,15 @@ namespace Waher.Mock
 						do
 						{
 							Console.Out.Write("Password: ");
-							Config.password = Console.In.ReadLine();
-							if (string.IsNullOrEmpty(Config.password))
-								Config.password = Default;
+							Credentials.Password = Console.In.ReadLine();
+							if (string.IsNullOrEmpty(Credentials.Password))
+								Credentials.Password = Default;
 						}
-						while (string.IsNullOrEmpty(Config.password));
+						while (string.IsNullOrEmpty(Credentials.Password));
 
 						Console.ForegroundColor = ConsoleColor.Green;
 						Console.Out.WriteLine();
-						Console.Out.WriteLine("You've selected to use '" + Config.password + "'. Is this correct? [y/n]");
+						Console.Out.WriteLine("You've selected to use '" + Credentials.Password + "'. Is this correct? [y/n]");
 						s = Console.In.ReadLine();
 						Console.Out.WriteLine();
 					}
@@ -572,18 +436,86 @@ namespace Waher.Mock
 						Console.Out.Write("Trust server [y/n]? ");
 
 						s = Console.In.ReadLine();
-						Config.trustServer = s.StartsWith("y", StringComparison.InvariantCultureIgnoreCase);
+						Credentials.TrustServer = s.StartsWith("y", StringComparison.InvariantCultureIgnoreCase);
 					}
-					while (!Config.trustServer && !s.StartsWith("n", StringComparison.InvariantCultureIgnoreCase));
+					while (!Credentials.TrustServer && !s.StartsWith("n", StringComparison.InvariantCultureIgnoreCase));
+
+					Console.ForegroundColor = ConsoleColor.Yellow;
+					Console.Out.WriteLine("Do you want to create an account on the server?");
+
+					do
+					{
+						Console.ForegroundColor = ConsoleColor.White;
+						Console.Out.Write("Create account [y/n]? ");
+
+						s = Console.In.ReadLine();
+						Credentials.AllowRegistration = s.StartsWith("y", StringComparison.InvariantCultureIgnoreCase);
+					}
+					while (!Credentials.AllowRegistration && !s.StartsWith("n", StringComparison.InvariantCultureIgnoreCase));
+
+					if (Credentials.AllowRegistration)
+					{
+						Console.ForegroundColor = ConsoleColor.Yellow;
+
+						Console.Out.WriteLine();
+						Console.Out.WriteLine("Some servers require an API key to allow account creation.");
+						Console.Out.WriteLine("If so, please enter an API key below.");
+
+						Default = Credentials.FormSignatureKey;
+						Console.Out.WriteLine();
+						Console.Out.WriteLine("What API Key do you want to use? Press ENTER to use " + Default);
+
+						do
+						{
+							Console.ForegroundColor = ConsoleColor.White;
+							Console.Out.Write("API Key: ");
+							Credentials.FormSignatureKey = Console.In.ReadLine();
+							if (string.IsNullOrEmpty(Credentials.FormSignatureKey))
+								Credentials.FormSignatureKey = Default;
+
+							Console.ForegroundColor = ConsoleColor.Green;
+							Console.Out.WriteLine();
+							Console.Out.WriteLine("You've selected to use '" + Credentials.FormSignatureKey + "'. Is this correct? [y/n]");
+							s = Console.In.ReadLine();
+							Console.Out.WriteLine();
+						}
+						while (!s.StartsWith("y", StringComparison.InvariantCultureIgnoreCase));
+
+						if (!string.IsNullOrEmpty(Credentials.FormSignatureKey))
+						{
+							Console.ForegroundColor = ConsoleColor.Yellow;
+
+							Console.Out.WriteLine();
+							Console.Out.WriteLine("Please provide the corresponding secret below.");
+
+							Default = Credentials.FormSignatureSecret;
+							Console.Out.WriteLine();
+							Console.Out.WriteLine("What secret belongs to the API key? Press ENTER to use " + Default);
+
+							do
+							{
+								Console.ForegroundColor = ConsoleColor.White;
+								Console.Out.Write("Secret: ");
+								Credentials.FormSignatureSecret = Console.In.ReadLine();
+								if (string.IsNullOrEmpty(Credentials.FormSignatureSecret))
+									Credentials.FormSignatureSecret = Default;
+
+								Console.ForegroundColor = ConsoleColor.Green;
+								Console.Out.WriteLine();
+								Console.Out.WriteLine("You've selected to use '" + Credentials.FormSignatureSecret + "'. Is this correct? [y/n]");
+								s = Console.In.ReadLine();
+								Console.Out.WriteLine();
+							}
+							while (!s.StartsWith("y", StringComparison.InvariantCultureIgnoreCase));
+						}
+					}
 
 					Console.ForegroundColor = ConsoleColor.Yellow;
 					Console.Out.WriteLine("I will now try to connect to the server to see if the information");
 					Console.Out.WriteLine("provided is correct.");
 
-					using (XmppClient Client = new XmppClient(Config.host, Config.port, Config.account, Config.password, "en", AppAssembly))
+					using (XmppClient Client = new XmppClient(Credentials, "en", AppAssembly))
 					{
-						Client.AllowRegistration(FormSignatureKey, FormSignatureSecret);
-						Client.TrustServer = Config.trustServer;
 						Client.Connect();
 
 						ManualResetEvent Connected = new ManualResetEvent(false);
@@ -598,8 +530,11 @@ namespace Waher.Mock
 								case XmppState.Connected:
 									Console.ForegroundColor = ConsoleColor.Green;
 									Console.Out.WriteLine("Connection successful.");
-									Config.password = Client.PasswordHash;
-									Config.passwordType = Client.PasswordHashMethod;
+									Credentials.Password = Client.PasswordHash;
+									Credentials.PasswordType = Client.PasswordHashMethod;
+									Credentials.AllowRegistration = false;
+									Credentials.FormSignatureKey = string.Empty;
+									Credentials.FormSignatureSecret = string.Empty;
 									Connected.Set();
 									break;
 
@@ -635,29 +570,29 @@ namespace Waher.Mock
 								Console.Out.WriteLine("Checking " + Item.JID + ".");
 								ServiceDiscoveryEventArgs e2 = Client.ServiceDiscovery(Item.JID, 10000);
 
-								if (e2.Features.ContainsKey("urn:xmpp:iot:discovery") && string.IsNullOrEmpty(Config.thingRegistry))
+								if (e2.Features.ContainsKey("urn:xmpp:iot:discovery") && string.IsNullOrEmpty(Credentials.ThingRegistry))
 								{
 									Console.Out.WriteLine("Thing registry found.");
-									Config.thingRegistry = Item.JID;
+									Credentials.ThingRegistry = Item.JID;
 								}
 								else
-									Config.thingRegistry = string.Empty;
+									Credentials.ThingRegistry = string.Empty;
 
-								if (e2.Features.ContainsKey("urn:ieee:iot:prov:d:1.0") && string.IsNullOrEmpty(Config.provisioning))
+								if (e2.Features.ContainsKey("urn:ieee:iot:prov:d:1.0") && string.IsNullOrEmpty(Credentials.Provisioning))
 								{
 									Console.Out.WriteLine("Provisioning server found.");
-									Config.provisioning = Item.JID;
+									Credentials.Provisioning = Item.JID;
 								}
 								else
-									Config.provisioning = string.Empty;
+									Credentials.Provisioning = string.Empty;
 
-								if (e2.Features.ContainsKey("urn:xmpp:eventlog") && string.IsNullOrEmpty(Config.events))
+								if (e2.Features.ContainsKey("urn:xmpp:eventlog") && string.IsNullOrEmpty(Credentials.Events))
 								{
 									Console.Out.WriteLine("Event log found.");
-									Config.events = Item.JID;
+									Credentials.Events = Item.JID;
 								}
 								else
-									Config.events = string.Empty;
+									Credentials.Events = string.Empty;
 							}
 
 						}
@@ -665,7 +600,7 @@ namespace Waher.Mock
 				}
 				while (!Ok);
 
-				Default = Config.thingRegistry;
+				Default = Credentials.ThingRegistry;
 				Console.ForegroundColor = ConsoleColor.Yellow;
 				Console.Out.WriteLine("What thing registry do you want to use? The use of a thing registry is optional.");
 
@@ -678,22 +613,22 @@ namespace Waher.Mock
 				{
 					Console.ForegroundColor = ConsoleColor.White;
 					Console.Out.Write("Thing Registry: ");
-					Config.thingRegistry = Console.In.ReadLine();
-					if (string.IsNullOrEmpty(Config.thingRegistry))
-						Config.thingRegistry = Default;
+					Credentials.ThingRegistry = Console.In.ReadLine();
+					if (string.IsNullOrEmpty(Credentials.ThingRegistry))
+						Credentials.ThingRegistry = Default;
 
 					Console.ForegroundColor = ConsoleColor.Green;
 					Console.Out.WriteLine();
-					if (string.IsNullOrEmpty(Config.thingRegistry))
+					if (string.IsNullOrEmpty(Credentials.ThingRegistry))
 						Console.Out.WriteLine("You've selected to not use a thing registry. Is this correct? [y/n]");
 					else
-						Console.Out.WriteLine("You've selected to use '" + Config.thingRegistry + "'. Is this correct? [y/n]");
+						Console.Out.WriteLine("You've selected to use '" + Credentials.ThingRegistry + "'. Is this correct? [y/n]");
 					s = Console.In.ReadLine();
 					Console.Out.WriteLine();
 				}
 				while (!s.StartsWith("y", StringComparison.InvariantCultureIgnoreCase));
 
-				Default = Config.provisioning;
+				Default = Credentials.Provisioning;
 				Console.ForegroundColor = ConsoleColor.Yellow;
 				Console.Out.WriteLine("What provisioning server do you want to use? The use of a provisioning server");
 				Console.Out.WriteLine("is optional.");
@@ -707,22 +642,22 @@ namespace Waher.Mock
 				{
 					Console.ForegroundColor = ConsoleColor.White;
 					Console.Out.Write("Provisioning Server: ");
-					Config.provisioning = Console.In.ReadLine();
-					if (string.IsNullOrEmpty(Config.provisioning))
-						Config.provisioning = Default;
+					Credentials.Provisioning = Console.In.ReadLine();
+					if (string.IsNullOrEmpty(Credentials.Provisioning))
+						Credentials.Provisioning = Default;
 
 					Console.ForegroundColor = ConsoleColor.Green;
 					Console.Out.WriteLine();
-					if (string.IsNullOrEmpty(Config.provisioning))
+					if (string.IsNullOrEmpty(Credentials.Provisioning))
 						Console.Out.WriteLine("You've selected to not use a provisioning server. Is this correct? [y/n]");
 					else
-						Console.Out.WriteLine("You've selected to use '" + Config.provisioning + "'. Is this correct? [y/n]");
+						Console.Out.WriteLine("You've selected to use '" + Credentials.Provisioning + "'. Is this correct? [y/n]");
 					s = Console.In.ReadLine();
 					Console.Out.WriteLine();
 				}
 				while (!s.StartsWith("y", StringComparison.InvariantCultureIgnoreCase));
 
-				Default = Config.events;
+				Default = Credentials.Events;
 				Console.ForegroundColor = ConsoleColor.Yellow;
 				Console.Out.WriteLine("What event log do you want to use? The use of a event logs is optional.");
 
@@ -735,16 +670,16 @@ namespace Waher.Mock
 				{
 					Console.ForegroundColor = ConsoleColor.White;
 					Console.Out.Write("Event Log: ");
-					Config.events = Console.In.ReadLine();
-					if (string.IsNullOrEmpty(Config.events))
-						Config.events = Default;
+					Credentials.Events = Console.In.ReadLine();
+					if (string.IsNullOrEmpty(Credentials.Events))
+						Credentials.Events = Default;
 
 					Console.ForegroundColor = ConsoleColor.Green;
 					Console.Out.WriteLine();
-					if (string.IsNullOrEmpty(Config.events))
+					if (string.IsNullOrEmpty(Credentials.Events))
 						Console.Out.WriteLine("You've selected to not use an event log. Is this correct? [y/n]");
 					else
-						Console.Out.WriteLine("You've selected to use '" + Config.events + "'. Is this correct? [y/n]");
+						Console.Out.WriteLine("You've selected to use '" + Credentials.Events + "'. Is this correct? [y/n]");
 					s = Console.In.ReadLine();
 					Console.Out.WriteLine();
 				}
@@ -761,24 +696,25 @@ namespace Waher.Mock
 					Console.Out.Write("Sniffer [y/n]? ");
 
 					s = Console.In.ReadLine();
-					Config.sniffer = s.StartsWith("y", StringComparison.InvariantCultureIgnoreCase);
+					Credentials.Sniffer = s.StartsWith("y", StringComparison.InvariantCultureIgnoreCase);
 				}
-				while (!Config.sniffer && !s.StartsWith("n", StringComparison.InvariantCultureIgnoreCase));
+				while (!Credentials.Sniffer && !s.StartsWith("n", StringComparison.InvariantCultureIgnoreCase));
 
 				Console.Out.WriteLine();
 				Console.ForegroundColor = FgBak;
 #endif
-				Config.SaveSimpleXmppConfiguration(FileName);
+				SaveSimpleXmppConfiguration(FileName, Credentials);
 
-				return Config;
+				return Credentials;
 			}
 		}
 
 		/// <summary>
 		/// Exports the settings to XML.
 		/// </summary>
+		/// <param name="Credentials">XMPP Client credentials.</param>
 		/// <returns>XML</returns>
-		public string ExportSimpleXmppConfiguration()
+		public static string ExportSimpleXmppConfiguration(XmppCredentials Credentials)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -786,49 +722,78 @@ namespace Waher.Mock
 			Xml.AppendLine("<SimpleXmppConfiguration xmlns='http://waher.se/Schema/SimpleXmppConfiguration.xsd'>");
 
 			Xml.Append("\t<Host>");
-			Xml.Append(XML.Encode(this.host));
+			Xml.Append(XML.Encode(Credentials.Host));
 			Xml.AppendLine("</Host>");
 
 			Xml.Append("\t<Port>");
-			Xml.Append(this.port.ToString());
+			Xml.Append(Credentials.Port.ToString());
 			Xml.AppendLine("</Port>");
 
 			Xml.Append("\t<Account>");
-			Xml.Append(XML.Encode(this.account));
+			Xml.Append(XML.Encode(Credentials.Account));
 			Xml.AppendLine("</Account>");
 
 			Xml.Append("\t<Password type=\"");
-			Xml.Append(XML.Encode(this.passwordType));
+			Xml.Append(XML.Encode(Credentials.PasswordType));
 			Xml.Append("\">");
-			Xml.Append(XML.Encode(this.password));
+			Xml.Append(XML.Encode(Credentials.Password));
 			Xml.AppendLine("</Password>");
 
 			Xml.Append("\t<ThingRegistry>");
-			Xml.Append(XML.Encode(this.thingRegistry));
+			Xml.Append(XML.Encode(Credentials.ThingRegistry));
 			Xml.AppendLine("</ThingRegistry>");
 
 			Xml.Append("\t<Provisioning>");
-			Xml.Append(XML.Encode(this.provisioning));
+			Xml.Append(XML.Encode(Credentials.Provisioning));
 			Xml.AppendLine("</Provisioning>");
 
 			Xml.Append("\t<Events>");
-			Xml.Append(XML.Encode(this.events));
+			Xml.Append(XML.Encode(Credentials.Events));
 			Xml.AppendLine("</Events>");
 
 			Xml.Append("\t<Sniffer>");
-			Xml.Append(CommonTypes.Encode(this.sniffer));
+			Xml.Append(CommonTypes.Encode(Credentials.Sniffer));
 			Xml.AppendLine("</Sniffer>");
 
 			Xml.Append("\t<TrustServer>");
-			Xml.Append(CommonTypes.Encode(this.trustServer));
+			Xml.Append(CommonTypes.Encode(Credentials.TrustServer));
 			Xml.AppendLine("</TrustServer>");
 
-			Xml.AppendLine("\t<AllowCramMD5>true</AllowCramMD5>");
-			Xml.AppendLine("\t<AllowDigestMD5>true</AllowDigestMD5>");
-			Xml.AppendLine("\t<AllowPlain>false</AllowPlain>");
-			Xml.AppendLine("\t<AllowScramSHA1>true</AllowScramSHA1>");
-			Xml.AppendLine("\t<AllowEncryption>true</AllowEncryption>");
-			Xml.AppendLine("\t<RequestRosterOnStartup>true</RequestRosterOnStartup>");
+			Xml.Append("\t<AllowCramMD5>");
+			Xml.Append(CommonTypes.Encode(Credentials.AllowCramMD5));
+			Xml.AppendLine("</AllowCramMD5>");
+
+			Xml.Append("\t<AllowDigestMD5>");
+			Xml.Append(CommonTypes.Encode(Credentials.AllowDigestMD5));
+			Xml.AppendLine("</AllowDigestMD5>");
+
+			Xml.Append("\t<AllowPlain>");
+			Xml.Append(CommonTypes.Encode(Credentials.AllowPlain));
+			Xml.AppendLine("</AllowPlain>");
+
+			Xml.Append("\t<AllowScramSHA1>");
+			Xml.Append(CommonTypes.Encode(Credentials.AllowScramSHA1));
+			Xml.AppendLine("</AllowScramSHA1>");
+
+			Xml.Append("\t<AllowEncryption>");
+			Xml.Append(CommonTypes.Encode(Credentials.AllowEncryption));
+			Xml.AppendLine("</AllowEncryption>");
+
+			Xml.Append("\t<RequestRosterOnStartup>");
+			Xml.Append(CommonTypes.Encode(Credentials.RequestRosterOnStartup));
+			Xml.AppendLine("</RequestRosterOnStartup>");
+
+			Xml.Append("\t<AllowRegistration>");
+			Xml.Append(CommonTypes.Encode(Credentials.AllowRegistration));
+			Xml.AppendLine("</AllowRegistration>");
+
+			Xml.Append("\t<FormSignatureKey>");
+			Xml.Append(XML.Encode(Credentials.FormSignatureKey));
+			Xml.AppendLine("</FormSignatureKey>");
+
+			Xml.Append("\t<FormSignatureSecret>");
+			Xml.Append(XML.Encode(Credentials.FormSignatureSecret));
+			Xml.AppendLine("</FormSignatureSecret>");
 
 			Xml.AppendLine("</SimpleXmppConfiguration>");
 
@@ -839,34 +804,23 @@ namespace Waher.Mock
 		/// Saves the settings to a file.
 		/// </summary>
 		/// <param name="FileName">File name.</param>
-		public void SaveSimpleXmppConfiguration(string FileName)
+		/// <param name="Credentials">XMPP Client credentials.</param>
+		public static void SaveSimpleXmppConfiguration(string FileName, XmppCredentials Credentials)
 		{
-			File.WriteAllText(FileName, this.ExportSimpleXmppConfiguration(), Encoding.UTF8);
+			File.WriteAllText(FileName, ExportSimpleXmppConfiguration(Credentials), Encoding.UTF8);
 		}
 
 		/// <summary>
 		/// Gets a new XMPP client using the settings provided in the current object.
 		/// </summary>
+		/// <param name="Credentials">XMPP Client credentials.</param>
 		/// <param name="Language">Primary language.</param>
 		/// <param name="AppAssembly">Application assembly.</param>
 		/// <param name="Connect">If a connection should be initiated directly.</param>
 		/// <returns>XMPP Client object.</returns>
-		public XmppClient GetClient(string Language, Assembly AppAssembly, bool Connect)
+		public static XmppClient GetClient(XmppCredentials Credentials, string Language, Assembly AppAssembly, bool Connect)
 		{
-			XmppClient Client;
-
-			if (string.IsNullOrEmpty(this.passwordType))
-				Client = new XmppClient(this.host, this.port, this.account, this.password, "en", AppAssembly);
-			else
-				Client = new XmppClient(this.host, this.port, this.account, this.password, this.passwordType, "en", AppAssembly);
-
-			Client.AllowCramMD5 = this.allowCramMD5;
-			Client.AllowDigestMD5 = this.allowDigestMD5;
-			Client.AllowPlain = this.allowPlain;
-			Client.AllowScramSHA1 = this.allowScramSHA1;
-			Client.AllowEncryption = this.allowEncryption;
-			Client.RequestRosterOnStartup = this.requestRosterOnStartup;
-			Client.TrustServer = this.trustServer;
+			XmppClient Client = new XmppClient(Credentials, Language, AppAssembly);
 
 			if (Connect)
 				Client.Connect();

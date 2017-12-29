@@ -195,133 +195,144 @@ namespace Waher.IoTGateway.App
 				string.IsNullOrEmpty(PasswordHash) ||
 				string.IsNullOrEmpty(PasswordHashMethod))
 			{
-				while (true)
+				XmppClient Client = null;
+
+				try
 				{
-					await MainPage.Instance.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
+					while (true)
 					{
-						try
-						{
-							AccountDialog Dialog = new AccountDialog(Host, Port, UserName, TrustCertificate, AllowInsecure, StorePassword, CreateAccount, Key, Secret);
-
-							switch (await Dialog.ShowAsync())
-							{
-								case ContentDialogResult.Primary:
-									Host = Dialog.Host;
-									Port = Dialog.Port;
-									UserName = Dialog.UserName;
-									PasswordHash = Dialog.Password;
-									PasswordHashMethod = string.Empty;
-									TrustCertificate = Dialog.TrustServer;
-									AllowInsecure = Dialog.AllowInsecure;
-									StorePassword = Dialog.AllowStorePassword;
-									CreateAccount = Dialog.AllowRegistration;
-									Key = Dialog.Key;
-									Secret = Dialog.Secret;
-									break;
-
-								case ContentDialogResult.Secondary:
-								default:
-									break;
-							}
-						}
-						catch (Exception ex)
-						{
-							Log.Critical(ex);
-						}
-					});
-
-					using (XmppClient Client = new XmppClient(Host, Port, UserName, PasswordHash, "en", typeof(App).Assembly)
-					{
-						TrustServer = TrustCertificate,
-						AllowCramMD5 = AllowInsecure,
-						AllowDigestMD5 = AllowInsecure,
-						AllowPlain = AllowInsecure,
-						AllowScramSHA1 = AllowInsecure,
-						AllowEncryption = AllowInsecure
-					})
-					{
-						if (CreateAccount)
-							Client.AllowRegistration(Key, Secret);
-
-						Client.Add(new LogSniffer());   // TODO: Remove
-
 						TaskCompletionSource<bool> Search = new TaskCompletionSource<bool>();
 
-						Client.OnStateChanged += (sender, State) =>
+						await MainPage.Instance.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
 						{
-							if (State == XmppState.Connected)
+							try
 							{
-								Client.SendServiceItemsDiscoveryRequest(Client.Domain, (sender2, e2) =>
+								AccountDialog Dialog = new AccountDialog(Host, Port, UserName, TrustCertificate, AllowInsecure, StorePassword, CreateAccount, Key, Secret);
+
+								switch (await Dialog.ShowAsync())
 								{
-									if (e2.Ok)
-									{
-										Dictionary<string, bool> Items = new Dictionary<string, bool>();
+									case ContentDialogResult.Primary:
+										Host = Dialog.Host;
+										Port = Dialog.Port;
+										UserName = Dialog.UserName;
+										PasswordHash = Dialog.Password;
+										PasswordHashMethod = string.Empty;
+										TrustCertificate = Dialog.TrustServer;
+										AllowInsecure = Dialog.AllowInsecure;
+										StorePassword = Dialog.AllowStorePassword;
+										CreateAccount = Dialog.AllowRegistration;
+										Key = Dialog.Key;
+										Secret = Dialog.Secret;
 
-										foreach (Item Item in e2.Items)
-											Items[Item.JID] = true;
-
-										foreach (Item Item in e2.Items)
+										if (Client != null)
 										{
-											Log.Informational("Checking " + Item.JID + ".");
-
-											Client.SendServiceDiscoveryRequest(Item.JID, (sender3, e3) =>
-											{
-												string JID = (string)e3.State;
-
-												if (e3.Ok)
-												{
-													if (e3.Features.ContainsKey(ThingRegistryClient.NamespaceDiscovery))
-													{
-														ThingRegistry = JID;
-														Console.Out.WriteLine("Thing registry found.", ThingRegistry);
-													}
-
-													if (e3.Features.ContainsKey(ProvisioningClient.NamespaceProvisioningDevice))
-													{
-														Provisioning = JID;
-														Console.Out.WriteLine("Provisioning server found.", Provisioning);
-													}
-												}
-
-												Items.Remove(JID);
-												if (Items.Count == 0)
-													Search.SetResult(true);
-
-											}, Item.JID);
+											Client.Dispose();
+											Client = null;
 										}
-									}
-									else
-										Search.SetResult(true);
-								}, null);
+
+										Client = new XmppClient(Host, Port, UserName, PasswordHash, "en", typeof(App).Assembly)
+										{
+											TrustServer = TrustCertificate,
+											AllowCramMD5 = AllowInsecure,
+											AllowDigestMD5 = AllowInsecure,
+											AllowPlain = AllowInsecure,
+											AllowScramSHA1 = AllowInsecure,
+											AllowEncryption = AllowInsecure
+										};
+
+										if (CreateAccount)
+											Client.AllowRegistration(Key, Secret);
+
+										Client.Add(new LogSniffer());   // TODO: Remove
+
+										Client.OnStateChanged += (sender, State) =>
+											{
+												if (State == XmppState.Connected)
+												{
+													if (!StorePassword)
+													{
+														PasswordHash = Client.PasswordHash;
+														PasswordHashMethod = Client.PasswordHashMethod;
+													}
+
+													Client.SendServiceItemsDiscoveryRequest(Client.Domain, (sender2, e2) =>
+													{
+														if (e2.Ok)
+														{
+															Dictionary<string, bool> Items = new Dictionary<string, bool>();
+
+															foreach (Item Item in e2.Items)
+																Items[Item.JID] = true;
+
+															foreach (Item Item in e2.Items)
+															{
+																Log.Informational("Checking " + Item.JID + ".");
+
+																Client.SendServiceDiscoveryRequest(Item.JID, (sender3, e3) =>
+																{
+																	string JID = (string)e3.State;
+
+																	if (e3.Ok)
+																	{
+																		if (e3.Features.ContainsKey(ThingRegistryClient.NamespaceDiscovery))
+																		{
+																			ThingRegistry = JID;
+																			Console.Out.WriteLine("Thing registry found.", ThingRegistry);
+																		}
+
+																		if (e3.Features.ContainsKey(ProvisioningClient.NamespaceProvisioningDevice))
+																		{
+																			Provisioning = JID;
+																			Console.Out.WriteLine("Provisioning server found.", Provisioning);
+																		}
+																	}
+
+																	Items.Remove(JID);
+																	if (Items.Count == 0)
+																		Search.SetResult(true);
+
+																}, Item.JID);
+															}
+														}
+														else
+															Search.SetResult(true);
+													}, null);
+												}
+											};
+
+										Client.OnConnectionError += (sender, e) =>
+										{
+											Search.SetResult(false);
+										};
+
+										Log.Informational("Connecting to " + Host + ":" + Port.ToString());
+										Client.Connect();
+										break;
+
+									case ContentDialogResult.Secondary:
+									default:
+										Search.SetResult(false);
+										break;
+								}
 							}
-						};
-
-						Client.OnConnectionError += (sender, e) =>
-						{
-							Search.SetResult(false);
-						};
-
-						Log.Informational("Connecting to " + Host + ":" + Port.ToString());
-						Client.Connect();
+							catch (Exception ex)
+							{
+								Log.Critical(ex);
+							}
+						});
 
 						if (await Search.Task)
 						{
-							if (!StorePassword)
-							{
-								PasswordHash = Client.PasswordHash;
-								PasswordHashMethod = Client.PasswordHashMethod;
-							}
-
-							RuntimeSettings.Set("XmppHost", Host);
-							RuntimeSettings.Set("XmppPort", Port);
-							RuntimeSettings.Set("XmppUserName", UserName);
-							RuntimeSettings.Set("XmppPasswordHash", PasswordHash);
-							RuntimeSettings.Set("XmppPasswordHashMethod", PasswordHashMethod);
-							RuntimeSettings.Set("XmppTrustCertificate", TrustCertificate);
-							RuntimeSettings.Set("XmppAllowInsecure", AllowInsecure);
-							RuntimeSettings.Set("XmppStorePassword", StorePassword);
-							RuntimeSettings.Set("XmppRegistry", ThingRegistry);
-							RuntimeSettings.Set("XmppProvisioning", Provisioning);
+							await RuntimeSettings.SetAsync("XmppHost", Host);
+							await RuntimeSettings.SetAsync("XmppPort", Port);
+							await RuntimeSettings.SetAsync("XmppUserName", UserName);
+							await RuntimeSettings.SetAsync("XmppPasswordHash", PasswordHash);
+							await RuntimeSettings.SetAsync("XmppPasswordHashMethod", PasswordHashMethod);
+							await RuntimeSettings.SetAsync("XmppTrustCertificate", TrustCertificate);
+							await RuntimeSettings.SetAsync("XmppAllowInsecure", AllowInsecure);
+							await RuntimeSettings.SetAsync("XmppStorePassword", StorePassword);
+							await RuntimeSettings.SetAsync("XmppRegistry", ThingRegistry);
+							await RuntimeSettings.SetAsync("XmppProvisioning", Provisioning);
 
 							return new XmppCredentials()
 							{
@@ -344,6 +355,14 @@ namespace Waher.IoTGateway.App
 								Events = string.Empty
 							};
 						}
+					}
+				}
+				finally
+				{
+					if (Client != null)
+					{
+						Client.Dispose();
+						Client = null;
 					}
 				}
 			}
@@ -389,7 +408,7 @@ namespace Waher.IoTGateway.App
 			List<MetaDataTag> Result = new List<MetaDataTag>(MetaData);
 			string s;
 
-			if (RuntimeSettings.Get("ThingRegistry.Location", false))
+			if (await RuntimeSettings.GetAsync("ThingRegistry.Location", false))
 			{
 				s = await RuntimeSettings.GetAsync("ThingRegistry.Country", string.Empty);
 				if (!string.IsNullOrEmpty(s))
@@ -433,72 +452,72 @@ namespace Waher.IoTGateway.App
 			}
 			else
 			{
-				try
+				TaskCompletionSource<bool> UserInput = new TaskCompletionSource<bool>();
+
+				await MainPage.Instance.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
 				{
-					await MainPage.Instance.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
+					try
 					{
-						try
+						RegistrationDialog Dialog = new RegistrationDialog();
+
+						switch (await Dialog.ShowAsync())
 						{
-							RegistrationDialog Dialog = new RegistrationDialog();
+							case ContentDialogResult.Primary:
+								await RuntimeSettings.SetAsync("ThingRegistry.Country", s = Dialog.Reg_Country);
+								if (!string.IsNullOrEmpty(s))
+									Result.Add(new MetaDataStringTag("COUNTRY", s));
 
-							switch (await Dialog.ShowAsync())
-							{
-								case ContentDialogResult.Primary:
-									await RuntimeSettings.SetAsync("ThingRegistry.Country", s = Dialog.Reg_Country);
-									if (!string.IsNullOrEmpty(s))
-										Result.Add(new MetaDataStringTag("COUNTRY", s));
+								await RuntimeSettings.SetAsync("ThingRegistry.Region", s = Dialog.Reg_Region);
+								if (!string.IsNullOrEmpty(s))
+									Result.Add(new MetaDataStringTag("REGION", s));
 
-									await RuntimeSettings.SetAsync("ThingRegistry.Region", s = Dialog.Reg_Region);
-									if (!string.IsNullOrEmpty(s))
-										Result.Add(new MetaDataStringTag("REGION", s));
+								await RuntimeSettings.SetAsync("ThingRegistry.City", s = Dialog.Reg_City);
+								if (!string.IsNullOrEmpty(s))
+									Result.Add(new MetaDataStringTag("CITY", s));
 
-									await RuntimeSettings.SetAsync("ThingRegistry.City", s = Dialog.Reg_City);
-									if (!string.IsNullOrEmpty(s))
-										Result.Add(new MetaDataStringTag("CITY", s));
+								await RuntimeSettings.SetAsync("ThingRegistry.Area", s = Dialog.Reg_Area);
+								if (!string.IsNullOrEmpty(s))
+									Result.Add(new MetaDataStringTag("AREA", s));
 
-									await RuntimeSettings.SetAsync("ThingRegistry.Area", s = Dialog.Reg_Area);
-									if (!string.IsNullOrEmpty(s))
-										Result.Add(new MetaDataStringTag("AREA", s));
+								await RuntimeSettings.SetAsync("ThingRegistry.Street", s = Dialog.Reg_Street);
+								if (!string.IsNullOrEmpty(s))
+									Result.Add(new MetaDataStringTag("STREET", s));
 
-									await RuntimeSettings.SetAsync("ThingRegistry.Street", s = Dialog.Reg_Street);
-									if (!string.IsNullOrEmpty(s))
-										Result.Add(new MetaDataStringTag("STREET", s));
+								await RuntimeSettings.SetAsync("ThingRegistry.StreetNr", s = Dialog.Reg_StreetNr);
+								if (!string.IsNullOrEmpty(s))
+									Result.Add(new MetaDataStringTag("STREETNR", s));
 
-									await RuntimeSettings.SetAsync("ThingRegistry.StreetNr", s = Dialog.Reg_StreetNr);
-									if (!string.IsNullOrEmpty(s))
-										Result.Add(new MetaDataStringTag("STREETNR", s));
+								await RuntimeSettings.SetAsync("ThingRegistry.Building", s = Dialog.Reg_Building);
+								if (!string.IsNullOrEmpty(s))
+									Result.Add(new MetaDataStringTag("BLD", s));
 
-									await RuntimeSettings.SetAsync("ThingRegistry.Building", s = Dialog.Reg_Building);
-									if (!string.IsNullOrEmpty(s))
-										Result.Add(new MetaDataStringTag("BLD", s));
+								await RuntimeSettings.SetAsync("ThingRegistry.Apartment", s = Dialog.Reg_Apartment);
+								if (!string.IsNullOrEmpty(s))
+									Result.Add(new MetaDataStringTag("APT", s));
 
-									await RuntimeSettings.SetAsync("ThingRegistry.Apartment", s = Dialog.Reg_Apartment);
-									if (!string.IsNullOrEmpty(s))
-										Result.Add(new MetaDataStringTag("APT", s));
+								await RuntimeSettings.SetAsync("ThingRegistry.Room", s = Dialog.Reg_Room);
+								if (!string.IsNullOrEmpty(s))
+									Result.Add(new MetaDataStringTag("ROOM", s));
 
-									await RuntimeSettings.SetAsync("ThingRegistry.Room", s = Dialog.Reg_Room);
-									if (!string.IsNullOrEmpty(s))
-										Result.Add(new MetaDataStringTag("ROOM", s));
+								await RuntimeSettings.SetAsync("ThingRegistry.Name", s = Dialog.Name);
+								if (!string.IsNullOrEmpty(s))
+									Result.Add(new MetaDataStringTag("NAME", s));
 
-									await RuntimeSettings.SetAsync("ThingRegistry.Name", s = Dialog.Name);
-									if (!string.IsNullOrEmpty(s))
-										Result.Add(new MetaDataStringTag("NAME", s));
-									break;
+								UserInput.SetResult(true);
+								break;
 
-								case ContentDialogResult.Secondary:
-									break;
-							}
+							case ContentDialogResult.Secondary:
+								UserInput.SetResult(false);
+								break;
 						}
-						catch (Exception ex)
-						{
-							Log.Critical(ex);
-						}
-					});
-				}
-				catch (Exception ex)
-				{
-					Log.Critical(ex);
-				}
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
+				});
+
+				await UserInput.Task;
 			}
 
 			return Result.ToArray();

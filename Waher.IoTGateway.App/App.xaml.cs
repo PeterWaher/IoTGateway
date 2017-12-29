@@ -159,34 +159,34 @@ namespace Waher.IoTGateway.App
 			}
 		}
 
-		private static IDatabaseProvider GetDatabase(XmlElement DatabaseConfig)
+		private static Task<IDatabaseProvider> GetDatabase(XmlElement DatabaseConfig)
 		{
 			if (CommonTypes.TryParse(DatabaseConfig.Attributes["encrypted"].Value, out bool Encrypted) && Encrypted)
 				throw new Exception("Encrypted database storage not supported on this platform.");
 
-			return new FilesProvider(Gateway.AppDataFolder + DatabaseConfig.Attributes["folder"].Value,
+			return Task.FromResult<IDatabaseProvider>(new FilesProvider(Gateway.AppDataFolder + DatabaseConfig.Attributes["folder"].Value,
 				DatabaseConfig.Attributes["defaultCollectionName"].Value,
 				int.Parse(DatabaseConfig.Attributes["blockSize"].Value),
 				int.Parse(DatabaseConfig.Attributes["blocksInCache"].Value),
 				int.Parse(DatabaseConfig.Attributes["blobBlockSize"].Value), Encoding.UTF8,
 				int.Parse(DatabaseConfig.Attributes["timeoutMs"].Value),
-				false);
+				false));
 		}
 
-		private static XmppCredentials GetXmppClientCredentials(string XmppConfigFileName)
+		private static async Task<XmppCredentials> GetXmppClientCredentials(string XmppConfigFileName)
 		{
-			string Host = RuntimeSettings.Get("XmppHost", "waher.se");
-			int Port = (int)RuntimeSettings.Get("XmppPort", 5222);
-			string UserName = RuntimeSettings.Get("XmppUserName", string.Empty);
-			string PasswordHash = RuntimeSettings.Get("XmppPasswordHash", string.Empty);
-			string PasswordHashMethod = RuntimeSettings.Get("XmppPasswordHashMethod", string.Empty);
-			string ThingRegistry = RuntimeSettings.Get("XmppRegistry", string.Empty);
-			string Provisioning = RuntimeSettings.Get("XmppProvisioning", string.Empty);
+			string Host = await RuntimeSettings.GetAsync("XmppHost", "waher.se");
+			int Port = (int)await RuntimeSettings.GetAsync("XmppPort", 5222);
+			string UserName = await RuntimeSettings.GetAsync("XmppUserName", string.Empty);
+			string PasswordHash = await RuntimeSettings.GetAsync("XmppPasswordHash", string.Empty);
+			string PasswordHashMethod = await RuntimeSettings.GetAsync("XmppPasswordHashMethod", string.Empty);
+			string ThingRegistry = await RuntimeSettings.GetAsync("XmppRegistry", string.Empty);
+			string Provisioning = await RuntimeSettings.GetAsync("XmppProvisioning", string.Empty);
 			string Key = string.Empty;
 			string Secret = string.Empty;
-			bool TrustCertificate = RuntimeSettings.Get("XmppTrustCertificate", false);
-			bool AllowInsecure = RuntimeSettings.Get("XmppAllowInsecure", false);
-			bool StorePassword = RuntimeSettings.Get("XmppStorePassword", false);
+			bool TrustCertificate = await RuntimeSettings.GetAsync("XmppTrustCertificate", false);
+			bool AllowInsecure = await RuntimeSettings.GetAsync("XmppAllowInsecure", false);
+			bool StorePassword = await RuntimeSettings.GetAsync("XmppStorePassword", false);
 			bool CreateAccount = false;
 
 			if (string.IsNullOrEmpty(Host) ||
@@ -197,11 +197,11 @@ namespace Waher.IoTGateway.App
 			{
 				while (true)
 				{
-					MainPage.Instance.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
+					await MainPage.Instance.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
 					{
 						try
 						{
-							AccountDialog Dialog = new AccountDialog(Host, Port, UserName, TrustCertificate, AllowInsecure, StorePassword, false, Key, Secret);
+							AccountDialog Dialog = new AccountDialog(Host, Port, UserName, TrustCertificate, AllowInsecure, StorePassword, CreateAccount, Key, Secret);
 
 							switch (await Dialog.ShowAsync())
 							{
@@ -220,6 +220,7 @@ namespace Waher.IoTGateway.App
 									break;
 
 								case ContentDialogResult.Secondary:
+								default:
 									break;
 							}
 						}
@@ -227,8 +228,7 @@ namespace Waher.IoTGateway.App
 						{
 							Log.Critical(ex);
 						}
-
-					}).AsTask().Wait();
+					});
 
 					using (XmppClient Client = new XmppClient(Host, Port, UserName, PasswordHash, "en", typeof(App).Assembly)
 					{
@@ -243,8 +243,9 @@ namespace Waher.IoTGateway.App
 						if (CreateAccount)
 							Client.AllowRegistration(Key, Secret);
 
-						ManualResetEvent Ok = new ManualResetEvent(false);
-						ManualResetEvent Error = new ManualResetEvent(false);
+						Client.Add(new LogSniffer());   // TODO: Remove
+
+						TaskCompletionSource<bool> Search = new TaskCompletionSource<bool>();
 
 						Client.OnStateChanged += (sender, State) =>
 						{
@@ -284,69 +285,64 @@ namespace Waher.IoTGateway.App
 
 												Items.Remove(JID);
 												if (Items.Count == 0)
-													Ok.Set();
+													Search.SetResult(true);
 
 											}, Item.JID);
 										}
 									}
 									else
-										Ok.Set();
+										Search.SetResult(true);
 								}, null);
 							}
 						};
 
 						Client.OnConnectionError += (sender, e) =>
 						{
-							Error.Set();
+							Search.SetResult(false);
 						};
 
 						Log.Informational("Connecting to " + Host + ":" + Port.ToString());
 						Client.Connect();
 
-						switch (WaitHandle.WaitAny(new WaitHandle[] { Ok, Error }, 30000))
+						if (await Search.Task)
 						{
-							case 0:
-								if (!StorePassword)
-								{
-									PasswordHash = Client.PasswordHash;
-									PasswordHashMethod = Client.PasswordHashMethod;
-								}
+							if (!StorePassword)
+							{
+								PasswordHash = Client.PasswordHash;
+								PasswordHashMethod = Client.PasswordHashMethod;
+							}
 
-								RuntimeSettings.Set("XmppHost", Host);
-								RuntimeSettings.Set("XmppPort", Port);
-								RuntimeSettings.Set("XmppUserName", UserName);
-								RuntimeSettings.Set("XmppPasswordHash", PasswordHash);
-								RuntimeSettings.Set("XmppPasswordHashMethod", PasswordHashMethod);
-								RuntimeSettings.Set("XmppTrustCertificate", TrustCertificate );
-								RuntimeSettings.Set("XmppAllowInsecure", AllowInsecure);
-								RuntimeSettings.Set("XmppStorePassword", StorePassword);
-								RuntimeSettings.Set("XmppRegistry", ThingRegistry);
-								RuntimeSettings.Set("XmppProvisioning", Provisioning);
+							RuntimeSettings.Set("XmppHost", Host);
+							RuntimeSettings.Set("XmppPort", Port);
+							RuntimeSettings.Set("XmppUserName", UserName);
+							RuntimeSettings.Set("XmppPasswordHash", PasswordHash);
+							RuntimeSettings.Set("XmppPasswordHashMethod", PasswordHashMethod);
+							RuntimeSettings.Set("XmppTrustCertificate", TrustCertificate);
+							RuntimeSettings.Set("XmppAllowInsecure", AllowInsecure);
+							RuntimeSettings.Set("XmppStorePassword", StorePassword);
+							RuntimeSettings.Set("XmppRegistry", ThingRegistry);
+							RuntimeSettings.Set("XmppProvisioning", Provisioning);
 
-								return new XmppCredentials()
-								{
-									Host = Host,
-									Port = Port,
-									Account = UserName,
-									Password = PasswordHash,
-									PasswordType = PasswordHashMethod,
-									TrustServer = TrustCertificate,
-									AllowCramMD5 = AllowInsecure,
-									AllowDigestMD5 = AllowInsecure,
-									AllowPlain = AllowInsecure,
-									AllowScramSHA1 = true,
-									AllowEncryption = true,
-									AllowRegistration = false,
-									FormSignatureKey = string.Empty,
-									FormSignatureSecret = string.Empty,
-									ThingRegistry = ThingRegistry,
-									Provisioning = Provisioning,
-									Events = string.Empty
-								};
-
-							case 1:
-							default:
-								break;
+							return new XmppCredentials()
+							{
+								Host = Host,
+								Port = Port,
+								Account = UserName,
+								Password = PasswordHash,
+								PasswordType = PasswordHashMethod,
+								TrustServer = TrustCertificate,
+								AllowCramMD5 = AllowInsecure,
+								AllowDigestMD5 = AllowInsecure,
+								AllowPlain = AllowInsecure,
+								AllowScramSHA1 = true,
+								AllowEncryption = true,
+								AllowRegistration = false,
+								FormSignatureKey = string.Empty,
+								FormSignatureSecret = string.Empty,
+								ThingRegistry = ThingRegistry,
+								Provisioning = Provisioning,
+								Events = string.Empty
+							};
 						}
 					}
 				}
@@ -377,61 +373,61 @@ namespace Waher.IoTGateway.App
 
 		}
 
-		private static void XmppCredentialsUpdated(string XmppConfigFileName, XmppCredentials Credentials)
+		private static async Task XmppCredentialsUpdated(string XmppConfigFileName, XmppCredentials Credentials)
 		{
-			bool StorePassword = RuntimeSettings.Get("XmppStorePassword", false);
+			bool StorePassword = await RuntimeSettings.GetAsync("XmppStorePassword", false);
 
 			if (!StorePassword)
 			{
-				RuntimeSettings.Set("XmppPasswordHash", Credentials.Password);
-				RuntimeSettings.Set("XmppPasswordHashMethod", Credentials.PasswordType);
+				await RuntimeSettings.SetAsync("XmppPasswordHash", Credentials.Password);
+				await RuntimeSettings.SetAsync("XmppPasswordHashMethod", Credentials.PasswordType);
 			}
 		}
 
-		private MetaDataTag[] GetMetaData(MetaDataTag[] MetaData)
+		private async Task<MetaDataTag[]> GetMetaData(MetaDataTag[] MetaData)
 		{
 			List<MetaDataTag> Result = new List<MetaDataTag>(MetaData);
 			string s;
 
 			if (RuntimeSettings.Get("ThingRegistry.Location", false))
 			{
-				s = RuntimeSettings.Get("ThingRegistry.Country", string.Empty);
+				s = await RuntimeSettings.GetAsync("ThingRegistry.Country", string.Empty);
 				if (!string.IsNullOrEmpty(s))
 					Result.Add(new MetaDataStringTag("COUNTRY", s));
 
-				s = RuntimeSettings.Get("ThingRegistry.Region", string.Empty);
+				s = await RuntimeSettings.GetAsync("ThingRegistry.Region", string.Empty);
 				if (!string.IsNullOrEmpty(s))
 					Result.Add(new MetaDataStringTag("REGION", s));
 
-				s = RuntimeSettings.Get("ThingRegistry.City", string.Empty);
+				s = await RuntimeSettings.GetAsync("ThingRegistry.City", string.Empty);
 				if (!string.IsNullOrEmpty(s))
 					Result.Add(new MetaDataStringTag("CITY", s));
 
-				s = RuntimeSettings.Get("ThingRegistry.Area", string.Empty);
+				s = await RuntimeSettings.GetAsync("ThingRegistry.Area", string.Empty);
 				if (!string.IsNullOrEmpty(s))
 					Result.Add(new MetaDataStringTag("AREA", s));
 
-				s = RuntimeSettings.Get("ThingRegistry.Street", string.Empty);
+				s = await RuntimeSettings.GetAsync("ThingRegistry.Street", string.Empty);
 				if (!string.IsNullOrEmpty(s))
 					Result.Add(new MetaDataStringTag("STREET", s));
 
-				s = RuntimeSettings.Get("ThingRegistry.StreetNr", string.Empty);
+				s = await RuntimeSettings.GetAsync("ThingRegistry.StreetNr", string.Empty);
 				if (!string.IsNullOrEmpty(s))
 					Result.Add(new MetaDataStringTag("STREETNR", s));
 
-				s = RuntimeSettings.Get("ThingRegistry.Building", string.Empty);
+				s = await RuntimeSettings.GetAsync("ThingRegistry.Building", string.Empty);
 				if (!string.IsNullOrEmpty(s))
 					Result.Add(new MetaDataStringTag("BLD", s));
 
-				s = RuntimeSettings.Get("ThingRegistry.Apartment", string.Empty);
+				s = await RuntimeSettings.GetAsync("ThingRegistry.Apartment", string.Empty);
 				if (!string.IsNullOrEmpty(s))
 					Result.Add(new MetaDataStringTag("APT", s));
 
-				s = RuntimeSettings.Get("ThingRegistry.Room", string.Empty);
+				s = await RuntimeSettings.GetAsync("ThingRegistry.Room", string.Empty);
 				if (!string.IsNullOrEmpty(s))
 					Result.Add(new MetaDataStringTag("ROOM", s));
 
-				s = RuntimeSettings.Get("ThingRegistry.Name", string.Empty);
+				s = await RuntimeSettings.GetAsync("ThingRegistry.Name", string.Empty);
 				if (!string.IsNullOrEmpty(s))
 					Result.Add(new MetaDataStringTag("NAME", s));
 			}
@@ -439,7 +435,7 @@ namespace Waher.IoTGateway.App
 			{
 				try
 				{
-					MainPage.Instance.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
+					await MainPage.Instance.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
 					{
 						try
 						{
@@ -497,7 +493,7 @@ namespace Waher.IoTGateway.App
 						{
 							Log.Critical(ex);
 						}
-					}).AsTask().Wait();
+					});
 				}
 				catch (Exception ex)
 				{
@@ -508,7 +504,7 @@ namespace Waher.IoTGateway.App
 			return Result.ToArray();
 		}
 
-		private static void RegistrationSuccessful(MetaDataTag[] MetaData, RegistrationEventArgs e)
+		private static async Task RegistrationSuccessful(MetaDataTag[] MetaData, RegistrationEventArgs e)
 		{
 			if (!e.IsClaimed)
 			{
@@ -518,7 +514,7 @@ namespace Waher.IoTGateway.App
 				Log.Informational("Registration successful.");
 				Log.Informational(ClaimUrl, new KeyValuePair<string, object>("Path", FilePath));
 
-				File.WriteAllText(FilePath, ClaimUrl);
+				await File.WriteAllTextAsync(FilePath, ClaimUrl);
 			}
 		}
 

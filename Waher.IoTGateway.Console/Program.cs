@@ -4,6 +4,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content;
 using Waher.Events;
@@ -137,36 +138,37 @@ namespace Waher.IoTGateway.Console
 			}
 		}
 
-		private static IDatabaseProvider GetDatabase(XmlElement DatabaseConfig)
+		private static Task<IDatabaseProvider> GetDatabase(XmlElement DatabaseConfig)
 		{
 			if (!CommonTypes.TryParse(DatabaseConfig.Attributes["encrypted"].Value, out bool Encrypted))
 				Encrypted = true;
 
-			return new FilesProvider(Gateway.AppDataFolder + DatabaseConfig.Attributes["folder"].Value,
+			return Task.FromResult<IDatabaseProvider>(new FilesProvider(Gateway.AppDataFolder + DatabaseConfig.Attributes["folder"].Value,
 				DatabaseConfig.Attributes["defaultCollectionName"].Value,
 				int.Parse(DatabaseConfig.Attributes["blockSize"].Value),
 				int.Parse(DatabaseConfig.Attributes["blocksInCache"].Value),
 				int.Parse(DatabaseConfig.Attributes["blobBlockSize"].Value), Encoding.UTF8,
 				int.Parse(DatabaseConfig.Attributes["timeoutMs"].Value),
-				Encrypted, false, true);
+				Encrypted, false, true));
 		}
 
-		private static XmppCredentials GetXmppClientCredentials(string XmppConfigFileName)
+		private static Task<XmppCredentials> GetXmppClientCredentials(string XmppConfigFileName)
 		{
 			XmppCredentials Result = SimpleXmppConfiguration.GetConfigUsingSimpleConsoleDialog(XmppConfigFileName,
 				Guid.NewGuid().ToString().Replace("-", string.Empty),   // Default user name.
 				Guid.NewGuid().ToString().Replace("-", string.Empty),   // Default password.
 				typeof(Gateway).Assembly);
 
-			return Result;
+			return Task.FromResult<XmppCredentials>(Result);
 		}
 
-		private static void XmppCredentialsUpdated(string XmppConfigFileName, XmppCredentials Credentials)
+		private static Task XmppCredentialsUpdated(string XmppConfigFileName, XmppCredentials Credentials)
 		{
 			SimpleXmppConfiguration.SaveSimpleXmppConfiguration(XmppConfigFileName, Credentials);
+			return Task.CompletedTask;
 		}
 
-		private static void RegistrationSuccessful(MetaDataTag[] MetaData, RegistrationEventArgs e)
+		private static async Task RegistrationSuccessful(MetaDataTag[] MetaData, RegistrationEventArgs e)
 		{
 			if (!e.IsClaimed)
 			{
@@ -178,7 +180,7 @@ namespace Waher.IoTGateway.Console
 				Log.Informational("Registration successful.");
 				Log.Informational(ClaimUrl, new KeyValuePair<string, object>("Path", FilePath));
 
-				File.WriteAllText(FilePath, ClaimUrl);
+				await File.WriteAllTextAsync(FilePath, ClaimUrl);
 			}
 		}
 

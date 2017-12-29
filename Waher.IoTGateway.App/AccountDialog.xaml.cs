@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -54,6 +55,10 @@ namespace Waher.IoTGateway.App
 			this.CreateAccount.IsChecked = CreateAccount;
 			this.AccountCreationKey.Text = Key;
 			this.AccountCreationSecret.Text = Secret;
+
+			this.RetypePassword.IsEnabled = CreateAccount;
+			this.AccountCreationKey.IsEnabled = CreateAccount;
+			this.AccountCreationSecret.IsEnabled = CreateAccount;
 		}
 
 		public string Host
@@ -128,13 +133,33 @@ namespace Waher.IoTGateway.App
 		private void ContentDialog_ConnectButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
 		{
 			if (ushort.TryParse(this.PortInput.Text, out ushort Port))
+			{
 				this.port = Port;
+				this.host = this.HostInput.Text;
+				this.userName = this.UserNameInput.Text;
+				this.password = this.PasswordInput.Password;
+				this.key = this.AccountCreationKey.Text;
+				this.secret = this.AccountCreationSecret.Text;
+				this.trustServerCertificate = this.TrustServerCertificate.IsChecked.HasValue && this.TrustServerCertificate.IsChecked.Value;
+				this.allowInsecureAuthentication = this.AllowInsecureAuthentication.IsChecked.HasValue && this.AllowInsecureAuthentication.IsChecked.Value;
+				this.storePassword = this.StorePassword.IsChecked.HasValue && this.StorePassword.IsChecked.Value;
+				this.createAccount = this.CreateAccount.IsChecked.HasValue && this.CreateAccount.IsChecked.Value;
+
+				if (this.createAccount && this.password != this.RetypePassword.Password)
+				{
+					args.Cancel = true;
+
+					MessageDialog Dialog = new MessageDialog("Password not identically retyped.", "Error");
+					IAsyncOperation<IUICommand> T = Dialog.ShowAsync();
+				}
+			}
 			else
+			{
 				args.Cancel = true;
 
-			this.host = this.HostInput.Text;
-			this.userName = this.UserNameInput.Text;
-			this.password = this.PasswordInput.Password;
+				MessageDialog Dialog = new MessageDialog("Invalid port number.", "Error");
+				IAsyncOperation<IUICommand> T = Dialog.ShowAsync();
+			}
 		}
 
 		private void ContentDialog_CancelButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)

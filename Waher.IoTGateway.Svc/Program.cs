@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content;
 using Waher.Events;
@@ -356,29 +357,29 @@ namespace Waher.IoTGateway.Svc
 			}
 		}
 
-		internal static IDatabaseProvider GetDatabase(XmlElement DatabaseConfig)
+		internal static Task<IDatabaseProvider> GetDatabase(XmlElement DatabaseConfig)
 		{
 			if (!CommonTypes.TryParse(DatabaseConfig.Attributes["encrypted"].Value, out bool Encrypted))
 				Encrypted = true;
 
-			return new FilesProvider(Gateway.AppDataFolder + DatabaseConfig.Attributes["folder"].Value,
+			return Task.FromResult<IDatabaseProvider>(new FilesProvider(Gateway.AppDataFolder + DatabaseConfig.Attributes["folder"].Value,
 				DatabaseConfig.Attributes["defaultCollectionName"].Value,
 				int.Parse(DatabaseConfig.Attributes["blockSize"].Value),
 				int.Parse(DatabaseConfig.Attributes["blocksInCache"].Value),
 				int.Parse(DatabaseConfig.Attributes["blobBlockSize"].Value), Encoding.UTF8,
 				int.Parse(DatabaseConfig.Attributes["timeoutMs"].Value),
-				Encrypted, false, true);
+				Encrypted, false, true));
 		}
 
-		internal static XmppCredentials GetXmppClientCredentialsAsConsole(string XmppConfigFileName)
+		internal static Task<XmppCredentials> GetXmppClientCredentialsAsConsole(string XmppConfigFileName)
 		{
-			return SimpleXmppConfiguration.GetConfigUsingSimpleConsoleDialog(XmppConfigFileName,
+			return Task.FromResult<XmppCredentials>(SimpleXmppConfiguration.GetConfigUsingSimpleConsoleDialog(XmppConfigFileName,
 				Guid.NewGuid().ToString().Replace("-", string.Empty),   // Default user name.
 				Guid.NewGuid().ToString().Replace("-", string.Empty),   // Default password.
-				typeof(Gateway).Assembly);
+				typeof(Gateway).Assembly));
 		}
 
-		internal static XmppCredentials GetXmppClientCredentialsAsService(string XmppConfigFileName)
+		internal static Task<XmppCredentials> GetXmppClientCredentialsAsService(string XmppConfigFileName)
 		{
 			XmppCredentials Result;
 
@@ -395,23 +396,25 @@ namespace Waher.IoTGateway.Svc
 				Result = SimpleXmppConfiguration.Load(Doc);
 			}
 
-			return Result;
+			return Task.FromResult<XmppCredentials>(Result);
 		}
 
-		internal static void XmppCredentialsUpdated(string XmppConfigFileName, XmppCredentials Credentials)
+		internal static Task XmppCredentialsUpdated(string XmppConfigFileName, XmppCredentials Credentials)
 		{
 			SimpleXmppConfiguration.SaveSimpleXmppConfiguration(XmppConfigFileName, Credentials);
+			return Task.CompletedTask;
 		}
 
-		internal static void RegistrationSuccessfulAsConsole(MetaDataTag[] MetaData, RegistrationEventArgs e)
+		internal static Task RegistrationSuccessfulAsConsole(MetaDataTag[] MetaData, RegistrationEventArgs e)
 		{
 			if (!e.IsClaimed)
 				SimpleXmppConfiguration.PrintQRCode(ThingRegistryClient.EncodeAsIoTDiscoURI(MetaData));
 
-			RegistrationSuccessfulAsService(MetaData, e);
+			return RegistrationSuccessfulAsService(MetaData, e);
+
 		}
 
-		internal static void RegistrationSuccessfulAsService(MetaDataTag[] MetaData, RegistrationEventArgs e)
+		internal static async Task RegistrationSuccessfulAsService(MetaDataTag[] MetaData, RegistrationEventArgs e)
 		{
 			if (!e.IsClaimed)
 			{
@@ -421,7 +424,7 @@ namespace Waher.IoTGateway.Svc
 				Log.Informational("Registration successful.");
 				Log.Informational(ClaimUrl, new KeyValuePair<string, object>("Path", FilePath));
 
-				File.WriteAllText(FilePath, ClaimUrl);
+				await File.WriteAllTextAsync(FilePath, ClaimUrl);
 			}
 		}
 

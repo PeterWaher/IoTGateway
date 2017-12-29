@@ -67,35 +67,35 @@ namespace Waher.IoTGateway
 	/// </summary>
 	/// <param name="Definition">XML definition of provider.</param>
 	/// <returns>Database provider.</returns>
-	public delegate IDatabaseProvider GetDatabaseProviderEventHandler(XmlElement Definition);
+	public delegate Task<IDatabaseProvider> GetDatabaseProviderEventHandler(XmlElement Definition);
 
 	/// <summary>
 	/// Delegate for callback methods used for retrieval of XMPP Client credentials.
 	/// </summary>
 	/// <param name="XmppConfigFileName">XMPP Config file name.</param>
 	/// <returns>XMPP Client Credentials.</returns>
-	public delegate XmppCredentials GetXmppClientCredentialsEventHandler(string XmppConfigFileName);
+	public delegate Task<XmppCredentials> GetXmppClientCredentialsEventHandler(string XmppConfigFileName);
 
 	/// <summary>
 	/// Delegate for callback methods used to persist updated XMPP Client credentials.
 	/// </summary>
 	/// <param name="XmppConfigFileName">XMPP Config file name.</param>
 	/// <param name="Credentials">XMPP Client Credentials.</param>
-	public delegate void XmppClientCredentialsUpdatedEventHandler(string XmppConfigFileName, XmppCredentials Credentials);
+	public delegate Task XmppClientCredentialsUpdatedEventHandler(string XmppConfigFileName, XmppCredentials Credentials);
 
 	/// <summary>
 	/// Delegate for registration callback methods.
 	/// </summary>
 	/// <param name="MetaData">Meta data used in registration.</param>
 	/// <param name="e">Event arguments.</param>
-	public delegate void RegistrationEventHandler(MetaDataTag[] MetaData, RegistrationEventArgs e);
+	public delegate Task RegistrationEventHandler(MetaDataTag[] MetaData, RegistrationEventArgs e);
 
 	/// <summary>
 	/// Delegate for events requesting meta data for registration.
 	/// </summary>
 	/// <param name="MetaData">Defult meta data.</param>
 	/// <returns>Meta data to register.</returns>
-	public delegate MetaDataTag[] GetRegistryMetaDataEventHandler(MetaDataTag[] MetaData);
+	public delegate Task<MetaDataTag[]> GetRegistryMetaDataEventHandler(MetaDataTag[] MetaData);
 
 	/// <summary>
 	/// Static class managing the runtime environment of the IoT Gateway.
@@ -220,7 +220,13 @@ namespace Waher.IoTGateway
 				domain = Config.DocumentElement["Domain"].InnerText;
 
 				XmlElement DatabaseConfig = Config.DocumentElement["Database"];
-				IDatabaseProvider DatabaseProvider = GetDatabaseProvider?.Invoke(DatabaseConfig);
+				IDatabaseProvider DatabaseProvider;
+
+				if (GetDatabaseProvider != null)
+					DatabaseProvider = GetDatabaseProvider(DatabaseConfig).Result;
+				else
+					DatabaseProvider = null;
+
 				if (DatabaseProvider == null)
 					throw new Exception("Database provider not defined. Make sure the GetDatabaseProvider event has an appropriate event handler.");
 
@@ -234,7 +240,11 @@ namespace Waher.IoTGateway
 				if (!File.Exists(xmppConfigFileName))
 					xmppConfigFileName = appDataFolder + xmppConfigFileName;
 
-				xmppCredentials = GetXmppClientCredentials?.Invoke(xmppConfigFileName);
+				if (GetXmppClientCredentials != null)
+					xmppCredentials = GetXmppClientCredentials(xmppConfigFileName).Result;
+				else
+					xmppCredentials = null;
+
 				if (xmppCredentials == null)
 					throw new Exception("XMPP Client Credentials not provided. Make sure the GetXmppClientCredentials event has an appropriate event handler.");
 
@@ -873,7 +883,7 @@ namespace Waher.IoTGateway
 					MarkdownToHtmlConverter.BareJID = xmppClient.BareJID;
 
 					if (!registered && thingRegistryClient != null)
-						Register();
+						Task.Run(Register);
 
 					if (!socksProxy.HasProxy)
 						socksProxy.StartSearch(null);
@@ -1033,7 +1043,7 @@ namespace Waher.IoTGateway
 		{
 			Log.Informational("Thing has been disowned.", ownerJid);
 			ownerJid = string.Empty;
-			Register();
+			Task.Run(Register);
 		}
 
 		private static void ThingRegistryClient_Removed(object Sender, NodeEventArgs e)
@@ -1041,7 +1051,7 @@ namespace Waher.IoTGateway
 			Log.Informational("Thing has been removed from the public registry.", ownerJid);
 		}
 
-		private static void Register()
+		private static async Task Register()
 		{
 			string Key = Guid.NewGuid().ToString().Replace("-", string.Empty);
 
@@ -1056,7 +1066,7 @@ namespace Waher.IoTGateway
 				new MetaDataNumericTag("V", 1.0)
 			};
 
-			MetaDataTag[] MetaData2 = GetMetaData?.Invoke(MetaData);
+			MetaDataTag[] MetaData2 = await GetMetaData?.Invoke(MetaData);
 			if (MetaData2 != null)
 				MetaData = MetaData2;
 

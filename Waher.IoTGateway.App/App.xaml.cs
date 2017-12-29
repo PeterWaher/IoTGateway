@@ -142,6 +142,7 @@ namespace Waher.IoTGateway.App
 				Gateway.GetXmppClientCredentials += GetXmppClientCredentials;
 				Gateway.XmppCredentialsUpdated += XmppCredentialsUpdated;
 				Gateway.RegistrationSuccessful += RegistrationSuccessful;
+				Gateway.GetMetaData += GetMetaData;
 
 				if (!Gateway.Start(false))
 				{
@@ -385,6 +386,126 @@ namespace Waher.IoTGateway.App
 				RuntimeSettings.Set("XmppPasswordHash", Credentials.Password);
 				RuntimeSettings.Set("XmppPasswordHashMethod", Credentials.PasswordType);
 			}
+		}
+
+		private MetaDataTag[] GetMetaData(MetaDataTag[] MetaData)
+		{
+			List<MetaDataTag> Result = new List<MetaDataTag>(MetaData);
+			string s;
+
+			if (RuntimeSettings.Get("ThingRegistry.Location", false))
+			{
+				s = RuntimeSettings.Get("ThingRegistry.Country", string.Empty);
+				if (!string.IsNullOrEmpty(s))
+					Result.Add(new MetaDataStringTag("COUNTRY", s));
+
+				s = RuntimeSettings.Get("ThingRegistry.Region", string.Empty);
+				if (!string.IsNullOrEmpty(s))
+					Result.Add(new MetaDataStringTag("REGION", s));
+
+				s = RuntimeSettings.Get("ThingRegistry.City", string.Empty);
+				if (!string.IsNullOrEmpty(s))
+					Result.Add(new MetaDataStringTag("CITY", s));
+
+				s = RuntimeSettings.Get("ThingRegistry.Area", string.Empty);
+				if (!string.IsNullOrEmpty(s))
+					Result.Add(new MetaDataStringTag("AREA", s));
+
+				s = RuntimeSettings.Get("ThingRegistry.Street", string.Empty);
+				if (!string.IsNullOrEmpty(s))
+					Result.Add(new MetaDataStringTag("STREET", s));
+
+				s = RuntimeSettings.Get("ThingRegistry.StreetNr", string.Empty);
+				if (!string.IsNullOrEmpty(s))
+					Result.Add(new MetaDataStringTag("STREETNR", s));
+
+				s = RuntimeSettings.Get("ThingRegistry.Building", string.Empty);
+				if (!string.IsNullOrEmpty(s))
+					Result.Add(new MetaDataStringTag("BLD", s));
+
+				s = RuntimeSettings.Get("ThingRegistry.Apartment", string.Empty);
+				if (!string.IsNullOrEmpty(s))
+					Result.Add(new MetaDataStringTag("APT", s));
+
+				s = RuntimeSettings.Get("ThingRegistry.Room", string.Empty);
+				if (!string.IsNullOrEmpty(s))
+					Result.Add(new MetaDataStringTag("ROOM", s));
+
+				s = RuntimeSettings.Get("ThingRegistry.Name", string.Empty);
+				if (!string.IsNullOrEmpty(s))
+					Result.Add(new MetaDataStringTag("NAME", s));
+			}
+			else
+			{
+				try
+				{
+					MainPage.Instance.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
+					{
+						try
+						{
+							RegistrationDialog Dialog = new RegistrationDialog();
+
+							switch (await Dialog.ShowAsync())
+							{
+								case ContentDialogResult.Primary:
+									await RuntimeSettings.SetAsync("ThingRegistry.Country", s = Dialog.Reg_Country);
+									if (!string.IsNullOrEmpty(s))
+										Result.Add(new MetaDataStringTag("COUNTRY", s));
+
+									await RuntimeSettings.SetAsync("ThingRegistry.Region", s = Dialog.Reg_Region);
+									if (!string.IsNullOrEmpty(s))
+										Result.Add(new MetaDataStringTag("REGION", s));
+
+									await RuntimeSettings.SetAsync("ThingRegistry.City", s = Dialog.Reg_City);
+									if (!string.IsNullOrEmpty(s))
+										Result.Add(new MetaDataStringTag("CITY", s));
+
+									await RuntimeSettings.SetAsync("ThingRegistry.Area", s = Dialog.Reg_Area);
+									if (!string.IsNullOrEmpty(s))
+										Result.Add(new MetaDataStringTag("AREA", s));
+
+									await RuntimeSettings.SetAsync("ThingRegistry.Street", s = Dialog.Reg_Street);
+									if (!string.IsNullOrEmpty(s))
+										Result.Add(new MetaDataStringTag("STREET", s));
+
+									await RuntimeSettings.SetAsync("ThingRegistry.StreetNr", s = Dialog.Reg_StreetNr);
+									if (!string.IsNullOrEmpty(s))
+										Result.Add(new MetaDataStringTag("STREETNR", s));
+
+									await RuntimeSettings.SetAsync("ThingRegistry.Building", s = Dialog.Reg_Building);
+									if (!string.IsNullOrEmpty(s))
+										Result.Add(new MetaDataStringTag("BLD", s));
+
+									await RuntimeSettings.SetAsync("ThingRegistry.Apartment", s = Dialog.Reg_Apartment);
+									if (!string.IsNullOrEmpty(s))
+										Result.Add(new MetaDataStringTag("APT", s));
+
+									await RuntimeSettings.SetAsync("ThingRegistry.Room", s = Dialog.Reg_Room);
+									if (!string.IsNullOrEmpty(s))
+										Result.Add(new MetaDataStringTag("ROOM", s));
+
+									await RuntimeSettings.SetAsync("ThingRegistry.Name", s = Dialog.Name);
+									if (!string.IsNullOrEmpty(s))
+										Result.Add(new MetaDataStringTag("NAME", s));
+									break;
+
+								case ContentDialogResult.Secondary:
+									break;
+							}
+						}
+						catch (Exception ex)
+						{
+							Log.Critical(ex);
+						}
+					}).AsTask().Wait();
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			}
+
+			return Result.ToArray();
 		}
 
 		private static void RegistrationSuccessful(MetaDataTag[] MetaData, RegistrationEventArgs e)

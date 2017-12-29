@@ -23,6 +23,7 @@ using Waher.Content;
 using Waher.Events;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Provisioning;
+using Waher.Networking.XMPP.ServiceDiscovery;
 using Waher.Persistence;
 using Waher.Persistence.Files;
 using Waher.Runtime.Settings;
@@ -178,6 +179,8 @@ namespace Waher.IoTGateway.App
 			string UserName = RuntimeSettings.Get("XmppUserName", string.Empty);
 			string PasswordHash = RuntimeSettings.Get("XmppPasswordHash", string.Empty);
 			string PasswordHashMethod = RuntimeSettings.Get("XmppPasswordHashMethod", string.Empty);
+			string ThingRegistry = RuntimeSettings.Get("XmppRegistry", string.Empty);
+			string Provisioning = RuntimeSettings.Get("XmppProvisioning", string.Empty);
 			string Key = string.Empty;
 			string Secret = string.Empty;
 			bool TrustCertificate = RuntimeSettings.Get("XmppTrustCertificate", false);
@@ -245,7 +248,50 @@ namespace Waher.IoTGateway.App
 						Client.OnStateChanged += (sender, State) =>
 						{
 							if (State == XmppState.Connected)
-								Ok.Set();
+							{
+								Client.SendServiceItemsDiscoveryRequest(Client.Domain, (sender2, e2) =>
+								{
+									if (e2.Ok)
+									{
+										Dictionary<string, bool> Items = new Dictionary<string, bool>();
+
+										foreach (Item Item in e2.Items)
+											Items[Item.JID] = true;
+
+										foreach (Item Item in e2.Items)
+										{
+											Log.Informational("Checking " + Item.JID + ".");
+
+											Client.SendServiceDiscoveryRequest(Item.JID, (sender3, e3) =>
+											{
+												string JID = (string)e3.State;
+
+												if (e3.Ok)
+												{
+													if (e3.Features.ContainsKey(ThingRegistryClient.NamespaceDiscovery))
+													{
+														ThingRegistry = JID;
+														Console.Out.WriteLine("Thing registry found.", ThingRegistry);
+													}
+
+													if (e3.Features.ContainsKey(ProvisioningClient.NamespaceProvisioningDevice))
+													{
+														Provisioning = JID;
+														Console.Out.WriteLine("Provisioning server found.", Provisioning);
+													}
+												}
+
+												Items.Remove(JID);
+												if (Items.Count == 0)
+													Ok.Set();
+
+											}, Item.JID);
+										}
+									}
+									else
+										Ok.Set();
+								}, null);
+							}
 						};
 
 						Client.OnConnectionError += (sender, e) =>
@@ -273,6 +319,8 @@ namespace Waher.IoTGateway.App
 								RuntimeSettings.Set("XmppTrustCertificate", TrustCertificate );
 								RuntimeSettings.Set("XmppAllowInsecure", AllowInsecure);
 								RuntimeSettings.Set("XmppStorePassword", StorePassword);
+								RuntimeSettings.Set("XmppRegistry", ThingRegistry);
+								RuntimeSettings.Set("XmppProvisioning", Provisioning);
 
 								return new XmppCredentials()
 								{
@@ -289,7 +337,10 @@ namespace Waher.IoTGateway.App
 									AllowEncryption = true,
 									AllowRegistration = false,
 									FormSignatureKey = string.Empty,
-									FormSignatureSecret = string.Empty
+									FormSignatureSecret = string.Empty,
+									ThingRegistry = ThingRegistry,
+									Provisioning = Provisioning,
+									Events = string.Empty
 								};
 
 							case 1:
@@ -316,7 +367,10 @@ namespace Waher.IoTGateway.App
 					AllowEncryption = true,
 					AllowRegistration = false,
 					FormSignatureKey = string.Empty,
-					FormSignatureSecret = string.Empty
+					FormSignatureSecret = string.Empty,
+					ThingRegistry = ThingRegistry,
+					Provisioning = Provisioning,
+					Events = string.Empty
 				};
 			}
 

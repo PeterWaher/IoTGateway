@@ -67,28 +67,35 @@ namespace Waher.IoTGateway
 	/// </summary>
 	/// <param name="Definition">XML definition of provider.</param>
 	/// <returns>Database provider.</returns>
-	public delegate IDatabaseProvider GetDatabaseProviderCallback(XmlElement Definition);
+	public delegate IDatabaseProvider GetDatabaseProviderEventHandler(XmlElement Definition);
 
 	/// <summary>
 	/// Delegate for callback methods used for retrieval of XMPP Client credentials.
 	/// </summary>
 	/// <param name="XmppConfigFileName">XMPP Config file name.</param>
 	/// <returns>XMPP Client Credentials.</returns>
-	public delegate XmppCredentials GetXmppClientCredentialsCallback(string XmppConfigFileName);
+	public delegate XmppCredentials GetXmppClientCredentialsEventHandler(string XmppConfigFileName);
 
 	/// <summary>
 	/// Delegate for callback methods used to persist updated XMPP Client credentials.
 	/// </summary>
 	/// <param name="XmppConfigFileName">XMPP Config file name.</param>
 	/// <param name="Credentials">XMPP Client Credentials.</param>
-	public delegate void XmppClientCredentialsUpdated(string XmppConfigFileName, XmppCredentials Credentials);
-	
+	public delegate void XmppClientCredentialsUpdatedEventHandler(string XmppConfigFileName, XmppCredentials Credentials);
+
 	/// <summary>
 	/// Delegate for registration callback methods.
 	/// </summary>
 	/// <param name="MetaData">Meta data used in registration.</param>
 	/// <param name="e">Event arguments.</param>
 	public delegate void RegistrationEventHandler(MetaDataTag[] MetaData, RegistrationEventArgs e);
+
+	/// <summary>
+	/// Delegate for events requesting meta data for registration.
+	/// </summary>
+	/// <param name="MetaData">Defult meta data.</param>
+	/// <returns>Meta data to register.</returns>
+	public delegate MetaDataTag[] GetRegistryMetaDataEventHandler(MetaDataTag[] MetaData);
 
 	/// <summary>
 	/// Static class managing the runtime environment of the IoT Gateway.
@@ -265,14 +272,18 @@ namespace Waher.IoTGateway
 
 				if (!string.IsNullOrEmpty(xmppCredentials.Provisioning))
 					provisioningClient = new ProvisioningClient(xmppClient, xmppCredentials.Provisioning);
+				else
+				{
+					provisioningClient = null;
+					xmppClient.OnPresenceSubscribe += XmppClient_OnPresenceSubscribe;
+					xmppClient.OnPresenceUnsubscribe += XmppClient_OnPresenceUnsubscribe;
+				}
 
 				DateTime Now = DateTime.Now;
 				int MsToNext = 60000 - (Now.Second * 1000 + Now.Millisecond);
 
 				connectionTimer = new Timer(CheckConnection, null, MsToNext, 60000);
 				xmppClient.OnStateChanged += XmppClient_OnStateChanged;
-				xmppClient.OnPresenceSubscribe += XmppClient_OnPresenceSubscribe;
-				xmppClient.OnPresenceUnsubscribe += XmppClient_OnPresenceUnsubscribe;
 				xmppClient.OnRosterItemUpdated += XmppClient_OnRosterItemUpdated;
 
 				ibbClient = new Networking.XMPP.InBandBytestreams.IbbClient(xmppClient, MaxChunkSize);
@@ -528,12 +539,12 @@ namespace Waher.IoTGateway
 		/// <summary>
 		/// Event raised when the Gateway requires its database provider from the host.
 		/// </summary>
-		public static event GetDatabaseProviderCallback GetDatabaseProvider = null;
+		public static event GetDatabaseProviderEventHandler GetDatabaseProvider = null;
 
 		/// <summary>
 		/// Event raised when the Gateway requires its XMPP Client Credentials from the host.
 		/// </summary>
-		public static event GetXmppClientCredentialsCallback GetXmppClientCredentials = null;
+		public static event GetXmppClientCredentialsEventHandler GetXmppClientCredentials = null;
 
 		/// <summary>
 		/// Initializes the inventory engine by loading available assemblies in the installation folder (top directory only).
@@ -880,7 +891,7 @@ namespace Waher.IoTGateway
 
 		private static void XmppClient_OnPresenceSubscribe(object Sender, PresenceEventArgs e)
 		{
-			e.Accept();     // TODO: Provisioning
+			e.Accept();
 
 			RosterItem Item = xmppClient.GetRosterItem(e.FromBareJID);
 			if (Item == null || Item.State == SubscriptionState.None || Item.State == SubscriptionState.From)
@@ -1006,7 +1017,7 @@ namespace Waher.IoTGateway
 		/// <summary>
 		/// Event raised when credentials have been updated.
 		/// </summary>
-		public static event XmppClientCredentialsUpdated XmppCredentialsUpdated = null;
+		public static event XmppClientCredentialsUpdatedEventHandler XmppCredentialsUpdated = null;
 
 		#endregion
 
@@ -1042,8 +1053,12 @@ namespace Waher.IoTGateway
 				new MetaDataStringTag("MAN", "waher.se"),
 				new MetaDataStringTag("MODEL", "Waher.IoTGateway"),
 				new MetaDataStringTag("PURL", "https://github.com/PeterWaher/IoTGateway#iotgateway"),
-				new MetaDataNumericTag("V",1.0)
+				new MetaDataNumericTag("V", 1.0)
 			};
+
+			MetaDataTag[] MetaData2 = GetMetaData?.Invoke(MetaData);
+			if (MetaData2 != null)
+				MetaData = MetaData2;
 
 			thingRegistryClient.RegisterThing(MetaData, (sender2, e2) =>
 			{
@@ -1060,6 +1075,11 @@ namespace Waher.IoTGateway
 				}
 			}, null);
 		}
+
+		/// <summary>
+		/// Event raised when meta data is compiled for registration.
+		/// </summary>
+		public static event GetRegistryMetaDataEventHandler GetMetaData = null;
 
 		/// <summary>
 		/// Event raised when the gateway has performed a successful registration in a thing registry.

@@ -15,7 +15,7 @@ namespace Waher.Persistence.Files.Serialization.Model
 		private Type memberType;
 		private TypeCode memberTypeCode;
 		private TypeInfo memberTypeInfo;
-		private ObjectSerializer nestedSerializer = null;
+		private IObjectSerializer nestedSerializer = null;
 		private ulong fieldCode;
 		private uint memberFieldDataTypeCode;
 		private bool isNestedObject;
@@ -239,7 +239,7 @@ namespace Waher.Persistence.Files.Serialization.Model
 		/// <summary>
 		/// Nested serializer.
 		/// </summary>
-		public ObjectSerializer NestedSerializer
+		public IObjectSerializer NestedSerializer
 		{
 			get { return this.nestedSerializer; }
 			internal set { this.nestedSerializer = value; }

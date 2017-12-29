@@ -1818,16 +1818,16 @@ namespace Waher.Persistence.Files.Serialization
 				string CSharpCode = CSharp.ToString();
 
 				Dictionary<string, bool> Dependencies = new Dictionary<string, bool>()
-			{
-				{ GetLocation(typeof(object)), true },
-				{ Path.Combine(Path.GetDirectoryName(GetLocation(typeof(object))), "System.Runtime.dll"), true },
-				{ Path.Combine(Path.GetDirectoryName(GetLocation(typeof(Encoding))), "System.Text.Encoding.dll"), true },
-				{ Path.Combine(Path.GetDirectoryName(GetLocation(typeof(MemoryStream))), "System.IO.dll"), true },
-				{ Path.Combine(Path.GetDirectoryName(GetLocation(typeof(MemoryStream))), "System.Runtime.Extensions.dll"), true },
-				{ GetLocation(typeof(Types)), true },
-				{ GetLocation(typeof(Database)), true },
-				{ GetLocation(typeof(ObjectSerializer)), true }
-			};
+				{
+					{ GetLocation(typeof(object)), true },
+					{ Path.Combine(Path.GetDirectoryName(GetLocation(typeof(object))), "System.Runtime.dll"), true },
+					{ Path.Combine(Path.GetDirectoryName(GetLocation(typeof(Encoding))), "System.Text.Encoding.dll"), true },
+					{ Path.Combine(Path.GetDirectoryName(GetLocation(typeof(MemoryStream))), "System.IO.dll"), true },
+					{ Path.Combine(Path.GetDirectoryName(GetLocation(typeof(MemoryStream))), "System.Runtime.Extensions.dll"), true },
+					{ GetLocation(typeof(Types)), true },
+					{ GetLocation(typeof(Database)), true },
+					{ GetLocation(typeof(ObjectSerializer)), true }
+				};
 
 				System.Reflection.TypeInfo LoopInfo;
 				Type Loop = Type;
@@ -1980,7 +1980,7 @@ namespace Waher.Persistence.Files.Serialization
 					this.membersOrdered.AddLast(Member);
 
 					if (Member.IsNestedObject)
-						Member.NestedSerializer = this.provider.GetObjectSerializerEx(Member.MemberType);
+						Member.NestedSerializer = this.provider.GetObjectSerializer(Member.MemberType);
 				}
 #if NETSTANDARD1_5
 			}
@@ -2691,11 +2691,16 @@ namespace Waher.Persistence.Files.Serialization
 							case TYPE_OBJECT:
 								if (Member.ByReference)
 								{
-									Writer.WriteBits(TYPE_GUID, 6);
+									if (Member.NestedSerializer is ObjectSerializer ObjectSerializer)
+									{
+										Writer.WriteBits(TYPE_GUID, 6);
 
-									Task<Guid> WriteTask = Member.NestedSerializer.GetObjectId(MemberValue, true);
-									FilesProvider.Wait(WriteTask, this.provider.TimeoutMilliseconds);
-									Writer.Write(WriteTask.Result);
+										Task<Guid> WriteTask = ObjectSerializer.GetObjectId(MemberValue, true);
+										FilesProvider.Wait(WriteTask, this.provider.TimeoutMilliseconds);
+										Writer.Write(WriteTask.Result);
+									}
+									else
+										throw new Exception("Objects of type " + Member.MemberType.FullName + " cannot be stored by reference.");
 								}
 								else
 									Member.NestedSerializer.Serialize(Writer, true, true, MemberValue);

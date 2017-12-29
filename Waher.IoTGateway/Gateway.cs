@@ -145,7 +145,8 @@ namespace Waher.IoTGateway
 		/// Starts the gateway.
 		/// </summary>
 		/// <param name="ConsoleOutput">If console output is permitted.</param>
-		public static bool Start(bool ConsoleOutput)
+		/// <returns>If the gateway was successfully started.</returns>
+		public static async Task<bool> Start(bool ConsoleOutput)
 		{
 			gatewayRunning = new Semaphore(1, 1, "Waher.IoTGateway.Running");
 			if (!gatewayRunning.WaitOne(1000))
@@ -205,7 +206,7 @@ namespace Waher.IoTGateway
 				scheduler = new Scheduler();
 				rnd = RandomNumberGenerator.Create();
 
-				Task.Run(() => CodeContent.GraphViz.Init());
+				Task T = Task.Run(() => CodeContent.GraphViz.Init());
 
 				XmlDocument Config = new XmlDocument();
 
@@ -223,7 +224,7 @@ namespace Waher.IoTGateway
 				IDatabaseProvider DatabaseProvider;
 
 				if (GetDatabaseProvider != null)
-					DatabaseProvider = GetDatabaseProvider(DatabaseConfig).Result;
+					DatabaseProvider = await GetDatabaseProvider(DatabaseConfig);
 				else
 					DatabaseProvider = null;
 
@@ -241,7 +242,7 @@ namespace Waher.IoTGateway
 					xmppConfigFileName = appDataFolder + xmppConfigFileName;
 
 				if (GetXmppClientCredentials != null)
-					xmppCredentials = GetXmppClientCredentials(xmppConfigFileName).Result;
+					xmppCredentials = await GetXmppClientCredentials(xmppConfigFileName);
 				else
 					xmppCredentials = null;
 
@@ -475,7 +476,7 @@ namespace Waher.IoTGateway
 				ExceptionDispatchInfo.Capture(ex).Throw();
 			}
 
-			Task.Run(async () =>
+			Task T2 = Task.Run(async () =>
 			{
 				try
 				{

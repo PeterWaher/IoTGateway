@@ -144,10 +144,8 @@ namespace Waher.IoTGateway.App
 				Gateway.RegistrationSuccessful += RegistrationSuccessful;
 				Gateway.GetMetaData += GetMetaData;
 
-				if (!Gateway.Start(false))
-				{
+				if (!await Gateway.Start(false))
 					throw new Exception("Gateway being started in another process.");
-				}
 			}
 			catch (Exception ex)
 			{
@@ -236,8 +234,8 @@ namespace Waher.IoTGateway.App
 											AllowCramMD5 = AllowInsecure,
 											AllowDigestMD5 = AllowInsecure,
 											AllowPlain = AllowInsecure,
-											AllowScramSHA1 = AllowInsecure,
-											AllowEncryption = AllowInsecure
+											AllowScramSHA1 = true,
+											AllowEncryption = true
 										};
 
 										if (CreateAccount)
@@ -246,59 +244,59 @@ namespace Waher.IoTGateway.App
 										Client.Add(new LogSniffer());   // TODO: Remove
 
 										Client.OnStateChanged += (sender, State) =>
+										{
+											if (State == XmppState.Connected)
 											{
-												if (State == XmppState.Connected)
+												if (!StorePassword)
 												{
-													if (!StorePassword)
-													{
-														PasswordHash = Client.PasswordHash;
-														PasswordHashMethod = Client.PasswordHashMethod;
-													}
+													PasswordHash = Client.PasswordHash;
+													PasswordHashMethod = Client.PasswordHashMethod;
+												}
 
-													Client.SendServiceItemsDiscoveryRequest(Client.Domain, (sender2, e2) =>
+												Client.SendServiceItemsDiscoveryRequest(Client.Domain, (sender2, e2) =>
+												{
+													if (e2.Ok)
 													{
-														if (e2.Ok)
+														Dictionary<string, bool> Items = new Dictionary<string, bool>();
+
+														foreach (Item Item in e2.Items)
+															Items[Item.JID] = true;
+
+														foreach (Item Item in e2.Items)
 														{
-															Dictionary<string, bool> Items = new Dictionary<string, bool>();
+															Log.Informational("Checking " + Item.JID + ".");
 
-															foreach (Item Item in e2.Items)
-																Items[Item.JID] = true;
-
-															foreach (Item Item in e2.Items)
+															Client.SendServiceDiscoveryRequest(Item.JID, (sender3, e3) =>
 															{
-																Log.Informational("Checking " + Item.JID + ".");
+																string JID = (string)e3.State;
 
-																Client.SendServiceDiscoveryRequest(Item.JID, (sender3, e3) =>
+																if (e3.Ok)
 																{
-																	string JID = (string)e3.State;
-
-																	if (e3.Ok)
+																	if (e3.Features.ContainsKey(ThingRegistryClient.NamespaceDiscovery))
 																	{
-																		if (e3.Features.ContainsKey(ThingRegistryClient.NamespaceDiscovery))
-																		{
-																			ThingRegistry = JID;
-																			Console.Out.WriteLine("Thing registry found.", ThingRegistry);
-																		}
-
-																		if (e3.Features.ContainsKey(ProvisioningClient.NamespaceProvisioningDevice))
-																		{
-																			Provisioning = JID;
-																			Console.Out.WriteLine("Provisioning server found.", Provisioning);
-																		}
+																		ThingRegistry = JID;
+																		Console.Out.WriteLine("Thing registry found.", ThingRegistry);
 																	}
 
-																	Items.Remove(JID);
-																	if (Items.Count == 0)
-																		Search.SetResult(true);
+																	if (e3.Features.ContainsKey(ProvisioningClient.NamespaceProvisioningDevice))
+																	{
+																		Provisioning = JID;
+																		Console.Out.WriteLine("Provisioning server found.", Provisioning);
+																	}
+																}
 
-																}, Item.JID);
-															}
+																Items.Remove(JID);
+																if (Items.Count == 0)
+																	Search.SetResult(true);
+
+															}, Item.JID);
 														}
-														else
-															Search.SetResult(true);
-													}, null);
-												}
-											};
+													}
+													else
+														Search.SetResult(true);
+												}, null);
+											}
+										};
 
 										Client.OnConnectionError += (sender, e) =>
 										{

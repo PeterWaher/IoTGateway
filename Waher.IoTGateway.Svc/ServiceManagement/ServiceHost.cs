@@ -94,7 +94,7 @@ namespace Waher.IoTGateway.Svc.ServiceManagement
 				Gateway.XmppCredentialsUpdated += Program.XmppCredentialsUpdated;
 				Gateway.RegistrationSuccessful += Program.RegistrationSuccessfulAsService;
 
-				if (!Gateway.Start(true))
+				if (!Gateway.Start(true).Result)
 					throw new Exception("Gateway being started in another process.");
 
 				ReportServiceStatus(ServiceState.Running, ServiceAcceptedControlCommandsFlags.Stop, win32ExitCode: 0, waitHint: 0);

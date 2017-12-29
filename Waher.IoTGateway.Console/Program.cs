@@ -89,7 +89,7 @@ namespace Waher.IoTGateway.Console
 				Gateway.XmppCredentialsUpdated += XmppCredentialsUpdated;
 				Gateway.RegistrationSuccessful += RegistrationSuccessful;
 
-				if (!Gateway.Start(true))
+				if (!Gateway.Start(true).Result)
 				{
 					System.Console.Out.WriteLine();
 					System.Console.Out.WriteLine("Gateway being started in another process.");

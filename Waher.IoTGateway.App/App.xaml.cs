@@ -241,8 +241,6 @@ namespace Waher.IoTGateway.App
 										if (CreateAccount)
 											Client.AllowRegistration(Key, Secret);
 
-										Client.Add(new LogSniffer());   // TODO: Remove
-
 										Client.OnStateChanged += (sender, State) =>
 										{
 											if (State == XmppState.Connected)

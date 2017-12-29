@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
-using System.Runtime.InteropServices.WindowsRuntime;
+using System.Xml;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.Foundation;
@@ -20,7 +21,11 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using Waher.Content;
 using Waher.Events;
+using Waher.Networking.XMPP;
+using Waher.Networking.XMPP.Provisioning;
+using Waher.Persistence;
 using Waher.Persistence.Files;
+using Waher.Runtime.Settings;
 
 namespace Waher.IoTGateway.App
 {
@@ -132,19 +137,12 @@ namespace Waher.IoTGateway.App
 						Log.Critical("Unexpected null exception thrown.");
 				};
 
-				if (!Gateway.Start(false, (DatabaseConfig) =>
-				{
-					if (CommonTypes.TryParse(DatabaseConfig.Attributes["encrypted"].Value, out bool Encrypted) && Encrypted)
-						throw new Exception("Encrypted database storage not supported on this platform.");
+				Gateway.GetDatabaseProvider += GetDatabase;
+				Gateway.GetXmppClientCredentials += GetXmppClientCredentials;
+				Gateway.XmppCredentialsUpdated += XmppCredentialsUpdated;
+				Gateway.RegistrationSuccessful += RegistrationSuccessful;
 
-					return new FilesProvider(Gateway.AppDataFolder + DatabaseConfig.Attributes["folder"].Value,
-						DatabaseConfig.Attributes["defaultCollectionName"].Value,
-						int.Parse(DatabaseConfig.Attributes["blockSize"].Value),
-						int.Parse(DatabaseConfig.Attributes["blocksInCache"].Value),
-						int.Parse(DatabaseConfig.Attributes["blobBlockSize"].Value), Encoding.UTF8,
-						int.Parse(DatabaseConfig.Attributes["timeoutMs"].Value),
-						false);
-				}))
+				if (!Gateway.Start(false))
 				{
 					throw new Exception("Gateway being started in another process.");
 				}
@@ -159,6 +157,195 @@ namespace Waher.IoTGateway.App
 			}
 		}
 
+		private static IDatabaseProvider GetDatabase(XmlElement DatabaseConfig)
+		{
+			if (CommonTypes.TryParse(DatabaseConfig.Attributes["encrypted"].Value, out bool Encrypted) && Encrypted)
+				throw new Exception("Encrypted database storage not supported on this platform.");
+
+			return new FilesProvider(Gateway.AppDataFolder + DatabaseConfig.Attributes["folder"].Value,
+				DatabaseConfig.Attributes["defaultCollectionName"].Value,
+				int.Parse(DatabaseConfig.Attributes["blockSize"].Value),
+				int.Parse(DatabaseConfig.Attributes["blocksInCache"].Value),
+				int.Parse(DatabaseConfig.Attributes["blobBlockSize"].Value), Encoding.UTF8,
+				int.Parse(DatabaseConfig.Attributes["timeoutMs"].Value),
+				false);
+		}
+
+		private static XmppCredentials GetXmppClientCredentials(string XmppConfigFileName)
+		{
+			string Host = RuntimeSettings.Get("XmppHost", "waher.se");
+			int Port = (int)RuntimeSettings.Get("XmppPort", 5222);
+			string UserName = RuntimeSettings.Get("XmppUserName", string.Empty);
+			string PasswordHash = RuntimeSettings.Get("XmppPasswordHash", string.Empty);
+			string PasswordHashMethod = RuntimeSettings.Get("XmppPasswordHashMethod", string.Empty);
+			string Key = string.Empty;
+			string Secret = string.Empty;
+			bool TrustCertificate = RuntimeSettings.Get("XmppTrustCertificate", false);
+			bool AllowInsecure = RuntimeSettings.Get("XmppAllowInsecure", false);
+			bool StorePassword = RuntimeSettings.Get("XmppStorePassword", false);
+			bool CreateAccount = false;
+
+			if (string.IsNullOrEmpty(Host) ||
+				Port <= 0 || Port > ushort.MaxValue ||
+				string.IsNullOrEmpty(UserName) ||
+				string.IsNullOrEmpty(PasswordHash) ||
+				string.IsNullOrEmpty(PasswordHashMethod))
+			{
+				while (true)
+				{
+					MainPage.Instance.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
+					{
+						try
+						{
+							AccountDialog Dialog = new AccountDialog(Host, Port, UserName, TrustCertificate, AllowInsecure, StorePassword, false, Key, Secret);
+
+							switch (await Dialog.ShowAsync())
+							{
+								case ContentDialogResult.Primary:
+									Host = Dialog.Host;
+									Port = Dialog.Port;
+									UserName = Dialog.UserName;
+									PasswordHash = Dialog.Password;
+									PasswordHashMethod = string.Empty;
+									TrustCertificate = Dialog.TrustServer;
+									AllowInsecure = Dialog.AllowInsecure;
+									StorePassword = Dialog.AllowStorePassword;
+									CreateAccount = Dialog.AllowRegistration;
+									Key = Dialog.Key;
+									Secret = Dialog.Secret;
+									break;
+
+								case ContentDialogResult.Secondary:
+									break;
+							}
+						}
+						catch (Exception ex)
+						{
+							Log.Critical(ex);
+						}
+
+					}).AsTask().Wait();
+
+					using (XmppClient Client = new XmppClient(Host, Port, UserName, PasswordHash, "en", typeof(App).Assembly)
+					{
+						TrustServer = TrustCertificate,
+						AllowCramMD5 = AllowInsecure,
+						AllowDigestMD5 = AllowInsecure,
+						AllowPlain = AllowInsecure,
+						AllowScramSHA1 = AllowInsecure,
+						AllowEncryption = AllowInsecure
+					})
+					{
+						if (CreateAccount)
+							Client.AllowRegistration(Key, Secret);
+
+						ManualResetEvent Ok = new ManualResetEvent(false);
+						ManualResetEvent Error = new ManualResetEvent(false);
+
+						Client.OnStateChanged += (sender, State) =>
+						{
+							if (State == XmppState.Connected)
+								Ok.Set();
+						};
+
+						Client.OnConnectionError += (sender, e) =>
+						{
+							Error.Set();
+						};
+
+						Log.Informational("Connecting to " + Host + ":" + Port.ToString());
+						Client.Connect();
+
+						switch (WaitHandle.WaitAny(new WaitHandle[] { Ok, Error }, 30000))
+						{
+							case 0:
+								if (!StorePassword)
+								{
+									PasswordHash = Client.PasswordHash;
+									PasswordHashMethod = Client.PasswordHashMethod;
+								}
+
+								RuntimeSettings.Set("XmppHost", Host);
+								RuntimeSettings.Set("XmppPort", Port);
+								RuntimeSettings.Set("XmppUserName", UserName);
+								RuntimeSettings.Set("XmppPasswordHash", PasswordHash);
+								RuntimeSettings.Set("XmppPasswordHashMethod", PasswordHashMethod);
+								RuntimeSettings.Set("XmppTrustCertificate", TrustCertificate );
+								RuntimeSettings.Set("XmppAllowInsecure", AllowInsecure);
+								RuntimeSettings.Set("XmppStorePassword", StorePassword);
+
+								return new XmppCredentials()
+								{
+									Host = Host,
+									Port = Port,
+									Account = UserName,
+									Password = PasswordHash,
+									PasswordType = PasswordHashMethod,
+									TrustServer = TrustCertificate,
+									AllowCramMD5 = AllowInsecure,
+									AllowDigestMD5 = AllowInsecure,
+									AllowPlain = AllowInsecure,
+									AllowScramSHA1 = true,
+									AllowEncryption = true,
+									AllowRegistration = false,
+									FormSignatureKey = string.Empty,
+									FormSignatureSecret = string.Empty
+								};
+
+							case 1:
+							default:
+								break;
+						}
+					}
+				}
+			}
+			else
+			{
+				return new XmppCredentials()
+				{
+					Host = Host,
+					Port = Port,
+					Account = UserName,
+					Password = PasswordHash,
+					PasswordType = PasswordHashMethod,
+					TrustServer = TrustCertificate,
+					AllowCramMD5 = AllowInsecure,
+					AllowDigestMD5 = AllowInsecure,
+					AllowPlain = AllowInsecure,
+					AllowScramSHA1 = true,
+					AllowEncryption = true,
+					AllowRegistration = false,
+					FormSignatureKey = string.Empty,
+					FormSignatureSecret = string.Empty
+				};
+			}
+
+		}
+
+		private static void XmppCredentialsUpdated(string XmppConfigFileName, XmppCredentials Credentials)
+		{
+			bool StorePassword = RuntimeSettings.Get("XmppStorePassword", false);
+
+			if (!StorePassword)
+			{
+				RuntimeSettings.Set("XmppPasswordHash", Credentials.Password);
+				RuntimeSettings.Set("XmppPasswordHashMethod", Credentials.PasswordType);
+			}
+		}
+
+		private static void RegistrationSuccessful(MetaDataTag[] MetaData, RegistrationEventArgs e)
+		{
+			if (!e.IsClaimed)
+			{
+				string ClaimUrl = ThingRegistryClient.EncodeAsIoTDiscoURI(MetaData);
+				string FilePath = Path.Combine(Gateway.AppDataFolder, "Gateway.iotdisco");
+
+				Log.Informational("Registration successful.");
+				Log.Informational(ClaimUrl, new KeyValuePair<string, object>("Path", FilePath));
+
+				File.WriteAllText(FilePath, ClaimUrl);
+			}
+		}
 
 		/// <summary>
 		/// Invoked when Navigation to a certain page fails

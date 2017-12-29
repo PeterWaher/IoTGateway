@@ -94,6 +94,9 @@
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="AccountDialog.xaml.cs">
+      <DependentUpon>AccountDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
@@ -170,6 +173,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="AccountDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="MainPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -228,6 +235,14 @@
       <Project>{9fae9c95-b89e-418d-9e09-80d2a9a45b53}</Project>
       <Name>Waher.Networking.HTTP</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Networking\Waher.Networking.XMPP.Provisioning\Waher.Networking.XMPP.Provisioning.csproj">
+      <Project>{3cd1a7c7-7cd1-418d-a6cd-ba057b04ea42}</Project>
+      <Name>Waher.Networking.XMPP.Provisioning</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Networking\Waher.Networking.XMPP\Waher.Networking.XMPP.csproj">
+      <Project>{4d96e9bc-6fc0-4866-9e6b-3f5a30de1011}</Project>
+      <Name>Waher.Networking.XMPP</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Networking\Waher.Networking\Waher.Networking.csproj">
       <Project>{9f60a3e1-ee96-4648-8970-76e67b086a63}</Project>
       <Name>Waher.Networking</Name>
@@ -243,6 +258,10 @@
     <ProjectReference Include="..\Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj">
       <Project>{7f1b0d78-aa86-445b-9e1f-7df75b9e4c04}</Project>
       <Name>Waher.Runtime.Inventory</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Runtime\Waher.Runtime.Settings\Waher.Runtime.Settings.csproj">
+      <Project>{e97e6869-7fa0-4775-999a-5fbde8061723}</Project>
+      <Name>Waher.Runtime.Settings</Name>
     </ProjectReference>
     <ProjectReference Include="..\Script\Waher.Script.Persistence\Waher.Script.Persistence.csproj">
       <Project>{9dd2d852-e874-43fc-a83d-c78066e26c16}</Project>

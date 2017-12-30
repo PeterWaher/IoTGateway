@@ -8,6 +8,7 @@ using Waher.Persistence;
 using Waher.Persistence.Attributes;
 using Waher.Persistence.Filters;
 using Waher.Runtime.Language;
+using Waher.Things.Attributes;
 using Waher.Things.DisplayableParameters;
 
 namespace Waher.Things.Metering
@@ -31,12 +32,25 @@ namespace Waher.Things.Metering
 		private object synchObject = new object();
 		private DateTime created = DateTime.Now;
 		private DateTime updated = DateTime.MinValue;
+		private ThingReference thingReference = null;
 
 		/// <summary>
 		/// Base class for all metering nodes.
 		/// </summary>
 		public MeteringNode()
 		{
+		}
+
+		/// <summary>
+		/// Converts a MeteringNode to a ThingReference object.
+		/// </summary>
+		/// <param name="Node">Metering node.</param>
+		public static implicit operator ThingReference(MeteringNode Node)
+		{
+			if (Node.thingReference == null)
+				Node.thingReference = new ThingReference(Node.nodeId, Node.SourceId, Node.Partition);
+
+			return Node.thingReference;
 		}
 
 		/// <summary>
@@ -99,10 +113,18 @@ namespace Waher.Things.Metering
 		/// <summary>
 		/// ID of node.
 		/// </summary>
+		[Header(15, "ID:")]
+		[Page(16, "Identity")]
+		[ToolTip(17, "Node identity on the network.")]
+		[Required]
 		public string NodeId
 		{
 			get { return this.nodeId; }
-			set { this.nodeId = value; }
+			set
+			{
+				this.nodeId = value;
+				this.thingReference = null;
+			}
 		}
 
 		/// <summary>

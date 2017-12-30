@@ -283,6 +283,14 @@
       <Project>{c39e8f9b-1386-4cd3-bfa7-3481181d3ba1}</Project>
       <Name>Waher.Script</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Things\Waher.Things.Gpio\Waher.Things.Gpio.csproj">
+      <Project>{f074513c-4099-4438-956e-a2c9952757b5}</Project>
+      <Name>Waher.Things.Gpio</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Things\Waher.Things\Waher.Things.csproj">
+      <Project>{1659833d-9a9a-4147-9237-2ba8d96086bc}</Project>
+      <Name>Waher.Things</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Waher.IoTGateway.Resources\Waher.IoTGateway.Resources.csproj">
       <Project>{01233ec7-6a52-4ace-9b06-aebaf5d92df6}</Project>
       <Name>Waher.IoTGateway.Resources</Name>

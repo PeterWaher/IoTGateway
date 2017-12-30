@@ -129,7 +129,7 @@ namespace Waher.Things.Gpio
 
 		private void Pin_ValueChanged(GpioPin sender, GpioPinValueChangedEventArgs args)
 		{
-			Gateway.NewMomentaryValues(new BooleanField(this, DateTime.Now, "Value", args.Edge == GpioPinEdge.RisingEdge, 
+			Gateway.NewMomentaryValues(this, new BooleanField(this, DateTime.Now, "Value", args.Edge == GpioPinEdge.RisingEdge, 
 				FieldType.Momentary, FieldQoS.AutomaticReadout, typeof(Controller).Namespace, 12));
 		}
 

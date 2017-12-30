@@ -21,7 +21,7 @@ namespace Waher.Things.Metering
 		/// </summary>
 		public const string SourceID = "MeteringTopology";
 
-		private Root root = null;
+		private static Root root = null;
 		private DateTime lastChanged;
 
 		/// <summary>
@@ -116,14 +116,28 @@ namespace Waher.Things.Metering
 		{
 			get
 			{
-				if (this.root == null)
-					this.LoadRoot().Wait();
+				if (root == null)
+					LoadRoot().Wait();
 
-				yield return this.root;
+				yield return root;
 			}
 		}
 
-		private async Task LoadRoot()
+		/// <summary>
+		/// Root node.
+		/// </summary>
+		public static Root Root
+		{
+			get
+			{
+				if (root == null)
+					LoadRoot().Wait();
+
+				return root;
+			}
+		}
+
+		private static async Task LoadRoot()
 		{
 			Root Result = null;
 
@@ -148,7 +162,7 @@ namespace Waher.Things.Metering
 				await Database.Insert(Result);
 			}
 
-			this.root = Result;
+			root = Result;
 		}
 
 	}

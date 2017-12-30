@@ -4,18 +4,67 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.Devices.Gpio;
+using Waher.IoTGateway;
+using Waher.Persistence.Attributes;
 using Waher.Runtime.Language;
+using Waher.Things.Attributes;
 using Waher.Things.SensorData;
 
 namespace Waher.Things.Gpio
 {
+	public enum InputPinMode
+	{
+		Input,
+		InputPullUp,
+		InputPullDown
+	}
+
 	public class InputPin : Pin, ISensor
 	{
 		private GpioPin pin = null;
+		private InputPinMode mode = InputPinMode.Input;
 
 		public InputPin()
 			: base()
 		{
+		}
+
+		[Page(2, "GPIO")]
+		[Header(7, "Mode:")]
+		[ToolTip(8, "Select drive mode of pin.")]
+		[DefaultValue(InputPinMode.Input)]
+		[Option(InputPinMode.Input, 9, "Input")]
+		[Option(InputPinMode.InputPullUp, 10, "Input with Pull/Up")]
+		[Option(InputPinMode.Input, 11, "Input with Pull/Down")]
+		public InputPinMode Mode
+		{
+			get { return this.mode; }
+			set
+			{
+				this.SetDriveMode(value);
+				this.mode = value;
+			}
+		}
+
+		private void SetDriveMode(InputPinMode Mode)
+		{
+			if (this.pin != null)
+			{
+				switch (Mode)
+				{
+					case InputPinMode.Input:
+						this.pin.SetDriveMode(GpioPinDriveMode.Input);
+						break;
+
+					case InputPinMode.InputPullDown:
+						this.pin.SetDriveMode(GpioPinDriveMode.InputPullDown);
+						break;
+
+					case InputPinMode.InputPullUp:
+						this.pin.SetDriveMode(GpioPinDriveMode.InputPullUp);
+						break;
+				}
+			}
 		}
 
 		public override Task<string> GetTypeNameAsync(Language Language)
@@ -41,25 +90,36 @@ namespace Waher.Things.Gpio
 					}
 
 					this.pin.ValueChanged += Pin_ValueChanged;
+
+					this.SetDriveMode(this.mode);
 				}
 
 				List<Field> Fields = new List<Field>();
 				DateTime Now = DateTime.Now;
 
 				if (Request.IsIncluded(FieldType.Momentary))
-					Fields.Add(new BooleanField(this, Now, "Value", this.pin.Read() == GpioPinValue.High, FieldType.Momentary, FieldQoS.AutomaticReadout));
+				{
+					Fields.Add(new BooleanField(this, Now, "Value", this.pin.Read() == GpioPinValue.High, FieldType.Momentary, FieldQoS.AutomaticReadout,
+						typeof(Controller).Namespace, 12));
+				}
 
 				if (Request.IsIncluded(FieldType.Identity))
-					Fields.Add(new Int32Field(this, Now, "Pin Number", this.PinNr, FieldType.Identity, FieldQoS.AutomaticReadout));
+				{
+					Fields.Add(new Int32Field(this, Now, "Pin Number", this.PinNr, FieldType.Identity, FieldQoS.AutomaticReadout,
+						typeof(Controller).Namespace, 13));
+				}
 
 				if (Request.IsIncluded(FieldType.Status))
 				{
-					Fields.Add(new TimeField(this, Now, "Debounce Timeout", this.pin.DebounceTimeout, FieldType.Status, FieldQoS.AutomaticReadout));
-					Fields.Add(new EnumField(this, Now, "Sharing Mode", this.pin.SharingMode, FieldType.Status, FieldQoS.AutomaticReadout));
-					Fields.Add(new EnumField(this, Now, "Drive Mode", this.pin.GetDriveMode(), FieldType.Status, FieldQoS.AutomaticReadout));
-				}
+					Fields.Add(new TimeField(this, Now, "Debounce Timeout", this.pin.DebounceTimeout, FieldType.Status, FieldQoS.AutomaticReadout,
+						typeof(Controller).Namespace, 14));
 
-				//this.pin.SetDriveMode();
+					Fields.Add(new EnumField(this, Now, "Sharing Mode", this.pin.SharingMode, FieldType.Status, FieldQoS.AutomaticReadout,
+						typeof(Controller).Namespace, 15));
+
+					Fields.Add(new EnumField(this, Now, "Drive Mode", this.pin.GetDriveMode(), FieldType.Status, FieldQoS.AutomaticReadout,
+						typeof(Controller).Namespace, 16));
+				}
 			}
 			catch (Exception ex)
 			{
@@ -69,6 +129,8 @@ namespace Waher.Things.Gpio
 
 		private void Pin_ValueChanged(GpioPin sender, GpioPinValueChangedEventArgs args)
 		{
+			Gateway.NewMomentaryValues(new BooleanField(this, DateTime.Now, "Value", args.Edge == GpioPinEdge.RisingEdge, 
+				FieldType.Momentary, FieldQoS.AutomaticReadout, typeof(Controller).Namespace, 12));
 		}
 
 		public override Task DestroyAsync()

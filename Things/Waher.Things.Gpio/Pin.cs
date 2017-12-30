@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.Devices.Gpio;
+using Waher.Persistence.Attributes;
 using Waher.Runtime.Language;
 using Waher.Things.Attributes;
 using Waher.Things.DisplayableParameters;
@@ -25,6 +26,7 @@ namespace Waher.Things.Gpio
 		[ToolTip(4, "Pin number on parent controller.")]
 		[Range(0, ushort.MaxValue)]
 		[Required]
+		[DefaultValue(0)]
 		public int PinNr
 		{
 			get { return this.pinNr; }

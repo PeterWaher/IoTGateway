@@ -38,6 +38,7 @@ using Waher.Persistence;
 using Waher.Things;
 using Waher.Things.ControlParameters;
 using Waher.Things.Metering;
+using Waher.Things.SensorData;
 
 namespace Waher.IoTGateway
 {
@@ -1113,10 +1114,14 @@ namespace Waher.IoTGateway
 		/// </summary>
 		public static event RegistrationEventHandler RegistrationSuccessful = null;
 
-		internal static XmppClient XmppClient
+		/// <summary>
+		/// XMPP Client connection of gateway.
+		/// </summary>
+		public static XmppClient XmppClient
 		{
 			get { return xmppClient; }
 		}
+
 
 		// TODO: Teman: http://mmistakes.github.io/skinny-bones-jekyll/, http://jekyllrb.com/
 
@@ -1280,6 +1285,48 @@ namespace Waher.IoTGateway
 			d /= ulong.MaxValue;
 
 			return d;
+		}
+
+		#endregion
+
+		#region Momentary values
+
+		/// <summary>
+		/// Reports newly measured values.
+		/// </summary>
+		/// <param name="Values">New momentary values.</param>
+		public static void NewMomentaryValues(params Field[] Values)
+		{
+			concentratorServer?.SensorServer?.NewMomentaryValues(Values);
+		}
+
+		/// <summary>
+		/// Reports newly measured values.
+		/// </summary>
+		/// <param name="Reference">Optional node reference</param>
+		/// <param name="Values">New momentary values.</param>
+		public static void NewMomentaryValues(ThingReference Reference, params Field[] Values)
+		{
+			concentratorServer?.SensorServer?.NewMomentaryValues(Reference, Values);
+		}
+
+		/// <summary>
+		/// Reports newly measured values.
+		/// </summary>
+		/// <param name="Values">New momentary values.</param>
+		public static void NewMomentaryValues(IEnumerable<Field> Values)
+		{
+			concentratorServer?.SensorServer?.NewMomentaryValues(Values);
+		}
+
+		/// <summary>
+		/// Reports newly measured values.
+		/// </summary>
+		/// <param name="Reference">Optional node reference</param>
+		/// <param name="Values">New momentary values.</param>
+		public static void NewMomentaryValues(ThingReference Reference, IEnumerable<Field> Values)
+		{
+			concentratorServer?.SensorServer?.NewMomentaryValues(Reference, Values);
 		}
 
 		#endregion

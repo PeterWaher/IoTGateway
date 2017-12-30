@@ -97,7 +97,7 @@ namespace Waher.Things.Metering
 		/// <summary>
 		/// Message Type
 		/// </summary>
-		[DefaultValue(NodeState.None)]
+		[DefaultValue(MessageType.Information)]
 		public MessageType Type
 		{
 			get { return this.type; }

@@ -297,6 +297,7 @@ The [Things](Things) folder contains libraries that manage data abstraction for 
 | Project                   | Type         | Link                                                           | Project description |
 |---------------------------|--------------|----------------------------------------------------------------|---------------------|
 | **Waher.Things**          | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Things/)          | The [Waher.Things](Things/Waher.Things) project is a class library that provides basic abstraction of things, errors, sensor data and control operations. |
+| **Waher.Things.Arduino**  | UWP          | [NuGet](https://www.nuget.org/packages/Waher.Things.Arduino/)  | The [Waher.Things.Arduino](Things/Waher.Things.Arduino) project is a class library that publishes nodes for interaction with Arduinos and connected modules via Firmata. |
 | **Waher.Things.Gpio**     | UWP          | [NuGet](https://www.nuget.org/packages/Waher.Things.Gpio/)     | The [Waher.Things.Gpio](Things/Waher.Things.Gpio) project is a class library that publishes nodes for interaction with onboard General Purpose Input/Output (GPIO) modules. |
 | **Waher.Things.Metering** | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Things.Metering/) | The [Waher.Things.Metering](Things/Waher.Things.Metering) project is a class library that defines a basic metering infrastructure. |
 

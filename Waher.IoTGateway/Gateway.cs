@@ -465,12 +465,11 @@ namespace Waher.IoTGateway
 				Types.SetModuleParameter("CoAP", coapEndpoint);
 
 				IDataSource[] Sources = new IDataSource[] { new MeteringTopology() };
-				IDataSource[] Sources2 = await GetDataSources?.Invoke(Sources);
 
-				if (Sources2 != null)
-					Sources = Sources2;
+				if (GetDataSources != null)
+					Sources = await GetDataSources(Sources);
 
-				concentratorServer = new ConcentratorServer(xmppClient, provisioningClient, Sources2);
+				concentratorServer = new ConcentratorServer(xmppClient, provisioningClient, Sources);
 				Types.SetModuleParameter("Concentrator", concentratorServer);
 				Types.SetModuleParameter("Sensor", concentratorServer.SensorServer);
 				Types.SetModuleParameter("Control", concentratorServer.ControlServer);
@@ -1085,9 +1084,8 @@ namespace Waher.IoTGateway
 				new MetaDataNumericTag("V", 1.0)
 			};
 
-			MetaDataTag[] MetaData2 = await GetMetaData?.Invoke(MetaData);
-			if (MetaData2 != null)
-				MetaData = MetaData2;
+			if (GetMetaData != null)
+				MetaData = await GetMetaData(MetaData);
 
 			thingRegistryClient.RegisterThing(MetaData, (sender2, e2) =>
 			{

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Waher.Networking.XMPP.Concentrator.Attributes
+namespace Waher.Things.Attributes
 {
 	/// <summary>
 	/// Validates input against a regular expression.

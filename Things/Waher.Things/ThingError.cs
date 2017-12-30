@@ -17,6 +17,28 @@ namespace Waher.Things
 		/// Contains information about an error on a thing
 		/// </summary>
 		/// <param name="Thing">Thing reference.</param>
+		/// <param name="ErrorMessage">Error message.</param>
+		public ThingError(ThingReference Thing, string ErrorMessage)
+			: this(Thing.NodeId, Thing.SourceId, Thing.Partition, DateTime.Now, ErrorMessage)
+		{
+		}
+
+		/// <summary>
+		/// Contains information about an error on a thing
+		/// </summary>
+		/// <param name="NodeId">ID of node.</param>
+		/// <param name="SourceId">Optional ID of source containing node.</param>
+		/// <param name="Partition">Optional partition in which the Node ID is unique.</param>
+		/// <param name="ErrorMessage">Error message.</param>
+		public ThingError(string NodeId, string SourceId, string Partition, string ErrorMessage)
+			: this(NodeId, SourceId, Partition, DateTime.Now, ErrorMessage)
+		{
+		}
+
+		/// <summary>
+		/// Contains information about an error on a thing
+		/// </summary>
+		/// <param name="Thing">Thing reference.</param>
 		/// <param name="Timestamp">Timestamp.</param>
 		/// <param name="ErrorMessage">Error message.</param>
 		public ThingError(ThingReference Thing, DateTime Timestamp, string ErrorMessage)

@@ -5,18 +5,18 @@ using System.Threading.Tasks;
 using SkiaSharp;
 using Waher.Content;
 using Waher.Runtime.Language;
-using Waher.Networking.XMPP.Concentrator.Attributes;
 using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.DataForms.DataTypes;
 using Waher.Networking.XMPP.DataForms.FieldTypes;
 using Waher.Networking.XMPP.DataForms.Layout;
 using Waher.Networking.XMPP.DataForms.ValidationMethods;
+using Waher.Things.Attributes;
 
 namespace Waher.Networking.XMPP.Concentrator
 {
 	/// <summary>
 	/// Static class managing editable parameters in objects. Editable parameters are defined by using the 
-	/// attributes defined in the <see cref="Waher.Networking.XMPP.Concentrator.Attributes"/> namespace.
+	/// attributes defined in the <see cref="Waher.Things.Attributes"/> namespace.
 	/// </summary>
 	public static class Parameters
 	{

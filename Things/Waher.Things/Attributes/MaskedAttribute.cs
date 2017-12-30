@@ -4,18 +4,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Waher.Networking.XMPP.Concentrator.Attributes
+namespace Waher.Things.Attributes
 {
 	/// <summary>
-	/// Includes the alpha channel of a color property.
+	/// Defines a masked parameter.
 	/// </summary>
 	[AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
-	public class AlphaChannelAttribute : Attribute
+	public class MaskedAttribute : Attribute
 	{
 		/// <summary>
-		/// Includes the alpha channel of a color property.
+		/// Defines a masked parameter.
 		/// </summary>
-		public AlphaChannelAttribute()
+		public MaskedAttribute()
 		{
 		}
 	}

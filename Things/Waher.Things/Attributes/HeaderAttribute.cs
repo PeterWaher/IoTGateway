@@ -4,35 +4,35 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Waher.Networking.XMPP.Concentrator.Attributes
+namespace Waher.Things.Attributes
 {
 	/// <summary>
-	/// Defines a localizable tooltip string for the property.
+	/// Defines a localizable header string for the property.
 	/// </summary>
 	[AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
-	public class ToolTipAttribute : Attribute
+	public class HeaderAttribute : Attribute
 	{
 		private int stringId;
-		private string tooltip;
+		private string header;
 
 		/// <summary>
-		/// Defines a tooltip string for the property.
+		/// Defines a header string for the property.
 		/// </summary>
-		/// <param name="ToolTip">Tooltip string.</param>
-		public ToolTipAttribute(string ToolTip)
-			: this(0, ToolTip)
+		/// <param name="Header">Header string.</param>
+		public HeaderAttribute(string Header)
+			: this(0, Header)
 		{
 		}
 
 		/// <summary>
-		/// Defines a localizable tooltip string for the property.
+		/// Defines a localizable header string for the property.
 		/// </summary>
 		/// <param name="StringId">String ID in the namespace of the current class, in the default language defined for the class.</param>
-		/// <param name="ToolTip">Default tooltip string, in the default language defined for the class.</param>
-		public ToolTipAttribute(int StringId, string ToolTip)
+		/// <param name="Header">Default header string, in the default language defined for the class.</param>
+		public HeaderAttribute(int StringId, string Header)
 		{
 			this.stringId = StringId;
-			this.tooltip = ToolTip;
+			this.header = Header;
 		}
 
 		/// <summary>
@@ -44,11 +44,11 @@ namespace Waher.Networking.XMPP.Concentrator.Attributes
 		}
 
 		/// <summary>
-		/// Default tooltip string, in the default language defined for the class.
+		/// Default header string, in the default language defined for the class.
 		/// </summary>
-		public string ToolTip
+		public string Header
 		{
-			get { return this.tooltip; }
+			get { return this.header; }
 		}
 	}
 }

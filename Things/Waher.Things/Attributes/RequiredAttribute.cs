@@ -4,18 +4,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Waher.Networking.XMPP.Concentrator.Attributes
+namespace Waher.Things.Attributes
 {
 	/// <summary>
-	/// Defines a read-only parameter.
+	/// Defines a required parameter.
 	/// </summary>
 	[AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
-	public class ReadOnlyAttribute : Attribute
+	public class RequiredAttribute : Attribute
 	{
 		/// <summary>
-		/// Defines a read-only parameter.
+		/// Defines a required parameter.
 		/// </summary>
-		public ReadOnlyAttribute()
+		public RequiredAttribute()
 		{
 		}
 	}

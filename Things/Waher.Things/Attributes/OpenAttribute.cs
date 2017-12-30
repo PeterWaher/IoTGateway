@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Waher.Networking.XMPP.Concentrator.Attributes
+namespace Waher.Things.Attributes
 {
 	/// <summary>
 	/// Defines an open parameter. Open parameters accept values outside of listed options, as long as values conform to the

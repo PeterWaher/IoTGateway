@@ -4,18 +4,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Waher.Networking.XMPP.Concentrator.Attributes
+namespace Waher.Things.Attributes
 {
 	/// <summary>
-	/// Defines a read-only parameter.
+	/// Only edits the date of the underlying DateTime property.
 	/// </summary>
 	[AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
-	public class ReadOnlyAttribute : Attribute
+	public class DateOnlyAttribute : Attribute
 	{
 		/// <summary>
-		/// Defines a read-only parameter.
+		/// Only edits the date of the underlying DateTime property.
 		/// </summary>
-		public ReadOnlyAttribute()
+		public DateOnlyAttribute()
 		{
 		}
 	}

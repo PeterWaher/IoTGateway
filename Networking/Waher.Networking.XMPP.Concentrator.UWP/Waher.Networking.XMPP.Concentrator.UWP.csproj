@@ -107,21 +107,6 @@
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Attributes\AlphaChannelAttribute.cs" />
-    <Compile Include="Attributes\DateOnlyAttribute.cs" />
-    <Compile Include="Attributes\DefaultLanguageAttribute.cs" />
-    <Compile Include="Attributes\HeaderAttribute.cs" />
-    <Compile Include="Attributes\MaskedAttribute.cs" />
-    <Compile Include="Attributes\OpenAttribute.cs" />
-    <Compile Include="Attributes\OptionAttribute.cs" />
-    <Compile Include="Attributes\PageAttribute.cs" />
-    <Compile Include="Attributes\RangeAttribute.cs" />
-    <Compile Include="Attributes\ReadOnlyAttribute.cs" />
-    <Compile Include="Attributes\RegularExpressionAttribute.cs" />
-    <Compile Include="Attributes\RequiredAttribute.cs" />
-    <Compile Include="Attributes\SectionAttribute.cs" />
-    <Compile Include="Attributes\TextAttribute.cs" />
-    <Compile Include="Attributes\ToolTipAttribute.cs" />
     <Compile Include="ConcentratorClient.cs" />
     <Compile Include="ConcentratorServer.cs" />
     <Compile Include="DataSourceReference.cs" />
@@ -210,7 +195,6 @@
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP.Concentrator\*.cs" "$(ProjectDir)" /Y
-xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP.Concentrator\Attributes\*.cs" "$(ProjectDir)Attributes" /S /R /Y
 xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP.Concentrator\Events\*.cs" "$(ProjectDir)Events" /S /R /Y
 xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP.Concentrator\Language\*.lng" "$(ProjectDir)Language" /S /R /Y</PreBuildEvent>
   </PropertyGroup>

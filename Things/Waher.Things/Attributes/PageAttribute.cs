@@ -4,32 +4,32 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Waher.Networking.XMPP.Concentrator.Attributes
+namespace Waher.Things.Attributes
 {
 	/// <summary>
-	/// Shows a text segment before the parameter.
+	/// Places the parameter on a localizable page.
 	/// </summary>
-	[AttributeUsage(AttributeTargets.Property, AllowMultiple = true, Inherited = true)]
-	public class TextAttribute : Attribute
+	[AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
+	public class PageAttribute : Attribute
 	{
 		private int stringId;
 		private string label;
 
 		/// <summary>
-		/// Shows a text segment before the parameter.
+		/// Places the parameter on a page.
 		/// </summary>
 		/// <param name="Label">Label string</param>
-		public TextAttribute(string Label)
+		public PageAttribute(string Label)
 			: this(0, Label)
 		{
 		}
 
 		/// <summary>
-		/// Shows a text segment before the parameter.
+		/// Places the parameter on a localizable page.
 		/// </summary>
 		/// <param name="StringId">String ID in the namespace of the current class, in the default language defined for the class.</param>
 		/// <param name="Label">Default label string, in the default language defined for the class.</param>
-		public TextAttribute(int StringId, string Label)
+		public PageAttribute(int StringId, string Label)
 		{
 			this.stringId = StringId;
 			this.label = Label;

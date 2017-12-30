@@ -4,8 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.Devices.Gpio;
-using Waher.Networking.XMPP.Concentrator.Attributes;
 using Waher.Runtime.Language;
+using Waher.Things.Attributes;
 using Waher.Things.DisplayableParameters;
 using Waher.Things.Metering;
 
@@ -50,6 +50,20 @@ namespace Waher.Things.Gpio
 		public override Task<bool> AcceptsParentAsync(INode Parent)
 		{
 			return Task.FromResult<bool>(Parent is Controller);
+		}
+
+		protected string GetStatusMessage(GpioOpenStatus Status)
+		{
+			switch (Status)
+			{
+				case GpioOpenStatus.MuxingConflict: return "The pin is currently opened for a different function, such as **I2c**, **Spi**, or **UART**. Ensure the pin is not in use by another function.";
+				case GpioOpenStatus.PinOpened: return "The GPIO pin was successfully opened.";
+				case GpioOpenStatus.PinUnavailable: return "The pin is reserved by the system and is not available to apps that run in user mode.";
+				case GpioOpenStatus.SharingViolation: return "The pin is currently open in an incompatible sharing mode.";
+				case GpioOpenStatus.UnknownError:
+				default:
+					return "The pin could not be opened.";
+			}
 		}
 
 	}

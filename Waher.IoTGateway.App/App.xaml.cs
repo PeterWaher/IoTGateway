@@ -145,7 +145,6 @@ namespace Waher.IoTGateway.App
 				Gateway.XmppCredentialsUpdated += XmppCredentialsUpdated;
 				Gateway.RegistrationSuccessful += RegistrationSuccessful;
 				Gateway.GetMetaData += GetMetaData;
-				Gateway.GetDataSources += this.GetDataSources;
 
 				if (!await Gateway.Start(false))
 					throw new Exception("Gateway being started in another process.");
@@ -536,16 +535,6 @@ namespace Waher.IoTGateway.App
 
 				await File.WriteAllTextAsync(FilePath, ClaimUrl);
 			}
-		}
-
-		private Task<IDataSource[]> GetDataSources(params IDataSource[] DataSources)
-		{
-			List<IDataSource> Result = new List<IDataSource>(DataSources);
-
-			if (GpioSource.SupportsGpio)
-				Result.Add(new GpioSource());
-
-			return Task.FromResult<IDataSource[]>(Result.ToArray());
 		}
 
 		/// <summary>

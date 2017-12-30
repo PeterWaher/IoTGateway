@@ -98,6 +98,13 @@ namespace Waher.IoTGateway
 	public delegate Task<MetaDataTag[]> GetRegistryMetaDataEventHandler(MetaDataTag[] MetaData);
 
 	/// <summary>
+	/// Delegate for events requesting an array of data sources.
+	/// </summary>
+	/// <param name="DataSources">Default set of data sources.</param>
+	/// <returns>Data sources to publish.</returns>
+	public delegate Task<IDataSource[]> GetDataSources(params IDataSource[] DataSources);
+
+	/// <summary>
 	/// Static class managing the runtime environment of the IoT Gateway.
 	/// </summary>
 	public static class Gateway
@@ -457,7 +464,13 @@ namespace Waher.IoTGateway
 				coapEndpoint = new CoapEndpoint();
 				Types.SetModuleParameter("CoAP", coapEndpoint);
 
-				concentratorServer = new ConcentratorServer(xmppClient, provisioningClient, new MeteringTopology());
+				IDataSource[] Sources = new IDataSource[] { new MeteringTopology() };
+				IDataSource[] Sources2 = await GetDataSources?.Invoke(Sources);
+
+				if (Sources2 != null)
+					Sources = Sources2;
+
+				concentratorServer = new ConcentratorServer(xmppClient, provisioningClient, Sources2);
 				Types.SetModuleParameter("Concentrator", concentratorServer);
 				Types.SetModuleParameter("Sensor", concentratorServer.SensorServer);
 				Types.SetModuleParameter("Control", concentratorServer.ControlServer);
@@ -556,6 +569,11 @@ namespace Waher.IoTGateway
 		/// Event raised when the Gateway requires its XMPP Client Credentials from the host.
 		/// </summary>
 		public static event GetXmppClientCredentialsEventHandler GetXmppClientCredentials = null;
+
+		/// <summary>
+		/// Event raised when the Gateway requires a set of data sources to publish.
+		/// </summary>
+		public static event GetDataSources GetDataSources = null;
 
 		/// <summary>
 		/// Initializes the inventory engine by loading available assemblies in the installation folder (top directory only).

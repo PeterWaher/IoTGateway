@@ -499,6 +499,8 @@ namespace Waher.IoTGateway.App
 								if (!string.IsNullOrEmpty(s))
 									Result.Add(new MetaDataStringTag("NAME", s));
 
+								await RuntimeSettings.SetAsync("ThingRegistry.Location", true);
+
 								UserInput.SetResult(true);
 								break;
 

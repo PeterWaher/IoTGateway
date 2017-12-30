@@ -106,7 +106,9 @@
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Module.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UsbSerialPort.cs" />
     <EmbeddedResource Include="Properties\Waher.Things.Arduino.rd.xml" />
   </ItemGroup>
   <ItemGroup>
@@ -123,9 +125,17 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj">
+      <Project>{8ae9d52d-28cd-4f83-98de-b6a016f5c7ba}</Project>
+      <Name>Waher.Events</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Persistence\Waher.Persistence\Waher.Persistence.csproj">
       <Project>{0286288f-4af3-4e64-a398-24c8957ceb04}</Project>
       <Name>Waher.Persistence</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj">
+      <Project>{7f1b0d78-aa86-445b-9e1f-7df75b9e4c04}</Project>
+      <Name>Waher.Runtime.Inventory</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Language\Waher.Runtime.Language.csproj">
       <Project>{e11e0021-a85f-466b-92ab-5725c6277b6a}</Project>

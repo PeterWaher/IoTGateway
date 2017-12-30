@@ -1,5 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
   <PropertyGroup>
     <TargetFramework>netstandard1.3</TargetFramework>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
@@ -19,21 +18,20 @@
     <AssemblyVersion>1.0.5</AssemblyVersion>
     <FileVersion>1.0.5</FileVersion>
     <Version>1.0.5</Version>
+    <FileUpgradeFlags>40</FileUpgradeFlags>
+    <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Networking\Waher.Networking.CoAP\</UpgradeBackupLocation>
+    <OldToolsVersion>2.0</OldToolsVersion>
   </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DocumentationFile>bin\Debug\netstandard1.3\Waher.Networking.CoAP.xml</DocumentationFile>
   </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DocumentationFile>bin\Release\netstandard1.3\Waher.Networking.CoAP.xml</DocumentationFile>
   </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="System.Net.NameResolution" Version="4.3.0" />
     <PackageReference Include="System.Net.NetworkInformation" Version="4.3.0" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\Content\Waher.Content\Waher.Content.csproj" />
     <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj" />
@@ -44,5 +42,4 @@
     <ProjectReference Include="..\..\Security\Waher.Security\Waher.Security.csproj" />
     <ProjectReference Include="..\Waher.Networking\Waher.Networking.csproj" />
   </ItemGroup>
-
 </Project>

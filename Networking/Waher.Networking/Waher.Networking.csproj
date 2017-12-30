@@ -1,5 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
   <PropertyGroup>
     <TargetFramework>netstandard1.3</TargetFramework>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
@@ -19,22 +18,20 @@
     <FileVersion>1.0.4</FileVersion>
     <Version>1.0.4</Version>
     <PackageIconUrl>https://github.com/PeterWaher/IoTGateway/blob/master/Images/Icon.ico?raw=true</PackageIconUrl>
+    <FileUpgradeFlags>40</FileUpgradeFlags>
+    <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Networking\Waher.Networking\</UpgradeBackupLocation>
+    <OldToolsVersion>2.0</OldToolsVersion>
   </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DocumentationFile>bin\Debug\netstandard1.3\.xml</DocumentationFile>
   </PropertyGroup>
-
   <ItemGroup>
     <None Remove="Schema\SnifferOutput.xsd" />
   </ItemGroup>
-
   <ItemGroup>
     <EmbeddedResource Include="Schema\SnifferOutput.xsd" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj" />
   </ItemGroup>
-
 </Project>

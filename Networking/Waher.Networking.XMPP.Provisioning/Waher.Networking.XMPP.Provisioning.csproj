@@ -1,5 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
+<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
   <PropertyGroup>
     <TargetFramework>netstandard1.3</TargetFramework>
     <Description>Implements the XMPP IoT provisioning extesion as defined by the IEEE XMPP IoT Interface working group.</Description>
@@ -19,20 +18,19 @@
     <AssemblyVersion>1.0.15</AssemblyVersion>
     <FileVersion>1.0.15</FileVersion>
     <Version>1.0.15</Version>
+    <FileUpgradeFlags>40</FileUpgradeFlags>
+    <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Networking\Waher.Networking.XMPP.Provisioning\</UpgradeBackupLocation>
+    <OldToolsVersion>2.0</OldToolsVersion>
   </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DocumentationFile>bin\Debug\netstandard1.3\Waher.Networking.XMPP.Provisioning.xml</DocumentationFile>
   </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DocumentationFile>bin\Release\netstandard1.3\Waher.Networking.XMPP.Provisioning.xml</DocumentationFile>
   </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="System.Security.Cryptography.X509Certificates" Version="4.3.0" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\Content\Waher.Content\Waher.Content.csproj" />
     <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj" />
@@ -40,5 +38,4 @@
     <ProjectReference Include="..\..\Things\Waher.Things\Waher.Things.csproj" />
     <ProjectReference Include="..\Waher.Networking.XMPP\Waher.Networking.XMPP.csproj" />
   </ItemGroup>
-
 </Project>

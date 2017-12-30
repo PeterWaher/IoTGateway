@@ -1,5 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
+<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <Description>Contains tools for simple XML validation using embedded XML schemas and transformation using embedded XSL transformations.</Description>
@@ -18,17 +17,17 @@
     <NeutralLanguage>English</NeutralLanguage>
     <AssemblyVersion>1.0.0</AssemblyVersion>
     <FileVersion>1.0.0</FileVersion>
+    <FileUpgradeFlags>40</FileUpgradeFlags>
+    <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Content\Waher.Content.Xsl\</UpgradeBackupLocation>
+    <OldToolsVersion>2.0</OldToolsVersion>
   </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DocumentationFile>bin\Debug\netstandard2.0\Waher.Content.Xsl.xml</DocumentationFile>
   </PropertyGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj" />
     <ProjectReference Include="..\..\Script\Waher.Script\Waher.Script.csproj" />
     <ProjectReference Include="..\Waher.Content.Xml\Waher.Content.Xml.csproj" />
     <ProjectReference Include="..\Waher.Content\Waher.Content.csproj" />
   </ItemGroup>
-
 </Project>

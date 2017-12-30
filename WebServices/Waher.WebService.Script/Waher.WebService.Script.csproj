@@ -1,5 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
+<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
   <PropertyGroup>
     <TargetFramework>netstandard1.5</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -18,12 +17,13 @@
     <NeutralLanguage>English</NeutralLanguage>
     <AssemblyVersion>1.0.0</AssemblyVersion>
     <FileVersion>1.0.0</FileVersion>
+    <FileUpgradeFlags>40</FileUpgradeFlags>
+    <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\WebServices\Waher.WebService.Script\</UpgradeBackupLocation>
+    <OldToolsVersion>2.0</OldToolsVersion>
   </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DocumentationFile>bin\Debug\netstandard1.3\Waher.WebService.Script.xml</DocumentationFile>
   </PropertyGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\Content\Waher.Content.Xml\Waher.Content.Xml.csproj" />
     <ProjectReference Include="..\..\Content\Waher.Content\Waher.Content.csproj" />
@@ -34,5 +34,4 @@
     <ProjectReference Include="..\..\Script\Waher.Script.Statistics\Waher.Script.Statistics.csproj" />
     <ProjectReference Include="..\..\Script\Waher.Script\Waher.Script.csproj" />
   </ItemGroup>
-
 </Project>

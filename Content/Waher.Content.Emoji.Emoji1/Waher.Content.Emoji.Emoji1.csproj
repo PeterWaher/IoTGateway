@@ -1,5 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
   <PropertyGroup>
     <TargetFramework>netstandard1.3</TargetFramework>
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
@@ -19,12 +18,13 @@
     <FileVersion>1.0.1</FileVersion>
     <PackageIconUrl>https://github.com/PeterWaher/IoTGateway/blob/master/Images/Icon.ico?raw=true</PackageIconUrl>
     <Version>1.0.1</Version>
+    <FileUpgradeFlags>40</FileUpgradeFlags>
+    <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Content\Waher.Content.Emoji.Emoji1\</UpgradeBackupLocation>
+    <OldToolsVersion>2.0</OldToolsVersion>
   </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DocumentationFile>bin\Debug\netstandard1.3\.xml</DocumentationFile>
   </PropertyGroup>
-
   <ItemGroup>
     <Content Include="Graphics\Emoji1\png\128x128\0023-20e3.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -19515,9 +19515,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\Waher.Content.Emoji\Waher.Content.Emoji.csproj" />
   </ItemGroup>
-
 </Project>

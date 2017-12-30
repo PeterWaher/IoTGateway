@@ -1,5 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
+<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.0</TargetFramework>
@@ -16,25 +15,23 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags />
     <NeutralLanguage>English</NeutralLanguage>
+    <FileUpgradeFlags>40</FileUpgradeFlags>
+    <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Utilities\Waher.Utility.Install\</UpgradeBackupLocation>
+    <OldToolsVersion>2.0</OldToolsVersion>
   </PropertyGroup>
-
   <ItemGroup>
     <None Remove="Schema\Manifest.xsd" />
   </ItemGroup>
-
   <ItemGroup>
     <EmbeddedResource Include="Schema\Manifest.xsd" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\Content\Waher.Content.Xml\Waher.Content.Xml.csproj" />
     <ProjectReference Include="..\..\Content\Waher.Content.Xsl\Waher.Content.Xsl.csproj" />
     <ProjectReference Include="..\..\Content\Waher.Content\Waher.Content.csproj" />
     <ProjectReference Include="..\..\Events\Waher.Events.Console\Waher.Events.Console.csproj" />
   </ItemGroup>
-
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="if not exist &quot;$(ProjectDir)obj\$(ConfigurationName)\netcoreapp2.0\win-x86&quot; md &quot;$(ProjectDir)obj\$(ConfigurationName)\netcoreapp2.0\win-x86&quot;&#xD;&#xA;copy &quot;$(TargetPath)&quot; &quot;$(ProjectDir)obj\$(ConfigurationName)\netcoreapp2.0\win-x86&quot;&#xD;&#xA;" />
   </Target>
-
 </Project>

@@ -1,5 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
+<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -19,22 +18,21 @@
     <AssemblyVersion>1.0.9</AssemblyVersion>
     <FileVersion>1.0.9</FileVersion>
     <Version>1.0.9</Version>
+    <FileUpgradeFlags>40</FileUpgradeFlags>
+    <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Waher.IoTGateway\</UpgradeBackupLocation>
+    <OldToolsVersion>2.0</OldToolsVersion>
   </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DocumentationFile>bin\Debug\netstandard2.0\Waher.IoTGateway.xml</DocumentationFile>
   </PropertyGroup>
-
   <ItemGroup>
     <None Remove="Schema\CertificateConfiguration.xsd" />
     <None Remove="Schema\GatewayConfiguration.xsd" />
   </ItemGroup>
-
   <ItemGroup>
     <EmbeddedResource Include="Schema\CertificateConfiguration.xsd" />
     <EmbeddedResource Include="Schema\GatewayConfiguration.xsd" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\Content\Waher.Content.Emoji.Emoji1\Waher.Content.Emoji.Emoji1.csproj" />
     <ProjectReference Include="..\Content\Waher.Content.Emoji\Waher.Content.Emoji.csproj" />
@@ -73,5 +71,4 @@
     <ProjectReference Include="..\Things\Waher.Things.Metering\Waher.Things.Metering.csproj" />
     <ProjectReference Include="..\Things\Waher.Things\Waher.Things.csproj" />
   </ItemGroup>
-
 </Project>

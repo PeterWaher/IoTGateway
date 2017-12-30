@@ -1,5 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
+<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -19,30 +18,27 @@
     <AssemblyVersion>1.0.1</AssemblyVersion>
     <FileVersion>1.0.1</FileVersion>
     <Version>1.0.1</Version>
+    <FileUpgradeFlags>40</FileUpgradeFlags>
+    <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Mocks\Waher.Mock\</UpgradeBackupLocation>
+    <OldToolsVersion>2.0</OldToolsVersion>
   </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DocumentationFile>bin\Debug\netstandard2.0\Waher.Mock.xml</DocumentationFile>
   </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DocumentationFile>bin\Release\netstandard2.0\Waher.Mock.xml</DocumentationFile>
   </PropertyGroup>
-
   <ItemGroup>
     <None Remove="Schema\SimpleComponentConfiguration.xsd" />
     <None Remove="Schema\SimpleXmppConfiguration.xsd" />
   </ItemGroup>
-
   <ItemGroup>
     <EmbeddedResource Include="Schema\SimpleComponentConfiguration.xsd" />
     <EmbeddedResource Include="Schema\SimpleXmppConfiguration.xsd" />
   </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="Gma.QrCodeNet.Encoding" Version="1.0.1" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\Content\Waher.Content.Xml\Waher.Content.Xml.csproj" />
     <ProjectReference Include="..\..\Content\Waher.Content.Xsl\Waher.Content.Xsl.csproj" />
@@ -50,5 +46,4 @@
     <ProjectReference Include="..\..\Networking\Waher.Networking.XMPP\Waher.Networking.XMPP.csproj" />
     <ProjectReference Include="..\..\Networking\Waher.Networking\Waher.Networking.csproj" />
   </ItemGroup>
-
 </Project>

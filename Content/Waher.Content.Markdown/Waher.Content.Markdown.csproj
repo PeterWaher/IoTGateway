@@ -1,5 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
   <PropertyGroup>
     <TargetFramework>netstandard1.3</TargetFramework>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
@@ -20,16 +19,16 @@ Syntax supported: https://waher.se/Markdown.md</Description>
     <FileVersion>1.0.11</FileVersion>
     <PackageIconUrl>https://github.com/PeterWaher/IoTGateway/blob/master/Images/Icon.ico?raw=true</PackageIconUrl>
     <Version>1.0.11</Version>
+    <FileUpgradeFlags>40</FileUpgradeFlags>
+    <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Content\Waher.Content.Markdown\</UpgradeBackupLocation>
+    <OldToolsVersion>2.0</OldToolsVersion>
   </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DocumentationFile>bin\Debug\netstandard1.3\.xml</DocumentationFile>
   </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="SkiaSharp" Version="1.59.3" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Cache\Waher.Runtime.Cache.csproj" />
     <ProjectReference Include="..\..\Script\Waher.Script.Graphs\Waher.Script.Graphs.csproj" />
@@ -37,5 +36,4 @@ Syntax supported: https://waher.se/Markdown.md</Description>
     <ProjectReference Include="..\Waher.Content.Emoji\Waher.Content.Emoji.csproj" />
     <ProjectReference Include="..\Waher.Content.Xml\Waher.Content.Xml.csproj" />
   </ItemGroup>
-
 </Project>

@@ -1,5 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
+<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.0</TargetFramework>
@@ -22,12 +21,13 @@
     <AssemblyVersion>1.0.0</AssemblyVersion>
     <FileVersion>1.0.0</FileVersion>
     <RuntimeIdentifiers>win-x86;win-x64;win-arm;win-arm64;linux-x64;osx-x64;android</RuntimeIdentifiers>
+    <FileUpgradeFlags>40</FileUpgradeFlags>
+    <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Waher.IoTGateway.Console\</UpgradeBackupLocation>
+    <OldToolsVersion>2.0</OldToolsVersion>
   </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="SkiaSharp" Version="1.59.3" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\Content\Waher.Content.Emoji.Emoji1\Waher.Content.Emoji.Emoji1.csproj" />
     <ProjectReference Include="..\Content\Waher.Content.Emoji\Waher.Content.Emoji.csproj" />
@@ -50,5 +50,4 @@
     <ProjectReference Include="..\Waher.IoTGateway\Waher.IoTGateway.csproj" />
     <ProjectReference Include="..\WebServices\Waher.WebService.Script\Waher.WebService.Script.csproj" />
   </ItemGroup>
-
 </Project>

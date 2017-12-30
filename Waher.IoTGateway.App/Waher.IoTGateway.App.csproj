@@ -197,6 +197,9 @@
     <PackageReference Include="SkiaSharp">
       <Version>1.59.3</Version>
     </PackageReference>
+    <PackageReference Include="Windows-Remote-Arduino">
+      <Version>1.4.0</Version>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Content\Waher.Content.Emoji.Emoji1\Waher.Content.Emoji.Emoji1.csproj">
@@ -314,6 +317,10 @@
     <ProjectReference Include="..\Security\Waher.Security\Waher.Security.csproj">
       <Project>{a248de37-d588-4a5c-b51b-b500c7caaf68}</Project>
       <Name>Waher.Security</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Things\Waher.Things.Arduino\Waher.Things.Arduino.csproj">
+      <Project>{99859282-a034-4014-bb69-a21728b3169f}</Project>
+      <Name>Waher.Things.Arduino</Name>
     </ProjectReference>
     <ProjectReference Include="..\Things\Waher.Things.Gpio\Waher.Things.Gpio.csproj">
       <Project>{f074513c-4099-4438-956e-a2c9952757b5}</Project>

@@ -19,12 +19,12 @@ namespace Waher.Things.Gpio
 		InputPullDown
 	}
 
-	public class InputPin : Pin, ISensor
+	public class DigitalInput : Pin, ISensor
 	{
 		private GpioPin pin = null;
 		private InputPinMode mode = InputPinMode.Input;
 
-		public InputPin()
+		public DigitalInput()
 			: base()
 		{
 		}
@@ -69,7 +69,7 @@ namespace Waher.Things.Gpio
 
 		public override Task<string> GetTypeNameAsync(Language Language)
 		{
-			return Language.GetStringAsync(typeof(Controller), 5, "Input Pin");
+			return Language.GetStringAsync(typeof(Controller), 5, "Digital Input");
 		}
 
 		public void StartReadout(ISensorReadout Request)

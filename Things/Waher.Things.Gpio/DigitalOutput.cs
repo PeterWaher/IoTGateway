@@ -22,12 +22,12 @@ namespace Waher.Things.Gpio
 		OutputOpenSourcePullDown
 	}
 
-	public class OutputPin : Pin, ISensor, IActuator
+	public class DigitalOutput : Pin, ISensor, IActuator
 	{
 		private GpioPin pin = null;
 		private OutputPinMode mode = OutputPinMode.Output;
 
-		public OutputPin()
+		public DigitalOutput()
 			: base()
 		{
 		}
@@ -82,7 +82,7 @@ namespace Waher.Things.Gpio
 
 		public override Task<string> GetTypeNameAsync(Language Language)
 		{
-			return Language.GetStringAsync(typeof(Controller), 6, "Output Pin");
+			return Language.GetStringAsync(typeof(Controller), 6, "Digital Output");
 		}
 
 		public void StartReadout(ISensorReadout Request)

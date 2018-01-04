@@ -106,9 +106,15 @@
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="AnalogInput.cs" />
+    <Compile Include="DigitalOutput.cs" />
+    <Compile Include="DigitalInput.cs" />
+    <Compile Include="AnalogPin.cs" />
+    <Compile Include="DigitalPin.cs" />
     <Compile Include="Module.cs" />
+    <Compile Include="Pin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="UsbSerialPort.cs" />
+    <Compile Include="UsbConnectedDevice.cs" />
     <EmbeddedResource Include="Properties\Waher.Things.Arduino.rd.xml" />
   </ItemGroup>
   <ItemGroup>

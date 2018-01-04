@@ -14,7 +14,7 @@ namespace Waher.Things.Gpio
 {
 	public abstract class Pin : MeteringNode
 	{
-		private int pinNr = 0;
+		private byte pinNr = 0;
 
 		public Pin()
 			: base()
@@ -24,10 +24,10 @@ namespace Waher.Things.Gpio
 		[Page(2, "GPIO")]
 		[Header(3, "Pin number:")]
 		[ToolTip(4, "Pin number on parent controller.")]
-		[Range(0, ushort.MaxValue)]
+		[Range(0, byte.MaxValue)]
 		[Required]
 		[DefaultValue(0)]
-		public int PinNr
+		public byte PinNr
 		{
 			get { return this.pinNr; }
 			set { this.pinNr = value; }

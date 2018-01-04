@@ -227,7 +227,7 @@ namespace Waher.Things.Metering
 		/// If the node can be controlled.
 		/// </summary>
 		[IgnoreMember]
-		public bool IsControllable
+		public virtual bool IsControllable
 		{
 			get
 			{
@@ -239,7 +239,7 @@ namespace Waher.Things.Metering
 		/// If the node can be read.
 		/// </summary>
 		[IgnoreMember]
-		public bool IsReadable
+		public virtual bool IsReadable
 		{
 			get
 			{
@@ -341,7 +341,7 @@ namespace Waher.Things.Metering
 		/// Adds a new child to the node.
 		/// </summary>
 		/// <param name="Child">New child to add.</param>
-		public async Task AddAsync(INode Child)
+		public virtual async Task AddAsync(INode Child)
 		{
 			MeteringNode Node = Child as MeteringNode;
 			if (Node == null)
@@ -375,7 +375,7 @@ namespace Waher.Things.Metering
 		/// </summary>
 		/// <param name="Caller">Information about caller.</param>
 		/// <returns>If the node was moved down.</returns>
-		public Task<bool> MoveDownAsync(RequestOrigin Caller)
+		public virtual Task<bool> MoveDownAsync(RequestOrigin Caller)
 		{
 			return Task.FromResult<bool>(false);
 		}
@@ -385,7 +385,7 @@ namespace Waher.Things.Metering
 		/// </summary>
 		/// <param name="Caller">Information about caller.</param>
 		/// <returns>If the node was moved up.</returns>
-		public Task<bool> MoveUpAsync(RequestOrigin Caller)
+		public virtual Task<bool> MoveUpAsync(RequestOrigin Caller)
 		{
 			return Task.FromResult<bool>(false);
 		}
@@ -395,7 +395,7 @@ namespace Waher.Things.Metering
 		/// </summary>
 		/// <param name="Child">Child to remove.</param>
 		/// <returns>If the Child node was found and removed.</returns>
-		public async Task<bool> RemoveAsync(INode Child)
+		public virtual async Task<bool> RemoveAsync(INode Child)
 		{
 			MeteringNode Node = Child as MeteringNode;
 			if (Node == null)
@@ -538,7 +538,7 @@ namespace Waher.Things.Metering
 		/// Gets messages logged on the node.
 		/// </summary>
 		/// <returns>Set of messages.</returns>
-		public async Task<IEnumerable<Message>> GetMessagesAsync(RequestOrigin Caller)
+		public virtual async Task<IEnumerable<Message>> GetMessagesAsync(RequestOrigin Caller)
 		{
 			IEnumerable<MeteringMessage> Messages = await Database.Find<MeteringMessage>(
 				new FilterFieldEqualTo("NodeId", this.objectId), "Timestamp");
@@ -554,7 +554,7 @@ namespace Waher.Things.Metering
 		/// Logs an error message on the node.
 		/// </summary>
 		/// <param name="Body">Message body.</param>
-		public Task LogErrorAsync(string Body)
+		public virtual Task LogErrorAsync(string Body)
 		{
 			return this.LogMessageAsync(MessageType.Error, string.Empty, Body);
 		}
@@ -564,7 +564,7 @@ namespace Waher.Things.Metering
 		/// </summary>
 		/// <param name="EventId">Optional Event ID.</param>
 		/// <param name="Body">Message body.</param>
-		public Task LogErrorAsync(string EventId, string Body)
+		public virtual Task LogErrorAsync(string EventId, string Body)
 		{
 			return this.LogMessageAsync(MessageType.Error, EventId, Body);
 		}
@@ -573,7 +573,7 @@ namespace Waher.Things.Metering
 		/// Logs an warning message on the node.
 		/// </summary>
 		/// <param name="Body">Message body.</param>
-		public Task LogWarningAsync(string Body)
+		public virtual Task LogWarningAsync(string Body)
 		{
 			return this.LogMessageAsync(MessageType.Warning, string.Empty, Body);
 		}
@@ -583,7 +583,7 @@ namespace Waher.Things.Metering
 		/// </summary>
 		/// <param name="EventId">Optional Event ID.</param>
 		/// <param name="Body">Message body.</param>
-		public Task LogWarningAsync(string EventId, string Body)
+		public virtual Task LogWarningAsync(string EventId, string Body)
 		{
 			return this.LogMessageAsync(MessageType.Warning, EventId, Body);
 		}
@@ -592,7 +592,7 @@ namespace Waher.Things.Metering
 		/// Logs an informational message on the node.
 		/// </summary>
 		/// <param name="Body">Message body.</param>
-		public Task LogInformationAsync(string Body)
+		public virtual Task LogInformationAsync(string Body)
 		{
 			return this.LogMessageAsync(MessageType.Information, string.Empty, Body);
 		}
@@ -602,7 +602,7 @@ namespace Waher.Things.Metering
 		/// </summary>
 		/// <param name="EventId">Optional Event ID.</param>
 		/// <param name="Body">Message body.</param>
-		public Task LogInformationAsync(string EventId, string Body)
+		public virtual Task LogInformationAsync(string EventId, string Body)
 		{
 			return this.LogMessageAsync(MessageType.Information, EventId, Body);
 		}
@@ -612,7 +612,7 @@ namespace Waher.Things.Metering
 		/// </summary>
 		/// <param name="Type">Type of message.</param>
 		/// <param name="Body">Message body.</param>
-		public Task LogMessageAsync(MessageType Type, string Body)
+		public virtual Task LogMessageAsync(MessageType Type, string Body)
 		{
 			return this.LogMessageAsync(Type, string.Empty, Body);
 		}
@@ -623,7 +623,7 @@ namespace Waher.Things.Metering
 		/// <param name="Type">Type of message.</param>
 		/// <param name="EventId">Optional Event ID.</param>
 		/// <param name="Body">Message body.</param>
-		public async Task LogMessageAsync(MessageType Type, string EventId, string Body)
+		public virtual async Task LogMessageAsync(MessageType Type, string EventId, string Body)
 		{
 			if (this.objectId == Guid.Empty)
 				throw new Exception("You can only log messages on persisted nodes.");
@@ -718,7 +718,7 @@ namespace Waher.Things.Metering
 		/// </summary>
 		/// <param name="Caller">Information about caller.</param>
 		/// <returns>If the node can be added to by the caller.</returns>
-		public Task<bool> CanAddAsync(RequestOrigin Caller)
+		public virtual Task<bool> CanAddAsync(RequestOrigin Caller)
 		{
 			return Task.FromResult<bool>(true);     // TODO: Check user privileges
 		}
@@ -728,7 +728,7 @@ namespace Waher.Things.Metering
 		/// </summary>
 		/// <param name="Caller">Information about caller.</param>
 		/// <returns>If the node can be added to by the caller.</returns>
-		public Task<bool> CanDestroyAsync(RequestOrigin Caller)
+		public virtual Task<bool> CanDestroyAsync(RequestOrigin Caller)
 		{
 			return Task.FromResult<bool>(true);     // TODO: Check user privileges
 		}
@@ -738,7 +738,7 @@ namespace Waher.Things.Metering
 		/// </summary>
 		/// <param name="Caller">Information about caller.</param>
 		/// <returns>If the node can be edited by the caller.</returns>
-		public Task<bool> CanEditAsync(RequestOrigin Caller)
+		public virtual Task<bool> CanEditAsync(RequestOrigin Caller)
 		{
 			return Task.FromResult<bool>(true);     // TODO: Check user privileges
 		}
@@ -748,7 +748,7 @@ namespace Waher.Things.Metering
 		/// </summary>
 		/// <param name="Caller">Information about caller.</param>
 		/// <returns>If the node is visible to the caller.</returns>
-		public Task<bool> CanViewAsync(RequestOrigin Caller)
+		public virtual Task<bool> CanViewAsync(RequestOrigin Caller)
 		{
 			return Task.FromResult<bool>(true);     // TODO: Check user privileges
 		}

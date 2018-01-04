@@ -109,8 +109,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Controller.cs" />
-    <Compile Include="OutputPin.cs" />
-    <Compile Include="InputPin.cs" />
+    <Compile Include="DigitalOutput.cs" />
+    <Compile Include="DigitalInput.cs" />
     <Compile Include="Pin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Properties\Waher.Things.Gpio.rd.xml" />

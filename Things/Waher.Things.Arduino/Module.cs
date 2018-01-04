@@ -53,7 +53,7 @@ namespace Waher.Things.Arduino
 
 					foreach (INode Node in await MeteringTopology.Root.ChildNodes)
 					{
-						if (Node is UsbSerialPort Port)
+						if (Node is UsbConnectedDevice Port)
 						{
 							if (Port.PortName == DeviceInfo.Name)
 							{
@@ -66,7 +66,7 @@ namespace Waher.Things.Arduino
 					if (Found)
 						continue;
 
-					UsbSerialPort Port2 = new UsbSerialPort()
+					UsbConnectedDevice Port2 = new UsbConnectedDevice()
 					{
 						NodeId = DeviceInfo.Name,
 						PortName = DeviceInfo.Name

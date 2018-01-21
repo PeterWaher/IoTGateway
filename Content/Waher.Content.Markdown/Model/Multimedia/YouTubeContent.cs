@@ -14,8 +14,8 @@ namespace Waher.Content.Markdown.Model.Multimedia
 	/// </summary>
 	public class YouTubeContent : MultimediaContent
 	{
-		private Regex youTubeLink = new Regex(@"^http(s)?://www[.]youtube[.]com/watch[?]v=(?'VideoId'[^&].*)", RegexOptions.Singleline | RegexOptions.Compiled);
-		private Regex youTubeLink2 = new Regex(@"^http(s)?://www[.]youtu[.]be/(?'VideoId'[^&].*)", RegexOptions.Singleline | RegexOptions.Compiled);
+		private Regex youTubeLink = new Regex(@"^http(s)?://(www[.])?youtube[.]com/watch[?]v=(?'VideoId'[^&].*)", RegexOptions.Singleline | RegexOptions.Compiled);
+		private Regex youTubeLink2 = new Regex(@"^http(s)?://(www[.])?youtu[.]be/(?'VideoId'[^&].*)", RegexOptions.Singleline | RegexOptions.Compiled);
 
 		/// <summary>
 		/// YouTube content.

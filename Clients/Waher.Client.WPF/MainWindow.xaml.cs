@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media.Imaging;
 using Microsoft.Win32;
 using Waher.Content.Xml;
 using Waher.Events;
@@ -350,12 +351,10 @@ namespace Waher.Client.WPF
 				}
 			}
 
-			TabItem TabItem = new TabItem();
+			TabItem TabItem = MainWindow.NewTab(Node.Header);
 			this.Tabs.Items.Add(TabItem);
 
 			View = new SnifferView(Node);
-
-			TabItem.Header = Node.Header;
 			TabItem.Content = View;
 
 			View.Sniffer = new TabSniffer(TabItem, View);
@@ -412,12 +411,10 @@ namespace Waher.Client.WPF
 				}
 			}
 
-			TabItem TabItem = new TabItem();
+			TabItem TabItem = MainWindow.NewTab(Node.Header);
 			this.Tabs.Items.Add(TabItem);
 
 			View = new ChatView(Node);
-
-			TabItem.Header = Node.Header;
 			TabItem.Content = View;
 
 			this.Tabs.SelectedItem = TabItem;
@@ -594,12 +591,10 @@ namespace Waher.Client.WPF
 
 				if (XmppAccountNode.TryGetChild(e.FromBareJID, out TreeNode ContactNode))
 				{
-					TabItem TabItem2 = new TabItem();
+					TabItem TabItem2 = MainWindow.NewTab(e.FromBareJID);
 					this.Tabs.Items.Add(TabItem2);
 
 					ChatView = new ChatView(ContactNode);
-
-					TabItem2.Header = e.FromBareJID;
 					TabItem2.Content = ChatView;
 
 					ChatView.ChatMessageReceived(Message, IsMarkdown, this);
@@ -636,12 +631,10 @@ namespace Waher.Client.WPF
 			if (Request == null)
 				return;
 
-			TabItem TabItem = new TabItem();
+			TabItem TabItem = MainWindow.NewTab(Node.Header);
 			this.Tabs.Items.Add(TabItem);
 
 			SensorDataView View = new SensorDataView(Request, Node, false);
-
-			TabItem.Header = Node.Header;
 			TabItem.Content = View;
 
 			this.Tabs.SelectedItem = TabItem;
@@ -663,12 +656,10 @@ namespace Waher.Client.WPF
 			if (Request == null)
 				return;
 
-			TabItem TabItem = new TabItem();
+			TabItem TabItem = MainWindow.NewTab(Node.Header);
 			this.Tabs.Items.Add(TabItem);
 
 			SensorDataView View = new SensorDataView(Request, Node, false);
-
-			TabItem.Header = Node.Header;
 			TabItem.Content = View;
 
 			this.Tabs.SelectedItem = TabItem;
@@ -696,12 +687,10 @@ namespace Waher.Client.WPF
 			if (Request == null)
 				return;
 
-			TabItem TabItem = new TabItem();
+			TabItem TabItem = MainWindow.NewTab(Node.Header);
 			this.Tabs.Items.Add(TabItem);
 
 			SensorDataView View = new SensorDataView(Request, Node, true);
-
-			TabItem.Header = Node.Header;
 			TabItem.Content = View;
 
 			this.Tabs.SelectedItem = TabItem;
@@ -787,12 +776,10 @@ namespace Waher.Client.WPF
 
 		private void Script_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
-			TabItem TabItem = new TabItem();
+			TabItem TabItem = MainWindow.NewTab("Script");
 			this.Tabs.Items.Add(TabItem);
 
 			ScriptView ScriptView = new ScriptView();
-
-			TabItem.Header = "Script";
 			TabItem.Content = ScriptView;
 
 			this.Tabs.SelectedItem = TabItem;
@@ -866,16 +853,70 @@ namespace Waher.Client.WPF
 
 		private QuestionView CreateQuestionTab(XmppAccountNode Owner, ProvisioningClient ProvisioningClient)
 		{
-			TabItem TabItem = new TabItem();
+			TabItem TabItem = MainWindow.NewTab("Questions (" + Owner.BareJID + ")");
 			this.Tabs.Items.Add(TabItem);
 
 			QuestionView QuestionView = new QuestionView(Owner, ProvisioningClient);
-
-			TabItem.Header = "Questions (" + Owner.BareJID + ")";
 			TabItem.Content = QuestionView;
 
 			return QuestionView;
 		}
 
+		internal static TabItem NewTab(string HeaderText)
+		{
+			StackPanel Header = new StackPanel()
+			{
+				Orientation = Orientation.Horizontal
+			};
+
+			Image CloseImage = new Image()
+			{
+				Source = new BitmapImage(new Uri("../Graphics/symbol-delete-icon-gray.png", UriKind.Relative)),
+				Width = 16,
+				Height = 16,
+				ToolTip = "Close tab"
+			};
+
+			Header.Children.Add(new TextBlock()
+			{
+				Text = HeaderText,
+				Margin = new Thickness(0, 0, 5, 0)
+			});
+			Header.Children.Add(CloseImage);
+
+			TabItem Result = new TabItem()
+			{
+				Header = Header
+			};
+
+			CloseImage.MouseLeftButtonDown += CloseImage_MouseLeftButtonDown;
+			CloseImage.MouseEnter += CloseImage_MouseEnter;
+			CloseImage.MouseLeave += CloseImage_MouseLeave;
+			CloseImage.Tag = Result;
+
+			return Result;
+		}
+
+		private static void CloseImage_MouseLeave(object sender, MouseEventArgs e)
+		{
+			if (sender is Image Image)
+				Image.Source = new BitmapImage(new Uri("../Graphics/symbol-delete-icon-gray.png", UriKind.Relative));
+		}
+
+		private static void CloseImage_MouseEnter(object sender, MouseEventArgs e)
+		{
+			if (sender is Image Image)
+				Image.Source = new BitmapImage(new Uri("../Graphics/symbol-delete-icon.png", UriKind.Relative));
+		}
+
+		private static void CloseImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+		{
+			if ((sender as Image)?.Tag is TabItem Item)
+			{
+				MainWindow.currentInstance?.Tabs?.Items.Remove(Item);
+				if (Item is IDisposable Disposable)
+					Disposable.Dispose();
+			}
+		}
 	}
 }

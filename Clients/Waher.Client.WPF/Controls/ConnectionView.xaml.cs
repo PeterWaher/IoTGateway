@@ -207,12 +207,10 @@ namespace Waher.Client.WPF.Controls
 						break;
 
 					case "Sniff":
-						TabItem TabItem = new TabItem();
+						TabItem TabItem = MainWindow.NewTab(System.IO.Path.GetFileName(FileName));
 						this.MainWindow.Tabs.Items.Add(TabItem);
 
 						SnifferView SnifferView = new SnifferView(null);
-
-						TabItem.Header = System.IO.Path.GetFileName(FileName);
 						TabItem.Content = SnifferView;
 
 						SnifferView.Sniffer = new TabSniffer(TabItem, SnifferView);
@@ -223,14 +221,13 @@ namespace Waher.Client.WPF.Controls
 						break;
 
 					case "Chat":
-						TabItem = new TabItem();
+						TabItem = MainWindow.NewTab(System.IO.Path.GetFileName(FileName));
 						this.MainWindow.Tabs.Items.Add(TabItem);
 
 						ChatView ChatView = new ChatView(null);
 						ChatView.Input.IsEnabled = false;
 						ChatView.SendButton.IsEnabled = false;
 
-						TabItem.Header = System.IO.Path.GetFileName(FileName);
 						TabItem.Content = ChatView;
 
 						this.MainWindow.Tabs.SelectedItem = TabItem;
@@ -239,12 +236,10 @@ namespace Waher.Client.WPF.Controls
 						break;
 
 					case "SensorData":
-						TabItem = new TabItem();
+						TabItem = MainWindow.NewTab(System.IO.Path.GetFileName(FileName));
 						this.MainWindow.Tabs.Items.Add(TabItem);
 
 						SensorDataView SensorDataView = new SensorDataView(null, null, false);
-
-						TabItem.Header = System.IO.Path.GetFileName(FileName);
 						TabItem.Content = SensorDataView;
 
 						this.MainWindow.Tabs.SelectedItem = TabItem;
@@ -253,12 +248,10 @@ namespace Waher.Client.WPF.Controls
 						break;
 
 					case "SearchResult":
-						TabItem = new TabItem();
+						TabItem = MainWindow.NewTab(System.IO.Path.GetFileName(FileName));
 						this.MainWindow.Tabs.Items.Add(TabItem);
 
 						SearchResultView SearchResultView = new SearchResultView();
-
-						TabItem.Header = System.IO.Path.GetFileName(FileName);
 						TabItem.Content = SearchResultView;
 
 						this.MainWindow.Tabs.SelectedItem = TabItem;
@@ -267,12 +260,10 @@ namespace Waher.Client.WPF.Controls
 						break;
 
 					case "Script":
-						TabItem = new TabItem();
+						TabItem = MainWindow.NewTab(System.IO.Path.GetFileName(FileName));
 						this.MainWindow.Tabs.Items.Add(TabItem);
 
 						ScriptView ScriptView = new ScriptView();
-
-						TabItem.Header = System.IO.Path.GetFileName(FileName);
 						TabItem.Content = ScriptView;
 
 						this.MainWindow.Tabs.SelectedItem = TabItem;

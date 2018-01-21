@@ -505,6 +505,12 @@
     <Resource Include="Graphics\Transfer-icon_16.png" />
     <Resource Include="Graphics\Transfer-icon_32.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Graphics\symbol-delete-icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Graphics\symbol-delete-icon-gray.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\..\packages\SkiaSharp.1.59.3\build\net45\SkiaSharp.targets" Condition="Exists('..\..\packages\SkiaSharp.1.59.3\build\net45\SkiaSharp.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

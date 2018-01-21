@@ -411,12 +411,10 @@ namespace Waher.Client.WPF.Model
 
 				MainWindow.currentInstance.Dispatcher.Invoke(() =>
 				{
-					TabItem TabItem = new TabItem();
+					TabItem TabItem = MainWindow.NewTab("Search Result");
 					MainWindow.currentInstance.Tabs.Items.Add(TabItem);
 
 					SearchResultView View = new SearchResultView(Headers.ToArray(), Records.ToArray());
-
-					TabItem.Header = "Search Result";
 					TabItem.Content = View;
 
 					MainWindow.currentInstance.Tabs.SelectedItem = TabItem;

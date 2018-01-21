@@ -164,7 +164,7 @@ You may not use, copy, emulate, clone, rent, lease, sell, modify, decompile, dis
 licensed program, or any subset of the licensed program, except as provided for in this agreement.  Any such unauthorised use shall
 result in immediate and automatic termination of this license and may result in criminal and/or civil prosecution.
 
-The [source code](https://github.com/PeterWaher/IoTGateway) provided in this project is provided open for the following uses:
+The [source code](https://github.com/PeterWaher/IoTGateway) and libraries provided in this project is provided open for the following uses:
 
 * For **Personal evaluation**. Personal evaluation means evaluating the code, its libraries and underlying technologies, including learning 
 	about underlying technologies.

@@ -54,7 +54,7 @@ as defined by John Gruber at Daring Fireball, but contains numerous other additi
     `[someref]: some/url "some title" WIDTH HEIGHT`
 
 	Multiresolution or Multiformatted multimedia can be included by including a sequence of sources. If inline mode is used, each source is written
-	between a set of parenthesis. The sources are then optionally separated by whitespace (inluding on a new row).
+	between a set of parenthesis. The sources are then optionally separated by whitespace (including on a new row).
 
 There are numerous typographical enhancements added to the parser. These are inspired by the the [Smarty Pants](http://daringfireball.net/projects/smartypants/) 
 addition to the original markdown, but numerous other character sequences are also supported:
@@ -164,25 +164,25 @@ You may not use, copy, emulate, clone, rent, lease, sell, modify, decompile, dis
 licensed program, or any subset of the licensed program, except as provided for in this agreement.  Any such unauthorised use shall
 result in immediate and automatic termination of this license and may result in criminal and/or civil prosecution.
 
-The [source code](https://github.com/PeterWaher/IoTGateway) and libraries provided in this project is provided open for the following uses:
+The [source code](https://github.com/PeterWaher/IoTGateway) and libraries provided in this repository is provided open for the following uses:
 
 * For **Personal evaluation**. Personal evaluation means evaluating the code, its libraries and underlying technologies, including learning 
 	about underlying technologies.
 
 * For **Academic use**. If you want to use the following code for academic use, all you need to do is to inform the author of who you are, what 
 	academic institution you work for (or study for), and in what projects you intend to use the code. All I ask in return is for an 
-	acknowledgement and visible attribution to this project, inluding a link, and that you do not redistribute the source code, or parts thereof 
+	acknowledgement and visible attribution to this repository, including a link, and that you do not redistribute the source code, or parts thereof 
 	in the solutions you develop. Any solutions developed for academic use, that become commercial, require a commercial license.
 
-* For **Security analysis**. If you perform any security analysis on the code, to see what security aspects the code might have,
-	all I ask is that you inform me of any findings so that any vulnerabilities might be addressed. I am thankful for any such contributions,
-	and will acknowledge them.
+* For **Security analysis**. If you perform any security analysis on the code, to see what security aspects the code might have, all that is 
+	asked of you, is that you inform the author of any findings at least forty-five days before publication of the findings, so that any vulnerabilities 
+	might be addressed. Such contributions are much appreciated and will be acknowledged.
 
 Commercial use of the code, in part or in full, in compiled binary form, or its source code, requires
 a **Commercial License**. Contact the author for details.
 
 All rights to the source code are reserved and exclusively owned by [Waher Data AB](http://waher.se/). 
-Any contributions made to the project become the intellectual property of [Waher Data AB](http://waher.se/).
+Any contributions made to the **IoT Gateway** repository become the intellectual property of [Waher Data AB](http://waher.se/).
 If you're interested in using the source code, as a whole, or in part, you need a license agreement 
 with the author. You can contact him through [LinkedIn](http://waher.se/).
 

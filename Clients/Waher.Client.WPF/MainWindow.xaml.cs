@@ -113,28 +113,28 @@ namespace Waher.Client.WPF
 				Log.RegisterExceptionToUnnest(typeof(System.Security.Authentication.AuthenticationException));
 
 				Value = Registry.GetValue(registryKey, "WindowLeft", (int)this.Left);
-				if (Value != null && Value is int)
-					this.Left = (int)Value;
+				if (Value != null && Value is int WindowLeft)
+					this.Left = WindowLeft;
 
 				Value = Registry.GetValue(registryKey, "WindowTop", (int)this.Top);
-				if (Value != null && Value is int)
-					this.Top = (int)Value;
+				if (Value != null && Value is int WindowTop)
+					this.Top = WindowTop;
 
 				Value = Registry.GetValue(registryKey, "WindowWidth", (int)this.Width);
-				if (Value != null && Value is int)
-					this.Width = (int)Value;
+				if (Value != null && Value is int WindowWidth && WindowWidth > 0)
+					this.Width = WindowWidth;
 
 				Value = Registry.GetValue(registryKey, "WindowHeight", (int)this.Height);
-				if (Value != null && Value is int)
-					this.Height = (int)Value;
+				if (Value != null && Value is int WindowHeight && WindowHeight > 0)
+					this.Height = WindowHeight;
 
 				Value = Registry.GetValue(registryKey, "ConnectionTreeWidth", (int)this.MainView.ConnectionTree.Width);
-				if (Value != null && Value is int)
-					this.MainView.ConnectionsGrid.ColumnDefinitions[0].Width = new GridLength((int)Value);
+				if (Value != null && Value is int ConnectionTreeWidth && ConnectionTreeWidth > 0)
+					this.MainView.ConnectionsGrid.ColumnDefinitions[0].Width = new GridLength(ConnectionTreeWidth);
 
 				Value = Registry.GetValue(registryKey, "WindowState", this.WindowState.ToString());
-				if (Value != null && Value is string)
-					this.WindowState = (WindowState)Enum.Parse(typeof(WindowState), (string)Value);
+				if (Value != null && Value is string s && Enum.TryParse<WindowState>(s, out WindowState WindowState))
+					this.WindowState = WindowState;
 
 				Value = Registry.GetValue(registryKey, "FileName", string.Empty);
 				if (Value != null && Value is string)

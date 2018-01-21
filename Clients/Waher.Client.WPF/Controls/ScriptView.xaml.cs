@@ -114,13 +114,12 @@ namespace Waher.Client.WPF.Controls
 
 					this.variables["Ans"] = Ans;
 
-					this.Dispatcher.Invoke(() =>
+					this.Dispatcher.BeginInvoke(new ThreadStart(() =>
 					{
-						Graph G = Ans as Graph;
 						SKImage Img;
 						object Obj;
 
-						if (G != null)
+						if (Ans is Graph G)
 						{
 							GraphSettings Settings = new GraphSettings();
 							Tuple<int, int> Size;
@@ -169,11 +168,9 @@ namespace Waher.Client.WPF.Controls
 							this.AddImageBlock(ScriptBlock, Img);
 						else if (Ans.AssociatedObjectValue is Exception ex)
 						{
-							AggregateException ex2;
-
 							ex = Log.UnnestException(ex);
 
-							if ((ex2 = ex as AggregateException) != null)
+							if (ex is AggregateException ex2)
 							{
 								foreach (Exception ex3 in ex2.InnerExceptions)
 									ScriptBlock = this.AddTextBlock(ScriptBlock, ex3.Message, Colors.Red, FontWeights.Bold, ex3);
@@ -183,15 +180,15 @@ namespace Waher.Client.WPF.Controls
 						}
 						else
 							this.AddTextBlock(ScriptBlock, Ans.ToString(), Colors.Red, FontWeights.Normal, true);
-					});
+					}));
 				}
 				catch (Exception ex)
 				{
-					this.Dispatcher.Invoke(() =>
+					this.Dispatcher.BeginInvoke(new ThreadStart(() =>
 					{
 						ex = Log.UnnestException(ex);
 						MessageBox.Show(MainWindow.currentInstance, ex.Message, "Unable to parse script.", MessageBoxButton.OK, MessageBoxImage.Error);
-					});
+					}));
 				}
 			});
 		}
@@ -321,7 +318,7 @@ namespace Waher.Client.WPF.Controls
 
 		internal void Print(string Output)
 		{
-			MainWindow.currentInstance.Dispatcher.Invoke(() => this.AddTextBlock(null, Output, Colors.Blue, FontWeights.Normal, false));
+			MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() => this.AddTextBlock(null, Output, Colors.Blue, FontWeights.Normal, false)));
 		}
 
 		public void NewButton_Click(object sender, RoutedEventArgs e)

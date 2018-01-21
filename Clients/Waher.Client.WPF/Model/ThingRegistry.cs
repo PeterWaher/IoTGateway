@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 using Waher.Content;
 using Waher.Events;
 using Waher.Networking.XMPP;
@@ -96,8 +97,8 @@ namespace Waher.Client.WPF.Model
 
 					await Database.Insert(Question);
 
-					MainWindow.currentInstance.Dispatcher.Invoke(() =>
-						MainWindow.currentInstance.NewQuestion(this.Account, this.provisioningClient, Question));
+					DispatcherOperation Op = MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() =>
+						MainWindow.currentInstance.NewQuestion(this.Account, this.provisioningClient, Question)));
 				}
 			}
 			catch (Exception ex)
@@ -135,8 +136,8 @@ namespace Waher.Client.WPF.Model
 
 					await Database.Insert(Question);
 
-					MainWindow.currentInstance.Dispatcher.Invoke(() =>
-						MainWindow.currentInstance.NewQuestion(this.Account, this.provisioningClient, Question));
+					DispatcherOperation Op = MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() =>
+						MainWindow.currentInstance.NewQuestion(this.Account, this.provisioningClient, Question)));
 				}
 			}
 			catch (Exception ex)
@@ -173,8 +174,8 @@ namespace Waher.Client.WPF.Model
 
 					await Database.Insert(Question);
 
-					MainWindow.currentInstance.Dispatcher.Invoke(() =>
-						MainWindow.currentInstance.NewQuestion(this.Account, this.provisioningClient, Question));
+					DispatcherOperation Op = MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() =>
+						MainWindow.currentInstance.NewQuestion(this.Account, this.provisioningClient, Question)));
 				}
 			}
 			catch (Exception ex)
@@ -409,7 +410,7 @@ namespace Waher.Client.WPF.Model
 
 				// TODO: Pages, if more things available.
 
-				MainWindow.currentInstance.Dispatcher.Invoke(() =>
+				MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() =>
 				{
 					TabItem TabItem = MainWindow.NewTab("Search Result");
 					MainWindow.currentInstance.Tabs.Items.Add(TabItem);
@@ -418,13 +419,13 @@ namespace Waher.Client.WPF.Model
 					TabItem.Content = View;
 
 					MainWindow.currentInstance.Tabs.SelectedItem = TabItem;
-				});
+				}));
 			}
 			else
 			{
-				MainWindow.currentInstance.Dispatcher.Invoke(() => MessageBox.Show(MainWindow.currentInstance,
+				MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() => MessageBox.Show(MainWindow.currentInstance,
 					string.IsNullOrEmpty(e.ErrorText) ? "Unable to perform search." : e.ErrorText, "Error",
-					MessageBoxButton.OK, MessageBoxImage.Error));
+					MessageBoxButton.OK, MessageBoxImage.Error)));
 			}
 		}
 
@@ -469,17 +470,17 @@ namespace Waher.Client.WPF.Model
 							}
 						}
 
-						MainWindow.currentInstance.Dispatcher.Invoke(() => MessageBox.Show(MainWindow.currentInstance,
-							Msg.ToString(), "Success", MessageBoxButton.OK, MessageBoxImage.Information));
+						MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() => MessageBox.Show(MainWindow.currentInstance,
+							Msg.ToString(), "Success", MessageBoxButton.OK, MessageBoxImage.Information)));
 
 						if (this.Account.Client.GetRosterItem(e.JID) == null)
 							this.Account.Client.RequestPresenceSubscription(e.JID);
 					}
 					else
 					{
-						MainWindow.currentInstance.Dispatcher.Invoke(() => MessageBox.Show(MainWindow.currentInstance,
+						MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() => MessageBox.Show(MainWindow.currentInstance,
 							string.IsNullOrEmpty(e.ErrorText) ? "Unable to claim device." : e.ErrorText, "Error",
-							MessageBoxButton.OK, MessageBoxImage.Error));
+							MessageBoxButton.OK, MessageBoxImage.Error)));
 					}
 				}, null);
 			}
@@ -539,14 +540,14 @@ namespace Waher.Client.WPF.Model
 			{
 				if (e2.Ok)
 				{
-					MainWindow.currentInstance.Dispatcher.Invoke(() => MessageBox.Show(MainWindow.currentInstance,
-						"The rule caches in your connected devices have been cleared.", "Success", MessageBoxButton.OK, MessageBoxImage.Information));
+					MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() => MessageBox.Show(MainWindow.currentInstance,
+						"The rule caches in your connected devices have been cleared.", "Success", MessageBoxButton.OK, MessageBoxImage.Information)));
 				}
 				else
 				{
-					MainWindow.currentInstance.Dispatcher.Invoke(() => MessageBox.Show(MainWindow.currentInstance,
+					MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() => MessageBox.Show(MainWindow.currentInstance,
 						string.IsNullOrEmpty(e2.ErrorText) ? "Unable to clear rule caches in your connected devices." : e2.ErrorText, 
-						"Error", MessageBoxButton.OK, MessageBoxImage.Information));
+						"Error", MessageBoxButton.OK, MessageBoxImage.Information)));
 				}
 			}, null);
 		}
@@ -657,14 +658,14 @@ namespace Waher.Client.WPF.Model
 			{
 				if (e2.Ok)
 				{
-					MainWindow.currentInstance.Dispatcher.Invoke(() => MessageBox.Show(MainWindow.currentInstance,
-						"The rule cache in " + Contact.BareJID + " has been cleared.", "Success", MessageBoxButton.OK, MessageBoxImage.Information));
+					MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() => MessageBox.Show(MainWindow.currentInstance,
+						"The rule cache in " + Contact.BareJID + " has been cleared.", "Success", MessageBoxButton.OK, MessageBoxImage.Information)));
 				}
 				else
 				{
-					MainWindow.currentInstance.Dispatcher.Invoke(() => MessageBox.Show(MainWindow.currentInstance,
+					MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() => MessageBox.Show(MainWindow.currentInstance,
 						string.IsNullOrEmpty(e2.ErrorText) ? "Unable to clear the rule cache in " + Contact.BareJID + "." : e2.ErrorText,
-						"Error", MessageBoxButton.OK, MessageBoxImage.Information));
+						"Error", MessageBoxButton.OK, MessageBoxImage.Information)));
 				}
 			}, null);
 		}
@@ -678,14 +679,14 @@ namespace Waher.Client.WPF.Model
 			{
 				if (e2.Ok)
 				{
-					MainWindow.currentInstance.Dispatcher.Invoke(() => MessageBox.Show(MainWindow.currentInstance,
-						"The rules in " + Contact.BareJID + " have been deleted.", "Success", MessageBoxButton.OK, MessageBoxImage.Information));
+					MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() => MessageBox.Show(MainWindow.currentInstance,
+						"The rules in " + Contact.BareJID + " have been deleted.", "Success", MessageBoxButton.OK, MessageBoxImage.Information)));
 				}
 				else
 				{
-					MainWindow.currentInstance.Dispatcher.Invoke(() => MessageBox.Show(MainWindow.currentInstance,
+					MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() => MessageBox.Show(MainWindow.currentInstance,
 						string.IsNullOrEmpty(e2.ErrorText) ? "Unable to delete the rules in " + Contact.BareJID + "." : e2.ErrorText,
-						"Error", MessageBoxButton.OK, MessageBoxImage.Information));
+						"Error", MessageBoxButton.OK, MessageBoxImage.Information)));
 				}
 			}, null);
 		}
@@ -699,14 +700,14 @@ namespace Waher.Client.WPF.Model
 			{
 				if (e2.Ok)
 				{
-					MainWindow.currentInstance.Dispatcher.Invoke(() => MessageBox.Show(MainWindow.currentInstance,
-						"The rules in " + Node.Header + " have been deleted.", "Success", MessageBoxButton.OK, MessageBoxImage.Information));
+					MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() => MessageBox.Show(MainWindow.currentInstance,
+						"The rules in " + Node.Header + " have been deleted.", "Success", MessageBoxButton.OK, MessageBoxImage.Information)));
 				}
 				else
 				{
-					MainWindow.currentInstance.Dispatcher.Invoke(() => MessageBox.Show(MainWindow.currentInstance,
+					MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() => MessageBox.Show(MainWindow.currentInstance,
 						string.IsNullOrEmpty(e2.ErrorText) ? "Unable to delete the rules in " + Node.Header + "." : e2.ErrorText,
-						"Error", MessageBoxButton.OK, MessageBoxImage.Information));
+						"Error", MessageBoxButton.OK, MessageBoxImage.Information)));
 				}
 			}, null);
 		}
@@ -720,14 +721,14 @@ namespace Waher.Client.WPF.Model
 			{
 				if (e2.Ok)
 				{
-					MainWindow.currentInstance.Dispatcher.Invoke(() => MessageBox.Show(MainWindow.currentInstance,
-						Contact.BareJID + " has been disowned.", "Success", MessageBoxButton.OK, MessageBoxImage.Information));
+					MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() => MessageBox.Show(MainWindow.currentInstance,
+						Contact.BareJID + " has been disowned.", "Success", MessageBoxButton.OK, MessageBoxImage.Information)));
 				}
 				else
 				{
-					MainWindow.currentInstance.Dispatcher.Invoke(() => MessageBox.Show(MainWindow.currentInstance,
+					MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() => MessageBox.Show(MainWindow.currentInstance,
 						string.IsNullOrEmpty(e2.ErrorText) ? "Unable to disown " + Contact.BareJID + "." : e2.ErrorText,
-						"Error", MessageBoxButton.OK, MessageBoxImage.Information));
+						"Error", MessageBoxButton.OK, MessageBoxImage.Information)));
 				}
 			}, null);
 		}
@@ -741,14 +742,14 @@ namespace Waher.Client.WPF.Model
 			{
 				if (e2.Ok)
 				{
-					MainWindow.currentInstance.Dispatcher.Invoke(() => MessageBox.Show(MainWindow.currentInstance,
-						Node.Header + " has been disowned.", "Success", MessageBoxButton.OK, MessageBoxImage.Information));
+					MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() => MessageBox.Show(MainWindow.currentInstance,
+						Node.Header + " has been disowned.", "Success", MessageBoxButton.OK, MessageBoxImage.Information)));
 				}
 				else
 				{
-					MainWindow.currentInstance.Dispatcher.Invoke(() => MessageBox.Show(MainWindow.currentInstance,
+					MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() => MessageBox.Show(MainWindow.currentInstance,
 						string.IsNullOrEmpty(e2.ErrorText) ? "Unable to disown " + Node.Header + "." : e2.ErrorText,
-						"Error", MessageBoxButton.OK, MessageBoxImage.Information));
+						"Error", MessageBoxButton.OK, MessageBoxImage.Information)));
 				}
 			}, null);
 		}

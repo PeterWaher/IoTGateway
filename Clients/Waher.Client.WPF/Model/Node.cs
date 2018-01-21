@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Windows.Media;
 using System.Windows.Input;
 using System.Xml;
@@ -111,7 +112,7 @@ namespace Waher.Client.WPF.Model
 							"en", string.Empty, string.Empty, string.Empty, (sender, e) =>
 						{
 							this.loadingChildren = false;
-							MainWindow.currentInstance.Dispatcher.Invoke(() => Mouse.OverrideCursor = null);
+							MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() => Mouse.OverrideCursor = null));
 
 							if (e.Ok)
 							{

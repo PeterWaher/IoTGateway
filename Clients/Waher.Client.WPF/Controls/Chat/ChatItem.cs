@@ -120,7 +120,7 @@ namespace Waher.Client.WPF.Controls.Chat
 
 				MarkdownDocument Markdown = new MarkdownDocument(s, new MarkdownSettings(ChatView.Emoji1_24x24, false));
 
-				MainWindow.Dispatcher.Invoke(() => this.Refresh2(ChatListView, s, Markdown));
+				MainWindow.Dispatcher.BeginInvoke(new ThreadStart(() => this.Refresh2(ChatListView, s, Markdown)));
 			}
 			catch (Exception ex)
 			{
@@ -175,9 +175,8 @@ namespace Waher.Client.WPF.Controls.Chat
 			int i, c = VisualTreeHelper.GetChildrenCount(Element);
 			DependencyObject Child;
 			Hyperlink Hyperlink;
-			TextBlock TextBlock;
 
-			if ((TextBlock = Element as TextBlock) != null)
+			if (Element is TextBlock TextBlock)
 			{
 				foreach (Inline Inline in TextBlock.Inlines)
 				{

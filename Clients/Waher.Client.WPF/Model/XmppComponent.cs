@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -84,23 +84,23 @@ namespace Waher.Client.WPF.Model
 			{
 				if (e.Ok)
 				{
-					MainWindow.currentInstance.Dispatcher.Invoke(() =>
+					MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() =>
 					{
 						ParameterDialog Dialog = new ParameterDialog(e.SearchForm);
 						Dialog.ShowDialog();
-					});
+					}));
 				}
 				else
 				{
-					MainWindow.currentInstance.Dispatcher.Invoke(() => MessageBox.Show(MainWindow.currentInstance,
+					MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() => MessageBox.Show(MainWindow.currentInstance,
 						string.IsNullOrEmpty(e.ErrorText) ? "Unable to get search form." : e.ErrorText, "Error",
-						MessageBoxButton.OK, MessageBoxImage.Error));
+						MessageBoxButton.OK, MessageBoxImage.Error)));
 				}
 			}, (sender, e) =>
 			{
 				if (e.Ok)
 				{
-					MainWindow.currentInstance.Dispatcher.Invoke(() =>
+					MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() =>
 					{
 						TabItem TabItem = MainWindow.NewTab("Search Result");
 						MainWindow.currentInstance.Tabs.Items.Add(TabItem);
@@ -109,13 +109,13 @@ namespace Waher.Client.WPF.Model
 						TabItem.Content = View;
 
 						MainWindow.currentInstance.Tabs.SelectedItem = TabItem;
-					});
+					}));
 				}
 				else
 				{
-					MainWindow.currentInstance.Dispatcher.Invoke(() => MessageBox.Show(MainWindow.currentInstance,
+					MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() => MessageBox.Show(MainWindow.currentInstance,
 						string.IsNullOrEmpty(e.ErrorText) ? "Unable to perform search." : e.ErrorText, "Error",
-						MessageBoxButton.OK, MessageBoxImage.Error));
+						MessageBoxButton.OK, MessageBoxImage.Error)));
 				}
 			}, null);
 		}

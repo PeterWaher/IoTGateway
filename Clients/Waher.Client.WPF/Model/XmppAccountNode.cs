@@ -1020,8 +1020,8 @@ namespace Waher.Client.WPF.Model
 
 							if (ThingRegistry != null && ThingRegistry.SupportsProvisioning)
 							{
-								MainWindow.currentInstance.Dispatcher.Invoke(() =>
-									MainWindow.currentInstance.NewQuestion(this, ThingRegistry.ProvisioningClient, null));
+								MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() =>
+									MainWindow.currentInstance.NewQuestion(this, ThingRegistry.ProvisioningClient, null)));
 							}
 						}
 						catch (Exception ex)
@@ -1105,13 +1105,13 @@ namespace Waher.Client.WPF.Model
 					this.passwordHash = string.Empty;
 					this.client.Reconnect(this.client.UserName, NewPassword);
 
-					MainWindow.currentInstance.Dispatcher.Invoke(() => MessageBox.Show(MainWindow.currentInstance,
-						"Password successfully changed.", "Success", MessageBoxButton.OK, MessageBoxImage.Information));
+					MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() => MessageBox.Show(MainWindow.currentInstance,
+						"Password successfully changed.", "Success", MessageBoxButton.OK, MessageBoxImage.Information)));
 				}
 				else
 				{
-					MainWindow.currentInstance.Dispatcher.Invoke(() => MessageBox.Show(MainWindow.currentInstance,
-						"Unable to change password.", "Error", MessageBoxButton.OK, MessageBoxImage.Error));
+					MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() => MessageBox.Show(MainWindow.currentInstance,
+						"Unable to change password.", "Error", MessageBoxButton.OK, MessageBoxImage.Error)));
 				}
 			}, null);
 		}

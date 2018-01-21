@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
-using System.Threading.Tasks;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Threading;
 using Waher.Events;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Provisioning;
@@ -414,7 +415,7 @@ namespace Waher.Client.WPF.Controls.Questions
 					this.availableFieldNames = Fields;
 					await Database.Update(this);
 
-					MainWindow.currentInstance.Dispatcher.Invoke(() =>
+					DispatcherOperation Op = MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() =>
 					{
 						SortedDictionary<string, bool> Selected = null;
 						bool AllSelected = this.fieldNames == null;
@@ -441,7 +442,7 @@ namespace Waher.Client.WPF.Controls.Questions
 								Tag = FieldName
 							});
 						}
-					});
+					}));
 				}
 			}
 			catch (Exception ex)
@@ -499,14 +500,14 @@ namespace Waher.Client.WPF.Controls.Questions
 					await this.Processed(this.questionView);
 				else
 				{
-					MainWindow.currentInstance.Dispatcher.Invoke(() => MessageBox.Show(MainWindow.currentInstance,
-						string.IsNullOrEmpty(e.ErrorText) ? "Unable to set rule." : e.ErrorText, "Error", MessageBoxButton.OK, MessageBoxImage.Error));
+					DispatcherOperation Op = MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() => MessageBox.Show(MainWindow.currentInstance,
+						string.IsNullOrEmpty(e.ErrorText) ? "Unable to set rule." : e.ErrorText, "Error", MessageBoxButton.OK, MessageBoxImage.Error)));
 				}
 			}
 			catch (Exception ex)
 			{
-				MainWindow.currentInstance.Dispatcher.Invoke(() => MessageBox.Show(MainWindow.currentInstance,
-					ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error));
+				DispatcherOperation Op = MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() => MessageBox.Show(MainWindow.currentInstance,
+					ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error)));
 			}
 		}
 

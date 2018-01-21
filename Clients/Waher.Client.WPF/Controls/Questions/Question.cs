@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -151,7 +151,7 @@ namespace Waher.Client.WPF.Controls.Questions
 
 		public async Task Processed(QuestionView QuestionView)
 		{
-			MainWindow.currentInstance.Dispatcher.Invoke(() =>
+			await MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() =>
 			{
 				int i = QuestionView.QuestionListView.SelectedIndex;
 				int c;
@@ -164,7 +164,7 @@ namespace Waher.Client.WPF.Controls.Questions
 					MainWindow.currentInstance.CloseTab_Executed(this, null);
 				else if (i < c)
 					QuestionView.QuestionListView.SelectedIndex = i;
-			});
+			}));
 
 			await Database.Delete(this);
 
@@ -183,14 +183,14 @@ namespace Waher.Client.WPF.Controls.Questions
 
 			if (ToRemove != null)
 			{
-				MainWindow.currentInstance.Dispatcher.Invoke(() =>
+				await MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() =>
 				{
 					foreach (Question Question in ToRemove)
 						QuestionView.QuestionListView.Items.Remove(Question);
 
 					if (QuestionView.QuestionListView.Items.Count == 0)
 						MainWindow.currentInstance.CloseTab_Executed(this, null);
-				});
+				}));
 
 				foreach (Question Question in ToRemove)
 					await Database.Delete(Question);

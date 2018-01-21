@@ -9,6 +9,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 using Microsoft.Win32;
 using Waher.Content.Xml;
 using Waher.Events;
@@ -92,7 +93,7 @@ namespace Waher.Client.WPF
 				}
 				catch (Exception ex)
 				{
-					Dispatcher.Invoke(() => MessageBox.Show(this, ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error));
+					Dispatcher.BeginInvoke(new ThreadStart(() => MessageBox.Show(this, ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error)));
 				}
 			});
 
@@ -816,14 +817,14 @@ namespace Waher.Client.WPF
 
 					if (Questions.First != null)
 					{
-						MainWindow.currentInstance.Dispatcher.Invoke(() =>
+						DispatcherOperation Op = MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() =>
 						{
 							if (QuestionView == null)
 								QuestionView = this.CreateQuestionTab(Owner, ProvisioningClient);
 
 							foreach (Question Question2 in Questions)
 								QuestionView.NewQuestion(Question2);
-						});
+						}));
 					}
 				}
 				catch (Exception ex)

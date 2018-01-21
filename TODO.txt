@@ -1,6 +1,10 @@
 Client:
 * Allow owner to suggest friendships.
 * getCertificate
+* Presence subscriptions
+	* Custom dialog
+	* List available subscription requests in a list
+	* Ignore duplicates
 
 * Client install:
 	- Make sure app is started after installation

@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Documents;
+using System.Windows.Threading;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Provisioning;
 using Waher.Persistence.Attributes;
@@ -145,14 +145,14 @@ namespace Waher.Client.WPF.Controls.Questions
 					await this.Processed(this.questionView);
 				else
 				{
-					MainWindow.currentInstance.Dispatcher.Invoke(() => MessageBox.Show(MainWindow.currentInstance,
-						string.IsNullOrEmpty(e.ErrorText) ? "Unable to set rule." : e.ErrorText, "Error", MessageBoxButton.OK, MessageBoxImage.Error));
+					DispatcherOperation Op = MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() => MessageBox.Show(MainWindow.currentInstance,
+						string.IsNullOrEmpty(e.ErrorText) ? "Unable to set rule." : e.ErrorText, "Error", MessageBoxButton.OK, MessageBoxImage.Error)));
 				}
 			}
 			catch (Exception ex)
 			{
-				MainWindow.currentInstance.Dispatcher.Invoke(() => MessageBox.Show(MainWindow.currentInstance,
-					ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error));
+				DispatcherOperation Op = MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() => MessageBox.Show(MainWindow.currentInstance,
+					ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error)));
 			}
 		}
 

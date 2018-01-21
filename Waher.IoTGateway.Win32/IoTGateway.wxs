@@ -36,7 +36,7 @@
     <Property Id="ErrorIcon">error_icon</Property>
     <Property Id="QuestionIcon">question_icon</Property>
     <Directory Id='TARGETDIR' Name='SourceDir'>
-      <Merge Id="VCRedist" SourceFile="C:\Program Files (x86)\Common Files\Merge Modules\Microsoft_VC140_CRT_x86.msm" DiskId="1" Language="0"/>
+      <Merge Id="VCRedist" SourceFile="C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\VC\Redist\MSVC\14.12.25810\MergeModules\Microsoft_VC141_CRT_x86.msm" DiskId="1" Language="0"/>
       <Directory Id='ProgramFilesFolder' Name='ProgramFiles'>
         <Directory Id='WaherDataAB' Name='Waher Data AB'>
           <Directory Id='INSTALLDIR' Name='IoT Gateway 1.0'>

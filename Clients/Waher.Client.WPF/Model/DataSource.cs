@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 using System.Windows.Media;
 using System.Windows.Input;
 using System.Xml;
@@ -91,7 +91,7 @@ namespace Waher.Client.WPF.Model
 						Concentrator.XmppAccountNode.ConcentratorClient.GetChildDataSources(FullJid, this.key, (sender, e) =>
 						{
 							this.loadingChildren = false;
-							MainWindow.currentInstance.Dispatcher.Invoke(() => Mouse.OverrideCursor = null);
+							MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() => Mouse.OverrideCursor = null));
 
 							if (e.Ok)
 							{
@@ -114,7 +114,7 @@ namespace Waher.Client.WPF.Model
 							"en", string.Empty, string.Empty, string.Empty, (sender, e) =>
 						{
 							this.loadingChildren = false;
-							MainWindow.currentInstance.Dispatcher.Invoke(() => Mouse.OverrideCursor = null);
+							MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() => Mouse.OverrideCursor = null));
 
 							if (e.Ok)
 							{

@@ -104,7 +104,7 @@ namespace Waher.Client.WPF.Dialogs
 			{
 				ParameterDialog Dialog = new ParameterDialog(Form);
 
-				MainWindow.currentInstance.Dispatcher.Invoke(() => Dialog.ShowDialog());
+				MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() => Dialog.ShowDialog()));
 			}
 			else
 				Form.Submit();

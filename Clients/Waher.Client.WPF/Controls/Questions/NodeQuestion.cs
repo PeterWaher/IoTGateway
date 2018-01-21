@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
-using System.Threading.Tasks;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using Waher.Networking.XMPP.Provisioning;
@@ -133,10 +133,10 @@ namespace Waher.Client.WPF.Controls.Questions
 									this.certificates[Token2] = e.Certificate;
 								}
 
-								MainWindow.currentInstance.Dispatcher.Invoke(() =>
+								MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() =>
 								{
 									this.AddToken(Details, Token2, e.Certificate, OnYes, OnNo, Range);
-								});
+								}));
 							}
 						}, Token);
 					}

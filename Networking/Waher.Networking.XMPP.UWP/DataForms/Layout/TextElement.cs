@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Xml;
+using Waher.Content.Xml;
 
 namespace Waher.Networking.XMPP.DataForms.Layout
 {
@@ -36,6 +38,13 @@ namespace Waher.Networking.XMPP.DataForms.Layout
 		internal override bool RemoveExcluded()
 		{
 			return false;
+		}
+
+		internal override void Serialize(StringBuilder Output)
+		{
+			Output.Append("<xdl:text>");
+			Output.Append(XML.Encode(this.text));
+			Output.Append("</xdl:text>");
 		}
 	}
 }

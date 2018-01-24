@@ -7,13 +7,14 @@ namespace Waher.Networking.XMPP.DataForms
 	/// <summary>
 	/// Event arguments for dynamic data form events.
 	/// </summary>
-	public class DynamicDataFormEventArgs : EventArgs
+	public class DynamicDataFormEventArgs : MessageEventArgs
 	{
 		private DataForm form;
 		private string sessionVariable;
 		private string language;
 
-		internal DynamicDataFormEventArgs(DataForm Form, string SessionVariable, string Language)
+		internal DynamicDataFormEventArgs(DataForm Form, string SessionVariable, string Language, MessageEventArgs e)
+			: base(e)
 		{
 			this.form = Form;
 			this.sessionVariable = SessionVariable;

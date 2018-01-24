@@ -26,5 +26,7 @@ namespace Waher.Networking.XMPP.DataForms.Layout
 		}
 
 		internal abstract bool RemoveExcluded();
+
+		internal abstract void Serialize(StringBuilder Output);
 	}
 }

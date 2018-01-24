@@ -963,6 +963,12 @@ namespace Waher.Networking.XMPP.DataForms
 					Output.Append(XML.Encode(this.title));
 					Output.Append("</title>");
 				}
+
+				if (this.pages != null)
+				{
+					foreach (Page Page in this.pages)
+						Page.Serialize(Output);
+				}
 			}
 
 			foreach (Field Field in this.fields)

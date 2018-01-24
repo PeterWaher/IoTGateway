@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Xml;
+using Waher.Content.Xml;
 
 namespace Waher.Networking.XMPP.DataForms.Layout
 {
@@ -39,6 +41,18 @@ namespace Waher.Networking.XMPP.DataForms.Layout
 		internal Page(DataForm Form, string Title, ReportedReference ReportedReference)
 			: base(Form, Title, ReportedReference)
 		{
+		}
+
+		internal override void Serialize(StringBuilder Output)
+		{
+			Output.Append("<xdl:page label='");
+			Output.Append(XML.Encode(this.Label));
+			Output.Append("'>");
+
+			foreach (LayoutElement E in this.Elements)
+				E.Serialize(Output);
+
+			Output.Append("</xdl:page>");
 		}
 	}
 }

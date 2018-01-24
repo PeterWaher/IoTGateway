@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Xml;
 using Waher.Content.Xml;
 
@@ -38,6 +39,13 @@ namespace Waher.Networking.XMPP.DataForms.Layout
 		{
 			Field F = this.Form[this.var];
 			return F == null || F.Exclude;
+		}
+
+		internal override void Serialize(StringBuilder Output)
+		{
+			Output.Append("<xdl:fieldref var='");
+			Output.Append(XML.Encode(this.var));
+			Output.Append("'/>");
 		}
 	}
 }

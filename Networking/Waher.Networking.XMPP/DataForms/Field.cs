@@ -221,8 +221,7 @@ namespace Waher.Networking.XMPP.DataForms
 
 		private void FormUpdated(object Sender, IqResultEventArgs e)
 		{
-			XmppClient Client = Sender as XmppClient;
-			if (Client != null && e.Ok)
+			if (e.Ok && Sender is XmppClient Client && Client != null)
 			{
 				foreach (XmlNode N in e.Response)
 				{
@@ -282,7 +281,7 @@ namespace Waher.Networking.XMPP.DataForms
 						if (this.validationMethod != null)
 							this.validationMethod.Serialize(Output);
 
-						Output.Append("</validate>");
+						Output.Append("</xdv:validate>");
 					}
 
 					if (this.notSame)

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Xml;
 using Waher.Content.Xml;
 
@@ -148,6 +149,18 @@ namespace Waher.Networking.XMPP.DataForms.Layout
 			}
 
 			return c == 0;
+		}
+
+		internal override void Serialize(StringBuilder Output)
+		{
+			Output.Append("<xdl:section label='");
+			Output.Append(XML.Encode(this.Label));
+			Output.Append("'>");
+
+			foreach (LayoutElement E in this.Elements)
+				E.Serialize(Output);
+
+			Output.Append("</xdl:section>");
 		}
 
 	}

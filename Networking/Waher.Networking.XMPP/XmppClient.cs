@@ -4687,7 +4687,7 @@ namespace Waher.Networking.XMPP
 				{
 					try
 					{
-						h(this, new DynamicDataFormEventArgs(Form, SessionVariable, Language));
+						h(this, new DynamicDataFormEventArgs(Form, SessionVariable, Language, e));
 					}
 					catch (Exception ex)
 					{

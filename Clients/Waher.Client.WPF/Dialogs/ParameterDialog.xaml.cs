@@ -25,6 +25,7 @@ namespace Waher.Client.WPF.Dialogs
 	public partial class ParameterDialog : Window
 	{
 		private DataForm form;
+		private FrameworkElement makeVisible = null;
 
 		/// <summary>
 		/// Interaction logic for ParameterDialog.xaml
@@ -186,32 +187,41 @@ namespace Waher.Client.WPF.Dialogs
 			if (Field == null)
 				return null;
 
-			Field.Validate(Field.ValueStrings);
+			Control Result = null;
+			bool MakeVisible = false;
+
+			if (Field.HasError)
+				MakeVisible = true;
+			else
+				Field.Validate(Field.ValueStrings);
 
 			if (Field is TextSingleField)
-				return this.Layout(Container, (TextSingleField)Field, Form);
+				Result = this.Layout(Container, (TextSingleField)Field, Form);
 			else if (Field is TextMultiField)
-				return this.Layout(Container, (TextMultiField)Field, Form);
+				Result = this.Layout(Container, (TextMultiField)Field, Form);
 			else if (Field is TextPrivateField)
-				return this.Layout(Container, (TextPrivateField)Field, Form);
+				Result = this.Layout(Container, (TextPrivateField)Field, Form);
 			else if (Field is BooleanField)
-				return this.Layout(Container, (BooleanField)Field, Form);
+				Result = this.Layout(Container, (BooleanField)Field, Form);
 			else if (Field is ListSingleField)
-				return this.Layout(Container, (ListSingleField)Field, Form);
+				Result = this.Layout(Container, (ListSingleField)Field, Form);
 			else if (Field is ListMultiField)
-				return this.Layout(Container, (ListMultiField)Field, Form);
+				Result = this.Layout(Container, (ListMultiField)Field, Form);
 			else if (Field is FixedField)
 				this.Layout(Container, (FixedField)Field, Form);
 			else if (Field is HiddenField)
 				this.Layout(Container, (HiddenField)Field, Form);
 			else if (Field is JidMultiField)
-				return this.Layout(Container, (JidMultiField)Field, Form);
+				Result = this.Layout(Container, (JidMultiField)Field, Form);
 			else if (Field is JidSingleField)
-				return this.Layout(Container, (JidSingleField)Field, Form);
+				Result = this.Layout(Container, (JidSingleField)Field, Form);
 			else if (Field is MediaField)
 				this.Layout(Container, (MediaField)Field, Form);
 
-			return null;
+			if (MakeVisible && this.makeVisible == null)
+				this.makeVisible = Result;
+
+			return Result;
 		}
 
 		private Control Layout(Panel Container, BooleanField Field, DataForm Form)
@@ -1143,6 +1153,28 @@ namespace Waher.Client.WPF.Dialogs
 			this.form.Cancel();
 
 			this.DialogResult = false;
+		}
+
+		private void Window_Activated(object sender, EventArgs e)
+		{
+			if (this.makeVisible != null)
+			{
+				LinkedList<FrameworkElement> List = new LinkedList<FrameworkElement>();
+
+				while (this.makeVisible != null)
+				{
+					List.AddFirst(this.makeVisible);
+					this.makeVisible = this.makeVisible.Parent as FrameworkElement;
+				}
+
+				foreach (FrameworkElement E in List)
+				{
+					if (E.Focusable)
+						E.Focus();
+					else
+						E.BringIntoView();
+				}
+			}
 		}
 
 		// TODO: Color picker.

@@ -1,7 +1,7 @@
 ﻿<Window x:Class="Waher.Client.WPF.Dialogs.ParameterDialog"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="ParameterDialog" Height="600" Width="600" WindowStartupLocation="CenterOwner">
+        Title="ParameterDialog" Height="600" Width="600" WindowStartupLocation="CenterOwner" Activated="Window_Activated">
     <DockPanel Name="DialogPanel">
         <DockPanel Width="160" Height="30" DockPanel.Dock="Bottom">
             <Button Content="OK" Height="23" HorizontalAlignment="Left" Name="OkButton" VerticalAlignment="Center" Width="75" IsDefault="True" 

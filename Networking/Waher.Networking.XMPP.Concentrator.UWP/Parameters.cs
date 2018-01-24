@@ -189,7 +189,7 @@ namespace Waher.Networking.XMPP.Concentrator
 							Options.ToArray(), ToolTip, StringDataType.Instance, ValidationMethod, string.Empty, false, ReadOnly, false);
 					}
 				}
-				else if (PropertyType == typeof(Enum))
+				else if (PropertyType.GetTypeInfo().IsEnum)
 				{
 					if (ValidationMethod == null)
 						ValidationMethod = new BasicValidation();
@@ -437,8 +437,8 @@ namespace Waher.Networking.XMPP.Concentrator
 			Type PropertyType;
 			string NamespaceStr;
 			string LastNamespaceStr = null;
-			string Header;
 			object ValueToSet;
+			object ValueToSet2;
 			object[] Parsed;
 			bool ReadOnly;
 			bool Alpha;
@@ -475,7 +475,6 @@ namespace Waher.Networking.XMPP.Concentrator
 					LastNamespaceStr = NamespaceStr;
 				}
 
-				Header = null;
 				ValidationMethod = null;
 				ReadOnly = Alpha = DateOnly = HasHeader = HasOptions = ValidOption = false;
 
@@ -503,7 +502,7 @@ namespace Waher.Networking.XMPP.Concentrator
 						DateOnly = true;
 				}
 
-				if (Header == null)
+				if (!HasHeader)
 				{
 					AddError(ref Errors, Field.Var, await ConcentratorNamespace.GetStringAsync(2, "Property not editable."));
 					continue;
@@ -525,6 +524,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 				PropertyType = PI.PropertyType;
 				ValueToSet = null;
+				ValueToSet2 = null;
 				Parsed = null;
 				DataType = null;
 
@@ -536,7 +536,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					ValueToSet = Parsed = Field.ValueStrings;
 					DataType = StringDataType.Instance;
 				}
-				else if (PropertyType == typeof(Enum))
+				else if (PropertyType.GetTypeInfo().IsEnum)
 				{
 					if (ValidationMethod == null)
 						ValidationMethod = new BasicValidation();
@@ -568,7 +568,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				{
 					if (PropertyType == typeof(string))
 						DataType = StringDataType.Instance;
-					else if (PropertyType == typeof(byte))
+					else if (PropertyType == typeof(sbyte))
 						DataType = ByteDataType.Instance;
 					else if (PropertyType == typeof(short))
 						DataType = ShortDataType.Instance;
@@ -576,12 +576,12 @@ namespace Waher.Networking.XMPP.Concentrator
 						DataType = IntDataType.Instance;
 					else if (PropertyType == typeof(long))
 						DataType = LongDataType.Instance;
-					else if (PropertyType == typeof(sbyte))
+					else if (PropertyType == typeof(byte))
 					{
 						DataType = ShortDataType.Instance;
 
 						if (ValidationMethod == null)
-							ValidationMethod = new RangeValidation(sbyte.MinValue.ToString(), sbyte.MaxValue.ToString());
+							ValidationMethod = new RangeValidation(byte.MinValue.ToString(), byte.MaxValue.ToString());
 					}
 					else if (PropertyType == typeof(ushort))
 					{
@@ -637,6 +637,11 @@ namespace Waher.Networking.XMPP.Concentrator
 					try
 					{
 						ValueToSet = DataType.Parse(Field.ValueString);
+
+						if (ValueToSet.GetType() == PI.PropertyType)
+							ValueToSet2 = ValueToSet;
+						else
+							ValueToSet2 = System.Convert.ChangeType(ValueToSet, PI.PropertyType);
 					}
 					catch (Exception)
 					{
@@ -658,7 +663,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				if (ToSet == null)
 					ToSet = new LinkedList<KeyValuePair<PropertyInfo, object>>();
 
-				ToSet.AddLast(new KeyValuePair<PropertyInfo, object>(PI, ValueToSet));
+				ToSet.AddLast(new KeyValuePair<PropertyInfo, object>(PI, ValueToSet2));
 			}
 
 			if (Errors == null)

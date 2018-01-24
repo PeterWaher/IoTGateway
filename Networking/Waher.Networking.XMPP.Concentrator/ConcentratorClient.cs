@@ -1046,11 +1046,15 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="ServiceToken">Optional Service token.</param>
 		/// <param name="DeviceToken">Optional Device token.</param>
 		/// <param name="UserToken">Optional User token.</param>
-		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="FormCallback">Method to call when parameter form is returned.</param>
+		/// <param name="NodeCallback">Method to call when node creation response is returned.</param>
+		/// <param name="State">State object to pass on to node callback method.</param>
 		public void GetParametersForNewNode(string To, IThingReference Node, string NodeType, string Language,
-			string ServiceToken, string DeviceToken, string UserToken, DataFormEventHandler Callback)
+			string ServiceToken, string DeviceToken, string UserToken, DataFormEventHandler FormCallback, 
+			NodeInformationEventHandler NodeCallback, object State)
 		{
-			this.GetParametersForNewNode(To, Node.NodeId, Node.SourceId, Node.Partition, NodeType, Language, ServiceToken, DeviceToken, UserToken, Callback);
+			this.GetParametersForNewNode(To, Node.NodeId, Node.SourceId, Node.Partition, NodeType, Language, ServiceToken, DeviceToken, UserToken, 
+				FormCallback, NodeCallback, State);
 		}
 
 		/// <summary>
@@ -1065,9 +1069,11 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="ServiceToken">Optional Service token.</param>
 		/// <param name="DeviceToken">Optional Device token.</param>
 		/// <param name="UserToken">Optional User token.</param>
-		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="FormCallback">Method to call when parameter form is returned.</param>
+		/// <param name="NodeCallback">Method to call when node creation response is returned.</param>
+		/// <param name="State">State object to pass on to node callback method.</param>
 		public void GetParametersForNewNode(string To, string NodeID, string SourceID, string Partition, string NodeType, string Language,
-			string ServiceToken, string DeviceToken, string UserToken, DataFormEventHandler Callback)
+			string ServiceToken, string DeviceToken, string UserToken, DataFormEventHandler FormCallback, NodeInformationEventHandler NodeCallback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -1103,11 +1109,11 @@ namespace Waher.Networking.XMPP.Concentrator
 				else
 					e.Ok = false;
 
-				if (Callback != null && Form != null)
+				if (FormCallback != null && Form != null)
 				{
 					try
 					{
-						Callback(this, Form);
+						FormCallback(this, Form);
 					}
 					catch (Exception ex)
 					{
@@ -1115,16 +1121,99 @@ namespace Waher.Networking.XMPP.Concentrator
 					}
 				}
 
-			}, new object[] { To, NodeID, SourceID, Partition, NodeType, Language, ServiceToken, DeviceToken, UserToken });
+			}, new object[] { To, NodeID, SourceID, Partition, NodeType, Language, ServiceToken, DeviceToken, UserToken, FormCallback, NodeCallback, State });
 		}
 
 		private void CreateNewNode(object Sender, DataForm Form)
 		{
+			object[] P = (object[])Form.State;
+			string To = (string)P[0];
+			string NodeID = (string)P[1];
+			string SourceID = (string)P[2];
+			string Partition = (string)P[3];
+			string NodeType = (string)P[4];
+			string Language = (string)P[5];
+			string ServiceToken = (string)P[6];
+			string DeviceToken = (string)P[7];
+			string UserToken = (string)P[8];
+			DataFormEventHandler FormCallback = (DataFormEventHandler)P[9];
+			NodeInformationEventHandler NodeCallback = (NodeInformationEventHandler)P[10];
+			object State = P[11];
 
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<createNewNode xmlns='");
+			Xml.Append(ConcentratorServer.NamespaceConcentrator);
+			Xml.Append("' type='");
+			Xml.Append(XML.Encode(NodeType));
+			Xml.Append("'");
+			this.AppendNodeAttributes(Xml, NodeID, SourceID, Partition);
+			this.AppendTokenAttributes(Xml, ServiceToken, DeviceToken, UserToken);
+			this.AppendNodeInfoAttributes(Xml, false, false, Language);
+			Xml.Append("'>");
+			Form.SerializeSubmit(Xml);
+			Xml.Append("</createNewNode>");
+
+			this.client.SendIqGet(To, Xml.ToString(), (sender, e) =>
+			{
+				if (!e.Ok && e.ErrorElement != null && e.ErrorType == ErrorType.Modify)
+				{
+					foreach (XmlNode N in e.ErrorElement.ChildNodes)
+					{
+						if (N is XmlElement E && E.LocalName == "createNewNodeResponse" && E.NamespaceURI == ConcentratorServer.NamespaceConcentrator)
+						{
+							foreach (XmlNode N2 in E.ChildNodes)
+							{
+								if (N2 is XmlElement E2 && E2.LocalName == "error" && E.NamespaceURI == ConcentratorServer.NamespaceConcentrator)
+								{
+									string Var = XML.Attribute(E2, "var");
+									string ErrorMsg = E2.InnerText;
+									Field F = Form[Var];
+
+									if (F != null)
+										F.Error = ErrorMsg;
+								}
+							}
+						}
+					}
+
+					if (FormCallback != null)
+					{
+						try
+						{
+							FormCallback(this, Form);
+						}
+						catch (Exception ex)
+						{
+							Log.Critical(ex);
+						}
+
+						return;
+					}
+				}
+
+				this.NodeResponse(e, "createNewNodeResponse", true, true, NodeCallback, State);
+
+			}, new string[] { To, NodeID, SourceID, Partition, NodeType, Language, ServiceToken, DeviceToken, UserToken });
 		}
 
 		private void CancelCreateNewNode(object Sender, DataForm Form)
 		{
+			object[] P = (object[])Form.State;
+			NodeInformationEventHandler NodeCallback = (NodeInformationEventHandler)P[10];
+			object State = P[11];
+
+			if (NodeCallback != null)
+			{
+				try
+				{
+					NodeCallback(this, new NodeInformationEventArgs(null, new IqResultEventArgs(null, string.Empty, string.Empty, string.Empty, false, State)));
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			}
 		}
 
 	}

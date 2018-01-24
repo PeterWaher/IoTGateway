@@ -332,7 +332,28 @@ namespace Waher.Client.WPF.Model
 						Dialog.ShowDialog();
 					}));
 
-				});
+				}, (sender, e)=>
+				{
+					if (e.Ok)
+					{
+						if (!this.loadingChildren && (this.children == null || this.children.Count != 1 || !this.children.ContainsKey(string.Empty)))
+						{
+							SortedDictionary<string, TreeNode> Children = new SortedDictionary<string, TreeNode>();
+
+							if (this.children != null)
+							{
+								foreach (KeyValuePair<string, TreeNode> P in this.children)
+									Children[P.Key] = P.Value;
+							}
+
+							Children[e.NodeInformation.NodeId] = new Node(this, e.NodeInformation);
+							this.children = Children;
+
+							this.OnUpdated();
+							this.Concentrator?.NodesAdded(Children.Values, this);
+						}
+					}
+				}, null);
 			}
 		}
 

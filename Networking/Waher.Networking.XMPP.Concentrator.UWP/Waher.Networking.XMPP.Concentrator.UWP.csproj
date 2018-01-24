@@ -115,6 +115,7 @@
     <Compile Include="Events\BooleansResponseEventArgs..cs" />
     <Compile Include="Events\CapabilitiesEventArgs.cs" />
     <Compile Include="Events\DataSourcesEventArgs.cs" />
+    <Compile Include="Events\LocalizedStringsResponseEventArgs..cs" />
     <Compile Include="Events\NodeInformationEventArgs.cs" />
     <Compile Include="Events\NodesInformationEventArgs.cs" />
     <Compile Include="Events\StringsResponseEventArgs..cs" />

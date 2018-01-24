@@ -952,5 +952,88 @@ namespace Waher.Networking.XMPP.Concentrator
 			}, State);
 		}
 
+		/// <summary>
+		/// Gets information about all ancestors of a node.
+		/// </summary>
+		/// <param name="To">Address of server.</param>
+		/// <param name="Node">Node reference.</param>
+		/// <param name="Language">Code of desired language.</param>
+		/// <param name="ServiceToken">Optional Service token.</param>
+		/// <param name="DeviceToken">Optional Device token.</param>
+		/// <param name="UserToken">Optional User token.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void GetAddableNodeTypes(string To, IThingReference Node, string Language,
+			string ServiceToken, string DeviceToken, string UserToken, LocalizedStringsResponseEventHandler Callback, object State)
+		{
+			this.GetAddableNodeTypes(To, Node.NodeId, Node.SourceId, Node.Partition, Language, ServiceToken, DeviceToken, UserToken, Callback, State);
+		}
+
+		/// <summary>
+		/// Gets information about all ancestors of a node.
+		/// </summary>
+		/// <param name="To">Address of server.</param>
+		/// <param name="NodeID">Node ID</param>
+		/// <param name="SourceID">Optional Source ID</param>
+		/// <param name="Partition">Optional Partition</param>
+		/// <param name="Language">Code of desired language.</param>
+		/// <param name="ServiceToken">Optional Service token.</param>
+		/// <param name="DeviceToken">Optional Device token.</param>
+		/// <param name="UserToken">Optional User token.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void GetAddableNodeTypes(string To, string NodeID, string SourceID, string Partition, string Language,
+			string ServiceToken, string DeviceToken, string UserToken, LocalizedStringsResponseEventHandler Callback, object State)
+		{
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<getAddableNodeTypes xmlns='");
+			Xml.Append(ConcentratorServer.NamespaceConcentrator);
+			Xml.Append("'");
+			this.AppendNodeAttributes(Xml, NodeID, SourceID, Partition);
+			this.AppendTokenAttributes(Xml, ServiceToken, DeviceToken, UserToken);
+			this.AppendNodeInfoAttributes(Xml, false, false, Language);
+			Xml.Append("'/>");
+
+			this.client.SendIqGet(To, Xml.ToString(), (sender, e) =>
+			{
+				List<LocalizedString> Types = new List<LocalizedString>();
+				XmlElement E;
+
+				if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "getAddableNodeTypesResponse" && E.NamespaceURI == ConcentratorServer.NamespaceConcentrator)
+				{
+					foreach (XmlNode N in E)
+					{
+						if (N is XmlElement E2 && E2.LocalName == "nodeType")
+						{
+							string Type = XML.Attribute(E2, "type");
+							string Name = XML.Attribute(E2, "name");
+
+							Types.Add(new LocalizedString()
+							{
+								Unlocalized = Type,
+								Localized = Name
+							});
+						}
+					}
+				}
+				else
+					e.Ok = false;
+
+				if (Callback != null)
+				{
+					try
+					{
+						Callback(this, new LocalizedStringsResponseEventArgs(Types.ToArray(), e));
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
+				}
+
+			}, State);
+		}
+
 	}
 }

@@ -5,6 +5,7 @@ using System.Windows.Media;
 using System.Windows.Input;
 using System.Xml;
 using Waher.Content;
+using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Concentrator;
 using Waher.Networking.XMPP.Control;
 using Waher.Networking.XMPP.DataForms;
@@ -12,6 +13,7 @@ using Waher.Networking.XMPP.Sensor;
 using Waher.Things;
 using Waher.Things.DisplayableParameters;
 using Waher.Things.SensorData;
+using Waher.Client.WPF.Dialogs;
 
 namespace Waher.Client.WPF.Model
 {
@@ -50,7 +52,6 @@ namespace Waher.Client.WPF.Model
 		public override string Header => this.nodeInfo.LocalId;
 		public override string ToolTip => "Node";
 		public override string TypeName => this.nodeInfo.NodeType;
-		public override bool CanAddChildren => false;
 		public override bool CanRecycle => false;
 		public override DisplayableParameters DisplayableParameters => this.parameters;
 
@@ -95,24 +96,40 @@ namespace Waher.Client.WPF.Model
 
 		private bool loadingChildren = false;
 
+		public ConcentratorClient ConcentratorClient
+		{
+			get
+			{
+				XmppConcentrator Concentrator = this.Concentrator;
+				if (Concentrator == null)
+					return null;
+
+				XmppAccountNode AccountNode = Concentrator.XmppAccountNode;
+				if (AccountNode == null)
+					return null;
+
+				return AccountNode.ConcentratorClient;
+			}
+		}
+
 		protected override void LoadChildren()
 		{
 			if (!this.loadingChildren && this.children != null && this.children.Count == 1 && this.children.ContainsKey(string.Empty))
 			{
 				string FullJid = this.Concentrator?.FullJid;
+				ConcentratorClient ConcentratorClient = this.ConcentratorClient;
 
-				if (!string.IsNullOrEmpty(FullJid))
+				if (ConcentratorClient != null && !string.IsNullOrEmpty(FullJid))
 				{
 					if (this.nodeInfo.HasChildren)
 					{
 						Mouse.OverrideCursor = Cursors.Wait;
 
 						this.loadingChildren = true;
-						Concentrator.XmppAccountNode.ConcentratorClient.GetChildNodes(FullJid, this.nodeInfo, true, true,
-							"en", string.Empty, string.Empty, string.Empty, (sender, e) =>
+						ConcentratorClient.GetChildNodes(FullJid, this.nodeInfo, true, true, "en", string.Empty, string.Empty, string.Empty, (sender, e) =>
 						{
 							this.loadingChildren = false;
-							MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() => Mouse.OverrideCursor = null));
+							MainWindow.MouseDefault();
 
 							if (e.Ok)
 							{
@@ -161,8 +178,8 @@ namespace Waher.Client.WPF.Model
 			}
 		}
 
-		public override bool CanReadSensorData => this.nodeInfo.IsReadable;
-		public override bool CanSubscribeToSensorData => this.nodeInfo.IsReadable && this.Concentrator.SupportsEvents;
+		public override bool CanReadSensorData => this.nodeInfo.IsReadable && this.IsOnline;
+		public override bool CanSubscribeToSensorData => this.nodeInfo.IsReadable && this.Concentrator.SupportsEvents && this.IsOnline;
 
 		public override SensorDataClientRequest StartSensorDataMomentaryReadout()
 		{
@@ -210,7 +227,7 @@ namespace Waher.Client.WPF.Model
 				return null;
 		}
 
-		public override bool CanConfigure => this.nodeInfo.IsControllable;
+		public override bool CanConfigure => this.nodeInfo.IsControllable && this.IsOnline;
 
 		public override void GetConfigurationForm(DataFormResultEventHandler Callback, object State)
 		{
@@ -225,6 +242,80 @@ namespace Waher.Client.WPF.Model
 			}
 			else
 				throw new NotSupportedException();
+		}
+
+		public bool IsOnline
+		{
+			get
+			{
+				XmppConcentrator Concentrator = this.Concentrator;
+				if (Concentrator == null)
+					return false;
+
+				XmppAccountNode XmppAccountNode = Concentrator.XmppAccountNode;
+				if (XmppAccountNode == null)
+					return false;
+
+				XmppClient Client = XmppAccountNode.Client;
+				return Client != null && Client.State == XmppState.Connected;
+			}
+		}
+
+		public override bool CanAddChildren => this.IsOnline;
+
+		public override void Add()
+		{
+			string FullJid = this.Concentrator?.FullJid;
+			ConcentratorClient ConcentratorClient = this.ConcentratorClient;
+
+			if (ConcentratorClient != null && !string.IsNullOrEmpty(FullJid))
+			{
+				Mouse.OverrideCursor = Cursors.Wait;
+
+				ConcentratorClient.GetAddableNodeTypes(FullJid, this.nodeInfo, "en", string.Empty, string.Empty, string.Empty, (sender, e) =>
+				{
+					MainWindow.MouseDefault();
+
+					if (e.Ok)
+					{
+						switch (e.Result.Length)
+						{
+							case 0:
+								MainWindow.ErrorBox("No nodes can be added to this type of node.");
+								break;
+
+							case 1:
+								this.Add(e.Result[0].Unlocalized);
+								break;
+
+							default:
+								MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() =>
+								{
+								SelectItemDialog Form = new SelectItemDialog("Add node", "Select type of node to add:",
+									"Add node of selected type.", "Type", "Class", e.Result)
+									{
+										Owner = MainWindow.currentInstance
+									};
+
+									bool? Result = Form.ShowDialog();
+
+									if (Result.HasValue && Result.Value)
+									{
+										LocalizedString? Item = Form.SelectedItem;
+										if (Item.HasValue)
+											this.Add(Item.Value.Unlocalized);
+									}
+								}));
+								break;
+						}
+					}
+				}, null);
+			}
+		}
+
+		private void Add(string Type)
+		{
+
 		}
 
 	}

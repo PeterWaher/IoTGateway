@@ -127,6 +127,9 @@
     </Compile>
     <Compile Include="Controls\Sniffers\SniffItem.cs" />
     <Compile Include="Controls\Sniffers\TabSniffer.cs" />
+    <Compile Include="Dialogs\SelectItemDialog.xaml.cs">
+      <DependentUpon>SelectItemDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\ClaimDeviceForm.xaml.cs">
       <DependentUpon>ClaimDeviceForm.xaml</DependentUpon>
     </Compile>
@@ -163,6 +166,10 @@
     <Page Include="Controls\SnifferView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\SelectItemDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Dialogs\ClaimDeviceForm.xaml">
       <Generator>MSBuild:Compile</Generator>

@@ -383,6 +383,20 @@ namespace Waher.Things.Metering
 		}
 
 		/// <summary>
+		/// Updates the node (in persisted storage).
+		/// </summary>
+		public virtual async Task UpdateAsync()
+		{
+			if (this.objectId != Guid.Empty)
+			{
+				this.updated = DateTime.Now;
+				await Database.Update(this);
+			}
+
+			this.RaiseUpdate();
+		}
+
+		/// <summary>
 		/// Tries to move the node down.
 		/// </summary>
 		/// <param name="Caller">Information about caller.</param>
@@ -780,5 +794,6 @@ namespace Waher.Things.Metering
 		{
 			return Task.FromResult<bool>(true);     // TODO: Check user privileges
 		}
+
 	}
 }

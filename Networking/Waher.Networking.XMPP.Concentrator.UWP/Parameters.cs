@@ -533,7 +533,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					if (ValidationMethod == null)
 						ValidationMethod = new BasicValidation();
 
-					ValueToSet = Parsed = Field.ValueStrings;
+					ValueToSet = ValueToSet2 = Parsed = Field.ValueStrings;
 					DataType = StringDataType.Instance;
 				}
 				else if (PropertyType.GetTypeInfo().IsEnum)
@@ -543,7 +543,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 					try
 					{
-						ValueToSet = Enum.Parse(PropertyType, Field.ValueString);
+						ValueToSet = ValueToSet2 = Enum.Parse(PropertyType, Field.ValueString);
 					}
 					catch (Exception)
 					{
@@ -563,6 +563,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					}
 
 					DataType = BooleanDataType.Instance;
+					ValueToSet = ValueToSet2 = b;
 				}
 				else
 				{

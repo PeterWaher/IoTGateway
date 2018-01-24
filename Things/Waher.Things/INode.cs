@@ -220,6 +220,11 @@ namespace Waher.Things
 		Task AddAsync(INode Child);
 
 		/// <summary>
+		/// Updates the node (in persisted storage).
+		/// </summary>
+		Task UpdateAsync();
+
+		/// <summary>
 		/// Removes a child from the node.
 		/// </summary>
 		/// <param name="Child">Child to remove.</param>

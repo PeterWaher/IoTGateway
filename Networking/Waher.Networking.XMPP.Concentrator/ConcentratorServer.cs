@@ -1619,7 +1619,24 @@ namespace Waher.Networking.XMPP.Concentrator
 						KeyValuePair<string, string>[] Errors = await Parameters.SetEditableForm(e, Node, Form);
 
 						if (Errors == null)
-							e.IqResult("<setNodeParametersAfterEditResponse xmlns='" + NamespaceConcentrator + "'/>");
+						{
+							StringBuilder Xml = new StringBuilder();
+
+							Xml.Append("<setNodeParametersAfterEditResponse xmlns='");
+							Xml.Append(NamespaceConcentrator);
+							Xml.Append("'>");
+
+							await Node.UpdateAsync();
+
+							Xml.Append("<nd");
+							await ExportAttributes(Xml, Node, Language);
+							Xml.Append(">");
+							await this.ExportParametersAndMessages(Xml, Node, true, true, Language, Caller);
+							Xml.Append("</nd>");
+							Xml.Append("</setNodeParametersAfterEditResponse>");
+
+							e.IqResult(Xml.ToString());
+						}
 						else
 						{
 							Form = await Parameters.GetEditableForm(Sender as XmppClient, e, Node, Node.NodeId);

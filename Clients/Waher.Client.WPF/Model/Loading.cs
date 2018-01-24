@@ -24,6 +24,7 @@ namespace Waher.Client.WPF.Model
 		public override string ToolTip => "Items are being loaded.";
 		public override string TypeName => string.Empty;
 		public override bool CanAddChildren => false;
+		public override bool CanDelete => false;
 		public override bool CanRecycle => false;
 		public override ImageSource ImageResource => XmppAccountNode.hourglass;
 

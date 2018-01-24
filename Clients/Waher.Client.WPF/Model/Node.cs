@@ -5,6 +5,7 @@ using System.Windows.Media;
 using System.Windows.Input;
 using System.Xml;
 using Waher.Content;
+using Waher.Events;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Concentrator;
 using Waher.Networking.XMPP.Control;
@@ -262,6 +263,7 @@ namespace Waher.Client.WPF.Model
 		}
 
 		public override bool CanAddChildren => this.IsOnline;
+		public override bool CanDelete => true;
 
 		public override void Add()
 		{
@@ -351,6 +353,34 @@ namespace Waher.Client.WPF.Model
 
 							this.OnUpdated();
 							this.Concentrator?.NodesAdded(Children.Values, this);
+						}
+					}
+				}, null);
+			}
+		}
+
+		public override void Delete(TreeNode Parent, EventHandler OnDeleted)
+		{
+			string FullJid = this.Concentrator?.FullJid;
+			ConcentratorClient ConcentratorClient = this.ConcentratorClient;
+
+			if (ConcentratorClient != null && !string.IsNullOrEmpty(FullJid))
+			{
+				Mouse.OverrideCursor = Cursors.Wait;
+
+				ConcentratorClient.DestroyNode(FullJid, this.nodeInfo, "en", string.Empty, string.Empty, string.Empty, (sender, e) =>
+				{
+					MainWindow.MouseDefault();
+
+					if (e.Ok)
+					{
+						try
+						{
+							base.Delete(Parent, OnDeleted);
+						}
+						catch (Exception ex)
+						{
+							Log.Critical(ex);
 						}
 					}
 				}, null);

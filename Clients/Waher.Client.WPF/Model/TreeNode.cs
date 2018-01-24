@@ -331,6 +331,25 @@ namespace Waher.Client.WPF.Model
 		}
 
 		/// <summary>
+		/// If the node can be deleted.
+		/// </summary>
+		public abstract bool CanDelete
+		{
+			get;
+		}
+
+		/// <summary>
+		/// Method called when a node is to be deleted.
+		/// </summary>
+		/// <param name="Parent">Parent node.</param>
+		/// <param name="OnDeleted">Method called when node has been successfully deleted.</param>
+		public virtual void Delete(TreeNode Parent, EventHandler OnDeleted)
+		{
+			Parent.RemoveChild(this);
+			OnDeleted?.Invoke(this, new EventArgs());
+		}
+
+		/// <summary>
 		/// If the node can be recycled.
 		/// </summary>
 		public abstract bool CanRecycle
@@ -353,7 +372,7 @@ namespace Waher.Client.WPF.Model
 		/// </summary>
 		/// <param name="Node">Child node.</param>
 		/// <returns>If the node was found and removed.</returns>
-		public virtual bool Delete(TreeNode Node)
+		public virtual bool RemoveChild(TreeNode Node)
 		{
 			if (this.children != null)
 			{

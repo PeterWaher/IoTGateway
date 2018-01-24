@@ -441,6 +441,8 @@ namespace Waher.Client.WPF.Model
 			}
 		}
 
+		public override bool CanDelete => true;
+
 		public override void Add()
 		{
 			AddContactForm Dialog = new AddContactForm()
@@ -892,9 +894,9 @@ namespace Waher.Client.WPF.Model
 			}
 		}
 
-		public override bool Delete(TreeNode Node)
+		public override bool RemoveChild(TreeNode Node)
 		{
-			if (base.Delete(Node))
+			if (base.RemoveChild(Node))
 			{
 				if (Node is XmppContact Contact)
 				{

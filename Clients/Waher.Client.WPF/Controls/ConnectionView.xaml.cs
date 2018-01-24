@@ -383,7 +383,7 @@ namespace Waher.Client.WPF.Controls
 				this.ConnectionTree.Items.Remove(ChildNode);
 			}
 			else
-				Parent.Delete(ChildNode);
+				Parent.RemoveChild(ChildNode);
 
 			this.ConnectionTree.Items.Refresh();
 		}

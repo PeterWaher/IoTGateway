@@ -310,19 +310,26 @@ namespace Waher.Client.WPF
 		private void Delete_CanExecute(object sender, CanExecuteRoutedEventArgs e)
 		{
 			TreeNode Node = this.SelectedNode;
-			e.CanExecute = (Node != null);
+			e.CanExecute = (Node != null && Node.CanDelete);
 		}
 
 		private void Delete_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
 			TreeNode Node = this.SelectedNode;
-			if (Node == null)
+			if (Node == null || !Node.CanDelete)
 				return;
 
 			if (System.Windows.MessageBox.Show(this, "Are you sure you want to remove " + Node.Header + "?", "Are you sure?", MessageBoxButton.YesNo,
 				MessageBoxImage.Question, MessageBoxResult.No) == MessageBoxResult.Yes)
 			{
-				this.MainView.NodeRemoved(Node.Parent, Node);
+				try
+				{
+					Node.Delete(Node.Parent, (sender2, e2) => this.MainView.NodeRemoved(Node.Parent, Node));
+				}
+				catch (Exception ex)
+				{
+					ErrorBox(ex.Message);
+				}
 			}
 		}
 

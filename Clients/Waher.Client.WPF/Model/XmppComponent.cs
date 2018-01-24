@@ -42,6 +42,7 @@ namespace Waher.Client.WPF.Model
 		public override ImageSource ImageResource => XmppAccountNode.component;
 		public override string TypeName => "XMPP Server component";
 		public override bool CanAddChildren => false;
+		public override bool CanDelete => false;
 		public override bool CanRecycle => false;
 
 		public override string Header

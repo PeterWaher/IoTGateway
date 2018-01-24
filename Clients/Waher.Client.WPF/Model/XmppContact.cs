@@ -214,6 +214,11 @@ namespace Waher.Client.WPF.Model
 			get { return false; }
 		}
 
+		public override bool CanDelete
+		{
+			get { return true; }
+		}
+
 		public override bool CanRecycle
 		{
 			get { return false; }

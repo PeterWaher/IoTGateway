@@ -37,6 +37,7 @@ namespace Waher.Client.WPF.Model
 		public override string ToolTip => "Data source";
 		public override string TypeName => "Data Source";
 		public override bool CanAddChildren => false;
+		public override bool CanDelete => false;
 		public override bool CanRecycle => false;
 
 		public override ImageSource ImageResource

@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata minClientVersion="3.2">
     <id>Waher.Things.Gpio</id>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <title>Waher.Things.Gpio</title>
     <authors>Peter Waher</authors>
     <owners>Waher Data AB</owners>
@@ -18,8 +18,8 @@
       <dependency id="Waher.IoTGateway" version="1.0.10"/>
       <dependency id="Waher.Persistence" version="1.0.2"/>
       <dependency id="Waher.Runtime.Language" version="1.0.1"/>
-      <dependency id="Waher.Things" version="1.0.8"/>
-      <dependency id="Waher.Things.Metering" version="1.0.7"/>
+      <dependency id="Waher.Things" version="1.0.10"/>
+      <dependency id="Waher.Things.Metering" version="1.0.8"/>
     </dependencies>
   </metadata>
   <files>

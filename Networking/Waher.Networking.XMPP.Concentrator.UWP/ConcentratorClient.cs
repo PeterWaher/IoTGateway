@@ -1194,7 +1194,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 				this.NodeResponse(e, "createNewNodeResponse", true, true, NodeCallback, State);
 
-			}, new string[] { To, NodeID, SourceID, Partition, NodeType, Language, ServiceToken, DeviceToken, UserToken });
+			}, P);
 		}
 
 		private void CancelCreateNewNode(object Sender, DataForm Form)
@@ -1260,6 +1260,179 @@ namespace Waher.Networking.XMPP.Concentrator
 			Xml.Append("'/>");
 
 			this.client.SendIqGet(To, Xml.ToString(), Callback, State);
+		}
+
+		/// <summary>
+		/// Gets the set of parameters for the purpose of editing a node.
+		/// </summary>
+		/// <param name="To">Address of server.</param>
+		/// <param name="Node">Node reference.</param>
+		/// <param name="Language">Code of desired language.</param>
+		/// <param name="ServiceToken">Optional Service token.</param>
+		/// <param name="DeviceToken">Optional Device token.</param>
+		/// <param name="UserToken">Optional User token.</param>
+		/// <param name="FormCallback">Method to call when parameter form is returned.</param>
+		/// <param name="NodeCallback">Method to call when node creation response is returned.</param>
+		/// <param name="State">State object to pass on to node callback method.</param>
+		public void GetNodeParametersForEdit(string To, IThingReference Node, string Language,
+			string ServiceToken, string DeviceToken, string UserToken, DataFormEventHandler FormCallback,
+			NodeInformationEventHandler NodeCallback, object State)
+		{
+			this.GetNodeParametersForEdit(To, Node.NodeId, Node.SourceId, Node.Partition, Language, ServiceToken, DeviceToken, UserToken,
+				FormCallback, NodeCallback, State);
+		}
+
+		/// <summary>
+		/// Gets the set of parameters for the purpose of editing a node.
+		/// </summary>
+		/// <param name="To">Address of server.</param>
+		/// <param name="NodeID">Node ID</param>
+		/// <param name="SourceID">Optional Source ID</param>
+		/// <param name="Partition">Optional Partition</param>
+		/// <param name="Language">Code of desired language.</param>
+		/// <param name="ServiceToken">Optional Service token.</param>
+		/// <param name="DeviceToken">Optional Device token.</param>
+		/// <param name="UserToken">Optional User token.</param>
+		/// <param name="FormCallback">Method to call when parameter form is returned.</param>
+		/// <param name="NodeCallback">Method to call when node creation response is returned.</param>
+		/// <param name="State">State object to pass on to node callback method.</param>
+		public void GetNodeParametersForEdit(string To, string NodeID, string SourceID, string Partition, string Language,
+			string ServiceToken, string DeviceToken, string UserToken, DataFormEventHandler FormCallback, NodeInformationEventHandler NodeCallback, object State)
+		{
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<getNodeParametersForEdit xmlns='");
+			Xml.Append(ConcentratorServer.NamespaceConcentrator);
+			Xml.Append("'");
+			this.AppendNodeAttributes(Xml, NodeID, SourceID, Partition);
+			this.AppendTokenAttributes(Xml, ServiceToken, DeviceToken, UserToken);
+			this.AppendNodeInfoAttributes(Xml, false, false, Language);
+			Xml.Append("'/>");
+
+			this.client.SendIqGet(To, Xml.ToString(), (sender, e) =>
+			{
+				DataForm Form = null;
+				XmlElement E;
+
+				if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "getNodeParametersForEditResponse" && E.NamespaceURI == ConcentratorServer.NamespaceConcentrator)
+				{
+					foreach (XmlNode N in E)
+					{
+						if (N is XmlElement E2 && E2.LocalName == "x")
+						{
+							Form = new DataForm(this.client, E2, this.EditNode, this.CancelEditNode, e.From, e.To)
+							{
+								State = e.State
+							};
+							break;
+						}
+					}
+				}
+				else
+					e.Ok = false;
+
+				if (FormCallback != null && Form != null)
+				{
+					try
+					{
+						FormCallback(this, Form);
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
+				}
+
+			}, new object[] { To, NodeID, SourceID, Partition, Language, ServiceToken, DeviceToken, UserToken, FormCallback, NodeCallback, State });
+		}
+
+		private void EditNode(object Sender, DataForm Form)
+		{
+			object[] P = (object[])Form.State;
+			string To = (string)P[0];
+			string NodeID = (string)P[1];
+			string SourceID = (string)P[2];
+			string Partition = (string)P[3];
+			string Language = (string)P[4];
+			string ServiceToken = (string)P[5];
+			string DeviceToken = (string)P[6];
+			string UserToken = (string)P[7];
+			DataFormEventHandler FormCallback = (DataFormEventHandler)P[8];
+			NodeInformationEventHandler NodeCallback = (NodeInformationEventHandler)P[9];
+			object State = P[10];
+
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<setNodeParametersAfterEdit xmlns='");
+			Xml.Append(ConcentratorServer.NamespaceConcentrator);
+			Xml.Append("'");
+			this.AppendNodeAttributes(Xml, NodeID, SourceID, Partition);
+			this.AppendTokenAttributes(Xml, ServiceToken, DeviceToken, UserToken);
+			this.AppendNodeInfoAttributes(Xml, false, false, Language);
+			Xml.Append("'>");
+			Form.SerializeSubmit(Xml);
+			Xml.Append("</setNodeParametersAfterEdit>");
+
+			this.client.SendIqGet(To, Xml.ToString(), (sender, e) =>
+			{
+				if (!e.Ok && e.ErrorElement != null && e.ErrorType == ErrorType.Modify)
+				{
+					foreach (XmlNode N in e.ErrorElement.ChildNodes)
+					{
+						if (N is XmlElement E && E.LocalName == "setNodeParametersAfterEditResponse" && E.NamespaceURI == ConcentratorServer.NamespaceConcentrator)
+						{
+							foreach (XmlNode N2 in E.ChildNodes)
+							{
+								if (N2 is XmlElement E2 && E2.LocalName == "error" && E.NamespaceURI == ConcentratorServer.NamespaceConcentrator)
+								{
+									string Var = XML.Attribute(E2, "var");
+									string ErrorMsg = E2.InnerText;
+									Field F = Form[Var];
+
+									if (F != null)
+										F.Error = ErrorMsg;
+								}
+							}
+						}
+					}
+
+					if (FormCallback != null)
+					{
+						try
+						{
+							FormCallback(this, Form);
+						}
+						catch (Exception ex)
+						{
+							Log.Critical(ex);
+						}
+
+						return;
+					}
+				}
+
+				this.NodeResponse(e, "setNodeParametersAfterEditResponse", true, true, NodeCallback, State);
+
+			}, P);
+		}
+
+		private void CancelEditNode(object Sender, DataForm Form)
+		{
+			object[] P = (object[])Form.State;
+			NodeInformationEventHandler NodeCallback = (NodeInformationEventHandler)P[10];
+			object State = P[11];
+
+			if (NodeCallback != null)
+			{
+				try
+				{
+					NodeCallback(this, new NodeInformationEventArgs(null, new IqResultEventArgs(null, string.Empty, string.Empty, string.Empty, false, State)));
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			}
 		}
 
 	}

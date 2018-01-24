@@ -219,6 +219,11 @@ namespace Waher.Client.WPF.Model
 			get { return true; }
 		}
 
+		public override bool CanEdit
+		{
+			get { return false; }	// TODO: Edit Friendly name, groups
+		}
+
 		public override bool CanRecycle
 		{
 			get { return false; }

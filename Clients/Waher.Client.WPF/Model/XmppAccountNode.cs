@@ -441,6 +441,7 @@ namespace Waher.Client.WPF.Model
 			}
 		}
 
+		public override bool CanEdit => false;		// TODO: Edit connection properties.
 		public override bool CanDelete => true;
 
 		public override void Add()

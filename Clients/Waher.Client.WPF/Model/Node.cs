@@ -263,7 +263,8 @@ namespace Waher.Client.WPF.Model
 		}
 
 		public override bool CanAddChildren => this.IsOnline;
-		public override bool CanDelete => true;
+		public override bool CanEdit => this.IsOnline;
+		public override bool CanDelete => this.IsOnline;
 
 		public override void Add()
 		{
@@ -382,6 +383,36 @@ namespace Waher.Client.WPF.Model
 						{
 							Log.Critical(ex);
 						}
+					}
+				}, null);
+			}
+		}
+
+		public override void Edit()
+		{
+			string FullJid = this.Concentrator?.FullJid;
+			ConcentratorClient ConcentratorClient = this.ConcentratorClient;
+
+			if (ConcentratorClient != null && !string.IsNullOrEmpty(FullJid))
+			{
+				Mouse.OverrideCursor = Cursors.Wait;
+
+				ConcentratorClient.GetNodeParametersForEdit(FullJid, this.nodeInfo, "en", string.Empty, string.Empty, string.Empty, (sender, Form) =>
+				{
+					MainWindow.MouseDefault();
+
+					MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() =>
+					{
+						ParameterDialog Dialog = new ParameterDialog(Form);
+						Dialog.ShowDialog();
+					}));
+
+				}, (sender, e) =>
+				{
+					if (e.Ok)
+					{
+						this.nodeInfo = e.NodeInformation;
+						this.OnUpdated();
 					}
 				}, null);
 			}

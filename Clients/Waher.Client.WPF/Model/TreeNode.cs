@@ -350,6 +350,23 @@ namespace Waher.Client.WPF.Model
 		}
 
 		/// <summary>
+		/// If the node can be edited.
+		/// </summary>
+		public abstract bool CanEdit
+		{
+			get;
+		}
+
+		/// <summary>
+		/// Is called when the user wants to edit a node.
+		/// </summary>
+		/// <exception cref="NotSupportedException">If the feature is not supported by the node.</exception>
+		public virtual void Edit()
+		{
+			throw new NotSupportedException();
+		}
+
+		/// <summary>
 		/// If the node can be recycled.
 		/// </summary>
 		public abstract bool CanRecycle

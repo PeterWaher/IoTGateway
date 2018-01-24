@@ -20,6 +20,7 @@
         <CommandBinding Command="SaveAs" Executed="SaveAs_Executed" />
         <CommandBinding Command="{x:Static wcw:MainWindow.Add}" Executed="Add_Executed" CanExecute="Add_CanExecute" />
         <CommandBinding Command="Delete" Executed="Delete_Executed" CanExecute="Delete_CanExecute" />
+        <CommandBinding Command="{x:Static wcw:MainWindow.Edit}" Executed="Edit_Executed" CanExecute="Edit_CanExecute" />
         <CommandBinding Command="{x:Static wcw:MainWindow.ConnectTo}" Executed="ConnectTo_Executed" />
         <CommandBinding Command="Refresh" Executed="Refresh_Executed" CanExecute="Refresh_CanExecute" />
         <CommandBinding Command="{x:Static wcw:MainWindow.Sniff}" Executed="Sniff_Executed" CanExecute="Sniff_CanExecute" />
@@ -37,6 +38,7 @@
         <KeyBinding Modifiers="Control" Key="S" Command="Save"/>
         <KeyBinding Modifiers="Control" Key="N" Command="New"/>
         <KeyBinding Modifiers="Control" Key="Ins" Command="{x:Static wcw:MainWindow.Add}"/>
+        <KeyBinding Modifiers="Alt" Key="Enter" Command="{x:Static wcw:MainWindow.Edit}"/>
         <KeyBinding Modifiers="Control" Key="Del" Command="Delete"/>
         <KeyBinding Modifiers="Control" Key="F5" Command="Refresh"/>
         <KeyBinding Modifiers="Control" Key="F2" Command="{x:Static wcw:MainWindow.Sniff}"/>
@@ -73,6 +75,11 @@
                 <MenuItem Name="AddMenuItem" Header="_Add..." IsEnabled="{Binding ElementName=AddButton, Path=IsEnabled}" Command="{x:Static wcw:MainWindow.Add}">
                     <MenuItem.Icon>
                         <Image Source="Graphics/Add.png" Width="16" Height="16" Style="{StaticResource ImageEnabled}"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Name="EditMenuItem" Header="_Edit..." IsEnabled="{Binding ElementName=EditButton, Path=IsEnabled}" Command="{x:Static wcw:MainWindow.Edit}">
+                    <MenuItem.Icon>
+                        <Image Source="Graphics/Properties-icon_16.png" Width="16" Height="16" Style="{StaticResource ImageEnabled}"/>
                     </MenuItem.Icon>
                 </MenuItem>
                 <MenuItem Name="DeleteMenuItem" Header="_Delete..." IsEnabled="{Binding ElementName=DeleteButton, Path=IsEnabled}" Command="Delete">
@@ -165,6 +172,9 @@
             <ToolBar Name="EditToolBar">
                 <Button Name="AddButton" ToolTip="Add..." IsEnabled="False" Command="{x:Static wcw:MainWindow.Add}">
                     <Image Source="Graphics/Add.png" Width="32" Height="32" Style="{StaticResource ImageEnabled}"/>
+                </Button>
+                <Button Name="EditButton" ToolTip="Edit..." IsEnabled="False" Command="{x:Static wcw:MainWindow.Edit}">
+                    <Image Source="Graphics/Properties-icon_32.png" Width="32" Height="32" Style="{StaticResource ImageEnabled}"/>
                 </Button>
                 <Button Name="DeleteButton" ToolTip="Delete..." IsEnabled="False" Command="Delete">
                     <Image Source="Graphics/delete_32_h.png" Width="32" Height="32" Style="{StaticResource ImageEnabled}"/>

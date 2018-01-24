@@ -163,7 +163,7 @@ namespace Waher.Things.Metering
 				if (!this.childrenLoaded)
 					this.LoadChildren().Wait();
 
-				return this.children != null;
+				return this.children != null && this.children.Count > 0;
 			}
 		}
 
@@ -186,7 +186,10 @@ namespace Waher.Things.Metering
 
 			lock (this.synchObject)
 			{
-				return this.children.ToArray();
+				if (this.children == null)
+					return new INode[0];
+				else
+					return this.children.ToArray();
 			}
 		}
 
@@ -196,11 +199,16 @@ namespace Waher.Things.Metering
 
 			lock (this.synchObject)
 			{
-				this.children = new List<MeteringNode>();
-				this.children.AddRange(Children);
+				this.children = null;
 
-				foreach (MeteringNode Child in this.children)
+				foreach (MeteringNode Child in Children)
+				{
+					if (this.children == null)
+						this.children = new List<MeteringNode>();
+
+					this.children.Add(Child);
 					Child.parent = this;
+				}
 
 				this.SortChildrenAfterLoadLocked();
 				this.childrenLoaded = true;
@@ -364,7 +372,11 @@ namespace Waher.Things.Metering
 
 			lock (this.synchObject)
 			{
+				if (this.children == null)
+					this.children = new List<MeteringNode>();
+
 				this.children.Add(Node);
+				Node.parent = this;
 			}
 
 			this.RaiseUpdate();
@@ -408,12 +420,23 @@ namespace Waher.Things.Metering
 
 			lock (this.synchObject)
 			{
-				i = this.children.IndexOf(Node);
-				if (i >= 0)
-					this.children.RemoveAt(i);
+				if (this.children != null)
+				{
+					i = this.children.IndexOf(Node);
+					if (i >= 0)
+					{
+						this.children.RemoveAt(i);
+						if (i == 0 && this.children.Count == 0)
+							this.children = null;
+					}
+				}
+				else
+					i = -1;
 			}
 
 			Node.parentId = Guid.Empty;
+			Node.parent = null;
+
 			if (Node.objectId != Guid.Empty)
 			{
 				await Database.Update(Child);
@@ -432,9 +455,14 @@ namespace Waher.Things.Metering
 			{
 				if (this.parent.childrenLoaded)
 				{
-					lock (this.synchObject)
+					lock (this.parent.synchObject)
 					{
-						this.parent.children.Remove(this);
+						if (this.parent.children != null)
+						{
+							this.parent.children.Remove(this);
+							if (this.parent.children.Count == 0)
+								this.parent.children = null;
+						}
 					}
 				}
 			}

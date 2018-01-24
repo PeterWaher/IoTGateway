@@ -39,6 +39,7 @@ namespace Waher.Client.WPF
 		public const string WindowTitle = "Simple XMPP IoT Client";
 
 		public static RoutedUICommand Add = new RoutedUICommand("Add", "Add", typeof(MainWindow));
+		public static RoutedUICommand Edit = new RoutedUICommand("Edit", "Edit", typeof(MainWindow));
 		public static RoutedUICommand Delete = new RoutedUICommand("Delete", "Delete", typeof(MainWindow));
 		public static RoutedUICommand ConnectTo = new RoutedUICommand("Connect To", "ConnectTo", typeof(MainWindow));
 		public static RoutedUICommand Refresh = new RoutedUICommand("Refresh", "Refresh", typeof(MainWindow));
@@ -222,6 +223,7 @@ namespace Waher.Client.WPF
 			if (Node == null)
 			{
 				this.AddButton.IsEnabled = false;
+				this.EditButton.IsEnabled = false;
 				this.DeleteButton.IsEnabled = false;
 				this.RefreshButton.IsEnabled = false;
 				this.SniffButton.IsEnabled = false;
@@ -235,7 +237,8 @@ namespace Waher.Client.WPF
 			else
 			{
 				this.AddButton.IsEnabled = Node.CanAddChildren;
-				this.DeleteButton.IsEnabled = true;
+				this.EditButton.IsEnabled = Node.CanEdit;
+				this.DeleteButton.IsEnabled = Node.CanDelete;
 				this.RefreshButton.IsEnabled = Node.CanRecycle;
 				this.SniffButton.IsEnabled = Node.IsSniffable;
 				this.ChatButton.IsEnabled = Node.CanChat;
@@ -331,6 +334,21 @@ namespace Waher.Client.WPF
 					ErrorBox(ex.Message);
 				}
 			}
+		}
+
+		private void Edit_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+		{
+			TreeNode Node = this.SelectedNode;
+			e.CanExecute = (Node != null && Node.CanEdit);
+		}
+
+		private void Edit_Executed(object sender, ExecutedRoutedEventArgs e)
+		{
+			TreeNode Node = this.SelectedNode;
+			if (Node == null || !Node.CanEdit)
+				return;
+
+			Node.Edit();
 		}
 
 		private void Sniff_CanExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -940,8 +958,11 @@ namespace Waher.Client.WPF
 
 		public static void MessageBox(string Text, string Caption, MessageBoxButton Button, MessageBoxImage Icon)
 		{
-			Mouse.OverrideCursor = null;
-			currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() => System.Windows.MessageBox.Show(currentInstance, Text, Caption, Button, Icon)));
+			currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() =>
+			{
+				Mouse.OverrideCursor = null;
+				System.Windows.MessageBox.Show(currentInstance, Text, Caption, Button, Icon);
+			}));
 		}
 
 		public static void MouseDefault()

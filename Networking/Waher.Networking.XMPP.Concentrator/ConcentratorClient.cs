@@ -7,6 +7,7 @@ using SkiaSharp;
 using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Events;
+using Waher.Networking.XMPP.DataForms;
 using Waher.Things;
 using Waher.Things.DisplayableParameters;
 
@@ -913,7 +914,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		public void GetAncestors(string To, IThingReference Node, bool Parameters, bool Messages, string Language,
 			string ServiceToken, string DeviceToken, string UserToken, NodesInformationEventHandler Callback, object State)
 		{
-			this.GetAncestors(To, Node.NodeId, Node.SourceId, Node.Partition, Parameters, Messages, Language, 
+			this.GetAncestors(To, Node.NodeId, Node.SourceId, Node.Partition, Parameters, Messages, Language,
 				ServiceToken, DeviceToken, UserToken, Callback, State);
 		}
 
@@ -953,7 +954,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		}
 
 		/// <summary>
-		/// Gets information about all ancestors of a node.
+		/// Gets a list of what type of nodes can be added to a given node.
 		/// </summary>
 		/// <param name="To">Address of server.</param>
 		/// <param name="Node">Node reference.</param>
@@ -970,7 +971,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		}
 
 		/// <summary>
-		/// Gets information about all ancestors of a node.
+		/// Gets a list of what type of nodes can be added to a given node.
 		/// </summary>
 		/// <param name="To">Address of server.</param>
 		/// <param name="NodeID">Node ID</param>
@@ -1033,6 +1034,97 @@ namespace Waher.Networking.XMPP.Concentrator
 				}
 
 			}, State);
+		}
+
+		/// <summary>
+		/// Gets a set of parameters for the creation of a new node.
+		/// </summary>
+		/// <param name="To">Address of server.</param>
+		/// <param name="Node">Node reference.</param>
+		/// <param name="NodeType">Type of node to create.</param>
+		/// <param name="Language">Code of desired language.</param>
+		/// <param name="ServiceToken">Optional Service token.</param>
+		/// <param name="DeviceToken">Optional Device token.</param>
+		/// <param name="UserToken">Optional User token.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		public void GetParametersForNewNode(string To, IThingReference Node, string NodeType, string Language,
+			string ServiceToken, string DeviceToken, string UserToken, DataFormEventHandler Callback)
+		{
+			this.GetParametersForNewNode(To, Node.NodeId, Node.SourceId, Node.Partition, NodeType, Language, ServiceToken, DeviceToken, UserToken, Callback);
+		}
+
+		/// <summary>
+		/// Gets a set of parameters for the creation of a new node.
+		/// </summary>
+		/// <param name="To">Address of server.</param>
+		/// <param name="NodeID">Node ID</param>
+		/// <param name="SourceID">Optional Source ID</param>
+		/// <param name="Partition">Optional Partition</param>
+		/// <param name="NodeType">Type of node to create.</param>
+		/// <param name="Language">Code of desired language.</param>
+		/// <param name="ServiceToken">Optional Service token.</param>
+		/// <param name="DeviceToken">Optional Device token.</param>
+		/// <param name="UserToken">Optional User token.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		public void GetParametersForNewNode(string To, string NodeID, string SourceID, string Partition, string NodeType, string Language,
+			string ServiceToken, string DeviceToken, string UserToken, DataFormEventHandler Callback)
+		{
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<getParametersForNewNode xmlns='");
+			Xml.Append(ConcentratorServer.NamespaceConcentrator);
+			Xml.Append("' type='");
+			Xml.Append(XML.Encode(NodeType));
+			Xml.Append("'");
+			this.AppendNodeAttributes(Xml, NodeID, SourceID, Partition);
+			this.AppendTokenAttributes(Xml, ServiceToken, DeviceToken, UserToken);
+			this.AppendNodeInfoAttributes(Xml, false, false, Language);
+			Xml.Append("'/>");
+
+			this.client.SendIqGet(To, Xml.ToString(), (sender, e) =>
+			{
+				DataForm Form = null;
+				XmlElement E;
+
+				if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "getParametersForNewNodeResponse" && E.NamespaceURI == ConcentratorServer.NamespaceConcentrator)
+				{
+					foreach (XmlNode N in E)
+					{
+						if (N is XmlElement E2 && E2.LocalName == "x")
+						{
+							Form = new DataForm(this.client, E2, this.CreateNewNode, this.CancelCreateNewNode, e.From, e.To)
+							{
+								State = e.State
+							};
+							break;
+						}
+					}
+				}
+				else
+					e.Ok = false;
+
+				if (Callback != null && Form != null)
+				{
+					try
+					{
+						Callback(this, Form);
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
+				}
+
+			}, new object[] { To, NodeID, SourceID, Partition, NodeType, Language, ServiceToken, DeviceToken, UserToken });
+		}
+
+		private void CreateNewNode(object Sender, DataForm Form)
+		{
+
+		}
+
+		private void CancelCreateNewNode(object Sender, DataForm Form)
+		{
 		}
 
 	}

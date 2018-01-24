@@ -1961,7 +1961,8 @@ namespace Waher.Networking.XMPP.Concentrator
 
 				Xml.Append("</getParametersForNewNodeResponse>");
 
-				e.IqResult(Xml.ToString());
+				string s = Xml.ToString();
+				e.IqResult(s);
 			}
 			catch (Exception ex)
 			{

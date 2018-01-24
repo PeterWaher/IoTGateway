@@ -314,10 +314,10 @@ namespace Waher.Networking.XMPP.DataForms
 						foreach (KeyValuePair<string, string> P in this.options)
 						{
 							Output.Append("<option label='");
-							Output.Append(XML.Encode(P.Key));
-							Output.Append("'>");
 							Output.Append(XML.Encode(P.Value));
-							Output.Append("</option>");
+							Output.Append("'><value>");
+							Output.Append(XML.Encode(P.Key));
+							Output.Append("</value></option>");
 						}
 					}
 				}

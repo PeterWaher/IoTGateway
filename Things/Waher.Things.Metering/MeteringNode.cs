@@ -114,7 +114,7 @@ namespace Waher.Things.Metering
 		/// ID of node.
 		/// </summary>
 		[Header(15, "ID:")]
-		[Page(16, "Identity")]
+		[Page(16, "Identity", 0)]
 		[ToolTip(17, "Node identity on the network.")]
 		[Required]
 		public string NodeId

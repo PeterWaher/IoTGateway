@@ -34,18 +34,21 @@ namespace Waher.Networking.XMPP.Concentrator
 			string DefaultLanguageCode = GetDefaultLanguageCode(T);
 			DataForm Parameters = new DataForm(Client, FormType.Form, e.To, e.From);
 			Language Language = await ConcentratorServer.GetLanguage(e.Query, DefaultLanguageCode);
-			Namespace Namespace = await Language.GetNamespaceAsync(T.Namespace);
+			Namespace Namespace = null;
 			List<Field> Fields = new List<Field>();
 			List<Page> Pages = new List<Page>();
 			Dictionary<string, Page> PageByLabel = new Dictionary<string, Page>();
 			Dictionary<string, Section> SectionByPageAndSectionLabel = null;
 			List<KeyValuePair<string, string>> Options = null;
+			string NamespaceStr;
+			string LastNamespaceStr = null;
 			string Header;
 			string ToolTip;
 			string PageLabel;
 			string SectionLabel;
 			string s;
 			int StringId;
+			int PagePriority;
 			bool Required;
 			bool ReadOnly;
 			bool Masked;
@@ -65,19 +68,30 @@ namespace Waher.Networking.XMPP.Concentrator
 			Field Field;
 			Page DefaultPage = null;
 			Page Page;
-			
+
 			if (Namespace == null)
 				Namespace = await Language.CreateNamespaceAsync(T.Namespace);
 
-			foreach (PropertyInfo PI in T.GetRuntimeProperties())
+			IEnumerable<PropertyInfo> Properties = T.GetRuntimeProperties();
+
+			foreach (PropertyInfo PI in Properties)
 			{
 				if (!PI.CanRead || !PI.CanWrite)
 					continue;
 
+				NamespaceStr = PI.DeclaringType.Namespace;
+				if (Namespace == null || NamespaceStr != LastNamespaceStr)
+				{
+					Namespace = await Language.GetNamespaceAsync(NamespaceStr);
+					LastNamespaceStr = NamespaceStr;
+				}
+
 				Header = ToolTip = PageLabel = SectionLabel = null;
 				TextAttributes = null;
 				ValidationMethod = null;
+				Options = null;
 				Required = ReadOnly = Masked = Alpha = DateOnly = false;
+				PagePriority = PageAttribute.DefaultPriority;
 
 				foreach (Attribute Attr in PI.GetCustomAttributes())
 				{
@@ -99,6 +113,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					{
 						PageLabel = PageAttribute.Label;
 						StringId = PageAttribute.StringId;
+						PagePriority = PageAttribute.Priority;
 						if (StringId > 0)
 							PageLabel = await Namespace.GetStringAsync(StringId, PageLabel);
 					}
@@ -129,7 +144,7 @@ namespace Waher.Networking.XMPP.Concentrator
 						if (StringId > 0)
 						{
 							Options.Add(new KeyValuePair<string, string>(OptionAttribute.Option.ToString(),
-								await Namespace.GetStringAsync(StringId, TextAttribute.Label)));
+								await Namespace.GetStringAsync(StringId, OptionAttribute.Label)));
 						}
 						else
 							Options.Add(new KeyValuePair<string, string>(OptionAttribute.Option.ToString(), OptionAttribute.Label));
@@ -206,7 +221,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 					if (PropertyType == typeof(string))
 						DataType = StringDataType.Instance;
-					else if (PropertyType == typeof(byte))
+					else if (PropertyType == typeof(sbyte))
 						DataType = ByteDataType.Instance;
 					else if (PropertyType == typeof(short))
 						DataType = ShortDataType.Instance;
@@ -214,12 +229,12 @@ namespace Waher.Networking.XMPP.Concentrator
 						DataType = IntDataType.Instance;
 					else if (PropertyType == typeof(long))
 						DataType = LongDataType.Instance;
-					else if (PropertyType == typeof(sbyte))
+					else if (PropertyType == typeof(byte))
 					{
 						DataType = ShortDataType.Instance;
 
 						if (ValidationMethod == null)
-							ValidationMethod = new RangeValidation(sbyte.MinValue.ToString(), sbyte.MaxValue.ToString());
+							ValidationMethod = new RangeValidation(byte.MinValue.ToString(), byte.MaxValue.ToString());
 					}
 					else if (PropertyType == typeof(ushort))
 					{
@@ -267,26 +282,26 @@ namespace Waher.Networking.XMPP.Concentrator
 							DataType = ColorDataType.Instance;
 					}
 					else
-						DataType = null;
+						DataType = StringDataType.Instance;
 
 					if (ValidationMethod == null)
 						ValidationMethod = new BasicValidation();
 
 					if (Masked)
 					{
-						Field = new TextPrivateField(Parameters, PI.Name, Header, Required, new string[] { (string)PI.GetValue(EditableObject) },
-							Options?.ToArray(), ToolTip, StringDataType.Instance, ValidationMethod,
+						Field = new TextPrivateField(Parameters, PI.Name, Header, Required, new string[] { PI.GetValue(EditableObject).ToString() },
+							Options?.ToArray(), ToolTip, DataType, ValidationMethod,
 							string.Empty, false, ReadOnly, false);
 					}
 					else if (Options == null)
 					{
-						Field = new TextSingleField(Parameters, PI.Name, Header, Required, new string[] { (string)PI.GetValue(EditableObject) },
-							null, ToolTip, StringDataType.Instance, ValidationMethod, string.Empty, false, ReadOnly, false);
+						Field = new TextSingleField(Parameters, PI.Name, Header, Required, new string[] { PI.GetValue(EditableObject).ToString() },
+							null, ToolTip, DataType, ValidationMethod, string.Empty, false, ReadOnly, false);
 					}
 					else
 					{
-						Field = new ListSingleField(Parameters, PI.Name, Header, Required, new string[] { (string)PI.GetValue(EditableObject) },
-							Options.ToArray(), ToolTip, StringDataType.Instance, ValidationMethod, string.Empty, false, ReadOnly, false);
+						Field = new ListSingleField(Parameters, PI.Name, Header, Required, new string[] { PI.GetValue(EditableObject).ToString() },
+							Options.ToArray(), ToolTip, DataType, ValidationMethod, string.Empty, false, ReadOnly, false);
 					}
 				}
 
@@ -299,7 +314,10 @@ namespace Waher.Networking.XMPP.Concentrator
 				{
 					if (DefaultPage == null)
 					{
-						DefaultPage = new Page(Parameters, string.Empty);
+						DefaultPage = new Page(Parameters, string.Empty)
+						{
+							Priority = PageAttribute.DefaultPriority
+						};
 						Pages.Add(DefaultPage);
 						PageByLabel[string.Empty] = DefaultPage;
 					}
@@ -311,7 +329,10 @@ namespace Waher.Networking.XMPP.Concentrator
 				{
 					if (!PageByLabel.TryGetValue(PageLabel, out Page))
 					{
-						Page = new Page(Parameters, PageLabel);
+						Page = new Page(Parameters, PageLabel)
+						{
+							Priority = PagePriority
+						};
 						Pages.Add(Page);
 						PageByLabel[PageLabel] = Page;
 					}
@@ -351,11 +372,19 @@ namespace Waher.Networking.XMPP.Concentrator
 				}
 			}
 
+			if (Pages != null && Pages.Count > 1)
+				Pages.Sort(OrderPages);
+
 			Parameters.Title = Title;
 			Parameters.Fields = Fields.ToArray();
 			Parameters.Pages = Pages.ToArray();
 
 			return Parameters;
+		}
+
+		private static int OrderPages(Page x, Page y)
+		{
+			return x.Priority - y.Priority;
 		}
 
 		private static string GetDefaultLanguageCode(Type Type)
@@ -397,7 +426,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			List<KeyValuePair<string, string>> Errors = null;
 			PropertyInfo PI;
 			Language Language = await ConcentratorServer.GetLanguage(e.Query, DefaultLanguageCode);
-			Namespace Namespace = await Language.GetNamespaceAsync(T.Namespace);
+			Namespace Namespace = null;
 			Namespace ConcentratorNamespace = await Language.GetNamespaceAsync(typeof(ConcentratorServer).Namespace);
 			LinkedList<KeyValuePair<PropertyInfo, object>> ToSet = null;
 			ValidationMethod ValidationMethod;
@@ -406,6 +435,8 @@ namespace Waher.Networking.XMPP.Concentrator
 			RangeAttribute RangeAttribute;
 			DataType DataType;
 			Type PropertyType;
+			string NamespaceStr;
+			string LastNamespaceStr = null;
 			string Header;
 			object ValueToSet;
 			object[] Parsed;
@@ -435,6 +466,13 @@ namespace Waher.Networking.XMPP.Concentrator
 				{
 					AddError(ref Errors, Field.Var, await ConcentratorNamespace.GetStringAsync(2, "Property not editable."));
 					continue;
+				}
+
+				NamespaceStr = PI.DeclaringType.Namespace;
+				if (Namespace == null || NamespaceStr != LastNamespaceStr)
+				{
+					Namespace = await Language.GetNamespaceAsync(NamespaceStr);
+					LastNamespaceStr = NamespaceStr;
 				}
 
 				Header = null;

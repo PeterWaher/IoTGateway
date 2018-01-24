@@ -14,6 +14,7 @@ namespace Waher.Networking.XMPP.DataForms.Layout
 		private string label;
 		private LayoutElement[] staticElements;
 		private List<LayoutElement> dynamicElements = null;
+		private int priority = 0;
 
 		/// <summary>
 		/// Class managing a section within a page in a data form layout.
@@ -90,6 +91,15 @@ namespace Waher.Networking.XMPP.DataForms.Layout
 		/// Label
 		/// </summary>
 		public string Label { get { return this.label; } }
+
+		/// <summary>
+		/// Can be used to sort pages or sections. Not serialized to or from XML.
+		/// </summary>
+		public int Priority
+		{
+			get { return this.priority; }
+			set { this.priority = value; }
+		}
 
 		/// <summary>
 		/// Embedded layout elements.

@@ -97,7 +97,7 @@ namespace Waher.Client.WPF.Model
 					this.XmppAccountNode.ConcentratorClient.GetRootDataSources(FullJid, (sender, e) =>
 					{
 						this.loadingChildren = false;
-						MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() => Mouse.OverrideCursor = null));
+						MainWindow.MouseDefault();
 
 						if (e.Ok)
 						{

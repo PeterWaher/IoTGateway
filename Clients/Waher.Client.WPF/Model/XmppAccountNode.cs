@@ -1105,14 +1105,11 @@ namespace Waher.Client.WPF.Model
 					this.passwordHash = string.Empty;
 					this.client.Reconnect(this.client.UserName, NewPassword);
 
-					MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() => MessageBox.Show(MainWindow.currentInstance,
-						"Password successfully changed.", "Success", MessageBoxButton.OK, MessageBoxImage.Information)));
+					MainWindow.SuccessBox("Password successfully changed.");
 				}
 				else
-				{
-					MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() => MessageBox.Show(MainWindow.currentInstance,
-						"Unable to change password.", "Error", MessageBoxButton.OK, MessageBoxImage.Error)));
-				}
+					MainWindow.ErrorBox("Unable to change password.");
+
 			}, null);
 		}
 

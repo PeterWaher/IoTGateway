@@ -91,11 +91,7 @@ namespace Waher.Client.WPF.Model
 					}));
 				}
 				else
-				{
-					MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() => MessageBox.Show(MainWindow.currentInstance,
-						string.IsNullOrEmpty(e.ErrorText) ? "Unable to get search form." : e.ErrorText, "Error",
-						MessageBoxButton.OK, MessageBoxImage.Error)));
-				}
+					MainWindow.ErrorBox(string.IsNullOrEmpty(e.ErrorText) ? "Unable to get search form." : e.ErrorText);
 			}, (sender, e) =>
 			{
 				if (e.Ok)
@@ -112,11 +108,7 @@ namespace Waher.Client.WPF.Model
 					}));
 				}
 				else
-				{
-					MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() => MessageBox.Show(MainWindow.currentInstance,
-						string.IsNullOrEmpty(e.ErrorText) ? "Unable to perform search." : e.ErrorText, "Error",
-						MessageBoxButton.OK, MessageBoxImage.Error)));
-				}
+					MainWindow.ErrorBox(string.IsNullOrEmpty(e.ErrorText) ? "Unable to perform search." : e.ErrorText);
 			}, null);
 		}
 

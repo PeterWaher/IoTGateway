@@ -19,6 +19,7 @@ using System.Windows.Shapes;
 using Microsoft.Win32;
 using Waher.Content.Xml;
 using Waher.Content.Xsl;
+using Waher.Events;
 using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.DataForms.DataTypes;
 using Waher.Networking.XMPP.DataForms.FieldTypes;
@@ -231,6 +232,7 @@ namespace Waher.Client.WPF.Controls
 			}
 			catch (Exception ex)
 			{
+				ex = Log.UnnestException(ex);
 				MessageBox.Show(ex.Message, "Unable to load file.", MessageBoxButton.OK, MessageBoxImage.Error);
 			}
 		}

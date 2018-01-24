@@ -422,11 +422,7 @@ namespace Waher.Client.WPF.Model
 				}));
 			}
 			else
-			{
-				MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() => MessageBox.Show(MainWindow.currentInstance,
-					string.IsNullOrEmpty(e.ErrorText) ? "Unable to perform search." : e.ErrorText, "Error",
-					MessageBoxButton.OK, MessageBoxImage.Error)));
-			}
+				MainWindow.ErrorBox(string.IsNullOrEmpty(e.ErrorText) ? "Unable to perform search." : e.ErrorText);
 		}
 
 		public override bool CanAddChildren => true;
@@ -470,18 +466,14 @@ namespace Waher.Client.WPF.Model
 							}
 						}
 
-						MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() => MessageBox.Show(MainWindow.currentInstance,
-							Msg.ToString(), "Success", MessageBoxButton.OK, MessageBoxImage.Information)));
+						MainWindow.SuccessBox(Msg.ToString());
 
 						if (this.Account.Client.GetRosterItem(e.JID) == null)
 							this.Account.Client.RequestPresenceSubscription(e.JID);
 					}
 					else
-					{
-						MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() => MessageBox.Show(MainWindow.currentInstance,
-							string.IsNullOrEmpty(e.ErrorText) ? "Unable to claim device." : e.ErrorText, "Error",
-							MessageBoxButton.OK, MessageBoxImage.Error)));
-					}
+						MainWindow.ErrorBox(string.IsNullOrEmpty(e.ErrorText) ? "Unable to claim device." : e.ErrorText);
+
 				}, null);
 			}
 		}
@@ -539,16 +531,9 @@ namespace Waher.Client.WPF.Model
 			this.provisioningClient.ClearDeviceCaches((sender2, e2) =>
 			{
 				if (e2.Ok)
-				{
-					MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() => MessageBox.Show(MainWindow.currentInstance,
-						"The rule caches in your connected devices have been cleared.", "Success", MessageBoxButton.OK, MessageBoxImage.Information)));
-				}
+					MainWindow.SuccessBox("The rule caches in your connected devices have been cleared.");
 				else
-				{
-					MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() => MessageBox.Show(MainWindow.currentInstance,
-						string.IsNullOrEmpty(e2.ErrorText) ? "Unable to clear rule caches in your connected devices." : e2.ErrorText, 
-						"Error", MessageBoxButton.OK, MessageBoxImage.Information)));
-				}
+					MainWindow.ErrorBox(string.IsNullOrEmpty(e2.ErrorText) ? "Unable to clear rule caches in your connected devices." : e2.ErrorText);
 			}, null);
 		}
 
@@ -657,16 +642,10 @@ namespace Waher.Client.WPF.Model
 			this.provisioningClient.ClearDeviceCache(Contact.BareJID, (sender2, e2) =>
 			{
 				if (e2.Ok)
-				{
-					MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() => MessageBox.Show(MainWindow.currentInstance,
-						"The rule cache in " + Contact.BareJID + " has been cleared.", "Success", MessageBoxButton.OK, MessageBoxImage.Information)));
-				}
+					MainWindow.SuccessBox("The rule cache in " + Contact.BareJID + " has been cleared.");
 				else
-				{
-					MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() => MessageBox.Show(MainWindow.currentInstance,
-						string.IsNullOrEmpty(e2.ErrorText) ? "Unable to clear the rule cache in " + Contact.BareJID + "." : e2.ErrorText,
-						"Error", MessageBoxButton.OK, MessageBoxImage.Information)));
-				}
+					MainWindow.ErrorBox(string.IsNullOrEmpty(e2.ErrorText) ? "Unable to clear the rule cache in " + Contact.BareJID + "." : e2.ErrorText);
+
 			}, null);
 		}
 
@@ -678,16 +657,10 @@ namespace Waher.Client.WPF.Model
 			this.provisioningClient.DeleteDeviceRules(Contact.BareJID, (sender2, e2) =>
 			{
 				if (e2.Ok)
-				{
-					MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() => MessageBox.Show(MainWindow.currentInstance,
-						"The rules in " + Contact.BareJID + " have been deleted.", "Success", MessageBoxButton.OK, MessageBoxImage.Information)));
-				}
+					MainWindow.SuccessBox("The rules in " + Contact.BareJID + " have been deleted.");
 				else
-				{
-					MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() => MessageBox.Show(MainWindow.currentInstance,
-						string.IsNullOrEmpty(e2.ErrorText) ? "Unable to delete the rules in " + Contact.BareJID + "." : e2.ErrorText,
-						"Error", MessageBoxButton.OK, MessageBoxImage.Information)));
-				}
+					MainWindow.ErrorBox(string.IsNullOrEmpty(e2.ErrorText) ? "Unable to delete the rules in " + Contact.BareJID + "." : e2.ErrorText);
+
 			}, null);
 		}
 
@@ -699,16 +672,10 @@ namespace Waher.Client.WPF.Model
 			this.provisioningClient.DeleteDeviceRules(Node.Concentrator.BareJID, Node.NodeId, Node.SourceId, Node.Partition, (sender2, e2) =>
 			{
 				if (e2.Ok)
-				{
-					MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() => MessageBox.Show(MainWindow.currentInstance,
-						"The rules in " + Node.Header + " have been deleted.", "Success", MessageBoxButton.OK, MessageBoxImage.Information)));
-				}
+					MainWindow.SuccessBox("The rules in " + Node.Header + " have been deleted.");
 				else
-				{
-					MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() => MessageBox.Show(MainWindow.currentInstance,
-						string.IsNullOrEmpty(e2.ErrorText) ? "Unable to delete the rules in " + Node.Header + "." : e2.ErrorText,
-						"Error", MessageBoxButton.OK, MessageBoxImage.Information)));
-				}
+					MainWindow.ErrorBox(string.IsNullOrEmpty(e2.ErrorText) ? "Unable to delete the rules in " + Node.Header + "." : e2.ErrorText);
+
 			}, null);
 		}
 
@@ -720,16 +687,10 @@ namespace Waher.Client.WPF.Model
 			this.registryClient.Disown(Contact.BareJID, (sender2, e2) =>
 			{
 				if (e2.Ok)
-				{
-					MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() => MessageBox.Show(MainWindow.currentInstance,
-						Contact.BareJID + " has been disowned.", "Success", MessageBoxButton.OK, MessageBoxImage.Information)));
-				}
+					MainWindow.SuccessBox(Contact.BareJID + " has been disowned.");
 				else
-				{
-					MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() => MessageBox.Show(MainWindow.currentInstance,
-						string.IsNullOrEmpty(e2.ErrorText) ? "Unable to disown " + Contact.BareJID + "." : e2.ErrorText,
-						"Error", MessageBoxButton.OK, MessageBoxImage.Information)));
-				}
+					MainWindow.ErrorBox(string.IsNullOrEmpty(e2.ErrorText) ? "Unable to disown " + Contact.BareJID + "." : e2.ErrorText);
+
 			}, null);
 		}
 
@@ -741,16 +702,9 @@ namespace Waher.Client.WPF.Model
 			this.registryClient.Disown(Node.Concentrator.BareJID, Node.NodeId, Node.SourceId, Node.Partition, (sender2, e2) =>
 			{
 				if (e2.Ok)
-				{
-					MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() => MessageBox.Show(MainWindow.currentInstance,
-						Node.Header + " has been disowned.", "Success", MessageBoxButton.OK, MessageBoxImage.Information)));
-				}
+					MainWindow.SuccessBox(Node.Header + " has been disowned.");
 				else
-				{
-					MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() => MessageBox.Show(MainWindow.currentInstance,
-						string.IsNullOrEmpty(e2.ErrorText) ? "Unable to disown " + Node.Header + "." : e2.ErrorText,
-						"Error", MessageBoxButton.OK, MessageBoxImage.Information)));
-				}
+					MainWindow.ErrorBox(string.IsNullOrEmpty(e2.ErrorText) ? "Unable to disown " + Node.Header + "." : e2.ErrorText);
 			}, null);
 		}
 

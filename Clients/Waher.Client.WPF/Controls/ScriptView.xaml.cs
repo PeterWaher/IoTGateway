@@ -184,11 +184,8 @@ namespace Waher.Client.WPF.Controls
 				}
 				catch (Exception ex)
 				{
-					this.Dispatcher.BeginInvoke(new ThreadStart(() =>
-					{
-						ex = Log.UnnestException(ex);
-						MessageBox.Show(MainWindow.currentInstance, ex.Message, "Unable to parse script.", MessageBoxButton.OK, MessageBoxImage.Error);
-					}));
+					ex = Log.UnnestException(ex);
+					MainWindow.MessageBox(ex.Message, "Unable to parse script.", MessageBoxButton.OK, MessageBoxImage.Error);
 				}
 			});
 		}
@@ -481,6 +478,7 @@ namespace Waher.Client.WPF.Controls
 			}
 			catch (Exception ex)
 			{
+				ex = Log.UnnestException(ex);
 				MessageBox.Show(ex.Message, "Unable to load file.", MessageBoxButton.OK, MessageBoxImage.Error);
 			}
 		}

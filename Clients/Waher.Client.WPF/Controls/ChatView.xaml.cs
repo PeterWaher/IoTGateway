@@ -17,12 +17,13 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Microsoft.Win32;
-using Waher.Client.WPF.Controls.Chat;
-using Waher.Client.WPF.Model;
 using Waher.Content.Emoji.Emoji1;
 using Waher.Content.Markdown;
 using Waher.Content.Xml;
 using Waher.Content.Xsl;
+using Waher.Events;
+using Waher.Client.WPF.Controls.Chat;
+using Waher.Client.WPF.Model;
 
 namespace Waher.Client.WPF.Controls
 {
@@ -282,6 +283,7 @@ namespace Waher.Client.WPF.Controls
 			}
 			catch (Exception ex)
 			{
+				ex = Log.UnnestException(ex);
 				MessageBox.Show(ex.Message, "Unable to load file.", MessageBoxButton.OK, MessageBoxImage.Error);
 			}
 		}

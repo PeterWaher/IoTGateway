@@ -319,18 +319,12 @@ namespace Waher.Client.WPF.Controls.Questions
 					}));
 				}
 				else
-				{
-					DispatcherOperation Op = MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() =>
-					{
-						MessageBox.Show(MainWindow.currentInstance, string.IsNullOrEmpty(e.ErrorText) ? "Unable to get control form." : e.ErrorText,
-							"Error", MessageBoxButton.OK, MessageBoxImage.Error);
-					}));
-				}
+					MainWindow.ErrorBox(string.IsNullOrEmpty(e.ErrorText) ? "Unable to get control form." : e.ErrorText);
 			}
 			catch (Exception ex)
 			{
-				DispatcherOperation Op = MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() =>
-					MessageBox.Show(MainWindow.currentInstance, ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error)));
+				ex = Log.UnnestException(ex);
+				MainWindow.ErrorBox(ex.Message);
 			}
 		}
 
@@ -360,15 +354,12 @@ namespace Waher.Client.WPF.Controls.Questions
 				if (e.Ok)
 					await this.Processed(this.questionView);
 				else
-				{
-					DispatcherOperation Op = MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() => MessageBox.Show(MainWindow.currentInstance,
-						string.IsNullOrEmpty(e.ErrorText) ? "Unable to set rule." : e.ErrorText, "Error", MessageBoxButton.OK, MessageBoxImage.Error)));
-				}
+					MainWindow.ErrorBox(string.IsNullOrEmpty(e.ErrorText) ? "Unable to set rule." : e.ErrorText);
 			}
 			catch (Exception ex)
 			{
-				DispatcherOperation Op = MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() => MessageBox.Show(MainWindow.currentInstance,
-					ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error)));
+				ex = Log.UnnestException(ex);
+				MainWindow.ErrorBox(ex.Message);
 			}
 		}
 

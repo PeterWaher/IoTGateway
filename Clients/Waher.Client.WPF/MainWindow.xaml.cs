@@ -93,7 +93,8 @@ namespace Waher.Client.WPF
 				}
 				catch (Exception ex)
 				{
-					Dispatcher.BeginInvoke(new ThreadStart(() => MessageBox.Show(this, ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error)));
+					ex = Log.UnnestException(ex);
+					ErrorBox(ex.Message);
 				}
 			});
 
@@ -147,7 +148,7 @@ namespace Waher.Client.WPF
 			}
 			catch (Exception ex)
 			{
-				MessageBox.Show(this, ex.Message, "Unable to load values from registry.", MessageBoxButton.OK, MessageBoxImage.Error);
+				System.Windows.MessageBox.Show(this, ex.Message, "Unable to load values from registry.", MessageBoxButton.OK, MessageBoxImage.Error);
 			}
 		}
 
@@ -318,7 +319,7 @@ namespace Waher.Client.WPF
 			if (Node == null)
 				return;
 
-			if (MessageBox.Show(this, "Are you sure you want to remove " + Node.Header + "?", "Are you sure?", MessageBoxButton.YesNo,
+			if (System.Windows.MessageBox.Show(this, "Are you sure you want to remove " + Node.Header + "?", "Are you sure?", MessageBoxButton.YesNo,
 				MessageBoxImage.Question, MessageBoxResult.No) == MessageBoxResult.Yes)
 			{
 				this.MainView.NodeRemoved(Node.Parent, Node);
@@ -743,9 +744,9 @@ namespace Waher.Client.WPF
 			Mouse.OverrideCursor = null;
 
 			if (P is IqResultEventArgs e)
-				MessageBox.Show(this, e.ErrorText, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+				System.Windows.MessageBox.Show(this, e.ErrorText, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
 			else
-				MessageBox.Show(this, P.ToString(), "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+				System.Windows.MessageBox.Show(this, P.ToString(), "Error", MessageBoxButton.OK, MessageBoxImage.Error);
 		}
 
 		private void Search_CanExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -766,7 +767,7 @@ namespace Waher.Client.WPF
 			}
 			catch (Exception ex)
 			{
-				MessageBox.Show(this, ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+				System.Windows.MessageBox.Show(this, ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
 			}
 		}
 
@@ -918,6 +919,27 @@ namespace Waher.Client.WPF
 				if (Item is IDisposable Disposable)
 					Disposable.Dispose();
 			}
+		}
+
+		public static void ErrorBox(string ErrorMessage)
+		{
+			MessageBox(ErrorMessage, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+		}
+
+		public static void SuccessBox(string ErrorMessage)
+		{
+			MessageBox(ErrorMessage, "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+		}
+
+		public static void MessageBox(string Text, string Caption, MessageBoxButton Button, MessageBoxImage Icon)
+		{
+			Mouse.OverrideCursor = null;
+			currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() => System.Windows.MessageBox.Show(currentInstance, Text, Caption, Button, Icon)));
+		}
+
+		public static void MouseDefault()
+		{
+			MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() => Mouse.OverrideCursor = null));
 		}
 	}
 }

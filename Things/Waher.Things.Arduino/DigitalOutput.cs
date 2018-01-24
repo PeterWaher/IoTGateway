@@ -1,18 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Maker.RemoteWiring;
+using Waher.Events;
 using Waher.IoTGateway;
 using Waher.Persistence.Attributes;
 using Waher.Runtime.Language;
 using Waher.Things.Attributes;
+using Waher.Things.ControlParameters;
 using Waher.Things.SensorData;
 
 namespace Waher.Things.Arduino
 {
-	public class DigitalOutput : DigitalPin, ISensor
+	public class DigitalOutput : DigitalPin, ISensor, IActuator
 	{
 		private bool initialized = false;
 
@@ -71,6 +72,30 @@ namespace Waher.Things.Arduino
 		{
 			Gateway.NewMomentaryValues(this, new BooleanField(this, DateTime.Now, "Value", NewState == PinState.HIGH, FieldType.Momentary, FieldQoS.AutomaticReadout,
 				typeof(Module).Namespace, 13));
+		}
+
+		public ControlParameter[] GetControlParameters()
+		{
+			RemoteDevice Device = this.Device;
+			if (Device == null)
+				return new ControlParameter[0];
+
+			return new ControlParameter[]
+			{
+				new BooleanControlParameter("Output", "Actuator", "Output:", "Digital output.",
+					(Node) => Device.digitalRead(this.PinNr) == PinState.HIGH,
+					(Node, Value) =>
+					{
+						try
+						{
+							Device.digitalWrite(this.PinNr, Value ? PinState.HIGH : PinState.LOW);
+						}
+						catch (Exception ex)
+						{
+							Log.Critical(ex);
+						}
+					})
+			};
 		}
 	}
 }

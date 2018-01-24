@@ -315,7 +315,25 @@ namespace Waher.Client.WPF.Model
 
 		private void Add(string Type)
 		{
+			string FullJid = this.Concentrator?.FullJid;
+			ConcentratorClient ConcentratorClient = this.ConcentratorClient;
 
+			if (ConcentratorClient != null && !string.IsNullOrEmpty(FullJid))
+			{
+				Mouse.OverrideCursor = Cursors.Wait;
+
+				ConcentratorClient.GetParametersForNewNode(FullJid, this.nodeInfo, Type, "en", string.Empty, string.Empty, string.Empty, (sender, Form) =>
+				{
+					MainWindow.MouseDefault();
+
+					MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() =>
+					{
+						ParameterDialog Dialog = new ParameterDialog(Form);
+						Dialog.ShowDialog();
+					}));
+
+				});
+			}
 		}
 
 	}

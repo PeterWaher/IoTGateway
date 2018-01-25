@@ -106,6 +106,12 @@ namespace Waher.IoTGateway
 	public delegate Task<IDataSource[]> GetDataSources(params IDataSource[] DataSources);
 
 	/// <summary>
+	/// Delegate for XMPP Credential export callback methods.
+	/// </summary>
+	/// <param name="Credentials">XMPP Credentials</param>
+	public delegate void ExportXmppCredentialsEventHandler(XmppCredentials Credentials);
+
+	/// <summary>
 	/// Static class managing the runtime environment of the IoT Gateway.
 	/// </summary>
 	public static class Gateway
@@ -1120,6 +1126,22 @@ namespace Waher.IoTGateway
 		public static XmppClient XmppClient
 		{
 			get { return xmppClient; }
+		}
+
+		/// <summary>
+		/// Exports current XMPP Credentials.
+		/// </summary>
+		/// <param name="Callback">Method to call when credentials are available.</param>
+		public static async Task Export(ExportXmppCredentialsEventHandler Callback)
+		{
+			XmppCredentials Credentials;
+
+			if (GetXmppClientCredentials != null)
+				Credentials = await GetXmppClientCredentials(xmppConfigFileName);
+			else
+				throw new Exception("XMPP Client Credentials not provided. Make sure the GetXmppClientCredentials event has an appropriate event handler.");
+
+			Callback?.Invoke(Credentials);
 		}
 
 

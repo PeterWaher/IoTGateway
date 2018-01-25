@@ -40,6 +40,7 @@
     <ProjectReference Include="..\Events\Waher.Events.Console\Waher.Events.Console.csproj" />
     <ProjectReference Include="..\Events\Waher.Events.Persistence\Waher.Events.Persistence.csproj" />
     <ProjectReference Include="..\Events\Waher.Events\Waher.Events.csproj" />
+    <ProjectReference Include="..\Mocks\Waher.Mock\Waher.Mock.csproj" />
     <ProjectReference Include="..\Persistence\Waher.Persistence.Files\Waher.Persistence.Files.csproj" />
     <ProjectReference Include="..\Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj" />
     <ProjectReference Include="..\Script\Waher.Script.Persistence\Waher.Script.Persistence.csproj" />

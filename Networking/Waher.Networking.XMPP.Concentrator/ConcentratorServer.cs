@@ -1136,7 +1136,7 @@ namespace Waher.Networking.XMPP.Concentrator
 							if (Parameters || Messages)
 							{
 								Xml.Append(">");
-								await this.ExportParametersAndMessages(Xml, Node, Parameters, Messages, Language, Caller);
+								await this.ExportParametersAndMessages(Xml, ChildNode, Parameters, Messages, Language, Caller);
 								Xml.Append("</nd>");
 							}
 							else

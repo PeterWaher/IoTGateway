@@ -105,6 +105,9 @@ namespace Waher.Client.WPF.Controls
 							{
 								foreach (Parameter P in Parameters.Ordered)
 								{
+									if (P.Id == "NodeId" || P.Id == "Type")
+										continue;
+
 									if (Headers == null)
 										Headers = new Dictionary<string, bool>();
 
@@ -116,7 +119,7 @@ namespace Waher.Client.WPF.Controls
 										{
 											Header = P.Name,
 											Width = double.NaN,
-											DisplayMemberBinding = new Binding("DisplayableParameters[" + P.Id + "].StringValue")
+											DisplayMemberBinding = new Binding("DisplayableParameters[" + P.Id + "]")
 										};
 
 										GridView.Columns.Add(Column);

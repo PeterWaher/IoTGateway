@@ -5,12 +5,8 @@ Client:
 	* Custom dialog
 	* List available subscription requests in a list
 	* Ignore duplicates
-
-Errors
-	Pin collision (digital/analog)
-
-Parameters Dialog
-	Auto-select first control
+* Parameters Dialog
+	* Auto-select first control
 
 Metering Node
 	Provisioning tab

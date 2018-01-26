@@ -52,9 +52,23 @@ namespace Waher.Client.WPF.Model
 		public override string Key => this.nodeInfo.NodeId;
 		public override string Header => this.nodeInfo.LocalId;
 		public override string ToolTip => "Node";
-		public override string TypeName => this.nodeInfo.NodeType;
 		public override bool CanRecycle => false;
 		public override DisplayableParameters DisplayableParameters => this.parameters;
+
+		public override string TypeName
+		{
+			get
+			{
+				if (this.parameters != null)
+				{
+					string s = this.parameters["Type"];
+					if (!string.IsNullOrEmpty(s))
+						return s;
+				}
+
+				return this.nodeInfo.NodeType;
+			}
+		}
 
 		public override ImageSource ImageResource
 		{
@@ -294,8 +308,8 @@ namespace Waher.Client.WPF.Model
 							default:
 								MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() =>
 								{
-								SelectItemDialog Form = new SelectItemDialog("Add node", "Select type of node to add:",
-									"Add node of selected type.", "Type", "Class", e.Result)
+									SelectItemDialog Form = new SelectItemDialog("Add node", "Select type of node to add:",
+										"Add node of selected type.", "Type", "Class", e.Result)
 									{
 										Owner = MainWindow.currentInstance
 									};
@@ -335,7 +349,7 @@ namespace Waher.Client.WPF.Model
 						Dialog.ShowDialog();
 					}));
 
-				}, (sender, e)=>
+				}, (sender, e) =>
 				{
 					if (e.Ok)
 					{

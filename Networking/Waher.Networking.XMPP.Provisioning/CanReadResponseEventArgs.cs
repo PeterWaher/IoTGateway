@@ -24,7 +24,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		private string[] fieldNames;
 
 		internal CanReadResponseEventArgs(IqResultEventArgs e, object State, string JID, bool CanRead, FieldType FieldTypes,
-			ThingReference[] Nodes, string[] FieldNames)
+			IThingReference[] Nodes, string[] FieldNames)
 			: base(e, State, JID, Nodes)
 		{
 			this.canRead = CanRead;

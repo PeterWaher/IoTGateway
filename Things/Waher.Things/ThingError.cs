@@ -18,7 +18,7 @@ namespace Waher.Things
 		/// </summary>
 		/// <param name="Thing">Thing reference.</param>
 		/// <param name="ErrorMessage">Error message.</param>
-		public ThingError(ThingReference Thing, string ErrorMessage)
+		public ThingError(IThingReference Thing, string ErrorMessage)
 			: this(Thing.NodeId, Thing.SourceId, Thing.Partition, DateTime.Now, ErrorMessage)
 		{
 		}
@@ -41,7 +41,7 @@ namespace Waher.Things
 		/// <param name="Thing">Thing reference.</param>
 		/// <param name="Timestamp">Timestamp.</param>
 		/// <param name="ErrorMessage">Error message.</param>
-		public ThingError(ThingReference Thing, DateTime Timestamp, string ErrorMessage)
+		public ThingError(IThingReference Thing, DateTime Timestamp, string ErrorMessage)
 			: this(Thing.NodeId, Thing.SourceId, Thing.Partition, Timestamp, ErrorMessage)
 		{
 		}

@@ -69,14 +69,14 @@ namespace Waher.Things.ControlParameters
 		/// <param name="Node">Node reference, if available.</param>
 		/// <param name="StringValue">String representation of value to set.</param>
 		/// <returns>If the parameter could be set (true), or if the value could not be parsed or its value was invalid (false).</returns>
-		public abstract bool SetStringValue(ThingReference Node, string StringValue);
+		public abstract bool SetStringValue(IThingReference Node, string StringValue);
 
 		/// <summary>
 		/// Gets the string value of the control parameter.
 		/// </summary>
 		/// <param name="Node">Node reference, if available.</param>
 		/// <returns>String representation of the value.</returns>
-		public abstract string GetStringValue(ThingReference Node);
+		public abstract string GetStringValue(IThingReference Node);
 
 		/// <summary>
 		/// <see cref="Object.Equals(object)"/>
@@ -101,7 +101,7 @@ namespace Waher.Things.ControlParameters
 		/// </summary>
 		/// <param name="Output">Output</param>
 		/// <param name="Node">Node reference, if available.</param>
-		public virtual void ExportToForm(XmlWriter Output, ThingReference Node)
+		public virtual void ExportToForm(XmlWriter Output, IThingReference Node)
 		{
 			string StringValue = this.GetStringValue(Node);
 
@@ -132,7 +132,7 @@ namespace Waher.Things.ControlParameters
 		/// </summary>
 		/// <param name="Output">Output</param>
 		/// <param name="Node">Node reference, if available.</param>
-		public abstract void ExportValidationRules(XmlWriter Output, ThingReference Node);
+		public abstract void ExportValidationRules(XmlWriter Output, IThingReference Node);
 
 	}
 }

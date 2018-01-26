@@ -17,7 +17,7 @@ namespace Waher.Networking.XMPP.Sensor
 		private string id;
 		private string remoteJid;
 		private string actor;
-		private ThingReference[] nodes;
+		private IThingReference[] nodes;
 		private FieldType types;
 		private string[] fieldsNames;
 		private DateTime from;
@@ -44,7 +44,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="ServiceToken">Optional service token.</param>
 		/// <param name="DeviceToken">Optional device token.</param>
 		/// <param name="UserToken">Optional user token.</param>
-		internal SensorDataRequest(string Id, string RemoteJID, string Actor, ThingReference[] Nodes, FieldType Types, string[] FieldNames, 
+		internal SensorDataRequest(string Id, string RemoteJID, string Actor, IThingReference[] Nodes, FieldType Types, string[] FieldNames, 
 			DateTime From, DateTime To, DateTime When, string ServiceToken, string DeviceToken, string UserToken)
 		{
 			this.id = Id;
@@ -100,7 +100,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <summary>
 		/// Array of nodes to read. Can be null or empty, if reading a sensor that is not a concentrator.
 		/// </summary>
-		public ThingReference[] Nodes
+		public IThingReference[] Nodes
 		{
 			get { return this.nodes; }
 			internal set { this.nodes = value; }

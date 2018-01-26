@@ -12,14 +12,14 @@ namespace Waher.Things.ControlParameters
 	/// </summary>
 	/// <param name="Node">Node whose parameter is being set.</param>
 	/// <param name="Value">Value set.</param>
-	public delegate void Int32SetHandler(ThingReference Node, int Value);
+	public delegate void Int32SetHandler(IThingReference Node, int Value);
 
 	/// <summary>
 	/// Get handler delegate for 32-bit integer control parameters.
 	/// </summary>
 	/// <param name="Node">Node whose parameter is being retrieved.</param>
 	/// <returns>Current value, or null if not available.</returns>
-	public delegate int? Int32GetHandler(ThingReference Node);
+	public delegate int? Int32GetHandler(IThingReference Node);
 
 	/// <summary>
 	/// Int32 control parameter.
@@ -74,7 +74,7 @@ namespace Waher.Things.ControlParameters
 		/// <param name="Node">Node reference, if available.</param>
 		/// <param name="Value">Value to set.</param>
 		/// <returns>If the parameter could be set (true), or if the value was invalid (false).</returns>
-		public bool Set(ThingReference Node, int Value)
+		public bool Set(IThingReference Node, int Value)
 		{
 			try
 			{
@@ -97,7 +97,7 @@ namespace Waher.Things.ControlParameters
 		/// <param name="Node">Node reference, if available.</param>
 		/// <param name="StringValue">String representation of value to set.</param>
 		/// <returns>If the parameter could be set (true), or if the value could not be parsed or its value was invalid (false).</returns>
-		public override bool SetStringValue(ThingReference Node, string StringValue)
+		public override bool SetStringValue(IThingReference Node, string StringValue)
 		{
 			if (!int.TryParse(StringValue, out int Value) || (this.min.HasValue && Value < this.min.Value) || (this.max.HasValue && Value > this.max.Value))
 				return false;
@@ -111,7 +111,7 @@ namespace Waher.Things.ControlParameters
 		/// Gets the value of the control parameter.
 		/// </summary>
 		/// <returns>Current value, or null if not available.</returns>
-		public int? Get(ThingReference Node)
+		public int? Get(IThingReference Node)
 		{
 			try
 			{
@@ -129,7 +129,7 @@ namespace Waher.Things.ControlParameters
 		/// </summary>
 		/// <param name="Node">Node reference, if available.</param>
 		/// <returns>String representation of the value.</returns>
-		public override string GetStringValue(ThingReference Node)
+		public override string GetStringValue(IThingReference Node)
 		{
 			int? Value = this.Get(Node);
 
@@ -144,7 +144,7 @@ namespace Waher.Things.ControlParameters
 		/// </summary>
 		/// <param name="Output">Output</param>
 		/// <param name="Node">Node reference, if available.</param>
-		public override void ExportValidationRules(XmlWriter Output, ThingReference Node)
+		public override void ExportValidationRules(XmlWriter Output, IThingReference Node)
 		{
 			Output.WriteStartElement("xdv", "validate", null);
 			Output.WriteAttributeString("datatype", "xs:int");

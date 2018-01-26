@@ -20,7 +20,7 @@ namespace Waher.Networking.XMPP.Control
 	/// </summary>
 	/// <param name="Node">Node reference.</param>
 	/// <returns>Collection of control parameters for node, or null if node not recognized.</returns>
-	public delegate Task<ControlParameter[]> GetControlParametersEventHandler(ThingReference Node);
+	public delegate Task<ControlParameter[]> GetControlParametersEventHandler(IThingReference Node);
 
 	/// <summary>
 	/// Implements an XMPP control server interface.
@@ -101,7 +101,7 @@ namespace Waher.Networking.XMPP.Control
 		/// </summary>
 		/// <param name="Node">Optional null reference. If not behind a concentrator, use null.</param>
 		/// <returns>Control parameters by parameter name.</returns>
-		public async Task<Dictionary<string, ControlParameter>> GetControlParametersByName(ThingReference Node)
+		public async Task<Dictionary<string, ControlParameter>> GetControlParametersByName(IThingReference Node)
 		{
 			GetControlParametersEventHandler h = this.OnGetControlParameters;
 			if (h == null)
@@ -173,7 +173,14 @@ namespace Waher.Networking.XMPP.Control
 		/// <summary>
 		/// Array consisting of a null reference, implying no underlying nodes are referenced in the control operation.
 		/// </summary>
-		public static readonly IEnumerable<ThingReference> NoNodes = new ThingReference[] { null };
+		public static readonly IEnumerable<IThingReference> NoNodes = new ThingReference[] { null };
+
+		/// <summary>
+		/// Event raised when a node is referenced in a request. Can be used to check if nodes exist, and
+		/// return the proper node class. If not provided, <see cref="ThingReference"/> objects will be created
+		/// for each node reference.
+		/// </summary>
+		public event GetThingReferenceMethod OnGetNode = null;
 
 		private async void SetHandler(object Sender, IqEventArgs e)
 		{
@@ -183,7 +190,7 @@ namespace Waher.Networking.XMPP.Control
 				string DeviceToken = XML.Attribute(e.Query, "dt");
 				string UserToken = XML.Attribute(e.Query, "ut");
 
-				LinkedList<ThingReference> Nodes = null;
+				LinkedList<IThingReference> Nodes = null;
 				SortedDictionary<string, bool> ParameterNames = this.provisioningClient == null ? null : new SortedDictionary<string, bool>();
 				LinkedList<ControlOperation> Operations = new LinkedList<ControlOperation>();
 				ControlParameter Parameter;
@@ -201,12 +208,22 @@ namespace Waher.Networking.XMPP.Control
 					{
 						case "nd":
 							if (Nodes == null)
-								Nodes = new LinkedList<ThingReference>();
+								Nodes = new LinkedList<IThingReference>();
 
-							Nodes.AddLast(new ThingReference(
-								XML.Attribute(E, "id"),
-								XML.Attribute(E, "src"),
-								XML.Attribute(E, "pt")));
+							string NodeId = XML.Attribute(E, "id");
+							string SourceId = XML.Attribute(E, "src");
+							string Partition = XML.Attribute(E, "pt");
+
+							if (this.OnGetNode == null)
+								Nodes.AddLast(new ThingReference(NodeId, SourceId, Partition));
+							else
+							{
+								IThingReference Ref = await this.OnGetNode(NodeId, SourceId, Partition);
+								if (Ref == null)
+									throw new ItemNotFoundException("Node not found.", e.IQ);
+
+								Nodes.AddLast(Ref);
+							}
 							break;
 
 						case "b":
@@ -254,7 +271,7 @@ namespace Waher.Networking.XMPP.Control
 					{
 						case "b":
 							Name = XML.Attribute(E, "n");
-							foreach (ThingReference Node in Nodes ?? NoNodes)
+							foreach (IThingReference Node in Nodes ?? NoNodes)
 							{
 								Parameter = await this.GetParameter(Node, Name, e);
 								if (Parameter == null)
@@ -273,7 +290,7 @@ namespace Waher.Networking.XMPP.Control
 
 						case "cl":
 							Name = XML.Attribute(E, "n");
-							foreach (ThingReference Node in Nodes ?? NoNodes)
+							foreach (IThingReference Node in Nodes ?? NoNodes)
 							{
 								Parameter = await this.GetParameter(Node, Name, e);
 								if (Parameter == null)
@@ -488,7 +505,7 @@ namespace Waher.Networking.XMPP.Control
 
 								if (e2.Nodes != null || e2.ParameterNames != null)
 								{
-									Dictionary<ThingReference, bool> AllowedNodes = null;
+									Dictionary<IThingReference, bool> AllowedNodes = null;
 									Dictionary<string, bool> AllowedParameterNames = null;
 
 									Operations2 = new LinkedList<ControlOperation>();
@@ -496,7 +513,7 @@ namespace Waher.Networking.XMPP.Control
 
 									if (e2.Nodes != null)
 									{
-										AllowedNodes = new Dictionary<ThingReference, bool>();
+										AllowedNodes = new Dictionary<IThingReference, bool>();
 										foreach (ThingReference Node in e2.Nodes)
 											AllowedNodes[Node] = true;
 									}
@@ -552,7 +569,7 @@ namespace Waher.Networking.XMPP.Control
 
 		private static readonly char[] space = new char[] { ' ' };
 
-		private void PerformOperations(LinkedList<ControlOperation> Operations, IqEventArgs e, IEnumerable<ThingReference> Nodes,
+		private void PerformOperations(LinkedList<ControlOperation> Operations, IqEventArgs e, IEnumerable<IThingReference> Nodes,
 			IEnumerable<string> ParameterNames)
 		{
 			foreach (ControlOperation Operation in Operations)
@@ -611,7 +628,7 @@ namespace Waher.Networking.XMPP.Control
 			e.IqResult(Xml.ToString());
 		}
 
-		private async Task<ControlParameter> GetParameter(ThingReference Node, string Name, IqEventArgs e)
+		private async Task<ControlParameter> GetParameter(IThingReference Node, string Name, IqEventArgs e)
 		{
 			Dictionary<string, ControlParameter> Parameters = await this.GetControlParametersByName(Node);
 
@@ -634,7 +651,7 @@ namespace Waher.Networking.XMPP.Control
 		{
 			try
 			{
-				LinkedList<ThingReference> Nodes = null;
+				LinkedList<IThingReference> Nodes = null;
 				XmlElement E;
 				string ServiceToken = XML.Attribute(e.Query, "st");
 				string DeviceToken = XML.Attribute(e.Query, "dt");
@@ -649,12 +666,22 @@ namespace Waher.Networking.XMPP.Control
 					if (E.LocalName == "nd")
 					{
 						if (Nodes == null)
-							Nodes = new LinkedList<ThingReference>();
+							Nodes = new LinkedList<IThingReference>();
 
-						Nodes.AddLast(new ThingReference(
-							XML.Attribute(E, "id"),
-							XML.Attribute(E, "src"),
-							XML.Attribute(E, "pt")));
+						string NodeId = XML.Attribute(E, "id");
+						string SourceId = XML.Attribute(E, "src");
+						string Partition = XML.Attribute(E, "pt");
+
+						if (this.OnGetNode == null)
+							Nodes.AddLast(new ThingReference(NodeId, SourceId, Partition));
+						else
+						{
+							IThingReference Ref = await this.OnGetNode(NodeId, SourceId, Partition);
+							if (Ref == null)
+								throw new ItemNotFoundException("Node not found.", e.IQ);
+
+							Nodes.AddLast(Ref);
+						}
 					}
 				}
 
@@ -789,11 +816,11 @@ namespace Waher.Networking.XMPP.Control
 			}
 		}
 
-		private void ReturnForm(IqEventArgs e, ControlParameter[] Parameters, LinkedList<ThingReference> Nodes)
+		private void ReturnForm(IqEventArgs e, ControlParameter[] Parameters, LinkedList<IThingReference> Nodes)
 		{
 			StringBuilder Xml = new StringBuilder();
 			XmlWriter Output = XmlWriter.Create(Xml, XML.WriterSettings(false, true));
-			ThingReference FirstNode;
+			IThingReference FirstNode;
 
 			Output.WriteStartElement("x", XmppClient.NamespaceData);
 			Output.WriteAttributeString("xmlns", "xdv", null, XmppClient.NamespaceDataValidate);

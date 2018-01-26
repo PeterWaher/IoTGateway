@@ -43,7 +43,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="ServiceToken">Service Token.</param>
 		/// <param name="DeviceToken">Device Token.</param>
 		/// <param name="UserToken">User Token.</param>
-		public Subscription(string Id, string From, ThingReference[] Nodes, Dictionary<string, FieldSubscriptionRule> Fields,
+		public Subscription(string Id, string From, IThingReference[] Nodes, Dictionary<string, FieldSubscriptionRule> Fields,
 			FieldType FieldTypes, Duration MaxAge, Duration MinInterval, Duration MaxInterval, string ServiceToken, string DeviceToken,
 			string UserToken)
 		{

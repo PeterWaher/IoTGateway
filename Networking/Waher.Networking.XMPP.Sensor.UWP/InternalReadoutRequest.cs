@@ -29,7 +29,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="OnFieldsReported">Callback method when fields are reported.</param>
 		/// <param name="OnErrorsReported">Callback method when errors are reported.</param>
 		/// <param name="State">State object passed on to callback methods.</param>
-		public InternalReadoutRequest(string Actor, ThingReference[] Nodes, FieldType Types, string[] Fields, DateTime From, DateTime To,
+		public InternalReadoutRequest(string Actor, IThingReference[] Nodes, FieldType Types, string[] Fields, DateTime From, DateTime To,
 			InternalReadoutFieldsEventHandler OnFieldsReported, InternalReadoutErrorsEventHandler OnErrorsReported, object State)
 			: base(string.Empty, null, string.Empty, Actor, Nodes, Types, Fields, From, To, DateTime.MinValue, string.Empty, string.Empty, string.Empty)
 		{

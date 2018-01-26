@@ -23,7 +23,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		private string[] parameterNames;
 
 		internal CanControlResponseEventArgs(IqResultEventArgs e, object State, string JID, bool CanControl, 
-			ThingReference[] Nodes, string[] ParameterNames)
+			IThingReference[] Nodes, string[] ParameterNames)
 			: base(e, State, JID, Nodes)
 		{
 			this.canControl = CanControl;

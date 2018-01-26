@@ -13,14 +13,14 @@ namespace Waher.Things.ControlParameters
 	/// </summary>
 	/// <param name="Node">Node whose parameter is being set.</param>
 	/// <param name="Value">Value set.</param>
-	public delegate void DateTimeSetHandler(ThingReference Node, DateTime Value);
+	public delegate void DateTimeSetHandler(IThingReference Node, DateTime Value);
 
 	/// <summary>
 	/// Get handler delegate for date and time control parameters.
 	/// </summary>
 	/// <param name="Node">Node whose parameter is being retrieved.</param>
 	/// <returns>Current value, or null if not available.</returns>
-	public delegate DateTime? DateTimeGetHandler(ThingReference Node);
+	public delegate DateTime? DateTimeGetHandler(IThingReference Node);
 
 	/// <summary>
 	/// DateTime control parameter.
@@ -58,7 +58,7 @@ namespace Waher.Things.ControlParameters
 		/// <param name="Node">Node reference, if available.</param>
 		/// <param name="Value">Value to set.</param>
 		/// <returns>If the parameter could be set (true), or if the value was invalid (false).</returns>
-		public bool Set(ThingReference Node, DateTime Value)
+		public bool Set(IThingReference Node, DateTime Value)
 		{
 			try
 			{
@@ -81,7 +81,7 @@ namespace Waher.Things.ControlParameters
 		/// <param name="Node">Node reference, if available.</param>
 		/// <param name="StringValue">String representation of value to set.</param>
 		/// <returns>If the parameter could be set (true), or if the value could not be parsed or its value was invalid (false).</returns>
-		public override bool SetStringValue(ThingReference Node, string StringValue)
+		public override bool SetStringValue(IThingReference Node, string StringValue)
 		{
 			if (!XML.TryParse(StringValue, out DateTime Value))
 				return false;
@@ -95,7 +95,7 @@ namespace Waher.Things.ControlParameters
 		/// Gets the value of the control parameter.
 		/// </summary>
 		/// <returns>Current value, or null if not available.</returns>
-		public DateTime? Get(ThingReference Node)
+		public DateTime? Get(IThingReference Node)
 		{
 			try
 			{
@@ -113,7 +113,7 @@ namespace Waher.Things.ControlParameters
 		/// </summary>
 		/// <param name="Node">Node reference, if available.</param>
 		/// <returns>String representation of the value.</returns>
-		public override string GetStringValue(ThingReference Node)
+		public override string GetStringValue(IThingReference Node)
 		{
 			DateTime? Value = this.Get(Node);
 
@@ -128,7 +128,7 @@ namespace Waher.Things.ControlParameters
 		/// </summary>
 		/// <param name="Output">Output</param>
 		/// <param name="Node">Node reference, if available.</param>
-		public override void ExportValidationRules(XmlWriter Output, ThingReference Node)
+		public override void ExportValidationRules(XmlWriter Output, IThingReference Node)
 		{
 			Output.WriteStartElement("xdv", "validate", null);
 			Output.WriteAttributeString("datatype", "xs:dateTime");

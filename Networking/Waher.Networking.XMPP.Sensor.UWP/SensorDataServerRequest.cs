@@ -43,7 +43,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="ServiceToken">Optional service token.</param>
 		/// <param name="DeviceToken">Optional device token.</param>
 		/// <param name="UserToken">Optional user token.</param>
-		public SensorDataServerRequest(string Id, SensorServer SensorServer, string RemoteJID, string Actor, ThingReference[] Nodes, FieldType Types,
+		public SensorDataServerRequest(string Id, SensorServer SensorServer, string RemoteJID, string Actor, IThingReference[] Nodes, FieldType Types,
 			string[] Fields, DateTime From, DateTime To, DateTime When, string ServiceToken, string DeviceToken, string UserToken)
 			: base(Id, RemoteJID, Actor, Nodes, Types, Fields, From, To, When, ServiceToken, DeviceToken, UserToken)
 		{
@@ -312,7 +312,6 @@ namespace Waher.Networking.XMPP.Sensor
 			FieldType FieldTypes;
 			FieldQoS FieldQoS;
 			EnumField EnumField;
-			QuantityField QuantityField;
 			string FieldDataTypeName;
 			bool First;
 
@@ -426,7 +425,7 @@ namespace Waher.Networking.XMPP.Sensor
 			if (FieldQoS.HasFlag(FieldQoS.InvoiceConfirmed))
 				Xml.WriteAttributeString("ic", "true");
 
-			if ((QuantityField = Field as QuantityField) != null)
+			if (Field is QuantityField QuantityField)
 			{
 				Xml.WriteAttributeString("v", CommonTypes.Encode(QuantityField.Value, QuantityField.NrDecimals));
 				Xml.WriteAttributeString("u", QuantityField.Unit);

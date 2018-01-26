@@ -14,14 +14,14 @@ namespace Waher.Things.ControlParameters
 	/// </summary>
 	/// <param name="Node">Node whose parameter is being set.</param>
 	/// <param name="Value">Value set.</param>
-	public delegate void ColorSetHandler(ThingReference Node, ColorReference Value);
+	public delegate void ColorSetHandler(IThingReference Node, ColorReference Value);
 
 	/// <summary>
 	/// Get handler delegate for color control parameters.
 	/// </summary>
 	/// <param name="Node">Node whose parameter is being retrieved.</param>
 	/// <returns>Current value, or null if not available.</returns>
-	public delegate ColorReference ColorGetHandler(ThingReference Node);
+	public delegate ColorReference ColorGetHandler(IThingReference Node);
 
 	/// <summary>
 	/// Color control parameter.
@@ -53,7 +53,7 @@ namespace Waher.Things.ControlParameters
 		/// <param name="Node">Node reference, if available.</param>
 		/// <param name="Value">Value to set.</param>
 		/// <returns>If the parameter could be set (true), or if the value was invalid (false).</returns>
-		public bool Set(ThingReference Node, ColorReference Value)
+		public bool Set(IThingReference Node, ColorReference Value)
 		{
 			try
 			{
@@ -73,7 +73,7 @@ namespace Waher.Things.ControlParameters
 		/// <param name="Node">Node reference, if available.</param>
 		/// <param name="StringValue">String representation of value to set.</param>
 		/// <returns>If the parameter could be set (true), or if the value could not be parsed or its value was invalid (false).</returns>
-		public override bool SetStringValue(ThingReference Node, string StringValue)
+		public override bool SetStringValue(IThingReference Node, string StringValue)
 		{
 			byte R, G, B;
 
@@ -110,7 +110,7 @@ namespace Waher.Things.ControlParameters
 		/// Gets the value of the control parameter.
 		/// </summary>
 		/// <returns>Current value, or null if not available.</returns>
-		public ColorReference Get(ThingReference Node)
+		public ColorReference Get(IThingReference Node)
 		{
 			try
 			{
@@ -128,7 +128,7 @@ namespace Waher.Things.ControlParameters
 		/// </summary>
 		/// <param name="Node">Node reference, if available.</param>
 		/// <returns>String representation of the value.</returns>
-		public override string GetStringValue(ThingReference Node)
+		public override string GetStringValue(IThingReference Node)
 		{
 			ColorReference Value = this.Get(Node);
 
@@ -143,7 +143,7 @@ namespace Waher.Things.ControlParameters
 		/// </summary>
 		/// <param name="Output">Output</param>
 		/// <param name="Node">Node reference, if available.</param>
-		public override void ExportValidationRules(XmlWriter Output, ThingReference Node)
+		public override void ExportValidationRules(XmlWriter Output, IThingReference Node)
 		{
 			ColorReference Value = this.Get(Node);
 

@@ -157,7 +157,7 @@ namespace Waher.Things.Gpio
 			};
 		}
 
-		private bool? GetValue(ThingReference Node)
+		private bool? GetValue(IThingReference Node)
 		{
 			if (this.pin == null)
 			{
@@ -170,7 +170,7 @@ namespace Waher.Things.Gpio
 			return this.pin.Read() == GpioPinValue.High;
 		}
 
-		private void SetValue(ThingReference Node, bool Value)
+		private void SetValue(IThingReference Node, bool Value)
 		{
 			if (this.pin == null)
 			{

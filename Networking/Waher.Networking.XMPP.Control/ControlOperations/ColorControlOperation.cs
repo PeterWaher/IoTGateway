@@ -22,7 +22,7 @@ namespace Waher.Networking.XMPP.Control.ControlOperations
 		/// <param name="Parameter">Control parameter.</param>
 		/// <param name="Value">Value to set.</param>
 		/// <param name="request">Original request.</param>
-		public ColorControlOperation(ThingReference Node, ColorControlParameter Parameter, string Value, IqEventArgs request)
+		public ColorControlOperation(IThingReference Node, ColorControlParameter Parameter, string Value, IqEventArgs request)
 			: base(Node, request, Parameter)
 		{
 			this.parameter = Parameter;

@@ -16,7 +16,7 @@ namespace Waher.Things
 		/// <summary>
 		/// Array of nodes to read. Can be null or empty, if reading a sensor that is not a concentrator.
 		/// </summary>
-		ThingReference[] Nodes
+		IThingReference[] Nodes
 		{
 			get;
 		}

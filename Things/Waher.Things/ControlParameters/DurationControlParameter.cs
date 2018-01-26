@@ -13,14 +13,14 @@ namespace Waher.Things.ControlParameters
 	/// </summary>
 	/// <param name="Node">Node whose parameter is being set.</param>
 	/// <param name="Value">Value set.</param>
-	public delegate void DurationSetHandler(ThingReference Node, Duration Value);
+	public delegate void DurationSetHandler(IThingReference Node, Duration Value);
 
 	/// <summary>
 	/// Get handler delegate for duration control parameters.
 	/// </summary>
 	/// <param name="Node">Node whose parameter is being retrieved.</param>
 	/// <returns>Current value, or null if not available.</returns>
-	public delegate Duration DurationGetHandler(ThingReference Node);
+	public delegate Duration DurationGetHandler(IThingReference Node);
 
 	/// <summary>
 	/// Duration control parameter.
@@ -77,7 +77,7 @@ namespace Waher.Things.ControlParameters
 		/// <param name="Node">Node reference, if available.</param>
 		/// <param name="Value">Value to set.</param>
 		/// <returns>If the parameter could be set (true), or if the value was invalid (false).</returns>
-		public bool Set(ThingReference Node, Duration Value)
+		public bool Set(IThingReference Node, Duration Value)
 		{
 			try
 			{
@@ -100,7 +100,7 @@ namespace Waher.Things.ControlParameters
 		/// <param name="Node">Node reference, if available.</param>
 		/// <param name="StringValue">String representation of value to set.</param>
 		/// <returns>If the parameter could be set (true), or if the value could not be parsed or its value was invalid (false).</returns>
-		public override bool SetStringValue(ThingReference Node, string StringValue)
+		public override bool SetStringValue(IThingReference Node, string StringValue)
 		{
 			if (!Duration.TryParse(StringValue, out Duration Value))
 				return false;
@@ -114,7 +114,7 @@ namespace Waher.Things.ControlParameters
 		/// Gets the value of the control parameter.
 		/// </summary>
 		/// <returns>Current value, or null if not available.</returns>
-		public Duration Get(ThingReference Node)
+		public Duration Get(IThingReference Node)
 		{
 			try
 			{
@@ -132,7 +132,7 @@ namespace Waher.Things.ControlParameters
 		/// </summary>
 		/// <param name="Node">Node reference, if available.</param>
 		/// <returns>String representation of the value.</returns>
-		public override string GetStringValue(ThingReference Node)
+		public override string GetStringValue(IThingReference Node)
 		{
 			Duration Value = this.Get(Node);
 
@@ -147,7 +147,7 @@ namespace Waher.Things.ControlParameters
 		/// </summary>
 		/// <param name="Output">Output</param>
 		/// <param name="Node">Node reference, if available.</param>
-		public override void ExportValidationRules(XmlWriter Output, ThingReference Node)
+		public override void ExportValidationRules(XmlWriter Output, IThingReference Node)
 		{
 			Output.WriteStartElement("xdv", "validate", null);
 			Output.WriteAttributeString("datatype", "xs:duration");

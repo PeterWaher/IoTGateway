@@ -2081,9 +2081,9 @@ namespace Waher.Networking.XMPP.Concentrator
 					await Node.AddAsync(PresumptiveChild);
 
 					Xml.Append("<nd");
-					await ExportAttributes(Xml, Node, Language);
+					await ExportAttributes(Xml, PresumptiveChild, Language);
 					Xml.Append(">");
-					await this.ExportParametersAndMessages(Xml, Node, true, true, Language, Caller);
+					await this.ExportParametersAndMessages(Xml, PresumptiveChild, true, true, Language, Caller);
 					Xml.Append("</nd>");
 					Xml.Append("</createNewNodeResponse>");
 

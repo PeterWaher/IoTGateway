@@ -415,7 +415,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <summary>
 		/// Result of a set properties operation.
 		/// </summary>
-		public struct SetEditableFormResult
+		public class SetEditableFormResult
 		{
 			/// <summary>
 			/// If any errors were encountered.

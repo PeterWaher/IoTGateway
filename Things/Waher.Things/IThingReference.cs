@@ -1,10 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using Waher.Persistence.Attributes;
+using System.Threading.Tasks;
 
 namespace Waher.Things
 {
+	/// <summary>
+	/// Delegate for methods returning thing reference nodes.
+	/// </summary>
+	/// <param name="NodeId">Node ID</param>
+	/// <param name="SourceId">Source ID</param>
+	/// <param name="Partition">Partition</param>
+	/// <returns>Thing reference, if found, null if not.</returns>
+	public delegate Task<IThingReference> GetThingReferenceMethod(string NodeId, string SourceId, string Partition);
+
 	/// <summary>
 	/// Interface for thing references.
 	/// </summary>

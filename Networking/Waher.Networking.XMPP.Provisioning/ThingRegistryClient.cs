@@ -247,11 +247,11 @@ namespace Waher.Networking.XMPP.Provisioning
 
 			Request.Append("'>");
 
-			this.AddTags(Request, MetaDataTags);
+			string RegistryAddress = this.AddTags(Request, MetaDataTags, this.thingRegistryAddress);
 
 			Request.Append("</register>");
 
-			this.client.SendIqSet(this.thingRegistryAddress, Request.ToString(), (sender, e) =>
+			this.client.SendIqSet(RegistryAddress, Request.ToString(), (sender, e) =>
 			{
 				if (Callback != null)
 				{
@@ -307,27 +307,34 @@ namespace Waher.Networking.XMPP.Provisioning
 			}
 		}
 
-		private void AddTags(StringBuilder Request, MetaDataTag[] MetaDataTags)
+		private string AddTags(StringBuilder Request, MetaDataTag[] MetaDataTags, string RegistryAddress)
 		{
 			foreach (MetaDataTag Tag in MetaDataTags)
 			{
 				if (Tag is MetaDataStringTag)
 				{
-					Request.Append("<str name='");
-					Request.Append(XML.Encode(Tag.Name));
-					Request.Append("' value='");
-					Request.Append(XML.Encode((string)Tag.Value));
-					Request.Append("'/>");
+					if (Tag.Name == "R")
+						RegistryAddress = Tag.StringValue;
+					else
+					{
+						Request.Append("<str name='");
+						Request.Append(XML.Encode(Tag.Name));
+						Request.Append("' value='");
+						Request.Append(XML.Encode(Tag.StringValue));
+						Request.Append("'/>");
+					}
 				}
 				else if (Tag is MetaDataNumericTag)
 				{
 					Request.Append("<num name='");
 					Request.Append(XML.Encode(Tag.Name));
 					Request.Append("' value='");
-					Request.Append(CommonTypes.Encode((double)Tag.Value));
+					Request.Append(Tag.StringValue);
 					Request.Append("'/>");
 				}
 			}
+
+			return RegistryAddress;
 		}
 
 		/// <summary>
@@ -358,11 +365,11 @@ namespace Waher.Networking.XMPP.Provisioning
 			Request.Append(CommonTypes.Encode(Public));
 			Request.Append("'>");
 
-			this.AddTags(Request, MetaDataTags);
+			string RegistryAddress = this.AddTags(Request, MetaDataTags, this.thingRegistryAddress);
 
 			Request.Append("</mine>");
 
-			this.client.SendIqSet(this.thingRegistryAddress, Request.ToString(), (sender, e) =>
+			this.client.SendIqSet(RegistryAddress, Request.ToString(), (sender, e) =>
 			{
 				if (Callback != null)
 				{
@@ -653,11 +660,11 @@ namespace Waher.Networking.XMPP.Provisioning
 
 			Request.Append("'>");
 
-			this.AddTags(Request, MetaDataTags);
+			string RegistryAddress = this.AddTags(Request, MetaDataTags, this.thingRegistryAddress);
 
 			Request.Append("</update>");
 
-			this.client.SendIqSet(this.thingRegistryAddress, Request.ToString(), (sender, e) =>
+			this.client.SendIqSet(RegistryAddress, Request.ToString(), (sender, e) =>
 			{
 				if (Callback != null)
 				{
@@ -990,7 +997,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// </summary>
 		/// <param name="MetaData">Meta-data to encode.</param>
 		/// <returns>IOTDISCO URI encoding the meta-data.</returns>
-		public static string EncodeAsIoTDiscoURI(params MetaDataTag[] MetaData)
+		public string EncodeAsIoTDiscoURI(params MetaDataTag[] MetaData)
 		{
 			StringBuilder Result = new StringBuilder("iotdisco:");
 			bool First = true;
@@ -1009,6 +1016,12 @@ namespace Waher.Networking.XMPP.Provisioning
 				Result.Append('=');
 				Result.Append(Uri.EscapeDataString(Tag.StringValue));
 			}
+
+			if (!First)
+				Result.Append(';');
+
+			Result.Append("R=");
+			Result.Append(Uri.EscapeDataString(this.thingRegistryAddress));
 
 			return Result.ToString();
 		}

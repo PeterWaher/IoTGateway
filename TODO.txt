@@ -14,11 +14,38 @@ Metering Node
 		Owner
 		QR-code
 		URI
+	 Register node when created/updated and no owner
+	 Update node when updated and owner
+	 map claims to nodes in concentrator
+		check IsProvisioned
+	 map disownments to nodes in concentrator
+		check IsProvisioned
 
 Nugets:
 	Waher.Networking.XMPP.Concentrator
 	Waher.Networking.XMPP.Concentrator.UWP
+	Waher.Networking.XMPP.Provisioning
+	Waher.Networking.XMPP.Provisioning.UWP
+	Waher.Networking.XMPP.Sensor
+	Waher.Networking.XMPP.Sensor.UWP
+	Waher.Networking.XMPP.Control
+	Waher.Networking.XMPP.Control.UWP
+	Waher.Things
+	Waher.Things.Metering
+	Waher.Things.Arduino
+	Waher.Things.Gpio
+	Waher.IoTGateway
 
+Update:
+	Client setup
+	Server setup
+	MIoT
+	Chapter 11
+		IoTDisco URIs
+			Code
+			Example
+			QR-code
+		hint: R tag
 
 
 * Client install:

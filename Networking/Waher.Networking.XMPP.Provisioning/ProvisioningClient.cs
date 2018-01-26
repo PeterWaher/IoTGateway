@@ -494,6 +494,81 @@ namespace Waher.Networking.XMPP.Provisioning
 			}
 		}
 
+		private bool Split(string FromBareJid, IEnumerable<IThingReference> Nodes, out IEnumerable<IThingReference> ToCheck,
+			out IEnumerable<IThingReference> Permitted)
+		{
+			if (string.Compare(FromBareJid, this.provisioningServerAddress, true) == 0)
+			{
+				ToCheck = null;
+				Permitted = Nodes;
+
+				return true;
+			}
+			else if (Nodes == null)
+			{
+				ToCheck = null;
+				Permitted = null;
+
+				return !string.IsNullOrEmpty(this.ownerJid) && string.Compare(FromBareJid, this.ownerJid, true) == 0;
+			}
+			else
+			{
+				LinkedList<IThingReference> ToCheck2 = null;
+				LinkedList<IThingReference> Permitted2 = null;
+				string Owner;
+				bool Safe;
+
+				foreach (IThingReference Ref in Nodes)
+				{
+					if (Ref is ILifeCycleManagement LifeCycleManagement)
+					{
+						Safe = (!LifeCycleManagement.IsProvisioned) ||
+							(!string.IsNullOrEmpty(Owner = LifeCycleManagement.Owner) && string.Compare(FromBareJid, Owner, true) == 0);
+					}
+					else if (string.IsNullOrEmpty(Ref.NodeId) && string.IsNullOrEmpty(Ref.SourceId) && string.IsNullOrEmpty(Ref.Partition))
+						Safe = string.Compare(FromBareJid, this.ownerJid, true) == 0;
+					else
+						Safe = false;
+
+					if (Safe)
+					{
+						if (Permitted2 == null)
+						{
+							ToCheck2 = new LinkedList<IThingReference>();
+							Permitted2 = new LinkedList<IThingReference>();
+
+							foreach (IThingReference Ref2 in Nodes)
+							{
+								if (Ref2 == Ref)
+									break;
+
+								ToCheck2.AddLast(Ref2);
+							}
+						}
+
+						Permitted2.AddLast(Ref);
+					}
+					else if (ToCheck2 != null)
+						ToCheck2.AddLast(Ref);
+				}
+
+				if (Permitted2 == null)
+				{
+					ToCheck = Nodes;
+					Permitted = null;
+
+					return false;
+				}
+				else
+				{
+					ToCheck = ToCheck2;
+					Permitted = Permitted2;
+
+					return ToCheck2.First == null;
+				}
+			}
+		}
+
 		/// <summary>
 		/// Checks if a readout can be performed.
 		/// </summary>
@@ -506,20 +581,19 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="UserTokens">Any user tokens provided.</param>
 		/// <param name="Callback">Method to call when result is received.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void CanRead(string RequestFromBareJid, FieldType FieldTypes, IEnumerable<ThingReference> Nodes, IEnumerable<string> FieldNames,
+		public void CanRead(string RequestFromBareJid, FieldType FieldTypes, IEnumerable<IThingReference> Nodes, IEnumerable<string> FieldNames,
 			string[] ServiceTokens, string[] DeviceTokens, string[] UserTokens, CanReadCallback Callback, object State)
 		{
-			if ((!string.IsNullOrEmpty(this.ownerJid) && string.Compare(RequestFromBareJid, this.ownerJid, true) == 0 && !this.RequestToInternalNode(Nodes)) ||
-				string.Compare(RequestFromBareJid, this.provisioningServerAddress, true) == 0)
+			if (Split(RequestFromBareJid, Nodes, out IEnumerable<IThingReference> ToCheck, out IEnumerable<IThingReference> Permitted))
 			{
 				if (Callback != null)
 				{
 					try
 					{
-						ThingReference[] Nodes2 = Nodes as ThingReference[];
+						IThingReference[] Nodes2 = Nodes as IThingReference[];
 						if (Nodes2 == null && Nodes != null)
 						{
-							List<ThingReference> List = new List<ThingReference>();
+							List<IThingReference> List = new List<IThingReference>();
 							List.AddRange(Nodes);
 							Nodes2 = List.ToArray();
 						}
@@ -580,15 +654,15 @@ namespace Waher.Networking.XMPP.Provisioning
 					Xml.Append("' h='true");
 			}
 
-			if (Nodes == null && FieldNames == null)
+			if (ToCheck == null && FieldNames == null)
 				Xml.Append("'/>");
 			else
 			{
 				Xml.Append("'>");
 
-				if (Nodes != null)
+				if (ToCheck != null)
 				{
-					foreach (ThingReference Node in Nodes)
+					foreach (IThingReference Node in ToCheck)
 						this.AppendNode(Xml, Node);
 				}
 
@@ -608,7 +682,7 @@ namespace Waher.Networking.XMPP.Provisioning
 			this.CachedIqGet(Xml.ToString(), (sender, e) =>
 			{
 				XmlElement E = e.FirstElement;
-				List<ThingReference> Nodes2 = null;
+				List<IThingReference> Nodes2 = null;
 				List<string> Fields2 = null;
 				FieldType FieldTypes2 = (FieldType)0;
 				string Jid = string.Empty;
@@ -667,31 +741,59 @@ namespace Waher.Networking.XMPP.Provisioning
 						}
 					}
 
-					foreach (XmlNode N in E.ChildNodes)
+					if (CanRead)
 					{
-						switch (N.LocalName)
+						if (Permitted != null)
+							Nodes2 = new List<IThingReference>(Permitted);
+
+						foreach (XmlNode N in E.ChildNodes)
 						{
-							case "nd":
-								if (Nodes2 == null)
-									Nodes2 = new List<ThingReference>();
+							switch (N.LocalName)
+							{
+								case "nd":
+									if (Nodes2 == null)
+										Nodes2 = new List<IThingReference>();
 
-								E = (XmlElement)N;
-								NodeId = XML.Attribute(E, "id");
-								SourceId = XML.Attribute(E, "src");
-								Partition = XML.Attribute(E, "pt");
+									E = (XmlElement)N;
+									NodeId = XML.Attribute(E, "id");
+									SourceId = XML.Attribute(E, "src");
+									Partition = XML.Attribute(E, "pt");
 
-								Nodes2.Add(new ThingReference(NodeId, SourceId, Partition));
-								break;
+									bool Found = false;
 
-							case "f":
-								if (Fields2 == null)
-									Fields2 = new List<string>();
+									foreach (IThingReference Ref in Nodes)
+									{
+										if (Ref.NodeId == NodeId && Ref.SourceId == SourceId && Ref.Partition == Partition)
+										{
+											Nodes2.Add(Ref);
+											Found = true;
+											break;
+										}
+									}
 
-								Fields2.Add(XML.Attribute((XmlElement)N, "n"));
-								break;
+									if (!Found)
+										Nodes2.Add(new ThingReference(NodeId, SourceId, Partition));
+									break;
+
+								case "f":
+									if (Fields2 == null)
+										Fields2 = new List<string>();
+
+									Fields2.Add(XML.Attribute((XmlElement)N, "n"));
+									break;
+							}
 						}
 					}
+					else if (Permitted != null)
+					{
+						CanRead = true;
+						Jid = RequestFromBareJid;
+						FieldTypes2 = FieldTypes;
+						Nodes2 = new List<IThingReference>(Permitted);
 
+						if (FieldNames != null)
+							Fields2 = new List<string>(FieldNames);
+					}
 				}
 				else
 					CanRead = false;
@@ -708,20 +810,6 @@ namespace Waher.Networking.XMPP.Provisioning
 				}
 
 			}, null);
-		}
-
-		private bool RequestToInternalNode(IEnumerable<ThingReference> Nodes)
-		{
-			if (Nodes == null)
-				return false;
-
-			foreach (ThingReference Ref in Nodes)
-			{
-				if (!Ref.IsEmpty)
-					return true;
-			}
-
-			return false;
 		}
 
 		private void AppendNode(StringBuilder Xml, IThingReference Node)
@@ -784,20 +872,19 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="UserTokens">Any user tokens provided.</param>
 		/// <param name="Callback">Method to call when result is received.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void CanControl(string RequestFromBareJid, IEnumerable<ThingReference> Nodes, IEnumerable<string> ParameterNames,
+		public void CanControl(string RequestFromBareJid, IEnumerable<IThingReference> Nodes, IEnumerable<string> ParameterNames,
 			string[] ServiceTokens, string[] DeviceTokens, string[] UserTokens, CanControlCallback Callback, object State)
 		{
-			if ((!string.IsNullOrEmpty(this.ownerJid) && string.Compare(RequestFromBareJid, this.ownerJid, true) == 0 && !this.RequestToInternalNode(Nodes)) ||
-				string.Compare(RequestFromBareJid, this.provisioningServerAddress, true) == 0)
+			if (Split(RequestFromBareJid, Nodes, out IEnumerable<IThingReference> ToCheck, out IEnumerable<IThingReference> Permitted))
 			{
 				if (Callback != null)
 				{
 					try
 					{
-						ThingReference[] Nodes2 = Nodes as ThingReference[];
+						IThingReference[] Nodes2 = Nodes as IThingReference[];
 						if (Nodes2 == null && Nodes != null)
 						{
-							List<ThingReference> List = new List<ThingReference>();
+							List<IThingReference> List = new List<IThingReference>();
 							List.AddRange(Nodes);
 							Nodes2 = List.ToArray();
 						}
@@ -835,15 +922,16 @@ namespace Waher.Networking.XMPP.Provisioning
 			this.AppendTokens(Xml, "dt", DeviceTokens);
 			this.AppendTokens(Xml, "ut", UserTokens);
 
-			if (Nodes == null && ParameterNames == null)
+			if (ToCheck == null && ParameterNames == null)
 				Xml.Append("'/>");
 			else
 			{
 				Xml.Append("'>");
 
-				if (Nodes != null)
+
+				if (ToCheck != null)
 				{
-					foreach (ThingReference Node in Nodes)
+					foreach (IThingReference Node in ToCheck)
 						this.AppendNode(Xml, Node);
 				}
 
@@ -863,7 +951,7 @@ namespace Waher.Networking.XMPP.Provisioning
 			this.CachedIqGet(Xml.ToString(), (sender, e) =>
 			{
 				XmlElement E = e.FirstElement;
-				List<ThingReference> Nodes2 = null;
+				List<IThingReference> Nodes2 = null;
 				List<string> ParameterNames2 = null;
 				string Jid = string.Empty;
 				string NodeId;
@@ -881,31 +969,58 @@ namespace Waher.Networking.XMPP.Provisioning
 							Jid = Attr.Value;
 					}
 
-					foreach (XmlNode N in E.ChildNodes)
+					if (CanControl)
 					{
-						switch (N.LocalName)
+						if (Permitted != null)
+							Nodes2 = new List<IThingReference>(Permitted);
+
+						foreach (XmlNode N in E.ChildNodes)
 						{
-							case "nd":
-								if (Nodes2 == null)
-									Nodes2 = new List<ThingReference>();
+							switch (N.LocalName)
+							{
+								case "nd":
+									if (Nodes2 == null)
+										Nodes2 = new List<IThingReference>();
 
-								E = (XmlElement)N;
-								NodeId = XML.Attribute(E, "id");
-								SourceId = XML.Attribute(E, "src");
-								Partition = XML.Attribute(E, "pt");
+									E = (XmlElement)N;
+									NodeId = XML.Attribute(E, "id");
+									SourceId = XML.Attribute(E, "src");
+									Partition = XML.Attribute(E, "pt");
 
-								Nodes2.Add(new ThingReference(NodeId, SourceId, Partition));
-								break;
+									bool Found = false;
 
-							case "parameter":
-								if (ParameterNames2 == null)
-									ParameterNames2 = new List<string>();
+									foreach (IThingReference Ref in Nodes)
+									{
+										if (Ref.NodeId == NodeId && Ref.SourceId == SourceId && Ref.Partition == Partition)
+										{
+											Nodes2.Add(Ref);
+											Found = true;
+											break;
+										}
+									}
 
-								ParameterNames2.Add(XML.Attribute((XmlElement)N, "name"));
-								break;
+									if (!Found)
+										Nodes2.Add(new ThingReference(NodeId, SourceId, Partition));
+									break;
+
+								case "parameter":
+									if (ParameterNames2 == null)
+										ParameterNames2 = new List<string>();
+
+									ParameterNames2.Add(XML.Attribute((XmlElement)N, "name"));
+									break;
+							}
 						}
 					}
+					else if (Permitted != null)
+					{
+						CanControl = true;
+						Jid = RequestFromBareJid;
+						Nodes2 = new List<IThingReference>(Permitted);
 
+						if (ParameterNames != null)
+							ParameterNames2 = new List<string>(ParameterNames);
+					}
 				}
 				else
 					CanControl = false;

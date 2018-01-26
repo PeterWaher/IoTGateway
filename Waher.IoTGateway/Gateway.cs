@@ -476,10 +476,12 @@ namespace Waher.IoTGateway
 				if (GetDataSources != null)
 					Sources = await GetDataSources(Sources);
 
-				concentratorServer = new ConcentratorServer(xmppClient, provisioningClient, Sources);
+				concentratorServer = new ConcentratorServer(xmppClient, thingRegistryClient, provisioningClient, Sources);
 				Types.SetModuleParameter("Concentrator", concentratorServer);
 				Types.SetModuleParameter("Sensor", concentratorServer.SensorServer);
 				Types.SetModuleParameter("Control", concentratorServer.ControlServer);
+				Types.SetModuleParameter("Registry", thingRegistryClient);
+				Types.SetModuleParameter("Provisioning", provisioningClient);
 			}
 			catch (Exception ex)
 			{
@@ -1060,20 +1062,27 @@ namespace Waher.IoTGateway
 
 		private static void ThingRegistryClient_Claimed(object Sender, ClaimedEventArgs e)
 		{
-			ownerJid = e.JID;
-			Log.Informational("Thing has been claimed.", ownerJid, new KeyValuePair<string, object>("Public", e.IsPublic));
+			if (e.Node.IsEmpty)
+			{
+				ownerJid = e.JID;
+				Log.Informational("Gateway has been claimed.", ownerJid, new KeyValuePair<string, object>("Public", e.IsPublic));
+			}
 		}
 
 		private static void ThingRegistryClient_Disowned(object Sender, NodeEventArgs e)
 		{
-			Log.Informational("Thing has been disowned.", ownerJid);
-			ownerJid = string.Empty;
-			Task.Run(Register);
+			if (e.Node.IsEmpty)
+			{
+				Log.Informational("Gateway has been disowned.", ownerJid);
+				ownerJid = string.Empty;
+				Task.Run(Register);
+			}
 		}
 
 		private static void ThingRegistryClient_Removed(object Sender, NodeEventArgs e)
 		{
-			Log.Informational("Thing has been removed from the public registry.", ownerJid);
+			if (e.Node.IsEmpty)
+				Log.Informational("Gateway has been removed from the public registry.", ownerJid);
 		}
 
 		private static async Task Register()

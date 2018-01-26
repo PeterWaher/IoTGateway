@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using System.Reflection;
 using System.Text;
 using System.Xml;
@@ -18,6 +19,8 @@ using Waher.Networking.XMPP.Control;
 using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.Provisioning;
 using Waher.Networking.XMPP.Sensor;
+using Waher.Runtime.Settings;
+using Waher.Security;
 
 namespace Waher.Networking.XMPP.Concentrator
 {
@@ -40,6 +43,9 @@ namespace Waher.Networking.XMPP.Concentrator
 		private object synchObject = new object();
 		private SensorServer sensorServer = null;
 		private ControlServer controlServer = null;
+		private ProvisioningClient provisioningClient = null;
+		private ThingRegistryClient thingRegistryClient = null;
+		private RandomNumberGenerator rnd = RandomNumberGenerator.Create();
 
 		/// <summary>
 		/// Implements an XMPP concentrator server interface.
@@ -50,7 +56,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="Client">XMPP Client</param>
 		/// <param name="DataSources">Data sources.</param>
 		public ConcentratorServer(XmppClient Client, params IDataSource[] DataSources)
-			: this(Client, null, DataSources)
+			: this(Client, null, null, DataSources)
 		{
 		}
 
@@ -61,16 +67,29 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// http://xmpp.org/extensions/xep-0326.html
 		/// </summary>
 		/// <param name="Client">XMPP Client</param>
+		/// <param name="ThingRegistryClient">Thing Registry client.</param>
 		/// <param name="ProvisioningClient">Provisioning client.</param>
 		/// <param name="DataSources">Data sources.</param>
-		public ConcentratorServer(XmppClient Client, ProvisioningClient ProvisioningClient, params IDataSource[] DataSources)
+		public ConcentratorServer(XmppClient Client, ThingRegistryClient ThingRegistryClient, ProvisioningClient ProvisioningClient, params IDataSource[] DataSources)
 			: base(Client)
 		{
+			this.thingRegistryClient = ThingRegistryClient;
+			this.provisioningClient = ProvisioningClient;
+
 			this.sensorServer = new SensorServer(this.client, ProvisioningClient, true);
+			this.sensorServer.OnGetNode += OnGetNode;
 			this.sensorServer.OnExecuteReadoutRequest += SensorServer_OnExecuteReadoutRequest;
 
 			this.controlServer = new ControlServer(this.client, ProvisioningClient);
+			this.controlServer.OnGetNode += OnGetNode;
 			this.controlServer.OnGetControlParameters += ControlServer_OnGetControlParameters;
+
+			if (this.thingRegistryClient != null)
+			{
+				this.thingRegistryClient.Claimed += ThingRegistryClient_Claimed;
+				this.thingRegistryClient.Disowned += ThingRegistryClient_Disowned;
+				this.thingRegistryClient.Removed += ThingRegistryClient_Removed;
+			}
 
 			foreach (IDataSource DataSource in DataSources)
 				this.Register(DataSource);
@@ -89,10 +108,11 @@ namespace Waher.Networking.XMPP.Concentrator
 			this.client.RegisterIqGetHandler("getNodeInheritance", NamespaceConcentrator, this.GetNodeInheritanceHandler, false);                               // ConcentratorClient.GetNodeInheritance
 			this.client.RegisterIqGetHandler("getRootNodes", NamespaceConcentrator, this.GetRootNodesHandler, false);                                           // ConcentratorClient.GetRootNodes
 			this.client.RegisterIqGetHandler("getChildNodes", NamespaceConcentrator, this.GetChildNodesHandler, false);                                         // ConcentratorClient.GetChildNodes
-																																								// getIndices
-																																								// getNodesFromIndex
-																																								// getNodesFromIndices
-																																								// getAllIndexValues
+
+			// getIndices
+			// getNodesFromIndex
+			// getNodesFromIndices
+			// getAllIndexValues
 
 			this.client.RegisterIqGetHandler("getNodeParametersForEdit", NamespaceConcentrator, this.GetNodeParametersForEditHandler, false);                   // ConcentratorClient.GetNodeParametersForEdit
 			this.client.RegisterIqGetHandler("setNodeParametersAfterEdit", NamespaceConcentrator, this.SetNodeParametersAfterEditHandler, false);               // (ConcentratorClient.EditNode)
@@ -128,6 +148,70 @@ namespace Waher.Networking.XMPP.Concentrator
 			// startDatabaseReadout
 		}
 
+		private async void ThingRegistryClient_Claimed(object Sender, ClaimedEventArgs e)
+		{
+			try
+			{
+				if (!e.Node.IsEmpty)
+				{
+					IThingReference Ref = await this.OnGetNode(e.Node.NodeId, e.Node.SourceId, e.Node.Partition);
+					if (Ref != null && Ref is ILifeCycleManagement LifeCycleManagement)
+						await LifeCycleManagement.Claimed(e.JID, e.IsPublic);
+				}
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+			}
+		}
+
+		private async void ThingRegistryClient_Disowned(object Sender, NodeEventArgs e)
+		{
+			try
+			{
+				if (!e.Node.IsEmpty)
+				{
+					IThingReference Ref = await this.OnGetNode(e.Node.NodeId, e.Node.SourceId, e.Node.Partition);
+					if (Ref != null && Ref is ILifeCycleManagement LifeCycleManagement)
+						await LifeCycleManagement.Disowned();
+				}
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+			}
+		}
+
+		private async void ThingRegistryClient_Removed(object Sender, NodeEventArgs e)
+		{
+			try
+			{
+				if (!e.Node.IsEmpty)
+				{
+					IThingReference Ref = await this.OnGetNode(e.Node.NodeId, e.Node.SourceId, e.Node.Partition);
+					if (Ref != null && Ref is ILifeCycleManagement LifeCycleManagement)
+						await LifeCycleManagement.Removed();
+				}
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+			}
+		}
+
+		private async Task<IThingReference> OnGetNode(string NodeId, string SourceId, string Partition)
+		{
+			IDataSource Source;
+
+			lock (this.synchObject)
+			{
+				if (!this.dataSources.TryGetValue(SourceId, out Source))
+					return null;
+			}
+
+			return await Source.GetNodeAsync(new ThingReference(NodeId, SourceId, Partition));
+		}
+
 		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>
 		/// </summary>
@@ -149,6 +233,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			this.client.UnregisterIqGetHandler("getNodeInheritance", NamespaceConcentrator, this.GetNodeInheritanceHandler, false);
 			this.client.UnregisterIqGetHandler("getRootNodes", NamespaceConcentrator, this.GetRootNodesHandler, false);
 			this.client.UnregisterIqGetHandler("getChildNodes", NamespaceConcentrator, this.GetChildNodesHandler, false);
+
 			// getIndices
 			// getNodesFromIndex
 			// getNodesFromIndices
@@ -227,6 +312,16 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// Control server.
 		/// </summary>
 		public ControlServer ControlServer => this.controlServer;
+
+		/// <summary>
+		/// Thing Registry client being used.
+		/// </summary>
+		public ThingRegistryClient ThingRegistryClient => this.thingRegistryClient;
+
+		/// <summary>
+		/// Provisioning client being used.
+		/// </summary>
+		public ProvisioningClient ProvisioningClient => this.provisioningClient;
 
 		#region Capabilities
 
@@ -1136,7 +1231,7 @@ namespace Waher.Networking.XMPP.Concentrator
 							if (Parameters || Messages)
 							{
 								Xml.Append(">");
-								await this.ExportParametersAndMessages(Xml, Node, Parameters, Messages, Language, Caller);
+								await this.ExportParametersAndMessages(Xml, ChildNode, Parameters, Messages, Language, Caller);
 								Xml.Append("</nd>");
 							}
 							else
@@ -1616,7 +1711,39 @@ namespace Waher.Networking.XMPP.Concentrator
 						e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 10, "Data form missing."), e.IQ));
 					else
 					{
-						Parameters.SetEditableFormResult Result = await Parameters.SetEditableForm(e, Node, Form, true);
+						string OldNodeId = Node.NodeId;
+						string OldSourceId = Node.SourceId;
+						string OldPartition = Node.Partition;
+						string NewNodeId = Form["NodeId"]?.ValueString;
+						string NewSourceId = Form["SourceId"]?.ValueString;
+						string NewPartition = Form["Partition"]?.ValueString;
+						Parameters.SetEditableFormResult Result = null;
+
+						if (!string.IsNullOrEmpty(NewNodeId))
+						{
+							if (string.IsNullOrEmpty(NewSourceId))
+								NewSourceId = OldSourceId;
+
+							if (string.IsNullOrEmpty(NewPartition))
+								NewPartition = OldPartition;
+
+							if ((NewNodeId != OldNodeId ||
+								NewSourceId != OldSourceId ||
+								NewPartition != OldPartition) &&
+								await Source.GetNodeAsync(new ThingReference(NewNodeId, NewSourceId, NewPartition)) != null)
+							{
+								Result = new Parameters.SetEditableFormResult()
+								{
+									Errors = new KeyValuePair<string, string>[]
+									{
+										new KeyValuePair<string, string>("NodeId", "Identity already exists.")
+									}
+								};
+							}
+						}
+
+						if (Result == null)
+							Result = await Parameters.SetEditableForm(e, Node, Form, true);
 
 						if (Result.Errors == null)
 						{
@@ -1771,7 +1898,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			{
 				Language Language = await GetLanguage(e.Query);
 				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
-				LinkedList<ThingReference> Nodes = null;
+				LinkedList<KeyValuePair<IDataSource, ThingReference>> Nodes = null;
 				DataForm Form = null;
 				ThingReference ThingRef;
 				IDataSource Source;
@@ -1807,9 +1934,9 @@ namespace Waher.Networking.XMPP.Concentrator
 							}
 
 							if (Nodes == null)
-								Nodes = new LinkedList<ThingReference>();
+								Nodes = new LinkedList<KeyValuePair<IDataSource, ThingReference>>();
 
-							Nodes.AddLast(ThingRef);
+							Nodes.AddLast(new KeyValuePair<IDataSource, ThingReference>(Source, ThingRef));
 							break;
 
 						case "x":
@@ -1824,9 +1951,41 @@ namespace Waher.Networking.XMPP.Concentrator
 					e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 10, "Data form missing."), e.IQ));
 				else
 				{
-					foreach (ThingReference Node2 in Nodes)
+					foreach (KeyValuePair<IDataSource, ThingReference> P in Nodes)
 					{
-						Parameters.SetEditableFormResult Result = await Parameters.SetEditableForm(e, Node2, Form, true);
+						string OldNodeId = P.Value.NodeId;
+						string OldSourceId = P.Value.SourceId;
+						string OldPartition = P.Value.Partition;
+						string NewNodeId = Form["NodeId"]?.ValueString;
+						string NewSourceId = Form["SourceId"]?.ValueString;
+						string NewPartition = Form["Partition"]?.ValueString;
+						Parameters.SetEditableFormResult Result = null;
+
+						if (!string.IsNullOrEmpty(NewNodeId))
+						{
+							if (string.IsNullOrEmpty(NewSourceId))
+								NewSourceId = OldSourceId;
+
+							if (string.IsNullOrEmpty(NewPartition))
+								NewPartition = OldPartition;
+
+							if ((NewNodeId != OldNodeId ||
+								NewSourceId != OldSourceId ||
+								NewPartition != OldPartition) &&
+								await P.Key.GetNodeAsync(new ThingReference(NewNodeId, NewSourceId, NewPartition)) != null)
+							{
+								Result = new Parameters.SetEditableFormResult()
+								{
+									Errors = new KeyValuePair<string, string>[]
+									{
+										new KeyValuePair<string, string>("NodeId", "Identity already exists.")
+									}
+								};
+							}
+						}
+
+						if (Result == null)
+							Result = await Parameters.SetEditableForm(e, P.Value, Form, true);
 
 						if (Result.Errors != null)
 						{
@@ -1835,10 +1994,10 @@ namespace Waher.Networking.XMPP.Concentrator
 						}
 
 						Result.Tags.Add(new KeyValuePair<string, object>("Full", e.From));
-						Result.Tags.Add(new KeyValuePair<string, object>("Source", Node2.SourceId));
-						Result.Tags.Add(new KeyValuePair<string, object>("Partition", Node2.Partition));
+						Result.Tags.Add(new KeyValuePair<string, object>("Source", P.Value.SourceId));
+						Result.Tags.Add(new KeyValuePair<string, object>("Partition", P.Value.Partition));
 
-						Log.Informational("Node edited.", Node2.NodeId, e.FromBareJid, "NodeEdited", EventLevel.Medium, Result.Tags.ToArray());
+						Log.Informational("Node edited.", P.Value.NodeId, e.FromBareJid, "NodeEdited", EventLevel.Medium, Result.Tags.ToArray());
 					}
 
 					e.IqResult("<setCommonNodeParametersAfterEditResponse xmlns='" + NamespaceConcentrator + "'/>");
@@ -2090,6 +2249,17 @@ namespace Waher.Networking.XMPP.Concentrator
 
 				if (Result.Errors == null)
 				{
+					if (await Source.GetNodeAsync(PresumptiveChild) != null)
+					{
+						Result.Errors = new KeyValuePair<string, string>[]
+						{
+							new KeyValuePair<string, string>("NodeId", "Identity already exists.")
+						};
+					}
+				}
+
+				if (Result.Errors == null)
+				{
 					StringBuilder Xml = new StringBuilder();
 
 					Xml.Append("<createNewNodeResponse xmlns='");
@@ -2113,6 +2283,9 @@ namespace Waher.Networking.XMPP.Concentrator
 					Result.Tags.Add(new KeyValuePair<string, object>("Partition", PresumptiveChild.Partition));
 
 					Log.Informational("Node created.", PresumptiveChild.NodeId, e.FromBareJid, "NodeCreated", EventLevel.Major, Result.Tags.ToArray());
+
+					if (this.thingRegistryClient != null && PresumptiveChild is ILifeCycleManagement LifeCycleManagement && LifeCycleManagement.IsProvisioned)
+						await this.RegisterNode(LifeCycleManagement);
 				}
 				else
 					e.IqError(this.GetFormErrorsXml(Result.Errors, "createNewNodeResponse"));
@@ -2121,6 +2294,169 @@ namespace Waher.Networking.XMPP.Concentrator
 			{
 				e.IqError(ex);
 			}
+		}
+
+		/// <summary>
+		/// Registers a node in the thing registry.
+		/// </summary>
+		/// <param name="Node">Node to register.</param>
+		public async Task RegisterNode(ILifeCycleManagement Node)
+		{
+			KeyValuePair<string, object>[] MetaData = await Node.GetMetaData();
+
+			this.thingRegistryClient?.RegisterThing(false, Node.NodeId, Node.SourceId, Node.Partition, await this.GetTags(Node, MetaData, true),
+				async (sender, e) =>
+				{
+					try
+					{
+						if (e.Ok)
+						{
+							if (e.IsClaimed)
+							{
+								Log.Informational("Node is owned.", Node.NodeId,
+									new KeyValuePair<string, object>("SourceId", Node.SourceId),
+									new KeyValuePair<string, object>("Partition", Node.Partition),
+									new KeyValuePair<string, object>("Owner", e.OwnerJid),
+									new KeyValuePair<string, object>("IsPublic", e.IsPublic));
+
+								await Node.Claimed(e.OwnerJid, e.IsPublic);
+								await RuntimeSettings.SetAsync(this.KeyId(Node), string.Empty);
+								await this.UpdateNodeRegistration(Node);
+							}
+							else
+							{
+								Log.Informational("Node registration successful.", Node.NodeId,
+									new KeyValuePair<string, object>("SourceId", Node.SourceId),
+									new KeyValuePair<string, object>("Partition", Node.Partition));
+							}
+						}
+						else
+						{
+							Log.Error("Unable to register node in thing registry.", Node.NodeId,
+								new KeyValuePair<string, object>("SourceId", Node.SourceId),
+								new KeyValuePair<string, object>("Partition", Node.Partition));
+						}
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
+				}, null);
+		}
+
+		private string KeyId(INode Node)
+		{
+			return "KEY." + Node.NodeId + "." + Node.SourceId + "." + Node.Partition;
+		}
+
+		/// <summary>
+		/// Updates a node in the thing registry.
+		/// </summary>
+		/// <param name="Node">Node to update.</param>
+		public async Task UpdateNodeRegistration(ILifeCycleManagement Node)
+		{
+			KeyValuePair<string, object>[] MetaData = await Node.GetMetaData();
+
+			this.thingRegistryClient?.UpdateThing(Node.NodeId, Node.SourceId, Node.Partition, await this.GetTags(Node, MetaData, false),
+				async (sender, e) =>
+				{
+					try
+					{
+						if (e.Ok)
+						{
+							if (e.Disowned)
+							{
+								Log.Informational("Node is disowned.", Node.NodeId,
+									new KeyValuePair<string, object>("SourceId", Node.SourceId),
+									new KeyValuePair<string, object>("Partition", Node.Partition));
+
+								await Node.Disowned();
+								await this.RegisterNode(Node);
+							}
+							else
+							{
+								Log.Informational("Node registration updated.", Node.NodeId,
+									new KeyValuePair<string, object>("SourceId", Node.SourceId),
+									new KeyValuePair<string, object>("Partition", Node.Partition));
+							}
+						}
+						else
+						{
+							Log.Error("Unable to update node registration in thing registry.", Node.NodeId,
+								new KeyValuePair<string, object>("SourceId", Node.SourceId),
+								new KeyValuePair<string, object>("Partition", Node.Partition));
+						}
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
+				}, null);
+		}
+
+		private async Task<MetaDataTag[]> GetTags(INode Node, KeyValuePair<string, object>[] MetaData, bool IncludeKey)
+		{
+			List<MetaDataTag> Result = new List<MetaDataTag>();
+			object Value;
+
+			foreach (KeyValuePair<string, object> P in MetaData)
+			{
+				Value = P.Value;
+				if (Value == null)
+					Result.Add(new MetaDataStringTag(P.Key, string.Empty));
+				else if (Value is string s)
+					Result.Add(new MetaDataStringTag(P.Key, s));
+				else if (Value is double dbl)
+					Result.Add(new MetaDataNumericTag(P.Key, dbl));
+				else if (Value is float sng)
+					Result.Add(new MetaDataNumericTag(P.Key, sng));
+				else if (Value is decimal dec)
+					Result.Add(new MetaDataNumericTag(P.Key, (double)dec));
+				else if (Value is byte ui8)
+					Result.Add(new MetaDataNumericTag(P.Key, ui8));
+				else if (Value is short i16)
+					Result.Add(new MetaDataNumericTag(P.Key, i16));
+				else if (Value is int i32)
+					Result.Add(new MetaDataNumericTag(P.Key, i32));
+				else if (Value is long i64)
+					Result.Add(new MetaDataNumericTag(P.Key, i64));
+				else if (Value is sbyte i8)
+					Result.Add(new MetaDataNumericTag(P.Key, i8));
+				else if (Value is ushort ui16)
+					Result.Add(new MetaDataNumericTag(P.Key, ui16));
+				else if (Value is uint ui32)
+					Result.Add(new MetaDataNumericTag(P.Key, ui32));
+				else if (Value is ulong ui64)
+					Result.Add(new MetaDataNumericTag(P.Key, ui64));
+				else
+					Result.Add(new MetaDataStringTag(P.Key, P.Value.ToString()));
+			}
+
+			if (IncludeKey)
+			{
+				string KeyId = this.KeyId(Node);
+				string Key = await RuntimeSettings.GetAsync(KeyId, string.Empty);
+
+				if (string.IsNullOrEmpty(Key))
+				{
+					byte[] Bin = new byte[32];
+
+					lock (this.rnd)
+					{
+						this.rnd.GetBytes(Bin);
+					}
+
+					Key = Hashes.BinaryToString(Bin);
+					await RuntimeSettings.SetAsync(KeyId, Key);
+				}
+
+				Result.Add(new MetaDataStringTag("KEY", Key));
+			}
+
+			MetaDataTag[] Tags = Result.ToArray();
+			string IoTDisco = ThingRegistryClient.EncodeAsIoTDiscoURI(Tags);
+
+			return Tags;
 		}
 
 		private async void DestroyNodeHandler(object Sender, IqEventArgs e)
@@ -3642,7 +3978,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		private async void SensorServer_OnExecuteReadoutRequest(object Sender, SensorDataServerRequest Request)
 		{
 			DateTime Now = DateTime.Now;
-			ThingReference[] Nodes = Request.Nodes;
+			IThingReference[] Nodes = Request.Nodes;
 			int i, c;
 
 			try
@@ -3653,7 +3989,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				{
 					for (i = 0; i < c; i++)
 					{
-						ThingReference NodeRef = Nodes[i];
+						IThingReference NodeRef = Nodes[i];
 
 						if (!this.TryGetDataSource(NodeRef.SourceId, out IDataSource DataSource))
 						{
@@ -3709,7 +4045,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 		#region Control interface
 
-		private async Task<ControlParameter[]> ControlServer_OnGetControlParameters(ThingReference Node)
+		private async Task<ControlParameter[]> ControlServer_OnGetControlParameters(IThingReference Node)
 		{
 			DateTime Now = DateTime.Now;
 

@@ -54,6 +54,31 @@ namespace Waher.Things.Metering
 		}
 
 		/// <summary>
+		/// Determines whether the specified object is equal to the current object.
+		/// </summary>
+		/// <param name="obj">The object to compare with the current object.</param>
+		/// <returns>true if the specified object is equal to the current object; otherwise, false.</returns>
+		public override bool Equals(object obj)
+		{
+			IThingReference Ref = obj as IThingReference;
+			if (Ref == null)
+				return false;
+			else
+				return this.nodeId == Ref.NodeId && this.SourceId == Ref.SourceId && this.Partition == Ref.Partition;
+		}
+
+		/// <summary>
+		/// Serves as the default hash function.
+		/// </summary>
+		/// <returns>A hash code for the current object.</returns>
+		public override int GetHashCode()
+		{
+			return this.nodeId.GetHashCode() ^
+				this.SourceId.GetHashCode() ^
+				this.Partition.GetHashCode();
+		}
+
+		/// <summary>
 		/// Object ID in persistence layer.
 		/// </summary>
 		[ObjectId]
@@ -449,12 +474,16 @@ namespace Waher.Things.Metering
 		private async Task LoadChildren()
 		{
 			IEnumerable<MeteringNode> Children = await Database.Find<MeteringNode>(new FilterFieldEqualTo("ParentId", this.objectId));
+			LinkedList<MeteringNode> Children2 = new LinkedList<MeteringNode>();
+
+			foreach (MeteringNode Node in Children)
+				Children2.AddLast(MeteringTopology.RegisterNode(Node));
 
 			lock (this.synchObject)
 			{
 				this.children = null;
 
-				foreach (MeteringNode Child in Children)
+				foreach (MeteringNode Child in Children2)
 				{
 					if (this.children == null)
 						this.children = new List<MeteringNode>();
@@ -476,12 +505,9 @@ namespace Waher.Things.Metering
 			// Do nothing by default.
 		}
 
-		private async Task<MeteringNode> LoadParent()
+		private Task<MeteringNode> LoadParent()
 		{
-			foreach (MeteringNode Node in await Database.Find<MeteringNode>(new FilterFieldEqualTo("ObjectId", this.parentId)))
-				return Node;
-
-			return null;
+			return MeteringTopology.GetNode(this.Parent);
 		}
 
 		/// <summary>
@@ -667,7 +693,10 @@ namespace Waher.Things.Metering
 
 			Node.parentId = this.objectId;
 			if (Node.objectId == Guid.Empty)
+			{
 				await Database.Insert(Node);
+				MeteringTopology.RegisterNode(Node);
+			}
 			else
 			{
 				Node.updated = DateTime.Now;
@@ -783,6 +812,8 @@ namespace Waher.Things.Metering
 
 			if (this.objectId != Guid.Empty)
 				await Database.Delete(this);
+
+			MeteringTopology.UnregisterNode(this);
 		}
 
 		/// <summary>

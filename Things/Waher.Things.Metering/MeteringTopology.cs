@@ -21,6 +21,7 @@ namespace Waher.Things.Metering
 		/// </summary>
 		public const string SourceID = "MeteringTopology";
 
+		private static Dictionary<string, MeteringNode> nodes = new Dictionary<string, MeteringNode>();
 		private static Root root = null;
 		private DateTime lastChanged;
 
@@ -90,13 +91,66 @@ namespace Waher.Things.Metering
 		/// <returns>Node, if found, null otherwise.</returns>
 		public async Task<INode> GetNodeAsync(IThingReference NodeRef)
 		{
+			return await GetNode(NodeRef);
+		}
+
+		internal static async Task<MeteringNode> GetNode(IThingReference NodeRef)
+		{
 			if (NodeRef.SourceId != MeteringTopology.SourceID || !string.IsNullOrEmpty(NodeRef.Partition))
 				return null;
 
-			foreach (MeteringNode Node in await Database.Find<MeteringNode>(new FilterFieldEqualTo("NodeId", NodeRef.NodeId)))
-				return Node;
+			lock (nodes)
+			{
+				if (nodes.TryGetValue(NodeRef.NodeId, out MeteringNode Node))
+					return Node;
+			}
+
+			foreach (MeteringNode Node2 in await Database.Find<MeteringNode>(new FilterFieldEqualTo("NodeId", NodeRef.NodeId)))
+			{
+				lock (nodes)
+				{
+					if (nodes.TryGetValue(NodeRef.NodeId, out MeteringNode Node))
+						return Node;
+					else
+					{
+						nodes[NodeRef.NodeId] = Node2;
+						return Node2;
+					}
+				}
+			}
 
 			return null;
+		}
+
+		internal static MeteringNode RegisterNode(MeteringNode Node)
+		{
+			if (Node.SourceId == MeteringTopology.SourceID && string.IsNullOrEmpty(Node.Partition))
+			{
+				lock (nodes)
+				{
+					if (nodes.TryGetValue(Node.NodeId, out MeteringNode Node2))
+						return Node2;
+					else
+					{
+						nodes[Node.NodeId] = Node;
+						return Node;
+					}
+				}
+			}
+			else
+				return Node;
+		}
+
+		internal static void UnregisterNode(MeteringNode Node)
+		{
+			if (Node.SourceId == MeteringTopology.SourceID && string.IsNullOrEmpty(Node.Partition))
+			{
+				lock (nodes)
+				{
+					if (nodes.TryGetValue(Node.NodeId, out MeteringNode Node2) && Node == Node2)
+						nodes.Remove(Node.NodeId);
+				}
+			}
 		}
 
 		/// <summary>
@@ -160,6 +214,11 @@ namespace Waher.Things.Metering
 				};
 
 				await Database.Insert(Result);
+			}
+
+			lock (nodes)
+			{
+				nodes[Result.NodeId] = Result;
 			}
 
 			root = Result;

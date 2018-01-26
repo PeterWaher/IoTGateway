@@ -157,6 +157,11 @@ namespace Waher.Networking.XMPP.Concentrator
 					IThingReference Ref = await this.OnGetNode(e.Node.NodeId, e.Node.SourceId, e.Node.Partition);
 					if (Ref != null && Ref is ILifeCycleManagement LifeCycleManagement)
 						await LifeCycleManagement.Claimed(e.JID, e.IsPublic);
+
+					string KeyId = this.KeyId(Ref);
+
+					await RuntimeSettings.SetAsync(KeyId, string.Empty);
+					await RuntimeSettings.SetAsync("IoTDisco." + KeyId, string.Empty);
 				}
 			}
 			catch (Exception ex)
@@ -172,8 +177,12 @@ namespace Waher.Networking.XMPP.Concentrator
 				if (!e.Node.IsEmpty)
 				{
 					IThingReference Ref = await this.OnGetNode(e.Node.NodeId, e.Node.SourceId, e.Node.Partition);
+
 					if (Ref != null && Ref is ILifeCycleManagement LifeCycleManagement)
+					{
 						await LifeCycleManagement.Disowned();
+						await this.RegisterNode(LifeCycleManagement);
+					}
 				}
 			}
 			catch (Exception ex)
@@ -1769,6 +1778,14 @@ namespace Waher.Networking.XMPP.Concentrator
 							Result.Tags.Add(new KeyValuePair<string, object>("Partition", Node.Partition));
 
 							Log.Informational("Node edited.", Node.NodeId, e.FromBareJid, "NodeEdited", EventLevel.Medium, Result.Tags.ToArray());
+
+							if (this.thingRegistryClient != null && Node is ILifeCycleManagement LifeCycleManagement && LifeCycleManagement.IsProvisioned)
+							{
+								if (string.IsNullOrEmpty(LifeCycleManagement.Owner))
+									await this.RegisterNode(LifeCycleManagement);
+								else
+									await this.UpdateNodeRegistration(LifeCycleManagement);
+							}
 						}
 						else
 						{
@@ -1998,6 +2015,14 @@ namespace Waher.Networking.XMPP.Concentrator
 						Result.Tags.Add(new KeyValuePair<string, object>("Partition", P.Value.Partition));
 
 						Log.Informational("Node edited.", P.Value.NodeId, e.FromBareJid, "NodeEdited", EventLevel.Medium, Result.Tags.ToArray());
+
+						if (this.thingRegistryClient != null && P.Value is ILifeCycleManagement LifeCycleManagement && LifeCycleManagement.IsProvisioned)
+						{
+							if (string.IsNullOrEmpty(LifeCycleManagement.Owner))
+								await this.RegisterNode(LifeCycleManagement);
+							else
+								await this.UpdateNodeRegistration(LifeCycleManagement);
+						}
 					}
 
 					e.IqResult("<setCommonNodeParametersAfterEditResponse xmlns='" + NamespaceConcentrator + "'/>");
@@ -2344,7 +2369,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				}, null);
 		}
 
-		private string KeyId(INode Node)
+		private string KeyId(IThingReference Node)
 		{
 			return "KEY." + Node.NodeId + "." + Node.SourceId + "." + Node.Partition;
 		}
@@ -2392,6 +2417,40 @@ namespace Waher.Networking.XMPP.Concentrator
 						Log.Critical(ex);
 					}
 				}, null);
+		}
+
+		/// <summary>
+		/// Unregisters a node from the thing registry.
+		/// </summary>
+		/// <param name="Node">Node to unregister.</param>
+		public void UnregisterNode(ILifeCycleManagement Node)
+		{
+			string NodeId = Node.NodeId;
+			string SourceId = Node.SourceId;
+			string Partition = Node.Partition;
+
+			this.thingRegistryClient?.Unregister(NodeId, SourceId, Partition, (sender, e) =>
+			{
+				try
+				{
+					if (e.Ok)
+					{
+						Log.Informational("Node is unregistered.", NodeId,
+							new KeyValuePair<string, object>("SourceId", SourceId),
+							new KeyValuePair<string, object>("Partition", Partition));
+					}
+					else
+					{
+						Log.Error("Unable to unregister node from thing registry.", NodeId,
+							new KeyValuePair<string, object>("SourceId", SourceId),
+							new KeyValuePair<string, object>("Partition", Partition));
+					}
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			}, null);
 		}
 
 		private async Task<MetaDataTag[]> GetTags(INode Node, KeyValuePair<string, object>[] MetaData, bool IncludeKey)
@@ -2451,12 +2510,16 @@ namespace Waher.Networking.XMPP.Concentrator
 				}
 
 				Result.Add(new MetaDataStringTag("KEY", Key));
+
+				MetaDataTag[] Tags = Result.ToArray();
+				string IoTDisco = ThingRegistryClient.EncodeAsIoTDiscoURI(Tags);
+
+				await RuntimeSettings.SetAsync("IoTDisco." + KeyId, IoTDisco);
+
+				return Tags;
 			}
-
-			MetaDataTag[] Tags = Result.ToArray();
-			string IoTDisco = ThingRegistryClient.EncodeAsIoTDiscoURI(Tags);
-
-			return Tags;
+			else
+				return Result.ToArray();
 		}
 
 		private async void DestroyNodeHandler(object Sender, IqEventArgs e)
@@ -2499,6 +2562,9 @@ namespace Waher.Networking.XMPP.Concentrator
 					new KeyValuePair<string, object>("Source", Node.SourceId),
 					new KeyValuePair<string, object>("Partition", Node.Partition)
 				};
+
+				if (Node is ILifeCycleManagement LifeCycleManagement)
+					this.UnregisterNode(LifeCycleManagement);
 
 				if (Parent != null)
 					await Parent.RemoveAsync(Node);

@@ -6,6 +6,25 @@ Client:
 	* List available subscription requests in a list
 	* Ignore duplicates
 
+Errors
+	Pin collision (digital/analog)
+
+Parameters Dialog
+	Auto-select first control
+
+Metering Node
+	Provisioning tab
+		Enable
+		Owner
+		QR-code
+		URI
+
+Nugets:
+	Waher.Networking.XMPP.Concentrator
+	Waher.Networking.XMPP.Concentrator.UWP
+
+
+
 * Client install:
 	- Make sure app is started after installation
 	- Make sure icon created in start menu & on desktop.

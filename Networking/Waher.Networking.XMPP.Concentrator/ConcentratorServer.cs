@@ -1616,7 +1616,39 @@ namespace Waher.Networking.XMPP.Concentrator
 						e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 10, "Data form missing."), e.IQ));
 					else
 					{
-						Parameters.SetEditableFormResult Result = await Parameters.SetEditableForm(e, Node, Form, true);
+						string OldNodeId = Node.NodeId;
+						string OldSourceId = Node.SourceId;
+						string OldPartition = Node.Partition;
+						string NewNodeId = Form["NodeId"]?.ValueString;
+						string NewSourceId = Form["SourceId"]?.ValueString;
+						string NewPartition = Form["Partition"]?.ValueString;
+						Parameters.SetEditableFormResult Result = null;
+
+						if (!string.IsNullOrEmpty(NewNodeId))
+						{
+							if (string.IsNullOrEmpty(NewSourceId))
+								NewSourceId = OldSourceId;
+
+							if (string.IsNullOrEmpty(NewPartition))
+								NewPartition = OldPartition;
+
+							if ((NewNodeId != OldNodeId ||
+								NewSourceId != OldSourceId ||
+								NewPartition != OldPartition) &&
+								await Source.GetNodeAsync(new ThingReference(NewNodeId, NewSourceId, NewPartition)) != null)
+							{
+								Result = new Parameters.SetEditableFormResult()
+								{
+									Errors = new KeyValuePair<string, string>[]
+									{
+										new KeyValuePair<string, string>("NodeId", "Identity already exists.")
+									}
+								};
+							}
+						}
+
+						if (Result == null)
+							Result = await Parameters.SetEditableForm(e, Node, Form, true);
 
 						if (Result.Errors == null)
 						{
@@ -1771,7 +1803,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			{
 				Language Language = await GetLanguage(e.Query);
 				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
-				LinkedList<ThingReference> Nodes = null;
+				LinkedList<KeyValuePair<IDataSource, ThingReference>> Nodes = null;
 				DataForm Form = null;
 				ThingReference ThingRef;
 				IDataSource Source;
@@ -1807,9 +1839,9 @@ namespace Waher.Networking.XMPP.Concentrator
 							}
 
 							if (Nodes == null)
-								Nodes = new LinkedList<ThingReference>();
+								Nodes = new LinkedList<KeyValuePair<IDataSource, ThingReference>>();
 
-							Nodes.AddLast(ThingRef);
+							Nodes.AddLast(new KeyValuePair<IDataSource, ThingReference>(Source, ThingRef));
 							break;
 
 						case "x":
@@ -1824,9 +1856,41 @@ namespace Waher.Networking.XMPP.Concentrator
 					e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 10, "Data form missing."), e.IQ));
 				else
 				{
-					foreach (ThingReference Node2 in Nodes)
+					foreach (KeyValuePair<IDataSource, ThingReference> P in Nodes)
 					{
-						Parameters.SetEditableFormResult Result = await Parameters.SetEditableForm(e, Node2, Form, true);
+						string OldNodeId = P.Value.NodeId;
+						string OldSourceId = P.Value.SourceId;
+						string OldPartition = P.Value.Partition;
+						string NewNodeId = Form["NodeId"]?.ValueString;
+						string NewSourceId = Form["SourceId"]?.ValueString;
+						string NewPartition = Form["Partition"]?.ValueString;
+						Parameters.SetEditableFormResult Result = null;
+
+						if (!string.IsNullOrEmpty(NewNodeId))
+						{
+							if (string.IsNullOrEmpty(NewSourceId))
+								NewSourceId = OldSourceId;
+
+							if (string.IsNullOrEmpty(NewPartition))
+								NewPartition = OldPartition;
+
+							if ((NewNodeId != OldNodeId ||
+								NewSourceId != OldSourceId ||
+								NewPartition != OldPartition) &&
+								await P.Key.GetNodeAsync(new ThingReference(NewNodeId, NewSourceId, NewPartition)) != null)
+							{
+								Result = new Parameters.SetEditableFormResult()
+								{
+									Errors = new KeyValuePair<string, string>[]
+									{
+										new KeyValuePair<string, string>("NodeId", "Identity already exists.")
+									}
+								};
+							}
+						}
+
+						if (Result == null)
+							Result = await Parameters.SetEditableForm(e, P.Value, Form, true);
 
 						if (Result.Errors != null)
 						{
@@ -1835,10 +1899,10 @@ namespace Waher.Networking.XMPP.Concentrator
 						}
 
 						Result.Tags.Add(new KeyValuePair<string, object>("Full", e.From));
-						Result.Tags.Add(new KeyValuePair<string, object>("Source", Node2.SourceId));
-						Result.Tags.Add(new KeyValuePair<string, object>("Partition", Node2.Partition));
+						Result.Tags.Add(new KeyValuePair<string, object>("Source", P.Value.SourceId));
+						Result.Tags.Add(new KeyValuePair<string, object>("Partition", P.Value.Partition));
 
-						Log.Informational("Node edited.", Node2.NodeId, e.FromBareJid, "NodeEdited", EventLevel.Medium, Result.Tags.ToArray());
+						Log.Informational("Node edited.", P.Value.NodeId, e.FromBareJid, "NodeEdited", EventLevel.Medium, Result.Tags.ToArray());
 					}
 
 					e.IqResult("<setCommonNodeParametersAfterEditResponse xmlns='" + NamespaceConcentrator + "'/>");
@@ -2087,6 +2151,17 @@ namespace Waher.Networking.XMPP.Concentrator
 				}
 
 				Parameters.SetEditableFormResult Result = await Parameters.SetEditableForm(e, PresumptiveChild, Form, false);
+
+				if (Result.Errors == null)
+				{
+					if (await Source.GetNodeAsync(PresumptiveChild) != null)
+					{
+						Result.Errors = new KeyValuePair<string, string>[]
+						{
+							new KeyValuePair<string, string>("NodeId", "Identity already exists.")
+						};
+					}
+				}
 
 				if (Result.Errors == null)
 				{

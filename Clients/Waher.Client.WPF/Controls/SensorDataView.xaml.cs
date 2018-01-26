@@ -106,22 +106,27 @@ namespace Waher.Client.WPF.Controls
 		private void OnErrorsReceived(object P)
 		{
 			IEnumerable<ThingError> NewErrors = (IEnumerable<ThingError>)P;
+			string LastKey = null;
 			string Key;
 
-			lock (this.failed)
+			lock (this.nodes)
 			{
 				foreach (ThingError Error in NewErrors)
 				{
 					Key = Error.Key;
-					this.failed[Key] = true;
-					this.nodes[Key] = true;
+					if (LastKey == null || Key != LastKey)
+					{
+						LastKey = Key;
+						this.failed[Key] = true;
+						this.nodes[Key] = true;
+					}
+
+					this.SensorDataListView.Items.Add(new ErrorItem(Error));
 				}
 
 				this.NodesFailedLabel.Content = this.failed.Count.ToString();
 				this.NodesTotalLabel.Content = this.nodes.Count.ToString();
 			}
-
-			// TODO: Display errors.
 		}
 
 		private void Request_OnFieldsReceived(object Sender, IEnumerable<Field> NewFields)

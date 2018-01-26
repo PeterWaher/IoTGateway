@@ -18,7 +18,7 @@ namespace Waher.Client.WPF.Controls.SensorData
 		private QuantityField quantityField;
 
 		/// <summary>
-		/// Represents one item in a sniffer output.
+		/// Represents one item in a sensor data readout.
 		/// </summary>
 		/// <param name="Field">Sensor data field.</param>
 		public FieldItem(Field Field)

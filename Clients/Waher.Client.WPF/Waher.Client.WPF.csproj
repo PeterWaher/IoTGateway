@@ -115,6 +115,7 @@
     <Compile Include="Controls\SensorDataView.xaml.cs">
       <DependentUpon>SensorDataView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\SensorData\ErrorItem.cs" />
     <Compile Include="Controls\SensorData\FieldItem.cs" />
     <Compile Include="Controls\ScriptView.xaml.cs">
       <DependentUpon>ScriptView.xaml</DependentUpon>

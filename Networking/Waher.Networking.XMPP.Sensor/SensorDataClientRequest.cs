@@ -62,7 +62,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="ServiceToken">Optional service token.</param>
 		/// <param name="DeviceToken">Optional device token.</param>
 		/// <param name="UserToken">Optional user token.</param>
-		internal SensorDataClientRequest(string Id, SensorClient SensorClient, string RemoteJID, string Actor, ThingReference[] Nodes, FieldType Types,
+		internal SensorDataClientRequest(string Id, SensorClient SensorClient, string RemoteJID, string Actor, IThingReference[] Nodes, FieldType Types,
 			string[] FieldNames, DateTime From, DateTime To, DateTime When, string ServiceToken, string DeviceToken, string UserToken)
 			: base(Id, RemoteJID, Actor, Nodes, Types, FieldNames, From, To, When, ServiceToken, DeviceToken, UserToken)
 		{

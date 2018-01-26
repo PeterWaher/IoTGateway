@@ -127,7 +127,7 @@ namespace Waher.Networking.XMPP.Control
 		/// </summary>
 		/// <param name="Node">Optional null reference. If not behind a concentrator, use null.</param>
 		/// <returns>Control parameters.</returns>
-		public Task<ControlParameter[]> GetControlParameters(ThingReference Node)
+		public Task<ControlParameter[]> GetControlParameters(IThingReference Node)
 		{
 			GetControlParametersEventHandler h = this.OnGetControlParameters;
 			if (h == null)
@@ -309,7 +309,7 @@ namespace Waher.Networking.XMPP.Control
 
 						case "d":
 							Name = XML.Attribute(E, "n");
-							foreach (ThingReference Node in Nodes ?? NoNodes)
+							foreach (IThingReference Node in Nodes ?? NoNodes)
 							{
 								Parameter = await this.GetParameter(Node, Name, e);
 								if (Parameter == null)
@@ -328,7 +328,7 @@ namespace Waher.Networking.XMPP.Control
 
 						case "dt":
 							Name = XML.Attribute(E, "n");
-							foreach (ThingReference Node in Nodes ?? NoNodes)
+							foreach (IThingReference Node in Nodes ?? NoNodes)
 							{
 								Parameter = await this.GetParameter(Node, Name, e);
 								if (Parameter == null)
@@ -347,7 +347,7 @@ namespace Waher.Networking.XMPP.Control
 
 						case "db":
 							Name = XML.Attribute(E, "n");
-							foreach (ThingReference Node in Nodes ?? NoNodes)
+							foreach (IThingReference Node in Nodes ?? NoNodes)
 							{
 								Parameter = await this.GetParameter(Node, Name, e);
 								if (Parameter == null)
@@ -366,7 +366,7 @@ namespace Waher.Networking.XMPP.Control
 
 						case "dr":
 							Name = XML.Attribute(E, "n");
-							foreach (ThingReference Node in Nodes ?? NoNodes)
+							foreach (IThingReference Node in Nodes ?? NoNodes)
 							{
 								Parameter = await this.GetParameter(Node, Name, e);
 								if (Parameter == null)
@@ -385,7 +385,7 @@ namespace Waher.Networking.XMPP.Control
 
 						case "i":
 							Name = XML.Attribute(E, "n");
-							foreach (ThingReference Node in Nodes ?? NoNodes)
+							foreach (IThingReference Node in Nodes ?? NoNodes)
 							{
 								Parameter = await this.GetParameter(Node, Name, e);
 								if (Parameter == null)
@@ -404,7 +404,7 @@ namespace Waher.Networking.XMPP.Control
 
 						case "l":
 							Name = XML.Attribute(E, "n");
-							foreach (ThingReference Node in Nodes ?? NoNodes)
+							foreach (IThingReference Node in Nodes ?? NoNodes)
 							{
 								Parameter = await this.GetParameter(Node, Name, e);
 								if (Parameter == null)
@@ -423,7 +423,7 @@ namespace Waher.Networking.XMPP.Control
 
 						case "s":
 							Name = XML.Attribute(E, "n");
-							foreach (ThingReference Node in Nodes ?? NoNodes)
+							foreach (IThingReference Node in Nodes ?? NoNodes)
 							{
 								Parameter = await this.GetParameter(Node, Name, e);
 								if (Parameter == null)
@@ -443,7 +443,7 @@ namespace Waher.Networking.XMPP.Control
 
 						case "t":
 							Name = XML.Attribute(E, "n");
-							foreach (ThingReference Node in Nodes ?? NoNodes)
+							foreach (IThingReference Node in Nodes ?? NoNodes)
 							{
 								Parameter = await this.GetParameter(Node, Name, e);
 								if (Parameter == null)
@@ -463,7 +463,7 @@ namespace Waher.Networking.XMPP.Control
 						case "x":
 							Dictionary<string, ControlParameter> Parameters;
 
-							foreach (ThingReference Node in Nodes ?? NoNodes)
+							foreach (IThingReference Node in Nodes ?? NoNodes)
 							{
 								Parameters = await this.GetControlParametersByName(Node);
 								if (Parameters == null)
@@ -514,7 +514,7 @@ namespace Waher.Networking.XMPP.Control
 									if (e2.Nodes != null)
 									{
 										AllowedNodes = new Dictionary<IThingReference, bool>();
-										foreach (ThingReference Node in e2.Nodes)
+										foreach (IThingReference Node in e2.Nodes)
 											AllowedNodes[Node] = true;
 									}
 
@@ -589,7 +589,7 @@ namespace Waher.Networking.XMPP.Control
 
 				if (Nodes != null)
 				{
-					foreach (ThingReference Node in Nodes)
+					foreach (IThingReference Node in Nodes)
 					{
 						Xml.Append("<nd id='");
 						Xml.Append(XML.Encode(Node.NodeId));
@@ -705,7 +705,7 @@ namespace Waher.Networking.XMPP.Control
 					Parameters = null;
 					Parameters1 = null;
 
-					foreach (ThingReference Node in Nodes)
+					foreach (IThingReference Node in Nodes)
 					{
 						if (Parameters1 == null)
 						{

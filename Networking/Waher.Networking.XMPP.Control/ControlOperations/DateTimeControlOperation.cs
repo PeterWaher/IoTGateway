@@ -22,7 +22,7 @@ namespace Waher.Networking.XMPP.Control.ControlOperations
 		/// <param name="Parameter">Control parameter.</param>
 		/// <param name="Value">Value to set.</param>
 		/// <param name="request">Original request.</param>
-		public DateTimeControlOperation(ThingReference Node, DateTimeControlParameter Parameter, DateTime Value, IqEventArgs request)
+		public DateTimeControlOperation(IThingReference Node, DateTimeControlParameter Parameter, DateTime Value, IqEventArgs request)
 			: base(Node, request, Parameter)
 		{
 			this.parameter = Parameter;

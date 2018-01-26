@@ -230,7 +230,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="DeviceToken">Optional device token.</param>
 		/// <param name="UserToken">Optional user token.</param>
 		/// <returns>Request object maintaining the current status of the request.</returns>
-		public SensorDataClientRequest RequestReadout(string Destination, ThingReference[] Nodes, FieldType Types, string[] Fields, DateTime From, DateTime To, DateTime When,
+		public SensorDataClientRequest RequestReadout(string Destination, IThingReference[] Nodes, FieldType Types, string[] Fields, DateTime From, DateTime To, DateTime When,
 			string ServiceToken, string DeviceToken, string UserToken)
 		{
 			StringBuilder Xml = new StringBuilder();
@@ -309,7 +309,7 @@ namespace Waher.Networking.XMPP.Sensor
 
 			if (Nodes != null)
 			{
-				foreach (ThingReference Node in Nodes)
+				foreach (IThingReference Node in Nodes)
 				{
 					Xml.Append("<nd id='");
 					Xml.Append(XML.Encode(Node.NodeId));
@@ -1056,7 +1056,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="UserToken">Optional user token.</param>
 		/// <param name="ImmediateReadout">If an immediate readout should be performed.</param>
 		/// <returns>Request object maintaining the current status of the subscription.</returns>
-		public SensorDataSubscriptionRequest Subscribe(string Destination, ThingReference[] Nodes, FieldType Types, FieldSubscriptionRule[] Fields,
+		public SensorDataSubscriptionRequest Subscribe(string Destination, IThingReference[] Nodes, FieldType Types, FieldSubscriptionRule[] Fields,
 			Duration MinInterval, Duration MaxInterval, Duration MaxAge, string ServiceToken, string DeviceToken, string UserToken,
 			bool ImmediateReadout)
 		{
@@ -1139,7 +1139,7 @@ namespace Waher.Networking.XMPP.Sensor
 
 			if (Nodes != null)
 			{
-				foreach (ThingReference Node in Nodes)
+				foreach (IThingReference Node in Nodes)
 				{
 					Xml.Append("<nd id='");
 					Xml.Append(XML.Encode(Node.NodeId));

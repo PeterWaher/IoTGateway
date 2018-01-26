@@ -689,11 +689,11 @@ namespace Waher.Networking.XMPP.Control
 			return Xml;
 		}
 
-		private void Serialize(StringBuilder Xml, ThingReference[] Nodes)
+		private void Serialize(StringBuilder Xml, IThingReference[] Nodes)
 		{
 			if (Nodes != null)
 			{
-				foreach (ThingReference Node in Nodes)
+				foreach (IThingReference Node in Nodes)
 				{
 					Xml.Append("<nd id='");
 					Xml.Append(XML.Encode(Node.NodeId));

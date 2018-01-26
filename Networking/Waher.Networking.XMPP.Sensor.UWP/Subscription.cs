@@ -13,7 +13,7 @@ namespace Waher.Networking.XMPP.Sensor
 	/// </summary>
 	public class Subscription
 	{
-		private Dictionary<ThingReference, bool> nodes = new Dictionary<ThingReference, bool>();
+		private Dictionary<IThingReference, bool> nodes = new Dictionary<IThingReference, bool>();
 		private Dictionary<string, FieldSubscriptionRule> fields = null;
 		private Availability availability = Availability.Online;
 		private FieldType fieldTypes;
@@ -47,9 +47,9 @@ namespace Waher.Networking.XMPP.Sensor
 			FieldType FieldTypes, Duration MaxAge, Duration MinInterval, Duration MaxInterval, string ServiceToken, string DeviceToken,
 			string UserToken)
 		{
-			this.nodes = new Dictionary<ThingReference, bool>();
+			this.nodes = new Dictionary<IThingReference, bool>();
 
-			foreach (ThingReference Ref in Nodes)
+			foreach (IThingReference Ref in Nodes)
 				this.nodes[Ref] = true;
 
 			this.fields = Fields;
@@ -69,7 +69,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// </summary>
 		/// <param name="Reference">Reference to remove.</param>
 		/// <returns>If the subscription has become inactive, due to lack of referenced things.</returns>
-		public bool RemoveNode(ThingReference Reference)
+		public bool RemoveNode(IThingReference Reference)
 		{
 			lock (this.nodes)
 			{
@@ -89,7 +89,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <summary>
 		/// Nodes in subscription.
 		/// </summary>
-		public Dictionary<ThingReference, bool>.KeyCollection Nodes
+		public Dictionary<IThingReference, bool>.KeyCollection Nodes
 		{
 			get { return this.nodes.Keys; }
 		}
@@ -115,14 +115,14 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <summary>
 		/// Node references, for use when requesting a new readout.
 		/// </summary>
-		public ThingReference[] NodeReferences
+		public IThingReference[] NodeReferences
 		{
 			get
 			{
 				if (this.nodes.Count == 1 && this.nodes.ContainsKey(ThingReference.Empty))
 					return null;
 
-				ThingReference[] Result = new ThingReference[this.nodes.Count];
+				IThingReference[] Result = new IThingReference[this.nodes.Count];
 				this.nodes.Keys.CopyTo(Result, 0);
 				return Result;
 			}

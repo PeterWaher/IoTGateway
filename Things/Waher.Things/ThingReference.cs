@@ -157,7 +157,7 @@ namespace Waher.Things
 		/// <returns>true if the specified object is equal to the current object; otherwise, false.</returns>
 		public override bool Equals(object obj)
 		{
-			ThingReference Ref = obj as ThingReference;
+			IThingReference Ref = obj as IThingReference;
 			if (Ref == null)
 				return false;
 			else

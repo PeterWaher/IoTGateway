@@ -121,7 +121,7 @@ namespace Waher.Networking.XMPP.Sensor
 				{
 					Subscription.Active = false;
 
-					foreach (ThingReference Ref in Subscription.NodeReferences)
+					foreach (IThingReference Ref in Subscription.NodeReferences)
 					{
 						if (!this.subscriptionsByThing.TryGetValue(Ref, out LinkedList<Subscription> Subscriptions2))
 							continue;
@@ -739,7 +739,7 @@ namespace Waher.Networking.XMPP.Sensor
 				Subscription = new Subscription(Id, e.From, Nodes, FieldNames, FieldTypes, MaxAge, MinInterval, MaxInterval,
 					ServiceToken, DeviceToken, UserToken);
 
-				foreach (ThingReference Thing in Nodes)
+				foreach (IThingReference Thing in Nodes)
 				{
 					if (!subscriptionsByThing.TryGetValue(Thing, out LinkedList<Subscription> Subscriptions))
 					{
@@ -839,7 +839,7 @@ namespace Waher.Networking.XMPP.Sensor
 
 			Subscription.Active = false;
 
-			foreach (ThingReference Ref in Subscription.Nodes)
+			foreach (IThingReference Ref in Subscription.Nodes)
 			{
 				if (!this.subscriptionsByThing.TryGetValue(Ref, out LinkedList<Subscription> Subscriptions))
 					continue;

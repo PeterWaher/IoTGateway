@@ -13,6 +13,7 @@ using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Provisioning;
 using Waher.Persistence;
 using Waher.Persistence.Files;
+using Waher.Runtime.Inventory;
 using Waher.Runtime.Settings;
 using Waher.IoTGateway.Svc.ServiceManagement;
 using Waher.IoTGateway.Svc.ServiceManagement.Enumerations;
@@ -407,7 +408,7 @@ namespace Waher.IoTGateway.Svc
 
 		internal static Task RegistrationSuccessfulAsConsole(MetaDataTag[] MetaData, RegistrationEventArgs e)
 		{
-			if (!e.IsClaimed)
+			if (!e.IsClaimed && Types.TryGetModuleParameter("Registry", out object Obj) && Obj is ThingRegistryClient ThingRegistryClient)
 				SimpleXmppConfiguration.PrintQRCode(ThingRegistryClient.EncodeAsIoTDiscoURI(MetaData));
 
 			return RegistrationSuccessfulAsService(MetaData, e);
@@ -416,7 +417,7 @@ namespace Waher.IoTGateway.Svc
 
 		internal static async Task RegistrationSuccessfulAsService(MetaDataTag[] MetaData, RegistrationEventArgs e)
 		{
-			if (!e.IsClaimed)
+			if (!e.IsClaimed && Types.TryGetModuleParameter("Registry", out object Obj) && Obj is ThingRegistryClient ThingRegistryClient)
 			{
 				string ClaimUrl = ThingRegistryClient.EncodeAsIoTDiscoURI(MetaData);
 				string FilePath = Path.Combine(Gateway.AppDataFolder, "Gateway.iotdisco");

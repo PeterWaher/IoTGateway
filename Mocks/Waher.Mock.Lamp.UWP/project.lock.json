@@ -2622,7 +2622,9 @@
           "Waher.Networking.XMPP.UWP": "1.0.0",
           "Waher.Runtime.Inventory": "1.0.4",
           "Waher.Runtime.Language": "1.0.1",
+          "Waher.Runtime.Settings": "1.0.1",
           "Waher.Runtime.Timing": "1.0.1",
+          "Waher.Security": "1.0.1",
           "Waher.Things": "1.0.11"
         }
       },
@@ -5393,7 +5395,9 @@
           "Waher.Networking.XMPP.UWP": "1.0.0",
           "Waher.Runtime.Inventory": "1.0.4",
           "Waher.Runtime.Language": "1.0.1",
+          "Waher.Runtime.Settings": "1.0.1",
           "Waher.Runtime.Timing": "1.0.1",
+          "Waher.Security": "1.0.1",
           "Waher.Things": "1.0.11"
         }
       },
@@ -8200,7 +8204,9 @@
           "Waher.Networking.XMPP.UWP": "1.0.0",
           "Waher.Runtime.Inventory": "1.0.4",
           "Waher.Runtime.Language": "1.0.1",
+          "Waher.Runtime.Settings": "1.0.1",
           "Waher.Runtime.Timing": "1.0.1",
+          "Waher.Security": "1.0.1",
           "Waher.Things": "1.0.11"
         }
       },
@@ -10980,7 +10986,9 @@
           "Waher.Networking.XMPP.UWP": "1.0.0",
           "Waher.Runtime.Inventory": "1.0.4",
           "Waher.Runtime.Language": "1.0.1",
+          "Waher.Runtime.Settings": "1.0.1",
           "Waher.Runtime.Timing": "1.0.1",
+          "Waher.Security": "1.0.1",
           "Waher.Things": "1.0.11"
         }
       },
@@ -13796,7 +13804,9 @@
           "Waher.Networking.XMPP.UWP": "1.0.0",
           "Waher.Runtime.Inventory": "1.0.4",
           "Waher.Runtime.Language": "1.0.1",
+          "Waher.Runtime.Settings": "1.0.1",
           "Waher.Runtime.Timing": "1.0.1",
+          "Waher.Security": "1.0.1",
           "Waher.Things": "1.0.11"
         }
       },
@@ -16576,7 +16586,9 @@
           "Waher.Networking.XMPP.UWP": "1.0.0",
           "Waher.Runtime.Inventory": "1.0.4",
           "Waher.Runtime.Language": "1.0.1",
+          "Waher.Runtime.Settings": "1.0.1",
           "Waher.Runtime.Timing": "1.0.1",
+          "Waher.Security": "1.0.1",
           "Waher.Things": "1.0.11"
         }
       },
@@ -19392,7 +19404,9 @@
           "Waher.Networking.XMPP.UWP": "1.0.0",
           "Waher.Runtime.Inventory": "1.0.4",
           "Waher.Runtime.Language": "1.0.1",
+          "Waher.Runtime.Settings": "1.0.1",
           "Waher.Runtime.Timing": "1.0.1",
+          "Waher.Security": "1.0.1",
           "Waher.Things": "1.0.11"
         }
       },

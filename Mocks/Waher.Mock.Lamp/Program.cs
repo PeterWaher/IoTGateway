@@ -220,7 +220,7 @@ namespace Waher.Mock.Lamp
 					else
 					{
 						ownerJid = string.Empty;
-						SimpleXmppConfiguration.PrintQRCode(ThingRegistryClient.EncodeAsIoTDiscoURI(MetaData));
+						SimpleXmppConfiguration.PrintQRCode(thingRegistryClient.EncodeAsIoTDiscoURI(MetaData));
 					}
 				}
 			}, null);

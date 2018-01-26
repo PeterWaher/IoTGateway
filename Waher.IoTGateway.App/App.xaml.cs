@@ -26,6 +26,7 @@ using Waher.Networking.XMPP.Provisioning;
 using Waher.Networking.XMPP.ServiceDiscovery;
 using Waher.Persistence;
 using Waher.Persistence.Files;
+using Waher.Runtime.Inventory;
 using Waher.Runtime.Settings;
 using Waher.Things;
 using Waher.Things.Gpio;
@@ -525,7 +526,7 @@ namespace Waher.IoTGateway.App
 
 		private static async Task RegistrationSuccessful(MetaDataTag[] MetaData, RegistrationEventArgs e)
 		{
-			if (!e.IsClaimed)
+			if (!e.IsClaimed && Types.TryGetModuleParameter("Registry", out object Obj) && Obj is ThingRegistryClient ThingRegistryClient)
 			{
 				string ClaimUrl = ThingRegistryClient.EncodeAsIoTDiscoURI(MetaData);
 				string FilePath = Path.Combine(Gateway.AppDataFolder, "Gateway.iotdisco");

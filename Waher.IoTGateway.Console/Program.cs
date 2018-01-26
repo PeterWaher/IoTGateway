@@ -14,6 +14,7 @@ using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Provisioning;
 using Waher.Persistence;
 using Waher.Persistence.Files;
+using Waher.Runtime.Inventory;
 
 namespace Waher.IoTGateway.Console
 {
@@ -170,12 +171,12 @@ namespace Waher.IoTGateway.Console
 
 		private static async Task RegistrationSuccessful(MetaDataTag[] MetaData, RegistrationEventArgs e)
 		{
-			if (!e.IsClaimed)
+			if (!e.IsClaimed && Types.TryGetModuleParameter("Registry", out object Obj) && Obj is ThingRegistryClient ThingRegistryClient)
 			{
-				SimpleXmppConfiguration.PrintQRCode(ThingRegistryClient.EncodeAsIoTDiscoURI(MetaData));
-
 				string ClaimUrl = ThingRegistryClient.EncodeAsIoTDiscoURI(MetaData);
 				string FilePath = Path.Combine(Gateway.AppDataFolder, "Gateway.iotdisco");
+
+				SimpleXmppConfiguration.PrintQRCode(ClaimUrl);
 
 				Log.Informational("Registration successful.");
 				Log.Informational(ClaimUrl, new KeyValuePair<string, object>("Path", FilePath));

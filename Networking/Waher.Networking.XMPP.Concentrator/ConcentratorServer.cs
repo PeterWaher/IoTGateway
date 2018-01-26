@@ -75,29 +75,29 @@ namespace Waher.Networking.XMPP.Concentrator
 			foreach (IDataSource DataSource in DataSources)
 				this.Register(DataSource);
 
-			this.client.RegisterIqGetHandler("getCapabilities", NamespaceConcentrator, this.GetCapabilitiesHandler, true);										// ConcentratorClient.GetCapabilities
+			this.client.RegisterIqGetHandler("getCapabilities", NamespaceConcentrator, this.GetCapabilitiesHandler, true);                                      // ConcentratorClient.GetCapabilities
 
-			this.client.RegisterIqGetHandler("getAllDataSources", NamespaceConcentrator, this.GetAllDataSourcesHandler, false);									// ConcentratorClient.GetAllDataSources
-			this.client.RegisterIqGetHandler("getRootDataSources", NamespaceConcentrator, this.GetRootDataSourcesHandler, false);								// ConcentratorClient.GetRootDataSources
-			this.client.RegisterIqGetHandler("getChildDataSources", NamespaceConcentrator, this.GetChildDataSourcesHandler, false);								// ConcentratorClient.GetChildDataSources
+			this.client.RegisterIqGetHandler("getAllDataSources", NamespaceConcentrator, this.GetAllDataSourcesHandler, false);                                 // ConcentratorClient.GetAllDataSources
+			this.client.RegisterIqGetHandler("getRootDataSources", NamespaceConcentrator, this.GetRootDataSourcesHandler, false);                               // ConcentratorClient.GetRootDataSources
+			this.client.RegisterIqGetHandler("getChildDataSources", NamespaceConcentrator, this.GetChildDataSourcesHandler, false);                             // ConcentratorClient.GetChildDataSources
 
-			this.client.RegisterIqGetHandler("containsNode", NamespaceConcentrator, this.ContainsNodeHandler, false);											// ConcentratorClient.ContainsNode
-			this.client.RegisterIqGetHandler("containsNodes", NamespaceConcentrator, this.ContainsNodesHandler, false);											// ConcentratorClient.ContainsNodes
-			this.client.RegisterIqGetHandler("getNode", NamespaceConcentrator, this.GetNodeHandler, false);														// ConcentratorClient.GetNode
-			this.client.RegisterIqGetHandler("getNodes", NamespaceConcentrator, this.GetNodesHandler, false);													// ConcentratorClient.GetNodes
-			this.client.RegisterIqGetHandler("getAllNodes", NamespaceConcentrator, this.GetAllNodesHandler, false);												// ConcentratorClient.GetAllNodes
-			this.client.RegisterIqGetHandler("getNodeInheritance", NamespaceConcentrator, this.GetNodeInheritanceHandler, false);								// ConcentratorClient.GetNodeInheritance
-			this.client.RegisterIqGetHandler("getRootNodes", NamespaceConcentrator, this.GetRootNodesHandler, false);											// ConcentratorClient.GetRootNodes
-			this.client.RegisterIqGetHandler("getChildNodes", NamespaceConcentrator, this.GetChildNodesHandler, false);											// ConcentratorClient.GetChildNodes
-			// getIndices
-			// getNodesFromIndex
-			// getNodesFromIndices
-			// getAllIndexValues
+			this.client.RegisterIqGetHandler("containsNode", NamespaceConcentrator, this.ContainsNodeHandler, false);                                           // ConcentratorClient.ContainsNode
+			this.client.RegisterIqGetHandler("containsNodes", NamespaceConcentrator, this.ContainsNodesHandler, false);                                         // ConcentratorClient.ContainsNodes
+			this.client.RegisterIqGetHandler("getNode", NamespaceConcentrator, this.GetNodeHandler, false);                                                     // ConcentratorClient.GetNode
+			this.client.RegisterIqGetHandler("getNodes", NamespaceConcentrator, this.GetNodesHandler, false);                                                   // ConcentratorClient.GetNodes
+			this.client.RegisterIqGetHandler("getAllNodes", NamespaceConcentrator, this.GetAllNodesHandler, false);                                             // ConcentratorClient.GetAllNodes
+			this.client.RegisterIqGetHandler("getNodeInheritance", NamespaceConcentrator, this.GetNodeInheritanceHandler, false);                               // ConcentratorClient.GetNodeInheritance
+			this.client.RegisterIqGetHandler("getRootNodes", NamespaceConcentrator, this.GetRootNodesHandler, false);                                           // ConcentratorClient.GetRootNodes
+			this.client.RegisterIqGetHandler("getChildNodes", NamespaceConcentrator, this.GetChildNodesHandler, false);                                         // ConcentratorClient.GetChildNodes
+																																								// getIndices
+																																								// getNodesFromIndex
+																																								// getNodesFromIndices
+																																								// getAllIndexValues
 
 			this.client.RegisterIqGetHandler("getNodeParametersForEdit", NamespaceConcentrator, this.GetNodeParametersForEditHandler, false);                   // ConcentratorClient.GetNodeParametersForEdit
 			this.client.RegisterIqGetHandler("setNodeParametersAfterEdit", NamespaceConcentrator, this.SetNodeParametersAfterEditHandler, false);               // (ConcentratorClient.EditNode)
-			this.client.RegisterIqGetHandler("getCommonNodeParametersForEdit", NamespaceConcentrator, this.GetCommonNodeParametersForEditHandler, false);		// TODO:
-			this.client.RegisterIqGetHandler("setCommonNodeParametersAfterEdit", NamespaceConcentrator, this.SetCommonNodeParametersAfterEditHandler, false);	// TODO:
+			this.client.RegisterIqGetHandler("getCommonNodeParametersForEdit", NamespaceConcentrator, this.GetCommonNodeParametersForEditHandler, false);       // TODO:
+			this.client.RegisterIqGetHandler("setCommonNodeParametersAfterEdit", NamespaceConcentrator, this.SetCommonNodeParametersAfterEditHandler, false);   // TODO:
 
 			this.client.RegisterIqGetHandler("getAddableNodeTypes", NamespaceConcentrator, this.GetAddableNodeTypesHandler, false);                             // ConcentratorClient.GetAddableNodeTypes
 			this.client.RegisterIqGetHandler("getParametersForNewNode", NamespaceConcentrator, this.GetParametersForNewNodeHandler, false);                     // ConcentratorClient.GetParametersForNewNode
@@ -106,20 +106,20 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			this.client.RegisterIqGetHandler("getAncestors", NamespaceConcentrator, this.GetAncestorsHandler, false);                                           // ConcentratorClient.GetAncestors
 
-			this.client.RegisterIqGetHandler("getNodeCommands", NamespaceConcentrator, this.GetNodeCommandsHandler, false);										// TODO:
-			this.client.RegisterIqGetHandler("getCommandParameters", NamespaceConcentrator, this.GetCommandParametersHandler, false);							// TODO:
-			this.client.RegisterIqGetHandler("executeNodeCommand", NamespaceConcentrator, this.ExecuteNodeCommandHandler, false);								// TODO:
-			this.client.RegisterIqGetHandler("executeNodeQuery", NamespaceConcentrator, this.ExecuteNodeQueryHandler, false);									// TODO:
-			this.client.RegisterIqGetHandler("abortNodeQuery", NamespaceConcentrator, this.AbortNodeQueryHandler, false);										// TODO:
-			this.client.RegisterIqGetHandler("getCommonNodeCommands", NamespaceConcentrator, this.GetCommonNodeCommandsHandler, false);							// TODO:
-			this.client.RegisterIqGetHandler("getCommonCommandParameters", NamespaceConcentrator, this.GetCommonCommandParametersHandler, false);				// TODO:
-			this.client.RegisterIqGetHandler("executeCommonNodeCommand", NamespaceConcentrator, this.ExecuteCommonNodeCommandHandler, false);					// TODO:
-			this.client.RegisterIqGetHandler("executeCommonNodeQuery", NamespaceConcentrator, this.ExecuteCommonNodeQueryHandler, false);						// TODO:
+			this.client.RegisterIqGetHandler("getNodeCommands", NamespaceConcentrator, this.GetNodeCommandsHandler, false);                                     // TODO:
+			this.client.RegisterIqGetHandler("getCommandParameters", NamespaceConcentrator, this.GetCommandParametersHandler, false);                           // TODO:
+			this.client.RegisterIqGetHandler("executeNodeCommand", NamespaceConcentrator, this.ExecuteNodeCommandHandler, false);                               // TODO:
+			this.client.RegisterIqGetHandler("executeNodeQuery", NamespaceConcentrator, this.ExecuteNodeQueryHandler, false);                                   // TODO:
+			this.client.RegisterIqGetHandler("abortNodeQuery", NamespaceConcentrator, this.AbortNodeQueryHandler, false);                                       // TODO:
+			this.client.RegisterIqGetHandler("getCommonNodeCommands", NamespaceConcentrator, this.GetCommonNodeCommandsHandler, false);                         // TODO:
+			this.client.RegisterIqGetHandler("getCommonCommandParameters", NamespaceConcentrator, this.GetCommonCommandParametersHandler, false);               // TODO:
+			this.client.RegisterIqGetHandler("executeCommonNodeCommand", NamespaceConcentrator, this.ExecuteCommonNodeCommandHandler, false);                   // TODO:
+			this.client.RegisterIqGetHandler("executeCommonNodeQuery", NamespaceConcentrator, this.ExecuteCommonNodeQueryHandler, false);                       // TODO:
 
-			this.client.RegisterIqGetHandler("moveNodeUp", NamespaceConcentrator, this.MoveNodeUpHandler, false);												// TODO:
-			this.client.RegisterIqGetHandler("moveNodeDown", NamespaceConcentrator, this.MoveNodeDownHandler, false);											// TODO:
-			this.client.RegisterIqGetHandler("moveNodesUp", NamespaceConcentrator, this.MoveNodesUpHandler, false);												// TODO:
-			this.client.RegisterIqGetHandler("moveNodesDown", NamespaceConcentrator, this.MoveNodesDownHandler, false);											// TODO:
+			this.client.RegisterIqGetHandler("moveNodeUp", NamespaceConcentrator, this.MoveNodeUpHandler, false);                                               // TODO:
+			this.client.RegisterIqGetHandler("moveNodeDown", NamespaceConcentrator, this.MoveNodeDownHandler, false);                                           // TODO:
+			this.client.RegisterIqGetHandler("moveNodesUp", NamespaceConcentrator, this.MoveNodesUpHandler, false);                                             // TODO:
+			this.client.RegisterIqGetHandler("moveNodesDown", NamespaceConcentrator, this.MoveNodesDownHandler, false);                                         // TODO:
 
 			// subscribe
 			// unsubscribe
@@ -1616,9 +1616,9 @@ namespace Waher.Networking.XMPP.Concentrator
 						e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 10, "Data form missing."), e.IQ));
 					else
 					{
-						KeyValuePair<string, string>[] Errors = await Parameters.SetEditableForm(e, Node, Form);
+						Parameters.SetEditableFormResult Result = await Parameters.SetEditableForm(e, Node, Form, true);
 
-						if (Errors == null)
+						if (Result.Errors == null)
 						{
 							StringBuilder Xml = new StringBuilder();
 
@@ -1636,11 +1636,17 @@ namespace Waher.Networking.XMPP.Concentrator
 							Xml.Append("</setNodeParametersAfterEditResponse>");
 
 							e.IqResult(Xml.ToString());
+
+							Result.Tags.Add(new KeyValuePair<string, object>("Full", e.From));
+							Result.Tags.Add(new KeyValuePair<string, object>("Source", Node.SourceId));
+							Result.Tags.Add(new KeyValuePair<string, object>("Partition", Node.Partition));
+
+							Log.Informational("Node edited.", Node.NodeId, e.FromBareJid, "NodeEdited", EventLevel.Medium, Result.Tags.ToArray());
 						}
 						else
 						{
 							Form = await Parameters.GetEditableForm(Sender as XmppClient, e, Node, Node.NodeId);
-							e.IqError(this.GetFormErrorsXml(Errors, "setNodeParametersAfterEditResponse"));
+							e.IqError(this.GetFormErrorsXml(Result.Errors, "setNodeParametersAfterEditResponse"));
 						}
 					}
 				}
@@ -1818,12 +1824,24 @@ namespace Waher.Networking.XMPP.Concentrator
 					e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 10, "Data form missing."), e.IQ));
 				else
 				{
-					KeyValuePair<string, string>[] Errors = await Parameters.SetEditableForm(e, Nodes, Form);
+					foreach (ThingReference Node2 in Nodes)
+					{
+						Parameters.SetEditableFormResult Result = await Parameters.SetEditableForm(e, Node2, Form, true);
 
-					if (Errors == null)
-						e.IqResult("<setCommonNodeParametersAfterEditResponse xmlns='" + NamespaceConcentrator + "'/>");
-					else
-						e.IqError(this.GetFormErrorsXml(Errors, "setCommonNodeParametersAfterEditResponse"));
+						if (Result.Errors != null)
+						{
+							e.IqError(this.GetFormErrorsXml(Result.Errors, "setCommonNodeParametersAfterEditResponse"));
+							break;
+						}
+
+						Result.Tags.Add(new KeyValuePair<string, object>("Full", e.From));
+						Result.Tags.Add(new KeyValuePair<string, object>("Source", Node2.SourceId));
+						Result.Tags.Add(new KeyValuePair<string, object>("Partition", Node2.Partition));
+
+						Log.Informational("Node edited.", Node2.NodeId, e.FromBareJid, "NodeEdited", EventLevel.Medium, Result.Tags.ToArray());
+					}
+
+					e.IqResult("<setCommonNodeParametersAfterEditResponse xmlns='" + NamespaceConcentrator + "'/>");
 				}
 			}
 			catch (Exception ex)
@@ -2068,9 +2086,9 @@ namespace Waher.Networking.XMPP.Concentrator
 					return;
 				}
 
-				KeyValuePair<string, string>[] Errors = await Parameters.SetEditableForm(e, PresumptiveChild, Form);
+				Parameters.SetEditableFormResult Result = await Parameters.SetEditableForm(e, PresumptiveChild, Form, false);
 
-				if (Errors == null)
+				if (Result.Errors == null)
 				{
 					StringBuilder Xml = new StringBuilder();
 
@@ -2088,9 +2106,16 @@ namespace Waher.Networking.XMPP.Concentrator
 					Xml.Append("</createNewNodeResponse>");
 
 					e.IqResult(Xml.ToString());
+
+					Result.Tags.Add(new KeyValuePair<string, object>("Full", e.From));
+					Result.Tags.Add(new KeyValuePair<string, object>("Parent", Node.NodeId));
+					Result.Tags.Add(new KeyValuePair<string, object>("Source", PresumptiveChild.SourceId));
+					Result.Tags.Add(new KeyValuePair<string, object>("Partition", PresumptiveChild.Partition));
+
+					Log.Informational("Node created.", PresumptiveChild.NodeId, e.FromBareJid, "NodeCreated", EventLevel.Major, Result.Tags.ToArray());
 				}
 				else
-					e.IqError(this.GetFormErrorsXml(Errors, "createNewNodeResponse"));
+					e.IqError(this.GetFormErrorsXml(Result.Errors, "createNewNodeResponse"));
 			}
 			catch (Exception ex)
 			{
@@ -2132,11 +2157,19 @@ namespace Waher.Networking.XMPP.Concentrator
 
 				IThingReference ParentRef = Node.Parent;
 				INode Parent = await Source.GetNodeAsync(Node.Parent);
+				KeyValuePair<string, object>[] Tags = new KeyValuePair<string, object>[]
+				{
+					new KeyValuePair<string, object>("Full", e.From),
+					new KeyValuePair<string, object>("Source", Node.SourceId),
+					new KeyValuePair<string, object>("Partition", Node.Partition)
+				};
 
 				if (Parent != null)
 					await Parent.RemoveAsync(Node);
 
 				await Node.DestroyAsync();
+
+				Log.Informational("Node destroyed.", Node.NodeId, e.FromBareJid, "NodeDestroyed", EventLevel.Major, Tags);
 
 				StringBuilder Xml = new StringBuilder();
 
@@ -2396,12 +2429,12 @@ namespace Waher.Networking.XMPP.Concentrator
 
 							Command = (ICommand)Activator.CreateInstance(Command.GetType());
 
-							KeyValuePair<string, string>[] Errors = await Parameters.SetEditableForm(e, Command, Form);
+							Parameters.SetEditableFormResult Result = await Parameters.SetEditableForm(e, Command, Form, false);
 
-							if (Errors != null)
+							if (Result.Errors != null)
 							{
 								DisposeObject(Command);
-								e.IqError(this.GetFormErrorsXml(Errors, "executeNodeCommandResponse"));
+								e.IqError(this.GetFormErrorsXml(Result.Errors, "executeNodeCommandResponse"));
 								return;
 							}
 						}
@@ -2488,12 +2521,12 @@ namespace Waher.Networking.XMPP.Concentrator
 
 						Command = (ICommand)Activator.CreateInstance(Command.GetType());
 
-						KeyValuePair<string, string>[] Errors = await Parameters.SetEditableForm(e, Command, Form);
+						Parameters.SetEditableFormResult Result = await Parameters.SetEditableForm(e, Command, Form, false);
 
-						if (Errors != null)
+						if (Result.Errors != null)
 						{
 							DisposeObject(Command);
-							e.IqError(this.GetFormErrorsXml(Errors, "executeNodeQueryResponse"));
+							e.IqError(this.GetFormErrorsXml(Result.Errors, "executeNodeQueryResponse"));
 							return;
 						}
 
@@ -3348,12 +3381,12 @@ namespace Waher.Networking.XMPP.Concentrator
 
 					Command = (ICommand)Activator.CreateInstance(Command.GetType());
 
-					KeyValuePair<string, string>[] Errors = await Parameters.SetEditableForm(e, Command, Form);
+					Parameters.SetEditableFormResult Result = await Parameters.SetEditableForm(e, Command, Form, false);
 
-					if (Errors != null)
+					if (Result.Errors != null)
 					{
 						DisposeObject(Command);
-						e.IqError(this.GetFormErrorsXml(Errors, "executeCommonNodeCommandResponse"));
+						e.IqError(this.GetFormErrorsXml(Result.Errors, "executeCommonNodeCommandResponse"));
 						return;
 					}
 				}
@@ -3508,12 +3541,12 @@ namespace Waher.Networking.XMPP.Concentrator
 
 				Command = (ICommand)Activator.CreateInstance(Command.GetType());
 
-				KeyValuePair<string, string>[] Errors = await Parameters.SetEditableForm(e, Command, Form);
+				Parameters.SetEditableFormResult Result = await Parameters.SetEditableForm(e, Command, Form, false);
 
-				if (Errors != null)
+				if (Result.Errors != null)
 				{
 					DisposeObject(Command);
-					e.IqError(this.GetFormErrorsXml(Errors, "executeCommonNodeQueryResponse"));
+					e.IqError(this.GetFormErrorsXml(Result.Errors, "executeCommonNodeQueryResponse"));
 					return;
 				}
 

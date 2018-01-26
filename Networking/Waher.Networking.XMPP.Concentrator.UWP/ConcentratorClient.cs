@@ -412,10 +412,22 @@ namespace Waher.Networking.XMPP.Concentrator
 			NodeInformationEventHandler Callback, object State)
 		{
 			XmlElement E;
-			NodeInformation NodeInfo;
+			NodeInformation NodeInfo = null;
 
 			if (e.Ok && (E = e.FirstElement) != null && E.LocalName == ExpectedElement)
-				NodeInfo = this.GetNodeInformation(E, Parameters, Messages);
+			{
+				foreach (XmlNode N in E.ChildNodes)
+				{
+					if (N is XmlElement E2 && E2.LocalName == "nd")
+					{
+						NodeInfo = this.GetNodeInformation(E2, Parameters, Messages);
+						break;
+					}
+				}
+
+				if (NodeInfo == null)
+					e.Ok = false;
+			}
 			else
 			{
 				e.Ok = false;

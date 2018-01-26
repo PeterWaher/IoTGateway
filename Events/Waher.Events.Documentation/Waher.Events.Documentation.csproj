@@ -62,6 +62,15 @@
   <ItemGroup>
     <None Include="EventsLost.xml" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="NodeCreated.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="NodeEdited.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="NodeDestroyed.xml" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

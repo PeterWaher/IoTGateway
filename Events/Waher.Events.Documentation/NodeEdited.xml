@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<EventDescription xmlns="http://waher.se/Schema/EventIdDocument.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+				  eventId="NodeEdited" minor="false" medium="true" major="false"
+				  debug="false" informational="true" notice="false" warning="false" 
+				  error="false" critical="false" alert="false" emergency="false">
+	<Description>Event raised when a node in a data source has been edited. New properties of node will be available as tags.</Description>
+	<Object>Node ID</Object>
+	<Actor>Actor performing the action.</Actor>
+  <Tag key="Full" valueType="xs:string">
+    <Description>Full Address of actor.</Description>
+  </Tag>
+  <Tag key="Source" valueType="xs:string">
+    <Description>Source ID of new node.</Description>
+  </Tag>
+  <Tag key="Partition" valueType="xs:string">
+    <Description>Partition of new node.</Description>
+  </Tag>
+</EventDescription>

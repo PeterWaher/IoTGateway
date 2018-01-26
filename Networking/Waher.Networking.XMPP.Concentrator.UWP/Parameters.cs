@@ -413,13 +413,30 @@ namespace Waher.Networking.XMPP.Concentrator
 		}
 
 		/// <summary>
+		/// Result of a set properties operation.
+		/// </summary>
+		public struct SetEditableFormResult
+		{
+			/// <summary>
+			/// If any errors were encountered.
+			/// </summary>
+			public KeyValuePair<string, string>[] Errors;
+
+			/// <summary>
+			/// Actual property values set.
+			/// </summary>
+			public List<KeyValuePair<string, object>> Tags;
+		}
+
+		/// <summary>
 		/// Sets parameters from a data form in an object.
 		/// </summary>
 		/// <param name="e">IQ Event Arguments describing the request.</param>
 		/// <param name="EditableObject">Object whose parameters will be set.</param>
 		/// <param name="Form">Data Form.</param>
+		/// <param name="OnlySetChanged">If only changed parameters are to be set.</param>
 		/// <returns>Any errors encountered, or null if parameters was set properly.</returns>
-		public static async Task<KeyValuePair<string, string>[]> SetEditableForm(IqEventArgs e, object EditableObject, DataForm Form)
+		public static async Task<SetEditableFormResult> SetEditableForm(IqEventArgs e, object EditableObject, DataForm Form, bool OnlySetChanged)
 		{
 			Type T = EditableObject.GetType();
 			string DefaultLanguageCode = GetDefaultLanguageCode(T);
@@ -669,44 +686,49 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			if (Errors == null)
 			{
+				SetEditableFormResult Result = new SetEditableFormResult()
+				{
+					Errors = null,
+					Tags = new List<KeyValuePair<string, object>>()
+				};
+
 				foreach (KeyValuePair<PropertyInfo, object> P in ToSet)
 				{
 					try
 					{
+						if (OnlySetChanged)
+						{
+							object Current = P.Key.GetValue(EditableObject);
+
+							if (Current == null)
+							{
+								if (P.Value == null)
+									continue;
+							}
+							else if (P.Value != null && Current.Equals(P.Value))
+								continue;
+						}
+
 						P.Key.SetValue(EditableObject, P.Value);
+
+						Result.Tags.Add(new KeyValuePair<string, object>(P.Key.Name, P.Value));
 					}
 					catch (Exception ex)
 					{
 						AddError(ref Errors, P.Key.Name, ex.Message);
 					}
 				}
-			}
 
-			if (Errors == null)
-				return null;
+				return Result;
+			}
 			else
-				return Errors.ToArray();
-		}
-
-		/// <summary>
-		/// Sets parameters from a data form in a set of objects.
-		/// </summary>
-		/// <param name="e">IQ Event Arguments describing the request.</param>
-		/// <param name="EditableObjects">Objects whose parameters will be set.</param>
-		/// <param name="Form">Data Form.</param>
-		/// <returns>Any errors encountered, or null if parameters was set properly.</returns>
-		public static async Task<KeyValuePair<string, string>[]> SetEditableForm(IqEventArgs e, IEnumerable<object> EditableObjects, DataForm Form)
-		{
-			KeyValuePair<string, string>[] Result;
-
-			foreach (Object EditableObject in EditableObjects)
 			{
-				Result = await SetEditableForm(e, EditableObject, Form);
-				if (Result != null)
-					return Result;
+				return new SetEditableFormResult()
+				{
+					Errors = Errors.ToArray(),
+					Tags = null
+				};
 			}
-
-			return null;
 		}
 
 		/// <summary>

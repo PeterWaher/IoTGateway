@@ -392,6 +392,7 @@ namespace Waher.Client.WPF.Model
 		{
 			string FullJid = this.Concentrator?.FullJid;
 			ConcentratorClient ConcentratorClient = this.ConcentratorClient;
+			string OldKey = this.Key;
 
 			if (ConcentratorClient != null && !string.IsNullOrEmpty(FullJid))
 			{
@@ -413,6 +414,12 @@ namespace Waher.Client.WPF.Model
 					{
 						this.nodeInfo = e.NodeInformation;
 						this.OnUpdated();
+
+						string NewKey = this.Key;
+						TreeNode Parent = this.Parent;
+
+						if (NewKey != OldKey && Parent != null)
+							Parent.RenameChild(OldKey, NewKey, this);
 					}
 				}, null);
 			}

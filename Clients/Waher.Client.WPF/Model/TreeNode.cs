@@ -402,6 +402,18 @@ namespace Waher.Client.WPF.Model
 				return false;
 		}
 
+		internal void RenameChild(string OldKey, string NewKey, TreeNode Node)
+		{
+			if (this.children != null)
+			{
+				lock (this.children)
+				{
+					this.children.Remove(OldKey);
+					this.children[NewKey] = Node;
+				}
+			}
+		}
+
 		/// <summary>
 		/// If the node can be sniffed.
 		/// </summary>

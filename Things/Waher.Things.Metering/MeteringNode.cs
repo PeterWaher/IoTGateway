@@ -153,6 +153,31 @@ namespace Waher.Things.Metering
 		}
 
 		/// <summary>
+		/// <see cref="Object.ToString()"/>
+		/// </summary>
+		public override string ToString()
+		{
+			StringBuilder sb = new StringBuilder();
+			Language Language = Translator.GetDefaultLanguageAsync().Result;
+			string[] NoStrings = new string[0];
+
+			sb.Append(this.nodeId);
+			sb.Append(" (");
+			sb.Append(this.GetTypeNameAsync(Language).Result);
+			sb.Append(")");
+
+			foreach (Parameter P in this.GetDisplayableParametersAsync(Language, new RequestOrigin(string.Empty, NoStrings, NoStrings, NoStrings)).Result)
+			{
+				sb.Append(", ");
+				sb.Append(P.Name);
+				sb.Append("=");
+				sb.Append(P.StringValue);
+			}
+
+			return sb.ToString();
+		}
+
+		/// <summary>
 		/// Logs an error message on the node.
 		/// </summary>
 		/// <param name="Body">Message body.</param>

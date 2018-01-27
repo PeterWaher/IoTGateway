@@ -428,28 +428,28 @@ namespace Waher.Client.WPF.Controls
 				object Value;
 
 				Value = Registry.GetValue(MainWindow.registryKey, "SensorDataTimestampWidth", (int)GridView.Columns[0].Width);
-				if (Value != null && Value is int)
-					GridView.Columns[0].Width = (int)Value;
+				if (Value != null && Value is int i && i > 0)
+					GridView.Columns[0].Width = i;
 
 				Value = Registry.GetValue(MainWindow.registryKey, "SensorDataFieldWidth", (int)GridView.Columns[1].Width);
-				if (Value != null && Value is int)
-					GridView.Columns[1].Width = (int)Value;
+				if (Value != null && Value is int i2 && i2 > 0)
+					GridView.Columns[1].Width = i2;
 
 				Value = Registry.GetValue(MainWindow.registryKey, "SensorDataValueWidth", (int)GridView.Columns[2].Width);
-				if (Value != null && Value is int)
-					GridView.Columns[2].Width = (int)Value;
+				if (Value != null && Value is int i3 && i3 > 0)
+					GridView.Columns[2].Width = i3;
 
 				Value = Registry.GetValue(MainWindow.registryKey, "SensorDataUnitWidth", (int)GridView.Columns[3].Width);
-				if (Value != null && Value is int)
-					GridView.Columns[3].Width = (int)Value;
+				if (Value != null && Value is int i4 && i4 > 0)
+					GridView.Columns[3].Width = i4;
 
 				Value = Registry.GetValue(MainWindow.registryKey, "SensorDataStatusWidth", (int)GridView.Columns[4].Width);
-				if (Value != null && Value is int)
-					GridView.Columns[4].Width = (int)Value;
+				if (Value != null && Value is int i5 && i5 > 0)
+					GridView.Columns[4].Width = i5;
 
 				Value = Registry.GetValue(MainWindow.registryKey, "SensorDataTypeWidth", (int)GridView.Columns[5].Width);
-				if (Value != null && Value is int)
-					GridView.Columns[5].Width = (int)Value;
+				if (Value != null && Value is int i6 && i6 > 0)
+					GridView.Columns[5].Width = i6;
 			}
 
 		}

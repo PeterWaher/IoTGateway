@@ -23,6 +23,8 @@ namespace Waher.Networking.XMPP.DataForms
 		private DataType dataType;
 		private ValidationMethod validationMethod;
 		private string error;
+		private int priority = 0;
+		private int ordinal = 0;
 		private bool postBack;
 		private bool readOnly;
 		private bool notSame;
@@ -156,6 +158,24 @@ namespace Waher.Networking.XMPP.DataForms
 		/// If the field has been edited.
 		/// </summary>
 		public bool Edited { get { return this.edited; } }
+
+		/// <summary>
+		/// Can be used to sort fields. Not serialized to or from XML.
+		/// </summary>
+		public int Priority
+		{
+			get { return this.priority; }
+			set { this.priority = value; }
+		}
+
+		/// <summary>
+		/// Can be used to sort fields having the same priority. Not serialized to or from XML.
+		/// </summary>
+		public int Ordinal
+		{
+			get { return this.ordinal; }
+			set { this.ordinal = value; }
+		}
 
 		/// <summary>
 		/// Validates field input. The <see cref="Field.Error"/> property will reflect any errors found.

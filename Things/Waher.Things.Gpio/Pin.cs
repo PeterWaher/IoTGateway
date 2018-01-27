@@ -22,7 +22,7 @@ namespace Waher.Things.Gpio
 		}
 
 		[Page(2, "GPIO")]
-		[Header(3, "Pin number:")]
+		[Header(3, "Pin number:", 10)]
 		[ToolTip(4, "Pin number on parent controller.")]
 		[Range(0, byte.MaxValue)]
 		[Required]

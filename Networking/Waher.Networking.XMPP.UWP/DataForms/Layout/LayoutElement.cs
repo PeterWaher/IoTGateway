@@ -28,5 +28,13 @@ namespace Waher.Networking.XMPP.DataForms.Layout
 		internal abstract bool RemoveExcluded();
 
 		internal abstract void Serialize(StringBuilder Output);
+
+		/// <summary>
+		/// Sorts the contents of the layout element.
+		/// </summary>
+		public virtual void Sort()
+		{
+			// Do nothing by default.
+		}
 	}
 }

@@ -49,6 +49,9 @@ namespace Waher.Networking.XMPP.Concentrator
 			string s;
 			int StringId;
 			int PagePriority;
+			int PageOrdinal = 0;
+			int FieldPriority;
+			int FieldOrdinal = 0;
 			bool Required;
 			bool ReadOnly;
 			bool Masked;
@@ -92,6 +95,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				Options = null;
 				Required = ReadOnly = Masked = Alpha = DateOnly = false;
 				PagePriority = PageAttribute.DefaultPriority;
+				FieldPriority = HeaderAttribute.DefaultPriority;
 
 				foreach (Attribute Attr in PI.GetCustomAttributes())
 				{
@@ -99,6 +103,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					{
 						Header = HeaderAttribute.Header;
 						StringId = HeaderAttribute.StringId;
+						FieldPriority = HeaderAttribute.Priority;
 						if (StringId > 0)
 							Header = await Namespace.GetStringAsync(StringId, Header);
 					}
@@ -308,6 +313,8 @@ namespace Waher.Networking.XMPP.Concentrator
 				if (Field == null)
 					continue;
 
+				Field.Priority = FieldPriority;
+				Field.Ordinal = FieldOrdinal++;
 				Fields.Add(Field);
 
 				if (string.IsNullOrEmpty(PageLabel))
@@ -316,7 +323,8 @@ namespace Waher.Networking.XMPP.Concentrator
 					{
 						DefaultPage = new Page(Parameters, string.Empty)
 						{
-							Priority = PageAttribute.DefaultPriority
+							Priority = PageAttribute.DefaultPriority,
+							Ordinal = PageOrdinal++
 						};
 						Pages.Add(DefaultPage);
 						PageByLabel[string.Empty] = DefaultPage;
@@ -331,7 +339,8 @@ namespace Waher.Networking.XMPP.Concentrator
 					{
 						Page = new Page(Parameters, PageLabel)
 						{
-							Priority = PagePriority
+							Priority = PagePriority,
+							Ordinal = PageOrdinal++
 						};
 						Pages.Add(Page);
 						PageByLabel[PageLabel] = Page;
@@ -372,11 +381,18 @@ namespace Waher.Networking.XMPP.Concentrator
 				}
 			}
 
-			if (Pages != null && Pages.Count > 1)
-				Pages.Sort(OrderPages);
-
+			Fields.Sort(OrderFields);
 			Parameters.Title = Title;
 			Parameters.Fields = Fields.ToArray();
+
+			if (Pages != null)
+			{
+				Pages.Sort(OrderPages);
+
+				foreach (Page Page2 in Pages)
+					Page2.Sort();
+			}
+
 			Parameters.Pages = Pages.ToArray();
 
 			return Parameters;
@@ -384,7 +400,20 @@ namespace Waher.Networking.XMPP.Concentrator
 
 		private static int OrderPages(Page x, Page y)
 		{
-			return x.Priority - y.Priority;
+			int i = x.Priority - y.Priority;
+			if (i != 0)
+				return i;
+
+			return x.Ordinal - y.Ordinal;
+		}
+
+		private static int OrderFields(Field x, Field y)
+		{
+			int i = x.Priority - y.Priority;
+			if (i != 0)
+				return i;
+
+			return x.Ordinal - y.Ordinal;
 		}
 
 		private static string GetDefaultLanguageCode(Type Type)

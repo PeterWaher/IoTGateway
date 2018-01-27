@@ -30,7 +30,7 @@ namespace Waher.Things.Arduino
 		}
 
 		[Page(5, "Arduino")]
-		[Header(9, "Mode:")]
+		[Header(9, "Mode:", 20)]
 		[ToolTip(10, "Select drive mode of pin.")]
 		[DefaultValue(DigitalInputPinMode.Input)]
 		[Option(DigitalInputPinMode.Input, 11, "Input")]

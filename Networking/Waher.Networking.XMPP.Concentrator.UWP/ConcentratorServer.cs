@@ -4057,17 +4057,20 @@ namespace Waher.Networking.XMPP.Concentrator
 					{
 						IThingReference NodeRef = Nodes[i];
 
-						if (!this.TryGetDataSource(NodeRef.SourceId, out IDataSource DataSource))
+						if (!(NodeRef is INode Node))
 						{
-							Request.ReportErrors(i == c - 1, new ThingError(NodeRef, Now, "Data source not found."));
-							continue;
-						}
+							if (!this.TryGetDataSource(NodeRef.SourceId, out IDataSource DataSource))
+							{
+								Request.ReportErrors(i == c - 1, new ThingError(NodeRef, Now, "Data source not found."));
+								continue;
+							}
 
-						INode Node = await DataSource.GetNodeAsync(NodeRef);
-						if (Node == null)
-						{
-							Request.ReportErrors(i == c - 1, new ThingError(NodeRef, Now, "Node not found."));
-							continue;
+							Node = await DataSource.GetNodeAsync(NodeRef);
+							if (Node == null)
+							{
+								Request.ReportErrors(i == c - 1, new ThingError(NodeRef, Now, "Node not found."));
+								continue;
+							}
 						}
 
 						ISensor Sensor = Node as ISensor;
@@ -4117,12 +4120,15 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			try
 			{
-				if (!this.TryGetDataSource(Node.SourceId, out IDataSource DataSource))
-					return null;
+				if (!(Node is INode Node2))
+				{
+					if (!this.TryGetDataSource(Node.SourceId, out IDataSource DataSource))
+						return null;
 
-				INode Node2 = await DataSource.GetNodeAsync(Node);
-				if (Node2 == null)
-					return null;
+					Node2 = await DataSource.GetNodeAsync(Node);
+					if (Node2 == null)
+						return null;
+				}
 
 				IActuator Actuator = Node2 as IActuator;
 				if (Actuator == null)

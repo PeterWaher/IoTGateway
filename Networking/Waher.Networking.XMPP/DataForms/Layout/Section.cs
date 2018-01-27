@@ -15,6 +15,7 @@ namespace Waher.Networking.XMPP.DataForms.Layout
 		private LayoutElement[] staticElements;
 		private List<LayoutElement> dynamicElements = null;
 		private int priority = 0;
+		private int ordinal = 0;
 
 		/// <summary>
 		/// Class managing a section within a page in a data form layout.
@@ -102,6 +103,15 @@ namespace Waher.Networking.XMPP.DataForms.Layout
 		}
 
 		/// <summary>
+		/// Can be used to sort pages or sections having the same priority. Not serialized to or from XML.
+		/// </summary>
+		public int Ordinal
+		{
+			get { return this.ordinal; }
+			set { this.ordinal = value; }
+		}
+
+		/// <summary>
 		/// Embedded layout elements.
 		/// </summary>
 		public LayoutElement[] Elements
@@ -171,6 +181,57 @@ namespace Waher.Networking.XMPP.DataForms.Layout
 				E.Serialize(Output);
 
 			Output.Append("</xdl:section>");
+		}
+
+		/// <summary>
+		/// Sorts the contents of the layout element.
+		/// </summary>
+		public override void Sort()
+		{
+			if (this.dynamicElements != null)
+			{
+				this.dynamicElements.Sort(this.OrderElements);
+
+				foreach (LayoutElement E in this.dynamicElements)
+					E.Sort();
+			}
+			else
+			{
+				Array.Sort<LayoutElement>(this.staticElements, this.OrderElements);
+
+				foreach (LayoutElement E in this.staticElements)
+					E.Sort();
+			}
+		}
+
+		private int OrderElements(LayoutElement x, LayoutElement y)
+		{
+			int i;
+
+			if (x is FieldReference frx && y is FieldReference fry)
+			{
+				Field fx = this.Form[frx.Var];
+				Field fy = this.Form[fry.Var];
+
+				if (fx == null || fy == null)
+					return 0;
+
+				i = fx.Priority - fy.Priority;
+				if (i != 0)
+					return i;
+
+				return fx.Ordinal - fy.Ordinal;
+			}
+			else if (x is Section sx && y is Section sy)
+			{
+				i = sx.Priority - sy.Priority;
+				if (i != 0)
+					return i;
+
+				return sx.Ordinal - sy.Ordinal;
+			}
+			else
+				return 0;
 		}
 
 	}

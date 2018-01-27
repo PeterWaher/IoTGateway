@@ -590,11 +590,11 @@ namespace Waher.Networking.XMPP.Provisioning
 				{
 					try
 					{
-						IThingReference[] Nodes2 = Nodes as IThingReference[];
-						if (Nodes2 == null && Nodes != null)
+						IThingReference[] Nodes2 = Permitted as IThingReference[];
+						if (Nodes2 == null && Permitted != null)
 						{
 							List<IThingReference> List = new List<IThingReference>();
-							List.AddRange(Nodes);
+							List.AddRange(Permitted);
 							Nodes2 = List.ToArray();
 						}
 

@@ -34,7 +34,7 @@ namespace Waher.Things.Gpio
 		}
 
 		[Page(2, "GPIO")]
-		[Header(7, "Mode:")]
+		[Header(7, "Mode:", 20)]
 		[ToolTip(8, "Select drive mode of pin.")]
 		[DefaultValue(OutputPinMode.Output)]
 		[Option(OutputPinMode.Output, 17, "Output")]

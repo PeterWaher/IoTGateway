@@ -22,7 +22,7 @@ namespace Waher.Things.Arduino
 		}
 
 		[Page(5, "Arduino")]
-		[Header(6, "Pin number:")]
+		[Header(6, "Pin number:", 10)]
 		[ToolTip(7, "Pin number on parent controller.")]
 		[Range(0, byte.MaxValue)]
 		[Required]

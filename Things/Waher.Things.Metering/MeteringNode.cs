@@ -120,7 +120,7 @@ namespace Waher.Things.Metering
 		/// <summary>
 		/// ID of node.
 		/// </summary>
-		[Header(15, "ID:")]
+		[Header(15, "ID:", 0)]
 		[Page(16, "Identity", 0)]
 		[ToolTip(17, "Node identity on the network.")]
 		[Required]

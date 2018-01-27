@@ -57,6 +57,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			bool Masked;
 			bool Alpha;
 			bool DateOnly;
+			bool Nullable;
 			HeaderAttribute HeaderAttribute;
 			ToolTipAttribute ToolTipAttribute;
 			PageAttribute PageAttribute;
@@ -177,6 +178,17 @@ namespace Waher.Networking.XMPP.Concentrator
 
 				PropertyType = PI.PropertyType;
 				Field = null;
+				Nullable = false;
+
+				if (PropertyType.GetTypeInfo().IsGenericType)
+				{
+					Type GT = PropertyType.GetGenericTypeDefinition();
+					if (GT == typeof(Nullable<>))
+					{
+						Nullable = true;
+						PropertyType = PropertyType.GenericTypeArguments[0];
+					}
+				}
 
 				if (PropertyType == typeof(string[]))
 				{
@@ -207,7 +219,11 @@ namespace Waher.Networking.XMPP.Concentrator
 							Options.Add(new KeyValuePair<string, string>(Option, Option));
 					}
 
-					Field = new ListSingleField(Parameters, PI.Name, Header, Required, new string[] { PI.GetValue(EditableObject).ToString() },
+					s = PI.GetValue(EditableObject)?.ToString();
+					if (Nullable && s == null)
+						s = string.Empty;
+
+					Field = new ListSingleField(Parameters, PI.Name, Header, Required, new string[] { s },
 						Options.ToArray(), ToolTip, null, ValidationMethod, string.Empty, false, ReadOnly, false);
 				}
 				else if (PropertyType == typeof(bool))
@@ -215,8 +231,14 @@ namespace Waher.Networking.XMPP.Concentrator
 					if (ValidationMethod == null)
 						ValidationMethod = new BasicValidation();
 
-					Field = new BooleanField(Parameters, PI.Name, Header, Required,
-						new string[] { CommonTypes.Encode((bool)PI.GetValue(EditableObject)) },
+					object Value = PI.GetValue(EditableObject);
+
+					if (Nullable && Value == null)
+						s = string.Empty;
+					else
+						s = CommonTypes.Encode((bool)Value);
+
+					Field = new BooleanField(Parameters, PI.Name, Header, Required, new string[] { s },
 						Options?.ToArray(), ToolTip, BooleanDataType.Instance, ValidationMethod,
 						string.Empty, false, ReadOnly, false);
 				}
@@ -292,20 +314,24 @@ namespace Waher.Networking.XMPP.Concentrator
 					if (ValidationMethod == null)
 						ValidationMethod = new BasicValidation();
 
+					s = PI.GetValue(EditableObject)?.ToString();
+					if (Nullable && s == null)
+						s = string.Empty;
+
 					if (Masked)
 					{
-						Field = new TextPrivateField(Parameters, PI.Name, Header, Required, new string[] { PI.GetValue(EditableObject).ToString() },
+						Field = new TextPrivateField(Parameters, PI.Name, Header, Required, new string[] { s },
 							Options?.ToArray(), ToolTip, DataType, ValidationMethod,
 							string.Empty, false, ReadOnly, false);
 					}
 					else if (Options == null)
 					{
-						Field = new TextSingleField(Parameters, PI.Name, Header, Required, new string[] { PI.GetValue(EditableObject).ToString() },
+						Field = new TextSingleField(Parameters, PI.Name, Header, Required, new string[] { s },
 							null, ToolTip, DataType, ValidationMethod, string.Empty, false, ReadOnly, false);
 					}
 					else
 					{
-						Field = new ListSingleField(Parameters, PI.Name, Header, Required, new string[] { PI.GetValue(EditableObject).ToString() },
+						Field = new ListSingleField(Parameters, PI.Name, Header, Required, new string[] { s },
 							Options.ToArray(), ToolTip, DataType, ValidationMethod, string.Empty, false, ReadOnly, false);
 					}
 				}
@@ -492,6 +518,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			bool HasHeader;
 			bool HasOptions;
 			bool ValidOption;
+			bool Nullable;
 
 			if (Namespace == null)
 				Namespace = await Language.CreateNamespaceAsync(T.Namespace);
@@ -556,7 +583,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 				if (ReadOnly)
 				{
-					if (Field.ValueString != PI.GetValue(EditableObject).ToString())
+					if (Field.ValueString != PI.GetValue(EditableObject)?.ToString())
 						AddError(ref Errors, Field.Var, await ConcentratorNamespace.GetStringAsync(3, "Property is read-only."));
 
 					continue;
@@ -573,138 +600,154 @@ namespace Waher.Networking.XMPP.Concentrator
 				ValueToSet2 = null;
 				Parsed = null;
 				DataType = null;
+				Nullable = false;
 
-				if (PropertyType == typeof(string[]))
+				if (PropertyType.GetTypeInfo().IsGenericType)
 				{
-					if (ValidationMethod == null)
-						ValidationMethod = new BasicValidation();
-
-					ValueToSet = ValueToSet2 = Parsed = Field.ValueStrings;
-					DataType = StringDataType.Instance;
-				}
-				else if (PropertyType.GetTypeInfo().IsEnum)
-				{
-					if (ValidationMethod == null)
-						ValidationMethod = new BasicValidation();
-
-					try
+					Type GT = PropertyType.GetGenericTypeDefinition();
+					if (GT == typeof(Nullable<>))
 					{
-						ValueToSet = ValueToSet2 = Enum.Parse(PropertyType, Field.ValueString);
-					}
-					catch (Exception)
-					{
-						AddError(ref Errors, Field.Var, await ConcentratorNamespace.GetStringAsync(4, "Select a valid option."));
-						continue;
+						Nullable = true;
+						PropertyType = PropertyType.GenericTypeArguments[0];
 					}
 				}
-				else if (PropertyType == typeof(bool))
-				{
-					if (ValidationMethod == null)
-						ValidationMethod = new BasicValidation();
 
-					if (!CommonTypes.TryParse(Field.ValueString, out bool b))
-					{
-						AddError(ref Errors, Field.Var, await ConcentratorNamespace.GetStringAsync(5, "Invalid boolean value."));
-						continue;
-					}
-
-					DataType = BooleanDataType.Instance;
-					ValueToSet = ValueToSet2 = b;
-				}
+				if (Nullable && string.IsNullOrEmpty(Field.ValueString))
+					ValueToSet2 = null;
 				else
 				{
-					if (PropertyType == typeof(string))
+					if (PropertyType == typeof(string[]))
+					{
+						if (ValidationMethod == null)
+							ValidationMethod = new BasicValidation();
+
+						ValueToSet = ValueToSet2 = Parsed = Field.ValueStrings;
 						DataType = StringDataType.Instance;
-					else if (PropertyType == typeof(sbyte))
-						DataType = ByteDataType.Instance;
-					else if (PropertyType == typeof(short))
-						DataType = ShortDataType.Instance;
-					else if (PropertyType == typeof(int))
-						DataType = IntDataType.Instance;
-					else if (PropertyType == typeof(long))
-						DataType = LongDataType.Instance;
-					else if (PropertyType == typeof(byte))
+					}
+					else if (PropertyType.GetTypeInfo().IsEnum)
 					{
-						DataType = ShortDataType.Instance;
-
 						if (ValidationMethod == null)
-							ValidationMethod = new RangeValidation(byte.MinValue.ToString(), byte.MaxValue.ToString());
-					}
-					else if (PropertyType == typeof(ushort))
-					{
-						DataType = IntDataType.Instance;
+							ValidationMethod = new BasicValidation();
 
-						if (ValidationMethod == null)
-							ValidationMethod = new RangeValidation(ushort.MinValue.ToString(), ushort.MaxValue.ToString());
+						try
+						{
+							ValueToSet = ValueToSet2 = Enum.Parse(PropertyType, Field.ValueString);
+						}
+						catch (Exception)
+						{
+							AddError(ref Errors, Field.Var, await ConcentratorNamespace.GetStringAsync(4, "Select a valid option."));
+							continue;
+						}
 					}
-					else if (PropertyType == typeof(uint))
+					else if (PropertyType == typeof(bool))
 					{
-						DataType = LongDataType.Instance;
+						if (ValidationMethod == null)
+							ValidationMethod = new BasicValidation();
 
-						if (ValidationMethod == null)
-							ValidationMethod = new RangeValidation(uint.MinValue.ToString(), uint.MaxValue.ToString());
-					}
-					else if (PropertyType == typeof(ulong))
-					{
-						DataType = IntegerDataType.Instance;
+						if (!CommonTypes.TryParse(Field.ValueString, out bool b))
+						{
+							AddError(ref Errors, Field.Var, await ConcentratorNamespace.GetStringAsync(5, "Invalid boolean value."));
+							continue;
+						}
 
-						if (ValidationMethod == null)
-							ValidationMethod = new RangeValidation(ulong.MinValue.ToString(), ulong.MaxValue.ToString());
-					}
-					else if (PropertyType == typeof(DateTime))
-					{
-						if (DateOnly)
-							DataType = DateDataType.Instance;
-						else
-							DataType = DateTimeDataType.Instance;
-					}
-					else if (PropertyType == typeof(decimal))
-						DataType = DecimalDataType.Instance;
-					else if (PropertyType == typeof(double))
-						DataType = DoubleDataType.Instance;
-					else if (PropertyType == typeof(float))
-						DataType = DoubleDataType.Instance;    // Use xs:double anyway
-					else if (PropertyType == typeof(TimeSpan))
-						DataType = TimeDataType.Instance;
-					else if (PropertyType == typeof(Uri))
-						DataType = AnyUriDataType.Instance;
-					else if (PropertyType == typeof(SKColor))
-					{
-						if (Alpha)
-							DataType = ColorAlphaDataType.Instance;
-						else
-							DataType = ColorDataType.Instance;
+						DataType = BooleanDataType.Instance;
+						ValueToSet = ValueToSet2 = b;
 					}
 					else
-						DataType = null;
-
-					if (ValidationMethod == null)
-						ValidationMethod = new BasicValidation();
-
-					try
 					{
-						ValueToSet = DataType.Parse(Field.ValueString);
+						if (PropertyType == typeof(string))
+							DataType = StringDataType.Instance;
+						else if (PropertyType == typeof(sbyte))
+							DataType = ByteDataType.Instance;
+						else if (PropertyType == typeof(short))
+							DataType = ShortDataType.Instance;
+						else if (PropertyType == typeof(int))
+							DataType = IntDataType.Instance;
+						else if (PropertyType == typeof(long))
+							DataType = LongDataType.Instance;
+						else if (PropertyType == typeof(byte))
+						{
+							DataType = ShortDataType.Instance;
 
-						if (ValueToSet.GetType() == PI.PropertyType)
-							ValueToSet2 = ValueToSet;
+							if (ValidationMethod == null)
+								ValidationMethod = new RangeValidation(byte.MinValue.ToString(), byte.MaxValue.ToString());
+						}
+						else if (PropertyType == typeof(ushort))
+						{
+							DataType = IntDataType.Instance;
+
+							if (ValidationMethod == null)
+								ValidationMethod = new RangeValidation(ushort.MinValue.ToString(), ushort.MaxValue.ToString());
+						}
+						else if (PropertyType == typeof(uint))
+						{
+							DataType = LongDataType.Instance;
+
+							if (ValidationMethod == null)
+								ValidationMethod = new RangeValidation(uint.MinValue.ToString(), uint.MaxValue.ToString());
+						}
+						else if (PropertyType == typeof(ulong))
+						{
+							DataType = IntegerDataType.Instance;
+
+							if (ValidationMethod == null)
+								ValidationMethod = new RangeValidation(ulong.MinValue.ToString(), ulong.MaxValue.ToString());
+						}
+						else if (PropertyType == typeof(DateTime))
+						{
+							if (DateOnly)
+								DataType = DateDataType.Instance;
+							else
+								DataType = DateTimeDataType.Instance;
+						}
+						else if (PropertyType == typeof(decimal))
+							DataType = DecimalDataType.Instance;
+						else if (PropertyType == typeof(double))
+							DataType = DoubleDataType.Instance;
+						else if (PropertyType == typeof(float))
+							DataType = DoubleDataType.Instance;    // Use xs:double anyway
+						else if (PropertyType == typeof(TimeSpan))
+							DataType = TimeDataType.Instance;
+						else if (PropertyType == typeof(Uri))
+							DataType = AnyUriDataType.Instance;
+						else if (PropertyType == typeof(SKColor))
+						{
+							if (Alpha)
+								DataType = ColorAlphaDataType.Instance;
+							else
+								DataType = ColorDataType.Instance;
+						}
 						else
-							ValueToSet2 = System.Convert.ChangeType(ValueToSet, PI.PropertyType);
+							DataType = null;
+
+						if (ValidationMethod == null)
+							ValidationMethod = new BasicValidation();
+
+						try
+						{
+							ValueToSet = DataType.Parse(Field.ValueString);
+
+							if (ValueToSet.GetType() == PI.PropertyType)
+								ValueToSet2 = ValueToSet;
+							else
+								ValueToSet2 = System.Convert.ChangeType(ValueToSet, PI.PropertyType);
+						}
+						catch (Exception)
+						{
+							AddError(ref Errors, Field.Var, await ConcentratorNamespace.GetStringAsync(6, "Invalid value."));
+							continue;
+						}
 					}
-					catch (Exception)
+
+					if (Parsed == null)
+						Parsed = new object[] { ValueToSet };
+
+					ValidationMethod.Validate(Field, DataType, Parsed, Field.ValueStrings);
+					if (Field.HasError)
 					{
-						AddError(ref Errors, Field.Var, await ConcentratorNamespace.GetStringAsync(6, "Invalid value."));
+						AddError(ref Errors, Field.Var, Field.Error);
 						continue;
 					}
-				}
-
-				if (Parsed == null)
-					Parsed = new object[] { ValueToSet };
-
-				ValidationMethod.Validate(Field, DataType, Parsed, Field.ValueStrings);
-				if (Field.HasError)
-				{
-					AddError(ref Errors, Field.Var, Field.Error);
-					continue;
 				}
 
 				if (ToSet == null)

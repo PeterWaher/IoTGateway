@@ -402,7 +402,7 @@ namespace Waher.Networking.XMPP.Chat
 
 					case "?":
 					case "??":
-						ThingReference ThingRef;
+						IThingReference ThingRef;
 						bool Full = (s == "??");
 
 						if (this.concentratorServer != null)
@@ -413,12 +413,12 @@ namespace Waher.Networking.XMPP.Chat
 								break;
 							}
 
-							ThingRef = new ThingReference(SelectedNode.NodeId, SelectedNode.SourceId, SelectedNode.Partition);
+							ThingRef = SelectedNode;
 						}
 						else
 							ThingRef = ThingReference.Empty;
 
-						ThingReference[] NodeReferences = new ThingReference[] { ThingRef };
+						IThingReference[] NodeReferences = new IThingReference[] { ThingRef };
 						FieldType FieldTypes = Full ? FieldType.All : FieldType.AllExceptHistorical;
 						InternalReadoutFieldsEventHandler FieldsHandler = Full ? (InternalReadoutFieldsEventHandler)this.AllFieldsRead : this.MomentaryFieldsRead;
 						InternalReadoutErrorsEventHandler ErrorsHandler = Full ? (InternalReadoutErrorsEventHandler)this.AllFieldsErrorsRead : this.MomentaryFieldsErrorsRead;
@@ -616,71 +616,77 @@ namespace Waher.Networking.XMPP.Chat
 						break;
 
 					default:
-						if (int.TryParse(s, out i) && i >= 0 && Menu != null && Menu.TryGetValue(i, out KeyValuePair<string, object> Item) && !string.IsNullOrEmpty(Item.Key))
+						if (int.TryParse(s, out i) && i >= 0 && Menu != null && Menu.TryGetValue(i, out KeyValuePair<string, object> Item))
 						{
-							s = Item.Key;
+							if (string.IsNullOrEmpty(Item.Key))
+							{
+								if (i == 0 && Item.Value is SortedDictionary<int, KeyValuePair<string, object>> PreviousMenu)
+								{
+									Menu = PreviousMenu;
+									if (Menu == null)
+										this.Error(e.From, "There's no previous menu.", Support);
+									else
+										this.SendMenu(e.From, Menu, Variables, Support);
+								}
+							}
+							else
+							{
+								s = Item.Key;
 
-							if (i == 0)
-							{
-								Menu = Item.Value as SortedDictionary<int, KeyValuePair<string, object>>;
-								if (Menu == null)
-									this.Error(e.From, "There's no previous menu.", Support);
-								else
-									this.SendMenu(e.From, Menu, Variables, Support);
-							}
-							else if (Menu.TryGetValue(-2, out KeyValuePair<string, object> Obj) && Obj.Value is INode Node &&
-								Menu.TryGetValue(-1, out Obj) && Obj.Value is IDataSource Source)
-							{
-								if (Node.HasChildren)
+								if (Menu.TryGetValue(-2, out KeyValuePair<string, object> Obj) && Obj.Value is INode Node &&
+									Menu.TryGetValue(-1, out Obj) && Obj.Value is IDataSource Source)
 								{
-									foreach (INode ChildNode in await Node.ChildNodes)
+									if (Node.HasChildren)
 									{
-										if (ChildNode.NodeId == s)
+										foreach (INode ChildNode in await Node.ChildNodes)
 										{
-											await this.SelectNode(e, Source, Node, Variables, Menu, Support);
-											break;
-										}
-									}
-								}
-							}
-							else if (Menu.TryGetValue(-1, out Obj))
-							{
-								if (Obj.Value == null)
-								{
-									foreach (IDataSource RootSource in this.concentratorServer.DataSources)
-									{
-										if (RootSource.SourceID == s)
-										{
-											this.SelectSource(e, RootSource, Variables, Menu, Support);
-											break;
-										}
-									}
-								}
-								else if ((Source = Obj.Value as IDataSource) != null)
-								{
-									if (Source.HasChildren)
-									{
-										foreach (IDataSource ChildSource in Source.ChildSources)
-										{
-											if (ChildSource.SourceID == s)
+											if (ChildNode.NodeId == s)
 											{
-												this.SelectSource(e, ChildSource, Variables, Menu, Support);
-												s = null;
+												await this.SelectNode(e, Source, ChildNode, Variables, Menu, Support);
 												break;
 											}
 										}
 									}
-
-									if (!string.IsNullOrEmpty(s))
+								}
+								else if (Menu.TryGetValue(-1, out Obj))
+								{
+									if (Obj.Value == null)
 									{
-										if (Source.RootNodes != null)
+										foreach (IDataSource RootSource in this.concentratorServer.DataSources)
 										{
-											foreach (INode RootNode in Source.RootNodes)
+											if (RootSource.SourceID == s)
 											{
-												if (RootNode.NodeId == s)
+												this.SelectSource(e, RootSource, Variables, Menu, Support);
+												break;
+											}
+										}
+									}
+									else if ((Source = Obj.Value as IDataSource) != null)
+									{
+										if (Source.HasChildren)
+										{
+											foreach (IDataSource ChildSource in Source.ChildSources)
+											{
+												if (ChildSource.SourceID == s)
 												{
-													await this.SelectNode(e, Source, RootNode, Variables, Menu, Support);
+													this.SelectSource(e, ChildSource, Variables, Menu, Support);
+													s = null;
 													break;
+												}
+											}
+										}
+
+										if (!string.IsNullOrEmpty(s))
+										{
+											if (Source.RootNodes != null)
+											{
+												foreach (INode RootNode in Source.RootNodes)
+												{
+													if (RootNode.NodeId == s)
+													{
+														await this.SelectNode(e, Source, RootNode, Variables, Menu, Support);
+														break;
+													}
 												}
 											}
 										}
@@ -711,9 +717,8 @@ namespace Waher.Networking.XMPP.Chat
 								i = Field.IndexOf('.');
 								if (i >= 0)
 								{
-									Node = await SelectedSource.GetNodeAsync(
-										new ThingReference(this.CheckMenu(Menu, Field.Substring(0, i)), SelectedSource.SourceID, string.Empty));
-									Field = this.CheckMenu(Menu, Field.Substring(i + 1));
+									Node = this.CheckMenuValue(Menu, Field.Substring(0, i)) as INode;
+									Field = this.CheckMenuKey(Menu, Field.Substring(i + 1));
 
 									if (Node == null)
 									{
@@ -721,50 +726,84 @@ namespace Waher.Networking.XMPP.Chat
 										break;
 									}
 								}
-								else if ((Node = await SelectedSource.GetNodeAsync(new ThingReference(this.CheckMenu(Menu, Field),
-									SelectedSource.SourceID, string.Empty))) != null)
-								{
+								else if ((Node = this.CheckMenuValue(Menu, Field) as INode) != null)
 									Field = string.Empty;
-								}
 								else
 								{
 									Node = SelectedNode;
 
-									if (Node == null)
+									if (Node == null || !Node.IsReadable)
 									{
-										this.Error(e.From, "No node selected.", Support);
-										break;
+										if (SelectedSource != null && await SelectedSource.GetNodeAsync(new ThingReference(Field, SelectedSource.SourceID, string.Empty)) is INode Node2)
+										{
+											Node = Node2;
+											Field = string.Empty;
+										}
+										else
+										{
+											this.Error(e.From, "No node selected.", Support);
+											break;
+										}
 									}
 								}
 
-								ThingRef = new ThingReference(Node.NodeId, Node.SourceId, Node.Partition);
+								ThingRef = Node;
 
 								this.SendPlainTextChatMessage(e.From, "Readout of " + Field + " on " + Node.NodeId + " started...");
 
-								NodeReferences = new ThingReference[] { ThingRef };
+								NodeReferences = new IThingReference[] { ThingRef };
 
-								if (this.provisioningClient != null)
+								if (string.IsNullOrEmpty(Field))
 								{
-									this.provisioningClient.CanRead(XmppClient.GetBareJID(e.From),
-										FieldTypes, NodeReferences, null, new string[0], new string[0], new string[0],
-										(sender2, e2) =>
-										{
-											if (e2.Ok && e2.CanRead)
+									if (this.provisioningClient != null)
+									{
+										this.provisioningClient.CanRead(XmppClient.GetBareJID(e.From),
+											FieldTypes, NodeReferences, null, new string[0], new string[0], new string[0],
+											(sender2, e2) =>
 											{
-												this.sensorServer.DoInternalReadout(e.From, e2.Nodes, e2.FieldTypes, e2.FieldsNames,
-													DateTime.MinValue, DateTime.MaxValue, FieldsHandler, ErrorsHandler,
-													new object[] { e.From, true, Field, Support });
-											}
-											else
-												this.Error(e.From, "Access denied.", Support);
+												if (e2.Ok && e2.CanRead)
+												{
+													this.sensorServer.DoInternalReadout(e.From, e2.Nodes, e2.FieldTypes, e2.FieldsNames,
+														DateTime.MinValue, DateTime.MaxValue, FieldsHandler, ErrorsHandler,
+														new object[] { e.From, true, Field, Support });
+												}
+												else
+													this.Error(e.From, "Access denied.", Support);
 
-										}, null);
+											}, null);
+									}
+									else
+									{
+										this.sensorServer.DoInternalReadout(e.From, NodeReferences,
+											FieldTypes, null, DateTime.MinValue, DateTime.MaxValue, FieldsHandler, ErrorsHandler,
+											new object[] { e.From, true, Field, Support });
+									}
 								}
 								else
 								{
-									this.sensorServer.DoInternalReadout(e.From, NodeReferences,
-										FieldTypes, null, DateTime.MinValue, DateTime.MaxValue, FieldsHandler, ErrorsHandler,
-										new object[] { e.From, true, Field, Support });
+									if (this.provisioningClient != null)
+									{
+										this.provisioningClient.CanRead(XmppClient.GetBareJID(e.From),
+											FieldTypes, NodeReferences, new string[] { Field }, new string[0], new string[0], new string[0],
+											(sender2, e2) =>
+											{
+												if (e2.Ok && e2.CanRead)
+												{
+													this.sensorServer.DoInternalReadout(e.From, e2.Nodes, e2.FieldTypes, e2.FieldsNames,
+														DateTime.MinValue, DateTime.MaxValue, FieldsHandler, ErrorsHandler,
+														new object[] { e.From, true, Field, Support });
+												}
+												else
+													this.Error(e.From, "Access denied.", Support);
+
+											}, null);
+									}
+									else
+									{
+										this.sensorServer.DoInternalReadout(e.From, NodeReferences,
+											FieldTypes, new string[] { Field }, DateTime.MinValue, DateTime.MaxValue, FieldsHandler, ErrorsHandler,
+											new object[] { e.From, true, Field, Support });
+									}
 								}
 							}
 							else
@@ -801,7 +840,7 @@ namespace Waher.Networking.XMPP.Chat
 						{
 							if (this.controlServer != null && (i = s.IndexOf(":=")) > 0)
 							{
-								string ParameterName = this.CheckMenu(Menu, s.Substring(0, i).Trim());
+								string ParameterName = this.CheckMenuKey(Menu, s.Substring(0, i).Trim());
 								string ValueStr = s.Substring(i + 2).Trim();
 
 								if (this.concentratorServer != null)
@@ -815,16 +854,18 @@ namespace Waher.Networking.XMPP.Chat
 									i = ParameterName.IndexOf('.');
 									if (i >= 0)
 									{
-										Node = await SelectedSource.GetNodeAsync(
-											new ThingReference(this.CheckMenu(Menu, ParameterName.Substring(0, i)), SelectedSource.SourceID, string.Empty));
-										ParameterName = this.CheckMenu(Menu, ParameterName.Substring(i + 1));
+										s = ParameterName.Substring(0, i);
+										ParameterName = this.CheckMenuKey(Menu, ParameterName.Substring(i + 1));
+
+										Node = this.CheckMenuValue(Menu, s) as INode;
+										if (Node == null && SelectedSource != null && await SelectedSource.GetNodeAsync(new ThingReference(s, SelectedSource.SourceID, string.Empty)) is INode Node3)
+											Node = Node3;
 									}
 									else
 									{
 										if (string.IsNullOrEmpty(ValueStr))
 										{
-											Node = await SelectedSource.GetNodeAsync(new ThingReference(this.CheckMenu(Menu, ParameterName),
-												SelectedSource.SourceID, string.Empty));
+											Node = this.CheckMenuValue(Menu, ParameterName) as INode;
 
 											if (Node != null)
 												ParameterName = string.Empty;
@@ -838,10 +879,7 @@ namespace Waher.Networking.XMPP.Chat
 									if (Node == null && Menu != null && Menu.TryGetValue(-2, out KeyValuePair<string, object> P) && P.Value is INode Node2)
 										Node = Node2;
 
-									if (Node == null)
-										ThingRef = null;
-									else
-										ThingRef = new ThingReference(Node.NodeId, Node.SourceId, Node.Partition);
+									ThingRef = Node;
 								}
 								else
 								{
@@ -850,8 +888,8 @@ namespace Waher.Networking.XMPP.Chat
 										ThingRef = ThingReference.Empty;
 									else
 									{
-										ThingRef = new ThingReference(this.CheckMenu(Menu, ParameterName.Substring(0, i)), string.Empty, string.Empty);
-										ParameterName = this.CheckMenu(Menu, ParameterName.Substring(i + 1).TrimStart());
+										ThingRef = this.CheckMenuValue(Menu, ParameterName.Substring(0, i)) as IThingReference;
+										ParameterName = this.CheckMenuKey(Menu, ParameterName.Substring(i + 1).TrimStart());
 									}
 								}
 
@@ -923,11 +961,10 @@ namespace Waher.Networking.XMPP.Chat
 											}
 
 											if (P0 == null)
-												throw new Exception("Control parameter not found.");
-
-											if (this.provisioningClient != null)
+												this.Execute(s, e.From, Support);
+											else if (this.provisioningClient != null)
 											{
-												this.provisioningClient.CanControl(e.FromBareJID, new ThingReference[] { ThingRef },
+												this.provisioningClient.CanControl(e.FromBareJID, new IThingReference[] { ThingRef },
 													new string[] { ParameterName }, new string[0], new string[0], new string[0], (sender2, e2) =>
 													{
 														if (e2.Ok && e2.CanControl)
@@ -989,7 +1026,7 @@ namespace Waher.Networking.XMPP.Chat
 				int j, c = Parameters.Length;
 				string[] ParameterNames = new string[c];
 
-				for (j = 0; j < c; i++)
+				for (j = 0; j < c; j++)
 					ParameterNames[j] = Parameters[j].Name;
 
 				this.provisioningClient.CanControl(e.FromBareJID, null, ParameterNames,
@@ -1004,8 +1041,7 @@ namespace Waher.Networking.XMPP.Chat
 								if (e2.ParameterNames == null || Array.IndexOf<string>(e2.ParameterNames, P.Name) >= 0)
 								{
 									Parameters2.Add(P);
-									Menu[++i] = new KeyValuePair<string, object>(P.Name, P.Name + " (" +
-										P.GetStringValue(new ThingReference(SelectedNode.NodeId, SelectedNode.SourceId, SelectedNode.Partition)) + ")");
+									Menu[++i] = new KeyValuePair<string, object>(P.Name, P.Name + " (" + P.GetStringValue(SelectedNode) + ")");
 								}
 							}
 
@@ -1020,16 +1056,13 @@ namespace Waher.Networking.XMPP.Chat
 			else
 			{
 				foreach (ControlParameter P in Parameters)
-				{
-					Menu[++i] = new KeyValuePair<string, object>(P.Name, P.Name + " (" +
-						P.GetStringValue(new ThingReference(SelectedNode.NodeId, SelectedNode.SourceId, SelectedNode.Partition)) + ")");
-				}
+					Menu[++i] = new KeyValuePair<string, object>(P.Name, P.Name + " (" + P.GetStringValue(SelectedNode) + ")");
 
 				this.SendMenu(e.From, Menu, Variables, Support);
 			}
 		}
 
-		private string CheckMenu(SortedDictionary<int, KeyValuePair<string, object>> Menu, string s)
+		private string CheckMenuKey(SortedDictionary<int, KeyValuePair<string, object>> Menu, string s)
 		{
 			if (Menu != null &&
 				int.TryParse(s, out int i) &&
@@ -1041,6 +1074,20 @@ namespace Waher.Networking.XMPP.Chat
 			}
 			else
 				return s;
+		}
+
+		private object CheckMenuValue(SortedDictionary<int, KeyValuePair<string, object>> Menu, string s)
+		{
+			if (Menu != null &&
+				int.TryParse(s, out int i) &&
+				i > 0 &&
+				Menu.TryGetValue(i, out KeyValuePair<string, object> Obj) &&
+				!string.IsNullOrEmpty(Obj.Key))
+			{
+				return Obj.Value;
+			}
+			else
+				return null;
 		}
 
 		private async Task SelectNode(MessageEventArgs e, IDataSource SelectedSource, INode SelectedNode, Variables Variables,

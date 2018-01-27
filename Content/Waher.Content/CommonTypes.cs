@@ -848,5 +848,60 @@ namespace Waher.Content
 
 		#endregion
 
+		#region Number of decimals
+		
+		/// <summary>
+		/// Calculates the number of decimals of a floating-point number.
+		/// </summary>
+		/// <param name="x">Value</param>
+		/// <returns>Number of decimals.</returns>
+		public static byte GetNrDecimals(double x)
+		{
+			return GetNrDecimals(Encode(x));
+		}
+
+		/// <summary>
+		/// Calculates the number of decimals of a floating-point number.
+		/// </summary>
+		/// <param name="x">Value</param>
+		/// <returns>Number of decimals.</returns>
+		public static byte GetNrDecimals(float x)
+		{
+			return GetNrDecimals(Encode(x));
+		}
+
+		/// <summary>
+		/// Calculates the number of decimals of a floating-point number.
+		/// </summary>
+		/// <param name="x">Value</param>
+		/// <returns>Number of decimals.</returns>
+		public static byte GetNrDecimals(decimal x)
+		{
+			return GetNrDecimals(Encode(x));
+		}
+
+
+		/// <summary>
+		/// Calculates the number of decimals of a floating-point number.
+		/// </summary>
+		/// <param name="x">Value</param>
+		/// <returns>Number of decimals.</returns>
+		private static byte GetNrDecimals(string s)
+		{
+			int i = s.IndexOf('.');
+			if (i < 0)
+				return 0;
+			else
+			{
+				i = s.Length - i - 1;
+				if (i > byte.MaxValue)
+					return byte.MaxValue;
+				else
+					return (byte)i;
+			}
+		}
+
+
+		#endregion
 	}
 }

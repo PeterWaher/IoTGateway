@@ -16,7 +16,7 @@ namespace Waher.Things.Metering
 	/// <summary>
 	/// Base class for all provisioned metering nodes.
 	/// </summary>
-	public abstract class ProvisionedMeteringNode : MeteringNode
+	public abstract class ProvisionedMeteringNode : MetaMeteringNode
 	{
 		private string owner = string.Empty;
 		private bool provisioned = false;

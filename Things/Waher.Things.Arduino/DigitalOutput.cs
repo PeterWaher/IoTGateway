@@ -65,6 +65,8 @@ namespace Waher.Things.Arduino
 				{
 					Fields.Add(new Int32Field(this, Now, "Pin Number", this.PinNr, FieldType.Identity, FieldQoS.AutomaticReadout,
 						typeof(Module).Namespace, 14));
+
+					this.AddIdentityReadout(Fields, Now);
 				}
 
 				if (Request.IsIncluded(FieldType.Status))

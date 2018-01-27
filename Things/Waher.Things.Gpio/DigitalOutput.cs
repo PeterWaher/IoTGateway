@@ -119,6 +119,8 @@ namespace Waher.Things.Gpio
 				{
 					Fields.Add(new Int32Field(this, Now, "Pin Number", this.PinNr, FieldType.Identity, FieldQoS.AutomaticReadout,
 						typeof(Controller).Namespace, 13));
+
+					this.AddIdentityReadout(Fields, Now);
 				}
 
 				if (Request.IsIncluded(FieldType.Status))

@@ -68,5 +68,14 @@ namespace Waher.Things.Gpio
 			}
 		}
 
+		public override async Task<IEnumerable<Parameter>> GetDisplayableParametersAsync(Language Language, RequestOrigin Caller)
+		{
+			LinkedList<Parameter> Result = await base.GetDisplayableParametersAsync(Language, Caller) as LinkedList<Parameter>;
+
+			Result.AddLast(new Int32Parameter("Pin", await Language.GetStringAsync(typeof(Controller), 22, "Pin"), this.PinNr));
+
+			return Result;
+		}
+
 	}
 }

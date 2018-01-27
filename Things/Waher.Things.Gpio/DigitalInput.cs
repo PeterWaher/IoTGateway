@@ -8,6 +8,7 @@ using Waher.IoTGateway;
 using Waher.Persistence.Attributes;
 using Waher.Runtime.Language;
 using Waher.Things.Attributes;
+using Waher.Things.DisplayableParameters;
 using Waher.Things.SensorData;
 
 namespace Waher.Things.Gpio
@@ -144,6 +145,15 @@ namespace Waher.Things.Gpio
 			}
 
 			return base.DestroyAsync();
+		}
+
+		public override async Task<IEnumerable<Parameter>> GetDisplayableParametersAsync(Language Language, RequestOrigin Caller)
+		{
+			LinkedList<Parameter> Result = await base.GetDisplayableParametersAsync(Language, Caller) as LinkedList<Parameter>;
+
+			Result.AddLast(new StringParameter("Mode", await Language.GetStringAsync(typeof(Controller), 23, "Mode"), this.mode.ToString()));
+
+			return Result;
 		}
 	}
 }

@@ -17,7 +17,7 @@ namespace Waher.Things.Arduino
 {
 	public class Module : IModule
 	{
-		private static Dictionary<string, DeviceInformation> usbSerialPorts = new Dictionary<string, DeviceInformation>();
+		private static Dictionary<string, UsbState> serialPorts = new Dictionary<string, UsbState>();
 
 		public Module()
 		{
@@ -35,46 +35,35 @@ namespace Waher.Things.Arduino
 			try
 			{
 				DeviceInformationCollection Devices = await UsbSerial.listAvailableDevicesAsync();
+				UsbState State;
 
 				foreach (DeviceInformation DeviceInfo in Devices)
 				{
 					if (!DeviceInfo.IsEnabled)
 						continue;
 
-					if (!DeviceInfo.Name.StartsWith("Arduino"))
-						continue;
-
-					lock (usbSerialPorts)
+					lock (serialPorts)
 					{
-						usbSerialPorts[DeviceInfo.Name] = DeviceInfo;
-					}
-
-					bool Found = false;
-
-					foreach (INode Node in await MeteringTopology.Root.ChildNodes)
-					{
-						if (Node is UsbConnectedDevice Port)
+						State = new UsbState()
 						{
-							if (Port.PortName == DeviceInfo.Name)
-							{
-								Found = true;
-								break;
-							}
-						}
+							Name = DeviceInfo.Name,
+							DeviceInformation = DeviceInfo,
+							SerialPort = new UsbSerial(DeviceInfo)
+						};
+
+						State.SerialPort.ConnectionEstablished += State.SerialPort_ConnectionEstablished;
+
+						State.Device = new RemoteDevice(State.SerialPort);
+						State.Device.DeviceReady += State.Device_DeviceReady;
+						State.Device.AnalogPinUpdated += State.Device_AnalogPinUpdated;
+						State.Device.DigitalPinUpdated += State.Device_DigitalPinUpdated;
+						State.Device.DeviceConnectionFailed += State.Device_DeviceConnectionFailed;
+						State.Device.DeviceConnectionLost += State.Device_DeviceConnectionLost;
+
+						serialPorts[DeviceInfo.Name] = State;
 					}
 
-					if (Found)
-						continue;
-
-					UsbConnectedDevice Port2 = new UsbConnectedDevice()
-					{
-						NodeId = DeviceInfo.Name,
-						PortName = DeviceInfo.Name
-					};
-
-					await MeteringTopology.Root.AddAsync(Port2);
-
-					Log.Informational("Device added to metering topology.", DeviceInfo.Name);
+					State.SerialPort.begin(57600, SerialConfig.SERIAL_8N1);
 				}
 			}
 			catch (Exception ex)
@@ -89,10 +78,21 @@ namespace Waher.Things.Arduino
 
 		public static DeviceInformation GetDeviceInformation(string DeviceName)
 		{
-			lock (usbSerialPorts)
+			lock (serialPorts)
 			{
-				if (usbSerialPorts.TryGetValue(DeviceName, out DeviceInformation Result))
-					return Result;
+				if (serialPorts.TryGetValue(DeviceName, out UsbState State))
+					return State.DeviceInformation;
+				else
+					return null;
+			}
+		}
+
+		internal static RemoteDevice GetDevice(string Name)
+		{
+			lock (serialPorts)
+			{
+				if (serialPorts.TryGetValue(Name, out UsbState State))
+					return State.Device;
 				else
 					return null;
 			}
@@ -100,10 +100,17 @@ namespace Waher.Things.Arduino
 
 		public void Stop()
 		{
-			lock (usbSerialPorts)
+			UsbState[] States;
+
+			lock (serialPorts)
 			{
-				usbSerialPorts.Clear();
+				States = new UsbState[serialPorts.Count];
+				serialPorts.Values.CopyTo(States, 0);
+				serialPorts.Clear();
 			}
+
+			foreach (UsbState State in States)
+				State.Dispose();
 		}
 	}
 }

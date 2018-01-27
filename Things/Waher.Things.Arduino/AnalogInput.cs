@@ -8,6 +8,7 @@ using Waher.IoTGateway;
 using Waher.Persistence.Attributes;
 using Waher.Runtime.Language;
 using Waher.Things.Attributes;
+using Waher.Things.DisplayableParameters;
 using Waher.Things.SensorData;
 
 namespace Waher.Things.Arduino
@@ -37,33 +38,33 @@ namespace Waher.Things.Arduino
 			get { return this.mode; }
 			set
 			{
-				this.SetDriveMode(value);
 				this.mode = value;
-			}
-		}
-
-		private void SetDriveMode(AnalogInputPinMode Mode)
-		{
-			RemoteDevice Device = this.Device;
-
-			if (Device == null)
-				this.initialized = false;
-			else
-			{
-				switch (Mode)
-				{
-					case AnalogInputPinMode.Input:
-						Device.pinMode(this.PinNr, PinMode.ANALOG);
-						break;
-				}
-
-				this.initialized = true;
+				this.Initialize();
 			}
 		}
 
 		public override Task<string> GetTypeNameAsync(Language Language)
 		{
 			return Language.GetStringAsync(typeof(Module), 16, "Analog Input");
+		}
+
+		public override void Initialize()
+		{
+			RemoteDevice Device = this.Device;
+
+			if (Device != null)
+			{
+				switch (Mode)
+				{
+					case AnalogInputPinMode.Input:
+						Device.pinMode(this.PinNrStr, PinMode.ANALOG);
+						break;
+				}
+
+				this.initialized = true;
+			}
+			else
+				this.initialized = false;
 		}
 
 		public void StartReadout(ISensorReadout Request)
@@ -73,12 +74,18 @@ namespace Waher.Things.Arduino
 				RemoteDevice Device = this.Device;
 				if (Device == null)
 					throw new Exception("Device not ready.");
-
-				if (!this.initialized)
-					this.SetDriveMode(this.mode);
 					
 				List<Field> Fields = new List<Field>();
 				DateTime Now = DateTime.Now;
+
+				if (!this.initialized)
+					this.Initialize();
+
+				if (Request.IsIncluded(FieldType.Status))
+				{
+					Fields.Add(new EnumField(this, Now, "Drive Mode", Device.getPinMode(this.PinNr), FieldType.Status, FieldQoS.AutomaticReadout,
+						typeof(Module).Namespace, 15));
+				}
 
 				if (Request.IsIncluded(FieldType.Momentary))
 				{
@@ -90,12 +97,6 @@ namespace Waher.Things.Arduino
 				{
 					Fields.Add(new Int32Field(this, Now, "Pin Number", this.PinNr, FieldType.Identity, FieldQoS.AutomaticReadout,
 						typeof(Module).Namespace, 14));
-				}
-
-				if (Request.IsIncluded(FieldType.Status))
-				{
-					Fields.Add(new EnumField(this, Now, "Drive Mode", Device.getPinMode(this.PinNr), FieldType.Status, FieldQoS.AutomaticReadout,
-						typeof(Module).Namespace, 15));
 				}
 
 				Request.ReportFields(true, Fields);
@@ -110,6 +111,15 @@ namespace Waher.Things.Arduino
 		{
 			Gateway.NewMomentaryValues(this, new Int32Field(this, DateTime.Now, "Value", Value, FieldType.Momentary, FieldQoS.AutomaticReadout,
 				typeof(Module).Namespace, 13));
+		}
+
+		public override async Task<IEnumerable<Parameter>> GetDisplayableParametersAsync(Language Language, RequestOrigin Caller)
+		{
+			LinkedList<Parameter> Result = await base.GetDisplayableParametersAsync(Language, Caller) as LinkedList<Parameter>;
+
+			Result.AddLast(new StringParameter("Mode", await Language.GetStringAsync(typeof(Module), 19, "Mode"), this.mode.ToString()));
+
+			return Result;
 		}
 	}
 }

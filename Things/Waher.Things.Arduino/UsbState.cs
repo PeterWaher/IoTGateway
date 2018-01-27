@@ -6,15 +6,17 @@ using Microsoft.Maker.RemoteWiring;
 using Microsoft.Maker.Serial;
 using Windows.Devices.Enumeration;
 using Waher.Events;
+using Waher.Things.Metering;
 
 namespace Waher.Things.Arduino
 {
 	internal class UsbState : IDisposable
 	{
-		public string Name = string.Empty;
+		public Dictionary<string, Pin> Pins = new Dictionary<string, Pin>();
+		public DeviceInformation DeviceInformation = null;
 		public UsbSerial SerialPort = null;
 		public RemoteDevice Device = null;
-		public Dictionary<string, Pin> Pins = null;
+		public string Name = string.Empty;
 		public bool Ready = false;
 
 		internal void Device_DeviceConnectionLost(string message)
@@ -29,10 +31,56 @@ namespace Waher.Things.Arduino
 			Log.Error("Device connection failed.", this.Name);  // TODO: Retry, after delay
 		}
 
-		internal void Device_DeviceReady()
+		internal async void Device_DeviceReady()
 		{
-			this.Ready = true;
-			Log.Informational("Device ready.", this.Name);
+			try
+			{
+				this.Ready = true;
+				Log.Informational("Device ready.", this.Name);
+
+				UsbConnectedDevice Port = null;
+				bool Found = false;
+
+				foreach (INode Node in await MeteringTopology.Root.ChildNodes)
+				{
+					Port = Node as UsbConnectedDevice;
+					if (Port != null && Port.PortName == this.Name)
+					{
+						Found = true;
+						break;
+					}
+				}
+
+				if (!Found)
+				{
+					Port = new UsbConnectedDevice()
+					{
+						NodeId = this.Name,
+						PortName = this.Name
+					};
+
+					await MeteringTopology.Root.AddAsync(Port);
+
+					Log.Informational("Device added to metering topology.", this.Name);
+				}
+
+				foreach (MeteringNode Child in await Port.ChildNodes)
+				{
+					if (Child is Pin Pin)
+					{
+						lock (this.Pins)
+						{
+							this.Pins[Pin.PinNrStr] = Pin;
+						}
+
+						Pin.Initialize();
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+			}
 		}
 
 		internal void SerialPort_ConnectionEstablished()
@@ -72,9 +120,6 @@ namespace Waher.Things.Arduino
 
 		internal Pin GetPin(string PinNr)
 		{
-			if (this.Pins == null)
-				return null;
-
 			lock (this.Pins)
 			{
 				if (this.Pins.TryGetValue(PinNr, out Pin Pin))
@@ -101,25 +146,22 @@ namespace Waher.Things.Arduino
 
 		internal void AddPin(string PinNr, Pin Pin)
 		{
-			if (this.Pins != null)
+			lock (this.Pins)
 			{
-				lock (this.Pins)
-				{
-					if (!this.Pins.ContainsKey(PinNr))
-						this.Pins[PinNr] = Pin;
-				}
+				if (!this.Pins.ContainsKey(PinNr))
+					this.Pins[PinNr] = Pin;
 			}
+
+			if (this.Ready)
+				Pin.Initialize();
 		}
 
 		internal void RemovePin(string PinNr, Pin Pin)
 		{
-			if (this.Pins != null)
+			lock (this.Pins)
 			{
-				lock (this.Pins)
-				{
-					if (this.Pins.TryGetValue(PinNr, out Pin Pin2) && Pin2 == Pin)
-						this.Pins.Remove(PinNr);
-				}
+				if (this.Pins.TryGetValue(PinNr, out Pin Pin2) && Pin2 == Pin)
+					this.Pins.Remove(PinNr);
 			}
 		}
 	}

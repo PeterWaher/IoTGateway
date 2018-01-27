@@ -9,6 +9,7 @@ using Waher.Persistence.Attributes;
 using Waher.Runtime.Language;
 using Waher.Things.Attributes;
 using Waher.Things.ControlParameters;
+using Waher.Things.DisplayableParameters;
 using Waher.Things.SensorData;
 
 namespace Waher.Things.Arduino
@@ -27,6 +28,19 @@ namespace Waher.Things.Arduino
 			return Language.GetStringAsync(typeof(Module), 17, "Digital Output");
 		}
 
+		public override void Initialize()
+		{
+			RemoteDevice Device = this.Device;
+
+			if (Device != null)
+			{
+				Device.pinMode(this.PinNr, PinMode.OUTPUT);
+				this.initialized = true;
+			}
+			else
+				this.initialized = false;
+		}
+
 		public void StartReadout(ISensorReadout Request)
 		{
 			try
@@ -35,14 +49,11 @@ namespace Waher.Things.Arduino
 				if (Device == null)
 					throw new Exception("Device not ready.");
 
-				if (!this.initialized)
-				{
-					Device.pinMode(this.PinNr, PinMode.OUTPUT);
-					this.initialized = true;
-				}
-
 				List<Field> Fields = new List<Field>();
 				DateTime Now = DateTime.Now;
+
+				if (!this.initialized)
+					this.Initialize();
 
 				if (Request.IsIncluded(FieldType.Momentary))
 				{
@@ -98,6 +109,15 @@ namespace Waher.Things.Arduino
 						}
 					})
 			};
+		}
+
+		public override async Task<IEnumerable<Parameter>> GetDisplayableParametersAsync(Language Language, RequestOrigin Caller)
+		{
+			LinkedList<Parameter> Result = await base.GetDisplayableParametersAsync(Language, Caller) as LinkedList<Parameter>;
+
+			Result.AddLast(new StringParameter("Mode", await Language.GetStringAsync(typeof(Module), 19, "Mode"), PinMode.OUTPUT.ToString()));
+
+			return Result;
 		}
 	}
 }

@@ -38,6 +38,8 @@ namespace Waher.Things.Arduino
 			get;
 		}
 
+		public abstract void Initialize();
+
 		public RemoteDevice Device
 		{
 			get

@@ -23,5 +23,14 @@ namespace Waher.Things.Arduino
 		public override string PinNrStr => this.PinNr.ToString();
 
 		public abstract void Pin_ValueChanged(PinState NewState);
+
+		public override async Task<IEnumerable<Parameter>> GetDisplayableParametersAsync(Language Language, RequestOrigin Caller)
+		{
+			LinkedList<Parameter> Result = await base.GetDisplayableParametersAsync(Language, Caller) as LinkedList<Parameter>;
+
+			Result.AddLast(new Int32Parameter("Pin", await Language.GetStringAsync(typeof(Module), 18, "Pin"), this.PinNr));
+
+			return Result;
+		}
 	}
 }

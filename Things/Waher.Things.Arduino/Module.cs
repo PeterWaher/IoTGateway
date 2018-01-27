@@ -76,23 +76,22 @@ namespace Waher.Things.Arduino
 			}
 		}
 
-		public static DeviceInformation GetDeviceInformation(string DeviceName)
+		public static DeviceInformation GetDeviceInformation(string Name)
 		{
-			lock (serialPorts)
-			{
-				if (serialPorts.TryGetValue(DeviceName, out UsbState State))
-					return State.DeviceInformation;
-				else
-					return null;
-			}
+			return GetState(Name)?.DeviceInformation;
 		}
 
 		internal static RemoteDevice GetDevice(string Name)
 		{
+			return GetState(Name)?.Device;
+		}
+
+		internal static UsbState GetState(string Name)
+		{
 			lock (serialPorts)
 			{
 				if (serialPorts.TryGetValue(Name, out UsbState State))
-					return State.Device;
+					return State;
 				else
 					return null;
 			}

@@ -18,7 +18,6 @@ namespace Waher.Things.Arduino
 	public class UsbConnectedDevice : MeteringNode
 	{
 		private string portName = string.Empty;
-		private UsbState state = null;
 
 		public UsbConnectedDevice()
 			: base()
@@ -35,19 +34,11 @@ namespace Waher.Things.Arduino
 			set { this.portName = value; }
 		}
 
-		internal UsbState UsbState
-		{
-			get { return this.state; }
-		}
-
 		public RemoteDevice Device
 		{
 			get
 			{
-				if (this.state != null)
-					return this.state.Device;
-				else
-					return null;
+				return Module.GetDevice(this.portName);
 			}
 		}
 
@@ -55,8 +46,9 @@ namespace Waher.Things.Arduino
 		{
 			Task Result = base.AddAsync(Child);
 
-			if (this.state != null && Child is Pin Pin)
-				this.state.AddPin(Pin.PinNrStr, Pin);
+			UsbState State = Module.GetState(this.portName);
+			if (State != null && Child is Pin Pin)
+				State.AddPin(Pin.PinNrStr, Pin);
 
 			return Result;
 		}
@@ -65,8 +57,9 @@ namespace Waher.Things.Arduino
 		{
 			bool Result = await base.RemoveAsync(Child);
 
-			if (Result && this.state != null && Child is Pin Pin)
-				this.state.RemovePin(Pin.PinNrStr, Pin);
+			UsbState State = Module.GetState(this.portName);
+			if (State != null && Child is Pin Pin)
+				State.RemovePin(Pin.PinNrStr, Pin);
 
 			return Result;
 		}
@@ -75,21 +68,25 @@ namespace Waher.Things.Arduino
 		{
 			base.SortChildrenAfterLoadLocked(Children);
 
-			if (this.state != null && Children != null)
+			if (Children != null)
 			{
-				MeteringNode[] Children2 = Children.ToArray();
-
-				Task.Run(() =>
+				UsbState State = Module.GetState(this.portName);
+				if (State != null)
 				{
-					lock (this.state.Pins)
+					MeteringNode[] Children2 = Children.ToArray();
+
+					Task.Run(() =>
 					{
-						foreach (INode Node in Children2)
+						lock (State.Pins)
 						{
-							if (Node is Pin Pin)
-								this.state.Pins[Pin.PinNrStr] = Pin;
+							foreach (INode Node in Children2)
+							{
+								if (Node is Pin Pin)
+									State.Pins[Pin.PinNrStr] = Pin;
+							}
 						}
-					}
-				});
+					});
+				}
 			}
 		}
 

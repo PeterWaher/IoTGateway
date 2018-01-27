@@ -66,7 +66,10 @@ namespace Waher.Things.Arduino
 			Task Result = base.DestroyAsync();
 
 			if (this.Parent is UsbConnectedDevice UsbConnectedDevice)
-				UsbConnectedDevice.UsbState.RemovePin(this.PinNrStr, this);
+			{
+				UsbState State = Module.GetState(UsbConnectedDevice.PortName);
+				State?.RemovePin(this.PinNrStr, this);
+			}
 
 			return Result;
 		}

@@ -79,13 +79,13 @@ namespace Waher.Things.Metering
 		[ReadOnly]
 		public bool Public
 		{
-			get { return this.provisioned; }
+			get { return this.isPublic; }
 			set
 			{
-				if (this.provisioned && !value && !string.IsNullOrEmpty(this.owner))
+				if (this.provisioned && !value && this.isPublic && !string.IsNullOrEmpty(this.owner))
 					throw new Exception("Device is owned by " + this.owner + ". Device must be disowned first.");
 
-				this.provisioned = value;
+				this.isPublic = value;
 			}
 		}
 

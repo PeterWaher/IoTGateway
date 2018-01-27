@@ -115,6 +115,7 @@
     <Compile Include="Pin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UsbConnectedDevice.cs" />
+    <Compile Include="UsbState.cs" />
     <EmbeddedResource Include="Properties\Waher.Things.Arduino.rd.xml" />
   </ItemGroup>
   <ItemGroup>

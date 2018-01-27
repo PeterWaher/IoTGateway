@@ -97,6 +97,8 @@ namespace Waher.Things.Arduino
 					Fields.Add(new EnumField(this, Now, "Drive Mode", Device.getPinMode(this.PinNr), FieldType.Status, FieldQoS.AutomaticReadout,
 						typeof(Module).Namespace, 15));
 				}
+
+				Request.ReportFields(true, Fields);
 			}
 			catch (Exception ex)
 			{

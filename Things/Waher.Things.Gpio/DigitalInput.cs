@@ -120,6 +120,8 @@ namespace Waher.Things.Gpio
 					Fields.Add(new EnumField(this, Now, "Drive Mode", this.pin.GetDriveMode(), FieldType.Status, FieldQoS.AutomaticReadout,
 						typeof(Controller).Namespace, 16));
 				}
+
+				Request.ReportFields(true, Fields);
 			}
 			catch (Exception ex)
 			{

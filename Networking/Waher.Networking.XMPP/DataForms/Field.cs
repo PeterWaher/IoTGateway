@@ -256,7 +256,7 @@ namespace Waher.Networking.XMPP.DataForms
 
 		internal bool Serialize(StringBuilder Output, bool ValuesOnly)
 		{
-			if (this.notSame && ValuesOnly)
+			if ((this.notSame || this.readOnly) && ValuesOnly)
 				return false;
 
 			string TypeName = this.TypeName;
@@ -306,6 +306,9 @@ namespace Waher.Networking.XMPP.DataForms
 
 					if (this.notSame)
 						Output.Append("<xdd:notSame/>");
+
+					if (this.readOnly)
+						Output.Append("<xdd:readOnly/>");
 
 					if (!string.IsNullOrEmpty(this.error))
 					{

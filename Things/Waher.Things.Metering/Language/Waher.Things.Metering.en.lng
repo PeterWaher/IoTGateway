@@ -16,6 +16,31 @@
 			<String id="12">Error</String>
 			<String id="13">Metering Topology</String>
 			<String id="14">Root</String>
-		</Namespace>
+      <String id="15">ID:</String>
+      <String id="16">Identity</String>
+      <String id="17">Node identity on the network.</String>
+      <String id="18">Provisioning</String>
+      <String id="19">Provision node.</String>
+      <String id="20">If checked, the node will be registered in the Thing Registry (if available), and access rights will be controlled by the corresponding owner (if a Provisioning Server is available).</String>
+      <String id="21">Owner:</String>
+      <String id="22">Communication address of owner.</String>
+      <String id="23">Public node.</String>
+      <String id="24">If the node is registered as a public node in the Thing Registry.</String>
+      <String id="25">Provisioned</String>
+      <String id="26">Owner</String>
+      <String id="27">Public</String>
+      <String id="28"></String>
+      <String id="29"></String>
+      <String id="30"></String>
+      <String id="31"></String>
+      <String id="32"></String>
+      <String id="33"></String>
+      <String id="34"></String>
+      <String id="35"></String>
+      <String id="36"></String>
+      <String id="37"></String>
+      <String id="38"></String>
+      <String id="39"></String>
+    </Namespace>
 	</Language>
 </Translation>

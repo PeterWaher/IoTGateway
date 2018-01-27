@@ -12,7 +12,7 @@ using Waher.Things.Metering;
 
 namespace Waher.Things.Arduino
 {
-	public abstract class Pin : MeteringNode
+	public abstract class Pin : ProvisionedMeteringNode
 	{
 		private byte pinNr = 0;
 

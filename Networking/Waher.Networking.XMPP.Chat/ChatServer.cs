@@ -616,71 +616,77 @@ namespace Waher.Networking.XMPP.Chat
 						break;
 
 					default:
-						if (int.TryParse(s, out i) && i >= 0 && Menu != null && Menu.TryGetValue(i, out KeyValuePair<string, object> Item) && !string.IsNullOrEmpty(Item.Key))
+						if (int.TryParse(s, out i) && i >= 0 && Menu != null && Menu.TryGetValue(i, out KeyValuePair<string, object> Item))
 						{
-							s = Item.Key;
+							if (string.IsNullOrEmpty(Item.Key))
+							{
+								if (i == 0 && Item.Value is SortedDictionary<int, KeyValuePair<string, object>> PreviousMenu)
+								{
+									Menu = PreviousMenu;
+									if (Menu == null)
+										this.Error(e.From, "There's no previous menu.", Support);
+									else
+										this.SendMenu(e.From, Menu, Variables, Support);
+								}
+							}
+							else
+							{
+								s = Item.Key;
 
-							if (i == 0)
-							{
-								Menu = Item.Value as SortedDictionary<int, KeyValuePair<string, object>>;
-								if (Menu == null)
-									this.Error(e.From, "There's no previous menu.", Support);
-								else
-									this.SendMenu(e.From, Menu, Variables, Support);
-							}
-							else if (Menu.TryGetValue(-2, out KeyValuePair<string, object> Obj) && Obj.Value is INode Node &&
-								Menu.TryGetValue(-1, out Obj) && Obj.Value is IDataSource Source)
-							{
-								if (Node.HasChildren)
+								if (Menu.TryGetValue(-2, out KeyValuePair<string, object> Obj) && Obj.Value is INode Node &&
+									Menu.TryGetValue(-1, out Obj) && Obj.Value is IDataSource Source)
 								{
-									foreach (INode ChildNode in await Node.ChildNodes)
+									if (Node.HasChildren)
 									{
-										if (ChildNode.NodeId == s)
+										foreach (INode ChildNode in await Node.ChildNodes)
 										{
-											await this.SelectNode(e, Source, Node, Variables, Menu, Support);
-											break;
-										}
-									}
-								}
-							}
-							else if (Menu.TryGetValue(-1, out Obj))
-							{
-								if (Obj.Value == null)
-								{
-									foreach (IDataSource RootSource in this.concentratorServer.DataSources)
-									{
-										if (RootSource.SourceID == s)
-										{
-											this.SelectSource(e, RootSource, Variables, Menu, Support);
-											break;
-										}
-									}
-								}
-								else if ((Source = Obj.Value as IDataSource) != null)
-								{
-									if (Source.HasChildren)
-									{
-										foreach (IDataSource ChildSource in Source.ChildSources)
-										{
-											if (ChildSource.SourceID == s)
+											if (ChildNode.NodeId == s)
 											{
-												this.SelectSource(e, ChildSource, Variables, Menu, Support);
-												s = null;
+												await this.SelectNode(e, Source, ChildNode, Variables, Menu, Support);
 												break;
 											}
 										}
 									}
-
-									if (!string.IsNullOrEmpty(s))
+								}
+								else if (Menu.TryGetValue(-1, out Obj))
+								{
+									if (Obj.Value == null)
 									{
-										if (Source.RootNodes != null)
+										foreach (IDataSource RootSource in this.concentratorServer.DataSources)
 										{
-											foreach (INode RootNode in Source.RootNodes)
+											if (RootSource.SourceID == s)
 											{
-												if (RootNode.NodeId == s)
+												this.SelectSource(e, RootSource, Variables, Menu, Support);
+												break;
+											}
+										}
+									}
+									else if ((Source = Obj.Value as IDataSource) != null)
+									{
+										if (Source.HasChildren)
+										{
+											foreach (IDataSource ChildSource in Source.ChildSources)
+											{
+												if (ChildSource.SourceID == s)
 												{
-													await this.SelectNode(e, Source, RootNode, Variables, Menu, Support);
+													this.SelectSource(e, ChildSource, Variables, Menu, Support);
+													s = null;
 													break;
+												}
+											}
+										}
+
+										if (!string.IsNullOrEmpty(s))
+										{
+											if (Source.RootNodes != null)
+											{
+												foreach (INode RootNode in Source.RootNodes)
+												{
+													if (RootNode.NodeId == s)
+													{
+														await this.SelectNode(e, Source, RootNode, Variables, Menu, Support);
+														break;
+													}
 												}
 											}
 										}

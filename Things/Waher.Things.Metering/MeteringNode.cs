@@ -492,7 +492,7 @@ namespace Waher.Things.Metering
 					Child.parent = this;
 				}
 
-				this.SortChildrenAfterLoadLocked();
+				this.SortChildrenAfterLoadLocked(this.children);
 				this.childrenLoaded = true;
 			}
 		}
@@ -500,14 +500,24 @@ namespace Waher.Things.Metering
 		/// <summary>
 		/// Method that allows the node to sort its children, after they have been loaded.
 		/// </summary>
-		protected virtual void SortChildrenAfterLoadLocked()
+		/// <param name="Children">Loaded children.</param>
+		protected virtual void SortChildrenAfterLoadLocked(List<MeteringNode> Children)
 		{
 			// Do nothing by default.
 		}
 
-		private Task<MeteringNode> LoadParent()
+		private async Task<MeteringNode> LoadParent()
 		{
-			return MeteringTopology.GetNode(this.Parent);
+			if (this.parent != null)
+				return this.parent;
+
+			if (this.parentId == Guid.Empty)
+				return null;
+
+			this.parent = await Database.LoadObject<MeteringNode>(this.parentId);
+			MeteringTopology.RegisterNode(this.parent);
+
+			return this.parent;
 		}
 
 		/// <summary>

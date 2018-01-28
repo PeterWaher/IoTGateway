@@ -57,6 +57,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			bool Masked;
 			bool Alpha;
 			bool DateOnly;
+			bool Nullable;
 			HeaderAttribute HeaderAttribute;
 			ToolTipAttribute ToolTipAttribute;
 			PageAttribute PageAttribute;
@@ -64,7 +65,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			OptionAttribute OptionAttribute;
 			TextAttribute TextAttribute;
 			RegularExpressionAttribute RegularExpressionAttribute;
-			LinkedList<string> TextAttributes;
+			LinkedList<TextAttribute> TextAttributes;
 			RangeAttribute RangeAttribute;
 			ValidationMethod ValidationMethod;
 			Type PropertyType;
@@ -79,7 +80,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			foreach (PropertyInfo PI in Properties)
 			{
-				if (!PI.CanRead || !PI.CanWrite)
+				if (!PI.CanRead)
 					continue;
 
 				NamespaceStr = PI.DeclaringType.Namespace;
@@ -93,7 +94,8 @@ namespace Waher.Networking.XMPP.Concentrator
 				TextAttributes = null;
 				ValidationMethod = null;
 				Options = null;
-				Required = ReadOnly = Masked = Alpha = DateOnly = false;
+				Required = Masked = Alpha = DateOnly = false;
+				ReadOnly = !PI.CanWrite;
 				PagePriority = PageAttribute.DefaultPriority;
 				FieldPriority = HeaderAttribute.DefaultPriority;
 
@@ -132,13 +134,9 @@ namespace Waher.Networking.XMPP.Concentrator
 					else if ((TextAttribute = Attr as TextAttribute) != null)
 					{
 						if (TextAttributes == null)
-							TextAttributes = new LinkedList<string>();
+							TextAttributes = new LinkedList<TextAttribute>();
 
-						StringId = TextAttribute.StringId;
-						if (StringId > 0)
-							TextAttributes.AddLast(await Namespace.GetStringAsync(StringId, TextAttribute.Label));
-						else
-							TextAttributes.AddLast(TextAttribute.Label);
+						TextAttributes.AddLast(TextAttribute);
 					}
 					else if ((OptionAttribute = Attr as OptionAttribute) != null)
 					{
@@ -177,6 +175,17 @@ namespace Waher.Networking.XMPP.Concentrator
 
 				PropertyType = PI.PropertyType;
 				Field = null;
+				Nullable = false;
+
+				if (PropertyType.GetTypeInfo().IsGenericType)
+				{
+					Type GT = PropertyType.GetGenericTypeDefinition();
+					if (GT == typeof(Nullable<>))
+					{
+						Nullable = true;
+						PropertyType = PropertyType.GenericTypeArguments[0];
+					}
+				}
 
 				if (PropertyType == typeof(string[]))
 				{
@@ -207,7 +216,11 @@ namespace Waher.Networking.XMPP.Concentrator
 							Options.Add(new KeyValuePair<string, string>(Option, Option));
 					}
 
-					Field = new ListSingleField(Parameters, PI.Name, Header, Required, new string[] { PI.GetValue(EditableObject).ToString() },
+					s = PI.GetValue(EditableObject)?.ToString();
+					if (Nullable && s == null)
+						s = string.Empty;
+
+					Field = new ListSingleField(Parameters, PI.Name, Header, Required, new string[] { s },
 						Options.ToArray(), ToolTip, null, ValidationMethod, string.Empty, false, ReadOnly, false);
 				}
 				else if (PropertyType == typeof(bool))
@@ -215,8 +228,14 @@ namespace Waher.Networking.XMPP.Concentrator
 					if (ValidationMethod == null)
 						ValidationMethod = new BasicValidation();
 
-					Field = new BooleanField(Parameters, PI.Name, Header, Required,
-						new string[] { CommonTypes.Encode((bool)PI.GetValue(EditableObject)) },
+					object Value = PI.GetValue(EditableObject);
+
+					if (Nullable && Value == null)
+						s = string.Empty;
+					else
+						s = CommonTypes.Encode((bool)Value);
+
+					Field = new BooleanField(Parameters, PI.Name, Header, Required, new string[] { s },
 						Options?.ToArray(), ToolTip, BooleanDataType.Instance, ValidationMethod,
 						string.Empty, false, ReadOnly, false);
 				}
@@ -292,30 +311,30 @@ namespace Waher.Networking.XMPP.Concentrator
 					if (ValidationMethod == null)
 						ValidationMethod = new BasicValidation();
 
+					s = PI.GetValue(EditableObject)?.ToString();
+					if (Nullable && s == null)
+						s = string.Empty;
+
 					if (Masked)
 					{
-						Field = new TextPrivateField(Parameters, PI.Name, Header, Required, new string[] { PI.GetValue(EditableObject).ToString() },
+						Field = new TextPrivateField(Parameters, PI.Name, Header, Required, new string[] { s },
 							Options?.ToArray(), ToolTip, DataType, ValidationMethod,
 							string.Empty, false, ReadOnly, false);
 					}
 					else if (Options == null)
 					{
-						Field = new TextSingleField(Parameters, PI.Name, Header, Required, new string[] { PI.GetValue(EditableObject).ToString() },
+						Field = new TextSingleField(Parameters, PI.Name, Header, Required, new string[] { s },
 							null, ToolTip, DataType, ValidationMethod, string.Empty, false, ReadOnly, false);
 					}
 					else
 					{
-						Field = new ListSingleField(Parameters, PI.Name, Header, Required, new string[] { PI.GetValue(EditableObject).ToString() },
+						Field = new ListSingleField(Parameters, PI.Name, Header, Required, new string[] { s },
 							Options.ToArray(), ToolTip, DataType, ValidationMethod, string.Empty, false, ReadOnly, false);
 					}
 				}
 
 				if (Field == null)
 					continue;
-
-				Field.Priority = FieldPriority;
-				Field.Ordinal = FieldOrdinal++;
-				Fields.Add(Field);
 
 				if (string.IsNullOrEmpty(PageLabel))
 				{
@@ -347,15 +366,43 @@ namespace Waher.Networking.XMPP.Concentrator
 					}
 				}
 
+				Field.Priority = FieldPriority;
+				Field.Ordinal = FieldOrdinal++;
+				Fields.Add(Field);
+
 				if (string.IsNullOrEmpty(SectionLabel))
 				{
 					if (TextAttributes != null)
 					{
-						foreach (string Text in TextAttributes)
-							Page.Add(new TextElement(Parameters, Text));
+						foreach (TextAttribute TextAttr in TextAttributes)
+						{
+							if (TextAttr.Position == TextPosition.BeforeField)
+							{
+								StringId = TextAttr.StringId;
+								if (StringId > 0)
+									Page.Add(new TextElement(Parameters, await Namespace.GetStringAsync(StringId, TextAttr.Label)));
+								else
+									Page.Add(new TextElement(Parameters, TextAttr.Label));
+							}
+						}
 					}
 
 					Page.Add(new FieldReference(Parameters, Field.Var));
+
+					if (TextAttributes != null)
+					{
+						foreach (TextAttribute TextAttr in TextAttributes)
+						{
+							if (TextAttr.Position == TextPosition.AfterField)
+							{
+								StringId = TextAttr.StringId;
+								if (StringId > 0)
+									Page.Add(new TextElement(Parameters, await Namespace.GetStringAsync(StringId, TextAttr.Label)));
+								else
+									Page.Add(new TextElement(Parameters, TextAttr.Label));
+							}
+						}
+					}
 				}
 				else
 				{
@@ -373,12 +420,53 @@ namespace Waher.Networking.XMPP.Concentrator
 
 					if (TextAttributes != null)
 					{
-						foreach (string Text in TextAttributes)
-							Section.Add(new TextElement(Parameters, Text));
+						foreach (TextAttribute TextAttr in TextAttributes)
+						{
+							if (TextAttr.Position == TextPosition.BeforeField)
+							{
+								StringId = TextAttr.StringId;
+								if (StringId > 0)
+									Section.Add(new TextElement(Parameters, await Namespace.GetStringAsync(StringId, TextAttr.Label)));
+								else
+									Section.Add(new TextElement(Parameters, TextAttr.Label));
+							}
+						}
 					}
 
 					Section.Add(new FieldReference(Parameters, Field.Var));
+
+					if (TextAttributes != null)
+					{
+						foreach (TextAttribute TextAttr in TextAttributes)
+						{
+							if (TextAttr.Position == TextPosition.AfterField)
+							{
+								StringId = TextAttr.StringId;
+								if (StringId > 0)
+									Section.Add(new TextElement(Parameters, await Namespace.GetStringAsync(StringId, TextAttr.Label)));
+								else
+									Section.Add(new TextElement(Parameters, TextAttr.Label));
+							}
+						}
+					}
 				}
+			}
+
+			if (EditableObject is IPropertyFormAnnotation PropertyFormAnnotation)
+			{
+				FormState State = new FormState()
+				{
+					PageByLabel = PageByLabel,
+					SectionByPageAndSectionLabel = SectionByPageAndSectionLabel,
+					DefaultPage = DefaultPage,
+					LanguageCode = Language.Code,
+					Fields = Fields,
+					Pages = Pages,
+					FieldOrdinal = FieldOrdinal,
+					PageOrdinal = PageOrdinal
+				};
+
+				await PropertyFormAnnotation.AnnotatePropertyForm(State);
 			}
 
 			Fields.Sort(OrderFields);
@@ -492,6 +580,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			bool HasHeader;
 			bool HasOptions;
 			bool ValidOption;
+			bool Nullable;
 
 			if (Namespace == null)
 				Namespace = await Language.CreateNamespaceAsync(T.Namespace);
@@ -556,7 +645,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 				if (ReadOnly)
 				{
-					if (Field.ValueString != PI.GetValue(EditableObject).ToString())
+					if (Field.ValueString != PI.GetValue(EditableObject)?.ToString())
 						AddError(ref Errors, Field.Var, await ConcentratorNamespace.GetStringAsync(3, "Property is read-only."));
 
 					continue;
@@ -573,138 +662,154 @@ namespace Waher.Networking.XMPP.Concentrator
 				ValueToSet2 = null;
 				Parsed = null;
 				DataType = null;
+				Nullable = false;
 
-				if (PropertyType == typeof(string[]))
+				if (PropertyType.GetTypeInfo().IsGenericType)
 				{
-					if (ValidationMethod == null)
-						ValidationMethod = new BasicValidation();
-
-					ValueToSet = ValueToSet2 = Parsed = Field.ValueStrings;
-					DataType = StringDataType.Instance;
-				}
-				else if (PropertyType.GetTypeInfo().IsEnum)
-				{
-					if (ValidationMethod == null)
-						ValidationMethod = new BasicValidation();
-
-					try
+					Type GT = PropertyType.GetGenericTypeDefinition();
+					if (GT == typeof(Nullable<>))
 					{
-						ValueToSet = ValueToSet2 = Enum.Parse(PropertyType, Field.ValueString);
-					}
-					catch (Exception)
-					{
-						AddError(ref Errors, Field.Var, await ConcentratorNamespace.GetStringAsync(4, "Select a valid option."));
-						continue;
+						Nullable = true;
+						PropertyType = PropertyType.GenericTypeArguments[0];
 					}
 				}
-				else if (PropertyType == typeof(bool))
-				{
-					if (ValidationMethod == null)
-						ValidationMethod = new BasicValidation();
 
-					if (!CommonTypes.TryParse(Field.ValueString, out bool b))
-					{
-						AddError(ref Errors, Field.Var, await ConcentratorNamespace.GetStringAsync(5, "Invalid boolean value."));
-						continue;
-					}
-
-					DataType = BooleanDataType.Instance;
-					ValueToSet = ValueToSet2 = b;
-				}
+				if (Nullable && string.IsNullOrEmpty(Field.ValueString))
+					ValueToSet2 = null;
 				else
 				{
-					if (PropertyType == typeof(string))
+					if (PropertyType == typeof(string[]))
+					{
+						if (ValidationMethod == null)
+							ValidationMethod = new BasicValidation();
+
+						ValueToSet = ValueToSet2 = Parsed = Field.ValueStrings;
 						DataType = StringDataType.Instance;
-					else if (PropertyType == typeof(sbyte))
-						DataType = ByteDataType.Instance;
-					else if (PropertyType == typeof(short))
-						DataType = ShortDataType.Instance;
-					else if (PropertyType == typeof(int))
-						DataType = IntDataType.Instance;
-					else if (PropertyType == typeof(long))
-						DataType = LongDataType.Instance;
-					else if (PropertyType == typeof(byte))
+					}
+					else if (PropertyType.GetTypeInfo().IsEnum)
 					{
-						DataType = ShortDataType.Instance;
-
 						if (ValidationMethod == null)
-							ValidationMethod = new RangeValidation(byte.MinValue.ToString(), byte.MaxValue.ToString());
-					}
-					else if (PropertyType == typeof(ushort))
-					{
-						DataType = IntDataType.Instance;
+							ValidationMethod = new BasicValidation();
 
-						if (ValidationMethod == null)
-							ValidationMethod = new RangeValidation(ushort.MinValue.ToString(), ushort.MaxValue.ToString());
+						try
+						{
+							ValueToSet = ValueToSet2 = Enum.Parse(PropertyType, Field.ValueString);
+						}
+						catch (Exception)
+						{
+							AddError(ref Errors, Field.Var, await ConcentratorNamespace.GetStringAsync(4, "Select a valid option."));
+							continue;
+						}
 					}
-					else if (PropertyType == typeof(uint))
+					else if (PropertyType == typeof(bool))
 					{
-						DataType = LongDataType.Instance;
+						if (ValidationMethod == null)
+							ValidationMethod = new BasicValidation();
 
-						if (ValidationMethod == null)
-							ValidationMethod = new RangeValidation(uint.MinValue.ToString(), uint.MaxValue.ToString());
-					}
-					else if (PropertyType == typeof(ulong))
-					{
-						DataType = IntegerDataType.Instance;
+						if (!CommonTypes.TryParse(Field.ValueString, out bool b))
+						{
+							AddError(ref Errors, Field.Var, await ConcentratorNamespace.GetStringAsync(5, "Invalid boolean value."));
+							continue;
+						}
 
-						if (ValidationMethod == null)
-							ValidationMethod = new RangeValidation(ulong.MinValue.ToString(), ulong.MaxValue.ToString());
-					}
-					else if (PropertyType == typeof(DateTime))
-					{
-						if (DateOnly)
-							DataType = DateDataType.Instance;
-						else
-							DataType = DateTimeDataType.Instance;
-					}
-					else if (PropertyType == typeof(decimal))
-						DataType = DecimalDataType.Instance;
-					else if (PropertyType == typeof(double))
-						DataType = DoubleDataType.Instance;
-					else if (PropertyType == typeof(float))
-						DataType = DoubleDataType.Instance;    // Use xs:double anyway
-					else if (PropertyType == typeof(TimeSpan))
-						DataType = TimeDataType.Instance;
-					else if (PropertyType == typeof(Uri))
-						DataType = AnyUriDataType.Instance;
-					else if (PropertyType == typeof(SKColor))
-					{
-						if (Alpha)
-							DataType = ColorAlphaDataType.Instance;
-						else
-							DataType = ColorDataType.Instance;
+						DataType = BooleanDataType.Instance;
+						ValueToSet = ValueToSet2 = b;
 					}
 					else
-						DataType = null;
-
-					if (ValidationMethod == null)
-						ValidationMethod = new BasicValidation();
-
-					try
 					{
-						ValueToSet = DataType.Parse(Field.ValueString);
+						if (PropertyType == typeof(string))
+							DataType = StringDataType.Instance;
+						else if (PropertyType == typeof(sbyte))
+							DataType = ByteDataType.Instance;
+						else if (PropertyType == typeof(short))
+							DataType = ShortDataType.Instance;
+						else if (PropertyType == typeof(int))
+							DataType = IntDataType.Instance;
+						else if (PropertyType == typeof(long))
+							DataType = LongDataType.Instance;
+						else if (PropertyType == typeof(byte))
+						{
+							DataType = ShortDataType.Instance;
 
-						if (ValueToSet.GetType() == PI.PropertyType)
-							ValueToSet2 = ValueToSet;
+							if (ValidationMethod == null)
+								ValidationMethod = new RangeValidation(byte.MinValue.ToString(), byte.MaxValue.ToString());
+						}
+						else if (PropertyType == typeof(ushort))
+						{
+							DataType = IntDataType.Instance;
+
+							if (ValidationMethod == null)
+								ValidationMethod = new RangeValidation(ushort.MinValue.ToString(), ushort.MaxValue.ToString());
+						}
+						else if (PropertyType == typeof(uint))
+						{
+							DataType = LongDataType.Instance;
+
+							if (ValidationMethod == null)
+								ValidationMethod = new RangeValidation(uint.MinValue.ToString(), uint.MaxValue.ToString());
+						}
+						else if (PropertyType == typeof(ulong))
+						{
+							DataType = IntegerDataType.Instance;
+
+							if (ValidationMethod == null)
+								ValidationMethod = new RangeValidation(ulong.MinValue.ToString(), ulong.MaxValue.ToString());
+						}
+						else if (PropertyType == typeof(DateTime))
+						{
+							if (DateOnly)
+								DataType = DateDataType.Instance;
+							else
+								DataType = DateTimeDataType.Instance;
+						}
+						else if (PropertyType == typeof(decimal))
+							DataType = DecimalDataType.Instance;
+						else if (PropertyType == typeof(double))
+							DataType = DoubleDataType.Instance;
+						else if (PropertyType == typeof(float))
+							DataType = DoubleDataType.Instance;    // Use xs:double anyway
+						else if (PropertyType == typeof(TimeSpan))
+							DataType = TimeDataType.Instance;
+						else if (PropertyType == typeof(Uri))
+							DataType = AnyUriDataType.Instance;
+						else if (PropertyType == typeof(SKColor))
+						{
+							if (Alpha)
+								DataType = ColorAlphaDataType.Instance;
+							else
+								DataType = ColorDataType.Instance;
+						}
 						else
-							ValueToSet2 = System.Convert.ChangeType(ValueToSet, PI.PropertyType);
+							DataType = null;
+
+						if (ValidationMethod == null)
+							ValidationMethod = new BasicValidation();
+
+						try
+						{
+							ValueToSet = DataType.Parse(Field.ValueString);
+
+							if (ValueToSet.GetType() == PI.PropertyType)
+								ValueToSet2 = ValueToSet;
+							else
+								ValueToSet2 = System.Convert.ChangeType(ValueToSet, PI.PropertyType);
+						}
+						catch (Exception)
+						{
+							AddError(ref Errors, Field.Var, await ConcentratorNamespace.GetStringAsync(6, "Invalid value."));
+							continue;
+						}
 					}
-					catch (Exception)
+
+					if (Parsed == null)
+						Parsed = new object[] { ValueToSet };
+
+					ValidationMethod.Validate(Field, DataType, Parsed, Field.ValueStrings);
+					if (Field.HasError)
 					{
-						AddError(ref Errors, Field.Var, await ConcentratorNamespace.GetStringAsync(6, "Invalid value."));
+						AddError(ref Errors, Field.Var, Field.Error);
 						continue;
 					}
-				}
-
-				if (Parsed == null)
-					Parsed = new object[] { ValueToSet };
-
-				ValidationMethod.Validate(Field, DataType, Parsed, Field.ValueStrings);
-				if (Field.HasError)
-				{
-					AddError(ref Errors, Field.Var, Field.Error);
-					continue;
 				}
 
 				if (ToSet == null)

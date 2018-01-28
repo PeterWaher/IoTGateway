@@ -65,7 +65,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			OptionAttribute OptionAttribute;
 			TextAttribute TextAttribute;
 			RegularExpressionAttribute RegularExpressionAttribute;
-			LinkedList<string> TextAttributes;
+			LinkedList<TextAttribute> TextAttributes;
 			RangeAttribute RangeAttribute;
 			ValidationMethod ValidationMethod;
 			Type PropertyType;
@@ -80,7 +80,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			foreach (PropertyInfo PI in Properties)
 			{
-				if (!PI.CanRead || !PI.CanWrite)
+				if (!PI.CanRead)
 					continue;
 
 				NamespaceStr = PI.DeclaringType.Namespace;
@@ -94,7 +94,8 @@ namespace Waher.Networking.XMPP.Concentrator
 				TextAttributes = null;
 				ValidationMethod = null;
 				Options = null;
-				Required = ReadOnly = Masked = Alpha = DateOnly = false;
+				Required = Masked = Alpha = DateOnly = false;
+				ReadOnly = !PI.CanWrite;
 				PagePriority = PageAttribute.DefaultPriority;
 				FieldPriority = HeaderAttribute.DefaultPriority;
 
@@ -133,13 +134,9 @@ namespace Waher.Networking.XMPP.Concentrator
 					else if ((TextAttribute = Attr as TextAttribute) != null)
 					{
 						if (TextAttributes == null)
-							TextAttributes = new LinkedList<string>();
+							TextAttributes = new LinkedList<TextAttribute>();
 
-						StringId = TextAttribute.StringId;
-						if (StringId > 0)
-							TextAttributes.AddLast(await Namespace.GetStringAsync(StringId, TextAttribute.Label));
-						else
-							TextAttributes.AddLast(TextAttribute.Label);
+						TextAttributes.AddLast(TextAttribute);
 					}
 					else if ((OptionAttribute = Attr as OptionAttribute) != null)
 					{
@@ -339,10 +336,6 @@ namespace Waher.Networking.XMPP.Concentrator
 				if (Field == null)
 					continue;
 
-				Field.Priority = FieldPriority;
-				Field.Ordinal = FieldOrdinal++;
-				Fields.Add(Field);
-
 				if (string.IsNullOrEmpty(PageLabel))
 				{
 					if (DefaultPage == null)
@@ -373,15 +366,43 @@ namespace Waher.Networking.XMPP.Concentrator
 					}
 				}
 
+				Field.Priority = FieldPriority;
+				Field.Ordinal = FieldOrdinal++;
+				Fields.Add(Field);
+
 				if (string.IsNullOrEmpty(SectionLabel))
 				{
 					if (TextAttributes != null)
 					{
-						foreach (string Text in TextAttributes)
-							Page.Add(new TextElement(Parameters, Text));
+						foreach (TextAttribute TextAttr in TextAttributes)
+						{
+							if (TextAttr.Position == TextPosition.BeforeField)
+							{
+								StringId = TextAttr.StringId;
+								if (StringId > 0)
+									Page.Add(new TextElement(Parameters, await Namespace.GetStringAsync(StringId, TextAttr.Label)));
+								else
+									Page.Add(new TextElement(Parameters, TextAttr.Label));
+							}
+						}
 					}
 
 					Page.Add(new FieldReference(Parameters, Field.Var));
+
+					if (TextAttributes != null)
+					{
+						foreach (TextAttribute TextAttr in TextAttributes)
+						{
+							if (TextAttr.Position == TextPosition.AfterField)
+							{
+								StringId = TextAttr.StringId;
+								if (StringId > 0)
+									Page.Add(new TextElement(Parameters, await Namespace.GetStringAsync(StringId, TextAttr.Label)));
+								else
+									Page.Add(new TextElement(Parameters, TextAttr.Label));
+							}
+						}
+					}
 				}
 				else
 				{
@@ -399,12 +420,54 @@ namespace Waher.Networking.XMPP.Concentrator
 
 					if (TextAttributes != null)
 					{
-						foreach (string Text in TextAttributes)
-							Section.Add(new TextElement(Parameters, Text));
+						foreach (TextAttribute TextAttr in TextAttributes)
+						{
+							if (TextAttr.Position == TextPosition.BeforeField)
+							{
+								StringId = TextAttr.StringId;
+								if (StringId > 0)
+									Section.Add(new TextElement(Parameters, await Namespace.GetStringAsync(StringId, TextAttr.Label)));
+								else
+									Section.Add(new TextElement(Parameters, TextAttr.Label));
+							}
+						}
 					}
 
 					Section.Add(new FieldReference(Parameters, Field.Var));
+
+					if (TextAttributes != null)
+					{
+						foreach (TextAttribute TextAttr in TextAttributes)
+						{
+							if (TextAttr.Position == TextPosition.AfterField)
+							{
+								StringId = TextAttr.StringId;
+								if (StringId > 0)
+									Section.Add(new TextElement(Parameters, await Namespace.GetStringAsync(StringId, TextAttr.Label)));
+								else
+									Section.Add(new TextElement(Parameters, TextAttr.Label));
+							}
+						}
+					}
 				}
+			}
+
+			if (EditableObject is IPropertyFormAnnotation PropertyFormAnnotation)
+			{
+				FormState State = new FormState()
+				{
+					Form = Parameters,
+					PageByLabel = PageByLabel,
+					SectionByPageAndSectionLabel = SectionByPageAndSectionLabel,
+					DefaultPage = DefaultPage,
+					LanguageCode = Language.Code,
+					Fields = Fields,
+					Pages = Pages,
+					FieldOrdinal = FieldOrdinal,
+					PageOrdinal = PageOrdinal
+				};
+
+				await PropertyFormAnnotation.AnnotatePropertyForm(State);
 			}
 
 			Fields.Sort(OrderFields);

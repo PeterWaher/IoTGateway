@@ -1751,6 +1751,9 @@ namespace Waher.Networking.XMPP.Concentrator
 							}
 						}
 
+						ILifeCycleManagement LifeCycleManagement = Node as ILifeCycleManagement;
+						bool PreProvisioned = LifeCycleManagement != null && LifeCycleManagement.IsProvisioned;
+
 						if (Result == null)
 							Result = await Parameters.SetEditableForm(e, Node, Form, true);
 
@@ -1779,12 +1782,17 @@ namespace Waher.Networking.XMPP.Concentrator
 
 							Log.Informational("Node edited.", Node.NodeId, e.FromBareJid, "NodeEdited", EventLevel.Medium, Result.Tags.ToArray());
 
-							if (this.thingRegistryClient != null && Node is ILifeCycleManagement LifeCycleManagement && LifeCycleManagement.IsProvisioned)
+							if (this.thingRegistryClient != null && LifeCycleManagement != null)
 							{
-								if (string.IsNullOrEmpty(LifeCycleManagement.Owner))
-									await this.RegisterNode(LifeCycleManagement);
-								else
-									await this.UpdateNodeRegistration(LifeCycleManagement);
+								if (LifeCycleManagement.IsProvisioned)
+								{
+									if (string.IsNullOrEmpty(LifeCycleManagement.Owner))
+										await this.RegisterNode(LifeCycleManagement);
+									else
+										await this.UpdateNodeRegistration(LifeCycleManagement);
+								}
+								else if (PreProvisioned)
+									this.UnregisterNode(LifeCycleManagement);
 							}
 						}
 						else
@@ -2001,6 +2009,9 @@ namespace Waher.Networking.XMPP.Concentrator
 							}
 						}
 
+						ILifeCycleManagement LifeCycleManagement = P.Value as ILifeCycleManagement;
+						bool PreProvisioned = LifeCycleManagement != null && LifeCycleManagement.IsProvisioned;
+
 						if (Result == null)
 							Result = await Parameters.SetEditableForm(e, P.Value, Form, true);
 
@@ -2016,12 +2027,17 @@ namespace Waher.Networking.XMPP.Concentrator
 
 						Log.Informational("Node edited.", P.Value.NodeId, e.FromBareJid, "NodeEdited", EventLevel.Medium, Result.Tags.ToArray());
 
-						if (this.thingRegistryClient != null && P.Value is ILifeCycleManagement LifeCycleManagement && LifeCycleManagement.IsProvisioned)
+						if (this.thingRegistryClient != null && LifeCycleManagement != null)
 						{
-							if (string.IsNullOrEmpty(LifeCycleManagement.Owner))
-								await this.RegisterNode(LifeCycleManagement);
-							else
-								await this.UpdateNodeRegistration(LifeCycleManagement);
+							if (LifeCycleManagement.IsProvisioned)
+							{
+								if (string.IsNullOrEmpty(LifeCycleManagement.Owner))
+									await this.RegisterNode(LifeCycleManagement);
+								else
+									await this.UpdateNodeRegistration(LifeCycleManagement);
+							}
+							else if (PreProvisioned)
+								this.UnregisterNode(LifeCycleManagement);
 						}
 					}
 

@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata minClientVersion="3.2">
     <id>Waher.Networking.XMPP.Control.UWP</id>
-    <version>1.0.15</version>
+    <version>1.0.16</version>
     <title>Waher.Networking.XMPP.Control.UWP</title>
     <authors>Peter Waher</authors>
     <owners>Waher Data AB</owners>
@@ -15,13 +15,13 @@
     <copyright>Copyright © Waher Data AB 2016-2018. All rights reserved.</copyright>
     <tags>networking communication xmpp iot actuator control ieee uwp</tags>
     <dependencies>
-      <dependency id="Waher.Content" version="1.0.6"/>
+      <dependency id="Waher.Content" version="1.0.7"/>
       <dependency id="Waher.Content.Xml" version="1.0.2"/>
       <dependency id="Waher.Events" version="1.0.4"/>
       <dependency id="Waher.Networking" version="1.0.4"/>
-      <dependency id="Waher.Networking.XMPP.UWP" version="1.0.14"/>
-      <dependency id="Waher.Networking.XMPP.Provisioning.UWP" version="1.0.16"/>
-      <dependency id="Waher.Things" version="1.0.11"/>
+      <dependency id="Waher.Networking.XMPP.UWP" version="1.0.15"/>
+      <dependency id="Waher.Networking.XMPP.Provisioning.UWP" version="1.0.17"/>
+      <dependency id="Waher.Things" version="1.0.12"/>
     </dependencies>
   </metadata>
   <files>

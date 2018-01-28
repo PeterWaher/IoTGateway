@@ -11,26 +11,6 @@ Client:
 		
 Things.Performance
 
-Nugets:
-	Waher.Content
-	Waher.Networking.XMPP
-	Waher.Networking.XMPP.UWP
-	Waher.Networking.XMPP.Concentrator
-	Waher.Networking.XMPP.Concentrator.UWP
-	Waher.Networking.XMPP.Provisioning
-	Waher.Networking.XMPP.Provisioning.UWP
-	Waher.Networking.XMPP.Sensor
-	Waher.Networking.XMPP.Sensor.UWP
-	Waher.Networking.XMPP.Control
-	Waher.Networking.XMPP.Control.UWP
-	Waher.Networking.XMPP.Chat
-	Waher.Networking.XMPP.Chat.UWP
-	Waher.Things
-	Waher.Things.Metering
-	Waher.Things.Arduino
-	Waher.Things.Gpio
-	Waher.IoTGateway
-
 Update:
 	Client setup
 	Server setup

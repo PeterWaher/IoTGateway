@@ -456,6 +456,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			{
 				FormState State = new FormState()
 				{
+					Form = Parameters,
 					PageByLabel = PageByLabel,
 					SectionByPageAndSectionLabel = SectionByPageAndSectionLabel,
 					DefaultPage = DefaultPage,

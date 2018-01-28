@@ -12,6 +12,11 @@ namespace Waher.Networking.XMPP.DataForms
 	public class FormState
 	{
 		/// <summary>
+		/// Form being built.
+		/// </summary>
+		public DataForm Form;
+
+		/// <summary>
 		/// Pages by page label.
 		/// </summary>
 		public Dictionary<string, Page> PageByLabel;

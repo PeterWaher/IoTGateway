@@ -121,14 +121,7 @@ namespace Waher.Networking.XMPP.Sensor
 
 		internal void Fail(string Reason)
 		{
-			lock (this.synchObject)
-			{
-				if (this.errors == null)
-					this.errors = new List<ThingError>();
-
-				this.errors.Add(new ThingError(string.Empty, string.Empty, string.Empty, DateTime.Now, Reason));
-			}
-
+			this.LogErrors(new ThingError[] { new ThingError(string.Empty, string.Empty, string.Empty, DateTime.Now, Reason) });
 			this.State = SensorDataReadoutState.Failure;
 		}
 

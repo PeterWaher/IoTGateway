@@ -8,10 +8,6 @@ Client:
 * Parameters Dialog
 	* Auto-select first control
 
-Metering Node
-	Provisioning tab
-		QR-code
-		URI
 		
 Things.Performance
 
@@ -45,6 +41,16 @@ Update:
 			Example
 			QR-code
 		hint: R tag
+
+Authorization:
+	Privileges
+		CanView
+		CanEdit
+		CanAdd
+		CanDelete
+	Only owner of concentrator by default
+		Able to add privileges
+		Questions to owner when others try to use privileges not yet defined
 
 
 * Client install:

@@ -884,7 +884,7 @@ namespace Waher.Content
 		/// <summary>
 		/// Calculates the number of decimals of a floating-point number.
 		/// </summary>
-		/// <param name="x">Value</param>
+		/// <param name="s">Value</param>
 		/// <returns>Number of decimals.</returns>
 		private static byte GetNrDecimals(string s)
 		{

@@ -11,15 +11,6 @@ Client:
 		
 Things.Performance
 
-Update:
-	MIoT
-	Chapter 11
-		IoTDisco URIs
-			Code
-			Example
-			QR-code
-		hint: R tag
-
 Authorization:
 	Privileges
 		CanView

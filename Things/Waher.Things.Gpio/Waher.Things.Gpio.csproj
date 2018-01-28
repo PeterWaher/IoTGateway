@@ -121,6 +121,10 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Networking\Waher.Networking.XMPP\Waher.Networking.XMPP.csproj">
+      <Project>{4d96e9bc-6fc0-4866-9e6b-3f5a30de1011}</Project>
+      <Name>Waher.Networking.XMPP</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Persistence\Waher.Persistence\Waher.Persistence.csproj">
       <Project>{0286288f-4af3-4e64-a398-24c8957ceb04}</Project>
       <Name>Waher.Persistence</Name>

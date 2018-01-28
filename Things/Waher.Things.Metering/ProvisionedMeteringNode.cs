@@ -4,10 +4,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Events;
+using Waher.Networking.XMPP.DataForms;
+using Waher.Networking.XMPP.DataForms.FieldTypes;
+using Waher.Networking.XMPP.DataForms.Layout;
 using Waher.Persistence;
 using Waher.Persistence.Attributes;
 using Waher.Persistence.Filters;
+using Waher.Runtime.Inventory;
 using Waher.Runtime.Language;
+using Waher.Runtime.Settings;
 using Waher.Things.Attributes;
 using Waher.Things.DisplayableParameters;
 
@@ -16,7 +21,7 @@ namespace Waher.Things.Metering
 	/// <summary>
 	/// Base class for all provisioned metering nodes.
 	/// </summary>
-	public abstract class ProvisionedMeteringNode : MetaMeteringNode
+	public abstract class ProvisionedMeteringNode : MetaMeteringNode, IPropertyFormAnnotation
 	{
 		private string owner = string.Empty;
 		private bool provisioned = false;
@@ -167,6 +172,38 @@ namespace Waher.Things.Metering
 			else
 				return Task.CompletedTask;
 		}
+
+		/// <summary>
+		/// Annotates the property form.
+		/// </summary>
+		/// <param name="Form">Form being built.</param>
+		public virtual async Task AnnotatePropertyForm(FormState Form)
+		{
+			if (this.provisioned && string.IsNullOrEmpty(this.owner))
+			{
+				string Uri = await RuntimeSettings.GetAsync("IoTDisco.KEY." + this.NodeId + "." + this.SourceId + "." + this.Partition, string.Empty);
+				if (!string.IsNullOrEmpty(Uri))
+				{
+					Language Language = await Translator.GetLanguageAsync(Form.LanguageCode);
+					Namespace Namespace = await Language.GetNamespaceAsync(typeof(MeteringTopology).Namespace);
+					Field Field;
+
+					Field = new TextMultiField(Form.Form, "IoTDiscoUri", await Namespace.GetStringAsync(94, "URI to claim node:"), false,
+						new string[] { Uri }, null, await Namespace.GetStringAsync(95, "The owner can use this URI to claim ownership of the node."),
+						null, null, null, false, true, false)
+					{
+						Priority = HeaderAttribute.DefaultPriority,
+						Ordinal = Form.FieldOrdinal++
+					};
+
+					Form.Fields.Add(Field);
+
+					if (Form.PageByLabel.TryGetValue(await Namespace.GetStringAsync(18, "Provisioning"), out Page Page))
+						Page.Add(new FieldReference(Form.Form, Field.Var));
+				}
+			}
+		}
+
 
 	}
 }

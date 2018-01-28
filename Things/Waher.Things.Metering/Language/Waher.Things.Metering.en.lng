@@ -95,6 +95,8 @@
       <String id="91">Serial number</String>
       <String id="92">Meter Number</String>
       <String id="93">Meter Location</String>
+      <String id="94">URI to claim node:</String>
+      <String id="95">The owner can use this URI to claim ownership of the node.</String>
     </Namespace>
 	</Language>
 </Translation>

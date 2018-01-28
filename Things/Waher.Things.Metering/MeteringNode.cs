@@ -888,7 +888,7 @@ namespace Waher.Things.Metering
 		/// <returns>Meta data.</returns>
 		public virtual Task<KeyValuePair<string, object>[]> GetMetaData()
 		{
-			return Task.FromResult<KeyValuePair<string, object>[]>(new KeyValuePair<string, object>[0]);
+			return Task.FromResult<KeyValuePair<string,object>[]>(new KeyValuePair<string, object>[0]);
 		}
 
 		/// <summary>

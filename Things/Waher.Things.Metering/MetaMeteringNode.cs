@@ -411,6 +411,10 @@ namespace Waher.Things.Metering
 			return Result;
 		}
 
+		/// <summary>
+		/// Gets meta-data about the node.
+		/// </summary>
+		/// <returns>Meta data.</returns>
 		public override async Task<KeyValuePair<string, object>[]> GetMetaData()
 		{
 			List<KeyValuePair<string, object>> Result = new List<KeyValuePair<string, object>>(await base.GetMetaData());
@@ -481,6 +485,11 @@ namespace Waher.Things.Metering
 			return Result.ToArray();
 		}
 
+		/// <summary>
+		/// Adds defined identity fields to a sensor data readout.
+		/// </summary>
+		/// <param name="Fields">List of fields being constructed.</param>
+		/// <param name="Now">Timestamp of readout.</param>
 		public virtual void AddIdentityReadout(List<Field> Fields, DateTime Now)
 		{
 			string Module = typeof(MeteringTopology).Namespace;

@@ -469,7 +469,7 @@ namespace Waher.Client.WPF.Dialogs
 			ComboBox ComboBox = new ComboBox()
 			{
 				Name = "Form_" + Field.Var,
-				IsEnabled = !Field.ReadOnly,
+				IsReadOnly = Field.ReadOnly,
 				ToolTip = Field.Description,
 				Margin = new Thickness(0, 0, 0, 5)
 			};
@@ -868,6 +868,7 @@ namespace Waher.Client.WPF.Dialogs
 			TextBox.AcceptsReturn = true;
 			TextBox.AcceptsTab = true;
 			TextBox.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
+			TextBox.TextWrapping = TextWrapping.Wrap;
 
 			return TextBox;
 		}
@@ -944,7 +945,7 @@ namespace Waher.Client.WPF.Dialogs
 			{
 				Name = "Form_" + Field.Var,
 				Text = Field.ValueString,
-				IsEnabled = !Field.ReadOnly,
+				IsReadOnly = Field.ReadOnly,
 				ToolTip = Field.Description,
 				Margin = new Thickness(0, 0, 0, 5)
 			};

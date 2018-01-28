@@ -12,8 +12,6 @@ Client:
 Things.Performance
 
 Update:
-	Client setup
-	Server setup
 	MIoT
 	Chapter 11
 		IoTDisco URIs

@@ -20,6 +20,8 @@
     <PackageCertificateKeyFile>Waher.IoTGateway.App_TemporaryKey.pfx</PackageCertificateKeyFile>
     <PackageCertificateThumbprint>BA76B44BAE1339500FB9E1B5783BA59DBA1153C2</PackageCertificateThumbprint>
     <AppxBundlePlatforms>x86|x64|arm</AppxBundlePlatforms>
+    <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
+    <AppxBundle>Always</AppxBundle>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <DebugSymbols>true</DebugSymbols>

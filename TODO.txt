@@ -9,7 +9,11 @@ Client:
 	* Auto-select first control
 
 		
-Things.Performance
+Waher.Things.MBus
+Waher.Things.Modbus
+Waher.Things.Performance
+Waher.Security.Acme
+Waher.WebService.Transform (transforms JSON to Text using named templates)
 
 Authorization:
 	Privileges

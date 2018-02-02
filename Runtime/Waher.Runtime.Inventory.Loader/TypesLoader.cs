@@ -44,7 +44,13 @@ namespace Waher.Runtime.Inventory.Loader
 		public static void Initialize(string Folder, LoadFileCallback LoadFile)
 		{
 			if (string.IsNullOrEmpty(Folder))
-				Folder = Path.GetDirectoryName(typeof(TypesLoader).GetTypeInfo().Assembly.Location);
+			{
+				Folder = Assembly.GetExecutingAssembly().Location;
+				if (string.IsNullOrEmpty(Folder))
+					Folder = AppDomain.CurrentDomain.BaseDirectory;
+
+				Folder = Path.GetDirectoryName(Folder);
+			}
 
 			string[] DllFiles = Directory.GetFiles(Folder, "*.dll", SearchOption.TopDirectoryOnly);
 			SortedDictionary<string, Assembly> LoadedAssembliesByName = new SortedDictionary<string, Assembly>(StringComparer.CurrentCultureIgnoreCase);
@@ -58,8 +64,15 @@ namespace Waher.Runtime.Inventory.Loader
 				if (!A.IsDynamic)
 					LoadedAssembliesByLocation[A.Location] = A;
 
-				foreach (AssemblyName AN in A.GetReferencedAssemblies())
-					ReferencedAssemblies[AN.FullName] = AN;
+				try
+				{
+					foreach (AssemblyName AN in A.GetReferencedAssemblies())
+						ReferencedAssemblies[AN.FullName] = AN;
+				}
+				catch (Exception)
+				{
+					// Referenced assemblies might not be accessible.
+				}
 			}
 
 			LoadReferencedAssemblies(LoadedAssembliesByName, LoadedAssembliesByLocation, ReferencedAssemblies);
@@ -83,16 +96,33 @@ namespace Waher.Runtime.Inventory.Loader
 					}
 				}
 
+				AssemblyName AN;
+				Assembly A;
+
 				try
 				{
-					AssemblyName AN = AssemblyName.GetAssemblyName(DllFile);
-					Assembly A = AppDomain.CurrentDomain.Load(AN);
+					try
+					{
+						AN = AssemblyName.GetAssemblyName(DllFile);
+						A = AppDomain.CurrentDomain.Load(AN);
+					}
+					catch (PlatformNotSupportedException)
+					{
+						continue;	// GetAssemblyName() not available on some platforms.
+					}
 
 					LoadedAssembliesByName[A.FullName] = A;
 					LoadedAssembliesByLocation[A.Location] = A;
 
-					foreach (AssemblyName ANRef in A.GetReferencedAssemblies())
-						ReferencedAssemblies[ANRef.FullName] = ANRef;
+					try
+					{
+						foreach (AssemblyName ANRef in A.GetReferencedAssemblies())
+							ReferencedAssemblies[ANRef.FullName] = ANRef;
+					}
+					catch (Exception)
+					{
+						// Referenced assemblies might not be accessible.
+					}
 				}
 				catch (BadImageFormatException ex)
 				{
@@ -119,9 +149,9 @@ namespace Waher.Runtime.Inventory.Loader
 		private static void LogException(BadImageFormatException ex)
 		{
 			List<KeyValuePair<string, object>> Tags = new List<KeyValuePair<string, object>>()
-					{
-						new KeyValuePair<string, object>("FusionLog", ex.FusionLog)
-					};
+			{
+				new KeyValuePair<string, object>("FusionLog", ex.FusionLog)
+			};
 
 			foreach (KeyValuePair<object, object> P in ex.Data)
 				Tags.Add(new KeyValuePair<string, object>(P.Key.ToString(), P.Value));
@@ -150,8 +180,15 @@ namespace Waher.Runtime.Inventory.Loader
 						LoadedAssembliesByName[A.FullName] = A;
 						LoadedAssembliesByLocation[A.Location] = A;
 
-						foreach (AssemblyName AN2 in A.GetReferencedAssemblies())
-							ReferencedAssemblies[AN2.FullName] = AN2;
+						try
+						{
+							foreach (AssemblyName AN2 in A.GetReferencedAssemblies())
+								ReferencedAssemblies[AN2.FullName] = AN2;
+						}
+						catch (Exception)
+						{
+							// Referenced assemblies might not be accessible.
+						}
 					}
 					catch (BadImageFormatException ex)
 					{

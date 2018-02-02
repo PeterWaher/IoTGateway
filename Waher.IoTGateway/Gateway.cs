@@ -588,7 +588,12 @@ namespace Waher.IoTGateway
 		/// </summary>
 		private static void Initialize()
 		{
-			runtimeFolder = Path.GetDirectoryName(typeof(Gateway).GetTypeInfo().Assembly.Location);
+			string Folder = Assembly.GetExecutingAssembly().Location;
+			if (string.IsNullOrEmpty(Folder))
+				Folder = AppDomain.CurrentDomain.BaseDirectory;
+
+			runtimeFolder = Path.GetDirectoryName(Folder);
+
 			Directory.SetCurrentDirectory(runtimeFolder);
 
 			TypesLoader.Initialize(runtimeFolder, (FileName) =>

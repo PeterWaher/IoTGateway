@@ -448,19 +448,26 @@ namespace Waher.Runtime.Inventory
 
 					types[TypeName] = Type;
 
-					foreach (Type Interface in Type.GetTypeInfo().ImplementedInterfaces)
+					try
 					{
-						InterfaceName = Interface.FullName;
-						if (InterfaceName == null)
-							continue;   // Generic interface.
-
-						if (!typesPerInterface.TryGetValue(InterfaceName, out Types))
+						foreach (Type Interface in Type.GetTypeInfo().ImplementedInterfaces)
 						{
-							Types = new SortedDictionary<string, Type>();
-							typesPerInterface[InterfaceName] = Types;
-						}
+							InterfaceName = Interface.FullName;
+							if (InterfaceName == null)
+								continue;   // Generic interface.
 
-						Types[TypeName] = Type;
+							if (!typesPerInterface.TryGetValue(InterfaceName, out Types))
+							{
+								Types = new SortedDictionary<string, Type>();
+								typesPerInterface[InterfaceName] = Types;
+							}
+
+							Types[TypeName] = Type;
+						}
+					}
+					catch (Exception)
+					{
+						// Implemented interfaces might not be accessible.
 					}
 
 					Namespace = Type.Namespace;

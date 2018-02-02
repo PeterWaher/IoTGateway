@@ -1316,7 +1316,7 @@ The following meta-data tags are transparently mapped to HTTP response headers w
 
 ### Access-Control-Allow-Origin
 
-Allows you to define a [Cross-origin resource charing (CORS)](http://www.w3.org/TR/cors/) header.
+Allows you to define a [Cross-origin resource sharing (CORS)](http://www.w3.org/TR/cors/) header.
 
 ### Cache-Control
 

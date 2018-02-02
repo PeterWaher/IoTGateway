@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27130.2010
+VisualStudioVersion = 15.0.27130.2026
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B9E73330-E0D8-4830-BBCF-9A3C57F672D2}"
 	ProjectSection(SolutionItems) = preProject
@@ -2359,6 +2359,8 @@ Global
 		{142C3903-C822-4081-AC2D-DCA8A06F094E}.Debug|x86.Build.0 = Debug|x86
 		{142C3903-C822-4081-AC2D-DCA8A06F094E}.Debug|x86.Deploy.0 = Debug|x86
 		{142C3903-C822-4081-AC2D-DCA8A06F094E}.Release|Any CPU.ActiveCfg = Release|x86
+		{142C3903-C822-4081-AC2D-DCA8A06F094E}.Release|Any CPU.Build.0 = Release|x86
+		{142C3903-C822-4081-AC2D-DCA8A06F094E}.Release|Any CPU.Deploy.0 = Release|x86
 		{142C3903-C822-4081-AC2D-DCA8A06F094E}.Release|ARM.ActiveCfg = Release|ARM
 		{142C3903-C822-4081-AC2D-DCA8A06F094E}.Release|ARM.Build.0 = Release|ARM
 		{142C3903-C822-4081-AC2D-DCA8A06F094E}.Release|ARM.Deploy.0 = Release|ARM

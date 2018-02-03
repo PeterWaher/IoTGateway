@@ -27,6 +27,7 @@ using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Concentrator;
 using Waher.Networking.XMPP.Control;
 using Waher.Networking.XMPP.HTTPX;
+using Waher.Networking.XMPP.InBandBytestreams;
 using Waher.Networking.XMPP.Provisioning;
 using Waher.Networking.XMPP.Sensor;
 using Waher.Runtime.Language;
@@ -1140,6 +1141,22 @@ namespace Waher.IoTGateway
 		public static XmppClient XmppClient
 		{
 			get { return xmppClient; }
+		}
+
+		/// <summary>
+		/// HTTP Server
+		/// </summary>
+		public static HttpServer HttpServer
+		{
+			get { return webServer; }
+		}
+
+		/// <summary>
+		/// CoAP Endpoint
+		/// </summary>
+		public static CoapEndpoint CoapEndpoint
+		{
+			get { return coapEndpoint; }
 		}
 
 		/// <summary>

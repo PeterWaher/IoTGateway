@@ -23,7 +23,7 @@ namespace Waher.Things.Attributes
 	}
 
 	/// <summary>
-	/// Shows a text segment before the parameter.
+	/// Shows a text segment associated with the parameter.
 	/// </summary>
 	[AttributeUsage(AttributeTargets.Property, AllowMultiple = true, Inherited = true)]
 	public class TextAttribute : Attribute
@@ -33,7 +33,7 @@ namespace Waher.Things.Attributes
 		private string label;
 
 		/// <summary>
-		/// Shows a text segment before the parameter.
+		/// Shows a text segment associated with the parameter.
 		/// </summary>
 		/// <param name="Position">Position of text in relation to the field.</param>
 		/// <param name="Label">Label string</param>
@@ -43,7 +43,7 @@ namespace Waher.Things.Attributes
 		}
 
 		/// <summary>
-		/// Shows a text segment before the parameter.
+		/// Shows a text segment associated with the parameter.
 		/// </summary>
 		/// <param name="Position">Position of text in relation to the field.</param>
 		/// <param name="StringId">String ID in the namespace of the current class, in the default language defined for the class.</param>

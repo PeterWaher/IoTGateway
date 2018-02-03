@@ -1256,6 +1256,10 @@ Links to JavaScript files that should be included in the generated HTML page.
 
 Here you can provide a set of keywords describing the contents of the document.
 
+### Login
+
+Link to a login page. This page will be shown if the user variable does not contain a valid user.
+
 ### Master
 
 Points to a master content file that embeds the current file in a `[%Details]` section (if written in Markdown).
@@ -1274,6 +1278,12 @@ they can be parsed as a double number or boolean value.
 
 Link to previous document, in a paginated set of documents.
 
+### Privilege
+
+Requered user privileges to display page. Meta-data tag can be used multiple times, one for each privilege required.
+The `IUser.HasPrivilege` method will be called to check that the valid user has the corresponding privilege, before
+the page is displayed.
+
 ### Refresh
 
 Tells the browser to refresh the page after a given number of seconds.
@@ -1289,6 +1299,10 @@ Provides a means to create a subtitle for the document. If provided, will be sho
 ### Title
 
 Use this key to provide a title for the document. The title of the page will be shown in the browser header or tab.
+
+### UserVariable
+
+Name of the variable that will hold a reference to the `IUser` interface (defined in `Waher.Security`) for the currently logged in user.
 
 ### VideoAutoplay
 

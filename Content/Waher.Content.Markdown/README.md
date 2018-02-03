@@ -125,7 +125,7 @@ generated HTML document. Keys are case insensitive.
 | Image			| Link to image for page.																					 |
 | JavaScript	| Link(s) to JavaScript files(s) that should be includedin the generated HTML page.							 |
 | Keywords		| Keywords.																									 |
-| Login			| Link to a login page. This page will be shown if the user variable does not contain a user.                |
+| Login			| Link to a login page. This page will be shown if the user variable does not contain a valid user.          |
 | Next			| Link to next document, in a paginated set of documents.													 |
 | Parameter     | Name of a query parameter recognized by the page.                                                          |
 | Prev			| Synonymous with Previous.																					 |

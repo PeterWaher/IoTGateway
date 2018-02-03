@@ -21,10 +21,10 @@ namespace Waher.Utility.Install
 	/// -d APP_DATA_FOLDER   Points to the application data folder.
 	/// -s SERVER_EXE        Points to the executable file of the IoT Gateway.
 	/// -v                   Verbose mode.
-	/// -i                   Install. This the default. Switch not required.
+	/// -i                   Install. This is the default. Switch not required.
 	/// -u                   Uninstall. Add this switch if the module is being uninstalled.
 	/// -r                   Remove files. Add this switch if you want files removed during
-	///                      uninstalltion. Default is to not remove files.
+	///                      uninstallation. Default is to not remove files.
 	/// -?                   Help.
 	/// </summary>
 	class Program
@@ -114,7 +114,7 @@ namespace Waher.Utility.Install
 					Console.Out.WriteLine("-i                   Install. This the default. Switch not required.");
 					Console.Out.WriteLine("-u                   Uninstall. Add this switch if the module is being uninstalled.");
 					Console.Out.WriteLine("-r                   Remove files. Add this switch if you want files removed during");
-					Console.Out.WriteLine("                     uninstalltion. Default is to not remove files.");
+					Console.Out.WriteLine("                     uninstallation. Default is to not remove files.");
 					Console.Out.WriteLine("-?                   Help.");
 					return 0;
 				}

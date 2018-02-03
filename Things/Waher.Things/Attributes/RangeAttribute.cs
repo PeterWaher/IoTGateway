@@ -22,8 +22,8 @@ namespace Waher.Things.Attributes
 		/// <param name="Max">Largest accepted value. Can be null, if no maximum exists.</param>
 		public RangeAttribute(object Min, object Max)
 		{
-			this.min = Min == null ? null : Min.ToString();
-			this.max = Max == null ? null : Max.ToString();
+			this.min = Min?.ToString();
+			this.max = Max?.ToString();
 		}
 
 		/// <summary>

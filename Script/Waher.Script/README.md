@@ -892,10 +892,12 @@ The following functions are available in the [Waher.Script.Statistics](../Waher.
 
 | Function | Description | Example |
 |----------|-------------|---------|
-| `Exponential([Mean[,N]])`    | Generates a random number using the exponential distribution. If no `Mean` is given, the mean is assumed to be 1. If `N` is provided, a vector with random elements is returned. | `Exponential(3,100)` |
+| `Chi2(Degrees[,N]])`         | Generates a random number using the chi squared distribution. If `N` is provided, a vector with random elements is returned. | `[Labels,Counts]:=Histogram(Chi2(6,10000),0,20,10);VerticalBars(Labels,Counts)` |
+| `Exponential([Mean[,N]])`    | Generates a random number using the exponential distribution. If no `Mean` is given, the mean is assumed to be 1. If `N` is provided, a vector with random elements is returned. | `[Labels,Counts]:=Histogram(Exponential(3,10000),0,10,10);VerticalBars(Labels,Counts)` |
+| `Gamma(Shape,Scale[,N]])`    | Generates a random number using the gamma distribution. If `N` is provided, a vector with random elements is returned. | `[Labels,Counts]:=Histogram(Gamma(3,3,10000),0,20,10);VerticalBars(Labels,Counts)` |
 | `Histogram(V,Min,Max,N)`     | Calculates the histogram of a set of data `V` with `N` buckets between `Min` and `Max`. | `[Labels,Counts]:=Histogram(Uniform(0,10,10000),0,10,10);VerticalBars(Labels,Counts)` |
-| `Normal([Mean,StdDev][,N]])` | Generates a random number using the normal distribution. If no `Mean` and standard deviation `StdDev` is given, the mean is assumed to be 0 and standarddeviation assumed to be 1. If `N` is provided, a vector with random elements is returned. | `Normal(10,5,100)` |
-| `Uniform([Min,Max][,N]])`    | Generates a random number using the uniform distribution. If no interval is given, the standard interval [0,1] is assumed. If `N` is provided, a vector with random elements is returned. | `Uniform(1,10,100)` |
+| `Normal([Mean,StdDev][,N]])` | Generates a random number using the normal distribution. If no `Mean` and standard deviation `StdDev` is given, the mean is assumed to be 0 and standarddeviation assumed to be 1. If `N` is provided, a vector with random elements is returned. | `[Labels,Counts]:=Histogram(Normal(0,5,10000),-20,20,10);VerticalBars(Labels,Counts)` |
+| `Uniform([Min,Max][,N]])`    | Generates a random number using the uniform distribution. If no interval is given, the standard interval [0,1] is assumed. If `N` is provided, a vector with random elements is returned. | `[Labels,Counts]:=Histogram(Uniform(0,10,10000),0,10,10);VerticalBars(Labels,Counts)` |
 
 #### Content-related functions (Waher.Content)
 

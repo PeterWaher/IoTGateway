@@ -30,7 +30,7 @@ namespace Waher.Security.DTLS.Ciphers
 				throw new ArgumentException("Valid Tlen values are 4, 6, 8, 10, 12, 14 and 16.", nameof(Tlen));
 
 			if (Nlen < 7 || Nlen > 13)
-				throw new ArgumentException("Valid Nlen values are 7-13.", nameof(Nlen));
+				throw new ArgumentOutOfRangeException("Valid Nlen values are 7-13.", nameof(Nlen));
 
 			this.aes = Aes.Create();
 			this.t = Tlen;

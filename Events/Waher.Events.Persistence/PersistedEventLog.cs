@@ -36,7 +36,7 @@ namespace Waher.Events.Persistence
 			: base("Persisted Event Log")
 		{
 			if (EventLifetimeDays <= 0)
-				throw new ArgumentException("The lifetime must be a positive number of days.", nameof(EventLifetimeDays));
+				throw new ArgumentOutOfRangeException("The lifetime must be a positive number of days.", nameof(EventLifetimeDays));
 
 			this.eventLifetimeDays = EventLifetimeDays;
 
@@ -56,7 +56,7 @@ namespace Waher.Events.Persistence
 			this.TurnOffDailyPurge();
 
 			if (CleanupTime < TimeSpan.Zero || CleanupTime.TotalDays >= 1.0)
-				throw new ArgumentException("Invalid time.", nameof(CleanupTime));
+				throw new ArgumentOutOfRangeException("Invalid time.", nameof(CleanupTime));
 
 			int MillisecondsPerDay = 1000 * 60 * 60 * 24;
 			int MsUntilNext = (int)((DateTime.Today.AddDays(1).Add(CleanupTime) - DateTime.Now).TotalMilliseconds + 0.5);

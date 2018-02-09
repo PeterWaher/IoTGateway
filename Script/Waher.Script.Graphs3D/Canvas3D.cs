@@ -45,13 +45,13 @@ namespace Waher.Script.Graphs3D
 		public Canvas3D(int Width, int Height, int Oversampling, SKColor BackgroundColor)
 		{
 			if (Width <= 0)
-				throw new ArgumentException("Width must be a positive integer.", nameof(Width));
+				throw new ArgumentOutOfRangeException("Width must be a positive integer.", nameof(Width));
 
 			if (Height <= 0)
-				throw new ArgumentException("Height must be a positive integer.", nameof(Height));
+				throw new ArgumentOutOfRangeException("Height must be a positive integer.", nameof(Height));
 
 			if (Oversampling <= 0)
-				throw new ArgumentException("Oversampling must be a positive integer.", nameof(Oversampling));
+				throw new ArgumentOutOfRangeException("Oversampling must be a positive integer.", nameof(Oversampling));
 
 			this.width = Width;
 			this.height = Height;
@@ -196,7 +196,7 @@ namespace Waher.Script.Graphs3D
 		public void ProjectZ(float Distance)
 		{
 			if (Distance <= 0)
-				throw new ArgumentException("Invalid camera distance.", nameof(Distance));
+				throw new ArgumentOutOfRangeException("Invalid camera distance.", nameof(Distance));
 
 			this.distance = Distance;
 			this.viewerPosition = new Vector3(this.cx, this.cy, -this.distance);

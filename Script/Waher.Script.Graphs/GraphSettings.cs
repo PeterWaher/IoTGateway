@@ -42,7 +42,7 @@ namespace Waher.Script.Graphs
 			set
 			{
 				if (value < 1)
-					throw new ArgumentException("Value must be positive.", nameof(Width));
+					throw new ArgumentOutOfRangeException("Value must be positive.", nameof(Width));
 
 				this.width = value;
 			}
@@ -57,7 +57,7 @@ namespace Waher.Script.Graphs
 			set
 			{
 				if (value < 1)
-					throw new ArgumentException("Value must be positive.", nameof(Height));
+					throw new ArgumentOutOfRangeException("Value must be positive.", nameof(Height));
 
 				this.height = value;
 			}
@@ -90,7 +90,7 @@ namespace Waher.Script.Graphs
 			set
 			{
 				if (value < 0)
-					throw new ArgumentException("Value must be non-negative.", nameof(AxisWidth));
+					throw new ArgumentOutOfRangeException("Value must be non-negative.", nameof(AxisWidth));
 
 				this.axisWidth = value;
 			}
@@ -114,7 +114,7 @@ namespace Waher.Script.Graphs
 			set
 			{
 				if (value < 0)
-					throw new ArgumentException("Value must be non-negative.", nameof(GridWidth));
+					throw new ArgumentOutOfRangeException("Value must be non-negative.", nameof(GridWidth));
 
 				this.gridWidth = value;
 			}
@@ -129,7 +129,7 @@ namespace Waher.Script.Graphs
 			set
 			{
 				if (value < 0)
-					throw new ArgumentException("Value must be non-negative.", nameof(MarginTop));
+					throw new ArgumentOutOfRangeException("Value must be non-negative.", nameof(MarginTop));
 
 				this.marginTop = value;
 			}
@@ -144,7 +144,7 @@ namespace Waher.Script.Graphs
 			set
 			{
 				if (value < 0)
-					throw new ArgumentException("Value must be non-negative.", nameof(MarginBottom));
+					throw new ArgumentOutOfRangeException("Value must be non-negative.", nameof(MarginBottom));
 
 				this.marginBottom = value;
 			}
@@ -159,7 +159,7 @@ namespace Waher.Script.Graphs
 			set
 			{
 				if (value < 0)
-					throw new ArgumentException("Value must be non-negative.", nameof(MarginLeft));
+					throw new ArgumentOutOfRangeException("Value must be non-negative.", nameof(MarginLeft));
 
 				this.marginLeft = value;
 			}
@@ -174,7 +174,7 @@ namespace Waher.Script.Graphs
 			set
 			{
 				if (value < 0)
-					throw new ArgumentException("Value must be non-negative.", nameof(MarginRight));
+					throw new ArgumentOutOfRangeException("Value must be non-negative.", nameof(MarginRight));
 
 				this.marginRight = value;
 			}
@@ -189,7 +189,7 @@ namespace Waher.Script.Graphs
 			set
 			{
 				if (value < 0)
-					throw new ArgumentException("Value must be non-negative.", nameof(MarginLabel));
+					throw new ArgumentOutOfRangeException("Value must be non-negative.", nameof(MarginLabel));
 
 				this.marginLabel = value;
 			}
@@ -219,7 +219,7 @@ namespace Waher.Script.Graphs
 			set
 			{
 				if (value < 0)
-					throw new ArgumentException("Value must be positive.", nameof(LabelFontSize));
+					throw new ArgumentOutOfRangeException("Value must be positive.", nameof(LabelFontSize));
 
 				this.labelFontSize = value;
 			}
@@ -234,7 +234,7 @@ namespace Waher.Script.Graphs
 			set
 			{
 				if (value < 0)
-					throw new ArgumentException("Value must be non-negative.", nameof(ApproxNrLabelsX));
+					throw new ArgumentOutOfRangeException("Value must be non-negative.", nameof(ApproxNrLabelsX));
 
 				this.approxNrLabelsX = value;
 			}
@@ -249,7 +249,7 @@ namespace Waher.Script.Graphs
 			set
 			{
 				if (value < 0)
-					throw new ArgumentException("Value must be non-negative.", nameof(ApproxNrLabelsY));
+					throw new ArgumentOutOfRangeException("Value must be non-negative.", nameof(ApproxNrLabelsY));
 
 				this.approxNrLabelsY = value;
 			}

@@ -159,7 +159,7 @@ namespace Waher.Security.DTLS
 			{
 				if (value < 0 || value > 1)
 				{
-					throw new ArgumentException("Valid probabilities lie between 0 and 1.",
+					throw new ArgumentOutOfRangeException("Valid probabilities lie between 0 and 1.",
 						nameof(ProbabilityPacketLoss));
 				}
 

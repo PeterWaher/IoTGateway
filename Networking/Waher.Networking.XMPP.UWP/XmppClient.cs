@@ -5732,7 +5732,7 @@ namespace Waher.Networking.XMPP
 			set
 			{
 				if (value <= 0)
-					throw new ArgumentException("Value must be positive.", nameof(KeepAliveSeconds));
+					throw new ArgumentOutOfRangeException("Value must be positive.", nameof(KeepAliveSeconds));
 
 				this.keepAliveSeconds = value;
 			}
@@ -5769,7 +5769,7 @@ namespace Waher.Networking.XMPP
 			set
 			{
 				if (value <= 0)
-					throw new ArgumentException("Value must be positive.", nameof(MaxAssuredMessagesPendingFromSource));
+					throw new ArgumentOutOfRangeException("Value must be positive.", nameof(MaxAssuredMessagesPendingFromSource));
 
 				this.maxAssuredMessagesPendingFromSource = value;
 			}
@@ -5784,7 +5784,7 @@ namespace Waher.Networking.XMPP
 			set
 			{
 				if (value <= 0)
-					throw new ArgumentException("Value must be positive.", nameof(MaxAssuredMessagesPendingTotal));
+					throw new ArgumentOutOfRangeException("Value must be positive.", nameof(MaxAssuredMessagesPendingTotal));
 
 				this.maxAssuredMessagesPendingTotal = value;
 			}
@@ -5800,7 +5800,7 @@ namespace Waher.Networking.XMPP
 			set
 			{
 				if (value <= 0)
-					throw new ArgumentException("Value must be positive.", nameof(DefaultRetryTimeout));
+					throw new ArgumentOutOfRangeException("Value must be positive.", nameof(DefaultRetryTimeout));
 
 				this.defaultRetryTimeout = value;
 			}
@@ -5816,7 +5816,7 @@ namespace Waher.Networking.XMPP
 			set
 			{
 				if (value <= 0)
-					throw new ArgumentException("Value must be positive.", nameof(DefaultNrRetries));
+					throw new ArgumentOutOfRangeException("Value must be positive.", nameof(DefaultNrRetries));
 
 				this.defaultNrRetries = value;
 			}
@@ -5832,7 +5832,7 @@ namespace Waher.Networking.XMPP
 			set
 			{
 				if (value <= 0)
-					throw new ArgumentException("Value must be positive.", nameof(DefaultMaxRetryTimeout));
+					throw new ArgumentOutOfRangeException("Value must be positive.", nameof(DefaultMaxRetryTimeout));
 
 				this.defaultMaxRetryTimeout = value;
 			}

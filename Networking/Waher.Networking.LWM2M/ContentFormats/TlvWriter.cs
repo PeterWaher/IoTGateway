@@ -45,7 +45,7 @@ namespace Waher.Networking.LWM2M.ContentFormats
 				b |= 32;
 
 			if (c > 0xffffff)
-				throw new ArgumentException("Value too large.", nameof(Value));
+				throw new ArgumentOutOfRangeException("Value too large.", nameof(Value));
 			else if (c > 0xffff)
 				b |= 24;
 			else if (c > 0xff)

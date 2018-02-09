@@ -203,7 +203,7 @@ namespace Waher.Persistence.Files
 			ObjectBTreeFile.CheckBlockSizes(BlockSize, BlobBlockSize);
 
 			if (TimeoutMilliseconds <= 0)
-				throw new ArgumentException("The timeout must be positive.", nameof(TimeoutMilliseconds));
+				throw new ArgumentOutOfRangeException("The timeout must be positive.", nameof(TimeoutMilliseconds));
 
 			this.id = Guid.NewGuid().ToString().Replace("-", string.Empty);
 			this.defaultCollectionName = DefaultCollectionName;

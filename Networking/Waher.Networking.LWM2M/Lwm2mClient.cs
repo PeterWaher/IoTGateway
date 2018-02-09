@@ -476,7 +476,7 @@ namespace Waher.Networking.LWM2M
 		public void Register(int LifetimeSeconds, params Lwm2mServerReference[] Servers)
 		{
 			if (LifetimeSeconds <= 0)
-				throw new ArgumentException("Expected positive integer.", nameof(LifetimeSeconds));
+				throw new ArgumentOutOfRangeException("Expected positive integer.", nameof(LifetimeSeconds));
 
 			this.serverReferences = Servers;
 			this.lastLinks = this.EncodeObjectLinks(false);

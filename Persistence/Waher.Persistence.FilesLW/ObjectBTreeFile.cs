@@ -177,7 +177,7 @@ namespace Waher.Persistence.Files
 			CheckBlockSizes(BlockSize, BlobBlockSize);
 
 			if (TimeoutMilliseconds <= 0)
-				throw new ArgumentException("The timeout must be positive.", nameof(TimeoutMilliseconds));
+				throw new ArgumentOutOfRangeException("The timeout must be positive.", nameof(TimeoutMilliseconds));
 
 			this.provider = Provider;
 			this.id = this.provider.GetNewFileId();
@@ -268,16 +268,16 @@ namespace Waher.Persistence.Files
 		internal static void CheckBlockSizes(int BlockSize, int BlobBlockSize)
 		{
 			if (BlockSize < 1024)
-				throw new ArgumentException("Block size too small.", nameof(BlockSize));
+				throw new ArgumentOutOfRangeException("Block size too small.", nameof(BlockSize));
 
 			if (BlockSize > 65536)
-				throw new ArgumentException("Block size too large.", nameof(BlockSize));
+				throw new ArgumentOutOfRangeException("Block size too large.", nameof(BlockSize));
 
 			if (BlobBlockSize < 1024)
-				throw new ArgumentException("BLOB Block size too small.", nameof(BlobBlockSize));
+				throw new ArgumentOutOfRangeException("BLOB Block size too small.", nameof(BlobBlockSize));
 
 			if (BlobBlockSize > 65536)
-				throw new ArgumentException("BLOB Block size too large.", nameof(BlobBlockSize));
+				throw new ArgumentOutOfRangeException("BLOB Block size too large.", nameof(BlobBlockSize));
 
 			int i = BlockSize;
 			while (i != 0 && (i & 1) == 0)
@@ -624,7 +624,7 @@ namespace Waher.Persistence.Files
 			}
 
 			if (PhysicalPosition != this.file.Seek(PhysicalPosition, SeekOrigin.Begin))
-				throw new ArgumentException("Invalid file position.", nameof(PhysicalPosition));
+				throw new ArgumentOutOfRangeException("Invalid file position.", nameof(PhysicalPosition));
 
 			Block = new byte[this.blockSize];
 
@@ -721,7 +721,7 @@ namespace Waher.Persistence.Files
 				EncryptedBlock = (byte[])Block.Clone();
 
 			if (PhysicalPosition != this.file.Seek(PhysicalPosition, SeekOrigin.Begin))
-				throw new ArgumentException("Invalid file position.", nameof(PhysicalPosition));
+				throw new ArgumentOutOfRangeException("Invalid file position.", nameof(PhysicalPosition));
 
 			await this.file.WriteAsync(EncryptedBlock, 0, this.blockSize);
 

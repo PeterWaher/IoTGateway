@@ -905,9 +905,8 @@ namespace Waher.Script
 					int Start = Left.Start;
 					string[] ArgumentNames;
 					ArgumentType[] ArgumentTypes;
-					VariableReference Ref;
-
-					if ((Ref = Left as VariableReference) != null)
+					
+					if (Left is VariableReference Ref)
 					{
 						ArgumentNames = new string[] { Ref.VariableName };
 						ArgumentTypes = new ArgumentType[] { ArgumentType.Normal };
@@ -2033,7 +2032,7 @@ namespace Waher.Script
 						return this.ParseSuffixOperator();
 					}
 					else
-						return new Negate(this.AssertOperandNotNull(this.ParseUnaryPrefixOperator()), Start, this.pos - Start, this);
+						return new Negate(this.AssertOperandNotNull(this.ParseFactors()), Start, this.pos - Start, this);
 
 				case '+':
 					this.pos++;
@@ -2049,7 +2048,7 @@ namespace Waher.Script
 					else if ((ch >= '0' && ch <= '9') || (ch == '.'))
 						return this.ParseSuffixOperator();
 					else
-						return this.AssertOperandNotNull(this.ParseUnaryPrefixOperator());
+						return this.AssertOperandNotNull(this.ParseFactors());
 
 				case '!':
 					this.pos++;
@@ -2902,11 +2901,9 @@ namespace Waher.Script
 							}
 							catch (Exception ex)
 							{
-								AggregateException ex2;
-
 								ex = Log.UnnestException(ex);
 
-								if ((ex2 = ex as AggregateException) != null)
+								if (ex is AggregateException ex2)
 								{
 									foreach (Exception ex3 in ex2.InnerExceptions)
 										Log.Critical(ex3);

@@ -79,7 +79,7 @@ namespace Waher.Script.Statistics.Functions
 
 					if (x >= Min && x <= Max)
 					{
-						i = (int)(x * Scale);
+						i = (int)((x - Min) * Scale);
 						if (i == N)
 							i--;
 
@@ -107,7 +107,7 @@ namespace Waher.Script.Statistics.Functions
 
 					if (x >= Min && x <= Max)
 					{
-						i = (int)(x * Scale);
+						i = (int)((x - Min) * Scale);
 						if (i == N)
 							i--;
 

@@ -140,7 +140,11 @@ namespace Waher.Script.Statistics.Functions
             }
         }
 
-        private static ulong NextULong()
+		/// <summary>
+		/// Gets a random 64-bit unsigned integer.
+		/// </summary>
+		/// <returns>Random value.</returns>
+        public static ulong NextULong()
         {
             byte[] Bin = new byte[8];
 
@@ -152,7 +156,11 @@ namespace Waher.Script.Statistics.Functions
             return BitConverter.ToUInt64(Bin, 0);
         }
 
-        private static double NextDouble()
+		/// <summary>
+		/// Gets a random value in [0,1).
+		/// </summary>
+		/// <returns>Random value.</returns>
+		public static double NextDouble()
         {
             byte[] Bin = new byte[8];
 
@@ -167,5 +175,5 @@ namespace Waher.Script.Statistics.Functions
             return l / maxD;
         }
 
-    }
+	}
 }

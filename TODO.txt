@@ -71,7 +71,6 @@ Graph properties:
 
 Statistics:
 * Probability density functions
-* Random variables for various distributions
 
 
 Upgrade:

@@ -892,6 +892,7 @@ The following functions are available in the [Waher.Script.Statistics](../Waher.
 
 | Function | Description | Example |
 |----------|-------------|---------|
+| `Histogram(V,Min,Max,N)`  | Calculates the histogram of a set of data `V` with `N` buckets between `Min` and `Max`. | `[Labels,Counts]:=Histogram(Uniform(0,10,10000),0,10,10);VerticalBars(Labels,Counts)` |
 | `Uniform([Min,Max][,N]])` | Generates a random number using the uniform distribution. If no interval is given, the standard interval [0,1] is assumed. If `N` is provided, a vector with random elements is returned. | `Uniform(1,10,100)` |
 
 #### Content-related functions (Waher.Content)

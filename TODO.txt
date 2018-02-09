@@ -70,7 +70,6 @@ Graph properties:
 * Graph.FontName
 
 Statistics:
-* Histogram(Vector,Min,Max,NrBuckets)																			https://en.wikipedia.org/wiki/Histogram		Example: [Labels,Counts]:=Histogram(V,10);Plot2DVerticalBars(Labels,Counts);
 * Probability density functions
 * Random variables for various distributions
 
@@ -146,6 +145,8 @@ XEP-0347:
 * Example 47: Bare JID in jid attribute in example.
 * <myThings> (with pagination): Return list of things owned by sender. (In case an app is run on a new device, 
 	and friendships are not registered or desireable).
+* Remove dependencies on 0323-0326
+* R tag
 
 XEP-0332:
 * Socks5 attribute (s5).

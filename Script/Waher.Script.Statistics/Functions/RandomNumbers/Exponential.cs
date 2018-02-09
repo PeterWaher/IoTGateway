@@ -109,7 +109,7 @@ namespace Waher.Script.Statistics.Functions
 		/// Gets a exponentially distributed random value. Distribution has a mean of 0 and standard deviation of 1.
 		/// </summary>
 		/// <returns>Random value.</returns>
-		private static double NextDouble()
+		public static double NextDouble()
         {
 			return -Math.Log(Uniform.NextDouble());
 		}

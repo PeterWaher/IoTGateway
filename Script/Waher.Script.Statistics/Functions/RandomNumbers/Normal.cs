@@ -140,7 +140,7 @@ namespace Waher.Script.Statistics.Functions
 		/// Gets a normally distributed random value. Distribution has a mean of 0 and standard deviation of 1.
 		/// </summary>
 		/// <returns>Random value.</returns>
-		private static double NextDouble()
+		public static double NextDouble()
         {
 			double U1 = Uniform.NextDouble();
 			double U2 = Uniform.NextDouble();

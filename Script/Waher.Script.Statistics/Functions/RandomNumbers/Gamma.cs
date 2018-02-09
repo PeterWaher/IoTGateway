@@ -57,7 +57,7 @@ namespace Waher.Script.Statistics.Functions
 		/// </summary>
 		public override string[] DefaultArgumentNames
 		{
-			get { return new string[] { "shape", "scale" }; }
+			get { return new string[] { "shape", "scale", "N" }; }
 		}
 
 		/// <summary>

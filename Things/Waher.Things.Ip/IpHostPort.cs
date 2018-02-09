@@ -15,7 +15,7 @@ namespace Waher.Things.IP
 		/// <summary>
 		/// Port number.
 		/// </summary>
-		[Page(1, "IP", 0)]
+		[Page(1, "IP")]
 		[Header(4, "Port Number:", 60)]
 		[ToolTip(5, "Port number to use when communicating with device.")]
 		[DefaultValue(0)]

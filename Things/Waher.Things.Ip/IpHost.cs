@@ -49,7 +49,7 @@ namespace Waher.Things.IP
 		/// <summary>
 		/// Host name or IP address.
 		/// </summary>
-		[Page(1, "IP", 0)]
+		[Page(1, "IP")]
 		[Header(2, "Host Name:", 50)]
 		[ToolTip(3, "Host Name or IP Address of device.")]
 		[DefaultValueStringEmpty]
@@ -124,11 +124,11 @@ namespace Waher.Things.IP
 						case IPStatus.DestinationProhibited:
 							Request.ReportErrors(true, new ThingError(this, Now, "Destination prohibited"));
 							break;
-							/*
-						case IPStatus.DestinationProtocolUnreachable:
-							Request.ReportErrors(true, new ThingError(this, Now, "Destination protocol unreachable"));
-							break;
-							*/
+						/*
+					case IPStatus.DestinationProtocolUnreachable:
+						Request.ReportErrors(true, new ThingError(this, Now, "Destination protocol unreachable"));
+						break;
+						*/
 						case IPStatus.DestinationScopeMismatch:
 							Request.ReportErrors(true, new ThingError(this, Now, "Destination scope mismatch"));
 							break;
@@ -187,6 +187,13 @@ namespace Waher.Things.IP
 							break;
 					}
 				}
+			}
+			catch (PingException ex)
+			{
+				if (ex.InnerException != null)
+					Request.ReportErrors(true, new ThingError(this, ex.InnerException.Message));
+				else
+					Request.ReportErrors(true, new ThingError(this, ex.Message));
 			}
 			catch (Exception ex)
 			{

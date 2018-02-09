@@ -999,6 +999,7 @@ The following functions are available in the [Waher.Script.Statistics](../Waher.
 
 | Function | Description | Example |
 |----------|-------------|---------|
+| `Exponential([Mean[,N]])`    | Generates a random number using the exponential distribution. If no `Mean` is given, the mean is assumed to be 1. If `N` is provided, a vector with random elements is returned. | `Exponential(3,100)` |
 | `Histogram(V,Min,Max,N)`     | Calculates the histogram of a set of data `V` with `N` buckets between `Min` and `Max`. | `[Labels,Counts]:=Histogram(Uniform(0,10,10000),0,10,10);VerticalBars(Labels,Counts)` |
 | `Normal([Mean,StdDev][,N]])` | Generates a random number using the normal distribution. If no `Mean` and standard deviation `StdDev` is given, the mean is assumed to be 0 and standarddeviation assumed to be 1. If `N` is provided, a vector with random elements is returned. | `Normal(10,5,100)` |
 | `Uniform([Min,Max][,N]])`    | Generates a random number using the uniform distribution. If no interval is given, the standard interval [0,1] is assumed. If `N` is provided, a vector with random elements is returned. | `Uniform(1,10,100)` |

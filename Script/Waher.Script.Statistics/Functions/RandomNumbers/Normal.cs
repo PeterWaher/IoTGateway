@@ -18,8 +18,6 @@ namespace Waher.Script.Statistics.Functions
         private static readonly ArgumentType[] argumentTypes2Parameters = new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Scalar, };
         private static readonly ArgumentType[] argumentTypes1Parameters = new ArgumentType[] { ArgumentType.Scalar };
         private static readonly ArgumentType[] argumentTypes0Parameters = new ArgumentType[] { };
-		private static RandomNumberGenerator rnd = RandomNumberGenerator.Create();
-		private const double maxD = ((double)(1UL << 53));
 
 		/// <summary>
 		/// Generates a random number using the normal distribution.

@@ -47,6 +47,9 @@
     <ProjectReference Include="..\Script\Waher.Script.Persistence\Waher.Script.Persistence.csproj" />
     <ProjectReference Include="..\Script\Waher.Script.Statistics\Waher.Script.Statistics.csproj" />
     <ProjectReference Include="..\Script\Waher.Script\Waher.Script.csproj" />
+    <ProjectReference Include="..\Things\Waher.Things.Ip\Waher.Things.Ip.csproj" />
+    <ProjectReference Include="..\Things\Waher.Things.Metering\Waher.Things.Metering.csproj" />
+    <ProjectReference Include="..\Things\Waher.Things\Waher.Things.csproj" />
     <ProjectReference Include="..\Waher.IoTGateway.Resources\Waher.IoTGateway.Resources.csproj" />
     <ProjectReference Include="..\Waher.IoTGateway\Waher.IoTGateway.csproj" />
     <ProjectReference Include="..\WebServices\Waher.WebService.Script\Waher.WebService.Script.csproj" />

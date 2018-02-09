@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Translation xmlns="http://waher.se/Schema/Translation.xsd">
+	<Language code="en" name="English">
+		<Namespace name="Waher.Things.IP">
+      <String id="1">IP</String>
+      <String id="2">Host Name:</String>
+      <String id="3">Host Name or IP Address of device.</String>
+      <String id="4">Port Number:</String>
+      <String id="5">Port number to use when communicating with device.</String>
+      <String id="6">IP Host</String>
+      <String id="7">Ping</String>
+      <String id="8">IP Address</String>
+    </Namespace>
+	</Language>
+</Translation>

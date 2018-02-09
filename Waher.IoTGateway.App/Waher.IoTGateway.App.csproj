@@ -333,6 +333,10 @@
       <Project>{f074513c-4099-4438-956e-a2c9952757b5}</Project>
       <Name>Waher.Things.Gpio</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Things\Waher.Things.Ip\Waher.Things.Ip.csproj">
+      <Project>{296512ea-c5de-43c8-a1c5-b20ccf4b7f60}</Project>
+      <Name>Waher.Things.Ip</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Things\Waher.Things.Metering\Waher.Things.Metering.csproj">
       <Project>{47d09596-eb38-40a6-b233-e465e3152e44}</Project>
       <Name>Waher.Things.Metering</Name>

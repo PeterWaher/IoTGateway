@@ -274,6 +274,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Things.Gpio", "Things
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Things.Arduino", "Things\Waher.Things.Arduino\Waher.Things.Arduino.csproj", "{99859282-A034-4014-BB69-A21728B3169F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Things.Ip", "Things\Waher.Things.Ip\Waher.Things.Ip.csproj", "{296512EA-C5DE-43C8-A1C5-B20CCF4B7F60}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -2413,6 +2415,26 @@ Global
 		{99859282-A034-4014-BB69-A21728B3169F}.Release|x64.Build.0 = Release|x64
 		{99859282-A034-4014-BB69-A21728B3169F}.Release|x86.ActiveCfg = Release|x86
 		{99859282-A034-4014-BB69-A21728B3169F}.Release|x86.Build.0 = Release|x86
+		{296512EA-C5DE-43C8-A1C5-B20CCF4B7F60}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{296512EA-C5DE-43C8-A1C5-B20CCF4B7F60}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{296512EA-C5DE-43C8-A1C5-B20CCF4B7F60}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{296512EA-C5DE-43C8-A1C5-B20CCF4B7F60}.Debug|ARM.Build.0 = Debug|Any CPU
+		{296512EA-C5DE-43C8-A1C5-B20CCF4B7F60}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{296512EA-C5DE-43C8-A1C5-B20CCF4B7F60}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{296512EA-C5DE-43C8-A1C5-B20CCF4B7F60}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{296512EA-C5DE-43C8-A1C5-B20CCF4B7F60}.Debug|x64.Build.0 = Debug|Any CPU
+		{296512EA-C5DE-43C8-A1C5-B20CCF4B7F60}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{296512EA-C5DE-43C8-A1C5-B20CCF4B7F60}.Debug|x86.Build.0 = Debug|Any CPU
+		{296512EA-C5DE-43C8-A1C5-B20CCF4B7F60}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{296512EA-C5DE-43C8-A1C5-B20CCF4B7F60}.Release|Any CPU.Build.0 = Release|Any CPU
+		{296512EA-C5DE-43C8-A1C5-B20CCF4B7F60}.Release|ARM.ActiveCfg = Release|Any CPU
+		{296512EA-C5DE-43C8-A1C5-B20CCF4B7F60}.Release|ARM.Build.0 = Release|Any CPU
+		{296512EA-C5DE-43C8-A1C5-B20CCF4B7F60}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{296512EA-C5DE-43C8-A1C5-B20CCF4B7F60}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{296512EA-C5DE-43C8-A1C5-B20CCF4B7F60}.Release|x64.ActiveCfg = Release|Any CPU
+		{296512EA-C5DE-43C8-A1C5-B20CCF4B7F60}.Release|x64.Build.0 = Release|Any CPU
+		{296512EA-C5DE-43C8-A1C5-B20CCF4B7F60}.Release|x86.ActiveCfg = Release|Any CPU
+		{296512EA-C5DE-43C8-A1C5-B20CCF4B7F60}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -2516,6 +2538,7 @@ Global
 		{AEE6DB4E-55C2-4B36-B723-7164E1ABA723} = {1A06B80C-EDAE-46B3-B7B3-6F641EE03BA6}
 		{F074513C-4099-4438-956E-A2C9952757B5} = {F3F09E8E-51C5-4F8B-A4F4-E17F8FC204C1}
 		{99859282-A034-4014-BB69-A21728B3169F} = {F3F09E8E-51C5-4F8B-A4F4-E17F8FC204C1}
+		{296512EA-C5DE-43C8-A1C5-B20CCF4B7F60} = {F3F09E8E-51C5-4F8B-A4F4-E17F8FC204C1}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {32CF1367-B83E-4CAD-8329-0D1C73AF59F4}

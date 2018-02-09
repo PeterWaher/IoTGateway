@@ -6,12 +6,12 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Waher.IoTGateway.App")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Universal Windows Platform App hosting the IoT Gateway.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Waher Data AB")]
 [assembly: AssemblyProduct("Waher.IoTGateway.App")]
-[assembly: AssemblyCopyright("Copyright ©  2017")]
-[assembly: AssemblyTrademark("")]
+[assembly: AssemblyCopyright("Copyright © Waher Data AB 2017-2018. All rights reserved.")]
+[assembly: AssemblyTrademark("IoT Gateway")]
 [assembly: AssemblyCulture("")]
 
 // Version information for an assembly consists of the following four values:

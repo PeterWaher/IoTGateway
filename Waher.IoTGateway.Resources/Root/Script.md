@@ -999,6 +999,7 @@ The following functions are available in the [Waher.Script.Statistics](../Waher.
 
 | Function | Description | Example |
 |----------|-------------|---------|
+| `Cauchy(Median,Scale[,N]])`  | Generates a random number using the Cauchy distribution. If `N` is provided, a vector with random elements is returned. | `[Labels,Counts]:=Histogram(Cauchy(5,1.5,10000),0,10,10);VerticalBars(Labels,Counts)` |
 | `Chi2(Degrees[,N]])`         | Generates a random number using the chi squared distribution. If `N` is provided, a vector with random elements is returned. | `[Labels,Counts]:=Histogram(Chi2(6,10000),0,20,10);VerticalBars(Labels,Counts)` |
 | `Exponential([Mean[,N]])`    | Generates a random number using the exponential distribution. If no `Mean` is given, the mean is assumed to be 1. If `N` is provided, a vector with random elements is returned. | `[Labels,Counts]:=Histogram(Exponential(3,10000),0,10,10);VerticalBars(Labels,Counts)` |
 | `Gamma(Shape,Scale[,N]])`    | Generates a random number using the gamma distribution. If `N` is provided, a vector with random elements is returned. | `[Labels,Counts]:=Histogram(Gamma(3,3,10000),0,20,10);VerticalBars(Labels,Counts)` |

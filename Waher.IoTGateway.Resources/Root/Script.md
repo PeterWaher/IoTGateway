@@ -1005,6 +1005,7 @@ The following functions are available in the [Waher.Script.Statistics](../Waher.
 | `Histogram(V,Min,Max,N)`     | Calculates the histogram of a set of data `V` with `N` buckets between `Min` and `Max`. | `[Labels,Counts]:=Histogram(Uniform(0,10,10000),0,10,10);VerticalBars(Labels,Counts)` |
 | `Normal([Mean,StdDev][,N]])` | Generates a random number using the normal distribution. If no `Mean` and standard deviation `StdDev` is given, the mean is assumed to be 0 and standarddeviation assumed to be 1. If `N` is provided, a vector with random elements is returned. | `[Labels,Counts]:=Histogram(Normal(0,5,10000),-20,20,10);VerticalBars(Labels,Counts)` |
 | `Uniform([Min,Max][,N]])`    | Generates a random number using the uniform distribution. If no interval is given, the standard interval [0,1] is assumed. If `N` is provided, a vector with random elements is returned. | `[Labels,Counts]:=Histogram(Uniform(0,10,10000),0,10,10);VerticalBars(Labels,Counts)` |
+| `Weibull(Shape,Scale[,N]])`  | Generates a random number using the weibull distribution. If `N` is provided, a vector with random elements is returned. | `[Labels,Counts]:=Histogram(Weibull(5,3,10000),0,10,10);VerticalBars(Labels,Counts)` |
 
 #### Content-related functions (Waher.Content)
 

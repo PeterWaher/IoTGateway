@@ -721,7 +721,7 @@ namespace Waher.Persistence.Files
 				EncryptedBlock = (byte[])Block.Clone();
 
 			if (PhysicalPosition != this.file.Seek(PhysicalPosition, SeekOrigin.Begin))
-				throw new ArgumentOutOfRangeException("Invalid file position.", nameof(PhysicalPosition));
+				throw new ArgumentException("Invalid file position.", nameof(PhysicalPosition));
 
 			await this.file.WriteAsync(EncryptedBlock, 0, this.blockSize);
 

@@ -248,6 +248,7 @@
 		<Grid.RowDefinitions>
 			<RowDefinition Height="Auto" />
 			<RowDefinition Height="Auto" />
+			<RowDefinition Height="Auto" />
 		</Grid.RowDefinitions>
 		<TextBlock TextWrapping="Wrap" Grid.Column="0" Grid.Row="0" Margin="0,0,5,0">•</TextBlock>
 		<StackPanel Grid.Column="1" Grid.Row="0">
@@ -275,6 +276,10 @@
 				</StackPanel>
 			</Grid>
 		</StackPanel>
+		<TextBlock TextWrapping="Wrap" Grid.Column="0" Grid.Row="2" Margin="0,0,5,0">•</TextBlock>
+		<StackPanel Grid.Column="1" Grid.Row="2">
+			<TextBlock TextWrapping="Wrap">Item 3</TextBlock>
+		</StackPanel>
 	</Grid>
 	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Nested lists 3:</TextBlock>
 	<Grid Margin="0,5,0,5">
@@ -283,6 +288,7 @@
 			<ColumnDefinition Width="*" />
 		</Grid.ColumnDefinitions>
 		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto" />
 			<RowDefinition Height="Auto" />
 			<RowDefinition Height="Auto" />
 		</Grid.RowDefinitions>
@@ -311,6 +317,10 @@
 					<TextBlock TextWrapping="Wrap">Item 2b</TextBlock>
 				</StackPanel>
 			</Grid>
+		</StackPanel>
+		<TextBlock TextWrapping="Wrap" Grid.Column="0" Grid.Row="2" Margin="0,0,5,0">•</TextBlock>
+		<StackPanel Grid.Column="1" Grid.Row="2">
+			<TextBlock TextWrapping="Wrap">Item 3</TextBlock>
 		</StackPanel>
 	</Grid>
 </StackPanel>

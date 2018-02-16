@@ -172,5 +172,11 @@ namespace Waher.Content.Markdown.Test
 		{
 			this.DoTest("Test_21_Httpx.md", "Test_21_Httpx.txt");
 		}
+
+		[TestMethod]
+		public void Test_22_TaskLists()
+		{
+			this.DoTest("Test_22_TaskLists.md", "Test_22_TaskLists.txt");
+		}
 	}
 }

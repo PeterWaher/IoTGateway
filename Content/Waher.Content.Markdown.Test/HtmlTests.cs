@@ -33,26 +33,26 @@ namespace Waher.Content.Markdown.Test
 			AssertEqual(ExpectedHtml, GeneratedHtml, "Generated HTML does not match expected HTML.");
 		}
 
-		public static void AssertEqual(string s1, string s2, string Message)
+		public static void AssertEqual(string Expected, string Generated, string Message)
 		{
-			int i, c = s1.Length;
-			int d = s2.Length;
+			int i, c = Expected.Length;
+			int d = Generated.Length;
 
 			if (d < c)
 				c = d;
 
 			for (i = 0; i < c; i++)
 			{
-				if (s1[i] != s2[i])
+				if (Expected[i] != Generated[i])
 				{
 					throw new Exception(Message + "\r\n\r\nMismatch at position " + i.ToString() +
-						"\r\n\r\nGenerated: " + s2.Substring(i, Math.Min(100, s2.Length - i)) +
-						"\r\n\r\nExpected: " + s1.Substring(i, Math.Min(100, s1.Length - i)));
+						"\r\n\r\nGenerated: " + Generated.Substring(i, Math.Min(100, Generated.Length - i)) +
+						"\r\n\r\nExpected: " + Expected.Substring(i, Math.Min(100, Expected.Length - i)));
 				}
 			}
 
-			if (s1.Length != s2.Length)
-				throw new Exception(Message + "\r\n\r\nUnexpected end: " + s2.Substring(c));
+			if (Expected.Length != Generated.Length)
+				throw new Exception(Message + "\r\n\r\nUnexpected end: " + Generated.Substring(c));
 		}
 
 		[TestMethod]
@@ -179,6 +179,12 @@ namespace Waher.Content.Markdown.Test
 		public void Test_21_Httpx()
 		{
 			this.DoTest("Test_21_Httpx.md", "Test_21_Httpx.html");
+		}
+
+		[TestMethod]
+		public void Test_22_TaskLists()
+		{
+			this.DoTest("Test_22_TaskLists.md", "Test_22_TaskLists.html");
 		}
 	}
 }

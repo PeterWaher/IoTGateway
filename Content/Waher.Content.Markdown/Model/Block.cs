@@ -95,15 +95,16 @@ namespace Waher.Content.Markdown.Model
 				{
 					if (ch > ' ' && ch != 160)
 						break;
-					else
-					{
-						k++;
 
-						if (ch == ' ' || ch == 160)
-							j++;
-						else if (ch == '\t')
-							j += 4;
-					}
+					k++;
+
+					if (ch == ' ' || ch == 160)
+						j++;
+					else if (ch == '\t')
+						j += 4;
+
+					if (!FirstRow && j >= NrCharacters)
+						break;
 				}
 
 				if (k > 0)

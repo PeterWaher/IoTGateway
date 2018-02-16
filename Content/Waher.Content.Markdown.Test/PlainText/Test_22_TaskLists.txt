@@ -1,0 +1,16 @@
+﻿Simple task list:
+
+[ ] Unchecked
+[X] Checked
+[X] Also checked
+
+Nested task list:
+
+[ ] Unchecked
+[X] Checked 
+[ ] Unchecked subitem
+[X] Checked subitem
+[X] Second checked subitem
+
+[X] Also checked
+

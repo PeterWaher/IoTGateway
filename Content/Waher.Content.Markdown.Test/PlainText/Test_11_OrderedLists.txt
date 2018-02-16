@@ -61,6 +61,8 @@ Nested lists:
 - Item 2a
 - Item 2b
 
+3. Item 3
+
 Nested lists 2:
 
 1. Item 1
@@ -68,10 +70,14 @@ Nested lists 2:
 #. Item 2a
 #. Item 2b
 
+3. Item 3
+
 Nested lists 3:
 
 1. Item 1
 2. Item 2 
 2. Item 2a
 3. Item 2b
+
+3. Item 3
 

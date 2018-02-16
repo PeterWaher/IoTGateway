@@ -148,6 +148,28 @@ namespace Waher.Content.Markdown.Model
 			return ch;
 		}
 
+		public char[] PeekNextChars(int Len)
+		{
+			int PosBak = this.pos;
+			int LenBak = this.len;
+			int CurrentBak = this.current;
+			string CurrentRowBak = this.currentRow;
+			bool LineBreakAfterBak = this.lineBreakAfter;
+			char[] Result = new char[Len];
+			int i;
+
+			for (i = 0; i < Len; i++)
+				Result[i] = this.NextChar();
+
+			this.pos = PosBak;
+			this.len = LenBak;
+			this.current = CurrentBak;
+			this.currentRow = CurrentRowBak;
+			this.lineBreakAfter = LineBreakAfterBak;
+
+			return Result;
+		}
+
 		private class StateBackup
 		{
 			public int Pos;
@@ -161,12 +183,14 @@ namespace Waher.Content.Markdown.Model
 
 		public void BackupState()
 		{
-			StateBackup Backup = new StateBackup();
-			Backup.Pos = this.pos;
-			Backup.Len = this.len;
-			Backup.Current = this.current;
-			Backup.CurrentRow = this.currentRow;
-			Backup.LineBreakAfter = this.lineBreakAfter;
+			StateBackup Backup = new StateBackup()
+			{
+				Pos = this.pos,
+				Len = this.len,
+				Current = this.current,
+				CurrentRow = this.currentRow,
+				LineBreakAfter = this.lineBreakAfter
+			};
 
 			if (this.backup == null)
 				this.backup = new LinkedList<StateBackup>();

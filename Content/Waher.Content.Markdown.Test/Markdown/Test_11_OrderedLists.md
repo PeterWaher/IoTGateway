@@ -75,6 +75,7 @@ Nested lists:
 2. Item 2
 	- Item 2a
 	- Item 2b
+3. Item 3
 
 Nested lists 2:
 
@@ -82,6 +83,7 @@ Nested lists 2:
 2. Item 2
 	#. Item 2a
 	#. Item 2b
+3. Item 3
 
 Nested lists 3:
 
@@ -89,3 +91,4 @@ Nested lists 3:
 2. Item 2
 	2. Item 2a
 	3. Item 2b
+3. Item 3

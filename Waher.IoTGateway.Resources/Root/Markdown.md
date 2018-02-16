@@ -697,6 +697,79 @@ digraph G {
 (or the machine). GraphViz is detected during initialization of the service. Make sure that GraphViz is installed in the program data folder, preferrably
 in its default folder.
 
+For more information about the GraphViz syntax, see the [GraphViz documentation](http://www.graphviz.org/documentation/).
+
+#### UML with PlantUML
+
+If you have the [PlantUML.jar](http://plantuml.com/download) file stored in the program files folder, and have [Java](https://www.java.com) installed
+on the same machine as the IoT Gateway, they can be used to render UML diagrams from code blocks. The diagram will be rendered as an *SVG* image.
+
+Example of a sequence **uml** PlantUML diagram:
+
+	```uml: Simple Sequence diagram
+	@startuml
+	Alice -> Bob: Authentication Request
+	Bob --> Alice: Authentication Response
+
+	Alice -> Bob: Another authentication Request
+	Alice <-- Bob: another authentication Response
+	@enduml
+	```
+
+	```uml: Simple Timing diagram
+	@startuml
+	robust "Web Browser" as WB
+	concise "Web User" as WU
+
+	@0
+	WU is Idle
+	WB is Idle
+
+	@100
+	WU is Waiting
+	WB is Processing
+
+	@300
+	WB is Waiting
+	@enduml
+	```
+
+This is rendered as:
+
+```uml: Simple Sequence diagram
+@startuml
+Alice -> Bob: Authentication Request
+Bob --> Alice: Authentication Response
+
+Alice -> Bob: Another authentication Request
+Alice <-- Bob: another authentication Response
+@enduml
+```
+
+```uml: Simple Timing diagram
+@startuml
+robust "Web Browser" as WB
+concise "Web User" as WU
+
+@0
+WU is Idle
+WB is Idle
+
+@100
+WU is Waiting
+WB is Processing
+
+@300
+WB is Waiting
+@enduml
+```
+
+**Note**: If after having installed [PlantUML](http://plantuml.com/download) and [Java](https://www.java.com), the above is not displayed as a graph, 
+make sure to restart the IoT Gateway service (or the machine). PlantUML and Java are detected during initialization of the service. Make sure that 
+PlantUML is installed in the program data folder.
+
+For more information about PlantUML syntax, see the [PlantUML Language Reference Guide](http://plantuml.com/PlantUML_Language_Reference_Guide.pdf).
+
 ### Horizontal rules
 
 Horizontal rules can be used to separate sections of the text. There are various ways of including a horizontal rule. On a separate line, write a

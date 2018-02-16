@@ -15,9 +15,9 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>IoT Gateway HTTP CoAP MQTT XMPP LWM2M</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.0.13</AssemblyVersion>
-    <FileVersion>1.0.13</FileVersion>
-    <Version>1.0.13</Version>
+    <AssemblyVersion>1.0.14</AssemblyVersion>
+    <FileVersion>1.0.14</FileVersion>
+    <Version>1.0.14</Version>
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Waher.IoTGateway\</UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>

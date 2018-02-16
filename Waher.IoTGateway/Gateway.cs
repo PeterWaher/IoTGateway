@@ -221,7 +221,11 @@ namespace Waher.IoTGateway
 				scheduler = new Scheduler();
 				rnd = RandomNumberGenerator.Create();
 
-				Task T = Task.Run(() => CodeContent.GraphViz.Init());
+				Task T = Task.Run(() =>
+				{
+					CodeContent.GraphViz.Init();
+					CodeContent.PlantUml.Init();
+				});
 
 				XmlDocument Config = new XmlDocument();
 

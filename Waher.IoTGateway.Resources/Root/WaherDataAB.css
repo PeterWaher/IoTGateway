@@ -486,14 +486,19 @@ li > ol
 
 ul.taskList 
 {
+    list-style-type: none;
 }
 
 li.taskListItem
 {
+    text-indent: -1.5em;
 }
 
-label.taskListItemLabel 
-{   
+label.taskListItemLabel > input[type='checkbox']
+{
+    display:inline;
+    width:1.5em;
+    box-shadow:0px 0px 0px #000;
 }
 
 dl

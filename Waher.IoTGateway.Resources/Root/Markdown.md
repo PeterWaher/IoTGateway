@@ -399,7 +399,7 @@ This results in:
 
 Numbered lists are created by simply writing the items prefixed by their corresponding number followed by a period `.` a space character. The number used
 will be the number that the item receives in the generated list. As with bullet lists, items written together are treated as inline text, while items
-separated by empty rows (or rows including only white space) will be treated as items containing paragraphs. Multi-paragraph items are create indenting.
+separated by empty rows (or rows including only white space) will be treated as items containing paragraphs. Multi-paragraph items are indented.
 Example of a simple list:
 
 	1. Normal text
@@ -450,6 +450,157 @@ This is tranformed to:
 		- Item 2.1.1
 		- Item 2.1.2
 	#. Item 2.2
+
+### Definition Lists
+
+Definition lists can be used to create glossaries, or similar constructs where terms are defined. A definition list is divided into definition blocks. 
+Each definition block can have one or more terms followed by a one or more descriptions. The terms are simple inline text, written one term per row. 
+The descriptions are prefixed by a colon (`:`) on the first paragraph. If it has more than one paragraph, the first row (at least) each paragraph must 
+be indented using 1-4 space characters or one tab character. If you want, you can indent all rows in the paragraphs, to make the text easier to read.
+
+A simple definition list only contains a sequence of terms and simple definitions:
+
+	Term 1
+	:	Definition 1
+
+	Term 2
+	:	Definition 2
+
+	Term 3
+	:	Definition 3
+
+This becomes:
+
+Term 1
+:	Definition 1
+
+Term 2
+:	Definition 2
+
+Term 3
+:	Definition 3
+
+You can group multiple terms for a definition:
+
+	Term 1
+	Term 2
+	:	Definition for Term 1 and 2.
+
+	Term 3
+	:	Definition 3
+
+Which is transformed to:
+
+Term 1
+Term 2
+:	Definition for Term 1 and 2.
+
+Term 3
+:	Definition 3
+
+You can also have multiple descriptions for a single term:
+
+	Term 1
+	:	Definition 1.1
+	:	Definition 1.2
+
+	Term 2
+	:	Definition 2
+
+This is shown as:
+
+Term 1
+:	Definition 1.1
+:	Definition 1.2
+
+Term 2
+:	Definition 2
+
+As with the other forms of lists mentioned above, if you include an empty row (or a row with only whitespace) between terms and definitions, definitions
+are considered paragraphs instead of inline text.
+
+	Term 1
+
+	:	Definition 1
+
+	Term 2
+
+	:	Definition 2
+
+	Term 3
+
+	:	Definition 3
+
+Which is displayed as:
+
+Term 1
+
+:	Definition 1
+
+Term 2
+
+:	Definition 2
+
+Term 3
+
+:	Definition 3
+
+You can also have long descriptions spanning multiple paragraphs, or join types, some of inline type, others of paragraph type.
+
+	Term 1
+
+	:	Long Definition for term 1.
+
+		It continues to a second paragraph.
+
+	Term 2
+	:	Definition 2
+
+Which becomes:
+
+Term 1
+
+:	Long Definition for term 1.
+
+	It continues to a second paragraph.
+
+Term 2
+:	Definition 2
+
+### Task lists
+
+Task lists are lists where items are either checked or unchecked. An unchecked item is prefixed using `[ ]` (note the single space character).
+Checked items are prefixed using `[x]` or `[X]`. As with bullet lists or numbered lists, items written together are treated as inline text, while items
+separated by empty rows (or rows including only white space) will be treated as items containing paragraphs. Multi-paragraph items are indented.
+Example of a simple task list:
+
+	[ ] Unchecked item
+	[x] Checked item
+	[X] Another checked item
+
+This is displayed as:
+
+[ ] Unchecked item
+[x] Checked item
+[X] Another checked item
+
+An example of a nested task list:
+
+	[ ] Unchecked item
+	[x] Checked item
+		[ ] Unchecked subitem
+		[x] Checked subitem
+		[X] Another checked subitem
+	[X] A second checked item
+
+This gets shown as:
+
+[ ] Unchecked item
+[x] Checked item
+	[ ] Unchecked subitem
+	[x] Checked subitem
+	[X] Another checked subitem
+[X] A second checked item
 
 ### Code blocks
 
@@ -658,122 +809,6 @@ This is transformed to:
 
 **Note**: It is not important to keep columns aligned in the markdown text. The Markdown parser makes sure the table is exported correctly. The only
 reason for maintaining columns in the markdown text aligned, is to make it more readable.
-
-### Definition Lists
-
-Definition lists can be used to create glossaries, or similar constructs where terms are defined. A definition list is divided into definition blocks. 
-Each definition block can have one or more terms followed by a one or more descriptions. The terms are simple inline text, written one term per row. 
-The descriptions are prefixed by a colon (`:`) on the first paragraph. If it has more than one paragraph, the first row (at least) each paragraph must 
-be indented using 1-4 space characters or one tab character. If you want, you can indent all rows in the paragraphs, to make the text easier to read.
-
-A simple definition list only contains a sequence of terms and simple definitions:
-
-	Term 1
-	:	Definition 1
-
-	Term 2
-	:	Definition 2
-
-	Term 3
-	:	Definition 3
-
-This becomes:
-
-Term 1
-:	Definition 1
-
-Term 2
-:	Definition 2
-
-Term 3
-:	Definition 3
-
-You can group multiple terms for a definition:
-
-	Term 1
-	Term 2
-	:	Definition for Term 1 and 2.
-
-	Term 3
-	:	Definition 3
-
-Which is transformed to:
-
-Term 1
-Term 2
-:	Definition for Term 1 and 2.
-
-Term 3
-:	Definition 3
-
-You can also have multiple descriptions for a single term:
-
-	Term 1
-	:	Definition 1.1
-	:	Definition 1.2
-
-	Term 2
-	:	Definition 2
-
-This is shown as:
-
-Term 1
-:	Definition 1.1
-:	Definition 1.2
-
-Term 2
-:	Definition 2
-
-As with the other forms of lists mentioned above, if you include an empty row (or a row with only whitespace) between terms and definitions, definitions
-are considered paragraphs instead of inline text.
-
-	Term 1
-
-	:	Definition 1
-
-	Term 2
-
-	:	Definition 2
-
-	Term 3
-
-	:	Definition 3
-
-Which is displayed as:
-
-Term 1
-
-:	Definition 1
-
-Term 2
-
-:	Definition 2
-
-Term 3
-
-:	Definition 3
-
-You can also have long descriptions spanning multiple paragraphs, or join types, some of inline type, others of paragraph type.
-
-	Term 1
-
-	:	Long Definition for term 1.
-
-		It continues to a second paragraph.
-
-	Term 2
-	:	Definition 2
-
-Which becomes:
-
-Term 1
-
-:	Long Definition for term 1.
-
-	It continues to a second paragraph.
-
-Term 2
-:	Definition 2
 
 ### Footnotes
 

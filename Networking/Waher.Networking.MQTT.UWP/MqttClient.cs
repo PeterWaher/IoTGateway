@@ -80,17 +80,22 @@ namespace Waher.Networking.MQTT
 		private Stream stream = null;
 		private byte[] buffer = new byte[BufferSize];
 #endif
+		private byte[] willData = null;
 		private Timer secondTimer = null;
 		private DateTime nextPing = DateTime.MinValue;
+		private MqttQualityOfService willQoS = MqttQualityOfService.AtMostOnce;
 		private string host;
 		private string userName;
 		private string password;
+		private string willTopic = null;
 		private int port;
 		private int keepAliveSeconds;
 		private MqttState state;
 		private bool tls;
 		private bool trustServer = false;
 		private bool serverCertificateValid = false;
+		private bool will = false;
+		private bool willRetain = false;
 
 		/// <summary>
 		/// Manages an MQTT connection. Implements MQTT v3.1.1, as defined in
@@ -105,17 +110,8 @@ namespace Waher.Networking.MQTT
 #else
 		public MqttClient(string Host, int Port, X509Certificate ClientCertificate, params ISniffer[] Sniffers)
 #endif
-			: base(Sniffers)
+			: this(Host, Port, ClientCertificate, null, MqttQualityOfService.AtMostOnce, false, null, Sniffers)
 		{
-			this.host = Host;
-			this.port = Port;
-			this.tls = true;
-			this.userName = string.Empty;
-			this.password = string.Empty;
-			this.clientCertificate = ClientCertificate;
-			this.state = MqttState.Offline;
-
-			Task.Run(() => this.BeginConnect());
 		}
 
 		/// <summary>
@@ -129,6 +125,66 @@ namespace Waher.Networking.MQTT
 		/// <param name="Password">Password</param>
 		/// <param name="Sniffers">Sniffers to use.</param>
 		public MqttClient(string Host, int Port, bool Tls, string UserName, string Password, params ISniffer[] Sniffers)
+			: this(Host, Port, Tls, UserName, Password, null, MqttQualityOfService.AtMostOnce, false, null, Sniffers)
+		{
+		}
+
+		/// <summary>
+		/// Manages an MQTT connection. Implements MQTT v3.1.1, as defined in
+		/// http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html
+		/// </summary>
+		/// <param name="Host">Host name or IP address of MQTT server.</param>
+		/// <param name="Port">Port to connect to.</param>
+		/// <param name="ClientCertificate">Client certificate.</param>
+		/// <param name="WillTopic">Topic to publish the last will and testament, in case the connection drops unexpectedly.</param>
+		/// <param name="WillQoS">Quality of Service of last will and testament, in case the connection drops unexpectedly.</param>
+		/// <param name="WillRetain">If last will and testament should be retained, in case the connection drops unexpectedly.</param>
+		/// <param name="WillData">Data of last will and testament, in case the connection drops unexpectedly.</param>
+		/// <param name="Sniffers">Sniffers to use.</param>
+#if WINDOWS_UWP
+		public MqttClient(string Host, int Port, Certificate ClientCertificate, string WillTopic, 
+			MqttQualityOfService WillQoS, bool WillRetain, byte[] WillData, params ISniffer[] Sniffers)
+#else
+		public MqttClient(string Host, int Port, X509Certificate ClientCertificate, string WillTopic, 
+			MqttQualityOfService WillQoS, bool WillRetain, byte[] WillData, params ISniffer[] Sniffers)
+#endif
+			: base(Sniffers)
+		{
+			this.host = Host;
+			this.port = Port;
+			this.tls = true;
+			this.userName = string.Empty;
+			this.password = string.Empty;
+			this.clientCertificate = ClientCertificate;
+			this.state = MqttState.Offline;
+			this.will = !string.IsNullOrEmpty(WillTopic) && WillData != null;
+			this.willTopic = WillTopic;
+			this.willQoS = WillQoS;
+			this.willRetain = WillRetain;
+			this.willData = WillData;
+
+			if (this.will && this.willData.Length > 65535)
+				throw new ArgumentException("Will data too large.", nameof(WillData));
+
+			Task.Run(() => this.BeginConnect());
+		}
+
+		/// <summary>
+		/// Manages an MQTT connection. Implements MQTT v3.1.1, as defined in
+		/// http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html
+		/// </summary>
+		/// <param name="Host">Host name or IP address of MQTT server.</param>
+		/// <param name="Port">Port to connect to.</param>
+		/// <param name="Tls">If TLS is used to encrypt communication.</param>
+		/// <param name="UserName">User Name</param>
+		/// <param name="Password">Password</param>
+		/// <param name="WillTopic">Topic to publish the last will and testament, in case the connection drops unexpectedly.</param>
+		/// <param name="WillQoS">Quality of Service of last will and testament, in case the connection drops unexpectedly.</param>
+		/// <param name="WillRetain">If last will and testament should be retained, in case the connection drops unexpectedly.</param>
+		/// <param name="WillData">Data of last will and testament, in case the connection drops unexpectedly.</param>
+		/// <param name="Sniffers">Sniffers to use.</param>
+		public MqttClient(string Host, int Port, bool Tls, string UserName, string Password, string WillTopic,
+			MqttQualityOfService WillQoS, bool WillRetain, byte[] WillData, params ISniffer[] Sniffers)
 		: base(Sniffers)
 		{
 			this.host = Host;
@@ -138,6 +194,14 @@ namespace Waher.Networking.MQTT
 			this.password = Password;
 			this.clientCertificate = null;
 			this.state = MqttState.Offline;
+			this.will = !string.IsNullOrEmpty(WillTopic) && WillData != null;
+			this.willTopic = WillTopic;
+			this.willQoS = WillQoS;
+			this.willRetain = WillRetain;
+			this.willData = WillData;
+
+			if (this.will && this.willData.Length > 65535)
+				throw new ArgumentException("Will data too large.", nameof(WillData));
 
 			Task.Run(() => this.BeginConnect());
 		}
@@ -291,22 +355,47 @@ namespace Waher.Networking.MQTT
 
 			byte b = 2;     // Clean session.
 
+			if (this.will)
+			{
+				b |= 4;
+				b |= (byte)(((int)this.willQoS) << 3);
+
+				if (this.willRetain)
+					b |= 32;
+			}
+
+			if (!string.IsNullOrEmpty(this.userName))
+			{
+				b |= 128;
+
+				if (!string.IsNullOrEmpty(this.password))
+					b |= 64;
+			}
+
 			Payload.WriteByte(b);
 
 			Payload.WriteByte((byte)(KeepAliveSeconds >> 8));
 			Payload.WriteByte((byte)KeepAliveSeconds);
 
 			Payload.WriteString(this.clientId);
+
+			if (this.will)
+			{
+				Payload.WriteString(this.willTopic);
+
+				int l = this.willData.Length;
+
+				Payload.WriteByte((byte)(l >> 8));
+				Payload.WriteByte((byte)l);
+				Payload.WriteBytes(this.willData);
+			}
+
 			if (!string.IsNullOrEmpty(this.userName))
 			{
-				b |= 128;
 				Payload.WriteString(this.userName);
 
 				if (!string.IsNullOrEmpty(this.password))
-				{
-					b |= 64;
 					Payload.WriteString(this.password);
-				}
 			}
 
 			byte[] PayloadData = Payload.GetPacket();

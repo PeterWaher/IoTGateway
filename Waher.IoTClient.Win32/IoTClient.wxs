@@ -350,14 +350,12 @@
               <RemoveFile Id='RemoveWaher.Security.pdb' Name='Waher.Security.pdb' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Things.pdb' Name='Waher.Things.pdb' On='uninstall'/>
             </Component>
-            <Directory Id='Graphics' Name='Graphics'>
-							<Directory Id='GraphicsEmoji1' Name='Emoji1'>
-								<Component Id='Emoji1Zip' Guid='9A7A7EA5-3961-45DC-8B2B-A9829636F790'>
-									<RemoveFolder Id='RemoveEmoji1Folder' On='uninstall' />
-									<File Id='Emoji1.zip' Name='Emoji1.zip' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Graphics\Emoji1.zip' Vital='yes' KeyPath='yes'/>
-									<RemoveFile Id='RemoveEmoji1Zip' Name='Emoji1.zip' On='uninstall'/>
-								</Component>
-							</Directory>
+						<Directory Id='Graphics' Name='Graphics'>
+							<Component Id='Emoji1Zip' Guid='9A7A7EA5-3961-45DC-8B2B-A9829636F790'>
+								<RemoveFolder Id='RemoveEmoji1Folder' On='uninstall' />
+								<File Id='Emoji1.zip' Name='Emoji1.zip' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Graphics\Emoji1.zip' Vital='yes' KeyPath='yes'/>
+								<RemoveFile Id='RemoveEmoji1Zip' Name='Emoji1.zip' On='uninstall'/>
+							</Component>
 						</Directory>
           </Directory>
         </Directory>

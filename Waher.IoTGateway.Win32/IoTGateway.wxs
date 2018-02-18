@@ -736,15 +736,13 @@
               <File Id='Waher.Utility.AnalyzeDB.pdb' Name='Waher.Utility.AnalyzeDB.pdb' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.AnalyzeDB\bin\$(var.Configuration)\netcoreapp2.0\Waher.Utility.AnalyzeDB.pdb' Vital='yes' KeyPath='yes'/>
               <RemoveFile Id='RemoveWaher.Utility.AnalyzeDB.pdb' Name='Waher.Utility.AnalyzeDB.pdb' On='uninstall'/>
             </Component>
-            <Directory Id='Graphics' Name='Graphics'>
-              <Directory Id='GraphicsEmoji1' Name='Emoji1'>
-								<Component Id='Emoji1Zip' Guid='B7FF03C8-054C-4E72-A87B-DFBE1C3710C5'>
-									<RemoveFolder Id='RemoveEmoji1Folder' On='uninstall' />
-									<File Id='Emoji1.zip' Name='Emoji1.zip' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Graphics\Emoji1.zip' Vital='yes' KeyPath='yes'/>
-									<RemoveFile Id='RemoveEmoji1Zip' Name='Emoji1.zip' On='uninstall'/>
-								</Component>
-              </Directory>
-            </Directory>
+						<Directory Id='Graphics' Name='Graphics'>
+							<Component Id='Emoji1Zip' Guid='B7FF03C8-054C-4E72-A87B-DFBE1C3710C5'>
+								<RemoveFolder Id='RemoveEmoji1Folder' On='uninstall' />
+								<File Id='Emoji1.zip' Name='Emoji1.zip' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Graphics\Emoji1.zip' Vital='yes' KeyPath='yes'/>
+								<RemoveFile Id='RemoveEmoji1Zip' Name='Emoji1.zip' On='uninstall'/>
+							</Component>
+						</Directory>
             <Directory Id='Highlight' Name='Highlight'>
               <Directory Id='HighlightStyles' Name='styles'>
                 <Component Id='HighlightStyles' Guid='2E4EAA84-F4E0-4D31-96DF-B9A15DD51BDC'>

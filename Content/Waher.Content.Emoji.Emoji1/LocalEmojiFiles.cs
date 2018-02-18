@@ -3,6 +3,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Collections.Generic;
 using System.Text;
+using Waher.Events;
 
 namespace Waher.Content.Emoji.Emoji1
 {
@@ -92,15 +93,34 @@ namespace Waher.Content.Emoji.Emoji1
 			this.zipFileName = ZipFileName;
 			this.programDataFolder = ProgramDataFolder;
 
-			if (File.Exists(ZipFileName))
+			try
 			{
-				string Folder = Path.Combine(ProgramDataFolder, "Emoji1");
+				if (File.Exists(ZipFileName))
+				{
+					Log.Informational("Starting unpacking file.",
+						new KeyValuePair<string, object>("FileName", ZipFileName),
+						new KeyValuePair<string, object>("Destination", ProgramDataFolder));
 
-				if (Directory.Exists(Folder))
-					Directory.Delete(Folder, true);
+					if (!Directory.Exists(ProgramDataFolder))
+						Directory.CreateDirectory(ProgramDataFolder);
+					else
+					{
+						string Folder = Path.Combine(ProgramDataFolder, "Emoji1");
 
-				ZipFile.ExtractToDirectory(ZipFileName, ProgramDataFolder);
-				File.Delete(ZipFileName);
+						if (Directory.Exists(Folder))
+							Directory.Delete(Folder, true);
+					}
+
+					ZipFile.ExtractToDirectory(ZipFileName, ProgramDataFolder);
+					File.Delete(ZipFileName);
+
+					Log.Informational("File unpacked and deleted.",
+						new KeyValuePair<string, object>("FileName", ZipFileName));
+				}
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
 			}
 		}
 

@@ -34,7 +34,7 @@ namespace Waher.Script.Operators.Comparisons
         /// <returns>Result</returns>
         public override IElement EvaluateScalar(IElement Left, IElement Right, Variables Variables)
         {
-            if (Left.Equals(Right))
+			if (Left.Equals(Right))
                 return BooleanValue.True;
             else
                 return BooleanValue.False;

@@ -35,7 +35,7 @@ namespace Waher.Script.Operators.Comparisons
             IElement Left = this.left.Evaluate(Variables);
             IElement Right = this.right.Evaluate(Variables);
 
-            if (Left.GetType() != Right.GetType())
+			if (Left.GetType() != Right.GetType())
                 return BooleanValue.False;
             else if (Left.Equals(Right))
                 return BooleanValue.True;

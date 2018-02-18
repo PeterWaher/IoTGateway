@@ -1384,7 +1384,7 @@ namespace Waher.Content.Markdown
 									Positions.Add(State.CurrentPosition);
 									Rows.Add(State.RestOfRow());
 
-									Checked = (chs[0] != ' ');
+									Checked = (chs[1] != ' ');
 								}
 								else
 								{

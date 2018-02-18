@@ -9,7 +9,7 @@ using Waher.Script;
 namespace Waher.Content.Markdown.Test
 {
 	[TestClass]
-	public class HtmlTests
+	public class MarkdownHtmlTests
 	{
 		private void DoTest(string MarkdownFileName, string HtmlFileName)
 		{

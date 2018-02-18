@@ -12,13 +12,13 @@ using Waher.Script.Graphs;
 namespace Waher.Content.Markdown.Test
 {
 	[TestClass]
-	public class PlainTextTests
+	public class MarkdownPlainTextTests
 	{
 		[AssemblyInitialize]
 		public static void AssemblyInitialize(TestContext Context)
 		{
 			Waher.Runtime.Inventory.Types.Initialize(
-				typeof(PlainTextTests).Assembly,
+				typeof(MarkdownPlainTextTests).Assembly,
 				typeof(Expression).Assembly,
 				typeof(Graph).Assembly,
 				typeof(MarkdownDocument).Assembly,
@@ -44,7 +44,7 @@ namespace Waher.Content.Markdown.Test
 			Console.Out.WriteLine();
 			Console.Out.WriteLine();
 
-			HtmlTests.AssertEqual(ExpectedText, GeneratedText, "Generated Plain Text does not match expected Plain Text.");
+			MarkdownHtmlTests.AssertEqual(ExpectedText, GeneratedText, "Generated Plain Text does not match expected Plain Text.");
 		}
 
 		[TestMethod]

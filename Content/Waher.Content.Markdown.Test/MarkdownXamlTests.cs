@@ -11,7 +11,7 @@ using Waher.Script;
 namespace Waher.Content.Markdown.Test
 {
 	[TestClass]
-	public class XamlTextTests
+	public class MarkdownXamlTests
 	{
 		private void DoTest(string MarkdownFileName, string XamlFileName)
 		{
@@ -33,7 +33,7 @@ namespace Waher.Content.Markdown.Test
 			Console.Out.WriteLine();
 			Console.Out.WriteLine();
 
-			HtmlTests.AssertEqual(ExpectedText, GeneratedXaml, "Generated XAML does not match expected XAML.");
+			MarkdownHtmlTests.AssertEqual(ExpectedText, GeneratedXaml, "Generated XAML does not match expected XAML.");
 		}
 
 		[TestMethod]

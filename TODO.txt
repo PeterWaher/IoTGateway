@@ -15,6 +15,8 @@ Waher.Things.Performance
 Waher.Security.Acme
 Waher.WebService.Transform (transforms JSON to Text using named templates)
 
+MQTT v5
+
 Authorization:
 	Privileges
 		CanView

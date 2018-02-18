@@ -2208,7 +2208,12 @@ namespace Waher.Networking.XMPP
 				lock (this.roster)
 				{
 					if (this.roster.TryGetValue(e.FromBareJID, out Item))
+					{
 						Item.LastPresence = e;
+
+						if (Item.PendingSubscription == PendingSubscription.Subscribe)
+							Item.PendingSubscription = PendingSubscription.None;	// Might be out of synch.
+					}
 				}
 			}
 		}
@@ -4147,6 +4152,10 @@ namespace Waher.Networking.XMPP
 		/// <param name="CustomXml">Custom XML to include in the subscription request.</param>
 		public void RequestPresenceSubscription(string BareJid, string CustomXml)
 		{
+			RosterItem Item = this.GetRosterItem(BareJid);
+			if (Item != null)
+				Item.PendingSubscription = PendingSubscription.Subscribe;
+
 			StringBuilder Xml = new StringBuilder();
 			uint SeqNr;
 
@@ -4178,6 +4187,10 @@ namespace Waher.Networking.XMPP
 		/// <param name="BareJid">Bare JID of contact.</param>
 		public void RequestPresenceUnsubscription(string BareJid)
 		{
+			RosterItem Item = this.GetRosterItem(BareJid);
+			if (Item != null)
+				Item.PendingSubscription = PendingSubscription.Unsubscribe;
+
 			StringBuilder Xml = new StringBuilder();
 			uint SeqNr;
 
@@ -4220,6 +4233,21 @@ namespace Waher.Networking.XMPP
 
 		internal void PresenceSubscriptionAccepted(string Id, string BareJid)
 		{
+			RosterItem Item = this.GetRosterItem(BareJid);
+			if (Item != null)
+			{
+				switch (Item.State)
+				{
+					case SubscriptionState.None:
+						Item.State = SubscriptionState.From;
+						break;
+
+					case SubscriptionState.To:
+						Item.State = SubscriptionState.Both;
+						break;
+				}
+			}
+
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<presence to='");

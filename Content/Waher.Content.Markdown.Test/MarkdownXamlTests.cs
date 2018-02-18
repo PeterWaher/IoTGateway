@@ -19,7 +19,7 @@ namespace Waher.Content.Markdown.Test
 			string ExpectedText = File.ReadAllText("XAML/" + XamlFileName);
 			ExpectedText = ExpectedText.Replace("&#xD;\r", "&#xD;");
 			MarkdownSettings Settings = new MarkdownSettings(
-				new Emoji1LocalFiles(Emoji1SourceFileType.Svg, 24, 24, "/emoji1/%FILENAME%", File.Exists, File.ReadAllBytes),
+				new Emoji1LocalFiles(Emoji1SourceFileType.Svg, 24, 24, "/emoji1/%FILENAME%", Path.Combine("Graphics", "Emoji1.zip"), "Graphics"),
 				true, new Variables())
 			{
 				HttpxProxy = "/HttpxProxy/%URL%"

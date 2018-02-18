@@ -120,9 +120,6 @@ namespace Waher.IoTGateway
 		private const int MaxRecordsPerPeriod = 500;
 		private const int MaxChunkSize = 4096;
 
-		internal static readonly Emoji1LocalFiles Emoji1_24x24 = new Emoji1LocalFiles(Emoji1SourceFileType.Svg, 24, 24,
-			"/Graphics/Emoji1/svg/%FILENAME%", File.Exists, File.ReadAllBytes);
-
 		private static LinkedList<KeyValuePair<string, int>> ports = new LinkedList<KeyValuePair<string, int>>();
 		private static Dictionary<int, EventHandler> serviceCommandByNr = new Dictionary<int, EventHandler>();
 		private static Dictionary<EventHandler, int> serviceCommandNrByCallback = new Dictionary<EventHandler, int>();
@@ -143,6 +140,7 @@ namespace Waher.IoTGateway
 		private static Scheduler scheduler = null;
 		private static RandomNumberGenerator rnd = null;
 		private static Semaphore gatewayRunning = null;
+		private static Emoji1LocalFiles emoji1_24x24 = null;
 		private static string domain = null;
 		private static string ownerJid = null;
 		private static string appDataFolder;
@@ -424,7 +422,7 @@ namespace Waher.IoTGateway
 				HttpFolderResource HttpFolderResource;
 				HttpxProxy HttpxProxy;
 
-				webServer.Register(new HttpFolderResource("/Graphics", "Graphics", false, false, true, false)); // TODO: Add authentication mechanisms for PUT & DELETE.
+				webServer.Register(new HttpFolderResource("/Graphics", Path.Combine(appDataFolder, "Graphics"), false, false, true, false)); // TODO: Add authentication mechanisms for PUT & DELETE.
 				webServer.Register(new HttpFolderResource("/highlight", "Highlight", false, false, true, false));   // Syntax highlighting library, provided by http://highlightjs.org
 				webServer.Register(HttpFolderResource = new HttpFolderResource(string.Empty, rootFolder, false, false, true, true));    // TODO: Add authentication mechanisms for PUT & DELETE.
 				webServer.Register(HttpxProxy = new HttpxProxy("/HttpxProxy", xmppClient, MaxChunkSize));
@@ -434,8 +432,11 @@ namespace Waher.IoTGateway
 				});
 				webServer.Register(clientEvents = new ClientEvents());
 
+				emoji1_24x24 = new Emoji1LocalFiles(Emoji1SourceFileType.Svg, 24, 24, "/Graphics/Emoji1/svg/%FILENAME%",
+					Path.Combine(runtimeFolder, "Graphics", "Emoji1.zip"), Path.Combine(appDataFolder, "Graphics"));
+				
 				HttpFolderResource.AllowTypeConversion();
-				MarkdownToHtmlConverter.EmojiSource = Emoji1_24x24;
+				MarkdownToHtmlConverter.EmojiSource = emoji1_24x24;
 
 				XmlElement FileFolders = Config.DocumentElement["FileFolders"];
 				if (FileFolders != null)
@@ -832,6 +833,14 @@ namespace Waher.IoTGateway
 		public static string RootFolder
 		{
 			get { return rootFolder; }
+		}
+
+		/// <summary>
+		/// Emojis.
+		/// </summary>
+		public static Emoji1LocalFiles Emoji1_24x24
+		{
+			get { return emoji1_24x24; }
 		}
 
 		/// <summary>

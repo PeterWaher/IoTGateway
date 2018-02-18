@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.IO.Compression;
 using System.Collections.Generic;
 using System.Text;
 
@@ -51,8 +52,8 @@ namespace Waher.Content.Emoji.Emoji1
 	public class Emoji1LocalFiles : IEmojiSource
 	{
 		private Emoji1SourceFileType sourceFileType;
-		private FileExistsHandler fileexists;
-		private ReadAllBytesHandler readAllBytes;
+		private string zipFileName;
+		private string programDataFolder;
 		private string imageUrl;
 		private int width;
 		private int height;
@@ -63,11 +64,11 @@ namespace Waher.Content.Emoji.Emoji1
 		/// <param name="SourceFileType">Type of files to use.</param>
 		/// <param name="Width">Desired width of emojis.</param>
 		/// <param name="Height">Desired height of emojis.</param>
-		/// <param name="FileExists">Delegate to method used to check if a file exists.</param>
-		/// <param name="ReadAllBytes">Method to read all bytes of a file.</param>
-		public Emoji1LocalFiles(Emoji1SourceFileType SourceFileType, int Width, int Height, 
-			FileExistsHandler FileExists, ReadAllBytesHandler ReadAllBytes)
-			: this(SourceFileType, Width, Height, string.Empty, FileExists, ReadAllBytes)
+		/// <param name="ZipFileName">Full path of the emoji1 zip file. It will be deleted after unpacking to <paramref name="ProgramDataFolder"/>.</param>
+		/// <param name="ProgramDataFolder">Folder to unzip emojis to.</param>
+		public Emoji1LocalFiles(Emoji1SourceFileType SourceFileType, int Width, int Height,
+			string ZipFileName, string ProgramDataFolder)
+			: this(SourceFileType, Width, Height, string.Empty, ZipFileName, ProgramDataFolder)
 		{
 		}
 
@@ -79,17 +80,28 @@ namespace Waher.Content.Emoji.Emoji1
 		/// <param name="Height">Desired height of emojis.</param>
 		/// <param name="ImageURL">URL for remote clients to fetch the image. If not provided, images are embedded into generated pages.
 		/// Include the string %FILENAME% where the name of the emoji image file is to be inserted.</param>
-		/// <param name="FileExists">Delegate to method used to check if a file exists.</param>
-		/// <param name="ReadAllBytes">Method to read all bytes of a file.</param>
-		public Emoji1LocalFiles(Emoji1SourceFileType SourceFileType, int Width, int Height, string ImageURL, 
-			FileExistsHandler FileExists, ReadAllBytesHandler ReadAllBytes)
+		/// <param name="ZipFileName">Full path of the emoji1 zip file. It will be deleted after unpacking to <paramref name="ProgramDataFolder"/>.</param>
+		/// <param name="ProgramDataFolder">Folder to unzip emojis to.</param>
+		public Emoji1LocalFiles(Emoji1SourceFileType SourceFileType, int Width, int Height, string ImageURL,
+			string ZipFileName, string ProgramDataFolder)
 		{
 			this.sourceFileType = SourceFileType;
 			this.width = Width;
 			this.height = Height;
 			this.imageUrl = ImageURL;
-			this.fileexists = FileExists;
-			this.readAllBytes = ReadAllBytes;
+			this.zipFileName = ZipFileName;
+			this.programDataFolder = ProgramDataFolder;
+
+			if (File.Exists(ZipFileName))
+			{
+				string Folder = Path.Combine(ProgramDataFolder, "Emoji1");
+
+				if (Directory.Exists(Folder))
+					Directory.Delete(Folder, true);
+
+				ZipFile.ExtractToDirectory(ZipFileName, ProgramDataFolder);
+				File.Delete(ZipFileName);
+			}
 		}
 
 		/// <summary>
@@ -123,8 +135,8 @@ namespace Waher.Content.Emoji.Emoji1
 		/// <returns>If emoji is supported.</returns>
 		public bool EmojiSupported(EmojiInfo Emoji)
 		{
-			string LocalFileName = this.GetLocalFileName(Emoji);
-			return this.fileexists(LocalFileName);
+			string FileName = this.GetFileName(Emoji);
+			return File.Exists(FileName);
 		}
 
 		/// <summary>
@@ -132,47 +144,21 @@ namespace Waher.Content.Emoji.Emoji1
 		/// </summary>
 		/// <param name="Emoji">Emoji</param>
 		/// <returns>Local file name.</returns>
-		public string GetLocalFileName(EmojiInfo Emoji)
+		public string GetFileName(EmojiInfo Emoji)
 		{
-			StringBuilder Result = new StringBuilder();
-			string FileName = Emoji.FileName;
-
-			Result.Append("Graphics");
-			Result.Append(Path.DirectorySeparatorChar);
-			Result.Append("Emoji1");
-			Result.Append(Path.DirectorySeparatorChar);
-
 			switch (this.sourceFileType)
 			{
-				case Emoji1SourceFileType.Png64:
-					Result.Append("png");
-					Result.Append(Path.DirectorySeparatorChar);
-					Result.Append("64x64");
-					break;
-
-				case Emoji1SourceFileType.Png128:
-					Result.Append("png");
-					Result.Append(Path.DirectorySeparatorChar);
-					Result.Append("128x128");
-					break;
-
-				case Emoji1SourceFileType.Png512:
-					Result.Append("png");
-					Result.Append(Path.DirectorySeparatorChar);
-					Result.Append("512x512");
-					break;
-
+				case Emoji1SourceFileType.Png64: return Path.Combine(this.programDataFolder, "Emoji1", "png", "64x64", Emoji.FileName);
+				case Emoji1SourceFileType.Png128: return Path.Combine(this.programDataFolder, "Emoji1", "png", "128x128", Emoji.FileName);
+				case Emoji1SourceFileType.Png512: return Path.Combine(this.programDataFolder, "Emoji1", "png", "512x512", Emoji.FileName);
 				case Emoji1SourceFileType.Svg:
-					Result.Append("svg");
-					if (FileName.EndsWith(".png"))
-						FileName = FileName.Substring(0, FileName.Length - 3) + "svg";
-					break;
+				default:
+					string s = Emoji.FileName;
+					if (s.EndsWith(".png"))
+						s = s.Substring(0, s.Length - 3) + "svg";
+
+					return Path.Combine(this.programDataFolder, "Emoji1", "svg", s);
 			}
-
-			Result.Append(Path.DirectorySeparatorChar);
-			Result.Append(FileName);
-
-			return Result.ToString();
 		}
 
 		/// <summary>
@@ -232,8 +218,8 @@ namespace Waher.Content.Emoji.Emoji1
 
 				Output.Append(";base64,");
 
-				string LocalFileName = this.GetLocalFileName(Emoji);
-				byte[] Data = this.readAllBytes(LocalFileName);
+				string FileName = this.GetFileName(Emoji);
+				byte[] Data = File.ReadAllBytes(FileName);
 
 				Output.Append(Convert.ToBase64String(Data));
 

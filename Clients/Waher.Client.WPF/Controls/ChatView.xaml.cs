@@ -2,7 +2,7 @@
 using System.IO;
 using System.Threading;
 using System.Collections.Generic;
-using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Xml;
 using System.Xml.Schema;
@@ -32,16 +32,31 @@ namespace Waher.Client.WPF.Controls
 	/// </summary>
 	public partial class ChatView : UserControl, ITabView
 	{
-		internal static readonly Emoji1LocalFiles Emoji1_24x24 = new Emoji1LocalFiles(Emoji1SourceFileType.Png64, 24, 24, 
-			"pack://siteoforigin:,,,/Graphics/Emoji1/png/64x64/%FILENAME%", File.Exists, File.ReadAllBytes);
-
+		private static Emoji1LocalFiles emoji1_24x24 = null;
 		private TreeNode node;
 
 		public ChatView(TreeNode Node)
 		{
+			string Folder = Assembly.GetExecutingAssembly().Location;
+			if (string.IsNullOrEmpty(Folder))
+				Folder = AppDomain.CurrentDomain.BaseDirectory;
+
 			this.node = Node;
 
+			if (emoji1_24x24 == null)
+			{
+				emoji1_24x24 = new Emoji1LocalFiles(Emoji1SourceFileType.Png64, 24, 24,
+					System.IO.Path.Combine(MainWindow.AppDataFolder, "Graphics", "Emoji1", "png", "64x64", "%FILENAME%"),
+					System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Folder), "Graphics", "Emoji1.zip"),
+					System.IO.Path.Combine(MainWindow.AppDataFolder, "Graphics"));
+			}
+
 			InitializeComponent();
+		}
+
+		public static Emoji1LocalFiles Emoji1_24x24
+		{
+			get { return emoji1_24x24; }
 		}
 
 		public void Dispose()

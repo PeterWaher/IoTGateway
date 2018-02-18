@@ -274,7 +274,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Things.Gpio", "Things
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Things.Arduino", "Things\Waher.Things.Arduino\Waher.Things.Arduino.csproj", "{99859282-A034-4014-BB69-A21728B3169F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Things.Ip", "Things\Waher.Things.Ip\Waher.Things.Ip.csproj", "{296512EA-C5DE-43C8-A1C5-B20CCF4B7F60}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Things.Ip", "Things\Waher.Things.Ip\Waher.Things.Ip.csproj", "{296512EA-C5DE-43C8-A1C5-B20CCF4B7F60}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

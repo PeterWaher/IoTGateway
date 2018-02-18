@@ -104,6 +104,11 @@ namespace Waher.Client.WPF
 			this.MainView.Load(this);
 		}
 
+		public static string AppDataFolder
+		{
+			get { return appDataFolder; }
+		}
+
 		internal static readonly string registryKey = Registry.CurrentUser + @"\Software\Waher Data AB\Waher.Client.WPF";
 
 		private void Window_Loaded(object sender, RoutedEventArgs e)

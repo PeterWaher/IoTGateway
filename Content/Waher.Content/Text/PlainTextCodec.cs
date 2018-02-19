@@ -24,8 +24,6 @@ namespace Waher.Content.Text
 		{
 			"text/plain",
  			"text/css",
-			"text/html",
-			"application/xhtml+xml",
 			"text/sgml",
 			"text/tab-separated-values",
 			"application/javascript",
@@ -40,10 +38,6 @@ namespace Waher.Content.Text
 			"txt",
 			"text",
 			"css",
-			"htm",
-			"html",
-			"xhtml",
-			"xhtm",
 			"sgml",
 			"tsv",
 			"js",
@@ -126,16 +120,6 @@ namespace Waher.Content.Text
 
 				case "css":
 					ContentType = "text/css";
-					return true;
-
-				case "htm":
-				case "html":
-					ContentType = "text/html";
-					return true;
-
-				case "xhtml":
-				case "xhtm":
-					ContentType = "application/xhtml+xml";
 					return true;
 
 				case "sgml":

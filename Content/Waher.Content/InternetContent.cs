@@ -216,15 +216,36 @@ namespace Waher.Content
 		/// <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
 		public static bool IsAccepted(string[] ContentTypes, params string[] AcceptedContentTypes)
 		{
-			if (AcceptedContentTypes.Length == 0)
-				return true;
+			return IsAccepted(ContentTypes, out string ContentType, AcceptedContentTypes);
+		}
 
-			foreach (string ContentType in ContentTypes)
+		/// <summary>
+		/// Checks if at least one content type in a set of content types is acceptable.
+		/// </summary>
+		/// <param name="ContentTypes">Content types.</param>
+		/// <param name="ContentType">Content type selected as the first acceptable content type.</param>
+		/// <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
+		public static bool IsAccepted(string[] ContentTypes, out string ContentType, params string[] AcceptedContentTypes)
+		{
+			if (ContentTypes.Length == 0)
+				throw new ArgumentException("Empty list of content types not permitted.", nameof(ContentTypes));
+
+			if (AcceptedContentTypes.Length == 0)
 			{
-				if (IsAccepted(ContentType, AcceptedContentTypes))
-					return true;
+				ContentType = ContentTypes[0];
+				return true;
 			}
 
+			foreach (string ContentType2 in ContentTypes)
+			{
+				if (IsAccepted(ContentType2, AcceptedContentTypes))
+				{
+					ContentType = ContentType2;
+					return true;
+				}
+			}
+
+			ContentType = null;
 			return false;
 		}
 

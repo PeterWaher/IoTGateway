@@ -111,5 +111,13 @@ namespace Waher.Content.Html
 
 			Output.WriteEndElement();
 		}
+
+		/// <summary>
+		/// If the element is an empty element.
+		/// </summary>
+		public virtual bool IsEmptyElement
+		{
+			get { return false; }
+		}
 	}
 }

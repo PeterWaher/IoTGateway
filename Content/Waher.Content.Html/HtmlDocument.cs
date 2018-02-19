@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Xml;
+using Waher.Content.Html.Elements;
 
 namespace Waher.Content.Html
 {
@@ -85,7 +86,7 @@ namespace Waher.Content.Html
 
 							State = 10;
 						}
-						else 
+						else
 						{
 							sb.Append(ch);
 							Empty = false;
@@ -479,14 +480,30 @@ namespace Waher.Content.Html
 		{
 			HtmlElement Result;
 
+			if (Parent != null && Parent.IsEmptyElement)
+				Parent = Parent.Parent as HtmlElement;
+
 			TagName = TagName.ToUpper();
 
 			switch (TagName)
 			{
-				// TODO: Specialized classes.
-				default:
-					Result = new HtmlElement(Parent, TagName);
-					break;
+				// TODO: Non-empty elements
+				case "AREA": Result = new Area(Parent); break;
+				case "BASE": Result = new Base(Parent); break;
+				case "BR": Result = new Br(Parent); break;
+				case "COL": Result = new Col(Parent); break;
+				case "EMBED": Result = new Embed(Parent); break;
+				case "HR": Result = new Hr(Parent); break;
+				case "IMG": Result = new Img(Parent); break;
+				case "INPUT": Result = new Input(Parent); break;
+				case "KEYGEN": Result = new Keygen(Parent); break;
+				case "LINK": Result = new Link(Parent); break;
+				case "META": Result = new Meta(Parent); break;
+				case "PARAM": Result = new Param(Parent); break;
+				case "SOURCE": Result = new Source(Parent); break;
+				case "TRACK": Result = new Track(Parent); break;
+				case "WBR": Result = new Wbr(Parent); break;
+				default: Result = new HtmlElement(Parent, TagName); break;
 			}
 
 			if (Parent == null)

@@ -24,8 +24,4 @@
     <ProjectReference Include="..\Waher.Content\Waher.Content.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Elements\" />
-  </ItemGroup>
-
 </Project>

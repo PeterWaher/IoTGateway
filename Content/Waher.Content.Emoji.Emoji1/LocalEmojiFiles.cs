@@ -3,6 +3,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Waher.Events;
 
@@ -51,9 +52,10 @@ namespace Waher.Content.Emoji.Emoji1
 	/// <summary>
 	/// Provides emojis from Emoji One (http://emojione.com/) stored as local files.
 	/// </summary>
-	public class Emoji1LocalFiles : IEmojiSource
+	public class Emoji1LocalFiles : IEmojiSource, IDisposable
 	{
 		private Emoji1SourceFileType sourceFileType;
+		private ManualResetEvent initialized = new ManualResetEvent(false);
 		private string zipFileName;
 		private string programDataFolder;
 		private string imageUrl;
@@ -108,8 +110,12 @@ namespace Waher.Content.Emoji.Emoji1
 							Directory.Delete(Folder, true);
 					}
 
+					this.initialized = new ManualResetEvent(false);
+
 					Task.Run(this.Unpack);
 				}
+				else
+					this.initialized = new ManualResetEvent(true);
 			}
 			catch (Exception ex)
 			{
@@ -119,17 +125,38 @@ namespace Waher.Content.Emoji.Emoji1
 
 		private Task Unpack()
 		{
-			Log.Informational("Starting unpacking file.",
-				new KeyValuePair<string, object>("FileName", this.zipFileName),
-				new KeyValuePair<string, object>("Destination", this.programDataFolder));
+			try
+			{
+				Log.Informational("Starting unpacking file.",
+					new KeyValuePair<string, object>("FileName", this.zipFileName),
+					new KeyValuePair<string, object>("Destination", this.programDataFolder));
 
-			ZipFile.ExtractToDirectory(this.zipFileName, this.programDataFolder);
-			File.Delete(this.zipFileName);
+				ZipFile.ExtractToDirectory(this.zipFileName, this.programDataFolder);
+				File.Delete(this.zipFileName);
 
-			Log.Informational("File unpacked and deleted.",
-				new KeyValuePair<string, object>("FileName", this.zipFileName));
+				Log.Informational("File unpacked and deleted.",
+					new KeyValuePair<string, object>("FileName", this.zipFileName));
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+			}
+			finally
+			{
+				this.initialized.Set();
+			}
 
 			return Task.CompletedTask;
+		}
+
+		/// <summary>
+		/// Waits until initialization is completed.
+		/// </summary>
+		/// <param name="TimeoutMilliseconds">Timeout, in milliseconds.</param>
+		/// <returns>If initialization completed successfully.</returns>
+		public bool WaitUntilInitialized(int TimeoutMilliseconds)
+		{
+			return this.initialized.WaitOne(TimeoutMilliseconds);
 		}
 
 		/// <summary>
@@ -277,5 +304,16 @@ namespace Waher.Content.Emoji.Emoji1
 			Height = this.height;
 		}
 
+		/// <summary>
+		/// <see cref="IDisposable"/>
+		/// </summary>
+		public void Dispose()
+		{
+			if (this.initialized != null)
+			{
+				this.initialized.Dispose();
+				this.initialized = null;
+			}
+		}
 	}
 }

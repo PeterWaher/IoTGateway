@@ -30,12 +30,15 @@ namespace Waher.Content.Markdown.Test
 		{
 			string Markdown = File.ReadAllText("Markdown/" + MarkdownFileName);
 			string ExpectedText = File.ReadAllText("PlainText/" + PlainTextFileName);
-			MarkdownSettings Settings = new MarkdownSettings(
-				new Emoji1LocalFiles(Emoji1SourceFileType.Svg, 24, 24, "/emoji1/%FILENAME%", Path.Combine("Graphics","Emoji1.zip"), "Graphics"),
-				true, new Variables())
+			Emoji1LocalFiles Emoji1LocalFiles = new Emoji1LocalFiles(Emoji1SourceFileType.Svg, 24, 24, "/emoji1/%FILENAME%", Path.Combine("Graphics", "Emoji1.zip"), "Graphics");
+
+			MarkdownSettings Settings = new MarkdownSettings(Emoji1LocalFiles, true, new Variables())
 			{
 				HttpxProxy = "/HttpxProxy/%URL%"
 			};
+
+			Assert.IsTrue(Emoji1LocalFiles.WaitUntilInitialized(60000));
+
 			MarkdownDocument Doc = new MarkdownDocument(Markdown, Settings);
 			string GeneratedText = Doc.GeneratePlainText();
 

@@ -3591,6 +3591,51 @@ namespace Waher.Content.Markdown
 							Text.Append(ch);
 						break;
 
+					case 'h':
+						if (char.IsWhiteSpace(PrevChar) && State.PeekNextCharSameRow() == 't')
+						{
+							chs = State.PeekNextChars(7);
+							if (chs[1] == 't' && chs[2] == 'p' &&
+								((chs[3] == ':' && chs[4] == '/' && chs[5] == '/') ||
+								(chs[3] == 's' && chs[4] == ':' && chs[5] == '/' && chs[6] == '/')))
+							{
+								this.AppendAnyText(Elements, Text);
+
+								Text.Clear();
+								Text.Append('h');
+
+								if (chs[3] == ':')
+									ch2 = (char)6;
+								else
+									ch2 = (char)7;
+
+								while (ch2 > 0)
+								{
+									Text.Append(State.NextChar());
+									ch2--;
+								}
+
+								while ((ch2 = State.PeekNextCharSameRow()) > ' ' && ch2 != 160)
+								{
+									Text.Append(ch2);
+									State.NextChar();
+								}
+
+								Url = Text.ToString();
+								Text.Clear();
+
+								ChildElements = new LinkedList<MarkdownElement>();
+								ChildElements.AddLast(new InlineText(this, Url));
+
+								Elements.AddLast(new Link(this, ChildElements, Url, string.Empty));
+							}
+							else
+								Text.Append(ch);
+						}
+						else
+							Text.Append(ch);
+						break;
+
 					case '\\':
 						switch (ch2 = State.PeekNextCharSameRow())
 						{
@@ -3619,6 +3664,7 @@ namespace Waher.Content.Markdown
 							case '=':
 							case ':':
 							case '|':
+							case 'h':
 								Text.Append(ch2);
 								State.NextCharSameRow();
 								break;

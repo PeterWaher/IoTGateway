@@ -3,6 +3,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using Waher.Events;
 
 namespace Waher.Content.Emoji.Emoji1
@@ -97,10 +98,6 @@ namespace Waher.Content.Emoji.Emoji1
 			{
 				if (File.Exists(ZipFileName))
 				{
-					Log.Informational("Starting unpacking file.",
-						new KeyValuePair<string, object>("FileName", ZipFileName),
-						new KeyValuePair<string, object>("Destination", ProgramDataFolder));
-
 					if (!Directory.Exists(ProgramDataFolder))
 						Directory.CreateDirectory(ProgramDataFolder);
 					else
@@ -111,17 +108,28 @@ namespace Waher.Content.Emoji.Emoji1
 							Directory.Delete(Folder, true);
 					}
 
-					ZipFile.ExtractToDirectory(ZipFileName, ProgramDataFolder);
-					File.Delete(ZipFileName);
-
-					Log.Informational("File unpacked and deleted.",
-						new KeyValuePair<string, object>("FileName", ZipFileName));
+					Task.Run(this.Unpack);
 				}
 			}
 			catch (Exception ex)
 			{
 				Log.Critical(ex);
 			}
+		}
+
+		private Task Unpack()
+		{
+			Log.Informational("Starting unpacking file.",
+				new KeyValuePair<string, object>("FileName", this.zipFileName),
+				new KeyValuePair<string, object>("Destination", this.programDataFolder));
+
+			ZipFile.ExtractToDirectory(this.zipFileName, this.programDataFolder);
+			File.Delete(this.zipFileName);
+
+			Log.Informational("File unpacked and deleted.",
+				new KeyValuePair<string, object>("FileName", this.zipFileName));
+
+			return Task.CompletedTask;
 		}
 
 		/// <summary>

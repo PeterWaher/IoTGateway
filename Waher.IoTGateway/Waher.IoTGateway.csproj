@@ -15,9 +15,9 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>IoT Gateway HTTP CoAP MQTT XMPP LWM2M</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.0.18</AssemblyVersion>
-    <FileVersion>1.0.18</FileVersion>
-    <Version>1.0.18</Version>
+    <AssemblyVersion>1.0.19</AssemblyVersion>
+    <FileVersion>1.0.19</FileVersion>
+    <Version>1.0.19</Version>
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Waher.IoTGateway\</UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>
@@ -36,6 +36,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Content\Waher.Content.Emoji.Emoji1\Waher.Content.Emoji.Emoji1.csproj" />
     <ProjectReference Include="..\Content\Waher.Content.Emoji\Waher.Content.Emoji.csproj" />
+    <ProjectReference Include="..\Content\Waher.Content.Html\Waher.Content.Html.csproj" />
     <ProjectReference Include="..\Content\Waher.Content.Images\Waher.Content.Images.csproj" />
     <ProjectReference Include="..\Content\Waher.Content.Markdown.Web\Waher.Content.Markdown.Web.csproj" />
     <ProjectReference Include="..\Content\Waher.Content.Markdown\Waher.Content.Markdown.csproj" />

@@ -9,6 +9,9 @@ using Waher.Script.Objects.VectorSpaces;
 
 namespace Waher.Script.Statistics.Functions
 {
+	/// <summary>
+	/// Computes a histogram from a set of data.
+	/// </summary>
 	public class Histogram : FunctionMultiVariate
 	{
 		private static readonly ArgumentType[] argumentTypes4Parameters = new ArgumentType[] { ArgumentType.Vector, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar };

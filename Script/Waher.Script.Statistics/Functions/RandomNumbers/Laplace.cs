@@ -98,7 +98,7 @@ namespace Waher.Script.Statistics.Functions
 		/// <summary>
 		/// Gets a laplace distributed random value.
 		/// </summary>
-		/// <param name="Median">Median of distribution.</param>
+		/// <param name="Mean">Mean of distribution.</param>
 		/// <param name="Scale">Scale of distribution.</param>
 		/// <returns>Random value.</returns>
 		public static double NextDouble(double Mean, double Scale)

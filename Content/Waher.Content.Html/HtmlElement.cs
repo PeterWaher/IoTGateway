@@ -108,6 +108,8 @@ namespace Waher.Content.Html
 				foreach (HtmlNode Child in this.children)
 					Child.Export(Output);
 			}
+
+			Output.WriteEndElement();
 		}
 
 		/// <summary>

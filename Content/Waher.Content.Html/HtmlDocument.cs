@@ -23,6 +23,8 @@ namespace Waher.Content.Html
 		private Footer footer = null;
 		private Details details = null;
 		private Summary summary = null;
+		private LinkedList<DtdInstruction> dtd = null;
+		private LinkedList<ProcessingInstruction> processingInstructions = null;
 		private LinkedList<Link> link = null;
 		private LinkedList<Meta> meta = null;
 		private LinkedList<Style> style = null;
@@ -78,6 +80,18 @@ namespace Waher.Content.Html
 		}
 
 		/// <summary>
+		/// First HTML element of document, if found, null otherwise.
+		/// </summary>
+		public Elements.Html Html
+		{
+			get
+			{
+				this.AssertParsed();
+				return this.html;
+			}
+		}
+
+		/// <summary>
 		/// First TITLE element of document, if found, null otherwise.
 		/// </summary>
 		public Title Title
@@ -86,6 +100,18 @@ namespace Waher.Content.Html
 			{
 				this.AssertParsed();
 				return this.title;
+			}
+		}
+
+		/// <summary>
+		/// First HEAD element of document, if found, null otherwise.
+		/// </summary>
+		public Head Head
+		{
+			get
+			{
+				this.AssertParsed();
+				return this.head;
 			}
 		}
 
@@ -389,6 +415,30 @@ namespace Waher.Content.Html
 			}
 		}
 
+		/// <summary>
+		/// DTD instructions found in document, or null if none found.
+		/// </summary>
+		public IEnumerable<DtdInstruction> Dtd
+		{
+			get
+			{
+				this.AssertParsed();
+				return this.dtd;
+			}
+		}
+
+		/// <summary>
+		/// Processing instructions found in document, or null if none found.
+		/// </summary>
+		public IEnumerable<ProcessingInstruction> ProcessingInstructions
+		{
+			get
+			{
+				this.AssertParsed();
+				return this.processingInstructions;
+			}
+		}
+
 		private void Parse()
 		{
 			LinkedList<HtmlElement> Stack = new LinkedList<HtmlElement>();
@@ -437,10 +487,8 @@ namespace Waher.Content.Html
 						}
 						break;
 
-					case 1:     // Waiting for !, /, attributes or >
-						if (ch == '!' && this.root == null)
-							State++;
-						else if (ch == '>')
+					case 1:     // Waiting for ?, !, /, attributes or >
+						if (ch == '>')
 						{
 							if (Empty)
 							{
@@ -485,6 +533,10 @@ namespace Waher.Content.Html
 								State = 5;
 							}
 						}
+						else if (ch == '!')
+							State++;
+						else if (ch == '?')
+							State = 19;
 						else if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || (ch >= '0' && ch <= '9'))
 						{
 							sb.Append(ch);
@@ -499,16 +551,29 @@ namespace Waher.Content.Html
 						}
 						break;
 
-					case 2: // Skip DTD
+					case 2: // DTD, comment or CDATA?
 						if (ch == '>')
 						{
-							if (!Empty)
-							{
-								sb.Clear();
-								Empty = true;
-							}
+							if (this.dtd == null)
+								this.dtd = new LinkedList<DtdInstruction>();
+
+							DtdInstruction Dtd = new DtdInstruction(CurrentElement, string.Empty);
+
+							CurrentElement?.Add(Dtd);
+							this.dtd.AddLast(Dtd);
 
 							State = 0;
+						}
+						else if (ch == '-')
+							State = 15;     // Comment?
+						else if (ch == '[')
+							State = 21;     // CDATA?
+						else
+						{
+							sb.Append(ch);
+							Empty = false;
+
+							State = 14;     // DTD
 						}
 						break;
 
@@ -803,6 +868,234 @@ namespace Waher.Content.Html
 						}
 						else if (ch == '/')
 							State = 9;
+						break;
+
+					case 14: // Skip DTD
+						if (ch == '>')
+						{
+							if (this.dtd == null)
+								this.dtd = new LinkedList<DtdInstruction>();
+
+							DtdInstruction Dtd = new DtdInstruction(CurrentElement, sb.ToString());
+
+							CurrentElement?.Add(Dtd);
+							this.dtd.AddLast(Dtd);
+
+							sb.Clear();
+							Empty = true;
+
+							State = 0;
+						}
+						else
+						{
+							sb.Append(ch);
+							Empty = false;
+						}
+						break;
+
+					case 15:    // Second hyphen in start of comment?
+						if (ch == '-')
+							State++;
+						else
+						{
+							sb.Append("<!-");
+							sb.Append(ch);
+							Empty = false;
+
+							State = 0;
+						}
+						break;
+
+					case 16:    // In comment
+						if (ch == '-')
+							State++;
+						else
+						{
+							sb.Append(ch);
+							Empty = false;
+						}
+						break;
+
+					case 17:    // Second hyphen?
+						if (ch == '-')
+							State++;
+						else
+						{
+							sb.Append('-');
+							sb.Append(ch);
+							Empty = false;
+
+							State--;
+						}
+						break;
+
+					case 18:    // End of comment
+						if (ch == '>')
+						{
+							CurrentElement?.Add(new Comment(CurrentElement, sb.ToString()));
+
+							sb.Clear();
+							Empty = true;
+
+							State = 0;
+						}
+						else
+						{
+							sb.Append("--");
+							sb.Append(ch);
+							Empty = false;
+
+							State -= 2;
+						}
+						break;
+
+					case 19:    // In processing instruction
+						if (ch == '?')
+							State++;
+						else
+						{
+							sb.Append(ch);
+							Empty = false;
+						}
+						break;
+
+					case 20:    // End of processing instruction?
+						if (ch == '>')
+						{
+							if (this.processingInstructions == null)
+								this.processingInstructions = new LinkedList<ProcessingInstruction>();
+
+							ProcessingInstruction PI = new ProcessingInstruction(CurrentElement, sb.ToString());
+
+							CurrentElement?.Add(PI);
+							this.processingInstructions.AddLast(PI);
+
+							sb.Clear();
+							Empty = true;
+
+							State = 0;
+						}
+						else
+						{
+							sb.Append('?');
+							sb.Append(ch);
+							Empty = false;
+
+							State--;
+						}
+						break;
+
+					case 21:    // <![ received
+						if (ch == 'C')
+							State++;
+						else
+						{
+							sb.Append("<![");
+							sb.Append(ch);
+							Empty = false;
+							State = 0;
+						}
+						break;
+
+					case 22:    // <![C received
+						if (ch == 'D')
+							State++;
+						else
+						{
+							sb.Append("<![C");
+							sb.Append(ch);
+							Empty = false;
+							State = 0;
+						}
+						break;
+
+					case 23:    // <![CD received
+						if (ch == 'A')
+							State++;
+						else
+						{
+							sb.Append("<![CD");
+							sb.Append(ch);
+							Empty = false;
+							State = 0;
+						}
+						break;
+
+					case 24:    // <![CDA received
+						if (ch == 'T')
+							State++;
+						else
+						{
+							sb.Append("<![CDA");
+							sb.Append(ch);
+							Empty = false;
+							State = 0;
+						}
+						break;
+
+					case 25:    // <![CDAT received
+						if (ch == 'A')
+							State++;
+						else
+						{
+							sb.Append("<![CDAT");
+							sb.Append(ch);
+							Empty = false;
+							State = 0;
+						}
+						break;
+
+					case 26:    // <![CDATA received
+						if (ch == '[')
+							State++;
+						else
+						{
+							sb.Append("<![CDATA");
+							sb.Append(ch);
+							Empty = false;
+							State = 0;
+						}
+						break;
+
+					case 27:    // In CDATA
+						if (ch == ']')
+							State++;
+						else
+						{
+							sb.Append(ch);
+							Empty = false;
+						}
+						break;
+
+					case 28:
+						if (ch == ']')
+							State++;
+						else
+						{
+							sb.Append('[');
+							sb.Append(ch);
+							Empty = false;
+							State--;
+						}
+						break;
+
+					case 29:
+						if (ch == '>')
+						{
+							CurrentElement?.Add(new CDATA(CurrentElement, sb.ToString()));
+
+							sb.Clear();
+							Empty = true;
+
+							State = 0;
+						}
+						else
+						{
+							sb.Append("[[");
+							sb.Append(ch);
+							Empty = false;
+							State -= 2;
+						}
 						break;
 
 					default:
@@ -1253,7 +1546,13 @@ namespace Waher.Content.Html
 					this.time.AddLast(Time);
 					break;
 
-				case "TITLE": Result = new Title(Parent); break;
+				case "TITLE":
+					Title Title = new Title(Parent);
+					Result = Title;
+					if (this.title == null)
+						this.title = Title;
+					break;
+
 				case "TR": Result = new Tr(Parent); break;
 				case "TRACK": Result = new Track(Parent); break;
 				case "TT": Result = new Tt(Parent); break;

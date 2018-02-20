@@ -16,13 +16,13 @@ namespace Waher.Content.Html
 		private Elements.Html html = null;
 		private Title title = null;
 		private Body body = null;
-		private Article article = null;
-		private Main main = null;
 		private Head head = null;
-		private Header header = null;
-		private Footer footer = null;
-		private Details details = null;
-		private Summary summary = null;
+		private LinkedList<Main> main = null;
+		private LinkedList<Header> header = null;
+		private LinkedList<Footer> footer = null;
+		private LinkedList<Details> details = null;
+		private LinkedList<Summary> summary = null;
+		private LinkedList<Article> article = null;
 		private LinkedList<DtdInstruction> dtd = null;
 		private LinkedList<ProcessingInstruction> processingInstructions = null;
 		private LinkedList<Link> link = null;
@@ -128,21 +128,9 @@ namespace Waher.Content.Html
 		}
 
 		/// <summary>
-		/// First ARTICLE element of document, if found, null otherwise.
+		/// HEADER elements found in document, or null if none found.
 		/// </summary>
-		public Article Article
-		{
-			get
-			{
-				this.AssertParsed();
-				return this.article;
-			}
-		}
-
-		/// <summary>
-		/// First MAIN element of document, if found, null otherwise.
-		/// </summary>
-		public Main Main
+		public IEnumerable<Main> Main
 		{
 			get
 			{
@@ -152,9 +140,9 @@ namespace Waher.Content.Html
 		}
 
 		/// <summary>
-		/// First HEADER element of document, if found, null otherwise.
+		/// HEADER elements found in document, or null if none found.
 		/// </summary>
-		public Header Header
+		public IEnumerable<Header> Header
 		{
 			get
 			{
@@ -164,9 +152,9 @@ namespace Waher.Content.Html
 		}
 
 		/// <summary>
-		/// First FOOTER element of document, if found, null otherwise.
+		/// FOOTER elements found in document, or null if none found.
 		/// </summary>
-		public Footer Footer
+		public IEnumerable<Footer> Footer
 		{
 			get
 			{
@@ -176,9 +164,9 @@ namespace Waher.Content.Html
 		}
 
 		/// <summary>
-		/// First DETAILS element of document, if found, null otherwise.
+		/// DETAILS elements found in document, or null if none found.
 		/// </summary>
-		public Details Details
+		public IEnumerable<Details> Details
 		{
 			get
 			{
@@ -188,14 +176,26 @@ namespace Waher.Content.Html
 		}
 
 		/// <summary>
-		/// First SUMMARY element of document, if found, null otherwise.
+		/// SUMMARY elements found in document, or null if none found.
 		/// </summary>
-		public Summary Summary
+		public IEnumerable<Summary> Summary
 		{
 			get
 			{
 				this.AssertParsed();
 				return this.summary;
+			}
+		}
+
+		/// <summary>
+		/// ARTICLE elements found in document, or null if none found.
+		/// </summary>
+		public IEnumerable<Article> Article
+		{
+			get
+			{
+				this.AssertParsed();
+				return this.article;
 			}
 		}
 
@@ -549,7 +549,7 @@ namespace Waher.Content.Html
 								State = 0;
 							}
 						}
-						else if (ch <= ' ')
+						else if (ch <= ' ' || ch == 160)
 						{
 							if (Empty)
 							{
@@ -675,15 +675,23 @@ namespace Waher.Content.Html
 									HtmlElement Loop = CurrentElement.Parent as HtmlElement;
 
 									while (Loop != null && Loop.Name != s)
-									{
-										if (Loop.EndPosition < 0)
-											Loop.EndPosition = Pos;
-
 										Loop = Loop.Parent as HtmlElement;
-									}
 
 									if (Loop != null)
 									{
+										Loop = CurrentElement.Parent as HtmlElement;
+
+										while (Loop != null && Loop.Name != s)
+										{
+											if (Loop.EndPosition < 0)
+												Loop.EndPosition = Pos;
+
+											Loop = Loop.Parent as HtmlElement;
+										}
+
+										if (Loop.EndPosition < 0)
+											Loop.EndPosition = Pos;
+
 										CurrentElement = Loop.Parent as HtmlElement;
 										CurrentElementIsScript = CurrentElement is Elements.Script;
 									}
@@ -714,7 +722,7 @@ namespace Waher.Content.Html
 							Name = string.Empty;
 							State = 7;
 						}
-						else if (ch > ' ')
+						else if (ch > ' ' && ch != 160)
 						{
 							if (IsNameCharacter(ch))
 							{
@@ -764,7 +772,7 @@ namespace Waher.Content.Html
 						}
 						else
 						{
-							if (ch <= ' ')
+							if (ch <= ' ' || ch == 160)
 							{
 								CurrentElement.AddAttribute(new HtmlAttribute(this, CurrentElement, StartOfAttribute, Pos - 1, sb.ToString(), string.Empty));
 
@@ -808,7 +816,7 @@ namespace Waher.Content.Html
 							CurrentElement.AddAttribute(new HtmlAttribute(this, CurrentElement, StartOfAttribute, Pos - 1, Name, string.Empty));
 							State = 9;
 						}
-						else if (ch > ' ')
+						else if (ch > ' ' && ch != 160)
 						{
 							sb.Append(ch);
 							Empty = false;
@@ -817,7 +825,7 @@ namespace Waher.Content.Html
 						break;
 
 					case 8: // Non-encapsulated attribute value
-						if (ch <= ' ')
+						if (ch <= ' ' || ch == 160)
 						{
 							CurrentElement.AddAttribute(new HtmlAttribute(this, CurrentElement, StartOfAttribute, Pos - 1, Name, sb.ToString()));
 
@@ -855,6 +863,7 @@ namespace Waher.Content.Html
 					case 9: // Waiting for > at end of empty element
 						if (ch == '>')
 						{
+							CurrentElement.EndPosition = Pos;
 							CurrentElement = CurrentElement.Parent as HtmlElement;
 							CurrentElementIsScript = CurrentElement is Elements.Script;
 							StartOfText = Pos + 1;
@@ -1277,6 +1286,14 @@ namespace Waher.Content.Html
 						break;
 				}
 			}
+
+			while (CurrentElement != null)
+			{
+				if (CurrentElement.EndPosition < 0)
+					CurrentElement.EndPosition = Pos - 1;
+
+				CurrentElement = CurrentElement.Parent as HtmlElement;
+			}
 		}
 
 		private static bool IsNameCharacter(char ch)
@@ -1387,7 +1404,8 @@ namespace Waher.Content.Html
 					Article Article = new Article(this, Parent, Start);
 					Result = Article;
 					if (this.article == null)
-						this.article = Article;
+						this.article = new LinkedList<Article>();
+					this.article.AddLast(Article);
 					break;
 
 				case "ASIDE":
@@ -1455,7 +1473,8 @@ namespace Waher.Content.Html
 					Details Details = new Details(this, Parent, Start);
 					Result = Details;
 					if (this.details == null)
-						this.details = Details;
+						this.details = new LinkedList<Details>();
+					this.details.AddLast(Details);
 					break;
 
 				case "DFN": Result = new Dfn(this, Parent, Start); break;
@@ -1489,7 +1508,8 @@ namespace Waher.Content.Html
 					Footer Footer = new Footer(this, Parent, Start);
 					Result = Footer;
 					if (this.footer == null)
-						this.footer = Footer;
+						this.footer= new LinkedList<Footer>();
+					this.footer.AddLast(Footer);
 					break;
 
 				case "FORM":
@@ -1522,7 +1542,8 @@ namespace Waher.Content.Html
 					Header Header = new Header(this, Parent, Start);
 					Result = Header;
 					if (this.header == null)
-						this.header = Header;
+						this.header = new LinkedList<Header>();
+					this.header.AddLast(Header);
 					break;
 
 				case "HGROUP": Result = new HGroup(this, Parent, Start); break;
@@ -1566,7 +1587,8 @@ namespace Waher.Content.Html
 					Main Main = new Main(this, Parent, Start);
 					Result = Main;
 					if (this.main == null)
-						this.main = Main;
+						this.main = new LinkedList<Main>();
+					this.main.AddLast(Main);
 					break;
 
 				case "MAP": Result = new Map(this, Parent, Start); break;
@@ -1660,7 +1682,8 @@ namespace Waher.Content.Html
 					Summary Summary = new Summary(this, Parent, Start);
 					Result = Summary;
 					if (this.summary == null)
-						this.summary = Summary;
+						this.summary = new LinkedList<Summary>();
+					this.summary.AddLast(Summary);
 					break;
 
 				case "SUP": Result = new Sup(this, Parent, Start); break;

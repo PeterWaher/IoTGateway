@@ -16,7 +16,7 @@ namespace Waher.Content.Html.Test
 		[AssemblyInitialize]
 		public static void AssemblyInitialize(TestContext Context)
 		{
-			Types.Initialize(typeof(InternetContent).Assembly, 
+			Types.Initialize(typeof(InternetContent).Assembly,
 				typeof(HtmlDocument).Assembly);
 		}
 
@@ -41,6 +41,42 @@ namespace Waher.Content.Html.Test
 				Assert.IsNotNull(Doc.Head);
 				Assert.IsNotNull(Doc.Body);
 				Assert.IsNotNull(Doc.Title);
+
+				List<HtmlNode> Todo = new List<HtmlNode>()
+				{
+					Doc.Root
+				};
+
+				string s;
+				HtmlNode N;
+				int i = 0;
+				int Last = -1;
+
+				while (i < Todo.Count)
+				{
+					N = Todo[i++];
+
+					if (Last >= 0)
+						s = "\r\n\r\n" + Doc.HtmlText.Substring(Last + 1);
+					else
+						s = string.Empty;
+
+					Assert.IsTrue(N.StartPosition > Last, "Start position not set properly. Start=" + N.StartPosition.ToString() + ", Last=" + Last.ToString() + s);
+					Assert.IsTrue(N.EndPosition >= N.StartPosition, "End position not set.\r\n\r\n" + Doc.HtmlText.Substring(N.StartPosition));
+					Assert.IsTrue(!string.IsNullOrEmpty(N.OuterHtml), "OuterHTML not set properly.\r\n\r\n" + Doc.HtmlText.Substring(N.StartPosition));
+
+					if (N is HtmlElement E)
+					{
+						Last = E.EndPositionOfStartTag;
+
+						if (E.HasChildren)
+							Todo.InsertRange(i, E.Children);
+
+						Assert.IsTrue(E.InnerHtml != null, "InnerHTML not set properly.\r\n\r\n" + Doc.HtmlText.Substring(N.StartPosition));
+					}
+					else
+						Last = N.EndPosition;
+				}
 
 				XmlWriterSettings Settings = XML.WriterSettings(true, true);
 				using (XmlWriter Output = XmlWriter.Create(Console.Out, Settings))

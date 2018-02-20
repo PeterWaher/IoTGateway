@@ -129,6 +129,23 @@ namespace Waher.Content.Html
 		}
 
 		/// <summary>
+		/// End position of start tag.
+		/// </summary>
+		public int EndPositionOfStartTag
+		{
+			get
+			{
+				if (this.children != null)
+				{
+					foreach (HtmlNode N in this.children)
+						return N.StartPosition - 1;
+				}
+
+				return this.EndPosition;
+			}
+		}
+
+		/// <summary>
 		/// <see cref="object.ToString()"/>
 		/// </summary>
 		public override string ToString()

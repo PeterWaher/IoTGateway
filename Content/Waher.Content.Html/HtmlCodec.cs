@@ -160,12 +160,12 @@ namespace Waher.Content.Html
 				if (Encoding == null)
 				{
 					ContentType += "; charset=utf-8";
-					return Encoding.UTF8.GetBytes(HtmlDoc.Html);
+					return Encoding.UTF8.GetBytes(HtmlDoc.HtmlText);
 				}
 				else
 				{
 					ContentType += "; charset=" + Encoding.WebName;
-					return Encoding.GetBytes(HtmlDoc.Html);
+					return Encoding.GetBytes(HtmlDoc.HtmlText);
 				}
 			}
 			else

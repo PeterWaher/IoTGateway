@@ -11,8 +11,36 @@ namespace Waher.Content.Html
 	/// </summary>
 	public class HtmlDocument
 	{
-		private string html;
+		private string htmlText;
 		private HtmlElement root = null;
+		private Elements.Html html = null;
+		private Title title = null;
+		private Body body = null;
+		private Article article = null;
+		private Main main = null;
+		private Head head = null;
+		private Header header = null;
+		private Footer footer = null;
+		private Details details = null;
+		private Summary summary = null;
+		private LinkedList<Link> link = null;
+		private LinkedList<Meta> meta = null;
+		private LinkedList<Style> style = null;
+		private LinkedList<Address> address = null;
+		private LinkedList<Aside> aside = null;
+		private LinkedList<Nav> nav = null;
+		private LinkedList<Section> section = null;
+		private LinkedList<Dialog> dialog = null;
+		private LinkedList<Figure> figure = null;
+		private LinkedList<Elements.Audio> audio = null;
+		private LinkedList<Elements.Video> video = null;
+		private LinkedList<Img> img = null;
+		private LinkedList<Picture> picture = null;
+		private LinkedList<Cite> cite = null;
+		private LinkedList<Data> data = null;
+		private LinkedList<Time> time = null;
+		private LinkedList<Elements.Script> script = null;
+		private LinkedList<Form> form = null;
 
 		/// <summary>
 		/// HTML document.
@@ -20,15 +48,21 @@ namespace Waher.Content.Html
 		/// <param name="Html">HTML text.</param>
 		public HtmlDocument(string Html)
 		{
-			this.html = Html;
+			this.htmlText = Html;
 		}
 
 		/// <summary>
 		/// HTML text.
 		/// </summary>
-		public string Html
+		public string HtmlText
 		{
-			get { return this.html; }
+			get { return this.htmlText; }
+		}
+
+		private void AssertParsed()
+		{
+			if (this.root == null)
+				this.Parse();
 		}
 
 		/// <summary>
@@ -38,10 +72,320 @@ namespace Waher.Content.Html
 		{
 			get
 			{
-				if (this.root == null)
-					this.Parse();
-
+				this.AssertParsed();
 				return this.root;
+			}
+		}
+
+		/// <summary>
+		/// First TITLE element of document, if found, null otherwise.
+		/// </summary>
+		public Title Title
+		{
+			get
+			{
+				this.AssertParsed();
+				return this.title;
+			}
+		}
+
+		/// <summary>
+		/// First BODY element of document, if found, null otherwise.
+		/// </summary>
+		public Body Body
+		{
+			get
+			{
+				this.AssertParsed();
+				return this.body;
+			}
+		}
+
+		/// <summary>
+		/// First ARTICLE element of document, if found, null otherwise.
+		/// </summary>
+		public Article Article
+		{
+			get
+			{
+				this.AssertParsed();
+				return this.article;
+			}
+		}
+
+		/// <summary>
+		/// First MAIN element of document, if found, null otherwise.
+		/// </summary>
+		public Main Main
+		{
+			get
+			{
+				this.AssertParsed();
+				return this.main;
+			}
+		}
+
+		/// <summary>
+		/// First HEADER element of document, if found, null otherwise.
+		/// </summary>
+		public Header Header
+		{
+			get
+			{
+				this.AssertParsed();
+				return this.header;
+			}
+		}
+
+		/// <summary>
+		/// First FOOTER element of document, if found, null otherwise.
+		/// </summary>
+		public Footer Footer
+		{
+			get
+			{
+				this.AssertParsed();
+				return this.footer;
+			}
+		}
+
+		/// <summary>
+		/// First DETAILS element of document, if found, null otherwise.
+		/// </summary>
+		public Details Details
+		{
+			get
+			{
+				this.AssertParsed();
+				return this.details;
+			}
+		}
+
+		/// <summary>
+		/// First SUMMARY element of document, if found, null otherwise.
+		/// </summary>
+		public Summary Summary
+		{
+			get
+			{
+				this.AssertParsed();
+				return this.summary;
+			}
+		}
+
+		/// <summary>
+		/// LINK elements found in document, or null if none found.
+		/// </summary>
+		public IEnumerable<Link> Link
+		{
+			get
+			{
+				this.AssertParsed();
+				return this.link;
+			}
+		}
+
+		/// <summary>
+		/// META elements found in document, or null if none found.
+		/// </summary>
+		public IEnumerable<Meta> Meta
+		{
+			get
+			{
+				this.AssertParsed();
+				return this.meta;
+			}
+		}
+
+		/// <summary>
+		/// STYLE elements found in document, or null if none found.
+		/// </summary>
+		public IEnumerable<Style> Style
+		{
+			get
+			{
+				this.AssertParsed();
+				return this.style;
+			}
+		}
+
+		/// <summary>
+		/// ADDRESS elements found in document, or null if none found.
+		/// </summary>
+		public IEnumerable<Address> Address
+		{
+			get
+			{
+				this.AssertParsed();
+				return this.address;
+			}
+		}
+
+		/// <summary>
+		/// ASIDE elements found in document, or null if none found.
+		/// </summary>
+		public IEnumerable<Aside> Aside
+		{
+			get
+			{
+				this.AssertParsed();
+				return this.aside;
+			}
+		}
+
+		/// <summary>
+		/// NAV elements found in document, or null if none found.
+		/// </summary>
+		public IEnumerable<Nav> Nav
+		{
+			get
+			{
+				this.AssertParsed();
+				return this.nav;
+			}
+		}
+
+		/// <summary>
+		/// SECTION elements found in document, or null if none found.
+		/// </summary>
+		public IEnumerable<Section> Section
+		{
+			get
+			{
+				this.AssertParsed();
+				return this.section;
+			}
+		}
+
+		/// <summary>
+		/// DIALOG elements found in document, or null if none found.
+		/// </summary>
+		public IEnumerable<Dialog> Dialog
+		{
+			get
+			{
+				this.AssertParsed();
+				return this.dialog;
+			}
+		}
+
+		/// <summary>
+		/// FIGURE elements found in document, or null if none found.
+		/// </summary>
+		public IEnumerable<Figure> Figure
+		{
+			get
+			{
+				this.AssertParsed();
+				return this.figure;
+			}
+		}
+
+		/// <summary>
+		/// AUDIO elements found in document, or null if none found.
+		/// </summary>
+		public IEnumerable<Elements.Audio> Audio
+		{
+			get
+			{
+				this.AssertParsed();
+				return this.audio;
+			}
+		}
+
+		/// <summary>
+		/// VIDEO elements found in document, or null if none found.
+		/// </summary>
+		public IEnumerable<Elements.Video> Video
+		{
+			get
+			{
+				this.AssertParsed();
+				return this.video;
+			}
+		}
+
+		/// <summary>
+		/// IMG elements found in document, or null if none found.
+		/// </summary>
+		public IEnumerable<Img> Img
+		{
+			get
+			{
+				this.AssertParsed();
+				return this.img;
+			}
+		}
+
+		/// <summary>
+		/// PICTURE elements found in document, or null if none found.
+		/// </summary>
+		public IEnumerable<Picture> Picture
+		{
+			get
+			{
+				this.AssertParsed();
+				return this.picture;
+			}
+		}
+
+		/// <summary>
+		/// CITE elements found in document, or null if none found.
+		/// </summary>
+		public IEnumerable<Cite> Cite
+		{
+			get
+			{
+				this.AssertParsed();
+				return this.cite;
+			}
+		}
+
+		/// <summary>
+		/// DATA elements found in document, or null if none found.
+		/// </summary>
+		public IEnumerable<Data> Data
+		{
+			get
+			{
+				this.AssertParsed();
+				return this.data;
+			}
+		}
+
+		/// <summary>
+		/// TIME elements found in document, or null if none found.
+		/// </summary>
+		public IEnumerable<Time> Time
+		{
+			get
+			{
+				this.AssertParsed();
+				return this.time;
+			}
+		}
+
+		/// <summary>
+		/// SCRIPT elements found in document, or null if none found.
+		/// </summary>
+		public IEnumerable<Elements.Script> Script
+		{
+			get
+			{
+				this.AssertParsed();
+				return this.script;
+			}
+		}
+
+		/// <summary>
+		/// FORM elements found in document, or null if none found.
+		/// </summary>
+		public IEnumerable<Form> Form
+		{
+			get
+			{
+				this.AssertParsed();
+				return this.form;
 			}
 		}
 
@@ -57,7 +401,7 @@ namespace Waher.Content.Html
 			char EndChar = '\x00';
 			bool Empty = true;
 
-			foreach (char ch in this.html)
+			foreach (char ch in this.htmlText)
 			{
 				switch (State)
 				{
@@ -602,12 +946,39 @@ namespace Waher.Content.Html
 				case "A": Result = new A(Parent); break;
 				case "ABBR": Result = new Abbr(Parent); break;
 				case "ACRONYM": Result = new Acronym(Parent); break;
-				case "ADDRESS": Result = new Address(Parent); break;
+				case "ADDRESS":
+					Address Address = new Address(Parent);
+					Result = Address;
+					if (this.address == null)
+						this.address = new LinkedList<Address>();
+					this.address.AddLast(Address);
+					break;
+
 				case "APPLET": Result = new Applet(Parent); break;
 				case "AREA": Result = new Area(Parent); break;
-				case "ARTICLE": Result = new Article(Parent); break;
-				case "ASIDE": Result = new Aside(Parent); break;
-				case "AUDIO": Result = new Elements.Audio(Parent); break;
+				case "ARTICLE":
+					Article Article = new Article(Parent);
+					Result = Article;
+					if (this.article == null)
+						this.article = Article;
+					break;
+
+				case "ASIDE":
+					Aside Aside = new Aside(Parent);
+					Result = Aside;
+					if (this.aside == null)
+						this.aside = new LinkedList<Aside>();
+					this.aside.AddLast(Aside);
+					break;
+
+				case "AUDIO":
+					Elements.Audio Audio = new Elements.Audio(Parent);
+					Result = Audio;
+					if (this.audio == null)
+						this.audio = new LinkedList<Elements.Audio>();
+					this.audio.AddLast(Audio);
+					break;
+
 				case "B": Result = new B(Parent); break;
 				case "BASE": Result = new Base(Parent); break;
 				case "BASEFONT": Result = new BaseFont(Parent); break;
@@ -617,25 +988,58 @@ namespace Waher.Content.Html
 				case "BIG": Result = new Big(Parent); break;
 				case "BLINK": Result = new BLink(Parent); break;
 				case "BLOCKQUOTE": Result = new BlockQuote(Parent); break;
-				case "BODY": Result = new Body(Parent); break;
+				case "BODY":
+					Body Body = new Body(Parent);
+					Result = Body;
+					if (this.body == null)
+						this.body = Body;
+					break;
+
 				case "BR": Result = new Br(Parent); break;
 				case "BUTTON": Result = new Button(Parent); break;
 				case "CANVAS": Result = new Canvas(Parent); break;
 				case "CAPTION": Result = new Caption(Parent); break;
 				case "CENTER": Result = new Center(Parent); break;
-				case "CITE": Result = new Cite(Parent); break;
+				case "CITE":
+					Cite Cite = new Cite(Parent);
+					Result = Cite;
+					if (this.cite == null)
+						this.cite = new LinkedList<Cite>();
+					this.cite.AddLast(Cite);
+					break;
+
 				case "CODE": Result = new Code(Parent); break;
 				case "COL": Result = new Col(Parent); break;
 				case "COLGROUP": Result = new ColGroup(Parent); break;
 				case "COMMAND": Result = new Command(Parent); break;
 				case "CONTENT": Result = new Elements.Content(Parent); break;
-				case "DATA": Result = new Data(Parent); break;
+				case "DATA":
+					Data Data = new Data(Parent);
+					Result = Data;
+					if (this.data == null)
+						this.data = new LinkedList<Data>();
+					this.data.AddLast(Data);
+					break;
+
 				case "DATALIST": Result = new DataList(Parent); break;
 				case "DD": Result = new Dd(Parent); break;
 				case "DEL": Result = new Del(Parent); break;
-				case "DETAILS": Result = new Details(Parent); break;
+				case "DETAILS":
+					Details Details = new Details(Parent);
+					Result = Details;
+					if (this.details == null)
+						this.details = Details;
+					break;
+
 				case "DFN": Result = new Dfn(Parent); break;
-				case "DIALOG": Result = new Dialog(Parent); break;
+				case "DIALOG":
+					Dialog Dialog = new Dialog(Parent);
+					Result = Dialog;
+					if (this.dialog == null)
+						this.dialog = new LinkedList<Dialog>();
+					this.dialog.AddLast(Dialog);
+					break;
+
 				case "DIR": Result = new Dir(Parent); break;
 				case "DIV": Result = new Div(Parent); break;
 				case "DL": Result = new Dl(Parent); break;
@@ -645,10 +1049,30 @@ namespace Waher.Content.Html
 				case "EMBED": Result = new Embed(Parent); break;
 				case "FIELDSET": Result = new FieldSet(Parent); break;
 				case "FIGCAPTION": Result = new FigCaption(Parent); break;
-				case "FIGURE": Result = new FigCaption(Parent); break;
+				case "FIGURE":
+					Figure Figure = new Figure(Parent);
+					Result = Figure;
+					if (this.figure == null)
+						this.figure = new LinkedList<Figure>();
+					this.figure.AddLast(Figure);
+					break;
+
 				case "FONT": Result = new Font(Parent); break;
-				case "FOOTER": Result = new Footer(Parent); break;
-				case "FORM": Result = new Form(Parent); break;
+				case "FOOTER":
+					Footer Footer = new Footer(Parent);
+					Result = Footer;
+					if (this.footer == null)
+						this.footer = Footer;
+					break;
+
+				case "FORM":
+					Form Form = new Form(Parent);
+					Result = Form;
+					if (this.form == null)
+						this.form = new LinkedList<Form>();
+					this.form.AddLast(Form);
+					break;
+
 				case "FRAME": Result = new Frame(Parent); break;
 				case "FRAMESET": Result = new FrameSet(Parent); break;
 				case "H1": Result = new Hn(Parent, 1); break;
@@ -660,15 +1084,40 @@ namespace Waher.Content.Html
 				case "H7": Result = new Hn(Parent, 7); break;
 				case "H8": Result = new Hn(Parent, 8); break;
 				case "H9": Result = new Hn(Parent, 9); break;
-				case "HEAD": Result = new Head(Parent); break;
-				case "HEADER": Result = new Header(Parent); break;
+				case "HEAD":
+					Head Head = new Head(Parent);
+					Result = Head;
+					if (this.head == null)
+						this.head = Head;
+					break;
+
+				case "HEADER":
+					Header Header = new Header(Parent);
+					Result = Header;
+					if (this.header == null)
+						this.header = Header;
+					break;
+
 				case "HGROUP": Result = new HGroup(Parent); break;
 				case "HR": Result = new Hr(Parent); break;
-				case "HTML": Result = new Elements.Html(Parent); break;
+				case "HTML":
+					Elements.Html Html = new Elements.Html(Parent);
+					Result = Html;
+					if (this.html == null)
+						this.html = Html;
+					break;
+
 				case "I": Result = new I(Parent); break;
 				case "IFRAME": Result = new IFrame(Parent); break;
 				case "IMAGE": Result = new Image(Parent); break;
-				case "IMG": Result = new Img(Parent); break;
+				case "IMG":
+					Img Img = new Img(Parent);
+					Result = Img;
+					if (this.img == null)
+						this.img = new LinkedList<Img>();
+					this.img.AddLast(Img);
+					break;
+
 				case "INPUT": Result = new Input(Parent); break;
 				case "INS": Result = new Ins(Parent); break;
 				case "ISINDEX": Result = new IsIndex(Parent); break;
@@ -677,18 +1126,45 @@ namespace Waher.Content.Html
 				case "LABEL": Result = new Label(Parent); break;
 				case "LEGEND": Result = new Legend(Parent); break;
 				case "LI": Result = new Li(Parent); break;
-				case "LINK": Result = new Link(Parent); break;
+				case "LINK":
+					Link Link = new Link(Parent);
+					Result = Link;
+					if (this.link == null)
+						this.link = new LinkedList<Link>();
+					this.link.AddLast(Link);
+					break;
+
 				case "LISTING": Result = new Listing(Parent); break;
-				case "MAIN": Result = new Main(Parent); break;
+				case "MAIN":
+					Main Main = new Main(Parent);
+					Result = Main;
+					if (this.main == null)
+						this.main = Main;
+					break;
+
 				case "MAP": Result = new Map(Parent); break;
 				case "MARK": Result = new Mark(Parent); break;
 				case "MARQUEE": Result = new Marquee(Parent); break;
 				case "MENU": Result = new Menu(Parent); break;
 				case "MENUITEM": Result = new MenuItem(Parent); break;
-				case "META": Result = new Meta(Parent); break;
+				case "META":
+					Meta Meta = new Meta(Parent);
+					Result = Meta;
+					if (this.meta == null)
+						this.meta = new LinkedList<Meta>();
+					this.meta.AddLast(Meta);
+					break;
+
 				case "METER": Result = new Meter(Parent); break;
 				case "MULTICOL": Result = new MultiCol(Parent); break;
-				case "NAV": Result = new Nav(Parent); break;
+				case "NAV":
+					Nav Nav = new Nav(Parent);
+					Result = Nav;
+					if (this.nav == null)
+						this.nav = new LinkedList<Nav>();
+					this.nav.AddLast(Nav);
+					break;
+
 				case "NEXTID": Result = new NextId(Parent); break;
 				case "NOBR": Result = new NoBr(Parent); break;
 				case "NOEMBED": Result = new NoEmbed(Parent); break;
@@ -701,7 +1177,14 @@ namespace Waher.Content.Html
 				case "OUTPUT": Result = new Output(Parent); break;
 				case "P": Result = new P(Parent); break;
 				case "PARAM": Result = new Param(Parent); break;
-				case "PICTURE": Result = new Picture(Parent); break;
+				case "PICTURE":
+					Picture Picture = new Picture(Parent);
+					Result = Picture;
+					if (this.picture == null)
+						this.picture = new LinkedList<Picture>();
+					this.picture.AddLast(Picture);
+					break;
+
 				case "PLAINTEXT": Result = new PlainText(Parent); break;
 				case "PRE": Result = new Pre(Parent); break;
 				case "PROGRESS": Result = new Progress(Parent); break;
@@ -712,8 +1195,22 @@ namespace Waher.Content.Html
 				case "RUBY": Result = new Ruby(Parent); break;
 				case "S": Result = new S(Parent); break;
 				case "SAMP": Result = new Samp(Parent); break;
-				case "SCRIPT": Result = new Elements.Script(Parent); break;
-				case "SECTION": Result = new Section(Parent); break;
+				case "SCRIPT":
+					Elements.Script Script = new Elements.Script(Parent);
+					Result = Script;
+					if (this.script == null)
+						this.script = new LinkedList<Elements.Script>();
+					this.script.AddLast(Script);
+					break;
+
+				case "SECTION":
+					Section Section = new Section(Parent);
+					Result = Section;
+					if (this.section == null)
+						this.section = new LinkedList<Section>();
+					this.section.AddLast(Section);
+					break;
+
 				case "SELECT": Result = new Select(Parent); break;
 				case "SHADOW": Result = new Shadow(Parent); break;
 				case "SLOT": Result = new Slot(Parent); break;
@@ -723,9 +1220,22 @@ namespace Waher.Content.Html
 				case "SPAN": Result = new Span(Parent); break;
 				case "STRIKE": Result = new Strike(Parent); break;
 				case "STRONG": Result = new Strong(Parent); break;
-				case "STYLE": Result = new Style(Parent); break;
+				case "STYLE":
+					Style Style = new Style(Parent);
+					Result = Style;
+					if (this.style == null)
+						this.style = new LinkedList<Style>();
+					this.style.AddLast(Style);
+					break;
+
 				case "SUB": Result = new Sub(Parent); break;
-				case "SUMMARY": Result = new Summary(Parent); break;
+				case "SUMMARY":
+					Summary Summary = new Summary(Parent);
+					Result = Summary;
+					if (this.summary == null)
+						this.summary = Summary;
+					break;
+
 				case "SUP": Result = new Sup(Parent); break;
 				case "TABLE": Result = new Table(Parent); break;
 				case "TBODY": Result = new TBody(Parent); break;
@@ -735,7 +1245,14 @@ namespace Waher.Content.Html
 				case "TFOOT": Result = new TFoot(Parent); break;
 				case "TH": Result = new Th(Parent); break;
 				case "THEAD": Result = new THead(Parent); break;
-				case "TIME": Result = new Time(Parent); break;
+				case "TIME":
+					Time Time = new Time(Parent);
+					Result = Time;
+					if (this.time == null)
+						this.time = new LinkedList<Time>();
+					this.time.AddLast(Time);
+					break;
+
 				case "TITLE": Result = new Title(Parent); break;
 				case "TR": Result = new Tr(Parent); break;
 				case "TRACK": Result = new Track(Parent); break;
@@ -743,7 +1260,14 @@ namespace Waher.Content.Html
 				case "U": Result = new U(Parent); break;
 				case "UL": Result = new Ul(Parent); break;
 				case "VAR": Result = new Var(Parent); break;
-				case "VIDEO": Result = new Elements.Video(Parent); break;
+				case "VIDEO":
+					Elements.Video Video = new Elements.Video(Parent);
+					Result = Video;
+					if (this.video == null)
+						this.video = new LinkedList<Elements.Video>();
+					this.video.AddLast(Video);
+					break;
+
 				case "WBR": Result = new Wbr(Parent); break;
 				case "XMP": Result = new Xmp(Parent); break;
 				default: Result = new HtmlElement(Parent, TagName); break;

@@ -12,9 +12,11 @@ namespace Waher.Content.Html.Elements
 		/// <summary>
 		/// BASEFONT element
 		/// </summary>
+		/// <param name="Document">HTML Document.</param>
 		/// <param name="Parent">Parent element. Can be null for root elements.</param>
-		public BaseFont(HtmlElement Parent)
-			: base(Parent, "BASEFONT")
+		/// <param name="StartPosition">Start position.</param>
+		public BaseFont(HtmlDocument Document, HtmlElement Parent, int StartPosition)
+			: base(Document, Parent, StartPosition, "BASEFONT")
 		{
 		}
     }

@@ -12,9 +12,11 @@ namespace Waher.Content.Html.Elements
 		/// <summary>
 		/// BGSOUND element
 		/// </summary>
+		/// <param name="Document">HTML Document.</param>
 		/// <param name="Parent">Parent element. Can be null for root elements.</param>
-		public BgSound(HtmlElement Parent)
-			: base(Parent, "BGSOUND")
+		/// <param name="StartPosition">Start position.</param>
+		public BgSound(HtmlDocument Document, HtmlElement Parent, int StartPosition)
+			: base(Document, Parent, StartPosition, "BGSOUND")
 		{
 		}
     }

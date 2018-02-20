@@ -14,10 +14,13 @@ namespace Waher.Content.Html
 		/// <summary>
 		/// HTML Entity
 		/// </summary>
-		/// <param name="Parent">Parent node.</param>
+		/// <param name="Document">HTML Document.</param>
+		/// <param name="Parent">Parent element. Can be null for root elements.</param>
+		/// <param name="StartPosition">Start position.</param>
+		/// <param name="EndPosition">End position.</param>
 		/// <param name="EntityName">Entity name.</param>
-		public HtmlEntity(HtmlNode Parent, string EntityName)
-			: base(Parent)
+		public HtmlEntity(HtmlDocument Document, HtmlNode Parent, int StartPosition, int EndPosition, string EntityName)
+			: base(Document, Parent, StartPosition, EndPosition)
 		{
 			this.entityName = EntityName;
 		}

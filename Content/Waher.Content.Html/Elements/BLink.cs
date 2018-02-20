@@ -12,9 +12,11 @@ namespace Waher.Content.Html.Elements
 		/// <summary>
 		/// BLINK element
 		/// </summary>
+		/// <param name="Document">HTML Document.</param>
 		/// <param name="Parent">Parent element. Can be null for root elements.</param>
-		public BLink(HtmlElement Parent)
-			: base(Parent, "BLINK")
+		/// <param name="StartPosition">Start position.</param>
+		public BLink(HtmlDocument Document, HtmlElement Parent, int StartPosition)
+			: base(Document, Parent, StartPosition, "BLINK")
 		{
 		}
     }

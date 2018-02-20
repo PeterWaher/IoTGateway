@@ -12,9 +12,11 @@ namespace Waher.Content.Html.Elements
 		/// <summary>
 		/// ACRONYM element
 		/// </summary>
+		/// <param name="Document">HTML Document.</param>
 		/// <param name="Parent">Parent element. Can be null for root elements.</param>
-		public Acronym(HtmlElement Parent)
-			: base(Parent, "ACRONYM")
+		/// <param name="StartPosition">Start position.</param>
+		public Acronym(HtmlDocument Document, HtmlElement Parent, int StartPosition)
+			: base(Document, Parent, StartPosition, "ACRONYM")
 		{
 		}
     }

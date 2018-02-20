@@ -12,9 +12,11 @@ namespace Waher.Content.Html.Elements
 		/// <summary>
 		/// COLGROUP element
 		/// </summary>
+		/// <param name="Document">HTML Document.</param>
 		/// <param name="Parent">Parent element. Can be null for root elements.</param>
-		public ColGroup(HtmlElement Parent)
-			: base(Parent, "COLGROUP")
+		/// <param name="StartPosition">Start position.</param>
+		public ColGroup(HtmlDocument Document, HtmlElement Parent, int StartPosition)
+			: base(Document, Parent, StartPosition, "COLGROUP")
 		{
 		}
     }

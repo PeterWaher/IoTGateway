@@ -12,9 +12,11 @@ namespace Waher.Content.Html.Elements
 		/// <summary>
 		/// NOFRAMES element
 		/// </summary>
+		/// <param name="Document">HTML Document.</param>
 		/// <param name="Parent">Parent element. Can be null for root elements.</param>
-		public NoFrames(HtmlElement Parent)
-			: base(Parent, "NOFRAMES")
+		/// <param name="StartPosition">Start position.</param>
+		public NoFrames(HtmlDocument Document, HtmlElement Parent, int StartPosition)
+			: base(Document, Parent, StartPosition, "NOFRAMES")
 		{
 		}
     }

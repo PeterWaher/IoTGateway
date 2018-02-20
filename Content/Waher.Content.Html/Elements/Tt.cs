@@ -12,9 +12,11 @@ namespace Waher.Content.Html.Elements
 		/// <summary>
 		/// TT element
 		/// </summary>
+		/// <param name="Document">HTML Document.</param>
 		/// <param name="Parent">Parent element. Can be null for root elements.</param>
-		public Tt(HtmlElement Parent)
-			: base(Parent, "TT")
+		/// <param name="StartPosition">Start position.</param>
+		public Tt(HtmlDocument Document, HtmlElement Parent, int StartPosition)
+			: base(Document, Parent, StartPosition, "TT")
 		{
 		}
     }

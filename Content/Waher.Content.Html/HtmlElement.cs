@@ -17,10 +17,12 @@ namespace Waher.Content.Html
 		/// <summary>
 		/// Base class for all HTML elements.
 		/// </summary>
+		/// <param name="Document">HTML Document.</param>
 		/// <param name="Parent">Parent element. Can be null for root elements.</param>
+		/// <param name="StartPosition">Start position.</param>
 		/// <param name="Name">Tag name.</param>
-		public HtmlElement(HtmlElement Parent, string Name)
-			: base(Parent)
+		public HtmlElement(HtmlDocument Document, HtmlElement Parent, int StartPosition, string Name)
+			: base(Document, Parent, StartPosition)
 		{
 			this.name = Name;
 		}
@@ -82,11 +84,56 @@ namespace Waher.Content.Html
 		}
 
 		/// <summary>
+		/// Inner HTML
+		/// </summary>
+		public string InnerHtml
+		{
+			get
+			{
+				int? Start = null;
+				int? End = null;
+
+				if (this.children != null)
+				{
+					foreach (HtmlNode N in this.children)
+					{
+						if (!Start.HasValue)
+							Start = N.StartPosition;
+
+						End = N.EndPosition;
+					}
+				}
+
+				if (Start.HasValue && End.HasValue)
+					return this.Document.HtmlText.Substring(Start.Value, End.Value - Start.Value + 1);
+				else
+					return string.Empty;
+			}
+		}
+
+		/// <summary>
+		/// Start tag.
+		/// </summary>
+		public string StartTag
+		{
+			get
+			{
+				if (this.children != null)
+				{
+					foreach (HtmlNode N in this.children)
+						return this.Document.HtmlText.Substring(this.StartPosition, N.StartPosition - this.StartPosition);
+				}
+
+				return this.OuterHtml;
+			}
+		}
+
+		/// <summary>
 		/// <see cref="object.ToString()"/>
 		/// </summary>
 		public override string ToString()
 		{
-			return this.name;
+			return this.StartTag;
 		}
 
 		/// <summary>

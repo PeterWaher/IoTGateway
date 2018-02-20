@@ -15,10 +15,14 @@ namespace Waher.Content.Html
 		/// <summary>
 		/// Represents a DTD instruction inside the document.
 		/// </summary>
-		/// <param name="Parent">Parent node. Can be null for root elements.</param>
+		/// <param name="Document">HTML Document.</param>
+		/// <param name="Parent">Parent element. Can be null for root elements.</param>
+		/// <param name="StartPosition">Start position.</param>
+		/// <param name="EndPosition">End position.</param>
 		/// <param name="Instruction">Instruction</param>
-		public DtdInstruction(HtmlNode Parent, string Instruction)
-			: base(Parent)
+		public DtdInstruction(HtmlDocument Document, HtmlElement Parent, int StartPosition, 
+			int EndPosition, string Instruction)
+			: base(Document, Parent, StartPosition, EndPosition)
 		{
 			this.instruction = Instruction;
 		}

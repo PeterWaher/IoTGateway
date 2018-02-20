@@ -12,9 +12,11 @@ namespace Waher.Content.Html.Elements
 		/// <summary>
 		/// NOSCRIPT element
 		/// </summary>
+		/// <param name="Document">HTML Document.</param>
 		/// <param name="Parent">Parent element. Can be null for root elements.</param>
-		public NoScript(HtmlElement Parent)
-			: base(Parent, "NOSCRIPT")
+		/// <param name="StartPosition">Start position.</param>
+		public NoScript(HtmlDocument Document, HtmlElement Parent, int StartPosition)
+			: base(Document, Parent, StartPosition, "NOSCRIPT")
 		{
 		}
     }

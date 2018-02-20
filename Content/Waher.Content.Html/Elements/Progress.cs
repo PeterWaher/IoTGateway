@@ -12,9 +12,11 @@ namespace Waher.Content.Html.Elements
 		/// <summary>
 		/// PROGRESS element
 		/// </summary>
+		/// <param name="Document">HTML Document.</param>
 		/// <param name="Parent">Parent element. Can be null for root elements.</param>
-		public Progress(HtmlElement Parent)
-			: base(Parent, "PROGRESS")
+		/// <param name="StartPosition">Start position.</param>
+		public Progress(HtmlDocument Document, HtmlElement Parent, int StartPosition)
+			: base(Document, Parent, StartPosition, "PROGRESS")
 		{
 		}
     }

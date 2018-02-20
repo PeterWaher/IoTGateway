@@ -12,9 +12,11 @@ namespace Waher.Content.Html.Elements
 		/// <summary>
 		/// CENTER element
 		/// </summary>
+		/// <param name="Document">HTML Document.</param>
 		/// <param name="Parent">Parent element. Can be null for root elements.</param>
-		public Center(HtmlElement Parent)
-			: base(Parent, "CENTER")
+		/// <param name="StartPosition">Start position.</param>
+		public Center(HtmlDocument Document, HtmlElement Parent, int StartPosition)
+			: base(Document, Parent, StartPosition, "CENTER")
 		{
 		}
     }

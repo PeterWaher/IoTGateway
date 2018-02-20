@@ -15,10 +15,14 @@ namespace Waher.Content.Html
 		/// <summary>
 		/// CDATA content.
 		/// </summary>
-		/// <param name="Parent">Parent node. Can be null for root elements.</param>
+		/// <param name="Document">HTML Document.</param>
+		/// <param name="Parent">Parent element. Can be null for root elements.</param>
+		/// <param name="StartPosition">Start position.</param>
+		/// <param name="EndPosition">End position.</param>
 		/// <param name="Content">CDATA Content</param>
-		public CDATA(HtmlNode Parent, string Content)
-			: base(Parent)
+		public CDATA(HtmlDocument Document, HtmlElement Parent, int StartPosition,
+			int EndPosition, string Content)
+			: base(Document, Parent, StartPosition, EndPosition)
 		{
 			this.content = Content;
 		}

@@ -15,10 +15,13 @@ namespace Waher.Content.Html
 		/// <summary>
 		/// In-line text.
 		/// </summary>
+		/// <param name="Document">HTML Document.</param>
 		/// <param name="Parent">Parent node.</param>
+		/// <param name="StartPosition">Start position.</param>
+		/// <param name="EndPosition">End position.</param>
 		/// <param name="Text">Text.</param>
-		public HtmlText(HtmlNode Parent, string Text)
-			: base(Parent)
+		public HtmlText(HtmlDocument Document, HtmlNode Parent, int StartPosition, int EndPosition, string Text)
+			: base(Document, Parent, StartPosition, EndPosition)
 		{
 			this.text = Text;
 		}

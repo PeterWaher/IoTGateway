@@ -12,9 +12,11 @@ namespace Waher.Content.Html.Elements
 		/// <summary>
 		/// MENU element
 		/// </summary>
+		/// <param name="Document">HTML Document.</param>
 		/// <param name="Parent">Parent element. Can be null for root elements.</param>
-		public Menu(HtmlElement Parent)
-			: base(Parent, "MENU")
+		/// <param name="StartPosition">Start position.</param>
+		public Menu(HtmlDocument Document, HtmlElement Parent, int StartPosition)
+			: base(Document, Parent, StartPosition, "MENU")
 		{
 		}
     }

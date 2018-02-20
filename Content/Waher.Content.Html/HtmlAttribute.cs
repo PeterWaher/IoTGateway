@@ -17,11 +17,15 @@ namespace Waher.Content.Html
 		/// <summary>
 		/// HTML attribute
 		/// </summary>
+		/// <param name="Document">HTML Document.</param>
 		/// <param name="Parent">Element to whom the attribute belongs.</param>
+		/// <param name="StartPosition">Start position.</param>
+		/// <param name="EndPosition">End position.</param>
 		/// <param name="Name">Attribute name.</param>
 		/// <param name="Value">Attribute value.</param>
-		public HtmlAttribute(HtmlElement Parent, string Name, string Value)
-			: base(Parent)
+		public HtmlAttribute(HtmlDocument Document, HtmlElement Parent, int StartPosition,
+			int EndPosition, string Name, string Value)
+			: base(Document, Parent, StartPosition, EndPosition)
 		{
 			this.name = Name;
 			this.value = Value;
@@ -31,10 +35,45 @@ namespace Waher.Content.Html
 		/// <summary>
 		/// HTML attribute
 		/// </summary>
+		/// <param name="Document">HTML Document.</param>
 		/// <param name="Parent">Element to whom the attribute belongs.</param>
+		/// <param name="StartPosition">Start position.</param>
+		/// <param name="EndPosition">End position.</param>
 		/// <param name="Name">Attribute name.</param>
-		public HtmlAttribute(HtmlElement Parent, string Name)
-			: base(Parent)
+		public HtmlAttribute(HtmlDocument Document, HtmlElement Parent, int StartPosition,
+			int EndPosition, string Name)
+			: base(Document, Parent, StartPosition, EndPosition)
+		{
+			this.name = Name;
+			this.value = null;
+			this.segments = null;
+		}
+
+		/// <summary>
+		/// HTML attribute
+		/// </summary>
+		/// <param name="Document">HTML Document.</param>
+		/// <param name="Parent">Element to whom the attribute belongs.</param>
+		/// <param name="StartPosition">Start position.</param>
+		/// <param name="Name">Attribute name.</param>
+		/// <param name="Value">Attribute value.</param>
+		public HtmlAttribute(HtmlDocument Document, HtmlElement Parent, int StartPosition, string Name, string Value)
+			: base(Document, Parent, StartPosition)
+		{
+			this.name = Name;
+			this.value = Value;
+			this.segments = null;
+		}
+
+		/// <summary>
+		/// HTML attribute
+		/// </summary>
+		/// <param name="Document">HTML Document.</param>
+		/// <param name="Parent">Element to whom the attribute belongs.</param>
+		/// <param name="StartPosition">Start position.</param>
+		/// <param name="Name">Attribute name.</param>
+		public HtmlAttribute(HtmlDocument Document, HtmlElement Parent, int StartPosition, string Name)
+			: base(Document, Parent, StartPosition)
 		{
 			this.name = Name;
 			this.value = null;

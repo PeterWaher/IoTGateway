@@ -15,10 +15,14 @@ namespace Waher.Content.Html
 		/// <summary>
 		/// Represents a Processing instruction inside the document.
 		/// </summary>
+		/// <param name="Document">HTML Document.</param>
 		/// <param name="Parent">Parent node. Can be null for root elements.</param>
+		/// <param name="StartPosition">Start position.</param>
+		/// <param name="EndPosition">End position.</param>
 		/// <param name="Instruction">Instruction</param>
-		public ProcessingInstruction(HtmlNode Parent, string Instruction)
-			: base(Parent)
+		public ProcessingInstruction(HtmlDocument Document, HtmlElement Parent, int StartPosition,
+			int EndPosition, string Instruction)
+			: base(Document, Parent, StartPosition, EndPosition)
 		{
 			this.instruction = Instruction;
 		}

@@ -450,6 +450,7 @@ namespace Waher.Content.Html
 			int State = 0;
 			char EndChar = '\x00';
 			bool Empty = true;
+			bool CurrentElementIsScript = false;
 
 			foreach (char ch in this.htmlText)
 			{
@@ -488,31 +489,45 @@ namespace Waher.Content.Html
 						break;
 
 					case 1:     // Waiting for ?, !, /, attributes or >
-						if (ch == '>')
+						if (ch == '/')
+						{
+							if (Empty)  // Closing tag
+								State = 4;
+							else if (CurrentElementIsScript)
+							{
+								sb.Insert(0, '<');
+								sb.Append('/');
+								State = 0;
+							}
+							else
+								State = 3;
+						}
+						else if (ch == '!' && Empty)
+							State++;
+						else if (CurrentElementIsScript)
+						{
+							sb.Insert(0, '<');
+							sb.Append(ch);
+							State = 0;
+						}
+						else if (ch == '>')
 						{
 							if (Empty)
 							{
-								sb.Append('<');
-								sb.Append(ch);
+								sb.Append("<>");
 								Empty = false;
 								State = 0;
 							}
 							else
 							{
 								CurrentElement = this.CreateElement(CurrentElement, sb.ToString());
+								CurrentElementIsScript = CurrentElement is Elements.Script;
 
 								sb.Clear();
 								Empty = true;
 
 								State = 0;
 							}
-						}
-						else if (ch == '/')
-						{
-							if (Empty)  // Closing tag
-								State = 4;
-							else
-								State = 3;
 						}
 						else if (ch <= ' ')
 						{
@@ -523,9 +538,16 @@ namespace Waher.Content.Html
 								Empty = false;
 								State = 0;
 							}
+							else if (CurrentElementIsScript)
+							{
+								sb.Insert(0, '<');
+								sb.Append(ch);
+								State = 0;
+							}
 							else
 							{
 								CurrentElement = this.CreateElement(CurrentElement, sb.ToString());
+								CurrentElementIsScript = CurrentElement is Elements.Script;
 
 								sb.Clear();
 								Empty = true;
@@ -533,8 +555,6 @@ namespace Waher.Content.Html
 								State = 5;
 							}
 						}
-						else if (ch == '!')
-							State++;
 						else if (ch == '?')
 							State = 19;
 						else if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || (ch >= '0' && ch <= '9'))
@@ -552,7 +572,16 @@ namespace Waher.Content.Html
 						break;
 
 					case 2: // DTD, comment or CDATA?
-						if (ch == '>')
+						if (ch == '[')
+							State = 21;     // CDATA?
+						else if (CurrentElementIsScript)
+						{
+							sb.Append("<!");
+							sb.Append(ch);
+							Empty = false;
+							State = 0;
+						}
+						else if (ch == '>')
 						{
 							if (this.dtd == null)
 								this.dtd = new LinkedList<DtdInstruction>();
@@ -566,8 +595,6 @@ namespace Waher.Content.Html
 						}
 						else if (ch == '-')
 							State = 15;     // Comment?
-						else if (ch == '[')
-							State = 21;     // CDATA?
 						else
 						{
 							sb.Append(ch);
@@ -606,7 +633,10 @@ namespace Waher.Content.Html
 							if (CurrentElement != null)
 							{
 								if (CurrentElement.Name == s)
+								{
 									CurrentElement = CurrentElement.Parent as HtmlElement;
+									CurrentElementIsScript = CurrentElement is Elements.Script;
+								}
 								else
 								{
 									HtmlElement Loop = CurrentElement.Parent as HtmlElement;
@@ -615,7 +645,10 @@ namespace Waher.Content.Html
 										Loop = Loop.Parent as HtmlElement;
 
 									if (Loop != null)
+									{
 										CurrentElement = Loop.Parent as HtmlElement;
+										CurrentElementIsScript = CurrentElement is Elements.Script;
+									}
 								}
 							}
 
@@ -769,6 +802,7 @@ namespace Waher.Content.Html
 						if (ch == '>')
 						{
 							CurrentElement = CurrentElement.Parent as HtmlElement;
+							CurrentElementIsScript = CurrentElement is Elements.Script;
 							State = 0;
 						}
 						break;

@@ -7,7 +7,7 @@
     <Authors>Peter Waher</Authors>
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
-    <Description>Provides a simple HTML document parser.</Description>
+    <Description>Provides a simple HTML document parser that can be used to extract information from web pages.</Description>
     <Copyright>Copyright © Waher Data AB 2018. All rights reserved.</Copyright>
     <PackageLicenseUrl>https://github.com/PeterWaher/IoTGateway#license</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Content/Waher.Content.Html</PackageProjectUrl>

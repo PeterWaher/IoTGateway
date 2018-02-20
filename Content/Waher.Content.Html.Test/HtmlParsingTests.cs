@@ -36,8 +36,11 @@ namespace Waher.Content.Html.Test
 				HtmlDocument Doc = InternetContent.Decode(ContentType, Data, new Uri(Url)) as HtmlDocument;
 				Assert.IsNotNull(Doc);
 
-				HtmlElement Root = Doc.Root;    // Makes sure document is parsed.
-				Assert.IsNotNull(Root);
+				Assert.IsNotNull(Doc.Root);
+				Assert.IsNotNull(Doc.Html);
+				Assert.IsNotNull(Doc.Head);
+				Assert.IsNotNull(Doc.Body);
+				Assert.IsNotNull(Doc.Title);
 
 				XmlWriterSettings Settings = XML.WriterSettings(true, true);
 				using (XmlWriter Output = XmlWriter.Create(Console.Out, Settings))

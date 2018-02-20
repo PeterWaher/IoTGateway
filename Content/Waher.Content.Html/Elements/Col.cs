@@ -8,7 +8,7 @@ namespace Waher.Content.Html.Elements
 	/// COL element
 	/// </summary>
     public class Col : HtmlEmptyElement
-    {
+	{
 		/// <summary>
 		/// COL element
 		/// </summary>

@@ -8,7 +8,7 @@ namespace Waher.Content.Html.Elements
 	/// LINK element
 	/// </summary>
     public class Link : HtmlEmptyElement
-    {
+	{
 		/// <summary>
 		/// LINK element
 		/// </summary>

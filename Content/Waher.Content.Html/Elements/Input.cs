@@ -8,7 +8,7 @@ namespace Waher.Content.Html.Elements
 	/// INPUT element
 	/// </summary>
     public class Input : HtmlEmptyElement
-    {
+	{
 		/// <summary>
 		/// INPUT element
 		/// </summary>

@@ -8,7 +8,7 @@ namespace Waher.Content.Html.Elements
 	/// IMG element
 	/// </summary>
     public class Img : HtmlEmptyElement
-    {
+	{
 		/// <summary>
 		/// IMG element
 		/// </summary>

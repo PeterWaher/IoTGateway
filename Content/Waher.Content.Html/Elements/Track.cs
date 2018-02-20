@@ -8,7 +8,7 @@ namespace Waher.Content.Html.Elements
 	/// TRACK element
 	/// </summary>
     public class Track : HtmlEmptyElement
-    {
+	{
 		/// <summary>
 		/// TRACK element
 		/// </summary>

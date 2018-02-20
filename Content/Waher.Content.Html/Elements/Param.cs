@@ -8,7 +8,7 @@ namespace Waher.Content.Html.Elements
 	/// PARAM element
 	/// </summary>
     public class Param : HtmlEmptyElement
-    {
+	{
 		/// <summary>
 		/// PARAM element
 		/// </summary>

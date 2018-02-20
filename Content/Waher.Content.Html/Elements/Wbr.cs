@@ -8,7 +8,7 @@ namespace Waher.Content.Html.Elements
 	/// WBR element
 	/// </summary>
     public class Wbr : HtmlEmptyElement
-    {
+	{
 		/// <summary>
 		/// WBR element
 		/// </summary>

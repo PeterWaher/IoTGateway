@@ -8,7 +8,7 @@ namespace Waher.Content.Html.Elements
 	/// EMBED element
 	/// </summary>
     public class Embed : HtmlEmptyElement
-    {
+	{
 		/// <summary>
 		/// EMBED element
 		/// </summary>

@@ -8,7 +8,7 @@ namespace Waher.Content.Html.Elements
 	/// SOURCE element
 	/// </summary>
     public class Source : HtmlEmptyElement
-    {
+	{
 		/// <summary>
 		/// SOURCE element
 		/// </summary>

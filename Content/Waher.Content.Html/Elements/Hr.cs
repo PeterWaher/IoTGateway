@@ -8,7 +8,7 @@ namespace Waher.Content.Html.Elements
 	/// HR element
 	/// </summary>
     public class Hr : HtmlEmptyElement
-    {
+	{
 		/// <summary>
 		/// HR element
 		/// </summary>

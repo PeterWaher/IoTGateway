@@ -8,7 +8,7 @@ namespace Waher.Content.Html.Elements
 	/// KEYGEN element
 	/// </summary>
     public class Keygen : HtmlEmptyElement
-    {
+	{
 		/// <summary>
 		/// KEYGEN element
 		/// </summary>

@@ -8,7 +8,7 @@ namespace Waher.Content.Html.Elements
 	/// META element
 	/// </summary>
     public class Meta : HtmlEmptyElement
-    {
+	{
 		/// <summary>
 		/// META element
 		/// </summary>

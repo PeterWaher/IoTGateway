@@ -53,5 +53,11 @@ namespace Waher.Content.Html.Test
 		{
 			await this.LoadAndParse("http://google.com/");
 		}
+
+		[TestMethod]
+		public async Task HtmlParseTest_02_Trocadero()
+		{
+			await this.LoadAndParse("http://www.kristianstadsbladet.se/tt-ekonomi/folkstorm-nar-trocadero-forsvinner/");
+		}
 	}
 }

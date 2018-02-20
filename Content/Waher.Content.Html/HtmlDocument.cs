@@ -231,23 +231,24 @@ namespace Waher.Content.Html
 						}
 						else if (ch > ' ')
 						{
-							sb.Append(ch);
-							Empty = false;
-							State++;
+							if (IsNameCharacter(ch))
+							{
+								sb.Append(ch);
+								Empty = false;
+								State++;
+							}
+							else
+							{
+								sb.Clear();
+								Empty = true;
+
+								State = 13;
+							}
 						}
 						break;
 
 					case 6: // Attribute name
-						if (ch <= ' ')
-						{
-							CurrentElement.AddAttribute(new HtmlAttribute(CurrentElement, sb.ToString(), string.Empty));
-
-							sb.Clear();
-							Empty = true;
-
-							State--;
-						}
-						else if (ch == '>')
+						if (ch == '>')
 						{
 							CurrentElement.AddAttribute(new HtmlAttribute(CurrentElement, sb.ToString(), string.Empty));
 
@@ -276,8 +277,27 @@ namespace Waher.Content.Html
 						}
 						else
 						{
-							sb.Append(ch);
-							Empty = false;
+							if (ch <= ' ')
+							{
+								CurrentElement.AddAttribute(new HtmlAttribute(CurrentElement, sb.ToString(), string.Empty));
+
+								sb.Clear();
+								Empty = true;
+
+								State--;
+							}
+							else if (IsNameCharacter(ch))
+							{
+								sb.Append(ch);
+								Empty = false;
+							}
+							else
+							{
+								sb.Clear();
+								Empty = true;
+
+								State = 13;
+							}
 						}
 						break;
 
@@ -429,6 +449,18 @@ namespace Waher.Content.Html
 						}
 						break;
 
+					case 13:    // Ignore everything until end of tag.
+						if (ch == '>')
+						{
+							sb.Clear();
+							Empty = true;
+
+							State = 0;
+						}
+						else if (ch == '/')
+							State = 9;
+						break;
+
 					default:
 						throw new Exception("Internal error: Unrecognized state.");
 				}
@@ -474,6 +506,86 @@ namespace Waher.Content.Html
 			}
 
 			// TODO: Elements that cannot take children (BR, HR)
+		}
+
+		private static bool IsNameCharacter(char ch)
+		{
+			if (ch == '-' || ch == '.')
+				return true;
+
+			if (ch < '0')
+				return false;
+
+			if (ch <= '9')
+				return true;
+
+			if (ch == ':')
+				return true;
+
+			if (ch < 'A')
+				return false;
+
+			if (ch <= 'Z')
+				return true;
+
+			if (ch == '_')
+				return true;
+
+			if (ch < 'a')
+				return false;
+
+			if (ch <= 'z')
+				return true;
+
+			if (ch == '\xb7')
+				return true;
+
+			if (ch < '\xc0')
+				return false;
+
+			if (ch == '\xd7' || ch == '\xf7')
+				return false;
+
+			if (ch == '\x037e')
+				return false;
+
+			if (ch <= '\x1fff')
+				return true;
+
+			if (ch == '\x200c' || ch == '\x200d' || ch == '\x203f' || ch == '\x2040')
+				return true;
+
+			if (ch < '\x2070')
+				return false;
+
+			if (ch <= '\x218f')
+				return true;
+
+			if (ch < '\x2c00')
+				return false;
+
+			if (ch <= '\x2fef')
+				return true;
+
+			if (ch < '\x3001')
+				return false;
+
+			if (ch <= '\xd7ff')
+				return true;
+
+			if (ch < '\xf900')
+				return false;
+
+			if (ch <= '\xfdcf')
+				return true;
+
+			if (ch < '\xfdf0')
+				return false;
+
+			if (ch <= '\xfffd')
+				return true;
+
+			return false;
 		}
 
 		private HtmlElement CreateElement(HtmlElement Parent, string TagName)

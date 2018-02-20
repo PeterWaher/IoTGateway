@@ -8,8 +8,8 @@ namespace Waher.Content.Html
 	/// <summary>
 	/// HTML attribute
 	/// </summary>
-    public class HtmlAttribute : HtmlNode
-    {
+	public class HtmlAttribute : HtmlNode
+	{
 		private LinkedList<HtmlNode> segments = null;
 		private string name;
 		private string value;

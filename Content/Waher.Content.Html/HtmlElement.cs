@@ -8,8 +8,8 @@ namespace Waher.Content.Html
 	/// <summary>
 	/// Base class for all HTML elements.
 	/// </summary>
-    public class HtmlElement : HtmlNode
-    {
+	public class HtmlElement : HtmlNode
+	{
 		private LinkedList<HtmlAttribute> attributes = null;
 		private LinkedList<HtmlNode> children = null;
 		private string name;
@@ -108,8 +108,6 @@ namespace Waher.Content.Html
 				foreach (HtmlNode Child in this.children)
 					Child.Export(Output);
 			}
-
-			Output.WriteEndElement();
 		}
 
 		/// <summary>

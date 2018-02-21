@@ -14,8 +14,8 @@ namespace Waher.Content.Markdown.Model.Multimedia
 	/// </summary>
 	public class YouTubeContent : MultimediaContent
 	{
-		private Regex youTubeLink = new Regex(@"^http(s)?://(www[.])?youtube[.]com/watch[?]v=(?'VideoId'[^&].*)", RegexOptions.Singleline | RegexOptions.Compiled);
-		private Regex youTubeLink2 = new Regex(@"^http(s)?://(www[.])?youtu[.]be/(?'VideoId'[^&].*)", RegexOptions.Singleline | RegexOptions.Compiled);
+		private Regex youTubeLink = new Regex(@"^(?'Scheme'http(s)?)://(www[.])?youtube[.]com/watch[?]v=(?'VideoId'[^&].*)", RegexOptions.Singleline | RegexOptions.Compiled);
+		private Regex youTubeLink2 = new Regex(@"^(?'Scheme'http(s)?)://(www[.])?youtu[.]be/(?'VideoId'[^&].*)", RegexOptions.Singleline | RegexOptions.Compiled);
 
 		/// <summary>
 		/// YouTube content.
@@ -38,6 +38,14 @@ namespace Waher.Content.Markdown.Model.Multimedia
 		}
 
 		/// <summary>
+		/// If inline links handled by this interface should be embedded automatically.
+		/// </summary>
+		public override bool EmbedInlineLinks
+		{
+			get { return true; }
+		}
+
+		/// <summary>
 		/// Generates HTML for the markdown element.
 		/// </summary>
 		/// <param name="Output">HTML will be output here.</param>
@@ -56,7 +64,9 @@ namespace Waher.Content.Markdown.Model.Multimedia
 
 				if (M.Success)
 				{
-					Output.Append("<iframe src=\"http://www.youtube.com/embed/");
+					Output.Append("<iframe src=\"");
+					Output.Append(M.Groups["Scheme"].Value);
+					Output.Append("://www.youtube.com/embed/");
 					Output.Append(XML.HtmlAttributeEncode(M.Groups["VideoId"].Value));
 
 					if (Item.Width.HasValue)
@@ -105,7 +115,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
 
 				Match M = youTubeLink.Match(Item.Url);
 				if (M.Success)
-					Output.WriteAttributeString("Source", "http://www.youtube.com/embed/" + M.Groups["VideoId"].Value);
+					Output.WriteAttributeString("Source", M.Groups["Scheme"].Value + "://www.youtube.com/embed/" + M.Groups["VideoId"].Value);
 				else
 					Output.WriteAttributeString("Source", Item.Url);
 

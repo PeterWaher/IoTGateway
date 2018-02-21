@@ -20,7 +20,11 @@ I get 10 times more traffic from Google than from Yahoo or MSN.
 
 You can also write links, such as http://littlesister.se/ inline.
 
-Or on separrate paragraphs:
+Or on separate paragraphs:
 
 http://littlesister.se/
+
+Recognized multi-media content put on separate rows are automatically handled as multi-media:
+
+https://www.youtube.com/watch?v=whBPLc8m4SU
 

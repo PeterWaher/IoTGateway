@@ -11,8 +11,10 @@
 	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">I get 10 times more traffic from <Hyperlink NavigateUri="http://google.com/" ToolTip="Google">Google</Hyperlink> than from <Hyperlink NavigateUri="http://search.yahoo.com/" ToolTip="Yahoo Search">Yahoo</Hyperlink> or <Hyperlink NavigateUri="http://search.msn.com/" ToolTip="MSN Search">MSN</Hyperlink>.</TextBlock>
 	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">I get 10 times more traffic from <Hyperlink NavigateUri="http://google.com/" ToolTip="Google">Google</Hyperlink> than from <Hyperlink NavigateUri="http://search.yahoo.com/" ToolTip="Yahoo Search">Yahoo</Hyperlink> or <Hyperlink NavigateUri="http://search.msn.com/" ToolTip="MSN Search">MSN</Hyperlink>.</TextBlock>
 	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">You can also write links, such as <Hyperlink NavigateUri="http://littlesister.se/">http://littlesister.se/</Hyperlink> inline.</TextBlock>
-	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Or on separrate paragraphs:</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Or on separate paragraphs:</TextBlock>
 	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">
 		<Hyperlink NavigateUri="http://littlesister.se/">http://littlesister.se/</Hyperlink>
 	</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Recognized multi-media content put on separate rows are automatically handled as multi-media:</TextBlock>
+	<WebBrowser Source="https://www.youtube.com/embed/whBPLc8m4SU" />
 </StackPanel>

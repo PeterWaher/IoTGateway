@@ -34,15 +34,23 @@ namespace Waher.Content.Markdown.Model.Multimedia
                 return Grade.Barely;
         }
 
-        /// <summary>
-        /// Generates HTML for the markdown element.
-        /// </summary>
-        /// <param name="Output">HTML will be output here.</param>
-        /// <param name="Items">Multimedia items.</param>
-        /// <param name="ChildNodes">Child nodes.</param>
-        /// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
-        /// <param name="Document">Markdown document containing element.</param>
-        public override void GenerateHTML(StringBuilder Output, MultimediaItem[] Items, IEnumerable<MarkdownElement> ChildNodes,
+		/// <summary>
+		/// If inline links handled by this interface should be embedded automatically.
+		/// </summary>
+		public override bool EmbedInlineLinks
+		{
+			get { return false; }
+		}
+
+		/// <summary>
+		/// Generates HTML for the markdown element.
+		/// </summary>
+		/// <param name="Output">HTML will be output here.</param>
+		/// <param name="Items">Multimedia items.</param>
+		/// <param name="ChildNodes">Child nodes.</param>
+		/// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+		/// <param name="Document">Markdown document containing element.</param>
+		public override void GenerateHTML(StringBuilder Output, MultimediaItem[] Items, IEnumerable<MarkdownElement> ChildNodes,
             bool AloneInParagraph, MarkdownDocument Document)
         {
             foreach (MultimediaItem Item in Items)

@@ -3594,6 +3594,8 @@ namespace Waher.Content.Markdown
 					case 'h':
 						if (char.IsWhiteSpace(PrevChar) && State.PeekNextCharSameRow() == 't')
 						{
+							FirstCharOnLine = State.IsFirstCharOnLine;
+
 							chs = State.PeekNextChars(7);
 							if (chs[1] == 't' && chs[2] == 'p' &&
 								((chs[3] == ':' && chs[4] == '/' && chs[5] == '/') ||
@@ -3626,6 +3628,18 @@ namespace Waher.Content.Markdown
 
 								ChildElements = new LinkedList<MarkdownElement>();
 								ChildElements.AddLast(new InlineText(this, Url));
+
+								if (FirstCharOnLine && State.PeekNextNonWhitespaceCharSameRow() == 0)
+								{
+									IMultimediaContent Handler = Multimedia.GetMultimediaHandler(Url);
+									if (Handler != null && Handler.EmbedInlineLinks)
+									{
+										Elements.AddLast(new Multimedia(this, ChildElements, true,
+											new MultimediaItem(this, Url, string.Empty, null, null)));
+
+										break;
+									}
+								}
 
 								Elements.AddLast(new Link(this, ChildElements, Url, string.Empty));
 							}

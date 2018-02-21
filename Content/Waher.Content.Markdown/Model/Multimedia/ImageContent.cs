@@ -37,6 +37,14 @@ namespace Waher.Content.Markdown.Model.Multimedia
 		}
 
 		/// <summary>
+		/// If inline links handled by this interface should be embedded automatically.
+		/// </summary>
+		public override bool EmbedInlineLinks
+		{
+			get { return true; }
+		}
+
+		/// <summary>
 		/// Generates HTML for the markdown element.
 		/// </summary>
 		/// <param name="Output">HTML will be output here.</param>

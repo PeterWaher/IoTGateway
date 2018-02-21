@@ -12,7 +12,7 @@
 	<Image Source="url/to/image" Width="320" Height="200" />
 	<MediaElement Source="/local/music.mp3" LoadedBehavior="Play" />
 	<MediaElement Source="/local/video.mp4" Width="320" Height="200" />
-	<WebBrowser Source="http://www.youtube.com/embed/whBPLc8m4SU" Width="800" Height="600" />
+	<WebBrowser Source="https://www.youtube.com/embed/whBPLc8m4SU" Width="800" Height="600" />
 	<Image Source="img1.svg" />
 	<Image Source="img1.svg" Width="320" Height="200" />
 	<Image Source="img1.svg" Width="320" Height="200" ToolTip="SVG" />

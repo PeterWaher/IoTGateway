@@ -662,7 +662,7 @@ namespace Waher.Content.Html
 
 							if (CurrentElement != null)
 							{
-								if (CurrentElement.EndPosition < 0)
+								if (CurrentElement.EndPosition < Pos)
 									CurrentElement.EndPosition = Pos;
 
 								if (CurrentElement.Name == s)
@@ -683,13 +683,13 @@ namespace Waher.Content.Html
 
 										while (Loop != null && Loop.Name != s)
 										{
-											if (Loop.EndPosition < 0)
+											if (Loop.EndPosition < Pos)
 												Loop.EndPosition = Pos;
 
 											Loop = Loop.Parent as HtmlElement;
 										}
 
-										if (Loop.EndPosition < 0)
+										if (Loop.EndPosition < Pos)
 											Loop.EndPosition = Pos;
 
 										CurrentElement = Loop.Parent as HtmlElement;
@@ -711,6 +711,9 @@ namespace Waher.Content.Html
 					case 5: // Waiting for attribute
 						if (ch == '>')
 						{
+							if (CurrentElement.IsEmptyElement)
+								CurrentElement.EndPosition = Pos;
+
 							StartOfText = Pos + 1;
 							State = 0;
 						}
@@ -1289,7 +1292,7 @@ namespace Waher.Content.Html
 
 			while (CurrentElement != null)
 			{
-				if (CurrentElement.EndPosition < 0)
+				if (CurrentElement.EndPosition < Pos - 1)
 					CurrentElement.EndPosition = Pos - 1;
 
 				CurrentElement = CurrentElement.Parent as HtmlElement;
@@ -1750,6 +1753,15 @@ namespace Waher.Content.Html
 		public void Export(XmlWriter Output)
 		{
 			this.root?.Export(Output);
+		}
+
+		/// <summary>
+		/// Gets meta-data about the page.
+		/// </summary>
+		/// <returns>Meta-data</returns>
+		public PageMetaData GetMetaData()
+		{
+			return new PageMetaData(this);
 		}
 
 	}

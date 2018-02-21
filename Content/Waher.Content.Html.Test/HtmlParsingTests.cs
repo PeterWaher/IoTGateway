@@ -7,6 +7,7 @@ using System.Xml;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Content.Xml;
 using Waher.Runtime.Inventory;
+using Waher.Content.Html.Elements;
 
 namespace Waher.Content.Html.Test
 {
@@ -76,6 +77,14 @@ namespace Waher.Content.Html.Test
 					}
 					else
 						Last = N.EndPosition;
+				}
+
+				PageMetaData MetaData = Doc.GetMetaData();
+
+				if (Doc.Meta != null)
+				{
+					foreach (Meta Meta in Doc.Meta)
+						Console.Out.WriteLine(Meta.OuterHtml);
 				}
 
 				XmlWriterSettings Settings = XML.WriterSettings(true, true);

@@ -132,13 +132,16 @@ an automatic link or an address, and not another type of construct.
 
 #### Automatic web links
 
-The Markdown parser will create automatic links if your link is a web link, i.e. if it starts with `http://` or `htttps://`. Example:
+The Markdown parser will create automatic links if your link is a web link, i.e. if it starts with `http://` or `https://`. Example:
 
 	http://waher.se/
 
 Simply becomes:
 
 http://waher.se/
+
+**Note**: Some of the multi-media interfaces supported, can also manage automatic links. If you include a web link that such a multimedia interface
+recognizes, the corresponding presentation will be used.
 
 ### Inline HTML
 
@@ -1061,7 +1064,7 @@ Example[^This example uses sound from <http://soundbible.com/2084-Glass-Ping.htm
 
 ### YouTube
 
-TO include YouTube clips into your document is easy. A YouTube multimedia content plugin recognizes the YouTube video URL and inserts it accordingly
+To include YouTube clips into your document is easy. A YouTube multimedia content plugin recognizes the YouTube video URL and inserts it accordingly
 into the generated page inside an `<iframe>` element. Example:
 
 	![Complex perturbation](https://www.youtube.com/watch?v=whBPLc8m4SU 800 600)

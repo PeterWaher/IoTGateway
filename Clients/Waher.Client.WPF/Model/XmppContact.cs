@@ -273,7 +273,7 @@ namespace Waher.Client.WPF.Model
 					XmppAccountNode.Client.SendChatMessage(this.RosterItem?.LastPresenceFullJid, Message);
 				else
 				{
-					string PlainText = Markdown.GeneratePlainText();
+					string PlainText = Markdown.GeneratePlainText().Trim();
 
 					XmppAccountNode.Client.SendMessage(QoSLevel.Unacknowledged, MessageType.Chat, this.RosterItem?.LastPresenceFullJid,
 						"<content xmlns=\"urn:xmpp:content\" type=\"text/markdown\">" + XML.Encode(Message) + "</content>", PlainText,

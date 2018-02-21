@@ -37,12 +37,14 @@ namespace Waher.Content.Markdown.Model.Multimedia
 				return Grade.NotAtAll;
 		}
 
+
 		/// <summary>
-		/// If inline links handled by this interface should be embedded automatically.
+		/// If the link provided should be embedded in a multi-media construct automatically.
 		/// </summary>
-		public override bool EmbedInlineLinks
+		/// <param name="Url">Inline link.</param>
+		public override bool EmbedInlineLink(string Url)
 		{
-			get { return true; }
+			return true;
 		}
 
 		/// <summary>
@@ -54,7 +56,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
 		/// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
 		/// <param name="Document">Markdown document containing element.</param>
 		public override void GenerateHTML(StringBuilder Output, MultimediaItem[] Items, IEnumerable<MarkdownElement> ChildNodes,
-			bool AloneInParagraph, MarkdownDocument Document)
+				bool AloneInParagraph, MarkdownDocument Document)
 		{
 			foreach (MultimediaItem Item in Items)
 			{

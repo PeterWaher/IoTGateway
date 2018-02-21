@@ -37,11 +37,15 @@ namespace Waher.Content.Markdown.Model.Multimedia
 		}
 
 		/// <summary>
-		/// If inline links handled by this interface should be embedded automatically.
+		/// If the link provided should be embedded in a multi-media construct automatically.
 		/// </summary>
-		public override bool EmbedInlineLinks
+		/// <param name="Url">Inline link.</param>
+		public override bool EmbedInlineLink(string Url)
 		{
-			get { return true; }
+			string Extension = Path.GetExtension(Url);
+			string ContentType = InternetContent.GetContentType(Extension);
+
+			return ContentType.StartsWith("image/");
 		}
 
 		/// <summary>

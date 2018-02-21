@@ -19,12 +19,10 @@ namespace Waher.Content.Markdown.Model
 		Grade Supports(MultimediaItem Item);
 
 		/// <summary>
-		/// If inline links handled by this interface should be embedded automatically.
+		/// If the link provided should be embedded in a multi-media construct automatically.
 		/// </summary>
-		bool EmbedInlineLinks
-		{
-			get;
-		}
+		/// <param name="Url">Inline link.</param>
+		bool EmbedInlineLink(string Url);
 
 		/// <summary>
 		/// Generates HTML for the markdown element.

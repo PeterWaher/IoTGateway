@@ -3626,14 +3626,14 @@ namespace Waher.Content.Markdown
 								Url = Text.ToString();
 								Text.Clear();
 
-								ChildElements = new LinkedList<MarkdownElement>();
-								ChildElements.AddLast(new InlineText(this, Url));
-
 								if (FirstCharOnLine && State.PeekNextNonWhitespaceCharSameRow() == 0)
 								{
 									IMultimediaContent Handler = Multimedia.GetMultimediaHandler(Url);
-									if (Handler != null && Handler.EmbedInlineLinks)
+									if (Handler != null && Handler.EmbedInlineLink(Url))
 									{
+										ChildElements = new LinkedList<MarkdownElement>();
+										ChildElements.AddLast(new InlineText(this, Url));
+
 										Elements.AddLast(new Multimedia(this, ChildElements, true,
 											new MultimediaItem(this, Url, string.Empty, null, null)));
 
@@ -3641,7 +3641,7 @@ namespace Waher.Content.Markdown
 									}
 								}
 
-								Elements.AddLast(new Link(this, ChildElements, Url, string.Empty));
+								Elements.AddLast(new AutomaticLinkUrl(this, Url));
 							}
 							else
 								Text.Append(ch);
@@ -5226,6 +5226,18 @@ namespace Waher.Content.Markdown
 		/// <returns>Array of links found in the document.</returns>
 		public string[] FindLinks()
 		{
+			return this.FindLinks(true, true, true);
+		}
+
+		/// <summary>
+		/// Finds all links in the document.
+		/// </summary>
+		/// <param name="IncludeAutomaticLinks">If automatic links are to be included. (Default=true)</param>
+		/// <param name="IncludeLinks">If normal links are to be included. (Default=true)</param>
+		/// <param name="IncludeMultimedia">If Multimedia links are to be included. (Default=true)</param>
+		/// <returns>Array of links found in the document.</returns>
+		public string[] FindLinks(bool IncludeAutomaticLinks, bool IncludeLinks, bool IncludeMultimedia)
+		{
 			Dictionary<string, bool> Links = new Dictionary<string, bool>();
 
 			this.ForEach((E, Obj) =>
@@ -5234,7 +5246,7 @@ namespace Waher.Content.Markdown
 					Links[AutomaticLinkUrl.URL] = true;
 				else if (E is Link Link)
 					Links[Link.Url] = true;
-				else if (E is Multimedia Multimedia)
+				else if (IncludeMultimedia && E is Multimedia Multimedia)
 				{
 					foreach (MultimediaItem Item in Multimedia.Items)
 						Links[Item.Url] = true;

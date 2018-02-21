@@ -74,15 +74,6 @@ following example: `` `Inline code` ``. This is transformed to: `Inline code`. A
 **Note 2**: If you want to include a back tick in the inline code, you can surround the inline code using double back ticks and a space, one after the
 first double back tick, and one before the last back tick, such as this: <code>\`\` \`Inline code\` \`\`</code>. This sequence was used to produce `` `Inline code` ``.
 
-### Automatic links
-
-Markdown help you include links to online resources (URLs) or mail addresses automatically by surrounding them with `<` and `>` characters, such as 
-`<http://example.com/>` or `<address@example.com>`. These would turn into clickable links in the HTML representation, as follows: <http://example.com/> 
-and <address@example.com>.
-
-**Note**: It's important to include the *URI Scheme* (for example `http://`) in links or the @ sign in mail addresses, for the parser to understand it's 
-an automatic link or an address, and not another type of construct.
-
 ### Links
 
 To include a link into a markdown text, you can, apart from automatic links, also include custom links. These are written in the form
@@ -129,6 +120,25 @@ The following list shows some examples. These examples are used above to create 
 [ExAMPLE 2]: <http://example.com/> 'Example 2'
 [3]: http://example.com/
 	(Example 3)
+
+#### Shorthand links
+
+Markdown help you include links to online resources (URLs) or mail addresses automatically by surrounding them with `<` and `>` characters, such as 
+`<http://example.com/>` or `<address@example.com>`. These would turn into clickable links in the HTML representation, as follows: <http://example.com/> 
+and <address@example.com>.
+
+**Note**: It's important to include the *URI Scheme* (for example `http://`) in links or the @ sign in mail addresses, for the parser to understand it's 
+an automatic link or an address, and not another type of construct.
+
+#### Automatic web links
+
+The Markdown parser will create automatic links if your link is a web link, i.e. if it starts with `http://` or `htttps://`. Example:
+
+	http://waher.se/
+
+Simply becomes:
+
+http://waher.se/
 
 ### Inline HTML
 

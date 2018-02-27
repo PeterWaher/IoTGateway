@@ -17,6 +17,9 @@ Waher.WebService.Transform (transforms JSON to Text using named templates)
 
 MQTT v5
 
+CoAP, observable resources:
+	Only accept messages that are newer than the last. §3.4, RFC 7641: https://tools.ietf.org/html/rfc7641#section-3.4 (to avoid retries being delivered even when newer messages have been successfully received.)
+
 Authorization:
 	Privileges
 		CanView

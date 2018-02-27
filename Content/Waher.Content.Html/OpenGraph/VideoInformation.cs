@@ -38,5 +38,36 @@ namespace Waher.Content.Html.OpenGraph
 			get { return this.height; }
 			set { this.height = value; }
 		}
+
+		/// <summary>
+		/// <see cref="Object.ToString()"/>
+		/// </summary>
+		public override bool Equals(object obj)
+		{
+			if (obj is VideoInformation Video)
+			{
+				return base.Equals(Video) &&
+					this.width == Video.width &&
+					this.height == Video.height;
+			}
+			else
+				return false;
+		}
+
+		/// <summary>
+		/// <see cref="Object.GetHashCode()"/>
+		/// </summary>
+		public override int GetHashCode()
+		{
+			int Result = base.GetHashCode();
+
+			if (this.width.HasValue)
+				Result ^= Result << 5 ^ this.width.Value.GetHashCode();
+
+			if (this.height.HasValue)
+				Result ^= Result << 5 ^ this.height.Value.GetHashCode();
+
+			return Result;
+		}
 	}
 }

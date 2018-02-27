@@ -252,7 +252,7 @@ namespace Waher.Content.Html
 
 			if (string.IsNullOrEmpty(this.title) && Doc.Title != null)
 				this.title = Doc.Title.InnerHtml.Trim();
-			
+
 			this.images = Images?.ToArray();
 			this.audio = Audio?.ToArray();
 			this.video = Video?.ToArray();
@@ -356,6 +356,149 @@ namespace Waher.Content.Html
 		{
 			get { return this.siteName; }
 			set { this.siteName = value; }
+		}
+
+		/// <summary>
+		/// <see cref="System.Object.ToString"/>
+		/// </summary>
+		public override bool Equals(object obj)
+		{
+			PageMetaData Meta = obj as PageMetaData;
+			int i, c;
+
+			if ((this == null) ^ (Meta == null))
+				return false;
+
+			if (this == null)
+				return true;
+
+			if (this.title != Meta.title ||
+				this.type != Meta.type ||
+				this.url != Meta.url ||
+				this.description != Meta.description ||
+				this.determiner != Meta.determiner ||
+				this.locale != Meta.locale ||
+				this.siteName != Meta.siteName)
+			{
+				return false;
+			}
+
+			if ((this.localeAlternate == null) ^ (Meta.localeAlternate == null))
+				return false;
+
+			if (this.localeAlternate != null)
+			{
+				if ((c = this.localeAlternate.Length) != Meta.localeAlternate.Length)
+					return false;
+
+				for (i = 0; i < c; i++)
+				{
+					if (this.localeAlternate[i] != Meta.localeAlternate[i])
+						return false;
+				}
+			}
+
+			if ((this.images == null) ^ (Meta.images == null))
+				return false;
+
+			if (this.images != null)
+			{
+				if ((c = this.images.Length) != Meta.images.Length)
+					return false;
+
+				for (i = 0; i < c; i++)
+				{
+					if (!this.images[i].Equals(Meta.localeAlternate[i]))
+						return false;
+				}
+			}
+
+			if ((this.audio == null) ^ (Meta.audio == null))
+				return false;
+
+			if (this.audio != null)
+			{
+				if ((c = this.audio.Length) != Meta.audio.Length)
+					return false;
+
+				for (i = 0; i < c; i++)
+				{
+					if (!this.audio[i].Equals(Meta.localeAlternate[i]))
+						return false;
+				}
+			}
+
+			if ((this.video == null) ^ (Meta.video == null))
+				return false;
+
+			if (this.video != null)
+			{
+				if ((c = this.video.Length) != Meta.video.Length)
+					return false;
+
+				for (i = 0; i < c; i++)
+				{
+					if (!this.video[i].Equals(Meta.localeAlternate[i]))
+						return false;
+				}
+			}
+
+			return true;
+		}
+
+		/// <summary>
+		/// <see cref="Object.GetHashCode()"/>
+		/// </summary>
+		public override int GetHashCode()
+		{
+			int Result = 0;
+
+			if (this.title != null)
+				Result = this.title.GetHashCode();
+
+			if (this.type != null)
+				Result ^= Result << 5 ^ this.type.GetHashCode();
+
+			if (this.url != null)
+				Result ^= Result << 5 ^ this.url.GetHashCode();
+
+			if (this.description != null)
+				Result ^= Result << 5 ^ this.description.GetHashCode();
+
+			if (this.determiner != null)
+				Result ^= Result << 5 ^ this.determiner.GetHashCode();
+
+			if (this.locale != null)
+				Result ^= Result << 5 ^ this.locale.GetHashCode();
+
+			if (this.siteName != null)
+				Result ^= Result << 5 ^ this.siteName.GetHashCode();
+
+			if (this.localeAlternate != null)
+			{
+				foreach (string s in this.localeAlternate)
+					Result ^= Result << 5 ^ s.GetHashCode();
+			}
+
+			if (this.images != null)
+			{
+				foreach (ImageInformation Obj in this.images)
+					Result ^= Result << 5 ^ Obj.GetHashCode();
+			}
+
+			if (this.audio != null)
+			{
+				foreach (ImageInformation Obj in this.audio)
+					Result ^= Result << 5 ^ Obj.GetHashCode();
+			}
+
+			if (this.video != null)
+			{
+				foreach (ImageInformation Obj in this.video)
+					Result ^= Result << 5 ^ Obj.GetHashCode();
+			}
+
+			return Result;
 		}
 
 	}

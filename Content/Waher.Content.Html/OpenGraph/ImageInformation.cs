@@ -28,5 +28,32 @@ namespace Waher.Content.Html.OpenGraph
 			set { this.description = value; }
 		}
 
+		/// <summary>
+		/// <see cref="Object.ToString()"/>
+		/// </summary>
+		public override bool Equals(object obj)
+		{
+			if (obj is ImageInformation Image)
+			{
+				return base.Equals(Image) &&
+					this.description == Image.description;
+			}
+			else
+				return false;
+		}
+
+		/// <summary>
+		/// <see cref="Object.GetHashCode()"/>
+		/// </summary>
+		public override int GetHashCode()
+		{
+			int Result = base.GetHashCode();
+
+			if (this.description != null)
+				Result ^= Result << 5 ^ this.description.GetHashCode();
+
+			return Result;
+		}
+
 	}
 }

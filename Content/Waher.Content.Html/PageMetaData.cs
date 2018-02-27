@@ -408,7 +408,7 @@ namespace Waher.Content.Html
 
 				for (i = 0; i < c; i++)
 				{
-					if (!this.images[i].Equals(Meta.localeAlternate[i]))
+					if (!this.images[i].Equals(Meta.images[i]))
 						return false;
 				}
 			}
@@ -423,7 +423,7 @@ namespace Waher.Content.Html
 
 				for (i = 0; i < c; i++)
 				{
-					if (!this.audio[i].Equals(Meta.localeAlternate[i]))
+					if (!this.audio[i].Equals(Meta.audio[i]))
 						return false;
 				}
 			}
@@ -438,7 +438,7 @@ namespace Waher.Content.Html
 
 				for (i = 0; i < c; i++)
 				{
-					if (!this.video[i].Equals(Meta.localeAlternate[i]))
+					if (!this.video[i].Equals(Meta.video[i]))
 						return false;
 				}
 			}

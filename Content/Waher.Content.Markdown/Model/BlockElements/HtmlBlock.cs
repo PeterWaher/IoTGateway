@@ -28,7 +28,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		{
 			foreach (MarkdownElement E in this.Children)
 				E.GenerateHTML(Output);
-	
+
 			Output.AppendLine();
 		}
 
@@ -45,7 +45,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 			foreach (MarkdownElement E in this.Children)
 			{
 				E.GeneratePlainText(sb);
-				s = sb.ToString().TrimStart().Trim(' ');	// Only space at the end, not CRLF
+				s = sb.ToString().TrimStart().Trim(' ');    // Only space at the end, not CRLF
 				sb.Clear();
 
 				if (!string.IsNullOrEmpty(s))
@@ -92,6 +92,15 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		internal override bool InlineSpanElement
 		{
 			get { return false; }
+		}
+
+		/// <summary>
+		/// Exports the element to XML.
+		/// </summary>
+		/// <param name="Output">XML Output.</param>
+		public override void Export(XmlWriter Output)
+		{
+			this.Export(Output, "HtmlBlock");
 		}
 	}
 }

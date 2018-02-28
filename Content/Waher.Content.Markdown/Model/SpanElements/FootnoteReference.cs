@@ -38,9 +38,8 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		public override void GenerateHTML(StringBuilder Output)
 		{
 			string s;
-			int Nr;
 
-			if (this.Document.TryGetFootnoteNumber(this.key, out Nr))
+			if (this.Document.TryGetFootnoteNumber(this.key, out int Nr))
 			{
 				s = Nr.ToString();
 
@@ -60,9 +59,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="Output">Plain text will be output here.</param>
 		public override void GeneratePlainText(StringBuilder Output)
 		{
-			int Nr;
-
-			if (this.Document.TryGetFootnoteNumber(this.key, out Nr))
+			if (this.Document.TryGetFootnoteNumber(this.key, out int Nr))
 			{
 				Output.Append(" [");
 				Output.Append(Nr.ToString());
@@ -87,9 +84,8 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		public override void GenerateXAML(XmlWriter Output, XamlSettings Settings, TextAlignment TextAlignment)
 		{
 			string s;
-			int Nr;
 
-			if (this.Document.TryGetFootnoteNumber(this.key, out Nr))
+			if (this.Document.TryGetFootnoteNumber(this.key, out int Nr))
 			{
 				Output.WriteStartElement("TextBlock");
 				Output.WriteAttributeString("Text", Nr.ToString());
@@ -118,6 +114,22 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		internal override bool InlineSpanElement
 		{
 			get { return true; }
+		}
+
+		/// <summary>
+		/// Exports the element to XML.
+		/// </summary>
+		/// <param name="Output">XML Output.</param>
+		public override void Export(XmlWriter Output)
+		{
+			Output.WriteStartElement("FootnoteReference");
+
+			if (this.Document.TryGetFootnoteNumber(this.key, out int Nr))
+				Output.WriteAttributeString("nr", Nr.ToString());
+			else
+				Output.WriteAttributeString("key", this.key);
+
+			Output.WriteEndElement();
 		}
 	}
 }

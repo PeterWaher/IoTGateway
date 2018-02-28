@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Xml;
 using Waher.Content.Markdown.Model.BlockElements;
 
 namespace Waher.Content.Markdown.Model
@@ -20,8 +21,7 @@ namespace Waher.Content.Markdown.Model
 		public MarkdownElementSingleChild(MarkdownDocument Document, MarkdownElement Child)
 			: base(Document)
 		{
-			NestedBlock NestedBlock = Child as NestedBlock;
-			if (NestedBlock != null && NestedBlock.HasOneChild)
+			if (Child is NestedBlock NestedBlock && NestedBlock.HasOneChild)
 				this.child = NestedBlock.FirstChild;
 			else
 				this.child = Child;
@@ -60,6 +60,28 @@ namespace Waher.Content.Markdown.Model
 				return false;
 
 			return true;
+		}
+
+		/// <summary>
+		/// Exports the element to XML.
+		/// </summary>
+		/// <param name="Output">XML Output.</param>
+		/// <param name="ElementName">Name of element.</param>
+		public void Export(XmlWriter Output, string ElementName)
+		{
+			Output.WriteStartElement(ElementName);
+			this.ExportChild(Output);
+			Output.WriteEndElement();
+		}
+
+		/// <summary>
+		/// Exports the child element to XML.
+		/// </summary>
+		/// <param name="Output">XML Output.</param>
+		protected virtual void ExportChild(XmlWriter Output)
+		{
+			if (this.child != null)
+				this.child.Export(Output);
 		}
 
 	}

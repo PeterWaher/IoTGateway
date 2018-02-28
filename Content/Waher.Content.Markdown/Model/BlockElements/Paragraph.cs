@@ -88,5 +88,14 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		{
 			get { return false; }
 		}
+
+		/// <summary>
+		/// Exports the element to XML.
+		/// </summary>
+		/// <param name="Output">XML Output.</param>
+		public override void Export(XmlWriter Output)
+		{
+			this.Export(Output, "Paragraph");
+		}
 	}
 }

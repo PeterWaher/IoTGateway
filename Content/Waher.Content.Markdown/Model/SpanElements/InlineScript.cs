@@ -76,12 +76,10 @@ namespace Waher.Content.Markdown.Model.SpanElements
 			if (Result == null)
 				return;
 
+			SKImage Img;
 			string s;
 
-			Graph G = Result as Graph;
-			SKImage Img;
-
-			if (G != null)
+			if (Result is Graph G)
 			{
 				GraphSettings GraphSettings = new GraphSettings();
 				object Obj;
@@ -206,11 +204,10 @@ namespace Waher.Content.Markdown.Model.SpanElements
 			if (Result == null)
 				return;
 
-			Graph G = Result as Graph;
 			SKImage Img;
 			string s;
 
-			if (G != null)
+			if (Result is Graph G)
 			{
 				GraphSettings GraphSettings = new GraphSettings();
 				object Obj;
@@ -362,6 +359,18 @@ namespace Waher.Content.Markdown.Model.SpanElements
 			{
 				return "Baseline";
 			}
+		}
+
+		/// <summary>
+		/// Exports the element to XML.
+		/// </summary>
+		/// <param name="Output">XML Output.</param>
+		public override void Export(XmlWriter Output)
+		{
+			Output.WriteStartElement("Script");
+			Output.WriteAttributeString("expression", this.expression.Script);
+			Output.WriteAttributeString("aloneInParagraph", CommonTypes.Encode(this.aloneInParagraph));
+			Output.WriteEndElement();
 		}
 
 	}

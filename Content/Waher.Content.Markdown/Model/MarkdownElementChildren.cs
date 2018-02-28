@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Xml;
 
 namespace Waher.Content.Markdown.Model
 {
@@ -159,6 +160,31 @@ namespace Waher.Content.Markdown.Model
 			}
 
 			return true;
+		}
+
+		/// <summary>
+		/// Exports the element to XML.
+		/// </summary>
+		/// <param name="Output">XML Output.</param>
+		/// <param name="ElementName">Name of element.</param>
+		public void Export(XmlWriter Output, string ElementName)
+		{
+			Output.WriteStartElement(ElementName);
+			this.ExportChildren(Output);
+			Output.WriteEndElement();
+		}
+
+		/// <summary>
+		/// Exports the child elements to XML.
+		/// </summary>
+		/// <param name="Output">XML Output.</param>
+		protected virtual void ExportChildren(XmlWriter Output)
+		{
+			if (this.children != null)
+			{
+				foreach (MarkdownElement E in this.children)
+					E.Export(Output);
+			}
 		}
 	}
 }

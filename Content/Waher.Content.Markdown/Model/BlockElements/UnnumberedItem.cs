@@ -114,5 +114,17 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		{
 			this.Child.GetMargins(Settings, out TopMargin, out BottomMargin);
 		}
+
+		/// <summary>
+		/// Exports the element to XML.
+		/// </summary>
+		/// <param name="Output">XML Output.</param>
+		public override void Export(XmlWriter Output)
+		{
+			Output.WriteStartElement("UnnumberedItem");
+			Output.WriteAttributeString("prefix", this.prefix);
+			this.ExportChild(Output);
+			Output.WriteEndElement();
+		}
 	}
 }

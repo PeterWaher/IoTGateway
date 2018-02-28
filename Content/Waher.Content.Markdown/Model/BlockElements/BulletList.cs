@@ -82,8 +82,6 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		public override void GenerateXAML(XmlWriter Output, XamlSettings Settings, TextAlignment TextAlignment)
 		{
 			int Row = 0;
-			int TopMargin;
-			int BottomMargin;
 			bool ParagraphBullet;
 
 			Output.WriteStartElement("Grid");
@@ -113,7 +111,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 			foreach (MarkdownElement E in this.Children)
 			{
 				ParagraphBullet = !E.InlineSpanElement || E.OutsideParagraph;
-				E.GetMargins(Settings, out TopMargin, out BottomMargin);
+				E.GetMargins(Settings, out int TopMargin, out int BottomMargin);
 
 				Output.WriteStartElement("TextBlock");
 				Output.WriteAttributeString("TextWrapping", "Wrap");
@@ -160,6 +158,15 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		internal override bool InlineSpanElement
 		{
 			get { return false; }
+		}
+
+		/// <summary>
+		/// Exports the element to XML.
+		/// </summary>
+		/// <param name="Output">XML Output.</param>
+		public override void Export(XmlWriter Output)
+		{
+			this.Export(Output, "BulletList");
 		}
 	}
 }

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Collections.Generic;
-using System.Text;
+using System.Xml;
 
 namespace Waher.Content.Markdown.Model
 {
@@ -120,6 +120,27 @@ namespace Waher.Content.Markdown.Model
 
 				return this.contentType;
 			}
+		}
+
+		/// <summary>
+		/// Exports the element to XML.
+		/// </summary>
+		/// <param name="Output">XML Output.</param>
+		public void Export(XmlWriter Output)
+		{
+			Output.WriteStartElement("MultimediaItem");
+			Output.WriteAttributeString("url", this.url);
+			Output.WriteAttributeString("title", this.title);
+			Output.WriteAttributeString("extension", this.extension);
+			Output.WriteAttributeString("contentType", this.contentType);
+
+			if (this.width.HasValue)
+				Output.WriteAttributeString("width", this.width.Value.ToString());
+
+			if (this.height.HasValue)
+				Output.WriteAttributeString("height", this.height.Value.ToString());
+
+			Output.WriteEndElement();
 		}
 
 	}

@@ -77,10 +77,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="TextAlignment">Alignment of text in element.</param>
 		public override void GenerateXAML(XmlWriter Output, XamlSettings Settings, TextAlignment TextAlignment)
 		{
-			string Url;
-			int Width, Height;
-
-			this.Document.EmojiSource.GetImageSource(this.emoji, out Url, out Width, out Height);
+			this.Document.EmojiSource.GetImageSource(this.emoji, out string Url, out int Width, out int Height);
 
 			Output.WriteStartElement("Image");
 			Output.WriteAttributeString("Source", Url);
@@ -107,6 +104,17 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		internal override bool InlineSpanElement
 		{
 			get { return true; }
+		}
+
+		/// <summary>
+		/// Exports the element to XML.
+		/// </summary>
+		/// <param name="Output">XML Output.</param>
+		public override void Export(XmlWriter Output)
+		{
+			Output.WriteStartElement("Emoji");
+			Output.WriteAttributeString("shortName", this.emoji.ShortName);
+			Output.WriteEndElement();
 		}
 	}
 }

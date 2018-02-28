@@ -57,6 +57,15 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		{
 			get { return true; }
 		}
-	
+
+		/// <summary>
+		/// Exports the element to XML.
+		/// </summary>
+		/// <param name="Output">XML Output.</param>
+		public override void Export(XmlWriter Output)
+		{
+			this.Export(Output, "Emphasize");
+		}
+
 	}
 }

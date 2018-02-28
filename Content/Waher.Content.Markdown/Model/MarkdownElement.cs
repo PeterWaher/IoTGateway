@@ -104,5 +104,11 @@ namespace Waher.Content.Markdown.Model
 			return Callback(this, State);
 		}
 
+		/// <summary>
+		/// Exports the element to XML.
+		/// </summary>
+		/// <param name="Output">XML Output.</param>
+		public abstract void Export(XmlWriter Output);
+
 	}
 }

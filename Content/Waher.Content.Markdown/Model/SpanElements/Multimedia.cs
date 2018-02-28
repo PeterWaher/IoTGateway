@@ -205,5 +205,21 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		{
 			get { return true; }
 		}
+
+		/// <summary>
+		/// Exports the element to XML.
+		/// </summary>
+		/// <param name="Output">XML Output.</param>
+		public override void Export(XmlWriter Output)
+		{
+			Output.WriteStartElement("Multimedia");
+			Output.WriteAttributeString("aloneInParagraph", CommonTypes.Encode(this.aloneInParagraph));
+			this.ExportChildren(Output);
+
+			foreach (MultimediaItem Item in this.items)
+				Item.Export(Output);
+
+			Output.WriteEndElement();
+		}
 	}
 }

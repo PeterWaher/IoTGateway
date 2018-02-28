@@ -1400,7 +1400,7 @@ namespace Waher.Content.Markdown
 								if (Elements.Last != null && Elements.Last.Value is TaskList TaskList)
 									TaskList.AddChildren(Item);
 								else
-									Elements.AddLast(new NumberedList(this, Item));
+									Elements.AddLast(new TaskList(this, Item));
 							}
 
 							break;
@@ -4742,6 +4742,110 @@ namespace Waher.Content.Markdown
 				Output.WriteEndElement();
 				Output.Flush();
 			}
+		}
+
+		/// <summary>
+		/// Exports the parsed document to XML.
+		/// </summary>
+		/// <returns>XML String.</returns>
+		public string ExportXml()
+		{
+			StringBuilder Xml = new StringBuilder();
+			this.ExportXml(Xml);
+			return Xml.ToString();
+		}
+
+		/// <summary>
+		/// Exports the parsed document to XML.
+		/// </summary>
+		/// <param name="Xml">XML Output.</param>
+		public void ExportXml(StringBuilder Xml)
+		{
+			this.ExportXml(Xml, XML.WriterSettings(true, true));
+		}
+
+		/// <summary>
+		/// Exports the parsed document to XML.
+		/// </summary>
+		/// <param name="Xml">XML Output.</param>
+		/// <param name="Settings">XML Settings.</param>
+		public void ExportXml(StringBuilder Xml, XmlWriterSettings Settings)
+		{
+			using (XmlWriter w = XmlWriter.Create(Xml, Settings))
+			{
+				this.ExportXml(w);
+				w.Flush();
+			}
+		}
+
+		/// <summary>
+		/// Exports the parsed document to XML.
+		/// </summary>
+		/// <param name="Xml">XML Output.</param>
+		public void ExportXml(XmlWriter Xml)
+		{
+			Xml.WriteStartElement("parsedMakdown", "http://waher.se/Schema/Markdown.xsd");
+			Xml.WriteAttributeString("isDynamic", CommonTypes.Encode(this.isDynamic));
+
+			if (this.metaData != null)
+			{
+				Xml.WriteStartElement("metaData");
+
+				foreach (KeyValuePair<string, KeyValuePair<string, bool>[]> P in this.metaData)
+				{
+					Xml.WriteStartElement("tag", P.Key);
+
+					foreach (KeyValuePair<string, bool> P2 in P.Value)
+					{
+						Xml.WriteStartElement("value", P2.Key);
+						Xml.WriteAttributeString("lineBreak", CommonTypes.Encode(P2.Value));
+						Xml.WriteEndElement();
+					}
+
+					Xml.WriteEndElement();
+				}
+
+				Xml.WriteEndElement();
+			}
+
+			Xml.WriteStartElement("elements");
+
+			foreach (MarkdownElement E in this.elements)
+				E.Export(Xml);
+
+			Xml.WriteEndElement();
+
+			if (this.references != null)
+			{
+				Xml.WriteStartElement("references");
+
+				foreach (KeyValuePair<string, Multimedia> P in this.references)
+				{
+					Xml.WriteStartElement("reference");
+					Xml.WriteAttributeString("key", P.Key);
+
+					P.Value.Export(Xml);
+
+					Xml.WriteEndElement();
+				}
+
+				Xml.WriteEndElement();
+			}
+
+			if (this.footnoteOrder != null)
+			{
+				Xml.WriteStartElement("footnotes");
+
+				foreach (string s in this.footnoteOrder)
+				{
+					if (this.footnotes.TryGetValue(s, out Footnote F))
+						F.Export(Xml);
+				}
+
+				Xml.WriteEndElement();
+			}
+
+			Xml.WriteEndElement();
 		}
 
 		internal Multimedia GetReference(string Label)

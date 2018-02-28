@@ -323,5 +323,24 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		{
 			get { return false; }
 		}
+
+		/// <summary>
+		/// Exports the element to XML.
+		/// </summary>
+		/// <param name="Output">XML Output.</param>
+		public override void Export(XmlWriter Output)
+		{
+			Output.WriteStartElement("CodeBlock");
+			Output.WriteAttributeString("language", this.language);
+			Output.WriteAttributeString("start", this.start.ToString());
+			Output.WriteAttributeString("end", this.end.ToString());
+			Output.WriteAttributeString("indent", this.indent.ToString());
+			Output.WriteAttributeString("indentString", this.indentString);
+
+			foreach (string s in this.rows)
+				Output.WriteElementString("Row", s);
+
+			Output.WriteEndElement();
+		}
 	}
 }

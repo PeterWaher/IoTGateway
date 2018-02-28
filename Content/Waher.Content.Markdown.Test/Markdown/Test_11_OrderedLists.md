@@ -92,3 +92,15 @@ Nested lists 3:
 	2. Item 2a
 	3. Item 2b
 3. Item 3
+
+Three levels:
+
+1. Item 1
+2. Item 2
+	1. Item 2a
+	2. Item 2b
+		1. Item 2bi
+		2. Item 2bii
+		3. Item 2biii
+	3. Item 2c
+3. Item 3

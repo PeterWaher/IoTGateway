@@ -35,31 +35,19 @@
 						</TaskItem>
 						<TaskItem isChecked="true">
 							<NestedBlock>
-								<InlineText>Checked subitem 	</InlineText>
+								<InlineText>Checked subitem </InlineText>
 								<TaskList>
 									<TaskItem isChecked="false">
-										<NestedBlock>
-											<InlineText>Unchecked subsubitem 	</InlineText>
-											<TaskList>
-												<TaskItem isChecked="true">
-													<NestedBlock>
-														<InlineText>Checked subsubitem 	</InlineText>
-														<TaskList>
-															<TaskItem isChecked="true">
-																<NestedBlock>
-																	<InlineText>Second checked subsubitem 	</InlineText>
-																	<TaskList>
-																		<TaskItem isChecked="false">
-																			<InlineText>Second unchecked subsubitem</InlineText>
-																		</TaskItem>
-																	</TaskList>
-																</NestedBlock>
-															</TaskItem>
-														</TaskList>
-													</NestedBlock>
-												</TaskItem>
-											</TaskList>
-										</NestedBlock>
+										<InlineText>Unchecked subsubitem</InlineText>
+									</TaskItem>
+									<TaskItem isChecked="true">
+										<InlineText>Checked subsubitem</InlineText>
+									</TaskItem>
+									<TaskItem isChecked="true">
+										<InlineText>Second checked subsubitem</InlineText>
+									</TaskItem>
+									<TaskItem isChecked="false">
+										<InlineText>Second unchecked subsubitem</InlineText>
 									</TaskItem>
 								</TaskList>
 							</NestedBlock>

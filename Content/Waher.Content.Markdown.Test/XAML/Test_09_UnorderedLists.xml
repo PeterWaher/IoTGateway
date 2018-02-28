@@ -323,4 +323,74 @@
 			<TextBlock TextWrapping="Wrap">Item 3</TextBlock>
 		</StackPanel>
 	</Grid>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Three levels:</TextBlock>
+	<Grid Margin="0,5,0,5">
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="Auto" />
+			<ColumnDefinition Width="*" />
+		</Grid.ColumnDefinitions>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="Auto" />
+		</Grid.RowDefinitions>
+		<TextBlock TextWrapping="Wrap" Grid.Column="0" Grid.Row="0" Margin="0,0,5,0">•</TextBlock>
+		<StackPanel Grid.Column="1" Grid.Row="0">
+			<TextBlock TextWrapping="Wrap">Item 1</TextBlock>
+		</StackPanel>
+		<TextBlock TextWrapping="Wrap" Grid.Column="0" Grid.Row="1" Margin="0,0,5,5">•</TextBlock>
+		<StackPanel Grid.Column="1" Grid.Row="1">
+			<TextBlock TextWrapping="Wrap">Item 2 </TextBlock>
+			<Grid Margin="0,5,0,5">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="Auto" />
+					<ColumnDefinition Width="*" />
+				</Grid.ColumnDefinitions>
+				<Grid.RowDefinitions>
+					<RowDefinition Height="Auto" />
+					<RowDefinition Height="Auto" />
+					<RowDefinition Height="Auto" />
+				</Grid.RowDefinitions>
+				<TextBlock TextWrapping="Wrap" Grid.Column="0" Grid.Row="0" Margin="0,0,5,0">•</TextBlock>
+				<StackPanel Grid.Column="1" Grid.Row="0">
+					<TextBlock TextWrapping="Wrap">Item 2a</TextBlock>
+				</StackPanel>
+				<TextBlock TextWrapping="Wrap" Grid.Column="0" Grid.Row="1" Margin="0,0,5,5">•</TextBlock>
+				<StackPanel Grid.Column="1" Grid.Row="1">
+					<TextBlock TextWrapping="Wrap">Item 2b </TextBlock>
+					<Grid Margin="0,5,0,5">
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="Auto" />
+							<ColumnDefinition Width="*" />
+						</Grid.ColumnDefinitions>
+						<Grid.RowDefinitions>
+							<RowDefinition Height="Auto" />
+							<RowDefinition Height="Auto" />
+							<RowDefinition Height="Auto" />
+						</Grid.RowDefinitions>
+						<TextBlock TextWrapping="Wrap" Grid.Column="0" Grid.Row="0" Margin="0,0,5,0">•</TextBlock>
+						<StackPanel Grid.Column="1" Grid.Row="0">
+							<TextBlock TextWrapping="Wrap">Item 2bi</TextBlock>
+						</StackPanel>
+						<TextBlock TextWrapping="Wrap" Grid.Column="0" Grid.Row="1" Margin="0,0,5,0">•</TextBlock>
+						<StackPanel Grid.Column="1" Grid.Row="1">
+							<TextBlock TextWrapping="Wrap">Item 2bii</TextBlock>
+						</StackPanel>
+						<TextBlock TextWrapping="Wrap" Grid.Column="0" Grid.Row="2" Margin="0,0,5,0">•</TextBlock>
+						<StackPanel Grid.Column="1" Grid.Row="2">
+							<TextBlock TextWrapping="Wrap">Item 2biii</TextBlock>
+						</StackPanel>
+					</Grid>
+				</StackPanel>
+				<TextBlock TextWrapping="Wrap" Grid.Column="0" Grid.Row="2" Margin="0,0,5,0">•</TextBlock>
+				<StackPanel Grid.Column="1" Grid.Row="2">
+					<TextBlock TextWrapping="Wrap">Item 2c</TextBlock>
+				</StackPanel>
+			</Grid>
+		</StackPanel>
+		<TextBlock TextWrapping="Wrap" Grid.Column="0" Grid.Row="2" Margin="0,0,5,0">•</TextBlock>
+		<StackPanel Grid.Column="1" Grid.Row="2">
+			<TextBlock TextWrapping="Wrap">Item 3</TextBlock>
+		</StackPanel>
+	</Grid>
 </StackPanel>

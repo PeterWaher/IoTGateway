@@ -1335,7 +1335,7 @@ namespace Waher.Content.Markdown
 
 						char[] chs;
 
-						if (FirstCharOnLine && (((chs = State.PeekNextChars(3))[0] == ' ' || chs[0] == 'x' || chs[0] == 'X') && chs[1] == ']' && chs[2] <= ' ' && chs[2] > 0))
+						if (FirstCharOnLine && (((chs = State.PeekNextChars(3))[0] == ' ' || chs[0] == 'x' || chs[0] == 'X') && chs[1] == ']' && ((chs[2] <= ' ' && chs[2] > 0) || chs[2] == 160)))
 						{
 							State.NextChar();
 							State.NextChar();
@@ -1361,7 +1361,7 @@ namespace Waher.Content.Markdown
 							{
 								if ((chs = State.PeekNextChars(4))[0] == '[' &&
 									(chs[1] == ' ' || chs[1] == 'x' || chs[1] == 'X') &&
-									chs[2] == ']' && chs[3] <= ' ' && chs[3] > 0)
+									chs[2] == ']' && ((chs[3] <= ' ' && chs[3] > 0) || chs[3] == 160))
 								{
 									State.NextChar();
 									State.NextChar();
@@ -1370,7 +1370,7 @@ namespace Waher.Content.Markdown
 
 									while (((ch2 = State.PeekNextCharSameRow()) <= ' ' && ch2 > 0) || ch2 == 160)
 										State.NextCharSameRow();
-
+									
 									Item = new TaskItem(this, Checked, new NestedBlock(this, this.ParseBlock(Rows.ToArray(), Positions.ToArray())));
 
 									if (Elements.Last != null && Elements.Last.Value is TaskList TaskList)
@@ -1388,6 +1388,7 @@ namespace Waher.Content.Markdown
 								}
 								else
 								{
+									State.SkipWhitespaceSameRow(4);
 									Positions.Add(State.CurrentPosition);
 									Rows.Add(State.RestOfRow());
 								}
@@ -2222,6 +2223,8 @@ namespace Waher.Content.Markdown
 									}
 									else
 									{
+										State.SkipWhitespaceSameRow(4);
+
 										Positions.Add(State.CurrentPosition);
 										Rows.Add(State.RestOfRow());
 									}
@@ -2476,6 +2479,8 @@ namespace Waher.Content.Markdown
 										}
 										else
 										{
+											State.SkipWhitespaceSameRow(4);
+
 											Positions.Add(State.CurrentPosition);
 											Rows.Add(State.RestOfRow());
 										}

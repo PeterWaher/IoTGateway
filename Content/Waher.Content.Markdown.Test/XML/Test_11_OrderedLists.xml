@@ -216,6 +216,46 @@
 				<InlineText>Item 3</InlineText>
 			</NumberedItem>
 		</NumberedList>
+		<Paragraph>
+			<InlineText>Three levels:</InlineText>
+		</Paragraph>
+		<NumberedList>
+			<NumberedItem number="1">
+				<InlineText>Item 1</InlineText>
+			</NumberedItem>
+			<NumberedItem number="2">
+				<NestedBlock>
+					<InlineText>Item 2 </InlineText>
+					<NumberedList>
+						<NumberedItem number="1">
+							<InlineText>Item 2a</InlineText>
+						</NumberedItem>
+						<NumberedItem number="2">
+							<NestedBlock>
+								<InlineText>Item 2b </InlineText>
+								<NumberedList>
+									<NumberedItem number="1">
+										<InlineText>Item 2bi</InlineText>
+									</NumberedItem>
+									<NumberedItem number="2">
+										<InlineText>Item 2bii</InlineText>
+									</NumberedItem>
+									<NumberedItem number="3">
+										<InlineText>Item 2biii</InlineText>
+									</NumberedItem>
+								</NumberedList>
+							</NestedBlock>
+						</NumberedItem>
+						<NumberedItem number="3">
+							<InlineText>Item 2c</InlineText>
+						</NumberedItem>
+					</NumberedList>
+				</NestedBlock>
+			</NumberedItem>
+			<NumberedItem number="3">
+				<InlineText>Item 3</InlineText>
+			</NumberedItem>
+		</NumberedList>
 	</elements>
 	<references />
 </parsedMakdown>

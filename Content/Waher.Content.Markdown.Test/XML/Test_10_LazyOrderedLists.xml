@@ -195,6 +195,46 @@
 				</NestedBlock>
 			</UnnumberedItem>
 		</NumberedList>
+		<Paragraph>
+			<InlineText>Three levels:</InlineText>
+		</Paragraph>
+		<NumberedList>
+			<UnnumberedItem prefix="#. ">
+				<InlineText>Item 1</InlineText>
+			</UnnumberedItem>
+			<UnnumberedItem prefix="#. ">
+				<NestedBlock>
+					<InlineText>Item 2 </InlineText>
+					<NumberedList>
+						<UnnumberedItem prefix="#. ">
+							<InlineText>Item 2a</InlineText>
+						</UnnumberedItem>
+						<UnnumberedItem prefix="#. ">
+							<NestedBlock>
+								<InlineText>Item 2b </InlineText>
+								<NumberedList>
+									<UnnumberedItem prefix="#. ">
+										<InlineText>Item 2bi</InlineText>
+									</UnnumberedItem>
+									<UnnumberedItem prefix="#. ">
+										<InlineText>Item 2bii</InlineText>
+									</UnnumberedItem>
+									<UnnumberedItem prefix="#. ">
+										<InlineText>Item 2biii</InlineText>
+									</UnnumberedItem>
+								</NumberedList>
+							</NestedBlock>
+						</UnnumberedItem>
+						<UnnumberedItem prefix="#. ">
+							<InlineText>Item 2c</InlineText>
+						</UnnumberedItem>
+					</NumberedList>
+				</NestedBlock>
+			</UnnumberedItem>
+			<UnnumberedItem prefix="#. ">
+				<InlineText>Item 3</InlineText>
+			</UnnumberedItem>
+		</NumberedList>
 	</elements>
 	<references />
 </parsedMakdown>

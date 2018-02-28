@@ -1,0 +1,15 @@
+﻿<parsedMakdown isDynamic="false" xmlns="http://waher.se/Schema/Markdown.xsd">
+	<metaData>
+		<tag xmlns="TITLE">
+			<value lineBreak="false" xmlns="Test_14_HorizontalRules.md" />
+		</tag>
+	</metaData>
+	<elements>
+		<HorizontalRule />
+		<HorizontalRule />
+		<HorizontalRule />
+		<HorizontalRule />
+		<HorizontalRule />
+	</elements>
+	<references />
+</parsedMakdown>

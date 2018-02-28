@@ -1,0 +1,172 @@
+﻿<parsedMakdown isDynamic="false" xmlns="http://waher.se/Schema/Markdown.xsd">
+	<metaData>
+		<tag xmlns="TITLE">
+			<value lineBreak="false" xmlns="Test_02_Links.md" />
+		</tag>
+	</metaData>
+	<elements>
+		<Paragraph>
+			<InlineText>This is </InlineText>
+			<Link url="http://example.com/" title="Title">
+				<InlineText>an example</InlineText>
+			</Link>
+			<InlineText> inline link.</InlineText>
+		</Paragraph>
+		<Paragraph>
+			<Link url="http://example.net/" title="">
+				<InlineText>This link</InlineText>
+			</Link>
+			<InlineText> has no title attribute.</InlineText>
+		</Paragraph>
+		<Paragraph>
+			<InlineText>See my </InlineText>
+			<Link url="/about/" title="">
+				<InlineText>About</InlineText>
+			</Link>
+			<InlineText> page for details.</InlineText>
+		</Paragraph>
+		<Paragraph>
+			<InlineText>This is </InlineText>
+			<LinkReference label="id">
+				<InlineText>an example</InlineText>
+			</LinkReference>
+			<InlineText> reference-style link.</InlineText>
+		</Paragraph>
+		<Paragraph>
+			<InlineText>This is </InlineText>
+			<LinkReference label="id2">
+				<InlineText>an example</InlineText>
+			</LinkReference>
+			<InlineText> reference-style link.</InlineText>
+		</Paragraph>
+		<Paragraph>
+			<InlineText>This is </InlineText>
+			<LinkReference label="ID3">
+				<InlineText>an example</InlineText>
+			</LinkReference>
+			<InlineText> reference-style link.</InlineText>
+		</Paragraph>
+		<Paragraph>
+			<InlineText>Visit </InlineText>
+			<LinkReference label="Daring Fireball">
+				<InlineText>Daring Fireball</InlineText>
+			</LinkReference>
+			<InlineText> for more information.</InlineText>
+		</Paragraph>
+		<Paragraph>
+			<InlineText>I get 10 times more traffic from </InlineText>
+			<LinkReference label="1">
+				<InlineText>Google</InlineText>
+			</LinkReference>
+			<InlineText> than from </InlineText>
+			<LinkReference label="2">
+				<InlineText>Yahoo</InlineText>
+			</LinkReference>
+			<InlineText> or </InlineText>
+			<LinkReference label="3">
+				<InlineText>MSN</InlineText>
+			</LinkReference>
+			<InlineText>.</InlineText>
+		</Paragraph>
+		<Paragraph>
+			<InlineText>I get 10 times more traffic from </InlineText>
+			<LinkReference label="Google">
+				<InlineText>Google</InlineText>
+			</LinkReference>
+			<InlineText> than from </InlineText>
+			<LinkReference label="Yahoo">
+				<InlineText>Yahoo</InlineText>
+			</LinkReference>
+			<InlineText> or </InlineText>
+			<LinkReference label="MSN">
+				<InlineText>MSN</InlineText>
+			</LinkReference>
+			<InlineText>.</InlineText>
+		</Paragraph>
+		<Paragraph>
+			<InlineText>I get 10 times more traffic from </InlineText>
+			<Link url="http://google.com/" title="Google">
+				<InlineText>Google</InlineText>
+			</Link>
+			<InlineText> than from </InlineText>
+			<Link url="http://search.yahoo.com/" title="Yahoo Search">
+				<InlineText>Yahoo</InlineText>
+			</Link>
+			<InlineText> or </InlineText>
+			<Link url="http://search.msn.com/" title="MSN Search">
+				<InlineText>MSN</InlineText>
+			</Link>
+			<InlineText>.</InlineText>
+		</Paragraph>
+		<Paragraph>
+			<InlineText>You can also write links, such as </InlineText>
+			<AutomaticLinkUrl url="http://littlesister.se/" />
+			<InlineText> inline.</InlineText>
+		</Paragraph>
+		<Paragraph>
+			<InlineText>Or on separate paragraphs:</InlineText>
+		</Paragraph>
+		<Paragraph>
+			<AutomaticLinkUrl url="http://littlesister.se/" />
+		</Paragraph>
+		<Paragraph>
+			<InlineText>Recognized multi-media content put on separate rows are automatically handled as multi-media:</InlineText>
+		</Paragraph>
+		<Multimedia aloneInParagraph="true">
+			<InlineText>https://www.youtube.com/watch?v=whBPLc8m4SU</InlineText>
+			<MultimediaItem url="https://www.youtube.com/watch?v=whBPLc8m4SU" title="" extension="" contentType="" />
+		</Multimedia>
+	</elements>
+	<references>
+		<reference key="id">
+			<Multimedia aloneInParagraph="false">
+				<MultimediaItem url="http://example.com/" title="Optional Title Here" extension="" contentType="" />
+			</Multimedia>
+		</reference>
+		<reference key="id2">
+			<Multimedia aloneInParagraph="false">
+				<MultimediaItem url="http://example.com/" title="Optional Title Here" extension="" contentType="" />
+			</Multimedia>
+		</reference>
+		<reference key="id3">
+			<Multimedia aloneInParagraph="true">
+				<MultimediaItem url="http://example.com/" title="Optional Title Here" extension="" contentType="" />
+			</Multimedia>
+		</reference>
+		<reference key="daring fireball">
+			<Multimedia aloneInParagraph="true">
+				<MultimediaItem url="http://daringfireball.net/" title="" extension="" contentType="" />
+			</Multimedia>
+		</reference>
+		<reference key="1">
+			<Multimedia aloneInParagraph="false">
+				<MultimediaItem url="http://google.com/" title="Google" extension="" contentType="" />
+			</Multimedia>
+		</reference>
+		<reference key="2">
+			<Multimedia aloneInParagraph="false">
+				<MultimediaItem url="http://search.yahoo.com/" title="Yahoo Search" extension="" contentType="" />
+			</Multimedia>
+		</reference>
+		<reference key="3">
+			<Multimedia aloneInParagraph="true">
+				<MultimediaItem url="http://search.msn.com/" title="MSN Search" extension="" contentType="" />
+			</Multimedia>
+		</reference>
+		<reference key="google">
+			<Multimedia aloneInParagraph="false">
+				<MultimediaItem url="http://google.com/" title="Google" extension="" contentType="" />
+			</Multimedia>
+		</reference>
+		<reference key="yahoo">
+			<Multimedia aloneInParagraph="false">
+				<MultimediaItem url="http://search.yahoo.com/" title="Yahoo Search" extension="" contentType="" />
+			</Multimedia>
+		</reference>
+		<reference key="msn">
+			<Multimedia aloneInParagraph="true">
+				<MultimediaItem url="http://search.msn.com/" title="MSN Search" extension="" contentType="" />
+			</Multimedia>
+		</reference>
+	</references>
+</parsedMakdown>

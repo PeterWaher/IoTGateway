@@ -1,0 +1,72 @@
+﻿<parsedMakdown isDynamic="false" xmlns="http://waher.se/Schema/Markdown.xsd">
+	<metaData>
+		<tag xmlns="TITLE">
+			<value lineBreak="false" xmlns="Test_07_BlockQuotes.md" />
+		</tag>
+	</metaData>
+	<elements>
+		<Paragraph>
+			<InlineText>Markdown uses email-style &gt; characters for blockquoting. If you’re familiar with quoting passages of text in an email message, then you know how to create a blockquote in Markdown. It looks best if you hard wrap the text and put a &gt; before every line:</InlineText>
+		</Paragraph>
+		<BlockQuote>
+			<Paragraph>
+				<InlineText>This is a blockquote with two paragraphs. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aliquam hendrerit mi posuere lectus. Vestibulum enim wisi, viverra nec, fringilla in, laoreet vitae, risus.</InlineText>
+			</Paragraph>
+			<Paragraph>
+				<InlineText>Donec sit amet nisl. Aliquam semper ipsum sit amet velit. Suspendisse id sem consectetuer libero luctus adipiscing.</InlineText>
+			</Paragraph>
+		</BlockQuote>
+		<Paragraph>
+			<InlineText>Markdown allows you to be lazy and only put the &gt; before the first line of a hard-wrapped paragraph:</InlineText>
+		</Paragraph>
+		<BlockQuote>
+			<Paragraph>
+				<InlineText>This is a blockquote with two paragraphs. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aliquam hendrerit mi posuere lectus. Vestibulum enim wisi, viverra nec, fringilla in, laoreet vitae, risus.</InlineText>
+			</Paragraph>
+			<Paragraph>
+				<InlineText>Donec sit amet nisl. Aliquam semper ipsum sit amet velit. Suspendisse id sem consectetuer libero luctus adipiscing.</InlineText>
+			</Paragraph>
+		</BlockQuote>
+		<Paragraph>
+			<InlineText>Blockquotes can be nested (i.e. a blockquote-in-a-blockquote) by adding additional levels of &gt;:</InlineText>
+		</Paragraph>
+		<BlockQuote>
+			<Paragraph>
+				<InlineText>This is the first level of quoting.</InlineText>
+			</Paragraph>
+			<BlockQuote>
+				<Paragraph>
+					<InlineText>This is nested blockquote.</InlineText>
+				</Paragraph>
+			</BlockQuote>
+			<Paragraph>
+				<InlineText>Back to the first level.</InlineText>
+			</Paragraph>
+		</BlockQuote>
+		<Paragraph>
+			<InlineText>Blockquotes can contain other Markdown elements, including headers, lists, and code blocks:</InlineText>
+		</Paragraph>
+		<BlockQuote>
+			<Header id="thisIsAHeader" level="2">
+				<InlineText>This is a header.</InlineText>
+			</Header>
+			<NumberedList>
+				<NumberedItem number="1">
+					<InlineText>This is the first list item.</InlineText>
+				</NumberedItem>
+				<NumberedItem number="2">
+					<InlineText>This is the second list item.</InlineText>
+				</NumberedItem>
+			</NumberedList>
+			<Paragraph>
+				<InlineText>Here</InlineText>
+				<HtmlEntity>rsquo</HtmlEntity>
+				<InlineText>s some example code:</InlineText>
+			</Paragraph>
+			<CodeBlock language="" start="0" end="0" indent="0" indentString="">
+				<Row>return shell_exec("echo $input | $markdown_script");</Row>
+			</CodeBlock>
+		</BlockQuote>
+	</elements>
+	<references />
+</parsedMakdown>

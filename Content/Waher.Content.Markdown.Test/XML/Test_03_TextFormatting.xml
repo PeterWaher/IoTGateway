@@ -1,0 +1,91 @@
+﻿<parsedMakdown isDynamic="false" xmlns="http://waher.se/Schema/Markdown.xsd">
+	<metaData>
+		<tag xmlns="TITLE">
+			<value lineBreak="false" xmlns="Test_03_TextFormatting.md" />
+		</tag>
+	</metaData>
+	<elements>
+		<Paragraph>
+			<Emphasize>
+				<InlineText>single asterisks</InlineText>
+			</Emphasize>
+		</Paragraph>
+		<Paragraph>
+			<Underline>
+				<InlineText>single underscores</InlineText>
+			</Underline>
+		</Paragraph>
+		<Paragraph>
+			<StrikeThrough>
+				<InlineText>single tildes</InlineText>
+			</StrikeThrough>
+		</Paragraph>
+		<Paragraph>
+			<Strong>
+				<InlineText>double asterisks</InlineText>
+			</Strong>
+		</Paragraph>
+		<Paragraph>
+			<Insert>
+				<InlineText>double underscores</InlineText>
+			</Insert>
+		</Paragraph>
+		<Paragraph>
+			<Delete>
+				<InlineText>double tildes</InlineText>
+			</Delete>
+		</Paragraph>
+		<Paragraph>
+			<InlineText>un</InlineText>
+			<Emphasize>
+				<InlineText>frigging</InlineText>
+			</Emphasize>
+			<InlineText>believable</InlineText>
+		</Paragraph>
+		<Paragraph>
+			<InlineText>This * will not be formatted, nor this * asterisk.</InlineText>
+		</Paragraph>
+		<Paragraph>
+			<InlineText>This _ will not be formatted, nor this _ underscore.</InlineText>
+		</Paragraph>
+		<Paragraph>
+			<InlineText>This ~ will not be formatted, nor this ~ tilde.</InlineText>
+		</Paragraph>
+		<Paragraph>
+			<InlineText>*this text is surrounded by literal asterisks*</InlineText>
+		</Paragraph>
+		<Paragraph>
+			<InlineText>Use the </InlineText>
+			<InlineCode><![CDATA[printf()]]></InlineCode>
+			<InlineText> function.</InlineText>
+		</Paragraph>
+		<Paragraph>
+			<InlineCode><![CDATA[There is a literal backtick (`) here.]]></InlineCode>
+		</Paragraph>
+		<Paragraph>
+			<InlineText>A single backtick in a code span: </InlineText>
+			<InlineCode><![CDATA[`]]></InlineCode>
+		</Paragraph>
+		<Paragraph>
+			<InlineText>A backtick-delimited string in a code span: </InlineText>
+			<InlineCode><![CDATA[`foo`]]></InlineCode>
+		</Paragraph>
+		<Paragraph>
+			<InlineText>Please don</InlineText>
+			<HtmlEntity>rsquo</HtmlEntity>
+			<InlineText>t use any </InlineText>
+			<InlineCode><![CDATA[<blink>]]></InlineCode>
+			<InlineText> tags.</InlineText>
+		</Paragraph>
+		<Paragraph>
+			<InlineCode><![CDATA[&#8212;]]></InlineCode>
+			<InlineText> is the decimal-encoded equivalent of </InlineText>
+			<InlineCode><![CDATA[&mdash;]]></InlineCode>
+			<InlineText>.</InlineText>
+		</Paragraph>
+		<Paragraph>
+			<InlineText>*literal asterisks*</InlineText>
+		</Paragraph>
+	</elements>
+	<references />
+</parsedMakdown>

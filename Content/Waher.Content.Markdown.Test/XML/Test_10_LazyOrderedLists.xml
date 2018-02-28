@@ -1,0 +1,200 @@
+﻿<parsedMakdown isDynamic="false" xmlns="http://waher.se/Schema/Markdown.xsd">
+	<metaData>
+		<tag xmlns="TITLE">
+			<value lineBreak="false" xmlns="Test_10_LazyOrderedLists.md" />
+		</tag>
+	</metaData>
+	<elements>
+		<Paragraph>
+			<InlineText>Lazy numbering can be accomplished by prefixing items with </InlineText>
+			<InlineCode><![CDATA[#.]]></InlineCode>
+			<InlineText>:</InlineText>
+		</Paragraph>
+		<NumberedList>
+			<UnnumberedItem prefix="#. ">
+				<InlineText>Bird</InlineText>
+			</UnnumberedItem>
+			<UnnumberedItem prefix="#. ">
+				<InlineText>McHale</InlineText>
+			</UnnumberedItem>
+			<UnnumberedItem prefix="#. ">
+				<InlineText>Parish</InlineText>
+			</UnnumberedItem>
+		</NumberedList>
+		<Paragraph>
+			<InlineText>To make lists look nice, you can wrap items with hanging indents:</InlineText>
+		</Paragraph>
+		<NumberedList>
+			<UnnumberedItem prefix="#. ">
+				<InlineText>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aliquam hendrerit mi posuere lectus. Vestibulum enim wisi, viverra nec, fringilla in, laoreet vitae, risus.</InlineText>
+			</UnnumberedItem>
+			<UnnumberedItem prefix="#. ">
+				<InlineText>Donec sit amet nisl. Aliquam semper ipsum sit amet velit. Suspendisse id sem consectetuer libero luctus adipiscing.</InlineText>
+			</UnnumberedItem>
+		</NumberedList>
+		<Paragraph>
+			<InlineText>But if you want to be lazy, you don’t have to:</InlineText>
+		</Paragraph>
+		<NumberedList>
+			<UnnumberedItem prefix="#. ">
+				<InlineText>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aliquam hendrerit mi posuere lectus. Vestibulum enim wisi, viverra nec, fringilla in, laoreet vitae, risus.</InlineText>
+			</UnnumberedItem>
+			<UnnumberedItem prefix="#. ">
+				<InlineText>Donec sit amet nisl. Aliquam semper ipsum sit amet velit. Suspendisse id sem consectetuer libero luctus adipiscing.</InlineText>
+			</UnnumberedItem>
+		</NumberedList>
+		<Paragraph>
+			<InlineText>On separate lines:</InlineText>
+		</Paragraph>
+		<NumberedList>
+			<UnnumberedItem prefix="#. ">
+				<Paragraph>
+					<InlineText>Bird</InlineText>
+				</Paragraph>
+			</UnnumberedItem>
+			<UnnumberedItem prefix="#. ">
+				<Paragraph>
+					<InlineText>Magic</InlineText>
+				</Paragraph>
+			</UnnumberedItem>
+		</NumberedList>
+		<Paragraph>
+			<InlineText>List items may consist of multiple paragraphs. Each subsequent paragraph in a list item must be indented by either 4 spaces or one tab:</InlineText>
+		</Paragraph>
+		<NumberedList>
+			<UnnumberedItem prefix="#. ">
+				<NestedBlock>
+					<Paragraph>
+						<InlineText>This is a list item with two paragraphs. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aliquam hendrerit mi posuere lectus.</InlineText>
+					</Paragraph>
+					<Paragraph>
+						<InlineText>Vestibulum enim wisi, viverra nec, fringilla in, laoreet vitae, risus. Donec sit amet nisl. Aliquam semper ipsum sit amet velit.</InlineText>
+					</Paragraph>
+				</NestedBlock>
+			</UnnumberedItem>
+			<UnnumberedItem prefix="#. ">
+				<Paragraph>
+					<InlineText>Suspendisse id sem consectetuer libero luctus adipiscing.</InlineText>
+				</Paragraph>
+			</UnnumberedItem>
+		</NumberedList>
+		<Paragraph>
+			<InlineText>It looks nice if you indent every line of the subsequent paragraphs, but here again, Markdown will allow you to be lazy:</InlineText>
+		</Paragraph>
+		<NumberedList>
+			<UnnumberedItem prefix="#. ">
+				<NestedBlock>
+					<Paragraph>
+						<InlineText>This is a list item with two paragraphs.</InlineText>
+					</Paragraph>
+					<Paragraph>
+						<InlineText>This is the second paragraph in the list item. You</InlineText>
+						<HtmlEntity>rsquo</HtmlEntity>
+						<InlineText>re only required to indent the first line. Lorem ipsum dolor sit amet, consectetuer adipiscing elit.</InlineText>
+					</Paragraph>
+				</NestedBlock>
+			</UnnumberedItem>
+			<UnnumberedItem prefix="#. ">
+				<Paragraph>
+					<InlineText>Another item in the same list.</InlineText>
+				</Paragraph>
+			</UnnumberedItem>
+		</NumberedList>
+		<Paragraph>
+			<InlineText>To put a blockquote within a list item, the blockquote’s &gt; delimiters need to be indented:</InlineText>
+		</Paragraph>
+		<NumberedList>
+			<UnnumberedItem prefix="#. ">
+				<NestedBlock>
+					<Paragraph>
+						<InlineText>A list item with a blockquote:</InlineText>
+					</Paragraph>
+					<BlockQuote>
+						<Paragraph>
+							<InlineText>This is a blockquote inside a list item.</InlineText>
+						</Paragraph>
+					</BlockQuote>
+				</NestedBlock>
+			</UnnumberedItem>
+		</NumberedList>
+		<Paragraph>
+			<InlineText>To put a code block within a list item, the code block needs to be indented twice — 8 spaces or two tabs:</InlineText>
+		</Paragraph>
+		<NumberedList>
+			<UnnumberedItem prefix="#. ">
+				<NestedBlock>
+					<Paragraph>
+						<InlineText>A list item with a code block:</InlineText>
+					</Paragraph>
+					<CodeBlock language="" start="0" end="0" indent="0" indentString="">
+						<Row>&lt;code goes here&gt;</Row>
+					</CodeBlock>
+				</NestedBlock>
+			</UnnumberedItem>
+		</NumberedList>
+		<Paragraph>
+			<InlineText>Nested lists:</InlineText>
+		</Paragraph>
+		<NumberedList>
+			<UnnumberedItem prefix="#. ">
+				<InlineText>Item 1</InlineText>
+			</UnnumberedItem>
+			<UnnumberedItem prefix="#. ">
+				<NestedBlock>
+					<InlineText>Item 2 </InlineText>
+					<BulletList>
+						<UnnumberedItem prefix="+ ">
+							<InlineText>Item 2a</InlineText>
+						</UnnumberedItem>
+						<UnnumberedItem prefix="+ ">
+							<InlineText>Item 2b</InlineText>
+						</UnnumberedItem>
+					</BulletList>
+				</NestedBlock>
+			</UnnumberedItem>
+		</NumberedList>
+		<Paragraph>
+			<InlineText>Nested lists 2:</InlineText>
+		</Paragraph>
+		<NumberedList>
+			<UnnumberedItem prefix="#. ">
+				<InlineText>Item 1</InlineText>
+			</UnnumberedItem>
+			<UnnumberedItem prefix="#. ">
+				<NestedBlock>
+					<InlineText>Item 2 </InlineText>
+					<NumberedList>
+						<UnnumberedItem prefix="#. ">
+							<InlineText>Item 2a</InlineText>
+						</UnnumberedItem>
+						<UnnumberedItem prefix="#. ">
+							<InlineText>Item 2b</InlineText>
+						</UnnumberedItem>
+					</NumberedList>
+				</NestedBlock>
+			</UnnumberedItem>
+		</NumberedList>
+		<Paragraph>
+			<InlineText>Nested lists 3:</InlineText>
+		</Paragraph>
+		<NumberedList>
+			<UnnumberedItem prefix="#. ">
+				<InlineText>Item 1</InlineText>
+			</UnnumberedItem>
+			<UnnumberedItem prefix="#. ">
+				<NestedBlock>
+					<InlineText>Item 2 </InlineText>
+					<NumberedList>
+						<NumberedItem number="2">
+							<InlineText>Item 2a</InlineText>
+						</NumberedItem>
+						<NumberedItem number="3">
+							<InlineText>Item 2b</InlineText>
+						</NumberedItem>
+					</NumberedList>
+				</NestedBlock>
+			</UnnumberedItem>
+		</NumberedList>
+	</elements>
+	<references />
+</parsedMakdown>

@@ -1,0 +1,58 @@
+﻿<parsedMakdown isDynamic="false" xmlns="http://waher.se/Schema/Markdown.xsd">
+	<metaData>
+		<tag xmlns="TITLE">
+			<value lineBreak="false" xmlns="Test_06_CodeBlocks.md" />
+		</tag>
+	</metaData>
+	<elements>
+		<Paragraph>
+			<InlineText>This is a normal paragraph:</InlineText>
+		</Paragraph>
+		<CodeBlock language="" start="0" end="0" indent="0" indentString="">
+			<Row>This is a code block.</Row>
+		</CodeBlock>
+		<Paragraph>
+			<InlineText>Here is an example of AppleScript:</InlineText>
+		</Paragraph>
+		<CodeBlock language="" start="0" end="2" indent="0" indentString="">
+			<Row>tell application "Foo"</Row>
+			<Row>    beep</Row>
+			<Row>end tell</Row>
+		</CodeBlock>
+		<Paragraph>
+			<InlineText>Fenced code block:</InlineText>
+		</Paragraph>
+		<CodeBlock language="" start="0" end="2" indent="0" indentString="">
+			<Row>&lt;div class="footer"&gt;</Row>
+			<Row>    &amp;copy; 2004 Foo Corporation</Row>
+			<Row>&lt;/div&gt;</Row>
+		</CodeBlock>
+		<Paragraph>
+			<InlineText>Fenced code block (with syntax highlighting):</InlineText>
+		</Paragraph>
+		<CodeBlock language="basic" start="0" end="4" indent="0" indentString="">
+			<Row />
+			<Row>10 PRINT "*";</Row>
+			<Row />
+			<Row>20 GOTO 10</Row>
+			<Row />
+		</CodeBlock>
+		<Paragraph>
+			<InlineText>Headers can also be written on a single line, prefixing them with hash signs (</InlineText>
+			<InlineCode><![CDATA[#]]></InlineCode>
+			<InlineText>) and a space character. The number of hash signs defines the level of the header:</InlineText>
+		</Paragraph>
+		<CodeBlock language="" start="0" end="8" indent="0" indentString="">
+			<Row># First level header</Row>
+			<Row />
+			<Row>## Second level header</Row>
+			<Row />
+			<Row>### Third level header</Row>
+			<Row />
+			<Row>#### Fourth level header</Row>
+			<Row />
+			<Row>...</Row>
+		</CodeBlock>
+	</elements>
+	<references />
+</parsedMakdown>

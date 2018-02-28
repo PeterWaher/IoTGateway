@@ -1,0 +1,155 @@
+﻿<parsedMakdown isDynamic="false" xmlns="http://waher.se/Schema/Markdown.xsd">
+	<metaData>
+		<tag xmlns="TITLE">
+			<value lineBreak="false" xmlns="Test_15_DefinitionLists.md" />
+		</tag>
+	</metaData>
+	<elements>
+		<DefinitionList>
+			<DefinitionTerms>
+				<InlineText>Apple</InlineText>
+			</DefinitionTerms>
+			<DefinitionDescription>
+				<NestedBlock>
+					<InlineText>Pomaceous fruit of plants of the genus Malus in the family Rosaceae.</InlineText>
+				</NestedBlock>
+			</DefinitionDescription>
+			<DefinitionTerms>
+				<InlineText>Orange</InlineText>
+			</DefinitionTerms>
+			<DefinitionDescription>
+				<NestedBlock>
+					<InlineText>The fruit of an evergreen tree of the genus Citrus.</InlineText>
+				</NestedBlock>
+			</DefinitionDescription>
+		</DefinitionList>
+		<HorizontalRule />
+		<DefinitionList>
+			<DefinitionTerms>
+				<InlineText>Apple</InlineText>
+			</DefinitionTerms>
+			<DefinitionDescription>
+				<NestedBlock>
+					<InlineText>Pomaceous fruit of plants of the genus Malus in the family Rosaceae.</InlineText>
+				</NestedBlock>
+			</DefinitionDescription>
+			<DefinitionTerms>
+				<InlineText>Orange</InlineText>
+			</DefinitionTerms>
+			<DefinitionDescription>
+				<NestedBlock>
+					<InlineText>The fruit of an evergreen tree of the genus Citrus.</InlineText>
+				</NestedBlock>
+			</DefinitionDescription>
+		</DefinitionList>
+		<HorizontalRule />
+		<DefinitionList>
+			<DefinitionTerms>
+				<InlineText>Apple</InlineText>
+			</DefinitionTerms>
+			<DefinitionDescription>
+				<NestedBlock>
+					<InlineText>Pomaceous fruit of plants of the genus Malus in the family Rosaceae.</InlineText>
+				</NestedBlock>
+				<NestedBlock>
+					<InlineText>An American computer company.</InlineText>
+				</NestedBlock>
+			</DefinitionDescription>
+			<DefinitionTerms>
+				<InlineText>Orange</InlineText>
+			</DefinitionTerms>
+			<DefinitionDescription>
+				<NestedBlock>
+					<InlineText>The fruit of an evergreen tree of the genus Citrus.</InlineText>
+				</NestedBlock>
+			</DefinitionDescription>
+		</DefinitionList>
+		<HorizontalRule />
+		<DefinitionList>
+			<DefinitionTerms>
+				<InlineText>Term 1</InlineText>
+				<NestedBlock>
+					<InlineText>Term 2</InlineText>
+				</NestedBlock>
+			</DefinitionTerms>
+			<DefinitionDescription>
+				<NestedBlock>
+					<InlineText>Definition a</InlineText>
+				</NestedBlock>
+			</DefinitionDescription>
+			<DefinitionTerms>
+				<InlineText>Term 3</InlineText>
+			</DefinitionTerms>
+			<DefinitionDescription>
+				<NestedBlock>
+					<InlineText>Definition b</InlineText>
+				</NestedBlock>
+			</DefinitionDescription>
+		</DefinitionList>
+		<HorizontalRule />
+		<DefinitionList>
+			<DefinitionTerms>
+				<InlineText>Apple</InlineText>
+			</DefinitionTerms>
+			<DefinitionDescription>
+				<Paragraph>
+					<InlineText>Pomaceous fruit of plants of the genus Malus in the family Rosaceae.</InlineText>
+				</Paragraph>
+			</DefinitionDescription>
+			<DefinitionTerms>
+				<InlineText>Orange</InlineText>
+			</DefinitionTerms>
+			<DefinitionDescription>
+				<Paragraph>
+					<InlineText>The fruit of an evergreen tree of the genus Citrus.</InlineText>
+				</Paragraph>
+			</DefinitionDescription>
+		</DefinitionList>
+		<HorizontalRule />
+		<DefinitionList>
+			<DefinitionTerms>
+				<InlineText>Term 1</InlineText>
+			</DefinitionTerms>
+			<DefinitionDescription>
+				<NestedBlock>
+					<Paragraph>
+						<InlineText>This is a definition with two paragraphs. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aliquam hendrerit mi posuere lectus.</InlineText>
+					</Paragraph>
+					<Paragraph>
+						<InlineText>Vestibulum enim wisi, viverra nec, fringilla in, laoreet vitae, risus.</InlineText>
+					</Paragraph>
+				</NestedBlock>
+				<Paragraph>
+					<InlineText>Second definition for term 1, also wrapped in a paragraph because of the blank line preceding it.</InlineText>
+				</Paragraph>
+			</DefinitionDescription>
+			<DefinitionTerms>
+				<InlineText>Term 2</InlineText>
+			</DefinitionTerms>
+			<DefinitionDescription>
+				<NestedBlock>
+					<Paragraph>
+						<InlineText>This definition has a code block, a blockquote and a list.</InlineText>
+					</Paragraph>
+					<CodeBlock language="" start="0" end="0" indent="0" indentString="">
+						<Row>code block.</Row>
+					</CodeBlock>
+					<BlockQuote>
+						<Paragraph>
+							<InlineText>block quote on two lines.</InlineText>
+						</Paragraph>
+					</BlockQuote>
+					<NumberedList>
+						<NumberedItem number="1">
+							<InlineText>first list item</InlineText>
+						</NumberedItem>
+						<NumberedItem number="2">
+							<InlineText>second list item</InlineText>
+						</NumberedItem>
+					</NumberedList>
+				</NestedBlock>
+			</DefinitionDescription>
+		</DefinitionList>
+	</elements>
+	<references />
+</parsedMakdown>

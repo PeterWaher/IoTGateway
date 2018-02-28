@@ -1,0 +1,49 @@
+﻿<parsedMakdown isDynamic="false" xmlns="http://waher.se/Schema/Markdown.xsd">
+	<metaData>
+		<tag xmlns="TITLE">
+			<value lineBreak="false" xmlns="Test_17_Footnotes.md" />
+		</tag>
+	</metaData>
+	<elements>
+		<Paragraph>
+			<InlineText>Here is some text containing a footnote</InlineText>
+			<FootnoteReference nr="1" />
+			<InlineText>. You can then continue your thought</InlineText>
+			<HtmlEntity>hellip</HtmlEntity>
+		</Paragraph>
+		<Paragraph>
+			<InlineText>Even go to a new paragraph and the footnotes with go to the bottom of the document</InlineText>
+			<FootnoteReference nr="2" />
+			<InlineText>.</InlineText>
+		</Paragraph>
+		<Paragraph>
+			<InlineText>This is an example of an inline footnote.</InlineText>
+			<FootnoteReference nr="3" />
+		</Paragraph>
+	</elements>
+	<references />
+	<footnotes>
+		<Footnote nr="1">
+			<Paragraph>
+				<InlineText>Here is the text of the footnote itself.</InlineText>
+			</Paragraph>
+		</Footnote>
+		<Footnote nr="2">
+			<Paragraph>
+				<InlineText>Depending on the final form of your document, of course. See the documentation and experiment.</InlineText>
+			</Paragraph>
+			<Paragraph>
+				<InlineText>This footnote has a second paragraph.</InlineText>
+			</Paragraph>
+		</Footnote>
+		<Footnote nr="3">
+			<Paragraph>
+				<InlineText>This is the </InlineText>
+				<Emphasize>
+					<InlineText>actual</InlineText>
+				</Emphasize>
+				<InlineText> footnote.</InlineText>
+			</Paragraph>
+		</Footnote>
+	</footnotes>
+</parsedMakdown>

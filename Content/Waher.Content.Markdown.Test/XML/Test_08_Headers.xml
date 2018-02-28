@@ -1,0 +1,38 @@
+﻿<parsedMakdown isDynamic="false" xmlns="http://waher.se/Schema/Markdown.xsd">
+	<metaData>
+		<tag xmlns="TITLE">
+			<value lineBreak="false" xmlns="Test_08_Headers.md" />
+		</tag>
+	</metaData>
+	<elements>
+		<Multimedia aloneInParagraph="true">
+			<InlineText>Table of Contents</InlineText>
+			<MultimediaItem url="ToC" title="" extension="" contentType="" />
+		</Multimedia>
+		<Header id="thisIsAnH1" level="1">
+			<InlineText>This is an H1</InlineText>
+		</Header>
+		<Header id="thisIsAnH2" level="2">
+			<InlineText>This is an H2</InlineText>
+		</Header>
+		<Header id="thisIsASecondH1" level="1">
+			<InlineText>This is a second H1</InlineText>
+		</Header>
+		<Header id="thisIsASecondH2" level="2">
+			<InlineText>This is a second H2</InlineText>
+		</Header>
+		<Header id="thisIsAnH6" level="6">
+			<InlineText>This is an H6</InlineText>
+		</Header>
+		<Header id="thisIsAThirdH1" level="1">
+			<InlineText>This is a third H1</InlineText>
+		</Header>
+		<Header id="thisIsAThirdH2" level="2">
+			<InlineText>This is a third H2</InlineText>
+		</Header>
+		<Header id="thisIsAnH3" level="3">
+			<InlineText>This is an H3</InlineText>
+		</Header>
+	</elements>
+	<references />
+</parsedMakdown>

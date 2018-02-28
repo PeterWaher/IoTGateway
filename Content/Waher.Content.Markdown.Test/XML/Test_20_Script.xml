@@ -1,0 +1,23 @@
+﻿<parsedMakdown isDynamic="true" xmlns="http://waher.se/Schema/Markdown.xsd">
+	<metaData>
+		<tag xmlns="TITLE">
+			<value lineBreak="false" xmlns="Test_20_Script.md" />
+		</tag>
+	</metaData>
+	<elements>
+		<Paragraph>
+			<InlineText>4*5 is </InlineText>
+			<Script expression="4*5" aloneInParagraph="false" />
+			<InlineText>.</InlineText>
+		</Paragraph>
+		<Paragraph>
+			<InlineText>Result of execution: </InlineText>
+			<Strong>
+				<InlineText>some text</InlineText>
+			</Strong>
+			<InlineText>.</InlineText>
+		</Paragraph>
+		<Script expression="x:=-10..10|0.1;y:=sin(x);plot2dcurve(x,y)" aloneInParagraph="true" />
+	</elements>
+	<references />
+</parsedMakdown>

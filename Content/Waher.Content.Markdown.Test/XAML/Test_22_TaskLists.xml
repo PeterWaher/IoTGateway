@@ -55,7 +55,33 @@
 				</StackPanel>
 				<TextBlock TextWrapping="Wrap" Grid.Column="0" Grid.Row="1" Margin="0,0,5,0">✓</TextBlock>
 				<StackPanel Grid.Column="1" Grid.Row="1">
-					<TextBlock TextWrapping="Wrap">Checked subitem</TextBlock>
+					<TextBlock TextWrapping="Wrap">Checked subitem </TextBlock>
+					<Grid Margin="0,5,0,5">
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="Auto" />
+							<ColumnDefinition Width="*" />
+						</Grid.ColumnDefinitions>
+						<Grid.RowDefinitions>
+							<RowDefinition Height="Auto" />
+							<RowDefinition Height="Auto" />
+							<RowDefinition Height="Auto" />
+							<RowDefinition Height="Auto" />
+						</Grid.RowDefinitions>
+						<StackPanel Grid.Column="1" Grid.Row="0">
+							<TextBlock TextWrapping="Wrap">Unchecked subsubitem</TextBlock>
+						</StackPanel>
+						<TextBlock TextWrapping="Wrap" Grid.Column="0" Grid.Row="1" Margin="0,0,5,0">✓</TextBlock>
+						<StackPanel Grid.Column="1" Grid.Row="1">
+							<TextBlock TextWrapping="Wrap">Checked subsubitem</TextBlock>
+						</StackPanel>
+						<TextBlock TextWrapping="Wrap" Grid.Column="0" Grid.Row="2" Margin="0,0,5,0">✓</TextBlock>
+						<StackPanel Grid.Column="1" Grid.Row="2">
+							<TextBlock TextWrapping="Wrap">Second checked subsubitem</TextBlock>
+						</StackPanel>
+						<StackPanel Grid.Column="1" Grid.Row="3">
+							<TextBlock TextWrapping="Wrap">Second unchecked subsubitem</TextBlock>
+						</StackPanel>
+					</Grid>
 				</StackPanel>
 				<TextBlock TextWrapping="Wrap" Grid.Column="0" Grid.Row="2" Margin="0,0,5,0">✓</TextBlock>
 				<StackPanel Grid.Column="1" Grid.Row="2">

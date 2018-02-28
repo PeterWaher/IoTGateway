@@ -1,0 +1,112 @@
+﻿<parsedMakdown isDynamic="false" xmlns="http://waher.se/Schema/Markdown.xsd">
+	<metaData>
+		<tag xmlns="TITLE">
+			<value lineBreak="false" xmlns="Test_13_Tables.md" />
+		</tag>
+	</metaData>
+	<elements>
+		<Table caption="" id="simple_table" columns="3">
+			<Column alignment="Left" />
+			<Column alignment="Center" />
+			<Column alignment="Right" />
+			<HeaderRow>
+				<HeaderCell>
+					<InlineText>First Header</InlineText>
+				</HeaderCell>
+				<HeaderCell>
+					<InlineText>Second Header</InlineText>
+				</HeaderCell>
+				<HeaderCell>
+					<InlineText>Third Header</InlineText>
+				</HeaderCell>
+			</HeaderRow>
+			<Row>
+				<Cell>
+					<InlineText>First row</InlineText>
+				</Cell>
+				<Cell>
+					<InlineText>Data</InlineText>
+				</Cell>
+				<Cell>
+					<InlineText>Very long data entry</InlineText>
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<InlineText>Second row</InlineText>
+				</Cell>
+				<Cell>
+					<Strong>
+						<InlineText>Cell</InlineText>
+					</Strong>
+				</Cell>
+				<Cell>
+					<Emphasize>
+						<InlineText>Cell</InlineText>
+					</Emphasize>
+				</Cell>
+			</Row>
+		</Table>
+		<Table caption="Prototype table" id="reference_table" columns="3">
+			<Column alignment="Left" />
+			<Column alignment="Center" />
+			<Column alignment="Right" />
+			<HeaderRow>
+				<HeaderCell>
+					<NestedBlock />
+				</HeaderCell>
+				<HeaderCell>
+					<InlineText>Grouping</InlineText>
+				</HeaderCell>
+				<Continue />
+			</HeaderRow>
+			<HeaderRow>
+				<HeaderCell>
+					<InlineText>First Header</InlineText>
+				</HeaderCell>
+				<HeaderCell>
+					<InlineText>Second Header</InlineText>
+				</HeaderCell>
+				<HeaderCell>
+					<InlineText>Third Header</InlineText>
+				</HeaderCell>
+			</HeaderRow>
+			<Row>
+				<Cell>
+					<InlineText>Content</InlineText>
+				</Cell>
+				<Cell>
+					<Emphasize>
+						<InlineText>Long Cell</InlineText>
+					</Emphasize>
+				</Cell>
+				<Continue />
+			</Row>
+			<Row>
+				<Cell>
+					<InlineText>Content</InlineText>
+				</Cell>
+				<Cell>
+					<Strong>
+						<InlineText>Cell</InlineText>
+					</Strong>
+				</Cell>
+				<Cell>
+					<InlineText>Cell</InlineText>
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<InlineText>New section</InlineText>
+				</Cell>
+				<Cell>
+					<InlineText>More</InlineText>
+				</Cell>
+				<Cell>
+					<InlineText>Data</InlineText>
+				</Cell>
+			</Row>
+		</Table>
+	</elements>
+	<references />
+</parsedMakdown>

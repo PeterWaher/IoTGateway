@@ -9,7 +9,12 @@ Nested task list:
 [ ] Unchecked
 [X] Checked 
 [ ] Unchecked subitem
-[X] Checked subitem
+[X] Checked subitem 
+[ ] Unchecked subsubitem
+[X] Checked subsubitem
+[X] Second checked subsubitem
+[ ] Second unchecked subsubitem
+
 [X] Second checked subitem
 [ ] Second unchecked subitem
 

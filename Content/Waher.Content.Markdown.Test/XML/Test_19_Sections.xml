@@ -1,0 +1,32 @@
+﻿<parsedMakdown isDynamic="false" xmlns="http://waher.se/Schema/Markdown.xsd">
+	<metaData>
+		<tag xmlns="TITLE">
+			<value lineBreak="false" xmlns="Test_19_Sections.md" />
+		</tag>
+	</metaData>
+	<elements>
+		<Sections nrColumns="2">
+			<Paragraph>
+				<InlineText>This is section 1.</InlineText>
+			</Paragraph>
+			<Paragraph>
+				<InlineText>It is written in two columns.</InlineText>
+			</Paragraph>
+			<SectionSeparator sectionNr="1" nrColumns="1" />
+			<Paragraph>
+				<InlineText>This is section 2.</InlineText>
+			</Paragraph>
+			<Paragraph>
+				<InlineText>It is written in one column.</InlineText>
+			</Paragraph>
+			<SectionSeparator sectionNr="2" nrColumns="3" />
+			<Paragraph>
+				<InlineText>This is section 3.</InlineText>
+			</Paragraph>
+			<Paragraph>
+				<InlineText>It is written in three columns.</InlineText>
+			</Paragraph>
+		</Sections>
+	</elements>
+	<references />
+</parsedMakdown>

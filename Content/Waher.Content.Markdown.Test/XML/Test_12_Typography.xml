@@ -1,0 +1,113 @@
+﻿<parsedMakdown isDynamic="false" xmlns="http://waher.se/Schema/Markdown.xsd">
+	<metaData>
+		<tag xmlns="TITLE">
+			<value lineBreak="false" xmlns="Test_12_Typography.md" />
+		</tag>
+	</metaData>
+	<elements>
+		<Paragraph>
+			<InlineText>. .. </InlineText>
+			<HtmlEntity>hellip</HtmlEntity>
+			<InlineText> </InlineText>
+			<HtmlEntity>hellip</HtmlEntity>
+			<InlineText>.</InlineText>
+		</Paragraph>
+		<Paragraph>
+			<InlineText>- </InlineText>
+			<HtmlEntity>ndash</HtmlEntity>
+			<InlineText> </InlineText>
+			<HtmlEntity>mdash</HtmlEntity>
+			<InlineText> </InlineText>
+			<HtmlEntity>mdash</HtmlEntity>
+			<InlineText>-</InlineText>
+		</Paragraph>
+		<Paragraph>
+			<InlineText>Straight quotes " into </InlineText>
+			<HtmlEntity>ldquo</HtmlEntity>
+			<InlineText>curly</InlineText>
+			<HtmlEntity>rdquo</HtmlEntity>
+			<InlineText> quote HTML entities</InlineText>
+		</Paragraph>
+		<Paragraph>
+			<InlineText>Straight quotes ' into </InlineText>
+			<HtmlEntity>lsquo</HtmlEntity>
+			<InlineText>curly</InlineText>
+			<HtmlEntity>rsquo</HtmlEntity>
+			<InlineText> quote HTML entities</InlineText>
+		</Paragraph>
+		<Paragraph>
+			<HtmlEntity>copy</HtmlEntity>
+			<InlineText> </InlineText>
+			<HtmlEntity>COPY</HtmlEntity>
+			<InlineText> </InlineText>
+			<HtmlEntity>reg</HtmlEntity>
+			<InlineText> </InlineText>
+			<HtmlEntity>REG</HtmlEntity>
+			<InlineText> </InlineText>
+			<HtmlEntity>copysr</HtmlEntity>
+			<InlineText> </InlineText>
+			<HtmlEntity>copysr</HtmlEntity>
+			<InlineText> </InlineText>
+			<HtmlEntity>oS</HtmlEntity>
+			<InlineText> </InlineText>
+			<HtmlEntity>circledS</HtmlEntity>
+		</Paragraph>
+		<Paragraph>
+			<HtmlEntity>laquo</HtmlEntity>
+			<InlineText> </InlineText>
+			<HtmlEntity>Ll</HtmlEntity>
+			<InlineText> </InlineText>
+			<HtmlEntity>larr</HtmlEntity>
+			<InlineText> </InlineText>
+			<HtmlEntity>harr</HtmlEntity>
+			<InlineText> </InlineText>
+			<HtmlEntity>lArr</HtmlEntity>
+			<InlineText> </InlineText>
+			<HtmlEntity>hArr</HtmlEntity>
+			<InlineText> </InlineText>
+			<HtmlEntity>leq</HtmlEntity>
+			<InlineText> </InlineText>
+			<HtmlEntity>ne</HtmlEntity>
+			<InlineText> </InlineText>
+			<HtmlEntity>raquo</HtmlEntity>
+			<InlineText> </InlineText>
+			<HtmlEntity>Gg</HtmlEntity>
+			<InlineText> </InlineText>
+			<HtmlEntity>geq</HtmlEntity>
+			<InlineText> </InlineText>
+			<HtmlEntity>rarr</HtmlEntity>
+			<InlineText> </InlineText>
+			<HtmlEntity>rArr</HtmlEntity>
+			<InlineText> </InlineText>
+			<HtmlEntity>equiv</HtmlEntity>
+			<InlineText> </InlineText>
+			<HtmlEntity>MinusPlus</HtmlEntity>
+			<InlineText> </InlineText>
+			<HtmlEntity>PlusMinus</HtmlEntity>
+		</Paragraph>
+		<Paragraph>
+			<HtmlEntity>LeftDoubleBracket</HtmlEntity>
+			<InlineText> </InlineText>
+			<HtmlEntity>RightDoubleBracket</HtmlEntity>
+			<InlineText> </InlineText>
+			<HtmlEntity>permil</HtmlEntity>
+			<InlineText> </InlineText>
+			<HtmlEntity>pertenk</HtmlEntity>
+			<InlineText> </InlineText>
+			<HtmlEntity>ordf</HtmlEntity>
+			<InlineText> </InlineText>
+			<HtmlEntity>ordm</HtmlEntity>
+			<InlineText> </InlineText>
+			<HtmlEntity>deg</HtmlEntity>
+			<InlineText> </InlineText>
+			<HtmlEntityUnicode>185</HtmlEntityUnicode>
+			<InlineText> </InlineText>
+			<HtmlEntityUnicode>178</HtmlEntityUnicode>
+			<InlineText> </InlineText>
+			<HtmlEntityUnicode>179</HtmlEntityUnicode>
+			<InlineText> </InlineText>
+			<HtmlEntity>trade</HtmlEntity>
+		</Paragraph>
+	</elements>
+	<references />
+</parsedMakdown>

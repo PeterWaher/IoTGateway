@@ -10,7 +10,7 @@
     </tr>
 </table>
 
-This is an examble of <b>bold text</b>.
+This is an example of <b>bold text</b>.
 
 &copy; Waher Data AB 2016-2018. All rights reserved.
 

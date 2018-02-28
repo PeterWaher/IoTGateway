@@ -1,0 +1,21 @@
+﻿<parsedMakdown isDynamic="false" xmlns="http://waher.se/Schema/Markdown.xsd">
+	<metaData>
+		<tag xmlns="TITLE">
+			<value lineBreak="false" xmlns="Test_21_Httpx.md" />
+		</tag>
+	</metaData>
+	<elements>
+		<Paragraph>
+			<InlineText>När Ossian kom på besök:</InlineText>
+		</Paragraph>
+		<Multimedia aloneInParagraph="true">
+			<InlineText>20160504_195607.jpg</InlineText>
+			<MultimediaItem url="httpx://gw1@kode.im/Uploaded/2016/06/18/20160504_195607.jpg" title="" extension="" contentType="" />
+		</Multimedia>
+		<Multimedia aloneInParagraph="true">
+			<InlineText>20160504_220012.jpg</InlineText>
+			<MultimediaItem url="httpx://gw1@kode.im/Uploaded/2016/06/18/20160504_220012.jpg" title="" extension="" contentType="" />
+		</Multimedia>
+	</elements>
+	<references />
+</parsedMakdown>

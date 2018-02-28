@@ -1,0 +1,62 @@
+﻿<parsedMakdown isDynamic="false" xmlns="http://waher.se/Schema/Markdown.xsd">
+	<metaData>
+		<tag xmlns="TITLE">
+			<value lineBreak="false" xmlns="Test_16_MetaData.md" />
+		</tag>
+		<tag xmlns="SUBTITLE">
+			<value lineBreak="false" xmlns="Unit tests" />
+		</tag>
+		<tag xmlns="DESCRIPTION">
+			<value lineBreak="false" xmlns="This document contains a markdown page that tests the meta-data feature." />
+		</tag>
+		<tag xmlns="AUTHOR">
+			<value lineBreak="false" xmlns="Peter Waher" />
+		</tag>
+		<tag xmlns="COPYRIGHT">
+			<value lineBreak="false" xmlns="https://github.com/PeterWaher/IoTGateway#license" />
+		</tag>
+		<tag xmlns="DATE">
+			<value lineBreak="false" xmlns="2016-01-11" />
+		</tag>
+		<tag xmlns="CSS">
+			<value lineBreak="false" xmlns="css/style.css" />
+		</tag>
+		<tag xmlns="KEYWORDS">
+			<value lineBreak="false" xmlns="Markdown, unit tests" />
+		</tag>
+		<tag xmlns="IMAGE">
+			<value lineBreak="false" xmlns="images/test.png" />
+		</tag>
+		<tag xmlns="WEB">
+			<value lineBreak="false" xmlns="http://waher.se/" />
+		</tag>
+		<tag xmlns="ALTERNATE">
+			<value lineBreak="false" xmlns="https://github.com/PeterWaher/IoTGateway/tree/master/Content/Waher.Content.Markdown.Test" />
+		</tag>
+		<tag xmlns="HELP">
+			<value lineBreak="false" xmlns="https://github.com/PeterWaher/IoTGateway#license" />
+		</tag>
+		<tag xmlns="PREVIOUS">
+			<value lineBreak="false" xmlns="Test_15_MetaData.md" />
+		</tag>
+		<tag xmlns="NEXT">
+			<value lineBreak="false" xmlns="Test_17.md" />
+		</tag>
+		<tag xmlns="ICON">
+			<value lineBreak="false" xmlns="favicon.ico" />
+		</tag>
+	</metaData>
+	<elements>
+		<Paragraph>
+			<InlineText>Title of document: </InlineText>
+			<MetaReference key="Title" />
+			<LineBreak />
+			<InlineText>Subtitle of document: </InlineText>
+			<MetaReference key="Subtitle" />
+			<LineBreak />
+			<InlineText>Author: </InlineText>
+			<MetaReference key="Author" />
+		</Paragraph>
+	</elements>
+	<references />
+</parsedMakdown>

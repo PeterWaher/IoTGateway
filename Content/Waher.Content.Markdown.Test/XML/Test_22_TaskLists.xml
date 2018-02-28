@@ -1,0 +1,82 @@
+﻿<parsedMakdown isDynamic="false" xmlns="http://waher.se/Schema/Markdown.xsd">
+	<metaData>
+		<tag xmlns="TITLE">
+			<value lineBreak="false" xmlns="Test_22_TaskLists.md" />
+		</tag>
+	</metaData>
+	<elements>
+		<Paragraph>
+			<InlineText>Simple task list:</InlineText>
+		</Paragraph>
+		<TaskList>
+			<TaskItem isChecked="false">
+				<InlineText>Unchecked</InlineText>
+			</TaskItem>
+			<TaskItem isChecked="true">
+				<InlineText>Checked</InlineText>
+			</TaskItem>
+			<TaskItem isChecked="true">
+				<InlineText>Also checked</InlineText>
+			</TaskItem>
+		</TaskList>
+		<Paragraph>
+			<InlineText>Nested task list:</InlineText>
+		</Paragraph>
+		<TaskList>
+			<TaskItem isChecked="false">
+				<InlineText>Unchecked</InlineText>
+			</TaskItem>
+			<TaskItem isChecked="true">
+				<NestedBlock>
+					<InlineText>Checked </InlineText>
+					<TaskList>
+						<TaskItem isChecked="false">
+							<InlineText>Unchecked subitem</InlineText>
+						</TaskItem>
+						<TaskItem isChecked="true">
+							<NestedBlock>
+								<InlineText>Checked subitem 	</InlineText>
+								<TaskList>
+									<TaskItem isChecked="false">
+										<NestedBlock>
+											<InlineText>Unchecked subsubitem 	</InlineText>
+											<TaskList>
+												<TaskItem isChecked="true">
+													<NestedBlock>
+														<InlineText>Checked subsubitem 	</InlineText>
+														<TaskList>
+															<TaskItem isChecked="true">
+																<NestedBlock>
+																	<InlineText>Second checked subsubitem 	</InlineText>
+																	<TaskList>
+																		<TaskItem isChecked="false">
+																			<InlineText>Second unchecked subsubitem</InlineText>
+																		</TaskItem>
+																	</TaskList>
+																</NestedBlock>
+															</TaskItem>
+														</TaskList>
+													</NestedBlock>
+												</TaskItem>
+											</TaskList>
+										</NestedBlock>
+									</TaskItem>
+								</TaskList>
+							</NestedBlock>
+						</TaskItem>
+						<TaskItem isChecked="true">
+							<InlineText>Second checked subitem</InlineText>
+						</TaskItem>
+						<TaskItem isChecked="false">
+							<InlineText>Second unchecked subitem</InlineText>
+						</TaskItem>
+					</TaskList>
+				</NestedBlock>
+			</TaskItem>
+			<TaskItem isChecked="true">
+				<InlineText>Also checked</InlineText>
+			</TaskItem>
+		</TaskList>
+	</elements>
+	<references />
+</parsedMakdown>

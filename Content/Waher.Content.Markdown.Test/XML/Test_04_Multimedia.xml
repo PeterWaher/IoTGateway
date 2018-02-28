@@ -1,0 +1,196 @@
+﻿<parsedMakdown isDynamic="false" xmlns="http://waher.se/Schema/Markdown.xsd">
+	<metaData>
+		<tag xmlns="TITLE">
+			<value lineBreak="false" xmlns="Test_04_Multimedia.md" />
+		</tag>
+	</metaData>
+	<elements>
+		<Paragraph>
+			<InlineText>Image: </InlineText>
+			<Multimedia aloneInParagraph="false">
+				<InlineText>Alt text 1</InlineText>
+				<MultimediaItem url="/path/to/img.jpg" title="" extension="" contentType="" />
+			</Multimedia>
+		</Paragraph>
+		<Multimedia aloneInParagraph="true">
+			<InlineText>Alt text 1</InlineText>
+			<MultimediaItem url="/path/to/img.jpg" title="" extension="" contentType="" />
+		</Multimedia>
+		<Multimedia aloneInParagraph="true">
+			<InlineText>Alt text 2</InlineText>
+			<MultimediaItem url="/path/to/img.jpg" title="Optional title" extension="" contentType="" />
+		</Multimedia>
+		<LinkReference label="id">
+			<InlineText>Alt text 3</InlineText>
+		</LinkReference>
+		<LinkReference label="id2">
+			<InlineText>Alt text 4</InlineText>
+		</LinkReference>
+		<Multimedia aloneInParagraph="true">
+			<InlineText>Alt text 5</InlineText>
+			<MultimediaItem url="/path/to/img.jpg" title="" extension="" contentType="" width="320" height="200" />
+		</Multimedia>
+		<Multimedia aloneInParagraph="true">
+			<InlineText>Alt text 6</InlineText>
+			<MultimediaItem url="/path/to/img.jpg" title="Optional title 2" extension="" contentType="" width="320" height="200" />
+		</Multimedia>
+		<LinkReference label="id3">
+			<InlineText>Alt text 7</InlineText>
+		</LinkReference>
+		<LinkReference label="id4">
+			<InlineText>Alt text 8</InlineText>
+		</LinkReference>
+		<LinkReference label="id5">
+			<InlineText>Alt text 9</InlineText>
+		</LinkReference>
+		<LinkReference label="id6">
+			<InlineText>Alt text 10</InlineText>
+		</LinkReference>
+		<Multimedia aloneInParagraph="true">
+			<InlineText>Your browser does not support the audio tag</InlineText>
+			<MultimediaItem url="/local/music.mp3" title="" extension="" contentType="" />
+		</Multimedia>
+		<Multimedia aloneInParagraph="true">
+			<InlineText>Your browser does not support the video tag</InlineText>
+			<MultimediaItem url="/local/video.mp4" title="" extension="" contentType="" width="320" height="200" />
+		</Multimedia>
+		<Multimedia aloneInParagraph="true">
+			<InlineText>Your browser does not support the iframe tag</InlineText>
+			<MultimediaItem url="https://www.youtube.com/watch?v=whBPLc8m4SU" title="" extension="" contentType="" width="800" height="600" />
+		</Multimedia>
+		<Multimedia aloneInParagraph="true">
+			<InlineText>MultiImage1</InlineText>
+			<MultimediaItem url="img1.svg" title="" extension="" contentType="" />
+			<MultimediaItem url="img2.png" title="" extension="" contentType="" />
+		</Multimedia>
+		<Multimedia aloneInParagraph="true">
+			<InlineText>MultiImage2</InlineText>
+			<MultimediaItem url="img1.svg" title="" extension="" contentType="" width="320" height="200" />
+			<MultimediaItem url="img2.png" title="" extension="" contentType="" width="320" height="200" />
+		</Multimedia>
+		<Multimedia aloneInParagraph="true">
+			<InlineText>MultiImage3</InlineText>
+			<MultimediaItem url="img1.svg" title="SVG" extension="" contentType="" width="320" height="200" />
+			<MultimediaItem url="img2.png" title="PNG" extension="" contentType="" width="320" height="200" />
+		</Multimedia>
+		<Multimedia aloneInParagraph="true">
+			<InlineText>MultiAudio1</InlineText>
+			<MultimediaItem url="audio1.mp3" title="" extension="" contentType="" />
+			<MultimediaItem url="audio2.wav" title="" extension="" contentType="" />
+			<MultimediaItem url="audio3.ogg" title="" extension="" contentType="" />
+		</Multimedia>
+		<Multimedia aloneInParagraph="true">
+			<InlineText>MultiVideo1</InlineText>
+			<MultimediaItem url="video1.mp4" title="" extension="" contentType="" />
+			<MultimediaItem url="video2.webm" title="" extension="" contentType="" />
+			<MultimediaItem url="video3.ogv" title="" extension="" contentType="" />
+			<MultimediaItem url="video4.3gp" title="" extension="" contentType="" />
+			<MultimediaItem url="video5.flv" title="" extension="" contentType="" />
+		</Multimedia>
+		<Multimedia aloneInParagraph="true">
+			<InlineText>MultiVideo2</InlineText>
+			<MultimediaItem url="video1.mp4" title="" extension="" contentType="" width="320" height="200" />
+			<MultimediaItem url="video2.webm" title="" extension="" contentType="" width="320" height="200" />
+			<MultimediaItem url="video3.ogv" title="" extension="" contentType="" width="320" height="200" />
+			<MultimediaItem url="video4.3gp" title="" extension="" contentType="" width="320" height="200" />
+			<MultimediaItem url="video5.flv" title="" extension="" contentType="" width="320" height="200" />
+		</Multimedia>
+		<LinkReference label="mid1">
+			<InlineText>MultiImage1</InlineText>
+		</LinkReference>
+		<LinkReference label="mid2">
+			<InlineText>MultiImage2</InlineText>
+		</LinkReference>
+		<LinkReference label="mid3">
+			<InlineText>MultiImage3</InlineText>
+		</LinkReference>
+		<LinkReference label="mid4">
+			<InlineText>MultiAudio1</InlineText>
+		</LinkReference>
+		<LinkReference label="mid5">
+			<InlineText>MultiVideo1</InlineText>
+		</LinkReference>
+		<LinkReference label="mid6">
+			<InlineText>MultiVideo2</InlineText>
+		</LinkReference>
+		<Multimedia aloneInParagraph="true">
+			<InlineText>Google</InlineText>
+			<MultimediaItem url="http://google.com/" title="" extension="" contentType="" width="1200" height="300" />
+		</Multimedia>
+	</elements>
+	<references>
+		<reference key="id">
+			<Multimedia aloneInParagraph="false">
+				<MultimediaItem url="url/to/image" title="Optional title attribute" extension="" contentType="" />
+			</Multimedia>
+		</reference>
+		<reference key="id2">
+			<Multimedia aloneInParagraph="true">
+				<MultimediaItem url="url/to/image" title="Optional title attribute" extension="" contentType="" />
+			</Multimedia>
+		</reference>
+		<reference key="id3">
+			<Multimedia aloneInParagraph="false">
+				<MultimediaItem url="url/to/image" title="Optional title attribute 2" extension="" contentType="" width="320" height="200" />
+			</Multimedia>
+		</reference>
+		<reference key="id4">
+			<Multimedia aloneInParagraph="false">
+				<MultimediaItem url="url/to/image" title="" extension="" contentType="" width="320" height="200" />
+			</Multimedia>
+		</reference>
+		<reference key="id5">
+			<Multimedia aloneInParagraph="false">
+				<MultimediaItem url="url/to/image" title="Optional title attribute 2" extension="" contentType="" width="320" height="200" />
+			</Multimedia>
+		</reference>
+		<reference key="id6">
+			<Multimedia aloneInParagraph="true">
+				<MultimediaItem url="url/to/image" title="" extension="" contentType="" width="320" height="200" />
+			</Multimedia>
+		</reference>
+		<reference key="mid1">
+			<Multimedia aloneInParagraph="false">
+				<MultimediaItem url="img1.svg" title="" extension="" contentType="" />
+				<MultimediaItem url="img2.png" title="" extension="" contentType="" />
+			</Multimedia>
+		</reference>
+		<reference key="mid2">
+			<Multimedia aloneInParagraph="false">
+				<MultimediaItem url="img1.svg" title="" extension="" contentType="" width="320" height="200" />
+				<MultimediaItem url="img2.png" title="" extension="" contentType="" width="320" height="200" />
+			</Multimedia>
+		</reference>
+		<reference key="mid3">
+			<Multimedia aloneInParagraph="true">
+				<MultimediaItem url="img1.svg" title="SVG" extension="" contentType="" width="320" height="200" />
+				<MultimediaItem url="img2.png" title="PNG" extension="" contentType="" width="320" height="200" />
+			</Multimedia>
+		</reference>
+		<reference key="mid4">
+			<Multimedia aloneInParagraph="false">
+				<MultimediaItem url="audio1.mp3" title="" extension="" contentType="" />
+				<MultimediaItem url="audio2.wav" title="" extension="" contentType="" />
+				<MultimediaItem url="audio3.ogg" title="" extension="" contentType="" />
+			</Multimedia>
+		</reference>
+		<reference key="mid5">
+			<Multimedia aloneInParagraph="true">
+				<MultimediaItem url="video1.mp4" title="" extension="" contentType="" />
+				<MultimediaItem url="video2.webm" title="" extension="" contentType="" />
+				<MultimediaItem url="video3.ogv" title="" extension="" contentType="" />
+				<MultimediaItem url="video4.3gp" title="" extension="" contentType="" />
+				<MultimediaItem url="video5.flv" title="" extension="" contentType="" />
+			</Multimedia>
+		</reference>
+		<reference key="mid6">
+			<Multimedia aloneInParagraph="true">
+				<MultimediaItem url="video1.mp4" title="" extension="" contentType="" width="320" height="200" />
+				<MultimediaItem url="video2.webm" title="" extension="" contentType="" width="320" height="200" />
+				<MultimediaItem url="video3.ogv" title="" extension="" contentType="" width="320" height="200" />
+				<MultimediaItem url="video4.3gp" title="" extension="" contentType="" width="320" height="200" />
+				<MultimediaItem url="video5.flv" title="" extension="" contentType="" width="320" height="200" />
+			</Multimedia>
+		</reference>
+	</references>
+</parsedMakdown>

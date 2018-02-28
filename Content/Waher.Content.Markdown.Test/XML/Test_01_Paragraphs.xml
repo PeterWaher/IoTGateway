@@ -1,0 +1,27 @@
+﻿<parsedMakdown isDynamic="false" xmlns="http://waher.se/Schema/Markdown.xsd">
+	<metaData>
+		<tag xmlns="TITLE">
+			<value lineBreak="false" xmlns="Test_01_Paragraphs.md" />
+		</tag>
+	</metaData>
+	<elements>
+		<Paragraph>
+			<InlineText>This is paragraph 1</InlineText>
+		</Paragraph>
+		<Paragraph>
+			<InlineText>This is paragraph 2</InlineText>
+		</Paragraph>
+		<Paragraph>
+			<InlineText>This is the third paragraph.</InlineText>
+		</Paragraph>
+		<Paragraph>
+			<InlineText>In this fourth paragraph</InlineText>
+			<LineBreak />
+			<InlineText>a line break is inserted.</InlineText>
+		</Paragraph>
+		<Paragraph>
+			<InlineText>The fifth paragraph is separated from the fourth by a line containing only spaces.</InlineText>
+		</Paragraph>
+	</elements>
+	<references />
+</parsedMakdown>

@@ -1,0 +1,57 @@
+﻿<parsedMakdown isDynamic="false" xmlns="http://waher.se/Schema/Markdown.xsd">
+	<metaData>
+		<tag xmlns="TITLE">
+			<value lineBreak="false" xmlns="Test_05_HTML.md" />
+		</tag>
+	</metaData>
+	<elements>
+		<Paragraph>
+			<AutomaticLinkUrl url="http://example.com/" />
+		</Paragraph>
+		<Paragraph>
+			<AutomaticLinkMail eMail="address@example.com" />
+		</Paragraph>
+		<HtmlBlock>
+			<Html><![CDATA[<table>]]></Html>
+			<InlineText>&#xD;
+    </InlineText>
+			<Html><![CDATA[<tr>]]></Html>
+			<InlineText>&#xD;
+        </InlineText>
+			<Html><![CDATA[<td>]]></Html>
+			<InlineText>Foo</InlineText>
+			<Html><![CDATA[</td>]]></Html>
+			<InlineText>&#xD;
+    </InlineText>
+			<Html><![CDATA[</tr>]]></Html>
+			<InlineText>&#xD;
+</InlineText>
+			<Html><![CDATA[</table>]]></Html>
+		</HtmlBlock>
+		<Paragraph>
+			<InlineText>This is an example of </InlineText>
+			<Html><![CDATA[<b>]]></Html>
+			<InlineText>bold text</InlineText>
+			<Html><![CDATA[</b>]]></Html>
+			<InlineText>.</InlineText>
+		</Paragraph>
+		<Paragraph>
+			<HtmlEntity>copy</HtmlEntity>
+			<InlineText> Waher Data AB 2016-2018. All rights reserved.</InlineText>
+		</Paragraph>
+		<Paragraph>
+			<InlineText>AT</InlineText>
+			<InlineText>&amp;T</InlineText>
+		</Paragraph>
+		<Paragraph>
+			<InlineText>4 &lt; 5</InlineText>
+		</Paragraph>
+		<Paragraph>
+			<HtmlEntityUnicode>124</HtmlEntityUnicode>
+		</Paragraph>
+		<Paragraph>
+			<HtmlEntityUnicode>124</HtmlEntityUnicode>
+		</Paragraph>
+	</elements>
+	<references />
+</parsedMakdown>

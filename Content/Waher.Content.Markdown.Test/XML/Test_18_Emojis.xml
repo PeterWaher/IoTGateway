@@ -1,0 +1,1030 @@
+﻿<parsedMakdown isDynamic="false" xmlns="http://waher.se/Schema/Markdown.xsd">
+	<metaData>
+		<tag xmlns="TITLE">
+			<value lineBreak="false" xmlns="Test_18_Emojis.md" />
+		</tag>
+	</metaData>
+	<elements>
+		<Table caption="" id="" columns="2">
+			<Column alignment="Center" />
+			<Column alignment="Center" />
+			<HeaderRow>
+				<HeaderCell>
+					<InlineText>Smiley</InlineText>
+				</HeaderCell>
+				<HeaderCell>
+					<InlineText>Emoji</InlineText>
+				</HeaderCell>
+			</HeaderRow>
+			<Row>
+				<Cell>
+					<Emoji shortName="heart" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="heart" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="broken_heart" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="broken_heart" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="joy" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="joy" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="joy" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="joy" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="smiley" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="smiley" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="smiley" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="smiley" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="smiley" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="smiley" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="smile" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="smile" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="smile" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="smile" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="smile" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="smile" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="smile" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="smile" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="smile" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="smile" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="sweat_smile" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="sweat_smile" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="sweat_smile" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="sweat_smile" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="sweat_smile" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="sweat_smile" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="sweat_smile" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="sweat_smile" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="sweat_smile" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="sweat_smile" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="sweat_smile" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="sweat_smile" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="laughing" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="laughing" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="laughing" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="laughing" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="laughing" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="laughing" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="laughing" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="laughing" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="wink" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="wink" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="wink" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="wink" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="wink" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="wink" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="wink" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="wink" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="wink" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="wink" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="wink" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="wink" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="wink" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="wink" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="wink" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="wink" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="sweat" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="sweat" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="sweat" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="sweat" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="sweat" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="sweat" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="kissing_heart" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="kissing_heart" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="kissing_heart" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="kissing_heart" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="kissing_heart" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="kissing_heart" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="kissing_heart" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="kissing_heart" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="stuck_out_tongue_winking_eye" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="stuck_out_tongue_winking_eye" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="stuck_out_tongue_winking_eye" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="stuck_out_tongue_winking_eye" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="stuck_out_tongue_winking_eye" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="stuck_out_tongue_winking_eye" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="disappointed" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="disappointed" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="disappointed" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="disappointed" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="disappointed" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="disappointed" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="disappointed" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="disappointed" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="disappointed" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="disappointed" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="disappointed" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="disappointed" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="angry" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="angry" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="angry" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="angry" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="angry" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="angry" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="cry" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="cry" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="cry" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="cry" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="cry" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="cry" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="cry" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="cry" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="persevere" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="persevere" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="flushed" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="flushed" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="flushed" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="flushed" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="dizzy_face" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="dizzy_face" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="dizzy_face" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="dizzy_face" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="dizzy_face" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="dizzy_face" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="dizzy_face" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="dizzy_face" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="dizzy_face" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="dizzy_face" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="dizzy_face" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="dizzy_face" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="ok_woman" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="ok_woman" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="ok_woman" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="ok_woman" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="ok_woman" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="ok_woman" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="ok_woman" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="ok_woman" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="innocent" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="innocent" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="innocent" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="innocent" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="innocent" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="innocent" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="innocent" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="innocent" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="innocent" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="innocent" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="innocent" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="innocent" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="innocent" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="innocent" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="innocent" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="innocent" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="innocent" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="innocent" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="innocent" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="innocent" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="innocent" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="innocent" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="innocent" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="innocent" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="innocent" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="innocent" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="sunglasses" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="sunglasses" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="sunglasses" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="sunglasses" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="sunglasses" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="sunglasses" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="sunglasses" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="sunglasses" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="sunglasses" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="sunglasses" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="sunglasses" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="sunglasses" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="expressionless" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="expressionless" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="expressionless" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="expressionless" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="expressionless" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="expressionless" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="confused" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="confused" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="confused" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="confused" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="confused" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="confused" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="confused" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="confused" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="confused" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="confused" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="confused" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="confused" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="confused" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="confused" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="confused" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="confused" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="confused" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="confused" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="confused" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="confused" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="stuck_out_tongue" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="stuck_out_tongue" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="stuck_out_tongue" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="stuck_out_tongue" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="stuck_out_tongue" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="stuck_out_tongue" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="stuck_out_tongue" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="stuck_out_tongue" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="stuck_out_tongue" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="stuck_out_tongue" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="stuck_out_tongue" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="stuck_out_tongue" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="stuck_out_tongue" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="stuck_out_tongue" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="stuck_out_tongue" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="stuck_out_tongue" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="stuck_out_tongue" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="stuck_out_tongue" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="stuck_out_tongue" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="stuck_out_tongue" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="stuck_out_tongue" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="stuck_out_tongue" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="stuck_out_tongue" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="stuck_out_tongue" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="stuck_out_tongue" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="stuck_out_tongue" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="open_mouth" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="open_mouth" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="open_mouth" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="open_mouth" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="open_mouth" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="open_mouth" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="open_mouth" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="open_mouth" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="open_mouth" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="open_mouth" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="open_mouth" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="open_mouth" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="no_mouth" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="no_mouth" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="no_mouth" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="no_mouth" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="no_mouth" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="no_mouth" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="no_mouth" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="no_mouth" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="no_mouth" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="no_mouth" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="no_mouth" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="no_mouth" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="no_mouth" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="no_mouth" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="no_mouth" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="no_mouth" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<Emoji shortName="no_mouth" />
+				</Cell>
+				<Cell>
+					<Emoji shortName="no_mouth" />
+				</Cell>
+			</Row>
+		</Table>
+	</elements>
+	<references />
+</parsedMakdown>

@@ -1,0 +1,26 @@
+﻿<parsedMakdown isDynamic="false" xmlns="http://waher.se/Schema/Markdown.xsd">
+	<metaData>
+		<tag xmlns="TITLE">
+			<value lineBreak="false" xmlns="Test_24_Subscript.md" />
+		</tag>
+	</metaData>
+	<elements>
+		<Paragraph>
+			<InlineText>Some</InlineText>
+			<SubScript>
+				<InlineText>subscript</InlineText>
+			</SubScript>
+		</Paragraph>
+		<Paragraph>
+			<InlineText>a</InlineText>
+			<SubScript>
+				<InlineText>i</InlineText>
+			</SubScript>
+			<InlineText>=A</InlineText>
+			<SubScript>
+				<InlineText>i,j</InlineText>
+			</SubScript>
+		</Paragraph>
+	</elements>
+	<references />
+</parsedMakdown>

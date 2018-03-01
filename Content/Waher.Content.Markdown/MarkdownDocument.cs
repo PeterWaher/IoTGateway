@@ -1085,15 +1085,6 @@ namespace Waher.Content.Markdown
 
 							switch (ch2)
 							{
-								case '*':
-									State.NextCharSameRow();
-
-									if (this.ParseBlock(State, '*', 2, ChildElements))
-										Elements.AddLast(new Strong(this, ChildElements));
-									else
-										this.FixSyntaxError(Elements, "**", ChildElements);
-									break;
-
 								case ')':
 									State.NextCharSameRow();
 									Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_wink));
@@ -1370,7 +1361,7 @@ namespace Waher.Content.Markdown
 
 									while (((ch2 = State.PeekNextCharSameRow()) <= ' ' && ch2 > 0) || ch2 == 160)
 										State.NextCharSameRow();
-									
+
 									Item = new TaskItem(this, Checked, new NestedBlock(this, this.ParseBlock(Rows.ToArray(), Positions.ToArray())));
 
 									if (Elements.Last != null && Elements.Last.Value is TaskList TaskList)
@@ -1412,9 +1403,10 @@ namespace Waher.Content.Markdown
 
 						if (this.ParseBlock(State, ']', 1, ChildElements))
 						{
-							ch2 = State.NextNonWhitespaceChar();
+							ch2 = State.PeekNextNonWhitespaceChar();
 							if (ch2 == '(')
 							{
+								State.NextNonWhitespaceChar();
 								Title = string.Empty;
 
 								while ((ch2 = State.NextCharSameRow()) != 0 && ch2 > ' ' && ch2 != ')' && ch2 != 160)
@@ -1516,6 +1508,7 @@ namespace Waher.Content.Markdown
 							}
 							else if (ch2 == ':' && FirstCharOnLine)
 							{
+								State.NextNonWhitespaceChar();
 								ch2 = State.NextChar();
 								while ((ch2 != 0 && ch2 <= ' ') || ch2 == 160)
 									ch2 = State.NextChar();
@@ -1575,6 +1568,7 @@ namespace Waher.Content.Markdown
 							}
 							else if (ch2 == '[')
 							{
+								State.NextNonWhitespaceChar();
 								while ((ch2 = State.NextCharSameRow()) != 0 && ch2 != ']')
 									Text.Append(ch2);
 
@@ -1598,9 +1592,11 @@ namespace Waher.Content.Markdown
 								else
 									Elements.AddLast(new LinkReference(this, ChildElements, Title));
 							}
+							else if (ch != '!')
+								Elements.AddLast(new SubScript(this, ChildElements));
 							else
 							{
-								this.FixSyntaxError(Elements, ch == '!' ? "![" : "[", ChildElements);
+								this.FixSyntaxError(Elements, "![", ChildElements);
 								Elements.AddLast(new InlineText(this, "]" + ch2));
 							}
 						}
@@ -2909,51 +2905,193 @@ namespace Waher.Content.Markdown
 
 					case '^':
 						ch2 = State.PeekNextCharSameRow();
-						if (ch2 == 'a' || ch2 == 'o' || (ch2 >= '0' && ch2 <= '3') || ch2 == 'T')
+						switch (ch2)
 						{
-							State.NextCharSameRow();
-							this.AppendAnyText(Elements, Text);
+							case 'a':
+								State.NextCharSameRow();
+								this.AppendAnyText(Elements, Text);
+								Elements.AddLast(new HtmlEntity(this, "ordf"));
+								break;
 
-							switch (ch2)
-							{
-								case 'a':
-									Elements.AddLast(new HtmlEntity(this, "ordf"));
-									break;
+							case 'o':
+								State.NextCharSameRow();
+								this.AppendAnyText(Elements, Text);
+								Elements.AddLast(new HtmlEntity(this, "ordm"));
+								break;
 
-								case 'o':
-									Elements.AddLast(new HtmlEntity(this, "ordm"));
-									break;
+							case '0':
+								State.NextCharSameRow();
+								this.AppendAnyText(Elements, Text);
+								Elements.AddLast(new HtmlEntity(this, "deg"));
+								break;
 
-								case '0':
-									Elements.AddLast(new HtmlEntity(this, "deg"));
-									break;
+							case '1':
+								State.NextCharSameRow();
+								this.AppendAnyText(Elements, Text);
+								Elements.AddLast(new HtmlEntityUnicode(this, 185));
+								break;
 
-								case '1':
-									Elements.AddLast(new HtmlEntityUnicode(this, 185));
-									break;
+							case '2':
+								State.NextCharSameRow();
+								this.AppendAnyText(Elements, Text);
+								Elements.AddLast(new HtmlEntityUnicode(this, 178));
+								break;
 
-								case '2':
-									Elements.AddLast(new HtmlEntityUnicode(this, 178));
-									break;
+							case '3':
+								State.NextCharSameRow();
+								this.AppendAnyText(Elements, Text);
+								Elements.AddLast(new HtmlEntityUnicode(this, 179));
+								break;
 
-								case '3':
-									Elements.AddLast(new HtmlEntityUnicode(this, 179));
-									break;
+							case '4':
+							case '5':
+							case '6':
+							case '7':
+							case '8':
+							case '9':
+							case 'b':
+							case 'c':
+							case 'd':
+							case 'e':
+							case 'f':
+							case 'g':
+							case 'h':
+							case 'i':
+							case 'j':
+							case 'k':
+							case 'l':
+							case 'm':
+							case 'p':
+							case 'q':
+							case 'u':
+							case 'v':
+							case 'w':
+							case 'x':
+							case 'y':
+							case 'z':
+							case 'A':
+							case 'B':
+							case 'C':
+							case 'D':
+							case 'E':
+							case 'F':
+							case 'G':
+							case 'H':
+							case 'I':
+							case 'J':
+							case 'K':
+							case 'L':
+							case 'M':
+							case 'N':
+							case 'O':
+							case 'P':
+							case 'Q':
+							case 'R':
+							case 'S':
+							case 'U':
+							case 'V':
+							case 'W':
+							case 'X':
+							case 'Y':
+							case 'Z':
+								State.NextCharSameRow();
+								this.AppendAnyText(Elements, Text);
+								Elements.AddLast(new SuperScript(this, new string(ch2, 1)));
+								break;
 
-								case 'T':
-									ch3 = State.PeekNextCharSameRow();
-									if (ch3 == 'M')
-									{
-										State.NextCharSameRow();
-										Elements.AddLast(new HtmlEntity(this, "trade"));
-									}
-									else
-										Text.Append("^T");
-									break;
-							}
+							case 'T':
+								State.NextCharSameRow();
+								this.AppendAnyText(Elements, Text);
+
+								if (State.PeekNextCharSameRow() == 'M')
+								{
+									State.NextCharSameRow();
+									Elements.AddLast(new HtmlEntity(this, "trade"));
+								}
+								else
+									Elements.AddLast(new SuperScript(this, "T"));
+								break;
+
+							case 's':
+								State.NextCharSameRow();
+								this.AppendAnyText(Elements, Text);
+
+								if (State.PeekNextCharSameRow() == 't')
+								{
+									State.NextCharSameRow();
+									Elements.AddLast(new SuperScript(this, "st"));
+								}
+								else
+									Elements.AddLast(new SuperScript(this, "s"));
+								break;
+
+							case 'n':
+								State.NextCharSameRow();
+								this.AppendAnyText(Elements, Text);
+
+								if (State.PeekNextCharSameRow() == 'd')
+								{
+									State.NextCharSameRow();
+									Elements.AddLast(new SuperScript(this, "nd"));
+								}
+								else
+									Elements.AddLast(new SuperScript(this, "n"));
+								break;
+
+							case 'r':
+								State.NextCharSameRow();
+								this.AppendAnyText(Elements, Text);
+
+								if (State.PeekNextCharSameRow() == 'd')
+								{
+									State.NextCharSameRow();
+									Elements.AddLast(new SuperScript(this, "rd"));
+								}
+								else
+									Elements.AddLast(new SuperScript(this, "r"));
+								break;
+
+							case 't':
+								State.NextCharSameRow();
+								this.AppendAnyText(Elements, Text);
+
+								if (State.PeekNextCharSameRow() == 'h')
+								{
+									State.NextCharSameRow();
+									Elements.AddLast(new SuperScript(this, "th"));
+								}
+								else
+									Elements.AddLast(new SuperScript(this, "t"));
+								break;
+
+							case '(':
+								State.NextCharSameRow();
+								this.AppendAnyText(Elements, Text);
+
+								ChildElements = new LinkedList<MarkdownElement>();
+
+								if (this.ParseBlock(State, ')', 1, ChildElements))
+									Elements.AddLast(new SuperScript(this, ChildElements));
+								else
+									this.FixSyntaxError(Elements, "^(", ChildElements);
+								break;
+
+							case '[':
+								State.NextCharSameRow();
+								this.AppendAnyText(Elements, Text);
+
+								ChildElements = new LinkedList<MarkdownElement>();
+
+								if (this.ParseBlock(State, ']', 1, ChildElements))
+									Elements.AddLast(new SuperScript(this, ChildElements));
+								else
+									this.FixSyntaxError(Elements, "^]", ChildElements);
+								break;
+
+							default:
+								Text.Append('^');
+								break;
 						}
-						else
-							Text.Append('^');
 						break;
 
 					case ':':

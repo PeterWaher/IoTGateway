@@ -1,0 +1,56 @@
+﻿<parsedMakdown isDynamic="false" xmlns="http://waher.se/Schema/Markdown.xsd">
+	<metaData>
+		<tag xmlns="TITLE">
+			<value lineBreak="false" xmlns="Test_23_Superscript.md" />
+		</tag>
+	</metaData>
+	<elements>
+		<Paragraph>
+			<InlineText>Some</InlineText>
+			<SuperScript>
+				<InlineText>superscript</InlineText>
+			</SuperScript>
+		</Paragraph>
+		<Paragraph>
+			<InlineText>a</InlineText>
+			<SuperScript>
+				<InlineText>b+c</InlineText>
+			</SuperScript>
+			<InlineText>=a</InlineText>
+			<SuperScript>
+				<InlineText>b</InlineText>
+			</SuperScript>
+			<InlineText>a</InlineText>
+			<SuperScript>
+				<InlineText>c</InlineText>
+			</SuperScript>
+		</Paragraph>
+		<Paragraph>
+			<InlineText>a</InlineText>
+			<HtmlEntityUnicode>178</HtmlEntityUnicode>
+			<InlineText>+b</InlineText>
+			<HtmlEntityUnicode>178</HtmlEntityUnicode>
+			<InlineText>=c</InlineText>
+			<HtmlEntityUnicode>178</HtmlEntityUnicode>
+		</Paragraph>
+		<Paragraph>
+			<InlineText>a</InlineText>
+			<SuperScript>
+				<InlineText>n</InlineText>
+			</SuperScript>
+			<InlineText>+b</InlineText>
+			<SuperScript>
+				<InlineText>n</InlineText>
+			</SuperScript>
+			<HtmlEntity>ne</HtmlEntity>
+			<InlineText>c</InlineText>
+			<SuperScript>
+				<InlineText>n</InlineText>
+			</SuperScript>
+			<InlineText>, n</InlineText>
+			<HtmlEntity>geq</HtmlEntity>
+			<InlineText>3</InlineText>
+		</Paragraph>
+	</elements>
+	<references />
+</parsedMakdown>

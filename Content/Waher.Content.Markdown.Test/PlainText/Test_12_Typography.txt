@@ -10,5 +10,5 @@ Straight quotes ' into ‘curly’ quote HTML entities
 
 « ⋘ ← ↔ ⇐ ⇔ ≤ ≠ » ⋙ ≥ → ⇒ ≡ ∓ ±
 
-⟦ ⟧ ‰ ‱ ª º ° ¹ ² ³ ™
+⟦ ⟧ ‰ ‱ ° ¹ ² ³ ⁴ ⁵ ⁶ ⁷ ⁸ ⁹ ª ᵇ ᶜ ᵈ ᵉ ᶠ ᵍ ʰ ⁱ ʲ ᵏ ˡ ᵐ ⁿ º ᵖ q ʳ ˢ ᵗ ᵘ ᵛ ʷ ˣ ʸ ᶻ ᴬ ᴮ C ᴰ ᴱ F ᴳ ᴴ ᴵ ᴶ ᴷ ᴸ ᴹ ᴺ ᴼ ᴾ Q ᴿ S ᵀ ᵁ V ᵂ X Y Z ™ ˢᵗ ⁿᵈ ʳᵈ ᵗʰ
 

@@ -1,0 +1,6 @@
+﻿<StackPanel xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Some<Run Typography.Variants="Superscript">superscript</Run></TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">a<Run Typography.Variants="Superscript">b+c</Run>=a<Run Typography.Variants="Superscript">b</Run>a<Run Typography.Variants="Superscript">c</Run></TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">a²+b²=c²</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">a<Run Typography.Variants="Superscript">n</Run>+b<Run Typography.Variants="Superscript">n</Run>≠c<Run Typography.Variants="Superscript">n</Run>, n≥3</TextBlock>
+</StackPanel>

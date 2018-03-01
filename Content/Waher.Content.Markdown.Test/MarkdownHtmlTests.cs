@@ -188,5 +188,17 @@ namespace Waher.Content.Markdown.Test
 		{
 			this.DoTest("Test_22_TaskLists.md", "Test_22_TaskLists.html");
 		}
+
+		[TestMethod]
+		public void Test_23_Superscript()
+		{
+			this.DoTest("Test_23_Superscript.md", "Test_23_Superscript.html");
+		}
+
+		[TestMethod]
+		public void Test_24_Subscript()
+		{
+			this.DoTest("Test_24_Subscript.md", "Test_24_Subscript.html");
+		}
 	}
 }

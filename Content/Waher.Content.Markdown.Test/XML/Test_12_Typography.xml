@@ -94,10 +94,6 @@
 			<InlineText> </InlineText>
 			<HtmlEntity>pertenk</HtmlEntity>
 			<InlineText> </InlineText>
-			<HtmlEntity>ordf</HtmlEntity>
-			<InlineText> </InlineText>
-			<HtmlEntity>ordm</HtmlEntity>
-			<InlineText> </InlineText>
 			<HtmlEntity>deg</HtmlEntity>
 			<InlineText> </InlineText>
 			<HtmlEntityUnicode>185</HtmlEntityUnicode>
@@ -106,7 +102,251 @@
 			<InlineText> </InlineText>
 			<HtmlEntityUnicode>179</HtmlEntityUnicode>
 			<InlineText> </InlineText>
+			<SuperScript>
+				<InlineText>4</InlineText>
+			</SuperScript>
+			<InlineText> </InlineText>
+			<SuperScript>
+				<InlineText>5</InlineText>
+			</SuperScript>
+			<InlineText> </InlineText>
+			<SuperScript>
+				<InlineText>6</InlineText>
+			</SuperScript>
+			<InlineText> </InlineText>
+			<SuperScript>
+				<InlineText>7</InlineText>
+			</SuperScript>
+			<InlineText> </InlineText>
+			<SuperScript>
+				<InlineText>8</InlineText>
+			</SuperScript>
+			<InlineText> </InlineText>
+			<SuperScript>
+				<InlineText>9</InlineText>
+			</SuperScript>
+			<InlineText> </InlineText>
+			<HtmlEntity>ordf</HtmlEntity>
+			<InlineText> </InlineText>
+			<SuperScript>
+				<InlineText>b</InlineText>
+			</SuperScript>
+			<InlineText> </InlineText>
+			<SuperScript>
+				<InlineText>c</InlineText>
+			</SuperScript>
+			<InlineText> </InlineText>
+			<SuperScript>
+				<InlineText>d</InlineText>
+			</SuperScript>
+			<InlineText> </InlineText>
+			<SuperScript>
+				<InlineText>e</InlineText>
+			</SuperScript>
+			<InlineText> </InlineText>
+			<SuperScript>
+				<InlineText>f</InlineText>
+			</SuperScript>
+			<InlineText> </InlineText>
+			<SuperScript>
+				<InlineText>g</InlineText>
+			</SuperScript>
+			<InlineText> </InlineText>
+			<SuperScript>
+				<InlineText>h</InlineText>
+			</SuperScript>
+			<InlineText> </InlineText>
+			<SuperScript>
+				<InlineText>i</InlineText>
+			</SuperScript>
+			<InlineText> </InlineText>
+			<SuperScript>
+				<InlineText>j</InlineText>
+			</SuperScript>
+			<InlineText> </InlineText>
+			<SuperScript>
+				<InlineText>k</InlineText>
+			</SuperScript>
+			<InlineText> </InlineText>
+			<SuperScript>
+				<InlineText>l</InlineText>
+			</SuperScript>
+			<InlineText> </InlineText>
+			<SuperScript>
+				<InlineText>m</InlineText>
+			</SuperScript>
+			<InlineText> </InlineText>
+			<SuperScript>
+				<InlineText>n</InlineText>
+			</SuperScript>
+			<InlineText> </InlineText>
+			<HtmlEntity>ordm</HtmlEntity>
+			<InlineText> </InlineText>
+			<SuperScript>
+				<InlineText>p</InlineText>
+			</SuperScript>
+			<InlineText> </InlineText>
+			<SuperScript>
+				<InlineText>q</InlineText>
+			</SuperScript>
+			<InlineText> </InlineText>
+			<SuperScript>
+				<InlineText>r</InlineText>
+			</SuperScript>
+			<InlineText> </InlineText>
+			<SuperScript>
+				<InlineText>s</InlineText>
+			</SuperScript>
+			<InlineText> </InlineText>
+			<SuperScript>
+				<InlineText>t</InlineText>
+			</SuperScript>
+			<InlineText> </InlineText>
+			<SuperScript>
+				<InlineText>u</InlineText>
+			</SuperScript>
+			<InlineText> </InlineText>
+			<SuperScript>
+				<InlineText>v</InlineText>
+			</SuperScript>
+			<InlineText> </InlineText>
+			<SuperScript>
+				<InlineText>w</InlineText>
+			</SuperScript>
+			<InlineText> </InlineText>
+			<SuperScript>
+				<InlineText>x</InlineText>
+			</SuperScript>
+			<InlineText> </InlineText>
+			<SuperScript>
+				<InlineText>y</InlineText>
+			</SuperScript>
+			<InlineText> </InlineText>
+			<SuperScript>
+				<InlineText>z</InlineText>
+			</SuperScript>
+			<InlineText> </InlineText>
+			<SuperScript>
+				<InlineText>A</InlineText>
+			</SuperScript>
+			<InlineText> </InlineText>
+			<SuperScript>
+				<InlineText>B</InlineText>
+			</SuperScript>
+			<InlineText> </InlineText>
+			<SuperScript>
+				<InlineText>C</InlineText>
+			</SuperScript>
+			<InlineText> </InlineText>
+			<SuperScript>
+				<InlineText>D</InlineText>
+			</SuperScript>
+			<InlineText> </InlineText>
+			<SuperScript>
+				<InlineText>E</InlineText>
+			</SuperScript>
+			<InlineText> </InlineText>
+			<SuperScript>
+				<InlineText>F</InlineText>
+			</SuperScript>
+			<InlineText> </InlineText>
+			<SuperScript>
+				<InlineText>G</InlineText>
+			</SuperScript>
+			<InlineText> </InlineText>
+			<SuperScript>
+				<InlineText>H</InlineText>
+			</SuperScript>
+			<InlineText> </InlineText>
+			<SuperScript>
+				<InlineText>I</InlineText>
+			</SuperScript>
+			<InlineText> </InlineText>
+			<SuperScript>
+				<InlineText>J</InlineText>
+			</SuperScript>
+			<InlineText> </InlineText>
+			<SuperScript>
+				<InlineText>K</InlineText>
+			</SuperScript>
+			<InlineText> </InlineText>
+			<SuperScript>
+				<InlineText>L</InlineText>
+			</SuperScript>
+			<InlineText> </InlineText>
+			<SuperScript>
+				<InlineText>M</InlineText>
+			</SuperScript>
+			<InlineText> </InlineText>
+			<SuperScript>
+				<InlineText>N</InlineText>
+			</SuperScript>
+			<InlineText> </InlineText>
+			<SuperScript>
+				<InlineText>O</InlineText>
+			</SuperScript>
+			<InlineText> </InlineText>
+			<SuperScript>
+				<InlineText>P</InlineText>
+			</SuperScript>
+			<InlineText> </InlineText>
+			<SuperScript>
+				<InlineText>Q</InlineText>
+			</SuperScript>
+			<InlineText> </InlineText>
+			<SuperScript>
+				<InlineText>R</InlineText>
+			</SuperScript>
+			<InlineText> </InlineText>
+			<SuperScript>
+				<InlineText>S</InlineText>
+			</SuperScript>
+			<InlineText> </InlineText>
+			<SuperScript>
+				<InlineText>T</InlineText>
+			</SuperScript>
+			<InlineText> </InlineText>
+			<SuperScript>
+				<InlineText>U</InlineText>
+			</SuperScript>
+			<InlineText> </InlineText>
+			<SuperScript>
+				<InlineText>V</InlineText>
+			</SuperScript>
+			<InlineText> </InlineText>
+			<SuperScript>
+				<InlineText>W</InlineText>
+			</SuperScript>
+			<InlineText> </InlineText>
+			<SuperScript>
+				<InlineText>X</InlineText>
+			</SuperScript>
+			<InlineText> </InlineText>
+			<SuperScript>
+				<InlineText>Y</InlineText>
+			</SuperScript>
+			<InlineText> </InlineText>
+			<SuperScript>
+				<InlineText>Z</InlineText>
+			</SuperScript>
+			<InlineText> </InlineText>
 			<HtmlEntity>trade</HtmlEntity>
+			<InlineText> </InlineText>
+			<SuperScript>
+				<InlineText>st</InlineText>
+			</SuperScript>
+			<InlineText> </InlineText>
+			<SuperScript>
+				<InlineText>nd</InlineText>
+			</SuperScript>
+			<InlineText> </InlineText>
+			<SuperScript>
+				<InlineText>rd</InlineText>
+			</SuperScript>
+			<InlineText> </InlineText>
+			<SuperScript>
+				<InlineText>th</InlineText>
+			</SuperScript>
 		</Paragraph>
 	</elements>
 	<references />

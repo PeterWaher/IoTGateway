@@ -45,6 +45,28 @@ Underlined text is created by surrounding the underlined text with underscores `
 _Underlined text_. As with other text formatting operators, underlined text can be included in the _middle_ of a sentance, or in the
 mi_dd_le of a word. In HTML, underlined text gets surrounded by `<u>` and `</u>` tags.
 
+#### Superscript text
+
+You can add superscript text by inserting the superscript text between a `^[` and a `]`, or a `^(` and a `)`. If you want to use parenthesis `(` or `)`
+in your superscript text, you should use `^[` and `]`. If you want to use brackets `[` and `]`, you should use `^(` and `)`. Some special characters,
+like the digits and ASCII letters can superseed the `^` sign without having to be enclosed in parenthesis or brackets. See 
+[Typographical enhancements](#typographicalEnhancements) for details.
+
+Examples: 
+
+* `Some^[superscript]` ==> Some^[superscript]
+* `a^[b+c]=a^ba^c` ==> a^[b+c]=a^ba^c
+* `a^2+b^2=c^2` ==> a^2+b^2=c^2
+* `a^n+b^n<>c^n, n>=3` ==> a^n+b^n<>c^n, n>=3
+
+#### Subscript
+
+Text between brackets `[` and `]`, that do not form part of a link, a link reference, reference definitions or a multi-media definition or reference, 
+is treated as subscript text. Examples:
+
+* `Some[subscript]` ==> Some[subscript]
+* `a[i]=A[i,j]` ==> a[i]=A[i,j]
+
 #### Inserted text
 
 Inserted text, which by default is also shown as underlined (but which can be changed to a different style using style sheets), is created by surrounding 
@@ -185,16 +207,34 @@ There are numerous typographical enhancements added to the markdown parser. This
 are inspired by the the [Smarty Pants](http://daringfireball.net/projects/smartypants/) addition to the original markdown, but numerous other character 
 sequences have been added to the **IoT Gateway** version of markdown, as shown in the following table:
 
-| Sequence | Becomes |<span style='width:30px'></span>| Sequence | Becomes |<span style='width:30px'></span>| Sequence | Becomes |<span style='width:30px'></span>| Sequence | Becomes |<span style='width:30px'></span>| Sequence | Becomes |
-|:--------:|:-------:|--------------------------------|:--------:|:-------:|--------------------------------|:--------:|:-------:|--------------------------------|:--------:|:-------:|--------------------------------|:--------:|:-------:|
-| `...`    | ...     |                                | `(R)`    | (R)     |                                | `>>>`    | >>>     |                                | `]]`     | ]]      |                                | `^o`     | ^o      |
-| `"text"` | "text"  |                                | `(p)`    | (p)     |                                | `<--`    | <--     |                                | `+-`     | +-      |                                | `^0`     | ^0      |
-| `'text'` | 'text'  |                                | `(P)`    | (P)     |                                | `-->`    | -->     |                                | `-+`     | -+      |                                | `^1`     | ^1      |
-| `--`     | --      |                                | `(s)`    | (s)     |                                | `<-->`   | <-->    |                                | `<>`     | <>      |                                | `^2`     | ^2      |
-| `---`    | ---     |                                | `(S)`    | (S)     |                                | `<==`    | <==     |                                | `<=`     | <=      |                                | `^3`     | ^3      |
-| `(c)`    | (c)     |                                | `<<`     | <<      |                                | `==>`    | ==>     |                                | `>=`     | >=      |                                | `^TM`    | ^TM     |
-| `(C)`    | (C)     |                                | `>>`     | >>      |                                | `<==>`   | <==>    |                                | `==`     | ==      |                                | `%0`     | %0      |
-| `(r)`    | (r)     |                                | `<<<`    | <<<     |                                | `[[`     | [[      |                                | `^a`     | ^a      |                                | `%00`    | %00     |
+| Sequence | Becomes |<span style='width:30px'></span>| Sequence | Becomes |<span style='width:30px'></span>| Sequence | Becomes |<span style='width:30px'></span>| Sequence | Becomes |
+|:--------:|:-------:|--------------------------------|:--------:|:-------:|--------------------------------|:--------:|:-------:|--------------------------------|:--------:|:-------:|
+| `...`    | ...     |                                | `-+`     | -+      |                                | `^l`     | ^l      |                                | `^L`     | ^L      |
+| `"text"` | "text"  |                                | `<>`     | <>      |                                | `^m`     | ^m      |                                | `^M`     | ^M      |
+| `'text'` | 'text'  |                                | `<=`     | <=      |                                | `^n`     | ^n      |                                | `^N`     | ^N      |
+| `--`     | --      |                                | `>=`     | >=      |                                | `^o`     | ^o      |                                | `^O`     | ^O      |
+| `---`    | ---     |                                | `==`     | ==      |                                | `^p`     | ^p      |                                | `^P`     | ^P      |
+| `(c)`    | (c)     |                                | `^0`     | ^0      |                                | `^q`     | ^q      |                                | `^Q`     | ^Q      |
+| `(C)`    | (C)     |                                | `^1`     | ^1      |                                | `^r`     | ^r      |                                | `^R`     | ^R      |
+| `(r)`    | (r)     |                                | `^2`     | ^2      |                                | `^s`     | ^s      |                                | `^S`     | ^S      |
+| `(R)`    | (R)     |                                | `^3`     | ^3      |                                | `^t`     | ^t      |                                | `^T`     | ^T      |
+| `(p)`    | (p)     |                                | `^4`     | ^4      |                                | `^u`     | ^u      |                                | `^U`     | ^U      |
+| `(P)`    | (P)     |                                |	`^5`     | ^5      |                                | `^v`     | ^v      |                                | `^V`     | ^V      |
+| `(s)`    | (s)     |                                | `^6`     | ^6      |                                | `^w`     | ^w      |                                | `^W`     | ^W      |
+| `(S)`    | (S)     |                                | `^7`     | ^7      |                                | `^x`     | ^x      |                                | `^X`     | ^X      |
+| `<<`     | <<      |                                | `^8`     | ^8      |                                | `^y`     | ^y      |                                | `^Y`     | ^Y      |
+| `>>`     | >>      |                                | `^9`     | ^9      |                                | `^z`     | ^z      |                                | `^Z`     | ^Z      |
+| `<<<`    | <<<     |                                | `^a`     | ^a      |                                | `^A`     | ^A      |                                | `^TM`    | ^TM     |
+| `>>>`    | >>>     |                                | `^b`     | ^b      |                                | `^B`     | ^B      |                                | `^st`    | ^st     |
+| `<--`    | <--     |                                | `^c`     | ^c      |                                | `^C`     | ^C      |                                | `^nd`    | ^nd     |
+| `-->`    | -->     |                                | `^d`     | ^d      |                                | `^D`     | ^D      |                                | `^rd`    | ^rd     |
+| `<-->`   | <-->    |                                | `^e`     | ^e      |                                | `^E`     | ^E      |                                | `^th`    | ^th     |
+| `<==`    | <==     |                                | `^f`     | ^f      |                                | `^F`     | ^F      |                                | `%0`     | %0      |
+| `==>`    | ==>     |                                | `^g`     | ^g      |                                | `^G`     | ^G      |                                | `%00`    | %00     |
+| `<==>`   | <==>    |                                | `^h`     | ^h      |                                | `^H`     | ^H      |                                |          |         |
+| `[[`     | [[      |                                |	`^i`     | ^i      |                                | `^I`     | ^I      |                                |          |         |
+| `]]`     | ]]      |                                | `^j`     | ^j      |                                | `^J`     | ^J      |                                |          |         |
+| `+-`     | +-      |                                |	`^k`     | ^k      |                                | `^K`     | ^K      |                                |          |         |
 
 ### Emojis
 

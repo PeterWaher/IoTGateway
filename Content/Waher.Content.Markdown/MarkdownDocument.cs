@@ -4182,19 +4182,24 @@ namespace Waher.Content.Markdown
 				if (this.master.metaData.ContainsKey("MASTER"))
 					throw new Exception("Master documents are not allowed to be embedded in other master documents.");
 
-				foreach (KeyValuePair<string, KeyValuePair<string, bool>[]> Meta in this.metaData)
-				{
-					if (this.master.metaData.TryGetValue(Meta.Key, out KeyValuePair<string, bool>[] Meta0))
-						this.master.metaData[Meta.Key] = this.Concat(Meta0, Meta.Value);
-					else
-						this.master.metaData[Meta.Key] = Meta.Value;
-				}
+				CopyMetaDataTags(this, this.master);
 
 				this.master.detail = this;
 			}
 		}
 
-		private KeyValuePair<string, bool>[] Concat(KeyValuePair<string, bool>[] Meta1, KeyValuePair<string, bool>[] Meta2)
+		internal static void CopyMetaDataTags(MarkdownDocument From, MarkdownDocument To)
+		{
+			foreach (KeyValuePair<string, KeyValuePair<string, bool>[]> Meta in From.metaData)
+			{
+				if (To.metaData.TryGetValue(Meta.Key, out KeyValuePair<string, bool>[] Meta0))
+					To.metaData[Meta.Key] = Concat(Meta0, Meta.Value);
+				else
+					To.metaData[Meta.Key] = Meta.Value;
+			}
+		}
+
+		private static KeyValuePair<string, bool>[] Concat(KeyValuePair<string, bool>[] Meta1, KeyValuePair<string, bool>[] Meta2)
 		{
 			int c = Meta1.Length;
 			int d = Meta2.Length;

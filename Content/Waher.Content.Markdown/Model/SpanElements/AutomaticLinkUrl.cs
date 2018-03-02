@@ -38,8 +38,14 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="Output">HTML will be output here.</param>
 		public override void GenerateHTML(StringBuilder Output)
 		{
+			bool IsRelative = this.url.IndexOf(':') < 0;
+
 			Output.Append("<a href=\"");
 			Output.Append(XML.HtmlAttributeEncode(this.Document.CheckURL(this.url, null)));
+
+			if (!IsRelative)
+				Output.Append("\" target=\"_blank");
+
 			Output.Append("\">");
 			Output.Append(XML.HtmlValueEncode(this.url));
 			Output.Append("</a>");

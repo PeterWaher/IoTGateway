@@ -64,6 +64,8 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		public static void GenerateHTML(StringBuilder Output, string Url, string Title, IEnumerable<MarkdownElement> ChildNodes, 
 			MarkdownDocument Document)
 		{
+			bool IsRelative = Url.IndexOf(':') < 0;
+
 			Output.Append("<a href=\"");
 			Output.Append(XML.HtmlAttributeEncode(Document.CheckURL(Url, null)));
 
@@ -72,6 +74,9 @@ namespace Waher.Content.Markdown.Model.SpanElements
 				Output.Append("\" title=\"");
 				Output.Append(XML.HtmlAttributeEncode(Title));
 			}
+
+			if (!IsRelative)
+				Output.Append("\" target=\"_blank");
 
 			Output.Append("\">");
 

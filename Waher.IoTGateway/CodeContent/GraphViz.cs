@@ -126,21 +126,21 @@ namespace Waher.IoTGateway.CodeContent
 		{
 			string InstallationFolder;
 
-			InstallationFolder = SearchForInstallationFolder(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86));
+			InstallationFolder = SearchForInstallationFolder(Environment.SpecialFolder.ProgramFilesX86);
 			if (string.IsNullOrEmpty(InstallationFolder))
 			{
-				InstallationFolder = SearchForInstallationFolder(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles));
+				InstallationFolder = SearchForInstallationFolder(Environment.SpecialFolder.ProgramFiles);
 				if (string.IsNullOrEmpty(InstallationFolder))
 				{
-					InstallationFolder = SearchForInstallationFolder(Environment.GetFolderPath(Environment.SpecialFolder.Programs));
+					InstallationFolder = SearchForInstallationFolder(Environment.SpecialFolder.Programs);
 					if (string.IsNullOrEmpty(InstallationFolder))
 					{
-						InstallationFolder = SearchForInstallationFolder(Environment.GetFolderPath(Environment.SpecialFolder.CommonProgramFilesX86));
+						InstallationFolder = SearchForInstallationFolder(Environment.SpecialFolder.CommonProgramFilesX86);
 						if (string.IsNullOrEmpty(InstallationFolder))
 						{
-							InstallationFolder = SearchForInstallationFolder(Environment.GetFolderPath(Environment.SpecialFolder.CommonProgramFiles));
+							InstallationFolder = SearchForInstallationFolder(Environment.SpecialFolder.CommonProgramFiles);
 							if (string.IsNullOrEmpty(InstallationFolder))
-								InstallationFolder = SearchForInstallationFolder(Environment.GetFolderPath(Environment.SpecialFolder.CommonPrograms));
+								InstallationFolder = SearchForInstallationFolder(Environment.SpecialFolder.CommonPrograms);
 						}
 					}
 				}
@@ -149,8 +149,19 @@ namespace Waher.IoTGateway.CodeContent
 			return InstallationFolder;
 		}
 
-		private static string SearchForInstallationFolder(string Folder)
+		private static string SearchForInstallationFolder(Environment.SpecialFolder SpecialFolder)
 		{
+			string Folder;
+
+			try
+			{
+				Folder = Environment.GetFolderPath(SpecialFolder);
+			}
+			catch (Exception)
+			{
+				return null; // Folder not defined for the operating system.
+			}
+
 			if (String.IsNullOrEmpty(Folder))
 				return null;
 
@@ -160,8 +171,23 @@ namespace Waher.IoTGateway.CodeContent
 			string FolderName;
 			string BestFolder = null;
 			double BestVersion = 0;
+			string[] SubFolders;
 
-			foreach (string SubFolder in Directory.GetDirectories(Folder))
+			try
+			{
+				SubFolders = Directory.GetDirectories(Folder);
+			}
+			catch (UnauthorizedAccessException)
+			{
+				return null;
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+				return null;
+			}
+
+			foreach (string SubFolder in SubFolders)
 			{
 				FolderName = Path.GetFileName(SubFolder);
 				if (!FolderName.StartsWith("Graphviz", StringComparison.CurrentCultureIgnoreCase))

@@ -115,29 +115,40 @@ namespace Waher.IoTGateway.CodeContent
 			JarPath = string.Empty;
 			JavaPath = string.Empty;
 
-			SearchForInstallationFolder(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), ref JarPath, ref JavaPath);
+			SearchForInstallationFolder(Environment.SpecialFolder.ProgramFilesX86, ref JarPath, ref JavaPath);
 			if (string.IsNullOrEmpty(JarPath) || string.IsNullOrEmpty(javaPath))
 			{
-				SearchForInstallationFolder(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), ref JarPath, ref JavaPath);
+				SearchForInstallationFolder(Environment.SpecialFolder.ProgramFiles, ref JarPath, ref JavaPath);
 				if (string.IsNullOrEmpty(JarPath) || string.IsNullOrEmpty(javaPath))
 				{
-					SearchForInstallationFolder(Environment.GetFolderPath(Environment.SpecialFolder.Programs), ref JarPath, ref JavaPath);
+					SearchForInstallationFolder(Environment.SpecialFolder.Programs, ref JarPath, ref JavaPath);
 					if (string.IsNullOrEmpty(JarPath) || string.IsNullOrEmpty(javaPath))
 					{
-						SearchForInstallationFolder(Environment.GetFolderPath(Environment.SpecialFolder.CommonProgramFilesX86), ref JarPath, ref JavaPath);
+						SearchForInstallationFolder(Environment.SpecialFolder.CommonProgramFilesX86, ref JarPath, ref JavaPath);
 						if (string.IsNullOrEmpty(JarPath) || string.IsNullOrEmpty(javaPath))
 						{
-							SearchForInstallationFolder(Environment.GetFolderPath(Environment.SpecialFolder.CommonProgramFiles), ref JarPath, ref JavaPath);
+							SearchForInstallationFolder(Environment.SpecialFolder.CommonProgramFiles, ref JarPath, ref JavaPath);
 							if (string.IsNullOrEmpty(JarPath) || string.IsNullOrEmpty(javaPath))
-								SearchForInstallationFolder(Environment.GetFolderPath(Environment.SpecialFolder.CommonPrograms), ref JarPath, ref JavaPath);
+								SearchForInstallationFolder(Environment.SpecialFolder.CommonPrograms, ref JarPath, ref JavaPath);
 						}
 					}
 				}
 			}
 		}
 
-		private static void SearchForInstallationFolder(string Folder, ref string JarPath, ref string JavaPath)
+		private static void SearchForInstallationFolder(Environment.SpecialFolder SpecialFolder, ref string JarPath, ref string JavaPath)
 		{
+			string Folder;
+
+			try
+			{
+				Folder = Environment.GetFolderPath(SpecialFolder);
+			}
+			catch (Exception)
+			{
+				return;	// Folder not defined for the operating system.
+			}
+
 			if (String.IsNullOrEmpty(Folder))
 				return;
 
@@ -149,6 +160,7 @@ namespace Waher.IoTGateway.CodeContent
 			DateTime TP = DateTime.MinValue;
 			string FolderName;
 			string[] Files;
+			string[] SubFolders;
 
 			if (string.IsNullOrEmpty(JarPath))
 				JarTP = DateTime.MinValue;
@@ -160,7 +172,21 @@ namespace Waher.IoTGateway.CodeContent
 			else
 				JavaTP = File.GetCreationTimeUtc(JavaPath);
 
-			foreach (string SubFolder in Directory.GetDirectories(Folder))
+			try
+			{
+				SubFolders = Directory.GetDirectories(Folder);
+			}
+			catch (UnauthorizedAccessException)
+			{
+				return;
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+				return;
+			}
+
+			foreach (string SubFolder in SubFolders)
 			{
 				try
 				{

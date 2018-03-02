@@ -348,7 +348,10 @@ namespace Waher.Networking.PeerToPeer
 				{
 					int NrRead = await this.stream.ReadAsync(this.incomingBuffer, 0, BufferSize);
 					if (NrRead <= 0 || this.disposed)
+					{
 						this.Closed();
+						break;
+					}
 					else
 					{
 						this.lastTcpPacket = DateTime.Now;
@@ -369,7 +372,7 @@ namespace Waher.Networking.PeerToPeer
 										{
 											this.packetBuffer = new byte[this.packetSize];
 											this.packetPos = 0;
-											this.readState++;
+											this.readState = 1;
 										}
 										break;
 
@@ -393,7 +396,7 @@ namespace Waher.Networking.PeerToPeer
 												}
 												catch (Exception ex)
 												{
-													Events.Log.Critical(ex);
+													Log.Critical(ex);
 												}
 											}
 
@@ -402,6 +405,10 @@ namespace Waher.Networking.PeerToPeer
 											this.offset = 0;
 											this.packetBuffer = null;
 										}
+										break;
+
+									default:
+										Pos = NrRead;
 										break;
 								}
 							}
@@ -422,7 +429,7 @@ namespace Waher.Networking.PeerToPeer
 								}
 								catch (Exception ex)
 								{
-									Events.Log.Critical(ex);
+									Log.Critical(ex);
 								}
 							}
 						}

@@ -131,7 +131,11 @@ namespace Waher.Networking.XMPP.P2P
 						}
 					}
 				}
+				else
+					return;
 			}
+
+			this.Information("Removing JID from set of recognized JIDs: " + XmppAddress);
 		}
 
 		/// <summary>
@@ -203,6 +207,9 @@ namespace Waher.Networking.XMPP.P2P
 					Infos[LocalPort] = Info;
 				}
 			}
+
+			this.Information("P2P information available for " + XmppAddress + ". External: " + ExternalIp + ":" + ExternalPort.ToString() +
+				", Local: " + LocalIp + ":" + LocalPort.ToString());
 		}
 
 		internal void AuthenticatePeer(PeerConnection Peer, string BareJID)
@@ -241,10 +248,14 @@ namespace Waher.Networking.XMPP.P2P
 			{
 				this.peersByJid[State.RemoteBareJid] = State;
 			}
+
+			this.Information("Peer authenticated: " + State.RemoteBareJid);
 		}
 
 		internal void NewXmppClient(XmppClient Client, string LocalJid, string RemoteJid)
 		{
+			this.Information("Serverless XMPP connection established with " + RemoteJid);
+
 			/*foreach (ISniffer Sniffer in this.Sniffers)
 				Client.Add(Sniffer);*/
 
@@ -269,6 +280,8 @@ namespace Waher.Networking.XMPP.P2P
 
 		internal void PeerClosed(PeerState State)
 		{
+			this.Information("Serverless XMPP connection with " + State.RemoteBareJid + " closed.");
+
 			lock (this.peersByJid)
 			{
 				if (this.peersByJid.TryGetValue(State.RemoteBareJid, out PeerState State2) && State2 == State)

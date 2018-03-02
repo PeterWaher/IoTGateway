@@ -220,7 +220,7 @@ namespace Waher.Events
 			if (this.toAvoid == null)
 				this.toAvoid = new LinkedList<IEventSink>();
 
-			if (this.toAvoid.Contains(EventSink))
+			if (!this.toAvoid.Contains(EventSink))
 				this.toAvoid.AddLast(EventSink);
 		}
 

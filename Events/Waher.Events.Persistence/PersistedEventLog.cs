@@ -254,20 +254,8 @@ namespace Waher.Events.Persistence
 		/// <param name="Event">Event to queue.</param>
 		public override async void Queue(Event Event)
 		{
-			try
-			{
-				PersistedEvent PersistedEvent = new PersistedEvent(Event);
-				await Database.Insert(PersistedEvent);
-			}
-			catch (Exception ex)
-			{
-				Event Event2 = new Event(DateTime.Now, EventType.Critical, ex.Message, this.ObjectID, string.Empty, string.Empty, EventLevel.Major,
-					string.Empty, ex.Source, ex.StackTrace);
-
-				Event2.Avoid(this);
-
-				Log.Event(Event2);
-			}
+			PersistedEvent PersistedEvent = new PersistedEvent(Event);
+			await Database.Insert(PersistedEvent);
 		}
 	}
 }

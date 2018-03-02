@@ -780,11 +780,9 @@ namespace Waher.Events
 		private static void Event(EventType Type, Exception Exception, string Object, string Actor, string EventId,
 			EventLevel Level, string Facility, string Module, params KeyValuePair<string, object>[] Tags)
 		{
-			AggregateException ex;
-
 			Exception = UnnestException(Exception);
 
-			if ((ex = Exception as AggregateException) != null)
+			if (Exception is AggregateException ex)
 			{
 				foreach (Exception ex2 in ex.InnerExceptions)
 					Event(Type, ex2, Object, Actor, EventId, Level, Facility, Module, Tags);
@@ -831,11 +829,9 @@ namespace Waher.Events
 		private static void Event(EventType Type, Exception Exception, string Object, string Actor, string EventId,
 			EventLevel Level, string Facility, params KeyValuePair<string, object>[] Tags)
 		{
-			AggregateException ex;
-
 			Exception = UnnestException(Exception);
 
-			if ((ex = Exception as AggregateException) != null)
+			if (Exception is AggregateException ex)
 			{
 				foreach (Exception ex2 in ex.InnerExceptions)
 					Event(Type, ex2, Object, Actor, EventId, Level, Facility, Tags);
@@ -862,11 +858,9 @@ namespace Waher.Events
 		private static void Event(EventType Type, Exception Exception, string Object, string Actor, string EventId,
 			EventLevel Level, params KeyValuePair<string, object>[] Tags)
 		{
-			AggregateException ex;
-
 			Exception = UnnestException(Exception);
 
-			if ((ex = Exception as AggregateException) != null)
+			if (Exception is AggregateException ex)
 			{
 				foreach (Exception ex2 in ex.InnerExceptions)
 					Event(Type, ex2, Object, Actor, EventId, Level, Tags);
@@ -891,11 +885,9 @@ namespace Waher.Events
 		private static void Event(EventType Type, Exception Exception, string Object, string Actor, string EventId,
 			params KeyValuePair<string, object>[] Tags)
 		{
-			AggregateException ex;
-
 			Exception = UnnestException(Exception);
 
-			if ((ex = Exception as AggregateException) != null)
+			if (Exception is AggregateException ex)
 			{
 				foreach (Exception ex2 in ex.InnerExceptions)
 					Event(Type, ex2, Object, Actor, EventId, Tags);
@@ -919,11 +911,9 @@ namespace Waher.Events
 		private static void Event(EventType Type, Exception Exception, string Object, string Actor,
 			params KeyValuePair<string, object>[] Tags)
 		{
-			AggregateException ex;
-
 			Exception = UnnestException(Exception);
 
-			if ((ex = Exception as AggregateException) != null)
+			if (Exception is AggregateException ex)
 			{
 				foreach (Exception ex2 in ex.InnerExceptions)
 					Event(Type, ex2, Object, Actor, Tags);
@@ -946,11 +936,9 @@ namespace Waher.Events
 		private static void Event(EventType Type, Exception Exception, string Object,
 			params KeyValuePair<string, object>[] Tags)
 		{
-			AggregateException ex;
-
 			Exception = UnnestException(Exception);
 
-			if ((ex = Exception as AggregateException) != null)
+			if (Exception is AggregateException ex)
 			{
 				foreach (Exception ex2 in ex.InnerExceptions)
 					Event(Type, ex2, Object, Tags);
@@ -971,11 +959,9 @@ namespace Waher.Events
 
 		private static void Event(EventType Type, Exception Exception, params KeyValuePair<string, object>[] Tags)
 		{
-			AggregateException ex;
-
 			Exception = UnnestException(Exception);
 
-			if ((ex = Exception as AggregateException) != null)
+			if (Exception is AggregateException ex)
 			{
 				foreach (Exception ex2 in ex.InnerExceptions)
 					Event(Type, ex2, Tags);

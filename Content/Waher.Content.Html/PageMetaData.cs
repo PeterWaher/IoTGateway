@@ -447,7 +447,7 @@ namespace Waher.Content.Html
 		}
 
 		/// <summary>
-		/// <see cref="Object.GetHashCode()"/>
+		/// <see cref="System.Object.GetHashCode()"/>
 		/// </summary>
 		public override int GetHashCode()
 		{

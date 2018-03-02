@@ -51,6 +51,36 @@
 			<HtmlEntity>geq</HtmlEntity>
 			<InlineText>3</InlineText>
 		</Paragraph>
+		<Paragraph>
+			<InlineText>a</InlineText>
+			<SuperScript>
+				<InlineText>(b+c)/2</InlineText>
+			</SuperScript>
+			<InlineText>=sqrt(a</InlineText>
+			<SuperScript>
+				<InlineText>b</InlineText>
+			</SuperScript>
+			<InlineText>a</InlineText>
+			<SuperScript>
+				<InlineText>c</InlineText>
+			</SuperScript>
+			<InlineText>)</InlineText>
+		</Paragraph>
+		<Paragraph>
+			<InlineText>a</InlineText>
+			<SuperScript>
+				<InlineText>(b+c)/2</InlineText>
+			</SuperScript>
+			<InlineText>=sqrt(a</InlineText>
+			<SuperScript>
+				<InlineText>b</InlineText>
+			</SuperScript>
+			<InlineText>a</InlineText>
+			<SuperScript>
+				<InlineText>c</InlineText>
+			</SuperScript>
+			<InlineText>)</InlineText>
+		</Paragraph>
 	</elements>
 	<references />
 </parsedMakdown>

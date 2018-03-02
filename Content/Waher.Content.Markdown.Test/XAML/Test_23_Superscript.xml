@@ -3,4 +3,6 @@
 	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">a<Run Typography.Variants="Superscript">b+c</Run>=a<Run Typography.Variants="Superscript">b</Run>a<Run Typography.Variants="Superscript">c</Run></TextBlock>
 	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">a²+b²=c²</TextBlock>
 	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">a<Run Typography.Variants="Superscript">n</Run>+b<Run Typography.Variants="Superscript">n</Run>≠c<Run Typography.Variants="Superscript">n</Run>, n≥3</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">a<Run Typography.Variants="Superscript">(b+c)/2</Run>=sqrt(a<Run Typography.Variants="Superscript">b</Run>a<Run Typography.Variants="Superscript">c</Run>)</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">a<Run Typography.Variants="Superscript">(b+c)/2</Run>=sqrt(a<Run Typography.Variants="Superscript">b</Run>a<Run Typography.Variants="Superscript">c</Run>)</TextBlock>
 </StackPanel>

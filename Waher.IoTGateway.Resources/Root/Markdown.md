@@ -48,7 +48,7 @@ mi_dd_le of a word. In HTML, underlined text gets surrounded by `<u>` and `</u>`
 #### Superscript text
 
 You can add superscript text by inserting the superscript text between a `^[` and a `]`, or a `^(` and a `)`. If you want to use parenthesis `(` or `)`
-in your superscript text, you should use `^[` and `]`. If you want to use brackets `[` and `]`, you should use `^(` and `)`. Some special characters,
+in your superscript text, you should use `^[` and `]`. You could also escape the parenthesis using `\(` or `\)`. Some special characters,
 like the digits and ASCII letters can superseed the `^` sign without having to be enclosed in parenthesis or brackets. See 
 [Typographical enhancements](#typographicalEnhancements) for details.
 
@@ -58,6 +58,8 @@ Examples:
 * `a^[b+c]=a^ba^c` ==> a^[b+c]=a^ba^c
 * `a^2+b^2=c^2` ==> a^2+b^2=c^2
 * `a^n+b^n<>c^n, n>=3` ==> a^n+b^n<>c^n, n>=3
+* `a^[(b+c)/2]=sqrt(a^ba^c)` ==> a^[(b+c)/2]=sqrt(a^ba^c)
+* `a^(\(b+c\)/2)=sqrt(a^ba^c)` ==> a^(\(b+c\)/2)=sqrt(a^ba^c)
 
 #### Subscript
 

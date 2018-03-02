@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
-using System.Security;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Waher.Events.WindowsEventLog
 {
@@ -63,7 +63,7 @@ namespace Waher.Events.WindowsEventLog
 		/// <summary>
 		/// <see cref="EventSink.Queue(Event)"/>
 		/// </summary>
-		public override void Queue(Event Event)
+		public override Task Queue(Event Event)
 		{
 			WindowsEventType Type;
 			uint EventId = 0;   // https://msdn.microsoft.com/en-us/library/aa363651(v=vs.85).aspx
@@ -181,6 +181,8 @@ namespace Waher.Events.WindowsEventLog
 
 			if (!Win32.ReportEventW(this.eventLog, Type, 0, EventId, IntPtr.Zero, 1, 0, Strings.ToArray(), IntPtr.Zero))
 				throw new Win32Exception(Marshal.GetLastWin32Error());
+
+			return Task.CompletedTask;
 		}
 	}
 }

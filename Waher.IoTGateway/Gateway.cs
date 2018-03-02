@@ -252,7 +252,19 @@ namespace Waher.IoTGateway
 
 				PersistedEventLog PersistedEventLog = new PersistedEventLog(7, new TimeSpan(4, 15, 0));
 				Log.Register(PersistedEventLog);
-				PersistedEventLog.Queue(new Event(EventType.Informational, "Server starting up.", string.Empty, string.Empty, string.Empty, EventLevel.Minor, string.Empty, string.Empty, string.Empty));
+				try
+				{
+					await PersistedEventLog.Queue(new Event(EventType.Informational, "Server starting up.", string.Empty, string.Empty, string.Empty, EventLevel.Minor, string.Empty, string.Empty, string.Empty));
+				}
+				catch (Exception ex)
+				{
+					Event Event = new Event(DateTime.Now, EventType.Critical, ex.Message, PersistedEventLog.ObjectID, string.Empty, string.Empty,
+						EventLevel.Major, string.Empty, ex.Source, ex.StackTrace);
+
+					Event.Avoid(PersistedEventLog);
+
+					Log.Event(Event);
+				}
 
 				xmppConfigFileName = Config.DocumentElement["XmppClient"].Attributes["configFileName"].Value;
 				if (!File.Exists(xmppConfigFileName))

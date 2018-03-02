@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Waher.Events
 {
@@ -22,7 +23,7 @@ namespace Waher.Events
 		/// <summary>
 		/// <see cref="IEventSink.Queue"/>
 		/// </summary>
-		public override void Queue(Event Event)
+		public override Task Queue(Event Event)
 		{
 			StringBuilder Output = new StringBuilder();
 			int i;
@@ -113,6 +114,8 @@ namespace Waher.Events
 			Output.AppendLine();
 
 			System.Diagnostics.Debug.WriteLine(Output.ToString());
+
+			return Task.CompletedTask;
 		}
 
 		private void AddTag(StringBuilder Output, string Key, object Value, bool First)

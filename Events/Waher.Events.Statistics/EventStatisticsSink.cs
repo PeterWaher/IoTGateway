@@ -71,7 +71,7 @@ namespace Waher.Events.Statistics
 		/// Queues an event to be output.
 		/// </summary>
 		/// <param name="Event">Event to queue.</param>
-		public override void Queue(Event Event)
+		public override Task Queue(Event Event)
 		{
 			string s;
 
@@ -98,6 +98,8 @@ namespace Waher.Events.Statistics
 					this.IncLocked(Event.StackTrace, this.perStackTrace);
 				}
 			}
+
+			return Task.CompletedTask;
 		}
 
 		private void IncLocked(string Key, Dictionary<string, Statistic> PerKey)

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Waher.Events
 {
@@ -13,6 +14,6 @@ namespace Waher.Events
 		/// Queues an event to be output.
 		/// </summary>
 		/// <param name="Event">Event to queue.</param>
-		void Queue(Event Event);
+		Task Queue(Event Event);
 	}
 }

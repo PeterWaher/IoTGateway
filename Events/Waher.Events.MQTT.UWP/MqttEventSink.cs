@@ -2,9 +2,9 @@
 using System.Threading;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Xml;
-using Waher.Networking;
 using Waher.Networking.MQTT;
 
 namespace Waher.Events.MQTT
@@ -123,14 +123,14 @@ namespace Waher.Events.MQTT
 		/// <summary>
 		/// <see cref="EventSink.Queue"/>
 		/// </summary>
-		public override void Queue(Event Event)
+		public override Task Queue(Event Event)
 		{
 			lock (this.synchObj)
 			{
 				if (!this.connected)
 				{
 					this.eventsLost++;
-					return;
+					return Task.CompletedTask;
 				}
 			}
 
@@ -308,6 +308,8 @@ namespace Waher.Events.MQTT
 			byte[] Data = System.Text.Encoding.UTF8.GetBytes(Xml.ToString());
 
 			this.client.PUBLISH(this.topic, MqttQualityOfService.AtLeastOnce, false, Data);
+
+			return Task.CompletedTask;
 		}
 	}
 }

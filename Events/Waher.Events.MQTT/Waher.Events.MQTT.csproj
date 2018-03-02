@@ -15,11 +15,12 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>logger logging logs events eventlogging eventlogs mqtt</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.0.0</AssemblyVersion>
-    <FileVersion>1.0.0</FileVersion>
+    <AssemblyVersion>1.0.1</AssemblyVersion>
+    <FileVersion>1.0.1</FileVersion>
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Events\Waher.Events.MQTT\</UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>
+    <Version>1.0.1</Version>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DocumentationFile>bin\Debug\netstandard1.3\.xml</DocumentationFile>

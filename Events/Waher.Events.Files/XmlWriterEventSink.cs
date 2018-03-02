@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 
 namespace Waher.Events.Files
@@ -60,10 +60,10 @@ namespace Waher.Events.Files
 		/// Queues an event to be output.
 		/// </summary>
 		/// <param name="Event">Event to queue.</param>
-		public override void Queue(Event Event)
+		public override Task Queue(Event Event)
 		{
 			if (this.disposed)
-				return;
+				return Task.CompletedTask;
 
 			lock (this.synchObject)
 			{
@@ -129,6 +129,8 @@ namespace Waher.Events.Files
 					this.AfterWrite();
 				}
 			}
+
+			return Task.CompletedTask;
 		}
 
 		private static string[] GetRows(string s)

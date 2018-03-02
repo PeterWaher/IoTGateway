@@ -252,7 +252,7 @@ namespace Waher.Events.Persistence
 		/// Queues an event to be output.
 		/// </summary>
 		/// <param name="Event">Event to queue.</param>
-		public override async void Queue(Event Event)
+		public override async Task Queue(Event Event)
 		{
 			PersistedEvent PersistedEvent = new PersistedEvent(Event);
 			await Database.Insert(PersistedEvent);

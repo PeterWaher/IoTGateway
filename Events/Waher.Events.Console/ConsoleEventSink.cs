@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Waher.Events.Console
 {
@@ -34,7 +35,7 @@ namespace Waher.Events.Console
 		/// <summary>
 		/// <see cref="IEventSink.Queue"/>
 		/// </summary>
-		public override void Queue(Event Event)
+		public override Task Queue(Event Event)
 		{
 			lock (System.Console.Out)
 			{
@@ -186,6 +187,8 @@ namespace Waher.Events.Console
 					System.Console.BackgroundColor = BgBak;
 				}
 			}
+
+			return Task.CompletedTask;
 		}
 
 		private void AddTag(StringBuilder Output, int Width, string Key, object Value, bool First, bool WriteLine)

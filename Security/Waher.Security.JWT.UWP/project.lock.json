@@ -2415,7 +2415,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Events.Statistics/1.0.2": {
+      "Waher.Events.Statistics/1.0.3": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -4930,7 +4930,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Events.Statistics/1.0.2": {
+      "Waher.Events.Statistics/1.0.3": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -7481,7 +7481,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Events.Statistics/1.0.2": {
+      "Waher.Events.Statistics/1.0.3": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -10005,7 +10005,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Events.Statistics/1.0.2": {
+      "Waher.Events.Statistics/1.0.3": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -12565,7 +12565,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Events.Statistics/1.0.2": {
+      "Waher.Events.Statistics/1.0.3": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -15089,7 +15089,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Events.Statistics/1.0.2": {
+      "Waher.Events.Statistics/1.0.3": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -17649,7 +17649,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Events.Statistics/1.0.2": {
+      "Waher.Events.Statistics/1.0.3": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -27473,7 +27473,7 @@
       "path": "../../Events/Waher.Events/Waher.Events.csproj",
       "msbuildProject": "../../Events/Waher.Events/Waher.Events.csproj"
     },
-    "Waher.Events.Statistics/1.0.2": {
+    "Waher.Events.Statistics/1.0.3": {
       "type": "project",
       "path": "../../Events/Waher.Events.Statistics/Waher.Events.Statistics.csproj",
       "msbuildProject": "../../Events/Waher.Events.Statistics/Waher.Events.Statistics.csproj"

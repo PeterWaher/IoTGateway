@@ -2482,7 +2482,7 @@
           "Waher.Content": "1.0.8"
         }
       },
-      "Waher.Content.Markdown/1.0.19": {
+      "Waher.Content.Markdown/1.0.20": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -2514,7 +2514,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Events.Statistics/1.0.2": {
+      "Waher.Events.Statistics/1.0.3": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -5060,7 +5060,7 @@
           "Waher.Content": "1.0.8"
         }
       },
-      "Waher.Content.Markdown/1.0.19": {
+      "Waher.Content.Markdown/1.0.20": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -5092,7 +5092,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Events.Statistics/1.0.2": {
+      "Waher.Events.Statistics/1.0.3": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -7674,7 +7674,7 @@
           "Waher.Content": "1.0.8"
         }
       },
-      "Waher.Content.Markdown/1.0.19": {
+      "Waher.Content.Markdown/1.0.20": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -7706,7 +7706,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Events.Statistics/1.0.2": {
+      "Waher.Events.Statistics/1.0.3": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -10261,7 +10261,7 @@
           "Waher.Content": "1.0.8"
         }
       },
-      "Waher.Content.Markdown/1.0.19": {
+      "Waher.Content.Markdown/1.0.20": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -10293,7 +10293,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Events.Statistics/1.0.2": {
+      "Waher.Events.Statistics/1.0.3": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -12884,7 +12884,7 @@
           "Waher.Content": "1.0.8"
         }
       },
-      "Waher.Content.Markdown/1.0.19": {
+      "Waher.Content.Markdown/1.0.20": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -12916,7 +12916,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Events.Statistics/1.0.2": {
+      "Waher.Events.Statistics/1.0.3": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -15471,7 +15471,7 @@
           "Waher.Content": "1.0.8"
         }
       },
-      "Waher.Content.Markdown/1.0.19": {
+      "Waher.Content.Markdown/1.0.20": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -15503,7 +15503,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Events.Statistics/1.0.2": {
+      "Waher.Events.Statistics/1.0.3": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -18094,7 +18094,7 @@
           "Waher.Content": "1.0.8"
         }
       },
-      "Waher.Content.Markdown/1.0.19": {
+      "Waher.Content.Markdown/1.0.20": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -18126,7 +18126,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Events.Statistics/1.0.2": {
+      "Waher.Events.Statistics/1.0.3": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -28005,7 +28005,7 @@
       "path": "../Waher.Content.Html/Waher.Content.Html.csproj",
       "msbuildProject": "../Waher.Content.Html/Waher.Content.Html.csproj"
     },
-    "Waher.Content.Markdown/1.0.19": {
+    "Waher.Content.Markdown/1.0.20": {
       "type": "project",
       "path": "../Waher.Content.Markdown/Waher.Content.Markdown.csproj",
       "msbuildProject": "../Waher.Content.Markdown/Waher.Content.Markdown.csproj"
@@ -28020,7 +28020,7 @@
       "path": "../../Events/Waher.Events/Waher.Events.csproj",
       "msbuildProject": "../../Events/Waher.Events/Waher.Events.csproj"
     },
-    "Waher.Events.Statistics/1.0.2": {
+    "Waher.Events.Statistics/1.0.3": {
       "type": "project",
       "path": "../../Events/Waher.Events.Statistics/Waher.Events.Statistics.csproj",
       "msbuildProject": "../../Events/Waher.Events.Statistics/Waher.Events.Statistics.csproj"

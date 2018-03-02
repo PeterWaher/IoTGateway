@@ -125,22 +125,15 @@ namespace Waher.Events
 		/// Logs an event. It will be distributed to registered event sinks.
 		/// </summary>
 		/// <param name="Event">Event to log.</param>
-		public static void Event(Event Event)
+		public static async void Event(Event Event)
 		{
-			Task.Factory.StartNew(DistributeEvent, Event);
-		}
-
-		private static void DistributeEvent(object State)
-		{
-			Event Event = (Event)State;
-
 			foreach (IEventSink EventSink in staticSinks)
 			{
 				if (!Event.ShoudAvoid(EventSink))
 				{
 					try
 					{
-						EventSink.Queue(Event);
+						await EventSink.Queue(Event);
 
 						if (hasReportedErrors)
 						{

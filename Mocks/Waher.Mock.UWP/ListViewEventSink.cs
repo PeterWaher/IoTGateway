@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Windows;
+using System.Threading.Tasks;
 using Waher.Events;
 using Windows.UI;
 using Windows.UI.Xaml.Controls;
@@ -63,7 +61,7 @@ namespace Waher.Mock
 		/// Queues an event to be output.
 		/// </summary>
 		/// <param name="Event">Event to queue.</param>
-		public override void Queue(Event Event)
+		public override Task Queue(Event Event)
 		{
 			switch (Event.Type)
 			{
@@ -99,6 +97,8 @@ namespace Waher.Mock
 					this.Add(new SniffItem(SniffItemType.Information, Event.Message, null, Colors.White, Colors.Black));
 					break;
 			}
+
+			return Task.CompletedTask;
 		}
 	}
 }

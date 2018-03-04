@@ -1060,6 +1060,11 @@ namespace Waher.Content.Html
 							StartOfText = Pos + 1;
 							State = 0;
 						}
+						else if (ch == '-')
+						{
+							sb.Append('-');
+							Empty = false;
+						}
 						else
 						{
 							sb.Append("--");
@@ -1511,7 +1516,7 @@ namespace Waher.Content.Html
 					Footer Footer = new Footer(this, Parent, Start);
 					Result = Footer;
 					if (this.footer == null)
-						this.footer= new LinkedList<Footer>();
+						this.footer = new LinkedList<Footer>();
 					this.footer.AddLast(Footer);
 					break;
 

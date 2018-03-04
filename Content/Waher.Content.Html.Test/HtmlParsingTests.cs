@@ -107,5 +107,11 @@ namespace Waher.Content.Html.Test
 		{
 			await this.LoadAndParse("http://www.kristianstadsbladet.se/tt-ekonomi/folkstorm-nar-trocadero-forsvinner/");
 		}
+
+		[TestMethod]
+		public async Task HtmlParseTest_03_TheGuardian()
+		{
+			await this.LoadAndParse("https://www.theguardian.com/technology/2018/mar/04/has-dopamine-got-us-hooked-on-tech-facebook-apps-addiction");
+		}
 	}
 }

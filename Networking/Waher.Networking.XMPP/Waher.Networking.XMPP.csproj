@@ -27,7 +27,7 @@ XEP-0336: Data Forms - Dynamic Forms
 XEP-0348: Signing Forms
 XEP-0363: HTTP File Upload
 XEP-0377: Spam Reporting</Description>
-    <Copyright>Copyright © Waher Data AB 2015-2017. All rights reserved.</Copyright>
+    <Copyright>Copyright © Waher Data AB 2015-2018. All rights reserved.</Copyright>
     <Authors>Peter Waher</Authors>
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
@@ -38,9 +38,9 @@ XEP-0377: Spam Reporting</Description>
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>networking communication xmpp</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.0.16</AssemblyVersion>
-    <FileVersion>1.0.16</FileVersion>
-    <Version>1.0.16</Version>
+    <AssemblyVersion>1.0.17</AssemblyVersion>
+    <FileVersion>1.0.17</FileVersion>
+    <Version>1.0.17</Version>
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Networking\Waher.Networking.XMPP\</UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>

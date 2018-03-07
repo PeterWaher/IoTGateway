@@ -150,4 +150,83 @@ namespace Waher.Networking.XMPP.PubSub
 		/// </summary>
 		collection
 	}
+
+	/// <summary>
+	/// Node subscription status
+	/// </summary>
+	public enum NodeSubscriptionStatus
+	{
+		/// <summary>
+		/// No subscription active
+		/// </summary>
+		none,
+
+		/// <summary>
+		/// Subscription pending approval
+		/// </summary>
+		pending,
+
+		/// <summary>
+		/// Subscribed
+		/// </summary>
+		subscribed,
+
+		/// <summary>
+		/// Subscription requires configuration
+		/// </summary>
+		unconfigured
+	}
+
+	/// <summary>
+	/// Subscription type
+	/// </summary>
+	public enum SubscriptionType
+	{
+		/// <summary>
+		/// Receive notification of new items only
+		/// </summary>
+		items,
+
+		/// <summary>
+		/// Receive notification of new nodes only
+		/// </summary>
+		nodes
+	}
+
+	/// <summary>
+	/// Subscription depth
+	/// </summary>
+	public enum SubscriptonDepth
+	{
+		/// <summary>
+		/// Receive notification from direct child nodes only
+		/// </summary>
+		one,
+
+		/// <summary>
+		/// Receive notification from all descendent nodes
+		/// </summary>
+		all
+	}
+
+	/// <summary>
+	/// Availability of options.
+	/// </summary>
+	public enum OptionsAvailability
+	{
+		/// <summary>
+		/// Support for options unknown.
+		/// </summary>
+		Unknown,
+
+		/// <summary>
+		/// Options supported.
+		/// </summary>
+		Supported,
+
+		/// <summary>
+		/// Options required.
+		/// </summary>
+		Required
+	}
 }

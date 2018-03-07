@@ -528,104 +528,104 @@ namespace Waher.Networking.XMPP.PubSub
 				new HiddenField("FORM_TYPE", "http://jabber.org/protocol/pubsub#node_config")
 			};
 
-			if (this.AccessModel.HasValue)
-				Fields.Add(new ListSingleField("pubsub#access_model", this.AccessModel.Value.ToString()));
+			if (this.accessModel.HasValue)
+				Fields.Add(new ListSingleField("pubsub#access_model", this.accessModel.Value.ToString()));
 
-			if (this.BodyXsltUrl != null)
-				Fields.Add(new TextSingleField("pubsub#body_xslt", this.BodyXsltUrl));
+			if (this.bodyXsltUrl != null)
+				Fields.Add(new TextSingleField("pubsub#body_xslt", this.bodyXsltUrl));
 
-			if (this.Collections != null)
-				Fields.Add(new TextMultiField("pubsub#collection", this.Collections));
+			if (this.collections != null)
+				Fields.Add(new TextMultiField("pubsub#collection", this.collections));
 
-			if (this.Contact != null)
-				Fields.Add(new TextMultiField("pubsub#contact", this.Contact));
+			if (this.contact != null)
+				Fields.Add(new TextMultiField("pubsub#contact", this.contact));
 
-			if (this.DataFormXsltUrl != null)
-				Fields.Add(new TextSingleField("pubsub#dataform_xslt", this.DataFormXsltUrl));
+			if (this.dataFormXsltUrl != null)
+				Fields.Add(new TextSingleField("pubsub#dataform_xslt", this.dataFormXsltUrl));
 
-			if (this.DeliverNotifications.HasValue)
-				Fields.Add(new BooleanField("pubsub#deliver_notifications", this.DeliverNotifications.Value));
+			if (this.deliverNotifications.HasValue)
+				Fields.Add(new BooleanField("pubsub#deliver_notifications", this.deliverNotifications.Value));
 
-			if (this.DeliverPayloads.HasValue)
-				Fields.Add(new BooleanField("pubsub#deliver_payloads", this.DeliverPayloads.Value));
+			if (this.deliverPayloads.HasValue)
+				Fields.Add(new BooleanField("pubsub#deliver_payloads", this.deliverPayloads.Value));
 
-			if (this.ItemReply.HasValue)
-				Fields.Add(new ListSingleField("pubsub#itemreply", this.ItemReply.Value.ToString()));
+			if (this.itemReply.HasValue)
+				Fields.Add(new ListSingleField("pubsub#itemreply", this.itemReply.Value.ToString()));
 
-			if (this.ChildAssociationPolicy.HasValue)
-				Fields.Add(new ListSingleField("pubsub#children_association_policy", this.ChildAssociationPolicy.Value.ToString()));
+			if (this.childAssociationPolicy.HasValue)
+				Fields.Add(new ListSingleField("pubsub#children_association_policy", this.childAssociationPolicy.Value.ToString()));
 
-			if (this.ChildAssociationWhitelist != null)
-				Fields.Add(new JidMultiField("pubsub#children_association_whitelist", this.ChildAssociationWhitelist));
+			if (this.childAssociationWhitelist != null)
+				Fields.Add(new JidMultiField("pubsub#children_association_whitelist", this.childAssociationWhitelist));
 
-			if (this.Children != null)
-				Fields.Add(new TextMultiField("pubsub#children", this.Children));
+			if (this.children != null)
+				Fields.Add(new TextMultiField("pubsub#children", this.children));
 
-			if (this.MaxChildren.HasValue)
-				Fields.Add(new TextSingleField("pubsub#children_max", this.MaxChildren.Value.ToString()));
+			if (this.maxChildren.HasValue)
+				Fields.Add(new TextSingleField("pubsub#children_max", this.maxChildren.Value.ToString()));
 
-			if (this.MaxItems.HasValue)
-				Fields.Add(new TextSingleField("pubsub#max_items", this.MaxItems.Value.ToString()));
+			if (this.maxItems.HasValue)
+				Fields.Add(new TextSingleField("pubsub#max_items", this.maxItems.Value.ToString()));
 
-			if (this.ItemExpireSeconds.HasValue)
-				Fields.Add(new TextSingleField("pubsub#item_expire", this.ItemExpireSeconds.Value.ToString()));
+			if (this.itemExpireSeconds.HasValue)
+				Fields.Add(new TextSingleField("pubsub#item_expire", this.itemExpireSeconds.Value.ToString()));
 
-			if (this.MaxPayloadSize.HasValue)
-				Fields.Add(new TextSingleField("pubsub#max_payload_size", this.MaxPayloadSize.Value.ToString()));
+			if (this.maxPayloadSize.HasValue)
+				Fields.Add(new TextSingleField("pubsub#max_payload_size", this.maxPayloadSize.Value.ToString()));
 
-			if (this.NodeType.HasValue)
-				Fields.Add(new ListSingleField("pubsub#node_type", this.NodeType.Value.ToString()));
+			if (this.nodeType.HasValue)
+				Fields.Add(new ListSingleField("pubsub#node_type", this.nodeType.Value.ToString()));
 
-			if (this.NotifyConfig.HasValue)
-				Fields.Add(new BooleanField("pubsub#notify_config", this.NotifyConfig.Value));
+			if (this.notifyConfig.HasValue)
+				Fields.Add(new BooleanField("pubsub#notify_config", this.notifyConfig.Value));
 
-			if (this.NotifyDelete.HasValue)
-				Fields.Add(new BooleanField("pubsub#notify_delete", this.NotifyDelete.Value));
+			if (this.notifyDelete.HasValue)
+				Fields.Add(new BooleanField("pubsub#notify_delete", this.notifyDelete.Value));
 
-			if (this.NotifyRetract.HasValue)
-				Fields.Add(new BooleanField("pubsub#notify_retract", this.NotifyRetract.Value));
+			if (this.notifyRetract.HasValue)
+				Fields.Add(new BooleanField("pubsub#notify_retract", this.notifyRetract.Value));
 
-			if (this.NotifySubscriptions.HasValue)
-				Fields.Add(new BooleanField("pubsub#notify_sub", this.NotifySubscriptions.Value));
+			if (this.notifySubscriptions.HasValue)
+				Fields.Add(new BooleanField("pubsub#notify_sub", this.notifySubscriptions.Value));
 
-			if (this.PersistItems.HasValue)
-				Fields.Add(new BooleanField("pubsub#persist_items", this.PersistItems.Value));
+			if (this.persistItems.HasValue)
+				Fields.Add(new BooleanField("pubsub#persist_items", this.persistItems.Value));
 
-			if (this.PresenceBasedDelivery.HasValue)
-				Fields.Add(new BooleanField("pubsub#presence_based_delivery", this.PresenceBasedDelivery.Value));
+			if (this.presenceBasedDelivery.HasValue)
+				Fields.Add(new BooleanField("pubsub#presence_based_delivery", this.presenceBasedDelivery.Value));
 
-			if (this.PublisherModel.HasValue)
-				Fields.Add(new ListSingleField("pubsub#publish_model", this.PublisherModel.ToString()));
+			if (this.publisherModel.HasValue)
+				Fields.Add(new ListSingleField("pubsub#publish_model", this.publisherModel.ToString()));
 
-			if (this.ReplyRooms != null)
-				Fields.Add(new JidMultiField("pubsub#replyroom", this.ReplyRooms));
+			if (this.replyRooms != null)
+				Fields.Add(new JidMultiField("pubsub#replyroom", this.replyRooms));
 
-			if (this.ReplyTo != null)
-				Fields.Add(new JidMultiField("pubsub#replyto", this.ReplyTo));
+			if (this.replyTo != null)
+				Fields.Add(new JidMultiField("pubsub#replyto", this.replyTo));
 
-			if (this.RosterGroupsAllowed != null)
-				Fields.Add(new ListMultiField("pubsub#roster_groups_allowed", this.RosterGroupsAllowed));
+			if (this.rosterGroupsAllowed != null)
+				Fields.Add(new ListMultiField("pubsub#roster_groups_allowed", this.rosterGroupsAllowed));
 
-			if (this.SendLastPublishedItem.HasValue)
-				Fields.Add(new ListSingleField("pubsub#send_last_published_item", this.SendLastPublishedItem.ToString()));
+			if (this.sendLastPublishedItem.HasValue)
+				Fields.Add(new ListSingleField("pubsub#send_last_published_item", this.sendLastPublishedItem.ToString()));
 
-			if (this.AllowSubscriptions.HasValue)
-				Fields.Add(new BooleanField("pubsub#subscribe", this.AllowSubscriptions.Value));
+			if (this.allowSubscriptions.HasValue)
+				Fields.Add(new BooleanField("pubsub#subscribe", this.allowSubscriptions.Value));
 
-			if (this.Title != null)
-				Fields.Add(new TextSingleField("pubsub#title", this.Title));
+			if (this.title != null)
+				Fields.Add(new TextSingleField("pubsub#title", this.title));
 
-			if (this.Description != null)
-				Fields.Add(new TextMultiField("pubsub#description", this.Description));
+			if (this.description != null)
+				Fields.Add(new TextMultiField("pubsub#description", this.description));
 
-			if (this.PayloadType != null)
-				Fields.Add(new TextSingleField("pubsub#type", this.PayloadType));
+			if (this.payloadType != null)
+				Fields.Add(new TextSingleField("pubsub#type", this.payloadType));
 
-			if (this.NotificationType.HasValue)
-				Fields.Add(new ListSingleField("pubsub#notification_type", this.NotificationType.ToString()));
+			if (this.notificationType.HasValue)
+				Fields.Add(new ListSingleField("pubsub#notification_type", this.notificationType.ToString()));
 
-			if (this.PurgeOffline.HasValue)
-				Fields.Add(new BooleanField("pubsub#purge_offline", this.PurgeOffline.Value));
+			if (this.purgeOffline.HasValue)
+				Fields.Add(new BooleanField("pubsub#purge_offline", this.purgeOffline.Value));
 
 			return new DataForm(Client.Client, FormType.Form, Client.Client.FullJID, 
 				Client.ComponentAddress, Fields.ToArray());

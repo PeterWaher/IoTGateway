@@ -607,7 +607,7 @@ namespace Waher.Networking.XMPP.PubSub
 					Log.Critical(ex);
 				}
 
-			}, null);
+			}, State);
 		}
 
 		private void SubmitSubscribeOptions(object Sender, DataForm Form)
@@ -729,7 +729,7 @@ namespace Waher.Networking.XMPP.PubSub
 					Log.Critical(ex);
 				}
 
-			}, null);
+			}, State);
 		}
 
 		/// <summary>
@@ -847,7 +847,7 @@ namespace Waher.Networking.XMPP.PubSub
 					Log.Critical(ex);
 				}
 
-			}, null);
+			}, State);
 		}
 
 		/// <summary>
@@ -921,7 +921,7 @@ namespace Waher.Networking.XMPP.PubSub
 					Log.Critical(ex);
 				}
 
-			}, null);
+			}, State);
 		}
 
 		#endregion
@@ -1038,7 +1038,7 @@ namespace Waher.Networking.XMPP.PubSub
 					Log.Critical(ex);
 				}
 
-			}, null);
+			}, State);
 		}
 
 		#endregion
@@ -1147,7 +1147,7 @@ namespace Waher.Networking.XMPP.PubSub
 				{
 					Log.Critical(ex);
 				}
-			}, null);
+			}, State);
 		}
 
 		private void EventNotificationHandler(object Sender, MessageEventArgs e)
@@ -1181,19 +1181,38 @@ namespace Waher.Networking.XMPP.PubSub
 
 					foreach (XmlNode N2 in E.ChildNodes)
 					{
-						if (N2 is XmlElement E2 && E2.LocalName == "item")
+						if (N2 is XmlElement E2)
 						{
-							string ItemId = XML.Attribute(E2, "id");
-							string Publisher = XML.Attribute(E2, "publisher");
-							ItemNotificationEventArgs e2 = new ItemNotificationEventArgs(NodeName, ItemId, SubscriptionId, Publisher, E2, e);
+							switch (E2.LocalName)
+							{
+								case "item":
+									string ItemId = XML.Attribute(E2, "id");
+									string Publisher = XML.Attribute(E2, "publisher");
+									ItemNotificationEventArgs e2 = new ItemNotificationEventArgs(NodeName, ItemId, SubscriptionId, Publisher, E2, e);
 
-							try
-							{
-								this.ItemNotification?.Invoke(this, e2);
-							}
-							catch (Exception ex)
-							{
-								Log.Critical(ex);
+									try
+									{
+										this.ItemNotification?.Invoke(this, e2);
+									}
+									catch (Exception ex)
+									{
+										Log.Critical(ex);
+									}
+									break;
+
+								case "retract":
+									ItemId = XML.Attribute(E2, "id");
+									e2 = new ItemNotificationEventArgs(NodeName, ItemId, SubscriptionId, string.Empty, E2, e);
+
+									try
+									{
+										this.ItemRetracted?.Invoke(this, e2);
+									}
+									catch (Exception ex)
+									{
+										Log.Critical(ex);
+									}
+									break;
 							}
 						}
 					}
@@ -1205,6 +1224,38 @@ namespace Waher.Networking.XMPP.PubSub
 		/// Event raised whenever an item notification has been received.
 		/// </summary>
 		public event ItemNotificationEventHandler ItemNotification = null;
+
+		#endregion
+
+		#region Retract Item
+
+		/// <summary>
+		/// Retracts an item from a node.
+		/// </summary>
+		/// <param name="Node">Node name.</param>
+		/// <param name="ItemId">Item identity.</param>
+		/// <param name="Callback">Method to call when operation completes.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void Retract(string Node, string ItemId, IqResultEventHandler Callback, object State)
+		{
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<pubsub xmlns='");
+			Xml.Append(NamespacePubSub);
+			Xml.Append("'><retract node='");
+			Xml.Append(XML.Encode(Node));
+			Xml.Append("'><item");
+			Xml.Append(" id='");
+			Xml.Append(XML.Encode(ItemId));
+			Xml.Append("'/></retract></pubsub>");
+
+			this.client.SendIqSet(this.componentAddress, Xml.ToString(), Callback, State);
+		}
+
+		/// <summary>
+		/// Event raised whenever an item retraction notification has been received.
+		/// </summary>
+		public event ItemNotificationEventHandler ItemRetracted = null;
 
 		#endregion
 

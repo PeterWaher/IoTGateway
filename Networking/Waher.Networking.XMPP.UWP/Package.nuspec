@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata minClientVersion="3.2">
     <id>Waher.Networking.XMPP.UWP</id>
-    <version>1.0.17</version>
+    <version>1.0.18</version>
     <title>Waher.Networking.XMPP.UWP</title>
     <authors>Peter Waher</authors>
     <owners>Waher Data AB</owners>
@@ -18,6 +18,7 @@ XEP-0004: Data Forms
 XEP-0030: Service Discovery
 XEP-0047: In-band Bytestreams
 XEP-0055: Jabber Search
+XEP-0059: Result Set Management
 XEP-0068: Field Standardization for Data Forms
 XEP-0077: In-band Registration
 XEP-0092: Software Version

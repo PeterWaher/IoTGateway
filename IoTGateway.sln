@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27130.2026
+VisualStudioVersion = 15.0.27130.2036
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B9E73330-E0D8-4830-BBCF-9A3C57F672D2}"
 	ProjectSection(SolutionItems) = preProject
@@ -276,9 +276,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Things.Arduino", "Thi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Things.Ip", "Things\Waher.Things.Ip\Waher.Things.Ip.csproj", "{296512EA-C5DE-43C8-A1C5-B20CCF4B7F60}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Content.Html", "Content\Waher.Content.Html\Waher.Content.Html.csproj", "{1A5CE219-E61B-4CF4-91EF-DBCC18A7FBC0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Content.Html", "Content\Waher.Content.Html\Waher.Content.Html.csproj", "{1A5CE219-E61B-4CF4-91EF-DBCC18A7FBC0}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Content.Html.Test", "Content\Waher.Content.Html.Test\Waher.Content.Html.Test.csproj", "{7FA57421-2DFE-4292-AD99-1172FD2E86F5}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Networking.XMPP.PubSub", "Networking\Waher.Networking.XMPP.PubSub\Waher.Networking.XMPP.PubSub.csproj", "{E7BBCD12-29C4-4272-A972-6C28F8905C34}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -2479,6 +2481,26 @@ Global
 		{7FA57421-2DFE-4292-AD99-1172FD2E86F5}.Release|x64.Build.0 = Release|Any CPU
 		{7FA57421-2DFE-4292-AD99-1172FD2E86F5}.Release|x86.ActiveCfg = Release|Any CPU
 		{7FA57421-2DFE-4292-AD99-1172FD2E86F5}.Release|x86.Build.0 = Release|Any CPU
+		{E7BBCD12-29C4-4272-A972-6C28F8905C34}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E7BBCD12-29C4-4272-A972-6C28F8905C34}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E7BBCD12-29C4-4272-A972-6C28F8905C34}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{E7BBCD12-29C4-4272-A972-6C28F8905C34}.Debug|ARM.Build.0 = Debug|Any CPU
+		{E7BBCD12-29C4-4272-A972-6C28F8905C34}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{E7BBCD12-29C4-4272-A972-6C28F8905C34}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{E7BBCD12-29C4-4272-A972-6C28F8905C34}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{E7BBCD12-29C4-4272-A972-6C28F8905C34}.Debug|x64.Build.0 = Debug|Any CPU
+		{E7BBCD12-29C4-4272-A972-6C28F8905C34}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{E7BBCD12-29C4-4272-A972-6C28F8905C34}.Debug|x86.Build.0 = Debug|Any CPU
+		{E7BBCD12-29C4-4272-A972-6C28F8905C34}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E7BBCD12-29C4-4272-A972-6C28F8905C34}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E7BBCD12-29C4-4272-A972-6C28F8905C34}.Release|ARM.ActiveCfg = Release|Any CPU
+		{E7BBCD12-29C4-4272-A972-6C28F8905C34}.Release|ARM.Build.0 = Release|Any CPU
+		{E7BBCD12-29C4-4272-A972-6C28F8905C34}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{E7BBCD12-29C4-4272-A972-6C28F8905C34}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{E7BBCD12-29C4-4272-A972-6C28F8905C34}.Release|x64.ActiveCfg = Release|Any CPU
+		{E7BBCD12-29C4-4272-A972-6C28F8905C34}.Release|x64.Build.0 = Release|Any CPU
+		{E7BBCD12-29C4-4272-A972-6C28F8905C34}.Release|x86.ActiveCfg = Release|Any CPU
+		{E7BBCD12-29C4-4272-A972-6C28F8905C34}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -2585,6 +2607,7 @@ Global
 		{296512EA-C5DE-43C8-A1C5-B20CCF4B7F60} = {F3F09E8E-51C5-4F8B-A4F4-E17F8FC204C1}
 		{1A5CE219-E61B-4CF4-91EF-DBCC18A7FBC0} = {E2EEE209-6C34-4FDD-9ADA-89A2CAC5E78F}
 		{7FA57421-2DFE-4292-AD99-1172FD2E86F5} = {E2EEE209-6C34-4FDD-9ADA-89A2CAC5E78F}
+		{E7BBCD12-29C4-4272-A972-6C28F8905C34} = {0EA3132A-669C-4228-8684-3B98AE876BEF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {32CF1367-B83E-4CAD-8329-0D1C73AF59F4}

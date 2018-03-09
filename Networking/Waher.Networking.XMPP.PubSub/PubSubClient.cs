@@ -6,7 +6,7 @@ using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Networking.XMPP.DataForms;
-using Waher.Networking.XMPP.DataForms.FieldTypes;
+using Waher.Networking.XMPP.ResultSetManagement;
 
 namespace Waher.Networking.XMPP.PubSub
 {
@@ -1256,6 +1256,113 @@ namespace Waher.Networking.XMPP.PubSub
 		/// Event raised whenever an item retraction notification has been received.
 		/// </summary>
 		public event ItemNotificationEventHandler ItemRetracted = null;
+
+		#endregion
+
+		#region Get Items
+
+		/// <summary>
+		/// Gets items from a node.
+		/// </summary>
+		/// <param name="NodeName">Name of node.</param>
+		/// <param name="Callback">Method to call when operation completes.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void GetItems(string NodeName, ItemsEventHandler Callback, object State)
+		{
+			this.GetItems(NodeName, null, null, Callback, State);
+		}
+
+		/// <summary>
+		/// Gets items from a node.
+		/// </summary>
+		/// <param name="NodeName">Name of node.</param>
+		/// <param name="Page">Query restriction, for pagination.</param>
+		/// <param name="Callback">Method to call when operation completes.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void GetItems(string NodeName, RestrictedQuery Page, ItemsEventHandler Callback, object State)
+		{
+			this.GetItems(NodeName, null, Page, Callback, State);
+		}
+
+		/// <summary>
+		/// Gets items from a node.
+		/// </summary>
+		/// <param name="NodeName">Name of node.</param>
+		/// <param name="ItemIds">Item identities.</param>
+		/// <param name="Callback">Method to call when operation completes.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void GetItems(string NodeName, string[] ItemIds, ItemsEventHandler Callback, object State)
+		{
+			this.GetItems(NodeName, ItemIds, null, Callback, State);
+		}
+
+		/// <summary>
+		/// Gets items from a node.
+		/// </summary>
+		/// <param name="NodeName">Name of node.</param>
+		/// <param name="ItemIds">Item identities.</param>
+		/// <param name="Page">Query restriction, for pagination.</param>
+		/// <param name="Callback">Method to call when operation completes.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		private void GetItems(string NodeName, string[] ItemIds, RestrictedQuery Page, ItemsEventHandler Callback, object State)
+		{
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<pubsub xmlns='");
+			Xml.Append(NamespacePubSub);
+			Xml.Append("'><items node='");
+			Xml.Append(XML.Encode(NodeName));
+			Xml.Append("'/>");
+
+			if (Page != null)
+				Page.Append(Xml);
+
+			Xml.Append("</pubsub>");
+
+			this.client.SendIqGet(this.componentAddress, Xml.ToString(), (sender, e) =>
+			{
+				List<PubSubItem> Items = new List<PubSubItem>();
+				ResultPage ResultPage = null;
+				XmlElement E;
+
+				if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "pubsub" && E.NamespaceURI == NamespacePubSub)
+				{
+					foreach (XmlNode N in E.ChildNodes)
+					{
+						if (N is XmlElement E2)
+						{
+							switch (E2.LocalName)
+							{
+								case "items":
+									if (E2.NamespaceURI == NamespacePubSub &&
+										XML.Attribute(E2, "node") == NodeName)
+									{
+										foreach (XmlNode N2 in E2.ChildNodes)
+										{
+											if (N2 is XmlElement E3 && E3.LocalName == "item")
+												Items.Add(new PubSubItem(NodeName, E3));
+										}
+									}
+									break;
+
+								case "set":
+									ResultPage = new ResultPage(E2);
+									break;
+							}
+						}
+					}
+				}
+
+				try
+				{
+					Callback?.Invoke(this, new ItemsEventArgs(NodeName, Items.ToArray(), ResultPage, e));
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			}, null);
+		}
 
 		#endregion
 

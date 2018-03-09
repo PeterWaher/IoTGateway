@@ -200,6 +200,8 @@
     <Compile Include="PresenceEventArgs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QoSLevel.cs" />
+    <Compile Include="ResultSetManagement\RestrictedQuery.cs" />
+    <Compile Include="ResultSetManagement\ResultPage.cs" />
     <Compile Include="RosterItem.cs" />
     <Compile Include="Search\SearchFormEventArgs.cs" />
     <Compile Include="Search\SearchResultEventArgs.cs" />
@@ -315,6 +317,7 @@ xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP\InBandBytestreams\*.cs" "$
 xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP\Abuse\*.cs" "$(ProjectDir)Abuse" /S /R /Y
 xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP\BitsOfBinary\*.cs" "$(ProjectDir)BitsOfBinary" /S /R /Y
 xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP\HttpFileUpload\*.cs" "$(ProjectDir)HttpFileUpload" /S /R /Y
+xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP\ResultSetManagement\*.cs" "$(ProjectDir)ResultSetManagement" /S /R /Y
 </PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>

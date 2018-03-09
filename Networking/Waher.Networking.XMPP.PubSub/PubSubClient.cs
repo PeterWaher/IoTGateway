@@ -26,6 +26,16 @@ namespace Waher.Networking.XMPP.PubSub
 		/// </summary>
 		public const string NamespacePubSubOwner = "http://jabber.org/protocol/pubsub#owner";
 
+		/// <summary>
+		/// http://jabber.org/protocol/pubsub#event
+		/// </summary>
+		public const string NamespacePubSubEvents = "http://jabber.org/protocol/pubsub#event";
+
+		/// <summary>
+		/// http://jabber.org/protocol/shim
+		/// </summary>
+		public const string NamespaceStanzaHeaders = "http://jabber.org/protocol/shim";
+
 		private string componentAddress;
 
 		/// <summary>
@@ -38,6 +48,18 @@ namespace Waher.Networking.XMPP.PubSub
 			: base(Client)
 		{
 			this.componentAddress = ComponentAddress;
+
+			Client.RegisterMessageHandler("event", NamespacePubSubEvents, this.EventNotificationHandler, true);
+		}
+
+		/// <summary>
+		/// <see cref="IDisposable.Dispose"/>
+		/// </summary>
+		public override void Dispose()
+		{
+			Client.UnregisterMessageHandler("event", NamespacePubSubEvents, this.EventNotificationHandler, true);
+
+			base.Dispose();
 		}
 
 		/// <summary>
@@ -46,14 +68,6 @@ namespace Waher.Networking.XMPP.PubSub
 		public string ComponentAddress
 		{
 			get { return this.componentAddress; }
-		}
-
-		/// <summary>
-		/// <see cref="IDisposable.Dispose"/>
-		/// </summary>
-		public override void Dispose()
-		{
-			base.Dispose();
 		}
 
 		/// <summary>
@@ -621,7 +635,7 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <param name="NodeName">Name of node.</param>
 		/// <param name="Callback">Method to call when operation has completed.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void GetSubscriptionOptions(string NodeName, 
+		public void GetSubscriptionOptions(string NodeName,
 			SubscriptionOptionsEventHandler Callback, object State)
 		{
 			this.GetSubscriptionOptions(NodeName, null, null, Callback, State);
@@ -634,7 +648,7 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <param name="Jid">JID, if different from the bare JID of the client.</param>
 		/// <param name="Callback">Method to call when operation has completed.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void GetSubscriptionOptions(string NodeName, string Jid, 
+		public void GetSubscriptionOptions(string NodeName, string Jid,
 			SubscriptionOptionsEventHandler Callback, object State)
 		{
 			this.GetSubscriptionOptions(NodeName, Jid, null, Callback, State);
@@ -766,7 +780,7 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <param name="Options">Subscription options to set.</param>
 		/// <param name="Callback">Method to call when operation has completed.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void SetSubscriptionOptions(string NodeName, string Jid, 
+		public void SetSubscriptionOptions(string NodeName, string Jid,
 			DataForm Options, SubscriptionOptionsEventHandler Callback, object State)
 		{
 			this.SetSubscriptionOptions(NodeName, Jid, null, Options, Callback, State);
@@ -796,7 +810,7 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <param name="Options">Subscription options to set.</param>
 		/// <param name="Callback">Method to call when operation has completed.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void SetSubscriptionOptions(string NodeName, string Jid, string SubscriptionId, 
+		public void SetSubscriptionOptions(string NodeName, string Jid, string SubscriptionId,
 			DataForm Options, SubscriptionOptionsEventHandler Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
@@ -996,7 +1010,7 @@ namespace Waher.Networking.XMPP.PubSub
 										break;
 									}
 
-									if (!string.IsNullOrEmpty(SubscriptionId) && 
+									if (!string.IsNullOrEmpty(SubscriptionId) &&
 										XML.Attribute(E2, "subid", SubscriptionId) != SubscriptionId)
 									{
 										e.Ok = false;
@@ -1026,6 +1040,171 @@ namespace Waher.Networking.XMPP.PubSub
 
 			}, null);
 		}
+
+		#endregion
+
+		#region Publish Item
+
+		/// <summary>
+		/// Publishes an item on a node.
+		/// </summary>
+		/// <param name="Node">Node name.</param>
+		/// <param name="Callback">Method to call when operation completes.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void Publish(string Node, ItemResultEventHandler Callback, object State)
+		{
+			this.Publish(Node, string.Empty, string.Empty, Callback, State);
+		}
+
+		/// <summary>
+		/// Publishes an item on a node.
+		/// </summary>
+		/// <param name="Node">Node name.</param>
+		/// <param name="PayloadXml">Payload XML.</param>
+		/// <param name="Callback">Method to call when operation completes.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void Publish(string Node, string PayloadXml, ItemResultEventHandler Callback, object State)
+		{
+			this.Publish(Node, string.Empty, PayloadXml, Callback, State);
+		}
+
+		/// <summary>
+		/// Publishes an item on a node.
+		/// </summary>
+		/// <param name="Node">Node name.</param>
+		/// <param name="ItemId">Item identity, if available. If used, and an existing item
+		/// is available with that identity, it will be updated with the new content.</param>
+		/// <param name="PayloadXml">Payload XML.</param>
+		/// <param name="Callback">Method to call when operation completes.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void Publish(string Node, string ItemId, string PayloadXml, ItemResultEventHandler Callback, object State)
+		{
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<pubsub xmlns='");
+			Xml.Append(NamespacePubSub);
+			Xml.Append("'><publish node='");
+			Xml.Append(XML.Encode(Node));
+
+			if (string.IsNullOrEmpty(ItemId) && string.IsNullOrEmpty(PayloadXml))
+				Xml.Append("'/>");
+			else
+			{
+				Xml.Append("'><item");
+
+				if (!string.IsNullOrEmpty(ItemId))
+				{
+					Xml.Append(" id='");
+					Xml.Append(XML.Encode(ItemId));
+					Xml.Append('\'');
+				}
+
+				if (string.IsNullOrEmpty(PayloadXml))
+					Xml.Append("/>");
+				else
+				{
+					Xml.Append('>');
+					Xml.Append(PayloadXml);
+					Xml.Append("</item>");
+				}
+
+				Xml.Append("</publish>");
+			}
+
+			Xml.Append("</pubsub>");
+
+			this.client.SendIqSet(this.componentAddress, Xml.ToString(), (sender, e) =>
+			{
+				string NodeName = string.Empty;
+				XmlElement E;
+
+				if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "pubsub" &&
+					E.NamespaceURI == NamespacePubSub)
+				{
+					foreach (XmlNode N2 in E.ChildNodes)
+					{
+						if (N2 is XmlElement E2 && E2.LocalName == "publish")
+						{
+							NodeName = XML.Attribute(E2, "node");
+
+							foreach (XmlNode N3 in E2.ChildNodes)
+							{
+								if (N3 is XmlElement E3 && E3.LocalName == "item")
+								{
+									ItemId = XML.Attribute(E3, "id");
+									break;
+								}
+							}
+						}
+					}
+				}
+
+				try
+				{
+					Callback?.Invoke(this, new ItemResultEventArgs(NodeName, ItemId, e));
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			}, null);
+		}
+
+		private void EventNotificationHandler(object Sender, MessageEventArgs e)
+		{
+			string SubscriptionId = string.Empty;
+
+			foreach (XmlNode N in e.Message.ChildNodes)
+			{
+				if (N is XmlElement E && E.LocalName == "headers" && E.NamespaceURI == NamespaceStanzaHeaders)
+				{
+					foreach (XmlNode N2 in E.ChildNodes)
+					{
+						if (N2 is XmlElement E2 && E2.LocalName == "header" && E2.NamespaceURI == NamespaceStanzaHeaders
+							&& XML.Attribute(E2, "name") == "SubID")
+						{
+							SubscriptionId = E2.InnerText;
+							break;
+						}
+					}
+
+					if (!string.IsNullOrEmpty(SubscriptionId))
+						break;
+				}
+			}
+
+			foreach (XmlNode N in e.Content.ChildNodes)
+			{
+				if (N is XmlElement E && E.LocalName == "items")
+				{
+					string NodeName = XML.Attribute(E, "node");
+
+					foreach (XmlNode N2 in E.ChildNodes)
+					{
+						if (N2 is XmlElement E2 && E2.LocalName == "item")
+						{
+							string ItemId = XML.Attribute(E2, "id");
+							string Publisher = XML.Attribute(E2, "publisher");
+							ItemNotificationEventArgs e2 = new ItemNotificationEventArgs(NodeName, ItemId, SubscriptionId, Publisher, E2, e);
+
+							try
+							{
+								this.ItemNotification?.Invoke(this, e2);
+							}
+							catch (Exception ex)
+							{
+								Log.Critical(ex);
+							}
+						}
+					}
+				}
+			}
+		}
+
+		/// <summary>
+		/// Event raised whenever an item notification has been received.
+		/// </summary>
+		public event ItemNotificationEventHandler ItemNotification = null;
 
 		#endregion
 

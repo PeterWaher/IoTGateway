@@ -59,7 +59,6 @@ namespace Waher.Networking.XMPP.PubSub
 		public SubscriptionOptions Options
 		{
 			get { return this.options; }
-			set { this.options = value; }
 		}
 	}
 }

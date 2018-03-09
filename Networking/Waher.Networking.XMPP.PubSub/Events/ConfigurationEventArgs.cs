@@ -48,7 +48,6 @@ namespace Waher.Networking.XMPP.PubSub
 		public NodeConfiguration Configuration
 		{
 			get { return this.configuration; }
-			set { this.configuration = value; }
 		}
     }
 }

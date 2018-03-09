@@ -47,7 +47,6 @@ namespace Waher.Networking.XMPP.PubSub
 		public OptionsAvailability OptionsSupported
 		{
 			get { return this.availability; }
-			set { this.availability = value; }
 		}
 
 		/// <summary>
@@ -56,7 +55,6 @@ namespace Waher.Networking.XMPP.PubSub
 		public DateTime Expires
 		{
 			get { return this.expires; }
-			set { this.expires = value; }
 		}
 
 		/// <summary>
@@ -65,7 +63,6 @@ namespace Waher.Networking.XMPP.PubSub
 		public string SubscriptionId
 		{
 			get { return this.subscriptionId; }
-			set { this.subscriptionId = value; }
 		}
 	}
 }

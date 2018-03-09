@@ -1360,7 +1360,7 @@ namespace Waher.Persistence.Files
 				while ((Leaf = await this.FindLeafNodeLocked(ObjectId)) == null);
 
 				if (!Serializer.TrySetObjectId(Object, ObjectId))
-					throw new NotSupportedException("Unable to set Object ID: Unsupported type.");
+					throw new NotSupportedException("Unable to set Object ID.");
 			}
 
 			return new Tuple<Guid, BlockInfo>(ObjectId, Leaf);

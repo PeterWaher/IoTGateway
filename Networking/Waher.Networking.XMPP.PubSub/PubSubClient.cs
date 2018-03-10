@@ -353,6 +353,10 @@ namespace Waher.Networking.XMPP.PubSub
 			}, State);
 		}
 
+		#endregion
+
+		#region Delete Node
+
 		/// <summary>
 		/// Deletes a node.
 		/// </summary>
@@ -1175,46 +1179,65 @@ namespace Waher.Networking.XMPP.PubSub
 
 			foreach (XmlNode N in e.Content.ChildNodes)
 			{
-				if (N is XmlElement E && E.LocalName == "items")
+				if (N is XmlElement E)
 				{
-					string NodeName = XML.Attribute(E, "node");
-
-					foreach (XmlNode N2 in E.ChildNodes)
+					switch (E.LocalName)
 					{
-						if (N2 is XmlElement E2)
-						{
-							switch (E2.LocalName)
+						case "items":
+							string NodeName = XML.Attribute(E, "node");
+
+							foreach (XmlNode N2 in E.ChildNodes)
 							{
-								case "item":
-									string ItemId = XML.Attribute(E2, "id");
-									string Publisher = XML.Attribute(E2, "publisher");
-									ItemNotificationEventArgs e2 = new ItemNotificationEventArgs(NodeName, ItemId, SubscriptionId, Publisher, E2, e);
+								if (N2 is XmlElement E2)
+								{
+									switch (E2.LocalName)
+									{
+										case "item":
+											string ItemId = XML.Attribute(E2, "id");
+											string Publisher = XML.Attribute(E2, "publisher");
+											ItemNotificationEventArgs e2 = new ItemNotificationEventArgs(NodeName, ItemId, SubscriptionId, Publisher, E2, e);
 
-									try
-									{
-										this.ItemNotification?.Invoke(this, e2);
-									}
-									catch (Exception ex)
-									{
-										Log.Critical(ex);
-									}
-									break;
+											try
+											{
+												this.ItemNotification?.Invoke(this, e2);
+											}
+											catch (Exception ex)
+											{
+												Log.Critical(ex);
+											}
+											break;
 
-								case "retract":
-									ItemId = XML.Attribute(E2, "id");
-									e2 = new ItemNotificationEventArgs(NodeName, ItemId, SubscriptionId, string.Empty, E2, e);
+										case "retract":
+											ItemId = XML.Attribute(E2, "id");
+											e2 = new ItemNotificationEventArgs(NodeName, ItemId, SubscriptionId, string.Empty, E2, e);
 
-									try
-									{
-										this.ItemRetracted?.Invoke(this, e2);
+											try
+											{
+												this.ItemRetracted?.Invoke(this, e2);
+											}
+											catch (Exception ex)
+											{
+												Log.Critical(ex);
+											}
+											break;
 									}
-									catch (Exception ex)
-									{
-										Log.Critical(ex);
-									}
-									break;
+								}
 							}
-						}
+							break;
+
+						case "purge":
+							NodeName = XML.Attribute(E, "node");
+							NodeNotificationEventArgs e3 = new NodeNotificationEventArgs(NodeName, SubscriptionId, e);
+
+							try
+							{
+								this.NodePurged?.Invoke(this, e3);
+							}
+							catch (Exception ex)
+							{
+								Log.Critical(ex);
+							}
+							break;
 					}
 				}
 			}
@@ -1397,6 +1420,44 @@ namespace Waher.Networking.XMPP.PubSub
 		{
 			this.GetItems(NodeName, null, null, Count, Callback, State);
 		}
+
+		#endregion
+
+		#region Purge Node
+
+		/// <summary>
+		/// Purges a node (deletes all items persisted on the node).
+		/// </summary>
+		/// <param name="Name">Name of node.</param>
+		/// <param name="Callback">Method to call when operation has completed.</param>
+		/// <param name="State">State parameter to send to the callback method.</param>
+		public void PurgeNode(string Name, NodeEventHandler Callback, object State)
+		{
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<pubsub xmlns='");
+			Xml.Append(NamespacePubSubOwner);
+			Xml.Append("'><purge node='");
+			Xml.Append(XML.Encode(Name));
+			Xml.Append("'/></pubsub>");
+
+			this.client.SendIqSet(this.componentAddress, Xml.ToString(), (sender, e) =>
+			{
+				try
+				{
+					Callback?.Invoke(this, new NodeEventArgs(Name, e));
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			}, State);
+		}
+
+		/// <summary>
+		/// Event raised whenever a node has been purged and all its items have been deleted.
+		/// </summary>
+		public event NodeNotificationEventHandler NodePurged = null;
 
 		#endregion
 

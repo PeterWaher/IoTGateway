@@ -14,11 +14,9 @@ namespace Waher.Networking.XMPP.PubSub
 	/// <summary>
 	/// Event argument for item notification events.
 	/// </summary>
-	public class ItemNotificationEventArgs : MessageEventArgs
+	public class ItemNotificationEventArgs : NodeNotificationEventArgs
     {
-		private string nodeName;
 		private string itemId;
-		private string subscriptionId;
 		private string publisher;
 		private XmlElement item;
 
@@ -33,21 +31,11 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <param name="e">Message event arguments</param>
 		public ItemNotificationEventArgs(string NodeName, string ItemId, string SubscriptionId,
 			string Publisher, XmlElement Item, MessageEventArgs e)
-			: base(e)
+			: base(NodeName, SubscriptionId, e)
 		{
-			this.nodeName = NodeName;
 			this.itemId = ItemId;
-			this.subscriptionId = SubscriptionId;
 			this.publisher = Publisher;
 			this.item = Item;
-		}
-
-		/// <summary>
-		/// Name of node.
-		/// </summary>
-		public string NodeName
-		{
-			get { return this.nodeName; }
 		}
 
 		/// <summary>
@@ -56,14 +44,6 @@ namespace Waher.Networking.XMPP.PubSub
 		public string ItemId
 		{
 			get { return this.itemId; }
-		}
-
-		/// <summary>
-		/// Subscription identity, if provided in event notification.
-		/// </summary>
-		public string SubscriptionId
-		{
-			get { return this.subscriptionId; }
 		}
 
 		/// <summary>

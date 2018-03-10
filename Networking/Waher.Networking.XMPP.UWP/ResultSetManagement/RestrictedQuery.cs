@@ -24,6 +24,28 @@ namespace Waher.Networking.XMPP.ResultSetManagement
 		/// <summary>
 		/// Contains information about a restricted query, as deinfed in XEP-0059: Result Set Management
 		/// </summary>
+		public RestrictedQuery()
+		{
+		}
+
+		/// <summary>
+		/// Contains information about a restricted query, as deinfed in XEP-0059: Result Set Management
+		/// </summary>
+		/// <param name="After">Return items after this key.</param>
+		/// <param name="Before">Return items before this key.</param>
+		/// <param name="Index">Request results from this index.</param>
+		/// <param name="Max">If result set should be limited in size.</param>
+		public RestrictedQuery(string After, string Before, int? Index, int? Max)
+		{
+			this.after = After;
+			this.before = Before;
+			this.index = Index;
+			this.max = Max;
+		}
+
+		/// <summary>
+		/// Contains information about a restricted query, as deinfed in XEP-0059: Result Set Management
+		/// </summary>
 		/// <param name="Rsm">XML definition</param>
 		public RestrictedQuery(XmlElement Rsm)
 		{
@@ -61,6 +83,7 @@ namespace Waher.Networking.XMPP.ResultSetManagement
 		public string After
 		{
 			get { return this.after; }
+			set { this.after = value; }
 		}
 
 		/// <summary>
@@ -69,6 +92,7 @@ namespace Waher.Networking.XMPP.ResultSetManagement
 		public string Before
 		{
 			get { return this.before; }
+			set { this.before = value; }
 		}
 
 		/// <summary>
@@ -77,6 +101,7 @@ namespace Waher.Networking.XMPP.ResultSetManagement
 		public int? Index
 		{
 			get { return this.index; }
+			set { this.index = value; }
 		}
 
 		/// <summary>
@@ -85,6 +110,7 @@ namespace Waher.Networking.XMPP.ResultSetManagement
 		public int? Max
 		{
 			get { return this.max; }
+			set { this.max = value; }
 		}
 
 		/// <summary>

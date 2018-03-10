@@ -1312,7 +1312,22 @@ namespace Waher.Networking.XMPP.PubSub
 			Xml.Append(NamespacePubSub);
 			Xml.Append("'><items node='");
 			Xml.Append(XML.Encode(NodeName));
-			Xml.Append("'/>");
+
+			if (ItemIds == null)
+				Xml.Append("'/>");
+			else
+			{
+				Xml.Append("'>");
+
+				foreach (string ItemId in ItemIds)
+				{
+					Xml.Append("<item id='");
+					Xml.Append(XML.Encode(ItemId));
+					Xml.Append("'/>");
+				}
+
+				Xml.Append("</items>");
+			}
 
 			if (Page != null)
 				Page.Append(Xml);

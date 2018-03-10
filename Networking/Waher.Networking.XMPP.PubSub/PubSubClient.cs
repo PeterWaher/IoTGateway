@@ -1269,7 +1269,7 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void GetItems(string NodeName, ItemsEventHandler Callback, object State)
 		{
-			this.GetItems(NodeName, null, null, Callback, State);
+			this.GetItems(NodeName, null, null, null, Callback, State);
 		}
 
 		/// <summary>
@@ -1281,7 +1281,7 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void GetItems(string NodeName, RestrictedQuery Page, ItemsEventHandler Callback, object State)
 		{
-			this.GetItems(NodeName, null, Page, Callback, State);
+			this.GetItems(NodeName, null, Page, null, Callback, State);
 		}
 
 		/// <summary>
@@ -1293,7 +1293,7 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void GetItems(string NodeName, string[] ItemIds, ItemsEventHandler Callback, object State)
 		{
-			this.GetItems(NodeName, ItemIds, null, Callback, State);
+			this.GetItems(NodeName, ItemIds, null, null, Callback, State);
 		}
 
 		/// <summary>
@@ -1302,9 +1302,10 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <param name="NodeName">Name of node.</param>
 		/// <param name="ItemIds">Item identities.</param>
 		/// <param name="Page">Query restriction, for pagination.</param>
+		/// <param name="Count">Get this number of latest items.</param>
 		/// <param name="Callback">Method to call when operation completes.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		private void GetItems(string NodeName, string[] ItemIds, RestrictedQuery Page, ItemsEventHandler Callback, object State)
+		private void GetItems(string NodeName, string[] ItemIds, RestrictedQuery Page, int? Count, ItemsEventHandler Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -1312,6 +1313,12 @@ namespace Waher.Networking.XMPP.PubSub
 			Xml.Append(NamespacePubSub);
 			Xml.Append("'><items node='");
 			Xml.Append(XML.Encode(NodeName));
+
+			if (Count.HasValue)
+			{
+				Xml.Append("' max_items='");
+				Xml.Append(Count.Value.ToString());
+			}
 
 			if (ItemIds == null)
 				Xml.Append("'/>");
@@ -1377,6 +1384,18 @@ namespace Waher.Networking.XMPP.PubSub
 					Log.Critical(ex);
 				}
 			}, null);
+		}
+
+		/// <summary>
+		/// Gets the latest items from a node.
+		/// </summary>
+		/// <param name="NodeName">Name of node.</param>
+		/// <param name="Count">Number of items to get.</param>
+		/// <param name="Callback">Method to call when operation completes.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void GetLatestItems(string NodeName, int Count, ItemsEventHandler Callback, object State)
+		{
+			this.GetItems(NodeName, null, null, Count, Callback, State);
 		}
 
 		#endregion

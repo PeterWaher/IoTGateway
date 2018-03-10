@@ -4744,6 +4744,70 @@ namespace Waher.Persistence.Files
 		}
 
 		/// <summary>
+		/// Finds the best index for finding objects using  a given property.
+		/// </summary>
+		/// <param name="BestNrFields">Number of index fields used in best index.</param>
+		/// <param name="Property">Property to search on. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the corresponding field name by a hyphen (minus) sign.</param>
+		/// <param name="SortOrder">Sort order result is to be presented with.</param>
+		/// <returns>Best index to use for the search. If no index is found matching the properties, null is returned.</returns>
+		internal IndexBTreeFile FindBestIndex(out int BestNrFields, string Property, string[] SortOrder)
+		{
+			string s, s2;
+
+			if (SortOrder == null || SortOrder.Length <= 1)
+				return this.FindBestIndex(out BestNrFields, Property);
+
+			s = SortOrder[0];
+			if (s.StartsWith("-"))
+				s = s.Substring(1);
+
+			if (Property.StartsWith("-"))
+				s2 = Property.Substring(1);
+			else
+				s2 = Property;
+
+			if (s2 != s)
+				return this.FindBestIndex(out BestNrFields, Property);
+
+			return this.FindBestIndex(out BestNrFields, SortOrder);
+		}
+
+		/// <summary>
+		/// Finds the best index for finding objects using  a given set of properties. The method assumes the most restrictive
+		/// property is mentioned first in <paramref name="Properties"/>.
+		/// </summary>
+		/// <param name="BestNrFields">Number of index fields used in best index.</param>
+		/// <param name="Properties">Properties to search on. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the corresponding field name by a hyphen (minus) sign.</param>
+		/// <param name="SortOrder">Sort order result is to be presented with.</param>
+		/// <returns>Best index to use for the search. If no index is found matching the properties, null is returned.</returns>
+		internal IndexBTreeFile FindBestIndex(out int BestNrFields, string[] Properties, string[] SortOrder)
+		{
+			string s, s2;
+			int i, c;
+
+			if (SortOrder == null || SortOrder.Length <= (c = Properties.Length))
+				return this.FindBestIndex(out BestNrFields, Properties);
+
+			for (i = 0; i < c; i++)
+			{
+				s = SortOrder[i];
+				if (s.StartsWith("-"))
+					s = s.Substring(1);
+
+				s2 = Properties[i];
+				if (s2.StartsWith("-"))
+					s2 = s2.Substring(1);
+
+				if (s2 != s)
+					return this.FindBestIndex(out BestNrFields, Properties);
+			}
+
+			return this.FindBestIndex(out BestNrFields, SortOrder);
+		}
+
+		/// <summary>
 		/// Finds the best index for finding objects using  a given set of properties. The method assumes the most restrictive
 		/// property is mentioned first in <paramref name="Properties"/>.
 		/// </summary>
@@ -4889,7 +4953,7 @@ namespace Waher.Persistence.Files
 					Result = await this.ConvertFilterToCursor<T>(Filter.Normalize(), Locked, SortOrder);
 
 					if (SortOrder != null && SortOrder.Length > 0)
-						Result = await this.Sort<T>(Result, this.ConvertFilter(Filter)?.ConstantFields, SortOrder, true);	// false);
+						Result = await this.Sort<T>(Result, this.ConvertFilter(Filter)?.ConstantFields, SortOrder, true);   // false);
 
 					if (Offset > 0 || MaxCount < int.MaxValue)
 						Result = new Searching.PagesCursor<T>(Offset, MaxCount, Result, this.timeoutMilliseconds);
@@ -5016,7 +5080,7 @@ namespace Waher.Persistence.Files
 						Index = null;
 					}
 					else
-						Index = this.FindBestIndex(out NrFields, Properties.ToArray());
+						Index = this.FindBestIndex(out NrFields, Properties.ToArray(), SortOrder);
 
 					if (Index == null)
 					{
@@ -5185,7 +5249,7 @@ namespace Waher.Persistence.Files
 			else if (Filter is FilterFieldValue FilterFieldValue)
 			{
 				object Value = FilterFieldValue.Value;
-				IndexBTreeFile Index = this.FindBestIndex(FilterFieldValue.FieldName);
+				IndexBTreeFile Index = this.FindBestIndex(out int NrFields, FilterFieldValue.FieldName, SortOrder);
 				ICursor<T> Cursor;
 
 				if (Index == null)
@@ -5315,7 +5379,7 @@ namespace Waher.Persistence.Files
 				if (Filter is FilterFieldLikeRegEx FilterFieldLikeRegEx)
 				{
 					Searching.FilterFieldLikeRegEx FilterFieldLikeRegEx2 = (Searching.FilterFieldLikeRegEx)this.ConvertFilter(Filter);
-					IndexBTreeFile Index = this.FindBestIndex(FilterFieldLikeRegEx.FieldName);
+					IndexBTreeFile Index = this.FindBestIndex(out int NrFields, FilterFieldLikeRegEx.FieldName, SortOrder);
 
 					string ConstantPrefix = Index == null ? string.Empty : this.GetRegExConstantPrefix(FilterFieldLikeRegEx.RegularExpression, FilterFieldLikeRegEx2.Regex);
 

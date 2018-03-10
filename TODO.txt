@@ -37,7 +37,6 @@ Authorization:
 
 
 DB Optimizations:
-* ta hänsyn till Sort Order när man väljer Best index.
 * PagedEnumerator: Om offset, försök hoppa snabbt frammåt via rank, istället för att sekventiellt läsa in alla objekt.
 
 

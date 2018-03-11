@@ -196,6 +196,7 @@
     <Compile Include="IqResultEventArgs.cs" />
     <Compile Include="IXmppExtension.cs" />
     <Compile Include="MessageEventArgs.cs" />
+    <Compile Include="MessageFormEventArgs.cs" />
     <Compile Include="PendingRequest.cs" />
     <Compile Include="PresenceEventArgs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

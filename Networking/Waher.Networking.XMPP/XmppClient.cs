@@ -85,6 +85,13 @@ namespace Waher.Networking.XMPP
 	public delegate void MessageEventHandler(object Sender, MessageEventArgs e);
 
 	/// <summary>
+	/// Delegate for Message Form events.
+	/// </summary>
+	/// <param name="Sender">Sender of event.</param>
+	/// <param name="e">Event arguments.</param>
+	public delegate void MessageFormEventHandler(object Sender, MessageFormEventArgs e);
+
+	/// <summary>
 	/// Delegate for Roster Item events.
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
@@ -225,6 +232,7 @@ namespace Waher.Networking.XMPP
 		private Dictionary<string, IqEventHandler> iqGetHandlers = new Dictionary<string, IqEventHandler>();
 		private Dictionary<string, IqEventHandler> iqSetHandlers = new Dictionary<string, IqEventHandler>();
 		private Dictionary<string, MessageEventHandler> messageHandlers = new Dictionary<string, MessageEventHandler>();
+		private Dictionary<string, MessageFormEventHandler> messageFormHandlers = new Dictionary<string, MessageFormEventHandler>();
 		private Dictionary<string, PresenceEventHandler> presenceHandlers = new Dictionary<string, PresenceEventHandler>();
 		private Dictionary<string, MessageEventArgs> receivedMessages = new Dictionary<string, MessageEventArgs>();
 		private SortedDictionary<string, bool> clientFeatures = new SortedDictionary<string, bool>();
@@ -2021,15 +2029,35 @@ namespace Waher.Networking.XMPP
 		/// <param name="e">Message event arguments.</param>
 		public void ProcessMessage(MessageEventArgs e)
 		{
-			MessageEventHandler h = null;
+			MessageFormEventHandler FormHandler = null;
+			MessageEventHandler MessageHandler = null;
+			DataForm Form = null;
+			string FormType = null;
 			string Key;
 
 			lock (this.synchObject)
 			{
 				foreach (XmlElement E in e.Message.ChildNodes)
 				{
+					if (FormHandler == null && E.LocalName == "x" && E.NamespaceURI == NamespaceData)
+					{
+						Form = new DataForm(this, E, this.MessageFormSubmitted, this.MessageFormCancelled, e.From, e.To)
+						{
+							State = e
+						};
+
+						Field FormTypeField = Form["FORM_TYPE"];
+						FormType = FormTypeField?.ValueString;
+
+						if (!string.IsNullOrEmpty(FormType) && this.messageFormHandlers.TryGetValue(FormType, out FormHandler))
+						{
+							e.Content = E;
+							break;
+						}
+					}
+
 					Key = E.LocalName + " " + E.NamespaceURI;
-					if (this.messageHandlers.TryGetValue(Key, out h))
+					if (this.messageHandlers.TryGetValue(Key, out MessageHandler))
 					{
 						e.Content = E;
 						break;
@@ -2044,55 +2072,90 @@ namespace Waher.Networking.XMPP
 						}
 					}
 					else
-						h = null;
+						MessageHandler = null;
 				}
 			}
 
-			if (h != null)
-				this.Information(h.GetMethodInfo().Name);
+			if (MessageHandler != null)
+				this.Information(MessageHandler.GetMethodInfo().Name);
+			else if (FormHandler != null)
+				this.Information(FormHandler.GetMethodInfo().Name);
 			else
 			{
 				switch (e.Type)
 				{
 					case MessageType.Chat:
 						this.Information("OnChatMessage()");
-						h = this.OnChatMessage;
+						MessageHandler = this.OnChatMessage;
 						break;
 
 					case MessageType.Error:
 						this.Information("OnErrorMessage()");
-						h = this.OnErrorMessage;
+						MessageHandler = this.OnErrorMessage;
 						break;
 
 					case MessageType.GroupChat:
 						this.Information("OnGroupChatMessage()");
-						h = this.OnGroupChatMessage;
+						MessageHandler = this.OnGroupChatMessage;
 						break;
 
 					case MessageType.Headline:
 						this.Information("OnHeadlineMessage()");
-						h = this.OnHeadlineMessage;
+						MessageHandler = this.OnHeadlineMessage;
 						break;
 
 					case MessageType.Normal:
 					default:
 						this.Information("OnNormalMessage()");
-						h = this.OnNormalMessage;
+						MessageHandler = this.OnNormalMessage;
 						break;
 				}
 			}
 
-			if (h != null)
+			if (MessageHandler != null)
 			{
 				try
 				{
-					h(this, e);
+					MessageHandler(this, e);
 				}
 				catch (Exception ex)
 				{
 					this.Exception(ex);
 				}
 			}
+			else if (FormHandler != null)
+			{
+				try
+				{
+					FormHandler(this, new MessageFormEventArgs(Form, FormType, e));
+				}
+				catch (Exception ex)
+				{
+					this.Exception(ex);
+				}
+			}
+		}
+
+		private void MessageFormSubmitted(object Sender, DataForm Form)
+		{
+			MessageEventArgs e = (MessageEventArgs)Form.State;
+			StringBuilder Xml = new StringBuilder();
+
+			Form.SerializeSubmit(Xml);
+
+			this.SendMessage(e.Type, Form.From, Xml.ToString(), string.Empty, string.Empty, 
+				string.Empty, e.ThreadID, e.ParentThreadID);
+		}
+
+		private void MessageFormCancelled(object Sender, DataForm Form)
+		{
+			MessageEventArgs e = (MessageEventArgs)Form.State;
+			StringBuilder Xml = new StringBuilder();
+
+			Form.SerializeCancel(Xml);
+
+			this.SendMessage(e.Type, Form.From, Xml.ToString(), string.Empty, string.Empty,
+				string.Empty, e.ThreadID, e.ParentThreadID);
 		}
 
 		/// <summary>
@@ -2212,7 +2275,7 @@ namespace Waher.Networking.XMPP
 						Item.LastPresence = e;
 
 						if (Item.PendingSubscription == PendingSubscription.Subscribe)
-							Item.PendingSubscription = PendingSubscription.None;	// Might be out of synch.
+							Item.PendingSubscription = PendingSubscription.None;    // Might be out of synch.
 					}
 				}
 			}
@@ -2401,6 +2464,44 @@ namespace Waher.Networking.XMPP
 					this.clientFeatures.Remove(Namespace);
 					this.entityCapabilitiesVersion = null;
 				}
+			}
+
+			return true;
+		}
+
+		/// <summary>
+		/// Registers a Message Form handler.
+		/// </summary>
+		/// <param name="FormType">Form Type, as defined by the FORM_TYPE field in the form.</param>
+		/// <param name="Handler">Handler to process message.</param>
+		public void RegisterMessageFormHandler(string FormType, MessageFormEventHandler Handler)
+		{
+			lock (this.synchObject)
+			{
+				if (this.messageFormHandlers.ContainsKey(FormType))
+					throw new ArgumentException("Handler already registered.", nameof(FormType));
+
+				this.messageFormHandlers[FormType] = Handler;
+			}
+		}
+
+		/// <summary>
+		/// Unregisters a Message handler.
+		/// </summary>
+		/// <param name="FormType">Form Type, as defined by the FORM_TYPE field in the form.</param>
+		/// <param name="Handler">Handler to remove.</param>
+		/// <returns>If the handler was found and removed.</returns>
+		public bool UnregisterMessageFormHandler(string FormType, MessageFormEventHandler Handler)
+		{
+			lock (this.synchObject)
+			{
+				if (!this.messageFormHandlers.TryGetValue(FormType, out MessageFormEventHandler h))
+					return false;
+
+				if (h != Handler)
+					return false;
+
+				this.messageFormHandlers.Remove(FormType);
 			}
 
 			return true;
@@ -4587,9 +4688,12 @@ namespace Waher.Networking.XMPP
 				Xml.Append("</subject>");
 			}
 
-			Xml.Append("<body>");
-			Xml.Append(XML.Encode(Body));
-			Xml.Append("</body>");
+			if (!string.IsNullOrEmpty(Body))
+			{
+				Xml.Append("<body>");
+				Xml.Append(XML.Encode(Body));
+				Xml.Append("</body>");
+			}
 
 			if (!string.IsNullOrEmpty(ThreadId))
 			{

@@ -229,4 +229,40 @@ namespace Waher.Networking.XMPP.PubSub
 		/// </summary>
 		Required
 	}
+
+	/// <summary>
+	/// User affiliation
+	/// </summary>
+	public enum Affiliation
+	{
+		/// <summary>
+		/// Owners can: Subscribe, Retrieve Items, Publish Items, Delete Single Item, Purge Node, Configure Node, Delete Node
+		/// </summary>
+		owner,
+
+		/// <summary>
+		/// Publishers can: Subscribe, Retrieve Items, Publish Items, Delete Single Item, Purge Node
+		/// </summary>
+		publisher,
+
+		/// <summary>
+		/// Publish-only can: Publish Items, Delete Single Item (that they have published), Purge Node (of items that they have published)
+		/// </summary>
+		publishOnly,
+
+		/// <summary>
+		/// Members can: Subscribe, Retrieve Items
+		/// </summary>
+		member,
+
+		/// <summary>
+		/// Members can: Subscribe
+		/// </summary>
+		none,
+
+		/// <summary>
+		/// Outcast can do nothing.
+		/// </summary>
+		outcast
+	}
 }

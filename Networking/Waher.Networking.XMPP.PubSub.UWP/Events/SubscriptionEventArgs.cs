@@ -20,6 +20,7 @@ namespace Waher.Networking.XMPP.PubSub
 		private OptionsAvailability availability;
 		private DateTime expires;
 		private string subscriptionId;
+		private NodeSubscriptionStatus status;
 
 		/// <summary>
 		/// Event arguments for node subscription callback events.
@@ -30,15 +31,17 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <param name="Options">Subscription options, if available.</param>
 		/// <param name="Availability">If options are supported.</param>
 		/// <param name="Expires">When the subscription expires.</param>
+		/// <param name="Status">Status of subscription.</param>
 		/// <param name="e">IQ result event arguments.</param>
 		public SubscriptionEventArgs(string NodeName, string Jid, string SubscriptionId,
-			SubscriptionOptions Options, OptionsAvailability Availability, DateTime Expires, 
-			DataFormEventArgs e)
+			SubscriptionOptions Options, OptionsAvailability Availability, DateTime Expires,
+			NodeSubscriptionStatus Status, DataFormEventArgs e)
 			: base(NodeName, Jid, Options, e)
 		{
 			this.availability = Availability;
 			this.expires = Expires;
 			this.subscriptionId = SubscriptionId;
+			this.status = Status;
 		}
 
 		/// <summary>
@@ -63,6 +66,14 @@ namespace Waher.Networking.XMPP.PubSub
 		public string SubscriptionId
 		{
 			get { return this.subscriptionId; }
+		}
+
+		/// <summary>
+		/// Status of subscripton.
+		/// </summary>
+		public NodeSubscriptionStatus Status
+		{
+			get { return this.status; }
 		}
 	}
 }

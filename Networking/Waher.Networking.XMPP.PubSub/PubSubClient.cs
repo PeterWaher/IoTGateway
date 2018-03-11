@@ -36,6 +36,11 @@ namespace Waher.Networking.XMPP.PubSub
 		/// </summary>
 		public const string NamespaceStanzaHeaders = "http://jabber.org/protocol/shim";
 
+		/// <summary>
+		/// http://jabber.org/protocol/pubsub#subscribe_authorization
+		/// </summary>
+		public const string FormTypeSubscriptionAuthorization = "http://jabber.org/protocol/pubsub#subscribe_authorization";
+
 		private string componentAddress;
 
 		/// <summary>
@@ -50,6 +55,7 @@ namespace Waher.Networking.XMPP.PubSub
 			this.componentAddress = ComponentAddress;
 
 			Client.RegisterMessageHandler("event", NamespacePubSubEvents, this.EventNotificationHandler, true);
+			Client.RegisterMessageFormHandler(FormTypeSubscriptionAuthorization, this.SubscriptionAuthorizationHandler);
 		}
 
 		/// <summary>
@@ -58,6 +64,7 @@ namespace Waher.Networking.XMPP.PubSub
 		public override void Dispose()
 		{
 			Client.UnregisterMessageHandler("event", NamespacePubSubEvents, this.EventNotificationHandler, true);
+			Client.UnregisterMessageFormHandler(FormTypeSubscriptionAuthorization, this.SubscriptionAuthorizationHandler);
 
 			base.Dispose();
 		}
@@ -604,7 +611,7 @@ namespace Waher.Networking.XMPP.PubSub
 				try
 				{
 					Callback?.Invoke(this, new SubscriptionEventArgs(NodeName, Jid, SubscriptionId,
-						Options2, Availability, Expires, new DataFormEventArgs(Form, e)));
+						Options2, Availability, Expires, Status, new DataFormEventArgs(Form, e)));
 				}
 				catch (Exception ex)
 				{
@@ -1035,7 +1042,7 @@ namespace Waher.Networking.XMPP.PubSub
 				try
 				{
 					Callback?.Invoke(this, new SubscriptionEventArgs(NodeName, Jid, SubscriptionId,
-						null, OptionsAvailability.Unknown, Expires, new DataFormEventArgs(Form, e)));
+						null, OptionsAvailability.Unknown, Expires, Status, new DataFormEventArgs(Form, e)));
 				}
 				catch (Exception ex)
 				{
@@ -1156,6 +1163,9 @@ namespace Waher.Networking.XMPP.PubSub
 
 		private void EventNotificationHandler(object Sender, MessageEventArgs e)
 		{
+			if (e.From != this.componentAddress)
+				return;
+
 			string SubscriptionId = string.Empty;
 
 			foreach (XmlNode N in e.Message.ChildNodes)
@@ -1232,6 +1242,22 @@ namespace Waher.Networking.XMPP.PubSub
 							try
 							{
 								this.NodePurged?.Invoke(this, e3);
+							}
+							catch (Exception ex)
+							{
+								Log.Critical(ex);
+							}
+							break;
+
+						case "subscription":
+							NodeName = XML.Attribute(E, "node");
+							string Jid = XML.Attribute(E, "jid");
+							NodeSubscriptionStatus Status = (NodeSubscriptionStatus)XML.Attribute(E, "subscription", NodeSubscriptionStatus.none);
+
+							try
+							{
+								this.SubscriptionStatusChanged?.Invoke(this,
+									new SubscriptionNotificationEventArgs(NodeName, Jid, Status, e));
 							}
 							catch (Exception ex)
 							{
@@ -1458,6 +1484,41 @@ namespace Waher.Networking.XMPP.PubSub
 		/// Event raised whenever a node has been purged and all its items have been deleted.
 		/// </summary>
 		public event NodeNotificationEventHandler NodePurged = null;
+
+		#endregion
+
+		#region Subscription requests
+
+		private void SubscriptionAuthorizationHandler(object Sender, MessageFormEventArgs e)
+		{
+			if (e.From != this.componentAddress)
+				return;
+
+			DataForm Form = e.Form;
+			string SubscriptionId = Form["pubsub#subid"]?.ValueString ?? string.Empty;
+			string NodeName = Form["pubsub#node"]?.ValueString ?? string.Empty;
+			string Jid = Form["pubsub#subscriber_jid"]?.ValueString ?? string.Empty;
+
+			try
+			{
+				this.SubscriptionRequest?.Invoke(this, new SubscriptionRequestEventArgs(NodeName, Jid, SubscriptionId, e));
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+			}
+		}
+
+		/// <summary>
+		/// Event raised when a subscription request has been received on a node to 
+		/// which the client is an owner.
+		/// </summary>
+		public event SubscriptionRequestEventHandler SubscriptionRequest = null;
+
+		/// <summary>
+		/// Event raised when the status changes for a subscription.
+		/// </summary>
+		public event SubscriptionNotificationEventHandler SubscriptionStatusChanged = null;
 
 		#endregion
 

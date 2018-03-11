@@ -2049,7 +2049,7 @@ namespace Waher.Networking.XMPP
 						Field FormTypeField = Form["FORM_TYPE"];
 						FormType = FormTypeField?.ValueString;
 
-						if (string.IsNullOrEmpty(FormType) && this.messageFormHandlers.TryGetValue(FormType, out FormHandler))
+						if (!string.IsNullOrEmpty(FormType) && this.messageFormHandlers.TryGetValue(FormType, out FormHandler))
 						{
 							e.Content = E;
 							break;
@@ -4688,9 +4688,12 @@ namespace Waher.Networking.XMPP
 				Xml.Append("</subject>");
 			}
 
-			Xml.Append("<body>");
-			Xml.Append(XML.Encode(Body));
-			Xml.Append("</body>");
+			if (!string.IsNullOrEmpty(Body))
+			{
+				Xml.Append("<body>");
+				Xml.Append(XML.Encode(Body));
+				Xml.Append("</body>");
+			}
 
 			if (!string.IsNullOrEmpty(ThreadId))
 			{

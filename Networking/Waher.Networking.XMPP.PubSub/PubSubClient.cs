@@ -1432,7 +1432,7 @@ namespace Waher.Networking.XMPP.PubSub
 				{
 					Log.Critical(ex);
 				}
-			}, null);
+			}, State);
 		}
 
 		/// <summary>
@@ -1519,6 +1519,92 @@ namespace Waher.Networking.XMPP.PubSub
 		/// Event raised when the status changes for a subscription.
 		/// </summary>
 		public event SubscriptionNotificationEventHandler SubscriptionStatusChanged = null;
+
+		#endregion
+
+		#region Subscriptions management
+
+		/// <summary>
+		/// Gets the list of subscriptions for a node.
+		/// </summary>
+		/// <param name="NodeName">Name of node.</param>
+		/// <param name="Callback">Callback method.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void GetSubscriptionsList(string NodeName, SubscriptionListEventHandler Callback, object State)
+		{
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<pubsub xmlns='");
+			Xml.Append(NamespacePubSubOwner);
+			Xml.Append("'><subscriptions node='");
+			Xml.Append(XML.Encode(NodeName));
+			Xml.Append("'/></pubsub>");
+
+			this.client.SendIqGet(this.componentAddress, Xml.ToString(), (sender, e) =>
+			{
+				Dictionary<string, NodeSubscriptionStatus> Subscriptions = null;
+				XmlElement E;
+
+				if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "pubsub" && E.NamespaceURI == NamespacePubSubOwner)
+				{
+					foreach (XmlNode N in E.ChildNodes)
+					{
+						if (N is XmlElement E2 && E2.LocalName == "subscriptions" && XML.Attribute(E2, "node") == NodeName)
+						{
+							Subscriptions = new Dictionary<string, NodeSubscriptionStatus>();
+
+							foreach (XmlNode N2 in E2.ChildNodes)
+							{
+								if (N2 is XmlElement E3 && E3.LocalName == "subscription")
+									Subscriptions[XML.Attribute(E3, "jid")] = (NodeSubscriptionStatus)XML.Attribute(E3, "subscription", NodeSubscriptionStatus.none);
+							}
+						}
+					}
+				}
+
+				try
+				{
+					Callback?.Invoke(this, new SubscriptionListEventArgs(NodeName, Subscriptions, e));
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+
+			}, State);
+		}
+
+		/// <summary>
+		/// Updates subcriptions on a node.
+		/// </summary>
+		/// <param name="NodeName">Name of node.</param>
+		/// <param name="Subscriptions">Subscriptions to be updated</param>
+		/// <param name="Callback">Callback method.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void UpdateSubscriptions(string NodeName, IEnumerable<KeyValuePair<string, NodeSubscriptionStatus>> Subscriptions,
+			IqResultEventHandler Callback, object State)
+		{
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<pubsub xmlns='");
+			Xml.Append(NamespacePubSubOwner);
+			Xml.Append("'><subscriptions node='");
+			Xml.Append(XML.Encode(NodeName));
+			Xml.Append("'>");
+
+			foreach (KeyValuePair<string, NodeSubscriptionStatus> Subscription in Subscriptions)
+			{
+				Xml.Append("<subscription jid='");
+				Xml.Append(XML.Encode(Subscription.Key));
+				Xml.Append("' subscription='");
+				Xml.Append(Subscription.Value.ToString());
+				Xml.Append("'/>");
+			}
+
+			Xml.Append("</subscriptions></pubsub>");
+
+			this.client.SendIqSet(this.componentAddress, Xml.ToString(), Callback, State);
+		}
 
 		#endregion
 

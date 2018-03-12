@@ -847,7 +847,7 @@ namespace Waher.Networking.XMPP.DataForms
 				Xml.Append("<cancel xmlns='");
 				Xml.Append(XmppClient.NamespaceDynamicForms);
 				Xml.Append("'>");
-				this.ExportXml(Xml, "submit", true);
+				this.ExportXml(Xml, "submit", true, false);
 				Xml.Append("</cancel>");
 
 				this.client.SendIqSet(this.from, Xml.ToString(), null, null);
@@ -902,7 +902,17 @@ namespace Waher.Networking.XMPP.DataForms
 		/// <returns>Number of fields exported.</returns>
 		public int SerializeSubmit(StringBuilder Output)
 		{
-			return this.ExportXml(Output, "submit", true);
+			return this.ExportXml(Output, "submit", true, false);
+		}
+
+		/// <summary>
+		/// Serializes the form as a result submission.
+		/// </summary>
+		/// <param name="Output">Output to serialize the form to.</param>
+		/// <returns>Number of fields exported.</returns>
+		public int SerializeResult(StringBuilder Output)
+		{
+			return this.ExportXml(Output, "result", true, true);
 		}
 
 		/// <summary>
@@ -912,7 +922,7 @@ namespace Waher.Networking.XMPP.DataForms
 		/// <returns>Number of fields exported.</returns>
 		public int SerializeCancel(StringBuilder Output)
 		{
-			return this.ExportXml(Output, "cancel", true);
+			return this.ExportXml(Output, "cancel", true, false);
 		}
 
 		/// <summary>
@@ -922,10 +932,10 @@ namespace Waher.Networking.XMPP.DataForms
 		/// <returns>Number of fields exported.</returns>
 		public int SerializeForm(StringBuilder Output)
 		{
-			return this.ExportXml(Output, "form", false);
+			return this.ExportXml(Output, "form", false, true);
 		}
 
-		internal int ExportXml(StringBuilder Output, string Type, bool ValuesOnly)
+		internal int ExportXml(StringBuilder Output, string Type, bool ValuesOnly, bool IncludeLabels)
 		{
 			int NrFieldsExported = 0;
 
@@ -976,7 +986,7 @@ namespace Waher.Networking.XMPP.DataForms
 				if (Field.Exclude)
 					continue;
 
-				if (Field.Serialize(Output, ValuesOnly))
+				if (Field.Serialize(Output, ValuesOnly, IncludeLabels))
 					NrFieldsExported++;
 			}
 
@@ -985,7 +995,7 @@ namespace Waher.Networking.XMPP.DataForms
 				Output.Append("<reported>");
 
 				foreach (Field Field in this.header)
-					Field.Serialize(Output, false);
+					Field.Serialize(Output, false, true);
 
 				Output.Append("</reported>");
 			}
@@ -995,7 +1005,7 @@ namespace Waher.Networking.XMPP.DataForms
 				Output.Append("<item>");
 
 				foreach (Field Field in Record)
-					Field.Serialize(Output, true);
+					Field.Serialize(Output, true, false);
 
 				Output.Append("</item>");
 			}

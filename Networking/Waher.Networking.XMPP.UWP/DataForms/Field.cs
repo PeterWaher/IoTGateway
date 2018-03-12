@@ -232,7 +232,7 @@ namespace Waher.Networking.XMPP.DataForms
 				Xml.Append("<submit xmlns='");
 				Xml.Append(XmppClient.NamespaceDynamicForms);
 				Xml.Append("'>");
-				this.form.ExportXml(Xml, "submit", true);
+				this.form.ExportXml(Xml, "submit", true, false);
 				Xml.Append("</submit>");
 
 				this.form.Client.SendIqSet(this.form.From, Xml.ToString(), this.FormUpdated, null);
@@ -254,7 +254,7 @@ namespace Waher.Networking.XMPP.DataForms
 			}
 		}
 
-		internal bool Serialize(StringBuilder Output, bool ValuesOnly)
+		internal bool Serialize(StringBuilder Output, bool ValuesOnly, bool IncludeLabels)
 		{
 			if ((this.notSame || this.readOnly) && ValuesOnly)
 				return false;
@@ -266,14 +266,14 @@ namespace Waher.Networking.XMPP.DataForms
 				Output.Append("<field var='");
 				Output.Append(XML.Encode(this.var));
 
+				if (IncludeLabels && !string.IsNullOrEmpty(this.label))
+				{
+					Output.Append("' label='");
+					Output.Append(XML.Encode(this.label));
+				}
+
 				if (!ValuesOnly)
 				{
-					if (!string.IsNullOrEmpty(this.label))
-					{
-						Output.Append("' label='");
-						Output.Append(XML.Encode(this.label));
-					}
-
 					Output.Append("' type='");
 					Output.Append(this.TypeName);
 				}

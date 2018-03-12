@@ -46,6 +46,18 @@ namespace Waher.Networking.XMPP.DataForms.FieldTypes
 		}
 
 		/// <summary>
+		/// JidSingle form field.
+		/// </summary>
+		/// <param name="Var">Variable name</param>
+		/// <param name="Label">Label</param>
+		/// <param name="Value">Value for the field.</param>
+		public JidSingleField(string Var, string Label, string Value)
+			: base(null, Var, Label, false, new string[] { Value }, null, string.Empty, null, null,
+				  string.Empty, false, false, false)
+		{
+		}
+
+		/// <summary>
 		/// <see cref="Field.TypeName"/>
 		/// </summary>
 		public override string TypeName

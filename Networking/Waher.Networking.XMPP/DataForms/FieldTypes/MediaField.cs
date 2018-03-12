@@ -39,6 +39,29 @@ namespace Waher.Networking.XMPP.DataForms.FieldTypes
 		}
 
 		/// <summary>
+		/// Media form field.
+		/// </summary>
+		/// <param name="Var">Variable name</param>
+		/// <param name="Media">Media element.</param>
+		public MediaField(string Var, Media Media)
+			: base(null, Var, string.Empty, false, new string[0], null, string.Empty, null, null, string.Empty, false, false, false)
+		{
+			this.media = Media;
+		}
+
+		/// <summary>
+		/// Media form field.
+		/// </summary>
+		/// <param name="Var">Variable name</param>
+		/// <param name="Label">Label</param>
+		/// <param name="Media">Media element.</param>
+		public MediaField(string Var, string Label, Media Media)
+			: base(null, Var, Label, false, new string[0], null, string.Empty, null, null, string.Empty, false, false, false)
+		{
+			this.media = Media;
+		}
+
+		/// <summary>
 		/// <see cref="Field.TypeName"/>
 		/// </summary>
 		public override string TypeName

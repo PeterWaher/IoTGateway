@@ -39,9 +39,9 @@ XEP-0377: Spam Reporting</Description>
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>networking communication xmpp</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.0.20</AssemblyVersion>
-    <FileVersion>1.0.20</FileVersion>
-    <Version>1.0.20</Version>
+    <AssemblyVersion>1.0.21</AssemblyVersion>
+    <FileVersion>1.0.21</FileVersion>
+    <Version>1.0.21</Version>
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Networking\Waher.Networking.XMPP\</UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>

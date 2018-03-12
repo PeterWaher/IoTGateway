@@ -46,6 +46,18 @@ namespace Waher.Networking.XMPP.DataForms.FieldTypes
 		}
 
 		/// <summary>
+		/// TextMulti form field.
+		/// </summary>
+		/// <param name="Var">Variable name</param>
+		/// <param name="Label">Label</param>
+		/// <param name="Values">Values for the field (string representations).</param>
+		public TextMultiField(string Var, string Label, string[] Values)
+			: base(null, Var, Label, false, Values, null, string.Empty, null, null,
+				  string.Empty, false, false, false)
+		{
+		}
+
+		/// <summary>
 		/// <see cref="Field.TypeName"/>
 		/// </summary>
 		public override string TypeName

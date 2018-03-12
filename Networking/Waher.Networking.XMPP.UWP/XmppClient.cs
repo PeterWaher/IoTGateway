@@ -4863,7 +4863,7 @@ namespace Waher.Networking.XMPP
 				}
 
 				foreach (DataForm Form in this.extendedServiceDiscoveryInformation.Values)
-					Form.ExportXml(Xml, "result", true);
+					Form.SerializeResult(Xml);
 			}
 
 			Xml.Append("</query>");

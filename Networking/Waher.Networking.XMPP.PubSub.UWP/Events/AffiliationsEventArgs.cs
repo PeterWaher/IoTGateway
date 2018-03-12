@@ -9,14 +9,14 @@ namespace Waher.Networking.XMPP.PubSub
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Event arguments.</param>
-	public delegate void AffiliationListEventHandler(object Sender, AffiliationListEventArgs e);
+	public delegate void AffiliationsEventHandler(object Sender, AffiliationsEventArgs e);
 
 	/// <summary>
 	/// Event arguments for affiliation list callback events.
 	/// </summary>
-	public class AffiliationListEventArgs : NodeEventArgs
+	public class AffiliationsEventArgs : NodeEventArgs
     {
-		private Dictionary<string, Affiliation> affiliations;
+		private Affiliation[] affiliations;
 
 		/// <summary>
 		/// Event arguments for affiliation list callback events.
@@ -24,8 +24,7 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <param name="NodeName">Name of node.</param>
 		/// <param name="Affiliations">Available affiliations.</param>
 		/// <param name="e">IQ result event arguments.</param>
-		public AffiliationListEventArgs(string NodeName, 
-			Dictionary<string, Affiliation> Affiliations, IqResultEventArgs e)
+		public AffiliationsEventArgs(string NodeName, Affiliation[] Affiliations, IqResultEventArgs e)
 			: base(NodeName, e)
 		{
 			this.affiliations = Affiliations;
@@ -34,7 +33,7 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <summary>
 		/// Available affiliations.
 		/// </summary>
-		public Dictionary<string, Affiliation> Affiliations
+		public Affiliation[] Affiliations
 		{
 			get { return this.affiliations; }
 		}

@@ -107,18 +107,26 @@
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Affiliation.cs" />
     <Compile Include="Enumerations.cs" />
+    <Compile Include="Events\AffiliationNotificationEventArgs.cs" />
+    <Compile Include="Events\AffiliationsEventArgs.cs" />
     <Compile Include="Events\ConfigurationEventArgs.cs" />
     <Compile Include="Events\ItemNotificationEventArgs.cs" />
     <Compile Include="Events\ItemResultEventArgs.cs" />
     <Compile Include="Events\ItemsEventArgs.cs" />
     <Compile Include="Events\NodeEventArgs.cs" />
+    <Compile Include="Events\NodeNotificationEventArgs.cs" />
     <Compile Include="Events\SubscriptionEventArgs.cs" />
+    <Compile Include="Events\SubscriptionNotificationEventArgs.cs" />
     <Compile Include="Events\SubscriptionOptionsEventArgs.cs" />
+    <Compile Include="Events\SubscriptionRequestEventArgs.cs" />
+    <Compile Include="Events\SubscriptionsEventArgs.cs" />
     <Compile Include="NodeConfiguration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PubSubClient.cs" />
     <Compile Include="PubSubItem.cs" />
+    <Compile Include="Subscription.cs" />
     <Compile Include="SubscriptionOptions.cs" />
     <EmbeddedResource Include="Properties\Waher.Networking.XMPP.PubSub.UWP.rd.xml" />
   </ItemGroup>

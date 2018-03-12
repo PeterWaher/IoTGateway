@@ -1277,17 +1277,12 @@ namespace Waher.Networking.XMPP.PubSub
 										case "affiliation":
 											Jid = XML.Attribute(E2, "jid");
 											string s = XML.Attribute(E2, "affiliation");
-
-											Affiliation Affiliation;
-
-											if (s == "publish-only")
-												Affiliation = Affiliation.publishOnly;
-											else if (!Enum.TryParse<Affiliation>(s, out Affiliation))
+											if (!TryParse(s, out AffiliationStatus Affiliation))
 												break;
 
 											try
 											{
-												this.AffiliationNotification?.Invoke(this, 
+												this.AffiliationNotification?.Invoke(this,
 													new AffiliationNotificationEventArgs(NodeName, Jid, Affiliation, e));
 											}
 											catch (Exception ex)
@@ -1309,6 +1304,23 @@ namespace Waher.Networking.XMPP.PubSub
 		/// Event raised whenever an item notification has been received.
 		/// </summary>
 		public event ItemNotificationEventHandler ItemNotification = null;
+
+		/// <summary>
+		/// Tries to parse an affiliation
+		/// </summary>
+		/// <param name="s">String representation</param>
+		/// <param name="Affiliation">Affiliation</param>
+		/// <returns>If parsing was successful.</returns>
+		private static bool TryParse(string s, out AffiliationStatus Affiliation)
+		{
+			if (s == "publish-only")
+			{
+				Affiliation = AffiliationStatus.publishOnly;
+				return true;
+			}
+			else
+				return Enum.TryParse<AffiliationStatus>(s, out Affiliation);
+		}
 
 		#endregion
 
@@ -1566,7 +1578,7 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <param name="NodeName">Name of node.</param>
 		/// <param name="Callback">Callback method.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void GetSubscriptionsList(string NodeName, SubscriptionListEventHandler Callback, object State)
+		public void GetSubscriptions(string NodeName, SubscriptionsEventHandler Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -1578,7 +1590,7 @@ namespace Waher.Networking.XMPP.PubSub
 
 			this.client.SendIqGet(this.componentAddress, Xml.ToString(), (sender, e) =>
 			{
-				Dictionary<string, NodeSubscriptionStatus> Subscriptions = null;
+				List<Subscription> Subscriptions = new List<Subscription>();
 				XmlElement E;
 
 				if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "pubsub" && E.NamespaceURI == NamespacePubSubOwner)
@@ -1587,12 +1599,15 @@ namespace Waher.Networking.XMPP.PubSub
 					{
 						if (N is XmlElement E2 && E2.LocalName == "subscriptions" && XML.Attribute(E2, "node") == NodeName)
 						{
-							Subscriptions = new Dictionary<string, NodeSubscriptionStatus>();
-
 							foreach (XmlNode N2 in E2.ChildNodes)
 							{
 								if (N2 is XmlElement E3 && E3.LocalName == "subscription")
-									Subscriptions[XML.Attribute(E3, "jid")] = (NodeSubscriptionStatus)XML.Attribute(E3, "subscription", NodeSubscriptionStatus.none);
+								{
+									Subscriptions.Add(new Subscription(NodeName,
+										XML.Attribute(E3, "jid"),
+										(NodeSubscriptionStatus)XML.Attribute(E3, "subscription", NodeSubscriptionStatus.none),
+										XML.Attribute(E3, "subid")));
+								}
 							}
 						}
 					}
@@ -1600,7 +1615,7 @@ namespace Waher.Networking.XMPP.PubSub
 
 				try
 				{
-					Callback?.Invoke(this, new SubscriptionListEventArgs(NodeName, Subscriptions, e));
+					Callback?.Invoke(this, new SubscriptionsEventArgs(NodeName, Subscriptions.ToArray(), e));
 				}
 				catch (Exception ex)
 				{
@@ -1652,7 +1667,7 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <param name="NodeName">Name of node.</param>
 		/// <param name="Callback">Callback method.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void GetAffiliationsList(string NodeName, AffiliationListEventHandler Callback, object State)
+		public void GetAffiliations(string NodeName, AffiliationsEventHandler Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -1664,7 +1679,7 @@ namespace Waher.Networking.XMPP.PubSub
 
 			this.client.SendIqGet(this.componentAddress, Xml.ToString(), (sender, e) =>
 			{
-				Dictionary<string, Affiliation> Affiliations = null;
+				List<Affiliation> Affiliations = null;
 				XmlElement E;
 
 				if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "pubsub" && E.NamespaceURI == NamespacePubSubOwner)
@@ -1673,21 +1688,17 @@ namespace Waher.Networking.XMPP.PubSub
 					{
 						if (N is XmlElement E2 && E2.LocalName == "affiliations" && XML.Attribute(E2, "node") == NodeName)
 						{
-							Affiliations = new Dictionary<string, Affiliation>();
+							Affiliations = new List<Affiliation>();
 
 							foreach (XmlNode N2 in E2.ChildNodes)
 							{
 								if (N2 is XmlElement E3 && E3.LocalName == "affiliation")
 								{
 									string s = XML.Attribute(E3, "affiliation");
-									Affiliation Affiliation;
-
-									if (s == "publish-only")
-										Affiliation = Affiliation.publishOnly;
-									else if (!Enum.TryParse<Affiliation>(s, out Affiliation))
+									if (!TryParse(s, out AffiliationStatus Affiliation))
 										continue;
 
-									Affiliations[XML.Attribute(E3, "jid")] = Affiliation;
+									Affiliations.Add(new Affiliation(NodeName, XML.Attribute(E3, "jid"), Affiliation));
 								}
 							}
 						}
@@ -1696,7 +1707,7 @@ namespace Waher.Networking.XMPP.PubSub
 
 				try
 				{
-					Callback?.Invoke(this, new AffiliationListEventArgs(NodeName, Affiliations, e));
+					Callback?.Invoke(this, new AffiliationsEventArgs(NodeName, Affiliations?.ToArray(), e));
 				}
 				catch (Exception ex)
 				{
@@ -1713,7 +1724,7 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <param name="Affiliations">Affiliations to be updated</param>
 		/// <param name="Callback">Callback method.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void UpdateAffiliations(string NodeName, IEnumerable<KeyValuePair<string, Affiliation>> Affiliations,
+		public void UpdateAffiliations(string NodeName, IEnumerable<KeyValuePair<string, AffiliationStatus>> Affiliations,
 			IqResultEventHandler Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
@@ -1724,13 +1735,13 @@ namespace Waher.Networking.XMPP.PubSub
 			Xml.Append(XML.Encode(NodeName));
 			Xml.Append("'>");
 
-			foreach (KeyValuePair<string, Affiliation> Affiliation in Affiliations)
+			foreach (KeyValuePair<string, AffiliationStatus> Affiliation in Affiliations)
 			{
 				Xml.Append("<affiliation jid='");
 				Xml.Append(XML.Encode(Affiliation.Key));
 				Xml.Append("' affiliation='");
 
-				if (Affiliation.Value == PubSub.Affiliation.publishOnly)
+				if (Affiliation.Value == AffiliationStatus.publishOnly)
 					Xml.Append("publish-only");
 				else
 					Xml.Append(Affiliation.Value.ToString());
@@ -1747,6 +1758,156 @@ namespace Waher.Networking.XMPP.PubSub
 		/// Event raised whenever the affiliation status of the client has changed on a node.
 		/// </summary>
 		public event AffiliationNotificationEventHandler AffiliationNotification = null;
+
+		#endregion
+
+		#region My subscriptions
+
+		/// <summary>
+		/// Gets the list of your subscriptions.
+		/// </summary>
+		/// <param name="Callback">Callback method.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void GetMySubscriptions(SubscriptionsEventHandler Callback, object State)
+		{
+			this.GetMySubscriptions(null, Callback, State);
+		}
+
+		/// <summary>
+		/// Gets the list of your subscriptions for a node.
+		/// </summary>
+		/// <param name="NodeName">Name of node.</param>
+		/// <param name="Callback">Callback method.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void GetMySubscriptions(string NodeName, SubscriptionsEventHandler Callback, object State)
+		{
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<pubsub xmlns='");
+			Xml.Append(NamespacePubSub);
+
+			if (string.IsNullOrEmpty(NodeName))
+				Xml.Append("'><subscriptions/></pubsub>");
+			else
+			{
+				Xml.Append("'><subscriptions node='");
+				Xml.Append(XML.Encode(NodeName));
+				Xml.Append("'/></pubsub>");
+			}
+
+			this.client.SendIqGet(this.componentAddress, Xml.ToString(), (sender, e) =>
+			{
+				List<Subscription> Subscriptions = new List<Subscription>();
+				XmlElement E;
+
+				if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "pubsub" && E.NamespaceURI == NamespacePubSub)
+				{
+					foreach (XmlNode N in E.ChildNodes)
+					{
+						if (N is XmlElement E2 && E2.LocalName == "subscriptions")
+						{
+							foreach (XmlNode N2 in E2.ChildNodes)
+							{
+								if (N2 is XmlElement E3 && E3.LocalName == "subscription")
+								{
+									Subscriptions.Add(new Subscription(
+										E3.HasAttribute("node") ? E3.GetAttribute("node") : NodeName,
+										XML.Attribute(E3, "jid"),
+										(NodeSubscriptionStatus)XML.Attribute(E3, "subscription", NodeSubscriptionStatus.none),
+										XML.Attribute(E3, "subid")));
+								}
+							}
+						}
+					}
+				}
+
+				try
+				{
+					Callback?.Invoke(this, new SubscriptionsEventArgs(NodeName, Subscriptions.ToArray(), e));
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+
+			}, State);
+		}
+
+		#endregion
+
+		#region My affiliations
+
+		/// <summary>
+		/// Gets the list of your affiliations.
+		/// </summary>
+		/// <param name="Callback">Callback method.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void GetMyAffiliations(AffiliationsEventHandler Callback, object State)
+		{
+			this.GetMyAffiliations(null, Callback, State);
+		}
+
+		/// <summary>
+		/// Gets the list of your affiliations for a node.
+		/// </summary>
+		/// <param name="NodeName">Name of node.</param>
+		/// <param name="Callback">Callback method.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void GetMyAffiliations(string NodeName, AffiliationsEventHandler Callback, object State)
+		{
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<pubsub xmlns='");
+			Xml.Append(NamespacePubSub);
+
+			if (string.IsNullOrEmpty(NodeName))
+				Xml.Append("'><affiliations/></pubsub>");
+			else
+			{
+				Xml.Append("'><affiliations node='");
+				Xml.Append(XML.Encode(NodeName));
+				Xml.Append("'/></pubsub>");
+			}
+
+			this.client.SendIqGet(this.componentAddress, Xml.ToString(), (sender, e) =>
+			{
+				List<Affiliation> Affiliations = new List<Affiliation>();
+				XmlElement E;
+
+				if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "pubsub" && E.NamespaceURI == NamespacePubSub)
+				{
+					foreach (XmlNode N in E.ChildNodes)
+					{
+						if (N is XmlElement E2 && E2.LocalName == "affiliations")
+						{
+							foreach (XmlNode N2 in E2.ChildNodes)
+							{
+								if (N2 is XmlElement E3 && E3.LocalName == "affiliation")
+								{
+									if (!TryParse(XML.Attribute(E3, "affiliation"), out AffiliationStatus Affiliation))
+										continue;
+
+									Affiliations.Add(new Affiliation(
+										E3.HasAttribute("node") ? E3.GetAttribute("node") : NodeName,
+										E3.HasAttribute("jid") ? E3.GetAttribute("jid") : this.client.BareJID,
+										Affiliation));
+								}
+							}
+						}
+					}
+				}
+
+				try
+				{
+					Callback?.Invoke(this, new AffiliationsEventArgs(NodeName, Affiliations.ToArray(), e));
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+
+			}, State);
+		}
 
 		#endregion
 

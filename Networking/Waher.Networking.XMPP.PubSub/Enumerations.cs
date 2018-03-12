@@ -233,7 +233,7 @@ namespace Waher.Networking.XMPP.PubSub
 	/// <summary>
 	/// User affiliation
 	/// </summary>
-	public enum Affiliation
+	public enum AffiliationStatus
 	{
 		/// <summary>
 		/// Owners can: Subscribe, Retrieve Items, Publish Items, Delete Single Item, Purge Node, Configure Node, Delete Node

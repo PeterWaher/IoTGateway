@@ -9,14 +9,14 @@ namespace Waher.Networking.XMPP.PubSub
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Event arguments.</param>
-	public delegate void SubscriptionListEventHandler(object Sender, SubscriptionListEventArgs e);
+	public delegate void SubscriptionsEventHandler(object Sender, SubscriptionsEventArgs e);
 
 	/// <summary>
 	/// Event arguments for subscription list callback events.
 	/// </summary>
-	public class SubscriptionListEventArgs : NodeEventArgs
+	public class SubscriptionsEventArgs : NodeEventArgs
     {
-		private Dictionary<string, NodeSubscriptionStatus> subscriptions;
+		private Subscription[] subscriptions;
 
 		/// <summary>
 		/// Event arguments for subscription list callback events.
@@ -24,8 +24,7 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <param name="NodeName">Name of node.</param>
 		/// <param name="Subscriptions">Available subscriptions.</param>
 		/// <param name="e">IQ result event arguments.</param>
-		public SubscriptionListEventArgs(string NodeName, 
-			Dictionary<string,NodeSubscriptionStatus> Subscriptions, IqResultEventArgs e)
+		public SubscriptionsEventArgs(string NodeName, Subscription[] Subscriptions, IqResultEventArgs e)
 			: base(NodeName, e)
 		{
 			this.subscriptions = Subscriptions;
@@ -34,7 +33,7 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <summary>
 		/// Available subscriptions.
 		/// </summary>
-		public Dictionary<string, NodeSubscriptionStatus> Subscriptions
+		public Subscription[] Subscriptions
 		{
 			get { return this.subscriptions; }
 		}

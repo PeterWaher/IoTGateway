@@ -5,30 +5,30 @@ using System.Xml;
 namespace Waher.Networking.XMPP.PubSub
 {
 	/// <summary>
-	/// Delegate for subscription event notificaction event handlers.
+	/// Delegate for affiliation event notificaction event handlers.
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Event arguments</param>
-	public delegate void SubscriptionNotificationEventHandler(object Sender, SubscriptionNotificationEventArgs e);
+	public delegate void AffiliationNotificationEventHandler(object Sender, AffiliationNotificationEventArgs e);
 
 	/// <summary>
-	/// Event argument for subscription event notification events.
+	/// Event argument for affiliation event notification events.
 	/// </summary>
-	public class SubscriptionNotificationEventArgs : MessageEventArgs
+	public class AffiliationNotificationEventArgs : MessageEventArgs
     {
 		private string nodeName;
 		private string jid;
-		private NodeSubscriptionStatus status;
+		private Affiliation status;
 
 		/// <summary>
-		/// Event argument for subscription event notification events.
+		/// Event argument for affiliation event notification events.
 		/// </summary>
 		/// <param name="NodeName">Node name.</param>
 		/// <param name="Jid">JID of subscriber.</param>
-		/// <param name="Status">Subscription status</param>
+		/// <param name="Status">Affiliation status</param>
 		/// <param name="e">Message event arguments</param>
-		public SubscriptionNotificationEventArgs(string NodeName, string Jid,
-			NodeSubscriptionStatus Status, MessageEventArgs e)
+		public AffiliationNotificationEventArgs(string NodeName, string Jid,
+			Affiliation Status, MessageEventArgs e)
 			: base(e)
 		{
 			this.nodeName = NodeName;
@@ -53,9 +53,9 @@ namespace Waher.Networking.XMPP.PubSub
 		}
 
 		/// <summary>
-		/// New subscription status.
+		/// New affiliation status.
 		/// </summary>
-		public NodeSubscriptionStatus Status
+		public Affiliation Status
 		{
 			get { return this.status; }
 		}

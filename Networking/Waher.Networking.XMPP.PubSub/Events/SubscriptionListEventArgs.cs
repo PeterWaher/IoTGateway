@@ -19,7 +19,7 @@ namespace Waher.Networking.XMPP.PubSub
 		private Dictionary<string, NodeSubscriptionStatus> subscriptions;
 
 		/// <summary>
-		/// Event arguments for node callback events.
+		/// Event arguments for subscription list callback events.
 		/// </summary>
 		/// <param name="NodeName">Name of node.</param>
 		/// <param name="Subscriptions">Available subscriptions.</param>

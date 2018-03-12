@@ -1264,6 +1264,42 @@ namespace Waher.Networking.XMPP.PubSub
 								Log.Critical(ex);
 							}
 							break;
+
+						case "affiliations":
+							NodeName = XML.Attribute(E, "node");
+
+							foreach (XmlNode N2 in E.ChildNodes)
+							{
+								if (N2 is XmlElement E2)
+								{
+									switch (E2.LocalName)
+									{
+										case "affiliation":
+											Jid = XML.Attribute(E2, "jid");
+											string s = XML.Attribute(E2, "affiliation");
+
+											Affiliation Affiliation;
+
+											if (s == "publish-only")
+												Affiliation = Affiliation.publishOnly;
+											else if (!Enum.TryParse<Affiliation>(s, out Affiliation))
+												break;
+
+											try
+											{
+												this.AffiliationNotification?.Invoke(this, 
+													new AffiliationNotificationEventArgs(NodeName, Jid, Affiliation, e));
+											}
+											catch (Exception ex)
+											{
+												Log.Critical(ex);
+											}
+											break;
+									}
+								}
+							}
+							break;
+
 					}
 				}
 			}
@@ -1522,7 +1558,7 @@ namespace Waher.Networking.XMPP.PubSub
 
 		#endregion
 
-		#region Subscriptions management
+		#region Subscription management
 
 		/// <summary>
 		/// Gets the list of subscriptions for a node.
@@ -1605,6 +1641,112 @@ namespace Waher.Networking.XMPP.PubSub
 
 			this.client.SendIqSet(this.componentAddress, Xml.ToString(), Callback, State);
 		}
+
+		#endregion
+
+		#region Affiliation management
+
+		/// <summary>
+		/// Gets the list of affiliations for a node.
+		/// </summary>
+		/// <param name="NodeName">Name of node.</param>
+		/// <param name="Callback">Callback method.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void GetAffiliationsList(string NodeName, AffiliationListEventHandler Callback, object State)
+		{
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<pubsub xmlns='");
+			Xml.Append(NamespacePubSubOwner);
+			Xml.Append("'><affiliations node='");
+			Xml.Append(XML.Encode(NodeName));
+			Xml.Append("'/></pubsub>");
+
+			this.client.SendIqGet(this.componentAddress, Xml.ToString(), (sender, e) =>
+			{
+				Dictionary<string, Affiliation> Affiliations = null;
+				XmlElement E;
+
+				if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "pubsub" && E.NamespaceURI == NamespacePubSubOwner)
+				{
+					foreach (XmlNode N in E.ChildNodes)
+					{
+						if (N is XmlElement E2 && E2.LocalName == "affiliations" && XML.Attribute(E2, "node") == NodeName)
+						{
+							Affiliations = new Dictionary<string, Affiliation>();
+
+							foreach (XmlNode N2 in E2.ChildNodes)
+							{
+								if (N2 is XmlElement E3 && E3.LocalName == "affiliation")
+								{
+									string s = XML.Attribute(E3, "affiliation");
+									Affiliation Affiliation;
+
+									if (s == "publish-only")
+										Affiliation = Affiliation.publishOnly;
+									else if (!Enum.TryParse<Affiliation>(s, out Affiliation))
+										continue;
+
+									Affiliations[XML.Attribute(E3, "jid")] = Affiliation;
+								}
+							}
+						}
+					}
+				}
+
+				try
+				{
+					Callback?.Invoke(this, new AffiliationListEventArgs(NodeName, Affiliations, e));
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+
+			}, State);
+		}
+
+		/// <summary>
+		/// Updates affiliations on a node.
+		/// </summary>
+		/// <param name="NodeName">Name of node.</param>
+		/// <param name="Affiliations">Affiliations to be updated</param>
+		/// <param name="Callback">Callback method.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void UpdateAffiliations(string NodeName, IEnumerable<KeyValuePair<string, Affiliation>> Affiliations,
+			IqResultEventHandler Callback, object State)
+		{
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<pubsub xmlns='");
+			Xml.Append(NamespacePubSubOwner);
+			Xml.Append("'><affiliations node='");
+			Xml.Append(XML.Encode(NodeName));
+			Xml.Append("'>");
+
+			foreach (KeyValuePair<string, Affiliation> Affiliation in Affiliations)
+			{
+				Xml.Append("<affiliation jid='");
+				Xml.Append(XML.Encode(Affiliation.Key));
+				Xml.Append("' affiliation='");
+
+				if (Affiliation.Value == PubSub.Affiliation.publishOnly)
+					Xml.Append("publish-only");
+				else
+					Xml.Append(Affiliation.Value.ToString());
+
+				Xml.Append("'/>");
+			}
+
+			Xml.Append("</affiliations></pubsub>");
+
+			this.client.SendIqSet(this.componentAddress, Xml.ToString(), Callback, State);
+		}
+
+		/// <summary>
+		/// Event raised whenever the affiliation status of the client has changed on a node.
+		/// </summary>
+		public event AffiliationNotificationEventHandler AffiliationNotification = null;
 
 		#endregion
 

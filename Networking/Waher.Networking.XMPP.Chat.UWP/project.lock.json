@@ -239,7 +239,7 @@
           "lib/netstandard1.0/_._": {}
         }
       },
-      "Microsoft.NETCore.UniversalWindowsPlatform/6.0.7": {
+      "Microsoft.NETCore.UniversalWindowsPlatform/6.0.8": {
         "type": "package",
         "dependencies": {
           "Microsoft.NETCore": "5.0.2",
@@ -498,7 +498,7 @@
           }
         }
       },
-      "SkiaSharp/1.59.3": {
+      "SkiaSharp/1.60.0": {
         "type": "package",
         "compile": {
           "lib/uap10.0/SkiaSharp.dll": {}
@@ -2487,7 +2487,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "SkiaSharp": "1.59.3",
+          "SkiaSharp": "1.60.0",
           "Waher.Content.Emoji": "1.0.1",
           "Waher.Content.Html": "1.0.3",
           "Waher.Content.Xml": "1.0.2",
@@ -2526,7 +2526,7 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
-          "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.7",
+          "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.8",
           "Waher.Content": "1.0.8",
           "Waher.Content.Xml": "1.0.2",
           "Waher.Events": "1.0.6",
@@ -2547,7 +2547,7 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
-          "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.7",
+          "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.8",
           "Waher.Content": "1.0.0",
           "Waher.Content.Xml": "1.0.0",
           "Waher.Events": "1.0.0",
@@ -2561,7 +2561,7 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
-          "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.7",
+          "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.8",
           "Waher.Content": "1.0.0",
           "Waher.Content.Xml": "1.0.0",
           "Waher.Events": "1.0.0",
@@ -2575,7 +2575,7 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
-          "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.7",
+          "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.8",
           "Waher.Content": "1.0.0",
           "Waher.Content.Xml": "1.0.0",
           "Waher.Events": "1.0.0",
@@ -2590,7 +2590,7 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
-          "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.7",
+          "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.8",
           "Waher.Content": "1.0.0",
           "Waher.Content.Xml": "1.0.0",
           "Waher.Events": "1.0.0",
@@ -2661,7 +2661,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "SkiaSharp": "1.59.3",
+          "SkiaSharp": "1.60.0",
           "Waher.Script": "1.0.11"
         }
       },
@@ -2677,7 +2677,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "SkiaSharp": "1.59.3",
+          "SkiaSharp": "1.60.0",
           "Waher.Content": "1.0.8",
           "Waher.Content.Xml": "1.0.2",
           "Waher.Events": "1.0.6",
@@ -2870,7 +2870,7 @@
           "lib/netstandard1.0/_._": {}
         }
       },
-      "Microsoft.NETCore.UniversalWindowsPlatform/6.0.7": {
+      "Microsoft.NETCore.UniversalWindowsPlatform/6.0.8": {
         "type": "package",
         "dependencies": {
           "Microsoft.NETCore": "5.0.2",
@@ -2910,7 +2910,7 @@
           "System.Threading.Overlapped": "4.0.1",
           "System.Xml.XmlDocument": "4.0.1",
           "System.Xml.XmlSerializer": "4.0.11",
-          "runtime.win10-arm.Microsoft.NETCore.UniversalWindowsPlatform": "6.0.7"
+          "runtime.win10-arm.Microsoft.NETCore.UniversalWindowsPlatform": "6.0.8"
         },
         "compile": {
           "ref/netcore50/_._": {}
@@ -3360,7 +3360,7 @@
           "runtimes/win/lib/netcore50/System.Runtime.Extensions.dll": {}
         }
       },
-      "runtime.win10-arm.Microsoft.NETCore.UniversalWindowsPlatform/6.0.7": {
+      "runtime.win10-arm.Microsoft.NETCore.UniversalWindowsPlatform/6.0.8": {
         "type": "package",
         "compile": {
           "ref/netstandard/_._": {}
@@ -3403,7 +3403,7 @@
           "runtimes/win8-arm/native/clrcompression.dll": {}
         }
       },
-      "SkiaSharp/1.59.3": {
+      "SkiaSharp/1.60.0": {
         "type": "package",
         "compile": {
           "lib/uap10.0/SkiaSharp.dll": {}
@@ -5163,7 +5163,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "SkiaSharp": "1.59.3",
+          "SkiaSharp": "1.60.0",
           "Waher.Content.Emoji": "1.0.1",
           "Waher.Content.Html": "1.0.3",
           "Waher.Content.Xml": "1.0.2",
@@ -5202,7 +5202,7 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
-          "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.7",
+          "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.8",
           "Waher.Content": "1.0.8",
           "Waher.Content.Xml": "1.0.2",
           "Waher.Events": "1.0.6",
@@ -5223,7 +5223,7 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
-          "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.7",
+          "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.8",
           "Waher.Content": "1.0.0",
           "Waher.Content.Xml": "1.0.0",
           "Waher.Events": "1.0.0",
@@ -5237,7 +5237,7 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
-          "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.7",
+          "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.8",
           "Waher.Content": "1.0.0",
           "Waher.Content.Xml": "1.0.0",
           "Waher.Events": "1.0.0",
@@ -5251,7 +5251,7 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
-          "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.7",
+          "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.8",
           "Waher.Content": "1.0.0",
           "Waher.Content.Xml": "1.0.0",
           "Waher.Events": "1.0.0",
@@ -5266,7 +5266,7 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
-          "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.7",
+          "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.8",
           "Waher.Content": "1.0.0",
           "Waher.Content.Xml": "1.0.0",
           "Waher.Events": "1.0.0",
@@ -5337,7 +5337,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "SkiaSharp": "1.59.3",
+          "SkiaSharp": "1.60.0",
           "Waher.Script": "1.0.11"
         }
       },
@@ -5353,7 +5353,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "SkiaSharp": "1.59.3",
+          "SkiaSharp": "1.60.0",
           "Waher.Content": "1.0.8",
           "Waher.Content.Xml": "1.0.2",
           "Waher.Events": "1.0.6",
@@ -5547,7 +5547,7 @@
           "lib/netstandard1.0/_._": {}
         }
       },
-      "Microsoft.NETCore.UniversalWindowsPlatform/6.0.7": {
+      "Microsoft.NETCore.UniversalWindowsPlatform/6.0.8": {
         "type": "package",
         "dependencies": {
           "Microsoft.NETCore": "5.0.2",
@@ -5587,7 +5587,7 @@
           "System.Threading.Overlapped": "4.0.1",
           "System.Xml.XmlDocument": "4.0.1",
           "System.Xml.XmlSerializer": "4.0.11",
-          "runtime.win10-arm-aot.Microsoft.NETCore.UniversalWindowsPlatform": "6.0.7"
+          "runtime.win10-arm-aot.Microsoft.NETCore.UniversalWindowsPlatform": "6.0.8"
         },
         "compile": {
           "ref/netcore50/_._": {}
@@ -6082,7 +6082,7 @@
           "runtimes/aot/lib/netcore50/System.Runtime.Extensions.dll": {}
         }
       },
-      "runtime.win10-arm-aot.Microsoft.NETCore.UniversalWindowsPlatform/6.0.7": {
+      "runtime.win10-arm-aot.Microsoft.NETCore.UniversalWindowsPlatform/6.0.8": {
         "type": "package",
         "compile": {
           "ref/netstandard/_._": {}
@@ -6115,7 +6115,7 @@
           "runtimes/win8-arm-aot/native/_._": {}
         }
       },
-      "SkiaSharp/1.59.3": {
+      "SkiaSharp/1.60.0": {
         "type": "package",
         "compile": {
           "lib/uap10.0/SkiaSharp.dll": {}
@@ -7875,7 +7875,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "SkiaSharp": "1.59.3",
+          "SkiaSharp": "1.60.0",
           "Waher.Content.Emoji": "1.0.1",
           "Waher.Content.Html": "1.0.3",
           "Waher.Content.Xml": "1.0.2",
@@ -7914,7 +7914,7 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
-          "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.7",
+          "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.8",
           "Waher.Content": "1.0.8",
           "Waher.Content.Xml": "1.0.2",
           "Waher.Events": "1.0.6",
@@ -7935,7 +7935,7 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
-          "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.7",
+          "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.8",
           "Waher.Content": "1.0.0",
           "Waher.Content.Xml": "1.0.0",
           "Waher.Events": "1.0.0",
@@ -7949,7 +7949,7 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
-          "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.7",
+          "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.8",
           "Waher.Content": "1.0.0",
           "Waher.Content.Xml": "1.0.0",
           "Waher.Events": "1.0.0",
@@ -7963,7 +7963,7 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
-          "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.7",
+          "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.8",
           "Waher.Content": "1.0.0",
           "Waher.Content.Xml": "1.0.0",
           "Waher.Events": "1.0.0",
@@ -7978,7 +7978,7 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
-          "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.7",
+          "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.8",
           "Waher.Content": "1.0.0",
           "Waher.Content.Xml": "1.0.0",
           "Waher.Events": "1.0.0",
@@ -8049,7 +8049,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "SkiaSharp": "1.59.3",
+          "SkiaSharp": "1.60.0",
           "Waher.Script": "1.0.11"
         }
       },
@@ -8065,7 +8065,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "SkiaSharp": "1.59.3",
+          "SkiaSharp": "1.60.0",
           "Waher.Content": "1.0.8",
           "Waher.Content.Xml": "1.0.2",
           "Waher.Events": "1.0.6",
@@ -8261,7 +8261,7 @@
           "lib/netstandard1.0/_._": {}
         }
       },
-      "Microsoft.NETCore.UniversalWindowsPlatform/6.0.7": {
+      "Microsoft.NETCore.UniversalWindowsPlatform/6.0.8": {
         "type": "package",
         "dependencies": {
           "Microsoft.NETCore": "5.0.2",
@@ -8301,7 +8301,7 @@
           "System.Threading.Overlapped": "4.0.1",
           "System.Xml.XmlDocument": "4.0.1",
           "System.Xml.XmlSerializer": "4.0.11",
-          "runtime.win10-x64.Microsoft.NETCore.UniversalWindowsPlatform": "6.0.7"
+          "runtime.win10-x64.Microsoft.NETCore.UniversalWindowsPlatform": "6.0.8"
         },
         "compile": {
           "ref/netcore50/_._": {}
@@ -8751,7 +8751,7 @@
           "runtimes/win/lib/netcore50/System.Runtime.Extensions.dll": {}
         }
       },
-      "runtime.win10-x64.Microsoft.NETCore.UniversalWindowsPlatform/6.0.7": {
+      "runtime.win10-x64.Microsoft.NETCore.UniversalWindowsPlatform/6.0.8": {
         "type": "package",
         "compile": {
           "ref/netstandard/_._": {}
@@ -8800,7 +8800,7 @@
           "runtimes/win/lib/netcore50/System.Private.Uri.dll": {}
         }
       },
-      "SkiaSharp/1.59.3": {
+      "SkiaSharp/1.60.0": {
         "type": "package",
         "compile": {
           "lib/uap10.0/SkiaSharp.dll": {}
@@ -10560,7 +10560,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "SkiaSharp": "1.59.3",
+          "SkiaSharp": "1.60.0",
           "Waher.Content.Emoji": "1.0.1",
           "Waher.Content.Html": "1.0.3",
           "Waher.Content.Xml": "1.0.2",
@@ -10599,7 +10599,7 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
-          "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.7",
+          "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.8",
           "Waher.Content": "1.0.8",
           "Waher.Content.Xml": "1.0.2",
           "Waher.Events": "1.0.6",
@@ -10620,7 +10620,7 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
-          "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.7",
+          "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.8",
           "Waher.Content": "1.0.0",
           "Waher.Content.Xml": "1.0.0",
           "Waher.Events": "1.0.0",
@@ -10634,7 +10634,7 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
-          "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.7",
+          "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.8",
           "Waher.Content": "1.0.0",
           "Waher.Content.Xml": "1.0.0",
           "Waher.Events": "1.0.0",
@@ -10648,7 +10648,7 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
-          "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.7",
+          "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.8",
           "Waher.Content": "1.0.0",
           "Waher.Content.Xml": "1.0.0",
           "Waher.Events": "1.0.0",
@@ -10663,7 +10663,7 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
-          "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.7",
+          "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.8",
           "Waher.Content": "1.0.0",
           "Waher.Content.Xml": "1.0.0",
           "Waher.Events": "1.0.0",
@@ -10734,7 +10734,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "SkiaSharp": "1.59.3",
+          "SkiaSharp": "1.60.0",
           "Waher.Script": "1.0.11"
         }
       },
@@ -10750,7 +10750,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "SkiaSharp": "1.59.3",
+          "SkiaSharp": "1.60.0",
           "Waher.Content": "1.0.8",
           "Waher.Content.Xml": "1.0.2",
           "Waher.Events": "1.0.6",
@@ -10947,7 +10947,7 @@
           "lib/netstandard1.0/_._": {}
         }
       },
-      "Microsoft.NETCore.UniversalWindowsPlatform/6.0.7": {
+      "Microsoft.NETCore.UniversalWindowsPlatform/6.0.8": {
         "type": "package",
         "dependencies": {
           "Microsoft.NETCore": "5.0.2",
@@ -10987,7 +10987,7 @@
           "System.Threading.Overlapped": "4.0.1",
           "System.Xml.XmlDocument": "4.0.1",
           "System.Xml.XmlSerializer": "4.0.11",
-          "runtime.win10-x64-aot.Microsoft.NETCore.UniversalWindowsPlatform": "6.0.7"
+          "runtime.win10-x64-aot.Microsoft.NETCore.UniversalWindowsPlatform": "6.0.8"
         },
         "compile": {
           "ref/netcore50/_._": {}
@@ -11482,7 +11482,7 @@
           "runtimes/aot/lib/netcore50/System.Runtime.Extensions.dll": {}
         }
       },
-      "runtime.win10-x64-aot.Microsoft.NETCore.UniversalWindowsPlatform/6.0.7": {
+      "runtime.win10-x64-aot.Microsoft.NETCore.UniversalWindowsPlatform/6.0.8": {
         "type": "package",
         "compile": {
           "ref/netstandard/_._": {}
@@ -11521,7 +11521,7 @@
           "runtimes/aot/lib/netcore50/System.Private.Uri.dll": {}
         }
       },
-      "SkiaSharp/1.59.3": {
+      "SkiaSharp/1.60.0": {
         "type": "package",
         "compile": {
           "lib/uap10.0/SkiaSharp.dll": {}
@@ -13281,7 +13281,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "SkiaSharp": "1.59.3",
+          "SkiaSharp": "1.60.0",
           "Waher.Content.Emoji": "1.0.1",
           "Waher.Content.Html": "1.0.3",
           "Waher.Content.Xml": "1.0.2",
@@ -13320,7 +13320,7 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
-          "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.7",
+          "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.8",
           "Waher.Content": "1.0.8",
           "Waher.Content.Xml": "1.0.2",
           "Waher.Events": "1.0.6",
@@ -13341,7 +13341,7 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
-          "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.7",
+          "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.8",
           "Waher.Content": "1.0.0",
           "Waher.Content.Xml": "1.0.0",
           "Waher.Events": "1.0.0",
@@ -13355,7 +13355,7 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
-          "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.7",
+          "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.8",
           "Waher.Content": "1.0.0",
           "Waher.Content.Xml": "1.0.0",
           "Waher.Events": "1.0.0",
@@ -13369,7 +13369,7 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
-          "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.7",
+          "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.8",
           "Waher.Content": "1.0.0",
           "Waher.Content.Xml": "1.0.0",
           "Waher.Events": "1.0.0",
@@ -13384,7 +13384,7 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
-          "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.7",
+          "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.8",
           "Waher.Content": "1.0.0",
           "Waher.Content.Xml": "1.0.0",
           "Waher.Events": "1.0.0",
@@ -13455,7 +13455,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "SkiaSharp": "1.59.3",
+          "SkiaSharp": "1.60.0",
           "Waher.Script": "1.0.11"
         }
       },
@@ -13471,7 +13471,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "SkiaSharp": "1.59.3",
+          "SkiaSharp": "1.60.0",
           "Waher.Content": "1.0.8",
           "Waher.Content.Xml": "1.0.2",
           "Waher.Events": "1.0.6",
@@ -13667,7 +13667,7 @@
           "lib/netstandard1.0/_._": {}
         }
       },
-      "Microsoft.NETCore.UniversalWindowsPlatform/6.0.7": {
+      "Microsoft.NETCore.UniversalWindowsPlatform/6.0.8": {
         "type": "package",
         "dependencies": {
           "Microsoft.NETCore": "5.0.2",
@@ -13707,7 +13707,7 @@
           "System.Threading.Overlapped": "4.0.1",
           "System.Xml.XmlDocument": "4.0.1",
           "System.Xml.XmlSerializer": "4.0.11",
-          "runtime.win10-x86.Microsoft.NETCore.UniversalWindowsPlatform": "6.0.7"
+          "runtime.win10-x86.Microsoft.NETCore.UniversalWindowsPlatform": "6.0.8"
         },
         "compile": {
           "ref/netcore50/_._": {}
@@ -14157,7 +14157,7 @@
           "runtimes/win/lib/netcore50/System.Runtime.Extensions.dll": {}
         }
       },
-      "runtime.win10-x86.Microsoft.NETCore.UniversalWindowsPlatform/6.0.7": {
+      "runtime.win10-x86.Microsoft.NETCore.UniversalWindowsPlatform/6.0.8": {
         "type": "package",
         "compile": {
           "ref/netstandard/_._": {}
@@ -14206,7 +14206,7 @@
           "runtimes/win/lib/netcore50/System.Private.Uri.dll": {}
         }
       },
-      "SkiaSharp/1.59.3": {
+      "SkiaSharp/1.60.0": {
         "type": "package",
         "compile": {
           "lib/uap10.0/SkiaSharp.dll": {}
@@ -15966,7 +15966,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "SkiaSharp": "1.59.3",
+          "SkiaSharp": "1.60.0",
           "Waher.Content.Emoji": "1.0.1",
           "Waher.Content.Html": "1.0.3",
           "Waher.Content.Xml": "1.0.2",
@@ -16005,7 +16005,7 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
-          "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.7",
+          "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.8",
           "Waher.Content": "1.0.8",
           "Waher.Content.Xml": "1.0.2",
           "Waher.Events": "1.0.6",
@@ -16026,7 +16026,7 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
-          "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.7",
+          "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.8",
           "Waher.Content": "1.0.0",
           "Waher.Content.Xml": "1.0.0",
           "Waher.Events": "1.0.0",
@@ -16040,7 +16040,7 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
-          "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.7",
+          "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.8",
           "Waher.Content": "1.0.0",
           "Waher.Content.Xml": "1.0.0",
           "Waher.Events": "1.0.0",
@@ -16054,7 +16054,7 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
-          "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.7",
+          "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.8",
           "Waher.Content": "1.0.0",
           "Waher.Content.Xml": "1.0.0",
           "Waher.Events": "1.0.0",
@@ -16069,7 +16069,7 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
-          "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.7",
+          "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.8",
           "Waher.Content": "1.0.0",
           "Waher.Content.Xml": "1.0.0",
           "Waher.Events": "1.0.0",
@@ -16140,7 +16140,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "SkiaSharp": "1.59.3",
+          "SkiaSharp": "1.60.0",
           "Waher.Script": "1.0.11"
         }
       },
@@ -16156,7 +16156,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "SkiaSharp": "1.59.3",
+          "SkiaSharp": "1.60.0",
           "Waher.Content": "1.0.8",
           "Waher.Content.Xml": "1.0.2",
           "Waher.Events": "1.0.6",
@@ -16353,7 +16353,7 @@
           "lib/netstandard1.0/_._": {}
         }
       },
-      "Microsoft.NETCore.UniversalWindowsPlatform/6.0.7": {
+      "Microsoft.NETCore.UniversalWindowsPlatform/6.0.8": {
         "type": "package",
         "dependencies": {
           "Microsoft.NETCore": "5.0.2",
@@ -16393,7 +16393,7 @@
           "System.Threading.Overlapped": "4.0.1",
           "System.Xml.XmlDocument": "4.0.1",
           "System.Xml.XmlSerializer": "4.0.11",
-          "runtime.win10-x86-aot.Microsoft.NETCore.UniversalWindowsPlatform": "6.0.7"
+          "runtime.win10-x86-aot.Microsoft.NETCore.UniversalWindowsPlatform": "6.0.8"
         },
         "compile": {
           "ref/netcore50/_._": {}
@@ -16888,7 +16888,7 @@
           "runtimes/aot/lib/netcore50/System.Runtime.Extensions.dll": {}
         }
       },
-      "runtime.win10-x86-aot.Microsoft.NETCore.UniversalWindowsPlatform/6.0.7": {
+      "runtime.win10-x86-aot.Microsoft.NETCore.UniversalWindowsPlatform/6.0.8": {
         "type": "package",
         "compile": {
           "ref/netstandard/_._": {}
@@ -16927,7 +16927,7 @@
           "runtimes/aot/lib/netcore50/System.Private.Uri.dll": {}
         }
       },
-      "SkiaSharp/1.59.3": {
+      "SkiaSharp/1.60.0": {
         "type": "package",
         "compile": {
           "lib/uap10.0/SkiaSharp.dll": {}
@@ -18687,7 +18687,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "SkiaSharp": "1.59.3",
+          "SkiaSharp": "1.60.0",
           "Waher.Content.Emoji": "1.0.1",
           "Waher.Content.Html": "1.0.3",
           "Waher.Content.Xml": "1.0.2",
@@ -18726,7 +18726,7 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
-          "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.7",
+          "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.8",
           "Waher.Content": "1.0.8",
           "Waher.Content.Xml": "1.0.2",
           "Waher.Events": "1.0.6",
@@ -18747,7 +18747,7 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
-          "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.7",
+          "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.8",
           "Waher.Content": "1.0.0",
           "Waher.Content.Xml": "1.0.0",
           "Waher.Events": "1.0.0",
@@ -18761,7 +18761,7 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
-          "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.7",
+          "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.8",
           "Waher.Content": "1.0.0",
           "Waher.Content.Xml": "1.0.0",
           "Waher.Events": "1.0.0",
@@ -18775,7 +18775,7 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
-          "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.7",
+          "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.8",
           "Waher.Content": "1.0.0",
           "Waher.Content.Xml": "1.0.0",
           "Waher.Events": "1.0.0",
@@ -18790,7 +18790,7 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
-          "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.7",
+          "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.8",
           "Waher.Content": "1.0.0",
           "Waher.Content.Xml": "1.0.0",
           "Waher.Events": "1.0.0",
@@ -18861,7 +18861,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "SkiaSharp": "1.59.3",
+          "SkiaSharp": "1.60.0",
           "Waher.Script": "1.0.11"
         }
       },
@@ -18877,7 +18877,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "SkiaSharp": "1.59.3",
+          "SkiaSharp": "1.60.0",
           "Waher.Content": "1.0.8",
           "Waher.Content.Xml": "1.0.2",
           "Waher.Events": "1.0.6",
@@ -21179,14 +21179,14 @@
         "runtime.json"
       ]
     },
-    "Microsoft.NETCore.UniversalWindowsPlatform/6.0.7": {
-      "sha512": "ieBIGwT7GnEIdlvx4Sg8fmpQ6Q7ZwkxOD1JcuWICtBsgrKsJAdu2WhnSd+GeCMenqfV+Z2ggAKGQUqE81EhCAw==",
+    "Microsoft.NETCore.UniversalWindowsPlatform/6.0.8": {
+      "sha512": "zGyKY3y4bLAFJPIaUUl+JBysmo++bRHT7zB93dmUJNs8U1Gy1D95grF1fPydr5ipPveE3PblYpQio98LQZR9lg==",
       "type": "package",
-      "path": "microsoft.netcore.universalwindowsplatform/6.0.7",
+      "path": "microsoft.netcore.universalwindowsplatform/6.0.8",
       "files": [
         "LICENSE.TXT",
         "THIRD-PARTY-NOTICES.TXT",
-        "microsoft.netcore.universalwindowsplatform.6.0.7.nupkg.sha512",
+        "microsoft.netcore.universalwindowsplatform.6.0.8.nupkg.sha512",
         "microsoft.netcore.universalwindowsplatform.nuspec",
         "ref/netcore50/_._",
         "ref/uap10.0.15138/Microsoft.CSharp.dll",
@@ -22471,15 +22471,15 @@
         "runtimes/win/lib/netstandard1.5/System.Runtime.Extensions.dll"
       ]
     },
-    "runtime.win10-arm-aot.Microsoft.NETCore.UniversalWindowsPlatform/6.0.7": {
-      "sha512": "avtC8VVfL3vYwCzsbbHfzKkhuIFGS+D7c2gOFNal3UGIdPJ20qc+1oOQxNL+9QxO49xCAhGELf6o05Nj8YchSw==",
+    "runtime.win10-arm-aot.Microsoft.NETCore.UniversalWindowsPlatform/6.0.8": {
+      "sha512": "mCcoolv8UTrTcmRktwjlPk4N+kjcoJDFEI6cH/kT72zv31Mf5HH7/H99q6lNwSF1dXZAeZbzBXJcDOKFMJoKTw==",
       "type": "package",
-      "path": "runtime.win10-arm-aot.microsoft.netcore.universalwindowsplatform/6.0.7",
+      "path": "runtime.win10-arm-aot.microsoft.netcore.universalwindowsplatform/6.0.8",
       "files": [
         "LICENSE.TXT",
         "THIRD-PARTY-NOTICES.TXT",
         "ref/netstandard/_._",
-        "runtime.win10-arm-aot.microsoft.netcore.universalwindowsplatform.6.0.7.nupkg.sha512",
+        "runtime.win10-arm-aot.microsoft.netcore.universalwindowsplatform.6.0.8.nupkg.sha512",
         "runtime.win10-arm-aot.microsoft.netcore.universalwindowsplatform.nuspec",
         "runtimes/win10-arm-aot/lib/uap10.0.15138/Microsoft.CSharp.dll",
         "runtimes/win10-arm-aot/lib/uap10.0.15138/Microsoft.VisualBasic.dll",
@@ -22660,15 +22660,15 @@
         "runtimes/win10-arm-aot/lib/netcore50/clrcompression.dll"
       ]
     },
-    "runtime.win10-arm.Microsoft.NETCore.UniversalWindowsPlatform/6.0.7": {
-      "sha512": "cAv6eXOf4fMCcRNZeBTITprR4Xt3w1UVYdHd2ju3a8AoSLT2TMGjnRq7OKuvkUwEhpYCyYjC1MG6dYbMQ/YBbA==",
+    "runtime.win10-arm.Microsoft.NETCore.UniversalWindowsPlatform/6.0.8": {
+      "sha512": "tbmLG9GnSm0LWKkzvzq6Ppw85Lt4EE+aRDSGoYrbbiPTkzK9fzcPOv5YqzL86WKzxWi9E9pZvVytM1uvd3bYXg==",
       "type": "package",
-      "path": "runtime.win10-arm.microsoft.netcore.universalwindowsplatform/6.0.7",
+      "path": "runtime.win10-arm.microsoft.netcore.universalwindowsplatform/6.0.8",
       "files": [
         "LICENSE.TXT",
         "THIRD-PARTY-NOTICES.TXT",
         "ref/netstandard/_._",
-        "runtime.win10-arm.microsoft.netcore.universalwindowsplatform.6.0.7.nupkg.sha512",
+        "runtime.win10-arm.microsoft.netcore.universalwindowsplatform.6.0.8.nupkg.sha512",
         "runtime.win10-arm.microsoft.netcore.universalwindowsplatform.nuspec",
         "runtimes/win10-arm/lib/uap10.0.15138/Microsoft.CSharp.dll",
         "runtimes/win10-arm/lib/uap10.0.15138/Microsoft.VisualBasic.dll",
@@ -22836,15 +22836,15 @@
         "runtimes/win10-arm/nativeassets/uap10.0.15138/clrcompression.dll"
       ]
     },
-    "runtime.win10-x64-aot.Microsoft.NETCore.UniversalWindowsPlatform/6.0.7": {
-      "sha512": "ebFZQNM7+kuGUnasuUYLV9yJx9KkzuM2l1A5AbcfRCHBS8Ahtiyak3cLk8yA6xiVR06IfwvtkicSGWB7uq36BQ==",
+    "runtime.win10-x64-aot.Microsoft.NETCore.UniversalWindowsPlatform/6.0.8": {
+      "sha512": "QhGAy+4NIyxehEg0t0Ps+TvLDj9EHZxwqK+St3q4ggMhGCKXsv7B1g1i9OjC3GGLWW1ShEaSGJMTXf05cDO8Cg==",
       "type": "package",
-      "path": "runtime.win10-x64-aot.microsoft.netcore.universalwindowsplatform/6.0.7",
+      "path": "runtime.win10-x64-aot.microsoft.netcore.universalwindowsplatform/6.0.8",
       "files": [
         "LICENSE.TXT",
         "THIRD-PARTY-NOTICES.TXT",
         "ref/netstandard/_._",
-        "runtime.win10-x64-aot.microsoft.netcore.universalwindowsplatform.6.0.7.nupkg.sha512",
+        "runtime.win10-x64-aot.microsoft.netcore.universalwindowsplatform.6.0.8.nupkg.sha512",
         "runtime.win10-x64-aot.microsoft.netcore.universalwindowsplatform.nuspec",
         "runtimes/win10-x64-aot/lib/uap10.0.15138/Microsoft.CSharp.dll",
         "runtimes/win10-x64-aot/lib/uap10.0.15138/Microsoft.VisualBasic.dll",
@@ -23025,15 +23025,15 @@
         "runtimes/win10-x64-aot/lib/netcore50/clrcompression.dll"
       ]
     },
-    "runtime.win10-x64.Microsoft.NETCore.UniversalWindowsPlatform/6.0.7": {
-      "sha512": "X7iEv9lXlMVmHe6D0HnWSn7ZO8rsIMjkID2M4ekfx9IllRDuLq67xIvWz71p7lyOtEN26Cq7LUa9GS2GebF7Yw==",
+    "runtime.win10-x64.Microsoft.NETCore.UniversalWindowsPlatform/6.0.8": {
+      "sha512": "gDKOajerneiwUinQpoVy0dEzX4QRB/oWO37vmfwTac4bSkAsrfdhA5gEeMR4y2JN0OHABLP8zjm1bOiHp4XnFQ==",
       "type": "package",
-      "path": "runtime.win10-x64.microsoft.netcore.universalwindowsplatform/6.0.7",
+      "path": "runtime.win10-x64.microsoft.netcore.universalwindowsplatform/6.0.8",
       "files": [
         "LICENSE.TXT",
         "THIRD-PARTY-NOTICES.TXT",
         "ref/netstandard/_._",
-        "runtime.win10-x64.microsoft.netcore.universalwindowsplatform.6.0.7.nupkg.sha512",
+        "runtime.win10-x64.microsoft.netcore.universalwindowsplatform.6.0.8.nupkg.sha512",
         "runtime.win10-x64.microsoft.netcore.universalwindowsplatform.nuspec",
         "runtimes/win10-x64/lib/uap10.0.15138/Microsoft.CSharp.dll",
         "runtimes/win10-x64/lib/uap10.0.15138/Microsoft.VisualBasic.dll",
@@ -23201,15 +23201,15 @@
         "runtimes/win10-x64/nativeassets/uap10.0.15138/clrcompression.dll"
       ]
     },
-    "runtime.win10-x86-aot.Microsoft.NETCore.UniversalWindowsPlatform/6.0.7": {
-      "sha512": "MtbgNudV3dJikzomvTd+NJdIDnjzpkWYg7mCUxG8bgswyTmrfkrkFyFndmmZSv7F1j7BAHjnfjm0s5W/VVzjeg==",
+    "runtime.win10-x86-aot.Microsoft.NETCore.UniversalWindowsPlatform/6.0.8": {
+      "sha512": "qlJZm6eLTkgsb4TjIlkeCU2DkEAtJw1l0X/YzsMwTmx5yz63gSc1UBp45IrPu699kG0AY3TuUJ6fXeWk9x9iIg==",
       "type": "package",
-      "path": "runtime.win10-x86-aot.microsoft.netcore.universalwindowsplatform/6.0.7",
+      "path": "runtime.win10-x86-aot.microsoft.netcore.universalwindowsplatform/6.0.8",
       "files": [
         "LICENSE.TXT",
         "THIRD-PARTY-NOTICES.TXT",
         "ref/netstandard/_._",
-        "runtime.win10-x86-aot.microsoft.netcore.universalwindowsplatform.6.0.7.nupkg.sha512",
+        "runtime.win10-x86-aot.microsoft.netcore.universalwindowsplatform.6.0.8.nupkg.sha512",
         "runtime.win10-x86-aot.microsoft.netcore.universalwindowsplatform.nuspec",
         "runtimes/win10-x86-aot/lib/uap10.0.15138/Microsoft.CSharp.dll",
         "runtimes/win10-x86-aot/lib/uap10.0.15138/Microsoft.VisualBasic.dll",
@@ -23390,15 +23390,15 @@
         "runtimes/win10-x86-aot/lib/netcore50/clrcompression.dll"
       ]
     },
-    "runtime.win10-x86.Microsoft.NETCore.UniversalWindowsPlatform/6.0.7": {
-      "sha512": "Lalm5ziKxvQrXV2WaGuM8BhO609wjiqzOygxPlOF8FCxel6brkOVlsIf9/5o0q6j7vXyiqUWjYLbjOy2iav5qA==",
+    "runtime.win10-x86.Microsoft.NETCore.UniversalWindowsPlatform/6.0.8": {
+      "sha512": "CHjI9Nsqvw/8nOqiCJOnXr8HT/Fpo44Ir2sUqANdH9jnxGs4u7RTcZSG1dIRyJrOvd0nHLklAVfbwu8SIkXPWg==",
       "type": "package",
-      "path": "runtime.win10-x86.microsoft.netcore.universalwindowsplatform/6.0.7",
+      "path": "runtime.win10-x86.microsoft.netcore.universalwindowsplatform/6.0.8",
       "files": [
         "LICENSE.TXT",
         "THIRD-PARTY-NOTICES.TXT",
         "ref/netstandard/_._",
-        "runtime.win10-x86.microsoft.netcore.universalwindowsplatform.6.0.7.nupkg.sha512",
+        "runtime.win10-x86.microsoft.netcore.universalwindowsplatform.6.0.8.nupkg.sha512",
         "runtime.win10-x86.microsoft.netcore.universalwindowsplatform.nuspec",
         "runtimes/win10-x86/lib/uap10.0.15138/Microsoft.CSharp.dll",
         "runtimes/win10-x86/lib/uap10.0.15138/Microsoft.VisualBasic.dll",
@@ -23725,10 +23725,10 @@
         "runtimes/win8-arm/native/clrcompression.dll"
       ]
     },
-    "SkiaSharp/1.59.3": {
-      "sha512": "MNVXKHn3dDGnJPtO4dPMU6GtvFHO1aUHDWm1V5i7QbacVJFxT+a8x1chGGdgFNl7pB4+/yzEo39x9Q7ggRYt6A==",
+    "SkiaSharp/1.60.0": {
+      "sha512": "HoSNIZH54rinevEhLUWdeclr+H/QdmOp252+Tt07HTXwQyvRl9eW32ga/X7T56wsR855SKprb0RcnBPRCzlqSA==",
       "type": "package",
-      "path": "skiasharp/1.59.3",
+      "path": "skiasharp/1.60.0",
       "files": [
         "build/net45/SkiaSharp.dll.config",
         "build/net45/SkiaSharp.targets",
@@ -23740,6 +23740,8 @@
         "lib/XamariniOS/SkiaSharp.xml",
         "lib/XamarintvOS/SkiaSharp.dll",
         "lib/XamarintvOS/SkiaSharp.xml",
+        "lib/XamarinwatchOS/SkiaSharp.dll",
+        "lib/XamarinwatchOS/SkiaSharp.xml",
         "lib/net45/SkiaSharp.dll",
         "lib/net45/SkiaSharp.dll.config",
         "lib/net45/SkiaSharp.xml",
@@ -23761,7 +23763,7 @@
         "runtimes/win10-x86/nativeassets/uap10.0/libSkiaSharp.dll",
         "runtimes/win7-x64/native/libSkiaSharp.dll",
         "runtimes/win7-x86/native/libSkiaSharp.dll",
-        "skiasharp.1.59.3.nupkg.sha512",
+        "skiasharp.1.60.0.nupkg.sha512",
         "skiasharp.nuspec",
         "xamarin.interactive/SkiaSharp.Workbooks.dll"
       ]
@@ -28789,7 +28791,7 @@
   },
   "projectFileDependencyGroups": {
     "": [
-      "Microsoft.NETCore.UniversalWindowsPlatform >= 6.0.7"
+      "Microsoft.NETCore.UniversalWindowsPlatform >= 6.0.8"
     ],
     "UAP,Version=v10.0.10240": []
   },
@@ -28836,18 +28838,6 @@
             "C:\\My Projects\\IoTGateway\\Events\\Waher.Events\\Waher.Events.csproj": {
               "projectPath": "C:\\My Projects\\IoTGateway\\Events\\Waher.Events\\Waher.Events.csproj"
             },
-            "C:\\My Projects\\IoTGateway\\Runtime\\Waher.Runtime.Cache\\Waher.Runtime.Cache.csproj": {
-              "projectPath": "C:\\My Projects\\IoTGateway\\Runtime\\Waher.Runtime.Cache\\Waher.Runtime.Cache.csproj"
-            },
-            "C:\\My Projects\\IoTGateway\\Script\\Waher.Script.Graphs\\Waher.Script.Graphs.csproj": {
-              "projectPath": "C:\\My Projects\\IoTGateway\\Script\\Waher.Script.Graphs\\Waher.Script.Graphs.csproj"
-            },
-            "C:\\My Projects\\IoTGateway\\Script\\Waher.Script\\Waher.Script.csproj": {
-              "projectPath": "C:\\My Projects\\IoTGateway\\Script\\Waher.Script\\Waher.Script.csproj"
-            },
-            "C:\\My Projects\\IoTGateway\\Things\\Waher.Things\\Waher.Things.csproj": {
-              "projectPath": "C:\\My Projects\\IoTGateway\\Things\\Waher.Things\\Waher.Things.csproj"
-            },
             "C:\\My Projects\\IoTGateway\\Networking\\Waher.Networking.XMPP.Concentrator.UWP\\Waher.Networking.XMPP.Concentrator.UWP.csproj": {
               "projectPath": "C:\\My Projects\\IoTGateway\\Networking\\Waher.Networking.XMPP.Concentrator.UWP\\Waher.Networking.XMPP.Concentrator.UWP.csproj"
             },
@@ -28865,13 +28855,25 @@
             },
             "C:\\My Projects\\IoTGateway\\Networking\\Waher.Networking\\Waher.Networking.csproj": {
               "projectPath": "C:\\My Projects\\IoTGateway\\Networking\\Waher.Networking\\Waher.Networking.csproj"
+            },
+            "C:\\My Projects\\IoTGateway\\Runtime\\Waher.Runtime.Cache\\Waher.Runtime.Cache.csproj": {
+              "projectPath": "C:\\My Projects\\IoTGateway\\Runtime\\Waher.Runtime.Cache\\Waher.Runtime.Cache.csproj"
+            },
+            "C:\\My Projects\\IoTGateway\\Script\\Waher.Script.Graphs\\Waher.Script.Graphs.csproj": {
+              "projectPath": "C:\\My Projects\\IoTGateway\\Script\\Waher.Script.Graphs\\Waher.Script.Graphs.csproj"
+            },
+            "C:\\My Projects\\IoTGateway\\Script\\Waher.Script\\Waher.Script.csproj": {
+              "projectPath": "C:\\My Projects\\IoTGateway\\Script\\Waher.Script\\Waher.Script.csproj"
+            },
+            "C:\\My Projects\\IoTGateway\\Things\\Waher.Things\\Waher.Things.csproj": {
+              "projectPath": "C:\\My Projects\\IoTGateway\\Things\\Waher.Things\\Waher.Things.csproj"
             }
           }
         }
       }
     },
     "dependencies": {
-      "Microsoft.NETCore.UniversalWindowsPlatform": "[6.0.7, )"
+      "Microsoft.NETCore.UniversalWindowsPlatform": "[6.0.8, )"
     },
     "frameworks": {
       "uap10.0.10240": {}

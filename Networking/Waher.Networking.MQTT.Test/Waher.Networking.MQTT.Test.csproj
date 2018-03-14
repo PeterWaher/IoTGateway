@@ -76,6 +76,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\Waher.Networking.MQTT\Waher.Networking.MQTT.csproj">
       <Project>{91e36bb1-8da9-4887-896d-9882060cfedb}</Project>
       <Name>Waher.Networking.MQTT</Name>
@@ -84,9 +87,6 @@
       <Project>{9f60a3e1-ee96-4648-8970-76e67b086a63}</Project>
       <Name>Waher.Networking</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

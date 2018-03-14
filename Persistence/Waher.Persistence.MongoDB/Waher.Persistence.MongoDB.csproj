@@ -59,6 +59,9 @@
     <Compile Include="Serialization\ObjectSerializer.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Cache\Waher.Runtime.Cache.csproj">
       <Project>{7d5a1c49-15e9-4e74-a7b5-3ff9b705e73f}</Project>
       <Name>Waher.Runtime.Cache</Name>
@@ -71,9 +74,6 @@
       <Project>{0286288f-4af3-4e64-a398-24c8957ceb04}</Project>
       <Name>Waher.Persistence</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

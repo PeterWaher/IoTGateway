@@ -48,6 +48,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include=".bak\Waher.Networking.XMPP\MessageFormEventArgs.cs" />
+    <Compile Include=".bak\Waher.Networking.XMPP\ResultSetManagement\RestrictedQuery.cs" />
+    <Compile Include=".bak\Waher.Networking.XMPP\ResultSetManagement\ResultPage.cs" />
     <Compile Include=".bak\Waher.Networking.XMPP\XmppCredentials.cs" />
     <Compile Include="Registration.cs" />
     <Compile Include="CustomAction.cs" />

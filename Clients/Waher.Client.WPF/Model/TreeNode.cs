@@ -345,7 +345,7 @@ namespace Waher.Client.WPF.Model
 		/// <param name="OnDeleted">Method called when node has been successfully deleted.</param>
 		public virtual void Delete(TreeNode Parent, EventHandler OnDeleted)
 		{
-			Parent.RemoveChild(this);
+			Parent?.RemoveChild(this);
 			OnDeleted?.Invoke(this, new EventArgs());
 		}
 

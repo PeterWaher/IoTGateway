@@ -123,72 +123,144 @@ namespace Waher.Client.WPF.Model.PubSub
 		{
 			if (!this.loadingChildren && this.children != null && this.children.Count == 1 && this.children.ContainsKey(string.Empty))
 			{
+				SortedDictionary<string, TreeNode> Children = new SortedDictionary<string, TreeNode>();
+
 				Mouse.OverrideCursor = Cursors.Wait;
-
 				this.loadingChildren = true;
-				this.Service.Account.Client.SendServiceItemsDiscoveryRequest(this.PubSubClient.ComponentAddress, this.node, (sender, e) =>
+
+				if (this.nodeType == NodeType.leaf && this.Service.SupportsLastPublished)
 				{
-					this.loadingChildren = false;
-					MainWindow.MouseDefault();
-
-					if (e.Ok)
+					this.Service.PubSubClient.GetLatestItems(this.node, 50, (sender, e) =>
 					{
-						SortedDictionary<string, TreeNode> Children = new SortedDictionary<string, TreeNode>();
-
-						this.Service.NodesRemoved(this.children.Values, this);
-
-						if (this.nodeType == NodeType.leaf)
+						if (e.Ok)
 						{
-							foreach (Item Item in e.Items)
-								Children[Item.Name] = new PubSubItem(this, this.jid, this.node, Item.Name);
+							foreach (Networking.XMPP.PubSub.PubSubItem Item in e.Items)
+								Children[Item.ItemId] = new PubSubItem(this, this.jid, Item.Node, Item.ItemId, Item.Payload, Item.Publisher);
 
-							this.children = new SortedDictionary<string, TreeNode>(Children);
+							this.children = Children;
 
 							this.OnUpdated();
 							this.Service.NodesAdded(this.children.Values, this);
 						}
 						else
+							MainWindow.ErrorBox(string.IsNullOrEmpty(e.ErrorText) ? "Unable to get latest items." : e.ErrorText);
+
+					}, null);
+				}
+				else
+				{
+					this.Service.Account.Client.SendServiceItemsDiscoveryRequest(this.PubSubClient.ComponentAddress, this.node, (sender, e) =>
+					{
+						this.loadingChildren = false;
+						MainWindow.MouseDefault();
+
+						if (e.Ok)
 						{
-							foreach (Item Item in e.Items)
+							this.Service.NodesRemoved(this.children.Values, this);
+
+							if (this.nodeType == NodeType.leaf)
 							{
-								this.Service.Account.Client.SendServiceDiscoveryRequest(this.PubSubClient.ComponentAddress, Item.Node, (sender2, e2) =>
+								List<string> ItemIds = new List<string>();
+
+								foreach (Item Item in e.Items)
+									ItemIds.Add(Item.Name);
+
+								this.Service.PubSubClient.GetItems(this.node, ItemIds.ToArray(), (sender2, e2) =>
 								{
 									if (e2.Ok)
 									{
-										Item Item2 = (Item)e2.State;
-										string Jid = Item2.JID;
-										string Node = Item2.Node;
-										string Name = Item2.Name;
-										NodeType NodeType = NodeType.leaf;
-										TreeNode NewNode;
-
-										foreach (Identity Identity in e2.Identities)
+										if (e2.Items.Length == ItemIds.Count)
 										{
-											if (Identity.Category == "pubsub")
-											{
-												if (!Enum.TryParse<NodeType>(Identity.Type, out NodeType))
-													NodeType = NodeType.leaf;
+											foreach (Networking.XMPP.PubSub.PubSubItem Item in e2.Items)
+												Children[Item.ItemId] = new PubSubItem(this, this.jid, Item.Node, Item.ItemId, Item.Payload, Item.Publisher);
 
-												if (!string.IsNullOrEmpty(Identity.Name))
-													Name = Identity.Name;
+											this.children = Children;
+
+											this.OnUpdated();
+											this.Service.NodesAdded(this.children.Values, this);
+										}
+										else
+										{
+											foreach (Item Item in e.Items)
+											{
+												this.Service.PubSubClient.GetItems(this.node, new string[] { Item.Name }, (sender3, e3) =>
+												{
+													if (e3.Ok)
+													{
+														if (e3.Items.Length == 1)
+														{
+															Networking.XMPP.PubSub.PubSubItem Item2 = e3.Items[0];
+															TreeNode NewNode;
+
+															lock (Children)
+															{
+																NewNode = new PubSubItem(this, this.jid, Item2.Node, Item2.ItemId, Item2.Payload, Item2.Publisher);
+																Children[Item2.ItemId] = NewNode;
+																this.children = new SortedDictionary<string, TreeNode>(Children);
+															}
+
+															this.OnUpdated();
+															this.Service.NodesAdded(new TreeNode[] { NewNode }, this);
+														}
+													}
+													else
+														MainWindow.ErrorBox(string.IsNullOrEmpty(e2.ErrorText) ? "Unable to get item." : e3.ErrorText);
+
+												}, Item);
 											}
 										}
-
-										lock (Children)
-										{
-											NewNode = new PubSubNode(this, Jid, Node, Name, NodeType);
-											Children[Item2.Node] = NewNode;
-											this.children = new SortedDictionary<string, TreeNode>(Children);
-										}
-
-										this.OnUpdated();
-										this.Service.NodesAdded(new TreeNode[] { NewNode }, this);
 									}
-								}, Item);
+									else
+										MainWindow.ErrorBox(string.IsNullOrEmpty(e2.ErrorText) ? "Unable to get items." : e2.ErrorText);
+								}, null);
+							}
+							else
+							{
+								foreach (Item Item in e.Items)
+								{
+									this.Service.Account.Client.SendServiceDiscoveryRequest(this.PubSubClient.ComponentAddress, Item.Node, (sender2, e2) =>
+									{
+										if (e2.Ok)
+										{
+											Item Item2 = (Item)e2.State;
+											string Jid = Item2.JID;
+											string Node = Item2.Node;
+											string Name = Item2.Name;
+											NodeType NodeType = NodeType.leaf;
+											TreeNode NewNode;
+
+											foreach (Identity Identity in e2.Identities)
+											{
+												if (Identity.Category == "pubsub")
+												{
+													if (!Enum.TryParse<NodeType>(Identity.Type, out NodeType))
+														NodeType = NodeType.leaf;
+
+													if (!string.IsNullOrEmpty(Identity.Name))
+														Name = Identity.Name;
+												}
+											}
+
+											lock (Children)
+											{
+												NewNode = new PubSubNode(this, Jid, Node, Name, NodeType);
+												Children[Item2.Node] = NewNode;
+												this.children = new SortedDictionary<string, TreeNode>(Children);
+											}
+
+											this.OnUpdated();
+											this.Service.NodesAdded(new TreeNode[] { NewNode }, this);
+										}
+										else
+											MainWindow.ErrorBox(string.IsNullOrEmpty(e2.ErrorText) ? "Unable to get information." : e2.ErrorText);
+									}, Item);
+								}
 							}
 						}
-					}
-				}, null);
+						else
+							MainWindow.ErrorBox(string.IsNullOrEmpty(e.ErrorText) ? "Unable to get information." : e.ErrorText);
+					}, null);
+				}
 			}
 
 			base.LoadChildren();

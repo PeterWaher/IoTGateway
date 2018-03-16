@@ -1033,6 +1033,8 @@ namespace Waher.Client.WPF.Model
 								MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() =>
 									MainWindow.currentInstance.NewQuestion(this, ThingRegistry.ProvisioningClient, null)));
 							}
+
+							this.OnUpdated();
 						}
 						catch (Exception ex)
 						{

@@ -37,9 +37,204 @@ namespace Waher.Networking.XMPP.PubSub
 		public const string NamespaceStanzaHeaders = "http://jabber.org/protocol/shim";
 
 		/// <summary>
+		/// http://jabber.org/protocol/pubsub#node_config
+		/// </summary>
+		public const string FormTypeNodeConfig = "http://jabber.org/protocol/pubsub#node_config";
+
+		/// <summary>
+		/// http://jabber.org/protocol/pubsub#subscribe_options
+		/// </summary>
+		public const string FormTypeSubscribeOptions = "http://jabber.org/protocol/pubsub#subscribe_options";
+
+		/// <summary>
 		/// http://jabber.org/protocol/pubsub#subscribe_authorization
 		/// </summary>
 		public const string FormTypeSubscriptionAuthorization = "http://jabber.org/protocol/pubsub#subscribe_authorization";
+
+		/// <summary>
+		/// http://jabber.org/protocol/pubsub#meta-data
+		/// </summary>
+		public const string FormTypeNodeMetaData = "http://jabber.org/protocol/pubsub#meta-data";
+
+		/// <summary>
+		/// http://jabber.org/protocol/pubsub#access-authorize
+		/// </summary>
+		public const string NamespacePubSubAccessAuthorize = "http://jabber.org/protocol/pubsub#access-authorize";
+
+		/// <summary>
+		/// http://jabber.org/protocol/pubsub#access-open
+		/// </summary>
+		public const string NamespacePubSubAccessOpen = "http://jabber.org/protocol/pubsub#access-open";
+
+		/// <summary>
+		/// http://jabber.org/protocol/pubsub#access-presence
+		/// </summary>
+		public const string NamespacePubSubAccessPresence = "http://jabber.org/protocol/pubsub#access-presence";
+
+		/// <summary>
+		/// http://jabber.org/protocol/pubsub#access-roster
+		/// </summary>
+		public const string NamespacePubSubAccessRoster = "http://jabber.org/protocol/pubsub#access-roster";
+
+		/// <summary>
+		/// http://jabber.org/protocol/pubsub#access-whitelist
+		/// </summary>
+		public const string NamespacePubSubAccessWhitelist = "http://jabber.org/protocol/pubsub#access-whitelist";
+
+		/// <summary>
+		/// http://jabber.org/protocol/pubsub#collections
+		/// </summary>
+		public const string NamespacePubSubCollections = "http://jabber.org/protocol/pubsub#collections";
+
+		/// <summary>
+		/// http://jabber.org/protocol/pubsub#config-node
+		/// </summary>
+		public const string NamespacePubSubNodeConfiguration = "http://jabber.org/protocol/pubsub#config-node";
+
+		/// <summary>
+		/// http://jabber.org/protocol/pubsub#create-and-configure
+		/// </summary>
+		public const string NamespacePubSubCreateAndConfigure = "http://jabber.org/protocol/pubsub#create-and-configure";
+
+		/// <summary>
+		/// http://jabber.org/protocol/pubsub#create-nodes
+		/// </summary>
+		public const string NamespacePubSubCreateNodes = "http://jabber.org/protocol/pubsub#create-nodes";
+
+		/// <summary>
+		/// http://jabber.org/protocol/pubsub#delete-items
+		/// </summary>
+		public const string NamespacePubSubDeleteItems = "http://jabber.org/protocol/pubsub#delete-items";
+
+		/// <summary>
+		/// http://jabber.org/protocol/pubsub#delete-nodes
+		/// </summary>
+		public const string NamespacePubSubDeleteNodes = "http://jabber.org/protocol/pubsub#delete-nodes";
+
+		/// <summary>
+		/// http://jabber.org/protocol/pubsub#item-ids
+		/// </summary>
+		public const string NamespacePubSubItemIds = "http://jabber.org/protocol/pubsub#item-ids";
+
+		/// <summary>
+		/// http://jabber.org/protocol/pubsub#last-published
+		/// </summary>
+		public const string NamespacePubSubLastPublished = "http://jabber.org/protocol/pubsub#last-published";
+
+		/// <summary>
+		/// http://jabber.org/protocol/pubsub#leased-subscription
+		/// </summary>
+		public const string NamespacePubSubLeasedSubscription = "http://jabber.org/protocol/pubsub#leased-subscription";
+
+		/// <summary>
+		/// http://jabber.org/protocol/pubsub#manage-subscriptions
+		/// </summary>
+		public const string NamespacePubSubManageSubscriptions = "http://jabber.org/protocol/pubsub#manage-subscriptions";
+
+		/// <summary>
+		/// http://jabber.org/protocol/pubsub#member-affiliation
+		/// </summary>
+		public const string NamespacePubSubemberAffiliation = "http://jabber.org/protocol/pubsub#member-affiliation";
+
+		/// <summary>
+		/// http://jabber.org/protocol/pubsub#meta-data
+		/// </summary>
+		public const string NamespacePubSubMetaData = "http://jabber.org/protocol/pubsub#meta-data";
+
+		/// <summary>
+		/// http://jabber.org/protocol/pubsub#modify-affiliations
+		/// </summary>
+		public const string NamespacePubSubModifyAffiliations = "http://jabber.org/protocol/pubsub#modify-affiliations";
+
+		/// <summary>
+		/// http://jabber.org/protocol/pubsub#multi-collection
+		/// </summary>
+		public const string NamespacePubSubMultiCollecton = "http://jabber.org/protocol/pubsub#multi-collection";
+
+		/// <summary>
+		/// http://jabber.org/protocol/pubsub#multi-items
+		/// </summary>
+		public const string NamespacePubSubMultiItems = "http://jabber.org/protocol/pubsub#multi-items";
+
+		/// <summary>
+		/// http://jabber.org/protocol/pubsub#outcast-affiliation
+		/// </summary>
+		public const string NamespacePubSubOutcastAffiliation = "http://jabber.org/protocol/pubsub#outcast-affiliation";
+
+		/// <summary>
+		/// http://jabber.org/protocol/pubsub#persistent-items
+		/// </summary>
+		public const string NamespacePubSubPersistentItems = "http://jabber.org/protocol/pubsub#persistent-items";
+
+		/// <summary>
+		/// http://jabber.org/protocol/pubsub#presence-subscribe
+		/// </summary>
+		public const string NamespacePubSubOresenceSubscribe = "http://jabber.org/protocol/pubsub#presence-subscribe";
+
+		/// <summary>
+		/// http://jabber.org/protocol/pubsub#publish
+		/// </summary>
+		public const string NamespacePubSubPublish = "http://jabber.org/protocol/pubsub#publish";
+
+		/// <summary>
+		/// http://jabber.org/protocol/pubsub#publish-only-affiliation
+		/// </summary>
+		public const string NamespacePubSubPublishOnlyAffiliation = "http://jabber.org/protocol/pubsub#publish-only-affiliation";
+
+		/// <summary>
+		/// http://jabber.org/protocol/pubsub#publisher-affiliation
+		/// </summary>
+		public const string NamespacePubSubPublisheAffiliation = "http://jabber.org/protocol/pubsub#publisher-affiliation";
+
+		/// <summary>
+		/// http://jabber.org/protocol/pubsub#purge-nodes
+		/// </summary>
+		public const string NamespacePubSubPurgeNodes = "http://jabber.org/protocol/pubsub#purge-nodes";
+
+		/// <summary>
+		/// http://jabber.org/protocol/pubsub#retract-items
+		/// </summary>
+		public const string NamespacePubSubRetractItems = "http://jabber.org/protocol/pubsub#retract-items";
+
+		/// <summary>
+		/// http://jabber.org/protocol/pubsub#retrieve-affiliations
+		/// </summary>
+		public const string NamespacePubSubRetrieveAffiliations = "http://jabber.org/protocol/pubsub#retrieve-affiliations";
+
+		/// <summary>
+		/// http://jabber.org/protocol/pubsub#retrieve-default
+		/// </summary>
+		public const string NamespacePubSubRetrieveDefault = "http://jabber.org/protocol/pubsub#retrieve-default";
+
+		/// <summary>
+		/// http://jabber.org/protocol/pubsub#retrieve-default-sub
+		/// </summary>
+		public const string NamespacePubSubRetrieveDefaultSub = "http://jabber.org/protocol/pubsub#retrieve-default-sub";
+
+		/// <summary>
+		/// http://jabber.org/protocol/pubsub#retrieve-items
+		/// </summary>
+		public const string NamespacePubSubRetrieveItems = "http://jabber.org/protocol/pubsub#retrieve-items";
+
+		/// <summary>
+		/// http://jabber.org/protocol/pubsub#retrieve-subscriptions
+		/// </summary>
+		public const string NamespacePubSubRetrieveSubscriptions = "http://jabber.org/protocol/pubsub#retrieve-subscriptions";
+
+		/// <summary>
+		/// http://jabber.org/protocol/pubsub#subscribe
+		/// </summary>
+		public const string NamespacePubSubSubscribe = "http://jabber.org/protocol/pubsub#subscribe";
+
+		/// <summary>
+		/// http://jabber.org/protocol/pubsub#subscription-options
+		/// </summary>
+		public const string NamespacePubSubSubscriptionOptions = "http://jabber.org/protocol/pubsub#subscription-options";
+
+		/// <summary>
+		/// http://jabber.org/protocol/pubsub#subscription-notifications
+		/// </summary>
+		public const string NamespacePubSubSubscriptionNotifications = "http://jabber.org/protocol/pubsub#subscription-notifications";
 
 		private string componentAddress;
 

@@ -16,7 +16,7 @@ using Waher.Things.DisplayableParameters;
 using Waher.Things.SensorData;
 using Waher.Client.WPF.Dialogs;
 
-namespace Waher.Client.WPF.Model
+namespace Waher.Client.WPF.Model.Concentrator
 {
 	/// <summary>
 	/// Represents a node in a concentrator.

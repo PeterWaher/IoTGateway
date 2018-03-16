@@ -43,15 +43,15 @@ namespace Waher.Client.WPF.Model
 
 		public override SensorDataClientRequest StartSensorDataFullReadout()
 		{
-			return this.DoReadout(Things.SensorData.FieldType.All);
+			return this.DoReadout(Waher.Things.SensorData.FieldType.All);
 		}
 
 		public override SensorDataClientRequest StartSensorDataMomentaryReadout()
 		{
-			return this.DoReadout(Things.SensorData.FieldType.Momentary);
+			return this.DoReadout(Waher.Things.SensorData.FieldType.Momentary);
 		}
 
-		private SensorDataClientRequest DoReadout(Things.SensorData.FieldType Types)
+		private SensorDataClientRequest DoReadout(Waher.Things.SensorData.FieldType Types)
 		{
 			XmppClient Client = this.XmppAccountNode.Client;
 			string Id = Guid.NewGuid().ToString();
@@ -69,25 +69,25 @@ namespace Waher.Client.WPF.Model
 			{
 				if (e.Ok)
 				{
-					List<Things.SensorData.Field> Fields = new List<Things.SensorData.Field>();
+					List<Waher.Things.SensorData.Field> Fields = new List<Waher.Things.SensorData.Field>();
 					DateTime Now = DateTime.Now;
 
 					foreach (KeyValuePair<string, bool> Feature in e.Features)
 					{
-						Fields.Add(new Things.SensorData.BooleanField(Things.ThingReference.Empty, Now,
-							Feature.Key, Feature.Value, Things.SensorData.FieldType.Momentary, Things.SensorData.FieldQoS.AutomaticReadout));
+						Fields.Add(new Waher.Things.SensorData.BooleanField(Waher.Things.ThingReference.Empty, Now,
+							Feature.Key, Feature.Value, Waher.Things.SensorData.FieldType.Momentary, Waher.Things.SensorData.FieldQoS.AutomaticReadout));
 					}
 
 					bool VersionDone = false;
 
-					if ((Types & Things.SensorData.FieldType.Identity) != 0)
+					if ((Types & Waher.Things.SensorData.FieldType.Identity) != 0)
 					{
 						foreach (Identity Identity in e.Identities)
 						{
-							Fields.Add(new Things.SensorData.StringField(Things.ThingReference.Empty, Now,
+							Fields.Add(new Waher.Things.SensorData.StringField(Waher.Things.ThingReference.Empty, Now,
 								Identity.Type, Identity.Category + (string.IsNullOrEmpty(Identity.Name) ? string.Empty : " (" + Identity.Name + ")"),
-								Things.SensorData.FieldType.Identity,
-								Things.SensorData.FieldQoS.AutomaticReadout));
+								Waher.Things.SensorData.FieldType.Identity,
+								Waher.Things.SensorData.FieldQoS.AutomaticReadout));
 						}
 
 						if (e.HasFeature(XmppClient.NamespaceSoftwareVersion))
@@ -98,21 +98,21 @@ namespace Waher.Client.WPF.Model
 
 								if (e2.Ok)
 								{
-									Request.LogFields(new Things.SensorData.Field[]
+									Request.LogFields(new Waher.Things.SensorData.Field[]
 									{
-										new Things.SensorData.StringField(Things.ThingReference.Empty, Now, "Client, Name", e2.Name,
-											Things.SensorData.FieldType.Identity, Things.SensorData.FieldQoS.AutomaticReadout),
-										new Things.SensorData.StringField(Things.ThingReference.Empty, Now, "Client, OS", e2.OS,
-											Things.SensorData.FieldType.Identity, Things.SensorData.FieldQoS.AutomaticReadout),
-										new Things.SensorData.StringField(Things.ThingReference.Empty, Now, "Client, Version", e2.Version,
-											Things.SensorData.FieldType.Identity, Things.SensorData.FieldQoS.AutomaticReadout),
+										new Waher.Things.SensorData.StringField(Waher.Things.ThingReference.Empty, Now, "Client, Name", e2.Name,
+											Waher.Things.SensorData.FieldType.Identity, Waher.Things.SensorData.FieldQoS.AutomaticReadout),
+										new Waher.Things.SensorData.StringField(Waher.Things.ThingReference.Empty, Now, "Client, OS", e2.OS,
+											Waher.Things.SensorData.FieldType.Identity, Waher.Things.SensorData.FieldQoS.AutomaticReadout),
+										new Waher.Things.SensorData.StringField(Waher.Things.ThingReference.Empty, Now, "Client, Version", e2.Version,
+											Waher.Things.SensorData.FieldType.Identity, Waher.Things.SensorData.FieldQoS.AutomaticReadout),
 									});
 								}
 								else
 								{
-									Request.LogErrors(new Things.ThingError[]
+									Request.LogErrors(new Waher.Things.ThingError[]
 									{
-										new Things.ThingError(Things.ThingReference.Empty, Now, "Unable to read software version.")
+										new Waher.Things.ThingError(Waher.Things.ThingReference.Empty, Now, "Unable to read software version.")
 									});
 								}
 

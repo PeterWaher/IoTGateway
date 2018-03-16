@@ -217,16 +217,19 @@
     <Compile Include="Model\DisplayableParameters.cs" />
     <Compile Include="Model\EventLog.cs" />
     <Compile Include="Model\IMenuAggregator.cs" />
+    <Compile Include="Model\PubSub\PubSubItem.cs" />
+    <Compile Include="Model\PubSub\PubSubNode.cs" />
+    <Compile Include="Model\PubSub\PubSubService.cs" />
     <Compile Include="Model\XmppComponent.cs" />
     <Compile Include="Model\Connections.cs" />
     <Compile Include="Model\Loading.cs" />
-    <Compile Include="Model\Node.cs" />
-    <Compile Include="Model\DataSource.cs" />
-    <Compile Include="Model\ThingRegistry.cs" />
-    <Compile Include="Model\XmppConcentrator.cs" />
-    <Compile Include="Model\XmppActuator.cs" />
+    <Compile Include="Model\Concentrator\Node.cs" />
+    <Compile Include="Model\Concentrator\DataSource.cs" />
+    <Compile Include="Model\Provisioning\ThingRegistry.cs" />
+    <Compile Include="Model\Concentrator\XmppConcentrator.cs" />
+    <Compile Include="Model\Things\XmppActuator.cs" />
     <Compile Include="Model\XmppOther.cs" />
-    <Compile Include="Model\XmppSensor.cs" />
+    <Compile Include="Model\Things\XmppSensor.cs" />
     <Compile Include="Model\SelectableItem.cs" />
     <Compile Include="Model\TreeNode.cs" />
     <Compile Include="Model\XmppAccountNode.cs" />
@@ -335,6 +338,10 @@
     <ProjectReference Include="..\..\Networking\Waher.Networking.XMPP.Provisioning\Waher.Networking.XMPP.Provisioning.csproj">
       <Project>{3cd1a7c7-7cd1-418d-a6cd-ba057b04ea42}</Project>
       <Name>Waher.Networking.XMPP.Provisioning</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Networking\Waher.Networking.XMPP.PubSub\Waher.Networking.XMPP.PubSub.csproj">
+      <Project>{e7bbcd12-29c4-4272-a972-6c28f8905c34}</Project>
+      <Name>Waher.Networking.XMPP.PubSub</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Networking\Waher.Networking.XMPP.Sensor\Waher.Networking.XMPP.Sensor.csproj">
       <Project>{ac5aff6e-1d81-4142-95c5-472f615f3167}</Project>

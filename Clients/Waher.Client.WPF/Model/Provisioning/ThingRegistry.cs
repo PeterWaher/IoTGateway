@@ -19,8 +19,9 @@ using Waher.Persistence.Filters;
 using Waher.Client.WPF.Controls;
 using Waher.Client.WPF.Controls.Questions;
 using Waher.Client.WPF.Dialogs;
+using Waher.Client.WPF.Model.Concentrator;
 
-namespace Waher.Client.WPF.Model
+namespace Waher.Client.WPF.Model.Provisioning
 {
 	public class ThingRegistry : XmppComponent, IMenuAggregator
 	{

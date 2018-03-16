@@ -5,7 +5,7 @@ using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Sensor;
 using Waher.Things.SensorData;
 
-namespace Waher.Client.WPF.Model
+namespace Waher.Client.WPF.Model.Things
 {
 	/// <summary>
 	/// Represents a simple XMPP sensor.

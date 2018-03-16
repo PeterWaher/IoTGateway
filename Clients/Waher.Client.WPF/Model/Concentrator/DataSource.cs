@@ -8,7 +8,7 @@ using System.Windows.Input;
 using System.Xml;
 using Waher.Networking.XMPP.Concentrator;
 
-namespace Waher.Client.WPF.Model
+namespace Waher.Client.WPF.Model.Concentrator
 {
 	/// <summary>
 	/// Represents a data source in a concentrator.

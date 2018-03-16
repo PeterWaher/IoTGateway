@@ -114,6 +114,53 @@ namespace Waher.Client.WPF.Model
 			}, null);
 		}
 
+		public void NodesAdded(IEnumerable<TreeNode> Nodes, TreeNode Parent)
+		{
+			XmppAccountNode XmppAccountNode = this.Account;
+			if (XmppAccountNode == null)
+				return;
+
+			ConnectionView View = XmppAccountNode.View;
+			if (View == null)
+				return;
+
+			foreach (TreeNode Node in Nodes)
+				View.NodeAdded(Parent, Node);
+		}
+
+		public void NodesRemoved(IEnumerable<TreeNode> Nodes, TreeNode Parent)
+		{
+			XmppAccountNode XmppAccountNode = this.Account;
+			if (XmppAccountNode == null)
+				return;
+
+			Controls.ConnectionView View = XmppAccountNode.View;
+			if (View == null)
+				return;
+
+			LinkedList<KeyValuePair<TreeNode, TreeNode>> ToRemove = new LinkedList<KeyValuePair<TreeNode, TreeNode>>();
+
+			foreach (TreeNode Node in Nodes)
+				ToRemove.AddLast(new KeyValuePair<TreeNode, TreeNode>(Parent, Node));
+
+			while (ToRemove.First != null)
+			{
+				KeyValuePair<TreeNode, TreeNode> P = ToRemove.First.Value;
+				ToRemove.RemoveFirst();
+
+				Parent = P.Key;
+				TreeNode Node = P.Value;
+
+				if (Node.HasChildren.HasValue && Node.HasChildren.Value)
+				{
+					foreach (TreeNode Child in Node.Children)
+						ToRemove.AddLast(new KeyValuePair<TreeNode, TreeNode>(Node, Child));
+				}
+
+				View.NodeRemoved(Parent, Node);
+			}
+		}
+
 
 	}
 }

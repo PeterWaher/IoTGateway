@@ -7,7 +7,7 @@ using System.Windows.Input;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Concentrator;
 
-namespace Waher.Client.WPF.Model
+namespace Waher.Client.WPF.Model.Concentrator
 {
 	/// <summary>
 	/// Represents an XMPP concentrator.

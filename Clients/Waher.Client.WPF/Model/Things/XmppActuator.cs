@@ -10,7 +10,7 @@ using Waher.Networking.XMPP.Sensor;
 using Waher.Things;
 using Waher.Things.SensorData;
 
-namespace Waher.Client.WPF.Model
+namespace Waher.Client.WPF.Model.Things
 {
 	/// <summary>
 	/// Represents a simple XMPP actuator.

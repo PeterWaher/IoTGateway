@@ -169,7 +169,7 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <summary>
 		/// http://jabber.org/protocol/pubsub#presence-subscribe
 		/// </summary>
-		public const string NamespacePubSubOresenceSubscribe = "http://jabber.org/protocol/pubsub#presence-subscribe";
+		public const string NamespacePubSubPresenceSubscribe = "http://jabber.org/protocol/pubsub#presence-subscribe";
 
 		/// <summary>
 		/// http://jabber.org/protocol/pubsub#publish

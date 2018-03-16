@@ -9,7 +9,7 @@
 				<Control Type="ComboBox" Property="XMPPBROKER" Default="yes" Sorted="yes" Text="[XMPPBROKER]" Id="BrokerComboBox" Width="169" Height="16" X="38" Y="142">
 					<ComboBox Property="XMPPBROKER">
             <ListItem Text="waher.se" Value="waher.se" />
-            <ListItem Text="cityaware.cl" Value="cityaware.cl" />
+            <ListItem Text="us.ipdx.net" Value="us.ipdx.net" />
             <ListItem Text="xmpp.i0t.se" Value="xmpp.i0t.se" />
             <ListItem Text="kode.im" Value="kode.im" />
           </ComboBox>

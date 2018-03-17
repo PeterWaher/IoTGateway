@@ -10,6 +10,8 @@
       <String id="6">IP Host</String>
       <String id="7">Ping</String>
       <String id="8">IP Address</String>
+			<String id="9">Host</String>
+			<String id="10">Port</String>
     </Namespace>
 	</Language>
 </Translation>

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Waher.Persistence.Attributes;
 using Waher.Runtime.Language;
 using Waher.Things.Attributes;
+using Waher.Things.DisplayableParameters;
 using Waher.Things.SensorData;
 using Waher.Things.Metering;
 using Waher.Things.Metering.NodeTypes;
@@ -203,6 +204,21 @@ namespace Waher.Things.Ip
 
 		private static readonly byte[] data = Encoding.ASCII.GetBytes("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
 		private static PingOptions options = new PingOptions(64, true);
+
+		/// <summary>
+		/// Gets displayable parameters.
+		/// </summary>
+		/// <param name="Language">Language to use.</param>
+		/// <param name="Caller">Information about caller.</param>
+		/// <returns>Set of displayable parameters.</returns>
+		public async override Task<IEnumerable<Parameter>> GetDisplayableParametersAsync(Language Language, RequestOrigin Caller)
+		{
+			LinkedList<Parameter> Result = await base.GetDisplayableParametersAsync(Language, Caller) as LinkedList<Parameter>;
+
+			Result.AddLast(new StringParameter("Host", await Language.GetStringAsync(typeof(IpHost), 9, "Host"), this.host));
+
+			return Result;
+		}
 
 	}
 }

@@ -7,6 +7,7 @@ using Waher.Networking;
 using Waher.Persistence.Attributes;
 using Waher.Runtime.Language;
 using Waher.Things.Attributes;
+using Waher.Things.DisplayableParameters;
 
 namespace Waher.Things.Ip
 {
@@ -39,6 +40,21 @@ namespace Waher.Things.Ip
 			await Client.ConnectAsync(this.Host, this.port);
 
 			return new TcpTransport(Client);
+		}
+
+		/// <summary>
+		/// Gets displayable parameters.
+		/// </summary>
+		/// <param name="Language">Language to use.</param>
+		/// <param name="Caller">Information about caller.</param>
+		/// <returns>Set of displayable parameters.</returns>
+		public async override Task<IEnumerable<Parameter>> GetDisplayableParametersAsync(Language Language, RequestOrigin Caller)
+		{
+			LinkedList<Parameter> Result = await base.GetDisplayableParametersAsync(Language, Caller) as LinkedList<Parameter>;
+
+			Result.AddLast(new Int32Parameter("Port", await Language.GetStringAsync(typeof(IpHost), 10, "Port"), this.port));
+
+			return Result;
 		}
 
 	}

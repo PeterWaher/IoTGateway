@@ -2614,7 +2614,7 @@
           "Waher.Networking.XMPP.Provisioning.UWP": "1.0.0",
           "Waher.Networking.XMPP.Sensor.UWP": "1.0.0",
           "Waher.Networking.XMPP.UWP": "1.0.0",
-          "Waher.Things": "1.0.12"
+          "Waher.Things": "1.0.13"
         }
       },
       "Waher.Networking.XMPP.Control.UWP/1.0.0": {
@@ -2728,7 +2728,7 @@
           "Waher.Script": "1.0.11"
         }
       },
-      "Waher.Things/1.0.12": {
+      "Waher.Things/1.0.13": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -5346,7 +5346,7 @@
           "Waher.Networking.XMPP.Provisioning.UWP": "1.0.0",
           "Waher.Networking.XMPP.Sensor.UWP": "1.0.0",
           "Waher.Networking.XMPP.UWP": "1.0.0",
-          "Waher.Things": "1.0.12"
+          "Waher.Things": "1.0.13"
         }
       },
       "Waher.Networking.XMPP.Control.UWP/1.0.0": {
@@ -5460,7 +5460,7 @@
           "Waher.Script": "1.0.11"
         }
       },
-      "Waher.Things/1.0.12": {
+      "Waher.Things/1.0.13": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -8114,7 +8114,7 @@
           "Waher.Networking.XMPP.Provisioning.UWP": "1.0.0",
           "Waher.Networking.XMPP.Sensor.UWP": "1.0.0",
           "Waher.Networking.XMPP.UWP": "1.0.0",
-          "Waher.Things": "1.0.12"
+          "Waher.Things": "1.0.13"
         }
       },
       "Waher.Networking.XMPP.Control.UWP/1.0.0": {
@@ -8228,7 +8228,7 @@
           "Waher.Script": "1.0.11"
         }
       },
-      "Waher.Things/1.0.12": {
+      "Waher.Things/1.0.13": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -10855,7 +10855,7 @@
           "Waher.Networking.XMPP.Provisioning.UWP": "1.0.0",
           "Waher.Networking.XMPP.Sensor.UWP": "1.0.0",
           "Waher.Networking.XMPP.UWP": "1.0.0",
-          "Waher.Things": "1.0.12"
+          "Waher.Things": "1.0.13"
         }
       },
       "Waher.Networking.XMPP.Control.UWP/1.0.0": {
@@ -10969,7 +10969,7 @@
           "Waher.Script": "1.0.11"
         }
       },
-      "Waher.Things/1.0.12": {
+      "Waher.Things/1.0.13": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -13632,7 +13632,7 @@
           "Waher.Networking.XMPP.Provisioning.UWP": "1.0.0",
           "Waher.Networking.XMPP.Sensor.UWP": "1.0.0",
           "Waher.Networking.XMPP.UWP": "1.0.0",
-          "Waher.Things": "1.0.12"
+          "Waher.Things": "1.0.13"
         }
       },
       "Waher.Networking.XMPP.Control.UWP/1.0.0": {
@@ -13746,7 +13746,7 @@
           "Waher.Script": "1.0.11"
         }
       },
-      "Waher.Things/1.0.12": {
+      "Waher.Things/1.0.13": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -16373,7 +16373,7 @@
           "Waher.Networking.XMPP.Provisioning.UWP": "1.0.0",
           "Waher.Networking.XMPP.Sensor.UWP": "1.0.0",
           "Waher.Networking.XMPP.UWP": "1.0.0",
-          "Waher.Things": "1.0.12"
+          "Waher.Things": "1.0.13"
         }
       },
       "Waher.Networking.XMPP.Control.UWP/1.0.0": {
@@ -16487,7 +16487,7 @@
           "Waher.Script": "1.0.11"
         }
       },
-      "Waher.Things/1.0.12": {
+      "Waher.Things/1.0.13": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -19150,7 +19150,7 @@
           "Waher.Networking.XMPP.Provisioning.UWP": "1.0.0",
           "Waher.Networking.XMPP.Sensor.UWP": "1.0.0",
           "Waher.Networking.XMPP.UWP": "1.0.0",
-          "Waher.Things": "1.0.12"
+          "Waher.Things": "1.0.13"
         }
       },
       "Waher.Networking.XMPP.Control.UWP/1.0.0": {
@@ -19264,7 +19264,7 @@
           "Waher.Script": "1.0.11"
         }
       },
-      "Waher.Things/1.0.12": {
+      "Waher.Things/1.0.13": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -29243,7 +29243,7 @@
       "path": "../../Script/Waher.Script.Graphs/Waher.Script.Graphs.csproj",
       "msbuildProject": "../../Script/Waher.Script.Graphs/Waher.Script.Graphs.csproj"
     },
-    "Waher.Things/1.0.12": {
+    "Waher.Things/1.0.13": {
       "type": "project",
       "path": "../../Things/Waher.Things/Waher.Things.csproj",
       "msbuildProject": "../../Things/Waher.Things/Waher.Things.csproj"

@@ -2544,7 +2544,7 @@
           "Waher.Runtime.Inventory": "1.0.5"
         }
       },
-      "Waher.Things/1.0.12": {
+      "Waher.Things/1.0.13": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -5092,7 +5092,7 @@
           "Waher.Runtime.Inventory": "1.0.5"
         }
       },
-      "Waher.Things/1.0.12": {
+      "Waher.Things/1.0.13": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -7676,7 +7676,7 @@
           "Waher.Runtime.Inventory": "1.0.5"
         }
       },
-      "Waher.Things/1.0.12": {
+      "Waher.Things/1.0.13": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -10233,7 +10233,7 @@
           "Waher.Runtime.Inventory": "1.0.5"
         }
       },
-      "Waher.Things/1.0.12": {
+      "Waher.Things/1.0.13": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -12826,7 +12826,7 @@
           "Waher.Runtime.Inventory": "1.0.5"
         }
       },
-      "Waher.Things/1.0.12": {
+      "Waher.Things/1.0.13": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -15383,7 +15383,7 @@
           "Waher.Runtime.Inventory": "1.0.5"
         }
       },
-      "Waher.Things/1.0.12": {
+      "Waher.Things/1.0.13": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -17976,7 +17976,7 @@
           "Waher.Runtime.Inventory": "1.0.5"
         }
       },
-      "Waher.Things/1.0.12": {
+      "Waher.Things/1.0.13": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -27832,7 +27832,7 @@
       "path": "../../Script/Waher.Script/Waher.Script.csproj",
       "msbuildProject": "../../Script/Waher.Script/Waher.Script.csproj"
     },
-    "Waher.Things/1.0.12": {
+    "Waher.Things/1.0.13": {
       "type": "project",
       "path": "../../Things/Waher.Things/Waher.Things.csproj",
       "msbuildProject": "../../Things/Waher.Things/Waher.Things.csproj"

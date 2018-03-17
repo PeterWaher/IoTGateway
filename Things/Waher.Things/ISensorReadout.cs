@@ -132,6 +132,11 @@ namespace Waher.Things
 		bool IsIncluded(string FieldName, DateTime Timestamp, FieldType Type);
 
 		/// <summary>
+		/// Report that readout has started. Can optionally be used to report feedback to end-user when readout is slow.
+		/// </summary>
+		void Start();
+
+		/// <summary>
 		/// Report read fields to the client.
 		/// </summary>
 		/// <param name="Done">If the readout is complete (true) or if more data will be reported (false).</param>

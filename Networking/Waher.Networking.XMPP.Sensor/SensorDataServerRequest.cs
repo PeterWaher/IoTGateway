@@ -534,5 +534,22 @@ namespace Waher.Networking.XMPP.Sensor
 			this.sensorServer.Client.SendMessage(MessageType.Normal, this.RemoteJID, Xml.ToString(), string.Empty, string.Empty,
 				string.Empty, string.Empty, string.Empty);
 		}
+
+		/// <summary>
+		/// Report that readout has started. Can optionally be used to report feedback to end-user when readout is slow.
+		/// </summary>
+		public virtual void Start()
+		{
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<resp xmlns='");
+			Xml.Append(SensorClient.NamespaceSensorData);
+			Xml.Append("' id='");
+			Xml.Append(this.Id);
+			Xml.Append("'/>");
+
+			this.sensorServer.Client.SendMessage(MessageType.Normal, this.RemoteJID, Xml.ToString(), string.Empty, string.Empty,
+				string.Empty, string.Empty, string.Empty);
+		}
 	}
 }

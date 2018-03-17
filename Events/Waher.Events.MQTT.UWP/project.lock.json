@@ -2439,7 +2439,6 @@
         "framework": "UAP,Version=v10.0.10586",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.8",
-          "Waher.Events": "1.0.0",
           "Waher.Networking": "1.0.0"
         }
       },
@@ -4936,7 +4935,6 @@
         "framework": "UAP,Version=v10.0.10586",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.8",
-          "Waher.Events": "1.0.0",
           "Waher.Networking": "1.0.0"
         }
       },
@@ -7469,7 +7467,6 @@
         "framework": "UAP,Version=v10.0.10586",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.8",
-          "Waher.Events": "1.0.0",
           "Waher.Networking": "1.0.0"
         }
       },
@@ -9975,7 +9972,6 @@
         "framework": "UAP,Version=v10.0.10586",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.8",
-          "Waher.Events": "1.0.0",
           "Waher.Networking": "1.0.0"
         }
       },
@@ -12517,7 +12513,6 @@
         "framework": "UAP,Version=v10.0.10586",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.8",
-          "Waher.Events": "1.0.0",
           "Waher.Networking": "1.0.0"
         }
       },
@@ -15023,7 +15018,6 @@
         "framework": "UAP,Version=v10.0.10586",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.8",
-          "Waher.Events": "1.0.0",
           "Waher.Networking": "1.0.0"
         }
       },
@@ -17565,7 +17559,6 @@
         "framework": "UAP,Version=v10.0.10586",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.8",
-          "Waher.Events": "1.0.0",
           "Waher.Networking": "1.0.0"
         }
       },
@@ -27409,9 +27402,6 @@
           "projectReferences": {
             "C:\\My Projects\\IoTGateway\\Content\\Waher.Content.Xml\\Waher.Content.Xml.csproj": {
               "projectPath": "C:\\My Projects\\IoTGateway\\Content\\Waher.Content.Xml\\Waher.Content.Xml.csproj"
-            },
-            "C:\\My Projects\\IoTGateway\\Content\\Waher.Content\\Waher.Content.csproj": {
-              "projectPath": "C:\\My Projects\\IoTGateway\\Content\\Waher.Content\\Waher.Content.csproj"
             },
             "C:\\My Projects\\IoTGateway\\Events\\Waher.Events\\Waher.Events.csproj": {
               "projectPath": "C:\\My Projects\\IoTGateway\\Events\\Waher.Events\\Waher.Events.csproj"

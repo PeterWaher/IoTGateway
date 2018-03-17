@@ -498,65 +498,6 @@
           }
         }
       },
-      "SkiaSharp/1.60.0": {
-        "type": "package",
-        "compile": {
-          "lib/uap10.0/SkiaSharp.dll": {}
-        },
-        "runtime": {
-          "lib/uap10.0/SkiaSharp.dll": {}
-        },
-        "runtimeTargets": {
-          "runtimes/osx/native/libSkiaSharp.dylib": {
-            "assetType": "native",
-            "rid": "osx"
-          },
-          "runtimes/win10-arm/nativeassets/uap10.0/libEGL.dll": {
-            "assetType": "native",
-            "rid": "win10-arm"
-          },
-          "runtimes/win10-arm/nativeassets/uap10.0/libGLESv2.dll": {
-            "assetType": "native",
-            "rid": "win10-arm"
-          },
-          "runtimes/win10-arm/nativeassets/uap10.0/libSkiaSharp.dll": {
-            "assetType": "native",
-            "rid": "win10-arm"
-          },
-          "runtimes/win10-x64/nativeassets/uap10.0/libEGL.dll": {
-            "assetType": "native",
-            "rid": "win10-x64"
-          },
-          "runtimes/win10-x64/nativeassets/uap10.0/libGLESv2.dll": {
-            "assetType": "native",
-            "rid": "win10-x64"
-          },
-          "runtimes/win10-x64/nativeassets/uap10.0/libSkiaSharp.dll": {
-            "assetType": "native",
-            "rid": "win10-x64"
-          },
-          "runtimes/win10-x86/nativeassets/uap10.0/libEGL.dll": {
-            "assetType": "native",
-            "rid": "win10-x86"
-          },
-          "runtimes/win10-x86/nativeassets/uap10.0/libGLESv2.dll": {
-            "assetType": "native",
-            "rid": "win10-x86"
-          },
-          "runtimes/win10-x86/nativeassets/uap10.0/libSkiaSharp.dll": {
-            "assetType": "native",
-            "rid": "win10-x86"
-          },
-          "runtimes/win7-x64/native/libSkiaSharp.dll": {
-            "assetType": "native",
-            "rid": "win7-x64"
-          },
-          "runtimes/win7-x86/native/libSkiaSharp.dll": {
-            "assetType": "native",
-            "rid": "win7-x86"
-          }
-        }
-      },
       "System.AppContext/4.3.0": {
         "type": "package",
         "dependencies": {
@@ -2403,19 +2344,19 @@
           "lib/netcore50/System.Xml.XDocument.dll": {}
         }
       },
-      "System.Xml.XmlDocument/4.3.0": {
+      "System.Xml.XmlDocument/4.0.1": {
         "type": "package",
         "dependencies": {
-          "System.Collections": "4.3.0",
-          "System.Diagnostics.Debug": "4.3.0",
-          "System.Globalization": "4.3.0",
-          "System.IO": "4.3.0",
-          "System.Resources.ResourceManager": "4.3.0",
-          "System.Runtime": "4.3.0",
-          "System.Runtime.Extensions": "4.3.0",
-          "System.Text.Encoding": "4.3.0",
-          "System.Threading": "4.3.0",
-          "System.Xml.ReaderWriter": "4.3.0"
+          "System.Collections": "4.0.11",
+          "System.Diagnostics.Debug": "4.0.11",
+          "System.Globalization": "4.0.11",
+          "System.IO": "4.1.0",
+          "System.Resources.ResourceManager": "4.0.1",
+          "System.Runtime": "4.1.0",
+          "System.Runtime.Extensions": "4.1.0",
+          "System.Text.Encoding": "4.0.11",
+          "System.Threading": "4.0.11",
+          "System.Xml.ReaderWriter": "4.0.11"
         },
         "compile": {
           "ref/netstandard1.3/System.Xml.XmlDocument.dll": {}
@@ -2467,59 +2408,11 @@
           "Waher.Script": "1.0.11"
         }
       },
-      "Waher.Content.Emoji/1.0.1": {
-        "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
-        "dependencies": {
-          "NETStandard.Library": "1.6.1"
-        }
-      },
-      "Waher.Content.Html/1.0.3": {
-        "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
-        "dependencies": {
-          "NETStandard.Library": "1.6.1",
-          "Waher.Content": "1.0.8"
-        }
-      },
-      "Waher.Content.Markdown/1.0.21": {
-        "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
-        "dependencies": {
-          "NETStandard.Library": "1.6.1",
-          "SkiaSharp": "1.60.0",
-          "Waher.Content.Emoji": "1.0.1",
-          "Waher.Content.Html": "1.0.3",
-          "Waher.Content.Xml": "1.0.2",
-          "Waher.Runtime.Cache": "1.0.1",
-          "Waher.Script": "1.0.11",
-          "Waher.Script.Graphs": "1.0.6"
-        }
-      },
-      "Waher.Content.Xml/1.0.2": {
-        "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
-        "dependencies": {
-          "NETStandard.Library": "1.6.1",
-          "System.Xml.XmlDocument": "4.3.0",
-          "Waher.Content": "1.0.8",
-          "Waher.Runtime.Inventory": "1.0.5",
-          "Waher.Script": "1.0.11"
-        }
-      },
       "Waher.Events/1.0.6": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1"
-        }
-      },
-      "Waher.Events.Statistics/1.0.3": {
-        "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
-        "dependencies": {
-          "NETStandard.Library": "1.6.1",
-          "Waher.Events": "1.0.6"
         }
       },
       "Waher.Networking/1.0.4": {
@@ -2537,7 +2430,6 @@
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.8",
           "Waher.Content": "1.0.0",
           "Waher.Events": "1.0.0",
-          "Waher.Events.Statistics": "1.0.0",
           "Waher.Networking": "1.0.0",
           "Waher.Runtime.Cache": "1.0.0",
           "Waher.Runtime.Inventory": "1.0.0",
@@ -2568,15 +2460,6 @@
           "NETStandard.Library": "1.6.1",
           "Waher.Events": "1.0.6",
           "Waher.Runtime.Inventory": "1.0.5"
-        }
-      },
-      "Waher.Script.Graphs/1.0.6": {
-        "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
-        "dependencies": {
-          "NETStandard.Library": "1.6.1",
-          "SkiaSharp": "1.60.0",
-          "Waher.Script": "1.0.11"
         }
       },
       "Waher.Security/1.0.1": {
@@ -3303,20 +3186,6 @@
         "type": "package",
         "native": {
           "runtimes/win8-arm/native/clrcompression.dll": {}
-        }
-      },
-      "SkiaSharp/1.60.0": {
-        "type": "package",
-        "compile": {
-          "lib/uap10.0/SkiaSharp.dll": {}
-        },
-        "runtime": {
-          "lib/uap10.0/SkiaSharp.dll": {}
-        },
-        "native": {
-          "runtimes/win10-arm/nativeassets/uap10.0/libEGL.dll": {},
-          "runtimes/win10-arm/nativeassets/uap10.0/libGLESv2.dll": {},
-          "runtimes/win10-arm/nativeassets/uap10.0/libSkiaSharp.dll": {}
         }
       },
       "System.AppContext/4.3.0": {
@@ -4987,19 +4856,19 @@
           "lib/netcore50/System.Xml.XDocument.dll": {}
         }
       },
-      "System.Xml.XmlDocument/4.3.0": {
+      "System.Xml.XmlDocument/4.0.1": {
         "type": "package",
         "dependencies": {
-          "System.Collections": "4.3.0",
-          "System.Diagnostics.Debug": "4.3.0",
-          "System.Globalization": "4.3.0",
-          "System.IO": "4.3.0",
-          "System.Resources.ResourceManager": "4.3.0",
-          "System.Runtime": "4.3.0",
-          "System.Runtime.Extensions": "4.3.0",
-          "System.Text.Encoding": "4.3.0",
-          "System.Threading": "4.3.0",
-          "System.Xml.ReaderWriter": "4.3.0"
+          "System.Collections": "4.0.11",
+          "System.Diagnostics.Debug": "4.0.11",
+          "System.Globalization": "4.0.11",
+          "System.IO": "4.1.0",
+          "System.Resources.ResourceManager": "4.0.1",
+          "System.Runtime": "4.1.0",
+          "System.Runtime.Extensions": "4.1.0",
+          "System.Text.Encoding": "4.0.11",
+          "System.Threading": "4.0.11",
+          "System.Xml.ReaderWriter": "4.0.11"
         },
         "compile": {
           "ref/netstandard1.3/System.Xml.XmlDocument.dll": {}
@@ -5045,59 +4914,11 @@
           "Waher.Script": "1.0.11"
         }
       },
-      "Waher.Content.Emoji/1.0.1": {
-        "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
-        "dependencies": {
-          "NETStandard.Library": "1.6.1"
-        }
-      },
-      "Waher.Content.Html/1.0.3": {
-        "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
-        "dependencies": {
-          "NETStandard.Library": "1.6.1",
-          "Waher.Content": "1.0.8"
-        }
-      },
-      "Waher.Content.Markdown/1.0.21": {
-        "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
-        "dependencies": {
-          "NETStandard.Library": "1.6.1",
-          "SkiaSharp": "1.60.0",
-          "Waher.Content.Emoji": "1.0.1",
-          "Waher.Content.Html": "1.0.3",
-          "Waher.Content.Xml": "1.0.2",
-          "Waher.Runtime.Cache": "1.0.1",
-          "Waher.Script": "1.0.11",
-          "Waher.Script.Graphs": "1.0.6"
-        }
-      },
-      "Waher.Content.Xml/1.0.2": {
-        "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
-        "dependencies": {
-          "NETStandard.Library": "1.6.1",
-          "System.Xml.XmlDocument": "4.3.0",
-          "Waher.Content": "1.0.8",
-          "Waher.Runtime.Inventory": "1.0.5",
-          "Waher.Script": "1.0.11"
-        }
-      },
       "Waher.Events/1.0.6": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1"
-        }
-      },
-      "Waher.Events.Statistics/1.0.3": {
-        "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
-        "dependencies": {
-          "NETStandard.Library": "1.6.1",
-          "Waher.Events": "1.0.6"
         }
       },
       "Waher.Networking/1.0.4": {
@@ -5115,7 +4936,6 @@
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.8",
           "Waher.Content": "1.0.0",
           "Waher.Events": "1.0.0",
-          "Waher.Events.Statistics": "1.0.0",
           "Waher.Networking": "1.0.0",
           "Waher.Runtime.Cache": "1.0.0",
           "Waher.Runtime.Inventory": "1.0.0",
@@ -5146,15 +4966,6 @@
           "NETStandard.Library": "1.6.1",
           "Waher.Events": "1.0.6",
           "Waher.Runtime.Inventory": "1.0.5"
-        }
-      },
-      "Waher.Script.Graphs/1.0.6": {
-        "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
-        "dependencies": {
-          "NETStandard.Library": "1.6.1",
-          "SkiaSharp": "1.60.0",
-          "Waher.Script": "1.0.11"
         }
       },
       "Waher.Security/1.0.1": {
@@ -5917,20 +5728,6 @@
         },
         "native": {
           "runtimes/win8-arm-aot/native/_._": {}
-        }
-      },
-      "SkiaSharp/1.60.0": {
-        "type": "package",
-        "compile": {
-          "lib/uap10.0/SkiaSharp.dll": {}
-        },
-        "runtime": {
-          "lib/uap10.0/SkiaSharp.dll": {}
-        },
-        "native": {
-          "runtimes/win10-arm/nativeassets/uap10.0/libEGL.dll": {},
-          "runtimes/win10-arm/nativeassets/uap10.0/libGLESv2.dll": {},
-          "runtimes/win10-arm/nativeassets/uap10.0/libSkiaSharp.dll": {}
         }
       },
       "System.AppContext/4.3.0": {
@@ -7601,19 +7398,19 @@
           "lib/netcore50/System.Xml.XDocument.dll": {}
         }
       },
-      "System.Xml.XmlDocument/4.3.0": {
+      "System.Xml.XmlDocument/4.0.1": {
         "type": "package",
         "dependencies": {
-          "System.Collections": "4.3.0",
-          "System.Diagnostics.Debug": "4.3.0",
-          "System.Globalization": "4.3.0",
-          "System.IO": "4.3.0",
-          "System.Resources.ResourceManager": "4.3.0",
-          "System.Runtime": "4.3.0",
-          "System.Runtime.Extensions": "4.3.0",
-          "System.Text.Encoding": "4.3.0",
-          "System.Threading": "4.3.0",
-          "System.Xml.ReaderWriter": "4.3.0"
+          "System.Collections": "4.0.11",
+          "System.Diagnostics.Debug": "4.0.11",
+          "System.Globalization": "4.0.11",
+          "System.IO": "4.1.0",
+          "System.Resources.ResourceManager": "4.0.1",
+          "System.Runtime": "4.1.0",
+          "System.Runtime.Extensions": "4.1.0",
+          "System.Text.Encoding": "4.0.11",
+          "System.Threading": "4.0.11",
+          "System.Xml.ReaderWriter": "4.0.11"
         },
         "compile": {
           "ref/netstandard1.3/System.Xml.XmlDocument.dll": {}
@@ -7659,59 +7456,11 @@
           "Waher.Script": "1.0.11"
         }
       },
-      "Waher.Content.Emoji/1.0.1": {
-        "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
-        "dependencies": {
-          "NETStandard.Library": "1.6.1"
-        }
-      },
-      "Waher.Content.Html/1.0.3": {
-        "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
-        "dependencies": {
-          "NETStandard.Library": "1.6.1",
-          "Waher.Content": "1.0.8"
-        }
-      },
-      "Waher.Content.Markdown/1.0.21": {
-        "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
-        "dependencies": {
-          "NETStandard.Library": "1.6.1",
-          "SkiaSharp": "1.60.0",
-          "Waher.Content.Emoji": "1.0.1",
-          "Waher.Content.Html": "1.0.3",
-          "Waher.Content.Xml": "1.0.2",
-          "Waher.Runtime.Cache": "1.0.1",
-          "Waher.Script": "1.0.11",
-          "Waher.Script.Graphs": "1.0.6"
-        }
-      },
-      "Waher.Content.Xml/1.0.2": {
-        "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
-        "dependencies": {
-          "NETStandard.Library": "1.6.1",
-          "System.Xml.XmlDocument": "4.3.0",
-          "Waher.Content": "1.0.8",
-          "Waher.Runtime.Inventory": "1.0.5",
-          "Waher.Script": "1.0.11"
-        }
-      },
       "Waher.Events/1.0.6": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1"
-        }
-      },
-      "Waher.Events.Statistics/1.0.3": {
-        "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
-        "dependencies": {
-          "NETStandard.Library": "1.6.1",
-          "Waher.Events": "1.0.6"
         }
       },
       "Waher.Networking/1.0.4": {
@@ -7729,7 +7478,6 @@
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.8",
           "Waher.Content": "1.0.0",
           "Waher.Events": "1.0.0",
-          "Waher.Events.Statistics": "1.0.0",
           "Waher.Networking": "1.0.0",
           "Waher.Runtime.Cache": "1.0.0",
           "Waher.Runtime.Inventory": "1.0.0",
@@ -7760,15 +7508,6 @@
           "NETStandard.Library": "1.6.1",
           "Waher.Events": "1.0.6",
           "Waher.Runtime.Inventory": "1.0.5"
-        }
-      },
-      "Waher.Script.Graphs/1.0.6": {
-        "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
-        "dependencies": {
-          "NETStandard.Library": "1.6.1",
-          "SkiaSharp": "1.60.0",
-          "Waher.Script": "1.0.11"
         }
       },
       "Waher.Security/1.0.1": {
@@ -8504,20 +8243,6 @@
         },
         "runtime": {
           "runtimes/win/lib/netcore50/System.Private.Uri.dll": {}
-        }
-      },
-      "SkiaSharp/1.60.0": {
-        "type": "package",
-        "compile": {
-          "lib/uap10.0/SkiaSharp.dll": {}
-        },
-        "runtime": {
-          "lib/uap10.0/SkiaSharp.dll": {}
-        },
-        "native": {
-          "runtimes/win10-x64/nativeassets/uap10.0/libEGL.dll": {},
-          "runtimes/win10-x64/nativeassets/uap10.0/libGLESv2.dll": {},
-          "runtimes/win10-x64/nativeassets/uap10.0/libSkiaSharp.dll": {}
         }
       },
       "System.AppContext/4.3.0": {
@@ -10188,19 +9913,19 @@
           "lib/netcore50/System.Xml.XDocument.dll": {}
         }
       },
-      "System.Xml.XmlDocument/4.3.0": {
+      "System.Xml.XmlDocument/4.0.1": {
         "type": "package",
         "dependencies": {
-          "System.Collections": "4.3.0",
-          "System.Diagnostics.Debug": "4.3.0",
-          "System.Globalization": "4.3.0",
-          "System.IO": "4.3.0",
-          "System.Resources.ResourceManager": "4.3.0",
-          "System.Runtime": "4.3.0",
-          "System.Runtime.Extensions": "4.3.0",
-          "System.Text.Encoding": "4.3.0",
-          "System.Threading": "4.3.0",
-          "System.Xml.ReaderWriter": "4.3.0"
+          "System.Collections": "4.0.11",
+          "System.Diagnostics.Debug": "4.0.11",
+          "System.Globalization": "4.0.11",
+          "System.IO": "4.1.0",
+          "System.Resources.ResourceManager": "4.0.1",
+          "System.Runtime": "4.1.0",
+          "System.Runtime.Extensions": "4.1.0",
+          "System.Text.Encoding": "4.0.11",
+          "System.Threading": "4.0.11",
+          "System.Xml.ReaderWriter": "4.0.11"
         },
         "compile": {
           "ref/netstandard1.3/System.Xml.XmlDocument.dll": {}
@@ -10246,59 +9971,11 @@
           "Waher.Script": "1.0.11"
         }
       },
-      "Waher.Content.Emoji/1.0.1": {
-        "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
-        "dependencies": {
-          "NETStandard.Library": "1.6.1"
-        }
-      },
-      "Waher.Content.Html/1.0.3": {
-        "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
-        "dependencies": {
-          "NETStandard.Library": "1.6.1",
-          "Waher.Content": "1.0.8"
-        }
-      },
-      "Waher.Content.Markdown/1.0.21": {
-        "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
-        "dependencies": {
-          "NETStandard.Library": "1.6.1",
-          "SkiaSharp": "1.60.0",
-          "Waher.Content.Emoji": "1.0.1",
-          "Waher.Content.Html": "1.0.3",
-          "Waher.Content.Xml": "1.0.2",
-          "Waher.Runtime.Cache": "1.0.1",
-          "Waher.Script": "1.0.11",
-          "Waher.Script.Graphs": "1.0.6"
-        }
-      },
-      "Waher.Content.Xml/1.0.2": {
-        "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
-        "dependencies": {
-          "NETStandard.Library": "1.6.1",
-          "System.Xml.XmlDocument": "4.3.0",
-          "Waher.Content": "1.0.8",
-          "Waher.Runtime.Inventory": "1.0.5",
-          "Waher.Script": "1.0.11"
-        }
-      },
       "Waher.Events/1.0.6": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1"
-        }
-      },
-      "Waher.Events.Statistics/1.0.3": {
-        "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
-        "dependencies": {
-          "NETStandard.Library": "1.6.1",
-          "Waher.Events": "1.0.6"
         }
       },
       "Waher.Networking/1.0.4": {
@@ -10316,7 +9993,6 @@
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.8",
           "Waher.Content": "1.0.0",
           "Waher.Events": "1.0.0",
-          "Waher.Events.Statistics": "1.0.0",
           "Waher.Networking": "1.0.0",
           "Waher.Runtime.Cache": "1.0.0",
           "Waher.Runtime.Inventory": "1.0.0",
@@ -10347,15 +10023,6 @@
           "NETStandard.Library": "1.6.1",
           "Waher.Events": "1.0.6",
           "Waher.Runtime.Inventory": "1.0.5"
-        }
-      },
-      "Waher.Script.Graphs/1.0.6": {
-        "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
-        "dependencies": {
-          "NETStandard.Library": "1.6.1",
-          "SkiaSharp": "1.60.0",
-          "Waher.Script": "1.0.11"
         }
       },
       "Waher.Security/1.0.1": {
@@ -11129,20 +10796,6 @@
           "runtimes/aot/lib/netcore50/System.Private.Uri.dll": {}
         }
       },
-      "SkiaSharp/1.60.0": {
-        "type": "package",
-        "compile": {
-          "lib/uap10.0/SkiaSharp.dll": {}
-        },
-        "runtime": {
-          "lib/uap10.0/SkiaSharp.dll": {}
-        },
-        "native": {
-          "runtimes/win10-x64/nativeassets/uap10.0/libEGL.dll": {},
-          "runtimes/win10-x64/nativeassets/uap10.0/libGLESv2.dll": {},
-          "runtimes/win10-x64/nativeassets/uap10.0/libSkiaSharp.dll": {}
-        }
-      },
       "System.AppContext/4.3.0": {
         "type": "package",
         "dependencies": {
@@ -12811,19 +12464,19 @@
           "lib/netcore50/System.Xml.XDocument.dll": {}
         }
       },
-      "System.Xml.XmlDocument/4.3.0": {
+      "System.Xml.XmlDocument/4.0.1": {
         "type": "package",
         "dependencies": {
-          "System.Collections": "4.3.0",
-          "System.Diagnostics.Debug": "4.3.0",
-          "System.Globalization": "4.3.0",
-          "System.IO": "4.3.0",
-          "System.Resources.ResourceManager": "4.3.0",
-          "System.Runtime": "4.3.0",
-          "System.Runtime.Extensions": "4.3.0",
-          "System.Text.Encoding": "4.3.0",
-          "System.Threading": "4.3.0",
-          "System.Xml.ReaderWriter": "4.3.0"
+          "System.Collections": "4.0.11",
+          "System.Diagnostics.Debug": "4.0.11",
+          "System.Globalization": "4.0.11",
+          "System.IO": "4.1.0",
+          "System.Resources.ResourceManager": "4.0.1",
+          "System.Runtime": "4.1.0",
+          "System.Runtime.Extensions": "4.1.0",
+          "System.Text.Encoding": "4.0.11",
+          "System.Threading": "4.0.11",
+          "System.Xml.ReaderWriter": "4.0.11"
         },
         "compile": {
           "ref/netstandard1.3/System.Xml.XmlDocument.dll": {}
@@ -12869,59 +12522,11 @@
           "Waher.Script": "1.0.11"
         }
       },
-      "Waher.Content.Emoji/1.0.1": {
-        "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
-        "dependencies": {
-          "NETStandard.Library": "1.6.1"
-        }
-      },
-      "Waher.Content.Html/1.0.3": {
-        "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
-        "dependencies": {
-          "NETStandard.Library": "1.6.1",
-          "Waher.Content": "1.0.8"
-        }
-      },
-      "Waher.Content.Markdown/1.0.21": {
-        "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
-        "dependencies": {
-          "NETStandard.Library": "1.6.1",
-          "SkiaSharp": "1.60.0",
-          "Waher.Content.Emoji": "1.0.1",
-          "Waher.Content.Html": "1.0.3",
-          "Waher.Content.Xml": "1.0.2",
-          "Waher.Runtime.Cache": "1.0.1",
-          "Waher.Script": "1.0.11",
-          "Waher.Script.Graphs": "1.0.6"
-        }
-      },
-      "Waher.Content.Xml/1.0.2": {
-        "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
-        "dependencies": {
-          "NETStandard.Library": "1.6.1",
-          "System.Xml.XmlDocument": "4.3.0",
-          "Waher.Content": "1.0.8",
-          "Waher.Runtime.Inventory": "1.0.5",
-          "Waher.Script": "1.0.11"
-        }
-      },
       "Waher.Events/1.0.6": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1"
-        }
-      },
-      "Waher.Events.Statistics/1.0.3": {
-        "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
-        "dependencies": {
-          "NETStandard.Library": "1.6.1",
-          "Waher.Events": "1.0.6"
         }
       },
       "Waher.Networking/1.0.4": {
@@ -12939,7 +12544,6 @@
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.8",
           "Waher.Content": "1.0.0",
           "Waher.Events": "1.0.0",
-          "Waher.Events.Statistics": "1.0.0",
           "Waher.Networking": "1.0.0",
           "Waher.Runtime.Cache": "1.0.0",
           "Waher.Runtime.Inventory": "1.0.0",
@@ -12970,15 +12574,6 @@
           "NETStandard.Library": "1.6.1",
           "Waher.Events": "1.0.6",
           "Waher.Runtime.Inventory": "1.0.5"
-        }
-      },
-      "Waher.Script.Graphs/1.0.6": {
-        "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
-        "dependencies": {
-          "NETStandard.Library": "1.6.1",
-          "SkiaSharp": "1.60.0",
-          "Waher.Script": "1.0.11"
         }
       },
       "Waher.Security/1.0.1": {
@@ -13714,20 +13309,6 @@
         },
         "runtime": {
           "runtimes/win/lib/netcore50/System.Private.Uri.dll": {}
-        }
-      },
-      "SkiaSharp/1.60.0": {
-        "type": "package",
-        "compile": {
-          "lib/uap10.0/SkiaSharp.dll": {}
-        },
-        "runtime": {
-          "lib/uap10.0/SkiaSharp.dll": {}
-        },
-        "native": {
-          "runtimes/win10-x86/nativeassets/uap10.0/libEGL.dll": {},
-          "runtimes/win10-x86/nativeassets/uap10.0/libGLESv2.dll": {},
-          "runtimes/win10-x86/nativeassets/uap10.0/libSkiaSharp.dll": {}
         }
       },
       "System.AppContext/4.3.0": {
@@ -15398,19 +14979,19 @@
           "lib/netcore50/System.Xml.XDocument.dll": {}
         }
       },
-      "System.Xml.XmlDocument/4.3.0": {
+      "System.Xml.XmlDocument/4.0.1": {
         "type": "package",
         "dependencies": {
-          "System.Collections": "4.3.0",
-          "System.Diagnostics.Debug": "4.3.0",
-          "System.Globalization": "4.3.0",
-          "System.IO": "4.3.0",
-          "System.Resources.ResourceManager": "4.3.0",
-          "System.Runtime": "4.3.0",
-          "System.Runtime.Extensions": "4.3.0",
-          "System.Text.Encoding": "4.3.0",
-          "System.Threading": "4.3.0",
-          "System.Xml.ReaderWriter": "4.3.0"
+          "System.Collections": "4.0.11",
+          "System.Diagnostics.Debug": "4.0.11",
+          "System.Globalization": "4.0.11",
+          "System.IO": "4.1.0",
+          "System.Resources.ResourceManager": "4.0.1",
+          "System.Runtime": "4.1.0",
+          "System.Runtime.Extensions": "4.1.0",
+          "System.Text.Encoding": "4.0.11",
+          "System.Threading": "4.0.11",
+          "System.Xml.ReaderWriter": "4.0.11"
         },
         "compile": {
           "ref/netstandard1.3/System.Xml.XmlDocument.dll": {}
@@ -15456,59 +15037,11 @@
           "Waher.Script": "1.0.11"
         }
       },
-      "Waher.Content.Emoji/1.0.1": {
-        "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
-        "dependencies": {
-          "NETStandard.Library": "1.6.1"
-        }
-      },
-      "Waher.Content.Html/1.0.3": {
-        "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
-        "dependencies": {
-          "NETStandard.Library": "1.6.1",
-          "Waher.Content": "1.0.8"
-        }
-      },
-      "Waher.Content.Markdown/1.0.21": {
-        "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
-        "dependencies": {
-          "NETStandard.Library": "1.6.1",
-          "SkiaSharp": "1.60.0",
-          "Waher.Content.Emoji": "1.0.1",
-          "Waher.Content.Html": "1.0.3",
-          "Waher.Content.Xml": "1.0.2",
-          "Waher.Runtime.Cache": "1.0.1",
-          "Waher.Script": "1.0.11",
-          "Waher.Script.Graphs": "1.0.6"
-        }
-      },
-      "Waher.Content.Xml/1.0.2": {
-        "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
-        "dependencies": {
-          "NETStandard.Library": "1.6.1",
-          "System.Xml.XmlDocument": "4.3.0",
-          "Waher.Content": "1.0.8",
-          "Waher.Runtime.Inventory": "1.0.5",
-          "Waher.Script": "1.0.11"
-        }
-      },
       "Waher.Events/1.0.6": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1"
-        }
-      },
-      "Waher.Events.Statistics/1.0.3": {
-        "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
-        "dependencies": {
-          "NETStandard.Library": "1.6.1",
-          "Waher.Events": "1.0.6"
         }
       },
       "Waher.Networking/1.0.4": {
@@ -15526,7 +15059,6 @@
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.8",
           "Waher.Content": "1.0.0",
           "Waher.Events": "1.0.0",
-          "Waher.Events.Statistics": "1.0.0",
           "Waher.Networking": "1.0.0",
           "Waher.Runtime.Cache": "1.0.0",
           "Waher.Runtime.Inventory": "1.0.0",
@@ -15557,15 +15089,6 @@
           "NETStandard.Library": "1.6.1",
           "Waher.Events": "1.0.6",
           "Waher.Runtime.Inventory": "1.0.5"
-        }
-      },
-      "Waher.Script.Graphs/1.0.6": {
-        "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
-        "dependencies": {
-          "NETStandard.Library": "1.6.1",
-          "SkiaSharp": "1.60.0",
-          "Waher.Script": "1.0.11"
         }
       },
       "Waher.Security/1.0.1": {
@@ -16337,20 +15860,6 @@
         },
         "runtime": {
           "runtimes/aot/lib/netcore50/System.Private.Uri.dll": {}
-        }
-      },
-      "SkiaSharp/1.60.0": {
-        "type": "package",
-        "compile": {
-          "lib/uap10.0/SkiaSharp.dll": {}
-        },
-        "runtime": {
-          "lib/uap10.0/SkiaSharp.dll": {}
-        },
-        "native": {
-          "runtimes/win10-x86/nativeassets/uap10.0/libEGL.dll": {},
-          "runtimes/win10-x86/nativeassets/uap10.0/libGLESv2.dll": {},
-          "runtimes/win10-x86/nativeassets/uap10.0/libSkiaSharp.dll": {}
         }
       },
       "System.AppContext/4.3.0": {
@@ -18021,19 +17530,19 @@
           "lib/netcore50/System.Xml.XDocument.dll": {}
         }
       },
-      "System.Xml.XmlDocument/4.3.0": {
+      "System.Xml.XmlDocument/4.0.1": {
         "type": "package",
         "dependencies": {
-          "System.Collections": "4.3.0",
-          "System.Diagnostics.Debug": "4.3.0",
-          "System.Globalization": "4.3.0",
-          "System.IO": "4.3.0",
-          "System.Resources.ResourceManager": "4.3.0",
-          "System.Runtime": "4.3.0",
-          "System.Runtime.Extensions": "4.3.0",
-          "System.Text.Encoding": "4.3.0",
-          "System.Threading": "4.3.0",
-          "System.Xml.ReaderWriter": "4.3.0"
+          "System.Collections": "4.0.11",
+          "System.Diagnostics.Debug": "4.0.11",
+          "System.Globalization": "4.0.11",
+          "System.IO": "4.1.0",
+          "System.Resources.ResourceManager": "4.0.1",
+          "System.Runtime": "4.1.0",
+          "System.Runtime.Extensions": "4.1.0",
+          "System.Text.Encoding": "4.0.11",
+          "System.Threading": "4.0.11",
+          "System.Xml.ReaderWriter": "4.0.11"
         },
         "compile": {
           "ref/netstandard1.3/System.Xml.XmlDocument.dll": {}
@@ -18079,59 +17588,11 @@
           "Waher.Script": "1.0.11"
         }
       },
-      "Waher.Content.Emoji/1.0.1": {
-        "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
-        "dependencies": {
-          "NETStandard.Library": "1.6.1"
-        }
-      },
-      "Waher.Content.Html/1.0.3": {
-        "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
-        "dependencies": {
-          "NETStandard.Library": "1.6.1",
-          "Waher.Content": "1.0.8"
-        }
-      },
-      "Waher.Content.Markdown/1.0.21": {
-        "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
-        "dependencies": {
-          "NETStandard.Library": "1.6.1",
-          "SkiaSharp": "1.60.0",
-          "Waher.Content.Emoji": "1.0.1",
-          "Waher.Content.Html": "1.0.3",
-          "Waher.Content.Xml": "1.0.2",
-          "Waher.Runtime.Cache": "1.0.1",
-          "Waher.Script": "1.0.11",
-          "Waher.Script.Graphs": "1.0.6"
-        }
-      },
-      "Waher.Content.Xml/1.0.2": {
-        "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
-        "dependencies": {
-          "NETStandard.Library": "1.6.1",
-          "System.Xml.XmlDocument": "4.3.0",
-          "Waher.Content": "1.0.8",
-          "Waher.Runtime.Inventory": "1.0.5",
-          "Waher.Script": "1.0.11"
-        }
-      },
       "Waher.Events/1.0.6": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1"
-        }
-      },
-      "Waher.Events.Statistics/1.0.3": {
-        "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
-        "dependencies": {
-          "NETStandard.Library": "1.6.1",
-          "Waher.Events": "1.0.6"
         }
       },
       "Waher.Networking/1.0.4": {
@@ -18149,7 +17610,6 @@
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.8",
           "Waher.Content": "1.0.0",
           "Waher.Events": "1.0.0",
-          "Waher.Events.Statistics": "1.0.0",
           "Waher.Networking": "1.0.0",
           "Waher.Runtime.Cache": "1.0.0",
           "Waher.Runtime.Inventory": "1.0.0",
@@ -18180,15 +17640,6 @@
           "NETStandard.Library": "1.6.1",
           "Waher.Events": "1.0.6",
           "Waher.Runtime.Inventory": "1.0.5"
-        }
-      },
-      "Waher.Script.Graphs/1.0.6": {
-        "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
-        "dependencies": {
-          "NETStandard.Library": "1.6.1",
-          "SkiaSharp": "1.60.0",
-          "Waher.Script": "1.0.11"
         }
       },
       "Waher.Security/1.0.1": {
@@ -23039,49 +22490,6 @@
         "runtimes/win8-arm/native/clrcompression.dll"
       ]
     },
-    "SkiaSharp/1.60.0": {
-      "sha512": "HoSNIZH54rinevEhLUWdeclr+H/QdmOp252+Tt07HTXwQyvRl9eW32ga/X7T56wsR855SKprb0RcnBPRCzlqSA==",
-      "type": "package",
-      "path": "skiasharp/1.60.0",
-      "files": [
-        "build/net45/SkiaSharp.dll.config",
-        "build/net45/SkiaSharp.targets",
-        "lib/MonoAndroid/SkiaSharp.dll",
-        "lib/MonoAndroid/SkiaSharp.xml",
-        "lib/XamarinMac/SkiaSharp.dll",
-        "lib/XamarinMac/SkiaSharp.xml",
-        "lib/XamariniOS/SkiaSharp.dll",
-        "lib/XamariniOS/SkiaSharp.xml",
-        "lib/XamarintvOS/SkiaSharp.dll",
-        "lib/XamarintvOS/SkiaSharp.xml",
-        "lib/XamarinwatchOS/SkiaSharp.dll",
-        "lib/XamarinwatchOS/SkiaSharp.xml",
-        "lib/net45/SkiaSharp.dll",
-        "lib/net45/SkiaSharp.dll.config",
-        "lib/net45/SkiaSharp.xml",
-        "lib/netstandard1.3/SkiaSharp.dll",
-        "lib/netstandard1.3/SkiaSharp.xml",
-        "lib/portable-net45+win8+wpa81+wp8/SkiaSharp.dll",
-        "lib/portable-net45+win8+wpa81+wp8/SkiaSharp.xml",
-        "lib/uap10.0/SkiaSharp.dll",
-        "lib/uap10.0/SkiaSharp.xml",
-        "runtimes/osx/native/libSkiaSharp.dylib",
-        "runtimes/win10-arm/nativeassets/uap10.0/libEGL.dll",
-        "runtimes/win10-arm/nativeassets/uap10.0/libGLESv2.dll",
-        "runtimes/win10-arm/nativeassets/uap10.0/libSkiaSharp.dll",
-        "runtimes/win10-x64/nativeassets/uap10.0/libEGL.dll",
-        "runtimes/win10-x64/nativeassets/uap10.0/libGLESv2.dll",
-        "runtimes/win10-x64/nativeassets/uap10.0/libSkiaSharp.dll",
-        "runtimes/win10-x86/nativeassets/uap10.0/libEGL.dll",
-        "runtimes/win10-x86/nativeassets/uap10.0/libGLESv2.dll",
-        "runtimes/win10-x86/nativeassets/uap10.0/libSkiaSharp.dll",
-        "runtimes/win7-x64/native/libSkiaSharp.dll",
-        "runtimes/win7-x86/native/libSkiaSharp.dll",
-        "skiasharp.1.60.0.nupkg.sha512",
-        "skiasharp.nuspec",
-        "xamarin.interactive/SkiaSharp.Workbooks.dll"
-      ]
-    },
     "System.AppContext/4.3.0": {
       "sha512": "fKC+rmaLfeIzUhagxY17Q9siv/sPrjjKcfNg1Ic8IlQkZLipo8ljcaZQu4VtI4Jqbzjc2VTjzGLF6WmsRXAEgA==",
       "type": "package",
@@ -27886,11 +27294,13 @@
         "system.xml.xdocument.nuspec"
       ]
     },
-    "System.Xml.XmlDocument/4.3.0": {
-      "sha512": "lJ8AxvkX7GQxpC6GFCeBj8ThYVyQczx2+f/cWHJU8tjS7YfI6Cv6bon70jVEgs2CiFbmmM8b9j1oZVx0dSI2Ww==",
+    "System.Xml.XmlDocument/4.0.1": {
+      "sha512": "2eZu6IP+etFVBBFUFzw2w6J21DqIN5eL9Y8r8JfJWUmV28Z5P0SNU01oCisVHQgHsDhHPnmq2s1hJrJCFZWloQ==",
       "type": "package",
-      "path": "system.xml.xmldocument/4.3.0",
+      "path": "system.xml.xmldocument/4.0.1",
       "files": [
+        "System.Xml.XmlDocument.4.0.1.nupkg.sha512",
+        "System.Xml.XmlDocument.nuspec",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
         "lib/MonoAndroid10/_._",
@@ -27918,9 +27328,7 @@
         "ref/xamarinios10/_._",
         "ref/xamarinmac20/_._",
         "ref/xamarintvos10/_._",
-        "ref/xamarinwatchos10/_._",
-        "system.xml.xmldocument.4.3.0.nupkg.sha512",
-        "system.xml.xmldocument.nuspec"
+        "ref/xamarinwatchos10/_._"
       ]
     },
     "System.Xml.XmlSerializer/4.0.11": {
@@ -27997,35 +27405,10 @@
       "path": "../Waher.Content/Waher.Content.csproj",
       "msbuildProject": "../Waher.Content/Waher.Content.csproj"
     },
-    "Waher.Content.Emoji/1.0.1": {
-      "type": "project",
-      "path": "../Waher.Content.Emoji/Waher.Content.Emoji.csproj",
-      "msbuildProject": "../Waher.Content.Emoji/Waher.Content.Emoji.csproj"
-    },
-    "Waher.Content.Html/1.0.3": {
-      "type": "project",
-      "path": "../Waher.Content.Html/Waher.Content.Html.csproj",
-      "msbuildProject": "../Waher.Content.Html/Waher.Content.Html.csproj"
-    },
-    "Waher.Content.Markdown/1.0.21": {
-      "type": "project",
-      "path": "../Waher.Content.Markdown/Waher.Content.Markdown.csproj",
-      "msbuildProject": "../Waher.Content.Markdown/Waher.Content.Markdown.csproj"
-    },
-    "Waher.Content.Xml/1.0.2": {
-      "type": "project",
-      "path": "../Waher.Content.Xml/Waher.Content.Xml.csproj",
-      "msbuildProject": "../Waher.Content.Xml/Waher.Content.Xml.csproj"
-    },
     "Waher.Events/1.0.6": {
       "type": "project",
       "path": "../../Events/Waher.Events/Waher.Events.csproj",
       "msbuildProject": "../../Events/Waher.Events/Waher.Events.csproj"
-    },
-    "Waher.Events.Statistics/1.0.3": {
-      "type": "project",
-      "path": "../../Events/Waher.Events.Statistics/Waher.Events.Statistics.csproj",
-      "msbuildProject": "../../Events/Waher.Events.Statistics/Waher.Events.Statistics.csproj"
     },
     "Waher.Networking/1.0.4": {
       "type": "project",
@@ -28051,11 +27434,6 @@
       "type": "project",
       "path": "../../Script/Waher.Script/Waher.Script.csproj",
       "msbuildProject": "../../Script/Waher.Script/Waher.Script.csproj"
-    },
-    "Waher.Script.Graphs/1.0.6": {
-      "type": "project",
-      "path": "../../Script/Waher.Script.Graphs/Waher.Script.Graphs.csproj",
-      "msbuildProject": "../../Script/Waher.Script.Graphs/Waher.Script.Graphs.csproj"
     },
     "Waher.Security/1.0.1": {
       "type": "project",
@@ -28097,26 +27475,11 @@
       "frameworks": {
         "uap10.0.10586": {
           "projectReferences": {
-            "C:\\My Projects\\IoTGateway\\Content\\Waher.Content.Emoji\\Waher.Content.Emoji.csproj": {
-              "projectPath": "C:\\My Projects\\IoTGateway\\Content\\Waher.Content.Emoji\\Waher.Content.Emoji.csproj"
-            },
-            "C:\\My Projects\\IoTGateway\\Content\\Waher.Content.Markdown\\Waher.Content.Markdown.csproj": {
-              "projectPath": "C:\\My Projects\\IoTGateway\\Content\\Waher.Content.Markdown\\Waher.Content.Markdown.csproj"
-            },
-            "C:\\My Projects\\IoTGateway\\Content\\Waher.Content\\Waher.Content.csproj": {
-              "projectPath": "C:\\My Projects\\IoTGateway\\Content\\Waher.Content\\Waher.Content.csproj"
-            },
             "C:\\My Projects\\IoTGateway\\Networking\\Waher.Networking.HTTP.UWP\\Waher.Networking.HTTP.UWP.csproj": {
               "projectPath": "C:\\My Projects\\IoTGateway\\Networking\\Waher.Networking.HTTP.UWP\\Waher.Networking.HTTP.UWP.csproj"
             },
             "C:\\My Projects\\IoTGateway\\Runtime\\Waher.Runtime.Inventory\\Waher.Runtime.Inventory.csproj": {
               "projectPath": "C:\\My Projects\\IoTGateway\\Runtime\\Waher.Runtime.Inventory\\Waher.Runtime.Inventory.csproj"
-            },
-            "C:\\My Projects\\IoTGateway\\Script\\Waher.Script\\Waher.Script.csproj": {
-              "projectPath": "C:\\My Projects\\IoTGateway\\Script\\Waher.Script\\Waher.Script.csproj"
-            },
-            "C:\\My Projects\\IoTGateway\\Security\\Waher.Security\\Waher.Security.csproj": {
-              "projectPath": "C:\\My Projects\\IoTGateway\\Security\\Waher.Security\\Waher.Security.csproj"
             }
           }
         }

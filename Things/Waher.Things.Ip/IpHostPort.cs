@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Networking;
 using Waher.Persistence.Attributes;
 using Waher.Runtime.Language;
 using Waher.Things.Attributes;
 
-namespace Waher.Things.IP
+namespace Waher.Things.Ip
 {
 	public abstract class IpHostPort : IpHost
 	{
@@ -24,6 +26,19 @@ namespace Waher.Things.IP
 		{
 			get { return this.port; }
 			set { this.port = value; }
+		}
+
+		/// <summary>
+		/// Connect to the remote host and port using TCP.
+		/// </summary>
+		/// <returns>TCP transport.</returns>
+		public async Task<TcpTransport> ConnectTcp()
+		{
+			TcpClient Client = new TcpClient();
+
+			await Client.ConnectAsync(this.Host, this.port);
+
+			return new TcpTransport(Client);
 		}
 
 	}

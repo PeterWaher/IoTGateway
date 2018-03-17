@@ -10,7 +10,7 @@ using Waher.Things.SensorData;
 using Waher.Things.Metering;
 using Waher.Things.Metering.NodeTypes;
 
-namespace Waher.Things.IP
+namespace Waher.Things.Ip
 {
 	public class IpHost : ProvisionedMeteringNode, ISensor
 	{

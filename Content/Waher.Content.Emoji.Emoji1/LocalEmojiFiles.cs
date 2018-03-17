@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Waher.Events;
+using Waher.Runtime.Settings;
 
 namespace Waher.Content.Emoji.Emoji1
 {
@@ -98,7 +99,9 @@ namespace Waher.Content.Emoji.Emoji1
 
 			try
 			{
-				if (File.Exists(ZipFileName))
+				DateTime TP = File.GetLastWriteTime(this.zipFileName);
+
+				if (File.Exists(this.zipFileName) && RuntimeSettings.Get(this.zipFileName, DateTime.MinValue) != TP)
 				{
 					if (!Directory.Exists(ProgramDataFolder))
 						Directory.CreateDirectory(ProgramDataFolder);
@@ -123,7 +126,7 @@ namespace Waher.Content.Emoji.Emoji1
 			}
 		}
 
-		private Task Unpack()
+		private async Task Unpack()
 		{
 			try
 			{
@@ -132,10 +135,19 @@ namespace Waher.Content.Emoji.Emoji1
 					new KeyValuePair<string, object>("Destination", this.programDataFolder));
 
 				ZipFile.ExtractToDirectory(this.zipFileName, this.programDataFolder);
-				File.Delete(this.zipFileName);
 
-				Log.Informational("File unpacked and deleted.",
-					new KeyValuePair<string, object>("FileName", this.zipFileName));
+				DateTime TP = File.GetLastWriteTime(this.zipFileName);
+				await RuntimeSettings.SetAsync(this.zipFileName, TP);
+
+				try
+				{
+					File.Delete(this.zipFileName);
+					Log.Informational("File unpacked and deleted.", new KeyValuePair<string, object>("FileName", this.zipFileName));
+				}
+				catch (Exception)
+				{
+					Log.Informational("File unpacked.", new KeyValuePair<string, object>("FileName", this.zipFileName));
+				}
 			}
 			catch (Exception ex)
 			{
@@ -145,8 +157,6 @@ namespace Waher.Content.Emoji.Emoji1
 			{
 				this.initialized.Set();
 			}
-
-			return Task.CompletedTask;
 		}
 
 		/// <summary>

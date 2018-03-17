@@ -2415,6 +2415,14 @@
           "NETStandard.Library": "1.6.1"
         }
       },
+      "Waher.Networking/1.0.4": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "Waher.Events": "1.0.6"
+        }
+      },
       "Waher.Runtime.Cache/1.0.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
@@ -2438,6 +2446,13 @@
           "NETStandard.Library": "1.6.1",
           "Waher.Events": "1.0.6",
           "Waher.Runtime.Inventory": "1.0.5"
+        }
+      },
+      "Waher.Security/1.0.1": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1"
         }
       }
     },
@@ -4892,6 +4907,14 @@
           "NETStandard.Library": "1.6.1"
         }
       },
+      "Waher.Networking/1.0.4": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "Waher.Events": "1.0.6"
+        }
+      },
       "Waher.Runtime.Cache/1.0.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
@@ -4915,6 +4938,13 @@
           "NETStandard.Library": "1.6.1",
           "Waher.Events": "1.0.6",
           "Waher.Runtime.Inventory": "1.0.5"
+        }
+      },
+      "Waher.Security/1.0.1": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1"
         }
       }
     },
@@ -7405,6 +7435,14 @@
           "NETStandard.Library": "1.6.1"
         }
       },
+      "Waher.Networking/1.0.4": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "Waher.Events": "1.0.6"
+        }
+      },
       "Waher.Runtime.Cache/1.0.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
@@ -7428,6 +7466,13 @@
           "NETStandard.Library": "1.6.1",
           "Waher.Events": "1.0.6",
           "Waher.Runtime.Inventory": "1.0.5"
+        }
+      },
+      "Waher.Security/1.0.1": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1"
         }
       }
     },
@@ -9891,6 +9936,14 @@
           "NETStandard.Library": "1.6.1"
         }
       },
+      "Waher.Networking/1.0.4": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "Waher.Events": "1.0.6"
+        }
+      },
       "Waher.Runtime.Cache/1.0.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
@@ -9914,6 +9967,13 @@
           "NETStandard.Library": "1.6.1",
           "Waher.Events": "1.0.6",
           "Waher.Runtime.Inventory": "1.0.5"
+        }
+      },
+      "Waher.Security/1.0.1": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1"
         }
       }
     },
@@ -12413,6 +12473,14 @@
           "NETStandard.Library": "1.6.1"
         }
       },
+      "Waher.Networking/1.0.4": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "Waher.Events": "1.0.6"
+        }
+      },
       "Waher.Runtime.Cache/1.0.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
@@ -12436,6 +12504,13 @@
           "NETStandard.Library": "1.6.1",
           "Waher.Events": "1.0.6",
           "Waher.Runtime.Inventory": "1.0.5"
+        }
+      },
+      "Waher.Security/1.0.1": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1"
         }
       }
     },
@@ -14899,6 +14974,14 @@
           "NETStandard.Library": "1.6.1"
         }
       },
+      "Waher.Networking/1.0.4": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "Waher.Events": "1.0.6"
+        }
+      },
       "Waher.Runtime.Cache/1.0.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
@@ -14922,6 +15005,13 @@
           "NETStandard.Library": "1.6.1",
           "Waher.Events": "1.0.6",
           "Waher.Runtime.Inventory": "1.0.5"
+        }
+      },
+      "Waher.Security/1.0.1": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1"
         }
       }
     },
@@ -17421,6 +17511,14 @@
           "NETStandard.Library": "1.6.1"
         }
       },
+      "Waher.Networking/1.0.4": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "Waher.Events": "1.0.6"
+        }
+      },
       "Waher.Runtime.Cache/1.0.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
@@ -17444,6 +17542,13 @@
           "NETStandard.Library": "1.6.1",
           "Waher.Events": "1.0.6",
           "Waher.Runtime.Inventory": "1.0.5"
+        }
+      },
+      "Waher.Security/1.0.1": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1"
         }
       }
     }
@@ -27207,6 +27312,11 @@
       "path": "../../Events/Waher.Events/Waher.Events.csproj",
       "msbuildProject": "../../Events/Waher.Events/Waher.Events.csproj"
     },
+    "Waher.Networking/1.0.4": {
+      "type": "project",
+      "path": "../Waher.Networking/Waher.Networking.csproj",
+      "msbuildProject": "../Waher.Networking/Waher.Networking.csproj"
+    },
     "Waher.Runtime.Cache/1.0.1": {
       "type": "project",
       "path": "../../Runtime/Waher.Runtime.Cache/Waher.Runtime.Cache.csproj",
@@ -27221,6 +27331,11 @@
       "type": "project",
       "path": "../../Script/Waher.Script/Waher.Script.csproj",
       "msbuildProject": "../../Script/Waher.Script/Waher.Script.csproj"
+    },
+    "Waher.Security/1.0.1": {
+      "type": "project",
+      "path": "../../Security/Waher.Security/Waher.Security.csproj",
+      "msbuildProject": "../../Security/Waher.Security/Waher.Security.csproj"
     }
   },
   "projectFileDependencyGroups": {
@@ -27260,8 +27375,20 @@
             "C:\\My Projects\\IoTGateway\\Content\\Waher.Content\\Waher.Content.csproj": {
               "projectPath": "C:\\My Projects\\IoTGateway\\Content\\Waher.Content\\Waher.Content.csproj"
             },
+            "C:\\My Projects\\IoTGateway\\Networking\\Waher.Networking\\Waher.Networking.csproj": {
+              "projectPath": "C:\\My Projects\\IoTGateway\\Networking\\Waher.Networking\\Waher.Networking.csproj"
+            },
             "C:\\My Projects\\IoTGateway\\Runtime\\Waher.Runtime.Cache\\Waher.Runtime.Cache.csproj": {
               "projectPath": "C:\\My Projects\\IoTGateway\\Runtime\\Waher.Runtime.Cache\\Waher.Runtime.Cache.csproj"
+            },
+            "C:\\My Projects\\IoTGateway\\Runtime\\Waher.Runtime.Inventory\\Waher.Runtime.Inventory.csproj": {
+              "projectPath": "C:\\My Projects\\IoTGateway\\Runtime\\Waher.Runtime.Inventory\\Waher.Runtime.Inventory.csproj"
+            },
+            "C:\\My Projects\\IoTGateway\\Script\\Waher.Script\\Waher.Script.csproj": {
+              "projectPath": "C:\\My Projects\\IoTGateway\\Script\\Waher.Script\\Waher.Script.csproj"
+            },
+            "C:\\My Projects\\IoTGateway\\Security\\Waher.Security\\Waher.Security.csproj": {
+              "projectPath": "C:\\My Projects\\IoTGateway\\Security\\Waher.Security\\Waher.Security.csproj"
             }
           }
         }

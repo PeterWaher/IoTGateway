@@ -542,7 +542,7 @@ namespace Waher.Networking.XMPP.Sensor
 		{
 			StringBuilder Xml = new StringBuilder();
 
-			Xml.Append("<resp xmlns='");
+			Xml.Append("<started xmlns='");
 			Xml.Append(SensorClient.NamespaceSensorData);
 			Xml.Append("' id='");
 			Xml.Append(this.Id);

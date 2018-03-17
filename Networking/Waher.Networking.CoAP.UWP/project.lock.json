@@ -2399,6 +2399,15 @@
           }
         }
       },
+      "Waher.Content/1.0.8": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "Waher.Runtime.Inventory": "1.0.5",
+          "Waher.Script": "1.0.11"
+        }
+      },
       "Waher.Events/1.0.6": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
@@ -2436,6 +2445,15 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Events": "1.0.6"
+        }
+      },
+      "Waher.Script/1.0.11": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "Waher.Events": "1.0.6",
+          "Waher.Runtime.Inventory": "1.0.5"
         }
       },
       "Waher.Security/1.0.1": {
@@ -4894,6 +4912,15 @@
           "lib/netcore50/System.Xml.XmlSerializer.dll": {}
         }
       },
+      "Waher.Content/1.0.8": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "Waher.Runtime.Inventory": "1.0.5",
+          "Waher.Script": "1.0.11"
+        }
+      },
       "Waher.Events/1.0.6": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
@@ -4931,6 +4958,15 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Events": "1.0.6"
+        }
+      },
+      "Waher.Script/1.0.11": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "Waher.Events": "1.0.6",
+          "Waher.Runtime.Inventory": "1.0.5"
         }
       },
       "Waher.Security/1.0.1": {
@@ -7425,6 +7461,15 @@
           "runtimes/aot/lib/netcore50/System.Xml.XmlSerializer.dll": {}
         }
       },
+      "Waher.Content/1.0.8": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "Waher.Runtime.Inventory": "1.0.5",
+          "Waher.Script": "1.0.11"
+        }
+      },
       "Waher.Events/1.0.6": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
@@ -7462,6 +7507,15 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Events": "1.0.6"
+        }
+      },
+      "Waher.Script/1.0.11": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "Waher.Events": "1.0.6",
+          "Waher.Runtime.Inventory": "1.0.5"
         }
       },
       "Waher.Security/1.0.1": {
@@ -9929,6 +9983,15 @@
           "lib/netcore50/System.Xml.XmlSerializer.dll": {}
         }
       },
+      "Waher.Content/1.0.8": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "Waher.Runtime.Inventory": "1.0.5",
+          "Waher.Script": "1.0.11"
+        }
+      },
       "Waher.Events/1.0.6": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
@@ -9966,6 +10029,15 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Events": "1.0.6"
+        }
+      },
+      "Waher.Script/1.0.11": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "Waher.Events": "1.0.6",
+          "Waher.Runtime.Inventory": "1.0.5"
         }
       },
       "Waher.Security/1.0.1": {
@@ -12469,6 +12541,15 @@
           "runtimes/aot/lib/netcore50/System.Xml.XmlSerializer.dll": {}
         }
       },
+      "Waher.Content/1.0.8": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "Waher.Runtime.Inventory": "1.0.5",
+          "Waher.Script": "1.0.11"
+        }
+      },
       "Waher.Events/1.0.6": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
@@ -12506,6 +12587,15 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Events": "1.0.6"
+        }
+      },
+      "Waher.Script/1.0.11": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "Waher.Events": "1.0.6",
+          "Waher.Runtime.Inventory": "1.0.5"
         }
       },
       "Waher.Security/1.0.1": {
@@ -14973,6 +15063,15 @@
           "lib/netcore50/System.Xml.XmlSerializer.dll": {}
         }
       },
+      "Waher.Content/1.0.8": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "Waher.Runtime.Inventory": "1.0.5",
+          "Waher.Script": "1.0.11"
+        }
+      },
       "Waher.Events/1.0.6": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
@@ -15010,6 +15109,15 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Events": "1.0.6"
+        }
+      },
+      "Waher.Script/1.0.11": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "Waher.Events": "1.0.6",
+          "Waher.Runtime.Inventory": "1.0.5"
         }
       },
       "Waher.Security/1.0.1": {
@@ -17513,6 +17621,15 @@
           "runtimes/aot/lib/netcore50/System.Xml.XmlSerializer.dll": {}
         }
       },
+      "Waher.Content/1.0.8": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "Waher.Runtime.Inventory": "1.0.5",
+          "Waher.Script": "1.0.11"
+        }
+      },
       "Waher.Events/1.0.6": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
@@ -17550,6 +17667,15 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Events": "1.0.6"
+        }
+      },
+      "Waher.Script/1.0.11": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "Waher.Events": "1.0.6",
+          "Waher.Runtime.Inventory": "1.0.5"
         }
       },
       "Waher.Security/1.0.1": {
@@ -27323,6 +27449,11 @@
         "system.xml.xmlserializer.nuspec"
       ]
     },
+    "Waher.Content/1.0.8": {
+      "type": "project",
+      "path": "../../Content/Waher.Content/Waher.Content.csproj",
+      "msbuildProject": "../../Content/Waher.Content/Waher.Content.csproj"
+    },
     "Waher.Events/1.0.6": {
       "type": "project",
       "path": "../../Events/Waher.Events/Waher.Events.csproj",
@@ -27347,6 +27478,11 @@
       "type": "project",
       "path": "../../Runtime/Waher.Runtime.Timing/Waher.Runtime.Timing.csproj",
       "msbuildProject": "../../Runtime/Waher.Runtime.Timing/Waher.Runtime.Timing.csproj"
+    },
+    "Waher.Script/1.0.11": {
+      "type": "project",
+      "path": "../../Script/Waher.Script/Waher.Script.csproj",
+      "msbuildProject": "../../Script/Waher.Script/Waher.Script.csproj"
     },
     "Waher.Security/1.0.1": {
       "type": "project",
@@ -27393,8 +27529,17 @@
       "frameworks": {
         "uap10.0.10586": {
           "projectReferences": {
-            "C:\\My Projects\\IoTGateway\\Events\\Waher.Events\\Waher.Events.csproj": {
-              "projectPath": "C:\\My Projects\\IoTGateway\\Events\\Waher.Events\\Waher.Events.csproj"
+            "C:\\My Projects\\IoTGateway\\Content\\Waher.Content\\Waher.Content.csproj": {
+              "projectPath": "C:\\My Projects\\IoTGateway\\Content\\Waher.Content\\Waher.Content.csproj"
+            },
+            "C:\\My Projects\\IoTGateway\\Networking\\Waher.Networking\\Waher.Networking.csproj": {
+              "projectPath": "C:\\My Projects\\IoTGateway\\Networking\\Waher.Networking\\Waher.Networking.csproj"
+            },
+            "C:\\My Projects\\IoTGateway\\Runtime\\Waher.Runtime.Cache\\Waher.Runtime.Cache.csproj": {
+              "projectPath": "C:\\My Projects\\IoTGateway\\Runtime\\Waher.Runtime.Cache\\Waher.Runtime.Cache.csproj"
+            },
+            "C:\\My Projects\\IoTGateway\\Runtime\\Waher.Runtime.Inventory\\Waher.Runtime.Inventory.csproj": {
+              "projectPath": "C:\\My Projects\\IoTGateway\\Runtime\\Waher.Runtime.Inventory\\Waher.Runtime.Inventory.csproj"
             },
             "C:\\My Projects\\IoTGateway\\Security\\Waher.Security.DTLS\\Waher.Security.DTLS.csproj": {
               "projectPath": "C:\\My Projects\\IoTGateway\\Security\\Waher.Security.DTLS\\Waher.Security.DTLS.csproj"

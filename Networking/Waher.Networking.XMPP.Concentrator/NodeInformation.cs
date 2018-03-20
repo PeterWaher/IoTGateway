@@ -24,6 +24,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		private bool isReadable;
 		private bool isControllable;
 		private bool hasCommands;
+		private bool sniffable;
 		private string parentId;
 		private string parentPartition;
 		private DateTime lastChanged;
@@ -46,6 +47,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="IsReadable">If the node is readable.</param>
 		/// <param name="IsControllable">If the node is controllable.</param>
 		/// <param name="HasCommands">If the node has commands.</param>
+		/// <param name="Sniffable">If the node is sniffable.</param>
 		/// <param name="ParentId">Node ID of parent node.</param>
 		/// <param name="ParentPartition">Partition of parent node.</param>
 		/// <param name="LastChanged">When the node was last changed.</param>
@@ -53,7 +55,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="MessageList">List of messages.</param>
 		public NodeInformation(string NodeId, string SourceId, string Partition, string NodeType, string DisplayName, NodeState NodeState,
 			string LocalId, string LogId, bool HasChildren, bool ChildrenOrdered, bool IsReadable, bool IsControllable, bool HasCommands,
-			string ParentId, string ParentPartition, DateTime LastChanged, Parameter[] ParameterList, Message[] MessageList)
+			bool Sniffable, string ParentId, string ParentPartition, DateTime LastChanged, Parameter[] ParameterList, Message[] MessageList)
 		{
 			this.nodeId = NodeId;
 			this.sourceId = SourceId;
@@ -68,6 +70,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			this.isReadable = IsReadable;
 			this.isControllable = IsControllable;
 			this.hasCommands = HasCommands;
+			this.sniffable = Sniffable;
 			this.parentId = ParentId;
 			this.parentPartition = ParentPartition;
 			this.lastChanged = LastChanged;
@@ -139,6 +142,11 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// If the node has commands.
 		/// </summary>
 		public bool HasCommands => this.hasCommands;
+
+		/// <summary>
+		/// If the node is sniffable.
+		/// </summary>
+		public bool Sniffable => this.sniffable;
 
 		/// <summary>
 		/// The Ndoe ID of the parent node.

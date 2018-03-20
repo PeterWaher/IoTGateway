@@ -22,6 +22,8 @@
 			<String id="18">Query with same ID already running.</String>
 			<String id="19">Query not found.</String>
 			<String id="20">No nodes specified.</String>
+			<String id="21">Node is not sniffable.</String>
+			<String id="22">Sniffer not found.</String>
 		</Namespace>
 	</Language>
 </Translation>

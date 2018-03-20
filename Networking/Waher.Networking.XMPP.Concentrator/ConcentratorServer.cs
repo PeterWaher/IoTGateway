@@ -15,6 +15,7 @@ using Waher.Things;
 using Waher.Things.ControlParameters;
 using Waher.Things.DisplayableParameters;
 using Waher.Things.Queries;
+using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP.Control;
 using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.Provisioning;
@@ -146,6 +147,9 @@ namespace Waher.Networking.XMPP.Concentrator
 			// getDatabases
 			// getDatabaseReadoutParameters
 			// startDatabaseReadout
+
+			this.client.RegisterIqSetHandler("registerSniffer", NamespaceConcentrator, this.RegisterSnifferHandler, false);
+			this.client.RegisterIqSetHandler("unregisterSniffer", NamespaceConcentrator, this.UnregisterSnifferHandler, false);
 		}
 
 		private async void ThingRegistryClient_Claimed(object Sender, ClaimedEventArgs e)
@@ -281,6 +285,9 @@ namespace Waher.Networking.XMPP.Concentrator
 			// getDatabases
 			// getDatabaseReadoutParameters
 			// startDatabaseReadout
+
+			this.client.UnregisterIqSetHandler("registerSniffer", NamespaceConcentrator, this.RegisterSnifferHandler, false);
+			this.client.UnregisterIqSetHandler("unregisterSniffer", NamespaceConcentrator, this.UnregisterSnifferHandler, false);
 
 			Query[] Queries;
 
@@ -813,6 +820,9 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			if (Node.HasCommands)
 				Xml.Append("' hasCommands='true");
+
+			if (Node is ISniffable Sniffable)
+				Xml.Append("' sniffable='true");
 
 			IThingReference Parent = Node.Parent;
 			if (Parent != null)
@@ -4159,6 +4169,120 @@ namespace Waher.Networking.XMPP.Concentrator
 			{
 				Log.Critical(ex);
 				return new ControlParameter[0];
+			}
+		}
+
+		#endregion
+
+		#region Sniffers
+
+		private async void RegisterSnifferHandler(object Sender, IqEventArgs e)
+		{
+			try
+			{
+				Language Language = await GetLanguage(e.Query);
+				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+				ThingReference ThingRef = GetThingReference(e.Query);
+				IDataSource Source;
+				INode Node;
+
+				lock (this.synchObject)
+				{
+					if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Source))
+						Source = null;
+				}
+
+				if (Source == null)
+					Node = null;
+				else
+					Node = await Source.GetNodeAsync(ThingRef);
+
+				if (Node == null || !await Node.CanViewAsync(Caller))
+					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+				else if (!await Node.CanEditAsync(Caller))
+					e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
+				else if (!(Node is ISniffable Sniffable))
+					e.IqError(new StanzaErrors.NotAcceptableException(await GetErrorMessage(Language, 21, "Node is not sniffable."), e.IQ));
+				else
+				{
+					DateTime Expires = XML.Attribute(e.Query, "expires", DateTime.Now.AddHours(1));
+					RemoteSniffer Sniffer = new RemoteSniffer(e.From, Expires, Sniffable, this);
+					DateTime MaxExpires = DateTime.Now.AddDays(1);
+
+					if (Expires > MaxExpires)
+						Expires = MaxExpires;
+
+					Sniffable.Add(Sniffer);
+
+					StringBuilder Xml = new StringBuilder();
+
+					Xml.Append("<registerSniffer xmlns='");
+					Xml.Append(NamespaceConcentrator);
+					Xml.Append("' snifferId='");
+					Xml.Append(Sniffer.Id);
+					Xml.Append("' expires='");
+					Xml.Append(XML.Encode(Expires));
+					Xml.Append("'/>");
+
+					e.IqResult(Xml.ToString());
+				}
+			}
+			catch (Exception ex)
+			{
+				e.IqError(ex);
+			}
+		}
+
+		private async void UnregisterSnifferHandler(object Sender, IqEventArgs e)
+		{
+			try
+			{
+				Language Language = await GetLanguage(e.Query);
+				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+				ThingReference ThingRef = GetThingReference(e.Query);
+				IDataSource Source;
+				INode Node;
+
+				lock (this.synchObject)
+				{
+					if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Source))
+						Source = null;
+				}
+
+				if (Source == null)
+					Node = null;
+				else
+					Node = await Source.GetNodeAsync(ThingRef);
+
+				if (Node == null || !await Node.CanViewAsync(Caller))
+					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+				else if (!await Node.CanEditAsync(Caller))
+					e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
+				else if (!(Node is ISniffable Sniffable))
+					e.IqError(new StanzaErrors.NotAcceptableException(await GetErrorMessage(Language, 21, "Node is not sniffable."), e.IQ));
+				else
+				{
+					string Id = XML.Attribute(e.Query, "snifferId");
+
+					if (Sniffable.HasSniffers)
+					{
+						foreach (ISniffer Sniffer in Sniffable.Sniffers)
+						{
+							if (Sniffer is RemoteSniffer RemoteSniffer && RemoteSniffer.Id == Id)
+							{
+								Sniffable.Remove(RemoteSniffer);
+
+								e.IqResult(string.Empty);
+							}
+						}
+					}
+
+					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 22, "Sniffer not found."), e.IQ));
+				}
+			}
+			catch (Exception ex)
+			{
+				e.IqError(ex);
 			}
 		}
 

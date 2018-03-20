@@ -7,6 +7,7 @@ using SkiaSharp;
 using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Events;
+using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP.DataForms;
 using Waher.Things;
 using Waher.Things.DisplayableParameters;
@@ -21,6 +22,8 @@ namespace Waher.Networking.XMPP.Concentrator
 	/// </summary>
 	public class ConcentratorClient : XmppExtension
 	{
+		private Dictionary<string, ISniffer> sniffers = new Dictionary<string, ISniffer>();
+
 		/// <summary>
 		/// Implements an XMPP concentrator client interface.
 		/// 
@@ -31,6 +34,17 @@ namespace Waher.Networking.XMPP.Concentrator
 		public ConcentratorClient(XmppClient Client)
 			: base(Client)
 		{
+			Client.RegisterMessageHandler("sniff", ConcentratorServer.NamespaceConcentrator, this.SniffMessageHandler, false);
+		}
+
+		/// <summary>
+		/// Disposes of the extension.
+		/// </summary>
+		public override void Dispose()
+		{
+			base.Dispose();
+
+			Client.UnregisterMessageHandler("sniff", ConcentratorServer.NamespaceConcentrator, this.SniffMessageHandler, false);
 		}
 
 		/// <summary>
@@ -462,6 +476,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			bool IsReadable = XML.Attribute(E, "isReadable", false);
 			bool IsControllable = XML.Attribute(E, "isControllable", false);
 			bool HasCommands = XML.Attribute(E, "hasCommands", false);
+			bool Sniffable = XML.Attribute(E, "sniffable", false);
 			string ParentId = XML.Attribute(E, "parentId");
 			string ParentPartition = XML.Attribute(E, "parentPartition");
 			DateTime LastChanged = XML.Attribute(E, "lastChanged", DateTime.MinValue);
@@ -592,7 +607,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			}
 
 			return new NodeInformation(NodeId, SourceId, Partition, NodeType, DisplayName, NodeState, LocalId, LogId, HasChildren, ChildrenOrdered,
-				IsReadable, IsControllable, HasCommands, ParentId, ParentPartition, LastChanged, ParameterList?.ToArray(), MessageList?.ToArray());
+				IsReadable, IsControllable, HasCommands, Sniffable, ParentId, ParentPartition, LastChanged, ParameterList?.ToArray(), MessageList?.ToArray());
 		}
 
 		/// <summary>
@@ -1060,12 +1075,12 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="UserToken">Optional User token.</param>
 		/// <param name="FormCallback">Method to call when parameter form is returned.</param>
 		/// <param name="NodeCallback">Method to call when node creation response is returned.</param>
-		/// <param name="State">State object to pass on to node callback method.</param>
+		/// <param name="State">State object to pass on to the node callback method.</param>
 		public void GetParametersForNewNode(string To, IThingReference Node, string NodeType, string Language,
-			string ServiceToken, string DeviceToken, string UserToken, DataFormEventHandler FormCallback, 
+			string ServiceToken, string DeviceToken, string UserToken, DataFormEventHandler FormCallback,
 			NodeInformationEventHandler NodeCallback, object State)
 		{
-			this.GetParametersForNewNode(To, Node.NodeId, Node.SourceId, Node.Partition, NodeType, Language, ServiceToken, DeviceToken, UserToken, 
+			this.GetParametersForNewNode(To, Node.NodeId, Node.SourceId, Node.Partition, NodeType, Language, ServiceToken, DeviceToken, UserToken,
 				FormCallback, NodeCallback, State);
 		}
 
@@ -1083,7 +1098,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="UserToken">Optional User token.</param>
 		/// <param name="FormCallback">Method to call when parameter form is returned.</param>
 		/// <param name="NodeCallback">Method to call when node creation response is returned.</param>
-		/// <param name="State">State object to pass on to node callback method.</param>
+		/// <param name="State">State object to pass on to the node callback method.</param>
 		public void GetParametersForNewNode(string To, string NodeID, string SourceID, string Partition, string NodeType, string Language,
 			string ServiceToken, string DeviceToken, string UserToken, DataFormEventHandler FormCallback, NodeInformationEventHandler NodeCallback, object State)
 		{
@@ -1285,7 +1300,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="UserToken">Optional User token.</param>
 		/// <param name="FormCallback">Method to call when parameter form is returned.</param>
 		/// <param name="NodeCallback">Method to call when node creation response is returned.</param>
-		/// <param name="State">State object to pass on to node callback method.</param>
+		/// <param name="State">State object to pass on to the node callback method.</param>
 		public void GetNodeParametersForEdit(string To, IThingReference Node, string Language,
 			string ServiceToken, string DeviceToken, string UserToken, DataFormEventHandler FormCallback,
 			NodeInformationEventHandler NodeCallback, object State)
@@ -1307,7 +1322,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="UserToken">Optional User token.</param>
 		/// <param name="FormCallback">Method to call when parameter form is returned.</param>
 		/// <param name="NodeCallback">Method to call when node creation response is returned.</param>
-		/// <param name="State">State object to pass on to node callback method.</param>
+		/// <param name="State">State object to pass on to the node callback method.</param>
 		public void GetNodeParametersForEdit(string To, string NodeID, string SourceID, string Partition, string Language,
 			string ServiceToken, string DeviceToken, string UserToken, DataFormEventHandler FormCallback, NodeInformationEventHandler NodeCallback, object State)
 		{
@@ -1443,6 +1458,221 @@ namespace Waher.Networking.XMPP.Concentrator
 				catch (Exception ex)
 				{
 					Log.Critical(ex);
+				}
+			}
+		}
+
+		/// <summary>
+		/// Registers a new sniffer on a node.
+		/// </summary>
+		/// <param name="To">Address of server.</param>
+		/// <param name="Node">Node reference.</param>
+		/// <param name="Expires">When the sniffer should expire, if not unregistered before.</param>
+		/// <param name="Sniffer">Sniffer to register.</param>
+		/// <param name="ServiceToken">Optional Service token.</param>
+		/// <param name="DeviceToken">Optional Device token.</param>
+		/// <param name="UserToken">Optional User token.</param>
+		/// <param name="Callback">Method to call when process has completed.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public void RegisterSniffer(string To, IThingReference Node, DateTime Expires, ISniffer Sniffer,
+			string ServiceToken, string DeviceToken, string UserToken, SnifferRegistrationEventHandler Callback, object State)
+		{
+			this.RegisterSniffer(To, Node.NodeId, Node.SourceId, Node.Partition, Expires, Sniffer, ServiceToken, DeviceToken, UserToken, Callback, State);
+		}
+
+		/// <summary>
+		/// Registers a new sniffer on a node.
+		/// </summary>
+		/// <param name="To">Address of server.</param>
+		/// <param name="NodeID">Node ID</param>
+		/// <param name="SourceID">Optional Source ID</param>
+		/// <param name="Partition">Optional Partition</param>
+		/// <param name="Expires">When the sniffer should expire, if not unregistered before.</param>
+		/// <param name="Sniffer">Sniffer to register.</param>
+		/// <param name="ServiceToken">Optional Service token.</param>
+		/// <param name="DeviceToken">Optional Device token.</param>
+		/// <param name="UserToken">Optional User token.</param>
+		/// <param name="Callback">Method to call when process has completed.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public void RegisterSniffer(string To, string NodeID, string SourceID, string Partition, DateTime Expires, ISniffer Sniffer,
+			string ServiceToken, string DeviceToken, string UserToken, SnifferRegistrationEventHandler Callback, object State)
+		{
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<registerSniffer xmlns='");
+			Xml.Append(ConcentratorServer.NamespaceConcentrator);
+			Xml.Append("'");
+			this.AppendNodeAttributes(Xml, NodeID, SourceID, Partition);
+			this.AppendTokenAttributes(Xml, ServiceToken, DeviceToken, UserToken);
+			this.AppendNodeInfoAttributes(Xml, false, false, this.client.Language);
+			Xml.Append("' expires='");
+			Xml.Append(XML.Encode(Expires));
+			Xml.Append("'/>");
+
+			this.client.SendIqGet(To, Xml.ToString(), (sender, e) =>
+			{
+				XmlElement E;
+				string SnifferId = null;
+
+				if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "registerSniffer" && E.NamespaceURI == ConcentratorServer.NamespaceConcentrator)
+				{
+					SnifferId = XML.Attribute(E, "snifferId");
+					Expires = XML.Attribute(E, "expires", DateTime.MinValue);
+
+					lock (this.sniffers)
+					{
+						this.sniffers[SnifferId] = Sniffer;
+					}
+				}
+				else
+					e.Ok = false;
+
+				if (Callback != null)
+				{
+					try
+					{
+						Callback(this, new SnifferRegistrationEventArgs(SnifferId, Expires, e));
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
+				}
+
+			}, State);
+		}
+
+		/// <summary>
+		/// Registers a new sniffer on a node.
+		/// </summary>
+		/// <param name="To">Address of server.</param>
+		/// <param name="Node">Node reference.</param>
+		/// <param name="SnifferId">ID of sniffer to unregister.</param>
+		/// <param name="ServiceToken">Optional Service token.</param>
+		/// <param name="DeviceToken">Optional Device token.</param>
+		/// <param name="UserToken">Optional User token.</param>
+		/// <param name="Callback">Method to call when process has completed.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public void UnregisterSniffer(string To, IThingReference Node, string SnifferId, string ServiceToken, string DeviceToken, string UserToken,
+			IqResultEventHandler Callback, object State)
+		{
+			this.UnregisterSniffer(To, Node.NodeId, Node.SourceId, Node.Partition, SnifferId, ServiceToken, DeviceToken, UserToken, Callback, State);
+		}
+
+		/// <summary>
+		/// Registers a new sniffer on a node.
+		/// </summary>
+		/// <param name="To">Address of server.</param>
+		/// <param name="NodeID">Node ID</param>
+		/// <param name="SourceID">Optional Source ID</param>
+		/// <param name="Partition">Optional Partition</param>
+		/// <param name="SnifferId">ID of sniffer to unregister.</param>
+		/// <param name="ServiceToken">Optional Service token.</param>
+		/// <param name="DeviceToken">Optional Device token.</param>
+		/// <param name="UserToken">Optional User token.</param>
+		/// <param name="Callback">Method to call when process has completed.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public void UnregisterSniffer(string To, string NodeID, string SourceID, string Partition, string SnifferId,
+			string ServiceToken, string DeviceToken, string UserToken, IqResultEventHandler Callback, object State)
+		{
+			lock (this.sniffers)
+			{
+				this.sniffers.Remove(SnifferId);
+			}
+
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<unregisterSniffer xmlns='");
+			Xml.Append(ConcentratorServer.NamespaceConcentrator);
+			Xml.Append("'");
+			this.AppendNodeAttributes(Xml, NodeID, SourceID, Partition);
+			this.AppendTokenAttributes(Xml, ServiceToken, DeviceToken, UserToken);
+			this.AppendNodeInfoAttributes(Xml, false, false, this.client.Language);
+			Xml.Append("' snifferId='");
+			Xml.Append(XML.Encode(SnifferId));
+			Xml.Append("'/>");
+
+			this.client.SendIqGet(To, Xml.ToString(), Callback, State);
+		}
+
+		private void SniffMessageHandler(object Sender, MessageEventArgs e)
+		{
+			string SnifferId = XML.Attribute(e.Content, "snifferId");
+			DateTime Timestamp = XML.Attribute(e.Content, "timestamp", DateTime.Now);
+			ISniffer Sniffer;
+
+			lock (this.sniffers)
+			{
+				if (!this.sniffers.TryGetValue(SnifferId, out Sniffer))
+					return;
+			}
+
+			foreach (XmlNode N in e.Content.ChildNodes)
+			{
+				if (N is XmlElement E)
+				{
+					try
+					{
+						switch (E.LocalName)
+						{
+							case "RxBin":
+								byte[] Bin = Convert.FromBase64String(E.InnerText);
+								Sniffer.ReceiveBinary(Bin);
+								break;
+
+							case "TxBin":
+								Bin = Convert.FromBase64String(E.InnerText);
+								Sniffer.TransmitBinary(Bin);
+								break;
+
+							case "Rx":
+								string s = E.InnerText;
+								Sniffer.ReceiveText(s);
+								break;
+
+							case "Tx":
+								s = E.InnerText;
+								Sniffer.TransmitText(s);
+								break;
+
+							case "Info":
+								s = E.InnerText;
+								Sniffer.Information(s);
+								break;
+
+							case "Warning":
+								s = E.InnerText;
+								Sniffer.Warning(s);
+								break;
+
+							case "Error":
+								s = E.InnerText;
+								Sniffer.Error(s);
+								break;
+
+							case "Exception":
+								s = E.InnerText;
+								Sniffer.Exception(s);
+								break;
+
+							case "Expired":
+								lock (this.sniffers)
+								{
+									this.sniffers.Remove(SnifferId);
+								}
+
+								Sniffer.Information("Remote sniffer expired.");
+								break;
+
+							default:
+								Sniffer.Error("Unrecognized sniffer event received: " + E.OuterXml);
+								break;
+						}
+					}
+					catch (Exception)
+					{
+						Sniffer.Error("Badly encoded sniffer data was received: " + E.OuterXml);
+					}
 				}
 			}
 		}

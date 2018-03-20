@@ -118,10 +118,12 @@
     <Compile Include="Events\LocalizedStringsResponseEventArgs..cs" />
     <Compile Include="Events\NodeInformationEventArgs.cs" />
     <Compile Include="Events\NodesInformationEventArgs.cs" />
+    <Compile Include="Events\SnifferRegistrationEventArgs..cs" />
     <Compile Include="Events\StringsResponseEventArgs..cs" />
     <Compile Include="NodeInformation.cs" />
     <Compile Include="Parameters.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RemoteSniffer.cs" />
     <EmbeddedResource Include="Properties\Waher.Networking.XMPP.Concentrator.UWP.rd.xml" />
   </ItemGroup>
   <ItemGroup>

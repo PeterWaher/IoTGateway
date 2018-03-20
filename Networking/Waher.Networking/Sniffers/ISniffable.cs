@@ -24,10 +24,26 @@ namespace Waher.Networking.Sniffers
 		void AddRange(IEnumerable<ISniffer> Sniffers);
 
 		/// <summary>
-		/// REmoves a sniffer, if registered.
+		/// Removes a sniffer, if registered.
 		/// </summary>
 		/// <param name="Sniffer">Sniffer to remove.</param>
 		/// <returns>If the sniffer was found and removed.</returns>
 		bool Remove(ISniffer Sniffer);
+
+		/// <summary>
+		/// Registered sniffers.
+		/// </summary>
+		ISniffer[] Sniffers
+		{
+			get;
+		}
+
+		/// <summary>
+		/// If there are sniffers registered on the object.
+		/// </summary>
+		bool HasSniffers
+		{
+			get;
+		}
 	}
 }

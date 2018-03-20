@@ -15,6 +15,8 @@ using Waher.Things;
 using Waher.Things.DisplayableParameters;
 using Waher.Things.SensorData;
 using Waher.Client.WPF.Dialogs;
+using Waher.Client.WPF.Controls.Sniffers;
+using Waher.Networking.Sniffers;
 
 namespace Waher.Client.WPF.Model.Concentrator
 {
@@ -437,6 +439,53 @@ namespace Waher.Client.WPF.Model.Concentrator
 					}
 				}, null);
 			}
+		}
+
+		public override bool IsSniffable => this.nodeInfo.Sniffable && this.IsOnline;
+
+		public override void AddSniffer(ISniffer Sniffer)
+		{
+			string FullJid = this.Concentrator?.FullJid;
+			ConcentratorClient ConcentratorClient = this.ConcentratorClient;
+
+			if (ConcentratorClient != null && !string.IsNullOrEmpty(FullJid))
+			{
+				Mouse.OverrideCursor = Cursors.Wait;
+
+				this.ConcentratorClient.RegisterSniffer(FullJid, this.nodeInfo, DateTime.Now.AddHours(1), Sniffer,
+					string.Empty, string.Empty, string.Empty, (sender, e) =>
+					{
+						MainWindow.MouseDefault();
+
+						if (e.Ok)
+						{
+							if (Sniffer is TabSniffer TabSniffer)
+								TabSniffer.SnifferId = e.SnifferrId;
+						}
+						else
+							MainWindow.ErrorBox(e.ErrorText);
+
+					}, null);
+			}
+		}
+
+		public override bool RemoveSniffer(ISniffer Sniffer)
+		{
+			string FullJid = this.Concentrator?.FullJid;
+			ConcentratorClient ConcentratorClient = this.ConcentratorClient;
+
+			if (Sniffer is TabSniffer TabSniffer && ConcentratorClient != null && !string.IsNullOrEmpty(FullJid))
+			{
+				Mouse.OverrideCursor = Cursors.Wait;
+
+				return this.ConcentratorClient.UnregisterSniffer(FullJid, this.nodeInfo, TabSniffer.SnifferId, 
+					string.Empty, string.Empty, string.Empty, (sender, e) =>
+					{
+						MainWindow.MouseDefault();
+					}, null);
+			}
+			else
+				return false;
 		}
 
 	}

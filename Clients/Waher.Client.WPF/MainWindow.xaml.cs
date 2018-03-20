@@ -408,8 +408,8 @@ namespace Waher.Client.WPF
 				if (this.Tabs.Items[i] is TabItem TabItem)
 				{
 					object Content = TabItem.Content;
-					if (Content != null && Content is IDisposable)
-						((IDisposable)Content).Dispose();
+					if (Content != null && Content is IDisposable Disposable)
+						Disposable.Dispose();
 				}
 
 				this.Tabs.Items.RemoveAt(i);
@@ -946,7 +946,7 @@ namespace Waher.Client.WPF
 			if ((sender as Image)?.Tag is TabItem Item)
 			{
 				MainWindow.currentInstance?.Tabs?.Items.Remove(Item);
-				if (Item is IDisposable Disposable)
+				if (Item.Content != null && Item.Content is IDisposable Disposable)
 					Disposable.Dispose();
 			}
 		}

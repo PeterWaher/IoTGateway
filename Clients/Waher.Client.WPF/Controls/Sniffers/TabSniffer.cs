@@ -14,11 +14,18 @@ namespace Waher.Client.WPF.Controls.Sniffers
 	{
 		private TabItem tabItem;
 		private SnifferView view;
+		private string snifferId = null;
 
 		public TabSniffer(TabItem TabItem, SnifferView View)
 		{
 			this.tabItem = TabItem;
 			this.view = View;
+		}
+
+		public string SnifferId
+		{
+			get { return this.snifferId; }
+			set { this.snifferId = value; }
 		}
 
 		public void ReceiveBinary(byte[] Data)

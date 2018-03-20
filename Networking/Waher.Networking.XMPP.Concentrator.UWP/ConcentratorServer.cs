@@ -4273,6 +4273,7 @@ namespace Waher.Networking.XMPP.Concentrator
 								Sniffable.Remove(RemoteSniffer);
 
 								e.IqResult(string.Empty);
+								return;
 							}
 						}
 					}

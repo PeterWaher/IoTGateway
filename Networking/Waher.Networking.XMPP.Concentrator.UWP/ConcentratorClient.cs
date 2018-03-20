@@ -1509,7 +1509,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			Xml.Append(XML.Encode(Expires));
 			Xml.Append("'/>");
 
-			this.client.SendIqGet(To, Xml.ToString(), (sender, e) =>
+			this.client.SendIqSet(To, Xml.ToString(), (sender, e) =>
 			{
 				XmlElement E;
 				string SnifferId = null;
@@ -1553,10 +1553,11 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="UserToken">Optional User token.</param>
 		/// <param name="Callback">Method to call when process has completed.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void UnregisterSniffer(string To, IThingReference Node, string SnifferId, string ServiceToken, string DeviceToken, string UserToken,
+		/// <returns>If the sniffer was found locally and removed.</returns>
+		public bool UnregisterSniffer(string To, IThingReference Node, string SnifferId, string ServiceToken, string DeviceToken, string UserToken,
 			IqResultEventHandler Callback, object State)
 		{
-			this.UnregisterSniffer(To, Node.NodeId, Node.SourceId, Node.Partition, SnifferId, ServiceToken, DeviceToken, UserToken, Callback, State);
+			return this.UnregisterSniffer(To, Node.NodeId, Node.SourceId, Node.Partition, SnifferId, ServiceToken, DeviceToken, UserToken, Callback, State);
 		}
 
 		/// <summary>
@@ -1572,12 +1573,15 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="UserToken">Optional User token.</param>
 		/// <param name="Callback">Method to call when process has completed.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void UnregisterSniffer(string To, string NodeID, string SourceID, string Partition, string SnifferId,
+		/// <returns>If the sniffer was found locally and removed.</returns>
+		public bool UnregisterSniffer(string To, string NodeID, string SourceID, string Partition, string SnifferId,
 			string ServiceToken, string DeviceToken, string UserToken, IqResultEventHandler Callback, object State)
 		{
+			bool Result;
+
 			lock (this.sniffers)
 			{
-				this.sniffers.Remove(SnifferId);
+				Result = this.sniffers.Remove(SnifferId);
 			}
 
 			StringBuilder Xml = new StringBuilder();
@@ -1592,7 +1596,9 @@ namespace Waher.Networking.XMPP.Concentrator
 			Xml.Append(XML.Encode(SnifferId));
 			Xml.Append("'/>");
 
-			this.client.SendIqGet(To, Xml.ToString(), Callback, State);
+			this.client.SendIqSet(To, Xml.ToString(), Callback, State);
+
+			return Result;
 		}
 
 		private void SniffMessageHandler(object Sender, MessageEventArgs e)

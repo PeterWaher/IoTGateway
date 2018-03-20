@@ -2426,20 +2426,12 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Networking/1.0.4": {
-        "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
-        "dependencies": {
-          "NETStandard.Library": "1.6.1",
-          "Waher.Events": "1.0.6"
-        }
-      },
       "Waher.Networking.MQTT.UWP/1.0.0": {
         "type": "project",
         "framework": "UAP,Version=v10.0.10586",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.8",
-          "Waher.Networking": "1.0.0"
+          "Waher.Events": "1.0.0"
         }
       },
       "Waher.Runtime.Inventory/1.0.5": {
@@ -4922,20 +4914,12 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Networking/1.0.4": {
-        "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
-        "dependencies": {
-          "NETStandard.Library": "1.6.1",
-          "Waher.Events": "1.0.6"
-        }
-      },
       "Waher.Networking.MQTT.UWP/1.0.0": {
         "type": "project",
         "framework": "UAP,Version=v10.0.10586",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.8",
-          "Waher.Networking": "1.0.0"
+          "Waher.Events": "1.0.0"
         }
       },
       "Waher.Runtime.Inventory/1.0.5": {
@@ -7454,20 +7438,12 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Networking/1.0.4": {
-        "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
-        "dependencies": {
-          "NETStandard.Library": "1.6.1",
-          "Waher.Events": "1.0.6"
-        }
-      },
       "Waher.Networking.MQTT.UWP/1.0.0": {
         "type": "project",
         "framework": "UAP,Version=v10.0.10586",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.8",
-          "Waher.Networking": "1.0.0"
+          "Waher.Events": "1.0.0"
         }
       },
       "Waher.Runtime.Inventory/1.0.5": {
@@ -9959,20 +9935,12 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Networking/1.0.4": {
-        "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
-        "dependencies": {
-          "NETStandard.Library": "1.6.1",
-          "Waher.Events": "1.0.6"
-        }
-      },
       "Waher.Networking.MQTT.UWP/1.0.0": {
         "type": "project",
         "framework": "UAP,Version=v10.0.10586",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.8",
-          "Waher.Networking": "1.0.0"
+          "Waher.Events": "1.0.0"
         }
       },
       "Waher.Runtime.Inventory/1.0.5": {
@@ -12500,20 +12468,12 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Networking/1.0.4": {
-        "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
-        "dependencies": {
-          "NETStandard.Library": "1.6.1",
-          "Waher.Events": "1.0.6"
-        }
-      },
       "Waher.Networking.MQTT.UWP/1.0.0": {
         "type": "project",
         "framework": "UAP,Version=v10.0.10586",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.8",
-          "Waher.Networking": "1.0.0"
+          "Waher.Events": "1.0.0"
         }
       },
       "Waher.Runtime.Inventory/1.0.5": {
@@ -15005,20 +14965,12 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Networking/1.0.4": {
-        "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
-        "dependencies": {
-          "NETStandard.Library": "1.6.1",
-          "Waher.Events": "1.0.6"
-        }
-      },
       "Waher.Networking.MQTT.UWP/1.0.0": {
         "type": "project",
         "framework": "UAP,Version=v10.0.10586",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.8",
-          "Waher.Networking": "1.0.0"
+          "Waher.Events": "1.0.0"
         }
       },
       "Waher.Runtime.Inventory/1.0.5": {
@@ -17546,20 +17498,12 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Networking/1.0.4": {
-        "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
-        "dependencies": {
-          "NETStandard.Library": "1.6.1",
-          "Waher.Events": "1.0.6"
-        }
-      },
       "Waher.Networking.MQTT.UWP/1.0.0": {
         "type": "project",
         "framework": "UAP,Version=v10.0.10586",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.8",
-          "Waher.Networking": "1.0.0"
+          "Waher.Events": "1.0.0"
         }
       },
       "Waher.Runtime.Inventory/1.0.5": {
@@ -27345,11 +27289,6 @@
       "path": "../Waher.Events/Waher.Events.csproj",
       "msbuildProject": "../Waher.Events/Waher.Events.csproj"
     },
-    "Waher.Networking/1.0.4": {
-      "type": "project",
-      "path": "../../Networking/Waher.Networking/Waher.Networking.csproj",
-      "msbuildProject": "../../Networking/Waher.Networking/Waher.Networking.csproj"
-    },
     "Waher.Networking.MQTT.UWP/1.0.0": {
       "type": "project",
       "path": "../../Networking/Waher.Networking.MQTT.UWP/project.json",
@@ -27405,9 +27344,6 @@
             },
             "C:\\My Projects\\IoTGateway\\Networking\\Waher.Networking.MQTT.UWP\\Waher.Networking.MQTT.UWP.csproj": {
               "projectPath": "C:\\My Projects\\IoTGateway\\Networking\\Waher.Networking.MQTT.UWP\\Waher.Networking.MQTT.UWP.csproj"
-            },
-            "C:\\My Projects\\IoTGateway\\Networking\\Waher.Networking\\Waher.Networking.csproj": {
-              "projectPath": "C:\\My Projects\\IoTGateway\\Networking\\Waher.Networking\\Waher.Networking.csproj"
             }
           }
         }

@@ -18,7 +18,7 @@
       <dependency id="Waher.Content" version="1.0.8"/>
       <dependency id="Waher.Content.Xml" version="1.0.2"/>
       <dependency id="Waher.Events" version="1.0.6"/>
-      <dependency id="Waher.Networking" version="1.0.5"/>
+      <dependency id="Waher.Networking" version="1.0.6"/>
       <dependency id="Waher.Networking.MQTT.UWP" version="1.0.9"/>
     </dependencies>
   </metadata>

@@ -2606,7 +2606,7 @@
           "Waher.Networking.XMPP.UWP": "1.0.0"
         }
       },
-      "Waher.Networking/1.0.5": {
+      "Waher.Networking/1.0.6": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -5323,7 +5323,7 @@
           "Waher.Networking.XMPP.UWP": "1.0.0"
         }
       },
-      "Waher.Networking/1.0.5": {
+      "Waher.Networking/1.0.6": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -8076,7 +8076,7 @@
           "Waher.Networking.XMPP.UWP": "1.0.0"
         }
       },
-      "Waher.Networking/1.0.5": {
+      "Waher.Networking/1.0.6": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -10802,7 +10802,7 @@
           "Waher.Networking.XMPP.UWP": "1.0.0"
         }
       },
-      "Waher.Networking/1.0.5": {
+      "Waher.Networking/1.0.6": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -13564,7 +13564,7 @@
           "Waher.Networking.XMPP.UWP": "1.0.0"
         }
       },
-      "Waher.Networking/1.0.5": {
+      "Waher.Networking/1.0.6": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -16290,7 +16290,7 @@
           "Waher.Networking.XMPP.UWP": "1.0.0"
         }
       },
-      "Waher.Networking/1.0.5": {
+      "Waher.Networking/1.0.6": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -19052,7 +19052,7 @@
           "Waher.Networking.XMPP.UWP": "1.0.0"
         }
       },
-      "Waher.Networking/1.0.5": {
+      "Waher.Networking/1.0.6": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -29102,7 +29102,7 @@
       "path": "../../Mocks/Waher.Mock.UWP/project.json",
       "msbuildProject": "../../Mocks/Waher.Mock.UWP/Waher.Mock.UWP.csproj"
     },
-    "Waher.Networking/1.0.5": {
+    "Waher.Networking/1.0.6": {
       "type": "project",
       "path": "../../Networking/Waher.Networking/Waher.Networking.csproj",
       "msbuildProject": "../../Networking/Waher.Networking/Waher.Networking.csproj"

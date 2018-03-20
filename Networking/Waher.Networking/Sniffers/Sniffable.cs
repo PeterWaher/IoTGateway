@@ -101,54 +101,6 @@ namespace Waher.Networking.Sniffers
 			return new SnifferEnumerator(this.staticList);
 		}
 
-		private class SnifferEnumerator : IEnumerator<ISniffer>
-		{
-			private ISniffer[] list;
-			private int pos = 0;
-
-			public SnifferEnumerator(ISniffer[] List)
-			{
-				this.list = List;
-			}
-
-			public ISniffer Current
-			{
-				get
-				{
-					if (this.pos < this.list.Length)
-						return this.list[this.pos];
-					else
-						return null;
-				}
-			}
-
-			public void Dispose()
-			{
-			}
-
-			object IEnumerator.Current
-			{
-				get
-				{
-					if (this.pos < this.list.Length)
-						return this.list[this.pos];
-					else
-						return null;
-				}
-			}
-
-			public bool MoveNext()
-			{
-				this.pos++;
-				return this.pos < this.list.Length;
-			}
-
-			public void Reset()
-			{
-				this.pos = 0;
-			}
-		}
-
 		/// <summary>
 		/// <see cref="ISniffable.Add"/>
 		/// </summary>
@@ -317,11 +269,9 @@ namespace Waher.Networking.Sniffers
 		/// <param name="Exception">Exception.</param>
 		public void Exception(Exception Exception)
 		{
-			AggregateException ex;
-
 			Exception = Log.UnnestException(Exception);
 
-			if ((ex = Exception as AggregateException) != null)
+			if (Exception is AggregateException ex)
 			{
 				foreach (Exception ex2 in ex.InnerExceptions)
 					this.Exception(ex2);

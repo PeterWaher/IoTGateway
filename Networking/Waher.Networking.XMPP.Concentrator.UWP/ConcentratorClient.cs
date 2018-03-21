@@ -1683,5 +1683,89 @@ namespace Waher.Networking.XMPP.Concentrator
 			}
 		}
 
+
+		/// <summary>
+		/// Gets available commands for a node.
+		/// </summary>
+		/// <param name="To">Address of server.</param>
+		/// <param name="Node">Node reference.</param>
+		/// <param name="ServiceToken">Optional Service token.</param>
+		/// <param name="DeviceToken">Optional Device token.</param>
+		/// <param name="UserToken">Optional User token.</param>
+		/// <param name="Callback">Method to call when process has completed.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public void GetNodeCommands(string To, IThingReference Node, 
+			string ServiceToken, string DeviceToken, string UserToken, CommandsEventHandler Callback, object State)
+		{
+			this.GetNodeCommands(To, Node.NodeId, Node.SourceId, Node.Partition, ServiceToken, DeviceToken, UserToken, Callback, State);
+		}
+
+		/// <summary>
+		/// Gets available commands for a node.
+		/// </summary>
+		/// <param name="To">Address of server.</param>
+		/// <param name="NodeID">Node ID</param>
+		/// <param name="SourceID">Optional Source ID</param>
+		/// <param name="Partition">Optional Partition</param>
+		/// <param name="ServiceToken">Optional Service token.</param>
+		/// <param name="DeviceToken">Optional Device token.</param>
+		/// <param name="UserToken">Optional User token.</param>
+		/// <param name="Callback">Method to call when process has completed.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public void GetNodeCommands(string To, string NodeID, string SourceID, string Partition, 
+			string ServiceToken, string DeviceToken, string UserToken, CommandsEventHandler Callback, object State)
+		{
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<getNodeCommands xmlns='");
+			Xml.Append(ConcentratorServer.NamespaceConcentrator);
+			Xml.Append("'");
+			this.AppendNodeAttributes(Xml, NodeID, SourceID, Partition);
+			this.AppendTokenAttributes(Xml, ServiceToken, DeviceToken, UserToken);
+			this.AppendNodeInfoAttributes(Xml, false, false, this.client.Language);
+			Xml.Append("'/>");
+
+			this.client.SendIqGet(To, Xml.ToString(), (sender, e) =>
+			{
+				XmlElement E;
+				List<NodeCommand> Commands = new List<NodeCommand>();
+
+				if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "getNodeCommandsResponse" && E.NamespaceURI == ConcentratorServer.NamespaceConcentrator)
+				{
+					foreach (XmlNode N in E.ChildNodes)
+					{
+						if (N is XmlElement E2 && E2.LocalName == "command")
+						{
+							string Command = XML.Attribute(E2, "command");
+							string Name = XML.Attribute(E2, "name");
+							CommandType Type = (CommandType)XML.Attribute(E2, "type", CommandType.Simple);
+							string SuccessString = XML.Attribute(E2, "successString");
+							string FailureString = XML.Attribute(E2, "failureString");
+							string ConfirmationString = XML.Attribute(E2, "confirmationString");
+							string SortCategory = XML.Attribute(E2, "sortCategory");
+							string SortKey = XML.Attribute(E2, "sortKey");
+
+							Commands.Add(new NodeCommand(Command, Name, Type, SuccessString, FailureString, ConfirmationString, SortCategory, SortKey));
+						}
+					}
+				}
+				else
+					e.Ok = false;
+
+				if (Callback != null)
+				{
+					try
+					{
+						Callback(this, new CommandsEventArgs(Commands.ToArray(), e));
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
+				}
+
+			}, State);
+		}
+
 	}
 }

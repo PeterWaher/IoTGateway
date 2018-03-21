@@ -241,6 +241,8 @@ namespace Waher.Client.WPF
 			}
 			else
 			{
+				Node.SelectionChanged();
+
 				this.AddButton.IsEnabled = Node.CanAddChildren;
 				this.EditButton.IsEnabled = Node.CanEdit;
 				this.DeleteButton.IsEnabled = Node.CanDelete;

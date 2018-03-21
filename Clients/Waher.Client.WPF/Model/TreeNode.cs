@@ -751,5 +751,10 @@ namespace Waher.Client.WPF.Model
 			}
 		}
 
+		public virtual void SelectionChanged()
+		{
+			// Do nothing by default.
+		}
+
 	}
 }

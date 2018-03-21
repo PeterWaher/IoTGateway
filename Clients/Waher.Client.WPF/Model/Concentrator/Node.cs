@@ -17,16 +17,18 @@ using Waher.Things.SensorData;
 using Waher.Client.WPF.Dialogs;
 using Waher.Client.WPF.Controls.Sniffers;
 using Waher.Networking.Sniffers;
+using System.Windows.Controls;
 
 namespace Waher.Client.WPF.Model.Concentrator
 {
 	/// <summary>
 	/// Represents a node in a concentrator.
 	/// </summary>
-	public class Node : TreeNode
+	public class Node : TreeNode, IMenuAggregator
 	{
 		private NodeInformation nodeInfo;
 		private DisplayableParameters parameters;
+		private NodeCommand[] commands = null;
 
 		public Node(TreeNode Parent, NodeInformation NodeInfo)
 			: base(Parent)
@@ -488,5 +490,32 @@ namespace Waher.Client.WPF.Model.Concentrator
 				return false;
 		}
 
+		public override void SelectionChanged()
+		{
+			base.SelectionChanged();
+
+			if (this.nodeInfo != null && this.nodeInfo.HasCommands && this.commands == null)
+			{
+				string FullJid = this.Concentrator?.FullJid;
+				ConcentratorClient ConcentratorClient = this.ConcentratorClient;
+
+				if (ConcentratorClient != null && !string.IsNullOrEmpty(FullJid))
+				{
+					this.commands = new NodeCommand[0];
+
+					this.ConcentratorClient.GetNodeCommands(FullJid, this.nodeInfo, string.Empty, string.Empty, string.Empty, (sender, e) =>
+					{
+						if (e.Ok)
+							this.commands = e.Result;
+
+					}, null);
+				}
+			}
+		}
+
+		public void AddContexMenuItems(TreeNode Node, ref string CurrentGroup, ContextMenu Menu)
+		{
+			// TODO
+		}
 	}
 }

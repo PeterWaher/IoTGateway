@@ -5,14 +5,14 @@ using System.Text;
 namespace Waher.Networking.XMPP.Concentrator
 {
 	/// <summary>
-	/// Delegate for boolean rersponses callback methods.
+	/// Delegate for boolean responses callback methods.
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Event arguments.</param>
 	public delegate void BooleansResponseEventHandler(object Sender, BooleansResponseEventArgs e);
 
 	/// <summary>
-	/// Event arguments for boolean rersponses rersponsess.
+	/// Event arguments for boolean responses responsess.
 	/// </summary>
 	public class BooleansResponseEventArgs : IqResultEventArgs
 	{

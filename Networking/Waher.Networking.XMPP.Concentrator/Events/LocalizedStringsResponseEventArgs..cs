@@ -5,7 +5,7 @@ using System.Text;
 namespace Waher.Networking.XMPP.Concentrator
 {
 	/// <summary>
-	/// Delegate for localized string array rersponses callback methods.
+	/// Delegate for localized string array responses callback methods.
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Event arguments.</param>
@@ -28,7 +28,7 @@ namespace Waher.Networking.XMPP.Concentrator
 	}
 
 	/// <summary>
-	/// Event arguments for localized string array rersponses rersponsess.
+	/// Event arguments for localized string array responses responsess.
 	/// </summary>
 	public class LocalizedStringsResponseEventArgs : IqResultEventArgs
 	{

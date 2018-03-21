@@ -5,14 +5,14 @@ using System.Text;
 namespace Waher.Networking.XMPP.Concentrator
 {
 	/// <summary>
-	/// Delegate for string array rersponses callback methods.
+	/// Delegate for string array responses callback methods.
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Event arguments.</param>
 	public delegate void StringsResponseEventHandler(object Sender, StringsResponseEventArgs e);
 
 	/// <summary>
-	/// Event arguments for string array rersponses rersponsess.
+	/// Event arguments for string array responses responsess.
 	/// </summary>
 	public class StringsResponseEventArgs : IqResultEventArgs
 	{

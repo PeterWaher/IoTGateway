@@ -96,6 +96,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Controls\QueryResultView.xaml.cs">
+      <DependentUpon>QueryResultView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\ChatView.xaml.cs">
       <DependentUpon>ChatView.xaml</DependentUpon>
     </Compile>
@@ -140,6 +143,10 @@
     <Compile Include="Dialogs\ParameterDialog.xaml.cs">
       <DependentUpon>ParameterDialog.xaml</DependentUpon>
     </Compile>
+    <Page Include="Controls\QueryResultView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Controls\ChatView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

@@ -898,6 +898,11 @@ namespace Waher.Client.WPF
 
 		internal static TabItem NewTab(string HeaderText)
 		{
+			return NewTab(HeaderText, out TextBlock HeaderLabel);
+		}
+
+		internal static TabItem NewTab(string HeaderText, out TextBlock HeaderLabel)
+		{
 			StackPanel Header = new StackPanel()
 			{
 				Orientation = Orientation.Horizontal
@@ -911,11 +916,13 @@ namespace Waher.Client.WPF
 				ToolTip = "Close tab"
 			};
 
-			Header.Children.Add(new TextBlock()
+			HeaderLabel = new TextBlock()
 			{
 				Text = HeaderText,
 				Margin = new Thickness(0, 0, 5, 0)
-			});
+			};
+
+			Header.Children.Add(HeaderLabel);
 			Header.Children.Add(CloseImage);
 
 			TabItem Result = new TabItem()

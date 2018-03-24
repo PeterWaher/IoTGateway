@@ -15,6 +15,7 @@ using Waher.Things;
 using Waher.Things.DisplayableParameters;
 using Waher.Things.SensorData;
 using Waher.Client.WPF.Dialogs;
+using Waher.Client.WPF.Controls;
 using Waher.Client.WPF.Controls.Sniffers;
 using Waher.Networking.Sniffers;
 using System.Windows.Controls;
@@ -569,7 +570,6 @@ namespace Waher.Client.WPF.Model.Concentrator
 						break;
 
 					case CommandType.Parametrized:
-					case CommandType.Query:
 						Mouse.OverrideCursor = Cursors.Wait;
 
 						ConcentratorClient.GetCommandParameters(FullJid, this.NodeId, this.SourceId, this.Partition, Command.Command,
@@ -585,6 +585,38 @@ namespace Waher.Client.WPF.Model.Concentrator
 							},
 							(sender2, e2) =>
 							{
+								this.ShowCommandResult(e2, Command);
+							}, null);
+						break;
+
+					case CommandType.Query:
+						Mouse.OverrideCursor = Cursors.Wait;
+
+						ConcentratorClient.GetQueryParameters(FullJid, this.NodeId, this.SourceId, this.Partition, Command.Command,
+							ConcentratorClient.Client.Language, string.Empty, string.Empty, string.Empty, (sender2, Form) =>
+							{
+								MainWindow.MouseDefault();
+
+								MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() =>
+								{
+									ParameterDialog Dialog = new ParameterDialog(Form);
+									Dialog.ShowDialog();
+								}));
+							},
+							(sender2, e2) =>
+							{
+								if (e2.Ok)
+								{
+									MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() =>
+									{
+										TabItem TabItem = MainWindow.NewTab(Command.Name, out TextBlock HeaderLabel);
+										MainWindow.currentInstance.Tabs.Items.Add(TabItem);
+
+										QueryResultView ResultView = new QueryResultView(this, e2.Query, HeaderLabel);
+										TabItem.Content = ResultView;
+									}));
+								}
+
 								this.ShowCommandResult(e2, Command);
 							}, null);
 						break;

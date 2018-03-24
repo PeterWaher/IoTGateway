@@ -2405,6 +2405,14 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1"
         }
+      },
+      "Waher.Networking/1.0.6": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "Waher.Events": "1.0.6"
+        }
       }
     },
     "UAP,Version=v10.0.10586/win10-arm": {
@@ -4847,6 +4855,14 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1"
+        }
+      },
+      "Waher.Networking/1.0.6": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "Waher.Events": "1.0.6"
         }
       }
     },
@@ -7327,6 +7343,14 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1"
         }
+      },
+      "Waher.Networking/1.0.6": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "Waher.Events": "1.0.6"
+        }
       }
     },
     "UAP,Version=v10.0.10586/win10-x64": {
@@ -9778,6 +9802,14 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1"
+        }
+      },
+      "Waher.Networking/1.0.6": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "Waher.Events": "1.0.6"
         }
       }
     },
@@ -12267,6 +12299,14 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1"
         }
+      },
+      "Waher.Networking/1.0.6": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "Waher.Events": "1.0.6"
+        }
       }
     },
     "UAP,Version=v10.0.10586/win10-x86": {
@@ -14718,6 +14758,14 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1"
+        }
+      },
+      "Waher.Networking/1.0.6": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "Waher.Events": "1.0.6"
         }
       }
     },
@@ -17206,6 +17254,14 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1"
+        }
+      },
+      "Waher.Networking/1.0.6": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "Waher.Events": "1.0.6"
         }
       }
     }
@@ -26963,6 +27019,11 @@
       "type": "project",
       "path": "../../Events/Waher.Events/Waher.Events.csproj",
       "msbuildProject": "../../Events/Waher.Events/Waher.Events.csproj"
+    },
+    "Waher.Networking/1.0.6": {
+      "type": "project",
+      "path": "../Waher.Networking/Waher.Networking.csproj",
+      "msbuildProject": "../Waher.Networking/Waher.Networking.csproj"
     }
   },
   "projectFileDependencyGroups": {
@@ -27001,6 +27062,9 @@
           "projectReferences": {
             "C:\\My Projects\\IoTGateway\\Events\\Waher.Events\\Waher.Events.csproj": {
               "projectPath": "C:\\My Projects\\IoTGateway\\Events\\Waher.Events\\Waher.Events.csproj"
+            },
+            "C:\\My Projects\\IoTGateway\\Networking\\Waher.Networking\\Waher.Networking.csproj": {
+              "projectPath": "C:\\My Projects\\IoTGateway\\Networking\\Waher.Networking\\Waher.Networking.csproj"
             }
           }
         }

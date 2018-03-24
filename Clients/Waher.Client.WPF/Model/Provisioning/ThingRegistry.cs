@@ -546,6 +546,8 @@ namespace Waher.Client.WPF.Model.Provisioning
 			{
 				if (this.registryClient != null)
 				{
+					this.GroupSeparator(ref CurrentGroup, "Registry", Menu);
+
 					Menu.Items.Add(Item = new MenuItem()
 					{
 						Header = "_Disown device...",
@@ -564,6 +566,8 @@ namespace Waher.Client.WPF.Model.Provisioning
 
 				if (this.provisioningClient != null)
 				{
+					this.GroupSeparator(ref CurrentGroup, "Registry", Menu);
+
 					Menu.Items.Add(Item = new MenuItem()
 					{
 						Header = "_Clear rule cache...",
@@ -599,6 +603,8 @@ namespace Waher.Client.WPF.Model.Provisioning
 			{
 				if (this.registryClient != null)
 				{
+					this.GroupSeparator(ref CurrentGroup, "Registry", Menu);
+
 					Menu.Items.Add(Item = new MenuItem()
 					{
 						Header = "_Disown device...",
@@ -617,6 +623,8 @@ namespace Waher.Client.WPF.Model.Provisioning
 
 				if (this.provisioningClient != null)
 				{
+					this.GroupSeparator(ref CurrentGroup, "Registry", Menu);
+
 					Menu.Items.Add(Item = new MenuItem()
 					{
 						Header = "_Reconfigure device...",

@@ -480,7 +480,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 			{
 				Mouse.OverrideCursor = Cursors.Wait;
 
-				return this.ConcentratorClient.UnregisterSniffer(FullJid, this.nodeInfo, TabSniffer.SnifferId, 
+				return this.ConcentratorClient.UnregisterSniffer(FullJid, this.nodeInfo, TabSniffer.SnifferId,
 					string.Empty, string.Empty, string.Empty, (sender, e) =>
 					{
 						MainWindow.MouseDefault();
@@ -515,7 +515,98 @@ namespace Waher.Client.WPF.Model.Concentrator
 
 		public void AddContexMenuItems(TreeNode Node, ref string CurrentGroup, ContextMenu Menu)
 		{
-			// TODO
+			if (Node is Node Node2 && Node2.commands != null)
+			{
+				MenuItem Item;
+
+				foreach (NodeCommand Command in Node2.commands)
+				{
+					this.GroupSeparator(ref CurrentGroup, Command.SortCategory, Menu);
+
+					Menu.Items.Add(Item = new MenuItem()
+					{
+						Header = Command.Name,
+						IsEnabled = true,
+						Tag = Command
+					});
+
+					Item.Click += NodeCommandClick;
+				}
+			}
 		}
+
+		private void NodeCommandClick(object sender, System.Windows.RoutedEventArgs e)
+		{
+			string FullJid = this.Concentrator?.FullJid;
+			ConcentratorClient ConcentratorClient = this.ConcentratorClient;
+
+			if (ConcentratorClient != null && !string.IsNullOrEmpty(FullJid))
+			{
+				MenuItem Item = (MenuItem)sender;
+				NodeCommand Command = (NodeCommand)Item.Tag;
+
+				if (!string.IsNullOrEmpty(Command.ConfirmationString))
+				{
+					if (System.Windows.MessageBox.Show(MainWindow.currentInstance, Command.ConfirmationString, "Confirm",
+						System.Windows.MessageBoxButton.YesNoCancel, System.Windows.MessageBoxImage.Question) != System.Windows.MessageBoxResult.Yes)
+					{
+						return;
+					}
+				}
+
+				switch (Command.Type)
+				{
+					case CommandType.Simple:
+						Mouse.OverrideCursor = Cursors.Wait;
+
+						ConcentratorClient.ExecuteCommand(FullJid, this.NodeId, this.SourceId, this.Partition, Command.Command,
+							ConcentratorClient.Client.Language, string.Empty, string.Empty, string.Empty, (sender2, e2) =>
+							{
+								MainWindow.MouseDefault();
+
+								this.ShowCommandResult(e2, Command);
+							}, null);
+						break;
+
+					case CommandType.Parametrized:
+					case CommandType.Query:
+						Mouse.OverrideCursor = Cursors.Wait;
+
+						ConcentratorClient.GetCommandParameters(FullJid, this.NodeId, this.SourceId, this.Partition, Command.Command,
+							ConcentratorClient.Client.Language, string.Empty, string.Empty, string.Empty, (sender2, Form)=>
+							{
+								MainWindow.MouseDefault();
+
+								MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() =>
+								{
+									ParameterDialog Dialog = new ParameterDialog(Form);
+									Dialog.ShowDialog();
+								}));
+							},
+							(sender2, e2) =>
+							{
+								this.ShowCommandResult(e2, Command);
+							}, null);
+						break;
+				}
+			}
+		}
+
+		private void ShowCommandResult(IqResultEventArgs e, NodeCommand Command)
+		{
+			if (e.Ok)
+			{
+				if (!string.IsNullOrEmpty(Command.SuccessString))
+					MainWindow.MessageBox(Command.SuccessString, "Success", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+			}
+			else
+			{
+				if (!string.IsNullOrEmpty(Command.FailureString))
+					MainWindow.MessageBox(Command.FailureString, "Failure", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+				else
+					MainWindow.MessageBox(e.ErrorText, "Error", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+			}
+		}
+
 	}
 }

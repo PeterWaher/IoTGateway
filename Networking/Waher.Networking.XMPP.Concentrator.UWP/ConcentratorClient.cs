@@ -9,8 +9,10 @@ using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP.DataForms;
+using Waher.Networking.XMPP.Concentrator.Queries;
 using Waher.Things;
 using Waher.Things.DisplayableParameters;
+using Waher.Things.Queries;
 
 namespace Waher.Networking.XMPP.Concentrator
 {
@@ -23,6 +25,7 @@ namespace Waher.Networking.XMPP.Concentrator
 	public class ConcentratorClient : XmppExtension
 	{
 		private Dictionary<string, ISniffer> sniffers = new Dictionary<string, ISniffer>();
+		private Dictionary<string, NodeQuery> queries = new Dictionary<string, NodeQuery>();
 
 		/// <summary>
 		/// Implements an XMPP concentrator client interface.
@@ -34,6 +37,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		public ConcentratorClient(XmppClient Client)
 			: base(Client)
 		{
+			Client.RegisterMessageHandler("queryProgress", ConcentratorServer.NamespaceConcentrator, this.QueryProgressHandler, false);
 			Client.RegisterMessageHandler("sniff", ConcentratorServer.NamespaceConcentrator, this.SniffMessageHandler, false);
 		}
 
@@ -44,6 +48,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		{
 			base.Dispose();
 
+			Client.UnregisterMessageHandler("queryProgress", ConcentratorServer.NamespaceConcentrator, this.QueryProgressHandler, false);
 			Client.UnregisterMessageHandler("sniff", ConcentratorServer.NamespaceConcentrator, this.SniffMessageHandler, false);
 		}
 
@@ -55,7 +60,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <summary>
 		/// Gets the capabilities of a concentrator server.
 		/// </summary>
-		/// <param name="To">Address of server.</param>
+		/// <param name="To">Address of concentrator server.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void GetCapabilities(string To, CapabilitiesEventHandler Callback, object State)
@@ -93,7 +98,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <summary>
 		/// Gets all data sources from the server.
 		/// </summary>
-		/// <param name="To">Address of server.</param>
+		/// <param name="To">Address of concentrator server.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void GetAllDataSources(string To, DataSourcesEventHandler Callback, object State)
@@ -137,7 +142,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <summary>
 		/// Gets all root data sources from the server.
 		/// </summary>
-		/// <param name="To">Address of server.</param>
+		/// <param name="To">Address of concentrator server.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void GetRootDataSources(string To, DataSourcesEventHandler Callback, object State)
@@ -152,7 +157,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <summary>
 		/// Gets all root data sources from the server.
 		/// </summary>
-		/// <param name="To">Address of server.</param>
+		/// <param name="To">Address of concentrator server.</param>
 		/// <param name="SourceID">Parent Data Source ID.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
@@ -168,7 +173,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <summary>
 		/// Checks if the concentrator contains a given node (that the user is allowed to see).
 		/// </summary>
-		/// <param name="To">Address of server.</param>
+		/// <param name="To">Address of concentrator server.</param>
 		/// <param name="Node">Node</param>
 		/// <param name="ServiceToken">Optional Service token.</param>
 		/// <param name="DeviceToken">Optional Device token.</param>
@@ -184,7 +189,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <summary>
 		/// Checks if the concentrator contains a given node (that the user is allowed to see).
 		/// </summary>
-		/// <param name="To">Address of server.</param>
+		/// <param name="To">Address of concentrator server.</param>
 		/// <param name="NodeID">Node ID</param>
 		/// <param name="SourceID">Optional Source ID</param>
 		/// <param name="Partition">Optional Partition</param>
@@ -277,7 +282,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <summary>
 		/// Checks if the concentrator contains a set of nodes (that the user is allowed to see).
 		/// </summary>
-		/// <param name="To">Address of server.</param>
+		/// <param name="To">Address of concentrator server.</param>
 		/// <param name="Nodes">Nodes</param>
 		/// <param name="ServiceToken">Optional Service token.</param>
 		/// <param name="DeviceToken">Optional Device token.</param>
@@ -350,7 +355,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <summary>
 		/// Gets information about a node in the concentrator.
 		/// </summary>
-		/// <param name="To">Address of server.</param>
+		/// <param name="To">Address of concentrator server.</param>
 		/// <param name="Node">Node reference.</param>
 		/// <param name="Parameters">If node parameters should be included in response.</param>
 		/// <param name="Messages">If messages should be included in the response.</param>
@@ -369,7 +374,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <summary>
 		/// Gets information about a node in the concentrator.
 		/// </summary>
-		/// <param name="To">Address of server.</param>
+		/// <param name="To">Address of concentrator server.</param>
 		/// <param name="NodeID">Node ID</param>
 		/// <param name="SourceID">Optional Source ID</param>
 		/// <param name="Partition">Optional Partition</param>
@@ -503,27 +508,7 @@ namespace Waher.Networking.XMPP.Concentrator
 							Name = XML.Attribute(E2, "name");
 
 							string s = XML.Attribute(E2, "value");
-							SKColor Value = SKColors.Transparent;
-
-							if (s.Length == 6)
-							{
-								if (byte.TryParse(s.Substring(0, 2), NumberStyles.HexNumber, null, out byte R) &&
-									byte.TryParse(s.Substring(2, 2), NumberStyles.HexNumber, null, out byte G) &&
-									byte.TryParse(s.Substring(4, 2), NumberStyles.HexNumber, null, out byte B))
-								{
-									Value = new SKColor(R, G, B);
-								}
-							}
-							else if (s.Length == 8)
-							{
-								if (byte.TryParse(s.Substring(0, 2), NumberStyles.HexNumber, null, out byte R) &&
-									byte.TryParse(s.Substring(2, 2), NumberStyles.HexNumber, null, out byte G) &&
-									byte.TryParse(s.Substring(4, 2), NumberStyles.HexNumber, null, out byte B) &&
-									byte.TryParse(s.Substring(6, 2), NumberStyles.HexNumber, null, out byte A))
-								{
-									Value = new SKColor(R, G, B, A);
-								}
-							}
+							TryParse(s, out SKColor Value);
 
 							if (ParameterList != null)
 								ParameterList.Add(new ColorParameter(Id, Name, Value));
@@ -611,9 +596,44 @@ namespace Waher.Networking.XMPP.Concentrator
 		}
 
 		/// <summary>
+		/// Tries to parse a color value from its string representation.
+		/// </summary>
+		/// <param name="s">String representation (RRGGBB or RRGGBBAA) of the color.</param>
+		/// <param name="Color">Parse color.</param>
+		/// <returns>If a color was successfully parsed.</returns>
+		public static bool TryParse(string s, out SKColor Color)
+		{
+			if (s.Length == 6)
+			{
+				if (byte.TryParse(s.Substring(0, 2), NumberStyles.HexNumber, null, out byte R) &&
+					byte.TryParse(s.Substring(2, 2), NumberStyles.HexNumber, null, out byte G) &&
+					byte.TryParse(s.Substring(4, 2), NumberStyles.HexNumber, null, out byte B))
+				{
+					Color = new SKColor(R, G, B);
+					return true;
+				}
+			}
+			else if (s.Length == 8)
+			{
+				if (byte.TryParse(s.Substring(0, 2), NumberStyles.HexNumber, null, out byte R) &&
+					byte.TryParse(s.Substring(2, 2), NumberStyles.HexNumber, null, out byte G) &&
+					byte.TryParse(s.Substring(4, 2), NumberStyles.HexNumber, null, out byte B) &&
+					byte.TryParse(s.Substring(6, 2), NumberStyles.HexNumber, null, out byte A))
+				{
+					Color = new SKColor(R, G, B, A);
+					return true;
+				}
+			}
+
+			Color = SKColors.Transparent;
+
+			return false;
+		}
+
+		/// <summary>
 		/// Gets information about a set of nodes in the concentrator.
 		/// </summary>
-		/// <param name="To">Address of server.</param>
+		/// <param name="To">Address of concentrator server.</param>
 		/// <param name="Nodes">Node references.</param>
 		/// <param name="Parameters">If node parameters should be included in response.</param>
 		/// <param name="Messages">If messages should be included in the response.</param>
@@ -686,7 +706,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <summary>
 		/// Gets information about all nodes in a data source.
 		/// </summary>
-		/// <param name="To">Address of server.</param>
+		/// <param name="To">Address of concentrator server.</param>
 		/// <param name="SourceID">Data source ID.</param>
 		/// <param name="Parameters">If node parameters should be included in response.</param>
 		/// <param name="Messages">If messages should be included in the response.</param>
@@ -705,7 +725,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <summary>
 		/// Gets information about all nodes in a data source.
 		/// </summary>
-		/// <param name="To">Address of server.</param>
+		/// <param name="To">Address of concentrator server.</param>
 		/// <param name="SourceID">Data source ID.</param>
 		/// <param name="OnlyIfDerivedFrom">Array of types nodes must be derived from, to be included in the response.</param>
 		/// <param name="Parameters">If node parameters should be included in response.</param>
@@ -754,7 +774,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <summary>
 		/// Gets information about the inheritance of a node in the concentrator.
 		/// </summary>
-		/// <param name="To">Address of server.</param>
+		/// <param name="To">Address of concentrator server.</param>
 		/// <param name="Node">Node reference.</param>
 		/// <param name="Language">Code of desired language.</param>
 		/// <param name="ServiceToken">Optional Service token.</param>
@@ -771,7 +791,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <summary>
 		/// Gets information about the inheritance of a node in the concentrator.
 		/// </summary>
-		/// <param name="To">Address of server.</param>
+		/// <param name="To">Address of concentrator server.</param>
 		/// <param name="NodeID">Node ID</param>
 		/// <param name="SourceID">Optional Source ID</param>
 		/// <param name="Partition">Optional Partition</param>
@@ -840,7 +860,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <summary>
 		/// Gets information about all root nodes in a data source.
 		/// </summary>
-		/// <param name="To">Address of server.</param>
+		/// <param name="To">Address of concentrator server.</param>
 		/// <param name="SourceID">Data source ID.</param>
 		/// <param name="Parameters">If node parameters should be included in response.</param>
 		/// <param name="Messages">If messages should be included in the response.</param>
@@ -873,7 +893,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <summary>
 		/// Gets information about all root nodes in a data source.
 		/// </summary>
-		/// <param name="To">Address of server.</param>
+		/// <param name="To">Address of concentrator server.</param>
 		/// <param name="Node">Node reference.</param>
 		/// <param name="Parameters">If node parameters should be included in response.</param>
 		/// <param name="Messages">If messages should be included in the response.</param>
@@ -893,7 +913,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <summary>
 		/// Gets information about all root nodes in a data source.
 		/// </summary>
-		/// <param name="To">Address of server.</param>
+		/// <param name="To">Address of concentrator server.</param>
 		/// <param name="NodeID">Node ID</param>
 		/// <param name="SourceID">Optional Source ID</param>
 		/// <param name="Partition">Optional Partition</param>
@@ -928,7 +948,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <summary>
 		/// Gets information about all ancestors of a node.
 		/// </summary>
-		/// <param name="To">Address of server.</param>
+		/// <param name="To">Address of concentrator server.</param>
 		/// <param name="Node">Node reference.</param>
 		/// <param name="Parameters">If node parameters should be included in response.</param>
 		/// <param name="Messages">If messages should be included in the response.</param>
@@ -948,7 +968,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <summary>
 		/// Gets information about all ancestors of a node.
 		/// </summary>
-		/// <param name="To">Address of server.</param>
+		/// <param name="To">Address of concentrator server.</param>
 		/// <param name="NodeID">Node ID</param>
 		/// <param name="SourceID">Optional Source ID</param>
 		/// <param name="Partition">Optional Partition</param>
@@ -983,7 +1003,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <summary>
 		/// Gets a list of what type of nodes can be added to a given node.
 		/// </summary>
-		/// <param name="To">Address of server.</param>
+		/// <param name="To">Address of concentrator server.</param>
 		/// <param name="Node">Node reference.</param>
 		/// <param name="Language">Code of desired language.</param>
 		/// <param name="ServiceToken">Optional Service token.</param>
@@ -1000,7 +1020,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <summary>
 		/// Gets a list of what type of nodes can be added to a given node.
 		/// </summary>
-		/// <param name="To">Address of server.</param>
+		/// <param name="To">Address of concentrator server.</param>
 		/// <param name="NodeID">Node ID</param>
 		/// <param name="SourceID">Optional Source ID</param>
 		/// <param name="Partition">Optional Partition</param>
@@ -1066,7 +1086,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <summary>
 		/// Gets a set of parameters for the creation of a new node.
 		/// </summary>
-		/// <param name="To">Address of server.</param>
+		/// <param name="To">Address of concentrator server.</param>
 		/// <param name="Node">Node reference.</param>
 		/// <param name="NodeType">Type of node to create.</param>
 		/// <param name="Language">Code of desired language.</param>
@@ -1087,7 +1107,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <summary>
 		/// Gets a set of parameters for the creation of a new node.
 		/// </summary>
-		/// <param name="To">Address of server.</param>
+		/// <param name="To">Address of concentrator server.</param>
 		/// <param name="NodeID">Node ID</param>
 		/// <param name="SourceID">Optional Source ID</param>
 		/// <param name="Partition">Optional Partition</param>
@@ -1181,7 +1201,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			Form.SerializeSubmit(Xml);
 			Xml.Append("</createNewNode>");
 
-			this.client.SendIqGet(To, Xml.ToString(), (sender, e) =>
+			this.client.SendIqSet(To, Xml.ToString(), (sender, e) =>
 			{
 				if (!e.Ok && e.ErrorElement != null && e.ErrorType == ErrorType.Modify)
 				{
@@ -1246,7 +1266,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <summary>
 		/// Destroys a node.
 		/// </summary>
-		/// <param name="To">Address of server.</param>
+		/// <param name="To">Address of concentrator server.</param>
 		/// <param name="Node">Node reference.</param>
 		/// <param name="Language">Code of desired language.</param>
 		/// <param name="ServiceToken">Optional Service token.</param>
@@ -1263,7 +1283,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <summary>
 		/// Destroys a node.
 		/// </summary>
-		/// <param name="To">Address of server.</param>
+		/// <param name="To">Address of concentrator server.</param>
 		/// <param name="NodeID">Node ID</param>
 		/// <param name="SourceID">Optional Source ID</param>
 		/// <param name="Partition">Optional Partition</param>
@@ -1286,13 +1306,13 @@ namespace Waher.Networking.XMPP.Concentrator
 			this.AppendNodeInfoAttributes(Xml, false, false, Language);
 			Xml.Append("'/>");
 
-			this.client.SendIqGet(To, Xml.ToString(), Callback, State);
+			this.client.SendIqSet(To, Xml.ToString(), Callback, State);
 		}
 
 		/// <summary>
 		/// Gets the set of parameters for the purpose of editing a node.
 		/// </summary>
-		/// <param name="To">Address of server.</param>
+		/// <param name="To">Address of concentrator server.</param>
 		/// <param name="Node">Node reference.</param>
 		/// <param name="Language">Code of desired language.</param>
 		/// <param name="ServiceToken">Optional Service token.</param>
@@ -1312,7 +1332,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <summary>
 		/// Gets the set of parameters for the purpose of editing a node.
 		/// </summary>
-		/// <param name="To">Address of server.</param>
+		/// <param name="To">Address of concentrator server.</param>
 		/// <param name="NodeID">Node ID</param>
 		/// <param name="SourceID">Optional Source ID</param>
 		/// <param name="Partition">Optional Partition</param>
@@ -1400,7 +1420,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			Form.SerializeSubmit(Xml);
 			Xml.Append("</setNodeParametersAfterEdit>");
 
-			this.client.SendIqGet(To, Xml.ToString(), (sender, e) =>
+			this.client.SendIqSet(To, Xml.ToString(), (sender, e) =>
 			{
 				if (!e.Ok && e.ErrorElement != null && e.ErrorType == ErrorType.Modify)
 				{
@@ -1465,7 +1485,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <summary>
 		/// Registers a new sniffer on a node.
 		/// </summary>
-		/// <param name="To">Address of server.</param>
+		/// <param name="To">Address of concentrator server.</param>
 		/// <param name="Node">Node reference.</param>
 		/// <param name="Expires">When the sniffer should expire, if not unregistered before.</param>
 		/// <param name="Sniffer">Sniffer to register.</param>
@@ -1483,7 +1503,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <summary>
 		/// Registers a new sniffer on a node.
 		/// </summary>
-		/// <param name="To">Address of server.</param>
+		/// <param name="To">Address of concentrator server.</param>
 		/// <param name="NodeID">Node ID</param>
 		/// <param name="SourceID">Optional Source ID</param>
 		/// <param name="Partition">Optional Partition</param>
@@ -1545,7 +1565,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <summary>
 		/// Registers a new sniffer on a node.
 		/// </summary>
-		/// <param name="To">Address of server.</param>
+		/// <param name="To">Address of concentrator server.</param>
 		/// <param name="Node">Node reference.</param>
 		/// <param name="SnifferId">ID of sniffer to unregister.</param>
 		/// <param name="ServiceToken">Optional Service token.</param>
@@ -1563,7 +1583,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <summary>
 		/// Registers a new sniffer on a node.
 		/// </summary>
-		/// <param name="To">Address of server.</param>
+		/// <param name="To">Address of concentrator server.</param>
 		/// <param name="NodeID">Node ID</param>
 		/// <param name="SourceID">Optional Source ID</param>
 		/// <param name="Partition">Optional Partition</param>
@@ -1683,18 +1703,17 @@ namespace Waher.Networking.XMPP.Concentrator
 			}
 		}
 
-
 		/// <summary>
 		/// Gets available commands for a node.
 		/// </summary>
-		/// <param name="To">Address of server.</param>
+		/// <param name="To">Address of concentrator server.</param>
 		/// <param name="Node">Node reference.</param>
 		/// <param name="ServiceToken">Optional Service token.</param>
 		/// <param name="DeviceToken">Optional Device token.</param>
 		/// <param name="UserToken">Optional User token.</param>
 		/// <param name="Callback">Method to call when process has completed.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void GetNodeCommands(string To, IThingReference Node, 
+		public void GetNodeCommands(string To, IThingReference Node,
 			string ServiceToken, string DeviceToken, string UserToken, CommandsEventHandler Callback, object State)
 		{
 			this.GetNodeCommands(To, Node.NodeId, Node.SourceId, Node.Partition, ServiceToken, DeviceToken, UserToken, Callback, State);
@@ -1703,7 +1722,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <summary>
 		/// Gets available commands for a node.
 		/// </summary>
-		/// <param name="To">Address of server.</param>
+		/// <param name="To">Address of concentrator server.</param>
 		/// <param name="NodeID">Node ID</param>
 		/// <param name="SourceID">Optional Source ID</param>
 		/// <param name="Partition">Optional Partition</param>
@@ -1712,7 +1731,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="UserToken">Optional User token.</param>
 		/// <param name="Callback">Method to call when process has completed.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void GetNodeCommands(string To, string NodeID, string SourceID, string Partition, 
+		public void GetNodeCommands(string To, string NodeID, string SourceID, string Partition,
 			string ServiceToken, string DeviceToken, string UserToken, CommandsEventHandler Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
@@ -1748,6 +1767,8 @@ namespace Waher.Networking.XMPP.Concentrator
 							Commands.Add(new NodeCommand(Command, Name, Type, SuccessString, FailureString, ConfirmationString, SortCategory, SortKey));
 						}
 					}
+
+					Commands.Sort(this.CompareCommands);
 				}
 				else
 					e.Ok = false;
@@ -1765,6 +1786,766 @@ namespace Waher.Networking.XMPP.Concentrator
 				}
 
 			}, State);
+		}
+
+		private int CompareCommands(NodeCommand Cmd1, NodeCommand Cmd2)
+		{
+			int i = Cmd1.SortCategory.CompareTo(Cmd2.SortCategory);
+			if (i != 0)
+				return i;
+
+			return Cmd1.SortKey.CompareTo(Cmd2.SortKey);
+		}
+
+		/// <summary>
+		/// Gets the set of parameters for a parametrized command.
+		/// </summary>
+		/// <param name="To">Address of concentrator server.</param>
+		/// <param name="Node">Node reference.</param>
+		/// <param name="Command">Command for which to get parameters.</param>
+		/// <param name="Language">Code of desired language.</param>
+		/// <param name="ServiceToken">Optional Service token.</param>
+		/// <param name="DeviceToken">Optional Device token.</param>
+		/// <param name="UserToken">Optional User token.</param>
+		/// <param name="FormCallback">Method to call when parameter form is returned.</param>
+		/// <param name="CommandCallback">Method to call after executing command.</param>
+		/// <param name="State">State object to pass on to the node callback method.</param>
+		public void GetCommandParameters(string To, IThingReference Node, string Command, string Language,
+			string ServiceToken, string DeviceToken, string UserToken, DataFormEventHandler FormCallback,
+			IqResultEventHandler CommandCallback, object State)
+		{
+			this.GetCommandParameters(To, Node.NodeId, Node.SourceId, Node.Partition, Command, Language, ServiceToken, DeviceToken, UserToken,
+				FormCallback, CommandCallback, null, State);
+		}
+
+		/// <summary>
+		/// Gets the set of parameters for a parametrized command.
+		/// </summary>
+		/// <param name="To">Address of concentrator server.</param>
+		/// <param name="NodeID">Node ID</param>
+		/// <param name="SourceID">Optional Source ID</param>
+		/// <param name="Partition">Optional Partition</param>
+		/// <param name="Command">Command for which to get parameters.</param>
+		/// <param name="Language">Code of desired language.</param>
+		/// <param name="ServiceToken">Optional Service token.</param>
+		/// <param name="DeviceToken">Optional Device token.</param>
+		/// <param name="UserToken">Optional User token.</param>
+		/// <param name="FormCallback">Method to call when parameter form is returned.</param>
+		/// <param name="CommandCallback">Method to call after executing command.</param>
+		/// <param name="State">State object to pass on to the node callback method.</param>
+		public void GetCommandParameters(string To, string NodeID, string SourceID, string Partition, string Command, string Language,
+			string ServiceToken, string DeviceToken, string UserToken, DataFormEventHandler FormCallback, IqResultEventHandler CommandCallback, object State)
+		{
+			this.GetCommandParameters(To, NodeID, SourceID, Partition, Command, Language, ServiceToken, DeviceToken, UserToken, FormCallback, CommandCallback, null, State);
+		}
+
+		/// <summary>
+		/// Gets the set of parameters for a parametrized query.
+		/// </summary>
+		/// <param name="To">Address of concentrator server.</param>
+		/// <param name="Node">Node reference.</param>
+		/// <param name="Command">Command for which to get parameters.</param>
+		/// <param name="Language">Code of desired language.</param>
+		/// <param name="ServiceToken">Optional Service token.</param>
+		/// <param name="DeviceToken">Optional Device token.</param>
+		/// <param name="UserToken">Optional User token.</param>
+		/// <param name="FormCallback">Method to call when parameter form is returned.</param>
+		/// <param name="QueryCallback">Method to call when query execution has begun.</param>
+		/// <param name="State">State object to pass on to the node callback method.</param>
+		public void GetQueryParameters(string To, IThingReference Node, string Command, string Language,
+			string ServiceToken, string DeviceToken, string UserToken, DataFormEventHandler FormCallback,
+			NodeQueryEventHandler QueryCallback, object State)
+		{
+			this.GetCommandParameters(To, Node.NodeId, Node.SourceId, Node.Partition, Command, Language, ServiceToken, DeviceToken, UserToken,
+				FormCallback, null, QueryCallback, State);
+		}
+
+		/// <summary>
+		/// Gets the set of parameters for a parametrized query.
+		/// </summary>
+		/// <param name="To">Address of concentrator server.</param>
+		/// <param name="NodeID">Node ID</param>
+		/// <param name="SourceID">Optional Source ID</param>
+		/// <param name="Partition">Optional Partition</param>
+		/// <param name="Command">Command for which to get parameters.</param>
+		/// <param name="Language">Code of desired language.</param>
+		/// <param name="ServiceToken">Optional Service token.</param>
+		/// <param name="DeviceToken">Optional Device token.</param>
+		/// <param name="UserToken">Optional User token.</param>
+		/// <param name="FormCallback">Method to call when parameter form is returned.</param>
+		/// <param name="QueryCallback">Method to call when query execution has begun.</param>
+		/// <param name="State">State object to pass on to the node callback method.</param>
+		public void GetQueryParameters(string To, string NodeID, string SourceID, string Partition, string Command, string Language,
+			string ServiceToken, string DeviceToken, string UserToken, DataFormEventHandler FormCallback, NodeQueryEventHandler QueryCallback, object State)
+		{
+			this.GetCommandParameters(To, NodeID, SourceID, Partition, Command, Language, ServiceToken, DeviceToken, UserToken, FormCallback, null, QueryCallback, State);
+		}
+
+		private void GetCommandParameters(string To, string NodeID, string SourceID, string Partition, string Command, string Language,
+			string ServiceToken, string DeviceToken, string UserToken, DataFormEventHandler FormCallback, IqResultEventHandler CommandCallback,
+			NodeQueryEventHandler QueryCallback, object State)
+		{
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<getCommandParameters xmlns='");
+			Xml.Append(ConcentratorServer.NamespaceConcentrator);
+			Xml.Append("'");
+			this.AppendNodeAttributes(Xml, NodeID, SourceID, Partition);
+			this.AppendTokenAttributes(Xml, ServiceToken, DeviceToken, UserToken);
+			this.AppendNodeInfoAttributes(Xml, false, false, Language);
+			Xml.Append("' command='");
+			Xml.Append(XML.Encode(Command));
+			Xml.Append("'/>");
+
+			this.client.SendIqGet(To, Xml.ToString(), (sender, e) =>
+			{
+				DataForm Form = null;
+				XmlElement E;
+
+				if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "getCommandParametersResponse" && E.NamespaceURI == ConcentratorServer.NamespaceConcentrator)
+				{
+					foreach (XmlNode N in E)
+					{
+						if (N is XmlElement E2 && E2.LocalName == "x")
+						{
+							Form = new DataForm(this.client, E2, this.EditCommandParameters, this.CancelEditCommandParameters, e.From, e.To)
+							{
+								State = e.State
+							};
+							break;
+						}
+					}
+				}
+				else
+					e.Ok = false;
+
+				if (FormCallback != null && Form != null)
+				{
+					try
+					{
+						FormCallback(this, Form);
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
+				}
+
+			}, new object[] { To, NodeID, SourceID, Partition, Command, Language, ServiceToken, DeviceToken, UserToken, FormCallback, CommandCallback, QueryCallback, State });
+		}
+
+		private void EditCommandParameters(object Sender, DataForm Form)
+		{
+			object[] P = (object[])Form.State;
+			string To = (string)P[0];
+			string NodeID = (string)P[1];
+			string SourceID = (string)P[2];
+			string Partition = (string)P[3];
+			string Command = (string)P[4];
+			string Language = (string)P[5];
+			string ServiceToken = (string)P[6];
+			string DeviceToken = (string)P[7];
+			string UserToken = (string)P[8];
+			DataFormEventHandler FormCallback = (DataFormEventHandler)P[9];
+			IqResultEventHandler CommandCallback = (IqResultEventHandler)P[10];
+			NodeQueryResponseEventHandler QueryCallback = (NodeQueryResponseEventHandler)P[11];
+			object State = P[12];
+
+			if (CommandCallback != null)
+				this.ExecuteCommand(To, NodeID, SourceID, Partition, Command, Form, Language, ServiceToken, DeviceToken, UserToken, CommandCallback, State);
+			else
+				this.ExecuteQuery(To, NodeID, SourceID, Partition, Command, Form, Language, ServiceToken, DeviceToken, UserToken, QueryCallback, State);
+		}
+
+		private void CancelEditCommandParameters(object Sender, DataForm Form)
+		{
+			object[] P = (object[])Form.State;
+			IqResultEventHandler CommandCallback = (IqResultEventHandler)P[10];
+			object State = P[11];
+
+			if (CommandCallback != null)
+			{
+				try
+				{
+					CommandCallback(this, new NodeInformationEventArgs(null, new IqResultEventArgs(null, string.Empty, string.Empty, string.Empty, false, State)));
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			}
+		}
+
+		/// <summary>
+		/// Executes a node command.
+		/// </summary>
+		/// <param name="To">Address of concentrator server.</param>
+		/// <param name="Node">Node reference.</param>
+		/// <param name="Command">Command for which to get parameters.</param>
+		/// <param name="Language">Code of desired language.</param>
+		/// <param name="ServiceToken">Optional Service token.</param>
+		/// <param name="DeviceToken">Optional Device token.</param>
+		/// <param name="UserToken">Optional User token.</param>
+		/// <param name="Callback">Method to call when operation has been executed.</param>
+		/// <param name="State">State object to pass on to the node callback method.</param>
+		public void ExecuteCommand(string To, IThingReference Node, string Command, string Language,
+			string ServiceToken, string DeviceToken, string UserToken, IqResultEventHandler Callback, object State)
+		{
+			this.ExecuteCommand(To, Node.NodeId, Node.SourceId, Node.Partition, Command, null, null, Language, ServiceToken, DeviceToken, UserToken,
+				Callback, null, State);
+		}
+
+		/// <summary>
+		/// Executes a node command.
+		/// </summary>
+		/// <param name="To">Address of concentrator server.</param>
+		/// <param name="NodeID">Node ID</param>
+		/// <param name="SourceID">Optional Source ID</param>
+		/// <param name="Partition">Optional Partition</param>
+		/// <param name="Command">Command for which to get parameters.</param>
+		/// <param name="Language">Code of desired language.</param>
+		/// <param name="ServiceToken">Optional Service token.</param>
+		/// <param name="DeviceToken">Optional Device token.</param>
+		/// <param name="UserToken">Optional User token.</param>
+		/// <param name="Callback">Method to call when operation has been executed.</param>
+		/// <param name="State">State object to pass on to the node callback method.</param>
+		public void ExecuteCommand(string To, string NodeID, string SourceID, string Partition, string Command, string Language,
+			string ServiceToken, string DeviceToken, string UserToken, IqResultEventHandler Callback, object State)
+		{
+			this.ExecuteCommand(To, NodeID, SourceID, Partition, Command, null, null, Language, ServiceToken, DeviceToken, UserToken, Callback, null, State);
+		}
+
+		/// <summary>
+		/// Executes a node command.
+		/// </summary>
+		/// <param name="To">Address of concentrator server.</param>
+		/// <param name="Node">Node reference.</param>
+		/// <param name="Command">Command for which to get parameters.</param>
+		/// <param name="Parameters">Command parameters.</param>
+		/// <param name="Language">Code of desired language.</param>
+		/// <param name="ServiceToken">Optional Service token.</param>
+		/// <param name="DeviceToken">Optional Device token.</param>
+		/// <param name="UserToken">Optional User token.</param>
+		/// <param name="Callback">Method to call when operation has been executed.</param>
+		/// <param name="State">State object to pass on to the node callback method.</param>
+		public void ExecuteCommand(string To, IThingReference Node, string Command, DataForm Parameters, string Language,
+			string ServiceToken, string DeviceToken, string UserToken, IqResultEventHandler Callback, object State)
+		{
+			this.ExecuteCommand(To, Node.NodeId, Node.SourceId, Node.Partition, Command, Parameters, null, Language, ServiceToken, DeviceToken, UserToken,
+				Callback, null, State);
+		}
+
+		/// <summary>
+		/// Executes a node command.
+		/// </summary>
+		/// <param name="To">Address of concentrator server.</param>
+		/// <param name="NodeID">Node ID</param>
+		/// <param name="SourceID">Optional Source ID</param>
+		/// <param name="Partition">Optional Partition</param>
+		/// <param name="Command">Command for which to get parameters.</param>
+		/// <param name="Parameters">Command parameters.</param>
+		/// <param name="Language">Code of desired language.</param>
+		/// <param name="ServiceToken">Optional Service token.</param>
+		/// <param name="DeviceToken">Optional Device token.</param>
+		/// <param name="UserToken">Optional User token.</param>
+		/// <param name="Callback">Method to call when operation has been executed.</param>
+		/// <param name="State">State object to pass on to the node callback method.</param>
+		public void ExecuteCommand(string To, string NodeID, string SourceID, string Partition, string Command, DataForm Parameters, string Language,
+			string ServiceToken, string DeviceToken, string UserToken, IqResultEventHandler Callback, object State)
+		{
+			this.ExecuteCommand(To, NodeID, SourceID, Partition, Command, Parameters, null, Language, ServiceToken, DeviceToken, UserToken, Callback, null, State);
+		}
+
+
+		/// <summary>
+		/// Executes a node query command.
+		/// </summary>
+		/// <param name="To">Address of concentrator server.</param>
+		/// <param name="Node">Node reference.</param>
+		/// <param name="Command">Command for which to get parameters.</param>
+		/// <param name="Language">Code of desired language.</param>
+		/// <param name="ServiceToken">Optional Service token.</param>
+		/// <param name="DeviceToken">Optional Device token.</param>
+		/// <param name="UserToken">Optional User token.</param>
+		/// <param name="Callback">Method to call when operation has been executed.</param>
+		/// <param name="State">State object to pass on to the node callback method.</param>
+		/// <returns>Node query object where results will be made available</returns>
+		public NodeQuery ExecuteQuery(string To, IThingReference Node, string Command, string Language,
+			string ServiceToken, string DeviceToken, string UserToken, NodeQueryResponseEventHandler Callback, object State)
+		{
+			return this.ExecuteQuery(To, Node.NodeId, Node.SourceId, Node.Partition, Command, null, Language, ServiceToken, DeviceToken, UserToken,
+				Callback, State);
+		}
+
+		/// <summary>
+		/// Executes a node query command.
+		/// </summary>
+		/// <param name="To">Address of concentrator server.</param>
+		/// <param name="NodeID">Node ID</param>
+		/// <param name="SourceID">Optional Source ID</param>
+		/// <param name="Partition">Optional Partition</param>
+		/// <param name="Command">Command for which to get parameters.</param>
+		/// <param name="Language">Code of desired language.</param>
+		/// <param name="ServiceToken">Optional Service token.</param>
+		/// <param name="DeviceToken">Optional Device token.</param>
+		/// <param name="UserToken">Optional User token.</param>
+		/// <param name="Callback">Method to call when operation has been executed.</param>
+		/// <param name="State">State object to pass on to the node callback method.</param>
+		/// <returns>Node query object where results will be made available</returns>
+		public NodeQuery ExecuteQuery(string To, string NodeID, string SourceID, string Partition, string Command, string Language,
+			string ServiceToken, string DeviceToken, string UserToken, NodeQueryResponseEventHandler Callback, object State)
+		{
+			return this.ExecuteQuery(To, NodeID, SourceID, Partition, Command, null, Language, ServiceToken, DeviceToken, UserToken, Callback, State);
+		}
+
+		/// <summary>
+		/// Executes a node query command.
+		/// </summary>
+		/// <param name="To">Address of concentrator server.</param>
+		/// <param name="Node">Node reference.</param>
+		/// <param name="Command">Command for which to get parameters.</param>
+		/// <param name="Parameters">Command parameters.</param>
+		/// <param name="Language">Code of desired language.</param>
+		/// <param name="ServiceToken">Optional Service token.</param>
+		/// <param name="DeviceToken">Optional Device token.</param>
+		/// <param name="UserToken">Optional User token.</param>
+		/// <param name="Callback">Method to call when operation has been executed.</param>
+		/// <param name="State">State object to pass on to the node callback method.</param>
+		/// <returns>Node query object where results will be made available</returns>
+		public NodeQuery ExecuteQuery(string To, IThingReference Node, string Command, DataForm Parameters, string Language,
+			string ServiceToken, string DeviceToken, string UserToken, NodeQueryResponseEventHandler Callback, object State)
+		{
+			return this.ExecuteQuery(To, Node.NodeId, Node.SourceId, Node.Partition, Command, Parameters, Language, ServiceToken, DeviceToken, UserToken,
+				Callback, State);
+		}
+
+		/// <summary>
+		/// Executes a node query command.
+		/// </summary>
+		/// <param name="To">Address of concentrator server.</param>
+		/// <param name="NodeID">Node ID</param>
+		/// <param name="SourceID">Optional Source ID</param>
+		/// <param name="Partition">Optional Partition</param>
+		/// <param name="Command">Command for which to get parameters.</param>
+		/// <param name="Parameters">Command parameters.</param>
+		/// <param name="Language">Code of desired language.</param>
+		/// <param name="ServiceToken">Optional Service token.</param>
+		/// <param name="DeviceToken">Optional Device token.</param>
+		/// <param name="UserToken">Optional User token.</param>
+		/// <param name="Callback">Method to call when operation has been executed.</param>
+		/// <param name="State">State object to pass on to the node callback method.</param>
+		/// <returns>Node query object where results will be made available</returns>
+		public NodeQuery ExecuteQuery(string To, string NodeID, string SourceID, string Partition, string Command, DataForm Parameters, string Language,
+			string ServiceToken, string DeviceToken, string UserToken, NodeQueryResponseEventHandler Callback, object State)
+		{
+			NodeQuery Query;
+
+			lock (this.queries)
+			{
+				do
+				{
+					Query = new NodeQuery(this, To, NodeID, SourceID, Partition, Command, Language, ServiceToken, DeviceToken, UserToken);
+				}
+				while (this.queries.ContainsKey(Query.QueryId));
+
+				this.queries[Query.QueryId] = Query;
+			}
+
+			this.ExecuteCommand(To, NodeID, SourceID, Partition, Command, Parameters, Query, Language, ServiceToken, DeviceToken, UserToken, null, Callback, State);
+
+			return Query;
+		}
+
+		private void ExecuteCommand(string To, string NodeID, string SourceID, string Partition, string Command, DataForm Parameters, NodeQuery Query,
+			string Language, string ServiceToken, string DeviceToken, string UserToken, IqResultEventHandler CommandCallback,
+			NodeQueryResponseEventHandler QueryCallback, object State)
+		{
+			StringBuilder Xml = new StringBuilder();
+			string TagName;
+
+			if (Query != null)
+				TagName = "executeNodeCommand";
+			else
+				TagName = "executeNodeQuery";
+
+			Xml.Append('<');
+			Xml.Append(TagName);
+			Xml.Append(" xmlns='");
+
+			Xml.Append(ConcentratorServer.NamespaceConcentrator);
+			Xml.Append("'");
+			this.AppendNodeAttributes(Xml, NodeID, SourceID, Partition);
+			this.AppendTokenAttributes(Xml, ServiceToken, DeviceToken, UserToken);
+			this.AppendNodeInfoAttributes(Xml, false, false, Language);
+			Xml.Append("' command='");
+			Xml.Append(XML.Encode(Command));
+
+			if (Query != null)
+			{
+				Xml.Append("' queryId='");
+				Xml.Append(XML.Encode(Query.QueryId));
+			}
+
+			if (Parameters != null)
+			{
+				Xml.Append("'>");
+				Parameters.SerializeSubmit(Xml);
+				Xml.Append("</");
+				Xml.Append(TagName);
+				Xml.Append('>');
+			}
+			else
+				Xml.Append("'/>");
+
+			this.client.SendIqSet(To, Xml.ToString(), (sender, e) =>
+			{
+				XmlElement E;
+
+				if (e.Ok && (E = e.FirstElement) != null && E.LocalName == TagName + "Response" && E.NamespaceURI == ConcentratorServer.NamespaceConcentrator)
+				{
+					if (Parameters != null)
+					{
+						foreach (XmlNode N2 in E.ChildNodes)
+						{
+							if (N2 is XmlElement E2 && E2.LocalName == "error" && E.NamespaceURI == ConcentratorServer.NamespaceConcentrator)
+							{
+								string Var = XML.Attribute(E2, "var");
+								string ErrorMsg = E2.InnerText;
+								Field F = Parameters[Var];
+
+								if (F != null)
+									F.Error = ErrorMsg;
+							}
+						}
+					}
+				}
+				else
+					e.Ok = false;
+
+				try
+				{
+					if (CommandCallback != null)
+						CommandCallback(this, e);
+					else 
+						QueryCallback?.Invoke(this, new NodeQueryResponseEventArgs(Query, e));
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+
+			}, State);
+		}
+
+		/// <summary>
+		/// Aborts a node query command.
+		/// </summary>
+		/// <param name="To">Address of concentrator server.</param>
+		/// <param name="Node">Node reference.</param>
+		/// <param name="Command">Command for which to get parameters.</param>
+		/// <param name="QueryId">Query ID</param>
+		/// <param name="Language">Code of desired language.</param>
+		/// <param name="ServiceToken">Optional Service token.</param>
+		/// <param name="DeviceToken">Optional Device token.</param>
+		/// <param name="UserToken">Optional User token.</param>
+		/// <param name="Callback">Method to call when operation has been executed.</param>
+		/// <param name="State">State object to pass on to the node callback method.</param>
+		public void AbortQuery(string To, IThingReference Node, string Command, string QueryId,
+			string Language, string ServiceToken, string DeviceToken, string UserToken, IqResultEventHandler Callback, object State)
+		{
+			this.AbortQuery(To, Node.NodeId, Node.SourceId, Node.Partition, Command, QueryId, Language, ServiceToken, DeviceToken, UserToken, Callback, State);
+		}
+
+		/// <summary>
+		/// Aborts a node query command.
+		/// </summary>
+		/// <param name="To">Address of concentrator server.</param>
+		/// <param name="NodeID">Node ID</param>
+		/// <param name="SourceID">Optional Source ID</param>
+		/// <param name="Partition">Optional Partition</param>
+		/// <param name="Command">Command for which to get parameters.</param>
+		/// <param name="QueryId">Query ID</param>
+		/// <param name="Language">Code of desired language.</param>
+		/// <param name="ServiceToken">Optional Service token.</param>
+		/// <param name="DeviceToken">Optional Device token.</param>
+		/// <param name="UserToken">Optional User token.</param>
+		/// <param name="Callback">Method to call when operation has been executed.</param>
+		/// <param name="State">State object to pass on to the node callback method.</param>
+		public void AbortQuery(string To, string NodeID, string SourceID, string Partition, string Command, string QueryId,
+			string Language, string ServiceToken, string DeviceToken, string UserToken, IqResultEventHandler Callback, object State)
+		{
+			lock (this.queries)
+			{
+				if (this.queries.TryGetValue(QueryId, out NodeQuery Query) &&
+					Query.To == To && Query.NodeID == NodeID && Query.SourceID == SourceID && Query.Partition == Partition &&
+					Query.Command == Command)
+				{
+					this.queries.Remove(QueryId);
+				}
+			}
+
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<abortNodeQuery xmlns='");
+			Xml.Append(ConcentratorServer.NamespaceConcentrator);
+			Xml.Append("'");
+			this.AppendNodeAttributes(Xml, NodeID, SourceID, Partition);
+			this.AppendTokenAttributes(Xml, ServiceToken, DeviceToken, UserToken);
+			this.AppendNodeInfoAttributes(Xml, false, false, Language);
+			Xml.Append("' command='");
+			Xml.Append(XML.Encode(Command));
+			Xml.Append("' queryId='");
+			Xml.Append(XML.Encode(QueryId));
+			Xml.Append("'/>");
+
+			this.client.SendIqSet(To, Xml.ToString(), Callback, State);
+		}
+
+		private void QueryProgressHandler(object Sender, MessageEventArgs e)
+		{
+			string NodeId = XML.Attribute(e.Content, "id");
+			string SourceId = XML.Attribute(e.Content, "src");
+			string Partition = XML.Attribute(e.Content, "pt");
+			string QueryId = XML.Attribute(e.Content, "queryId");
+			NodeQuery Query;
+			string s, s2;
+			lock (this.queries)
+			{
+				if (!this.queries.TryGetValue(QueryId, out Query))
+					return;
+			}
+
+			foreach (XmlNode N in e.Content.ChildNodes)
+			{
+				if (N is XmlElement E)
+				{
+					try
+					{
+						switch (E.LocalName)
+						{
+							case "title":
+								s = XML.Attribute(E, "name");
+								Query.SetTitle(s, e);
+								break;
+
+							case "tableDone":
+								s = XML.Attribute(E, "tableId");
+								Query.TableDone(s, e);
+								break;
+
+							case "status":
+								s = XML.Attribute(E, "message");
+								Query.StatusMessage(s, e);
+								break;
+
+							case "queryStarted":
+								Query.ReportStarted(e);
+								break;
+
+							case "newTable":
+								s = XML.Attribute(E, "tableId");
+								s2 = XML.Attribute(E, "tableName");
+
+								List<Column> Columns = new List<Column>();
+
+								foreach (XmlNode N2 in E.ChildNodes)
+								{
+									if (N2 is XmlElement E2 && E2.LocalName == "column")
+									{
+										string ColumnId = XML.Attribute(E2, "columnId");
+										string Header = XML.Attribute(E2, "header");
+										string SourceID = XML.Attribute(E2, "src");
+										string Partition2 = XML.Attribute(E2, "pt");
+										SKColor? FgColor = null;
+										SKColor? BgColor = null;
+										ColumnAlignment? ColumnAlignment = null;
+										byte? NrDecimals = null;
+
+										if (E2.HasAttribute("fgColor") && TryParse(E2.GetAttribute("fgColor"), out SKColor Color))
+											FgColor = Color;
+
+										if (E2.HasAttribute("bgColor") && TryParse(E2.GetAttribute("bgColor"), out Color))
+											BgColor = Color;
+
+										if (E2.HasAttribute("alignment") && Enum.TryParse<ColumnAlignment>(E2.GetAttribute("alignment"), out ColumnAlignment ColumnAlignment2))
+											ColumnAlignment = ColumnAlignment2;
+
+										if (E2.HasAttribute("nrDecimals") && byte.TryParse(E2.GetAttribute("nrDecimals"), out byte b))
+											NrDecimals = b;
+
+										Columns.Add(new Column(ColumnId, Header, SourceID, Partition2, FgColor, BgColor, ColumnAlignment, NrDecimals));
+									}
+								}
+
+								Query.NewTable(new Table(s, s2, Columns.ToArray()), e);
+								break;
+
+							case "newRecords":
+								s = XML.Attribute(E, "tableId");
+
+								List<Record> Records = new List<Record>();
+								List<object> Record = null;
+
+								foreach (XmlNode N2 in E.ChildNodes)
+								{
+									if (N2 is XmlElement E2 && E2.LocalName == "record")
+									{
+										if (Record == null)
+											Record = new List<object>();
+										else
+											Record.Clear();
+
+										foreach (XmlNode N3 in E2.ChildNodes)
+										{
+											if (N3 is XmlElement E3)
+											{
+												switch (E3.LocalName)
+												{
+													case "void":
+														Record.Add(null);
+														break;
+
+													case "boolean":
+														if (CommonTypes.TryParse(E3.InnerText, out bool b))
+															Record.Add(b);
+														else
+															Record.Add(null);
+														break;
+
+													case "color":
+														if (TryParse(E3.InnerText, out SKColor Color))
+															Record.Add(Color);
+														else
+															Record.Add(null);
+														break;
+
+													case "date":
+													case "dateTime":
+														if (XML.TryParse(E3.InnerText, out DateTime TP))
+															Record.Add(TP);
+														else
+															Record.Add(null);
+														break;
+
+													case "double":
+														if (CommonTypes.TryParse(E3.InnerText, out double d))
+															Record.Add(d);
+														else
+															Record.Add(null);
+														break;
+
+													case "duration":
+														if (Duration.TryParse(E3.InnerText, out Duration d2))
+															Record.Add(d2);
+														else
+															Record.Add(null);
+														break;
+
+													case "int":
+														if (int.TryParse(E3.InnerText, out int i))
+															Record.Add(i);
+														else
+															Record.Add(null);
+														break;
+
+													case "long":
+														if (long.TryParse(E3.InnerText, out long l))
+															Record.Add(l);
+														else
+															Record.Add(null);
+														break;
+
+													case "string":
+														Record.Add(E3.InnerText);
+														break;
+
+													case "time":
+														if (TimeSpan.TryParse(E3.InnerText, out TimeSpan TS))
+															Record.Add(TS);
+														else
+															Record.Add(null);
+														break;
+
+													case "base64":
+														try
+														{
+															string ContentType = XML.Attribute(E3, "contentType");
+															byte[] Bin = Convert.FromBase64String(E3.InnerText);
+															object Decoded = InternetContent.Decode(ContentType, Bin, null);
+
+															Record.Add(Decoded);
+														}
+														catch (Exception ex)
+														{
+															Query.QueryMessage(QueryEventType.Exception, QueryEventLevel.Major, ex.Message, e);
+															Record.Add(null);
+														}
+														break;
+
+													default:
+														Record.Add(null);
+														break;
+												}
+											}
+										}
+
+										Records.Add(new Record(Record.ToArray()));
+									}
+								}
+
+								Query.NewRecords(s, Records.ToArray(), e);
+								break;
+
+							case "newObject":
+								try
+								{
+									string ContentType = XML.Attribute(E, "contentType");
+									byte[] Bin = Convert.FromBase64String(E.InnerText);
+									object Decoded = InternetContent.Decode(ContentType, Bin, null);
+
+									Query.NewObject(Decoded, e);
+								}
+								catch (Exception ex)
+								{
+									Query.QueryMessage(QueryEventType.Exception, QueryEventLevel.Major, ex.Message, e);
+								}
+								break;
+
+							case "queryMessage":
+								QueryEventType Type = (QueryEventType)XML.Attribute(E, "type", QueryEventType.Information);
+								QueryEventLevel Level = (QueryEventLevel)XML.Attribute(E, "level", QueryEventLevel.Minor);
+
+								Query.QueryMessage(Type, Level, E.InnerText, e);
+								break;
+
+							case "endSection":
+								Query.EndSection(e);
+								break;
+
+							case "queryDone":
+								Query.ReportDone(e);
+								break;
+
+							case "beginSection":
+								s = XML.Attribute(E, "header");
+								Query.BeginSection(s, e);
+								break;
+
+							case "queryAborted":
+								Query.ReportAborted(e);
+								break;
+
+							default:
+								Query.QueryMessage(QueryEventType.Exception, QueryEventLevel.Major, "Unrecognized sniffer event received: " + E.OuterXml, e);
+								break;
+						}
+					}
+					catch (Exception ex)
+					{
+						Query.QueryMessage(QueryEventType.Exception, QueryEventLevel.Major, ex.Message, e);
+					}
+				}
+			}
 		}
 
 	}

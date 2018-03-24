@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Waher.Things
+namespace Waher.Things.Queries
 {
 	/// <summary>
 	/// Defines a record in a table.

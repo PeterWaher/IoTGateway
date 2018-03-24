@@ -118,6 +118,13 @@
     <Compile Include="Events\DataSourcesEventArgs.cs" />
     <Compile Include="Events\LocalizedStringsResponseEventArgs..cs" />
     <Compile Include="Events\NodeInformationEventArgs.cs" />
+    <Compile Include="Events\NodeQueryEventArgs.cs" />
+    <Compile Include="Events\NodeQueryEventMessageEventArgs.cs" />
+    <Compile Include="Events\NodeQueryObjectEventArgs.cs" />
+    <Compile Include="Events\NodeQueryResponseEventArgs.cs" />
+    <Compile Include="Events\NodeQuerySectionEventArgs.cs" />
+    <Compile Include="Events\NodeQueryStatusMessageEventArgs.cs" />
+    <Compile Include="Events\NodeQueryTableEventArgs.cs" />
     <Compile Include="Events\NodesInformationEventArgs.cs" />
     <Compile Include="Events\SnifferRegistrationEventArgs..cs" />
     <Compile Include="Events\StringsResponseEventArgs..cs" />
@@ -125,6 +132,11 @@
     <Compile Include="NodeInformation.cs" />
     <Compile Include="Parameters.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Queries\NodeQuery.cs" />
+    <Compile Include="Queries\QueryItem.cs" />
+    <Compile Include="Queries\QueryObject.cs" />
+    <Compile Include="Queries\QuerySection.cs" />
+    <Compile Include="Queries\QueryTable.cs" />
     <Compile Include="RemoteSniffer.cs" />
     <EmbeddedResource Include="Properties\Waher.Networking.XMPP.Concentrator.UWP.rd.xml" />
   </ItemGroup>
@@ -209,7 +221,8 @@
   <PropertyGroup>
     <PreBuildEvent>xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP.Concentrator\*.cs" "$(ProjectDir)" /Y
 xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP.Concentrator\Events\*.cs" "$(ProjectDir)Events" /S /R /Y
-xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP.Concentrator\Language\*.lng" "$(ProjectDir)Language" /S /R /Y</PreBuildEvent>
+xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP.Concentrator\Language\*.lng" "$(ProjectDir)Language" /S /R /Y
+xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP.Concentrator\Queries\*.cs" "$(ProjectDir)Queries" /S /R /Y</PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
     <PostBuildEvent>cd "$(ProjectDir)bin"

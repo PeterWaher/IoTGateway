@@ -1854,7 +1854,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="State">State object to pass on to the node callback method.</param>
 		public void GetQueryParameters(string To, IThingReference Node, string Command, string Language,
 			string ServiceToken, string DeviceToken, string UserToken, DataFormEventHandler FormCallback,
-			NodeQueryEventHandler QueryCallback, object State)
+			NodeQueryResponseEventHandler QueryCallback, object State)
 		{
 			this.GetCommandParameters(To, Node.NodeId, Node.SourceId, Node.Partition, Command, Language, ServiceToken, DeviceToken, UserToken,
 				FormCallback, null, QueryCallback, State);
@@ -1876,14 +1876,14 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="QueryCallback">Method to call when query execution has begun.</param>
 		/// <param name="State">State object to pass on to the node callback method.</param>
 		public void GetQueryParameters(string To, string NodeID, string SourceID, string Partition, string Command, string Language,
-			string ServiceToken, string DeviceToken, string UserToken, DataFormEventHandler FormCallback, NodeQueryEventHandler QueryCallback, object State)
+			string ServiceToken, string DeviceToken, string UserToken, DataFormEventHandler FormCallback, NodeQueryResponseEventHandler QueryCallback, object State)
 		{
 			this.GetCommandParameters(To, NodeID, SourceID, Partition, Command, Language, ServiceToken, DeviceToken, UserToken, FormCallback, null, QueryCallback, State);
 		}
 
 		private void GetCommandParameters(string To, string NodeID, string SourceID, string Partition, string Command, string Language,
 			string ServiceToken, string DeviceToken, string UserToken, DataFormEventHandler FormCallback, IqResultEventHandler CommandCallback,
-			NodeQueryEventHandler QueryCallback, object State)
+			NodeQueryResponseEventHandler QueryCallback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -2164,9 +2164,9 @@ namespace Waher.Networking.XMPP.Concentrator
 			string TagName;
 
 			if (Query != null)
-				TagName = "executeNodeCommand";
-			else
 				TagName = "executeNodeQuery";
+			else
+				TagName = "executeNodeCommand";
 
 			Xml.Append('<');
 			Xml.Append(TagName);

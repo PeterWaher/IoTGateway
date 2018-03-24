@@ -105,7 +105,8 @@ namespace Waher.Things
 		/// Starts the execution of a query.
 		/// </summary>
 		/// <param name="Query">Query data receptor.</param>
-		Task StartQueryExecutionAsync(Query Query);
+		/// <param name="Language">Language to use.</param>
+		Task StartQueryExecutionAsync(Query Query, Language Language);
 
 		/// <summary>
 		/// Creates a copy of the command object.

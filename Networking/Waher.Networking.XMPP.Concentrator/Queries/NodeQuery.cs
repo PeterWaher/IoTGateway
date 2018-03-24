@@ -158,6 +158,11 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 		}
 
 		/// <summary>
+		/// Title os response report.
+		/// </summary>
+		public string Title => this.title;
+
+		/// <summary>
 		/// Raised when the result report gets a new title.
 		/// </summary>
 		public event NodeQueryEventHandler NewTitle = null;
@@ -168,14 +173,19 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 		}
 
 		/// <summary>
-		/// Raised when the result report is completed.
+		/// Raised when the result report has started.
 		/// </summary>
 		public event NodeQueryEventHandler Started = null;
 
 		internal void ReportDone(MessageEventArgs e)
 		{
-			this.Invoke(this.Started, e);
+			this.Invoke(this.Done, e);
 		}
+
+		/// <summary>
+		/// Raised when the result report is completed.
+		/// </summary>
+		public event NodeQueryEventHandler Done = null;
 
 		internal void ReportAborted(MessageEventArgs e)
 		{

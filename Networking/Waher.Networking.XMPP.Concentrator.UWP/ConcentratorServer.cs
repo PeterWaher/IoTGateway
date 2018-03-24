@@ -2975,6 +2975,14 @@ namespace Waher.Networking.XMPP.Concentrator
 							return;
 						}
 
+						StringBuilder Xml = new StringBuilder();
+
+						Xml.Append("<executeNodeQueryResponse xmlns='");
+						Xml.Append(NamespaceConcentrator);
+						Xml.Append("'/>");
+
+						e.IqResult(Xml.ToString());
+
 						Query.OnAborted += Query_OnAborted;
 						Query.OnBeginSection += Query_OnBeginSection;
 						Query.OnDone += Query_OnDone;
@@ -2990,15 +2998,17 @@ namespace Waher.Networking.XMPP.Concentrator
 
 						try
 						{
-							await Command.StartQueryExecutionAsync(Query);
+							Query.Start();
+							await Command.StartQueryExecutionAsync(Query, Language);
 						}
-						catch (Exception)
+						catch (Exception ex)
 						{
 							lock (this.synchObject)
 							{
 								this.queries.Remove(QueryId);
 							}
 
+							Query.LogMessage(QueryEventType.Exception, QueryEventLevel.Major, ex.Message);
 							Query.Abort();
 							throw;
 						}
@@ -3006,14 +3016,6 @@ namespace Waher.Networking.XMPP.Concentrator
 						{
 							DisposeObject(Command);
 						}
-
-						StringBuilder Xml = new StringBuilder();
-
-						Xml.Append("<executeNodeQueryResponse xmlns='");
-						Xml.Append(NamespaceConcentrator);
-						Xml.Append("'/>");
-
-						e.IqResult(Xml.ToString());
 					}
 				}
 			}
@@ -4020,7 +4022,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				{
 					try
 					{
-						await Command.StartQueryExecutionAsync(Query);
+						await Command.StartQueryExecutionAsync(Query, Language);
 						ErrorMessage = null;
 					}
 					catch (Exception ex)

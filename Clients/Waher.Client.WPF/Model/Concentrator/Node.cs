@@ -530,7 +530,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 						Tag = Command
 					});
 
-					Item.Click += NodeCommandClick;
+					Item.Click += Node2.NodeCommandClick;
 				}
 			}
 		}

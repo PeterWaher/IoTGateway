@@ -106,5 +106,11 @@ namespace Waher.Things
 		/// </summary>
 		/// <param name="Query">Query data receptor.</param>
 		Task StartQueryExecutionAsync(Query Query);
+
+		/// <summary>
+		/// Creates a copy of the command object.
+		/// </summary>
+		/// <returns>Copy of command object.</returns>
+		ICommand Copy();
 	}
 }

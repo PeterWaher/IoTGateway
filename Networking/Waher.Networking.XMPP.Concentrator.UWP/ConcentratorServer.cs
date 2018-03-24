@@ -2855,7 +2855,7 @@ namespace Waher.Networking.XMPP.Concentrator
 								return;
 							}
 
-							Command = (ICommand)Activator.CreateInstance(Command.GetType());
+							Command = Command.Copy();
 
 							Parameters.SetEditableFormResult Result = await Parameters.SetEditableForm(e, Command, Form, false);
 
@@ -2947,7 +2947,7 @@ namespace Waher.Networking.XMPP.Concentrator
 							return;
 						}
 
-						Command = (ICommand)Activator.CreateInstance(Command.GetType());
+						Command = Command.Copy();
 
 						Parameters.SetEditableFormResult Result = await Parameters.SetEditableForm(e, Command, Form, false);
 
@@ -3807,7 +3807,7 @@ namespace Waher.Networking.XMPP.Concentrator
 						return;
 					}
 
-					Command = (ICommand)Activator.CreateInstance(Command.GetType());
+					Command = Command.Copy();
 
 					Parameters.SetEditableFormResult Result = await Parameters.SetEditableForm(e, Command, Form, false);
 
@@ -3967,7 +3967,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					return;
 				}
 
-				Command = (ICommand)Activator.CreateInstance(Command.GetType());
+				Command = Command.Copy();
 
 				Parameters.SetEditableFormResult Result = await Parameters.SetEditableForm(e, Command, Form, false);
 

@@ -340,6 +340,35 @@ namespace Waher.Things.Metering
 			}
 		}
 
+		/// <summary>
+		/// Gets a Node ID, based on <paramref name="NodeId"/> that is not already available in the database.
+		/// </summary>
+		/// <param name="NodeId">Desired Node ID</param>
+		/// <returns>A Node ID that does not exist in the database.</returns>
+		public static async Task<string> GetUniqueNodeId(string NodeId)
+		{
+			string Suffix = string.Empty;
+			int i = 1;
+			bool Found;
+
+			while (true)
+			{
+				Found = false;
+
+				foreach (MeteringNode Node in await Database.Find<MeteringNode>(0, 1, new FilterFieldEqualTo("NodeId", NodeId + Suffix)))
+				{
+					Found = true;
+					break;
+				}
+
+				if (!Found)
+					return NodeId + Suffix;
+
+				i++;
+				Suffix = " (" + i.ToString() + ")";
+			}
+		}
+
 		#region INode
 
 		/// <summary>
@@ -888,7 +917,7 @@ namespace Waher.Things.Metering
 		/// <returns>Meta data.</returns>
 		public virtual Task<KeyValuePair<string, object>[]> GetMetaData()
 		{
-			return Task.FromResult<KeyValuePair<string,object>[]>(new KeyValuePair<string, object>[0]);
+			return Task.FromResult<KeyValuePair<string, object>[]>(new KeyValuePair<string, object>[0]);
 		}
 
 		/// <summary>

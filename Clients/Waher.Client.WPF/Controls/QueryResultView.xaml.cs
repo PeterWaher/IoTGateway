@@ -40,7 +40,7 @@ namespace Waher.Client.WPF.Controls
 		private NodeQuery query;
 		private TextBlock headerLabel;
 		private StackPanel currentPanel;
-		private Dictionary<string, (DataTable, Column[])> tables = new Dictionary<string, (DataTable, Column[])>();
+		private Dictionary<string, (DataTable, Column[], ListView)> tables = new Dictionary<string, (DataTable, Column[], ListView)>();
 
 		public QueryResultView(Node Node, NodeQuery Query, TextBlock HeaderLabel)
 		{
@@ -109,7 +109,11 @@ namespace Waher.Client.WPF.Controls
 
 		private void Query_SectionAdded(object Sender, NodeQuerySectionEventArgs e)
 		{
-			StackPanel Section = new StackPanel();
+			StackPanel Section = new StackPanel()
+			{
+				Margin = new Thickness(16, 8, 16, 8)
+			};
+
 			this.currentPanel.Children.Add(Section);
 			this.currentPanel = Section;
 
@@ -117,7 +121,8 @@ namespace Waher.Client.WPF.Controls
 			{
 				Text = e.Section.Header,
 				FontSize = 20,
-				FontWeight = FontWeights.Bold
+				FontWeight = FontWeights.Bold,
+				Margin = new Thickness(0, 0, 0, 12)
 			});
 		}
 
@@ -165,7 +170,8 @@ namespace Waher.Client.WPF.Controls
 					CellTemplate.Resources.Add(new TextBlock()
 					{
 						Text = "{Binding " + Column.ColumnId + "}",
-						TextAlignment = Alignment
+						TextAlignment = Alignment,
+						Margin = new Thickness(5, 2, 5, 2)
 					}, null);
 
 					GridView.Columns.Add(new GridViewColumn()
@@ -175,13 +181,13 @@ namespace Waher.Client.WPF.Controls
 					});
 				}
 
-				this.tables[e.Table.TableDefinition.TableId] = (Table, e.Table.TableDefinition.Columns);
-
 				ListView TableView = new ListView()
 				{
 					ItemsSource = Table.DefaultView,
 					View = GridView
 				};
+
+				this.tables[e.Table.TableDefinition.TableId] = (Table, e.Table.TableDefinition.Columns, TableView);
 
 				this.currentPanel.Children.Add(TableView);
 			}
@@ -189,10 +195,11 @@ namespace Waher.Client.WPF.Controls
 
 		private void Query_TableUpdated(object Sender, NodeQueryTableUpdatedEventArgs e)
 		{
-			if (this.tables.TryGetValue(e.Table.TableDefinition.TableId, out (DataTable, Column[]) P))
+			if (this.tables.TryGetValue(e.Table.TableDefinition.TableId, out (DataTable, Column[], ListView) P))
 			{
 				DataTable DataTable = P.Item1;
 				Column[] Columns = P.Item2;
+				ListView TableView = P.Item3;
 				Column Column;
 				object Obj;
 				int i, c = Columns.Length;
@@ -231,6 +238,9 @@ namespace Waher.Client.WPF.Controls
 							Row[Column.ColumnId] = Obj.ToString();
 					}
 				}
+
+				DataTable.AcceptChanges();
+				TableView.UpdateLayout();
 			}
 		}
 
@@ -241,7 +251,7 @@ namespace Waher.Client.WPF.Controls
 
 		private void Query_ObjectAdded(object Sender, NodeQueryObjectEventArgs e)
 		{
-			object Obj = e.Object;
+			object Obj = e.Object.Object;
 			if (Obj == null)
 				return;
 
@@ -249,7 +259,8 @@ namespace Waher.Client.WPF.Controls
 
 			this.currentPanel.Children.Add(new TextBlock()
 			{
-				Text = Obj.ToString()
+				Text = Obj.ToString(),
+				Margin = new Thickness(0, 0, 0, 6)
 			});
 		}
 

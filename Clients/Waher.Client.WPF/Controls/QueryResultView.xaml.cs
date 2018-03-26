@@ -41,6 +41,7 @@ namespace Waher.Client.WPF.Controls
 		private TextBlock headerLabel;
 		private StackPanel currentPanel;
 		private Dictionary<string, (DataTable, Column[], ListView)> tables = new Dictionary<string, (DataTable, Column[], ListView)>();
+		private LinkedList<ThreadStart> guiQueue = new LinkedList<ThreadStart>();
 
 		public QueryResultView(Node Node, NodeQuery Query, TextBlock HeaderLabel)
 		{
@@ -66,9 +67,52 @@ namespace Waher.Client.WPF.Controls
 			this.currentPanel = this.ReportPanel;
 		}
 
+		private void UpdateGui(ThreadStart P)
+		{
+			bool Call;
+
+			lock (this.guiQueue)
+			{
+				Call = this.guiQueue.First == null;
+				this.guiQueue.AddLast(P);
+			}
+
+			if (Call)
+				this.Dispatcher.BeginInvoke(new ThreadStart(this.UpdateGuiSta));
+		}
+
+		private void UpdateGuiSta()
+		{
+			ThreadStart P;
+			bool More;
+
+			do
+			{
+				lock (this.guiQueue)
+				{
+					if (this.guiQueue.First == null)
+						return;
+
+					P = this.guiQueue.First.Value;
+					this.guiQueue.RemoveFirst();
+					More = this.guiQueue.First != null;
+				}
+
+				try
+				{
+					P();
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			}
+			while (More);
+		}
+
 		private void StatusMessage(string Message)
 		{
-			this.Dispatcher.BeginInvoke(new ThreadStart(() =>
+			this.UpdateGui(new ThreadStart(() =>
 			{
 				this.Status.Content = Message;
 			}));
@@ -101,7 +145,7 @@ namespace Waher.Client.WPF.Controls
 
 		private void Query_NewTitle(object Sender, NodeQueryEventArgs e)
 		{
-			this.Dispatcher.BeginInvoke(new ThreadStart(() =>
+			this.UpdateGui(new ThreadStart(() =>
 			{
 				this.headerLabel.Text = this.query.Title;
 			}));
@@ -109,159 +153,150 @@ namespace Waher.Client.WPF.Controls
 
 		private void Query_SectionAdded(object Sender, NodeQuerySectionEventArgs e)
 		{
-			StackPanel Section = new StackPanel()
+			this.UpdateGui(new ThreadStart(() =>
 			{
-				Margin = new Thickness(16, 8, 16, 8)
-			};
+				StackPanel Section = new StackPanel()
+				{
+					Margin = new Thickness(16, 8, 16, 8)
+				};
 
-			this.currentPanel.Children.Add(Section);
-			this.currentPanel = Section;
+				this.currentPanel.Children.Add(Section);
+				this.currentPanel = Section;
 
-			Section.Children.Add(new TextBlock()
-			{
-				Text = e.Section.Header,
-				FontSize = 20,
-				FontWeight = FontWeights.Bold,
-				Margin = new Thickness(0, 0, 0, 12)
-			});
+				Section.Children.Add(new TextBlock()
+				{
+					Text = e.Section.Header,
+					FontSize = 20,
+					FontWeight = FontWeights.Bold,
+					Margin = new Thickness(0, 0, 0, 12)
+				});
+			}));
 		}
 
 		private void Query_SectionCompleted(object Sender, NodeQuerySectionEventArgs e)
 		{
-			this.currentPanel = this.currentPanel.Parent as StackPanel;
-			if (this.currentPanel == null)
-				this.currentPanel = this.ReportPanel;
+			this.UpdateGui(new ThreadStart(() =>
+			{
+				this.currentPanel = this.currentPanel.Parent as StackPanel;
+				if (this.currentPanel == null)
+					this.currentPanel = this.ReportPanel;
+			}));
 		}
 
 		private void Query_TableAdded(object Sender, NodeQueryTableEventArgs e)
 		{
-			if (!this.tables.ContainsKey(e.Table.TableDefinition.TableId))
+			this.UpdateGui(new ThreadStart(() =>
 			{
-				DataTable Table = new DataTable(e.Table.TableDefinition.Name);
-				GridView GridView = new GridView();
-
-				foreach (Column Column in e.Table.TableDefinition.Columns)
+				if (!this.tables.ContainsKey(e.Table.TableDefinition.TableId))
 				{
-					Table.Columns.Add(new DataColumn()
+					DataTable Table = new DataTable(e.Table.TableDefinition.Name);
+					GridView GridView = new GridView();
+
+					foreach (Column Column in e.Table.TableDefinition.Columns)
 					{
-						Caption = Column.Header,
-						ColumnName = Column.ColumnId
-					});
+						Table.Columns.Add(Column.ColumnId);
 
-					TextAlignment Alignment;
+						// TODO: Alignment 
 
-					switch (Column.Alignment)
-					{
-						default:
-						case ColumnAlignment.Left:
-							Alignment = TextAlignment.Left;
-							break;
-
-						case ColumnAlignment.Right:
-							Alignment = TextAlignment.Right;
-							break;
-
-						case ColumnAlignment.Center:
-							Alignment = TextAlignment.Center;
-							break;
+						GridView.Columns.Add(new GridViewColumn()
+						{
+							Header = Column.Header,
+							DisplayMemberBinding = new Binding(Column.ColumnId)
+						});
 					}
 
-					DataTemplate CellTemplate = new DataTemplate();
-					CellTemplate.Resources.Add(new TextBlock()
+					ListView TableView = new ListView()
 					{
-						Text = "{Binding " + Column.ColumnId + "}",
-						TextAlignment = Alignment,
-						Margin = new Thickness(5, 2, 5, 2)
-					}, null);
+						ItemsSource = Table.DefaultView,
+						View = GridView
+					};
 
-					GridView.Columns.Add(new GridViewColumn()
-					{
-						Header = Column.Header,
-						CellTemplate = CellTemplate
-					});
+					this.tables[e.Table.TableDefinition.TableId] = (Table, e.Table.TableDefinition.Columns, TableView);
+
+					this.currentPanel.Children.Add(TableView);
 				}
-
-				ListView TableView = new ListView()
-				{
-					ItemsSource = Table.DefaultView,
-					View = GridView
-				};
-
-				this.tables[e.Table.TableDefinition.TableId] = (Table, e.Table.TableDefinition.Columns, TableView);
-
-				this.currentPanel.Children.Add(TableView);
-			}
+			}));
 		}
 
 		private void Query_TableUpdated(object Sender, NodeQueryTableUpdatedEventArgs e)
 		{
-			if (this.tables.TryGetValue(e.Table.TableDefinition.TableId, out (DataTable, Column[], ListView) P))
+			this.UpdateGui(new ThreadStart(() =>
 			{
-				DataTable DataTable = P.Item1;
-				Column[] Columns = P.Item2;
-				ListView TableView = P.Item3;
-				Column Column;
-				object Obj;
-				int i, c = Columns.Length;
-				int d;
-
-				foreach (Record Record in e.NewRecords)
+				if (this.tables.TryGetValue(e.Table.TableDefinition.TableId, out (DataTable, Column[], ListView) P))
 				{
-					DataRow Row = DataTable.NewRow();
+					DataTable Table = P.Item1;
+					Column[] Columns = P.Item2;
+					ListView TableView = P.Item3;
+					Column Column;
+					object Obj;
+					int i, c = Columns.Length;
+					int d;
 
-					d = Math.Min(c, Record.Elements.Length);
-					for (i = 0; i < d; i++)
+					foreach (Record Record in e.NewRecords)
 					{
-						Obj = Record.Elements[i];
-						if (Obj == null)
-							continue;
+						DataRow Row = Table.NewRow();
 
-						Column = Columns[i];
+						d = Math.Min(c, Record.Elements.Length);
+						for (i = 0; i < d; i++)
+						{
+							Obj = Record.Elements[i];
+							if (Obj == null)
+								continue;
 
-						if (Obj is bool b)
-							Row[Column.ColumnId] = b ? "✓" : string.Empty;
-						/*else if (Obj is SKColor)	TODO
-						{
-						}*/
-						else if (Obj is double dbl)
-						{
-							if (Column.NrDecimals.HasValue)
-								Row[Column.ColumnId] = dbl.ToString("F" + Column.NrDecimals.Value.ToString());
+							Column = Columns[i];
+
+							if (Obj is bool b)
+								Row[Column.ColumnId] = b ? "✓" : string.Empty;
+							/*else if (Obj is SKColor)	TODO
+							{
+							}*/
+							else if (Obj is double dbl)
+							{
+								if (Column.NrDecimals.HasValue)
+									Row[Column.ColumnId] = dbl.ToString("F" + Column.NrDecimals.Value.ToString());
+								else
+									Row[Column.ColumnId] = dbl.ToString();
+
+							}
+							/*else if (Obj is Image)	TODO
+							{
+							}*/
 							else
-								Row[Column.ColumnId] = dbl.ToString();
-
+								Row[Column.ColumnId] = Obj.ToString();
 						}
-						/*else if (Obj is Image)	TODO
-						{
-						}*/
-						else
-							Row[Column.ColumnId] = Obj.ToString();
-					}
-				}
 
-				DataTable.AcceptChanges();
-				TableView.UpdateLayout();
-			}
+						Table.Rows.Add(Row);
+					}
+
+					//Table.AcceptChanges();
+				}
+			}));
 		}
 
 		private void Query_TableCompleted(object Sender, NodeQueryTableEventArgs e)
 		{
-			this.tables.Remove(e.Table.TableDefinition.TableId);
+			this.UpdateGui(new ThreadStart(() =>
+			{
+				this.tables.Remove(e.Table.TableDefinition.TableId);
+			}));
 		}
 
 		private void Query_ObjectAdded(object Sender, NodeQueryObjectEventArgs e)
 		{
-			object Obj = e.Object.Object;
-			if (Obj == null)
-				return;
-
-			// TODO: Images
-
-			this.currentPanel.Children.Add(new TextBlock()
+			this.UpdateGui(new ThreadStart(() =>
 			{
-				Text = Obj.ToString(),
-				Margin = new Thickness(0, 0, 0, 6)
-			});
+				object Obj = e.Object.Object;
+				if (Obj == null)
+					return;
+
+				// TODO: Images
+
+				this.currentPanel.Children.Add(new TextBlock()
+				{
+					Text = Obj.ToString(),
+					Margin = new Thickness(0, 0, 0, 6)
+				});
+			}));
 		}
 
 		public void Dispose()

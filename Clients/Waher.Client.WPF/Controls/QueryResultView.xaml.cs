@@ -1,5 +1,5 @@
 ﻿using System;
-using System.IO;
+using System.Data;
 using System.Threading;
 using System.Collections.Generic;
 using System.Reflection;
@@ -39,6 +39,8 @@ namespace Waher.Client.WPF.Controls
 		private Node node;
 		private NodeQuery query;
 		private TextBlock headerLabel;
+		private StackPanel currentPanel;
+		private Dictionary<string, (DataTable, Column[])> tables = new Dictionary<string, (DataTable, Column[])>();
 
 		public QueryResultView(Node Node, NodeQuery Query, TextBlock HeaderLabel)
 		{
@@ -57,8 +59,11 @@ namespace Waher.Client.WPF.Controls
 			this.query.TableAdded += Query_TableAdded;
 			this.query.TableCompleted += Query_TableCompleted;
 			this.query.TableUpdated += Query_TableUpdated;
+			this.query.ObjectAdded += Query_ObjectAdded;
 
 			InitializeComponent();
+
+			this.currentPanel = this.ReportPanel;
 		}
 
 		private void StatusMessage(string Message)
@@ -102,29 +107,150 @@ namespace Waher.Client.WPF.Controls
 			}));
 		}
 
-		private void Query_TableAdded(object Sender, NodeQueryTableEventArgs e)
-		{
-			// TODO
-		}
-
-		private void Query_TableUpdated(object Sender, NodeQueryTableEventArgs e)
-		{
-			// TODO
-		}
-
-		private void Query_TableCompleted(object Sender, NodeQueryTableEventArgs e)
-		{
-			// TODO
-		}
-
 		private void Query_SectionAdded(object Sender, NodeQuerySectionEventArgs e)
 		{
-			// TODO
+			StackPanel Section = new StackPanel();
+			this.currentPanel.Children.Add(Section);
+			this.currentPanel = Section;
+
+			Section.Children.Add(new TextBlock()
+			{
+				Text = e.Section.Header,
+				FontSize = 20,
+				FontWeight = FontWeights.Bold
+			});
 		}
 
 		private void Query_SectionCompleted(object Sender, NodeQuerySectionEventArgs e)
 		{
-			// TODO
+			this.currentPanel = this.currentPanel.Parent as StackPanel;
+			if (this.currentPanel == null)
+				this.currentPanel = this.ReportPanel;
+		}
+
+		private void Query_TableAdded(object Sender, NodeQueryTableEventArgs e)
+		{
+			if (!this.tables.ContainsKey(e.Table.TableDefinition.TableId))
+			{
+				DataTable Table = new DataTable(e.Table.TableDefinition.Name);
+				GridView GridView = new GridView();
+
+				foreach (Column Column in e.Table.TableDefinition.Columns)
+				{
+					Table.Columns.Add(new DataColumn()
+					{
+						Caption = Column.Header,
+						ColumnName = Column.ColumnId
+					});
+
+					TextAlignment Alignment;
+
+					switch (Column.Alignment)
+					{
+						default:
+						case ColumnAlignment.Left:
+							Alignment = TextAlignment.Left;
+							break;
+
+						case ColumnAlignment.Right:
+							Alignment = TextAlignment.Right;
+							break;
+
+						case ColumnAlignment.Center:
+							Alignment = TextAlignment.Center;
+							break;
+					}
+
+					DataTemplate CellTemplate = new DataTemplate();
+					CellTemplate.Resources.Add(new TextBlock()
+					{
+						Text = "{Binding " + Column.ColumnId + "}",
+						TextAlignment = Alignment
+					}, null);
+
+					GridView.Columns.Add(new GridViewColumn()
+					{
+						Header = Column.Header,
+						CellTemplate = CellTemplate
+					});
+				}
+
+				this.tables[e.Table.TableDefinition.TableId] = (Table, e.Table.TableDefinition.Columns);
+
+				ListView TableView = new ListView()
+				{
+					ItemsSource = Table.DefaultView,
+					View = GridView
+				};
+
+				this.currentPanel.Children.Add(TableView);
+			}
+		}
+
+		private void Query_TableUpdated(object Sender, NodeQueryTableUpdatedEventArgs e)
+		{
+			if (this.tables.TryGetValue(e.Table.TableDefinition.TableId, out (DataTable, Column[]) P))
+			{
+				DataTable DataTable = P.Item1;
+				Column[] Columns = P.Item2;
+				Column Column;
+				object Obj;
+				int i, c = Columns.Length;
+				int d;
+
+				foreach (Record Record in e.NewRecords)
+				{
+					DataRow Row = DataTable.NewRow();
+
+					d = Math.Min(c, Record.Elements.Length);
+					for (i = 0; i < d; i++)
+					{
+						Obj = Record.Elements[i];
+						if (Obj == null)
+							continue;
+
+						Column = Columns[i];
+
+						if (Obj is bool b)
+							Row[Column.ColumnId] = b ? "✓" : string.Empty;
+						/*else if (Obj is SKColor)	TODO
+						{
+						}*/
+						else if (Obj is double dbl)
+						{
+							if (Column.NrDecimals.HasValue)
+								Row[Column.ColumnId] = dbl.ToString("F" + Column.NrDecimals.Value.ToString());
+							else
+								Row[Column.ColumnId] = dbl.ToString();
+
+						}
+						/*else if (Obj is Image)	TODO
+						{
+						}*/
+						else
+							Row[Column.ColumnId] = Obj.ToString();
+					}
+				}
+			}
+		}
+
+		private void Query_TableCompleted(object Sender, NodeQueryTableEventArgs e)
+		{
+			this.tables.Remove(e.Table.TableDefinition.TableId);
+		}
+
+		private void Query_ObjectAdded(object Sender, NodeQueryObjectEventArgs e)
+		{
+			object Obj = e.Object;
+			if (Obj == null)
+				return;
+
+			// TODO: Images
+
+			this.currentPanel.Children.Add(new TextBlock()
+			{
+				Text = Obj.ToString()
+			});
 		}
 
 		public void Dispose()

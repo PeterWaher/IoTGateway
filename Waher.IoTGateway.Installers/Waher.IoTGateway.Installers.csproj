@@ -52,6 +52,7 @@
     <Compile Include=".bak\Waher.Networking.XMPP\ResultSetManagement\RestrictedQuery.cs" />
     <Compile Include=".bak\Waher.Networking.XMPP\ResultSetManagement\ResultPage.cs" />
     <Compile Include=".bak\Waher.Networking.XMPP\XmppCredentials.cs" />
+    <Compile Include=".bak\Waher.Networking\Sniffers\SnifferEnumerator.cs" />
     <Compile Include="Registration.cs" />
     <Compile Include="CustomAction.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

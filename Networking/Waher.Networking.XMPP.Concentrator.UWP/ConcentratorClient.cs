@@ -2226,7 +2226,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				{
 					if (CommandCallback != null)
 						CommandCallback(this, e);
-					else 
+					else
 						QueryCallback?.Invoke(this, new NodeQueryResponseEventArgs(Query, e));
 				}
 				catch (Exception ex)
@@ -2307,13 +2307,47 @@ namespace Waher.Networking.XMPP.Concentrator
 			string SourceId = XML.Attribute(e.Content, "src");
 			string Partition = XML.Attribute(e.Content, "pt");
 			string QueryId = XML.Attribute(e.Content, "queryId");
+			int SequenceNr = XML.Attribute(e.Content, "seqNr", 0);
 			NodeQuery Query;
-			string s, s2;
+
 			lock (this.queries)
 			{
 				if (!this.queries.TryGetValue(QueryId, out Query))
 					return;
 			}
+
+			if (Query.NodeID != NodeId || Query.SourceID != SourceId || Query.Partition != Partition)
+				return;
+
+			int ExpectedSeqNr = Query.SequenceNr + 1;
+			if (SequenceNr < ExpectedSeqNr)
+				return;
+
+			if (SequenceNr == ExpectedSeqNr)
+			{
+				Query.NextSequenceNr();
+				this.ProcessQueryProgress(Query, e);
+
+				if (Query.HasQueued)
+				{
+					ExpectedSeqNr++;
+
+					e = Query.PopQueued(ExpectedSeqNr);
+					while (e!=null)
+					{
+						this.ProcessQueryProgress(Query, e);
+						ExpectedSeqNr++;
+						e = Query.PopQueued(ExpectedSeqNr);
+					}
+				}
+			}
+			else
+				Query.Queue(SequenceNr, e);
+		}
+
+		private void ProcessQueryProgress(NodeQuery Query, MessageEventArgs e)
+		{
+			string s, s2;
 
 			foreach (XmlNode N in e.Content.ChildNodes)
 			{

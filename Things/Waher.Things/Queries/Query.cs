@@ -76,6 +76,7 @@ namespace Waher.Things.Queries
 		private object state;
 		private bool isAborted = false;
 		private bool isDone = false;
+		private int seqNr = 0;
 
 		/// <summary>
 		/// Class handling the reception of data from a query.
@@ -151,6 +152,23 @@ namespace Waher.Things.Queries
 		}
 
 		/// <summary>
+		/// Curernt sequence number counter.
+		/// </summary>
+		public int SequenceNumber
+		{
+			get { return this.seqNr; }
+		}
+
+		/// <summary>
+		/// Gets the next sequence number.
+		/// </summary>
+		/// <returns>Next sequence number.</returns>
+		public int NextSequenceNumber()
+		{
+			return ++this.seqNr;
+		}
+
+		/// <summary>
 		/// Aborts the query.
 		/// </summary>
 		public virtual void Abort()
@@ -207,8 +225,8 @@ namespace Waher.Things.Queries
 		/// </summary>
 		public void Done()
 		{
-			this.isDone = true;
 			this.Raise(this.OnDone, new QueryEventArgs(this));
+			this.isDone = true;
 		}
 
 		internal void Done(QueryEventArgs e)

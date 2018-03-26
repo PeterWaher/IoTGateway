@@ -23,11 +23,13 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 		private string userToken;
 		private ConcentratorClient client;
 		private bool isDone = false;
+		private int seqNr = 0;
 		private string title = string.Empty;
 		private List<QueryItem> result = new List<QueryItem>();
 		private QueryItem[] resultFixed = null;
 		private Dictionary<string, QueryTable> tables = new Dictionary<string, QueryTable>();
 		private QuerySection currentSection = null;
+		private LinkedList<KeyValuePair<int, MessageEventArgs>> queuedMessages = null;
 
 		/// <summary>
 		/// Client-side Node Query object. It collects the results of the query.
@@ -218,6 +220,11 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 				}
 			}
 
+			lock (this.tables)
+			{
+				this.tables[Table.TableId] = Table2;
+			}
+
 			this.Invoke(this.TableAdded, Table2, e);
 		}
 
@@ -293,7 +300,7 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 		internal void NewObject(object Object, MessageEventArgs e)
 		{
 			QueryObject Obj;
-			
+
 			lock (this.result)
 			{
 				if (this.currentSection != null)
@@ -448,5 +455,67 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 				return Result;
 			}
 		}
+
+		internal void Queue(int SequenceNr, MessageEventArgs e)
+		{
+			if (this.queuedMessages == null)
+			{
+				this.queuedMessages = new LinkedList<KeyValuePair<int, MessageEventArgs>>();
+				this.queuedMessages.AddLast(new KeyValuePair<int, MessageEventArgs>(SequenceNr, e));
+			}
+			else
+			{
+				LinkedListNode<KeyValuePair<int, MessageEventArgs>> Loop = this.queuedMessages.First;
+
+				while (Loop != null)
+				{
+					if (SequenceNr < Loop.Value.Key)
+					{
+						this.queuedMessages.AddBefore(Loop, new KeyValuePair<int, MessageEventArgs>(SequenceNr, e));
+						Loop = null;
+					}
+					else if (Loop.Next == null)
+					{
+						this.queuedMessages.AddAfter(Loop, new KeyValuePair<int, MessageEventArgs>(SequenceNr, e));
+						Loop = null;
+					}
+					else
+						Loop = Loop.Next;
+				}
+			}
+		}
+
+		internal bool HasQueued
+		{
+			get { return this.queuedMessages != null; }
+		}
+
+		internal int SequenceNr
+		{
+			get { return this.seqNr; }
+		}
+
+		internal void NextSequenceNr()
+		{
+			this.seqNr++;
+		}
+
+		internal MessageEventArgs PopQueued(int ExpectedSequenceNr)
+		{
+			KeyValuePair<int, MessageEventArgs> P;
+
+			if (this.queuedMessages != null && this.queuedMessages.First != null && (P = this.queuedMessages.First.Value).Key == ExpectedSequenceNr)
+			{
+				this.queuedMessages.RemoveFirst();
+
+				if (this.queuedMessages.First == null)
+					this.queuedMessages = null;
+
+				return P.Value;
+			}
+			else
+				return null;
+		}
+
 	}
 }

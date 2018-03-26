@@ -3102,7 +3102,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			XmppClient Client = (XmppClient)P[0];
 			IqEventArgs e0 = (IqEventArgs)P[1];
 			StringBuilder Xml = new StringBuilder();
-
+			
 			this.StartQueryProgress(Xml, e);
 
 			Xml.Append("<title name='");
@@ -3138,6 +3138,8 @@ namespace Waher.Networking.XMPP.Concentrator
 			Xml.Append(XML.Encode(Node.NodeId));
 			Xml.Append("' queryId='");
 			Xml.Append(XML.Encode(e.Query.QueryID));
+			Xml.Append("' seqNr='");
+			Xml.Append(e.Query.NextSequenceNumber().ToString());
 			Xml.Append("'>");
 		}
 
@@ -3334,28 +3336,46 @@ namespace Waher.Networking.XMPP.Concentrator
 						Xml.Append(CommonTypes.Encode((double)Element));
 						Xml.Append("</double>");
 					}
+					else if (Element is float)
+					{
+						Xml.Append("<double>");
+						Xml.Append(CommonTypes.Encode((float)Element));
+						Xml.Append("</double>");
+					}
+					else if (Element is decimal)
+					{
+						Xml.Append("<double>");
+						Xml.Append(CommonTypes.Encode((decimal)Element));
+						Xml.Append("</double>");
+					}
 					else if (Element is Duration)
 					{
 						Xml.Append("<duration>");
 						Xml.Append(Element.ToString());
 						Xml.Append("</duration>");
 					}
-					else if (Element is int)
+					else if (Element is int || Element is byte || Element is sbyte || Element is short || Element is ushort)
 					{
 						Xml.Append("<int>");
 						Xml.Append(Element.ToString());
 						Xml.Append("</int>");
 					}
-					else if (Element is long)
+					else if (Element is long || Element is uint || (Element is ulong ul && ul <= long.MaxValue))
 					{
 						Xml.Append("<long>");
 						Xml.Append(Element.ToString());
 						Xml.Append("</long>");
 					}
-					else if (Element is string)
+					else if (Element is ulong)
+					{
+						Xml.Append("<double>");
+						Xml.Append(Element.ToString());
+						Xml.Append("</double>");
+					}
+					else if (Element is string || Element is char)
 					{
 						Xml.Append("<string>");
-						Xml.Append(Element.ToString());
+						Xml.Append(XML.Encode(Element.ToString()));
 						Xml.Append("</string>");
 					}
 					else if (Element is TimeSpan)

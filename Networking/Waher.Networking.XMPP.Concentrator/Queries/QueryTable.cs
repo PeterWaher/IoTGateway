@@ -11,7 +11,7 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 	/// </summary>
 	public class QueryTable : QueryItem
 	{
-		private Table table;
+		private Table tableDefinition;
 		private List<Record> records = new List<Record>();
 		private Record[] recordsFixed = null;
 		private bool isDone = false;
@@ -24,13 +24,13 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 		public QueryTable(QueryItem Parent, Table Table)
 			: base(Parent)
 		{
-			this.table = Table;
+			this.tableDefinition = Table;
 		}
 
 		/// <summary>
 		/// Table definitions.
 		/// </summary>
-		public Table Table => this.table;
+		public Table TableDefinition => this.tableDefinition;
 
 		/// <summary>
 		/// Records

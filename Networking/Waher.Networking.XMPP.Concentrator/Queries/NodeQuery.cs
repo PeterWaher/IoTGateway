@@ -250,13 +250,25 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 
 			Table.Add(Records);
 
-			this.Invoke(this.TableUpdated, Table, e);
+			this.Invoke(this.TableUpdated, Table, Records, e);
+		}
+
+		private void Invoke(NodeQueryTableUpdatedEventHandler h, QueryTable Table, Record[] NewRecords, MessageEventArgs e)
+		{
+			try
+			{
+				h?.Invoke(this, new NodeQueryTableUpdatedEventArgs(Table, this, NewRecords, e));
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+			}
 		}
 
 		/// <summary>
 		/// Event raised when records has been added to a table.
 		/// </summary>
-		public event NodeQueryTableEventHandler TableUpdated = null;
+		public event NodeQueryTableUpdatedEventHandler TableUpdated = null;
 
 		internal void TableDone(string TableId, MessageEventArgs e)
 		{
@@ -305,7 +317,7 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 		/// <summary>
 		/// Raised when an object has been added to the report.
 		/// </summary>
-		public NodeQueryObjectEventHandler ObjectAdded = null;
+		public event NodeQueryObjectEventHandler ObjectAdded = null;
 
 		private void Invoke(NodeQueryObjectEventHandler Callback, QueryObject Object, MessageEventArgs e)
 		{

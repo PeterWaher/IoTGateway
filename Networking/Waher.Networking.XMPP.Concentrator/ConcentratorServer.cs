@@ -3267,7 +3267,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					Xml.Append(Column.NrDecimals.Value.ToString());
 				}
 
-				Xml.Append("/>");
+				Xml.Append("'/>");
 			}
 
 			Xml.Append("</newTable>");

@@ -1466,8 +1466,8 @@ namespace Waher.Networking.XMPP.Concentrator
 		private void CancelEditNode(object Sender, DataForm Form)
 		{
 			object[] P = (object[])Form.State;
-			NodeInformationEventHandler NodeCallback = (NodeInformationEventHandler)P[10];
-			object State = P[11];
+			NodeInformationEventHandler NodeCallback = (NodeInformationEventHandler)P[9];
+			object State = P[10];
 
 			if (NodeCallback != null)
 			{

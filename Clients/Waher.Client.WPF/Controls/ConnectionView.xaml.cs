@@ -404,11 +404,7 @@ namespace Waher.Client.WPF.Controls
 
 		private void ConnectionListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
-			this.selectedNode = this.ConnectionListView.SelectedItem as TreeNode;
-
-			MainWindow MainWindow = MainWindow.FindWindow(this);
-			if (MainWindow != null)
-				MainWindow.SelectionChanged();
+			this.ConnectionListView_GotFocus(sender, e);
 		}
 
 		public TreeNode SelectedNode
@@ -436,5 +432,22 @@ namespace Waher.Client.WPF.Controls
 				this.selectedNode.AddContexMenuItems(ref Group, Menu);
 		}
 
+		private void ConnectionListView_GotFocus(object sender, RoutedEventArgs e)
+		{
+			this.selectedNode = this.ConnectionListView.SelectedItem as TreeNode;
+
+			MainWindow MainWindow = MainWindow.FindWindow(this);
+			if (MainWindow != null)
+				MainWindow.SelectionChanged();
+		}
+
+		private void ConnectionTree_GotFocus(object sender, RoutedEventArgs e)
+		{
+			this.selectedNode = this.ConnectionTree.SelectedItem as TreeNode;
+
+			MainWindow MainWindow = MainWindow.FindWindow(this);
+			if (MainWindow != null)
+				MainWindow.SelectionChanged();
+		}
 	}
 }

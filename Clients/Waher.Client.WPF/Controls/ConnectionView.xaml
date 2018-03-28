@@ -19,7 +19,7 @@
                 <ColumnDefinition Width="3"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <TreeView Name="ConnectionTree" Grid.Column="0" SelectedItemChanged="ConnectionTree_SelectedItemChanged" DataContext="{Binding}" ContextMenuOpening="TreeContextMenu_ContextMenuOpening">
+            <TreeView Name="ConnectionTree" Grid.Column="0" SelectedItemChanged="ConnectionTree_SelectedItemChanged" GotFocus="ConnectionTree_GotFocus" DataContext="{Binding}" ContextMenuOpening="TreeContextMenu_ContextMenuOpening">
                 <TreeView.ItemContainerStyle>
                     <Style TargetType="{x:Type TreeViewItem}">
                         <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
@@ -47,7 +47,7 @@
                 </TreeView.ContextMenu>
             </TreeView>
             <GridSplitter Name="Separator" HorizontalAlignment="Stretch" Grid.Column="1"/>
-            <ListView Name="ConnectionListView" Grid.Column="2" ScrollViewer.VerticalScrollBarVisibility="Visible" 
+            <ListView Name="ConnectionListView" Grid.Column="2" ScrollViewer.VerticalScrollBarVisibility="Visible" GotFocus="ConnectionListView_GotFocus" 
                       SelectionChanged="ConnectionListView_SelectionChanged" SelectionMode="Single" ContextMenuOpening="ListViewContextMenu_ContextMenuOpening">
                 <ListView.Resources>
                     <Style TargetType="{x:Type GridViewColumnHeader}">

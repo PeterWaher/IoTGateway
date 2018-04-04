@@ -27,7 +27,7 @@
       <dependency id="Waher.Runtime.Cache" version="1.0.1"/>
       <dependency id="Waher.Script" version="1.0.11"/>
       <dependency id="Waher.Script.Graphs" version="1.0.6"/>
-      <dependency id="Waher.Things" version="1.0.17"/>
+      <dependency id="Waher.Things" version="1.0.18"/>
     </dependencies>
   </metadata>
   <files>

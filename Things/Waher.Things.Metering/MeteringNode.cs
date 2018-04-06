@@ -329,7 +329,7 @@ namespace Waher.Things.Metering
 
 		internal async Task NodeStateChanged()
 		{
-			NodeStatusChanged Event = new NodeStatusChanged()
+			await MeteringTopology.NewEvent(new NodeStatusChanged()
 			{
 				Messages = await this.GetMessageArrayAsync(RequestOrigin.Empty),
 				State = this.state,
@@ -337,9 +337,7 @@ namespace Waher.Things.Metering
 				Partition = this.Partition,
 				SourceId = this.SourceId,
 				Timestamp = DateTime.Now
-			};
-
-			await Database.Insert(Event);
+			});
 		}
 
 		/// <summary>
@@ -809,15 +807,13 @@ namespace Waher.Things.Metering
 				this.children.Insert(i - 1, Child);
 			}
 
-			NodeMovedUp Event = new NodeMovedUp()
+			await MeteringTopology.NewEvent(new NodeMovedUp()
 			{
 				NodeId = Child.NodeId,
 				Partition = Child.Partition,
 				SourceId = Child.SourceId,
 				Timestamp = DateTime.Now
-			};
-
-			await Database.Insert(Event);
+			});
 
 			return true;
 		}
@@ -846,15 +842,13 @@ namespace Waher.Things.Metering
 				this.children.Insert(i + 1, Child);
 			}
 
-			NodeMovedDown Event = new NodeMovedDown()
+			await MeteringTopology.NewEvent(new NodeMovedDown()
 			{
 				NodeId = Child.NodeId,
 				Partition = Child.Partition,
 				SourceId = Child.SourceId,
 				Timestamp = DateTime.Now
-			};
-
-			await Database.Insert(Event);
+			});
 
 			return true;
 		}
@@ -934,7 +928,7 @@ namespace Waher.Things.Metering
 					Event.AfterPartition = After.Partition;
 				}
 
-				await Database.Insert(Event);
+				await MeteringTopology.NewEvent(Event);
 			}
 			else
 				await Node.NodeUpdated();
@@ -950,7 +944,7 @@ namespace Waher.Things.Metering
 			this.updated = DateTime.Now;
 			await Database.Update(this);
 
-			NodeUpdated Event = new NodeUpdated()
+			await MeteringTopology.NewEvent(new NodeUpdated()
 			{
 				Parameters = await this.GetDisplayableParameterAraryAsync(await Translator.GetDefaultLanguageAsync(), RequestOrigin.Empty),
 				NodeType = this.GetType().FullName,
@@ -967,9 +961,7 @@ namespace Waher.Things.Metering
 				Partition = this.Partition,
 				SourceId = this.SourceId,
 				Timestamp = DateTime.Now
-			};
-
-			await Database.Insert(Event);
+			});
 
 			this.oldId = this.nodeId;
 		}
@@ -1025,15 +1017,13 @@ namespace Waher.Things.Metering
 				await Database.Update(Child);
 				this.RaiseUpdate();
 
-				NodeRemoved Event = new NodeRemoved()
+				await MeteringTopology.NewEvent(new NodeRemoved()
 				{
 					NodeId = Node.NodeId,
 					Partition = Node.Partition,
 					SourceId = Node.SourceId,
 					Timestamp = DateTime.Now
-				};
-
-				await Database.Insert(Event);
+				});
 			}
 
 			return i >= 0;

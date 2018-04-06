@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using Waher.Things;
 using Waher.Runtime.Language;
+using Waher.Things;
+using Waher.Things.SourceEvents;
 
 namespace Waher.Things
 {
@@ -73,5 +74,9 @@ namespace Waher.Things
 		/// <returns>Node, if found, null otherwise.</returns>
 		Task<INode> GetNodeAsync(IThingReference NodeRef);
 
+		/// <summary>
+		/// Event raised when a data source event has been raised.
+		/// </summary>
+		event SourceEventEventHandler OnEvent;
 	}
 }

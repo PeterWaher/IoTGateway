@@ -26,6 +26,8 @@ namespace Waher.Things.Metering
 
 		private static Dictionary<string, MeteringNode> nodes = new Dictionary<string, MeteringNode>();
 		private static Root root = null;
+		private static MeteringTopology instance = null;
+
 		private DateTime lastChanged;
 
 		/// <summary>
@@ -35,6 +37,9 @@ namespace Waher.Things.Metering
 		public MeteringTopology()
 		{
 			lastChanged = RuntimeSettings.Get(MeteringTopology.SourceID + ".LastChanged", DateTime.MinValue);
+
+			if (instance == null)
+				instance = this;
 		}
 
 		/// <summary>
@@ -218,7 +223,7 @@ namespace Waher.Things.Metering
 
 				await Database.Insert(Result);
 
-				NodeAdded Event = new NodeAdded()
+				await MeteringTopology.NewEvent(new NodeAdded()
 				{
 					Parameters = await Result.GetDisplayableParameterAraryAsync(await Translator.GetDefaultLanguageAsync(), RequestOrigin.Empty),
 					NodeType = Result.GetType().FullName,
@@ -234,9 +239,7 @@ namespace Waher.Things.Metering
 					Partition = Result.Partition,
 					SourceId = Result.SourceId,
 					Timestamp = DateTime.Now
-				};
-
-				await Database.Insert(Event);
+				});
 			}
 
 			lock (nodes)
@@ -290,6 +293,25 @@ namespace Waher.Things.Metering
 			}
 
 			return NrEvents;
+		}
+
+		/// <summary>
+		/// Event raised when a data source event has been raised.
+		/// </summary>
+		public event SourceEventEventHandler OnEvent = null;
+
+		internal static async Task NewEvent(SourceEvent Event)
+		{
+			await Database.Insert(Event);
+
+			try
+			{
+				instance?.OnEvent?.Invoke(instance, Event);
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+			}
 		}
 
 	}

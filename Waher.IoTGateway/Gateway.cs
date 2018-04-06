@@ -500,6 +500,8 @@ namespace Waher.IoTGateway
 				Types.SetModuleParameter("Control", concentratorServer.ControlServer);
 				Types.SetModuleParameter("Registry", thingRegistryClient);
 				Types.SetModuleParameter("Provisioning", provisioningClient);
+
+				ScheduleEvent(DeleteOldDataSourceEvents, DateTime.Today.AddDays(1).AddHours(4), null);
 			}
 			catch (Exception ex)
 			{
@@ -584,6 +586,20 @@ namespace Waher.IoTGateway
 			});
 
 			return true;
+		}
+
+		private static async void DeleteOldDataSourceEvents(object P)
+		{
+			try
+			{
+				await MeteringTopology.DeleteOldEvents(new TimeSpan(7, 0, 0, 0));
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+			}
+
+			ScheduleEvent(DeleteOldDataSourceEvents, DateTime.Today.AddDays(1).AddHours(4), null);
 		}
 
 		/// <summary>

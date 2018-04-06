@@ -4,7 +4,7 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <Description>Defines the IoT Gateway runtime environment.</Description>
-    <Copyright>Copyright © Waher Data AB 2016-2017. All rights reserved.</Copyright>
+    <Copyright>Copyright © Waher Data AB 2016-2018. All rights reserved.</Copyright>
     <Authors>Peter Waher</Authors>
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
@@ -15,9 +15,9 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>IoT Gateway HTTP CoAP MQTT XMPP LWM2M</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.0.20</AssemblyVersion>
-    <FileVersion>1.0.20</FileVersion>
-    <Version>1.0.20</Version>
+    <AssemblyVersion>1.0.21</AssemblyVersion>
+    <FileVersion>1.0.21</FileVersion>
+    <Version>1.0.21</Version>
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Waher.IoTGateway\</UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>

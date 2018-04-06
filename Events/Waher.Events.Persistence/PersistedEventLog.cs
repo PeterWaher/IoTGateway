@@ -122,20 +122,24 @@ namespace Waher.Events.Persistence
 				{
 					await Database.Delete(Event);
 					NrEvents++;
+					Deleted = true;
 				}
 			}
 			while (Deleted);
 
-			KeyValuePair<string, object>[] Tags = new KeyValuePair<string, object>[]
+			if (NrEvents > 0)
 			{
-				new KeyValuePair<string, object>("Limit", Limit),
-				new KeyValuePair<string, object>("NrEvents", NrEvents)
-			};
+				KeyValuePair<string, object>[] Tags = new KeyValuePair<string, object>[]
+				{
+					new KeyValuePair<string, object>("Limit", Limit),
+					new KeyValuePair<string, object>("NrEvents", NrEvents)
+				};
 
-			if (NrEvents == 1)
-				Log.Informational("Deleting 1 event from the database.", this.ObjectID, Tags);
-			else
-				Log.Informational("Deleting " + NrEvents.ToString() + " events from the database.", this.ObjectID, Tags);
+				if (NrEvents == 1)
+					Log.Informational("Deleting 1 event from the database.", this.ObjectID, Tags);
+				else
+					Log.Informational("Deleting " + NrEvents.ToString() + " events from the database.", this.ObjectID, Tags);
+			}
 
 			return NrEvents;
 		}

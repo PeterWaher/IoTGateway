@@ -10,6 +10,11 @@ namespace Waher.Things
 	/// </summary>
 	public class RequestOrigin
 	{
+		/// <summary>
+		/// Empty request origin.
+		/// </summary>
+		public static readonly RequestOrigin Empty = new RequestOrigin(string.Empty, new string[0], new string[0], new string[0]);
+
 		private string[] deviceTokens;
 		private string[] serviceTokens;
 		private string[] userTokens;

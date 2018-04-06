@@ -6,7 +6,9 @@ using Waher.Persistence;
 using Waher.Persistence.Filters;
 using Waher.Runtime.Language;
 using Waher.Runtime.Settings;
+using Waher.Things.DisplayableParameters;
 using Waher.Things.Metering.NodeTypes;
+using Waher.Things.SourceEvents;
 
 namespace Waher.Things.Metering
 {
@@ -214,6 +216,26 @@ namespace Waher.Things.Metering
 				};
 
 				await Database.Insert(Result);
+
+				NodeAdded Event = new NodeAdded()
+				{
+					Parameters = await Result.GetDisplayableParameterAraryAsync(await Translator.GetDefaultLanguageAsync(), RequestOrigin.Empty),
+					NodeType = Result.GetType().FullName,
+					HasChildren = Result.HasChildren,
+					IsReadable = Result.IsReadable,
+					IsControllable = Result.IsControllable,
+					HasCommands = Result.HasCommands,
+					ParentId = string.Empty,
+					ParentPartition = string.Empty,
+					Updated = Result.Updated,
+					State = Result.State,
+					NodeId = Result.NodeId,
+					Partition = Result.Partition,
+					SourceId = Result.SourceId,
+					Timestamp = DateTime.Now
+				};
+
+				await Database.Insert(Event);
 			}
 
 			lock (nodes)

@@ -141,7 +141,7 @@ namespace Waher.Things.Metering
 			this.isPublic = IsPublic;
 
 			if (this.ObjectId != Guid.Empty)
-				return Database.Update(this);
+				return this.NodeUpdated();
 			else
 				return Task.CompletedTask;
 		}
@@ -155,7 +155,7 @@ namespace Waher.Things.Metering
 			this.isPublic = false;
 
 			if (this.ObjectId != Guid.Empty)
-				return Database.Update(this);
+				return this.NodeUpdated();
 			else
 				return Task.CompletedTask;
 		}
@@ -168,7 +168,7 @@ namespace Waher.Things.Metering
 			this.isPublic = false;
 
 			if (this.ObjectId != Guid.Empty)
-				return Database.Update(this);
+				return this.NodeUpdated();
 			else
 				return Task.CompletedTask;
 		}

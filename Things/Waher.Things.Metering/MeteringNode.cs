@@ -10,6 +10,7 @@ using Waher.Persistence.Filters;
 using Waher.Runtime.Language;
 using Waher.Things.Attributes;
 using Waher.Things.DisplayableParameters;
+using Waher.Things.SourceEvents;
 
 namespace Waher.Things.Metering
 {
@@ -26,6 +27,7 @@ namespace Waher.Things.Metering
 		private Guid parentId = Guid.Empty;
 		private MeteringNode parent = null;
 		private string nodeId = string.Empty;
+		private string oldId = null;
 		private NodeState state = NodeState.None;
 		private List<MeteringNode> children = null;
 		private bool childrenLoaded = false;
@@ -131,6 +133,9 @@ namespace Waher.Things.Metering
 			{
 				this.nodeId = value;
 				this.thingReference = null;
+
+				if (this.oldId == null && !string.IsNullOrEmpty(value))
+					this.oldId = value;
 			}
 		}
 
@@ -166,7 +171,7 @@ namespace Waher.Things.Metering
 			sb.Append(this.GetTypeNameAsync(Language).Result);
 			sb.Append(")");
 
-			foreach (Parameter P in this.GetDisplayableParametersAsync(Language, new RequestOrigin(string.Empty, NoStrings, NoStrings, NoStrings)).Result)
+			foreach (Parameter P in this.GetDisplayableParametersAsync(Language, RequestOrigin.Empty).Result)
 			{
 				sb.Append(", ");
 				sb.Append(P.Name);
@@ -290,6 +295,7 @@ namespace Waher.Things.Metering
 						this.state = NodeState.ErrorUnsigned;
 						await Database.Update(this);
 						this.RaiseUpdate();
+						await this.NodeStateChanged();
 					}
 					break;
 
@@ -299,6 +305,7 @@ namespace Waher.Things.Metering
 						this.state = NodeState.WarningUnsigned;
 						await Database.Update(this);
 						this.RaiseUpdate();
+						await this.NodeStateChanged();
 					}
 					break;
 			}
@@ -317,6 +324,21 @@ namespace Waher.Things.Metering
 					Log.Error(Body, this.nodeId, string.Empty, EventId, EventLevel.Minor);
 					break;
 			}
+		}
+
+		private async Task NodeStateChanged()
+		{
+			NodeStatusChanged Event = new NodeStatusChanged()
+			{
+				Messages = await this.GetMessageArrayAsync(RequestOrigin.Empty),
+				State = this.state,
+				NodeId = this.NodeId,
+				Partition = this.Partition,
+				SourceId = this.SourceId,
+				Timestamp = DateTime.Now
+			};
+
+			await Database.Insert(Event);
 		}
 
 		/// <summary>
@@ -690,6 +712,22 @@ namespace Waher.Things.Metering
 		}
 
 		/// <summary>
+		/// Gets displayable parameters.
+		/// </summary>
+		/// <param name="Language">Language to use.</param>
+		/// <param name="Caller">Information about caller.</param>
+		/// <returns>Set of displayable parameters.</returns>
+		public async Task<Parameter[]> GetDisplayableParameterAraryAsync(Language Language, RequestOrigin Caller)
+		{
+			List<Parameter> Result = new List<Parameter>();
+
+			foreach (Parameter P in await this.GetDisplayableParametersAsync(Language, Caller))
+				Result.Add(P);
+
+			return Result.ToArray();
+		}
+
+		/// <summary>
 		/// Gets messages logged on the node.
 		/// </summary>
 		/// <returns>Set of messages.</returns>
@@ -706,13 +744,31 @@ namespace Waher.Things.Metering
 		}
 
 		/// <summary>
+		/// Gets messages logged on the node.
+		/// </summary>
+		/// <returns>Array of messages.</returns>
+		public async Task<Message[]> GetMessageArrayAsync(RequestOrigin Caller)
+		{
+			List<Message> Result = new List<Message>();
+
+			foreach (Message Msg in await this.GetMessagesAsync(Caller))
+				Result.Add(Msg);
+
+			return Result.ToArray();
+		}
+
+		/// <summary>
 		/// Tries to move the node up.
 		/// </summary>
 		/// <param name="Caller">Information about caller.</param>
 		/// <returns>If the node was moved up.</returns>
 		public virtual Task<bool> MoveUpAsync(RequestOrigin Caller)
 		{
-			return Task.FromResult<bool>(false);
+			MeteringNode Parent = this.Parent as MeteringNode;
+			if (Parent == null)
+				return Task.FromResult<bool>(false);
+			else
+				return Parent.MoveUpAsync(this, Caller);
 		}
 
 		/// <summary>
@@ -722,7 +778,84 @@ namespace Waher.Things.Metering
 		/// <returns>If the node was moved down.</returns>
 		public virtual Task<bool> MoveDownAsync(RequestOrigin Caller)
 		{
-			return Task.FromResult<bool>(false);
+			MeteringNode Parent = this.Parent as MeteringNode;
+			if (Parent == null)
+				return Task.FromResult<bool>(false);
+			else
+				return Parent.MoveDownAsync(this, Caller);
+		}
+
+		/// <summary>
+		/// Tries to move the child node up.
+		/// </summary>
+		/// <param name="Caller">Information about caller.</param>
+		/// <returns>If the child node was moved up.</returns>
+		public virtual async Task<bool> MoveUpAsync(MeteringNode Child, RequestOrigin Caller)
+		{
+			if (!this.ChildrenOrdered || this.children == null)
+				return false;
+
+			if (!await this.CanEditAsync(Caller) || !await Child.CanEditAsync(Caller))
+				return false;
+
+			lock (this.children)
+			{
+				int i = this.children.IndexOf(Child);
+				if (i <= 0)
+					return false;
+
+				this.children.RemoveAt(i);
+				this.children.Insert(i - 1, Child);
+			}
+
+			NodeMovedUp Event = new NodeMovedUp()
+			{
+				NodeId = Child.NodeId,
+				Partition = Child.Partition,
+				SourceId = Child.SourceId,
+				Timestamp = DateTime.Now
+			};
+
+			await Database.Insert(Event);
+
+			return true;
+		}
+
+		/// <summary>
+		/// Tries to move the child node down.
+		/// </summary>
+		/// <param name="Caller">Information about caller.</param>
+		/// <returns>If the child node was moved down.</returns>
+		public virtual async Task<bool> MoveDownAsync(MeteringNode Child, RequestOrigin Caller)
+		{
+			if (!this.ChildrenOrdered || this.children == null)
+				return false;
+
+			if (!await this.CanEditAsync(Caller) || !await Child.CanEditAsync(Caller))
+				return false;
+
+			lock (this.children)
+			{
+				int c = this.children.Count;
+				int i = this.children.IndexOf(Child);
+				if (i < 0 || i + 1 >= c)
+					return false;
+
+				this.children.RemoveAt(i);
+				this.children.Insert(i + 1, Child);
+			}
+
+			NodeMovedDown Event = new NodeMovedDown()
+			{
+				NodeId = Child.NodeId,
+				Partition = Child.Partition,
+				SourceId = Child.SourceId,
+				Timestamp = DateTime.Now
+			};
+
+			await Database.Insert(Event);
+
+			return true;
 		}
 
 		/// <summary>
@@ -756,27 +889,88 @@ namespace Waher.Things.Metering
 				await this.LoadChildren();
 
 			Node.parentId = this.objectId;
-			if (Node.objectId == Guid.Empty)
-			{
-				await Database.Insert(Node);
-				MeteringTopology.RegisterNode(Node);
-			}
-			else
-			{
-				Node.updated = DateTime.Now;
-				await Database.Update(Node);
-			}
+
+			MeteringNode After = null;
+			int c;
 
 			lock (this.synchObject)
 			{
 				if (this.children == null)
 					this.children = new List<MeteringNode>();
+				else if ((c = this.children.Count) > 0)
+					After = this.children[c - 1];
 
 				this.children.Add(Node);
 				Node.parent = this;
 			}
 
+			if (Node.objectId == Guid.Empty)
+			{
+				await Database.Insert(Node);
+				MeteringTopology.RegisterNode(Node);
+
+				NodeAdded Event = new NodeAdded()
+				{
+					Parameters = await Node.GetDisplayableParameterAraryAsync(await Translator.GetDefaultLanguageAsync(), RequestOrigin.Empty),
+					NodeType = Node.GetType().FullName,
+					HasChildren = Node.HasChildren,
+					IsReadable = Node.IsReadable,
+					IsControllable = Node.IsControllable,
+					HasCommands = Node.HasCommands,
+					ParentId = this.NodeId,
+					ParentPartition = this.Partition,
+					Updated = Node.Updated,
+					State = Node.State,
+					NodeId = Node.NodeId,
+					Partition = Node.Partition,
+					SourceId = Node.SourceId,
+					Timestamp = DateTime.Now
+				};
+
+				if (this.ChildrenOrdered && After != null)
+				{
+					Event.AfterNodeId = After.nodeId;
+					Event.AfterPartition = After.Partition;
+				}
+
+				await Database.Insert(Event);
+			}
+			else
+				await Node.NodeUpdated();
+
 			this.RaiseUpdate();
+		}
+
+		/// <summary>
+		/// Persists changes to the node, and generates a node updated event.
+		/// </summary>
+		protected virtual async Task NodeUpdated()
+		{
+			this.updated = DateTime.Now;
+			await Database.Update(this);
+
+			NodeUpdated Event = new NodeUpdated()
+			{
+				Parameters = await this.GetDisplayableParameterAraryAsync(await Translator.GetDefaultLanguageAsync(), RequestOrigin.Empty),
+				NodeType = this.GetType().FullName,
+				HasChildren = this.HasChildren,
+				IsReadable = this.IsReadable,
+				IsControllable = this.IsControllable,
+				HasCommands = this.HasCommands,
+				ParentId = this.NodeId,
+				ParentPartition = this.Partition,
+				Updated = this.Updated,
+				State = this.State,
+				NodeId = this.NodeId,
+				OldId = this.oldId,
+				Partition = this.Partition,
+				SourceId = this.SourceId,
+				Timestamp = DateTime.Now
+			};
+
+			await Database.Insert(Event);
+
+			this.oldId = this.nodeId;
 		}
 
 		/// <summary>
@@ -785,10 +979,7 @@ namespace Waher.Things.Metering
 		public virtual async Task UpdateAsync()
 		{
 			if (this.objectId != Guid.Empty)
-			{
-				this.updated = DateTime.Now;
-				await Database.Update(this);
-			}
+				await this.NodeUpdated();
 
 			this.RaiseUpdate();
 		}
@@ -832,6 +1023,16 @@ namespace Waher.Things.Metering
 			{
 				await Database.Update(Child);
 				this.RaiseUpdate();
+
+				NodeRemoved Event = new NodeRemoved()
+				{
+					NodeId = Node.NodeId,
+					Partition = Node.Partition,
+					SourceId = Node.SourceId,
+					Timestamp = DateTime.Now
+				};
+
+				await Database.Insert(Event);
 			}
 
 			return i >= 0;

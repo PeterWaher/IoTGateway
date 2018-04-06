@@ -97,6 +97,30 @@
       <String id="93">Meter Location</String>
       <String id="94">URI to claim node:</String>
       <String id="95">The owner can use this URI to claim ownership of the node.</String>
-    </Namespace>
+			<String id="96">Erase messages</String>
+			<String id="97">Messages successfully erased.</String>
+			<String id="98">Are you sure you want to erase all messages for the selected node(s)?</String>
+			<String id="99">Unable to erase messages.</String>
+			<String id="100">Message</String>
+			<String id="101">Type:</String>
+			<String id="102">Type of message to log.</String>
+			<String id="103">Body:</String>
+			<String id="104">Text of the message to log.</String>
+			<String id="105"></String>
+			<String id="106"></String>
+			<String id="107"></String>
+			<String id="108"></String>
+			<String id="109"></String>
+			<String id="110"></String>
+			<String id="111"></String>
+			<String id="112"></String>
+			<String id="113"></String>
+			<String id="114"></String>
+			<String id="115"></String>
+			<String id="116"></String>
+			<String id="117"></String>
+			<String id="118"></String>
+			<String id="119"></String>
+		</Namespace>
 	</Language>
 </Translation>

@@ -10,6 +10,7 @@ using Waher.Persistence.Filters;
 using Waher.Runtime.Language;
 using Waher.Things.Attributes;
 using Waher.Things.DisplayableParameters;
+using Waher.Things.Metering.Commands;
 using Waher.Things.SourceEvents;
 
 namespace Waher.Things.Metering
@@ -326,7 +327,7 @@ namespace Waher.Things.Metering
 			}
 		}
 
-		private async Task NodeStateChanged()
+		internal async Task NodeStateChanged()
 		{
 			NodeStatusChanged Event = new NodeStatusChanged()
 			{
@@ -471,7 +472,7 @@ namespace Waher.Things.Metering
 		[IgnoreMember]
 		public virtual bool HasCommands
 		{
-			get { return false; }
+			get { return true; }
 		}
 
 		/// <summary>
@@ -1089,8 +1090,40 @@ namespace Waher.Things.Metering
 		{
 			get
 			{
-				return Task.FromResult<IEnumerable<ICommand>>(null);
+				return Task.FromResult<IEnumerable<ICommand>>(new ICommand[]
+				{
+					new ClearMessages(this),
+					new LogMessage(this)
+				});
 			}
+		}
+
+		/// <summary>
+		/// Joins sets of commands.
+		/// </summary>
+		/// <param name="Commands">First set of commands.</param>
+		/// <param name="Commands2">Second set of commands.</param>
+		/// <returns>Joined set of commands.</returns>
+		public static async Task<IEnumerable<ICommand>> Join(Task<IEnumerable<ICommand>> Commands, params ICommand[] Commands2)
+		{
+			IEnumerable<ICommand> Commands1 = await Commands;
+
+			if (Commands1 == null)
+				return Commands2;
+
+			List<ICommand> Result = Commands1 as List<ICommand>;
+
+			if (Result == null)
+			{
+				Result = new List<ICommand>();
+
+				foreach (ICommand Cmd in Commands1)
+					Result.Add(Cmd);
+			}
+
+			Result.AddRange(Commands2);
+
+			return Result;
 		}
 
 		#endregion

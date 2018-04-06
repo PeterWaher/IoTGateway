@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Events;
 using Waher.Persistence;
 using Waher.Persistence.Filters;
 using Waher.Runtime.Language;
@@ -244,6 +245,51 @@ namespace Waher.Things.Metering
 			}
 
 			root = Result;
+		}
+
+		/// <summary>
+		/// Deletes old data source events.
+		/// </summary>
+		/// <param name="MaxAge">Maximum age of events to keep.</param>
+		/// <returns>Number of events deleted.</returns>
+		public static async Task<int> DeleteOldEvents(TimeSpan MaxAge)
+		{
+			if (MaxAge <= TimeSpan.Zero)
+				throw new ArgumentException("Age must be positive.", nameof(MaxAge));
+
+			DateTime Limit = DateTime.Now.Subtract(MaxAge);
+			int NrEvents = 0;
+			bool Deleted;
+
+			do
+			{
+				Deleted = false;
+
+				foreach (SourceEvent Event in await Database.Find<SourceEvent>(0, 100, new FilterAnd(
+					new FilterFieldEqualTo("SourceId", SourceID), new FilterFieldLesserOrEqualTo("Timestamp", Limit))))
+				{
+					await Database.Delete(Event);
+					NrEvents++;
+					Deleted = true;
+				}
+			}
+			while (Deleted);
+
+			if (NrEvents > 0)
+			{
+				KeyValuePair<string, object>[] Tags = new KeyValuePair<string, object>[]
+				{
+					new KeyValuePair<string, object>("Limit", Limit),
+					new KeyValuePair<string, object>("NrEvents", NrEvents)
+				};
+
+				if (NrEvents == 1)
+					Log.Informational("Deleting 1 meterring topology event from the database.", SourceID, Tags);
+				else
+					Log.Informational("Deleting " + NrEvents.ToString() + " meterring topology events from the database.", SourceID, Tags);
+			}
+
+			return NrEvents;
 		}
 
 	}

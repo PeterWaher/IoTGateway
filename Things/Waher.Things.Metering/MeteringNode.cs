@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Events;
+using Waher.Networking.Sniffers;
 using Waher.Persistence;
 using Waher.Persistence.Attributes;
 using Waher.Persistence.Filters;
@@ -296,7 +297,6 @@ namespace Waher.Things.Metering
 						this.state = NodeState.ErrorUnsigned;
 						await Database.Update(this);
 						this.RaiseUpdate();
-						await this.NodeStateChanged();
 					}
 					break;
 
@@ -306,7 +306,6 @@ namespace Waher.Things.Metering
 						this.state = NodeState.WarningUnsigned;
 						await Database.Update(this);
 						this.RaiseUpdate();
-						await this.NodeStateChanged();
 					}
 					break;
 			}
@@ -325,6 +324,8 @@ namespace Waher.Things.Metering
 					Log.Error(Body, this.nodeId, string.Empty, EventId, EventLevel.Minor);
 					break;
 			}
+
+			await this.NodeStateChanged();
 		}
 
 		internal async Task NodeStateChanged()
@@ -787,6 +788,7 @@ namespace Waher.Things.Metering
 		/// <summary>
 		/// Tries to move the child node up.
 		/// </summary>
+		/// <param name="Child">Child node to move.</param>
 		/// <param name="Caller">Information about caller.</param>
 		/// <returns>If the child node was moved up.</returns>
 		public virtual async Task<bool> MoveUpAsync(MeteringNode Child, RequestOrigin Caller)
@@ -821,6 +823,7 @@ namespace Waher.Things.Metering
 		/// <summary>
 		/// Tries to move the child node down.
 		/// </summary>
+		/// <param name="Child">Child node to move.</param>
 		/// <param name="Caller">Information about caller.</param>
 		/// <returns>If the child node was moved down.</returns>
 		public virtual async Task<bool> MoveDownAsync(MeteringNode Child, RequestOrigin Caller)
@@ -904,11 +907,15 @@ namespace Waher.Things.Metering
 				await Database.Insert(Node);
 				MeteringTopology.RegisterNode(Node);
 
+				Language Language = await Translator.GetDefaultLanguageAsync();
 				NodeAdded Event = new NodeAdded()
 				{
-					Parameters = await Node.GetDisplayableParameterAraryAsync(await Translator.GetDefaultLanguageAsync(), RequestOrigin.Empty),
+					Parameters = await Node.GetDisplayableParameterAraryAsync(Language, RequestOrigin.Empty),
 					NodeType = Node.GetType().FullName,
+					Sniffable = this is ISniffable,
+					DisplayName = await Node.GetTypeNameAsync(Language),
 					HasChildren = Node.HasChildren,
+					ChildrenOrdered = Node.ChildrenOrdered,
 					IsReadable = Node.IsReadable,
 					IsControllable = Node.IsControllable,
 					HasCommands = Node.HasCommands,
@@ -918,6 +925,8 @@ namespace Waher.Things.Metering
 					State = Node.State,
 					NodeId = Node.NodeId,
 					Partition = Node.Partition,
+					LogId = MeteringTopology.EmptyIfSame(Node.LogId, Node.NodeId),
+					LocalId = MeteringTopology.EmptyIfSame(Node.LocalId, Node.NodeId),
 					SourceId = Node.SourceId,
 					Timestamp = DateTime.Now
 				};
@@ -947,8 +956,8 @@ namespace Waher.Things.Metering
 			await MeteringTopology.NewEvent(new NodeUpdated()
 			{
 				Parameters = await this.GetDisplayableParameterAraryAsync(await Translator.GetDefaultLanguageAsync(), RequestOrigin.Empty),
-				NodeType = this.GetType().FullName,
 				HasChildren = this.HasChildren,
+				ChildrenOrdered = this.ChildrenOrdered,
 				IsReadable = this.IsReadable,
 				IsControllable = this.IsControllable,
 				HasCommands = this.HasCommands,
@@ -959,6 +968,8 @@ namespace Waher.Things.Metering
 				NodeId = this.NodeId,
 				OldId = this.oldId,
 				Partition = this.Partition,
+				LogId = MeteringTopology.EmptyIfSame(this.LogId, this.NodeId),
+				LocalId = MeteringTopology.EmptyIfSame(this.LocalId, this.NodeId),
 				SourceId = this.SourceId,
 				Timestamp = DateTime.Now
 			});

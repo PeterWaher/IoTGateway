@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Events;
+using Waher.Networking.Sniffers;
 using Waher.Persistence;
 using Waher.Persistence.Filters;
 using Waher.Runtime.Language;
@@ -223,11 +224,15 @@ namespace Waher.Things.Metering
 
 				await Database.Insert(Result);
 
+				Language Language = await Translator.GetDefaultLanguageAsync();
 				await MeteringTopology.NewEvent(new NodeAdded()
 				{
-					Parameters = await Result.GetDisplayableParameterAraryAsync(await Translator.GetDefaultLanguageAsync(), RequestOrigin.Empty),
+					Parameters = await Result.GetDisplayableParameterAraryAsync(Language, RequestOrigin.Empty),
 					NodeType = Result.GetType().FullName,
+					Sniffable = Result is ISniffable,
+					DisplayName = await Result.GetTypeNameAsync(Language),
 					HasChildren = Result.HasChildren,
+					ChildrenOrdered = Result.ChildrenOrdered,
 					IsReadable = Result.IsReadable,
 					IsControllable = Result.IsControllable,
 					HasCommands = Result.HasCommands,
@@ -237,6 +242,8 @@ namespace Waher.Things.Metering
 					State = Result.State,
 					NodeId = Result.NodeId,
 					Partition = Result.Partition,
+					LogId = EmptyIfSame(Result.LogId, Result.NodeId),
+					LocalId = EmptyIfSame(Result.LocalId, Result.NodeId),
 					SourceId = Result.SourceId,
 					Timestamp = DateTime.Now
 				});
@@ -248,6 +255,14 @@ namespace Waher.Things.Metering
 			}
 
 			root = Result;
+		}
+
+		internal static string EmptyIfSame(string Value, string Org)
+		{
+			if (Value == Org)
+				return string.Empty;
+			else
+				return Value;
 		}
 
 		/// <summary>
@@ -287,9 +302,9 @@ namespace Waher.Things.Metering
 				};
 
 				if (NrEvents == 1)
-					Log.Informational("Deleting 1 meterring topology event from the database.", SourceID, Tags);
+					Log.Informational("Deleting 1 metering topology event from the database.", SourceID, Tags);
 				else
-					Log.Informational("Deleting " + NrEvents.ToString() + " meterring topology events from the database.", SourceID, Tags);
+					Log.Informational("Deleting " + NrEvents.ToString() + " metering topology events from the database.", SourceID, Tags);
 			}
 
 			return NrEvents;

@@ -15,11 +15,14 @@ using Waher.Things;
 using Waher.Things.ControlParameters;
 using Waher.Things.DisplayableParameters;
 using Waher.Things.Queries;
+using Waher.Things.SourceEvents;
 using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP.Control;
 using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.Provisioning;
 using Waher.Networking.XMPP.Sensor;
+using Waher.Persistence;
+using Waher.Persistence.Filters;
 using Waher.Runtime.Settings;
 using Waher.Security;
 
@@ -39,7 +42,8 @@ namespace Waher.Networking.XMPP.Concentrator
 		public const string NamespaceConcentrator = "urn:xmpp:iot:concentrators";
 
 		private Dictionary<string, IDataSource> rootDataSources = new Dictionary<string, IDataSource>();
-		private Dictionary<string, IDataSource> dataSources = new Dictionary<string, IDataSource>();
+		private Dictionary<string, DataSourceRec> dataSources = new Dictionary<string, DataSourceRec>();
+		private Dictionary<string, Dictionary<string, DataSourceRec>> subscriptions = new Dictionary<string, Dictionary<string, DataSourceRec>>();
 		private Dictionary<string, Query> queries = new Dictionary<string, Query>();
 		private object synchObject = new object();
 		private SensorServer sensorServer = null;
@@ -127,11 +131,11 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			this.client.RegisterIqGetHandler("getAncestors", NamespaceConcentrator, this.GetAncestorsHandler, false);                                           // ConcentratorClient.GetAncestors
 
-			this.client.RegisterIqGetHandler("getNodeCommands", NamespaceConcentrator, this.GetNodeCommandsHandler, false);                                     // TODO:
-			this.client.RegisterIqGetHandler("getCommandParameters", NamespaceConcentrator, this.GetCommandParametersHandler, false);                           // TODO:
-			this.client.RegisterIqSetHandler("executeNodeCommand", NamespaceConcentrator, this.ExecuteNodeCommandHandler, false);                               // TODO:
-			this.client.RegisterIqSetHandler("executeNodeQuery", NamespaceConcentrator, this.ExecuteNodeQueryHandler, false);                                   // TODO:
-			this.client.RegisterIqSetHandler("abortNodeQuery", NamespaceConcentrator, this.AbortNodeQueryHandler, false);                                       // TODO:
+			this.client.RegisterIqGetHandler("getNodeCommands", NamespaceConcentrator, this.GetNodeCommandsHandler, false);                                     // ConcentratorClient.GetNodeCommands
+			this.client.RegisterIqGetHandler("getCommandParameters", NamespaceConcentrator, this.GetCommandParametersHandler, false);                           // ConcentratorClient.GetCommandParameters, ConcentratorClient.GetQueryParameters.
+			this.client.RegisterIqSetHandler("executeNodeCommand", NamespaceConcentrator, this.ExecuteNodeCommandHandler, false);                               // ConcentratorClient.ExecuteCommand
+			this.client.RegisterIqSetHandler("executeNodeQuery", NamespaceConcentrator, this.ExecuteNodeQueryHandler, false);                                   // ConcentratorClient.ExecuteQuery
+			this.client.RegisterIqSetHandler("abortNodeQuery", NamespaceConcentrator, this.AbortNodeQueryHandler, false);                                       // ConcentratorClient.AbortQuery
 			this.client.RegisterIqGetHandler("getCommonNodeCommands", NamespaceConcentrator, this.GetCommonNodeCommandsHandler, false);                         // TODO:
 			this.client.RegisterIqGetHandler("getCommonCommandParameters", NamespaceConcentrator, this.GetCommonCommandParametersHandler, false);               // TODO:
 			this.client.RegisterIqGetHandler("executeCommonNodeCommand", NamespaceConcentrator, this.ExecuteCommonNodeCommandHandler, false);                   // TODO:
@@ -142,8 +146,9 @@ namespace Waher.Networking.XMPP.Concentrator
 			this.client.RegisterIqSetHandler("moveNodesUp", NamespaceConcentrator, this.MoveNodesUpHandler, false);                                             // TODO:
 			this.client.RegisterIqSetHandler("moveNodesDown", NamespaceConcentrator, this.MoveNodesDownHandler, false);                                         // TODO:
 
-			// subscribe
-			// unsubscribe
+			this.client.RegisterIqSetHandler("subscribe", NamespaceConcentrator, this.SubscribeHandler, false);                                             // TODO:
+			this.client.RegisterIqSetHandler("unsubscribe", NamespaceConcentrator, this.UnsubscribeHandler, false);                                         // TODO:
+
 			// getDatabases
 			// getDatabaseReadoutParameters
 			// startDatabaseReadout
@@ -214,15 +219,15 @@ namespace Waher.Networking.XMPP.Concentrator
 
 		private async Task<IThingReference> OnGetNode(string NodeId, string SourceId, string Partition)
 		{
-			IDataSource Source;
+			DataSourceRec Rec;
 
 			lock (this.synchObject)
 			{
-				if (!this.dataSources.TryGetValue(SourceId, out Source))
+				if (!this.dataSources.TryGetValue(SourceId, out Rec))
 					return null;
 			}
 
-			return await Source.GetNodeAsync(new ThingReference(NodeId, SourceId, Partition));
+			return await Rec.Source.GetNodeAsync(new ThingReference(NodeId, SourceId, Partition));
 		}
 
 		/// <summary>
@@ -280,8 +285,9 @@ namespace Waher.Networking.XMPP.Concentrator
 			this.client.UnregisterIqGetHandler("moveNodesUp", NamespaceConcentrator, this.MoveNodesUpHandler, false);
 			this.client.UnregisterIqGetHandler("moveNodesDown", NamespaceConcentrator, this.MoveNodesDownHandler, false);
 
-			// subscribe
-			// unsubscribe
+			this.client.UnregisterIqSetHandler("subscribe", NamespaceConcentrator, this.SubscribeHandler, false);
+			this.client.UnregisterIqSetHandler("unsubscribe", NamespaceConcentrator, this.UnsubscribeHandler, false);
+
 			// getDatabases
 			// getDatabaseReadoutParameters
 			// startDatabaseReadout
@@ -290,16 +296,25 @@ namespace Waher.Networking.XMPP.Concentrator
 			this.client.UnregisterIqSetHandler("unregisterSniffer", NamespaceConcentrator, this.UnregisterSnifferHandler, false);
 
 			Query[] Queries;
+			DataSourceRec[] Sources;
 
 			lock (this.synchObject)
 			{
 				Queries = new Query[this.queries.Count];
 				this.queries.Values.CopyTo(Queries, 0);
 				this.queries.Clear();
+
+				Sources = new DataSourceRec[this.dataSources.Count];
+				this.dataSources.Values.CopyTo(Sources, 0);
+				this.dataSources.Clear();
+				this.rootDataSources.Clear();
 			}
 
 			foreach (Query Query in Queries)
 				Query.Abort();
+
+			foreach (DataSourceRec Rec in Sources)
+				Rec.Source.OnEvent -= this.DataSource_OnEvent;
 
 			if (this.sensorServer != null)
 			{
@@ -446,11 +461,13 @@ namespace Waher.Networking.XMPP.Concentrator
 				if (this.dataSources.ContainsKey(DataSource.SourceID))
 					return false;
 
-				this.dataSources[DataSource.SourceID] = DataSource;
+				this.dataSources[DataSource.SourceID] = new DataSourceRec(DataSource);
 
 				if (Root)
 					this.rootDataSources[DataSource.SourceID] = DataSource;
 			}
+
+			DataSource.OnEvent += this.DataSource_OnEvent;
 
 			IEnumerable<IDataSource> ChildSources = DataSource.ChildSources;
 			if (ChildSources != null)
@@ -460,6 +477,27 @@ namespace Waher.Networking.XMPP.Concentrator
 			}
 
 			return true;
+		}
+
+		private class DataSourceRec
+		{
+			public IDataSource Source;
+			public Dictionary<string, SubscriptionRec> Subscriptions = new Dictionary<string, SubscriptionRec>();
+			public SubscriptionRec[] SubscriptionsStatic = new SubscriptionRec[0];
+
+			public DataSourceRec(IDataSource Source)
+			{
+				this.Source = Source;
+			}
+		}
+
+		private class SubscriptionRec
+		{
+			public string Jid;
+			public SourceEventType EventTypes;
+			public Language Language;
+			public bool Messages;
+			public bool Parameters;
 		}
 
 		/// <summary>
@@ -488,15 +526,16 @@ namespace Waher.Networking.XMPP.Concentrator
 		{
 			get
 			{
-				IDataSource[] Result;
+				List<IDataSource> Result = new List<IDataSource>();
 
 				lock (this.synchObject)
 				{
-					Result = new IDataSource[this.dataSources.Count];
-					this.dataSources.Values.CopyTo(Result, 0);
+					foreach (DataSourceRec Rec in this.dataSources.Values)
+						Result.Add(Rec.Source);
+
 				}
 
-				return Result;
+				return Result.ToArray();
 			}
 		}
 
@@ -640,15 +679,15 @@ namespace Waher.Networking.XMPP.Concentrator
 				Language Language = await GetLanguage(e.Query);
 				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
 				string SourceId = XML.Attribute(e.Query, "src");
-				IDataSource Source;
+				DataSourceRec Rec;
 
 				lock (this.synchObject)
 				{
-					if (!this.dataSources.TryGetValue(SourceId, out Source))
-						Source = null;
+					if (!this.dataSources.TryGetValue(SourceId, out Rec))
+						Rec = null;
 				}
 
-				if (Source == null || !await Source.CanViewAsync(Caller))
+				if (Rec == null || !await Rec.Source.CanViewAsync(Caller))
 					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 7, "Source not found."), e.IQ));
 				else
 				{
@@ -657,14 +696,14 @@ namespace Waher.Networking.XMPP.Concentrator
 					Xml.Append("<getChildDataSourcesResponse xmlns='");
 					Xml.Append(NamespaceConcentrator);
 
-					IEnumerable<IDataSource> ChildSources = Source.ChildSources;
+					IEnumerable<IDataSource> ChildSources = Rec.Source.ChildSources;
 					if (ChildSources != null)
 					{
 						Xml.Append("'>");
 
 						foreach (IDataSource S in ChildSources)
 						{
-							if (await Source.CanViewAsync(Caller))
+							if (await Rec.Source.CanViewAsync(Caller))
 								await this.Export(Xml, S, Language);
 						}
 
@@ -692,19 +731,19 @@ namespace Waher.Networking.XMPP.Concentrator
 			{
 				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
 				ThingReference ThingRef = GetThingReference(e.Query);
-				IDataSource Source;
+				DataSourceRec Rec;
 				INode Node;
 
 				lock (this.synchObject)
 				{
-					if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Source))
-						Source = null;
+					if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
+						Rec = null;
 				}
 
-				if (Source == null)
+				if (Rec == null)
 					Node = null;
 				else
-					Node = await Source.GetNodeAsync(ThingRef);
+					Node = await Rec.Source.GetNodeAsync(ThingRef);
 
 				bool Result = (Node != null && await Node.CanViewAsync(Caller));
 
@@ -723,7 +762,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
 				StringBuilder Xml = new StringBuilder();
 				ThingReference ThingRef;
-				IDataSource Source;
+				DataSourceRec Rec;
 				INode Node;
 				XmlElement E;
 				bool Result;
@@ -742,14 +781,14 @@ namespace Waher.Networking.XMPP.Concentrator
 
 					lock (this.synchObject)
 					{
-						if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Source))
-							Source = null;
+						if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
+							Rec = null;
 					}
 
-					if (Source == null)
+					if (Rec == null)
 						Node = null;
 					else
-						Node = await Source.GetNodeAsync(ThingRef);
+						Node = await Rec.Source.GetNodeAsync(ThingRef);
 
 					Result = (Node != null && await Node.CanViewAsync(Caller));
 
@@ -851,19 +890,19 @@ namespace Waher.Networking.XMPP.Concentrator
 				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
 				ThingReference ThingRef = GetThingReference(e.Query);
 				Language Language = await GetLanguage(e.Query);
-				IDataSource Source;
+				DataSourceRec Rec;
 				INode Node;
 
 				lock (this.synchObject)
 				{
-					if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Source))
-						Source = null;
+					if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
+						Rec = null;
 				}
 
-				if (Source == null)
+				if (Rec == null)
 					Node = null;
 				else
-					Node = await Source.GetNodeAsync(ThingRef);
+					Node = await Rec.Source.GetNodeAsync(ThingRef);
 
 				if (Node != null && await Node.CanViewAsync(Caller))
 				{
@@ -930,7 +969,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
 				Language Language = await GetLanguage(e.Query);
 				StringBuilder Xml = new StringBuilder();
-				IDataSource Source;
+				DataSourceRec Rec;
 				ThingReference ThingRef;
 				INode Node;
 				XmlElement E;
@@ -949,14 +988,14 @@ namespace Waher.Networking.XMPP.Concentrator
 
 					lock (this.synchObject)
 					{
-						if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Source))
-							Source = null;
+						if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
+							Rec = null;
 					}
 
-					if (Source == null)
+					if (Rec == null)
 						Node = null;
 					else
-						Node = await Source.GetNodeAsync(ThingRef);
+						Node = await Rec.Source.GetNodeAsync(ThingRef);
 
 					if (Node == null || !(await Node.CanViewAsync(Caller)))
 					{
@@ -996,15 +1035,15 @@ namespace Waher.Networking.XMPP.Concentrator
 				bool Messages = XML.Attribute(e.Query, "messages", false);
 				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
 				string SourceId = XML.Attribute(e.Query, "src");
-				IDataSource Source;
+				DataSourceRec Rec;
 
 				lock (this.synchObject)
 				{
-					if (!this.dataSources.TryGetValue(SourceId, out Source))
-						Source = null;
+					if (!this.dataSources.TryGetValue(SourceId, out Rec))
+						Rec = null;
 				}
 
-				if (Source == null || !await Source.CanViewAsync(Caller))
+				if (Rec == null || !await Rec.Source.CanViewAsync(Caller))
 					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 7, "Source not found."), e.IQ));
 				else
 				{
@@ -1031,7 +1070,7 @@ namespace Waher.Networking.XMPP.Concentrator
 						}
 					}
 
-					foreach (INode N in Source.RootNodes)
+					foreach (INode N in Rec.Source.RootNodes)
 					{
 						if ((OnlyIfDerivedFrom == null || this.IsAssignableFrom(OnlyIfDerivedFrom, N)) && await N.CanViewAsync(Caller))
 							Nodes.AddLast(N);
@@ -1102,19 +1141,19 @@ namespace Waher.Networking.XMPP.Concentrator
 				Language Language = await GetLanguage(e.Query);
 				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
 				ThingReference ThingRef = GetThingReference(e.Query);
-				IDataSource Source;
+				DataSourceRec Rec;
 				INode Node;
 
 				lock (this.synchObject)
 				{
-					if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Source))
-						Source = null;
+					if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
+						Rec = null;
 				}
 
-				if (Source == null)
+				if (Rec == null)
 					Node = null;
 				else
-					Node = await Source.GetNodeAsync(ThingRef);
+					Node = await Rec.Source.GetNodeAsync(ThingRef);
 
 				if (Node != null && await Node.CanViewAsync(Caller))
 				{
@@ -1157,15 +1196,15 @@ namespace Waher.Networking.XMPP.Concentrator
 				bool Messages = XML.Attribute(e.Query, "messages", false);
 				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
 				string SourceId = XML.Attribute(e.Query, "src");
-				IDataSource Source;
+				DataSourceRec Rec;
 
 				lock (this.synchObject)
 				{
-					if (!this.dataSources.TryGetValue(SourceId, out Source))
-						Source = null;
+					if (!this.dataSources.TryGetValue(SourceId, out Rec))
+						Rec = null;
 				}
 
-				if (Source == null || !await Source.CanViewAsync(Caller))
+				if (Rec == null || !await Rec.Source.CanViewAsync(Caller))
 					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 7, "Source not found."), e.IQ));
 				else
 				{
@@ -1175,7 +1214,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					Xml.Append(NamespaceConcentrator);
 					Xml.Append("'>");
 
-					foreach (INode Node in Source.RootNodes)
+					foreach (INode Node in Rec.Source.RootNodes)
 					{
 						if (!await Node.CanViewAsync(Caller))
 							continue;
@@ -1213,19 +1252,19 @@ namespace Waher.Networking.XMPP.Concentrator
 				bool Messages = XML.Attribute(e.Query, "messages", false);
 				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
 				ThingReference ThingRef = GetThingReference(e.Query);
-				IDataSource Source;
+				DataSourceRec Rec;
 				INode Node;
 
 				lock (this.synchObject)
 				{
-					if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Source))
-						Source = null;
+					if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
+						Rec = null;
 				}
 
-				if (Source == null)
+				if (Rec == null)
 					Node = null;
 				else
-					Node = await Source.GetNodeAsync(ThingRef);
+					Node = await Rec.Source.GetNodeAsync(ThingRef);
 
 				if (Node == null || !await Node.CanViewAsync(Caller))
 					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
@@ -1278,19 +1317,19 @@ namespace Waher.Networking.XMPP.Concentrator
 				bool Messages = XML.Attribute(e.Query, "messages", false);
 				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
 				IThingReference ThingRef = GetThingReference(e.Query);
-				IDataSource Source;
+				DataSourceRec Rec;
 				INode Node;
 
 				lock (this.synchObject)
 				{
-					if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Source))
-						Source = null;
+					if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
+						Rec = null;
 				}
 
-				if (Source == null)
+				if (Rec == null)
 					Node = null;
 				else
-					Node = await Source.GetNodeAsync(ThingRef);
+					Node = await Rec.Source.GetNodeAsync(ThingRef);
 
 				if (Node == null || !await Node.CanViewAsync(Caller))
 					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
@@ -1322,7 +1361,7 @@ namespace Waher.Networking.XMPP.Concentrator
 						ThingRef = Node.Parent;
 						Node = ThingRef as INode;
 						if (Node == null)
-							Node = await Source.GetNodeAsync(Node.Parent);
+							Node = await Rec.Source.GetNodeAsync(Node.Parent);
 					}
 
 					Xml.Append("</getAncestorsResponse>");
@@ -1347,19 +1386,19 @@ namespace Waher.Networking.XMPP.Concentrator
 				Language Language = await GetLanguage(e.Query);
 				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
 				IThingReference ThingRef = GetThingReference(e.Query);
-				IDataSource Source;
+				DataSourceRec Rec;
 				INode Node;
 
 				lock (this.synchObject)
 				{
-					if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Source))
-						Source = null;
+					if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
+						Rec = null;
 				}
 
-				if (Source == null)
+				if (Rec == null)
 					Node = null;
 				else
-					Node = await Source.GetNodeAsync(ThingRef);
+					Node = await Rec.Source.GetNodeAsync(ThingRef);
 
 				if (Node == null || !await Node.CanViewAsync(Caller))
 					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
@@ -1391,19 +1430,19 @@ namespace Waher.Networking.XMPP.Concentrator
 				Language Language = await GetLanguage(e.Query);
 				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
 				IThingReference ThingRef = GetThingReference(e.Query);
-				IDataSource Source;
+				DataSourceRec Rec;
 				INode Node;
 
 				lock (this.synchObject)
 				{
-					if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Source))
-						Source = null;
+					if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
+						Rec = null;
 				}
 
-				if (Source == null)
+				if (Rec == null)
 					Node = null;
 				else
-					Node = await Source.GetNodeAsync(ThingRef);
+					Node = await Rec.Source.GetNodeAsync(ThingRef);
 
 				if (Node == null || !await Node.CanViewAsync(Caller))
 					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
@@ -1437,7 +1476,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				LinkedList<INode> RootNodes = null;
 				Dictionary<string, LinkedList<INode>> NodesPerParent = null;
 				IThingReference ThingRef;
-				IDataSource Source;
+				DataSourceRec Rec;
 				INode Node;
 				XmlElement E;
 				string Key;
@@ -1452,14 +1491,14 @@ namespace Waher.Networking.XMPP.Concentrator
 
 					lock (this.synchObject)
 					{
-						if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Source))
-							Source = null;
+						if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
+							Rec = null;
 					}
 
-					if (Source == null)
+					if (Rec == null)
 						Node = null;
 					else
-						Node = await Source.GetNodeAsync(ThingRef);
+						Node = await Rec.Source.GetNodeAsync(ThingRef);
 
 					if (Node == null || !await Node.CanViewAsync(Caller))
 					{
@@ -1540,7 +1579,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				LinkedList<INode> RootNodes = null;
 				Dictionary<string, LinkedList<INode>> NodesPerParent = null;
 				IThingReference ThingRef;
-				IDataSource Source;
+				DataSourceRec Rec;
 				INode Node;
 				XmlElement E;
 				LinkedListNode<INode> Loop;
@@ -1556,14 +1595,14 @@ namespace Waher.Networking.XMPP.Concentrator
 
 					lock (this.synchObject)
 					{
-						if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Source))
-							Source = null;
+						if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
+							Rec = null;
 					}
 
-					if (Source == null)
+					if (Rec == null)
 						Node = null;
 					else
-						Node = await Source.GetNodeAsync(ThingRef);
+						Node = await Rec.Source.GetNodeAsync(ThingRef);
 
 					if (Node == null || !await Node.CanViewAsync(Caller))
 					{
@@ -1648,19 +1687,19 @@ namespace Waher.Networking.XMPP.Concentrator
 				Language Language = await GetLanguage(e.Query);
 				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
 				ThingReference ThingRef = GetThingReference(e.Query);
-				IDataSource Source;
+				DataSourceRec Rec;
 				INode Node;
 
 				lock (this.synchObject)
 				{
-					if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Source))
-						Source = null;
+					if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
+						Rec = null;
 				}
 
-				if (Source == null)
+				if (Rec == null)
 					Node = null;
 				else
-					Node = await Source.GetNodeAsync(ThingRef);
+					Node = await Rec.Source.GetNodeAsync(ThingRef);
 
 				if (Node == null || !await Node.CanViewAsync(Caller))
 					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
@@ -1695,19 +1734,19 @@ namespace Waher.Networking.XMPP.Concentrator
 				Language Language = await GetLanguage(e.Query);
 				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
 				ThingReference ThingRef = GetThingReference(e.Query);
-				IDataSource Source;
+				DataSourceRec Rec;
 				INode Node;
 
 				lock (this.synchObject)
 				{
-					if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Source))
-						Source = null;
+					if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
+						Rec = null;
 				}
 
-				if (Source == null)
+				if (Rec == null)
 					Node = null;
 				else
-					Node = await Source.GetNodeAsync(ThingRef);
+					Node = await Rec.Source.GetNodeAsync(ThingRef);
 
 				if (Node == null || !await Node.CanViewAsync(Caller))
 					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
@@ -1749,7 +1788,7 @@ namespace Waher.Networking.XMPP.Concentrator
 							if ((NewNodeId != OldNodeId ||
 								NewSourceId != OldSourceId ||
 								NewPartition != OldPartition) &&
-								await Source.GetNodeAsync(new ThingReference(NewNodeId, NewSourceId, NewPartition)) != null)
+								await Rec.Source.GetNodeAsync(new ThingReference(NewNodeId, NewSourceId, NewPartition)) != null)
 							{
 								Result = new Parameters.SetEditableFormResult()
 								{
@@ -1854,7 +1893,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				Language Language = await GetLanguage(e.Query);
 				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
 				ThingReference ThingRef;
-				IDataSource Source;
+				DataSourceRec Rec;
 				INode Node;
 				XmlElement E;
 				DataForm Form = null;
@@ -1870,17 +1909,17 @@ namespace Waher.Networking.XMPP.Concentrator
 
 					lock (this.synchObject)
 					{
-						if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Source))
-							Source = null;
+						if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
+							Rec = null;
 					}
 
-					if (Source == null)
+					if (Rec == null)
 					{
 						e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 7, "Source not found."), e.IQ));
 						return;
 					}
 
-					Node = await Source.GetNodeAsync(ThingRef);
+					Node = await Rec.Source.GetNodeAsync(ThingRef);
 					if (Node == null || !await Node.CanViewAsync(Caller))
 					{
 						e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
@@ -1936,7 +1975,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				LinkedList<KeyValuePair<IDataSource, ThingReference>> Nodes = null;
 				DataForm Form = null;
 				ThingReference ThingRef;
-				IDataSource Source;
+				DataSourceRec Rec;
 				INode Node;
 
 				foreach (XmlNode N in e.Query.ChildNodes)
@@ -1948,14 +1987,14 @@ namespace Waher.Networking.XMPP.Concentrator
 
 							lock (this.synchObject)
 							{
-								if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Source))
-									Source = null;
+								if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
+									Rec = null;
 							}
 
-							if (Source == null)
+							if (Rec == null)
 								Node = null;
 							else
-								Node = await Source.GetNodeAsync(ThingRef);
+								Node = await Rec.Source.GetNodeAsync(ThingRef);
 
 							if (Node == null || !await Node.CanViewAsync(Caller))
 							{
@@ -1971,7 +2010,7 @@ namespace Waher.Networking.XMPP.Concentrator
 							if (Nodes == null)
 								Nodes = new LinkedList<KeyValuePair<IDataSource, ThingReference>>();
 
-							Nodes.AddLast(new KeyValuePair<IDataSource, ThingReference>(Source, ThingRef));
+							Nodes.AddLast(new KeyValuePair<IDataSource, ThingReference>(Rec.Source, ThingRef));
 							break;
 
 						case "x":
@@ -2071,19 +2110,19 @@ namespace Waher.Networking.XMPP.Concentrator
 				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
 				ThingReference ThingRef = GetThingReference(e.Query);
 				Language Language = await GetLanguage(e.Query);
-				IDataSource Source;
+				DataSourceRec Rec;
 				INode Node;
 
 				lock (this.synchObject)
 				{
-					if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Source))
-						Source = null;
+					if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
+						Rec = null;
 				}
 
-				if (Source == null)
+				if (Rec == null)
 					Node = null;
 				else
-					Node = await Source.GetNodeAsync(ThingRef);
+					Node = await Rec.Source.GetNodeAsync(ThingRef);
 
 				if (Node == null || !await Node.CanViewAsync(Caller))
 				{
@@ -2141,19 +2180,19 @@ namespace Waher.Networking.XMPP.Concentrator
 				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
 				ThingReference ThingRef = GetThingReference(e.Query);
 				Language Language = await GetLanguage(e.Query);
-				IDataSource Source;
+				DataSourceRec Rec;
 				INode Node;
 
 				lock (this.synchObject)
 				{
-					if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Source))
-						Source = null;
+					if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
+						Rec = null;
 				}
 
-				if (Source == null)
+				if (Rec == null)
 					Node = null;
 				else
-					Node = await Source.GetNodeAsync(ThingRef);
+					Node = await Rec.Source.GetNodeAsync(ThingRef);
 
 				if (Node == null || !await Node.CanViewAsync(Caller))
 				{
@@ -2222,19 +2261,19 @@ namespace Waher.Networking.XMPP.Concentrator
 				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
 				ThingReference ThingRef = GetThingReference(e.Query);
 				Language Language = await GetLanguage(e.Query);
-				IDataSource Source;
+				DataSourceRec Rec;
 				INode Node;
 
 				lock (this.synchObject)
 				{
-					if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Source))
-						Source = null;
+					if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
+						Rec = null;
 				}
 
-				if (Source == null)
+				if (Rec == null)
 					Node = null;
 				else
-					Node = await Source.GetNodeAsync(ThingRef);
+					Node = await Rec.Source.GetNodeAsync(ThingRef);
 
 				if (Node == null || !await Node.CanViewAsync(Caller))
 				{
@@ -2300,7 +2339,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 				if (Result.Errors == null)
 				{
-					if (await Source.GetNodeAsync(PresumptiveChild) != null)
+					if (await Rec.Source.GetNodeAsync(PresumptiveChild) != null)
 					{
 						Result.Errors = new KeyValuePair<string, string>[]
 						{
@@ -2555,19 +2594,19 @@ namespace Waher.Networking.XMPP.Concentrator
 				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
 				ThingReference ThingRef = GetThingReference(e.Query);
 				Language Language = await GetLanguage(e.Query);
-				IDataSource Source;
+				DataSourceRec Rec;
 				INode Node;
 
 				lock (this.synchObject)
 				{
-					if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Source))
-						Source = null;
+					if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
+						Rec = null;
 				}
 
-				if (Source == null)
+				if (Rec == null)
 					Node = null;
 				else
-					Node = await Source.GetNodeAsync(ThingRef);
+					Node = await Rec.Source.GetNodeAsync(ThingRef);
 
 				if (Node == null || !await Node.CanViewAsync(Caller))
 				{
@@ -2581,7 +2620,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				}
 
 				IThingReference ParentRef = Node.Parent;
-				INode Parent = await Source.GetNodeAsync(Node.Parent);
+				INode Parent = await Rec.Source.GetNodeAsync(Node.Parent);
 				KeyValuePair<string, object>[] Tags = new KeyValuePair<string, object>[]
 				{
 					new KeyValuePair<string, object>("Full", e.From),
@@ -2624,19 +2663,19 @@ namespace Waher.Networking.XMPP.Concentrator
 				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
 				ThingReference ThingRef = GetThingReference(e.Query);
 				Language Language = await GetLanguage(e.Query);
-				IDataSource Source;
+				DataSourceRec Rec;
 				INode Node;
 
 				lock (this.synchObject)
 				{
-					if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Source))
-						Source = null;
+					if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
+						Rec = null;
 				}
 
-				if (Source == null)
+				if (Rec == null)
 					Node = null;
 				else
-					Node = await Source.GetNodeAsync(ThingRef);
+					Node = await Rec.Source.GetNodeAsync(ThingRef);
 
 				if (Node == null || !await Node.CanViewAsync(Caller))
 					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
@@ -2740,19 +2779,19 @@ namespace Waher.Networking.XMPP.Concentrator
 				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
 				ThingReference ThingRef = GetThingReference(e.Query);
 				Language Language = await GetLanguage(e.Query);
-				IDataSource Source;
+				DataSourceRec Rec;
 				INode Node;
 
 				lock (this.synchObject)
 				{
-					if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Source))
-						Source = null;
+					if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
+						Rec = null;
 				}
 
-				if (Source == null)
+				if (Rec == null)
 					Node = null;
 				else
-					Node = await Source.GetNodeAsync(ThingRef);
+					Node = await Rec.Source.GetNodeAsync(ThingRef);
 
 				if (Node == null || !await Node.CanViewAsync(Caller))
 					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
@@ -2801,19 +2840,19 @@ namespace Waher.Networking.XMPP.Concentrator
 				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
 				ThingReference ThingRef = GetThingReference(e.Query);
 				Language Language = await GetLanguage(e.Query);
-				IDataSource Source;
+				DataSourceRec Rec;
 				INode Node;
 
 				lock (this.synchObject)
 				{
-					if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Source))
-						Source = null;
+					if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
+						Rec = null;
 				}
 
-				if (Source == null)
+				if (Rec == null)
 					Node = null;
 				else
-					Node = await Source.GetNodeAsync(ThingRef);
+					Node = await Rec.Source.GetNodeAsync(ThingRef);
 
 				if (Node == null || !await Node.CanViewAsync(Caller))
 					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
@@ -2900,19 +2939,19 @@ namespace Waher.Networking.XMPP.Concentrator
 				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
 				ThingReference ThingRef = GetThingReference(e.Query);
 				Language Language = await GetLanguage(e.Query);
-				IDataSource Source;
+				DataSourceRec Rec;
 				INode Node;
 
 				lock (this.synchObject)
 				{
-					if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Source))
-						Source = null;
+					if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
+						Rec = null;
 				}
 
-				if (Source == null)
+				if (Rec == null)
 					Node = null;
 				else
-					Node = await Source.GetNodeAsync(ThingRef);
+					Node = await Rec.Source.GetNodeAsync(ThingRef);
 
 				if (Node == null || !await Node.CanViewAsync(Caller))
 					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
@@ -3032,19 +3071,19 @@ namespace Waher.Networking.XMPP.Concentrator
 				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
 				ThingReference ThingRef = GetThingReference(e.Query);
 				Language Language = await GetLanguage(e.Query);
-				IDataSource Source;
+				DataSourceRec Rec;
 				INode Node;
 
 				lock (this.synchObject)
 				{
-					if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Source))
-						Source = null;
+					if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
+						Rec = null;
 				}
 
-				if (Source == null)
+				if (Rec == null)
 					Node = null;
 				else
-					Node = await Source.GetNodeAsync(ThingRef);
+					Node = await Rec.Source.GetNodeAsync(ThingRef);
 
 				if (Node == null || !await Node.CanViewAsync(Caller))
 					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
@@ -3102,7 +3141,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			XmppClient Client = (XmppClient)P[0];
 			IqEventArgs e0 = (IqEventArgs)P[1];
 			StringBuilder Xml = new StringBuilder();
-			
+
 			this.StartQueryProgress(Xml, e);
 
 			Xml.Append("<title name='");
@@ -3539,7 +3578,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
 				Language Language = await GetLanguage(e.Query);
 				ThingReference ThingRef;
-				IDataSource Source;
+				DataSourceRec Rec;
 				XmlElement E;
 				INode Node;
 
@@ -3553,14 +3592,14 @@ namespace Waher.Networking.XMPP.Concentrator
 
 					lock (this.synchObject)
 					{
-						if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Source))
-							Source = null;
+						if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
+							Rec = null;
 					}
 
-					if (Source == null)
+					if (Rec == null)
 						Node = null;
 					else
-						Node = await Source.GetNodeAsync(ThingRef);
+						Node = await Rec.Source.GetNodeAsync(ThingRef);
 
 					if (Node == null || !await Node.CanViewAsync(Caller))
 					{
@@ -3629,7 +3668,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
 				ThingReference ThingRef;
 				Language Language = await GetLanguage(e.Query);
-				IDataSource Source;
+				DataSourceRec Rec;
 				XmlElement E;
 				INode Node;
 				ICommand Command = null;
@@ -3648,14 +3687,14 @@ namespace Waher.Networking.XMPP.Concentrator
 
 					lock (this.synchObject)
 					{
-						if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Source))
-							Source = null;
+						if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
+							Rec = null;
 					}
 
-					if (Source == null)
+					if (Rec == null)
 						Node = null;
 					else
-						Node = await Source.GetNodeAsync(ThingRef);
+						Node = await Rec.Source.GetNodeAsync(ThingRef);
 
 					if (Node == null || !await Node.CanViewAsync(Caller))
 					{
@@ -3733,7 +3772,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
 				ThingReference ThingRef;
 				Language Language = await GetLanguage(e.Query);
-				IDataSource Source;
+				DataSourceRec Rec;
 				XmlElement E;
 				INode Node;
 				ICommand Command = null;
@@ -3753,14 +3792,14 @@ namespace Waher.Networking.XMPP.Concentrator
 
 						lock (this.synchObject)
 						{
-							if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Source))
-								Source = null;
+							if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
+								Rec = null;
 						}
 
-						if (Source == null)
+						if (Rec == null)
 							Node = null;
 						else
-							Node = await Source.GetNodeAsync(ThingRef);
+							Node = await Rec.Source.GetNodeAsync(ThingRef);
 
 						if (Node == null || !await Node.CanViewAsync(Caller))
 						{
@@ -3892,7 +3931,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
 				ThingReference ThingRef;
 				Language Language = await GetLanguage(e.Query);
-				IDataSource Source;
+				DataSourceRec Rec;
 				XmlElement E;
 				INode Node;
 				ICommand Command = null;
@@ -3913,14 +3952,14 @@ namespace Waher.Networking.XMPP.Concentrator
 
 						lock (this.synchObject)
 						{
-							if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Source))
-								Source = null;
+							if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
+								Rec = null;
 						}
 
-						if (Source == null)
+						if (Rec == null)
 							Node = null;
 						else
-							Node = await Source.GetNodeAsync(ThingRef);
+							Node = await Rec.Source.GetNodeAsync(ThingRef);
 
 						if (Node == null || !await Node.CanViewAsync(Caller))
 						{
@@ -4205,19 +4244,19 @@ namespace Waher.Networking.XMPP.Concentrator
 				Language Language = await GetLanguage(e.Query);
 				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
 				ThingReference ThingRef = GetThingReference(e.Query);
-				IDataSource Source;
+				DataSourceRec Rec;
 				INode Node;
 
 				lock (this.synchObject)
 				{
-					if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Source))
-						Source = null;
+					if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
+						Rec = null;
 				}
 
-				if (Source == null)
+				if (Rec == null)
 					Node = null;
 				else
-					Node = await Source.GetNodeAsync(ThingRef);
+					Node = await Rec.Source.GetNodeAsync(ThingRef);
 
 				if (Node == null || !await Node.CanViewAsync(Caller))
 					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
@@ -4262,19 +4301,19 @@ namespace Waher.Networking.XMPP.Concentrator
 				Language Language = await GetLanguage(e.Query);
 				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
 				ThingReference ThingRef = GetThingReference(e.Query);
-				IDataSource Source;
+				DataSourceRec Rec;
 				INode Node;
 
 				lock (this.synchObject)
 				{
-					if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Source))
-						Source = null;
+					if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
+						Rec = null;
 				}
 
-				if (Source == null)
+				if (Rec == null)
 					Node = null;
 				else
-					Node = await Source.GetNodeAsync(ThingRef);
+					Node = await Rec.Source.GetNodeAsync(ThingRef);
 
 				if (Node == null || !await Node.CanViewAsync(Caller))
 					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
@@ -4301,6 +4340,401 @@ namespace Waher.Networking.XMPP.Concentrator
 					}
 
 					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 22, "Sniffer not found."), e.IQ));
+				}
+			}
+			catch (Exception ex)
+			{
+				e.IqError(ex);
+			}
+		}
+
+		#endregion
+
+		#region Data Source Events
+
+		private void DataSource_OnEvent(object Sender, SourceEvent Event)
+		{
+			DataSourceRec Rec;
+
+			lock (this.synchObject)
+			{
+				if (!this.dataSources.TryGetValue(Event.SourceId, out Rec))
+					return;
+			}
+
+			SubscriptionRec[] Subscriptions = Rec.SubscriptionsStatic;
+			if (Subscriptions == null || Subscriptions.Length == 0 || this.client.State != XmppState.Connected)
+				return;
+
+			StringBuilder Xml = null;
+			LinkedList<string> ToRemove = null;
+
+			foreach (SubscriptionRec Subscription in Subscriptions)
+				this.SendEventMessage(Subscription, Event, ref ToRemove, ref Xml);
+
+			if (ToRemove != null)
+				this.Remove(Rec, ToRemove);
+		}
+
+		private void Remove(DataSourceRec Rec, LinkedList<string> ToRemove)
+		{
+			lock (Rec.Subscriptions)
+			{
+				foreach (string Jid in ToRemove)
+					Rec.Subscriptions.Remove(Jid);
+
+				Rec.SubscriptionsStatic = ToArray(Rec.Subscriptions);
+			}
+		}
+
+		private void SendEventMessage(SubscriptionRec Subscription, SourceEvent Event, ref LinkedList<string> ToRemove, ref StringBuilder Xml)
+		{
+			SourceEventType EventType = Event.EventType;
+
+			if ((Subscription.EventTypes & EventType) != 0)
+			{
+				RosterItem Item = this.client[XmppClient.GetBareJID(Subscription.Jid)];
+				if (Item == null || !Item.HasLastPresence || !Item.LastPresence.IsOnline)
+				{
+					if (ToRemove == null)
+						ToRemove = new LinkedList<string>();
+
+					ToRemove.AddLast(Subscription.Jid);
+				}
+				else
+				{
+					if (Xml == null)
+						Xml = new StringBuilder();
+					else
+						Xml.Clear();
+
+					switch (EventType)
+					{
+						case SourceEventType.NodeAdded:
+							NodeAdded NodeAdded = (NodeAdded)Event;
+							Xml.Append("<nodeAdded xmlns='");
+							Xml.Append(NamespaceConcentrator);
+
+							if (!string.IsNullOrEmpty(NodeAdded.AfterNodeId))
+							{
+								Xml.Append("' aid='");
+								Xml.Append(XML.Encode(NodeAdded.AfterNodeId));
+							}
+
+							if (!string.IsNullOrEmpty(NodeAdded.AfterPartition))
+							{
+								Xml.Append("' apt='");
+								Xml.Append(XML.Encode(NodeAdded.AfterPartition));
+							}
+
+							this.Append(Xml, NodeAdded, Subscription.Parameters);
+
+							if (Subscription.Parameters)
+								Xml.Append("</nodeAdded>");
+							break;
+
+						case SourceEventType.NodeUpdated:
+							NodeUpdated NodeUpdated = (NodeUpdated)Event;
+
+							Xml.Append("<nodeUpdated xmlns='");
+							Xml.Append(NamespaceConcentrator);
+
+							if (!string.IsNullOrEmpty(NodeUpdated.OldId) && NodeUpdated.OldId != NodeUpdated.NodeId)
+							{
+								Xml.Append("' oid='");
+								Xml.Append(XML.Encode(NodeUpdated.OldId));
+							}
+
+							this.Append(Xml, NodeUpdated, Subscription.Parameters);
+
+							if (Subscription.Parameters)
+								Xml.Append("</nodeUpdated>");
+							break;
+
+						case SourceEventType.NodeStatusChanged:
+							NodeStatusChanged NodeStatusChanged = (NodeStatusChanged)Event;
+							Xml.Append("<nodeStatusChanged xmlns='");
+							Xml.Append(NamespaceConcentrator);
+
+							this.Append(Xml, NodeStatusChanged);
+
+							if (Subscription.Messages && NodeStatusChanged.Messages != null)
+							{
+								Xml.Append('>');
+
+								foreach (Message Message in NodeStatusChanged.Messages)
+									Message.Export(Xml);
+
+								Xml.Append("</nodeStatusChanged>");
+							}
+							else
+								Xml.Append("/>");
+							break;
+
+						case SourceEventType.NodeRemoved:
+							Xml.Append("<nodeRemoved xmlns='");
+							Xml.Append(NamespaceConcentrator);
+							Xml.Append("/>");
+							break;
+
+						case SourceEventType.NodeMovedUp:
+							Xml.Append("<nodeMovedUp xmlns='");
+							Xml.Append(NamespaceConcentrator);
+							Xml.Append("/>");
+							break;
+
+						case SourceEventType.NodeMovedDown:
+							Xml.Append("<nodeMovedDown xmlns='");
+							Xml.Append(NamespaceConcentrator);
+							Xml.Append("/>");
+							break;
+
+						default:
+							return;
+					}
+
+					this.client.SendMessage(MessageType.Normal, Subscription.Jid, Xml.ToString(), string.Empty, string.Empty, Translator.DefaultLanguageCode, string.Empty, string.Empty);
+				}
+			}
+		}
+
+		private static TValue[] ToArray<TKey, TValue>(Dictionary<TKey, TValue> Dictionary)
+		{
+			TValue[] Result = new TValue[Dictionary.Count];
+			Dictionary.Values.CopyTo(Result, 0);
+			return Result;
+		}
+
+		private void Append(StringBuilder Xml, NodeParametersEvent NodeParametersEvent, bool IncludeParameters)
+		{
+			Xml.Append("' nodeType='");
+			Xml.Append(XML.Encode(NodeParametersEvent.NodeType));
+			Xml.Append("' nodeType='");
+			Xml.Append(XML.Encode(NodeParametersEvent.NodeType));
+			Xml.Append("' hasChildren='");
+			Xml.Append(CommonTypes.Encode(NodeParametersEvent.HasChildren));
+
+			if (NodeParametersEvent.IsReadable)
+				Xml.Append("' isReadable='true");
+
+			if (NodeParametersEvent.IsControllable)
+				Xml.Append("' isControllable='true");
+
+			if (NodeParametersEvent.HasCommands)
+				Xml.Append("' hasCommands='true");
+
+			if (!string.IsNullOrEmpty(NodeParametersEvent.ParentId))
+			{
+				Xml.Append("' parentId='");
+				Xml.Append(XML.Encode(NodeParametersEvent.ParentId));
+			}
+
+			if (!string.IsNullOrEmpty(NodeParametersEvent.ParentPartition))
+			{
+				Xml.Append("' parentPartition='");
+				Xml.Append(XML.Encode(NodeParametersEvent.ParentPartition));
+			}
+
+			Xml.Append("' lastChanged='");
+			Xml.Append(XML.Encode(NodeParametersEvent.Updated));
+			Xml.Append("'");
+
+			Append(Xml, (NodeStatusEvent)NodeParametersEvent);
+
+			if (IncludeParameters)
+			{
+				Xml.Append('>');
+
+				if (IncludeParameters && NodeParametersEvent.Parameters != null)
+				{
+					foreach (Parameter Parameter in NodeParametersEvent.Parameters)
+						Parameter.Export(Xml);
+				}
+			}
+			else
+				Xml.Append("/>");
+		}
+
+		private void Append(StringBuilder Xml, NodeStatusEvent NodeStatusEvent)
+		{
+			Xml.Append("' state='");
+			Xml.Append(NodeStatusEvent.State.ToString());
+
+			this.Append(Xml, (NodeEvent)NodeStatusEvent);
+		}
+
+		private void Append(StringBuilder Xml, NodeEvent NodeEvent)
+		{
+			Xml.Append("' id='");
+			Xml.Append(XML.Encode(NodeEvent.NodeId));
+
+			if (!string.IsNullOrEmpty(NodeEvent.Partition))
+			{
+				Xml.Append("' pt='");
+				Xml.Append(XML.Encode(NodeEvent.Partition));
+			}
+
+			this.Append(Xml, (SourceEvent)NodeEvent);
+		}
+
+		private void Append(StringBuilder Xml, SourceEvent SourceEvent)
+		{
+			Xml.Append("' src='");
+			Xml.Append(XML.Encode(SourceEvent.SourceId));
+
+			Xml.Append("' ts='");
+			Xml.Append(XML.Encode(SourceEvent.Timestamp));
+		}
+
+		private async void SubscribeHandler(object Sender, IqEventArgs e)
+		{
+			try
+			{
+				Language Language = await GetLanguage(e.Query);
+				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+				string SourceId = XML.Attribute(e.Query, "src");
+				DataSourceRec Rec;
+
+				lock (this.synchObject)
+				{
+					if (!this.dataSources.TryGetValue(SourceId, out Rec))
+						Rec = null;
+				}
+
+				if (Rec == null || !await Rec.Source.CanViewAsync(Caller))
+					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 7, "Source not found."), e.IQ));
+				else
+				{
+					DateTime GetEventsSince = XML.Attribute(e.Query, "getEventsSince", DateTime.MaxValue);
+					bool Parameters = XML.Attribute(e.Query, "parameters", false);
+					bool Messages = XML.Attribute(e.Query, "messages", false);
+					SourceEventType Types = SourceEventType.None;
+
+					if (XML.Attribute(e.Query, "nodeAdded", true))
+						Types |= SourceEventType.NodeAdded;
+
+					if (XML.Attribute(e.Query, "nodeUpdated", true))
+						Types |= SourceEventType.NodeUpdated;
+
+					if (XML.Attribute(e.Query, "nodeStatusChanged", true))
+						Types |= SourceEventType.NodeStatusChanged;
+
+					if (XML.Attribute(e.Query, "nodeRemoved", true))
+						Types |= SourceEventType.NodeRemoved;
+
+					if (XML.Attribute(e.Query, "nodeMovedUp", true))
+						Types |= SourceEventType.NodeMovedUp;
+
+					if (XML.Attribute(e.Query, "nodeMovedDown", true))
+						Types |= SourceEventType.NodeMovedDown;
+
+					SubscriptionRec SubscriptionRec;
+
+					lock (Rec.Subscriptions)
+					{
+						if (Rec.Subscriptions.TryGetValue(e.From, out SubscriptionRec))
+						{
+							SubscriptionRec.EventTypes |= Types;
+							SubscriptionRec.Messages |= Messages;
+							SubscriptionRec.Parameters |= Parameters;
+							SubscriptionRec.Language = Language;
+						}
+						else
+						{
+							Rec.Subscriptions[e.From] = SubscriptionRec = new SubscriptionRec()
+							{
+								Jid = e.From,
+								EventTypes = Types,
+								Messages = Messages,
+								Parameters = Parameters,
+								Language = Language
+							};
+
+							Rec.SubscriptionsStatic = ToArray(Rec.Subscriptions);
+						}
+					}
+
+					e.IqResult(string.Empty);
+
+					if (GetEventsSince <= DateTime.Now)
+					{
+						StringBuilder Xml = null;
+						LinkedList<string> ToRemove = null;
+
+						foreach (SourceEvent Event in await Database.Find<SourceEvent>(new FilterAnd(new FilterFieldEqualTo("SourceId", SourceId),
+							new FilterFieldGreaterOrEqualTo("Timestamp", GetEventsSince)), "SourceId", "Timestamp"))
+						{
+							this.SendEventMessage(SubscriptionRec, Event, ref ToRemove, ref Xml);
+							if (ToRemove != null)
+							{
+								this.Remove(Rec, ToRemove);
+								break;
+							}
+						}
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				e.IqError(ex);
+			}
+		}
+
+		private async void UnsubscribeHandler(object Sender, IqEventArgs e)
+		{
+			try
+			{
+				Language Language = await GetLanguage(e.Query);
+				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+				string SourceId = XML.Attribute(e.Query, "src");
+				DataSourceRec Rec;
+
+				lock (this.synchObject)
+				{
+					if (!this.dataSources.TryGetValue(SourceId, out Rec))
+						Rec = null;
+				}
+
+				if (Rec == null || !await Rec.Source.CanViewAsync(Caller))
+					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 7, "Source not found."), e.IQ));
+				else
+				{
+					DateTime GetEventsSince = XML.Attribute(e.Query, "getEventsSince", DateTime.MaxValue);
+					SourceEventType Types = SourceEventType.None;
+
+					if (XML.Attribute(e.Query, "nodeAdded", true))
+						Types |= SourceEventType.NodeAdded;
+
+					if (XML.Attribute(e.Query, "nodeUpdated", true))
+						Types |= SourceEventType.NodeUpdated;
+
+					if (XML.Attribute(e.Query, "nodeStatusChanged", true))
+						Types |= SourceEventType.NodeStatusChanged;
+
+					if (XML.Attribute(e.Query, "nodeRemoved", true))
+						Types |= SourceEventType.NodeRemoved;
+
+					if (XML.Attribute(e.Query, "nodeMovedUp", true))
+						Types |= SourceEventType.NodeMovedUp;
+
+					if (XML.Attribute(e.Query, "nodeMovedDown", true))
+						Types |= SourceEventType.NodeMovedDown;
+
+					lock (Rec.Subscriptions)
+					{
+						if (Rec.Subscriptions.TryGetValue(e.From, out SubscriptionRec SubscriptionRec))
+						{
+							SubscriptionRec.EventTypes &= ~Types;
+
+							if (SubscriptionRec.EventTypes == SourceEventType.None)
+							{
+								Rec.Subscriptions.Remove(e.From);
+								Rec.SubscriptionsStatic = ToArray(Rec.Subscriptions);
+							}
+						}
+					}
+
+					e.IqResult(string.Empty);
 				}
 			}
 			catch (Exception ex)

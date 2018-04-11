@@ -181,6 +181,7 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 
 		internal void ReportDone(MessageEventArgs e)
 		{
+			this.isDone = true;
 			this.Invoke(this.Done, e);
 		}
 

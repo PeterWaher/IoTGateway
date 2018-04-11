@@ -146,8 +146,8 @@ namespace Waher.Networking.XMPP.Concentrator
 			this.client.RegisterIqSetHandler("moveNodesUp", NamespaceConcentrator, this.MoveNodesUpHandler, false);                                             // TODO:
 			this.client.RegisterIqSetHandler("moveNodesDown", NamespaceConcentrator, this.MoveNodesDownHandler, false);                                         // TODO:
 
-			this.client.RegisterIqSetHandler("subscribe", NamespaceConcentrator, this.SubscribeHandler, false);                                             // TODO:
-			this.client.RegisterIqSetHandler("unsubscribe", NamespaceConcentrator, this.UnsubscribeHandler, false);                                         // TODO:
+			this.client.RegisterIqSetHandler("subscribe", NamespaceConcentrator, this.SubscribeHandler, false);                                                 // ConcentratorClient.Subscribe
+			this.client.RegisterIqSetHandler("unsubscribe", NamespaceConcentrator, this.UnsubscribeHandler, false);                                             // ConcentratorClient.Unsubscribe
 
 			// getDatabases
 			// getDatabaseReadoutParameters
@@ -496,6 +496,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			public string Jid;
 			public SourceEventType EventTypes;
 			public Language Language;
+			public DateTime Expires;
 			public bool Messages;
 			public bool Parameters;
 		}
@@ -4391,110 +4392,118 @@ namespace Waher.Networking.XMPP.Concentrator
 		{
 			SourceEventType EventType = Event.EventType;
 
-			if ((Subscription.EventTypes & EventType) != 0)
+			if (Subscription.Expires <= DateTime.Now)
 			{
-				RosterItem Item = this.client[XmppClient.GetBareJID(Subscription.Jid)];
-				if (Item == null || !Item.HasLastPresence || !Item.LastPresence.IsOnline)
-				{
-					if (ToRemove == null)
-						ToRemove = new LinkedList<string>();
+				if (ToRemove == null)
+					ToRemove = new LinkedList<string>();
 
-					ToRemove.AddLast(Subscription.Jid);
-				}
+				ToRemove.AddLast(Subscription.Jid);
+			}
+			else if ((Subscription.EventTypes & EventType) != 0)
+			{
+				if (Xml == null)
+					Xml = new StringBuilder();
 				else
+					Xml.Clear();
+
+				switch (EventType)
 				{
-					if (Xml == null)
-						Xml = new StringBuilder();
-					else
-						Xml.Clear();
+					case SourceEventType.NodeAdded:
+						NodeAdded NodeAdded = (NodeAdded)Event;
+						Xml.Append("<nodeAdded xmlns='");
+						Xml.Append(NamespaceConcentrator);
 
-					switch (EventType)
-					{
-						case SourceEventType.NodeAdded:
-							NodeAdded NodeAdded = (NodeAdded)Event;
-							Xml.Append("<nodeAdded xmlns='");
-							Xml.Append(NamespaceConcentrator);
+						if (!string.IsNullOrEmpty(NodeAdded.AfterNodeId))
+						{
+							Xml.Append("' aid='");
+							Xml.Append(XML.Encode(NodeAdded.AfterNodeId));
+						}
 
-							if (!string.IsNullOrEmpty(NodeAdded.AfterNodeId))
-							{
-								Xml.Append("' aid='");
-								Xml.Append(XML.Encode(NodeAdded.AfterNodeId));
-							}
+						if (!string.IsNullOrEmpty(NodeAdded.AfterPartition))
+						{
+							Xml.Append("' apt='");
+							Xml.Append(XML.Encode(NodeAdded.AfterPartition));
+						}
 
-							if (!string.IsNullOrEmpty(NodeAdded.AfterPartition))
-							{
-								Xml.Append("' apt='");
-								Xml.Append(XML.Encode(NodeAdded.AfterPartition));
-							}
+						Xml.Append("' nodeType='");
+						Xml.Append(XML.Encode(NodeAdded.NodeType));
 
-							this.Append(Xml, NodeAdded, Subscription.Parameters);
+						Xml.Append("' displayName='");
+						Xml.Append(XML.Encode(NodeAdded.DisplayName));
 
-							if (Subscription.Parameters)
-								Xml.Append("</nodeAdded>");
-							break;
+						if (NodeAdded.Sniffable)
+							Xml.Append("' sniffable='true");
 
-						case SourceEventType.NodeUpdated:
-							NodeUpdated NodeUpdated = (NodeUpdated)Event;
+						this.Append(Xml, NodeAdded, Subscription.Parameters);
 
-							Xml.Append("<nodeUpdated xmlns='");
-							Xml.Append(NamespaceConcentrator);
+						if (Subscription.Parameters)
+							Xml.Append("</nodeAdded>");
+						break;
 
-							if (!string.IsNullOrEmpty(NodeUpdated.OldId) && NodeUpdated.OldId != NodeUpdated.NodeId)
-							{
-								Xml.Append("' oid='");
-								Xml.Append(XML.Encode(NodeUpdated.OldId));
-							}
+					case SourceEventType.NodeUpdated:
+						NodeUpdated NodeUpdated = (NodeUpdated)Event;
 
-							this.Append(Xml, NodeUpdated, Subscription.Parameters);
+						Xml.Append("<nodeUpdated xmlns='");
+						Xml.Append(NamespaceConcentrator);
 
-							if (Subscription.Parameters)
-								Xml.Append("</nodeUpdated>");
-							break;
+						if (!string.IsNullOrEmpty(NodeUpdated.OldId) && NodeUpdated.OldId != NodeUpdated.NodeId)
+						{
+							Xml.Append("' oid='");
+							Xml.Append(XML.Encode(NodeUpdated.OldId));
+						}
 
-						case SourceEventType.NodeStatusChanged:
-							NodeStatusChanged NodeStatusChanged = (NodeStatusChanged)Event;
-							Xml.Append("<nodeStatusChanged xmlns='");
-							Xml.Append(NamespaceConcentrator);
+						this.Append(Xml, NodeUpdated, Subscription.Parameters);
 
-							this.Append(Xml, NodeStatusChanged);
+						if (Subscription.Parameters)
+							Xml.Append("</nodeUpdated>");
+						break;
 
-							if (Subscription.Messages && NodeStatusChanged.Messages != null)
-							{
-								Xml.Append('>');
+					case SourceEventType.NodeStatusChanged:
+						NodeStatusChanged NodeStatusChanged = (NodeStatusChanged)Event;
+						Xml.Append("<nodeStatusChanged xmlns='");
+						Xml.Append(NamespaceConcentrator);
 
-								foreach (Message Message in NodeStatusChanged.Messages)
-									Message.Export(Xml);
+						this.Append(Xml, NodeStatusChanged);
 
-								Xml.Append("</nodeStatusChanged>");
-							}
-							else
-								Xml.Append("/>");
-							break;
+						if (Subscription.Messages && NodeStatusChanged.Messages != null)
+						{
+							Xml.Append("'>");
 
-						case SourceEventType.NodeRemoved:
-							Xml.Append("<nodeRemoved xmlns='");
-							Xml.Append(NamespaceConcentrator);
-							Xml.Append("/>");
-							break;
+							foreach (Message Message in NodeStatusChanged.Messages)
+								Message.Export(Xml);
 
-						case SourceEventType.NodeMovedUp:
-							Xml.Append("<nodeMovedUp xmlns='");
-							Xml.Append(NamespaceConcentrator);
-							Xml.Append("/>");
-							break;
+							Xml.Append("</nodeStatusChanged>");
+						}
+						else
+							Xml.Append("'/>");
+						break;
 
-						case SourceEventType.NodeMovedDown:
-							Xml.Append("<nodeMovedDown xmlns='");
-							Xml.Append(NamespaceConcentrator);
-							Xml.Append("/>");
-							break;
+					case SourceEventType.NodeRemoved:
+						Xml.Append("<nodeRemoved xmlns='");
+						Xml.Append(NamespaceConcentrator);
+						this.Append(Xml, (NodeRemoved)Event);
+						Xml.Append("'/>");
+						break;
 
-						default:
-							return;
-					}
+					case SourceEventType.NodeMovedUp:
+						Xml.Append("<nodeMovedUp xmlns='");
+						Xml.Append(NamespaceConcentrator);
+						this.Append(Xml, (NodeMovedUp)Event);
+						Xml.Append("'/>");
+						break;
 
-					this.client.SendMessage(MessageType.Normal, Subscription.Jid, Xml.ToString(), string.Empty, string.Empty, Translator.DefaultLanguageCode, string.Empty, string.Empty);
+					case SourceEventType.NodeMovedDown:
+						Xml.Append("<nodeMovedDown xmlns='");
+						Xml.Append(NamespaceConcentrator);
+						this.Append(Xml, (NodeMovedDown)Event);
+						Xml.Append("'/>");
+						break;
+
+					default:
+						return;
 				}
+
+				this.client.SendMessage(MessageType.Normal, Subscription.Jid, Xml.ToString(), string.Empty, string.Empty, Translator.DefaultLanguageCode, string.Empty, string.Empty);
 			}
 		}
 
@@ -4507,10 +4516,6 @@ namespace Waher.Networking.XMPP.Concentrator
 
 		private void Append(StringBuilder Xml, NodeParametersEvent NodeParametersEvent, bool IncludeParameters)
 		{
-			Xml.Append("' nodeType='");
-			Xml.Append(XML.Encode(NodeParametersEvent.NodeType));
-			Xml.Append("' nodeType='");
-			Xml.Append(XML.Encode(NodeParametersEvent.NodeType));
 			Xml.Append("' hasChildren='");
 			Xml.Append(CommonTypes.Encode(NodeParametersEvent.HasChildren));
 
@@ -4522,6 +4527,9 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			if (NodeParametersEvent.HasCommands)
 				Xml.Append("' hasCommands='true");
+
+			if (NodeParametersEvent.ChildrenOrdered)
+				Xml.Append("' childrenOrdered='true");
 
 			if (!string.IsNullOrEmpty(NodeParametersEvent.ParentId))
 			{
@@ -4535,15 +4543,17 @@ namespace Waher.Networking.XMPP.Concentrator
 				Xml.Append(XML.Encode(NodeParametersEvent.ParentPartition));
 			}
 
-			Xml.Append("' lastChanged='");
-			Xml.Append(XML.Encode(NodeParametersEvent.Updated));
-			Xml.Append("'");
+			if (NodeParametersEvent.Updated != DateTime.MinValue)
+			{
+				Xml.Append("' lastChanged='");
+				Xml.Append(XML.Encode(NodeParametersEvent.Updated));
+			}
 
-			Append(Xml, (NodeStatusEvent)NodeParametersEvent);
+			this.Append(Xml, (NodeStatusEvent)NodeParametersEvent);
 
 			if (IncludeParameters)
 			{
-				Xml.Append('>');
+				Xml.Append("'>");
 
 				if (IncludeParameters && NodeParametersEvent.Parameters != null)
 				{
@@ -4552,7 +4562,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				}
 			}
 			else
-				Xml.Append("/>");
+				Xml.Append("'/>");
 		}
 
 		private void Append(StringBuilder Xml, NodeStatusEvent NodeStatusEvent)
@@ -4574,6 +4584,18 @@ namespace Waher.Networking.XMPP.Concentrator
 				Xml.Append(XML.Encode(NodeEvent.Partition));
 			}
 
+			if (!string.IsNullOrEmpty(NodeEvent.LogId))
+			{
+				Xml.Append("' logId='");
+				Xml.Append(XML.Encode(NodeEvent.LogId));
+			}
+
+			if (!string.IsNullOrEmpty(NodeEvent.LocalId))
+			{
+				Xml.Append("' localId='");
+				Xml.Append(XML.Encode(NodeEvent.LocalId));
+			}
+
 			this.Append(Xml, (SourceEvent)NodeEvent);
 		}
 
@@ -4593,6 +4615,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				Language Language = await GetLanguage(e.Query);
 				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
 				string SourceId = XML.Attribute(e.Query, "src");
+				int TtlSeconds = XML.Attribute(e.Query, "ttl", 0);
 				DataSourceRec Rec;
 
 				lock (this.synchObject)
@@ -4603,6 +4626,8 @@ namespace Waher.Networking.XMPP.Concentrator
 
 				if (Rec == null || !await Rec.Source.CanViewAsync(Caller))
 					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 7, "Source not found."), e.IQ));
+				else if (TtlSeconds <= 0)
+					e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 23, "Invalid timeout value."), e.IQ));
 				else
 				{
 					DateTime GetEventsSince = XML.Attribute(e.Query, "getEventsSince", DateTime.MaxValue);
@@ -4638,6 +4663,7 @@ namespace Waher.Networking.XMPP.Concentrator
 							SubscriptionRec.Messages |= Messages;
 							SubscriptionRec.Parameters |= Parameters;
 							SubscriptionRec.Language = Language;
+							SubscriptionRec.Expires = DateTime.Now.AddSeconds(TtlSeconds);
 						}
 						else
 						{
@@ -4647,7 +4673,8 @@ namespace Waher.Networking.XMPP.Concentrator
 								EventTypes = Types,
 								Messages = Messages,
 								Parameters = Parameters,
-								Language = Language
+								Language = Language,
+								Expires = DateTime.Now.AddSeconds(TtlSeconds)
 							};
 
 							Rec.SubscriptionsStatic = ToArray(Rec.Subscriptions);

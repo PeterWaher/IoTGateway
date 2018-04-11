@@ -11,6 +11,7 @@ using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.Concentrator.Queries;
 using Waher.Things;
+using Waher.Things.SourceEvents;
 using Waher.Things.DisplayableParameters;
 using Waher.Things.Queries;
 
@@ -39,6 +40,12 @@ namespace Waher.Networking.XMPP.Concentrator
 		{
 			Client.RegisterMessageHandler("queryProgress", ConcentratorServer.NamespaceConcentrator, this.QueryProgressHandler, false);
 			Client.RegisterMessageHandler("sniff", ConcentratorServer.NamespaceConcentrator, this.SniffMessageHandler, false);
+			Client.RegisterMessageHandler("nodeAdded", ConcentratorServer.NamespaceConcentrator, this.NodeAddedMessageHandler, false);
+			Client.RegisterMessageHandler("nodeUpdated", ConcentratorServer.NamespaceConcentrator, this.NodeUpdatedMessageHandler, false);
+			Client.RegisterMessageHandler("nodeRemoved", ConcentratorServer.NamespaceConcentrator, this.NodeRemovedMessageHandler, false);
+			Client.RegisterMessageHandler("nodeStatusChanged", ConcentratorServer.NamespaceConcentrator, this.NodeStatusChangedMessageHandler, false);
+			Client.RegisterMessageHandler("nodeMovedUp", ConcentratorServer.NamespaceConcentrator, this.NodeMovedUpMessageHandler, false);
+			Client.RegisterMessageHandler("nodeMovedDown", ConcentratorServer.NamespaceConcentrator, this.NodeMovedDownMessageHandler, false);
 		}
 
 		/// <summary>
@@ -50,6 +57,12 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			Client.UnregisterMessageHandler("queryProgress", ConcentratorServer.NamespaceConcentrator, this.QueryProgressHandler, false);
 			Client.UnregisterMessageHandler("sniff", ConcentratorServer.NamespaceConcentrator, this.SniffMessageHandler, false);
+			Client.UnregisterMessageHandler("nodeAdded", ConcentratorServer.NamespaceConcentrator, this.NodeAddedMessageHandler, false);
+			Client.UnregisterMessageHandler("nodeUpdated", ConcentratorServer.NamespaceConcentrator, this.NodeUpdatedMessageHandler, false);
+			Client.UnregisterMessageHandler("nodeRemoved", ConcentratorServer.NamespaceConcentrator, this.NodeRemovedMessageHandler, false);
+			Client.UnregisterMessageHandler("nodeStatusChanged", ConcentratorServer.NamespaceConcentrator, this.NodeStatusChangedMessageHandler, false);
+			Client.UnregisterMessageHandler("nodeMovedUp", ConcentratorServer.NamespaceConcentrator, this.NodeMovedUpMessageHandler, false);
+			Client.UnregisterMessageHandler("nodeMovedDown", ConcentratorServer.NamespaceConcentrator, this.NodeMovedDownMessageHandler, false);
 		}
 
 		/// <summary>
@@ -488,6 +501,14 @@ namespace Waher.Networking.XMPP.Concentrator
 			List<Parameter> ParameterList = Parameters ? new List<Parameter>() : null;
 			List<Message> MessageList = Messages ? new List<Message>() : null;
 
+			this.GetParameters(E, ref ParameterList, ref MessageList);
+
+			return new NodeInformation(NodeId, SourceId, Partition, NodeType, DisplayName, NodeState, LocalId, LogId, HasChildren, ChildrenOrdered,
+				IsReadable, IsControllable, HasCommands, Sniffable, ParentId, ParentPartition, LastChanged, ParameterList?.ToArray(), MessageList?.ToArray());
+		}
+
+		private void GetParameters(XmlElement E, ref List<Parameter> ParameterList, ref List<Message> MessageList)
+		{
 			foreach (XmlNode N in E.ChildNodes)
 			{
 				if (N is XmlElement E2)
@@ -590,9 +611,6 @@ namespace Waher.Networking.XMPP.Concentrator
 					}
 				}
 			}
-
-			return new NodeInformation(NodeId, SourceId, Partition, NodeType, DisplayName, NodeState, LocalId, LogId, HasChildren, ChildrenOrdered,
-				IsReadable, IsControllable, HasCommands, Sniffable, ParentId, ParentPartition, LastChanged, ParameterList?.ToArray(), MessageList?.ToArray());
 		}
 
 		/// <summary>
@@ -2333,7 +2351,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					ExpectedSeqNr++;
 
 					e = Query.PopQueued(ExpectedSeqNr);
-					while (e!=null)
+					while (e != null)
 					{
 						this.ProcessQueryProgress(Query, e);
 						ExpectedSeqNr++;
@@ -2581,6 +2599,224 @@ namespace Waher.Networking.XMPP.Concentrator
 				}
 			}
 		}
+
+		/// <summary>
+		/// Subscribes to data source events.
+		/// </summary>
+		/// <param name="To">Address of concentrator server.</param>
+		/// <param name="SourceID">ID of data source to subscribe to.</param>
+		/// <param name="TimeoutSeconds">Timeout of subscription, in seconds. To maintain a subscription for longer time,
+		/// send a new subscription before the time elapses.</param>
+		/// <param name="EventTypes">Types of events to subscribe to. (Default=<see cref="SourceEventType.All"/>)</param>
+		/// <param name="Parameters">If node parameters should be included in corresponding node events. (Default=true)</param>
+		/// <param name="Messages">If node messages should be included in corresponding node events. (Default=true)</param>
+		/// <param name="Language">Code of desired language.</param>
+		/// <param name="ServiceToken">Optional Service token.</param>
+		/// <param name="DeviceToken">Optional Device token.</param>
+		/// <param name="UserToken">Optional User token.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void Subscribe(string To, string SourceID, int TimeoutSeconds, SourceEventType EventTypes, bool Parameters, bool Messages,
+			string Language, string ServiceToken, string DeviceToken, string UserToken, IqResultEventHandler Callback, object State)
+		{
+			if (TimeoutSeconds <= 0)
+				throw new ArgumentException("Timeout must be positive.", nameof(TimeoutSeconds));
+
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<subscribe xmlns='");
+			Xml.Append(ConcentratorServer.NamespaceConcentrator);
+			Xml.Append("' src='");
+			Xml.Append(XML.Encode(SourceID));
+			Xml.Append("' ttl='");
+			Xml.Append(TimeoutSeconds.ToString());
+			this.AppendTokenAttributes(Xml, ServiceToken, DeviceToken, UserToken);
+			this.AppendNodeInfoAttributes(Xml, Parameters, Messages, Language);
+			Xml.Append("'/>");
+
+			this.client.SendIqSet(To, Xml.ToString(), Callback, State);
+		}
+
+		/// <summary>
+		/// Unsubscribes from data source events.
+		/// </summary>
+		/// <param name="To">Address of concentrator server.</param>
+		/// <param name="SourceID">ID of data source to subscribe to.</param>
+		/// <param name="EventTypes">Types of events to subscribe to. (Default=<see cref="SourceEventType.All"/>)</param>
+		/// <param name="Language">Code of desired language.</param>
+		/// <param name="ServiceToken">Optional Service token.</param>
+		/// <param name="DeviceToken">Optional Device token.</param>
+		/// <param name="UserToken">Optional User token.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void Unsubscribe(string To, string SourceID, SourceEventType EventTypes, string Language,
+			string ServiceToken, string DeviceToken, string UserToken, IqResultEventHandler Callback, object State)
+		{
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<unsubscribe xmlns='");
+			Xml.Append(ConcentratorServer.NamespaceConcentrator);
+			Xml.Append("' src='");
+			Xml.Append(XML.Encode(SourceID));
+			this.AppendTokenAttributes(Xml, ServiceToken, DeviceToken, UserToken);
+			this.AppendNodeInfoAttributes(Xml, false, false, Language);
+			Xml.Append("'/>");
+
+			this.client.SendIqSet(To, Xml.ToString(), Callback, State);
+		}
+
+		private void NodeAddedMessageHandler(object Sender, MessageEventArgs e)
+		{
+			XmlElement E = e.Content;
+			string NodeId = XML.Attribute(E, "id");
+			List<Parameter> ParameterList = new List<Parameter>();
+			List<Message> MessageList = null;
+
+			this.GetParameters(E, ref ParameterList, ref MessageList);
+
+			this.SourceEventReceived(new NodeAdded()
+			{
+				AfterNodeId = XML.Attribute(E, "aid"),
+				AfterPartition = XML.Attribute(E, "apt"),
+				NodeType = XML.Attribute(E, "nodeType"),
+				DisplayName = XML.Attribute(E, "displayName"),
+				Sniffable = XML.Attribute(E, "sniffable", false),
+				HasChildren = XML.Attribute(E, "hasChildren", false),
+				IsReadable = XML.Attribute(E, "isReadable", false),
+				IsControllable = XML.Attribute(E, "isControllable", false),
+				HasCommands = XML.Attribute(E, "hasCommands", false),
+				ChildrenOrdered = XML.Attribute(E, "childrenOrdered", false),
+				ParentId = XML.Attribute(E, "parentId"),
+				ParentPartition = XML.Attribute(E, "parentPartition"),
+				Updated = XML.Attribute(E, "lastChanged", DateTime.MinValue),
+				State = (NodeState)XML.Attribute(E, "state", NodeState.None),
+				NodeId = NodeId,
+				Partition = XML.Attribute(E, "pt"),
+				LogId = XML.Attribute(E, "logId", NodeId),
+				LocalId = XML.Attribute(E, "localId", NodeId),
+				SourceId = XML.Attribute(E, "src"),
+				Timestamp = XML.Attribute(E, "ts", DateTime.MinValue),
+				Parameters = ParameterList?.ToArray()
+			});
+		}
+
+		private void NodeUpdatedMessageHandler(object Sender, MessageEventArgs e)
+		{
+			XmlElement E = e.Content;
+			string NodeId = XML.Attribute(E, "id");
+			List<Parameter> ParameterList = new List<Parameter>();
+			List<Message> MessageList = null;
+
+			this.GetParameters(E, ref ParameterList, ref MessageList);
+
+			this.SourceEventReceived(new NodeUpdated()
+			{
+				OldId = XML.Attribute(E, "oid", NodeId),
+				HasChildren = XML.Attribute(E, "hasChildren", false),
+				IsReadable = XML.Attribute(E, "isReadable", false),
+				IsControllable = XML.Attribute(E, "isControllable", false),
+				HasCommands = XML.Attribute(E, "hasCommands", false),
+				ChildrenOrdered = XML.Attribute(E, "childrenOrdered", false),
+				ParentId = XML.Attribute(E, "parentId"),
+				ParentPartition = XML.Attribute(E, "parentPartition"),
+				Updated = XML.Attribute(E, "lastChanged", DateTime.MinValue),
+				State = (NodeState)XML.Attribute(E, "state", NodeState.None),
+				NodeId = NodeId,
+				Partition = XML.Attribute(E, "pt"),
+				LogId = XML.Attribute(E, "logId", NodeId),
+				LocalId = XML.Attribute(E, "localId", NodeId),
+				SourceId = XML.Attribute(E, "src"),
+				Timestamp = XML.Attribute(E, "ts", DateTime.MinValue),
+				Parameters = ParameterList?.ToArray()
+			});
+		}
+
+		private void NodeRemovedMessageHandler(object Sender, MessageEventArgs e)
+		{
+			XmlElement E = e.Content;
+			string NodeId = XML.Attribute(E, "id");
+
+			this.SourceEventReceived(new NodeRemoved()
+			{
+				NodeId = NodeId,
+				Partition = XML.Attribute(E, "pt"),
+				LogId = XML.Attribute(E, "logId", NodeId),
+				LocalId = XML.Attribute(E, "localId", NodeId),
+				SourceId = XML.Attribute(E, "src"),
+				Timestamp = XML.Attribute(E, "ts", DateTime.MinValue)
+			});
+		}
+
+		private void NodeStatusChangedMessageHandler(object Sender, MessageEventArgs e)
+		{
+			XmlElement E = e.Content;
+			string NodeId = XML.Attribute(E, "id");
+			List<Parameter> ParameterList = null;
+			List<Message> MessageList = new List<Message>();
+
+			this.GetParameters(E, ref ParameterList, ref MessageList);
+
+			this.SourceEventReceived(new NodeStatusChanged()
+			{
+				State = (NodeState)XML.Attribute(E, "state", NodeState.None),
+				NodeId = NodeId,
+				Partition = XML.Attribute(E, "pt"),
+				LogId = XML.Attribute(E, "logId", NodeId),
+				LocalId = XML.Attribute(E, "localId", NodeId),
+				SourceId = XML.Attribute(E, "src"),
+				Timestamp = XML.Attribute(E, "ts", DateTime.MinValue),
+				Messages = MessageList?.ToArray()
+			});
+		}
+
+		private void NodeMovedUpMessageHandler(object Sender, MessageEventArgs e)
+		{
+			XmlElement E = e.Content;
+			string NodeId = XML.Attribute(E, "id");
+
+			this.SourceEventReceived(new NodeMovedUp()
+			{
+				NodeId = NodeId,
+				Partition = XML.Attribute(E, "pt"),
+				LogId = XML.Attribute(E, "logId", NodeId),
+				LocalId = XML.Attribute(E, "localId", NodeId),
+				SourceId = XML.Attribute(E, "src"),
+				Timestamp = XML.Attribute(E, "ts", DateTime.MinValue)
+			});
+		}
+
+		private void NodeMovedDownMessageHandler(object Sender, MessageEventArgs e)
+		{
+			XmlElement E = e.Content;
+			string NodeId = XML.Attribute(E, "id");
+
+			this.SourceEventReceived(new NodeMovedDown()
+			{
+				NodeId = NodeId,
+				Partition = XML.Attribute(E, "pt"),
+				LogId = XML.Attribute(E, "logId", NodeId),
+				LocalId = XML.Attribute(E, "localId", NodeId),
+				SourceId = XML.Attribute(E, "src"),
+				Timestamp = XML.Attribute(E, "ts", DateTime.MinValue)
+			});
+		}
+
+		private void SourceEventReceived(SourceEvent Event)
+		{
+			try
+			{
+				this.OnEvent?.Invoke(this, Event);
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+			}
+		}
+
+		/// <summary>
+		/// Event raised when a data source event has been received.
+		/// </summary>
+		public event SourceEventEventHandler OnEvent = null;
 
 	}
 }

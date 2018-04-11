@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata minClientVersion="3.2">
     <id>Waher.Networking.XMPP.Concentrator.UWP</id>
-    <version>0.1.23</version>
+    <version>0.1.24</version>
     <title>Waher.Networking.XMPP.Concentrator.UWP</title>
     <authors>Peter Waher</authors>
     <owners>Waher Data AB</owners>

@@ -15,9 +15,9 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>networking communication xmpp iot concentrator XEP-0326</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>0.1.23</AssemblyVersion>
-    <FileVersion>0.1.23</FileVersion>
-    <Version>0.1.23</Version>
+    <AssemblyVersion>0.1.24</AssemblyVersion>
+    <FileVersion>0.1.24</FileVersion>
+    <Version>0.1.24</Version>
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Networking\Waher.Networking.XMPP.Concentrator\</UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>

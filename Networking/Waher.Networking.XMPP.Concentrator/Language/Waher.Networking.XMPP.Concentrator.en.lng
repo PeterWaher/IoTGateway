@@ -24,6 +24,7 @@
 			<String id="20">No nodes specified.</String>
 			<String id="21">Node is not sniffable.</String>
 			<String id="22">Sniffer not found.</String>
+			<String id="23">Invalid timeout value.</String>
 		</Namespace>
 	</Language>
 </Translation>

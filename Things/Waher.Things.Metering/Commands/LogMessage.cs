@@ -30,6 +30,9 @@ namespace Waher.Things.Metering.Commands
 			this.node = Node;
 		}
 
+		/// <summary>
+		/// Type of message.
+		/// </summary>
 		[Page(100, "Message")]
 		[Header(101, "Type:")]
 		[ToolTip(102, "Type of message to log.")]
@@ -40,6 +43,9 @@ namespace Waher.Things.Metering.Commands
 			set { this.messageType = value; }
 		}
 
+		/// <summary>
+		/// Message body
+		/// </summary>
 		[Page(100, "Message")]
 		[Header(103, "Body:")]
 		[ToolTip(104, "Text of the message to log.")]
@@ -103,7 +109,7 @@ namespace Waher.Things.Metering.Commands
 		/// <param name="Language">Language to use.</param>
 		public Task<string> GetNameAsync(Language Language)
 		{
-			return Language.GetStringAsync(typeof(MeteringTopology), 96, "Erase messages");
+			return Language.GetStringAsync(typeof(MeteringTopology), 105, "Log message...");
 		}
 
 		/// <summary>
@@ -112,7 +118,7 @@ namespace Waher.Things.Metering.Commands
 		/// <param name="Language">Language to use.</param>
 		public Task<string> GetSuccessStringAsync(Language Language)
 		{
-			return Language.GetStringAsync(typeof(MeteringTopology), 97, "Messages successfully erased.");
+			return Language.GetStringAsync(typeof(MeteringTopology), 106, "Message successfully logged.");
 		}
 
 		/// <summary>
@@ -121,7 +127,7 @@ namespace Waher.Things.Metering.Commands
 		/// <param name="Language">Language to use.</param>
 		public Task<string> GetConfirmationStringAsync(Language Language)
 		{
-			return Language.GetStringAsync(typeof(MeteringTopology), 98, "Are you sure you want to erase all messages for the selected node(s)?");
+			return Task.FromResult<string>(string.Empty);
 		}
 
 		/// <summary>
@@ -130,7 +136,7 @@ namespace Waher.Things.Metering.Commands
 		/// <param name="Language">Language to use.</param>
 		public Task<string> GetFailureStringAsync(Language Language)
 		{
-			return Language.GetStringAsync(typeof(MeteringTopology), 99, "Unable to erase messages.");
+			return Language.GetStringAsync(typeof(MeteringTopology), 107, "Unable to log message.");
 		}
 
 		/// <summary>

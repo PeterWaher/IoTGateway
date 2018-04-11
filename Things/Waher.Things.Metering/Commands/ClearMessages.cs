@@ -74,10 +74,9 @@ namespace Waher.Things.Metering.Commands
 				await Database.Delete(Msg);
 
 			if (this.node.State != NodeState.None)
-			{
 				this.node.State = NodeState.None;
-				await this.node.NodeStateChanged();
-			}
+
+			await this.node.NodeStateChanged();
 		}
 
 		/// <summary>

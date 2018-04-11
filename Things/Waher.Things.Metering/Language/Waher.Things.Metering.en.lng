@@ -106,9 +106,9 @@
 			<String id="102">Type of message to log.</String>
 			<String id="103">Body:</String>
 			<String id="104">Text of the message to log.</String>
-			<String id="105"></String>
-			<String id="106"></String>
-			<String id="107"></String>
+			<String id="105">Log message...</String>
+			<String id="106">Message successfully logged.</String>
+			<String id="107">Unable to log message.</String>
 			<String id="108"></String>
 			<String id="109"></String>
 			<String id="110"></String>

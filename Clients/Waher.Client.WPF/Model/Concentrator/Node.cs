@@ -307,7 +307,8 @@ namespace Waher.Client.WPF.Model.Concentrator
 								break;
 
 							case 1:
-								this.Add(e.Result[0].Unlocalized);
+								MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() =>
+									this.Add(e.Result[0].Unlocalized)));
 								break;
 
 							default:
@@ -516,11 +517,11 @@ namespace Waher.Client.WPF.Model.Concentrator
 
 		public void AddContexMenuItems(TreeNode Node, ref string CurrentGroup, ContextMenu Menu)
 		{
-			if (Node is Node Node2 && Node2.commands != null)
+			if (Node == this && this.commands != null)
 			{
 				MenuItem Item;
 
-				foreach (NodeCommand Command in Node2.commands)
+				foreach (NodeCommand Command in this.commands)
 				{
 					this.GroupSeparator(ref CurrentGroup, Command.SortCategory, Menu);
 
@@ -531,7 +532,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 						Tag = Command
 					});
 
-					Item.Click += Node2.NodeCommandClick;
+					Item.Click += this.NodeCommandClick;
 				}
 			}
 		}

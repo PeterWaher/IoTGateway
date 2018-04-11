@@ -6,6 +6,7 @@ using System.Windows;
 using System.Windows.Input;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Concentrator;
+using Waher.Things.SourceEvents;
 
 namespace Waher.Client.WPF.Model.Concentrator
 {
@@ -93,8 +94,10 @@ namespace Waher.Client.WPF.Model.Concentrator
 				{
 					Mouse.OverrideCursor = Cursors.Wait;
 
+					ConcentratorClient ConcentratorClient = this.XmppAccountNode.ConcentratorClient;
+
 					this.loadingChildren = true;
-					this.XmppAccountNode.ConcentratorClient.GetRootDataSources(FullJid, (sender, e) =>
+					ConcentratorClient.GetRootDataSources(FullJid, (sender, e) =>
 					{
 						this.loadingChildren = false;
 						MainWindow.MouseDefault();
@@ -104,7 +107,12 @@ namespace Waher.Client.WPF.Model.Concentrator
 							SortedDictionary<string, TreeNode> Children = new SortedDictionary<string, TreeNode>();
 
 							foreach (DataSourceReference Ref in e.DataSources)
-								Children[Ref.SourceID] = new DataSource(this, Ref.SourceID, Ref.SourceID, Ref.HasChildren);
+							{
+								DataSource DataSource = new DataSource(this, Ref.SourceID, Ref.SourceID, Ref.HasChildren);
+								Children[Ref.SourceID] = DataSource;
+
+								DataSource.SubscribeToEvents();
+							}
 
 							this.children = Children;
 
@@ -162,6 +170,9 @@ namespace Waher.Client.WPF.Model.Concentrator
 				}
 
 				View.NodeRemoved(Parent, Node);
+
+				if (XmppAccountNode.IsOnline && Node is DataSource DataSource)
+					DataSource.UnsubscribeFromEvents();
 			}
 		}
 

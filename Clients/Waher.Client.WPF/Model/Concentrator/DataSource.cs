@@ -7,6 +7,7 @@ using System.Windows.Media;
 using System.Windows.Input;
 using System.Xml;
 using Waher.Networking.XMPP.Concentrator;
+using Waher.Things.SourceEvents;
 
 namespace Waher.Client.WPF.Model.Concentrator
 {
@@ -15,9 +16,11 @@ namespace Waher.Client.WPF.Model.Concentrator
 	/// </summary>
 	public class DataSource : TreeNode
 	{
+		private Timer timer = null;
 		private string key;
 		private string header;
 		private bool hasChildSources;
+		private bool unsubscribed = false;
 
 		public DataSource(TreeNode Parent, string Key, string Header, bool HasChildSources)
 			: base(Parent)
@@ -30,6 +33,17 @@ namespace Waher.Client.WPF.Model.Concentrator
 			{
 				{ string.Empty, new Loading(this) }
 			};
+		}
+
+		public override void Dispose()
+		{
+			if (this.timer != null)
+			{
+				this.timer.Dispose();
+				this.timer = null;
+			}
+
+			base.Dispose();
 		}
 
 		public override string Key => this.key;
@@ -63,7 +77,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 			{
 				TreeNode Loop = this.Parent;
 
-				while (Loop!=null)
+				while (Loop != null)
 				{
 					if (Loop is XmppConcentrator Concentrator)
 						return Concentrator;
@@ -100,7 +114,12 @@ namespace Waher.Client.WPF.Model.Concentrator
 								SortedDictionary<string, TreeNode> Children = new SortedDictionary<string, TreeNode>();
 
 								foreach (DataSourceReference Ref in e.DataSources)
-									Children[Ref.SourceID] = new DataSource(this, Ref.SourceID, Ref.SourceID, Ref.HasChildren);
+								{
+									DataSource DataSource = new DataSource(this, Ref.SourceID, Ref.SourceID, Ref.HasChildren);
+									Children[Ref.SourceID] = DataSource;
+
+									DataSource.SubscribeToEvents();
+								}
 
 								this.children = Children;
 
@@ -112,7 +131,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 					else
 					{
 						this.loadingChildren = true;
-						Concentrator.XmppAccountNode.ConcentratorClient.GetRootNodes(FullJid, this.key, true, true, 
+						Concentrator.XmppAccountNode.ConcentratorClient.GetRootNodes(FullJid, this.key, true, true,
 							"en", string.Empty, string.Empty, string.Empty, (sender, e) =>
 						{
 							this.loadingChildren = false;
@@ -136,6 +155,70 @@ namespace Waher.Client.WPF.Model.Concentrator
 			}
 
 			base.LoadChildren();
+		}
+
+		public void SubscribeToEvents()
+		{
+			if (this.unsubscribed)
+				return;
+
+			XmppConcentrator Concentrator = this.Concentrator;
+			if (Concentrator == null)
+				return;
+
+			XmppAccountNode XmppAccountNode = Concentrator.XmppAccountNode;
+			if (XmppAccountNode == null)
+				return;
+
+			string FullJid = Concentrator.FullJid;
+			ConcentratorClient ConcentratorClient = XmppAccountNode?.ConcentratorClient;
+			if (ConcentratorClient == null)
+				return;
+
+			if (this.timer != null)
+			{
+				this.timer.Dispose();
+				this.timer = null;
+			}
+
+			ConcentratorClient.Subscribe(FullJid, this.key, 600, SourceEventType.All, true, true, "en",
+				string.Empty, string.Empty, string.Empty, (sender, e) =>
+				{
+					if (e.Ok)
+					{
+						this.timer = new Timer((P) =>
+						{
+							this.SubscribeToEvents();
+						}, null, 300000, 300000);
+					}
+				}, null);
+		}
+
+		public void UnsubscribeFromEvents()
+		{
+			this.unsubscribed = true;
+
+			if (this.timer != null)
+			{
+				this.timer.Dispose();
+				this.timer = null;
+			}
+
+			XmppConcentrator Concentrator = this.Concentrator;
+			if (Concentrator == null)
+				return;
+
+			XmppAccountNode XmppAccountNode = Concentrator.XmppAccountNode;
+			if (XmppAccountNode == null)
+				return;
+
+			string FullJid = Concentrator.FullJid;
+			ConcentratorClient ConcentratorClient = XmppAccountNode?.ConcentratorClient;
+			if (ConcentratorClient == null)
+				return;
+
+			XmppAccountNode.ConcentratorClient.Unsubscribe(FullJid, this.key, SourceEventType.All, "en",
+				string.Empty, string.Empty, string.Empty, null, null);
 		}
 
 		protected override void UnloadChildren()

@@ -730,7 +730,7 @@ namespace Waher.Client.WPF.Model
 				});
 			}
 
-			TreeNode Loop = this.parent;
+			TreeNode Loop = this;
 			while (Loop != null)
 			{
 				if (Loop is IMenuAggregator MenuAggregator)

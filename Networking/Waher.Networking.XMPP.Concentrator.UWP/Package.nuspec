@@ -29,7 +29,7 @@
       <dependency id="Waher.Runtime.Settings" version="1.0.1"/>
       <dependency id="Waher.Runtime.Timing" version="1.0.1"/>
       <dependency id="Waher.Security" version="1.0.1"/>
-      <dependency id="Waher.Things" version="1.0.21"/>
+      <dependency id="Waher.Things" version="1.0.22"/>
     </dependencies>
   </metadata>
   <files>

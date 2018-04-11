@@ -12,8 +12,8 @@ namespace Waher.Things.SourceEvents
 	public abstract class NodeParametersEvent : NodeStatusEvent 
     {
 		private Parameter[] parameters = null;
-		private string nodeType = string.Empty;
 		private bool hasChildren = false;
+		private bool childrenOrdered = false;
 		private bool isReadable = false;
 		private bool isControllable = false;
 		private bool hasCommands = false;
@@ -48,16 +48,6 @@ namespace Waher.Things.SourceEvents
 		{
 			get { return this.updated; }
 			set { this.updated = value; }
-		}
-
-		/// <summary>
-		/// Type of node, at time of event.
-		/// </summary>
-		[DefaultValueStringEmpty]
-		public string NodeType
-		{
-			get { return this.nodeType; }
-			set { this.nodeType = value; }
 		}
 
 		/// <summary>
@@ -118,6 +108,16 @@ namespace Waher.Things.SourceEvents
 		{
 			get { return this.hasCommands; }
 			set { this.hasCommands = value; }
+		}
+
+		/// <summary>
+		/// If node children was ordered, at time of event.
+		/// </summary>
+		[DefaultValue(false)]
+		public bool ChildrenOrdered
+		{
+			get { return this.childrenOrdered; }
+			set { this.childrenOrdered = value; }
 		}
 	}
 }

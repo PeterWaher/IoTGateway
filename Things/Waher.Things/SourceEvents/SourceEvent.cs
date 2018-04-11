@@ -23,6 +23,9 @@ namespace Waher.Things.SourceEvents
 		private string sourceId = string.Empty;
 		private DateTime timestamp = DateTime.MinValue;
 
+		/// <summary>
+		/// Abstract base class for all data source events.
+		/// </summary>
 		public SourceEvent()
 		{
 		}

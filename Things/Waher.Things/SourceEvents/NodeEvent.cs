@@ -11,6 +11,8 @@ namespace Waher.Things.SourceEvents
 	public abstract class NodeEvent : SourceEvent
     {
 		private string nodeId = string.Empty;
+		private string localId = string.Empty;
+		private string logId = string.Empty;
 		private string partition = string.Empty;
 
 		/// <summary>
@@ -41,6 +43,28 @@ namespace Waher.Things.SourceEvents
 		{
 			get { return this.partition; }
 			set { this.partition = value; }
+		}
+
+		/// <summary>
+		/// Log identity, if different from <see cref="NodeId"/>.
+		/// </summary>
+		[DefaultValueStringEmpty]
+		[ShortName("lg")]
+		public string LogId
+		{
+			get { return this.logId; }
+			set { this.logId = value; }
+		}
+
+		/// <summary>
+		/// Local identity, if different from <see cref="NodeId"/>.
+		/// </summary>
+		[DefaultValueStringEmpty]
+		[ShortName("lc")]
+		public string LocalId
+		{
+			get { return this.localId; }
+			set { this.localId = value; }
 		}
 	}
 }

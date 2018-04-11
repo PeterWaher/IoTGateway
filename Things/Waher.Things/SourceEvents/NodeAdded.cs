@@ -41,5 +41,13 @@ namespace Waher.Things.SourceEvents
 			get { return this.afterPartition; }
 			set { this.afterPartition = value; }
 		}
+
+		/// <summary>
+		/// Type of data source event.
+		/// </summary>
+		public override SourceEventType EventType
+		{
+			get { return SourceEventType.NodeAdded; }
+		}
 	}
 }

@@ -29,5 +29,13 @@ namespace Waher.Things.SourceEvents
 			get { return this.messages; }
 			set { this.messages = value; }
 		}
+
+		/// <summary>
+		/// Type of data source event.
+		/// </summary>
+		public override SourceEventType EventType
+		{
+			get { return SourceEventType.NodeStatusChanged; }
+		}
 	}
 }

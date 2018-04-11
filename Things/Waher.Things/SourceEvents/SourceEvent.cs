@@ -58,5 +58,13 @@ namespace Waher.Things.SourceEvents
 			get { return this.timestamp; }
 			set { this.timestamp = value; }
 		}
+
+		/// <summary>
+		/// Type of data source event.
+		/// </summary>
+		public abstract SourceEventType EventType
+		{
+			get;
+		}
 	}
 }

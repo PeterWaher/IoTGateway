@@ -18,5 +18,13 @@ namespace Waher.Things.SourceEvents
 			: base()
 		{
 		}
+
+		/// <summary>
+		/// Type of data source event.
+		/// </summary>
+		public override SourceEventType EventType
+		{
+			get { return SourceEventType.NodeRemoved; }
+		}
 	}
 }

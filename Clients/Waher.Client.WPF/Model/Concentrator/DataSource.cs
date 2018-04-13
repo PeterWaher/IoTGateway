@@ -16,6 +16,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 	/// </summary>
 	public class DataSource : TreeNode
 	{
+		private Dictionary<string, Node> nodes = new Dictionary<string, Node>();
 		private Timer timer = null;
 		private string key;
 		private string header;
@@ -147,7 +148,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 								this.children = Children;
 
 								this.OnUpdated();
-								this.Concentrator?.NodesAdded(Children.Values, this);
+								this.NodesAdded(Children.Values, this);
 							}
 						}, null);
 					}
@@ -155,6 +156,40 @@ namespace Waher.Client.WPF.Model.Concentrator
 			}
 
 			base.LoadChildren();
+		}
+
+		public void NodesAdded(IEnumerable<TreeNode> Nodes, TreeNode Parent)
+		{
+			lock (this.nodes)
+			{
+				foreach (TreeNode Node in Nodes)
+				{
+					if (Node is Node Node2)
+					{
+						string Key = Node2.Partition + " " + Node2.NodeId;
+						this.nodes[Key] = Node2;
+					}
+				}
+			}
+
+			this.Concentrator?.NodesAdded(Nodes, Parent);
+		}
+
+		public void NodesRemoved(IEnumerable<TreeNode> Nodes, TreeNode Parent)
+		{
+			lock (this.nodes)
+			{
+				foreach (TreeNode Node in Nodes)
+				{
+					if (Node is Node Node2)
+					{
+						string Key = Node2.Partition + " " + Node2.NodeId;
+						this.nodes.Remove(Key);
+					}
+				}
+			}
+
+			this.Concentrator?.NodesRemoved(Nodes, Parent);
 		}
 
 		public void SubscribeToEvents()
@@ -228,7 +263,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 			if (this.children == null || this.children.Count != 1 || !this.children.ContainsKey(string.Empty))
 			{
 				if (this.children != null)
-					this.Concentrator?.NodesRemoved(this.children.Values, this);
+					this.NodesRemoved(this.children.Values, this);
 
 				this.children = new SortedDictionary<string, TreeNode>()
 				{
@@ -238,5 +273,134 @@ namespace Waher.Client.WPF.Model.Concentrator
 				this.OnUpdated();
 			}
 		}
+
+		internal void ConcentratorClient_OnEvent(object Sender, SourceEventMessageEventArgs EventMessage)
+		{
+			SourceEvent Event = EventMessage.Event;
+			string Key, ParentKey;
+			Node Node;
+
+			switch (Event.EventType)
+			{
+				case SourceEventType.NodeAdded:
+					if (Event is NodeAdded NodeAdded)
+					{
+						Key = NodeAdded.Partition + " " + NodeAdded.NodeId;
+						ParentKey = NodeAdded.ParentPartition + " " + NodeAdded.ParentId;
+						Node Parent;
+
+						lock (this.nodes)
+						{
+							if (this.nodes.ContainsKey(Key))
+								return; // Already added
+
+							if (!this.nodes.TryGetValue(ParentKey, out Parent))
+								return; // Parent not loaded.
+
+							Node = new Node(Parent, new NodeInformation(NodeAdded.NodeId, NodeAdded.SourceId, NodeAdded.Partition,
+								NodeAdded.NodeType, NodeAdded.DisplayName, NodeAdded.State, NodeAdded.LocalId, NodeAdded.LogId,
+								NodeAdded.HasChildren, NodeAdded.ChildrenOrdered, NodeAdded.IsReadable, NodeAdded.IsControllable,
+								NodeAdded.HasCommands, NodeAdded.Sniffable, NodeAdded.ParentId, NodeAdded.ParentPartition,
+								NodeAdded.Updated, NodeAdded.Parameters, null));
+
+							this.nodes[Key] = Node;
+						}
+
+						Parent.Add(Node);
+					}
+					break;
+
+				case SourceEventType.NodeUpdated:
+					if (Event is NodeUpdated NodeUpdated)
+					{
+						Key = NodeUpdated.Partition + " " + NodeUpdated.NodeId;
+
+						lock (this.nodes)
+						{
+							if (!this.nodes.TryGetValue(Key, out Node))
+								return; // Parent not loaded.
+						}
+
+						Node.NodeInformation = new NodeInformation(NodeUpdated.NodeId, NodeUpdated.SourceId, NodeUpdated.Partition,
+							Node.NodeInformation.NodeType, Node.NodeInformation.DisplayName, NodeUpdated.State, NodeUpdated.LocalId, NodeUpdated.LogId,
+							NodeUpdated.HasChildren, NodeUpdated.ChildrenOrdered, NodeUpdated.IsReadable, NodeUpdated.IsControllable,
+							NodeUpdated.HasCommands, Node.NodeInformation.Sniffable, NodeUpdated.ParentId, NodeUpdated.ParentPartition,
+							NodeUpdated.Updated, NodeUpdated.Parameters, null);
+
+						Node.OnUpdated();
+					}
+					break;
+
+				case SourceEventType.NodeRemoved:
+					if (Event is NodeRemoved NodeRemoved)
+					{
+						Key = NodeRemoved.Partition + " " + NodeRemoved.NodeId;
+
+						lock (this.nodes)
+						{
+							if (!this.nodes.TryGetValue(Key, out Node))
+								return; // Parent not loaded.
+
+							this.nodes.Remove(Key);
+						}
+
+						Node.Parent.RemoveChild(Node);
+						this.NodesRemoved(new TreeNode[] { Node }, Node.Parent);
+					}
+					break;
+
+				case SourceEventType.NodeStatusChanged:
+					if (Event is NodeStatusChanged NodeStatusChanged)
+					{
+						Key = NodeStatusChanged.Partition + " " + NodeStatusChanged.NodeId;
+
+						lock (this.nodes)
+						{
+							if (!this.nodes.TryGetValue(Key, out Node))
+								return; // Parent not loaded.
+						}
+
+						Node.NodeInformation = new NodeInformation(NodeStatusChanged.NodeId, NodeStatusChanged.SourceId, NodeStatusChanged.Partition,
+							Node.NodeInformation.NodeType, Node.NodeInformation.DisplayName, NodeStatusChanged.State, NodeStatusChanged.LocalId, NodeStatusChanged.LogId,
+							Node.NodeInformation.HasChildren, Node.NodeInformation.ChildrenOrdered, Node.NodeInformation.IsReadable, Node.NodeInformation.IsControllable,
+							Node.NodeInformation.HasCommands, Node.NodeInformation.Sniffable, Node.NodeInformation.ParentId, Node.NodeInformation.ParentPartition,
+							Node.NodeInformation.LastChanged, Node.NodeInformation.ParameterList, null);
+
+						Node.OnUpdated();
+					}
+					break;
+
+				case SourceEventType.NodeMovedUp:
+					if (Event is NodeMovedUp NodeMovedUp)
+					{
+						Key = NodeMovedUp.Partition + " " + NodeMovedUp.NodeId;
+
+						lock (this.nodes)
+						{
+							if (!this.nodes.TryGetValue(Key, out Node))
+								return; // Parent not loaded.
+						}
+
+						// TODO: Node.Parent?.MoveUp(Node);
+					}
+					break;
+
+				case SourceEventType.NodeMovedDown:
+					if (Event is NodeMovedDown NodeMovedDown)
+					{
+						Key = NodeMovedDown.Partition + " " + NodeMovedDown.NodeId;
+
+						lock (this.nodes)
+						{
+							if (!this.nodes.TryGetValue(Key, out Node))
+								return; // Parent not loaded.
+						}
+
+						// TODO: Node.Parent?.MoveDown(Node);
+					}
+					break;
+			}
+		}
+
 	}
 }

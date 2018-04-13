@@ -4,6 +4,7 @@ using System.Text;
 using System.Xml;
 using System.Threading;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Waher.Events;
@@ -21,12 +22,12 @@ using Waher.Networking.XMPP.Provisioning;
 using Waher.Networking.XMPP.PubSub;
 using Waher.Networking.XMPP.Sensor;
 using Waher.Networking.XMPP.ServiceDiscovery;
+using Waher.Things.SourceEvents;
 using Waher.Client.WPF.Dialogs;
 using Waher.Client.WPF.Model.Concentrator;
 using Waher.Client.WPF.Model.Provisioning;
 using Waher.Client.WPF.Model.PubSub;
 using Waher.Client.WPF.Model.Things;
-using System.Windows.Controls;
 
 namespace Waher.Client.WPF.Model
 {
@@ -44,6 +45,7 @@ namespace Waher.Client.WPF.Model
 		private LinkedList<KeyValuePair<DateTime, MessageEventArgs>> unhandledMessages = new LinkedList<KeyValuePair<DateTime, MessageEventArgs>>();
 		private LinkedList<XmppComponent> components = new LinkedList<XmppComponent>();
 		private Dictionary<string, List<RosterItemEventHandler>> rosterSubscriptions = new Dictionary<string, List<RosterItemEventHandler>>(StringComparer.CurrentCultureIgnoreCase);
+		private Dictionary<string, DataSource> dataSources = new Dictionary<string, DataSource>();
 		private Connections connections;
 		private XmppClient client;
 		private SensorClient sensorClient;
@@ -159,7 +161,18 @@ namespace Waher.Client.WPF.Model
 			this.controlClient = new ControlClient(this.client);
 			this.concentratorClient = new ConcentratorClient(this.client);
 
+			this.concentratorClient.OnEvent += ConcentratorClient_OnEvent;
+
 			this.client.Connect();
+		}
+
+		private void ConcentratorClient_OnEvent(object Sender, SourceEventMessageEventArgs EventMessage)
+		{
+			if (this.TryGetChild(EventMessage.FromBareJID, out TreeNode Child) &&
+				(Child is XmppConcentrator Concentrator))
+			{
+				Concentrator.ConcentratorClient_OnEvent(Sender, EventMessage);
+			}
 		}
 
 		private void Client_OnNormalMessage(object Sender, MessageEventArgs e)

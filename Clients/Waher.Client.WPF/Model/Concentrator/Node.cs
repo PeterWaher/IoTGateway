@@ -59,6 +59,11 @@ namespace Waher.Client.WPF.Model.Concentrator
 		public override string ToolTip => "Node";
 		public override bool CanRecycle => false;
 		public override DisplayableParameters DisplayableParameters => this.parameters;
+		public NodeInformation NodeInformation
+		{
+			get { return this.nodeInfo; }
+			internal set { this.nodeInfo = value; }
+		}
 
 		public override string TypeName
 		{
@@ -114,6 +119,24 @@ namespace Waher.Client.WPF.Model.Concentrator
 			}
 		}
 
+		public DataSource DataSource
+		{
+			get
+			{
+				TreeNode Loop = this.Parent;
+
+				while (Loop != null)
+				{
+					if (Loop is DataSource DataSource)
+						return DataSource;
+
+					Loop = Loop.Parent;
+				}
+
+				return null;
+			}
+		}
+
 		private bool loadingChildren = false;
 
 		public ConcentratorClient ConcentratorClient
@@ -161,14 +184,14 @@ namespace Waher.Client.WPF.Model.Concentrator
 								this.children = Children;
 
 								this.OnUpdated();
-								this.Concentrator?.NodesAdded(Children.Values, this);
+								this.DataSource?.NodesAdded(Children.Values, this);
 							}
 						}, null);
 					}
 					else
 					{
 						if (this.children != null)
-							this.Concentrator?.NodesRemoved(this.children.Values, this);
+							this.DataSource?.NodesRemoved(this.children.Values, this);
 
 						this.children = null;
 
@@ -187,7 +210,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 			if (this.nodeInfo.HasChildren && (this.children == null || this.children.Count != 1 || !this.children.ContainsKey(string.Empty)))
 			{
 				if (this.children != null)
-					this.Concentrator?.NodesRemoved(this.children.Values, this);
+					this.DataSource?.NodesRemoved(this.children.Values, this);
 
 				this.children = new SortedDictionary<string, TreeNode>()
 				{
@@ -358,25 +381,28 @@ namespace Waher.Client.WPF.Model.Concentrator
 				}, (sender, e) =>
 				{
 					if (e.Ok)
-					{
-						if (!this.loadingChildren && (this.children == null || this.children.Count != 1 || !this.children.ContainsKey(string.Empty)))
-						{
-							SortedDictionary<string, TreeNode> Children = new SortedDictionary<string, TreeNode>();
-
-							if (this.children != null)
-							{
-								foreach (KeyValuePair<string, TreeNode> P in this.children)
-									Children[P.Key] = P.Value;
-							}
-
-							Children[e.NodeInformation.NodeId] = new Node(this, e.NodeInformation);
-							this.children = Children;
-
-							this.OnUpdated();
-							this.Concentrator?.NodesAdded(Children.Values, this);
-						}
-					}
+						this.Add(new Node(this, e.NodeInformation));
 				}, null);
+			}
+		}
+
+		internal void Add(Node Node)
+		{
+			if (!this.loadingChildren && (this.children == null || this.children.Count != 1 || !this.children.ContainsKey(string.Empty)))
+			{
+				SortedDictionary<string, TreeNode> Children = new SortedDictionary<string, TreeNode>();
+
+				if (this.children != null)
+				{
+					foreach (KeyValuePair<string, TreeNode> P in this.children)
+						Children[P.Key] = P.Value;
+				}
+
+				Children[Node.NodeId] = Node;
+				this.children = Children;
+
+				this.OnUpdated();
+				this.DataSource?.NodesAdded(Children.Values, this);
 			}
 		}
 

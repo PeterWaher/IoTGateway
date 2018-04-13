@@ -16,6 +16,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 	public class XmppConcentrator : XmppContact
 	{
 		private Dictionary<string, bool> capabilities = null;
+		private Dictionary<string, DataSource> dataSources = new Dictionary<string, DataSource>();
 		private bool suportsEvents;
 
 		public XmppConcentrator(TreeNode Parent, XmppClient Client, string BareJid, bool SupportsEventSubscripton)
@@ -128,28 +129,25 @@ namespace Waher.Client.WPF.Model.Concentrator
 
 		public void NodesAdded(IEnumerable<TreeNode> Nodes, TreeNode Parent)
 		{
-			XmppAccountNode XmppAccountNode = this.XmppAccountNode;
-			if (XmppAccountNode == null)
-				return;
-
-			Controls.ConnectionView View = XmppAccountNode.View;
-			if (View == null)
-				return;
+			Controls.ConnectionView View = this.XmppAccountNode?.View;
 
 			foreach (TreeNode Node in Nodes)
-				View.NodeAdded(Parent, Node);
+			{
+				View?.NodeAdded(Parent, Node);
+
+				if (Node is DataSource DataSource)
+				{
+					lock (this.dataSources)
+					{
+						this.dataSources[DataSource.Key] = DataSource;
+					}
+				}
+			}
 		}
 
 		public void NodesRemoved(IEnumerable<TreeNode> Nodes, TreeNode Parent)
 		{
-			XmppAccountNode XmppAccountNode = this.XmppAccountNode;
-			if (XmppAccountNode == null)
-				return;
-
-			Controls.ConnectionView View = XmppAccountNode.View;
-			if (View == null)
-				return;
-
+			Controls.ConnectionView View = this.XmppAccountNode?.View;
 			LinkedList<KeyValuePair<TreeNode, TreeNode>> ToRemove = new LinkedList<KeyValuePair<TreeNode, TreeNode>>();
 
 			foreach (TreeNode Node in Nodes)
@@ -169,10 +167,18 @@ namespace Waher.Client.WPF.Model.Concentrator
 						ToRemove.AddLast(new KeyValuePair<TreeNode, TreeNode>(Node, Child));
 				}
 
-				View.NodeRemoved(Parent, Node);
+				View?.NodeRemoved(Parent, Node);
 
-				if (XmppAccountNode.IsOnline && Node is DataSource DataSource)
-					DataSource.UnsubscribeFromEvents();
+				if (Node is DataSource DataSource)
+				{
+					if (XmppAccountNode.IsOnline)
+						DataSource.UnsubscribeFromEvents();
+
+					lock (this.dataSources)
+					{
+						this.dataSources.Remove(DataSource.Key);
+					}
+				}
 			}
 		}
 
@@ -192,6 +198,19 @@ namespace Waher.Client.WPF.Model.Concentrator
 
 				this.OnUpdated();
 			}
+		}
+
+		internal void ConcentratorClient_OnEvent(object Sender, SourceEventMessageEventArgs EventMessage)
+		{
+			DataSource Source;
+
+			lock(this.dataSources)
+			{
+				if (!this.dataSources.TryGetValue(EventMessage.Event.SourceId, out Source))
+					return;
+			}
+
+			Source.ConcentratorClient_OnEvent(Sender, EventMessage);
 		}
 
 	}

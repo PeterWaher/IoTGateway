@@ -2697,7 +2697,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				SourceId = XML.Attribute(E, "src"),
 				Timestamp = XML.Attribute(E, "ts", DateTime.MinValue),
 				Parameters = ParameterList?.ToArray()
-			});
+			}, e);
 		}
 
 		private void NodeUpdatedMessageHandler(object Sender, MessageEventArgs e)
@@ -2728,7 +2728,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				SourceId = XML.Attribute(E, "src"),
 				Timestamp = XML.Attribute(E, "ts", DateTime.MinValue),
 				Parameters = ParameterList?.ToArray()
-			});
+			}, e);
 		}
 
 		private void NodeRemovedMessageHandler(object Sender, MessageEventArgs e)
@@ -2744,7 +2744,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				LocalId = XML.Attribute(E, "localId", NodeId),
 				SourceId = XML.Attribute(E, "src"),
 				Timestamp = XML.Attribute(E, "ts", DateTime.MinValue)
-			});
+			}, e);
 		}
 
 		private void NodeStatusChangedMessageHandler(object Sender, MessageEventArgs e)
@@ -2766,7 +2766,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				SourceId = XML.Attribute(E, "src"),
 				Timestamp = XML.Attribute(E, "ts", DateTime.MinValue),
 				Messages = MessageList?.ToArray()
-			});
+			}, e);
 		}
 
 		private void NodeMovedUpMessageHandler(object Sender, MessageEventArgs e)
@@ -2782,7 +2782,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				LocalId = XML.Attribute(E, "localId", NodeId),
 				SourceId = XML.Attribute(E, "src"),
 				Timestamp = XML.Attribute(E, "ts", DateTime.MinValue)
-			});
+			}, e);
 		}
 
 		private void NodeMovedDownMessageHandler(object Sender, MessageEventArgs e)
@@ -2798,14 +2798,14 @@ namespace Waher.Networking.XMPP.Concentrator
 				LocalId = XML.Attribute(E, "localId", NodeId),
 				SourceId = XML.Attribute(E, "src"),
 				Timestamp = XML.Attribute(E, "ts", DateTime.MinValue)
-			});
+			}, e);
 		}
 
-		private void SourceEventReceived(SourceEvent Event)
+		private void SourceEventReceived(SourceEvent Event, MessageEventArgs e)
 		{
 			try
 			{
-				this.OnEvent?.Invoke(this, Event);
+				this.OnEvent?.Invoke(this, new SourceEventMessageEventArgs(Event, e));
 			}
 			catch (Exception ex)
 			{
@@ -2816,7 +2816,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <summary>
 		/// Event raised when a data source event has been received.
 		/// </summary>
-		public event SourceEventEventHandler OnEvent = null;
+		public event SourceEventMessageEventHandler OnEvent = null;
 
 	}
 }

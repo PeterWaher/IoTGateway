@@ -128,6 +128,7 @@
     <Compile Include="Events\NodeQueryTableUpdatedEventArgs.cs" />
     <Compile Include="Events\NodesInformationEventArgs.cs" />
     <Compile Include="Events\SnifferRegistrationEventArgs..cs" />
+    <Compile Include="Events\SourceEventMessageEventArgs.cs" />
     <Compile Include="Events\StringsResponseEventArgs..cs" />
     <Compile Include="NodeCommand.cs" />
     <Compile Include="NodeInformation.cs" />

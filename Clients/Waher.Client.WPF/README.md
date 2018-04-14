@@ -4,20 +4,7 @@ The **Waher.Client.WPF** project implements a simple IoT client that allows you 
 chat with both users and things. The client GUI is built using Windows Presentation Foundation (WPF). Chat sessions support normal plain text content, and 
 rich content based on markdown. The client also supports multiple connections to different servers.
 
-![Chat](../../Images/Waher.Client.WPF.1.png)
-
-To allow developers to understand underlying network protocols, the IoT client provides sniffers that display detailed information about the underlying 
-protocol.
-
-![Sniff](../../Images/Waher.Client.WPF.2.png)
-
-Apart from normal Instant Messaging features, the IoT client also includes integrated support for M2M and IoT protocols. 
-
-![IoT Readout](../../Images/Waher.Client.WPF.3.png)
-
-## Binary executable
-
-You can test the application by downloading a [binary executable](../../Executables/Waher.Client.WPF.zip).
+For more information, see <https://waher.se/IoTGateway/SimpleIoTClient.md>
 
 ## License
 

@@ -100,7 +100,8 @@ can be run by users to perform different types of interaction with things or the
 Content
 ----------------------
 
-The [Content](Content) folder contains libraries that manage Internet Content, and Internet Content Type encodings and decodings.
+The [Content](Content) folder contains libraries that Internet Content including parsing and rendering, and their
+corresponding Internet Content Type encodings and decodings.
 
 | Project                            | Type         | Link                                                                    | Project description |
 |------------------------------------|--------------|-------------------------------------------------------------------------|---------------------|
@@ -207,7 +208,9 @@ The folder also contains the following unit test projects:
 Persistence
 ----------------------
 
-The [Persistence](Persistence) folder contains libraries that manage data persistence in object databases.
+The [Persistence](Persistence) folder contains libraries that create an infrastructure for persistence of objects in applications. 
+This includes a simple embedded encrypted local object database, as well as integration with external databases. Objects are persisted based on 
+their annotated class definitions.
 
 | Project                            | Type         | Link                                                               | Project description |
 |------------------------------------|--------------|--------------------------------------------------------------------|---------------------|
@@ -227,7 +230,8 @@ The folder also contains the following unit test projects:
 Runtime
 ----------------------
 
-The [Runtime](Runtime) folder contains libraries that manage different aspects of the runtime environment.
+The [Runtime](Runtime) folder contains libraries that help applications with common runtime tasks, such as caching, maintaining a type inventory, 
+language localization, runtime settings, timing and scheduling.
 
 | Project                            | Type          | Link                                                                    | Project description |
 |------------------------------------|---------------|-------------------------------------------------------------------------|---------------------|
@@ -247,7 +251,10 @@ The folder also contains the following unit test projects:
 Script
 ----------------------
 
-The [Script](Script) folder contains libraries that manage scripting.
+The [Script](Script) folder contains libraries that define an extensible execution envionment for script supporting canonical extensions, .NET integration, 
+graphs, physical units and unit conversions, etc. For more information about the script engine supported by these libraries, see the 
+[script reference](https://waher.se/Script.md).
+
 
 | Project                      | Type         | Link                                                              | Project description |
 |------------------------------|--------------|-------------------------------------------------------------------|---------------------|
@@ -267,12 +274,13 @@ The folder also contains the following unit test projects:
 Security
 ----------------------
 
-The [Security](Security) folder contains libraries that relate to security and encryption.
+The [Security](Security) folder contains libraries that are dedicated at solving particular security or data protection such as authentication, 
+authorization and encryption.
 
 | Project                      | Type         | Link                                                            | Project description |
 |------------------------------|--------------|-----------------------------------------------------------------|---------------------|
 | **Waher.Security**           | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Security/)         | The [Waher.Security](Security/Waher.Security) project provides a basic security model based on users, roles and privileges. It's not based on operating system features, to allow code to be platform independent. |
-| **Waher.Security.DTLS**      | .NET Std 1.3 |                                                                 | The [Waher.Security.DTLS](Security/Waher.Security.DTLS) project contains a class library implementing the Datagram Transport Layer Security (DTLS) Version 1.2, as defined in [RFC 6347](https://tools.ietf.org/html/rfc6347). Work in progress. |
+| **Waher.Security.DTLS**      | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Security.DTLS/)    | The [Waher.Security.DTLS](https://github.com/PeterWaher/IoTGateway/tree/master/Security/Waher.Security.DTLS) project contains a class library implementing the Datagram Transport Layer Security (DTLS) Version 1.2, as defined in [RFC 6347](https://tools.ietf.org/html/rfc6347). |
 | **Waher.Security.JWT**       | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Security.JWT/)     | The [Waher.Security.JWT](Security/Waher.Security.JWT) project helps applications with the creation and validation of Java Web Tokens (JWT), as defined in [RFC 7519](https://tools.ietf.org/html/rfc7519). |
 | **Waher.Security.JWT.UWP**   | UWP          | [NuGet](https://www.nuget.org/packages/Waher.Security.JWT.UWP/) | The [Waher.Security.JWT.UWP](Security/Waher.Security.JWT.UWP) project provides a Universal Windows Platform compatible version of the **Waher.Security.JWT** Library. This library can be used to develop applications for Windows 10, on for instance Rasperry Pi. |
 
@@ -296,7 +304,9 @@ The [Services](Services) folder contains standalone service applications.
 Things
 ----------------------
 
-The [Things](Things) folder contains libraries that manage data abstraction for things.
+The [Things](Things) folder contains libraries that define a hardware and data abstraction layer for interacting with things. This includes describing 
+sensor data, control parameters, attributes, displayable parameters, commands, queries and data sources. It also includes embedding things dynamically,
+to form more complex devices, such as concentrators or bridges.
 
 | Project                   | Type         | Link                                                           | Project description |
 |---------------------------|--------------|----------------------------------------------------------------|---------------------|

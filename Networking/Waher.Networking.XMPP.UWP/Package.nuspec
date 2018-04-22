@@ -36,7 +36,10 @@ XEP-0331: Data Forms - Color Field Types
 XEP-0336: Data Forms - Dynamic Forms
 XEP-0348: Signing Forms
 XEP-0363: HTTP File Upload
-XEP-0377: Spam Reporting</summary>
+XEP-0377: Spam Reporting
+
+Support for other extensions is provided by separate nuget packages. See: https://waher.se/IoTGateway/Libraries.md#networking
+</summary>
     <copyright>Copyright © Waher Data AB 2016-2018. All rights reserved.</copyright>
     <tags>networking communication xmpp uwp</tags>
     <dependencies>

@@ -29,7 +29,7 @@
     <DocumentationFile>bin\Release\netstandard1.3\Waher.Networking.MQTT.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="System.Net.Security" Version="4.3.1" />
+    <PackageReference Include="System.Net.Security" Version="4.3.2" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj" />

@@ -2,18 +2,19 @@
   "version": 3,
   "targets": {
     "UAP,Version=v10.0.10240": {
-      "Microsoft.ApplicationInsights/2.4.0": {
+      "Microsoft.ApplicationInsights/2.5.1": {
         "type": "package",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "System.Diagnostics.DiagnosticSource": "4.4.0",
-          "System.Diagnostics.StackTrace": "4.3.0"
+          "System.Diagnostics.StackTrace": "4.3.0",
+          "System.Net.Requests": "4.3.0"
         },
         "compile": {
-          "lib/uap10.0/Microsoft.ApplicationInsights.dll": {}
+          "lib/netstandard1.3/Microsoft.ApplicationInsights.dll": {}
         },
         "runtime": {
-          "lib/uap10.0/Microsoft.ApplicationInsights.dll": {}
+          "lib/netstandard1.3/Microsoft.ApplicationInsights.dll": {}
         }
       },
       "Microsoft.ApplicationInsights.PersistenceChannel/1.2.3": {
@@ -1312,14 +1313,21 @@
           "lib/win8/_._": {}
         }
       },
-      "System.Net.Requests/4.0.11": {
+      "System.Net.Requests/4.3.0": {
         "type": "package",
         "dependencies": {
-          "System.IO": "4.1.0",
-          "System.Net.Primitives": "4.0.11",
-          "System.Net.WebHeaderCollection": "4.0.1",
-          "System.Runtime": "4.1.0",
-          "System.Threading.Tasks": "4.0.11"
+          "System.Collections": "4.3.0",
+          "System.Diagnostics.Debug": "4.3.0",
+          "System.Diagnostics.Tracing": "4.3.0",
+          "System.Globalization": "4.3.0",
+          "System.IO": "4.3.0",
+          "System.Net.Http": "4.3.0",
+          "System.Net.Primitives": "4.3.0",
+          "System.Net.WebHeaderCollection": "4.3.0",
+          "System.Resources.ResourceManager": "4.3.0",
+          "System.Runtime": "4.3.0",
+          "System.Threading": "4.3.0",
+          "System.Threading.Tasks": "4.3.0"
         },
         "compile": {
           "ref/netcore50/System.Net.Requests.dll": {}
@@ -1352,13 +1360,13 @@
           "ref/netstandard1.3/System.Net.Sockets.dll": {}
         }
       },
-      "System.Net.WebHeaderCollection/4.0.1": {
+      "System.Net.WebHeaderCollection/4.3.0": {
         "type": "package",
         "dependencies": {
-          "System.Collections": "4.0.11",
-          "System.Resources.ResourceManager": "4.0.1",
-          "System.Runtime": "4.1.0",
-          "System.Runtime.Extensions": "4.1.0"
+          "System.Collections": "4.3.0",
+          "System.Resources.ResourceManager": "4.3.0",
+          "System.Runtime": "4.3.0",
+          "System.Runtime.Extensions": "4.3.0"
         },
         "compile": {
           "ref/netstandard1.3/System.Net.WebHeaderCollection.dll": {}
@@ -2629,12 +2637,13 @@
           "Waher.Networking.XMPP.Provisioning.UWP": "1.0.0",
           "Waher.Networking.XMPP.Sensor.UWP": "1.0.0",
           "Waher.Networking.XMPP.UWP": "1.0.0",
+          "Waher.Persistence": "1.0.2",
           "Waher.Runtime.Inventory": "1.0.5",
           "Waher.Runtime.Language": "1.0.1",
           "Waher.Runtime.Settings": "1.0.1",
           "Waher.Runtime.Timing": "1.0.1",
           "Waher.Security": "1.0.1",
-          "Waher.Things": "1.0.17"
+          "Waher.Things": "1.0.22"
         }
       },
       "Waher.Networking.XMPP.Control.UWP/1.0.0": {
@@ -2778,7 +2787,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Things/1.0.17": {
+      "Waher.Things/1.0.22": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -2792,18 +2801,19 @@
       }
     },
     "UAP,Version=v10.0.10240/win10-arm": {
-      "Microsoft.ApplicationInsights/2.4.0": {
+      "Microsoft.ApplicationInsights/2.5.1": {
         "type": "package",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "System.Diagnostics.DiagnosticSource": "4.4.0",
-          "System.Diagnostics.StackTrace": "4.3.0"
+          "System.Diagnostics.StackTrace": "4.3.0",
+          "System.Net.Requests": "4.3.0"
         },
         "compile": {
-          "lib/uap10.0/Microsoft.ApplicationInsights.dll": {}
+          "lib/netstandard1.3/Microsoft.ApplicationInsights.dll": {}
         },
         "runtime": {
-          "lib/uap10.0/Microsoft.ApplicationInsights.dll": {}
+          "lib/netstandard1.3/Microsoft.ApplicationInsights.dll": {}
         }
       },
       "Microsoft.ApplicationInsights.PersistenceChannel/1.2.3": {
@@ -4208,14 +4218,21 @@
           "lib/win8/_._": {}
         }
       },
-      "System.Net.Requests/4.0.11": {
+      "System.Net.Requests/4.3.0": {
         "type": "package",
         "dependencies": {
-          "System.IO": "4.1.0",
-          "System.Net.Primitives": "4.0.11",
-          "System.Net.WebHeaderCollection": "4.0.1",
-          "System.Runtime": "4.1.0",
-          "System.Threading.Tasks": "4.0.11"
+          "System.Collections": "4.3.0",
+          "System.Diagnostics.Debug": "4.3.0",
+          "System.Diagnostics.Tracing": "4.3.0",
+          "System.Globalization": "4.3.0",
+          "System.IO": "4.3.0",
+          "System.Net.Http": "4.3.0",
+          "System.Net.Primitives": "4.3.0",
+          "System.Net.WebHeaderCollection": "4.3.0",
+          "System.Resources.ResourceManager": "4.3.0",
+          "System.Runtime": "4.3.0",
+          "System.Threading": "4.3.0",
+          "System.Threading.Tasks": "4.3.0"
         },
         "compile": {
           "ref/netcore50/System.Net.Requests.dll": {}
@@ -4239,13 +4256,13 @@
           "ref/netstandard1.3/System.Net.Sockets.dll": {}
         }
       },
-      "System.Net.WebHeaderCollection/4.0.1": {
+      "System.Net.WebHeaderCollection/4.3.0": {
         "type": "package",
         "dependencies": {
-          "System.Collections": "4.0.11",
-          "System.Resources.ResourceManager": "4.0.1",
-          "System.Runtime": "4.1.0",
-          "System.Runtime.Extensions": "4.1.0"
+          "System.Collections": "4.3.0",
+          "System.Resources.ResourceManager": "4.3.0",
+          "System.Runtime": "4.3.0",
+          "System.Runtime.Extensions": "4.3.0"
         },
         "compile": {
           "ref/netstandard1.3/System.Net.WebHeaderCollection.dll": {}
@@ -5411,12 +5428,13 @@
           "Waher.Networking.XMPP.Provisioning.UWP": "1.0.0",
           "Waher.Networking.XMPP.Sensor.UWP": "1.0.0",
           "Waher.Networking.XMPP.UWP": "1.0.0",
+          "Waher.Persistence": "1.0.2",
           "Waher.Runtime.Inventory": "1.0.5",
           "Waher.Runtime.Language": "1.0.1",
           "Waher.Runtime.Settings": "1.0.1",
           "Waher.Runtime.Timing": "1.0.1",
           "Waher.Security": "1.0.1",
-          "Waher.Things": "1.0.17"
+          "Waher.Things": "1.0.22"
         }
       },
       "Waher.Networking.XMPP.Control.UWP/1.0.0": {
@@ -5560,7 +5578,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Things/1.0.17": {
+      "Waher.Things/1.0.22": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -5574,18 +5592,19 @@
       }
     },
     "UAP,Version=v10.0.10240/win10-arm-aot": {
-      "Microsoft.ApplicationInsights/2.4.0": {
+      "Microsoft.ApplicationInsights/2.5.1": {
         "type": "package",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "System.Diagnostics.DiagnosticSource": "4.4.0",
-          "System.Diagnostics.StackTrace": "4.3.0"
+          "System.Diagnostics.StackTrace": "4.3.0",
+          "System.Net.Requests": "4.3.0"
         },
         "compile": {
-          "lib/uap10.0/Microsoft.ApplicationInsights.dll": {}
+          "lib/netstandard1.3/Microsoft.ApplicationInsights.dll": {}
         },
         "runtime": {
-          "lib/uap10.0/Microsoft.ApplicationInsights.dll": {}
+          "lib/netstandard1.3/Microsoft.ApplicationInsights.dll": {}
         }
       },
       "Microsoft.ApplicationInsights.PersistenceChannel/1.2.3": {
@@ -7026,14 +7045,21 @@
           "lib/win8/_._": {}
         }
       },
-      "System.Net.Requests/4.0.11": {
+      "System.Net.Requests/4.3.0": {
         "type": "package",
         "dependencies": {
-          "System.IO": "4.1.0",
-          "System.Net.Primitives": "4.0.11",
-          "System.Net.WebHeaderCollection": "4.0.1",
-          "System.Runtime": "4.1.0",
-          "System.Threading.Tasks": "4.0.11"
+          "System.Collections": "4.3.0",
+          "System.Diagnostics.Debug": "4.3.0",
+          "System.Diagnostics.Tracing": "4.3.0",
+          "System.Globalization": "4.3.0",
+          "System.IO": "4.3.0",
+          "System.Net.Http": "4.3.0",
+          "System.Net.Primitives": "4.3.0",
+          "System.Net.WebHeaderCollection": "4.3.0",
+          "System.Resources.ResourceManager": "4.3.0",
+          "System.Runtime": "4.3.0",
+          "System.Threading": "4.3.0",
+          "System.Threading.Tasks": "4.3.0"
         },
         "compile": {
           "ref/netcore50/System.Net.Requests.dll": {}
@@ -7057,13 +7083,13 @@
           "ref/netstandard1.3/System.Net.Sockets.dll": {}
         }
       },
-      "System.Net.WebHeaderCollection/4.0.1": {
+      "System.Net.WebHeaderCollection/4.3.0": {
         "type": "package",
         "dependencies": {
-          "System.Collections": "4.0.11",
-          "System.Resources.ResourceManager": "4.0.1",
-          "System.Runtime": "4.1.0",
-          "System.Runtime.Extensions": "4.1.0"
+          "System.Collections": "4.3.0",
+          "System.Resources.ResourceManager": "4.3.0",
+          "System.Runtime": "4.3.0",
+          "System.Runtime.Extensions": "4.3.0"
         },
         "compile": {
           "ref/netstandard1.3/System.Net.WebHeaderCollection.dll": {}
@@ -8229,12 +8255,13 @@
           "Waher.Networking.XMPP.Provisioning.UWP": "1.0.0",
           "Waher.Networking.XMPP.Sensor.UWP": "1.0.0",
           "Waher.Networking.XMPP.UWP": "1.0.0",
+          "Waher.Persistence": "1.0.2",
           "Waher.Runtime.Inventory": "1.0.5",
           "Waher.Runtime.Language": "1.0.1",
           "Waher.Runtime.Settings": "1.0.1",
           "Waher.Runtime.Timing": "1.0.1",
           "Waher.Security": "1.0.1",
-          "Waher.Things": "1.0.17"
+          "Waher.Things": "1.0.22"
         }
       },
       "Waher.Networking.XMPP.Control.UWP/1.0.0": {
@@ -8378,7 +8405,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Things/1.0.17": {
+      "Waher.Things/1.0.22": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -8392,18 +8419,19 @@
       }
     },
     "UAP,Version=v10.0.10240/win10-x64": {
-      "Microsoft.ApplicationInsights/2.4.0": {
+      "Microsoft.ApplicationInsights/2.5.1": {
         "type": "package",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "System.Diagnostics.DiagnosticSource": "4.4.0",
-          "System.Diagnostics.StackTrace": "4.3.0"
+          "System.Diagnostics.StackTrace": "4.3.0",
+          "System.Net.Requests": "4.3.0"
         },
         "compile": {
-          "lib/uap10.0/Microsoft.ApplicationInsights.dll": {}
+          "lib/netstandard1.3/Microsoft.ApplicationInsights.dll": {}
         },
         "runtime": {
-          "lib/uap10.0/Microsoft.ApplicationInsights.dll": {}
+          "lib/netstandard1.3/Microsoft.ApplicationInsights.dll": {}
         }
       },
       "Microsoft.ApplicationInsights.PersistenceChannel/1.2.3": {
@@ -9817,14 +9845,21 @@
           "lib/win8/_._": {}
         }
       },
-      "System.Net.Requests/4.0.11": {
+      "System.Net.Requests/4.3.0": {
         "type": "package",
         "dependencies": {
-          "System.IO": "4.1.0",
-          "System.Net.Primitives": "4.0.11",
-          "System.Net.WebHeaderCollection": "4.0.1",
-          "System.Runtime": "4.1.0",
-          "System.Threading.Tasks": "4.0.11"
+          "System.Collections": "4.3.0",
+          "System.Diagnostics.Debug": "4.3.0",
+          "System.Diagnostics.Tracing": "4.3.0",
+          "System.Globalization": "4.3.0",
+          "System.IO": "4.3.0",
+          "System.Net.Http": "4.3.0",
+          "System.Net.Primitives": "4.3.0",
+          "System.Net.WebHeaderCollection": "4.3.0",
+          "System.Resources.ResourceManager": "4.3.0",
+          "System.Runtime": "4.3.0",
+          "System.Threading": "4.3.0",
+          "System.Threading.Tasks": "4.3.0"
         },
         "compile": {
           "ref/netcore50/System.Net.Requests.dll": {}
@@ -9848,13 +9883,13 @@
           "ref/netstandard1.3/System.Net.Sockets.dll": {}
         }
       },
-      "System.Net.WebHeaderCollection/4.0.1": {
+      "System.Net.WebHeaderCollection/4.3.0": {
         "type": "package",
         "dependencies": {
-          "System.Collections": "4.0.11",
-          "System.Resources.ResourceManager": "4.0.1",
-          "System.Runtime": "4.1.0",
-          "System.Runtime.Extensions": "4.1.0"
+          "System.Collections": "4.3.0",
+          "System.Resources.ResourceManager": "4.3.0",
+          "System.Runtime": "4.3.0",
+          "System.Runtime.Extensions": "4.3.0"
         },
         "compile": {
           "ref/netstandard1.3/System.Net.WebHeaderCollection.dll": {}
@@ -11020,12 +11055,13 @@
           "Waher.Networking.XMPP.Provisioning.UWP": "1.0.0",
           "Waher.Networking.XMPP.Sensor.UWP": "1.0.0",
           "Waher.Networking.XMPP.UWP": "1.0.0",
+          "Waher.Persistence": "1.0.2",
           "Waher.Runtime.Inventory": "1.0.5",
           "Waher.Runtime.Language": "1.0.1",
           "Waher.Runtime.Settings": "1.0.1",
           "Waher.Runtime.Timing": "1.0.1",
           "Waher.Security": "1.0.1",
-          "Waher.Things": "1.0.17"
+          "Waher.Things": "1.0.22"
         }
       },
       "Waher.Networking.XMPP.Control.UWP/1.0.0": {
@@ -11169,7 +11205,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Things/1.0.17": {
+      "Waher.Things/1.0.22": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -11183,18 +11219,19 @@
       }
     },
     "UAP,Version=v10.0.10240/win10-x64-aot": {
-      "Microsoft.ApplicationInsights/2.4.0": {
+      "Microsoft.ApplicationInsights/2.5.1": {
         "type": "package",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "System.Diagnostics.DiagnosticSource": "4.4.0",
-          "System.Diagnostics.StackTrace": "4.3.0"
+          "System.Diagnostics.StackTrace": "4.3.0",
+          "System.Net.Requests": "4.3.0"
         },
         "compile": {
-          "lib/uap10.0/Microsoft.ApplicationInsights.dll": {}
+          "lib/netstandard1.3/Microsoft.ApplicationInsights.dll": {}
         },
         "runtime": {
-          "lib/uap10.0/Microsoft.ApplicationInsights.dll": {}
+          "lib/netstandard1.3/Microsoft.ApplicationInsights.dll": {}
         }
       },
       "Microsoft.ApplicationInsights.PersistenceChannel/1.2.3": {
@@ -12644,14 +12681,21 @@
           "lib/win8/_._": {}
         }
       },
-      "System.Net.Requests/4.0.11": {
+      "System.Net.Requests/4.3.0": {
         "type": "package",
         "dependencies": {
-          "System.IO": "4.1.0",
-          "System.Net.Primitives": "4.0.11",
-          "System.Net.WebHeaderCollection": "4.0.1",
-          "System.Runtime": "4.1.0",
-          "System.Threading.Tasks": "4.0.11"
+          "System.Collections": "4.3.0",
+          "System.Diagnostics.Debug": "4.3.0",
+          "System.Diagnostics.Tracing": "4.3.0",
+          "System.Globalization": "4.3.0",
+          "System.IO": "4.3.0",
+          "System.Net.Http": "4.3.0",
+          "System.Net.Primitives": "4.3.0",
+          "System.Net.WebHeaderCollection": "4.3.0",
+          "System.Resources.ResourceManager": "4.3.0",
+          "System.Runtime": "4.3.0",
+          "System.Threading": "4.3.0",
+          "System.Threading.Tasks": "4.3.0"
         },
         "compile": {
           "ref/netcore50/System.Net.Requests.dll": {}
@@ -12675,13 +12719,13 @@
           "ref/netstandard1.3/System.Net.Sockets.dll": {}
         }
       },
-      "System.Net.WebHeaderCollection/4.0.1": {
+      "System.Net.WebHeaderCollection/4.3.0": {
         "type": "package",
         "dependencies": {
-          "System.Collections": "4.0.11",
-          "System.Resources.ResourceManager": "4.0.1",
-          "System.Runtime": "4.1.0",
-          "System.Runtime.Extensions": "4.1.0"
+          "System.Collections": "4.3.0",
+          "System.Resources.ResourceManager": "4.3.0",
+          "System.Runtime": "4.3.0",
+          "System.Runtime.Extensions": "4.3.0"
         },
         "compile": {
           "ref/netstandard1.3/System.Net.WebHeaderCollection.dll": {}
@@ -13847,12 +13891,13 @@
           "Waher.Networking.XMPP.Provisioning.UWP": "1.0.0",
           "Waher.Networking.XMPP.Sensor.UWP": "1.0.0",
           "Waher.Networking.XMPP.UWP": "1.0.0",
+          "Waher.Persistence": "1.0.2",
           "Waher.Runtime.Inventory": "1.0.5",
           "Waher.Runtime.Language": "1.0.1",
           "Waher.Runtime.Settings": "1.0.1",
           "Waher.Runtime.Timing": "1.0.1",
           "Waher.Security": "1.0.1",
-          "Waher.Things": "1.0.17"
+          "Waher.Things": "1.0.22"
         }
       },
       "Waher.Networking.XMPP.Control.UWP/1.0.0": {
@@ -13996,7 +14041,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Things/1.0.17": {
+      "Waher.Things/1.0.22": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -14010,18 +14055,19 @@
       }
     },
     "UAP,Version=v10.0.10240/win10-x86": {
-      "Microsoft.ApplicationInsights/2.4.0": {
+      "Microsoft.ApplicationInsights/2.5.1": {
         "type": "package",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "System.Diagnostics.DiagnosticSource": "4.4.0",
-          "System.Diagnostics.StackTrace": "4.3.0"
+          "System.Diagnostics.StackTrace": "4.3.0",
+          "System.Net.Requests": "4.3.0"
         },
         "compile": {
-          "lib/uap10.0/Microsoft.ApplicationInsights.dll": {}
+          "lib/netstandard1.3/Microsoft.ApplicationInsights.dll": {}
         },
         "runtime": {
-          "lib/uap10.0/Microsoft.ApplicationInsights.dll": {}
+          "lib/netstandard1.3/Microsoft.ApplicationInsights.dll": {}
         }
       },
       "Microsoft.ApplicationInsights.PersistenceChannel/1.2.3": {
@@ -15435,14 +15481,21 @@
           "lib/win8/_._": {}
         }
       },
-      "System.Net.Requests/4.0.11": {
+      "System.Net.Requests/4.3.0": {
         "type": "package",
         "dependencies": {
-          "System.IO": "4.1.0",
-          "System.Net.Primitives": "4.0.11",
-          "System.Net.WebHeaderCollection": "4.0.1",
-          "System.Runtime": "4.1.0",
-          "System.Threading.Tasks": "4.0.11"
+          "System.Collections": "4.3.0",
+          "System.Diagnostics.Debug": "4.3.0",
+          "System.Diagnostics.Tracing": "4.3.0",
+          "System.Globalization": "4.3.0",
+          "System.IO": "4.3.0",
+          "System.Net.Http": "4.3.0",
+          "System.Net.Primitives": "4.3.0",
+          "System.Net.WebHeaderCollection": "4.3.0",
+          "System.Resources.ResourceManager": "4.3.0",
+          "System.Runtime": "4.3.0",
+          "System.Threading": "4.3.0",
+          "System.Threading.Tasks": "4.3.0"
         },
         "compile": {
           "ref/netcore50/System.Net.Requests.dll": {}
@@ -15466,13 +15519,13 @@
           "ref/netstandard1.3/System.Net.Sockets.dll": {}
         }
       },
-      "System.Net.WebHeaderCollection/4.0.1": {
+      "System.Net.WebHeaderCollection/4.3.0": {
         "type": "package",
         "dependencies": {
-          "System.Collections": "4.0.11",
-          "System.Resources.ResourceManager": "4.0.1",
-          "System.Runtime": "4.1.0",
-          "System.Runtime.Extensions": "4.1.0"
+          "System.Collections": "4.3.0",
+          "System.Resources.ResourceManager": "4.3.0",
+          "System.Runtime": "4.3.0",
+          "System.Runtime.Extensions": "4.3.0"
         },
         "compile": {
           "ref/netstandard1.3/System.Net.WebHeaderCollection.dll": {}
@@ -16638,12 +16691,13 @@
           "Waher.Networking.XMPP.Provisioning.UWP": "1.0.0",
           "Waher.Networking.XMPP.Sensor.UWP": "1.0.0",
           "Waher.Networking.XMPP.UWP": "1.0.0",
+          "Waher.Persistence": "1.0.2",
           "Waher.Runtime.Inventory": "1.0.5",
           "Waher.Runtime.Language": "1.0.1",
           "Waher.Runtime.Settings": "1.0.1",
           "Waher.Runtime.Timing": "1.0.1",
           "Waher.Security": "1.0.1",
-          "Waher.Things": "1.0.17"
+          "Waher.Things": "1.0.22"
         }
       },
       "Waher.Networking.XMPP.Control.UWP/1.0.0": {
@@ -16787,7 +16841,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Things/1.0.17": {
+      "Waher.Things/1.0.22": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -16801,18 +16855,19 @@
       }
     },
     "UAP,Version=v10.0.10240/win10-x86-aot": {
-      "Microsoft.ApplicationInsights/2.4.0": {
+      "Microsoft.ApplicationInsights/2.5.1": {
         "type": "package",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "System.Diagnostics.DiagnosticSource": "4.4.0",
-          "System.Diagnostics.StackTrace": "4.3.0"
+          "System.Diagnostics.StackTrace": "4.3.0",
+          "System.Net.Requests": "4.3.0"
         },
         "compile": {
-          "lib/uap10.0/Microsoft.ApplicationInsights.dll": {}
+          "lib/netstandard1.3/Microsoft.ApplicationInsights.dll": {}
         },
         "runtime": {
-          "lib/uap10.0/Microsoft.ApplicationInsights.dll": {}
+          "lib/netstandard1.3/Microsoft.ApplicationInsights.dll": {}
         }
       },
       "Microsoft.ApplicationInsights.PersistenceChannel/1.2.3": {
@@ -18262,14 +18317,21 @@
           "lib/win8/_._": {}
         }
       },
-      "System.Net.Requests/4.0.11": {
+      "System.Net.Requests/4.3.0": {
         "type": "package",
         "dependencies": {
-          "System.IO": "4.1.0",
-          "System.Net.Primitives": "4.0.11",
-          "System.Net.WebHeaderCollection": "4.0.1",
-          "System.Runtime": "4.1.0",
-          "System.Threading.Tasks": "4.0.11"
+          "System.Collections": "4.3.0",
+          "System.Diagnostics.Debug": "4.3.0",
+          "System.Diagnostics.Tracing": "4.3.0",
+          "System.Globalization": "4.3.0",
+          "System.IO": "4.3.0",
+          "System.Net.Http": "4.3.0",
+          "System.Net.Primitives": "4.3.0",
+          "System.Net.WebHeaderCollection": "4.3.0",
+          "System.Resources.ResourceManager": "4.3.0",
+          "System.Runtime": "4.3.0",
+          "System.Threading": "4.3.0",
+          "System.Threading.Tasks": "4.3.0"
         },
         "compile": {
           "ref/netcore50/System.Net.Requests.dll": {}
@@ -18293,13 +18355,13 @@
           "ref/netstandard1.3/System.Net.Sockets.dll": {}
         }
       },
-      "System.Net.WebHeaderCollection/4.0.1": {
+      "System.Net.WebHeaderCollection/4.3.0": {
         "type": "package",
         "dependencies": {
-          "System.Collections": "4.0.11",
-          "System.Resources.ResourceManager": "4.0.1",
-          "System.Runtime": "4.1.0",
-          "System.Runtime.Extensions": "4.1.0"
+          "System.Collections": "4.3.0",
+          "System.Resources.ResourceManager": "4.3.0",
+          "System.Runtime": "4.3.0",
+          "System.Runtime.Extensions": "4.3.0"
         },
         "compile": {
           "ref/netstandard1.3/System.Net.WebHeaderCollection.dll": {}
@@ -19465,12 +19527,13 @@
           "Waher.Networking.XMPP.Provisioning.UWP": "1.0.0",
           "Waher.Networking.XMPP.Sensor.UWP": "1.0.0",
           "Waher.Networking.XMPP.UWP": "1.0.0",
+          "Waher.Persistence": "1.0.2",
           "Waher.Runtime.Inventory": "1.0.5",
           "Waher.Runtime.Language": "1.0.1",
           "Waher.Runtime.Settings": "1.0.1",
           "Waher.Runtime.Timing": "1.0.1",
           "Waher.Security": "1.0.1",
-          "Waher.Things": "1.0.17"
+          "Waher.Things": "1.0.22"
         }
       },
       "Waher.Networking.XMPP.Control.UWP/1.0.0": {
@@ -19614,7 +19677,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Things/1.0.17": {
+      "Waher.Things/1.0.22": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -19629,23 +19692,15 @@
     }
   },
   "libraries": {
-    "Microsoft.ApplicationInsights/2.4.0": {
-      "sha512": "4dX/zu3Psz9oM3ErU64xfOHuSxOwMxN6q5RabSkeYbX42Yn6dR/kDToqjs+txCRjrfHUxyYjfeJHu+MbCfvAsg==",
+    "Microsoft.ApplicationInsights/2.5.1": {
+      "sha512": "k9PtCkxAf5LIJo7i3VCt0R+EtvrZ+b/JPlN0GVtyOuNXZmqdCpmKxoQnOOSwReWDQNkvfF6HWvk75VCKXzf31g==",
       "type": "package",
-      "path": "microsoft.applicationinsights/2.4.0",
+      "path": "microsoft.applicationinsights/2.5.1",
       "files": [
-        "lib/net40/Microsoft.ApplicationInsights.XML",
-        "lib/net40/Microsoft.ApplicationInsights.dll",
-        "lib/net45/Microsoft.ApplicationInsights.XML",
         "lib/net45/Microsoft.ApplicationInsights.dll",
-        "lib/net46/Microsoft.ApplicationInsights.XML",
         "lib/net46/Microsoft.ApplicationInsights.dll",
-        "lib/netstandard1.3/Microsoft.ApplicationInsights.XML",
         "lib/netstandard1.3/Microsoft.ApplicationInsights.dll",
-        "lib/portable-win81+wpa81/Microsoft.ApplicationInsights.dll",
-        "lib/uap10.0/Microsoft.ApplicationInsights.dll",
-        "lib/wp8/Microsoft.ApplicationInsights.dll",
-        "microsoft.applicationinsights.2.4.0.nupkg.sha512",
+        "microsoft.applicationinsights.2.5.1.nupkg.sha512",
         "microsoft.applicationinsights.nuspec"
       ]
     },
@@ -26616,10 +26671,10 @@
         "system.net.primitives.nuspec"
       ]
     },
-    "System.Net.Requests/4.0.11": {
-      "sha512": "vxGt7C0cZixN+VqoSW4Yakc1Y9WknmxauDqzxgpw/FnBdz4kQNN51l4wxdXX5VY1xjqy//+G+4CvJWp1+f+y6Q==",
+    "System.Net.Requests/4.3.0": {
+      "sha512": "OZNUuAs0kDXUzm7U5NZ1ojVta5YFZmgT2yxBqsQ7Eseq5Ahz88LInGRuNLJ/NP2F8W1q7tse1pKDthj3reF5QA==",
       "type": "package",
-      "path": "system.net.requests/4.0.11",
+      "path": "system.net.requests/4.3.0",
       "files": [
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
@@ -26693,7 +26748,7 @@
         "runtimes/unix/lib/netstandard1.3/System.Net.Requests.dll",
         "runtimes/win/lib/net46/_._",
         "runtimes/win/lib/netstandard1.3/System.Net.Requests.dll",
-        "system.net.requests.4.0.11.nupkg.sha512",
+        "system.net.requests.4.3.0.nupkg.sha512",
         "system.net.requests.nuspec"
       ]
     },
@@ -26733,10 +26788,10 @@
         "system.net.sockets.nuspec"
       ]
     },
-    "System.Net.WebHeaderCollection/4.0.1": {
-      "sha512": "XX2TIAN+wBSAIV51BU2FvvXMdstUa8b0FBSZmDWjZdwUMmggQSifpTOZ5fNH20z9ZCg2fkV1L5SsZnpO2RQDRQ==",
+    "System.Net.WebHeaderCollection/4.3.0": {
+      "sha512": "XZrXYG3c7QV/GpWeoaRC02rM6LH2JJetfVYskf35wdC/w2fFDFMphec4gmVH2dkll6abtW14u9Rt96pxd9YH2A==",
       "type": "package",
-      "path": "system.net.webheadercollection/4.0.1",
+      "path": "system.net.webheadercollection/4.3.0",
       "files": [
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
@@ -26766,7 +26821,7 @@
         "ref/xamarinmac20/_._",
         "ref/xamarintvos10/_._",
         "ref/xamarinwatchos10/_._",
-        "system.net.webheadercollection.4.0.1.nupkg.sha512",
+        "system.net.webheadercollection.4.3.0.nupkg.sha512",
         "system.net.webheadercollection.nuspec"
       ]
     },
@@ -29603,7 +29658,7 @@
       "path": "../../Security/Waher.Security/Waher.Security.csproj",
       "msbuildProject": "../../Security/Waher.Security/Waher.Security.csproj"
     },
-    "Waher.Things/1.0.17": {
+    "Waher.Things/1.0.22": {
       "type": "project",
       "path": "../../Things/Waher.Things/Waher.Things.csproj",
       "msbuildProject": "../../Things/Waher.Things/Waher.Things.csproj"
@@ -29611,7 +29666,7 @@
   },
   "projectFileDependencyGroups": {
     "": [
-      "Microsoft.ApplicationInsights >= 2.4.0",
+      "Microsoft.ApplicationInsights >= 2.5.1",
       "Microsoft.ApplicationInsights.PersistenceChannel >= 1.2.3",
       "Microsoft.ApplicationInsights.WindowsApps >= 1.1.1",
       "Microsoft.NETCore.UniversalWindowsPlatform >= 6.0.8"
@@ -29623,6 +29678,7 @@
     "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackagesFallback\\": {}
   },
   "project": {
+    "version": "1.0.0",
     "restore": {
       "projectUniqueName": "C:\\My Projects\\IoTGateway\\Mocks\\Waher.Mock.Temperature.UWP\\Waher.Mock.Temperature.UWP.csproj",
       "projectName": "Waher.Mock.Temperature.UWP",
@@ -29696,7 +29752,7 @@
       }
     },
     "dependencies": {
-      "Microsoft.ApplicationInsights": "[2.4.0, )",
+      "Microsoft.ApplicationInsights": "[2.5.1, )",
       "Microsoft.ApplicationInsights.PersistenceChannel": "[1.2.3, )",
       "Microsoft.ApplicationInsights.WindowsApps": "[1.1.1, )",
       "Microsoft.NETCore.UniversalWindowsPlatform": "[6.0.8, )"
@@ -29730,7 +29786,7 @@
       "code": "NU1608",
       "level": "Warning",
       "warningLevel": 1,
-      "message": "Detected package version outside of dependency constraint: Microsoft.ApplicationInsights.WindowsApps 1.1.1 requires Microsoft.ApplicationInsights (= 1.2.3) but version Microsoft.ApplicationInsights 2.4.0 was resolved.",
+      "message": "Detected package version outside of dependency constraint: Microsoft.ApplicationInsights.WindowsApps 1.1.1 requires Microsoft.ApplicationInsights (= 1.2.3) but version Microsoft.ApplicationInsights 2.5.1 was resolved.",
       "libraryId": "Microsoft.ApplicationInsights",
       "targetGraphs": [
         "UAP,Version=v10.0.10240",

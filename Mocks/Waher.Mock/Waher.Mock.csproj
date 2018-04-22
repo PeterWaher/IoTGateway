@@ -37,7 +37,7 @@
     <EmbeddedResource Include="Schema\SimpleXmppConfiguration.xsd" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Gma.QrCodeNet.Encoding" Version="1.0.1" />
+    <PackageReference Include="Gma.QrCodeNet.Encoding" Version="2.0.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Content\Waher.Content.Xml\Waher.Content.Xml.csproj" />

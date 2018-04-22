@@ -10,6 +10,7 @@ using System.Net;
 using System.Net.Security;
 using System.Net.Sockets;
 using System.Security.Authentication;
+using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
 #if WINDOWS_UWP
@@ -219,6 +220,8 @@ namespace Waher.Networking.XMPP
 		/// Regular expression for Bare JIDs
 		/// </summary>
 		public static readonly Regex BareJidRegEx = new Regex("^(?:([^@/<>'\\\"\\s]+)@)([^@/<>'\\\"\\s]+)$", RegexOptions.Singleline | RegexOptions.Compiled);
+
+		private static RandomNumberGenerator rnd = RandomNumberGenerator.Create();
 
 		private const int BufferSize = 65536;
 		private const int KeepAliveTimeSeconds = 30;
@@ -2143,7 +2146,7 @@ namespace Waher.Networking.XMPP
 
 			Form.SerializeSubmit(Xml);
 
-			this.SendMessage(e.Type, Form.From, Xml.ToString(), string.Empty, string.Empty, 
+			this.SendMessage(e.Type, Form.From, Xml.ToString(), string.Empty, string.Empty,
 				string.Empty, e.ThreadID, e.ParentThreadID);
 		}
 
@@ -2750,9 +2753,9 @@ namespace Waher.Networking.XMPP
 				if (this.allowScramSHA1 && this.authenticationMechanisms.ContainsKey("SCRAM-SHA-1") &&
 					(string.IsNullOrEmpty(this.passwordHashMethod) || this.passwordHashMethod == "SCRAM-SHA-1"))
 				{
-					string Nonce = Convert.ToBase64String(Guid.NewGuid().ToByteArray());
+					string Nonce = Convert.ToBase64String(XmppClient.GetRandomBytes(16));
 					string s = "n,,n=" + this.userName + ",r=" + Nonce;
-					byte[] Data = System.Text.Encoding.UTF8.GetBytes(s);
+					byte[] Data = Encoding.UTF8.GetBytes(s);
 
 					this.State = XmppState.Authenticating;
 					this.authenticationMethod = new ScramSha1(Nonce);
@@ -4735,7 +4738,7 @@ namespace Waher.Networking.XMPP
 					break;
 
 				case QoSLevel.Assured:
-					string MsgId = Guid.NewGuid().ToString().Replace("-", string.Empty);
+					string MsgId = Hashes.BinaryToString(XmppClient.GetRandomBytes(16));
 
 					Xml.Clear();
 					Xml.Append("<qos:assured xmlns:qos='urn:xmpp:qos' msgId='");
@@ -6414,6 +6417,23 @@ namespace Waher.Networking.XMPP
 			Extension = null;
 
 			return false;
+		}
+
+		/// <summary>
+		/// Gets an array of random bytes.
+		/// </summary>
+		/// <param name="NrBytes">Number of random bytes to get.</param>
+		/// <returns>Random bytes.</returns>
+		internal static byte[] GetRandomBytes(int NrBytes)
+		{
+			byte[] Result = new byte[NrBytes];
+
+			lock (rnd)
+			{
+				rnd.GetBytes(Result);
+			}
+
+			return Result;
 		}
 
 	}

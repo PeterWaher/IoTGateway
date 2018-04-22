@@ -1044,7 +1044,7 @@ namespace Waher.Networking.XMPP.DataForms
 				DateTime Now = DateTime.Now.ToUniversalTime();
 				TimeSpan Span = Now - OAuthFirstDay;
 				long TotalSeconds = (long)Span.TotalSeconds;
-				string Nonce = Guid.NewGuid().ToString().Replace("-", string.Empty);
+				string Nonce = Hashes.BinaryToString(XmppClient.GetRandomBytes(16));
 				string TokenSecret = oauth_token_secret.ValueString;
 
 				oauth_consumer_key.SetValue(FormSignatureKey);

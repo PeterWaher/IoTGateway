@@ -2314,7 +2314,7 @@ namespace Waher.Networking.XMPP
 					break;
 
 				case QoSLevel.Assured:
-					string MsgId = Guid.NewGuid().ToString().Replace("-", string.Empty);
+					string MsgId = Hashes.BinaryToString(XmppClient.GetRandomBytes(16));
 
 					Xml.Clear();
 					Xml.Append("<qos:assured xmlns:qos='urn:xmpp:qos' msgId='");

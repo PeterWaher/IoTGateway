@@ -6,6 +6,7 @@ using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Networking.XMPP.StanzaErrors;
 using Waher.Runtime.Cache;
+using Waher.Security;
 
 namespace Waher.Networking.XMPP.InBandBytestreams
 {
@@ -102,7 +103,7 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 		public OutgoingStream OpenStream(string To, int BlockSize, string StreamId, IEndToEndEncryption E2E)
 		{
 			if (string.IsNullOrEmpty(StreamId))
-				StreamId = Guid.NewGuid().ToString().Replace("-", string.Empty);
+				StreamId = Hashes.BinaryToString(XmppClient.GetRandomBytes(16));
 
 			OutgoingStream Result = new OutgoingStream(this.client, To, StreamId, BlockSize, E2E);
 

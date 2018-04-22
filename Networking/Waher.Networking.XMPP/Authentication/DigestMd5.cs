@@ -112,7 +112,7 @@ namespace Waher.Networking.XMPP.Authentication
 
 				string DigestUri = "xmpp/" + Client.Domain;
 
-				string ClientNonce = Convert.ToBase64String(Guid.NewGuid().ToByteArray());
+				string ClientNonce = Convert.ToBase64String(XmppClient.GetRandomBytes(16));
 
 				sb.Append(",cnonce=\"");
 				sb.Append(ClientNonce.Replace("\"", "\\\""));

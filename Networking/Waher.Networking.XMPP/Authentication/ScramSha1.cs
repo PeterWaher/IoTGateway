@@ -37,7 +37,7 @@ namespace Waher.Networking.XMPP.Authentication
 		public override string Challenge(string Challenge, XmppClient Client)
 		{
 			byte[] ChallengeBinary = Convert.FromBase64String(Challenge);
-			string ChallengeString = System.Text.Encoding.UTF8.GetString(ChallengeBinary);
+			string ChallengeString = Encoding.UTF8.GetString(ChallengeBinary);
 
 			foreach (KeyValuePair<string, string> Pair in this.ParseCommaSeparatedParameterList(ChallengeString))
 			{
@@ -58,21 +58,24 @@ namespace Waher.Networking.XMPP.Authentication
 				}
 			}
 
-			if (string.IsNullOrEmpty(this.serverNonce) || this.salt == null || this.nrIterations <= 0)
+			if (string.IsNullOrEmpty(this.serverNonce) || !this.serverNonce.StartsWith(this.nonce) ||
+				this.salt == null || this.nrIterations <= 0)
+			{
 				throw new XmppException("Invalid challenge.");
+			}
 
 			byte[] SaltedPassword;
 
 			if (string.IsNullOrEmpty(Client.PasswordHash))
 			{
-				SaltedPassword = Hi(System.Text.Encoding.UTF8.GetBytes(Client.Password), this.salt, this.nrIterations);     // Client.Pasword.Normalize()	- Normalize method avaialble in .NET 2.0
+				SaltedPassword = Hi(Encoding.UTF8.GetBytes(Client.Password), this.salt, this.nrIterations);     // Client.Pasword.Normalize()	- Normalize method avaialble in .NET 2.0
 				Client.PasswordHash = Convert.ToBase64String(SaltedPassword);
 				Client.PasswordHashMethod = "SCRAM-SHA-1";
 			}
 			else
 				SaltedPassword = Convert.FromBase64String(Client.PasswordHash);
 
-			byte[] ClientKey = HMAC(SaltedPassword, System.Text.Encoding.UTF8.GetBytes("Client Key"));
+			byte[] ClientKey = HMAC(SaltedPassword, Encoding.UTF8.GetBytes("Client Key"));
 			byte[] StoredKey = H(ClientKey);
 
 			StringBuilder sb;
@@ -91,11 +94,11 @@ namespace Waher.Networking.XMPP.Authentication
 			sb.Append(",c=biws,r=");
 			sb.Append(this.serverNonce);
 
-			byte[] AuthenticationMessage = System.Text.Encoding.UTF8.GetBytes(sb.ToString());
+			byte[] AuthenticationMessage = Encoding.UTF8.GetBytes(sb.ToString());
 			byte[] ClientSignature = HMAC(StoredKey, AuthenticationMessage);
 			byte[] ClientProof = XOR(ClientKey, ClientSignature);
 
-			byte[] ServerKey = HMAC(SaltedPassword, System.Text.Encoding.UTF8.GetBytes("Server Key"));
+			byte[] ServerKey = HMAC(SaltedPassword, Encoding.UTF8.GetBytes("Server Key"));
 			byte[] ServerSignature = HMAC(ServerKey, AuthenticationMessage);
 
 			this.serverSignature = Convert.ToBase64String(ServerSignature);
@@ -106,7 +109,7 @@ namespace Waher.Networking.XMPP.Authentication
 			sb.Append(",p=");
 			sb.Append(Convert.ToBase64String(ClientProof));
 
-			return Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(sb.ToString()));
+			return Convert.ToBase64String(Encoding.UTF8.GetBytes(sb.ToString()));
 		}
 
 		private byte[] Hi(byte[] String, byte[] Salt, int NrIterations)
@@ -134,7 +137,7 @@ namespace Waher.Networking.XMPP.Authentication
 		public override bool CheckSuccess(string Success, XmppClient Client)
 		{
 			byte[] ResponseBinary = Convert.FromBase64String(Success);
-			string ResponseString = System.Text.Encoding.UTF8.GetString(ResponseBinary);
+			string ResponseString = Encoding.UTF8.GetString(ResponseBinary);
 
 			foreach (KeyValuePair<string, string> Pair in this.ParseCommaSeparatedParameterList(ResponseString))
 			{

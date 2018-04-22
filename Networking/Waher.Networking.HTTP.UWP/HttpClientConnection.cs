@@ -625,5 +625,15 @@ namespace Waher.Networking.HTTP
 				// TODO: Add error message content.
 			}
 		}
+
+		/// <summary>
+		/// Underlying stream
+		/// </summary>
+#if WINDOWS_UWP
+		public Stream Stream => this.inputStream;
+#else
+		public Stream Stream => this.stream;
+#endif
+
 	}
 }

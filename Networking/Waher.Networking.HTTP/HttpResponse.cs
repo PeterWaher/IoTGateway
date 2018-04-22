@@ -797,5 +797,10 @@ namespace Waher.Networking.HTTP
 			this.responseStream = ResponseStream;
 		}
 
+		/// <summary>
+		/// Underlying stream, if any.
+		/// </summary>
+		public Stream Stream => this.clientConnection?.Stream;
+
 	}
 }

@@ -85,12 +85,8 @@ namespace Waher.Networking.XMPP.Authentication
 			sb.Append(Client.UserName);
 			sb.Append(",r=");
 			sb.Append(this.nonce);
-			sb.Append(",r=");
-			sb.Append(this.serverNonce);
-			sb.Append(",s=");
-			sb.Append(this.saltString);
-			sb.Append(",i=");
-			sb.Append(this.nrIterations.ToString());
+			sb.Append(',');
+			sb.Append(ChallengeString);
 			sb.Append(",c=biws,r=");
 			sb.Append(this.serverNonce);
 

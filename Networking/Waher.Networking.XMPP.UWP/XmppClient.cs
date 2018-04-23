@@ -212,6 +212,11 @@ namespace Waher.Networking.XMPP
 		public const string NamespaceMessageDeliveryReceipts = "urn:xmpp:receipts";
 
 		/// <summary>
+		/// jabber:iq:private (XEP-0049)
+		/// </summary>
+		public const string NamespacePrivateXmlStorage = "jabber:iq:private";
+
+		/// <summary>
 		/// Regular expression for Full JIDs
 		/// </summary>
 		public static readonly Regex FullJidRegEx = new Regex("^(?:([^@/<>'\\\"\\s]+)@)([^@/<>'\\\"\\s]+)(?:/([^<>'\\\"\\s]*))?$", RegexOptions.Singleline | RegexOptions.Compiled);
@@ -6436,5 +6441,163 @@ namespace Waher.Networking.XMPP
 			return Result;
 		}
 
+		#region XEP-0049: Private XML Storage
+
+		/// <summary>
+		/// Gets an XML element from the Private XML Storage for the current account.
+		/// </summary>
+		/// <param name="LocalName">Local name of XML element.</param>
+		/// <param name="Namespace">Namespace of XML element.</param>
+		public Task<XmlElement> GetPrivateXmlElementAsync(string LocalName, string Namespace)
+		{
+			TaskCompletionSource<XmlElement> Result = new TaskCompletionSource<XmlElement>();
+
+			this.GetPrivateXmlElement(LocalName, Namespace, (sender, e) =>
+			{
+				if (e.Ok)
+					Result.SetResult(e.Element);
+				else
+					Result.SetException(new Exception(string.IsNullOrEmpty(e.ErrorText) ? "Unable to get private XML element." : e.ErrorText));
+			}, null);
+
+			return Result.Task;
+		}
+
+		/// <summary>
+		/// Gets an XML element from the Private XML Storage for the current account.
+		/// </summary>
+		/// <param name="LocalName">Local name of XML element.</param>
+		/// <param name="Namespace">Namespace of XML element.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
+		public void GetPrivateXmlElement(string LocalName, string Namespace, PrivateXmlEventHandler Callback, object State)
+		{
+			if (XML.Encode(LocalName) != LocalName)
+				throw new ArgumentException("Invalid local name.", nameof(LocalName));
+
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<query xmlns='");
+			Xml.Append(NamespacePrivateXmlStorage);
+			Xml.Append("'><");
+			Xml.Append(LocalName);
+			Xml.Append(" xmlns='");
+			Xml.Append(XML.Encode(Namespace));
+			Xml.Append("'/></query>");
+
+			this.SendIqGet(string.Empty, Xml.ToString(), (sender, e) =>
+			{
+				XmlElement Result = null;
+				XmlElement E;
+
+				if (e.Ok && (E = e.FirstElement) != null)
+				{
+					foreach (XmlNode N in e.FirstElement.ChildNodes)
+					{
+						if (N is XmlElement E2 && E2.LocalName == LocalName && E2.NamespaceURI == Namespace)
+						{
+							Result = E2;
+							break;
+						}
+					}
+				}
+
+				if (Result == null)
+					e.Ok = false;
+
+				if (Callback != null)
+				{
+					try
+					{
+						Callback(this, new PrivateXmlEventArgs(Result, e));
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
+				}
+
+			}, State);
+		}
+
+		/// <summary>
+		/// Sets an XML element in the Private XML Storage for the current account.
+		/// </summary>
+		/// <param name="ElementXml">XML element to store.</param>
+		public Task SetPrivateXmlElementAsync(string ElementXml)
+		{
+			XmlDocument Doc = new XmlDocument();
+			Doc.LoadXml(ElementXml);
+
+			return this.SetPrivateXmlElementAsync(Doc.DocumentElement);
+		}
+
+		/// <summary>
+		/// Sets an XML element in the Private XML Storage for the current account.
+		/// </summary>
+		/// <param name="Element">XML element to store.</param>
+		public Task SetPrivateXmlElementAsync(XmlElement Element)
+		{
+			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
+
+			this.SetPrivateXmlElement(Element, (sender, e) =>
+			{
+				if (e.Ok)
+					Result.SetResult(true);
+				else
+					Result.SetException(new Exception(string.IsNullOrEmpty(e.ErrorText) ? "Unable to set private XML element." : e.ErrorText));
+			}, null);
+
+			return Result.Task;
+		}
+
+		/// <summary>
+		/// Sets an XML element in the Private XML Storage for the current account.
+		/// </summary>
+		/// <param name="ElementXml">XML element to store.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
+		public void SetPrivateXmlElement(string ElementXml, PrivateXmlEventHandler Callback, object State)
+		{
+			XmlDocument Doc = new XmlDocument();
+			Doc.LoadXml(ElementXml);
+
+			this.SetPrivateXmlElement(Doc.DocumentElement, Callback, State);
+		}
+
+		/// <summary>
+		/// Sets an XML element in the Private XML Storage for the current account.
+		/// </summary>
+		/// <param name="Element">XML element to store.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
+		public void SetPrivateXmlElement(XmlElement Element, PrivateXmlEventHandler Callback, object State)
+		{
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<query xmlns='");
+			Xml.Append(NamespacePrivateXmlStorage);
+			Xml.Append("'>");
+			Xml.Append(Element.OuterXml);
+			Xml.Append("</query>");
+
+			this.SendIqSet(string.Empty, Xml.ToString(), (sender, e) =>
+			{
+				if (Callback != null)
+				{
+					try
+					{
+						Callback(this, new PrivateXmlEventArgs(Element, e));
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
+				}
+
+			}, State);
+		}
+
+		#endregion
 	}
 }

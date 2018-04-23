@@ -91,6 +91,8 @@ namespace Waher.Client.WPF
 
 					Database.Find<Question>(new FilterAnd(new FilterFieldEqualTo("OwnerJID", string.Empty),
 						new FilterFieldEqualTo("ProvisioningJID", string.Empty)));  // To prepare indices, etc.
+
+					ChatView.InitEmojis();
 				}
 				catch (Exception ex)
 				{

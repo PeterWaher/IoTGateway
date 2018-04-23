@@ -37,21 +37,24 @@ namespace Waher.Client.WPF.Controls
 
 		public ChatView(TreeNode Node)
 		{
-			string Folder = Assembly.GetExecutingAssembly().Location;
-			if (string.IsNullOrEmpty(Folder))
-				Folder = AppDomain.CurrentDomain.BaseDirectory;
-
 			this.node = Node;
 
+			InitializeComponent();
+		}
+
+		internal static void InitEmojis()
+		{
 			if (emoji1_24x24 == null)
 			{
+				string Folder = Assembly.GetExecutingAssembly().Location;
+				if (string.IsNullOrEmpty(Folder))
+					Folder = AppDomain.CurrentDomain.BaseDirectory;
+
 				emoji1_24x24 = new Emoji1LocalFiles(Emoji1SourceFileType.Png64, 24, 24,
 					System.IO.Path.Combine(MainWindow.AppDataFolder, "Graphics", "Emoji1", "png", "64x64", "%FILENAME%"),
 					System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Folder), "Graphics", "Emoji1.zip"),
 					System.IO.Path.Combine(MainWindow.AppDataFolder, "Graphics"));
 			}
-
-			InitializeComponent();
 		}
 
 		public static Emoji1LocalFiles Emoji1_24x24

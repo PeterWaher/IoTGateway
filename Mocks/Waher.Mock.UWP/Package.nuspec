@@ -19,7 +19,7 @@
       <dependency id="Waher.Content.Xml" version="1.0.2"/>
       <dependency id="Waher.Events" version="1.0.6"/>
       <dependency id="Waher.Networking" version="1.0.6"/>
-      <dependency id="Waher.Networking.XMPP.UWP" version="1.0.22"/>
+      <dependency id="Waher.Networking.XMPP.UWP" version="1.0.23"/>
     </dependencies>
   </metadata>
   <files>

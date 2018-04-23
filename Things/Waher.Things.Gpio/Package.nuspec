@@ -16,7 +16,7 @@
     <tags>UWP IoT GPIO</tags>
     <dependencies>
       <dependency id="Waher.IoTGateway" version="1.0.20"/>
-      <dependency id="Waher.Networking.XMPP" version="1.0.22"/>
+      <dependency id="Waher.Networking.XMPP" version="1.0.23"/>
       <dependency id="Waher.Persistence" version="1.0.2"/>
       <dependency id="Waher.Runtime.Language" version="1.0.1"/>
       <dependency id="Waher.Things" version="1.0.22"/>

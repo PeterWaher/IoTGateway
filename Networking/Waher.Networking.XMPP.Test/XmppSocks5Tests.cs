@@ -196,6 +196,11 @@ namespace Waher.Networking.XMPP.Test
 		public void Socks5_Test_05_InitiateSession()
 		{
 			this.ConnectClients();
+
+			Console.Out.WriteLine();
+			Console.Out.WriteLine("Searching for SOCKS5 proxy.");
+			Console.Out.WriteLine();
+
 			ManualResetEvent Done1 = new ManualResetEvent(false);
 			Socks5Proxy Proxy1 = new Socks5Proxy(this.client1);
 
@@ -225,6 +230,10 @@ namespace Waher.Networking.XMPP.Test
 			ManualResetEvent Error2 = new ManualResetEvent(false);
 			ManualResetEvent Closed1 = new ManualResetEvent(false);
 			ManualResetEvent Closed2 = new ManualResetEvent(false);
+
+			Console.Out.WriteLine();
+			Console.Out.WriteLine("Start of session initiation.");
+			Console.Out.WriteLine();
 
 			Proxy2.OnOpen += (sender, e) =>
 			{

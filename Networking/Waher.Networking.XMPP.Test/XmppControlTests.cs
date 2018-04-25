@@ -7,6 +7,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Control;
 using Waher.Content;
+using Waher.Runtime.Inventory;
 using Waher.Things;
 using Waher.Things.ControlParameters;
 
@@ -28,6 +29,12 @@ namespace Waher.Networking.XMPP.Test
 		private long l = 0;
 		private string s = string.Empty;
 		private TimeSpan t = TimeSpan.Zero;
+
+		[AssemblyInitialize]
+		public static void AssemblyInitialize(TestContext Context)
+		{
+			Types.Initialize();
+		}
 
 		public override void ConnectClients()
 		{
@@ -165,6 +172,8 @@ namespace Waher.Networking.XMPP.Test
 
 				DateTime Now = DateTime.Now;
 				this.dt = DateTime.MinValue;
+
+				Now = new DateTime(Now.Year, Now.Month, Now.Day, Now.Hour, Now.Minute, Now.Second, Now.Millisecond);
 
 				this.controlClient.Set(this.client2.FullJID, "DateTime", Now, false, (sender, e) =>
 				{

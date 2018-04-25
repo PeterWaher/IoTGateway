@@ -15,6 +15,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public void Stanza_Test_01_ChatMessage()
 		{
+			this.ConnectClients();
 			ManualResetEvent Done = new ManualResetEvent(false);
 			this.client2.OnChatMessage += (sender, e) => Done.Set();
 
@@ -26,6 +27,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public void Stanza_Test_02_ChatMessageWithSubject()
 		{
+			this.ConnectClients();
 			ManualResetEvent Done = new ManualResetEvent(false);
 			this.client2.OnChatMessage += (sender, e) => Done.Set();
 
@@ -37,6 +39,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public void Stanza_Test_03_ChatMessageWithSubjectAndLanguage()
 		{
+			this.ConnectClients();
 			ManualResetEvent Done = new ManualResetEvent(false);
 			this.client2.OnChatMessage += (sender, e) => Done.Set();
 
@@ -48,6 +51,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public void Stanza_Test_04_Presence()
 		{
+			this.ConnectClients();
 			ManualResetEvent Done = new ManualResetEvent(false);
 			this.client1.OnPresence += (sender, e) =>
 			{
@@ -63,6 +67,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public void Stanza_Test_05_IQ_Get()
 		{
+			this.ConnectClients();
 			this.client1.RegisterIqGetHandler("query", "test", (sender, e) =>
 			{
 				e.IqResult("<response xmlns='test'/>");
@@ -74,6 +79,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public void Stanza_Test_06_IQ_Set()
 		{
+			this.ConnectClients();
 			this.client1.RegisterIqSetHandler("query", "test", (sender, e) =>
 			{
 				e.IqResult("<response xmlns='test'/>");

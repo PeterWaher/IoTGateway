@@ -18,6 +18,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public void Search_Test_01_FindSearchForms()
 		{
+			this.ConnectClients();
 			string[] JIDs = SearchJIDs();
 
 			foreach (string JID in JIDs)
@@ -26,6 +27,7 @@ namespace Waher.Networking.XMPP.Test
 
 		private string[] SearchJIDs()
 		{
+			this.ConnectClients();
 			List<string> SupportsSearch = new List<string>();
 
 			ServiceDiscoveryEventArgs e = this.client1.ServiceDiscovery(this.client1.Domain, 10000);
@@ -46,6 +48,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public void Search_Test_02_GetSearchForms()
 		{
+			this.ConnectClients();
 			string[] JIDs = SearchJIDs();
 
 			foreach (string JID in JIDs)
@@ -73,6 +76,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public void Search_Test_03_DoSearch()
 		{
+			this.ConnectClients();
 			string[] JIDs = SearchJIDs();
 
 			foreach (string JID in JIDs)

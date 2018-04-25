@@ -18,6 +18,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public void Socks5_Test_01_FindProxy()
 		{
+			this.ConnectClients();
 			ManualResetEvent Done = new ManualResetEvent(false);
 			Socks5Proxy Proxy = new Socks5Proxy(this.client1);
 
@@ -37,6 +38,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public void Socks5_Test_02_ConnectSOCKS5()
 		{
+			this.ConnectClients();
 			ManualResetEvent Error = new ManualResetEvent(false);
 			ManualResetEvent Done = new ManualResetEvent(false);
 			Socks5Client Client = new Socks5Client("proxy.kode.im", 5000, "proxy.kode.im",
@@ -64,6 +66,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public void Socks5_Test_03_ConnectStream()
 		{
+			this.ConnectClients();
 			ManualResetEvent Error = new ManualResetEvent(false);
 			ManualResetEvent Done = new ManualResetEvent(false);
 			Socks5Client Client = new Socks5Client("proxy.kode.im", 5000, "proxy.kode.im",
@@ -95,6 +98,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public void Socks5_Test_04_ActivateStream()
 		{
+			this.ConnectClients();
 			ManualResetEvent Error1 = new ManualResetEvent(false);
 			ManualResetEvent Done1 = new ManualResetEvent(false);
 			Socks5Client Client1 = new Socks5Client("proxy.kode.im", 5000, "proxy.kode.im",
@@ -196,6 +200,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public void Socks5_Test_05_InitiateSession()
 		{
+			this.ConnectClients();
 			ManualResetEvent Done1 = new ManualResetEvent(false);
 			Socks5Proxy Proxy1 = new Socks5Proxy(this.client1);
 

@@ -32,6 +32,8 @@ namespace Waher.Networking.XMPP.Test
 
 		private void QoSTest(QoSLevel Level)
 		{
+			this.ConnectClients();
+
 			ManualResetEvent Received = new ManualResetEvent(false);
 			ManualResetEvent Delivered = new ManualResetEvent(false);
 
@@ -49,6 +51,8 @@ namespace Waher.Networking.XMPP.Test
 		{
 			ManualResetEvent Done = new ManualResetEvent(false);
 			IqResultEventArgs e2 = null;
+
+			this.ConnectClients();
 
 			this.client2.RegisterIqGetHandler("test", "test", (sender, e) =>
 			{

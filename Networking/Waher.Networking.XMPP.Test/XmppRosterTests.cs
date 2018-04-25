@@ -15,6 +15,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public void Roster_Test_01_GetRoster()
 		{
+			this.ConnectClients();
 			Assert.IsTrue(this.client1.HasRoster);
 			Assert.IsTrue(this.client2.HasRoster);
 		}
@@ -22,6 +23,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public void Roster_Test_02_AddRosterItem()
 		{
+			this.ConnectClients();
 			using (ManualResetEvent Added = new ManualResetEvent(false))
 			{
 				this.client1.AddRosterItem(new RosterItem(this.client2.BareJID, "Test Client 2", "Test Clients"),
@@ -34,6 +36,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public void Roster_Test_03_UpdateRosterItem()
 		{
+			this.ConnectClients();
 			using (ManualResetEvent Updated = new ManualResetEvent(false))
 			{
 				this.client1.UpdateRosterItem(this.client2.BareJID, "Test Client II", new string[] { "Test Clients" },
@@ -46,6 +49,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public void Roster_Test_04_RemoveRosterItem()
 		{
+			this.ConnectClients();
 			using (ManualResetEvent Removed = new ManualResetEvent(false))
 			{
 				this.client1.RemoveRosterItem(this.client2.BareJID, (sender, e) => Removed.Set(), null);
@@ -57,6 +61,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public void Roster_Test_05_AcceptPresenceSubscription()
 		{
+			this.ConnectClients();
 			ManualResetEvent Done = new ManualResetEvent(false);
 
 			this.client2.OnPresenceSubscribe += (sender, e) => e.Accept();
@@ -70,6 +75,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public void Roster_Test_06_AcceptPresenceUnsubscription()
 		{
+			this.ConnectClients();
 			ManualResetEvent Done = new ManualResetEvent(false);
 
 			this.client2.OnPresenceUnsubscribe += (sender, e) => e.Accept();
@@ -86,6 +92,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public void Roster_Test_07_FederatedSubscriptionRequest()
 		{
+			this.ConnectClients();
 			ManualResetEvent Done = new ManualResetEvent(false);
 
 			this.client1.OnPresenceSubscribed += (sender, e) => Done.Set();

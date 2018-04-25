@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
@@ -12,6 +13,7 @@ using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.DataForms.FieldTypes;
 using Waher.Networking.XMPP.Provisioning;
 using Waher.Networking.XMPP.StanzaErrors;
+using Waher.Runtime.Inventory;
 
 namespace Waher.Networking.XMPP.Control
 {
@@ -232,6 +234,7 @@ namespace Waher.Networking.XMPP.Control
 						case "dt":
 						case "db":
 						case "dr":
+						case "e":
 						case "i":
 						case "l":
 						case "s":
@@ -380,6 +383,60 @@ namespace Waher.Networking.XMPP.Control
 								}
 
 								Operations.AddLast(new DurationControlOperation(Node, DurationControlParameter, XML.Attribute(E, "v", Duration.Zero), e));
+							}
+							break;
+
+						case "e":
+							Name = XML.Attribute(E, "n");
+							foreach (IThingReference Node in Nodes ?? NoNodes)
+							{
+								Parameter = await this.GetParameter(Node, Name, e);
+								if (Parameter == null)
+									return;
+
+								string StringValue = XML.Attribute(E, "v");
+
+								if (Parameter is EnumControlParameter EnumControlParameter)
+								{
+									Type T = Types.GetType(XML.Attribute(E, "t"));
+									if (T == null)
+									{
+										e.IqError("<error type='modify'><bad-request xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/><paramError xmlns=\"" +
+											ControlClient.NamespaceControl + "\" n=\"" + Name + "\">Type not found.</paramError></error>");
+										return;
+									}
+
+									if (!T.GetTypeInfo().IsEnum)
+									{
+										e.IqError("<error type='modify'><bad-request xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/><paramError xmlns=\"" +
+											ControlClient.NamespaceControl + "\" n=\"" + Name + "\">Type is not an enumeration.</paramError></error>");
+										return;
+									}
+
+									Enum Value;
+
+									try
+									{
+										Value = (Enum)Enum.Parse(T, StringValue);
+									}
+									catch (Exception)
+									{
+										e.IqError("<error type='modify'><bad-request xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/><paramError xmlns=\"" +
+											ControlClient.NamespaceControl + "\" n=\"" + Name + "\">Value not valid element of enumeration.</paramError></error>");
+										return;
+									}
+
+									Operations.AddLast(new EnumControlOperation(Node, EnumControlParameter, Value, e));
+								}
+								else if (Parameter is StringControlParameter StringControlParameter)
+									Operations.AddLast(new StringControlOperation(Node, StringControlParameter, StringValue, e));
+								else if (Parameter is MultiLineTextControlParameter MultiLineTextControlParameter)
+									Operations.AddLast(new MultiLineTextControlOperation(Node, MultiLineTextControlParameter, StringValue, e));
+								else
+								{
+									ParameterWrongType(Name, e);
+									return;
+								}
 							}
 							break;
 

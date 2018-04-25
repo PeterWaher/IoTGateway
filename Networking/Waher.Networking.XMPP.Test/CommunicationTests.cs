@@ -57,7 +57,7 @@ namespace Waher.Networking.XMPP.Test
 			this.connected2.Reset();
 			this.error2.Reset();
 			this.offline2.Reset();
-			
+
 			this.ex1 = null;
 			this.ex2 = null;
 
@@ -70,9 +70,9 @@ namespace Waher.Networking.XMPP.Test
 			};
 
 			this.client1.Add(new TextWriterSniffer(Console.Out, BinaryPresentationMethod.ByteCount));
-			this.client1.OnConnectionError += new XmppExceptionEventHandler(Client_OnConnectionError1);
-			this.client1.OnError += new XmppExceptionEventHandler(Client_OnError1);
-			this.client1.OnStateChanged += new StateChangedEventHandler(Client_OnStateChanged1);
+			this.client1.OnConnectionError += Client_OnConnectionError1;
+			this.client1.OnError += Client_OnError1;
+			this.client1.OnStateChanged += Client_OnStateChanged1;
 			this.client1.SetPresence(Availability.Chat, string.Empty, new KeyValuePair<string, string>("en", "Live and well"));
 			this.client1.Connect();
 
@@ -86,9 +86,9 @@ namespace Waher.Networking.XMPP.Test
 				DefaultDropOff = true
 			};
 
-			this.client2.OnConnectionError += new XmppExceptionEventHandler(Client_OnConnectionError2);
-			this.client2.OnError += new XmppExceptionEventHandler(Client_OnError2);
-			this.client2.OnStateChanged += new StateChangedEventHandler(Client_OnStateChanged2);
+			this.client2.OnConnectionError += Client_OnConnectionError2;
+			this.client2.OnError += Client_OnError2;
+			this.client2.OnStateChanged += Client_OnStateChanged2;
 			this.client2.SetPresence(Availability.Chat, string.Empty, new KeyValuePair<string, string>("en", "Ready to chat."));
 			this.client2.Connect();
 
@@ -170,11 +170,13 @@ namespace Waher.Networking.XMPP.Test
 		private void WaitConnected1(int Timeout)
 		{
 			this.AssertWaitConnected(this.Wait1(Timeout));
+			Thread.Sleep(100);  // Wait for presence to be processed by server.
 		}
 
 		private void WaitConnected2(int Timeout)
 		{
 			this.AssertWaitConnected(this.Wait2(Timeout));
+			Thread.Sleep(100);  // Wait for presence to be processed by server.
 		}
 
 		private void AssertWaitConnected(int Event)

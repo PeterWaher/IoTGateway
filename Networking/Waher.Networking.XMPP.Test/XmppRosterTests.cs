@@ -62,13 +62,20 @@ namespace Waher.Networking.XMPP.Test
 		public void Roster_Test_05_AcceptPresenceSubscription()
 		{
 			this.ConnectClients();
+			ManualResetEvent Received = new ManualResetEvent(false);
 			ManualResetEvent Done = new ManualResetEvent(false);
 
-			this.client2.OnPresenceSubscribe += (sender, e) => e.Accept();
+			this.client2.OnPresenceSubscribe += (sender, e) =>
+			{
+				Received.Set();
+				e.Accept();
+			};
+
 			this.client1.OnPresenceSubscribed += (sender, e) => Done.Set();
 
 			this.client1.RequestPresenceSubscription(this.client2.BareJID);
 
+			Assert.IsTrue(Received.WaitOne(10000), "Presence subscription not received.");
 			Assert.IsTrue(Done.WaitOne(10000), "Presence subscription failed.");
 		}
 

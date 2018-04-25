@@ -1728,29 +1728,36 @@ namespace Waher.Networking.XMPP
 		/// <exception cref="XmppException">If an IQ error is returned.</exception>
 		public XmlElement IqGet(string From, string To, string Xml, int Timeout)
 		{
-			ManualResetEvent Done = new ManualResetEvent(false);
-			IqResultEventArgs e = null;
+			Task<XmlElement> Result = this.IqGetAsync(From, To, Xml);
 
-			try
+			if (!Result.Wait(Timeout))
+				throw new TimeoutException();
+
+			return Result.Result;
+		}
+
+		/// <summary>
+		/// Performs an asynchronous IQ Get request/response operation.
+		/// </summary>
+		/// <param name="From">Address of sender.</param>
+		/// <param name="To">Destination address</param>
+		/// <param name="Xml">XML to embed into the request.</param>
+		/// <returns>Response XML element.</returns>
+		/// <exception cref="TimeoutException">If a timeout occurred.</exception>
+		/// <exception cref="XmppException">If an IQ error is returned.</exception>
+		public Task<XmlElement> IqGetAsync(string From, string To, string Xml)
+		{
+			TaskCompletionSource<XmlElement> Result = new TaskCompletionSource<XmlElement>();
+
+			this.SendIqGet(From, To, Xml, (sender, e) =>
 			{
-				this.SendIqGet(From, To, Xml, (sender, e2) =>
-				{
-					e = e2;
-					Done.Set();
-				}, null);
+				if (e.Ok)
+					Result.SetResult(e.Response);
+				else
+					Result.SetException(e.StanzaError ?? new XmppException("Unable to perform IQ Get."));
+			}, null);
 
-				if (!Done.WaitOne(Timeout))
-					throw new TimeoutException();
-			}
-			finally
-			{
-				Done.Dispose();
-			}
-
-			if (!e.Ok)
-				throw e.StanzaError;
-
-			return e.Response;
+			return Result.Task;
 		}
 
 		/// <summary>
@@ -1765,29 +1772,36 @@ namespace Waher.Networking.XMPP
 		/// <exception cref="XmppException">If an IQ error is returned.</exception>
 		public XmlElement IqSet(string From, string To, string Xml, int Timeout)
 		{
-			ManualResetEvent Done = new ManualResetEvent(false);
-			IqResultEventArgs e = null;
+			Task<XmlElement> Result = this.IqSetAsync(From, To, Xml);
 
-			try
+			if (!Result.Wait(Timeout))
+				throw new TimeoutException();
+
+			return Result.Result;
+		}
+
+		/// <summary>
+		/// Performs an asynchronous IQ Set request/response operation.
+		/// </summary>
+		/// <param name="From">Address of sender.</param>
+		/// <param name="To">Destination address</param>
+		/// <param name="Xml">XML to embed into the request.</param>
+		/// <returns>Response XML element.</returns>
+		/// <exception cref="TimeoutException">If a timeout occurred.</exception>
+		/// <exception cref="XmppException">If an IQ error is returned.</exception>
+		public Task<XmlElement> IqSetAsync(string From, string To, string Xml)
+		{
+			TaskCompletionSource<XmlElement> Result = new TaskCompletionSource<XmlElement>();
+
+			this.SendIqSet(From, To, Xml, (sender, e) =>
 			{
-				this.SendIqSet(From, To, Xml, (sender, e2) =>
-				{
-					e = e2;
-					Done.Set();
-				}, null);
+				if (e.Ok)
+					Result.SetResult(e.Response);
+				else
+					Result.SetException(e.StanzaError ?? new XmppException("Unable to perform IQ Set."));
+			}, null);
 
-				if (!Done.WaitOne(Timeout))
-					throw new TimeoutException();
-			}
-			finally
-			{
-				Done.Dispose();
-			}
-
-			if (!e.Ok)
-				throw e.StanzaError;
-
-			return e.Response;
+			return Result.Task;
 		}
 
 		/// <summary>

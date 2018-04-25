@@ -3391,29 +3391,36 @@ namespace Waher.Networking.XMPP
 		/// <exception cref="XmppException">If an IQ error is returned.</exception>
 		public XmlElement IqGet(string To, string Xml, int Timeout)
 		{
-			ManualResetEvent Done = new ManualResetEvent(false);
-			IqResultEventArgs e = null;
+			Task<XmlElement> Result = this.IqGetAsync(To, Xml);
 
-			try
+			if (!Result.Wait(Timeout))
+				throw new TimeoutException();
+
+			return Result.Result;
+		}
+
+		/// <summary>
+		/// Performs an asynchronous IQ Get request/response operation.
+		/// </summary>
+		/// <param name="To">Destination address</param>
+		/// <param name="Xml">XML to embed into the request.</param>
+		/// <returns>Response XML element.</returns>
+		/// <exception cref="TimeoutException">If a timeout occurred.</exception>
+		/// <exception cref="XmppException">If an IQ error is returned.</exception>
+		public Task<XmlElement> IqGetAsync(string To, string Xml)
+		{
+			TaskCompletionSource<XmlElement> Result = new TaskCompletionSource<XmlElement>();
+
+			this.SendIqGet(To, Xml, (sender, e) =>
 			{
-				this.SendIqGet(To, Xml, (sender, e2) =>
-				{
-					e = e2;
-					Done.Set();
-				}, null);
+				if (e.Ok)
+					Result.SetResult(e.Response);
+				else
+					Result.SetException(e.StanzaError ?? new XmppException("Unable to perform IQ Get."));
 
-				if (!Done.WaitOne(Timeout))
-					throw new TimeoutException();
-			}
-			finally
-			{
-				Done.Dispose();
-			}
+			}, null);
 
-			if (!e.Ok)
-				throw e.StanzaError;
-
-			return e.Response;
+			return Result.Task;
 		}
 
 		/// <summary>
@@ -3427,29 +3434,35 @@ namespace Waher.Networking.XMPP
 		/// <exception cref="XmppException">If an IQ error is returned.</exception>
 		public XmlElement IqSet(string To, string Xml, int Timeout)
 		{
-			ManualResetEvent Done = new ManualResetEvent(false);
-			IqResultEventArgs e = null;
+			Task<XmlElement> Result = this.IqSetAsync(To, Xml);
 
-			try
+			if (!Result.Wait(Timeout))
+				throw new TimeoutException();
+
+			return Result.Result;
+		}
+
+		/// <summary>
+		/// Performs an asynchronous IQ Set request/response operation.
+		/// </summary>
+		/// <param name="To">Destination address</param>
+		/// <param name="Xml">XML to embed into the request.</param>
+		/// <returns>Response XML element.</returns>
+		/// <exception cref="TimeoutException">If a timeout occurred.</exception>
+		/// <exception cref="XmppException">If an IQ error is returned.</exception>
+		public Task<XmlElement> IqSetAsync(string To, string Xml)
+		{
+			TaskCompletionSource<XmlElement> Result = new TaskCompletionSource<XmlElement>();
+
+			this.SendIqSet(To, Xml, (sender, e) =>
 			{
-				this.SendIqSet(To, Xml, (sender, e2) =>
-				{
-					e = e2;
-					Done.Set();
-				}, null);
+				if (e.Ok)
+					Result.SetResult(e.Response);
+				else
+					Result.SetException(e.StanzaError ?? new XmppException("Unable to perform IQ Set."));
+			}, null);
 
-				if (!Done.WaitOne(Timeout))
-					throw new TimeoutException();
-			}
-			finally
-			{
-				Done.Dispose();
-			}
-
-			if (!e.Ok)
-				throw e.StanzaError;
-
-			return e.Response;
+			return Result.Task;
 		}
 
 		private void RegistrationFormReceived(object Sender, IqResultEventArgs e)
@@ -5175,7 +5188,7 @@ namespace Waher.Networking.XMPP
 		}
 
 		/// <summary>
-		/// Sends a service discovery request
+		/// Performs a synchronous service discovery request
 		/// </summary>
 		/// <param name="To">Destination address.</param>
 		/// <param name="Timeout">Timeout in milliseconds.</param>
@@ -5186,7 +5199,7 @@ namespace Waher.Networking.XMPP
 		}
 
 		/// <summary>
-		/// Sends a service discovery request
+		/// Performs a synchronous service discovery request
 		/// </summary>
 		/// <param name="To">Destination address.</param>
 		/// <param name="Node">Optional node.</param>
@@ -5199,7 +5212,7 @@ namespace Waher.Networking.XMPP
 		}
 
 		/// <summary>
-		/// Sends a service discovery request
+		/// Performs a synchronous service discovery request
 		/// </summary>
 		/// <param name="E2eEncryption">Optional End-to-end encryption interface. If end-to-end encryption
 		/// cannot be established, the request is sent normally.</param>
@@ -5212,7 +5225,7 @@ namespace Waher.Networking.XMPP
 		}
 
 		/// <summary>
-		/// Sends a service discovery request
+		/// Performs a synchronous service discovery request
 		/// </summary>
 		/// <param name="E2eEncryption">Optional End-to-end encryption interface. If end-to-end encryption
 		/// cannot be established, the request is sent normally.</param>
@@ -5223,29 +5236,33 @@ namespace Waher.Networking.XMPP
 		/// <exception cref="XmppException">If an IQ error is returned.</exception>
 		public ServiceDiscoveryEventArgs ServiceDiscovery(IEndToEndEncryption E2eEncryption, string To, string Node, int Timeout)
 		{
-			ManualResetEvent Done = new ManualResetEvent(false);
-			ServiceDiscoveryEventArgs e = null;
+			Task<ServiceDiscoveryEventArgs> Result = this.ServiceDiscoveryAsync(E2eEncryption, To, Node);
 
-			try
+			if (!Result.Wait(Timeout))
+				throw new TimeoutException();
+
+			return Result.Result;
+		}
+
+		/// <summary>
+		/// Performs an asynchronous service discovery request
+		/// </summary>
+		/// <param name="E2eEncryption">Optional End-to-end encryption interface. If end-to-end encryption
+		/// cannot be established, the request is sent normally.</param>
+		/// <param name="To">Destination address.</param>
+		/// <param name="Node">Optional node.</param>
+		/// <exception cref="TimeoutException">If timeout occurs.</exception>
+		/// <exception cref="XmppException">If an IQ error is returned.</exception>
+		public Task<ServiceDiscoveryEventArgs> ServiceDiscoveryAsync(IEndToEndEncryption E2eEncryption, string To, string Node)
+		{
+			TaskCompletionSource<ServiceDiscoveryEventArgs> Result = new TaskCompletionSource<ServiceDiscoveryEventArgs>();
+
+			this.SendServiceDiscoveryRequest(E2eEncryption, To, Node, (sender, e) =>
 			{
-				this.SendServiceDiscoveryRequest(E2eEncryption, To, Node, (sender, e2) =>
-				{
-					e = e2;
-					Done.Set();
-				}, null);
+				Result.SetResult(e);
+			}, null);
 
-				if (!Done.WaitOne(Timeout))
-					throw new TimeoutException();
-			}
-			finally
-			{
-				Done.Dispose();
-			}
-
-			if (!e.Ok)
-				throw e.StanzaError;
-
-			return e;
+			return Result.Task;
 		}
 
 		/// <summary>
@@ -5393,7 +5410,7 @@ namespace Waher.Networking.XMPP
 		}
 
 		/// <summary>
-		/// Sends a service items discovery request
+		/// Performs a synchronous service items discovery request
 		/// </summary>
 		/// <param name="To">Destination address.</param>
 		/// <param name="Timeout">Timeout in milliseconds.</param>
@@ -5404,7 +5421,7 @@ namespace Waher.Networking.XMPP
 		}
 
 		/// <summary>
-		/// Sends a service items discovery request
+		/// Performs a synchronous service items discovery request
 		/// </summary>
 		/// <param name="To">Destination address.</param>
 		/// <param name="Node">Optional node.</param>
@@ -5417,7 +5434,7 @@ namespace Waher.Networking.XMPP
 		}
 
 		/// <summary>
-		/// Sends a service items discovery request
+		/// Performs a synchronous service items discovery request
 		/// </summary>
 		/// <param name="E2eEncryption">Optional End-to-end encryption interface. If end-to-end encryption
 		/// cannot be established, the request is sent normally.</param>
@@ -5430,7 +5447,7 @@ namespace Waher.Networking.XMPP
 		}
 
 		/// <summary>
-		/// Sends a service items discovery request
+		/// Performs a synchronous service items discovery request
 		/// </summary>
 		/// <param name="E2eEncryption">Optional End-to-end encryption interface. If end-to-end encryption
 		/// cannot be established, the request is sent normally.</param>
@@ -5442,29 +5459,34 @@ namespace Waher.Networking.XMPP
 		public ServiceItemsDiscoveryEventArgs ServiceItemsDiscovery(IEndToEndEncryption E2eEncryption, string To,
 			string Node, int Timeout)
 		{
-			ManualResetEvent Done = new ManualResetEvent(false);
-			ServiceItemsDiscoveryEventArgs e = null;
+			Task<ServiceItemsDiscoveryEventArgs> Result = this.ServiceItemsDiscoveryAsync(E2eEncryption, To, Node);
 
-			try
+			if (!Result.Wait(Timeout))
+				throw new TimeoutException();
+
+			return Result.Result;
+		}
+
+		/// <summary>
+		/// Performs an asynchronous service items discovery request
+		/// </summary>
+		/// <param name="E2eEncryption">Optional End-to-end encryption interface. If end-to-end encryption
+		/// cannot be established, the request is sent normally.</param>
+		/// <param name="To">Destination address.</param>
+		/// <param name="Node">Optional node.</param>
+		/// <exception cref="TimeoutException">If timeout occurs.</exception>
+		/// <exception cref="XmppException">If an IQ error is returned.</exception>
+		public Task<ServiceItemsDiscoveryEventArgs> ServiceItemsDiscoveryAsync(IEndToEndEncryption E2eEncryption, string To,
+			string Node)
+		{
+			TaskCompletionSource<ServiceItemsDiscoveryEventArgs> Result = new TaskCompletionSource<ServiceItemsDiscoveryEventArgs>();
+
+			this.SendServiceItemsDiscoveryRequest(E2eEncryption, To, Node, (sender, e) =>
 			{
-				this.SendServiceItemsDiscoveryRequest(E2eEncryption, To, Node, (sender, e2) =>
-				{
-					e = e2;
-					Done.Set();
-				}, null);
+				Result.SetResult(e);
+			}, null);
 
-				if (!Done.WaitOne(Timeout))
-					throw new TimeoutException();
-			}
-			finally
-			{
-				Done.Dispose();
-			}
-
-			if (!e.Ok)
-				throw e.StanzaError;
-
-			return e;
+			return Result.Task;
 		}
 
 		private void SoftwareVersionRequestHandler(object Sender, IqEventArgs e)
@@ -5579,7 +5601,7 @@ namespace Waher.Networking.XMPP
 		}
 
 		/// <summary>
-		/// Sends a software version request
+		/// Performs a synchronous software version request
 		/// </summary>
 		/// <param name="To">Destination address.</param>
 		/// <param name="Timeout">Timeout in milliseconds.</param>
@@ -5591,7 +5613,7 @@ namespace Waher.Networking.XMPP
 		}
 
 		/// <summary>
-		/// Sends a software version request
+		/// Performs a synchronous software version request
 		/// </summary>
 		/// <param name="E2eEncryption">Optional End-to-end encryption interface. If end-to-end encryption
 		/// cannot be established, the request is sent normally.</param>
@@ -5601,29 +5623,32 @@ namespace Waher.Networking.XMPP
 		/// <returns>Version information.</returns>
 		public SoftwareVersionEventArgs SoftwareVersion(IEndToEndEncryption E2eEncryption, string To, int Timeout)
 		{
-			ManualResetEvent Done = new ManualResetEvent(false);
-			SoftwareVersionEventArgs e = null;
+			Task<SoftwareVersionEventArgs> Result = this.SoftwareVersionAsync(E2eEncryption, To);
 
-			try
+			if (!Result.Wait(Timeout))
+				throw new TimeoutException();
+
+			return Result.Result;
+		}
+
+		/// <summary>
+		/// Performs an asynchronous software version request
+		/// </summary>
+		/// <param name="E2eEncryption">Optional End-to-end encryption interface. If end-to-end encryption
+		/// cannot be established, the request is sent normally.</param>
+		/// <param name="To">Destination address.</param>
+		/// <exception cref="TimeoutException">If timeout occurs.</exception>
+		/// <returns>Version information.</returns>
+		public Task<SoftwareVersionEventArgs> SoftwareVersionAsync(IEndToEndEncryption E2eEncryption, string To)
+		{
+			TaskCompletionSource<SoftwareVersionEventArgs> Result = new TaskCompletionSource<SoftwareVersionEventArgs>();
+
+			this.SendSoftwareVersionRequest(E2eEncryption, To, (sender, e) =>
 			{
-				this.SendSoftwareVersionRequest(E2eEncryption, To, (sender, e2) =>
-				{
-					e = e2;
-					Done.Set();
-				}, null);
+				Result.SetResult(e);
+			}, null);
 
-				if (!Done.WaitOne(Timeout))
-					throw new TimeoutException();
-			}
-			finally
-			{
-				Done.Dispose();
-			}
-
-			if (!e.Ok)
-				throw e.StanzaError;
-
-			return e;
+			return Result.Task;
 		}
 
 		/// <summary>
@@ -5793,7 +5818,7 @@ namespace Waher.Networking.XMPP
 		}
 
 		/// <summary>
-		/// Performs a search form request
+		/// Performs a synchronous search form request
 		/// </summary>
 		/// <param name="To">Destination address.</param>
 		/// <param name="Timeout">Timeout in milliseconds.</param>
@@ -5804,7 +5829,7 @@ namespace Waher.Networking.XMPP
 		}
 
 		/// <summary>
-		/// Performs a search form request
+		/// Performs a synchronous search form request
 		/// </summary>
 		/// <param name="E2eEncryption">Optional End-to-end encryption interface. If end-to-end encryption
 		/// cannot be established, the request is sent normally.</param>
@@ -5813,29 +5838,31 @@ namespace Waher.Networking.XMPP
 		/// <exception cref="TimeoutException">If timeout occurs.</exception>
 		public SearchFormEventArgs SearchForm(IEndToEndEncryption E2eEncryption, string To, int Timeout)
 		{
-			ManualResetEvent Done = new ManualResetEvent(false);
-			SearchFormEventArgs e = null;
+			Task<SearchFormEventArgs> Result = this.SearchFormAsync(E2eEncryption, To);
 
-			try
+			if (!Result.Wait(Timeout))
+				throw new TimeoutException();
+
+			return Result.Result;
+		}
+
+		/// <summary>
+		/// Performs an asynchronous search form request
+		/// </summary>
+		/// <param name="E2eEncryption">Optional End-to-end encryption interface. If end-to-end encryption
+		/// cannot be established, the request is sent normally.</param>
+		/// <param name="To">Destination address.</param>
+		/// <exception cref="TimeoutException">If timeout occurs.</exception>
+		public Task<SearchFormEventArgs> SearchFormAsync(IEndToEndEncryption E2eEncryption, string To)
+		{
+			TaskCompletionSource<SearchFormEventArgs> Result = new TaskCompletionSource<SearchFormEventArgs>();
+
+			this.SendSearchFormRequest(E2eEncryption, To, (sender, e) =>
 			{
-				this.SendSearchFormRequest(E2eEncryption, To, (sender, e2) =>
-				{
-					e = e2;
-					Done.Set();
-				}, null, null);
+				Result.SetResult(e);
+			}, null, null);
 
-				if (!Done.WaitOne(Timeout))
-					throw new TimeoutException();
-			}
-			finally
-			{
-				Done.Dispose();
-			}
-
-			if (!e.Ok)
-				throw e.StanzaError;
-
-			return e;
+			return Result.Task;
 		}
 
 		internal static string Concat(params string[] Rows)
@@ -6457,7 +6484,7 @@ namespace Waher.Networking.XMPP
 				if (e.Ok)
 					Result.SetResult(e.Element);
 				else
-					Result.SetException(new Exception(string.IsNullOrEmpty(e.ErrorText) ? "Unable to get private XML element." : e.ErrorText));
+					Result.SetException(e.StanzaError ?? new XmppException("Unable to get private XML element."));
 			}, null);
 
 			return Result.Task;
@@ -6545,7 +6572,7 @@ namespace Waher.Networking.XMPP
 				if (e.Ok)
 					Result.SetResult(true);
 				else
-					Result.SetException(new Exception(string.IsNullOrEmpty(e.ErrorText) ? "Unable to set private XML element." : e.ErrorText));
+					Result.SetException(e.StanzaError ?? new XmppException("Unable to set private XML element."));
 			}, null);
 
 			return Result.Task;

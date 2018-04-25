@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content.Xml;
 using Waher.Networking.XMPP.DataForms;
@@ -411,35 +412,37 @@ namespace Waher.Networking.XMPP.Search
 		}
 
 		/// <summary>
-		/// Performs a search request
+		/// Performs a synchronous search request
 		/// </summary>
 		/// <param name="Timeout">Timeout in milliseconds.</param>
 		/// <exception cref="TimeoutException">If timeout occurs.</exception>
 		public SearchResultEventArgs Search(int Timeout)
 		{
-			ManualResetEvent Done = new ManualResetEvent(false);
-			SearchResultEventArgs e = null;
+			Task<SearchResultEventArgs> Result = this.SearchAsync();
 
-			try
+			if (!Result.Wait(Timeout))
+				throw new TimeoutException();
+
+			return Result.Result;
+		}
+
+		/// <summary>
+		/// Performs a synchronous search request
+		/// </summary>
+		/// <exception cref="TimeoutException">If timeout occurs.</exception>
+		public Task<SearchResultEventArgs> SearchAsync()
+		{
+			TaskCompletionSource<SearchResultEventArgs> Result = new TaskCompletionSource<SearchResultEventArgs>();
+
+			this.SendSearchRequest((sender, e) =>
 			{
-				this.SendSearchRequest((sender, e2) =>
-				{
-					e = e2;
-					Done.Set();
-				}, null);
+				if (e.Ok)
+					Result.SetResult(e);
+				else
+					Result.SetException(e.StanzaError ?? new XmppException("Unable to perform search operation."));
+			}, null);
 
-				if (!Done.WaitOne(Timeout))
-					throw new TimeoutException();
-			}
-			finally
-			{
-				Done.Dispose();
-			}
-
-			if (!e.Ok)
-				throw e.StanzaError;
-
-			return e;
+			return Result.Task;
 		}
 
 	}

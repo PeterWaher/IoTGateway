@@ -21,7 +21,7 @@ namespace Waher.Networking.XMPP.Test
 			this.ConnectClients();
 			ManualResetEvent Done = new ManualResetEvent(false);
 			Socks5Proxy Proxy = new Socks5Proxy(this.client1);
-
+			
 			Proxy.StartSearch((sender, e) =>
 			{
 				Done.Set();
@@ -41,8 +41,7 @@ namespace Waher.Networking.XMPP.Test
 			this.ConnectClients();
 			ManualResetEvent Error = new ManualResetEvent(false);
 			ManualResetEvent Done = new ManualResetEvent(false);
-			Socks5Client Client = new Socks5Client("proxy.kode.im", 5000, "proxy.kode.im",
-				//Socks5Client Client = new Socks5Client("89.163.130.28", 7777, "proxy.draugr.de",
+			Socks5Client Client = new Socks5Client("waher.se", 1080, "socks5.waher.se",
 				new TextWriterSniffer(Console.Out, BinaryPresentationMethod.Hexadecimal));
 
 			Client.OnStateChange += (sender, e) =>
@@ -69,8 +68,7 @@ namespace Waher.Networking.XMPP.Test
 			this.ConnectClients();
 			ManualResetEvent Error = new ManualResetEvent(false);
 			ManualResetEvent Done = new ManualResetEvent(false);
-			Socks5Client Client = new Socks5Client("proxy.kode.im", 5000, "proxy.kode.im",
-				//Socks5Client Client = new Socks5Client("89.163.130.28", 7777, "proxy.draugr.de",
+			Socks5Client Client = new Socks5Client("waher.se", 1080, "socks5.waher.se",
 				new TextWriterSniffer(Console.Out, BinaryPresentationMethod.Hexadecimal));
 
 			Client.OnStateChange += (sender, e) =>
@@ -101,8 +99,7 @@ namespace Waher.Networking.XMPP.Test
 			this.ConnectClients();
 			ManualResetEvent Error1 = new ManualResetEvent(false);
 			ManualResetEvent Done1 = new ManualResetEvent(false);
-			Socks5Client Client1 = new Socks5Client("proxy.kode.im", 5000, "proxy.kode.im",
-				//Socks5Client Client1 = new Socks5Client("89.163.130.28", 7777, "proxy.draugr.de",
+			Socks5Client Client1 = new Socks5Client("waher.se", 1080, "socks5.waher.se",
 				new TextWriterSniffer(Console.Out, BinaryPresentationMethod.Hexadecimal));
 
 			Client1.OnStateChange += (sender, e) =>
@@ -126,8 +123,7 @@ namespace Waher.Networking.XMPP.Test
 
 			ManualResetEvent Error2 = new ManualResetEvent(false);
 			ManualResetEvent Done2 = new ManualResetEvent(false);
-			Socks5Client Client2 = new Socks5Client("proxy.kode.im", 5000, "proxy.kode.im",
-				//Socks5Client Client2 = new Socks5Client("89.163.130.28", 7777, "proxy.draugr.de",
+			Socks5Client Client2 = new Socks5Client("waher.se", 1080, "socks5.waher.se",
 				new TextWriterSniffer(Console.Out, BinaryPresentationMethod.Hexadecimal));
 
 			Client2.OnStateChange += (sender, e) =>
@@ -177,8 +173,7 @@ namespace Waher.Networking.XMPP.Test
 					Error2.Set();
 			};
 
-			//this.client1.SendIqSet("proxy.draugr.de", "<query xmlns='http://jabber.org/protocol/bytestreams' sid='Stream0001'>" +
-			this.client1.SendIqSet("proxy.kode.im", "<query xmlns='http://jabber.org/protocol/bytestreams' sid='Stream0001'>" +
+			this.client1.SendIqSet("socks5.waher.se", "<query xmlns='http://jabber.org/protocol/bytestreams' sid='Stream0001'>" +
 				"<activate>" + this.client2.FullJID + "</activate></query>", (sender, e) =>
 			{
 				if (e.Ok)

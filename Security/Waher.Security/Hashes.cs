@@ -93,7 +93,7 @@ namespace Waher.Security
 				}
 				else
 				{
-					b <<= 8;
+					b <<= 4;
 					b |= b2;
 
 					Bytes.Add(b);

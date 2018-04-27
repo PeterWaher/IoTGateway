@@ -15,9 +15,9 @@ namespace Waher.Networking.XMPP.Test
 		private InteroperabilityClient interopClient;
 		private InteroperabilityServer interopServer;
 
-		public override void ConnectClients()
+		public override void ConnectClients(bool Bosh)
 		{
-			base.ConnectClients();
+			base.ConnectClients(Bosh);
 
 			Assert.AreEqual(XmppState.Connected, this.client1.State);
 			Assert.AreEqual(XmppState.Connected, this.client2.State);

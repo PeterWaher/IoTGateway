@@ -48,7 +48,12 @@ namespace Waher.Networking.XMPP.Test
 			}
 		}
 
-		public virtual void ConnectClients()
+		public void ConnectClients()
+		{
+			this.ConnectClients(false);
+		}
+
+		public virtual void ConnectClients(bool Bosh)
 		{
 			this.connected1.Reset();
 			this.error1.Reset();
@@ -61,7 +66,16 @@ namespace Waher.Networking.XMPP.Test
 			this.ex1 = null;
 			this.ex2 = null;
 
-			this.client1 = new XmppClient("waher.se", 5222, "xmppclient.test01", "testpassword", "en", typeof(CommunicationTests).Assembly)
+			XmppCredentials Credentias1 = new XmppCredentials()
+			{
+				Host = "waher.se",
+				Port = 5222,
+				HttpEndpoint = Bosh ? "https://waher.se/http-bind" : string.Empty,
+				Account = "xmppclient.test01",
+				Password = "testpassword"
+			};
+
+			this.client1 = new XmppClient(Credentias1, "en", typeof(CommunicationTests).Assembly)
 			{
 				DefaultNrRetries = 2,
 				DefaultRetryTimeout = 1000,
@@ -78,7 +92,16 @@ namespace Waher.Networking.XMPP.Test
 
 			this.WaitConnected1(5000);
 
-			this.client2 = new XmppClient("waher.se", 5222, "xmppclient.test02", "testpassword", "en", typeof(CommunicationTests).Assembly)
+			XmppCredentials Credentias2 = new XmppCredentials()
+			{
+				Host = "waher.se",
+				Port = 5222,
+				HttpEndpoint = Bosh ? "https://waher.se/http-bind" : string.Empty,
+				Account = "xmppclient.test02",
+				Password = "testpassword"
+			};
+
+			this.client2 = new XmppClient(Credentias2, "en", typeof(CommunicationTests).Assembly)
 			{
 				DefaultNrRetries = 2,
 				DefaultRetryTimeout = 1000,
@@ -188,7 +211,7 @@ namespace Waher.Networking.XMPP.Test
 					Assert.Fail("Unable to connect. Timeout occurred.");
 					break;
 
-				case 0:	// Connected
+				case 0: // Connected
 					break;
 
 				case 1:

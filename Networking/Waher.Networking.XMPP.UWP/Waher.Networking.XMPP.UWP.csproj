@@ -182,6 +182,7 @@
     <Compile Include="DataForms\ValidationMethods\RegexValidation.cs" />
     <Compile Include="DataForms\ValidationMethods\ValidationMethod.cs" />
     <Compile Include="DeliveryEventArgs.cs" />
+    <Compile Include="HttpBinding.cs" />
     <Compile Include="HttpFileUpload\HttpFileUploadClient.cs" />
     <Compile Include="HttpFileUpload\HttpFileUploadEventArgs.cs" />
     <Compile Include="IEndToEndEncryption.cs" />

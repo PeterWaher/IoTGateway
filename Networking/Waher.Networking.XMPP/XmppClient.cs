@@ -119,8 +119,10 @@ namespace Waher.Networking.XMPP
 	/// XEP-0077: In-band Registration: http://xmpp.org/extensions/xep-0077.html
 	/// XEP-0092: Software Version: http://xmpp.org/extensions/xep-0092.html
 	/// XEP-0115: Entity Capabilities: http://xmpp.org/extensions/xep-0115.html
+	/// XEP-0124: Bidirectional-streams Over Synchronous HTTP (BOSH): https://xmpp.org/extensions/xep-0124.html
 	/// XEP-0128: Service Discovery Extensions: http://xmpp.org/extensions/xep-0128.html
 	/// XEP-0199: XMPP Ping: http://xmpp.org/extensions/xep-0199.html
+	/// XEP-0206: XMPP Over BOSH: https://xmpp.org/extensions/xep-0206.html
 	/// 
 	/// Quality of Service: http://xmpp.org/extensions/inbox/qos.html
 	/// </summary>
@@ -336,22 +338,7 @@ namespace Waher.Networking.XMPP
 		private bool openBracketReceived = false;
 
 		/// <summary>
-		/// Manages an XMPP client connection. Implements XMPP, as defined in
-		/// https://tools.ietf.org/html/rfc6120
-		/// https://tools.ietf.org/html/rfc6121
-		/// https://tools.ietf.org/html/rfc6122
-		/// 
-		/// Extensions supported directly by client object:
-		/// 
-		/// XEP-0030: Service Discovery: http://xmpp.org/extensions/xep-0030.html
-		/// XEP-0055: Jabber Search: http://xmpp.org/extensions/xep-0055.html
-		/// XEP-0077: In-band Registration: http://xmpp.org/extensions/xep-0077.html
-		/// XEP-0092: Software Version: http://xmpp.org/extensions/xep-0092.html
-		/// XEP-0115: Entity Capabilities: http://xmpp.org/extensions/xep-0115.html
-		/// XEP-0128: Service Discovery Extensions: http://xmpp.org/extensions/xep-0128.html
-		/// XEP-0199: XMPP Ping: http://xmpp.org/extensions/xep-0199.html
-		/// 
-		/// Quality of Service: http://xmpp.org/extensions/inbox/qos.html
+		/// Manages an XMPP client connection over a traditional binary socket connection. 
 		/// </summary>
 		/// <param name="Host">Host name or IP address of XMPP server.</param>
 		/// <param name="Port">Port to connect to.</param>
@@ -372,22 +359,7 @@ namespace Waher.Networking.XMPP
 		}
 
 		/// <summary>
-		/// Manages an XMPP client connection. Implements XMPP, as defined in
-		/// https://tools.ietf.org/html/rfc6120
-		/// https://tools.ietf.org/html/rfc6121
-		/// https://tools.ietf.org/html/rfc6122
-		/// 
-		/// Extensions supported directly by client object:
-		/// 
-		/// XEP-0030: Service Discovery: http://xmpp.org/extensions/xep-0030.html
-		/// XEP-0055: Jabber Search: http://xmpp.org/extensions/xep-0055.html
-		/// XEP-0077: In-band Registration: http://xmpp.org/extensions/xep-0077.html
-		/// XEP-0092: Software Version: http://xmpp.org/extensions/xep-0092.html
-		/// XEP-0115: Entity Capabilities: http://xmpp.org/extensions/xep-0115.html
-		/// XEP-0128: Service Discovery Extensions: http://xmpp.org/extensions/xep-0128.html
-		/// XEP-0199: XMPP Ping: http://xmpp.org/extensions/xep-0199.html
-		/// 
-		/// Quality of Service: http://xmpp.org/extensions/inbox/qos.html
+		/// Manages an XMPP client connection over a traditional binary socket connection. 
 		/// </summary>
 		/// <param name="Host">Host name or IP address of XMPP server.</param>
 		/// <param name="Port">Port to connect to.</param>
@@ -419,22 +391,7 @@ namespace Waher.Networking.XMPP
 		}
 
 		/// <summary>
-		/// Manages an XMPP client connection. Implements XMPP, as defined in
-		/// https://tools.ietf.org/html/rfc6120
-		/// https://tools.ietf.org/html/rfc6121
-		/// https://tools.ietf.org/html/rfc6122
-		/// 
-		/// Extensions supported directly by client object:
-		/// 
-		/// XEP-0030: Service Discovery: http://xmpp.org/extensions/xep-0030.html
-		/// XEP-0055: Jabber Search: http://xmpp.org/extensions/xep-0055.html
-		/// XEP-0077: In-band Registration: http://xmpp.org/extensions/xep-0077.html
-		/// XEP-0092: Software Version: http://xmpp.org/extensions/xep-0092.html
-		/// XEP-0115: Entity Capabilities: http://xmpp.org/extensions/xep-0115.html
-		/// XEP-0128: Service Discovery Extensions: http://xmpp.org/extensions/xep-0128.html
-		/// XEP-0199: XMPP Ping: http://xmpp.org/extensions/xep-0199.html
-		/// 
-		/// Quality of Service: http://xmpp.org/extensions/inbox/qos.html
+		/// Manages an XMPP client connection over a traditional binary socket connection. 
 		/// </summary>
 		/// <param name="Host">Host name or IP address of XMPP server.</param>
 		/// <param name="Port">Port to connect to.</param>
@@ -456,22 +413,7 @@ namespace Waher.Networking.XMPP
 		}
 
 		/// <summary>
-		/// Manages an XMPP client connection. Implements XMPP, as defined in
-		/// https://tools.ietf.org/html/rfc6120
-		/// https://tools.ietf.org/html/rfc6121
-		/// https://tools.ietf.org/html/rfc6122
-		/// 
-		/// Extensions supported directly by client object:
-		/// 
-		/// XEP-0030: Service Discovery: http://xmpp.org/extensions/xep-0030.html
-		/// XEP-0055: Jabber Search: http://xmpp.org/extensions/xep-0055.html
-		/// XEP-0077: In-band Registration: http://xmpp.org/extensions/xep-0077.html
-		/// XEP-0092: Software Version: http://xmpp.org/extensions/xep-0092.html
-		/// XEP-0115: Entity Capabilities: http://xmpp.org/extensions/xep-0115.html
-		/// XEP-0128: Service Discovery Extensions: http://xmpp.org/extensions/xep-0128.html
-		/// XEP-0199: XMPP Ping: http://xmpp.org/extensions/xep-0199.html
-		/// 
-		/// Quality of Service: http://xmpp.org/extensions/inbox/qos.html
+		/// Manages an XMPP client connection over a traditional binary socket connection. 
 		/// </summary>
 		/// <param name="Host">Host name or IP address of XMPP server.</param>
 		/// <param name="Port">Port to connect to.</param>
@@ -504,22 +446,8 @@ namespace Waher.Networking.XMPP
 		}
 
 		/// <summary>
-		/// Manages an XMPP client connection. Implements XMPP, as defined in
-		/// https://tools.ietf.org/html/rfc6120
-		/// https://tools.ietf.org/html/rfc6121
-		/// https://tools.ietf.org/html/rfc6122
-		/// 
-		/// Extensions supported directly by client object:
-		/// 
-		/// XEP-0030: Service Discovery: http://xmpp.org/extensions/xep-0030.html
-		/// XEP-0055: Jabber Search: http://xmpp.org/extensions/xep-0055.html
-		/// XEP-0077: In-band Registration: http://xmpp.org/extensions/xep-0077.html
-		/// XEP-0092: Software Version: http://xmpp.org/extensions/xep-0092.html
-		/// XEP-0115: Entity Capabilities: http://xmpp.org/extensions/xep-0115.html
-		/// XEP-0128: Service Discovery Extensions: http://xmpp.org/extensions/xep-0128.html
-		/// XEP-0199: XMPP Ping: http://xmpp.org/extensions/xep-0199.html
-		/// 
-		/// Quality of Service: http://xmpp.org/extensions/inbox/qos.html
+		/// Manages an XMPP client connection. Connection information is defined in
+		/// <paramref name="Credentials"/>.
 		/// </summary>
 		/// <param name="Credentials">Client credentials.</param>
 		/// <param name="Language">Language Code, according to RFC 5646.</param>
@@ -530,6 +458,14 @@ namespace Waher.Networking.XMPP
 			this.host = this.domain = Credentials.Host;
 			this.port = Credentials.Port;
 			this.userName = Credentials.Account;
+
+			if (!string.IsNullOrEmpty(Credentials.HttpEndpoint))
+			{
+				this.textTransportLayer = new HttpBinding(Credentials.HttpEndpoint, this);
+
+				this.textTransportLayer.OnReceived += TextTransportLayer_OnReceived;
+				this.textTransportLayer.OnSent += TextTransportLayer_OnSent;
+			}
 
 			if (string.IsNullOrEmpty(Credentials.PasswordType))
 			{
@@ -611,22 +547,8 @@ namespace Waher.Networking.XMPP
 		}
 
 		/// <summary>
-		/// Manages an XMPP client connection. Implements XMPP, as defined in
-		/// https://tools.ietf.org/html/rfc6120
-		/// https://tools.ietf.org/html/rfc6121
-		/// https://tools.ietf.org/html/rfc6122
-		/// 
-		/// Extensions supported directly by client object:
-		/// 
-		/// XEP-0030: Service Discovery: http://xmpp.org/extensions/xep-0030.html
-		/// XEP-0055: Jabber Search: http://xmpp.org/extensions/xep-0055.html
-		/// XEP-0077: In-band Registration: http://xmpp.org/extensions/xep-0077.html
-		/// XEP-0092: Software Version: http://xmpp.org/extensions/xep-0092.html
-		/// XEP-0115: Entity Capabilities: http://xmpp.org/extensions/xep-0115.html
-		/// XEP-0128: Service Discovery Extensions: http://xmpp.org/extensions/xep-0128.html
-		/// XEP-0199: XMPP Ping: http://xmpp.org/extensions/xep-0199.html
-		/// 
-		/// Quality of Service: http://xmpp.org/extensions/inbox/qos.html
+		/// Manages an XMPP client connection. Transport layer is implemented in
+		/// <paramref name="TextTransporLayer"/>.
 		/// </summary>
 		/// <param name="TextTransporLayer">Text transport layer to send and receive XMPP fragments on. The transport layer
 		/// MUST ALREADY be connected and at least the stream element processed, if applicable. The transport layer is responsible 
@@ -705,28 +627,34 @@ namespace Waher.Networking.XMPP
 				this.serverFeatures = null;
 				this.serverComponents = null;
 
+				this.bareJid = this.fullJid = this.userName + "@" + this.domain;
+
+				if (this.textTransportLayer == null)
+				{
 #if WINDOWS_UWP
-				this.client = new StreamSocket();
-				await this.client.ConnectAsync(new HostName(Host), Port.ToString(), SocketProtectionLevel.PlainSocket);     // Allow use of service name "xmpp-client"
+					this.client = new StreamSocket();
+					await this.client.ConnectAsync(new HostName(Host), Port.ToString(), SocketProtectionLevel.PlainSocket);     // Allow use of service name "xmpp-client"
 
-				this.bareJid = this.fullJid = this.userName + "@" + this.domain;
-				this.State = XmppState.StreamNegotiation;
-
-				this.dataReader = new DataReader(this.client.InputStream);
-				this.dataWriter = new DataWriter(this.client.OutputStream);
+					this.dataReader = new DataReader(this.client.InputStream);
+					this.dataWriter = new DataWriter(this.client.OutputStream);
 #else
-				this.client = new TcpClient();
-				await this.client.ConnectAsync(Host, Port);
-				if (this.client == null)
-					return;
+					this.client = new TcpClient();
+					await this.client.ConnectAsync(Host, Port);
+					if (this.client == null)
+						return;
 
-				this.stream = new NetworkStream(this.client.Client, false);
-
-				this.bareJid = this.fullJid = this.userName + "@" + this.domain;
-				this.State = XmppState.StreamNegotiation;
+					this.stream = new NetworkStream(this.client.Client, false);
 #endif
-				this.BeginWrite("<?xml version='1.0' encoding='utf-8'?><stream:stream to='" + XML.Encode(this.domain) + "' version='1.0' xml:lang='" +
-					XML.Encode(this.language) + "' xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams'>", null);
+					this.State = XmppState.StreamNegotiation;
+
+					this.BeginWrite("<?xml version='1.0' encoding='utf-8'?><stream:stream to='" + XML.Encode(this.domain) + "' version='1.0' xml:lang='" +
+						XML.Encode(this.language) + "' xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams'>", null);
+				}
+				else if (this.textTransportLayer is HttpBinding HttpBinding)
+				{
+					this.State = XmppState.StreamNegotiation;
+					HttpBinding.CreateSession();
+				}
 
 				this.ResetState(false);
 				this.BeginRead();
@@ -788,7 +716,7 @@ namespace Waher.Networking.XMPP
 			}
 		}
 
-		private void ConnectionError(Exception ex)
+		internal void ConnectionError(Exception ex)
 		{
 			XmppExceptionEventHandler h = this.OnConnectionError;
 			if (h != null)
@@ -1034,6 +962,14 @@ namespace Waher.Networking.XMPP
 
 			this.DisposeClient();
 
+			ITextTransportLayer TTL;
+
+			if ((TTL = this.textTransportLayer) != null)
+			{
+				this.textTransportLayer = null;
+				TTL.Dispose();
+			}
+
 #if WINDOWS_UWP
 			if (this.memoryBuffer != null)
 			{
@@ -1083,14 +1019,6 @@ namespace Waher.Networking.XMPP
 				this.client = null;
 			}
 #endif
-			ITextTransportLayer TTL;
-
-			if ((TTL = this.textTransportLayer) != null)
-			{
-				this.textTransportLayer = null;
-				TTL.Dispose();
-			}
-
 			EventHandler h = this.OnDisposed;
 			if (h != null)
 			{

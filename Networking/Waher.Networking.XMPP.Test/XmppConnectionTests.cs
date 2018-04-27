@@ -14,12 +14,12 @@ namespace Waher.Networking.XMPP.Test
 	[TestClass]
 	public class XmppConnectionTests
 	{
-		private static ConsoleEventSink sink = null;
-		private AutoResetEvent connected = new AutoResetEvent(false);
-		private AutoResetEvent error = new AutoResetEvent(false);
-		private AutoResetEvent offline = new AutoResetEvent(false);
-		private XmppClient client;
-		private Exception ex = null;
+		protected static ConsoleEventSink sink = null;
+		protected AutoResetEvent connected = new AutoResetEvent(false);
+		protected AutoResetEvent error = new AutoResetEvent(false);
+		protected AutoResetEvent offline = new AutoResetEvent(false);
+		protected XmppClient client;
+		protected Exception ex = null;
 
 		public XmppConnectionTests()
 		{
@@ -52,14 +52,7 @@ namespace Waher.Networking.XMPP.Test
 
 			this.ex = null;
 
-			//this.client = new XmppClient("tigase.im", 5222, "xmppclient.test01", "testpassword", "en", typeof(CommunicationTests).Assembly);
-			//this.client.AllowPlain = true;
-			//this.client.TrustServer = true;
-			//this.client = new XmppClient("jappix.com", 5222, "xmppclient.test01", "testpassword", "en", typeof(CommunicationTests).Assembly);
-			//this.client = new XmppClient("jabber.de", 5222, "xmppclient.test01", "testpassword", "en", typeof(CommunicationTests).Assembly);
-			//this.client = new XmppClient("jabber.se", 5222, "xmppclient.test01", "testpassword", "en", typeof(CommunicationTests).Assembly);
-			//this.client = new XmppClient("ik.nu", 5222, "xmppclient.test01", "testpassword", "en", typeof(CommunicationTests).Assembly);
-			this.client = new XmppClient("kode.im", 5222, "xmppclient.test01", "testpassword", "en", typeof(CommunicationTests).Assembly)
+			this.client = new XmppClient(this.GetCredentials(), "en", typeof(CommunicationTests).Assembly)
 			{
 				DefaultNrRetries = 2,
 				DefaultRetryTimeout = 1000,
@@ -73,6 +66,17 @@ namespace Waher.Networking.XMPP.Test
 			this.client.OnError += new XmppExceptionEventHandler(Client_OnError);
 			this.client.OnStateChanged += new StateChangedEventHandler(Client_OnStateChanged);
 			this.client.Connect();
+		}
+
+		public virtual XmppCredentials GetCredentials()
+		{
+			return new XmppCredentials()
+			{
+				Host = "kode.im",
+				Port = 5222,
+				Account = "xmppclient.test01",
+				Password = "testpassword"
+			};
 		}
 
 		private void Client_OnStateChanged(object Sender, XmppState NewState)

@@ -19,9 +19,9 @@ namespace Waher.Networking.XMPP.Test
 		private SensorServer sensorServer;
 		private double temp;
 
-		public override void ConnectClients()
+		public override void ConnectClients(bool Bosh)
 		{
-			base.ConnectClients();
+			base.ConnectClients(Bosh);
 
 			Assert.AreEqual(XmppState.Connected, this.client1.State);
 			Assert.AreEqual(XmppState.Connected, this.client2.State);

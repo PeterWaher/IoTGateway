@@ -36,9 +36,9 @@ namespace Waher.Networking.XMPP.Test
 			Types.Initialize();
 		}
 
-		public override void ConnectClients(bool Bosh)
+		public override void ConnectClients()
 		{
-			base.ConnectClients(Bosh);
+			base.ConnectClients();
 
 			Assert.AreEqual(XmppState.Connected, this.client1.State);
 			Assert.AreEqual(XmppState.Connected, this.client2.State);

@@ -59,6 +59,32 @@ namespace Waher.Networking.XMPP.Test
 					Done.Set();
 			};
 
+			RosterItem Item = this.client1.GetRosterItem(this.client2.BareJID);
+			if (Item == null || (Item.State != SubscriptionState.Both && Item.State != SubscriptionState.To))
+			{
+				ManualResetEvent Done2 = new ManualResetEvent(false);
+				ManualResetEvent Error2 = new ManualResetEvent(false);
+
+				this.client2.OnPresenceSubscribe += (sender, e) =>
+				{
+					if (e.FromBareJID == this.client1.BareJID)
+					{
+						e.Accept();
+						Done2.Set();
+					}
+					else
+					{
+						e.Decline();
+						Error2.Set();
+					}
+				};
+
+				this.client1.RequestPresenceSubscription(this.client2.BareJID);
+
+				Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done2, Error2 }, 10000));
+			}
+
+			Thread.Sleep(500);
 			this.client2.SetPresence(Availability.Chat, "<hola xmlns='bandola'>abc</hola>");
 
 			Assert.IsTrue(Done.WaitOne(10000), "Presence not delivered properly.");

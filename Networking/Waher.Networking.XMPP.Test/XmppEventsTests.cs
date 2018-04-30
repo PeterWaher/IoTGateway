@@ -17,9 +17,9 @@ namespace Waher.Networking.XMPP.Test
 		XmppEventReceptor receptor = null;
 		XmppEventSink sink = null;
 
-		public override void ConnectClients(bool Bosh)
+		public override void ConnectClients()
 		{
-			base.ConnectClients(Bosh);
+			base.ConnectClients();
 
 			Assert.AreEqual(XmppState.Connected, this.client1.State);
 			Assert.AreEqual(XmppState.Connected, this.client2.State);

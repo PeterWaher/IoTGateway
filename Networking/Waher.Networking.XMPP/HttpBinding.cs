@@ -163,16 +163,26 @@ namespace Waher.Networking.XMPP
 		{
 			try
 			{
-				if (this.active[0] && this.httpClients[0] != null)
-				{
-					this.httpClients[0].Dispose();
-					this.httpClients[0] = new HttpClient(this.httpHandler)
-					{
-						Timeout = TimeSpan.FromMilliseconds(30000)
-					};
+				int i, c;
 
-					this.httpClients[0].DefaultRequestHeaders.ExpectContinue = false;
-					this.active[0] = false;
+				lock (this.httpClients)
+				{
+					c = this.httpClients.Length;
+
+					for (i = 0; i < c; i++)
+					{
+						if (this.active[i] && this.httpClients[i] != null)
+						{
+							this.httpClients[i].Dispose();
+							this.httpClients[i] = new HttpClient(this.httpHandler)
+							{
+								Timeout = TimeSpan.FromMilliseconds(30000)
+							};
+
+							this.httpClients[i].DefaultRequestHeaders.ExpectContinue = false;
+							this.active[i] = false;
+						}
+					}
 				}
 
 				StringBuilder Xml = new StringBuilder();
@@ -195,7 +205,9 @@ namespace Waher.Networking.XMPP
 				HttpContent Content = new StringContent(s, System.Text.Encoding.UTF8, "text/xml");
 				XmlDocument ResponseXml;
 
-				this.xmppClient.Information("Session initiated:\r\n" + s);
+				//this.xmppClient.Information("Session initiated:\r\n" + s);
+
+				this.xmppClient.NextPing = DateTime.Now.AddMinutes(1);
 
 				HttpResponseMessage Response = await this.httpClients[0].PostAsync(this.url, Content);
 				Response.EnsureSuccessStatusCode();
@@ -316,8 +328,6 @@ namespace Waher.Networking.XMPP
 					Array.Resize<bool>(ref this.active, this.requests);
 				}
 
-				int i;
-
 				for (i = 0; i < this.requests; i++)
 				{
 					if (this.httpClients[i] != null)
@@ -393,7 +403,10 @@ namespace Waher.Networking.XMPP
 						if (ClientIndex >= this.requests)
 						{
 							if (!string.IsNullOrEmpty(Packet))
+							{
+								this.xmppClient?.Information("Outbound stanza queued.");
 								this.outputQueue.AddLast(new KeyValuePair<string, EventHandler>(Packet, DeliveryCallback));
+							}
 
 							return;
 						}
@@ -460,7 +473,9 @@ namespace Waher.Networking.XMPP
 					string s = Xml.ToString();
 					HttpContent Content = new StringContent(s, System.Text.Encoding.UTF8, "text/xml");
 
-					this.xmppClient.Information("HTTP client " + (ClientIndex + 1).ToString() + " transmits:\r\n" + s);
+					//this.xmppClient.Information("HTTP client " + (ClientIndex + 1).ToString() + " transmits:\r\n" + s);
+
+					this.xmppClient.NextPing = DateTime.Now.AddSeconds(this.waitSeconds + 5);
 
 					HttpResponseMessage Response = await this.httpClients[ClientIndex].PostAsync(this.url, Content);
 
@@ -504,7 +519,7 @@ namespace Waher.Networking.XMPP
 
 					string XmlResponse = Encoding.GetString(Bin).Trim();
 
-					this.xmppClient.Information("HTTP client " + (ClientIndex + 1).ToString() + " received:\r\n" + XmlResponse);
+					//this.xmppClient.Information("HTTP client " + (ClientIndex + 1).ToString() + " received:\r\n" + XmlResponse);
 
 					this.BodyReceived(XmlResponse, false);
 				}
@@ -552,8 +567,6 @@ namespace Waher.Networking.XMPP
 					XmlDocument BodyDoc = new XmlDocument();
 					LinkedList<KeyValuePair<string, string>> Namespaces = null;
 					BodyDoc.LoadXml(Body);
-
-					i = Xml.IndexOf('>');
 
 					foreach (XmlAttribute Attr in BodyDoc.DocumentElement.Attributes)
 					{

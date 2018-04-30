@@ -822,6 +822,12 @@ namespace Waher.Networking.XMPP
 			set { this.streamFooter = value; }
 		}
 
+		internal DateTime NextPing
+		{
+			get { return this.nextPing; }
+			set { this.nextPing = value; }
+		}
+
 		/// <summary>
 		/// If server should be trusted, regardless if the operating system could validate its certificate or not.
 		/// </summary>
@@ -1068,10 +1074,10 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public void Reconnect()
 		{
-			if (this.textTransportLayer != null)
+			if (this.textTransportLayer != null && !(this.textTransportLayer is HttpBinding))
 				throw new Exception("Reconnections must be made in the underlying transport layer.");
-
-			this.Connect(this.domain);
+			else
+				this.Connect(this.domain);
 		}
 
 		/// <summary>

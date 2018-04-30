@@ -48,12 +48,7 @@ namespace Waher.Networking.XMPP.Test
 			}
 		}
 
-		public void ConnectClients()
-		{
-			this.ConnectClients(false);
-		}
-
-		public virtual void ConnectClients(bool Bosh)
+		public virtual void ConnectClients()
 		{
 			this.connected1.Reset();
 			this.error1.Reset();
@@ -66,16 +61,7 @@ namespace Waher.Networking.XMPP.Test
 			this.ex1 = null;
 			this.ex2 = null;
 
-			XmppCredentials Credentias1 = new XmppCredentials()
-			{
-				Host = "waher.se",
-				Port = 5222,
-				HttpEndpoint = Bosh ? "https://waher.se/http-bind" : string.Empty,
-				Account = "xmppclient.test01",
-				Password = "testpassword"
-			};
-
-			this.client1 = new XmppClient(Credentias1, "en", typeof(CommunicationTests).Assembly)
+			this.client1 = new XmppClient(this.GetCredentials1(), "en", typeof(CommunicationTests).Assembly)
 			{
 				DefaultNrRetries = 2,
 				DefaultRetryTimeout = 1000,
@@ -83,7 +69,7 @@ namespace Waher.Networking.XMPP.Test
 				DefaultDropOff = true
 			};
 
-			this.client1.Add(new TextWriterSniffer(Console.Out, BinaryPresentationMethod.ByteCount));
+			//this.client1.Add(new TextWriterSniffer(Console.Out, BinaryPresentationMethod.ByteCount));
 			this.client1.OnConnectionError += Client_OnConnectionError1;
 			this.client1.OnError += Client_OnError1;
 			this.client1.OnStateChanged += Client_OnStateChanged1;
@@ -92,16 +78,7 @@ namespace Waher.Networking.XMPP.Test
 
 			this.WaitConnected1(5000);
 
-			XmppCredentials Credentias2 = new XmppCredentials()
-			{
-				Host = "waher.se",
-				Port = 5222,
-				HttpEndpoint = Bosh ? "https://waher.se/http-bind" : string.Empty,
-				Account = "xmppclient.test02",
-				Password = "testpassword"
-			};
-
-			this.client2 = new XmppClient(Credentias2, "en", typeof(CommunicationTests).Assembly)
+			this.client2 = new XmppClient(this.GetCredentials2(), "en", typeof(CommunicationTests).Assembly)
 			{
 				DefaultNrRetries = 2,
 				DefaultRetryTimeout = 1000,
@@ -109,6 +86,7 @@ namespace Waher.Networking.XMPP.Test
 				DefaultDropOff = true
 			};
 
+			this.client2.Add(new TextWriterSniffer(Console.Out, BinaryPresentationMethod.ByteCount));
 			this.client2.OnConnectionError += Client_OnConnectionError2;
 			this.client2.OnError += Client_OnError2;
 			this.client2.OnStateChanged += Client_OnStateChanged2;
@@ -116,6 +94,28 @@ namespace Waher.Networking.XMPP.Test
 			this.client2.Connect();
 
 			this.WaitConnected2(5000);
+		}
+
+		public virtual XmppCredentials GetCredentials1()
+		{
+			return new XmppCredentials()
+			{
+				Host = "waher.se",
+				Port = 5222,
+				Account = "xmppclient.test01",
+				Password = "testpassword"
+			};
+		}
+
+		public virtual XmppCredentials GetCredentials2()
+		{
+			return new XmppCredentials()
+			{
+				Host = "waher.se",
+				Port = 5222,
+				Account = "xmppclient.test02",
+				Password = "testpassword"
+			};
 		}
 
 		private void Client_OnStateChanged1(object Sender, XmppState NewState)

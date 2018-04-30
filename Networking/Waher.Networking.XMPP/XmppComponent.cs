@@ -162,7 +162,7 @@ namespace Waher.Networking.XMPP
 				this.dataWriter = new DataWriter(this.client.OutputStream);
 
 				this.BeginWrite("<?xml version='1.0' encoding='utf-8'?><stream:stream to='" + XML.Encode(this.componentSubDomain) + 
-					"' xmlns='jabber:component:accept' xmlns:stream='http://etherx.jabber.org/streams'>", null);
+					"' xmlns='jabber:component:accept' xmlns:stream='" + XmppClient.NamespaceStream + "'>", null);
 
 				this.ResetState(false);
 				this.BeginRead();
@@ -175,7 +175,7 @@ namespace Waher.Networking.XMPP
 				this.State = XmppState.StreamNegotiation;
 
 				this.BeginWrite("<?xml version='1.0' encoding='utf-8'?><stream:stream to='" + XML.Encode(this.componentSubDomain) +
-					"' xmlns='jabber:component:accept' xmlns:stream='http://etherx.jabber.org/streams'>", null);
+					"' xmlns='jabber:component:accept' xmlns:stream='" + XmppClient.NamespaceStream + "'>", null);
 
 				this.ResetState(false);
 				this.BeginRead();

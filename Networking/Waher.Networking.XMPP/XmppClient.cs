@@ -129,6 +129,15 @@ namespace Waher.Networking.XMPP
 	public class XmppClient : Sniffable, IDisposable
 	{
 		/// <summary>
+		/// http://etherx.jabber.org/streams
+		/// </summary>
+		public const string NamespaceStream = "http://etherx.jabber.org/streams";
+
+		/// <summary>
+		/// jabber:client
+		/// </summary>
+		public const string NamespaceClient = "jabber:client";
+		/// <summary>
 		/// urn:ietf:params:xml:ns:xmpp-streams
 		/// </summary>
 		public const string NamespaceXmppStreams = "urn:ietf:params:xml:ns:xmpp-streams";
@@ -648,7 +657,8 @@ namespace Waher.Networking.XMPP
 					this.State = XmppState.StreamNegotiation;
 
 					this.BeginWrite("<?xml version='1.0' encoding='utf-8'?><stream:stream to='" + XML.Encode(this.domain) + "' version='1.0' xml:lang='" +
-						XML.Encode(this.language) + "' xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams'>", null);
+						XML.Encode(this.language) + "' xmlns='" + NamespaceClient + "' xmlns:stream='" +
+						NamespaceStream + "'>", null);
 				}
 				else if (this.textTransportLayer is HttpBinding HttpBinding)
 				{
@@ -798,6 +808,18 @@ namespace Waher.Networking.XMPP
 		public ITextTransportLayer TextTransportLayer
 		{
 			get { return this.textTransportLayer; }
+		}
+
+		internal string StreamHeader
+		{
+			get { return this.streamHeader; }
+			set { this.streamHeader = value; }
+		}
+
+		internal string StreamFooter
+		{
+			get { return this.streamFooter; }
+			set { this.streamFooter = value; }
 		}
 
 		/// <summary>
@@ -1908,7 +1930,7 @@ namespace Waher.Networking.XMPP
 									this.ResetState(true);
 									this.BeginWrite("<?xml version='1.0' encoding='utf-8'?><stream:stream to='" + XML.Encode(this.domain) +
 										"' version='1.0' xml:lang='" + XML.Encode(this.language) +
-										"' xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams'>", null);
+										"' xmlns='" + NamespaceClient + "' xmlns:stream='" + NamespaceStream + "'>", null);
 								}
 								else
 									throw new XmppException("Server authentication rejected by client.", E);
@@ -2912,7 +2934,8 @@ namespace Waher.Networking.XMPP
 					SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12, true);
 #endif
 				this.BeginWrite("<?xml version='1.0' encoding='utf-8'?><stream:stream from='" + XML.Encode(this.bareJid) + "' to='" + XML.Encode(this.domain) +
-					"' version='1.0' xml:lang='" + XML.Encode(this.language) + "' xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams'>", null);
+					"' version='1.0' xml:lang='" + XML.Encode(this.language) + "' xmlns='" + NamespaceClient + "' xmlns:stream='" +
+					NamespaceStream + "'>", null);
 
 				this.ResetState(false);
 				this.BeginRead();
@@ -6162,7 +6185,7 @@ namespace Waher.Networking.XMPP
 						{
 							StringBuilder Xml = new StringBuilder();
 
-							Xml.Append("<iq xmlns='jabber:client' type='error' from='");
+							Xml.Append("<iq xmlns='" + NamespaceClient + "' type='error' from='");
 							Xml.Append(Request.To);
 							Xml.Append("' id='");
 							Xml.Append(Request.SeqNr.ToString());

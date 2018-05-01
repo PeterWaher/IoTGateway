@@ -36,7 +36,6 @@ namespace Waher.Networking.XMPP
 
 		private LinkedList<KeyValuePair<string, EventHandler>> outputQueue = new LinkedList<KeyValuePair<string, EventHandler>>();
 		private HttpClient[] httpClients;
-		private HttpClientHandler httpHandler;
 		private bool[] active;
 		private XmppClient xmppClient;
 		private string url;
@@ -66,15 +65,13 @@ namespace Waher.Networking.XMPP
 			this.url = Url;
 			this.xmppClient = Client;
 
-			this.httpHandler = new HttpClientHandler()
-			{
-				ServerCertificateCustomValidationCallback = this.RemoteCertificateValidationCallback,
-				UseCookies = false
-			};
-
 			this.httpClients = new HttpClient[]
 			{
-				new HttpClient(this.httpHandler)
+				new HttpClient(new HttpClientHandler()
+				{
+					ServerCertificateCustomValidationCallback = this.RemoteCertificateValidationCallback,
+					UseCookies = false
+				})
 				{
 					Timeout = TimeSpan.FromMilliseconds(30000)
 				}
@@ -174,7 +171,11 @@ namespace Waher.Networking.XMPP
 						if (this.active[i] && this.httpClients[i] != null)
 						{
 							this.httpClients[i].Dispose();
-							this.httpClients[i] = new HttpClient(this.httpHandler)
+							this.httpClients[i] = new HttpClient(new HttpClientHandler()
+							{
+								ServerCertificateCustomValidationCallback = this.RemoteCertificateValidationCallback,
+								UseCookies = false
+							})
 							{
 								Timeout = TimeSpan.FromMilliseconds(30000)
 							};
@@ -341,7 +342,11 @@ namespace Waher.Networking.XMPP
 							continue;
 					}
 
-					this.httpClients[i] = new HttpClient(this.httpHandler)
+					this.httpClients[i] = new HttpClient(new HttpClientHandler()
+					{
+						ServerCertificateCustomValidationCallback = this.RemoteCertificateValidationCallback,
+						UseCookies = false
+					})
 					{
 						Timeout = TimeSpan.FromMilliseconds(30000)
 					};

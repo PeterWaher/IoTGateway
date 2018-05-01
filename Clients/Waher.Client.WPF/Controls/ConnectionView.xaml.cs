@@ -22,6 +22,7 @@ using Waher.Networking;
 using Waher.Client.WPF.Model;
 using Waher.Client.WPF.Dialogs;
 using Waher.Client.WPF.Controls.Sniffers;
+using Waher.Networking.XMPP;
 using Waher.Things.DisplayableParameters;
 
 namespace Waher.Client.WPF.Controls
@@ -347,16 +348,14 @@ namespace Waher.Client.WPF.Controls
 
 			if (Result.HasValue && Result.Value)
 			{
-				string Host = Dialog.XmppServer.Text;
-				int Port = int.Parse(Dialog.XmppPort.Text);
-				string Account = Dialog.AccountName.Text;
-				string PasswordHash = Dialog.PasswordHash;
-				string PasswordHashMethod = Dialog.PasswordHashMethod;
-				bool TrustCertificate = Dialog.TrustServerCertificate.IsChecked.HasValue && Dialog.TrustServerCertificate.IsChecked.Value;
-				bool AllowInsecureAuthentication = Dialog.AllowInsecureAuthentication.IsChecked.HasValue && Dialog.AllowInsecureAuthentication.IsChecked.Value;
+				if (!int.TryParse(Dialog.XmppPort.Text, out int Port))
+					Port = XmppCredentials.DefaultPort;
 
-				XmppAccountNode Node = new XmppAccountNode(this.connections, null, Host, Port, Account, PasswordHash, PasswordHashMethod,
-					TrustCertificate, AllowInsecureAuthentication);
+				XmppAccountNode Node = new XmppAccountNode(this.connections, null, Dialog.XmppServer.Text, 
+					(TransportMethod)Dialog.ConnectionMethod.SelectedIndex, Port, Dialog.HttpEndpoint.Text,
+					Dialog.AccountName.Text, Dialog.PasswordHash, Dialog.PasswordHashMethod,
+					Dialog.TrustServerCertificate.IsChecked.HasValue && Dialog.TrustServerCertificate.IsChecked.Value,
+					Dialog.AllowInsecureAuthentication.IsChecked.HasValue && Dialog.AllowInsecureAuthentication.IsChecked.Value);
 
 				this.connections.Add(Node);
 				this.AddNode(Node);

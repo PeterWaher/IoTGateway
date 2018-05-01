@@ -16,6 +16,8 @@
 
 	<xs:complexType name="XmppAccount">
     <xs:attribute name="host" type="xs:string" use="required"/>
+		<xs:attribute name="transport" type="Transport" use="optional" default="TraditionalSocket"/>
+		<xs:attribute name="httpBindResource" type="xs:anyURI" use="optional"/>
     <xs:attribute name="port" type="PortNumber" use="optional" default="5222"/>
 		<xs:attribute name="account" type="xs:string" use="required"/>
 		<xs:attribute name="password" type="xs:string" use="optional"/>
@@ -30,6 +32,13 @@
 	<xs:simpleType name="PortNumber">
 		<xs:restriction base="xs:positiveInteger">
 			<xs:maxInclusive value="65535"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="Transport">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="TraditionalSocket"/>
+			<xs:enumeration value="BOSH"/>
 		</xs:restriction>
 	</xs:simpleType>
 

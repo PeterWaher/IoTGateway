@@ -31,6 +31,12 @@ using Waher.Client.WPF.Model.Things;
 
 namespace Waher.Client.WPF.Model
 {
+	public enum TransportMethod
+	{
+		TraditionalSocket = 0,
+		BOSH = 1
+	}
+
 	/// <summary>
 	/// Class representing a normal XMPP account.
 	/// </summary>
@@ -53,8 +59,10 @@ namespace Waher.Client.WPF.Model
 		private ConcentratorClient concentratorClient;
 		private Timer connectionTimer;
 		private Exception lastError = null;
+		private TransportMethod transport = TransportMethod.TraditionalSocket;
 		private string host;
 		private string domain;
+		private string httpBindResource;
 		private int port;
 		private string account;
 		private string password;
@@ -72,19 +80,23 @@ namespace Waher.Client.WPF.Model
 		/// <param name="Connections">Connections object.</param>
 		/// <param name="Parent">Parent node.</param>
 		/// <param name="Host">Host name.</param>
+		/// <param name="Transport">Transport method.</param>
 		/// <param name="Port">Port number.</param>
+		/// <param name="HttpBindResource">HTTP bind resource.</param>
 		/// <param name="Account">Account name.</param>
 		/// <param name="PasswordHash">Password hash.</param>
 		/// <param name="PasswordHashMethod">Password hash method.</param>
 		/// <param name="TrustCertificate">If the server certificate should be trusted.</param>
 		/// <param name="AllowInsecureAuthentication">If insecure authentication mechanisms are to be allowed.</param>
-		public XmppAccountNode(Connections Connections, TreeNode Parent, string Host, int Port, string Account,
-			string PasswordHash, string PasswordHashMethod, bool TrustCertificate, bool AllowInsecureAuthentication)
+		public XmppAccountNode(Connections Connections, TreeNode Parent, string Host, TransportMethod Transport, int Port, string HttpBindResource,
+			string Account, string PasswordHash, string PasswordHashMethod, bool TrustCertificate, bool AllowInsecureAuthentication)
 			: base(Parent)
 		{
 			this.connections = Connections;
 			this.host = this.domain = Host;
+			this.transport = Transport;
 			this.port = Port;
+			this.httpBindResource = HttpBindResource;
 			this.account = Account;
 
 			if (string.IsNullOrEmpty(PasswordHashMethod))
@@ -113,8 +125,10 @@ namespace Waher.Client.WPF.Model
 		{
 			this.connections = Connections;
 			this.host = XML.Attribute(E, "host");
+			this.transport = (TransportMethod)XML.Attribute(E, "transport", TransportMethod.TraditionalSocket);
+			this.httpBindResource = XML.Attribute(E, "httpBindResource");
 			this.domain = XML.Attribute(E, "domain", this.host);
-			this.port = XML.Attribute(E, "port", 5222);
+			this.port = XML.Attribute(E, "port", XmppCredentials.DefaultPort);
 			this.account = XML.Attribute(E, "account");
 			this.password = XML.Attribute(E, "password");
 			this.passwordHash = XML.Attribute(E, "passwordHash");
@@ -128,15 +142,37 @@ namespace Waher.Client.WPF.Model
 
 		private void Init(params ISniffer[] Sniffers)
 		{
+			XmppCredentials Credentials = new XmppCredentials()
+			{
+				Host = this.host,
+				Port = this.port,
+				Account = this.account,
+				TrustServer = this.trustCertificate,
+				AllowPlain = this.allowInsecureAuthentication,
+				AllowCramMD5 = this.allowInsecureAuthentication,
+				AllowDigestMD5 = this.allowInsecureAuthentication
+			};
+
+			switch (this.transport)
+			{
+				case TransportMethod.BOSH:
+					Credentials.HttpEndpoint = this.httpBindResource;
+					break;
+			}
+
 			if (!string.IsNullOrEmpty(this.passwordHash))
-				this.client = new XmppClient(this.host, this.port, this.account, this.passwordHash, this.passwordHashMethod, "en", typeof(App).Assembly);
+			{
+				Credentials.Password = this.passwordHash;
+				Credentials.PasswordType = this.passwordHashMethod;
+			}
 			else
-				this.client = new XmppClient(this.host, this.port, this.account, this.password, "en", typeof(App).Assembly);
+				Credentials.Password = this.password;
+
+			this.client = new XmppClient(Credentials, "en", typeof(App).Assembly);
 
 			if (Sniffers != null)
 				this.client.AddRange(Sniffers);
 
-			this.client.TrustServer = this.trustCertificate;
 			this.client.OnStateChanged += new StateChangedEventHandler(Client_OnStateChanged);
 			this.client.OnError += new XmppExceptionEventHandler(Client_OnError);
 			this.client.OnPresence += new PresenceEventHandler(Client_OnPresence);
@@ -147,13 +183,6 @@ namespace Waher.Client.WPF.Model
 			this.client.OnRosterItemUpdated += new RosterItemEventHandler(Client_OnRosterItemUpdated);
 			this.connectionTimer = new Timer(this.CheckConnection, null, 60000, 60000);
 			this.client.OnNormalMessage += Client_OnNormalMessage;
-
-			if (this.allowInsecureAuthentication)
-			{
-				this.client.AllowPlain = true;
-				this.client.AllowCramMD5 = true;
-				this.client.AllowDigestMD5 = true;
-			}
 
 			this.client.SetPresence(Availability.Chat);
 
@@ -266,14 +295,15 @@ namespace Waher.Client.WPF.Model
 			this.OnUpdated();
 		}
 
-		public string Host { get { return this.host; } }
-		public int Port { get { return this.port; } }
-		public string Account { get { return this.account; } }
-		public string PasswordHash { get { return this.passwordHash; } }
-		public string PasswordHashMethod { get { return this.passwordHashMethod; } }
-		public bool TrustCertificate { get { return this.trustCertificate; } }
-		public bool AllowInsecureAuthentication { get { return this.allowInsecureAuthentication; } }
-		public bool SupportsHashes { get { return this.supportsHashes; } }
+		public TransportMethod Transport => this.transport;
+		public string Host => this.host;
+		public int Port => this.port;
+		public string Account => this.account;
+		public string PasswordHash => this.passwordHash;
+		public string PasswordHashMethod => this.passwordHashMethod;
+		public bool TrustCertificate => this.trustCertificate;
+		public bool AllowInsecureAuthentication => this.allowInsecureAuthentication;
+		public bool SupportsHashes => this.supportsHashes;
 
 		public override string Header
 		{
@@ -341,7 +371,10 @@ namespace Waher.Client.WPF.Model
 			Output.WriteStartElement("XmppAccount");
 			Output.WriteAttributeString("host", this.host);
 			Output.WriteAttributeString("domain", this.domain);
+			Output.WriteAttributeString("transport", this.transport.ToString());
 			Output.WriteAttributeString("port", this.port.ToString());
+			Output.WriteAttributeString("httpBindResource", this.httpBindResource);
+
 			Output.WriteAttributeString("account", this.account);
 
 			if (string.IsNullOrEmpty(this.passwordHash))
@@ -459,7 +492,7 @@ namespace Waher.Client.WPF.Model
 			}
 		}
 
-		public override bool CanEdit => false;		// TODO: Edit connection properties.
+		public override bool CanEdit => true;
 		public override bool CanDelete => true;
 
 		public override void Add()
@@ -1258,6 +1291,45 @@ namespace Waher.Client.WPF.Model
 			{
 				if (Component is IMenuAggregator MenuAggregator)
 					MenuAggregator.AddContexMenuItems(Node, ref CurrentGroup, Menu);
+			}
+		}
+
+		public override void Edit()
+		{
+			ConnectToForm Dialog = new ConnectToForm()
+			{
+				Owner = MainWindow.currentInstance
+			};
+
+			Dialog.XmppServer.Text = this.host;
+			Dialog.XmppPort.Text = this.port.ToString();
+			Dialog.HttpEndpoint.Text = this.httpBindResource;
+			Dialog.ConnectionMethod.SelectedIndex = (int)this.transport;
+			Dialog.AccountName.Text = this.account;
+			Dialog.Password.Password = this.passwordHash;
+			Dialog.RetypePassword.Password = this.passwordHash;
+			Dialog.PasswordHash = this.passwordHash;
+			Dialog.PasswordHashMethod = this.passwordHashMethod;
+			Dialog.TrustServerCertificate.IsChecked = this.trustCertificate;
+			Dialog.AllowInsecureAuthentication.IsChecked = this.allowInsecureAuthentication;
+
+			bool? Result = Dialog.ShowDialog();
+
+			if (Result.HasValue && Result.Value)
+			{
+				this.transport = (TransportMethod)Dialog.ConnectionMethod.SelectedIndex;
+				this.host = Dialog.XmppServer.Text;
+				this.httpBindResource = Dialog.HttpEndpoint.Text;
+				this.account = Dialog.AccountName.Text;
+				this.passwordHash = Dialog.PasswordHash;
+				this.passwordHashMethod = Dialog.PasswordHashMethod;
+				this.trustCertificate = Dialog.TrustServerCertificate.IsChecked.HasValue && Dialog.TrustServerCertificate.IsChecked.Value;
+				this.allowInsecureAuthentication = Dialog.AllowInsecureAuthentication.IsChecked.HasValue && Dialog.AllowInsecureAuthentication.IsChecked.Value;
+
+				if (!int.TryParse(Dialog.XmppPort.Text, out this.port))
+					this.port = XmppCredentials.DefaultPort;
+
+				this.OnUpdated();
 			}
 		}
 

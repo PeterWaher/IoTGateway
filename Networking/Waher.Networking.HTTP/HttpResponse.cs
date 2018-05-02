@@ -254,6 +254,11 @@ namespace Waher.Networking.HTTP
 			}
 		}
 
+		/// <summary>
+		/// Corresponding HTTP Request
+		/// </summary>
+		public HttpRequest Request => this.httpRequest;
+
 		internal LinkedList<Cookie> Cookies
 		{
 			get { return this.cookies; }

@@ -59,8 +59,10 @@ namespace Waher.Networking.XMPP.Test
 					Done.Set();
 			};
 
-			RosterItem Item = this.client1.GetRosterItem(this.client2.BareJID);
-			if (Item == null || (Item.State != SubscriptionState.Both && Item.State != SubscriptionState.To))
+			RosterItem Item1 = this.client1.GetRosterItem(this.client2.BareJID);
+			RosterItem Item2 = this.client2.GetRosterItem(this.client1.BareJID);
+			if (Item1 == null || (Item1.State != SubscriptionState.Both && Item1.State != SubscriptionState.To) ||
+				Item2 == null || (Item2.State != SubscriptionState.Both && Item2.State != SubscriptionState.From))
 			{
 				ManualResetEvent Done2 = new ManualResetEvent(false);
 				ManualResetEvent Error2 = new ManualResetEvent(false);

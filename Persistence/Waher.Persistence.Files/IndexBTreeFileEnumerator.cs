@@ -215,8 +215,17 @@ namespace Waher.Persistence.Files
 				if (this.currentSerializer == null)
 					this.currentSerializer = this.provider.GetObjectSerializer(typeof(T));
 
-				this.current = (T)await this.file.ObjectFile.LoadObject(this.currentObjectId, this.currentSerializer);
-				this.currentTypeCompatible = true;
+				object Obj = await this.file.ObjectFile.LoadObject(this.currentObjectId, this.currentSerializer);
+				if (Obj is T T2)
+				{
+					this.current = T2;
+					this.currentTypeCompatible = true;
+				}
+				else
+				{
+					this.current = default(T);
+					this.currentTypeCompatible = false;
+				}
 			}
 			catch (Exception)
 			{
@@ -394,4 +403,3 @@ namespace Waher.Persistence.Files
 
 	}
 }
-	

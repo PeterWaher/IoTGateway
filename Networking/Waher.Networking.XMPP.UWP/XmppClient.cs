@@ -129,6 +129,15 @@ namespace Waher.Networking.XMPP
 	public class XmppClient : Sniffable, IDisposable
 	{
 		/// <summary>
+		/// http://etherx.jabber.org/streams
+		/// </summary>
+		public const string NamespaceStream = "http://etherx.jabber.org/streams";
+
+		/// <summary>
+		/// jabber:client
+		/// </summary>
+		public const string NamespaceClient = "jabber:client";
+		/// <summary>
 		/// urn:ietf:params:xml:ns:xmpp-streams
 		/// </summary>
 		public const string NamespaceXmppStreams = "urn:ietf:params:xml:ns:xmpp-streams";
@@ -336,7 +345,7 @@ namespace Waher.Networking.XMPP
 		private bool sendFromAddress = false;
 		private bool checkConnection = false;
 		private bool openBracketReceived = false;
-
+		
 		/// <summary>
 		/// Manages an XMPP client connection over a traditional binary socket connection. 
 		/// </summary>
@@ -459,12 +468,10 @@ namespace Waher.Networking.XMPP
 			this.port = Credentials.Port;
 			this.userName = Credentials.Account;
 
-			if (string.IsNullOrEmpty(this.host) && !string.IsNullOrEmpty(Credentials.HttpEndpoint))
+			if (!string.IsNullOrEmpty(Credentials.HttpEndpoint))
 			{
-				this.textTransportLayer = new HttpBinding(Credentials.HttpEndpoint);
-
-				this.textTransportLayer.OnReceived += TextTransportLayer_OnReceived;
-				this.textTransportLayer.OnSent += TextTransportLayer_OnSent;
+				this.textTransportLayer = new HttpBinding(Credentials.HttpEndpoint, this);
+				this.textTransportLayer.OnReceived += TextTransportLayer_OnReceived_NoSniff;
 			}
 
 			if (string.IsNullOrEmpty(Credentials.PasswordType))
@@ -596,6 +603,11 @@ namespace Waher.Networking.XMPP
 			return this.ProcessFragment(Packet);
 		}
 
+		private bool TextTransportLayer_OnReceived_NoSniff(object Sender, string Packet)
+		{
+			return this.ProcessFragment(Packet);
+		}
+
 		/// <summary>
 		/// Connects the client.
 		/// </summary>
@@ -627,28 +639,35 @@ namespace Waher.Networking.XMPP
 				this.serverFeatures = null;
 				this.serverComponents = null;
 
+				this.bareJid = this.fullJid = this.userName + "@" + this.domain;
+
+				if (this.textTransportLayer == null)
+				{
 #if WINDOWS_UWP
-				this.client = new StreamSocket();
-				await this.client.ConnectAsync(new HostName(Host), Port.ToString(), SocketProtectionLevel.PlainSocket);     // Allow use of service name "xmpp-client"
+					this.client = new StreamSocket();
+					await this.client.ConnectAsync(new HostName(Host), Port.ToString(), SocketProtectionLevel.PlainSocket);     // Allow use of service name "xmpp-client"
 
-				this.bareJid = this.fullJid = this.userName + "@" + this.domain;
-				this.State = XmppState.StreamNegotiation;
-
-				this.dataReader = new DataReader(this.client.InputStream);
-				this.dataWriter = new DataWriter(this.client.OutputStream);
+					this.dataReader = new DataReader(this.client.InputStream);
+					this.dataWriter = new DataWriter(this.client.OutputStream);
 #else
-				this.client = new TcpClient();
-				await this.client.ConnectAsync(Host, Port);
-				if (this.client == null)
-					return;
+					this.client = new TcpClient();
+					await this.client.ConnectAsync(Host, Port);
+					if (this.client == null)
+						return;
 
-				this.stream = new NetworkStream(this.client.Client, false);
-
-				this.bareJid = this.fullJid = this.userName + "@" + this.domain;
-				this.State = XmppState.StreamNegotiation;
+					this.stream = new NetworkStream(this.client.Client, false);
 #endif
-				this.BeginWrite("<?xml version='1.0' encoding='utf-8'?><stream:stream to='" + XML.Encode(this.domain) + "' version='1.0' xml:lang='" +
-					XML.Encode(this.language) + "' xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams'>", null);
+					this.State = XmppState.StreamNegotiation;
+
+					this.BeginWrite("<?xml version='1.0' encoding='utf-8'?><stream:stream to='" + XML.Encode(this.domain) + "' version='1.0' xml:lang='" +
+						XML.Encode(this.language) + "' xmlns='" + NamespaceClient + "' xmlns:stream='" +
+						NamespaceStream + "'>", null);
+				}
+				else if (this.textTransportLayer is HttpBinding HttpBinding)
+				{
+					this.State = XmppState.StreamNegotiation;
+					HttpBinding.CreateSession();
+				}
 
 				this.ResetState(false);
 				this.BeginRead();
@@ -710,7 +729,7 @@ namespace Waher.Networking.XMPP
 			}
 		}
 
-		private void ConnectionError(Exception ex)
+		internal void ConnectionError(Exception ex)
 		{
 			XmppExceptionEventHandler h = this.OnConnectionError;
 			if (h != null)
@@ -792,6 +811,24 @@ namespace Waher.Networking.XMPP
 		public ITextTransportLayer TextTransportLayer
 		{
 			get { return this.textTransportLayer; }
+		}
+
+		internal string StreamHeader
+		{
+			get { return this.streamHeader; }
+			set { this.streamHeader = value; }
+		}
+
+		internal string StreamFooter
+		{
+			get { return this.streamFooter; }
+			set { this.streamFooter = value; }
+		}
+
+		internal DateTime NextPing
+		{
+			get { return this.nextPing; }
+			set { this.nextPing = value; }
 		}
 
 		/// <summary>
@@ -956,6 +993,14 @@ namespace Waher.Networking.XMPP
 
 			this.DisposeClient();
 
+			ITextTransportLayer TTL;
+
+			if ((TTL = this.textTransportLayer) != null)
+			{
+				this.textTransportLayer = null;
+				TTL.Dispose();
+			}
+
 #if WINDOWS_UWP
 			if (this.memoryBuffer != null)
 			{
@@ -1005,14 +1050,6 @@ namespace Waher.Networking.XMPP
 				this.client = null;
 			}
 #endif
-			ITextTransportLayer TTL;
-
-			if ((TTL = this.textTransportLayer) != null)
-			{
-				this.textTransportLayer = null;
-				TTL.Dispose();
-			}
-
 			EventHandler h = this.OnDisposed;
 			if (h != null)
 			{
@@ -1040,10 +1077,10 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public void Reconnect()
 		{
-			if (this.textTransportLayer != null)
+			if (this.textTransportLayer != null && !(this.textTransportLayer is HttpBinding))
 				throw new Exception("Reconnections must be made in the underlying transport layer.");
-
-			this.Connect(this.domain);
+			else
+				this.Connect(this.domain);
 		}
 
 		/// <summary>
@@ -1902,7 +1939,7 @@ namespace Waher.Networking.XMPP
 									this.ResetState(true);
 									this.BeginWrite("<?xml version='1.0' encoding='utf-8'?><stream:stream to='" + XML.Encode(this.domain) +
 										"' version='1.0' xml:lang='" + XML.Encode(this.language) +
-										"' xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams'>", null);
+										"' xmlns='" + NamespaceClient + "' xmlns:stream='" + NamespaceStream + "'>", null);
 								}
 								else
 									throw new XmppException("Server authentication rejected by client.", E);
@@ -2906,7 +2943,8 @@ namespace Waher.Networking.XMPP
 					SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12, true);
 #endif
 				this.BeginWrite("<?xml version='1.0' encoding='utf-8'?><stream:stream from='" + XML.Encode(this.bareJid) + "' to='" + XML.Encode(this.domain) +
-					"' version='1.0' xml:lang='" + XML.Encode(this.language) + "' xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams'>", null);
+					"' version='1.0' xml:lang='" + XML.Encode(this.language) + "' xmlns='" + NamespaceClient + "' xmlns:stream='" +
+					NamespaceStream + "'>", null);
 
 				this.ResetState(false);
 				this.BeginRead();
@@ -6156,7 +6194,7 @@ namespace Waher.Networking.XMPP
 						{
 							StringBuilder Xml = new StringBuilder();
 
-							Xml.Append("<iq xmlns='jabber:client' type='error' from='");
+							Xml.Append("<iq xmlns='" + NamespaceClient + "' type='error' from='");
 							Xml.Append(Request.To);
 							Xml.Append("' id='");
 							Xml.Append(Request.SeqNr.ToString());

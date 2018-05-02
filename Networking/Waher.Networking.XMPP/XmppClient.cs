@@ -345,7 +345,7 @@ namespace Waher.Networking.XMPP
 		private bool sendFromAddress = false;
 		private bool checkConnection = false;
 		private bool openBracketReceived = false;
-
+		
 		/// <summary>
 		/// Manages an XMPP client connection over a traditional binary socket connection. 
 		/// </summary>
@@ -471,9 +471,7 @@ namespace Waher.Networking.XMPP
 			if (!string.IsNullOrEmpty(Credentials.HttpEndpoint))
 			{
 				this.textTransportLayer = new HttpBinding(Credentials.HttpEndpoint, this);
-
-				this.textTransportLayer.OnReceived += TextTransportLayer_OnReceived;
-				this.textTransportLayer.OnSent += TextTransportLayer_OnSent;
+				this.textTransportLayer.OnReceived += TextTransportLayer_OnReceived_NoSniff;
 			}
 
 			if (string.IsNullOrEmpty(Credentials.PasswordType))
@@ -602,6 +600,11 @@ namespace Waher.Networking.XMPP
 			else
 				this.ReceiveText(Packet);
 
+			return this.ProcessFragment(Packet);
+		}
+
+		private bool TextTransportLayer_OnReceived_NoSniff(object Sender, string Packet)
+		{
 			return this.ProcessFragment(Packet);
 		}
 

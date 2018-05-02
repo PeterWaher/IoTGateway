@@ -69,7 +69,7 @@ namespace Waher.Networking.XMPP.Test
 				DefaultDropOff = true
 			};
 
-			//this.client1.Add(new TextWriterSniffer(Console.Out, BinaryPresentationMethod.ByteCount));
+			this.client1.Add(new TextWriterSniffer(Console.Out, BinaryPresentationMethod.ByteCount));
 			this.client1.OnConnectionError += Client_OnConnectionError1;
 			this.client1.OnError += Client_OnError1;
 			this.client1.OnStateChanged += Client_OnStateChanged1;
@@ -86,7 +86,7 @@ namespace Waher.Networking.XMPP.Test
 				DefaultDropOff = true
 			};
 
-			this.client2.Add(new TextWriterSniffer(Console.Out, BinaryPresentationMethod.ByteCount));
+			//this.client2.Add(new TextWriterSniffer(Console.Out, BinaryPresentationMethod.ByteCount));
 			this.client2.OnConnectionError += Client_OnConnectionError2;
 			this.client2.OnError += Client_OnError2;
 			this.client2.OnStateChanged += Client_OnStateChanged2;

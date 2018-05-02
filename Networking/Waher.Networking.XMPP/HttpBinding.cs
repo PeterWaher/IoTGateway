@@ -1,4 +1,5 @@
-﻿using System;
+﻿//#define ECHO
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
@@ -53,6 +54,7 @@ namespace Waher.Networking.XMPP
 		private int requests = 1;
 		private int hold = 3;
 		private bool disposed = false;
+		private bool terminated = false;
 		private bool restartLogic = false;
 
 		/// <summary>
@@ -69,7 +71,9 @@ namespace Waher.Networking.XMPP
 			{
 				new HttpClient(new HttpClientHandler()
 				{
+#if !NETFW
 					ServerCertificateCustomValidationCallback = this.RemoteCertificateValidationCallback,
+#endif
 					UseCookies = false
 				})
 				{
@@ -164,6 +168,9 @@ namespace Waher.Networking.XMPP
 
 				lock (this.httpClients)
 				{
+					this.terminated = false;
+					this.outputQueue.Clear();
+
 					c = this.httpClients.Length;
 
 					for (i = 0; i < c; i++)
@@ -173,7 +180,9 @@ namespace Waher.Networking.XMPP
 							this.httpClients[i].Dispose();
 							this.httpClients[i] = new HttpClient(new HttpClientHandler()
 							{
+#if !NETFW
 								ServerCertificateCustomValidationCallback = this.RemoteCertificateValidationCallback,
+#endif
 								UseCookies = false
 							})
 							{
@@ -194,6 +203,9 @@ namespace Waher.Networking.XMPP
 				Xml.Append((this.rid++).ToString());
 				Xml.Append("' to='");
 				Xml.Append(XML.Encode(this.xmppClient.Domain));
+#if ECHO
+				Xml.Append("' echo='0");
+#endif
 				Xml.Append("' ver='1.11' wait='30' xml:lang='");
 				Xml.Append(XML.Encode(this.xmppClient.Language));
 				Xml.Append("' xmpp:version='1.0' xmlns='");
@@ -203,10 +215,15 @@ namespace Waher.Networking.XMPP
 				Xml.Append("'/>");
 
 				string s = Xml.ToString();
+
+				if (this.xmppClient.HasSniffers)
+				{
+					this.xmppClient.Information("Initiating session.");
+					this.xmppClient.TransmitText(s);
+				}
+
 				HttpContent Content = new StringContent(s, System.Text.Encoding.UTF8, "text/xml");
 				XmlDocument ResponseXml;
-
-				//this.xmppClient.Information("Session initiated:\r\n" + s);
 
 				this.xmppClient.NextPing = DateTime.Now.AddMinutes(1);
 
@@ -226,6 +243,9 @@ namespace Waher.Networking.XMPP
 					Encoding = System.Text.Encoding.GetEncoding(CharSet);
 
 				string XmlResponse = Encoding.GetString(Bin);
+
+				if (this.xmppClient.HasSniffers)
+					this.xmppClient.ReceiveText(XmlResponse);
 
 				ResponseXml = new XmlDocument();
 				ResponseXml.LoadXml(XmlResponse);
@@ -344,7 +364,9 @@ namespace Waher.Networking.XMPP
 
 					this.httpClients[i] = new HttpClient(new HttpClientHandler()
 					{
+#if !NETFW
 						ServerCertificateCustomValidationCallback = this.RemoteCertificateValidationCallback,
+#endif
 						UseCookies = false
 					})
 					{
@@ -379,12 +401,15 @@ namespace Waher.Networking.XMPP
 		/// <param name="DeliveryCallback">Optional method to call when packet has been delivered.</param>
 		public async void Send(string Packet, EventHandler DeliveryCallback)
 		{
+			if (this.terminated)
+				return;
+
 			try
 			{
 				LinkedList<KeyValuePair<string, EventHandler>> Queued = null;
 				StringBuilder Xml;
 				long Rid;
-				int ClientIndex;
+				int ClientIndex = -1;
 				bool AllInactive;
 				bool Restart = false;
 				int i;
@@ -399,31 +424,35 @@ namespace Waher.Networking.XMPP
 				{
 					lock (this.httpClients)
 					{
-						for (ClientIndex = 0; ClientIndex < this.requests; ClientIndex++)
+						if (Queued == null)
 						{
-							if (!this.active[ClientIndex])
-								break;
-						}
-
-						if (ClientIndex >= this.requests)
-						{
-							if (!string.IsNullOrEmpty(Packet))
+							for (ClientIndex = 0; ClientIndex < this.requests; ClientIndex++)
 							{
-								this.xmppClient?.Information("Outbound stanza queued.");
-								this.outputQueue.AddLast(new KeyValuePair<string, EventHandler>(Packet, DeliveryCallback));
+								if (!this.active[ClientIndex])
+									break;
 							}
 
-							return;
+							if (ClientIndex >= this.requests)
+							{
+								if (!string.IsNullOrEmpty(Packet))
+								{
+									this.xmppClient?.Information("Outbound stanza queued.");
+									this.outputQueue.AddLast(new KeyValuePair<string, EventHandler>(Packet, DeliveryCallback));
+								}
+
+								return;
+							}
+
+							this.active[ClientIndex] = true;
+
+							if (this.outputQueue.First != null)
+							{
+								Queued = this.outputQueue;
+								this.outputQueue = new LinkedList<KeyValuePair<string, EventHandler>>();
+							}
 						}
 
-						this.active[ClientIndex] = true;
 						Rid = this.rid++;
-
-						if (this.outputQueue.First != null)
-						{
-							Queued = this.outputQueue;
-							this.outputQueue = new LinkedList<KeyValuePair<string, EventHandler>>();
-						}
 					}
 
 					Xml = new StringBuilder();
@@ -432,6 +461,10 @@ namespace Waher.Networking.XMPP
 					Xml.Append(Rid.ToString());
 					Xml.Append("' sid='");
 					Xml.Append(this.sid);
+#if ECHO
+					Xml.Append("' echo='");                 
+					Xml.Append(ClientIndex.ToString());
+#endif
 					Xml.Append("' xmlns='");
 					Xml.Append(HttpBindNamespace);
 
@@ -476,14 +509,15 @@ namespace Waher.Networking.XMPP
 					Xml.Append("</body>");
 
 					string s = Xml.ToString();
-					HttpContent Content = new StringContent(s, System.Text.Encoding.UTF8, "text/xml");
 
-					//this.xmppClient.Information("HTTP client " + (ClientIndex + 1).ToString() + " transmits:\r\n" + s);
+					if (this.xmppClient.HasSniffers)
+						this.xmppClient.TransmitText(s);
+
+					HttpContent Content = new StringContent(s, System.Text.Encoding.UTF8, "text/xml");
 
 					this.xmppClient.NextPing = DateTime.Now.AddSeconds(this.waitSeconds + 5);
 
 					HttpResponseMessage Response = await this.httpClients[ClientIndex].PostAsync(this.url, Content);
-
 					Response.EnsureSuccessStatusCode();
 
 					lock (this.httpClients)
@@ -524,7 +558,8 @@ namespace Waher.Networking.XMPP
 
 					string XmlResponse = Encoding.GetString(Bin).Trim();
 
-					//this.xmppClient.Information("HTTP client " + (ClientIndex + 1).ToString() + " received:\r\n" + XmlResponse);
+					if (this.xmppClient.HasSniffers)
+						this.xmppClient.ReceiveText(XmlResponse);
 
 					this.BodyReceived(XmlResponse, false);
 				}
@@ -610,7 +645,16 @@ namespace Waher.Networking.XMPP
 					}
 
 					if (Terminate)
+					{
+						this.terminated = true;
+
+						lock (this.httpClients)
+						{
+							this.outputQueue.Clear();
+						}
+
 						throw new Exception("Session terminated. Condition: " + Condition);
+					}
 
 					if (First)
 					{

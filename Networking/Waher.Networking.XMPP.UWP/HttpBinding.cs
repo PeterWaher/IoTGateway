@@ -1,4 +1,4 @@
-﻿//#define ECHO
+﻿#define ECHO
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -410,7 +410,7 @@ namespace Waher.Networking.XMPP
 				StringBuilder Xml;
 				long Rid;
 				int ClientIndex = -1;
-				bool AllInactive;
+				bool AllInactive = false;
 				bool Restart = false;
 				int i;
 
@@ -424,7 +424,7 @@ namespace Waher.Networking.XMPP
 				{
 					lock (this.httpClients)
 					{
-						if (Queued == null)
+						if (Queued == null && !AllInactive)
 						{
 							for (ClientIndex = 0; ClientIndex < this.requests; ClientIndex++)
 							{
@@ -542,6 +542,9 @@ namespace Waher.Networking.XMPP
 									break;
 								}
 							}
+
+							if (AllInactive)
+								this.active[ClientIndex] = true;
 						}
 					}
 

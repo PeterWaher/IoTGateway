@@ -11,6 +11,7 @@ using System.Xml;
 using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Events;
+using Waher.Security;
 
 namespace Waher.Networking.XMPP
 {
@@ -36,6 +37,7 @@ namespace Waher.Networking.XMPP
 		public const string BoshNamespace = "urn:xmpp:xbosh";
 
 		private LinkedList<KeyValuePair<string, EventHandler>> outputQueue = new LinkedList<KeyValuePair<string, EventHandler>>();
+		private LinkedList<string> keys = new LinkedList<string>();
 		private HttpClient[] httpClients;
 		private bool[] active;
 		private XmppClient xmppClient;
@@ -195,6 +197,8 @@ namespace Waher.Networking.XMPP
 					}
 				}
 
+				this.GenerateKeys();
+
 				StringBuilder Xml = new StringBuilder();
 
 				Xml.Append("<body content='text/xml; charset=utf-8' from='");
@@ -203,6 +207,10 @@ namespace Waher.Networking.XMPP
 				Xml.Append((this.rid++).ToString());
 				Xml.Append("' to='");
 				Xml.Append(XML.Encode(this.xmppClient.Domain));
+				Xml.Append("' newkey='");
+				Xml.Append(this.keys.First.Value);
+				this.keys.RemoveFirst();
+
 #if ECHO
 				Xml.Append("' echo='0");
 #endif
@@ -385,6 +393,23 @@ namespace Waher.Networking.XMPP
 			}
 		}
 
+		private void GenerateKeys()
+		{
+			int n = XmppClient.GetRandomValue(8, 24);
+			byte[] Bin = XmppClient.GetRandomBytes(20);
+			string Key = Hashes.ComputeSHA1HashString(Bin);
+
+			this.keys.Clear();
+			this.keys.AddFirst(Key);
+
+			while (--n > 0)
+			{
+				Bin = Encoding.ASCII.GetBytes(Key);
+				Key = Hashes.ComputeSHA1HashString(Bin);
+				this.keys.AddFirst(Key);
+			}
+		}
+
 		/// <summary>
 		/// Sends a text packet.
 		/// </summary>
@@ -461,8 +486,21 @@ namespace Waher.Networking.XMPP
 					Xml.Append(Rid.ToString());
 					Xml.Append("' sid='");
 					Xml.Append(this.sid);
+					Xml.Append("' key='");
+					Xml.Append(this.keys.First.Value);
+
+					this.keys.RemoveFirst();
+					if (this.keys.First == null)
+					{
+						this.GenerateKeys();
+
+						Xml.Append("' newkey='");
+						Xml.Append(this.keys.First.Value);
+						this.keys.RemoveFirst();
+					}
+
 #if ECHO
-					Xml.Append("' echo='");                 
+					Xml.Append("' echo='");
 					Xml.Append(ClientIndex.ToString());
 #endif
 					Xml.Append("' xmlns='");

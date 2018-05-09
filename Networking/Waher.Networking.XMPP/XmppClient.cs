@@ -345,7 +345,7 @@ namespace Waher.Networking.XMPP
 		private bool sendFromAddress = false;
 		private bool checkConnection = false;
 		private bool openBracketReceived = false;
-		
+
 		/// <summary>
 		/// Manages an XMPP client connection over a traditional binary socket connection. 
 		/// </summary>
@@ -6426,6 +6426,40 @@ namespace Waher.Networking.XMPP
 			}
 
 			return Result;
+		}
+
+		private const double maxD = ((double)(1UL << 53));
+
+		/// <summary>
+		/// Gets a random value in the range [0,1).
+		/// </summary>
+		/// <returns>Random value in the range [0,1).</returns>
+		internal static double GetRandomDouble()
+		{
+			byte[] Bin = new byte[8];
+
+			lock (rnd)
+			{
+				rnd.GetBytes(Bin);
+			}
+
+			ulong l = BitConverter.ToUInt64(Bin, 0);
+			l >>= 11;
+
+			return l / maxD;
+		}
+
+		internal static int GetRandomValue(int Min, int Max)
+		{
+			if (Min > Max)
+			{
+				int Temp = Min;
+				Min = Max;
+				Max = Temp;
+			}
+
+			uint Diff = (uint)(Max - Min);
+			return (int)(GetRandomDouble() * (Diff + 1));
 		}
 
 		#region XEP-0049: Private XML Storage

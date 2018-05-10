@@ -48,11 +48,11 @@ namespace Waher.Client.WPF.Model
 		private const string ConcentratorGroupName = "Concentrators";
 		private const string OtherGroupName = "Others";
 
-		private LinkedList<KeyValuePair<DateTime, MessageEventArgs>> unhandledMessages = new LinkedList<KeyValuePair<DateTime, MessageEventArgs>>();
-		private LinkedList<XmppComponent> components = new LinkedList<XmppComponent>();
-		private Dictionary<string, List<RosterItemEventHandler>> rosterSubscriptions = new Dictionary<string, List<RosterItemEventHandler>>(StringComparer.CurrentCultureIgnoreCase);
-		private Dictionary<string, DataSource> dataSources = new Dictionary<string, DataSource>();
-		private Connections connections;
+		private readonly LinkedList<KeyValuePair<DateTime, MessageEventArgs>> unhandledMessages = new LinkedList<KeyValuePair<DateTime, MessageEventArgs>>();
+		private readonly LinkedList<XmppComponent> components = new LinkedList<XmppComponent>();
+		private readonly Dictionary<string, List<RosterItemEventHandler>> rosterSubscriptions = new Dictionary<string, List<RosterItemEventHandler>>(StringComparer.CurrentCultureIgnoreCase);
+		private readonly Dictionary<string, DataSource> dataSources = new Dictionary<string, DataSource>();
+		private readonly Connections connections;
 		private XmppClient client;
 		private SensorClient sensorClient;
 		private ControlClient controlClient;

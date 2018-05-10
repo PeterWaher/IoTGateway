@@ -243,25 +243,25 @@ namespace Waher.Networking.XMPP
 		private const int KeepAliveTimeSeconds = 30;
 		private const int MaxFragmentSize = 1000000;
 
-		private LinkedList<KeyValuePair<string, EventHandler>> outputQueue = new LinkedList<KeyValuePair<string, EventHandler>>();
-		private Dictionary<string, bool> authenticationMechanisms = new Dictionary<string, bool>();
-		private Dictionary<string, bool> compressionMethods = new Dictionary<string, bool>();
-		private Dictionary<uint, PendingRequest> pendingRequestsBySeqNr = new Dictionary<uint, PendingRequest>();
-		private SortedDictionary<DateTime, PendingRequest> pendingRequestsByTimeout = new SortedDictionary<DateTime, PendingRequest>();
+		private readonly LinkedList<KeyValuePair<string, EventHandler>> outputQueue = new LinkedList<KeyValuePair<string, EventHandler>>();
+		private readonly Dictionary<string, bool> authenticationMechanisms = new Dictionary<string, bool>();
+		private readonly Dictionary<string, bool> compressionMethods = new Dictionary<string, bool>();
+		private readonly Dictionary<uint, PendingRequest> pendingRequestsBySeqNr = new Dictionary<uint, PendingRequest>();
+		private readonly SortedDictionary<DateTime, PendingRequest> pendingRequestsByTimeout = new SortedDictionary<DateTime, PendingRequest>();
 		private Dictionary<string, IqEventHandler> iqGetHandlers = new Dictionary<string, IqEventHandler>();
 		private Dictionary<string, IqEventHandler> iqSetHandlers = new Dictionary<string, IqEventHandler>();
 		private Dictionary<string, MessageEventHandler> messageHandlers = new Dictionary<string, MessageEventHandler>();
-		private Dictionary<string, MessageFormEventHandler> messageFormHandlers = new Dictionary<string, MessageFormEventHandler>();
+		private readonly Dictionary<string, MessageFormEventHandler> messageFormHandlers = new Dictionary<string, MessageFormEventHandler>();
 		private Dictionary<string, PresenceEventHandler> presenceHandlers = new Dictionary<string, PresenceEventHandler>();
-		private Dictionary<string, MessageEventArgs> receivedMessages = new Dictionary<string, MessageEventArgs>();
+		private readonly Dictionary<string, MessageEventArgs> receivedMessages = new Dictionary<string, MessageEventArgs>();
 		private SortedDictionary<string, bool> clientFeatures = new SortedDictionary<string, bool>();
 		private ServiceDiscoveryEventArgs serverFeatures = null;
 		private ServiceItemsDiscoveryEventArgs serverComponents = null;
 		private SortedDictionary<string, DataForm> extendedServiceDiscoveryInformation = new SortedDictionary<string, DataForm>();
-		private Dictionary<string, RosterItem> roster = new Dictionary<string, RosterItem>(StringComparer.CurrentCultureIgnoreCase);
-		private Dictionary<string, int> pendingAssuredMessagesPerSource = new Dictionary<string, int>();
-		private Dictionary<string, object> tags = new Dictionary<string, object>();
-		private List<IXmppExtension> extensions = new List<IXmppExtension>();
+		private readonly Dictionary<string, RosterItem> roster = new Dictionary<string, RosterItem>(StringComparer.CurrentCultureIgnoreCase);
+		private readonly Dictionary<string, int> pendingAssuredMessagesPerSource = new Dictionary<string, int>();
+		private readonly Dictionary<string, object> tags = new Dictionary<string, object>();
+		private readonly List<IXmppExtension> extensions = new List<IXmppExtension>();
 		private AuthenticationMethod authenticationMethod = null;
 #if WINDOWS_UWP
 		private StreamSocket client = null;
@@ -276,15 +276,15 @@ namespace Waher.Networking.XMPP
 		private X509Certificate serverCertificate = null;
 		private TcpClient client = null;
 		private Stream stream = null;
-		private byte[] buffer = new byte[BufferSize];
+		private readonly byte[] buffer = new byte[BufferSize];
 #endif
 		private Timer secondTimer = null;
 		private DateTime nextPing = DateTime.MaxValue;
-		private UTF8Encoding encoding = new UTF8Encoding(false, false);
-		private StringBuilder fragment = new StringBuilder();
+		private readonly UTF8Encoding encoding = new UTF8Encoding(false, false);
+		private readonly StringBuilder fragment = new StringBuilder();
 		private int fragmentLength = 0;
 		private XmppState state;
-		private Random gen = new Random();
+		private readonly Random gen = new Random();
 		private object synchObject = new object();
 		private Availability currentAvailability = Availability.Online;
 		private string customPresenceXml = string.Empty;
@@ -297,7 +297,7 @@ namespace Waher.Networking.XMPP
 		private string clientVersion;
 		private string clientOS;
 		private string host;
-		private string language;
+		private readonly string language;
 		private string domain;
 		private string bareJid;
 		private string fullJid;
@@ -314,7 +314,7 @@ namespace Waher.Networking.XMPP
 		private string entityCapabilitiesVersion = null;
 		private double version;
 		private uint seqnr = 0;
-		private int port;
+		private readonly int port;
 		private int keepAliveSeconds = 30;
 		private int inputState = 0;
 		private int inputDepth = 0;
@@ -339,6 +339,7 @@ namespace Waher.Networking.XMPP
 		private bool allowDigestMD5 = true;
 		private bool allowScramSHA1 = true;
 		private bool allowPlain = false;
+		private readonly bool sendHeartbeats = true;
 		private bool supportsPing = true;
 		private bool pingResponse = true;
 		private bool allowEncryption = true;
@@ -470,6 +471,7 @@ namespace Waher.Networking.XMPP
 
 			if (!string.IsNullOrEmpty(Credentials.HttpEndpoint))
 			{
+				this.sendHeartbeats = false;
 				this.textTransportLayer = new HttpBinding(Credentials.HttpEndpoint, this);
 				this.textTransportLayer.OnReceived += TextTransportLayer_OnReceived_NoSniff;
 			}
@@ -6097,35 +6099,39 @@ namespace Waher.Networking.XMPP
 				if (this.state == XmppState.Connected)
 				{
 					this.nextPing = DateTime.Now.AddMilliseconds(this.keepAliveSeconds * 500);
-					try
+
+					if (this.sendHeartbeats)
 					{
-						if (this.supportsPing)
+						try
 						{
-							if (this.pingResponse)
+							if (this.supportsPing)
 							{
-								this.pingResponse = false;
-								this.SendPing(string.Empty, this.PingResult, null);
+								if (this.pingResponse)
+								{
+									this.pingResponse = false;
+									this.SendPing(string.Empty, this.PingResult, null);
+								}
+								else
+								{
+									try
+									{
+										this.Warning("Reconnecting.");
+										this.Reconnect();
+									}
+									catch (Exception ex)
+									{
+										Log.Critical(ex);
+									}
+								}
 							}
 							else
-							{
-								try
-								{
-									this.Warning("Reconnecting.");
-									this.Reconnect();
-								}
-								catch (Exception ex)
-								{
-									Log.Critical(ex);
-								}
-							}
+								this.BeginWrite(" ", null);
 						}
-						else
-							this.BeginWrite(" ", null);
-					}
-					catch (Exception ex)
-					{
-						this.Exception(ex);
-						this.Reconnect();
+						catch (Exception ex)
+						{
+							this.Exception(ex);
+							this.Reconnect();
+						}
 					}
 				}
 				else
@@ -6459,7 +6465,7 @@ namespace Waher.Networking.XMPP
 			}
 
 			uint Diff = (uint)(Max - Min);
-			return (int)(GetRandomDouble() * (Diff + 1));
+			return (int)(GetRandomDouble() * (Diff + 1)) + Min;
 		}
 
 		#region XEP-0049: Private XML Storage

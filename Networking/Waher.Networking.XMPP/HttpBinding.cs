@@ -37,11 +37,11 @@ namespace Waher.Networking.XMPP
 		public const string BoshNamespace = "urn:xmpp:xbosh";
 
 		private LinkedList<KeyValuePair<string, EventHandler>> outputQueue = new LinkedList<KeyValuePair<string, EventHandler>>();
-		private LinkedList<string> keys = new LinkedList<string>();
+		private readonly LinkedList<string> keys = new LinkedList<string>();
 		private HttpClient[] httpClients;
 		private bool[] active;
 		private XmppClient xmppClient;
-		private string url;
+		private readonly string url;
 		private string sid = null;
 		private string accept = null;
 		private string charsets = null;
@@ -79,7 +79,7 @@ namespace Waher.Networking.XMPP
 					UseCookies = false
 				})
 				{
-					Timeout = TimeSpan.FromMilliseconds(30000)
+					Timeout = TimeSpan.FromMilliseconds(60000)
 				}
 			};
 
@@ -106,6 +106,11 @@ namespace Waher.Networking.XMPP
 		/// Event received when text data has been received.
 		/// </summary>
 		public event TextEventHandler OnReceived;
+
+		/// <summary>
+		/// Connection manager supports stream restart logic.
+		/// </summary>
+		public bool RestartLogic => this.restartLogic;
 
 		/// <summary>
 		/// Performs application-defined tasks associated with freeing, releasing, or resetting
@@ -166,6 +171,7 @@ namespace Waher.Networking.XMPP
 		{
 			try
 			{
+				StringBuilder Xml;
 				int i, c;
 
 				lock (this.httpClients)
@@ -188,28 +194,28 @@ namespace Waher.Networking.XMPP
 								UseCookies = false
 							})
 							{
-								Timeout = TimeSpan.FromMilliseconds(30000)
+								Timeout = TimeSpan.FromMilliseconds(60000)
 							};
 
 							this.httpClients[i].DefaultRequestHeaders.ExpectContinue = false;
 							this.active[i] = false;
 						}
 					}
+
+					this.GenerateKeysLocked();
+
+					Xml = new StringBuilder();
+
+					Xml.Append("<body content='text/xml; charset=utf-8' from='");
+					Xml.Append(XML.Encode(this.xmppClient.BareJID));
+					Xml.Append("' hold='1' rid='");
+					Xml.Append((this.rid++).ToString());
+					Xml.Append("' to='");
+					Xml.Append(XML.Encode(this.xmppClient.Domain));
+					Xml.Append("' newkey='");
+					Xml.Append(this.keys.First.Value);
+					this.keys.RemoveFirst();
 				}
-
-				this.GenerateKeys();
-
-				StringBuilder Xml = new StringBuilder();
-
-				Xml.Append("<body content='text/xml; charset=utf-8' from='");
-				Xml.Append(XML.Encode(this.xmppClient.BareJID));
-				Xml.Append("' hold='1' rid='");
-				Xml.Append((this.rid++).ToString());
-				Xml.Append("' to='");
-				Xml.Append(XML.Encode(this.xmppClient.Domain));
-				Xml.Append("' newkey='");
-				Xml.Append(this.keys.First.Value);
-				this.keys.RemoveFirst();
 
 #if ECHO
 				Xml.Append("' echo='0");
@@ -378,7 +384,7 @@ namespace Waher.Networking.XMPP
 						UseCookies = false
 					})
 					{
-						Timeout = TimeSpan.FromMilliseconds(30000)
+						Timeout = TimeSpan.FromMilliseconds(60000)
 					};
 
 					this.httpClients[i].DefaultRequestHeaders.ExpectContinue = false;
@@ -393,7 +399,7 @@ namespace Waher.Networking.XMPP
 			}
 		}
 
-		private void GenerateKeys()
+		private void GenerateKeysLocked()
 		{
 			int n = XmppClient.GetRandomValue(8, 24);
 			byte[] Bin = XmppClient.GetRandomBytes(20);
@@ -449,7 +455,7 @@ namespace Waher.Networking.XMPP
 				{
 					lock (this.httpClients)
 					{
-						if (Queued == null && !AllInactive)
+						if (ClientIndex < 0)
 						{
 							for (ClientIndex = 0; ClientIndex < this.requests; ClientIndex++)
 							{
@@ -465,6 +471,17 @@ namespace Waher.Networking.XMPP
 									this.outputQueue.AddLast(new KeyValuePair<string, EventHandler>(Packet, DeliveryCallback));
 								}
 
+								if (Queued != null)
+								{
+									LinkedListNode<KeyValuePair<string, EventHandler>> Loop = Queued.Last;
+
+									while (Loop != null)
+									{
+										this.outputQueue.AddFirst(Loop.Value);
+										Loop = Loop.Previous;
+									}
+								}
+
 								return;
 							}
 
@@ -478,25 +495,25 @@ namespace Waher.Networking.XMPP
 						}
 
 						Rid = this.rid++;
-					}
 
-					Xml = new StringBuilder();
+						Xml = new StringBuilder();
 
-					Xml.Append("<body rid='");
-					Xml.Append(Rid.ToString());
-					Xml.Append("' sid='");
-					Xml.Append(this.sid);
-					Xml.Append("' key='");
-					Xml.Append(this.keys.First.Value);
-
-					this.keys.RemoveFirst();
-					if (this.keys.First == null)
-					{
-						this.GenerateKeys();
-
-						Xml.Append("' newkey='");
+						Xml.Append("<body rid='");
+						Xml.Append(Rid.ToString());
+						Xml.Append("' sid='");
+						Xml.Append(this.sid);
+						Xml.Append("' key='");
 						Xml.Append(this.keys.First.Value);
+
 						this.keys.RemoveFirst();
+						if (this.keys.First == null)
+						{
+							this.GenerateKeysLocked();
+
+							Xml.Append("' newkey='");
+							Xml.Append(this.keys.First.Value);
+							this.keys.RemoveFirst();
+						}
 					}
 
 #if ECHO
@@ -520,6 +537,18 @@ namespace Waher.Networking.XMPP
 						{
 							this.RaiseOnSent(P.Key);
 							Xml.Append(P.Key);
+
+							if (P.Value != null)
+							{
+								try
+								{
+									P.Value(this, new EventArgs());
+								}
+								catch (Exception ex)
+								{
+									Log.Critical(ex);
+								}
+							}
 						}
 					}
 
@@ -560,8 +589,6 @@ namespace Waher.Networking.XMPP
 
 					lock (this.httpClients)
 					{
-						AllInactive = true;
-
 						if (this.outputQueue.First != null)
 						{
 							Queued = this.outputQueue;
@@ -569,20 +596,23 @@ namespace Waher.Networking.XMPP
 						}
 						else
 						{
+							AllInactive = true;
 							Queued = null;
-							this.active[ClientIndex] = false;
 
 							for (i = 0; i < this.requests; i++)
 							{
-								if (this.active[i])
+								if (i != ClientIndex && this.active[i])
 								{
 									AllInactive = false;
 									break;
 								}
 							}
 
-							if (AllInactive)
-								this.active[ClientIndex] = true;
+							if (!AllInactive)
+							{
+								this.active[ClientIndex] = false;
+								ClientIndex = -1;
+							}
 						}
 					}
 
@@ -605,6 +635,14 @@ namespace Waher.Networking.XMPP
 					this.BodyReceived(XmlResponse, false);
 				}
 				while (!this.disposed && (Queued != null || (AllInactive && this.xmppClient.State == XmppState.Connected)));
+
+				if (ClientIndex >= 0)
+				{
+					lock (this.httpClients)
+					{
+						this.active[ClientIndex] = false;
+					}
+				}
 			}
 			catch (Exception ex)
 			{

@@ -6,6 +6,7 @@ using System.Net;
 using System.Net.Security;
 using System.Net.Sockets;
 using System.Net.NetworkInformation;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 #if WINDOWS_UWP
 using Windows.Foundation;
@@ -61,20 +62,21 @@ namespace Waher.Networking.HTTP
 		private LinkedList<KeyValuePair<StreamSocketListener, bool>> listeners = new LinkedList<KeyValuePair<StreamSocketListener, bool>>();
 #else
 		private LinkedList<KeyValuePair<TcpListener, bool>> listeners = new LinkedList<KeyValuePair<TcpListener, bool>>();
-		private X509Certificate serverCertificate;
+		private readonly X509Certificate serverCertificate;
 #endif
-		private Dictionary<string, HttpResource> resources = new Dictionary<string, HttpResource>(StringComparer.CurrentCultureIgnoreCase);
+		private readonly Dictionary<string, HttpResource> resources = new Dictionary<string, HttpResource>(StringComparer.CurrentCultureIgnoreCase);
 		private TimeSpan sessionTimeout = new TimeSpan(0, 20, 0);
 		private TimeSpan requestTimeout = new TimeSpan(0, 2, 0);
-		private Cache<HttpRequest, RequestInfo> currentRequests;
+		private readonly Cache<HttpRequest, RequestInfo> currentRequests;
 		private Cache<string, Variables> sessions;
 		private string resourceOverride = null;
-		private object statSynch = new object();
+		private Regex resourceOverrideFilter = null;
+		private readonly object statSynch = new object();
 		private Dictionary<string, Statistic> callsPerMethod = new Dictionary<string, Statistic>();
 		private Dictionary<string, Statistic> callsPerUserAgent = new Dictionary<string, Statistic>();
 		private Dictionary<string, Statistic> callsPerFrom = new Dictionary<string, Statistic>();
 		private Dictionary<string, Statistic> callsPerResource = new Dictionary<string, Statistic>();
-		private Dictionary<int, bool> failedPorts = new Dictionary<int, bool>();
+		private readonly Dictionary<int, bool> failedPorts = new Dictionary<int, bool>();
 		private DateTime lastStat = DateTime.MinValue;
 		private long nrBytesRx = 0;
 		private long nrBytesTx = 0;
@@ -524,6 +526,22 @@ namespace Waher.Networking.HTTP
 		}
 
 		/// <summary>
+		/// If null, all resources are redirected to <see cref="ResourceOverride"/>, if provided.
+		/// If not null, only resources matching this regular expression will be redirected to <see cref="ResourceOverride"/>, if provided.
+		/// </summary>
+		public string ResourceOverrideFilter
+		{
+			get { return this.resourceOverrideFilter?.ToString(); }
+			set
+			{
+				if (value == null)
+					this.resourceOverrideFilter = null;
+				else
+					this.resourceOverrideFilter = new Regex(value, RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Singleline);
+			}
+		}
+
+		/// <summary>
 		/// Registers a resource with the server.
 		/// </summary>
 		/// <param name="Resource">Resource</param>
@@ -689,7 +707,10 @@ namespace Waher.Networking.HTTP
 			int i;
 
 			if (!string.IsNullOrEmpty(this.resourceOverride))
-				ResourceName = this.resourceOverride;
+			{
+				if (this.resourceOverrideFilter == null || this.resourceOverrideFilter.IsMatch(ResourceName))
+					ResourceName = this.resourceOverride;
+			}
 
 			SubPath = string.Empty;
 

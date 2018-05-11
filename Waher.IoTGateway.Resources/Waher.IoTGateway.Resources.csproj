@@ -121,6 +121,9 @@
     <None Remove="Root\Markdown.md" />
     <None Remove="Root\Master.md" />
     <None Remove="Root\Script.md" />
+    <None Remove="Root\Settings\XMPP.css" />
+    <None Remove="Root\Settings\XMPP.js" />
+    <None Remove="Root\Settings\XMPP.md" />
     <None Remove="Root\Smileys.md" />
     <None Remove="Root\Templates\Repeat.md" />
     <None Remove="Root\Video\small.3gp" />
@@ -428,6 +431,15 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Root\Script.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Settings\XMPP.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Settings\XMPP.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Settings\XMPP.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Root\Smileys.md">

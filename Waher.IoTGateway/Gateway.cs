@@ -20,6 +20,7 @@ using Waher.Events;
 using Waher.Events.Files;
 using Waher.Events.Persistence;
 using Waher.Events.XMPP;
+using Waher.IoTGateway.Setup;
 using Waher.Networking.CoAP;
 using Waher.Networking.HTTP;
 using Waher.Networking.Sniffers;
@@ -266,71 +267,105 @@ namespace Waher.IoTGateway
 					Log.Event(Event);
 				}
 
-				xmppConfigFileName = Config.DocumentElement["XmppClient"].Attributes["configFileName"].Value;
-				if (!File.Exists(xmppConfigFileName))
-					xmppConfigFileName = appDataFolder + xmppConfigFileName;
+				Dictionary<string, Type> SystemConfigurationTypes = new Dictionary<string, Type>();
+				Dictionary<string, SystemConfiguration> SystemConfigurations = new Dictionary<string, SystemConfiguration>();
+				bool Configured = true;
 
-				if (GetXmppClientCredentials != null)
-					xmppCredentials = await GetXmppClientCredentials(xmppConfigFileName);
-				else
-					xmppCredentials = null;
-
-				if (xmppCredentials == null)
-					throw new Exception("XMPP Client Credentials not provided. Make sure the GetXmppClientCredentials event has an appropriate event handler.");
-
-				xmppClient = new XmppClient(xmppCredentials, "en", typeof(Gateway).Assembly);
-				xmppClient.OnValidateSender += XmppClient_OnValidateSender;
-				Types.SetModuleParameter("XMPP", xmppClient);
-
-				if (xmppCredentials.Sniffer)
+				foreach (Type SystemConfigurationType in Types.GetTypesImplementingInterface(typeof(ISystemConfiguration)))
 				{
-					ISniffer Sniffer;
+					if (SystemConfigurationType.IsAbstract)
+						continue;
 
-					if (ConsoleOutput)
+					SystemConfigurationTypes[SystemConfigurationType.FullName] = SystemConfigurationType;
+				}
+
+				foreach (SystemConfiguration SystemConfiguration in await Database.Find<SystemConfiguration>())
+				{
+					string s = SystemConfiguration.GetType().FullName;
+
+					if (SystemConfigurations.ContainsKey(s))
+						await Database.Delete(SystemConfiguration);
+					else
 					{
-						Sniffer = new ConsoleOutSniffer(BinaryPresentationMethod.ByteCount, LineEnding.PadWithSpaces);
-						xmppClient.Add(Sniffer);
+						SystemConfigurations[s] = SystemConfiguration;
+
+						if (!SystemConfiguration.Complete)
+							Configured = false;
+					}
+				}
+
+				foreach (KeyValuePair<string, Type> P in SystemConfigurationTypes)
+				{
+					try
+					{
+						SystemConfiguration SystemConfiguration = (SystemConfiguration)Activator.CreateInstance(P.Value);
+						SystemConfiguration.Complete = false;
+						SystemConfiguration.Created = DateTime.Now;
+
+						await Database.Insert(SystemConfiguration);
+
+						SystemConfigurations[P.Key] = SystemConfiguration;
+						Configured = false;
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+						continue;
+					}
+				}
+
+				SystemConfiguration[] Configurations = new SystemConfiguration[SystemConfigurations.Count];
+				SystemConfigurations.Values.CopyTo(Configurations, 0);
+				Array.Sort<SystemConfiguration>(Configurations, (c1, c2) => c1.Priority - c2.Priority);
+
+				HttpFolderResource HttpFolderResource;
+				ISystemConfiguration CurrentConfiguration = null;
+				StringBuilder sb;
+
+				if (!Configured)
+				{
+					Log.Informational("System needs to be configured.");
+
+					webServer = new HttpServer(new int[] { HttpServer.DefaultHttpPort, 8080, 8081, 8082 }, null, null)
+					{
+						ResourceOverrideFilter = "[.]md$"
+					};
+
+					webServer.Register(new HttpFolderResource("/Graphics", Path.Combine(appDataFolder, "Graphics"), false, false, true, false)); // TODO: Add authentication mechanisms for PUT & DELETE.
+					webServer.Register(new HttpFolderResource("/highlight", "Highlight", false, false, true, false));   // Syntax highlighting library, provided by http://highlightjs.org
+					webServer.Register(HttpFolderResource = new HttpFolderResource(string.Empty, rootFolder, false, false, true, true));    // TODO: Add authentication mechanisms for PUT & DELETE.
+					webServer.Register("/", (req, resp) =>
+					{
+						throw new TemporaryRedirectException(CurrentConfiguration?.Resource);
+					});
+					webServer.Register(clientEvents = new ClientEvents());
+
+					emoji1_24x24 = new Emoji1LocalFiles(Emoji1SourceFileType.Svg, 24, 24, "/Graphics/Emoji1/svg/%FILENAME%",
+						Path.Combine(runtimeFolder, "Graphics", "Emoji1.zip"), Path.Combine(appDataFolder, "Graphics"));
+
+					HttpFolderResource.AllowTypeConversion();
+					MarkdownToHtmlConverter.EmojiSource = emoji1_24x24;
+				}
+
+				foreach (SystemConfiguration Configuration in Configurations)
+				{
+					Configuration.SetStaticInstance(Configuration);
+
+					if (!Configuration.Complete)
+					{
+						CurrentConfiguration = Configuration;
+						webServer.ResourceOverride = Configuration.Resource;
+						Configuration.SetStaticInstance(Configuration);
+
+						ClientEvents.PushEvent(ClientEvents.GetTabIDs(), "Reload", string.Empty);
+
+						await Configuration.WaitForConfiguration(webServer);
 					}
 
-					Sniffer = new XmlFileSniffer(appDataFolder + "XMPP" + Path.DirectorySeparatorChar +
-						"XMPP Log %YEAR%-%MONTH%-%DAY%T%HOUR%.xml",
-						appDataFolder + "Transforms" + Path.DirectorySeparatorChar + "SnifferXmlToHtml.xslt",
-						7, BinaryPresentationMethod.ByteCount);
-					xmppClient.Add(Sniffer);
+					await Configuration.ConfigureSystem();
 				}
 
-				if (!string.IsNullOrEmpty(xmppCredentials.Events))
-					Log.Register(new XmppEventSink("XMPP Event Sink", xmppClient, xmppCredentials.Events, false));
-
-				if (!string.IsNullOrEmpty(xmppCredentials.ThingRegistry))
-				{
-					thingRegistryClient = new ThingRegistryClient(xmppClient, xmppCredentials.ThingRegistry);
-					thingRegistryClient.Claimed += ThingRegistryClient_Claimed;
-					thingRegistryClient.Disowned += ThingRegistryClient_Disowned;
-					thingRegistryClient.Removed += ThingRegistryClient_Removed;
-				}
-
-				if (!string.IsNullOrEmpty(xmppCredentials.Provisioning))
-					provisioningClient = new ProvisioningClient(xmppClient, xmppCredentials.Provisioning);
-				else
-				{
-					provisioningClient = null;
-					xmppClient.OnPresenceSubscribe += XmppClient_OnPresenceSubscribe;
-					xmppClient.OnPresenceUnsubscribe += XmppClient_OnPresenceUnsubscribe;
-				}
-
-				DateTime Now = DateTime.Now;
-				int MsToNext = 60000 - (Now.Second * 1000 + Now.Millisecond);
-
-				connectionTimer = new Timer(CheckConnection, null, MsToNext, 60000);
-				xmppClient.OnStateChanged += XmppClient_OnStateChanged;
-				xmppClient.OnRosterItemUpdated += XmppClient_OnRosterItemUpdated;
-
-				ibbClient = new Networking.XMPP.InBandBytestreams.IbbClient(xmppClient, MaxChunkSize);
-				Types.SetModuleParameter("IBB", ibbClient);
-
-				socksProxy = new Networking.XMPP.P2P.SOCKS5.Socks5Proxy(xmppClient);
-				Types.SetModuleParameter("SOCKS5", socksProxy);
+				ClientEvents.PushEvent(ClientEvents.GetTabIDs(), "Reload", string.Empty);
 
 				string CertificateLocalFileName = Config.DocumentElement["Certificate"].Attributes["configFileName"].Value;
 				string CertificateFileName;
@@ -414,10 +449,16 @@ namespace Waher.IoTGateway
 					}
 				}
 
+				if (webServer != null)
+				{
+					webServer.Dispose();
+					webServer = null;
+				}
+
 				webServer = new HttpServer(GetConfigPorts("HTTP"), GetConfigPorts("HTTPS"), certificate);
 				Types.SetModuleParameter("HTTP", webServer);
 
-				StringBuilder sb = new StringBuilder();
+				sb = new StringBuilder();
 
 				foreach (int Port in webServer.OpenPorts)
 					sb.AppendLine(Port.ToString());
@@ -431,7 +472,6 @@ namespace Waher.IoTGateway
 					Log.Critical(ex);
 				}
 
-				HttpFolderResource HttpFolderResource;
 				HttpxProxy HttpxProxy;
 
 				webServer.Register(new HttpFolderResource("/Graphics", Path.Combine(appDataFolder, "Graphics"), false, false, true, false)); // TODO: Add authentication mechanisms for PUT & DELETE.
@@ -444,11 +484,15 @@ namespace Waher.IoTGateway
 				});
 				webServer.Register(clientEvents = new ClientEvents());
 
-				emoji1_24x24 = new Emoji1LocalFiles(Emoji1SourceFileType.Svg, 24, 24, "/Graphics/Emoji1/svg/%FILENAME%",
-					Path.Combine(runtimeFolder, "Graphics", "Emoji1.zip"), Path.Combine(appDataFolder, "Graphics"));
-				
+				if (emoji1_24x24 != null)
+				{
+					emoji1_24x24 = new Emoji1LocalFiles(Emoji1SourceFileType.Svg, 24, 24, "/Graphics/Emoji1/svg/%FILENAME%",
+						Path.Combine(runtimeFolder, "Graphics", "Emoji1.zip"), Path.Combine(appDataFolder, "Graphics"));
+
+					MarkdownToHtmlConverter.EmojiSource = emoji1_24x24;
+				}
+
 				HttpFolderResource.AllowTypeConversion();
-				MarkdownToHtmlConverter.EmojiSource = emoji1_24x24;
 
 				XmlElement FileFolders = Config.DocumentElement["FileFolders"];
 				if (FileFolders != null)
@@ -586,6 +630,64 @@ namespace Waher.IoTGateway
 			});
 
 			return true;
+		}
+
+		internal static async Task ConfigureXmpp(XmppConfiguration Configuration)
+		{
+			xmppCredentials = Configuration.GetCredentials();
+			xmppClient = new XmppClient(xmppCredentials, "en", typeof(Gateway).Assembly);
+			xmppClient.OnValidateSender += XmppClient_OnValidateSender;
+			Types.SetModuleParameter("XMPP", xmppClient);
+
+			if (xmppCredentials.Sniffer)
+			{
+				ISniffer Sniffer;
+
+				if (ConsoleOutput)
+				{
+					Sniffer = new ConsoleOutSniffer(BinaryPresentationMethod.ByteCount, LineEnding.PadWithSpaces);
+					xmppClient.Add(Sniffer);
+				}
+
+				Sniffer = new XmlFileSniffer(appDataFolder + "XMPP" + Path.DirectorySeparatorChar +
+					"XMPP Log %YEAR%-%MONTH%-%DAY%T%HOUR%.xml",
+					appDataFolder + "Transforms" + Path.DirectorySeparatorChar + "SnifferXmlToHtml.xslt",
+					7, BinaryPresentationMethod.ByteCount);
+				xmppClient.Add(Sniffer);
+			}
+
+			if (!string.IsNullOrEmpty(xmppCredentials.Events))
+				Log.Register(new XmppEventSink("XMPP Event Sink", xmppClient, xmppCredentials.Events, false));
+
+			if (!string.IsNullOrEmpty(xmppCredentials.ThingRegistry))
+			{
+				thingRegistryClient = new ThingRegistryClient(xmppClient, xmppCredentials.ThingRegistry);
+				thingRegistryClient.Claimed += ThingRegistryClient_Claimed;
+				thingRegistryClient.Disowned += ThingRegistryClient_Disowned;
+				thingRegistryClient.Removed += ThingRegistryClient_Removed;
+			}
+
+			if (!string.IsNullOrEmpty(xmppCredentials.Provisioning))
+				provisioningClient = new ProvisioningClient(xmppClient, xmppCredentials.Provisioning);
+			else
+			{
+				provisioningClient = null;
+				xmppClient.OnPresenceSubscribe += XmppClient_OnPresenceSubscribe;
+				xmppClient.OnPresenceUnsubscribe += XmppClient_OnPresenceUnsubscribe;
+			}
+
+			DateTime Now = DateTime.Now;
+			int MsToNext = 60000 - (Now.Second * 1000 + Now.Millisecond);
+
+			connectionTimer = new Timer(CheckConnection, null, MsToNext, 60000);
+			xmppClient.OnStateChanged += XmppClient_OnStateChanged;
+			xmppClient.OnRosterItemUpdated += XmppClient_OnRosterItemUpdated;
+
+			ibbClient = new Networking.XMPP.InBandBytestreams.IbbClient(xmppClient, MaxChunkSize);
+			Types.SetModuleParameter("IBB", ibbClient);
+
+			socksProxy = new Networking.XMPP.P2P.SOCKS5.Socks5Proxy(xmppClient);
+			Types.SetModuleParameter("SOCKS5", socksProxy);
 		}
 
 		private static async void DeleteOldDataSourceEvents(object P)

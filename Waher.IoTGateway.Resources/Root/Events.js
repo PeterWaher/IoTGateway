@@ -70,6 +70,12 @@
     xhttp.send(window.location.href);
 }
 
+function ShowError(xhttp)
+{
+    if (xhttp.responseText.length > 0)
+        window.alert(xhttp.responseText);
+}
+
 function CreateGUID()
 {
     function Segment()

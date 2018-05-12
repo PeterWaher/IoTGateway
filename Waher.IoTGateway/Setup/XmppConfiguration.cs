@@ -35,7 +35,7 @@ namespace Waher.IoTGateway.Setup
 	/// <summary>
 	/// XMPP Configuration
 	/// </summary>
-	public class XmppConfiguration : SystemMultiStepConfiguration
+	public partial class XmppConfiguration : SystemMultiStepConfiguration
 	{
 		private static XmppConfiguration instance = null;
 
@@ -253,7 +253,7 @@ namespace Waher.IoTGateway.Setup
 		public override Task WaitForConfiguration(HttpServer WebServer)
 		{
 			Task Result = base.WaitForConfiguration(WebServer);
-			
+
 			WebServer.Register("/Settings/ConnectToHost", null, this.ConnectToHost, true, false, true);
 			WebServer.Register("/Settings/XmppComplete", null, this.XmppComplete, true, false, true);
 
@@ -351,6 +351,12 @@ namespace Waher.IoTGateway.Setup
 				AllowScramSHA1 = true,
 				RequestRosterOnStartup = true
 			};
+
+			if (this.createAccount && clp.TryGetValue(this.host, out KeyValuePair<string, string> P))
+			{
+				Credentials.FormSignatureKey = P.Key;
+				Credentials.FormSignatureSecret = P.Value;
+			}
 
 			switch (this.transportMethod)
 			{
@@ -589,8 +595,18 @@ namespace Waher.IoTGateway.Setup
 		{
 			get
 			{
-				return new string[] { "us.ipdx.net", "waher.se", "xmpp.i0t.se" };   // TODO: Take from external file.
+				if (featuredServers == null)
+				{
+					string[] Result = new string[clp.Count];
+					clp.Keys.CopyTo(Result, 0);
+					Array.Sort(Result);
+					featuredServers = Result;
+				}
+
+				return featuredServers;
 			}
 		}
+
+		private static string[] featuredServers = null;
 	}
 }

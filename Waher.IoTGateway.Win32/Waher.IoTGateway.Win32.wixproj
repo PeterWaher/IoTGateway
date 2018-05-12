@@ -24,19 +24,7 @@
     <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="AccountInvalidDlg.wxs" />
-    <Compile Include="AccountCreationFailureDlg.wxs" />
-    <Compile Include="AccountNameFailureDlg.wxs" />
-    <Compile Include="TrustServerDlg.wxs" />
-    <Compile Include="NameAccountDlg.wxs" />
-    <Compile Include="CreateAccountDlg.wxs" />
-    <Compile Include="PasswordsInvalidDlg.wxs" />
-    <Compile Include="ServiceProviderAccountDlg.wxs" />
-    <Compile Include="InvalidPortDlg.wxs" />
-    <Compile Include="InvalidHostDlg.wxs" />
-    <Compile Include="ServiceProviderPortDlg.wxs" />
     <Compile Include="IoTGateway.wxs" />
-    <Compile Include="ServiceProviderDlg.wxs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="banner.bmp" />

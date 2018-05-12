@@ -72,4 +72,10 @@
     <ProjectReference Include="..\Things\Waher.Things.Metering\Waher.Things.Metering.csproj" />
     <ProjectReference Include="..\Things\Waher.Things\Waher.Things.csproj" />
   </ItemGroup>
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <Exec Command="if exist &quot;$(SolutionDir)..\Registration.cs&quot; copy &quot;$(ProjectDir)Setup\Registration.cs&quot; &quot;$(SolutionDir)..\Registration.cs.bak&quot;&#xD;&#xA;if exist &quot;$(SolutionDir)..\Registration.cs&quot; copy &quot;$(SolutionDir)..\Registration.cs&quot; &quot;$(ProjectDir)&quot;Setup&#xD;&#xA;" />
+  </Target>
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="if exist &quot;$(SolutionDir)..\Registration.cs&quot; copy &quot;$(SolutionDir)..\Registration.cs.bak&quot; &quot;$(ProjectDir)Setup\Registration.cs&quot;" />
+  </Target>
 </Project>

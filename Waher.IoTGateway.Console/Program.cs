@@ -9,7 +9,6 @@ using System.Xml;
 using Waher.Content;
 using Waher.Events;
 using Waher.Events.Console;
-using Waher.Mock;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Provisioning;
 using Waher.Persistence;
@@ -86,8 +85,6 @@ namespace Waher.IoTGateway.Console
 				};
 
 				Gateway.GetDatabaseProvider += GetDatabase;
-				Gateway.GetXmppClientCredentials += GetXmppClientCredentials;
-				Gateway.XmppCredentialsUpdated += XmppCredentialsUpdated;
 				Gateway.RegistrationSuccessful += RegistrationSuccessful;
 
 				if (!Gateway.Start(true).Result)
@@ -153,30 +150,12 @@ namespace Waher.IoTGateway.Console
 				Encrypted, false, true));
 		}
 
-		private static Task<XmppCredentials> GetXmppClientCredentials(string XmppConfigFileName)
-		{
-			XmppCredentials Result = SimpleXmppConfiguration.GetConfigUsingSimpleConsoleDialog(XmppConfigFileName,
-				Guid.NewGuid().ToString().Replace("-", string.Empty),   // Default user name.
-				Guid.NewGuid().ToString().Replace("-", string.Empty),   // Default password.
-				typeof(Gateway).Assembly);
-
-			return Task.FromResult<XmppCredentials>(Result);
-		}
-
-		private static Task XmppCredentialsUpdated(string XmppConfigFileName, XmppCredentials Credentials)
-		{
-			SimpleXmppConfiguration.SaveSimpleXmppConfiguration(XmppConfigFileName, Credentials);
-			return Task.CompletedTask;
-		}
-
 		private static async Task RegistrationSuccessful(MetaDataTag[] MetaData, RegistrationEventArgs e)
 		{
 			if (!e.IsClaimed && Types.TryGetModuleParameter("Registry", out object Obj) && Obj is ThingRegistryClient ThingRegistryClient)
 			{
 				string ClaimUrl = ThingRegistryClient.EncodeAsIoTDiscoURI(MetaData);
 				string FilePath = Path.Combine(Gateway.AppDataFolder, "Gateway.iotdisco");
-
-				SimpleXmppConfiguration.PrintQRCode(ClaimUrl);
 
 				Log.Informational("Registration successful.");
 				Log.Informational(ClaimUrl, new KeyValuePair<string, object>("Path", FilePath));

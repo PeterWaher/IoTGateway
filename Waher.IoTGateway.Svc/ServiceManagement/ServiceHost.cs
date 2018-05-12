@@ -30,7 +30,7 @@ namespace Waher.IoTGateway.Svc.ServiceManagement
 		private ServiceStatus serviceStatus;
 		private ServiceStatusHandle serviceStatusHandle;
 		private TaskCompletionSource<int> stopTaskCompletionSource;
-		private string serviceName;
+		private readonly string serviceName;
 		private uint checkpointCounter = 1;
 
 		internal ServiceHost(string ServiceName)
@@ -90,9 +90,7 @@ namespace Waher.IoTGateway.Svc.ServiceManagement
 				Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
 
 				Gateway.GetDatabaseProvider += Program.GetDatabase;
-				Gateway.GetXmppClientCredentials += Program.GetXmppClientCredentialsAsService;
-				Gateway.XmppCredentialsUpdated += Program.XmppCredentialsUpdated;
-				Gateway.RegistrationSuccessful += Program.RegistrationSuccessfulAsService;
+				Gateway.RegistrationSuccessful += Program.RegistrationSuccessful;
 
 				if (!Gateway.Start(true).Result)
 					throw new Exception("Gateway being started in another process.");

@@ -3,10 +3,9 @@
 The **Waher.IoTGateway.Svc** is a Windows service version of the [IoT Gateway](../Waher.IoTGateway). 
 It uses XMPP and can be administered using the [Waher.Client.WPF](../Clients/Waher.Client.WPF) application.
 
-The service application requires XMPP credentials to be stored in the `xmpp.config` file. If installed using
-the [IoT Gateway installer](../Executables/IoTGatewaySetip.exe), the files will be written to the **Program Data** 
-folder `IoT Gateway`, and the `xmpp.config` file will be generated automatically. Otherwise, you can use the
-[Waher.IoTGateway.Console](../Waher.IoTGateway.Console) project to create an `xmpp.config` file, or write one manually.
+When running the application for the first time, you need to configure it. You do this by navigating to it using
+a browse. You will be displayed a sequence of dialogs that you need to fill in, to configure different aspects
+of the system. This includes setting up the connection to the XMPP network.
 
 ## Web Server
 

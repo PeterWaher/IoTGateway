@@ -4,10 +4,9 @@ The **Waher.IoTGateway.Console** is a console application version of the [IoT Ga
 It's easy to use and experiment with. It uses XMPP and can be administered using the 
 [Waher.Client.WPF](../Clients/Waher.Client.WPF) application.
 
-The first time the application is run, it provides a simple console interface for the user to provide network 
-credentials. These credentials are then stored in the `xmpp.config` file. Passwords are hashed. If installed using
-the [IoT Gateway installer](../Executables/IoTGatewaySetip.exe), all web files will be written to the **Program Data** 
-folder `IoT Gateway`, and the `xmpp.config` file will be generated automatically.
+When running the application for the first time, you need to configure it. You do this by navigating to it using
+a browse. You will be displayed a sequence of dialogs that you need to fill in, to configure different aspects
+of the system. This includes setting up the connection to the XMPP network.
 
 The [Waher.IoTGateway.Svc](../Waher.IoTGateway.Svc) project provides a Windows Service for the **IoT Gateway**.
 

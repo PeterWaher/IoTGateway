@@ -11,9 +11,6 @@
     <Property Id="INSTALLDIR">
       <RegistrySearch Id='IoTGatewayRegistry' Type='raw' Root='HKLM' Key='Software\[Manufacturer]\[ProductName]' Name='InstallDir' />
     </Property>
-    <Property Id="XMPPBROKER" Value="waher.se">
-      <RegistrySearch Id='DefaultXmppBroker' Type='raw' Root='HKLM' Key='Software\[Manufacturer]\[ProductName]' Name='XmppBroker' />
-    </Property>
     <Property Id="BROWSER">
       <RegistrySearch Id='DefaultBrowser' Type='raw' Root='HKLM' Key='SOFTWARE\Classes\http\shell\open\command' />
     </Property>
@@ -22,10 +19,6 @@
     <Property Id="OPENBROWSER" Value="unset"/>
     <Property Id="SERVICEDISPLAYNAME" Value="IoT Gateway Service"/>
     <Property Id="SERVICEDESCRIPTION" Value="Windows Service hosting the Waher IoT Gateway."/>
-    <Property Id="XMPPPASSWORD1" Secure="yes" Hidden="yes"/>
-    <Property Id="XMPPPASSWORD2" Secure="yes" Hidden="yes"/>
-    <Property Id="XMPPPASSWORDHASH" Secure="yes" Hidden="yes"/>
-    <Property Id="XMPPPASSWORDHASHMETHOD" Secure="yes" Hidden="yes"/>
     <Property Id="DiskPrompt" Value="IoT Gateway 1.0 Installation [1]"/>
     <Property Id="ButtonText_No">!(loc.ButtonText_No)</Property>
     <Property Id="ButtonText_Yes">!(loc.ButtonText_Yes)</Property>
@@ -487,7 +480,6 @@
             <Component Id='MainExecutable' Guid='CF5A1FBA-908B-437A-A7B0-43909859F9A1'>
               <RegistryKey Root='HKLM' Key='Software\[Manufacturer]\[ProductName]'>
                 <RegistryValue Type='string' Name='InstallDir' Value='[INSTALLDIR]' Action='write'/>
-                <RegistryValue Type='string' Name='XmppBroker' Value='[XMPPBROKER]' Action='write'/>
               </RegistryKey>
               <File Id='Waher.Content.dll' Name='Waher.Content.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.dll' Vital='yes'/>
               <File Id='Waher.Content.Emoji.dll' Name='Waher.Content.Emoji.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Emoji.dll' Vital='yes'/>
@@ -515,7 +507,6 @@
               <File Id='Waher.IoTGateway.Svc.runtimeconfig.json' Name='Waher.IoTGateway.Svc.runtimeconfig.json' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.IoTGateway.Svc.runtimeconfig.json' Vital='yes' />
               <File Id='Waher.Events.WindowsEventLog.dll' Name='Waher.Events.WindowsEventLog.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Events.WindowsEventLog.dll' Vital='yes'/>
               <fire:FirewallException Id="FirewallServiceRule" Name="IoT Gateway Service" File="Waher.IoTGateway.Svc.exe" Scope="any"/>
-              <File Id='Waher.Mock.dll' Name='Waher.Mock.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Mock.dll' Vital='yes'/>
               <File Id='Waher.Networking.dll' Name='Waher.Networking.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Networking.dll' Vital='yes'/>
               <File Id='Waher.Networking.CoAP.dll' Name='Waher.Networking.CoAP.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Networking.CoAP.dll' Vital='yes'/>
               <File Id='Waher.Networking.HTTP.dll' Name='Waher.Networking.HTTP.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Networking.HTTP.dll' Vital='yes'/>
@@ -568,7 +559,6 @@
               <RemoveFile Id='RemoveWaher.IoTGateway.Svc.deps.json' Name='Waher.IoTGateway.Svc.deps.json' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.IoTGateway.Svc.runtimeconfig.json' Name='Waher.IoTGateway.Svc.runtimeconfig.json' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Events.WindowsEventLog.dll' Name='Waher.Events.WindowsEventLog.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveWaher.Mock.dll' Name='Waher.Mock.dll' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Networking.dll' Name='Waher.Networking.dll' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Networking.CoAP.dll' Name='Waher.Networking.CoAP.dll' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Networking.HTTP.dll' Name='Waher.Networking.HTTP.dll' On='uninstall'/>
@@ -619,7 +609,6 @@
               <File Id='Waher.IoTGateway.pdb' Name='Waher.IoTGateway.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.IoTGateway.pdb' Vital='yes'/>
               <File Id='Waher.IoTGateway.Svc.pdb' Name='Waher.IoTGateway.Svc.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\netcoreapp2.0\Waher.IoTGateway.Svc.pdb' Vital='yes' KeyPath='yes'/>
               <File Id='Waher.Events.WindowsEventLog.pdb' Name='Waher.Events.WindowsEventLog.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Events.WindowsEventLog.pdb' Vital='yes'/>
-              <File Id='Waher.Mock.pdb' Name='Waher.Mock.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Mock.pdb' Vital='yes'/>
               <File Id='Waher.Networking.pdb' Name='Waher.Networking.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Networking.pdb' Vital='yes'/>
               <File Id='Waher.Networking.CoAP.pdb' Name='Waher.Networking.CoAP.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Networking.CoAP.pdb' Vital='yes'/>
               <File Id='Waher.Networking.HTTP.pdb' Name='Waher.Networking.HTTP.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Networking.HTTP.pdb' Vital='yes'/>
@@ -667,7 +656,6 @@
               <RemoveFile Id='RemoveWaher.IoTGateway.pdb' Name='Waher.IoTGateway.pdb' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.IoTGateway.Svc.pdb' Name='Waher.IoTGateway.Svc.pdb' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Events.WindowsEventLog.pdb' Name='Waher.Events.WindowsEventLog.pdb' On='uninstall'/>
-              <RemoveFile Id='RemoveWaher.Mock.pdb' Name='Waher.Mock.pdb' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Networking.pdb' Name='Waher.Networking.pdb' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Networking.CoAP.pdb' Name='Waher.Networking.CoAP.pdb' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Networking.HTTP.pdb' Name='Waher.Networking.HTTP.pdb' On='uninstall'/>
@@ -1091,17 +1079,11 @@
     <UI Id="MyWixUI_Mondo">
       <UIRef Id="WixUI_Mondo" />
       <UIRef Id="WixUI_ErrorProgressText" />
-      <DialogRef Id="ServiceProviderDlg" />
       <DialogRef Id="WelcomeDlg" />
-      <Publish Dialog="WelcomeDlg" Control="Next" Event="DoAction" Value="CheckXmppConfigExists" Order="3">1</Publish>
-      <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="ServiceProviderDlg" Order="4">XmppConfigExists = "0"</Publish>
-      <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="SetupTypeDlg" Order="5">XmppConfigExists = "1"</Publish>
-      <Publish Dialog="SetupTypeDlg" Control="Back" Event="NewDialog" Value="ServiceProviderAccountDlg" Order="1">(XmppConfigExists = "0") AND (XmppValidCertificte = "1")</Publish>
-      <Publish Dialog="SetupTypeDlg" Control="Back" Event="NewDialog" Value="TrustServerDlg" Order="2">(XmppConfigExists = "0") AND (XmppValidCertificte &lt;&gt; "1")</Publish>
-      <Publish Dialog="SetupTypeDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg" Order="3">XmppConfigExists = "1"</Publish>
+      <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="SetupTypeDlg" Order="5">1</Publish>
+      <Publish Dialog="SetupTypeDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg" Order="3">1</Publish>
     </UI>
     <Icon Id="eye.ico" SourceFile="..\..\eye.ico" />
-    <CustomAction Id='CreateXmppConfigFile' BinaryKey='Waher.IoTGateway.Installers.CA.dll' DllEntry='CreateXmppConfigFile' Return='check' Execute='immediate' />
     <CustomAction Id='InstallAndStartService' BinaryKey='Waher.IoTGateway.Installers.CA.dll' DllEntry='InstallAndStartService' Return='check' Execute='immediate' />
     <CustomAction Id='UninstallService' BinaryKey='Waher.IoTGateway.Installers.CA.dll' DllEntry='UninstallService' Return='check' Execute='immediate' />
     <CustomAction Id='StartService' BinaryKey='Waher.IoTGateway.Installers.CA.dll' DllEntry='StartService' Return='check' Execute='immediate' />
@@ -1114,12 +1096,10 @@
     <CustomAction Id='CreateEventSource' BinaryKey='Waher.IoTGateway.Installers.CA.dll' DllEntry='CreateEventSource' Return='check' Execute='immediate' />
     <CustomAction Id='DeleteEventSource' BinaryKey='Waher.IoTGateway.Installers.CA.dll' DllEntry='DeleteEventSource' Return='check' Execute='immediate' />
     <CustomAction Id='OpenLocalhost' BinaryKey='Waher.IoTGateway.Installers.CA.dll' DllEntry='OpenLocalhost' Return='check' Execute='immediate' />
-    <CustomAction Id='CheckXmppConfigExists' BinaryKey='Waher.IoTGateway.Installers.CA.dll' DllEntry='CheckXmppConfigExists' Return='check' Execute='immediate' />
     <InstallExecuteSequence>
       <LaunchConditions After='AppSearch' />
       <RemoveExistingProducts After='InstallFinalize' />
       <Custom Action='CreateEventSource' Before='InstallFinalize'>NOT Installed</Custom>
-      <Custom Action='CreateXmppConfigFile' Before='InstallAndStartService'>(NOT Installed) AND (XmppConfigExists="0")</Custom>
       <!--
 			<Custom Action='DisableHttpService' Before='InstallAndStartService'>NOT Installed</Custom>
 			-->

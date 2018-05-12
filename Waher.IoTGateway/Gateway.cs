@@ -73,20 +73,6 @@ namespace Waher.IoTGateway
 	public delegate Task<IDatabaseProvider> GetDatabaseProviderEventHandler(XmlElement Definition);
 
 	/// <summary>
-	/// Delegate for callback methods used for retrieval of XMPP Client credentials.
-	/// </summary>
-	/// <param name="XmppConfigFileName">XMPP Config file name.</param>
-	/// <returns>XMPP Client Credentials.</returns>
-	public delegate Task<XmppCredentials> GetXmppClientCredentialsEventHandler(string XmppConfigFileName);
-
-	/// <summary>
-	/// Delegate for callback methods used to persist updated XMPP Client credentials.
-	/// </summary>
-	/// <param name="XmppConfigFileName">XMPP Config file name.</param>
-	/// <param name="Credentials">XMPP Client Credentials.</param>
-	public delegate Task XmppClientCredentialsUpdatedEventHandler(string XmppConfigFileName, XmppCredentials Credentials);
-
-	/// <summary>
 	/// Delegate for registration callback methods.
 	/// </summary>
 	/// <param name="MetaData">Meta data used in registration.</param>
@@ -108,12 +94,6 @@ namespace Waher.IoTGateway
 	public delegate Task<IDataSource[]> GetDataSources(params IDataSource[] DataSources);
 
 	/// <summary>
-	/// Delegate for XMPP Credential export callback methods.
-	/// </summary>
-	/// <param name="Credentials">XMPP Credentials</param>
-	public delegate void ExportXmppCredentialsEventHandler(XmppCredentials Credentials);
-
-	/// <summary>
 	/// Static class managing the runtime environment of the IoT Gateway.
 	/// </summary>
 	public static class Gateway
@@ -127,7 +107,6 @@ namespace Waher.IoTGateway
 		private static ThingRegistryClient thingRegistryClient = null;
 		private static ProvisioningClient provisioningClient = null;
 		private static XmppCredentials xmppCredentials = null;
-		private static string xmppConfigFileName = string.Empty;
 		private static XmppClient xmppClient = null;
 		private static Networking.XMPP.InBandBytestreams.IbbClient ibbClient = null;
 		private static Networking.XMPP.P2P.SOCKS5.Socks5Proxy socksProxy = null;
@@ -152,6 +131,7 @@ namespace Waher.IoTGateway
 		private static bool registered = false;
 		private static bool connected = false;
 		private static bool immediateReconnect;
+		private static bool consoleOutput;
 
 		#region Life Cycle
 
@@ -179,6 +159,7 @@ namespace Waher.IoTGateway
 
 			try
 			{
+				consoleOutput = ConsoleOutput;
 				appDataFolder = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
 				if (!appDataFolder.EndsWith(new string(Path.DirectorySeparatorChar, 1)))
 					appDataFolder += Path.DirectorySeparatorChar;
@@ -632,7 +613,7 @@ namespace Waher.IoTGateway
 			return true;
 		}
 
-		internal static async Task ConfigureXmpp(XmppConfiguration Configuration)
+		internal static Task ConfigureXmpp(XmppConfiguration Configuration)
 		{
 			xmppCredentials = Configuration.GetCredentials();
 			xmppClient = new XmppClient(xmppCredentials, "en", typeof(Gateway).Assembly);
@@ -643,7 +624,7 @@ namespace Waher.IoTGateway
 			{
 				ISniffer Sniffer;
 
-				if (ConsoleOutput)
+				if (consoleOutput)
 				{
 					Sniffer = new ConsoleOutSniffer(BinaryPresentationMethod.ByteCount, LineEnding.PadWithSpaces);
 					xmppClient.Add(Sniffer);
@@ -688,6 +669,8 @@ namespace Waher.IoTGateway
 
 			socksProxy = new Networking.XMPP.P2P.SOCKS5.Socks5Proxy(xmppClient);
 			Types.SetModuleParameter("SOCKS5", socksProxy);
+
+			return Task.CompletedTask;
 		}
 
 		private static async void DeleteOldDataSourceEvents(object P)
@@ -708,11 +691,6 @@ namespace Waher.IoTGateway
 		/// Event raised when the Gateway requires its database provider from the host.
 		/// </summary>
 		public static event GetDatabaseProviderEventHandler GetDatabaseProvider = null;
-
-		/// <summary>
-		/// Event raised when the Gateway requires its XMPP Client Credentials from the host.
-		/// </summary>
-		public static event GetXmppClientCredentialsEventHandler GetXmppClientCredentials = null;
 
 		/// <summary>
 		/// Event raised when the Gateway requires a set of data sources to publish.
@@ -1194,16 +1172,15 @@ namespace Waher.IoTGateway
 				xmppCredentials.FormSignatureKey = string.Empty;
 				xmppCredentials.FormSignatureSecret = string.Empty;
 
-				XmppCredentialsUpdated?.Invoke(xmppConfigFileName, xmppCredentials);
+				XmppConfiguration.Instance.Account = UserName;
+				XmppConfiguration.Instance.Password = PasswordHash;
+				XmppConfiguration.Instance.PasswordType = PasswordHashMethod;
+
+				await Database.Update(XmppConfiguration.Instance);
 			}
 
 			return LoginResult.Successful;
 		}
-
-		/// <summary>
-		/// Event raised when credentials have been updated.
-		/// </summary>
-		public static event XmppClientCredentialsUpdatedEventHandler XmppCredentialsUpdated = null;
 
 		#endregion
 
@@ -1300,22 +1277,6 @@ namespace Waher.IoTGateway
 		public static CoapEndpoint CoapEndpoint
 		{
 			get { return coapEndpoint; }
-		}
-
-		/// <summary>
-		/// Exports current XMPP Credentials.
-		/// </summary>
-		/// <param name="Callback">Method to call when credentials are available.</param>
-		public static async Task Export(ExportXmppCredentialsEventHandler Callback)
-		{
-			XmppCredentials Credentials;
-
-			if (GetXmppClientCredentials != null)
-				Credentials = await GetXmppClientCredentials(xmppConfigFileName);
-			else
-				throw new Exception("XMPP Client Credentials not provided. Make sure the GetXmppClientCredentials event has an appropriate event handler.");
-
-			Callback?.Invoke(Credentials);
 		}
 
 

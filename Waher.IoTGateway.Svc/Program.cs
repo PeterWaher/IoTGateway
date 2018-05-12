@@ -8,7 +8,6 @@ using System.Xml;
 using Waher.Content;
 using Waher.Events;
 using Waher.Events.Console;
-using Waher.Mock;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Provisioning;
 using Waher.Persistence;
@@ -306,9 +305,7 @@ namespace Waher.IoTGateway.Svc
 				Log.Register(new ConsoleEventSink(false));
 
 				Gateway.GetDatabaseProvider += GetDatabase;
-				Gateway.GetXmppClientCredentials += GetXmppClientCredentialsAsConsole;
-				Gateway.XmppCredentialsUpdated += XmppCredentialsUpdated;
-				Gateway.RegistrationSuccessful += RegistrationSuccessfulAsConsole;
+				Gateway.RegistrationSuccessful += RegistrationSuccessful;
 
 				if (!Gateway.Start(true).Result)
 				{
@@ -372,50 +369,7 @@ namespace Waher.IoTGateway.Svc
 				Encrypted, false, true));
 		}
 
-		internal static Task<XmppCredentials> GetXmppClientCredentialsAsConsole(string XmppConfigFileName)
-		{
-			return Task.FromResult<XmppCredentials>(SimpleXmppConfiguration.GetConfigUsingSimpleConsoleDialog(XmppConfigFileName,
-				Guid.NewGuid().ToString().Replace("-", string.Empty),   // Default user name.
-				Guid.NewGuid().ToString().Replace("-", string.Empty),   // Default password.
-				typeof(Gateway).Assembly));
-		}
-
-		internal static Task<XmppCredentials> GetXmppClientCredentialsAsService(string XmppConfigFileName)
-		{
-			XmppCredentials Result;
-
-			if (File.Exists(XmppConfigFileName))
-			{
-				Result = SimpleXmppConfiguration.Load(XmppConfigFileName);
-				RuntimeSettings.Set("XMPP.CONFIG", SimpleXmppConfiguration.ExportSimpleXmppConfiguration(Result));
-			}
-			else
-			{
-				string XmppConfig = RuntimeSettings.Get("XMPP.CONFIG", string.Empty);
-				XmlDocument Doc = new XmlDocument();
-				Doc.LoadXml(XmppConfig);
-				Result = SimpleXmppConfiguration.Load(Doc);
-			}
-
-			return Task.FromResult<XmppCredentials>(Result);
-		}
-
-		internal static Task XmppCredentialsUpdated(string XmppConfigFileName, XmppCredentials Credentials)
-		{
-			SimpleXmppConfiguration.SaveSimpleXmppConfiguration(XmppConfigFileName, Credentials);
-			return Task.CompletedTask;
-		}
-
-		internal static Task RegistrationSuccessfulAsConsole(MetaDataTag[] MetaData, RegistrationEventArgs e)
-		{
-			if (!e.IsClaimed && Types.TryGetModuleParameter("Registry", out object Obj) && Obj is ThingRegistryClient ThingRegistryClient)
-				SimpleXmppConfiguration.PrintQRCode(ThingRegistryClient.EncodeAsIoTDiscoURI(MetaData));
-
-			return RegistrationSuccessfulAsService(MetaData, e);
-
-		}
-
-		internal static async Task RegistrationSuccessfulAsService(MetaDataTag[] MetaData, RegistrationEventArgs e)
+		internal static async Task RegistrationSuccessful(MetaDataTag[] MetaData, RegistrationEventArgs e)
 		{
 			if (!e.IsClaimed && Types.TryGetModuleParameter("Registry", out object Obj) && Obj is ThingRegistryClient ThingRegistryClient)
 			{

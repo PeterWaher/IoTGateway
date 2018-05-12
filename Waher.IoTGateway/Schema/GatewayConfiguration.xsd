@@ -27,19 +27,6 @@
             </xs:attribute>
           </xs:complexType>
         </xs:element>
-        <xs:element name="XmppClient">
-          <xs:complexType>
-            <xs:annotation>
-              <xs:documentation>Information about how to setup a XMPP client connection to the XMPP network.</xs:documentation>
-            </xs:annotation>
-            <xs:attribute name="configFileName" use="required">
-              <xs:annotation>
-                <xs:documentation>Configuration file will be read and deleted after contents has been stored in the internal encrypted persistence layer.</xs:documentation>
-                <xs:documentation>To update settings, create a new file and restart the gateway.</xs:documentation>
-              </xs:annotation>
-            </xs:attribute>
-          </xs:complexType>
-        </xs:element>
         <xs:element name="DefaultPage" type="xs:string">
           <xs:annotation>
             <xs:documentation>Default web page.</xs:documentation>

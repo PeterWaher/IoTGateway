@@ -2579,7 +2579,7 @@
           "Waher.Script": "1.0.11"
         }
       },
-      "Waher.Security/1.0.1": {
+      "Waher.Security/1.0.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -5157,7 +5157,7 @@
           "Waher.Script": "1.0.11"
         }
       },
-      "Waher.Security/1.0.1": {
+      "Waher.Security/1.0.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -7771,7 +7771,7 @@
           "Waher.Script": "1.0.11"
         }
       },
-      "Waher.Security/1.0.1": {
+      "Waher.Security/1.0.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -10358,7 +10358,7 @@
           "Waher.Script": "1.0.11"
         }
       },
-      "Waher.Security/1.0.1": {
+      "Waher.Security/1.0.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -12981,7 +12981,7 @@
           "Waher.Script": "1.0.11"
         }
       },
-      "Waher.Security/1.0.1": {
+      "Waher.Security/1.0.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -15568,7 +15568,7 @@
           "Waher.Script": "1.0.11"
         }
       },
-      "Waher.Security/1.0.1": {
+      "Waher.Security/1.0.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -18191,7 +18191,7 @@
           "Waher.Script": "1.0.11"
         }
       },
-      "Waher.Security/1.0.1": {
+      "Waher.Security/1.0.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -28057,7 +28057,7 @@
       "path": "../../Script/Waher.Script.Graphs/Waher.Script.Graphs.csproj",
       "msbuildProject": "../../Script/Waher.Script.Graphs/Waher.Script.Graphs.csproj"
     },
-    "Waher.Security/1.0.1": {
+    "Waher.Security/1.0.2": {
       "type": "project",
       "path": "../../Security/Waher.Security/Waher.Security.csproj",
       "msbuildProject": "../../Security/Waher.Security/Waher.Security.csproj"
@@ -28070,8 +28070,7 @@
     "UAP,Version=v10.0.10586": []
   },
   "packageFolders": {
-    "C:\\Users\\Peter\\.nuget\\packages\\": {},
-    "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackagesFallback\\": {}
+    "C:\\Users\\Peter\\.nuget\\packages\\": {}
   },
   "project": {
     "restore": {
@@ -28082,13 +28081,9 @@
       "packagesPath": "C:\\Users\\Peter\\.nuget\\packages\\",
       "outputPath": "C:\\My Projects\\IoTGateway\\Content\\Waher.Content.Markdown.Web.UWP\\obj\\",
       "projectStyle": "ProjectJson",
-      "fallbackFolders": [
-        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackagesFallback\\"
-      ],
       "configFilePaths": [
         "C:\\Users\\Peter\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.Fallback.config"
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},

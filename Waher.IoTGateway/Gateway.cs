@@ -269,6 +269,7 @@ namespace Waher.IoTGateway
 					else
 					{
 						SystemConfigurations[s] = SystemConfiguration;
+						SystemConfigurationTypes.Remove(s);
 
 						if (!SystemConfiguration.Complete)
 							Configured = false;
@@ -612,6 +613,8 @@ namespace Waher.IoTGateway
 
 			return true;
 		}
+
+		internal static bool ConsoleOutput => consoleOutput;
 
 		internal static Task ConfigureXmpp(XmppConfiguration Configuration)
 		{

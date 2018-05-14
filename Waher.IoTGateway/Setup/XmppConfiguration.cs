@@ -3,16 +3,21 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Net.Security;
+using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Xml;
 using System.Threading.Tasks;
+using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Networking.HTTP;
+using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP;
+using Waher.Networking.XMPP.ServiceDiscovery;
 using Waher.Persistence;
 using Waher.Persistence.Attributes;
+using Waher.Security;
 
 namespace Waher.IoTGateway.Setup
 {
@@ -44,16 +49,23 @@ namespace Waher.IoTGateway.Setup
 		private int port = XmppCredentials.DefaultPort;
 		private string boshUrl = string.Empty;
 		private string account = string.Empty;
+		private string accountHumanReadableName = string.Empty;
 		private string password = string.Empty;
 		private string passwordType = string.Empty;
 		private string thingRegistry = string.Empty;
 		private string provisioning = string.Empty;
 		private string events = string.Empty;
+		private string pubSub = string.Empty;
 		private bool sniffer = false;
 		private bool trustServer = false;
 		private bool allowInsecureMechanisms = false;
 		private bool storePasswordInsteadOfHash = false;
 		private bool customBinding = false;
+		private bool offlineMessages = false;
+		private bool blocking = false;
+		private bool reporting = false;
+		private bool abuse = false;
+		private bool spam = false;
 
 		private XmppClient client = null;
 		private bool createAccount = false;
@@ -134,6 +146,15 @@ namespace Waher.IoTGateway.Setup
 		}
 
 		/// <summary>
+		/// Human readable account name, if any.
+		/// </summary>
+		public string AccountHumanReadableName
+		{
+			get { return this.accountHumanReadableName; }
+			set { this.accountHumanReadableName = value; }
+		}
+
+		/// <summary>
 		/// JID of Thing Registry.
 		/// </summary>
 		[DefaultValueStringEmpty]
@@ -161,6 +182,16 @@ namespace Waher.IoTGateway.Setup
 		{
 			get { return this.events; }
 			set { this.events = value; }
+		}
+
+		/// <summary>
+		/// JID of publish/subscribe component.
+		/// </summary>
+		[DefaultValueStringEmpty]
+		public string PubSub
+		{
+			get { return this.pubSub; }
+			set { this.pubSub = value; }
 		}
 
 		/// <summary>
@@ -214,6 +245,56 @@ namespace Waher.IoTGateway.Setup
 		}
 
 		/// <summary>
+		/// If offline messages are supported by the server.
+		/// </summary>
+		[DefaultValue(false)]
+		public bool OfflineMessages
+		{
+			get { return this.offlineMessages; }
+			set { this.offlineMessages = value; }
+		}
+
+		/// <summary>
+		/// If blocking accounts is supported by the server.
+		/// </summary>
+		[DefaultValue(false)]
+		public bool Blocking
+		{
+			get { return this.blocking; }
+			set { this.blocking = value; }
+		}
+
+		/// <summary>
+		/// If reporting is supported by the server.
+		/// </summary>
+		[DefaultValue(false)]
+		public bool Reporting
+		{
+			get { return this.reporting; }
+			set { this.reporting = value; }
+		}
+
+		/// <summary>
+		/// If reporting abuse is supported by the server.
+		/// </summary>
+		[DefaultValue(false)]
+		public bool Abuse
+		{
+			get { return this.abuse; }
+			set { this.abuse = value; }
+		}
+
+		/// <summary>
+		/// If reporting spam is supported by the server.
+		/// </summary>
+		[DefaultValue(false)]
+		public bool Spam
+		{
+			get { return this.spam; }
+			set { this.spam = value; }
+		}
+
+		/// <summary>
 		/// If an account can be created.
 		/// </summary>
 		[IgnoreMember]
@@ -256,6 +337,7 @@ namespace Waher.IoTGateway.Setup
 
 			WebServer.Register("/Settings/ConnectToHost", null, this.ConnectToHost, true, false, true);
 			WebServer.Register("/Settings/XmppComplete", null, this.XmppComplete, true, false, true);
+			WebServer.Register("/Settings/RandomizePassword", null, this.RandomizePassword, true, false, true);
 
 			return Result;
 		}
@@ -282,7 +364,13 @@ namespace Waher.IoTGateway.Setup
 			if (!Parameters.TryGetValue("boshUrl", out Obj) || !(Obj is string BoshUrl))
 				throw new BadRequestException();
 
+			if (!Parameters.TryGetValue("customBinding", out Obj) || !(Obj is bool CustomBinding))
+				throw new BadRequestException();
+
 			if (!Parameters.TryGetValue("trustServer", out Obj) || !(Obj is bool TrustServer))
+				throw new BadRequestException();
+
+			if (!Parameters.TryGetValue("sniffer", out Obj) || !(Obj is bool Sniffer))
 				throw new BadRequestException();
 
 			if (!Parameters.TryGetValue("transport", out Obj) || !(Obj is string s2) || !Enum.TryParse<XmppTransportMethod>(s2, out XmppTransportMethod Method))
@@ -297,13 +385,19 @@ namespace Waher.IoTGateway.Setup
 			if (!Parameters.TryGetValue("createAccount", out Obj) || !(Obj is bool CreateAccount))
 				throw new BadRequestException();
 
+			if (!Parameters.TryGetValue("accountName", out Obj) || !(Obj is string AccountName))
+				throw new BadRequestException();
+
 			this.host = HostName;
 			this.port = Port;
 			this.boshUrl = BoshUrl.Trim();
+			this.customBinding = CustomBinding;
 			this.trustServer = TrustServer;
+			this.sniffer = Sniffer;
 			this.transportMethod = Method;
 			this.account = Account;
 			this.createAccount = CreateAccount;
+			this.accountHumanReadableName = AccountName;
 
 			if (this.password != Password)
 			{
@@ -329,6 +423,19 @@ namespace Waher.IoTGateway.Setup
 			await this.MakeCompleted();
 		}
 
+		private void RandomizePassword(HttpRequest Request, HttpResponse Response)
+		{
+			using (RandomNumberGenerator Gen = RandomNumberGenerator.Create())
+			{
+				byte[] Bin = new byte[32];
+				Gen.GetBytes(Bin);
+
+				Response.StatusCode = 200;
+				Response.ContentType = "text/plain";
+				Response.Write(Hashes.BinaryToString(Bin));
+			}
+		}
+
 		/// <summary>
 		/// Gets connection credentials.
 		/// </summary>
@@ -343,6 +450,7 @@ namespace Waher.IoTGateway.Setup
 				Password = this.password,
 				PasswordType = this.passwordType,
 				TrustServer = this.trustServer,
+				Sniffer = this.sniffer,
 				AllowEncryption = true,
 				AllowCramMD5 = this.allowInsecureMechanisms,
 				AllowDigestMD5 = this.allowInsecureMechanisms,
@@ -376,20 +484,37 @@ namespace Waher.IoTGateway.Setup
 			this.client.SetTag("EncyptionSuccessful", false);
 			this.client.SetTag("StartedAuthentication", false);
 
+			if (this.sniffer)
+			{
+				ISniffer Sniffer;
+
+				if (Gateway.ConsoleOutput)
+				{
+					Sniffer = new ConsoleOutSniffer(BinaryPresentationMethod.ByteCount, LineEnding.PadWithSpaces);
+					this.client.Add(Sniffer);
+				}
+
+				Sniffer = new XmlFileSniffer(Gateway.AppDataFolder + "XMPP" + Path.DirectorySeparatorChar +
+					"XMPP Log %YEAR%-%MONTH%-%DAY%T%HOUR%.xml",
+					Gateway.AppDataFolder + "Transforms" + Path.DirectorySeparatorChar + "SnifferXmlToHtml.xslt",
+					7, BinaryPresentationMethod.ByteCount);
+				this.client.Add(Sniffer);
+			}
+
 			this.client.OnStateChanged += Client_OnStateChanged;
 			this.client.Connect();
 		}
 
 		private async void Client_OnStateChanged(object Sender, XmppState NewState)
 		{
+			if (!(Sender is XmppClient Client))
+				return;
+
+			if (!Client.TryGetTag("TabID", out object Obj) || !(Obj is string TabID))
+				return;
+
 			try
 			{
-				if (!(Sender is XmppClient Client))
-					return;
-
-				if (!Client.TryGetTag("TabID", out object Obj) || !(Obj is string TabID))
-					return;
-
 				string Msg;
 
 				switch (NewState)
@@ -413,11 +538,93 @@ namespace Waher.IoTGateway.Setup
 						break;
 
 					case XmppState.Binding:
-						Msg = "Binds to resource.";
+						Msg = "Binding to resource.";
 						break;
 
 					case XmppState.Connected:
-						ClientEvents.PushEvent(new string[] { TabID }, "ConnectionOK1", "Connection successful.", false);
+						if (this.createAccount && !string.IsNullOrEmpty(this.accountHumanReadableName))
+						{
+							ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Setting vCard.", false);
+
+							StringBuilder Xml = new StringBuilder();
+
+							Xml.Append("<vCard xmlns='vcard-temp'>");
+							Xml.Append("<FN>");
+							Xml.Append(XML.Encode(this.accountHumanReadableName));
+							Xml.Append("</FN>");
+							Xml.Append("<JABBERID>");
+							Xml.Append(XML.Encode(this.client.BareJID));
+							Xml.Append("</JABBERID>");
+							Xml.Append("</vCard>");
+
+							await Client.IqSetAsync(this.client.BareJID, Xml.ToString());
+						}
+
+						ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Checking server features.", false);
+
+						ServiceDiscoveryEventArgs e = await Client.ServiceDiscoveryAsync(null, string.Empty, string.Empty);
+
+						this.offlineMessages = false;
+						this.blocking = false;
+						this.reporting = false;
+						this.abuse = false;
+						this.spam = false;
+
+						if (e.Ok)
+						{
+							this.offlineMessages = e.HasFeature("msgoffline");
+							this.blocking = e.HasFeature(Networking.XMPP.Abuse.AbuseClient.NamespaceBlocking);
+							this.reporting = e.HasFeature(Networking.XMPP.Abuse.AbuseClient.NamespaceReporting);
+							this.abuse = e.HasFeature(Networking.XMPP.Abuse.AbuseClient.NamespaceAbuseReason);
+							this.spam = e.HasFeature(Networking.XMPP.Abuse.AbuseClient.NamespaceSpamReason);
+						}
+
+						ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Checking server components.", false);
+
+						ServiceItemsDiscoveryEventArgs e2 = await Client.ServiceItemsDiscoveryAsync(null, string.Empty, string.Empty);
+
+						this.thingRegistry = string.Empty;
+						this.provisioning = string.Empty;
+						this.events = string.Empty;
+						this.pubSub = string.Empty;
+
+						if (e2.Ok)
+						{
+							foreach (Item Item in e2.Items)
+							{
+								ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Checking component features for " + Item.JID, false);
+
+								e = await Client.ServiceDiscoveryAsync(null, Item.JID, string.Empty);
+
+								if (e.HasFeature(Networking.XMPP.Provisioning.ThingRegistryClient.NamespaceDiscovery))
+									this.thingRegistry = Item.JID;
+
+								if (e.HasFeature(Networking.XMPP.Provisioning.ProvisioningClient.NamespaceProvisioningDevice))
+									this.provisioning = Item.JID;
+
+								if (e.HasFeature(Networking.XMPP.PubSub.PubSubClient.NamespacePubSub))
+									this.pubSub = Item.JID;
+
+								if (e.HasFeature(Waher.Events.XMPP.XmppEventSink.NamespaceEventLogging))
+									this.events = Item.JID;
+							}
+						}
+
+						Dictionary<string, object> ConnectionInfo = new Dictionary<string, object>()
+						{
+							{ "msg", "Connection successful." },
+							{ "offlineMsg", this.offlineMessages },
+							{ "blocking", this.blocking },
+							{ "reporting", this.reporting },
+							{ "abuse", this.abuse },
+							{ "spam", this.spam },
+							{ "thingRegistry", this.thingRegistry },
+							{ "provisioning", this.provisioning },
+							{ "eventLog", this.events },
+							{ "pubSub", this.pubSub }
+						};
+
+						ClientEvents.PushEvent(new string[] { TabID }, "ConnectionOK1", JSON.Encode(ConnectionInfo, false), true);
 
 						this.client.Dispose();
 						this.client = null;
@@ -512,11 +719,17 @@ namespace Waher.IoTGateway.Setup
 						}
 						else
 						{
-							if (Client.TryGetTag("StartedAuthentication", out Obj) && Obj is bool b && b)
-								ClientEvents.PushEvent(new string[] { TabID }, "ShowFail1", "", false);
-
 							Msg = "Unable to connect properly.";
 							Error = true;
+
+							if (Client.TryGetTag("StartedAuthentication", out Obj) && Obj is bool b && b)
+							{
+								if (this.createAccount)
+									ClientEvents.PushEvent(new string[] { TabID }, "ShowFail2", Msg, false);
+								else
+									ClientEvents.PushEvent(new string[] { TabID }, "ShowFail1", Msg, false);
+								return;
+							}
 						}
 
 						if (Error)
@@ -573,6 +786,7 @@ namespace Waher.IoTGateway.Setup
 			catch (Exception ex)
 			{
 				Log.Critical(ex);
+				ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", ex.Message, false);
 			}
 		}
 

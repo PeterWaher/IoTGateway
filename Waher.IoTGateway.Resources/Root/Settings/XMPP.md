@@ -30,6 +30,8 @@ own XMPP server. [xmpp.org](https://xmpp.org/software/servers.html) publishes an
 	value="{{ConfigClass:=Waher.IoTGateway.Setup.XmppConfiguration;Config:=ConfigClass.Instance;Config.Host}}" {{Config.Step=0 ? "autofocus" : ""}}/>
 </p>
 
+<p id="XmppServerError" class="error" style="display:none">You must select an XMPP server.</p>
+
 Featured servers:
 
 <div class="featuredServers">
@@ -52,6 +54,11 @@ Featured servers:
 </p>
 
 <p>
+<input type="checkbox" name="Sniffer" id="Sniffer" title="If XMPP communication is to be logged." {{Config.Sniffer ? "checked" : ""}} />
+<label for="Sniffer">Log XMPP communication to the application data folder.</label>
+</p>
+
+<p>
 <label for="Transport">Transport:</label>  
 <select id="Transport" name="Transport" style="width:auto" onchange="ToggleTransport()">
 <option value="C2S"{{(TransportMethod:=Config.TransportMethod.ToString())="C2S" ? " selected" : ""}}>TCP</option>
@@ -64,6 +71,7 @@ Featured servers:
 <label for="Port">Port:</label>  
 <input id="Port" name="Port" type="number" min="1" max="65535" style="width:20em" value="{{Config.Port}}" />
 </p>
+<p id="PortError" class="error" style="display:none">Invalid port number.</p>
 </div>
 
 <div id="BOSH" style="display:{{TransportMethod="BOSH" ? "block" : "none"}}">
@@ -71,6 +79,7 @@ Featured servers:
 <label for="BoshUrl">URL:</label>  
 <input id="BoshUrl" name="BoshUrl" type="url" style="width:40em" value="{{Config.BoshUrl}}" />
 </p>
+<p id="BoshUrlError" class="error" style="display:none">You must provide a URL to connect to.</p>
 </div>
 
 </div>
@@ -91,8 +100,11 @@ Good. Successfully connected to server. Now, please provide user credentials.
 <input id="Password" name="Password" type="password" style="width:20em" value="{{Config.Password}}" />
 </p>
 
-<p id="Fail1" class="message" style="display:none">
+<p id="Fail1" class="error" style="display:none">
 Account does not exist or password is incorrect. If the account does not exist, you can try to create it by checking the box below.
+</p>
+<p id="Fail2" class="error" style="display:none">
+Password is incorrect, or a new account was not permitted to be created.
 </p>
 
 <p>
@@ -105,15 +117,40 @@ Account does not exist or password is incorrect. If the account does not exist, 
 <p>
 <label for="Password2">Repeat password:</label>  
 <input id="Password2" name="Password2" type="password" style="width:20em" value="{{Config.Password}}" />
+<button type='button' onclick='RandomizePassword()'>Randomize password</button>
+</p>
+<p id="Password2Error" class="error" style="display:none">Passwords do not match.</p>
+
+<p>
+<label for="AccountName">Readable name:</label>  
+<input id="AccountName" name="AccountName" type="text" style="width:20em" value="{{Config.AccountHumanReadableName}}" />
 </p>
 
 </div>
 </div>
 
-Press the Connect button to try the connection.
+<p id="ConnectMessage">Press the Connect button to try the connection.</p>
+<p id="ConnectError" class="error" style="display:none">Unable to connect to the server. Please verify your connection details and try again.</p>
+<p id="NextMessage" class="message" style="display:none">Connection successful. Press the Next button to save settings and continue.</p>
 
 <button type='button' onclick='ConnectToHost()'>Connect</button>
 <button id='NextButton' type='button' onclick='Next()' style='display:{{Config.Step>1 ? "inline" : "none"}}'>Next</button>
+
+</fieldset>
+
+<fieldset id="ServerFeatures" style="display:{{Config.Step>1 ? "block" : "none"}}">
+<legend>Server features</legend>
+
+| Feature | Support | JID |
+|:--------|:-------:|:---:|
+| Offline messages | <span id="OfflineMessages">{{Config.OfflineMessages ? "✓" : ""}}</span> | N/A |
+| Blocking | <span id="Blocking">{{Config.Blocking ? "✓" : ""}}</span> | N/A |
+| Reporting | <span id="Reporting">{{Config.Reporting ? "✓" : ""}}</span> | N/A |
+| Abuse reporting | <span id="AbuseReporting">{{Config.Abuse ? "✓" : ""}}</span> | N/A |
+| Spam reporting | <span id="SpamReporting">{{Config.Spam? "✓" : ""}}</span> | N/A |
+| Thing Registry | <span id="ThingRegistry">{{empty(Config.ThingRegistry) ? "" : "✓"}}</span> | <span id="ThingRegistryJID">{{Config.ThingRegistry}}</span> |
+| Provisioning | <span id="Provisioning">{{empty(Config.Provisioning) ? "" : "✓"}}</span> | <span id="ProvisioningJID">{{Config.Provisioning}}</span> |
+| Publish/Subscribe | <span id="PubSub">{{empty(Config.PubSub) ? "" : "✓"}}</span> | <span id="PubSubJID">{{Config.PubSub}}</span> |
 
 </fieldset>
 

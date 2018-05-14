@@ -7,10 +7,22 @@
 
 function ConnectToHost()
 {
+    document.getElementById("XmppServerError").style.display = "none";
+    document.getElementById("PortError").style.display = "none";
+    document.getElementById("BoshUrlError").style.display = "none";
+    document.getElementById("Password2Error").style.display = "none";
+    document.getElementById("ConnectError").style.display = "none";
+    document.getElementById("NextMessage").style.display = "none";
+    document.getElementById("Fail1").style.display = "none";
+    document.getElementById("Fail2").style.display = "none";
+    document.getElementById("ServerFeatures").style.display = "none";
+    document.getElementById("ConnectMessage").style.display = "block";
+
     var Host = GetInputValue("XmppServer");
-    if (Host == "")
+    if (Host === "")
     {
-        window.alert("You must select an XMPP server.");
+        document.getElementById("XmppServer").focus();
+        document.getElementById("XmppServerError").style.display = "block";
         return;
     }
 
@@ -23,15 +35,17 @@ function ConnectToHost()
         case "C2S":
             if (Port < 1 || Port > 65536)
             {
-                window.alert("Invalid port number.");
+                document.getElementById("Port").focus();
+                document.getElementById("PortError").style.display = "block";
                 return;
             }
             break;
 
         case "BOSH":
-            if (BoshUrl == "")
+            if (BoshUrl === "")
             {
-                window.alert("You must provide a URL to connect to.");
+                document.getElementById("BoshUrl").focus();
+                document.getElementById("BoshUrlError").style.display = "block";
                 return;
             }
             break;
@@ -41,28 +55,30 @@ function ConnectToHost()
     var Password = GetInputValue("Password");
     var CreateAccount = GetInputChecked("CreateAccount");
     var Password2 = GetInputValue("Password2");
+    var AccountName = GetInputValue("AccountName");
 
-    if (CreateAccount && Password != Password2)
+    if (CreateAccount && Password !== Password2)
     {
-        window.alert("Passwords do not match.");
+        document.getElementById("Password2").focus();
+        document.getElementById("Password2Error").style.display = "block";
         return;
     }
 
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function ()
     {
-        if (xhttp.readyState == 4)
+        if (xhttp.readyState === 4)
         {
-            if (xhttp.status != 200)
+            if (xhttp.status !== 200)
                 ShowError(xhttp);
-        };
-    }
+        }
+    };
 
     document.getElementById("Status").innerHTML = "";
     document.getElementById("ConnectionStatus").style.display = 'block';
     document.getElementById("Success0").style.display = 'none';
 
-    xhttp.open("POST", "ConnectToHost", true);
+    xhttp.open("POST", "/Settings/ConnectToHost", true);
     xhttp.setRequestHeader("Content-Type", "application/json");
     xhttp.setRequestHeader("X-TabID", TabID);
     xhttp.send(JSON.stringify({
@@ -73,7 +89,10 @@ function ConnectToHost()
         "account": Account,
         "password": Password,
         "createAccount": CreateAccount,
-        "trustServer": GetInputChecked("TrustServer")
+        "accountName": AccountName,
+        "customBinding": GetInputChecked("Custom"),
+        "trustServer": GetInputChecked("TrustServer"),
+        "sniffer": GetInputChecked("Sniffer")
     }));
 }
 
@@ -82,21 +101,49 @@ function Next()
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function ()
     {
-        if (xhttp.readyState == 4)
+        if (xhttp.readyState === 4)
         {
-            if (xhttp.status != 200)
+            if (xhttp.status !== 200)
                 ShowError(xhttp);
-        };
-    }
+        }
+    };
 
-    xhttp.open("POST", "XmppComplete", true);
+    xhttp.open("POST", "/Settings/XmppComplete", true);
+    xhttp.send("");
+}
+
+function RandomizePassword()
+{
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function ()
+    {
+        if (xhttp.readyState === 4)
+        {
+            if (xhttp.status === 200)
+            {
+                var Input = document.getElementById("Password");
+
+                Input.value = xhttp.responseText;
+                Input.type = "text";
+
+                Input = document.getElementById("Password2");
+
+                Input.value = xhttp.responseText;
+                Input.type = "text";
+            }
+            else
+                ShowError(xhttp);
+        }
+    };
+
+    xhttp.open("POST", "/Settings/RandomizePassword", true);
     xhttp.send("");
 }
 
 function GetInputValue(Id)
 {
     var Element = document.getElementById(Id);
-    if (Element == null)
+    if (Element === null)
         return null;
 
     return Element.value;
@@ -105,7 +152,7 @@ function GetInputValue(Id)
 function GetInputChecked(Id)
 {
     var Element = document.getElementById(Id);
-    if (Element == null)
+    if (Element === null)
         return null;
 
     return Element.checked;
@@ -114,7 +161,7 @@ function GetInputChecked(Id)
 function SetInputValue(Id, Value)
 {
     var Element = document.getElementById(Id);
-    if (Element != null)
+    if (Element !== null)
         Element.value = Value;
 }
 
@@ -140,8 +187,8 @@ function ShowCustomProperties(Data)
 function ToggleTransport()
 {
     var Transport = document.getElementById("Transport").value;
-    document.getElementById("C2S").style.display = (Transport == "C2S" ? "block" : "none");
-    document.getElementById("BOSH").style.display = (Transport == "BOSH" ? "block" : "none");
+    document.getElementById("C2S").style.display = Transport === "C2S" ? "block" : "none";
+    document.getElementById("BOSH").style.display = Transport === "BOSH" ? "block" : "none";
 }
 
 function ShowTransport(Data)
@@ -153,12 +200,19 @@ function ShowTransport(Data)
 function ToggleCreateAccount()
 {
     var CreateAccount = document.getElementById("CreateAccount").checked;
-    document.getElementById("Create").style.display = (CreateAccount ? "block" : "none");
+    document.getElementById("Create").style.display = CreateAccount ? "block" : "none";
 }
 
 function ShowFail1(data)
 {
+    ShowStatus(data);
     document.getElementById("Fail1").style.display = "block";
+}
+
+function ShowFail2(data)
+{
+    ShowStatus(data);
+    document.getElementById("Fail2").style.display = "block";
 }
 
 function ConnectionOK0(data)
@@ -172,17 +226,32 @@ function ConnectionOK0(data)
 
 function ConnectionOK1(data)
 {
-    ShowStatus(data);
+    ShowStatus(data.msg);
     document.getElementById("NextButton").style.display = "inline";
-    window.alert("Connection successful. Press the Next button to save settings and continue.");
+    document.getElementById("ConnectMessage").style.display = "none";
+    document.getElementById("NextMessage").style.display = "block";
+
+    document.getElementById("OfflineMessages").innerText = data.offlineMsg ? "✓" : "";
+    document.getElementById("Blocking").innerText = data.blocking ? "✓" : "";
+    document.getElementById("Reporting").innerText = data.reporting ? "✓" : "";
+    document.getElementById("AbuseReporting").innerText = data.abuse ? "✓" : "";
+    document.getElementById("SpamReporting").innerText = data.spam ? "✓" : "";
+    document.getElementById("ThingRegistry").innerText = data.thingRegistry ? "✓" : "";
+    document.getElementById("ThingRegistryJID").innerText = data.thingRegistry;
+    document.getElementById("Provisioning").innerText = data.provisioning ? "✓" : "";
+    document.getElementById("ProvisioningJID").innerText = data.provisioning;
+    document.getElementById("PubSub").innerText = data.pubSub ? "✓" : "";
+    document.getElementById("PubSubJID").innerText = data.pubSub;
+    document.getElementById("ServerFeatures").style.display = "block";
 }
 
 function Next()
 {
+    // TODO
 }
 
 function ConnectionError(data)
 {
     ShowStatus(data);
-    window.alert("Unable to connect to the server. Please verify your connection details and try again.");
+    document.getElementById("ConnectError").style.display = "block";
 }

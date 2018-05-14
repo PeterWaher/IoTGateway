@@ -125,8 +125,7 @@ namespace Waher.Content
 
 							while (true)
 							{
-								string Key = JSON.Parse(Json, ref Pos, Len) as string;
-								if (Key == null)
+								if (!(JSON.Parse(Json, ref Pos, Len) is string Key))
 									throw new Exception("Expected member name.");
 
 								while (Pos < Len && ((ch = Json[Pos]) <= ' ' || ch == 160))

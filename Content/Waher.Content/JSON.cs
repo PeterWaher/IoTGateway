@@ -555,9 +555,10 @@ namespace Waher.Content
 						Json.AppendLine();
 
 						if (Indent.HasValue)
+						{
 							Indent = Indent - 1;
-
-						Json.Append(new string('\t', Indent.Value));
+							Json.Append(new string('\t', Indent.Value));
+						}
 					}
 
 					Json.Append('}');
@@ -593,9 +594,10 @@ namespace Waher.Content
 						Json.AppendLine();
 
 						if (Indent.HasValue)
+						{
 							Indent = Indent - 1;
-
-						Json.Append(new string('\t', Indent.Value));
+							Json.Append(new string('\t', Indent.Value));
+						}
 					}
 
 					Json.Append(']');

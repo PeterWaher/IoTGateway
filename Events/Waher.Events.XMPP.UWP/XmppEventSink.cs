@@ -20,14 +20,14 @@ namespace Waher.Events.XMPP
 		/// <summary>
 		/// urn:xmpp:eventlog
 		/// </summary>
-		internal const string NamespaceEventLogging = "urn:xmpp:eventlog";
+		public const string NamespaceEventLogging = "urn:xmpp:eventlog";
 
-		private XmppClient client;
-		private string destination;
+		private readonly XmppClient client;
+		private readonly string destination;
 		private bool connected;
 		private uint eventsLost = 0;
-		private object synchObj = new object();
-		private Timer timer = null;
+		private readonly object synchObj = new object();
+		private readonly Timer timer = null;
 
 		/// <summary>
 		/// Event sink sending events to a destination over the XMPP network. 

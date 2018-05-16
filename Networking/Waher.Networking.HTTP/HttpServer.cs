@@ -606,10 +606,13 @@ namespace Waher.Networking.HTTP
 		/// <param name="HandlesSubPaths">If sub-paths are handled.</param>
 		/// <param name="UserSessions">If the resource uses user sessions.</param>
 		/// <param name="AuthenticationSchemes">Any authentication schemes used to authenticate users before access is granted.</param>
-		public void Register(string ResourceName, HttpMethodHandler GET, bool Synchronous, bool HandlesSubPaths,
+		/// <returns>Reference to generated HTTP resource object.</returns>
+		public HttpResource Register(string ResourceName, HttpMethodHandler GET, bool Synchronous, bool HandlesSubPaths,
 			bool UserSessions, params HttpAuthenticationScheme[] AuthenticationSchemes)
 		{
-			this.Register(new HttpGetDelegateResource(ResourceName, GET, Synchronous, HandlesSubPaths, UserSessions, AuthenticationSchemes));
+			HttpResource Result = new HttpGetDelegateResource(ResourceName, GET, Synchronous, HandlesSubPaths, UserSessions, AuthenticationSchemes);
+			this.Register(Result);
+			return Result;
 		}
 
 		/// <summary>
@@ -666,11 +669,13 @@ namespace Waher.Networking.HTTP
 		/// <param name="HandlesSubPaths">If sub-paths are handled.</param>
 		/// <param name="UserSessions">If the resource uses user sessions.</param>
 		/// <param name="AuthenticationSchemes">Any authentication schemes used to authenticate users before access is granted.</param>
-		public void Register(string ResourceName, HttpMethodHandler GET, HttpMethodHandler POST, bool Synchronous, bool HandlesSubPaths,
+		/// <returns>Reference to generated HTTP resource object.</returns>
+		public HttpResource Register(string ResourceName, HttpMethodHandler GET, HttpMethodHandler POST, bool Synchronous, bool HandlesSubPaths,
 			bool UserSessions, params HttpAuthenticationScheme[] AuthenticationSchemes)
 		{
-			this.Register(new HttpGetPostDelegateResource(ResourceName, GET, POST, Synchronous, HandlesSubPaths, UserSessions,
-				AuthenticationSchemes));
+			HttpResource Result = new HttpGetPostDelegateResource(ResourceName, GET, POST, Synchronous, HandlesSubPaths, UserSessions, AuthenticationSchemes);
+			this.Register(Result);
+			return Result;
 		}
 
 		/// <summary>

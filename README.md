@@ -280,6 +280,7 @@ authorization and encryption.
 | Project                      | Type         | Link                                                            | Project description |
 |------------------------------|--------------|-----------------------------------------------------------------|---------------------|
 | **Waher.Security**           | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Security/)         | The [Waher.Security](Security/Waher.Security) project provides a basic security model based on users, roles and privileges. It's not based on operating system features, to allow code to be platform independent. |
+| **Waher.Security.ACME**      | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Security.ACME/)    | The [Waher.Security.ACME](https://github.com/PeterWaher/IoTGateway/tree/master/Security/Waher.Security.ACME) project contains a class library implementing the ACME protocol for the generation of certificates using ACME-compliant certificate servers, as defined in the [ACME draft](https://tools.ietf.org/html/draft-ietf-acme-acme-12). |
 | **Waher.Security.DTLS**      | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Security.DTLS/)    | The [Waher.Security.DTLS](https://github.com/PeterWaher/IoTGateway/tree/master/Security/Waher.Security.DTLS) project contains a class library implementing the Datagram Transport Layer Security (DTLS) Version 1.2, as defined in [RFC 6347](https://tools.ietf.org/html/rfc6347). |
 | **Waher.Security.JWT**       | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Security.JWT/)     | The [Waher.Security.JWT](Security/Waher.Security.JWT) project helps applications with the creation and validation of Java Web Tokens (JWT), as defined in [RFC 7519](https://tools.ietf.org/html/rfc7519). |
 | **Waher.Security.JWT.UWP**   | UWP          | [NuGet](https://www.nuget.org/packages/Waher.Security.JWT.UWP/) | The [Waher.Security.JWT.UWP](Security/Waher.Security.JWT.UWP) project provides a Universal Windows Platform compatible version of the **Waher.Security.JWT** Library. This library can be used to develop applications for Windows 10, on for instance Rasperry Pi. |
@@ -288,7 +289,8 @@ The folder also contains the following unit test projects:
 
 | Project                            | Type         | Project description |
 |------------------------------------|--------------|---------------------|
-| **Waher.Security.DTLS.Test**       | .NET 4.6.2   | The [Waher.Security.JWT.Test](Security/Waher.Security.DTLS.Test) project contains unit tests for the  [Waher.Security.DTLS](Security/Waher.Security.DTLS) project. |
+| **Waher.Security.ACME.Test**       | .NET 4.6.2   | The [Waher.Security.ACME.Test](Security/Waher.Security.ACME.Test) project contains unit tests for the  [Waher.Security.ACME](Security/Waher.Security.ACME) project. |
+| **Waher.Security.DTLS.Test**       | .NET 4.6.2   | The [Waher.Security.DTLS.Test](Security/Waher.Security.DTLS.Test) project contains unit tests for the  [Waher.Security.DTLS](Security/Waher.Security.DTLS) project. |
 | **Waher.Security.JWT.Test**        | .NET 4.6.2   | The [Waher.Security.JWT.Test](Security/Waher.Security.JWT.Test) project contains unit tests for the  [Waher.Security.JWT](Security/Waher.Security.JWT) project. |
 
 Services

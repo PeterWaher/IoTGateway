@@ -227,6 +227,7 @@ namespace Waher.IoTGateway
 					XSL.LoadSchema(typeof(Gateway).Namespace + ".Schema.GatewayConfiguration.xsd", typeof(Gateway).Assembly));
 
 				domain = Config.DocumentElement["Domain"].InnerText;
+				defaultPage = Config.DocumentElement["DefaultPage"].InnerText;
 
 				XmlElement DatabaseConfig = Config.DocumentElement["Database"];
 				IDatabaseProvider DatabaseProvider;
@@ -327,10 +328,7 @@ namespace Waher.IoTGateway
 					webServer.Register(new HttpFolderResource("/Graphics", Path.Combine(appDataFolder, "Graphics"), false, false, true, false)); // TODO: Add authentication mechanisms for PUT & DELETE.
 					webServer.Register(new HttpFolderResource("/highlight", "Highlight", false, false, true, false));   // Syntax highlighting library, provided by http://highlightjs.org
 					webServer.Register(HttpFolderResource = new HttpFolderResource(string.Empty, rootFolder, false, false, true, true));    // TODO: Add authentication mechanisms for PUT & DELETE.
-					webServer.Register("/", (req, resp) =>
-					{
-						throw new TemporaryRedirectException(CurrentConfiguration?.Resource);
-					});
+					webServer.Register("/", (req, resp) => throw new TemporaryRedirectException(defaultPage));
 					webServer.Register(clientEvents = new ClientEvents());
 					webServer.Register(login = new Login());
 					webServer.Register(logout = new Logout());
@@ -470,8 +468,6 @@ namespace Waher.IoTGateway
 				}
 
 				HttpxProxy HttpxProxy;
-
-				defaultPage = Config.DocumentElement["DefaultPage"].InnerText;
 
 				webServer.Register(new HttpFolderResource("/Graphics", Path.Combine(appDataFolder, "Graphics"), false, false, true, false)); // TODO: Add authentication mechanisms for PUT & DELETE.
 				webServer.Register(new HttpFolderResource("/highlight", "Highlight", false, false, true, false));   // Syntax highlighting library, provided by http://highlightjs.org

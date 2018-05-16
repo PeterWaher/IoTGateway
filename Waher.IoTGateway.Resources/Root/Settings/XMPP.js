@@ -249,11 +249,6 @@ function ConnectionOK1(data)
     document.getElementById("ServerFeatures").style.display = "block";
 }
 
-function Next()
-{
-    // TODO
-}
-
 function ConnectionError(data)
 {
     ShowStatus(data);

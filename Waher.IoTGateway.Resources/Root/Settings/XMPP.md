@@ -21,10 +21,11 @@ IoT Gateway Setup
 <legend>XMPP connection settings</legend>
 
 The IoT Gateway requires a connection to an XMPP network to work properly. The XMPP connection allows you to configure, monitor and administer your
-IoT Gateway in a secure manner, from anywhere where you have access to the same XMPP network. If the server has provisioning support, it will allow 
-for additional security for embedded devices. Enter the domain name of the XMPP server you wish to use. Or click on any of the featured servers below.
-You can also use any of the free public servers listed at [xmpp.net](https://xmpp.net/directory.php). If you're an expert user, you can also setup your
-own XMPP server. [xmpp.org](https://xmpp.org/software/servers.html) publishes an abridged list of XMPP server software you can use.
+IoT Gateway in a secure manner, from anywhere where you have access to the same XMPP network, even if you reside behind a different firewall. 
+If the server has provisioning support, it will provide for additional security for any embedded devices. Enter the domain name of the XMPP server 
+you wish to use. Or click on any of the featured servers below. You can also use any of the free public servers listed at 
+[xmpp.net](https://xmpp.net/directory.php). If you're an expert user, you can also setup your own XMPP server. 
+[xmpp.org](https://xmpp.org/software/servers.html) publishes an abridged list of XMPP server software you can use.
 
 <p>
 <label for="XmppServer">Server:</label>  
@@ -44,30 +45,30 @@ Featured servers:
 </div>
 
 <p>
-<input type="checkbox" name="Custom" id="Custom" title="If custom binding properties are required." {{Config.CustomBinding ? "checked" : ""}} onclick="ToggleCustomProperties()"/>
-<label for="Custom">Custom connection properties.</label>
+<input type="checkbox" name="Custom" id="Custom" {{Config.CustomBinding ? "checked" : ""}} onclick="ToggleCustomProperties()"/>
+<label for="Custom" title="If custom binding properties are required.">Custom connection properties.</label>
 </p>
 
 <div id="CustomProperties" style="display:{{Config.CustomBinding ? "block" : "none"}}">
 
 <p>
-<input type="checkbox" name="TrustServer" id="TrustServer" title="If invalid server sertificates is acceptable." {{Config.TrustServer ? "checked" : ""}} />
-<label for="TrustServer">Trust invalid server certificates.</label>
+<input type="checkbox" name="TrustServer" id="TrustServer" {{Config.TrustServer ? "checked" : ""}} />
+<label for="TrustServer" title="If invalid server sertificates is acceptable.">Trust invalid server certificates.</label>
 </p>
 
 <p>
-<input type="checkbox" name="InsecureMechanisms" id="InsecureMechanisms" title="Allows the use of insecure or obsolete authentication mechanisms if no secure option is available." {{Config.AllowInsecureMechanisms ? "checked" : ""}} />
-<label for="InsecureMechanisms">Allow insecure or obsolete authentication mechanisms.</label>
+<input type="checkbox" name="InsecureMechanisms" id="InsecureMechanisms" {{Config.AllowInsecureMechanisms ? "checked" : ""}} />
+<label for="InsecureMechanisms" title="Allows the use of insecure or obsolete authentication mechanisms if no secure option is available.">Allow insecure or obsolete authentication mechanisms.</label>
 </p>
 
 <p>
-<input type="checkbox" name="StorePassword" id="StorePassword" title="Some servers change the salt used in authentication mechanisms regularly. This makes it impossible to store intermediate hash values of the password. If you use such a server, you need to allow the application to store the password, instead of the password hash." {{Config.StorePasswordInsteadOfHash ? "checked" : ""}} />
-<label for="StorePassword">Store password instead of password hash.</label>
+<input type="checkbox" name="StorePassword" id="StorePassword" {{Config.StorePasswordInsteadOfHash ? "checked" : ""}} />
+<label for="StorePassword" title="Some servers change the salt used in authentication mechanisms regularly. This makes it impossible to store intermediate hash values of the password. If you use such a server, you need to allow the application to store the password, instead of the password hash.">Store password instead of password hash.</label>
 </p>
 
 <p>
-<input type="checkbox" name="Sniffer" id="Sniffer" title="If XMPP communication is to be logged." {{Config.Sniffer ? "checked" : ""}} />
-<label for="Sniffer">Log XMPP communication to the application data folder (`C:\ProgramData\IoT Gateway\XMPP`).</label>
+<input type="checkbox" name="Sniffer" id="Sniffer" {{Config.Sniffer ? "checked" : ""}} />
+<label for="Sniffer" title="If XMPP communication is to be logged.">Log XMPP communication to the application data folder (`C:\ProgramData\IoT Gateway\XMPP`).</label>
 </p>
 
 <p>
@@ -120,8 +121,8 @@ Password is incorrect, or a new account was not permitted to be created.
 </p>
 
 <p>
-<input type="checkbox" name="CreateAccount" id="CreateAccount" title="If an account should be created on the server." {{Config.CreateAccount ? "checked" : ""}} onclick="ToggleCreateAccount()"/>
-<label for="CreateAccount">Create account on server.</label>
+<input type="checkbox" name="CreateAccount" id="CreateAccount" {{Config.CreateAccount ? "checked" : ""}} onclick="ToggleCreateAccount()"/>
+<label for="CreateAccount" title="If an account should be created on the server.">Create account on server.</label>
 </p>
 
 <div id="Create" style="display:{{Config.CreateAccount ? "block" : "none"}}">

@@ -92,6 +92,8 @@ function ConnectToHost()
         "accountName": AccountName,
         "customBinding": GetInputChecked("Custom"),
         "trustServer": GetInputChecked("TrustServer"),
+        "insecureMechanisms": GetInputChecked("InsecureMechanisms"),
+        "storePassword": GetInputChecked("StorePassword"),
         "sniffer": GetInputChecked("Sniffer")
     }));
 }
@@ -231,16 +233,18 @@ function ConnectionOK1(data)
     document.getElementById("ConnectMessage").style.display = "none";
     document.getElementById("NextMessage").style.display = "block";
 
-    document.getElementById("OfflineMessages").innerText = data.offlineMsg ? "✓" : "";
-    document.getElementById("Blocking").innerText = data.blocking ? "✓" : "";
-    document.getElementById("Reporting").innerText = data.reporting ? "✓" : "";
-    document.getElementById("AbuseReporting").innerText = data.abuse ? "✓" : "";
-    document.getElementById("SpamReporting").innerText = data.spam ? "✓" : "";
-    document.getElementById("ThingRegistry").innerText = data.thingRegistry ? "✓" : "";
+    document.getElementById("OfflineMessages").innerText = data.offlineMsg ? "✓" : "✗";
+    document.getElementById("Blocking").innerText = data.blocking ? "✓" : "✗";
+    document.getElementById("Reporting").innerText = data.reporting ? "✓" : "✗";
+    document.getElementById("AbuseReporting").innerText = data.abuse ? "✓" : "✗";
+    document.getElementById("SpamReporting").innerText = data.spam ? "✓" : "✗";
+    document.getElementById("Pep").innerText = data.pep ? "✓" : "✗";
+    document.getElementById("PepJID").innerText = data.pep;
+    document.getElementById("ThingRegistry").innerText = data.thingRegistry ? "✓" : "✗";
     document.getElementById("ThingRegistryJID").innerText = data.thingRegistry;
-    document.getElementById("Provisioning").innerText = data.provisioning ? "✓" : "";
+    document.getElementById("Provisioning").innerText = data.provisioning ? "✓" : "✗";
     document.getElementById("ProvisioningJID").innerText = data.provisioning;
-    document.getElementById("PubSub").innerText = data.pubSub ? "✓" : "";
+    document.getElementById("PubSub").innerText = data.pubSub ? "✓" : "✗";
     document.getElementById("PubSubJID").innerText = data.pubSub;
     document.getElementById("ServerFeatures").style.display = "block";
 }

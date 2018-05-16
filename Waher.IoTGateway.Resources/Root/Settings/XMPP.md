@@ -16,7 +16,7 @@ IoT Gateway Setup
 
 <form>
 <fieldset>
-<legend>XMPP settings</legend>
+<legend>XMPP connection settings</legend>
 
 The IoT Gateway requires a connection to an XMPP network to work properly. The XMPP connection allows you to configure, monitor and administer your
 IoT Gateway in a secure manner, from anywhere where you have access to the same XMPP network. If the server has provisioning support, it will allow 
@@ -54,8 +54,18 @@ Featured servers:
 </p>
 
 <p>
+<input type="checkbox" name="InsecureMechanisms" id="InsecureMechanisms" title="Allows the use of insecure or obsolete authentication mechanisms if no secure option is available." {{Config.AllowInsecureMechanisms ? "checked" : ""}} />
+<label for="InsecureMechanisms">Allow insecure or obsolete authentication mechanisms.</label>
+</p>
+
+<p>
+<input type="checkbox" name="StorePassword" id="StorePassword" title="Some servers change the salt used in authentication mechanisms regularly. This makes it impossible to store intermediate hash values of the password. If you use such a server, you need to allow the application to store the password, instead of the password hash." {{Config.StorePasswordInsteadOfHash ? "checked" : ""}} />
+<label for="StorePassword">Store password instead of password hash.</label>
+</p>
+
+<p>
 <input type="checkbox" name="Sniffer" id="Sniffer" title="If XMPP communication is to be logged." {{Config.Sniffer ? "checked" : ""}} />
-<label for="Sniffer">Log XMPP communication to the application data folder.</label>
+<label for="Sniffer">Log XMPP communication to the application data folder (`C:\ProgramData\IoT Gateway\XMPP`).</label>
 </p>
 
 <p>
@@ -141,16 +151,20 @@ Password is incorrect, or a new account was not permitted to be created.
 <fieldset id="ServerFeatures" style="display:{{Config.Step>1 ? "block" : "none"}}">
 <legend>Server features</legend>
 
+The following table contains an abbreviated list of features that an XMPP server should support. Lack of support for any of these features might
+limit applications using the server to interoperate accordingly.
+
 | Feature | Support | JID |
 |:--------|:-------:|:---:|
-| Offline messages | <span id="OfflineMessages">{{Config.OfflineMessages ? "✓" : ""}}</span> | N/A |
-| Blocking | <span id="Blocking">{{Config.Blocking ? "✓" : ""}}</span> | N/A |
-| Reporting | <span id="Reporting">{{Config.Reporting ? "✓" : ""}}</span> | N/A |
-| Abuse reporting | <span id="AbuseReporting">{{Config.Abuse ? "✓" : ""}}</span> | N/A |
-| Spam reporting | <span id="SpamReporting">{{Config.Spam? "✓" : ""}}</span> | N/A |
-| Thing Registry | <span id="ThingRegistry">{{empty(Config.ThingRegistry) ? "" : "✓"}}</span> | <span id="ThingRegistryJID">{{Config.ThingRegistry}}</span> |
-| Provisioning | <span id="Provisioning">{{empty(Config.Provisioning) ? "" : "✓"}}</span> | <span id="ProvisioningJID">{{Config.Provisioning}}</span> |
-| Publish/Subscribe | <span id="PubSub">{{empty(Config.PubSub) ? "" : "✓"}}</span> | <span id="PubSubJID">{{Config.PubSub}}</span> |
+| Offline messages | <span id="OfflineMessages">{{Config.OfflineMessages ? "✓" : "✗"}}</span> | N/A |
+| Blocking | <span id="Blocking">{{Config.Blocking ? "✓" : "✗"}}</span> | N/A |
+| Reporting | <span id="Reporting">{{Config.Reporting ? "✓" : "✗"}}</span> | N/A |
+| Abuse reporting | <span id="AbuseReporting">{{Config.Abuse ? "✓" : "✗"}}</span> | N/A |
+| Spam reporting | <span id="SpamReporting">{{Config.Spam ? "✓" : "✗"}}</span> | N/A |
+| Personal Eventing | <span id="Pep">{{Config.PersonalEventing ? "✓" : "✗"}}</span> | <span id="PepJID">{{Config.PersonalEventing ? Config.BareJid : ""}}</span> |
+| Thing Registry | <span id="ThingRegistry">{{empty(Config.ThingRegistry) ? "✗" : "✓"}}</span> | <span id="ThingRegistryJID">{{Config.ThingRegistry}}</span> |
+| Provisioning | <span id="Provisioning">{{empty(Config.Provisioning) ? "✗" : "✓"}}</span> | <span id="ProvisioningJID">{{Config.Provisioning}}</span> |
+| Publish/Subscribe | <span id="PubSub">{{empty(Config.PubSub) ? "✗" : "✓"}}</span> | <span id="PubSubJID">{{Config.PubSub}}</span> |
 
 </fieldset>
 

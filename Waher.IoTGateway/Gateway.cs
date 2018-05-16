@@ -1131,8 +1131,16 @@ namespace Waher.IoTGateway
 
 				await Task.Run(() => Result = WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 10000));
 
-				PasswordHash = Client.PasswordHash;
-				PasswordHashMethod = Client.PasswordHashMethod;
+				if (XmppConfiguration.Instance.StorePasswordInsteadOfHash)
+				{
+					PasswordHash = Password;
+					PasswordHashMethod = string.Empty;
+				}
+				else
+				{
+					PasswordHash = Client.PasswordHash;
+					PasswordHashMethod = Client.PasswordHashMethod;
+				}
 			}
 
 			if (Result != 0)

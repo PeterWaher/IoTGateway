@@ -56,6 +56,7 @@ namespace Waher.IoTGateway.Setup
 		private string provisioning = string.Empty;
 		private string events = string.Empty;
 		private string pubSub = string.Empty;
+		private string bareJid = string.Empty;
 		private bool sniffer = false;
 		private bool trustServer = false;
 		private bool allowInsecureMechanisms = false;
@@ -66,6 +67,7 @@ namespace Waher.IoTGateway.Setup
 		private bool reporting = false;
 		private bool abuse = false;
 		private bool spam = false;
+		private bool pep = false;
 
 		private XmppClient client = null;
 		private bool createAccount = false;
@@ -195,6 +197,16 @@ namespace Waher.IoTGateway.Setup
 		}
 
 		/// <summary>
+		/// Bare JID
+		/// </summary>
+		[DefaultValueStringEmpty]
+		public string BareJid
+		{
+			get { return this.bareJid; }
+			set { this.bareJid = value; }
+		}
+
+		/// <summary>
 		/// If communication should be sniffed.
 		/// </summary>
 		[DefaultValue(false)]
@@ -295,6 +307,16 @@ namespace Waher.IoTGateway.Setup
 		}
 
 		/// <summary>
+		/// If the Personal Eventing Protocol (PEP) is supported by the server.
+		/// </summary>
+		[DefaultValue(false)]
+		public bool PersonalEventing
+		{
+			get { return this.pep; }
+			set { this.pep = value; }
+		}
+
+		/// <summary>
 		/// If an account can be created.
 		/// </summary>
 		[IgnoreMember]
@@ -370,6 +392,12 @@ namespace Waher.IoTGateway.Setup
 			if (!Parameters.TryGetValue("trustServer", out Obj) || !(Obj is bool TrustServer))
 				throw new BadRequestException();
 
+			if (!Parameters.TryGetValue("insecureMechanisms", out Obj) || !(Obj is bool InsecureMechanisms))
+				throw new BadRequestException();
+
+			if (!Parameters.TryGetValue("storePassword", out Obj) || !(Obj is bool StorePasswordInsteadOfHash))
+				throw new BadRequestException();
+
 			if (!Parameters.TryGetValue("sniffer", out Obj) || !(Obj is bool Sniffer))
 				throw new BadRequestException();
 
@@ -393,6 +421,8 @@ namespace Waher.IoTGateway.Setup
 			this.boshUrl = BoshUrl.Trim();
 			this.customBinding = CustomBinding;
 			this.trustServer = TrustServer;
+			this.allowInsecureMechanisms = InsecureMechanisms;
+			this.storePasswordInsteadOfHash = StorePasswordInsteadOfHash;
 			this.sniffer = Sniffer;
 			this.transportMethod = Method;
 			this.account = Account;
@@ -542,6 +572,8 @@ namespace Waher.IoTGateway.Setup
 						break;
 
 					case XmppState.Connected:
+						this.bareJid = Client.BareJID;
+
 						if (this.createAccount && !string.IsNullOrEmpty(this.accountHumanReadableName))
 						{
 							ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Setting vCard.", false);
@@ -561,14 +593,7 @@ namespace Waher.IoTGateway.Setup
 						}
 
 						ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Checking server features.", false);
-
 						ServiceDiscoveryEventArgs e = await Client.ServiceDiscoveryAsync(null, string.Empty, string.Empty);
-
-						this.offlineMessages = false;
-						this.blocking = false;
-						this.reporting = false;
-						this.abuse = false;
-						this.spam = false;
 
 						if (e.Ok)
 						{
@@ -578,9 +603,21 @@ namespace Waher.IoTGateway.Setup
 							this.abuse = e.HasFeature(Networking.XMPP.Abuse.AbuseClient.NamespaceAbuseReason);
 							this.spam = e.HasFeature(Networking.XMPP.Abuse.AbuseClient.NamespaceSpamReason);
 						}
+						else
+						{
+							this.offlineMessages = false;
+							this.blocking = false;
+							this.reporting = false;
+							this.abuse = false;
+							this.spam = false;
+						}
+
+						ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Checking account features.", false);
+						e = await Client.ServiceDiscoveryAsync(null, Client.BareJID, string.Empty);
+
+						this.pep = e.Ok && this.ContainsIdentity("pep", "pubsub", e);
 
 						ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Checking server components.", false);
-
 						ServiceItemsDiscoveryEventArgs e2 = await Client.ServiceItemsDiscoveryAsync(null, string.Empty, string.Empty);
 
 						this.thingRegistry = string.Empty;
@@ -602,7 +639,7 @@ namespace Waher.IoTGateway.Setup
 								if (e.HasFeature(Networking.XMPP.Provisioning.ProvisioningClient.NamespaceProvisioningDevice))
 									this.provisioning = Item.JID;
 
-								if (e.HasFeature(Networking.XMPP.PubSub.PubSubClient.NamespacePubSub))
+								if (e.HasFeature(Networking.XMPP.PubSub.PubSubClient.NamespacePubSub) && this.ContainsIdentity("service", "pubsub", e))
 									this.pubSub = Item.JID;
 
 								if (e.HasFeature(Waher.Events.XMPP.XmppEventSink.NamespaceEventLogging))
@@ -618,6 +655,7 @@ namespace Waher.IoTGateway.Setup
 							{ "reporting", this.reporting },
 							{ "abuse", this.abuse },
 							{ "spam", this.spam },
+							{ "pep", this.pep ? this.bareJid : string.Empty },
 							{ "thingRegistry", this.thingRegistry },
 							{ "provisioning", this.provisioning },
 							{ "eventLog", this.events },
@@ -788,6 +826,17 @@ namespace Waher.IoTGateway.Setup
 				Log.Critical(ex);
 				ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", ex.Message, false);
 			}
+		}
+
+		private bool ContainsIdentity(string Type, string Cateogory, ServiceDiscoveryEventArgs e)
+		{
+			foreach (Identity Identity in e.Identities)
+			{
+				if (Identity.Type == Type && Identity.Category == Cateogory)
+					return true;
+			}
+
+			return false;
 		}
 
 		private bool RemoteCertificateValidationCallback(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)

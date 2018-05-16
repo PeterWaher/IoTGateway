@@ -22,4 +22,8 @@
     <DocumentationFile>bin\Debug\netstandard1.3\Waher.Security.ACME.xml</DocumentationFile>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\Content\Waher.Content\Waher.Content.csproj" />
+  </ItemGroup>
+
 </Project>

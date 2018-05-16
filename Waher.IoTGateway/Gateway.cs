@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Runtime.ExceptionServices;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
@@ -20,6 +23,7 @@ using Waher.Events;
 using Waher.Events.Files;
 using Waher.Events.Persistence;
 using Waher.Events.XMPP;
+using Waher.IoTGateway.WebResources;
 using Waher.IoTGateway.Setup;
 using Waher.Networking.CoAP;
 using Waher.Networking.HTTP;
@@ -37,6 +41,7 @@ using Waher.Runtime.Inventory.Loader;
 using Waher.Runtime.Settings;
 using Waher.Runtime.Timing;
 using Waher.Persistence;
+using Waher.Script;
 using Waher.Things;
 using Waher.Things.ControlParameters;
 using Waher.Things.Metering;
@@ -117,6 +122,9 @@ namespace Waher.IoTGateway
 		private static HttpxServer httpxServer = null;
 		private static CoapEndpoint coapEndpoint = null;
 		private static ClientEvents clientEvents = null;
+		private static Login login = null;
+		private static Logout logout = null;
+		private static LoggedIn loggedIn = null;
 		private static Scheduler scheduler = null;
 		private static RandomNumberGenerator rnd = null;
 		private static Semaphore gatewayRunning = null;
@@ -126,6 +134,7 @@ namespace Waher.IoTGateway
 		private static string appDataFolder;
 		private static string runtimeFolder;
 		private static string rootFolder;
+		private static string defaultPage;
 		private static int nextServiceCommandNr = 128;
 		private static int beforeUninstallCommandNr = 0;
 		private static bool registered = false;
@@ -310,8 +319,10 @@ namespace Waher.IoTGateway
 
 					webServer = new HttpServer(new int[] { HttpServer.DefaultHttpPort, 8080, 8081, 8082 }, null, null)
 					{
-						ResourceOverrideFilter = "[.]md$"
+						ResourceOverrideFilter = "(?<!Login)[.]md(\\?[.]*)?$"
 					};
+
+					loggedIn = new LoggedIn(webServer);
 
 					webServer.Register(new HttpFolderResource("/Graphics", Path.Combine(appDataFolder, "Graphics"), false, false, true, false)); // TODO: Add authentication mechanisms for PUT & DELETE.
 					webServer.Register(new HttpFolderResource("/highlight", "Highlight", false, false, true, false));   // Syntax highlighting library, provided by http://highlightjs.org
@@ -321,6 +332,8 @@ namespace Waher.IoTGateway
 						throw new TemporaryRedirectException(CurrentConfiguration?.Resource);
 					});
 					webServer.Register(clientEvents = new ClientEvents());
+					webServer.Register(login = new Login());
+					webServer.Register(logout = new Logout());
 
 					emoji1_24x24 = new Emoji1LocalFiles(Emoji1SourceFileType.Svg, 24, 24, "/Graphics/Emoji1/svg/%FILENAME%",
 						Path.Combine(runtimeFolder, "Graphics", "Emoji1.zip"), Path.Combine(appDataFolder, "Graphics"));
@@ -440,6 +453,8 @@ namespace Waher.IoTGateway
 				webServer = new HttpServer(GetConfigPorts("HTTP"), GetConfigPorts("HTTPS"), certificate);
 				Types.SetModuleParameter("HTTP", webServer);
 
+				loggedIn = new LoggedIn(webServer);
+
 				sb = new StringBuilder();
 
 				foreach (int Port in webServer.OpenPorts)
@@ -456,15 +471,16 @@ namespace Waher.IoTGateway
 
 				HttpxProxy HttpxProxy;
 
+				defaultPage = Config.DocumentElement["DefaultPage"].InnerText;
+
 				webServer.Register(new HttpFolderResource("/Graphics", Path.Combine(appDataFolder, "Graphics"), false, false, true, false)); // TODO: Add authentication mechanisms for PUT & DELETE.
 				webServer.Register(new HttpFolderResource("/highlight", "Highlight", false, false, true, false));   // Syntax highlighting library, provided by http://highlightjs.org
 				webServer.Register(HttpFolderResource = new HttpFolderResource(string.Empty, rootFolder, false, false, true, true));    // TODO: Add authentication mechanisms for PUT & DELETE.
 				webServer.Register(HttpxProxy = new HttpxProxy("/HttpxProxy", xmppClient, MaxChunkSize));
-				webServer.Register("/", (req, resp) =>
-				{
-					throw new TemporaryRedirectException(Config.DocumentElement["DefaultPage"].InnerText);
-				});
+				webServer.Register("/", (req, resp) => throw new TemporaryRedirectException(defaultPage));
 				webServer.Register(clientEvents = new ClientEvents());
+				webServer.Register(login = new Login());
+				webServer.Register(logout = new Logout());
 
 				if (emoji1_24x24 != null)
 				{
@@ -904,6 +920,8 @@ namespace Waher.IoTGateway
 			}
 
 			clientEvents = null;
+			login = null;
+			logout = null;
 		}
 
 		/// <summary>
@@ -944,6 +962,14 @@ namespace Waher.IoTGateway
 		public static string RootFolder
 		{
 			get { return rootFolder; }
+		}
+
+		/// <summary>
+		/// Default page of gateway.
+		/// </summary>
+		public static string DefaultPage
+		{
+			get { return defaultPage; }
 		}
 
 		/// <summary>
@@ -1191,6 +1217,116 @@ namespace Waher.IoTGateway
 			}
 
 			return LoginResult.Successful;
+		}
+
+		/// <summary>
+		/// Checks if a web request comes from the local host in the current session. If so, the user is automatically logged in.
+		/// </summary>
+		/// <param name="Request">Web request</param>
+		public static void CheckLocalLogin(HttpRequest Request)
+		{
+			string RemoteEndpoint = Request.RemoteEndPoint;
+			string From;
+			int Port;
+			int i;
+
+			if (Request.Session == null || !Request.Session.TryGetVariable("from", out Variable v) || string.IsNullOrEmpty(From = v.ValueObject as string))
+				return;
+
+			if (RemoteEndpoint.StartsWith("[::1]:"))
+			{
+				if (!int.TryParse(RemoteEndpoint.Substring(6), out Port))
+					return;
+			}
+			else if (RemoteEndpoint.StartsWith("127."))
+			{
+				i = RemoteEndpoint.IndexOf(':');
+				if (i < 0 || !int.TryParse(RemoteEndpoint.Substring(i + 1), out Port))
+					return;
+			}
+			else
+				return;
+
+#if MONO
+			Log.Informational("Local user logged in.", string.Empty, Request.RemoteEndPoint, "LoginSuccessful", EventLevel.Minor);
+			Login.DoLogin(Request, From);
+#else
+			try
+			{
+				using (Process Proc = new Process())
+				{
+					ProcessStartInfo StartInfo = new ProcessStartInfo()
+					{
+						FileName = "netstat.exe",
+						Arguments = "-a -n -o",
+						WindowStyle = ProcessWindowStyle.Hidden,
+						UseShellExecute = false,
+						RedirectStandardInput = true,
+						RedirectStandardOutput = true,
+						RedirectStandardError = true
+					};
+
+					Proc.StartInfo = StartInfo;
+					Proc.Start();
+
+					string Output = Proc.StandardOutput.ReadToEnd();
+					if (Proc.ExitCode != 0)
+						return;
+
+					string[] Rows = Output.Split(CommonTypes.CRLF, StringSplitOptions.RemoveEmptyEntries);
+
+					foreach (string Row in Rows)
+					{
+						string[] Tokens = Regex.Split(Row, @"\s+");
+
+						if (Tokens.Length < 6)
+							continue;
+
+						if (Tokens[1] != "TCP")
+							continue;
+
+						if (Tokens[2] != RemoteEndpoint)
+							continue;
+
+						if (Tokens[4] != "ESTABLISHED")
+							continue;
+
+						if (!int.TryParse(Tokens[5], out int PID))
+							continue;
+
+						Process P = Process.GetProcessById(PID);
+						int CurrentSession = WTSGetActiveConsoleSessionId();
+
+						if (P.SessionId == CurrentSession)
+						{
+							Log.Informational("Local user logged in.", string.Empty, Request.RemoteEndPoint, "LoginSuccessful", EventLevel.Minor);
+							Login.DoLogin(Request, From);
+						}
+					}
+				}
+			}
+			catch (HttpException)
+			{
+				throw;
+			}
+			catch (Exception)
+			{
+				return;
+			}
+#endif
+		}
+
+#if !MONO
+		[DllImport("kernel32.dll")]
+		static extern int WTSGetActiveConsoleSessionId();
+#endif
+
+		/// <summary>
+		/// Authentication mechanism that makes sure the call is made from a session with a valid authenticated user.
+		/// </summary>
+		public static LoggedIn LoggedIn
+		{
+			get { return loggedIn; }
 		}
 
 		#endregion

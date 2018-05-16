@@ -6,6 +6,8 @@ Copyright: Copyright.md
 Master: Master.md
 JavaScript: Calculator.js
 Parameter: Expression
+UserVariable: User
+Login: Login.md
 
 Script calculator
 =============================

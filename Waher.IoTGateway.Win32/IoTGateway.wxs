@@ -921,8 +921,9 @@
               <File Id='Emojis.md' Name='Emojis.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Emojis.md'/>
               <File Id='Entities.md' Name='Entities.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Entities.md'/>
               <File Id='Events.js' Name='Events.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Events.js'/>
-              <File Id='Index.md' Name='Index.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Index.md'/>
-              <File Id='Markdown.md' Name='Markdown.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Markdown.md'/>
+							<File Id='Index.md' Name='Index.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Index.md'/>
+							<File Id='Login.md' Name='Login.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Login.md'/>
+							<File Id='Markdown.md' Name='Markdown.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Markdown.md'/>
               <File Id='Master.md' Name='Master.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Master.md'/>
               <File Id='Script.md' Name='Script.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Script.md'/>
               <File Id='Smileys.md' Name='Smileys.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Smileys.md'/>
@@ -933,8 +934,9 @@
               <RemoveFile Id='RemoveEmojis.md' Name='Emojis.md' On='uninstall'/>
               <RemoveFile Id='RemoveEntities.md' Name='Entities.md' On='uninstall'/>
               <RemoveFile Id='RemoveEvents.js' Name='Events.js' On='uninstall'/>
-              <RemoveFile Id='RemoveIndex.md' Name='Index.md' On='uninstall'/>
-              <RemoveFile Id='RemoveMarkdown.md' Name='Markdown.md' On='uninstall'/>
+							<RemoveFile Id='RemoveIndex.md' Name='Index.md' On='uninstall'/>
+							<RemoveFile Id='RemoveLogin.md' Name='Login.md' On='uninstall'/>
+							<RemoveFile Id='RemoveMarkdown.md' Name='Markdown.md' On='uninstall'/>
               <RemoveFile Id='RemoveMaster.md' Name='Master.md' On='uninstall'/>
               <RemoveFile Id='RemoveScript.md' Name='Script.md' On='uninstall'/>
               <RemoveFile Id='RemoveSmileys.md' Name='Smileys.md' On='uninstall'/>

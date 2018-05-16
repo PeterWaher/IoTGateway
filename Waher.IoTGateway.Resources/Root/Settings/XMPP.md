@@ -7,6 +7,8 @@ Master: ..\Master.md
 JavaScript: /Events.js
 JavaScript: /Settings/XMPP.js
 CSS: /Settings/XMPP.css
+UserVariable: User
+Login: /Login.md
 
 
 ========================================================================

@@ -14,6 +14,8 @@ namespace Waher.IoTGateway.Setup
 	public abstract class SystemConfiguration : ISystemConfiguration
 	{
 		private TaskCompletionSource<bool> completionSource = null;
+		private HttpResource configResource = null;
+
 		private Guid objectId = Guid.Empty;
 		private DateTime created = DateTime.MinValue;
 		private DateTime updated = DateTime.MinValue;
@@ -101,10 +103,39 @@ namespace Waher.IoTGateway.Setup
 		/// Waits for the user to provide configuration.
 		/// </summary>
 		/// <param name="WebServer">Current Web Server object.</param>
-		public virtual Task WaitForConfiguration(HttpServer WebServer)
+		public virtual Task SetupConfiguration(HttpServer WebServer)
 		{
 			this.completionSource = new TaskCompletionSource<bool>();
+
+			this.configResource = WebServer.Register("/Settings/ConfigComplete", null, this.ConfigComplete, true, false, true);
+
 			return this.completionSource.Task;
+		}
+
+		/// <summary>
+		/// Cleans up after configuration has been performed.
+		/// </summary>
+		/// <param name="WebServer">Current Web Server object.</param>
+		public virtual Task CleanupAfterConfiguration(HttpServer WebServer)
+		{
+			if (this.configResource != null)
+			{
+				WebServer.Unregister(this.configResource);
+				this.configResource = null;
+			}
+
+			return Task.CompletedTask;
+		}
+
+		/// <summary>
+		/// Method is called when the user completes the current configuration task.
+		/// </summary>
+		/// <param name="Request">HTTP Request</param>
+		/// <param name="Response">HTTP Response</param>
+		protected virtual async void ConfigComplete(HttpRequest Request, HttpResponse Response)
+		{
+			Response.StatusCode = 200;
+			await this.MakeCompleted();
 		}
 
 		/// <summary>

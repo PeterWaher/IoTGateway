@@ -70,6 +70,8 @@ namespace Waher.IoTGateway.Setup
 		private bool pep = false;
 
 		private XmppClient client = null;
+		private HttpResource connectToHost = null;
+		private HttpResource randomizePassword = null;
 		private bool createAccount = false;
 
 		/// <summary>
@@ -353,13 +355,35 @@ namespace Waher.IoTGateway.Setup
 		/// Waits for the user to provide configuration.
 		/// </summary>
 		/// <param name="WebServer">Current Web Server object.</param>
-		public override Task WaitForConfiguration(HttpServer WebServer)
+		public override Task SetupConfiguration(HttpServer WebServer)
 		{
-			Task Result = base.WaitForConfiguration(WebServer);
+			Task Result = base.SetupConfiguration(WebServer);
 
-			WebServer.Register("/Settings/ConnectToHost", null, this.ConnectToHost, true, false, true);
-			WebServer.Register("/Settings/XmppComplete", null, this.XmppComplete, true, false, true);
-			WebServer.Register("/Settings/RandomizePassword", null, this.RandomizePassword, true, false, true);
+			this.connectToHost = WebServer.Register("/Settings/ConnectToHost", null, this.ConnectToHost, true, false, true);
+			this.randomizePassword = WebServer.Register("/Settings/RandomizePassword", null, this.RandomizePassword, true, false, true);
+
+			return Result;
+		}
+
+		/// <summary>
+		/// Cleans up after configuration has been performed.
+		/// </summary>
+		/// <param name="WebServer">Current Web Server object.</param>
+		public override Task CleanupAfterConfiguration(HttpServer WebServer)
+		{
+			Task Result = base.CleanupAfterConfiguration(WebServer);
+
+			if (this.connectToHost != null)
+			{
+				WebServer.Unregister(this.connectToHost);
+				this.connectToHost = null;
+			}
+
+			if (this.randomizePassword != null)
+			{
+				WebServer.Unregister(this.randomizePassword);
+				this.randomizePassword = null;
+			}
 
 			return Result;
 		}
@@ -444,13 +468,6 @@ namespace Waher.IoTGateway.Setup
 			Response.StatusCode = 200;
 
 			this.Connect(TabID);
-		}
-
-		private async void XmppComplete(HttpRequest Request, HttpResponse Response)
-		{
-			Response.StatusCode = 200;
-
-			await this.MakeCompleted();
 		}
 
 		private void RandomizePassword(HttpRequest Request, HttpResponse Response)

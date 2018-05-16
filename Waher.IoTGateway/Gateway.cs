@@ -135,6 +135,7 @@ namespace Waher.IoTGateway
 		private static string runtimeFolder;
 		private static string rootFolder;
 		private static string defaultPage;
+		private static string applicationName;
 		private static int nextServiceCommandNr = 128;
 		private static int beforeUninstallCommandNr = 0;
 		private static bool registered = false;
@@ -227,6 +228,7 @@ namespace Waher.IoTGateway
 					XSL.LoadSchema(typeof(Gateway).Namespace + ".Schema.GatewayConfiguration.xsd", typeof(Gateway).Assembly));
 
 				domain = Config.DocumentElement["Domain"].InnerText;
+				applicationName = Config.DocumentElement["ApplicationName"].InnerText;
 				defaultPage = Config.DocumentElement["DefaultPage"].InnerText;
 
 				XmlElement DatabaseConfig = Config.DocumentElement["Database"];
@@ -342,6 +344,8 @@ namespace Waher.IoTGateway
 
 				foreach (SystemConfiguration Configuration in Configurations)
 				{
+					bool NeedsCleanup = false;
+
 					Configuration.SetStaticInstance(Configuration);
 
 					if (!Configuration.Complete)
@@ -352,13 +356,15 @@ namespace Waher.IoTGateway
 
 						ClientEvents.PushEvent(ClientEvents.GetTabIDs(), "Reload", string.Empty);
 
-						await Configuration.WaitForConfiguration(webServer);
+						await Configuration.SetupConfiguration(webServer);
+						NeedsCleanup = true;
 					}
 
 					await Configuration.ConfigureSystem();
-				}
 
-				ClientEvents.PushEvent(ClientEvents.GetTabIDs(), "Reload", string.Empty);
+					if (NeedsCleanup)
+						await Configuration.CleanupAfterConfiguration(webServer);
+				}
 
 				string CertificateLocalFileName = Config.DocumentElement["Certificate"].Attributes["configFileName"].Value;
 				string CertificateFileName;
@@ -524,6 +530,8 @@ namespace Waher.IoTGateway
 					webServer.Add(Sniffer);
 				}
 
+				ClientEvents.PushEvent(ClientEvents.GetTabIDs(), "Reload", string.Empty);
+				
 				coapEndpoint = new CoapEndpoint();
 				Types.SetModuleParameter("CoAP", coapEndpoint);
 
@@ -966,6 +974,14 @@ namespace Waher.IoTGateway
 		public static string DefaultPage
 		{
 			get { return defaultPage; }
+		}
+
+		/// <summary>
+		/// Application Name.
+		/// </summary>
+		public static string ApplicationName
+		{
+			get { return applicationName; }
 		}
 
 		/// <summary>

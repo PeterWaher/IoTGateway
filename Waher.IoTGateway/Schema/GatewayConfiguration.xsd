@@ -9,7 +9,12 @@
   <xs:element name="GatewayConfiguration">
     <xs:complexType>
       <xs:sequence>
-        <xs:element name="Domain" type="xs:string">
+				<xs:element name="ApplicationName" type="xs:string">
+					<xs:annotation>
+						<xs:documentation>Name of application.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="Domain" type="xs:string">
           <xs:annotation>
             <xs:documentation>Domain Name.</xs:documentation>
           </xs:annotation>

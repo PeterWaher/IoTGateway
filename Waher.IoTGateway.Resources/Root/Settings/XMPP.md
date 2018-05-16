@@ -6,6 +6,7 @@ Copyright: /Copyright.md
 Master: ..\Master.md
 JavaScript: /Events.js
 JavaScript: /Settings/XMPP.js
+JavaScript: /Settings/Next.js
 CSS: /Settings/XMPP.css
 UserVariable: User
 Login: /Login.md
@@ -13,7 +14,7 @@ Login: /Login.md
 
 ========================================================================
 
-IoT Gateway Setup
+Network connectivity
 =============================
 
 <form>

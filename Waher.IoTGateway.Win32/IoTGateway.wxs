@@ -976,7 +976,22 @@
                 <RemoveFile Id='Removelogo_Futura_500x97.png' Name='logo-Futura-500x97.png' On='uninstall'/>
               </Component>
             </Directory>
-            <Directory Id='Templates' Name='Templates'>
+						<Directory Id='Settings' Name='Settings'>
+							<Component Id='SettingsFiles' Guid='DF0DEED0-4ECF-4E25-925C-F820F97B3FEE'>
+								<RemoveFolder Id='SettingsFiles' On='uninstall' />
+								<File Id='Introduction.js' Name='Introduction.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Introduction.js' KeyPath='yes'/>
+								<File Id='Introduction.md' Name='Introduction.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Introduction.md'/>
+								<File Id='XMPP.css' Name='XMPP.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\XMPP.css'/>
+								<File Id='XMPP.js' Name='XMPP.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\XMPP.js'/>
+								<File Id='XMPP.md' Name='XMPP.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\XMPP.md'/>
+								<RemoveFile Id='Introduction.js' Name='Introduction.js' On='uninstall'/>
+								<RemoveFile Id='Introduction.md' Name='Introduction.md' On='uninstall'/>
+								<RemoveFile Id='XMPP.css' Name='XMPP.css' On='uninstall'/>
+								<RemoveFile Id='XMPP.js' Name='XMPP.js' On='uninstall'/>
+								<RemoveFile Id='XMPP.md' Name='XMPP.md' On='uninstall'/>
+							</Component>
+						</Directory>
+						<Directory Id='Templates' Name='Templates'>
               <Component Id='TemplateFiles' Guid='BA793911-4C7F-4682-B118-3ABE514B24D4'>
                 <RemoveFolder Id='RemoveTemplates' On='uninstall' />
                 <File Id='Repeat.md' Name='Repeat.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Templates\Repeat.md' KeyPath='yes'/>
@@ -1055,8 +1070,9 @@
         <ComponentRef Id='RootFiles' />
         <ComponentRef Id='AudioFiles' />
         <ComponentRef Id='ImageFiles' />
-        <ComponentRef Id='TemplateFiles' />
-        <ComponentRef Id='VideoFiles' />
+				<ComponentRef Id='SettingsFiles' />
+				<ComponentRef Id='TemplateFiles' />
+				<ComponentRef Id='VideoFiles' />
         <ComponentRef Id='TransformFiles' />
       </Feature>
       <Feature Id='Emoji1' Title='Emoji1' Description='Contains emojies from Emoji1.' Level='1'>

@@ -79,6 +79,12 @@ namespace Waher.IoTGateway.Setup
 		/// Waits for the user to provide configuration.
 		/// </summary>
 		/// <param name="WebServer">Current Web Server object.</param>
-		Task WaitForConfiguration(HttpServer WebServer);
+		Task SetupConfiguration(HttpServer WebServer);
+
+		/// <summary>
+		/// Cleans up after configuration has been performed.
+		/// </summary>
+		/// <param name="WebServer">Current Web Server object.</param>
+		Task CleanupAfterConfiguration(HttpServer WebServer);
 	}
 }

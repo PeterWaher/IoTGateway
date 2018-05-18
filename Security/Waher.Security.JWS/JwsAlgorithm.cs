@@ -59,10 +59,20 @@ namespace Waher.Security.JWS
 			out string PayloadString, out string Signature)
 		{
 			string HeaderJson;
+			bool HasKeyID = false;
 
-			if (this.HasPublicWebKey)
+			foreach (KeyValuePair<string, object> P in Header)
 			{
-				HeaderJson = JSON.Encode(Header, null, 
+				if (P.Key == "kid")
+				{
+					HasKeyID = true;
+					break;
+				}
+			}
+
+			if (this.HasPublicWebKey && !HasKeyID)
+			{
+				HeaderJson = JSON.Encode(Header, null,
 					new KeyValuePair<string, object>("alg", this.Name),
 					new KeyValuePair<string, object>("jwk", this.PublicWebKey));
 			}

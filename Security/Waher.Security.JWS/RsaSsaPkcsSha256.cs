@@ -48,7 +48,7 @@ namespace Waher.Security.JWS
 				Flags = CspProviderFlags.UseMachineKeyStore,
 				KeyContainerName = KeyContainerName
 			};
-
+			
 			try
 			{
 				this.rsa = new RSACryptoServiceProvider(KeySize, CspParams);
@@ -59,6 +59,15 @@ namespace Waher.Security.JWS
 			}
 
 			this.Init();
+		}
+
+		/// <summary>
+		/// Deletes the key from the CSP, and disposes the object.
+		/// </summary>
+		public void DeleteRsaKeyFromCsp()
+		{
+			this.rsa.PersistKeyInCsp = false;
+			this.Dispose();
 		}
 
 		private void Init()

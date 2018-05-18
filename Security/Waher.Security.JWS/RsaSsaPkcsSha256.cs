@@ -14,6 +14,7 @@ namespace Waher.Security.JWS
 	{
 		private RSACryptoServiceProvider rsa;
 		private SHA256 sha;
+		private KeyValuePair<string, object>[] jwk;
 
 		/// <summary>
 		/// RSASSA-PKCS1-v1_5 SHA-256 algorithm.
@@ -30,6 +31,8 @@ namespace Waher.Security.JWS
 			{
 				throw new CryptographicException("Unable to get access to cryptographic key. Was application initially run using another user?", ex);
 			}
+
+			this.Init();
 		}
 
 		/// <summary>
@@ -55,7 +58,25 @@ namespace Waher.Security.JWS
 				throw new CryptographicException("Unable to get access to cryptographic key. Was application initially run using another user?", ex);
 			}
 
-			RSAParameters Parameters = rsa.ExportParameters(true);
+			this.Init();
+		}
+
+		private void Init()
+		{
+			RSAParameters Parameters = this.rsa.ExportParameters(false);
+
+			this.jwk = new KeyValuePair<string, object>[]
+			{
+				new KeyValuePair<string, object>("kty", "RSA"),
+				new KeyValuePair<string, object>("n", Base64Url.Encode(Parameters.Modulus)),
+				new KeyValuePair<string, object>("e", Base64Url.Encode(Parameters.Exponent))/*,
+				new KeyValuePair<string, object>("d", Base64Url.Encode(Parameters.D)),
+				new KeyValuePair<string, object>("p", Base64Url.Encode(Parameters.P)),
+				new KeyValuePair<string, object>("q", Base64Url.Encode(Parameters.Q)),
+				new KeyValuePair<string, object>("dp", Base64Url.Encode(Parameters.DP)),
+				new KeyValuePair<string, object>("dq", Base64Url.Encode(Parameters.DQ)),
+				new KeyValuePair<string, object>("qi", Base64Url.Encode(Parameters.InverseQ))*/
+			};
 
 			this.sha = SHA256.Create();
 		}
@@ -82,6 +103,16 @@ namespace Waher.Security.JWS
 		/// Short name for algorithm.
 		/// </summary>
 		public override string Name => "RS256";
+
+		/// <summary>
+		/// If the algorithm has a public key.
+		/// </summary>
+		public override bool HasPublicWebKey => true;
+
+		/// <summary>
+		/// The public JSON web key, if supported.
+		/// </summary>
+		public override IEnumerable<KeyValuePair<string, object>> PublicWebKey => this.jwk;
 
 		/// <summary>
 		/// Signs data.

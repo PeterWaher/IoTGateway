@@ -9,5 +9,12 @@ namespace Waher.Security.JWS
 	/// </summary>
     public abstract class HmacSha : JwsAlgorithm
     {
-    }
+		/// <summary>
+		/// If the algorithm has a public key.
+		/// </summary>
+		public override bool HasPublicWebKey
+		{
+			get { return false; }
+		}
+	}
 }

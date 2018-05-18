@@ -13,11 +13,32 @@ namespace Waher.Security.JWS
 	public abstract class JwsAlgorithm : IJwsAlgorithm
 	{
 		/// <summary>
+		/// application/jose+json
+		/// </summary>
+		public const string JwsContentType = "application/jose+json";
+
+		/// <summary>
 		/// Short name for algorithm.
 		/// </summary>
 		public abstract string Name
 		{
 			get;
+		}
+
+		/// <summary>
+		/// If the algorithm has a public key.
+		/// </summary>
+		public abstract bool HasPublicWebKey
+		{
+			get;
+		}
+
+		/// <summary>
+		/// The public JSON web key, if supported.
+		/// </summary>
+		public virtual IEnumerable<KeyValuePair<string, object>> PublicWebKey
+		{
+			get { throw new NotSupportedException("Algorithm does not have a public web key."); }
 		}
 
 		/// <summary>
@@ -37,7 +58,17 @@ namespace Waher.Security.JWS
 			IEnumerable<KeyValuePair<string, object>> Payload, out string HeaderString,
 			out string PayloadString, out string Signature)
 		{
-			string HeaderJson = JSON.Encode(Header, null, new KeyValuePair<string, object>("alg", this.Name));
+			string HeaderJson;
+
+			if (this.HasPublicWebKey)
+			{
+				HeaderJson = JSON.Encode(Header, null, 
+					new KeyValuePair<string, object>("alg", this.Name),
+					new KeyValuePair<string, object>("jwk", this.PublicWebKey));
+			}
+			else
+				HeaderJson = JSON.Encode(Header, null, new KeyValuePair<string, object>("alg", this.Name));
+
 			byte[] HeaderBin = Encoding.UTF8.GetBytes(HeaderJson);
 			HeaderString = Base64Url.Encode(HeaderBin);
 

@@ -19,6 +19,22 @@ namespace Waher.Security.JWS
 		}
 
 		/// <summary>
+		/// If the algorithm has a public web key.
+		/// </summary>
+		bool HasPublicWebKey
+		{
+			get;
+		}
+
+		/// <summary>
+		/// The public JSON web key, if supported.
+		/// </summary>
+		IEnumerable<KeyValuePair<string,object>> PublicWebKey
+		{
+			get;
+		}
+
+		/// <summary>
 		/// Signs data.
 		/// </summary>
 		/// <param name="Header">Properties to include in the header.</param>

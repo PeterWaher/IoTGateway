@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Http;
 using System.Security.Authentication;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Security.JWS;
@@ -16,6 +17,8 @@ namespace Waher.Security.ACME
 	/// </summary>
 	public class AcmeClient : IDisposable
 	{
+		private const int KeySize = 4096;
+
 		private readonly Uri directoryEndpoint;
 		private HttpClient httpClient;
 		private AcmeDirectory directory = null;
@@ -38,7 +41,7 @@ namespace Waher.Security.ACME
 		public AcmeClient(Uri DirectoryEndpoint)
 		{
 			this.directoryEndpoint = DirectoryEndpoint;
-			this.jws = new RsaSsaPkcsSha256(4096, DirectoryEndpoint.ToString());
+			this.jws = new RsaSsaPkcsSha256(KeySize, DirectoryEndpoint.ToString());
 
 			this.httpClient = new HttpClient(new HttpClientHandler()
 			{
@@ -105,7 +108,7 @@ namespace Waher.Security.ACME
 			if (Response.IsSuccessStatusCode)
 				return Obj;
 			else
-				throw CreateException(Obj);
+				throw CreateException(Obj, Response);
 		}
 
 		internal async Task<string> NextNonce()
@@ -147,29 +150,36 @@ namespace Waher.Security.ACME
 			}
 		}
 
-		/// <summary>
-		/// Creates an account on the ACME server.
-		/// </summary>
-		/// <param name="ContactURLs">URLs for contacting the account holder.</param>
-		/// <param name="TermsOfServiceAgreed">If the terms of service have been accepted.</param>
-		/// <returns>ACME account object.</returns>
-		public async Task<AcmeAccount> CreateAccount(string[] ContactURLs, bool TermsOfServiceAgreed)
+		internal class AcmeResponse
 		{
-			if (this.directory == null)
-				await this.GetDirectory();
-
-			return new AcmeAccount(this, await this.POST(this.directory.NewAccount,
-				new KeyValuePair<string, object>("termsOfServiceAgreed", TermsOfServiceAgreed),
-				new KeyValuePair<string, object>("contact", ContactURLs)));
+			public IEnumerable<KeyValuePair<string, object>> Payload;
+			public Uri Location;
+			public string Json;
 		}
 
-		internal async Task<IEnumerable<KeyValuePair<string, object>>> POST(Uri URL, params KeyValuePair<string, object>[] Payload)
+		internal async Task<AcmeResponse> POST(Uri URL, Uri KeyID, params KeyValuePair<string, object>[] Payload)
 		{
-			this.jws.Sign(new KeyValuePair<string, object>[]
+			string HeaderString;
+			string PayloadString;
+			string Signature;
+
+			if (KeyID == null)
 			{
-				new KeyValuePair<string, object>("nonce", await this.NextNonce()),
-				new KeyValuePair<string, object>("url", URL.ToString())
-			}, Payload, out string HeaderString, out string PayloadString, out string Signature);
+				this.jws.Sign(new KeyValuePair<string, object>[]
+				{
+					new KeyValuePair<string, object>("nonce", await this.NextNonce()),
+					new KeyValuePair<string, object>("url", URL.ToString())
+				}, Payload, out HeaderString, out PayloadString, out Signature);
+			}
+			else
+			{
+				this.jws.Sign(new KeyValuePair<string, object>[]
+				{
+					new KeyValuePair<string, object>("kid", KeyID.ToString()),
+					new KeyValuePair<string, object>("nonce", await this.NextNonce()),
+					new KeyValuePair<string, object>("url", URL.ToString())
+				}, Payload, out HeaderString, out PayloadString, out Signature);
+			}
 
 			string Json = JSON.Encode(new KeyValuePair<string, object>[]
 			{
@@ -194,22 +204,39 @@ namespace Waher.Security.ACME
 			else
 				Encoding = System.Text.Encoding.GetEncoding(CharSet);
 
-			string JsonResponse = Encoding.GetString(Bin);
+			AcmeResponse AcmeResponse = new AcmeResponse()
+			{
+				Json = Encoding.GetString(Bin),
+				Location = URL,
+				Payload = null
+			};
 
-			if (!(JSON.Parse(JsonResponse) is IEnumerable<KeyValuePair<string, object>> Obj))
+			if (Response.Headers.TryGetValues("Location", out IEnumerable<string> Values))
+			{
+				foreach (string s in Values)
+				{
+					AcmeResponse.Location = new Uri(s);
+					break;
+				}
+			}
+
+			if (string.IsNullOrEmpty(AcmeResponse.Json))
+				AcmeResponse.Payload = null;
+			else if ((AcmeResponse.Payload = JSON.Parse(AcmeResponse.Json) as IEnumerable<KeyValuePair<string, object>>) == null)
 				throw new Exception("Unexpected response returned.");
 
 			if (Response.IsSuccessStatusCode)
-				return Obj;
+				return AcmeResponse;
 			else
-				throw CreateException(Obj);
+				throw CreateException(AcmeResponse.Payload, Response);
 		}
 
-		internal static AcmeException CreateException(IEnumerable<KeyValuePair<string, object>> Obj)
+		internal static AcmeException CreateException(IEnumerable<KeyValuePair<string, object>> Obj, HttpResponseMessage Response)
 		{
 			AcmeException[] Subproblems = null;
 			string Type = null;
 			string Detail = null;
+			string instance = null;
 			int? Status = null;
 
 			foreach (KeyValuePair<string, object> P in Obj)
@@ -222,6 +249,10 @@ namespace Waher.Security.ACME
 
 					case "detail":
 						Detail = P.Value as string;
+						break;
+
+					case "instance":
+						instance = P.Value as string;
 						break;
 
 					case "status":
@@ -237,7 +268,7 @@ namespace Waher.Security.ACME
 							foreach (object Obj2 in A)
 							{
 								if (Obj2 is IEnumerable<KeyValuePair<string, object>> Obj3)
-									Subproblems2.Add(CreateException(Obj3));
+									Subproblems2.Add(CreateException(Obj3, Response));
 							}
 
 							Subproblems = Subproblems2.ToArray();
@@ -270,12 +301,32 @@ namespace Waher.Security.ACME
 					case "unauthorized": return new AcmeUnauthorizedException(Type, Detail, Status, Subproblems);
 					case "unsupportedContact": return new AcmeUnsupportedContactException(Type, Detail, Status, Subproblems);
 					case "unsupportedIdentifier": return new AcmeUnsupportedIdentifierException(Type, Detail, Status, Subproblems);
-					case "userActionRequired": return new AcmeUserActionRequiredException(Type, Detail, Status, Subproblems);
+					case "userActionRequired": return new AcmeUserActionRequiredException(Type, Detail, Status, Subproblems, new Uri(instance), GetLink(Response, "terms-of-service"));
 					default: return new AcmeException(Type, Detail, Status, Subproblems);
 				}
 			}
 			else
 				return new AcmeException(Type, Detail, Status, Subproblems);
+		}
+
+		private static readonly Regex nextUrl = new Regex("^\\s*[<](?'URL'[^>]+)[>]\\s*;\\s*rel\\s*=\\s*['\"](?'Rel'.*)['\"]\\s*$", RegexOptions.Singleline | RegexOptions.Compiled);
+
+		internal static Uri GetLink(HttpResponseMessage Response, string Rel)
+		{
+			if (Response.Headers.TryGetValues("Link", out IEnumerable<string> Values))
+			{
+				foreach (string s in Values)
+				{
+					Match M = nextUrl.Match(s);
+					if (M.Success)
+					{
+						if (M.Groups["Rel"].Value == Rel)
+							return new Uri(M.Groups["URL"].Value);
+					}
+				}
+			}
+
+			return null;
 		}
 
 		private void GetNextNonce(HttpResponseMessage Response)
@@ -290,6 +341,108 @@ namespace Waher.Security.ACME
 			}
 		}
 
+		/// <summary>
+		/// Creates an account on the ACME server.
+		/// </summary>
+		/// <param name="ContactURLs">URLs for contacting the account holder.</param>
+		/// <param name="TermsOfServiceAgreed">If the terms of service have been accepted.</param>
+		/// <returns>ACME account object.</returns>
+		public async Task<AcmeAccount> CreateAccount(string[] ContactURLs, bool TermsOfServiceAgreed)
+		{
+			if (this.directory == null)
+				await this.GetDirectory();
+
+			AcmeResponse Response = await this.POST(this.directory.NewAccount, null,
+				new KeyValuePair<string, object>("termsOfServiceAgreed", TermsOfServiceAgreed),
+				new KeyValuePair<string, object>("contact", ContactURLs));
+
+			AcmeAccount Account;
+
+			if (Response.Payload == null)
+			{
+				Response = await this.POST(Response.Location, Response.Location);
+				Account = new AcmeAccount(this, Response.Location, Response.Payload);
+
+				bool ContactsDifferent = false;
+				int i, c = ContactURLs.Length;
+
+				if (c != Account.Contact.Length)
+					ContactsDifferent = true;
+				else
+				{
+					for (i = 0; i < c; i++)
+					{
+						if (ContactURLs[i] != Account.Contact[i])
+						{
+							ContactsDifferent = true;
+							break;
+						}
+					}
+				}
+
+				if (ContactsDifferent)
+					Account = await this.UpdateAccount(Account.Location, ContactURLs);
+			}
+			else
+				Account = new AcmeAccount(this, Response.Location, Response.Payload);
+
+			return Account;
+		}
+
+		/// <summary>
+		/// Gets the account object from the ACME server.
+		/// </summary>
+		/// <returns>ACME account object.</returns>
+		public async Task<AcmeAccount> GetAccount()
+		{
+			if (this.directory == null)
+				await this.GetDirectory();
+
+			AcmeResponse Response = await this.POST(this.directory.NewAccount, null,
+				new KeyValuePair<string, object>("onlyReturnExisting", true));
+
+			if (Response.Payload == null)
+				Response = await this.POST(Response.Location, Response.Location);
+
+			return new AcmeAccount(this, Response.Location, Response.Payload);
+		}
+
+		/// <summary>
+		/// Updates an account.
+		/// </summary>
+		/// <param name="AccountLocation">Account location.</param>
+		/// <param name="Contact">New contact information.</param>
+		/// <returns>New account object.</returns>
+		public async Task<AcmeAccount> UpdateAccount(Uri AccountLocation, string[] Contact)
+		{
+			if (this.directory == null)
+				await this.GetDirectory();
+
+			AcmeResponse Response = await this.POST(AccountLocation, AccountLocation,
+				new KeyValuePair<string, object>("contact", Contact));
+
+			return new AcmeAccount(this, Response.Location, Response.Payload);
+		}
+
+		/// <summary>
+		/// Deactivates an account.
+		/// </summary>
+		/// <param name="AccountLocation">Account location.</param>
+		/// <returns>New account object.</returns>
+		public async Task<AcmeAccount> DeactivateAccount(Uri AccountLocation)
+		{
+			if (this.directory == null)
+				await this.GetDirectory();
+
+			AcmeResponse Response = await this.POST(AccountLocation, AccountLocation,
+				new KeyValuePair<string, object>("status", "deactivated"));
+
+			this.jws.DeleteRsaKeyFromCsp();
+			this.jws = null;
+			this.jws = new RsaSsaPkcsSha256(KeySize, this.directoryEndpoint.ToString());
+
+			return new AcmeAccount(this, Response.Location, Response.Payload);
+		}
 
 	}
 }

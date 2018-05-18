@@ -11,25 +11,13 @@ namespace Waher.Security.ACME
 	/// </summary>
 	public class AcmeOrders : AcmeObject
 	{
-		private static readonly Regex nextUrl = new Regex("^\\s*[<](?'URL'[^>]+)[>]\\s*;\\s*rel\\s*=\\s*['\"]next['\"]\\s*$", RegexOptions.Singleline | RegexOptions.Compiled);
 		private readonly Uri[] orders = null;
 		private readonly Uri next = null;
 
 		internal AcmeOrders(AcmeClient Client, HttpResponseMessage Response, IEnumerable<KeyValuePair<string, object>> Obj)
 			: base(Client)
 		{
-			if (Response.Headers.TryGetValues("Link", out IEnumerable<string> Values))
-			{
-				foreach (string s in Values)
-				{
-					Match M = nextUrl.Match(s);
-					if (M.Success)
-					{
-						this.next = new Uri(M.Groups["URL"].Value);
-						break;
-					}
-				}
-			}
+			this.next = AcmeClient.GetLink(Response, "next");
 
 			foreach (KeyValuePair<string, object> P in Obj)
 			{

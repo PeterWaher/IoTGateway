@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Xml;
 
@@ -30,7 +30,7 @@ namespace Waher.Security.ACME
 	/// <summary>
 	/// Represents an ACME account.
 	/// </summary>
-	public class AcmeAccount : AcmeObject
+	public class AcmeAccount : AcmeResource
 	{
 		private readonly AcmeAccountStatus status;
 		private readonly string[] contact = null;
@@ -39,8 +39,8 @@ namespace Waher.Security.ACME
 		private readonly DateTime? createdAt = null;
 		private readonly bool? termsOfServiceAgreed = null;
 
-		internal AcmeAccount(AcmeClient Client, IEnumerable<KeyValuePair<string, object>> Obj)
-			: base(Client)
+		internal AcmeAccount(AcmeClient Client, Uri Location, IEnumerable<KeyValuePair<string, object>> Obj)
+			: base(Client, Location)
 		{
 			foreach (KeyValuePair<string, object> P in Obj)
 			{
@@ -122,5 +122,16 @@ namespace Waher.Security.ACME
 		/// Date and time of creation, if available.
 		/// </summary>
 		public DateTime? CreatedAt => this.createdAt;
+
+		/// <summary>
+		/// Updates the account.
+		/// </summary>
+		/// <param name="Contact">New contact information.</param>
+		/// <returns>New account object.</returns>
+		public Task<AcmeAccount> Update(string[] Contact)
+		{
+			return this.Client.UpdateAccount(this.Location, Contact);
+		}
+
 	}
 }

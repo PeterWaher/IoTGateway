@@ -49,8 +49,39 @@ namespace Waher.Security.ACME.Test
 			Assert.IsNotNull(Account);
 			Assert.AreEqual(AcmeAccountStatus.valid, Account.Status);
 			Assert.IsNotNull(Account.Contact);
-			Assert.AreEqual(1, Account.Contact.Length);
+			Assert.IsTrue(Account.Contact.Length > 0);
 			Assert.AreEqual("mailto:unit.test@example.com", Account.Contact[0]);
+		}
+
+		[TestMethod]
+		public async Task ACME_Test_03_GetAccount()
+		{
+			AcmeAccount Account = await this.client.GetAccount();
+			Assert.IsNotNull(Account);
+			Assert.AreEqual(AcmeAccountStatus.valid, Account.Status);
+			Assert.IsNotNull(Account.Contact);
+			Assert.IsTrue(Account.Contact.Length > 0);
+			Assert.AreEqual("mailto:unit.test@example.com", Account.Contact[0]);
+		}
+
+		[TestMethod]
+		public async Task ACME_Test_04_UpdateAccount()
+		{
+			AcmeAccount Account = await this.client.GetAccount();
+			Account = await Account.Update(new string[] { "mailto:unit.test@example.com", "mailto:unit.test2@example.com" });
+			Assert.IsNotNull(Account);
+			Assert.AreEqual(AcmeAccountStatus.valid, Account.Status);
+			Assert.IsNotNull(Account.Contact);
+			Assert.IsTrue(Account.Contact.Length > 1);
+			Assert.AreEqual("mailto:unit.test@example.com", Account.Contact[0]);
+			Assert.AreEqual("mailto:unit.test2@example.com", Account.Contact[1]);
+		}
+
+		[TestMethod]
+		public async Task ACME_Test_05_DeactivateAccount()
+		{
+			AcmeAccount Account = await this.client.GetAccount();
+			Account = await this.client.DeactivateAccount(Account.Location);
 		}
 	}
 }

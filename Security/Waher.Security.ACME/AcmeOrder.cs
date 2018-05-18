@@ -48,7 +48,7 @@ namespace Waher.Security.ACME
 		private readonly DateTime? notAfter = null;
 		private readonly KeyValuePair<string, string>[] identifiers = null;
 		private readonly Uri[] authorizations = null;
-		private readonly object error = null; // TODO: Problem document
+		private readonly AcmeException error = null; // TODO: Problem document
 		private readonly Uri finalize = null;
 		private readonly Uri certificate = null;
 

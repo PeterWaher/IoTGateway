@@ -69,6 +69,14 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj">
+      <Project>{7f1b0d78-aa86-445b-9e1f-7df75b9e4c04}</Project>
+      <Name>Waher.Runtime.Inventory</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Waher.Security.JWS\Waher.Security.JWS.csproj">
+      <Project>{712709ac-748d-43d7-a369-3beb829bf5e3}</Project>
+      <Name>Waher.Security.JWS</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Waher.Security.JWT\Waher.Security.JWT.csproj">
       <Project>{56b0ebaa-6412-490e-aa14-057a8c83a4ce}</Project>
       <Name>Waher.Security.JWT</Name>

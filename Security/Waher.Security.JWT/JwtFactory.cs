@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
-using Waher.Content;
+using Waher.Security.JWS;
 
 namespace Waher.Security.JWT
 {
@@ -12,24 +11,19 @@ namespace Waher.Security.JWT
 	/// </summary>
 	public class JwtFactory : IDisposable
 	{
-		private HMACSHA256 hmacSHA256;
+		private HmacSha256 algorithm;
 		private TimeSpan timeMargin = TimeSpan.Zero;
-		private string headerStr;
-		private byte[] headerBin;
-		private string header;
+		private readonly KeyValuePair<string, object>[] header = new KeyValuePair<string, object>[]
+		{
+			new KeyValuePair<string, object>("typ", "JWT")
+		};
 
 		/// <summary>
 		/// A factory that can create and validate JWT tokens.
 		/// </summary>
 		public JwtFactory()
 		{
-			using (RandomNumberGenerator Rnd = RandomNumberGenerator.Create())
-			{
-				byte[] Secret = new byte[32];
-				Rnd.GetBytes(Secret);
-
-				this.Init(Secret);
-			}
+			this.algorithm = new HmacSha256();
 		}
 
 		/// <summary>
@@ -38,16 +32,7 @@ namespace Waher.Security.JWT
 		/// <param name="Secret">Secret used for creating and validating signatures.</param>
 		public JwtFactory(byte[] Secret)
 		{
-			this.Init(Secret);
-		}
-
-		private void Init(byte[] Secret)
-		{
-			this.hmacSHA256 = new HMACSHA256(Secret);
-
-			this.headerStr = "{\"typ\":\"JWT\",\"alg\":\"HS256\"}";
-			this.headerBin = Encoding.UTF8.GetBytes(this.headerStr);
-			this.header = JwtToken.Base64UrlEncode(this.headerBin);
+			this.algorithm = new HmacSha256(Secret);
 		}
 
 		/// <summary>
@@ -71,10 +56,10 @@ namespace Waher.Security.JWT
 		/// </summary>
 		public void Dispose()
 		{
-			if (this.hmacSHA256 != null)
+			if (this.algorithm != null)
 			{
-				this.hmacSHA256.Dispose();
-				this.hmacSHA256 = null;
+				this.algorithm.Dispose();
+				this.algorithm = null;
 			}
 		}
 
@@ -85,7 +70,7 @@ namespace Waher.Security.JWT
 		/// <returns>If the token is correctly signed and valid.</returns>
 		public bool IsValid(JwtToken Token)
 		{
-			if (Token.Algorithm != JwtAlgorithm.HS256 || Token.Signature == null)
+			if (Token.Algorithm == null || !(Token.Algorithm is HmacSha256) || Token.Signature == null)
 				return false;
 
 			if (Token.Expiration != null || Token.NotBefore != null)
@@ -99,25 +84,7 @@ namespace Waher.Security.JWT
 					return false;
 			}
 
-			byte[] Signature = Token.Signature;
-			byte[] Hash;
-			int i, c;
-
-			lock (this.hmacSHA256)
-			{
-				Hash = this.hmacSHA256.ComputeHash(Encoding.ASCII.GetBytes(Token.Header + "." + Token.Payload));
-			}
-
-			if ((c = Hash.Length) != Signature.Length)
-				return false;
-
-			for (i = 0; i < c; i++)
-			{
-				if (Hash[i] != Signature[i])
-					return false;
-			}
-
-			return true;
+			return this.algorithm.IsValid(Token.Header, Token.Payload, Token.Signature);
 		}
 
 		/// <summary>
@@ -130,69 +97,23 @@ namespace Waher.Security.JWT
 		/// <returns>JWT token.</returns>
 		public string Create(params KeyValuePair<string, object>[] Claims)
 		{
-			StringBuilder Json = new StringBuilder("{");
-			bool First = true;
+			return this.Create((IEnumerable<KeyValuePair<string, object>>)Claims);
+		}
 
-			foreach (KeyValuePair<string, object> Claim in Claims)
-			{
-				if (First)
-					First = false;
-				else
-					Json.Append(',');
+		/// <summary>
+		/// Creates a new JWT token.
+		/// </summary>
+		/// <param name="Claims">Claims to include in token.
+		/// 
+		/// For a list of public claim names, see:
+		/// https://www.iana.org/assignments/jwt/jwt.xhtml</param>
+		/// <returns>JWT token.</returns>
+		public string Create(IEnumerable<KeyValuePair<string, object>> Claims)
+		{
+			this.algorithm.Sign(this.header, Claims, out string Header, out string Payload, 
+				out string Signature);
 
-				Json.Append('"');
-				Json.Append(JSON.Encode(Claim.Key));
-				Json.Append("\":");
-
-				if (Claim.Value == null)
-					Json.Append("null");
-				else if (Claim.Value is string s)
-				{
-					Json.Append('"');
-					Json.Append(JSON.Encode(s));
-					Json.Append('"');
-				}
-				else if (Claim.Value is bool b)
-				{
-					if (b)
-						Json.Append("true");
-					else
-						Json.Append("false");
-				}
-				else if (Claim.Value is DateTime TP)
-					Json.Append(((int)((TP.ToUniversalTime() - JwtToken.epoch).TotalSeconds)).ToString());
-				else if (Claim.Value is int i)
-					Json.Append(i.ToString());
-				else if (Claim.Value is long l)
-					Json.Append(l.ToString());
-				else if (Claim.Value is short sh)
-					Json.Append(sh.ToString());
-				else if (Claim.Value is byte bt)
-					Json.Append(bt.ToString());
-				else
-				{
-					Json.Append('"');
-					Json.Append(JSON.Encode(Claim.Value.ToString()));
-					Json.Append('"');
-				}
-			}
-
-			Json.Append('}');
-
-			string PayloadStr = Json.ToString();
-			byte[] PayloadBin = Encoding.UTF8.GetBytes(PayloadStr);
-			string Payload = JwtToken.Base64UrlEncode(PayloadBin);
-			byte[] Signature;
-			string Token = this.header + "." + Payload;
-
-			lock (this.hmacSHA256)
-			{
-				Signature = this.hmacSHA256.ComputeHash(Encoding.ASCII.GetBytes(Token));
-			}
-
-			Token += "." + JwtToken.Base64UrlEncode(Signature);
-
-			return Token;
+			return Header + "." + Payload + "." + Signature;
 		}
 
 	}

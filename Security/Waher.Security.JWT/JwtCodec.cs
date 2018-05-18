@@ -113,13 +113,12 @@ namespace Waher.Security.JWT
 		/// <exception cref="ArgumentException">If the object cannot be encoded.</exception>
 		public byte[] Encode(object Object, Encoding Encoding, out string ContentType, params string[] AcceptedContentTypes)
 		{
-			JwtToken Token = Object as JwtToken;
-			if (Token == null)
+			if (!(Object is JwtToken Token))
 				throw new ArgumentException("Object not a JWT token.", nameof(Object));
 
 			ContentType = JwtCodec.ContentType;
 
-			string s = Token.Header + "." + Token.Payload + "." + JwtToken.Base64UrlEncode(Token.Signature);
+			string s = Token.Header + "." + Token.Payload + "." + Token.Signature;
 
 			if (Encoding == null)
 				return Encoding.ASCII.GetBytes(s);

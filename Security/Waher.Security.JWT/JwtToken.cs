@@ -2,35 +2,10 @@
 using System.Collections.Generic;
 using System.Text;
 using Waher.Content;
+using Waher.Security.JWS;
 
 namespace Waher.Security.JWT
 {
-	/// <summary>
-	/// Signing algorithms supported for JWT tokens.
-	/// </summary>
-	public enum JwtAlgorithm
-	{
-		/// <summary>
-		/// HMAC SHA-256
-		/// </summary>
-		HS256,
-
-		/// <summary>
-		/// HMAC SHA-384
-		/// </summary>
-		HS384,
-
-		/// <summary>
-		/// HMAC SHA-512
-		/// </summary>
-		HS512,
-
-		/// <summary>
-		/// Unsecure token.
-		/// </summary>
-		none
-	}
-
 	/// <summary>
 	/// Contains information about a Java Web Token (JWT). JWT is defined in RFC 7519:
 	/// https://tools.ietf.org/html/rfc7519
@@ -44,16 +19,16 @@ namespace Waher.Security.JWT
 	public class JwtToken
 	{
 		private readonly string token;
-		private readonly JwtAlgorithm algorithm;
+		private readonly IJwsAlgorithm algorithm;
 		private readonly Dictionary<string, object> claims;
 		private readonly string header;
 		private readonly string payload;
+		private readonly string signature = null;
 		private readonly string type = null;
 		private readonly string issuer = null;
 		private readonly string subject = null;
 		private readonly string id = null;
 		private readonly string[] audience = null;
-		private readonly byte[] signature = null;
 		private readonly DateTime? expiration = null;
 		private readonly DateTime? notBefore = null;
 		private readonly DateTime? issuedAt = null;
@@ -75,7 +50,7 @@ namespace Waher.Security.JWT
 			try
 			{
 				string[] Parts = Token.Split('.');
-				byte[] HeaderBin = Base64UrlDecode(this.header = Parts[0]);
+				byte[] HeaderBin = Base64Url.Decode(this.header = Parts[0]);
 				string HeaderString = Encoding.UTF8.GetString(HeaderBin);
 
 				if (JSON.Parse(HeaderString) is Dictionary<string, object> Header)
@@ -83,8 +58,13 @@ namespace Waher.Security.JWT
 					if (Header.TryGetValue("typ", out object Typ))
 						this.type = Typ as string;
 
-					if (!Header.TryGetValue("alg", out object Alg) || !(Alg is string AlgStr) || !Enum.TryParse<JwtAlgorithm>(AlgStr, true, out this.algorithm))
+					if (!Header.TryGetValue("alg", out object Alg) || !(Alg is string AlgStr))
 						throw new ArgumentException("Invalid alg header field.", nameof(Token));
+
+					if (string.IsNullOrEmpty(AlgStr) || AlgStr.ToLower() == "none")
+						this.algorithm = null;
+					else if (!JwsAlgorithm.TryGetAlgorithm(AlgStr, out this.algorithm))
+						throw new ArgumentException("Unrecognized algorithm reference in header field.", nameof(Token));
 				}
 				else
 					throw new Exception("Invalid JSON header.");
@@ -92,7 +72,7 @@ namespace Waher.Security.JWT
 				if (Parts.Length < 2)
 					throw new Exception("Claims set missing.");
 
-				byte[] ClaimsBin = Base64UrlDecode(this.payload = Parts[1]);
+				byte[] ClaimsBin = Base64Url.Decode(this.payload = Parts[1]);
 				string ClaimsString = Encoding.UTF8.GetString(ClaimsBin);
 
 				if (JSON.Parse(ClaimsString) is Dictionary<string, object> Claims)
@@ -131,17 +111,17 @@ namespace Waher.Security.JWT
 
 							case "exp":
 								if (P.Value is int ExpInt)
-									this.expiration = epoch.AddSeconds(ExpInt);
+									this.expiration = JSON.UnixEpoch.AddSeconds(ExpInt);
 								break;
 
 							case "nbf":
 								if (P.Value is int NbfInt)
-									this.notBefore = epoch.AddSeconds(NbfInt);
+									this.notBefore = JSON.UnixEpoch.AddSeconds(NbfInt);
 								break;
 
 							case "iat":
 								if (P.Value is int IatInt)
-									this.issuedAt = epoch.AddSeconds(IatInt);
+									this.issuedAt = JSON.UnixEpoch.AddSeconds(IatInt);
 								break;
 
 							case "expires":
@@ -155,67 +135,12 @@ namespace Waher.Security.JWT
 				if (Parts.Length < 3)
 					throw new Exception("Signature missing.");
 
-				this.signature = Base64UrlDecode(Parts[2]);
+				this.signature = Parts[2];
 			}
 			catch (Exception ex)
 			{
 				throw new Exception("Unable to parse JWT token.", ex);
 			}
-		}
-
-		internal static readonly DateTime epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-
-		/// <summary>
-		/// Converts a Base64URL-encoded string to its binary representation.
-		/// </summary>
-		/// <param name="Base64Url">Base64URL-encoded string.</param>
-		/// <returns>Binary representation.</returns>
-		public static byte[] Base64UrlDecode(string Base64Url)
-		{
-			int c = Base64Url.Length;
-			int i = c & 3;
-
-			Base64Url = Base64Url.Replace('-', '+'); // 62nd char of encoding
-			Base64Url = Base64Url.Replace('_', '/'); // 63rd char of encoding
-
-			switch (i)
-			{
-				case 1:
-					Base64Url += "A==";
-					break;
-
-				case 2:
-					Base64Url += "==";
-					break;
-
-				case 3:
-					Base64Url += "=";
-					break;
-			}
-
-			return Convert.FromBase64String(Base64Url);
-		}
-
-		/// <summary>
-		/// Converts a binary block of data to a Base64URL-encoded string.
-		/// </summary>
-		/// <param name="Data">Data to encode.</param>
-		/// <returns>Base64URL-encoded string.</returns>
-		public static string Base64UrlEncode(byte[] Data)
-		{
-			string s = Convert.ToBase64String(Data);
-			int c = Data.Length;
-			int i = c % 3;
-
-			if (i == 1)
-				s = s.Substring(0, s.Length - 2);
-			else if (i == 2)
-				s = s.Substring(0, s.Length - 1);
-
-			s = s.Replace('+', '-'); // 62nd char of encoding
-			s = s.Replace('/', '_'); // 63rd char of encoding
-
-			return s;
 		}
 
 		/// <summary>
@@ -235,6 +160,14 @@ namespace Waher.Security.JWT
 		}
 
 		/// <summary>
+		/// The Base64URL-encoded signature.
+		/// </summary>
+		public string Signature
+		{
+			get { return this.signature; }
+		}
+
+		/// <summary>
 		/// String token that can be embedded easily in web requests, etc.
 		/// </summary>
 		public string Token
@@ -243,9 +176,9 @@ namespace Waher.Security.JWT
 		}
 
 		/// <summary>
-		/// JWT signature algoritm.
+		/// JWS signature algoritm.
 		/// </summary>
-		public JwtAlgorithm Algorithm
+		public IJwsAlgorithm Algorithm
 		{
 			get { return this.algorithm; }
 		}
@@ -332,14 +265,6 @@ namespace Waher.Security.JWT
 		public DateTime? IssuedAt
 		{
 			get { return this.issuedAt; }
-		}
-
-		/// <summary>
-		/// Signature of token.
-		/// </summary>
-		public byte[] Signature
-		{
-			get { return this.signature; }
 		}
 
 	}

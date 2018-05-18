@@ -2,19 +2,27 @@
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Waher.Runtime.Inventory;
+using Waher.Security.JWS;
 
 namespace Waher.Security.JWT.Test
 {
 	[TestClass]
 	public class JwtTests
 	{
+		[AssemblyInitialize]
+		public static void AssemblyInitialize(TestContext Context)
+		{
+			Types.Initialize(typeof(IJwsAlgorithm).Assembly);
+		}
+
 		[TestMethod]
 		public void JWT_Test_01_Parse_Secure()
 		{
 			JwtToken Token = new JwtToken("eyJ0eXAiOiJKV1QiLA0KICJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGFtcGxlLmNvbS9pc19yb290Ijp0cnVlfQ.dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk");
 
 			Assert.AreEqual("JWT", Token.Type);
-			Assert.AreEqual(JwtAlgorithm.HS256, Token.Algorithm);
+			Assert.IsTrue(Token.Algorithm is HmacSha256);
 
 			Assert.AreEqual(true, Token.TryGetClaim("iss", out object Issuer));
 			Assert.AreEqual("joe", Issuer);
@@ -33,7 +41,7 @@ namespace Waher.Security.JWT.Test
 		{
 			JwtToken Token = new JwtToken("eyJhbGciOiJub25lIn0.eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGFtcGxlLmNvbS9pc19yb290Ijp0cnVlfQ.");
 
-			Assert.AreEqual(JwtAlgorithm.none, Token.Algorithm);
+			Assert.IsNull(Token.Algorithm);
 
 			Assert.AreEqual(true, Token.TryGetClaim("iss", out object Issuer));
 			Assert.AreEqual("joe", Issuer);
@@ -53,7 +61,7 @@ namespace Waher.Security.JWT.Test
 			JwtToken Token = new JwtToken("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ");
 
 			Assert.AreEqual("JWT", Token.Type);
-			Assert.AreEqual(JwtAlgorithm.HS256, Token.Algorithm);
+			Assert.IsTrue(Token.Algorithm is HmacSha256);
 
 			Assert.AreEqual(true, Token.TryGetClaim("sub", out object Subject));
 			Assert.AreEqual("1234567890", Subject);
@@ -77,7 +85,7 @@ namespace Waher.Security.JWT.Test
 			JwtToken Token = new JwtToken("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ");
 
 			Assert.AreEqual("JWT", Token.Type);
-			Assert.AreEqual(JwtAlgorithm.HS256, Token.Algorithm);
+			Assert.IsTrue(Token.Algorithm is HmacSha256);
 
 			Assert.AreEqual(true, Token.TryGetClaim("sub", out object Subject));
 			Assert.AreEqual("1234567890", Subject);
@@ -100,14 +108,14 @@ namespace Waher.Security.JWT.Test
 		{
 			using (JwtFactory Factory = new JwtFactory(Encoding.ASCII.GetBytes("secret")))
 			{
-				DateTime Expires = new DateTime(2018, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+				DateTime Expires = DateTime.Today.ToUniversalTime().AddDays(2);
 				string TokenStr = Factory.Create(
 					new KeyValuePair<string, object>("sub", "test user"),
 					new KeyValuePair<string, object>("exp", Expires));
 				JwtToken Token = new JwtToken(TokenStr);
 
 				Assert.AreEqual("JWT", Token.Type);
-				Assert.AreEqual(JwtAlgorithm.HS256, Token.Algorithm);
+				Assert.IsTrue(Token.Algorithm is HmacSha256);
 
 				Assert.AreEqual(true, Token.TryGetClaim("sub", out object Subject));
 				Assert.AreEqual("test user", Subject);

@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata minClientVersion="3.2">
     <id>Waher.Security.JWT.UWP</id>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
     <title>Waher.Security.JWT.UWP</title>
     <authors>Peter Waher</authors>
     <owners>Waher Data AB</owners>
@@ -18,8 +18,9 @@
       <dependency id="Waher.Content" version="1.0.9"/>
       <dependency id="Waher.Networking.HTTP.UWP" version="1.0.10"/>
       <dependency id="Waher.Runtime.Inventory" version="1.0.4"/>
-      <dependency id="Waher.Security" version="1.0.2"/>
-    </dependencies>
+			<dependency id="Waher.Security" version="1.0.2"/>
+			<dependency id="Waher.Security.JWS" version="1.0.0"/>
+		</dependencies>
   </metadata>
   <files>
     <!-- Architecture-independent reference library for use at compile-time. -->

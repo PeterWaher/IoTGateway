@@ -54,7 +54,7 @@ namespace Waher.Security.ACME
 		private readonly string value = null;
 		private readonly bool? wildcard = null;
 
-		internal AcmeAuthorization(AcmeClient Client, Dictionary<string, object> Obj)
+		internal AcmeAuthorization(AcmeClient Client, IEnumerable<KeyValuePair<string, object>> Obj)
 			: base(Client)
 		{
 			foreach (KeyValuePair<string, object> P in Obj)
@@ -74,7 +74,7 @@ namespace Waher.Security.ACME
 						break;
 
 					case "identifier":
-						if (P.Value is Dictionary<string, object> Obj2)
+						if (P.Value is IEnumerable<KeyValuePair<string, object>> Obj2)
 						{
 							foreach (KeyValuePair<string, object> P2 in Obj2)
 							{
@@ -99,7 +99,7 @@ namespace Waher.Security.ACME
 
 							foreach (object Obj3 in A2)
 							{
-								if (Obj3 is Dictionary<string, object> Obj4)
+								if (Obj3 is IEnumerable<KeyValuePair<string, object>> Obj4)
 									Challenges.Add(new AcmeChallenge(Client, Obj4));
 							}
 

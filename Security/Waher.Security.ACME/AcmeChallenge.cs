@@ -6,6 +6,9 @@ using Waher.Content.Xml;
 
 namespace Waher.Security.ACME
 {
+	/// <summary>
+	/// ACME Challenge status enumeration
+	/// </summary>
 	public enum AcmeChallengeStatus
 	{
 		/// <summary>
@@ -32,7 +35,7 @@ namespace Waher.Security.ACME
 	/// <summary>
 	/// Abstract base class of an ACME challenge.
 	/// </summary>
-	public abstract class AcmeChallenge : AcmeObject
+	public /*abstract*/ class AcmeChallenge : AcmeObject
 	{
 		private readonly AcmeChallengeStatus status;
 		private readonly string url;
@@ -40,7 +43,7 @@ namespace Waher.Security.ACME
 		private readonly string token;
 		private readonly DateTime? validated;
 
-		internal AcmeChallenge(AcmeClient Client, Dictionary<string, object> Obj)
+		internal AcmeChallenge(AcmeClient Client, IEnumerable<KeyValuePair<string, object>> Obj)
 			: base(Client)
 		{
 			foreach (KeyValuePair<string, object> P in Obj)

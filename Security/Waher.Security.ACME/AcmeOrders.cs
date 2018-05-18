@@ -15,7 +15,7 @@ namespace Waher.Security.ACME
 		private readonly string[] orders = null;
 		private readonly string next = null;
 
-		internal AcmeOrders(AcmeClient Client, HttpResponseMessage Response, Dictionary<string, object> Obj)
+		internal AcmeOrders(AcmeClient Client, HttpResponseMessage Response, IEnumerable<KeyValuePair<string, object>> Obj)
 			: base(Client)
 		{
 			if (Response.Headers.TryGetValues("Link", out IEnumerable<string> Values))

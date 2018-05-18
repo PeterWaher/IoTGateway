@@ -36,7 +36,7 @@ namespace Waher.Security.ACME
 		private readonly string orders;
 		private readonly bool? termsOfServiceAgreed = null;
 
-		internal AcmeAccount(AcmeClient Client, Dictionary<string, object> Obj)
+		internal AcmeAccount(AcmeClient Client, IEnumerable<KeyValuePair<string, object>> Obj)
 			: base(Client)
 		{
 			foreach (KeyValuePair<string, object> P in Obj)

@@ -52,7 +52,7 @@ namespace Waher.Security.ACME
 		private readonly string finalize = null;
 		private readonly string certificate = null;
 
-		internal AcmeOrder(AcmeClient Client, Dictionary<string, object> Obj)
+		internal AcmeOrder(AcmeClient Client, IEnumerable<KeyValuePair<string, object>> Obj)
 			: base(Client)
 		{
 			foreach (KeyValuePair<string, object> P in Obj)
@@ -92,7 +92,7 @@ namespace Waher.Security.ACME
 
 							foreach (object Obj2 in A)
 							{
-								if (Obj2 is Dictionary<string, object> Obj3)
+								if (Obj2 is IEnumerable<KeyValuePair<string, object>> Obj3)
 								{
 									string Type = null;
 									string Value = null;

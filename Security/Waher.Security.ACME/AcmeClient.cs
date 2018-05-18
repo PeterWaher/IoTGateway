@@ -69,7 +69,7 @@ namespace Waher.Security.ACME
 			return this.directory;
 		}
 
-		internal async Task<Dictionary<string, object>> GET(string URL)
+		internal async Task<IEnumerable<KeyValuePair<string, object>>> GET(string URL)
 		{
 			HttpResponseMessage Response = await this.httpClient.GetAsync(URL);
 			Response.EnsureSuccessStatusCode();
@@ -86,7 +86,7 @@ namespace Waher.Security.ACME
 
 			string JsonResponse = Encoding.GetString(Bin);
 
-			if (!(JSON.Parse(JsonResponse) is Dictionary<string, object> Obj))
+			if (!(JSON.Parse(JsonResponse) is IEnumerable<KeyValuePair<string, object>> Obj))
 				throw new Exception("Unexpected response returned.");
 
 			return Obj;
@@ -142,15 +142,12 @@ namespace Waher.Security.ACME
 			if (this.directory == null)
 				await this.GetDirectory();
 
-			return new AcmeAccount(this, await this.POST(this.directory.NewAccount, 
-				new Dictionary<string, object>()
-				{
-					{ "termsOfServiceAgreed", TermsOfServiceAgreed },
-					{ "contact", ContactURLs }
-				}));
+			return new AcmeAccount(this, await this.POST(this.directory.NewAccount,
+				new KeyValuePair<string, object>("termsOfServiceAgreed", TermsOfServiceAgreed),
+				new KeyValuePair<string, object>("contact", ContactURLs)));
 		}
 
-		internal async Task<Dictionary<string, object>> POST(string URL, Dictionary<string, object> Payload)
+		internal async Task<IEnumerable<KeyValuePair<string, object>>> POST(string URL, params KeyValuePair<string, object>[] Payload)
 		{
 			HttpResponseMessage Response = await this.httpClient.GetAsync(URL);
 			Response.EnsureSuccessStatusCode();
@@ -167,7 +164,7 @@ namespace Waher.Security.ACME
 
 			string JsonResponse = Encoding.GetString(Bin);
 
-			if (!(JSON.Parse(JsonResponse) is Dictionary<string, object> Obj))
+			if (!(JSON.Parse(JsonResponse) is IEnumerable<KeyValuePair<string, object>> Obj))
 				throw new Exception("Unexpected response returned.");
 
 			return Obj;

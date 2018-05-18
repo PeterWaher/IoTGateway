@@ -20,7 +20,7 @@ namespace Waher.Security.ACME
 		private readonly string newAuthz = null;
 		private readonly bool externalAccountRequired = false;
 
-		internal AcmeDirectory(AcmeClient Client, Dictionary<string, object> Obj)
+		internal AcmeDirectory(AcmeClient Client, IEnumerable<KeyValuePair<string, object>> Obj)
 			: base(Client)
 		{
 			foreach (KeyValuePair<string, object> P in Obj)
@@ -32,7 +32,7 @@ namespace Waher.Security.ACME
 						break;
 
 					case "meta":
-						if (P.Value is Dictionary<string, object> Obj2)
+						if (P.Value is IEnumerable<KeyValuePair<string, object>> Obj2)
 						{
 							foreach (KeyValuePair<string, object> P2 in Obj2)
 							{

@@ -86,7 +86,6 @@ namespace Waher.Security.ACME
 		internal async Task<IEnumerable<KeyValuePair<string, object>>> GET(Uri URL)
 		{
 			HttpResponseMessage Response = await this.httpClient.GetAsync(URL);
-			Response.EnsureSuccessStatusCode();
 
 			Stream Stream = await Response.Content.ReadAsStreamAsync();
 			byte[] Bin = await Response.Content.ReadAsByteArrayAsync();
@@ -103,7 +102,10 @@ namespace Waher.Security.ACME
 			if (!(JSON.Parse(JsonResponse) is IEnumerable<KeyValuePair<string, object>> Obj))
 				throw new Exception("Unexpected response returned.");
 
-			return Obj;
+			if (Response.IsSuccessStatusCode)
+				return Obj;
+			else
+				throw CreateException(Obj);
 		}
 
 		internal async Task<string> NextNonce()
@@ -179,7 +181,6 @@ namespace Waher.Security.ACME
 			HttpContent Content = new ByteArrayContent(System.Text.Encoding.ASCII.GetBytes(Json));
 			Content.Headers.Add("Content-Type", JwsAlgorithm.JwsContentType);
 			HttpResponseMessage Response = await this.httpClient.PostAsync(URL, Content);
-			Response.EnsureSuccessStatusCode();
 
 			this.GetNextNonce(Response);
 
@@ -198,7 +199,83 @@ namespace Waher.Security.ACME
 			if (!(JSON.Parse(JsonResponse) is IEnumerable<KeyValuePair<string, object>> Obj))
 				throw new Exception("Unexpected response returned.");
 
-			return Obj;
+			if (Response.IsSuccessStatusCode)
+				return Obj;
+			else
+				throw CreateException(Obj);
+		}
+
+		internal static AcmeException CreateException(IEnumerable<KeyValuePair<string, object>> Obj)
+		{
+			AcmeException[] Subproblems = null;
+			string Type = null;
+			string Detail = null;
+			int? Status = null;
+
+			foreach (KeyValuePair<string, object> P in Obj)
+			{
+				switch (P.Key)
+				{
+					case "type":
+						Type = P.Value as string;
+						break;
+
+					case "detail":
+						Detail = P.Value as string;
+						break;
+
+					case "status":
+						if (int.TryParse(P.Value as string, out int i))
+							Status = i;
+						break;
+
+					case "subproblems":
+						if (P.Value is Array A)
+						{
+							List<AcmeException> Subproblems2 = new List<AcmeException>();
+
+							foreach (object Obj2 in A)
+							{
+								if (Obj2 is IEnumerable<KeyValuePair<string, object>> Obj3)
+									Subproblems2.Add(CreateException(Obj3));
+							}
+
+							Subproblems = Subproblems2.ToArray();
+						}
+						break;
+				}
+			}
+
+			if (Type.StartsWith("urn:ietf:params:acme:error:"))
+			{
+				switch (Type.Substring(27))
+				{
+					case "accountDoesNotExist": return new AcmeAccountDoesNotExistException(Type, Detail, Status, Subproblems);
+					case "badCSR": return new AcmeBadCsrException(Type, Detail, Status, Subproblems);
+					case "badNonce": return new AcmeBadNonceException(Type, Detail, Status, Subproblems);
+					case "badRevocationReason": return new AcmeBadRevocationReasonException(Type, Detail, Status, Subproblems);
+					case "badSignatureAlgorithm": return new AcmeBadSignatureAlgorithmException(Type, Detail, Status, Subproblems);
+					case "caa": return new AcmeCaaException(Type, Detail, Status, Subproblems);
+					case "compound": return new AcmeCompoundException(Type, Detail, Status, Subproblems);
+					case "connection": return new AcmeConnectionException(Type, Detail, Status, Subproblems);
+					case "dns": return new AcmeDnsException(Type, Detail, Status, Subproblems);
+					case "externalAccountRequired": return new AcmeExternalAccountRequiredException(Type, Detail, Status, Subproblems);
+					case "incorrectResponse": return new AcmeIncorrectResponseException(Type, Detail, Status, Subproblems);
+					case "invalidContact": return new AcmeInvalidContactException(Type, Detail, Status, Subproblems);
+					case "malformed": return new AcmeMalformedException(Type, Detail, Status, Subproblems);
+					case "rateLimited": return new AcmeRateLimitedException(Type, Detail, Status, Subproblems);
+					case "rejectedIdentifier": return new AcmeRejectedIdentifierException(Type, Detail, Status, Subproblems);
+					case "serverInternal": return new AcmeServerInternalException(Type, Detail, Status, Subproblems);
+					case "tls": return new AcmeTlsException(Type, Detail, Status, Subproblems);
+					case "unauthorized": return new AcmeUnauthorizedException(Type, Detail, Status, Subproblems);
+					case "unsupportedContact": return new AcmeUnsupportedContactException(Type, Detail, Status, Subproblems);
+					case "unsupportedIdentifier": return new AcmeUnsupportedIdentifierException(Type, Detail, Status, Subproblems);
+					case "userActionRequired": return new AcmeUserActionRequiredException(Type, Detail, Status, Subproblems);
+					default: return new AcmeException(Type, Detail, Status, Subproblems);
+				}
+			}
+			else
+				return new AcmeException(Type, Detail, Status, Subproblems);
 		}
 
 		private void GetNextNonce(HttpResponseMessage Response)

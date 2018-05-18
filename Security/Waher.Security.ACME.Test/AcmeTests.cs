@@ -30,6 +30,16 @@ namespace Waher.Security.ACME.Test
 		{
 			AcmeDirectory Directory = await this.client.GetDirectory();
 			Assert.IsNotNull(Directory);
+			Assert.IsTrue(Directory.CaaIdentities.Length > 0);
+			Assert.IsFalse(Directory.ExternalAccountRequired);
+			Assert.IsFalse(string.IsNullOrEmpty(Directory.KeyChange));
+			Assert.IsFalse(string.IsNullOrEmpty(Directory.NewAccount));
+			Assert.IsTrue(string.IsNullOrEmpty(Directory.NewAuthz));
+			Assert.IsFalse(string.IsNullOrEmpty(Directory.NewNonce));
+			Assert.IsFalse(string.IsNullOrEmpty(Directory.NewOrder));
+			Assert.IsFalse(string.IsNullOrEmpty(Directory.RevokeCert));
+			Assert.IsFalse(string.IsNullOrEmpty(Directory.TermsOfService));
+			Assert.IsFalse(string.IsNullOrEmpty(Directory.Website));
 		}
 	}
 }

@@ -15,9 +15,15 @@ namespace Waher.Security.ACME
 	/// </summary>
 	public class AcmeClient : IDisposable
 	{
+		/// <summary>
+		/// application/jose+json
+		/// </summary>
+		public const string JwsContentType = "application/jose+json";
+
 		private readonly string directoryEndpoint;
 		private HttpClient httpClient;
 		private AcmeDirectory directory = null;
+		private string nonce = null;
 
 		/// <summary>
 		/// Implements an ACME client for the generation of certificates using ACME-compliant certificate servers.
@@ -35,7 +41,7 @@ namespace Waher.Security.ACME
 			}, true);
 
 			this.httpClient.DefaultRequestHeaders.Add("User-Agent", typeof(AcmeClient).Namespace);
-			this.httpClient.DefaultRequestHeaders.Add("Accept", "application/jose+json");
+			this.httpClient.DefaultRequestHeaders.Add("Accept", JwsContentType);
 			this.httpClient.DefaultRequestHeaders.Add("Accept-Language", "en");
 		}
 
@@ -58,29 +64,57 @@ namespace Waher.Security.ACME
 		public async Task<AcmeDirectory> GetDirectory()
 		{
 			if (this.directory == null)
-			{
-				HttpResponseMessage Response = await this.httpClient.GetAsync(this.directoryEndpoint);
-				Response.EnsureSuccessStatusCode();
-
-				Stream Stream = await Response.Content.ReadAsStreamAsync(); // Regardless of status code, we check for XML content.
-				byte[] Bin = await Response.Content.ReadAsByteArrayAsync();
-				string CharSet = Response.Content.Headers.ContentType.CharSet;
-				Encoding Encoding;
-
-				if (string.IsNullOrEmpty(CharSet))
-					Encoding = Encoding.UTF8;
-				else
-					Encoding = System.Text.Encoding.GetEncoding(CharSet);
-
-				string JsonResponse = Encoding.GetString(Bin);
-
-				if (!(JSON.Parse(JsonResponse) is Dictionary<string, object> Obj))
-					throw new Exception("Unexpected response returned.");
-
-				this.directory = new AcmeDirectory(Obj);
-			}
+				this.directory = new AcmeDirectory(this, await this.GET(this.directoryEndpoint));
 
 			return this.directory;
+		}
+
+		internal async Task<Dictionary<string, object>> GET(string URL)
+		{
+			HttpResponseMessage Response = await this.httpClient.GetAsync(URL);
+			Response.EnsureSuccessStatusCode();
+
+			Stream Stream = await Response.Content.ReadAsStreamAsync();
+			byte[] Bin = await Response.Content.ReadAsByteArrayAsync();
+			string CharSet = Response.Content.Headers.ContentType.CharSet;
+			Encoding Encoding;
+
+			if (string.IsNullOrEmpty(CharSet))
+				Encoding = Encoding.UTF8;
+			else
+				Encoding = System.Text.Encoding.GetEncoding(CharSet);
+
+			string JsonResponse = Encoding.GetString(Bin);
+
+			if (!(JSON.Parse(JsonResponse) is Dictionary<string, object> Obj))
+				throw new Exception("Unexpected response returned.");
+
+			return Obj;
+		}
+
+		internal async Task<string> GetNonce()
+		{
+			if (!string.IsNullOrEmpty(this.nonce))
+			{
+				string s = this.nonce;
+				this.nonce = null;
+				return s;
+			}
+
+			if (this.directory == null)
+				await this.GetDirectory();
+
+			HttpRequestMessage Request = new HttpRequestMessage(HttpMethod.Head, this.directory.NewNonce);
+			HttpResponseMessage Response = await this.httpClient.SendAsync(Request);
+			Response.EnsureSuccessStatusCode();
+
+			if (Response.Headers.TryGetValues("Replay-Nonce", out IEnumerable<string> Values))
+			{
+				foreach (string s in Values)
+					return s;
+			}
+
+			throw new Exception("No nonce returned from server.");
 		}
 
 		/// <summary>
@@ -96,5 +130,61 @@ namespace Waher.Security.ACME
 					return Task.FromResult<AcmeDirectory>(this.directory);
 			}
 		}
+
+		/// <summary>
+		/// Creates an account on the ACME server.
+		/// </summary>
+		/// <param name="ContactURLs">URLs for contacting the account holder.</param>
+		/// <param name="TermsOfServiceAgreed">If the terms of service have been accepted.</param>
+		/// <returns>ACME account object.</returns>
+		public async Task<AcmeAccount> CreateAccount(string[] ContactURLs, bool TermsOfServiceAgreed)
+		{
+			if (this.directory == null)
+				await this.GetDirectory();
+
+			return new AcmeAccount(this, await this.POST(this.directory.NewAccount, 
+				new Dictionary<string, object>()
+				{
+					{ "termsOfServiceAgreed", TermsOfServiceAgreed },
+					{ "contact", ContactURLs }
+				}));
+		}
+
+		internal async Task<Dictionary<string, object>> POST(string URL, Dictionary<string, object> Payload)
+		{
+			HttpResponseMessage Response = await this.httpClient.GetAsync(URL);
+			Response.EnsureSuccessStatusCode();
+
+			Stream Stream = await Response.Content.ReadAsStreamAsync();
+			byte[] Bin = await Response.Content.ReadAsByteArrayAsync();
+			string CharSet = Response.Content.Headers.ContentType.CharSet;
+			Encoding Encoding;
+
+			if (string.IsNullOrEmpty(CharSet))
+				Encoding = Encoding.UTF8;
+			else
+				Encoding = System.Text.Encoding.GetEncoding(CharSet);
+
+			string JsonResponse = Encoding.GetString(Bin);
+
+			if (!(JSON.Parse(JsonResponse) is Dictionary<string, object> Obj))
+				throw new Exception("Unexpected response returned.");
+
+			return Obj;
+		}
+
+		private void GetNextNonce(HttpResponseMessage Response)
+		{
+			if (Response.Headers.TryGetValues("Replay-Nonce", out IEnumerable<string> Values))
+			{
+				foreach (string s in Values)
+				{
+					this.nonce = s;
+					return;
+				}
+			}
+		}
+
+
 	}
 }

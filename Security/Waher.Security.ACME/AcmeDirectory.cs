@@ -7,7 +7,7 @@ namespace Waher.Security.ACME
 	/// <summary>
 	/// Represents an ACME directory.
 	/// </summary>
-	public class AcmeDirectory
+	public class AcmeDirectory : AcmeObject
 	{
 		private readonly string[] caaIdentities = null;
 		private readonly string keyChange = null;
@@ -20,7 +20,8 @@ namespace Waher.Security.ACME
 		private readonly string newAuthz = null;
 		private readonly bool externalAccountRequired = false;
 
-		internal AcmeDirectory(Dictionary<string, object> Obj)
+		internal AcmeDirectory(AcmeClient Client, Dictionary<string, object> Obj)
+			: base(Client)
 		{
 			foreach (KeyValuePair<string, object> P in Obj)
 			{

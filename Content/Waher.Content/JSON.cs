@@ -12,6 +12,11 @@ namespace Waher.Content
 	/// </summary>
 	public static class JSON
 	{
+		/// <summary>
+		/// Unix Date and Time epoch, starting at 1970-01-01T00:00:00Z
+		/// </summary>
+		public static readonly DateTime UnixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+
 		#region Encoding/Decoding
 
 		/// <summary>
@@ -478,6 +483,104 @@ namespace Waher.Content
 			Encode(Object, Indent ? (int?)0 : null, Json);
 		}
 
+		/// <summary>
+		/// Encodes an object as JSON.
+		/// </summary>
+		/// <param name="Object">Object.</param>
+		/// <param name="Indent">If JSON should be indented.</param>
+		/// <param name="AdditionalProperties">Optional additional properties.</param>
+		/// <returns>Encoded object.</returns>
+		public static string Encode(IEnumerable<KeyValuePair<string, object>> Object, int? Indent,
+			params KeyValuePair<string, object>[] AdditionalProperties)
+		{
+			StringBuilder Json = new StringBuilder();
+			Encode(Object, Indent, Json, AdditionalProperties);
+			return Json.ToString();
+		}
+
+		/// <summary>
+		/// Encodes an object as JSON.
+		/// </summary>
+		/// <param name="Object">Object.</param>
+		/// <param name="Json">JSON Output.</param>
+		/// <param name="Indent">If JSON should be indented.</param>
+		/// <param name="AdditionalProperties">Optional additional properties.</param>
+		public static void Encode(IEnumerable<KeyValuePair<string, object>> Object, int? Indent, StringBuilder Json,
+			params KeyValuePair<string,object>[] AdditionalProperties)
+		{
+			bool First = true;
+
+			Json.Append('{');
+
+			if (Indent.HasValue)
+				Indent = Indent + 1;
+
+			if (Object != null)
+			{
+				foreach (KeyValuePair<string, object> Member in Object)
+				{
+					if (First)
+						First = false;
+					else
+						Json.Append(',');
+
+					if (Indent.HasValue)
+					{
+						Json.AppendLine();
+						Json.Append(new string('\t', Indent.Value));
+					}
+
+					Json.Append('"');
+					Json.Append(Encode(Member.Key));
+					Json.Append("\":");
+
+					if (Indent.HasValue)
+						Json.Append(' ');
+
+					Encode(Member.Value, Indent, Json);
+				}
+			}
+
+			if (AdditionalProperties != null)
+			{
+				foreach (KeyValuePair<string, object> Member in AdditionalProperties)
+				{
+					if (First)
+						First = false;
+					else
+						Json.Append(',');
+
+					if (Indent.HasValue)
+					{
+						Json.AppendLine();
+						Json.Append(new string('\t', Indent.Value));
+					}
+
+					Json.Append('"');
+					Json.Append(Encode(Member.Key));
+					Json.Append("\":");
+
+					if (Indent.HasValue)
+						Json.Append(' ');
+
+					Encode(Member.Value, Indent, Json);
+				}
+			}
+
+			if (!First)
+			{
+				Json.AppendLine();
+
+				if (Indent.HasValue)
+				{
+					Indent = Indent - 1;
+					Json.Append(new string('\t', Indent.Value));
+				}
+			}
+
+			Json.Append('}');
+		}
+
 		private static void Encode(object Object, int? Indent, StringBuilder Json)
 		{
 			if (Object == null)
@@ -509,6 +612,8 @@ namespace Waher.Content
 						Json.Append(Encode(Object.ToString()));
 						Json.Append('"');
 					}
+					else if (Object is DateTime TP)
+						Json.Append(((int)((TP.ToUniversalTime() - UnixEpoch).TotalSeconds)).ToString());
 					else
 						Json.Append(Object.ToString());
 				}
@@ -518,51 +623,8 @@ namespace Waher.Content
 					Json.Append(Encode(s));
 					Json.Append('"');
 				}
-				else if (Object is Dictionary<string, object> Obj)
-				{
-					bool First = true;
-
-					Json.Append('{');
-
-					if (Indent.HasValue)
-						Indent = Indent + 1;
-
-					foreach (KeyValuePair<string, object> Member in Obj)
-					{
-						if (First)
-							First = false;
-						else
-							Json.Append(',');
-
-						if (Indent.HasValue)
-						{
-							Json.AppendLine();
-							Json.Append(new string('\t', Indent.Value));
-						}
-
-						Json.Append('"');
-						Json.Append(Encode(Member.Key));
-						Json.Append("\":");
-
-						if (Indent.HasValue)
-							Json.Append(' ');
-
-						Encode(Member.Value, Indent, Json);
-					}
-
-					if (!First)
-					{
-						Json.AppendLine();
-
-						if (Indent.HasValue)
-						{
-							Indent = Indent - 1;
-							Json.Append(new string('\t', Indent.Value));
-						}
-					}
-
-					Json.Append('}');
-				}
+				else if (Object is IEnumerable<KeyValuePair<string, object>> Obj)
+					Encode(Obj, Indent, Json, null);
 				else if (Object is IEnumerable E)
 				{
 					IEnumerator e = E.GetEnumerator();

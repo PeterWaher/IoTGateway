@@ -125,7 +125,7 @@ namespace Waher.Content.Text
 		{
 			if (InternetContent.IsAccepted(JsonContentTypes, AcceptedContentTypes))
 			{
-				if (Object is Dictionary<string, object>)
+				if (Object is IEnumerable<KeyValuePair<string, object>>)
 				{
 					Grade = Grade.Ok;
 					return true;

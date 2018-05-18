@@ -43,20 +43,20 @@ namespace Waher.Security.JWT
 	/// </summary>
 	public class JwtToken
 	{
-		private string token;
-		private JwtAlgorithm algorithm;
-		private Dictionary<string, object> claims;
-		private string header;
-		private string payload;
-		private string type = null;
-		private string issuer = null;
-		private string subject = null;
-		private string id = null;
-		private string[] audience = null;
-		private byte[] signature = null;
-		private DateTime? expiration = null;
-		private DateTime? notBefore = null;
-		private DateTime? issuedAt = null;
+		private readonly string token;
+		private readonly JwtAlgorithm algorithm;
+		private readonly Dictionary<string, object> claims;
+		private readonly string header;
+		private readonly string payload;
+		private readonly string type = null;
+		private readonly string issuer = null;
+		private readonly string subject = null;
+		private readonly string id = null;
+		private readonly string[] audience = null;
+		private readonly byte[] signature = null;
+		private readonly DateTime? expiration = null;
+		private readonly DateTime? notBefore = null;
+		private readonly DateTime? issuedAt = null;
 
 		/// <summary>
 		/// Contains information about a Java Web Token (JWT). JWT is defined in RFC 7519:

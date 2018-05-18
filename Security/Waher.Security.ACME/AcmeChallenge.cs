@@ -38,7 +38,7 @@ namespace Waher.Security.ACME
 	public /*abstract*/ class AcmeChallenge : AcmeObject
 	{
 		private readonly AcmeChallengeStatus status;
-		private readonly string url;
+		private readonly Uri url;
 		private readonly string type;
 		private readonly string token;
 		private readonly DateTime? validated;
@@ -63,7 +63,7 @@ namespace Waher.Security.ACME
 						break;
 
 					case "url":
-						this.url = P.Value as string;
+						this.url = new Uri(P.Value as string);
 						break;
 
 					case "type":
@@ -95,7 +95,7 @@ namespace Waher.Security.ACME
 		/// <summary>
 		/// URL of challenge.
 		/// </summary>
-		public string Url => this.url;
+		public Uri Url => this.url;
 
 		/// <summary>
 		/// Token

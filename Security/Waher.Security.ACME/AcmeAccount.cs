@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Waher.Content;
+using Waher.Content.Xml;
 
 namespace Waher.Security.ACME
 {
@@ -33,7 +34,9 @@ namespace Waher.Security.ACME
 	{
 		private readonly AcmeAccountStatus status;
 		private readonly string[] contact = null;
-		private readonly string orders;
+		private readonly string initialIp = null;
+		private readonly Uri orders;
+		private readonly DateTime? createdAt = null;
 		private readonly bool? termsOfServiceAgreed = null;
 
 		internal AcmeAccount(AcmeClient Client, IEnumerable<KeyValuePair<string, object>> Obj)
@@ -71,7 +74,18 @@ namespace Waher.Security.ACME
 						break;
 
 					case "orders":
-						this.orders = P.Value as string;
+						this.orders = new Uri(P.Value as string);
+						break;
+
+					case "initialIp":
+						this.initialIp = P.Value as string;
+						break;
+
+					case "createdAt":
+						if (XML.TryParse(P.Value as string, out DateTime TP))
+							this.createdAt = TP;
+						else
+							throw new ArgumentException("Invalid date and time value.", "createdAt");
 						break;
 				}
 			}
@@ -97,6 +111,16 @@ namespace Waher.Security.ACME
 		/// <summary>
 		/// A URL from which a list of orders submitted by this account can be fetched via a GET request
 		/// </summary>
-		public string Orders => this.orders;
+		public Uri Orders => this.orders;
+
+		/// <summary>
+		/// Initial IP address.
+		/// </summary>
+		public string InitialIp => this.initialIp;
+
+		/// <summary>
+		/// Date and time of creation, if available.
+		/// </summary>
+		public DateTime? CreatedAt => this.createdAt;
 	}
 }

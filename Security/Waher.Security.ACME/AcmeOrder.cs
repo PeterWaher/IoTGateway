@@ -47,10 +47,10 @@ namespace Waher.Security.ACME
 		private readonly DateTime? notBefore = null;
 		private readonly DateTime? notAfter = null;
 		private readonly KeyValuePair<string, string>[] identifiers = null;
-		private readonly string[] authorizations = null;
+		private readonly Uri[] authorizations = null;
 		private readonly object error = null; // TODO: Problem document
-		private readonly string finalize = null;
-		private readonly string certificate = null;
+		private readonly Uri finalize = null;
+		private readonly Uri certificate = null;
 
 		internal AcmeOrder(AcmeClient Client, IEnumerable<KeyValuePair<string, object>> Obj)
 			: base(Client)
@@ -122,12 +122,12 @@ namespace Waher.Security.ACME
 					case "authorizations":
 						if (P.Value is Array A2)
 						{
-							List<string> Authorizations = new List<string>();
+							List<Uri> Authorizations = new List<Uri>();
 
 							foreach (object Obj2 in A2)
 							{
 								if (Obj2 is string s)
-									Authorizations.Add(s);
+									Authorizations.Add(new Uri(s));
 							}
 
 							this.authorizations = Authorizations.ToArray();
@@ -135,11 +135,11 @@ namespace Waher.Security.ACME
 						break;
 
 					case "finalize":
-						this.finalize = P.Value as string;
+						this.finalize = new Uri(P.Value as string);
 						break;
 
 					case "certificate":
-						this.certificate = P.Value as string;
+						this.certificate = new Uri(P.Value as string);
 						break;
 				}
 			}
@@ -154,7 +154,7 @@ namespace Waher.Security.ACME
 		/// For pending orders, the authorizations that the client needs to complete before the
 		/// requested certificate can be issued.
 		/// </summary>
-		public string[] Authorizations => this.authorizations;
+		public Uri[] Authorizations => this.authorizations;
 
 		/// <summary>
 		/// The status of this order.
@@ -179,11 +179,11 @@ namespace Waher.Security.ACME
 		/// <summary>
 		/// A URL that a CSR must be POSTed to once all of the order's authorizations are satisfied to finalize the order.
 		/// </summary>
-		public string Finalize => this.finalize;
+		public Uri Finalize => this.finalize;
 
 		/// <summary>
 		/// A URL for the certificate that has been issued in response to this order.
 		/// </summary>
-		public string Certificate => this.certificate;
+		public Uri Certificate => this.certificate;
 	}
 }

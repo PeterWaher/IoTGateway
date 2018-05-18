@@ -12,8 +12,8 @@ namespace Waher.Security.ACME
 	public class AcmeOrders : AcmeObject
 	{
 		private static readonly Regex nextUrl = new Regex("^\\s*[<](?'URL'[^>]+)[>]\\s*;\\s*rel\\s*=\\s*['\"]next['\"]\\s*$", RegexOptions.Singleline | RegexOptions.Compiled);
-		private readonly string[] orders = null;
-		private readonly string next = null;
+		private readonly Uri[] orders = null;
+		private readonly Uri next = null;
 
 		internal AcmeOrders(AcmeClient Client, HttpResponseMessage Response, IEnumerable<KeyValuePair<string, object>> Obj)
 			: base(Client)
@@ -25,7 +25,7 @@ namespace Waher.Security.ACME
 					Match M = nextUrl.Match(s);
 					if (M.Success)
 					{
-						this.next = M.Groups["URL"].Value;
+						this.next = new Uri(M.Groups["URL"].Value);
 						break;
 					}
 				}
@@ -38,12 +38,12 @@ namespace Waher.Security.ACME
 					case "orders":
 						if (P.Value is Array A)
 						{
-							List<string> Orders = new List<string>();
+							List<Uri> Orders = new List<Uri>();
 
 							foreach (object Obj2 in A)
 							{
 								if (Obj2 is string s)
-									Orders.Add(s);
+									Orders.Add(new Uri(s));
 							}
 
 							this.orders = Orders.ToArray();
@@ -56,11 +56,11 @@ namespace Waher.Security.ACME
 		/// <summary>
 		/// An array of URLs, each identifying an order belonging to the account.
 		/// </summary>
-		public string[] Orders => this.orders;
+		public Uri[] Orders => this.orders;
 
 		/// <summary>
 		/// If provided, indicates where further entries can be acquired.
 		/// </summary>
-		public string Next => this.next;
+		public Uri Next => this.next;
 	}
 }

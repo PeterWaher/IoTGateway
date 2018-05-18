@@ -7,6 +7,7 @@ using System.Security.Authentication;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Security.JWS;
 
 namespace Waher.Security.ACME
 {
@@ -15,14 +16,10 @@ namespace Waher.Security.ACME
 	/// </summary>
 	public class AcmeClient : IDisposable
 	{
-		/// <summary>
-		/// application/jose+json
-		/// </summary>
-		public const string JwsContentType = "application/jose+json";
-
-		private readonly string directoryEndpoint;
+		private readonly Uri directoryEndpoint;
 		private HttpClient httpClient;
 		private AcmeDirectory directory = null;
+		private RsaSsaPkcsSha256 jws;
 		private string nonce = null;
 
 		/// <summary>
@@ -30,8 +27,19 @@ namespace Waher.Security.ACME
 		/// </summary>
 		/// <param name="DirectoryEndpoint">HTTP endpoint for the ACME directory resource.</param>
 		public AcmeClient(string DirectoryEndpoint)
+			: this(new Uri(DirectoryEndpoint))
+		{
+		}
+
+		/// <summary>
+		/// Implements an ACME client for the generation of certificates using ACME-compliant certificate servers.
+		/// </summary>
+		/// <param name="DirectoryEndpoint">HTTP endpoint for the ACME directory resource.</param>
+		public AcmeClient(Uri DirectoryEndpoint)
 		{
 			this.directoryEndpoint = DirectoryEndpoint;
+			this.jws = new RsaSsaPkcsSha256(4096, DirectoryEndpoint.ToString());
+
 			this.httpClient = new HttpClient(new HttpClientHandler()
 			{
 				AllowAutoRedirect = true,
@@ -41,7 +49,7 @@ namespace Waher.Security.ACME
 			}, true);
 
 			this.httpClient.DefaultRequestHeaders.Add("User-Agent", typeof(AcmeClient).Namespace);
-			this.httpClient.DefaultRequestHeaders.Add("Accept", JwsContentType);
+			this.httpClient.DefaultRequestHeaders.Add("Accept", JwsAlgorithm.JwsContentType);
 			this.httpClient.DefaultRequestHeaders.Add("Accept-Language", "en");
 		}
 
@@ -54,6 +62,12 @@ namespace Waher.Security.ACME
 			{
 				this.httpClient.Dispose();
 				this.httpClient = null;
+			}
+
+			if (this.jws != null)
+			{
+				this.jws.Dispose();
+				this.jws = null;
 			}
 		}
 
@@ -69,14 +83,14 @@ namespace Waher.Security.ACME
 			return this.directory;
 		}
 
-		internal async Task<IEnumerable<KeyValuePair<string, object>>> GET(string URL)
+		internal async Task<IEnumerable<KeyValuePair<string, object>>> GET(Uri URL)
 		{
 			HttpResponseMessage Response = await this.httpClient.GetAsync(URL);
 			Response.EnsureSuccessStatusCode();
 
 			Stream Stream = await Response.Content.ReadAsStreamAsync();
 			byte[] Bin = await Response.Content.ReadAsByteArrayAsync();
-			string CharSet = Response.Content.Headers.ContentType.CharSet;
+			string CharSet = Response.Content.Headers.ContentType?.CharSet;
 			Encoding Encoding;
 
 			if (string.IsNullOrEmpty(CharSet))
@@ -92,7 +106,7 @@ namespace Waher.Security.ACME
 			return Obj;
 		}
 
-		internal async Task<string> GetNonce()
+		internal async Task<string> NextNonce()
 		{
 			if (!string.IsNullOrEmpty(this.nonce))
 			{
@@ -147,14 +161,31 @@ namespace Waher.Security.ACME
 				new KeyValuePair<string, object>("contact", ContactURLs)));
 		}
 
-		internal async Task<IEnumerable<KeyValuePair<string, object>>> POST(string URL, params KeyValuePair<string, object>[] Payload)
+		internal async Task<IEnumerable<KeyValuePair<string, object>>> POST(Uri URL, params KeyValuePair<string, object>[] Payload)
 		{
-			HttpResponseMessage Response = await this.httpClient.GetAsync(URL);
+			this.jws.Sign(new KeyValuePair<string, object>[]
+			{
+				new KeyValuePair<string, object>("nonce", await this.NextNonce()),
+				new KeyValuePair<string, object>("url", URL.ToString())
+			}, Payload, out string HeaderString, out string PayloadString, out string Signature);
+
+			string Json = JSON.Encode(new KeyValuePair<string, object>[]
+			{
+				new KeyValuePair<string, object>("protected", HeaderString),
+				new KeyValuePair<string, object>("payload", PayloadString),
+				new KeyValuePair<string, object>("signature", Signature)
+			}, null);
+
+			HttpContent Content = new ByteArrayContent(System.Text.Encoding.ASCII.GetBytes(Json));
+			Content.Headers.Add("Content-Type", JwsAlgorithm.JwsContentType);
+			HttpResponseMessage Response = await this.httpClient.PostAsync(URL, Content);
 			Response.EnsureSuccessStatusCode();
+
+			this.GetNextNonce(Response);
 
 			Stream Stream = await Response.Content.ReadAsStreamAsync();
 			byte[] Bin = await Response.Content.ReadAsByteArrayAsync();
-			string CharSet = Response.Content.Headers.ContentType.CharSet;
+			string CharSet = Response.Content.Headers.ContentType?.CharSet;
 			Encoding Encoding;
 
 			if (string.IsNullOrEmpty(CharSet))

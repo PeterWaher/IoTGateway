@@ -10,14 +10,14 @@ namespace Waher.Security.ACME
 	public class AcmeDirectory : AcmeObject
 	{
 		private readonly string[] caaIdentities = null;
-		private readonly string keyChange = null;
-		private readonly string termsOfService = null;
-		private readonly string website = null;
-		private readonly string newAccount = null;
-		private readonly string newNonce = null;
-		private readonly string newOrder = null;
-		private readonly string revokeCert = null;
-		private readonly string newAuthz = null;
+		private readonly Uri keyChange = null;
+		private readonly Uri termsOfService = null;
+		private readonly Uri website = null;
+		private readonly Uri newAccount = null;
+		private readonly Uri newNonce = null;
+		private readonly Uri newOrder = null;
+		private readonly Uri revokeCert = null;
+		private readonly Uri newAuthz = null;
 		private readonly bool externalAccountRequired = false;
 
 		internal AcmeDirectory(AcmeClient Client, IEnumerable<KeyValuePair<string, object>> Obj)
@@ -28,7 +28,7 @@ namespace Waher.Security.ACME
 				switch (P.Key)
 				{
 					case "keyChange":
-						this.keyChange = P.Value as string;
+						this.keyChange = new Uri(P.Value as string);
 						break;
 
 					case "meta":
@@ -54,11 +54,11 @@ namespace Waher.Security.ACME
 										break;
 
 									case "termsOfService":
-										this.termsOfService = P2.Value as string;
+										this.termsOfService = new Uri(P2.Value as string);
 										break;
 
 									case "website":
-										this.website = P2.Value as string;
+										this.website = new Uri(P2.Value as string);
 										break;
 
 									case "externalAccountRequired":
@@ -71,23 +71,23 @@ namespace Waher.Security.ACME
 						break;
 
 					case "newAccount":
-						this.newAccount = P.Value as string;
+						this.newAccount = new Uri(P.Value as string);
 						break;
 
 					case "newNonce":
-						this.newNonce = P.Value as string;
+						this.newNonce = new Uri(P.Value as string);
 						break;
 
 					case "newOrder":
-						this.newOrder = P.Value as string;
+						this.newOrder = new Uri(P.Value as string);
 						break;
 
 					case "revokeCert":
-						this.revokeCert = P.Value as string;
+						this.revokeCert = new Uri(P.Value as string);
 						break;
 
 					case "newAuthz":
-						this.newAuthz = P.Value as string;
+						this.newAuthz = new Uri(P.Value as string);
 						break;
 				}
 			}
@@ -101,42 +101,42 @@ namespace Waher.Security.ACME
 		/// <summary>
 		/// URL for keyChange method.
 		/// </summary>
-		public string KeyChange => this.keyChange;
+		public Uri KeyChange => this.keyChange;
 
 		/// <summary>
 		/// URL to terms of service.
 		/// </summary>
-		public string TermsOfService => this.termsOfService;
+		public Uri TermsOfService => this.termsOfService;
 
 		/// <summary>
 		/// URL to website.
 		/// </summary>
-		public string Website => this.website;
+		public Uri Website => this.website;
 
 		/// <summary>
 		/// URL for newAccount method.
 		/// </summary>
-		public string NewAccount => this.newAccount;
+		public Uri NewAccount => this.newAccount;
 
 		/// <summary>
 		/// URL for newNonce method.
 		/// </summary>
-		public string NewNonce => this.newNonce;
+		public Uri NewNonce => this.newNonce;
 
 		/// <summary>
 		/// URL for newOrder method.
 		/// </summary>
-		public string NewOrder => this.newOrder;
+		public Uri NewOrder => this.newOrder;
 
 		/// <summary>
 		/// URL for revokeCert method.
 		/// </summary>
-		public string RevokeCert => this.revokeCert;
+		public Uri RevokeCert => this.revokeCert;
 
 		/// <summary>
 		/// URL for newAuthz method.
 		/// </summary>
-		public string NewAuthz => this.newAuthz;
+		public Uri NewAuthz => this.newAuthz;
 
 		/// <summary>
 		/// If an external account is required.

@@ -11,8 +11,8 @@ namespace Waher.Networking.MQTT
 	public class BinaryOutput
 	{
 		internal static DateTime unixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-
-		private MemoryStream ms;
+		
+		private readonly MemoryStream ms;
 
 		/// <summary>
 		/// Class that helps serialize information into a a binary packet.

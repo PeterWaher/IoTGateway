@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using Waher.Content;
+using System.Threading.Tasks;
 using Waher.Content.Xml;
 
 namespace Waher.Security.ACME
@@ -33,18 +32,17 @@ namespace Waher.Security.ACME
 	}
 
 	/// <summary>
-	/// Abstract base class of an ACME challenge.
+	/// Base class of all ACME challenges.
 	/// </summary>
-	public /*abstract*/ class AcmeChallenge : AcmeObject
+	public class AcmeChallenge : AcmeResource
 	{
 		private readonly AcmeChallengeStatus status;
-		private readonly Uri url;
 		private readonly string type;
 		private readonly string token;
 		private readonly DateTime? validated;
 
-		internal AcmeChallenge(AcmeClient Client, IEnumerable<KeyValuePair<string, object>> Obj)
-			: base(Client)
+		internal AcmeChallenge(AcmeClient Client, Uri AccountLocation, IEnumerable<KeyValuePair<string, object>> Obj)
+			: base(Client, AccountLocation, null)
 		{
 			foreach (KeyValuePair<string, object> P in Obj)
 			{
@@ -63,7 +61,7 @@ namespace Waher.Security.ACME
 						break;
 
 					case "url":
-						this.url = new Uri(P.Value as string);
+						this.Location = new Uri(P.Value as string);
 						break;
 
 					case "type":
@@ -93,13 +91,17 @@ namespace Waher.Security.ACME
 		public string Type => this.type;
 
 		/// <summary>
-		/// URL of challenge.
-		/// </summary>
-		public Uri Url => this.url;
-
-		/// <summary>
 		/// Token
 		/// </summary>
 		public string Token => this.token;
+
+		/// <summary>
+		/// Acknowledges the challenge.
+		/// </summary>
+		/// <returns>Acknowledged challenge object.</returns>
+		public Task<AcmeChallenge> AcknowledgeChallenge()
+		{
+			return this.Client.AcknowledgeChallenge(this.AccountLocation, this.Location);
+		}
 	}
 }

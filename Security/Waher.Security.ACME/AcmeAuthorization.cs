@@ -50,16 +50,13 @@ namespace Waher.Security.ACME
 		private readonly AcmeAuthorizationStatus status;
 		private readonly DateTime? expires = null;
 		private readonly AcmeChallenge[] challenges = null;
-		private readonly Uri accountLocation;
 		private readonly string type = null;
 		private readonly string value = null;
 		private readonly bool? wildcard = null;
 
 		internal AcmeAuthorization(AcmeClient Client, Uri AccountLocation, Uri Location, IEnumerable<KeyValuePair<string, object>> Obj)
-			: base(Client, Location)
+			: base(Client, AccountLocation, Location)
 		{
-			this.accountLocation = AccountLocation;
-
 			foreach (KeyValuePair<string, object> P in Obj)
 			{
 				switch (P.Key)
@@ -103,7 +100,7 @@ namespace Waher.Security.ACME
 							foreach (object Obj3 in A2)
 							{
 								if (Obj3 is IEnumerable<KeyValuePair<string, object>> Obj4)
-									Challenges.Add(new AcmeChallenge(Client, Obj4));
+									Challenges.Add(this.Client.CreateChallenge(AccountLocation, Obj4));
 							}
 
 							this.challenges = Challenges.ToArray();
@@ -153,17 +150,12 @@ namespace Waher.Security.ACME
 		public bool? Wildcard => this.wildcard;
 
 		/// <summary>
-		/// Account location.
-		/// </summary>
-		public Uri AccountLocation => this.accountLocation;
-
-		/// <summary>
 		/// Gets the current state of the order.
 		/// </summary>
 		/// <returns>Current state of the order.</returns>
 		public Task<AcmeAuthorization> Poll()
 		{
-			return this.Client.GetAuthorization(this.accountLocation, this.Location);
+			return this.Client.GetAuthorization(this.AccountLocation, this.Location);
 		}
 
 		/// <summary>
@@ -172,7 +164,7 @@ namespace Waher.Security.ACME
 		/// <returns>New authorization object.</returns>
 		public Task<AcmeAuthorization> Deactivate()
 		{
-			return this.Client.DeactivateAuthorization(this.accountLocation, this.Location);
+			return this.Client.DeactivateAuthorization(this.AccountLocation, this.Location);
 		}
 
 	}

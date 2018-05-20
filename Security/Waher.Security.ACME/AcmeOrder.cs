@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Xml;
@@ -56,13 +57,11 @@ namespace Waher.Security.ACME
 		private readonly AcmeException error = null; // TODO: Problem document
 		private readonly Uri finalize = null;
 		private readonly Uri certificate = null;
-		private readonly Uri accountLocation = null;
 
-		internal AcmeOrder(AcmeClient Client, Uri AccountLocation, Uri Location, IEnumerable<KeyValuePair<string, object>> Obj)
-			: base(Client, Location)
+		internal AcmeOrder(AcmeClient Client, Uri AccountLocation, Uri Location,
+			IEnumerable<KeyValuePair<string, object>> Obj, HttpResponseMessage Response)
+			: base(Client, AccountLocation, Location)
 		{
-			this.accountLocation = AccountLocation;
-
 			foreach (KeyValuePair<string, object> P in Obj)
 			{
 				switch (P.Key)
@@ -130,6 +129,11 @@ namespace Waher.Security.ACME
 					case "certificate":
 						this.certificate = new Uri(P.Value as string);
 						break;
+
+					case "error":
+						if (P.Value is IEnumerable<KeyValuePair<string, object>> ErrorObj)
+							this.error = AcmeClient.CreateException(ErrorObj, Response);
+						break;
 				}
 			}
 		}
@@ -176,9 +180,9 @@ namespace Waher.Security.ACME
 		public Uri Certificate => this.certificate;
 
 		/// <summary>
-		/// URI of account.
+		/// Any error, if available.
 		/// </summary>
-		public Uri AccountLocation => this.accountLocation;
+		public AcmeException Error => this.error;
 
 		/// <summary>
 		/// Gets the current state of the order.
@@ -186,7 +190,7 @@ namespace Waher.Security.ACME
 		/// <returns>Current state of the order.</returns>
 		public Task<AcmeOrder> Poll()
 		{
-			return this.Client.GetOrder(this.accountLocation, this.Location);
+			return this.Client.GetOrder(this.AccountLocation, this.Location);
 		}
 
 		/// <summary>
@@ -203,7 +207,8 @@ namespace Waher.Security.ACME
 				for (i = 0; i < c; i++)
 				{
 					Uri Location = this.authorizationUris[i];
-					Result[i] = new AcmeAuthorization(this.Client, this.accountLocation, Location, await this.Client.GET(Location));
+					Result[i] = new AcmeAuthorization(this.Client, this.AccountLocation, Location, 
+						(await this.Client.GET(Location)).Payload);
 				}
 
 				this.authorizations = Result;

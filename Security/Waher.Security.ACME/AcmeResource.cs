@@ -9,22 +9,33 @@ namespace Waher.Security.ACME
 	/// </summary>
     public abstract class AcmeResource : AcmeObject
     {
-		private readonly Uri location = null;
+		private readonly Uri accountLocation;
+		private Uri location = null;
 
 		/// <summary>
 		/// Abstract base class for all ACME objects.
 		/// </summary>
 		/// <param name="Client">ACME client.</param>
 		/// <param name="Location">ACME resource location.</param>
-		public AcmeResource(AcmeClient Client, Uri Location)
+		public AcmeResource(AcmeClient Client, Uri AccountLocation, Uri Location)
 			: base(Client)
 		{
+			this.accountLocation = AccountLocation;
 			this.location = Location;
 		}
 
 		/// <summary>
+		/// Account location.
+		/// </summary>
+		public Uri AccountLocation => this.accountLocation;
+
+		/// <summary>
 		/// Location of resource.
 		/// </summary>
-		public Uri Location => this.location;
+		public Uri Location
+		{
+			get { return this.location; }
+			protected set { this.location = value; }
+		}
 	}
 }

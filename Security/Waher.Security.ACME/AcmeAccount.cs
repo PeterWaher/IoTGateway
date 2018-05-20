@@ -40,7 +40,7 @@ namespace Waher.Security.ACME
 		private readonly bool? termsOfServiceAgreed = null;
 
 		internal AcmeAccount(AcmeClient Client, Uri Location, IEnumerable<KeyValuePair<string, object>> Obj)
-			: base(Client, Location)
+			: base(Client, Location, Location)
 		{
 			foreach (KeyValuePair<string, object> P in Obj)
 			{

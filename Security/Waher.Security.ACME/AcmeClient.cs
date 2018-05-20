@@ -82,12 +82,12 @@ namespace Waher.Security.ACME
 		public async Task<AcmeDirectory> GetDirectory()
 		{
 			if (this.directory == null)
-				this.directory = new AcmeDirectory(this, await this.GET(this.directoryEndpoint));
+				this.directory = new AcmeDirectory(this, (await this.GET(this.directoryEndpoint)).Payload);
 
 			return this.directory;
 		}
 
-		internal async Task<IEnumerable<KeyValuePair<string, object>>> GET(Uri URL)
+		internal async Task<AcmeResponse> GET(Uri URL)
 		{
 			HttpResponseMessage Response = await this.httpClient.GetAsync(URL);
 
@@ -112,7 +112,15 @@ namespace Waher.Security.ACME
 			}
 
 			if (Response.IsSuccessStatusCode)
-				return Obj;
+			{
+				return new AcmeResponse()
+				{
+					Payload = Obj,
+					Location = URL,
+					Json = JsonResponse,
+					ResponseMessage = Response
+				};
+			}
 			else
 				throw CreateException(Obj, Response);
 		}
@@ -159,6 +167,7 @@ namespace Waher.Security.ACME
 		internal class AcmeResponse
 		{
 			public IEnumerable<KeyValuePair<string, object>> Payload;
+			public HttpResponseMessage ResponseMessage;
 			public Uri Location;
 			public string Json;
 		}
@@ -214,6 +223,7 @@ namespace Waher.Security.ACME
 			{
 				Json = Encoding.GetString(Bin),
 				Location = URL,
+				ResponseMessage = Response,
 				Payload = null
 			};
 
@@ -528,7 +538,7 @@ namespace Waher.Security.ACME
 			AcmeResponse Response = await this.POST(this.directory.NewOrder, AccountLocation,
 				Payload.ToArray());
 
-			return new AcmeOrder(this, AccountLocation, Response.Location, Response.Payload);
+			return new AcmeOrder(this, AccountLocation, Response.Location, Response.Payload, Response.ResponseMessage);
 		}
 
 		/// <summary>
@@ -539,8 +549,8 @@ namespace Waher.Security.ACME
 		/// <returns>ACME order object.</returns>
 		public async Task<AcmeOrder> GetOrder(Uri AccountLocation, Uri OrderLocation)
 		{
-			IEnumerable<KeyValuePair<string,object>> Response = await this.GET(OrderLocation);
-			return new AcmeOrder(this, AccountLocation, OrderLocation, Response);
+			AcmeResponse Response = await this.GET(OrderLocation);
+			return new AcmeOrder(this, AccountLocation, OrderLocation, Response.Payload, Response.ResponseMessage);
 		}
 
 		/// <summary>
@@ -551,8 +561,8 @@ namespace Waher.Security.ACME
 		/// <returns>ACME authorization object.</returns>
 		public async Task<AcmeAuthorization> GetAuthorization(Uri AccountLocation, Uri AuthorizationLocation)
 		{
-			IEnumerable<KeyValuePair<string, object>> Response = await this.GET(AuthorizationLocation);
-			return new AcmeAuthorization(this, AccountLocation, AuthorizationLocation, Response);
+			AcmeResponse Response = await this.GET(AuthorizationLocation);
+			return new AcmeAuthorization(this, AccountLocation, AuthorizationLocation, Response.Payload);
 		}
 
 		/// <summary>
@@ -569,6 +579,38 @@ namespace Waher.Security.ACME
 			return new AcmeAuthorization(this, AccountLocation, Response.Location, Response.Payload);
 		}
 
+		/// <summary>
+		/// Acknowledges a challenge from the server.
+		/// </summary>
+		/// <param name="AccountLocation">Account location.</param>
+		/// <param name="ChallengeLocation">Challenge location.</param>
+		/// <returns>Acknowledged challenge object.</returns>
+		public async Task<AcmeChallenge> AcknowledgeChallenge(Uri AccountLocation, Uri ChallengeLocation)
+		{
+			AcmeResponse Response = await this.POST(ChallengeLocation, AccountLocation);
+			return this.CreateChallenge(AccountLocation, Response.Payload);
+		}
+
+		internal AcmeChallenge CreateChallenge(Uri AccountLocation, IEnumerable<KeyValuePair<string, object>> Obj)
+		{
+			string Type = string.Empty;
+
+			foreach (KeyValuePair<string, object> P2 in Obj)
+			{
+				if (P2.Key == "type" && P2.Value is string s)
+				{
+					Type = s;
+					break;
+				}
+			}
+
+			switch (Type)
+			{
+				case "http-01": return new AcmeHttpChallenge(this, AccountLocation, Obj);
+				case "dns-01": return new AcmeDnsChallenge(this, AccountLocation, Obj);
+				default: return new AcmeChallenge(this, AccountLocation, Obj);
+			}
+		}
 
 	}
 }

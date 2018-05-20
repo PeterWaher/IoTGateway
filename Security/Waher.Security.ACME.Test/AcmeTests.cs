@@ -85,10 +85,82 @@ namespace Waher.Security.ACME.Test
 		}
 
 		[TestMethod]
-		public async Task ACME_Test_06_DeactivateAccount()
+		public async Task ACME_Test_06_OrderCertificate()
+		{
+			AcmeOrder Order = await this.OrderCertificate();
+			Assert.IsNotNull(Order);
+			Assert.IsTrue(Order.AuthorizationUris.Length > 0);
+			Assert.IsNull(Order.Certificate);
+			Assert.IsNotNull(Order.Expires);
+			Assert.IsNotNull(Order.Finalize);
+			Assert.IsTrue(Order.Identifiers.Length > 0);
+			Assert.IsNotNull(Order.Location);
+			Assert.IsNull(Order.NotAfter);
+			Assert.IsNull(Order.NotBefore);
+			Assert.AreEqual(AcmeOrderStatus.pending, Order.Status);
+		}
+
+		private async Task<AcmeOrder> OrderCertificate()
+		{
+			AcmeAccount Account = await this.client.GetAccount();
+			return await Account.OrderCertificate(new string[] { "example.com", "www.example.com" }, null, null);
+		}
+
+		[TestMethod]
+		public async Task ACME_Test_07_PollOrder()
+		{
+			AcmeOrder Order = await this.OrderCertificate();
+			AcmeOrder Order2 = await Order.Poll();
+
+			Assert.IsNotNull(Order2);
+			Assert.AreEqual(Order.AuthorizationUris.Length, Order2.AuthorizationUris.Length);
+			Assert.IsNull(Order2.Certificate);
+			Assert.AreEqual(Order.Expires, Order2.Expires);
+			Assert.AreEqual(Order.Finalize, Order2.Finalize);
+			Assert.AreEqual(Order.Identifiers.Length, Order2.Identifiers.Length);
+			Assert.AreEqual(Order.Location, Order2.Location);
+			Assert.IsNull(Order2.NotAfter);
+			Assert.IsNull(Order2.NotBefore);
+			Assert.AreEqual(Order.Status, Order2.Status);
+		}
+
+		[TestMethod]
+		public async Task ACME_Test_08_Authorizations()
+		{
+			AcmeOrder Order = await this.OrderCertificate();
+			AcmeAuthorization[] Authorizations = await Order.GetAuthorizations();
+
+			Assert.IsNotNull(Authorizations);
+			Assert.AreEqual(Order.AuthorizationUris.Length, Authorizations.Length);
+		}
+
+		[TestMethod]
+		public async Task ACME_Test_09_PollAuthorization()
+		{
+			AcmeOrder Order = await this.OrderCertificate();
+			AcmeAuthorization[] Authorizations = await Order.GetAuthorizations();
+
+			AcmeAuthorization Authorization = await Authorizations[0].Poll();
+			Assert.IsNotNull(Authorization);
+		}
+
+		[TestMethod]
+		public async Task ACME_Test_10_DeactivateAuthorizations()
+		{
+			AcmeOrder Order = await this.OrderCertificate();
+			AcmeAuthorization[] Authorizations = await Order.GetAuthorizations();
+			int i, c = Authorizations.Length;
+
+			for (i = 0; i < c; i++)
+				Authorizations[i] = await Authorizations[i].Deactivate();
+		}
+
+		[TestMethod]
+		public async Task ACME_Test_90_DeactivateAccount()
 		{
 			AcmeAccount Account = await this.client.GetAccount();
 			Account = await Account.Deactivate();
 		}
+
 	}
 }

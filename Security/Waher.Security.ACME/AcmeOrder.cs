@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Xml;
 
@@ -12,27 +12,31 @@ namespace Waher.Security.ACME
 	public enum AcmeOrderStatus
 	{
 		/// <summary>
-		/// Order is pending
+		/// The server does not believe that the client has fulfilled the requirements.  
+		/// Check the "authorizations" array for entries that are still pending.
 		/// </summary>
 		pending,
 
 		/// <summary>
-		/// Order is ready
+		/// The server agrees that the requirements have been fulfilled, and is awaiting finalization.  
+		/// Submit a finalization request.
 		/// </summary>
 		ready,
 
 		/// <summary>
-		/// Order is being processed
+		/// The certificate is being issued. Send a GET request after the time given in the 
+		/// "Retry-After" header field of the response, if any.
 		/// </summary>
 		processing,
 
 		/// <summary>
-		/// Order is valid
+		/// The server has issued the certificate and provisioned its URL to the "certificate" field 
+		/// of the order.  Download the certificate.
 		/// </summary>
 		valid,
 
 		/// <summary>
-		/// Order is invalid
+		/// The certificate will not be issued.  Consider this order process abandoned.
 		/// </summary>
 		invalid
 	};
@@ -40,21 +44,25 @@ namespace Waher.Security.ACME
 	/// <summary>
 	/// Represents an ACME order.
 	/// </summary>
-	public class AcmeOrder : AcmeObject
+	public class AcmeOrder : AcmeResource
 	{
 		private readonly AcmeOrderStatus status;
 		private readonly DateTime? expires = null;
 		private readonly DateTime? notBefore = null;
 		private readonly DateTime? notAfter = null;
-		private readonly KeyValuePair<string, string>[] identifiers = null;
-		private readonly Uri[] authorizations = null;
+		private readonly AcmeIdentifier[] identifiers = null;
+		private AcmeAuthorization[] authorizations = null;
+		private readonly Uri[] authorizationUris = null;
 		private readonly AcmeException error = null; // TODO: Problem document
 		private readonly Uri finalize = null;
 		private readonly Uri certificate = null;
+		private readonly Uri accountLocation = null;
 
-		internal AcmeOrder(AcmeClient Client, IEnumerable<KeyValuePair<string, object>> Obj)
-			: base(Client)
+		internal AcmeOrder(AcmeClient Client, Uri AccountLocation, Uri Location, IEnumerable<KeyValuePair<string, object>> Obj)
+			: base(Client, Location)
 		{
+			this.accountLocation = AccountLocation;
+
 			foreach (KeyValuePair<string, object> P in Obj)
 			{
 				switch (P.Key)
@@ -88,31 +96,12 @@ namespace Waher.Security.ACME
 					case "identifiers":
 						if (P.Value is Array A)
 						{
-							List<KeyValuePair<string, string>> Identifiers = new List<KeyValuePair<string, string>>();
+							List<AcmeIdentifier> Identifiers = new List<AcmeIdentifier>();
 
 							foreach (object Obj2 in A)
 							{
 								if (Obj2 is IEnumerable<KeyValuePair<string, object>> Obj3)
-								{
-									string Type = null;
-									string Value = null;
-
-									foreach (KeyValuePair<string, object> P2 in Obj3)
-									{
-										switch (P2.Key)
-										{
-											case "type":
-												Type = P2.Key;
-												break;
-
-											case "value":
-												Value = P2.Value as string;
-												break;
-										}
-									}
-
-									Identifiers.Add(new KeyValuePair<string, string>(Type, Value));
-								}
+									Identifiers.Add(new AcmeIdentifier(Client, Obj3));
 							}
 
 							this.identifiers = Identifiers.ToArray();
@@ -130,7 +119,7 @@ namespace Waher.Security.ACME
 									Authorizations.Add(new Uri(s));
 							}
 
-							this.authorizations = Authorizations.ToArray();
+							this.authorizationUris = Authorizations.ToArray();
 						}
 						break;
 
@@ -148,13 +137,13 @@ namespace Waher.Security.ACME
 		/// <summary>
 		/// An array of identifier objects that the order pertains to.
 		/// </summary>
-		public KeyValuePair<string, string>[] Identifiers => this.identifiers;
+		public AcmeIdentifier[] Identifiers => this.identifiers;
 
 		/// <summary>
 		/// For pending orders, the authorizations that the client needs to complete before the
 		/// requested certificate can be issued.
 		/// </summary>
-		public Uri[] Authorizations => this.authorizations;
+		public Uri[] AuthorizationUris => this.authorizationUris;
 
 		/// <summary>
 		/// The status of this order.
@@ -185,5 +174,51 @@ namespace Waher.Security.ACME
 		/// A URL for the certificate that has been issued in response to this order.
 		/// </summary>
 		public Uri Certificate => this.certificate;
+
+		/// <summary>
+		/// URI of account.
+		/// </summary>
+		public Uri AccountLocation => this.accountLocation;
+
+		/// <summary>
+		/// Gets the current state of the order.
+		/// </summary>
+		/// <returns>Current state of the order.</returns>
+		public Task<AcmeOrder> Poll()
+		{
+			return this.Client.GetOrder(this.accountLocation, this.Location);
+		}
+
+		/// <summary>
+		/// Gets current authorization objects.
+		/// </summary>
+		/// <returns>Arary of authorization objects.</returns>
+		public async Task<AcmeAuthorization[]> GetAuthorizations()
+		{
+			if (this.authorizations == null)
+			{
+				int i, c = this.authorizationUris.Length;
+				AcmeAuthorization[] Result = new AcmeAuthorization[c];
+
+				for (i = 0; i < c; i++)
+				{
+					Uri Location = this.authorizationUris[i];
+					Result[i] = new AcmeAuthorization(this.Client, this.accountLocation, Location, await this.Client.GET(Location));
+				}
+
+				this.authorizations = Result;
+			}
+
+			return this.authorizations;
+		}
+
+		/// <summary>
+		/// Curernt authorization objects.
+		/// </summary>
+		public Task<AcmeAuthorization[]> Authorizations
+		{
+			get { return this.GetAuthorizations(); }
+		}
+
 	}
 }

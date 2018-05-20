@@ -145,10 +145,79 @@ namespace Waher.Security.ACME
 		/// <summary>
 		/// Creates a new key for the account.
 		/// </summary>
-		/// <returns>New account key.</returns>
-		public Task NewKey()
+		/// <returns>New account.</returns>
+		public Task<AcmeAccount> NewKey()
 		{
 			return this.Client.NewKey(this.Location);
+		}
+
+		/// <summary>
+		/// Orders certificate.
+		/// </summary>
+		/// <param name="Domains">Domain names to include in certificate.</param>
+		/// <param name="NotBefore">If provided, certificate is not valid before this point in time.</param>
+		/// <param name="NotAfter">If provided, certificate is not valid after this point in time.</param>
+		/// <returns>ACME order object.</returns>
+		public Task<AcmeOrder> OrderCertificate(string[] Domains, DateTime? NotBefore, DateTime? NotAfter)
+		{
+			int i, c = Domains.Length;
+			AcmeIdentifier[] Identifiers = new AcmeIdentifier[c];
+
+			for (i = 0; i < c; i++)
+				Identifiers[i] = new AcmeIdentifier(this.Client, "dns", Domains[i]);
+
+			return this.OrderCertificate(Identifiers, NotBefore, NotAfter);
+		}
+
+		/// <summary>
+		/// Orders certificate.
+		/// </summary>
+		/// <param name="Domain">Domain name to include in certificate.</param>
+		/// <param name="NotBefore">If provided, certificate is not valid before this point in time.</param>
+		/// <param name="NotAfter">If provided, certificate is not valid after this point in time.</param>
+		/// <returns>ACME order object.</returns>
+		public Task<AcmeOrder> OrderCertificate(string Domain, DateTime? NotBefore, DateTime? NotAfter)
+		{
+			return this.OrderCertificate("dns", Domain, NotBefore, NotAfter);
+		}
+
+		/// <summary>
+		/// Orders certificate.
+		/// </summary>
+		/// <param name="Type">Type of identifier to include in the certificate.</param>
+		/// <param name="Value">Value of identifier to include in the certifiate.</param>
+		/// <param name="NotBefore">If provided, certificate is not valid before this point in time.</param>
+		/// <param name="NotAfter">If provided, certificate is not valid after this point in time.</param>
+		/// <returns>ACME order object.</returns>
+		public Task<AcmeOrder> OrderCertificate(string Type, string Value, DateTime? NotBefore, DateTime? NotAfter)
+		{
+			return this.OrderCertificate(new AcmeIdentifier(this.Client, Type, Value), NotBefore, NotAfter);
+		}
+
+		/// <summary>
+		/// Orders certificate.
+		/// </summary>
+		/// <param name="Identifier">Identifier to include in the certificate.</param>
+		/// <param name="NotBefore">If provided, certificate is not valid before this point in time.</param>
+		/// <param name="NotAfter">If provided, certificate is not valid after this point in time.</param>
+		/// <returns>ACME order object.</returns>
+		public Task<AcmeOrder> OrderCertificate(AcmeIdentifier Identifier,
+			DateTime? NotBefore, DateTime? NotAfter)
+		{
+			return this.OrderCertificate(new AcmeIdentifier[] { Identifier }, NotBefore, NotAfter);
+		}
+
+		/// <summary>
+		/// Orders certificate.
+		/// </summary>
+		/// <param name="Identifiers">Identifiers to include in the certificate.</param>
+		/// <param name="NotBefore">If provided, certificate is not valid before this point in time.</param>
+		/// <param name="NotAfter">If provided, certificate is not valid after this point in time.</param>
+		/// <returns>ACME order object.</returns>
+		public Task<AcmeOrder> OrderCertificate(AcmeIdentifier[] Identifiers,
+			DateTime? NotBefore, DateTime? NotAfter)
+		{
+			return this.Client.OrderCertificate(this.Location, Identifiers, NotBefore, NotAfter);
 		}
 
 	}

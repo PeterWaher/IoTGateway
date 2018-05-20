@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Xml;
 
@@ -45,18 +45,21 @@ namespace Waher.Security.ACME
 	/// <summary>
 	/// Represents an ACME authorization.
 	/// </summary>
-	public class AcmeAuthorization : AcmeObject
+	public class AcmeAuthorization : AcmeResource
 	{
 		private readonly AcmeAuthorizationStatus status;
 		private readonly DateTime? expires = null;
 		private readonly AcmeChallenge[] challenges = null;
+		private readonly Uri accountLocation;
 		private readonly string type = null;
 		private readonly string value = null;
 		private readonly bool? wildcard = null;
 
-		internal AcmeAuthorization(AcmeClient Client, IEnumerable<KeyValuePair<string, object>> Obj)
-			: base(Client)
+		internal AcmeAuthorization(AcmeClient Client, Uri AccountLocation, Uri Location, IEnumerable<KeyValuePair<string, object>> Obj)
+			: base(Client, Location)
 		{
+			this.accountLocation = AccountLocation;
+
 			foreach (KeyValuePair<string, object> P in Obj)
 			{
 				switch (P.Key)
@@ -81,7 +84,7 @@ namespace Waher.Security.ACME
 								switch (P2.Key)
 								{
 									case "type":
-										this.type = P2.Key;
+										this.type = P2.Value as string;
 										break;
 
 									case "value":
@@ -148,5 +151,29 @@ namespace Waher.Security.ACME
 		/// that contained a wildcard prefix this field MUST be present, and true.
 		/// </summary>
 		public bool? Wildcard => this.wildcard;
+
+		/// <summary>
+		/// Account location.
+		/// </summary>
+		public Uri AccountLocation => this.accountLocation;
+
+		/// <summary>
+		/// Gets the current state of the order.
+		/// </summary>
+		/// <returns>Current state of the order.</returns>
+		public Task<AcmeAuthorization> Poll()
+		{
+			return this.Client.GetAuthorization(this.accountLocation, this.Location);
+		}
+
+		/// <summary>
+		/// Deactivates the authorization.
+		/// </summary>
+		/// <returns>New authorization object.</returns>
+		public Task<AcmeAuthorization> Deactivate()
+		{
+			return this.Client.DeactivateAuthorization(this.accountLocation, this.Location);
+		}
+
 	}
 }

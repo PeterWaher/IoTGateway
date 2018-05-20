@@ -106,6 +106,11 @@ namespace Waher.Security.ACME
 			if (!(JSON.Parse(JsonResponse) is IEnumerable<KeyValuePair<string, object>> Obj))
 				throw new Exception("Unexpected response returned.");
 
+			if (Response.Content.Headers.TryGetValues("Retry-After", out IEnumerable<string> Values))
+			{
+				// TODO: Rate limit
+			}
+
 			if (Response.IsSuccessStatusCode)
 				return Obj;
 			else
@@ -449,7 +454,7 @@ namespace Waher.Security.ACME
 		/// Generates a new key for the account. (Account keys are managed by the CSP.)
 		/// </summary>
 		/// <param name="AccountLocation">URL of the account resource.</param>
-		public async Task NewKey(Uri AccountLocation)
+		public async Task<AcmeAccount> NewKey(Uri AccountLocation)
 		{
 			if (this.directory == null)
 				await this.GetDirectory();
@@ -468,18 +473,102 @@ namespace Waher.Security.ACME
 						new KeyValuePair<string, object>("newkey", Jws2.PublicWebKey)
 					}, out string Header, out string Payload, out string Signature);
 
-				await this.POST(this.directory.KeyChange, AccountLocation,
+				AcmeResponse Response = await this.POST(this.directory.KeyChange, AccountLocation,
 					new KeyValuePair<string, object>("protected", Header),
 					new KeyValuePair<string, object>("payload", Payload),
 					new KeyValuePair<string, object>("signature", Signature));
 
 				this.jws.ImportKey(NewKey);
+
+				return new AcmeAccount(this, Response.Location, Response.Payload);
 			}
 			finally
 			{
 				Jws2.Dispose();
 			}
 		}
+
+		/// <summary>
+		/// Orders certificate.
+		/// </summary>
+		/// <param name="AccountLocation">Account resource location.</param>
+		/// <param name="Identifiers">Identifiers to include in the certificate.</param>
+		/// <param name="NotBefore">If provided, certificate is not valid before this point in time.</param>
+		/// <param name="NotAfter">If provided, certificate is not valid after this point in time.</param>
+		/// <returns>ACME order object.</returns>
+		public async Task<AcmeOrder> OrderCertificate(Uri AccountLocation, AcmeIdentifier[] Identifiers,
+			DateTime? NotBefore, DateTime? NotAfter)
+		{
+			if (this.directory == null)
+				await this.GetDirectory();
+
+			int i, c = Identifiers.Length;
+			IEnumerable<KeyValuePair<string, object>>[] Identifiers2 = new IEnumerable<KeyValuePair<string, object>>[c];
+
+			for (i = 0; i < c; i++)
+			{
+				Identifiers2[i] = new KeyValuePair<string, object>[]
+				{
+					new KeyValuePair<string, object>("type", Identifiers[i].Type),
+					new KeyValuePair<string, object>("value", Identifiers[i].Value)
+				};
+			}
+
+			List<KeyValuePair<string, object>> Payload = new List<KeyValuePair<string, object>>()
+			{
+				new KeyValuePair<string, object>("identifiers", Identifiers2)
+			};
+
+			if (NotBefore.HasValue)
+				Payload.Add(new KeyValuePair<string, object>("notBefore", NotBefore.Value));
+
+			if (NotAfter.HasValue)
+				Payload.Add(new KeyValuePair<string, object>("notAfter", NotAfter.Value));
+
+			AcmeResponse Response = await this.POST(this.directory.NewOrder, AccountLocation,
+				Payload.ToArray());
+
+			return new AcmeOrder(this, AccountLocation, Response.Location, Response.Payload);
+		}
+
+		/// <summary>
+		/// Gets the state of an order.
+		/// </summary>
+		/// <param name="AccountLocation">URI of account.</param>
+		/// <param name="OrderLocation">URI of order.</param>
+		/// <returns>ACME order object.</returns>
+		public async Task<AcmeOrder> GetOrder(Uri AccountLocation, Uri OrderLocation)
+		{
+			IEnumerable<KeyValuePair<string,object>> Response = await this.GET(OrderLocation);
+			return new AcmeOrder(this, AccountLocation, OrderLocation, Response);
+		}
+
+		/// <summary>
+		/// Gets the state of an authorization.
+		/// </summary>
+		/// <param name="AccountLocation">URI of account.</param>
+		/// <param name="AuthorizationLocation">URI of authorization.</param>
+		/// <returns>ACME authorization object.</returns>
+		public async Task<AcmeAuthorization> GetAuthorization(Uri AccountLocation, Uri AuthorizationLocation)
+		{
+			IEnumerable<KeyValuePair<string, object>> Response = await this.GET(AuthorizationLocation);
+			return new AcmeAuthorization(this, AccountLocation, AuthorizationLocation, Response);
+		}
+
+		/// <summary>
+		/// Deactivates an authorization.
+		/// </summary>
+		/// <param name="AccountLocation">Account location.</param>
+		/// <param name="AuthorizationLocation">Authorization location</param>
+		/// <returns>New authorization object.</returns>
+		public async Task<AcmeAuthorization> DeactivateAuthorization(Uri AccountLocation, Uri AuthorizationLocation)
+		{
+			AcmeResponse Response = await this.POST(AuthorizationLocation, AccountLocation,
+				new KeyValuePair<string, object>("status", "deactivated"));
+
+			return new AcmeAuthorization(this, AccountLocation, Response.Location, Response.Payload);
+		}
+
 
 	}
 }

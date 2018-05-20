@@ -4,6 +4,7 @@ using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Security.Authentication;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -442,6 +443,42 @@ namespace Waher.Security.ACME
 			this.jws = new RsaSsaPkcsSha256(KeySize, this.directoryEndpoint.ToString());
 
 			return new AcmeAccount(this, Response.Location, Response.Payload);
+		}
+
+		/// <summary>
+		/// Generates a new key for the account. (Account keys are managed by the CSP.)
+		/// </summary>
+		/// <param name="AccountLocation">URL of the account resource.</param>
+		public async Task NewKey(Uri AccountLocation)
+		{
+			if (this.directory == null)
+				await this.GetDirectory();
+
+			RSACryptoServiceProvider NewKey = new RSACryptoServiceProvider(KeySize);
+			RsaSsaPkcsSha256 Jws2 = new RsaSsaPkcsSha256(NewKey);
+
+			try
+			{
+				Jws2.Sign(new KeyValuePair<string, object>[]
+					{
+						new KeyValuePair<string, object>("url", this.directory.KeyChange.ToString())
+					}, new KeyValuePair<string, object>[]
+					{
+						new KeyValuePair<string, object>("account", AccountLocation.ToString()),
+						new KeyValuePair<string, object>("newkey", Jws2.PublicWebKey)
+					}, out string Header, out string Payload, out string Signature);
+
+				await this.POST(this.directory.KeyChange, AccountLocation,
+					new KeyValuePair<string, object>("protected", Header),
+					new KeyValuePair<string, object>("payload", Payload),
+					new KeyValuePair<string, object>("signature", Signature));
+
+				this.jws.ImportKey(NewKey);
+			}
+			finally
+			{
+				Jws2.Dispose();
+			}
 		}
 
 	}

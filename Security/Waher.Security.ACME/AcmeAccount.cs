@@ -133,5 +133,23 @@ namespace Waher.Security.ACME
 			return this.Client.UpdateAccount(this.Location, Contact);
 		}
 
+		/// <summary>
+		/// Deactivates the account.
+		/// </summary>
+		/// <returns>New account object.</returns>
+		public Task<AcmeAccount> Deactivate()
+		{
+			return this.Client.DeactivateAccount(this.Location);
+		}
+
+		/// <summary>
+		/// Creates a new key for the account.
+		/// </summary>
+		/// <returns>New account key.</returns>
+		public Task NewKey()
+		{
+			return this.Client.NewKey(this.Location);
+		}
+
 	}
 }

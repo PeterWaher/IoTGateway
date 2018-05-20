@@ -78,10 +78,17 @@ namespace Waher.Security.ACME.Test
 		}
 
 		[TestMethod]
-		public async Task ACME_Test_05_DeactivateAccount()
+		public async Task ACME_Test_05_NewKey()
 		{
 			AcmeAccount Account = await this.client.GetAccount();
-			Account = await this.client.DeactivateAccount(Account.Location);
+			await Account.NewKey();
+		}
+
+		[TestMethod]
+		public async Task ACME_Test_06_DeactivateAccount()
+		{
+			AcmeAccount Account = await this.client.GetAccount();
+			Account = await Account.Deactivate();
 		}
 	}
 }

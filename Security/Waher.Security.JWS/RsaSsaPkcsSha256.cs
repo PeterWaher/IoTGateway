@@ -25,13 +25,23 @@ namespace Waher.Security.JWS
 			try
 			{
 				this.rsa = new RSACryptoServiceProvider(4096);
-				this.sha = SHA256.Create();
 			}
 			catch (CryptographicException ex)
 			{
 				throw new CryptographicException("Unable to get access to cryptographic key. Was application initially run using another user?", ex);
 			}
 
+			this.Init();
+		}
+
+		/// <summary>
+		/// RSASSA-PKCS1-v1_5 SHA-256 algorithm.
+		/// https://tools.ietf.org/html/rfc3447#page-32
+		/// </summary>
+		/// <param name="RSA">RSA Cryptographic service provider</param>
+		public RsaSsaPkcsSha256(RSACryptoServiceProvider RSA)
+		{
+			this.rsa = RSA;
 			this.Init();
 		}
 
@@ -62,6 +72,16 @@ namespace Waher.Security.JWS
 		}
 
 		/// <summary>
+		/// Imports a new key from an external RSA Cryptographic service provider.
+		/// </summary>
+		/// <param name="RSA">Contains new key.</param>
+		public void ImportKey(RSACryptoServiceProvider RSA)
+		{
+			RSAParameters P = RSA.ExportParameters(true);
+			this.rsa.ImportParameters(P);
+		}
+
+		/// <summary>
 		/// Deletes the key from the CSP, and disposes the object.
 		/// </summary>
 		public void DeleteRsaKeyFromCsp()
@@ -72,22 +92,44 @@ namespace Waher.Security.JWS
 
 		private void Init()
 		{
-			RSAParameters Parameters = this.rsa.ExportParameters(false);
-
-			this.jwk = new KeyValuePair<string, object>[]
-			{
-				new KeyValuePair<string, object>("kty", "RSA"),
-				new KeyValuePair<string, object>("n", Base64Url.Encode(Parameters.Modulus)),
-				new KeyValuePair<string, object>("e", Base64Url.Encode(Parameters.Exponent))/*,
-				new KeyValuePair<string, object>("d", Base64Url.Encode(Parameters.D)),
-				new KeyValuePair<string, object>("p", Base64Url.Encode(Parameters.P)),
-				new KeyValuePair<string, object>("q", Base64Url.Encode(Parameters.Q)),
-				new KeyValuePair<string, object>("dp", Base64Url.Encode(Parameters.DP)),
-				new KeyValuePair<string, object>("dq", Base64Url.Encode(Parameters.DQ)),
-				new KeyValuePair<string, object>("qi", Base64Url.Encode(Parameters.InverseQ))*/
-			};
-
+			this.jwk = GetJwk(this.rsa, false);
 			this.sha = SHA256.Create();
+		}
+
+		/// <summary>
+		/// Creaates a JSON Web Key
+		/// </summary>
+		/// <param name="RSA">RSA Cryptographic service provider</param>
+		/// <param name="IncludePrivate">If private parameters are to be included.</param>
+		/// <returns>JWK for <paramref name="RSA"/>.</returns>
+		public static KeyValuePair<string, object>[] GetJwk(RSACryptoServiceProvider RSA, bool IncludePrivate)
+		{
+			RSAParameters Parameters = RSA.ExportParameters(IncludePrivate);
+
+			if (IncludePrivate)
+			{
+				return new KeyValuePair<string, object>[]
+				{
+					new KeyValuePair<string, object>("kty", "RSA"),
+					new KeyValuePair<string, object>("n", Base64Url.Encode(Parameters.Modulus)),
+					new KeyValuePair<string, object>("e", Base64Url.Encode(Parameters.Exponent)),
+					new KeyValuePair<string, object>("d", Base64Url.Encode(Parameters.D)),
+					new KeyValuePair<string, object>("p", Base64Url.Encode(Parameters.P)),
+					new KeyValuePair<string, object>("q", Base64Url.Encode(Parameters.Q)),
+					new KeyValuePair<string, object>("dp", Base64Url.Encode(Parameters.DP)),
+					new KeyValuePair<string, object>("dq", Base64Url.Encode(Parameters.DQ)),
+					new KeyValuePair<string, object>("qi", Base64Url.Encode(Parameters.InverseQ))
+				};
+			}
+			else
+			{
+				return new KeyValuePair<string, object>[]
+				{
+					new KeyValuePair<string, object>("kty", "RSA"),
+					new KeyValuePair<string, object>("n", Base64Url.Encode(Parameters.Modulus)),
+					new KeyValuePair<string, object>("e", Base64Url.Encode(Parameters.Exponent))
+				};
+			}
 		}
 
 		/// <summary>

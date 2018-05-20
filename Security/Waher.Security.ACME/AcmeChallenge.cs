@@ -96,6 +96,17 @@ namespace Waher.Security.ACME
 		public string Token => this.token;
 
 		/// <summary>
+		/// Key authorization string. Used as response to challenge.
+		/// </summary>
+		public virtual string KeyAuthorization
+		{
+			get
+			{
+				return this.token + "." + this.Client.JwkThumbprint;
+			}
+		}
+
+		/// <summary>
 		/// Acknowledges the challenge.
 		/// </summary>
 		/// <returns>Acknowledged challenge object.</returns>

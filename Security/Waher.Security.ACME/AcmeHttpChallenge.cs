@@ -15,5 +15,14 @@ namespace Waher.Security.ACME
 			: base(Client, AccountLocation, Obj)
 		{
 		}
+
+		/// <summary>
+		/// Challenge resource. The HTTP server should return <see cref="AcmeChallenge.KeyAuthorization"/>
+		/// on this resource, using Content-Type application/octet-stream.
+		/// </summary>
+		public string ResourceName
+		{
+			get { return "/.well-known/acme-challenge/" + this.Token; }
+		}
 	}
 }

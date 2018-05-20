@@ -25,6 +25,7 @@ namespace Waher.Security.ACME
 		private AcmeDirectory directory = null;
 		private RsaSsaPkcsSha256 jws;
 		private string nonce = null;
+		private string jwkThumbprint = null;
 
 		/// <summary>
 		/// Implements an ACME client for the generation of certificates using ACME-compliant certificate servers.
@@ -488,6 +489,7 @@ namespace Waher.Security.ACME
 					new KeyValuePair<string, object>("payload", Payload),
 					new KeyValuePair<string, object>("signature", Signature));
 
+				this.jwkThumbprint = null;
 				this.jws.ImportKey(NewKey);
 
 				return new AcmeAccount(this, Response.Location, Response.Payload);
@@ -554,6 +556,18 @@ namespace Waher.Security.ACME
 		}
 
 		/// <summary>
+		/// Gets the list of current orders for an account.
+		/// </summary>
+		/// <param name="AccountLocation">URI of account.</param>
+		/// <param name="OrdersLocation">URI of orders.</param>
+		/// <returns>ACME order object.</returns>
+		public async Task<AcmeOrder[]> GetOrders(Uri AccountLocation, Uri OrdersLocation)
+		{
+			AcmeResponse Response = await this.GET(OrdersLocation);
+			return null;
+		}
+
+		/// <summary>
 		/// Gets the state of an authorization.
 		/// </summary>
 		/// <param name="AccountLocation">URI of account.</param>
@@ -609,6 +623,41 @@ namespace Waher.Security.ACME
 				case "http-01": return new AcmeHttpChallenge(this, AccountLocation, Obj);
 				case "dns-01": return new AcmeDnsChallenge(this, AccountLocation, Obj);
 				default: return new AcmeChallenge(this, AccountLocation, Obj);
+			}
+		}
+
+		/// <summary>
+		/// Returns the JWK thumbprint of the current JSon Web Key, as defined in RFC 7638
+		/// https://tools.ietf.org/html/rfc7638
+		/// </summary>
+		internal string JwkThumbprint
+		{
+			get
+			{
+				if (this.jwkThumbprint == null)
+				{
+					SortedDictionary<string, object> Sorted = new SortedDictionary<string, object>();
+
+					foreach (KeyValuePair<string, object> P in this.jws.PublicWebKey)
+					{
+						switch (P.Key)
+						{
+							case "kty":
+							case "n":
+							case "e":
+								Sorted[P.Key] = P.Value;
+								break;
+						}
+					}
+
+					string Json = JSON.Encode(Sorted, null);
+					byte[] Bin = Encoding.UTF8.GetBytes(Json);
+					byte[] Hash = Hashes.ComputeSHA256Hash(Bin);
+
+					this.jwkThumbprint = Base64Url.Encode(Hash);
+				}
+
+				return this.jwkThumbprint;
 			}
 		}
 

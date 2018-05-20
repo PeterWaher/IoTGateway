@@ -15,5 +15,24 @@ namespace Waher.Security.ACME
 			: base(Client, AccountLocation, Obj)
 		{
 		}
+
+		/// <summary>
+		/// Domain name prefix used to validate DNS domain name ownership.
+		/// </summary>
+		public string ValidationDomainNamePrefix
+		{
+			get { return "_acme-challenge."; }
+		}
+
+		/// <summary>
+		/// Key authorization string. Used as response to challenge.
+		/// </summary>
+		public override string KeyAuthorization
+		{
+			get
+			{
+				return Base64Url.Encode(Hashes.ComputeSHA256Hash(Encoding.ASCII.GetBytes(base.KeyAuthorization)));
+			}
+		}
 	}
 }

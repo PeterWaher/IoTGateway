@@ -35,7 +35,7 @@ namespace Waher.Security.ACME
 		private readonly AcmeAccountStatus status;
 		private readonly string[] contact = null;
 		private readonly string initialIp = null;
-		private readonly Uri orders;
+		private readonly Uri orders = null;
 		private readonly DateTime? createdAt = null;
 		private readonly bool? termsOfServiceAgreed = null;
 
@@ -220,5 +220,15 @@ namespace Waher.Security.ACME
 			return this.Client.OrderCertificate(this.Location, Identifiers, NotBefore, NotAfter);
 		}
 
+		/// <summary>
+		/// Gets the list of current orders.
+		/// </summary>
+		public Task<AcmeOrder[]> GetOrders()
+		{
+			if (this.orders == null)
+				throw new Exception("Account object did not report a URI for the list of orders.");
+
+			return this.Client.GetOrders(this.Location, this.orders);
+		}
 	}
 }

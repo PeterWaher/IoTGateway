@@ -79,6 +79,7 @@ namespace Waher.Security.JWS
 		{
 			RSAParameters P = RSA.ExportParameters(true);
 			this.rsa.ImportParameters(P);
+			this.jwk = GetJwk(this.rsa, false);
 		}
 
 		/// <summary>

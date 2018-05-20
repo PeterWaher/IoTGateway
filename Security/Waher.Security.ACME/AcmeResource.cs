@@ -16,6 +16,7 @@ namespace Waher.Security.ACME
 		/// Abstract base class for all ACME objects.
 		/// </summary>
 		/// <param name="Client">ACME client.</param>
+		/// <param name="AccountLocation">Account resource location.</param>
 		/// <param name="Location">ACME resource location.</param>
 		public AcmeResource(AcmeClient Client, Uri AccountLocation, Uri Location)
 			: base(Client)

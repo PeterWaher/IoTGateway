@@ -87,7 +87,7 @@ namespace Waher.Security.ACME.Test
 		[TestMethod]
 		public async Task ACME_Test_06_OrderCertificate()
 		{
-			AcmeOrder Order = await this.OrderCertificate();
+			AcmeOrder Order = await this.OrderCertificate("example.com", "www.example.com");
 			Assert.IsNotNull(Order);
 			Assert.IsTrue(Order.AuthorizationUris.Length > 0);
 			Assert.IsNull(Order.Certificate);
@@ -100,16 +100,16 @@ namespace Waher.Security.ACME.Test
 			Assert.AreEqual(AcmeOrderStatus.pending, Order.Status);
 		}
 
-		private async Task<AcmeOrder> OrderCertificate()
+		private async Task<AcmeOrder> OrderCertificate(params string[] Domains)
 		{
 			AcmeAccount Account = await this.client.GetAccount();
-			return await Account.OrderCertificate(new string[] { "example.com", "www.example.com" }, null, null);
+			return await Account.OrderCertificate(Domains, null, null);
 		}
 
 		[TestMethod]
 		public async Task ACME_Test_07_PollOrder()
 		{
-			AcmeOrder Order = await this.OrderCertificate();
+			AcmeOrder Order = await this.OrderCertificate("example.com", "www.example.com");
 			AcmeOrder Order2 = await Order.Poll();
 
 			Assert.IsNotNull(Order2);
@@ -127,7 +127,7 @@ namespace Waher.Security.ACME.Test
 		[TestMethod]
 		public async Task ACME_Test_08_Authorizations()
 		{
-			AcmeOrder Order = await this.OrderCertificate();
+			AcmeOrder Order = await this.OrderCertificate("example.com", "www.example.com");
 			AcmeAuthorization[] Authorizations = await Order.GetAuthorizations();
 
 			Assert.IsNotNull(Authorizations);
@@ -137,7 +137,7 @@ namespace Waher.Security.ACME.Test
 		[TestMethod]
 		public async Task ACME_Test_09_PollAuthorization()
 		{
-			AcmeOrder Order = await this.OrderCertificate();
+			AcmeOrder Order = await this.OrderCertificate("example.com", "www.example.com");
 			AcmeAuthorization[] Authorizations = await Order.GetAuthorizations();
 
 			AcmeAuthorization Authorization = await Authorizations[0].Poll();
@@ -147,12 +147,78 @@ namespace Waher.Security.ACME.Test
 		[TestMethod]
 		public async Task ACME_Test_10_DeactivateAuthorizations()
 		{
-			AcmeOrder Order = await this.OrderCertificate();
+			AcmeOrder Order = await this.OrderCertificate("example.com", "www.example.com");
 			AcmeAuthorization[] Authorizations = await Order.GetAuthorizations();
 			int i, c = Authorizations.Length;
 
 			for (i = 0; i < c; i++)
 				Authorizations[i] = await Authorizations[i].Deactivate();
+		}
+
+		[TestMethod]
+		public async Task ACME_Test_11_Challenges()
+		{
+			AcmeOrder Order = await this.OrderCertificate("waher.se", "www.waher.se");
+			AcmeAuthorization[] Authorizations = await Order.GetAuthorizations();
+
+			this.Print(Authorizations);
+		}
+
+		private void Print(params AcmeAuthorization[] Authorizations)
+		{
+			foreach (AcmeAuthorization Authorization in Authorizations)
+			{
+				Console.Out.WriteLine(Authorization.Type);
+				Console.Out.WriteLine(Authorization.Value);
+				Console.Out.WriteLine(Authorization.Status);
+				Console.Out.WriteLine();
+
+				this.Print(Authorization.Value, Authorization.Challenges);
+			}
+		}
+
+		private void Print(string DomainName, params AcmeChallenge[] Challenges)
+		{
+			foreach (AcmeChallenge Challenge in Challenges)
+			{
+				Console.Out.WriteLine(Challenge.Location);
+				Console.Out.WriteLine(Challenge.Status.ToString());
+				Console.Out.WriteLine(Challenge.Token);
+
+				if (Challenge is AcmeHttpChallenge HttpChallenge)
+				{
+					Console.Out.WriteLine(HttpChallenge.ResourceName);
+					Console.Out.WriteLine(HttpChallenge.KeyAuthorization);
+				}
+				else if (Challenge is AcmeDnsChallenge DnsChallenge)
+				{
+					Console.Out.WriteLine(DnsChallenge.ValidationDomainNamePrefix + DomainName);
+					Console.Out.WriteLine(DnsChallenge.KeyAuthorization);
+				}
+
+				if (Challenge.Validated.HasValue)
+					Console.Out.WriteLine(Challenge.Validated.Value);
+
+				Console.Out.WriteLine();
+			}
+		}
+
+		[TestMethod]
+		[Ignore]
+		public async Task ACME_Test_12_GetOrders()
+		{
+			AcmeAccount Account = await this.client.GetAccount();
+			AcmeOrder[] Orders = await Account.GetOrders();
+			
+			foreach (AcmeOrder Order in Orders)
+			{
+				Console.Out.WriteLine(Order.Location);
+				Console.Out.WriteLine(Order.Status);
+				Console.Out.WriteLine();
+
+				AcmeAuthorization[] Authorizations = await Order.GetAuthorizations();
+				this.Print(Authorizations);
+			}
 		}
 
 		[TestMethod]

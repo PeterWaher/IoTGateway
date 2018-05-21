@@ -7,6 +7,32 @@ using System.Text.RegularExpressions;
 namespace Waher.Security.ACME
 {
 	/// <summary>
+	/// Type class
+	/// </summary>
+	public enum Asn1TypeClass
+	{
+		/// <summary>
+		/// Native to ASN.1
+		/// </summary>
+		Universal = 0,
+
+		/// <summary>
+		/// Only valid for a specific application.
+		/// </summary>
+		Application = 1,
+
+		/// <summary>
+		/// Depends on the context.
+		/// </summary>
+		ContextSpecific = 2,
+
+		/// <summary>
+		/// Defined in private specifications.
+		/// </summary>
+		Private = 3
+	}
+
+	/// <summary>
 	/// Encodes data using the Distinguished Encoding Rules (DER), as defined in X.690
 	/// </summary>
 	public class DerEncoder
@@ -63,23 +89,19 @@ namespace Waher.Security.ACME
 		public void INTEGER(long Value)
 		{
 			this.output.Add(2);
-			this.EncodeInteger(Value);
-		}
 
-		private void EncodeInteger(long i)
-		{
 			int Pos = this.output.Count;
 			int c = 8;
 			byte b;
 
 			this.output.Add(0);
 
-			if (i < 0)
+			if (Value < 0)
 			{
 				do
 				{
-					b = (byte)(i >> 56);
-					i <<= 8;
+					b = (byte)(Value >> 56);
+					Value <<= 8;
 					c--;
 				}
 				while (b == 0xff);
@@ -91,19 +113,19 @@ namespace Waher.Security.ACME
 
 				while (c-- > 0)
 				{
-					b = (byte)(i >> 56);
+					b = (byte)(Value >> 56);
 					this.output.Add(b);
-					i <<= 8;
+					Value <<= 8;
 				}
 			}
-			else if (i == 0)
+			else if (Value == 0)
 				this.output.Add(0);
 			else
 			{
 				do
 				{
-					b = (byte)(i >> 56);
-					i <<= 8;
+					b = (byte)(Value >> 56);
+					Value <<= 8;
 					c--;
 				}
 				while (b == 0);
@@ -115,9 +137,9 @@ namespace Waher.Security.ACME
 
 				while (c-- > 0)
 				{
-					b = (byte)(i >> 56);
+					b = (byte)(Value >> 56);
 					this.output.Add(b);
-					i <<= 8;
+					Value <<= 8;
 				}
 			}
 
@@ -128,9 +150,38 @@ namespace Waher.Security.ACME
 		/// Encodes an INTEGER value.
 		/// </summary>
 		/// <param name="Value">INTEGER value.</param>
-		public void INTEGER(byte[] Value)
+		/// <param name="Negative">If the value is negative.</param>
+		public void INTEGER(byte[] Value, bool Negative)
 		{
 			this.output.Add(2);
+
+			if (Negative)
+			{
+				if (Value == null || Value.Length == 0)
+					Value = new byte[] { 0xff };
+				else if (Value[0] < 0x80)
+				{
+					int c = Value.Length;
+					byte[] Value2 = new byte[c + 1];
+					Value2[0] = 0xff;
+					Array.Copy(Value, 0, Value2, 1, Value.Length);
+					Value = Value2;
+				}
+			}
+			else
+			{
+				if (Value == null || Value.Length == 0)
+					Value = new byte[] { 0 };
+				else if (Value[0] >= 0x80)
+				{
+					int c = Value.Length;
+					byte[] Value2 = new byte[c + 1];
+					Value2[0] = 0;
+					Array.Copy(Value, 0, Value2, 1, Value.Length);
+					Value = Value2;
+				}
+			}
+
 			this.EncodeBinary(Value);
 		}
 
@@ -138,17 +189,33 @@ namespace Waher.Security.ACME
 		{
 			int Len = Bin.Length;
 
-			if (Len <= 127)
+			if (Len >= 0x80)
 			{
-				this.output.Add((byte)Len);
-				this.output.AddRange(Bin);
+				if (Len <= 0xff)
+					this.output.Add(0x81);
+				else
+				{
+					if (Len <= 0xffff)
+						this.output.Add(0x82);
+					else
+					{
+						if (Len <= 0xffffff)
+							this.output.Add(0x83);
+						else
+						{
+							this.output.Add(0x84);
+							this.output.Add((byte)(Len >> 24));
+						}
+
+						this.output.Add((byte)(Len >> 16));
+					}
+
+					this.output.Add((byte)(Len >> 8));
+				}
 			}
-			else
-			{
-				int Pos = this.output.Count;
-				this.EncodeInteger(Len);
-				this.output[Pos] |= 0x80;
-			}
+
+			this.output.Add((byte)Len);
+			this.output.AddRange(Bin);
 		}
 
 		/// <summary>
@@ -188,6 +255,40 @@ namespace Waher.Security.ACME
 			}
 
 			this.EncodeBinary(Bin);
+		}
+
+
+		/// <summary>
+		/// Encodes an BITSTRING value.
+		/// </summary>
+		/// <param name="Bytes">Bytes containing BITSTRING value.</param>
+		public void BITSTRING(byte[] Bytes)
+		{
+			this.output.Add(3);
+
+			int c = Bytes.Length;
+			byte[] Bytes2 = new byte[c + 1];
+			Bytes2[0] = 0;  // Unused bits.
+			Array.Copy(Bytes, 0, Bytes2, 1, c);
+
+			this.EncodeBinary(Bytes2);
+		}
+
+		/// <summary>
+		/// Starts a BITSTRING.
+		/// </summary>
+		public void StartBITSTRING()
+		{
+			this.Start();
+			this.output.Add(0);
+		}
+
+		/// <summary>
+		/// Starts the current BITSTRING.
+		/// </summary>
+		public void EndBITSTRING()
+		{
+			this.End(3);
 		}
 
 		/// <summary>
@@ -258,34 +359,19 @@ namespace Waher.Security.ACME
 			{
 				j = OID[i];
 
-				if (j < 0x80)
-					Bin.Add((byte)j);
-				else if (j < 0x4000)
-				{
-					Bin.Add((byte)(128 + (j >> 7)));
-					Bin.Add((byte)(j & 127));
-				}
-				else if (j < 0x200000)
-				{
-					Bin.Add((byte)(128 + (j >> 14)));
-					Bin.Add((byte)(128 + ((j >> 7) & 127)));
-					Bin.Add((byte)(j & 127));
-				}
-				else if (j < 0x10000000)
-				{
-					Bin.Add((byte)(128 + (j >> 21)));
-					Bin.Add((byte)(128 + ((j >> 14) & 127)));
-					Bin.Add((byte)(128 + ((j >> 7) & 127)));
-					Bin.Add((byte)(j & 127));
-				}
-				else
-				{
+				if (j >= 0x10000000)
 					Bin.Add((byte)(128 + (j >> 28)));
-					Bin.Add((byte)(128 + ((j >> 21) & 127)));
-					Bin.Add((byte)(128 + ((j >> 14) & 127)));
-					Bin.Add((byte)(128 + ((j >> 7) & 127)));
-					Bin.Add((byte)(j & 127));
-				}
+
+				if (j >= 0x200000)
+					Bin.Add((byte)(128 + (j >> 21)));
+
+				if (j >= 0x4000)
+					Bin.Add((byte)(128 + (j >> 14)));
+
+				if (j >= 0x80)
+					Bin.Add((byte)(128 + (j >> 7)));
+
+				Bin.Add((byte)(j & 127));
 			}
 
 			this.output.Add(6);
@@ -365,13 +451,13 @@ namespace Waher.Security.ACME
 
 		private void End(byte Type)
 		{
-			if (this.stack == null || this.stack.First == null)
+			if (this.stack == null || this.stack.Last == null)
 				throw new Exception("Not properly started.");
 
 			byte[] Bin = this.output.ToArray();
 
-			this.output = this.stack.First.Value;
-			this.stack.RemoveFirst();
+			this.output = this.stack.Last.Value;
+			this.stack.RemoveLast();
 
 			this.output.Add(Type);
 			this.EncodeBinary(Bin);
@@ -391,6 +477,16 @@ namespace Waher.Security.ACME
 		public void EndSET()
 		{
 			this.End(0x31);
+		}
+
+		/// <summary>
+		/// Writes an end-of-content (EOC) to the output.
+		/// </summary>
+		/// <param name="Class">Class</param>
+		public void EndOfContent(Asn1TypeClass Class)
+		{
+			this.output.Add((byte)((((int)Class) << 6) | 0x20));
+			this.output.Add(0);
 		}
 
 	}

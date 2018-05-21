@@ -222,6 +222,34 @@ namespace Waher.Security.ACME.Test
 		}
 
 		[TestMethod]
+		public async Task ACME_Test_13_AcknowledgeHttpChallenges()
+		{
+			AcmeOrder Order = await this.OrderCertificate("waher.se", "www.waher.se");
+			AcmeAuthorization[] Authorizations = await Order.GetAuthorizations();
+
+			foreach (AcmeAuthorization Authorization in Authorizations)
+			{
+				foreach (AcmeChallenge Challenge in Authorization.Challenges)
+				{
+					if (Challenge is AcmeHttpChallenge HttpChallenge)
+					{
+						AcmeChallenge Challenge2 = await Challenge.AcknowledgeChallenge();
+
+						this.Print(Authorization.Value, Challenge2);
+					}
+				}
+			}
+
+			System.Threading.Thread.Sleep(5000);
+
+			foreach (AcmeAuthorization Authorization in Authorizations)
+			{
+				AcmeAuthorization Authorization2 = await Authorization.Poll();
+				this.Print(Authorization2);
+			}
+		}
+
+		[TestMethod]
 		public async Task ACME_Test_90_DeactivateAccount()
 		{
 			AcmeAccount Account = await this.client.GetAccount();

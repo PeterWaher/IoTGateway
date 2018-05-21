@@ -3,6 +3,7 @@ using System.Collections;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Waher.Security.JWS;
 
 namespace Waher.Security.ACME.Test
 {
@@ -267,15 +268,15 @@ namespace Waher.Security.ACME.Test
 		}
 
 		[TestMethod]
-		public void DER_Test_20_CSR()
+		public void DER_Test_20_CSR_1()
 		{
 			// Example taken from: https://www.sslshopper.com/what-is-a-csr-certificate-signing-request.html
 
-			this.derOutput.StartSEQUENCE();
-			this.derOutput.StartSEQUENCE();
-			this.derOutput.INTEGER(0);  // Version
-			this.derOutput.StartSEQUENCE();
+			this.derOutput.StartSEQUENCE();     // CertificationRequest
+			this.derOutput.StartSEQUENCE();     // CertificationRequestInfo 
+			this.derOutput.INTEGER(0);          // Version
 
+			this.derOutput.StartSEQUENCE();     // subject
 			this.derOutput.StartSET();
 			this.derOutput.StartSEQUENCE();
 			this.derOutput.OBJECT_IDENTIFIER("2.5.4.6");    // Country Name
@@ -317,16 +318,16 @@ namespace Waher.Security.ACME.Test
 			this.derOutput.PRINTABLE_STRING("www.google.com");
 			this.derOutput.EndSEQUENCE();
 			this.derOutput.EndSET();
-			this.derOutput.EndSEQUENCE();
+			this.derOutput.EndSEQUENCE();       // end of subject
 
-			this.derOutput.StartSEQUENCE();
-			this.derOutput.StartSEQUENCE();
+			this.derOutput.StartSEQUENCE();     // subjectPKInfo
+			this.derOutput.StartSEQUENCE();     // algorithm
 			this.derOutput.OBJECT_IDENTIFIER("1.2.840.113549.1.1.1");   // RSA Encryption
 			this.derOutput.NULL();  // No parameters
-			this.derOutput.EndSEQUENCE();
-			this.derOutput.StartBITSTRING();
+			this.derOutput.EndSEQUENCE();       // end of algorithm
+			this.derOutput.StartBITSTRING();    // subjectPublicKey
 			this.derOutput.StartSEQUENCE();
-			this.derOutput.INTEGER(new byte[]
+			this.derOutput.INTEGER(new byte[]	// Modulus
 			{
 				165,155,88,36,33,201,225,90,85,
 				92,119,213,34,91,45,65,57,78,226,
@@ -341,20 +342,21 @@ namespace Waher.Security.ACME.Test
 				251,31,211,48,118,144,41,31,201,112,
 				133,143,134,166,144,134,194,110,205,150,
 				239,1,209,128,243,64,75,197,211
-			}, false);  // Modulus
+			}, false);
 			this.derOutput.INTEGER(new byte[] { 1, 0, 1 }, false);  // Exponent
 			this.derOutput.EndSEQUENCE();
-			this.derOutput.EndBITSTRING();
-			this.derOutput.EndSEQUENCE();
-			this.derOutput.EndOfContent(Asn1TypeClass.ContextSpecific);
-			this.derOutput.EndSEQUENCE();
+			this.derOutput.EndBITSTRING();      // end of subjectPublicKey
+			this.derOutput.EndSEQUENCE();       // end of subjectPKInfo
 
-			this.derOutput.StartSEQUENCE();
-			this.derOutput.OBJECT_IDENTIFIER("1.2.840.113549.1.1.5");   // SHA-1 with RSA Encryption
-			this.derOutput.NULL();  // No parameters
-			this.derOutput.EndSEQUENCE();
+			this.derOutput.EndOfContent(Asn1TypeClass.ContextSpecific);     // attributes
+			this.derOutput.EndSEQUENCE();       // end of CertificationRequestInfo
 
-			this.derOutput.BITSTRING(new byte[]
+			this.derOutput.StartSEQUENCE();     // signatureAlgorithm
+			this.derOutput.OBJECT_IDENTIFIER("1.2.840.113549.1.1.5");   // algorithm (SHA-1 with RSA Encryption)
+			this.derOutput.NULL();              // parameters
+			this.derOutput.EndSEQUENCE();       // End of signatureAlgorithm
+
+			this.derOutput.BITSTRING(new byte[]	// signature
 			{
 				136,101,224,251,197,171,231,187,138,144,
 				17,128,142,89,51,225,153,199,169,169,
@@ -371,9 +373,35 @@ namespace Waher.Security.ACME.Test
 				229,2,232,125,80,91,182,231
 			});
 
-			this.derOutput.EndSEQUENCE();
+			this.derOutput.EndSEQUENCE();       // end of CertificationRequest
 
 			this.AssertEqualTo(Convert.FromBase64String("MIIByjCCATMCAQAwgYkxCzAJBgNVBAYTAlVTMRMwEQYDVQQIEwpDYWxpZm9ybmlhMRYwFAYDVQQHEw1Nb3VudGFpbiBWaWV3MRMwEQYDVQQKEwpHb29nbGUgSW5jMR8wHQYDVQQLExZJbmZvcm1hdGlvbiBUZWNobm9sb2d5MRcwFQYDVQQDEw53d3cuZ29vZ2xlLmNvbTCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEApZtYJCHJ4VpVXHfVIlstQTlO4qC03hjX+ZkPyvdYd1Q4+qbAeTwXmCUKYHThVRd5aXSqlPzyIBwieMZrWFlRQddZ1IzXAlVRDWwAo60KecqeAXnnUK+5fXoTI/UgWshre8tJ+x/TMHaQKR/JcIWPhqaQhsJuzZbvAdGA80BLxdMCAwEAAaAAMA0GCSqGSIb3DQEBBQUAA4GBAIhl4PvFq+e7ipARgI5ZM+GZx6mpCz44DTo0JkwfRDf+BtrsaC0q68eTf2XhYOsq4fkHQ0uA0aVog3f5iJxCa3Hp5gxbJQ6zV6kJ0TEsuaaOhEko9sdpCoPOnRBm2i/XRD2D6iNh8f8z0ShGsFqjDgFHyF3o+lUyj+UC6H1QW7bn"));
+		}
+
+		[TestMethod]
+		public void DER_Test_21_CSR_2()
+		{
+			RsaSsaPkcsSha256 RSA = new RsaSsaPkcsSha256();
+			CertificateRequest CertificateRequest = new CertificateRequest(new RsaSha256(RSA.RSA))
+			{
+				//Country = "SE",
+				//StateOrProvince = "Stockholm",
+				//Locality = "Värmdö",
+				//Organization = "Waher Data AB",
+				//OrganizationalUnit = "Development",
+				CommonName = "www.waher.se",
+				//SubjectAlternativeNames = new string[] { "waher.se" },
+				//Surname = "Waher",
+				//Description = "Domain certificate",
+				//Name = "Peter Waher",
+				//GivenName = "Peter"
+			};
+
+			byte[] CSR = CertificateRequest.BuildCSR();
+
+			Console.Out.WriteLine("-----BEGIN CERTIFICATE REQUEST-----");
+			Console.Out.WriteLine(Convert.ToBase64String(CSR, Base64FormattingOptions.InsertLineBreaks));
+			Console.Out.WriteLine("-----END CERTIFICATE REQUEST-----");
 		}
 	}
 }

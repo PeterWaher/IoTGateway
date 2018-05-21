@@ -404,11 +404,21 @@ namespace Waher.Security.ACME
 		/// <param name="Value">PRINTABLE STRING value.</param>
 		public void PRINTABLE_STRING(string Value)
 		{
-			if (!PrintableString.IsMatch(Value))
-				throw new ArgumentException("Not printable string.", nameof(Value));
+			if (!IsPrintable(Value))
+				throw new ArgumentException("Not a printable string.", nameof(Value));
 
 			this.output.Add(0x13);
 			this.EncodeBinary(Encoding.ASCII.GetBytes(Value));
+		}
+
+		/// <summary>
+		/// Checks if a string is a printable string.
+		/// </summary>
+		/// <param name="Value">Value to check.</param>
+		/// <returns>If the string is a printable string or not.</returns>
+		public static bool IsPrintable(string Value)
+		{
+			return PrintableString.IsMatch(Value);
 		}
 
 		private static readonly Regex PrintableString = new Regex("^[A-Za-z0-9 '()+,-./:=?]*$", RegexOptions.Singleline | RegexOptions.Compiled);
@@ -480,13 +490,22 @@ namespace Waher.Security.ACME
 		}
 
 		/// <summary>
-		/// Writes an end-of-content (EOC) to the output.
+		/// Encodes an end-of-content (EOC) to the output.
 		/// </summary>
 		/// <param name="Class">Class</param>
 		public void EndOfContent(Asn1TypeClass Class)
 		{
 			this.output.Add((byte)((((int)Class) << 6) | 0x20));
 			this.output.Add(0);
+		}
+
+		/// <summary>
+		/// Adds DER-encoded bytes to the output.
+		/// </summary>
+		/// <param name="DerEncodedBytes">DER encoded bytes.</param>
+		public void Raw(byte[] DerEncodedBytes)
+		{
+			this.output.AddRange(DerEncodedBytes);
 		}
 
 	}

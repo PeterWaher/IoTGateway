@@ -83,6 +83,14 @@ namespace Waher.Security.JWS
 		}
 
 		/// <summary>
+		/// RSA Cryptographic service provider.
+		/// </summary>
+		public RSACryptoServiceProvider RSA
+		{
+			get { return this.rsa; }
+		}
+
+		/// <summary>
 		/// Deletes the key from the CSP, and disposes the object.
 		/// </summary>
 		public void DeleteRsaKeyFromCsp()

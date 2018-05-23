@@ -506,7 +506,7 @@ namespace Waher.Content
 		/// <param name="Indent">If JSON should be indented.</param>
 		/// <param name="AdditionalProperties">Optional additional properties.</param>
 		public static void Encode(IEnumerable<KeyValuePair<string, object>> Object, int? Indent, StringBuilder Json,
-			params KeyValuePair<string,object>[] AdditionalProperties)
+			params KeyValuePair<string, object>[] AdditionalProperties)
 		{
 			bool First = true;
 
@@ -651,15 +651,11 @@ namespace Waher.Content
 						Encode(e.Current, Indent, Json);
 					}
 
-					if (!First)
+					if (!First && Indent.HasValue)
 					{
 						Json.AppendLine();
-
-						if (Indent.HasValue)
-						{
-							Indent = Indent - 1;
-							Json.Append(new string('\t', Indent.Value));
-						}
+						Indent = Indent - 1;
+						Json.Append(new string('\t', Indent.Value));
 					}
 
 					Json.Append(']');

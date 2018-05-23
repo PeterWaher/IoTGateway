@@ -686,7 +686,7 @@ namespace Waher.Security.ACME.Test
 		}
 
 		[TestMethod]
-		public void DER_Test_24_CSR_6_Generic()
+		public void DER_Test_24_CSR_6_Generic_SHA256()
 		{
 			using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(2048))
 			{

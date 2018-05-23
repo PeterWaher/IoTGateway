@@ -21,10 +21,20 @@ namespace Waher.Security.JWS
 		/// https://tools.ietf.org/html/rfc3447#page-32
 		/// </summary>
 		public RsaSsaPkcsSha256()
+			: this(4096)
+		{
+		}
+
+		/// <summary>
+		/// RSASSA-PKCS1-v1_5 SHA-256 algorithm.
+		/// https://tools.ietf.org/html/rfc3447#page-32
+		/// </summary>
+		/// <param name="KeySize">Key size.</param>
+		public RsaSsaPkcsSha256(int KeySize)
 		{
 			try
 			{
-				this.rsa = new RSACryptoServiceProvider(4096);
+				this.rsa = new RSACryptoServiceProvider(KeySize);
 			}
 			catch (CryptographicException ex)
 			{

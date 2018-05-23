@@ -309,7 +309,7 @@ namespace Waher.Security.ACME
 
 			DER.StartSEQUENCE();     // subjectPKInfo
 			DER.StartSEQUENCE();     // algorithm
-			DER.OBJECT_IDENTIFIER(this.signatureAlgorithm.OID);
+			DER.OBJECT_IDENTIFIER(this.signatureAlgorithm.PkiAlgorithmOID);
 			DER.NULL();  // No parameters
 			DER.EndSEQUENCE();       // end of algorithm
 			DER.StartBITSTRING();    // subjectPublicKey
@@ -319,7 +319,7 @@ namespace Waher.Security.ACME
 			DER.EndBITSTRING();      // end of subjectPublicKey
 			DER.EndSEQUENCE();       // end of subjectPKInfo
 
-			//DER.EndOfContent(Asn1TypeClass.ContextSpecific);     // attributes
+			DER.EndOfContent(Asn1TypeClass.ContextSpecific);     // attributes
 			DER.EndSEQUENCE();       // end of CertificationRequestInfo
 
 			byte[] CertificationRequestInfo = DER.ToArray();
@@ -329,7 +329,7 @@ namespace Waher.Security.ACME
 			DER.Raw(CertificationRequestInfo);
 
 			DER.StartSEQUENCE();     // signatureAlgorithm
-			DER.OBJECT_IDENTIFIER(this.signatureAlgorithm.OID);   // algorithm OID
+			DER.OBJECT_IDENTIFIER(this.signatureAlgorithm.HashAlgorithmOID);   
 			DER.NULL();              // parameters
 			DER.EndSEQUENCE();       // End of signatureAlgorithm
 

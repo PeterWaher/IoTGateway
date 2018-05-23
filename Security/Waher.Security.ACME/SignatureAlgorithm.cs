@@ -10,9 +10,17 @@ namespace Waher.Security.ACME
     public abstract class SignatureAlgorithm
     {
 		/// <summary>
-		/// Object Identity for the algorithm.
+		/// Object Identity for the PKI algorithm.
 		/// </summary>
-		public abstract string OID
+		public abstract string PkiAlgorithmOID
+		{
+			get;
+		}
+
+		/// <summary>
+		/// Object Identity for the Hash algorithm.
+		/// </summary>
+		public abstract string HashAlgorithmOID
 		{
 			get;
 		}

@@ -661,5 +661,21 @@ namespace Waher.Security.ACME
 			}
 		}
 
+		/// <summary>
+		/// Finalize order.
+		/// </summary>
+		/// <param name="AccountLocation">Account location.</param>
+		/// <param name="FinalizeLocation">Finalize location.</param>
+		/// <param name="CertificateRequest">Certificate request.</param>
+		/// <returns>New order object.</returns>
+		public async Task<AcmeOrder> FinalizeOrder(Uri AccountLocation, Uri FinalizeLocation, CertificateRequest CertificateRequest)
+		{
+			byte[] CSR = CertificateRequest.BuildCSR();
+			AcmeResponse Response = await this.POST(FinalizeLocation, AccountLocation,
+				new KeyValuePair<string, object>("csr", Base64Url.Encode(CSR)));
+
+			return new AcmeOrder(this, AccountLocation, Response.Location, Response.Payload, Response.ResponseMessage);
+		}
+
 	}
 }

@@ -583,7 +583,7 @@ namespace Waher.Security.ACME.Test
 				this.derOutput.StartSET();
 				this.derOutput.StartSEQUENCE();
 				this.derOutput.OBJECT_IDENTIFIER("2.5.4.3");    // Common Name
-				this.derOutput.PRINTABLE_STRING("www.waher.se");
+				this.derOutput.PRINTABLE_STRING("www.example.com");
 				this.derOutput.EndSEQUENCE();
 				this.derOutput.EndSET();
 				this.derOutput.EndSEQUENCE();       // end of subject
@@ -642,7 +642,7 @@ namespace Waher.Security.ACME.Test
 				this.derOutput.StartSET();
 				this.derOutput.StartSEQUENCE();
 				this.derOutput.OBJECT_IDENTIFIER("2.5.4.3");    // Common Name
-				this.derOutput.PRINTABLE_STRING("www.waher.se");
+				this.derOutput.PRINTABLE_STRING("www.example.com");
 				this.derOutput.EndSEQUENCE();
 				this.derOutput.EndSET();
 				this.derOutput.EndSEQUENCE();       // end of subject
@@ -694,15 +694,15 @@ namespace Waher.Security.ACME.Test
 				{
 					Country = "SE",
 					StateOrProvince = "Stockholm",
-					Locality = "Värmdö",
-					Organization = "Waher Data AB",
+					Locality = "Locality",
+					Organization = "Example Ltd",
 					OrganizationalUnit = "Development",
-					CommonName = "www.waher.se",
-					SubjectAlternativeNames = new string[] { "waher.se" },
-					Surname = "Waher",
+					CommonName = "www.example.com",
+					SubjectAlternativeNames = new string[] { "example.com" },
+					Surname = "Smith",
 					Description = "Domain certificate",
-					Name = "Peter Waher",
-					GivenName = "Peter"
+					Name = "Mr Smith",
+					GivenName = "Mr"
 				};
 
 				byte[] CSR = CertificateRequest.BuildCSR();
@@ -720,15 +720,15 @@ namespace Waher.Security.ACME.Test
 				{
 					Country = "SE",
 					StateOrProvince = "Stockholm",
-					Locality = "Värmdö",
-					Organization = "Waher Data AB",
+					Locality = "Locality",
+					Organization = "Example Ltd",
 					OrganizationalUnit = "Development",
-					CommonName = "www.waher.se",
-					SubjectAlternativeNames = new string[] { "waher.se" },
-					Surname = "Waher",
+					CommonName = "www.example.com",
+					SubjectAlternativeNames = new string[] { "example.com" },
+					Surname = "Smith",
 					Description = "Domain certificate",
-					Name = "Peter Waher",
-					GivenName = "Peter"
+					Name = "Mr Smith",
+					GivenName = "Mr"
 				};
 
 				byte[] CSR = CertificateRequest.BuildCSR();
@@ -746,15 +746,15 @@ namespace Waher.Security.ACME.Test
 				{
 					Country = "SE",
 					StateOrProvince = "Stockholm",
-					Locality = "Värmdö",
-					Organization = "Waher Data AB",
+					Locality = "Locality",
+					Organization = "Example Ltd",
 					OrganizationalUnit = "Development",
-					CommonName = "www.waher.se",
-					SubjectAlternativeNames = new string[] { "waher.se" },
-					Surname = "Waher",
+					CommonName = "www.example.com",
+					SubjectAlternativeNames = new string[] { "example.com" },
+					Surname = "Smith",
 					Description = "Domain certificate",
-					Name = "Peter Waher",
-					GivenName = "Peter"
+					Name = "Mr Smith",
+					GivenName = "Mr"
 				};
 
 				byte[] CSR = CertificateRequest.BuildCSR();

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -158,7 +159,7 @@ namespace Waher.Security.ACME.Test
 		[TestMethod]
 		public async Task ACME_Test_11_Challenges()
 		{
-			AcmeOrder Order = await this.OrderCertificate("waher.se", "www.waher.se");
+			AcmeOrder Order = await this.OrderCertificate("example.com", "www.example.com");
 			AcmeAuthorization[] Authorizations = await Order.GetAuthorizations();
 
 			this.Print(Authorizations);
@@ -224,7 +225,7 @@ namespace Waher.Security.ACME.Test
 		[TestMethod]
 		public async Task ACME_Test_13_AcknowledgeHttpChallenges()
 		{
-			AcmeOrder Order = await this.OrderCertificate("waher.se", "www.waher.se");
+			AcmeOrder Order = await this.OrderCertificate("example.com", "www.example.com");
 			AcmeAuthorization[] Authorizations = await Order.GetAuthorizations();
 
 			foreach (AcmeAuthorization Authorization in Authorizations)
@@ -246,6 +247,30 @@ namespace Waher.Security.ACME.Test
 			{
 				AcmeAuthorization Authorization2 = await Authorization.Poll();
 				this.Print(Authorization2);
+			}
+		}
+
+		[TestMethod]
+		public async Task ACME_Test_14_FinalizeOrder()
+		{
+			using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(4096))
+			{
+				AcmeOrder Order = await this.OrderCertificate("example.com", "www.example.com");
+				Order = await Order.FinalizeOrder(new CertificateRequest(new RsaSha256(RSA))
+				{
+					//Country = "SE",
+					//StateOrProvince = "Stockholm",
+					//Locality = "Locality",
+					//Organization = "Example Ltd",
+					//OrganizationalUnit = "Development",
+					CommonName = "example.com",
+					SubjectAlternativeNames = new string[] { "DNS:www.example.com" },
+					EMailAddress = "ex@example.com",
+					//Surname = "Smith",
+					//Description = "Domain certificate",
+					//Name = "Mr Smith",
+					//GivenName = "Mr"
+				});
 			}
 		}
 

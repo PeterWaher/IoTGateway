@@ -35,6 +35,7 @@ namespace Waher.Security.ACME
 		private string distinguishedName = null;            // 2.5.4.49
 		private string houseIdentifier = null;              // 2.5.4.51
 		private string[] subjectAlternativeNames = null;    // 2.5.29.17
+		private string emailAddress = null;                 // 1.2.840.113549.1.9.1
 
 		/// <summary>
 		/// Contains information about a Certificate Signing Request (CSR).
@@ -270,6 +271,15 @@ namespace Waher.Security.ACME
 		}
 
 		/// <summary>
+		/// e-Mail Address (OID 1.2.840.113549.1.9.1)
+		/// </summary>
+		public string EMailAddress
+		{
+			get { return this.emailAddress; }
+			set { this.emailAddress = value; }
+		}
+
+		/// <summary>
 		/// Building a Certificate Signing Request (CSR) in accordance with RFC 2986
 		/// </summary>
 		/// <returns>CSR</returns>
@@ -305,6 +315,7 @@ namespace Waher.Security.ACME
 			this.EncodeIfDefined(DER, "2.5.4.49", this.distinguishedName);
 			this.EncodeIfDefined(DER, "2.5.4.51", this.houseIdentifier);
 			this.EncodeIfDefined(DER, "2.5.29.17", this.subjectAlternativeNames);
+			this.EncodeIfDefined(DER, "1.2.840.113549.1.9.1", this.emailAddress);
 			DER.EndSEQUENCE();       // end of subject
 
 			DER.StartSEQUENCE();     // subjectPKInfo
@@ -329,27 +340,43 @@ namespace Waher.Security.ACME
 			DER.Raw(CertificationRequestInfo);
 
 			DER.StartSEQUENCE();     // signatureAlgorithm
-			DER.OBJECT_IDENTIFIER(this.signatureAlgorithm.HashAlgorithmOID);   
+			DER.OBJECT_IDENTIFIER(this.signatureAlgorithm.HashAlgorithmOID);
 			DER.NULL();              // parameters
 			DER.EndSEQUENCE();       // End of signatureAlgorithm
 
-			DER.BITSTRING(this.signatureAlgorithm.Sign(CertificationRequestInfo));	// signature
+			DER.BITSTRING(this.signatureAlgorithm.Sign(CertificationRequestInfo));  // signature
 
 			DER.EndSEQUENCE();       // end of CertificationRequest
 
 			return DER.ToArray();
 		}
 
-		private void EncodeIfDefined(DerEncoder DER, string OID, params string[] Value)
+		private void EncodeIfDefined(DerEncoder DER, string OID, string Value)
+		{
+			if (Value != null)
+			{
+				DER.StartSET();
+				DER.StartSEQUENCE();
+				DER.OBJECT_IDENTIFIER(OID);
+
+				if (DerEncoder.IsPrintable(Value))
+					DER.PRINTABLE_STRING(Value);
+				else
+					DER.IA5_STRING(Value);
+
+				DER.EndSEQUENCE();
+				DER.EndSET();
+			}
+		}
+
+		private void EncodeIfDefined(DerEncoder DER, string OID, string[] Value)
 		{
 			if (Value != null && (Value.Length > 1 || !string.IsNullOrEmpty(Value[0])))
 			{
 				DER.StartSET();
 				DER.StartSEQUENCE();
 				DER.OBJECT_IDENTIFIER(OID);
-
-				if (Value.Length > 1)
-					DER.StartSEQUENCE();
+				DER.StartSEQUENCE();
 
 				foreach (string s in Value)
 				{
@@ -359,9 +386,7 @@ namespace Waher.Security.ACME
 						DER.UTF8_STRING(s);
 				}
 
-				if (Value.Length > 1)
-					DER.EndSEQUENCE();
-
+				DER.EndSEQUENCE();
 				DER.EndSEQUENCE();
 				DER.EndSET();
 			}

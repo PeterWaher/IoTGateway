@@ -225,5 +225,15 @@ namespace Waher.Security.ACME
 			get { return this.GetAuthorizations(); }
 		}
 
+		/// <summary>
+		/// Finalize order.
+		/// </summary>
+		/// <param name="CertificateRequest">Certificate request.</param>
+		/// <returns>New order object.</returns>
+		public Task<AcmeOrder> FinalizeOrder(CertificateRequest CertificateRequest)
+		{
+			return this.Client.FinalizeOrder(this.AccountLocation, this.finalize, CertificateRequest);
+		}
+
 	}
 }

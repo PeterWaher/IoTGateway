@@ -567,15 +567,11 @@ namespace Waher.Content
 				}
 			}
 
-			if (!First)
+			if (!First && Indent.HasValue)
 			{
 				Json.AppendLine();
-
-				if (Indent.HasValue)
-				{
-					Indent = Indent - 1;
-					Json.Append(new string('\t', Indent.Value));
-				}
+				Indent = Indent - 1;
+				Json.Append(new string('\t', Indent.Value));
 			}
 
 			Json.Append('}');

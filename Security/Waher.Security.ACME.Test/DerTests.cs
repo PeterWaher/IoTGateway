@@ -711,6 +711,58 @@ namespace Waher.Security.ACME.Test
 			}
 		}
 
+		[TestMethod]
+		public void DER_Test_24_CSR_7_Generic_SHA384()
+		{
+			using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(4096))
+			{
+				CertificateRequest CertificateRequest = new CertificateRequest(new RsaSha384(RSA))
+				{
+					Country = "SE",
+					StateOrProvince = "Stockholm",
+					Locality = "Värmdö",
+					Organization = "Waher Data AB",
+					OrganizationalUnit = "Development",
+					CommonName = "www.waher.se",
+					SubjectAlternativeNames = new string[] { "waher.se" },
+					Surname = "Waher",
+					Description = "Domain certificate",
+					Name = "Peter Waher",
+					GivenName = "Peter"
+				};
+
+				byte[] CSR = CertificateRequest.BuildCSR();
+
+				this.PrintCSR(CSR);
+			}
+		}
+
+		[TestMethod]
+		public void DER_Test_24_CSR_8_Generic_SHA512()
+		{
+			using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(4096))
+			{
+				CertificateRequest CertificateRequest = new CertificateRequest(new RsaSha512(RSA))
+				{
+					Country = "SE",
+					StateOrProvince = "Stockholm",
+					Locality = "Värmdö",
+					Organization = "Waher Data AB",
+					OrganizationalUnit = "Development",
+					CommonName = "www.waher.se",
+					SubjectAlternativeNames = new string[] { "waher.se" },
+					Surname = "Waher",
+					Description = "Domain certificate",
+					Name = "Peter Waher",
+					GivenName = "Peter"
+				};
+
+				byte[] CSR = CertificateRequest.BuildCSR();
+
+				this.PrintCSR(CSR);
+			}
+		}
+
 		private void PrintCSR(byte[] CSR)
 		{
 			Console.Out.WriteLine("-----BEGIN CERTIFICATE REQUEST-----");

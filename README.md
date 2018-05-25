@@ -324,11 +324,12 @@ Utilities
 
 The [Utilities](Utilities) folder contains applications that help the developer or administrator with different tasks.
 
-| Project                           | Type          | Link  | Project description |
-|-----------------------------------|---------------|-------|---------------------|
-| **Waher.Utility.AnalyzeDB**       | .NET Core 2.0 |       | The [Waher.Utility.AnalyzeDB](Utilities/Waher.Utility.AnalyzeDB) is a command-line tool that helps you analyze an object database created by the [Waher.Persistence.Files](Persistence/Waher.Persistence.Files) or [Waher.Persistence.FilesLW](Persistence/Waher.Persistence.FilesLW) libraries, such as the IoT Gateway database. |
-| **Waher.Utility.GetEmojiCatalog** | .NET 4.6.2    |       | The [Waher.Utility.GetEmojiCatalog](Utilities/Waher.Utility.GetEmojiCatalog) project downloads an [emoji catalog](http://unicodey.com/emoji-data/table.htm) and extracts the information and generates code for handling emojis. |
-| **Waher.Utility.Install**         | .NET Core 2.0 |       | The [Waher.Utility.Install](Utilities/Waher.Utility.Install) is a command-line tool that helps you install pluggable modules into the IoT Gateway. |
+| Project                            | Type          | Link  | Project description |
+|------------------------------------|---------------|-------|---------------------|
+| **Waher.Utility.Acme**             | .NET Core 2.0 |       | The [Waher.Utility.Acme](Utilities/Waher.Utility.Acme) is a command-line tool that helps you create certificates using the Automatic Certificate Management Environment (ACME) protocol. |
+| **Waher.Utility.AnalyzeDB**        | .NET Core 2.0 |       | The [Waher.Utility.AnalyzeDB](Utilities/Waher.Utility.AnalyzeDB) is a command-line tool that helps you analyze an object database created by the [Waher.Persistence.Files](Persistence/Waher.Persistence.Files) or [Waher.Persistence.FilesLW](Persistence/Waher.Persistence.FilesLW) libraries, such as the IoT Gateway database. |
+| **Waherv.Utility.GetEmojiCatalog** | .NET 4.6.2    |       | The [Waher.Utility.GetEmojiCatalog](Utilities/Waher.Utility.GetEmojiCatalog) project downloads an [emoji catalog](http://unicodey.com/emoji-data/table.htm) and extracts the information and generates code for handling emojis. |
+| **Waher.Utility.Install**          | .NET Core 2.0 |       | The [Waher.Utility.Install](Utilities/Waher.Utility.Install) is a command-line tool that helps you install pluggable modules into the IoT Gateway. |
 
 Web Services
 ----------------------

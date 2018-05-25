@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Events.Console;
@@ -29,6 +32,7 @@ namespace Waher.Utility.Acme
 	/// -a                    You agree to the terms of service agreement. This
 	///                       might be required if you want to be able to create
 	///                       an account.
+	/// -nk                   Generates a new account key.
 	/// -dns DOMAIN           Adds DOMAIN to the list of domain names when creating
 	///                       an order for a new certificate. Can be used multiple
 	///                       times.
@@ -36,7 +40,12 @@ namespace Waher.Utility.Acme
 	///                       TIMESTAMP.
 	/// -na TIMESTAMP         Generated certificate will not be valid after
 	///                       TIMESTAMP.
-	/// -nk                   Generates a new account key.
+	/// -http ROOTFOLDER      Allows the application to respond to HTTP challenges
+	///                       by storing temporary files under the corresponding ACME
+	///                       challenge response folder /.well-known/acme-challenge
+	/// -pi MS                Polling Interval, in milliseconds. Default value is
+	///                       5000.
+	/// -ks BITS              Certificate key size, in bits. Default is 4096.
 	/// -v                    Verbose mode.
 	/// -?                    Help.
 	/// </summary>
@@ -49,7 +58,10 @@ namespace Waher.Utility.Acme
 			List<string> DomainNames = null;
 			DateTime? NotBefore = null;
 			DateTime? NotAfter = null;
+			string HttpRootFolder = null;
 			string s;
+			int? PollingIngerval = null;
+			int? KeySize = null;
 			int i = 0;
 			int c = args.Length;
 			bool Help = false;
@@ -139,6 +151,42 @@ namespace Waher.Utility.Acme
 								throw new Exception("Invalid timestamp: " + args[i - 1]);
 							break;
 
+						case "-http":
+							if (i >= c)
+								throw new Exception("Missing HTTP root folder.");
+
+							if (HttpRootFolder == null)
+								HttpRootFolder = args[i++];
+							else
+								throw new Exception("Only one HTTP Root Folder allowed.");
+							break;
+
+						case "-pi":
+							if (i >= c)
+								throw new Exception("Missing polling interval.");
+
+							if (!int.TryParse(args[i++], out int j) || j <= 0)
+								throw new Exception("Invalid polling interval.");
+
+							if (PollingIngerval.HasValue)
+								throw new Exception("Only one polling interval allowed.");
+							else
+								PollingIngerval = j;
+							break;
+
+						case "-ks":
+							if (i >= c)
+								throw new Exception("Missing key size.");
+
+							if (!int.TryParse(args[i++], out j) || j <= 0)
+								throw new Exception("Invalid key size.");
+
+							if (KeySize.HasValue)
+								throw new Exception("Only one key size allowed.");
+							else
+								KeySize = j;
+							break;
+
 						case "-?":
 							Help = true;
 							break;
@@ -183,10 +231,20 @@ namespace Waher.Utility.Acme
 					Console.Out.WriteLine("-a                    You agree to the terms of service agreement. This");
 					Console.Out.WriteLine("                      might be required if you want to be able to create");
 					Console.Out.WriteLine("                      an account.");
+					Console.Out.WriteLine("-nk                   Generates a new account key.");
 					Console.Out.WriteLine("-dns DOMAIN           Adds DOMAIN to the list of domain names when creating");
 					Console.Out.WriteLine("                      an order for a new certificate. Can be used multiple");
 					Console.Out.WriteLine("                      times.");
-					Console.Out.WriteLine("-nk                   Generates a new account key.");
+					Console.Out.WriteLine("-nb TIMESTAMP         Generated certificate will not be valid before");
+					Console.Out.WriteLine("                      TIMESTAMP.");
+					Console.Out.WriteLine("-na TIMESTAMP         Generated certificate will not be valid after");
+					Console.Out.WriteLine("                      TIMESTAMP.");
+					Console.Out.WriteLine("-http ROOTFOLDER      Allows the application to respond to HTTP challenges");
+					Console.Out.WriteLine("                      by storing temporary files under the corresponding ACME");
+					Console.Out.WriteLine("                      challenge response folder /.well-known/acme-challenge");
+					Console.Out.WriteLine("-pi MS                Polling Interval, in milliseconds. Default value is");
+					Console.Out.WriteLine("                      5000.");
+					Console.Out.WriteLine("-ks BITS              Certificate key size, in bits. Default is 4096.");
 					Console.Out.WriteLine("-v                    Verbose mode.");
 					Console.Out.WriteLine("-?                    Help.");
 					return 0;
@@ -198,8 +256,15 @@ namespace Waher.Utility.Acme
 				if (Directory == null)
 					Directory = new Uri("https://acme-v02.api.letsencrypt.org/directory");
 
-				Process(Directory, ContactURLs?.ToArray(), TermsOfServiceAgreed, NewKey,
-					DomainNames?.ToArray(), NotBefore, NotAfter).Wait();
+				if (!PollingIngerval.HasValue)
+					PollingIngerval = 5000;
+
+				if (!KeySize.HasValue)
+					KeySize = 4096;
+
+				Process(Verbose, Directory, ContactURLs?.ToArray(), TermsOfServiceAgreed, NewKey,
+					DomainNames?.ToArray(), NotBefore, NotAfter, HttpRootFolder, PollingIngerval.Value,
+					KeySize.Value).Wait();
 
 				Console.Out.WriteLine("Press ENTER to continue."); // TODO: Remove
 				Console.In.ReadLine();  // TODO: Remove
@@ -207,8 +272,10 @@ namespace Waher.Utility.Acme
 			}
 			catch (Exception ex)
 			{
+				ex = Log.UnnestException(ex);
+
 				if (Verbose)
-					Log.Critical(ex);
+					Log.Error(ex.Message);
 				else
 					Console.Out.WriteLine(ex.Message);
 
@@ -218,8 +285,9 @@ namespace Waher.Utility.Acme
 			}
 		}
 
-		private static async Task Process(Uri Directory, string[] ContactURLs, bool TermsOfServiceAgreed,
-			bool NewKey, string[] DomainNames, DateTime? NotBefore, DateTime? NotAfter)
+		private static async Task Process(bool Verbose, Uri Directory, string[] ContactURLs, bool TermsOfServiceAgreed,
+			bool NewKey, string[] DomainNames, DateTime? NotBefore, DateTime? NotAfter, string HttpRootFolder, int PollingInterval,
+			int KeySize)
 		{
 			using (AcmeClient Client = new AcmeClient(Directory))
 			{
@@ -298,6 +366,15 @@ namespace Waher.Utility.Acme
 
 				if (DomainNames != null)
 				{
+					if (!string.IsNullOrEmpty(HttpRootFolder))
+					{
+						CheckExists(HttpRootFolder);
+						HttpRootFolder = Path.Combine(HttpRootFolder, ".well-known");
+						CheckExists(HttpRootFolder);
+						HttpRootFolder = Path.Combine(HttpRootFolder, "acme-challenge");
+						CheckExists(HttpRootFolder);
+					}
+
 					Log.Informational("Creating order.");
 
 					AcmeOrder Order = await Account.OrderCertificate(DomainNames, NotBefore, NotAfter);
@@ -309,13 +386,186 @@ namespace Waher.Utility.Acme
 						new KeyValuePair<string, object>("NotAfter", Order.NotAfter),
 						new KeyValuePair<string, object>("Identifiers", Order.Identifiers));
 
-					//Order.Authorizations;
-					//Order.AuthorizationUris;
+					List<string> FileNames = null;
+
+					try
+					{
+						foreach (AcmeAuthorization Authorization in await Order.GetAuthorizations())
+						{
+							Log.Informational("Processing authorization.",
+								new KeyValuePair<string, object>("Type", Authorization.Type),
+								new KeyValuePair<string, object>("Value", Authorization.Value),
+								new KeyValuePair<string, object>("Expires", Authorization.Status),
+								new KeyValuePair<string, object>("Expires", Authorization.Expires),
+								new KeyValuePair<string, object>("Wildcard", Authorization.Wildcard));
+
+							AcmeChallenge Challenge;
+							bool Manual = true;
+							int Index = 1;
+							int NrChallenges = Authorization.Challenges.Length;
+							string s;
+
+							for (Index = 1; Index <= NrChallenges; Index++)
+							{
+								Challenge = Authorization.Challenges[Index - 1];
+
+								if (Challenge is AcmeHttpChallenge HttpChallenge)
+								{
+									Log.Informational(Index.ToString() + ") HTTP challenge.",
+										new KeyValuePair<string, object>("Resource", HttpChallenge.ResourceName),
+										new KeyValuePair<string, object>("Response", HttpChallenge.KeyAuthorization),
+										new KeyValuePair<string, object>("Content-Type", "application/octet-stream"));
+
+									if (!string.IsNullOrEmpty(HttpRootFolder))
+									{
+										string FileName = Path.Combine(HttpRootFolder, HttpChallenge.Token);
+										File.WriteAllBytes(FileName, Encoding.ASCII.GetBytes(HttpChallenge.KeyAuthorization));
+
+										if (FileNames == null)
+											FileNames = new List<string>();
+
+										FileNames.Add(FileName);
+
+										Log.Informational("Acknowleding challenge.");
+
+										Challenge = await HttpChallenge.AcknowledgeChallenge();
+
+										Log.Informational("Challenge acknowledged.",
+											new KeyValuePair<string, object>("", Challenge.Status));
+
+										Manual = false;
+									}
+									else if (!Verbose)
+									{
+										Console.Out.WriteLine(Index.ToString() + ") HTTP challenge.");
+										Console.Out.WriteLine("Resource: " + HttpChallenge.ResourceName);
+										Console.Out.WriteLine("Response: " + HttpChallenge.KeyAuthorization);
+										Console.Out.WriteLine("Content-Type: " + "application/octet-stream");
+									}
+								}
+								else if (Challenge is AcmeDnsChallenge DnsChallenge)
+								{
+									Log.Informational(Index.ToString() + ") DNS challenge.",
+										new KeyValuePair<string, object>("Domain", DnsChallenge.ValidationDomainNamePrefix + Authorization.Value),
+										new KeyValuePair<string, object>("TXT Record", DnsChallenge.KeyAuthorization));
+
+									if (!Verbose)
+									{
+										Console.Out.WriteLine(Index.ToString() + ") DNS challenge.");
+										Console.Out.WriteLine("Domain: " + DnsChallenge.ValidationDomainNamePrefix + Authorization.Value);
+										Console.Out.WriteLine("TXT Record: " + DnsChallenge.KeyAuthorization);
+									}
+								}
+							}
+
+							if (Manual)
+							{
+								Console.Out.WriteLine();
+								Console.Out.WriteLine("No automated method found to respond to any of the authorization challenges. " +
+									"You can respond to a challenge manually. After configuring the corresponding " +
+									"resource, enter the number of the corresponding challenge and press ENTER to acknowledge it.");
+
+								do
+								{
+									Console.Out.Write("Challenge to acknowledge: ");
+									s = Console.In.ReadLine();
+								}
+								while (!int.TryParse(s, out Index) || Index <= 0 || Index > NrChallenges);
+
+								Log.Informational("Acknowleding challenge.");
+
+								Challenge = await Authorization.Challenges[Index - 1].AcknowledgeChallenge();
+
+								Log.Informational("Challenge acknowledged.",
+									new KeyValuePair<string, object>("", Challenge.Status));
+							}
+
+							AcmeAuthorization Authorization2 = Authorization;
+
+							do
+							{
+								Log.Informational("Waiting to poll authorization status.",
+									new KeyValuePair<string, object>("ms", PollingInterval));
+
+								System.Threading.Thread.Sleep(PollingInterval);
+
+								Log.Informational("Polling authorization.");
+
+								Authorization2 = await Authorization2.Poll();
+
+								Log.Informational("Authorization polled.",
+									new KeyValuePair<string, object>("Type", Authorization2.Type),
+									new KeyValuePair<string, object>("Value", Authorization2.Value),
+									new KeyValuePair<string, object>("Expires", Authorization2.Status),
+									new KeyValuePair<string, object>("Expires", Authorization2.Expires),
+									new KeyValuePair<string, object>("Wildcard", Authorization2.Wildcard));
+							}
+							while (Authorization2.Status == AcmeAuthorizationStatus.pending);
+
+							if (Authorization2.Status != AcmeAuthorizationStatus.valid)
+							{
+								switch (Authorization2.Status)
+								{
+									case AcmeAuthorizationStatus.deactivated:
+										throw new Exception("Authorization deactivated.");
+
+									case AcmeAuthorizationStatus.expired:
+										throw new Exception("Authorization expired.");
+
+									case AcmeAuthorizationStatus.invalid:
+										throw new Exception("Authorization invalid.");
+
+									case AcmeAuthorizationStatus.revoked:
+										throw new Exception("Authorization revoked.");
+								}
+							}
+						}
+
+						using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(KeySize))
+						{
+							Log.Informational("Finalizing order.");
+
+							Order = await Order.FinalizeOrder(new CertificateRequest(new RsaSha256(RSA))
+							{
+								CommonName = DomainNames[0],
+								SubjectAlternativeNames = DomainNames
+							});
+
+							Log.Informational("Order finalized.",
+								new KeyValuePair<string, object>("Status", Order.Status),
+								new KeyValuePair<string, object>("Expires", Order.Expires),
+								new KeyValuePair<string, object>("NotBefore", Order.NotBefore),
+								new KeyValuePair<string, object>("NotAfter", Order.NotAfter),
+								new KeyValuePair<string, object>("Identifiers", Order.Identifiers));
+						}
+					}
+					finally
+					{
+						if (FileNames != null)
+						{
+							foreach (string FileName in FileNames)
+								File.Delete(FileName);
+						}
+					}
 				}
 			}
 		}
 
-		public static bool AreEqual(string[] A1, string[] A2)
+		private static void CheckExists(string Folder)
+		{
+			if (!Directory.Exists(Folder))
+			{
+				Log.Informational("Creating folder.",
+					new KeyValuePair<string, object>("Folder", Folder));
+
+				Directory.CreateDirectory(Folder);
+
+				Log.Informational("Folder created.",
+					new KeyValuePair<string, object>("Folder", Folder));
+			}
+		}
+
+		private static bool AreEqual(string[] A1, string[] A2)
 		{
 			int i, c;
 

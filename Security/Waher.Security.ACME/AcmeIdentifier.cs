@@ -54,5 +54,13 @@ namespace Waher.Security.ACME
 		/// Identifier value.
 		/// </summary>
 		public string Value => this.value;
+
+		/// <summary>
+		/// <see cref="Object.ToString()"/>
+		/// </summary>
+		public override string ToString()
+		{
+			return this.type + ":" + this.value;
+		}
 	}
 }

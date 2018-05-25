@@ -168,7 +168,27 @@ namespace Waher.Events.Console
 						this.AddTag(Output, Width, "Module", Event.Module, false, WriteLine);
 
 					foreach (KeyValuePair<string, object> P in Event.Tags)
-						this.AddTag(Output, Width, P.Key, P.Value, false, WriteLine);
+					{
+						if (P.Value is Array A)
+						{
+							StringBuilder sb2 = new StringBuilder();
+							bool First = true;
+
+							foreach (object Item in A)
+							{
+								if (First)
+									First = false;
+								else
+									sb2.Append(", ");
+
+								sb2.Append(Item.ToString());
+							}
+
+							this.AddTag(Output, Width, P.Key, sb2.ToString(), false, WriteLine);
+						}
+						else
+							this.AddTag(Output, Width, P.Key, P.Value, false, WriteLine);
+					}
 
 					if (WriteLine)
 						Output.AppendLine();

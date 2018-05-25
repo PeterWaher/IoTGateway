@@ -26,6 +26,8 @@ namespace Waher.Security.ACME
 
 		/// <summary>
 		/// Key authorization string. Used as response to challenge.
+		/// Should be added to a TXT record to the domain name prefixed by
+		/// <see cref="ValidationDomainNamePrefix"/>.
 		/// </summary>
 		public override string KeyAuthorization
 		{
@@ -34,5 +36,6 @@ namespace Waher.Security.ACME
 				return Base64Url.Encode(Hashes.ComputeSHA256Hash(Encoding.ASCII.GetBytes(base.KeyAuthorization)));
 			}
 		}
+
 	}
 }

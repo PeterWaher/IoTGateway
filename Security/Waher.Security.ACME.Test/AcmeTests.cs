@@ -251,7 +251,35 @@ namespace Waher.Security.ACME.Test
 		}
 
 		[TestMethod]
-		public async Task ACME_Test_14_FinalizeOrder()
+		public async Task ACME_Test_14_AcknowledgeDnsChallenges()
+		{
+			AcmeOrder Order = await this.OrderCertificate("example.com", "www.example.com");
+			AcmeAuthorization[] Authorizations = await Order.GetAuthorizations();
+
+			foreach (AcmeAuthorization Authorization in Authorizations)
+			{
+				foreach (AcmeChallenge Challenge in Authorization.Challenges)
+				{
+					if (Challenge is AcmeDnsChallenge DnsChallenge)
+					{
+						AcmeChallenge Challenge2 = await Challenge.AcknowledgeChallenge();
+
+						this.Print(Authorization.Value, Challenge2);
+					}
+				}
+			}
+
+			System.Threading.Thread.Sleep(5000);
+
+			foreach (AcmeAuthorization Authorization in Authorizations)
+			{
+				AcmeAuthorization Authorization2 = await Authorization.Poll();
+				this.Print(Authorization2);
+			}
+		}
+
+		[TestMethod]
+		public async Task ACME_Test_15_FinalizeOrder()
 		{
 			using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(4096))
 			{

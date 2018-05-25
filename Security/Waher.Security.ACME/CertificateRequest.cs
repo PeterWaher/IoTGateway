@@ -314,7 +314,6 @@ namespace Waher.Security.ACME
 			this.EncodeIfDefined(DER, "2.5.4.43", this.initials);
 			this.EncodeIfDefined(DER, "2.5.4.49", this.distinguishedName);
 			this.EncodeIfDefined(DER, "2.5.4.51", this.houseIdentifier);
-			this.EncodeIfDefined(DER, "2.5.29.17", this.subjectAlternativeNames);
 			this.EncodeIfDefined(DER, "1.2.840.113549.1.9.1", this.emailAddress);
 			DER.EndSEQUENCE();       // end of subject
 
@@ -330,7 +329,35 @@ namespace Waher.Security.ACME
 			DER.EndBITSTRING();      // end of subjectPublicKey
 			DER.EndSEQUENCE();       // end of subjectPKInfo
 
-			DER.EndOfContent(Asn1TypeClass.ContextSpecific);     // attributes
+			DER.StartEndOfContent(Asn1TypeClass.ContextSpecific);	// attributes
+
+			if (this.subjectAlternativeNames != null && this.subjectAlternativeNames.Length > 0)
+			{
+				DER.StartSEQUENCE();
+				DER.OBJECT_IDENTIFIER("1.2.840.113549.1.9.14");  // extensionRequest
+				DER.StartSET();
+				DER.StartSEQUENCE();
+				DER.StartSEQUENCE();
+				DER.OBJECT_IDENTIFIER("2.5.29.17");
+				DER.StartOCTET_STRING();
+				DER.StartSEQUENCE();
+
+				foreach (string s in this.subjectAlternativeNames)
+				{
+					int Pos = DER.Position;
+					DER.IA5_STRING(s);
+					DER[Pos] = 0x82;	// Encoded as Context-specific INTEGER...
+				}
+
+				DER.EndSEQUENCE();
+				DER.EndOCTET_STRING();
+				DER.EndSEQUENCE();
+				DER.EndSEQUENCE();
+				DER.EndSET();
+				DER.EndSEQUENCE();
+			}
+
+			DER.EndEndOfContent(Asn1TypeClass.ContextSpecific);	// end of attributes
 			DER.EndSEQUENCE();       // end of CertificationRequestInfo
 
 			byte[] CertificationRequestInfo = DER.ToArray();
@@ -364,29 +391,6 @@ namespace Waher.Security.ACME
 				else
 					DER.IA5_STRING(Value);
 
-				DER.EndSEQUENCE();
-				DER.EndSET();
-			}
-		}
-
-		private void EncodeIfDefined(DerEncoder DER, string OID, string[] Value)
-		{
-			if (Value != null && (Value.Length > 1 || !string.IsNullOrEmpty(Value[0])))
-			{
-				DER.StartSET();
-				DER.StartSEQUENCE();
-				DER.OBJECT_IDENTIFIER(OID);
-				DER.StartSEQUENCE();
-
-				foreach (string s in Value)
-				{
-					if (DerEncoder.IsPrintable(s))
-						DER.PRINTABLE_STRING(s);
-					else
-						DER.UTF8_STRING(s);
-				}
-
-				DER.EndSEQUENCE();
 				DER.EndSEQUENCE();
 				DER.EndSET();
 			}

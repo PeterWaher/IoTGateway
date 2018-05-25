@@ -38,7 +38,7 @@ namespace Waher.Security.ACME
 	public class DerEncoder
 	{
 		private List<byte> output = new List<byte>();
-		private LinkedList<List<byte>> stack = null;
+		private LinkedList<KeyValuePair<byte, List<byte>>> stack = null;
 
 		/// <summary>
 		/// Encodes data using the Distinguished Encoding Rules (DER), as defined in X.690
@@ -279,12 +279,12 @@ namespace Waher.Security.ACME
 		/// </summary>
 		public void StartBITSTRING()
 		{
-			this.Start();
+			this.Start(3);
 			this.output.Add(0);
 		}
 
 		/// <summary>
-		/// Starts the current BITSTRING.
+		/// Ends the current BITSTRING.
 		/// </summary>
 		public void EndBITSTRING()
 		{
@@ -299,6 +299,22 @@ namespace Waher.Security.ACME
 		{
 			this.output.Add(4);
 			this.EncodeBinary(Value);
+		}
+
+		/// <summary>
+		/// Starts a OCTET_STRING.
+		/// </summary>
+		public void StartOCTET_STRING()
+		{
+			this.Start(4);
+		}
+
+		/// <summary>
+		/// Ends the current OCTET_STRING.
+		/// </summary>
+		public void EndOCTET_STRING()
+		{
+			this.End(4);
 		}
 
 		/// <summary>
@@ -438,21 +454,21 @@ namespace Waher.Security.ACME
 		/// </summary>
 		public void StartSEQUENCE()
 		{
-			this.Start();
+			this.Start(0x30);
 		}
 
-		private void Start()
+		private void Start(byte Expected)
 		{
 			if (this.stack == null)
-				this.stack = new LinkedList<List<byte>>();
+				this.stack = new LinkedList<KeyValuePair<byte, List<byte>>>();
 
-			this.stack.AddLast(this.output);
+			this.stack.AddLast(new KeyValuePair<byte, List<byte>>(Expected, this.output));
 
 			this.output = new List<byte>();
 		}
 
 		/// <summary>
-		/// Starts the current SEQUENCE.
+		/// Ends the current SEQUENCE.
 		/// </summary>
 		public void EndSEQUENCE()
 		{
@@ -464,9 +480,12 @@ namespace Waher.Security.ACME
 			if (this.stack == null || this.stack.Last == null)
 				throw new Exception("Not properly started.");
 
+			if (Type != this.stack.Last.Value.Key)
+				throw new Exception("Start/End type mismatch.");
+
 			byte[] Bin = this.output.ToArray();
 
-			this.output = this.stack.Last.Value;
+			this.output = this.stack.Last.Value.Value;
 			this.stack.RemoveLast();
 
 			this.output.Add(Type);
@@ -478,11 +497,11 @@ namespace Waher.Security.ACME
 		/// </summary>
 		public void StartSET()
 		{
-			this.Start();
+			this.Start(0x31);
 		}
 
 		/// <summary>
-		/// Starts the current SET.
+		/// Ends the current SET.
 		/// </summary>
 		public void EndSET()
 		{
@@ -500,12 +519,49 @@ namespace Waher.Security.ACME
 		}
 
 		/// <summary>
+		/// Starts an End-of-Content (EOC) section.
+		/// </summary>
+		/// <param name="Class">Class</param>
+		public void StartEndOfContent(Asn1TypeClass Class)
+		{
+			this.Start((byte)((((int)Class) << 6) | 0x20));
+		}
+
+		/// <summary>
+		/// Ends the current End-of-Content (EOC) section.
+		/// </summary>
+		/// <param name="Class">Class</param>
+		public void EndEndOfContent(Asn1TypeClass Class)
+		{
+			this.End((byte)((((int)Class) << 6) | 0x20));
+		}
+
+		/// <summary>
 		/// Adds DER-encoded bytes to the output.
 		/// </summary>
 		/// <param name="DerEncodedBytes">DER encoded bytes.</param>
 		public void Raw(byte[] DerEncodedBytes)
 		{
 			this.output.AddRange(DerEncodedBytes);
+		}
+
+		/// <summary>
+		/// Current output position.
+		/// </summary>
+		public int Position
+		{
+			get { return this.output.Count; }
+		}
+
+		/// <summary>
+		/// Access to binary output.
+		/// </summary>
+		/// <param name="Index">Zero-based index into generated output.</param>
+		/// <returns>Binary byte at position.</returns>
+		public byte this[int Index]
+		{
+			get { return this.output[Index]; }
+			set { this.output[Index] = value; }
 		}
 
 	}

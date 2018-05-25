@@ -264,7 +264,7 @@ namespace Waher.Security.ACME.Test
 					//Organization = "Example Ltd",
 					//OrganizationalUnit = "Development",
 					CommonName = "example.com",
-					SubjectAlternativeNames = new string[] { "DNS:www.example.com" },
+					SubjectAlternativeNames = new string[] { "example.com", "www.example.com" },
 					EMailAddress = "ex@example.com",
 					//Surname = "Smith",
 					//Description = "Domain certificate",

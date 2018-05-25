@@ -26,7 +26,8 @@ namespace Waher.Utility.Acme
 	///                       https://acme-staging-v02.api.letsencrypt.org/directory
 	/// -ce EMAIL             Adds EMAIL to the list of contact e-mail addresses
 	///                       when creating an account. Can be used multiple
-	///                       times.
+	///                       times. The first e-mail address will also be
+	///                       encoded into the certificate request.
 	/// -cu URI               Adds URI to the list of contact URIs when creating
 	///                       an account. Can be used multiple times.
 	/// -a                    You agree to the terms of service agreement. This
@@ -35,7 +36,9 @@ namespace Waher.Utility.Acme
 	/// -nk                   Generates a new account key.
 	/// -dns DOMAIN           Adds DOMAIN to the list of domain names when creating
 	///                       an order for a new certificate. Can be used multiple
-	///                       times.
+	///                       times. The first DOMAIN will be used as the common name
+	///                       for the certificate request. The following domain names
+	///                       will be used as altenative names.
 	/// -nb TIMESTAMP         Generated certificate will not be valid before
 	///                       TIMESTAMP.
 	/// -na TIMESTAMP         Generated certificate will not be valid after
@@ -46,6 +49,11 @@ namespace Waher.Utility.Acme
 	/// -pi MS                Polling Interval, in milliseconds. Default value is
 	///                       5000.
 	/// -ks BITS              Certificate key size, in bits. Default is 4096.
+	/// -c COUNTRY            Country name (C) in the certificate request.
+	/// -l LOCALITY           Locality name (L) in the certificate request.
+	/// -st STATEORPROVINCE   State or Province name (ST) in the certificate request.
+	/// -o ORGANIZATION       Organization name (O) in the certificate request.
+	/// -ou ORGUNIT           Organizational unit name (OU) in the certificate request.
 	/// -v                    Verbose mode.
 	/// -?                    Help.
 	/// </summary>
@@ -59,6 +67,12 @@ namespace Waher.Utility.Acme
 			DateTime? NotBefore = null;
 			DateTime? NotAfter = null;
 			string HttpRootFolder = null;
+			string EMail = null;
+			string Country = null;
+			string Locality = null;
+			string StateOrProvince = null;
+			string Organization = null;
+			string OrganizationalUnit = null;
 			string s;
 			int? PollingIngerval = null;
 			int? KeySize = null;
@@ -107,6 +121,9 @@ namespace Waher.Utility.Acme
 
 							if (ContactURLs == null)
 								ContactURLs = new List<string>();
+
+							if (EMail == null)
+								EMail = args[i];
 
 							ContactURLs.Add("mailto:" + args[i++]);
 							break;
@@ -187,6 +204,56 @@ namespace Waher.Utility.Acme
 								KeySize = j;
 							break;
 
+						case "-c":
+							if (i >= c)
+								throw new Exception("Missing country name.");
+
+							if (Country == null)
+								Country = args[i++];
+							else
+								throw new Exception("Only one country name allowed.");
+							break;
+
+						case "-l":
+							if (i >= c)
+								throw new Exception("Missing locality name.");
+
+							if (Locality == null)
+								Locality = args[i++];
+							else
+								throw new Exception("Only one locality name allowed.");
+							break;
+
+						case "-st":
+							if (i >= c)
+								throw new Exception("Missing state or province name.");
+
+							if (StateOrProvince == null)
+								StateOrProvince = args[i++];
+							else
+								throw new Exception("Only one state or province name allowed.");
+							break;
+
+						case "-o":
+							if (i >= c)
+								throw new Exception("Missing organization name.");
+
+							if (Organization == null)
+								Organization = args[i++];
+							else
+								throw new Exception("Only one organization name allowed.");
+							break;
+
+						case "-ou":
+							if (i >= c)
+								throw new Exception("Missing organizational unit name.");
+
+							if (OrganizationalUnit == null)
+								OrganizationalUnit = args[i++];
+							else
+								throw new Exception("Only one organizational unit name allowed.");
+							break;
+
 						case "-?":
 							Help = true;
 							break;
@@ -225,7 +292,8 @@ namespace Waher.Utility.Acme
 					Console.Out.WriteLine("                      https://acme-staging-v02.api.letsencrypt.org/directory");
 					Console.Out.WriteLine("-ce EMAIL             Adds EMAIL to the list of contact e-mail addresses");
 					Console.Out.WriteLine("                      when creating an account. Can be used multiple");
-					Console.Out.WriteLine("                      times.");
+					Console.Out.WriteLine("                      times. The first e-mail address will also be");
+					Console.Out.WriteLine("                      encoded into the certificate request.");
 					Console.Out.WriteLine("-cu URI               Adds URI to the list of contact URIs when creating");
 					Console.Out.WriteLine("                      an account. Can be used multiple times.");
 					Console.Out.WriteLine("-a                    You agree to the terms of service agreement. This");
@@ -234,7 +302,9 @@ namespace Waher.Utility.Acme
 					Console.Out.WriteLine("-nk                   Generates a new account key.");
 					Console.Out.WriteLine("-dns DOMAIN           Adds DOMAIN to the list of domain names when creating");
 					Console.Out.WriteLine("                      an order for a new certificate. Can be used multiple");
-					Console.Out.WriteLine("                      times.");
+					Console.Out.WriteLine("                      times. The first DOMAIN will be used as the common name");
+					Console.Out.WriteLine("                      for the certificate request. The following domain names");
+					Console.Out.WriteLine("                      will be used as altenative names.");
 					Console.Out.WriteLine("-nb TIMESTAMP         Generated certificate will not be valid before");
 					Console.Out.WriteLine("                      TIMESTAMP.");
 					Console.Out.WriteLine("-na TIMESTAMP         Generated certificate will not be valid after");
@@ -245,6 +315,11 @@ namespace Waher.Utility.Acme
 					Console.Out.WriteLine("-pi MS                Polling Interval, in milliseconds. Default value is");
 					Console.Out.WriteLine("                      5000.");
 					Console.Out.WriteLine("-ks BITS              Certificate key size, in bits. Default is 4096.");
+					Console.Out.WriteLine("-c COUNTRY            Country name (C) in the certificate request.");
+					Console.Out.WriteLine("-l LOCALITY           Locality name (L) in the certificate request.");
+					Console.Out.WriteLine("-st STATEORPROVINCE   State or Province name (ST) in the certificate request.");
+					Console.Out.WriteLine("-o ORGANIZATION       Organization name (O) in the certificate request.");
+					Console.Out.WriteLine("-ou ORGUNIT           Organizational unit name (OU) in the certificate request.");
 					Console.Out.WriteLine("-v                    Verbose mode.");
 					Console.Out.WriteLine("-?                    Help.");
 					return 0;
@@ -264,7 +339,8 @@ namespace Waher.Utility.Acme
 
 				Process(Verbose, Directory, ContactURLs?.ToArray(), TermsOfServiceAgreed, NewKey,
 					DomainNames?.ToArray(), NotBefore, NotAfter, HttpRootFolder, PollingIngerval.Value,
-					KeySize.Value).Wait();
+					KeySize.Value, EMail, Country, Locality, StateOrProvince, Organization, 
+					OrganizationalUnit).Wait();
 
 				Console.Out.WriteLine("Press ENTER to continue."); // TODO: Remove
 				Console.In.ReadLine();  // TODO: Remove
@@ -287,7 +363,8 @@ namespace Waher.Utility.Acme
 
 		private static async Task Process(bool Verbose, Uri Directory, string[] ContactURLs, bool TermsOfServiceAgreed,
 			bool NewKey, string[] DomainNames, DateTime? NotBefore, DateTime? NotAfter, string HttpRootFolder, int PollingInterval,
-			int KeySize)
+			int KeySize, string EMail, string Country, string Locality, string StateOrProvince, string Organization,
+			string OrganizationalUnit)
 		{
 			using (AcmeClient Client = new AcmeClient(Directory))
 			{
@@ -528,7 +605,13 @@ namespace Waher.Utility.Acme
 							Order = await Order.FinalizeOrder(new CertificateRequest(new RsaSha256(RSA))
 							{
 								CommonName = DomainNames[0],
-								SubjectAlternativeNames = DomainNames
+								SubjectAlternativeNames = DomainNames,
+								EMailAddress = EMail,
+								Country = Country,
+								Locality = Locality,
+								StateOrProvince = StateOrProvince,
+								Organization = Organization,
+								OrganizationalUnit = OrganizationalUnit
 							});
 
 							Log.Informational("Order finalized.",

@@ -125,7 +125,7 @@ namespace Waher.Utility.AnalyzeDB
 				if (Help || c == 0)
 				{
 					Console.Out.WriteLine("Analyzes an object database created by the Waher.Persistence.Files or");
-					Console.Out.WriteLine("<see Waher.Persistence.FilesLW libraries, such as the IoT Gateway database.");
+					Console.Out.WriteLine("Waher.Persistence.FilesLW libraries, such as the IoT Gateway database.");
 					Console.Out.WriteLine();
 					Console.Out.WriteLine("Command line switches:");
 					Console.Out.WriteLine();

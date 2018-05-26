@@ -56,6 +56,10 @@ namespace Waher.Utility.Acme
 	/// -st STATEORPROVINCE   State or Province name (ST) in the certificate request.
 	/// -o ORGANIZATION       Organization name (O) in the certificate request.
 	/// -ou ORGUNIT           Organizational unit name (OU) in the certificate request.
+	/// -f FILENAME           Output filename of the certificate, without file
+	///                       extension.
+	/// -pwd PASSWORD         Password to protect the private key in the generated
+	///                       certificate.
 	/// -v                    Verbose mode.
 	/// -?                    Help.
 	/// </summary>
@@ -75,6 +79,8 @@ namespace Waher.Utility.Acme
 			string StateOrProvince = null;
 			string Organization = null;
 			string OrganizationalUnit = null;
+			string FileName = null;
+			string Password = string.Empty;
 			string s;
 			int? PollingIngerval = null;
 			int? KeySize = null;
@@ -256,6 +262,26 @@ namespace Waher.Utility.Acme
 								throw new Exception("Only one organizational unit name allowed.");
 							break;
 
+						case "-f":
+							if (i >= c)
+								throw new Exception("Missing file name.");
+
+							if (FileName == null)
+								FileName = args[i++];
+							else
+								throw new Exception("Only one file name allowed.");
+							break;
+
+						case "-pwd":
+							if (i >= c)
+								throw new Exception("Missing password.");
+
+							if (string.IsNullOrEmpty(Password))
+								Password = args[i++];
+							else
+								throw new Exception("Only one password allowed.");
+							break;
+
 						case "-?":
 							Help = true;
 							break;
@@ -322,6 +348,10 @@ namespace Waher.Utility.Acme
 					Console.Out.WriteLine("-st STATEORPROVINCE   State or Province name (ST) in the certificate request.");
 					Console.Out.WriteLine("-o ORGANIZATION       Organization name (O) in the certificate request.");
 					Console.Out.WriteLine("-ou ORGUNIT           Organizational unit name (OU) in the certificate request.");
+					Console.Out.WriteLine("-f FILENAME           Output filename of the certificate, without file");
+					Console.Out.WriteLine("                      extension.");
+					Console.Out.WriteLine("-pwd PASSWORD         Password to protect the private key in the generated");
+					Console.Out.WriteLine("                      certificate.");
 					Console.Out.WriteLine("-v                    Verbose mode.");
 					Console.Out.WriteLine("-?                    Help.");
 					return 0;
@@ -339,14 +369,23 @@ namespace Waher.Utility.Acme
 				if (!KeySize.HasValue)
 					KeySize = 4096;
 
+				if (FileName == null)
+					throw new Exception("File name not provided.");
+
+				if (string.IsNullOrEmpty(Password))
+					Log.Warning("No password provided to protect the private key.");
+
+				if (string.IsNullOrEmpty(HttpRootFolder))
+					Log.Warning("No HTTP root folder provided. Challenge responses must be manually configured.");
+
 				Types.Initialize(
 					typeof(InternetContent).Assembly,
 					typeof(AcmeClient).Assembly);
 
 				Process(Verbose, Directory, ContactURLs?.ToArray(), TermsOfServiceAgreed, NewKey,
 					DomainNames?.ToArray(), NotBefore, NotAfter, HttpRootFolder, PollingIngerval.Value,
-					KeySize.Value, EMail, Country, Locality, StateOrProvince, Organization, 
-					OrganizationalUnit).Wait();
+					KeySize.Value, EMail, Country, Locality, StateOrProvince, Organization,
+					OrganizationalUnit, FileName, Password).Wait();
 
 				Console.Out.WriteLine("Press ENTER to continue."); // TODO: Remove
 				Console.In.ReadLine();  // TODO: Remove
@@ -370,7 +409,7 @@ namespace Waher.Utility.Acme
 		private static async Task Process(bool Verbose, Uri Directory, string[] ContactURLs, bool TermsOfServiceAgreed,
 			bool NewKey, string[] DomainNames, DateTime? NotBefore, DateTime? NotAfter, string HttpRootFolder, int PollingInterval,
 			int KeySize, string EMail, string Country, string Locality, string StateOrProvince, string Organization,
-			string OrganizationalUnit)
+			string OrganizationalUnit, string FileName, string Password)
 		{
 			using (AcmeClient Client = new AcmeClient(Directory))
 			{
@@ -501,13 +540,13 @@ namespace Waher.Utility.Acme
 
 									if (!string.IsNullOrEmpty(HttpRootFolder))
 									{
-										string FileName = Path.Combine(HttpRootFolder, HttpChallenge.Token);
-										File.WriteAllBytes(FileName, Encoding.ASCII.GetBytes(HttpChallenge.KeyAuthorization));
+										string ChallengeFileName = Path.Combine(HttpRootFolder, HttpChallenge.Token);
+										File.WriteAllBytes(ChallengeFileName, Encoding.ASCII.GetBytes(HttpChallenge.KeyAuthorization));
 
 										if (FileNames == null)
 											FileNames = new List<string>();
 
-										FileNames.Add(FileName);
+										FileNames.Add(ChallengeFileName);
 
 										Log.Informational("Acknowleding challenge.");
 
@@ -610,7 +649,7 @@ namespace Waher.Utility.Acme
 						using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(KeySize))
 						{
 							Log.Informational("Finalizing order.");
-							
+
 							Order = await Order.FinalizeOrder(new CertificateRequest(new RsaSha256(RSA))
 							{
 								CommonName = DomainNames[0],
@@ -647,14 +686,48 @@ namespace Waher.Utility.Acme
 
 							System.Security.Cryptography.X509Certificates.X509Certificate2[] Certificates =
 								await Order.DownloadCertificate();
+
+							string CertificateFileName;
+							int Index = 1;
+							byte[] Bin;
+
+							foreach (System.Security.Cryptography.X509Certificates.X509Certificate2 Certificate in Certificates)
+							{
+								if (Index == 1)
+								{
+									Certificate.PrivateKey = RSA;
+									Bin = Certificate.Export(System.Security.Cryptography.X509Certificates.X509ContentType.Pfx, Password);
+									CertificateFileName = FileName + ".pfx";
+								}
+								else
+								{
+									Bin = Certificate.Export(System.Security.Cryptography.X509Certificates.X509ContentType.Cert);
+									CertificateFileName = FileName + Index.ToString() + ".cer";
+								}
+
+								Log.Informational("Saving certificate.",
+									new KeyValuePair<string, object>("FileName", CertificateFileName),
+									new KeyValuePair<string, object>("FriendlyName", Certificate.FriendlyName),
+									new KeyValuePair<string, object>("HasPrivateKey", Certificate.HasPrivateKey),
+									new KeyValuePair<string, object>("Issuer", Certificate.Issuer),
+									new KeyValuePair<string, object>("NotAfter", Certificate.NotAfter),
+									new KeyValuePair<string, object>("NotBefore", Certificate.NotBefore),
+									new KeyValuePair<string, object>("SerialNumber", Certificate.SerialNumber),
+									new KeyValuePair<string, object>("Subject", Certificate.Subject),
+									new KeyValuePair<string, object>("Thumbprint", Certificate.Thumbprint));
+
+								File.WriteAllBytes(CertificateFileName, Bin);
+
+								Index++;
+							}
 						}
 					}
 					finally
 					{
 						if (FileNames != null)
 						{
-							foreach (string FileName in FileNames)
-								File.Delete(FileName);
+							foreach (string FileName2 in FileNames)
+								File.Delete(FileName2);
 						}
 					}
 				}

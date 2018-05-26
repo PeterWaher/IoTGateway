@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Xml;
@@ -235,5 +236,16 @@ namespace Waher.Security.ACME
 			return this.Client.FinalizeOrder(this.AccountLocation, this.finalize, CertificateRequest);
 		}
 
+		/// <summary>
+		/// Downloads the certificate.
+		/// </summary>
+		/// <returns>Certificate chain.</returns>
+		public Task<X509Certificate2[]> DownloadCertificate()
+		{
+			if (this.certificate == null)
+				throw new Exception("No certificate URI available.");
+
+			return this.Client.DownloadCertificate(this.certificate);
+		}
 	}
 }

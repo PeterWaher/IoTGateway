@@ -4,8 +4,10 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Content;
 using Waher.Events;
 using Waher.Events.Console;
+using Waher.Runtime.Inventory;
 using Waher.Security.ACME;
 
 namespace Waher.Utility.Acme
@@ -337,6 +339,10 @@ namespace Waher.Utility.Acme
 				if (!KeySize.HasValue)
 					KeySize = 4096;
 
+				Types.Initialize(
+					typeof(InternetContent).Assembly,
+					typeof(AcmeClient).Assembly);
+
 				Process(Verbose, Directory, ContactURLs?.ToArray(), TermsOfServiceAgreed, NewKey,
 					DomainNames?.ToArray(), NotBefore, NotAfter, HttpRootFolder, PollingIngerval.Value,
 					KeySize.Value, EMail, Country, Locality, StateOrProvince, Organization, 
@@ -472,7 +478,7 @@ namespace Waher.Utility.Acme
 							Log.Informational("Processing authorization.",
 								new KeyValuePair<string, object>("Type", Authorization.Type),
 								new KeyValuePair<string, object>("Value", Authorization.Value),
-								new KeyValuePair<string, object>("Expires", Authorization.Status),
+								new KeyValuePair<string, object>("Status", Authorization.Status),
 								new KeyValuePair<string, object>("Expires", Authorization.Expires),
 								new KeyValuePair<string, object>("Wildcard", Authorization.Wildcard));
 
@@ -508,7 +514,7 @@ namespace Waher.Utility.Acme
 										Challenge = await HttpChallenge.AcknowledgeChallenge();
 
 										Log.Informational("Challenge acknowledged.",
-											new KeyValuePair<string, object>("", Challenge.Status));
+											new KeyValuePair<string, object>("Status", Challenge.Status));
 
 										Manual = false;
 									}
@@ -554,7 +560,7 @@ namespace Waher.Utility.Acme
 								Challenge = await Authorization.Challenges[Index - 1].AcknowledgeChallenge();
 
 								Log.Informational("Challenge acknowledged.",
-									new KeyValuePair<string, object>("", Challenge.Status));
+									new KeyValuePair<string, object>("Status", Challenge.Status));
 							}
 
 							AcmeAuthorization Authorization2 = Authorization;
@@ -573,7 +579,7 @@ namespace Waher.Utility.Acme
 								Log.Informational("Authorization polled.",
 									new KeyValuePair<string, object>("Type", Authorization2.Type),
 									new KeyValuePair<string, object>("Value", Authorization2.Value),
-									new KeyValuePair<string, object>("Expires", Authorization2.Status),
+									new KeyValuePair<string, object>("Status", Authorization2.Status),
 									new KeyValuePair<string, object>("Expires", Authorization2.Expires),
 									new KeyValuePair<string, object>("Wildcard", Authorization2.Wildcard));
 							}
@@ -594,6 +600,9 @@ namespace Waher.Utility.Acme
 
 									case AcmeAuthorizationStatus.revoked:
 										throw new Exception("Authorization revoked.");
+
+									default:
+										throw new Exception("Authorization not validated.");
 								}
 							}
 						}
@@ -601,7 +610,7 @@ namespace Waher.Utility.Acme
 						using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(KeySize))
 						{
 							Log.Informational("Finalizing order.");
-
+							
 							Order = await Order.FinalizeOrder(new CertificateRequest(new RsaSha256(RSA))
 							{
 								CommonName = DomainNames[0],
@@ -620,6 +629,24 @@ namespace Waher.Utility.Acme
 								new KeyValuePair<string, object>("NotBefore", Order.NotBefore),
 								new KeyValuePair<string, object>("NotAfter", Order.NotAfter),
 								new KeyValuePair<string, object>("Identifiers", Order.Identifiers));
+
+							if (Order.Status != AcmeOrderStatus.valid)
+							{
+								switch (Order.Status)
+								{
+									case AcmeOrderStatus.invalid:
+										throw new Exception("Order invalid.");
+
+									default:
+										throw new Exception("Unable to validate oder.");
+								}
+							}
+
+							if (Order.Certificate == null)
+								throw new Exception("No certificate URI provided.");
+
+							System.Security.Cryptography.X509Certificates.X509Certificate2[] Certificates =
+								await Order.DownloadCertificate();
 						}
 					}
 					finally

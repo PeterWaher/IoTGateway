@@ -26,6 +26,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Events\Waher.Events.Console\Waher.Events.Console.csproj" />
     <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj" />
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj" />
     <ProjectReference Include="..\..\Security\Waher.Security.ACME\Waher.Security.ACME.csproj" />
     <ProjectReference Include="..\..\Security\Waher.Security.JWS\Waher.Security.JWS.csproj" />
   </ItemGroup>

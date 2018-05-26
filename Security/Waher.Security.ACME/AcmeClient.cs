@@ -5,11 +5,13 @@ using System.Net;
 using System.Net.Http;
 using System.Security.Authentication;
 using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Security.JWS;
+using Waher.Security.ACME.Decoders;
 
 namespace Waher.Security.ACME
 {
@@ -675,6 +677,38 @@ namespace Waher.Security.ACME
 				new KeyValuePair<string, object>("csr", Base64Url.Encode(CSR)));
 
 			return new AcmeOrder(this, AccountLocation, Response.Location, Response.Payload, Response.ResponseMessage);
+		}
+
+		/// <summary>
+		/// Downloads a certificate.
+		/// </summary>
+		/// <param name="CertificateLocation">URI of certificate.</param>
+		/// <returns>Certificate chain.</returns>
+		public async Task<X509Certificate2[]> DownloadCertificate(Uri CertificateLocation)
+		{
+			HttpRequestMessage Request = new HttpRequestMessage(HttpMethod.Get, CertificateLocation);
+			string ContentType = PemDecoder.ContentType;
+			Request.Headers.TryAddWithoutValidation("Accept", ContentType);
+			HttpResponseMessage Response = await this.httpClient.SendAsync(Request);
+			Response.EnsureSuccessStatusCode();
+
+			Stream Stream = await Response.Content.ReadAsStreamAsync();
+			byte[] Bin = await Response.Content.ReadAsByteArrayAsync();
+
+			if (Response.Headers.TryGetValues("Content-Type", out IEnumerable<string> Values))
+			{
+				foreach (string s in Values)
+				{
+					ContentType = s;
+					break;
+				}
+			}
+
+			object Decoded = InternetContent.Decode(ContentType, Bin, CertificateLocation);
+			if (!(Decoded is X509Certificate2[] Certificates))
+				throw new Exception("Unexpected response returned. Content-Type: " + ContentType);
+			
+			return Certificates;
 		}
 
 	}

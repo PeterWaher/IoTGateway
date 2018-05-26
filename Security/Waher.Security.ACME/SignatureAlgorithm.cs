@@ -32,6 +32,12 @@ namespace Waher.Security.ACME
 		public abstract void ExportPublicKey(DerEncoder Output);
 
 		/// <summary>
+		/// Exports the private key using DER.
+		/// </summary>
+		/// <param name="Output">Encoded output.</param>
+		public abstract void ExportPrivateKey(DerEncoder Output);
+
+		/// <summary>
 		/// Signs data.
 		/// </summary>
 		/// <param name="Data">Binary data to sign.</param>

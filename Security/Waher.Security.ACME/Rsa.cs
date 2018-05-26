@@ -49,6 +49,27 @@ namespace Waher.Security.ACME
 		}
 
 		/// <summary>
+		/// Exports the private key using DER.
+		/// </summary>
+		/// <param name="Output">Encoded output.</param>
+		public override void ExportPrivateKey(DerEncoder Output)
+		{
+			RSAParameters Parameters = this.rsa.ExportParameters(true);
+
+			Output.StartSEQUENCE();
+			Output.INTEGER(0);	// Version
+			Output.INTEGER(Parameters.Modulus, false);
+			Output.INTEGER(Parameters.Exponent, false);
+			Output.INTEGER(Parameters.D, false);
+			Output.INTEGER(Parameters.P, false);
+			Output.INTEGER(Parameters.Q, false);
+			Output.INTEGER(Parameters.DP, false);
+			Output.INTEGER(Parameters.DQ, false);
+			Output.INTEGER(Parameters.InverseQ, false);
+			Output.EndSEQUENCE();
+		}
+
+		/// <summary>
 		/// Signs data.
 		/// </summary>
 		/// <param name="Data">Binary data to sign.</param>

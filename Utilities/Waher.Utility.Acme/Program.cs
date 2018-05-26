@@ -691,36 +691,41 @@ namespace Waher.Utility.Acme
 								await Order.DownloadCertificate();
 
 							string CertificateFileName;
+							string CertificateFileName2;
 							int Index = 1;
 							byte[] Bin;
 
 							DerEncoder KeyOutput = new DerEncoder();
 							SignAlg.ExportPrivateKey(KeyOutput);
 
-							StringBuilder KeyFile = new StringBuilder();
+							StringBuilder PemOutput = new StringBuilder();
 
-							KeyFile.AppendLine("-----BEGIN RSA PRIVATE KEY-----");
-							KeyFile.AppendLine(Convert.ToBase64String(KeyOutput.ToArray(), Base64FormattingOptions.InsertLineBreaks));
-							KeyFile.AppendLine("-----END RSA PRIVATE KEY-----");
+							PemOutput.AppendLine("-----BEGIN RSA PRIVATE KEY-----");
+							PemOutput.AppendLine(Convert.ToBase64String(KeyOutput.ToArray(), Base64FormattingOptions.InsertLineBreaks));
+							PemOutput.AppendLine("-----END RSA PRIVATE KEY-----");
 
 							CertificateFileName = FileName + ".key";
 
 							Log.Informational("Saving private key.",
 								new KeyValuePair<string, object>("FileName", CertificateFileName));
 
-							File.WriteAllText(CertificateFileName, KeyFile.ToString(), Encoding.ASCII);
+							File.WriteAllText(CertificateFileName, PemOutput.ToString(), Encoding.ASCII);
 
 							foreach (X509Certificate2 Certificate in Certificates)
 							{
 								if (Index == 1)
-									CertificateFileName = FileName + ".cer";
+									CertificateFileName = FileName;
 								else
-									CertificateFileName = FileName + Index.ToString() + ".cer";
+									CertificateFileName = FileName + Index.ToString();
+
+								CertificateFileName2 = CertificateFileName + ".pem";
+								CertificateFileName += ".cer";
 
 								Bin = Certificate.Export(X509ContentType.Cert);
 
 								Log.Informational("Saving certificate.",
 									new KeyValuePair<string, object>("FileName", CertificateFileName),
+									new KeyValuePair<string, object>("FileName2", CertificateFileName2),
 									new KeyValuePair<string, object>("FriendlyName", Certificate.FriendlyName),
 									new KeyValuePair<string, object>("HasPrivateKey", Certificate.HasPrivateKey),
 									new KeyValuePair<string, object>("Issuer", Certificate.Issuer),
@@ -731,6 +736,13 @@ namespace Waher.Utility.Acme
 									new KeyValuePair<string, object>("Thumbprint", Certificate.Thumbprint));
 
 								File.WriteAllBytes(CertificateFileName, Bin);
+
+								PemOutput.Clear();
+								PemOutput.AppendLine("-----BEGIN CERTIFICATE-----");
+								PemOutput.AppendLine(Convert.ToBase64String(Bin, Base64FormattingOptions.InsertLineBreaks));
+								PemOutput.AppendLine("-----END CERTIFICATE-----");
+
+								File.WriteAllText(CertificateFileName2, PemOutput.ToString(), Encoding.ASCII);
 
 								Index++;
 							}

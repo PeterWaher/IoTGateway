@@ -699,9 +699,9 @@ namespace Waher.Utility.Acme
 
 							StringBuilder KeyFile = new StringBuilder();
 
-							KeyFile.AppendLine("—–BEGIN RSA PRIVATE KEY—–");
+							KeyFile.AppendLine("-----BEGIN RSA PRIVATE KEY-----");
 							KeyFile.AppendLine(Convert.ToBase64String(KeyOutput.ToArray(), Base64FormattingOptions.InsertLineBreaks));
-							KeyFile.AppendLine("—–END RSA PRIVATE KEY—–");
+							KeyFile.AppendLine("-----END RSA PRIVATE KEY-----");
 
 							CertificateFileName = FileName + ".key";
 

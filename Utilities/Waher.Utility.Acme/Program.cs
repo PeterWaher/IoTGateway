@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
@@ -650,7 +651,9 @@ namespace Waher.Utility.Acme
 						{
 							Log.Informational("Finalizing order.");
 
-							Order = await Order.FinalizeOrder(new CertificateRequest(new RsaSha256(RSA))
+							SignatureAlgorithm SignAlg = new RsaSha256(RSA);
+
+							Order = await Order.FinalizeOrder(new Security.ACME.CertificateRequest(SignAlg)
 							{
 								CommonName = DomainNames[0],
 								SubjectAlternativeNames = DomainNames,
@@ -691,19 +694,30 @@ namespace Waher.Utility.Acme
 							int Index = 1;
 							byte[] Bin;
 
-							foreach (System.Security.Cryptography.X509Certificates.X509Certificate2 Certificate in Certificates)
+							DerEncoder KeyOutput = new DerEncoder();
+							SignAlg.ExportPrivateKey(KeyOutput);
+
+							StringBuilder KeyFile = new StringBuilder();
+
+							KeyFile.AppendLine("—–BEGIN RSA PRIVATE KEY—–");
+							KeyFile.AppendLine(Convert.ToBase64String(KeyOutput.ToArray(), Base64FormattingOptions.InsertLineBreaks));
+							KeyFile.AppendLine("—–END RSA PRIVATE KEY—–");
+
+							CertificateFileName = FileName + ".key";
+
+							Log.Informational("Saving private key.",
+								new KeyValuePair<string, object>("FileName", CertificateFileName));
+
+							File.WriteAllText(CertificateFileName, KeyFile.ToString(), Encoding.ASCII);
+
+							foreach (X509Certificate2 Certificate in Certificates)
 							{
 								if (Index == 1)
-								{
-									Certificate.PrivateKey = RSA;
-									Bin = Certificate.Export(System.Security.Cryptography.X509Certificates.X509ContentType.Pfx, Password);
-									CertificateFileName = FileName + ".pfx";
-								}
+									CertificateFileName = FileName + ".cer";
 								else
-								{
-									Bin = Certificate.Export(System.Security.Cryptography.X509Certificates.X509ContentType.Cert);
 									CertificateFileName = FileName + Index.ToString() + ".cer";
-								}
+
+								Bin = Certificate.Export(X509ContentType.Cert);
 
 								Log.Informational("Saving certificate.",
 									new KeyValuePair<string, object>("FileName", CertificateFileName),

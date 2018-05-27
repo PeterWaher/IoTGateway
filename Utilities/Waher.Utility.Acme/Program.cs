@@ -388,8 +388,6 @@ namespace Waher.Utility.Acme
 					KeySize.Value, EMail, Country, Locality, StateOrProvince, Organization,
 					OrganizationalUnit, FileName, Password).Wait();
 
-				Console.Out.WriteLine("Press ENTER to continue."); // TODO: Remove
-				Console.In.ReadLine();  // TODO: Remove
 				return 0;
 			}
 			catch (Exception ex)
@@ -401,8 +399,6 @@ namespace Waher.Utility.Acme
 				else
 					Console.Out.WriteLine(ex.Message);
 
-				Console.Out.WriteLine("Press ENTER to continue."); // TODO: Remove
-				Console.In.ReadLine();  // TODO: Remove
 				return -1;
 			}
 		}
@@ -690,6 +686,7 @@ namespace Waher.Utility.Acme
 							System.Security.Cryptography.X509Certificates.X509Certificate2[] Certificates =
 								await Order.DownloadCertificate();
 
+							string CertificateFileNameBase;
 							string CertificateFileName;
 							string CertificateFileName2;
 							int Index = 1;
@@ -714,12 +711,12 @@ namespace Waher.Utility.Acme
 							foreach (X509Certificate2 Certificate in Certificates)
 							{
 								if (Index == 1)
-									CertificateFileName = FileName;
+									CertificateFileNameBase = FileName;
 								else
-									CertificateFileName = FileName + Index.ToString();
+									CertificateFileNameBase = FileName + Index.ToString();
 
-								CertificateFileName2 = CertificateFileName + ".pem";
-								CertificateFileName += ".cer";
+								CertificateFileName = CertificateFileNameBase + ".cer";
+								CertificateFileName2 = CertificateFileNameBase + ".pem";
 
 								Bin = Certificate.Export(X509ContentType.Cert);
 
@@ -748,9 +745,15 @@ namespace Waher.Utility.Acme
 								{
 									try
 									{
+										CertificateFileName = CertificateFileNameBase + ".pfx";
+
+										Log.Informational("Exporting to PFX.",
+											new KeyValuePair<string, object>("FileName", CertificateFileName));
+
 										Certificate.PrivateKey = RSA;
 										Bin = Certificate.Export(X509ContentType.Pfx, Password);
-										File.WriteAllBytes(CertificateFileName + ".pfx", Bin);
+
+										File.WriteAllBytes(CertificateFileName, Bin);
 									}
 									catch (Exception ex)
 									{

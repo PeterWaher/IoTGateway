@@ -1,9 +1,0 @@
-{
-  "profiles": {
-    "Waher.Utility.Acme": {
-      "commandName": "Project",
-      "commandLineArgs": "-let -v -a -ce peterwaher@hotmail.com -nk -dns extas.is -dns www.extas.is",
-      "workingDirectory": "C:\\My Projects\\IoTGateway\\Utilities\\Waher.Utility.Acme\\bin\\Debug\\netcoreapp2.0"
-    }
-  }
-}

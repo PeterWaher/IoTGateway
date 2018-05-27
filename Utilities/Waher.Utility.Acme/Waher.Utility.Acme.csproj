@@ -1,34 +1,97 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{A9907157-5603-4C9B-81B6-96C0B6EFF2F1}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp2.0</TargetFramework>
-    <StartupObject>Waher.Utility.Acme.Program</StartupObject>
-    <Authors>Peter Waher</Authors>
-    <Company>Waher Data AB</Company>
-    <Product>Waher.IoTGateway</Product>
-    <Description>Command-line tool that that helps you create certificates using the Automatic Certificate Management Environment (ACME) protocol.</Description>
-    <Copyright>Copyright © Waher Data AB 2017-2018. All rights reserved.</Copyright>
-    <PackageLicenseUrl>https://github.com/PeterWaher/IoTGateway#license</PackageLicenseUrl>
-    <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Waher.IoTGateway</PackageProjectUrl>
-    <PackageIconUrl>https://github.com/PeterWaher/IoTGateway/blob/master/Images/Icon.ico?raw=true</PackageIconUrl>
-    <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
-    <RepositoryType>GitHub</RepositoryType>
-    <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.0.0.0</AssemblyVersion>
-    <FileVersion>1.0.0.0</FileVersion>
+    <RootNamespace>Waher.Utility.Acme</RootNamespace>
+    <AssemblyName>Waher.Utility.Acme</AssemblyName>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
-
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="if not exist &quot;$(ProjectDir)obj\$(ConfigurationName)\netcoreapp2.0\win-x86&quot; md &quot;$(ProjectDir)obj\$(ConfigurationName)\netcoreapp2.0\win-x86&quot;&#xD;&#xA;copy &quot;$(TargetPath)&quot; &quot;$(ProjectDir)obj\$(ConfigurationName)\netcoreapp2.0\win-x86&quot;&#xD;&#xA;" />
-  </Target>
-
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>Waher.Utility.Acme.Program</StartupObject>
+  </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Events\Waher.Events.Console\Waher.Events.Console.csproj" />
-    <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj" />
-    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj" />
-    <ProjectReference Include="..\..\Security\Waher.Security.ACME\Waher.Security.ACME.csproj" />
-    <ProjectReference Include="..\..\Security\Waher.Security.JWS\Waher.Security.JWS.csproj" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Security.Cryptography.Algorithms, Version=4.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.Security.Cryptography.Algorithms.4.3.0\lib\net461\System.Security.Cryptography.Algorithms.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Security.Cryptography.Csp, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.Security.Cryptography.Csp.4.3.0\lib\net46\System.Security.Cryptography.Csp.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Security.Cryptography.Encoding, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.Security.Cryptography.Encoding.4.3.0\lib\net46\System.Security.Cryptography.Encoding.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Security.Cryptography.Primitives, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.Security.Cryptography.Primitives.4.3.0\lib\net46\System.Security.Cryptography.Primitives.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Security.Cryptography.X509Certificates, Version=4.1.1.2, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.Security.Cryptography.X509Certificates.4.3.2\lib\net461\System.Security.Cryptography.X509Certificates.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
-
+  <ItemGroup>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Content\Waher.Content\Waher.Content.csproj">
+      <Project>{03f3b861-5ef2-4d02-9ec2-aaa7374f5e58}</Project>
+      <Name>Waher.Content</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Events\Waher.Events.Console\Waher.Events.Console.csproj">
+      <Project>{549bb008-3bb9-4882-b5dc-782b58d2d7b4}</Project>
+      <Name>Waher.Events.Console</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj">
+      <Project>{8ae9d52d-28cd-4f83-98de-b6a016f5c7ba}</Project>
+      <Name>Waher.Events</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj">
+      <Project>{7f1b0d78-aa86-445b-9e1f-7df75b9e4c04}</Project>
+      <Name>Waher.Runtime.Inventory</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Security\Waher.Security.ACME\Waher.Security.ACME.csproj">
+      <Project>{881a8b62-e2a8-4569-b5af-6be3ae1a7a59}</Project>
+      <Name>Waher.Security.ACME</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Security\Waher.Security.JWS\Waher.Security.JWS.csproj">
+      <Project>{712709ac-748d-43d7-a369-3beb829bf5e3}</Project>
+      <Name>Waher.Security.JWS</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

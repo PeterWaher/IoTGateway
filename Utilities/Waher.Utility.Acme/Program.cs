@@ -814,5 +814,11 @@ namespace Waher.Utility.Acme
 			return true;
 		}
 
+		/* TODO:
+		 * 
+		 * pre-authorization 7.4.1
+		 * Retry-After (rate limiting when polling)
+		 * Revoke certificate 7.6
+		 */
 	}
 }

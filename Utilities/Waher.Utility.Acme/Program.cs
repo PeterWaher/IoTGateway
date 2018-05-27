@@ -4,6 +4,7 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Events;
@@ -66,7 +67,7 @@ namespace Waher.Utility.Acme
 	/// </summary>
 	class Program
 	{
-		static int Main(string[] args)
+		static void Main(string[] args)
 		{
 			Uri Directory = null;
 			List<string> ContactURLs = null;
@@ -355,7 +356,7 @@ namespace Waher.Utility.Acme
 					Console.Out.WriteLine("                      certificate.");
 					Console.Out.WriteLine("-v                    Verbose mode.");
 					Console.Out.WriteLine("-?                    Help.");
-					return 0;
+					return;
 				}
 
 				if (Verbose)
@@ -383,12 +384,14 @@ namespace Waher.Utility.Acme
 					typeof(InternetContent).Assembly,
 					typeof(AcmeClient).Assembly);
 
+				ManualResetEvent Done = new ManualResetEvent(false);
+
 				Process(Verbose, Directory, ContactURLs?.ToArray(), TermsOfServiceAgreed, NewKey,
 					DomainNames?.ToArray(), NotBefore, NotAfter, HttpRootFolder, PollingIngerval.Value,
 					KeySize.Value, EMail, Country, Locality, StateOrProvince, Organization,
-					OrganizationalUnit, FileName, Password).Wait();
+					OrganizationalUnit, FileName, Password, Done).Wait();
 
-				return 0;
+				Done.WaitOne();
 			}
 			catch (Exception ex)
 			{
@@ -398,382 +401,393 @@ namespace Waher.Utility.Acme
 					Log.Error(ex.Message);
 				else
 					Console.Out.WriteLine(ex.Message);
-
-				return -1;
 			}
 		}
 
 		private static async Task Process(bool Verbose, Uri Directory, string[] ContactURLs, bool TermsOfServiceAgreed,
 			bool NewKey, string[] DomainNames, DateTime? NotBefore, DateTime? NotAfter, string HttpRootFolder, int PollingInterval,
 			int KeySize, string EMail, string Country, string Locality, string StateOrProvince, string Organization,
-			string OrganizationalUnit, string FileName, string Password)
+			string OrganizationalUnit, string FileName, string Password, ManualResetEvent Done)
 		{
-			using (AcmeClient Client = new AcmeClient(Directory))
+			try
 			{
-				Log.Informational("Connecting to directory.",
-					new KeyValuePair<string, object>("URL", Directory.ToString()));
-
-				AcmeDirectory AcmeDirectory = await Client.GetDirectory();
-
-				if (AcmeDirectory.ExternalAccountRequired)
-					Log.Warning("An external account is required.");
-
-				if (AcmeDirectory.TermsOfService != null)
+				using (AcmeClient Client = new AcmeClient(Directory))
 				{
-					Log.Informational("Terms of service available.",
-						new KeyValuePair<string, object>("URL", AcmeDirectory.TermsOfService.ToString()));
-				}
+					Log.Informational("Connecting to directory.",
+						new KeyValuePair<string, object>("URL", Directory.ToString()));
 
-				if (AcmeDirectory.Website != null)
-				{
-					Log.Informational("Web site available.",
-						new KeyValuePair<string, object>("URL", AcmeDirectory.Website.ToString()));
-				}
+					AcmeDirectory AcmeDirectory = await Client.GetDirectory();
 
+					if (AcmeDirectory.ExternalAccountRequired)
+						Log.Warning("An external account is required.");
 
-				Log.Informational("Getting account.");
-
-				AcmeAccount Account;
-
-				try
-				{
-					Account = await Client.GetAccount();
-
-					Log.Informational("Account found.",
-						new KeyValuePair<string, object>("Created", Account.CreatedAt),
-						new KeyValuePair<string, object>("Initial IP", Account.InitialIp),
-						new KeyValuePair<string, object>("Status", Account.Status),
-						new KeyValuePair<string, object>("Contact", Account.Contact));
-
-					if (ContactURLs != null && !AreEqual(Account.Contact, ContactURLs))
+					if (AcmeDirectory.TermsOfService != null)
 					{
-						Log.Informational("Updating contact URIs in account.");
+						Log.Informational("Terms of service available.",
+							new KeyValuePair<string, object>("URL", AcmeDirectory.TermsOfService.ToString()));
+					}
 
-						Account = await Account.Update(ContactURLs);
+					if (AcmeDirectory.Website != null)
+					{
+						Log.Informational("Web site available.",
+							new KeyValuePair<string, object>("URL", AcmeDirectory.Website.ToString()));
+					}
 
-						Log.Informational("Account updated.",
+
+					Log.Informational("Getting account.");
+
+					AcmeAccount Account;
+
+					try
+					{
+						Account = await Client.GetAccount();
+
+						Log.Informational("Account found.",
+							new KeyValuePair<string, object>("Created", Account.CreatedAt),
+							new KeyValuePair<string, object>("Initial IP", Account.InitialIp),
+							new KeyValuePair<string, object>("Status", Account.Status),
+							new KeyValuePair<string, object>("Contact", Account.Contact));
+
+						if (ContactURLs != null && !AreEqual(Account.Contact, ContactURLs))
+						{
+							Log.Informational("Updating contact URIs in account.");
+
+							Account = await Account.Update(ContactURLs);
+
+							Log.Informational("Account updated.",
+								new KeyValuePair<string, object>("Created", Account.CreatedAt),
+								new KeyValuePair<string, object>("Initial IP", Account.InitialIp),
+								new KeyValuePair<string, object>("Status", Account.Status),
+								new KeyValuePair<string, object>("Contact", Account.Contact));
+						}
+					}
+					catch (AcmeAccountDoesNotExistException)
+					{
+						Log.Warning("Account not found. Creating account.",
+							new KeyValuePair<string, object>("Contact", ContactURLs),
+							new KeyValuePair<string, object>("TermsOfServiceAgreed", TermsOfServiceAgreed));
+
+						Account = await Client.CreateAccount(ContactURLs, TermsOfServiceAgreed);
+
+						Log.Informational("Account created.",
 							new KeyValuePair<string, object>("Created", Account.CreatedAt),
 							new KeyValuePair<string, object>("Initial IP", Account.InitialIp),
 							new KeyValuePair<string, object>("Status", Account.Status),
 							new KeyValuePair<string, object>("Contact", Account.Contact));
 					}
-				}
-				catch (AcmeAccountDoesNotExistException)
-				{
-					Log.Warning("Account not found. Creating account.",
-						new KeyValuePair<string, object>("Contact", ContactURLs),
-						new KeyValuePair<string, object>("TermsOfServiceAgreed", TermsOfServiceAgreed));
 
-					Account = await Client.CreateAccount(ContactURLs, TermsOfServiceAgreed);
-
-					Log.Informational("Account created.",
-						new KeyValuePair<string, object>("Created", Account.CreatedAt),
-						new KeyValuePair<string, object>("Initial IP", Account.InitialIp),
-						new KeyValuePair<string, object>("Status", Account.Status),
-						new KeyValuePair<string, object>("Contact", Account.Contact));
-				}
-
-				if (NewKey)
-				{
-					Log.Informational("Generating new key.");
-
-					await Account.NewKey();
-
-					Log.Informational("New key generated.");
-				}
-
-
-				if (DomainNames != null)
-				{
-					if (!string.IsNullOrEmpty(HttpRootFolder))
+					if (NewKey)
 					{
-						CheckExists(HttpRootFolder);
-						HttpRootFolder = Path.Combine(HttpRootFolder, ".well-known");
-						CheckExists(HttpRootFolder);
-						HttpRootFolder = Path.Combine(HttpRootFolder, "acme-challenge");
-						CheckExists(HttpRootFolder);
+						Log.Informational("Generating new key.");
+
+						await Account.NewKey();
+
+						Log.Informational("New key generated.");
 					}
 
-					Log.Informational("Creating order.");
 
-					AcmeOrder Order = await Account.OrderCertificate(DomainNames, NotBefore, NotAfter);
-
-					Log.Informational("Order created.",
-						new KeyValuePair<string, object>("Status", Order.Status),
-						new KeyValuePair<string, object>("Expires", Order.Expires),
-						new KeyValuePair<string, object>("NotBefore", Order.NotBefore),
-						new KeyValuePair<string, object>("NotAfter", Order.NotAfter),
-						new KeyValuePair<string, object>("Identifiers", Order.Identifiers));
-
-					List<string> FileNames = null;
-
-					try
+					if (DomainNames != null)
 					{
-						foreach (AcmeAuthorization Authorization in await Order.GetAuthorizations())
+						if (!string.IsNullOrEmpty(HttpRootFolder))
 						{
-							Log.Informational("Processing authorization.",
-								new KeyValuePair<string, object>("Type", Authorization.Type),
-								new KeyValuePair<string, object>("Value", Authorization.Value),
-								new KeyValuePair<string, object>("Status", Authorization.Status),
-								new KeyValuePair<string, object>("Expires", Authorization.Expires),
-								new KeyValuePair<string, object>("Wildcard", Authorization.Wildcard));
+							CheckExists(HttpRootFolder);
+							HttpRootFolder = Path.Combine(HttpRootFolder, ".well-known");
+							CheckExists(HttpRootFolder);
+							HttpRootFolder = Path.Combine(HttpRootFolder, "acme-challenge");
+							CheckExists(HttpRootFolder);
+						}
 
-							AcmeChallenge Challenge;
-							bool Manual = true;
-							int Index = 1;
-							int NrChallenges = Authorization.Challenges.Length;
-							string s;
+						Log.Informational("Creating order.");
 
-							for (Index = 1; Index <= NrChallenges; Index++)
+						AcmeOrder Order = await Account.OrderCertificate(DomainNames, NotBefore, NotAfter);
+
+						Log.Informational("Order created.",
+							new KeyValuePair<string, object>("Status", Order.Status),
+							new KeyValuePair<string, object>("Expires", Order.Expires),
+							new KeyValuePair<string, object>("NotBefore", Order.NotBefore),
+							new KeyValuePair<string, object>("NotAfter", Order.NotAfter),
+							new KeyValuePair<string, object>("Identifiers", Order.Identifiers));
+
+						List<string> FileNames = null;
+
+						try
+						{
+							foreach (AcmeAuthorization Authorization in await Order.GetAuthorizations())
 							{
-								Challenge = Authorization.Challenges[Index - 1];
+								Log.Informational("Processing authorization.",
+									new KeyValuePair<string, object>("Type", Authorization.Type),
+									new KeyValuePair<string, object>("Value", Authorization.Value),
+									new KeyValuePair<string, object>("Status", Authorization.Status),
+									new KeyValuePair<string, object>("Expires", Authorization.Expires),
+									new KeyValuePair<string, object>("Wildcard", Authorization.Wildcard));
 
-								if (Challenge is AcmeHttpChallenge HttpChallenge)
+								AcmeChallenge Challenge;
+								bool Manual = true;
+								int Index = 1;
+								int NrChallenges = Authorization.Challenges.Length;
+								string s;
+
+								for (Index = 1; Index <= NrChallenges; Index++)
 								{
-									Log.Informational(Index.ToString() + ") HTTP challenge.",
-										new KeyValuePair<string, object>("Resource", HttpChallenge.ResourceName),
-										new KeyValuePair<string, object>("Response", HttpChallenge.KeyAuthorization),
-										new KeyValuePair<string, object>("Content-Type", "application/octet-stream"));
+									Challenge = Authorization.Challenges[Index - 1];
 
-									if (!string.IsNullOrEmpty(HttpRootFolder))
+									if (Challenge is AcmeHttpChallenge HttpChallenge)
 									{
-										string ChallengeFileName = Path.Combine(HttpRootFolder, HttpChallenge.Token);
-										File.WriteAllBytes(ChallengeFileName, Encoding.ASCII.GetBytes(HttpChallenge.KeyAuthorization));
+										Log.Informational(Index.ToString() + ") HTTP challenge.",
+											new KeyValuePair<string, object>("Resource", HttpChallenge.ResourceName),
+											new KeyValuePair<string, object>("Response", HttpChallenge.KeyAuthorization),
+											new KeyValuePair<string, object>("Content-Type", "application/octet-stream"));
 
-										if (FileNames == null)
-											FileNames = new List<string>();
+										if (!string.IsNullOrEmpty(HttpRootFolder))
+										{
+											string ChallengeFileName = Path.Combine(HttpRootFolder, HttpChallenge.Token);
+											File.WriteAllBytes(ChallengeFileName, Encoding.ASCII.GetBytes(HttpChallenge.KeyAuthorization));
 
-										FileNames.Add(ChallengeFileName);
+											if (FileNames == null)
+												FileNames = new List<string>();
 
-										Log.Informational("Acknowleding challenge.");
+											FileNames.Add(ChallengeFileName);
 
-										Challenge = await HttpChallenge.AcknowledgeChallenge();
+											Log.Informational("Acknowleding challenge.");
 
-										Log.Informational("Challenge acknowledged.",
-											new KeyValuePair<string, object>("Status", Challenge.Status));
+											Challenge = await HttpChallenge.AcknowledgeChallenge();
 
-										Manual = false;
+											Log.Informational("Challenge acknowledged.",
+												new KeyValuePair<string, object>("Status", Challenge.Status));
+
+											Manual = false;
+										}
+										else if (!Verbose)
+										{
+											Console.Out.WriteLine(Index.ToString() + ") HTTP challenge.");
+											Console.Out.WriteLine("Resource: " + HttpChallenge.ResourceName);
+											Console.Out.WriteLine("Response: " + HttpChallenge.KeyAuthorization);
+											Console.Out.WriteLine("Content-Type: " + "application/octet-stream");
+										}
 									}
-									else if (!Verbose)
+									else if (Challenge is AcmeDnsChallenge DnsChallenge)
 									{
-										Console.Out.WriteLine(Index.ToString() + ") HTTP challenge.");
-										Console.Out.WriteLine("Resource: " + HttpChallenge.ResourceName);
-										Console.Out.WriteLine("Response: " + HttpChallenge.KeyAuthorization);
-										Console.Out.WriteLine("Content-Type: " + "application/octet-stream");
+										Log.Informational(Index.ToString() + ") DNS challenge.",
+											new KeyValuePair<string, object>("Domain", DnsChallenge.ValidationDomainNamePrefix + Authorization.Value),
+											new KeyValuePair<string, object>("TXT Record", DnsChallenge.KeyAuthorization));
+
+										if (!Verbose)
+										{
+											Console.Out.WriteLine(Index.ToString() + ") DNS challenge.");
+											Console.Out.WriteLine("Domain: " + DnsChallenge.ValidationDomainNamePrefix + Authorization.Value);
+											Console.Out.WriteLine("TXT Record: " + DnsChallenge.KeyAuthorization);
+										}
 									}
 								}
-								else if (Challenge is AcmeDnsChallenge DnsChallenge)
+
+								if (Manual)
 								{
-									Log.Informational(Index.ToString() + ") DNS challenge.",
-										new KeyValuePair<string, object>("Domain", DnsChallenge.ValidationDomainNamePrefix + Authorization.Value),
-										new KeyValuePair<string, object>("TXT Record", DnsChallenge.KeyAuthorization));
+									Console.Out.WriteLine();
+									Console.Out.WriteLine("No automated method found to respond to any of the authorization challenges. " +
+										"You can respond to a challenge manually. After configuring the corresponding " +
+										"resource, enter the number of the corresponding challenge and press ENTER to acknowledge it.");
 
-									if (!Verbose)
+									do
 									{
-										Console.Out.WriteLine(Index.ToString() + ") DNS challenge.");
-										Console.Out.WriteLine("Domain: " + DnsChallenge.ValidationDomainNamePrefix + Authorization.Value);
-										Console.Out.WriteLine("TXT Record: " + DnsChallenge.KeyAuthorization);
+										Console.Out.Write("Challenge to acknowledge: ");
+										s = Console.In.ReadLine();
 									}
-								}
-							}
+									while (!int.TryParse(s, out Index) || Index <= 0 || Index > NrChallenges);
 
-							if (Manual)
-							{
-								Console.Out.WriteLine();
-								Console.Out.WriteLine("No automated method found to respond to any of the authorization challenges. " +
-									"You can respond to a challenge manually. After configuring the corresponding " +
-									"resource, enter the number of the corresponding challenge and press ENTER to acknowledge it.");
+									Log.Informational("Acknowleding challenge.");
+
+									Challenge = await Authorization.Challenges[Index - 1].AcknowledgeChallenge();
+
+									Log.Informational("Challenge acknowledged.",
+										new KeyValuePair<string, object>("Status", Challenge.Status));
+								}
+
+								AcmeAuthorization Authorization2 = Authorization;
 
 								do
 								{
-									Console.Out.Write("Challenge to acknowledge: ");
-									s = Console.In.ReadLine();
+									Log.Informational("Waiting to poll authorization status.",
+										new KeyValuePair<string, object>("ms", PollingInterval));
+
+									System.Threading.Thread.Sleep(PollingInterval);
+
+									Log.Informational("Polling authorization.");
+
+									Authorization2 = await Authorization2.Poll();
+
+									Log.Informational("Authorization polled.",
+										new KeyValuePair<string, object>("Type", Authorization2.Type),
+										new KeyValuePair<string, object>("Value", Authorization2.Value),
+										new KeyValuePair<string, object>("Status", Authorization2.Status),
+										new KeyValuePair<string, object>("Expires", Authorization2.Expires),
+										new KeyValuePair<string, object>("Wildcard", Authorization2.Wildcard));
 								}
-								while (!int.TryParse(s, out Index) || Index <= 0 || Index > NrChallenges);
+								while (Authorization2.Status == AcmeAuthorizationStatus.pending);
 
-								Log.Informational("Acknowleding challenge.");
-
-								Challenge = await Authorization.Challenges[Index - 1].AcknowledgeChallenge();
-
-								Log.Informational("Challenge acknowledged.",
-									new KeyValuePair<string, object>("Status", Challenge.Status));
-							}
-
-							AcmeAuthorization Authorization2 = Authorization;
-
-							do
-							{
-								Log.Informational("Waiting to poll authorization status.",
-									new KeyValuePair<string, object>("ms", PollingInterval));
-
-								System.Threading.Thread.Sleep(PollingInterval);
-
-								Log.Informational("Polling authorization.");
-
-								Authorization2 = await Authorization2.Poll();
-
-								Log.Informational("Authorization polled.",
-									new KeyValuePair<string, object>("Type", Authorization2.Type),
-									new KeyValuePair<string, object>("Value", Authorization2.Value),
-									new KeyValuePair<string, object>("Status", Authorization2.Status),
-									new KeyValuePair<string, object>("Expires", Authorization2.Expires),
-									new KeyValuePair<string, object>("Wildcard", Authorization2.Wildcard));
-							}
-							while (Authorization2.Status == AcmeAuthorizationStatus.pending);
-
-							if (Authorization2.Status != AcmeAuthorizationStatus.valid)
-							{
-								switch (Authorization2.Status)
+								if (Authorization2.Status != AcmeAuthorizationStatus.valid)
 								{
-									case AcmeAuthorizationStatus.deactivated:
-										throw new Exception("Authorization deactivated.");
-
-									case AcmeAuthorizationStatus.expired:
-										throw new Exception("Authorization expired.");
-
-									case AcmeAuthorizationStatus.invalid:
-										throw new Exception("Authorization invalid.");
-
-									case AcmeAuthorizationStatus.revoked:
-										throw new Exception("Authorization revoked.");
-
-									default:
-										throw new Exception("Authorization not validated.");
-								}
-							}
-						}
-
-						using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(KeySize))
-						{
-							Log.Informational("Finalizing order.");
-
-							SignatureAlgorithm SignAlg = new RsaSha256(RSA);
-
-							Order = await Order.FinalizeOrder(new Security.ACME.CertificateRequest(SignAlg)
-							{
-								CommonName = DomainNames[0],
-								SubjectAlternativeNames = DomainNames,
-								EMailAddress = EMail,
-								Country = Country,
-								Locality = Locality,
-								StateOrProvince = StateOrProvince,
-								Organization = Organization,
-								OrganizationalUnit = OrganizationalUnit
-							});
-
-							Log.Informational("Order finalized.",
-								new KeyValuePair<string, object>("Status", Order.Status),
-								new KeyValuePair<string, object>("Expires", Order.Expires),
-								new KeyValuePair<string, object>("NotBefore", Order.NotBefore),
-								new KeyValuePair<string, object>("NotAfter", Order.NotAfter),
-								new KeyValuePair<string, object>("Identifiers", Order.Identifiers));
-
-							if (Order.Status != AcmeOrderStatus.valid)
-							{
-								switch (Order.Status)
-								{
-									case AcmeOrderStatus.invalid:
-										throw new Exception("Order invalid.");
-
-									default:
-										throw new Exception("Unable to validate oder.");
-								}
-							}
-
-							if (Order.Certificate == null)
-								throw new Exception("No certificate URI provided.");
-
-							System.Security.Cryptography.X509Certificates.X509Certificate2[] Certificates =
-								await Order.DownloadCertificate();
-
-							string CertificateFileNameBase;
-							string CertificateFileName;
-							string CertificateFileName2;
-							int Index = 1;
-							byte[] Bin;
-
-							DerEncoder KeyOutput = new DerEncoder();
-							SignAlg.ExportPrivateKey(KeyOutput);
-
-							StringBuilder PemOutput = new StringBuilder();
-
-							PemOutput.AppendLine("-----BEGIN RSA PRIVATE KEY-----");
-							PemOutput.AppendLine(Convert.ToBase64String(KeyOutput.ToArray(), Base64FormattingOptions.InsertLineBreaks));
-							PemOutput.AppendLine("-----END RSA PRIVATE KEY-----");
-
-							CertificateFileName = FileName + ".key";
-
-							Log.Informational("Saving private key.",
-								new KeyValuePair<string, object>("FileName", CertificateFileName));
-
-							File.WriteAllText(CertificateFileName, PemOutput.ToString(), Encoding.ASCII);
-
-							foreach (X509Certificate2 Certificate in Certificates)
-							{
-								if (Index == 1)
-									CertificateFileNameBase = FileName;
-								else
-									CertificateFileNameBase = FileName + Index.ToString();
-
-								CertificateFileName = CertificateFileNameBase + ".cer";
-								CertificateFileName2 = CertificateFileNameBase + ".pem";
-
-								Bin = Certificate.Export(X509ContentType.Cert);
-
-								Log.Informational("Saving certificate.",
-									new KeyValuePair<string, object>("FileName", CertificateFileName),
-									new KeyValuePair<string, object>("FileName2", CertificateFileName2),
-									new KeyValuePair<string, object>("FriendlyName", Certificate.FriendlyName),
-									new KeyValuePair<string, object>("HasPrivateKey", Certificate.HasPrivateKey),
-									new KeyValuePair<string, object>("Issuer", Certificate.Issuer),
-									new KeyValuePair<string, object>("NotAfter", Certificate.NotAfter),
-									new KeyValuePair<string, object>("NotBefore", Certificate.NotBefore),
-									new KeyValuePair<string, object>("SerialNumber", Certificate.SerialNumber),
-									new KeyValuePair<string, object>("Subject", Certificate.Subject),
-									new KeyValuePair<string, object>("Thumbprint", Certificate.Thumbprint));
-
-								File.WriteAllBytes(CertificateFileName, Bin);
-
-								PemOutput.Clear();
-								PemOutput.AppendLine("-----BEGIN CERTIFICATE-----");
-								PemOutput.AppendLine(Convert.ToBase64String(Bin, Base64FormattingOptions.InsertLineBreaks));
-								PemOutput.AppendLine("-----END CERTIFICATE-----");
-
-								File.WriteAllText(CertificateFileName2, PemOutput.ToString(), Encoding.ASCII);
-
-								if (Index == 1)
-								{
-									try
+									switch (Authorization2.Status)
 									{
-										CertificateFileName = CertificateFileNameBase + ".pfx";
+										case AcmeAuthorizationStatus.deactivated:
+											throw new Exception("Authorization deactivated.");
 
-										Log.Informational("Exporting to PFX.",
-											new KeyValuePair<string, object>("FileName", CertificateFileName));
+										case AcmeAuthorizationStatus.expired:
+											throw new Exception("Authorization expired.");
 
-										Certificate.PrivateKey = RSA;
-										Bin = Certificate.Export(X509ContentType.Pfx, Password);
+										case AcmeAuthorizationStatus.invalid:
+											throw new Exception("Authorization invalid.");
 
-										File.WriteAllBytes(CertificateFileName, Bin);
+										case AcmeAuthorizationStatus.revoked:
+											throw new Exception("Authorization revoked.");
+
+										default:
+											throw new Exception("Authorization not validated.");
 									}
-									catch (Exception ex)
+								}
+							}
+
+							using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(KeySize))
+							{
+								Log.Informational("Finalizing order.");
+
+								SignatureAlgorithm SignAlg = new RsaSha256(RSA);
+
+								Order = await Order.FinalizeOrder(new Security.ACME.CertificateRequest(SignAlg)
+								{
+									CommonName = DomainNames[0],
+									SubjectAlternativeNames = DomainNames,
+									EMailAddress = EMail,
+									Country = Country,
+									Locality = Locality,
+									StateOrProvince = StateOrProvince,
+									Organization = Organization,
+									OrganizationalUnit = OrganizationalUnit
+								});
+
+								Log.Informational("Order finalized.",
+									new KeyValuePair<string, object>("Status", Order.Status),
+									new KeyValuePair<string, object>("Expires", Order.Expires),
+									new KeyValuePair<string, object>("NotBefore", Order.NotBefore),
+									new KeyValuePair<string, object>("NotAfter", Order.NotAfter),
+									new KeyValuePair<string, object>("Identifiers", Order.Identifiers));
+
+								if (Order.Status != AcmeOrderStatus.valid)
+								{
+									switch (Order.Status)
 									{
-										Log.Error("Unable to export certificate to PFX: " + ex.Message);
+										case AcmeOrderStatus.invalid:
+											throw new Exception("Order invalid.");
+
+										default:
+											throw new Exception("Unable to validate oder.");
 									}
 								}
 
-								Index++;
+								if (Order.Certificate == null)
+									throw new Exception("No certificate URI provided.");
+
+								System.Security.Cryptography.X509Certificates.X509Certificate2[] Certificates =
+									await Order.DownloadCertificate();
+
+								string CertificateFileNameBase;
+								string CertificateFileName;
+								string CertificateFileName2;
+								int Index = 1;
+								byte[] Bin;
+
+								DerEncoder KeyOutput = new DerEncoder();
+								SignAlg.ExportPrivateKey(KeyOutput);
+
+								StringBuilder PemOutput = new StringBuilder();
+
+								PemOutput.AppendLine("-----BEGIN RSA PRIVATE KEY-----");
+								PemOutput.AppendLine(Convert.ToBase64String(KeyOutput.ToArray(), Base64FormattingOptions.InsertLineBreaks));
+								PemOutput.AppendLine("-----END RSA PRIVATE KEY-----");
+
+								CertificateFileName = FileName + ".key";
+
+								Log.Informational("Saving private key.",
+									new KeyValuePair<string, object>("FileName", CertificateFileName));
+
+								File.WriteAllText(CertificateFileName, PemOutput.ToString(), Encoding.ASCII);
+
+								foreach (X509Certificate2 Certificate in Certificates)
+								{
+									if (Index == 1)
+										CertificateFileNameBase = FileName;
+									else
+										CertificateFileNameBase = FileName + Index.ToString();
+
+									CertificateFileName = CertificateFileNameBase + ".cer";
+									CertificateFileName2 = CertificateFileNameBase + ".pem";
+
+									Bin = Certificate.Export(X509ContentType.Cert);
+
+									Log.Informational("Saving certificate.",
+										new KeyValuePair<string, object>("FileName", CertificateFileName),
+										new KeyValuePair<string, object>("FileName2", CertificateFileName2),
+										new KeyValuePair<string, object>("FriendlyName", Certificate.FriendlyName),
+										new KeyValuePair<string, object>("HasPrivateKey", Certificate.HasPrivateKey),
+										new KeyValuePair<string, object>("Issuer", Certificate.Issuer),
+										new KeyValuePair<string, object>("NotAfter", Certificate.NotAfter),
+										new KeyValuePair<string, object>("NotBefore", Certificate.NotBefore),
+										new KeyValuePair<string, object>("SerialNumber", Certificate.SerialNumber),
+										new KeyValuePair<string, object>("Subject", Certificate.Subject),
+										new KeyValuePair<string, object>("Thumbprint", Certificate.Thumbprint));
+
+									File.WriteAllBytes(CertificateFileName, Bin);
+
+									PemOutput.Clear();
+									PemOutput.AppendLine("-----BEGIN CERTIFICATE-----");
+									PemOutput.AppendLine(Convert.ToBase64String(Bin, Base64FormattingOptions.InsertLineBreaks));
+									PemOutput.AppendLine("-----END CERTIFICATE-----");
+
+									File.WriteAllText(CertificateFileName2, PemOutput.ToString(), Encoding.ASCII);
+
+									if (Index == 1)
+									{
+										try
+										{
+											CertificateFileName = CertificateFileNameBase + ".pfx";
+
+											Log.Informational("Exporting to PFX.",
+												new KeyValuePair<string, object>("FileName", CertificateFileName));
+
+											Certificate.PrivateKey = RSA;
+											Bin = Certificate.Export(X509ContentType.Pfx, Password);
+
+											File.WriteAllBytes(CertificateFileName, Bin);
+										}
+										catch (Exception ex)
+										{
+											Log.Error("Unable to export certificate to PFX: " + ex.Message);
+										}
+									}
+
+									Index++;
+								}
 							}
 						}
-					}
-					finally
-					{
-						if (FileNames != null)
+						finally
 						{
-							foreach (string FileName2 in FileNames)
-								File.Delete(FileName2);
+							if (FileNames != null)
+							{
+								foreach (string FileName2 in FileNames)
+									File.Delete(FileName2);
+							}
 						}
 					}
 				}
+			}
+			catch (Exception ex)
+			{
+				Console.Out.WriteLine(ex.Message);
+				Console.Out.WriteLine(ex.StackTrace);
+				Log.Error(ex);
+			}
+			finally
+			{
+				Done.Set();
 			}
 		}
 

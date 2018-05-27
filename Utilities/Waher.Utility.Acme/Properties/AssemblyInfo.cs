@@ -6,12 +6,12 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Waher.Utility.Acme")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Command-line tool that helps you create certificates using the Automatic Certificate Management Environment (ACME) v2 protocol.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Waher.Utility.Acme")]
-[assembly: AssemblyCopyright("Copyright ©  2018")]
-[assembly: AssemblyTrademark("")]
+[assembly: AssemblyCompany("Waher Data AB")]
+[assembly: AssemblyProduct("Waher.IoTGateway")]
+[assembly: AssemblyCopyright("Copyright © Waher Data AB 2018. All rights reserved.")]
+[assembly: AssemblyTrademark("IoT Gateway")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible

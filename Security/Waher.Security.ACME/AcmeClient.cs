@@ -47,13 +47,23 @@ namespace Waher.Security.ACME
 			this.directoryEndpoint = DirectoryEndpoint;
 			this.jws = new RsaSsaPkcsSha256(KeySize, DirectoryEndpoint.ToString());
 
-			this.httpClient = new HttpClient(new HttpClientHandler()
+			try
 			{
-				AllowAutoRedirect = true,
-				AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip,
-				CheckCertificateRevocationList = true,
-				SslProtocols = SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12
-			}, true);
+				this.httpClient = new HttpClient(new HttpClientHandler()
+				{
+					AllowAutoRedirect = true,
+					AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip,
+					CheckCertificateRevocationList = true,
+					SslProtocols = SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12
+				}, true);
+			}
+			catch (PlatformNotSupportedException)
+			{
+				this.httpClient = new HttpClient(new HttpClientHandler()
+				{
+					AllowAutoRedirect = true
+				}, true);
+			}
 
 			this.httpClient.DefaultRequestHeaders.Add("User-Agent", typeof(AcmeClient).Namespace);
 			this.httpClient.DefaultRequestHeaders.Add("Accept", JwsAlgorithm.JwsContentType);

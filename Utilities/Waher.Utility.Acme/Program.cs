@@ -744,6 +744,20 @@ namespace Waher.Utility.Acme
 
 								File.WriteAllText(CertificateFileName2, PemOutput.ToString(), Encoding.ASCII);
 
+								if (Index == 1)
+								{
+									try
+									{
+										Certificate.PrivateKey = RSA;
+										Bin = Certificate.Export(X509ContentType.Pfx, Password);
+										File.WriteAllBytes(CertificateFileName + ".pfx", Bin);
+									}
+									catch (Exception ex)
+									{
+										Log.Error("Unable to export certificate to PFX: " + ex.Message);
+									}
+								}
+
 								Index++;
 							}
 						}

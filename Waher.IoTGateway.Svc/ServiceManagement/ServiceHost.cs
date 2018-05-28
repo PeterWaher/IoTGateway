@@ -206,6 +206,7 @@ namespace Waher.IoTGateway.Svc.ServiceManagement
 		/// <param name="Description">Service description.</param>
 		/// <param name="StartType">How the service should be started.</param>
 		/// <param name="StartImmediately">If the service should be started immediately.</param>
+		/// <param name="FailureActions">Service failure actions.</param>
 		/// <param name="Credentials">Credentials to use when running service.</param>
 		/// <returns>
 		/// Return code:
@@ -216,7 +217,8 @@ namespace Waher.IoTGateway.Svc.ServiceManagement
 		/// 3: Updated, started.
 		/// </returns>
 		/// <exception cref="Exception">If service could not be installed.</exception>
-		public int Install(string DisplayName, string Description, ServiceStartType StartType, bool StartImmediately, Win32ServiceCredentials Credentials)
+		public int Install(string DisplayName, string Description, ServiceStartType StartType, bool StartImmediately,
+			ServiceFailureActions FailureActions, Win32ServiceCredentials Credentials)
 		{
 			string Path = Assembly.GetExecutingAssembly().Location.Replace(".dll", ".exe");
 
@@ -235,11 +237,13 @@ namespace Waher.IoTGateway.Svc.ServiceManagement
 							if (!string.IsNullOrEmpty(Description))
 								existingService.SetDescription(Description);
 
-							/*if (serviceFailureActions != null)
+							if (FailureActions != null)
 							{
-								existingService.SetFailureActions(serviceFailureActions);
-								existingService.SetFailureActionFlag(failureActionsOnNonCrashFailures);
-							}*/
+								existingService.SetFailureActions(FailureActions);
+								existingService.SetFailureActionFlag(true);
+							}
+							else
+								existingService.SetFailureActionFlag(false);
 
 							if (StartImmediately)
 							{
@@ -260,11 +264,13 @@ namespace Waher.IoTGateway.Svc.ServiceManagement
 								if (!string.IsNullOrEmpty(Description))
 									svc.SetDescription(Description);
 
-								/*if (serviceFailureActions != null)
+								if (FailureActions != null)
 								{
-									svc.SetFailureActions(serviceFailureActions);
-									svc.SetFailureActionFlag(failureActionsOnNonCrashFailures);
-								}*/
+									svc.SetFailureActions(FailureActions);
+									svc.SetFailureActionFlag(true);
+								}
+								else
+									svc.SetFailureActionFlag(false);
 
 								if (StartImmediately)
 								{

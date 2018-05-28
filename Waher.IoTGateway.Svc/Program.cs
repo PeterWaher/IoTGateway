@@ -15,6 +15,7 @@ using Waher.Persistence.Files;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Settings;
 using Waher.IoTGateway.Svc.ServiceManagement;
+using Waher.IoTGateway.Svc.ServiceManagement.Classes;
 using Waher.IoTGateway.Svc.ServiceManagement.Enumerations;
 using Waher.IoTGateway.Svc.ServiceManagement.Structures;
 
@@ -240,7 +241,14 @@ namespace Waher.IoTGateway.Svc
 				if (Install)
 				{
 					Log.Informational("Installing service.");
-					InstallService(ServiceName, DisplayName, Description, StartType, Immediate, Credentials);
+
+					InstallService(ServiceName, DisplayName, Description, StartType, Immediate,
+						new ServiceFailureActions(new TimeSpan(1, 0, 0, 0), null, null, new ScAction[]
+						{
+							new ScAction() { Type = ScActionType.ScActionRestart, Delay = new TimeSpan(0, 1, 0) },
+							new ScAction() { Type = ScActionType.ScActionRestart, Delay = new TimeSpan(0, 1, 0) },
+							new ScAction() { Type = ScActionType.ScActionRestart, Delay = new TimeSpan(0, 1, 0) }
+						}), Credentials);
 				}
 				else if (Uninstall)
 				{
@@ -384,12 +392,12 @@ namespace Waher.IoTGateway.Svc
 		}
 
 		private static void InstallService(string ServiceName, string DisplayName, string Description, ServiceStartType StartType, bool Immediate,
-			Win32ServiceCredentials Credentials)
+			ServiceFailureActions FailureActions, Win32ServiceCredentials Credentials)
 		{
 			ServiceHost host = new ServiceHost(ServiceName);
 			int i;
 
-			switch (i = host.Install(DisplayName, Description, StartType, Immediate, Credentials))
+			switch (i = host.Install(DisplayName, Description, StartType, Immediate, FailureActions, Credentials))
 			{
 				case 0:
 					Console.Out.WriteLine("Service successfully installed. Service start is pending.");

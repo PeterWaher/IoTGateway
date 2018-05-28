@@ -158,7 +158,7 @@ namespace Waher.IoTGateway
 		private static Cache<string, TabQueue> eventsByTabID = GetQueueCache();
 		private static Cache<string, TabQueue> timeoutByTabID = GetTimeoutCache();
 		private static Dictionary<string, string> locationByTabID = new Dictionary<string, string>();
-		private static Dictionary<string, Dictionary<string, List<KeyValuePair<string, string>>>> tabIdsByLocation = 
+		private static Dictionary<string, Dictionary<string, List<KeyValuePair<string, string>>>> tabIdsByLocation =
 			new Dictionary<string, Dictionary<string, List<KeyValuePair<string, string>>>>(StringComparer.OrdinalIgnoreCase);
 
 		private static Cache<string, TabQueue> GetTimeoutCache()
@@ -211,7 +211,7 @@ namespace Waher.IoTGateway
 			TabQueue Queue = e.Value;
 			string TabID = Queue.TabID;
 			string Location;
-			
+
 			Queue.Queue.Clear();
 
 			lock (locationByTabID)
@@ -461,13 +461,13 @@ namespace Waher.IoTGateway
 			Json.Append('}');
 
 			string s = Json.ToString();
-			
+
 			if (TabIDs == null)
 				TabIDs = eventsByTabID.GetKeys();
 
 			foreach (string TabID in TabIDs)
 			{
-				if (eventsByTabID.TryGetValue(TabID, out TabQueue Queue))
+				if (TabID != null && eventsByTabID.TryGetValue(TabID, out TabQueue Queue))
 				{
 					lock (Queue)
 					{

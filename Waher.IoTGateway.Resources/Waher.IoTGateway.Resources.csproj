@@ -122,9 +122,11 @@
     <None Remove="Root\Markdown.md" />
     <None Remove="Root\Master.md" />
     <None Remove="Root\Script.md" />
+    <None Remove="Root\Settings\Config.css" />
+    <None Remove="Root\Settings\Domain.js" />
+    <None Remove="Root\Settings\Domain.md" />
     <None Remove="Root\Settings\Introduction.md" />
     <None Remove="Root\Settings\Next.js" />
-    <None Remove="Root\Settings\XMPP.css" />
     <None Remove="Root\Settings\XMPP.js" />
     <None Remove="Root\Settings\XMPP.md" />
     <None Remove="Root\Smileys.md" />
@@ -445,10 +447,16 @@
     <Content Include="Root\Settings\Next.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Root\Settings\Domain.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Settings\Domain.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Root\Settings\XMPP.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Root\Settings\XMPP.css">
+    <Content Include="Root\Settings\Config.css">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Root\Settings\XMPP.md">

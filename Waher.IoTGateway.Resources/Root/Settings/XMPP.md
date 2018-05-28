@@ -7,8 +7,9 @@ Master: ..\Master.md
 JavaScript: /Events.js
 JavaScript: /Settings/XMPP.js
 JavaScript: /Settings/Next.js
-CSS: /Settings/XMPP.css
-{{ConfigClass:=Waher.IoTGateway.Setup.XmppConfiguration;Config:=ConfigClass.Instance;Config.Complete ? "UserVariable: User\r\nLogin: /Login.md" : ""}}
+CSS: /Settings/Config.css
+UserVariable: User
+Login: /Login.md
 
 ========================================================================
 
@@ -29,7 +30,7 @@ you wish to use. Or click on any of the featured servers below. You can also use
 <p>
 <label for="XmppServer">Server:</label>  
 <input id="XmppServer" name="XmppServer" type="text" style="width:20em" title="Name of server that hosts the XMPP server."
-	value="{{Config.Host}}" {{Config.Step=0 ? "autofocus" : ""}}/>
+	value="{{ConfigClass:=Waher.IoTGateway.Setup.XmppConfiguration;Config:=ConfigClass.Instance;Config.Host}}" {{Config.Step=0 ? "autofocus" : ""}}/>
 </p>
 
 <p id="XmppServerError" class="error" style="display:none">You must select an XMPP server.</p>
@@ -146,7 +147,7 @@ Password is incorrect, or a new account was not permitted to be created.
 <p id="NextMessage" class="message" style="display:none">Connection successful. Press the Next button to save settings and continue.</p>
 
 <button type='button' onclick='ConnectToHost()'>Connect</button>
-<button id='NextButton' type='button' onclick='Next()' style='display:{{Config.Step>1 ? "inline" : "none"}}'>Next</button>
+<button id='NextButton' type='button' onclick='Next()' style='display:{{Config.Step>1 ? "inline-block" : "none"}}'>Next</button>
 
 </fieldset>
 

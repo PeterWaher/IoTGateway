@@ -1043,14 +1043,18 @@
 								<RemoveFolder Id='SettingsFiles' On='uninstall' />
 								<File Id='Introduction.md' Name='Introduction.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Introduction.md'/>
 								<File Id='Next.js' Name='Next.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Next.js' KeyPath='yes'/>
-								<File Id='XMPP.css' Name='XMPP.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\XMPP.css'/>
+								<File Id='Config.css' Name='Config.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Config.css'/>
 								<File Id='XMPP.js' Name='XMPP.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\XMPP.js'/>
 								<File Id='XMPP.md' Name='XMPP.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\XMPP.md'/>
+								<File Id='Domain.js' Name='Domain.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Domain.js'/>
+								<File Id='Domain.md' Name='Domain.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Domain.md'/>
 								<RemoveFile Id='Next.js' Name='Next.js' On='uninstall'/>
 								<RemoveFile Id='Introduction.md' Name='Introduction.md' On='uninstall'/>
-								<RemoveFile Id='XMPP.css' Name='XMPP.css' On='uninstall'/>
+								<RemoveFile Id='Config.css' Name='Config.css' On='uninstall'/>
 								<RemoveFile Id='XMPP.js' Name='XMPP.js' On='uninstall'/>
 								<RemoveFile Id='XMPP.md' Name='XMPP.md' On='uninstall'/>
+								<RemoveFile Id='Domain.js' Name='Domain.js' On='uninstall'/>
+								<RemoveFile Id='Domain.md' Name='Domain.md' On='uninstall'/>
 							</Component>
 						</Directory>
 						<Directory Id='Templates' Name='Templates'>

@@ -531,7 +531,7 @@ namespace Waher.IoTGateway
 				}
 
 				ClientEvents.PushEvent(ClientEvents.GetTabIDs(), "Reload", string.Empty);
-				
+
 				coapEndpoint = new CoapEndpoint();
 				Types.SetModuleParameter("CoAP", coapEndpoint);
 
@@ -1259,10 +1259,15 @@ namespace Waher.IoTGateway
 			else
 				return;
 
-#if MONO
-			Log.Informational("Local user logged in.", string.Empty, Request.RemoteEndPoint, "LoginSuccessful", EventLevel.Minor);
-			Login.DoLogin(Request, From);
-#else
+#if !MONO
+			if (XmppConfiguration.Instance == null || !XmppConfiguration.Instance.Complete)
+#endif
+			{
+				Log.Informational("Local user logged in.", string.Empty, Request.RemoteEndPoint, "LoginSuccessful", EventLevel.Minor);
+				Login.DoLogin(Request, From);
+			}
+
+#if !MONO
 			try
 			{
 				using (Process Proc = new Process())
@@ -1601,6 +1606,26 @@ namespace Waher.IoTGateway
 			d /= ulong.MaxValue;
 
 			return d;
+		}
+
+		/// <summary>
+		/// Generates an array of random bytes.
+		/// </summary>
+		/// <param name="NrBytes">Number of random bytes to generate.</param>
+		/// <returns>Random bytes.</returns>
+		public static byte[] NextBytes(int NrBytes)
+		{
+			if (NrBytes < 0)
+				throw new ArgumentException("Number of bytes must be non-negative.", nameof(NrBytes));
+
+			byte[] Result = new byte[NrBytes];
+
+			lock (rnd)
+			{
+				rnd.GetBytes(Result);
+			}
+
+			return Result;
 		}
 
 		#endregion

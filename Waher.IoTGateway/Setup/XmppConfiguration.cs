@@ -472,15 +472,9 @@ namespace Waher.IoTGateway.Setup
 
 		private void RandomizePassword(HttpRequest Request, HttpResponse Response)
 		{
-			using (RandomNumberGenerator Gen = RandomNumberGenerator.Create())
-			{
-				byte[] Bin = new byte[32];
-				Gen.GetBytes(Bin);
-
-				Response.StatusCode = 200;
-				Response.ContentType = "text/plain";
-				Response.Write(Hashes.BinaryToString(Bin));
-			}
+			Response.StatusCode = 200;
+			Response.ContentType = "text/plain";
+			Response.Write(Hashes.BinaryToString(Gateway.NextBytes(32)));
 		}
 
 		/// <summary>

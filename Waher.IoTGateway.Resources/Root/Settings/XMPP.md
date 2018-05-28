@@ -8,9 +8,7 @@ JavaScript: /Events.js
 JavaScript: /Settings/XMPP.js
 JavaScript: /Settings/Next.js
 CSS: /Settings/XMPP.css
-UserVariable: User
-Login: /Login.md
-
+{{ConfigClass:=Waher.IoTGateway.Setup.XmppConfiguration;Config:=ConfigClass.Instance;Config.Complete ? "UserVariable: User\r\nLogin: /Login.md" : ""}}
 
 ========================================================================
 
@@ -25,13 +23,13 @@ The IoT Gateway requires a connection to an XMPP network to work properly. The X
 IoT Gateway in a secure manner, from anywhere where you have access to the same XMPP network, even if you reside behind a different firewall. 
 If the server has provisioning support, it will provide for additional security for any embedded devices. Enter the domain name of the XMPP server 
 you wish to use. Or click on any of the featured servers below. You can also use any of the free public servers listed at 
-[xmpp.net](https://xmpp.net/directory.php). If you're an expert user, you can also setup your own XMPP server. 
+[xmpp.net](https://xmpp.net/directory.php). If you're an expert user, you can also set up your own XMPP server. 
 [xmpp.org](https://xmpp.org/software/servers.html) publishes an abridged list of XMPP server software you can use.
 
 <p>
 <label for="XmppServer">Server:</label>  
 <input id="XmppServer" name="XmppServer" type="text" style="width:20em" title="Name of server that hosts the XMPP server."
-	value="{{ConfigClass:=Waher.IoTGateway.Setup.XmppConfiguration;Config:=ConfigClass.Instance;Config.Host}}" {{Config.Step=0 ? "autofocus" : ""}}/>
+	value="{{Config.Host}}" {{Config.Step=0 ? "autofocus" : ""}}/>
 </p>
 
 <p id="XmppServerError" class="error" style="display:none">You must select an XMPP server.</p>

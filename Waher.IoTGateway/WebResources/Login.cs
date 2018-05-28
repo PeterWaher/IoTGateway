@@ -62,10 +62,9 @@ namespace Waher.IoTGateway.WebResources
 					throw new BadRequestException();
 
 				object Obj = Request.DecodeData();
-				Dictionary<string, string> Form = Obj as Dictionary<string, string>;
 				string From;
 
-				if (Form == null ||
+				if (!(Obj is Dictionary<string, string> Form) ||
 					!Form.TryGetValue("UserName", out string UserName) ||
 					!Form.TryGetValue("Password", out string Password))
 				{

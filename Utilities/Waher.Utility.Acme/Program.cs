@@ -691,6 +691,9 @@ namespace Waher.Utility.Acme
 							if (Order.Certificate == null)
 								throw new Exception("No certificate URI provided.");
 
+							LogInformational("Downloading certificate.",
+								new KeyValuePair<string, object>("URL", Order.Certificate.ToString()));
+
 							X509Certificate2[] Certificates = await Order.DownloadCertificate();
 
 							string CertificateFileNameBase;

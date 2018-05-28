@@ -766,6 +766,36 @@ namespace Waher.Utility.Acme
 									{
 										LogError("Unable to export certificate to PFX: " + ex.Message);
 									}
+
+									try
+									{
+										LogInformational("Testing certificate.",
+											new KeyValuePair<string, object>("FileName", CertificateFileName));
+
+										X509Certificate2 Certificate2 = new X509Certificate2(CertificateFileName, password);
+
+										LogInformational("Certificate loaded.",
+											new KeyValuePair<string, object>("FileName", CertificateFileName),
+											new KeyValuePair<string, object>("FriendlyName", Certificate.FriendlyName),
+											new KeyValuePair<string, object>("HasPrivateKey", Certificate.HasPrivateKey),
+											new KeyValuePair<string, object>("Issuer", Certificate.Issuer),
+											new KeyValuePair<string, object>("NotAfter", Certificate.NotAfter),
+											new KeyValuePair<string, object>("NotBefore", Certificate.NotBefore),
+											new KeyValuePair<string, object>("SerialNumber", Certificate.SerialNumber),
+											new KeyValuePair<string, object>("Subject", Certificate.Subject),
+											new KeyValuePair<string, object>("Thumbprint", Certificate.Thumbprint));
+
+										if (!Certificate.HasPrivateKey)
+										{
+											LogError("Private key not successfully exported.",
+												new KeyValuePair<string, object>("FileName", CertificateFileName));
+										}
+									}
+									catch (Exception ex)
+									{
+										LogError("Unable to load certificate: " + ex.Message,
+											new KeyValuePair<string, object>("FileName", CertificateFileName));
+									}
 								}
 
 								Index++;

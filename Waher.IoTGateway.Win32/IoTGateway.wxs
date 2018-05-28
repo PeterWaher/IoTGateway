@@ -230,7 +230,6 @@
               <File Id='System.Security.Cryptography.Primitives.dll' Name='System.Security.Cryptography.Primitives.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Security.Cryptography.Primitives.dll' Vital='yes'/>
               <File Id='System.Security.Cryptography.X509Certificates.dll' Name='System.Security.Cryptography.X509Certificates.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Security.Cryptography.X509Certificates.dll' Vital='yes'/>
               <File Id='System.Security.dll' Name='System.Security.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Security.dll' Vital='yes'/>
-							<File Id='System.Security.Permissions.dll' Name='System.Security.Permissions.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Security.Permissions.dll' Vital='yes'/>
 							<File Id='System.Security.Principal.dll' Name='System.Security.Principal.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Security.Principal.dll' Vital='yes'/>
 							<File Id='System.Security.Principal.Windows.dll' Name='System.Security.Principal.Windows.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Security.Principal.Windows.dll' Vital='yes'/>
               <File Id='System.Security.SecureString.dll' Name='System.Security.SecureString.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Security.SecureString.dll' Vital='yes'/>
@@ -380,7 +379,6 @@
               <RemoveFile Id='RemoveSystem.Security.Cryptography.Primitives.dll' Name='System.Security.Cryptography.Primitives.dll'  On='uninstall' />
               <RemoveFile Id='RemoveSystem.Security.Cryptography.X509Certificates.dll' Name='System.Security.Cryptography.X509Certificates.dll'  On='uninstall' />
               <RemoveFile Id='RemoveSystem.Security.dll' Name='System.Security.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Security.Permissions.dll' Name='System.Security.Permissions.dll'  On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Security.Principal.dll' Name='System.Security.Principal.dll'  On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Security.Principal.Windows.dll' Name='System.Security.Principal.Windows.dll'  On='uninstall' />
               <RemoveFile Id='RemoveSystem.Security.SecureString.dll' Name='System.Security.SecureString.dll'  On='uninstall' />
@@ -468,12 +466,8 @@
               <RemoveFile Id='RemoveWindowsBase.dll' Name='WindowsBase.dll' On='uninstall'/>
             </Component>
             <Component Id='ExternalLibraries' Guid='81E97453-D3BA-4CA0-8875-3E2DE48A383B'>
-							<File Id='CoreCompat.System.Drawing.dll' Name='CoreCompat.System.Drawing.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\CoreCompat.System.Drawing.dll' Vital='yes'/>
-							<File Id='Gma.QrCodeNet.Encoding.dll' Name='Gma.QrCodeNet.Encoding.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Gma.QrCodeNet.Encoding.dll' Vital='yes' KeyPath='yes'/>
 							<File Id='SkiaSharp.dll' Name='SkiaSharp.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\SkiaSharp.dll' Vital='yes'/>
               <File Id='libSkiaSharp.dll' Name='libSkiaSharp.dll' DiskId='1' Source='..\..\..\Script\Waher.Script.Lab\Bin\Debug\libSkiaSharp.dll' Vital='yes'/>
-              <RemoveFile Id='RemoveGma.QrCodeNet.Encoding.dll' Name='Gma.QrCodeNet.Encoding.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveCoreCompat.System.Drawing.dll' Name='CoreCompat.System.Drawing.dll' On='uninstall'/>
               <RemoveFile Id='RemoveSkiaSharp.dll' Name='SkiaSharp.dll' On='uninstall'/>
               <RemoveFile Id='RemovelibSkiaSharp.dll' Name='libSkiaSharp.dll' On='uninstall'/>
             </Component>
@@ -746,6 +740,16 @@
               <File Id='Waher.Utility.AnalyzeDB.pdb' Name='Waher.Utility.AnalyzeDB.pdb' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.AnalyzeDB\bin\$(var.Configuration)\netcoreapp2.0\Waher.Utility.AnalyzeDB.pdb' Vital='yes' KeyPath='yes'/>
               <RemoveFile Id='RemoveWaher.Utility.AnalyzeDB.pdb' Name='Waher.Utility.AnalyzeDB.pdb' On='uninstall'/>
             </Component>
+						<Component Id='UtilityAcme' Guid='2E98966A-F96C-492E-9C82-243F37BD5AE0'>
+							<File Id='Waher.Utility.Acme.exe' Name='Waher.Utility.Acme.exe' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Acme\bin\$(var.Configuration)\Waher.Utility.Acme.exe' Vital='yes' KeyPath='yes'/>
+							<File Id='Waher.Utility.Acme.exe.config' Name='Waher.Utility.Acme.exe.config' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Acme\bin\$(var.Configuration)\Waher.Utility.Acme.exe.config' Vital='yes'/>
+							<RemoveFile Id='RemoveWaher.Utility.Acme.exe' Name='Waher.Utility.Acme.exe' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Utility.Acme.exe.config' Name='Waher.Utility.Acme.exe.config' On='uninstall'/>
+						</Component>
+						<Component Id='UtilityAcmeDebugFiles' Guid='E0368978-B9F4-426C-8569-1345758C4565'>
+							<File Id='Waher.Utility.Acme.pdb' Name='Waher.Utility.Acme.pdb' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Acme\bin\$(var.Configuration)\Waher.Utility.Acme.pdb' Vital='yes' KeyPath='yes'/>
+							<RemoveFile Id='RemoveWaher.Utility.Acme.pdb' Name='Waher.Utility.Acme.pdb' On='uninstall'/>
+						</Component>
 						<Directory Id='Graphics' Name='Graphics'>
 							<Component Id='Emoji1Zip' Guid='B7FF03C8-054C-4E72-A87B-DFBE1C3710C5'>
 								<RemoveFolder Id='RemoveEmoji1Folder' On='uninstall' />
@@ -1099,14 +1103,16 @@
       </Feature>
       <Feature Id='Utilities' Title='Utilities' Description='Contains command-line utilities for management of the gateway.' Level='1'>
         <ComponentRef Id='UtilityInstall' />
-        <ComponentRef Id='UtilityAnalyzeDB' />
-      </Feature>
+				<ComponentRef Id='UtilityAnalyzeDB' />
+				<ComponentRef Id='UtilityAcme' />
+			</Feature>
       <Feature Id='DebugFiles' Title='Debug Files' Description='Provides debug files. This will help debugging, since it provides more information in case something goes wrong.' Level='1000'>
         <ComponentRef Id='MainDebugFiles'/>
         <ComponentRef Id='ScriptWebServiceDebugFiles'/>
         <ComponentRef Id='UtilityInstallDebugFiles' />
-        <ComponentRef Id='UtilityAnalyzeDBDebugFiles' />
-      </Feature>
+				<ComponentRef Id='UtilityAnalyzeDBDebugFiles' />
+				<ComponentRef Id='UtilityAcmeDebugFiles' />
+			</Feature>
     </Feature>
     <WixVariable Id="WixUIBannerBmp" Value="..\..\banner.bmp" />
     <WixVariable Id="WixUIDialogBmp" Value="..\..\dialog.bmp" />

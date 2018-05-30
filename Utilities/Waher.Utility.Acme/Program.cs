@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Runtime.Inventory;
 using Waher.Security.ACME;
+using Waher.Security.PKCS;
 
 namespace Waher.Utility.Acme
 {
@@ -657,7 +658,7 @@ namespace Waher.Utility.Acme
 
 							SignatureAlgorithm SignAlg = new RsaSha256(RSA);
 
-							Order = await Order.FinalizeOrder(new Security.ACME.CertificateRequest(SignAlg)
+							Order = await Order.FinalizeOrder(new CertificateRequest(SignAlg)
 							{
 								CommonName = domainNames[0],
 								SubjectAlternativeNames = DomainNames,

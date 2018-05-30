@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Waher.Security.ACME
+namespace Waher.Security.PKCS
 {
 	/// <summary>
 	/// Type class
@@ -509,29 +509,29 @@ namespace Waher.Security.ACME
 		}
 
 		/// <summary>
-		/// Encodes an end-of-content (EOC) to the output.
+		/// Encodes content to the output.
 		/// </summary>
 		/// <param name="Class">Class</param>
-		public void EndOfContent(Asn1TypeClass Class)
+		public void Content(Asn1TypeClass Class)
 		{
 			this.output.Add((byte)((((int)Class) << 6) | 0x20));
 			this.output.Add(0);
 		}
 
 		/// <summary>
-		/// Starts an End-of-Content (EOC) section.
+		/// Starts a content section.
 		/// </summary>
 		/// <param name="Class">Class</param>
-		public void StartEndOfContent(Asn1TypeClass Class)
+		public void StartContent(Asn1TypeClass Class)
 		{
 			this.Start((byte)((((int)Class) << 6) | 0x20));
 		}
 
 		/// <summary>
-		/// Ends the current End-of-Content (EOC) section.
+		/// Ends the current Content section.
 		/// </summary>
 		/// <param name="Class">Class</param>
-		public void EndEndOfContent(Asn1TypeClass Class)
+		public void EndContent(Asn1TypeClass Class)
 		{
 			this.End((byte)((((int)Class) << 6) | 0x20));
 		}

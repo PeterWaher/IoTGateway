@@ -532,6 +532,7 @@
 							<File Id='Waher.Security.DTLS.dll' Name='Waher.Security.DTLS.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.DTLS.dll' Vital='yes'/>
 							<File Id='Waher.Security.JWS.dll' Name='Waher.Security.JWS.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.JWS.dll' Vital='yes'/>
 							<File Id='Waher.Security.JWT.dll' Name='Waher.Security.JWT.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.JWT.dll' Vital='yes'/>
+							<File Id='Waher.Security.PKCS.dll' Name='Waher.Security.PKCS.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.PKCS.dll' Vital='yes'/>
 							<File Id='Waher.Things.dll' Name='Waher.Things.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Things.dll' Vital='yes'/>
               <File Id='Waher.Things.IP.dll' Name='Waher.Things.IP.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Things.IP.dll' Vital='yes'/>
               <File Id='Waher.Things.Metering.dll' Name='Waher.Things.Metering.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Things.Metering.dll' Vital='yes'/>
@@ -588,6 +589,7 @@
 							<RemoveFile Id='RemoveWaher.Security.DTLS.dll' Name='Waher.Security.DTLS.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Security.JWS.dll' Name='Waher.Security.JWS.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Security.JWT.dll' Name='Waher.Security.JWT.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Security.PKCS.dll' Name='Waher.Security.PKCS.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Things.dll' Name='Waher.Things.dll' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Things.IP.dll' Name='Waher.Things.IP.dll' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Things.Metering.dll' Name='Waher.Things.Metering.dll' On='uninstall'/>
@@ -641,6 +643,7 @@
 							<File Id='Waher.Security.DTLS.pdb' Name='Waher.Security.DTLS.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.DTLS.pdb' Vital='yes'/>
 							<File Id='Waher.Security.JWS.pdb' Name='Waher.Security.JWS.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.JWS.pdb' Vital='yes'/>
 							<File Id='Waher.Security.JWT.pdb' Name='Waher.Security.JWT.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.JWT.pdb' Vital='yes'/>
+							<File Id='Waher.Security.PKCS.pdb' Name='Waher.Security.PKCS.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.PKCS.pdb' Vital='yes'/>
 							<File Id='Waher.Things.pdb' Name='Waher.Things.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Things.pdb' Vital='yes'/>
               <File Id='Waher.Things.IP.pdb' Name='Waher.Things.IP.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Things.IP.pdb' Vital='yes'/>
               <File Id='Waher.Things.Metering.pdb' Name='Waher.Things.Metering.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Things.Metering.pdb' Vital='yes'/>
@@ -692,6 +695,7 @@
 							<RemoveFile Id='RemoveWaher.Security.DTLS.pdb' Name='Waher.Security.DTLS.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Security.JWS.pdb' Name='Waher.Security.JWS.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Security.JWT.pdb' Name='Waher.Security.JWT.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Security.PKCS.pdb' Name='Waher.Security.PKCS.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Things.pdb' Name='Waher.Things.pdb' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Things.IP.pdb' Name='Waher.Things.IP.pdb' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Things.Metering.pdb' Name='Waher.Things.Metering.pdb' On='uninstall'/>
@@ -926,12 +930,13 @@
 							<File Id='Acme_Waher.Runtime.Inventory.pdb' Name='Waher.Runtime.Inventory.pdb' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Acme\bin\$(var.Configuration)\Waher.Runtime.Inventory.pdb' Vital='yes'/>
 							<File Id='Acme_Waher.Script.dll' Name='Waher.Script.dll' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Acme\bin\$(var.Configuration)\Waher.Script.dll' Vital='yes'/>
 							<File Id='Acme_Waher.Script.pdb' Name='Waher.Script.pdb' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Acme\bin\$(var.Configuration)\Waher.Script.pdb' Vital='yes'/>
+							<File Id='Acme_Waher.Security.dll' Name='Waher.Security.dll' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Acme\bin\$(var.Configuration)\Waher.Security.dll' Vital='yes'/>
+							<File Id='Acme_Waher.Security.pdb' Name='Waher.Security.pdb' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Acme\bin\$(var.Configuration)\Waher.Security.pdb' Vital='yes'/>
 							<File Id='Acme_Waher.Security.ACME.dll' Name='Waher.Security.ACME.dll' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Acme\bin\$(var.Configuration)\Waher.Security.ACME.dll' Vital='yes'/>
 							<File Id='Acme_Waher.Security.ACME.pdb' Name='Waher.Security.ACME.pdb' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Acme\bin\$(var.Configuration)\Waher.Security.ACME.pdb' Vital='yes'/>
-							<File Id='Acme_Waher.Security.dll' Name='Waher.Security.dll' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Acme\bin\$(var.Configuration)\Waher.Security.dll' Vital='yes'/>
 							<File Id='Acme_Waher.Security.JWS.dll' Name='Waher.Security.JWS.dll' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Acme\bin\$(var.Configuration)\Waher.Security.JWS.dll' Vital='yes'/>
 							<File Id='Acme_Waher.Security.JWS.pdb' Name='Waher.Security.JWS.pdb' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Acme\bin\$(var.Configuration)\Waher.Security.JWS.pdb' Vital='yes'/>
-							<File Id='Acme_Waher.Security.pdb' Name='Waher.Security.pdb' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Acme\bin\$(var.Configuration)\Waher.Security.pdb' Vital='yes'/>
+							<File Id='Acme_Waher.Security.PKCS.dll' Name='Waher.Security.PKCS.dll' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Acme\bin\$(var.Configuration)\Waher.Security.PKCS.dll' Vital='yes'/>
 							<RemoveFile Id='RemoveWaher.Utility.Acme.exe' Name='Waher.Utility.Acme.exe' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Utility.Acme.exe.config' Name='Waher.Utility.Acme.exe.config' On='uninstall'/>
 							<RemoveFile Id='RemoveAcme_System.Net.Http.dll' Name='System.Net.Http.dll' On='uninstall'/>
@@ -950,12 +955,13 @@
 							<RemoveFile Id='RemoveAcme_Waher.Runtime.Inventory.pdb' Name='Waher.Runtime.Inventory.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveAcme_Waher.Script.dll' Name='Waher.Script.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveAcme_Waher.Script.pdb' Name='Waher.Script.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveAcme_Waher.Security.dll' Name='Waher.Security.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveAcme_Waher.Security.pdb' Name='Waher.Security.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveAcme_Waher.Security.ACME.dll' Name='Waher.Security.ACME.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveAcme_Waher.Security.ACME.pdb' Name='Waher.Security.ACME.pdb' On='uninstall'/>
-							<RemoveFile Id='RemoveAcme_Waher.Security.dll' Name='Waher.Security.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveAcme_Waher.Security.JWS.dll' Name='Waher.Security.JWS.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveAcme_Waher.Security.JWS.pdb' Name='Waher.Security.JWS.pdb' On='uninstall'/>
-							<RemoveFile Id='RemoveAcme_Waher.Security.pdb' Name='Waher.Security.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveAcme_Waher.Security.PKCS.dll' Name='Waher.Security.PKCS.dll' On='uninstall'/>
 						</Component>
 						<Component Id='UtilityAcmeDebugFiles' Guid='E0368978-B9F4-426C-8569-1345758C4565'>
 							<File Id='Waher.Utility.Acme.pdb' Name='Waher.Utility.Acme.pdb' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Acme\bin\$(var.Configuration)\Waher.Utility.Acme.pdb' Vital='yes' KeyPath='yes'/>

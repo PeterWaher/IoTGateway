@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Waher.Security.ACME
+namespace Waher.Security.PKCS
 {
 	/// <summary>
 	/// Abstract base class for signature algorithms
 	/// </summary>
-    public abstract class SignatureAlgorithm
+    public abstract class PasswordEncryption
     {
 		/// <summary>
 		/// Object Identity for the PKI algorithm.

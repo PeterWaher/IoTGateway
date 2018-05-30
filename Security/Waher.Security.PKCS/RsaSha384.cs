@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Security.Cryptography;
 
-namespace Waher.Security.ACME
+namespace Waher.Security.PKCS
 {
 	/// <summary>
 	/// RSA with SHA-384 signatures

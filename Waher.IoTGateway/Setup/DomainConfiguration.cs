@@ -11,6 +11,7 @@ using Waher.Persistence;
 using Waher.Persistence.Attributes;
 using Waher.Security;
 using Waher.Security.ACME;
+using Waher.Security.PKCS;
 
 namespace Waher.IoTGateway.Setup
 {
@@ -608,7 +609,7 @@ namespace Waher.IoTGateway.Setup
 
 						SignatureAlgorithm SignAlg = new RsaSha256(RSA);
 
-						Order = await Order.FinalizeOrder(new Security.ACME.CertificateRequest(SignAlg)
+						Order = await Order.FinalizeOrder(new CertificateRequest(SignAlg)
 						{
 							CommonName = this.domain,
 							SubjectAlternativeNames = DomainNames,

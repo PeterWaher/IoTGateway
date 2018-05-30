@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Waher.Security.JWS;
 
-namespace Waher.Security.ACME
+namespace Waher.Security.PKCS
 {
 	/// <summary>
 	/// Contains information about a Certificate Signing Request (CSR).
@@ -329,7 +328,7 @@ namespace Waher.Security.ACME
 			DER.EndBITSTRING();      // end of subjectPublicKey
 			DER.EndSEQUENCE();       // end of subjectPKInfo
 
-			DER.StartEndOfContent(Asn1TypeClass.ContextSpecific);	// attributes
+			DER.StartContent(Asn1TypeClass.ContextSpecific);	// attributes
 
 			if (this.subjectAlternativeNames != null && this.subjectAlternativeNames.Length > 0)
 			{
@@ -357,7 +356,7 @@ namespace Waher.Security.ACME
 				DER.EndSEQUENCE();
 			}
 
-			DER.EndEndOfContent(Asn1TypeClass.ContextSpecific);	// end of attributes
+			DER.EndContent(Asn1TypeClass.ContextSpecific);	// end of attributes
 			DER.EndSEQUENCE();       // end of CertificationRequestInfo
 
 			byte[] CertificationRequestInfo = DER.ToArray();

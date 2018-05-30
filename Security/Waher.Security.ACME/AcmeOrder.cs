@@ -5,6 +5,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Xml;
+using Waher.Security.PKCS;
 
 namespace Waher.Security.ACME
 {

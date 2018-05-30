@@ -11,7 +11,8 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Security.JWS;
-using Waher.Security.ACME.Decoders;
+using Waher.Security.PKCS;
+using Waher.Security.PKCS.Decoders;
 
 namespace Waher.Security.ACME
 {

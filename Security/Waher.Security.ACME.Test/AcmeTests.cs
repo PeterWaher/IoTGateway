@@ -2,6 +2,7 @@
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Waher.Security.PKCS;
 
 namespace Waher.Security.ACME.Test
 {

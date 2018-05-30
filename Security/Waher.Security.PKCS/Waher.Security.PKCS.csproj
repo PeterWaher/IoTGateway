@@ -7,28 +7,30 @@
     <Authors>Peter Waher</Authors>
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
-    <Description>Implements the ACME v2 protocol for the generation of certificates using ACME-compliant certificate servers.</Description>
+    <Description>Contains classes and tools for working with Public Key Cryptography Standards (PKCS).</Description>
     <Copyright>Copyright © Waher Data AB 2018. All rights reserved.</Copyright>
     <PackageLicenseUrl>https://github.com/PeterWaher/IoTGateway#license</PackageLicenseUrl>
-    <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Security/Waher.Security.ACME</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Security/Waher.Security.PKCS</PackageProjectUrl>
     <PackageIconUrl>https://github.com/PeterWaher/IoTGateway/blob/master/Images/Icon.ico?raw=true</PackageIconUrl>
     <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
-    <PackageTags>Security Certificates ACME X.509</PackageTags>
-    <NeutralLanguage>English</NeutralLanguage>
+    <PackageTags>Security PKCS PKI PFX DER ASN.1</PackageTags>
     <AssemblyVersion>1.0.0</AssemblyVersion>
     <FileVersion>1.0.0</FileVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>bin\Debug\netstandard1.3\Waher.Security.ACME.xml</DocumentationFile>
+    <DocumentationFile>bin\Debug\netstandard1.3\Waher.Security.PKCS.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Content\Waher.Content.Xml\Waher.Content.Xml.csproj" />
+    <PackageReference Include="System.Security.Cryptography.Algorithms" Version="4.3.1" />
+    <PackageReference Include="System.Security.Cryptography.Csp" Version="4.3.0" />
+    <PackageReference Include="System.Security.Cryptography.Primitives" Version="4.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\Content\Waher.Content\Waher.Content.csproj" />
-    <ProjectReference Include="..\Waher.Security.JWS\Waher.Security.JWS.csproj" />
-    <ProjectReference Include="..\Waher.Security.PKCS\Waher.Security.PKCS.csproj" />
     <ProjectReference Include="..\Waher.Security\Waher.Security.csproj" />
   </ItemGroup>
 

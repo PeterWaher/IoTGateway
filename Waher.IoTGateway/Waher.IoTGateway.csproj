@@ -73,6 +73,7 @@
     <ProjectReference Include="..\Security\Waher.Security.DTLS\Waher.Security.DTLS.csproj" />
     <ProjectReference Include="..\Security\Waher.Security.JWS\Waher.Security.JWS.csproj" />
     <ProjectReference Include="..\Security\Waher.Security.JWT\Waher.Security.JWT.csproj" />
+    <ProjectReference Include="..\Security\Waher.Security.PKCS\Waher.Security.PKCS.csproj" />
     <ProjectReference Include="..\Security\Waher.Security\Waher.Security.csproj" />
     <ProjectReference Include="..\Things\Waher.Things.Metering\Waher.Things.Metering.csproj" />
     <ProjectReference Include="..\Things\Waher.Things\Waher.Things.csproj" />

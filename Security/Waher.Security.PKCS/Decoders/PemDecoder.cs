@@ -5,7 +5,7 @@ using System.Text;
 using Waher.Content;
 using Waher.Runtime.Inventory;
 
-namespace Waher.Security.ACME.Decoders
+namespace Waher.Security.PKCS.Decoders
 {
 	/// <summary>
 	/// Decodes certificates encoded using the application/pem-certificate-chain content type.

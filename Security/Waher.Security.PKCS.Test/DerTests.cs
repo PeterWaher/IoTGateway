@@ -2,11 +2,9 @@
 using System.Collections;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Waher.Security.JWS;
 
-namespace Waher.Security.ACME.Test
+namespace Waher.Security.PKCS.Test
 {
 	[TestClass]
 	public class DerTests
@@ -349,7 +347,7 @@ namespace Waher.Security.ACME.Test
 			this.derOutput.EndBITSTRING();      // end of subjectPublicKey
 			this.derOutput.EndSEQUENCE();       // end of subjectPKInfo
 
-			this.derOutput.EndOfContent(Asn1TypeClass.ContextSpecific);     // attributes
+			this.derOutput.Content(Asn1TypeClass.ContextSpecific);     // attributes
 			this.derOutput.EndSEQUENCE();       // end of CertificationRequestInfo
 
 			this.derOutput.StartSEQUENCE();     // signatureAlgorithm
@@ -448,7 +446,7 @@ namespace Waher.Security.ACME.Test
 				this.derOutput.EndBITSTRING();      // end of subjectPublicKey
 				this.derOutput.EndSEQUENCE();       // end of subjectPKInfo
 
-				this.derOutput.EndOfContent(Asn1TypeClass.ContextSpecific);     // attributes
+				this.derOutput.Content(Asn1TypeClass.ContextSpecific);     // attributes
 				this.derOutput.EndSEQUENCE();       // end of CertificationRequestInfo
 
 
@@ -542,7 +540,7 @@ namespace Waher.Security.ACME.Test
 				this.derOutput.EndBITSTRING();      // end of subjectPublicKey
 				this.derOutput.EndSEQUENCE();       // end of subjectPKInfo
 
-				this.derOutput.EndOfContent(Asn1TypeClass.ContextSpecific);     // attributes
+				this.derOutput.Content(Asn1TypeClass.ContextSpecific);     // attributes
 				this.derOutput.EndSEQUENCE();       // end of CertificationRequestInfo
 
 
@@ -601,7 +599,7 @@ namespace Waher.Security.ACME.Test
 				this.derOutput.EndBITSTRING();      // end of subjectPublicKey
 				this.derOutput.EndSEQUENCE();       // end of subjectPKInfo
 
-				this.derOutput.EndOfContent(Asn1TypeClass.ContextSpecific);     // attributes
+				this.derOutput.Content(Asn1TypeClass.ContextSpecific);     // attributes
 				this.derOutput.EndSEQUENCE();       // end of CertificationRequestInfo
 
 
@@ -660,7 +658,7 @@ namespace Waher.Security.ACME.Test
 				this.derOutput.EndBITSTRING();      // end of subjectPublicKey
 				this.derOutput.EndSEQUENCE();       // end of subjectPKInfo
 
-				this.derOutput.EndOfContent(Asn1TypeClass.ContextSpecific);     // attributes
+				this.derOutput.Content(Asn1TypeClass.ContextSpecific);     // attributes
 				this.derOutput.EndSEQUENCE();       // end of CertificationRequestInfo
 
 

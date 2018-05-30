@@ -285,6 +285,7 @@ authorization and encryption.
 | **Waher.Security.JWS**       | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Security.JWS/)     | The [Waher.Security.JWS](Security/Waher.Security.JWS) project implements a framework for JSON Web Signatures (JWS), as defined in [RFC 7515](https://tools.ietf.org/html/rfc7515). |
 | **Waher.Security.JWT**       | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Security.JWT/)     | The [Waher.Security.JWT](Security/Waher.Security.JWT) project helps applications with the creation and validation of Java Web Tokens (JWT), as defined in [RFC 7519](https://tools.ietf.org/html/rfc7519). |
 | **Waher.Security.JWT.UWP**   | UWP          | [NuGet](https://www.nuget.org/packages/Waher.Security.JWT.UWP/) | The [Waher.Security.JWT.UWP](Security/Waher.Security.JWT.UWP) project provides a Universal Windows Platform compatible version of the **Waher.Security.JWT** Library. This library can be used to develop applications for Windows 10, on for instance Rasperry Pi. |
+| **Waher.Security.PKCS**      | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Security.PKCS/)    | The [Waher.Security.PKCS](https://github.com/PeterWaher/IoTGateway/tree/master/Security/Waher.Security.PKCS) project contains classes and tools for working with Public Key Cryptography Standards (PKCS). |
 
 The folder also contains the following unit test projects:
 
@@ -293,6 +294,7 @@ The folder also contains the following unit test projects:
 | **Waher.Security.ACME.Test**       | .NET 4.6.2   | The [Waher.Security.ACME.Test](Security/Waher.Security.ACME.Test) project contains unit tests for the  [Waher.Security.ACME](Security/Waher.Security.ACME) project. |
 | **Waher.Security.DTLS.Test**       | .NET 4.6.2   | The [Waher.Security.DTLS.Test](Security/Waher.Security.DTLS.Test) project contains unit tests for the  [Waher.Security.DTLS](Security/Waher.Security.DTLS) project. |
 | **Waher.Security.JWT.Test**        | .NET 4.6.2   | The [Waher.Security.JWT.Test](Security/Waher.Security.JWT.Test) project contains unit tests for the  [Waher.Security.JWT](Security/Waher.Security.JWT) project. |
+| **Waher.Security.PKCS.Test**       | .NET 4.6.2   | The [Waher.Security.PKCS.Test](Security/Waher.Security.PKCS.Test) project contains unit tests for the  [Waher.Security.PKCS](Security/Waher.Security.PKCS) project. |
 
 Services
 ----------------------

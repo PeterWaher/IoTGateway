@@ -102,6 +102,10 @@
       <Project>{712709ac-748d-43d7-a369-3beb829bf5e3}</Project>
       <Name>Waher.Security.JWS</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Security\Waher.Security.PKCS\Waher.Security.PKCS.csproj">
+      <Project>{c3442084-a298-4277-be46-283644e2a1e6}</Project>
+      <Name>Waher.Security.PKCS</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.6.2">

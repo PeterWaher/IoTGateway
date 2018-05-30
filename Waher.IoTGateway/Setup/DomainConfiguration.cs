@@ -266,7 +266,10 @@ namespace Waher.IoTGateway.Setup
 			int Index = 0;
 
 			while (Parameters.TryGetValue("altDomainName" + Index.ToString(), out Obj) && Obj is string AltDomainName && !string.IsNullOrEmpty(AltDomainName))
+			{
 				AlternativeNames.Add(AltDomainName);
+				Index++;
+			}
 
 			if (Parameters.TryGetValue("altDomainName", out Obj) && Obj is string AltDomainName2 && !string.IsNullOrEmpty(AltDomainName2))
 				AlternativeNames.Add(AltDomainName2);
@@ -407,7 +410,10 @@ namespace Waher.IoTGateway.Setup
 			int Index = 0;
 
 			while (Parameters.TryGetValue("altDomainName" + Index.ToString(), out Obj) && Obj is string AltDomainName && !string.IsNullOrEmpty(AltDomainName))
+			{
 				AlternativeNames.Add(AltDomainName);
+				Index++;
+			}
 
 			if (Parameters.TryGetValue("altDomainName", out Obj) && Obj is string AltDomainName2 && !string.IsNullOrEmpty(AltDomainName2))
 				AlternativeNames.Add(AltDomainName2);

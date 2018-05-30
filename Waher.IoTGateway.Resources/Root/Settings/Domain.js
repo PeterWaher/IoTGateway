@@ -142,7 +142,10 @@ function GetDomainNamesReq()
     var Control;
 
     while ((Control = document.getElementById("AltDomainName" + Index)) !== null)
+    {
         Req["altDomainName" + Index] = Control.value;
+        Index++;
+    }
 
     return Req;
 }

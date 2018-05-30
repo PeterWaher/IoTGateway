@@ -634,20 +634,40 @@ namespace Waher.IoTGateway
 
 			if (Configuration.UseEncryption && Configuration.Certificate != null && Configuration.PrivateKey != null)
 			{
-				RSACryptoServiceProvider RSA = new RSACryptoServiceProvider();
-				RSA.ImportCspBlob(Configuration.PrivateKey);
-
-				certificate = new X509Certificate2(Configuration.Certificate)
-				{
-					PrivateKey = RSA
-				};
-
+				UpdateCertificate(Configuration);
 				scheduler.Add(DateTime.Now.AddDays(0.5 + NextDouble()), CheckCertificate, Configuration);
 			}
 			else
 				certificate = null;
 
 			return Task.CompletedTask;
+		}
+
+		private static bool UpdateCertificate(DomainConfiguration Configuration)
+		{
+			try
+			{
+				if (Configuration.PFX != null)
+					certificate = new X509Certificate2(Configuration.PFX, Configuration.Password);
+				else
+				{
+					RSACryptoServiceProvider RSA = new RSACryptoServiceProvider();
+					RSA.ImportCspBlob(Configuration.PrivateKey);
+
+					certificate = new X509Certificate2(Configuration.Certificate)
+					{
+						PrivateKey = RSA
+					};
+				}
+
+				return true;
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+			}
+
+			return false;
 		}
 
 		private static async void CheckCertificate(object P)
@@ -661,17 +681,11 @@ namespace Waher.IoTGateway
 				{
 					if (await Configuration.CreateCertificate())
 					{
-						RSACryptoServiceProvider RSA = new RSACryptoServiceProvider();
-						RSA.ImportCspBlob(Configuration.PrivateKey);
-
-						certificate = new X509Certificate2(Configuration.Certificate)
+						if (UpdateCertificate(Configuration))
 						{
-							PrivateKey = RSA
-						};
-
-						webServer.UpdateCertificate(certificate);
-
-						OnNewCertificate?.Invoke(certificate, new EventArgs());
+							webServer.UpdateCertificate(certificate);
+							OnNewCertificate?.Invoke(certificate, new EventArgs());
+						}
 					}
 					else
 					{

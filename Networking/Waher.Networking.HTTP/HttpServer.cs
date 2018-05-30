@@ -62,7 +62,7 @@ namespace Waher.Networking.HTTP
 		private LinkedList<KeyValuePair<StreamSocketListener, bool>> listeners = new LinkedList<KeyValuePair<StreamSocketListener, bool>>();
 #else
 		private LinkedList<KeyValuePair<TcpListener, bool>> listeners = new LinkedList<KeyValuePair<TcpListener, bool>>();
-		private readonly X509Certificate serverCertificate;
+		private X509Certificate serverCertificate;
 #endif
 		private readonly Dictionary<string, HttpResource> resources = new Dictionary<string, HttpResource>(StringComparer.CurrentCultureIgnoreCase);
 		private TimeSpan sessionTimeout = new TimeSpan(0, 20, 0);
@@ -389,6 +389,17 @@ namespace Waher.Networking.HTTP
 
 			return Result;
 		}
+
+#if !WINDOWS_UWP
+		/// <summary>
+		/// Updates the server certificate
+		/// </summary>
+		/// <param name="ServerCertificate">Server Certificate.</param>
+		public void UpdateCertificate(X509Certificate ServerCertificate)
+		{
+			this.serverCertificate = ServerCertificate;
+		}
+#endif
 
 		#endregion
 

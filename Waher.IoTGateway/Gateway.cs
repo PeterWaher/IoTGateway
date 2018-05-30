@@ -227,7 +227,6 @@ namespace Waher.IoTGateway
 				XSL.Validate("Gateway.config", Config, "GatewayConfiguration", "http://waher.se/Schema/GatewayConfiguration.xsd",
 					XSL.LoadSchema(typeof(Gateway).Namespace + ".Schema.GatewayConfiguration.xsd", typeof(Gateway).Assembly));
 
-				domain = Config.DocumentElement["Domain"].InnerText;
 				applicationName = Config.DocumentElement["ApplicationName"].InnerText;
 				defaultPage = Config.DocumentElement["DefaultPage"].InnerText;
 
@@ -366,77 +365,6 @@ namespace Waher.IoTGateway
 						await Configuration.CleanupAfterConfiguration(webServer);
 				}
 
-				string CertificateLocalFileName = Config.DocumentElement["Certificate"].Attributes["configFileName"].Value;
-				string CertificateFileName;
-				string CertificateXml;
-				string CertificatePassword;
-				byte[] CertificateRaw;
-
-				try
-				{
-					CertificateRaw = Convert.FromBase64String(RuntimeSettings.Get("CERTIFICATE.BASE64", string.Empty));
-					CertificatePassword = RuntimeSettings.Get("CERTIFICATE.PWD", string.Empty);
-
-					certificate = new X509Certificate2(CertificateRaw, CertificatePassword);
-				}
-				catch (Exception)
-				{
-					certificate = null;
-				}
-
-				if (File.Exists(CertificateFileName = appDataFolder + CertificateLocalFileName))
-					CertificateXml = File.ReadAllText(CertificateFileName);
-				else if (File.Exists(CertificateFileName = CertificateLocalFileName) && certificate == null)
-					CertificateXml = File.ReadAllText(CertificateFileName);
-				else
-				{
-					CertificateFileName = null;
-					CertificateXml = null;
-				}
-
-				if (CertificateXml != null)
-				{
-					XmlDocument CertificateConfig = new XmlDocument();
-					CertificateConfig.LoadXml(CertificateXml);
-
-					XSL.Validate(CertificateLocalFileName, CertificateConfig, "CertificateConfiguration", "http://waher.se/Schema/CertificateConfiguration.xsd",
-						XSL.LoadSchema(typeof(Gateway).Namespace + ".Schema.CertificateConfiguration.xsd", typeof(Gateway).Assembly));
-
-					CertificateLocalFileName = CertificateConfig.DocumentElement["FileName"].InnerText;
-
-					if (File.Exists(appDataFolder + CertificateLocalFileName))
-						CertificateLocalFileName = appDataFolder + CertificateLocalFileName;
-
-					CertificateRaw = File.ReadAllBytes(CertificateLocalFileName);
-					CertificatePassword = CertificateConfig.DocumentElement["Password"].InnerText;
-
-					certificate = new X509Certificate2(CertificateRaw, CertificatePassword);
-
-					RuntimeSettings.Set("CERTIFICATE.BASE64", Convert.ToBase64String(CertificateRaw));
-					RuntimeSettings.Set("CERTIFICATE.PWD", CertificatePassword);
-
-					if (CertificateLocalFileName != "certificate.pfx" || CertificatePassword != "testexamplecom")
-					{
-						try
-						{
-							File.Delete(CertificateLocalFileName);
-						}
-						catch (Exception)
-						{
-							Log.Warning("Unable to delete " + CertificateLocalFileName + " after importing it into the encrypted database.");
-						}
-
-						try
-						{
-							File.Delete(CertificateFileName);
-						}
-						catch (Exception)
-						{
-							Log.Warning("Unable to delete " + CertificateFileName + " after importing it into the encrypted database.");
-						}
-					}
-				}
-
 				foreach (XmlNode N in Config.DocumentElement["Ports"].ChildNodes)
 				{
 					if (N.LocalName == "Port")
@@ -454,7 +382,11 @@ namespace Waher.IoTGateway
 					webServer = null;
 				}
 
-				webServer = new HttpServer(GetConfigPorts("HTTP"), GetConfigPorts("HTTPS"), certificate);
+				if (certificate != null)
+					webServer = new HttpServer(GetConfigPorts("HTTP"), GetConfigPorts("HTTPS"), certificate);
+				else
+					webServer = new HttpServer(GetConfigPorts("HTTP"), null, null);
+
 				Types.SetModuleParameter("HTTP", webServer);
 
 				loggedIn = new LoggedIn(webServer);
@@ -695,6 +627,90 @@ namespace Waher.IoTGateway
 
 			return Task.CompletedTask;
 		}
+
+		internal static Task ConfigureDomain(DomainConfiguration Configuration)
+		{
+			domain = Configuration.Domain;
+
+			if (Configuration.UseEncryption && Configuration.Certificate != null && Configuration.PrivateKey != null)
+			{
+				RSACryptoServiceProvider RSA = new RSACryptoServiceProvider();
+				RSA.ImportCspBlob(Configuration.PrivateKey);
+
+				certificate = new X509Certificate2(Configuration.Certificate)
+				{
+					PrivateKey = RSA
+				};
+
+				scheduler.Add(DateTime.Now.AddDays(0.5 + NextDouble()), CheckCertificate, Configuration);
+			}
+			else
+				certificate = null;
+
+			return Task.CompletedTask;
+		}
+
+		private static async void CheckCertificate(object P)
+		{
+			DomainConfiguration Configuration = (DomainConfiguration)P;
+			DateTime Now = DateTime.Now;
+
+			try
+			{
+				if (Now.AddDays(50) >= certificate.NotAfter)
+				{
+					if (await Configuration.CreateCertificate())
+					{
+						RSACryptoServiceProvider RSA = new RSACryptoServiceProvider();
+						RSA.ImportCspBlob(Configuration.PrivateKey);
+
+						certificate = new X509Certificate2(Configuration.Certificate)
+						{
+							PrivateKey = RSA
+						};
+
+						webServer.UpdateCertificate(certificate);
+
+						OnNewCertificate?.Invoke(certificate, new EventArgs());
+					}
+					else
+					{
+						int DaysLeft = (int)Math.Round((certificate.NotAfter - Now.Date).TotalDays);
+
+						if (DaysLeft < 2)
+							Log.Emergency("Unable to generate new certificate.", domain);
+						else if (DaysLeft < 5)
+							Log.Alert("Unable to generate new certificate.", domain);
+						else if (DaysLeft < 10)
+							Log.Critical("Unable to generate new certificate.", domain);
+						else if (DaysLeft < 20)
+							Log.Error("Unable to generate new certificate.", domain);
+						else
+							Log.Warning("Unable to generate new certificate.", domain);
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				int DaysLeft = (int)Math.Round((certificate.NotAfter - Now.Date).TotalDays);
+
+				if (DaysLeft < 2)
+					Log.Emergency(ex, domain);
+				else if (DaysLeft < 5)
+					Log.Alert(ex, domain);
+				else 
+					Log.Critical(ex);
+			}
+			finally
+			{
+				scheduler.Add(DateTime.Now.AddDays(0.5 + NextDouble()), CheckCertificate, Configuration);
+			}
+		}
+
+		/// <summary>
+		/// Event raised when a new server certificate has been generated.
+		/// </summary>
+		public static EventHandler OnNewCertificate = null;
 
 		private static async void DeleteOldDataSourceEvents(object P)
 		{

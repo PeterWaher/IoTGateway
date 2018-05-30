@@ -24,11 +24,11 @@ namespace Waher.IoTGateway.Setup
 
 		private string[] alternativeDomains = null;
 		private byte[] certificate = null;
+		private byte[] privateKey = null;
 		private string domain = string.Empty;
 		private string acmeDirectory = string.Empty;
 		private string contactEMail = string.Empty;
 		private string urlToS = string.Empty;
-		private string password = string.Empty;
 		private bool useDomainName = false;
 		private bool useEncryption = true;
 		private bool customCA = false;
@@ -137,16 +137,6 @@ namespace Waher.IoTGateway.Setup
 		}
 
 		/// <summary>
-		/// Certificate password
-		/// </summary>
-		[DefaultValueStringEmpty]
-		public string Password
-		{
-			get { return this.password; }
-			set { this.password = value; }
-		}
-
-		/// <summary>
 		/// Certificate
 		/// </summary>
 		[DefaultValueNull]
@@ -154,6 +144,16 @@ namespace Waher.IoTGateway.Setup
 		{
 			get { return this.certificate; }
 			set { this.certificate = value; }
+		}
+
+		/// <summary>
+		/// Private Key
+		/// </summary>
+		[DefaultValueNull]
+		public byte[] PrivateKey
+		{
+			get { return this.privateKey; }
+			set { this.privateKey = value; }
 		}
 
 		/// <summary>
@@ -176,7 +176,7 @@ namespace Waher.IoTGateway.Setup
 		/// </summary>
 		public override Task ConfigureSystem()
 		{
-			return Task.CompletedTask;
+			return Gateway.ConfigureDomain(this);
 		}
 
 		/// <summary>
@@ -427,8 +427,14 @@ namespace Waher.IoTGateway.Setup
 
 			Response.StatusCode = 200;
 
-			Task T = this.CreateCertificate(TabID);
+			if (!this.inProgress)
+			{
+				this.inProgress = true;
+				Task T = this.CreateCertificate(TabID);
+			}
 		}
+
+		private bool inProgress = false;
 
 		internal Task<bool> CreateCertificate()
 		{
@@ -638,14 +644,10 @@ namespace Waher.IoTGateway.Setup
 						X509Certificate2[] Certificates = await Order.DownloadCertificate();
 						X509Certificate2 Certificate = Certificates[0];
 
-						ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Adding private key.", false);
-						Certificate.PrivateKey = RSA;
-
 						ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Exporting certificate.", false);
 
-						string Password = Hashes.BinaryToString(Gateway.NextBytes(32));
-						this.certificate = Certificate.Export(X509ContentType.Pfx, Password);
-						this.password = Password;
+						this.certificate = Certificate.Export(X509ContentType.Cert);
+						this.privateKey = RSA.ExportCspBlob(true);
 
 						if (this.Step < 2)
 							this.Step = 2;
@@ -662,6 +664,10 @@ namespace Waher.IoTGateway.Setup
 			{
 				ClientEvents.PushEvent(new string[] { TabID }, "CertificateError", "Unable to create certificate: " + ex.Message, false);
 				return false;
+			}
+			finally
+			{
+				this.inProgress = false;
 			}
 		}
 

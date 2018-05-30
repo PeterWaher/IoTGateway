@@ -249,5 +249,5 @@ function CertificateOk(Data)
 {
     document.getElementById("CertificateError").style.display = "none";
     document.getElementById("NextMessage2").style.display = "block";
-    document.getElementById("v").style.display = "inline-block";
+    document.getElementById("NextButton").style.display = "inline-block";
 }

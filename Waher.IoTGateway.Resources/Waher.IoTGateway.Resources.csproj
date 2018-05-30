@@ -22,8 +22,6 @@
     <OldToolsVersion>2.0</OldToolsVersion>
   </PropertyGroup>
   <ItemGroup>
-    <None Remove="Certificate.config" />
-    <None Remove="certificate.pfx" />
     <None Remove="Gateway.config" />
     <None Remove="Highlight\CHANGES.md" />
     <None Remove="Highlight\highlight.pack.js" />
@@ -141,12 +139,6 @@
     <None Remove="Transforms\SnifferXmlToHtml.xslt" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Certificate.config">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="certificate.pfx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="Gateway.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

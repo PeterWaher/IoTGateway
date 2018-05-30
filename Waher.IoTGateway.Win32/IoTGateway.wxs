@@ -702,11 +702,7 @@
             </Component>
             <Component Id='ServerConfiguration' Guid='C8B49257-4869-44AC-B225-8248E093DD15'>
               <File Id='Gateway.config' Name='Gateway.config' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Gateway.config' Vital='yes' KeyPath='yes'/>
-              <File Id='Certificate.config' Name='Certificate.config' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Certificate.config' Vital='yes'/>
-              <File Id='certificate.pfx' Name='certificate.pfx' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\certificate.pfx' Vital='yes'/>
               <RemoveFile Id='RemoveGateway.config' Name='Gateway.config' On='uninstall'/>
-              <RemoveFile Id='RemoveGCertificate.config' Name='Certificate.config' On='uninstall'/>
-              <RemoveFile Id='Removecertificate.pfx' Name='certificate.pfx' On='uninstall'/>
             </Component>
             <Component Id='ScriptWebService' Guid='0180993A-1B58-49CD-9C72-E94733B13F47'>
               <File Id='Waher.WebService.Script.dll' Name='Waher.WebService.Script.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.WebService.Script.dll' Vital='yes' KeyPath='yes'/>

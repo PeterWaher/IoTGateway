@@ -19,19 +19,6 @@
             <xs:documentation>Domain Name.</xs:documentation>
           </xs:annotation>
         </xs:element>
-        <xs:element name="Certificate">
-          <xs:complexType>
-            <xs:annotation>
-              <xs:documentation>Information about where certificate can be found.</xs:documentation>
-            </xs:annotation>
-            <xs:attribute name="configFileName" use="required">
-              <xs:annotation>
-                <xs:documentation>Configuration file will be read and deleted after contents has been stored in the internal encrypted persistence layer.</xs:documentation>
-                <xs:documentation>To update settings, create a new file and restart the gateway.</xs:documentation>
-              </xs:annotation>
-            </xs:attribute>
-          </xs:complexType>
-        </xs:element>
         <xs:element name="DefaultPage" type="xs:string">
           <xs:annotation>
             <xs:documentation>Default web page.</xs:documentation>

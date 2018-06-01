@@ -142,6 +142,7 @@ namespace Waher.IoTGateway
 		private static bool connected = false;
 		private static bool immediateReconnect;
 		private static bool consoleOutput;
+		private static bool loopbackIntefaceAvailable;
 
 		#region Life Cycle
 
@@ -150,7 +151,18 @@ namespace Waher.IoTGateway
 		/// </summary>
 		/// <param name="ConsoleOutput">If console output is permitted.</param>
 		/// <returns>If the gateway was successfully started.</returns>
-		public static async Task<bool> Start(bool ConsoleOutput)
+		public static Task<bool> Start(bool ConsoleOutput)
+		{
+			return Start(ConsoleOutput, true);
+		}
+
+		/// <summary>
+		/// Starts the gateway.
+		/// </summary>
+		/// <param name="ConsoleOutput">If console output is permitted.</param>
+		/// <param name="LoopbackIntefaceAvailable">If the loopback interface is available.</param>
+		/// <returns>If the gateway was successfully started.</returns>
+		public static async Task<bool> Start(bool ConsoleOutput, bool LoopbackIntefaceAvailable)
 		{
 			gatewayRunning = new Semaphore(1, 1, "Waher.IoTGateway.Running");
 			if (!gatewayRunning.WaitOne(1000))
@@ -170,6 +182,8 @@ namespace Waher.IoTGateway
 			try
 			{
 				consoleOutput = ConsoleOutput;
+				loopbackIntefaceAvailable = LoopbackIntefaceAvailable;
+
 				appDataFolder = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
 				if (!appDataFolder.EndsWith(new string(Path.DirectorySeparatorChar, 1)))
 					appDataFolder += Path.DirectorySeparatorChar;
@@ -317,7 +331,10 @@ namespace Waher.IoTGateway
 
 				if (!Configured)
 				{
-					Log.Informational("System needs to be configured.");
+					if (loopbackIntefaceAvailable)
+						Log.Notice("System needs to be configured. This is done by navigating to the loopback interface using a browser on this machine.");
+					else
+						Log.Notice("System needs to be configured. This is done by navigating to the machine using a browser on another machine in the same network.");
 
 					webServer = new HttpServer(new int[] { HttpServer.DefaultHttpPort, 8080, 8081, 8082 }, null, null)
 					{
@@ -719,7 +736,7 @@ namespace Waher.IoTGateway
 					Log.Emergency(ex, domain);
 				else if (DaysLeft < 5)
 					Log.Alert(ex, domain);
-				else 
+				else
 					Log.Critical(ex);
 			}
 			finally
@@ -1282,6 +1299,13 @@ namespace Waher.IoTGateway
 			if (Request.Session == null || !Request.Session.TryGetVariable("from", out Variable v) || string.IsNullOrEmpty(From = v.ValueObject as string))
 				return;
 
+			if (!loopbackIntefaceAvailable && !XmppConfiguration.Instance.Complete)
+			{
+				Log.Informational("User logged in by default, since XMPP not configued and loopback interface not available.", string.Empty, Request.RemoteEndPoint, "LoginSuccessful", EventLevel.Minor);
+				Login.DoLogin(Request, From);
+				return;
+			}
+
 			if (RemoteEndpoint.StartsWith("[::1]:"))
 			{
 				if (!int.TryParse(RemoteEndpoint.Substring(6), out Port))
@@ -1302,6 +1326,7 @@ namespace Waher.IoTGateway
 			{
 				Log.Informational("Local user logged in.", string.Empty, Request.RemoteEndPoint, "LoginSuccessful", EventLevel.Minor);
 				Login.DoLogin(Request, From);
+				return;
 			}
 
 #if !MONO
@@ -1355,6 +1380,7 @@ namespace Waher.IoTGateway
 						{
 							Log.Informational("Local user logged in.", string.Empty, Request.RemoteEndPoint, "LoginSuccessful", EventLevel.Minor);
 							Login.DoLogin(Request, From);
+							break;
 						}
 					}
 				}

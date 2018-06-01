@@ -87,7 +87,7 @@ namespace Waher.IoTGateway.Console
 				Gateway.GetDatabaseProvider += GetDatabase;
 				Gateway.RegistrationSuccessful += RegistrationSuccessful;
 
-				if (!Gateway.Start(true).Result)
+				if (!Gateway.Start(true, true).Result)
 				{
 					System.Console.Out.WriteLine();
 					System.Console.Out.WriteLine("Gateway being started in another process.");

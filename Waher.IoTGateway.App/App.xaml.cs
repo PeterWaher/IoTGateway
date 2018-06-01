@@ -143,7 +143,7 @@ namespace Waher.IoTGateway.App
 				Gateway.RegistrationSuccessful += RegistrationSuccessful;
 				Gateway.GetMetaData += GetMetaData;
 
-				if (!await Gateway.Start(false))
+				if (!await Gateway.Start(false, false))
 					throw new Exception("Gateway being started in another process.");
 			}
 			catch (Exception ex)

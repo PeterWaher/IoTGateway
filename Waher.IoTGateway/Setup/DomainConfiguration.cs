@@ -487,8 +487,27 @@ namespace Waher.IoTGateway.Setup
 			try
 			{
 				string URL = this.customCA ? this.acmeDirectory : "https://acme-v02.api.letsencrypt.org/directory";
+				RSAParameters Parameters;
 
-				using (AcmeClient Client = new AcmeClient(new Uri(URL), "IoTGateway:" + URL))
+				try
+				{
+					CspParameters CspParams = new CspParameters()
+					{
+						Flags = CspProviderFlags.UseMachineKeyStore,
+						KeyContainerName = "IoTGateway:" + URL
+					};
+
+					using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(CspParams))
+					{
+						Parameters = RSA.ExportParameters(true);
+					}
+				}
+				catch (CryptographicException ex)
+				{
+					throw new CryptographicException("Unable to get access to cryptographic key. Was application initially run using another user?", ex);
+				}
+
+				using (AcmeClient Client = new AcmeClient(new Uri(URL), Parameters))
 				{
 					ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Connecting to directory.", false);
 

@@ -414,7 +414,27 @@ namespace Waher.Utility.Acme
 
 		private static async Task Process()
 		{
-			using (AcmeClient Client = new AcmeClient(directory))
+			RSAParameters Parameters;
+
+			try
+			{
+				CspParameters CspParams = new CspParameters()
+				{
+					Flags = CspProviderFlags.UseMachineKeyStore,
+					KeyContainerName = directory.ToString()
+				};
+
+				using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(CspParams))
+				{
+					Parameters = RSA.ExportParameters(true);
+				}
+			}
+			catch (CryptographicException ex)
+			{
+				throw new CryptographicException("Unable to get access to cryptographic key. Was application initially run using another user?", ex);
+			}
+
+			using (AcmeClient Client = new AcmeClient(directory, Parameters))
 			{
 				LogInformational("Connecting to directory.",
 					new KeyValuePair<string, object>("URL", directory.ToString()));

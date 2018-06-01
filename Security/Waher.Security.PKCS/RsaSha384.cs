@@ -14,7 +14,7 @@ namespace Waher.Security.PKCS
 		/// RSA with SHA-384 signatures
 		/// </summary>
 		/// <param name="RSA">RSA cryptogaphic service provider.</param>
-		public RsaSha384(RSACryptoServiceProvider RSA)
+		public RsaSha384(RSA RSA)
 			: base(RSA)
 		{
 		}

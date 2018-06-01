@@ -34,29 +34,11 @@ namespace Waher.Security.ACME
 		/// Implements an ACME client for the generation of certificates using ACME-compliant certificate servers.
 		/// </summary>
 		/// <param name="DirectoryEndpoint">HTTP endpoint for the ACME directory resource.</param>
-		public AcmeClient(string DirectoryEndpoint)
-			: this(new Uri(DirectoryEndpoint))
-		{
-		}
-
-		/// <summary>
-		/// Implements an ACME client for the generation of certificates using ACME-compliant certificate servers.
-		/// </summary>
-		/// <param name="DirectoryEndpoint">HTTP endpoint for the ACME directory resource.</param>
-		public AcmeClient(Uri DirectoryEndpoint)
-			: this(DirectoryEndpoint, DirectoryEndpoint.ToString())
-		{
-		}
-
-		/// <summary>
-		/// Implements an ACME client for the generation of certificates using ACME-compliant certificate servers.
-		/// </summary>
-		/// <param name="DirectoryEndpoint">HTTP endpoint for the ACME directory resource.</param>
-		/// <param name="KeyContainerName">CSP Container name for the JWS key.</param>
-		public AcmeClient(Uri DirectoryEndpoint, string KeyContainerName)
+		/// <param name="Parameters">RSA key parameters.</param>
+		public AcmeClient(Uri DirectoryEndpoint, RSAParameters Parameters)
 		{
 			this.directoryEndpoint = DirectoryEndpoint;
-			this.jws = new RsaSsaPkcsSha256(KeySize, KeyContainerName);
+			this.jws = new RsaSsaPkcsSha256(Parameters);
 
 			try
 			{
@@ -476,10 +458,6 @@ namespace Waher.Security.ACME
 
 			AcmeResponse Response = await this.POST(AccountLocation, AccountLocation,
 				new KeyValuePair<string, object>("status", "deactivated"));
-
-			this.jws.DeleteRsaKeyFromCsp();
-			this.jws = null;
-			this.jws = new RsaSsaPkcsSha256(KeySize, this.directoryEndpoint.ToString());
 
 			return new AcmeAccount(this, Response.Location, Response.Payload);
 		}

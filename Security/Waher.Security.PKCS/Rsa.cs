@@ -10,13 +10,13 @@ namespace Waher.Security.PKCS
 	/// </summary>
 	public abstract class Rsa : SignatureAlgorithm
 	{
-		private readonly RSACryptoServiceProvider rsa;
+		private readonly RSA rsa;
 
 		/// <summary>
 		/// Base class for RSA algorithms
 		/// </summary>
 		/// <param name="RSA">RSA cryptogaphic service provider.</param>
-		public Rsa(RSACryptoServiceProvider RSA)
+		public Rsa(RSA RSA)
 		{
 			this.rsa = RSA;
 		}

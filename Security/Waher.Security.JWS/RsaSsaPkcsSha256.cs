@@ -12,7 +12,7 @@ namespace Waher.Security.JWS
 	/// </summary>
 	public class RsaSsaPkcsSha256 : JwsAlgorithm
 	{
-		private RSACryptoServiceProvider rsa;
+		private RSA rsa;
 		private SHA256 sha;
 		private KeyValuePair<string, object>[] jwk;
 
@@ -34,7 +34,8 @@ namespace Waher.Security.JWS
 		{
 			try
 			{
-				this.rsa = new RSACryptoServiceProvider(KeySize);
+				this.rsa = RSA.Create();
+				this.rsa.KeySize = KeySize;
 			}
 			catch (CryptographicException ex)
 			{
@@ -49,7 +50,7 @@ namespace Waher.Security.JWS
 		/// https://tools.ietf.org/html/rfc3447#page-32
 		/// </summary>
 		/// <param name="RSA">RSA Cryptographic service provider</param>
-		public RsaSsaPkcsSha256(RSACryptoServiceProvider RSA)
+		public RsaSsaPkcsSha256(RSA RSA)
 		{
 			this.rsa = RSA;
 			this.Init();
@@ -59,24 +60,11 @@ namespace Waher.Security.JWS
 		/// RSASSA-PKCS1-v1_5 SHA-256 algorithm.
 		/// https://tools.ietf.org/html/rfc3447#page-32
 		/// </summary>
-		/// <param name="KeySize">Key size.</param>
-		/// <param name="KeyContainerName">CSP Key container name for the private RSA key.</param>
-		public RsaSsaPkcsSha256(int KeySize, string KeyContainerName)
+		/// <param name="Parameters">RSA Parameters</param>
+		public RsaSsaPkcsSha256(RSAParameters Parameters)
 		{
-			CspParameters CspParams = new CspParameters()
-			{
-				Flags = CspProviderFlags.UseMachineKeyStore,
-				KeyContainerName = KeyContainerName
-			};
-			
-			try
-			{
-				this.rsa = new RSACryptoServiceProvider(KeySize, CspParams);
-			}
-			catch (CryptographicException ex)
-			{
-				throw new CryptographicException("Unable to get access to cryptographic key. Was application initially run using another user?", ex);
-			}
+			this.rsa = RSA.Create();
+			this.RSA.ImportParameters(Parameters);
 
 			this.Init();
 		}
@@ -85,7 +73,7 @@ namespace Waher.Security.JWS
 		/// Imports a new key from an external RSA Cryptographic service provider.
 		/// </summary>
 		/// <param name="RSA">Contains new key.</param>
-		public void ImportKey(RSACryptoServiceProvider RSA)
+		public void ImportKey(RSA RSA)
 		{
 			RSAParameters P = RSA.ExportParameters(true);
 			this.rsa.ImportParameters(P);
@@ -95,18 +83,9 @@ namespace Waher.Security.JWS
 		/// <summary>
 		/// RSA Cryptographic service provider.
 		/// </summary>
-		public RSACryptoServiceProvider RSA
+		public RSA RSA
 		{
 			get { return this.rsa; }
-		}
-
-		/// <summary>
-		/// Deletes the key from the CSP, and disposes the object.
-		/// </summary>
-		public void DeleteRsaKeyFromCsp()
-		{
-			this.rsa.PersistKeyInCsp = false;
-			this.Dispose();
 		}
 
 		private void Init()
@@ -121,7 +100,7 @@ namespace Waher.Security.JWS
 		/// <param name="RSA">RSA Cryptographic service provider</param>
 		/// <param name="IncludePrivate">If private parameters are to be included.</param>
 		/// <returns>JWK for <paramref name="RSA"/>.</returns>
-		public static KeyValuePair<string, object>[] GetJwk(RSACryptoServiceProvider RSA, bool IncludePrivate)
+		public static KeyValuePair<string, object>[] GetJwk(RSA RSA, bool IncludePrivate)
 		{
 			RSAParameters Parameters = RSA.ExportParameters(IncludePrivate);
 

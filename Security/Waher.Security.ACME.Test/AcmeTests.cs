@@ -9,12 +9,33 @@ namespace Waher.Security.ACME.Test
 	[TestClass]
 	public class AcmeTests
 	{
+		private const string directory = "https://acme-staging-v02.api.letsencrypt.org/directory";
 		private AcmeClient client;
 
 		[TestInitialize]
 		public void TestInitialize()
 		{
-			this.client = new AcmeClient("https://acme-staging-v02.api.letsencrypt.org/directory");
+			RSAParameters Parameters;
+
+			try
+			{
+				CspParameters CspParams = new CspParameters()
+				{
+					Flags = CspProviderFlags.UseMachineKeyStore,
+					KeyContainerName = directory
+				};
+
+				using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(CspParams))
+				{
+					Parameters = RSA.ExportParameters(true);
+				}
+			}
+			catch (CryptographicException ex)
+			{
+				throw new CryptographicException("Unable to get access to cryptographic key. Was application initially run using another user?", ex);
+			}
+
+			this.client = new AcmeClient(new Uri(directory), Parameters);
 		}
 
 		[TestCleanup]

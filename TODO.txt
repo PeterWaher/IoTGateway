@@ -12,7 +12,6 @@ Client:
 Waher.Things.MBus
 Waher.Things.Modbus
 Waher.Things.Performance
-Waher.Security.Acme
 Waher.WebService.Transform (transforms JSON to Text using named templates)
 
 MQTT v5
@@ -77,17 +76,11 @@ Statistics:
 * Probability density functions
 
 
-Upgrade:
-* Note about .NET Core 1.1 to run applications. (https://www.microsoft.com/net/download/core)
-
-
 README.md-filer för alla olika projekt
 Change to DateTimeOffset everywhere.
 
 Installer:
 	- Optional: Waher.IoTGateway.Finder (localhost + SSDP search, IP address + name of instance (name of XMPP account)).
-	- Custom Action
-		- stop http service, if running. (With question). Define alternative HTTP port, if not.
 
 When closing tab: Send close event to event service, to remove tab ID from internal lists immediately. 
 
@@ -114,13 +107,13 @@ Waher.Client.WPF
 	- Tab close button
 	- Sniff window: Stop, resume.
 	- Filnamn i alla flikar, samt korrekt hantering av Save & SaveAs.
-	- Visning av fel i avläsningsvyn.
 	- Chat:
 		- urn:xmpp:message-correct:0
 		- Remove smileys that begin with := (like :=L), at least if in script
 
 HTTP Server
 	- Web Services
+	- WebSockets
 	- XML -> HTML (via länkade XSLT)
 	- XML -> HTML via pluggbara gränssnitt som känner igen rotnamn + namespace.
 		- XMPP X-forms -> HTML-formulär

@@ -15,12 +15,12 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>Security Authentication JWT</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <Version>1.0.2</Version>
+    <Version>1.0.4</Version>
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Security\Waher.Security.JWT\</UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>
-    <AssemblyVersion>1.0.2</AssemblyVersion>
-    <FileVersion>1.0.2</FileVersion>
+    <AssemblyVersion>1.0.4</AssemblyVersion>
+    <FileVersion>1.0.4</FileVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DocumentationFile>bin\Debug\netstandard1.3\Waher.Security.JWT.xml</DocumentationFile>

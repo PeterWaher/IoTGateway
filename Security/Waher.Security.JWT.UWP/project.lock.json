@@ -1878,7 +1878,7 @@
           "lib/netstandard1.3/System.Security.Claims.dll": {}
         }
       },
-      "System.Security.Cryptography.Algorithms/4.3.1": {
+      "System.Security.Cryptography.Algorithms/4.3.0": {
         "type": "package",
         "dependencies": {
           "Microsoft.NETCore.Platforms": "1.1.0",
@@ -1922,22 +1922,6 @@
         },
         "runtimeTargets": {
           "runtimes/win/lib/netstandard1.4/System.Security.Cryptography.Cng.dll": {
-            "assetType": "runtime",
-            "rid": "win"
-          }
-        }
-      },
-      "System.Security.Cryptography.Csp/4.3.0": {
-        "type": "package",
-        "compile": {
-          "ref/netstandard1.3/System.Security.Cryptography.Csp.dll": {}
-        },
-        "runtimeTargets": {
-          "runtimes/unix/lib/netstandard1.3/System.Security.Cryptography.Csp.dll": {
-            "assetType": "runtime",
-            "rid": "unix"
-          },
-          "runtimes/win/lib/netcore50/_._": {
             "assetType": "runtime",
             "rid": "win"
           }
@@ -2494,14 +2478,11 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Security.JWS/1.0.1": {
+      "Waher.Security.JWS/1.0.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "System.Security.Cryptography.Algorithms": "4.3.1",
-          "System.Security.Cryptography.Csp": "4.3.0",
-          "System.Security.Cryptography.Primitives": "4.3.0",
           "Waher.Content": "1.0.10",
           "Waher.Runtime.Inventory": "1.0.5"
         }
@@ -4459,7 +4440,7 @@
           "lib/netstandard1.3/System.Security.Claims.dll": {}
         }
       },
-      "System.Security.Cryptography.Algorithms/4.3.1": {
+      "System.Security.Cryptography.Algorithms/4.3.0": {
         "type": "package",
         "dependencies": {
           "Microsoft.NETCore.Platforms": "1.1.0",
@@ -4500,15 +4481,6 @@
         },
         "runtime": {
           "runtimes/win/lib/netstandard1.4/System.Security.Cryptography.Cng.dll": {}
-        }
-      },
-      "System.Security.Cryptography.Csp/4.3.0": {
-        "type": "package",
-        "compile": {
-          "ref/netstandard1.3/System.Security.Cryptography.Csp.dll": {}
-        },
-        "runtime": {
-          "runtimes/win/lib/netcore50/_._": {}
         }
       },
       "System.Security.Cryptography.Encoding/4.3.0": {
@@ -5030,14 +5002,11 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Security.JWS/1.0.1": {
+      "Waher.Security.JWS/1.0.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "System.Security.Cryptography.Algorithms": "4.3.1",
-          "System.Security.Cryptography.Csp": "4.3.0",
-          "System.Security.Cryptography.Primitives": "4.3.0",
           "Waher.Content": "1.0.10",
           "Waher.Runtime.Inventory": "1.0.5"
         }
@@ -7031,7 +7000,7 @@
           "lib/netstandard1.3/System.Security.Claims.dll": {}
         }
       },
-      "System.Security.Cryptography.Algorithms/4.3.1": {
+      "System.Security.Cryptography.Algorithms/4.3.0": {
         "type": "package",
         "dependencies": {
           "Microsoft.NETCore.Platforms": "1.1.0",
@@ -7072,15 +7041,6 @@
         },
         "runtime": {
           "runtimes/win/lib/netstandard1.4/System.Security.Cryptography.Cng.dll": {}
-        }
-      },
-      "System.Security.Cryptography.Csp/4.3.0": {
-        "type": "package",
-        "compile": {
-          "ref/netstandard1.3/System.Security.Cryptography.Csp.dll": {}
-        },
-        "runtime": {
-          "runtimes/win/lib/netcore50/_._": {}
         }
       },
       "System.Security.Cryptography.Encoding/4.3.0": {
@@ -7602,14 +7562,11 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Security.JWS/1.0.1": {
+      "Waher.Security.JWS/1.0.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "System.Security.Cryptography.Algorithms": "4.3.1",
-          "System.Security.Cryptography.Csp": "4.3.0",
-          "System.Security.Cryptography.Primitives": "4.3.0",
           "Waher.Content": "1.0.10",
           "Waher.Runtime.Inventory": "1.0.5"
         }
@@ -9576,7 +9533,7 @@
           "lib/netstandard1.3/System.Security.Claims.dll": {}
         }
       },
-      "System.Security.Cryptography.Algorithms/4.3.1": {
+      "System.Security.Cryptography.Algorithms/4.3.0": {
         "type": "package",
         "dependencies": {
           "Microsoft.NETCore.Platforms": "1.1.0",
@@ -9617,15 +9574,6 @@
         },
         "runtime": {
           "runtimes/win/lib/netstandard1.4/System.Security.Cryptography.Cng.dll": {}
-        }
-      },
-      "System.Security.Cryptography.Csp/4.3.0": {
-        "type": "package",
-        "compile": {
-          "ref/netstandard1.3/System.Security.Cryptography.Csp.dll": {}
-        },
-        "runtime": {
-          "runtimes/win/lib/netcore50/_._": {}
         }
       },
       "System.Security.Cryptography.Encoding/4.3.0": {
@@ -10147,14 +10095,11 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Security.JWS/1.0.1": {
+      "Waher.Security.JWS/1.0.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "System.Security.Cryptography.Algorithms": "4.3.1",
-          "System.Security.Cryptography.Csp": "4.3.0",
-          "System.Security.Cryptography.Primitives": "4.3.0",
           "Waher.Content": "1.0.10",
           "Waher.Runtime.Inventory": "1.0.5"
         }
@@ -12157,7 +12102,7 @@
           "lib/netstandard1.3/System.Security.Claims.dll": {}
         }
       },
-      "System.Security.Cryptography.Algorithms/4.3.1": {
+      "System.Security.Cryptography.Algorithms/4.3.0": {
         "type": "package",
         "dependencies": {
           "Microsoft.NETCore.Platforms": "1.1.0",
@@ -12198,15 +12143,6 @@
         },
         "runtime": {
           "runtimes/win/lib/netstandard1.4/System.Security.Cryptography.Cng.dll": {}
-        }
-      },
-      "System.Security.Cryptography.Csp/4.3.0": {
-        "type": "package",
-        "compile": {
-          "ref/netstandard1.3/System.Security.Cryptography.Csp.dll": {}
-        },
-        "runtime": {
-          "runtimes/win/lib/netcore50/_._": {}
         }
       },
       "System.Security.Cryptography.Encoding/4.3.0": {
@@ -12728,14 +12664,11 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Security.JWS/1.0.1": {
+      "Waher.Security.JWS/1.0.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "System.Security.Cryptography.Algorithms": "4.3.1",
-          "System.Security.Cryptography.Csp": "4.3.0",
-          "System.Security.Cryptography.Primitives": "4.3.0",
           "Waher.Content": "1.0.10",
           "Waher.Runtime.Inventory": "1.0.5"
         }
@@ -14702,7 +14635,7 @@
           "lib/netstandard1.3/System.Security.Claims.dll": {}
         }
       },
-      "System.Security.Cryptography.Algorithms/4.3.1": {
+      "System.Security.Cryptography.Algorithms/4.3.0": {
         "type": "package",
         "dependencies": {
           "Microsoft.NETCore.Platforms": "1.1.0",
@@ -14743,15 +14676,6 @@
         },
         "runtime": {
           "runtimes/win/lib/netstandard1.4/System.Security.Cryptography.Cng.dll": {}
-        }
-      },
-      "System.Security.Cryptography.Csp/4.3.0": {
-        "type": "package",
-        "compile": {
-          "ref/netstandard1.3/System.Security.Cryptography.Csp.dll": {}
-        },
-        "runtime": {
-          "runtimes/win/lib/netcore50/_._": {}
         }
       },
       "System.Security.Cryptography.Encoding/4.3.0": {
@@ -15273,14 +15197,11 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Security.JWS/1.0.1": {
+      "Waher.Security.JWS/1.0.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "System.Security.Cryptography.Algorithms": "4.3.1",
-          "System.Security.Cryptography.Csp": "4.3.0",
-          "System.Security.Cryptography.Primitives": "4.3.0",
           "Waher.Content": "1.0.10",
           "Waher.Runtime.Inventory": "1.0.5"
         }
@@ -17283,7 +17204,7 @@
           "lib/netstandard1.3/System.Security.Claims.dll": {}
         }
       },
-      "System.Security.Cryptography.Algorithms/4.3.1": {
+      "System.Security.Cryptography.Algorithms/4.3.0": {
         "type": "package",
         "dependencies": {
           "Microsoft.NETCore.Platforms": "1.1.0",
@@ -17324,15 +17245,6 @@
         },
         "runtime": {
           "runtimes/win/lib/netstandard1.4/System.Security.Cryptography.Cng.dll": {}
-        }
-      },
-      "System.Security.Cryptography.Csp/4.3.0": {
-        "type": "package",
-        "compile": {
-          "ref/netstandard1.3/System.Security.Cryptography.Csp.dll": {}
-        },
-        "runtime": {
-          "runtimes/win/lib/netcore50/_._": {}
         }
       },
       "System.Security.Cryptography.Encoding/4.3.0": {
@@ -17854,14 +17766,11 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Security.JWS/1.0.1": {
+      "Waher.Security.JWS/1.0.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "System.Security.Cryptography.Algorithms": "4.3.1",
-          "System.Security.Cryptography.Csp": "4.3.0",
-          "System.Security.Cryptography.Primitives": "4.3.0",
           "Waher.Content": "1.0.10",
           "Waher.Runtime.Inventory": "1.0.5"
         }
@@ -26404,10 +26313,10 @@
         "system.security.claims.nuspec"
       ]
     },
-    "System.Security.Cryptography.Algorithms/4.3.1": {
-      "sha512": "DVUblnRfnarrI5olEC2B/OCsJQd0anjVaObQMndHSc43efbc88/RMOlDyg/EyY0ix5ecyZMXS8zMksb5ukebZA==",
+    "System.Security.Cryptography.Algorithms/4.3.0": {
+      "sha512": "W1kd2Y8mYSCgc3ULTAZ0hOP2dSdG5YauTb1089T0/kRcN2MpSAW1izOFROrJgxSlMn3ArsgHXagigyi+ibhevg==",
       "type": "package",
-      "path": "system.security.cryptography.algorithms/4.3.1",
+      "path": "system.security.cryptography.algorithms/4.3.0",
       "files": [
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
@@ -26439,7 +26348,7 @@
         "runtimes/win/lib/net463/System.Security.Cryptography.Algorithms.dll",
         "runtimes/win/lib/netcore50/System.Security.Cryptography.Algorithms.dll",
         "runtimes/win/lib/netstandard1.6/System.Security.Cryptography.Algorithms.dll",
-        "system.security.cryptography.algorithms.4.3.1.nupkg.sha512",
+        "system.security.cryptography.algorithms.4.3.0.nupkg.sha512",
         "system.security.cryptography.algorithms.nuspec"
       ]
     },
@@ -26467,36 +26376,6 @@
         "runtimes/win/lib/netstandard1.6/System.Security.Cryptography.Cng.dll",
         "system.security.cryptography.cng.4.3.0.nupkg.sha512",
         "system.security.cryptography.cng.nuspec"
-      ]
-    },
-    "System.Security.Cryptography.Csp/4.3.0": {
-      "sha512": "X4s/FCkEUnRGnwR3aSfVIkldBmtURMhmexALNTwpjklzxWU7yjMk7GHLKOZTNkgnWnE0q7+BCf9N2LVRWxewaA==",
-      "type": "package",
-      "path": "system.security.cryptography.csp/4.3.0",
-      "files": [
-        "ThirdPartyNotices.txt",
-        "dotnet_library_license.txt",
-        "lib/MonoAndroid10/_._",
-        "lib/MonoTouch10/_._",
-        "lib/net46/System.Security.Cryptography.Csp.dll",
-        "lib/xamarinios10/_._",
-        "lib/xamarinmac20/_._",
-        "lib/xamarintvos10/_._",
-        "lib/xamarinwatchos10/_._",
-        "ref/MonoAndroid10/_._",
-        "ref/MonoTouch10/_._",
-        "ref/net46/System.Security.Cryptography.Csp.dll",
-        "ref/netstandard1.3/System.Security.Cryptography.Csp.dll",
-        "ref/xamarinios10/_._",
-        "ref/xamarinmac20/_._",
-        "ref/xamarintvos10/_._",
-        "ref/xamarinwatchos10/_._",
-        "runtimes/unix/lib/netstandard1.3/System.Security.Cryptography.Csp.dll",
-        "runtimes/win/lib/net46/System.Security.Cryptography.Csp.dll",
-        "runtimes/win/lib/netcore50/_._",
-        "runtimes/win/lib/netstandard1.3/System.Security.Cryptography.Csp.dll",
-        "system.security.cryptography.csp.4.3.0.nupkg.sha512",
-        "system.security.cryptography.csp.nuspec"
       ]
     },
     "System.Security.Cryptography.Encoding/4.3.0": {
@@ -27692,7 +27571,7 @@
       "path": "../Waher.Security/Waher.Security.csproj",
       "msbuildProject": "../Waher.Security/Waher.Security.csproj"
     },
-    "Waher.Security.JWS/1.0.1": {
+    "Waher.Security.JWS/1.0.2": {
       "type": "project",
       "path": "../Waher.Security.JWS/Waher.Security.JWS.csproj",
       "msbuildProject": "../Waher.Security.JWS/Waher.Security.JWS.csproj"
@@ -27772,61 +27651,5 @@
         "#import": []
       }
     }
-  },
-  "logs": [
-    {
-      "code": "NU1203",
-      "level": "Error",
-      "message": "System.Security.Cryptography.Csp 4.3.0 provides a compile-time reference assembly for System.Security.Cryptography.Csp on UAP,Version=v10.0.10586, but there is no run-time assembly compatible with win10-arm.",
-      "libraryId": "System.Security.Cryptography.Csp",
-      "targetGraphs": [
-        "UAP,Version=v10.0.10586/win10-arm"
-      ]
-    },
-    {
-      "code": "NU1203",
-      "level": "Error",
-      "message": "System.Security.Cryptography.Csp 4.3.0 provides a compile-time reference assembly for System.Security.Cryptography.Csp on UAP,Version=v10.0.10586, but there is no run-time assembly compatible with win10-arm-aot.",
-      "libraryId": "System.Security.Cryptography.Csp",
-      "targetGraphs": [
-        "UAP,Version=v10.0.10586/win10-arm-aot"
-      ]
-    },
-    {
-      "code": "NU1203",
-      "level": "Error",
-      "message": "System.Security.Cryptography.Csp 4.3.0 provides a compile-time reference assembly for System.Security.Cryptography.Csp on UAP,Version=v10.0.10586, but there is no run-time assembly compatible with win10-x64.",
-      "libraryId": "System.Security.Cryptography.Csp",
-      "targetGraphs": [
-        "UAP,Version=v10.0.10586/win10-x64"
-      ]
-    },
-    {
-      "code": "NU1203",
-      "level": "Error",
-      "message": "System.Security.Cryptography.Csp 4.3.0 provides a compile-time reference assembly for System.Security.Cryptography.Csp on UAP,Version=v10.0.10586, but there is no run-time assembly compatible with win10-x64-aot.",
-      "libraryId": "System.Security.Cryptography.Csp",
-      "targetGraphs": [
-        "UAP,Version=v10.0.10586/win10-x64-aot"
-      ]
-    },
-    {
-      "code": "NU1203",
-      "level": "Error",
-      "message": "System.Security.Cryptography.Csp 4.3.0 provides a compile-time reference assembly for System.Security.Cryptography.Csp on UAP,Version=v10.0.10586, but there is no run-time assembly compatible with win10-x86.",
-      "libraryId": "System.Security.Cryptography.Csp",
-      "targetGraphs": [
-        "UAP,Version=v10.0.10586/win10-x86"
-      ]
-    },
-    {
-      "code": "NU1203",
-      "level": "Error",
-      "message": "System.Security.Cryptography.Csp 4.3.0 provides a compile-time reference assembly for System.Security.Cryptography.Csp on UAP,Version=v10.0.10586, but there is no run-time assembly compatible with win10-x86-aot.",
-      "libraryId": "System.Security.Cryptography.Csp",
-      "targetGraphs": [
-        "UAP,Version=v10.0.10586/win10-x86-aot"
-      ]
-    }
-  ]
+  }
 }

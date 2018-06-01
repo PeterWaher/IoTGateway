@@ -470,8 +470,9 @@ namespace Waher.Security.ACME
 		{
 			if (this.directory == null)
 				await this.GetDirectory();
-
-			RSACryptoServiceProvider NewKey = new RSACryptoServiceProvider(KeySize);
+			
+			RSA NewKey = RSA.Create();
+			NewKey.KeySize = KeySize;
 			RsaSsaPkcsSha256 Jws2 = new RsaSsaPkcsSha256(NewKey);
 
 			try

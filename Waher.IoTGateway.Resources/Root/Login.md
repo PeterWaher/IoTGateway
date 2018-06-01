@@ -17,10 +17,12 @@ Login
 You need to login to proceed.
 
 User Name:  
-<input id="UserName" name="UserName" type="text" autofocus="autofocus" style="width:20em" /> @{Waher.IoTGateway.Gateway.XmppClient.Domain}
+<input id="UserName" name="UserName" type="text" autofocus="autofocus" style="width:20em" />
 
 Password:  
 <input id="Password" name="Password" type="password" style="width:20em" />
+
+*(Credentials are used to log on to the XMPP server the gateway uses.)*
 
 {{if exists(LoginError) then]]
 <div class='error'>

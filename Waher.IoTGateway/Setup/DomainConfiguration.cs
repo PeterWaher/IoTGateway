@@ -7,6 +7,7 @@ using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Content.Xml;
 using Waher.Networking.HTTP;
 using Waher.Persistence;
 using Waher.Persistence.Attributes;
@@ -487,7 +488,7 @@ namespace Waher.IoTGateway.Setup
 			{
 				string URL = this.customCA ? this.acmeDirectory : "https://acme-v02.api.letsencrypt.org/directory";
 
-				using (AcmeClient Client = new AcmeClient(URL))
+				using (AcmeClient Client = new AcmeClient(new Uri(URL), "IoTGateway:" + URL))
 				{
 					ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Connecting to directory.", false);
 
@@ -705,83 +706,151 @@ namespace Waher.IoTGateway.Setup
 							string[] Files;
 							string Password = Hashes.BinaryToString(Gateway.NextBytes(32));
 							string CertFileName = null;
+							string CertFileName2 = null;
 							string KeyFileName = null;
 
 							if (string.IsNullOrEmpty(this.openSslPath) || !File.Exists(this.openSslPath))
-								Files = Directory.GetFiles(new string(Path.DirectorySeparatorChar, 1), "openssl.exe", SearchOption.AllDirectories);
+							{
+								Files = GetFiles(new string(Path.DirectorySeparatorChar, 1), "openssl.exe");
+								if (Files == null)
+								{
+									List<string> Files2 = new List<string>();
+
+									Files = GetFiles(Environment.SpecialFolder.ProgramFiles, "openssl.exe");
+									if (Files != null)
+										Files2.AddRange(Files);
+
+									Files = GetFiles(Environment.SpecialFolder.CommonProgramFilesX86, "openssl.exe");
+									if (Files != null)
+										Files2.AddRange(Files);
+
+									Files = GetFiles(Environment.SpecialFolder.Programs, "openssl.exe");
+									if (Files != null)
+										Files2.AddRange(Files);
+
+									Files = GetFiles(Environment.SpecialFolder.System, "openssl.exe");
+									if (Files != null)
+										Files2.AddRange(Files);
+
+									Files = GetFiles(Environment.SpecialFolder.SystemX86, "openssl.exe");
+									if (Files != null)
+										Files2.AddRange(Files);
+
+									Files = GetFiles(Environment.SpecialFolder.Windows, "openssl.exe");
+									if (Files != null)
+										Files2.AddRange(Files);
+
+									Files = GetFiles(Environment.SpecialFolder.CommonProgramFiles, "openssl.exe");
+									if (Files != null)
+										Files2.AddRange(Files);
+
+									Files = GetFiles(Environment.SpecialFolder.CommonProgramFilesX86, "openssl.exe");
+									if (Files != null)
+										Files2.AddRange(Files);
+
+									Files = GetFiles(Environment.SpecialFolder.CommonPrograms, "openssl.exe");
+									if (Files != null)
+										Files2.AddRange(Files);
+
+									Files = GetFiles(Path.DirectorySeparatorChar + "OpenSSL-Win32", "openssl.exe");
+									if (Files != null)
+										Files2.AddRange(Files);
+
+									Files = GetFiles(Path.DirectorySeparatorChar + "OpenSSL-Win64", "openssl.exe");
+									if (Files != null)
+										Files2.AddRange(Files);
+								}
+							}
 							else
 								Files = new string[] { this.openSslPath };
 
 							try
 							{
-								foreach (string OpenSslFile in Files)
+								if (Files.Length == 0)
 								{
-									if (CertFileName == null)
+									ClientEvents.PushEvent(new string[] { TabID }, "CertificateError", "Unable to join certificate with private key. Try installing <a target=\"_blank\" href=\"https://wiki.openssl.org/index.php/Binaries\">OpenSSL</a> and try again.", false);
+									return false;
+								}
+								else
+								{
+									foreach (string OpenSslFile in Files)
 									{
-										ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Generating temporary certificate file.", false);
+										if (CertFileName == null)
+										{
+											ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Generating temporary certificate file.", false);
 
-										CertFileName = Path.Combine(Gateway.AppDataFolder, "Certificate.cer");
-										File.WriteAllBytes(CertFileName, Certificate.Export(X509ContentType.Cert));
+											StringBuilder PemOutput = new StringBuilder();
+											byte[] Bin = Certificate.Export(X509ContentType.Cert);
 
-										ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Generating temporary key file.", false);
+											PemOutput.AppendLine("-----BEGIN CERTIFICATE-----");
+											PemOutput.AppendLine(Convert.ToBase64String(Bin, Base64FormattingOptions.InsertLineBreaks));
+											PemOutput.AppendLine("-----END CERTIFICATE-----");
 
-										DerEncoder KeyOutput = new DerEncoder();
-										SignAlg.ExportPrivateKey(KeyOutput);
+											CertFileName = Path.Combine(Gateway.AppDataFolder, "Certificate.pem");
+											File.WriteAllText(CertFileName, PemOutput.ToString(), Encoding.ASCII);
 
-										StringBuilder PemOutput = new StringBuilder();
+											ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Generating temporary key file.", false);
 
-										PemOutput.AppendLine("-----BEGIN RSA PRIVATE KEY-----");
-										PemOutput.AppendLine(Convert.ToBase64String(KeyOutput.ToArray(), Base64FormattingOptions.InsertLineBreaks));
-										PemOutput.AppendLine("-----END RSA PRIVATE KEY-----");
+											DerEncoder KeyOutput = new DerEncoder();
+											SignAlg.ExportPrivateKey(KeyOutput);
 
-										KeyFileName = Path.Combine(Gateway.AppDataFolder, "Certificate.key");
+											PemOutput.Clear();
+											PemOutput.AppendLine("-----BEGIN RSA PRIVATE KEY-----");
+											PemOutput.AppendLine(Convert.ToBase64String(KeyOutput.ToArray(), Base64FormattingOptions.InsertLineBreaks));
+											PemOutput.AppendLine("-----END RSA PRIVATE KEY-----");
 
-										File.WriteAllText(KeyFileName, PemOutput.ToString(), Encoding.ASCII);
+											KeyFileName = Path.Combine(Gateway.AppDataFolder, "Certificate.key");
+
+											File.WriteAllText(KeyFileName, PemOutput.ToString(), Encoding.ASCII);
+										}
+
+										ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Converting to PFX using " + OpenSslFile, false);
+
+										Process P = new Process()
+										{
+											StartInfo = new ProcessStartInfo()
+											{
+												FileName = OpenSslFile,
+												Arguments = "pkcs12 -nodes -export -out Certificate.pfx -inkey Certificate.key -in Certificate.pem -password pass:" + Password,
+												UseShellExecute = false,
+												RedirectStandardError = true,
+												RedirectStandardOutput = true,
+												WorkingDirectory = Gateway.AppDataFolder,
+												CreateNoWindow = true,
+												WindowStyle = ProcessWindowStyle.Hidden
+											}
+										};
+
+										P.Start();
+
+										if (!P.WaitForExit(60000) || P.ExitCode != 0)
+										{
+											if (!P.StandardOutput.EndOfStream)
+												ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Output: " + P.StandardOutput.ReadToEnd(), false);
+
+											if (!P.StandardError.EndOfStream)
+												ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Error: " + P.StandardError.ReadToEnd(), false);
+
+											continue;
+										}
+
+										ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Loading PFX.", false);
+
+										CertFileName2 = Path.Combine(Gateway.AppDataFolder, "Certificate.pfx");
+										this.pfx = File.ReadAllBytes(CertFileName2);
+										this.password = Password;
+										this.openSslPath = OpenSslFile;
+
+										ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "PFX successfully generated using OpenSSL.", false);
+										break;
 									}
 
-									ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Converting to PFX using " + OpenSslFile, false);
-
-									ProcessStartInfo ProcessInformation = new ProcessStartInfo()
+									if (this.pfx == null)
 									{
-										FileName = OpenSslFile,
-										Arguments = "pkcs12 -nodes -export -out Certificate.pfx -inkey Certificate.key -in Certificate.cer -password pass:" + Password,
-										UseShellExecute = false,
-										RedirectStandardError = true,
-										RedirectStandardOutput = true,
-										WorkingDirectory = Gateway.AppDataFolder,
-										CreateNoWindow = true,
-										WindowStyle = ProcessWindowStyle.Hidden
-									};
-
-									Process P = new Process();
-									bool Error = false;
-
-									P.ErrorDataReceived += (sender, e) =>
-									{
-										Error = true;
-									};
-
-									P.StartInfo = ProcessInformation;
-									P.Start();
-
-									if (!P.WaitForExit(60000) || Error || P.ExitCode != 0)
-										continue;
-
-									ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Loading PFX.", false);
-
-									this.pfx = File.ReadAllBytes(Path.Combine(Gateway.AppDataFolder, "Certificate.pfx"));
-									this.password = Password;
-									this.openSslPath = OpenSslFile;
-
-									ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "PFX successfully generated using OpenSSL.", false);
-									break;
-								}
-
-								if (this.pfx == null)
-								{
-									this.openSslPath = string.Empty;
-									ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Unable to convert to PFX using OpenSSL.", false);
-									return false;
+										this.openSslPath = string.Empty;
+										ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Unable to convert to PFX using OpenSSL.", false);
+										return false;
+									}
 								}
 							}
 							finally
@@ -796,6 +865,12 @@ namespace Waher.IoTGateway.Setup
 								{
 									ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Deleting temporary key file.", false);
 									File.Delete(KeyFileName);
+								}
+
+								if (CertFileName2 != null && File.Exists(CertFileName2))
+								{
+									ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Deleting temporary pfx file.", false);
+									File.Delete(CertFileName2);
 								}
 							}
 						}
@@ -814,12 +889,36 @@ namespace Waher.IoTGateway.Setup
 			}
 			catch (Exception ex)
 			{
-				ClientEvents.PushEvent(new string[] { TabID }, "CertificateError", "Unable to create certificate: " + ex.Message, false);
+				ClientEvents.PushEvent(new string[] { TabID }, "CertificateError", "Unable to create certificate: " + XML.HtmlValueEncode(ex.Message), false);
 				return false;
 			}
 			finally
 			{
 				this.inProgress = false;
+			}
+		}
+
+		private static string[] GetFiles(Environment.SpecialFolder Path, string Pattern)
+		{
+			try
+			{
+				return GetFiles(Environment.GetFolderPath(Path), Pattern);
+			}
+			catch (Exception)
+			{
+				return null;
+			}
+		}
+
+		private static string[] GetFiles(string Path, string Pattern)
+		{
+			try
+			{
+				return Directory.GetFiles(Path, Pattern, SearchOption.AllDirectories);
+			}
+			catch (Exception)
+			{
+				return null;
 			}
 		}
 

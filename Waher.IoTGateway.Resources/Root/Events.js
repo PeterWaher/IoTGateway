@@ -96,6 +96,17 @@ function Reload(Data)
     // TODO: Reload, without using contents in forms.
 }
 
+function EndsWith(String, Suffix)
+{
+    var c = String.length;
+    var d = Suffix.lenght;
+
+    if (c < d)
+        return false;
+
+    return String.substring(c - d, c) === Suffix;
+}
+
 var TabID;
 
 try

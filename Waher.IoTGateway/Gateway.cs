@@ -660,6 +660,16 @@ namespace Waher.IoTGateway
 					};
 				}
 
+				try
+				{
+					webServer?.UpdateCertificate(Certificate);
+					OnNewCertificate?.Invoke(certificate, new EventArgs());
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+
 				return true;
 			}
 			catch (Exception ex)
@@ -682,10 +692,7 @@ namespace Waher.IoTGateway
 					if (await Configuration.CreateCertificate())
 					{
 						if (UpdateCertificate(Configuration))
-						{
 							webServer.UpdateCertificate(certificate);
-							OnNewCertificate?.Invoke(certificate, new EventArgs());
-						}
 					}
 					else
 					{

@@ -20,7 +20,7 @@ function DomainNameInput(Control)
     var Input = Control.value;
     var Index = 0;
     var AltUpdated = false;
- 
+
     Span.innerText = Input;
 
     if (Input.length > 0 && Input.length < 10 && "localhost".substring(0, Input.length) === Input)
@@ -28,7 +28,7 @@ function DomainNameInput(Control)
 
     while ((Control = document.getElementById("AltDomainName" + Index)) !== null)
     {
-        if (Control.value.endsWith("." + Prev))
+        if (EndsWith(Control.value, "." + Prev))
         {
             Control.value = Control.value.substring(0, Control.value.length - Prev.length) + Input;
             AltUpdated = true;
@@ -40,7 +40,7 @@ function DomainNameInput(Control)
     Control = document.getElementById("AltDomainName");
     if (Control !== null)
     {
-        if (Control.value.endsWith("." + Prev))
+        if (EndsWith(Control.value, "." + Prev))
         {
             Control.value = Control.value.substring(0, Control.value.length - Prev.length) + Input;
             AltUpdated = true;
@@ -216,6 +216,7 @@ function TestAcme()
 
     document.getElementById("Status").innerHTML = "";
     document.getElementById("ConnectionStatus").style.display = 'block';
+    document.getElementById("PleaseWait").style.display = 'block';
     document.getElementById("CertificateError").style.display = 'none';
     document.getElementById("NextMessage2").style.display = 'none';
 
@@ -241,8 +242,10 @@ function TermsOfService(URL)
 
 function CertificateError(Message)
 {
+    document.getElementById("PleaseWait").style.display = 'none';
+
     var P = document.getElementById("CertificateError");
-    P.innerText = Message;
+    P.innerHTML = Message;
     P.style.display = "block";
 
     ShowStatus(Message);
@@ -250,6 +253,7 @@ function CertificateError(Message)
 
 function CertificateOk(Data)
 {
+    document.getElementById("PleaseWait").style.display = 'none';
     document.getElementById("CertificateError").style.display = "none";
     document.getElementById("NextMessage2").style.display = "block";
     document.getElementById("NextButton").style.display = "inline-block";

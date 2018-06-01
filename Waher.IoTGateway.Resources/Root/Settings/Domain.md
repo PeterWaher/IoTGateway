@@ -22,7 +22,7 @@ Domain Name
 <legend>Domain name settings</legend>
 
 By providing and using a domain name, it will be easier to reference and protect the application. This is especially important if you plan to make it
-available publicly on the Internet. A domain name must be registered with a *Domain Name Service* (DNS) or a domain name registrar, and point to the
+available publicly on the Internet. A domain name must be registered with a *Domain Name Service* (DNS) or a domain name registrar. It must also point to the
 machine where the application is running. If you don't use a domain name, you can still access the application, either by using the predefined domain name 
 **localhost** from the same machine, or by using the IP address of the machine.
 
@@ -109,6 +109,7 @@ to provide is the URL to their ACME Directory below.
 </div>
 
 <p>Press the Test button to test access to the Certificate Authority. An attempt to create a certificate will be made.</p>
+<p id="PleaseWait" style="display:none" class="message">Please wait while the machine attempts to create a certificate.</p>
 <p id="CertificateError" class="error" style="display:none"></p>
 <p id="NextMessage2" class="message" style="display:none">Certificate for the server successfully created.</p>
 

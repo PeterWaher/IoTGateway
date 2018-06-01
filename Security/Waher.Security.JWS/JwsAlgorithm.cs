@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text;
 using Waher.Content;
 using Waher.Events;
@@ -123,6 +124,9 @@ namespace Waher.Security.JWS
 				{
 					foreach (Type T in Types.GetTypesImplementingInterface(typeof(IJwsAlgorithm)))
 					{
+						if (T.GetTypeInfo().IsAbstract)
+							continue;
+
 						try
 						{
 							Algorithm = (IJwsAlgorithm)Activator.CreateInstance(T);

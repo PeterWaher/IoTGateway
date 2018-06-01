@@ -292,7 +292,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Security.JWS", "Secur
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Utility.Acme", "Utilities\Waher.Utility.Acme\Waher.Utility.Acme.csproj", "{A9907157-5603-4C9B-81B6-96C0B6EFF2F1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Security.PKCS", "Security\Waher.Security.PKCS\Waher.Security.PKCS.csproj", "{C3442084-A298-4277-BE46-283644E2A1E6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Security.PKCS", "Security\Waher.Security.PKCS\Waher.Security.PKCS.csproj", "{C3442084-A298-4277-BE46-283644E2A1E6}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Security.PKCS.Test", "Security\Waher.Security.PKCS.Test\Waher.Security.PKCS.Test.csproj", "{538FF73C-DA59-4B11-AA15-178922956A62}"
 EndProject

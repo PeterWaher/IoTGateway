@@ -44,9 +44,19 @@ namespace Waher.Security.ACME
 		/// </summary>
 		/// <param name="DirectoryEndpoint">HTTP endpoint for the ACME directory resource.</param>
 		public AcmeClient(Uri DirectoryEndpoint)
+			: this(DirectoryEndpoint, DirectoryEndpoint.ToString())
+		{
+		}
+
+		/// <summary>
+		/// Implements an ACME client for the generation of certificates using ACME-compliant certificate servers.
+		/// </summary>
+		/// <param name="DirectoryEndpoint">HTTP endpoint for the ACME directory resource.</param>
+		/// <param name="KeyContainerName">CSP Container name for the JWS key.</param>
+		public AcmeClient(Uri DirectoryEndpoint, string KeyContainerName)
 		{
 			this.directoryEndpoint = DirectoryEndpoint;
-			this.jws = new RsaSsaPkcsSha256(KeySize, DirectoryEndpoint.ToString());
+			this.jws = new RsaSsaPkcsSha256(KeySize, KeyContainerName);
 
 			try
 			{
@@ -718,7 +728,7 @@ namespace Waher.Security.ACME
 			object Decoded = InternetContent.Decode(ContentType, Bin, CertificateLocation);
 			if (!(Decoded is X509Certificate2[] Certificates))
 				throw new Exception("Unexpected response returned. Content-Type: " + ContentType);
-			
+
 			return Certificates;
 		}
 

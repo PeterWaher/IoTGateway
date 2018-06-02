@@ -871,14 +871,17 @@ namespace Waher.IoTGateway
 
 		private static void CopyFolders(string From, string To, bool OnlyIfNewer)
 		{
-			CopyFolder(From, To, "*.*", OnlyIfNewer);
-
-			string[] Folders = Directory.GetDirectories(From, "*.*", SearchOption.TopDirectoryOnly);
-
-			foreach (string Folder in Folders)
+			if (Directory.Exists(From))
 			{
-				string FolderName = Path.GetFileName(Folder);
-				CopyFolders(Folder, Path.Combine(To, FolderName), OnlyIfNewer);
+				CopyFolder(From, To, "*.*", OnlyIfNewer);
+
+				string[] Folders = Directory.GetDirectories(From, "*.*", SearchOption.TopDirectoryOnly);
+
+				foreach (string Folder in Folders)
+				{
+					string FolderName = Path.GetFileName(Folder);
+					CopyFolders(Folder, Path.Combine(To, FolderName), OnlyIfNewer);
+				}
 			}
 		}
 

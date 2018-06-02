@@ -30,4 +30,4 @@ To use this server software, you need to accept the [License agreement](Copyrigh
 
 The **IoT Gateway** is (c) [Waher Data AB](http://waher.se/) 2016-2018. All rights reserved.
  
-[![](/Images/logo-Futura-400x77.png)](http://waher.se/)
+[![](/Images/logo-WaherDataAB-400x77.png)](http://waher.se/)

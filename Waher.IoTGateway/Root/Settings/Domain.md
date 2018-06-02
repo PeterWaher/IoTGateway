@@ -3,7 +3,7 @@ Description: Allows the user to configure domain settings.
 Date: 2018-05-28
 Author: Peter Waher
 Copyright: /Copyright.md
-Master: ..\Master.md
+Master: Master.md
 JavaScript: /Events.js
 JavaScript: /Settings/Domain.js
 JavaScript: /Settings/XMPP.js

@@ -3,7 +3,7 @@ Description: Allows the user to configure XMPP settings.
 Date: 2018-05-10
 Author: Peter Waher
 Copyright: /Copyright.md
-Master: ..\Master.md
+Master: Master.md
 JavaScript: /Events.js
 JavaScript: /Settings/XMPP.js
 JavaScript: /Settings/Next.js

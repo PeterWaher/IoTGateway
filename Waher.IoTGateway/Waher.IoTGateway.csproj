@@ -26,8 +26,46 @@
     <DocumentationFile>bin\Debug\netstandard2.0\Waher.IoTGateway.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="Root\Events.js" />
+    <None Remove="Root\Settings\Config.css" />
+    <None Remove="Root\Settings\Domain.js" />
+    <None Remove="Root\Settings\Domain.md" />
+    <None Remove="Root\Settings\Introduction.md" />
+    <None Remove="Root\Settings\Master.md" />
+    <None Remove="Root\Settings\Next.js" />
+    <None Remove="Root\Settings\XMPP.js" />
+    <None Remove="Root\Settings\XMPP.md" />
     <None Remove="Schema\CertificateConfiguration.xsd" />
     <None Remove="Schema\GatewayConfiguration.xsd" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Root\Events.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Settings\Config.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Settings\Domain.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Settings\Domain.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Settings\Introduction.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Settings\Master.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Settings\Next.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Settings\XMPP.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Settings\XMPP.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Schema\CertificateConfiguration.xsd" />
@@ -82,6 +120,6 @@
     <Exec Command="if exist &quot;$(SolutionDir)..\Registration.cs&quot; copy &quot;$(ProjectDir)Setup\Registration.cs&quot; &quot;$(SolutionDir)..\Registration.cs.bak&quot;&#xD;&#xA;if exist &quot;$(SolutionDir)..\Registration.cs&quot; copy &quot;$(SolutionDir)..\Registration.cs&quot; &quot;$(ProjectDir)&quot;Setup&#xD;&#xA;" />
   </Target>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="if exist &quot;$(SolutionDir)..\Registration.cs&quot; copy &quot;$(SolutionDir)..\Registration.cs.bak&quot; &quot;$(ProjectDir)Setup\Registration.cs&quot;" />
+    <Exec Command="if exist &quot;$(SolutionDir)..\Registration.cs&quot; copy &quot;$(SolutionDir)..\Registration.cs.bak&quot; &quot;$(ProjectDir)Setup\Registration.cs&quot;&#xD;&#xA;&#xD;&#xA;xcopy &quot;$(OutDir)Root\*.*&quot; &quot;C:\ProgramData\IoT Gateway\Root&quot; /S /Y" />
   </Target>
 </Project>

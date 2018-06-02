@@ -3,7 +3,7 @@ Description: Provides the user with a short introduction.
 Date: 2018-05-16
 Author: Peter Waher
 Copyright: /Copyright.md
-Master: ..\Master.md
+Master: Master.md
 JavaScript: /Events.js
 JavaScript: /Settings/Next.js
 

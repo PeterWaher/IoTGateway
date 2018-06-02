@@ -14,11 +14,6 @@
 						<xs:documentation>Name of application.</xs:documentation>
 					</xs:annotation>
 				</xs:element>
-				<xs:element name="Domain" type="xs:string">
-          <xs:annotation>
-            <xs:documentation>Domain Name.</xs:documentation>
-          </xs:annotation>
-        </xs:element>
         <xs:element name="DefaultPage" type="xs:string">
           <xs:annotation>
             <xs:documentation>Default web page.</xs:documentation>

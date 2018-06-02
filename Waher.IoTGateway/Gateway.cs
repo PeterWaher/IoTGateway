@@ -207,7 +207,6 @@ namespace Waher.IoTGateway
 					if (Directory.Exists(s))
 					{
 						CopyFolder(runtimeFolder, appDataFolder, "*.config", true);
-						CopyFolder(runtimeFolder, appDataFolder, "*.pfx", true);
 						CopyFolders(s, rootFolder, true);
 						CopyFolders(Path.Combine(runtimeFolder, "Graphics"), Path.Combine(appDataFolder, "Graphics"), true);
 						CopyFolders(Path.Combine(runtimeFolder, "Transforms"), Path.Combine(appDataFolder, "Transforms"), true);

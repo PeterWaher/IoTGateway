@@ -1036,31 +1036,31 @@ This becomes:
 
 You can also define multi-resolution images as follows. In HTML, they are rendered using the `<picture>` element.
 
-	![Banner](/Images/Banner1%20-%202000x600.png 2000 600)
-		(/Images/Banner1%20-%201900x500.png 1900 500)
-		(/Images/Banner1%20-%201400x425.png 1400 425)
+	![Banner](Banner1%20-%202000x600.png 2000 600)
+		(Banner1%20-%201900x500.png 1900 500)
+		(Banner1%20-%201400x425.png 1400 425)
 
 Now, the browser will select the most appropriate image, based on available space, if the browser supports responsive images based on the 
 `<picture>` element. This is how it will look in your browser:
 
-![Banner](/Images/Banner1%20-%202000x600.png 2000 600)
-	(/Images/Banner1%20-%201900x500.png 1900 500)
-	(/Images/Banner1%20-%201400x425.png 1400 425)
+![Banner](/Themes/CactusRose/Banner1%20-%202000x600.png 2000 600)
+	(/Themes/CactusRose/Banner1%20-%201900x500.png 1900 500)
+	(/Themes/CactusRose/Banner1%20-%201400x425.png 1400 425)
 
 In the same way, you can also define multi-format images using reference notation. You simply list the media items and their different resolutions, if availble
 one after the other, optionally on separate rows.
 
 	![Cactus Rose][]
 	
-	[Cactus Rose]: /Images/Cactus%20Rose%201600x1600.png 1600 1600
-		/Images/Cactus%20Rose%20800x800.png 800 800
+	[Cactus Rose]: Cactus%20Rose%201600x1600.png 1600 1600
+		Cactus%20Rose%20800x800.png 800 800
 
 In your browser, this is displayed as:
 
 ![Cactus Rose][]
 	
-[Cactus Rose]: /Images/Cactus%20Rose%201600x1600.png 1600 1600
-	/Images/Cactus%20Rose%20800x800.png 800 800
+[Cactus Rose]: /Themes/WaherDataAB/Cactus%20Rose%201600x1600.png 1600 1600
+	/Themes/WaherDataAB/Cactus%20Rose%20800x800.png 800 800
 
 A short summary:
 

@@ -17,6 +17,7 @@ Apart from the [IoT Gateway](#iot-gateway) projects, the solution is divided int
 * [Script](#script)
 * [Security](#security)
 * [Services](#services)
+* [Themes](#themes)
 * [Things](#things)
 * [Utilities](#utilities)
 * [Web Services](#webServices)
@@ -64,7 +65,7 @@ damage.
 
 The **IoT Gateway** is &copy; [Waher Data AB](http://waher.se/) 2016-2018. All rights reserved.
  
-[![](Images/logo-Futura-300x58.png)](http://waher.se/)
+[![](/Images/logo-WaherDataAB-300x58.png)](http://waher.se/)
 
 IoT Gateway
 ----------------------
@@ -305,6 +306,15 @@ The [Services](Services) folder contains standalone service applications.
 |----------------------------|------------|---------------------------------------------------------------|---------------------|
 | **Waher.Service.GPIO**     | UWP        |                                                               | The [Waher.Service.GPIO](Services/Waher.Service.GPIO) project defines a Universal Windows Platform application that can be installed on Windows 10 IoT devices. It will publish available GPIO inputs/outputs over XMPP sensor, control and chat interfaces. It will also publish Digital and Analog Arduino interfaces, if an Arduino using the Firmata protocol is connected to an USB port of the device. The application can be used to elaborate with GPIO peripherals using a simple chat client. |
 | **Waher.Service.PcSensor** | .NET 4.6.2 | [Executable](Executables/Waher.Service.PcSensor.zip?raw=true) | The [Waher.Service.PcSensor](Services/Waher.Service.PcSensor) project defines an application that converts your PC into an IoT sensor, by publishing performace counters as sensor values. [Full Screen Shot 1.](Images/Waher.Service.PcSensor.1.png) [Full Screen Shot 2.](Images/Waher.Service.PcSensor.2.png) [Full Screen Shot 3.](Images/Waher.Service.PcSensor.3.png) |
+
+Themes
+----------------------
+
+The [Themes](Themes) folder contains libraries that contain content files for different visual themes.
+
+| Project                    | Type         | Link                                                            | Project description |
+|----------------------------|--------------|-----------------------------------------------------------------|---------------------|
+| **Waher.Theme.CactusRose** | .NET Std 1.0 | [NuGet](https://www.nuget.org/packages/Waher.Theme.CactusRose/) | The [Waher.Theme.CactusRose](Themes/Waher.Theme.CactusRose) project contains content files for the Cactus Rose theme. |
 
 Things
 ----------------------

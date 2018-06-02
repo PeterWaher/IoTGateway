@@ -3,7 +3,7 @@
     <TargetFramework>netstandard1.0</TargetFramework>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <Description>Contains common resource files for the IoT Gateway.</Description>
-    <Copyright>Copyright © Waher Data AB 2016-2017. All rights reserved.</Copyright>
+    <Copyright>Copyright © Waher Data AB 2016-2018. All rights reserved.</Copyright>
     <Authors>Peter Waher</Authors>
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
@@ -104,29 +104,17 @@
     <None Remove="Root\Copyright.md" />
     <None Remove="Root\Emojis.md" />
     <None Remove="Root\Entities.md" />
-    <None Remove="Root\Events.js" />
     <None Remove="Root\Images\Banner1 - 1400x425.png" />
     <None Remove="Root\Images\Banner1 - 1900x500.png" />
     <None Remove="Root\Images\Banner1 - 2000x600.png" />
     <None Remove="Root\Images\Cactus Rose 1600x1600 Dimmed.png" />
     <None Remove="Root\Images\Cactus Rose 1600x1600.png" />
     <None Remove="Root\Images\Cactus Rose 800x800.png" />
-    <None Remove="Root\Images\logo-Futura-200x39.png" />
-    <None Remove="Root\Images\logo-Futura-300x58.png" />
-    <None Remove="Root\Images\logo-Futura-400x77.png" />
-    <None Remove="Root\Images\logo-Futura-500x97.png" />
     <None Remove="Root\Index.md" />
     <None Remove="Root\Login.md" />
     <None Remove="Root\Markdown.md" />
     <None Remove="Root\Master.md" />
     <None Remove="Root\Script.md" />
-    <None Remove="Root\Settings\Config.css" />
-    <None Remove="Root\Settings\Domain.js" />
-    <None Remove="Root\Settings\Domain.md" />
-    <None Remove="Root\Settings\Introduction.md" />
-    <None Remove="Root\Settings\Next.js" />
-    <None Remove="Root\Settings\XMPP.js" />
-    <None Remove="Root\Settings\XMPP.md" />
     <None Remove="Root\Smileys.md" />
     <None Remove="Root\Templates\Repeat.md" />
     <None Remove="Root\Video\small.3gp" />
@@ -385,37 +373,16 @@
     <Content Include="Root\Entities.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Root\Events.js">
+    <Content Include="Root\Images\logo-WaherDataAB-200x39.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Root\Images\Banner1 - 1400x425.png">
+    <Content Include="Root\Images\logo-WaherDataAB-300x58.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Root\Images\Banner1 - 1900x500.png">
+    <Content Include="Root\Images\logo-WaherDataAB-400x77.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Root\Images\Banner1 - 2000x600.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Root\Images\Cactus Rose 1600x1600 Dimmed.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Root\Images\Cactus Rose 1600x1600.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Root\Images\Cactus Rose 800x800.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Root\Images\logo-Futura-200x39.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Root\Images\logo-Futura-300x58.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Root\Images\logo-Futura-400x77.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Root\Images\logo-Futura-500x97.png">
+    <Content Include="Root\Images\logo-WaherDataAB-500x97.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Root\Index.md">
@@ -431,27 +398,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Root\Script.md">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Root\Settings\Introduction.md">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Root\Settings\Next.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Root\Settings\Domain.md">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Root\Settings\Domain.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Root\Settings\XMPP.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Root\Settings\Config.css">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Root\Settings\XMPP.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Root\Smileys.md">
@@ -473,9 +419,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Root\Video\small.webm">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Root\WaherDataAB.css">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Transforms\DbStatXmlToHtml.xslt">

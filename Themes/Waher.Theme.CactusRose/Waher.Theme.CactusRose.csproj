@@ -1,0 +1,61 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard1.0</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <Authors>Peter Waher</Authors>
+    <Company>Waher Data AB</Company>
+    <Product>Waher.IoTGateway</Product>
+    <Description>Contains theme files for the Cactus Rose theme.</Description>
+    <Copyright>Copyright © Waher Data AB 2016-2018. All rights reserved.</Copyright>
+    <PackageLicenseUrl>https://github.com/PeterWaher/IoTGateway#license</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Themes/Waher.Theme.CactusRose</PackageProjectUrl>
+    <PackageIconUrl>https://github.com/PeterWaher/IoTGateway/blob/master/Images/Icon.ico?raw=true</PackageIconUrl>
+    <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
+    <RepositoryType>GitHub</RepositoryType>
+    <PackageTags>IoT Gateway Theme</PackageTags>
+    <NeutralLanguage>English</NeutralLanguage>
+    <AssemblyVersion>1.0.0</AssemblyVersion>
+    <FileVersion>1.0.0</FileVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Root\Themes\CactusRose\Banner1 - 1400x425.png" />
+    <None Remove="Root\Themes\CactusRose\Banner1 - 1900x500.png" />
+    <None Remove="Root\Themes\CactusRose\Banner1 - 2000x600.png" />
+    <None Remove="Root\Themes\CactusRose\Cactus Rose 1600x1600 Dimmed.png" />
+    <None Remove="Root\Themes\CactusRose\Cactus Rose 1600x1600.png" />
+    <None Remove="Root\Themes\CactusRose\Cactus Rose 800x800.png" />
+    <None Remove="Root\Themes\CactusRose\CactusRose.css" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Root\Themes\CactusRose\Banner1 - 1400x425.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Themes\CactusRose\Banner1 - 1900x500.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Themes\CactusRose\Banner1 - 2000x600.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Themes\CactusRose\Cactus Rose 1600x1600 Dimmed.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Themes\CactusRose\Cactus Rose 1600x1600.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Themes\CactusRose\Cactus Rose 800x800.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Themes\CactusRose\CactusRose.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="xcopy &quot;$(OutDir)Root\*.*&quot; &quot;C:\ProgramData\IoT Gateway\Root&quot; /S /Y" />
+  </Target>
+
+</Project>

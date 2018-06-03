@@ -1057,19 +1057,19 @@
 								<Component Id='CactusRoseFiles' Guid='2A32B513-9572-4804-951F-581AF6FE023F'>
 									<RemoveFolder Id='RemoveCactusRose' On='uninstall' />
 									<File Id='CactusRose.css' Name='CactusRose.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\CactusRose\CactusRose.css'/>
-									<File Id='Banner1_1400x425.png' Name='Banner1 - 1400x425.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\CactusRose\Banner1 - 1400x425.png' KeyPath='yes'/>
-									<File Id='Banner1_1900x500.png' Name='Banner1 - 1900x500.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\CactusRose\Banner1 - 1900x500.png'/>
-									<File Id='Banner1_2000x600.png' Name='Banner1 - 2000x600.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\CactusRose\Banner1 - 2000x600.png'/>
-									<File Id='CactusRose800x800.png' Name='Cactus Rose 800x800.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\CactusRose\Cactus Rose 800x800.png'/>
-									<File Id='CactusRose1600x1600Dimmed.png' Name='Cactus Rose 1600x1600 Dimmed.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\CactusRose\Cactus Rose 1600x1600 Dimmed.png'/>
-									<File Id='CactusRose1600x1600.png' Name='Cactus Rose 1600x1600.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\CactusRose\Cactus Rose 1600x1600.png'/>
+									<File Id='CactusRoseBanner1400x425.png' Name='CactusRoseBanner1400x425.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\CactusRose\CactusRoseBanner1400x425.png' KeyPath='yes'/>
+									<File Id='CactusRoseBanner1900x500.png' Name='CactusRoseBanner1900x500.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\CactusRose\CactusRoseBanner1900x500.png'/>
+									<File Id='CactusRoseBanner2000x600.png' Name='CactusRoseBanner2000x600.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\CactusRose\CactusRoseBanner2000x600.png'/>
+									<File Id='CactusRose800x800.png' Name='CactusRose800x800.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\CactusRose\CactusRose800x800.png'/>
+									<File Id='CactusRose1600x1600Dimmed.png' Name='CactusRose1600x1600Dimmed.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\CactusRose\CactusRose1600x1600Dimmed.png'/>
+									<File Id='CactusRose1600x1600.png' Name='CactusRose1600x1600.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\CactusRose\CactusRose1600x1600.png'/>
 									<RemoveFile Id='RemoveCactusRose.css' Name='CactusRose.css' On='uninstall'/>
-									<RemoveFile Id='RemoveBanner1_1400x425.png' Name='Banner1 - 1400x425.png' On='uninstall'/>
-									<RemoveFile Id='RemoveBanner1_1900x500.png' Name='Banner1 - 1900x500.png' On='uninstall'/>
-									<RemoveFile Id='RemoveBanner1_2000x600.png' Name='Banner1 - 2000x600.png' On='uninstall'/>
-									<RemoveFile Id='RemoveCactusRose800x800.png' Name='Cactus Rose 800x800.png' On='uninstall'/>
-									<RemoveFile Id='RemoveCactusRose1600x1600Dimmed.png' Name='Cactus Rose 1600x1600 Dimmed.png' On='uninstall'/>
-									<RemoveFile Id='RemoveCactusRose1600x1600.png' Name='Cactus Rose 1600x1600.png' On='uninstall'/>
+									<RemoveFile Id='RemoveCactusRoseBanner1400x425.png' Name='CactusRoseBanner1400x425.png' On='uninstall'/>
+									<RemoveFile Id='RemoveCactusRoseBanner1900x500.png' Name='CactusRoseBanner1900x500.png' On='uninstall'/>
+									<RemoveFile Id='RemoveCactusRoseBanner2000x600.png' Name='CactusRoseBanner2000x600.png' On='uninstall'/>
+									<RemoveFile Id='RemoveCactusRose800x800.png' Name='CactusRose800x800.png' On='uninstall'/>
+									<RemoveFile Id='RemoveCactusRose1600x1600Dimmed.png' Name='CactusRose1600x1600Dimmed.png' On='uninstall'/>
+									<RemoveFile Id='RemoveCactusRose1600x1600.png' Name='CactusRose1600x1600.png' On='uninstall'/>
 								</Component>
 							</Directory>
 						</Directory>

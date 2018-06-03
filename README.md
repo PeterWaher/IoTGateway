@@ -312,9 +312,10 @@ Themes
 
 The [Themes](Themes) folder contains libraries that contain content files for different visual themes.
 
-| Project                    | Type         | Link                                                            | Project description |
-|----------------------------|--------------|-----------------------------------------------------------------|---------------------|
-| **Waher.Theme.CactusRose** | .NET Std 1.0 | [NuGet](https://www.nuget.org/packages/Waher.Theme.CactusRose/) | The [Waher.Theme.CactusRose](Themes/Waher.Theme.CactusRose) project contains content files for the Cactus Rose theme. |
+| Project                       | Type         | Link                                                               | Project description |
+|-------------------------------|--------------|--------------------------------------------------------------------|---------------------|
+| **Waher.Theme.CactusRose**    | .NET Std 1.0 | [NuGet](https://www.nuget.org/packages/Waher.Theme.CactusRose/)    | The [Waher.Theme.CactusRose](Themes/Waher.Theme.CactusRose) project contains content files for the Cactus Rose theme. |
+| **Waher.Theme.GothicPeacock** | .NET Std 1.0 | [NuGet](https://www.nuget.org/packages/Waher.Theme.GothicPeacock/) | The [Waher.Theme.GothicPeacock](Themes/Waher.Theme.GothicPeacock) project contains content files for the Gothic Peacock theme. |
 
 Things
 ----------------------

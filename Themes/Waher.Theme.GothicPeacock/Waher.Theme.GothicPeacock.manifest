@@ -1,0 +1,9 @@
+﻿<Module xmlns="http://waher.se/Schema/ModuleManifest.xsd">
+  <Folder name="Root">
+		<Folder name="Themes">
+			<Folder name="GothicPeacock">
+				<Content fileName="GothicPeacock.css"/>
+			</Folder>
+		</Folder>
+  </Folder>
+</Module>

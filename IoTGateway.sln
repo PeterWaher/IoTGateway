@@ -298,7 +298,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Security.PKCS.Test", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Themes", "Themes", "{EFF8901B-9D53-4325-91C2-90ECBB50FFB1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Theme.CactusRose", "Themes\Waher.Theme.CactusRose\Waher.Theme.CactusRose.csproj", "{9F5BA12C-CF68-4D41-AD0A-9C9BBE7D2A05}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Theme.CactusRose", "Themes\Waher.Theme.CactusRose\Waher.Theme.CactusRose.csproj", "{9F5BA12C-CF68-4D41-AD0A-9C9BBE7D2A05}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Theme.GothicPeacock", "Themes\Waher.Theme.GothicPeacock\Waher.Theme.GothicPeacock.csproj", "{34FB9846-0E9C-415F-90C2-0DB17C2F6847}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -2679,6 +2681,26 @@ Global
 		{9F5BA12C-CF68-4D41-AD0A-9C9BBE7D2A05}.Release|x64.Build.0 = Release|Any CPU
 		{9F5BA12C-CF68-4D41-AD0A-9C9BBE7D2A05}.Release|x86.ActiveCfg = Release|Any CPU
 		{9F5BA12C-CF68-4D41-AD0A-9C9BBE7D2A05}.Release|x86.Build.0 = Release|Any CPU
+		{34FB9846-0E9C-415F-90C2-0DB17C2F6847}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{34FB9846-0E9C-415F-90C2-0DB17C2F6847}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{34FB9846-0E9C-415F-90C2-0DB17C2F6847}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{34FB9846-0E9C-415F-90C2-0DB17C2F6847}.Debug|ARM.Build.0 = Debug|Any CPU
+		{34FB9846-0E9C-415F-90C2-0DB17C2F6847}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{34FB9846-0E9C-415F-90C2-0DB17C2F6847}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{34FB9846-0E9C-415F-90C2-0DB17C2F6847}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{34FB9846-0E9C-415F-90C2-0DB17C2F6847}.Debug|x64.Build.0 = Debug|Any CPU
+		{34FB9846-0E9C-415F-90C2-0DB17C2F6847}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{34FB9846-0E9C-415F-90C2-0DB17C2F6847}.Debug|x86.Build.0 = Debug|Any CPU
+		{34FB9846-0E9C-415F-90C2-0DB17C2F6847}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{34FB9846-0E9C-415F-90C2-0DB17C2F6847}.Release|Any CPU.Build.0 = Release|Any CPU
+		{34FB9846-0E9C-415F-90C2-0DB17C2F6847}.Release|ARM.ActiveCfg = Release|Any CPU
+		{34FB9846-0E9C-415F-90C2-0DB17C2F6847}.Release|ARM.Build.0 = Release|Any CPU
+		{34FB9846-0E9C-415F-90C2-0DB17C2F6847}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{34FB9846-0E9C-415F-90C2-0DB17C2F6847}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{34FB9846-0E9C-415F-90C2-0DB17C2F6847}.Release|x64.ActiveCfg = Release|Any CPU
+		{34FB9846-0E9C-415F-90C2-0DB17C2F6847}.Release|x64.Build.0 = Release|Any CPU
+		{34FB9846-0E9C-415F-90C2-0DB17C2F6847}.Release|x86.ActiveCfg = Release|Any CPU
+		{34FB9846-0E9C-415F-90C2-0DB17C2F6847}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -2794,6 +2816,7 @@ Global
 		{C3442084-A298-4277-BE46-283644E2A1E6} = {D9FE4585-4E25-44EC-8DBA-DA90B012DC67}
 		{538FF73C-DA59-4B11-AA15-178922956A62} = {D9FE4585-4E25-44EC-8DBA-DA90B012DC67}
 		{9F5BA12C-CF68-4D41-AD0A-9C9BBE7D2A05} = {EFF8901B-9D53-4325-91C2-90ECBB50FFB1}
+		{34FB9846-0E9C-415F-90C2-0DB17C2F6847} = {EFF8901B-9D53-4325-91C2-90ECBB50FFB1}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {32CF1367-B83E-4CAD-8329-0D1C73AF59F4}

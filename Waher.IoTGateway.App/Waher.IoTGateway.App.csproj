@@ -325,6 +325,10 @@
       <Project>{9f5ba12c-cf68-4d41-ad0a-9c9bbe7d2a05}</Project>
       <Name>Waher.Theme.CactusRose</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Themes\Waher.Theme.GothicPeacock\Waher.Theme.GothicPeacock.csproj">
+      <Project>{34fb9846-0e9c-415f-90c2-0db17c2f6847}</Project>
+      <Name>Waher.Theme.GothicPeacock</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Things\Waher.Things.Arduino\Waher.Things.Arduino.csproj">
       <Project>{99859282-a034-4014-bb69-a21728b3169f}</Project>
       <Name>Waher.Things.Arduino</Name>

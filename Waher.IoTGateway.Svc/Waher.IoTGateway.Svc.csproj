@@ -47,6 +47,7 @@
     <ProjectReference Include="..\Script\Waher.Script.Statistics\Waher.Script.Statistics.csproj" />
     <ProjectReference Include="..\Script\Waher.Script\Waher.Script.csproj" />
     <ProjectReference Include="..\Themes\Waher.Theme.CactusRose\Waher.Theme.CactusRose.csproj" />
+    <ProjectReference Include="..\Themes\Waher.Theme.GothicPeacock\Waher.Theme.GothicPeacock.csproj" />
     <ProjectReference Include="..\Things\Waher.Things.Ip\Waher.Things.Ip.csproj" />
     <ProjectReference Include="..\Things\Waher.Things.Metering\Waher.Things.Metering.csproj" />
     <ProjectReference Include="..\Things\Waher.Things\Waher.Things.csproj" />

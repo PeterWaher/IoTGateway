@@ -15,9 +15,9 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>IoT Gateway HTTP CoAP MQTT XMPP LWM2M</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.0.26</AssemblyVersion>
-    <FileVersion>1.0.26</FileVersion>
-    <Version>1.0.26</Version>
+    <AssemblyVersion>1.0.27</AssemblyVersion>
+    <FileVersion>1.0.27</FileVersion>
+    <Version>1.0.27</Version>
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Waher.IoTGateway\</UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>
@@ -26,7 +26,9 @@
     <DocumentationFile>bin\Debug\netstandard2.0\Waher.IoTGateway.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="Root\Copyright.md" />
     <None Remove="Root\Events.js" />
+    <None Remove="Root\Login.md" />
     <None Remove="Root\Settings\Config.css" />
     <None Remove="Root\Settings\Domain.js" />
     <None Remove="Root\Settings\Domain.md" />
@@ -40,7 +42,13 @@
     <None Remove="Waher.IoTGateway.manifest" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Root\Copyright.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Root\Events.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Login.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Root\Settings\Config.css">

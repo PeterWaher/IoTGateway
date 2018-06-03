@@ -1,7 +1,9 @@
 ﻿<Module xmlns="http://waher.se/Schema/ModuleManifest.xsd">
 	<Assembly fileName="Waher.IoTGateway.dll"/>
 	<Folder name="Root">
+		<Content fileName="Copyright.md"/>
 		<Content fileName="Events.js"/>
+		<Content fileName="Login.md"/>
 		<Folder name="Settings">
 			<Content fileName="Config.css"/>
 			<Content fileName="Domain.js"/>

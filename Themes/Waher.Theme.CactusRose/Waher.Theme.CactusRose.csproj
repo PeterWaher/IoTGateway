@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard1.0</TargetFramework>
@@ -16,40 +16,39 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>IoT Gateway Theme</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.0.0</AssemblyVersion>
-    <FileVersion>1.0.0</FileVersion>
+    <AssemblyVersion>1.0.2</AssemblyVersion>
+    <FileVersion>1.0.2</FileVersion>
+    <Version>1.0.2</Version>
+    <PackageId>Waher.Theme.CactusRose</PackageId>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Root\Themes\CactusRose\Banner1 - 1400x425.png" />
-    <None Remove="Root\Themes\CactusRose\Banner1 - 1900x500.png" />
-    <None Remove="Root\Themes\CactusRose\Banner1 - 2000x600.png" />
-    <None Remove="Root\Themes\CactusRose\Cactus Rose 1600x1600 Dimmed.png" />
-    <None Remove="Root\Themes\CactusRose\Cactus Rose 1600x1600.png" />
-    <None Remove="Root\Themes\CactusRose\Cactus Rose 800x800.png" />
-    <None Remove="Root\Themes\CactusRose\CactusRose.css" />
+    <None Remove="Waher.Theme.CactusRose.manifest" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="Root\Themes\CactusRose\Banner1 - 1400x425.png">
+    <Content Include="Root\Themes\CactusRose\CactusRoseBanner1400x425.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Root\Themes\CactusRose\Banner1 - 1900x500.png">
+    <Content Include="Root\Themes\CactusRose\CactusRoseBanner1900x500.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Root\Themes\CactusRose\Banner1 - 2000x600.png">
+    <Content Include="Root\Themes\CactusRose\CactusRoseBanner2000x600.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Root\Themes\CactusRose\Cactus Rose 1600x1600 Dimmed.png">
+    <Content Include="Root\Themes\CactusRose\CactusRose1600x1600Dimmed.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Root\Themes\CactusRose\Cactus Rose 1600x1600.png">
+    <Content Include="Root\Themes\CactusRose\CactusRose1600x1600.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Root\Themes\CactusRose\Cactus Rose 800x800.png">
+    <Content Include="Root\Themes\CactusRose\CactusRose800x800.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Root\Themes\CactusRose\CactusRose.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Waher.Theme.CactusRose.manifest">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

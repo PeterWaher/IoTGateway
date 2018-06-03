@@ -8,7 +8,7 @@ body
     margin: 0;
     font-family: "Segoe UI", "Segoe UI Web Regular", "Segoe UI Symbol", "Helvetica Neue", "BBAlpha Sans", "S60 Sans", Arial, sans-serif;
     font-size: 100%;
-    background: url(Cactus%20Rose%201600x1600%20Dimmed.png) no-repeat center center fixed;
+    background: url(CactusRose1600x1600Dimmed.png) no-repeat center center fixed;
     -webkit-background-size: cover;
     -moz-background-size: cover;
     -o-background-size: cover;
@@ -30,7 +30,7 @@ main
 
 header
 {
-    background-image: url(Banner1%20-%202000x600.png);
+    background-image: url(CactusRoseBanner2000x600.png);
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
@@ -99,7 +99,7 @@ nav > ul > li > a:hover
 
 footer
 {
-    background-image: url(Banner1%20-%202000x600.png);
+    background-image: url(CactusRoseBanner2000x600.png);
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;

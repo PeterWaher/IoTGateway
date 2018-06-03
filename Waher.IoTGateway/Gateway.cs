@@ -623,14 +623,10 @@ namespace Waher.IoTGateway
 							Name = XML.Attribute(E, "fileName");
 
 							string s = Path.Combine(RuntimeSubfolder, Name);
-							if (File.Exists(s))
-								Name = s;
-							else
+							if (!File.Exists(s))
 							{
 								s = Path.Combine(RuntimeFolder, Name);
-								if (File.Exists(s))
-									Name = s;
-								else
+								if (!File.Exists(s))
 									break;
 							}
 

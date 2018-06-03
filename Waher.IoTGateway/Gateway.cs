@@ -189,6 +189,7 @@ namespace Waher.IoTGateway
 					appDataFolder += Path.DirectorySeparatorChar;
 
 				appDataFolder += "IoT Gateway" + Path.DirectorySeparatorChar;
+				rootFolder = appDataFolder + "Root" + Path.DirectorySeparatorChar;
 
 				Log.Register(new XmlFileEventSink("XML File Event Sink",
 					appDataFolder + "Events" + Path.DirectorySeparatorChar + "Event Log %YEAR%-%MONTH%-%DAY%T%HOUR%.xml",
@@ -200,7 +201,6 @@ namespace Waher.IoTGateway
 
 				beforeUninstallCommandNr = Gateway.RegisterServiceCommand(BeforeUninstall);
 
-				rootFolder = appDataFolder + "Root" + Path.DirectorySeparatorChar;
 				if (!Directory.Exists(rootFolder))
 				{
 					string s = Path.Combine(runtimeFolder, "Root");
@@ -217,6 +217,12 @@ namespace Waher.IoTGateway
 						rootFolder = "Root" + Path.DirectorySeparatorChar;
 					}
 				}
+
+				string[] ManifestFiles = Directory.GetFiles(runtimeFolder, "*.manifest", SearchOption.TopDirectoryOnly);
+
+				foreach (string ManifestFile in ManifestFiles)
+					CheckContentFiles(ManifestFile);
+
 
 				Types.SetModuleParameter("AppData", appDataFolder);
 				Types.SetModuleParameter("Root", rootFolder);
@@ -580,6 +586,78 @@ namespace Waher.IoTGateway
 			});
 
 			return true;
+		}
+
+		private static void CheckContentFiles(string ManifestFileName)
+		{
+			try
+			{
+				XmlDocument Doc = new XmlDocument();
+				Doc.Load(ManifestFileName);
+
+				if (Doc.DocumentElement != null && Doc.DocumentElement.LocalName == "Module" && Doc.DocumentElement.NamespaceURI == "http://waher.se/Schema/ModuleManifest.xsd")
+					CheckContentFiles(Doc.DocumentElement, runtimeFolder, runtimeFolder, appDataFolder);
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex, ManifestFileName);
+			}
+		}
+
+		private static void CheckContentFiles(XmlElement Element, string RuntimeFolder, string RuntimeSubfolder, string AppDataSubFolder)
+		{
+			bool AppDataFolderChecked = false;
+
+			foreach (XmlNode N in Element.ChildNodes)
+			{
+				if (N is XmlElement E)
+				{
+					switch (E.LocalName)
+					{
+						case "Folder":
+							string Name = XML.Attribute(E, "name");
+							CheckContentFiles(E, RuntimeFolder, Path.Combine(RuntimeFolder, Name), Path.Combine(AppDataSubFolder, Name));
+							break;
+
+						case "Content":
+							Name = XML.Attribute(E, "fileName");
+
+							string s = Path.Combine(RuntimeSubfolder, Name);
+							if (File.Exists(s))
+								Name = s;
+							else
+							{
+								s = Path.Combine(RuntimeFolder, Name);
+								if (File.Exists(s))
+									Name = s;
+								else
+									break;
+							}
+
+							if (!AppDataFolderChecked)
+							{
+								AppDataFolderChecked = true;
+
+								if (!Directory.Exists(AppDataSubFolder))
+									Directory.CreateDirectory(AppDataSubFolder);
+							}
+
+							string s2 = Path.Combine(AppDataSubFolder, Name);
+
+							if (!File.Exists(s2))
+								File.Copy(s, s2);
+							else
+							{
+								DateTime TP = File.GetLastWriteTime(s);
+								DateTime TP2 = File.GetLastWriteTime(s2);
+
+								if (TP2 > TP)
+									File.Copy(s, s2, true);
+							}
+							break;
+					}
+				}
+			}
 		}
 
 		internal static bool ConsoleOutput => consoleOutput;
@@ -1301,7 +1379,7 @@ namespace Waher.IoTGateway
 			if (Request.Session == null || !Request.Session.TryGetVariable("from", out Variable v) || string.IsNullOrEmpty(From = v.ValueObject as string))
 				return;
 
-			if (!loopbackIntefaceAvailable && !XmppConfiguration.Instance.Complete)
+			if (!loopbackIntefaceAvailable && (XmppConfiguration.Instance == null || !XmppConfiguration.Instance.Complete))
 			{
 				Log.Informational("User logged in by default, since XMPP not configued and loopback interface not available.", string.Empty, Request.RemoteEndPoint, "LoginSuccessful", EventLevel.Minor);
 				Login.DoLogin(Request, From);

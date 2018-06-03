@@ -15,9 +15,9 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>IoT Gateway HTTP CoAP MQTT XMPP LWM2M</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.0.24</AssemblyVersion>
-    <FileVersion>1.0.24</FileVersion>
-    <Version>1.0.24</Version>
+    <AssemblyVersion>1.0.25</AssemblyVersion>
+    <FileVersion>1.0.25</FileVersion>
+    <Version>1.0.25</Version>
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Waher.IoTGateway\</UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>
@@ -37,6 +37,7 @@
     <None Remove="Root\Settings\XMPP.md" />
     <None Remove="Schema\CertificateConfiguration.xsd" />
     <None Remove="Schema\GatewayConfiguration.xsd" />
+    <None Remove="Waher.IoTGateway.manifest" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Root\Events.js">
@@ -64,6 +65,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Root\Settings\XMPP.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Waher.IoTGateway.manifest">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

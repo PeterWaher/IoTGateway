@@ -125,6 +125,7 @@
     <None Remove="Root\WaherDataAB.css" />
     <None Remove="Transforms\EventXmlToHtml.xslt" />
     <None Remove="Transforms\SnifferXmlToHtml.xslt" />
+    <None Remove="Waher.IoTGateway.Resources.manifest" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Gateway.config">
@@ -428,6 +429,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Transforms\SnifferXmlToHtml.xslt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Waher.IoTGateway.Resources.manifest">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

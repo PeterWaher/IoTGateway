@@ -372,7 +372,9 @@ xcopy "$(TargetDir)Graphics" "$(TargetDir)AppX\Graphics" /S /Y
 xcopy "$(TargetDir)Highlight" "$(TargetDir)AppX\Highlight" /S /Y
 xcopy "$(TargetDir)Root" "$(TargetDir)AppX\Root" /S /Y
 xcopy "$(TargetDir)Transforms" "$(TargetDir)AppX\Transforms" /S /Y
-xcopy "$(TargetDir)*.config" "$(TargetDir)AppX" /Y</PostBuildEvent>
+xcopy "$(TargetDir)*.config" "$(TargetDir)AppX" /Y
+xcopy "$(TargetDir)*.manifest" "$(TargetDir)AppX" /Y
+</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

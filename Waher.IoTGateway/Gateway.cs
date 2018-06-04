@@ -616,7 +616,7 @@ namespace Waher.IoTGateway
 					{
 						case "Folder":
 							string Name = XML.Attribute(E, "name");
-							CheckContentFiles(E, RuntimeFolder, Path.Combine(RuntimeFolder, Name), Path.Combine(AppDataSubFolder, Name));
+							CheckContentFiles(E, RuntimeFolder, Path.Combine(RuntimeSubfolder, Name), Path.Combine(AppDataSubFolder, Name));
 							break;
 
 						case "Content":

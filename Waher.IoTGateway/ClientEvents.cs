@@ -8,7 +8,30 @@ using Waher.Runtime.Cache;
 namespace Waher.IoTGateway
 {
 	/// <summary>
-	/// Resource managing asynchronous events to web clients.
+	/// The ClientEvents class allows applications to push information asynchronously to web clients connected to the server.
+	/// It keeps track of all open web clients that have the Events.js Javascript file loaded. When Events.js is loaded, it
+	/// creates a unique Tab ID which it reports back to the ClientEvents resource. There, it is paired with the current resource
+	/// being displayed, including any query parameters. Any application can then use ClientEvents to push information, either
+	/// text strings or JSON objects, to any JavaScript function currently loaded by the client. Subsets of connected web clients
+	/// can be made, either on resource or query string parameters.
+	/// 
+	/// Note: The use of Tab IDs allows you to uniquely identify each open tab, even when multiple tabs are open at the same time in
+	/// the same browser.
+	/// 
+	/// Static methods of interest:
+	/// 
+	/// GetOpenLocations() allows you to get a list of resources currently being viewed.
+	/// 
+	/// GetTabIDsForLocation() allows you to get the set of Tab IDs viewing a particular resource, optionally filtered by query parameters.
+	/// 
+	/// GetTabIDsForLocations() allows you to get the set of Tab IDs viewing a set of resources.
+	/// 
+	/// GetTabIDs() returns the set of Tab IDs fr all open web clients.
+	/// 
+	/// PushEvent() allows you to push information to a set of clients, identified by their Tab IDs. Events.js performs constant long-polling
+	/// of the server, to retrieve any events it might push to the client. Events include a Type and a Data element. The Type is translated into
+	/// a Javascript function name. Data is passed to the function, as a parameter. The Data parameter can be either a string, or a JSON object.
+	/// You can use the static JSON class available in the Waher.Content library to encode and decode JSON.
 	/// </summary>
 	public class ClientEvents : HttpAsynchronousResource, IHttpPostMethod
 	{

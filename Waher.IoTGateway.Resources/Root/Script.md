@@ -66,6 +66,7 @@ special control characters in strings, accordig to the following table.
 | `\f`     | Form-feed character. | 
 | `\a`     | Audible bell character. | 
 | `\v`     | Vertical tab character. | 
+| `\xHH`   | Inlude a hexadecimally encoded byte. | 
 
 ### Null
 

@@ -36,11 +36,11 @@ namespace Waher.Script
 	{
 		private static readonly Dictionary<string, bool> keywords = GetKeywords();
 
-		private ScriptNode root;
+		private readonly ScriptNode root;
 		private string script;
 		private object tag;
 		private int pos;
-		private int len;
+		private readonly int len;
 		private bool containsImplicitPrint = false;
 
 		/// <summary>
@@ -352,8 +352,7 @@ namespace Waher.Script
 							}
 							else
 							{
-								Assignment Assignment = this.AssertOperandNotNull(this.ParseList()) as Assignment;
-								if (Assignment == null)
+								if (!(this.AssertOperandNotNull(this.ParseList()) is Assignment Assignment))
 									throw new SyntaxException("Assignment expected", this.pos, this.script);
 
 								this.SkipWhiteSpace();
@@ -905,7 +904,7 @@ namespace Waher.Script
 					int Start = Left.Start;
 					string[] ArgumentNames;
 					ArgumentType[] ArgumentTypes;
-					
+
 					if (Left is VariableReference Ref)
 					{
 						ArgumentNames = new string[] { Ref.VariableName };
@@ -2015,8 +2014,7 @@ namespace Waher.Script
 					if ((ch = this.PeekNextChar()) == '-')
 					{
 						this.pos++;
-						VariableReference Ref = this.ParseUnaryPrefixOperator() as VariableReference;
-						if (Ref == null)
+						if (!(this.ParseUnaryPrefixOperator() is VariableReference Ref))
 							throw new SyntaxException("The -- operator can only work on variable references.", this.pos, this.script);
 
 						return new PreDecrement(Ref.VariableName, Start, this.pos - Start, this);
@@ -2039,8 +2037,7 @@ namespace Waher.Script
 					if ((ch = this.PeekNextChar()) == '+')
 					{
 						this.pos++;
-						VariableReference Ref = this.ParseUnaryPrefixOperator() as VariableReference;
-						if (Ref == null)
+						if (!(this.ParseUnaryPrefixOperator() is VariableReference Ref))
 							throw new SyntaxException("The ++ operator can only work on variable references.", this.pos, this.script);
 
 						return new PreIncrement(Ref.VariableName, Start, this.pos - Start, this);
@@ -2978,7 +2975,7 @@ namespace Waher.Script
 
 		private static Dictionary<string, FunctionRef> functions = null;
 		private static Dictionary<string, IConstant> constants = null;
-		private static object searchSynch = new object();
+		private readonly static object searchSynch = new object();
 
 		private ScriptNode ParseObject()
 		{
@@ -3263,6 +3260,31 @@ namespace Waher.Script
 							case 'v':
 								ch2 = '\v';
 								break;
+
+							case 'x':
+								ch2 = this.NextChar();
+								if (ch2 >= '0' && ch2 <= '9')
+									ch2 -= '0';
+								else if (ch2 >= 'a' && ch2 <= 'f')
+									ch2 -= (char)('a' - 10);
+								else if (ch2 >= 'A' && ch2 <= 'F')
+									ch2 -= (char)('A' - 10);
+								else
+									throw new SyntaxException("Hexadecimal digit expected.", this.pos, this.script);
+
+								char ch3 = this.NextChar();
+								if (ch3 >= '0' && ch3 <= '9')
+									ch3 -= '0';
+								else if (ch3 >= 'a' && ch3 <= 'f')
+									ch3 -= (char)('a' - 10);
+								else if (ch3 >= 'A' && ch3 <= 'F')
+									ch3 -= (char)('A' - 10);
+								else
+									throw new SyntaxException("Hexadecimal digit expected.", this.pos, this.script);
+
+								ch2 <<= 4;
+								ch2 += ch3;
+								break;
 						}
 					}
 
@@ -3369,11 +3391,10 @@ namespace Waher.Script
 		/// </summary>
 		public override bool Equals(object obj)
 		{
-			Expression Exp = obj as Expression;
-			if (Exp == null)
-				return false;
-			else
+			if (obj is Expression Exp)
 				return this.script.Equals(Exp.script);
+			else
+				return false;
 		}
 
 		/// <summary>

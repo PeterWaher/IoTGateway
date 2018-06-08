@@ -328,8 +328,8 @@ namespace Waher.Script.Test
 		[TestMethod]
 		public void Parsing_Test_28_StringValues()
 		{
-			this.Test("\"Hello\\r\\n\\t\\f\\b\\a\\v\\\\\\\"\\''\"");
-			this.Test("'Hello\\r\\n\\t\\f\\b\\a\\v\\\\\\\"\\'\"'");
+			this.Test("\"Hello\\r\\n\\t\\f\\b\\a\\v\\\\\\\"\\''\"\x03");
+			this.Test("'Hello\\r\\n\\t\\f\\b\\a\\v\\\\\\\"\\'\"'\x03");
 		}
 
 		[TestMethod]

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Exceptions;
 using Waher.Script.Model;
 
 namespace Waher.Script.Operators.Calculus
@@ -9,7 +10,7 @@ namespace Waher.Script.Operators.Calculus
 	/// <summary>
 	/// Default Differentiation operator.
 	/// </summary>
-	public class DefaultDifferentiation : UnaryOperator 
+	public class DefaultDifferentiation : UnaryOperator
 	{
 		private int nrDifferentiations;
 
@@ -42,7 +43,17 @@ namespace Waher.Script.Operators.Calculus
 		/// <returns>Result.</returns>
 		public override IElement Evaluate(Variables Variables)
 		{
-			throw new NotImplementedException();	// TODO: Implement
+			if (this.op is IDifferentiable Differentiable)
+			{
+				string VariableName = Differentiable.DefaultVariableName;
+				if (string.IsNullOrEmpty(VariableName))
+					throw new ScriptRuntimeException("No default variable available.", this);
+
+				return new LambdaDefinition(new string[] { VariableName }, new ArgumentType[] { ArgumentType.Scalar },
+					Differentiable.Differentiate(VariableName, Variables), this.Start, this.Length, this.Expression);
+			}
+			else
+				throw new ScriptRuntimeException("Not differentiable.", this);
 		}
 	}
 }

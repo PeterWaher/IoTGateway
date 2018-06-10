@@ -10,7 +10,7 @@ namespace Waher.Script.Model
     /// <summary>
     /// Represents a variable reference.
     /// </summary>
-    public sealed class VariableReference : ScriptNode
+    public sealed class VariableReference : ScriptNode, IDifferentiable
     {
         private string variableName;
         private bool onlyVariables;
@@ -101,5 +101,24 @@ namespace Waher.Script.Model
             AlreadyFound[this.variableName] = CheckAgainst;
         }
 
-    }
+		/// <summary>
+		/// Differentiates a script node, if possible.
+		/// </summary>
+		/// <param name="VariableName">Name of variable to differentiate on.</param>
+		/// <param name="Variables">Collection of variables.</param>
+		/// <returns>Differentiated node.</returns>
+		public ScriptNode Differentiate(string VariableName, Variables Variables)
+		{
+			if (VariableName == this.variableName)
+				return new ConstantElement(DoubleNumber.OneElement, this.Start, this.Length, this.Expression);
+			else
+				return new ConstantElement(DoubleNumber.ZeroElement, this.Start, this.Length, this.Expression);
+		}
+
+		/// <summary>
+		/// Default variable name, if any, null otherwise.
+		/// </summary>
+		public string DefaultVariableName => this.variableName;
+
+	}
 }

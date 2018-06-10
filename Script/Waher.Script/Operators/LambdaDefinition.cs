@@ -16,7 +16,7 @@ namespace Waher.Script.Operators
     /// <summary>
     /// Lambda Definition.
     /// </summary>
-    public class LambdaDefinition : UnaryOperator, IElement, ILambdaExpression
+    public class LambdaDefinition : UnaryOperator, IElement, ILambdaExpression, IDifferentiable
     {
         private readonly string[] argumentNames;
         private readonly ArgumentType[] argumentTypes;
@@ -381,10 +381,28 @@ namespace Waher.Script.Operators
 		/// <param name="VariableName">Name of variable to differentiate on.</param>
 		/// <param name="Variables">Collection of variables.</param>
 		/// <returns>Differentiated lambda expression.</returns>
-		public ILambdaExpression Differentiate(string VariableName, Variables Variables)
+		public ScriptNode Differentiate(string VariableName, Variables Variables)
 		{
+			if (Array.IndexOf<string>(this.argumentNames, VariableName) < 0)
+				return new ConstantElement(Objects.DoubleNumber.ZeroElement, this.Start, this.Length, this.Expression);
+			else if (this.op is IDifferentiable Differentiable)
+				return new LambdaDefinition(this.argumentNames, this.argumentTypes, Differentiable.Differentiate(VariableName, Variables), this.Start, this.Length, this.Expression);
+			else
+				throw new ScriptRuntimeException("Lambda expression not differentiable.", this);
+		}
 
-			throw new NotImplementedException();	// TODO: Implement.
+		/// <summary>
+		/// Default variable name, if any, null otherwise.
+		/// </summary>
+		public string DefaultVariableName
+		{
+			get
+			{
+				if (this.argumentNames.Length == 1)
+					return this.argumentNames[0];
+				else
+					return null;
+			}
 		}
 
 		/// <summary>

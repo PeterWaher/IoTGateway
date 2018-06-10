@@ -42,13 +42,5 @@ namespace Waher.Script.Model
 		/// <param name="Variables">Variables collection.</param>
 		/// <returns>Result.</returns>
 		IElement Evaluate(IElement[] Arguments, Variables Variables);
-
-		/// <summary>
-		/// Differentiates a lambda expression, if possible.
-		/// </summary>
-		/// <param name="VariableName">Name of variable to differentiate on.</param>
-		/// <param name="Variables">Collection of variables.</param>
-		/// <returns>Differentiated lambda expression.</returns>
-		ILambdaExpression Differentiate(string VariableName, Variables Variables);
 	}
 }

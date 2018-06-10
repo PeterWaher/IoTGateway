@@ -44,5 +44,20 @@ namespace Waher.Script.Model
 			get;
 		}
 
+		/// <summary>
+		/// Default variable name, if any, null otherwise.
+		/// </summary>
+		public virtual string DefaultVariableName
+		{
+			get
+			{
+				string[] A = this.DefaultArgumentNames;
+				if (A.Length == 1)
+					return A[0];
+				else
+					return null;
+			}
+		}
+
 	}
 }

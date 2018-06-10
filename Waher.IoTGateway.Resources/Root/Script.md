@@ -841,15 +841,15 @@ by applications that are not part of the **IoT Gateway**.
 
 The following functions are available in the `Waher.Script.Graphs` library.
 
-| Function | Description | Example |
-|----------|-------------|---------|
-| `GrayScale(Color)` | Converts a color to its corresponding Gray-scale value. | `GrayScale(cl)` |
-| `HSL(H,S,L)` | Creates a color from its HSL representation. | `HSL(100,0.5,0.7)` |
-| `HSLA(H,S,L,A)` | Creates a color from its HSLA representation. | `HSLA(100,0.5,0.7,64)` |
-| `HSV(H,S,V)` | Creates a color from its HSV representation. | `HSV(100,0.5,0.7)` |
-| `HSVA(H,S,V,A)` | Creates a color from its HSVA representation. | `HSVA(100,0.5,0.7,64)` |
-| `RGB(R,G,B)` | Creates a color from its RGB representation. | `RGB(100,150,200)` |
-| `RGBA(R,G,B,A)` | Creates a color from its RGBA representation. | `RGBA(100,150,200,64)` |
+| Function           | Description | Example |
+|--------------------|-------------|---------|
+| `GrayScale(Color)` | Converts a color to its corresponding Gray-scale value. | `GrayScale(cl)`        |
+| `HSL(H,S,L)`       | Creates a color from its HSL representation.            | `HSL(100,0.5,0.7)`     |
+| `HSLA(H,S,L,A)`    | Creates a color from its HSLA representation.           | `HSLA(100,0.5,0.7,64)` |
+| `HSV(H,S,V)`       | Creates a color from its HSV representation.            | `HSV(100,0.5,0.7)`     |
+| `HSVA(H,S,V,A)`    | Creates a color from its HSVA representation.           | `HSVA(100,0.5,0.7,64)` |
+| `RGB(R,G,B)`       | Creates a color from its RGB representation.            | `RGB(100,150,200)`     |
+| `RGBA(R,G,B,A)`    | Creates a color from its RGBA representation.           | `RGBA(100,150,200,64)` |
 
 #### Graph functions (Waher.Script.Graphs)
 
@@ -982,6 +982,31 @@ plot2dlayeredcurvearea(x,y,rgba(255,0,0,64))+
    scatter2d(x,y,"Red",5)+
    scatter2d(x,y2,"Blue",5)
 }
+
+#### Palette generation functions (Waher.Script.Fractals)
+
+The following functions can be used to randomly create color palettes. The functions are available in the `Waher.Script.Fractals` library.
+
+| Function           | Description | Example |
+|--------------------|-------------|---------|
+| `LinearColors(Colors[,N[,BandSize]])` | Creates a cyclic palette of `N` colors (default=1024) from an array of `Colors`, by linear interpolation over bands of `BandSize` intermediate colors (default=16). | `TestColorModel(LinearColors(["Red","Green","Blue"],1024,64))` |
+| `RandomLinearAnalogousHSL([N[,BandSize[,Seed]]])` | Creates a palette of `N` colors (default=1024) consisting of bands of `BandSize` intermediate colors (default=16) interpolating random colors analogous in HSL space. The random number generator can be initialized by a `Seed`, if provided, or use a random one. | `TestColorModel(RandomLinearAnalogousHSL(1024,64))` |
+| `RandomLinearAnalogousHSV([N[,BandSize[,Seed]]])` | Creates a palette of `N` colors (default=1024) consisting of bands of `BandSize` intermediate colors (default=16) interpolating random colors analogous in HSV space. The random number generator can be initialized by a `Seed`, if provided, or use a random one. | `TestColorModel(RandomLinearAnalogousHSV(1024,64))` |
+| `RandomLinearComplementaryHSL([N[,BandSize[,Seed]]])` | Creates a palette of `N` colors (default=1024) consisting of bands of `BandSize` intermediate colors (default=16) interpolating random colors complementary in HSL space. The random number generator can be initialized by a `Seed`, if provided, or use a random one. | `TestColorModel(RandomLinearComplementaryHSL(1024,64))` |
+| `RandomLinearComplementaryHSV([N[,BandSize[,Seed]]])` | Creates a palette of `N` colors (default=1024) consisting of bands of `BandSize` intermediate colors (default=16) interpolating random colors complementary in HSV space. The random number generator can be initialized by a `Seed`, if provided, or use a random one. | `TestColorModel(RandomLinearComplementaryHSV(1024,64))` |
+| `RandomLinearRGB([N[,BandSize[,Seed]]])` | Creates a palette of `N` colors (default=1024) consisting of bands of `BandSize` intermediate colors (default=16) interpolating random colors in RGB space. The random number generator can be initialized by a `Seed`, if provided, or use a random one. | `TestColorModel(RandomLinearRGB(1024,64))` |
+| `RandomSingleHue([N[,BandSize[,Seed]]])` | Creates a palette of `N` colors (default=1024) consisting of bands of `BandSize` intermediate colors (default=16) interpolating random colors using a single Hue. The random number generator can be initialized by a `Seed`, if provided, or use a random one. | `TestColorModel(RandomSingleHue(1024,64))` |
+
+
+#### Complex Fractal functions (Waher.Script.Fractals)
+
+The following functions can be used to create fractal images based on iterations in the complex plane. The functions are available in the 
+`Waher.Script.Fractals` library. They can be used as a means to create backgound images for themes, etc.
+
+| Function                                | Description                                           | Example                                   |
+|-----------------------------------------|-------------------------------------------------------|-------------------------------------------|
+| `HalleyBuilderFractal(z,dr,R[,Coefficients[,Palette[,DimX[,DimY]]]])` | Calculates a Halley Fractal Image. When clicked (in a GUI that supports user interaction with resulting images), adds a root to the underying polynomial, instead of zooming in. | `HalleyBuilderFractal((0,0),3,)` |
+| `HalleyFractal(z,dr,R[,Coefficients[,Palette[,DimX[,DimY]]]])` | Calculates a Halley Fractal Image. | `HalleyBuilderFractal((0,0),3,)` |
 
 #### Persistence-related functions
 

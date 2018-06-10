@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <Description>Class library that adds fractal image functions to the script engine, suitable for generating backgound images.</Description>
+    <Authors>Peter Waher</Authors>
+    <Company>Waher Data AB</Company>
+    <Copyright>Copyright © Waher Data AB 2016-2018. All rights reserved.</Copyright>
+    <PackageLicenseUrl>https://github.com/PeterWaher/IoTGateway#license</PackageLicenseUrl>
+    <PackageIconUrl>https://github.com/PeterWaher/IoTGateway/blob/master/Images/Icon.ico?raw=true</PackageIconUrl>
+    <PackageTags>script fractals</PackageTags>
+    <NeutralLanguage>English</NeutralLanguage>
+    <FileVersion>1.0.0</FileVersion>
+    <AssemblyVersion>1.0.0</AssemblyVersion>
+    <Product>Waher.IoTGateway</Product>
+    <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Script/Waher.Script.Fractals</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
+    <RepositoryType>GitHub</RepositoryType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile></DocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="SkiaSharp" Version="1.60.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Waher.Script.Graphs\Waher.Script.Graphs.csproj" />
+    <ProjectReference Include="..\Waher.Script\Waher.Script.csproj" />
+  </ItemGroup>
+
+</Project>

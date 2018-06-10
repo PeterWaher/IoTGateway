@@ -502,12 +502,12 @@ namespace Waher.Script.Graphs
 		/// https://en.wikipedia.org/wiki/HSL_and_HSV#From_HSL
 		/// </summary>
 		/// <param name="H">Hue H ∈ [0°, 360°).</param>
-		/// <param name="S">Saturation SHSL ∈ [0, 1].</param>
+		/// <param name="S">Saturation S ∈ [0, 1].</param>
 		/// <param name="L">Lightness L ∈ [0, 1].</param>
 		/// <returns>Color</returns>
 		public static SKColor ToColorHSL(double H, double S, double L)
 		{
-			return SKColor.FromHsl((float)H, (float)(S * 255), (float)(L * 255));
+			return SKColor.FromHsl((float)H, (float)(S * 100), (float)(L * 100));
 		}
 
 		/// <summary>
@@ -517,13 +517,13 @@ namespace Waher.Script.Graphs
 		/// https://en.wikipedia.org/wiki/HSL_and_HSV#From_HSL
 		/// </summary>
 		/// <param name="H">Hue H ∈ [0°, 360°).</param>
-		/// <param name="S">Saturation SHSL ∈ [0, 1].</param>
+		/// <param name="S">Saturation S ∈ [0, 1].</param>
 		/// <param name="L">Lightness L ∈ [0, 1].</param>
 		/// <param name="A">Alpha A ∈ [0, 255].</param>
 		/// <returns>Color</returns>
 		public static SKColor ToColorHSL(double H, double S, double L, byte A)
 		{
-			return SKColor.FromHsl((float)H, (float)(S * 255), (float)(L * 255), A);
+			return SKColor.FromHsl((float)H, (float)(S * 100), (float)(L * 100), A);
 		}
 
 		/// <summary>
@@ -533,12 +533,12 @@ namespace Waher.Script.Graphs
 		/// https://en.wikipedia.org/wiki/HSL_and_HSV#From_HSV
 		/// </summary>
 		/// <param name="H">Hue H ∈ [0°, 360°).</param>
-		/// <param name="S">Saturation SHSL ∈ [0, 1].</param>
+		/// <param name="S">Saturation S ∈ [0, 1].</param>
 		/// <param name="V">Value V ∈ [0, 1].</param>
 		/// <returns>Color</returns>
 		public static SKColor ToColorHSV(double H, double S, double V)
 		{
-			return SKColor.FromHsv((float)H, (float)(S * 255), (float)(V * 255));
+			return SKColor.FromHsv((float)H, (float)(S * 100), (float)(V * 100));
 		}
 
 		/// <summary>
@@ -548,13 +548,13 @@ namespace Waher.Script.Graphs
 		/// https://en.wikipedia.org/wiki/HSL_and_HSV#From_HSV
 		/// </summary>
 		/// <param name="H">Hue H ∈ [0°, 360°).</param>
-		/// <param name="S">Saturation SHSL ∈ [0, 1].</param>
+		/// <param name="S">Saturation S ∈ [0, 1].</param>
 		/// <param name="V">Value V ∈ [0, 1].</param>
 		/// <param name="A">Alpha A ∈ [0, 255].</param>
 		/// <returns>Color</returns>
 		public static SKColor ToColorHSV(double H, double S, double V, byte A)
 		{
-			return SKColor.FromHsv((float)H, (float)(S * 255), (float)(V * 255), A);
+			return SKColor.FromHsv((float)H, (float)(S * 100), (float)(V * 100), A);
 		}
 
 		/// <summary>

@@ -21,5 +21,10 @@ namespace Waher.Script.Lab
 		{
 			this.mainWindow.Print(value);
 		}
+
+		public override void WriteLine(string value)
+		{
+			this.mainWindow.Print(value);
+		}
 	}
 }

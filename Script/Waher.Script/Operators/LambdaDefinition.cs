@@ -18,10 +18,10 @@ namespace Waher.Script.Operators
     /// </summary>
     public class LambdaDefinition : UnaryOperator, IElement, ILambdaExpression
     {
-        private string[] argumentNames;
-        private ArgumentType[] argumentTypes;
-        private int nrArguments;
-        private bool allNormal;
+        private readonly string[] argumentNames;
+        private readonly ArgumentType[] argumentTypes;
+        private readonly int nrArguments;
+        private readonly bool allNormal;
 
         /// <summary>
         /// Lambda Definition.
@@ -383,6 +383,7 @@ namespace Waher.Script.Operators
 		/// <returns>Differentiated lambda expression.</returns>
 		public ILambdaExpression Differentiate(string VariableName, Variables Variables)
 		{
+
 			throw new NotImplementedException();	// TODO: Implement.
 		}
 

@@ -163,6 +163,10 @@
       <Project>{7f1b0d78-aa86-445b-9e1f-7df75b9e4c04}</Project>
       <Name>Waher.Runtime.Inventory</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Waher.Script.Fractals\Waher.Script.Fractals.csproj">
+      <Project>{1c042e75-04d8-4cac-91b8-a7f559ac9d2b}</Project>
+      <Name>Waher.Script.Fractals</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Waher.Script.Graphs\Waher.Script.Graphs.csproj">
       <Project>{9c55559b-0f46-4799-9b0a-b175389d25b0}</Project>
       <Name>Waher.Script.Graphs</Name>

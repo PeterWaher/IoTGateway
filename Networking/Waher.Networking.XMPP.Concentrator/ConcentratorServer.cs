@@ -41,16 +41,16 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// </summary>
 		public const string NamespaceConcentrator = "urn:xmpp:iot:concentrators";
 
-		private Dictionary<string, IDataSource> rootDataSources = new Dictionary<string, IDataSource>();
-		private Dictionary<string, DataSourceRec> dataSources = new Dictionary<string, DataSourceRec>();
-		private Dictionary<string, Dictionary<string, DataSourceRec>> subscriptions = new Dictionary<string, Dictionary<string, DataSourceRec>>();
-		private Dictionary<string, Query> queries = new Dictionary<string, Query>();
-		private object synchObject = new object();
+		private readonly Dictionary<string, IDataSource> rootDataSources = new Dictionary<string, IDataSource>();
+		private readonly Dictionary<string, DataSourceRec> dataSources = new Dictionary<string, DataSourceRec>();
+		private readonly Dictionary<string, Dictionary<string, DataSourceRec>> subscriptions = new Dictionary<string, Dictionary<string, DataSourceRec>>();
+		private readonly Dictionary<string, Query> queries = new Dictionary<string, Query>();
+		private readonly object synchObject = new object();
 		private SensorServer sensorServer = null;
 		private ControlServer controlServer = null;
-		private ProvisioningClient provisioningClient = null;
-		private ThingRegistryClient thingRegistryClient = null;
-		private RandomNumberGenerator rnd = RandomNumberGenerator.Create();
+		private readonly ProvisioningClient provisioningClient = null;
+		private readonly ThingRegistryClient thingRegistryClient = null;
+		private readonly RandomNumberGenerator rnd = RandomNumberGenerator.Create();
 
 		/// <summary>
 		/// Implements an XMPP concentrator server interface.
@@ -4161,8 +4161,7 @@ namespace Waher.Networking.XMPP.Concentrator
 							}
 						}
 
-						ISensor Sensor = Node as ISensor;
-						if (Sensor == null || !Sensor.IsReadable)
+						if (!(Node is ISensor Sensor) || !Sensor.IsReadable)
 						{
 							Request.ReportErrors(i == c - 1, new ThingError(NodeRef, Now, "Node not readable."));
 							continue;
@@ -4218,8 +4217,7 @@ namespace Waher.Networking.XMPP.Concentrator
 						return null;
 				}
 
-				IActuator Actuator = Node2 as IActuator;
-				if (Actuator == null)
+				if (!(Node2 is IActuator Actuator))
 					return null;
 
 				if (!Actuator.IsControllable)

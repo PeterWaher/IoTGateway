@@ -788,12 +788,20 @@ namespace Waher.Networking.XMPP.Concentrator
 
 						try
 						{
-							ValueToSet = DataType.Parse(Field.ValueString);
-
-							if (ValueToSet.GetType() == PI.PropertyType)
-								ValueToSet2 = ValueToSet;
+							if (DataType == null)
+							{
+								ValueToSet = Field.ValueString;
+								ValueToSet2 = Activator.CreateInstance(PropertyType, ValueToSet);
+							}
 							else
-								ValueToSet2 = System.Convert.ChangeType(ValueToSet, PI.PropertyType);
+							{
+								ValueToSet = DataType.Parse(Field.ValueString);
+
+								if (ValueToSet.GetType() == PropertyType)
+									ValueToSet2 = ValueToSet;
+								else
+									ValueToSet2 = Convert.ChangeType(ValueToSet, PropertyType);
+							}
 						}
 						catch (Exception)
 						{

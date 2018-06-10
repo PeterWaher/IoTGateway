@@ -50,11 +50,6 @@ namespace Waher.Script.Fractals.IFS.Variations
 			return new DoubleVector(new double[] { x, y });
         }
 
-		ILambdaExpression ILambdaExpression.Differentiate(string VariableName, Variables Variables)
-		{
-			throw new NotImplementedException();
-		}
-
 		int ILambdaExpression.NrArguments
 		{
             get { return 2; }

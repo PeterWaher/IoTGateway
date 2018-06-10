@@ -237,7 +237,6 @@ namespace Waher.Script.Fractals.ComplexFractals
 			Complex R = (Complex)Parameters[3];
 			double[] Coefficients = Parameters[4] as double[];
 			Complex[] CoefficientsZ = Parameters[4] as Complex[];
-			ScriptNode fDef = Parameters[4] as ScriptNode;
 			string ColorExpression = (string)Parameters[5];
 
 			StringBuilder sb = new StringBuilder();
@@ -252,7 +251,7 @@ namespace Waher.Script.Fractals.ComplexFractals
 			sb.Append(Expression.ToString(R));
 			sb.Append(",");
 
-			if (fDef != null)
+			if (Parameters[4] is ScriptNode fDef)
 				sb.Append(fDef.SubExpression);
 			else if (CoefficientsZ != null)
 				sb.Append(Expression.ToString(CoefficientsZ));
@@ -549,10 +548,11 @@ namespace Waher.Script.Fractals.ComplexFractals
 			Variables v = new Variables();
 			Variables.CopyTo(v);
 
-			string ParameterName = f.ArgumentNames[0];
-			ILambdaExpression fPrim = f.Differentiate(ParameterName, v);
-			if (fPrim == null)
+			if (!(f is IDifferentiable Differentiable) ||
+				!(Differentiable.Differentiate(Differentiable.DefaultVariableName, v) is ILambdaExpression fPrim))
+			{
 				throw new ScriptRuntimeException("Lambda expression not differentiable.", Node);
+			}
 
 			int Size = Width * Height;
 			double Conv = 1e-10;

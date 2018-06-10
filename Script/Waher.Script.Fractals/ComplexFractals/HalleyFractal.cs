@@ -239,10 +239,9 @@ namespace Waher.Script.Fractals.ComplexFractals
             Complex R = (Complex)Parameters[3];
             double[] Coefficients = Parameters[4] as double[];
             Complex[] CoefficientsZ = Parameters[4] as Complex[];
-            ScriptNode fDef = Parameters[4] as ScriptNode;
-            string ColorExpression = (string)Parameters[5];
+			string ColorExpression = (string)Parameters[5];
 
-            StringBuilder sb = new StringBuilder();
+			StringBuilder sb = new StringBuilder();
 
             sb.Append("HalleyFractal(");
             sb.Append(Expression.ToString(r));
@@ -254,14 +253,14 @@ namespace Waher.Script.Fractals.ComplexFractals
             sb.Append(Expression.ToString(R));
             sb.Append(",");
 
-            if (fDef != null)
-                sb.Append(fDef.SubExpression);
-            else if (CoefficientsZ != null)
-                sb.Append(Expression.ToString(CoefficientsZ));
-            else
-                sb.Append(Expression.ToString(Coefficients));
+			if (Parameters[4] is ScriptNode fDef)
+				sb.Append(fDef.SubExpression);
+			else if (CoefficientsZ != null)
+				sb.Append(Expression.ToString(CoefficientsZ));
+			else
+				sb.Append(Expression.ToString(Coefficients));
 
-            if (!string.IsNullOrEmpty(ColorExpression))
+			if (!string.IsNullOrEmpty(ColorExpression))
             {
                 sb.Append(",");
                 sb.Append(ColorExpression);
@@ -660,17 +659,21 @@ namespace Waher.Script.Fractals.ComplexFractals
 
             Variables v = new Variables();
             Variables.CopyTo(v);
-			
-            string ParameterName = f.ArgumentNames[0];
-            ILambdaExpression fPrim = f.Differentiate(ParameterName, v);
-            if (fPrim == null)
-                throw new ScriptRuntimeException("Lambda expression not differentiable.", Node);
 
-			ILambdaExpression fBis = f.Differentiate(ParameterName, v);
-            if (fBis == null)
-                throw new ScriptRuntimeException("Lambda expression not twice differentiable.", Node);
+            string ParameterName;
+			if (!(f is IDifferentiable Differentiable) ||
+				!(Differentiable.Differentiate(ParameterName = Differentiable.DefaultVariableName, v) is ILambdaExpression fPrim))
+			{
+				throw new ScriptRuntimeException("Lambda expression not differentiable.", Node);
+			}
 
-            int size = Width * Height * 4;
+			if (!(fPrim is IDifferentiable Differentiable2) ||
+				!(Differentiable2.Differentiate(ParameterName, v) is ILambdaExpression fBis))
+			{
+				throw new ScriptRuntimeException("Lambda expression not twice differentiable.", Node);
+			}
+
+			int size = Width * Height * 4;
             double Conv = 1e-10;
             double Div = 1e10;
             byte[] rgb = new byte[size];

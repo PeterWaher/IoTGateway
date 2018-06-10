@@ -194,7 +194,7 @@
       <Version>6.0.8</Version>
     </PackageReference>
     <PackageReference Include="SkiaSharp">
-      <Version>1.60.0</Version>
+      <Version>1.60.1</Version>
     </PackageReference>
     <PackageReference Include="Windows-Remote-Arduino">
       <Version>1.4.0</Version>

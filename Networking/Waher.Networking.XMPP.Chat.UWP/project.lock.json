@@ -498,7 +498,7 @@
           }
         }
       },
-      "SkiaSharp/1.60.0": {
+      "SkiaSharp/1.60.1": {
         "type": "package",
         "compile": {
           "lib/uap10.0/SkiaSharp.dll": {}
@@ -510,6 +510,14 @@
           "runtimes/osx/native/libSkiaSharp.dylib": {
             "assetType": "native",
             "rid": "osx"
+          },
+          "runtimes/tizen-armel/native/libSkiaSharp.so": {
+            "assetType": "native",
+            "rid": "tizen-armel"
+          },
+          "runtimes/tizen-x86/native/libSkiaSharp.so": {
+            "assetType": "native",
+            "rid": "tizen-x86"
           },
           "runtimes/win10-arm/nativeassets/uap10.0/libEGL.dll": {
             "assetType": "native",
@@ -2464,7 +2472,7 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Runtime.Inventory": "1.0.5",
-          "Waher.Script": "1.0.12"
+          "Waher.Script": "1.0.13"
         }
       },
       "Waher.Content.Emoji/1.0.1": {
@@ -2487,12 +2495,12 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "SkiaSharp": "1.60.0",
+          "SkiaSharp": "1.60.1",
           "Waher.Content.Emoji": "1.0.1",
           "Waher.Content.Html": "1.0.3",
           "Waher.Content.Xml": "1.0.2",
           "Waher.Runtime.Cache": "1.0.1",
-          "Waher.Script": "1.0.12",
+          "Waher.Script": "1.0.13",
           "Waher.Script.Graphs": "1.0.6"
         }
       },
@@ -2504,7 +2512,7 @@
           "System.Xml.XmlDocument": "4.3.0",
           "Waher.Content": "1.0.10",
           "Waher.Runtime.Inventory": "1.0.5",
-          "Waher.Script": "1.0.12"
+          "Waher.Script": "1.0.13"
         }
       },
       "Waher.Events/1.0.7": {
@@ -2649,7 +2657,7 @@
           "Waher.Events": "1.0.7"
         }
       },
-      "Waher.Script/1.0.12": {
+      "Waher.Script/1.0.13": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -2663,8 +2671,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "SkiaSharp": "1.60.0",
-          "Waher.Script": "1.0.12"
+          "SkiaSharp": "1.60.1",
+          "Waher.Script": "1.0.13"
         }
       },
       "Waher.Security/1.0.2": {
@@ -2679,7 +2687,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "SkiaSharp": "1.60.0",
+          "SkiaSharp": "1.60.1",
           "Waher.Content": "1.0.10",
           "Waher.Content.Xml": "1.0.2",
           "Waher.Events": "1.0.7",
@@ -3405,7 +3413,7 @@
           "runtimes/win8-arm/native/clrcompression.dll": {}
         }
       },
-      "SkiaSharp/1.60.0": {
+      "SkiaSharp/1.60.1": {
         "type": "package",
         "compile": {
           "lib/uap10.0/SkiaSharp.dll": {}
@@ -5142,7 +5150,7 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Runtime.Inventory": "1.0.5",
-          "Waher.Script": "1.0.12"
+          "Waher.Script": "1.0.13"
         }
       },
       "Waher.Content.Emoji/1.0.1": {
@@ -5165,12 +5173,12 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "SkiaSharp": "1.60.0",
+          "SkiaSharp": "1.60.1",
           "Waher.Content.Emoji": "1.0.1",
           "Waher.Content.Html": "1.0.3",
           "Waher.Content.Xml": "1.0.2",
           "Waher.Runtime.Cache": "1.0.1",
-          "Waher.Script": "1.0.12",
+          "Waher.Script": "1.0.13",
           "Waher.Script.Graphs": "1.0.6"
         }
       },
@@ -5182,7 +5190,7 @@
           "System.Xml.XmlDocument": "4.3.0",
           "Waher.Content": "1.0.10",
           "Waher.Runtime.Inventory": "1.0.5",
-          "Waher.Script": "1.0.12"
+          "Waher.Script": "1.0.13"
         }
       },
       "Waher.Events/1.0.7": {
@@ -5327,7 +5335,7 @@
           "Waher.Events": "1.0.7"
         }
       },
-      "Waher.Script/1.0.12": {
+      "Waher.Script/1.0.13": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -5341,8 +5349,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "SkiaSharp": "1.60.0",
-          "Waher.Script": "1.0.12"
+          "SkiaSharp": "1.60.1",
+          "Waher.Script": "1.0.13"
         }
       },
       "Waher.Security/1.0.2": {
@@ -5357,7 +5365,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "SkiaSharp": "1.60.0",
+          "SkiaSharp": "1.60.1",
           "Waher.Content": "1.0.10",
           "Waher.Content.Xml": "1.0.2",
           "Waher.Events": "1.0.7",
@@ -6119,7 +6127,7 @@
           "runtimes/win8-arm-aot/native/_._": {}
         }
       },
-      "SkiaSharp/1.60.0": {
+      "SkiaSharp/1.60.1": {
         "type": "package",
         "compile": {
           "lib/uap10.0/SkiaSharp.dll": {}
@@ -7856,7 +7864,7 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Runtime.Inventory": "1.0.5",
-          "Waher.Script": "1.0.12"
+          "Waher.Script": "1.0.13"
         }
       },
       "Waher.Content.Emoji/1.0.1": {
@@ -7879,12 +7887,12 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "SkiaSharp": "1.60.0",
+          "SkiaSharp": "1.60.1",
           "Waher.Content.Emoji": "1.0.1",
           "Waher.Content.Html": "1.0.3",
           "Waher.Content.Xml": "1.0.2",
           "Waher.Runtime.Cache": "1.0.1",
-          "Waher.Script": "1.0.12",
+          "Waher.Script": "1.0.13",
           "Waher.Script.Graphs": "1.0.6"
         }
       },
@@ -7896,7 +7904,7 @@
           "System.Xml.XmlDocument": "4.3.0",
           "Waher.Content": "1.0.10",
           "Waher.Runtime.Inventory": "1.0.5",
-          "Waher.Script": "1.0.12"
+          "Waher.Script": "1.0.13"
         }
       },
       "Waher.Events/1.0.7": {
@@ -8041,7 +8049,7 @@
           "Waher.Events": "1.0.7"
         }
       },
-      "Waher.Script/1.0.12": {
+      "Waher.Script/1.0.13": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -8055,8 +8063,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "SkiaSharp": "1.60.0",
-          "Waher.Script": "1.0.12"
+          "SkiaSharp": "1.60.1",
+          "Waher.Script": "1.0.13"
         }
       },
       "Waher.Security/1.0.2": {
@@ -8071,7 +8079,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "SkiaSharp": "1.60.0",
+          "SkiaSharp": "1.60.1",
           "Waher.Content": "1.0.10",
           "Waher.Content.Xml": "1.0.2",
           "Waher.Events": "1.0.7",
@@ -8806,7 +8814,7 @@
           "runtimes/win/lib/netcore50/System.Private.Uri.dll": {}
         }
       },
-      "SkiaSharp/1.60.0": {
+      "SkiaSharp/1.60.1": {
         "type": "package",
         "compile": {
           "lib/uap10.0/SkiaSharp.dll": {}
@@ -10543,7 +10551,7 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Runtime.Inventory": "1.0.5",
-          "Waher.Script": "1.0.12"
+          "Waher.Script": "1.0.13"
         }
       },
       "Waher.Content.Emoji/1.0.1": {
@@ -10566,12 +10574,12 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "SkiaSharp": "1.60.0",
+          "SkiaSharp": "1.60.1",
           "Waher.Content.Emoji": "1.0.1",
           "Waher.Content.Html": "1.0.3",
           "Waher.Content.Xml": "1.0.2",
           "Waher.Runtime.Cache": "1.0.1",
-          "Waher.Script": "1.0.12",
+          "Waher.Script": "1.0.13",
           "Waher.Script.Graphs": "1.0.6"
         }
       },
@@ -10583,7 +10591,7 @@
           "System.Xml.XmlDocument": "4.3.0",
           "Waher.Content": "1.0.10",
           "Waher.Runtime.Inventory": "1.0.5",
-          "Waher.Script": "1.0.12"
+          "Waher.Script": "1.0.13"
         }
       },
       "Waher.Events/1.0.7": {
@@ -10728,7 +10736,7 @@
           "Waher.Events": "1.0.7"
         }
       },
-      "Waher.Script/1.0.12": {
+      "Waher.Script/1.0.13": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -10742,8 +10750,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "SkiaSharp": "1.60.0",
-          "Waher.Script": "1.0.12"
+          "SkiaSharp": "1.60.1",
+          "Waher.Script": "1.0.13"
         }
       },
       "Waher.Security/1.0.2": {
@@ -10758,7 +10766,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "SkiaSharp": "1.60.0",
+          "SkiaSharp": "1.60.1",
           "Waher.Content": "1.0.10",
           "Waher.Content.Xml": "1.0.2",
           "Waher.Events": "1.0.7",
@@ -11529,7 +11537,7 @@
           "runtimes/aot/lib/netcore50/System.Private.Uri.dll": {}
         }
       },
-      "SkiaSharp/1.60.0": {
+      "SkiaSharp/1.60.1": {
         "type": "package",
         "compile": {
           "lib/uap10.0/SkiaSharp.dll": {}
@@ -13266,7 +13274,7 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Runtime.Inventory": "1.0.5",
-          "Waher.Script": "1.0.12"
+          "Waher.Script": "1.0.13"
         }
       },
       "Waher.Content.Emoji/1.0.1": {
@@ -13289,12 +13297,12 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "SkiaSharp": "1.60.0",
+          "SkiaSharp": "1.60.1",
           "Waher.Content.Emoji": "1.0.1",
           "Waher.Content.Html": "1.0.3",
           "Waher.Content.Xml": "1.0.2",
           "Waher.Runtime.Cache": "1.0.1",
-          "Waher.Script": "1.0.12",
+          "Waher.Script": "1.0.13",
           "Waher.Script.Graphs": "1.0.6"
         }
       },
@@ -13306,7 +13314,7 @@
           "System.Xml.XmlDocument": "4.3.0",
           "Waher.Content": "1.0.10",
           "Waher.Runtime.Inventory": "1.0.5",
-          "Waher.Script": "1.0.12"
+          "Waher.Script": "1.0.13"
         }
       },
       "Waher.Events/1.0.7": {
@@ -13451,7 +13459,7 @@
           "Waher.Events": "1.0.7"
         }
       },
-      "Waher.Script/1.0.12": {
+      "Waher.Script/1.0.13": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -13465,8 +13473,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "SkiaSharp": "1.60.0",
-          "Waher.Script": "1.0.12"
+          "SkiaSharp": "1.60.1",
+          "Waher.Script": "1.0.13"
         }
       },
       "Waher.Security/1.0.2": {
@@ -13481,7 +13489,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "SkiaSharp": "1.60.0",
+          "SkiaSharp": "1.60.1",
           "Waher.Content": "1.0.10",
           "Waher.Content.Xml": "1.0.2",
           "Waher.Events": "1.0.7",
@@ -14216,7 +14224,7 @@
           "runtimes/win/lib/netcore50/System.Private.Uri.dll": {}
         }
       },
-      "SkiaSharp/1.60.0": {
+      "SkiaSharp/1.60.1": {
         "type": "package",
         "compile": {
           "lib/uap10.0/SkiaSharp.dll": {}
@@ -15953,7 +15961,7 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Runtime.Inventory": "1.0.5",
-          "Waher.Script": "1.0.12"
+          "Waher.Script": "1.0.13"
         }
       },
       "Waher.Content.Emoji/1.0.1": {
@@ -15976,12 +15984,12 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "SkiaSharp": "1.60.0",
+          "SkiaSharp": "1.60.1",
           "Waher.Content.Emoji": "1.0.1",
           "Waher.Content.Html": "1.0.3",
           "Waher.Content.Xml": "1.0.2",
           "Waher.Runtime.Cache": "1.0.1",
-          "Waher.Script": "1.0.12",
+          "Waher.Script": "1.0.13",
           "Waher.Script.Graphs": "1.0.6"
         }
       },
@@ -15993,7 +16001,7 @@
           "System.Xml.XmlDocument": "4.3.0",
           "Waher.Content": "1.0.10",
           "Waher.Runtime.Inventory": "1.0.5",
-          "Waher.Script": "1.0.12"
+          "Waher.Script": "1.0.13"
         }
       },
       "Waher.Events/1.0.7": {
@@ -16138,7 +16146,7 @@
           "Waher.Events": "1.0.7"
         }
       },
-      "Waher.Script/1.0.12": {
+      "Waher.Script/1.0.13": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -16152,8 +16160,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "SkiaSharp": "1.60.0",
-          "Waher.Script": "1.0.12"
+          "SkiaSharp": "1.60.1",
+          "Waher.Script": "1.0.13"
         }
       },
       "Waher.Security/1.0.2": {
@@ -16168,7 +16176,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "SkiaSharp": "1.60.0",
+          "SkiaSharp": "1.60.1",
           "Waher.Content": "1.0.10",
           "Waher.Content.Xml": "1.0.2",
           "Waher.Events": "1.0.7",
@@ -16939,7 +16947,7 @@
           "runtimes/aot/lib/netcore50/System.Private.Uri.dll": {}
         }
       },
-      "SkiaSharp/1.60.0": {
+      "SkiaSharp/1.60.1": {
         "type": "package",
         "compile": {
           "lib/uap10.0/SkiaSharp.dll": {}
@@ -18676,7 +18684,7 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Runtime.Inventory": "1.0.5",
-          "Waher.Script": "1.0.12"
+          "Waher.Script": "1.0.13"
         }
       },
       "Waher.Content.Emoji/1.0.1": {
@@ -18699,12 +18707,12 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "SkiaSharp": "1.60.0",
+          "SkiaSharp": "1.60.1",
           "Waher.Content.Emoji": "1.0.1",
           "Waher.Content.Html": "1.0.3",
           "Waher.Content.Xml": "1.0.2",
           "Waher.Runtime.Cache": "1.0.1",
-          "Waher.Script": "1.0.12",
+          "Waher.Script": "1.0.13",
           "Waher.Script.Graphs": "1.0.6"
         }
       },
@@ -18716,7 +18724,7 @@
           "System.Xml.XmlDocument": "4.3.0",
           "Waher.Content": "1.0.10",
           "Waher.Runtime.Inventory": "1.0.5",
-          "Waher.Script": "1.0.12"
+          "Waher.Script": "1.0.13"
         }
       },
       "Waher.Events/1.0.7": {
@@ -18861,7 +18869,7 @@
           "Waher.Events": "1.0.7"
         }
       },
-      "Waher.Script/1.0.12": {
+      "Waher.Script/1.0.13": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -18875,8 +18883,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "SkiaSharp": "1.60.0",
-          "Waher.Script": "1.0.12"
+          "SkiaSharp": "1.60.1",
+          "Waher.Script": "1.0.13"
         }
       },
       "Waher.Security/1.0.2": {
@@ -18891,7 +18899,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "SkiaSharp": "1.60.0",
+          "SkiaSharp": "1.60.1",
           "Waher.Content": "1.0.10",
           "Waher.Content.Xml": "1.0.2",
           "Waher.Events": "1.0.7",
@@ -23739,33 +23747,37 @@
         "runtimes/win8-arm/native/clrcompression.dll"
       ]
     },
-    "SkiaSharp/1.60.0": {
-      "sha512": "HoSNIZH54rinevEhLUWdeclr+H/QdmOp252+Tt07HTXwQyvRl9eW32ga/X7T56wsR855SKprb0RcnBPRCzlqSA==",
+    "SkiaSharp/1.60.1": {
+      "sha512": "da8H19f23Kr7dZkL3fgFJ154d9xS6JKhNsn+Wmtt2LoAscwLYLH8EMSb65Z9LB0Wx40jV0WUaKMHD02QvX5NYg==",
       "type": "package",
-      "path": "skiasharp/1.60.0",
+      "path": "skiasharp/1.60.1",
       "files": [
-        "build/net45/SkiaSharp.dll.config",
+        ".signature.p7s",
+        "LICENSE.txt",
+        "THIRD-PARTY-NOTICES.txt",
         "build/net45/SkiaSharp.targets",
+        "build/tizen40/SkiaSharp.targets",
         "lib/MonoAndroid/SkiaSharp.dll",
         "lib/MonoAndroid/SkiaSharp.xml",
-        "lib/XamarinMac/SkiaSharp.dll",
-        "lib/XamarinMac/SkiaSharp.xml",
-        "lib/XamariniOS/SkiaSharp.dll",
-        "lib/XamariniOS/SkiaSharp.xml",
-        "lib/XamarintvOS/SkiaSharp.dll",
-        "lib/XamarintvOS/SkiaSharp.xml",
-        "lib/XamarinwatchOS/SkiaSharp.dll",
-        "lib/XamarinwatchOS/SkiaSharp.xml",
+        "lib/Xamarin.Mac20/SkiaSharp.dll",
+        "lib/Xamarin.Mac20/SkiaSharp.xml",
+        "lib/Xamarin.TVOS/SkiaSharp.dll",
+        "lib/Xamarin.TVOS/SkiaSharp.xml",
+        "lib/Xamarin.WatchOS/SkiaSharp.dll",
+        "lib/Xamarin.WatchOS/SkiaSharp.xml",
+        "lib/Xamarin.iOS/SkiaSharp.dll",
+        "lib/Xamarin.iOS/SkiaSharp.xml",
         "lib/net45/SkiaSharp.dll",
-        "lib/net45/SkiaSharp.dll.config",
         "lib/net45/SkiaSharp.xml",
         "lib/netstandard1.3/SkiaSharp.dll",
         "lib/netstandard1.3/SkiaSharp.xml",
-        "lib/portable-net45+win8+wpa81+wp8/SkiaSharp.dll",
-        "lib/portable-net45+win8+wpa81+wp8/SkiaSharp.xml",
+        "lib/tizen40/SkiaSharp.dll",
+        "lib/tizen40/SkiaSharp.xml",
         "lib/uap10.0/SkiaSharp.dll",
         "lib/uap10.0/SkiaSharp.xml",
         "runtimes/osx/native/libSkiaSharp.dylib",
+        "runtimes/tizen-armel/native/libSkiaSharp.so",
+        "runtimes/tizen-x86/native/libSkiaSharp.so",
         "runtimes/win10-arm/nativeassets/uap10.0/libEGL.dll",
         "runtimes/win10-arm/nativeassets/uap10.0/libGLESv2.dll",
         "runtimes/win10-arm/nativeassets/uap10.0/libSkiaSharp.dll",
@@ -23777,7 +23789,7 @@
         "runtimes/win10-x86/nativeassets/uap10.0/libSkiaSharp.dll",
         "runtimes/win7-x64/native/libSkiaSharp.dll",
         "runtimes/win7-x86/native/libSkiaSharp.dll",
-        "skiasharp.1.60.0.nupkg.sha512",
+        "skiasharp.1.60.1.nupkg.sha512",
         "skiasharp.nuspec",
         "xamarin.interactive/SkiaSharp.Workbooks.dll"
       ]
@@ -28782,7 +28794,7 @@
       "path": "../../Runtime/Waher.Runtime.Timing/Waher.Runtime.Timing.csproj",
       "msbuildProject": "../../Runtime/Waher.Runtime.Timing/Waher.Runtime.Timing.csproj"
     },
-    "Waher.Script/1.0.12": {
+    "Waher.Script/1.0.13": {
       "type": "project",
       "path": "../../Script/Waher.Script/Waher.Script.csproj",
       "msbuildProject": "../../Script/Waher.Script/Waher.Script.csproj"

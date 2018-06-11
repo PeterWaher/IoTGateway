@@ -58,6 +58,7 @@
   <ItemGroup>
     <Compile Include="ScriptEvaluationTests.cs" />
     <Compile Include="Canvas3DTests.cs" />
+    <Compile Include="ScriptDifferentiationTests.cs" />
     <Compile Include="ScriptGraphTests.cs" />
     <Compile Include="ScriptParsingTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -86,7 +87,7 @@
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>rem xcopy "$(TargetDir)x86\libSkiaSharp.dll" "$(TargetDir)" /Y</PostBuildEvent>
+    <PostBuildEvent>xcopy "$(TargetDir)x86\libSkiaSharp.dll" "$(TargetDir)" /Y</PostBuildEvent>
   </PropertyGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

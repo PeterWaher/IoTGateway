@@ -71,7 +71,10 @@ namespace Waher.Client.WPF
 				typeof(Waher.Persistence.Database).Assembly,
 				typeof(Waher.Persistence.Files.FilesProvider).Assembly,
 				typeof(Waher.Script.Expression).Assembly,
-				typeof(Waher.Script.Graphs.Graph).Assembly);
+				typeof(Waher.Script.Graphs.Graph).Assembly,
+				typeof(Waher.Script.Fractals.FractalGraph).Assembly,
+				typeof(Waher.Script.Persistence.Functions.FindObjects).Assembly,
+				typeof(Waher.Script.Statistics.Functions.Beta).Assembly);
 
 			appDataFolder = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
 			if (!appDataFolder.EndsWith(new string(Path.DirectorySeparatorChar, 1)))

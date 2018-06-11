@@ -399,9 +399,21 @@
       <Project>{7f1b0d78-aa86-445b-9e1f-7df75b9e4c04}</Project>
       <Name>Waher.Runtime.Inventory</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Script\Waher.Script.Fractals\Waher.Script.Fractals.csproj">
+      <Project>{1c042e75-04d8-4cac-91b8-a7f559ac9d2b}</Project>
+      <Name>Waher.Script.Fractals</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Script\Waher.Script.Graphs\Waher.Script.Graphs.csproj">
       <Project>{9c55559b-0f46-4799-9b0a-b175389d25b0}</Project>
       <Name>Waher.Script.Graphs</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Script\Waher.Script.Persistence\Waher.Script.Persistence.csproj">
+      <Project>{9dd2d852-e874-43fc-a83d-c78066e26c16}</Project>
+      <Name>Waher.Script.Persistence</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Script\Waher.Script.Statistics\Waher.Script.Statistics.csproj">
+      <Project>{8850d7c6-da07-4bcb-b39a-7090eb39f581}</Project>
+      <Name>Waher.Script.Statistics</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Script\Waher.Script\Waher.Script.csproj">
       <Project>{c39e8f9b-1386-4cd3-bfa7-3481181d3ba1}</Project>

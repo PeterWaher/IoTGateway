@@ -8,30 +8,30 @@ using Waher.Script.Operators.Arithmetics;
 
 namespace Waher.Script.Functions.Analytic
 {
-    /// <summary>
-    /// CotH(x)
-    /// </summary>
-    public class CotH : FunctionOneScalarVariable, IDifferentiable
-    {
-        /// <summary>
-        /// CotH(x)
-        /// </summary>
-        /// <param name="Argument">Argument.</param>
-        /// <param name="Start">Start position in script expression.</param>
-        /// <param name="Length">Length of expression covered by node.</param>
+	/// <summary>
+	/// CotH(x)
+	/// </summary>
+	public class CotH : FunctionOneScalarVariable, IDifferentiable
+	{
+		/// <summary>
+		/// CotH(x)
+		/// </summary>
+		/// <param name="Argument">Argument.</param>
+		/// <param name="Start">Start position in script expression.</param>
+		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-        public CotH(ScriptNode Argument, int Start, int Length, Expression Expression)
-            : base(Argument, Start, Length, Expression)
-        {
-        }
+		public CotH(ScriptNode Argument, int Start, int Length, Expression Expression)
+			: base(Argument, Start, Length, Expression)
+		{
+		}
 
-        /// <summary>
-        /// Name of the function
-        /// </summary>
-        public override string FunctionName
-        {
-            get { return "coth"; }
-        }
+		/// <summary>
+		/// Name of the function
+		/// </summary>
+		public override string FunctionName
+		{
+			get { return "coth"; }
+		}
 
 		/// <summary>
 		/// Differentiates a script node, if possible.
@@ -43,22 +43,16 @@ namespace Waher.Script.Functions.Analytic
 		{
 			if (VariableName == this.DefaultVariableName)
 			{
-				if (this.Argument is IDifferentiable Differentiable)
-				{
-					int Start = this.Start;
-					int Len = this.Length;
-					Expression Exp = this.Expression;
+				int Start = this.Start;
+				int Len = this.Length;
+				Expression Exp = this.Expression;
 
-					return new Multiply(
-						new Negate(
-							new Square(
-								new CscH(this.Argument, Start, Len, Expression),
-								Start, Len, Expression),
+				return this.DifferentiationChainRule(VariableName, Variables, this.Argument,
+					new Negate(
+						new Square(
+							new CscH(this.Argument, Start, Len, Expression),
 							Start, Len, Expression),
-						Differentiable.Differentiate(VariableName, Variables), Start, Len, Expression);
-				}
-				else
-					throw new ScriptRuntimeException("Argument not differentiable.", this);
+						Start, Len, Expression));
 			}
 			else
 				return new ConstantElement(DoubleNumber.ZeroElement, this.Start, this.Length, this.Expression);
@@ -71,19 +65,19 @@ namespace Waher.Script.Functions.Analytic
 		/// <param name="Variables">Variables collection.</param>
 		/// <returns>Function result.</returns>
 		public override IElement EvaluateScalar(double Argument, Variables Variables)
-        {
-            return new DoubleNumber(1.0 / Math.Tanh(Argument));
-        }
+		{
+			return new DoubleNumber(1.0 / Math.Tanh(Argument));
+		}
 
-        /// <summary>
-        /// Evaluates the function on a scalar argument.
-        /// </summary>
-        /// <param name="Argument">Function argument.</param>
-        /// <param name="Variables">Variables collection.</param>
-        /// <returns>Function result.</returns>
-        public override IElement EvaluateScalar(Complex Argument, Variables Variables)
-        {
-            return new ComplexNumber(Complex.Reciprocal(Complex.Tanh(Argument)));
-        }
-    }
+		/// <summary>
+		/// Evaluates the function on a scalar argument.
+		/// </summary>
+		/// <param name="Argument">Function argument.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Function result.</returns>
+		public override IElement EvaluateScalar(Complex Argument, Variables Variables)
+		{
+			return new ComplexNumber(Complex.Reciprocal(Complex.Tanh(Argument)));
+		}
+	}
 }

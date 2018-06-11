@@ -43,22 +43,17 @@ namespace Waher.Script.Functions.Analytic
 		{
 			if (VariableName == this.DefaultVariableName)
 			{
-				if (this.Argument is IDifferentiable Differentiable)
-				{
-					int Start = this.Start;
-					int Len = this.Length;
-					Expression Exp = this.Expression;
+				int Start = this.Start;
+				int Len = this.Length;
+				Expression Exp = this.Expression;
 
-					return new Divide(
-						Differentiable.Differentiate(VariableName, Variables),
+				return this.DifferentiationChainRule(VariableName, Variables, this.Argument,
+					new Invert(
 						new Multiply(
 							new ConstantElement(new DoubleNumber(2), Start, Len, Expression),
-							new Sqrt(this.Argument, Start, Len, Expression),
+							this,
 							Start, Len, Expression),
-						Start, Len, Expression);
-				}
-				else
-					throw new ScriptRuntimeException("Argument not differentiable.", this);
+						Start, Len, Expression));
 			}
 			else
 				return new ConstantElement(DoubleNumber.ZeroElement, this.Start, this.Length, this.Expression);

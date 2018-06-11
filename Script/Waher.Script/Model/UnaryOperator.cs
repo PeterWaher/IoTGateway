@@ -35,5 +35,19 @@ namespace Waher.Script.Model
 			get { return this.op; }
 		}
 
+		/// <summary>
+		/// Default variable name, if any, null otherwise.
+		/// </summary>
+		public virtual string DefaultVariableName
+		{
+			get
+			{
+				if (this.op is IDifferentiable Differentiable)
+					return Differentiable.DefaultVariableName;
+				else
+					return null;
+			}
+		}
+
 	}
 }

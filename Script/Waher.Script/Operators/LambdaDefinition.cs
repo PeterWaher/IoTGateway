@@ -394,7 +394,7 @@ namespace Waher.Script.Operators
 		/// <summary>
 		/// Default variable name, if any, null otherwise.
 		/// </summary>
-		public string DefaultVariableName
+		public override string DefaultVariableName
 		{
 			get
 			{

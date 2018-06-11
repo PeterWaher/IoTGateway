@@ -44,8 +44,8 @@ namespace Waher.Script.Graphs
 		private bool showXAxis = true;
 		private bool showYAxis = true;
 		private bool showGrid = true;
-		private bool showZeroX = false;
-		private bool showZeroY = false;
+		private readonly bool showZeroX = false;
+		private readonly bool showZeroY = false;
 
 		/// <summary>
 		/// Base class for two-dimensional graphs.
@@ -69,18 +69,18 @@ namespace Waher.Script.Graphs
 			ScriptNode Node, params object[] Parameters)
 			: base()
 		{
+			if (X is Interval XI)
+				X = new DoubleVector(XI.GetArray());
+
+			if (Y is Interval YI)
+				Y = new DoubleVector(YI.GetArray());
+
 			int i, c = X.Dimension;
 			bool HasNull = false;
 			IElement ex, ey;
 
 			if (c != Y.Dimension)
 				throw new ScriptException("X and Y series must be equally large.");
-
-			if (X is Interval XI)
-				X = new DoubleVector(XI.GetArray());
-
-			if (Y is Interval YI)
-				Y = new DoubleVector(YI.GetArray());
 
 			for (i = 0; i < c; i++)
 			{
@@ -310,8 +310,7 @@ namespace Waher.Script.Graphs
 			if (this.x.First == null)
 				return Element;
 
-			Graph2D G = Element as Graph2D;
-			if (G == null)
+			if (!(Element is Graph2D G))
 				return null;
 
 			if (G.x.First == null)
@@ -373,8 +372,7 @@ namespace Waher.Script.Graphs
 		/// </summary>
 		public override bool Equals(object obj)
 		{
-			Graph2D G = obj as Graph2D;
-			if (G == null)
+			if (!(obj is Graph2D G))
 				return false;
 
 			return (

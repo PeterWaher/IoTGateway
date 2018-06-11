@@ -50,7 +50,7 @@ namespace Waher.Script.Functions.Analytic
 				return this.DifferentiationChainRule(VariableName, Variables, this.Argument,
 					new Invert(
 						new Multiply(
-							new ConstantElement(new DoubleNumber(2), Start, Len, Expression),
+							new ConstantElement(DoubleNumber.TwoElement, Start, Len, Expression),
 							this,
 							Start, Len, Expression),
 						Start, Len, Expression));

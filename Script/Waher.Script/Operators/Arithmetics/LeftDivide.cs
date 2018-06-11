@@ -50,12 +50,11 @@ namespace Waher.Script.Operators.Arithmetics
 		/// <returns>Result</returns>
 		public static IElement EvaluateDivision(IElement Left, IElement Right, ScriptNode Node)
 		{
-			IRingElement LE = Left as IRingElement;
 			IRingElement RE = Right as IRingElement;
 			IElement Result;
 			IRingElement Temp;
 
-			if (LE != null && RE != null)
+			if (Left is IRingElement LE && RE != null)
 			{
 				// TODO: Optimize in case of matrices. It's more efficient to employ a solve algorithm than to compute the inverse and the multiply.
 
@@ -127,52 +126,51 @@ namespace Waher.Script.Operators.Arithmetics
 				}
 				else
 				{
-                    ISet Set1 = Left as ISet;
-                    ISet Set2 = Right as ISet;
+					ISet Set2 = Right as ISet;
 
-                    if (Set1 != null && Set2 != null)
-                        return new SetDifference(Set1, Set2);
-                    else
-                    {
-                        ICollection<IElement> LeftChildren = Left.ChildElements;
-                        ICollection<IElement> RightChildren = Right.ChildElements;
+					if (Left is ISet Set1 && Set2 != null)
+						return new SetDifference(Set1, Set2);
+					else
+					{
+						ICollection<IElement> LeftChildren = Left.ChildElements;
+						ICollection<IElement> RightChildren = Right.ChildElements;
 
-                        if (LeftChildren.Count == RightChildren.Count)
-                        {
-                            LinkedList<IElement> Elements = new LinkedList<IElement>();
-                            IEnumerator<IElement> eLeft = LeftChildren.GetEnumerator();
-                            IEnumerator<IElement> eRight = RightChildren.GetEnumerator();
+						if (LeftChildren.Count == RightChildren.Count)
+						{
+							LinkedList<IElement> Elements = new LinkedList<IElement>();
+							IEnumerator<IElement> eLeft = LeftChildren.GetEnumerator();
+							IEnumerator<IElement> eRight = RightChildren.GetEnumerator();
 
-                            try
-                            {
-                                while (eLeft.MoveNext() && eRight.MoveNext())
-                                    Elements.AddLast(EvaluateDivision(eLeft.Current, eRight.Current, Node));
-                            }
-                            finally
-                            {
-                                eLeft.Dispose();
-                                eRight.Dispose();
-                            }
+							try
+							{
+								while (eLeft.MoveNext() && eRight.MoveNext())
+									Elements.AddLast(EvaluateDivision(eLeft.Current, eRight.Current, Node));
+							}
+							finally
+							{
+								eLeft.Dispose();
+								eRight.Dispose();
+							}
 
-                            return Left.Encapsulate(Elements, Node);
-                        }
-                        else
-                        {
-                            LinkedList<IElement> LeftResult = new LinkedList<IElement>();
+							return Left.Encapsulate(Elements, Node);
+						}
+						else
+						{
+							LinkedList<IElement> LeftResult = new LinkedList<IElement>();
 
-                            foreach (IElement LeftChild in LeftChildren)
-                            {
-                                LinkedList<IElement> RightResult = new LinkedList<IElement>();
+							foreach (IElement LeftChild in LeftChildren)
+							{
+								LinkedList<IElement> RightResult = new LinkedList<IElement>();
 
-                                foreach (IElement RightChild in RightChildren)
-                                    RightResult.AddLast(EvaluateDivision(LeftChild, RightChild, Node));
+								foreach (IElement RightChild in RightChildren)
+									RightResult.AddLast(EvaluateDivision(LeftChild, RightChild, Node));
 
-                                LeftResult.AddLast(Right.Encapsulate(RightResult, Node));
-                            }
+								LeftResult.AddLast(Right.Encapsulate(RightResult, Node));
+							}
 
-                            return Left.Encapsulate(LeftResult, Node);
-                        }
-                    }
+							return Left.Encapsulate(LeftResult, Node);
+						}
+					}
 				}
 			}
 		}

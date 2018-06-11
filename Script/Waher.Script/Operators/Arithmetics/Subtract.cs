@@ -11,7 +11,7 @@ namespace Waher.Script.Operators.Arithmetics
 	/// <summary>
 	/// Subtraction operator.
 	/// </summary>
-	public class Subtract : BinaryOperator 
+	public class Subtract : BinaryOperator, IDifferentiable
 	{
 		/// <summary>
 		/// Subtraction operator.
@@ -163,6 +163,26 @@ namespace Waher.Script.Operators.Arithmetics
 					}
 				}
 			}
+		}
+
+		/// <summary>
+		/// Differentiates a script node, if possible.
+		/// </summary>
+		/// <param name="VariableName">Name of variable to differentiate on.</param>
+		/// <param name="Variables">Collection of variables.</param>
+		/// <returns>Differentiated node.</returns>
+		public ScriptNode Differentiate(string VariableName, Variables Variables)
+		{
+			if (this.left is IDifferentiable Left &&
+				this.right is IDifferentiable Right)
+			{
+				return new Subtract(
+					Left.Differentiate(VariableName, Variables),
+					Right.Differentiate(VariableName, Variables),
+					this.Start, this.Length, this.Expression);
+			}
+			else
+				throw new ScriptRuntimeException("Terms not differentiable.", this);
 		}
 
 	}

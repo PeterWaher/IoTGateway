@@ -636,6 +636,12 @@ namespace Waher.Script.Graphs
 		/// <returns>Vector of labels.</returns>
 		public static double[] GetLabels(double Min, double Max, int ApproxNrLabels)
 		{
+			if (double.IsInfinity(Min))
+				throw new ArgumentException("Infinite interval.", nameof(Min));
+
+			if (double.IsInfinity(Max))
+				throw new ArgumentException("Infinite interval.", nameof(Max));
+
 			double StepSize = GetStepSize(Min, Max, ApproxNrLabels);
 			List<double> Steps = new List<double>();
 			int i = (int)Math.Ceiling(Min / StepSize);

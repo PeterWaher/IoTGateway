@@ -97,8 +97,7 @@ namespace Waher.Script.Objects.Sets
 		/// <returns>If the element is contained in the set.</returns>
 		public override bool Contains(IElement Element)
 		{
-			DoubleNumber n = Element as DoubleNumber;
-			if (n == null)
+			if (!(Element is DoubleNumber n))
 				return false;
 
 			double d = n.Value;
@@ -118,8 +117,7 @@ namespace Waher.Script.Objects.Sets
 		/// <returns>If elements are equal.</returns>
 		public override bool Equals(object obj)
 		{
-			Interval I = obj as Interval;
-			if (I == null)
+			if (!(obj is Interval I))
 				return false;
 			else
 			{
@@ -163,7 +161,7 @@ namespace Waher.Script.Objects.Sets
 			List<IElement> Result = new List<IElement>();
 
 			double d = this.from;
-			double s = this.stepSize.HasValue ? this.stepSize.Value : 1;
+			double s = this.stepSize ?? 1;
 
 			if (this.includesFrom)
 				Result.Add(new DoubleNumber(d));
@@ -193,16 +191,17 @@ namespace Waher.Script.Objects.Sets
 				List<double> Result = new List<double>();
 
 				double d = this.from;
-				double s = this.stepSize.HasValue ? this.stepSize.Value : 1;
+				double s = this.stepSize ?? 1;
 
 				if (this.includesFrom)
 					Result.Add(d);
 
-				d += s;
+				int i = 1;
+				d = this.from + s;
 				while (d < this.to)
 				{
 					Result.Add(d);
-					d += s;
+					d = this.from + s * ++i;    // Don't use += s, to avoid round-off errors.
 				}
 
 				if (d == this.to && this.IncludesTo)

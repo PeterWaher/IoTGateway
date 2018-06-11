@@ -16,7 +16,7 @@ namespace Waher.Script
 		private Dictionary<string, Variable> variables = new Dictionary<string, Variable>();
         private Stack<Dictionary<string, Variable>> stack = null;
 		private TextWriter consoleOut = null;
-		private Mutex mutex = new Mutex();
+		private readonly Mutex mutex = new Mutex();
 
         /// <summary>
         /// Collection of variables.
@@ -120,7 +120,7 @@ namespace Waher.Script
 
             Dictionary<string, Variable> Clone = new Dictionary<string, Variable>();
             foreach (KeyValuePair<string, Variable> P in this.variables)
-                Clone[P.Key] = P.Value;
+                Clone[P.Key] = new Variable(P.Key, P.Value.ValueElement);
 
             this.variables = Clone;
         }
@@ -211,7 +211,7 @@ namespace Waher.Script
 
 		private class VariableEnumerator : IEnumerator<Variable>
 		{
-			private Variable[] variables;
+			private readonly Variable[] variables;
 			private int pos = -1;
 
 			internal VariableEnumerator(Variable[] Variables)

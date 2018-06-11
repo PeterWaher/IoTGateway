@@ -50,5 +50,28 @@ namespace Waher.Script.Model
 			get { return this.right; }
 		}
 
+		/// <summary>
+		/// Default variable name, if any, null otherwise.
+		/// </summary>
+		public virtual string DefaultVariableName
+		{
+			get
+			{
+				if (this.left is IDifferentiable Left &&
+					this.right is IDifferentiable Right)
+				{
+					string s = Left.DefaultVariableName;
+					if (s == null)
+						return null;
+					else if (s == Right.DefaultVariableName)
+						return s;
+					else
+						return null;
+				}
+				else
+					return null;
+			}
+		}
+
 	}
 }

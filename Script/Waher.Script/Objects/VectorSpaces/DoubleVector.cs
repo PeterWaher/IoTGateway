@@ -132,8 +132,7 @@ namespace Waher.Script.Objects.VectorSpaces
 		/// <returns>Result, if understood, null otherwise.</returns>
 		public override IVectorSpaceElement MultiplyScalar(IFieldElement Scalar)
 		{
-			DoubleNumber DoubleNumber = Scalar as DoubleNumber;
-			if (DoubleNumber == null)
+			if (!(Scalar is DoubleNumber DoubleNumber))
 				return null;
 
 			double d = DoubleNumber.Value;
@@ -154,8 +153,7 @@ namespace Waher.Script.Objects.VectorSpaces
 		/// <returns>Result, if understood, null otherwise.</returns>
 		public override IAbelianGroupElement Add(IAbelianGroupElement Element)
 		{
-			DoubleVector DoubleVector = Element as DoubleVector;
-			if (DoubleVector == null)
+			if (!(Element is DoubleVector DoubleVector))
 				return null;
 
 			int i;
@@ -193,8 +191,7 @@ namespace Waher.Script.Objects.VectorSpaces
 		/// <returns>If elements are equal.</returns>
 		public override bool Equals(object obj)
 		{
-			DoubleVector DoubleVector = obj as DoubleVector;
-			if (DoubleVector == null)
+			if (!(obj is DoubleVector DoubleVector))
 				return false;
 
 			int i;
@@ -296,8 +293,7 @@ namespace Waher.Script.Objects.VectorSpaces
 			if (Index < 0 || Index >= this.dimension)
 				throw new ScriptException("Index out of bounds.");
 
-			DoubleNumber V = Value as DoubleNumber;
-			if (V == null)
+			if (!(Value is DoubleNumber V))
 				throw new ScriptException("Elements in a double vector are required to be double values.");
 
 			double[] Values = this.Values;

@@ -1,15 +1,16 @@
 ﻿using System.Collections.Generic;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
+using Waher.Script.Objects;
 
 namespace Waher.Script.Model
 {
     /// <summary>
     /// Represents a constant element value.
     /// </summary>
-    public class ConstantElement : ScriptNode
+    public class ConstantElement : ScriptNode, IDifferentiable
     {
-        private IElement constant;
+        private readonly IElement constant;
 
         /// <summary>
         /// Represents a constant element value.
@@ -52,5 +53,21 @@ namespace Waher.Script.Model
             if (!this.constant.Equals(CheckAgainst))
                 throw new ScriptRuntimeException("Pattern mismatch.", this);
         }
-    }
+
+		/// <summary>
+		/// Differentiates a script node, if possible.
+		/// </summary>
+		/// <param name="VariableName">Name of variable to differentiate on.</param>
+		/// <param name="Variables">Collection of variables.</param>
+		/// <returns>Differentiated node.</returns>
+		public ScriptNode Differentiate(string VariableName, Variables Variables)
+		{
+			return new ConstantElement(DoubleNumber.ZeroElement, this.Start, this.Length, this.Expression);
+		}
+
+		/// <summary>
+		/// Default variable name, if any, null otherwise.
+		/// </summary>
+		public string DefaultVariableName => null;
+	}
 }

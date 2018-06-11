@@ -11,7 +11,7 @@ namespace Waher.Script.Operators.Arithmetics
 	/// <summary>
 	/// Multiplication operator.
 	/// </summary>
-	public class Multiply : BinaryOperator 
+	public class Multiply : BinaryOperator, IDifferentiable
 	{
 		/// <summary>
 		/// Multiplication operator.
@@ -48,11 +48,10 @@ namespace Waher.Script.Operators.Arithmetics
 		/// <returns>Result</returns>
 		public static IElement EvaluateMultiplication(IElement Left, IElement Right, ScriptNode Node)
 		{
-			IRingElement LE = Left as IRingElement;
 			IRingElement RE = Right as IRingElement;
 			IElement Result;
 
-			if (LE != null && RE != null)
+			if (Left is IRingElement LE && RE != null)
 			{
 				Result = LE.MultiplyRight(RE);
 				if (Result != null)
@@ -154,6 +153,36 @@ namespace Waher.Script.Operators.Arithmetics
 					}
 				}
 			}
+		}
+
+		/// <summary>
+		/// Differentiates a script node, if possible.
+		/// </summary>
+		/// <param name="VariableName">Name of variable to differentiate on.</param>
+		/// <param name="Variables">Collection of variables.</param>
+		/// <returns>Differentiated node.</returns>
+		public ScriptNode Differentiate(string VariableName, Variables Variables)
+		{
+			if (this.left is IDifferentiable Left &&
+				this.right is IDifferentiable Right)
+			{
+				int Start = this.Start;
+				int Len = this.Length;
+				Expression Expression = this.Expression;
+
+				return new Add(
+					new Multiply(
+						Left.Differentiate(VariableName, Variables),
+						this.right,
+						Start, Len, Expression),
+					new Multiply(
+						this.left,
+						Right.Differentiate(VariableName, Variables),
+						Start, Len, Expression),
+					Start, Len, Expression);
+			}
+			else
+				throw new ScriptRuntimeException("Factors not differentiable.", this);
 		}
 
 	}

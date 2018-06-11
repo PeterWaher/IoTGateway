@@ -22,6 +22,16 @@ namespace Waher.Script.Objects
 		/// </summary>
 		public static readonly DoubleNumber OneElement = new DoubleNumber(1);
 
+		/// <summary>
+		/// 2
+		/// </summary>
+		public static readonly DoubleNumber TwoElement = new DoubleNumber(2);
+
+		/// <summary>
+		/// 3
+		/// </summary>
+		public static readonly DoubleNumber ThreeElement = new DoubleNumber(3);
+
 		private static readonly DoubleNumbers associatedField = new DoubleNumbers();
 
 		private double value;

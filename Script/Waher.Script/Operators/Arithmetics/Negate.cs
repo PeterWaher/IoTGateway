@@ -11,7 +11,7 @@ namespace Waher.Script.Operators.Arithmetics
 	/// <summary>
 	/// Negation operator.
 	/// </summary>
-	public class Negate : UnaryDoubleOperator
+	public class Negate : UnaryDoubleOperator, IDifferentiable
 	{
 		/// <summary>
 		/// Negation operator.
@@ -60,6 +60,24 @@ namespace Waher.Script.Operators.Arithmetics
 				return E.Negate();
 			else
 				throw new ScriptException("Operand cannot be negated.");
+		}
+
+		/// <summary>
+		/// Differentiates a script node, if possible.
+		/// </summary>
+		/// <param name="VariableName">Name of variable to differentiate on.</param>
+		/// <param name="Variables">Collection of variables.</param>
+		/// <returns>Differentiated node.</returns>
+		public ScriptNode Differentiate(string VariableName, Variables Variables)
+		{
+			if (this.op is IDifferentiable Differentiable)
+			{
+				return new Negate(
+					Differentiable.Differentiate(VariableName, Variables),
+					this.Start, this.Length, this.Expression);
+			}
+			else
+				throw new ScriptRuntimeException("Operand not differentiable.", this);
 		}
 
 	}

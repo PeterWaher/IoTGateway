@@ -13,9 +13,9 @@ namespace Waher.Script.Model
 	/// </summary>
 	public abstract class ScriptNode
 	{
-		private Expression expression;
+		private readonly Expression expression;
 		private int start;
-		private int length;
+		private readonly int length;
 
 		/// <summary>
 		/// Base class for all nodes in a parsed script tree.
@@ -108,9 +108,19 @@ namespace Waher.Script.Model
 				Expression Exp = this.Expression;
 
 				if (Differentiation is Invert Invert)
-					return new Divide(ChainFactor, Invert.Operand, Start, Len, Expression);
+				{
+					if (Invert.Operand is Negate Negate)
+						return new Negate(new Divide(ChainFactor, Negate.Operand, Start, Len, Expression), Start, Len, Expression);
+					else
+						return new Divide(ChainFactor, Invert.Operand, Start, Len, Expression);
+				}
 				else if (Differentiation is Negate Negate)
-					return new Negate(new Multiply(Negate.Operand, ChainFactor, Start, Len, Expression), Start, Len, Expression);
+				{
+					if (Negate.Operand is Invert Invert2)
+						return new Negate(new Divide(ChainFactor, Invert2.Operand, Start, Len, Expression), Start, Len, Expression);
+					else
+						return new Negate(new Multiply(Negate.Operand, ChainFactor, Start, Len, Expression), Start, Len, Expression);
+				}
 				else
 					return new Multiply(Differentiation, ChainFactor, Start, Len, Expression);
 			}

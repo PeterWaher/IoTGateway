@@ -4,6 +4,7 @@ using System.Text;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Exceptions;
+using Waher.Script.Functions.Analytic;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 
@@ -12,7 +13,7 @@ namespace Waher.Script.Operators.Arithmetics
 	/// <summary>
 	/// Power operator.
 	/// </summary>
-	public class Power : BinaryOperator
+	public class Power : BinaryOperator, IDifferentiable
 	{
 		/// <summary>
 		/// Power operator.
@@ -49,14 +50,12 @@ namespace Waher.Script.Operators.Arithmetics
 		/// <returns>Result</returns>
 		public static IElement EvaluatePower(IElement Left, IElement Right, ScriptNode Node)
 		{
-			DoubleNumber DL = Left as DoubleNumber;
 			DoubleNumber DR = Right as DoubleNumber;
 
-			if (DL != null && DR != null)
+			if (Left is DoubleNumber DL && DR != null)
 				return new DoubleNumber(Math.Pow(DL.Value, DR.Value));
 
-			IRingElement LE = Left as IRingElement;
-			if (LE != null && DR != null)
+			if (Left is IRingElement LE && DR != null)
 			{
 				double d = DR.Value;
 				if (d >= long.MinValue && d <= long.MaxValue && Math.Truncate(d) == d)
@@ -73,8 +72,7 @@ namespace Waher.Script.Operators.Arithmetics
 					}
 					else if (n == 0)
 					{
-						ICommutativeRingWithIdentityElement LE2 = LE as ICommutativeRingWithIdentityElement;
-						if (LE2 == null)
+						if (!(LE is ICommutativeRingWithIdentityElement LE2))
 							throw new ScriptRuntimeException("Base element ring does not have unity.", Node);
 
 						return LE2.One;
@@ -170,6 +168,75 @@ namespace Waher.Script.Operators.Arithmetics
 					}
 				}
 			}
+		}
+
+		/// <summary>
+		/// Differentiates a script node, if possible.
+		/// </summary>
+		/// <param name="VariableName">Name of variable to differentiate on.</param>
+		/// <param name="Variables">Collection of variables.</param>
+		/// <returns>Differentiated node.</returns>
+		public ScriptNode Differentiate(string VariableName, Variables Variables)
+		{
+			int Start = this.Start;
+			int Len = this.Length;
+			Expression Expression = this.Expression;
+
+			if (this.left is ConstantElement ConstantBase)
+			{
+				return this.DifferentiationChainRule(VariableName, Variables, this.right,
+					new Multiply(
+						this,
+						new Ln(ConstantBase, Start, Len, Expression),
+						Start, Len, Expression));
+			}
+			else if (this.left is IDifferentiable Left)
+			{
+				if (this.right is ConstantElement ConstantExp)
+				{
+					if (ConstantExp.Constant.Equals(DoubleNumber.OneElement))
+						return Left.Differentiate(VariableName, Variables);
+					else if (ConstantExp.Constant.Equals(DoubleNumber.TwoElement))
+					{
+						return this.DifferentiationChainRule(VariableName, Variables, this.left,
+							new Multiply(
+								ConstantExp,
+								this.left,
+								Start, Len, Expression));
+					}
+					else
+					{
+						return this.DifferentiationChainRule(VariableName, Variables, this.left,
+							new Multiply(
+								ConstantExp,
+								new Power(
+									this.left,
+									new ConstantElement(Subtract.EvaluateSubtraction(ConstantExp.Constant, DoubleNumber.OneElement, this), Start, Len, Expression),
+									Start, Len, Expression),
+								Start, Len, Expression));
+					}
+				}
+				else if (this.right is IDifferentiable Right)
+				{
+					return new Multiply(
+						this,
+						new Add(
+							new Multiply(
+								Left.Differentiate(VariableName, Variables),
+								new Divide(this.right, this.left, Start, Len, Expression),
+								Start, Len, Expression),
+							new Multiply(
+								Right.Differentiate(VariableName, Variables),
+								new Ln(this.left, Start, Len, Expression),
+								Start, Len, Expression),
+							Start, Len, Expression),
+						Start, Len, Expression);
+				}
+				else
+					throw new ScriptRuntimeException("Operands not differentiable.", this);
+			}
+			else
+				throw new ScriptRuntimeException("Operands not differentiable.", this);
 		}
 
 	}

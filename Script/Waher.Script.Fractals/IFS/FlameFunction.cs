@@ -14,22 +14,22 @@ namespace Waher.Script.Fractals.IFS
 {
     public class FlameFunction
     {
-		private DoubleNumber xv, yv;
-		private ComplexNumber zv;
-		private IElement[] complexParameters;
-		private IElement[] doubleParameters;
-        private double[] homogeneousTransform;
-        private ScriptNode node;
+		private readonly DoubleNumber xv, yv;
+		private readonly ComplexNumber zv;
+		private readonly IElement[] complexParameters;
+		private readonly IElement[] doubleParameters;
+        private readonly double[] homogeneousTransform;
+        private readonly ScriptNode node;
         private IFlameVariation[] variations;
         private ILambdaExpression[] variations2;
         private double[] variationWeights;
         private double[] variation2Weights;
         private bool[] variation2IsReal;
-        private List<IFlameVariation> variationsList = new List<IFlameVariation>();
-        private List<ILambdaExpression> variations2List = new List<ILambdaExpression>();
-        private List<double> variationsWeightList = new List<double>();
-        private List<double> variations2WeightList = new List<double>();
-        private List<bool> isReal = new List<bool>();
+        private readonly List<IFlameVariation> variationsList = new List<IFlameVariation>();
+        private readonly List<ILambdaExpression> variations2List = new List<ILambdaExpression>();
+        private readonly List<double> variationsWeightList = new List<double>();
+        private readonly List<double> variations2WeightList = new List<double>();
+        private readonly List<bool> isReal = new List<bool>();
         private SKColor color = SKColors.Red;
         private double weight = 1.0;
         private int nrVariations = 0;
@@ -38,7 +38,7 @@ namespace Waher.Script.Fractals.IFS
         private double red = 1.0;
         private double green = 0.0;
         private double blue = 0.0;
-        private bool hasProjection;
+        private readonly bool hasProjection;
         private bool hasVariations;
         private bool isTransparent = false;
 
@@ -140,8 +140,8 @@ namespace Waher.Script.Fractals.IFS
         {
             this.color = SKColors.Black;
             this.red = H / 360.0;
-            this.green = S;
-            this.blue = L;
+            this.green = S / 100.0;
+            this.blue = L / 100.0;
             this.isTransparent = false;
         }
 
@@ -227,12 +227,11 @@ namespace Waher.Script.Fractals.IFS
                             this.yv.Value = y2;
 
 							IElement Result = this.variations2[i].Evaluate(this.doubleParameters, Variables);
-							IVector V = Result as IVector;
 
-                            if (V == null || V.Dimension != 2)
-                                throw new ScriptRuntimeException("Real-valued lambda expressions must return a vector containing 2 real-valued numbers.", this.node);
+							if (!(Result is IVector V) || V.Dimension != 2)
+								throw new ScriptRuntimeException("Real-valued lambda expressions must return a vector containing 2 real-valued numbers.", this.node);
 
-                            x3 += w * Expression.ToDouble(V.GetElement(0).AssociatedObjectValue);
+							x3 += w * Expression.ToDouble(V.GetElement(0).AssociatedObjectValue);
                             y3 += w * Expression.ToDouble(V.GetElement(1).AssociatedObjectValue);
                         }
                         else

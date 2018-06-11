@@ -415,14 +415,13 @@ namespace Waher.Script.Fractals.IFS
 
             if (NrGames <= 1)
             {
-                FlameState P = new FlameState(Gen, xMin, xMax, yMin, yMax, Width, Height,
-                    SuperSampling, N, ColorMode.Hsl, Node);
+                FlameState P = new FlameState(Gen, xMin, xMax, yMin, yMax, Width, Height, SuperSampling, N, ColorMode.Hsl, Node);
                 Variables v = new Variables();
                 Variables.CopyTo(v);
 
                 RunChaosGame(v, Functions, SumWeights, P, Preview, Gamma, LightFactor, Node, true);
 
-                return new FractalGraph(P.RenderBitmapHsl(Gamma, LightFactor, false), xMin, yMin, xMax, yMax, rDelta,
+                return new FractalGraph(P.RenderBitmapHsl(Gamma, LightFactor, false, SKColors.Black), xMin, yMin, xMax, yMax, rDelta,
                     false, Node, FractalZoomScript, State);
             }
             else
@@ -458,7 +457,7 @@ namespace Waher.Script.Fractals.IFS
                     for (i = 1; i < NrGames; i++)
                         P[0].Add(P[i]);
 
-                    return new FractalGraph(P[0].RenderBitmapHsl(Gamma, LightFactor, false), xMin, yMin, xMax, yMax, rDelta,
+                    return new FractalGraph(P[0].RenderBitmapHsl(Gamma, LightFactor, false, SKColors.Black), xMin, yMin, xMax, yMax, rDelta,
                         false, Node, FractalZoomScript, State);
                 }
                 catch (ThreadAbortException)
@@ -587,7 +586,7 @@ namespace Waher.Script.Fractals.IFS
 
 							if (Preview)
 							{
-								Node.Expression.Preview(new GraphBitmap(P.RenderBitmapHsl(Gamma, LightFactor, true)));
+								Node.Expression.Preview(new GraphBitmap(P.RenderBitmapHsl(Gamma, LightFactor, true, SKColors.Black)));
 
 								Temp2 = System.DateTime.Now;
 

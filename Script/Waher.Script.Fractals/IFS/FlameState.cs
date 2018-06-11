@@ -175,7 +175,7 @@ namespace Waher.Script.Fractals.IFS
             }
         }
 
-        internal SKImage RenderBitmapRgba(double Gamma, double Vibrancy, bool Preview)
+        internal SKImage RenderBitmapRgba(double Gamma, double Vibrancy, bool Preview, SKColor? Background)
         {
             int[] Frequency;
             double[] Reds;
@@ -205,7 +205,7 @@ namespace Waher.Script.Fractals.IFS
             int dst = 0;
             int srcY;
             int src;
-            int si;
+            int si, a;
             int rowStep = Width * this.superSampling;
             int rowStep2 = rowStep - this.superSampling;
             int srcYStep = rowStep * this.superSampling;
@@ -215,8 +215,19 @@ namespace Waher.Script.Fractals.IFS
             int freq, maxfreq = 0;
             double GammaComponent = Gamma * (1 - Vibrancy) + Vibrancy;
             double GammaAlpha = Gamma * Vibrancy + (1 - Vibrancy);
+			bool HasBg = Background.HasValue;
+			byte BgR, BgG, BgB;
 
-            s2 = System.Math.Pow(255.0, GammaComponent);
+			if (HasBg)
+			{
+				BgR = Background.Value.Red;
+				BgG = Background.Value.Green;
+				BgB = Background.Value.Blue;
+			}
+			else
+				BgR = BgG = BgB = 0;
+
+			s2 = Math.Pow(255.0, GammaComponent);
 
             if (this.superSampling > 1)
             {
@@ -274,7 +285,7 @@ namespace Waher.Script.Fractals.IFS
             if (maxfreq == 0)
                 s = 1;
             else
-                s = System.Math.Pow(255.0, GammaAlpha) / System.Math.Log(maxfreq);
+                s = Math.Pow(255.0, GammaAlpha) / Math.Log(maxfreq);
 
             GammaComponent = 1.0 / GammaComponent;
             GammaAlpha = 1.0 / GammaAlpha;
@@ -287,47 +298,93 @@ namespace Waher.Script.Fractals.IFS
                     {
                         i = Frequency[src];
 
-                        if (i == 0)
-                        {
-                            rgb[dst++] = 0;
-                            rgb[dst++] = 0;
-                            rgb[dst++] = 0;
-                            rgb[dst++] = 0;
-                        }
-                        else
-                        {
-                            si = (int)Blues[src];
-                            if (si < 0)
-                                rgb[dst++] = 0;
-                            else if (si > 255)
-                                rgb[dst++] = 255;
-                            else
-                                rgb[dst++] = (byte)si;
+						if (i == 0)
+						{
+							if (HasBg)
+							{
+								rgb[dst++] = BgB;
+								rgb[dst++] = BgG;
+								rgb[dst++] = BgR;
+								rgb[dst++] = 0xff;
+							}
+							else
+							{
+								rgb[dst++] = 0;
+								rgb[dst++] = 0;
+								rgb[dst++] = 0;
+								rgb[dst++] = 0;
+							}
+						}
+						else
+						{
+							if (HasBg)
+							{
+								a = (int)(Math.Pow(Math.Log(i) * s, GammaAlpha));
 
-                            si = (int)Greens[src];
-                            if (si < 0)
-                                rgb[dst++] = 0;
-                            else if (si > 255)
-                                rgb[dst++] = 255;
-                            else
-                                rgb[dst++] = (byte)si;
+								si = (int)Blues[src];
+								si = (si * a + BgB * (255 - a) + 128) / 255;
+								if (si < 0)
+									rgb[dst++] = 0;
+								else if (si > 255)
+									rgb[dst++] = 255;
+								else
+									rgb[dst++] = (byte)si;
 
-                            si = (int)Reds[src];
-                            if (si < 0)
-                                rgb[dst++] = 0;
-                            else if (si > 255)
-                                rgb[dst++] = 255;
-                            else
-                                rgb[dst++] = (byte)si;
+								si = (int)Greens[src];
+								si = (si * a + BgG * (255 - a) + 128) / 255;
+								if (si < 0)
+									rgb[dst++] = 0;
+								else if (si > 255)
+									rgb[dst++] = 255;
+								else
+									rgb[dst++] = (byte)si;
 
-                            si = (int)(System.Math.Pow(System.Math.Log(i) * s, GammaAlpha));
-                            if (si < 0)
-                                rgb[dst++] = 0;
-                            else if (si > 255)
-                                rgb[dst++] = 255;
-                            else
-                                rgb[dst++] = (byte)si;
-                        }
+								si = (int)Reds[src];
+								si = (si * a + BgR * (255 - a) + 128) / 255;
+								if (si < 0)
+									rgb[dst++] = 0;
+								else if (si > 255)
+									rgb[dst++] = 255;
+								else
+									rgb[dst++] = (byte)si;
+
+								rgb[dst++] = 255;
+							}
+							else
+							{
+								si = (int)Blues[src];
+								if (si < 0)
+									rgb[dst++] = 0;
+								else if (si > 255)
+									rgb[dst++] = 255;
+								else
+									rgb[dst++] = (byte)si;
+
+								si = (int)Greens[src];
+								if (si < 0)
+									rgb[dst++] = 0;
+								else if (si > 255)
+									rgb[dst++] = 255;
+								else
+									rgb[dst++] = (byte)si;
+
+								si = (int)Reds[src];
+								if (si < 0)
+									rgb[dst++] = 0;
+								else if (si > 255)
+									rgb[dst++] = 255;
+								else
+									rgb[dst++] = (byte)si;
+
+								a = (int)(Math.Pow(Math.Log(i) * s, GammaAlpha));
+								if (a < 0)
+									rgb[dst++] = 0;
+								else if (a > 255)
+									rgb[dst++] = 255;
+								else
+									rgb[dst++] = (byte)a;
+							}
+						}
                     }
                 }
             }
@@ -339,47 +396,93 @@ namespace Waher.Script.Fractals.IFS
                     {
                         i = Frequency[src];
 
-                        if (i == 0)
-                        {
-                            rgb[dst++] = 0;
-                            rgb[dst++] = 0;
-                            rgb[dst++] = 0;
-                            rgb[dst++] = 0;
-                        }
-                        else
-                        {
-                            si = (int)System.Math.Pow(Blues[src], GammaComponent);
-                            if (si < 0)
-                                rgb[dst++] = 0;
-                            else if (si > 255)
-                                rgb[dst++] = 255;
-                            else
-                                rgb[dst++] = (byte)si;
+						if (i == 0)
+						{
+							if (HasBg)
+							{
+								rgb[dst++] = BgB;
+								rgb[dst++] = BgG;
+								rgb[dst++] = BgR;
+								rgb[dst++] = 0xff;
+							}
+							else
+							{
+								rgb[dst++] = 0;
+								rgb[dst++] = 0;
+								rgb[dst++] = 0;
+								rgb[dst++] = 0;
+							}
+						}
+						else
+						{
+							if (HasBg)
+							{
+								a = (int)(Math.Log(i) * s);
 
-                            si = (int)System.Math.Pow(Greens[src], GammaComponent);
-                            if (si < 0)
-                                rgb[dst++] = 0;
-                            else if (si > 255)
-                                rgb[dst++] = 255;
-                            else
-                                rgb[dst++] = (byte)si;
+								si = (int)Math.Pow(Blues[src], GammaComponent);
+								si = (si * a + BgB * (255 - a) + 128) / 255;
+								if (si < 0)
+									rgb[dst++] = 0;
+								else if (si > 255)
+									rgb[dst++] = 255;
+								else
+									rgb[dst++] = (byte)si;
 
-                            si = (int)System.Math.Pow(Reds[src], GammaComponent);
-                            if (si < 0)
-                                rgb[dst++] = 0;
-                            else if (si > 255)
-                                rgb[dst++] = 255;
-                            else
-                                rgb[dst++] = (byte)si;
+								si = (int)Math.Pow(Greens[src], GammaComponent);
+								si = (si * a + BgG * (255 - a) + 128) / 255;
+								if (si < 0)
+									rgb[dst++] = 0;
+								else if (si > 255)
+									rgb[dst++] = 255;
+								else
+									rgb[dst++] = (byte)si;
 
-                            si = (int)(System.Math.Log(i) * s);
-                            if (si < 0)
-                                rgb[dst++] = 0;
-                            else if (si > 255)
-                                rgb[dst++] = 255;
-                            else
-                                rgb[dst++] = (byte)si;
-                        }
+								si = (int)Math.Pow(Reds[src], GammaComponent);
+								si = (si * a + BgR * (255 - a) + 128) / 255;
+								if (si < 0)
+									rgb[dst++] = 0;
+								else if (si > 255)
+									rgb[dst++] = 255;
+								else
+									rgb[dst++] = (byte)si;
+
+								rgb[dst++] = 255;
+							}
+							else
+							{
+								si = (int)Math.Pow(Blues[src], GammaComponent);
+								if (si < 0)
+									rgb[dst++] = 0;
+								else if (si > 255)
+									rgb[dst++] = 255;
+								else
+									rgb[dst++] = (byte)si;
+
+								si = (int)Math.Pow(Greens[src], GammaComponent);
+								if (si < 0)
+									rgb[dst++] = 0;
+								else if (si > 255)
+									rgb[dst++] = 255;
+								else
+									rgb[dst++] = (byte)si;
+
+								si = (int)Math.Pow(Reds[src], GammaComponent);
+								if (si < 0)
+									rgb[dst++] = 0;
+								else if (si > 255)
+									rgb[dst++] = 255;
+								else
+									rgb[dst++] = (byte)si;
+
+								a = (int)(Math.Log(i) * s);
+								if (a < 0)
+									rgb[dst++] = 0;
+								else if (a > 255)
+									rgb[dst++] = 255;
+								else
+									rgb[dst++] = (byte)a;
+							}
+						}
                     }
                 }
             }
@@ -391,47 +494,93 @@ namespace Waher.Script.Fractals.IFS
                     {
                         i = Frequency[src];
 
-                        if (i == 0)
-                        {
-                            rgb[dst++] = 0;
-                            rgb[dst++] = 0;
-                            rgb[dst++] = 0;
-                            rgb[dst++] = 0;
-                        }
-                        else
-                        {
-                            si = (int)System.Math.Pow(Blues[src], GammaComponent);
-                            if (si < 0)
-                                rgb[dst++] = 0;
-                            else if (si > 255)
-                                rgb[dst++] = 255;
-                            else
-                                rgb[dst++] = (byte)si;
+						if (i == 0)
+						{
+							if (HasBg)
+							{
+								rgb[dst++] = BgB;
+								rgb[dst++] = BgG;
+								rgb[dst++] = BgR;
+								rgb[dst++] = 0xff;
+							}
+							else
+							{
+								rgb[dst++] = 0;
+								rgb[dst++] = 0;
+								rgb[dst++] = 0;
+								rgb[dst++] = 0;
+							}
+						}
+						else
+						{
+							if (HasBg)
+							{
+								a = (int)(Math.Pow(Math.Log(i) * s, GammaAlpha));
 
-                            si = (int)System.Math.Pow(Greens[src], GammaComponent);
-                            if (si < 0)
-                                rgb[dst++] = 0;
-                            else if (si > 255)
-                                rgb[dst++] = 255;
-                            else
-                                rgb[dst++] = (byte)si;
+								si = (int)Math.Pow(Blues[src], GammaComponent);
+								si = (si * a + BgB * (255 - a) + 128) / 255;
+								if (si < 0)
+									rgb[dst++] = 0;
+								else if (si > 255)
+									rgb[dst++] = 255;
+								else
+									rgb[dst++] = (byte)si;
 
-                            si = (int)System.Math.Pow(Reds[src], GammaComponent);
-                            if (si < 0)
-                                rgb[dst++] = 0;
-                            else if (si > 255)
-                                rgb[dst++] = 255;
-                            else
-                                rgb[dst++] = (byte)si;
+								si = (int)Math.Pow(Greens[src], GammaComponent);
+								si = (si * a + BgG * (255 - a) + 128) / 255;
+								if (si < 0)
+									rgb[dst++] = 0;
+								else if (si > 255)
+									rgb[dst++] = 255;
+								else
+									rgb[dst++] = (byte)si;
 
-                            si = (int)(System.Math.Pow(System.Math.Log(i) * s, GammaAlpha));
-                            if (si < 0)
-                                rgb[dst++] = 0;
-                            else if (si > 255)
-                                rgb[dst++] = 255;
-                            else
-                                rgb[dst++] = (byte)si;
-                        }
+								si = (int)Math.Pow(Reds[src], GammaComponent);
+								si = (si * a + BgR * (255 - a) + 128) / 255;
+								if (si < 0)
+									rgb[dst++] = 0;
+								else if (si > 255)
+									rgb[dst++] = 255;
+								else
+									rgb[dst++] = (byte)si;
+
+								rgb[dst++] = 255;
+							}
+							else
+							{
+								si = (int)Math.Pow(Blues[src], GammaComponent);
+								if (si < 0)
+									rgb[dst++] = 0;
+								else if (si > 255)
+									rgb[dst++] = 255;
+								else
+									rgb[dst++] = (byte)si;
+
+								si = (int)Math.Pow(Greens[src], GammaComponent);
+								if (si < 0)
+									rgb[dst++] = 0;
+								else if (si > 255)
+									rgb[dst++] = 255;
+								else
+									rgb[dst++] = (byte)si;
+
+								si = (int)Math.Pow(Reds[src], GammaComponent);
+								if (si < 0)
+									rgb[dst++] = 0;
+								else if (si > 255)
+									rgb[dst++] = 255;
+								else
+									rgb[dst++] = (byte)si;
+
+								a = (int)(Math.Pow(Math.Log(i) * s, GammaAlpha));
+								if (a < 0)
+									rgb[dst++] = 0;
+								else if (a > 255)
+									rgb[dst++] = 255;
+								else
+									rgb[dst++] = (byte)a;
+							}
+						}
                     }
                 }
             }
@@ -442,7 +591,7 @@ namespace Waher.Script.Fractals.IFS
 			}
         }
 
-        internal SKImage RenderBitmapHsl(double Gamma, double LightFactor, bool Preview)
+        internal SKImage RenderBitmapHsl(double Gamma, double LightFactor, bool Preview, SKColor? Background)
         {
             int[] Frequency;
             double[] Hues;
@@ -483,8 +632,19 @@ namespace Waher.Script.Fractals.IFS
             int freq, maxfreq = 0;
             long R2, G2, B2;
 			SKColor cl;
+			bool HasBg = Background.HasValue;
+			byte BgR, BgG, BgB;
 
-            maxfreq = 0;
+			if (HasBg)
+			{
+				BgR = Background.Value.Red;
+				BgG = Background.Value.Green;
+				BgB = Background.Value.Blue;
+			}
+			else
+				BgR = BgG = BgB = 0;
+
+			maxfreq = 0;
             foreach (int F in Frequency)
             {
                 if (F > maxfreq)
@@ -501,18 +661,28 @@ namespace Waher.Script.Fractals.IFS
                     {
                         i = Frequency[src];
 
-                        if (i == 0)
-                        {
-                            rgb[dst++] = 0;
-                            rgb[dst++] = 0;
-                            rgb[dst++] = 0;
-                            rgb[dst++] = 0xff;
-                        }
-                        else
-                        {
-                            H = Hues[src] * 360;
-                            S = System.Math.Pow(Saturations[src], Gamma);
-                            L = System.Math.Pow((Lights[src] * i) / maxfreq, Gamma) * LightFactor;
+						if (i == 0)
+						{
+							if (HasBg)
+							{
+								rgb[dst++] = BgB;
+								rgb[dst++] = BgG;
+								rgb[dst++] = BgR;
+							}
+							else
+							{
+								rgb[dst++] = 0;
+								rgb[dst++] = 0;
+								rgb[dst++] = 0;
+							}
+
+							rgb[dst++] = 0xff;
+						}
+						else
+						{
+							H = Hues[src] * 360;
+							S = Math.Pow(Saturations[src], Gamma);
+							L = Math.Pow((Lights[src] * i) / maxfreq, Gamma) * LightFactor;
 
 							if (S > 1)
 								S = 1;
@@ -521,11 +691,11 @@ namespace Waher.Script.Fractals.IFS
 								L = 1;
 
 							cl = Graph.ToColorHSL(H, S, L);
-                            rgb[dst++] = cl.Blue;
-                            rgb[dst++] = cl.Green;
-                            rgb[dst++] = cl.Red;
-                            rgb[dst++] = 0xff;
-                        }
+							rgb[dst++] = cl.Blue;
+							rgb[dst++] = cl.Green;
+							rgb[dst++] = cl.Red;
+							rgb[dst++] = 0xff;
+						}
                     }
                 }
             }
@@ -547,8 +717,8 @@ namespace Waher.Script.Fractals.IFS
                                 if (j > 0)
                                 {
                                     H = Hues[si] * 360;
-                                    S = System.Math.Pow(Saturations[si], Gamma);
-                                    L = System.Math.Pow((Lights[si] * j) / maxfreq, Gamma) * LightFactor;
+                                    S = Math.Pow(Saturations[si], Gamma);
+                                    L = Math.Pow((Lights[si] * j) / maxfreq, Gamma) * LightFactor;
 
 									if (S > 1)
 										S = 1;
@@ -570,10 +740,20 @@ namespace Waher.Script.Fractals.IFS
 
                         if (freq == 0)
                         {
-                            rgb[dst++] = 0;
-                            rgb[dst++] = 0;
-                            rgb[dst++] = 0;
-                            rgb[dst++] = 0xff;
+							if (HasBg)
+							{
+								rgb[dst++] = BgB;
+								rgb[dst++] = BgG;
+								rgb[dst++] = BgR;
+							}
+							else
+							{
+								rgb[dst++] = 0;
+								rgb[dst++] = 0;
+								rgb[dst++] = 0;
+							}
+
+							rgb[dst++] = 0xff;
                         }
                         else
                         {

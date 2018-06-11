@@ -997,7 +997,6 @@ The following functions can be used to randomly create color palettes. The funct
 | `RandomLinearRGB([N[,BandSize[,Seed]]])` | Creates a palette of `N` colors (default=1024) consisting of bands of `BandSize` intermediate colors (default=16) interpolating random colors in RGB space. The random number generator can be initialized by a `Seed`, if provided, or use a random one. | `TestColorModel(RandomLinearRGB(1024,64))` |
 | `RandomSingleHue([N[,BandSize[,Seed]]])` | Creates a palette of `N` colors (default=1024) consisting of bands of `BandSize` intermediate colors (default=16) interpolating random colors using a single Hue. The random number generator can be initialized by a `Seed`, if provided, or use a random one. | `TestColorModel(RandomSingleHue(1024,64))` |
 
-
 #### Complex Fractal functions (Waher.Script.Fractals)
 
 The following functions can be used to create fractal images based on iterations in the complex plane. The functions are available in the 
@@ -1029,6 +1028,80 @@ The following functions can be used to create fractal images based on iterations
 | `NovaMandelbrotFractal(r,i,dr,R,p[,Palette[,DimX[,DimY]]])` | Calculates a Nova-Mandelbrot fractal. | `NovaMandelbrotFractal(0,0,0.1,0,3,0.5,5.2,randomlinearrgb(1024,16),640,480)` |
 | `NovaMandelbrotSmoothFractal(r,i,dr,R,p[,Palette[,DimX[,DimY]]])` | As `NovaMandelbrotFractal`, except the image is smoothed out using the *Heat Equation*. Pixels where colors change are used as fixed boundary conditions. | `NovaMandelbrotSmoothFractal(0,0,0.1,0,3,0.5,5.2,randomlinearrgb(1024,16),640,480)` |
 | `NovaMandelbrotTopographyFractal(r,i,dr,R,p[,Palette[,DimX[,DimY]]])` | As `NovaMandelbrotFractal`, except only pixels where the color changes are returned, creating a topographical map of the image. | `NovaMandelbrotTopographyFractal(0,0,0.1,0,3,0.5,5.2,randomlinearrgb(1024,16),640,480)` |
+
+#### Iterated Function System (IFS) Fractal functions (Waher.Script.Fractals)
+
+The following functions can be used to create fractal images based on Iterated Function Systems (IFS). The functions are available in the 
+`Waher.Script.Fractals` library. They can be used as a means to create backgound images for themes, etc.
+
+| Function                                | Description                                           | Example                                   |
+|-----------------------------------------|-------------------------------------------------------|-------------------------------------------|
+| `FlameFractalHsl(xc,yc,dr,N,f[,Preview[,Parallel[,DimX[,DimY[,SuperSampling[,Gamma[,LightFactor[,Seed]]]]]]]])` | Calculates a flame fractal in HSL space. Intensity is mapped along the L-axis. Gamma correction is done along the SL-axes. The L-axis is multiplicated with the LightFactor. | `FlameFractalHsl(0.6109375,0.199208333333333,0.625,1e7,[Rotate2DH(-45°)*Scale2DH(1/sqrt(2),1/sqrt(2)),"Orange",Translate2DH(1,0)*Rotate2DH(-135°)*Scale2DH(1/sqrt(2),1/sqrt(2)),"Red",Identity(2),DiamondVariation(),"Red"],False,False,400,300,1,2.5,2,1668206157)` |
+| `FlameFractalRgba(xc,yc,dr,N,f[,Preview[,Parallel[,DimX[,DimY[,SuperSampling[,Gamma[,Vibrancy[,Seed]]]]]]]])` | Calculates a flame fractal in RGBA space. Intensity is calculated along the A-axis. Gamma correction is done along the RGB-axes (vibrancy=0) or along the A-axis (vibrancy=1), or a combination thereof. | `FlameFractalRgba(0,0,0,1e7,[Rotate2DH(-45°)*Scale2DH(1/sqrt(2),1/sqrt(2)),"Orange",ExponentialVariation(),Translate2DH(1,0)*Rotate2DH(-135°)*Scale2DH(1/sqrt(2),1/sqrt(2)),"Red",ExponentialVariation()],400,300)` |
+| `IfsFractal(xc,yc,dr,N,T[,DimX[,DimY[,Seed]]])` | Calculates a fractal based on an Iterated Function System, using the chaos game. | ` IfsFractal(0,5,6,2e6,[[[0,0,0],[0,0.16,0],[0,0,1]],0.01,"Green",[[0.85,0.04,0],[-0.04,0.85,1.6],[0,0,1]],0.85,"Green",[[0.2,-0.26,0],[0.26,0.24,1.6],[0,0,1]],0.07,"Green",[[-0.15,0.28,0],[0.26,0.24,0.44],[0,0,1]],0.07,"Green"],300,600);` |
+
+`IfsFractals` run on Iterated Function Systems using systems of linear equations. Flame fractals can modify the linear transforms using one or more
+*variations*. There are many different types of variations[^For more information about Flame Fractals and variations, see the paper on
+[The Fractal Flame Algorithm](http://flam3.com/flame.pdf) by Scott Daves and Erik Reckase] that can be used:
+
+| Flame variations        | Complex variations         | Fractal variations    |
+|-------------------------|----------------------------|-----------------------|
+| `XVariation`			  |  `zCosVariation`		   | `JuliaRoot1Variation` |
+| `ArchVariation`		  |	 `zCubeVariation`		   | `JuliaRoot2Variation` |
+| `Bent2Variation`		  |	 `zDivVariation`		   | `JuliaStepVariation`  |
+| `BentVariation`		  |	 `zExpVariation`		   |                       |
+| `BladeVariation`		  |	 `zLnVariation`			   |					   |
+| `BlobVariation`		  |	 `zLogNVariation`		   |					   |
+| `BlurVariation`		  |	 `zMulVariation`		   |					   |
+| `BubbleVariation`		  |	 `zPowerBaseVariation`	   |					   |
+| `ConicVariation`		  |	 `zPowerExponentVariation` |					   |
+| `CosineVariation`		  |	 `zSinHVariation`          |					   |
+| `CrossVariation`		  |	 `zSinVariation`		   |					   |
+| `CurlVariation`		  |	 `zSqrtVariation`		   |					   |
+| `CylinderVariation`	  |	 `zSqrVariation`		   |					   |
+| `DiamondVariation`	  |	 `zTanHVariation`		   |					   |
+| `Disc2Variation`		  |	 `zTanVariation`		   |					   |
+| `DiscVariation`		  |	 `zACosVariation`		   |					   |
+| `ExponentialVariation`  |	 `zASinVariation`		   |					   |
+| `EyeFishVariation`	  |	 `zATanVariation`		   |					   |
+| `Fan2Variation`		  |	 `zConjugateVariation`	   |					   |
+| `FanVariation`		  |	 `zCosHVariation`		   |					   |
+| `FishEyeVariation`	  |                            |					   |
+| `FlowerVariation`		  |							   |					   |
+| `GaussianVariation`	  |							   |					   |
+| `HandkerchiefVariation` |							   |					   |
+| `HeartVariation`        |							   |					   |
+| `HorseShoeVariation`	  |							   |					   |
+| `HyperbolicVariation`	  |							   |					   |
+| `JuliaNVariation`		  |							   |					   |
+| `JuliaScopeVariation`	  |							   |					   |
+| `JuliaVariation`		  |							   |					   |
+| `LinearVariation`		  |							   |					   |
+| `NGonVariation`		  |							   |					   |
+| `NoiseVariation`		  |							   |					   |
+| `ParabolaVariation`	  |							   |					   |
+| `PdjVariation`		  |							   |					   |
+| `PerspectiveVariation`  |							   |					   |
+| `PieVariation`		  |							   |					   |
+| `PolarVariation`		  |							   |					   |
+| `PopcornVariation`	  |							   |					   |
+| `PowerVariation`		  |							   |					   |
+| `RadialBlurVariation`	  |							   |					   |
+| `RaysVariation`		  |							   |					   |
+| `RectanglesVariation`	  |							   |					   |
+| `Rings2Variation`		  |							   |					   |
+| `RingsVariation`		  |							   |					   |
+| `Secant2Variation`	  |							   |					   |
+| `SecantVariation`		  |							   |					   |
+| `SinusoidalVariation`	  |							   |					   |
+| `SphericalVariation`	  |							   |					   |
+| `SpiralVariation`		  |							   |					   |
+| `SquareVariation`		  |							   |					   |
+| `SuperShapeVariation`	  |							   |					   |
+| `SwirlVariation`		  |							   |					   |
+| `TangentVariation`	  |							   |					   |
+| `TwintrianVariation`	  |							   |					   |
+| `WavesVariation`		  |							   |					   |
 
 #### Persistence-related functions
 

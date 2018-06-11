@@ -37,7 +37,7 @@ namespace Waher.Script.Fractals.IFS
 	/// 	 z->sqrt(z-(-0.748814392089844-0.0801434326171877*i)),
 	/// 	 z->-sqrt(z-(-0.748814392089844-0.0801434326171877*i))],400,400);
 	/// 
-	/// 	Heighway dragon:
+	/// Heighway dragon:
 	/// 
 	/// IfsFractal(0.4,0.2,2,1000000, [
 	/// 	 Rotate2DH(-45°)*Scale2DH(1/sqrt(2),1/sqrt(2)),"Orange",

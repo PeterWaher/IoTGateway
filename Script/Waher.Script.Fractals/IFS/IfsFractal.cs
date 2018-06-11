@@ -186,8 +186,7 @@ namespace Waher.Script.Fractals.IFS
 			if (N <= 0)
 				throw new ScriptRuntimeException("N in calls to IfsFractal() must be a positive integer.", this);
 
-			Array Functions = Arguments[i].AssociatedObjectValue as Array;
-			if (Functions == null)
+			if (!(Arguments[i].AssociatedObjectValue is Array Functions))
 				throw new ScriptRuntimeException("the fifth parameter to IfsFractal must be an array of homogenous 2D-transformations or lambda expressions.", this);
 
 			List<DoubleMatrix> Matrices = null;
@@ -265,6 +264,8 @@ namespace Waher.Script.Fractals.IFS
 				{
 					Seed = gen.Next();
 				}
+
+				Variables.ConsoleOut.WriteLine("Seed = " + Seed.ToString(), Variables);
 			}
 
 			if (i < c)
@@ -613,9 +614,8 @@ namespace Waher.Script.Fractals.IFS
 				{
 					xv.Value = x;
 					yv.Value = y;
-					IVector Result = Lambda.Evaluate(RealParameters, v) as IVector;
 
-					if (Result == null || Result.Dimension != 2)
+					if (!(Lambda.Evaluate(RealParameters, v) is IVector Result) || Result.Dimension != 2)
 						throw new ScriptRuntimeException("Expected 2-dimensional numeric vector as a result.", Node);
 
 					x = Expression.ToDouble(Result.GetElement(0).AssociatedObjectValue);
@@ -644,9 +644,8 @@ namespace Waher.Script.Fractals.IFS
 				{
 					xv.Value = x;
 					yv.Value = y;
-					IVector Result = Lambda.Evaluate(RealParameters, v) as IVector;
 
-					if (Result == null || Result.Dimension != 2)
+					if (!(Lambda.Evaluate(RealParameters, v) is IVector Result) || Result.Dimension != 2)
 						throw new ScriptRuntimeException("Expected 2-dimensional numeric vector as a result.", Node);
 
 					x = Expression.ToDouble(Result.GetElement(0).AssociatedObjectValue);

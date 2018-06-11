@@ -123,7 +123,7 @@ namespace Waher.Script.Fractals.ComplexFractals
             }
             else
             {
-                Palette = ColorModels.RandomLinearAnalogousHSL.CreatePalette(128, 4, out int Seed, this);
+                Palette = ColorModels.RandomLinearAnalogousHSL.CreatePalette(128, 4, out int Seed, this, Variables);
                 ColorExpression = "RandomLinearAnalogousHSL(128,4," + Seed.ToString() + ")";
 
 				if (i < c && this.Arguments[i] == null)

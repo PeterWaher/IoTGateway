@@ -124,7 +124,11 @@ namespace Waher.Script.Lab
 
 			try
 			{
-				Exp = new Expression(this.Input.Text);
+				string s = this.Input.Text.Trim();
+				if (string.IsNullOrEmpty(s))
+					return;
+
+				Exp = new Expression(s);
 
 				ScriptBlock = new TextBlock()
 				{
@@ -171,11 +175,10 @@ namespace Waher.Script.Lab
 
 					this.Dispatcher.Invoke(() =>
 					{
-						Graph G = Ans as Graph;
 						SKImage Img;
 						object Obj;
 
-						if (G != null)
+						if (Ans is Graph G)
 						{
 							GraphSettings Settings = new GraphSettings();
 							Tuple<int, int> Size;
@@ -224,11 +227,9 @@ namespace Waher.Script.Lab
 							this.AddImageBlock(ScriptBlock, Img);
 						else if (Ans.AssociatedObjectValue is Exception ex)
 						{
-							AggregateException ex2;
-
 							ex = Log.UnnestException(ex);
 
-							if ((ex2 = ex as AggregateException) != null)
+							if (ex is AggregateException ex2)
 							{
 								foreach (Exception ex3 in ex2.InnerExceptions)
 									ScriptBlock = this.AddTextBlock(ScriptBlock, ex3.Message, Colors.Red, FontWeights.Bold);

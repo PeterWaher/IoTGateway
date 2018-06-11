@@ -103,14 +103,16 @@ namespace Waher.Script.Fractals.ColorModels
             return CreatePalette(N, BandSize, null, Node);
         }
 
-        public static SKColor[] CreatePalette(int N, int BandSize, out int Seed, ScriptNode Node)
+        public static SKColor[] CreatePalette(int N, int BandSize, out int Seed, ScriptNode Node, Variables Variables)
         {
             lock (gen)
             {
                 Seed = gen.Next();
             }
 
-            return CreatePalette(N, BandSize, Seed, Node);
+			Variables.ConsoleOut.WriteLine("Seed = " + Seed.ToString(), Variables);
+
+			return CreatePalette(N, BandSize, Seed, Node);
         }
 
         public static SKColor[] CreatePalette(int N, int BandSize, int? Seed, ScriptNode Node)

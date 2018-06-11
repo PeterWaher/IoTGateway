@@ -42,6 +42,7 @@ namespace Waher.Script.Fractals.ComplexFractals
 	/// Using Lambda expressions:
 	/// NewtonFractal((0,0),3,,z->1+z^3)
 	/// NewtonFractal((pi/2,0),pi/4,,x->sin(x),RandomLinearRGB(128,16,1177860657))
+	/// NewtonFractal((pi/2,0),pi/2,2,x->tan(x),RandomLinearRGB(128,4,666001743),800,600)
 	/// </example>
 	public class NewtonFractal : FunctionMultiVariate
 	{
@@ -179,7 +180,7 @@ namespace Waher.Script.Fractals.ComplexFractals
 			}
 			else
 			{
-				Palette = ColorModels.RandomLinearAnalogousHSL.CreatePalette(128, 4, out int Seed, this);
+				Palette = ColorModels.RandomLinearAnalogousHSL.CreatePalette(128, 4, out int Seed, this, Variables);
 				ColorExpression = "RandomLinearAnalogousHSL(128,4," + Seed.ToString() + ")";
 
 				if (i < c && this.Arguments[i] == null)

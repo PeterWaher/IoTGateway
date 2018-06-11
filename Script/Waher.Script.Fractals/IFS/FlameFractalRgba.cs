@@ -168,11 +168,10 @@ namespace Waher.Script.Fractals.IFS
             object Obj = Arguments[i].AssociatedObjectValue;
             string FunctionsExpression = this.Arguments[i++].SubExpression;
 
-            Array FlameArray = Obj as Array;
-            if (FlameArray == null)
-                throw new ScriptRuntimeException("the fifth parameter to FlameFractal must be an array, containing flame definitions.", this);
+			if (!(Obj is Array FlameArray))
+				throw new ScriptRuntimeException("the fifth parameter to FlameFractal must be an array, containing flame definitions.", this);
 
-            List<FlameFunction> FlameFunctions = new List<FlameFunction>();
+			List<FlameFunction> FlameFunctions = new List<FlameFunction>();
             DoubleMatrix M;
             double Weight;
             double Gamma;
@@ -286,9 +285,11 @@ namespace Waher.Script.Fractals.IFS
                 {
                     Seed = gen.Next();
                 }
-            }
 
-            if (i < c)
+				Variables.ConsoleOut.WriteLine("Seed = " + Seed.ToString(), Variables);
+			}
+
+			if (i < c)
             {
                 throw new ScriptRuntimeException("Parameter mismatch in call to FlameFractalRgba(xc,yc,dr,N,FlameFunctions[,Preview[,Parallel[,dimx[,dimy[,SuperSampling[,Gamma[,Vibrancy[,Seed]]]]]]]]).",
                     this);

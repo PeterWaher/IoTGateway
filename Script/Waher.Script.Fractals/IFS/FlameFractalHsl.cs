@@ -275,9 +275,11 @@ namespace Waher.Script.Fractals.IFS
                 {
                     Seed = gen.Next();
                 }
-            }
 
-            if (i < c)
+				Variables.ConsoleOut.WriteLine("Seed = " + Seed.ToString(), Variables);
+			}
+
+			if (i < c)
             {
                 throw new ScriptRuntimeException("Parameter mismatch in call to FlameFractalHsl(xc,yc,dr,N,FlameFunctions[,Preview[,Parallel[,dimx[,dimy[,SuperSampling[,Gamma[,LightFactor[,Seed]]]]]]]]).",
                     this);

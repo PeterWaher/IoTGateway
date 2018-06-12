@@ -22,8 +22,8 @@ namespace Waher.WebService.Script
 	/// </summary>
 	public class ScriptService : HttpAsynchronousResource, IHttpPostMethod
 	{
-		private HttpAuthenticationScheme[] authenticationSchemes;
-		private Dictionary<string, Expression> expressions = new Dictionary<string, Expression>();
+		private readonly HttpAuthenticationScheme[] authenticationSchemes;
+		private readonly Dictionary<string, Expression> expressions = new Dictionary<string, Expression>();
 
 		/// <summary>
 		/// Web service that can be used to execute script on the server.
@@ -101,8 +101,7 @@ namespace Waher.WebService.Script
 				if (!string.IsNullOrEmpty(s = Request.Header["X-X"]) && int.TryParse(s, out int x) &&
 					!string.IsNullOrEmpty(s = Request.Header["X-Y"]) && int.TryParse(s, out int y))
 				{
-					Dictionary<string, KeyValuePair<Graph, object[]>> Graphs = Variables["Graphs"] as Dictionary<string, KeyValuePair<Graph, object[]>>;
-					if (Graphs == null)
+					if (!(Variables["Graphs"] is Dictionary<string, KeyValuePair<Graph, object[]>> Graphs))
 						throw new NotFoundException();
 
 					KeyValuePair<Graph, object[]> Rec;
@@ -197,12 +196,11 @@ namespace Waher.WebService.Script
 		{
 			Variables["Ans"] = Result;
 
-			Graph G = Result as Graph;
 			SKImage Img;
 			object Obj;
 			string s;
 
-			if (G != null)
+			if (Result is Graph G)
 			{
 				GraphSettings Settings = new GraphSettings();
 				Tuple<int, int> Size;
@@ -247,14 +245,13 @@ namespace Waher.WebService.Script
 					string Tag = Guid.NewGuid().ToString();
 					SKData Data = Bmp.Encode(SKEncodedImageFormat.Png, 100);
 					byte[] Bin = Data.ToArray();
-					s = System.Convert.ToBase64String(Bin, 0, Bin.Length);
+					s = Convert.ToBase64String(Bin, 0, Bin.Length);
 					s = "<figure><img border=\"2\" width=\"" + Settings.Width.ToString() + "\" height=\"" + Settings.Height.ToString() +
 						"\" src=\"data:image/png;base64," + s + "\" onclick=\"GraphClicked(this,event,'" + Tag + "');\" /></figure>";
 
 					Data.Dispose();
 
-					Dictionary<string, KeyValuePair<Graph, object[]>> Graphs = Variables["Graphs"] as Dictionary<string, KeyValuePair<Graph, object[]>>;
-					if (Graphs == null)
+					if (!(Variables["Graphs"] is Dictionary<string, KeyValuePair<Graph, object[]>> Graphs))
 					{
 						Graphs = new Dictionary<string, KeyValuePair<Graph, object[]>>();
 						Variables["Graphs"] = Graphs;
@@ -271,7 +268,7 @@ namespace Waher.WebService.Script
 				SKData Data = Img.Encode(SKEncodedImageFormat.Png, 100);
 				byte[] Bin = Data.ToArray();
 
-				s = System.Convert.ToBase64String(Bin, 0, Bin.Length);
+				s = Convert.ToBase64String(Bin, 0, Bin.Length);
 				s = "<figure><img border=\"2\" width=\"" + Img.Width.ToString() + "\" height=\"" + Img.Height.ToString() +
 					"\" src=\"data:image/png;base64," + s + "\" /></figure>";
 
@@ -279,11 +276,9 @@ namespace Waher.WebService.Script
 			}
 			else if (Result.AssociatedObjectValue is Exception ex)
 			{
-				AggregateException ex2;
-
 				ex = Log.UnnestException(ex);
 
-				if ((ex2 = ex as AggregateException) != null)
+				if (ex is AggregateException ex2)
 				{
 					StringBuilder sb2 = new StringBuilder();
 

@@ -190,8 +190,7 @@ namespace Waher.Client.WPF
 		{
 			get
 			{
-				TabItem TabItem = this.Tabs.SelectedItem as TabItem;
-				if (TabItem == null)
+				if (!(this.Tabs.SelectedItem is TabItem TabItem))
 					return null;
 				else
 					return TabItem.Content as ITabView;
@@ -601,8 +600,7 @@ namespace Waher.Client.WPF
 				if (ChatView == null)
 					continue;
 
-				XmppContact XmppContact = ChatView.Node as XmppContact;
-				if (XmppContact == null)
+				if (!(ChatView.Node is XmppContact XmppContact))
 					continue;
 
 				if (XmppContact.BareJID != e.FromBareJID)
@@ -621,8 +619,7 @@ namespace Waher.Client.WPF
 
 			foreach (TreeNode Node in this.MainView.ConnectionTree.Items)
 			{
-				XmppAccountNode XmppAccountNode = Node as XmppAccountNode;
-				if (XmppAccountNode == null)
+				if (!(Node is XmppAccountNode XmppAccountNode))
 					continue;
 
 				if (XmppAccountNode.BareJID != XmppClient.GetBareJID(e.To))

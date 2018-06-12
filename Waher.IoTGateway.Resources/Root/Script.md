@@ -853,7 +853,8 @@ The following functions are available in the `Waher.Script.Graphs` library.
 
 #### Graph functions (Waher.Script.Graphs)
 
-The following functions are available in the `Waher.Script.Graphs` library.
+The following functions are available in the `Waher.Script.Graphs` library. In an interactive script environment, clicking on the resulting graphs
+will return a vector corresponding to the point under the mouse.
 
 | Function                                | Description                                           | Example                                   |
 |-----------------------------------------|-------------------------------------------------------|-------------------------------------------|
@@ -986,6 +987,7 @@ plot2dlayeredcurvearea(x,y,rgba(255,0,0,64))+
 #### Palette generation functions (Waher.Script.Fractals)
 
 The following functions can be used to randomly create color palettes. The functions are available in the `Waher.Script.Fractals` library.
+In an interactive script environment, clicking on the resulting graphs will zoom into the fractal, unless otherwise stated.
 
 | Function           | Description | Example |
 |--------------------|-------------|---------|

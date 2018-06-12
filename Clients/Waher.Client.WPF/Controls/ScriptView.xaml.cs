@@ -161,11 +161,11 @@ namespace Waher.Client.WPF.Controls
 
 							using (SKImage Bmp = G.CreateBitmap(Settings, out object[] States))
 							{
-								this.AddImageBlock(ScriptBlock, Bmp);
+								this.AddImageBlock(ScriptBlock, Bmp, G, States);
 							}
 						}
 						else if ((Img = Ans.AssociatedObjectValue as SKImage) != null)
-							this.AddImageBlock(ScriptBlock, Img);
+							this.AddImageBlock(ScriptBlock, Img, null, null);
 						else if (Ans.AssociatedObjectValue is Exception ex)
 						{
 							ex = Log.UnnestException(ex);
@@ -218,7 +218,7 @@ namespace Waher.Client.WPF.Controls
 			e.Handled = true;
 		}
 
-		private void AddImageBlock(TextBlock ScriptBlock, SKImage Image)
+		private void AddImageBlock(TextBlock ScriptBlock, SKImage Image, Graph Graph, object[] States)
 		{
 			BitmapImage BitmapImage;
 			byte[] Bin;
@@ -242,7 +242,7 @@ namespace Waher.Client.WPF.Controls
 				Source = BitmapImage,
 				Width = Image.Width,
 				Height = Image.Height,
-				Tag = new Tuple<byte[], int, int>(Bin, Image.Width, Image.Height)
+				Tag = new Tuple<byte[], int, int, Graph, object[]>(Bin, Image.Width, Image.Height, Graph, States)
 			};
 
 			ImageBlock.PreviewMouseDown += ImageBlock_PreviewMouseDown;
@@ -253,64 +253,86 @@ namespace Waher.Client.WPF.Controls
 		private void ImageBlock_PreviewMouseDown(object sender, MouseButtonEventArgs e)
 		{
 			Image ImageBlock = (Image)sender;
-			BitmapImage Image = (BitmapImage)ImageBlock.Source;
 
-			SaveFileDialog Dialog = new SaveFileDialog()
+			if (e.ChangedButton == MouseButton.Left)
 			{
-				Title = "Save Image",
-				DefaultExt = "png",
-				Filter = "PNG files (*.png)|*.png|All Image files (*.bmp, *.gif, *.jpg, *.jpeg, *.png, *.tif, *.tiff)|*.bmp, *.gif, *.jpg, *.jpeg, *.png, *.tif, *.tiff|All files (*.*)|*.*",
-				OverwritePrompt = true
-			};
+				Point P = e.GetPosition(ImageBlock);
+				string Script;
 
-			bool? Result = Dialog.ShowDialog();
-			if (Result.HasValue && Result.Value)
-			{
-				BitmapEncoder Encoder;
-
-				switch (System.IO.Path.GetExtension(Dialog.FileName).ToLower())
+				if (ImageBlock.Tag is Tuple<byte[], int, int, Graph, object[]> Image && Image.Item4 != null && Image.Item5 != null)
 				{
-					case ".jpg":
-					case ".jpeg":
-						Encoder = new JpegBitmapEncoder();
-						break;
+					double X = ((double)P.X) * Image.Item2 / ImageBlock.ActualWidth;
+					double Y = ((double)P.Y) * Image.Item3 / ImageBlock.ActualHeight;
 
-					case ".bmp":
-						Encoder = new BmpBitmapEncoder();
-						break;
-
-					case ".gif":
-						Encoder = new GifBitmapEncoder();
-						break;
-
-					case ".tif":
-					case ".tiff":
-						Encoder = new TiffBitmapEncoder();
-						break;
-
-					case ".png":
-					default:
-						Encoder = new PngBitmapEncoder();
-						break;
+					Script = Image.Item4.GetBitmapClickScript(X, Y, Image.Item5);
 				}
+				else
+					Script = "[" + P.X.ToString() + "," + P.Y.ToString() + "]";
 
-				try
+				this.Input.Text = Script;
+				this.ExecuteButton_Click(this, e);
+			}
+			else if (e.ChangedButton == MouseButton.Right)
+			{
+				BitmapImage Image = (BitmapImage)ImageBlock.Source;
+
+				SaveFileDialog Dialog = new SaveFileDialog()
 				{
-					Encoder.Frames.Add(BitmapFrame.Create(Image));
+					Title = "Save Image",
+					DefaultExt = "png",
+					Filter = "PNG files (*.png)|*.png|All Image files (*.bmp, *.gif, *.jpg, *.jpeg, *.png, *.tif, *.tiff)|*.bmp, *.gif, *.jpg, *.jpeg, *.png, *.tif, *.tiff|All files (*.*)|*.*",
+					OverwritePrompt = true
+				};
 
-					using (FileStream File = new FileStream(Dialog.FileName, System.IO.FileMode.Create))
+				bool? Result = Dialog.ShowDialog();
+				if (Result.HasValue && Result.Value)
+				{
+					BitmapEncoder Encoder;
+
+					switch (System.IO.Path.GetExtension(Dialog.FileName).ToLower())
 					{
-						Encoder.Save(File);
+						case ".jpg":
+						case ".jpeg":
+							Encoder = new JpegBitmapEncoder();
+							break;
+
+						case ".bmp":
+							Encoder = new BmpBitmapEncoder();
+							break;
+
+						case ".gif":
+							Encoder = new GifBitmapEncoder();
+							break;
+
+						case ".tif":
+						case ".tiff":
+							Encoder = new TiffBitmapEncoder();
+							break;
+
+						case ".png":
+						default:
+							Encoder = new PngBitmapEncoder();
+							break;
+					}
+
+					try
+					{
+						Encoder.Frames.Add(BitmapFrame.Create(Image));
+
+						using (FileStream File = new FileStream(Dialog.FileName, System.IO.FileMode.Create))
+						{
+							Encoder.Save(File);
+						}
+					}
+					catch (Exception ex)
+					{
+						ex = Log.UnnestException(ex);
+						MessageBox.Show(MainWindow.currentInstance, ex.Message, "Unable to save image.", MessageBoxButton.OK, MessageBoxImage.Error);
 					}
 				}
-				catch (Exception ex)
-				{
-					ex = Log.UnnestException(ex);
-					MessageBox.Show(MainWindow.currentInstance, ex.Message, "Unable to save image.", MessageBoxButton.OK, MessageBoxImage.Error);
-				}
-			}
 
-			e.Handled = true;
+				e.Handled = true;
+			}
 		}
 
 		internal void Print(string Output)
@@ -425,7 +447,7 @@ namespace Waher.Client.WPF.Controls
 				}
 				else if (Object is Image ImageBlock)
 				{
-					if (ImageBlock.Tag is Tuple<byte[], int, int> Image)
+					if (ImageBlock.Tag is Tuple<byte[], int, int, Graph, object[]> Image)
 					{
 						w.WriteStartElement("Image");
 						w.WriteAttributeString("width", Image.Item2.ToString());
@@ -543,7 +565,7 @@ namespace Waher.Client.WPF.Controls
 								Source = BitmapImage,
 								Width = Width,
 								Height = Height,
-								Tag = new Tuple<byte[], int, int>(Bin, Width, Height)
+								Tag = new Tuple<byte[], int, int, Graph, object[]>(Bin, Width, Height, null, null)
 							};
 
 							ImageBlock.PreviewMouseDown += ImageBlock_PreviewMouseDown;

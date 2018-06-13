@@ -81,31 +81,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 
 			if (Result is Graph G)
 			{
-				GraphSettings GraphSettings = new GraphSettings();
-				object Obj;
-				double d;
-
-				if (this.variables.TryGetVariable("GraphWidth", out Variable v) && (Obj = v.ValueObject) is double && (d = (double)Obj) >= 1)
-				{
-					GraphSettings.Width = (int)Math.Round(d);
-					GraphSettings.MarginLeft = (int)Math.Round(15 * d / 640);
-					GraphSettings.MarginRight = GraphSettings.MarginLeft;
-				}
-				else if (!this.variables.ContainsVariable("GraphWidth"))
-					this.variables["GraphWidth"] = (double)GraphSettings.Width;
-
-
-				if (this.variables.TryGetVariable("GraphHeight", out v) && (Obj = v.ValueObject) is double && (d = (double)Obj) >= 1)
-				{
-					GraphSettings.Height = (int)Math.Round(d);
-					GraphSettings.MarginTop = (int)Math.Round(15 * d / 480);
-					GraphSettings.MarginBottom = GraphSettings.MarginTop;
-					GraphSettings.LabelFontSize = 12 * d / 480;
-				}
-				else if (!this.variables.ContainsVariable("GraphHeight"))
-					this.variables["GraphHeight"] = (double)GraphSettings.Height;
-
-				using (SKImage Bmp = G.CreateBitmap(GraphSettings))
+				using (SKImage Bmp = G.CreateBitmap(this.variables, out GraphSettings GraphSettings))
 				{
 					SKData Data = Bmp.Encode(SKEncodedImageFormat.Png, 100);
 					byte[] Bin = Data.ToArray();
@@ -209,38 +185,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 
 			if (Result is Graph G)
 			{
-				GraphSettings GraphSettings = new GraphSettings();
-				object Obj;
-				double d;
-
-				if (this.variables.TryGetVariable("GraphWidth", out Variable v) && (Obj = v.ValueObject) is double && (d = (double)Obj) >= 1)
-				{
-					GraphSettings.Width = (int)Math.Round(d);
-					GraphSettings.MarginLeft = (int)Math.Round(15 * d / 640);
-					GraphSettings.MarginRight = GraphSettings.MarginLeft;
-				}
-				else if (!this.variables.ContainsVariable("GraphWidth"))
-				{
-					this.variables["GraphWidth"] = (double)Settings.DefaultGraphWidth;
-					GraphSettings.MarginLeft = (int)Math.Round(15.0 * Settings.DefaultGraphWidth / 640);
-					GraphSettings.MarginRight = GraphSettings.MarginLeft;
-				}
-
-				if (this.variables.TryGetVariable("GraphHeight", out v) && (Obj = v.ValueObject) is double && (d = (double)Obj) >= 1)
-				{
-					GraphSettings.Height = (int)Math.Round(d);
-					GraphSettings.MarginTop = (int)Math.Round(15 * d / 480);
-					GraphSettings.MarginBottom = GraphSettings.MarginTop;
-					GraphSettings.LabelFontSize = 12 * d / 480;
-				}
-				else if (!this.variables.ContainsVariable("GraphHeight"))
-				{
-					this.variables["GraphHeight"] = (double)Settings.DefaultGraphHeight;
-					GraphSettings.MarginTop = (int)Math.Round(15.0 * Settings.DefaultGraphHeight / 480);
-					GraphSettings.MarginBottom = GraphSettings.MarginTop;
-				}
-
-				using (SKImage Bmp = G.CreateBitmap(GraphSettings))
+				using (SKImage Bmp = G.CreateBitmap(this.variables))
 				{
 					SKData Data = Bmp.Encode(SKEncodedImageFormat.Png, 100);
 					byte[] Bin = Data.ToArray();

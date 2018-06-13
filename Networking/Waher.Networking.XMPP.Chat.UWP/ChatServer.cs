@@ -1307,39 +1307,7 @@ namespace Waher.Networking.XMPP.Chat
 
 				if (Result is Graph G)
 				{
-					GraphSettings Settings = new GraphSettings();
-					object Obj;
-					double d;
-
-					Settings.Width = 600;
-					Settings.Height = 300;
-
-					if (Variables.TryGetVariable("GraphWidth", out Variable v) && (Obj = v.ValueObject) is double && (d = (double)Obj) >= 1)
-						Settings.Width = (int)Math.Round(d);
-					else
-					{
-						d = (double)Settings.Width;
-						if (!Variables.ContainsVariable("GraphWidth"))
-							Variables["GraphWidth"] = d;
-					}
-
-					Settings.MarginLeft = (int)Math.Round(15 * d / 640);
-					Settings.MarginRight = Settings.MarginLeft;
-
-					if (Variables.TryGetVariable("GraphHeight", out v) && (Obj = v.ValueObject) is double && (d = (double)Obj) >= 1)
-						Settings.Height = (int)Math.Round(d);
-					else
-					{
-						d = Settings.Height;
-						if (!Variables.ContainsVariable("GraphHeight"))
-							Variables["GraphHeight"] = d;
-					}
-
-					Settings.MarginTop = (int)Math.Round(15 * d / 480);
-					Settings.MarginBottom = Settings.MarginTop;
-					Settings.LabelFontSize = 12 * d / 480;
-
-					using (SKImage Bmp = G.CreateBitmap(Settings))
+					using (SKImage Bmp = G.CreateBitmap(G.GetSettings(Variables, 600, 300)))
 					{
 						ImageResult(From, Bmp, Support, Variables, true);
 						return;

@@ -176,49 +176,10 @@ namespace Waher.Script.Lab
 					this.Dispatcher.Invoke(() =>
 					{
 						SKImage Img;
-						object Obj;
 
 						if (Ans is Graph G)
 						{
-							GraphSettings Settings = new GraphSettings();
-							Tuple<int, int> Size;
-							double d;
-
-							if ((Size = G.RecommendedBitmapSize) != null)
-							{
-								Settings.Width = Size.Item1;
-								Settings.Height = Size.Item2;
-
-								Settings.MarginLeft = (int)Math.Round(15.0 * Settings.Width / 640);
-								Settings.MarginRight = Settings.MarginLeft;
-
-								Settings.MarginTop = (int)Math.Round(15.0 * Settings.Height / 480);
-								Settings.MarginBottom = Settings.MarginTop;
-								Settings.LabelFontSize = 12.0 * Settings.Height / 480;
-							}
-							else
-							{
-								if (this.variables.TryGetVariable("GraphWidth", out Variable v) && (Obj = v.ValueObject) is double && (d = (double)Obj) >= 1)
-								{
-									Settings.Width = (int)Math.Round(d);
-									Settings.MarginLeft = (int)Math.Round(15 * d / 640);
-									Settings.MarginRight = Settings.MarginLeft;
-								}
-								else if (!this.variables.ContainsVariable("GraphWidth"))
-									this.variables["GraphWidth"] = (double)Settings.Width;
-
-								if (this.variables.TryGetVariable("GraphHeight", out v) && (Obj = v.ValueObject) is double && (d = (double)Obj) >= 1)
-								{
-									Settings.Height = (int)Math.Round(d);
-									Settings.MarginTop = (int)Math.Round(15 * d / 480);
-									Settings.MarginBottom = Settings.MarginTop;
-									Settings.LabelFontSize = 12 * d / 480;
-								}
-								else if (!this.variables.ContainsVariable("GraphHeight"))
-									this.variables["GraphHeight"] = (double)Settings.Height;
-							}
-
-							using (SKImage Bmp = G.CreateBitmap(Settings, out object[] States))
+							using (SKImage Bmp = G.CreateBitmap(this.variables, out object[] States))
 							{
 								this.AddImageBlock(ScriptBlock, Bmp, G, States);
 							}

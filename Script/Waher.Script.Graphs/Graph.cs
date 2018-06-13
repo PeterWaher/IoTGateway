@@ -106,6 +106,118 @@ namespace Waher.Script.Graphs
 		}
 
 		/// <summary>
+		/// Gets default graph settings for drawing the graph.
+		/// </summary>
+		/// <param name="Variables">Current set of variables, where graph settings might be available.</param>
+		/// <returns>Graph settings.</returns>
+		public GraphSettings GetSettings(Variables Variables)
+		{
+			return this.GetSettings(Variables, null, null);
+		}
+
+		/// <summary>
+		/// Gets default graph settings for drawing the graph.
+		/// </summary>
+		/// <param name="Variables">Current set of variables, where graph settings might be available.</param>
+		/// <param name="DefaultWidth">Default width.</param>
+		/// <param name="DefaultHeight">Default height.</param>
+		/// <returns>Graph settings.</returns>
+		public GraphSettings GetSettings(Variables Variables, int? DefaultWidth, int? DefaultHeight)
+		{
+			GraphSettings Settings = new GraphSettings();
+			Tuple<int, int> Size;
+
+			if (DefaultWidth.HasValue)
+				Settings.Width = DefaultWidth.Value;
+
+			if (DefaultHeight.HasValue)
+				Settings.Height = DefaultHeight.Value;
+
+			if ((Size = this.RecommendedBitmapSize) != null)
+			{
+				Settings.Width = Size.Item1;
+				Settings.Height = Size.Item2;
+
+				Settings.MarginLeft = (int)Math.Round(15.0 * Settings.Width / 640);
+				Settings.MarginRight = Settings.MarginLeft;
+
+				Settings.MarginTop = (int)Math.Round(15.0 * Settings.Height / 480);
+				Settings.MarginBottom = Settings.MarginTop;
+				Settings.LabelFontSize = 12.0 * Settings.Height / 480;
+			}
+			else
+			{
+				if (Variables.TryGetVariable("GraphWidth", out Variable v) && v.ValueObject is double d && d >= 1)
+				{
+					Settings.Width = (int)Math.Round(d);
+					Settings.MarginLeft = (int)Math.Round(15 * d / 640);
+					Settings.MarginRight = Settings.MarginLeft;
+				}
+				else if (!Variables.ContainsVariable("GraphWidth"))
+					Variables["GraphWidth"] = (double)Settings.Width;
+
+				if (Variables.TryGetVariable("GraphHeight", out v) && v.ValueObject is double d2 && d2 >= 1)
+				{
+					Settings.Height = (int)Math.Round(d2);
+					Settings.MarginTop = (int)Math.Round(15 * d2 / 480);
+					Settings.MarginBottom = Settings.MarginTop;
+					Settings.LabelFontSize = 12 * d2 / 480;
+				}
+				else if (!Variables.ContainsVariable("GraphHeight"))
+					Variables["GraphHeight"] = (double)Settings.Height;
+			}
+
+			return Settings;
+		}
+
+		/// <summary>
+		/// Creates a bitmap of the graph.
+		/// </summary>
+		/// <param name="Variables">Variables from where default settings can be retrieved if not avalable in graph.</param>
+		/// <returns>Bitmap</returns>
+		public SKImage CreateBitmap(Variables Variables)
+		{
+			return this.CreateBitmap(Variables, out GraphSettings Settings, out object[] States);
+		}
+
+		/// <summary>
+		/// Creates a bitmap of the graph.
+		/// </summary>
+		/// <param name="Variables">Variables from where default settings can be retrieved if not avalable in graph.</param>
+		/// <param name="Settings">Settings used to create the graph.</param>
+		/// <returns>Bitmap</returns>
+		public SKImage CreateBitmap(Variables Variables, out GraphSettings Settings)
+		{
+			return this.CreateBitmap(Variables, out Settings, out object[] States);
+		}
+
+		/// <summary>
+		/// Creates a bitmap of the graph.
+		/// </summary>
+		/// <param name="Variables">Variables from where default settings can be retrieved if not avalable in graph.</param>
+		/// <param name="States">State objects that contain graph-specific information about its inner states.
+		/// These can be used in calls back to the graph object to make actions on the generated graph.</param>
+		/// <returns>Bitmap</returns>
+		public SKImage CreateBitmap(Variables Variables, out object[] States)
+		{
+			return this.CreateBitmap(Variables, out GraphSettings Settings, out States);
+		}
+
+		/// <summary>
+		/// Creates a bitmap of the graph.
+		/// </summary>
+		/// <param name="Variables">Variables from where default settings can be retrieved if not avalable in graph.</param>
+		/// <param name="Settings">Settings used to create the graph.</param>
+		/// <param name="States">State objects that contain graph-specific information about its inner states.
+		/// These can be used in calls back to the graph object to make actions on the generated graph.</param>
+		/// <returns>Bitmap</returns>
+		public SKImage CreateBitmap(Variables Variables, out GraphSettings Settings, out object[] States)
+		{
+			Settings = this.GetSettings(Variables);
+			return this.CreateBitmap(Settings, out States);
+		}
+
+		/// <summary>
 		/// Creates a bitmap of the graph.
 		/// </summary>
 		/// <param name="Settings">Graph settings.</param>
@@ -185,40 +297,36 @@ namespace Waher.Script.Graphs
 		{
 			if (Vector is DoubleVector)
 			{
-				DoubleNumber dMin = Min as DoubleNumber;
 				DoubleNumber dMax = Max as DoubleNumber;
 
-				if (dMin == null || dMax == null)
+				if (!(Min is DoubleNumber dMin) || dMax == null)
 					throw new ScriptException("Incompatible values.");
 
 				return Scale(((DoubleVector)Vector).Values, dMin.Value, dMax.Value, Offset, Size);
 			}
 			else if (Vector is Interval)
 			{
-				DoubleNumber dMin = Min as DoubleNumber;
 				DoubleNumber dMax = Max as DoubleNumber;
 
-				if (dMin == null || dMax == null)
+				if (!(Min is DoubleNumber dMin) || dMax == null)
 					throw new ScriptException("Incompatible values.");
 
 				return Scale(((Interval)Vector).GetArray(), dMin.Value, dMax.Value, Offset, Size);
 			}
 			else if (Vector is DateTimeVector)
 			{
-				DateTimeValue dMin = Min as DateTimeValue;
 				DateTimeValue dMax = Max as DateTimeValue;
 
-				if (dMin == null || dMax == null)
+				if (!(Min is DateTimeValue dMin) || dMax == null)
 					throw new ScriptException("Incompatible values.");
 
 				return Scale(((DateTimeVector)Vector).Values, dMin.Value, dMax.Value, Offset, Size);
 			}
 			else if (Vector is ObjectVector)
 			{
-				PhysicalQuantity MinQ = Min as PhysicalQuantity;
 				PhysicalQuantity MaxQ = Max as PhysicalQuantity;
 
-				if (MinQ != null && MaxQ != null)
+				if (Min is PhysicalQuantity MinQ && MaxQ != null)
 				{
 					if (MinQ.Unit != MaxQ.Unit)
 					{
@@ -243,10 +351,9 @@ namespace Waher.Script.Graphs
 				}
 				else
 				{
-					DoubleNumber MinD = Min as DoubleNumber;
 					DoubleNumber MaxD = Max as DoubleNumber;
 
-					if (MinD != null && MaxD != null)
+					if (Min is DoubleNumber MinD && MaxD != null)
 					{
 						int i = 0;
 						int c = Vector.Dimension;
@@ -266,10 +373,9 @@ namespace Waher.Script.Graphs
 					}
 					else
 					{
-						DateTimeValue MinDT = Min as DateTimeValue;
 						DateTimeValue MaxDT = Max as DateTimeValue;
 
-						if (MinDT != null && MaxDT != null)
+						if (Min is DateTimeValue MinDT && MaxDT != null)
 						{
 							int i = 0;
 							int c = Vector.Dimension;
@@ -337,7 +443,7 @@ namespace Waher.Script.Graphs
 			return Scale(v, (Min - referenceTimestamp).TotalDays, (Max - referenceTimestamp).TotalDays, Offset, Size);
 		}
 
-		private static DateTime referenceTimestamp = new DateTime(2000, 1, 1, 0, 0, 0);
+		private static readonly DateTime referenceTimestamp = new DateTime(2000, 1, 1, 0, 0, 0);
 
 		/// <summary>
 		/// Scales a vector to fit a given area.
@@ -886,7 +992,7 @@ namespace Waher.Script.Graphs
 								{
 									LabelType = LabelType.DateTimeYear;
 
-									i = (int)Math.Floor(GetStepSize((Min - referenceTimestamp).TotalDays / 365.25, 
+									i = (int)Math.Floor(GetStepSize((Min - referenceTimestamp).TotalDays / 365.25,
 										(Max - referenceTimestamp).TotalDays / 365.25, ApproxNrLabels));
 									if (i == 0)
 										i++;

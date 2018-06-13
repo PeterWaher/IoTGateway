@@ -80,9 +80,9 @@ namespace Waher.Script.Graphs.Functions.Colors
 			if (A < 0)
 				A = 0;
 			else if (A > 255)
-				A = 1;
+				A = 255;
 
-			return new ObjectValue(Graph.ToColorHSV((byte)H, (byte)S, (byte)V, (byte)A));
+			return new ObjectValue(Graph.ToColorHSV(H, S, V, (byte)A));
 		}
 	}
 }

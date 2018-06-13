@@ -843,6 +843,7 @@ The following functions are available in the `Waher.Script.Graphs` library.
 
 | Function           | Description | Example |
 |--------------------|-------------|---------|
+| `Color(string)`    | Parses a string and returns the corresponding color. The color can either be a known color name, or in any of the formats `RRGGBB`, `AARRGGBB`, `#RRGGBB`, `#AARRGGBB`. | `Colorr("Red")`        |
 | `GrayScale(Color)` | Converts a color to its corresponding Gray-scale value. | `GrayScale(cl)`        |
 | `HSL(H,S,L)`       | Creates a color from its HSL representation.            | `HSL(100,0.5,0.7)`     |
 | `HSLA(H,S,L,A)`    | Creates a color from its HSLA representation.           | `HSLA(100,0.5,0.7,64)` |

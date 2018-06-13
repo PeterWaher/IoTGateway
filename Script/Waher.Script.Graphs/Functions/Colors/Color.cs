@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Globalization;
 using SkiaSharp;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
@@ -214,6 +214,51 @@ namespace Waher.Script.Graphs.Functions.Colors
 				case "forestgreen": Color = SKColors.ForestGreen; break;
 				case "empty": Color = SKColors.Empty; break;
 				default:
+					byte R, G, B;
+
+					if (s.Length == 6)
+					{
+						if (byte.TryParse(s.Substring(0, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out R) &&
+							byte.TryParse(s.Substring(2, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out G) &&
+							byte.TryParse(s.Substring(4, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out B))
+						{
+							Color = new SKColor(R, G, B);
+							return true;
+						}
+					}
+					else if (s.Length == 8)
+					{
+						if (byte.TryParse(s.Substring(0, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out byte A) &&
+							byte.TryParse(s.Substring(2, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out R) &&
+							byte.TryParse(s.Substring(4, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out G) &&
+							byte.TryParse(s.Substring(6, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out B))
+						{
+							Color = new SKColor(R, G, B, A);
+							return true;
+						}
+					}
+					else if (s.Length == 7 && s[0] == '#')
+					{
+						if (byte.TryParse(s.Substring(1, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out R) &&
+							byte.TryParse(s.Substring(3, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out G) &&
+							byte.TryParse(s.Substring(5, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out B))
+						{
+							Color = new SKColor(R, G, B);
+							return true;
+						}
+					}
+					else if (s.Length == 9 && s[0] == '#')
+					{
+						if (byte.TryParse(s.Substring(1, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out byte A) &&
+							byte.TryParse(s.Substring(3, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out R) &&
+							byte.TryParse(s.Substring(5, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out G) &&
+							byte.TryParse(s.Substring(7, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out B))
+						{
+							Color = new SKColor(R, G, B, A);
+							return true;
+						}
+					}
+
 					Color = SKColors.Empty;
 					return false;
 			}

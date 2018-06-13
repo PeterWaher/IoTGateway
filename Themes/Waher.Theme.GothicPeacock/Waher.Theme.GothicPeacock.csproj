@@ -22,11 +22,35 @@
 
   <ItemGroup>
     <None Remove="Root\Themes\GothicPeacock\GothicPeacock.css" />
+    <None Remove="Root\Themes\GothicPeacock\GothicPeacock1600x1600.png" />
+    <None Remove="Root\Themes\GothicPeacock\GothicPeacock1600x1600Dimmed.png" />
+    <None Remove="Root\Themes\GothicPeacock\GothicPeacock800x800.png" />
+    <None Remove="Root\Themes\GothicPeacock\GothicPeacockBanner1400x425.png" />
+    <None Remove="Root\Themes\GothicPeacock\GothicPeacockBanner1900x500.png" />
+    <None Remove="Root\Themes\GothicPeacock\GothicPeacockBanner2000x600.png" />
     <None Remove="Waher.Theme.GothicPeacock.manifest" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Include="Root\Themes\GothicPeacock\GothicPeacock.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Themes\GothicPeacock\GothicPeacock1600x1600.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Themes\GothicPeacock\GothicPeacock1600x1600Dimmed.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Themes\GothicPeacock\GothicPeacock800x800.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Themes\GothicPeacock\GothicPeacockBanner1400x425.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Themes\GothicPeacock\GothicPeacockBanner1900x500.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Themes\GothicPeacock\GothicPeacockBanner2000x600.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Waher.Theme.GothicPeacock.manifest">

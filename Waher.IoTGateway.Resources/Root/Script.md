@@ -843,6 +843,7 @@ The following functions are available in the `Waher.Script.Graphs` library.
 
 | Function           | Description | Example |
 |--------------------|-------------|---------|
+| `Blend(c1,c2,p)`   | Blends colors `c1` and `c2` together using a blending factor 0<=`p`<=1. Any or both of `c1` and `c2` can be an image. | `Blend("Red","Green",0.5)` |
 | `Color(string)`    | Parses a string and returns the corresponding color. The color can either be a known color name, or in any of the formats `RRGGBB`, `AARRGGBB`, `#RRGGBB`, `#AARRGGBB`. | `Colorr("Red")`        |
 | `GrayScale(Color)` | Converts a color to its corresponding Gray-scale value. | `GrayScale(cl)`        |
 | `HSL(H,S,L)`       | Creates a color from its HSL representation.            | `HSL(100,0.5,0.7)`     |

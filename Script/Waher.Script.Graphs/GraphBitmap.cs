@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using SkiaSharp;
 using System.Text;
 using System.Threading.Tasks;
@@ -63,7 +63,7 @@ namespace Waher.Script.Graphs
 			if (this.bitmap == null)
 				return new GraphBitmap(Bmp);
 
-			using (SKSurface Surface = SKSurface.Create(Math.Max(Bmp.Width, this.width), Math.Max(Bmp.Height, this.height), 
+			using (SKSurface Surface = SKSurface.Create(Math.Max(Bmp.Width, this.width), Math.Max(Bmp.Height, this.height),
 				SKImageInfo.PlatformColorType, SKAlphaType.Premul))
 			{
 				SKCanvas Canvas = Surface.Canvas;
@@ -99,7 +99,7 @@ namespace Waher.Script.Graphs
 			if (this.bitmap == null)
 				return new GraphBitmap(Bmp);
 
-			using (SKSurface Surface = SKSurface.Create(Math.Max(Bmp.Width, this.width), Math.Max(Bmp.Height, this.height), 
+			using (SKSurface Surface = SKSurface.Create(Math.Max(Bmp.Width, this.width), Math.Max(Bmp.Height, this.height),
 				SKImageInfo.PlatformColorType, SKAlphaType.Premul))
 			{
 				SKCanvas Canvas = Surface.Canvas;
@@ -122,8 +122,29 @@ namespace Waher.Script.Graphs
 		/// <returns>Bitmap</returns>
 		public override SKImage CreateBitmap(GraphSettings Settings, out object[] States)
 		{
+			SKImageInfo ImageInfo = new SKImageInfo(this.bitmap.Width, this.bitmap.Height, SKColorType.Bgra8888);
+			int c = ImageInfo.BytesSize;
+
 			States = new object[0];
-			return this.bitmap;
+
+			IntPtr Pixels = Marshal.AllocCoTaskMem(c);
+			try
+			{
+				this.bitmap.ReadPixels(ImageInfo, Pixels, ImageInfo.RowBytes, 0, 0);
+
+				using (SKData Data = SKData.Create(Pixels, c))
+				{
+					SKImage Result = SKImage.FromPixelData(new SKImageInfo(ImageInfo.Width, ImageInfo.Height, SKColorType.Bgra8888), Data, ImageInfo.RowBytes);
+					Pixels = IntPtr.Zero;
+
+					return Result;
+				}
+			}
+			finally
+			{
+				if (Pixels != IntPtr.Zero)
+					Marshal.FreeCoTaskMem(Pixels);
+			}
 		}
 
 		/// <summary>

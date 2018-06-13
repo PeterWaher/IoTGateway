@@ -26,13 +26,13 @@ namespace Waher.Script.Fractals
 		//private const double LimitPercentChange = 0.0025;
 		private const double LimitPercentChange = 0.00025;
 
-		private FractalZoomScript fractalZoomScript;
-		private ScriptNode node;
-		private double r0, i0, r1, i1, size;
-		private object state;
-		private int width;
-		private int height;
-		private bool invertY;
+		private readonly FractalZoomScript fractalZoomScript;
+		private readonly ScriptNode node;
+		private readonly double r0, i0, r1, i1, size;
+		private readonly object state;
+		private readonly int width;
+		private readonly int height;
+		private readonly bool invertY;
 
 		/// <summary>
 		/// Defines a clickable fractal graph in the complex plane.

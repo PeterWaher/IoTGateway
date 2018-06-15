@@ -12,10 +12,10 @@ namespace Waher.Content
 	/// </summary>
 	internal class ConversionSequence : IContentConverter
 	{
-		private KeyValuePair<string, IContentConverter>[] sequence;
-		private Grade conversionGrade;
-		private string from;
-		private string to;
+		private readonly KeyValuePair<string, IContentConverter>[] sequence;
+		private readonly Grade conversionGrade;
+		private readonly string from;
+		private readonly string to;
 
 		public ConversionSequence(string From, string To, Grade ConversionGrade, params KeyValuePair<string, IContentConverter>[] Sequence)
 		{

@@ -34,7 +34,7 @@ namespace Waher.Networking.HTTP
 		private string resource = string.Empty;
 		private string queryString = string.Empty;
 		private string fragment = string.Empty;
-		private string uriScheme = string.Empty;
+		private readonly string uriScheme = string.Empty;
 		private double httpVersion = -1;
 
 		/// <summary>

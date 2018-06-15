@@ -56,9 +56,30 @@ namespace Waher.Script.Graphs.Functions.Colors
 		public override IElement EvaluateScalar(IElement Argument, Variables Variables)
 		{
 			SKColor Color = Graph.ToColor(Argument.AssociatedObjectValue);
-			byte Intensity = (byte)(0.3 * Color.Red + 0.59 * Color.Green + 0.11 * Color.Blue + 0.5);
+			return new ObjectValue(ToGrayScale(Color));
+		}
 
-			return new ObjectValue(new SKColor(Intensity, Intensity, Intensity, Color.Alpha));
+		/// <summary>
+		/// Converts a color to grayscale.
+		/// </summary>
+		/// <param name="Color">Color</param>
+		/// <returns>Grayscale.</returns>
+		public static SKColor ToGrayScale(SKColor Color)
+		{
+			byte Intensity = (byte)(0.3 * Color.Red + 0.59 * Color.Green + 0.11 * Color.Blue + 0.5);
+			return new SKColor(Intensity, Intensity, Intensity, Color.Alpha);
+		}
+
+		/// <summary>
+		/// Evaluates the function on a scalar argument.
+		/// </summary>
+		/// <param name="Argument">Function argument.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Function result.</returns>
+		public override IElement EvaluateScalar(string Argument, Variables Variables)
+		{
+			SKColor Color = Graph.ToColor(Argument);
+			return new ObjectValue(ToGrayScale(Color));
 		}
 	}
 }

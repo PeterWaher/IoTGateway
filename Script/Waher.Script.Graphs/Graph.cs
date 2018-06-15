@@ -564,39 +564,10 @@ namespace Waher.Script.Graphs
 		/// <returns>Color value.</returns>
 		public static SKColor ToColor(object Object)
 		{
-			if (Object is SKColor)
-				return (SKColor)Object;
-			else if (Object is string s)
-			{
-				if (s.StartsWith("#"))
-				{
-					byte R, G, B;
-
-					switch (s.Length)
-					{
-						case 7:
-							if (byte.TryParse(s.Substring(1, 2), NumberStyles.HexNumber, null, out R) &&
-								byte.TryParse(s.Substring(3, 2), NumberStyles.HexNumber, null, out G) &&
-								byte.TryParse(s.Substring(5, 2), NumberStyles.HexNumber, null, out B))
-							{
-								return new SKColor(R, G, B);
-							}
-							break;
-
-						case 9:
-							if (byte.TryParse(s.Substring(1, 2), NumberStyles.HexNumber, null, out R) &&
-								byte.TryParse(s.Substring(3, 2), NumberStyles.HexNumber, null, out G) &&
-								byte.TryParse(s.Substring(5, 2), NumberStyles.HexNumber, null, out B) &&
-								byte.TryParse(s.Substring(7, 2), NumberStyles.HexNumber, null, out byte A))
-							{
-								return new SKColor(R, G, B, A);
-							}
-							break;
-					}
-				}
-				else if (Functions.Colors.Color.TryParse(s, out SKColor Color))
-					return Color;
-			}
+			if (Object is SKColor Color)
+				return Color;
+			else if (Object is string s && Functions.Colors.Color.TryParse(s, out Color))
+				return Color;
 
 			throw new ScriptException("Expected a color.");
 		}

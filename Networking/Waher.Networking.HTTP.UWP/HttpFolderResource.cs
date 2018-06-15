@@ -431,9 +431,24 @@ namespace Waher.Networking.HTTP
 						{
 							double BestQuality = 0;
 							IContentConverter Best = null;
+							bool Found;
 
 							foreach (IContentConverter Converter2 in InternetContent.Converters)
 							{
+								Found = false;
+
+								foreach (string FromContentType in Converter2.FromContentTypes)
+								{
+									if (ContentType == FromContentType)
+									{
+										Found = true;
+										break;
+									}
+								}
+
+								if (!Found)
+									continue;
+
 								foreach (string ToContentType in Converter2.ToContentTypes)
 								{
 									if (Header.Accept.IsAcceptable(ToContentType, out double Quality2) && Quality > BestQuality)

@@ -414,7 +414,10 @@ namespace Waher.Networking.HTTP
 					{
 						NewContentType = AcceptRecord.Item;
 						if (NewContentType.EndsWith("/*"))
+						{
+							NewContentType = null;
 							continue;
+						}
 
 						if (InternetContent.CanConvert(ContentType, NewContentType, out Converter))
 						{
@@ -429,6 +432,7 @@ namespace Waher.Networking.HTTP
 
 						if (Converters != null)
 						{
+							string BestContentType = null;
 							double BestQuality = 0;
 							IContentConverter Best = null;
 							bool Found;
@@ -453,6 +457,7 @@ namespace Waher.Networking.HTTP
 								{
 									if (Header.Accept.IsAcceptable(ToContentType, out double Quality2) && Quality > BestQuality)
 									{
+										BestContentType = ToContentType;
 										BestQuality = Quality;
 										Best = Converter2;
 									}
@@ -463,6 +468,7 @@ namespace Waher.Networking.HTTP
 							{
 								Acceptable = true;
 								Converter = Best;
+								NewContentType = BestContentType;
 							}
 						}
 					}

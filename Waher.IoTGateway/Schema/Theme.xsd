@@ -1,0 +1,112 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="Theme"
+           targetNamespace="http://waher.se/Schema/Theme.xsd"
+           elementFormDefault="qualified"
+           xmlns="http://waher.se/Schema/Theme.xsd"
+           xmlns:mstns="http://waher.se/Schema/Theme.xsd"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:element name="Theme">
+    <xs:complexType>
+			<xs:sequence>
+				<xs:element name="Presentation">
+					<xs:annotation>
+						<xs:documentation>Contains meta-information about the theme.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="Title" type="xs:string">
+								<xs:annotation>
+									<xs:documentation>A human readable title for the theme.</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="Thumbnail">
+								<xs:annotation>
+									<xs:documentation>Path to a thumbnail image for the theme, relative to the current folder, together with size information.</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="xs:string">
+											<xs:attribute name="width" type="xs:positiveInteger" use="required"/>
+											<xs:attribute name="height" type="xs:positiveInteger" use="required"/>
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="BasicProperties">
+					<xs:annotation>
+						<xs:documentation>Contains basic properties for the theme.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="CSSX" type="xs:string">
+								<xs:annotation>
+									<xs:documentation>Path to the CSSX file of the theme, relative to the current folder.</xs:documentation>
+									<xs:documentation>A CSSX file is a CSS file that can contain embedded script, between ¤ signs.</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="HeaderColor" type="Color">
+								<xs:annotation>
+									<xs:documentation>Color for text headers.</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="HeaderTextColor" type="Color">
+								<xs:annotation>
+									<xs:documentation>Text color for text headers, if used with backgound HeaderColor.</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="ButtonColor" type="Color">
+								<xs:annotation>
+									<xs:documentation>Background color for controls.</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="ButtonTextColor" type="Color">
+								<xs:annotation>
+									<xs:documentation>Text color for controls.</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="LinkColor" type="Color">
+								<xs:annotation>
+									<xs:documentation>Text color for links.</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="EditColor" type="Color">
+								<xs:annotation>
+									<xs:documentation>Backgound color for edited text.</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="CustomProperties">
+					<xs:annotation>
+						<xs:documentation>Contains custom properties for the theme.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="Property" maxOccurs="unbounded" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>Defines a custom property fo the theme.</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:attribute name="name" type="xs:string" use="required"/>
+									<xs:attribute name="value" type="xs:string" use="required"/>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+	<xs:simpleType name="Color">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="#[0-9a-fA-F]{6}"/>
+		</xs:restriction>
+	</xs:simpleType>
+	
+</xs:schema>

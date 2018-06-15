@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Theme xmlns="http://waher.se/Schema/Theme.xsd">
+	<Presentation>
+		<Title>Cactus Rose</Title>
+		<Thumbnail width="320" height="200">Thumbnail.png</Thumbnail>
+	</Presentation>
+	<BasicProperties>
+		<CSSX>CactusRose.cssx</CSSX>
+		<HeaderColor>#3187B9</HeaderColor>
+		<HeaderTextColor>#FFFFFF</HeaderTextColor>
+		<ButtonColor>#4CAF50</ButtonColor>
+		<ButtonTextColor>#FFFFFF</ButtonTextColor>
+		<LinkColor>#FFFFFF</LinkColor>
+		<EditColor>#FFFF00</EditColor>
+	</BasicProperties>
+	<CustomProperties>
+	</CustomProperties>
+</Theme>

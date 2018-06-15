@@ -2,7 +2,7 @@
   <Folder name="Root">
 		<Folder name="Themes">
 			<Folder name="CactusRose">
-				<Content fileName="CactusRose.css"/>
+				<Content fileName="CactusRose.cssx"/>
 				<Content fileName="CactusRose800x800.png"/>
 				<Content fileName="CactusRose1600x1600.png"/>
 				<Content fileName="CactusRose1600x1600Dimmed.png"/>

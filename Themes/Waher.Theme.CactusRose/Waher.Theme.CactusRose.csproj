@@ -45,7 +45,7 @@
     <Content Include="Root\Themes\CactusRose\CactusRose800x800.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Root\Themes\CactusRose\CactusRose.css">
+    <Content Include="Root\Themes\CactusRose\CactusRose.cssx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Waher.Theme.CactusRose.manifest">

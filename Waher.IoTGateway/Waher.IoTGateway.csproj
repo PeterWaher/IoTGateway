@@ -38,6 +38,7 @@
     <None Remove="Root\Settings\XMPP.js" />
     <None Remove="Root\Settings\XMPP.md" />
     <None Remove="Schema\GatewayConfiguration.xsd" />
+    <None Remove="Schema\Theme.xsd" />
     <None Remove="Waher.IoTGateway.manifest" />
   </ItemGroup>
   <ItemGroup>
@@ -79,6 +80,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Schema\Theme.xsd" />
     <EmbeddedResource Include="Schema\GatewayConfiguration.xsd" />
   </ItemGroup>
   <ItemGroup>

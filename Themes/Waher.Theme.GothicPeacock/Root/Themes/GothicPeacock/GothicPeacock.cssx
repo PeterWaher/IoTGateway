@@ -8,7 +8,7 @@ body
     margin: 0;
     font-family: "Segoe UI", "Segoe UI Web Regular", "Segoe UI Symbol", "Helvetica Neue", "BBAlpha Sans", "S60 Sans", Arial, sans-serif;
     font-size: 100%;
-    background: url(CactusRose1600x1600Dimmed.png) no-repeat center center fixed;
+    background: url(GothicPeacock1600x1600Dimmed.png) no-repeat center center fixed;
     -webkit-background-size: cover;
     -moz-background-size: cover;
     -o-background-size: cover;
@@ -30,7 +30,7 @@ main
 
 header
 {
-    background-image: url(CactusRoseBanner2000x600.png);
+    background-image: url(GothicPeacockBanner2000x600.png);
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
@@ -81,7 +81,7 @@ nav > ul > li:first-child
 nav > ul > li > a
 {
     display: block;
-    color: white;
+    color: ¤LinkColor¤;
     text-align: center;
     padding: 0.9em 1em;
     text-decoration: none;
@@ -94,12 +94,12 @@ nav > ul > li > a:hover
 
 .active
 {
-    background-color: #4CAF50;
+    background-color: ¤ButtonColor¤;
 }
 
 footer
 {
-    background-image: url(CactusRoseBanner2000x600.png);
+    background-image: url(GothicPeacockBanner2000x600.png);
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
@@ -164,7 +164,7 @@ p
 
 h1,h2,h3,h4,h5,h6,h7,h8,h9
 {
-    color:rgb(49,135,185);
+    color:¤HeaderColor¤;
     margin: 1em 0 0 0;
 }
 
@@ -372,7 +372,7 @@ u
 
 ins
 {
-    background-color:Yellow;
+    background-color:¤EditColor¤;
 }
 
 s
@@ -381,7 +381,7 @@ s
 
 del
 {
-    background-color:Yellow;
+    background-color:¤EditColor¤;
 }
 
 sup
@@ -452,12 +452,12 @@ hr
 blockquote
 {
     margin-left:2em;
-    border-left:0.3em solid rgb(49,135,185);
-    border-top:0.1em solid rgb(49,135,185);
-    border-right:0.1em solid rgb(49,135,185);
-    border-bottom:0.1em solid rgb(49,135,185);
+    border-left:0.3em solid ¤HeaderColor¤;
+    border-top:0.1em solid ¤HeaderColor¤;
+    border-right:0.1em solid ¤HeaderColor¤;
+    border-bottom:0.1em solid ¤HeaderColor¤;
     padding: 1em 1em 1em 2em;
-    background-color: rgba(49,135,185,0.075);
+    background-color: ¤Alpha(HeaderColor,19)¤;
     border-radius: 0 1em 1em 0;
     box-shadow: 0.3em 0.3em 0.3em #999;
 }
@@ -508,7 +508,7 @@ dl
 dt
 {
     font-weight: bold;
-    color:#4CAF50;
+    color:¤ButtonColor¤;
 }
 
 dd
@@ -547,8 +547,8 @@ table, th, td
 
 th
 {
-    background-color: #4CAF50;
-    color: white;
+    background-color: ¤ButtonColor¤;
+    color: ¤ButtonTextColor¤;
 }
  
 th, td
@@ -560,16 +560,16 @@ th, td
 {
     margin:1em 0 1em 0;
     display:inline-block;
-    border:0.1em solid rgb(49,135,185);
+    border:0.1em solid ¤HeaderColor¤;
     padding: 1em 3em 1em 3em;
-    background-color: rgba(49,135,185,0.075);
+    background-color: ¤Alpha(HeaderColor,19)¤;
     border-radius: 1em;
     box-shadow: 0.3em 0.3em 0.3em #999;
 }
 
 .tocTitle
 {
-    color:rgb(49,135,185);
+    color:¤HeaderColor¤;
     font-size: 2.2em;
     text-align:center;
     font-weight:bold;
@@ -633,14 +633,14 @@ input
     padding: 6px 10px;
     margin: 4px 0;
     box-sizing: border-box;
-    border: 2px solid #4CAF50;
+    border: 2px solid ¤ButtonColor¤;
     border-radius: 4px;
     box-shadow: 0.3em 0.3em 0.3em #999;
 }
 
 input:focus
 {
-    border: 3px solid #4CAF50;
+    border: 3px solid ¤ButtonColor¤;
 }
 
 select
@@ -649,14 +649,14 @@ select
     padding: 6px 10px;
     margin: 4px 0;
     box-sizing: border-box;
-    border: 2px solid #4CAF50;
+    border: 2px solid ¤ButtonColor¤;
     border-radius: 4px;
     box-shadow: 0.3em 0.3em 0.3em #999;
 }
 
 select:focus
 {
-    border: 3px solid #4CAF50;
+    border: 3px solid ¤ButtonColor¤;
 }
 
 textarea 
@@ -667,7 +667,7 @@ textarea
     padding: 6px 10px;
     margin: 4px 0;
     box-sizing: border-box;
-    border: 2px solid #4CAF50;
+    border: 2px solid ¤ButtonColor¤;
     border-radius: 4px;
 	resize:none;
 	-moz-tab-size : 3;
@@ -678,14 +678,14 @@ textarea
 
 textarea:focus
 {
-    border: 3px solid #4CAF50;
+    border: 3px solid ¤ButtonColor¤;
 }
 
 input[type=button], input[type=submit], input[type=reset], button
 {
-    background-color: #4CAF50;
+    background-color: ¤ButtonColor¤;
     border: none;
-    color: white;
+    color: ¤ButtonTextColor¤;
     padding: 15px 32px;
     text-align: center;
     text-decoration: none;
@@ -740,20 +740,20 @@ input[type="checkbox"] + label:before
     border-radius: 0.15em;
     font-size: 1.75em;
     box-sizing: border-box;
-    border: 2px solid #4CAF50;
+    border: 2px solid ¤ButtonColor¤;
     box-shadow: 0.1em 0.1em 0.1em #999;
 }
 
 input[type="checkbox"] + label:before:focus
 {
-    border: 3px solid #4CAF50;
+    border: 3px solid ¤ButtonColor¤;
 }
 
 input[type="checkbox"]:checked + label:before
 {
     content: "\2713";
     text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3);
-    color: #4CAF50;
+    color: ¤ButtonColor¤;
     text-align: center;
     line-height: 0.75em;
 }
@@ -789,20 +789,20 @@ input[type="radio"] + label:before
     border-radius: 1em;
     font-size: 1.75em;
     box-sizing: border-box;
-    border: 2px solid #4CAF50;
+    border: 2px solid ¤ButtonColor¤;
     box-shadow: 0.1em 0.1em 0.1em #999;
 }
 
 input[type="radio"] + label:before:focus
 {
-    border: 3px solid #4CAF50;
+    border: 3px solid ¤ButtonColor¤;
 }
 
 input[type="radio"]:checked + label:before
 {
     content: "\2022";
     text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3);
-    color: #4CAF50;
+    color: ¤ButtonColor¤;
     text-align: center;
     line-height: 0.75em;
 }
@@ -823,9 +823,9 @@ input[type="radio"]:checked + label:before
 fieldset
 {
     margin:2em 1em 2em 1em;
-    border:0.1em solid rgb(49,135,185);
+    border:0.1em solid ¤HeaderColor¤;
     padding: 1em 2em 1em 2em;
-    background-color: rgba(49,135,185,0.025);
+    background-color: ¤Alpha(HeaderColor,6)¤;
     border-radius: 1em;
     box-shadow: 0.3em 0.3em 0.3em #999;
 	-webkit-column-break-inside: avoid;
@@ -834,9 +834,9 @@ fieldset
 
 fieldset > legend
 {
-    color:#fff;
+    color:¤HeaderTextColor¤;
     font-size: 1.25em;
 	padding: 0.25em 1em 0.25em 1em;
 	border-radius:0.7em;
-	background-color:rgb(49,135,185);
+	background-color:¤HeaderColor¤;
 }

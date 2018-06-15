@@ -2,7 +2,9 @@
   <Folder name="Root">
 		<Folder name="Themes">
 			<Folder name="GothicPeacock">
-				<Content fileName="GothicPeacock.css"/>
+				<Content fileName="GothicPeacock.xml"/>
+				<Content fileName="GothicPeacock.cssx"/>
+				<Content fileName="GothicPeacock.png"/>
 				<Content fileName="GothicPeacock800x800.png"/>
 				<Content fileName="GothicPeacock1600x1600.png"/>
 				<Content fileName="GothicPeacock1600x1600Dimmed.png"/>

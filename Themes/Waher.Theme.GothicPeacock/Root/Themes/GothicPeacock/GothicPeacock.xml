@@ -1,14 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<Theme id="CactusRose" xmlns="http://waher.se/Schema/Theme.xsd">
+<Theme id="GothicPeacock" xmlns="http://waher.se/Schema/Theme.xsd">
 	<Presentation>
-		<Title>Cactus Rose</Title>
-		<Thumbnail width="320" height="180">CactusRose.png</Thumbnail>
+		<Title>Gothic Peacock</Title>
+		<Thumbnail width="320" height="180">GothicPeacock.png</Thumbnail>
 	</Presentation>
 	<BasicProperties>
-		<CSSX>CactusRose.cssx</CSSX>
-		<HeaderColor>#3187B9</HeaderColor>
+		<CSSX>GothicPeacock.cssx</CSSX>
+		<HeaderColor>#993300</HeaderColor>
 		<HeaderTextColor>#FFFFFF</HeaderTextColor>
-		<ButtonColor>#4CAF50</ButtonColor>
+		<ButtonColor>#336600</ButtonColor>
 		<ButtonTextColor>#FFFFFF</ButtonTextColor>
 		<LinkColor>#FFFFFF</LinkColor>
 		<EditColor>#FFFF00</EditColor>

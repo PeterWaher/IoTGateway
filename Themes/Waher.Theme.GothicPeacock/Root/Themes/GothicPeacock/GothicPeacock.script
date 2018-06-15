@@ -1,7 +1,12 @@
 GothicPeacock1600x1600:=NovaMandelbrotSmoothFractal(2.1451171875,-0.876106770833332,0.3125,0.5,0+4*i,RandomLinearAnalogousHSL(1024,16,1298592145),1600,1600);
-GothicPeacock1600x1600Dimmed:=Blend(GothicPeacock1600x1600,"White",0.85);
+GothicPeacock1600x1600Dimmed:=Blend(GothicPeacock1600x1600,"Black",0.65);
 GothicPeacock800x800:=NovaMandelbrotSmoothFractal(2.1451171875,-0.876106770833332,0.3125,0.5,0+4*i,RandomLinearAnalogousHSL(1024,16,1298592145),800,800);
 
 GothicPeacockBanner1400x425:=NovaMandelbrotSmoothFractal(2.3154296875,-1.615,0.35,0.5,0+2*i,RandomLinearAnalogousHSL(1024,16,1298592145),1400,425);
 GothicPeacockBanner1900x500:=NovaMandelbrotSmoothFractal(2.3154296875,-1.615,0.35,0.5,0+2*i,RandomLinearAnalogousHSL(1024,16,1298592145),1900,500);
 GothicPeacockBanner2000x600:=NovaMandelbrotSmoothFractal(2.3154296875,-1.615,0.35,0.5,0+2*i,RandomLinearAnalogousHSL(1024,16,1298592145),2000,600);
+
+
+GothicPeacockBanner1400x425:=NovaMandelbrotSmoothFractal(2.3136296875,-1.62592333333333,0.0875,0.5,0+2*i,RandomLinearAnalogousHSL(1024,16,1298592145),1400,425);
+GothicPeacockBanner1900x500:=NovaMandelbrotSmoothFractal(2.3136296875,-1.62592333333333,0.0875,0.5,0+2*i,RandomLinearAnalogousHSL(1024,16,1298592145),1900,500);
+GothicPeacockBanner2000x600:=NovaMandelbrotSmoothFractal(2.3136296875,-1.62592333333333,0.0875,0.5,0+2*i,RandomLinearAnalogousHSL(1024,16,1298592145),2000,600);

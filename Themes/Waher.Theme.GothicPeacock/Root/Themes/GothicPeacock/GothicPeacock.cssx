@@ -127,16 +127,16 @@ section
 {
     padding: 2em 2em 2em 2em;
     border: 1px solid black;
-    box-shadow: 0.3em 0.3em 0.3em #999;
+    box-shadow: 0.3em 0.3em 0.3em rgba(0,0,0,0.5);
     margin: 3em 0.5em 3em 0;
-    background-color:rgba(255,255,255,0.95);
+    background-color:rgba(211, 204, 197, 0.9);
 }
 
 section section
 {
     padding: 1em 1em 1em 1em;
     border: 1px solid black;
-    box-shadow: 0.3em 0.3em 0.3em #999;
+    box-shadow: 0.3em 0.3em 0.3em rgba(0,0,0,0.5);
     margin: 1em 0 1em 0;
     background-color:rgba(0,0,0,0.05);
 }
@@ -400,24 +400,24 @@ img.aloneUnsized
 
 figure img
 {
-    box-shadow: 0.3em 0.3em 0.3em #999;
+    box-shadow: 0.3em 0.3em 0.3em rgba(0,0,0,0.5);
 }
 
 figure figcaption 
 {
-    text-shadow: 1px 1px 1px #999;
+    text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
     padding: 0.7em;
 }
 
 video
 {
-    box-shadow: 0.3em 0.3em 0.3em #999;
+    box-shadow: 0.3em 0.3em 0.3em rgba(0,0,0,0.5);
 	max-width:100%;
 }
 
 iframe
 {
-    box-shadow: 0.3em 0.3em 0.3em #999;
+    box-shadow: 0.3em 0.3em 0.3em rgba(0,0,0,0.5);
 }
 
 code
@@ -432,7 +432,7 @@ pre
     -moz-tab-size: 4;
     -o-tab-size: 4;
     tab-size: 4;
-    box-shadow: 0.3em 0.3em 0.3em #999;
+    box-shadow: 0.3em 0.3em 0.3em rgba(0,0,0,0.5);
     margin-bottom: 1.5em;
     white-space: pre-wrap;
     white-space: -moz-pre-wrap;
@@ -459,7 +459,7 @@ blockquote
     padding: 1em 1em 1em 2em;
     background-color: ¤Alpha(HeaderColor,19)¤;
     border-radius: 0 1em 1em 0;
-    box-shadow: 0.3em 0.3em 0.3em #999;
+    box-shadow: 0.3em 0.3em 0.3em rgba(0,0,0,0.5);
 }
 
 ul
@@ -519,7 +519,7 @@ table
 {
     margin-bottom: 1.5em;
     border-collapse: collapse;
-    box-shadow: 0.3em 0.3em 0.3em #999;
+    box-shadow: 0.3em 0.3em 0.3em rgba(0,0,0,0.5);
     border-collapse: separate;
     border-width: 0;
     border-spacing:0;
@@ -527,7 +527,7 @@ table
 
 table caption
 {
-    text-shadow: 1px 1px 1px #999;
+    text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
 }
 
 tr:nth-child(odd)
@@ -564,7 +564,7 @@ th, td
     padding: 1em 3em 1em 3em;
     background-color: ¤Alpha(HeaderColor,19)¤;
     border-radius: 1em;
-    box-shadow: 0.3em 0.3em 0.3em #999;
+    box-shadow: 0.3em 0.3em 0.3em rgba(0,0,0,0.5);
 }
 
 .tocTitle
@@ -635,7 +635,7 @@ input
     box-sizing: border-box;
     border: 2px solid ¤ButtonColor¤;
     border-radius: 4px;
-    box-shadow: 0.3em 0.3em 0.3em #999;
+    box-shadow: 0.3em 0.3em 0.3em rgba(0,0,0,0.5);
 }
 
 input:focus
@@ -651,7 +651,7 @@ select
     box-sizing: border-box;
     border: 2px solid ¤ButtonColor¤;
     border-radius: 4px;
-    box-shadow: 0.3em 0.3em 0.3em #999;
+    box-shadow: 0.3em 0.3em 0.3em rgba(0,0,0,0.5);
 }
 
 select:focus
@@ -673,7 +673,7 @@ textarea
 	-moz-tab-size : 3;
 	-o-tab-size : 3;
 	tab-size : 3;
-    box-shadow: 0.3em 0.3em 0.3em #999;
+    box-shadow: 0.3em 0.3em 0.3em rgba(0,0,0,0.5);
 }
 
 textarea:focus
@@ -695,18 +695,18 @@ input[type=button], input[type=submit], input[type=reset], button
     cursor: pointer;
     -webkit-transition-duration: 0.1s;
     transition-duration: 0.1s;
-    box-shadow: 0.3em 0.3em 0.3em #999;
+    box-shadow: 0.3em 0.3em 0.3em rgba(0,0,0,0.5);
     border-radius: 4px;
 }
 
 input[type=button]:active, input[type=submit]:active, input[type=reset]:active, button:active
 {
-   box-shadow: 0.1em 0.1em 0.1em #999;
+   box-shadow: 0.1em 0.1em 0.1em rgba(0,0,0,0.5);
 }
 
 input[type=button]:hover:not(:active), input[type=submit]:hover:not(:active), input[type=reset]:hover:not(:active), button:hover:not(:active)
 {
-    box-shadow: 0.5em 0.5em 0.5em #999;
+    box-shadow: 0.5em 0.5em 0.5em rgba(0,0,0,0.5);
 }
 
 input[type="checkbox"]
@@ -741,7 +741,7 @@ input[type="checkbox"] + label:before
     font-size: 1.75em;
     box-sizing: border-box;
     border: 2px solid ¤ButtonColor¤;
-    box-shadow: 0.1em 0.1em 0.1em #999;
+    box-shadow: 0.1em 0.1em 0.1em rgba(0,0,0,0.5);
 }
 
 input[type="checkbox"] + label:before:focus
@@ -790,7 +790,7 @@ input[type="radio"] + label:before
     font-size: 1.75em;
     box-sizing: border-box;
     border: 2px solid ¤ButtonColor¤;
-    box-shadow: 0.1em 0.1em 0.1em #999;
+    box-shadow: 0.1em 0.1em 0.1em rgba(0,0,0,0.5);
 }
 
 input[type="radio"] + label:before:focus
@@ -827,7 +827,7 @@ fieldset
     padding: 1em 2em 1em 2em;
     background-color: ¤Alpha(HeaderColor,6)¤;
     border-radius: 1em;
-    box-shadow: 0.3em 0.3em 0.3em #999;
+    box-shadow: 0.3em 0.3em 0.3em rgba(0,0,0,0.5);
 	-webkit-column-break-inside: avoid;
 	break-inside: avoid;
 }

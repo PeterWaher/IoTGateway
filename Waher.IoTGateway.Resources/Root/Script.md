@@ -841,17 +841,18 @@ by applications that are not part of the **IoT Gateway**.
 
 The following functions are available in the `Waher.Script.Graphs` library.
 
-| Function           | Description | Example |
-|--------------------|-------------|---------|
-| `Blend(c1,c2,p)`   | Blends colors `c1` and `c2` together using a blending factor 0<=`p`<=1. Any or both of `c1` and `c2` can be an image. | `Blend("Red","Green",0.5)` |
-| `Color(string)`    | Parses a string and returns the corresponding color. The color can either be a known color name, or in any of the formats `RRGGBB`, `AARRGGBB`, `#RRGGBB`, `#AARRGGBB`. | `Colorr("Red")`        |
-| `GrayScale(Color)` | Converts a color to its corresponding Gray-scale value. | `GrayScale(cl)`        |
-| `HSL(H,S,L)`       | Creates a color from its HSL representation.            | `HSL(100,0.5,0.7)`     |
-| `HSLA(H,S,L,A)`    | Creates a color from its HSLA representation.           | `HSLA(100,0.5,0.7,64)` |
-| `HSV(H,S,V)`       | Creates a color from its HSV representation.            | `HSV(100,0.5,0.7)`     |
-| `HSVA(H,S,V,A)`    | Creates a color from its HSVA representation.           | `HSVA(100,0.5,0.7,64)` |
-| `RGB(R,G,B)`       | Creates a color from its RGB representation.            | `RGB(100,150,200)`     |
-| `RGBA(R,G,B,A)`    | Creates a color from its RGBA representation.           | `RGBA(100,150,200,64)` |
+| Function             | Description | Example |
+|----------------------|-------------|---------|
+| `Alpha(Color,Alpha)` | Sets the Alpha channel of a color. | `Alpha("Red",128)` |
+| `Blend(c1,c2,p)`     | Blends colors `c1` and `c2` together using a blending factor 0<=`p`<=1. Any or both of `c1` and `c2` can be an image. | `Blend("Red","Green",0.5)` |
+| `Color(string)`      | Parses a string and returns the corresponding color. The color can either be a known color name, or in any of the formats `RRGGBB`, `RRGGBBAA`, `#RRGGBB`, `#RRGGBBAA`. | `Color("Red")`        |
+| `GrayScale(Color)`   | Converts a color to its corresponding Gray-scale value. | `GrayScale(cl)`        |
+| `HSL(H,S,L)`         | Creates a color from its HSL representation.            | `HSL(100,0.5,0.7)`     |
+| `HSLA(H,S,L,A)`      | Creates a color from its HSLA representation.           | `HSLA(100,0.5,0.7,64)` |
+| `HSV(H,S,V)`         | Creates a color from its HSV representation.            | `HSV(100,0.5,0.7)`     |
+| `HSVA(H,S,V,A)`      | Creates a color from its HSVA representation.           | `HSVA(100,0.5,0.7,64)` |
+| `RGB(R,G,B)`         | Creates a color from its RGB representation.            | `RGB(100,150,200)`     |
+| `RGBA(R,G,B,A)`      | Creates a color from its RGBA representation.           | `RGBA(100,150,200,64)` |
 
 #### Graph functions (Waher.Script.Graphs)
 

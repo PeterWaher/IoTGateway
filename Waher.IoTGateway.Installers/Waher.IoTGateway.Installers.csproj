@@ -51,6 +51,7 @@
     <Compile Include=".bak\Waher.Runtime.Inventory\Grade.cs" />
     <Compile Include=".bak\Waher.Runtime.Inventory\IModule.cs" />
     <Compile Include=".bak\Waher.Runtime.Inventory\Types.cs" />
+    <Compile Include=".bak\Waher.Script\Model\IDifferentiable.cs" />
     <Compile Include="CustomAction.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include=".bak\Waher.Content.Xml\XML.cs" />

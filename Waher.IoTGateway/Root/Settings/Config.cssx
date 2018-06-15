@@ -61,3 +61,46 @@
 	background-color:rgb(216,49,52);
 	width:7em;
 }
+
+.themes
+{
+}
+
+.theme
+{
+    background-color: white;
+    box-shadow: 0.5em 0.5em 0.5em #999;
+    margin:2em;
+    display:inline-block;
+	cursor:pointer;
+}
+
+.themeSelected
+{
+    background-color: white;
+    box-shadow: 0.1em 0.1em 0.1em #999;
+    margin:2em;
+    display:inline-block;
+    background-color: ¤Alpha(ButtonColor,51)¤;
+}
+
+.theme:active
+{
+    box-shadow: 0.1em 0.1em 0.1em #999;
+}
+
+.theme:hover:not(:active)
+{
+    box-shadow: 0.9em 0.5em 0.5em #999;
+}
+
+.themeImage
+{
+    width:100%;
+}
+
+.themeTitle
+{
+    text-align: center;
+    padding: 10px 20px;
+}

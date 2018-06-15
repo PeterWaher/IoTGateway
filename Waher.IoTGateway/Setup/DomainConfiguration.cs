@@ -287,6 +287,8 @@ namespace Waher.IoTGateway.Setup
 
 		private void TestDomainNames(HttpRequest Request, HttpResponse Response)
 		{
+			Gateway.AssertUserAuthenticated(Request);
+
 			if (!Request.HasData)
 				throw new BadRequestException();
 
@@ -324,6 +326,8 @@ namespace Waher.IoTGateway.Setup
 
 		private void TestDomainName(HttpRequest Request, HttpResponse Response)
 		{
+			Gateway.AssertUserAuthenticated(Request);
+
 			Response.StatusCode = 200;
 			Response.ContentType = "text/plain";
 			Response.Write(this.token);
@@ -416,6 +420,8 @@ namespace Waher.IoTGateway.Setup
 
 		private void TestCA(HttpRequest Request, HttpResponse Response)
 		{
+			Gateway.AssertUserAuthenticated(Request);
+
 			if (!Request.HasData)
 				throw new BadRequestException();
 

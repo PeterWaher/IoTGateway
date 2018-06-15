@@ -29,12 +29,14 @@
     <None Remove="Root\Copyright.md" />
     <None Remove="Root\Events.js" />
     <None Remove="Root\Login.md" />
-    <None Remove="Root\Settings\Config.css" />
+    <None Remove="Root\Settings\Config.cssx" />
     <None Remove="Root\Settings\Domain.js" />
     <None Remove="Root\Settings\Domain.md" />
     <None Remove="Root\Settings\Introduction.md" />
     <None Remove="Root\Settings\Master.md" />
     <None Remove="Root\Settings\Next.js" />
+    <None Remove="Root\Settings\Theme.js" />
+    <None Remove="Root\Settings\Theme.md" />
     <None Remove="Root\Settings\XMPP.js" />
     <None Remove="Root\Settings\XMPP.md" />
     <None Remove="Schema\GatewayConfiguration.xsd" />
@@ -51,7 +53,13 @@
     <Content Include="Root\Login.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Root\Settings\Config.css">
+    <Content Include="Root\Settings\Config.cssx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Settings\Theme.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Settings\Theme.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Root\Settings\Domain.js">

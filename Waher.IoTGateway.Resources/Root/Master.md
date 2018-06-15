@@ -3,7 +3,7 @@ Description: Main menu of the IoT Gateway
 Date: 2016-02-08
 Author: Peter Waher
 Copyright: Copyright.md
-CSS: {{Theme}}
+CSS: {{Theme.CSSX}}
 
 <header>
 <nav>

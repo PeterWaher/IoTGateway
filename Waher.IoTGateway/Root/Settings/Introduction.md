@@ -15,7 +15,7 @@ Welcome
 
 <form>
 
-Before the **{{Waher.IoTGateway.Gateway.ApplicationName}}** can run properly, you need to provide some basic configurations. The following pages
+Before **{{Waher.IoTGateway.Gateway.ApplicationName}}** can run properly, you need to provide some basic configurations. The following pages
 allow you to setup the basic functionality of the application. Press the **Begin** button to start.
 
 <button id='NextButton' type='button' onclick='Next()'>Begin</button>

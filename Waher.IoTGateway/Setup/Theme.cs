@@ -12,6 +12,8 @@ namespace Waher.IoTGateway.Setup
 	/// </summary>
     public class Theme : IConstant
     {
+		private static ThemeDefinition currentDefinition = null;
+
 		/// <summary>
 		/// Theme constant.
 		/// </summary>
@@ -40,7 +42,16 @@ namespace Waher.IoTGateway.Setup
 		/// </summary>
 		public IElement ValueElement
 		{
-			get { return new StringValue("/Themes/CactusRose/CactusRose.css"); }
+			get { return new ObjectValue(currentDefinition); }
+		}
+		
+		/// <summary>
+		/// Current theme.
+		/// </summary>
+		public static ThemeDefinition CurrerntTheme
+		{
+			get => currentDefinition;
+			internal set => currentDefinition = value;
 		}
 
 	}

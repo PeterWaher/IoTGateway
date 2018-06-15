@@ -100,6 +100,14 @@ namespace Waher.IoTGateway.Setup
 		public abstract void SetStaticInstance(ISystemConfiguration Configuration);
 
 		/// <summary>
+		/// Initializes the setup object.
+		/// </summary>
+		public virtual Task InitSetup()
+		{
+			return Task.CompletedTask;
+		}
+
+		/// <summary>
 		/// Waits for the user to provide configuration.
 		/// </summary>
 		/// <param name="WebServer">Current Web Server object.</param>
@@ -134,6 +142,8 @@ namespace Waher.IoTGateway.Setup
 		/// <param name="Response">HTTP Response</param>
 		protected virtual async void ConfigComplete(HttpRequest Request, HttpResponse Response)
 		{
+			Gateway.AssertUserAuthenticated(Request);
+
 			Response.StatusCode = 200;
 			await this.MakeCompleted();
 		}

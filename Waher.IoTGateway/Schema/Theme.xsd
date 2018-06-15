@@ -100,6 +100,11 @@
 					</xs:complexType>
 				</xs:element>
 			</xs:sequence>
+			<xs:attribute name="id" type="xs:Name" use="required">
+				<xs:annotation>
+					<xs:documentation>ID of the theme. Must correspond to the name of the Themes subfolder where theme-related content files reside.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
     </xs:complexType>
   </xs:element>
 

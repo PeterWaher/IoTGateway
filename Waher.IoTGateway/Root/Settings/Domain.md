@@ -8,23 +8,23 @@ JavaScript: /Events.js
 JavaScript: /Settings/Domain.js
 JavaScript: /Settings/XMPP.js
 JavaScript: /Settings/Next.js
-CSS: /Settings/Config.css
+CSS: /Settings/Config.cssx
 UserVariable: User
 Login: /Login.md
 
 ========================================================================
 
 Domain Name
-=============================
-
-<form>
-<fieldset>
-<legend>Domain name settings</legend>
+===================
 
 By providing and using a domain name, it will be easier to reference and protect the application. This is especially important if you plan to make it
 available publicly on the Internet. A domain name must be registered with a *Domain Name Service* (DNS) or a domain name registrar. It must also point to the
 machine where the application is running. If you don't use a domain name, you can still access the application, either by using the predefined domain name 
 **localhost** from the same machine, or by using the IP address of the machine.
+
+<form>
+<fieldset>
+<legend>Domain Settings</legend>
 
 <p>
 <input type="checkbox" name="UseDomainName" id="UseDomainName" {{ConfigClass:=Waher.IoTGateway.Setup.DomainConfiguration;Config:=ConfigClass.Instance;Config.UseDomainName ? "checked" : ""}} onclick="ToggleDomainNameProperties()"/>

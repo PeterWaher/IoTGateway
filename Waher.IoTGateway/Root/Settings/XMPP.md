@@ -7,18 +7,14 @@ Master: Master.md
 JavaScript: /Events.js
 JavaScript: /Settings/XMPP.js
 JavaScript: /Settings/Next.js
-CSS: /Settings/Config.css
+CSS: /Settings/Config.cssx
 UserVariable: User
 Login: /Login.md
 
 ========================================================================
 
 Network connectivity
-=============================
-
-<form>
-<fieldset>
-<legend>XMPP connection settings</legend>
+===========================
 
 The IoT Gateway requires a connection to an XMPP network to work properly. The XMPP connection allows you to configure, monitor and administer your
 IoT Gateway in a secure manner, from anywhere where you have access to the same XMPP network, even if you reside behind a different firewall. 
@@ -26,6 +22,10 @@ If the server has provisioning support, it will provide for additional security 
 you wish to use. Or click on any of the featured servers below. You can also use any of the free public servers listed at 
 [xmpp.net](https://xmpp.net/directory.php). If you're an expert user, you can also set up your own XMPP server. 
 [xmpp.org](https://xmpp.org/software/servers.html) publishes an abridged list of XMPP server software you can use.
+
+<form>
+<fieldset>
+<legend>XMPP Settings</legend>
 
 <p>
 <label for="XmppServer">Server:</label>  

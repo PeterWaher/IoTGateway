@@ -390,6 +390,8 @@ namespace Waher.IoTGateway.Setup
 
 		private void ConnectToHost(HttpRequest Request, HttpResponse Response)
 		{
+			Gateway.AssertUserAuthenticated(Request);
+
 			if (!Request.HasData)
 				throw new BadRequestException();
 

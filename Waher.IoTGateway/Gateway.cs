@@ -42,6 +42,7 @@ using Waher.Runtime.Settings;
 using Waher.Runtime.Timing;
 using Waher.Persistence;
 using Waher.Script;
+using Waher.Security;
 using Waher.Things;
 using Waher.Things.ControlParameters;
 using Waher.Things.Metering;
@@ -365,9 +366,13 @@ namespace Waher.IoTGateway
 
 				foreach (SystemConfiguration Configuration in Configurations)
 				{
-					bool NeedsCleanup = false;
-
 					Configuration.SetStaticInstance(Configuration);
+					await Configuration.InitSetup();
+				}
+
+				foreach (SystemConfiguration Configuration in Configurations)
+				{
+					bool NeedsCleanup = false;
 
 					if (!Configuration.Complete)
 					{
@@ -1483,6 +1488,18 @@ namespace Waher.IoTGateway
 		public static LoggedIn LoggedIn
 		{
 			get { return loggedIn; }
+		}
+
+		/// <summary>
+		/// Makes sure a request is being made from a session with a successful user login.
+		/// </summary>
+		/// <param name="Request">HTTP Request</param>
+		public static void AssertUserAuthenticated(HttpRequest Request)
+		{
+			IUser User;
+
+			if (Request.Session == null || !Request.Session.TryGetVariable("User", out Variable v) || (User = v.ValueObject as IUser) == null)
+				throw new Networking.HTTP.ForbiddenException();
 		}
 
 		#endregion

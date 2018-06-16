@@ -23,6 +23,10 @@ logic in your back-end applications, such as accessing databases, etc. The scrip
 loaded by the web server. Check out the [Script reference](Script.md) page for more details. You can also use the [Calculator](Calculator.md)
 to play around with script.
 
+You can also host dynamic CSS (`CSSX`) files, containing script embedded between sun characters `¤`. Such script will execute on the server, 
+and the results inserted in the CSS before being returned seamlessly to the browser. This allows you to adapt the layout of the page based on 
+user context, and allows for use the consistent use of themes across applications.
+
 When the **IoT Gateway** runs, it loads all dynamic link modules (with file extension `.dll`) automatically. All extensions and executable
 modules defined in these modules will be found and started automatically.
 

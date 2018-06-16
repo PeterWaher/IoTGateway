@@ -102,7 +102,8 @@ namespace Waher.IoTGateway.Setup
 		/// <summary>
 		/// Initializes the setup object.
 		/// </summary>
-		public virtual Task InitSetup()
+		/// <param name="WebServer">Current Web Server object.</param>
+		public virtual Task InitSetup(HttpServer WebServer)
 		{
 			return Task.CompletedTask;
 		}
@@ -155,6 +156,7 @@ namespace Waher.IoTGateway.Setup
 		{
 			this.complete = true;
 			this.completed = DateTime.Now;
+			this.updated = DateTime.Now;
 
 			await Database.Update(this);
 

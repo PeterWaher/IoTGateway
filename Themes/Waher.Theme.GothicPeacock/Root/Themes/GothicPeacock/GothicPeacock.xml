@@ -2,7 +2,7 @@
 <Theme id="GothicPeacock" xmlns="http://waher.se/Schema/Theme.xsd">
 	<Presentation>
 		<Title>Gothic Peacock</Title>
-		<Thumbnail width="320" height="180">GothicPeacock.png</Thumbnail>
+		<Thumbnail width="480" height="270">GothicPeacock.png</Thumbnail>
 	</Presentation>
 	<BasicProperties>
 		<CSSX>GothicPeacock.cssx</CSSX>
@@ -10,8 +10,11 @@
 		<HeaderTextColor>#FFFFFF</HeaderTextColor>
 		<ButtonColor>#663300</ButtonColor>
 		<ButtonTextColor>#FFFFFF</ButtonTextColor>
-		<LinkColor>#FFFFFF</LinkColor>
+		<MenuTextColor>#FFFFFF</MenuTextColor>
 		<EditColor>#FFFF00</EditColor>
+		<LinkColorUnvisited>#993300</LinkColorUnvisited>
+		<LinkColorVisited>#732600</LinkColorVisited>
+		<LinkColorHot>#663300</LinkColorHot>
 	</BasicProperties>
 	<CustomProperties>
 	</CustomProperties>

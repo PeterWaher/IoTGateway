@@ -68,14 +68,29 @@
 									<xs:documentation>Text color for controls.</xs:documentation>
 								</xs:annotation>
 							</xs:element>
-							<xs:element name="LinkColor" type="Color">
+							<xs:element name="MenuTextColor" type="Color">
 								<xs:annotation>
-									<xs:documentation>Text color for links.</xs:documentation>
+									<xs:documentation>Text color for links in the menu.</xs:documentation>
 								</xs:annotation>
 							</xs:element>
 							<xs:element name="EditColor" type="Color">
 								<xs:annotation>
 									<xs:documentation>Backgound color for edited text.</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="LinkColorUnvisited" type="Color">
+								<xs:annotation>
+									<xs:documentation>Color of unvisited links.</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="LinkColorVisited" type="Color">
+								<xs:annotation>
+									<xs:documentation>Color of visited links.</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="LinkColorHot" type="Color">
+								<xs:annotation>
+									<xs:documentation>Color of hot links.</xs:documentation>
 								</xs:annotation>
 							</xs:element>
 						</xs:sequence>

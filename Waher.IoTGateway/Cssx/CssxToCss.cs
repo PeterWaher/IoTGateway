@@ -70,8 +70,11 @@ namespace Waher.IoTGateway.Cssx
 					Session["HeaderTextColor"] = Def.HeaderTextColor;
 					Session["ButtonColor"] = Def.ButtonColor;
 					Session["ButtonTextColor"] = Def.ButtonTextColor;
-					Session["LinkColor"] = Def.LinkColor;
+					Session["MenuTextColor"] = Def.MenuTextColor;
 					Session["EditColor"] = Def.EditColor;
+					Session["LinkColorUnvisited"] = Def.LinkColorUnvisited;
+					Session["LinkColorVisited"] = Def.LinkColorVisited;
+					Session["LinkColorHot"] = Def.LinkColorHot;
 
 					foreach (KeyValuePair<string, string> P in Def.GetCustomProperties())
 						Session[P.Key] = P.Value;

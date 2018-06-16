@@ -13,3 +13,8 @@
     xhttp.open("POST", "/Settings/ConfigComplete", true);
     xhttp.send("");
 }
+
+function Ok()
+{
+    window.history.back();
+}

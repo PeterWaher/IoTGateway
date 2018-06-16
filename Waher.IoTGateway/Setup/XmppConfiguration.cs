@@ -70,8 +70,6 @@ namespace Waher.IoTGateway.Setup
 		private bool pep = false;
 
 		private XmppClient client = null;
-		private HttpResource connectToHost = null;
-		private HttpResource randomizePassword = null;
 		private bool createAccount = false;
 
 		/// <summary>
@@ -352,40 +350,15 @@ namespace Waher.IoTGateway.Setup
 		}
 
 		/// <summary>
-		/// Waits for the user to provide configuration.
+		/// Initializes the setup object.
 		/// </summary>
 		/// <param name="WebServer">Current Web Server object.</param>
-		public override Task SetupConfiguration(HttpServer WebServer)
+		public override Task InitSetup(HttpServer WebServer)
 		{
-			Task Result = base.SetupConfiguration(WebServer);
+			WebServer.Register("/Settings/ConnectToHost", null, this.ConnectToHost, true, false, true);
+			WebServer.Register("/Settings/RandomizePassword", null, this.RandomizePassword, true, false, true);
 
-			this.connectToHost = WebServer.Register("/Settings/ConnectToHost", null, this.ConnectToHost, true, false, true);
-			this.randomizePassword = WebServer.Register("/Settings/RandomizePassword", null, this.RandomizePassword, true, false, true);
-
-			return Result;
-		}
-
-		/// <summary>
-		/// Cleans up after configuration has been performed.
-		/// </summary>
-		/// <param name="WebServer">Current Web Server object.</param>
-		public override Task CleanupAfterConfiguration(HttpServer WebServer)
-		{
-			Task Result = base.CleanupAfterConfiguration(WebServer);
-
-			if (this.connectToHost != null)
-			{
-				WebServer.Unregister(this.connectToHost);
-				this.connectToHost = null;
-			}
-
-			if (this.randomizePassword != null)
-			{
-				WebServer.Unregister(this.randomizePassword);
-				this.randomizePassword = null;
-			}
-
-			return Result;
+			return Task.CompletedTask;
 		}
 
 		private void ConnectToHost(HttpRequest Request, HttpResponse Response)
@@ -474,6 +447,8 @@ namespace Waher.IoTGateway.Setup
 
 		private void RandomizePassword(HttpRequest Request, HttpResponse Response)
 		{
+			Gateway.AssertUserAuthenticated(Request);
+
 			Response.StatusCode = 200;
 			Response.ContentType = "text/plain";
 			Response.Write(Hashes.BinaryToString(Gateway.NextBytes(32)));
@@ -573,6 +548,7 @@ namespace Waher.IoTGateway.Setup
 							this.client = null;
 
 							this.Step = 1;
+							this.Updated = DateTime.Now;
 							await Database.Update(this);
 							return;
 						}
@@ -681,6 +657,7 @@ namespace Waher.IoTGateway.Setup
 						this.client = null;
 
 						this.Step = 2;
+						this.Updated = DateTime.Now;
 						await Database.Update(this);
 						return;
 

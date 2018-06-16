@@ -1060,7 +1060,7 @@
 							<Directory Id='CactusRose' Name='CactusRose'>
 								<Component Id='CactusRoseFiles' Guid='2A32B513-9572-4804-951F-581AF6FE023F'>
 									<RemoveFolder Id='RemoveCactusRose' On='uninstall' />
-									<File Id='CactusRose.css' Name='CactusRose.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\CactusRose\CactusRose.css'/>
+									<File Id='CactusRose.cssx' Name='CactusRose.cssx' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\CactusRose\CactusRose.cssx'/>
 									<File Id='CactusRose.xml' Name='CactusRose.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\CactusRose\CactusRose.xml'/>
 									<File Id='CactusRose.png' Name='CactusRose.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\CactusRose\CactusRose.png'/>
 									<File Id='CactusRoseBanner1400x425.png' Name='CactusRoseBanner1400x425.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\CactusRose\CactusRoseBanner1400x425.png' KeyPath='yes'/>
@@ -1069,7 +1069,7 @@
 									<File Id='CactusRose800x800.png' Name='CactusRose800x800.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\CactusRose\CactusRose800x800.png'/>
 									<File Id='CactusRose1600x1600Dimmed.png' Name='CactusRose1600x1600Dimmed.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\CactusRose\CactusRose1600x1600Dimmed.png'/>
 									<File Id='CactusRose1600x1600.png' Name='CactusRose1600x1600.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\CactusRose\CactusRose1600x1600.png'/>
-									<RemoveFile Id='RemoveCactusRose.css' Name='CactusRose.css' On='uninstall'/>
+									<RemoveFile Id='RemoveCactusRose.cssx' Name='CactusRose.cssx' On='uninstall'/>
 									<RemoveFile Id='RemoveCactusRose.xml' Name='CactusRose.xml' On='uninstall'/>
 									<RemoveFile Id='RemoveCactusRose.png' Name='CactusRose.png' On='uninstall'/>
 									<RemoveFile Id='RemoveCactusRoseBanner1400x425.png' Name='CactusRoseBanner1400x425.png' On='uninstall'/>
@@ -1083,7 +1083,7 @@
 							<Directory Id='GothicPeacock' Name='GothicPeacock'>
 								<Component Id='GothicPeacockFiles' Guid='4DD1B1AD-1AAF-444C-A46B-E5C612BB2883'>
 									<RemoveFolder Id='RemoveGothicPeacock' On='uninstall' />
-									<File Id='GothicPeacock.css' Name='GothicPeacock.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\GothicPeacock\GothicPeacock.css'/>
+									<File Id='GothicPeacock.cssx' Name='GothicPeacock.cssx' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\GothicPeacock\GothicPeacock.cssx'/>
 									<File Id='GothicPeacock.xml' Name='GothicPeacock.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\GothicPeacock\GothicPeacock.xml'/>
 									<File Id='GothicPeacock.png' Name='GothicPeacock.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\GothicPeacock\GothicPeacock.png'/>
 									<File Id='GothicPeacockBanner1400x425.png' Name='GothicPeacockBanner1400x425.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\GothicPeacock\GothicPeacockBanner1400x425.png' KeyPath='yes'/>
@@ -1092,7 +1092,7 @@
 									<File Id='GothicPeacock800x800.png' Name='GothicPeacock800x800.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\GothicPeacock\GothicPeacock800x800.png'/>
 									<File Id='GothicPeacock1600x1600Dimmed.png' Name='GothicPeacock1600x1600Dimmed.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\GothicPeacock\GothicPeacock1600x1600Dimmed.png'/>
 									<File Id='GothicPeacock1600x1600.png' Name='GothicPeacock1600x1600.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\GothicPeacock\GothicPeacock1600x1600.png'/>
-									<RemoveFile Id='RemoveGothicPeacock.css' Name='GothicPeacock.css' On='uninstall'/>
+									<RemoveFile Id='RemoveGothicPeacock.cssx' Name='GothicPeacock.cssx' On='uninstall'/>
 									<RemoveFile Id='RemoveGothicPeacock.xml' Name='GothicPeacock.xml' On='uninstall'/>
 									<RemoveFile Id='RemoveGothicPeacock.png' Name='GothicPeacock.png' On='uninstall'/>
 									<RemoveFile Id='RemoveGothicPeacockBanner1400x425.png' Name='GothicPeacockBanner1400x425.png' On='uninstall'/>

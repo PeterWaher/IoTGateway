@@ -23,8 +23,6 @@ namespace Waher.IoTGateway.Setup
 
 		private string themeId = string.Empty;
 
-		private HttpResource setTheme = null;
-
 		/// <summary>
 		/// Current instance of configuration.
 		/// </summary>
@@ -73,13 +71,16 @@ namespace Waher.IoTGateway.Setup
 		/// <summary>
 		/// Initializes the setup object.
 		/// </summary>
-		public override async Task InitSetup()
+		/// <param name="WebServer">Current Web Server object.</param>
+		public override async Task InitSetup(HttpServer WebServer)
 		{
+			this.themeId = "CactusRose";
+
 			XmlSchema Schema = XSL.LoadSchema(typeof(Gateway).Namespace + ".Schema.Theme.xsd", typeof(Gateway).Assembly);
 			string ThemesFolder = Path.Combine(Gateway.AppDataFolder, "Root", "Themes");
 			ThemeDefinition Def;
 
-			await base.InitSetup();
+			await base.InitSetup(WebServer);
 
 			if (Directory.Exists(ThemesFolder))
 			{
@@ -129,7 +130,10 @@ namespace Waher.IoTGateway.Setup
 			}
 
 			if (Update)
+			{
+				this.Updated = DateTime.Now;
 				await Database.Update(this);
+			}
 
 			if (!string.IsNullOrEmpty(this.themeId) && themeDefinitions.TryGetValue(this.themeId, out Def))
 				Theme.CurrerntTheme = Def;
@@ -143,36 +147,8 @@ namespace Waher.IoTGateway.Setup
 					break;
 				}
 			}
-		}
 
-		/// <summary>
-		/// Waits for the user to provide configuration.
-		/// </summary>
-		/// <param name="WebServer">Current Web Server object.</param>
-		public override Task SetupConfiguration(HttpServer WebServer)
-		{
-			Task Result = base.SetupConfiguration(WebServer);
-
-			this.setTheme = WebServer.Register("/Settings/SetTheme", null, this.SetTheme, true, false, true);
-
-			return Result;
-		}
-
-		/// <summary>
-		/// Cleans up after configuration has been performed.
-		/// </summary>
-		/// <param name="WebServer">Current Web Server object.</param>
-		public override Task CleanupAfterConfiguration(HttpServer WebServer)
-		{
-			Task Result = base.CleanupAfterConfiguration(WebServer);
-
-			if (this.setTheme != null)
-			{
-				WebServer.Unregister(this.setTheme);
-				this.setTheme = null;
-			}
-
-			return Result;
+			WebServer.Register("/Settings/SetTheme", null, this.SetTheme, true, false, true);
 		}
 
 		private void SetTheme(HttpRequest Request, HttpResponse Response)
@@ -209,6 +185,7 @@ namespace Waher.IoTGateway.Setup
 				if (this.Step <= 0)
 					this.Step = 1;
 
+				this.Updated = DateTime.Now;
 				await Database.Update(this);
 
 				ClientEvents.PushEvent(new string[] { TabID }, "ThemeOk", JSON.Encode(new KeyValuePair<string, object>[]

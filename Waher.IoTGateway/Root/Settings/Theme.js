@@ -38,14 +38,30 @@ function ThemeOk(Data)
     Loop = document.head.firstChild;
     while (Loop !== null)
     {
-        if (Loop.tagName === "LINK" && Loop.rel === "stylesheet" && Loop.href.indexOf("/Themes") >= 0)
+        if (Loop.tagName === "LINK" && Loop.rel === "stylesheet")
         {
-            Loop.href = Data.cssUrl;
-            break;
+            if (Loop.href.indexOf("/Themes") >= 0)
+                Loop.href = Data.cssUrl;
+            else
+            {
+                var s = Loop.href;
+                var i = s.indexOf("?");
+
+                if (i >= 0)
+                    s = s.substring(0, i);
+
+                var TP = new Date();
+
+                s += "?q=" + TP.getFullYear() + "-" + TP.getMonth() + "-" + TP.getDay() + "T" + TP.getHours() + ":" + TP.getMinutes() + ":" + TP.getSeconds() + "." + TP.getMilliseconds();
+
+                Loop.href = s;
+            }
         }
 
         Loop = Loop.nextSibling;
     }
 
-    document.getElementById("NextButton").style.display = "inline-block";
+    var NextButton = document.getElementById("NextButton");
+    if (NextButton !== null)
+        NextButton.style.display = "inline-block";
 }

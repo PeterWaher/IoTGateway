@@ -24,8 +24,11 @@ namespace Waher.IoTGateway.Setup
 		private SKColor headerTextColor;
 		private SKColor buttonColor;
 		private SKColor buttonTextColor;
-		private SKColor linkColor;
+		private SKColor menuTextColor;
 		private SKColor editColor;
+		private SKColor linkColorUnvisited;
+		private SKColor linkColorVisited;
+		private SKColor linkColorHot;
 
 		/// <summary>
 		/// Contains properties for a theme.
@@ -93,14 +96,29 @@ namespace Waher.IoTGateway.Setup
 												this.buttonTextColor = cl;
 											break;
 
-										case "LinkColor":
+										case "MenuTextColor":
 											if (Color.TryParse(E2.InnerText, out cl))
-												this.linkColor = cl;
+												this.menuTextColor = cl;
 											break;
 
 										case "EditColor":
 											if (Color.TryParse(E2.InnerText, out cl))
 												this.editColor = cl;
+											break;
+
+										case "LinkColorUnvisited":
+											if (Color.TryParse(E2.InnerText, out cl))
+												this.linkColorUnvisited = cl;
+											break;
+
+										case "LinkColorVisited":
+											if (Color.TryParse(E2.InnerText, out cl))
+												this.linkColorVisited = cl;
+											break;
+
+										case "LinkColorHot":
+											if (Color.TryParse(E2.InnerText, out cl))
+												this.linkColorHot = cl;
 											break;
 									}
 								}
@@ -132,6 +150,11 @@ namespace Waher.IoTGateway.Setup
 		public string this[string key] => this.customProperties[key];
 
 		/// <summary>
+		/// Tag representing when the theme configuation was updated.
+		/// </summary>
+		public string Updated => ThemeConfiguration.Instance.Updated.Ticks.ToString();
+
+		/// <summary>
 		/// ID of the theme.
 		/// </summary>
 		public string Id => this.id;
@@ -159,7 +182,7 @@ namespace Waher.IoTGateway.Setup
 		/// <summary>
 		/// Resource of the CSSX file of the theme
 		/// </summary>
-		public string CSSX => this.cssx;
+		public string CSSX => this.cssx + "?q=" + this.Updated;
 
 		/// <summary>
 		/// Color for text headers.
@@ -182,14 +205,29 @@ namespace Waher.IoTGateway.Setup
 		public SKColor ButtonTextColor => this.buttonTextColor;
 
 		/// <summary>
-		/// Text color for links.
+		/// Text color for links in the menu.
 		/// </summary>
-		public SKColor LinkColor => this.linkColor;
+		public SKColor MenuTextColor => this.menuTextColor;
 
 		/// <summary>
 		/// Backgound color for edited text.
 		/// </summary>
 		public SKColor EditColor => this.editColor;
+
+		/// <summary>
+		/// Color of unvisited links.
+		/// </summary>
+		public SKColor LinkColorUnvisited => this.linkColorUnvisited;
+
+		/// <summary>
+		/// Color of visited links.
+		/// </summary>
+		public SKColor LinkColorVisited => this.linkColorVisited;
+
+		/// <summary>
+		/// Color of hot links.
+		/// </summary>
+		public SKColor LinkColorHot => this.linkColorHot;
 
 		/// <summary>
 		/// Gets defined custom properties.

@@ -39,10 +39,6 @@ namespace Waher.IoTGateway.Setup
 		private bool customCA = false;
 		private bool acceptToS = false;
 
-		private HttpResource testNames = null;
-		private HttpResource testName = null;
-		private HttpResource testCA = null;
-		private HttpResource acmeChallenge = null;
 		private string challenge = string.Empty;
 		private string token = string.Empty;
 
@@ -224,65 +220,17 @@ namespace Waher.IoTGateway.Setup
 		}
 
 		/// <summary>
-		/// Waits for the user to provide configuration.
+		/// Initializes the setup object.
 		/// </summary>
 		/// <param name="WebServer">Current Web Server object.</param>
-		public override Task SetupConfiguration(HttpServer WebServer)
+		public override Task InitSetup(HttpServer WebServer)
 		{
-			Task Result = base.SetupConfiguration(WebServer);
+			WebServer.Register("/Settings/TestDomainNames", null, this.TestDomainNames, true, false, true);
+			WebServer.Register("/Settings/TestDomainName", this.TestDomainName, true, false, true);
+			WebServer.Register("/Settings/TestCA", null, this.TestCA, true, false, true);
+			WebServer.Register("/.well-known/acme-challenge", this.AcmeChallenge, true, true, true);
 
-			this.testNames = WebServer.Register("/Settings/TestDomainNames", null, this.TestDomainNames, true, false, true);
-			this.testName = WebServer.Register("/Settings/TestDomainName", this.TestDomainName, true, false, true);
-			this.testCA = WebServer.Register("/Settings/TestCA", null, this.TestCA, true, false, true);
-
-			this.RegisterAcmeChallenge(WebServer);
-
-			return Result;
-		}
-
-		internal void RegisterAcmeChallenge(HttpServer WebServer)
-		{
-			this.acmeChallenge = WebServer.Register("/.well-known/acme-challenge", this.AcmeChallenge, true, true, true);
-		}
-
-		internal void UnregisterAcmeChallenge(HttpServer WebServer)
-		{
-			if (this.acmeChallenge != null)
-			{
-				WebServer.Unregister(this.acmeChallenge);
-				this.acmeChallenge = null;
-			}
-		}
-
-		/// <summary>
-		/// Cleans up after configuration has been performed.
-		/// </summary>
-		/// <param name="WebServer">Current Web Server object.</param>
-		public override Task CleanupAfterConfiguration(HttpServer WebServer)
-		{
-			Task Result = base.CleanupAfterConfiguration(WebServer);
-
-			if (this.testNames != null)
-			{
-				WebServer.Unregister(this.testNames);
-				this.testNames = null;
-			}
-
-			if (this.testName != null)
-			{
-				WebServer.Unregister(this.testName);
-				this.testName = null;
-			}
-
-			if (this.testCA != null)
-			{
-				WebServer.Unregister(this.testCA);
-				this.testCA = null;
-			}
-
-			this.UnregisterAcmeChallenge(WebServer);
-
-			return Result;
+			return Task.CompletedTask;
 		}
 
 		private void TestDomainNames(HttpRequest Request, HttpResponse Response)
@@ -361,6 +309,7 @@ namespace Waher.IoTGateway.Setup
 				if (this.Step < 1)
 					this.Step = 1;
 
+				this.Updated = DateTime.Now;
 				await Database.Update(this);
 
 				ClientEvents.PushEvent(new string[] { TabID }, "NamesOK", string.Empty, false);
@@ -904,6 +853,7 @@ namespace Waher.IoTGateway.Setup
 						if (this.Step < 2)
 							this.Step = 2;
 
+						this.Updated = DateTime.Now;
 						await Database.Update(this);
 
 						ClientEvents.PushEvent(new string[] { TabID }, "CertificateOk", string.Empty, false);

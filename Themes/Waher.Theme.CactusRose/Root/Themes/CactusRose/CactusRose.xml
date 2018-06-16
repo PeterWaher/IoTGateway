@@ -2,7 +2,7 @@
 <Theme id="CactusRose" xmlns="http://waher.se/Schema/Theme.xsd">
 	<Presentation>
 		<Title>Cactus Rose</Title>
-		<Thumbnail width="320" height="180">CactusRose.png</Thumbnail>
+		<Thumbnail width="480" height="270">CactusRose.png</Thumbnail>
 	</Presentation>
 	<BasicProperties>
 		<CSSX>CactusRose.cssx</CSSX>
@@ -10,8 +10,11 @@
 		<HeaderTextColor>#FFFFFF</HeaderTextColor>
 		<ButtonColor>#4CAF50</ButtonColor>
 		<ButtonTextColor>#FFFFFF</ButtonTextColor>
-		<LinkColor>#FFFFFF</LinkColor>
+		<MenuTextColor>#FFFFFF</MenuTextColor>
 		<EditColor>#FFFF00</EditColor>
+		<LinkColorUnvisited>#3187B9</LinkColorUnvisited>
+		<LinkColorVisited>#25658B</LinkColorVisited>
+		<LinkColorHot>#4CAF50</LinkColorHot>
 	</BasicProperties>
 	<CustomProperties>
 	</CustomProperties>

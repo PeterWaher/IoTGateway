@@ -144,6 +144,7 @@ namespace Waher.IoTGateway
 		private static bool immediateReconnect;
 		private static bool consoleOutput;
 		private static bool loopbackIntefaceAvailable;
+		private static bool configuring = false;
 
 		#region Life Cycle
 
@@ -337,6 +338,8 @@ namespace Waher.IoTGateway
 
 				if (!Configured)
 				{
+					configuring = true;
+
 					if (loopbackIntefaceAvailable)
 						Log.Notice("System needs to be configured. This is done by navigating to the loopback interface using a browser on this machine.");
 					else
@@ -367,7 +370,9 @@ namespace Waher.IoTGateway
 				foreach (SystemConfiguration Configuration in Configurations)
 				{
 					Configuration.SetStaticInstance(Configuration);
-					await Configuration.InitSetup();
+
+					if (webServer != null)
+						await Configuration.InitSetup(webServer);
 				}
 
 				foreach (SystemConfiguration Configuration in Configurations)
@@ -392,6 +397,8 @@ namespace Waher.IoTGateway
 						await Configuration.CleanupAfterConfiguration(webServer);
 				}
 
+				configuring = false;
+
 				foreach (XmlNode N in Config.DocumentElement["Ports"].ChildNodes)
 				{
 					if (N.LocalName == "Port")
@@ -413,6 +420,9 @@ namespace Waher.IoTGateway
 					webServer = new HttpServer(GetConfigPorts("HTTP"), GetConfigPorts("HTTPS"), certificate);
 				else
 					webServer = new HttpServer(GetConfigPorts("HTTP"), null, null);
+
+				foreach (SystemConfiguration Configuration in Configurations)
+					await Configuration.InitSetup(webServer);
 
 				Types.SetModuleParameter("HTTP", webServer);
 
@@ -1128,6 +1138,14 @@ namespace Waher.IoTGateway
 		}
 
 		/// <summary>
+		/// If the gateway is being configured.
+		/// </summary>
+		public static bool Configuring
+		{
+			get { return configuring; }
+		}
+
+		/// <summary>
 		/// Gets the port numbers defined for a given protocol in the configuration file.
 		/// </summary>
 		/// <param name="Protocol">Protocol.</param>
@@ -1360,6 +1378,7 @@ namespace Waher.IoTGateway
 				XmppConfiguration.Instance.Password = PasswordHash;
 				XmppConfiguration.Instance.PasswordType = PasswordHashMethod;
 
+				XmppConfiguration.Instance.Updated = DateTime.Now;
 				await Database.Update(XmppConfiguration.Instance);
 			}
 

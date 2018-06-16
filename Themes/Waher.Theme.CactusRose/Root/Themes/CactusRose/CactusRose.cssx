@@ -81,7 +81,7 @@ nav > ul > li:first-child
 nav > ul > li > a
 {
     display: block;
-    color: ¤LinkColor¤;
+    color: ¤MenuTextColor¤;
     text-align: center;
     padding: 0.9em 1em;
     text-decoration: none;
@@ -103,7 +103,7 @@ footer
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
-    color: white;
+    color: ¤MenuTextColor¤;
     padding:0.6em;
     position: fixed;
     bottom: 0;
@@ -354,8 +354,24 @@ h9::before
     visibility: hidden;
 }
 
-a
+section a:link
 {
+    color: ¤LinkColorUnvisited¤;
+}
+
+section a:visited
+{
+    color: ¤LinkColorVisited¤;
+}
+
+section a:hover
+{
+    color: ¤LinkColorHot¤;
+}
+
+section a:active
+{
+    color: ¤LinkColorHot¤;
 }
 
 em

@@ -150,11 +150,6 @@ namespace Waher.IoTGateway.Setup
 		public string this[string key] => this.customProperties[key];
 
 		/// <summary>
-		/// Tag representing when the theme configuation was updated.
-		/// </summary>
-		public string Updated => ThemeConfiguration.Instance.Updated.Ticks.ToString();
-
-		/// <summary>
 		/// ID of the theme.
 		/// </summary>
 		public string Id => this.id;
@@ -182,7 +177,7 @@ namespace Waher.IoTGateway.Setup
 		/// <summary>
 		/// Resource of the CSSX file of the theme
 		/// </summary>
-		public string CSSX => this.cssx + "?q=" + this.Updated;
+		public string CSSX => this.cssx;
 
 		/// <summary>
 		/// Color for text headers.

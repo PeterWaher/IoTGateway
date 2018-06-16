@@ -7,7 +7,7 @@ Master: Master.md
 JavaScript: /Events.js
 JavaScript: /Settings/XMPP.js
 JavaScript: /Settings/Next.js
-CSS: /Settings/Config.cssx?q={{Theme.Updated}}
+CSS: /Settings/Config.cssx
 UserVariable: User
 Login: /Login.md
 

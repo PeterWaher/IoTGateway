@@ -24,6 +24,14 @@ namespace Waher.IoTGateway.Setup
 		private string themeId = string.Empty;
 
 		/// <summary>
+		/// Theme Configuration
+		/// </summary>
+		public ThemeConfiguration()
+			: base()
+		{
+		}
+
+		/// <summary>
 		/// Current instance of configuration.
 		/// </summary>
 		public static ThemeConfiguration Instance => instance;
@@ -74,13 +82,13 @@ namespace Waher.IoTGateway.Setup
 		/// <param name="WebServer">Current Web Server object.</param>
 		public override async Task InitSetup(HttpServer WebServer)
 		{
-			this.themeId = "CactusRose";
-
 			XmlSchema Schema = XSL.LoadSchema(typeof(Gateway).Namespace + ".Schema.Theme.xsd", typeof(Gateway).Assembly);
 			string ThemesFolder = Path.Combine(Gateway.AppDataFolder, "Root", "Themes");
 			ThemeDefinition Def;
 
 			await base.InitSetup(WebServer);
+
+			WebServer.ETagSalt = this.Updated.Ticks.ToString();
 
 			if (Directory.Exists(ThemesFolder))
 			{
@@ -187,6 +195,8 @@ namespace Waher.IoTGateway.Setup
 
 				this.Updated = DateTime.Now;
 				await Database.Update(this);
+
+				Gateway.HttpServer.ETagSalt = this.Updated.Ticks.ToString();
 
 				ClientEvents.PushEvent(new string[] { TabID }, "ThemeOk", JSON.Encode(new KeyValuePair<string, object>[]
 					{

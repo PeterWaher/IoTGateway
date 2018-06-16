@@ -191,7 +191,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
-      <Version>6.0.8</Version>
+      <Version>6.1.5</Version>
     </PackageReference>
     <PackageReference Include="SkiaSharp">
       <Version>1.60.1</Version>

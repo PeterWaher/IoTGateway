@@ -1,9 +1,9 @@
 ﻿{
   "dependencies": {
-    "Microsoft.ApplicationInsights": "2.5.1",
+    "Microsoft.ApplicationInsights": "2.6.4",
     "Microsoft.ApplicationInsights.PersistenceChannel": "1.2.3",
     "Microsoft.ApplicationInsights.WindowsApps": "1.1.1",
-    "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.8",
+    "Microsoft.NETCore.UniversalWindowsPlatform": "6.1.5",
     "Windows-Remote-Arduino": "1.4.0"
   },
   "frameworks": {

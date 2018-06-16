@@ -19,13 +19,14 @@ namespace Waher.Networking.HTTP
 	{
 		private const int BufferSize = 32768;
 
+		private readonly Dictionary<string, CacheRec> cacheInfo = new Dictionary<string, CacheRec>();
 		private Dictionary<string, bool> allowTypeConversionFrom = null;
-		private HttpAuthenticationScheme[] authenticationSchemes;
+		private readonly HttpAuthenticationScheme[] authenticationSchemes;
+		private readonly bool allowPut;
+		private readonly bool allowDelete;
+		private readonly bool anonymousGET;
+		private readonly bool userSessions;
 		private string folderPath;
-		private bool allowPut;
-		private bool allowDelete;
-		private bool anonymousGET;
-		private bool userSessions;
 
 		/// <summary>
 		/// Publishes an embedded resource through HTTP GET.
@@ -72,51 +73,27 @@ namespace Waher.Networking.HTTP
 		/// <summary>
 		/// If the resource handles sub-paths.
 		/// </summary>
-		public override bool HandlesSubPaths
-		{
-			get { return true; }
-		}
+		public override bool HandlesSubPaths => true;
 
 		/// <summary>
 		/// If the resource uses user sessions.
 		/// </summary>
-		public override bool UserSessions
-		{
-			get { return this.userSessions; }
-		}
+		public override bool UserSessions => this.userSessions;
 
 		/// <summary>
 		/// If the GET method is allowed.
 		/// </summary>
-		public bool AllowsGET
-		{
-			get
-			{
-				return true;
-			}
-		}
+		public bool AllowsGET => true;
 
 		/// <summary>
 		/// If the PUT method is allowed.
 		/// </summary>
-		public bool AllowsPUT
-		{
-			get
-			{
-				return this.allowPut;
-			}
-		}
+		public bool AllowsPUT => this.allowPut;
 
 		/// <summary>
 		/// If the DELETE method is allowed.
 		/// </summary>
-		public bool AllowsDELETE
-		{
-			get
-			{
-				return this.allowDelete;
-			}
-		}
+		public bool AllowsDELETE => this.allowDelete;
 
 		/// <summary>
 		/// Any authentication schemes used to authenticate users before access is granted to the corresponding resource.
@@ -180,8 +157,6 @@ namespace Waher.Networking.HTTP
 		{
 			return this.folderPath + WebUtility.UrlDecode(Request.SubPath).Replace('/', Path.DirectorySeparatorChar);
 		}
-
-		private Dictionary<string, CacheRec> cacheInfo = new Dictionary<string, CacheRec>();
 
 		private class CacheRec
 		{
@@ -292,7 +267,7 @@ namespace Waher.Networking.HTTP
 
 				using (FileStream fs = File.OpenRead(FullPath))
 				{
-					Rec.ETag = Hashes.ComputeSHA1HashString(fs);
+					Rec.ETag = this.ComputeETag(fs);
 				}
 
 				lock (this.cacheInfo)
@@ -855,5 +830,36 @@ namespace Waher.Networking.HTTP
 				this.allowTypeConversionFrom = List;
 			}
 		}
+
+		/// <summary>
+		/// Method called when a resource has been registered on a server.
+		/// </summary>
+		/// <param name="Server">Server</param>
+		public override void AddReference(HttpServer Server)
+		{
+			base.AddReference(Server);
+
+			Server.ETagSaltChanged += Server_ETagSaltChanged;
+		}
+
+		/// <summary>
+		/// Method called when a resource has been unregistered from a server.
+		/// </summary>
+		/// <param name="Server">Server</param>
+		public override bool RemoveReference(HttpServer Server)
+		{
+			Server.ETagSaltChanged -= Server_ETagSaltChanged;
+
+			return base.RemoveReference(Server);
+		}
+
+		private void Server_ETagSaltChanged(object sender, EventArgs e)
+		{
+			lock (this.cacheInfo)
+			{
+				this.cacheInfo.Clear();
+			}
+		}
+
 	}
 }

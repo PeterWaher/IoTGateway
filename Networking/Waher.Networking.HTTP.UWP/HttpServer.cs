@@ -78,6 +78,7 @@ namespace Waher.Networking.HTTP
 		private Dictionary<string, Statistic> callsPerResource = new Dictionary<string, Statistic>();
 		private readonly Dictionary<int, bool> failedPorts = new Dictionary<int, bool>();
 		private DateTime lastStat = DateTime.MinValue;
+		private string eTagSalt = string.Empty;
 		private long nrBytesRx = 0;
 		private long nrBytesTx = 0;
 		private long nrCalls = 0;
@@ -354,6 +355,35 @@ namespace Waher.Networking.HTTP
 			}
 		}
 
+		/// <summary>
+		/// Salt value used when calculating ETag values.
+		/// </summary>
+		public string ETagSalt
+		{
+			get { return this.eTagSalt; }
+			set
+			{
+				if (this.eTagSalt != value)
+				{
+					this.eTagSalt = value;
+
+					try
+					{
+						this.ETagSaltChanged?.Invoke(this, new EventArgs());
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
+				}
+			}
+		}
+
+		/// <summary>
+		/// Event raised when the <see cref="ETagSalt"/> value has changed.
+		/// </summary>
+		public event EventHandler ETagSaltChanged = null;
+
 		private int[] GetPorts(bool Http, bool Https)
 		{
 			SortedDictionary<int, bool> Open = new SortedDictionary<int, bool>();
@@ -566,6 +596,8 @@ namespace Waher.Networking.HTTP
 				else
 					throw new Exception("Resource name already registered.");
 			}
+
+			Resource.AddReference(this);
 		}
 
 		/// <summary>
@@ -702,13 +734,14 @@ namespace Waher.Networking.HTTP
 			lock (this.resources)
 			{
 				if (this.resources.TryGetValue(Resource.ResourceName, out HttpResource Resource2) && Resource2 == Resource)
-				{
 					this.resources.Remove(Resource.ResourceName);
-					return true;
-				}
 				else
 					return false;
 			}
+
+			Resource.RemoveReference(this);
+
+			return true;
 		}
 
 		/// <summary>

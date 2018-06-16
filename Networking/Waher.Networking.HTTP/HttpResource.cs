@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Security.Cryptography;
+using System.IO;
 using System.Text;
 using Waher.Networking.HTTP.HeaderFields;
 using Waher.Script;
@@ -21,17 +21,19 @@ namespace Waher.Networking.HTTP
 	/// </summary>
 	public abstract class HttpResource
 	{
-		private string[] allowedMethods;
-		private IHttpGetMethod get;
-		private IHttpGetRangesMethod getRanges;
-		private IHttpPostMethod post;
-		private IHttpPostRangesMethod postRanges;
-		private IHttpPutMethod put;
-		private IHttpPutRangesMethod putRanges;
-		private IHttpDeleteMethod delete;
-		private IHttpOptionsMethod options;
-		private IHttpTraceMethod trace;
-		private string resourceName;
+		private readonly List<HttpServer> servers = new List<HttpServer>();
+		private readonly string[] allowedMethods;
+		private readonly IHttpGetMethod get;
+		private readonly IHttpGetRangesMethod getRanges;
+		private readonly IHttpPostMethod post;
+		private readonly IHttpPostRangesMethod postRanges;
+		private readonly IHttpPutMethod put;
+		private readonly IHttpPutRangesMethod putRanges;
+		private readonly IHttpDeleteMethod delete;
+		private readonly IHttpOptionsMethod options;
+		private readonly IHttpTraceMethod trace;
+		private readonly string resourceName;
+		private HttpServer[] serversStatic = new HttpServer[0];
 
 		/// <summary>
 		/// Base class for all HTTP resources.
@@ -77,6 +79,37 @@ namespace Waher.Networking.HTTP
 		}
 
 		/// <summary>
+		/// Method called when a resource has been registered on a server.
+		/// </summary>
+		/// <param name="Server">Server</param>
+		public virtual void AddReference(HttpServer Server)
+		{
+			lock (this.servers)
+			{
+				this.servers.Add(Server);
+				this.serversStatic = this.servers.ToArray();
+			}
+		}
+
+		/// <summary>
+		/// Method called when a resource has been unregistered from a server.
+		/// </summary>
+		/// <param name="Server">Server</param>
+		public virtual bool RemoveReference(HttpServer Server)
+		{
+			lock (this.servers)
+			{
+				if (this.servers.Remove(Server))
+				{
+					this.serversStatic = this.servers.ToArray();
+					return true;
+				}
+				else
+					return false;
+			}
+		}
+
+		/// <summary>
 		/// Name of resource.
 		/// </summary>
 		public string ResourceName
@@ -101,13 +134,13 @@ namespace Waher.Networking.HTTP
 			get;
 		}
 
-        /// <summary>
-        /// If the resource uses user sessions.
-        /// </summary>
-        public abstract bool UserSessions
-        {
-            get;
-        }
+		/// <summary>
+		/// If the resource uses user sessions.
+		/// </summary>
+		public abstract bool UserSessions
+		{
+			get;
+		}
 
 		/// <summary>
 		/// Array of allowed methods.
@@ -115,6 +148,56 @@ namespace Waher.Networking.HTTP
 		public string[] AllowedMethods
 		{
 			get { return this.allowedMethods; }
+		}
+
+		/// <summary>
+		/// Salt value used when calculating ETag values.
+		/// </summary>
+		public string ETagSalt
+		{
+			get
+			{
+				HttpServer[] Servers = this.serversStatic;
+
+				switch (Servers.Length)
+				{
+					case 0:
+						return null;
+
+					case 1:
+						return Servers[0].ETagSalt;
+
+					default:
+						StringBuilder sb = new StringBuilder();
+						string s;
+
+						foreach (HttpServer Server in Servers)
+						{
+							s = Server.ETagSalt;
+							if (!string.IsNullOrEmpty(s))
+								sb.Append(s);
+						}
+
+						return sb.ToString();
+				}
+			}
+		}
+
+		/// <summary>
+		/// Computes an ETag value for a resource.
+		/// </summary>
+		/// <param name="fs">Stream containing data of resource.</param>
+		/// <returns>ETag value.</returns>
+		public string ComputeETag(Stream fs)
+		{
+			string ETag = Hashes.ComputeSHA1HashString(fs);
+			fs.Position = 0;
+
+			string Salt = this.ETagSalt;
+			if (!string.IsNullOrEmpty(Salt))
+				ETag = Hashes.ComputeSHA1HashString(Encoding.UTF8.GetBytes(ETag + Salt));
+
+			return ETag;
 		}
 
 		/// <summary>
@@ -133,7 +216,7 @@ namespace Waher.Networking.HTTP
 		/// interfaces <see cref="IHttpGetMethod"/>, <see cref="IHttpPostMethod"/>, <see cref="IHttpPutMethod"/> and <see cref="IHttpDeleteMethod"/>
 		/// if they are defined for the resource.
 		/// </summary>
-        /// <param name="Server">HTTP Server</param>
+		/// <param name="Server">HTTP Server</param>
 		/// <param name="Request">HTTP Request</param>
 		/// <param name="Response">HTTP Response</param>
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
@@ -142,19 +225,19 @@ namespace Waher.Networking.HTTP
 			HttpRequestHeader Header = Request.Header;
 			string Method = Request.Header.Method;
 
-            if (this.UserSessions)
-            {
-                HttpFieldCookie Cookie;
-                string HttpSessionID;
+			if (this.UserSessions)
+			{
+				HttpFieldCookie Cookie;
+				string HttpSessionID;
 
-                if ((Cookie = Request.Header.Cookie) == null || string.IsNullOrEmpty(HttpSessionID = Cookie["HttpSessionID"]))
-                {
+				if ((Cookie = Request.Header.Cookie) == null || string.IsNullOrEmpty(HttpSessionID = Cookie["HttpSessionID"]))
+				{
 					HttpSessionID = System.Convert.ToBase64String(Hashes.ComputeSHA512Hash(Guid.NewGuid().ToByteArray()));
-                    Response.SetCookie(new HTTP.Cookie("HttpSessionID", HttpSessionID, null, "/", null, false, true));
-                }
+					Response.SetCookie(new HTTP.Cookie("HttpSessionID", HttpSessionID, null, "/", null, false, true));
+				}
 
-                Request.Session = Server.GetSession(HttpSessionID);
-            }
+				Request.Session = Server.GetSession(HttpSessionID);
+			}
 
 			switch (Method)
 			{

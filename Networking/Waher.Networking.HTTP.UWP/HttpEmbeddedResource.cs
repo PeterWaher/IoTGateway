@@ -15,11 +15,11 @@ namespace Waher.Networking.HTTP
 	{
 		private const int BufferSize = 32768;
 
-		private HttpAuthenticationScheme[] authenticationSchemes;
+		private readonly HttpAuthenticationScheme[] authenticationSchemes;
+		private readonly Assembly assembly;
+		private readonly string embeddedResourceName;
+		private readonly string contentType;
 		private string etag = null;
-		private string embeddedResourceName;
-		private string contentType;
-		private Assembly assembly;
 
 		/// <summary>
 		/// Publishes an embedded resource through HTTP GET.
@@ -111,10 +111,7 @@ namespace Waher.Networking.HTTP
 					throw new NotFoundException();
 
 				if (this.etag == null)
-				{
-					this.etag = Hashes.ComputeSHA1HashString(f);
-					f.Position = 0;
-				}
+					this.etag = this.ComputeETag(f);
 
 				if (Request.Header.IfNoneMatch != null && Request.Header.IfNoneMatch.Value == this.etag)
 					throw new NotModifiedException();
@@ -143,6 +140,33 @@ namespace Waher.Networking.HTTP
 					}
 				}
 			}
+		}
+
+		/// <summary>
+		/// Method called when a resource has been registered on a server.
+		/// </summary>
+		/// <param name="Server">Server</param>
+		public override void AddReference(HttpServer Server)
+		{
+			base.AddReference(Server);
+
+			Server.ETagSaltChanged += Server_ETagSaltChanged;
+		}
+
+		/// <summary>
+		/// Method called when a resource has been unregistered from a server.
+		/// </summary>
+		/// <param name="Server">Server</param>
+		public override bool RemoveReference(HttpServer Server)
+		{
+			Server.ETagSaltChanged -= Server_ETagSaltChanged;
+
+			return base.RemoveReference(Server);
+		}
+
+		private void Server_ETagSaltChanged(object sender, EventArgs e)
+		{
+			this.etag = null;
 		}
 	}
 }

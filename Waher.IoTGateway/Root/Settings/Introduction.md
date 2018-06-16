@@ -6,6 +6,8 @@ Copyright: /Copyright.md
 Master: Master.md
 JavaScript: /Events.js
 JavaScript: /Settings/Next.js
+UserVariable: User
+Login: /Login.md
 
 
 ========================================================================

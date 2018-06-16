@@ -274,8 +274,6 @@ namespace Waher.IoTGateway.Setup
 
 		private void TestDomainName(HttpRequest Request, HttpResponse Response)
 		{
-			Gateway.AssertUserAuthenticated(Request);
-
 			Response.StatusCode = 200;
 			Response.ContentType = "text/plain";
 			Response.Write(this.token);

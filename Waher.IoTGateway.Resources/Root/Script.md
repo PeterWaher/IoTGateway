@@ -1315,28 +1315,28 @@ of the physical quantity only. Example:
 
 All units can be prefixed by any of the following prefixes recognized by the script engine:
 
-| Prefix | Name | Scale   |
-|:------:|:-----|:-------:|
-| Y      | Yotta | 10^24  |
-| Z      | Zetta | 10^21  |
-| E      | Eta   | 10^18  |
-| P      | Peta  | 10^15  |
-| T      | Tera  | 10^12  |
-| G      | Giga  | 10^9   |
-| M      | Mega  | 10^6   |
-| k      | Kilo  | 10^3   |
-| h      | Hecto | 10^2   |
-| da     | Deka  | 10^1   |
-| d      | Deci  | 10^-1  |
-| c      | Centi | 10^-2  |
-| m      | Milli | 10^-3  |
-| µ, u   | Micro | 10^-6  |
-| n      | Nano  | 10^-9  |
-| p      | Pico  | 10^-12 |
-| f      | Femto | 10^-15 |
-| a      | Atto  | 10^-18 |
-| z      | Zepto | 10^-21 |
-| y      | Yocto | 10^-24 |
+| Prefix | Name | Scale     |
+|:------:|:-----|:---------:|
+| Y      | Yotta | 10^[24]  |
+| Z      | Zetta | 10^[21]  |
+| E      | Eta   | 10^[18]  |
+| P      | Peta  | 10^[15]  |
+| T      | Tera  | 10^[12]  |
+| G      | Giga  | 10^9     |
+| M      | Mega  | 10^6     |
+| k      | Kilo  | 10^3     |
+| h      | Hecto | 10^2     |
+| da     | Deka  | 10^1     |
+| d      | Deci  | 10^[-1]  |
+| c      | Centi | 10^[-2]  |
+| m      | Milli | 10^[-3]  |
+| µ, u   | Micro | 10^[-6]  |
+| n      | Nano  | 10^[-9]  |
+| p      | Pico  | 10^[-12] |
+| f      | Femto | 10^[-15] |
+| a      | Atto  | 10^[-18] |
+| z      | Zepto | 10^[-21] |
+| y      | Yocto | 10^[-24] |
 
 **Note**: When there's an ambiguity of how to interpret a prefix with unit, and the system recognizes a unit with the full name, including the
 prefix, the full unit will be chosen. Example: `ft` will be interpreted as *foot*, not *femto-tonnes*, `min` will be interpreted as *minute*,

@@ -1249,7 +1249,7 @@
       <!--
 			<Custom Action='DisableHttpService' Before='InstallAndStartService'>NOT Installed</Custom>
 			-->
-      <Custom Action='InstallAndStartService' After='InstallFinalize'>NOT Installed</Custom>
+      <Custom Action='InstallAndStartService' After='InstallFinalize'>(NOT Installed) AND (OPENBROWSER="yes")</Custom>
       <Custom Action='OpenLocalhost' After='InstallAndStartService'>(NOT Installed) AND (OPENBROWSER="yes")</Custom>
       <Custom Action='StopService' Before='InstallFiles'>UPGRADINGPRODUCTCODE</Custom>
       <Custom Action='BeforeUninstallEvent' Before='UninstallService'>Installed AND NOT UPGRADINGPRODUCTCODE</Custom>

@@ -178,6 +178,7 @@ namespace Waher.IoTGateway
 				gatewayRunning = null;
 
 				StartingServer.Dispose();
+				StartingServer = null;
 				return false; // Being started in another process.
 			}
 
@@ -387,6 +388,13 @@ namespace Waher.IoTGateway
 
 						ClientEvents.PushEvent(ClientEvents.GetTabIDs(), "Reload", string.Empty);
 
+						if (StartingServer != null)
+						{
+							StartingServer.Release();
+							StartingServer.Dispose();
+							StartingServer = null;
+						}
+
 						await Configuration.SetupConfiguration(webServer);
 						NeedsCleanup = true;
 					}
@@ -522,12 +530,19 @@ namespace Waher.IoTGateway
 			{
 				Log.Critical(ex);
 
-				gatewayRunning.Release();
-				gatewayRunning.Dispose();
-				gatewayRunning = null;
+				if (gatewayRunning != null)
+				{
+					gatewayRunning.Release();
+					gatewayRunning.Dispose();
+					gatewayRunning = null;
+				}
 
-				StartingServer.Release();
-				StartingServer.Dispose();
+				if (StartingServer != null)
+				{
+					StartingServer.Release();
+					StartingServer.Dispose();
+					StartingServer = null;
+				}
 
 				ExceptionDispatchInfo.Capture(ex).Throw();
 			}
@@ -586,8 +601,12 @@ namespace Waher.IoTGateway
 					}
 					finally
 					{
-						StartingServer.Release();
-						StartingServer.Dispose();
+						if (StartingServer != null)
+						{
+							StartingServer.Release();
+							StartingServer.Dispose();
+							StartingServer = null;
+						}
 					}
 				}
 				catch (Exception ex)

@@ -66,6 +66,8 @@ namespace Waher.IoTGateway.Cssx
 				ThemeDefinition Def = Theme.CurrerntTheme;
 				if (Def != null)
 				{
+					Session["TextColor"] = Def.TextColor;
+					Session["BackgroundColor"] = Def.BackgroundColor;
 					Session["HeaderColor"] = Def.HeaderColor;
 					Session["HeaderTextColor"] = Def.HeaderTextColor;
 					Session["ButtonColor"] = Def.ButtonColor;
@@ -75,6 +77,8 @@ namespace Waher.IoTGateway.Cssx
 					Session["LinkColorUnvisited"] = Def.LinkColorUnvisited;
 					Session["LinkColorVisited"] = Def.LinkColorVisited;
 					Session["LinkColorHot"] = Def.LinkColorHot;
+					Session["BackgroundImages"] = Def.BackgroundImages;
+					Session["BannerImages"] = Def.BannerImages;
 
 					foreach (KeyValuePair<string, string> P in Def.GetCustomProperties())
 						Session[P.Key] = P.Value;
@@ -127,6 +131,8 @@ namespace Waher.IoTGateway.Cssx
 							Result.Append(')');
 						}
 					}
+					else if (Value is string s)
+						Result.Append(s);
 					else
 						Result.Append(Expression.ToString(Value));
 

@@ -6,8 +6,8 @@
            xmlns:mstns="http://waher.se/Schema/Theme.xsd"
            xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-  <xs:element name="Theme">
-    <xs:complexType>
+	<xs:element name="Theme">
+		<xs:complexType>
 			<xs:sequence>
 				<xs:element name="Presentation">
 					<xs:annotation>
@@ -20,18 +20,10 @@
 									<xs:documentation>A human readable title for the theme.</xs:documentation>
 								</xs:annotation>
 							</xs:element>
-							<xs:element name="Thumbnail">
+							<xs:element name="Thumbnail" type="Image">
 								<xs:annotation>
 									<xs:documentation>Path to a thumbnail image for the theme, relative to the current folder, together with size information.</xs:documentation>
 								</xs:annotation>
-								<xs:complexType>
-									<xs:simpleContent>
-										<xs:extension base="xs:string">
-											<xs:attribute name="width" type="xs:positiveInteger" use="required"/>
-											<xs:attribute name="height" type="xs:positiveInteger" use="required"/>
-										</xs:extension>
-									</xs:simpleContent>
-								</xs:complexType>
 							</xs:element>
 						</xs:sequence>
 					</xs:complexType>
@@ -46,6 +38,16 @@
 								<xs:annotation>
 									<xs:documentation>Path to the CSSX file of the theme, relative to the current folder.</xs:documentation>
 									<xs:documentation>A CSSX file is a CSS file that can contain embedded script, between ¤ signs.</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="TextColor" type="Color">
+								<xs:annotation>
+									<xs:documentation>Normal text color.</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="BackgroundColor" type="Color">
+								<xs:annotation>
+									<xs:documentation>Normal background color.</xs:documentation>
 								</xs:annotation>
 							</xs:element>
 							<xs:element name="HeaderColor" type="Color">
@@ -93,6 +95,11 @@
 									<xs:documentation>Color of hot links.</xs:documentation>
 								</xs:annotation>
 							</xs:element>
+							<xs:element name="FontFamily" type="xs:string">
+								<xs:annotation>
+									<xs:documentation>CSS font-family value.</xs:documentation>
+								</xs:annotation>
+							</xs:element>
 						</xs:sequence>
 					</xs:complexType>
 				</xs:element>
@@ -114,19 +121,56 @@
 						</xs:sequence>
 					</xs:complexType>
 				</xs:element>
+				<xs:element name="BackgroundImages">
+					<xs:annotation>
+						<xs:documentation>Contains a sequence of background images for the theme.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="BackgroundImage" minOccurs="1" maxOccurs="unbounded">
+								<xs:annotation>
+									<xs:documentation>One background image.</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="BannerImages">
+					<xs:annotation>
+						<xs:documentation>Contains a sequence of banner images for the theme.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="BannerImage" minOccurs="1" maxOccurs="unbounded">
+								<xs:annotation>
+									<xs:documentation>One banner image.</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
 			</xs:sequence>
 			<xs:attribute name="id" type="xs:Name" use="required">
 				<xs:annotation>
 					<xs:documentation>ID of the theme. Must correspond to the name of the Themes subfolder where theme-related content files reside.</xs:documentation>
 				</xs:annotation>
 			</xs:attribute>
-    </xs:complexType>
-  </xs:element>
+		</xs:complexType>
+	</xs:element>
 
 	<xs:simpleType name="Color">
 		<xs:restriction base="xs:string">
-			<xs:pattern value="#[0-9a-fA-F]{6}"/>
+			<xs:pattern value="#[0-9a-fA-F]{6,8}"/>
 		</xs:restriction>
 	</xs:simpleType>
-	
+
+	<xs:complexType name="Image">
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+				<xs:attribute name="width" type="xs:positiveInteger" use="required"/>
+				<xs:attribute name="height" type="xs:positiveInteger" use="required"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+
 </xs:schema>

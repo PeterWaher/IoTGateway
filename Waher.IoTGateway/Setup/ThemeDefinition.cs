@@ -14,12 +14,15 @@ namespace Waher.IoTGateway.Setup
 	public class ThemeDefinition
 	{
 		private readonly Dictionary<string, string> customProperties = new Dictionary<string, string>();
+		private readonly ThemeImage[] backgroundImages = null;
+		private readonly ThemeImage[] bannerImages = null;
+		private readonly ThemeImage thumbnail;
 		private readonly string id;
 		private readonly string title;
-		private readonly string thumbnail;
-		private readonly int thumbnailWidth;
-		private readonly int thumbnailHeight;
 		private readonly string cssx;
+		private readonly string fontFamily;
+		private SKColor textColor;
+		private SKColor backgroundColor;
 		private SKColor headerColor;
 		private SKColor headerTextColor;
 		private SKColor buttonColor;
@@ -56,9 +59,7 @@ namespace Waher.IoTGateway.Setup
 											break;
 
 										case "Thumbnail":
-											this.thumbnailWidth = int.Parse(XML.Attribute(E2, "width"));
-											this.thumbnailHeight = int.Parse(XML.Attribute(E2, "height"));
-											this.thumbnail = "/Themes/" + this.id + "/" + E2.InnerText;
+											this.thumbnail = this.ParseThemeImage(E2);
 											break;
 									}
 								}
@@ -73,11 +74,21 @@ namespace Waher.IoTGateway.Setup
 									switch (E2.LocalName)
 									{
 										case "CSSX":
-											this.cssx = "/Themes/" + this.id + "/" + E2.InnerText;
+											this.cssx = this.GetResourceName(E2.InnerText);
+											break;
+
+										case "TextColor":
+											if (Color.TryParse(E2.InnerText, out SKColor cl))
+												this.textColor = cl;
+											break;
+
+										case "BackgroundColor":
+											if (Color.TryParse(E2.InnerText, out cl))
+												this.backgroundColor = cl;
 											break;
 
 										case "HeaderColor":
-											if (Color.TryParse(E2.InnerText, out SKColor cl))
+											if (Color.TryParse(E2.InnerText, out cl))
 												this.headerColor = cl;
 											break;
 
@@ -120,6 +131,10 @@ namespace Waher.IoTGateway.Setup
 											if (Color.TryParse(E2.InnerText, out cl))
 												this.linkColorHot = cl;
 											break;
+
+										case "FontFamily":
+											this.fontFamily = E2.InnerText;
+											break;
 									}
 								}
 							}
@@ -137,9 +152,47 @@ namespace Waher.IoTGateway.Setup
 								}
 							}
 							break;
+
+						case "BackgroundImages":
+							List<ThemeImage> Images = new List<ThemeImage>();
+
+							foreach (XmlNode N2 in E.ChildNodes)
+							{
+								if (N2 is XmlElement E2 && E2.LocalName == "BackgroundImage")
+									Images.Add(this.ParseThemeImage(E2));
+							}
+
+							this.backgroundImages = Images.ToArray();
+							break;
+
+						case "BannerImages":
+							Images = new List<ThemeImage>();
+
+							foreach (XmlNode N2 in E.ChildNodes)
+							{
+								if (N2 is XmlElement E2 && E2.LocalName == "BannerImage")
+									Images.Add(this.ParseThemeImage(E2));
+							}
+
+							this.bannerImages = Images.ToArray();
+							break;
 					}
 				}
 			}
+		}
+
+		private ThemeImage ParseThemeImage(XmlElement E)
+		{
+			string FileName = E.InnerText;
+			int Width = XML.Attribute(E, "width", 0);
+			int Height = XML.Attribute(E, "height", 0);
+
+			return new ThemeImage(this.GetResourceName(FileName), Width, Height);
+		}
+
+		private string GetResourceName(string FileName)
+		{
+			return "/Themes/" + this.id + "/" + FileName;
 		}
 
 		/// <summary>
@@ -160,24 +213,24 @@ namespace Waher.IoTGateway.Setup
 		public string Title => this.title;
 
 		/// <summary>
-		/// Resource of thumbnail image for the theme
+		/// Thumbnail for the theme
 		/// </summary>
-		public string Thumbnail => this.thumbnail;
-
-		/// <summary>
-		/// Width of the thumbnail image for the theme
-		/// </summary>
-		public int ThumbnailWidth => this.thumbnailWidth;
-
-		/// <summary>
-		/// Height of the thumbnail image for the theme
-		/// </summary>
-		public int ThumbnailHeight => this.thumbnailHeight;
+		public ThemeImage Thumbnail => this.thumbnail;
 
 		/// <summary>
 		/// Resource of the CSSX file of the theme
 		/// </summary>
 		public string CSSX => this.cssx;
+
+		/// <summary>
+		/// Color for normal text.
+		/// </summary>
+		public SKColor TextColor => this.textColor;
+
+		/// <summary>
+		/// Background Color for normal text.
+		/// </summary>
+		public SKColor BackgroundColor => this.backgroundColor;
 
 		/// <summary>
 		/// Color for text headers.
@@ -225,6 +278,67 @@ namespace Waher.IoTGateway.Setup
 		public SKColor LinkColorHot => this.linkColorHot;
 
 		/// <summary>
+		/// CSS font-family value.
+		/// </summary>
+		public string FontFamily => this.fontFamily;
+
+		/// <summary>
+		/// Background images.
+		/// </summary>
+		public ThemeImage[] BackgroundImages => this.backgroundImages;
+
+		/// <summary>
+		/// Banner images.
+		/// </summary>
+		public ThemeImage[] BannerImages => this.bannerImages;
+
+		/// <summary>
+		/// Gets a background image best matching a given size.
+		/// </summary>
+		/// <param name="Width">Desired width</param>
+		/// <param name="Height">Desired height</param>
+		/// <returns>Image</returns>
+		public ThemeImage GetBackgroundImage(int Width, int Height)
+		{
+			return this.GetImage(this.backgroundImages, Width, Height);
+		}
+
+		/// <summary>
+		/// Gets a banner image best matching a given size.
+		/// </summary>
+		/// <param name="Width">Desired width</param>
+		/// <param name="Height">Desired height</param>
+		/// <returns>Image</returns>
+		public ThemeImage GetBannerImage(int Width, int Height)
+		{
+			return this.GetImage(this.bannerImages, Width, Height);
+		}
+
+		private ThemeImage GetImage(ThemeImage[] Images, int Width, int Height)
+		{
+			ThemeImage Best = null;
+			double BestSqrError = double.MaxValue;
+			double SqrError, d;
+
+			foreach (ThemeImage Img in Images)
+			{
+				d = Img.Width - Width;
+				SqrError = d * d;
+
+				d = Img.Height - Height;
+				SqrError += d * d;
+
+				if (Best == null || SqrError < BestSqrError)
+				{
+					Best = Img;
+					BestSqrError = SqrError;
+				}
+			}
+
+			return Best;
+		}
+
+		/// <summary>
 		/// Gets defined custom properties.
 		/// </summary>
 		/// <returns>Custom propeties.</returns>
@@ -238,5 +352,8 @@ namespace Waher.IoTGateway.Setup
 
 			return Result;
 		}
+
+
+
 	}
 }

@@ -662,7 +662,7 @@ namespace Waher.IoTGateway
 								DateTime TP = File.GetLastWriteTime(s);
 								DateTime TP2 = File.GetLastWriteTime(s2);
 
-								if (TP2 > TP)
+								if (TP > TP2)
 									File.Copy(s, s2, true);
 							}
 							break;

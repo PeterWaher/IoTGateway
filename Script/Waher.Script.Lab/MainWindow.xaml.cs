@@ -111,8 +111,8 @@ namespace Waher.Script.Lab
 			{
 				if (!Keyboard.Modifiers.HasFlag(ModifierKeys.Control) && !Keyboard.Modifiers.HasFlag(ModifierKeys.Shift))
 				{
-					this.ExecuteButton_Click(sender, e);
 					e.Handled = true;
+					this.ExecuteButton_Click(sender, e);
 				}
 			}
 		}
@@ -236,10 +236,10 @@ namespace Waher.Script.Lab
 
 		private void TextBlock_PreviewMouseDown(object sender, MouseButtonEventArgs e)
 		{
+			e.Handled = true;
 			this.Input.Text = ((TextBlock)sender).Text;
 			this.Input.SelectAll();
 			this.Input.Focus();
-			e.Handled = true;
 		}
 
 		private void AddImageBlock(TextBlock ScriptBlock, SKImage Image, Graph Graph, object[] States)
@@ -277,6 +277,8 @@ namespace Waher.Script.Lab
 		private void ImageBlock_PreviewMouseDown(object sender, MouseButtonEventArgs e)
 		{
 			Image ImageBlock = (Image)sender;
+
+			e.Handled = true;
 
 			if (e.ChangedButton == MouseButton.Left)
 			{
@@ -355,8 +357,6 @@ namespace Waher.Script.Lab
 					}
 				}
 			}
-
-			e.Handled = true;
 		}
 
 		internal void Print(string Output)

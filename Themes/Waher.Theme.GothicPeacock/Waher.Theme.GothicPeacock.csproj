@@ -16,8 +16,9 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>IoT Gateway Theme</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.0.0</AssemblyVersion>
-    <FileVersion>1.0.0</FileVersion>
+    <AssemblyVersion>1.0.1</AssemblyVersion>
+    <FileVersion>1.0.1</FileVersion>
+    <Version>1.0.1</Version>
   </PropertyGroup>
 
   <ItemGroup>
@@ -27,6 +28,7 @@
     <None Remove="Root\Themes\GothicPeacock\GothicPeacock1600x1600.png" />
     <None Remove="Root\Themes\GothicPeacock\GothicPeacock1600x1600Dimmed.png" />
     <None Remove="Root\Themes\GothicPeacock\GothicPeacock800x800.png" />
+    <None Remove="Root\Themes\GothicPeacock\GothicPeacock800x800Dimmed.png" />
     <None Remove="Root\Themes\GothicPeacock\GothicPeacockBanner1400x425.png" />
     <None Remove="Root\Themes\GothicPeacock\GothicPeacockBanner1900x500.png" />
     <None Remove="Root\Themes\GothicPeacock\GothicPeacockBanner2000x600.png" />
@@ -47,6 +49,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Root\Themes\GothicPeacock\GothicPeacock800x800.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Themes\GothicPeacock\GothicPeacock800x800Dimmed.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Root\Themes\GothicPeacock\GothicPeacockBanner1400x425.png">

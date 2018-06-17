@@ -1,0 +1,9 @@
+CactusRose1600x1600:=JuliaSmoothFractal((-0.16015625,-0.532937500000001),(z)->exp(z^3)-0.59,0.15625,RandomLinearAnalogousHsl(1024,16,1525287947),1600,1600);
+CactusRose1600x1600Dimmed:=Blend(CactusRose1600x1600,"White",0.85);
+CactusRose800x800:=JuliaSmoothFractal((-0.16015625,-0.532937500000001),(z)->exp(z^3)-0.59,0.15625,RandomLinearAnalogousHsl(1024,16,1525287947),800,800);
+CactusRose800x800Dimmed:=Blend(CactusRose800x800,"White",0.85);
+
+CactusRoseBanner1400x425:=NovaMandelbrotSmoothFractal(0.7421875,0.76171875,0.3125,1,(2*i),RandomLinearAnalogousHSL(1024,16,1999097629),1400,425);
+CactusRoseBanner1900x500:=NovaMandelbrotSmoothFractal(0.7421875,0.76171875,0.3125,1,(2*i),RandomLinearAnalogousHSL(1024,16,1999097629),1900,500);
+CactusRoseBanner2000x600:=NovaMandelbrotSmoothFractal(0.7421875,0.76171875,0.3125,1,(2*i),RandomLinearAnalogousHSL(1024,16,1999097629),2000,600);
+

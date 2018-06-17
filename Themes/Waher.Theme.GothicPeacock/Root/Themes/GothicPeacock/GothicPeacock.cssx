@@ -6,9 +6,9 @@ body
 {
     padding: 0;
     margin: 0;
-    font-family: "Segoe UI", "Segoe UI Web Regular", "Segoe UI Symbol", "Helvetica Neue", "BBAlpha Sans", "S60 Sans", Arial, sans-serif;
+    font-family: ¤Theme.FontFamily¤;
     font-size: 100%;
-    background: url(GothicPeacock1600x1600Dimmed.png) no-repeat center center fixed;
+    background: url(¤Theme.GetBackgroundImage(1600,1600)¤) no-repeat center center fixed;
     -webkit-background-size: cover;
     -moz-background-size: cover;
     -o-background-size: cover;
@@ -16,6 +16,7 @@ body
     width:100%;
     height:100%;
     position:relative;
+    color:¤TextColor¤;
 }
 
 main
@@ -30,7 +31,7 @@ main
 
 header
 {
-    background-image: url(GothicPeacockBanner2000x600.png);
+    background-image: url(¤Theme.GetBannerImage(2000,600)¤);
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
@@ -99,7 +100,7 @@ nav > ul > li > a:hover
 
 footer
 {
-    background-image: url(GothicPeacockBanner2000x600.png);
+    background-image: url(¤Theme.GetBannerImage(2000,600)¤);
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
@@ -129,7 +130,7 @@ section
     border: 1px solid black;
     box-shadow: 0.3em 0.3em 0.3em rgba(0,0,0,0.5);
     margin: 3em 0.5em 3em 0;
-    background-color:rgba(233, 230, 226, 0.9);
+    background-color:¤BackgroundColor¤;
 }
 
 section section

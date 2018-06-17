@@ -16,20 +16,24 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>IoT Gateway Theme</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.0.3</AssemblyVersion>
-    <FileVersion>1.0.3</FileVersion>
-    <Version>1.0.3</Version>
+    <AssemblyVersion>1.0.4</AssemblyVersion>
+    <FileVersion>1.0.4</FileVersion>
+    <Version>1.0.4</Version>
     <PackageId>Waher.Theme.CactusRose</PackageId>
   </PropertyGroup>
 
   <ItemGroup>
     <None Remove="Root\Themes\CactusRose\CactusRose.png" />
     <None Remove="Root\Themes\CactusRose\CactusRose.xml" />
+    <None Remove="Root\Themes\CactusRose\CactusRose800x800Dimmed.png" />
     <None Remove="Waher.Theme.CactusRose.manifest" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Include="Root\Themes\CactusRose\CactusRose.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Themes\CactusRose\CactusRose800x800Dimmed.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Root\Themes\CactusRose\CactusRoseBanner1400x425.png">

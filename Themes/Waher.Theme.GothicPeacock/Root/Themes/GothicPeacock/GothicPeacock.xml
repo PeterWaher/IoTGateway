@@ -6,6 +6,8 @@
 	</Presentation>
 	<BasicProperties>
 		<CSSX>GothicPeacock.cssx</CSSX>
+		<TextColor>#000000</TextColor>
+		<BackgroundColor>#E9E6E2E6</BackgroundColor>
 		<HeaderColor>#993300</HeaderColor>
 		<HeaderTextColor>#FFFFFF</HeaderTextColor>
 		<ButtonColor>#663300</ButtonColor>
@@ -15,7 +17,23 @@
 		<LinkColorUnvisited>#993300</LinkColorUnvisited>
 		<LinkColorVisited>#732600</LinkColorVisited>
 		<LinkColorHot>#663300</LinkColorHot>
+		<FontFamily>"Segoe UI", "Segoe UI Web Regular", "Segoe UI Symbol", "Helvetica Neue", "BBAlpha Sans", "S60 Sans", Arial, sans-serif</FontFamily>
 	</BasicProperties>
 	<CustomProperties>
+		<Property name="PosColor" value="#663300"/>
+		<Property name="PosSelectedColor" value="#8C6640"/>
+		<Property name="NegColor" value="#D83134"/>
+		<Property name="TagColor" value="#4C83AE"/>
+		<Property name="DropDownColor" value="#E4F0FE"/>
+		<Property name="RestrictionColor" value="#EB9500"/>
 	</CustomProperties>
+	<BackgroundImages>
+		<BackgroundImage width="1600" height="1600">GothicPeacock1600x1600Dimmed.png</BackgroundImage>
+		<BackgroundImage width="800" height="800">GothicPeacock800x800Dimmed.png</BackgroundImage>
+	</BackgroundImages>
+	<BannerImages>
+		<BannerImage width="1400" height="425">GothicPeacockBanner1400x425.png</BannerImage>
+		<BannerImage width="1900" height="500">GothicPeacockBanner1900x500.png</BannerImage>
+		<BannerImage width="2000" height="600">GothicPeacockBanner2000x600.png</BannerImage>
+	</BannerImages>
 </Theme>

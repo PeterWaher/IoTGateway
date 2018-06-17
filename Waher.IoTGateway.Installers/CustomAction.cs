@@ -690,14 +690,13 @@ namespace Waher.IoTGateway.Installers
 					else
 						Session.Log("Modules takes too long to start. Cancelling wait and continuing.");
 				}
-
-				return ActionResult.Success;
 			}
 			catch (Exception ex)
 			{
 				Session.Log("Unable to wait for all modules to start. The following error was reported: " + ex.Message);
-				return ActionResult.Failure;
 			}
+
+			return ActionResult.Success;
 		}
 
 		[CustomAction]
@@ -1125,7 +1124,14 @@ namespace Waher.IoTGateway.Installers
 				return false;
 
 			Session.Log("Deleting " + FileName);
-			File.Delete(FileName);
+			try
+			{
+				File.Delete(FileName);
+			}
+			catch (Exception ex)
+			{
+				Session.Log("Unable to delete file. Error reported: " + ex.Message);
+			}
 
 			return true;
 		}

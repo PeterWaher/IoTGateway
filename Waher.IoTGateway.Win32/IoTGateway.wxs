@@ -14,7 +14,6 @@
     <Property Id="BROWSER">
       <RegistrySearch Id='DefaultBrowser' Type='raw' Root='HKLM' Key='SOFTWARE\Classes\http\shell\open\command' />
     </Property>
-    <Property Id="SUPPORTACCOUNT" Value="unset"/>
     <Property Id="STARTPAGE" Value="unset"/>
     <Property Id="OPENBROWSER" Value="unset"/>
     <Property Id="SERVICEDISPLAYNAME" Value="IoT Gateway Service"/>

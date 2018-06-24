@@ -130,7 +130,7 @@ Password is incorrect, or a new account was not permitted to be created.
 <p>
 <label for="Password2">Repeat password:</label>  
 <input id="Password2" name="Password2" type="password" style="width:20em" value="{{Config.Password}}" />
-<button type='button' onclick='RandomizePassword()'>Randomize password</button>
+<button type='button' onclick='RandomizePassword()'>Create Random Password</button>
 </p>
 <p id="Password2Error" class="error" style="display:none">Passwords do not match.</p>
 

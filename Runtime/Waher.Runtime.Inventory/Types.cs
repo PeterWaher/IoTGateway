@@ -17,11 +17,12 @@ namespace Waher.Runtime.Inventory
 		private static SortedDictionary<string, SortedDictionary<string, Type>> typesPerNamespace = new SortedDictionary<string, SortedDictionary<string, Type>>();
 		private static SortedDictionary<string, SortedDictionary<string, bool>> namespacesPerNamespace = new SortedDictionary<string, SortedDictionary<string, bool>>();
 		private static SortedDictionary<string, bool> rootNamespaces = new SortedDictionary<string, bool>();
+		private static Assembly[] assemblies = null;
 		private static IModule[] modules = null;
 		private static WaitHandle[] startWaitHandles = null;
 		private static readonly Type[] noTypes = new Type[0];
 		private static readonly object[] noParameters = new object[0];
-		private static object synchObject = new object();
+		private static readonly object synchObject = new object();
 		private static bool isInitialized = false;
 
 		static Types()
@@ -420,6 +421,8 @@ namespace Waher.Runtime.Inventory
 				Assemblies[c] = A;
 			}
 
+			assemblies = Assemblies;
+
 			foreach (Assembly Assembly in Assemblies)
 			{
 				try
@@ -528,6 +531,11 @@ namespace Waher.Runtime.Inventory
 				Assemblies[c] = A;
 			}
 		}
+
+		/// <summary>
+		/// Assemblies in the inventory.
+		/// </summary>
+		public static Assembly[] Assemblies => assemblies;
 
 	}
 }

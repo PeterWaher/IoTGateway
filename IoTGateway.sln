@@ -304,6 +304,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Theme.GothicPeacock",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Script.Fractals", "Script\Waher.Script.Fractals\Waher.Script.Fractals.csproj", "{1C042E75-04D8-4CAC-91B8-A7F559AC9D2B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Runtime.ServiceRegistration", "Runtime\Waher.Runtime.ServiceRegistration\Waher.Runtime.ServiceRegistration.csproj", "{E73DECAC-C7E9-4E25-8072-B1A850C8642A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -2721,6 +2723,26 @@ Global
 		{1C042E75-04D8-4CAC-91B8-A7F559AC9D2B}.Release|x64.Build.0 = Release|Any CPU
 		{1C042E75-04D8-4CAC-91B8-A7F559AC9D2B}.Release|x86.ActiveCfg = Release|Any CPU
 		{1C042E75-04D8-4CAC-91B8-A7F559AC9D2B}.Release|x86.Build.0 = Release|Any CPU
+		{E73DECAC-C7E9-4E25-8072-B1A850C8642A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E73DECAC-C7E9-4E25-8072-B1A850C8642A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E73DECAC-C7E9-4E25-8072-B1A850C8642A}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{E73DECAC-C7E9-4E25-8072-B1A850C8642A}.Debug|ARM.Build.0 = Debug|Any CPU
+		{E73DECAC-C7E9-4E25-8072-B1A850C8642A}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{E73DECAC-C7E9-4E25-8072-B1A850C8642A}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{E73DECAC-C7E9-4E25-8072-B1A850C8642A}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{E73DECAC-C7E9-4E25-8072-B1A850C8642A}.Debug|x64.Build.0 = Debug|Any CPU
+		{E73DECAC-C7E9-4E25-8072-B1A850C8642A}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{E73DECAC-C7E9-4E25-8072-B1A850C8642A}.Debug|x86.Build.0 = Debug|Any CPU
+		{E73DECAC-C7E9-4E25-8072-B1A850C8642A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E73DECAC-C7E9-4E25-8072-B1A850C8642A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E73DECAC-C7E9-4E25-8072-B1A850C8642A}.Release|ARM.ActiveCfg = Release|Any CPU
+		{E73DECAC-C7E9-4E25-8072-B1A850C8642A}.Release|ARM.Build.0 = Release|Any CPU
+		{E73DECAC-C7E9-4E25-8072-B1A850C8642A}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{E73DECAC-C7E9-4E25-8072-B1A850C8642A}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{E73DECAC-C7E9-4E25-8072-B1A850C8642A}.Release|x64.ActiveCfg = Release|Any CPU
+		{E73DECAC-C7E9-4E25-8072-B1A850C8642A}.Release|x64.Build.0 = Release|Any CPU
+		{E73DECAC-C7E9-4E25-8072-B1A850C8642A}.Release|x86.ActiveCfg = Release|Any CPU
+		{E73DECAC-C7E9-4E25-8072-B1A850C8642A}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -2838,6 +2860,7 @@ Global
 		{9F5BA12C-CF68-4D41-AD0A-9C9BBE7D2A05} = {EFF8901B-9D53-4325-91C2-90ECBB50FFB1}
 		{34FB9846-0E9C-415F-90C2-0DB17C2F6847} = {EFF8901B-9D53-4325-91C2-90ECBB50FFB1}
 		{1C042E75-04D8-4CAC-91B8-A7F559AC9D2B} = {A26DA5FE-E41B-458F-AA90-EB0ADC43E39B}
+		{E73DECAC-C7E9-4E25-8072-B1A850C8642A} = {A6A2D4A1-12E4-467E-925C-720093EBFE26}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {32CF1367-B83E-4CAD-8329-0D1C73AF59F4}

@@ -234,14 +234,15 @@ Runtime
 The [Runtime](Runtime) folder contains libraries that help applications with common runtime tasks, such as caching, maintaining a type inventory, 
 language localization, runtime settings, timing and scheduling.
 
-| Project                            | Type          | Link                                                                    | Project description |
-|------------------------------------|---------------|-------------------------------------------------------------------------|---------------------|
-| **Waher.Runtime.Cache**            | .NET Std 1.3  | [NuGet](https://www.nuget.org/packages/Waher.Runtime.Cache/)            | The [Waher.Runtime.Cache](Runtime/Waher.Runtime.Cache) project provides tools for in-memory caching. |
-| **Waher.Runtime.Inventory**        | .NET Std 1.3  | [NuGet](https://www.nuget.org/packages/Waher.Runtime.Inventory/)        | The [Waher.Runtime.Inventory](Runtime/Waher.Runtime.Inventory) project keeps an inventory of types and interfaces available in your code. It also provides a means to access available types given an interface. |
-| **Waher.Runtime.Inventory.Loader** | .NET Std 2.0  | [NuGet](https://www.nuget.org/packages/Waher.Runtime.Inventory.Loader/) | The [Waher.Runtime.Inventory.Loader](Runtime/Waher.Runtime.Inventory.Loader) project dynamically loads modules from a folder, and initiates the inventory defined in [Waher.Runtime.Inventory](Runtime/Waher.Runtime.Inventory) with all loaded and referenced assemblies. |
-| **Waher.Runtime.Language**         | .NET Std 1.3  | [NuGet](https://www.nuget.org/packages/Waher.Runtime.Language/)         | The [Waher.Runtime.Language](Runtime/Waher.Runtime.Language) project helps applications with language localization. |
-| **Waher.Runtime.Settings**         | .NET Std 1.3  | [NuGet](https://www.nuget.org/packages/Waher.Runtime.Settings/)         | The [Waher.Runtime.Settings](Runtime/Waher.Runtime.Settings) project helps applications maintain a set of persistent settings. |
-| **Waher.Runtime.Timing**           | .NET Std 1.3  | [NuGet](https://www.nuget.org/packages/Waher.Runtime.Timing/)           | The [Waher.Runtime.Timing](Runtime/Waher.Runtime.Timing) project provides tools for timing and scheduling. |
+| Project                               | Type          | Link                                                                       | Project description |
+|---------------------------------------|---------------|----------------------------------------------------------------------------|---------------------|
+| **Waher.Runtime.Cache**               | .NET Std 1.3  | [NuGet](https://www.nuget.org/packages/Waher.Runtime.Cache/)               | The [Waher.Runtime.Cache](Runtime/Waher.Runtime.Cache) project provides tools for in-memory caching. |
+| **Waher.Runtime.Inventory**           | .NET Std 1.3  | [NuGet](https://www.nuget.org/packages/Waher.Runtime.Inventory/)           | The [Waher.Runtime.Inventory](Runtime/Waher.Runtime.Inventory) project keeps an inventory of types and interfaces available in your code. It also provides a means to access available types given an interface. |
+| **Waher.Runtime.Inventory.Loader**    | .NET Std 2.0  | [NuGet](https://www.nuget.org/packages/Waher.Runtime.Inventory.Loader/)    | The [Waher.Runtime.Inventory.Loader](Runtime/Waher.Runtime.Inventory.Loader) project dynamically loads modules from a folder, and initiates the inventory defined in [Waher.Runtime.Inventory](Runtime/Waher.Runtime.Inventory) with all loaded and referenced assemblies. |
+| **Waher.Runtime.Language**            | .NET Std 1.3  | [NuGet](https://www.nuget.org/packages/Waher.Runtime.Language/)            | The [Waher.Runtime.Language](Runtime/Waher.Runtime.Language) project helps applications with language localization. |
+| **Waher.Runtime.ServiceRegistration** | .NET Std 1.3  | [NuGet](https://www.nuget.org/packages/Waher.Runtime.ServiceRegistration/) | The [Waher.Runtime.ServiceRegistration](Runtime/Waher.Runtime.ServiceRegistration) library allows applications to register themselves with an XMPP-based Service Registry, such as the [IoT Broker](https://waher.se/Broker.md). |
+| **Waher.Runtime.Settings**            | .NET Std 1.3  | [NuGet](https://www.nuget.org/packages/Waher.Runtime.Settings/)            | The [Waher.Runtime.Settings](Runtime/Waher.Runtime.Settings) project helps applications maintain a set of persistent settings. |
+| **Waher.Runtime.Timing**              | .NET Std 1.3  | [NuGet](https://www.nuget.org/packages/Waher.Runtime.Timing/)              | The [Waher.Runtime.Timing](Runtime/Waher.Runtime.Timing) project provides tools for timing and scheduling. |
 
 The folder also contains the following unit test projects:
 

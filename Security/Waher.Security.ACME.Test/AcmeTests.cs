@@ -25,7 +25,7 @@ namespace Waher.Security.ACME.Test
 					KeyContainerName = directory
 				};
 
-				using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(CspParams))
+				using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(4096, CspParams))
 				{
 					Parameters = RSA.ExportParameters(true);
 				}

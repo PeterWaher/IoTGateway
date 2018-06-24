@@ -8,6 +8,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Xml;
+using Waher.Events;
 using Waher.Networking.HTTP;
 using Waher.Persistence;
 using Waher.Persistence.Attributes;
@@ -450,9 +451,28 @@ namespace Waher.IoTGateway.Setup
 						KeyContainerName = "IoTGateway:" + URL
 					};
 
-					using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(CspParams))
+					bool Ok;
+
+					using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(4096, CspParams))
 					{
 						Parameters = RSA.ExportParameters(true);
+
+						if (RSA.KeySize < 4096)
+						{
+							RSA.PersistKeyInCsp = false;
+							RSA.Clear();
+							Ok = false;
+						}
+						else
+							Ok = true;
+					}
+
+					if (!Ok)
+					{
+						using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(4096, CspParams))
+						{
+							Parameters = RSA.ExportParameters(true);
+						}
 					}
 				}
 				catch (CryptographicException ex)
@@ -731,6 +751,8 @@ namespace Waher.IoTGateway.Setup
 									Files = GetFiles(Path.DirectorySeparatorChar + "OpenSSL-Win64", "openssl.exe");
 									if (Files != null)
 										Files2.AddRange(Files);
+
+									Files = Files2.ToArray();
 								}
 							}
 							else
@@ -862,6 +884,7 @@ namespace Waher.IoTGateway.Setup
 			}
 			catch (Exception ex)
 			{
+				Log.Critical(ex);
 				ClientEvents.PushEvent(new string[] { TabID }, "CertificateError", "Unable to create certificate: " + XML.HtmlValueEncode(ex.Message), false);
 				return false;
 			}

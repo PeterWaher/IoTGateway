@@ -293,6 +293,10 @@
       <Project>{e11e0021-a85f-466b-92ab-5725c6277b6a}</Project>
       <Name>Waher.Runtime.Language</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Runtime\Waher.Runtime.ServiceRegistration\Waher.Runtime.ServiceRegistration.csproj">
+      <Project>{e73decac-c7e9-4e25-8072-b1a850c8642a}</Project>
+      <Name>Waher.Runtime.ServiceRegistration</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Runtime\Waher.Runtime.Settings\Waher.Runtime.Settings.csproj">
       <Project>{e97e6869-7fa0-4775-999a-5fbde8061723}</Project>
       <Name>Waher.Runtime.Settings</Name>

@@ -279,7 +279,7 @@ namespace Waher.IoTGateway.CodeContent
 		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
 		public bool GenerateHTML(StringBuilder Output, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
-			string FileName = this.GetFileName(Language, Rows, out string Title);
+			string FileName = this.GetFileName(Language, Rows, out string Title, out string MapFileName, out string Hash);
 			if (FileName == null)
 				return false;
 
@@ -298,6 +298,12 @@ namespace Waher.IoTGateway.CodeContent
 				Output.Append(XML.HtmlAttributeEncode(Title));
 			}
 
+			if (!string.IsNullOrEmpty(MapFileName))
+			{
+				Output.Append("\" usemap=\"#Map");
+				Output.Append(Hash);
+			}
+
 			Output.Append("\" class=\"aloneUnsized\"/>");
 
 			if (!string.IsNullOrEmpty(Title))
@@ -309,10 +315,28 @@ namespace Waher.IoTGateway.CodeContent
 
 			Output.AppendLine("</figure>");
 
+			if (!string.IsNullOrEmpty(MapFileName))
+			{
+				Output.Append("<map id=\"Map");
+				Output.Append(Hash);
+				Output.Append("\" name=\"Map");
+				Output.Append(Hash);
+				Output.AppendLine("\">");
+
+				string Map = File.ReadAllText(MapFileName);
+				string[] MapRows = Map.Split(CommonTypes.CRLF, StringSplitOptions.RemoveEmptyEntries);
+				int i, c;
+
+				for (i = 1, c = MapRows.Length - 1; i < c; i++)
+					Output.AppendLine(MapRows[i]);
+
+				Output.AppendLine("</map>");
+			}
+
 			return true;
 		}
 
-		private string GetFileName(string Language, string[] Rows, out string Title)
+		private string GetFileName(string Language, string[] Rows, out string Title, out string MapFileName, out string Hash)
 		{
 			StringBuilder sb = new StringBuilder();
 
@@ -332,13 +356,20 @@ namespace Waher.IoTGateway.CodeContent
 
 			sb.Append(Language);
 
-			string FileName = Hashes.ComputeSHA256HashString(Encoding.UTF8.GetBytes(sb.ToString()));
+			Hash = Hashes.ComputeSHA256HashString(Encoding.UTF8.GetBytes(sb.ToString()));
+
 			string GraphVizFolder = Path.Combine(Gateway.RootFolder, "GraphViz");
-
-			FileName = Path.Combine(GraphVizFolder, FileName);
-
+			string FileName = Path.Combine(GraphVizFolder, Hash);
 			string SvgFileName = FileName + ".svg";
-			if (!File.Exists(SvgFileName))
+
+			MapFileName = FileName + ".map";
+
+			if (File.Exists(SvgFileName))
+			{
+				if (!File.Exists(MapFileName))
+					MapFileName = null;
+			}
+			else
 			{
 				string TxtFileName = FileName + ".txt";
 				File.WriteAllText(TxtFileName, Graph, Encoding.Default);
@@ -346,7 +377,7 @@ namespace Waher.IoTGateway.CodeContent
 				ProcessStartInfo ProcessInformation = new ProcessStartInfo()
 				{
 					FileName = Path.Combine(installationFolder, "bin", Language.ToLower() + ".exe"),
-					Arguments = "-Tsvg -q -o\"" + SvgFileName + "\" \"" + TxtFileName + "\"",
+					Arguments = "-Tcmapx -o\"" + MapFileName + "\" -Tsvg -q -o\"" + SvgFileName + "\" \"" + TxtFileName + "\"",
 					UseShellExecute = false,
 					RedirectStandardError = true,
 					RedirectStandardOutput = true,
@@ -377,6 +408,14 @@ namespace Waher.IoTGateway.CodeContent
 					Log.Error("Unable to generate graph. Exit code: " + P.ExitCode.ToString());
 					return null;
 				}
+
+				string Map = File.ReadAllText(MapFileName);
+				string[] MapRows = Map.Split(CommonTypes.CRLF, StringSplitOptions.RemoveEmptyEntries);
+				if (MapRows.Length <= 2)
+				{
+					File.Delete(MapFileName);
+					MapFileName = null;
+				}
 			}
 
 			return SvgFileName;
@@ -393,7 +432,7 @@ namespace Waher.IoTGateway.CodeContent
 		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
 		public bool GeneratePlainText(StringBuilder Output, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
-			this.GetFileName(Language, Rows, out string Title);
+			this.GetFileName(Language, Rows, out string Title, out string MapFileName, out string Hash);
 			Output.AppendLine(Title);
 
 			return true;
@@ -412,7 +451,7 @@ namespace Waher.IoTGateway.CodeContent
 		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
 		public bool GenerateXAML(XmlWriter Output, XamlSettings Settings, TextAlignment TextAlignment, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
-			string FileName = this.GetFileName(Language, Rows, out string Title);
+			string FileName = this.GetFileName(Language, Rows, out string Title, out string MapFileName, out string Hash);
 			if (FileName == null)
 				return false;
 

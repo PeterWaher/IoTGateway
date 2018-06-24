@@ -752,6 +752,9 @@ digraph G {
 (or the machine). GraphViz is detected during initialization of the service. Make sure that GraphViz is installed in the program data folder, preferrably
 in its default folder.
 
+**Note 2**: You can make the graph clickable by embedding [URL attributes](http://www.graphviz.org/doc/info/attrs.html#d:URL) on either nodes, edges
+or the entire graph.
+
 For more information about the GraphViz syntax, see the [GraphViz documentation](http://www.graphviz.org/documentation/).
 
 #### UML with PlantUML

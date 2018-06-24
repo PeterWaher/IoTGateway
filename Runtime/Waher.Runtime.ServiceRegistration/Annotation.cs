@@ -17,10 +17,21 @@ namespace Waher.Runtime.ServiceRegistration
 		/// </summary>
 		/// <param name="Tag">Tag name</param>
 		/// <param name="value">Value</param>
-		public Annotation(string Tag, string value)
+		public Annotation()
+		{
+			this.tag = string.Empty;
+			this.value = string.Empty;
+		}
+
+		/// <summary>
+		/// Registry annotation.
+		/// </summary>
+		/// <param name="Tag">Tag name</param>
+		/// <param name="Value">Value</param>
+		public Annotation(string Tag, string Value)
 		{
 			this.tag = Tag;
-			this.value = value;
+			this.value = Value;
 		}
 
 		/// <summary>

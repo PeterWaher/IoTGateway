@@ -137,12 +137,15 @@ namespace Waher.Client.WPF.Controls
 				MainWindow.SelectionChanged();
 		}
 
-		public void SaveFile()
+		public bool SaveFile()
 		{
 			if (string.IsNullOrEmpty(this.fileName))
-				this.SaveNewFile();
+				return this.SaveNewFile();
 			else
+			{
 				this.connections.Save(this.fileName);
+				return true;
+			}
 		}
 
 		public bool CheckSaved()
@@ -153,7 +156,7 @@ namespace Waher.Client.WPF.Controls
 					"Save unsaved changes?", MessageBoxButton.YesNoCancel, MessageBoxImage.Question))
 				{
 					case MessageBoxResult.Yes:
-						if (this.SaveNewFile())
+						if (this.SaveFile())
 							break;
 						else
 							return false;

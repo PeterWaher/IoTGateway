@@ -1287,10 +1287,50 @@ namespace Waher.Client.WPF.Model
 
 		public void AddContexMenuItems(TreeNode Node, ref string CurrentGroup, ContextMenu Menu)
 		{
+			MenuItem Item;
+
+			if (Node == this)
+			{
+				this.GroupSeparator(ref CurrentGroup, "Connection", Menu);
+
+				Menu.Items.Add(Item = new MenuItem()
+				{
+					Header = "_Change password...",
+					IsEnabled = (this.client != null && this.client.State == XmppState.Connected)
+				});
+
+				Item.Click += this.ChangePassword_Click;
+			}
+
 			foreach (XmppComponent Component in this.components)
 			{
 				if (Component is IMenuAggregator MenuAggregator)
 					MenuAggregator.AddContexMenuItems(Node, ref CurrentGroup, Menu);
+			}
+		}
+
+		private void ChangePassword_Click(object sender, RoutedEventArgs e)
+		{
+			ChangePasswordForm Dialog = new ChangePasswordForm();
+			bool? Result = Dialog.ShowDialog();
+
+			if (Result.HasValue && Result.Value)
+			{
+				this.client.ChangePassword(Dialog.Password.Password, (sender2, e2) =>
+				{
+					if (e2.Ok)
+					{
+						this.connections.Modified = true;
+						this.password = Dialog.Password.Password;
+						this.passwordHash = string.Empty;
+						this.passwordHashMethod = string.Empty;
+						this.client.Reconnect(this.client.UserName, this.password);
+
+						MainWindow.SuccessBox("Password successfully changed.");
+					}
+					else
+						MainWindow.ErrorBox("Unable to change password.");
+				}, null);
 			}
 		}
 

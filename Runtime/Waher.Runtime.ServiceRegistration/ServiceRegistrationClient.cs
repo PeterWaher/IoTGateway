@@ -78,6 +78,7 @@ namespace Waher.Runtime.ServiceRegistration
 			AssembliesSorted.Keys.CopyTo(Assemblies, 0);
 
 			string BareJid = this.client.BareJID.ToLower();
+			bool New;
 
 			if (Registration == null)
 			{
@@ -85,6 +86,8 @@ namespace Waher.Runtime.ServiceRegistration
 				{
 					Created = DateTime.Now
 				};
+
+				New = true;
 			}
 			else if (Registration.BareJid != BareJid ||
 				!Equals<string>(Registration.Assemblies, Assemblies) ||
@@ -98,6 +101,7 @@ namespace Waher.Runtime.ServiceRegistration
 				Registration.Domain != this.client.Domain)
 			{
 				Registration.Updated = DateTime.Now;
+				New = false;
 			}
 			else
 				return;
@@ -105,7 +109,12 @@ namespace Waher.Runtime.ServiceRegistration
 			this.SetValues(Registration, Assemblies, Annotations);
 
 			if (await this.SendRegistration(Registration))
-				await Database.Update(Registration);
+			{
+				if (New)
+					await Database.Insert(Registration);
+				else
+					await Database.Update(Registration);
+			}
 		}
 
 		private Task<bool> SendRegistration(Registration Registration)

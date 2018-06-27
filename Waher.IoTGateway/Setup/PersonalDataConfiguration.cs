@@ -145,6 +145,8 @@ namespace Waher.IoTGateway.Setup
 			if (Hash != this.informationHash || (!this.consented && this.Complete))
 			{
 				this.InformationHash = Hash;
+				this.consented = false;
+				this.consentedTimestamp = DateTime.MinValue;
 				this.Complete = false;
 				this.Completed = DateTime.MinValue;
 				this.Updated = DateTime.Now;

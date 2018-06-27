@@ -13,9 +13,9 @@ namespace Waher.Script.Operators.Membership
 	/// </summary>
 	public class NamedMethodCall : UnaryOperator
 	{
-		private string name;
-		private ScriptNode[] parameters;
-		private int nrParameters;
+		private readonly string name;
+		private readonly ScriptNode[] parameters;
+		private readonly int nrParameters;
 
 		/// <summary>
 		/// Named method call operator.
@@ -370,6 +370,6 @@ namespace Waher.Script.Operators.Membership
 		private KeyValuePair<string, int>[] byReference = null;
 		private object[] methodArguments = null;
 		private bool[] methodArgumentExtensions = null;
-		private object synchObject = new object();
+		private readonly object synchObject = new object();
 	}
 }

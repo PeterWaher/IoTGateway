@@ -933,7 +933,7 @@ namespace Waher.Networking.HTTP
 				Method = Request.Header.Method
 			};
 
-			this.currentRequests.Add(Request, Info);
+			this.currentRequests?.Add(Request, Info);
 		}
 
 		private void IncLocked(string Key, Dictionary<string, Statistic> Stat)
@@ -1002,16 +1002,19 @@ namespace Waher.Networking.HTTP
 		/// <param name="StatusCode">Status code.</param>
 		public void RequestResponded(HttpRequest Request, int StatusCode)
 		{
-			if (this.currentRequests.TryGetValue(Request, out RequestInfo Info))
+			if (this.currentRequests != null)
 			{
-				Info.StatusCode = StatusCode;
-				this.currentRequests.Remove(Request);
-			}
-			else if (StatusCode != 0)
-			{
-				Log.Warning("Late response.", Request.Header.Resource,
-					new KeyValuePair<string, object>("Response", StatusCode),
-					new KeyValuePair<string, object>("Method", Request.Header.Method));
+				if (this.currentRequests.TryGetValue(Request, out RequestInfo Info))
+				{
+					Info.StatusCode = StatusCode;
+					this.currentRequests.Remove(Request);
+				}
+				else if (StatusCode != 0)
+				{
+					Log.Warning("Late response.", Request.Header.Resource,
+						new KeyValuePair<string, object>("Response", StatusCode),
+						new KeyValuePair<string, object>("Method", Request.Header.Method));
+				}
 			}
 		}
 
@@ -1022,7 +1025,7 @@ namespace Waher.Networking.HTTP
 		/// <returns>If request found among current requests.</returns>
 		public bool PingRequest(HttpRequest Request)
 		{
-			return this.currentRequests.TryGetValue(Request, out RequestInfo Info);
+			return this.currentRequests?.TryGetValue(Request, out RequestInfo Info) == false;
 		}
 
 		private void CurrentRequests_Removed(object Sender, CacheItemEventArgs<HttpRequest, RequestInfo> e)
@@ -1050,7 +1053,9 @@ namespace Waher.Networking.HTTP
 					throw new ArgumentOutOfRangeException("The request timeout must be positive.", nameof(value));
 
 				this.requestTimeout = value;
-				this.currentRequests.MaxTimeUnused = value;
+
+				if (this.currentRequests != null)
+					this.currentRequests.MaxTimeUnused = value;
 			}
 		}
 

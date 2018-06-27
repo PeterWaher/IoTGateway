@@ -22,7 +22,6 @@ namespace Waher.Client.WPF.Dialogs
 	/// </summary>
 	public partial class ChangePasswordForm : Window
 	{
-		private XmppClient client = null;
 		private string passwordHash = string.Empty;
 		private string passwordHashMethod = string.Empty;
 

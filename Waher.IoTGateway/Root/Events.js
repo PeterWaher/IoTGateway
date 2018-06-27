@@ -10,6 +10,7 @@
             {
                 if (NeedsReload)
                 {
+                    delete xhttp;
                     window.location.reload(false);
                     return;
                 }
@@ -42,32 +43,49 @@
                 }
                 finally
                 {
-                    xhttp.open("POST", "/ClientEvents", true);
-                    xhttp.setRequestHeader("Content-Type", "text/plain");
-                    xhttp.setRequestHeader("X-TabID", TabID);
-                    xhttp.send(window.location.href);
+                    if (EventCheckingEnabled)
+                    {
+                        xhttp.open("POST", "/ClientEvents", true);
+                        xhttp.setRequestHeader("Content-Type", "text/plain");
+                        xhttp.setRequestHeader("X-TabID", TabID);
+                        xhttp.send(window.location.href);
+                    }
+                    else
+                        delete xhttp;
                 }
             }
             else
             {
                 ShowError(xhttp);
 
-                window.setTimeout(function ()
+                if (EventCheckingEnabled)
                 {
-                    NeedsReload = true;
-                    xhttp.open("POST", "/ClientEvents", true);
-                    xhttp.setRequestHeader("Content-Type", "text/plain");
-                    xhttp.setRequestHeader("X-TabID", TabID);
-                    xhttp.send(window.location.href);
-                }, 5000);
+                    window.setTimeout(function ()
+                    {
+                        NeedsReload = true;
+                        xhttp.open("POST", "/ClientEvents", true);
+                        xhttp.setRequestHeader("Content-Type", "text/plain");
+                        xhttp.setRequestHeader("X-TabID", TabID);
+                        xhttp.send(window.location.href);
+                    }, 5000);
+                }
+                else
+                    delete xhttp;
             }
         };
     }
+
+    EventCheckingEnabled = true;
 
     xhttp.open("POST", "/ClientEvents", true);
     xhttp.setRequestHeader("Content-Type", "text/plain");
     xhttp.setRequestHeader("X-TabID", TabID);
     xhttp.send(window.location.href);
+}
+
+function CloseEvents()
+{
+    EventCheckingEnabled = false;
 }
 
 function ShowError(xhttp)
@@ -93,7 +111,6 @@ function NOP(Data)
 function Reload(Data)
 {
     window.location.reload(false);
-    // TODO: Reload, without using contents in forms.
 }
 
 function EndsWith(String, Suffix)
@@ -108,6 +125,7 @@ function EndsWith(String, Suffix)
 }
 
 var TabID;
+var EventCheckingEnabled = true;
 
 try
 {

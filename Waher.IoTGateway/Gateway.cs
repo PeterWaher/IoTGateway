@@ -386,14 +386,14 @@ namespace Waher.IoTGateway
 						webServer.ResourceOverride = Configuration.Resource;
 						Configuration.SetStaticInstance(Configuration);
 
-						ClientEvents.PushEvent(ClientEvents.GetTabIDs(), "Reload", string.Empty);
-
 						if (StartingServer != null)
 						{
 							StartingServer.Release();
 							StartingServer.Dispose();
 							StartingServer = null;
 						}
+
+						ClientEvents.PushEvent(ClientEvents.GetTabIDs(), "Reload", string.Empty);
 
 						await Configuration.SetupConfiguration(webServer);
 						NeedsCleanup = true;

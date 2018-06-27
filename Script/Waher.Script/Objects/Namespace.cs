@@ -61,12 +61,11 @@ namespace Waher.Script.Objects
         /// </summary>
         public override bool Equals(object obj)
         {
-            Namespace E = obj as Namespace;
-            if (E == null)
-                return false;
-            else
-                return this.value == E.value;
-        }
+			if (!(obj is Namespace E))
+				return false;
+			else
+				return this.value == E.value;
+		}
 
         /// <summary>
         /// <see cref="Object.GetHashCode()"/>

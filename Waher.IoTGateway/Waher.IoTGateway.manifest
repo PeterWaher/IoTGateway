@@ -11,9 +11,17 @@
 			<Content fileName="Introduction.md"/>
 			<Content fileName="Master.md"/>
 			<Content fileName="Next.js"/>
+			<Content fileName="PersonalData.js"/>
+			<Content fileName="PersonalData.md"/>
 			<Content fileName="Theme.md"/>
 			<Content fileName="XMPP.js"/>
 			<Content fileName="XMPP.md"/>
+			<Folder name="PersonalData">
+				<Content fileName="LocalDatabase.md"/>
+				<Content fileName="LocalSensorsAndDevices.md"/>
+				<Content fileName="NetworkIdentity.md"/>
+				<Content fileName="WebPages.md"/>
+			</Folder>
 		</Folder>
 	</Folder>
 </Module>

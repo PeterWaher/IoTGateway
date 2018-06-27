@@ -1044,6 +1044,8 @@
 								<File Id='Domain.js' Name='Domain.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Domain.js'/>
 								<File Id='Domain.md' Name='Domain.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Domain.md'/>
 								<File Id='Introduction.md' Name='Introduction.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Introduction.md'/>
+								<File Id='PersonalData.js' Name='PersonalData.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\PersonalData.js'/>
+								<File Id='PersonalData.md' Name='PersonalData.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\PersonalData.md'/>
 								<File Id='SettingsMaster.md' Name='Master.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Master.md' />
 								<File Id='Next.js' Name='Next.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Next.js'/>
 								<File Id='Theme.js' Name='Theme.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Theme.js'/>
@@ -1054,6 +1056,8 @@
 								<RemoveFile Id='RemoveDomain.js' Name='Domain.js' On='uninstall'/>
 								<RemoveFile Id='RemoveDomain.md' Name='Domain.md' On='uninstall'/>
 								<RemoveFile Id='RemoveIntroduction.md' Name='Introduction.md' On='uninstall'/>
+								<RemoveFile Id='RemovePersonalData.js' Name='PersonalData.js' On='uninstall'/>
+								<RemoveFile Id='RemovePersonalData.md' Name='PersonalData.md' On='uninstall'/>
 								<RemoveFile Id='RemoveSettingsMaster.md' Name='Master.md' On='uninstall'/>
 								<RemoveFile Id='RemoveNext.js' Name='Next.js' On='uninstall'/>
 								<RemoveFile Id='RemoveTheme.js' Name='Theme.js' On='uninstall'/>
@@ -1061,6 +1065,19 @@
 								<RemoveFile Id='RemoveXMPP.js' Name='XMPP.js' On='uninstall'/>
 								<RemoveFile Id='RemoveXMPP.md' Name='XMPP.md' On='uninstall'/>
 							</Component>
+							<Directory Id='PersonalData' Name='Personal Data'>
+								<Component Id='PersonalDataFiles' Guid='DB697CF1-B906-4181-8535-65B98F24F345'>
+									<RemoveFolder Id='RemovePersonalData' On='uninstall' />
+									<File Id='LocalDatabase.md' Name='LocalDatabase.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\PersonalData\LocalDatabase.md' KeyPath='yes'/>
+									<File Id='LocalSensorsAndDevices.md' Name='LocalSensorsAndDevices.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\PersonalData\LocalSensorsAndDevices.md' KeyPath='yes'/>
+									<File Id='NetworkIdentity.md' Name='NetworkIdentity.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\PersonalData\NetworkIdentity.md' KeyPath='yes'/>
+									<File Id='WebPages.md' Name='WebPages.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\PersonalData\WebPages.md' KeyPath='yes'/>
+									<RemoveFile Id='RemoveLocalDatabase.md' Name='LocalDatabase.md' On='uninstall'/>
+									<RemoveFile Id='RemoveLocalSensorsAndDevices.md' Name='LocalSensorsAndDevices.md' On='uninstall'/>
+									<RemoveFile Id='RemoveNetworkIdentity.md' Name='NetworkIdentity.md' On='uninstall'/>
+									<RemoveFile Id='RemoveWebPages.md' Name='WebPages.md' On='uninstall'/>
+								</Component>
+							</Directory>
 						</Directory>
 						<Directory Id='Templates' Name='Templates'>
               <Component Id='TemplateFiles' Guid='BA793911-4C7F-4682-B118-3ABE514B24D4'>
@@ -1194,6 +1211,7 @@
         <ComponentRef Id='AudioFiles' />
         <ComponentRef Id='ImageFiles' />
 				<ComponentRef Id='SettingsFiles' />
+				<ComponentRef Id='PersonalDataFiles'/>
 				<ComponentRef Id='TemplateFiles' />
 				<ComponentRef Id='CactusRoseFiles'/>
 				<ComponentRef Id='GothicPeacockFiles'/>

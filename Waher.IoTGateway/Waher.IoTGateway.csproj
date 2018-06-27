@@ -15,9 +15,9 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>IoT Gateway HTTP CoAP MQTT XMPP LWM2M</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.0.33</AssemblyVersion>
-    <FileVersion>1.0.33</FileVersion>
-    <Version>1.0.33</Version>
+    <AssemblyVersion>1.0.34</AssemblyVersion>
+    <FileVersion>1.0.34</FileVersion>
+    <Version>1.0.34</Version>
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Waher.IoTGateway\</UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>
@@ -35,6 +35,12 @@
     <None Remove="Root\Settings\Introduction.md" />
     <None Remove="Root\Settings\Master.md" />
     <None Remove="Root\Settings\Next.js" />
+    <None Remove="Root\Settings\PersonalData.js" />
+    <None Remove="Root\Settings\PersonalData.md" />
+    <None Remove="Root\Settings\PersonalData\LocalDatabase.md" />
+    <None Remove="Root\Settings\PersonalData\LocalSensorsAndDevices.md" />
+    <None Remove="Root\Settings\PersonalData\NetworkIdentity.md" />
+    <None Remove="Root\Settings\PersonalData\WebPages.md" />
     <None Remove="Root\Settings\Theme.js" />
     <None Remove="Root\Settings\Theme.md" />
     <None Remove="Root\Settings\XMPP.js" />
@@ -54,6 +60,24 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Root\Settings\Config.cssx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Settings\PersonalData.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Settings\PersonalData.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Settings\PersonalData\WebPages.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Settings\PersonalData\LocalSensorsAndDevices.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Settings\PersonalData\NetworkIdentity.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Settings\PersonalData\LocalDatabase.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Root\Settings\Theme.js">

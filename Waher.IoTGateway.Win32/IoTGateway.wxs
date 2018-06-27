@@ -1065,7 +1065,7 @@
 								<RemoveFile Id='RemoveXMPP.js' Name='XMPP.js' On='uninstall'/>
 								<RemoveFile Id='RemoveXMPP.md' Name='XMPP.md' On='uninstall'/>
 							</Component>
-							<Directory Id='PersonalData' Name='Personal Data'>
+							<Directory Id='PersonalData' Name='PersonalData'>
 								<Component Id='PersonalDataFiles' Guid='DB697CF1-B906-4181-8535-65B98F24F345'>
 									<RemoveFolder Id='RemovePersonalData' On='uninstall' />
 									<File Id='LocalDatabase.md' Name='LocalDatabase.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\PersonalData\LocalDatabase.md' KeyPath='yes'/>

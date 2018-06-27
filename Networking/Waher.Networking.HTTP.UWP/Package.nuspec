@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata minClientVersion="3.2">
     <id>Waher.Networking.HTTP.UWP</id>
-    <version>1.0.14</version>
+    <version>1.0.15</version>
     <title>Waher.Networking.HTTP.UWP</title>
     <authors>Peter Waher</authors>
     <owners>Waher Data AB</owners>

@@ -67,7 +67,7 @@ namespace Waher.Networking.HTTP
 		private readonly Dictionary<string, HttpResource> resources = new Dictionary<string, HttpResource>(StringComparer.CurrentCultureIgnoreCase);
 		private TimeSpan sessionTimeout = new TimeSpan(0, 20, 0);
 		private TimeSpan requestTimeout = new TimeSpan(0, 2, 0);
-		private readonly Cache<HttpRequest, RequestInfo> currentRequests;
+		private Cache<HttpRequest, RequestInfo> currentRequests;
 		private Cache<string, Variables> sessions;
 		private string resourceOverride = null;
 		private Regex resourceOverrideFilter = null;
@@ -319,6 +319,12 @@ namespace Waher.Networking.HTTP
 			{
 				this.sessions.Dispose();
 				this.sessions = null;
+			}
+
+			if (this.currentRequests != null)
+			{
+				this.currentRequests.Dispose();
+				this.currentRequests = null;
 			}
 		}
 

@@ -8,7 +8,7 @@ namespace Waher.Persistence.Files.Serialization
 {
 	internal class KeyCollection : ICollection<string>
 	{
-		private StringDictionary dictionary;
+		private readonly StringDictionary dictionary;
 
 		public KeyCollection(StringDictionary Dictionary)
 		{

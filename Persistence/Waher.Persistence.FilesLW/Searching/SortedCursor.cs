@@ -14,10 +14,10 @@ namespace Waher.Persistence.Files.Searching
 	/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
 	internal class SortedCursor<T> : ICursor<T>
 	{
-		private SortedDictionary<SortRec, Tuple<T, IObjectSerializer, Guid>> sortedObjects;
-		private SortedDictionary<SortRec, Tuple<T, IObjectSerializer, Guid>>.ValueCollection.Enumerator e;
-		private IndexRecords recordHandler;
-		private int timeoutMilliseconds;
+		private readonly SortedDictionary<SortRec, Tuple<T, IObjectSerializer, Guid>> sortedObjects;
+		private readonly SortedDictionary<SortRec, Tuple<T, IObjectSerializer, Guid>>.ValueCollection.Enumerator e;
+		private readonly IndexRecords recordHandler;
+		private readonly int timeoutMilliseconds;
 
 		/// <summary>
 		/// Provides a cursor into a sorted set of objects.
@@ -37,7 +37,7 @@ namespace Waher.Persistence.Files.Searching
 		internal class SortRec : IComparable
 		{
 			private byte[] key;
-			private IComparer<byte[]> comparer;
+			private readonly IComparer<byte[]> comparer;
 
 			internal SortRec(byte[] Key, IComparer<byte[]> Comparer)
 			{

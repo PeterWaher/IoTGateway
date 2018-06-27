@@ -10,7 +10,7 @@ namespace Waher.Persistence.Files.Serialization.Model
 	/// </summary>
     public class FieldMember : Member
     {
-		private FieldInfo fi;
+		private readonly FieldInfo fi;
 
 		/// <summary>
 		/// Field member.

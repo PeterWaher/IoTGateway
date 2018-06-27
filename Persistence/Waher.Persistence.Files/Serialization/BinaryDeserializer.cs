@@ -11,8 +11,8 @@ namespace Waher.Persistence.Files.Serialization
 	/// </summary>
 	public class BinaryDeserializer
 	{
-		private string collectionName;
-		private Encoding encoding;
+		private readonly string collectionName;
+		private readonly Encoding encoding;
 		private byte[] data;
 		private int pos;
 		private byte bitOffset = 0;

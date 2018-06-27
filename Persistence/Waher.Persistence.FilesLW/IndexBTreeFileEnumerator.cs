@@ -17,12 +17,12 @@ namespace Waher.Persistence.Files
 	{
 		private ObjectBTreeFileEnumerator<object> e;
 		private IObjectSerializer currentSerializer;
-		private FilesProvider provider;
-		private IndexBTreeFile file;
-		private IndexRecords recordHandler;
+		private readonly FilesProvider provider;
+		private readonly IndexBTreeFile file;
+		private readonly IndexRecords recordHandler;
 		private Guid currentObjectId;
 		private T current;
-		private int timeoutMilliseconds;
+		private readonly int timeoutMilliseconds;
 		private bool locked;
 		private bool hasCurrent;
 		private bool currentTypeCompatible;

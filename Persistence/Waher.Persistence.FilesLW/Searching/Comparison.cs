@@ -202,8 +202,7 @@ namespace Waher.Persistence.Files.Searching
 			if (!TryMakeSameType(ref Value1, ref Value2))
 				return null;
 
-			IComparable Comparable = Value1 as IComparable;
-			if (Comparable == null)
+			if (!(Value1 is IComparable Comparable))
 				return null;
 
 			return Comparable.CompareTo(Value2);

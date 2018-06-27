@@ -13,12 +13,12 @@ namespace Waher.Persistence.Files.Serialization
 	/// </summary>
 	public class BinarySerializer
 	{
-		private string collectionName;
-		private Encoding encoding;
-		private MemoryStream ms;
+		private readonly string collectionName;
+		private readonly Encoding encoding;
+		private readonly MemoryStream ms;
 		private byte bits = 0;
 		private byte bitOffset = 0;
-		private bool debug;
+		private readonly bool debug;
 
 		/// <summary>
 		/// Manages binary serialization of data.

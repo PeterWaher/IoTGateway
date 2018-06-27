@@ -12,7 +12,7 @@ namespace Waher.Persistence.Files.Searching
 	/// </summary>
 	public class FilterFieldLikeRegEx : F.FilterFieldLikeRegEx, IApplicableFilter
 	{
-		private Regex regex;
+		private readonly Regex regex;
 
 		/// <summary>
 		/// This filter selects objects that have a named field matching a given regular expression.

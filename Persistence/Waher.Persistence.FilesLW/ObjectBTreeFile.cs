@@ -33,17 +33,17 @@ namespace Waher.Persistence.Files
 		private IndexBTreeFile[] indices = new IndexBTreeFile[0];
 		private List<IndexBTreeFile> indexList = new List<IndexBTreeFile>();
 		private SortedDictionary<uint, bool> emptyBlocks = null;
-		private GenericObjectSerializer genericSerializer;
-		private FilesProvider provider;
+		private readonly GenericObjectSerializer genericSerializer;
+		private readonly FilesProvider provider;
 		private FileStream file;
 		private FileStream blobFile;
-		private Encoding encoding;
-		private SemaphoreSlim fileAccessSemaphore = new SemaphoreSlim(1, 1);
+		private readonly Encoding encoding;
+		private readonly SemaphoreSlim fileAccessSemaphore = new SemaphoreSlim(1, 1);
 		private SortedDictionary<long, byte[]> blocksToSave = null;
 		private LinkedList<KeyValuePair<object, ObjectSerializer>> objectsToSave = null;
 		private LinkedList<Tuple<Guid, ObjectSerializer, EmbeddedObjectSetter>> objectsToLoad = null;
-		private object synchObject = new object();
-		private IRecordHandler recordHandler;
+		private readonly object synchObject = new object();
+		private readonly IRecordHandler recordHandler;
 		private string lockStackTrace;
 		private ulong nrFullFileScans = 0;
 		private ulong nrSearches = 0;
@@ -55,21 +55,22 @@ namespace Waher.Persistence.Files
 		private ulong nrBlobBlockSaves = 0;
 		private ulong blockUpdateCounter = 0;
 		private string fileName;
-		private string collectionName;
-		private string blobFileName;
-		private int blockSize;
-		private int blobBlockSize;
-		private int inlineObjectSizeLimit;
-		private int timeoutMilliseconds;
-		private int id;
+		private readonly string collectionName;
+		private readonly string blobFileName;
+		private readonly int blockSize;
+		private readonly int blobBlockSize;
+		private readonly int inlineObjectSizeLimit;
+		private readonly int timeoutMilliseconds;
+		private readonly int id;
 		private bool isCorrupt = false;
 		private bool emptyRoot = false;
-		private bool debug;
+		private readonly bool debug;
 #if NETSTANDARD1_5
 		private Aes aes;
-		private byte[] aesKey;
-		private byte[] p;
-		private bool encrypted;
+		private readonly byte[] aesKey;
+		private readonly byte[] ivSeed;
+		private readonly int ivSeedLen;
+		private readonly bool encrypted;
 #endif
 
 #if NETSTANDARD1_5
@@ -200,29 +201,65 @@ namespace Waher.Persistence.Files
 			else
 				this.recordHandler = RecordHandler;
 
+			bool FileExists = File.Exists(this.fileName);
+
 #if NETSTANDARD1_5
 			if (this.encrypted)
 			{
-				RSACryptoServiceProvider rsa;
+				RSACryptoServiceProvider rsa = null;
 				CspParameters CspParams = new CspParameters()
 				{
-					Flags = CspProviderFlags.UseMachineKeyStore,
+					Flags = CspProviderFlags.UseMachineKeyStore |
+						CspProviderFlags.NoPrompt |
+						CspProviderFlags.UseExistingKey,
 					KeyContainerName = this.fileName
 				};
+
+				int KeyGenMode = 0;
 
 				try
 				{
 					rsa = new RSACryptoServiceProvider(CspParams);
+					if (!FileExists)
+						rsa.PersistKeyInCsp = false;    // Deletes key.
+					else if (rsa.KeySize > 1024)
+						KeyGenMode++;
 				}
 				catch (CryptographicException ex)
 				{
-					throw new CryptographicException("Unable to get access to cryptographic key to unlock database. Was the database created using another user?", ex);
+					if (FileExists)
+						throw new CryptographicException("Unable to get access to cryptographic key to unlock database. Was the database created using another user?", ex);
+				}
+
+				if (!FileExists)
+				{
+					rsa?.Dispose();
+					rsa = null;
+
+					CspParams.Flags = CspProviderFlags.UseMachineKeyStore |
+						CspProviderFlags.NoPrompt;
+
+					try
+					{
+						rsa = new RSACryptoServiceProvider(4096, CspParams);
+					}
+					catch (CryptographicException)
+					{
+						try
+						{
+							rsa = new RSACryptoServiceProvider(CspParams);
+						}
+						catch (CryptographicException ex)
+						{
+							throw new CryptographicException("Unable to get access to cryptographic key to unlock database. Was the database created using another user?", ex);
+						}
+					}
+
+					if (rsa.KeySize > 1024)
+						KeyGenMode++;
 				}
 
 				RSAParameters Parameters = rsa.ExportParameters(true);
-				this.p = Parameters.P;
-
-				byte[] Q = Parameters.Q;
 
 				this.aes = Aes.Create();
 				aes.BlockSize = 128;
@@ -232,7 +269,25 @@ namespace Waher.Persistence.Files
 
 				using (SHA256 Sha256 = SHA256.Create())
 				{
-					this.aesKey = Sha256.ComputeHash(Q);
+					if (KeyGenMode == 0)
+					{
+						this.ivSeed = Parameters.P;
+						this.aesKey = Sha256.ComputeHash(Parameters.Q);
+					}
+					else
+					{
+						int pLen = Parameters.P.Length;
+						int qLen = Parameters.Q.Length;
+						byte[] Bin = new byte[pLen + qLen];
+
+						Array.Copy(Parameters.P, 0, Bin, 0, pLen);
+						Array.Copy(Parameters.Q, 0, Bin, pLen, qLen);
+
+						this.aesKey = Sha256.ComputeHash(Bin);
+						this.ivSeed = Sha256.ComputeHash(Parameters.Modulus);
+					}
+
+					this.ivSeedLen = this.ivSeed.Length;
 				}
 			}
 #endif
@@ -240,7 +295,7 @@ namespace Waher.Persistence.Files
 			if (!string.IsNullOrEmpty(Folder) && !Directory.Exists(Folder))
 				Directory.CreateDirectory(Folder);
 
-			if (File.Exists(this.fileName))
+			if (FileExists)
 				this.file = File.Open(this.fileName, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
 			else
 
@@ -731,9 +786,9 @@ namespace Waher.Persistence.Files
 #if NETSTANDARD1_5
 		private byte[] GetIV(long Position)
 		{
-			byte[] Input = new byte[72];
-			Array.Copy(this.p, 0, Input, 0, 64);
-			Array.Copy(BitConverter.GetBytes(Position), 0, Input, 64, 8);
+			byte[] Input = new byte[this.ivSeedLen + 8];
+			Array.Copy(this.ivSeed, 0, Input, 0, this.ivSeedLen);
+			Array.Copy(BitConverter.GetBytes(Position), 0, Input, this.ivSeedLen, 8);
 			byte[] Hash;
 
 			using (SHA1 Sha1 = SHA1.Create())
@@ -4520,8 +4575,7 @@ namespace Waher.Persistence.Files
 			if (Item == null)
 				return false;
 
-			ObjectSerializer Serializer = this.provider.GetObjectSerializer(Item.GetType()) as ObjectSerializer;
-			if (Serializer == null)
+			if (!(this.provider.GetObjectSerializer(Item.GetType()) is ObjectSerializer Serializer))
 				return false;
 
 			if (!Serializer.HasObjectId(Item))
@@ -4554,8 +4608,7 @@ namespace Waher.Persistence.Files
 				byte[] Bin = Writer.GetSerialization();
 
 				BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Bin);
-				GenericObject Obj2 = this.genericSerializer.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false) as GenericObject;
-				if (Obj2 == null)
+				if (!(this.genericSerializer.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false) is GenericObject Obj2))
 					return false;
 
 				return Obj.Equals(Obj2);

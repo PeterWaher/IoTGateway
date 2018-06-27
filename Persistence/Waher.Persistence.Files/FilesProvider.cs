@@ -59,28 +59,28 @@ namespace Waher.Persistence.Files
 	public class FilesProvider : IDisposable, IDatabaseProvider
 	{
 		private Dictionary<Type, IObjectSerializer> serializers;
-		private Dictionary<string, Dictionary<string, ulong>> codeByFieldByCollection = new Dictionary<string, Dictionary<string, ulong>>();
-		private Dictionary<string, Dictionary<ulong, string>> fieldByCodeByCollection = new Dictionary<string, Dictionary<ulong, string>>();
-		private Dictionary<string, ObjectBTreeFile> files = new Dictionary<string, ObjectBTreeFile>();
-		private Dictionary<string, StringDictionary> nameFiles = new Dictionary<string, StringDictionary>();
-		private AutoResetEvent serializerAdded = new AutoResetEvent(false);
+		private readonly Dictionary<string, Dictionary<string, ulong>> codeByFieldByCollection = new Dictionary<string, Dictionary<string, ulong>>();
+		private readonly Dictionary<string, Dictionary<ulong, string>> fieldByCodeByCollection = new Dictionary<string, Dictionary<ulong, string>>();
+		private readonly Dictionary<string, ObjectBTreeFile> files = new Dictionary<string, ObjectBTreeFile>();
+		private readonly Dictionary<string, StringDictionary> nameFiles = new Dictionary<string, StringDictionary>();
+		private readonly AutoResetEvent serializerAdded = new AutoResetEvent(false);
 		private StringDictionary master;
 		private Cache<long, byte[]> blocks;
-		private object synchObj = new object();
-		private object synchObjNrFiles = new object();
+		private readonly object synchObj = new object();
+		private readonly object synchObjNrFiles = new object();
 
-		private Encoding encoding;
-		private string id;
-		private string defaultCollectionName;
-		private string folder;
-		private int blockSize;
-		private int blobBlockSize;
-		private int timeoutMilliseconds;
+		private readonly Encoding encoding;
+		private readonly string id;
+		private readonly string defaultCollectionName;
+		private readonly string folder;
+		private readonly int blockSize;
+		private readonly int blobBlockSize;
+		private readonly int timeoutMilliseconds;
 		private int nrFiles = 0;
-		private bool debug;
+		private readonly bool debug;
 #if NETSTANDARD1_5
-		private bool encrypted;
-		private bool compiled;
+		private readonly bool encrypted;
+		private readonly bool compiled;
 #endif
 
 		#region Constructors
@@ -641,8 +641,7 @@ namespace Waher.Persistence.Files
 		/// <returns>Object Serializer</returns>
 		public ObjectSerializer GetObjectSerializerEx(Type Type)
 		{
-			ObjectSerializer Serializer = this.GetObjectSerializer(Type) as ObjectSerializer;
-			if (Serializer == null)
+			if (!(this.GetObjectSerializer(Type) is ObjectSerializer Serializer))
 				throw new Exception("Objects of type " + Type.FullName + " must be embedded.");
 
 			return Serializer;
@@ -1489,8 +1488,7 @@ namespace Waher.Persistence.Files
 		/// <param name="Object">Object to insert.</param>
 		public async Task Update(object Object)
 		{
-			GenericObject GenObj = Object as GenericObject;
-			if (GenObj == null)
+			if (!(Object is GenericObject GenObj))
 			{
 				ObjectSerializer Serializer = this.GetObjectSerializerEx(Object.GetType());
 				ObjectBTreeFile File = await this.GetFile(Serializer.CollectionName);
@@ -1530,8 +1528,7 @@ namespace Waher.Persistence.Files
 		/// <param name="Object">Object to insert.</param>
 		public async Task Delete(object Object)
 		{
-			GenericObject GenObj = Object as GenericObject;
-			if (GenObj == null)
+			if (!(Object is GenericObject GenObj))
 			{
 				ObjectSerializer Serializer = this.GetObjectSerializerEx(Object.GetType());
 				ObjectBTreeFile File = await this.GetFile(Serializer.CollectionName);

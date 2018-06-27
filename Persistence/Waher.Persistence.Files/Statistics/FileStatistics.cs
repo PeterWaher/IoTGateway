@@ -11,7 +11,7 @@ namespace Waher.Persistence.Files.Statistics
 	/// </summary>
 	public class FileStatistics
 	{
-		private uint blockSize;
+		private readonly uint blockSize;
 		private uint nrObjects = 0;
 		private uint nrBlocks = 0;
 		private uint nrBlobBlocks = 0;
@@ -30,17 +30,17 @@ namespace Waher.Persistence.Files.Statistics
 		private ulong nrBlobBytesUsed = 0;
 		private ulong nrBlobBytesUnused = 0;
 		private ulong nrBlobBytesTotal = 0;
-		private ulong nrBlockLoads = 0;
-		private ulong nrCacheLoads = 0;
-		private ulong nrBlockSaves = 0;
-		private ulong nrBlobBlockLoads = 0;
-		private ulong nrBlobBlockSaves = 0;
-		private ulong nrFullFileScans;
-		private ulong nrSearches;
+		private readonly ulong nrBlockLoads = 0;
+		private readonly ulong nrCacheLoads = 0;
+		private readonly ulong nrBlockSaves = 0;
+		private readonly ulong nrBlobBlockLoads = 0;
+		private readonly ulong nrBlobBlockSaves = 0;
+		private readonly ulong nrFullFileScans;
+		private readonly ulong nrSearches;
 		private bool isCorrupt = false;
 		private bool isBalanced = true;
 		private List<string> comments = null;
-		private object synchObject = new object();
+		private readonly object synchObject = new object();
 
 		/// <summary>
 		/// Contains information about a file.

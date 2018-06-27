@@ -15,13 +15,13 @@ namespace Waher.Persistence.Files.Searching
 	/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
 	internal class UnionCursor<T> : ICursor<T>
 	{
-		private Dictionary<Guid, bool> returned = new Dictionary<Guid, bool>();
+		private readonly Dictionary<Guid, bool> returned = new Dictionary<Guid, bool>();
 		private ICursor<T> currentCursor;
-		private Filter[] childFilters;
-		private ObjectBTreeFile file;
+		private readonly Filter[] childFilters;
+		private readonly ObjectBTreeFile file;
 		private int currentCursorPosition = 0;
-		private int nrCursors;
-		private bool locked;
+		private readonly int nrCursors;
+		private readonly bool locked;
 
 		/// <summary>
 		/// Provides a cursor that joins results from multiple cursors. It only returns an object once, regardless of how many times

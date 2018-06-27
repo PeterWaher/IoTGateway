@@ -11,8 +11,8 @@ namespace Waher.Persistence.Files
 	/// </summary>
 	public class CursorEnumerator<T> : IEnumerator<T>, IEnumerator
 	{
-		private ICursor<T> cursor;
-		private int timeoutMilliseconds;
+		private readonly ICursor<T> cursor;
+		private readonly int timeoutMilliseconds;
 
 		/// <summary>
 		/// Cursor enumerator

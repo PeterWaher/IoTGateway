@@ -11,8 +11,8 @@ namespace Waher.Persistence.Files
 	/// </summary>
 	public class Bookmark
 	{
-		private ObjectBTreeFile file;
-		private BlockInfo position;
+		private readonly ObjectBTreeFile file;
+		private readonly BlockInfo position;
 
 		internal Bookmark(ObjectBTreeFile File, BlockInfo Position)
 		{

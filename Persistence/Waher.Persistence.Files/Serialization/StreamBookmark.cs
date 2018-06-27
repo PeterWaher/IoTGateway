@@ -10,8 +10,8 @@ namespace Waher.Persistence.Files.Serialization
 	/// </summary>
 	public class StreamBookmark
 	{
-		private int pos;
-		private byte bitOffset;
+		private readonly int pos;
+		private readonly byte bitOffset;
 
 		/// <summary>
 		/// Serialization bookmark.

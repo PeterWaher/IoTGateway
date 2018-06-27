@@ -10,20 +10,20 @@ namespace Waher.Persistence.Files.Serialization.Model
 	/// </summary>
 	public abstract class Member
 	{
-		private string name;
+		private readonly string name;
 		private object defaultValue;
-		private Type memberType;
-		private TypeCode memberTypeCode;
-		private TypeInfo memberTypeInfo;
+		private readonly Type memberType;
+		private readonly TypeCode memberTypeCode;
+		private readonly TypeInfo memberTypeInfo;
 		private IObjectSerializer nestedSerializer = null;
-		private ulong fieldCode;
-		private uint memberFieldDataTypeCode;
-		private bool isNestedObject;
+		private readonly ulong fieldCode;
+		private readonly uint memberFieldDataTypeCode;
+		private readonly bool isNestedObject;
 		private bool byReference = false;
-		private bool nullable = false;
+		private readonly bool nullable = false;
 		private bool isDefaultValueDefined = false;
-		private bool isEnum = false;
-		private bool hasFlags = false;
+		private readonly bool isEnum = false;
+		private readonly bool hasFlags = false;
 
 		/// <summary>
 		/// Class member.

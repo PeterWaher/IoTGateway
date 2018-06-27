@@ -13,8 +13,8 @@ namespace Waher.Persistence.Files.Searching
 	/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
 	internal class ReversedCursor<T> : ICursor<T>
 	{
-		private ICursor<T> cursor;
-		private int timeoutMilliseconds;
+		private readonly ICursor<T> cursor;
+		private readonly int timeoutMilliseconds;
 
 		/// <summary>
 		/// Reverses the direction of a given cursor.

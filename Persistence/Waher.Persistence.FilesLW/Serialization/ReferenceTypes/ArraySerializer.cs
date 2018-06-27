@@ -11,7 +11,7 @@ namespace Waher.Persistence.Files.Serialization.ReferenceTypes
 	/// <typeparam name="T">Element type.</typeparam>
 	public class ArraySerializer<T> : GeneratedObjectSerializerBase
 	{
-		private FilesProvider provider;
+		private readonly FilesProvider provider;
 
 		/// <summary>
 		/// Generic serializer of array types.

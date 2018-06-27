@@ -13,7 +13,7 @@ namespace Waher.Persistence.Files.Storage
 	public class PrimaryRecords : IRecordHandler
 	{
 		private int recordStart;
-		private int inlineObjectSizeLimit;
+		private readonly int inlineObjectSizeLimit;
 
 		/// <summary>
 		/// Handles primary storage of objects, as pairs of primary keys (GUIDs) and serialized objects.

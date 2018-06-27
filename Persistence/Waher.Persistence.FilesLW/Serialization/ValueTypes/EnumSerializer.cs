@@ -11,9 +11,9 @@ namespace Waher.Persistence.Files.Serialization.ValueTypes
 	/// </summary>
 	public class EnumSerializer : ValueTypeSerializer
 	{
-		private Type enumType;
-		private TypeInfo enumTypeInfo;
-		private bool asInt;
+		private readonly Type enumType;
+		private readonly TypeInfo enumTypeInfo;
+		private readonly bool asInt;
 
 		/// <summary>
 		/// Serializes an enumerated value.

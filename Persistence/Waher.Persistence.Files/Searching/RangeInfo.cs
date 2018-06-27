@@ -10,7 +10,7 @@ namespace Waher.Persistence.Files.Searching
 	/// </summary>
 	public class RangeInfo
 	{
-		private string fieldName;
+		private readonly string fieldName;
 		private object min;
 		private object max;
 		private object point;

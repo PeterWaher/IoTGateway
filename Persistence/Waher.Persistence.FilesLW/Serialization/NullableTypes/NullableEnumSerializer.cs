@@ -11,10 +11,10 @@ namespace Waher.Persistence.Files.Serialization.NullableTypes
 	/// </summary>
 	public class NullableEnumSerializer : NullableValueTypeSerializer
 	{
-		private Type enumType;
-		private Type genericType;
-		private ConstructorInfo constructor;
-		private PropertyInfo valueProperty;
+		private readonly Type enumType;
+		private readonly Type genericType;
+		private readonly ConstructorInfo constructor;
+		private readonly PropertyInfo valueProperty;
 
 		/// <summary>
 		/// Serializes a nullable enumerated value.

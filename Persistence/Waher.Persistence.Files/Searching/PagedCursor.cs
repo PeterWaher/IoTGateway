@@ -15,8 +15,8 @@ namespace Waher.Persistence.Files.Searching
 	{
 		private int offset;
 		private int maxCount;
-		private ICursor<T> cursor;
-		private int timeoutMilliseconds;
+		private readonly ICursor<T> cursor;
+		private readonly int timeoutMilliseconds;
 
 		/// <summary>
 		/// Provides a cursor into a paged set of objects.

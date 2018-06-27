@@ -40,12 +40,12 @@ namespace Waher.Persistence.Files.Storage
 	/// </summary>
 	public class IndexRecords : IRecordHandler, IComparer<byte[]>
 	{
-		private string[] fieldNames;
-		private bool[] ascending;
-		private string collectionName;
+		private readonly string[] fieldNames;
+		private readonly bool[] ascending;
+		private readonly string collectionName;
 		private Guid objectId = Guid.Empty;
-		private Encoding encoding;
-		private int keySizeLimit;
+		private readonly Encoding encoding;
+		private readonly int keySizeLimit;
 
 		/// <summary>
 		/// Handles index storage of object references.

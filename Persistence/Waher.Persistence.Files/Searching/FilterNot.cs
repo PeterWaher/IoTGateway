@@ -12,7 +12,7 @@ namespace Waher.Persistence.Files.Searching
 	/// </summary>
 	public class FilterNot : F.FilterNot, IApplicableFilter
 	{
-		private IApplicableFilter childFilter;
+		private readonly IApplicableFilter childFilter;
 
 		/// <summary>
 		/// This filter selects objects that does not conform to the child-filter provided.

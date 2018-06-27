@@ -14,12 +14,12 @@ namespace Waher.Persistence.Files.Storage
 	/// </summary>
 	public class StringDictionaryRecords : IRecordHandler, IComparer<string>
 	{
-		private GenericObjectSerializer genericSerializer;
-		private FilesProvider provider;
-		private Encoding encoding;
-		private string collectionName;
+		private readonly GenericObjectSerializer genericSerializer;
+		private readonly FilesProvider provider;
+		private readonly Encoding encoding;
+		private readonly string collectionName;
 		private int recordStart;
-		private int recordSizeLimit;
+		private readonly int recordSizeLimit;
 
 		/// <summary>
 		/// Handles string dictionary entries.

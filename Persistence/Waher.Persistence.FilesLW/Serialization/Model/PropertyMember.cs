@@ -10,7 +10,7 @@ namespace Waher.Persistence.Files.Serialization.Model
 	/// </summary>
     public class PropertyMember : Member
     {
-		private PropertyInfo pi;
+		private readonly PropertyInfo pi;
 
 		/// <summary>
 		/// Property member.

@@ -12,7 +12,7 @@ namespace Waher.Persistence.Files.Searching
 	/// </summary>
 	public class FilterFieldEqualTo : F.FilterFieldEqualTo, IApplicableFilter
 	{
-		private string[] constantFields;
+		private readonly string[] constantFields;
 
 		/// <summary>
 		/// This filter selects objects that have a named field equal to a given value.

@@ -16,12 +16,12 @@ namespace Waher.Persistence.Files
 	/// </summary>
 	public class IndexBTreeFile : IDisposable, IEnumerable<object>
 	{
-		private GenericObjectSerializer genericSerializer;
+		private readonly GenericObjectSerializer genericSerializer;
 		private ObjectBTreeFile objectFile;
 		private ObjectBTreeFile indexFile;
 		private IndexRecords recordHandler;
-		private Encoding encoding;
-		private string collectionName;
+		private readonly Encoding encoding;
+		private readonly string collectionName;
 
 		/// <summary>
 		/// This class manages an index file to a <see cref="ObjectBTreeFile"/>.

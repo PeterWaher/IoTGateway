@@ -15,13 +15,13 @@ namespace Waher.Persistence.Files
 	/// </summary>
 	public class ObjectBTreeFileEnumerator<T> : IEnumerator<T>, ICursor<T>
 	{
-		private ObjectBTreeFile file;
+		private readonly ObjectBTreeFile file;
 		private BlockHeader currentHeader;
 		private BinaryDeserializer currentReader;
-		private IObjectSerializer defaultSerializer;
+		private readonly IObjectSerializer defaultSerializer;
 		private IObjectSerializer currentSerializer;
 		private BlockInfo startingPoint;
-		private IRecordHandler recordHandler;
+		private readonly IRecordHandler recordHandler;
 		private object currentObjectId;
 		private T current;
 		private ulong? currentRank;
@@ -29,7 +29,7 @@ namespace Waher.Persistence.Files
 		private ulong blockUpdateCounter;
 		private uint currentBlockIndex;
 		private int currentObjPos;
-		private int timeoutMilliseconds;
+		private readonly int timeoutMilliseconds;
 		private bool locked;
 		private bool hasCurrent;
 		private bool currentTypeCompatible;

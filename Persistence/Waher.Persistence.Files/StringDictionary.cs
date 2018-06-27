@@ -14,15 +14,15 @@ namespace Waher.Persistence.Files
 	/// </summary>
 	public class StringDictionary : IDisposable, IDictionary<string, object>
 	{
-		private Dictionary<string, object> inMemory;
+		private readonly Dictionary<string, object> inMemory;
 		private ObjectBTreeFile dictionaryFile;
 		private StringDictionaryRecords recordHandler;
-		private KeyValueSerializer keyValueSerializer;
-		private GenericObjectSerializer genericSerializer;
-		private FilesProvider provider;
-		private Encoding encoding;
-		private string collectionName;
-		private int timeoutMilliseconds;
+		private readonly KeyValueSerializer keyValueSerializer;
+		private readonly GenericObjectSerializer genericSerializer;
+		private readonly FilesProvider provider;
+		private readonly Encoding encoding;
+		private readonly string collectionName;
+		private readonly int timeoutMilliseconds;
 
 		/// <summary>
 		/// This class manages a string dictionary in a persisted file.

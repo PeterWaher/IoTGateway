@@ -13,13 +13,13 @@ namespace Waher.Persistence.Files.Searching
 	/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
 	internal class FilteredCursor<T> : ICursor<T>
 	{
-		private ICursor<T> cursor;
-		private IApplicableFilter filter;
-		private FilesProvider provider;
-		private string[] constantFields;
-		private int timeoutMilliseconds;
-		private bool untilFirstFail;
-		private bool forward;
+		private readonly ICursor<T> cursor;
+		private readonly IApplicableFilter filter;
+		private readonly FilesProvider provider;
+		private readonly string[] constantFields;
+		private readonly int timeoutMilliseconds;
+		private readonly bool untilFirstFail;
+		private readonly bool forward;
 
 		/// <summary>
 		/// Provides a filtered cursor. It only returns objects that matches a given filter.

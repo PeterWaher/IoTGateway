@@ -11,7 +11,7 @@ namespace Waher.Persistence.Files.Serialization
 	/// </summary>
 	public class GenericObjectSerializer : IObjectSerializer
 	{
-		private FilesProvider provider;
+		private readonly FilesProvider provider;
 
 		/// <summary>
 		/// Provides a generic object serializer.

@@ -14,9 +14,9 @@ namespace Waher.Persistence.Files.Searching
 	/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
 	internal class SingletonCursor<T> : ICursor<T>
 	{
-		private T value;
-		private ObjectSerializer serializer;
-		private Guid objectId;
+		private readonly T value;
+		private readonly ObjectSerializer serializer;
+		private readonly Guid objectId;
 		private bool isCurrent = false;
 
 		/// <summary>

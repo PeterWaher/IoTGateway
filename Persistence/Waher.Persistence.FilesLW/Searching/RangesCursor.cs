@@ -14,20 +14,20 @@ namespace Waher.Persistence.Files.Searching
 	/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
 	internal class RangesCursor<T> : ICursor<T>
 	{
-		private RangeInfo[] ranges;
-		private RangeInfo[] currentLimits;
-		private IndexBTreeFile index;
-		private IApplicableFilter[] additionalfilters;
+		private readonly RangeInfo[] ranges;
+		private readonly RangeInfo[] currentLimits;
+		private readonly IndexBTreeFile index;
+		private readonly IApplicableFilter[] additionalfilters;
 		private ICursor<T> currentRange;
 		private KeyValuePair<string, IApplicableFilter>[] startRangeFilters;
 		private KeyValuePair<string, IApplicableFilter>[] endRangeFilters;
-		private FilesProvider provider;
-		private int nrRanges;
+		private readonly FilesProvider provider;
+		private readonly int nrRanges;
 		private int limitsUpdatedAt;
-		private bool locked;
-		private bool firstAscending;
-		private bool[] ascending;
-		private string[] fieldNames;
+		private readonly bool locked;
+		private readonly bool firstAscending;
+		private readonly bool[] ascending;
+		private readonly string[] fieldNames;
 
 		/// <summary>
 		/// Provides a cursor that joins results from multiple cursors. It only returns an object once, regardless of how many times

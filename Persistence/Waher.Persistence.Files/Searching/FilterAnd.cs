@@ -12,8 +12,8 @@ namespace Waher.Persistence.Files.Searching
 	/// </summary>
 	public class FilterAnd : F.FilterAnd, IApplicableFilter
 	{
-		private IApplicableFilter[] applicableFilters;
-		private string[] constantFields;
+		private readonly IApplicableFilter[] applicableFilters;
+		private readonly string[] constantFields;
 
 		/// <summary>
 		/// This filter selects objects that conform to all child-filters provided.

@@ -15,18 +15,18 @@ namespace Waher.Persistence.Files.Storage
 	/// </summary>
 	public class SequentialGuidGenerator : IDisposable
 	{
-		private static DateTime reference = new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+		private readonly static DateTime reference = new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
 #if NETSTANDARD1_5
 		private RandomNumberGenerator gen;
 #else
 		private Random gen;
 #endif
-		private byte[] processId;
-		private byte[] machineNr;
-		private byte[] random;
+		private readonly byte[] processId;
+		private readonly byte[] machineNr;
+		private readonly byte[] random;
 		private uint counter;
-		private bool reverseOrder;
+		private readonly bool reverseOrder;
 
 		/// <summary>
 		/// Class that generates sequential, albeit cyclical, GUIDs for use in databases. They are not guaranteed to be

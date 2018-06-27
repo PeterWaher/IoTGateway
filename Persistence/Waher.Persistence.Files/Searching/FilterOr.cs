@@ -12,7 +12,7 @@ namespace Waher.Persistence.Files.Searching
 	/// </summary>
 	public class FilterOr : F.FilterOr, IApplicableFilter
 	{
-		private IApplicableFilter[] applicableFilters;
+		private readonly IApplicableFilter[] applicableFilters;
 
 		/// <summary>
 		/// This filter selects objects that conform to any of the child-filters provided.

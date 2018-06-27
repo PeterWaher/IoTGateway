@@ -143,28 +143,28 @@ namespace Waher.Persistence.Files.Serialization
 		/// </summary>
 		public const uint TYPE_OBJECT = 31;
 
-		private Type type;
-		private System.Reflection.TypeInfo typeInfo;
-		private string collectionName;
-		private string typeFieldName;
-		private string[][] indices;
-		private TypeNameSerialization typeNameSerialization;
+		private readonly Type type;
+		private readonly System.Reflection.TypeInfo typeInfo;
+		private readonly string collectionName;
+		private readonly string typeFieldName;
+		private readonly string[][] indices;
+		private readonly TypeNameSerialization typeNameSerialization;
 #if NETSTANDARD1_5
-		private FieldInfo objectIdFieldInfo = null;
-		private PropertyInfo objectIdPropertyInfo = null;
-		private Dictionary<string, object> defaultValues = new Dictionary<string, object>();
-		private Dictionary<string, Type> memberTypes = new Dictionary<string, Type>();
-		private Dictionary<string, MemberInfo> members = new Dictionary<string, MemberInfo>();
-		private IObjectSerializer customSerializer = null;
-		private bool compiled;
+		private readonly FieldInfo objectIdFieldInfo = null;
+		private readonly PropertyInfo objectIdPropertyInfo = null;
+		private readonly Dictionary<string, object> defaultValues = new Dictionary<string, object>();
+		private readonly Dictionary<string, Type> memberTypes = new Dictionary<string, Type>();
+		private readonly Dictionary<string, MemberInfo> members = new Dictionary<string, MemberInfo>();
+		private readonly IObjectSerializer customSerializer = null;
+		private readonly bool compiled;
 #endif
-		private Member objectIdMember = null;
-		private Dictionary<string, Member> membersByName = new Dictionary<string, Member>();
-		private Dictionary<ulong, Member> membersByFieldCode = new Dictionary<ulong, Member>();
-		private LinkedList<Member> membersOrdered = new LinkedList<Member>();
-		private FilesProvider provider;
-		private bool isNullable;
-		private bool debug;
+		private readonly Member objectIdMember = null;
+		private readonly Dictionary<string, Member> membersByName = new Dictionary<string, Member>();
+		private readonly Dictionary<ulong, Member> membersByFieldCode = new Dictionary<ulong, Member>();
+		private readonly LinkedList<Member> membersOrdered = new LinkedList<Member>();
+		private readonly FilesProvider provider;
+		private readonly bool isNullable;
+		private readonly bool debug;
 		private bool indicesCreated = false;
 
 #if NETSTANDARD1_5

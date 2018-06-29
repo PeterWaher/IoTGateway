@@ -109,6 +109,7 @@
     <Compile Include="XmppComponentTests.cs" />
     <Compile Include="BoshConnectionTests.cs" />
     <Compile Include="XmppConnectionTests.cs" />
+    <Compile Include="XmppSynchronizationTests.cs" />
     <Compile Include="XmppEventsTests.cs" />
     <Compile Include="XmppBitsOfBinaryTests.cs" />
     <Compile Include="XmppInteroperabilityTests.cs" />
@@ -173,6 +174,10 @@
     <ProjectReference Include="..\Waher.Networking.XMPP.Sensor\Waher.Networking.XMPP.Sensor.csproj">
       <Project>{ac5aff6e-1d81-4142-95c5-472f615f3167}</Project>
       <Name>Waher.Networking.XMPP.Sensor</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Waher.Networking.XMPP.Synchronization\Waher.Networking.XMPP.Synchronization.csproj">
+      <Project>{e4112366-6d17-4b03-8127-0b62c0d42370}</Project>
+      <Name>Waher.Networking.XMPP.Synchronization</Name>
     </ProjectReference>
     <ProjectReference Include="..\Waher.Networking.XMPP\Waher.Networking.XMPP.csproj">
       <Project>{4d96e9bc-6fc0-4866-9e6b-3f5a30de1011}</Project>

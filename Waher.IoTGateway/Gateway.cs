@@ -1418,7 +1418,7 @@ namespace Waher.IoTGateway
 			if (Request.Session == null || !Request.Session.TryGetVariable("from", out Variable v) || string.IsNullOrEmpty(From = v.ValueObject as string))
 				return;
 
-			if (!loopbackIntefaceAvailable && (XmppConfiguration.Instance == null || !XmppConfiguration.Instance.Complete))
+			if (!loopbackIntefaceAvailable && (XmppConfiguration.Instance == null || !XmppConfiguration.Instance.Complete || configuring))
 			{
 				Log.Informational("User logged in by default, since XMPP not configued and loopback interface not available.", string.Empty, Request.RemoteEndPoint, "LoginSuccessful", EventLevel.Minor);
 				Login.DoLogin(Request, From);
@@ -1440,7 +1440,7 @@ namespace Waher.IoTGateway
 				return;
 
 #if !MONO
-			if (XmppConfiguration.Instance == null || !XmppConfiguration.Instance.Complete)
+			if (XmppConfiguration.Instance == null || !XmppConfiguration.Instance.Complete || configuring)
 #endif
 			{
 				Log.Informational("Local user logged in.", string.Empty, Request.RemoteEndPoint, "LoginSuccessful", EventLevel.Minor);

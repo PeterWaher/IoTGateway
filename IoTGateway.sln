@@ -304,7 +304,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Theme.GothicPeacock",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Script.Fractals", "Script\Waher.Script.Fractals\Waher.Script.Fractals.csproj", "{1C042E75-04D8-4CAC-91B8-A7F559AC9D2B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Runtime.ServiceRegistration", "Runtime\Waher.Runtime.ServiceRegistration\Waher.Runtime.ServiceRegistration.csproj", "{E73DECAC-C7E9-4E25-8072-B1A850C8642A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Runtime.ServiceRegistration", "Runtime\Waher.Runtime.ServiceRegistration\Waher.Runtime.ServiceRegistration.csproj", "{E73DECAC-C7E9-4E25-8072-B1A850C8642A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

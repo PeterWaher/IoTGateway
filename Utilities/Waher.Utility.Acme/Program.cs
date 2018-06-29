@@ -782,7 +782,7 @@ namespace Waher.Utility.Acme
 
 										LogInformational("Exporting to PFX.",
 											new KeyValuePair<string, object>("FileName", CertificateFileName));
-
+										
 										Certificate.PrivateKey = RSA;
 										Bin = Certificate.Export(X509ContentType.Pfx, password);
 

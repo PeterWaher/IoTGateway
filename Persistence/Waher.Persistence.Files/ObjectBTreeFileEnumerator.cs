@@ -748,7 +748,14 @@ namespace Waher.Persistence.Files
 
 				if (this.currentSerializer == null)
 				{
-					string TypeName = Reader.ReadString();
+					ulong TypeCode = Reader.ReadVariableLengthUInt64();
+					string TypeName;
+
+					if (TypeCode == 0)
+						TypeName = string.Empty;
+					else 
+						TypeName = this.file.Provider.GetFieldName(this.currentReader.CollectionName, TypeCode);
+
 					if (string.IsNullOrEmpty(TypeName))
 						this.currentSerializer = this.file.GenericObjectSerializer;
 					else
@@ -764,8 +771,17 @@ namespace Waher.Persistence.Files
 				Reader.Position = Start;
 				try
 				{
-					this.current = (T)this.currentSerializer.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
-					this.currentTypeCompatible = true;
+					if (this.currentSerializer.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false) is T Item)
+					{
+						this.current = Item;
+						this.currentTypeCompatible = true;
+					}
+					else
+					{
+						this.current = default(T);
+						this.currentTypeCompatible = false;
+						this.currentReader.Position = PosBak + Len;
+					}
 				}
 				catch (Exception)
 				{

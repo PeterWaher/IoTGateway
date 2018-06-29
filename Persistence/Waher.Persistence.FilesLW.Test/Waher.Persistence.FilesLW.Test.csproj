@@ -156,6 +156,7 @@
     <Compile Include="Classes\ObjectIdString.cs" />
     <Compile Include="Classes\Simple.cs" />
     <Compile Include="Classes\SimpleArrays.cs" />
+    <Compile Include="Classes\StringFields.cs" />
     <Compile Include="IndexBlobTests\LWFilesIndexTests_BLOB_16384.cs" />
     <Compile Include="IndexBlobTests\LWFilesIndexTests_BLOB_32768.cs" />
     <Compile Include="IndexBlobTests\LWFilesIndexTests_BLOB_65536.cs" />

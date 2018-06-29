@@ -38,5 +38,13 @@ namespace Waher.Persistence.Filters
 		{
 			return new FilterFieldLesserThan(this.FieldName, this.Value);
 		}
+
+		/// <summary>
+		/// <see cref="object.ToString()"/>
+		/// </summary>
+		public override string ToString()
+		{
+			return this.FieldName + "<" + this.Value?.ToString();
+		}
 	}
 }

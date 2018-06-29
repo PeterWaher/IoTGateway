@@ -128,6 +128,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssertEx.cs" />
+    <Compile Include="Classes\StringFields.cs" />
     <Compile Include="DBFilesBinarySerializationTests.cs" />
     <Compile Include="DBFilesBlockTests.cs" />
     <Compile Include="BTreeBlobTests\DBFilesBTreeTests_BLOB_16384.cs" />
@@ -187,6 +188,7 @@
     <Compile Include="DBFilesRangeTests.cs" />
     <Compile Include="DBFilesRetryLastBTreeTest.cs" />
     <Compile Include="DBFilesStringDictionaryTests.cs" />
+    <Compile Include="PersistenceTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -46,5 +46,13 @@ namespace Waher.Persistence.Filters
 		{
 			return this.ChildFilter.Negate();
 		}
+
+		/// <summary>
+		/// <see cref="object.ToString()"/>
+		/// </summary>
+		public override string ToString()
+		{
+			return "NOT(" + this.ChildFilter.ToString() + ")";
+		}
 	}
 }

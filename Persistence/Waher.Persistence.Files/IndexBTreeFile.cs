@@ -342,7 +342,7 @@ namespace Waher.Persistence.Files
 
 			using (ObjectBTreeFileEnumerator<object> e = await this.objectFile.GetTypedEnumeratorAsync<object>(true))
 			{
-				while (e.MoveNext())
+				while (await e.MoveNextAsync())
 				{
 					c++;
 					await this.SaveNewObject((Guid)e.CurrentObjectId, e.Current, e.CurrentSerializer);

@@ -124,5 +124,28 @@ namespace Waher.Persistence.Filters
 
 			return new FilterOr(Segments);
 		}
+
+		/// <summary>
+		/// <see cref="object.ToString()"/>
+		/// </summary>
+		public override string ToString()
+		{
+			StringBuilder sb = new StringBuilder();
+			bool First = true;
+
+			foreach (Filter F in this.ChildFilters)
+			{
+				if (First)
+					First = false;
+				else
+					sb.Append(" AND ");
+
+				sb.Append('(');
+				sb.Append(F.ToString());
+				sb.Append(')');
+			}
+
+			return sb.ToString();
+		}
 	}
 }

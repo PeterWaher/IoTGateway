@@ -307,8 +307,14 @@ namespace Waher.Persistence.Files.Serialization
 			List<T> Elements = new List<T>();
 			IObjectSerializer S = this.provider.GetObjectSerializer(typeof(T));
 
-			while (NrElements-- > 0)
-				Elements.Add((T)S.Deserialize(Reader, ElementDataType, true));
+			while (NrElements > 0)
+			{
+				if (S.Deserialize(Reader, ElementDataType, true) is T Item)
+				{
+					Elements.Add(Item);
+					NrElements--;
+				}
+			}
 
 			return Elements.ToArray();
 		}

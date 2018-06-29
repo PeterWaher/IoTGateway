@@ -7,7 +7,7 @@ using Waher.Runtime.Inventory;
 namespace Waher.Persistence.Files.Serialization
 {
 	/// <summary>
-	/// Provides a generic object serializer.
+	/// Serializer for objects of type KeyValuePair&lt;string, object&gt;.
 	/// </summary>
 	public class KeyValueSerializer : IObjectSerializer
 	{
@@ -15,7 +15,7 @@ namespace Waher.Persistence.Files.Serialization
 		private readonly GenericObjectSerializer genericSerializer;
 
 		/// <summary>
-		/// Provides a generic object serializer.
+		/// Serializer for objects of type KeyValuePair&lt;string, object&gt;.
 		/// </summary>
 		public KeyValueSerializer(FilesProvider Provider, GenericObjectSerializer GenericSerializer)
 		{

@@ -1840,6 +1840,15 @@ namespace Waher.Persistence.Files
 			return await this.ParseObjectLocked(Info, Serializer);
 		}
 
+		internal async Task<object> TryLoadObjectLocked(object ObjectId, IObjectSerializer Serializer)
+		{
+			BlockInfo Info = await this.FindNodeLocked(ObjectId);
+			if (Info == null)
+				return null;
+			else
+				return await this.ParseObjectLocked(Info, Serializer);
+		}
+
 		internal void QueueForLoad(Guid ObjectId, ObjectSerializer Serializer, EmbeddedObjectSetter Setter)
 		{
 			lock (this.synchObject)
@@ -4587,7 +4596,7 @@ namespace Waher.Persistence.Files
 			await this.Lock();
 			try
 			{
-				Obj = await this.LoadObjectLocked(ObjectId, this.genericSerializer) as GenericObject;
+				Obj = await this.TryLoadObjectLocked(ObjectId, this.genericSerializer) as GenericObject;
 			}
 			catch (Exception)
 			{
@@ -5133,7 +5142,12 @@ namespace Waher.Persistence.Files
 						Index = null;
 					}
 					else
+					{
 						Index = this.FindBestIndex(out NrFields, Properties.ToArray(), SortOrder);
+
+						if (NrFields > Properties.Count)
+							NrFields = Properties.Count;
+					}
 
 					if (Index == null)
 					{

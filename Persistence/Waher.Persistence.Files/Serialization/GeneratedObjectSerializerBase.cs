@@ -841,8 +841,14 @@ namespace Waher.Persistence.Files.Serialization
 					uint ElementDataType = Reader.ReadBits(6);
 					uint? ElementDataTypeN = ElementDataType == ObjectSerializer.TYPE_NULL ? (uint?)null : (uint?)ElementDataType;
 
-					while (NrElements-- > 0)
-						Elements.Add((T)S.Deserialize(Reader, ElementDataTypeN, true));
+					while (NrElements > 0)
+					{
+						if (S.Deserialize(Reader, ElementDataTypeN, true) is T Item)
+						{
+							Elements.Add(Item);
+							NrElements--;
+						}
+					}
 
 					return Elements.ToArray();
 

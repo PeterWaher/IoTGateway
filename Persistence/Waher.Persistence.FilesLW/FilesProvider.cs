@@ -222,6 +222,7 @@ namespace Waher.Persistence.Files
 			if (!string.IsNullOrEmpty(this.folder) && this.folder[this.folder.Length - 1] != Path.DirectorySeparatorChar)
 				this.folder += Path.DirectorySeparatorChar;
 
+			ConstructorInfo DefaultConstructor;
 			IObjectSerializer S;
 			TypeInfo TI;
 
@@ -231,13 +232,13 @@ namespace Waher.Persistence.Files
 				if (TI.IsAbstract || TI.IsGenericTypeDefinition)
 					continue;
 
+				DefaultConstructor = null;
+
 				try
 				{
-					ConstructorInfo DefaultConstructor = null;
-
 					foreach (ConstructorInfo CI in TI.DeclaredConstructors)
 					{
-						if (CI.GetParameters().Length == 0)
+						if (CI.IsPublic && CI.GetParameters().Length == 0)
 						{
 							DefaultConstructor = CI;
 							break;
@@ -247,12 +248,12 @@ namespace Waher.Persistence.Files
 					if (DefaultConstructor == null)
 						continue;
 
-					object Instance = DefaultConstructor.Invoke(Types.NoParameters);
-					S = (IObjectSerializer)Instance;
+					S = DefaultConstructor.Invoke(Types.NoParameters) as IObjectSerializer;
+					if (S == null)
+						continue;
 				}
-				catch (Exception ex)
+				catch (Exception)
 				{
-					string s = ex.Message;
 					continue;
 				}
 
@@ -954,7 +955,19 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		/// <param name="CollectionName">Name of collection.</param>
 		/// <returns>BTree file corresponding to the given collection.</returns>
-		public async Task<ObjectBTreeFile> GetFile(string CollectionName)
+		public Task<ObjectBTreeFile> GetFile(string CollectionName)
+		{
+			return this.GetFile(CollectionName, true);
+		}
+
+		/// <summary>
+		/// Gets the BTree file corresponding to a named collection.
+		/// </summary>
+		/// <param name="CollectionName">Name of collection.</param>
+		/// <param name="CreateIfNotExists">If the physical file should be created if one does not already exist.</param>
+		/// <returns>BTree file corresponding to the given collection. 
+		/// If file did not exist, and <paramref name="CreateIfNotExists"/> is false, null is returned.</returns>
+		public async Task<ObjectBTreeFile> GetFile(string CollectionName, bool CreateIfNotExists)
 		{
 			ObjectBTreeFile File;
 
@@ -964,6 +977,9 @@ namespace Waher.Persistence.Files
 			string s = this.GetFileName(CollectionName);
 			KeyValuePair<string, object>[] Strings;
 			StringDictionary Names;
+
+			if (!CreateIfNotExists && !System.IO.File.Exists(Path.GetFullPath(s + ".btree")))
+				return null;
 
 			lock (this.files)
 			{
@@ -1106,7 +1122,7 @@ namespace Waher.Persistence.Files
 			s = File.FileName + sb.ToString() + ".index";
 			Exists = System.IO.File.Exists(s);
 
-			if (Exists)		// Index file named using the Waher.Pesistence.FilesLW library.
+			if (Exists)     // Index file named using the Waher.Pesistence.FilesLW library.
 				sb.Insert(0, File.FileName);
 			else
 			{
@@ -1244,6 +1260,8 @@ namespace Waher.Persistence.Files
 		/// <returns>Task object</returns>
 		private async Task LoadConfiguration()
 		{
+			LinkedList<string> ToRemove = null;
+
 			foreach (KeyValuePair<string, object> P in this.master)
 			{
 				string s = P.Value.ToString();
@@ -1256,7 +1274,15 @@ namespace Waher.Persistence.Files
 							break;
 
 						string CollectionName = Rows[1];
-						ObjectBTreeFile File = await this.GetFile(CollectionName);
+						ObjectBTreeFile File = await this.GetFile(CollectionName, false);
+
+						if (File == null)
+						{
+							if (ToRemove == null)
+								ToRemove = new LinkedList<string>();
+
+							ToRemove.AddLast(P.Key);
+						}
 						break;
 
 					case "Index":
@@ -1267,10 +1293,27 @@ namespace Waher.Persistence.Files
 						string[] FieldNames = new string[Rows.Length - 2];
 						Array.Copy(Rows, 2, FieldNames, 0, Rows.Length - 2);
 
-						File = await this.GetFile(CollectionName);
-						await this.GetIndexFile(File, RegenerationOptions.RegenerateIfFileNotFound, FieldNames);
+						File = await this.GetFile(CollectionName, false);
+						if (File == null)
+						{
+							if (ToRemove == null)
+								ToRemove = new LinkedList<string>();
+
+							ToRemove.AddLast(P.Key);
+							break;
+						}
+
+						IndexBTreeFile Index = await this.GetIndexFile(File, 
+							RegenerationOptions.RegenerateIfFileNotFound, FieldNames);
+
 						break;
 				}
+			}
+
+			if (ToRemove != null)
+			{
+				foreach (string s in ToRemove)
+					await this.master.RemoveAsync(s);
 			}
 		}
 

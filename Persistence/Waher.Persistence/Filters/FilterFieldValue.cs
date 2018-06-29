@@ -11,7 +11,7 @@ namespace Waher.Persistence.Filters
 	/// </summary>
 	public abstract class FilterFieldValue : FilterField
 	{
-		private object value;
+		private readonly object value;
 
 		/// <summary>
 		/// Abstract base class for all field filters operating on a constant value.

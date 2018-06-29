@@ -292,12 +292,11 @@ namespace Waher.Persistence.Files
 			await this.dictionaryFile.Lock();
 			try
 			{
-				object Result = await this.dictionaryFile.LoadObjectLocked(key, this.keyValueSerializer);
-				return new KeyValuePair<bool, KeyValuePair<string, object>>(true, (KeyValuePair<string, object>)Result);
-			}
-			catch (KeyNotFoundException)
-			{
-				return new KeyValuePair<bool, KeyValuePair<string, object>>(false, new KeyValuePair<string, object>(key, null));
+				object Result = await this.dictionaryFile.TryLoadObjectLocked(key, this.keyValueSerializer);
+				if (Result == null)
+					return new KeyValuePair<bool, KeyValuePair<string, object>>(false, new KeyValuePair<string, object>(key, null));
+				else
+					return new KeyValuePair<bool, KeyValuePair<string, object>>(true, (KeyValuePair<string, object>)Result);
 			}
 			finally
 			{

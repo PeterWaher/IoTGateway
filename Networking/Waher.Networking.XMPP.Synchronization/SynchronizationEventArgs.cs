@@ -16,26 +16,26 @@ namespace Waher.Networking.XMPP.Synchronization
 	/// </summary>
 	public class SynchronizationEventArgs : IqResultEventArgs
     {
-		private readonly double latencySeconds;
-		private readonly double clockDifferenceSeconds;
+		private readonly long latency100Ns;
+		private readonly long clockDifference100Ns;
 
-		internal SynchronizationEventArgs(double LatencySeconds, double ClockDifferenceSeconds, IqResultEventArgs e)
+		internal SynchronizationEventArgs(long Latency100Ns, long ClockDifference100Ns, IqResultEventArgs e)
 			: base(e)
 		{
-			this.latencySeconds = LatencySeconds;
-			this.clockDifferenceSeconds = ClockDifferenceSeconds;
+			this.latency100Ns = Latency100Ns;
+			this.clockDifference100Ns = ClockDifference100Ns;
 		}
 
 		/// <summary>
-		/// Measured network latency in one direction, in seconds.
+		/// Measured network latency in one direction, in units of 100 ns.
 		/// </summary>
-		public double LatencySeconds => this.latencySeconds;
+		public long Latency100Ns => this.latency100Ns;
 
 		/// <summary>
-		/// Measured clock difference between source clock and client clock, in seconds.
+		/// Measured clock difference between source clock and client clock, in units of 100 ns.
 		/// Source clock = client clock + clock difference
 		/// </summary>
-		public double ClockDifferenceSeconds => this.clockDifferenceSeconds;
+		public long ClockDifference100Ns => this.clockDifference100Ns;
 
 	}
 }

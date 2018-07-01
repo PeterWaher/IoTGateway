@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -22,16 +23,28 @@ namespace Waher.Networking.XMPP.Synchronization
 		private List<Rec> history = null;
 		private XmppClient client;
 		private Timer timer;
+		private SpikeRemoval latency100NsWindow;
+		private SpikeRemoval difference100NsWindow;
+		private Stopwatch clock;
+		private Calibration calibration;
 		private string clockSourceJID;
-		private int count;
-		private int countAvg;
-		private int maxItems;
-		private int spikePos;
-		private long sumLatencyMyS;
-		private long sumDifferenceMyS;
+		private long rawLatency100Ns = 0;
+		private long filteredLatency100Ns = 0;
+		private long avgLatency100Ns = 0;
+		private long rawClockDifference100Ns = 0;
+		private long filteredClockDifference100Ns = 0;
+		private long avgClockDifference100Ns = 0;
+		private long sumLatency100Ns;
+		private long sumDifference100Ns;
+		private int nrLatency100Ns;
+		private int nrDifference100Ns;
+		private int maxInHistory;
+		private bool latencyRemoved = false;
+		private bool differenceRemoved = false;
 
 		/// <summary>
 		/// Implements the clock synchronization extesion as defined by the IEEE XMPP IoT Interface working group.
+		/// THe internal clock is calibrated with the high frequency timer.
 		/// </summary>
 		/// <param name="Client">XMPP Client</param>
 		public SynchronizationClient(XmppClient Client)
@@ -39,8 +52,46 @@ namespace Waher.Networking.XMPP.Synchronization
 			this.client = Client;
 			this.timer = null;
 			this.clockSourceJID = null;
+			this.clock = new Stopwatch();
+			this.clock.Start();
+
+			this.Calibrate();
 
 			this.client.RegisterIqGetHandler("clock", NamespaceSynchronization, this.Clock, true);
+		}
+
+		/// <summary>
+		/// Calibrates the internal clock with the high frequency timer.
+		/// </summary>
+		public void Calibrate()
+		{
+			DateTime TP = DateTime.Now;
+			long Ticks = TP.Ticks;
+			long HF = 0;
+			int i;
+
+			for (i = 0; i < 3; i++)   // An extra round, to avoid JIT effects.
+			{
+				while ((TP = DateTime.UtcNow).Ticks == Ticks)
+					;
+
+				HF = this.clock.ElapsedTicks;
+				Ticks = TP.Ticks;
+			}
+
+			this.calibration = new Calibration()
+			{
+				Reference = TP,
+				ReferenceHfTick = HF,
+				TicksTo100Ns = 1e7 / Stopwatch.Frequency
+			};
+		}
+
+		private class Calibration
+		{
+			public DateTime Reference;
+			public long ReferenceHfTick;
+			public double TicksTo100Ns;
 		}
 
 		/// <summary>
@@ -48,6 +99,12 @@ namespace Waher.Networking.XMPP.Synchronization
 		/// </summary>
 		public void Dispose()
 		{
+			if (this.clock != null)
+			{
+				this.clock.Stop();
+				this.clock = null;
+			}
+
 			if (this.timer != null)
 			{
 				this.timer.Dispose();
@@ -59,20 +116,77 @@ namespace Waher.Networking.XMPP.Synchronization
 				this.client.UnregisterIqGetHandler("clock", NamespaceSynchronization, this.Clock, true);
 				this.client = null;
 			}
+		}
 
+		/// <summary>
+		/// Current high-resolution date and time
+		/// </summary>
+		public DateTimeHF Now
+		{
+			get
+			{
+				DateTime NowRef = DateTime.UtcNow;
+				long Ticks = this.clock.ElapsedTicks;
+				Calibration Calibration = this.calibration;
+
+				Ticks -= Calibration.ReferenceHfTick;
+
+				long Ns100 = (long)(Ticks * Calibration.TicksTo100Ns + 0.5);
+				long Milliseconds = Ns100 / 10000;
+
+				DateTime Now = Calibration.Reference.AddMilliseconds(Milliseconds);
+
+				if ((Now - NowRef).TotalSeconds >= 1)
+				{
+					this.Calibrate();
+					return this.Now;
+				}
+				else
+				{
+					Ns100 %= 10000;
+
+					return new DateTimeHF(Now, (int)(Ns100 / 10), (int)(Ns100 % 10));
+				}
+			}
 		}
 
 		private void Clock(object Sender, IqEventArgs e)
 		{
+			DateTimeHF Now = this.Now;
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<clock xmlns='");
 			Xml.Append(NamespaceSynchronization);
 			Xml.Append("'>");
-			Xml.Append(XML.Encode(DateTime.UtcNow));
+			Encode(Now, Xml);
 			Xml.Append("</clock>");
 
 			e.IqResult(Xml.ToString());
+		}
+
+		/// <summary>
+		/// Encodes a high-frequency based Date and Time value to XML.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp</param>
+		/// <param name="Xml">XML output</param>
+		public static void Encode(DateTimeHF Timestamp, StringBuilder Xml)
+		{
+			Xml.Append(Timestamp.Year.ToString("D4"));
+			Xml.Append('-');
+			Xml.Append(Timestamp.Month.ToString("D2"));
+			Xml.Append('-');
+			Xml.Append(Timestamp.Day.ToString("D2"));
+			Xml.Append('T');
+			Xml.Append(Timestamp.Hour.ToString("D2"));
+			Xml.Append(':');
+			Xml.Append(Timestamp.Minute.ToString("D2"));
+			Xml.Append(':');
+			Xml.Append(Timestamp.Second.ToString("D2"));
+			Xml.Append('.');
+			Xml.Append(Timestamp.Millisecond.ToString("D3"));
+			Xml.Append(Timestamp.Microsecond.ToString("D3"));
+			Xml.Append(Timestamp.Nanosecond100.ToString("D1"));
+			Xml.Append('Z');
 		}
 
 		/// <summary>
@@ -83,41 +197,40 @@ namespace Waher.Networking.XMPP.Synchronization
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void MeasureClockDifference(string ClockSourceJID, SynchronizationEventHandler Callback, object State)
 		{
-			DateTime ClientTime1 = DateTime.UtcNow;
-
+			DateTimeHF ClientTime1 = this.Now;
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<clock xmlns='");
 			Xml.Append(NamespaceSynchronization);
 			Xml.Append("'>");
-			Xml.Append(XML.Encode(ClientTime1));
+			Encode(ClientTime1, Xml);
 			Xml.Append("</clock>");
 
 			this.client.SendIqGet(ClockSourceJID, Xml.ToString(), (sender, e) =>
 			{
-				DateTime ClientTime2 = DateTime.UtcNow;
+				DateTimeHF ClientTime2 = this.Now;
 				XmlElement E;
-				double LatencySeconds;
-				double ClockDifferenceSeconds;
+				long Latency100Ns;
+				long ClockDifference100Ns;
 
 				if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "clock" && E.NamespaceURI == NamespaceSynchronization &&
-					XML.TryParse(E.InnerText, out DateTime ServerTime))
+					DateTimeHF.TryParse(E.InnerText, out DateTimeHF ServerTime))
 				{
-					TimeSpan dt1 = ServerTime - ClientTime1;
-					TimeSpan dt2 = ClientTime2 - ServerTime;
-					LatencySeconds = (dt1 + dt2).TotalSeconds * 0.5;
-					ClockDifferenceSeconds = (dt1 - dt2).TotalSeconds * 0.5;
+					long dt1 = ServerTime - ClientTime1;
+					long dt2 = ClientTime2 - ServerTime;
+					Latency100Ns = dt1 + dt2;
+					ClockDifference100Ns = dt1 - dt2;
 				}
 				else
 				{
 					e.Ok = false;
-					LatencySeconds = double.NaN;
-					ClockDifferenceSeconds = double.NaN;
+					Latency100Ns = 0;
+					ClockDifference100Ns = 0;
 				}
 
 				try
 				{
-					Callback?.Invoke(this, new SynchronizationEventArgs(LatencySeconds, ClockDifferenceSeconds, e));
+					Callback?.Invoke(this, new SynchronizationEventArgs(Latency100Ns, ClockDifference100Ns, e));
 				}
 				catch (Exception ex)
 				{
@@ -152,7 +265,7 @@ namespace Waher.Networking.XMPP.Synchronization
 		/// <param name="IntervalMilliseconds">Interval, in milliseconds.</param>
 		public void MonitorClockDifference(string ClockSourceJID, int IntervalMilliseconds)
 		{
-			this.MonitorClockDifference(ClockSourceJID, IntervalMilliseconds, 100, 10);
+			this.MonitorClockDifference(ClockSourceJID, IntervalMilliseconds, 100, 16, 6, 3);
 		}
 
 		/// <summary>
@@ -161,15 +274,17 @@ namespace Waher.Networking.XMPP.Synchronization
 		/// </summary>
 		/// <param name="ClockSourceJID">JID of clock source.</param>
 		/// <param name="IntervalMilliseconds">Interval, in milliseconds.</param>
-		/// <param name="WindowSize">Number of samples to keep in memory. (Default=100)</param>
-		/// <param name="SpikePosition">Spike removal position, inside window. (Default=10)</param>
+		/// <param name="History">Number of samples to keep in history. (Default=100)	</param>
+		/// <param name="WindowSize">Number of samples to keep in memory. (Default=16)</param>
+		/// <param name="SpikePosition">Spike removal position, inside window. (Default=6)</param>
+		/// <param name="SpikeWidth">Number of samples that can constitute a spike. (Default=3)</param>
 		public void MonitorClockDifference(string ClockSourceJID, int IntervalMilliseconds,
-			int WindowSize, int SpikePosition)
+			int History, int WindowSize, int SpikePosition, int SpikeWidth)
 		{
-			if (IntervalMilliseconds < 5000)
-				throw new ArgumentException("Interval must be at least 5000 milliseconds.", nameof(IntervalMilliseconds));
+			if (IntervalMilliseconds < 1000)
+				throw new ArgumentException("Interval must be at least 1000 milliseconds.", nameof(IntervalMilliseconds));
 
-			if (WindowSize <= 2)
+			if (WindowSize <= 5)
 				throw new ArgumentException("Window size too small.", nameof(WindowSize));
 
 			if (SpikePosition < 0 || SpikePosition >= WindowSize)
@@ -187,11 +302,14 @@ namespace Waher.Networking.XMPP.Synchronization
 				this.history = new List<Rec>();
 
 			this.clockSourceJID = ClockSourceJID;
-			this.maxItems = WindowSize;
-			this.spikePos = SpikePosition;
-			this.count = 0;
-			this.sumDifferenceMyS = 0;
-			this.sumLatencyMyS = 0;
+			this.latency100NsWindow = new SpikeRemoval(WindowSize, SpikePosition, SpikeWidth);
+			this.difference100NsWindow = new SpikeRemoval(WindowSize, SpikePosition, SpikeWidth);
+			this.sumLatency100Ns = 0;
+			this.sumDifference100Ns = 0;
+			this.nrLatency100Ns = 0;
+			this.nrDifference100Ns = 0;
+			this.maxInHistory = History;
+
 			this.timer = new Timer(this.CheckClock, null, IntervalMilliseconds, IntervalMilliseconds);
 		}
 
@@ -201,42 +319,138 @@ namespace Waher.Networking.XMPP.Synchronization
 			{
 				if (e.Ok)
 				{
+					this.rawLatency100Ns = e.Latency100Ns;
+					this.rawClockDifference100Ns = e.ClockDifference100Ns;
+
 					Rec Rec = new Rec()
 					{
-						LatencyMyS = (long)(e.LatencySeconds * 1e6 + 0.5),
-						DifferenceMyS = (long)(e.ClockDifferenceSeconds * 1e6 + 0.5)
+						Timestamp = DateTime.Now
 					};
 
-					this.history.Add(Rec);
-
-					this.sumLatencyMyS += Rec.LatencyMyS;
-					this.sumDifferenceMyS += Rec.DifferenceMyS;
-
-					if (this.count >= this.maxItems)
+					if (this.latency100NsWindow.Add(e.Latency100Ns, out this.latencyRemoved, out long SumSamples, out int NrSamples))
 					{
-						Rec = this.history[this.count - 1];
-						this.history.RemoveAt(this.count - 1);
-
-						if (Rec != null)
-						{
-							this.sumLatencyMyS -= Rec.LatencyMyS;
-							this.sumDifferenceMyS -= Rec.DifferenceMyS;
-						}
+						Rec.SumLatency100Ns = SumSamples;
+						Rec.NrLatency100Ns = NrSamples;
 					}
-					else
-						this.count++;
 
+					if (this.difference100NsWindow.Add(e.ClockDifference100Ns, out this.differenceRemoved, out SumSamples, out NrSamples))
+					{
+						Rec.SumDifference100Ns = SumSamples;
+						Rec.NrDifference100Ns = NrSamples;
+					}
 
+					if (Rec.SumLatency100Ns.HasValue || Rec.SumDifference100Ns.HasValue)
+					{
+						this.history.Add(Rec);
+
+						if (Rec.SumLatency100Ns.HasValue)
+						{
+							this.filteredLatency100Ns = (Rec.SumLatency100Ns.Value + (Rec.NrLatency100Ns >> 1)) / Rec.NrLatency100Ns;
+
+							this.sumLatency100Ns += Rec.SumLatency100Ns.Value;
+							this.nrLatency100Ns += Rec.NrLatency100Ns;
+						}
+
+						if (Rec.SumDifference100Ns.HasValue)
+						{
+							this.filteredClockDifference100Ns = (Rec.SumDifference100Ns.Value + (Rec.NrDifference100Ns >> 1)) / Rec.NrDifference100Ns;
+
+							this.sumDifference100Ns += Rec.SumDifference100Ns.Value;
+							this.nrDifference100Ns += Rec.NrDifference100Ns;
+						}
+
+						while (this.history.Count > this.maxInHistory)
+						{
+							Rec = this.history[0];
+							this.history.RemoveAt(0);
+
+							if (Rec.SumLatency100Ns.HasValue)
+							{
+								this.sumLatency100Ns -= Rec.SumLatency100Ns.Value;
+								this.nrLatency100Ns -= Rec.NrLatency100Ns;
+							}
+
+							if (Rec.SumDifference100Ns.HasValue)
+							{
+								this.sumDifference100Ns -= Rec.SumDifference100Ns.Value;
+								this.nrDifference100Ns -= Rec.NrDifference100Ns;
+							}
+						}
+
+						if (this.nrLatency100Ns > 0)
+							this.avgLatency100Ns = (this.sumLatency100Ns + (this.nrLatency100Ns >> 1)) / this.nrLatency100Ns;
+
+						if (this.nrDifference100Ns > 0)
+							this.avgClockDifference100Ns = (this.sumDifference100Ns + (this.nrDifference100Ns >> 1)) / this.nrDifference100Ns;
+					}
+
+					try
+					{
+						this.OnUpdated?.Invoke(this, new EventArgs());
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
 				}
 			}, null);
 		}
 
+		/// <summary>
+		/// Most recent raw sample of the latency of sending a stanza between the machine and the clock source, or vice versa.
+		/// </summary>
+		public long RawLatency100Ns => this.rawLatency100Ns;
+
+		/// <summary>
+		/// Most recent filtered sample of the latency of sending a stanza between the machine and the clock source, or vice versa.
+		/// </summary>
+		public long FilteredLatency100Ns => this.filteredLatency100Ns;
+
+		/// <summary>
+		/// If a spike was detected and removed when calculating <see cref="FilteredLatency100Ns"/> from a short sequence of <see cref="RawLatency100Ns"/>.
+		/// </summary>
+		public bool LatencySpikeRemoved => this.latencyRemoved;
+
+		/// <summary>
+		/// Most recent average of the latency of sending a stanza between the machine and the clock source, or vice versa.
+		/// The average is calculated on a sequence of <see cref="FilteredLatency100Ns"/>.
+		/// </summary>
+		public long AvgLatency100Ns => this.avgLatency100Ns;
+
+		/// <summary>
+		/// Most recent raw sample of the clock difference beween the machine and the clock source.
+		/// </summary>
+		public long RawClockDifference100Ns => this.rawClockDifference100Ns;
+
+		/// <summary>
+		/// Most recent filtered sample of the clock difference beween the machine and the clock source.
+		/// </summary>
+		public long FilteredClockDifference100Ns => this.filteredClockDifference100Ns;
+
+		/// <summary>
+		/// If a spike was detected and removed when calculating <see cref="FilteredClockDifference100Ns"/> from a short sequence of <see cref="RawClockDifference100Ns"/>.
+		/// </summary>
+		public bool ClockDifferenceSpikeRemoved => this.latencyRemoved;
+
+		/// <summary>
+		/// Most recent average of the clock difference beween the machine and the clock source.
+		/// The average is calculated on a sequence of <see cref="FilteredClockDifference100Ns"/>.
+		/// </summary>
+		public long AvgClockDifference100Ns => this.avgClockDifference100Ns;
+
+		/// <summary>
+		/// Event raised when the clock difference estimates have been updated.
+		/// </summary>
+		public event EventHandler OnUpdated = null;
+
 		private class Rec
 		{
-			public long LatencyMyS;
-			public long DifferenceMyS;
+			public DateTime Timestamp;
+			public long? SumLatency100Ns;
+			public long? SumDifference100Ns;
+			public int NrLatency100Ns;
+			public int NrDifference100Ns;
 		}
-
 
 	}
 }

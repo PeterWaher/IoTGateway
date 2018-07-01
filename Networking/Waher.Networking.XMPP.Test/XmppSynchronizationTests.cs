@@ -80,6 +80,7 @@ namespace Waher.Networking.XMPP.Test
 			using (StreamWriter w = File.CreateText(FileName))
 			{
 				ManualResetEvent Done = new ManualResetEvent(false);
+				ManualResetEvent Error = new ManualResetEvent(false);
 
 				w.WriteLine("Date\tTime\tRaw Latency (ms)\tRaw Difference (ms)\tLatency Spike\tDifference Spike\tFiltered Latency (ms)\tFiltered Difference (ms)\tAvg Latency (ms)\tAvg Difference (ms)");
 
@@ -105,7 +106,13 @@ namespace Waher.Networking.XMPP.Test
 
 				this.synchronizationClient1.MonitorClockDifference(this.client2.FullJID, 1000);
 
-				Done.WaitOne();
+				this.synchronizationClient2.QueryClockSource(this.client1.FullJID, (sender, e) =>
+				{
+					if (!e.Ok || e.ClockSourceJID != this.client2.BareJID)
+						Error.Set();
+				}, null);
+
+				Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }));
 
 				w.Flush();
 			}

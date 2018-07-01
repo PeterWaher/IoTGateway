@@ -58,6 +58,7 @@ namespace Waher.Networking.XMPP.Synchronization
 			this.Calibrate();
 
 			this.client.RegisterIqGetHandler("clock", NamespaceSynchronization, this.Clock, true);
+			this.client.RegisterIqGetHandler("source", NamespaceSynchronization, this.Source, true);
 		}
 
 		/// <summary>
@@ -313,6 +314,20 @@ namespace Waher.Networking.XMPP.Synchronization
 			this.timer = new Timer(this.CheckClock, null, IntervalMilliseconds, IntervalMilliseconds);
 		}
 
+		/// <summary>
+		/// Stops monitoring clock source.
+		/// </summary>
+		public void Stop()
+		{
+			if (this.timer != null)
+			{
+				this.timer.Dispose();
+				this.timer = null;
+			}
+
+			this.clockSourceJID = null;
+		}
+
 		private void CheckClock(object P)
 		{
 			this.MeasureClockDifference(this.clockSourceJID, (sender, e) =>
@@ -450,6 +465,73 @@ namespace Waher.Networking.XMPP.Synchronization
 			public long? SumDifference100Ns;
 			public int NrLatency100Ns;
 			public int NrDifference100Ns;
+		}
+
+		private void Source(object Sender, IqEventArgs e)
+		{
+			if (!string.IsNullOrEmpty(this.clockSourceJID))
+			{
+				StringBuilder Xml = new StringBuilder();
+
+				Xml.Append("<source xmlns='");
+				Xml.Append(NamespaceSynchronization);
+				Xml.Append("'>");
+				Xml.Append(XML.Encode(XmppClient.GetBareJID(this.clockSourceJID)));
+				Xml.Append("</source>");
+
+				e.IqResult(Xml.ToString());
+			}
+			else
+				e.IqError(new StanzaErrors.ItemNotFoundException("Clock source not used.", e.IQ));
+		}
+
+		/// <summary>
+		/// Queries an entity about what clock source it uses.
+		/// </summary>
+		/// <param name="To">Destination JID</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void QueryClockSource(string To, ClockSourceEventHandler Callback, object State)
+		{
+			this.client.SendIqGet(To, "<source xmlns='" + NamespaceSynchronization + "'/>", (sender, e) =>
+			{
+				XmlElement E;
+				string ClockSourceJID = null;
+
+				if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "source" && E.NamespaceURI == NamespaceSynchronization)
+					ClockSourceJID = E.InnerText;
+
+				try
+				{
+					Callback?.Invoke(this, new ClockSourceEventArgs(ClockSourceJID, e));
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+
+			}, State);
+		}
+
+		/// <summary>
+		/// Queries an entity about what clock source it uses.
+		/// </summary>
+		/// <param name="To">Destination JID</param>
+		/// <returns>JID of clock source used by <paramref name="To"/>.</returns>
+		public Task<string> QueryClockSourceAsync(string To)
+		{
+			TaskCompletionSource<string> Result = new TaskCompletionSource<string>();
+
+			this.QueryClockSource(To, (sender, e) =>
+			{
+				if (e.Ok)
+					Result.SetResult(e.ClockSourceJID);
+				else
+					Result.SetException(new Exception(e.ErrorText));
+
+			}, null);
+
+			return Result.Task;
 		}
 
 	}

@@ -28,6 +28,7 @@
     <ProjectReference Include="..\..\Content\Waher.Content.Xml\Waher.Content.Xml.csproj" />
     <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj" />
     <ProjectReference Include="..\Waher.Networking.XMPP\Waher.Networking.XMPP.csproj" />
+    <ProjectReference Include="..\Waher.Networking\Waher.Networking.csproj" />
   </ItemGroup>
 
 </Project>

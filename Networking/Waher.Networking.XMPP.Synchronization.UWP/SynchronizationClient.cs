@@ -20,13 +20,14 @@ namespace Waher.Networking.XMPP.Synchronization
 		/// </summary>
 		public const string NamespaceSynchronization = "urn:ieee:iot:synchronization:1.0";
 
+		private static Calibration calibration;
+		private readonly static Stopwatch clock = CreateWatch();
+
 		private List<Rec> history = null;
 		private XmppClient client;
 		private Timer timer;
 		private SpikeRemoval latency100NsWindow;
 		private SpikeRemoval difference100NsWindow;
-		private Stopwatch clock;
-		private Calibration calibration;
 		private string clockSourceJID;
 		private long rawLatency100Ns = 0;
 		private long filteredLatency100Ns = 0;
@@ -42,6 +43,16 @@ namespace Waher.Networking.XMPP.Synchronization
 		private bool latencyRemoved = false;
 		private bool differenceRemoved = false;
 
+		private static Stopwatch CreateWatch()
+		{
+			Stopwatch Watch = new Stopwatch();
+			Watch.Start();
+
+			calibration = Calibrate(Watch);
+
+			return Watch;
+		}
+
 		/// <summary>
 		/// Implements the clock synchronization extesion as defined by the IEEE XMPP IoT Interface working group.
 		/// THe internal clock is calibrated with the high frequency timer.
@@ -52,10 +63,6 @@ namespace Waher.Networking.XMPP.Synchronization
 			this.client = Client;
 			this.timer = null;
 			this.clockSourceJID = null;
-			this.clock = new Stopwatch();
-			this.clock.Start();
-
-			this.Calibrate();
 
 			this.client.RegisterIqGetHandler("clock", NamespaceSynchronization, this.Clock, true);
 			this.client.RegisterIqGetHandler("source", NamespaceSynchronization, this.Source, true);
@@ -64,7 +71,12 @@ namespace Waher.Networking.XMPP.Synchronization
 		/// <summary>
 		/// Calibrates the internal clock with the high frequency timer.
 		/// </summary>
-		public void Calibrate()
+		public static void Calibrate()
+		{
+			calibration = Calibrate(clock);
+		}
+
+		private static Calibration Calibrate(Stopwatch Clock)
 		{
 			DateTime TP = DateTime.Now;
 			long Ticks = TP.Ticks;
@@ -76,11 +88,11 @@ namespace Waher.Networking.XMPP.Synchronization
 				while ((TP = DateTime.UtcNow).Ticks == Ticks)
 					;
 
-				HF = this.clock.ElapsedTicks;
+				HF = Clock.ElapsedTicks;
 				Ticks = TP.Ticks;
 			}
 
-			this.calibration = new Calibration()
+			return new Calibration()
 			{
 				Reference = TP,
 				ReferenceHfTick = HF,
@@ -100,12 +112,6 @@ namespace Waher.Networking.XMPP.Synchronization
 		/// </summary>
 		public void Dispose()
 		{
-			if (this.clock != null)
-			{
-				this.clock.Stop();
-				this.clock = null;
-			}
-
 			if (this.timer != null)
 			{
 				this.timer.Dispose();
@@ -127,8 +133,8 @@ namespace Waher.Networking.XMPP.Synchronization
 			get
 			{
 				DateTime NowRef = DateTime.UtcNow;
-				long Ticks = this.clock.ElapsedTicks;
-				Calibration Calibration = this.calibration;
+				long Ticks = clock.ElapsedTicks;
+				Calibration Calibration = calibration;
 
 				Ticks -= Calibration.ReferenceHfTick;
 
@@ -139,7 +145,7 @@ namespace Waher.Networking.XMPP.Synchronization
 
 				if ((Now - NowRef).TotalSeconds >= 1)
 				{
-					this.Calibrate();
+					Calibrate();
 					return this.Now;
 				}
 				else

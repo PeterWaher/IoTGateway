@@ -35,6 +35,7 @@ using Waher.Networking.XMPP.HTTPX;
 using Waher.Networking.XMPP.InBandBytestreams;
 using Waher.Networking.XMPP.Provisioning;
 using Waher.Networking.XMPP.Sensor;
+using Waher.Networking.XMPP.Synchronization;
 using Waher.Runtime.Language;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Inventory.Loader;
@@ -117,6 +118,7 @@ namespace Waher.IoTGateway
 		private static Networking.XMPP.InBandBytestreams.IbbClient ibbClient = null;
 		private static Networking.XMPP.P2P.SOCKS5.Socks5Proxy socksProxy = null;
 		private static ConcentratorServer concentratorServer = null;
+		private static SynchronizationClient synchronizationClient = null;
 		private static Timer connectionTimer = null;
 		private static X509Certificate2 certificate = null;
 		private static HttpServer webServer = null;
@@ -749,6 +751,8 @@ namespace Waher.IoTGateway
 			socksProxy = new Networking.XMPP.P2P.SOCKS5.Socks5Proxy(xmppClient);
 			Types.SetModuleParameter("SOCKS5", socksProxy);
 
+			synchronizationClient = new SynchronizationClient(xmppClient);
+
 			return Task.CompletedTask;
 		}
 
@@ -1037,6 +1041,12 @@ namespace Waher.IoTGateway
 			{
 				concentratorServer.Dispose();
 				concentratorServer = null;
+			}
+
+			if (synchronizationClient!=null)
+			{
+				synchronizationClient.Dispose();
+				synchronizationClient = null;
 			}
 
 			if (xmppClient != null)

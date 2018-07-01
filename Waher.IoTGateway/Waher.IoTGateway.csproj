@@ -15,9 +15,9 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>IoT Gateway HTTP CoAP MQTT XMPP LWM2M</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.0.34</AssemblyVersion>
-    <FileVersion>1.0.34</FileVersion>
-    <Version>1.0.34</Version>
+    <AssemblyVersion>1.0.35</AssemblyVersion>
+    <FileVersion>1.0.35</FileVersion>
+    <Version>1.0.35</Version>
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Waher.IoTGateway\</UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>
@@ -138,6 +138,7 @@
     <ProjectReference Include="..\Networking\Waher.Networking.XMPP.Provisioning\Waher.Networking.XMPP.Provisioning.csproj" />
     <ProjectReference Include="..\Networking\Waher.Networking.XMPP.PubSub\Waher.Networking.XMPP.PubSub.csproj" />
     <ProjectReference Include="..\Networking\Waher.Networking.XMPP.Sensor\Waher.Networking.XMPP.Sensor.csproj" />
+    <ProjectReference Include="..\Networking\Waher.Networking.XMPP.Synchronization\Waher.Networking.XMPP.Synchronization.csproj" />
     <ProjectReference Include="..\Networking\Waher.Networking.XMPP\Waher.Networking.XMPP.csproj" />
     <ProjectReference Include="..\Networking\Waher.Networking\Waher.Networking.csproj" />
     <ProjectReference Include="..\Persistence\Waher.Persistence\Waher.Persistence.csproj" />

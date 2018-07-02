@@ -121,6 +121,9 @@
     <None Remove="Root\Video\small.ogv" />
     <None Remove="Root\Video\small.webm" />
     <None Remove="Root\WaherDataAB.css" />
+    <None Remove="Transforms\ClockStatXmlToCsv.xslt" />
+    <None Remove="Transforms\ClockStatXmlToHtml.xslt" />
+    <None Remove="Transforms\ClockStatXmlToTsv.xslt" />
     <None Remove="Transforms\EventXmlToHtml.xslt" />
     <None Remove="Transforms\SnifferXmlToHtml.xslt" />
     <None Remove="Waher.IoTGateway.Resources.manifest" />
@@ -412,6 +415,15 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Root\Video\small.webm">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Transforms\ClockStatXmlToCsv.xslt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Transforms\ClockStatXmlToTsv.xslt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Transforms\ClockStatXmlToHtml.xslt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Transforms\DbStatXmlToHtml.xslt">

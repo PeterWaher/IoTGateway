@@ -48,8 +48,12 @@ namespace Waher.Networking.XMPP.Test
 		public async Task Control_Test_01_Measure()
 		{
 			this.ConnectClients();
+			await this.Measure(this.client2.FullJID);
+		}
 
-			SynchronizationEventArgs e = await this.synchronizationClient1.MeasureClockDifferenceAsync(this.client2.FullJID);
+		private async Task Measure(string Jid)
+		{
+			SynchronizationEventArgs e = await this.synchronizationClient1.MeasureClockDifferenceAsync(Jid);
 
 			double LatencyMs = e.Latency100Ns * 1e-4;
 			double DifferenceMs = e.ClockDifference100Ns * 1e-4;
@@ -57,29 +61,29 @@ namespace Waher.Networking.XMPP.Test
 			double DifferenceMsHf = e.ClockDifferenceHF.Value * 1e3 / e.HfFrequency;
 
 			Console.Out.WriteLine("Latency (ms)\tDifference (ms)\tLatency (HF)\tDifference (HF)");
-			Console.Out.WriteLine(LatencyMs.ToString() + "\t" + DifferenceMs.ToString() + "\t"+
+			Console.Out.WriteLine(LatencyMs.ToString() + "\t" + DifferenceMs.ToString() + "\t" +
 				LatencyMsHf.ToString() + "\t" + DifferenceMsHf.ToString());
 		}
 
 		[TestMethod]
 		public void Control_Test_02_Monitor_30()
 		{
-			this.Monitor(30, 1000, "Monitor30.tsv");
+			this.Monitor(this.client2.FullJID, 30, 1000, "Monitor30.tsv");
 		}
 
 		[TestMethod]
 		public void Control_Test_03_Monitor_200()
 		{
-			this.Monitor(200, 1000, "Monitor200.tsv");
+			this.Monitor(this.client2.FullJID, 200, 1000, "Monitor200.tsv");
 		}
 
 		[TestMethod]
 		public void Control_Test_04_Monitor_1000()
 		{
-			this.Monitor(1000, 1000, "Monitor1000.tsv");
+			this.Monitor(this.client2.FullJID, 1000, 1000, "Monitor1000.tsv");
 		}
 
-		private void Monitor(int RecordsLeft, int IntervalMs, string FileName)
+		private void Monitor(string Source, int RecordsLeft, int IntervalMs, string FileName)
 		{
 			this.ConnectClients();
 
@@ -110,11 +114,11 @@ namespace Waher.Networking.XMPP.Test
 						Done.Set();
 				};
 
-				this.synchronizationClient1.MonitorClockDifference(this.client2.FullJID, 1000);
+				this.synchronizationClient1.MonitorClockDifference(Source, 1000);
 
 				this.synchronizationClient2.QueryClockSource(this.client1.FullJID, (sender, e) =>
 				{
-					if (!e.Ok || e.ClockSourceJID != this.client2.BareJID)
+					if (!e.Ok || e.ClockSourceJID != XmppClient.GetBareJID(Source))
 						Error.Set();
 				}, null);
 
@@ -166,17 +170,50 @@ namespace Waher.Networking.XMPP.Test
 		public async Task Control_Test_06_Measure_Server()
 		{
 			this.ConnectClients();
+			await this.Measure("waher.se");
+		}
 
-			SynchronizationEventArgs e = await this.synchronizationClient1.MeasureClockDifferenceAsync(this.client2.Domain);
+		[TestMethod]
+		public void Control_Test_07_Monitor_30_Server()
+		{
+			this.Monitor("waher.se", 30, 1000, "Monitor30Server.tsv");
+		}
 
-			double LatencyMs = e.Latency100Ns * 1e-4;
-			double DifferenceMs = e.ClockDifference100Ns * 1e-4;
-			double LatencyMsHf = e.LatencyHF.Value * 1e3 / e.HfFrequency;
-			double DifferenceMsHf = e.ClockDifferenceHF.Value * 1e3 / e.HfFrequency;
+		[TestMethod]
+		public void Control_Test_08_Monitor_200_Server()
+		{
+			this.Monitor("waher.se", 200, 1000, "Monitor200Server.tsv");
+		}
 
-			Console.Out.WriteLine("Latency (ms)\tDifference (ms)\tLatency (HF)\tDifference (HF)");
-			Console.Out.WriteLine(LatencyMs.ToString() + "\t" + DifferenceMs.ToString() + "\t" +
-				LatencyMsHf.ToString() + "\t" + DifferenceMsHf.ToString());
+		[TestMethod]
+		public void Control_Test_09_Monitor_1000_Server()
+		{
+			this.Monitor("waher.se", 1000, 1000, "Monitor1000Server.tsv");
+		}
+
+		[TestMethod]
+		public async Task Control_Test_10_Measure_Federated_Server()
+		{
+			this.ConnectClients();
+			await this.Measure("extas.is");
+		}
+
+		[TestMethod]
+		public void Control_Test_11_Monitor_30_Federated_Server()
+		{
+			this.Monitor("extas.is", 30, 1000, "Monitor30FederatedServer.tsv");
+		}
+
+		[TestMethod]
+		public void Control_Test_12_Monitor_200_Federated_Server()
+		{
+			this.Monitor("extas.is", 200, 1000, "Monitor200FederatedServer.tsv");
+		}
+
+		[TestMethod]
+		public void Control_Test_13_Monitor_1000_Federated_Server()
+		{
+			this.Monitor("extas.is", 1000, 1000, "Monitor1000FederatedServer.tsv");
 		}
 
 	}

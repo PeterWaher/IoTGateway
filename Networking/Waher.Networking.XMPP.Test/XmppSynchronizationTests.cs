@@ -68,63 +68,87 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public void Control_Test_02_Monitor_30()
 		{
+			this.ConnectClients();
 			this.Monitor(this.client2.FullJID, 30, 1000, "Monitor30.tsv");
 		}
 
 		[TestMethod]
 		public void Control_Test_03_Monitor_200()
 		{
+			this.ConnectClients();
 			this.Monitor(this.client2.FullJID, 200, 1000, "Monitor200.tsv");
 		}
 
 		[TestMethod]
 		public void Control_Test_04_Monitor_1000()
 		{
+			this.ConnectClients();
 			this.Monitor(this.client2.FullJID, 1000, 1000, "Monitor1000.tsv");
 		}
 
 		private void Monitor(string Source, int RecordsLeft, int IntervalMs, string FileName)
 		{
-			this.ConnectClients();
-
 			using (StreamWriter w = File.CreateText(FileName))
 			{
 				ManualResetEvent Done = new ManualResetEvent(false);
 				ManualResetEvent Error = new ManualResetEvent(false);
+				double HfToMs = 1e3 / this.synchronizationClient1.HfFrequency;
 
-				w.WriteLine("Date\tTime\tRaw Latency (ms)\tRaw Difference (ms)\tLatency Spike\tDifference Spike\tFiltered Latency (ms)\tFiltered Difference (ms)\tAvg Latency (ms)\tAvg Difference (ms)");
+				w.WriteLine("Date\tTime\tRaw Latency (ms)\tRaw Difference (ms)\tLatency Spike\tDifference Spike\tFiltered Latency (ms)\tFiltered Difference (ms)\tAvg Latency (ms)\tAvg Difference (ms)\tRaw HF Latency (ms)\tRaw HF Difference (ms)\tHF Latency Spike\tHF Difference Spike\tFiltered HF Latency (ms)\tFiltered HF Difference (ms)\tAvg HF Latency (ms)\tAvg HF Difference (ms)");
 
 				this.synchronizationClient1.OnUpdated += (sender, e) =>
 				{
-					DateTime TP = DateTime.Now;
+					try
+					{
+						DateTime TP = DateTime.Now;
 
-					w.WriteLine(
-						TP.Date.ToShortDateString() + "\t" +
-						TP.ToLongTimeString() + "\t" +
-						Expression.ToString(this.synchronizationClient1.RawLatency100Ns * 1e-4) + "\t" +
-						Expression.ToString(this.synchronizationClient1.RawClockDifference100Ns * 1e-4) + "\t" +
-						CommonTypes.Encode(this.synchronizationClient1.LatencySpikeRemoved) + "\t" +
-						CommonTypes.Encode(this.synchronizationClient1.ClockDifferenceSpikeRemoved) + "\t" +
-						Expression.ToString(this.synchronizationClient1.FilteredLatency100Ns * 1e-4) + "\t" +
-						Expression.ToString(this.synchronizationClient1.FilteredClockDifference100Ns * 1e-4) + "\t" +
-						Expression.ToString(this.synchronizationClient1.AvgLatency100Ns * 1e-4) + "\t" +
-						Expression.ToString(this.synchronizationClient1.AvgClockDifference100Ns * 1e-4));
+						w.WriteLine(
+							TP.Date.ToShortDateString() + "\t" +
+							TP.ToLongTimeString() + "\t" +
+							Expression.ToString(this.synchronizationClient1.RawLatency100Ns * 1e-4) + "\t" +
+							Expression.ToString(this.synchronizationClient1.RawClockDifference100Ns * 1e-4) + "\t" +
+							CommonTypes.Encode(this.synchronizationClient1.LatencySpikeRemoved) + "\t" +
+							CommonTypes.Encode(this.synchronizationClient1.ClockDifferenceSpikeRemoved) + "\t" +
+							Expression.ToString(this.synchronizationClient1.FilteredLatency100Ns * 1e-4) + "\t" +
+							Expression.ToString(this.synchronizationClient1.FilteredClockDifference100Ns * 1e-4) + "\t" +
+							Expression.ToString(this.synchronizationClient1.AvgLatency100Ns * 1e-4) + "\t" +
+							Expression.ToString(this.synchronizationClient1.AvgClockDifference100Ns * 1e-4) + "\t" +
+							Expression.ToString(this.synchronizationClient1.RawLatencyHf * HfToMs) + "\t" +
+							Expression.ToString(this.synchronizationClient1.RawClockDifferenceHf * HfToMs) + "\t" +
+							CommonTypes.Encode(this.synchronizationClient1.LatencyHfSpikeRemoved) + "\t" +
+							CommonTypes.Encode(this.synchronizationClient1.ClockDifferenceHfSpikeRemoved) + "\t" +
+							Expression.ToString(this.synchronizationClient1.FilteredLatencyHf * HfToMs) + "\t" +
+							Expression.ToString(this.synchronizationClient1.FilteredClockDifferenceHf * HfToMs) + "\t" +
+							Expression.ToString(this.synchronizationClient1.AvgLatencyHf * HfToMs) + "\t" +
+							Expression.ToString(this.synchronizationClient1.AvgClockDifferenceHf * HfToMs));
 
-					if (--RecordsLeft == 0)
-						Done.Set();
+						if (--RecordsLeft == 0)
+							Done.Set();
+					}
+					catch (Exception ex)
+					{
+						Console.Out.WriteLine(ex.Message);
+						Console.Out.WriteLine(ex.StackTrace);
+						Error.Set();
+					}
 				};
 
 				this.synchronizationClient1.MonitorClockDifference(Source, 1000);
-
-				this.synchronizationClient2.QueryClockSource(this.client1.FullJID, (sender, e) =>
+				try
 				{
-					if (!e.Ok || e.ClockSourceJID != XmppClient.GetBareJID(Source))
-						Error.Set();
-				}, null);
+					this.synchronizationClient2.QueryClockSource(this.client1.FullJID, (sender, e) =>
+					{
+						if (!e.Ok || e.ClockSourceJID != XmppClient.GetBareJID(Source))
+							Error.Set();
+					}, null);
 
-				Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }));
-
-				w.Flush();
+					Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }));
+				}
+				finally
+				{
+					this.synchronizationClient1.Stop();
+					w.Flush();
+				}
 			}
 		}
 
@@ -176,18 +200,21 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public void Control_Test_07_Monitor_30_Server()
 		{
+			this.ConnectClients();
 			this.Monitor("waher.se", 30, 1000, "Monitor30Server.tsv");
 		}
 
 		[TestMethod]
 		public void Control_Test_08_Monitor_200_Server()
 		{
+			this.ConnectClients();
 			this.Monitor("waher.se", 200, 1000, "Monitor200Server.tsv");
 		}
 
 		[TestMethod]
 		public void Control_Test_09_Monitor_1000_Server()
 		{
+			this.ConnectClients();
 			this.Monitor("waher.se", 1000, 1000, "Monitor1000Server.tsv");
 		}
 
@@ -201,18 +228,21 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public void Control_Test_11_Monitor_30_Federated_Server()
 		{
+			this.ConnectClients();
 			this.Monitor("extas.is", 30, 1000, "Monitor30FederatedServer.tsv");
 		}
 
 		[TestMethod]
 		public void Control_Test_12_Monitor_200_Federated_Server()
 		{
+			this.ConnectClients();
 			this.Monitor("extas.is", 200, 1000, "Monitor200FederatedServer.tsv");
 		}
 
 		[TestMethod]
 		public void Control_Test_13_Monitor_1000_Federated_Server()
 		{
+			this.ConnectClients();
 			this.Monitor("extas.is", 1000, 1000, "Monitor1000FederatedServer.tsv");
 		}
 

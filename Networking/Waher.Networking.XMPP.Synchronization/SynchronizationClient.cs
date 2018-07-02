@@ -27,21 +27,35 @@ namespace Waher.Networking.XMPP.Synchronization
 		private XmppClient client;
 		private Timer timer;
 		private SpikeRemoval latency100NsWindow;
+		private SpikeRemoval latencyHfWindow;
 		private SpikeRemoval difference100NsWindow;
+		private SpikeRemoval differenceHfWindow;
 		private string clockSourceJID;
 		private long rawLatency100Ns = 0;
+		private long? rawLatencyHf = null;
 		private long filteredLatency100Ns = 0;
+		private long? filteredLatencyHf = null;
 		private long avgLatency100Ns = 0;
+		private long? avgLatencyHf = null;
 		private long rawClockDifference100Ns = 0;
+		private long? rawClockDifferenceHf = null;
 		private long filteredClockDifference100Ns = 0;
+		private long? filteredClockDifferenceHf = null;
 		private long avgClockDifference100Ns = 0;
-		private long sumLatency100Ns;
-		private long sumDifference100Ns;
-		private int nrLatency100Ns;
-		private int nrDifference100Ns;
+		private long? avgClockDifferenceHf = null;
+		private long sumLatency100Ns = 0;
+		private long? sumLatencyHf = null;
+		private long sumDifference100Ns = 0;
+		private long? sumDifferenceHf = null;
+		private int nrLatency100Ns = 0;
+		private int? nrLatencyHf = null;
+		private int nrDifference100Ns = 0;
+		private int? nrDifferenceHf = null;
 		private int maxInHistory;
 		private bool latencyRemoved = false;
+		private bool latencyHfRemoved = false;
 		private bool differenceRemoved = false;
+		private bool differenceHfRemoved = false;
 
 		private static Stopwatch CreateWatch()
 		{
@@ -340,11 +354,17 @@ namespace Waher.Networking.XMPP.Synchronization
 
 			this.clockSourceJID = ClockSourceJID;
 			this.latency100NsWindow = new SpikeRemoval(WindowSize, SpikePosition, SpikeWidth);
+			this.latencyHfWindow = new SpikeRemoval(WindowSize, SpikePosition, SpikeWidth);
 			this.difference100NsWindow = new SpikeRemoval(WindowSize, SpikePosition, SpikeWidth);
+			this.differenceHfWindow = new SpikeRemoval(WindowSize, SpikePosition, SpikeWidth);
 			this.sumLatency100Ns = 0;
+			this.sumLatencyHf = null;
 			this.sumDifference100Ns = 0;
+			this.sumDifferenceHf = null;
 			this.nrLatency100Ns = 0;
+			this.nrLatencyHf = null;
 			this.nrDifference100Ns = 0;
+			this.nrDifferenceHf = null;
 			this.maxInHistory = History;
 
 			this.timer = new Timer(this.CheckClock, null, IntervalMilliseconds, IntervalMilliseconds);
@@ -371,7 +391,9 @@ namespace Waher.Networking.XMPP.Synchronization
 				if (e.Ok)
 				{
 					this.rawLatency100Ns = e.Latency100Ns;
+					this.rawLatencyHf = e.LatencyHF;
 					this.rawClockDifference100Ns = e.ClockDifference100Ns;
+					this.rawClockDifferenceHf = e.ClockDifferenceHF;
 
 					Rec Rec = new Rec()
 					{
@@ -390,7 +412,19 @@ namespace Waher.Networking.XMPP.Synchronization
 						Rec.NrDifference100Ns = NrSamples;
 					}
 
-					if (Rec.SumLatency100Ns.HasValue || Rec.SumDifference100Ns.HasValue)
+					if (e.LatencyHF.HasValue && this.latencyHfWindow.Add(e.LatencyHF.Value, out this.latencyHfRemoved, out SumSamples, out NrSamples))
+					{
+						Rec.SumLatencyHf = SumSamples;
+						Rec.NrLatencyHf = NrSamples;
+					}
+
+					if (e.ClockDifferenceHF.HasValue && this.differenceHfWindow.Add(e.ClockDifferenceHF.Value, out this.differenceHfRemoved, out SumSamples, out NrSamples))
+					{
+						Rec.SumDifferenceHf = SumSamples;
+						Rec.NrDifferenceHf = NrSamples;
+					}
+
+					if (Rec.SumLatency100Ns.HasValue || Rec.SumDifference100Ns.HasValue || Rec.SumLatencyHf.HasValue || Rec.SumDifferenceHf.HasValue)
 					{
 						this.history.Add(Rec);
 
@@ -402,12 +436,40 @@ namespace Waher.Networking.XMPP.Synchronization
 							this.nrLatency100Ns += Rec.NrLatency100Ns;
 						}
 
+						if (Rec.SumLatencyHf.HasValue)
+						{
+							this.filteredLatencyHf = (Rec.SumLatencyHf.Value + (Rec.NrLatencyHf >> 1)) / Rec.NrLatencyHf;
+
+							if (!this.sumLatencyHf.HasValue)
+							{
+								this.sumLatencyHf = 0;
+								this.nrLatencyHf = 0;
+							}
+
+							this.sumLatencyHf += Rec.SumLatencyHf.Value;
+							this.nrLatencyHf += Rec.NrLatencyHf;
+						}
+
 						if (Rec.SumDifference100Ns.HasValue)
 						{
 							this.filteredClockDifference100Ns = (Rec.SumDifference100Ns.Value + (Rec.NrDifference100Ns >> 1)) / Rec.NrDifference100Ns;
 
 							this.sumDifference100Ns += Rec.SumDifference100Ns.Value;
 							this.nrDifference100Ns += Rec.NrDifference100Ns;
+						}
+
+						if (Rec.SumDifferenceHf.HasValue)
+						{
+							this.filteredClockDifferenceHf = (Rec.SumDifferenceHf.Value + (Rec.NrDifferenceHf >> 1)) / Rec.NrDifferenceHf;
+
+							if (!this.sumDifferenceHf.HasValue)
+							{
+								this.sumDifferenceHf = 0;
+								this.nrDifferenceHf = 0;
+							}
+
+							this.sumDifferenceHf += Rec.SumDifferenceHf.Value;
+							this.nrDifferenceHf += Rec.NrDifferenceHf;
 						}
 
 						while (this.history.Count > this.maxInHistory)
@@ -421,18 +483,36 @@ namespace Waher.Networking.XMPP.Synchronization
 								this.nrLatency100Ns -= Rec.NrLatency100Ns;
 							}
 
+							if (Rec.SumLatencyHf.HasValue)
+							{
+								this.sumLatencyHf -= Rec.SumLatencyHf.Value;
+								this.nrLatencyHf -= Rec.NrLatencyHf;
+							}
+
 							if (Rec.SumDifference100Ns.HasValue)
 							{
 								this.sumDifference100Ns -= Rec.SumDifference100Ns.Value;
 								this.nrDifference100Ns -= Rec.NrDifference100Ns;
+							}
+
+							if (Rec.SumDifferenceHf.HasValue)
+							{
+								this.sumDifferenceHf -= Rec.SumDifferenceHf.Value;
+								this.nrDifferenceHf -= Rec.NrDifferenceHf;
 							}
 						}
 
 						if (this.nrLatency100Ns > 0)
 							this.avgLatency100Ns = (this.sumLatency100Ns + (this.nrLatency100Ns >> 1)) / this.nrLatency100Ns;
 
+						if (this.nrLatencyHf > 0)
+							this.avgLatencyHf = (this.sumLatencyHf + (this.nrLatencyHf >> 1)) / this.nrLatencyHf;
+
 						if (this.nrDifference100Ns > 0)
 							this.avgClockDifference100Ns = (this.sumDifference100Ns + (this.nrDifference100Ns >> 1)) / this.nrDifference100Ns;
+
+						if (this.nrDifferenceHf > 0)
+							this.avgClockDifferenceHf = (this.sumDifferenceHf + (this.nrDifferenceHf >> 1)) / this.nrDifferenceHf;
 					}
 
 					try
@@ -448,14 +528,28 @@ namespace Waher.Networking.XMPP.Synchronization
 		}
 
 		/// <summary>
-		/// Most recent raw sample of the latency of sending a stanza between the machine and the clock source, or vice versa.
+		/// Most recent raw sample of the latency of sending a stanza between the machine and the clock source, or vice versa, measured in
+		/// units of 100 ns.
 		/// </summary>
 		public long RawLatency100Ns => this.rawLatency100Ns;
 
 		/// <summary>
-		/// Most recent filtered sample of the latency of sending a stanza between the machine and the clock source, or vice versa.
+		/// Most recent raw sample of the latency of sending a stanza between the machine and the clock source, or vice versa, measured in
+		/// units of the local high-frequency timer.
+		/// </summary>
+		public long? RawLatencyHf => this.rawLatencyHf;
+
+		/// <summary>
+		/// Most recent filtered sample of the latency of sending a stanza between the machine and the clock source, or vice versa, measured in
+		/// units of 100 ns.
 		/// </summary>
 		public long FilteredLatency100Ns => this.filteredLatency100Ns;
+
+		/// <summary>
+		/// Most recent filtered sample of the latency of sending a stanza between the machine and the clock source, or vice versa, measured in
+		/// units of the local high-frequency timer.
+		/// </summary>
+		public long? FilteredLatencyHf => this.filteredLatencyHf;
 
 		/// <summary>
 		/// If a spike was detected and removed when calculating <see cref="FilteredLatency100Ns"/> from a short sequence of <see cref="RawLatency100Ns"/>.
@@ -463,31 +557,72 @@ namespace Waher.Networking.XMPP.Synchronization
 		public bool LatencySpikeRemoved => this.latencyRemoved;
 
 		/// <summary>
-		/// Most recent average of the latency of sending a stanza between the machine and the clock source, or vice versa.
-		/// The average is calculated on a sequence of <see cref="FilteredLatency100Ns"/>.
+		/// If a spike was detected and removed when calculating <see cref="FilteredLatencyHf"/> from a short sequence of <see cref="RawLatencyHf"/>.
+		/// </summary>
+		public bool LatencyHfSpikeRemoved => this.latencyHfRemoved;
+
+		/// <summary>
+		/// Most recent average of the latency of sending a stanza between the machine and the clock source, or vice versa, measured in
+		/// units of 100 ns. The average is calculated on a sequence of <see cref="FilteredLatency100Ns"/>.
 		/// </summary>
 		public long AvgLatency100Ns => this.avgLatency100Ns;
 
 		/// <summary>
-		/// Most recent raw sample of the clock difference beween the machine and the clock source.
+		/// Most recent average of the latency of sending a stanza between the machine and the clock source, or vice versa, measured in
+		/// units of the local high-frequency timer. The average is calculated on a sequence of <see cref="FilteredLatencyHf"/>.
+		/// </summary>
+		public long? AvgLatencyHf => this.avgLatencyHf;
+
+		/// <summary>
+		/// Most recent raw sample of the clock difference beween the machine and the clock source, measured in
+		/// units of 100 ns.
 		/// </summary>
 		public long RawClockDifference100Ns => this.rawClockDifference100Ns;
 
 		/// <summary>
-		/// Most recent filtered sample of the clock difference beween the machine and the clock source.
+		/// Most recent raw sample of the clock difference beween the machine and the clock source, measured in
+		/// units of the local high-frequency timer.
+		/// </summary>
+		public long? RawClockDifferenceHf => this.rawClockDifferenceHf;
+
+		/// <summary>
+		/// Most recent filtered sample of the clock difference beween the machine and the clock source, measured in
+		/// units of 100 ns.
 		/// </summary>
 		public long FilteredClockDifference100Ns => this.filteredClockDifference100Ns;
 
 		/// <summary>
-		/// If a spike was detected and removed when calculating <see cref="FilteredClockDifference100Ns"/> from a short sequence of <see cref="RawClockDifference100Ns"/>.
+		/// Most recent filtered sample of the clock difference beween the machine and the clock source, measured in
+		/// units of the local high-frequency timer.
 		/// </summary>
-		public bool ClockDifferenceSpikeRemoved => this.latencyRemoved;
+		public long? FilteredClockDifferenceHf => this.filteredClockDifferenceHf;
 
 		/// <summary>
-		/// Most recent average of the clock difference beween the machine and the clock source.
-		/// The average is calculated on a sequence of <see cref="FilteredClockDifference100Ns"/>.
+		/// If a spike was detected and removed when calculating <see cref="FilteredClockDifference100Ns"/> from a short sequence of <see cref="RawClockDifference100Ns"/>.
+		/// </summary>
+		public bool ClockDifferenceSpikeRemoved => this.differenceRemoved;
+
+		/// <summary>
+		/// If a spike was detected and removed when calculating <see cref="FilteredClockDifferenceHf"/> from a short sequence of <see cref="RawClockDifferenceHf"/>.
+		/// </summary>
+		public bool ClockDifferenceHfSpikeRemoved => this.differenceHfRemoved;
+
+		/// <summary>
+		/// Most recent average of the clock difference beween the machine and the clock source, measured in
+		/// units of 100 ns. The average is calculated on a sequence of <see cref="FilteredClockDifference100Ns"/>.
 		/// </summary>
 		public long AvgClockDifference100Ns => this.avgClockDifference100Ns;
+
+		/// <summary>
+		/// Most recent average of the clock difference beween the machine and the clock source, measured in
+		/// units of the local high-frequency timer. The average is calculated on a sequence of <see cref="FilteredClockDifferenceHf"/>.
+		/// </summary>
+		public long? AvgClockDifferenceHf => this.avgClockDifferenceHf;
+
+		/// <summary>
+		/// High Frequency increments per second, on the local machine.
+		/// </summary>
+		public long HfFrequency => Stopwatch.Frequency;
 
 		/// <summary>
 		/// Event raised when the clock difference estimates have been updated.
@@ -498,9 +633,13 @@ namespace Waher.Networking.XMPP.Synchronization
 		{
 			public DateTime Timestamp;
 			public long? SumLatency100Ns;
+			public long? SumLatencyHf;
 			public long? SumDifference100Ns;
+			public long? SumDifferenceHf;
 			public int NrLatency100Ns;
+			public int NrLatencyHf;
 			public int NrDifference100Ns;
+			public int NrDifferenceHf;
 		}
 
 		private void SourceReq(object Sender, IqEventArgs e)

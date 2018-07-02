@@ -321,6 +321,7 @@ namespace Waher.Utility.AnalyzeClock
 							w.WriteAttributeString("window", Window.ToString());
 							w.WriteAttributeString("spikePos", SpikePos.ToString());
 							w.WriteAttributeString("spikeWidth", SpikeWidth.ToString());
+							w.WriteAttributeString("hfFreq", System.Diagnostics.Stopwatch.Frequency.ToString());
 							w.WriteEndElement();
 
 							w.WriteStartElement("Samples");

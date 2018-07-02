@@ -15,8 +15,6 @@ namespace Waher.Runtime.ServiceRegistration
 		/// <summary>
 		/// Registry annotation.
 		/// </summary>
-		/// <param name="Tag">Tag name</param>
-		/// <param name="value">Value</param>
 		public Annotation()
 		{
 			this.tag = string.Empty;

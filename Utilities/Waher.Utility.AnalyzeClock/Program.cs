@@ -268,8 +268,6 @@ namespace Waher.Utility.AnalyzeClock
 
 					Client.OnStateChanged += (sender, NewState) =>
 					{
-						Console.Out.WriteLine(NewState.ToString());
-
 						switch (NewState)
 						{
 							case XmppState.Connected:

@@ -4,6 +4,9 @@ using System.Text;
 
 namespace Waher.IoTGateway.Setup.PersonalData
 {
+	/// <summary>
+	/// Information about the connection to the Internet
+	/// </summary>
 	public class NetworkIdentity : IProcessingActivity
 	{
 		/// <summary>

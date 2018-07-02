@@ -4,6 +4,9 @@ using System.Text;
 
 namespace Waher.IoTGateway.Setup.PersonalData
 {
+	/// <summary>
+	/// Information about web pages
+	/// </summary>
 	public class WebPages : IProcessingActivity
 	{
 		/// <summary>

@@ -4,6 +4,9 @@ using System.Text;
 
 namespace Waher.IoTGateway.Setup.PersonalData
 {
+	/// <summary>
+	/// Information about the local database.
+	/// </summary>
 	public class LocalDatabase : IProcessingActivity
 	{
 		/// <summary>

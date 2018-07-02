@@ -64,8 +64,8 @@ namespace Waher.Networking.XMPP.Synchronization
 			this.timer = null;
 			this.clockSourceJID = null;
 
-			this.client.RegisterIqGetHandler("clock", NamespaceSynchronization, this.Clock, true);
-			this.client.RegisterIqGetHandler("source", NamespaceSynchronization, this.Source, true);
+			this.client.RegisterIqGetHandler("req", NamespaceSynchronization, this.Clock, true);
+			this.client.RegisterIqGetHandler("sourceReq", NamespaceSynchronization, this.SourceReq, true);
 		}
 
 		/// <summary>
@@ -120,7 +120,8 @@ namespace Waher.Networking.XMPP.Synchronization
 
 			if (this.client != null)
 			{
-				this.client.UnregisterIqGetHandler("clock", NamespaceSynchronization, this.Clock, true);
+				this.client.UnregisterIqGetHandler("req", NamespaceSynchronization, this.Clock, true);
+				this.client.UnregisterIqGetHandler("sourceReq", NamespaceSynchronization, this.SourceReq, true);
 				this.client = null;
 			}
 		}
@@ -128,7 +129,7 @@ namespace Waher.Networking.XMPP.Synchronization
 		/// <summary>
 		/// Current high-resolution date and time
 		/// </summary>
-		public DateTimeHF Now
+		public static DateTimeHF Now
 		{
 			get
 			{
@@ -146,27 +147,36 @@ namespace Waher.Networking.XMPP.Synchronization
 				if ((Now - NowRef).TotalSeconds >= 1)
 				{
 					Calibrate();
-					return this.Now;
+					return SynchronizationClient.Now;
 				}
 				else
 				{
 					Ns100 %= 10000;
 
-					return new DateTimeHF(Now, (int)(Ns100 / 10), (int)(Ns100 % 10));
+					return new DateTimeHF(Now, (int)(Ns100 / 10), (int)(Ns100 % 10), Ticks);
 				}
 			}
 		}
 
 		private void Clock(object Sender, IqEventArgs e)
 		{
-			DateTimeHF Now = this.Now;
+			DateTimeHF Now = SynchronizationClient.Now;
 			StringBuilder Xml = new StringBuilder();
 
-			Xml.Append("<clock xmlns='");
+			Xml.Append("<resp xmlns='");
 			Xml.Append(NamespaceSynchronization);
+
+			if (Now.Ticks.HasValue)
+			{
+				Xml.Append("' hf='");
+				Xml.Append(Now.Ticks.Value.ToString());
+				Xml.Append("' freq='");
+				Xml.Append(Stopwatch.Frequency.ToString());
+			}
+
 			Xml.Append("'>");
 			Encode(Now, Xml);
-			Xml.Append("</clock>");
+			Xml.Append("</resp>");
 
 			e.IqResult(Xml.ToString());
 		}
@@ -204,40 +214,60 @@ namespace Waher.Networking.XMPP.Synchronization
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void MeasureClockDifference(string ClockSourceJID, SynchronizationEventHandler Callback, object State)
 		{
-			DateTimeHF ClientTime1 = this.Now;
-			StringBuilder Xml = new StringBuilder();
+			DateTimeHF ClientTime1 = SynchronizationClient.Now;
 
-			Xml.Append("<clock xmlns='");
-			Xml.Append(NamespaceSynchronization);
-			Xml.Append("'>");
-			Encode(ClientTime1, Xml);
-			Xml.Append("</clock>");
-
-			this.client.SendIqGet(ClockSourceJID, Xml.ToString(), (sender, e) =>
+			this.client.SendIqGet(ClockSourceJID, "<req xmlns='" + NamespaceSynchronization + "'/>", (sender, e) =>
 			{
-				DateTimeHF ClientTime2 = this.Now;
+				DateTimeHF ClientTime2 = SynchronizationClient.Now;
 				XmlElement E;
 				long Latency100Ns;
 				long ClockDifference100Ns;
+				long? LatencyHF;
+				long? ClockDifferenceHF;
 
-				if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "clock" && E.NamespaceURI == NamespaceSynchronization &&
+				if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "resp" && E.NamespaceURI == NamespaceSynchronization &&
 					DateTimeHF.TryParse(E.InnerText, out DateTimeHF ServerTime))
 				{
 					long dt1 = ServerTime - ClientTime1;
 					long dt2 = ClientTime2 - ServerTime;
 					Latency100Ns = dt1 + dt2;
 					ClockDifference100Ns = dt1 - dt2;
+
+					if (E.HasAttribute("hf") && long.TryParse(E.GetAttribute("hf"), out long Hf) &&
+						E.HasAttribute("freq") && long.TryParse(E.GetAttribute("freq"), out long Freq))
+					{
+						if (Freq != Stopwatch.Frequency)
+						{
+							double d = Hf;
+							d *= Stopwatch.Frequency;
+							d /= Freq;
+							Hf = (long)(d + 0.5);
+						}
+
+						dt1 = Hf - ClientTime1.Ticks.Value;
+						dt2 = ClientTime2.Ticks.Value - Hf;
+						LatencyHF = dt1 + dt2;
+						ClockDifferenceHF = dt1 - dt2;
+					}
+					else
+					{
+						LatencyHF = null;
+						ClockDifferenceHF = null;
+					}
 				}
 				else
 				{
 					e.Ok = false;
 					Latency100Ns = 0;
 					ClockDifference100Ns = 0;
+					LatencyHF = null;
+					ClockDifferenceHF = null;
 				}
 
 				try
 				{
-					Callback?.Invoke(this, new SynchronizationEventArgs(Latency100Ns, ClockDifference100Ns, e));
+					Callback?.Invoke(this, new SynchronizationEventArgs(Latency100Ns, ClockDifference100Ns, LatencyHF, ClockDifferenceHF, 
+						Stopwatch.Frequency, e));
 				}
 				catch (Exception ex)
 				{
@@ -473,17 +503,17 @@ namespace Waher.Networking.XMPP.Synchronization
 			public int NrDifference100Ns;
 		}
 
-		private void Source(object Sender, IqEventArgs e)
+		private void SourceReq(object Sender, IqEventArgs e)
 		{
 			if (!string.IsNullOrEmpty(this.clockSourceJID))
 			{
 				StringBuilder Xml = new StringBuilder();
 
-				Xml.Append("<source xmlns='");
+				Xml.Append("<sourceResp xmlns='");
 				Xml.Append(NamespaceSynchronization);
 				Xml.Append("'>");
 				Xml.Append(XML.Encode(XmppClient.GetBareJID(this.clockSourceJID)));
-				Xml.Append("</source>");
+				Xml.Append("</sourceResp>");
 
 				e.IqResult(Xml.ToString());
 			}
@@ -499,12 +529,12 @@ namespace Waher.Networking.XMPP.Synchronization
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void QueryClockSource(string To, ClockSourceEventHandler Callback, object State)
 		{
-			this.client.SendIqGet(To, "<source xmlns='" + NamespaceSynchronization + "'/>", (sender, e) =>
+			this.client.SendIqGet(To, "<sourceReq xmlns='" + NamespaceSynchronization + "'/>", (sender, e) =>
 			{
 				XmlElement E;
 				string ClockSourceJID = null;
 
-				if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "source" && E.NamespaceURI == NamespaceSynchronization)
+				if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "sourceResp" && E.NamespaceURI == NamespaceSynchronization)
 					ClockSourceJID = E.InnerText;
 
 				try

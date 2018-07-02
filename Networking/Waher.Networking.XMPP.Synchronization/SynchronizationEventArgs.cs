@@ -18,12 +18,19 @@ namespace Waher.Networking.XMPP.Synchronization
     {
 		private readonly long latency100Ns;
 		private readonly long clockDifference100Ns;
+		private readonly long? latencyHF;
+		private readonly long? clockDifferenceHF;
+		private readonly long hfFrequency;
 
-		internal SynchronizationEventArgs(long Latency100Ns, long ClockDifference100Ns, IqResultEventArgs e)
+		internal SynchronizationEventArgs(long Latency100Ns, long ClockDifference100Ns, long? LatencyHF, long? ClockDifferenceHF,
+			long HfFrequency, IqResultEventArgs e)
 			: base(e)
 		{
 			this.latency100Ns = Latency100Ns;
 			this.clockDifference100Ns = ClockDifference100Ns;
+			this.latencyHF = LatencyHF;
+			this.clockDifferenceHF = ClockDifferenceHF;
+			this.hfFrequency = HfFrequency;
 		}
 
 		/// <summary>
@@ -36,6 +43,21 @@ namespace Waher.Networking.XMPP.Synchronization
 		/// Source clock = client clock + clock difference
 		/// </summary>
 		public long ClockDifference100Ns => this.clockDifference100Ns;
+
+		/// <summary>
+		/// Latency in network, measured in local high-frequency timer ticks.
+		/// </summary>
+		public long? LatencyHF => this.latencyHF;
+
+		/// <summary>
+		/// Difference if high-frequency timers, measured in local high-frequency timer ticks.
+		/// </summary>
+		public long? ClockDifferenceHF => this.clockDifferenceHF;
+
+		/// <summary>
+		/// Frequency of local high-frequency timer, in ticks per second.
+		/// </summary>
+		public long HfFrequency => this.hfFrequency;
 
 	}
 }

@@ -20,6 +20,7 @@ namespace Waher.Networking.XMPP.Synchronization
 		private readonly int microsecond;
 		private readonly int nanosecond100;
 		private readonly DateTimeKind kind;
+		private long? ticks;
 
 		/// <summary>
 		/// Date and Time value based on the intenal high-frequency timer.
@@ -27,9 +28,10 @@ namespace Waher.Networking.XMPP.Synchronization
 		/// <param name="TP">DateTime-value</param>
 		/// <param name="Microsecond">Microsecond</param>
 		/// <param name="Nanosecond100">100-nanosecond</param>
-		public DateTimeHF(DateTime TP, int Microsecond, int Nanosecond100)
+		/// <param name="Ticks">High-resolution timer ticks.</param>
+		public DateTimeHF(DateTime TP, int Microsecond, int Nanosecond100, long? Ticks)
 			: this(TP.Year, TP.Month, TP.Day, TP.Hour, TP.Minute, TP.Second, TP.Millisecond,
-				  Microsecond, Nanosecond100, TP.Kind)
+				  Microsecond, Nanosecond100, TP.Kind, Ticks)
 		{
 		}
 
@@ -46,8 +48,9 @@ namespace Waher.Networking.XMPP.Synchronization
 		/// <param name="Microsecond">Microsecond</param>
 		/// <param name="Nanosecond100">100-nanosecond</param>
 		/// <param name="Kind">Kind</param>
+		/// <param name="Ticks">High-resolution timer ticks.</param>
 		public DateTimeHF(int Year, int Month, int Day, int Hour, int Minute, int Second,
-			int Millisecond, int Microsecond, int Nanosecond100, DateTimeKind Kind)
+			int Millisecond, int Microsecond, int Nanosecond100, DateTimeKind Kind, long? Ticks)
 		{
 			this.year = Year;
 			this.month = Month;
@@ -59,6 +62,7 @@ namespace Waher.Networking.XMPP.Synchronization
 			this.microsecond = Microsecond;
 			this.nanosecond100 = Nanosecond100;
 			this.kind = Kind;
+			this.ticks = Ticks;
 		}
 
 		/// <summary>
@@ -107,6 +111,15 @@ namespace Waher.Networking.XMPP.Synchronization
 		public int Nanosecond100 => this.nanosecond100;
 
 		/// <summary>
+		/// High-resolution timer ticks.
+		/// </summary>
+		public long? Ticks
+		{
+			get => this.ticks;
+			internal set => this.ticks = value;
+		}
+
+		/// <summary>
 		/// Tries to parse a high-frequency date and time value.
 		/// </summary>
 		/// <param name="s">String-representation</param>
@@ -120,7 +133,7 @@ namespace Waher.Networking.XMPP.Synchronization
 			{
 				if (XML.TryParse(s, out DateTime TP))
 				{
-					Value = new DateTimeHF(TP, 0, 0);
+					Value = new DateTimeHF(TP, 0, 0, null);
 					return true;
 				}
 				else
@@ -144,7 +157,7 @@ namespace Waher.Networking.XMPP.Synchronization
 				{
 					if (XML.TryParse(s, out DateTime TP))
 					{
-						Value = new DateTimeHF(TP, 0, 0);
+						Value = new DateTimeHF(TP, 0, 0, null);
 						return true;
 					}
 					else
@@ -169,7 +182,7 @@ namespace Waher.Networking.XMPP.Synchronization
 
 					if (XML.TryParse(s, out DateTime TP) && int.TryParse(s2, out j))
 					{
-						Value = new DateTimeHF(TP, j / 10, j % 10);
+						Value = new DateTimeHF(TP, j / 10, j % 10, null);
 						return true;
 					}
 					else

@@ -51,8 +51,14 @@ namespace Waher.Networking.XMPP.Test
 
 			SynchronizationEventArgs e = await this.synchronizationClient1.MeasureClockDifferenceAsync(this.client2.FullJID);
 
-			Console.Out.WriteLine("Latency (ms)\tDifference (ms)");
-			Console.Out.WriteLine((e.Latency100Ns * 1e-4).ToString() + "\t" + (e.ClockDifference100Ns * 1e-4).ToString());
+			double LatencyMs = e.Latency100Ns * 1e-4;
+			double DifferenceMs = e.ClockDifference100Ns * 1e-4;
+			double LatencyMsHf = e.LatencyHF.Value * 1e3 / e.HfFrequency;
+			double DifferenceMsHf = e.ClockDifferenceHF.Value * 1e3 / e.HfFrequency;
+
+			Console.Out.WriteLine("Latency (ms)\tDifference (ms)\tLatency (HF)\tDifference (HF)");
+			Console.Out.WriteLine(LatencyMs.ToString() + "\t" + DifferenceMs.ToString() + "\t"+
+				LatencyMsHf.ToString() + "\t" + DifferenceMsHf.ToString());
 		}
 
 		[TestMethod]
@@ -154,6 +160,23 @@ namespace Waher.Networking.XMPP.Test
 
 				w.Flush();
 			}
+		}
+
+		[TestMethod]
+		public async Task Control_Test_06_Measure_Server()
+		{
+			this.ConnectClients();
+
+			SynchronizationEventArgs e = await this.synchronizationClient1.MeasureClockDifferenceAsync(this.client2.Domain);
+
+			double LatencyMs = e.Latency100Ns * 1e-4;
+			double DifferenceMs = e.ClockDifference100Ns * 1e-4;
+			double LatencyMsHf = e.LatencyHF.Value * 1e3 / e.HfFrequency;
+			double DifferenceMsHf = e.ClockDifferenceHF.Value * 1e3 / e.HfFrequency;
+
+			Console.Out.WriteLine("Latency (ms)\tDifference (ms)\tLatency (HF)\tDifference (HF)");
+			Console.Out.WriteLine(LatencyMs.ToString() + "\t" + DifferenceMs.ToString() + "\t" +
+				LatencyMsHf.ToString() + "\t" + DifferenceMsHf.ToString());
 		}
 
 	}

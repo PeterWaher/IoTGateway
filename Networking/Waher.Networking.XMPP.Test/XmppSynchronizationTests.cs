@@ -102,25 +102,59 @@ namespace Waher.Networking.XMPP.Test
 					{
 						DateTime TP = DateTime.Now;
 
-						w.WriteLine(
-							TP.Date.ToShortDateString() + "\t" +
-							TP.ToLongTimeString() + "\t" +
-							Expression.ToString(this.synchronizationClient1.RawLatency100Ns * 1e-4) + "\t" +
-							Expression.ToString(this.synchronizationClient1.RawClockDifference100Ns * 1e-4) + "\t" +
-							CommonTypes.Encode(this.synchronizationClient1.LatencySpikeRemoved) + "\t" +
-							CommonTypes.Encode(this.synchronizationClient1.ClockDifferenceSpikeRemoved) + "\t" +
-							Expression.ToString(this.synchronizationClient1.FilteredLatency100Ns * 1e-4) + "\t" +
-							Expression.ToString(this.synchronizationClient1.FilteredClockDifference100Ns * 1e-4) + "\t" +
-							Expression.ToString(this.synchronizationClient1.AvgLatency100Ns * 1e-4) + "\t" +
-							Expression.ToString(this.synchronizationClient1.AvgClockDifference100Ns * 1e-4) + "\t" +
-							Expression.ToString(this.synchronizationClient1.RawLatencyHf * HfToMs) + "\t" +
-							Expression.ToString(this.synchronizationClient1.RawClockDifferenceHf * HfToMs) + "\t" +
-							CommonTypes.Encode(this.synchronizationClient1.LatencyHfSpikeRemoved) + "\t" +
-							CommonTypes.Encode(this.synchronizationClient1.ClockDifferenceHfSpikeRemoved) + "\t" +
-							Expression.ToString(this.synchronizationClient1.FilteredLatencyHf * HfToMs) + "\t" +
-							Expression.ToString(this.synchronizationClient1.FilteredClockDifferenceHf * HfToMs) + "\t" +
-							Expression.ToString(this.synchronizationClient1.AvgLatencyHf * HfToMs) + "\t" +
-							Expression.ToString(this.synchronizationClient1.AvgClockDifferenceHf * HfToMs));
+						w.Write(TP.Date.ToShortDateString());
+						w.Write("\t");
+						w.Write(TP.ToLongTimeString());
+						w.Write("\t");
+						if (this.synchronizationClient1.RawLatency100Ns.HasValue)
+							w.Write(Expression.ToString(this.synchronizationClient1.RawLatency100Ns.Value * 1e-4));
+						w.Write("\t");
+						if (this.synchronizationClient1.RawClockDifference100Ns.HasValue)
+							w.Write(Expression.ToString(this.synchronizationClient1.RawClockDifference100Ns.Value * 1e-4));
+						w.Write("\t");
+						if (this.synchronizationClient1.LatencySpikeRemoved.HasValue)
+							w.Write(CommonTypes.Encode(this.synchronizationClient1.LatencySpikeRemoved.Value));
+						w.Write("\t");
+						if (this.synchronizationClient1.ClockDifferenceSpikeRemoved.HasValue)
+							w.Write(CommonTypes.Encode(this.synchronizationClient1.ClockDifferenceSpikeRemoved.Value));
+						w.Write("\t");
+						if (this.synchronizationClient1.FilteredLatency100Ns.HasValue)
+							w.Write(Expression.ToString(this.synchronizationClient1.FilteredLatency100Ns.Value * 1e-4));
+						w.Write("\t");
+						if (this.synchronizationClient1.FilteredClockDifference100Ns.HasValue)
+							w.Write(Expression.ToString(this.synchronizationClient1.FilteredClockDifference100Ns.Value * 1e-4));
+						w.Write("\t");
+						if (this.synchronizationClient1.AvgLatency100Ns.HasValue)
+							w.Write(Expression.ToString(this.synchronizationClient1.AvgLatency100Ns.Value * 1e-4));
+						w.Write("\t");
+						if (this.synchronizationClient1.AvgClockDifference100Ns.HasValue)
+							w.Write(Expression.ToString(this.synchronizationClient1.AvgClockDifference100Ns.Value * 1e-4));
+						w.Write("\t");
+						if (this.synchronizationClient1.RawLatencyHf.HasValue)
+							w.Write(Expression.ToString(this.synchronizationClient1.RawLatencyHf.Value * HfToMs));
+						w.Write("\t");
+						if (this.synchronizationClient1.RawClockDifferenceHf.HasValue)
+							w.Write(Expression.ToString(this.synchronizationClient1.RawClockDifferenceHf.Value * HfToMs));
+						w.Write("\t");
+						if (this.synchronizationClient1.LatencyHfSpikeRemoved.HasValue)
+							w.Write(CommonTypes.Encode(this.synchronizationClient1.LatencyHfSpikeRemoved.Value));
+						w.Write("\t");
+						if (this.synchronizationClient1.ClockDifferenceHfSpikeRemoved.HasValue)
+							w.Write(CommonTypes.Encode(this.synchronizationClient1.ClockDifferenceHfSpikeRemoved.Value));
+						w.Write("\t");
+						if (this.synchronizationClient1.FilteredLatencyHf.HasValue)
+							w.Write(Expression.ToString(this.synchronizationClient1.FilteredLatencyHf.Value * HfToMs));
+						w.Write("\t");
+						if (this.synchronizationClient1.FilteredClockDifferenceHf.HasValue)
+							w.Write(Expression.ToString(this.synchronizationClient1.FilteredClockDifferenceHf.Value * HfToMs));
+						w.Write("\t");
+						if (this.synchronizationClient1.AvgLatencyHf.HasValue)
+							w.Write(Expression.ToString(this.synchronizationClient1.AvgLatencyHf.Value * HfToMs));
+						w.Write("\t");
+						if (this.synchronizationClient1.AvgClockDifferenceHf.HasValue)
+							w.Write(Expression.ToString(this.synchronizationClient1.AvgClockDifferenceHf.Value * HfToMs));
+
+						w.WriteLine();
 
 						if (--RecordsLeft == 0)
 							Done.Set();

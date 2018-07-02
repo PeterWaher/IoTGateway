@@ -22,6 +22,7 @@ using Waher.Networking.XMPP.Provisioning;
 using Waher.Networking.XMPP.PubSub;
 using Waher.Networking.XMPP.Sensor;
 using Waher.Networking.XMPP.ServiceDiscovery;
+using Waher.Networking.XMPP.Synchronization;
 using Waher.Things.SourceEvents;
 using Waher.Client.WPF.Dialogs;
 using Waher.Client.WPF.Model.Concentrator;
@@ -57,6 +58,7 @@ namespace Waher.Client.WPF.Model
 		private SensorClient sensorClient;
 		private ControlClient controlClient;
 		private ConcentratorClient concentratorClient;
+		private SynchronizationClient synchronizationClient;
 		private Timer connectionTimer;
 		private Exception lastError = null;
 		private TransportMethod transport = TransportMethod.TraditionalSocket;
@@ -189,6 +191,7 @@ namespace Waher.Client.WPF.Model
 			this.sensorClient = new SensorClient(this.client);
 			this.controlClient = new ControlClient(this.client);
 			this.concentratorClient = new ConcentratorClient(this.client);
+			this.synchronizationClient = new SynchronizationClient(this.client);
 
 			this.concentratorClient.OnEvent += ConcentratorClient_OnEvent;
 
@@ -341,6 +344,12 @@ namespace Waher.Client.WPF.Model
 			{
 				this.concentratorClient.Dispose();
 				this.concentratorClient = null;
+			}
+
+			if (this.synchronizationClient != null)
+			{
+				this.synchronizationClient.Dispose();
+				this.synchronizationClient = null;
 			}
 
 			if (this.client != null)
@@ -1019,6 +1028,11 @@ namespace Waher.Client.WPF.Model
 		public ConcentratorClient ConcentratorClient
 		{
 			get { return this.concentratorClient; }
+		}
+
+		public SynchronizationClient SynchronizationClient
+		{
+			get { return this.synchronizationClient; }
 		}
 
 		public void SearchComponents()

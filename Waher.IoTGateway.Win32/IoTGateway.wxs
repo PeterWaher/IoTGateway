@@ -741,7 +741,21 @@
               <File Id='Waher.Utility.Install.pdb' Name='Waher.Utility.Install.pdb' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Install\bin\$(var.Configuration)\netcoreapp2.0\Waher.Utility.Install.pdb' Vital='yes' KeyPath='yes'/>
               <RemoveFile Id='RemoveWaher.Utility.Install.pdb' Name='Waher.Utility.Install.pdb' On='uninstall'/>
             </Component>
-            <Component Id='UtilityAnalyzeDB' Guid='86C2CA7D-73E4-44C3-96A1-CA67B79AB2CA'>
+						<Component Id='UtilityAnalyzeClock' Guid='A2A9931B-1B4C-4F0A-B139-AD0BF3822EEA'>
+							<File Id='Waher.Utility.AnalyzeClock.exe' Name='Waher.Utility.AnalyzeClock.exe' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.AnalyzeClock\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.AnalyzeClock.exe' Vital='yes' KeyPath='yes'/>
+							<File Id='Waher.Utility.AnalyzeClock.dll' Name='Waher.Utility.AnalyzeClock.dll' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.AnalyzeClock\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.AnalyzeClock.dll' Vital='yes'/>
+							<File Id='Waher.Utility.AnalyzeClock.deps.json' Name='Waher.Utility.AnalyzeClock.deps.json' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.AnalyzeClock\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.AnalyzeClock.deps.json' Vital='yes'/>
+							<File Id='Waher.Utility.AnalyzeClock.runtimeconfig.json' Name='Waher.Utility.AnalyzeClock.runtimeconfig.json' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.AnalyzeClock\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.AnalyzeClock.runtimeconfig.json' Vital='yes'/>
+							<RemoveFile Id='RemoveWaher.Utility.AnalyzeClock.exe' Name='Waher.Utility.AnalyzeClock.exe' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Utility.AnalyzeClock.dll' Name='Waher.Utility.AnalyzeClock.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Utility.AnalyzeClock.deps.json' Name='Waher.Utility.AnalyzeClock.deps.json' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Utility.AnalyzeClock.runtimeconfig.json' Name='Waher.Utility.AnalyzeClock.runtimeconfig.json' On='uninstall'/>
+						</Component>
+						<Component Id='UtilityAnalyzeClockDebugFiles' Guid='3F1BF45E-3E8D-402A-98E5-FF5F5FE41A0F'>
+							<File Id='Waher.Utility.AnalyzeClock.pdb' Name='Waher.Utility.AnalyzeClock.pdb' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.AnalyzeClock\bin\$(var.Configuration)\netcoreapp2.0\Waher.Utility.AnalyzeClock.pdb' Vital='yes' KeyPath='yes'/>
+							<RemoveFile Id='RemoveWaher.Utility.AnalyzeClock.pdb' Name='Waher.Utility.AnalyzeClock.pdb' On='uninstall'/>
+						</Component>
+						<Component Id='UtilityAnalyzeDB' Guid='86C2CA7D-73E4-44C3-96A1-CA67B79AB2CA'>
               <File Id='Waher.Utility.AnalyzeDB.exe' Name='Waher.Utility.AnalyzeDB.exe' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.AnalyzeDB\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.AnalyzeDB.exe' Vital='yes' KeyPath='yes'/>
               <File Id='Waher.Utility.AnalyzeDB.dll' Name='Waher.Utility.AnalyzeDB.dll' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.AnalyzeDB\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.AnalyzeDB.dll' Vital='yes'/>
               <File Id='Waher.Utility.AnalyzeDB.deps.json' Name='Waher.Utility.AnalyzeDB.deps.json' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.AnalyzeDB\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.AnalyzeDB.deps.json' Vital='yes'/>
@@ -1161,13 +1175,19 @@
           <Directory Id='Transforms' Name='Transforms'>
             <Component Id='TransformFiles' Guid='F42748D6-006C-45F4-AC84-040C8E3C9D57'>
               <RemoveFolder Id='RemoveTransforms' On='uninstall' />
-              <File Id='EventXmlToHtml.xslt' Name='EventXmlToHtml.xslt' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Transforms\EventXmlToHtml.xslt' KeyPath='yes'/>
+							<File Id='ClockStatXmlToCsv.xslt' Name='CloclStatXmlToCsv.xslt' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Transforms\ClockStatXmlToCsv.xslt' KeyPath='yes'/>
+							<File Id='ClockStatXmlToHtml.xslt' Name='CloclStatXmlToHtml.xslt' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Transforms\ClockStatXmlToHtml.xslt'/>
+							<File Id='ClockStatXmlToTsv.xslt' Name='CloclStatXmlToTsv.xslt' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Transforms\ClockStatXmlToTsv.xslt'/>
+							<File Id='DbStatXmlToHtml.xslt' Name='DbStatXmlToHtml.xslt' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Transforms\DbStatXmlToHtml.xslt'/>
+							<File Id='EventXmlToHtml.xslt' Name='EventXmlToHtml.xslt' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Transforms\EventXmlToHtml.xslt'/>
               <File Id='SnifferXmlToHtml.xslt' Name='SnifferXmlToHtml.xslt' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Transforms\SnifferXmlToHtml.xslt'/>
-              <File Id='DbStatXmlToHtml.xslt' Name='DbStatXmlToHtml.xslt' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Transforms\DbStatXmlToHtml.xslt'/>
-              <RemoveFile Id='RemoveEventXmlToHtml.xslt' Name='EventXmlToHtml.xslt' On='uninstall'/>
-              <RemoveFile Id='RemoveSnifferXmlToHtml.xslt' Name='SnifferXmlToHtml.xslt' On='uninstall'/>
-              <RemoveFile Id='RemoveDbStatXmlToHtml.xslt' Name='DbStatXmlToHtml.xslt' On='uninstall'/>
-            </Component>
+							<RemoveFile Id='RemoveClockStatXmlToCsv.xslt' Name='ClockStatXmlToCsv.xslt' On='uninstall'/>
+							<RemoveFile Id='RemoveClockStatXmlToHtml.xslt' Name='ClockStatXmlToHtml.xslt' On='uninstall'/>
+							<RemoveFile Id='RemoveClockStatXmlToTsv.xslt' Name='ClockStatXmlToTsv.xslt' On='uninstall'/>
+							<RemoveFile Id='RemoveDbStatXmlToHtml.xslt' Name='DbStatXmlToHtml.xslt' On='uninstall'/>
+							<RemoveFile Id='RemoveEventXmlToHtml.xslt' Name='EventXmlToHtml.xslt' On='uninstall'/>
+							<RemoveFile Id='RemoveSnifferXmlToHtml.xslt' Name='SnifferXmlToHtml.xslt' On='uninstall'/>
+						</Component>
           </Directory>
           <Directory Id='Language' Name='Language'>
             <Component Id='English' Guid='8D5AF9BA-A602-4014-A444-5539F2236ACB'>
@@ -1234,6 +1254,7 @@
       </Feature>
       <Feature Id='Utilities' Title='Utilities' Description='Contains command-line utilities for management of the gateway.' Level='1'>
         <ComponentRef Id='UtilityInstall' />
+				<ComponentRef Id='UtilityAnalyzeClock' />
 				<ComponentRef Id='UtilityAnalyzeDB' />
 				<ComponentRef Id='UtilityAcme' />
 			</Feature>
@@ -1241,6 +1262,7 @@
         <ComponentRef Id='MainDebugFiles'/>
         <ComponentRef Id='ScriptWebServiceDebugFiles'/>
         <ComponentRef Id='UtilityInstallDebugFiles' />
+				<ComponentRef Id='UtilityAnalyzeClockDebugFiles' />
 				<ComponentRef Id='UtilityAnalyzeDBDebugFiles' />
 				<ComponentRef Id='UtilityAcmeDebugFiles' />
 			</Feature>

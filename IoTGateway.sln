@@ -310,6 +310,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Networking.XMPP.Synch
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.XMPP.Synchronization.UWP", "Networking\Waher.Networking.XMPP.Synchronization.UWP\Waher.Networking.XMPP.Synchronization.UWP.csproj", "{EB9E389B-B576-47A9-9EEE-0BDC13C9630E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Utility.AnalyzeClock", "Utilities\Waher.Utility.AnalyzeClock\Waher.Utility.AnalyzeClock.csproj", "{ED6DEE77-5DD5-4539-A123-DB2A0208E66D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -2787,6 +2789,26 @@ Global
 		{EB9E389B-B576-47A9-9EEE-0BDC13C9630E}.Release|x64.Build.0 = Release|x64
 		{EB9E389B-B576-47A9-9EEE-0BDC13C9630E}.Release|x86.ActiveCfg = Release|x86
 		{EB9E389B-B576-47A9-9EEE-0BDC13C9630E}.Release|x86.Build.0 = Release|x86
+		{ED6DEE77-5DD5-4539-A123-DB2A0208E66D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED6DEE77-5DD5-4539-A123-DB2A0208E66D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ED6DEE77-5DD5-4539-A123-DB2A0208E66D}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{ED6DEE77-5DD5-4539-A123-DB2A0208E66D}.Debug|ARM.Build.0 = Debug|Any CPU
+		{ED6DEE77-5DD5-4539-A123-DB2A0208E66D}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{ED6DEE77-5DD5-4539-A123-DB2A0208E66D}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{ED6DEE77-5DD5-4539-A123-DB2A0208E66D}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{ED6DEE77-5DD5-4539-A123-DB2A0208E66D}.Debug|x64.Build.0 = Debug|Any CPU
+		{ED6DEE77-5DD5-4539-A123-DB2A0208E66D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{ED6DEE77-5DD5-4539-A123-DB2A0208E66D}.Debug|x86.Build.0 = Debug|Any CPU
+		{ED6DEE77-5DD5-4539-A123-DB2A0208E66D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ED6DEE77-5DD5-4539-A123-DB2A0208E66D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ED6DEE77-5DD5-4539-A123-DB2A0208E66D}.Release|ARM.ActiveCfg = Release|Any CPU
+		{ED6DEE77-5DD5-4539-A123-DB2A0208E66D}.Release|ARM.Build.0 = Release|Any CPU
+		{ED6DEE77-5DD5-4539-A123-DB2A0208E66D}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{ED6DEE77-5DD5-4539-A123-DB2A0208E66D}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{ED6DEE77-5DD5-4539-A123-DB2A0208E66D}.Release|x64.ActiveCfg = Release|Any CPU
+		{ED6DEE77-5DD5-4539-A123-DB2A0208E66D}.Release|x64.Build.0 = Release|Any CPU
+		{ED6DEE77-5DD5-4539-A123-DB2A0208E66D}.Release|x86.ActiveCfg = Release|Any CPU
+		{ED6DEE77-5DD5-4539-A123-DB2A0208E66D}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -2907,6 +2929,7 @@ Global
 		{E73DECAC-C7E9-4E25-8072-B1A850C8642A} = {A6A2D4A1-12E4-467E-925C-720093EBFE26}
 		{E4112366-6D17-4B03-8127-0B62C0D42370} = {0EA3132A-669C-4228-8684-3B98AE876BEF}
 		{EB9E389B-B576-47A9-9EEE-0BDC13C9630E} = {0EA3132A-669C-4228-8684-3B98AE876BEF}
+		{ED6DEE77-5DD5-4539-A123-DB2A0208E66D} = {5DB13D03-2513-4181-B5BF-891A6974B4A6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {32CF1367-B83E-4CAD-8329-0D1C73AF59F4}

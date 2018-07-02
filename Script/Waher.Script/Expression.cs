@@ -3716,6 +3716,8 @@ namespace Waher.Script
 
 				return sb.ToString();
 			}
+			else if (Value == null)
+				return "null";
 			else
 				return Value.ToString();
 		}

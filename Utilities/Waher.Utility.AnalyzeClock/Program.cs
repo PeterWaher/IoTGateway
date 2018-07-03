@@ -287,7 +287,7 @@ namespace Waher.Utility.AnalyzeClock
 					if (i == 1)
 						throw new Exception("Unable to connect to broker.");
 
-					Done.Reset();
+					ManualResetEvent Done2 = new ManualResetEvent(false);
 
 					using (StreamWriter f = File.CreateText(OutputFileName))
 					{
@@ -386,12 +386,12 @@ namespace Waher.Utility.AnalyzeClock
 									Console.Out.Write(".");
 
 									if (--Records <= 0)
-										Done.Set();
+										Done2.Set();
 								};
 
 								SynchClient.MonitorClockDifference(Jid, Interval, History, Window, SpikePos, SpikeWidth, true);
 
-								Done.WaitOne();
+								Done2.WaitOne();
 							}
 
 							w.WriteEndElement();

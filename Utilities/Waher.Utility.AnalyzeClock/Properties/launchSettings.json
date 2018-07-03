@@ -1,8 +1,7 @@
 {
   "profiles": {
     "Waher.Utility.AnalyzeClock": {
-      "commandName": "Project",
-      "commandLineArgs": "-h waher.se -a xmppclient.test01 -pwd testpassword -i 5000 -j waher.se -r 2000 -n 100 -w 16 -s 6 -sw 3 -o Waher.se.xml"
+      "commandName": "Project"
     }
   }
 }

@@ -310,7 +310,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Networking.XMPP.Synch
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.XMPP.Synchronization.UWP", "Networking\Waher.Networking.XMPP.Synchronization.UWP\Waher.Networking.XMPP.Synchronization.UWP.csproj", "{EB9E389B-B576-47A9-9EEE-0BDC13C9630E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Utility.AnalyzeClock", "Utilities\Waher.Utility.AnalyzeClock\Waher.Utility.AnalyzeClock.csproj", "{ED6DEE77-5DD5-4539-A123-DB2A0208E66D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Utility.AnalyzeClock", "Utilities\Waher.Utility.AnalyzeClock\Waher.Utility.AnalyzeClock.csproj", "{ED6DEE77-5DD5-4539-A123-DB2A0208E66D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Utility.Transform", "Utilities\Waher.Utility.Transform\Waher.Utility.Transform.csproj", "{F00183BC-A403-4F7F-A179-DDD153A11295}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -2809,6 +2811,26 @@ Global
 		{ED6DEE77-5DD5-4539-A123-DB2A0208E66D}.Release|x64.Build.0 = Release|Any CPU
 		{ED6DEE77-5DD5-4539-A123-DB2A0208E66D}.Release|x86.ActiveCfg = Release|Any CPU
 		{ED6DEE77-5DD5-4539-A123-DB2A0208E66D}.Release|x86.Build.0 = Release|Any CPU
+		{F00183BC-A403-4F7F-A179-DDD153A11295}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F00183BC-A403-4F7F-A179-DDD153A11295}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F00183BC-A403-4F7F-A179-DDD153A11295}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{F00183BC-A403-4F7F-A179-DDD153A11295}.Debug|ARM.Build.0 = Debug|Any CPU
+		{F00183BC-A403-4F7F-A179-DDD153A11295}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{F00183BC-A403-4F7F-A179-DDD153A11295}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{F00183BC-A403-4F7F-A179-DDD153A11295}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F00183BC-A403-4F7F-A179-DDD153A11295}.Debug|x64.Build.0 = Debug|Any CPU
+		{F00183BC-A403-4F7F-A179-DDD153A11295}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F00183BC-A403-4F7F-A179-DDD153A11295}.Debug|x86.Build.0 = Debug|Any CPU
+		{F00183BC-A403-4F7F-A179-DDD153A11295}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F00183BC-A403-4F7F-A179-DDD153A11295}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F00183BC-A403-4F7F-A179-DDD153A11295}.Release|ARM.ActiveCfg = Release|Any CPU
+		{F00183BC-A403-4F7F-A179-DDD153A11295}.Release|ARM.Build.0 = Release|Any CPU
+		{F00183BC-A403-4F7F-A179-DDD153A11295}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{F00183BC-A403-4F7F-A179-DDD153A11295}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{F00183BC-A403-4F7F-A179-DDD153A11295}.Release|x64.ActiveCfg = Release|Any CPU
+		{F00183BC-A403-4F7F-A179-DDD153A11295}.Release|x64.Build.0 = Release|Any CPU
+		{F00183BC-A403-4F7F-A179-DDD153A11295}.Release|x86.ActiveCfg = Release|Any CPU
+		{F00183BC-A403-4F7F-A179-DDD153A11295}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -2930,6 +2952,7 @@ Global
 		{E4112366-6D17-4B03-8127-0B62C0D42370} = {0EA3132A-669C-4228-8684-3B98AE876BEF}
 		{EB9E389B-B576-47A9-9EEE-0BDC13C9630E} = {0EA3132A-669C-4228-8684-3B98AE876BEF}
 		{ED6DEE77-5DD5-4539-A123-DB2A0208E66D} = {5DB13D03-2513-4181-B5BF-891A6974B4A6}
+		{F00183BC-A403-4F7F-A179-DDD153A11295} = {5DB13D03-2513-4181-B5BF-891A6974B4A6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {32CF1367-B83E-4CAD-8329-0D1C73AF59F4}

@@ -769,6 +769,20 @@
               <File Id='Waher.Utility.AnalyzeDB.pdb' Name='Waher.Utility.AnalyzeDB.pdb' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.AnalyzeDB\bin\$(var.Configuration)\netcoreapp2.0\Waher.Utility.AnalyzeDB.pdb' Vital='yes' KeyPath='yes'/>
               <RemoveFile Id='RemoveWaher.Utility.AnalyzeDB.pdb' Name='Waher.Utility.AnalyzeDB.pdb' On='uninstall'/>
             </Component>
+						<Component Id='UtilityTransform' Guid='D8DB8B56-37EC-44DC-A99B-B8EBC044400E'>
+							<File Id='Waher.Utility.Transform.exe' Name='Waher.Utility.Transform.exe' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Transform\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.Transform.exe' Vital='yes' KeyPath='yes'/>
+							<File Id='Waher.Utility.Transform.dll' Name='Waher.Utility.Transform.dll' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Transform\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.Transform.dll' Vital='yes'/>
+							<File Id='Waher.Utility.Transform.deps.json' Name='Waher.Utility.Transform.deps.json' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Transform\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.Transform.deps.json' Vital='yes'/>
+							<File Id='Waher.Utility.Transform.runtimeconfig.json' Name='Waher.Utility.Transform.runtimeconfig.json' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Transform\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.Transform.runtimeconfig.json' Vital='yes'/>
+							<RemoveFile Id='RemoveWaher.Utility.Transform.exe' Name='Waher.Utility.Transform.exe' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Utility.Transform.dll' Name='Waher.Utility.Transform.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Utility.Transform.deps.json' Name='Waher.Utility.Transform.deps.json' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Utility.Transform.runtimeconfig.json' Name='Waher.Utility.Transform.runtimeconfig.json' On='uninstall'/>
+						</Component>
+						<Component Id='UtilityTransformDebugFiles' Guid='FAD8F96E-7DD7-4DD8-BAD7-9C8CE4F05CC4'>
+							<File Id='Waher.Utility.Transform.pdb' Name='Waher.Utility.Transform.pdb' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Transform\bin\$(var.Configuration)\netcoreapp2.0\Waher.Utility.Transform.pdb' Vital='yes' KeyPath='yes'/>
+							<RemoveFile Id='RemoveWaher.Utility.Transform.pdb' Name='Waher.Utility.Transform.pdb' On='uninstall'/>
+						</Component>
 						<Directory Id='Graphics' Name='Graphics'>
 							<Component Id='Emoji1Zip' Guid='B7FF03C8-054C-4E72-A87B-DFBE1C3710C5'>
 								<RemoveFolder Id='RemoveEmoji1Folder' On='uninstall' />
@@ -1253,18 +1267,20 @@
         <ComponentRef Id='English'/>
       </Feature>
       <Feature Id='Utilities' Title='Utilities' Description='Contains command-line utilities for management of the gateway.' Level='1'>
-        <ComponentRef Id='UtilityInstall' />
+				<ComponentRef Id='UtilityAcme' />
 				<ComponentRef Id='UtilityAnalyzeClock' />
 				<ComponentRef Id='UtilityAnalyzeDB' />
-				<ComponentRef Id='UtilityAcme' />
+				<ComponentRef Id='UtilityInstall' />
+				<ComponentRef Id='UtilityTransform' />
 			</Feature>
       <Feature Id='DebugFiles' Title='Debug Files' Description='Provides debug files. This will help debugging, since it provides more information in case something goes wrong.' Level='1000'>
         <ComponentRef Id='MainDebugFiles'/>
         <ComponentRef Id='ScriptWebServiceDebugFiles'/>
-        <ComponentRef Id='UtilityInstallDebugFiles' />
+				<ComponentRef Id='UtilityAcmeDebugFiles' />
 				<ComponentRef Id='UtilityAnalyzeClockDebugFiles' />
 				<ComponentRef Id='UtilityAnalyzeDBDebugFiles' />
-				<ComponentRef Id='UtilityAcmeDebugFiles' />
+				<ComponentRef Id='UtilityInstallDebugFiles' />
+				<ComponentRef Id='UtilityTransformDebugFiles' />
 			</Feature>
     </Feature>
     <WixVariable Id="WixUIBannerBmp" Value="..\..\banner.bmp" />

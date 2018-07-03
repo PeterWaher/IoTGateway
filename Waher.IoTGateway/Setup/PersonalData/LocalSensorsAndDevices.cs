@@ -4,6 +4,9 @@ using System.Text;
 
 namespace Waher.IoTGateway.Setup.PersonalData
 {
+	/// <summary>
+	/// Information about the processing of local sensors and devices.
+	/// </summary>
 	public class LocalSensorsAndDevices : IProcessingActivity
 	{
 		/// <summary>

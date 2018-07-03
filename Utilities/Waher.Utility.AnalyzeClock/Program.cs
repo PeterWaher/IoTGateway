@@ -389,7 +389,7 @@ namespace Waher.Utility.AnalyzeClock
 										Done.Set();
 								};
 
-								SynchClient.MonitorClockDifference(Jid, Interval, History, Window, SpikePos, SpikeWidth);
+								SynchClient.MonitorClockDifference(Jid, Interval, History, Window, SpikePos, SpikeWidth, true);
 
 								Done.WaitOne();
 							}

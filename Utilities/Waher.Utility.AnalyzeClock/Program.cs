@@ -329,6 +329,7 @@ namespace Waher.Utility.AnalyzeClock
 								SynchClient.OnUpdated += (sender, e) =>
 								{
 									DateTime TP = DateTime.Now;
+									double? StdDev;
 
 									w.WriteStartElement("Sample");
 									w.WriteAttributeString("timestamp", XML.Encode(TP));
@@ -357,6 +358,14 @@ namespace Waher.Utility.AnalyzeClock
 									if (SynchClient.AvgClockDifference100Ns.HasValue)
 										w.WriteAttributeString("avgDifferenceMs", CommonTypes.Encode(SynchClient.AvgClockDifference100Ns.Value * 1e-4));
 
+									StdDev = SynchClient.CalcStdDevLatency100Ns();
+									if (StdDev.HasValue)
+										w.WriteAttributeString("stdDevLatencyMs", CommonTypes.Encode(StdDev.Value * 1e-4));
+
+									StdDev = SynchClient.CalcStdDevClockDifference100Ns();
+									if (StdDev.HasValue)
+										w.WriteAttributeString("stdDevDifferenceMs", CommonTypes.Encode(StdDev.Value * 1e-4));
+
 									if (SynchClient.RawLatencyHf.HasValue)
 										w.WriteAttributeString("rawLatencyHf", SynchClient.RawLatencyHf.Value.ToString());
 
@@ -380,6 +389,14 @@ namespace Waher.Utility.AnalyzeClock
 
 									if (SynchClient.AvgClockDifferenceHf.HasValue)
 										w.WriteAttributeString("avgDifferenceHf", SynchClient.AvgClockDifferenceHf.ToString());
+
+									StdDev = SynchClient.CalcStdDevLatencyHf();
+									if (StdDev.HasValue)
+										w.WriteAttributeString("stdDevLatencyHf", CommonTypes.Encode(StdDev.Value));
+
+									StdDev = SynchClient.CalcStdDevClockDifferenceHf();
+									if (StdDev.HasValue)
+										w.WriteAttributeString("stdDevDifferenceHf", CommonTypes.Encode(StdDev.Value));
 
 									w.WriteEndElement();
 

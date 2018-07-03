@@ -378,7 +378,12 @@ namespace Waher.Networking.XMPP.Synchronization
 			}
 
 			if (this.history != null)
-				this.history.Clear();
+			{
+				lock (this.history)
+				{
+					this.history.Clear();
+				}
+			}
 			else
 				this.history = new List<Rec>();
 
@@ -430,149 +435,152 @@ namespace Waher.Networking.XMPP.Synchronization
 					{
 						if (e.Ok && (DateTime.Now - ((DateTime)e.State)).TotalSeconds < 1.0)
 						{
-							this.rawLatency100Ns = e.Latency100Ns;
-							this.rawLatencyHf = e.LatencyHF;
-							this.rawClockDifference100Ns = e.ClockDifference100Ns;
-							this.rawClockDifferenceHf = e.ClockDifferenceHF;
-
-							Rec Rec = new Rec()
+							lock (this.history)
 							{
-								Timestamp = DateTime.Now
-							};
+								this.rawLatency100Ns = e.Latency100Ns;
+								this.rawLatencyHf = e.LatencyHF;
+								this.rawClockDifference100Ns = e.ClockDifference100Ns;
+								this.rawClockDifferenceHf = e.ClockDifferenceHF;
 
-							if (this.latency100NsWindow.Add(e.Latency100Ns, out bool SpikeRemoved, out long SumSamples, out int NrSamples))
-							{
-								this.latencyRemoved = SpikeRemoved;
-
-								Rec.SumLatency100Ns = SumSamples;
-								Rec.NrLatency100Ns = NrSamples;
-							}
-
-							if (this.difference100NsWindow.Add(e.ClockDifference100Ns, out SpikeRemoved, out SumSamples, out NrSamples))
-							{
-								this.differenceRemoved = SpikeRemoved;
-
-								Rec.SumDifference100Ns = SumSamples;
-								Rec.NrDifference100Ns = NrSamples;
-							}
-
-							if (e.LatencyHF.HasValue && this.latencyHfWindow.Add(e.LatencyHF.Value, out SpikeRemoved, out SumSamples, out NrSamples))
-							{
-								this.latencyHfRemoved = SpikeRemoved;
-
-								Rec.SumLatencyHf = SumSamples;
-								Rec.NrLatencyHf = NrSamples;
-							}
-
-							if (e.ClockDifferenceHF.HasValue && this.differenceHfWindow.Add(e.ClockDifferenceHF.Value, out SpikeRemoved, out SumSamples, out NrSamples))
-							{
-								this.differenceHfRemoved = SpikeRemoved;
-
-								Rec.SumDifferenceHf = SumSamples;
-								Rec.NrDifferenceHf = NrSamples;
-							}
-
-							if (Rec.SumLatency100Ns.HasValue || Rec.SumDifference100Ns.HasValue || Rec.SumLatencyHf.HasValue || Rec.SumDifferenceHf.HasValue)
-							{
-								this.history.Add(Rec);
-
-								if (Rec.SumLatency100Ns.HasValue)
+								Rec Rec = new Rec()
 								{
-									this.filteredLatency100Ns = (Rec.SumLatency100Ns.Value + (Rec.NrLatency100Ns >> 1)) / Rec.NrLatency100Ns;
+									Timestamp = DateTime.Now
+								};
 
-									if (!this.sumLatency100Ns.HasValue)
-									{
-										this.sumLatency100Ns = 0;
-										this.nrLatency100Ns = 0;
-									}
+								if (this.latency100NsWindow.Add(e.Latency100Ns, out bool SpikeRemoved, out long SumSamples, out int NrSamples))
+								{
+									this.latencyRemoved = SpikeRemoved;
 
-									this.sumLatency100Ns += Rec.SumLatency100Ns.Value;
-									this.nrLatency100Ns += Rec.NrLatency100Ns;
+									Rec.SumLatency100Ns = SumSamples;
+									Rec.NrLatency100Ns = NrSamples;
 								}
 
-								if (Rec.SumLatencyHf.HasValue)
+								if (this.difference100NsWindow.Add(e.ClockDifference100Ns, out SpikeRemoved, out SumSamples, out NrSamples))
 								{
-									this.filteredLatencyHf = (Rec.SumLatencyHf.Value + (Rec.NrLatencyHf >> 1)) / Rec.NrLatencyHf;
+									this.differenceRemoved = SpikeRemoved;
 
-									if (!this.sumLatencyHf.HasValue)
-									{
-										this.sumLatencyHf = 0;
-										this.nrLatencyHf = 0;
-									}
-
-									this.sumLatencyHf += Rec.SumLatencyHf.Value;
-									this.nrLatencyHf += Rec.NrLatencyHf;
+									Rec.SumDifference100Ns = SumSamples;
+									Rec.NrDifference100Ns = NrSamples;
 								}
 
-								if (Rec.SumDifference100Ns.HasValue)
+								if (e.LatencyHF.HasValue && this.latencyHfWindow.Add(e.LatencyHF.Value, out SpikeRemoved, out SumSamples, out NrSamples))
 								{
-									this.filteredClockDifference100Ns = (Rec.SumDifference100Ns.Value + (Rec.NrDifference100Ns >> 1)) / Rec.NrDifference100Ns;
+									this.latencyHfRemoved = SpikeRemoved;
 
-									if (!this.sumDifference100Ns.HasValue)
-									{
-										this.sumDifference100Ns = 0;
-										this.nrDifference100Ns = 0;
-									}
-
-									this.sumDifference100Ns += Rec.SumDifference100Ns.Value;
-									this.nrDifference100Ns += Rec.NrDifference100Ns;
+									Rec.SumLatencyHf = SumSamples;
+									Rec.NrLatencyHf = NrSamples;
 								}
 
-								if (Rec.SumDifferenceHf.HasValue)
+								if (e.ClockDifferenceHF.HasValue && this.differenceHfWindow.Add(e.ClockDifferenceHF.Value, out SpikeRemoved, out SumSamples, out NrSamples))
 								{
-									this.filteredClockDifferenceHf = (Rec.SumDifferenceHf.Value + (Rec.NrDifferenceHf >> 1)) / Rec.NrDifferenceHf;
+									this.differenceHfRemoved = SpikeRemoved;
 
-									if (!this.sumDifferenceHf.HasValue)
-									{
-										this.sumDifferenceHf = 0;
-										this.nrDifferenceHf = 0;
-									}
-
-									this.sumDifferenceHf += Rec.SumDifferenceHf.Value;
-									this.nrDifferenceHf += Rec.NrDifferenceHf;
+									Rec.SumDifferenceHf = SumSamples;
+									Rec.NrDifferenceHf = NrSamples;
 								}
 
-								while (this.history.Count > this.maxInHistory)
+								if (Rec.SumLatency100Ns.HasValue || Rec.SumDifference100Ns.HasValue || Rec.SumLatencyHf.HasValue || Rec.SumDifferenceHf.HasValue)
 								{
-									Rec = this.history[0];
-									this.history.RemoveAt(0);
+									this.history.Add(Rec);
 
 									if (Rec.SumLatency100Ns.HasValue)
 									{
-										this.sumLatency100Ns -= Rec.SumLatency100Ns.Value;
-										this.nrLatency100Ns -= Rec.NrLatency100Ns;
+										this.filteredLatency100Ns = (Rec.SumLatency100Ns.Value + (Rec.NrLatency100Ns >> 1)) / Rec.NrLatency100Ns;
+
+										if (!this.sumLatency100Ns.HasValue)
+										{
+											this.sumLatency100Ns = 0;
+											this.nrLatency100Ns = 0;
+										}
+
+										this.sumLatency100Ns += Rec.SumLatency100Ns.Value;
+										this.nrLatency100Ns += Rec.NrLatency100Ns;
 									}
 
 									if (Rec.SumLatencyHf.HasValue)
 									{
-										this.sumLatencyHf -= Rec.SumLatencyHf.Value;
-										this.nrLatencyHf -= Rec.NrLatencyHf;
+										this.filteredLatencyHf = (Rec.SumLatencyHf.Value + (Rec.NrLatencyHf >> 1)) / Rec.NrLatencyHf;
+
+										if (!this.sumLatencyHf.HasValue)
+										{
+											this.sumLatencyHf = 0;
+											this.nrLatencyHf = 0;
+										}
+
+										this.sumLatencyHf += Rec.SumLatencyHf.Value;
+										this.nrLatencyHf += Rec.NrLatencyHf;
 									}
 
 									if (Rec.SumDifference100Ns.HasValue)
 									{
-										this.sumDifference100Ns -= Rec.SumDifference100Ns.Value;
-										this.nrDifference100Ns -= Rec.NrDifference100Ns;
+										this.filteredClockDifference100Ns = (Rec.SumDifference100Ns.Value + (Rec.NrDifference100Ns >> 1)) / Rec.NrDifference100Ns;
+
+										if (!this.sumDifference100Ns.HasValue)
+										{
+											this.sumDifference100Ns = 0;
+											this.nrDifference100Ns = 0;
+										}
+
+										this.sumDifference100Ns += Rec.SumDifference100Ns.Value;
+										this.nrDifference100Ns += Rec.NrDifference100Ns;
 									}
 
 									if (Rec.SumDifferenceHf.HasValue)
 									{
-										this.sumDifferenceHf -= Rec.SumDifferenceHf.Value;
-										this.nrDifferenceHf -= Rec.NrDifferenceHf;
+										this.filteredClockDifferenceHf = (Rec.SumDifferenceHf.Value + (Rec.NrDifferenceHf >> 1)) / Rec.NrDifferenceHf;
+
+										if (!this.sumDifferenceHf.HasValue)
+										{
+											this.sumDifferenceHf = 0;
+											this.nrDifferenceHf = 0;
+										}
+
+										this.sumDifferenceHf += Rec.SumDifferenceHf.Value;
+										this.nrDifferenceHf += Rec.NrDifferenceHf;
 									}
+
+									while (this.history.Count > this.maxInHistory)
+									{
+										Rec = this.history[0];
+										this.history.RemoveAt(0);
+
+										if (Rec.SumLatency100Ns.HasValue)
+										{
+											this.sumLatency100Ns -= Rec.SumLatency100Ns.Value;
+											this.nrLatency100Ns -= Rec.NrLatency100Ns;
+										}
+
+										if (Rec.SumLatencyHf.HasValue)
+										{
+											this.sumLatencyHf -= Rec.SumLatencyHf.Value;
+											this.nrLatencyHf -= Rec.NrLatencyHf;
+										}
+
+										if (Rec.SumDifference100Ns.HasValue)
+										{
+											this.sumDifference100Ns -= Rec.SumDifference100Ns.Value;
+											this.nrDifference100Ns -= Rec.NrDifference100Ns;
+										}
+
+										if (Rec.SumDifferenceHf.HasValue)
+										{
+											this.sumDifferenceHf -= Rec.SumDifferenceHf.Value;
+											this.nrDifferenceHf -= Rec.NrDifferenceHf;
+										}
+									}
+
+									if (this.nrLatency100Ns > 0)
+										this.avgLatency100Ns = (this.sumLatency100Ns + (this.nrLatency100Ns >> 1)) / this.nrLatency100Ns;
+
+									if (this.nrLatencyHf > 0)
+										this.avgLatencyHf = (this.sumLatencyHf + (this.nrLatencyHf >> 1)) / this.nrLatencyHf;
+
+									if (this.nrDifference100Ns > 0)
+										this.avgClockDifference100Ns = (this.sumDifference100Ns + (this.nrDifference100Ns >> 1)) / this.nrDifference100Ns;
+
+									if (this.nrDifferenceHf > 0)
+										this.avgClockDifferenceHf = (this.sumDifferenceHf + (this.nrDifferenceHf >> 1)) / this.nrDifferenceHf;
 								}
-
-								if (this.nrLatency100Ns > 0)
-									this.avgLatency100Ns = (this.sumLatency100Ns + (this.nrLatency100Ns >> 1)) / this.nrLatency100Ns;
-
-								if (this.nrLatencyHf > 0)
-									this.avgLatencyHf = (this.sumLatencyHf + (this.nrLatencyHf >> 1)) / this.nrLatencyHf;
-
-								if (this.nrDifference100Ns > 0)
-									this.avgClockDifference100Ns = (this.sumDifference100Ns + (this.nrDifference100Ns >> 1)) / this.nrDifference100Ns;
-
-								if (this.nrDifferenceHf > 0)
-									this.avgClockDifferenceHf = (this.sumDifferenceHf + (this.nrDifferenceHf >> 1)) / this.nrDifferenceHf;
 							}
 
 							try
@@ -685,6 +693,142 @@ namespace Waher.Networking.XMPP.Synchronization
 		/// High Frequency increments per second, on the local machine.
 		/// </summary>
 		public long HfFrequency => Stopwatch.Frequency;
+
+		/// <summary>
+		/// Calculates the standard deviation of the latency, measured in 100 ns.
+		/// </summary>
+		/// <returns>Standard deviation, if known.</returns>
+		public double? CalcStdDevLatency100Ns()
+		{
+			lock (this.history)
+			{
+				if (!this.avgLatency100Ns.HasValue)
+					return null;
+
+				long Mean = this.avgLatency100Ns.Value;
+				double x;
+				double s = 0;
+				int N = 0;
+
+				foreach (Rec Rec in this.history)
+				{
+					if (Rec.SumLatency100Ns.HasValue)
+					{
+						x = ((double)Rec.SumLatency100Ns) / Rec.NrLatency100Ns;
+						x -= Mean;
+						s += x * x;
+						N++;
+					}
+				}
+
+				if (N <= 1)
+					return null;
+				else
+					return Math.Sqrt(s / (N - 1));
+			}
+		}
+
+		/// <summary>
+		/// Calculates the standard deviation of the latency, measured in High-frequency timer ticks.
+		/// </summary>
+		/// <returns>Standard deviation, if known.</returns>
+		public double? CalcStdDevLatencyHf()
+		{
+			lock (this.history)
+			{
+				if (!this.avgLatencyHf.HasValue)
+					return null;
+
+				long Mean = this.avgLatencyHf.Value;
+				double x;
+				double s = 0;
+				int N = 0;
+
+				foreach (Rec Rec in this.history)
+				{
+					if (Rec.SumLatencyHf.HasValue)
+					{
+						x = ((double)Rec.SumLatencyHf) / Rec.NrLatencyHf;
+						x -= Mean;
+						s += x * x;
+						N++;
+					}
+				}
+
+				if (N <= 1)
+					return null;
+				else
+					return Math.Sqrt(s / (N - 1));
+			}
+		}
+
+		/// <summary>
+		/// Calculates the standard deviation of the latency, measured in 100 ns.
+		/// </summary>
+		/// <returns>Standard deviation, if known.</returns>
+		public double? CalcStdDevClockDifference100Ns()
+		{
+			lock (this.history)
+			{
+				if (!this.avgClockDifference100Ns.HasValue)
+					return null;
+
+				long Mean = this.avgClockDifference100Ns.Value;
+				double x;
+				double s = 0;
+				int N = 0;
+
+				foreach (Rec Rec in this.history)
+				{
+					if (Rec.SumDifference100Ns.HasValue)
+					{
+						x = ((double)Rec.SumDifference100Ns) / Rec.NrDifference100Ns;
+						x -= Mean;
+						s += x * x;
+						N++;
+					}
+				}
+
+				if (N <= 1)
+					return null;
+				else
+					return Math.Sqrt(s / (N - 1));
+			}
+		}
+
+		/// <summary>
+		/// Calculates the standard deviation of the latency, measured in High-frequency timer ticks.
+		/// </summary>
+		/// <returns>Standard deviation, if known.</returns>
+		public double? CalcStdDevClockDifferenceHf()
+		{
+			lock (this.history)
+			{
+				if (!this.avgClockDifferenceHf.HasValue)
+					return null;
+
+				long Mean = this.avgClockDifferenceHf.Value;
+				double x;
+				double s = 0;
+				int N = 0;
+
+				foreach (Rec Rec in this.history)
+				{
+					if (Rec.SumDifferenceHf.HasValue)
+					{
+						x = ((double)Rec.SumDifferenceHf) / Rec.NrDifferenceHf;
+						x -= Mean;
+						s += x * x;
+						N++;
+					}
+				}
+
+				if (N <= 1)
+					return null;
+				else
+					return Math.Sqrt(s / (N - 1));
+			}
+		}
 
 		/// <summary>
 		/// Event raised when the clock difference estimates have been updated.

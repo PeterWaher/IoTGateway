@@ -29,6 +29,10 @@
 			<xsl:text>,</xsl:text>
 			<xsl:text>Avg Difference (ms)</xsl:text>
 			<xsl:text>,</xsl:text>
+			<xsl:text>StdDev Latency (ms)</xsl:text>
+			<xsl:text>,</xsl:text>
+			<xsl:text>StdDev Difference (ms)</xsl:text>
+			<xsl:text>,</xsl:text>
 			<xsl:text>Raw Latency (HF)</xsl:text>
 			<xsl:text>,</xsl:text>
 			<xsl:text>Spike</xsl:text>
@@ -44,6 +48,10 @@
 			<xsl:text>Avg Latency (HF)</xsl:text>
 			<xsl:text>,</xsl:text>
 			<xsl:text>Avg Difference (HF)</xsl:text>
+			<xsl:text>,</xsl:text>
+			<xsl:text>StdDev Latency (HF)</xsl:text>
+			<xsl:text>,</xsl:text>
+			<xsl:text>StdDev Difference (HF)</xsl:text>
 			<xsl:text>
 </xsl:text>
 			<xsl:for-each select="cstat:Sample">
@@ -67,6 +75,10 @@
 				<xsl:text>,</xsl:text>
 				<xsl:value-of select="@avgDifferenceMs"/>
 				<xsl:text>,</xsl:text>
+				<xsl:value-of select="@stdDevLatencyMs"/>
+				<xsl:text>,</xsl:text>
+				<xsl:value-of select="@stdDevDifferenceMs"/>
+				<xsl:text>,</xsl:text>
 				<xsl:value-of select="@rawLatencyHf"/>
 				<xsl:text>,</xsl:text>
 				<xsl:value-of select="@spikeLatencyHfRemoved"/>
@@ -82,6 +94,10 @@
 				<xsl:value-of select="@avgLatencyHf"/>
 				<xsl:text>,</xsl:text>
 				<xsl:value-of select="@avgDifferenceHf"/>
+				<xsl:text>,</xsl:text>
+				<xsl:value-of select="@stdDevLatencyHf"/>
+				<xsl:text>,</xsl:text>
+				<xsl:value-of select="@stdDevDifferenceHf"/>
 				<xsl:text>
 </xsl:text>
 			</xsl:for-each>

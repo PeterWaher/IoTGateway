@@ -202,6 +202,8 @@
 								<th class="Right">Filtered Difference (ms)</th>
 								<th class="Right">Avg Latency (ms)</th>
 								<th class="Right">Avg Difference (ms)</th>
+								<th class="Right">StdDev Latency (ms)</th>
+								<th class="Right">StdDev Difference (ms)</th>
 								<th class="Right">Raw Latency (HF)</th>
 								<th class="Center">Spike</th>
 								<th class="Right">Raw Difference (HF)</th>
@@ -210,6 +212,8 @@
 								<th class="Right">Filtered Difference (HF)</th>
 								<th class="Right">Avg Latency (HF)</th>
 								<th class="Right">Avg Difference (HF)</th>
+								<th class="Right">StdDev Latency (HF)</th>
+								<th class="Right">StdDev Difference (HF)</th>
 							</tr>
             </thead>
             <tbody>
@@ -246,6 +250,12 @@
 										<xsl:value-of select="@avgDifferenceMs"/>
 									</td>
 									<td class="Right">
+										<xsl:value-of select="@stdDevLatencyMs"/>
+									</td>
+									<td class="Right">
+										<xsl:value-of select="@stdDevDifferenceMs"/>
+									</td>
+									<td class="Right">
 										<xsl:value-of select="@rawLatencyHf"/>
 									</td>
 									<td class="Center">
@@ -268,6 +278,12 @@
 									</td>
 									<td class="Right">
 										<xsl:value-of select="@avgDifferenceHf"/>
+									</td>
+									<td class="Right">
+										<xsl:value-of select="@stdDevLatencyHf"/>
+									</td>
+									<td class="Right">
+										<xsl:value-of select="@stdDevDifferenceHf"/>
 									</td>
 								</tr>
 							</xsl:for-each>

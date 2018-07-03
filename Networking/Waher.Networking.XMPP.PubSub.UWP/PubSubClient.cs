@@ -236,7 +236,7 @@ namespace Waher.Networking.XMPP.PubSub
 		/// </summary>
 		public const string NamespacePubSubSubscriptionNotifications = "http://jabber.org/protocol/pubsub#subscription-notifications";
 
-		private string componentAddress;
+		private readonly string componentAddress;
 
 		/// <summary>
 		/// Client managing communication with a Publish/Subscribe component.

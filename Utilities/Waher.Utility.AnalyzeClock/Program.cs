@@ -37,7 +37,7 @@ namespace Waher.Utility.AnalyzeClock
 		///                       constitute a spike. Default=3
 		/// -o OUTPUT_FILE        File name of report file.
 		/// -enc ENCODING         Text encoding. Default=UTF-8
-		/// -t                    XSLT transform to use.
+		/// -t TRANSFORM_FILE     XSLT transform to use.
 		/// -?                    Help.
 		/// </summary>
 		static int Main(string[] args)
@@ -224,7 +224,7 @@ namespace Waher.Utility.AnalyzeClock
 					Console.Out.WriteLine("                      constitute a spike. Default=3");
 					Console.Out.WriteLine("-o OUTPUT_FILE        File name of report file.");
 					Console.Out.WriteLine("-enc ENCODING         Text encoding. Default=UTF-8");
-					Console.Out.WriteLine("-t                    XSLT transform to use.");
+					Console.Out.WriteLine("-t TRANSFORM_FILE     XSLT transform to use.");
 					Console.Out.WriteLine("-?                    Help.");
 					return 0;
 				}

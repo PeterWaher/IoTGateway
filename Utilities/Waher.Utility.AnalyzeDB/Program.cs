@@ -24,7 +24,7 @@ namespace Waher.Utility.AnalyzeDB
 	/// -bs BLOCK_SIZE        Block size, in bytes. Default=8192.
 	/// -bbs BLOB_BLOCK_SIZE  BLOB block size, in bytes. Default=8192.
 	/// -enc ENCODING         Text encoding. Default=UTF-8
-	/// -t                    XSLT transform to use.
+	/// -t TRANSFORM_FILE     XSLT transform to use.
 	/// -x                    Export contents of each collection.
 	/// -?                    Help.
 	/// </summary>
@@ -135,7 +135,7 @@ namespace Waher.Utility.AnalyzeDB
 					Console.Out.WriteLine("-bs BLOCK_SIZE        Block size, in bytes. Default=8192.");
 					Console.Out.WriteLine("-bbs BLOB_BLOCK_SIZE  BLOB block size, in bytes. Default=8192.");
 					Console.Out.WriteLine("-enc ENCODING         Text encoding. Default=UTF-8");
-					Console.Out.WriteLine("-t                    XSLT transform to use.");
+					Console.Out.WriteLine("-t TRANSFORM_FILE     XSLT transform to use.");
 					Console.Out.WriteLine("-x                    Export contents of each collection.");
 					Console.Out.WriteLine("-?                    Help.");
 					return 0;

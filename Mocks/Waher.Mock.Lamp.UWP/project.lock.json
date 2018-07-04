@@ -2522,7 +2522,7 @@
           }
         }
       },
-      "Waher.Content/1.0.10": {
+      "Waher.Content/1.0.11": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -2543,7 +2543,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "Waher.Content": "1.0.10"
+          "Waher.Content": "1.0.11"
         }
       },
       "Waher.Content.Markdown/1.0.22": {
@@ -2554,19 +2554,19 @@
           "SkiaSharp": "1.60.1",
           "Waher.Content.Emoji": "1.0.1",
           "Waher.Content.Html": "1.0.3",
-          "Waher.Content.Xml": "1.0.2",
+          "Waher.Content.Xml": "1.0.3",
           "Waher.Runtime.Cache": "1.0.1",
           "Waher.Script": "1.0.14",
           "Waher.Script.Graphs": "1.0.9"
         }
       },
-      "Waher.Content.Xml/1.0.2": {
+      "Waher.Content.Xml/1.0.3": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "System.Xml.XmlDocument": "4.3.0",
-          "Waher.Content": "1.0.10",
+          "Waher.Content": "1.0.11",
           "Waher.Runtime.Inventory": "1.0.6",
           "Waher.Script": "1.0.14"
         }
@@ -2637,8 +2637,8 @@
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.1.5",
-          "Waher.Content": "1.0.10",
-          "Waher.Content.Xml": "1.0.2",
+          "Waher.Content": "1.0.11",
+          "Waher.Content.Xml": "1.0.3",
           "Waher.Events": "1.0.7",
           "Waher.Networking": "1.0.6",
           "Waher.Networking.XMPP.Control.UWP": "1.0.0",
@@ -2802,8 +2802,8 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "SkiaSharp": "1.60.1",
-          "Waher.Content": "1.0.10",
-          "Waher.Content.Xml": "1.0.2",
+          "Waher.Content": "1.0.11",
+          "Waher.Content.Xml": "1.0.3",
           "Waher.Events": "1.0.7",
           "Waher.Runtime.Language": "1.0.1"
         }
@@ -5314,7 +5314,7 @@
           "lib/netcore50/System.Xml.XmlSerializer.dll": {}
         }
       },
-      "Waher.Content/1.0.10": {
+      "Waher.Content/1.0.11": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -5335,7 +5335,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "Waher.Content": "1.0.10"
+          "Waher.Content": "1.0.11"
         }
       },
       "Waher.Content.Markdown/1.0.22": {
@@ -5346,19 +5346,19 @@
           "SkiaSharp": "1.60.1",
           "Waher.Content.Emoji": "1.0.1",
           "Waher.Content.Html": "1.0.3",
-          "Waher.Content.Xml": "1.0.2",
+          "Waher.Content.Xml": "1.0.3",
           "Waher.Runtime.Cache": "1.0.1",
           "Waher.Script": "1.0.14",
           "Waher.Script.Graphs": "1.0.9"
         }
       },
-      "Waher.Content.Xml/1.0.2": {
+      "Waher.Content.Xml/1.0.3": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "System.Xml.XmlDocument": "4.3.0",
-          "Waher.Content": "1.0.10",
+          "Waher.Content": "1.0.11",
           "Waher.Runtime.Inventory": "1.0.6",
           "Waher.Script": "1.0.14"
         }
@@ -5429,8 +5429,8 @@
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.1.5",
-          "Waher.Content": "1.0.10",
-          "Waher.Content.Xml": "1.0.2",
+          "Waher.Content": "1.0.11",
+          "Waher.Content.Xml": "1.0.3",
           "Waher.Events": "1.0.7",
           "Waher.Networking": "1.0.6",
           "Waher.Networking.XMPP.Control.UWP": "1.0.0",
@@ -5594,8 +5594,8 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "SkiaSharp": "1.60.1",
-          "Waher.Content": "1.0.10",
-          "Waher.Content.Xml": "1.0.2",
+          "Waher.Content": "1.0.11",
+          "Waher.Content.Xml": "1.0.3",
           "Waher.Events": "1.0.7",
           "Waher.Runtime.Language": "1.0.1"
         }
@@ -8142,7 +8142,7 @@
           "runtimes/aot/lib/netcore50/System.Xml.XmlSerializer.dll": {}
         }
       },
-      "Waher.Content/1.0.10": {
+      "Waher.Content/1.0.11": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -8163,7 +8163,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "Waher.Content": "1.0.10"
+          "Waher.Content": "1.0.11"
         }
       },
       "Waher.Content.Markdown/1.0.22": {
@@ -8174,19 +8174,19 @@
           "SkiaSharp": "1.60.1",
           "Waher.Content.Emoji": "1.0.1",
           "Waher.Content.Html": "1.0.3",
-          "Waher.Content.Xml": "1.0.2",
+          "Waher.Content.Xml": "1.0.3",
           "Waher.Runtime.Cache": "1.0.1",
           "Waher.Script": "1.0.14",
           "Waher.Script.Graphs": "1.0.9"
         }
       },
-      "Waher.Content.Xml/1.0.2": {
+      "Waher.Content.Xml/1.0.3": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "System.Xml.XmlDocument": "4.3.0",
-          "Waher.Content": "1.0.10",
+          "Waher.Content": "1.0.11",
           "Waher.Runtime.Inventory": "1.0.6",
           "Waher.Script": "1.0.14"
         }
@@ -8257,8 +8257,8 @@
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.1.5",
-          "Waher.Content": "1.0.10",
-          "Waher.Content.Xml": "1.0.2",
+          "Waher.Content": "1.0.11",
+          "Waher.Content.Xml": "1.0.3",
           "Waher.Events": "1.0.7",
           "Waher.Networking": "1.0.6",
           "Waher.Networking.XMPP.Control.UWP": "1.0.0",
@@ -8422,8 +8422,8 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "SkiaSharp": "1.60.1",
-          "Waher.Content": "1.0.10",
-          "Waher.Content.Xml": "1.0.2",
+          "Waher.Content": "1.0.11",
+          "Waher.Content.Xml": "1.0.3",
           "Waher.Events": "1.0.7",
           "Waher.Runtime.Language": "1.0.1"
         }
@@ -10943,7 +10943,7 @@
           "lib/netcore50/System.Xml.XmlSerializer.dll": {}
         }
       },
-      "Waher.Content/1.0.10": {
+      "Waher.Content/1.0.11": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -10964,7 +10964,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "Waher.Content": "1.0.10"
+          "Waher.Content": "1.0.11"
         }
       },
       "Waher.Content.Markdown/1.0.22": {
@@ -10975,19 +10975,19 @@
           "SkiaSharp": "1.60.1",
           "Waher.Content.Emoji": "1.0.1",
           "Waher.Content.Html": "1.0.3",
-          "Waher.Content.Xml": "1.0.2",
+          "Waher.Content.Xml": "1.0.3",
           "Waher.Runtime.Cache": "1.0.1",
           "Waher.Script": "1.0.14",
           "Waher.Script.Graphs": "1.0.9"
         }
       },
-      "Waher.Content.Xml/1.0.2": {
+      "Waher.Content.Xml/1.0.3": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "System.Xml.XmlDocument": "4.3.0",
-          "Waher.Content": "1.0.10",
+          "Waher.Content": "1.0.11",
           "Waher.Runtime.Inventory": "1.0.6",
           "Waher.Script": "1.0.14"
         }
@@ -11058,8 +11058,8 @@
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.1.5",
-          "Waher.Content": "1.0.10",
-          "Waher.Content.Xml": "1.0.2",
+          "Waher.Content": "1.0.11",
+          "Waher.Content.Xml": "1.0.3",
           "Waher.Events": "1.0.7",
           "Waher.Networking": "1.0.6",
           "Waher.Networking.XMPP.Control.UWP": "1.0.0",
@@ -11223,8 +11223,8 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "SkiaSharp": "1.60.1",
-          "Waher.Content": "1.0.10",
-          "Waher.Content.Xml": "1.0.2",
+          "Waher.Content": "1.0.11",
+          "Waher.Content.Xml": "1.0.3",
           "Waher.Events": "1.0.7",
           "Waher.Runtime.Language": "1.0.1"
         }
@@ -13780,7 +13780,7 @@
           "runtimes/aot/lib/netcore50/System.Xml.XmlSerializer.dll": {}
         }
       },
-      "Waher.Content/1.0.10": {
+      "Waher.Content/1.0.11": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -13801,7 +13801,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "Waher.Content": "1.0.10"
+          "Waher.Content": "1.0.11"
         }
       },
       "Waher.Content.Markdown/1.0.22": {
@@ -13812,19 +13812,19 @@
           "SkiaSharp": "1.60.1",
           "Waher.Content.Emoji": "1.0.1",
           "Waher.Content.Html": "1.0.3",
-          "Waher.Content.Xml": "1.0.2",
+          "Waher.Content.Xml": "1.0.3",
           "Waher.Runtime.Cache": "1.0.1",
           "Waher.Script": "1.0.14",
           "Waher.Script.Graphs": "1.0.9"
         }
       },
-      "Waher.Content.Xml/1.0.2": {
+      "Waher.Content.Xml/1.0.3": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "System.Xml.XmlDocument": "4.3.0",
-          "Waher.Content": "1.0.10",
+          "Waher.Content": "1.0.11",
           "Waher.Runtime.Inventory": "1.0.6",
           "Waher.Script": "1.0.14"
         }
@@ -13895,8 +13895,8 @@
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.1.5",
-          "Waher.Content": "1.0.10",
-          "Waher.Content.Xml": "1.0.2",
+          "Waher.Content": "1.0.11",
+          "Waher.Content.Xml": "1.0.3",
           "Waher.Events": "1.0.7",
           "Waher.Networking": "1.0.6",
           "Waher.Networking.XMPP.Control.UWP": "1.0.0",
@@ -14060,8 +14060,8 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "SkiaSharp": "1.60.1",
-          "Waher.Content": "1.0.10",
-          "Waher.Content.Xml": "1.0.2",
+          "Waher.Content": "1.0.11",
+          "Waher.Content.Xml": "1.0.3",
           "Waher.Events": "1.0.7",
           "Waher.Runtime.Language": "1.0.1"
         }
@@ -16581,7 +16581,7 @@
           "lib/netcore50/System.Xml.XmlSerializer.dll": {}
         }
       },
-      "Waher.Content/1.0.10": {
+      "Waher.Content/1.0.11": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -16602,7 +16602,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "Waher.Content": "1.0.10"
+          "Waher.Content": "1.0.11"
         }
       },
       "Waher.Content.Markdown/1.0.22": {
@@ -16613,19 +16613,19 @@
           "SkiaSharp": "1.60.1",
           "Waher.Content.Emoji": "1.0.1",
           "Waher.Content.Html": "1.0.3",
-          "Waher.Content.Xml": "1.0.2",
+          "Waher.Content.Xml": "1.0.3",
           "Waher.Runtime.Cache": "1.0.1",
           "Waher.Script": "1.0.14",
           "Waher.Script.Graphs": "1.0.9"
         }
       },
-      "Waher.Content.Xml/1.0.2": {
+      "Waher.Content.Xml/1.0.3": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "System.Xml.XmlDocument": "4.3.0",
-          "Waher.Content": "1.0.10",
+          "Waher.Content": "1.0.11",
           "Waher.Runtime.Inventory": "1.0.6",
           "Waher.Script": "1.0.14"
         }
@@ -16696,8 +16696,8 @@
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.1.5",
-          "Waher.Content": "1.0.10",
-          "Waher.Content.Xml": "1.0.2",
+          "Waher.Content": "1.0.11",
+          "Waher.Content.Xml": "1.0.3",
           "Waher.Events": "1.0.7",
           "Waher.Networking": "1.0.6",
           "Waher.Networking.XMPP.Control.UWP": "1.0.0",
@@ -16861,8 +16861,8 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "SkiaSharp": "1.60.1",
-          "Waher.Content": "1.0.10",
-          "Waher.Content.Xml": "1.0.2",
+          "Waher.Content": "1.0.11",
+          "Waher.Content.Xml": "1.0.3",
           "Waher.Events": "1.0.7",
           "Waher.Runtime.Language": "1.0.1"
         }
@@ -19418,7 +19418,7 @@
           "runtimes/aot/lib/netcore50/System.Xml.XmlSerializer.dll": {}
         }
       },
-      "Waher.Content/1.0.10": {
+      "Waher.Content/1.0.11": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -19439,7 +19439,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "Waher.Content": "1.0.10"
+          "Waher.Content": "1.0.11"
         }
       },
       "Waher.Content.Markdown/1.0.22": {
@@ -19450,19 +19450,19 @@
           "SkiaSharp": "1.60.1",
           "Waher.Content.Emoji": "1.0.1",
           "Waher.Content.Html": "1.0.3",
-          "Waher.Content.Xml": "1.0.2",
+          "Waher.Content.Xml": "1.0.3",
           "Waher.Runtime.Cache": "1.0.1",
           "Waher.Script": "1.0.14",
           "Waher.Script.Graphs": "1.0.9"
         }
       },
-      "Waher.Content.Xml/1.0.2": {
+      "Waher.Content.Xml/1.0.3": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "System.Xml.XmlDocument": "4.3.0",
-          "Waher.Content": "1.0.10",
+          "Waher.Content": "1.0.11",
           "Waher.Runtime.Inventory": "1.0.6",
           "Waher.Script": "1.0.14"
         }
@@ -19533,8 +19533,8 @@
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.1.5",
-          "Waher.Content": "1.0.10",
-          "Waher.Content.Xml": "1.0.2",
+          "Waher.Content": "1.0.11",
+          "Waher.Content.Xml": "1.0.3",
           "Waher.Events": "1.0.7",
           "Waher.Networking": "1.0.6",
           "Waher.Networking.XMPP.Control.UWP": "1.0.0",
@@ -19698,8 +19698,8 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "SkiaSharp": "1.60.1",
-          "Waher.Content": "1.0.10",
-          "Waher.Content.Xml": "1.0.2",
+          "Waher.Content": "1.0.11",
+          "Waher.Content.Xml": "1.0.3",
           "Waher.Events": "1.0.7",
           "Waher.Runtime.Language": "1.0.1"
         }
@@ -29560,7 +29560,7 @@
         "system.xml.xmlserializer.nuspec"
       ]
     },
-    "Waher.Content/1.0.10": {
+    "Waher.Content/1.0.11": {
       "type": "project",
       "path": "../../Content/Waher.Content/Waher.Content.csproj",
       "msbuildProject": "../../Content/Waher.Content/Waher.Content.csproj"
@@ -29580,7 +29580,7 @@
       "path": "../../Content/Waher.Content.Markdown/Waher.Content.Markdown.csproj",
       "msbuildProject": "../../Content/Waher.Content.Markdown/Waher.Content.Markdown.csproj"
     },
-    "Waher.Content.Xml/1.0.2": {
+    "Waher.Content.Xml/1.0.3": {
       "type": "project",
       "path": "../../Content/Waher.Content.Xml/Waher.Content.Xml.csproj",
       "msbuildProject": "../../Content/Waher.Content.Xml/Waher.Content.Xml.csproj"

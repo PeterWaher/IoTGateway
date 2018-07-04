@@ -287,6 +287,37 @@ namespace Waher.Utility.AnalyzeClock
 					if (i == 1)
 						throw new Exception("Unable to connect to broker.");
 
+					if (Jid.Contains("@") && !Jid.Contains("/"))
+					{
+						RosterItem Contact = Client.GetRosterItem(Jid);
+						if (Contact == null || (Contact.State != SubscriptionState.Both && Contact.State != SubscriptionState.To))
+						{
+							Done.Reset();
+
+							Client.OnPresenceSubscribed += (sender, e) =>
+							{
+								if (string.Compare(e.FromBareJID, Jid, true) == 0)
+									Done.Set();
+							};
+
+							Client.OnPresenceUnsubscribed += (sender, e) =>
+							{
+								if (string.Compare(e.FromBareJID, Jid, true) == 0)
+									Error.Set();
+							};
+
+							Console.WriteLine("Requesting presence subscription to " + Jid);
+
+							Client.RequestPresenceSubscription(Jid);
+
+							i = WaitHandle.WaitAny(new WaitHandle[] { Done, Error });
+							if (i == 1)
+								throw new Exception("Unable to obtain presence subscription.");
+
+							Console.WriteLine("Presence subscription obtained.");
+						}
+					}
+
 					ManualResetEvent Done2 = new ManualResetEvent(false);
 
 					using (StreamWriter f = File.CreateText(OutputFileName))

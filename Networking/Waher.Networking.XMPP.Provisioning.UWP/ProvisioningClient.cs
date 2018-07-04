@@ -32,11 +32,12 @@ namespace Waher.Networking.XMPP.Provisioning
 	/// </summary>
 	public class ProvisioningClient : XmppExtension
 	{
-		private Dictionary<string, CertificateUse> certificates = new Dictionary<string, CertificateUse>();
-		private string provisioningServerAddress;
+		private readonly Dictionary<string, CertificateUse> certificates = new Dictionary<string, CertificateUse>();
+		private readonly string provisioningServerAddress;
 		private string ownerJid = string.Empty;
 		private DateTime lastCheck = DateTime.MinValue;
 		private Duration cacheUnusedLifetime = new Duration(false, 0, 13, 0, 0, 0, 0);
+		private bool managePresenceSubscriptionRequests = true;
 
 		/// <summary>
 		/// urn:ieee:iot:prov:t:1.0
@@ -138,27 +139,40 @@ namespace Waher.Networking.XMPP.Provisioning
 			internal set { this.ownerJid = value; }
 		}
 
+		/// <summary>
+		/// If presence subscription requests should be managed by the client.
+		/// </summary>
+		public bool ManagePresenceSubscriptionRequests
+		{
+			get => this.managePresenceSubscriptionRequests;
+			set => this.managePresenceSubscriptionRequests = value;
+		}
+
 		#region Presence subscriptions
 
 		private void Client_OnPresenceUnsubscribe(object Sender, PresenceEventArgs e)
 		{
-			e.Accept();
+			if (this.managePresenceSubscriptionRequests)
+				e.Accept();
 		}
 
 		private void Client_OnPresenceSubscribe(object Sender, PresenceEventArgs e)
 		{
-			if (string.Compare(e.From, this.provisioningServerAddress, true) == 0)
+			if (this.managePresenceSubscriptionRequests)
 			{
-				Log.Informational("Presence subscription from provisioning server accepted.", this.provisioningServerAddress, this.provisioningServerAddress);
-				e.Accept();
+				if (string.Compare(e.From, this.provisioningServerAddress, true) == 0)
+				{
+					Log.Informational("Presence subscription from provisioning server accepted.", this.provisioningServerAddress, this.provisioningServerAddress);
+					e.Accept();
+				}
+				else if (!string.IsNullOrEmpty(this.ownerJid) && string.Compare(e.From, this.ownerJid, true) == 0)
+				{
+					Log.Informational("Presence subscription from owner accepted.", this.ownerJid, this.provisioningServerAddress);
+					e.Accept();
+				}
+				else
+					this.IsFriend(XmppClient.GetBareJID(e.From), this.CheckIfFriendCallback, e);
 			}
-			else if (!string.IsNullOrEmpty(this.ownerJid) && string.Compare(e.From, this.ownerJid, true) == 0)
-			{
-				Log.Informational("Presence subscription from owner accepted.", this.ownerJid, this.provisioningServerAddress);
-				e.Accept();
-			}
-			else
-				this.IsFriend(XmppClient.GetBareJID(e.From), this.CheckIfFriendCallback, e);
 		}
 
 		private void CheckIfFriendCallback(object Sender, IsFriendResponseEventArgs e2)

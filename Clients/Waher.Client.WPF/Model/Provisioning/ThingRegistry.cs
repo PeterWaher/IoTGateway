@@ -25,7 +25,7 @@ namespace Waher.Client.WPF.Model.Provisioning
 {
 	public class ThingRegistry : XmppComponent, IMenuAggregator
 	{
-		private bool supportsProvisioning;
+		private readonly bool supportsProvisioning;
 		private ThingRegistryClient registryClient;
 		private ProvisioningClient provisioningClient;
 
@@ -40,7 +40,10 @@ namespace Waher.Client.WPF.Model.Provisioning
 				XmppAccountNode Account = this.Account;
 				XmppClient Client = Account.Client;
 
-				this.provisioningClient = new ProvisioningClient(Client, JID);
+				this.provisioningClient = new ProvisioningClient(Client, JID)
+				{
+					ManagePresenceSubscriptionRequests = false
+				};
 
 				this.provisioningClient.IsFriendQuestion += this.ProvisioningClient_IsFriendQuestion;
 				this.provisioningClient.CanReadQuestion += this.ProvisioningClient_CanReadQuestion;

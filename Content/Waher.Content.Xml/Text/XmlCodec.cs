@@ -33,7 +33,8 @@ namespace Waher.Content.Xml.Text
 		/// </summary>
 		public static readonly string[] XmlFileExtensions = new string[]
 		{
-			"xml"
+			"xml",
+			"xsd"
 		};
 
 		/// <summary>
@@ -114,6 +115,10 @@ namespace Waher.Content.Xml.Text
 			{
 				case "xml":
 					ContentType = "text/xml";
+					return true;
+
+				case "xsd":
+					ContentType = "application/xml";
 					return true;
 
 				default:

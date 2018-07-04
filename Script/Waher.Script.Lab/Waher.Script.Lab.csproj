@@ -152,6 +152,10 @@
       <Project>{8aeeb562-a2d3-4061-8384-a9c04920e110}</Project>
       <Name>Waher.Content.Xml</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Content\Waher.Content.Xsl\Waher.Content.Xsl.csproj">
+      <Project>{9525e41e-9c40-4f55-bada-ee8a6bab1062}</Project>
+      <Name>Waher.Content.Xsl</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Content\Waher.Content\Waher.Content.csproj">
       <Project>{03f3b861-5ef2-4d02-9ec2-aaa7374f5e58}</Project>
       <Name>Waher.Content</Name>
@@ -163,6 +167,10 @@
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj">
       <Project>{7f1b0d78-aa86-445b-9e1f-7df75b9e4c04}</Project>
       <Name>Waher.Runtime.Inventory</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Waher.Script.Content\Waher.Script.Content.csproj">
+      <Project>{6055882c-4fbb-4336-98e2-fa7594d6f143}</Project>
+      <Name>Waher.Script.Content</Name>
     </ProjectReference>
     <ProjectReference Include="..\Waher.Script.Fractals\Waher.Script.Fractals.csproj">
       <Project>{1c042e75-04d8-4cac-91b8-a7f559ac9d2b}</Project>

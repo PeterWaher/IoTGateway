@@ -31,23 +31,23 @@ namespace Waher.Content.Markdown
 	/// </summary>
 	public class MarkdownDocument : IFileNameResource, IEnumerable<MarkdownElement>
 	{
-		private Dictionary<string, Multimedia> references = new Dictionary<string, Multimedia>();
+		private readonly Dictionary<string, Multimedia> references = new Dictionary<string, Multimedia>();
 		private Dictionary<string, KeyValuePair<string, bool>[]> metaData = new Dictionary<string, KeyValuePair<string, bool>[]>();
 		private Dictionary<string, int> footnoteNumbers = null;
 		private Dictionary<string, Footnote> footnotes = null;
 		private SortedDictionary<int, string> toInsert = null;
-		private Type[] transparentExceptionTypes;
+		private readonly Type[] transparentExceptionTypes;
 		private List<string> footnoteOrder = null;
-		private LinkedList<MarkdownElement> elements;
-		private List<Header> headers = new List<Header>();
-		private IEmojiSource emojiSource;
-		private string markdownText;
+		private readonly LinkedList<MarkdownElement> elements;
+		private readonly List<Header> headers = new List<Header>();
+		private readonly IEmojiSource emojiSource;
+		private readonly string markdownText;
 		private string fileName = string.Empty;
 		private string resourceName = string.Empty;
 		private string url = string.Empty;
 		private MarkdownDocument master = null;
 		private MarkdownDocument detail = null;
-		private MarkdownSettings settings;
+		private readonly MarkdownSettings settings;
 		private int lastFootnote = 0;
 		private bool footnoteBacklinksAdded = false;
 		private bool syntaxHighlighting = false;

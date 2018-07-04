@@ -148,6 +148,7 @@
     <ProjectReference Include="..\Runtime\Waher.Runtime.Language\Waher.Runtime.Language.csproj" />
     <ProjectReference Include="..\Runtime\Waher.Runtime.Settings\Waher.Runtime.Settings.csproj" />
     <ProjectReference Include="..\Runtime\Waher.Runtime.Timing\Waher.Runtime.Timing.csproj" />
+    <ProjectReference Include="..\Script\Waher.Script.Content\Waher.Script.Content.csproj" />
     <ProjectReference Include="..\Script\Waher.Script.Graphs\Waher.Script.Graphs.csproj" />
     <ProjectReference Include="..\Script\Waher.Script.Persistence\Waher.Script.Persistence.csproj" />
     <ProjectReference Include="..\Script\Waher.Script.Statistics\Waher.Script.Statistics.csproj" />

@@ -1137,31 +1137,29 @@ The following functions are available in the [Waher.Script.Statistics](../Waher.
 | `Uniform([Min,Max][,N]])`    | Generates a random number using the Uniform distribution. If no interval is given, the standard interval [0,1] is assumed. If `N` is provided, a vector with random elements is returned. | `[Labels,Counts]:=Histogram(Uniform(0,10,10000),0,10,10);VerticalBars(Labels,Counts)` |
 | `Weibull(Shape,Scale[,N]])`  | Generates a random number using the Weibull distribution. If `N` is provided, a vector with random elements is returned. | `[Labels,Counts]:=Histogram(Weibull(5,3,10000),0,10,10);VerticalBars(Labels,Counts)` |
 
-#### Content-related functions (Waher.Content)
+#### Content-related functions (Waher.Script.Content)
 
-The following functions are available in the `Waher.Content` library.
+The following functions are available in the `Waher.Script.Content` library.
 
-| Function | Description | Example |
-|----------|-------------|---------|
-| `UrlDecode(s)` | Decodes a string taken from an URL. | [Example][UrlDecodeExample] |
-| `UrlEncode(s)` | Encodes a string for inclusion in an URL. | [Example][UrlEncodeExample] |
-
-[UrlDecodeExample]: Calculator.md?Expression=UrlDecode(%22Hello%2bWorld%22)
-[UrlEncodeExample]: Calculator.md?Expression=UrlEncode(%22Hello%20World%22)
-
-#### XML Content-related functions (Waher.Content.Xml)
-
-The following functions are available in the `Waher.Content` library.
-
-| Function | Description | Example |
-|----------|-------------|---------|
+| Function                 | Description | Example |
+|--------------------------|-------------|---------|
+| `Decode(Content,Type)`   | Decodes `Content` using the available Internet Content Type decoder for Content Type `Type`. | [Example][DecodeExample] |
 | `HtmlAttributeEncode(s)` | Encodes a string for inclusion in an HTML attribute. It transforms `<`, `>`, `&` and `"` to `&lt;`, `&gt;`, `&amp;` and `&quot;` correspondingly. | [Example][HtmlAttributeEncodeExample] |
-| `HtmlValueEncode(s)` | Encodes a string for inclusion as an HTML element value. It transforms `<`, `>` and `&` to `&lt;`, `&gt;` and `&amp;` correspondingly. | [Example][HtmlValueEncodeExample] |
-| `XmlDecode(s)` | Decodes a string taken from XML. It transforms `&lt;`, `&gt;`, `&amp;`, `&quot;` and `&apos;` to `<`, `>`, `&`, `"` and `'`  correspondingly. | [Example][XmlDecodeExample] |
-| `XmlEncode(s)` | Encodes a string for inclusion in XML. It transforms `<`, `>`, `&`, `"` and `'` to `&lt;`, `&gt;`, `&amp;`, `&quot;` and `&apos;` correspondingly. | [Example][XmlEncodeExample] |
+| `HtmlValueEncode(s)`     | Encodes a string for inclusion as an HTML element value. It transforms `<`, `>` and `&` to `&lt;`, `&gt;` and `&amp;` correspondingly. | [Example][HtmlValueEncodeExample] |
+| `HttpGet(Url)`           | Retrieves a resource using the HTTP protocol and decodes it, in accordance with its content type. | [Example](HttpGetExample) |
+| `LoadFile(FileName)`     | Loads a file and decodes it, in accordance with its file extension. | [Example](LoadFileExample) |
+| `UrlDecode(s)`           | Decodes a string taken from an URL. | [Example][UrlDecodeExample] |
+| `UrlEncode(s)`           | Encodes a string for inclusion in an URL. | [Example][UrlEncodeExample] |
+| `XmlDecode(s)`           | Decodes a string taken from XML. It transforms `&lt;`, `&gt;`, `&amp;`, `&quot;` and `&apos;` to `<`, `>`, `&`, `"` and `'`  correspondingly. | [Example][XmlDecodeExample] |
+| `XmlEncode(s)`           | Encodes a string for inclusion in XML. It transforms `<`, `>`, `&`, `"` and `'` to `&lt;`, `&gt;`, `&amp;`, `&quot;` and `&apos;` correspondingly. | [Example][XmlEncodeExample] |
 
+[DecodeExample]: Calculator.md?Expression=Decode(Csv,%22text/csv%22)
 [HtmlAttributeEncodeExample]: Calculator.md?Expression=HtmlAttributeEncode(%22%3Ctag%3E%22)
 [HtmlValueEncodeExample]: Calculator.md?Expression=HtmlValueEncode(%22%3Ctag%3E%22)
+[HttpGetExample]: Calculator.md?Expression=HttpGet(%22URL%22)
+[LoadFileExample]: Calculator.md?Expression=LoadFile(%22FileName%22)
+[UrlDecodeExample]: Calculator.md?Expression=UrlDecode(%22Hello%2bWorld%22)
+[UrlEncodeExample]: Calculator.md?Expression=UrlEncode(%22Hello%20World%22)
 [XmlDecodeExample]: Calculator.md?Expression=XmlDecode(%22%26lt%3Btag%26gt%3B%22)
 [XmlEncodeExample]: Calculator.md?Expression=XmlEncode(%22%3Ctag%3E%22)
 
@@ -1169,11 +1167,21 @@ The following functions are available in the `Waher.Content` library.
 
 The following functions are available in the `Waher.Content.Markdown` library.
 
-| Function | Description | Example |
-|----------|-------------|---------|
-| `MarkdownEncode(s)` | Encodes a string for inclusion in Markdown. | [Example][MarkdownEncodeExaple] |
+| Function                 | Description | Example |
+|--------------------------|-------------|---------|
+| `MarkdownEncode(s)`      | Encodes a string for inclusion in Markdown. | [Example][MarkdownEncodeExaple] |
 
 [MarkdownEncodeExaple]: Calculator.md?Expression=MarkdownEncode(%22test_sister%22)
+
+#### XSL-related functions (Waher.Content.Xsl)
+
+The following functions are available in the `Waher.Content.Xsl` library.
+
+| Function                 | Description | Example |
+|--------------------------|-------------|---------|
+| `Transform(XML,XSLT)`    | Transforms an XML document using an XSL Transform (XSLT). | [Example](TransformExample) |
+
+[TransformExample]: Calculator.md?Expression=Transform(LoadFile(%22Data.xml%22),LoadFile(%22Transform.xslt%22))
 
 =========================================================================================================================================================
 

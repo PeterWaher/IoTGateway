@@ -1,27 +1,24 @@
 ﻿using System;
-using System.Numerics;
-using Waher.Runtime.Inventory;
-using Waher.Script;
+using Waher.Content.Xml;
 using Waher.Script.Abstraction.Elements;
-using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 
-namespace Waher.Content.Xml.Functions
+namespace Waher.Script.Content.Functions.Encoding
 {
 	/// <summary>
-	/// HtmlValueEncode(s)
+	/// HtmlAttributeEncode(s)
 	/// </summary>
-	public class HtmlValueEncode : FunctionOneScalarVariable
+	public class HtmlAttributeEncode : FunctionOneScalarVariable
     {
         /// <summary>
-        /// HtmlValueEncode(x)
+        /// HtmlAttributeEncode(x)
         /// </summary>
         /// <param name="Argument">Argument.</param>
         /// <param name="Start">Start position in script expression.</param>
         /// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-        public HtmlValueEncode(ScriptNode Argument, int Start, int Length, Expression Expression)
+        public HtmlAttributeEncode(ScriptNode Argument, int Start, int Length, Expression Expression)
             : base(Argument, Start, Length, Expression)
         {
         }
@@ -31,7 +28,7 @@ namespace Waher.Content.Xml.Functions
         /// </summary>
         public override string FunctionName
         {
-            get { return "htmlvalueencode"; }
+            get { return "htmlattributeencode"; }
         }
 
         /// <summary>
@@ -42,7 +39,7 @@ namespace Waher.Content.Xml.Functions
         /// <returns>Function result.</returns>
         public override IElement EvaluateScalar(string Argument, Variables Variables)
         {
-			return new StringValue(XML.HtmlValueEncode(Argument));
+			return new StringValue(XML.HtmlAttributeEncode(Argument));
         }
     }
 }

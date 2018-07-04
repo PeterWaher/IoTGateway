@@ -339,7 +339,6 @@ namespace Waher.IoTGateway.Setup
 						return false;
 					}
 
-					Stream Stream = await Response.Content.ReadAsStreamAsync(); // Regardless of status code, we check for XML content.
 					byte[] Bin = await Response.Content.ReadAsByteArrayAsync();
 					string Token = Encoding.ASCII.GetString(Bin);
 

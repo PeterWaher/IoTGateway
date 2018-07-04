@@ -57,6 +57,7 @@ namespace Waher.Networking.XMPP.Synchronization
 		private bool? differenceRemoved = null;
 		private bool? differenceHfRemoved = null;
 		private bool checkConnection = false;
+		private bool isClienBareJid = false;
 
 		private static Stopwatch CreateWatch()
 		{
@@ -402,6 +403,7 @@ namespace Waher.Networking.XMPP.Synchronization
 			this.nrDifferenceHf = null;
 			this.maxInHistory = History;
 			this.checkConnection = CheckConnection;
+			this.isClienBareJid = this.clockSourceJID.Contains("@") && !this.clockSourceJID.Contains("/");
 
 			this.timer = new Timer(this.CheckClock, null, IntervalMilliseconds, IntervalMilliseconds);
 		}
@@ -431,7 +433,18 @@ namespace Waher.Networking.XMPP.Synchronization
 					break;
 
 				case XmppState.Connected:
-					this.MeasureClockDifference(this.clockSourceJID, (sender, e) =>
+					string Jid = this.clockSourceJID;
+
+					if (this.isClienBareJid)
+					{
+						RosterItem Item = this.client.GetRosterItem(Jid);
+						if (Item == null || !Item.HasLastPresence)
+							break;
+
+						Jid = Item.LastPresenceFullJid;
+					}
+
+					this.MeasureClockDifference(Jid, (sender, e) =>
 					{
 						if (e.Ok && (DateTime.Now - ((DateTime)e.State)).TotalSeconds < 1.0)
 						{

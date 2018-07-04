@@ -987,6 +987,30 @@ plot2dlayeredcurvearea(x,y,rgba(255,0,0,64))+
    scatter2d(x,y2,"Blue",5)
 }
 
+You can set the properties `Title`, `LabelX` and `LabelY` to descriptive strings, to provide information to the reader:
+
+	GraphWidth:=800;
+	GraphHeight:=400;
+	f:=x->sin(5*x)*exp(-(x^2/10));
+	x:=-10..10|0.1;
+	G:=plot2dcurve(x,f(x),"Blue")+plot2dcurve(x,f'(6)*(x-6)+f(6))+plot2dcurve(x,f'(-6)*(x+6)+f(-6))+scatter2d([-6,6],[f(-6),f(6)],"Red");
+	G.Title:="Tangent at x=6 and x=-6";
+	G.LabelX:="x";
+	G.LabelY:="y=sin(5x)exp(-(x^2/10))";
+	G
+
+{
+GraphWidth:=800;
+GraphHeight:=400;
+f:=x->sin(5*x)*exp(-(x^2/10));
+x:=-10..10|0.1;
+G:=plot2dcurve(x,f(x),"Blue")+plot2dcurve(x,f'(6)*(x-6)+f(6))+plot2dcurve(x,f'(-6)*(x+6)+f(-6))+scatter2d([-6,6],[f(-6),f(6)],"Red");
+G.Title:="Tangent at x=6 and x=-6";
+G.LabelX:="x";
+G.LabelY:="y=sin(5x)exp(-(x^2/10))";
+G
+}
+
 #### Palette generation functions (Waher.Script.Fractals)
 
 The following functions can be used to randomly create color palettes. The functions are available in the `Waher.Script.Fractals` library.

@@ -74,7 +74,7 @@ namespace Waher.Client.WPF.Model
 		private bool connected = false;
 		private bool supportsSearch = false;
 		private bool allowInsecureAuthentication = false;
-		private bool supportsHashes = true;
+		private readonly bool supportsHashes = true;
 
 		/// <summary>
 		/// Class representing a normal XMPP account.

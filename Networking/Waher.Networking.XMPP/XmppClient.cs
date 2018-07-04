@@ -272,7 +272,7 @@ namespace Waher.Networking.XMPP
 		private MemoryBuffer memoryBuffer = new MemoryBuffer(BufferSize);
 		private IBuffer buffer = null;
 #else
-		private X509Certificate clientCertificate = null;
+		private readonly X509Certificate clientCertificate = null;
 		private X509Certificate serverCertificate = null;
 		private TcpClient client = null;
 		private Stream stream = null;

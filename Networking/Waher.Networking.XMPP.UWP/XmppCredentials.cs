@@ -42,7 +42,7 @@ namespace Waher.Networking.XMPP
 		private bool allowPlain = false;
 		private bool allowScramSHA1 = true;
 		private bool allowEncryption = true;
-		private bool allowRegistration = true;
+		private bool allowRegistration = false;
 		private bool requestRosterOnStartup = true;
 		private int port = DefaultPort;
 

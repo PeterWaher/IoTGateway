@@ -1358,7 +1358,7 @@ namespace Waher.Networking.XMPP.PubSub
 
 		private void EventNotificationHandler(object Sender, MessageEventArgs e)
 		{
-			if (e.From != this.componentAddress)
+			if (!string.IsNullOrEmpty(this.componentAddress) && e.From != this.componentAddress)
 				return;
 
 			string SubscriptionId = string.Empty;

@@ -6,7 +6,7 @@ using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 
-namespace Waher.Script.Content.Functions.Loading
+namespace Waher.Script.Content.Functions.InputOutput
 {
 	/// <summary>
 	/// HttpGet(Url)

@@ -1172,6 +1172,7 @@ The following functions are available in the `Waher.Script.Content` library.
 | `HtmlValueEncode(s)`     | Encodes a string for inclusion as an HTML element value. It transforms `<`, `>` and `&` to `&lt;`, `&gt;` and `&amp;` correspondingly. | [Example][HtmlValueEncodeExample] |
 | `HttpGet(Url)`           | Retrieves a resource using the HTTP protocol and decodes it, in accordance with its content type. | [Example](HttpGetExample) |
 | `LoadFile(FileName)`     | Loads a file and decodes it, in accordance with its file extension. | [Example](LoadFileExample) |
+| `SaveFile(Obj,FileName)` | Encodes an object `Obj` in accordance with its type and file extension, and saves it as a file. | [Example](SaveFileExample) |
 | `UrlDecode(s)`           | Decodes a string taken from an URL. | [Example][UrlDecodeExample] |
 | `UrlEncode(s)`           | Encodes a string for inclusion in an URL. | [Example][UrlEncodeExample] |
 | `XmlDecode(s)`           | Decodes a string taken from XML. It transforms `&lt;`, `&gt;`, `&amp;`, `&quot;` and `&apos;` to `<`, `>`, `&`, `"` and `'`  correspondingly. | [Example][XmlDecodeExample] |
@@ -1182,6 +1183,7 @@ The following functions are available in the `Waher.Script.Content` library.
 [HtmlValueEncodeExample]: Calculator.md?Expression=HtmlValueEncode(%22%3Ctag%3E%22)
 [HttpGetExample]: Calculator.md?Expression=HttpGet(%22URL%22)
 [LoadFileExample]: Calculator.md?Expression=LoadFile(%22FileName%22)
+[SaveFileExample]: Calculator.md?Expression=SaveFile(Graph,%22Graph.png%22)
 [UrlDecodeExample]: Calculator.md?Expression=UrlDecode(%22Hello%2bWorld%22)
 [UrlEncodeExample]: Calculator.md?Expression=UrlEncode(%22Hello%20World%22)
 [XmlDecodeExample]: Calculator.md?Expression=XmlDecode(%22%26lt%3Btag%26gt%3B%22)

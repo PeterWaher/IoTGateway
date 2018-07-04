@@ -39,6 +39,7 @@ namespace Waher.Script.Graphs
 		private IElement minY, maxY;
 		private Type axisTypeX;
 		private Type axisTypeY;
+		private string title = string.Empty;
 		private string labelX = string.Empty;
 		private string labelY = string.Empty;
 		private bool showXAxis = true;
@@ -168,7 +169,7 @@ namespace Waher.Script.Graphs
 			}
 		}
 
-		private void AddSegment(IVector X, IVector Y, ICollection<IElement> X2, ICollection<IElement> Y2, 
+		private void AddSegment(IVector X, IVector Y, ICollection<IElement> X2, ICollection<IElement> Y2,
 			ScriptNode Node, DrawCallback PlotCallback, params object[] Parameters)
 		{
 			IVector X2V = (IVector)X.Encapsulate(X2, Node);
@@ -248,11 +249,21 @@ namespace Waher.Script.Graphs
 		}
 
 		/// <summary>
+		/// Title for graph.
+		/// </summary>
+		public string Title
+		{
+			get { return this.title; }
+			set { this.title = value; }
+		}
+
+		/// <summary>
 		/// Label for x-axis.
 		/// </summary>
 		public string LabelX
 		{
 			get { return this.labelX; }
+			set { this.labelX = value; }
 		}
 
 		/// <summary>
@@ -261,6 +272,7 @@ namespace Waher.Script.Graphs
 		public string LabelY
 		{
 			get { return this.labelY; }
+			set { this.labelY = value; }
 		}
 
 		/// <summary>
@@ -319,7 +331,10 @@ namespace Waher.Script.Graphs
 			Graph2D Result = new Graph2D()
 			{
 				axisTypeX = this.axisTypeX,
-				axisTypeY = this.axisTypeY
+				axisTypeY = this.axisTypeY,
+				title = this.title,
+				labelX = this.labelX,
+				labelY = this.labelY
 			};
 
 			foreach (IVector v in this.x)
@@ -382,6 +397,7 @@ namespace Waher.Script.Graphs
 				this.maxY.Equals(G.maxY) &&
 				this.axisTypeX.Equals(G.axisTypeX) &&
 				this.axisTypeY.Equals(G.axisTypeY) &&
+				this.title.Equals(G.title) &&
 				this.labelX.Equals(G.labelX) &&
 				this.labelY.Equals(G.labelY) &&
 				this.showXAxis.Equals(G.showXAxis) &&
@@ -422,6 +438,7 @@ namespace Waher.Script.Graphs
 				this.maxY.GetHashCode() ^
 				this.axisTypeX.GetHashCode() ^
 				this.axisTypeY.GetHashCode() ^
+				this.title.GetHashCode() ^
 				this.labelX.GetHashCode() ^
 				this.labelY.GetHashCode() ^
 				this.showXAxis.GetHashCode() ^
@@ -466,6 +483,15 @@ namespace Waher.Script.Graphs
 				x2 = Settings.Width - Settings.MarginRight;
 				y1 = Settings.MarginTop;
 				y2 = Settings.Height - Settings.MarginBottom;
+
+				if (!string.IsNullOrEmpty(this.labelY))
+					x1 += (int)(Settings.LabelFontSize * 2 + 0.5);
+
+				if (!string.IsNullOrEmpty(this.labelX))
+					y2 -= (int)(Settings.LabelFontSize * 2 + 0.5);
+
+				if (!string.IsNullOrEmpty(this.title))
+					y1 += (int)(Settings.LabelFontSize * 2 + 0.5);
 
 				IVector YLabels = GetLabels(ref this.minY, ref this.maxY, this.y, Settings.ApproxNrLabelsY, out LabelType YLabelType);
 				SKPaint Font = new SKPaint()
@@ -609,6 +635,66 @@ namespace Waher.Script.Graphs
 					}
 				}
 
+				Font.Dispose();
+				Font = null;
+
+				Font = new SKPaint()
+				{
+					FilterQuality = SKFilterQuality.High,
+					HintingLevel = SKPaintHinting.Full,
+					SubpixelText = true,
+					IsAntialias = true,
+					Style = SKPaintStyle.Fill,
+					Color = Settings.AxisColor,
+					Typeface = SKTypeface.FromFamilyName(Settings.FontName, SKTypefaceStyle.Bold),
+					TextSize = (float)(Settings.LabelFontSize * 1.5)
+				};
+
+				if (!string.IsNullOrEmpty(this.title))
+				{
+					Size = Font.MeasureText(this.title);
+
+					f = x3 + (x2 - x3 - Size) * 0.5f;
+
+					if (f < x3)
+						f = x3;
+					else if (f + Size > x3 + w)
+						f = x3 + w - Size;
+
+					Canvas.DrawText(this.title, f, (float)(Settings.MarginTop + 1.5 * Settings.LabelFontSize), Font);
+				}
+
+				if (!string.IsNullOrEmpty(this.labelX))
+				{
+					Size = Font.MeasureText(this.labelX);
+
+					f = x3 + (x2 - x3 - Size) * 0.5f;
+
+					if (f < x3)
+						f = x3;
+					else if (f + Size > x3 + w)
+						f = x3 + w - Size;
+
+					Canvas.DrawText(this.labelX, f, (float)(y2 + 0.45 * Settings.LabelFontSize), Font);
+				}
+
+				if (!string.IsNullOrEmpty(this.labelY))
+				{
+					Size = Font.MeasureText(this.labelY);
+
+					f = y3 - (y3 - y1 - Size) * 0.5f;
+
+					if (f - Size < y1)
+						f = y1 + Size;
+					else if (f > y3 + h)
+						f = y3 + h;
+
+					Canvas.Translate((float)(Settings.MarginLeft + 0.05 * Settings.LabelFontSize), f);
+					Canvas.RotateDegrees(-90);
+					Canvas.DrawText(this.labelY, 0, 0, Font);
+					Canvas.ResetMatrix();
+				}
+
 				IEnumerator<IVector> ex = this.x.GetEnumerator();
 				IEnumerator<IVector> ey = this.y.GetEnumerator();
 				IEnumerator<object[]> eParameters = this.parameters.GetEnumerator();
@@ -634,7 +720,9 @@ namespace Waher.Script.Graphs
 
 				SKImage Result = Surface.Snapshot();
 
-				Font.Dispose();
+				if (Font != null)
+					Font.Dispose();
+
 				AxisBrush.Dispose();
 				GridBrush.Dispose();
 				GridPen.Dispose();

@@ -16,9 +16,10 @@ namespace Waher.Networking.XMPP.PubSub
 	/// </summary>
 	public class ItemNotificationEventArgs : NodeNotificationEventArgs
     {
-		private string itemId;
-		private string publisher;
-		private XmlElement item;
+		private readonly string itemId;
+		private readonly string publisher;
+		private readonly XmlElement item;
+		private readonly DateTime? delay;
 
 		/// <summary>
 		/// Event argument for item notification events.
@@ -28,14 +29,29 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <param name="SubscriptionId">Subscription ID</param>
 		/// <param name="Publisher">Publisher.</param>
 		/// <param name="Item">Item XML element</param>
+		/// <param name="Delay">If provided, contains information about when the item was published.</param>
 		/// <param name="e">Message event arguments</param>
 		public ItemNotificationEventArgs(string NodeName, string ItemId, string SubscriptionId,
-			string Publisher, XmlElement Item, MessageEventArgs e)
+			string Publisher, XmlElement Item, DateTime? Delay, MessageEventArgs e)
 			: base(NodeName, SubscriptionId, e)
 		{
 			this.itemId = ItemId;
 			this.publisher = Publisher;
 			this.item = Item;
+			this.delay = Delay;
+		}
+
+		/// <summary>
+		/// Event argument for item notification events.
+		/// </summary>
+		/// <param name="e">Item notification event arguments</param>
+		public ItemNotificationEventArgs(ItemNotificationEventArgs e)
+			: base(e)
+		{
+			this.itemId = e.itemId;
+			this.publisher = e.publisher;
+			this.item = e.item;
+			this.delay = e.delay;
 		}
 
 		/// <summary>
@@ -60,6 +76,14 @@ namespace Waher.Networking.XMPP.PubSub
 		public XmlElement Item
 		{
 			get { return this.item; }
+		}
+
+		/// <summary>
+		/// If provided, contains information about when the item was published.
+		/// </summary>
+		public DateTime? Delay
+		{
+			get { return this.delay; }
 		}
 	}
 }

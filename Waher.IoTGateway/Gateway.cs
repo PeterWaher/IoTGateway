@@ -33,7 +33,9 @@ using Waher.Networking.XMPP.Concentrator;
 using Waher.Networking.XMPP.Control;
 using Waher.Networking.XMPP.HTTPX;
 using Waher.Networking.XMPP.InBandBytestreams;
+using Waher.Networking.XMPP.PEP;
 using Waher.Networking.XMPP.Provisioning;
+using Waher.Networking.XMPP.PubSub;
 using Waher.Networking.XMPP.Sensor;
 using Waher.Networking.XMPP.Synchronization;
 using Waher.Runtime.Language;
@@ -119,6 +121,7 @@ namespace Waher.IoTGateway
 		private static Networking.XMPP.P2P.SOCKS5.Socks5Proxy socksProxy = null;
 		private static ConcentratorServer concentratorServer = null;
 		private static SynchronizationClient synchronizationClient = null;
+		private static PepClient pepClient = null;
 		private static Timer connectionTimer = null;
 		private static X509Certificate2 certificate = null;
 		private static HttpServer webServer = null;
@@ -753,6 +756,9 @@ namespace Waher.IoTGateway
 
 			synchronizationClient = new SynchronizationClient(xmppClient);
 
+			pepClient = new PepClient(xmppClient);
+			pepClient.PersonalEventNotification += PepClient_PersonalEventNotificationNotification;
+
 			return Task.CompletedTask;
 		}
 
@@ -1043,10 +1049,16 @@ namespace Waher.IoTGateway
 				concentratorServer = null;
 			}
 
-			if (synchronizationClient!=null)
+			if (synchronizationClient != null)
 			{
 				synchronizationClient.Dispose();
 				synchronizationClient = null;
+			}
+
+			if (pepClient != null)
+			{
+				pepClient.Dispose();
+				pepClient = null;
 			}
 
 			if (xmppClient != null)
@@ -1563,7 +1575,7 @@ namespace Waher.IoTGateway
 			}
 		}
 
-		private static void ThingRegistryClient_Disowned(object Sender, NodeEventArgs e)
+		private static void ThingRegistryClient_Disowned(object Sender, Networking.XMPP.Provisioning.NodeEventArgs e)
 		{
 			if (e.Node.IsEmpty)
 			{
@@ -1573,7 +1585,7 @@ namespace Waher.IoTGateway
 			}
 		}
 
-		private static void ThingRegistryClient_Removed(object Sender, NodeEventArgs e)
+		private static void ThingRegistryClient_Removed(object Sender, Networking.XMPP.Provisioning.NodeEventArgs e)
 		{
 			if (e.Node.IsEmpty)
 				Log.Informational("Gateway has been removed from the public registry.", ownerJid);
@@ -1872,6 +1884,54 @@ namespace Waher.IoTGateway
 		public static void NewMomentaryValues(ThingReference Reference, IEnumerable<Field> Values)
 		{
 			concentratorServer?.SensorServer?.NewMomentaryValues(Reference, Values);
+		}
+
+		#endregion
+
+		#region Personal Eventing Protocll
+
+		/// <summary>
+		/// Publishes a personal event on the XMPP network.
+		/// </summary>
+		/// <param name="Node">Node on which the personal event is to be published.</param>
+		/// <param name="PayloadXml">XML of personal event.</param>
+		public static void PublishPersonalEvent(IPersonalEvent PersonalEvent)
+		{
+			pepClient?.Publish(PersonalEvent, null, null);
+		}
+
+		private static void PepClient_PersonalEventNotificationNotification(object Sender, PersonalEventNotificationEventArgs e)
+		{
+			PersonalEventNotification?.Invoke(Sender, e);
+		}
+
+		/// <summary>
+		/// Event raised whenever a personal event notification has been received.
+		/// </summary>
+		public static event PersonalEventNotificationEventHandler PersonalEventNotification = null;
+
+		/// <summary>
+		/// Registers an event handler of a specific type of personal events.
+		/// </summary>
+		/// <param name="PersonalEventType">Type of personal event.</param>
+		/// <param name="Handler">Event handler.</param>
+		public static void RegisterHandler(Type PersonalEventType, PersonalEventNotificationEventHandler Handler)
+		{
+			pepClient?.RegisterHandler(PersonalEventType, Handler);
+		}
+
+		/// <summary>
+		/// Unregisters an event handler of a specific type of personal events.
+		/// </summary>
+		/// <param name="PersonalEventType">Type of personal event.</param>
+		/// <param name="Handler">Event handler.</param>
+		/// <returns>If the event handler was found and removed.</returns>
+		public static bool UnregisterHandler(Type PersonalEventType, PersonalEventNotificationEventHandler Handler)
+		{
+			if (pepClient == null)
+				return false;
+			else
+				return pepClient.UnregisterHandler(PersonalEventType, Handler);
 		}
 
 		#endregion

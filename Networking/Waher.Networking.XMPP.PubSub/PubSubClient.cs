@@ -37,6 +37,11 @@ namespace Waher.Networking.XMPP.PubSub
 		public const string NamespaceStanzaHeaders = "http://jabber.org/protocol/shim";
 
 		/// <summary>
+		/// urn:xmpp:delay (XEP-0203)
+		/// </summary>
+		public const string NamespaceDelayedDelivery = "urn:xmpp:delay";
+
+		/// <summary>
 		/// http://jabber.org/protocol/pubsub#node_config
 		/// </summary>
 		public const string FormTypeNodeConfig = "http://jabber.org/protocol/pubsub#node_config";
@@ -1362,23 +1367,41 @@ namespace Waher.Networking.XMPP.PubSub
 				return;
 
 			string SubscriptionId = string.Empty;
+			DateTime? Delay = null;
 
 			foreach (XmlNode N in e.Message.ChildNodes)
 			{
-				if (N is XmlElement E && E.LocalName == "headers" && E.NamespaceURI == NamespaceStanzaHeaders)
+				if (N is XmlElement E)
 				{
-					foreach (XmlNode N2 in E.ChildNodes)
+					switch (E.LocalName)
 					{
-						if (N2 is XmlElement E2 && E2.LocalName == "header" && E2.NamespaceURI == NamespaceStanzaHeaders
-							&& XML.Attribute(E2, "name") == "SubID")
-						{
-							SubscriptionId = E2.InnerText;
-							break;
-						}
-					}
+						case "headers":
+							if (E.NamespaceURI == NamespaceStanzaHeaders)
+							{
+								foreach (XmlNode N2 in E.ChildNodes)
+								{
+									if (N2 is XmlElement E2 && E2.LocalName == "header" && E2.NamespaceURI == NamespaceStanzaHeaders
+										&& XML.Attribute(E2, "name") == "SubID")
+									{
+										SubscriptionId = E2.InnerText;
+										break;
+									}
+								}
 
-					if (!string.IsNullOrEmpty(SubscriptionId))
-						break;
+								if (!string.IsNullOrEmpty(SubscriptionId))
+									break;
+							}
+							break;
+
+						case "delay":
+							if (E.NamespaceURI == NamespaceDelayedDelivery &&
+								E.HasAttribute("stamp") &&
+								XML.TryParse(E.GetAttribute("stamp"), out DateTime Timestamp))
+							{
+								Delay = Timestamp;
+							}
+							break;
+					}
 				}
 			}
 
@@ -1400,7 +1423,7 @@ namespace Waher.Networking.XMPP.PubSub
 										case "item":
 											string ItemId = XML.Attribute(E2, "id");
 											string Publisher = XML.Attribute(E2, "publisher");
-											ItemNotificationEventArgs e2 = new ItemNotificationEventArgs(NodeName, ItemId, SubscriptionId, Publisher, E2, e);
+											ItemNotificationEventArgs e2 = new ItemNotificationEventArgs(NodeName, ItemId, SubscriptionId, Publisher, E2, Delay, e);
 
 											try
 											{
@@ -1414,7 +1437,7 @@ namespace Waher.Networking.XMPP.PubSub
 
 										case "retract":
 											ItemId = XML.Attribute(E2, "id");
-											e2 = new ItemNotificationEventArgs(NodeName, ItemId, SubscriptionId, string.Empty, E2, e);
+											e2 = new ItemNotificationEventArgs(NodeName, ItemId, SubscriptionId, string.Empty, E2, Delay, e);
 
 											try
 											{

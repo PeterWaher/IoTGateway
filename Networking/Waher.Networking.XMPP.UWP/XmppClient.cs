@@ -4825,6 +4825,15 @@ namespace Waher.Networking.XMPP
 
 			Xml.Append("<query xmlns='");
 			Xml.Append(NamespaceServiceDiscoveryInfo);
+
+			if (e.Query.HasAttribute("node"))
+			{
+				Xml.Append("' node='");
+				Xml.Append(this.entityNode);
+				Xml.Append('#');
+				Xml.Append(this.EntityCapabilitiesVersion);
+			}
+
 			Xml.Append("'><identity category='client' type='pc' name='");
 			Xml.Append(XML.Encode(this.clientName));
 

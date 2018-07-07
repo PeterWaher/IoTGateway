@@ -212,10 +212,13 @@ function ConnectionOK0(data)
 
 function ConnectionOK1(data)
 {
+    var ServerOk = data.offlineMsg && data.blocking && data.reporting && data.abuse && data.spam && data.pep && data.thingRegistry && data.provisioning && data.pubSub;
+
     ShowStatus(data.msg);
     document.getElementById("NextButton").style.display = "inline";
     document.getElementById("ConnectMessage").style.display = "none";
     document.getElementById("NextMessage").style.display = "block";
+    document.getElementById("WarningMessage").style.display = ServerOk ? "none" : "block";
 
     document.getElementById("OfflineMessages").innerText = data.offlineMsg ? "✓" : "✗";
     document.getElementById("Blocking").innerText = data.blocking ? "✓" : "✗";

@@ -144,6 +144,7 @@ Password is incorrect, or a new account was not permitted to be created.
 
 <p id="ConnectMessage">Press the Connect button to try the connection.</p>
 <p id="ConnectError" class="error" style="display:none">Unable to connect to the server. Please verify your connection details and try again.</p>
+<p id="WarningMessage" class="error" style="display:none">The server lacks certain feaures (see below). If you continue, any application functions relying on such features will not be available.</p>
 <p id="NextMessage" class="message" style="display:none">Connection successful. Press the Next button to save settings and continue.</p>
 
 <button type='button' onclick='ConnectToHost()'>Connect</button>

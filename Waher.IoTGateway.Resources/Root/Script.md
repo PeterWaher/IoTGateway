@@ -1170,9 +1170,9 @@ The following functions are available in the `Waher.Script.Content` library.
 | `Decode(Content,Type)`   | Decodes `Content` using the available Internet Content Type decoder for Content Type `Type`. | [Example][DecodeExample] |
 | `HtmlAttributeEncode(s)` | Encodes a string for inclusion in an HTML attribute. It transforms `<`, `>`, `&` and `"` to `&lt;`, `&gt;`, `&amp;` and `&quot;` correspondingly. | [Example][HtmlAttributeEncodeExample] |
 | `HtmlValueEncode(s)`     | Encodes a string for inclusion as an HTML element value. It transforms `<`, `>` and `&` to `&lt;`, `&gt;` and `&amp;` correspondingly. | [Example][HtmlValueEncodeExample] |
-| `HttpGet(Url)`           | Retrieves a resource using the HTTP protocol and decodes it, in accordance with its content type. | [Example](HttpGetExample) |
-| `LoadFile(FileName)`     | Loads a file and decodes it, in accordance with its file extension. | [Example](LoadFileExample) |
-| `SaveFile(Obj,FileName)` | Encodes an object `Obj` in accordance with its type and file extension, and saves it as a file. | [Example](SaveFileExample) |
+| `HttpGet(Url)`           | Retrieves a resource using the HTTP protocol and decodes it, in accordance with its content type. | [Example][HttpGetExample] |
+| `LoadFile(FileName)`     | Loads a file and decodes it, in accordance with its file extension. | [Example][LoadFileExample] |
+| `SaveFile(Obj,FileName)` | Encodes an object `Obj` in accordance with its type and file extension, and saves it as a file. | [Example][SaveFileExample] |
 | `UrlDecode(s)`           | Decodes a string taken from an URL. | [Example][UrlDecodeExample] |
 | `UrlEncode(s)`           | Encodes a string for inclusion in an URL. | [Example][UrlEncodeExample] |
 | `XmlDecode(s)`           | Decodes a string taken from XML. It transforms `&lt;`, `&gt;`, `&amp;`, `&quot;` and `&apos;` to `<`, `>`, `&`, `"` and `'`  correspondingly. | [Example][XmlDecodeExample] |
@@ -1205,7 +1205,7 @@ The following functions are available in the `Waher.Content.Xsl` library.
 
 | Function                 | Description | Example |
 |--------------------------|-------------|---------|
-| `Transform(XML,XSLT)`    | Transforms an XML document using an XSL Transform (XSLT). | [Example](TransformExample) |
+| `Transform(XML,XSLT)`    | Transforms an XML document using an XSL Transform (XSLT). | [Example][TransformExample] |
 
 [TransformExample]: Calculator.md?Expression=Transform(LoadFile(%22Data.xml%22),LoadFile(%22Transform.xslt%22))
 

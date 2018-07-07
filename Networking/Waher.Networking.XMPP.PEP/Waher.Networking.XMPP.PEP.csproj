@@ -13,8 +13,8 @@ XEP-0080: User Location
 XEP-0107: User Mood
 XEP-0108: User Activity
 XEP-0118: User Tune</Description>
-    <AssemblyVersion>1.0.0</AssemblyVersion>
-    <FileVersion>1.0.0</FileVersion>
+    <AssemblyVersion>1.0.1</AssemblyVersion>
+    <FileVersion>1.0.1</FileVersion>
     <Copyright>Copyright © Waher Data AB 2018. All rights reserved.</Copyright>
     <PackageLicenseUrl>https://github.com/PeterWaher/IoTGateway#license</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Networking/Waher.Networking.XMPP.Pep</PackageProjectUrl>
@@ -23,6 +23,7 @@ XEP-0118: User Tune</Description>
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>networking communication xmpp pep Personal Eventing XEP-0163 XEP-0080 XEP-0107 XEP-0108 XEP-0118 user location mood activity tune</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
+    <Version>1.0.1</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -36,6 +37,7 @@ XEP-0118: User Tune</Description>
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj" />
     <ProjectReference Include="..\Waher.Networking.XMPP.PubSub\Waher.Networking.XMPP.PubSub.csproj" />
     <ProjectReference Include="..\Waher.Networking.XMPP\Waher.Networking.XMPP.csproj" />
+    <ProjectReference Include="..\Waher.Networking\Waher.Networking.csproj" />
   </ItemGroup>
 
 </Project>

@@ -513,9 +513,9 @@ namespace Waher.Networking.XMPP.PEP
 
 						default:
 							if (Enum.TryParse<UserMoods>(E2.LocalName, out UserMoods Mood))
-								this.mood = Mood;
-							else if (!this.mood.HasValue)
-								this.mood = UserMoods.undefined;
+								Result.mood = Mood;
+							else if (!Result.mood.HasValue)
+								Result.mood = UserMoods.undefined;
 							break;
 					}
 				}

@@ -49,6 +49,15 @@ namespace Waher.Networking.XMPP.PEP
 		}
 
 		/// <summary>
+		/// <see cref="PubSubClient"/> used for the Personal Eventing Protocol. Use this client to perform administrative tasks
+		/// of the PEP service.
+		/// </summary>
+		public PubSubClient PubSubClient
+		{
+			get { return this.pubSubClient; }
+		}
+
+		/// <summary>
 		/// Implemented extensions.
 		/// </summary>
 		public override string[] Extensions => new string[] { "XEP-0163" };
@@ -114,21 +123,6 @@ namespace Waher.Networking.XMPP.PEP
 				}
 			}
 
-			PersonalEventNotificationEventArgs e2 = new PersonalEventNotificationEventArgs(PersonalEvent, e);
-			PersonalEventNotificationEventHandler h = this.PersonalEventNotification;
-
-			if (h != null)
-			{
-				try
-				{
-					h.Invoke(this, e2);
-				}
-				catch (Exception ex)
-				{
-					Log.Critical(ex);
-				}
-			}
-
 			if (PersonalEvent != null)
 			{
 				PersonalEventNotificationEventHandler[] Handlers;
@@ -138,6 +132,8 @@ namespace Waher.Networking.XMPP.PEP
 					if (!this.handlers.TryGetValue(PersonalEvent.GetType(), out Handlers))
 						return;
 				}
+
+				PersonalEventNotificationEventArgs e2 = new PersonalEventNotificationEventArgs(PersonalEvent, e);
 
 				foreach (PersonalEventNotificationEventHandler Handler in Handlers)
 				{
@@ -188,11 +184,6 @@ namespace Waher.Networking.XMPP.PEP
 		}
 
 		/// <summary>
-		/// Event raised whenever a personal event notification has been received.
-		/// </summary>
-		public event PersonalEventNotificationEventHandler PersonalEventNotification = null;
-
-		/// <summary>
 		/// Registers an event handler of a specific type of personal events.
 		/// </summary>
 		/// <param name="PersonalEventType">Type of personal event.</param>
@@ -201,6 +192,8 @@ namespace Waher.Networking.XMPP.PEP
 		{
 			if (!typeof(IPersonalEvent).GetTypeInfo().IsAssignableFrom(PersonalEventType.GetTypeInfo()))
 				throw new ArgumentException("Not a personal event type.", nameof(PersonalEventType));
+
+			IPersonalEvent PersonalEvent = (IPersonalEvent)Activator.CreateInstance(PersonalEventType);
 
 			lock (this.handlers)
 			{
@@ -220,6 +213,8 @@ namespace Waher.Networking.XMPP.PEP
 
 				this.handlers[PersonalEventType] = Handlers;
 			}
+
+			this.client.RegisterFeature(PersonalEvent.Namespace + "+notify");
 		}
 
 		/// <summary>
@@ -248,6 +243,8 @@ namespace Waher.Networking.XMPP.PEP
 					Handlers = List.ToArray();
 					this.handlers[PersonalEventType] = Handlers;
 				}
+
+				this.client.UnregisterFeature(PersonalEventType.Namespace + "+notify");
 
 				return true;
 			}

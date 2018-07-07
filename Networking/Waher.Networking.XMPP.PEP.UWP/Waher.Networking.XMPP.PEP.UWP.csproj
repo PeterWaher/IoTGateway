@@ -153,6 +153,10 @@
       <Project>{a41b6f92-8556-443b-bcd9-86e81e99e961}</Project>
       <Name>Waher.Networking.XMPP.UWP</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Waher.Networking\Waher.Networking.csproj">
+      <Project>{9f60a3e1-ee96-4648-8970-76e67b086a63}</Project>
+      <Name>Waher.Networking</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>

@@ -755,9 +755,7 @@ namespace Waher.IoTGateway
 			Types.SetModuleParameter("SOCKS5", socksProxy);
 
 			synchronizationClient = new SynchronizationClient(xmppClient);
-
 			pepClient = new PepClient(xmppClient);
-			pepClient.PersonalEventNotification += PepClient_PersonalEventNotificationNotification;
 
 			return Task.CompletedTask;
 		}
@@ -1893,22 +1891,11 @@ namespace Waher.IoTGateway
 		/// <summary>
 		/// Publishes a personal event on the XMPP network.
 		/// </summary>
-		/// <param name="Node">Node on which the personal event is to be published.</param>
-		/// <param name="PayloadXml">XML of personal event.</param>
+		/// <param name="PersonalEvent">Personal event to publish.</param>
 		public static void PublishPersonalEvent(IPersonalEvent PersonalEvent)
 		{
 			pepClient?.Publish(PersonalEvent, null, null);
 		}
-
-		private static void PepClient_PersonalEventNotificationNotification(object Sender, PersonalEventNotificationEventArgs e)
-		{
-			PersonalEventNotification?.Invoke(Sender, e);
-		}
-
-		/// <summary>
-		/// Event raised whenever a personal event notification has been received.
-		/// </summary>
-		public static event PersonalEventNotificationEventHandler PersonalEventNotification = null;
 
 		/// <summary>
 		/// Registers an event handler of a specific type of personal events.

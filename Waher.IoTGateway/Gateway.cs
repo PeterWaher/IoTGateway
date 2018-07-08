@@ -1642,6 +1642,46 @@ namespace Waher.IoTGateway
 		}
 
 		/// <summary>
+		/// XMPP Thing Registry Client.
+		/// </summary>
+		public static ThingRegistryClient ThingRegistryClient
+		{
+			get { return thingRegistryClient; }
+		}
+
+		/// <summary>
+		/// XMPP Provisioning Client.
+		/// </summary>
+		public static ProvisioningClient ProvisioningClient
+		{
+			get { return provisioningClient; }
+		}
+
+		/// <summary>
+		/// XMPP Concentrator Server.
+		/// </summary>
+		public static ConcentratorServer ConcentratorServer
+		{
+			get { return concentratorServer; }
+		}
+
+		/// <summary>
+		/// XMPP Synchronization Client.
+		/// </summary>
+		public static SynchronizationClient SynchronizationClient
+		{
+			get { return synchronizationClient; }
+		}
+
+		/// <summary>
+		/// XMPP Personal Eventing Protocol (PEP) Client.
+		/// </summary>
+		public static PepClient PepClient
+		{
+			get { return pepClient; }
+		}
+
+		/// <summary>
 		/// HTTP Server
 		/// </summary>
 		public static HttpServer HttpServer

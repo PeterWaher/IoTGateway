@@ -10,20 +10,21 @@
     <Description>Class library adding support for the Personal Eventing Protocol (XEP-0163) to the XMPP Client library defined in Waher.Networking.XMPP. Other related extensions supported include:
 
 XEP-0080: User Location
+XEP-0084: User Avatar
 XEP-0107: User Mood
 XEP-0108: User Activity
 XEP-0118: User Tune</Description>
-    <AssemblyVersion>1.0.1</AssemblyVersion>
-    <FileVersion>1.0.1</FileVersion>
+    <AssemblyVersion>1.0.2</AssemblyVersion>
+    <FileVersion>1.0.2</FileVersion>
     <Copyright>Copyright © Waher Data AB 2018. All rights reserved.</Copyright>
     <PackageLicenseUrl>https://github.com/PeterWaher/IoTGateway#license</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Networking/Waher.Networking.XMPP.Pep</PackageProjectUrl>
     <PackageIconUrl>https://github.com/PeterWaher/IoTGateway/blob/master/Images/Icon.ico?raw=true</PackageIconUrl>
     <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
-    <PackageTags>networking communication xmpp pep Personal Eventing XEP-0163 XEP-0080 XEP-0107 XEP-0108 XEP-0118 user location mood activity tune</PackageTags>
+    <PackageTags>networking communication xmpp pep Personal Eventing XEP-0163 XEP-0080 XEP-0084 XEP-0107 XEP-0108 XEP-0118 user location avatar mood activity tune</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <Version>1.0.1</Version>
+    <Version>1.0.2</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -35,6 +36,7 @@ XEP-0118: User Tune</Description>
     <ProjectReference Include="..\..\Content\Waher.Content\Waher.Content.csproj" />
     <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj" />
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj" />
+    <ProjectReference Include="..\..\Security\Waher.Security\Waher.Security.csproj" />
     <ProjectReference Include="..\Waher.Networking.XMPP.PubSub\Waher.Networking.XMPP.PubSub.csproj" />
     <ProjectReference Include="..\Waher.Networking.XMPP\Waher.Networking.XMPP.csproj" />
     <ProjectReference Include="..\Waher.Networking\Waher.Networking.csproj" />

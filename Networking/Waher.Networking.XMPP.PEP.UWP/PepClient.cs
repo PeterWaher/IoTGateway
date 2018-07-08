@@ -62,6 +62,8 @@ namespace Waher.Networking.XMPP.PEP
 		/// </summary>
 		public override string[] Extensions => new string[] { "XEP-0163" };
 
+		#region Personal Eventing Protocol (XEP-0163)
+
 		/// <summary>
 		/// Publishes an item on a node.
 		/// </summary>
@@ -93,7 +95,12 @@ namespace Waher.Networking.XMPP.PEP
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void Publish(IPersonalEvent PersonalEvent, ItemResultEventHandler Callback, object State)
 		{
-			this.pubSubClient?.Publish(PersonalEvent.Node, PersonalEvent.PayloadXml, Callback, State);
+			string ItemId = PersonalEvent.ItemId;
+
+			if (ItemId == null)
+				this.pubSubClient?.Publish(PersonalEvent.Node, PersonalEvent.PayloadXml, Callback, State);
+			else
+				this.pubSubClient?.Publish(PersonalEvent.Node, ItemId, PersonalEvent.PayloadXml, Callback, State);
 		}
 
 		/// <summary>
@@ -249,6 +256,346 @@ namespace Waher.Networking.XMPP.PEP
 				return true;
 			}
 		}
+
+		#endregion
+
+		#region XEP-0080: User Location
+
+		/// <summary>
+		/// Publishes a personal user location.
+		/// </summary>
+		/// <param name="Location">User location</param>
+		public void Publish(UserLocation Location)
+		{
+			this.Publish(Location, null, null);
+		}
+
+		/// <summary>
+		/// Event raised when a user location personal event has been received.
+		/// </summary>
+		public event UserLocationEventHandler OnUserLocation
+		{
+			add
+			{
+				if (this.onUserLocation == null)
+					this.RegisterHandler(typeof(UserLocation), this.UserLocationEventHandler);
+
+				this.onUserLocation += value;
+			}
+
+			remove
+			{
+				this.onUserLocation -= value;
+
+				if (this.onUserLocation == null)
+					this.UnregisterHandler(typeof(UserLocation), this.UserLocationEventHandler);
+			}
+		}
+
+		private UserLocationEventHandler onUserLocation = null;
+
+		private void UserLocationEventHandler(object Sender, PersonalEventNotificationEventArgs e)
+		{
+			if (e.PersonalEvent is UserLocation UserLocation)
+			{
+				try
+				{
+					this.onUserLocation?.Invoke(this, new UserLocationEventArguments(UserLocation, e));
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			}
+		}
+
+		#endregion
+
+		#region XEP-0084: User Avatar
+
+		/// <summary>
+		/// Publishes a personal user avatar.
+		/// </summary>
+		/// <param name="Images">Images of different types, representing the same avatar.</param>
+		public void Publish(params UserAvatarImage[] Images)
+		{
+			List<UserAvatarReference> References = new List<UserAvatarReference>();
+
+			foreach (UserAvatarImage Image in Images)
+			{
+				UserAvatarData Data = new UserAvatarData()
+				{
+					Data = Image.Data
+				};
+
+				this.Publish(Data, null, null);
+
+				References.Add(new UserAvatarReference()
+				{
+					Bytes = Image.Data.Length,
+					Height = Image.Height,
+					Id = Data.ItemId,
+					Type = Image.ContentType,
+					URL = Image.URL,
+					Width = Image.Width
+				});
+			}
+
+			this.Publish(new UserAvatarMetaData(References.ToArray()), null, null);
+		}
+
+		/// <summary>
+		/// Event raised when a user location personal event has been received.
+		/// </summary>
+		public event UserAvatarMetaDataEventHandler OnUserAvatarMetaData
+		{
+			add
+			{
+				if (this.onUserAvatarMetaData == null)
+					this.RegisterHandler(typeof(UserAvatarMetaData), this.UserAvatarMetaDataEventHandler);
+
+				this.onUserAvatarMetaData += value;
+			}
+
+			remove
+			{
+				this.onUserAvatarMetaData -= value;
+
+				if (this.onUserAvatarMetaData == null)
+					this.UnregisterHandler(typeof(UserAvatarMetaData), this.UserAvatarMetaDataEventHandler);
+			}
+		}
+
+		private UserAvatarMetaDataEventHandler onUserAvatarMetaData = null;
+
+		private void UserAvatarMetaDataEventHandler(object Sender, PersonalEventNotificationEventArgs e)
+		{
+			if (e.PersonalEvent is UserAvatarMetaData UserAvatarMetaData)
+			{
+				try
+				{
+					this.onUserAvatarMetaData?.Invoke(this, new UserAvatarMetaDataEventArguments(UserAvatarMetaData, e));
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			}
+		}
+
+		/// <summary>
+		/// Gets an avatar published by a user using the Personal Eventing Protocol
+		/// </summary>
+		/// <param name="UserBareJid">Bare JID of user publishing the avatar.</param>
+		/// <param name="Reference">Avatar reference, selected from	an <see cref="UserAvatarMetaData"/> event.</param>
+		/// <param name="Callback">Method to call when avatar has been retrieved.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void GetUserAvatarData(string UserBareJid, UserAvatarReference Reference, UserAvatarImageEventHandler Callback, object State)
+		{
+			this.pubSubClient.GetItems(UserBareJid, new string[] { Reference.Id }, (sender, e) =>
+			{
+				UserAvatarImage Image = null;
+
+				if (e.Ok)
+				{
+					foreach (PubSubItem Item in e.Items)
+					{
+						if (Item.ItemId == Reference.Id)
+						{
+							foreach (XmlNode N in Item.Item)
+							{
+								if (N is XmlElement E && E.LocalName == "data" && E.NamespaceURI == UserAvatarData.AvatarDataNamespace)
+								{
+									Image = new UserAvatarImage()
+									{
+										Data = Convert.FromBase64String(E.InnerText),
+										ContentType = Reference.Type,
+										Height = Reference.Height,
+										URL = Reference.URL,
+										Width = Reference.Width
+									};
+
+
+								}
+							}
+						}
+					}
+				}
+
+				Callback?.Invoke(this, new UserAvatarImageEventArguments(Image, e));
+
+			}, State);
+		}
+
+		#endregion
+
+		#region XEP-0107: User Mood
+
+		/// <summary>
+		/// Publishes a personal user mood.
+		/// </summary>
+		/// <param name="Mood">Mood</param>
+		/// <param name="Text">Custom</param>
+		public void Publish(UserMoods Mood, string Text)
+		{
+			this.Publish(new UserMood()
+			{
+				Mood = Mood,
+				Text = Text
+			}, null, null);
+		}
+
+		/// <summary>
+		/// Event raised when a user mood personal event has been received.
+		/// </summary>
+		public event UserMoodEventHandler OnUserMood
+		{
+			add
+			{
+				if (this.onUserMood == null)
+					this.RegisterHandler(typeof(UserMood), this.UserMoodEventHandler);
+
+				this.onUserMood += value;
+			}
+
+			remove
+			{
+				this.onUserMood -= value;
+
+				if (this.onUserMood == null)
+					this.UnregisterHandler(typeof(UserMood), this.UserMoodEventHandler);
+			}
+		}
+
+		private UserMoodEventHandler onUserMood = null;
+
+		private void UserMoodEventHandler(object Sender, PersonalEventNotificationEventArgs e)
+		{
+			if (e.PersonalEvent is UserMood UserMood)
+			{
+				try
+				{
+					this.onUserMood?.Invoke(this, new UserMoodEventArguments(UserMood, e));
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			}
+		}
+
+		#endregion
+
+		#region XEP-0108: User Activity
+
+		/// <summary>
+		/// Publishes a personal user activity.
+		/// </summary
+		/// <param name="GeneralActivity">General activity</param>
+		/// <param name="SpecificActivity">Specific activity</param>
+		/// <param name="Text">Custom</param>
+		public void Publish(UserGeneralActivities GeneralActivity, UserSpecificActivities SpecificActivity, string Text)
+		{
+			this.Publish(new UserActivity()
+			{
+				GeneralActivity = GeneralActivity,
+				SpecificActivity = SpecificActivity,
+				Text = Text
+			}, null, null);
+		}
+
+		/// <summary>
+		/// Event raised when a user activity personal event has been received.
+		/// </summary>
+		public event UserActivityEventHandler OnUserActivity
+		{
+			add
+			{
+				if (this.onUserActivity == null)
+					this.RegisterHandler(typeof(UserActivity), this.UserActivityEventHandler);
+
+				this.onUserActivity += value;
+			}
+
+			remove
+			{
+				this.onUserActivity -= value;
+
+				if (this.onUserActivity == null)
+					this.UnregisterHandler(typeof(UserActivity), this.UserActivityEventHandler);
+			}
+		}
+
+		private UserActivityEventHandler onUserActivity = null;
+
+		private void UserActivityEventHandler(object Sender, PersonalEventNotificationEventArgs e)
+		{
+			if (e.PersonalEvent is UserActivity UserActivity)
+			{
+				try
+				{
+					this.onUserActivity?.Invoke(this, new UserActivityEventArguments(UserActivity, e));
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			}
+		}
+
+		#endregion
+
+		#region XEP-0118: User Tune
+
+		/// <summary>
+		/// Publishes a personal user activity.
+		/// </summary
+		/// <param name="Tune">User tune</param>
+		public void Publish(UserTune Tune)
+		{
+			this.Publish(Tune, null, null);
+		}
+
+		/// <summary>
+		/// Event raised when a user tune personal event has been received.
+		/// </summary>
+		public event UserTuneEventHandler OnUserTune
+		{
+			add
+			{
+				if (this.onUserTune == null)
+					this.RegisterHandler(typeof(UserTune), this.UserTuneEventHandler);
+
+				this.onUserTune += value;
+			}
+
+			remove
+			{
+				this.onUserTune -= value;
+
+				if (this.onUserTune == null)
+					this.UnregisterHandler(typeof(UserTune), this.UserTuneEventHandler);
+			}
+		}
+
+		private UserTuneEventHandler onUserTune = null;
+
+		private void UserTuneEventHandler(object Sender, PersonalEventNotificationEventArgs e)
+		{
+			if (e.PersonalEvent is UserTune UserTune)
+			{
+				try
+				{
+					this.onUserTune?.Invoke(this, new UserTuneEventArguments(UserTune, e));
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			}
+		}
+
+		#endregion
 
 	}
 }

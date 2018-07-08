@@ -113,9 +113,20 @@
     <Compile Include="PersonalEventNotificationEventArgs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UserActivity.cs" />
+    <Compile Include="UserActivityEventArguments.cs" />
+    <Compile Include="UserAvatar.cs" />
+    <Compile Include="UserAvatarData.cs" />
+    <Compile Include="UserAvatarImage.cs" />
+    <Compile Include="UserAvatarImageEventArguments.cs" />
+    <Compile Include="UserAvatarMetaData.cs" />
+    <Compile Include="UserAvatarMetaDataEventArguments.cs" />
+    <Compile Include="UserAvatarReference.cs" />
     <Compile Include="UserLocation.cs" />
+    <Compile Include="UserLocationEventArguments.cs" />
     <Compile Include="UserMood.cs" />
+    <Compile Include="UserMoodEventArguments.cs" />
     <Compile Include="UserTune.cs" />
+    <Compile Include="UserTuneEventArguments.cs" />
     <EmbeddedResource Include="Properties\Waher.Networking.XMPP.PEP.UWP.rd.xml" />
   </ItemGroup>
   <ItemGroup>
@@ -144,6 +155,10 @@
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj">
       <Project>{7f1b0d78-aa86-445b-9e1f-7df75b9e4c04}</Project>
       <Name>Waher.Runtime.Inventory</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Security\Waher.Security\Waher.Security.csproj">
+      <Project>{a248de37-d588-4a5c-b51b-b500c7caaf68}</Project>
+      <Name>Waher.Security</Name>
     </ProjectReference>
     <ProjectReference Include="..\Waher.Networking.XMPP.PubSub.UWP\Waher.Networking.XMPP.PubSub.UWP.csproj">
       <Project>{47395fb6-ad33-4c2c-95b3-8fbbbc3b183d}</Project>

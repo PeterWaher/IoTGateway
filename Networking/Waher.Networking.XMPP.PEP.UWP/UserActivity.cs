@@ -416,7 +416,7 @@ namespace Waher.Networking.XMPP.PEP
 
 	/// <summary>
 	/// User Activity event, as defined in XEP-0108:
-	/// https://xmpp.org/extensions/xep-0107.html
+	/// https://xmpp.org/extensions/xep-0108.html
 	/// </summary>
 	public class UserActivity : PersonalEvent
 	{
@@ -426,7 +426,7 @@ namespace Waher.Networking.XMPP.PEP
 
 		/// <summary>
 		/// User Activity event, as defined in XEP-0108:
-		/// https://xmpp.org/extensions/xep-0107.html
+		/// https://xmpp.org/extensions/xep-0108.html
 		/// </summary>
 		public UserActivity()
 		{

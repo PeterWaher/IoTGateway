@@ -35,6 +35,17 @@ namespace Waher.Networking.XMPP.PubSub
 		}
 
 		/// <summary>
+		/// Event arguments for items callback events.
+		/// </summary>
+		/// <param name="e">Items event arguments.</param>
+		public ItemsEventArgs(ItemsEventArgs e)
+			: base(e)
+		{
+			this.items = e.Items;
+			this.page = e.Page;
+		}
+
+		/// <summary>
 		/// Items found.
 		/// </summary>
 		public PubSubItem[] Items

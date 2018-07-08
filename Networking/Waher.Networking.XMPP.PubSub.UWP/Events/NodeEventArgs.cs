@@ -30,6 +30,16 @@ namespace Waher.Networking.XMPP.PubSub
 		}
 
 		/// <summary>
+		/// Event arguments for node callback events.
+		/// </summary>
+		/// <param name="e">IQ result event arguments.</param>
+		public NodeEventArgs(NodeEventArgs e)
+			: base(e)
+		{
+			this.nodeName = e.NodeName;
+		}
+
+		/// <summary>
 		/// Node name.
 		/// </summary>
 		public string NodeName

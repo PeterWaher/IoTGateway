@@ -18,27 +18,30 @@ namespace Waher.Networking.XMPP.PEP
 	public class PersonalEventNotificationEventArgs : ItemNotificationEventArgs
     {
 		private readonly IPersonalEvent personalEvent;
+		private readonly PepClient pepClient;
 
 		/// <summary>
 		/// Event argument for personal event notification events.
 		/// </summary>
 		/// <param name="PersonalEvent">Personal event</param>
+		/// <param name="PepClient">Personal Eventing Protocol (PEP) Client.</param>
 		/// <param name="e">Message event arguments</param>
-		public PersonalEventNotificationEventArgs(IPersonalEvent PersonalEvent, ItemNotificationEventArgs e)
+		public PersonalEventNotificationEventArgs(IPersonalEvent PersonalEvent, PepClient PepClient, ItemNotificationEventArgs e)
 			: base(e)
 		{
 			this.personalEvent = PersonalEvent;
+			this.pepClient = PepClient;
 		}
 
 		/// <summary>
 		/// Event argument for personal event notification events.
 		/// </summary>
-		/// <param name="PersonalEvent">Personal event</param>
 		/// <param name="e">Message event arguments</param>
 		public PersonalEventNotificationEventArgs(PersonalEventNotificationEventArgs e)
 			: base(e)
 		{
 			this.personalEvent = e.personalEvent;
+			this.pepClient = e.pepClient;
 		}
 
 		/// <summary>
@@ -47,6 +50,14 @@ namespace Waher.Networking.XMPP.PEP
 		public IPersonalEvent PersonalEvent
 		{
 			get { return this.personalEvent; }
+		}
+
+		/// <summary>
+		/// Personal Eventing Protocol (PEP) Client.
+		/// </summary>
+		public PepClient PepClient
+		{
+			get { return this.pepClient; }
 		}
 	}
 }

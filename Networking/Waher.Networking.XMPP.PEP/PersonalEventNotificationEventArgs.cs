@@ -36,7 +36,6 @@ namespace Waher.Networking.XMPP.PEP
 		/// <summary>
 		/// Event argument for personal event notification events.
 		/// </summary>
-		/// <param name="PersonalEvent">Personal event</param>
 		/// <param name="e">Message event arguments</param>
 		public PersonalEventNotificationEventArgs(PersonalEventNotificationEventArgs e)
 			: base(e)

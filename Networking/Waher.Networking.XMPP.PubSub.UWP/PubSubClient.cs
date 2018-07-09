@@ -292,7 +292,7 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void CreateNode(string Name, NodeEventHandler Callback, object State)
 		{
-			this.CreateNode(Name, (DataForm)null, Callback, State);
+			this.CreateNode(this.componentAddress, Name, (DataForm)null, Callback, State);
 		}
 
 		/// <summary>
@@ -305,7 +305,7 @@ namespace Waher.Networking.XMPP.PubSub
 		public void CreateNode(string Name, NodeConfiguration Configuration,
 			NodeEventHandler Callback, object State)
 		{
-			this.CreateNode(Name, Configuration.ToForm(this), Callback, State);
+			this.CreateNode(this.componentAddress, Name, Configuration.ToForm(this), Callback, State);
 		}
 
 		/// <summary>
@@ -316,6 +316,34 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <param name="Callback">Method to call when request has been processed.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void CreateNode(string Name, DataForm Configuration,
+			NodeEventHandler Callback, object State)
+		{
+			this.CreateNode(this.componentAddress, Name, Configuration, Callback, State);
+		}
+
+		/// <summary>
+		/// Creates a node on the server.
+		/// </summary>
+		/// <param name="ServiceAddress">Publish/Subscribe service address.</param>
+		/// <param name="Name">Name of node.</param>
+		/// <param name="Configuration">Node configuration.</param>
+		/// <param name="Callback">Method to call when request has been processed.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void CreateNode(string ServiceAddress, string Name, NodeConfiguration Configuration,
+			NodeEventHandler Callback, object State)
+		{
+			this.CreateNode(this.componentAddress, Name, Configuration.ToForm(this), Callback, State);
+		}
+
+		/// <summary>
+		/// Creates a node on the server.
+		/// </summary>
+		/// <param name="ServiceAddress">Publish/Subscribe service address.</param>
+		/// <param name="Name">Name of node.</param>
+		/// <param name="Configuration">Node configuration.</param>
+		/// <param name="Callback">Method to call when request has been processed.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void CreateNode(string ServiceAddress, string Name, DataForm Configuration,
 			NodeEventHandler Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
@@ -335,7 +363,7 @@ namespace Waher.Networking.XMPP.PubSub
 
 			Xml.Append("</pubsub>");
 
-			this.client.SendIqSet(this.componentAddress, Xml.ToString(), (sender, e) =>
+			this.client.SendIqSet(ServiceAddress, Xml.ToString(), (sender, e) =>
 			{
 				try
 				{
@@ -360,6 +388,19 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void GetNodeConfiguration(string Name, ConfigurationEventHandler Callback, object State)
 		{
+			this.GetNodeConfiguration(this.componentAddress, Name, Callback, State);
+		}
+
+		/// <summary>
+		/// Gets the configuration for a node.
+		/// </summary>
+		/// <param name="ServiceAddress">Publish/Subscribe service address.</param>
+		/// <param name="Name">Name of node.</param>
+		/// <param name="Callback">Method to call when request has been processed.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void GetNodeConfiguration(string ServiceAddress, string Name,
+			ConfigurationEventHandler Callback, object State)
+		{
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<pubsub xmlns='");
@@ -369,7 +410,7 @@ namespace Waher.Networking.XMPP.PubSub
 			Xml.Append("'/>");
 			Xml.Append("</pubsub>");
 
-			this.client.SendIqGet(this.componentAddress, Xml.ToString(), (sender, e) =>
+			this.client.SendIqGet(ServiceAddress, Xml.ToString(), (sender, e) =>
 			{
 				XmlElement E;
 				DataForm Form = null;
@@ -437,7 +478,7 @@ namespace Waher.Networking.XMPP.PubSub
 		public void ConfigureNode(string Name, NodeConfiguration Configuration,
 			IqResultEventHandler Callback, object State)
 		{
-			this.ConfigureNode(Name, Configuration.ToForm(this), Callback, State);
+			this.ConfigureNode(this.componentAddress, Name, Configuration.ToForm(this), Callback, State);
 		}
 
 		/// <summary>
@@ -448,6 +489,34 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <param name="Callback">Method to call when operation has completed.</param>
 		/// <param name="State">State parameter to send to the callback method.</param>
 		public void ConfigureNode(string Name, DataForm Configuration,
+			IqResultEventHandler Callback, object State)
+		{
+			this.ConfigureNode(this.componentAddress, Name, Configuration, Callback, State);
+		}
+
+		/// <summary>
+		/// Configures a publish/subscribe node.
+		/// </summary>
+		/// <param name="ServiceAddress">Publish/Subscribe service address.</param>
+		/// <param name="Name">Node name</param>
+		/// <param name="Configuration">Configuration</param>
+		/// <param name="Callback">Method to call when operation has completed.</param>
+		/// <param name="State">State parameter to send to the callback method.</param>
+		public void ConfigureNode(string ServiceAddress, string Name, NodeConfiguration Configuration,
+			IqResultEventHandler Callback, object State)
+		{
+			this.ConfigureNode(ServiceAddress, Name, Configuration.ToForm(this), Callback, State);
+		}
+
+		/// <summary>
+		/// Configures a publish/subscribe node.
+		/// </summary>
+		/// <param name="ServiceAddress">Publish/Subscribe service address.</param>
+		/// <param name="Name">Node name</param>
+		/// <param name="Configuration">Configuration</param>
+		/// <param name="Callback">Method to call when operation has completed.</param>
+		/// <param name="State">State parameter to send to the callback method.</param>
+		public void ConfigureNode(string ServiceAddress, string Name, DataForm Configuration,
 			IqResultEventHandler Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
@@ -462,7 +531,7 @@ namespace Waher.Networking.XMPP.PubSub
 
 			Xml.Append("</configure></pubsub>");
 
-			this.client.SendIqSet(this.componentAddress, Xml.ToString(), (sender, e) =>
+			this.client.SendIqSet(ServiceAddress, Xml.ToString(), (sender, e) =>
 			{
 				try
 				{
@@ -483,6 +552,18 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <param name="State">State parameter to send to the callback method.</param>
 		public void CancelNodeConfiguration(string Name, IqResultEventHandler Callback, object State)
 		{
+			this.CancelNodeConfiguration(this.componentAddress, Name, Callback, State);
+		}
+
+		/// <summary>
+		/// Cancels a node configuration.
+		/// </summary>
+		/// <param name="ServiceAddress">Publish/Subscribe service address.</param>
+		/// <param name="Name">Name of node.</param>
+		/// <param name="Callback">Method to call when operation has completed.</param>
+		/// <param name="State">State parameter to send to the callback method.</param>
+		public void CancelNodeConfiguration(string ServiceAddress, string Name, IqResultEventHandler Callback, object State)
+		{
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<pubsub xmlns='");
@@ -493,7 +574,7 @@ namespace Waher.Networking.XMPP.PubSub
 			Xml.Append(XmppClient.NamespaceData);
 			Xml.Append("' type='cancel'/></configure></pubsub>");
 
-			this.client.SendIqSet(this.componentAddress, Xml.ToString(), (sender, e) =>
+			this.client.SendIqSet(ServiceAddress, Xml.ToString(), (sender, e) =>
 			{
 				try
 				{
@@ -513,6 +594,17 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void GetDefaultNodeConfiguration(ConfigurationEventHandler Callback, object State)
 		{
+			this.GetDefaultNodeConfiguration(this.componentAddress, Callback, State);
+		}
+
+		/// <summary>
+		/// Gets the default configuration for a node.
+		/// </summary>
+		/// <param name="ServiceAddress">Publish/Subscribe service address.</param>
+		/// <param name="Callback">Method to call when request has been processed.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void GetDefaultNodeConfiguration(string ServiceAddress, ConfigurationEventHandler Callback, object State)
+		{
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<pubsub xmlns='");
@@ -520,7 +612,7 @@ namespace Waher.Networking.XMPP.PubSub
 			Xml.Append("'><default/>");
 			Xml.Append("</pubsub>");
 
-			this.client.SendIqGet(this.componentAddress, Xml.ToString(), (sender, e) =>
+			this.client.SendIqGet(ServiceAddress, Xml.ToString(), (sender, e) =>
 			{
 				XmlElement E;
 				DataForm Form = null;
@@ -572,7 +664,7 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <param name="State">State parameter to send to the callback method.</param>
 		public void DeleteNode(string Name, NodeEventHandler Callback, object State)
 		{
-			this.DeleteNode(Name, null, Callback, State);
+			this.DeleteNode(this.componentAddress, Name, null, Callback, State);
 		}
 
 		/// <summary>
@@ -583,6 +675,19 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <param name="Callback">Method to call when operation has completed.</param>
 		/// <param name="State">State parameter to send to the callback method.</param>
 		public void DeleteNode(string Name, string RedirectUrl, NodeEventHandler Callback, object State)
+		{
+			this.DeleteNode(this.componentAddress, Name, RedirectUrl, Callback, State);
+		}
+
+		/// <summary>
+		/// Deletes a node.
+		/// </summary>
+		/// <param name="ServiceAddress">Publish/Subscribe service address.</param>
+		/// <param name="Name">Name of node.</param>
+		/// <param name="RedirectUrl">Redirection URL.</param>
+		/// <param name="Callback">Method to call when operation has completed.</param>
+		/// <param name="State">State parameter to send to the callback method.</param>
+		public void DeleteNode(string ServiceAddress, string Name, string RedirectUrl, NodeEventHandler Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -601,7 +706,7 @@ namespace Waher.Networking.XMPP.PubSub
 
 			Xml.Append("</delete></pubsub>");
 
-			this.client.SendIqSet(this.componentAddress, Xml.ToString(), (sender, e) =>
+			this.client.SendIqSet(ServiceAddress, Xml.ToString(), (sender, e) =>
 			{
 				try
 				{
@@ -626,7 +731,7 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void Subscribe(string NodeName, SubscriptionEventHandler Callback, object State)
 		{
-			this.Subscribe(NodeName, null, (DataForm)null, Callback, State);
+			this.Subscribe(this.componentAddress, NodeName, null, (DataForm)null, Callback, State);
 		}
 
 		/// <summary>
@@ -638,7 +743,7 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void Subscribe(string NodeName, string Jid, SubscriptionEventHandler Callback, object State)
 		{
-			this.Subscribe(NodeName, Jid, (DataForm)null, Callback, State);
+			this.Subscribe(this.componentAddress, NodeName, Jid, (DataForm)null, Callback, State);
 		}
 
 		/// <summary>
@@ -651,7 +756,7 @@ namespace Waher.Networking.XMPP.PubSub
 		public void Subscribe(string NodeName, SubscriptionOptions Options,
 			SubscriptionEventHandler Callback, object State)
 		{
-			this.Subscribe(NodeName, null, Options.ToForm(this), Callback, State);
+			this.Subscribe(this.componentAddress, NodeName, null, Options.ToForm(this), Callback, State);
 		}
 
 		/// <summary>
@@ -664,7 +769,7 @@ namespace Waher.Networking.XMPP.PubSub
 		public void Subscribe(string NodeName, DataForm Options,
 			SubscriptionEventHandler Callback, object State)
 		{
-			this.Subscribe(NodeName, null, Options, Callback, State);
+			this.Subscribe(this.componentAddress, NodeName, null, Options, Callback, State);
 		}
 
 		/// <summary>
@@ -678,7 +783,7 @@ namespace Waher.Networking.XMPP.PubSub
 		public void Subscribe(string NodeName, string Jid, SubscriptionOptions Options,
 			SubscriptionEventHandler Callback, object State)
 		{
-			this.Subscribe(NodeName, Jid, Options.ToForm(this), Callback, State);
+			this.Subscribe(this.componentAddress, NodeName, Jid, Options.ToForm(this), Callback, State);
 		}
 
 		/// <summary>
@@ -690,6 +795,21 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <param name="Callback">Method to call when operation has completed.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void Subscribe(string NodeName, string Jid, DataForm Options,
+			SubscriptionEventHandler Callback, object State)
+		{
+			this.Subscribe(this.componentAddress, NodeName, Jid, Options, Callback, State);
+		}
+
+		/// <summary>
+		/// Subscribes to a node.
+		/// </summary>
+		/// <param name="ServiceAddress">Publish/Subscribe service address.</param>
+		/// <param name="NodeName">Name of node.</param>
+		/// <param name="Jid">JID, if different from the bare JID of the client.</param>
+		/// <param name="Options">Subscription options.</param>
+		/// <param name="Callback">Method to call when operation has completed.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void Subscribe(string ServiceAddress, string NodeName, string Jid, DataForm Options,
 			SubscriptionEventHandler Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
@@ -718,7 +838,7 @@ namespace Waher.Networking.XMPP.PubSub
 
 			Xml.Append("</pubsub>");
 
-			this.client.SendIqSet(this.componentAddress, Xml.ToString(), (sender, e) =>
+			this.client.SendIqSet(ServiceAddress, Xml.ToString(), (sender, e) =>
 			{
 				SubscriptionOptions Options2 = null;
 				OptionsAvailability Availability = OptionsAvailability.Unknown;
@@ -849,7 +969,7 @@ namespace Waher.Networking.XMPP.PubSub
 		public void GetSubscriptionOptions(string NodeName,
 			SubscriptionOptionsEventHandler Callback, object State)
 		{
-			this.GetSubscriptionOptions(NodeName, null, null, Callback, State);
+			this.GetSubscriptionOptions(this.componentAddress, NodeName, null, null, Callback, State);
 		}
 
 		/// <summary>
@@ -862,7 +982,7 @@ namespace Waher.Networking.XMPP.PubSub
 		public void GetSubscriptionOptions(string NodeName, string Jid,
 			SubscriptionOptionsEventHandler Callback, object State)
 		{
-			this.GetSubscriptionOptions(NodeName, Jid, null, Callback, State);
+			this.GetSubscriptionOptions(this.componentAddress, NodeName, Jid, null, Callback, State);
 		}
 
 		/// <summary>
@@ -874,6 +994,22 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <param name="Callback">Method to call when operation has completed.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void GetSubscriptionOptions(string NodeName, string Jid, string SubscriptionId,
+			SubscriptionOptionsEventHandler Callback, object State)
+		{
+			this.GetSubscriptionOptions(this.componentAddress, NodeName, Jid, SubscriptionId,
+				Callback, State);
+		}
+
+		/// <summary>
+		/// Gets available subscription options.
+		/// </summary>
+		/// <param name="ServiceAddress">Publish/Subscribe service address.</param>
+		/// <param name="NodeName">Name of node.</param>
+		/// <param name="Jid">JID, if different from the bare JID of the client.</param>
+		/// <param name="SubscriptionId">Subscription ID</param>
+		/// <param name="Callback">Method to call when operation has completed.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void GetSubscriptionOptions(string ServiceAddress, string NodeName, string Jid, string SubscriptionId,
 			SubscriptionOptionsEventHandler Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
@@ -896,7 +1032,7 @@ namespace Waher.Networking.XMPP.PubSub
 
 			Xml.Append("'/></pubsub>");
 
-			this.client.SendIqGet(this.componentAddress, Xml.ToString(), (sender, e) =>
+			this.client.SendIqGet(ServiceAddress, Xml.ToString(), (sender, e) =>
 			{
 				XmlElement E;
 				DataForm Form = null;
@@ -953,7 +1089,7 @@ namespace Waher.Networking.XMPP.PubSub
 		public void SetSubscriptionOptions(string NodeName, SubscriptionOptions Options,
 			SubscriptionOptionsEventHandler Callback, object State)
 		{
-			this.SetSubscriptionOptions(NodeName, null, null, Options.ToForm(this), Callback, State);
+			this.SetSubscriptionOptions(this.componentAddress, NodeName, null, null, Options.ToForm(this), Callback, State);
 		}
 
 		/// <summary>
@@ -967,7 +1103,7 @@ namespace Waher.Networking.XMPP.PubSub
 		public void SetSubscriptionOptions(string NodeName, string Jid, SubscriptionOptions Options,
 			SubscriptionOptionsEventHandler Callback, object State)
 		{
-			this.SetSubscriptionOptions(NodeName, Jid, null, Options.ToForm(this), Callback, State);
+			this.SetSubscriptionOptions(this.componentAddress, NodeName, Jid, null, Options.ToForm(this), Callback, State);
 		}
 
 		/// <summary>
@@ -980,7 +1116,7 @@ namespace Waher.Networking.XMPP.PubSub
 		public void SetSubscriptionOptions(string NodeName, DataForm Options,
 			SubscriptionOptionsEventHandler Callback, object State)
 		{
-			this.SetSubscriptionOptions(NodeName, null, null, Options, Callback, State);
+			this.SetSubscriptionOptions(this.componentAddress, NodeName, null, null, Options, Callback, State);
 		}
 
 		/// <summary>
@@ -994,7 +1130,7 @@ namespace Waher.Networking.XMPP.PubSub
 		public void SetSubscriptionOptions(string NodeName, string Jid,
 			DataForm Options, SubscriptionOptionsEventHandler Callback, object State)
 		{
-			this.SetSubscriptionOptions(NodeName, Jid, null, Options, Callback, State);
+			this.SetSubscriptionOptions(this.componentAddress, NodeName, Jid, null, Options, Callback, State);
 		}
 
 		/// <summary>
@@ -1009,7 +1145,7 @@ namespace Waher.Networking.XMPP.PubSub
 		public void SetSubscriptionOptions(string NodeName, string Jid, string SubscriptionId, SubscriptionOptions Options,
 			SubscriptionOptionsEventHandler Callback, object State)
 		{
-			this.SetSubscriptionOptions(NodeName, Jid, SubscriptionId, Options.ToForm(this), Callback, State);
+			this.SetSubscriptionOptions(this.componentAddress, NodeName, Jid, SubscriptionId, Options.ToForm(this), Callback, State);
 		}
 
 		/// <summary>
@@ -1022,6 +1158,23 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <param name="Callback">Method to call when operation has completed.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void SetSubscriptionOptions(string NodeName, string Jid, string SubscriptionId,
+			DataForm Options, SubscriptionOptionsEventHandler Callback, object State)
+		{
+			this.SetSubscriptionOptions(this.componentAddress, NodeName, Jid, SubscriptionId,
+				Options, Callback, State);
+		}
+
+		/// <summary>
+		/// Gets available subscription options.
+		/// </summary>
+		/// <param name="ServiceAddress">Publish/Subscribe service address.</param>
+		/// <param name="NodeName">Name of node.</param>
+		/// <param name="Jid">JID, if different from the bare JID of the client.</param>
+		/// <param name="SubscriptionId">Subscription ID</param>
+		/// <param name="Options">Subscription options to set.</param>
+		/// <param name="Callback">Method to call when operation has completed.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void SetSubscriptionOptions(string ServiceAddress, string NodeName, string Jid, string SubscriptionId,
 			DataForm Options, SubscriptionOptionsEventHandler Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
@@ -1046,7 +1199,7 @@ namespace Waher.Networking.XMPP.PubSub
 			Options.SerializeSubmit(Xml);
 			Xml.Append("</options></pubsub>");
 
-			this.client.SendIqSet(this.componentAddress, Xml.ToString(), (sender, e) =>
+			this.client.SendIqSet(ServiceAddress, Xml.ToString(), (sender, e) =>
 			{
 				try
 				{
@@ -1079,6 +1232,18 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void GetDefaultSubscriptionOptions(string NodeName, SubscriptionOptionsEventHandler Callback, object State)
 		{
+			this.GetDefaultSubscriptionOptions(this.componentAddress, NodeName, Callback, State);
+		}
+
+		/// <summary>
+		/// Gets default subscription options.
+		/// </summary>
+		/// <param name="ServiceAddress">Publish/Subscribe service address.</param>
+		/// <param name="NodeName">Name of node.</param>
+		/// <param name="Callback">Method to call when operation has completed.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void GetDefaultSubscriptionOptions(string ServiceAddress, string NodeName, SubscriptionOptionsEventHandler Callback, object State)
+		{
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<pubsub xmlns='");
@@ -1094,7 +1259,7 @@ namespace Waher.Networking.XMPP.PubSub
 
 			Xml.Append("/></pubsub>");
 
-			this.client.SendIqGet(this.componentAddress, Xml.ToString(), (sender, e) =>
+			this.client.SendIqGet(ServiceAddress, Xml.ToString(), (sender, e) =>
 			{
 				XmlElement E;
 				DataForm Form = null;
@@ -1147,7 +1312,7 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void Unsubscribe(string NodeName, SubscriptionEventHandler Callback, object State)
 		{
-			this.Unsubscribe(NodeName, null, null, Callback, State);
+			this.Unsubscribe(this.componentAddress, NodeName, null, null, Callback, State);
 		}
 
 		/// <summary>
@@ -1159,7 +1324,7 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void Unsubscribe(string NodeName, string Jid, SubscriptionEventHandler Callback, object State)
 		{
-			this.Unsubscribe(NodeName, Jid, null, Callback, State);
+			this.Unsubscribe(this.componentAddress, NodeName, Jid, null, Callback, State);
 		}
 
 		/// <summary>
@@ -1171,6 +1336,21 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <param name="Callback">Method to call when operation has completed.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void Unsubscribe(string NodeName, string Jid, string SubscriptionId,
+			SubscriptionEventHandler Callback, object State)
+		{
+			this.Unsubscribe(this.componentAddress, NodeName, Jid, SubscriptionId, Callback, State);
+		}
+
+		/// <summary>
+		/// Unsubscribes from a node.
+		/// </summary>
+		/// <param name="ServiceAddress">Publish/Subscribe service address.</param>
+		/// <param name="NodeName">Name of node.</param>
+		/// <param name="Jid">JID, if different from the bare JID of the client.</param>
+		/// <param name="SubscriptionId">Subscription ID</param>
+		/// <param name="Callback">Method to call when operation has completed.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void Unsubscribe(string ServiceAddress, string NodeName, string Jid, string SubscriptionId,
 			SubscriptionEventHandler Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
@@ -1193,7 +1373,7 @@ namespace Waher.Networking.XMPP.PubSub
 
 			Xml.Append("'/></pubsub>");
 
-			this.client.SendIqSet(this.componentAddress, Xml.ToString(), (sender, e) =>
+			this.client.SendIqSet(ServiceAddress, Xml.ToString(), (sender, e) =>
 			{
 				NodeSubscriptionStatus Status = NodeSubscriptionStatus.none;
 				DateTime Expires = DateTime.MaxValue;
@@ -1264,7 +1444,7 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void Publish(string Node, ItemResultEventHandler Callback, object State)
 		{
-			this.Publish(Node, string.Empty, string.Empty, Callback, State);
+			this.Publish(this.componentAddress, Node, string.Empty, string.Empty, Callback, State);
 		}
 
 		/// <summary>
@@ -1276,7 +1456,7 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void Publish(string Node, string PayloadXml, ItemResultEventHandler Callback, object State)
 		{
-			this.Publish(Node, string.Empty, PayloadXml, Callback, State);
+			this.Publish(this.componentAddress, Node, string.Empty, PayloadXml, Callback, State);
 		}
 
 		/// <summary>
@@ -1289,6 +1469,21 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <param name="Callback">Method to call when operation completes.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void Publish(string Node, string ItemId, string PayloadXml, ItemResultEventHandler Callback, object State)
+		{
+			this.Publish(this.componentAddress, Node, ItemId, PayloadXml, Callback, State);
+		}
+
+		/// <summary>
+		/// Publishes an item on a node.
+		/// </summary>
+		/// <param name="ServiceAddress">Publish/Subscribe service address.</param>
+		/// <param name="Node">Node name.</param>
+		/// <param name="ItemId">Item identity, if available. If used, and an existing item
+		/// is available with that identity, it will be updated with the new content.</param>
+		/// <param name="PayloadXml">Payload XML.</param>
+		/// <param name="Callback">Method to call when operation completes.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void Publish(string ServiceAddress, string Node, string ItemId, string PayloadXml, ItemResultEventHandler Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -1324,7 +1519,7 @@ namespace Waher.Networking.XMPP.PubSub
 
 			Xml.Append("</pubsub>");
 
-			this.client.SendIqSet(this.componentAddress, Xml.ToString(), (sender, e) =>
+			this.client.SendIqSet(ServiceAddress, Xml.ToString(), (sender, e) =>
 			{
 				string NodeName = string.Empty;
 				XmlElement E;
@@ -1553,6 +1748,19 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void Retract(string Node, string ItemId, IqResultEventHandler Callback, object State)
 		{
+			this.Retract(this.componentAddress, Node, ItemId, Callback, State);
+		}
+
+		/// <summary>
+		/// Retracts an item from a node.
+		/// </summary>
+		/// <param name="ServiceAddress">Publish/Subscribe service address.</param>
+		/// <param name="Node">Node name.</param>
+		/// <param name="ItemId">Item identity.</param>
+		/// <param name="Callback">Method to call when operation completes.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void Retract(string ServiceAddress, string Node, string ItemId, IqResultEventHandler Callback, object State)
+		{
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<pubsub xmlns='");
@@ -1564,7 +1772,7 @@ namespace Waher.Networking.XMPP.PubSub
 			Xml.Append(XML.Encode(ItemId));
 			Xml.Append("'/></retract></pubsub>");
 
-			this.client.SendIqSet(this.componentAddress, Xml.ToString(), Callback, State);
+			this.client.SendIqSet(ServiceAddress, Xml.ToString(), Callback, State);
 		}
 
 		/// <summary>
@@ -1584,7 +1792,7 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void GetItems(string NodeName, ItemsEventHandler Callback, object State)
 		{
-			this.GetItems(NodeName, null, null, null, Callback, State);
+			this.GetItems(this.componentAddress, NodeName, null, null, null, Callback, State);
 		}
 
 		/// <summary>
@@ -1596,7 +1804,7 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void GetItems(string NodeName, RestrictedQuery Page, ItemsEventHandler Callback, object State)
 		{
-			this.GetItems(NodeName, null, Page, null, Callback, State);
+			this.GetItems(this.componentAddress, NodeName, null, Page, null, Callback, State);
 		}
 
 		/// <summary>
@@ -1608,19 +1816,58 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void GetItems(string NodeName, string[] ItemIds, ItemsEventHandler Callback, object State)
 		{
-			this.GetItems(NodeName, ItemIds, null, null, Callback, State);
+			this.GetItems(this.componentAddress, NodeName, ItemIds, null, null, Callback, State);
 		}
 
 		/// <summary>
 		/// Gets items from a node.
 		/// </summary>
+		/// <param name="ServiceAddress">Publish/Subscribe service address.</param>
+		/// <param name="NodeName">Name of node.</param>
+		/// <param name="Callback">Method to call when operation completes.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void GetItems(string ServiceAddress, string NodeName, ItemsEventHandler Callback, object State)
+		{
+			this.GetItems(ServiceAddress, NodeName, null, null, null, Callback, State);
+		}
+
+		/// <summary>
+		/// Gets items from a node.
+		/// </summary>
+		/// <param name="ServiceAddress">Publish/Subscribe service address.</param>
+		/// <param name="NodeName">Name of node.</param>
+		/// <param name="Page">Query restriction, for pagination.</param>
+		/// <param name="Callback">Method to call when operation completes.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void GetItems(string ServiceAddress, string NodeName, RestrictedQuery Page, ItemsEventHandler Callback, object State)
+		{
+			this.GetItems(ServiceAddress, NodeName, null, Page, null, Callback, State);
+		}
+
+		/// <summary>
+		/// Gets items from a node.
+		/// </summary>
+		/// <param name="ServiceAddress">Publish/Subscribe service address.</param>
+		/// <param name="NodeName">Name of node.</param>
+		/// <param name="ItemIds">Item identities.</param>
+		/// <param name="Callback">Method to call when operation completes.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void GetItems(string ServiceAddress, string NodeName, string[] ItemIds, ItemsEventHandler Callback, object State)
+		{
+			this.GetItems(ServiceAddress, NodeName, ItemIds, null, null, Callback, State);
+		}
+
+		/// <summary>
+		/// Gets items from a node.
+		/// </summary>
+		/// <param name="ServiceAddress">Publish/Subscribe service address.</param>
 		/// <param name="NodeName">Name of node.</param>
 		/// <param name="ItemIds">Item identities.</param>
 		/// <param name="Page">Query restriction, for pagination.</param>
 		/// <param name="Count">Get this number of latest items.</param>
 		/// <param name="Callback">Method to call when operation completes.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		private void GetItems(string NodeName, string[] ItemIds, RestrictedQuery Page, int? Count, ItemsEventHandler Callback, object State)
+		private void GetItems(string ServiceAddress, string NodeName, string[] ItemIds, RestrictedQuery Page, int? Count, ItemsEventHandler Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -1656,7 +1903,7 @@ namespace Waher.Networking.XMPP.PubSub
 
 			Xml.Append("</pubsub>");
 
-			this.client.SendIqGet(this.componentAddress, Xml.ToString(), (sender, e) =>
+			this.client.SendIqGet(ServiceAddress, Xml.ToString(), (sender, e) =>
 			{
 				List<PubSubItem> Items = new List<PubSubItem>();
 				ResultPage ResultPage = null;
@@ -1710,7 +1957,20 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void GetLatestItems(string NodeName, int Count, ItemsEventHandler Callback, object State)
 		{
-			this.GetItems(NodeName, null, null, Count, Callback, State);
+			this.GetItems(this.componentAddress, NodeName, null, null, Count, Callback, State);
+		}
+
+		/// <summary>
+		/// Gets the latest items from a node.
+		/// </summary>
+		/// <param name="ServiceAddress">Publish/Subscribe service address.</param>
+		/// <param name="NodeName">Name of node.</param>
+		/// <param name="Count">Number of items to get.</param>
+		/// <param name="Callback">Method to call when operation completes.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void GetLatestItems(string ServiceAddress, string NodeName, int Count, ItemsEventHandler Callback, object State)
+		{
+			this.GetItems(ServiceAddress, NodeName, null, null, Count, Callback, State);
 		}
 
 		#endregion
@@ -1725,6 +1985,18 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <param name="State">State parameter to send to the callback method.</param>
 		public void PurgeNode(string Name, NodeEventHandler Callback, object State)
 		{
+			this.PurgeNode(this.componentAddress, Name, Callback, State);
+		}
+
+		/// <summary>
+		/// Purges a node (deletes all items persisted on the node).
+		/// </summary>
+		/// <param name="ServiceAddress">Publish/Subscribe service address.</param>
+		/// <param name="Name">Name of node.</param>
+		/// <param name="Callback">Method to call when operation has completed.</param>
+		/// <param name="State">State parameter to send to the callback method.</param>
+		public void PurgeNode(string ServiceAddress, string Name, NodeEventHandler Callback, object State)
+		{
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<pubsub xmlns='");
@@ -1733,7 +2005,7 @@ namespace Waher.Networking.XMPP.PubSub
 			Xml.Append(XML.Encode(Name));
 			Xml.Append("'/></pubsub>");
 
-			this.client.SendIqSet(this.componentAddress, Xml.ToString(), (sender, e) =>
+			this.client.SendIqSet(ServiceAddress, Xml.ToString(), (sender, e) =>
 			{
 				try
 				{
@@ -1798,6 +2070,18 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void GetSubscriptions(string NodeName, SubscriptionsEventHandler Callback, object State)
 		{
+			this.GetSubscriptions(this.componentAddress, NodeName, Callback, State);
+		}
+
+		/// <summary>
+		/// Gets the list of subscriptions for a node.
+		/// </summary>
+		/// <param name="ServiceAddress">Publish/Subscribe service address.</param>
+		/// <param name="NodeName">Name of node.</param>
+		/// <param name="Callback">Callback method.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void GetSubscriptions(string ServiceAddress, string NodeName, SubscriptionsEventHandler Callback, object State)
+		{
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<pubsub xmlns='");
@@ -1806,7 +2090,7 @@ namespace Waher.Networking.XMPP.PubSub
 			Xml.Append(XML.Encode(NodeName));
 			Xml.Append("'/></pubsub>");
 
-			this.client.SendIqGet(this.componentAddress, Xml.ToString(), (sender, e) =>
+			this.client.SendIqGet(ServiceAddress, Xml.ToString(), (sender, e) =>
 			{
 				List<Subscription> Subscriptions = new List<Subscription>();
 				XmlElement E;
@@ -1853,6 +2137,20 @@ namespace Waher.Networking.XMPP.PubSub
 		public void UpdateSubscriptions(string NodeName, IEnumerable<KeyValuePair<string, NodeSubscriptionStatus>> Subscriptions,
 			IqResultEventHandler Callback, object State)
 		{
+			this.UpdateSubscriptions(this.componentAddress, NodeName, Subscriptions, Callback, State);
+		}
+
+		/// <summary>
+		/// Updates subcriptions on a node.
+		/// </summary>
+		/// <param name="ServiceAddress">Publish/Subscribe service address.</param>
+		/// <param name="NodeName">Name of node.</param>
+		/// <param name="Subscriptions">Subscriptions to be updated</param>
+		/// <param name="Callback">Callback method.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void UpdateSubscriptions(string ServiceAddress, string NodeName, IEnumerable<KeyValuePair<string, NodeSubscriptionStatus>> Subscriptions,
+			IqResultEventHandler Callback, object State)
+		{
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<pubsub xmlns='");
@@ -1872,7 +2170,7 @@ namespace Waher.Networking.XMPP.PubSub
 
 			Xml.Append("</subscriptions></pubsub>");
 
-			this.client.SendIqSet(this.componentAddress, Xml.ToString(), Callback, State);
+			this.client.SendIqSet(ServiceAddress, Xml.ToString(), Callback, State);
 		}
 
 		#endregion
@@ -1887,6 +2185,18 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void GetAffiliations(string NodeName, AffiliationsEventHandler Callback, object State)
 		{
+			this.GetAffiliations(this.componentAddress, NodeName, Callback, State);
+		}
+
+		/// <summary>
+		/// Gets the list of affiliations for a node.
+		/// </summary>
+		/// <param name="ServiceAddress">Publish/Subscribe service address.</param>
+		/// <param name="NodeName">Name of node.</param>
+		/// <param name="Callback">Callback method.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void GetAffiliations(string ServiceAddress, string NodeName, AffiliationsEventHandler Callback, object State)
+		{
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<pubsub xmlns='");
@@ -1895,7 +2205,7 @@ namespace Waher.Networking.XMPP.PubSub
 			Xml.Append(XML.Encode(NodeName));
 			Xml.Append("'/></pubsub>");
 
-			this.client.SendIqGet(this.componentAddress, Xml.ToString(), (sender, e) =>
+			this.client.SendIqGet(ServiceAddress, Xml.ToString(), (sender, e) =>
 			{
 				List<Affiliation> Affiliations = null;
 				XmlElement E;
@@ -1945,6 +2255,20 @@ namespace Waher.Networking.XMPP.PubSub
 		public void UpdateAffiliations(string NodeName, IEnumerable<KeyValuePair<string, AffiliationStatus>> Affiliations,
 			IqResultEventHandler Callback, object State)
 		{
+			this.UpdateAffiliations(this.componentAddress, NodeName, Affiliations, Callback, State);
+		}
+
+		/// <summary>
+		/// Updates affiliations on a node.
+		/// </summary>
+		/// <param name="ServiceAddress">Publish/Subscribe service address.</param>
+		/// <param name="NodeName">Name of node.</param>
+		/// <param name="Affiliations">Affiliations to be updated</param>
+		/// <param name="Callback">Callback method.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void UpdateAffiliations(string ServiceAddress, string NodeName, IEnumerable<KeyValuePair<string, AffiliationStatus>> Affiliations,
+			IqResultEventHandler Callback, object State)
+		{
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<pubsub xmlns='");
@@ -1969,7 +2293,7 @@ namespace Waher.Networking.XMPP.PubSub
 
 			Xml.Append("</affiliations></pubsub>");
 
-			this.client.SendIqSet(this.componentAddress, Xml.ToString(), Callback, State);
+			this.client.SendIqSet(ServiceAddress, Xml.ToString(), Callback, State);
 		}
 
 		/// <summary>
@@ -1988,7 +2312,7 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void GetMySubscriptions(SubscriptionsEventHandler Callback, object State)
 		{
-			this.GetMySubscriptions(null, Callback, State);
+			this.GetMySubscriptions(this.componentAddress, null, Callback, State);
 		}
 
 		/// <summary>
@@ -1998,6 +2322,18 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <param name="Callback">Callback method.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void GetMySubscriptions(string NodeName, SubscriptionsEventHandler Callback, object State)
+		{
+			this.GetMySubscriptions(this.componentAddress, NodeName, Callback, State);
+		}
+
+		/// <summary>
+		/// Gets the list of your subscriptions for a node.
+		/// </summary>
+		/// <param name="ServiceAddress">Publish/Subscribe service address.</param>
+		/// <param name="NodeName">Name of node.</param>
+		/// <param name="Callback">Callback method.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void GetMySubscriptions(string ServiceAddress, string NodeName, SubscriptionsEventHandler Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -2013,7 +2349,7 @@ namespace Waher.Networking.XMPP.PubSub
 				Xml.Append("'/></pubsub>");
 			}
 
-			this.client.SendIqGet(this.componentAddress, Xml.ToString(), (sender, e) =>
+			this.client.SendIqGet(ServiceAddress, Xml.ToString(), (sender, e) =>
 			{
 				List<Subscription> Subscriptions = new List<Subscription>();
 				XmlElement E;
@@ -2062,7 +2398,7 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void GetMyAffiliations(AffiliationsEventHandler Callback, object State)
 		{
-			this.GetMyAffiliations(null, Callback, State);
+			this.GetMyAffiliations(this.componentAddress, null, Callback, State);
 		}
 
 		/// <summary>
@@ -2072,6 +2408,18 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <param name="Callback">Callback method.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void GetMyAffiliations(string NodeName, AffiliationsEventHandler Callback, object State)
+		{
+			this.GetMyAffiliations(this.componentAddress, NodeName, Callback, State);
+		}
+
+		/// <summary>
+		/// Gets the list of your affiliations for a node.
+		/// </summary>
+		/// <param name="ServiceAddress">Publish/Subscribe service address.</param>
+		/// <param name="NodeName">Name of node.</param>
+		/// <param name="Callback">Callback method.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void GetMyAffiliations(string ServiceAddress, string NodeName, AffiliationsEventHandler Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -2087,7 +2435,7 @@ namespace Waher.Networking.XMPP.PubSub
 				Xml.Append("'/></pubsub>");
 			}
 
-			this.client.SendIqGet(this.componentAddress, Xml.ToString(), (sender, e) =>
+			this.client.SendIqGet(ServiceAddress, Xml.ToString(), (sender, e) =>
 			{
 				List<Affiliation> Affiliations = new List<Affiliation>();
 				XmlElement E;

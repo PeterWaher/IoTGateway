@@ -14,6 +14,9 @@ namespace Waher.Networking.XMPP.PEP
 	/// </summary>
 	public class UserAvatarData : PersonalEvent
 	{
+		/// <summary>
+		/// urn:xmpp:avatar:data
+		/// </summary>
 		public const string AvatarDataNamespace = "urn:xmpp:avatar:data";
 
 		private byte[] data = null;

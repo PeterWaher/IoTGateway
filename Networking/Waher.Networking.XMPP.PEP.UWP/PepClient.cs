@@ -140,7 +140,7 @@ namespace Waher.Networking.XMPP.PEP
 						return;
 				}
 
-				PersonalEventNotificationEventArgs e2 = new PersonalEventNotificationEventArgs(PersonalEvent, e);
+				PersonalEventNotificationEventArgs e2 = new PersonalEventNotificationEventArgs(PersonalEvent, this, e);
 
 				foreach (PersonalEventNotificationEventHandler Handler in Handlers)
 				{
@@ -392,7 +392,7 @@ namespace Waher.Networking.XMPP.PEP
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void GetUserAvatarData(string UserBareJid, UserAvatarReference Reference, UserAvatarImageEventHandler Callback, object State)
 		{
-			this.pubSubClient.GetItems(UserBareJid, new string[] { Reference.Id }, (sender, e) =>
+			this.pubSubClient.GetItems(UserBareJid, UserAvatarData.AvatarDataNamespace, new string[] { Reference.Id }, (sender, e) =>
 			{
 				UserAvatarImage Image = null;
 
@@ -415,7 +415,7 @@ namespace Waher.Networking.XMPP.PEP
 										Width = Reference.Width
 									};
 
-
+									break;
 								}
 							}
 						}
@@ -490,7 +490,7 @@ namespace Waher.Networking.XMPP.PEP
 
 		/// <summary>
 		/// Publishes a personal user activity.
-		/// </summary
+		/// </summary>
 		/// <param name="GeneralActivity">General activity</param>
 		/// <param name="SpecificActivity">Specific activity</param>
 		/// <param name="Text">Custom</param>
@@ -549,7 +549,7 @@ namespace Waher.Networking.XMPP.PEP
 
 		/// <summary>
 		/// Publishes a personal user activity.
-		/// </summary
+		/// </summary>
 		/// <param name="Tune">User tune</param>
 		public void Publish(UserTune Tune)
 		{

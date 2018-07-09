@@ -28,5 +28,17 @@ namespace Waher.Networking.XMPP.PEP
 		/// User avatar metadata.
 		/// </summary>
 		public UserAvatarMetaData AvatarMetaData => this.avatarMetaData;
-    }
+
+		/// <summary>
+		/// Gets an avatar published by a user using the Personal Eventing Protocol
+		/// </summary>
+		/// <param name="Reference">Avatar reference, selected from	an <see cref="UserAvatarMetaData"/> event.</param>
+		/// <param name="Callback">Method to call when avatar has been retrieved.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void GetUserAvatarData(UserAvatarReference Reference, UserAvatarImageEventHandler Callback, object State)
+		{
+			this.PepClient.GetUserAvatarData(this.FromBareJID, Reference, Callback, State);
+		}
+
+	}
 }

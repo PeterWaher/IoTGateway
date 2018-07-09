@@ -490,7 +490,7 @@ namespace Waher.Networking.XMPP.PEP
 
 		/// <summary>
 		/// Publishes a personal user activity.
-		/// </summary
+		/// </summary>
 		/// <param name="GeneralActivity">General activity</param>
 		/// <param name="SpecificActivity">Specific activity</param>
 		/// <param name="Text">Custom</param>
@@ -549,7 +549,7 @@ namespace Waher.Networking.XMPP.PEP
 
 		/// <summary>
 		/// Publishes a personal user activity.
-		/// </summary
+		/// </summary>
 		/// <param name="Tune">User tune</param>
 		public void Publish(UserTune Tune)
 		{

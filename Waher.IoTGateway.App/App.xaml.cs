@@ -99,7 +99,10 @@ namespace Waher.IoTGateway.App
 				{
 					if (e.IsTerminating)
 					{
-						using (StreamWriter w = File.CreateText(Path.Combine(Gateway.AppDataFolder, "UnhandledException.txt")))
+						string FileName = Path.Combine(Gateway.AppDataFolder, "UnhandledException.txt");
+						Networking.Sniffers.XmlFileSniffer.MakeUnique(ref FileName);
+
+						using (StreamWriter w = File.CreateText(FileName))
 						{
 							w.Write("Type: ");
 
@@ -114,9 +117,15 @@ namespace Waher.IoTGateway.App
 							w.WriteLine();
 							if (e.ExceptionObject is Exception ex)
 							{
-								w.WriteLine(ex.Message);
-								w.WriteLine();
-								w.WriteLine(ex.StackTrace);
+								while (ex != null)
+								{
+									w.WriteLine(ex.Message);
+									w.WriteLine();
+									w.WriteLine(ex.StackTrace);
+									w.WriteLine();
+
+									ex = ex.InnerException;
+								}
 							}
 							else
 							{

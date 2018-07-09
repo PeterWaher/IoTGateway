@@ -200,9 +200,10 @@ namespace Waher.Events.Files
 				this.output = null;
 			}
 
-			MakeUnique(ref s);
+			string s2 = s;
 
-			this.file = File.CreateText(s);
+			MakeUnique(ref s2);
+			this.file = File.CreateText(s2);
 			this.lastFileName = s;
 
 			this.output = XmlWriter.Create(this.file, this.settings);

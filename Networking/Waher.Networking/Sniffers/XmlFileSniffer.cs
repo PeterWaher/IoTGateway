@@ -230,11 +230,12 @@ namespace Waher.Networking.Sniffers
 				this.output = null;
 			}
 
-			MakeUnique(ref s);
+			string s2 = s;
+			MakeUnique(ref s2);
 
 			try
 			{
-				this.file = File.CreateText(s);
+				this.file = File.CreateText(s2);
 				this.lastFileName = s;
 				this.output = XmlWriter.Create(this.file, this.settings);
 			}

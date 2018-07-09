@@ -12,13 +12,13 @@ namespace Waher.Networking.Sniffers
 	/// </summary>
 	public class XmlFileSniffer : XmlWriterSniffer
 	{
-		private XmlWriterSettings settings;
+		private readonly XmlWriterSettings settings;
 		private StreamWriter file;
 		private DateTime lastEvent = DateTime.MinValue;
-		private string fileName;
+		private readonly string fileName;
 		private string lastFileName = null;
-		private string transform = null;
-		private int deleteAfterDays;
+		private readonly string transform = null;
+		private readonly int deleteAfterDays;
 
 		/// <summary>
 		/// Outputs sniffed data to an XML file.
@@ -158,19 +158,55 @@ namespace Waher.Networking.Sniffers
 		}
 
 		/// <summary>
-		/// Method is called before writing something to the text file.
+		/// Gets the name of a file, given a file name template.
 		/// </summary>
-		protected override void BeforeWrite()
+		/// <param name="TemplateFileName">File Name template.</param>
+		/// <param name="TP">Timestamp</param>
+		/// <returns>File name</returns>
+		public static string GetFileName(string TemplateFileName, DateTime TP)
 		{
-			DateTime TP = DateTime.Now;
-			string s = this.fileName.
+			return TemplateFileName.
 				Replace("%YEAR%", TP.Year.ToString("D4")).
 				Replace("%MONTH%", TP.Month.ToString("D2")).
 				Replace("%DAY%", TP.Day.ToString("D2")).
 				Replace("%HOUR%", TP.Hour.ToString("D2")).
 				Replace("%MINUTE%", TP.Minute.ToString("D2")).
 				Replace("%SECOND%", TP.Second.ToString("D2"));
+		}
 
+		/// <summary>
+		/// Makes a file name unique.
+		/// </summary>
+		/// <param name="FileName">File name.</param>
+		public static void MakeUnique(ref string FileName)
+		{
+			if (File.Exists(FileName))
+			{
+				int i = FileName.LastIndexOf('.');
+				int j = 2;
+
+				if (i < 0)
+					i = FileName.Length;
+
+				string s;
+
+				do
+				{
+					s = FileName.Insert(i, " (" + (j++).ToString() + ")");
+				}
+				while (File.Exists(s));
+
+				FileName = s;
+			}
+		}
+
+		/// <summary>
+		/// Method is called before writing something to the text file.
+		/// </summary>
+		protected override void BeforeWrite()
+		{
+			DateTime TP = DateTime.Now;
+			string s = GetFileName(this.fileName, TP);
 			this.lastEvent = TP;
 
 			if (this.lastFileName != null && this.lastFileName == s)
@@ -194,38 +230,11 @@ namespace Waher.Networking.Sniffers
 				this.output = null;
 			}
 
+			MakeUnique(ref s);
+
 			try
 			{
-				string s2 = s;
-				int i = 1;
-				int j;
-
-				while (i < 65536)
-				{
-					try
-					{
-						this.file = File.CreateText(s);
-						break;
-					}
-					catch (IOException)
-					{
-						j = s2.LastIndexOf('.');
-						if (j < 0)
-							break;
-
-						i++;
-
-						s = s2.Insert(j, " (" + i.ToString() + ")");
-					}
-				}
-
-				if (this.file == null)
-				{
-					Log.Error("Unable to create file.", s2);
-					this.output = null;
-					return;
-				}
-
+				this.file = File.CreateText(s);
 				this.lastFileName = s;
 				this.output = XmlWriter.Create(this.file, this.settings);
 			}

@@ -11,8 +11,8 @@ namespace Waher.Events.Files
 	public class TextFileEventSink : TextWriterEventSink
 	{
 		private StreamWriter file;
-		private string fileName;
-		private int deleteAfterDays;
+		private readonly string fileName;
+		private readonly int deleteAfterDays;
 
 		/// <summary>
 		/// Outputs sniffed data to a text file.
@@ -88,13 +88,7 @@ namespace Waher.Events.Files
 			}
 
 			DateTime TP = DateTime.Now;
-			string s = this.fileName.
-				Replace("%YEAR%", TP.Year.ToString("D4")).
-				Replace("%MONTH%", TP.Month.ToString("D2")).
-				Replace("%DAY%", TP.Day.ToString("D2")).
-				Replace("%HOUR%", TP.Hour.ToString("D2")).
-				Replace("%MINUTE%", TP.Minute.ToString("D2")).
-				Replace("%SECOND%", TP.Second.ToString("D2"));
+			string s = XmlFileEventSink.GetFileName(this.fileName);
 
 			if (File.Exists(s))
 				this.output = this.file = File.AppendText(s);

@@ -12,8 +12,8 @@ namespace Waher.Networking.Sniffers
 	public class TextFileSniffer : TextWriterSniffer
 	{
 		private StreamWriter file;
-		private string fileName;
-		private int deleteAfterDays;
+		private readonly string fileName;
+		private readonly int deleteAfterDays;
 
 		/// <summary>
 		/// Outputs sniffed data to a text file.
@@ -89,13 +89,7 @@ namespace Waher.Networking.Sniffers
 			}
 
 			DateTime TP = DateTime.Now;
-			string s = this.fileName.
-				Replace("%YEAR%", TP.Year.ToString("D4")).
-				Replace("%MONTH%", TP.Month.ToString("D2")).
-				Replace("%DAY%", TP.Day.ToString("D2")).
-				Replace("%HOUR%", TP.Hour.ToString("D2")).
-				Replace("%MINUTE%", TP.Minute.ToString("D2")).
-				Replace("%SECOND%", TP.Second.ToString("D2"));
+			string s = XmlFileSniffer.GetFileName(this.fileName, TP);
 
 			if (File.Exists(s))
 				this.output = this.file = File.AppendText(s);

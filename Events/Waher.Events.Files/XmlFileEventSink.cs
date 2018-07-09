@@ -11,12 +11,12 @@ namespace Waher.Events.Files
 	/// </summary>
 	public class XmlFileEventSink : XmlWriterEventSink
 	{
-		private XmlWriterSettings settings;
+		private readonly XmlWriterSettings settings;
 		private StreamWriter file;
-		private string fileName;
+		private readonly string fileName;
 		private string lastFileName = null;
-		private string transform = null;
-		private int deleteAfterDays;
+		private readonly string transform = null;
+		private readonly int deleteAfterDays;
 
 		/// <summary>
 		/// Outputs sniffed data to an XML file.
@@ -108,16 +108,18 @@ namespace Waher.Events.Files
 			this.transform = Transform;
 			this.deleteAfterDays = DeleteAfterDays;
 
-			this.settings = new XmlWriterSettings();
-			this.settings.CloseOutput = true;
-			this.settings.ConformanceLevel = ConformanceLevel.Document;
-			this.settings.Encoding = Encoding.UTF8;
-			this.settings.Indent = true;
-			this.settings.IndentChars = "\t";
-			this.settings.NewLineChars = "\r\n";
-			this.settings.NewLineHandling = NewLineHandling.Entitize;
-			this.settings.NewLineOnAttributes = false;
-			this.settings.OmitXmlDeclaration = false;
+			this.settings = new XmlWriterSettings
+			{
+				CloseOutput = true,
+				ConformanceLevel = ConformanceLevel.Document,
+				Encoding = Encoding.UTF8,
+				Indent = true,
+				IndentChars = "\t",
+				NewLineChars = "\r\n",
+				NewLineHandling = NewLineHandling.Entitize,
+				NewLineOnAttributes = false,
+				OmitXmlDeclaration = false
+			};
 
 			string FolderName = Path.GetDirectoryName(FileName);
 
@@ -129,19 +131,54 @@ namespace Waher.Events.Files
 		}
 
 		/// <summary>
-		/// Method is called before writing something to the text file.
+		/// Gets the name of a file, given a file name template.
 		/// </summary>
-		protected override void BeforeWrite()
+		/// <param name="TemplateFileName">File Name template.</param>
+		/// <returns>File name</returns>
+		public static string GetFileName(string TemplateFileName)
 		{
 			DateTime TP = DateTime.Now;
-			string s = this.fileName.
+			return TemplateFileName.
 				Replace("%YEAR%", TP.Year.ToString("D4")).
 				Replace("%MONTH%", TP.Month.ToString("D2")).
 				Replace("%DAY%", TP.Day.ToString("D2")).
 				Replace("%HOUR%", TP.Hour.ToString("D2")).
 				Replace("%MINUTE%", TP.Minute.ToString("D2")).
 				Replace("%SECOND%", TP.Second.ToString("D2"));
+		}
 
+		/// <summary>
+		/// Makes a file name unique.
+		/// </summary>
+		/// <param name="FileName">File name.</param>
+		public static void MakeUnique(ref string FileName)
+		{
+			if (File.Exists(FileName))
+			{
+				int i = FileName.LastIndexOf('.');
+				int j = 2;
+
+				if (i < 0)
+					i = FileName.Length;
+
+				string s;
+
+				do
+				{
+					s = FileName.Insert(i, " (" + (j++).ToString() + ")");
+				}
+				while (File.Exists(s));
+
+				FileName = s;
+			}
+		}
+
+		/// <summary>
+		/// Method is called before writing something to the text file.
+		/// </summary>
+		protected override void BeforeWrite()
+		{
+			string s = GetFileName(this.fileName);
 			if (this.lastFileName != null && this.lastFileName == s)
 				return;
 
@@ -162,6 +199,8 @@ namespace Waher.Events.Files
 				this.file = null;
 				this.output = null;
 			}
+
+			MakeUnique(ref s);
 
 			this.file = File.CreateText(s);
 			this.lastFileName = s;

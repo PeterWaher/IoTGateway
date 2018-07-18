@@ -24,7 +24,7 @@ namespace Waher.Networking.XMPP.Sensor
 	public class SensorDataServerRequest : SensorDataRequest, ISensorReadout
 	{
 		private Dictionary<ThingReference, List<Field>> momentaryFields = null;
-		private SensorServer sensorServer;
+		private readonly SensorServer sensorServer;
 		private bool started = false;
 
 		/// <summary>
@@ -167,7 +167,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <returns>If the response is non-empty, i.e. needs to be sent.</returns>
 		public static bool OutputFields(XmlWriter Xml, IEnumerable<Field> Fields, string Id, bool Done)
 		{
-			return OutputFields(Xml, Fields, Id, Done, null);
+			return OutputFields(Xml, Fields, null, Id, Done, null);
 		}
 
 		/// <summary>
@@ -181,13 +181,28 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <returns>If the response is non-empty, i.e. needs to be sent.</returns>
 		public static bool OutputFields(XmlWriter Xml, IEnumerable<Field> Fields, string Id, bool Done, IsIncludedDelegate IsIncluded)
 		{
+			return OutputFields(Xml, Fields, null, Id, Done, IsIncluded);
+		}
+
+		/// <summary>
+		/// Outputs a set of fields to XML using the field format specified in the IEEE XMPP IoT extensions.
+		/// </summary>
+		/// <param name="Xml">XML output.</param>
+		/// <param name="Fields">Fields to output.</param>
+		/// <param name="Errors">Errors to report.</param>
+		/// <param name="Id">Request identity.</param>
+		/// <param name="Done">If the readout is done.</param>
+		/// <param name="IsIncluded">Optional callback method that can be used to filter output. If null, all fields are output.</param>
+		/// <returns>If the response is non-empty, i.e. needs to be sent.</returns>
+		public static bool OutputFields(XmlWriter Xml, IEnumerable<Field> Fields, IEnumerable<ThingError> Errors, string Id, bool Done, IsIncludedDelegate IsIncluded)
+		{
 			Xml.WriteStartElement("resp", SensorClient.NamespaceSensorData);
 			Xml.WriteAttributeString("id", Id);
 
 			if (!Done)
 				Xml.WriteAttributeString("more", "true");
 
-			bool Result = OutputFields(Xml, Fields, IsIncluded);
+			bool Result = OutputFields(Xml, Fields, Errors, IsIncluded);
 
 			Xml.WriteEndElement();
 
@@ -205,17 +220,18 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <returns>If the response is non-empty, i.e. needs to be sent.</returns>
 		public static bool OutputFields(XmlWriter Xml, IEnumerable<Field> Fields)
 		{
-			return OutputFields(Xml, Fields, null);
+			return OutputFields(Xml, Fields, null, null);
 		}
 
 		/// <summary>
 		/// Outputs a set of fields to XML using the field format specified in the IEEE XMPP IoT extensions.
 		/// </summary>
 		/// <param name="Xml">XML output.</param>
-		/// <param name="Fields">Fields to output.</param>
+		/// <param name="Fields">Fields to output. Can be null.</param>
+		/// <param name="Errors">Any errors to output. Can be null.</param>
 		/// <param name="IsIncluded">Optional callback method that can be used to filter output. If null, all fields are output.</param>
 		/// <returns>If the response is non-empty, i.e. needs to be sent.</returns>
-		public static bool OutputFields(XmlWriter Xml, IEnumerable<Field> Fields, IsIncludedDelegate IsIncluded)
+		public static bool OutputFields(XmlWriter Xml, IEnumerable<Field> Fields, IEnumerable<ThingError> Errors, IsIncludedDelegate IsIncluded)
 		{
 			ThingReference LastThing = null;
 			DateTime LastTimestamp = DateTime.MinValue;
@@ -224,73 +240,133 @@ namespace Waher.Networking.XMPP.Sensor
 			bool Checked;
 			bool Empty = true;
 
-			foreach (Field Field in Fields)
+			if (Fields != null)
 			{
-				Checked = false;
-
-				if (LastThing == null || !LastThing.SameThing(Field.Thing))
+				foreach (Field Field in Fields)
 				{
-					if (IsIncluded != null && !IsIncluded(Field.Name, Field.Timestamp, Field.Type))
+					Checked = false;
+
+					if (LastThing == null || !LastThing.SameThing(Field.Thing))
+					{
+						if (IsIncluded != null && !IsIncluded(Field.Name, Field.Timestamp, Field.Type))
+							continue;
+
+						Checked = true;
+
+						if (TimestampOpen)
+						{
+							Xml.WriteEndElement();
+							TimestampOpen = false;
+						}
+
+						if (NodeOpen)
+						{
+							Xml.WriteEndElement();
+							NodeOpen = false;
+						}
+
+						LastThing = Field.Thing;
+						LastTimestamp = DateTime.MinValue;
+
+						if (!string.IsNullOrEmpty(LastThing.NodeId))
+						{
+							Xml.WriteStartElement("nd");
+							Xml.WriteAttributeString("id", LastThing.NodeId);
+
+							if (!string.IsNullOrEmpty(LastThing.SourceId))
+								Xml.WriteAttributeString("src", LastThing.SourceId);
+
+							if (!string.IsNullOrEmpty(LastThing.Partition))
+								Xml.WriteAttributeString("pt", LastThing.Partition);
+
+							NodeOpen = true;
+						}
+					}
+
+					if (LastTimestamp != Field.Timestamp)
+					{
+						if (IsIncluded != null && !IsIncluded(Field.Name, Field.Timestamp, Field.Type))
+							continue;
+
+						Checked = true;
+
+						if (TimestampOpen)
+						{
+							Xml.WriteEndElement();
+							TimestampOpen = false;
+						}
+
+						LastTimestamp = Field.Timestamp;
+
+						Xml.WriteStartElement("ts");
+						Xml.WriteAttributeString("v", XML.Encode(LastTimestamp));
+
+						TimestampOpen = true;
+					}
+
+					if (!Checked && IsIncluded != null && !IsIncluded(Field.Name, Field.Timestamp, Field.Type))
 						continue;
 
-					Checked = true;
-
-					if (TimestampOpen)
-					{
-						Xml.WriteEndElement();
-						TimestampOpen = false;
-					}
-
-					if (NodeOpen)
-					{
-						Xml.WriteEndElement();
-						NodeOpen = false;
-					}
-
-					LastThing = Field.Thing;
-					LastTimestamp = DateTime.MinValue;
-
-					if (!string.IsNullOrEmpty(LastThing.NodeId))
-					{
-						Xml.WriteStartElement("nd");
-						Xml.WriteAttributeString("id", LastThing.NodeId);
-
-						if (!string.IsNullOrEmpty(LastThing.SourceId))
-							Xml.WriteAttributeString("src", LastThing.SourceId);
-
-						if (!string.IsNullOrEmpty(LastThing.Partition))
-							Xml.WriteAttributeString("pt", LastThing.Partition);
-
-						NodeOpen = true;
-					}
+					OutputField(Xml, Field);
+					Empty = false;
 				}
+			}
 
-				if (LastTimestamp != Field.Timestamp)
+			if (Errors != null)
+			{
+				foreach (ThingError Error in Errors)
 				{
-					if (IsIncluded != null && !IsIncluded(Field.Name, Field.Timestamp, Field.Type))
-						continue;
-
-					Checked = true;
-
-					if (TimestampOpen)
+					if (LastThing == null || !LastThing.SameThing(Error))
 					{
-						Xml.WriteEndElement();
-						TimestampOpen = false;
+						if (TimestampOpen)
+						{
+							Xml.WriteEndElement();
+							TimestampOpen = false;
+						}
+
+						if (NodeOpen)
+						{
+							Xml.WriteEndElement();
+							NodeOpen = false;
+						}
+
+						LastThing = Error;
+						LastTimestamp = DateTime.MinValue;
+
+						if (!string.IsNullOrEmpty(LastThing.NodeId))
+						{
+							Xml.WriteStartElement("nd");
+							Xml.WriteAttributeString("id", LastThing.NodeId);
+
+							if (!string.IsNullOrEmpty(LastThing.SourceId))
+								Xml.WriteAttributeString("src", LastThing.SourceId);
+
+							if (!string.IsNullOrEmpty(LastThing.Partition))
+								Xml.WriteAttributeString("pt", LastThing.Partition);
+
+							NodeOpen = true;
+						}
 					}
 
-					LastTimestamp = Field.Timestamp;
+					if (LastTimestamp != Error.Timestamp)
+					{
+						if (TimestampOpen)
+						{
+							Xml.WriteEndElement();
+							TimestampOpen = false;
+						}
 
-					Xml.WriteStartElement("ts");
-					Xml.WriteAttributeString("v", XML.Encode(LastTimestamp));
+						LastTimestamp = Error.Timestamp;
 
-					TimestampOpen = true;
+						Xml.WriteStartElement("ts");
+						Xml.WriteAttributeString("v", XML.Encode(LastTimestamp));
+
+						TimestampOpen = true;
+					}
+
+					OutputError(Xml, Error);
+					Empty = false;
 				}
-
-				if (!Checked && IsIncluded != null && !IsIncluded(Field.Name, Field.Timestamp, Field.Type))
-					continue;
-
-				OutputField(Xml, Field);
-				Empty = false;
 			}
 
 			if (TimestampOpen)
@@ -300,6 +376,16 @@ namespace Waher.Networking.XMPP.Sensor
 				Xml.WriteEndElement();
 
 			return !Empty;
+		}
+
+		/// <summary>
+		/// Outputs a field to XML using the field format specified in the IEEE XMPP IoT extensions.
+		/// </summary>
+		/// <param name="Xml">XML output.</param>
+		/// <param name="Error">Error to output.</param>
+		public static void OutputError(XmlWriter Xml, ThingError Error)
+		{
+			Xml.WriteElementString("err", Error.ErrorMessage);
 		}
 
 		/// <summary>

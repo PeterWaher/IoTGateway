@@ -4,7 +4,7 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <Description>Implements the XMPP IoT sensor data extesion as defined by the IEEE XMPP IoT Interface working group.</Description>
-    <Copyright>Copyright © Waher Data AB 2015-2017. All rights reserved.</Copyright>
+    <Copyright>Copyright © Waher Data AB 2015-2018. All rights reserved.</Copyright>
     <Authors>Peter Waher</Authors>
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
@@ -15,9 +15,9 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>networking communication xmpp iot sensor data ieee</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.0.21</AssemblyVersion>
-    <FileVersion>1.0.21</FileVersion>
-    <Version>1.0.21</Version>
+    <AssemblyVersion>1.0.23</AssemblyVersion>
+    <FileVersion>1.0.23</FileVersion>
+    <Version>1.0.23</Version>
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Networking\Waher.Networking.XMPP.Sensor\</UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>
@@ -35,7 +35,9 @@
     <ProjectReference Include="..\..\Content\Waher.Content\Waher.Content.csproj" />
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Timing\Waher.Runtime.Timing.csproj" />
     <ProjectReference Include="..\..\Things\Waher.Things\Waher.Things.csproj" />
+    <ProjectReference Include="..\Waher.Networking.XMPP.PEP\Waher.Networking.XMPP.PEP.csproj" />
     <ProjectReference Include="..\Waher.Networking.XMPP.Provisioning\Waher.Networking.XMPP.Provisioning.csproj" />
+    <ProjectReference Include="..\Waher.Networking.XMPP.PubSub\Waher.Networking.XMPP.PubSub.csproj" />
     <ProjectReference Include="..\Waher.Networking.XMPP\Waher.Networking.XMPP.csproj" />
   </ItemGroup>
 </Project>

@@ -30,9 +30,9 @@ namespace Waher.Networking.XMPP.Sensor
 	/// </summary>
 	public class SensorServer : XmppExtension
 	{
-		private Dictionary<string, SensorDataServerRequest> requests = new Dictionary<string, SensorDataServerRequest>();
-		private Scheduler scheduler = new Scheduler();
-		private ProvisioningClient provisioningClient;
+		private readonly Dictionary<string, SensorDataServerRequest> requests = new Dictionary<string, SensorDataServerRequest>();
+		private readonly Scheduler scheduler = new Scheduler();
+		private readonly ProvisioningClient provisioningClient;
 
 		/// <summary>
 		/// Implements an XMPP sensor server interface.

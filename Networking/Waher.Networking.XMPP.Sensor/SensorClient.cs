@@ -27,8 +27,8 @@ namespace Waher.Networking.XMPP.Sensor
 		/// </summary>
 		public const string NamespaceSensorEvents = "urn:ieee:iot:events:1.0";
 
-		private Dictionary<string, SensorDataClientRequest> requests = new Dictionary<string, SensorDataClientRequest>();
-		private object synchObj = new object();
+		private readonly Dictionary<string, SensorDataClientRequest> requests = new Dictionary<string, SensorDataClientRequest>();
+		private readonly object synchObj = new object();
 
 		/// <summary>
 		/// Implements an XMPP sensor client interface.
@@ -499,14 +499,45 @@ namespace Waher.Networking.XMPP.Sensor
 		/// Parses sensor data field definitions.
 		/// </summary>
 		/// <param name="Content">Fields element containing sensor data as defined in the IEEE XMPP IoT extensions.</param>
+		/// <returns>Parsed fields.</returns>
+		public static SensorData ParseFields(XmlElement Content)
+		{
+			Tuple<List<Field>, List<ThingError>> Response = ParseFields(Content, out bool Done, out string Id);
+
+			return new SensorData()
+			{
+				Done = Done,
+				Errors = Response.Item2,
+				Fields = Response.Item1,
+				Id = Id
+			};
+		}
+
+		/// <summary>
+		/// Parses sensor data field definitions.
+		/// </summary>
+		/// <param name="Content">Fields element containing sensor data as defined in the IEEE XMPP IoT extensions.</param>
 		/// <param name="Done">If sensor data readout is done.</param>
 		/// <returns>Parsed fields.</returns>
 		public static Tuple<List<Field>, List<ThingError>> ParseFields(XmlElement Content, out bool Done)
+		{
+			return ParseFields(Content, out Done, out string Id);
+		}
+
+		/// <summary>
+		/// Parses sensor data field definitions.
+		/// </summary>
+		/// <param name="Content">Fields element containing sensor data as defined in the IEEE XMPP IoT extensions.</param>
+		/// <param name="Done">If sensor data readout is done.</param>
+		/// <param name="Id">Readout identity.</param>
+		/// <returns>Parsed fields.</returns>
+		public static Tuple<List<Field>, List<ThingError>> ParseFields(XmlElement Content, out bool Done, out string Id)
 		{
 			List<ThingError> Errors = null;
 			List<Field> Fields = null;
 
 			Done = !XML.Attribute(Content, "more", false);
+			Id = XML.Attribute(Content, "id");
 
 			foreach (XmlNode N in Content.ChildNodes)
 			{

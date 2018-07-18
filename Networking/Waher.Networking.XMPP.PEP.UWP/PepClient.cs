@@ -45,6 +45,28 @@ namespace Waher.Networking.XMPP.PEP
 				this.pubSubClient = null;
 			}
 
+			LinkedList<IPersonalEvent> ToUnregister = new LinkedList<IPersonalEvent>();
+
+			lock (this.handlers)
+			{
+				foreach (Type T in this.handlers.Keys)
+				{
+					try
+					{
+						ToUnregister.AddLast((IPersonalEvent)Activator.CreateInstance(T));
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
+				}
+
+				this.handlers.Clear();
+			}
+
+			foreach (IPersonalEvent PersonalEvent in ToUnregister)
+				this.client.UnregisterFeature(PersonalEvent.Namespace + "+notify");
+
 			base.Dispose();
 		}
 

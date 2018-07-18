@@ -12,7 +12,7 @@ namespace Waher.Client.WPF.Model.Things
 	/// </summary>
 	public class XmppSensor : XmppContact
 	{
-		private bool suportsEvents;
+		private readonly bool suportsEvents;
 
 		public XmppSensor(TreeNode Parent, XmppClient Client, string BareJid, bool SupportsEventSubscripton)
 			: base(Parent, Client, BareJid)

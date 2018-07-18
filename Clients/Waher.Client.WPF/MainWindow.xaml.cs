@@ -68,6 +68,7 @@ namespace Waher.Client.WPF
 				typeof(Waher.Content.Markdown.MarkdownDocument).Assembly,
 				typeof(Waher.Content.Xml.XML).Assembly,
 				typeof(Waher.Content.Xsl.XSL).Assembly,
+				typeof(Waher.Networking.XMPP.Sensor.SensorData).Assembly,
 				typeof(Waher.Persistence.Database).Assembly,
 				typeof(Waher.Persistence.Files.FilesProvider).Assembly,
 				typeof(Waher.Script.Expression).Assembly,

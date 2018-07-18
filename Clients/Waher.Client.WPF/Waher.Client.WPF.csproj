@@ -374,6 +374,10 @@
       <Project>{c5151b99-69e3-4ba1-9328-fba82facf159}</Project>
       <Name>Waher.Networking.XMPP.Control</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Networking\Waher.Networking.XMPP.PEP\Waher.Networking.XMPP.PEP.csproj">
+      <Project>{2e9216fa-4e3d-4ed8-80a0-3557a7aa4481}</Project>
+      <Name>Waher.Networking.XMPP.PEP</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Networking\Waher.Networking.XMPP.Provisioning\Waher.Networking.XMPP.Provisioning.csproj">
       <Project>{3cd1a7c7-7cd1-418d-a6cd-ba057b04ea42}</Project>
       <Name>Waher.Networking.XMPP.Provisioning</Name>

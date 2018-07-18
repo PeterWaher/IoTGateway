@@ -23,17 +23,16 @@ namespace Waher.Client.WPF.Model.PubSub
 	/// </summary>
 	public class PubSubItem : TreeNode
 	{
-		private DisplayableParameters parameters;
-		private XmlDocument xml;
+		private readonly XmlDocument xml;
 		private DateTime? published = null;
-		private string jid = null;
-		private string node = null;
-		private string itemId = null;
-		private string payload = null;
-		private string publisher = null;
-		private string title = null;
-		private string summary = null;
-		private string link = null;
+		private readonly string jid = null;
+		private readonly string node = null;
+		private readonly string itemId = null;
+		private readonly string payload = null;
+		private readonly string publisher = null;
+		private readonly string title = null;
+		private readonly string summary = null;
+		private readonly string link = null;
 
 		public PubSubItem(TreeNode Parent, string Jid, string Node, string ItemId, string Payload, string Publisher)
 			: base(Parent)
@@ -114,7 +113,6 @@ namespace Waher.Client.WPF.Model.PubSub
 		public override string Header => this.itemId;
 		public override string ToolTip => "Item ID " + this.itemId;
 		public override bool CanRecycle => false;
-		public override DisplayableParameters DisplayableParameters => this.parameters;
 
 		public override string TypeName
 		{

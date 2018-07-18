@@ -28,7 +28,6 @@ namespace Waher.Client.WPF.Model.Concentrator
 	public class Node : TreeNode, IMenuAggregator
 	{
 		private NodeInformation nodeInfo;
-		private DisplayableParameters parameters;
 		private NodeCommand[] commands = null;
 
 		public Node(TreeNode Parent, NodeInformation NodeInfo)
@@ -58,7 +57,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 		public override string Header => this.nodeInfo.LocalId;
 		public override string ToolTip => "Node";
 		public override bool CanRecycle => false;
-		public override DisplayableParameters DisplayableParameters => this.parameters;
+
 		public NodeInformation NodeInformation
 		{
 			get { return this.nodeInfo; }

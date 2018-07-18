@@ -17,8 +17,8 @@ namespace Waher.Client.WPF.Model
 	/// </summary>
 	public class XmppContact : TreeNode
 	{
-		private XmppClient client;
-		private string bareJid;
+		private readonly XmppClient client;
+		private readonly string bareJid;
 
 		public XmppContact(TreeNode Parent, XmppClient Client, string BareJid)
 			: base(Parent)

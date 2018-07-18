@@ -22,6 +22,7 @@ namespace Waher.Client.WPF.Model
 	public abstract class TreeNode : SelectableItem, IDisposable
 	{
 		private TreeNode parent;
+		protected DisplayableParameters parameters = null;
 		protected SortedDictionary<string, TreeNode> children = null;
 		private object tag = null;
 		private bool expanded = false;
@@ -194,8 +195,19 @@ namespace Waher.Client.WPF.Model
 		{
 			get
 			{
-				return string.Empty;
+				if (this.parameters != null)
+					return this.parameters[DisplayableParameter];
+				else
+					return string.Empty;
 			}
+		}
+
+		public virtual void Add(params Parameter[] Parameters)
+		{
+			if (this.parameters == null)
+				this.parameters = new DisplayableParameters(Parameters);
+			else
+				this.parameters.AddRange(Parameters);
 		}
 
 		/// <summary>
@@ -203,7 +215,7 @@ namespace Waher.Client.WPF.Model
 		/// </summary>
 		public virtual DisplayableParameters DisplayableParameters
 		{
-			get { return null; }
+			get { return this.parameters; }
 		}
 
 		/// <summary>

@@ -22,11 +22,10 @@ namespace Waher.Client.WPF.Model.PubSub
 	/// </summary>
 	public class PubSubNode : TreeNode
 	{
-		private DisplayableParameters parameters;
-		private NodeType nodeType;
-		private string jid;
-		private string node;
-		private string name;
+		private readonly NodeType nodeType;
+		private readonly string jid;
+		private readonly string node;
+		private readonly string name;
 
 		public PubSubNode(TreeNode Parent, string Jid, string Node, string Name, NodeType NodeType)
 			: base(Parent)
@@ -61,7 +60,6 @@ namespace Waher.Client.WPF.Model.PubSub
 		public override string Header => this.node;
 		public override string ToolTip => this.name;
 		public override bool CanRecycle => false;
-		public override DisplayableParameters DisplayableParameters => this.parameters;
 
 		public override string TypeName
 		{

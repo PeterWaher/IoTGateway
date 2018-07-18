@@ -18,12 +18,14 @@ using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.DataForms.DataTypes;
 using Waher.Networking.XMPP.DataForms.FieldTypes;
 using Waher.Networking.XMPP.DataForms.ValidationMethods;
+using Waher.Networking.XMPP.PEP;
 using Waher.Networking.XMPP.Provisioning;
 using Waher.Networking.XMPP.PubSub;
 using Waher.Networking.XMPP.Sensor;
 using Waher.Networking.XMPP.ServiceDiscovery;
 using Waher.Networking.XMPP.Synchronization;
-using Waher.Things.SourceEvents;
+using Waher.Things.DisplayableParameters;
+using Waher.Things.SensorData;
 using Waher.Client.WPF.Dialogs;
 using Waher.Client.WPF.Model.Concentrator;
 using Waher.Client.WPF.Model.Provisioning;
@@ -55,6 +57,7 @@ namespace Waher.Client.WPF.Model
 		private readonly Dictionary<string, DataSource> dataSources = new Dictionary<string, DataSource>();
 		private readonly Connections connections;
 		private XmppClient client;
+		private PepClient pepClient;
 		private SensorClient sensorClient;
 		private ControlClient controlClient;
 		private ConcentratorClient concentratorClient;
@@ -188,10 +191,18 @@ namespace Waher.Client.WPF.Model
 
 			this.client.SetPresence(Availability.Chat);
 
+			this.pepClient = new PepClient(this.client);
 			this.sensorClient = new SensorClient(this.client);
 			this.controlClient = new ControlClient(this.client);
 			this.concentratorClient = new ConcentratorClient(this.client);
 			this.synchronizationClient = new SynchronizationClient(this.client);
+
+			this.pepClient.OnUserActivity += PepClient_OnUserActivity;
+			this.pepClient.OnUserAvatarMetaData += PepClient_OnUserAvatarMetaData;
+			this.pepClient.OnUserLocation += PepClient_OnUserLocation;
+			this.pepClient.OnUserMood += PepClient_OnUserMood;
+			this.pepClient.OnUserTune += PepClient_OnUserTune;
+			this.pepClient.RegisterHandler(typeof(SensorData), PepClient_SensorData);
 
 			this.concentratorClient.OnEvent += ConcentratorClient_OnEvent;
 
@@ -326,6 +337,12 @@ namespace Waher.Client.WPF.Model
 			{
 				this.connectionTimer.Dispose();
 				this.connectionTimer = null;
+			}
+
+			if (this.pepClient != null)
+			{
+				this.pepClient.Dispose();
+				this.pepClient = null;
 			}
 
 			if (this.sensorClient != null)
@@ -1015,6 +1032,11 @@ namespace Waher.Client.WPF.Model
 			this.client.OnStateChanged -= Window.OnStateChange;
 		}
 
+		public PepClient PepClient
+		{
+			get { return this.pepClient; }
+		}
+
 		public SensorClient SensorClient
 		{
 			get { return this.sensorClient; }
@@ -1125,7 +1147,7 @@ namespace Waher.Client.WPF.Model
 
 		private class PasswordValidation : BasicValidation
 		{
-			public override void Validate(Field Field, DataType DataType, object[] Parsed, string[] Strings)
+			public override void Validate(Networking.XMPP.DataForms.Field Field, DataType DataType, object[] Parsed, string[] Strings)
 			{
 				string Password = Strings[0];
 
@@ -1156,7 +1178,7 @@ namespace Waher.Client.WPF.Model
 
 		private class Password2Validation : BasicValidation
 		{
-			public override void Validate(Field Field, DataType DataType, object[] Parsed, string[] Strings)
+			public override void Validate(Networking.XMPP.DataForms.Field Field, DataType DataType, object[] Parsed, string[] Strings)
 			{
 				string Password = Strings[0];
 
@@ -1385,6 +1407,109 @@ namespace Waher.Client.WPF.Model
 
 				this.OnUpdated();
 			}
+		}
+
+		private void PepClient_SensorData(object Sender, PersonalEventNotificationEventArgs e)
+		{
+			if (e.PersonalEvent is SensorData SensorData &&
+				SensorData.Fields != null &&
+				this.TryGetChild(e.FromBareJID, out TreeNode Node))
+			{
+				List<Parameter> Parameters = new List<Parameter>();
+
+				foreach (Waher.Things.SensorData.Field F in SensorData.Fields)
+				{
+					if (F is Int32Field I32)
+						Parameters.Add(new Int32Parameter(F.Name, F.Name, I32.Value));
+					else if (F is Int64Field I64)
+						Parameters.Add(new Int64Parameter(F.Name, F.Name, I64.Value));
+					else
+						Parameters.Add(new StringParameter(F.Name, F.Name, F.ValueString));
+				}
+
+				Node.Add(Parameters.ToArray());
+				Node.OnUpdated();
+			}
+		}
+
+		private void PepClient_OnUserTune(object Sender, UserTuneEventArguments e)
+		{
+			if (this.TryGetChild(e.FromBareJID, out TreeNode Node))
+			{
+				Node.Add(
+					new StringParameter("Tune_Artist", "Artist", e.Tune.Artist),
+					new StringParameter("Tune_Length", "Length", e.Tune.Length?.ToString() ?? string.Empty),
+					new StringParameter("Tune_Rating", "Rating", e.Tune.Rating?.ToString() ?? string.Empty),
+					new StringParameter("Tune_Source", "Source", e.Tune.Source),
+					new StringParameter("Tune_Title", "Title", e.Tune.Title),
+					new StringParameter("Tune_Track", "Track", e.Tune.Track),
+					new StringParameter("Tune_URI", "URI", e.Tune.Uri?.ToString() ?? string.Empty));
+
+				Node.OnUpdated();
+			}
+		}
+
+		private void PepClient_OnUserMood(object Sender, UserMoodEventArguments e)
+		{
+			if (this.TryGetChild(e.FromBareJID, out TreeNode Node))
+			{
+				Node.Add(
+					new StringParameter("Mood_Mood", "Mood", e.Mood.Mood?.ToString() ?? string.Empty),
+					new StringParameter("Mood_Text", "Text", e.Mood.Text));
+
+				Node.OnUpdated();
+			}
+		}
+
+		private void PepClient_OnUserLocation(object Sender, UserLocationEventArguments e)
+		{
+			if (this.TryGetChild(e.FromBareJID, out TreeNode Node))
+			{
+				Node.Add(
+					new StringParameter("Location_Artist", "Accuracy", e.Location.Accuracy?.ToString() ?? string.Empty),
+					new StringParameter("Location_Alt", "Alt", e.Location.Alt?.ToString() ?? string.Empty),
+					new StringParameter("Location_AltAccuracy", "AltAccuracy", e.Location.AltAccuracy?.ToString() ?? string.Empty),
+					new StringParameter("Location_Area", "Area", e.Location.Area ?? string.Empty),
+					new StringParameter("Location_Bearing", "Bearing", e.Location.Bearing?.ToString() ?? string.Empty),
+					new StringParameter("Location_Building", "Building", e.Location.Building ?? string.Empty),
+					new StringParameter("Location_Country", "Country", e.Location.Country ?? string.Empty),
+					new StringParameter("Location_CountryCode", "CountryCode", e.Location.CountryCode ?? string.Empty),
+					new StringParameter("Location_Datum", "Datum", e.Location.Datum ?? string.Empty),
+					new StringParameter("Location_Description", "Description", e.Location.Description ?? string.Empty),
+					new StringParameter("Location_Floor", "Floor", e.Location.Floor ?? string.Empty),
+					new StringParameter("Location_Lat", "Lat", e.Location.Lat?.ToString() ?? string.Empty),
+					new StringParameter("Location_Lon", "Lon", e.Location.Lon?.ToString() ?? string.Empty),
+					new StringParameter("Location_Locality", "Locality", e.Location.Locality ?? string.Empty),
+					new StringParameter("Location_PostalCode", "PostalCode", e.Location.PostalCode ?? string.Empty),
+					new StringParameter("Location_Region", "Region", e.Location.Region ?? string.Empty),
+					new StringParameter("Location_Room", "Room", e.Location.Room ?? string.Empty),
+					new StringParameter("Location_Speed", "Speed", e.Location.Speed?.ToString() ?? string.Empty),
+					new StringParameter("Location_Street", "Street", e.Location.Street ?? string.Empty),
+					new StringParameter("Location_Text", "Text", e.Location.Text ?? string.Empty),
+					new StringParameter("Location_Timestamp", "Timestamp", e.Location.Timestamp?.ToString() ?? string.Empty),
+					new StringParameter("Location_TimeZone", "TimeZone", e.Location.TimeZone ?? string.Empty),
+					new StringParameter("Location_URI", "URI", e.Location.Uri?.ToString() ?? string.Empty));
+
+				Node.OnUpdated();
+			}
+		}
+
+		private void PepClient_OnUserActivity(object Sender, UserActivityEventArguments e)
+		{
+			if (this.TryGetChild(e.FromBareJID, out TreeNode Node))
+			{
+				Node.Add(
+					new StringParameter("Activity_General", "General", e.Activity.GeneralActivity?.ToString() ?? string.Empty),
+					new StringParameter("Activity_Specific", "Specific", e.Activity.SpecificActivity?.ToString() ?? string.Empty),
+					new StringParameter("Activity_Text", "Text", e.Activity.Text));
+
+				Node.OnUpdated();
+			}
+		}
+
+		private void PepClient_OnUserAvatarMetaData(object Sender, UserAvatarMetaDataEventArguments e)
+		{
+			// TODO: Avatars
 		}
 
 	}

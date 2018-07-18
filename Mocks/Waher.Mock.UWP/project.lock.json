@@ -2447,7 +2447,7 @@
           "Waher.Security": "1.0.0"
         }
       },
-      "Waher.Runtime.Cache/1.0.1": {
+      "Waher.Runtime.Cache/1.0.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -4963,7 +4963,7 @@
           "Waher.Security": "1.0.0"
         }
       },
-      "Waher.Runtime.Cache/1.0.1": {
+      "Waher.Runtime.Cache/1.0.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -7515,7 +7515,7 @@
           "Waher.Security": "1.0.0"
         }
       },
-      "Waher.Runtime.Cache/1.0.1": {
+      "Waher.Runtime.Cache/1.0.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -10040,7 +10040,7 @@
           "Waher.Security": "1.0.0"
         }
       },
-      "Waher.Runtime.Cache/1.0.1": {
+      "Waher.Runtime.Cache/1.0.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -12601,7 +12601,7 @@
           "Waher.Security": "1.0.0"
         }
       },
-      "Waher.Runtime.Cache/1.0.1": {
+      "Waher.Runtime.Cache/1.0.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -15126,7 +15126,7 @@
           "Waher.Security": "1.0.0"
         }
       },
-      "Waher.Runtime.Cache/1.0.1": {
+      "Waher.Runtime.Cache/1.0.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -17687,7 +17687,7 @@
           "Waher.Security": "1.0.0"
         }
       },
-      "Waher.Runtime.Cache/1.0.1": {
+      "Waher.Runtime.Cache/1.0.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -27502,7 +27502,7 @@
       "path": "../../Networking/Waher.Networking.XMPP.UWP/project.json",
       "msbuildProject": "../../Networking/Waher.Networking.XMPP.UWP/Waher.Networking.XMPP.UWP.csproj"
     },
-    "Waher.Runtime.Cache/1.0.1": {
+    "Waher.Runtime.Cache/1.0.2": {
       "type": "project",
       "path": "../../Runtime/Waher.Runtime.Cache/Waher.Runtime.Cache.csproj",
       "msbuildProject": "../../Runtime/Waher.Runtime.Cache/Waher.Runtime.Cache.csproj"

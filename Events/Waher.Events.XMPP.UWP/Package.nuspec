@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata minClientVersion="3.2">
     <id>Waher.Events.XMPP.UWP</id>
-    <version>1.0.2</version>
+    <version>1.0.3</version>
     <title>Waher.Events.XMPP.UWP</title>
     <authors>Peter Waher</authors>
     <owners>Waher Data AB</owners>
@@ -19,7 +19,7 @@
       <dependency id="Waher.Content.Xml" version="1.0.3"/>
       <dependency id="Waher.Events" version="1.0.7"/>
       <dependency id="Waher.Networking" version="1.0.8"/>
-      <dependency id="Waher.Networking.XMPP.UWP" version="1.0.27"/>
+      <dependency id="Waher.Networking.XMPP.UWP" version="1.0.28"/>
     </dependencies>
   </metadata>
   <files>

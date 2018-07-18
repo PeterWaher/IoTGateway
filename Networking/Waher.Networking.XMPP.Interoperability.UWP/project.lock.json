@@ -2521,7 +2521,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Runtime.Cache/1.0.1": {
+      "Waher.Runtime.Cache/1.0.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -5087,7 +5087,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Runtime.Cache/1.0.1": {
+      "Waher.Runtime.Cache/1.0.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -7689,7 +7689,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Runtime.Cache/1.0.1": {
+      "Waher.Runtime.Cache/1.0.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -10264,7 +10264,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Runtime.Cache/1.0.1": {
+      "Waher.Runtime.Cache/1.0.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -12875,7 +12875,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Runtime.Cache/1.0.1": {
+      "Waher.Runtime.Cache/1.0.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -15450,7 +15450,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Runtime.Cache/1.0.1": {
+      "Waher.Runtime.Cache/1.0.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -18061,7 +18061,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Runtime.Cache/1.0.1": {
+      "Waher.Runtime.Cache/1.0.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -27957,7 +27957,7 @@
       "path": "../../Persistence/Waher.Persistence/Waher.Persistence.csproj",
       "msbuildProject": "../../Persistence/Waher.Persistence/Waher.Persistence.csproj"
     },
-    "Waher.Runtime.Cache/1.0.1": {
+    "Waher.Runtime.Cache/1.0.2": {
       "type": "project",
       "path": "../../Runtime/Waher.Runtime.Cache/Waher.Runtime.Cache.csproj",
       "msbuildProject": "../../Runtime/Waher.Runtime.Cache/Waher.Runtime.Cache.csproj"

@@ -12,12 +12,12 @@ namespace Waher.Runtime.Cache
 	/// <typeparam name="ValueType">Cache value type.</typeparam>
 	public class Cache<KeyType, ValueType> : IDisposable
 	{
-		private Dictionary<KeyType, CacheItem<KeyType, ValueType>> valuesByKey = new Dictionary<KeyType, CacheItem<KeyType, ValueType>>();
-		private SortedDictionary<DateTime, KeyType> keysByLastUsage = new SortedDictionary<DateTime, KeyType>();
-		private SortedDictionary<DateTime, KeyType> keysByCreation = new SortedDictionary<DateTime, KeyType>();
+		private readonly Dictionary<KeyType, CacheItem<KeyType, ValueType>> valuesByKey = new Dictionary<KeyType, CacheItem<KeyType, ValueType>>();
+		private readonly SortedDictionary<DateTime, KeyType> keysByLastUsage = new SortedDictionary<DateTime, KeyType>();
+		private readonly SortedDictionary<DateTime, KeyType> keysByCreation = new SortedDictionary<DateTime, KeyType>();
 		private Random rnd = new Random();
-		private object synchObject = new object();
-		private int maxItems;
+		private readonly object synchObject = new object();
+		private readonly int maxItems;
 		private TimeSpan maxTimeUsed;
 		private TimeSpan maxTimeUnused;
 		private Timer timer;
@@ -61,71 +61,78 @@ namespace Waher.Runtime.Cache
 			DateTime Now = DateTime.Now;
 			DateTime Limit;
 
-			lock (this.synchObject)
+			try
 			{
-				if (this.maxTimeUnused < TimeSpan.MaxValue)
+				lock (this.synchObject)
 				{
-					Limit = Now - this.maxTimeUnused;
-
-					foreach (KeyValuePair<DateTime, KeyType> P in this.keysByLastUsage)
+					if (this.maxTimeUnused < TimeSpan.MaxValue)
 					{
-						if (P.Key > Limit)
-							break;
+						Limit = Now - this.maxTimeUnused;
 
-						if (ToRemove1 == null)
-							ToRemove1 = new LinkedList<CacheItem<KeyType, ValueType>>();
+						foreach (KeyValuePair<DateTime, KeyType> P in this.keysByLastUsage)
+						{
+							if (P.Key > Limit)
+								break;
 
-						ToRemove1.AddLast(this.valuesByKey[P.Value]);
+							if (ToRemove1 == null)
+								ToRemove1 = new LinkedList<CacheItem<KeyType, ValueType>>();
+
+							ToRemove1.AddLast(this.valuesByKey[P.Value]);
+						}
+
+						if (ToRemove1 != null)
+						{
+							foreach (CacheItem<KeyType, ValueType> Item in ToRemove1)
+							{
+								this.valuesByKey.Remove(Item.Key);
+								this.keysByCreation.Remove(Item.Created);
+								this.keysByLastUsage.Remove(Item.LastUsed);
+							}
+						}
 					}
 
-					if (ToRemove1 != null)
+					if (this.maxTimeUsed < TimeSpan.MaxValue)
 					{
-						foreach (CacheItem<KeyType, ValueType> Item in ToRemove1)
+						Limit = Now - this.maxTimeUsed;
+
+						foreach (KeyValuePair<DateTime, KeyType> P in this.keysByCreation)
 						{
-							this.valuesByKey.Remove(Item.Key);
-							this.keysByCreation.Remove(Item.Created);
-							this.keysByLastUsage.Remove(Item.LastUsed);
+							if (P.Key > Limit)
+								break;
+
+							if (ToRemove2 == null)
+								ToRemove2 = new LinkedList<CacheItem<KeyType, ValueType>>();
+
+							ToRemove2.AddLast(this.valuesByKey[P.Value]);
+						}
+
+						if (ToRemove2 != null)
+						{
+							foreach (CacheItem<KeyType, ValueType> Item in ToRemove2)
+							{
+								this.valuesByKey.Remove(Item.Key);
+								this.keysByCreation.Remove(Item.Created);
+								this.keysByLastUsage.Remove(Item.LastUsed);
+							}
 						}
 					}
 				}
 
-				if (this.maxTimeUsed < TimeSpan.MaxValue)
+				if (ToRemove1 != null)
 				{
-					Limit = Now - this.maxTimeUsed;
+					foreach (CacheItem<KeyType, ValueType> Item in ToRemove1)
+						this.OnRemoved(Item.Key, Item.Value, RemovedReason.NotUsed);
+				}
 
-					foreach (KeyValuePair<DateTime, KeyType> P in this.keysByCreation)
-					{
-						if (P.Key > Limit)
-							break;
-
-						if (ToRemove2 == null)
-							ToRemove2 = new LinkedList<CacheItem<KeyType, ValueType>>();
-
-						ToRemove2.AddLast(this.valuesByKey[P.Value]);
-					}
-
-					if (ToRemove2 != null)
-					{
-						foreach (CacheItem<KeyType, ValueType> Item in ToRemove2)
-						{
-							this.valuesByKey.Remove(Item.Key);
-							this.keysByCreation.Remove(Item.Created);
-							this.keysByLastUsage.Remove(Item.LastUsed);
-						}
-					}
+				if (ToRemove2 != null)
+				{
+					foreach (CacheItem<KeyType, ValueType> Item in ToRemove2)
+						this.OnRemoved(Item.Key, Item.Value, RemovedReason.Old);
 				}
 			}
-
-			if (ToRemove1 != null)
+			catch (Exception ex)
 			{
-				foreach (CacheItem<KeyType, ValueType> Item in ToRemove1)
-					this.OnRemoved(Item.Key, Item.Value, RemovedReason.NotUsed);
-			}
-
-			if (ToRemove2 != null)
-			{
-				foreach (CacheItem<KeyType, ValueType> Item in ToRemove2)
-					this.OnRemoved(Item.Key, Item.Value, RemovedReason.Old);
+				Log.Critical(ex);
 			}
 		}
 

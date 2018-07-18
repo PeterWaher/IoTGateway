@@ -63,8 +63,8 @@ namespace Waher.Networking.MQTT
 		private const int BufferSize = 16384;
 		private const int KeepAliveTimeSeconds = 30;
 
-		private Dictionary<ushort, MqttContent> contentCache = new Dictionary<ushort, MqttContent>();
-		private string clientId = Guid.NewGuid().ToString().Substring(0, 23);
+		private readonly Dictionary<ushort, MqttContent> contentCache = new Dictionary<ushort, MqttContent>();
+		private readonly string clientId = Guid.NewGuid().ToString().Substring(0, 23);
 #if WINDOWS_UWP
 		private StreamSocket client = null;
 		private DataWriter dataWriter = null;
@@ -74,28 +74,28 @@ namespace Waher.Networking.MQTT
 		private MemoryBuffer memoryBuffer = new MemoryBuffer(BufferSize);
 		private IBuffer buffer = CryptographicBuffer.CreateFromByteArray(new byte[BufferSize]);
 #else
-		private X509Certificate clientCertificate = null;
-		private X509Certificate serverCertificate = null;
+		private readonly X509Certificate clientCertificate = null;
+		private readonly X509Certificate serverCertificate = null;
 		private TcpClient client = null;
 		private Stream stream = null;
-		private byte[] buffer = new byte[BufferSize];
+		private readonly byte[] buffer = new byte[BufferSize];
 #endif
-		private byte[] willData = null;
+		private readonly byte[] willData = null;
 		private Timer secondTimer = null;
 		private DateTime nextPing = DateTime.MinValue;
-		private MqttQualityOfService willQoS = MqttQualityOfService.AtMostOnce;
-		private string host;
-		private string userName;
-		private string password;
-		private string willTopic = null;
-		private int port;
+		private readonly MqttQualityOfService willQoS = MqttQualityOfService.AtMostOnce;
+		private readonly string host;
+		private readonly string userName;
+		private readonly string password;
+		private readonly string willTopic = null;
+		private readonly int port;
 		private int keepAliveSeconds;
 		private MqttState state;
-		private bool tls;
+		private readonly bool tls;
 		private bool trustServer = false;
 		private bool serverCertificateValid = false;
-		private bool will = false;
-		private bool willRetain = false;
+		private readonly bool will = false;
+		private readonly bool willRetain = false;
 
 		/// <summary>
 		/// Manages an MQTT connection. Implements MQTT v3.1.1, as defined in
@@ -265,6 +265,7 @@ namespace Waher.Networking.MQTT
 					await SslStream.AuthenticateAsClientAsync(this.host, null, 
 						SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12, true);
 
+					this.serverCertificateValid = true;
 					this.CONNECT(KeepAliveTimeSeconds);
 				}
 				else
@@ -521,47 +522,54 @@ namespace Waher.Networking.MQTT
 		{
 			DateTime Now = DateTime.Now;
 
-			if (Now >= this.nextPing)
+			try
 			{
-				this.PING();
-				this.nextPing = Now.AddMilliseconds(this.keepAliveSeconds * 500);
-			}
-
-			LinkedList<KeyValuePair<DateTime, OutputRecord>> Resend = null;
-
-			lock (this.outputQueue)
-			{
-				foreach (KeyValuePair<DateTime, OutputRecord> P in this.packetByTimeout)
+				if (Now >= this.nextPing)
 				{
-					if (Now < P.Key)
-						break;
+					this.PING();
+					this.nextPing = Now.AddMilliseconds(this.keepAliveSeconds * 500);
+				}
 
-					if (Resend == null)
-						Resend = new LinkedList<KeyValuePair<DateTime, OutputRecord>>();
+				LinkedList<KeyValuePair<DateTime, OutputRecord>> Resend = null;
 
-					Resend.AddLast(P);
+				lock (this.outputQueue)
+				{
+					foreach (KeyValuePair<DateTime, OutputRecord> P in this.packetByTimeout)
+					{
+						if (Now < P.Key)
+							break;
+
+						if (Resend == null)
+							Resend = new LinkedList<KeyValuePair<DateTime, OutputRecord>>();
+
+						Resend.AddLast(P);
+					}
+
+					if (Resend != null)
+					{
+						foreach (KeyValuePair<DateTime, OutputRecord> P in Resend)
+						{
+							this.packetByTimeout.Remove(P.Key);
+							this.timeoutByPacketIdentifier.Remove(P.Value.PacketIdentifier);
+						}
+					}
 				}
 
 				if (Resend != null)
 				{
 					foreach (KeyValuePair<DateTime, OutputRecord> P in Resend)
-					{
-						this.packetByTimeout.Remove(P.Key);
-						this.timeoutByPacketIdentifier.Remove(P.Value.PacketIdentifier);
-					}
+						this.BeginWrite(P.Value.Packet, P.Value.PacketIdentifier, P.Value.Callback);
 				}
 			}
-
-			if (Resend != null)
+			catch (Exception ex)
 			{
-				foreach (KeyValuePair<DateTime, OutputRecord> P in Resend)
-					this.BeginWrite(P.Value.Packet, P.Value.PacketIdentifier, P.Value.Callback);
+				Log.Critical(ex);
 			}
 		}
 
-		private LinkedList<OutputRecord> outputQueue = new LinkedList<OutputRecord>();
-		private SortedDictionary<DateTime, OutputRecord> packetByTimeout = new SortedDictionary<DateTime, OutputRecord>();
-		private SortedDictionary<int, DateTime> timeoutByPacketIdentifier = new SortedDictionary<int, DateTime>();
+		private readonly LinkedList<OutputRecord> outputQueue = new LinkedList<OutputRecord>();
+		private readonly SortedDictionary<DateTime, OutputRecord> packetByTimeout = new SortedDictionary<DateTime, OutputRecord>();
+		private readonly SortedDictionary<int, DateTime> timeoutByPacketIdentifier = new SortedDictionary<int, DateTime>();
 		private Random rnd = new Random();
 		private bool isWriting = false;
 

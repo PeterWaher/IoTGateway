@@ -59,17 +59,17 @@ namespace Waher.Networking.XMPP
 		private const int KeepAliveTimeSeconds = 30;
 		private const int MaxFragmentSize = 1000000;
 
-		private LinkedList<KeyValuePair<string, EventHandler>> outputQueue = new LinkedList<KeyValuePair<string, EventHandler>>();
-		private Dictionary<uint, PendingRequest> pendingRequestsBySeqNr = new Dictionary<uint, PendingRequest>();
-		private SortedDictionary<DateTime, PendingRequest> pendingRequestsByTimeout = new SortedDictionary<DateTime, PendingRequest>();
-		private Dictionary<string, IqEventHandler> iqGetHandlers = new Dictionary<string, IqEventHandler>();
-		private Dictionary<string, IqEventHandler> iqSetHandlers = new Dictionary<string, IqEventHandler>();
-		private Dictionary<string, MessageEventHandler> messageHandlers = new Dictionary<string, MessageEventHandler>();
-		private Dictionary<string, MessageEventArgs> receivedMessages = new Dictionary<string, MessageEventArgs>();
-		private Dictionary<string, bool> clientFeatures = new Dictionary<string, bool>();
-		private Dictionary<string, int> pendingAssuredMessagesPerSource = new Dictionary<string, int>();
+		private readonly LinkedList<KeyValuePair<string, EventHandler>> outputQueue = new LinkedList<KeyValuePair<string, EventHandler>>();
+		private readonly Dictionary<uint, PendingRequest> pendingRequestsBySeqNr = new Dictionary<uint, PendingRequest>();
+		private readonly SortedDictionary<DateTime, PendingRequest> pendingRequestsByTimeout = new SortedDictionary<DateTime, PendingRequest>();
+		private readonly Dictionary<string, IqEventHandler> iqGetHandlers = new Dictionary<string, IqEventHandler>();
+		private readonly Dictionary<string, IqEventHandler> iqSetHandlers = new Dictionary<string, IqEventHandler>();
+		private readonly Dictionary<string, MessageEventHandler> messageHandlers = new Dictionary<string, MessageEventHandler>();
+		private readonly Dictionary<string, MessageEventArgs> receivedMessages = new Dictionary<string, MessageEventArgs>();
+		private readonly Dictionary<string, bool> clientFeatures = new Dictionary<string, bool>();
+		private readonly Dictionary<string, int> pendingAssuredMessagesPerSource = new Dictionary<string, int>();
 		private Cache<string, uint> pendingPresenceRequests;
-		private object rosterSyncObject = new object();
+		private readonly object rosterSyncObject = new object();
 #if WINDOWS_UWP
 		private StreamSocket client = null;
 		private DataWriter dataWriter = null;
@@ -79,28 +79,28 @@ namespace Waher.Networking.XMPP
 #else
 		private TcpClient client = null;
 		private Stream stream = null;
-		private byte[] buffer = new byte[BufferSize];
+		private readonly byte[] buffer = new byte[BufferSize];
 #endif
 		private Timer secondTimer = null;
 		private DateTime nextPing = DateTime.MinValue;
-		private UTF8Encoding encoding = new UTF8Encoding(false, false);
-		private StringBuilder fragment = new StringBuilder();
+		private readonly UTF8Encoding encoding = new UTF8Encoding(false, false);
+		private readonly StringBuilder fragment = new StringBuilder();
 		private int fragmentLength = 0;
 		private XmppState state;
-		private Random gen = new Random();
+		private readonly Random gen = new Random();
 		private DateTime writeStarted = DateTime.MinValue;
-		private object synchObject = new object();
-		private string identityCategory;
-		private string identityType;
-		private string identityName;
+		private readonly object synchObject = new object();
+		private readonly string identityCategory;
+		private readonly string identityType;
+		private readonly string identityName;
 		private string host;
-		private string componentSubDomain;
-		private string sharedSecret;
+		private readonly string componentSubDomain;
+		private readonly string sharedSecret;
 		private string streamId;
 		private string streamHeader;
 		private string streamFooter;
 		private uint seqnr = 0;
-		private int port;
+		private readonly int port;
 		private int keepAliveSeconds = 30;
 		private int inputState = 0;
 		private int inputDepth = 0;
@@ -2643,114 +2643,121 @@ namespace Waher.Networking.XMPP
 
 		private void SecondTimerCallback(object State)
 		{
-			if (DateTime.Now >= this.nextPing)
+			try
 			{
-				this.nextPing = DateTime.Now.AddMilliseconds(this.keepAliveSeconds * 500);
-				try
+				if (DateTime.Now >= this.nextPing)
 				{
-					if (this.supportsPing)
-					{
-						if (this.pingResponse)
-						{
-							this.pingResponse = false;
-							this.SendPing(this.componentSubDomain, string.Empty, this.PingResult, null);
-						}
-						else
-						{
-							try
-							{
-								this.Warning("Reconnecting.");
-								this.Reconnect();
-							}
-							catch (Exception ex)
-							{
-								Log.Critical(ex);
-							}
-						}
-					}
-					else
-						this.BeginWrite(" ", null);
-				}
-				catch (Exception ex)
-				{
-					this.Exception(ex);
-					this.Reconnect();
-				}
-			}
-
-			List<PendingRequest> Retries = null;
-			DateTime Now = DateTime.Now;
-			DateTime TP;
-			bool Retry;
-
-			lock (this.synchObject)
-			{
-				foreach (KeyValuePair<DateTime, PendingRequest> P in this.pendingRequestsByTimeout)
-				{
-					if (P.Key <= Now)
-					{
-						if (Retries == null)
-							Retries = new List<PendingRequest>();
-
-						Retries.Add(P.Value);
-					}
-					else
-						break;
-				}
-			}
-
-			if (Retries != null)
-			{
-				foreach (PendingRequest Request in Retries)
-				{
-					lock (this.synchObject)
-					{
-						this.pendingRequestsByTimeout.Remove(Request.Timeout);
-
-						if (Retry = Request.CanRetry())
-						{
-							TP = Request.Timeout;
-
-							while (this.pendingRequestsByTimeout.ContainsKey(TP))
-								TP = TP.AddTicks(this.gen.Next(1, 10));
-
-							Request.Timeout = TP;
-
-							this.pendingRequestsByTimeout[Request.Timeout] = Request;
-						}
-						else
-							this.pendingRequestsBySeqNr.Remove(Request.SeqNr);
-					}
-
+					this.nextPing = DateTime.Now.AddMilliseconds(this.keepAliveSeconds * 500);
 					try
 					{
-						if (Retry)
-							this.BeginWrite(Request.Xml, null);
-						else
+						if (this.supportsPing)
 						{
-							StringBuilder Xml = new StringBuilder();
-
-							Xml.Append("<iq xmlns='jabber:component:accept' type='error' from='");
-							Xml.Append(Request.To);
-							Xml.Append("' id='");
-							Xml.Append(Request.SeqNr.ToString());
-							Xml.Append("'><error type='wait'><recipient-unavailable xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>");
-							Xml.Append("<text xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'>Timeout.</text></error></iq>");
-
-							XmlDocument Doc = new XmlDocument();
-							Doc.LoadXml(Xml.ToString());
-
-							IqResultEventArgs e = new IqResultEventArgs(Doc.DocumentElement, Request.SeqNr.ToString(), string.Empty, Request.To, false,
-								Request.State);
-
-							Request.IqCallback?.Invoke(this, e);
+							if (this.pingResponse)
+							{
+								this.pingResponse = false;
+								this.SendPing(this.componentSubDomain, string.Empty, this.PingResult, null);
+							}
+							else
+							{
+								try
+								{
+									this.Warning("Reconnecting.");
+									this.Reconnect();
+								}
+								catch (Exception ex)
+								{
+									Log.Critical(ex);
+								}
+							}
 						}
+						else
+							this.BeginWrite(" ", null);
 					}
 					catch (Exception ex)
 					{
 						this.Exception(ex);
+						this.Reconnect();
 					}
 				}
+
+				List<PendingRequest> Retries = null;
+				DateTime Now = DateTime.Now;
+				DateTime TP;
+				bool Retry;
+
+				lock (this.synchObject)
+				{
+					foreach (KeyValuePair<DateTime, PendingRequest> P in this.pendingRequestsByTimeout)
+					{
+						if (P.Key <= Now)
+						{
+							if (Retries == null)
+								Retries = new List<PendingRequest>();
+
+							Retries.Add(P.Value);
+						}
+						else
+							break;
+					}
+				}
+
+				if (Retries != null)
+				{
+					foreach (PendingRequest Request in Retries)
+					{
+						lock (this.synchObject)
+						{
+							this.pendingRequestsByTimeout.Remove(Request.Timeout);
+
+							if (Retry = Request.CanRetry())
+							{
+								TP = Request.Timeout;
+
+								while (this.pendingRequestsByTimeout.ContainsKey(TP))
+									TP = TP.AddTicks(this.gen.Next(1, 10));
+
+								Request.Timeout = TP;
+
+								this.pendingRequestsByTimeout[Request.Timeout] = Request;
+							}
+							else
+								this.pendingRequestsBySeqNr.Remove(Request.SeqNr);
+						}
+
+						try
+						{
+							if (Retry)
+								this.BeginWrite(Request.Xml, null);
+							else
+							{
+								StringBuilder Xml = new StringBuilder();
+
+								Xml.Append("<iq xmlns='jabber:component:accept' type='error' from='");
+								Xml.Append(Request.To);
+								Xml.Append("' id='");
+								Xml.Append(Request.SeqNr.ToString());
+								Xml.Append("'><error type='wait'><recipient-unavailable xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>");
+								Xml.Append("<text xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'>Timeout.</text></error></iq>");
+
+								XmlDocument Doc = new XmlDocument();
+								Doc.LoadXml(Xml.ToString());
+
+								IqResultEventArgs e = new IqResultEventArgs(Doc.DocumentElement, Request.SeqNr.ToString(), string.Empty, Request.To, false,
+									Request.State);
+
+								Request.IqCallback?.Invoke(this, e);
+							}
+						}
+						catch (Exception ex)
+						{
+							this.Exception(ex);
+						}
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
 			}
 		}
 

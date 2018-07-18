@@ -1229,11 +1229,12 @@ namespace Waher.IoTGateway
 
 		private static void CheckConnection(object State)
 		{
-			if (xmppClient.State == XmppState.Offline || xmppClient.State == XmppState.Error || xmppClient.State == XmppState.Authenticating)
+			XmppState? State2 = xmppClient?.State;
+			if (State2.HasValue && (State2 == XmppState.Offline || State2 == XmppState.Error || State2 == XmppState.Authenticating))
 			{
 				try
 				{
-					xmppClient.Reconnect();
+					xmppClient?.Reconnect();
 				}
 				catch (Exception ex)
 				{

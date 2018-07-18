@@ -14,10 +14,10 @@ namespace Waher.Networking.PeerToPeer
 	{
 		private const int BufferSize = 65536;
 
-		private byte[] incomingBuffer = new byte[BufferSize];
+		private readonly byte[] incomingBuffer = new byte[BufferSize];
 		private byte[] packetBuffer = null;
-		private LinkedList<QueuedItem> outgoingPackets = new LinkedList<QueuedItem>();
-		private PeerToPeerNetwork network;
+		private readonly LinkedList<QueuedItem> outgoingPackets = new LinkedList<QueuedItem>();
+		private readonly PeerToPeerNetwork network;
 		private IPEndPoint remoteEndpoint;
 		private TcpClient tcpConnection;
 		private NetworkStream stream;
@@ -31,7 +31,7 @@ namespace Waher.Networking.PeerToPeer
 		private bool writing = false;
 		private bool closed = false;
 		private bool disposed = false;
-		private bool encapsulatePackets;
+		private readonly bool encapsulatePackets;
 
 		internal PeerConnection(TcpClient TcpConnection, PeerToPeerNetwork Network, IPEndPoint RemoteEndpoint,
 			bool EncapsulatePackets)
@@ -117,7 +117,7 @@ namespace Waher.Networking.PeerToPeer
 
 			if (this.tcpConnection != null)
 			{
-				this.stream.Dispose();
+				this.stream?.Dispose();
 				this.stream = null;
 
 				this.tcpConnection.Dispose();
@@ -328,7 +328,7 @@ namespace Waher.Networking.PeerToPeer
 		}
 
 		private int nrHistoricPackets = 0;
-		private LinkedList<byte[]> historicPackets = new LinkedList<byte[]>();
+		private readonly LinkedList<byte[]> historicPackets = new LinkedList<byte[]>();
 
 		/// <summary>
 		/// Event raised when a packet has been sent.
@@ -486,7 +486,7 @@ namespace Waher.Networking.PeerToPeer
 				}
 				catch (Exception ex)
 				{
-					Events.Log.Critical(ex);
+					Log.Critical(ex);
 				}
 			}
 		}
@@ -624,7 +624,7 @@ namespace Waher.Networking.PeerToPeer
 		}
 
 		private ushort lastReceivedPacket = 0;
-		private object udpReceiveLock = new object();
+		private readonly object udpReceiveLock = new object();
 
 		internal void StartIdleTimer()
 		{
@@ -641,8 +641,15 @@ namespace Waher.Networking.PeerToPeer
 				}
 				catch (Exception)
 				{
-					this.Closed();
-					this.Dispose();
+					try
+					{
+						this.Closed();
+						this.Dispose();
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
 				}
 			}
 		}

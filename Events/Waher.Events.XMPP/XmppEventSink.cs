@@ -55,11 +55,12 @@ namespace Waher.Events.XMPP
 
 		private void CheckConnection(object State)
 		{
-			if (this.client.State == XmppState.Offline || this.client.State == XmppState.Error || this.client.State == XmppState.Authenticating)
+			XmppState? State2 = this.client?.State;
+			if (State2.HasValue && (State2 == XmppState.Offline || State2 == XmppState.Error || State2 == XmppState.Authenticating))
 			{
 				try
 				{
-					this.client.Reconnect();
+					this.client?.Reconnect();
 				}
 				catch (Exception ex)
 				{

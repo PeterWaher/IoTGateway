@@ -6103,133 +6103,140 @@ namespace Waher.Networking.XMPP
 			if (!this.checkConnection)
 				return;
 
-			if (DateTime.Now >= this.nextPing)
+			try
 			{
-				if (this.state == XmppState.Connected)
+				if (DateTime.Now >= this.nextPing)
 				{
-					this.nextPing = DateTime.Now.AddMilliseconds(this.keepAliveSeconds * 500);
+					if (this.state == XmppState.Connected)
+					{
+						this.nextPing = DateTime.Now.AddMilliseconds(this.keepAliveSeconds * 500);
 
-					if (this.sendHeartbeats)
+						if (this.sendHeartbeats)
+						{
+							try
+							{
+								if (this.supportsPing)
+								{
+									if (this.pingResponse)
+									{
+										this.pingResponse = false;
+										this.SendPing(string.Empty, this.PingResult, null);
+									}
+									else
+									{
+										try
+										{
+											this.Warning("Reconnecting.");
+											this.Reconnect();
+										}
+										catch (Exception ex)
+										{
+											Log.Critical(ex);
+										}
+									}
+								}
+								else
+									this.BeginWrite(" ", null);
+							}
+							catch (Exception ex)
+							{
+								this.Exception(ex);
+								this.Reconnect();
+							}
+						}
+					}
+					else
 					{
 						try
 						{
-							if (this.supportsPing)
+							this.Warning("Reconnecting.");
+							this.Reconnect();
+						}
+						catch (Exception ex)
+						{
+							Log.Critical(ex);
+						}
+					}
+				}
+
+				List<PendingRequest> Retries = null;
+				DateTime Now = DateTime.Now;
+				DateTime TP;
+				bool Retry;
+
+				lock (this.synchObject)
+				{
+					foreach (KeyValuePair<DateTime, PendingRequest> P in this.pendingRequestsByTimeout)
+					{
+						if (P.Key <= Now)
+						{
+							if (Retries == null)
+								Retries = new List<PendingRequest>();
+
+							Retries.Add(P.Value);
+						}
+						else
+							break;
+					}
+				}
+
+				if (Retries != null)
+				{
+					foreach (PendingRequest Request in Retries)
+					{
+						lock (this.synchObject)
+						{
+							this.pendingRequestsByTimeout.Remove(Request.Timeout);
+
+							if (Retry = Request.CanRetry())
 							{
-								if (this.pingResponse)
-								{
-									this.pingResponse = false;
-									this.SendPing(string.Empty, this.PingResult, null);
-								}
-								else
-								{
-									try
-									{
-										this.Warning("Reconnecting.");
-										this.Reconnect();
-									}
-									catch (Exception ex)
-									{
-										Log.Critical(ex);
-									}
-								}
+								TP = Request.Timeout;
+
+								while (this.pendingRequestsByTimeout.ContainsKey(TP))
+									TP = TP.AddTicks(this.gen.Next(1, 10));
+
+								Request.Timeout = TP;
+
+								this.pendingRequestsByTimeout[Request.Timeout] = Request;
 							}
 							else
-								this.BeginWrite(" ", null);
+								this.pendingRequestsBySeqNr.Remove(Request.SeqNr);
+						}
+
+						try
+						{
+							if (Retry)
+								this.BeginWrite(Request.Xml, null);
+							else
+							{
+								StringBuilder Xml = new StringBuilder();
+
+								Xml.Append("<iq xmlns='" + NamespaceClient + "' type='error' from='");
+								Xml.Append(Request.To);
+								Xml.Append("' id='");
+								Xml.Append(Request.SeqNr.ToString());
+								Xml.Append("'><error type='wait'><recipient-unavailable xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>");
+								Xml.Append("<text xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'>Timeout.</text></error></iq>");
+
+								XmlDocument Doc = new XmlDocument();
+								Doc.LoadXml(Xml.ToString());
+
+								IqResultEventArgs e = new IqResultEventArgs(Doc.DocumentElement, Request.SeqNr.ToString(), string.Empty, Request.To, false,
+									Request.State);
+
+								Request.IqCallback?.Invoke(this, e);
+							}
 						}
 						catch (Exception ex)
 						{
 							this.Exception(ex);
-							this.Reconnect();
 						}
-					}
-				}
-				else
-				{
-					try
-					{
-						this.Warning("Reconnecting.");
-						this.Reconnect();
-					}
-					catch (Exception ex)
-					{
-						Log.Critical(ex);
 					}
 				}
 			}
-
-			List<PendingRequest> Retries = null;
-			DateTime Now = DateTime.Now;
-			DateTime TP;
-			bool Retry;
-
-			lock (this.synchObject)
+			catch (Exception ex)
 			{
-				foreach (KeyValuePair<DateTime, PendingRequest> P in this.pendingRequestsByTimeout)
-				{
-					if (P.Key <= Now)
-					{
-						if (Retries == null)
-							Retries = new List<PendingRequest>();
-
-						Retries.Add(P.Value);
-					}
-					else
-						break;
-				}
-			}
-
-			if (Retries != null)
-			{
-				foreach (PendingRequest Request in Retries)
-				{
-					lock (this.synchObject)
-					{
-						this.pendingRequestsByTimeout.Remove(Request.Timeout);
-
-						if (Retry = Request.CanRetry())
-						{
-							TP = Request.Timeout;
-
-							while (this.pendingRequestsByTimeout.ContainsKey(TP))
-								TP = TP.AddTicks(this.gen.Next(1, 10));
-
-							Request.Timeout = TP;
-
-							this.pendingRequestsByTimeout[Request.Timeout] = Request;
-						}
-						else
-							this.pendingRequestsBySeqNr.Remove(Request.SeqNr);
-					}
-
-					try
-					{
-						if (Retry)
-							this.BeginWrite(Request.Xml, null);
-						else
-						{
-							StringBuilder Xml = new StringBuilder();
-
-							Xml.Append("<iq xmlns='" + NamespaceClient + "' type='error' from='");
-							Xml.Append(Request.To);
-							Xml.Append("' id='");
-							Xml.Append(Request.SeqNr.ToString());
-							Xml.Append("'><error type='wait'><recipient-unavailable xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>");
-							Xml.Append("<text xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'>Timeout.</text></error></iq>");
-
-							XmlDocument Doc = new XmlDocument();
-							Doc.LoadXml(Xml.ToString());
-
-							IqResultEventArgs e = new IqResultEventArgs(Doc.DocumentElement, Request.SeqNr.ToString(), string.Empty, Request.To, false,
-								Request.State);
-
-							Request.IqCallback?.Invoke(this, e);
-						}
-					}
-					catch (Exception ex)
-					{
-						this.Exception(ex);
-					}
-				}
+				Log.Critical(ex);
 			}
 		}
 

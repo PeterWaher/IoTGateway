@@ -10,9 +10,9 @@ namespace Waher.Runtime.Timing
 	/// </summary>
 	internal class ScheduledEvent
 	{
-		private DateTime when;
-		private ScheduledEventCallback eventMethod;
-		private object state;
+		private readonly DateTime when;
+		private readonly ScheduledEventCallback eventMethod;
+		private readonly object state;
 
 		/// <summary>
 		/// Contains information about a scheduled event.

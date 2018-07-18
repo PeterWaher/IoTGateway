@@ -21,8 +21,8 @@ namespace Waher.Runtime.Timing
 	{
 		private static readonly TimeSpan OnlyOnce = new TimeSpan(0, 0, 0, 0, -1);
 
-		private SortedDictionary<DateTime, ScheduledEvent> events = new SortedDictionary<DateTime, ScheduledEvent>();
-		private Random gen = new Random();
+		private readonly SortedDictionary<DateTime, ScheduledEvent> events = new SortedDictionary<DateTime, ScheduledEvent>();
+		private readonly Random gen = new Random();
 		private Timer timer = null;
 		private bool disposed = false;
 
@@ -114,9 +114,16 @@ namespace Waher.Runtime.Timing
 
 		private void TimerElapsed(object P)
 		{
-			lock (this.events)
+			try
 			{
-				this.RecalcTimerLocked();
+				lock (this.events)
+				{
+					this.RecalcTimerLocked();
+				}
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
 			}
 		}
 

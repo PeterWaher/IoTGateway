@@ -2426,7 +2426,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Networking/1.0.8": {
+      "Waher.Networking/1.0.9": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -4942,7 +4942,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Networking/1.0.8": {
+      "Waher.Networking/1.0.9": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -7494,7 +7494,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Networking/1.0.8": {
+      "Waher.Networking/1.0.9": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -10019,7 +10019,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Networking/1.0.8": {
+      "Waher.Networking/1.0.9": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -12580,7 +12580,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Networking/1.0.8": {
+      "Waher.Networking/1.0.9": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -15105,7 +15105,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Networking/1.0.8": {
+      "Waher.Networking/1.0.9": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -17666,7 +17666,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Networking/1.0.8": {
+      "Waher.Networking/1.0.9": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -27492,7 +27492,7 @@
       "path": "../Waher.Events/Waher.Events.csproj",
       "msbuildProject": "../Waher.Events/Waher.Events.csproj"
     },
-    "Waher.Networking/1.0.8": {
+    "Waher.Networking/1.0.9": {
       "type": "project",
       "path": "../../Networking/Waher.Networking/Waher.Networking.csproj",
       "msbuildProject": "../../Networking/Waher.Networking/Waher.Networking.csproj"

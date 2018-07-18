@@ -23,7 +23,7 @@
       <dependency id="Waher.Networking.XMPP.UWP" version="1.0.28"/>
       <dependency id="Waher.Networking.XMPP.Concentrator.UWP" version="0.1.26"/>
       <dependency id="Waher.Networking.XMPP.Control.UWP" version="1.0.17"/>
-      <dependency id="Waher.Networking.XMPP.Sensor.UWP" version="1.0.21"/>
+      <dependency id="Waher.Networking.XMPP.Sensor.UWP" version="1.0.23"/>
       <dependency id="Waher.Runtime.Cache" version="1.0.2"/>
       <dependency id="Waher.Script" version="1.0.14"/>
       <dependency id="Waher.Script.Graphs" version="1.0.9"/>

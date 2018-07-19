@@ -13,7 +13,7 @@ namespace Waher.Script.Operators.Membership
 	/// </summary>
 	public class NamedMember : UnaryOperator
 	{
-		private string name;
+		private readonly string name;
 
 		/// <summary>
 		/// Named member operator
@@ -110,7 +110,7 @@ namespace Waher.Script.Operators.Membership
 		private PropertyInfo property = null;
 		private FieldInfo field = null;
 		private string[] nameIndex = null;
-		private object synchObject = new object();
+		private readonly object synchObject = new object();
 
 		internal static readonly Type[] stringType = new Type[] { typeof(string) };
 

@@ -135,6 +135,7 @@ namespace Waher.IoTGateway
 		private static RandomNumberGenerator rnd = null;
 		private static Semaphore gatewayRunning = null;
 		private static Emoji1LocalFiles emoji1_24x24 = null;
+		private static StreamWriter exceptionFile = null;
 		private static string domain = null;
 		private static string ownerJid = null;
 		private static string appDataFolder;
@@ -142,6 +143,8 @@ namespace Waher.IoTGateway
 		private static string rootFolder;
 		private static string defaultPage;
 		private static string applicationName;
+		private static string exceptionFolder = null;
+		private static string exceptionFileName = null;
 		private static int nextServiceCommandNr = 128;
 		private static int beforeUninstallCommandNr = 0;
 		private static bool registered = false;
@@ -150,6 +153,7 @@ namespace Waher.IoTGateway
 		private static bool consoleOutput;
 		private static bool loopbackIntefaceAvailable;
 		private static bool configuring = false;
+		private static bool exportExceptions = false;
 
 		#region Life Cycle
 
@@ -256,6 +260,58 @@ namespace Waher.IoTGateway
 
 				applicationName = Config.DocumentElement["ApplicationName"].InnerText;
 				defaultPage = Config.DocumentElement["DefaultPage"].InnerText;
+
+				XmlElement ExportExceptions = Config.DocumentElement["ExportExceptions"];
+				if (ExportExceptions != null)
+				{
+					exceptionFolder = Path.Combine(appDataFolder, XML.Attribute(ExportExceptions, "folder", "Exceptions"));
+
+					if (!Directory.Exists(exceptionFolder))
+						Directory.CreateDirectory(exceptionFolder);
+
+					DateTime Now = DateTime.Now;
+
+					exceptionFileName = Path.Combine(exceptionFolder, Now.Year.ToString("D4") + "-" + Now.Month.ToString("D2") + "-" + Now.Day.ToString("D2") +
+						" " + Now.Hour.ToString("D2") + "." + Now.Minute.ToString("D2") + "." + Now.Second.ToString("D2") + ".txt");
+					exceptionFile = File.CreateText(exceptionFileName);
+					exportExceptions = true;
+
+					AppDomain.CurrentDomain.FirstChanceException += (sender, e) =>
+					{
+						if (!exportExceptions || e.Exception.StackTrace.Contains("FirstChanceExceptionEventArgs"))
+							return;
+
+						lock (exceptionFile)
+						{
+							exceptionFile.WriteLine(new string('-', 80));
+							exceptionFile.Write("Type: ");
+
+							if (e.Exception != null)
+								exceptionFile.WriteLine(e.Exception.GetType().FullName);
+							else
+								exceptionFile.WriteLine("null");
+
+							exceptionFile.Write("Time: ");
+							exceptionFile.WriteLine(DateTime.Now.ToString());
+
+							exceptionFile.WriteLine();
+
+							Exception ex = e.Exception;
+
+							while (ex != null)
+							{
+								exceptionFile.WriteLine(ex.Message);
+								exceptionFile.WriteLine();
+								exceptionFile.WriteLine(ex.StackTrace);
+								exceptionFile.WriteLine();
+
+								ex = ex.InnerException;
+							}
+
+							exceptionFile.Flush();
+						}
+					};
+				}
 
 				XmlElement DatabaseConfig = Config.DocumentElement["Database"];
 				IDatabaseProvider DatabaseProvider;
@@ -1110,6 +1166,16 @@ namespace Waher.IoTGateway
 			clientEvents = null;
 			login = null;
 			logout = null;
+
+			if (exportExceptions)
+			{
+				exportExceptions = false;
+
+				lock (exceptionFile)
+				{
+					exceptionFile.Close();
+				}
+			}
 		}
 
 		/// <summary>

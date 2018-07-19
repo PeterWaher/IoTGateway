@@ -121,6 +121,9 @@ namespace Waher.Persistence.Files.Serialization
 				case ObjectSerializer.TYPE_DATETIME:
 					return Reader.ReadDateTime();
 
+				case ObjectSerializer.TYPE_DATETIMEOFFSET:
+					return Reader.ReadDateTimeOffset();
+
 				case ObjectSerializer.TYPE_TIMESPAN:
 					return Reader.ReadTimeSpan();
 
@@ -228,6 +231,10 @@ namespace Waher.Persistence.Files.Serialization
 						Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadDateTime()));
 						break;
 
+					case ObjectSerializer.TYPE_DATETIMEOFFSET:
+						Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadDateTimeOffset()));
+						break;
+
 					case ObjectSerializer.TYPE_TIMESPAN:
 						Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadTimeSpan()));
 						break;
@@ -289,6 +296,7 @@ namespace Waher.Persistence.Files.Serialization
 				case ObjectSerializer.TYPE_DOUBLE: return this.ReadArray<double>(Reader, NrElements, ElementDataType);
 				case ObjectSerializer.TYPE_SINGLE: return this.ReadArray<float>(Reader, NrElements, ElementDataType);
 				case ObjectSerializer.TYPE_DATETIME: return this.ReadArray<DateTime>(Reader, NrElements, ElementDataType);
+				case ObjectSerializer.TYPE_DATETIMEOFFSET: return this.ReadArray<DateTimeOffset>(Reader, NrElements, ElementDataType);
 				case ObjectSerializer.TYPE_TIMESPAN: return this.ReadArray<TimeSpan>(Reader, NrElements, ElementDataType);
 				case ObjectSerializer.TYPE_CHAR: return this.ReadArray<char>(Reader, NrElements, ElementDataType);
 				case ObjectSerializer.TYPE_STRING:
@@ -400,6 +408,10 @@ namespace Waher.Persistence.Files.Serialization
 
 					case ObjectSerializer.TYPE_DATETIME:
 						Elements.Add(Reader.ReadDateTime());
+						break;
+
+					case ObjectSerializer.TYPE_DATETIMEOFFSET:
+						Elements.Add(Reader.ReadDateTimeOffset());
 						break;
 
 					case ObjectSerializer.TYPE_TIMESPAN:

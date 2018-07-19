@@ -85,6 +85,8 @@ namespace Waher.Persistence.Files.Searching
 				return Value.ToString().Replace(System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator, ".");
 			else if (TypeCode == ObjectSerializer.TYPE_DATETIME)
 				return ((DateTime)Value).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss") + "z";
+			else if (TypeCode == ObjectSerializer.TYPE_DATETIMEOFFSET)
+				return ((DateTimeOffset)Value).ToUniversalTime().DateTime.ToString("yyyy-MM-ddTHH:mm:ss") + "z";
 			else if (TypeCode == ObjectSerializer.TYPE_BYTEARRAY)
 				return Convert.ToBase64String((byte[])Value);
 			else
@@ -153,6 +155,10 @@ namespace Waher.Persistence.Files.Searching
 
 				case ObjectSerializer.TYPE_DATETIME:
 					Value = ((DateTime)Value).ToUniversalTime();
+					break;
+
+				case ObjectSerializer.TYPE_DATETIMEOFFSET:
+					Value = ((DateTimeOffset)Value).ToUniversalTime().DateTime;
 					break;
 
 				case ObjectSerializer.TYPE_TIMESPAN:
@@ -365,6 +371,16 @@ namespace Waher.Persistence.Files.Searching
 					else
 					{
 						Value = new DateTime(DT.Ticks + 1, DT.Kind);
+						return true;
+					}
+
+				case ObjectSerializer.TYPE_DATETIMEOFFSET:
+					DateTimeOffset DTO = (DateTimeOffset)Value;
+					if (DTO.Ticks == long.MaxValue)
+						return false;
+					else
+					{
+						Value = new DateTimeOffset(DTO.Ticks + 1, DTO.Offset);
 						return true;
 					}
 
@@ -751,6 +767,16 @@ namespace Waher.Persistence.Files.Searching
 					else
 					{
 						Value = new DateTime(DT.Ticks - 1, DT.Kind);
+						return true;
+					}
+
+				case ObjectSerializer.TYPE_DATETIMEOFFSET:
+					DateTimeOffset DTO = (DateTimeOffset)Value;
+					if (DTO.Ticks == long.MinValue)
+						return false;
+					else
+					{
+						Value = new DateTimeOffset(DTO.Ticks - 1, DTO.Offset);
 						return true;
 					}
 

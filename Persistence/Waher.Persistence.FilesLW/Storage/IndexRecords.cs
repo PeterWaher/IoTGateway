@@ -231,6 +231,10 @@ namespace Waher.Persistence.Files.Storage
 					Writer.Write((DateTime)Value);
 					break;
 
+				case ObjectSerializer.TYPE_DATETIMEOFFSET:
+					Writer.Write((DateTimeOffset)Value);
+					break;
+
 				case ObjectSerializer.TYPE_TIMESPAN:
 					Writer.Write((TimeSpan)Value);
 					break;
@@ -426,6 +430,7 @@ namespace Waher.Persistence.Files.Storage
 									return Ascending ? -1 : 1;
 
 								case ObjectSerializer.TYPE_DATETIME:
+								case ObjectSerializer.TYPE_DATETIMEOFFSET:
 								case ObjectSerializer.TYPE_TIMESPAN:
 								case ObjectSerializer.TYPE_GUID:
 								case ObjectSerializer.TYPE_BYTEARRAY:
@@ -532,6 +537,7 @@ namespace Waher.Persistence.Files.Storage
 									return Ascending ? -1 : 1;
 
 								case ObjectSerializer.TYPE_DATETIME:
+								case ObjectSerializer.TYPE_DATETIMEOFFSET:
 								case ObjectSerializer.TYPE_TIMESPAN:
 								case ObjectSerializer.TYPE_GUID:
 								case ObjectSerializer.TYPE_BYTEARRAY:
@@ -642,6 +648,7 @@ namespace Waher.Persistence.Files.Storage
 									return Ascending ? -1 : 1;
 
 								case ObjectSerializer.TYPE_DATETIME:
+								case ObjectSerializer.TYPE_DATETIMEOFFSET:
 								case ObjectSerializer.TYPE_TIMESPAN:
 								case ObjectSerializer.TYPE_GUID:
 								case ObjectSerializer.TYPE_BYTEARRAY:
@@ -752,6 +759,7 @@ namespace Waher.Persistence.Files.Storage
 									return Ascending ? -1 : 1;
 
 								case ObjectSerializer.TYPE_DATETIME:
+								case ObjectSerializer.TYPE_DATETIMEOFFSET:
 								case ObjectSerializer.TYPE_TIMESPAN:
 								case ObjectSerializer.TYPE_GUID:
 								case ObjectSerializer.TYPE_BYTEARRAY:
@@ -862,6 +870,7 @@ namespace Waher.Persistence.Files.Storage
 									return Ascending ? -1 : 1;
 
 								case ObjectSerializer.TYPE_DATETIME:
+								case ObjectSerializer.TYPE_DATETIMEOFFSET:
 								case ObjectSerializer.TYPE_TIMESPAN:
 								case ObjectSerializer.TYPE_GUID:
 								case ObjectSerializer.TYPE_BYTEARRAY:
@@ -972,6 +981,7 @@ namespace Waher.Persistence.Files.Storage
 									return Ascending ? -1 : 1;
 
 								case ObjectSerializer.TYPE_DATETIME:
+								case ObjectSerializer.TYPE_DATETIMEOFFSET:
 								case ObjectSerializer.TYPE_TIMESPAN:
 								case ObjectSerializer.TYPE_GUID:
 								case ObjectSerializer.TYPE_BYTEARRAY:
@@ -1078,6 +1088,7 @@ namespace Waher.Persistence.Files.Storage
 									return Ascending ? -1 : 1;
 
 								case ObjectSerializer.TYPE_DATETIME:
+								case ObjectSerializer.TYPE_DATETIMEOFFSET:
 								case ObjectSerializer.TYPE_TIMESPAN:
 								case ObjectSerializer.TYPE_GUID:
 								case ObjectSerializer.TYPE_BYTEARRAY:
@@ -1200,6 +1211,7 @@ namespace Waher.Persistence.Files.Storage
 									return Ascending ? -1 : 1;
 
 								case ObjectSerializer.TYPE_DATETIME:
+								case ObjectSerializer.TYPE_DATETIMEOFFSET:
 								case ObjectSerializer.TYPE_TIMESPAN:
 								case ObjectSerializer.TYPE_GUID:
 								case ObjectSerializer.TYPE_BYTEARRAY:
@@ -1322,6 +1334,7 @@ namespace Waher.Persistence.Files.Storage
 									return Ascending ? -1 : 1;
 
 								case ObjectSerializer.TYPE_DATETIME:
+								case ObjectSerializer.TYPE_DATETIMEOFFSET:
 								case ObjectSerializer.TYPE_TIMESPAN:
 								case ObjectSerializer.TYPE_GUID:
 								case ObjectSerializer.TYPE_BYTEARRAY:
@@ -1428,6 +1441,7 @@ namespace Waher.Persistence.Files.Storage
 									return Ascending ? -1 : 1;
 
 								case ObjectSerializer.TYPE_DATETIME:
+								case ObjectSerializer.TYPE_DATETIMEOFFSET:
 								case ObjectSerializer.TYPE_TIMESPAN:
 								case ObjectSerializer.TYPE_GUID:
 								case ObjectSerializer.TYPE_BYTEARRAY:
@@ -1534,6 +1548,7 @@ namespace Waher.Persistence.Files.Storage
 									return Ascending ? -1 : 1;
 
 								case ObjectSerializer.TYPE_DATETIME:
+								case ObjectSerializer.TYPE_DATETIMEOFFSET:
 								case ObjectSerializer.TYPE_TIMESPAN:
 								case ObjectSerializer.TYPE_GUID:
 								case ObjectSerializer.TYPE_BYTEARRAY:
@@ -1640,6 +1655,7 @@ namespace Waher.Persistence.Files.Storage
 									return Ascending ? -1 : 1;
 
 								case ObjectSerializer.TYPE_DATETIME:
+								case ObjectSerializer.TYPE_DATETIMEOFFSET:
 								case ObjectSerializer.TYPE_TIMESPAN:
 								case ObjectSerializer.TYPE_GUID:
 								case ObjectSerializer.TYPE_BYTEARRAY:
@@ -1686,6 +1702,64 @@ namespace Waher.Persistence.Files.Storage
 										return Ascending ? j : -j;
 									break;
 
+								case ObjectSerializer.TYPE_DATETIMEOFFSET:
+									j = xReader.ReadDateTime().ToUniversalTime().CompareTo(yReader.ReadDateTimeOffset().ToUniversalTime().DateTime);
+									if (j != 0)
+										return Ascending ? j : -j;
+									break;
+
+								case ObjectSerializer.TYPE_TIMESPAN:
+								case ObjectSerializer.TYPE_GUID:
+								case ObjectSerializer.TYPE_BYTEARRAY:
+								case ObjectSerializer.TYPE_ARRAY:
+								case ObjectSerializer.TYPE_OBJECT:
+								default:
+									return Ascending ? -1 : 1;
+							}
+							break;
+
+						case ObjectSerializer.TYPE_DATETIMEOFFSET:
+							switch (yType)
+							{
+								case ObjectSerializer.TYPE_BOOLEAN:
+								case ObjectSerializer.TYPE_BYTE:
+								case ObjectSerializer.TYPE_INT16:
+								case ObjectSerializer.TYPE_INT32:
+								case ObjectSerializer.TYPE_INT64:
+								case ObjectSerializer.TYPE_SBYTE:
+								case ObjectSerializer.TYPE_UINT16:
+								case ObjectSerializer.TYPE_UINT32:
+								case ObjectSerializer.TYPE_UINT64:
+								case ObjectSerializer.TYPE_DECIMAL:
+								case ObjectSerializer.TYPE_DOUBLE:
+								case ObjectSerializer.TYPE_SINGLE:
+								case ObjectSerializer.TYPE_CHAR:
+								case ObjectSerializer.TYPE_NULL:
+								case ObjectSerializer.TYPE_MIN:
+									return Ascending ? 1 : -1;
+
+								case ObjectSerializer.TYPE_MAX:
+									return Ascending ? -1 : 1;
+
+								case ObjectSerializer.TYPE_STRING:
+								case ObjectSerializer.TYPE_ENUM:
+									j = xReader.ReadDateTimeOffset().ToString().CompareTo(yReader.ReadString());
+									if (j != 0)
+										return Ascending ? j : -j;
+									break;
+
+								case ObjectSerializer.TYPE_DATETIME:
+									j = xReader.ReadDateTimeOffset().ToUniversalTime().CompareTo((DateTimeOffset)(yReader.ReadDateTime().ToUniversalTime()));
+									if (j != 0)
+										return Ascending ? j : -j;
+									break;
+
+								case ObjectSerializer.TYPE_DATETIMEOFFSET:
+									j = xReader.ReadDateTimeOffset().ToUniversalTime().CompareTo(yReader.ReadDateTimeOffset().ToUniversalTime());
+									if (j != 0)
+										return Ascending ? j : -j;
+									break;
+
 								case ObjectSerializer.TYPE_TIMESPAN:
 								case ObjectSerializer.TYPE_GUID:
 								case ObjectSerializer.TYPE_BYTEARRAY:
@@ -1714,6 +1788,7 @@ namespace Waher.Persistence.Files.Storage
 								case ObjectSerializer.TYPE_CHAR:
 								case ObjectSerializer.TYPE_NULL:
 								case ObjectSerializer.TYPE_DATETIME:
+								case ObjectSerializer.TYPE_DATETIMEOFFSET:
 								case ObjectSerializer.TYPE_MIN:
 									return Ascending ? 1 : -1;
 
@@ -1838,6 +1913,7 @@ namespace Waher.Persistence.Files.Storage
 									return Ascending ? -1 : 1;
 
 								case ObjectSerializer.TYPE_DATETIME:
+								case ObjectSerializer.TYPE_DATETIMEOFFSET:
 								case ObjectSerializer.TYPE_TIMESPAN:
 								case ObjectSerializer.TYPE_GUID:
 								case ObjectSerializer.TYPE_BYTEARRAY:
@@ -1955,6 +2031,12 @@ namespace Waher.Persistence.Files.Storage
 										return Ascending ? j : -j;
 									break;
 
+								case ObjectSerializer.TYPE_DATETIMEOFFSET:
+									j = xReader.ReadString().CompareTo(yReader.ReadDateTimeOffset().ToString());
+									if (j != 0)
+										return Ascending ? j : -j;
+									break;
+
 								case ObjectSerializer.TYPE_TIMESPAN:
 									j = xReader.ReadString().CompareTo(yReader.ReadTimeSpan().ToString());
 									if (j != 0)
@@ -1993,6 +2075,7 @@ namespace Waher.Persistence.Files.Storage
 								case ObjectSerializer.TYPE_CHAR:
 								case ObjectSerializer.TYPE_NULL:
 								case ObjectSerializer.TYPE_DATETIME:
+								case ObjectSerializer.TYPE_DATETIMEOFFSET:
 								case ObjectSerializer.TYPE_TIMESPAN:
 								case ObjectSerializer.TYPE_MIN:
 									return Ascending ? 1 : -1;
@@ -2204,6 +2287,10 @@ namespace Waher.Persistence.Files.Storage
 						Reader.SkipDateTime();
 						break;
 
+					case ObjectSerializer.TYPE_DATETIMEOFFSET:
+						Reader.SkipDateTimeOffset();
+						break;
+
 					case ObjectSerializer.TYPE_TIMESPAN:
 						Reader.SkipTimeSpan();
 						break;
@@ -2317,6 +2404,10 @@ namespace Waher.Persistence.Files.Storage
 
 						case ObjectSerializer.TYPE_DATETIME:
 							Value = Reader.ReadDateTime().ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss") + "z";
+							break;
+
+						case ObjectSerializer.TYPE_DATETIMEOFFSET:
+							Value = Reader.ReadDateTimeOffset().ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss") + "z";
 							break;
 
 						case ObjectSerializer.TYPE_TIMESPAN:

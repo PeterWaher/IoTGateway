@@ -34,6 +34,7 @@ namespace Waher.Persistence.FilesLW.Test.Classes
 		public string String;
 		public string ShortString;
 		public DateTime DateTime;
+		public DateTimeOffset DateTimeOffset;
 		public TimeSpan TimeSpan;
 		public Guid Guid;
 		public NormalEnum NormalEnum;

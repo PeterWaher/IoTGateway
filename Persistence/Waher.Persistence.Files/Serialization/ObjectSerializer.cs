@@ -119,6 +119,11 @@ namespace Waher.Persistence.Files.Serialization
 		public const uint TYPE_GUID = 18;
 
 		/// <summary>
+		/// Represents a <see cref="DateTimeOffset"/>
+		/// </summary>
+		public const uint TYPE_DATETIMEOFFSET = 19;
+
+		/// <summary>
 		/// Represents the smallest possible value for the field type being searched or filtered.
 		/// </summary>
 		public const uint TYPE_MIN = 27;
@@ -1089,6 +1094,14 @@ namespace Waher.Persistence.Files.Serialization
 											CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
 										}
 
+										if (MemberTypeInfo.IsAssignableFrom(typeof(DateTimeOffset)))
+										{
+											CSharp.AppendLine();
+											CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_DATETIMEOFFSET + ":");
+											CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (" + MemberType.FullName + ")ReadDateTimeOffset(Reader, FieldDataType);");
+											CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+										}
+
 										if (MemberTypeInfo.IsAssignableFrom(typeof(TimeSpan)))
 										{
 											CSharp.AppendLine();
@@ -1692,6 +1705,20 @@ namespace Waher.Persistence.Files.Serialization
 											CSharp.Append(".Value");
 										CSharp.AppendLine(");");
 									}
+									else if (MemberType == typeof(DateTimeOffset))
+									{
+										CSharp.Append(Indent2);
+										CSharp.Append("Writer.WriteBits(");
+										CSharp.Append(TYPE_DATETIMEOFFSET);
+										CSharp.AppendLine(", 6);");
+
+										CSharp.Append(Indent2);
+										CSharp.Append("Writer.Write(Value.");
+										CSharp.Append(Member.Name);
+										if (Nullable)
+											CSharp.Append(".Value");
+										CSharp.AppendLine(");");
+									}
 									else if (MemberType == typeof(Guid))
 									{
 										CSharp.Append(Indent2);
@@ -2200,6 +2227,13 @@ namespace Waher.Persistence.Files.Serialization
 									Member.Set(Result, GeneratedObjectSerializerBase.ReadDateTime(Reader, FieldDataType));
 								break;
 
+							case TYPE_DATETIMEOFFSET:
+								if (Member.Nullable)
+									Member.Set(Result, GeneratedObjectSerializerBase.ReadNullableDateTimeOffset(Reader, FieldDataType));
+								else
+									Member.Set(Result, GeneratedObjectSerializerBase.ReadDateTimeOffset(Reader, FieldDataType));
+								break;
+
 							case TYPE_DECIMAL:
 								if (Member.Nullable)
 									Member.Set(Result, GeneratedObjectSerializerBase.ReadNullableDecimal(Reader, FieldDataType));
@@ -2467,6 +2501,10 @@ namespace Waher.Persistence.Files.Serialization
 											Member.Set(Result, Reader.ReadDateTime());
 											break;
 
+										case TYPE_DATETIMEOFFSET:
+											Member.Set(Result, Reader.ReadDateTimeOffset());
+											break;
+
 										case TYPE_TIMESPAN:
 											Member.Set(Result, Reader.ReadTimeSpan());
 											break;
@@ -2595,6 +2633,11 @@ namespace Waher.Persistence.Files.Serialization
 							case TYPE_DATETIME:
 								Writer.WriteBits(TYPE_DATETIME, 6);
 								Writer.Write((DateTime)MemberValue);
+								break;
+
+							case TYPE_DATETIMEOFFSET:
+								Writer.WriteBits(TYPE_DATETIMEOFFSET, 6);
+								Writer.Write((DateTimeOffset)MemberValue);
 								break;
 
 							case TYPE_DECIMAL:

@@ -55,6 +55,7 @@ namespace Waher.Persistence.FilesLW.Test
 			Serializer.Write(1234567890.123456789);
 			Serializer.Write(1234567890.123456789f);
 			Serializer.Write(new DateTime(2016, 10, 06, 20, 32, 0));
+			Serializer.Write(new DateTimeOffset(new DateTime(2016, 10, 06, 20, 32, 0), new TimeSpan(12, 34, 56)));
 			Serializer.Write(new TimeSpan(1, 2, 3, 4, 5));
 			Serializer.Write('☀');
 			Serializer.Write(new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 });
@@ -97,6 +98,7 @@ namespace Waher.Persistence.FilesLW.Test
 			AssertEx.Same(1234567890.123456789, Deserializer.ReadDouble());
 			AssertEx.Same(1234567890.123456789f, Deserializer.ReadSingle());
 			AssertEx.Same(new DateTime(2016, 10, 06, 20, 32, 0), Deserializer.ReadDateTime());
+			AssertEx.Same(new DateTimeOffset(new DateTime(2016, 10, 06, 20, 32, 0), new TimeSpan(12, 34, 56)), Deserializer.ReadDateTimeOffset());
 			AssertEx.Same(new TimeSpan(1, 2, 3, 4, 5), Deserializer.ReadTimeSpan());
 			AssertEx.Same('☀', Deserializer.ReadChar());
 			AssertEx.Same(new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }, Deserializer.ReadByteArray());

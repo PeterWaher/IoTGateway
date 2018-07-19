@@ -96,6 +96,7 @@ namespace Waher.Persistence.FilesLW.Test
 				Single = 12345.6789f,
 				String = "Today, there will be a lot of ☀.",
 				DateTime = DateTime.Now,
+				DateTimeOffset = DateTimeOffset.Now,
 				Guid = Guid.NewGuid(),
 				NormalEnum = NormalEnum.Option3,
 				FlagsEnum = FlagsEnum.Option1 | FlagsEnum.Option4
@@ -139,6 +140,8 @@ namespace Waher.Persistence.FilesLW.Test
 			AssertEx.Same(Obj.String, Value);
 			Assert.IsTrue(S.TryGetFieldValue("DateTime", Obj, out Value));
 			AssertEx.Same(Obj.DateTime, Value);
+			Assert.IsTrue(S.TryGetFieldValue("DateTimeOffset", Obj, out Value));
+			AssertEx.Same(Obj.DateTimeOffset, Value);
 			Assert.IsTrue(S.TryGetFieldValue("TimeSpan", Obj, out Value));
 			AssertEx.Same(Obj.TimeSpan, Value);
 			Assert.IsTrue(S.TryGetFieldValue("Guid", Obj, out Value));
@@ -202,6 +205,7 @@ namespace Waher.Persistence.FilesLW.Test
 			AssertEx.Same(Obj.Single, Obj2.Single);
 			AssertEx.Same(Obj.String, Obj2.String);
 			AssertEx.Same(Obj.DateTime, Obj2.DateTime);
+			AssertEx.Same(Obj.DateTimeOffset, Obj2.DateTimeOffset);
 			AssertEx.Same(Obj.TimeSpan, Obj2.TimeSpan);
 			AssertEx.Same(Obj.Guid, Obj2.Guid);
 			AssertEx.Same(Obj.NormalEnum, Obj2.NormalEnum);
@@ -228,6 +232,7 @@ namespace Waher.Persistence.FilesLW.Test
 			AssertEx.Same(Obj.Single, GenObj["Single"]);
 			AssertEx.Same(Obj.String, GenObj["String"]);
 			AssertEx.Same(Obj.DateTime, GenObj["DateTime"]);
+			AssertEx.Same(Obj.DateTimeOffset, GenObj["DateTimeOffset"]);
 			AssertEx.Same(Obj.TimeSpan, GenObj["TimeSpan"]);
 			AssertEx.Same(Obj.Guid, GenObj["Guid"]);
 			AssertEx.Same(Obj.NormalEnum.ToString(), GenObj["NormalEnum"]);

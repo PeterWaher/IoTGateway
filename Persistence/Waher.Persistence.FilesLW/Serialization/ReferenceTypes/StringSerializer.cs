@@ -67,6 +67,7 @@ namespace Waher.Persistence.Files.Serialization.ReferenceTypes
 				case ObjectSerializer.TYPE_SINGLE: return Reader.ReadSingle().ToString();
 				case ObjectSerializer.TYPE_GUID: return Reader.ReadGuid().ToString();
 				case ObjectSerializer.TYPE_DATETIME: return Reader.ReadDateTime().ToString();
+				case ObjectSerializer.TYPE_DATETIMEOFFSET: return Reader.ReadDateTimeOffset().ToString();
 				case ObjectSerializer.TYPE_TIMESPAN: return Reader.ReadTimeSpan().ToString();
 				case ObjectSerializer.TYPE_NULL: return null;
 				default: throw new Exception("Expected a string value.");

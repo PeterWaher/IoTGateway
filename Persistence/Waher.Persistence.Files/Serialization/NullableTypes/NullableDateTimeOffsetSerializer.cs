@@ -3,17 +3,17 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Waher.Persistence.Files.Serialization.ValueTypes
+namespace Waher.Persistence.Files.Serialization.NullableTypes
 {
 	/// <summary>
-	/// Serializes a <see cref="DateTime"/> value.
+	/// Serializes a nullable <see cref="DateTimeOffset"/> value.
 	/// </summary>
-	public class DateTimeSerializer : ValueTypeSerializer
+	public class NullableDateTimeOffsetSerializer : NullableValueTypeSerializer
 	{
 		/// <summary>
-		/// Serializes a <see cref="DateTime"/> value.
+		/// Serializes a nullable <see cref="DateTimeOffset"/> value.
 		/// </summary>
-		public DateTimeSerializer()
+		public NullableDateTimeOffsetSerializer()
 		{
 		}
 
@@ -24,7 +24,7 @@ namespace Waher.Persistence.Files.Serialization.ValueTypes
 		{
 			get
 			{
-				return typeof(DateTime);
+				return typeof(DateTimeOffset?);
 			}
 		}
 
@@ -42,13 +42,13 @@ namespace Waher.Persistence.Files.Serialization.ValueTypes
 
 			switch (DataType.Value)
 			{
-				case ObjectSerializer.TYPE_DATETIME: return Reader.ReadDateTime();
-				case ObjectSerializer.TYPE_DATETIMEOFFSET: return Reader.ReadDateTimeOffset().DateTime;
-				case ObjectSerializer.TYPE_STRING: return DateTime.Parse(Reader.ReadString());
-				case ObjectSerializer.TYPE_MIN: return DateTime.MinValue;
-				case ObjectSerializer.TYPE_MAX: return DateTime.MaxValue;
+				case ObjectSerializer.TYPE_DATETIME: return (DateTimeOffset?)Reader.ReadDateTime();
+				case ObjectSerializer.TYPE_DATETIMEOFFSET: return (DateTimeOffset?)Reader.ReadDateTimeOffset();
+				case ObjectSerializer.TYPE_STRING: return (DateTimeOffset?)DateTimeOffset.Parse(Reader.ReadString());
+				case ObjectSerializer.TYPE_MIN: return DateTimeOffset.MinValue;
+				case ObjectSerializer.TYPE_MAX: return DateTimeOffset.MaxValue;
 				case ObjectSerializer.TYPE_NULL: return null;
-				default: throw new Exception("Expected a DateTime value.");
+				default: throw new Exception("Expected a nullable DateTimeOffset value.");
 			}
 		}
 
@@ -61,10 +61,22 @@ namespace Waher.Persistence.Files.Serialization.ValueTypes
 		/// <param name="Value">The actual object to serialize.</param>
 		public override void Serialize(BinarySerializer Writer, bool WriteTypeCode, bool Embedded, object Value)
 		{
-			if (WriteTypeCode)
-				Writer.WriteBits(ObjectSerializer.TYPE_DATETIME, 6);
+			DateTimeOffset? Value2 = (DateTimeOffset?)Value;
 
-			Writer.Write((DateTime)Value);
+			if (WriteTypeCode)
+			{
+				if (!Value2.HasValue)
+				{
+					Writer.WriteBits(ObjectSerializer.TYPE_NULL, 6);
+					return;
+				}
+				else
+					Writer.WriteBits(ObjectSerializer.TYPE_DATETIMEOFFSET, 6);
+			}
+			else if (!Value2.HasValue)
+				throw new NullReferenceException("Value cannot be null.");
+
+			Writer.Write(Value2.Value);
 		}
 
 	}

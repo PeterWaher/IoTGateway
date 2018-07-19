@@ -277,5 +277,14 @@ namespace Waher.Persistence.FilesLW.Test
 			float Diff = (float)Value - Org;
 			Assert.AreEqual(Org + Diff / 2, Org);
 		}
+
+		[TestMethod]
+		public void DBFiles_Inc_Test_31_DateTimeOffset()
+		{
+			DateTimeOffset Org = DateTimeOffset.Now;
+			object Value = Org;
+			Assert.IsTrue(Comparison.Increment(ref Value));
+			Assert.AreNotEqual(Value, Org);
+		}
 	}
 }

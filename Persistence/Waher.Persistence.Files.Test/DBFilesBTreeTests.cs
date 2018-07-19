@@ -136,6 +136,7 @@ namespace Waher.Persistence.FilesLW.Test
 				Double = gen.NextDouble(),
 				Single = (float)gen.NextDouble(),
 				DateTime = new DateTime(1900, 1, 1).AddDays(gen.NextDouble() * 73049),
+				DateTimeOffset = new DateTimeOffset(new DateTime(1900, 1, 1), TimeSpan.Zero).AddDays(gen.NextDouble() * 73049),
 				TimeSpan = new TimeSpan((long)(gen.NextDouble() * 36000000000)),
 				Guid = Guid.NewGuid()
 			};
@@ -436,6 +437,7 @@ namespace Waher.Persistence.FilesLW.Test
 			AssertEx.Same(Obj.Single, GenObj["Single"]);
 			AssertEx.Same(Obj.String, GenObj["String"]);
 			AssertEx.Same(Obj.DateTime, GenObj["DateTime"]);
+			AssertEx.Same(Obj.DateTimeOffset, GenObj["DateTimeOffset"]);
 			AssertEx.Same(Obj.TimeSpan, GenObj["TimeSpan"]);
 			AssertEx.Same(Obj.Guid, GenObj["Guid"]);
 			AssertEx.Same(Obj.NormalEnum.ToString(), GenObj["NormalEnum"]);

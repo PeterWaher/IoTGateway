@@ -313,6 +313,18 @@ namespace Waher.Persistence.Files.Serialization
 		/// Deserializes a value.
 		/// </summary>
 		/// <returns>Deserialized value.</returns>
+		public DateTimeOffset ReadDateTimeOffset()
+		{
+			long Ticks = this.ReadInt64();
+			TimeSpan Offset = this.ReadTimeSpan();
+
+			return new DateTimeOffset(Ticks, Offset);
+		}
+
+		/// <summary>
+		/// Deserializes a value.
+		/// </summary>
+		/// <returns>Deserialized value.</returns>
 		public TimeSpan ReadTimeSpan()
 		{
 			return new TimeSpan(this.ReadInt64());
@@ -697,6 +709,15 @@ namespace Waher.Persistence.Files.Serialization
 		public void SkipDateTime()
 		{
 			this.SkipBits(2);
+			this.SkipInt64();
+		}
+
+		/// <summary>
+		/// Skips a value.
+		/// </summary>
+		public void SkipDateTimeOffset()
+		{
+			this.SkipInt64();
 			this.SkipInt64();
 		}
 

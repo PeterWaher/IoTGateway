@@ -4289,6 +4289,10 @@ namespace Waher.Persistence.Files
 					XmlOutput.WriteElementString("DateTime", Searching.Comparison.ToString(Item, TypeCode));
 					break;
 
+				case ObjectSerializer.TYPE_DATETIMEOFFSET:
+					XmlOutput.WriteElementString("DateTimeOffset", Searching.Comparison.ToString(Item, TypeCode));
+					break;
+
 				case ObjectSerializer.TYPE_DECIMAL:
 					XmlOutput.WriteElementString("Decimal", Searching.Comparison.ToString(Item, TypeCode));
 					break;

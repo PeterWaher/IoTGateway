@@ -275,6 +275,16 @@ namespace Waher.Persistence.Files.Serialization
 		/// Serializes a value.
 		/// </summary>
 		/// <param name="Value">Value</param>
+		public void Write(DateTimeOffset Value)
+		{
+			this.Write(Value.Ticks);
+			this.Write(Value.Offset);
+		}
+
+		/// <summary>
+		/// Serializes a value.
+		/// </summary>
+		/// <param name="Value">Value</param>
 		public void Write(TimeSpan Value)
 		{
 			this.Write(Value.Ticks);

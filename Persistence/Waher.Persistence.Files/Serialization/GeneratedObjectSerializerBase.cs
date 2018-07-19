@@ -674,6 +674,7 @@ namespace Waher.Persistence.Files.Serialization
 			switch (FieldDataType)
 			{
 				case ObjectSerializer.TYPE_DATETIME: return Reader.ReadDateTime();
+				case ObjectSerializer.TYPE_DATETIMEOFFSET: return Reader.ReadDateTimeOffset().DateTime;
 				case ObjectSerializer.TYPE_STRING: return DateTime.Parse(Reader.ReadString());
 
 				default:
@@ -695,6 +696,42 @@ namespace Waher.Persistence.Files.Serialization
 				return null;
 			else
 				return ReadDateTime(Reader, FieldDataType);
+		}
+
+		/// <summary>
+		/// Reads a date &amp; time value with offset.
+		/// </summary>
+		/// <param name="Reader">Binary reader.</param>
+		/// <param name="FieldDataType">Field data type.</param>
+		/// <returns>DateTimeOffset value.</returns>
+		/// <exception cref="ArgumentException">If the <paramref name="FieldDataType"/> was invalid.</exception>
+		public static DateTimeOffset ReadDateTimeOffset(BinaryDeserializer Reader, uint FieldDataType)
+		{
+			switch (FieldDataType)
+			{
+				case ObjectSerializer.TYPE_DATETIME: return (DateTimeOffset)Reader.ReadDateTime();
+				case ObjectSerializer.TYPE_DATETIMEOFFSET: return Reader.ReadDateTimeOffset();
+				case ObjectSerializer.TYPE_STRING: return DateTimeOffset.Parse(Reader.ReadString());
+
+				default:
+					throw new ArgumentException("Expected a date & time value with offset, but was a " +
+						FilesProvider.GetFieldDataTypeName(FieldDataType) + ".", nameof(FieldDataType));
+			}
+		}
+
+		/// <summary>
+		/// Reads a nullable date &amp; time value with offset.
+		/// </summary>
+		/// <param name="Reader">Binary reader.</param>
+		/// <param name="FieldDataType">Field data type.</param>
+		/// <returns>Nullable DateTimeOffset value.</returns>
+		/// <exception cref="ArgumentException">If the <paramref name="FieldDataType"/> was invalid.</exception>
+		public static DateTimeOffset? ReadNullableDateTimeOffset(BinaryDeserializer Reader, uint FieldDataType)
+		{
+			if (FieldDataType == ObjectSerializer.TYPE_NULL)
+				return null;
+			else
+				return ReadDateTimeOffset(Reader, FieldDataType);
 		}
 
 		/// <summary>
@@ -795,6 +832,7 @@ namespace Waher.Persistence.Files.Serialization
 				case ObjectSerializer.TYPE_DOUBLE: return Reader.ReadDouble().ToString();
 				case ObjectSerializer.TYPE_SINGLE: return Reader.ReadSingle().ToString();
 				case ObjectSerializer.TYPE_DATETIME: return Reader.ReadDateTime().ToString();
+				case ObjectSerializer.TYPE_DATETIMEOFFSET: return Reader.ReadDateTimeOffset().ToString();
 				case ObjectSerializer.TYPE_GUID: return Reader.ReadSingle().ToString();
 				case ObjectSerializer.TYPE_TIMESPAN: return Reader.ReadSingle().ToString();
 				default:

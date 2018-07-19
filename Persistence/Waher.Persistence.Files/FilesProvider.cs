@@ -456,6 +456,7 @@ namespace Waher.Persistence.Files
 				case ObjectSerializer.TYPE_DOUBLE: return typeof(double);
 				case ObjectSerializer.TYPE_SINGLE: return typeof(float);
 				case ObjectSerializer.TYPE_DATETIME: return typeof(DateTime);
+				case ObjectSerializer.TYPE_DATETIMEOFFSET: return typeof(DateTimeOffset);
 				case ObjectSerializer.TYPE_TIMESPAN: return typeof(TimeSpan);
 				case ObjectSerializer.TYPE_CHAR: return typeof(char);
 				case ObjectSerializer.TYPE_STRING: return typeof(string);
@@ -523,6 +524,8 @@ namespace Waher.Persistence.Files
 				return ObjectSerializer.TYPE_SINGLE;
 			else if (FieldDataType == typeof(DateTime))
 				return ObjectSerializer.TYPE_DATETIME;
+			else if (FieldDataType == typeof(DateTimeOffset))
+				return ObjectSerializer.TYPE_DATETIMEOFFSET;
 			else if (FieldDataType == typeof(char))
 				return ObjectSerializer.TYPE_CHAR;
 			else if (FieldDataType == typeof(string))

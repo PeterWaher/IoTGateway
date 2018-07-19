@@ -213,6 +213,10 @@ namespace Waher.Persistence.Files.Storage
 					Reader.SkipDateTime();
 					break;
 
+				case ObjectSerializer.TYPE_DATETIMEOFFSET:
+					Reader.SkipDateTimeOffset();
+					break;
+
 				case ObjectSerializer.TYPE_TIMESPAN:
 					Reader.SkipTimeSpan();
 					break;

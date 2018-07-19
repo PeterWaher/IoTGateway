@@ -144,6 +144,10 @@ namespace Waher.Persistence.Files.Serialization
 					Value = Reader.ReadDateTime();
 					break;
 
+				case ObjectSerializer.TYPE_DATETIMEOFFSET:
+					Value = Reader.ReadDateTimeOffset();
+					break;
+
 				case ObjectSerializer.TYPE_TIMESPAN:
 					Value = Reader.ReadTimeSpan();
 					break;

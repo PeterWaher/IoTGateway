@@ -11,7 +11,8 @@ namespace Waher.Events.Console
 	public class ConsoleEventSink : EventSink
 	{
 		private const int TabWidth = 8;
-		private bool beep;
+		private readonly bool beep;
+		private bool consoleWidthWorks = true;
 
 		/// <summary>
 		/// Outputs events to the console standard output.
@@ -47,14 +48,23 @@ namespace Waher.Events.Console
 				bool WriteLine = false;
 				int i;
 
-				try
+				if (this.consoleWidthWorks)
 				{
-					Width = System.Console.WindowWidth;
+					try
+					{
+						Width = System.Console.WindowWidth;
 
-					if (System.Console.CursorLeft > 1)
-						System.Console.Out.WriteLine();
+						if (System.Console.CursorLeft > 1)
+							System.Console.Out.WriteLine();
+					}
+					catch (Exception)
+					{
+						Width = 80;
+						WriteLine = true;
+						this.consoleWidthWorks = false;
+					}
 				}
-				catch (Exception)
+				else
 				{
 					Width = 80;
 					WriteLine = true;

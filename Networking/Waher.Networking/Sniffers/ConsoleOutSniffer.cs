@@ -47,8 +47,9 @@ namespace Waher.Networking.Sniffers
 	public class ConsoleOutSniffer : ISniffer
 	{
 		private const int TabWidth = 8;
-		private BinaryPresentationMethod binaryPresentationMethod;
-		private LineEnding lineEndingMethod;
+		private readonly BinaryPresentationMethod binaryPresentationMethod;
+		private readonly LineEnding lineEndingMethod;
+		private bool consoleWidthWorks = true;
 
 		/// <summary>
 		/// Outputs sniffed data to <see cref="Console.Out"/>.
@@ -179,52 +180,59 @@ namespace Waher.Networking.Sniffers
 				{
 					ConsoleColor FgBak = Console.ForegroundColor;
 					ConsoleColor BgBak = Console.BackgroundColor;
+					int i, w;
 
 					Console.ForegroundColor = Fg;
 					Console.BackgroundColor = Bg;
 
-					try
+					if (this.consoleWidthWorks)
 					{
-						int i, w = Console.WindowWidth;
-
-						foreach (string Row in s.Replace("\r\n", "\n").Replace("\r", "\n").Split('\n'))
+						try
 						{
-							s = Row;
+							w = Console.WindowWidth;
 
-							if (s.IndexOf('\t') >= 0)
+							foreach (string Row in s.Replace("\r\n", "\n").Replace("\r", "\n").Split('\n'))
 							{
-								StringBuilder sb = new StringBuilder();
-								string[] Parts = s.Split('\t');
-								bool First = true;
+								s = Row;
 
-								foreach (string Part in Parts)
+								if (s.IndexOf('\t') >= 0)
 								{
-									if (First)
-										First = false;
-									else
+									StringBuilder sb = new StringBuilder();
+									string[] Parts = s.Split('\t');
+									bool First = true;
+
+									foreach (string Part in Parts)
 									{
-										i = Console.CursorLeft % TabWidth;
-										sb.Append(new string(' ', TabWidth - i));
+										if (First)
+											First = false;
+										else
+										{
+											i = Console.CursorLeft % TabWidth;
+											sb.Append(new string(' ', TabWidth - i));
+										}
+
+										sb.Append(Part);
 									}
 
-									sb.Append(Part);
+									s = sb.ToString();
 								}
 
-								s = sb.ToString();
+								i = s.Length % w;
+
+								if (i > 0)
+									s += new string(' ', w - i);
+
+								Console.Out.Write(s);
 							}
-
-							i = s.Length % w;
-
-							if (i > 0)
-								s += new string(' ', w - i);
-
-							Console.Out.Write(s);
+						}
+						catch (Exception)
+						{
+							this.consoleWidthWorks = false;
+							Console.Out.WriteLine(s);
 						}
 					}
-					catch (Exception)
-					{
+					else
 						Console.Out.WriteLine(s);
-					}
 
 					Console.ForegroundColor = Fg;
 					Console.BackgroundColor = Bg;

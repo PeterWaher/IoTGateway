@@ -125,6 +125,7 @@ namespace Waher.IoTGateway
 		private static Timer connectionTimer = null;
 		private static X509Certificate2 certificate = null;
 		private static HttpServer webServer = null;
+		private static HttpxProxy httpxProxy = null;
 		private static HttpxServer httpxServer = null;
 		private static CoapEndpoint coapEndpoint = null;
 		private static ClientEvents clientEvents = null;
@@ -511,12 +512,10 @@ namespace Waher.IoTGateway
 					Log.Critical(ex);
 				}
 
-				HttpxProxy HttpxProxy;
-
 				webServer.Register(new HttpFolderResource("/Graphics", Path.Combine(appDataFolder, "Graphics"), false, false, true, false)); // TODO: Add authentication mechanisms for PUT & DELETE.
 				webServer.Register(new HttpFolderResource("/highlight", "Highlight", false, false, true, false));   // Syntax highlighting library, provided by http://highlightjs.org
 				webServer.Register(HttpFolderResource = new HttpFolderResource(string.Empty, rootFolder, false, false, true, true));    // TODO: Add authentication mechanisms for PUT & DELETE.
-				webServer.Register(HttpxProxy = new HttpxProxy("/HttpxProxy", xmppClient, MaxChunkSize));
+				webServer.Register(httpxProxy = new HttpxProxy("/HttpxProxy", xmppClient, MaxChunkSize));
 				webServer.Register("/", (req, resp) => throw new TemporaryRedirectException(defaultPage));
 				webServer.Register(clientEvents = new ClientEvents());
 				webServer.Register(login = new Login());
@@ -548,13 +547,13 @@ namespace Waher.IoTGateway
 				}
 
 				httpxServer = new HttpxServer(xmppClient, webServer, MaxChunkSize);
-				Types.SetModuleParameter("HTTPX", HttpxProxy);
+				Types.SetModuleParameter("HTTPX", httpxProxy);
 				Types.SetModuleParameter("HTTPXS", httpxServer);
 
-				HttpxProxy.IbbClient = ibbClient;
+				httpxProxy.IbbClient = ibbClient;
 				httpxServer.IbbClient = ibbClient;
 
-				HttpxProxy.Socks5Proxy = socksProxy;
+				httpxProxy.Socks5Proxy = socksProxy;
 				httpxServer.Socks5Proxy = socksProxy;
 
 				if (xmppCredentials.Sniffer)
@@ -1077,6 +1076,12 @@ namespace Waher.IoTGateway
 			{
 				ibbClient.Dispose();
 				ibbClient = null;
+			}
+
+			if (httpxProxy != null)
+			{
+				httpxProxy.Dispose();
+				httpxProxy = null;
 			}
 
 			if (httpxServer != null)
@@ -1754,6 +1759,22 @@ namespace Waher.IoTGateway
 		public static HttpServer HttpServer
 		{
 			get { return webServer; }
+		}
+
+		/// <summary>
+		/// HTTPX Server
+		/// </summary>
+		public static HttpxServer HttpxServer
+		{
+			get { return httpxServer; }
+		}
+
+		/// <summary>
+		/// HTTPX Proxy resource
+		/// </summary>
+		public static HttpxProxy HttpxProxy
+		{
+			get { return httpxProxy; }
 		}
 
 		/// <summary>

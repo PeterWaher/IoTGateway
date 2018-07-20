@@ -84,7 +84,7 @@ namespace Waher.Persistence.Files.Searching
 		{
 			get
 			{
-				return true;
+				return e.Current != null;
 			}
 		}
 

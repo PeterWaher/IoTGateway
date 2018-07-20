@@ -316,7 +316,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Utility.Transform", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Script.Content", "Script\Waher.Script.Content\Waher.Script.Content.csproj", "{6055882C-4FBB-4336-98E2-FA7594D6F143}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.XMPP.PEP", "Networking\Waher.Networking.XMPP.PEP\Waher.Networking.XMPP.PEP.csproj", "{2E9216FA-4E3D-4ED8-80A0-3557A7AA4481}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Networking.XMPP.PEP", "Networking\Waher.Networking.XMPP.PEP\Waher.Networking.XMPP.PEP.csproj", "{2E9216FA-4E3D-4ED8-80A0-3557A7AA4481}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.XMPP.PEP.UWP", "Networking\Waher.Networking.XMPP.PEP.UWP\Waher.Networking.XMPP.PEP.UWP.csproj", "{E8115045-7CFB-4FB1-AC25-2BA4EE00485E}"
 EndProject
@@ -2353,7 +2353,6 @@ Global
 		{A1800A82-2C75-459A-9FF8-32A0C33EE8E4}.Release|Mixed Platforms.Build.0 = Release|x86
 		{A1800A82-2C75-459A-9FF8-32A0C33EE8E4}.Release|x64.ActiveCfg = Release|x86
 		{A1800A82-2C75-459A-9FF8-32A0C33EE8E4}.Release|x86.ActiveCfg = Release|x86
-		{A1800A82-2C75-459A-9FF8-32A0C33EE8E4}.Release|x86.Build.0 = Release|x86
 		{8925180A-CE67-4DAC-99C1-F74DA4B9EE2B}.Debug|Any CPU.ActiveCfg = Debug|x86
 		{8925180A-CE67-4DAC-99C1-F74DA4B9EE2B}.Debug|ARM.ActiveCfg = Debug|x86
 		{8925180A-CE67-4DAC-99C1-F74DA4B9EE2B}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
@@ -2366,7 +2365,6 @@ Global
 		{8925180A-CE67-4DAC-99C1-F74DA4B9EE2B}.Release|Mixed Platforms.Build.0 = Release|x86
 		{8925180A-CE67-4DAC-99C1-F74DA4B9EE2B}.Release|x64.ActiveCfg = Release|x86
 		{8925180A-CE67-4DAC-99C1-F74DA4B9EE2B}.Release|x86.ActiveCfg = Release|x86
-		{8925180A-CE67-4DAC-99C1-F74DA4B9EE2B}.Release|x86.Build.0 = Release|x86
 		{AEE6DB4E-55C2-4B36-B723-7164E1ABA723}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{AEE6DB4E-55C2-4B36-B723-7164E1ABA723}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AEE6DB4E-55C2-4B36-B723-7164E1ABA723}.Debug|ARM.ActiveCfg = Debug|Any CPU

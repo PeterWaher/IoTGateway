@@ -277,6 +277,9 @@ namespace Waher.IoTGateway
 					exceptionFile = File.CreateText(exceptionFileName);
 					exportExceptions = true;
 
+					exceptionFile.Write("Start of export: ");
+					exceptionFile.WriteLine(DateTime.Now.ToString());
+
 					AppDomain.CurrentDomain.FirstChanceException += (sender, e) =>
 					{
 						if (!exportExceptions || e.Exception.StackTrace.Contains("FirstChanceExceptionEventArgs"))
@@ -294,6 +297,12 @@ namespace Waher.IoTGateway
 
 							exceptionFile.Write("Time: ");
 							exceptionFile.WriteLine(DateTime.Now.ToString());
+
+							exceptionFile.WriteLine();
+
+							StackTrace Trace = new StackTrace(true);
+							foreach (StackFrame Frame in Trace.GetFrames())
+								Console.Out.WriteLine(Frame.ToString());
 
 							exceptionFile.WriteLine();
 
@@ -1178,6 +1187,11 @@ namespace Waher.IoTGateway
 
 				lock (exceptionFile)
 				{
+					exceptionFile.WriteLine(new string('-', 80));
+					exceptionFile.Write("End of export: ");
+					exceptionFile.WriteLine(DateTime.Now.ToString());
+
+					exceptionFile.Flush();
 					exceptionFile.Close();
 				}
 			}

@@ -4821,7 +4821,7 @@ namespace Waher.Persistence.Files
 		{
 			string s, s2;
 
-			if (SortOrder == null || SortOrder.Length <= 1)
+			if (SortOrder == null || SortOrder.Length == 0)
 				return this.FindBestIndex(out BestNrFields, Property);
 
 			s = SortOrder[0];
@@ -4833,10 +4833,15 @@ namespace Waher.Persistence.Files
 			else
 				s2 = Property;
 
-			if (s2 != s)
-				return this.FindBestIndex(out BestNrFields, Property);
+			if (s2 == s)
+				return this.FindBestIndex(out BestNrFields, SortOrder);
 
-			return this.FindBestIndex(out BestNrFields, SortOrder);
+			string[] Properties = new string[SortOrder.Length + 1];
+
+			Properties[0] = Property;
+			Array.Copy(SortOrder, 0, Properties, 1, SortOrder.Length);
+
+			return this.FindBestIndex(out BestNrFields, Properties);
 		}
 
 		/// <summary>
@@ -4850,27 +4855,44 @@ namespace Waher.Persistence.Files
 		/// <returns>Best index to use for the search. If no index is found matching the properties, null is returned.</returns>
 		internal IndexBTreeFile FindBestIndex(out int BestNrFields, string[] Properties, string[] SortOrder)
 		{
-			string s, s2;
-			int i, c;
+			string s2;
 
-			if (SortOrder == null || SortOrder.Length <= (c = Properties.Length))
+			if (SortOrder == null || SortOrder.Length == 0)
 				return this.FindBestIndex(out BestNrFields, Properties);
 
-			for (i = 0; i < c; i++)
+			if (Properties == null || Properties.Length == 0)
+				return this.FindBestIndex(out BestNrFields, SortOrder);
+
+			List<string> Order = new List<string>();
+			Dictionary<string, bool> Added = new Dictionary<string, bool>();
+
+			Order.AddRange(SortOrder);
+
+			foreach (string s in SortOrder)
 			{
-				s = SortOrder[i];
 				if (s.StartsWith("-"))
-					s = s.Substring(1);
+					s2 = s.Substring(1);
+				else
+					s2 = s;
 
-				s2 = Properties[i];
-				if (s2.StartsWith("-"))
-					s2 = s2.Substring(1);
-
-				if (s2 != s)
-					return this.FindBestIndex(out BestNrFields, Properties);
+				Added[s2] = true;
 			}
 
-			return this.FindBestIndex(out BestNrFields, SortOrder);
+			foreach (string s in Properties)
+			{
+				if (s.StartsWith("-"))
+					s2 = s.Substring(1);
+				else
+					s2 = s;
+
+				if (!Added.ContainsKey(s2))
+				{
+					Added[s2] = true;
+					Order.Insert(0, s);
+				}
+			}
+
+			return this.FindBestIndex(out BestNrFields, Order.ToArray());
 		}
 
 		/// <summary>

@@ -2179,6 +2179,12 @@ namespace Waher.Networking.XMPP
 					this.Information("OnPresence()");
 					h = this.OnPresence;
 					e.UpdateLastPresence = true;
+
+					lock (this.roster)
+					{
+						if (this.roster.TryGetValue(e.FromBareJID, out Item))
+							Item.PresenceReceived(e);
+					}
 					break;
 
 				case PresenceType.Unavailable:
@@ -2188,10 +2194,7 @@ namespace Waher.Networking.XMPP
 					lock (this.roster)
 					{
 						if (this.roster.TryGetValue(e.FromBareJID, out Item))
-						{
-							if (Item.LastPresenceFullJid == e.From)
-								Item.LastPresence = null;
-						}
+							Item.PresenceReceived(e);
 					}
 					break;
 
@@ -2232,20 +2235,6 @@ namespace Waher.Networking.XMPP
 				catch (Exception ex)
 				{
 					this.Exception(ex);
-				}
-			}
-
-			if (e.UpdateLastPresence)
-			{
-				lock (this.roster)
-				{
-					if (this.roster.TryGetValue(e.FromBareJID, out Item))
-					{
-						Item.LastPresence = e;
-
-						if (Item.PendingSubscription == PendingSubscription.Subscribe)
-							Item.PendingSubscription = PendingSubscription.None;    // Might be out of synch.
-					}
 				}
 			}
 		}
@@ -3847,13 +3836,18 @@ namespace Waher.Networking.XMPP
 					{
 						lock (this.roster)
 						{
+							Dictionary<string, RosterItem> OldRoster = new Dictionary<string, RosterItem>();
+
+							foreach (KeyValuePair<string, RosterItem> P in this.roster)
+								OldRoster[P.Key] = P.Value;
+
 							this.roster.Clear();
 
 							foreach (XmlNode N2 in N.ChildNodes)
 							{
 								if (N2.LocalName == "item")
 								{
-									Item = new RosterItem((XmlElement)N2);
+									Item = new RosterItem((XmlElement)N2, OldRoster);
 									this.roster[Item.BareJid] = Item;
 								}
 							}
@@ -4414,7 +4408,11 @@ namespace Waher.Networking.XMPP
 			{
 				if (E.LocalName == "item" && E.NamespaceURI == NamespaceRoster)
 				{
-					Item = new RosterItem(E);
+					lock (this.roster)
+					{
+						Item = new RosterItem(E, this.roster);
+					}
+
 					break;
 				}
 			}
@@ -4448,8 +4446,6 @@ namespace Waher.Networking.XMPP
 							this.roster[Item.BareJid] = Item;
 							this.Information("OnRosterItemUpdated()");
 							h = this.OnRosterItemUpdated;
-							if (Prev.HasLastPresence && (Item.State == SubscriptionState.Both || Item.State == SubscriptionState.To))
-								Item.LastPresence = Prev.LastPresence;
 						}
 					}
 					else

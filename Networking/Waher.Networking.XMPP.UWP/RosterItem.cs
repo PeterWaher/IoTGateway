@@ -70,6 +70,7 @@ namespace Waher.Networking.XMPP
 	/// </summary>
 	public class RosterItem
 	{
+		private readonly Dictionary<string, PresenceEventArgs> resources;
 		private string[] groups;
 		private SubscriptionState state;
 		private PendingSubscription pendingSubscription;
@@ -84,15 +85,28 @@ namespace Waher.Networking.XMPP
 		/// <param name="Name">Name of the roster item.</param>
 		/// <param name="Groups">Groups assigned to the roster item.</param>
 		public RosterItem(string BareJID, string Name, params string[] Groups)
+			: this(BareJID, Name, Groups, null)
+		{
+		}
+
+		/// <summary>
+		/// Maintains information about an item in the roster.
+		/// </summary>
+		/// <param name="BareJID">Bare JID of the roster item.</param>
+		/// <param name="Name">Name of the roster item.</param>
+		/// <param name="Groups">Groups assigned to the roster item.</param>
+		/// <param name="Prev">Inherit resources from the previous roster item.</param>
+		internal RosterItem(string BareJID, string Name, string[] Groups, RosterItem Prev)
 		{
 			this.groups = Groups;
 			this.state = SubscriptionState.Unknown;
 			this.bareJid = BareJID;
 			this.name = Name;
 			this.pendingSubscription = PendingSubscription.None;
+			this.resources = Prev?.resources ?? new Dictionary<string, PresenceEventArgs>();
 		}
 
-		internal RosterItem(XmlElement Item)
+		internal RosterItem(XmlElement Item, Dictionary<string, RosterItem> Roster)
 		{
 			this.bareJid = XML.Attribute(Item, "jid");
 			this.name = XML.Attribute(Item, "name");
@@ -149,6 +163,17 @@ namespace Waher.Networking.XMPP
 			}
 
 			this.groups = Groups.ToArray();
+
+			if (this.state == SubscriptionState.Both || this.state == SubscriptionState.To)
+			{
+				if (Roster.TryGetValue(this.bareJid, out RosterItem Prev))
+					this.resources = Prev.resources;
+
+				this.lastPresence = Prev?.lastPresence;
+			}
+
+			if (this.resources == null)
+				this.resources = new Dictionary<string, PresenceEventArgs>();
 		}
 
 		/// <summary>
@@ -206,6 +231,22 @@ namespace Waher.Networking.XMPP
 		}
 
 		/// <summary>
+		/// Active resources utilized by contact.
+		/// </summary>
+		public PresenceEventArgs[] Resouces
+		{
+			get
+			{
+				lock (this.resources)
+				{
+					PresenceEventArgs[] Result = new PresenceEventArgs[this.resources.Count];
+					this.resources.Values.CopyTo(Result, 0);
+					return Result;
+				}
+			}
+		}
+
+		/// <summary>
 		/// Serializes the roster item for transmission to the server.
 		/// </summary>
 		/// <param name="Output">Output</param>
@@ -252,7 +293,28 @@ namespace Waher.Networking.XMPP
 		public PresenceEventArgs LastPresence
 		{
 			get { return this.lastPresence; }
-			internal set { this.lastPresence = value; }
+		}
+
+		internal void PresenceReceived(PresenceEventArgs e)
+		{
+			lock (this.resources)
+			{
+				if (e.Type == PresenceType.Unavailable)
+				{
+					this.resources.Remove(e.From);
+
+					if (this.lastPresence != null && this.lastPresence.From == e.From)
+						this.lastPresence = null;
+				}
+				else if (e.Type == PresenceType.Available)
+				{
+					this.resources[e.From] = e;
+					this.lastPresence = e;
+
+					if (this.pendingSubscription == PendingSubscription.Subscribe)
+						this.pendingSubscription = PendingSubscription.None;    // Might be out of synch.
+				}
+			}
 		}
 
 		/// <summary>
@@ -285,8 +347,7 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public override bool Equals(object obj)
 		{
-			RosterItem Item = obj as RosterItem;
-			if (Item == null)
+			if (!(obj is RosterItem Item))
 				return false;
 
 			int i, c;

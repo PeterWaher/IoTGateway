@@ -11,8 +11,6 @@ namespace Waher.Script.Objects.VectorSpaces
 	/// </summary>
 	public sealed class DoubleVectors : VectorSpace
 	{
-		private static readonly DoubleNumbers scalarField = new DoubleNumbers();
-
 		private DoubleVector zero = null;
 		private int dimension;
 
@@ -38,7 +36,7 @@ namespace Waher.Script.Objects.VectorSpaces
 		/// </summary>
 		public override IField ScalarField
 		{
-			get { return scalarField; }
+			get { return DoubleNumbers.Instance; }
 		}
 
 		/// <summary>
@@ -62,8 +60,7 @@ namespace Waher.Script.Objects.VectorSpaces
 		/// <returns>If the element is contained in the set.</returns>
 		public override bool Contains(IElement Element)
 		{
-			DoubleVector v = Element as DoubleVector;
-			if (v == null)
+			if (!(Element is DoubleVector v))
 				return false;
 
 			return v.Dimension == this.dimension;
@@ -76,8 +73,7 @@ namespace Waher.Script.Objects.VectorSpaces
 		/// <returns>If elements are equal.</returns>
 		public override bool Equals(object obj)
 		{
-			DoubleVectors v = obj as DoubleVectors;
-			return (v != null && v.dimension == this.dimension);
+			return (obj is DoubleVectors v && v.dimension == this.dimension);
 		}
 
 		/// <summary>

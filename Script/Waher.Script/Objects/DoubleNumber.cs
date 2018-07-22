@@ -32,8 +32,6 @@ namespace Waher.Script.Objects
 		/// </summary>
 		public static readonly DoubleNumber ThreeElement = new DoubleNumber(3);
 
-		private static readonly DoubleNumbers associatedField = new DoubleNumbers();
-
 		private double value;
 
 		/// <summary>
@@ -67,7 +65,7 @@ namespace Waher.Script.Objects
 		/// </summary>
 		public override IField AssociatedField
 		{
-			get { return associatedField; }
+			get { return DoubleNumbers.Instance; }
 		}
 
 		/// <summary>
@@ -85,8 +83,7 @@ namespace Waher.Script.Objects
 		/// <returns>Result, if understood, null otherwise.</returns>
 		public override ICommutativeRingElement Multiply(ICommutativeRingElement Element)
 		{
-			DoubleNumber E = Element as DoubleNumber;
-			if (E == null)
+			if (!(Element is DoubleNumber E))
 				return null;
 			else
 				return new DoubleNumber(this.value * E.value);
@@ -108,8 +105,7 @@ namespace Waher.Script.Objects
 		/// <returns>Result, if understood, null otherwise.</returns>
 		public override IAbelianGroupElement Add(IAbelianGroupElement Element)
 		{
-			DoubleNumber E = Element as DoubleNumber;
-			if (E == null)
+			if (!(Element is DoubleNumber E))
 				return null;
 			else
 				return new DoubleNumber(this.value + E.value);
@@ -129,8 +125,7 @@ namespace Waher.Script.Objects
 		/// </summary>
 		public override bool Equals(object obj)
 		{
-			DoubleNumber E = obj as DoubleNumber;
-			if (E == null)
+			if (!(obj is DoubleNumber E))
 				return false;
 			else
 				return this.value == E.value;

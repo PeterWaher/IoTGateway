@@ -3879,19 +3879,39 @@ namespace Waher.Script
 
 			if (E1 is ComplexNumber)
 			{
-				if (E2 is DoubleNumber)
+				if (E2 is DoubleNumber D2)
 				{
-					E2 = new ComplexNumber(((DoubleNumber)E2).Value);
+					E2 = new ComplexNumber(D2.Value);
 					Set2 = ComplexNumbers.Instance;
 					return true;
 				}
 			}
 			else if (E2 is ComplexNumber)
 			{
-				if (E1 is DoubleNumber)
+				if (E1 is DoubleNumber D1)
 				{
-					E1 = new ComplexNumber(((DoubleNumber)E1).Value);
+					E1 = new ComplexNumber(D1.Value);
 					Set1 = ComplexNumbers.Instance;
+					return true;
+				}
+			}
+			else if (E1 is ObjectValue O1 && O1.AssociatedObjectValue is Enum Enum1 && E2 is DoubleNumber)
+			{
+				Type T1 =Enum.GetUnderlyingType(Enum1.GetType());
+				if (T1 == typeof(int))
+				{
+					E1 = new DoubleNumber(Convert.ToInt32(Enum1));
+					Set1 = DoubleNumbers.Instance;
+					return true;
+				}
+			}
+			else if (E2 is ObjectValue O2 && O2.AssociatedObjectValue is Enum Enum2 && E1 is DoubleNumber)
+			{
+				Type T2 = Enum.GetUnderlyingType(Enum2.GetType());
+				if (T2 == typeof(int))
+				{
+					E2 = new DoubleNumber(Convert.ToInt32(Enum2));
+					Set2 = DoubleNumbers.Instance;
 					return true;
 				}
 			}

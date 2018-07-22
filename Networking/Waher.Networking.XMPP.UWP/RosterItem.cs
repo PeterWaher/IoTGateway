@@ -233,7 +233,7 @@ namespace Waher.Networking.XMPP
 		/// <summary>
 		/// Active resources utilized by contact.
 		/// </summary>
-		public PresenceEventArgs[] Resouces
+		public PresenceEventArgs[] Resources
 		{
 			get
 			{

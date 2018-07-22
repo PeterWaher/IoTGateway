@@ -302,7 +302,7 @@ namespace Waher.IoTGateway
 
 							StackTrace Trace = new StackTrace(true);
 							foreach (StackFrame Frame in Trace.GetFrames())
-								Console.Out.WriteLine(Frame.ToString());
+								exceptionFile.WriteLine(Frame.ToString());
 
 							exceptionFile.WriteLine();
 

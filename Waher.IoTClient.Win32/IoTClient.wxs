@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
   <Product Name="IoT Client" Version="1.0" Manufacturer="Waher Data AB" Language="1033" Codepage="1252"
-					 Id="72b6ad2d-d8a1-4d29-bcd9-971ceefc0b64" UpgradeCode="123a8d51-1558-45da-adf3-6c5fb853438c">
+					 Id="72B6AD2D-D8A1-4D29-BCD9-971CEEFC0B64" UpgradeCode="123A8D51-1558-45DA-ADF3-6C5FB853438C">
     <Package Id='*' Keywords='Installer' InstallScope='perMachine'
 						 Description="IoT Client Installer" Comments='The Waher IoT Gateway is a registered trademark of Waher Data AB.'
 						 Manufacturer='Waher Data AB' InstallerVersion='301' Languages='1033' Compressed='yes'
@@ -20,7 +20,7 @@
       <Directory Id='ProgramFilesFolder' Name='ProgramFiles'>
         <Directory Id='WaherDataAB' Name='Waher Data AB'>
           <Directory Id='INSTALLDIR' Name='IoT Client 1.0'>
-            <Component Id='SystemLibraries' Guid='660e4cc3-334a-4124-bef2-fb82a4796534'>
+            <Component Id='SystemLibraries' Guid='660E4CC3-334A-4124-BEF2-FB82A4796534'>
               <File Id='System.Xml.XPath.XDocument.dll' Name='System.Xml.XPath.XDocument.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Xml.XPath.XDocument.dll' Vital='yes' KeyPath='yes'/>
               <File Id='System.AppContext.dll' Name='System.AppContext.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.AppContext.dll' Vital='yes'/>
               <File Id='System.Collections.Concurrent.dll' Name='System.Collections.Concurrent.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Collections.Concurrent.dll' Vital='yes'/>
@@ -210,19 +210,19 @@
               <RemoveFile Id='RemoveSystem.Xml.XmlSerializer.dll' Name='System.Xml.XmlSerializer.dll' On='uninstall'/>
               <RemoveFile Id='RemoveSystem.Xml.XPath.dll' Name='System.Xml.XPath.dll' On='uninstall'/>
             </Component>
-            <Component Id='MicrosoftLibraries' Guid='b2fc6b57-783c-45b5-a84e-bd5f1f173506'>
-              <File Id='Microsoft.Win32.Primitives.dll' Name='Microsoft.Win32.Primitives.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Microsoft.Win32.Primitives.dll' Vital='yes' />
+            <Component Id='MicrosoftLibraries' Guid='B2FC6B57-783C-45B5-A84E-BD5F1F173506'>
+              <File Id='Microsoft.Win32.Primitives.dll' Name='Microsoft.Win32.Primitives.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Microsoft.Win32.Primitives.dll' Vital='yes' KeyPath='yes' />
               <File Id='netstandard.dll' Name='netstandard.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\netstandard.dll' Vital='yes' />
               <RemoveFile Id='RemoveMicrosoft.Win32.Primitives.dll' Name='Microsoft.Win32.Primitives.dll' On='uninstall'/>
               <RemoveFile Id='Removenetstandard.dll' Name='netstandard.dll' On='uninstall'/>
             </Component>
-            <Component Id='ExternalLibraries' Guid='65c7c4ca-de10-4838-8301-b23824cdfa23'>
-              <File Id='SkiaSharp.dll' Name='SkiaSharp.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\SkiaSharp.dll' Vital='yes'/>
+            <Component Id='ExternalLibraries' Guid='65C7C4CA-DE10-4838-8301-B23824CDFA23'>
+              <File Id='SkiaSharp.dll' Name='SkiaSharp.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\SkiaSharp.dll' Vital='yes' KeyPath='yes'/>
               <File Id='libSkiaSharp.dll' Name='libSkiaSharp.dll' DiskId='1' Source='..\..\..\Script\Waher.Script.Lab\Bin\Debug\libSkiaSharp.dll' Vital='yes'/>
               <RemoveFile Id='RemoveSkiaSharp.dll' Name='SkiaSharp.dll' On='uninstall'/>
               <RemoveFile Id='RemovelibSkiaSharp.dll' Name='libSkiaSharp.dll' On='uninstall'/>
             </Component>
-            <Component Id='MainExecutable' Guid='cf8bb89b-c017-4945-af9e-b18fdb4e2ee9'>
+            <Component Id='MainExecutable' Guid='CF8BB89B-C017-4945-AF9E-B18FDB4E2EE9'>
               <RegistryKey Root='HKLM' Key='Software\[Manufacturer]\[ProductName]'>
                 <RegistryValue Type='string' Name='InstallDir' Value='[INSTALLDIR]' Action='write'/>
               </RegistryKey>
@@ -302,7 +302,7 @@
 							<RemoveFile Id='RemoveWaher.Security.dll' Name='Waher.Security.dll' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Things.dll' Name='Waher.Things.dll' On='uninstall'/>
             </Component>
-            <Component Id='MainDebugFiles' Guid='2a936317-68fe-40f9-ac44-4242c32faaf7'>
+            <Component Id='MainDebugFiles' Guid='2A936317-68FE-40F9-AC44-4242C32FAAF7'>
               <File Id='Waher.Client.WPF.pdb' Name='Waher.Client.WPF.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Client.WPF.pdb' Vital='yes' KeyPath='yes'/>
               <File Id='Waher.Content.pdb' Name='Waher.Content.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.pdb' Vital='yes'/>
               <File Id='Waher.Content.Emoji.pdb' Name='Waher.Content.Emoji.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Emoji.pdb' Vital='yes'/>
@@ -396,7 +396,7 @@
       </Directory>
       <Directory Id="ProgramMenuFolder" Name="Programs">
         <Directory Id="ProgramMenuDir" Name="IoT Client 1.0">
-          <Component Id="ProgramMenuDir" Guid="19878820-a9d8-4f18-b148-35806cc6cc3f">
+          <Component Id="ProgramMenuDir" Guid="19878820-A9D8-4F18-B148-35806CC6CC3F">
             <RemoveFolder Id='ProgramMenuDir' On='uninstall' />
             <RegistryKey Root='HKCU' Key='Software\[Manufacturer]\[ProductName]'>
               <RegistryValue Type='string' Value='' KeyPath='yes' Action='write' />

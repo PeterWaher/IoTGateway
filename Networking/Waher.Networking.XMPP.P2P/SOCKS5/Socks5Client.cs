@@ -64,9 +64,9 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		private NetworkStream stream = null;
 		private Socks5State state = Socks5State.Offline;
 		private LinkedList<byte[]> queue = new LinkedList<byte[]>();
-		private string host;
-		private int port;
-		private string jid;
+		private readonly string host;
+		private readonly int port;
+		private readonly string jid;
 		private byte[] inputBuffer;
 		private bool isWriting = false;
 		private bool closeWhenDone = false;

@@ -39,10 +39,10 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 	/// </summary>
 	public class ResponseEventArgs : EventArgs
 	{
-		private IPAddress ipAddress;
-		private string domainName;
-		private int port;
-		private byte responseCode;
+		private readonly IPAddress ipAddress;
+		private readonly string domainName;
+		private readonly int port;
+		private readonly byte responseCode;
 
 		/// <summary>
 		/// Event arguments for SOCKS5 responses.

@@ -19,7 +19,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		/// </summary>
 		public const string Namespace = "http://jabber.org/protocol/bytestreams";
 
-		private Dictionary<string, Socks5Client> streams = new Dictionary<string, Socks5Client>();
+		private readonly Dictionary<string, Socks5Client> streams = new Dictionary<string, Socks5Client>();
 		private IEndToEndEncryption e2e;
 		private bool hasProxy = false;
 		private string jid = null;

@@ -11,14 +11,14 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 	/// </summary>
 	public class OutgoingStream : IDisposable
 	{
-		private XmppClient xmppClient;
+		private readonly XmppClient xmppClient;
 		private Socks5Client client;
 		private TemporaryFile tempFile;
-		private IEndToEndEncryption e2e;
-		private string to;
+		private readonly IEndToEndEncryption e2e;
+		private readonly string to;
 		private object state = null;
 		private long pos = 0;
-		private int blockSize;
+		private readonly int blockSize;
 		private bool isWriting;
 		private bool done;
 		private bool aborted = false;

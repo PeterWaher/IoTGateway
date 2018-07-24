@@ -18,9 +18,9 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 	/// </summary>
 	public class DataReceivedEventArgs : EventArgs
 	{
-		private byte[] data;
-		private Socks5Client stream;
-		private object state;
+		private readonly byte[] data;
+		private readonly Socks5Client stream;
+		private readonly object state;
 
 		/// <summary>
 		/// Event arguments for data reception events.

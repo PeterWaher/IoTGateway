@@ -17,9 +17,9 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 	/// </summary>
 	public class StreamEventArgs : EventArgs
 	{
-		private bool ok;
-		private Socks5Client stream;
-		private object state;
+		private readonly bool ok;
+		private readonly Socks5Client stream;
+		private readonly object state;
 
 		/// <summary>
 		/// Event arguments for stream callbacks.

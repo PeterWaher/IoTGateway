@@ -11,10 +11,10 @@ namespace Waher.Networking.XMPP.P2P
 	/// </summary>
 	public class PeerConnectionEventArgs : EventArgs
 	{
-		private XmppClient client;
-		private object state;
-		private string localJid;
-		private string remoteJid;
+		private readonly XmppClient client;
+		private readonly object state;
+		private readonly string localJid;
+		private readonly string remoteJid;
 
 		/// <summary>
 		/// Peer connection event arguments.

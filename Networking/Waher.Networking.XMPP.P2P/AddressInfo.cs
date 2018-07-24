@@ -10,11 +10,11 @@ namespace Waher.Networking.XMPP.P2P
 	/// </summary>
 	public class AddressInfo
 	{
-		private string xmppAddress;
-		private string externalIp;
-		private string localIp;
-		private int externalPort;
-		private int localPort;
+		private readonly string xmppAddress;
+		private readonly string externalIp;
+		private readonly string localIp;
+		private readonly int externalPort;
+		private readonly int localPort;
 
 		/// <summary>
 		/// Contains information about peer addresses.

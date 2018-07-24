@@ -19,9 +19,9 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 	{
 		private DataReceivedEventHandler dataCallback = null;
 		private StreamEventHandler closeCallback = null;
-		private XmppClient client;
+		private readonly XmppClient client;
 		private object state = null;
-		private string streamId;
+		private readonly string streamId;
 
 		internal ValidateStreamEventArgs(XmppClient Client, IqEventArgs e, string StreamId)
 			: base(e)

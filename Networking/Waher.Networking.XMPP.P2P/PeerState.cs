@@ -19,23 +19,23 @@ namespace Waher.Networking.XMPP.P2P
 	{
         private const int MaxFragmentSize = 1000000;
 
-        private UTF8Encoding encoding = new UTF8Encoding(false, false);
-		private StringBuilder fragment = new StringBuilder();
+        private readonly UTF8Encoding encoding = new UTF8Encoding(false, false);
+		private readonly StringBuilder fragment = new StringBuilder();
         private int fragmentLength = 0;
 		private XmppState state = XmppState.StreamNegotiation;
 		private PeerConnection peer;
 		private XmppServerlessMessaging parent;
 		private XmppClient xmppClient;
 		private LinkedList<KeyValuePair<PeerConnectionEventHandler, object>> callbacks = null;
-		private DateTime created = DateTime.Now;
+		private readonly DateTime created = DateTime.Now;
 		private int inputState = 0;
 		private int inputDepth = 0;
-		private string parentBareJid;
+		private readonly string parentFullJid;
 		private string streamHeader;
 		private string streamFooter;
 		private string streamId;
 		private double version;
-		private string remoteBareJid;
+		private string remoteFullJid;
 		private bool headerSent = false;
 
 		/// <summary>
@@ -57,7 +57,7 @@ namespace Waher.Networking.XMPP.P2P
 		{
 			this.parent = Parent;
 			this.peer = Peer;
-			this.parentBareJid = Parent.BareJid;
+			this.parentFullJid = Parent.FullJid;
 
 			this.AddPeerHandlers();
 		}
@@ -67,24 +67,24 @@ namespace Waher.Networking.XMPP.P2P
 		/// </summary>
 		/// <param name="Peer">Peer connection.</param>
 		/// <param name="Parent">Parent object.</param>
-		/// <param name="RemoteJID">Remote JID</param>
+		/// <param name="RemoteJID">Remote Full JID</param>
 		/// <param name="StreamHeader">Stream header</param>
 		/// <param name="StreamFooter">Stream footer</param>
 		/// <param name="StreamId">Stream ID</param>
 		/// <param name="Version">Protocol version</param>
 		/// <param name="Callback">Callback method</param>
 		/// <param name="State">State object</param>
-		public PeerState(PeerConnection Peer, XmppServerlessMessaging Parent, string RemoteJID, string StreamHeader, string StreamFooter,
+		public PeerState(PeerConnection Peer, XmppServerlessMessaging Parent, string RemoteFullJID, string StreamHeader, string StreamFooter,
 			string StreamId, double Version, PeerConnectionEventHandler Callback, object State)
 		{
 			this.parent = Parent;
 			this.peer = Peer;
-			this.remoteBareJid = RemoteJID;
+			this.remoteFullJid = RemoteFullJID;
 			this.streamHeader = StreamHeader;
 			this.streamFooter = StreamFooter;
 			this.streamId = StreamId;
 			this.version = Version;
-			this.parentBareJid = Parent.BareJid;
+			this.parentFullJid = Parent.FullJid;
 
 			this.callbacks = new LinkedList<KeyValuePair<PeerConnectionEventHandler, object>>();
 			this.callbacks.AddLast(new KeyValuePair<PeerConnectionEventHandler, object>(Callback, State));
@@ -434,22 +434,22 @@ namespace Waher.Networking.XMPP.P2P
 
 				this.version = XML.Attribute(Stream, "version", 0.0);
 				this.streamId = XML.Attribute(Stream, "id");
-				this.remoteBareJid = XML.Attribute(Stream, "from");
+				this.remoteFullJid = XML.Attribute(Stream, "from");
 
 				if (this.version < 1.0)
 					throw new XmppException("Version not supported.", Stream);
 
-				if (this.parentBareJid != XML.Attribute(Stream, "to"))
+				if (this.parentFullJid != XML.Attribute(Stream, "to"))
 					throw new XmppException("Invalid destination JID.", Stream);
 
 				this.state = XmppState.Authenticating;
 
 				string Header = "<?xml version='1.0'?><stream:stream xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams' from='" +
-					this.parentBareJid + "' to='" + this.remoteBareJid + "' version='1.0'>";
+					this.parentFullJid + "' to='" + this.remoteFullJid + "' version='1.0'>";
 
 				try
 				{
-					this.parent.AuthenticatePeer(this.peer, this.remoteBareJid);
+					this.parent.AuthenticatePeer(this.peer, this.remoteFullJid);
 				}
 				catch (Exception ex)
 				{
@@ -475,14 +475,14 @@ namespace Waher.Networking.XMPP.P2P
 				}
 
 				this.state = XmppState.Connected;
-				this.xmppClient = new XmppClient(this, this.state, Header, "</stream:stream>", this.parentBareJid, 
+				this.xmppClient = new XmppClient(this, this.state, Header, "</stream:stream>", this.parentFullJid, 
 					typeof(XmppServerlessMessaging).GetTypeInfo().Assembly)
 				{
 					SendFromAddress = true
 				};
 				
 				this.parent.PeerAuthenticated(this);
-				this.parent.NewXmppClient(this.xmppClient, this.parentBareJid, this.remoteBareJid);
+				this.parent.NewXmppClient(this.xmppClient, this.parentFullJid, this.remoteFullJid);
 
 				this.xmppClient.OnStateChanged += this.XmppClient_OnStateChanged;
 
@@ -567,11 +567,11 @@ namespace Waher.Networking.XMPP.P2P
 		}
 
 		/// <summary>
-		/// Remote Bare JID
+		/// Remote Full JID
 		/// </summary>
-		public string RemoteBareJid
+		public string RemoteFullJid
 		{
-			get { return this.remoteBareJid; }
+			get { return this.remoteFullJid; }
 		}
 
 		internal bool HasCallbacks
@@ -592,7 +592,7 @@ namespace Waher.Networking.XMPP.P2P
 				{
 					try
 					{
-						P.Key(this, new PeerConnectionEventArgs(this.xmppClient, P.Value, this.parentBareJid, this.remoteBareJid));
+						P.Key(this, new PeerConnectionEventArgs(this.xmppClient, P.Value, this.parentFullJid, this.remoteFullJid));
 					}
 					catch (Exception ex)
 					{

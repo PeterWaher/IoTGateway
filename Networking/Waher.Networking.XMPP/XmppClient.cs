@@ -533,6 +533,7 @@ namespace Waher.Networking.XMPP
 				this.clientName = AssemblyName;
 
 			this.clientVersion = Name.Version.ToString();
+			this.bareJid = this.fullJid = this.userName + "@" + Domain;
 
 			/* Alternative for UWP:
 			string DeviceFamily = Windows.System.Profile.AnalyticsInfo.VersionInfo.DeviceFamily;

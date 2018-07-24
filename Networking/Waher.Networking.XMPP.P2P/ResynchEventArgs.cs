@@ -19,27 +19,27 @@ namespace Waher.Networking.XMPP.P2P
 	/// </summary>
 	public class ResynchEventArgs : EventArgs
 	{
-		private ResynchEventHandler callback;
-		private string remoteJid;
+		private readonly ResynchEventHandler callback;
+		private readonly string remoteFullJid;
 		private bool ok = false;
 
 		/// <summary>
 		/// Peer connection event arguments.
 		/// </summary>
-		/// <param name="RemoteJid">Remote JID.</param>
+		/// <param name="RemoteFullJid">Remote Full JID.</param>
 		/// <param name="Callback">Callback method.</param>
-		public ResynchEventArgs(string RemoteJid, ResynchEventHandler Callback)
+		public ResynchEventArgs(string RemoteFullJid, ResynchEventHandler Callback)
 		{
-			this.remoteJid = RemoteJid;
+			this.remoteFullJid = RemoteFullJid;
 			this.callback = Callback;
 		}
 
 		/// <summary>
 		/// JID of the remote end-point.
 		/// </summary>
-		public string RemoteJid
+		public string RemoteFullJid
 		{
-			get { return this.remoteJid; }
+			get { return this.remoteFullJid; }
 		}
 
 		/// <summary>

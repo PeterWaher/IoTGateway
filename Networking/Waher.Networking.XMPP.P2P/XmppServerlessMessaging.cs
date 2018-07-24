@@ -23,21 +23,21 @@ namespace Waher.Networking.XMPP.P2P
 	/// </summary>
 	public class XmppServerlessMessaging : Sniffable, IDisposable
 	{
-		private Dictionary<string, PeerState> peersByJid = new Dictionary<string, PeerState>(StringComparer.CurrentCultureIgnoreCase);
-		private Dictionary<string, AddressInfo> addressesByJid = new Dictionary<string, AddressInfo>(StringComparer.CurrentCultureIgnoreCase);
-		private Dictionary<string, Dictionary<int, AddressInfo>> addressesByExternalIPPort = new Dictionary<string, Dictionary<int, AddressInfo>>();
-		private Dictionary<string, Dictionary<int, AddressInfo>> addressesByLocalIPPort = new Dictionary<string, Dictionary<int, AddressInfo>>();
+		private Dictionary<string, PeerState> peersByFullJid = new Dictionary<string, PeerState>(StringComparer.CurrentCultureIgnoreCase);
+		private readonly Dictionary<string, AddressInfo> addressesByFullJid = new Dictionary<string, AddressInfo>(StringComparer.CurrentCultureIgnoreCase);
+		private readonly Dictionary<string, Dictionary<int, AddressInfo>> addressesByExternalIPPort = new Dictionary<string, Dictionary<int, AddressInfo>>();
+		private readonly Dictionary<string, Dictionary<int, AddressInfo>> addressesByLocalIPPort = new Dictionary<string, Dictionary<int, AddressInfo>>();
 		private PeerToPeerNetwork p2pNetwork = null;
-		private string bareJid;
+		private string fullJid;
 
 		/// <summary>
 		/// Class managing peer-to-peer serveless XMPP communication.
 		/// </summary>
 		/// <param name="ApplicationName">Name of application, as it will be registered in Internet Gateways.</param>
-		/// <param name="BareJid">Bare JID of local end-point.</param>
+		/// <param name="FullJid">Bare JID of local end-point.</param>
 		/// <param name="Sniffers">Sniffers</param>
-		public XmppServerlessMessaging(string ApplicationName, string BareJid, params ISniffer[] Sniffers)
-			: this(ApplicationName, BareJid, PeerToPeerNetwork.DefaultPort, PeerToPeerNetwork.DefaultPort,
+		public XmppServerlessMessaging(string ApplicationName, string FullJid, params ISniffer[] Sniffers)
+			: this(ApplicationName, FullJid, PeerToPeerNetwork.DefaultPort, PeerToPeerNetwork.DefaultPort,
 				  PeerToPeerNetwork.DefaultBacklog, Sniffers)
 		{
 		}
@@ -46,12 +46,12 @@ namespace Waher.Networking.XMPP.P2P
 		/// Class managing peer-to-peer serveless XMPP communication.
 		/// </summary>
 		/// <param name="ApplicationName">Name of application, as it will be registered in Internet Gateways.</param>
-		/// <param name="BareJid">Bare JID of local end-point.</param>
+		/// <param name="FullJid">Bare JID of local end-point.</param>
 		/// <param name="LocalPort">Desired local port number. If 0, a dynamic port number will be assigned.</param>
 		/// <param name="ExternalPort">Desired external port number. If 0, a dynamic port number will be assigned.</param>
 		/// <param name="Sniffers">Sniffers</param>
-		public XmppServerlessMessaging(string ApplicationName, string BareJid, int LocalPort, int ExternalPort, params ISniffer[] Sniffers)
-			: this(ApplicationName, BareJid, LocalPort, ExternalPort, PeerToPeerNetwork.DefaultBacklog, Sniffers)
+		public XmppServerlessMessaging(string ApplicationName, string FullJid, int LocalPort, int ExternalPort, params ISniffer[] Sniffers)
+			: this(ApplicationName, FullJid, LocalPort, ExternalPort, PeerToPeerNetwork.DefaultBacklog, Sniffers)
 		{
 		}
 
@@ -59,16 +59,16 @@ namespace Waher.Networking.XMPP.P2P
 		/// Class managing peer-to-peer serveless XMPP communication.
 		/// </summary>
 		/// <param name="ApplicationName">Name of application, as it will be registered in Internet Gateways.</param>
-		/// <param name="BareJid">Bare JID of local end-point.</param>
+		/// <param name="FullJid">Bare JID of local end-point.</param>
 		/// <param name="LocalPort">Desired local port number. If 0, a dynamic port number will be assigned.</param>
 		/// <param name="ExternalPort">Desired external port number. If 0, a dynamic port number will be assigned.</param>
 		/// <param name="Backlog">Connection backlog.</param>
 		/// <param name="Sniffers">Sniffers</param>
-		public XmppServerlessMessaging(string ApplicationName, string BareJid, int LocalPort, int ExternalPort, int Backlog,
+		public XmppServerlessMessaging(string ApplicationName, string FullJid, int LocalPort, int ExternalPort, int Backlog,
 			params ISniffer[] Sniffers)
 			: base(Sniffers)
 		{
-			this.bareJid = BareJid;
+			this.fullJid = FullJid;
 			this.p2pNetwork = new PeerToPeerNetwork(ApplicationName, LocalPort, ExternalPort, Backlog, Sniffers)
 			{
 				EncapsulatePackets = false
@@ -88,12 +88,12 @@ namespace Waher.Networking.XMPP.P2P
 		}
 
 		/// <summary>
-		/// Bare JID
+		/// Full JID
 		/// </summary>
-		public string BareJid
+		public string FullJid
 		{
-			get { return this.bareJid; }
-			set { this.bareJid = value; }
+			get { return this.fullJid; }
+			set { this.fullJid = value; }
 		}
 
 		private void P2PNetwork_OnPeerConnected(object Listener, PeerConnection Peer)
@@ -103,18 +103,18 @@ namespace Waher.Networking.XMPP.P2P
 		}
 
 		/// <summary>
-		/// Remove a JID from the recognized set of JIDs.
+		/// Removes a JID from the recognized set of JIDs.
 		/// </summary>
-		/// <param name="XmppAddress">JID.</param>
-		public void RemovePeerAddresses(string XmppAddress)
+		/// <param name="FullJID">Full JID.</param>
+		public void RemovePeerAddresses(string FullJID)
 		{
 			string ThisExternalIp = this.p2pNetwork.ExternalAddress == null ? string.Empty : this.p2pNetwork.ExternalAddress.ToString();
 
-			lock (this.addressesByJid)
+			lock (this.addressesByFullJid)
 			{
-				if (this.addressesByJid.TryGetValue(XmppAddress, out AddressInfo Info))
+				if (this.addressesByFullJid.TryGetValue(FullJID, out AddressInfo Info))
 				{
-					this.addressesByJid.Remove(XmppAddress);
+					this.addressesByFullJid.Remove(FullJID);
 
 					if (this.addressesByExternalIPPort.TryGetValue(Info.ExternalIp, out Dictionary<int, AddressInfo> Infos))
 					{
@@ -135,18 +135,18 @@ namespace Waher.Networking.XMPP.P2P
 					return;
 			}
 
-			this.Information("Removing JID from set of recognized JIDs: " + XmppAddress);
+			this.Information("Removing JID from set of recognized JIDs: " + FullJID);
 		}
 
 		/// <summary>
 		/// Reports recognized peer addresses.
 		/// </summary>
-		/// <param name="XmppAddress">XMPP Address (bare JID).</param>
+		/// <param name="FullJID">XMPP Address (full JID).</param>
 		/// <param name="ExternalIp">External IP address.</param>
 		/// <param name="ExternalPort">External Port number.</param>
 		/// <param name="LocalIp">Local IP address.</param>
 		/// <param name="LocalPort">Local Port number.</param>
-		public void ReportPeerAddresses(string XmppAddress, string ExternalIp, int ExternalPort, string LocalIp, int LocalPort)
+		public void ReportPeerAddresses(string FullJID, string ExternalIp, int ExternalPort, string LocalIp, int LocalPort)
 		{
 			Dictionary<int, AddressInfo> Infos;
 			string ThisExternalIp;
@@ -156,9 +156,9 @@ namespace Waher.Networking.XMPP.P2P
 			else
 				ThisExternalIp = this.p2pNetwork.ExternalAddress.ToString();
 
-			lock (this.addressesByJid)
+			lock (this.addressesByFullJid)
 			{
-				if (this.addressesByJid.TryGetValue(XmppAddress, out AddressInfo Info))
+				if (this.addressesByFullJid.TryGetValue(FullJID, out AddressInfo Info))
 				{
 					if (Info.ExternalIp == ExternalIp && Info.ExternalPort == ExternalPort &&
 						Info.LocalIp == LocalIp && Info.LocalPort == LocalPort)
@@ -185,8 +185,8 @@ namespace Waher.Networking.XMPP.P2P
 					}
 				}
 
-				Info = new AddressInfo(XmppAddress, ExternalIp, ExternalPort, LocalIp, LocalPort);
-				this.addressesByJid[XmppAddress] = Info;
+				Info = new AddressInfo(FullJID, ExternalIp, ExternalPort, LocalIp, LocalPort);
+				this.addressesByFullJid[FullJID] = Info;
 
 				if (!this.addressesByExternalIPPort.TryGetValue(ExternalIp, out Infos))
 				{
@@ -208,18 +208,18 @@ namespace Waher.Networking.XMPP.P2P
 				}
 			}
 
-			this.Information("P2P information available for " + XmppAddress + ". External: " + ExternalIp + ":" + ExternalPort.ToString() +
+			this.Information("P2P information available for " + FullJID + ". External: " + ExternalIp + ":" + ExternalPort.ToString() +
 				", Local: " + LocalIp + ":" + LocalPort.ToString());
 		}
 
-		internal void AuthenticatePeer(PeerConnection Peer, string BareJID)
+		internal void AuthenticatePeer(PeerConnection Peer, string FullJID)
 		{
 			AddressInfo Info;
 
-			lock (this.addressesByJid)
+			lock (this.addressesByFullJid)
 			{
-				if (!this.addressesByJid.TryGetValue(BareJID, out Info))
-					throw new XmppException("Peer JID " + BareJID + " not recognized.");
+				if (!this.addressesByFullJid.TryGetValue(FullJID, out Info))
+					throw new XmppException("Peer JID " + FullJID + " not recognized.");
 			}
 
 			if (Info.ExternalIp == this.p2pNetwork.ExternalAddress.ToString())
@@ -244,12 +244,12 @@ namespace Waher.Networking.XMPP.P2P
 
 		internal void PeerAuthenticated(PeerState State)
 		{
-			lock (this.peersByJid)
+			lock (this.peersByFullJid)
 			{
-				this.peersByJid[State.RemoteBareJid] = State;
+				this.peersByFullJid[State.RemoteFullJid] = State;
 			}
 
-			this.Information("Peer authenticated: " + State.RemoteBareJid);
+			this.Information("Peer authenticated: " + State.RemoteFullJid);
 		}
 
 		internal void NewXmppClient(XmppClient Client, string LocalJid, string RemoteJid)
@@ -280,24 +280,24 @@ namespace Waher.Networking.XMPP.P2P
 
 		internal void PeerClosed(PeerState State)
 		{
-			this.Information("Serverless XMPP connection with " + State.RemoteBareJid + " closed.");
+			this.Information("Serverless XMPP connection with " + State.RemoteFullJid + " closed.");
 
-			lock (this.peersByJid)
+			lock (this.peersByFullJid)
 			{
-				if (this.peersByJid.TryGetValue(State.RemoteBareJid, out PeerState State2) && State2 == State)
-					this.peersByJid.Remove(State.RemoteBareJid);
+				if (this.peersByFullJid.TryGetValue(State.RemoteFullJid, out PeerState State2) && State2 == State)
+					this.peersByFullJid.Remove(State.RemoteFullJid);
 			}
 		}
 
 		/// <summary>
 		/// Gets a peer XMPP connection.
 		/// </summary>
-		/// <param name="BareJID">Bare JID of peer to connect to.</param>
+		/// <param name="FullJID">Bare JID of peer to connect to.</param>
 		/// <param name="Callback">Method to call when connection is established.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void GetPeerConnection(string BareJID, PeerConnectionEventHandler Callback, object State)
+		public void GetPeerConnection(string FullJID, PeerConnectionEventHandler Callback, object State)
 		{
-			this.GetPeerConnection(BareJID, Callback, State, this.OnResynch);
+			this.GetPeerConnection(FullJID, Callback, State, this.OnResynch);
 		}
 
 		/// <summary>
@@ -308,15 +308,15 @@ namespace Waher.Networking.XMPP.P2P
 		/// <summary>
 		/// If it is possible to connect directly to a given peer, given it's bare JID.
 		/// </summary>
-		/// <param name="BareJID">Bare JID.</param>
+		/// <param name="FullJID">Full JID.</param>
 		/// <returns>If it is possible to connect directly to the peer.</returns>
-		public bool CanConnectToPeer(string BareJID)
+		public bool CanConnectToPeer(string FullJID)
 		{
 			AddressInfo Info;
 
-			lock (this.addressesByJid)
+			lock (this.addressesByFullJid)
 			{
-				if (!this.addressesByJid.TryGetValue(BareJID, out Info))
+				if (!this.addressesByFullJid.TryGetValue(FullJID, out Info))
 					return false;
 			}
 
@@ -326,18 +326,18 @@ namespace Waher.Networking.XMPP.P2P
 		/// <summary>
 		/// Gets peer-to-peer address information
 		/// </summary>
-		/// <param name="BareJID"></param>
-		/// <param name="Address"></param>
+		/// <param name="FullJID">Full JID</param>
+		/// <param name="Address">IP address information</param>
 		/// <returns></returns>
-		public bool TryGetAddressInfo(string BareJID, out AddressInfo Address)
+		public bool TryGetAddressInfo(string FullJID, out AddressInfo Address)
 		{
-			lock (this.addressesByJid)
+			lock (this.addressesByFullJid)
 			{
-				return this.addressesByJid.TryGetValue(BareJID, out Address);
+				return this.addressesByFullJid.TryGetValue(FullJID, out Address);
 			}
 		}
 
-		private void GetPeerConnection(string BareJID, PeerConnectionEventHandler Callback, object State, ResynchEventHandler ResynchMethod)
+		private void GetPeerConnection(string FullJID, PeerConnectionEventHandler Callback, object State, ResynchEventHandler ResynchMethod)
 		{
 			PeerState Result;
 			PeerState Old = null;
@@ -351,7 +351,7 @@ namespace Waher.Networking.XMPP.P2P
 				{
 					try
 					{
-						Callback(this, new PeerConnectionEventArgs(null, State, this.bareJid, BareJID));
+						Callback(this, new PeerConnectionEventArgs(null, State, this.fullJid, FullJID));
 					}
 					catch (Exception ex)
 					{
@@ -362,26 +362,26 @@ namespace Waher.Networking.XMPP.P2P
 				return;
 			}
 
-			lock (this.addressesByJid)
+			lock (this.addressesByFullJid)
 			{
-				b = this.addressesByJid.TryGetValue(BareJID, out Info);
+				b = this.addressesByFullJid.TryGetValue(FullJID, out Info);
 			}
 
 			if (!b)
 			{
-				Callback(this, new PeerConnectionEventArgs(null, State, this.bareJid, BareJID));
+				Callback(this, new PeerConnectionEventArgs(null, State, this.fullJid, FullJID));
 				return;
 			}
 
-			lock (this.peersByJid)
+			lock (this.peersByFullJid)
 			{
-				b = this.peersByJid.TryGetValue(BareJID, out Result);
+				b = this.peersByFullJid.TryGetValue(FullJID, out Result);
 
 				if (b)
 				{
 					if (Result.AgeSeconds >= 10 && (Result.HasCallbacks || Result.XmppClient == null || !Result.Peer.Tcp.Connected))
 					{
-						this.peersByJid.Remove(BareJID);
+						this.peersByFullJid.Remove(FullJID);
 						Old = Result;
 						Result = null;
 						b = false;
@@ -396,10 +396,10 @@ namespace Waher.Networking.XMPP.P2P
 				if (!b)
 				{
 					Header = "<?xml version='1.0'?><stream:stream xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams' from='" +
-						this.bareJid + "' to='" + BareJID + "' version='1.0'>";
+						this.fullJid + "' to='" + FullJID + "' version='1.0'>";
 
-					Result = new PeerState(null, this, BareJID, Header, "</stream:stream>", string.Empty, 1.0, Callback, State);
-					this.peersByJid[BareJID] = Result;
+					Result = new PeerState(null, this, FullJID, Header, "</stream:stream>", string.Empty, 1.0, Callback, State);
+					this.peersByFullJid[FullJID] = Result;
 				}
 			}
 
@@ -407,7 +407,7 @@ namespace Waher.Networking.XMPP.P2P
 			{
 				try
 				{
-					Callback(this, new PeerConnectionEventArgs(Result.XmppClient, State, this.bareJid, BareJID));
+					Callback(this, new PeerConnectionEventArgs(Result.XmppClient, State, this.fullJid, FullJID));
 				}
 				catch (Exception ex)
 				{
@@ -428,7 +428,7 @@ namespace Waher.Networking.XMPP.P2P
 
 				try
 				{
-					Connection = await this.ConnectToAsync(BareJID, Info);
+					Connection = await this.ConnectToAsync(FullJID, Info);
 				}
 				catch (Exception ex)
 				{
@@ -439,17 +439,17 @@ namespace Waher.Networking.XMPP.P2P
 					{
 						try
 						{
-							ResynchEventArgs e = new ResynchEventArgs(BareJID, (sender, e2) =>
+							ResynchEventArgs e = new ResynchEventArgs(FullJID, (sender, e2) =>
 							{
 								try
 								{
 									if (e2.Ok)
-										this.GetPeerConnection(BareJID, Callback, State, null);
+										this.GetPeerConnection(FullJID, Callback, State, null);
 									else
 									{
-										lock (this.peersByJid)
+										lock (this.peersByFullJid)
 										{
-											this.peersByJid.Remove(BareJID);
+											this.peersByFullJid.Remove(FullJID);
 										}
 
 										Result.CallCallbacks();
@@ -474,9 +474,9 @@ namespace Waher.Networking.XMPP.P2P
 
 				if (Connection == null)
 				{
-					lock (this.peersByJid)
+					lock (this.peersByFullJid)
 					{
-						this.peersByJid.Remove(BareJID);
+						this.peersByFullJid.Remove(FullJID);
 					}
 
 					Result.CallCallbacks();
@@ -490,14 +490,14 @@ namespace Waher.Networking.XMPP.P2P
 						{
 							try
 							{
-								ResynchMethod(this, new ResynchEventArgs(BareJID, async (sender2, e2) =>
+								ResynchMethod(this, new ResynchEventArgs(FullJID, async (sender2, e2) =>
 								{
 									try
 									{
 										if (e2.Ok)
 										{
 											Result.Peer = null;
-											Connection = await this.ConnectToAsync(BareJID, Info);
+											Connection = await this.ConnectToAsync(FullJID, Info);
 											Result.Peer = Connection;
 											Connection.Start();
 											Result.HeaderSent = true;
@@ -529,7 +529,7 @@ namespace Waher.Networking.XMPP.P2P
 			});
 		}
 
-		private async Task<PeerConnection> ConnectToAsync(string BareJID, AddressInfo Info)
+		private async Task<PeerConnection> ConnectToAsync(string FullJID, AddressInfo Info)
 		{
 			PeerConnection Connection;
 			IPAddress Addr;
@@ -538,9 +538,9 @@ namespace Waher.Networking.XMPP.P2P
 			{
 				if (IPAddress.TryParse(Info.LocalIp, out Addr))
 				{
-					this.Information("Connecting to " + Addr + ":" + Info.LocalPort.ToString() + " (" + BareJID + ")");
+					this.Information("Connecting to " + Addr + ":" + Info.LocalPort.ToString() + " (" + FullJID + ")");
 					Connection = await this.p2pNetwork.ConnectToPeer(new IPEndPoint(Addr, Info.LocalPort));
-					this.Information("Connected to to " + Addr + ":" + Info.LocalPort.ToString() + " (" + BareJID + ")");
+					this.Information("Connected to to " + Addr + ":" + Info.LocalPort.ToString() + " (" + FullJID + ")");
 				}
 				else
 					Connection = null;
@@ -549,9 +549,9 @@ namespace Waher.Networking.XMPP.P2P
 			{
 				if (IPAddress.TryParse(Info.ExternalIp, out Addr))
 				{
-					this.Information("Connecting to " + Addr + ":" + Info.ExternalPort.ToString() + " (" + BareJID + ")");
+					this.Information("Connecting to " + Addr + ":" + Info.ExternalPort.ToString() + " (" + FullJID + ")");
 					Connection = await this.p2pNetwork.ConnectToPeer(new IPEndPoint(Addr, Info.ExternalPort));
-					this.Information("Connected to " + Addr + ":" + Info.ExternalPort.ToString() + " (" + BareJID + ")");
+					this.Information("Connected to " + Addr + ":" + Info.ExternalPort.ToString() + " (" + FullJID + ")");
 				}
 				else
 					Connection = null;
@@ -571,16 +571,16 @@ namespace Waher.Networking.XMPP.P2P
 				this.p2pNetwork = null;
 			}
 
-			if (this.peersByJid != null)
+			if (this.peersByFullJid != null)
 			{
-				foreach (PeerState State in this.peersByJid.Values)
+				foreach (PeerState State in this.peersByFullJid.Values)
 				{
 					State.ClearCallbacks();
 					State.Close();
 				}
 
-				this.peersByJid.Clear();
-				this.peersByJid = null;
+				this.peersByFullJid.Clear();
+				this.peersByFullJid = null;
 			}
 		}
 

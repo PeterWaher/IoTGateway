@@ -15,7 +15,7 @@ namespace Waher.Networking.XMPP.HTTPX
 	public class HttpxProxy : HttpAsynchronousResource, IDisposable, IHttpGetMethod, IHttpGetRangesMethod, IHttpOptionsMethod,
 		IHttpPostMethod, IHttpPostRangesMethod, IHttpPutMethod, IHttpPutRangesMethod, IHttpTraceMethod, IHttpDeleteMethod
 	{
-		private XmppClient defaultXmppClient;
+		private readonly XmppClient defaultXmppClient;
 		private HttpxClient httpxClient;
 		private XmppServerlessMessaging serverlessMessaging;
 		private IHttpxCache httpxCache;
@@ -229,25 +229,32 @@ namespace Waher.Networking.XMPP.HTTPX
 
 					throw new ConflictException();  // TODO: Provide body describing error.
 				}
-				else if (Item.HasLastPresence)
-				{
-					if (this.serverlessMessaging != null)
-					{
-						this.serverlessMessaging.GetPeerConnection(BareJID, this.SendP2P, new SendP2pRec()
-						{
-							item = Item,
-							method = Method,
-							bareJID = BareJID,
-							localUrl = LocalUrl,
-							request = Request,
-							response = Response
-						});
-					}
-					else
-						this.SendRequest(this.httpxClient, Item.LastPresenceFullJid, Method, BareJID, LocalUrl, Request, Response);
-				}
 				else
+				{
+					foreach (PresenceEventArgs e in Item.Resources)
+					{
+						// TODO: Select one based on features.
+
+						if (this.serverlessMessaging != null)
+						{
+							this.serverlessMessaging.GetPeerConnection(e.From, this.SendP2P, new SendP2pRec()
+							{
+								item = Item,
+								method = Method,
+								bareJID = BareJID,
+								localUrl = LocalUrl,
+								request = Request,
+								response = Response
+							});
+						}
+						else
+							this.SendRequest(this.httpxClient, e.From, Method, BareJID, LocalUrl, Request, Response);
+
+						return;
+					}
+
 					throw new ServiceUnavailableException();
+				}
 			}
 			catch (Exception ex)
 			{

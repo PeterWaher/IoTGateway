@@ -1195,9 +1195,14 @@ The following functions are available in the `Waher.Content.Markdown` library.
 
 | Function                 | Description | Example |
 |--------------------------|-------------|---------|
-| `MarkdownEncode(s)`      | Encodes a string for inclusion in Markdown. | [Example][MarkdownEncodeExaple] |
+| `LoadMarkdown(FileName)` | Loads a markdown file and preprocesses it before returning it as a string. | [Example][LoadMarkdownExample] |
+| `MarkdownEncode(s)`      | Encodes a string for inclusion in Markdown. | [Example][MarkdownEncodeExample] |
+| `PreprocessMarkdown(MD)` | Preprocesses a markdown string `MD`, and returns it as a string. | [Example][PreprocessMarkdownExample] |
 
-[MarkdownEncodeExaple]: Calculator.md?Expression=MarkdownEncode(%22test_sister%22)
+
+[LoadMarkdownExample]: Calculator.md?Expression=LoadMarkdown(%22File.md%22)
+[MarkdownEncodeExample]: Calculator.md?Expression=MarkdownEncode(%22test_sister%22)
+[PreprocessMarkdownExample]: Calculator.md?Expression=s%3A%3D%22Hello%20World%21%22%3BPreprocessMarkdown%28%22%2A%7B%7Bs%7D%7D%2A%22%29
 
 #### XSL-related functions (Waher.Content.Xsl)
 

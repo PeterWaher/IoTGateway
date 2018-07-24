@@ -100,7 +100,7 @@ namespace Waher.Content.Markdown
 			this.transparentExceptionTypes = TransparentExceptionTypes;
 
 			if (Settings.Variables != null)
-				this.markdownText = this.Preprocess(this.markdownText, Settings.Variables);
+				this.markdownText = Preprocess(this.markdownText, Settings.Variables, this.fileName, out this.isDynamic, TransparentExceptionTypes);
 
 			List<Block> Blocks = this.ParseTextToBlocks(this.markdownText);
 			List<KeyValuePair<string, bool>> Values = new List<KeyValuePair<string, bool>>();
@@ -186,30 +186,63 @@ namespace Waher.Content.Markdown
 			get { return this.markdownText; }
 		}
 
-		private static Regex endOfHeader = new Regex(@"\n\s*\n", RegexOptions.Multiline | RegexOptions.Compiled);
-		private static Regex scriptHeader = new Regex(@"^[Ss][Cc][Rr][Ii][Pp][Tt]:\s*(?'ScriptFile'[^\n]*)", RegexOptions.Multiline | RegexOptions.Compiled);
+		internal static Regex endOfHeader = new Regex(@"\n\s*\n", RegexOptions.Multiline | RegexOptions.Compiled);
+		internal static Regex scriptHeader = new Regex(@"^[Ss][Cc][Rr][Ii][Pp][Tt]:\s*(?'ScriptFile'[^\n]*)", RegexOptions.Multiline | RegexOptions.Compiled);
 
-		private string Preprocess(string s, Variables Variables)
+		/// <summary>
+		/// Preprocesses markdown text.
+		/// </summary>
+		/// <param name="Markdown">Markdown text</param>
+		/// <param name="Variables">Current set of variables.</param>
+		/// <returns>Preprocessed markdown.</returns>
+		public static string Preprocess(string Markdown, Variables Variables, params Type[] TransparentExceptionTypes)
+		{
+			return Preprocess(Markdown, Variables, string.Empty, out bool IsDynamic, TransparentExceptionTypes);
+		}
+
+		/// <summary>
+		/// Preprocesses markdown text.
+		/// </summary>
+		/// <param name="Markdown">Markdown text</param>
+		/// <param name="Variables">Current set of variables.</param>
+		/// <param name="FileName">Filename of markdown.</param>
+		/// <returns>Preprocessed markdown.</returns>
+		public static string Preprocess(string Markdown, Variables Variables, string FileName, params Type[] TransparentExceptionTypes)
+		{
+			return Preprocess(Markdown, Variables, FileName, out bool IsDynamic, TransparentExceptionTypes);
+		}
+
+		/// <summary>
+		/// Preprocesses markdown text.
+		/// </summary>
+		/// <param name="Markdown">Markdown text</param>
+		/// <param name="Variables">Current set of variables.</param>
+		/// <param name="FileName">Filename of markdown.</param>
+		/// <param name="IsDynamic">If the markdown contained preprocessed script.</param>
+		/// <returns>Preprocessed markdown.</returns>
+		public static string Preprocess(string Markdown, Variables Variables, string FileName, out bool IsDynamic, params Type[] TransparentExceptionTypes)
 		{
 			Expression Exp;
 			string Script, s2;
 			object Result;
 			int i, j;
 
-			if (!string.IsNullOrEmpty(this.fileName))
+			IsDynamic = false;
+
+			if (!string.IsNullOrEmpty(FileName))
 			{
-				Match M = endOfHeader.Match(s);
+				Match M = endOfHeader.Match(Markdown);
 				if (M.Success)
 				{
-					s2 = s.Substring(0, M.Index);
+					s2 = Markdown.Substring(0, M.Index);
 
 					foreach (Match M2 in scriptHeader.Matches(s2))
 					{
 						if (M.Success)
 						{
-							string FileName = Path.Combine(Path.GetDirectoryName(this.fileName), M2.Groups["ScriptFile"].Value);
+							string FileName2 = Path.Combine(Path.GetDirectoryName(FileName), M2.Groups["ScriptFile"].Value);
 
-							Script = File.ReadAllText(FileName);
+							Script = File.ReadAllText(FileName2);
 							Exp = new Expression(Script);
 							Exp.Evaluate(Variables);
 						}
@@ -217,21 +250,21 @@ namespace Waher.Content.Markdown
 				}
 			}
 
-			i = s.IndexOf("{{");
+			i = Markdown.IndexOf("{{");
 
 			while (i >= 0)
 			{
-				j = s.IndexOf("}}", i + 2);
+				j = Markdown.IndexOf("}}", i + 2);
 				if (j < 0)
 					break;
 
-				Script = s.Substring(i + 2, j - i - 2);
-				s = s.Remove(i, j - i + 2);
+				Script = Markdown.Substring(i + 2, j - i - 2);
+				Markdown = Markdown.Remove(i, j - i + 2);
 
 				try
 				{
 					Exp = new Expression(Script);
-					this.isDynamic = true;
+					IsDynamic = true;
 
 					if (Exp.ContainsImplicitPrint)
 					{
@@ -266,7 +299,7 @@ namespace Waher.Content.Markdown
 
 						foreach (Exception ex3 in ex2.InnerExceptions)
 						{
-							this.CheckException(ex3);
+							CheckException(ex3, TransparentExceptionTypes);
 
 							Log.Critical(ex3);
 
@@ -279,7 +312,7 @@ namespace Waher.Content.Markdown
 					}
 					else
 					{
-						this.CheckException(ex);
+						CheckException(ex, TransparentExceptionTypes);
 
 						Log.Critical(ex);
 
@@ -290,21 +323,26 @@ namespace Waher.Content.Markdown
 				if (Result != null)
 				{
 					s2 = Result.ToString();
-					s = s.Insert(i, s2);
+					Markdown = Markdown.Insert(i, s2);
 					i += s2.Length;
 				}
 
-				i = s.IndexOf("{{", i);
+				i = Markdown.IndexOf("{{", i);
 			}
 
-			return s;
+			return Markdown;
 		}
 
 		internal void CheckException(Exception ex)
 		{
+			CheckException(ex, this.transparentExceptionTypes);
+		}
+
+		internal static void CheckException(Exception ex, Type[] TransparentExceptionTypes)
+		{
 			TypeInfo ExceptionType = ex.GetType().GetTypeInfo();
 
-			foreach (Type T in this.transparentExceptionTypes)
+			foreach (Type T in TransparentExceptionTypes)
 			{
 				if (T.GetTypeInfo().IsAssignableFrom(ExceptionType))
 					System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex).Throw();

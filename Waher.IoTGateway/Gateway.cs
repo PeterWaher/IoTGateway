@@ -530,7 +530,7 @@ namespace Waher.IoTGateway
 				webServer.Register(login = new Login());
 				webServer.Register(logout = new Logout());
 
-				if (emoji1_24x24 != null)
+				if (emoji1_24x24 == null)
 				{
 					emoji1_24x24 = new Emoji1LocalFiles(Emoji1SourceFileType.Svg, 24, 24, "/Graphics/Emoji1/svg/%FILENAME%",
 						Path.Combine(runtimeFolder, "Graphics", "Emoji1.zip"), Path.Combine(appDataFolder, "Graphics"));

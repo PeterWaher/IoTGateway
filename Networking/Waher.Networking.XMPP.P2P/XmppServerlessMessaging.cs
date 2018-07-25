@@ -379,7 +379,7 @@ namespace Waher.Networking.XMPP.P2P
 
 				if (b)
 				{
-					if (Result.AgeSeconds >= 10 && (Result.HasCallbacks || Result.XmppClient == null || !Result.Peer.Tcp.Connected))
+					if (Result.AgeSeconds >= 30 && (Result.HasCallbacks || Result.XmppClient == null || !Result.Peer.Tcp.Connected))
 					{
 						this.peersByFullJid.Remove(FullJID);
 						Old = Result;

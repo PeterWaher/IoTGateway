@@ -18,11 +18,11 @@ namespace Waher.Networking.XMPP.HTTPX
 	/// </summary>
 	public class HttpxServer : IDisposable
 	{
-		private XmppClient client;
-		private HttpServer server;
+		private readonly XmppClient client;
+		private readonly HttpServer server;
 		private InBandBytestreams.IbbClient ibbClient = null;
 		private P2P.SOCKS5.Socks5Proxy socks5Proxy = null;
-		private int maxChunkSize;
+		private readonly int maxChunkSize;
 		private bool requiresE2e = false;
 
 		/// <summary>

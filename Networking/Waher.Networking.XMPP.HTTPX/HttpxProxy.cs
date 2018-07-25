@@ -241,7 +241,7 @@ namespace Waher.Networking.XMPP.HTTPX
 							{
 								item = Item,
 								method = Method,
-								bareJID = BareJID,
+								fullJID = e.From,
 								localUrl = LocalUrl,
 								request = Request,
 								response = Response
@@ -266,7 +266,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		{
 			public RosterItem item;
 			public string method;
-			public string bareJID;
+			public string fullJID;
 			public string localUrl;
 			public HttpRequest request;
 			public HttpResponse response;
@@ -280,7 +280,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			{
 				if (e.Client == null)
 				{
-					this.SendRequest(this.httpxClient, Rec.item.LastPresenceFullJid, Rec.method, Rec.bareJID, Rec.localUrl,
+					this.SendRequest(this.httpxClient, Rec.fullJID, Rec.method, XmppClient.GetBareJID(Rec.fullJID), Rec.localUrl,
 						  Rec.request, Rec.response);
 				}
 				else
@@ -291,11 +291,11 @@ namespace Waher.Networking.XMPP.HTTPX
 						e.Client.TryGetTag("HttpxClient", out object Obj) &&
 						(HttpxClient = Obj as HttpxClient) != null)
 					{
-						this.SendRequest(HttpxClient, Rec.bareJID, Rec.method, Rec.bareJID, Rec.localUrl, Rec.request, Rec.response);
+						this.SendRequest(HttpxClient, Rec.fullJID, Rec.method, XmppClient.GetBareJID(Rec.fullJID), Rec.localUrl, Rec.request, Rec.response);
 					}
 					else
 					{
-						this.SendRequest(this.httpxClient, Rec.item.LastPresenceFullJid, Rec.method, Rec.bareJID, Rec.localUrl,
+						this.SendRequest(this.httpxClient, Rec.fullJID, Rec.method, XmppClient.GetBareJID(Rec.fullJID), Rec.localUrl,
 							Rec.request, Rec.response);
 					}
 				}

@@ -27,7 +27,7 @@ namespace Waher.Networking.XMPP.P2P
 		private XmppServerlessMessaging parent;
 		private XmppClient xmppClient;
 		private LinkedList<KeyValuePair<PeerConnectionEventHandler, object>> callbacks = null;
-		private readonly DateTime created = DateTime.Now;
+		private DateTime lastActivity = DateTime.Now;
 		private int inputState = 0;
 		private int inputDepth = 0;
 		private readonly string parentFullJid;
@@ -129,6 +129,7 @@ namespace Waher.Networking.XMPP.P2P
 		{
 			string s = this.encoding.GetString(Packet, 0, Packet.Length);
 
+			this.lastActivity = DateTime.Now;
 			if (this.xmppClient == null)
 				this.parent.ReceiveText(s);
 
@@ -730,7 +731,10 @@ namespace Waher.Networking.XMPP.P2P
 			byte[] Data = this.encoding.GetBytes(Packet);
 
 			if (this.peer != null)
+			{
 				this.peer.SendTcp(Data, Callback);
+				this.lastActivity = DateTime.Now;
+			}
 		}
 
 		/// <summary>
@@ -742,13 +746,13 @@ namespace Waher.Networking.XMPP.P2P
 		}
 
 		/// <summary>
-		/// Seconds since object was created.
+		/// Seconds since object was active.
 		/// </summary>
 		public double AgeSeconds
 		{
 			get
 			{
-				return (DateTime.Now - this.created).TotalSeconds;
+				return (DateTime.Now - this.lastActivity).TotalSeconds;
 			}
 		}
 	}

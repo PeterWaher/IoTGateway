@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Xml;
 using Waher.Content.Xml;
+using Waher.Networking.XMPP.StanzaErrors;
 
 namespace Waher.Networking.XMPP
 {
@@ -295,8 +296,10 @@ namespace Waher.Networking.XMPP
 			get { return this.lastPresence; }
 		}
 
-		internal void PresenceReceived(PresenceEventArgs e)
+		internal void PresenceReceived(XmppClient Client, PresenceEventArgs e)
 		{
+			PresenceEventArgs[] ToTest = null;
+
 			lock (this.resources)
 			{
 				if (e.Type == PresenceType.Unavailable)
@@ -308,6 +311,14 @@ namespace Waher.Networking.XMPP
 				}
 				else if (e.Type == PresenceType.Available)
 				{
+					int c = this.resources.Count;
+
+					if (c > 0 && Client.MonitorContactResourcesAlive && !this.resources.ContainsKey(e.From))
+					{
+						ToTest = new PresenceEventArgs[c];
+						this.resources.Values.CopyTo(ToTest, 0);
+					}
+
 					this.resources[e.From] = e;
 					this.lastPresence = e;
 
@@ -315,6 +326,37 @@ namespace Waher.Networking.XMPP
 						this.pendingSubscription = PendingSubscription.None;    // Might be out of synch.
 				}
 			}
+
+			if (ToTest != null)
+			{
+				foreach (PresenceEventArgs e2 in ToTest)
+					Client.SendPing(e2.From, this.PingResult, new object[] { Client, e2 });
+			}
+		}
+
+		private void PingResult(object Sender, IqResultEventArgs e)
+		{
+			if (e.Ok)
+				return;
+
+			if (e.ErrorElement != null && e.ErrorElement.LocalName == FeatureNotImplementedException.LocalName)
+				return;
+
+			object[] P = (object[])e.State;
+			XmppClient Client = (XmppClient)P[0];
+			PresenceEventArgs e2 = (PresenceEventArgs)P[1];
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<presence from='");
+			Xml.Append(XML.Encode(e2.From));
+			Xml.Append("' to='");
+			Xml.Append(XML.Encode(Client.FullJID));
+			Xml.Append("' type='unavailable'/>");
+
+			XmlDocument Doc = new XmlDocument();
+			Doc.LoadXml(Xml.ToString());
+
+			Client.ProcessPresence(new PresenceEventArgs(Client, Doc.DocumentElement));
 		}
 
 		/// <summary>

@@ -104,6 +104,7 @@ namespace Waher.Networking.XMPP
 		private XmppComponent component;
 		private PresenceType type;
 		private Availability availability;
+		private DateTime received;
 		private string from;
 		private string fromBareJid;
 		private string to;
@@ -153,6 +154,7 @@ namespace Waher.Networking.XMPP
 			this.errorCode = e.errorCode;
 			this.priority = e.priority;
 			this.ok = e.ok;
+			this.received = e.received;
 		}
 
 		private PresenceEventArgs(XmppClient Client, XmppComponent Component, XmlElement Presence)
@@ -169,6 +171,7 @@ namespace Waher.Networking.XMPP
 			this.ok = true;
 			this.errorCode = 0;
 			this.availability = Availability.Online;
+			this.received = DateTime.Now;
 
 			i = this.from.IndexOf('/');
 			if (i < 0)
@@ -421,6 +424,11 @@ namespace Waher.Networking.XMPP
 		/// Priority of presence stanza.
 		/// </summary>
 		public sbyte Priority { get { return this.priority; } }
+
+		/// <summary>
+		/// Timestamp of when the stanza was received.
+		/// </summary>
+		public DateTime Received { get { return this.received; } }
 
 		/// <summary>
 		/// Version of entity capabilities of sender.

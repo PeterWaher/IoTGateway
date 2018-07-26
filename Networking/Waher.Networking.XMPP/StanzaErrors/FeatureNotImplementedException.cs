@@ -12,6 +12,11 @@ namespace Waher.Networking.XMPP.StanzaErrors
 	public class FeatureNotImplementedException : StanzaCancelExceptionException
 	{
 		/// <summary>
+		/// feature-not-implemented
+		/// </summary>
+		public const string LocalName = "feature-not-implemented";
+
+		/// <summary>
 		/// The feature represented in the XML stanza is not implemented by the intended recipient or an intermediate server and therefore the stanza
 		/// cannot be processed (e.g., the entity understands the namespace but does not recognize the element name); the associated error type
 		/// SHOULD be "cancel" or "modify".
@@ -28,7 +33,7 @@ namespace Waher.Networking.XMPP.StanzaErrors
 		/// </summary>
 		public override string ErrorStanzaName
 		{
-			get { return "feature-not-implemented"; }
+			get { return LocalName; }
 		}
 	}
 }

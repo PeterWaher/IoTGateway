@@ -346,6 +346,7 @@ namespace Waher.Networking.XMPP
 		private bool sendFromAddress = false;
 		private bool checkConnection = false;
 		private bool openBracketReceived = false;
+		private bool monitorContactResourcesAlive = true;
 
 		/// <summary>
 		/// Manages an XMPP client connection over a traditional binary socket connection. 
@@ -893,6 +894,15 @@ namespace Waher.Networking.XMPP
 		public string Language
 		{
 			get { return this.language; }
+		}
+
+		/// <summary>
+		/// Monitors contact resources to see they are alive.
+		/// </summary>
+		public bool MonitorContactResourcesAlive
+		{
+			get { return this.monitorContactResourcesAlive; }
+			set { this.monitorContactResourcesAlive = value; }
 		}
 
 		/// <summary>
@@ -2146,7 +2156,7 @@ namespace Waher.Networking.XMPP
 			this.ProcessIq(this.iqSetHandlers, e);
 		}
 
-		private void ProcessPresence(PresenceEventArgs e)
+		internal void ProcessPresence(PresenceEventArgs e)
 		{
 			PresenceEventHandler h = null;
 			RosterItem Item;
@@ -2184,7 +2194,7 @@ namespace Waher.Networking.XMPP
 					lock (this.roster)
 					{
 						if (this.roster.TryGetValue(e.FromBareJID, out Item))
-							Item.PresenceReceived(e);
+							Item.PresenceReceived(this, e);
 					}
 					break;
 
@@ -2195,7 +2205,7 @@ namespace Waher.Networking.XMPP
 					lock (this.roster)
 					{
 						if (this.roster.TryGetValue(e.FromBareJID, out Item))
-							Item.PresenceReceived(e);
+							Item.PresenceReceived(this, e);
 					}
 					break;
 

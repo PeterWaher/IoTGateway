@@ -406,6 +406,7 @@ namespace Waher.IoTGateway
 
 				HttpFolderResource HttpFolderResource;
 				ISystemConfiguration CurrentConfiguration = null;
+				LinkedList<HttpResource> SetupResources = null;
 				StringBuilder sb;
 
 				if (!Configured)
@@ -424,13 +425,15 @@ namespace Waher.IoTGateway
 
 					loggedIn = new LoggedIn(webServer);
 
-					webServer.Register(new HttpFolderResource("/Graphics", Path.Combine(appDataFolder, "Graphics"), false, false, true, false)); // TODO: Add authentication mechanisms for PUT & DELETE.
-					webServer.Register(new HttpFolderResource("/highlight", "Highlight", false, false, true, false));   // Syntax highlighting library, provided by http://highlightjs.org
-					webServer.Register(HttpFolderResource = new HttpFolderResource(string.Empty, rootFolder, false, false, true, true));    // TODO: Add authentication mechanisms for PUT & DELETE.
-					webServer.Register("/", (req, resp) => throw new TemporaryRedirectException(defaultPage));
-					webServer.Register(clientEvents = new ClientEvents());
-					webServer.Register(login = new Login());
-					webServer.Register(logout = new Logout());
+					SetupResources = new LinkedList<HttpResource>();
+
+					SetupResources.AddLast(webServer.Register(new HttpFolderResource("/Graphics", Path.Combine(appDataFolder, "Graphics"), false, false, true, false))); // TODO: Add authentication mechanisms for PUT & DELETE.
+					SetupResources.AddLast(webServer.Register(new HttpFolderResource("/highlight", "Highlight", false, false, true, false)));   // Syntax highlighting library, provided by http://highlightjs.org
+					SetupResources.AddLast(webServer.Register(HttpFolderResource = new HttpFolderResource(string.Empty, rootFolder, false, false, true, true)));    // TODO: Add authentication mechanisms for PUT & DELETE.
+					SetupResources.AddLast(webServer.Register("/", (req, resp) => throw new TemporaryRedirectException(defaultPage)));
+					SetupResources.AddLast(webServer.Register(clientEvents = new ClientEvents()));
+					SetupResources.AddLast(webServer.Register(login = new Login()));
+					SetupResources.AddLast(webServer.Register(logout = new Logout()));
 
 					emoji1_24x24 = new Emoji1LocalFiles(Emoji1SourceFileType.Svg, 24, 24, "/Graphics/Emoji1/svg/%FILENAME%",
 						Path.Combine(runtimeFolder, "Graphics", "Emoji1.zip"), Path.Combine(appDataFolder, "Graphics"));
@@ -491,17 +494,33 @@ namespace Waher.IoTGateway
 
 				if (webServer != null)
 				{
-					webServer.Dispose();
-					webServer = null;
+					webServer.ResourceOverride = null;
+					webServer.ResourceOverrideFilter = null;
+
+					if (SetupResources != null)
+					{
+						foreach (HttpResource Resource in SetupResources)
+							webServer.Unregister(Resource);
+					}
+
+					webServer.AddHttpPorts(GetConfigPorts("HTTP"));
+
+					if (certificate != null)
+					{
+						webServer.AddHttpsPorts(GetConfigPorts("HTTPS"));
+						webServer.UpdateCertificate(certificate);
+					}
 				}
-
-				if (certificate != null)
-					webServer = new HttpServer(GetConfigPorts("HTTP"), GetConfigPorts("HTTPS"), certificate);
 				else
-					webServer = new HttpServer(GetConfigPorts("HTTP"), null, null);
+				{
+					if (certificate != null)
+						webServer = new HttpServer(GetConfigPorts("HTTP"), GetConfigPorts("HTTPS"), certificate);
+					else
+						webServer = new HttpServer(GetConfigPorts("HTTP"), null, null);
 
-				foreach (SystemConfiguration Configuration in Configurations)
-					await Configuration.InitSetup(webServer);
+					foreach (SystemConfiguration Configuration in Configurations)
+						await Configuration.InitSetup(webServer);
+				}
 
 				Types.SetModuleParameter("HTTP", webServer);
 

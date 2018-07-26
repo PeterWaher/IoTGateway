@@ -20,7 +20,7 @@
       <dependency id="Waher.Content.Markdown" version="1.0.23"/>
       <dependency id="Waher.Content.Xml" version="1.0.3"/>
       <dependency id="Waher.Networking" version="1.0.10"/>
-      <dependency id="Waher.Networking.XMPP.UWP" version="1.0.29"/>
+      <dependency id="Waher.Networking.XMPP.UWP" version="1.0.30"/>
       <dependency id="Waher.Networking.XMPP.Concentrator.UWP" version="0.1.26"/>
       <dependency id="Waher.Networking.XMPP.Control.UWP" version="1.0.17"/>
       <dependency id="Waher.Networking.XMPP.Sensor.UWP" version="1.0.23"/>

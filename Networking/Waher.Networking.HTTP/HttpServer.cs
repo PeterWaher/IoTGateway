@@ -167,21 +167,33 @@ namespace Waher.Networking.HTTP
 			this.currentRequests.Removed += CurrentRequests_Removed;
 			this.lastStat = DateTime.Now;
 
-#if WINDOWS_UWP
-			this.Init(HttpPorts);
-#else
-			this.Init(HttpPorts, HttpsPorts);
+			this.AddHttpPorts(HttpPorts);
+#if !WINDOWS_UWP
+			this.AddHttpsPorts(HttpsPorts);
 #endif
 		}
 
 #if WINDOWS_UWP
-		private async void Init(int[] HttpPorts)
+		/// <summary>
+		/// Opens additional HTTP ports, if not already open.
+		/// </summary>
+		/// <param name="HttpPorts">HTTP ports</param>
+		public async void AddHttpPorts(params int[] HttpPorts)
 #else
-		private void Init(int[] HttpPorts, int[] HttpsPorts)
+		/// <summary>
+		/// Opens additional HTTP ports, if not already open.
+		/// </summary>
+		/// <param name="HttpPorts">HTTP ports</param>
+		public void AddHttpPorts(params int[] HttpPorts)
 #endif
 		{
+			if (HttpPorts == null)
+				return;
+
 			try
 			{
+				int[] OldPorts = this.GetPorts(true, false);
+
 #if WINDOWS_UWP
 				StreamSocketListener Listener;
 
@@ -190,23 +202,23 @@ namespace Waher.Networking.HTTP
 					if (Profile.GetNetworkConnectivityLevel() == NetworkConnectivityLevel.None)
 						continue;
 
-					if (HttpPorts != null)
+					foreach (int HttpPort in HttpPorts)
 					{
-						foreach (int HttpPort in HttpPorts)
-						{
-							try
-							{
-								Listener = new StreamSocketListener();
-								await Listener.BindServiceNameAsync(HttpPort.ToString(), SocketProtectionLevel.PlainSocket, Profile.NetworkAdapter);
-								Listener.ConnectionReceived += Listener_ConnectionReceived;
+						if (Array.IndexOf<int>(OldPorts, HttpPort) >= 0)
+							continue;
 
-								this.listeners.AddLast(new KeyValuePair<StreamSocketListener, bool>(Listener, false));
-							}
-							catch (Exception ex)
-							{
-								this.failedPorts[HttpPort] = true;
-								Log.Critical(ex, Profile.ProfileName);
-							}
+						try
+						{
+							Listener = new StreamSocketListener();
+							await Listener.BindServiceNameAsync(HttpPort.ToString(), SocketProtectionLevel.PlainSocket, Profile.NetworkAdapter);
+							Listener.ConnectionReceived += Listener_ConnectionReceived;
+
+							this.listeners.AddLast(new KeyValuePair<StreamSocketListener, bool>(Listener, false));
+						}
+						catch (Exception ex)
+						{
+							this.failedPorts[HttpPort] = true;
+							Log.Critical(ex, Profile.ProfileName);
 						}
 					}
 				}
@@ -225,57 +237,30 @@ namespace Waher.Networking.HTTP
 						if ((UnicastAddress.Address.AddressFamily == AddressFamily.InterNetwork && Socket.OSSupportsIPv4) ||
 							(UnicastAddress.Address.AddressFamily == AddressFamily.InterNetworkV6 && Socket.OSSupportsIPv6))
 						{
-							if (HttpPorts != null)
+							foreach (int HttpPort in HttpPorts)
 							{
-								foreach (int HttpPort in HttpPorts)
-								{
-									try
-									{
-										Listener = new TcpListener(UnicastAddress.Address, HttpPort);
-										Listener.Start(DefaultConnectionBacklog);
-										Task T = this.ListenForIncomingConnections(Listener, false);
+								if (Array.IndexOf<int>(OldPorts, HttpPort) >= 0)
+									continue;
 
-										this.listeners.AddLast(new KeyValuePair<TcpListener, bool>(Listener, false));
-									}
-									catch (SocketException)
-									{
-										this.failedPorts[HttpPort] = true;
-										Log.Error("Unable to open port for listening.",
-											new KeyValuePair<string, object>("Address", UnicastAddress.Address.ToString()),
-											new KeyValuePair<string, object>("Port", HttpPort));
-									}
-									catch (Exception ex)
-									{
-										this.failedPorts[HttpPort] = true;
-										Log.Critical(ex, UnicastAddress.Address.ToString() + ":" + HttpPort);
-									}
+								try
+								{
+									Listener = new TcpListener(UnicastAddress.Address, HttpPort);
+									Listener.Start(DefaultConnectionBacklog);
+									Task T = this.ListenForIncomingConnections(Listener, false);
+
+									this.listeners.AddLast(new KeyValuePair<TcpListener, bool>(Listener, false));
 								}
-							}
-
-							if (HttpsPorts != null)
-							{
-								foreach (int HttpsPort in HttpsPorts)
+								catch (SocketException)
 								{
-									try
-									{
-										Listener = new TcpListener(UnicastAddress.Address, HttpsPort);
-										Listener.Start(DefaultConnectionBacklog);
-										Task T = this.ListenForIncomingConnections(Listener, true);
-
-										this.listeners.AddLast(new KeyValuePair<TcpListener, bool>(Listener, true));
-									}
-									catch (SocketException)
-									{
-										this.failedPorts[HttpsPort] = true;
-										Log.Error("Unable to open port for listening.",
-											new KeyValuePair<string, object>("Address", UnicastAddress.Address.ToString()),
-											new KeyValuePair<string, object>("Port", HttpsPort));
-									}
-									catch (Exception ex)
-									{
-										this.failedPorts[HttpsPort] = true;
-										Log.Critical(ex, UnicastAddress.Address.ToString() + ":" + HttpsPort);
-									}
+									this.failedPorts[HttpPort] = true;
+									Log.Error("Unable to open port for listening.",
+										new KeyValuePair<string, object>("Address", UnicastAddress.Address.ToString()),
+										new KeyValuePair<string, object>("Port", HttpPort));
+								}
+								catch (Exception ex)
+								{
+									this.failedPorts[HttpPort] = true;
+									Log.Critical(ex, UnicastAddress.Address.ToString() + ":" + HttpPort);
 								}
 							}
 						}
@@ -288,6 +273,70 @@ namespace Waher.Networking.HTTP
 				Log.Critical(ex);
 			}
 		}
+
+#if !WINDOWS_UWP
+		/// <summary>
+		/// Opens additional HTTPS ports, if not already open.
+		/// </summary>
+		/// <param name="HttpsPorts">HTTP ports</param>
+		public void AddHttpsPorts(params int[] HttpsPorts)
+		{
+			if (HttpsPorts == null)
+				return;
+
+			try
+			{
+				int[] OldPorts = this.GetPorts(false, true);
+				TcpListener Listener;
+
+				foreach (NetworkInterface Interface in NetworkInterface.GetAllNetworkInterfaces())
+				{
+					if (Interface.OperationalStatus != OperationalStatus.Up)
+						continue;
+
+					IPInterfaceProperties Properties = Interface.GetIPProperties();
+
+					foreach (UnicastIPAddressInformation UnicastAddress in Properties.UnicastAddresses)
+					{
+						if ((UnicastAddress.Address.AddressFamily == AddressFamily.InterNetwork && Socket.OSSupportsIPv4) ||
+							(UnicastAddress.Address.AddressFamily == AddressFamily.InterNetworkV6 && Socket.OSSupportsIPv6))
+						{
+							foreach (int HttpsPort in HttpsPorts)
+							{
+								if (Array.IndexOf<int>(OldPorts, HttpsPort) >= 0)
+									continue;
+
+								try
+								{
+									Listener = new TcpListener(UnicastAddress.Address, HttpsPort);
+									Listener.Start(DefaultConnectionBacklog);
+									Task T = this.ListenForIncomingConnections(Listener, true);
+
+									this.listeners.AddLast(new KeyValuePair<TcpListener, bool>(Listener, true));
+								}
+								catch (SocketException)
+								{
+									this.failedPorts[HttpsPort] = true;
+									Log.Error("Unable to open port for listening.",
+										new KeyValuePair<string, object>("Address", UnicastAddress.Address.ToString()),
+										new KeyValuePair<string, object>("Port", HttpsPort));
+								}
+								catch (Exception ex)
+								{
+									this.failedPorts[HttpsPort] = true;
+									Log.Critical(ex, UnicastAddress.Address.ToString() + ":" + HttpsPort);
+								}
+							}
+						}
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+			}
+		}
+#endif
 
 		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>
@@ -437,9 +486,9 @@ namespace Waher.Networking.HTTP
 		}
 #endif
 
-		#endregion
+#endregion
 
-		#region Connections
+#region Connections
 
 #if WINDOWS_UWP
 
@@ -558,9 +607,9 @@ namespace Waher.Networking.HTTP
 
 #endif
 
-		#endregion
+#endregion
 
-		#region Resources
+#region Resources
 
 		/// <summary>
 		/// By default, this property is null. If not null, or empty, every request made to the web server will
@@ -592,8 +641,9 @@ namespace Waher.Networking.HTTP
 		/// Registers a resource with the server.
 		/// </summary>
 		/// <param name="Resource">Resource</param>
+		/// <returns>Registered resource.</returns>
 		/// <exception cref="Exception">If a resource with the same resource name is already registered.</exception>
-		public void Register(HttpResource Resource)
+		public HttpResource Register(HttpResource Resource)
 		{
 			lock (this.resources)
 			{
@@ -604,6 +654,8 @@ namespace Waher.Networking.HTTP
 			}
 
 			Resource.AddReference(this);
+
+			return Resource;
 		}
 
 		/// <summary>
@@ -612,9 +664,11 @@ namespace Waher.Networking.HTTP
 		/// <param name="ResourceName">Resource Name.</param>
 		/// <param name="GET">GET method handler.</param>
 		/// <param name="AuthenticationSchemes">Any authentication schemes used to authenticate users before access is granted.</param>
-		public void Register(string ResourceName, HttpMethodHandler GET, params HttpAuthenticationScheme[] AuthenticationSchemes)
+		/// <returns>Registered resource.</returns>
+		/// <exception cref="Exception">If a resource with the same resource name is already registered.</exception>
+		public HttpResource Register(string ResourceName, HttpMethodHandler GET, params HttpAuthenticationScheme[] AuthenticationSchemes)
 		{
-			this.Register(ResourceName, GET, true, false, false, AuthenticationSchemes);
+			return this.Register(ResourceName, GET, true, false, false, AuthenticationSchemes);
 		}
 
 		/// <summary>
@@ -625,9 +679,11 @@ namespace Waher.Networking.HTTP
 		/// <param name="Synchronous">If the resource is synchronous (i.e. returns a response in the method handler), or if it is asynchronous
 		/// (i.e. sends the response from another thread).</param>
 		/// <param name="AuthenticationSchemes">Any authentication schemes used to authenticate users before access is granted.</param>
-		public void Register(string ResourceName, HttpMethodHandler GET, bool Synchronous, params HttpAuthenticationScheme[] AuthenticationSchemes)
+		/// <returns>Registered resource.</returns>
+		/// <exception cref="Exception">If a resource with the same resource name is already registered.</exception>
+		public HttpResource Register(string ResourceName, HttpMethodHandler GET, bool Synchronous, params HttpAuthenticationScheme[] AuthenticationSchemes)
 		{
-			this.Register(ResourceName, GET, Synchronous, false, false, AuthenticationSchemes);
+			return this.Register(ResourceName, GET, Synchronous, false, false, AuthenticationSchemes);
 		}
 
 		/// <summary>
@@ -639,10 +695,12 @@ namespace Waher.Networking.HTTP
 		/// (i.e. sends the response from another thread).</param>
 		/// <param name="HandlesSubPaths">If sub-paths are handled.</param>
 		/// <param name="AuthenticationSchemes">Any authentication schemes used to authenticate users before access is granted.</param>
-		public void Register(string ResourceName, HttpMethodHandler GET, bool Synchronous, bool HandlesSubPaths,
+		/// <returns>Registered resource.</returns>
+		/// <exception cref="Exception">If a resource with the same resource name is already registered.</exception>
+		public HttpResource Register(string ResourceName, HttpMethodHandler GET, bool Synchronous, bool HandlesSubPaths,
 			params HttpAuthenticationScheme[] AuthenticationSchemes)
 		{
-			this.Register(ResourceName, GET, Synchronous, HandlesSubPaths, false, AuthenticationSchemes);
+			return this.Register(ResourceName, GET, Synchronous, HandlesSubPaths, false, AuthenticationSchemes);
 		}
 
 		/// <summary>
@@ -656,12 +714,11 @@ namespace Waher.Networking.HTTP
 		/// <param name="UserSessions">If the resource uses user sessions.</param>
 		/// <param name="AuthenticationSchemes">Any authentication schemes used to authenticate users before access is granted.</param>
 		/// <returns>Reference to generated HTTP resource object.</returns>
+		/// <exception cref="Exception">If a resource with the same resource name is already registered.</exception>
 		public HttpResource Register(string ResourceName, HttpMethodHandler GET, bool Synchronous, bool HandlesSubPaths,
 			bool UserSessions, params HttpAuthenticationScheme[] AuthenticationSchemes)
 		{
-			HttpResource Result = new HttpGetDelegateResource(ResourceName, GET, Synchronous, HandlesSubPaths, UserSessions, AuthenticationSchemes);
-			this.Register(Result);
-			return Result;
+			return this.Register(new HttpGetDelegateResource(ResourceName, GET, Synchronous, HandlesSubPaths, UserSessions, AuthenticationSchemes));
 		}
 
 		/// <summary>
@@ -671,9 +728,11 @@ namespace Waher.Networking.HTTP
 		/// <param name="GET">GET method handler.</param>
 		/// <param name="POST">PSOT method handler.</param>
 		/// <param name="AuthenticationSchemes">Any authentication schemes used to authenticate users before access is granted.</param>
-		public void Register(string ResourceName, HttpMethodHandler GET, HttpMethodHandler POST, params HttpAuthenticationScheme[] AuthenticationSchemes)
+		/// <returns>Reference to generated HTTP resource object.</returns>
+		/// <exception cref="Exception">If a resource with the same resource name is already registered.</exception>
+		public HttpResource Register(string ResourceName, HttpMethodHandler GET, HttpMethodHandler POST, params HttpAuthenticationScheme[] AuthenticationSchemes)
 		{
-			this.Register(ResourceName, GET, POST, true, false, false, AuthenticationSchemes);
+			return this.Register(ResourceName, GET, POST, true, false, false, AuthenticationSchemes);
 		}
 
 		/// <summary>
@@ -685,10 +744,12 @@ namespace Waher.Networking.HTTP
 		/// <param name="Synchronous">If the resource is synchronous (i.e. returns a response in the method handler), or if it is asynchronous
 		/// (i.e. sends the response from another thread).</param>
 		/// <param name="AuthenticationSchemes">Any authentication schemes used to authenticate users before access is granted.</param>
-		public void Register(string ResourceName, HttpMethodHandler GET, HttpMethodHandler POST, bool Synchronous,
+		/// <returns>Reference to generated HTTP resource object.</returns>
+		/// <exception cref="Exception">If a resource with the same resource name is already registered.</exception>
+		public HttpResource Register(string ResourceName, HttpMethodHandler GET, HttpMethodHandler POST, bool Synchronous,
 			params HttpAuthenticationScheme[] AuthenticationSchemes)
 		{
-			this.Register(ResourceName, GET, POST, Synchronous, false, false, AuthenticationSchemes);
+			return this.Register(ResourceName, GET, POST, Synchronous, false, false, AuthenticationSchemes);
 		}
 
 		/// <summary>
@@ -701,10 +762,12 @@ namespace Waher.Networking.HTTP
 		/// (i.e. sends the response from another thread).</param>
 		/// <param name="HandlesSubPaths">If sub-paths are handled.</param>
 		/// <param name="AuthenticationSchemes">Any authentication schemes used to authenticate users before access is granted.</param>
-		public void Register(string ResourceName, HttpMethodHandler GET, HttpMethodHandler POST, bool Synchronous, bool HandlesSubPaths,
+		/// <returns>Reference to generated HTTP resource object.</returns>
+		/// <exception cref="Exception">If a resource with the same resource name is already registered.</exception>
+		public HttpResource Register(string ResourceName, HttpMethodHandler GET, HttpMethodHandler POST, bool Synchronous, bool HandlesSubPaths,
 			params HttpAuthenticationScheme[] AuthenticationSchemes)
 		{
-			this.Register(ResourceName, GET, POST, Synchronous, HandlesSubPaths, false, AuthenticationSchemes);
+			return this.Register(ResourceName, GET, POST, Synchronous, HandlesSubPaths, false, AuthenticationSchemes);
 		}
 
 		/// <summary>
@@ -719,12 +782,11 @@ namespace Waher.Networking.HTTP
 		/// <param name="UserSessions">If the resource uses user sessions.</param>
 		/// <param name="AuthenticationSchemes">Any authentication schemes used to authenticate users before access is granted.</param>
 		/// <returns>Reference to generated HTTP resource object.</returns>
+		/// <exception cref="Exception">If a resource with the same resource name is already registered.</exception>
 		public HttpResource Register(string ResourceName, HttpMethodHandler GET, HttpMethodHandler POST, bool Synchronous, bool HandlesSubPaths,
 			bool UserSessions, params HttpAuthenticationScheme[] AuthenticationSchemes)
 		{
-			HttpResource Result = new HttpGetPostDelegateResource(ResourceName, GET, POST, Synchronous, HandlesSubPaths, UserSessions, AuthenticationSchemes);
-			this.Register(Result);
-			return Result;
+			return this.Register(new HttpGetPostDelegateResource(ResourceName, GET, POST, Synchronous, HandlesSubPaths, UserSessions, AuthenticationSchemes));
 		}
 
 		/// <summary>
@@ -793,9 +855,9 @@ namespace Waher.Networking.HTTP
 			return false;
 		}
 
-		#endregion
+#endregion
 
-		#region Sessions
+#region Sessions
 
 		/// <summary>
 		/// Session timeout. Default is 20 minutes.
@@ -855,9 +917,9 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		public event CacheItemEventHandler<string, Variables> SessionRemoved = null;
 
-		#endregion
+#endregion
 
-		#region Statistics
+#region Statistics
 
 		/// <summary>
 		/// Call this method when data has been received.
@@ -1059,7 +1121,7 @@ namespace Waher.Networking.HTTP
 			}
 		}
 
-		#endregion
+#endregion
 
 		// TODO: Web Service resources
 	}

@@ -439,7 +439,7 @@ namespace Waher.Networking.HTTP
 								}
 							}
 
-							if (!Acceptable || BestQuality >= Quality)
+							if (Best != null && (!Acceptable || BestQuality >= Quality))
 							{
 								Acceptable = true;
 								Converter = Best;

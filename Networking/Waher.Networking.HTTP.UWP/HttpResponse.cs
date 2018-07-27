@@ -22,7 +22,7 @@ namespace Waher.Networking.HTTP
 		private HttpClientConnection clientConnection;
 		private Dictionary<string, string> customHeaders = null;
 		private LinkedList<Cookie> cookies = null;
-		private Encoding encoding = Encoding.UTF8;
+		private readonly Encoding encoding = Encoding.UTF8;
 		private DateTimeOffset date = DateTimeOffset.Now;
 		private DateTimeOffset? expires = null;
 		private DateTime lastPing = DateTime.Now;
@@ -38,9 +38,9 @@ namespace Waher.Networking.HTTP
 
 		private Stream responseStream;
 		private TransferEncoding transferEncoding = null;
-		private TransferEncoding desiredTransferEncoding = null;
-		private HttpServer httpServer;
-		private HttpRequest httpRequest;
+		private readonly TransferEncoding desiredTransferEncoding = null;
+		private readonly HttpServer httpServer;
+		private readonly HttpRequest httpRequest;
 
 		/// <summary>
 		/// Represets a response of an HTTP client request.
@@ -688,6 +688,16 @@ namespace Waher.Networking.HTTP
 				this.lastPing = TP;
 				this.httpServer.PingRequest(this.httpRequest);
 			}
+		}
+
+		internal void WriteRaw(byte[] Data)
+		{
+			this.responseStream.Write(Data, 0, Data.Length);
+		}
+
+		internal Task WriteRawAsync(byte[] Data)
+		{
+			return this.responseStream.WriteAsync(Data, 0, Data.Length);
 		}
 
 		/// <summary>

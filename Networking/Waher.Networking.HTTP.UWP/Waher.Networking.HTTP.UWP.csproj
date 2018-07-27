@@ -211,6 +211,12 @@
     <Compile Include="TransferEncoding.cs" />
     <Compile Include="TransferEncodings\ChunkedTransferEncoding.cs" />
     <Compile Include="TransferEncodings\ContentLengthEncoding.cs" />
+    <Compile Include="WebSockets\WebSocket.cs" />
+    <Compile Include="WebSockets\WebSocketBinaryEventArgs.cs" />
+    <Compile Include="WebSockets\WebSocketClosedEventArgs.cs" />
+    <Compile Include="WebSockets\WebSocketEventArgs.cs" />
+    <Compile Include="WebSockets\WebSocketListener.cs" />
+    <Compile Include="WebSockets\WebSocketTextEventArgs.cs" />
     <EmbeddedResource Include="Properties\Waher.Networking.HTTP.UWP.rd.xml" />
   </ItemGroup>
   <ItemGroup />
@@ -261,6 +267,7 @@ xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\Exceptions\ServerErrors\*.
 xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\HeaderFields\*.cs" "$(ProjectDir)HeaderFields" /Y
 xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\Interfaces\*.cs" "$(ProjectDir)Interfaces" /Y
 xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\TransferEncodings\*.cs" "$(ProjectDir)TransferEncodings" /Y
+xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\WebSockets\*.cs" "$(ProjectDir)WebSockets" /Y
 </PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>

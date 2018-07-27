@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Waher.Networking.HTTP.UWP")]
-[assembly: AssemblyDescription("UWP class library providing a simple HTTP server for publishing dynamic content and services, managing user authentication based on a customizable set of users and privileges.")]
+[assembly: AssemblyDescription("UWP class library providing a simple HTTP server for publishing dynamic content and services, managing user authentication based on a customizable set of users and privileges. Supports the WebSocket protocol.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Waher Data AB")]
 [assembly: AssemblyProduct("Waher.Networking.HTTP.UWP")]
@@ -24,5 +24,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.17")]
+[assembly: AssemblyVersion("1.0.18")]
 [assembly: ComVisible(false)]

@@ -66,6 +66,20 @@ namespace Waher.Networking.HTTP.Test
 			}
 		}
 
+		public bool TryGetUser(string UserName, out IUser User)
+		{
+			if (UserName == "User")
+			{
+				User = new User();
+				return true;
+			}
+			else
+			{
+				User = null;
+				return false;
+			}
+		}
+
 		[TestMethod]
 		public void Test_01_GET_HTTP_ContentLength()
 		{
@@ -154,43 +168,6 @@ namespace Waher.Networking.HTTP.Test
 				byte[] Data = Client.DownloadData("http://localhost:8080/test06.txt");
 				string s = Encoding.UTF8.GetString(Data);
 				Assert.AreEqual("hej på dej", s);
-			}
-		}
-
-		public bool TryGetUser(string UserName, out IUser User)
-		{
-			if (UserName == "User")
-			{
-				User = new User();
-				return true;
-			}
-			else
-			{
-				User = null;
-				return false;
-			}
-		}
-
-		class User : IUser
-		{
-			public string UserName
-			{
-				get { return "User"; }
-			}
-
-			public string PasswordHash
-			{
-				get { return "Password"; }
-			}
-
-			public string PasswordHashType
-			{
-				get { return string.Empty; }
-			}
-
-			public bool HasPrivilege(string Privilege)
-			{
-				return false;
 			}
 		}
 

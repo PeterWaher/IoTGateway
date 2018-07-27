@@ -10,6 +10,7 @@ using Waher.Events;
 using Waher.Networking.Sniffers;
 using Waher.Networking.HTTP.HeaderFields;
 using Waher.Networking.HTTP.TransferEncodings;
+using Waher.Networking.HTTP.WebSockets;
 using Waher.Security;
 #if WINDOWS_UWP
 using Windows.Networking.Sockets;
@@ -17,6 +18,12 @@ using Windows.Networking.Sockets;
 
 namespace Waher.Networking.HTTP
 {
+	internal enum ConnectionMode
+	{
+		Http,
+		WebSocket
+	}
+
 	/// <summary>
 	/// Class managing a remote client connection to a local <see cref="HttpServer"/>.
 	/// </summary>
@@ -31,24 +38,26 @@ namespace Waher.Networking.HTTP
 		private MemoryStream headerStream = null;
 		private Stream dataStream = null;
 		private TransferEncoding transferEncoding = null;
-		private byte[] inputBuffer;
-		private HttpServer server;
+		private readonly byte[] inputBuffer;
+		private readonly HttpServer server;
 #if WINDOWS_UWP
 		private StreamSocket client;
 		private Stream inputStream;
 		private Stream outputStream;
 #else
-		private TcpClient client;
+		private readonly TcpClient client;
 		private Stream stream;
 		private NetworkStream networkStream;
 #endif
 		private HttpRequestHeader header = null;
+		private ConnectionMode mode = ConnectionMode.Http;
+		private WebSocket webSocket = null;
 		private string lastResource = string.Empty;
-		private int bufferSize;
+		private readonly int bufferSize;
 		private byte b1 = 0;
 		private byte b2 = 0;
 		private byte b3 = 0;
-		private bool encrypted;
+		private readonly bool encrypted;
 		private bool disposed = false;
 
 #if WINDOWS_UWP
@@ -77,37 +86,46 @@ namespace Waher.Networking.HTTP
 
 		public void Dispose()
 		{
-			this.disposed = true;
+			if (!this.disposed)
+			{ 
+				this.disposed = true;
 
-			if (this.headerStream != null)
-			{
-				this.headerStream.Dispose();
-				this.headerStream = null;
-			}
+				if (this.webSocket != null)
+				{
+					this.webSocket.Dispose();
+					this.webSocket = null;
+				}
 
-			if (this.dataStream != null)
-			{
-				this.dataStream.Dispose();
-				this.dataStream = null;
-			}
+				if (this.headerStream != null)
+				{
+					this.headerStream.Dispose();
+					this.headerStream = null;
+				}
+
+				if (this.dataStream != null)
+				{
+					this.dataStream.Dispose();
+					this.dataStream = null;
+				}
 
 #if WINDOWS_UWP
-			if (this.outputStream != null)
-			{
-				this.outputStream.Flush();
-				this.outputStream.Dispose();
-				this.inputStream = null;
-				this.outputStream = null;
-			}
+				if (this.outputStream != null)
+				{
+					this.outputStream.Flush();
+					this.outputStream.Dispose();
+					this.inputStream = null;
+					this.outputStream = null;
+				}
 #else
-			if (this.stream != null)
-			{
-				this.networkStream.Flush();		// TODO: Wait until sent? Close(100) method not available in .NET Standard 1.3.
-				this.networkStream.Dispose();
-				this.networkStream = null;
-				this.stream = null;
-			}
+				if (this.stream != null)
+				{
+					this.networkStream.Flush();     // TODO: Wait until sent? Close(100) method not available in .NET Standard 1.3.
+					this.networkStream.Dispose();
+					this.networkStream = null;
+					this.stream = null;
+				}
 #endif
+			}
 		}
 
 		/// <summary>
@@ -152,16 +170,19 @@ namespace Waher.Networking.HTTP
 						return;
 
 					if (NrRead <= 0)
-						Continue = false;
-					else
-					{
-						this.server.DataReceived(NrRead);
+						break;
 
+					this.server.DataReceived(NrRead);
+
+					if (this.mode == ConnectionMode.Http)
+					{
 						if (this.header == null)
 							Continue = this.BinaryHeaderReceived(this.inputBuffer, 0, NrRead);
 						else
 							Continue = this.BinaryDataReceived(this.inputBuffer, 0, NrRead);
 					}
+					else
+						Continue = this.webSocket?.WebSocketDataReceived(this.inputBuffer, 0, NrRead) ?? false;
 				}
 				while (Continue);
 
@@ -360,6 +381,8 @@ namespace Waher.Networking.HTTP
 #else
 			HttpRequest Request = new HttpRequest(this.header, this.dataStream, this.stream, this.client.Client.RemoteEndPoint.ToString());
 #endif
+			Request.clientConnection = this;
+
 			bool? Queued = this.QueueRequest(Request);
 
 			if (Queued.HasValue)
@@ -465,7 +488,7 @@ namespace Waher.Networking.HTTP
 			{
 				Log.Critical(ex);
 
-				int Win32ErrorCode = Marshal.GetHRForException(ex) & 0xFFFF;    // TODO: Update to ex.HResult when upgrading to .NET 4.5
+				int Win32ErrorCode = ex.HResult & 0xFFFF;
 				if (Win32ErrorCode == 0x27 || Win32ErrorCode == 0x70)   // ERROR_HANDLE_DISK_FULL, ERROR_DISK_FULL
 					this.SendResponse(Request, 507, "Insufficient Storage", true);
 				else
@@ -634,6 +657,12 @@ namespace Waher.Networking.HTTP
 #else
 		public Stream Stream => this.stream;
 #endif
+
+		internal void Upgrade(WebSocket Socket)
+		{
+			this.mode = ConnectionMode.WebSocket;
+			this.webSocket = Socket;
+		}
 
 	}
 }

@@ -24,6 +24,7 @@ namespace Waher.Networking.HTTP
 		private Variables session = null;
 		private string subPath = string.Empty;
 		private long dataLength;
+		internal HttpClientConnection clientConnection = null;
 
 		/// <summary>
 		/// Represents an HTTP request.

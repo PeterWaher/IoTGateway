@@ -88,6 +88,8 @@
     <Compile Include="CookieWebClient.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="User.cs" />
+    <Compile Include="WebSocketTests.cs" />
     <Compile Include="HttpServerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

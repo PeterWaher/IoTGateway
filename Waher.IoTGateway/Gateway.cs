@@ -298,24 +298,31 @@ namespace Waher.IoTGateway
 							exceptionFile.Write("Time: ");
 							exceptionFile.WriteLine(DateTime.Now.ToString());
 
-							exceptionFile.WriteLine();
-
-							StackTrace Trace = new StackTrace(true);
-							foreach (StackFrame Frame in Trace.GetFrames())
-								exceptionFile.WriteLine(Frame.ToString());
-
-							exceptionFile.WriteLine();
-
-							Exception ex = e.Exception;
-
-							while (ex != null)
+							if (e.Exception != null)
 							{
-								exceptionFile.WriteLine(ex.Message);
-								exceptionFile.WriteLine();
-								exceptionFile.WriteLine(ex.StackTrace);
-								exceptionFile.WriteLine();
+								LinkedList<Exception> Exceptions = new LinkedList<Exception>();
+								Exceptions.AddLast(e.Exception);
 
-								ex = ex.InnerException;
+								while (Exceptions.First != null)
+								{
+									Exception ex = Exceptions.First.Value;
+									Exceptions.RemoveFirst();
+
+									exceptionFile.WriteLine();
+
+									exceptionFile.WriteLine(ex.Message);
+									exceptionFile.WriteLine();
+									exceptionFile.WriteLine(ex.StackTrace);
+									exceptionFile.WriteLine();
+
+									if (ex is AggregateException ex2)
+									{
+										foreach (Exception ex3 in ex2.InnerExceptions)
+											Exceptions.AddLast(ex3);
+									}
+									else if (ex.InnerException != null)
+										Exceptions.AddLast(ex.InnerException);
+								}
 							}
 
 							exceptionFile.Flush();

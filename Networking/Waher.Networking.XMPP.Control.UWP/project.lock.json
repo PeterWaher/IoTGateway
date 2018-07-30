@@ -2525,6 +2525,7 @@
           "Waher.Events": "1.0.0",
           "Waher.Networking": "1.0.0",
           "Waher.Runtime.Cache": "1.0.0",
+          "Waher.Runtime.Inventory": "1.0.0",
           "Waher.Security": "1.0.0"
         }
       },
@@ -5105,6 +5106,7 @@
           "Waher.Events": "1.0.0",
           "Waher.Networking": "1.0.0",
           "Waher.Runtime.Cache": "1.0.0",
+          "Waher.Runtime.Inventory": "1.0.0",
           "Waher.Security": "1.0.0"
         }
       },
@@ -7721,6 +7723,7 @@
           "Waher.Events": "1.0.0",
           "Waher.Networking": "1.0.0",
           "Waher.Runtime.Cache": "1.0.0",
+          "Waher.Runtime.Inventory": "1.0.0",
           "Waher.Security": "1.0.0"
         }
       },
@@ -10310,6 +10313,7 @@
           "Waher.Events": "1.0.0",
           "Waher.Networking": "1.0.0",
           "Waher.Runtime.Cache": "1.0.0",
+          "Waher.Runtime.Inventory": "1.0.0",
           "Waher.Security": "1.0.0"
         }
       },
@@ -12935,6 +12939,7 @@
           "Waher.Events": "1.0.0",
           "Waher.Networking": "1.0.0",
           "Waher.Runtime.Cache": "1.0.0",
+          "Waher.Runtime.Inventory": "1.0.0",
           "Waher.Security": "1.0.0"
         }
       },
@@ -15524,6 +15529,7 @@
           "Waher.Events": "1.0.0",
           "Waher.Networking": "1.0.0",
           "Waher.Runtime.Cache": "1.0.0",
+          "Waher.Runtime.Inventory": "1.0.0",
           "Waher.Security": "1.0.0"
         }
       },
@@ -18149,6 +18155,7 @@
           "Waher.Events": "1.0.0",
           "Waher.Networking": "1.0.0",
           "Waher.Runtime.Cache": "1.0.0",
+          "Waher.Runtime.Inventory": "1.0.0",
           "Waher.Security": "1.0.0"
         }
       },

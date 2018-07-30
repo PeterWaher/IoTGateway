@@ -17,13 +17,11 @@ XEP-0092: Software Version
 XEP-0114: Jabber Component Protocol
 XEP-0115: Entity Capabilities
 XEP-0122: Data Forms Validation
-XEP-0124: Bidirectional-streams Over Synchronous HTTP (BOSH)
 XEP-0128: Service Discovery Extensions
 XEP-0141: Data Forms Layout
 XEP-0184: Message Delivery Receipts
 XEP-0191: Blocking Command
 XEP-0199: XMPP Ping
-XEP-0206: XMPP Over BOSH
 XEP-0221: Data Forms Media Element
 XEP-0231: Bits of Binary
 XEP-0331: Data Forms - Color Field Types
@@ -66,6 +64,7 @@ Support for other extensions is provided by separate nuget packages. See: https:
     <ProjectReference Include="..\..\Content\Waher.Content\Waher.Content.csproj" />
     <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj" />
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Cache\Waher.Runtime.Cache.csproj" />
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj" />
     <ProjectReference Include="..\..\Security\Waher.Security\Waher.Security.csproj" />
     <ProjectReference Include="..\Waher.Networking\Waher.Networking.csproj" />
   </ItemGroup>

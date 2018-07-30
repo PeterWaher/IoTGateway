@@ -114,6 +114,7 @@
   <ItemGroup>
     <Compile Include="Abuse\AbuseClient.cs" />
     <Compile Include="Abuse\BlockListEventArgs.cs" />
+    <Compile Include="AlternativeTransport.cs" />
     <Compile Include="AuthenticationErrors\AccountDisabledException.cs" />
     <Compile Include="AuthenticationErrors\AuthenticationException.cs" />
     <Compile Include="AuthenticationErrors\CredentialsExpiredException.cs" />
@@ -182,9 +183,9 @@
     <Compile Include="DataForms\ValidationMethods\RegexValidation.cs" />
     <Compile Include="DataForms\ValidationMethods\ValidationMethod.cs" />
     <Compile Include="DeliveryEventArgs.cs" />
-    <Compile Include="HttpBinding.cs" />
     <Compile Include="HttpFileUpload\HttpFileUploadClient.cs" />
     <Compile Include="HttpFileUpload\HttpFileUploadEventArgs.cs" />
+    <Compile Include="IAlternativeTransport.cs" />
     <Compile Include="IEndToEndEncryption.cs" />
     <Compile Include="InBandBytestreams\DataReceivedEventArgs.cs" />
     <Compile Include="InBandBytestreams\IbbClient.cs" />
@@ -267,6 +268,7 @@
     <Compile Include="StreamErrors\UnsupportedStanzaTypeException.cs" />
     <Compile Include="StreamErrors\UnsupportedVersionException.cs" />
     <Compile Include="ValidateSenderEventArgs.cs" />
+    <Compile Include="XmppBindingInterface.cs" />
     <Compile Include="XmppClient.cs" />
     <Compile Include="XmppComponent.cs" />
     <Compile Include="XmppCredentials.cs" />
@@ -291,6 +293,10 @@
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Cache\Waher.Runtime.Cache.csproj">
       <Project>{7d5a1c49-15e9-4e74-a7b5-3ff9b705e73f}</Project>
       <Name>Waher.Runtime.Cache</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj">
+      <Project>{7f1b0d78-aa86-445b-9e1f-7df75b9e4c04}</Project>
+      <Name>Waher.Runtime.Inventory</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Security\Waher.Security\Waher.Security.csproj">
       <Project>{a248de37-d588-4a5c-b51b-b500c7caaf68}</Project>

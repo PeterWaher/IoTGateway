@@ -26,7 +26,6 @@ using System.Security.Cryptography.X509Certificates;
 #endif
 using Waher.Content.Xml;
 using Waher.Events;
-using Waher.Networking;
 using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP.Authentication;
 using Waher.Networking.XMPP.AuthenticationErrors;
@@ -39,6 +38,7 @@ using Waher.Networking.XMPP.DataForms.ValidationMethods;
 using Waher.Networking.XMPP.ServiceDiscovery;
 using Waher.Networking.XMPP.SoftwareVersion;
 using Waher.Networking.XMPP.Search;
+using Waher.Runtime.Inventory;
 using Waher.Security;
 
 namespace Waher.Networking.XMPP
@@ -456,6 +456,8 @@ namespace Waher.Networking.XMPP
 			this.Init(AppAssembly);
 		}
 
+		private static Type[] alternativeBindingMechanisms = null;
+
 		/// <summary>
 		/// Manages an XMPP client connection. Connection information is defined in
 		/// <paramref name="Credentials"/>.
@@ -470,11 +472,49 @@ namespace Waher.Networking.XMPP
 			this.port = Credentials.Port;
 			this.userName = Credentials.Account;
 
-			if (!string.IsNullOrEmpty(Credentials.HttpEndpoint))
+			if (!string.IsNullOrEmpty(Credentials.UriEndpoint))
 			{
-				this.sendHeartbeats = false;
-				this.textTransportLayer = new HttpBinding(Credentials.HttpEndpoint, this);
-				this.textTransportLayer.OnReceived += TextTransportLayer_OnReceived_NoSniff;
+				Uri URI = new Uri(Credentials.UriEndpoint);
+
+				if (alternativeBindingMechanisms == null)
+				{
+					alternativeBindingMechanisms = Types.GetTypesImplementingInterface(typeof(IAlternativeTransport));
+					Types.OnInvalidated += Types_OnInvalidated;
+				}
+
+				IAlternativeTransport Best = null;
+				Grade BestGrade = Grade.NotAtAll;
+
+				foreach (Type T in alternativeBindingMechanisms)
+				{
+					if (T.GetTypeInfo().IsAbstract)
+						continue;
+
+					try
+					{
+						IAlternativeTransport AlternativeTransport = (IAlternativeTransport)Activator.CreateInstance(T);
+						Grade Grade = AlternativeTransport.Handles(URI);
+						if (Grade > BestGrade)
+						{
+							Best = AlternativeTransport;
+							BestGrade = Grade;
+						}
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
+				}
+
+				if (Best != null)
+				{
+					IAlternativeTransport AlternativeTransport = Best.Instantiate(URI, this, new XmppBindingInterface(this));
+					this.textTransportLayer = AlternativeTransport;
+					this.textTransportLayer.OnReceived += TextTransportLayer_OnReceived_NoSniff;
+					this.sendHeartbeats = !AlternativeTransport.HandlesHeartbeats;
+				}
+				else
+					throw new ArgumentException("No alternative binding mechanism found that servers the endpoint URI provided.", nameof(Credentials));
 			}
 
 			if (string.IsNullOrEmpty(Credentials.PasswordType))
@@ -506,6 +546,11 @@ namespace Waher.Networking.XMPP
 
 			if (Credentials.AllowRegistration)
 				this.AllowRegistration(Credentials.FormSignatureKey, Credentials.FormSignatureSecret);
+		}
+
+		private void Types_OnInvalidated(object sender, EventArgs e)
+		{
+			alternativeBindingMechanisms = Types.GetTypesImplementingInterface(typeof(IAlternativeTransport));
 		}
 
 		private void Init(Assembly Assembly)
@@ -667,10 +712,10 @@ namespace Waher.Networking.XMPP
 						XML.Encode(this.language) + "' xmlns='" + NamespaceClient + "' xmlns:stream='" +
 						NamespaceStream + "'>", null);
 				}
-				else if (this.textTransportLayer is HttpBinding HttpBinding)
+				else if (this.textTransportLayer is AlternativeTransport AlternativeTransport)
 				{
 					this.State = XmppState.StreamNegotiation;
-					HttpBinding.CreateSession();
+					AlternativeTransport.CreateSession();
 				}
 
 				this.ResetState(false);
@@ -1090,7 +1135,7 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public void Reconnect()
 		{
-			if (this.textTransportLayer != null && !(this.textTransportLayer is HttpBinding))
+			if (this.textTransportLayer != null && !(this.textTransportLayer is AlternativeTransport))
 				throw new Exception("Reconnections must be made in the underlying transport layer.");
 			else
 				this.Connect(this.domain);
@@ -6445,7 +6490,7 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		/// <param name="NrBytes">Number of random bytes to get.</param>
 		/// <returns>Random bytes.</returns>
-		internal static byte[] GetRandomBytes(int NrBytes)
+		public static byte[] GetRandomBytes(int NrBytes)
 		{
 			byte[] Result = new byte[NrBytes];
 
@@ -6463,7 +6508,7 @@ namespace Waher.Networking.XMPP
 		/// Gets a random value in the range [0,1).
 		/// </summary>
 		/// <returns>Random value in the range [0,1).</returns>
-		internal static double GetRandomDouble()
+		public static double GetRandomDouble()
 		{
 			byte[] Bin = new byte[8];
 
@@ -6478,7 +6523,13 @@ namespace Waher.Networking.XMPP
 			return l / maxD;
 		}
 
-		internal static int GetRandomValue(int Min, int Max)
+		/// <summary>
+		/// Gets a random integer value in the interval [<paramref name="Min"/>,<paramref name="Max"/>].
+		/// </summary>
+		/// <param name="Min">Smallest value in interval.</param>
+		/// <param name="Max">Largest value in interval.</param>
+		/// <returns>Random number.</returns>
+		public static int GetRandomValue(int Min, int Max)
 		{
 			if (Min > Max)
 			{

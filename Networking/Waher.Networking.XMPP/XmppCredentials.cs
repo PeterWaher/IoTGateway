@@ -34,7 +34,7 @@ namespace Waher.Networking.XMPP
 		private string events = string.Empty;
 		private string formSignatureKey = string.Empty;
 		private string formSignatureSecret = string.Empty;
-		private string httpEndpoint = string.Empty;
+		private string uriEndpoint = string.Empty;
 		private bool sniffer = false;
 		private bool trustServer = false;
 		private bool allowCramMD5 = true;
@@ -226,12 +226,13 @@ namespace Waher.Networking.XMPP
 		}
 
 		/// <summary>
-		/// Alternative HTTP binding (BOSH) if a traditional binary socket connection is not possible or desirable to use.
+		/// Alternative binding defined using an URI, if a traditional binary socket connection is not possible or desirable to use.
+		/// The URI defines what alternative binding mechanism to use.
 		/// </summary>
-		public string HttpEndpoint
+		public string UriEndpoint
 		{
-			get { return this.httpEndpoint; }
-			set { this.httpEndpoint = value; }
+			get { return this.uriEndpoint; }
+			set { this.uriEndpoint = value; }
 		}
 
 #if WINDOWS_UWP

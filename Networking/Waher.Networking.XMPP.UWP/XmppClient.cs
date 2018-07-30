@@ -623,8 +623,7 @@ namespace Waher.Networking.XMPP
 			this.pingResponse = true;
 			this.streamHeader = StreamHeader;
 			this.streamFooter = StreamFooter;
-			this.bareJid = BareJid;
-			this.fullJid = BareJid;
+			this.bareJid = this.fullJid = BareJid;
 			this.ResetState(false);
 
 			this.textTransportLayer.OnReceived += TextTransportLayer_OnReceived;
@@ -677,6 +676,7 @@ namespace Waher.Networking.XMPP
 
 				this.domain = Domain;
 				this.bareJid = this.fullJid = this.userName + "@" + Domain;
+
 				this.checkConnection = true;
 				this.openBracketReceived = false;
 
@@ -687,8 +687,6 @@ namespace Waher.Networking.XMPP
 				this.serverCertificateValid = false;
 				this.serverFeatures = null;
 				this.serverComponents = null;
-
-				this.bareJid = this.fullJid = this.userName + "@" + this.domain;
 
 				if (this.textTransportLayer == null)
 				{
@@ -1043,11 +1041,8 @@ namespace Waher.Networking.XMPP
 				}
 			}
 
-			if (this.secondTimer != null)
-			{
-				this.secondTimer.Dispose();
-				this.secondTimer = null;
-			}
+			this.secondTimer?.Dispose();
+			this.secondTimer = null;
 
 			this.DisposeClient();
 
@@ -1060,11 +1055,8 @@ namespace Waher.Networking.XMPP
 			}
 
 #if WINDOWS_UWP
-			if (this.memoryBuffer != null)
-			{
-				this.memoryBuffer.Dispose();
-				this.memoryBuffer = null;
-			}
+			this.memoryBuffer?.Dispose();
+			this.memoryBuffer = null;
 #endif
 		}
 
@@ -1078,35 +1070,20 @@ namespace Waher.Networking.XMPP
 			}
 
 #if WINDOWS_UWP
-			if (this.dataReader != null)
-			{
-				this.dataReader.Dispose();
-				this.dataReader = null;
-			}
+			this.dataReader?.Dispose();
+			this.dataReader = null;
 
-			if (this.dataWriter != null)
-			{
-				this.dataWriter.Dispose();
-				this.dataWriter = null;
-			}
+			this.dataWriter?.Dispose();
+			this.dataWriter = null;
 
-			if (this.client != null)
-			{
-				this.client.Dispose();
-				this.client = null;
-			}
+			this.client?.Dispose();
+			this.client = null;
 #else
-			if (this.stream != null)
-			{
-				this.stream.Dispose();
-				this.stream = null;
-			}
+			this.stream?.Dispose();
+			this.stream = null;
 
-			if (this.client != null)
-			{
-				this.client.Dispose();
-				this.client = null;
-			}
+			this.client?.Dispose();
+			this.client = null;
 #endif
 			if (this.textTransportLayer is IAlternativeTransport AlternativeTransport)
 				AlternativeTransport.CloseSession();
@@ -1669,26 +1646,20 @@ namespace Waher.Networking.XMPP
 		{
 			this.inputState = -1;
 #if WINDOWS_UWP
-			if (this.dataWriter != null)
-			{
-				this.dataWriter.Dispose();
-				this.dataWriter = null;
+			this.dataWriter?.Dispose();
+			this.dataWriter = null;
 
-				this.dataReader.Dispose();
-				this.dataReader = null;
+			this.dataReader?.Dispose();
+			this.dataReader = null;
 
-				this.client.Dispose();
-				this.client = null;
-			}
+			this.client?.Dispose();
+			this.client = null;
 #else
-			if (this.stream != null)
-			{
-				this.stream.Dispose();
-				this.stream = null;
+			this.stream?.Dispose();
+			this.stream = null;
 
-				this.client.Dispose();
-				this.client = null;
-			}
+			this.client?.Dispose();
+			this.client = null;
 #endif
 			ITextTransportLayer TTL;
 
@@ -6162,10 +6133,10 @@ namespace Waher.Networking.XMPP
 			{
 				if (DateTime.Now >= this.nextPing)
 				{
+					this.nextPing = DateTime.Now.AddMilliseconds(this.keepAliveSeconds * 500);
+
 					if (this.state == XmppState.Connected)
 					{
-						this.nextPing = DateTime.Now.AddMilliseconds(this.keepAliveSeconds * 500);
-
 						if (this.sendHeartbeats)
 						{
 							try

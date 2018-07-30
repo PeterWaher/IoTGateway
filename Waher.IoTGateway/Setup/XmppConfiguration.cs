@@ -34,7 +34,12 @@ namespace Waher.IoTGateway.Setup
 		/// <summary>
 		/// BOSH
 		/// </summary>
-		BOSH = 1
+		BOSH = 1,
+
+		/// <summary>
+		/// Web-socket
+		/// </summary>
+		WS = 2
 	}
 
 	/// <summary>
@@ -48,6 +53,7 @@ namespace Waher.IoTGateway.Setup
 		private string host = string.Empty;
 		private int port = XmppCredentials.DefaultPort;
 		private string boshUrl = string.Empty;
+		private string wsUrl = string.Empty;
 		private string account = string.Empty;
 		private string accountHumanReadableName = string.Empty;
 		private string password = string.Empty;
@@ -115,6 +121,16 @@ namespace Waher.IoTGateway.Setup
 		{
 			get { return this.boshUrl; }
 			set { this.boshUrl = value; }
+		}
+
+		/// <summary>
+		/// Web-socket URL to bind to.
+		/// </summary>
+		[DefaultValueStringEmpty]
+		public string WebSocketUrl
+		{
+			get { return this.wsUrl; }
+			set { this.wsUrl = value; }
 		}
 
 		/// <summary>
@@ -487,7 +503,11 @@ namespace Waher.IoTGateway.Setup
 			switch (this.transportMethod)
 			{
 				case XmppTransportMethod.BOSH:
-					Credentials.HttpEndpoint = this.boshUrl;
+					Credentials.UriEndpoint = this.boshUrl;
+					break;
+
+				case XmppTransportMethod.WS:
+					Credentials.UriEndpoint = this.wsUrl;
 					break;
 			}
 
@@ -709,6 +729,7 @@ namespace Waher.IoTGateway.Setup
 									if (Doc.DocumentElement != null && Doc.DocumentElement.LocalName == "XRD")
 									{
 										string BoshUrl = null;
+										string WsUrl = null;
 
 										foreach (XmlNode N in Doc.DocumentElement.ChildNodes)
 										{
@@ -719,11 +740,26 @@ namespace Waher.IoTGateway.Setup
 													case "urn:xmpp:alt-connections:xbosh":
 														BoshUrl = XML.Attribute(E, "href");
 														break;
+
+													case "urn:xmpp:alt-connections:websocket":
+														WsUrl = XML.Attribute(E, "href");
+														break;
 												}
 											}
 										}
 
-										if (!string.IsNullOrEmpty(BoshUrl))
+										if (!string.IsNullOrEmpty(WsUrl))
+										{
+											this.wsUrl = WsUrl;
+											this.transportMethod = XmppTransportMethod.WS;
+
+											ClientEvents.PushEvent(new string[] { TabID }, "ShowTransport", "{\"method\":\"WS\"}", true);
+
+											this.Connect(TabID);
+
+											return;
+										}
+										else if (!string.IsNullOrEmpty(BoshUrl))
 										{
 											this.boshUrl = BoshUrl;
 											this.transportMethod = XmppTransportMethod.BOSH;

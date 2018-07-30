@@ -29,6 +29,7 @@ function ConnectToHost()
     var Transport = GetInputValue("Transport");
     var Port = parseInt(GetInputValue("Port"));
     var BoshUrl = GetInputValue("BoshUrl");
+    var WsUrl = GetInputValue("WsUrl");
 
     switch (Transport)
     {
@@ -37,6 +38,15 @@ function ConnectToHost()
             {
                 document.getElementById("Port").focus();
                 document.getElementById("PortError").style.display = "block";
+                return;
+            }
+            break;
+
+        case "WS":
+            if (WsUrl === "")
+            {
+                document.getElementById("WsUrl").focus();
+                document.getElementById("WsUrlError").style.display = "block";
                 return;
             }
             break;
@@ -85,6 +95,7 @@ function ConnectToHost()
         "host": Host,
         "transport": Transport,
         "port": Port,
+        "wsUrl": WsUrl,
         "boshUrl": BoshUrl,
         "account": Account,
         "password": Password,
@@ -174,6 +185,7 @@ function ToggleTransport()
 {
     var Transport = document.getElementById("Transport").value;
     document.getElementById("C2S").style.display = Transport === "C2S" ? "block" : "none";
+    document.getElementById("WS").style.display = Transport === "WS" ? "block" : "none";
     document.getElementById("BOSH").style.display = Transport === "BOSH" ? "block" : "none";
 }
 

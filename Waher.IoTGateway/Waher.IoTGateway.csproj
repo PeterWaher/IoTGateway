@@ -15,9 +15,9 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>IoT Gateway HTTP CoAP MQTT XMPP LWM2M</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.0.43</AssemblyVersion>
-    <FileVersion>1.0.43</FileVersion>
-    <Version>1.0.43</Version>
+    <AssemblyVersion>1.0.44</AssemblyVersion>
+    <FileVersion>1.0.44</FileVersion>
+    <Version>1.0.44</Version>
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Waher.IoTGateway\</UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>
@@ -131,6 +131,7 @@
     <ProjectReference Include="..\Events\Waher.Events\Waher.Events.csproj" />
     <ProjectReference Include="..\Networking\Waher.Networking.CoAP\Waher.Networking.CoAP.csproj" />
     <ProjectReference Include="..\Networking\Waher.Networking.HTTP\Waher.Networking.HTTP.csproj" />
+    <ProjectReference Include="..\Networking\Waher.Networking.XMPP.BOSH\Waher.Networking.XMPP.BOSH.csproj" />
     <ProjectReference Include="..\Networking\Waher.Networking.XMPP.Concentrator\Waher.Networking.XMPP.Concentrator.csproj" />
     <ProjectReference Include="..\Networking\Waher.Networking.XMPP.Control\Waher.Networking.XMPP.Control.csproj" />
     <ProjectReference Include="..\Networking\Waher.Networking.XMPP.HTTPX\Waher.Networking.XMPP.HTTPX.csproj" />
@@ -140,6 +141,7 @@
     <ProjectReference Include="..\Networking\Waher.Networking.XMPP.PubSub\Waher.Networking.XMPP.PubSub.csproj" />
     <ProjectReference Include="..\Networking\Waher.Networking.XMPP.Sensor\Waher.Networking.XMPP.Sensor.csproj" />
     <ProjectReference Include="..\Networking\Waher.Networking.XMPP.Synchronization\Waher.Networking.XMPP.Synchronization.csproj" />
+    <ProjectReference Include="..\Networking\Waher.Networking.XMPP.WebSocket\Waher.Networking.XMPP.WebSocket.csproj" />
     <ProjectReference Include="..\Networking\Waher.Networking.XMPP\Waher.Networking.XMPP.csproj" />
     <ProjectReference Include="..\Networking\Waher.Networking\Waher.Networking.csproj" />
     <ProjectReference Include="..\Persistence\Waher.Persistence\Waher.Persistence.csproj" />

@@ -75,6 +75,7 @@ Featured servers:
 <label for="Transport">Transport:</label>  
 <select id="Transport" name="Transport" style="width:auto" onchange="ToggleTransport()">
 <option value="C2S"{{(TransportMethod:=Config.TransportMethod.ToString())="C2S" ? " selected" : ""}}>TCP</option>
+<option value="WS"{{TransportMethod="WS" ? " selected" : ""}}>Web-socket</option>
 <option value="BOSH"{{TransportMethod="BOSH" ? " selected" : ""}}>HTTP</option>
 </select>
 </p>
@@ -87,12 +88,20 @@ Featured servers:
 <p id="PortError" class="error" style="display:none">Invalid port number.</p>
 </div>
 
+<div id="WS" style="display:{{TransportMethod="WS" ? "block" : "none"}}">
+<p>
+<label for="WsUrl">URL:</label>  
+<input id="WsUrl" name="WsUrl" type="url" style="width:40em" value="{{Config.WsUrl}}" />
+</p>
+<p id="WsUrlError" class="error" style="display:none">You must provide a Web-socket URL to connect to.</p>
+</div>
+
 <div id="BOSH" style="display:{{TransportMethod="BOSH" ? "block" : "none"}}">
 <p>
 <label for="BoshUrl">URL:</label>  
 <input id="BoshUrl" name="BoshUrl" type="url" style="width:40em" value="{{Config.BoshUrl}}" />
 </p>
-<p id="BoshUrlError" class="error" style="display:none">You must provide a URL to connect to.</p>
+<p id="BoshUrlError" class="error" style="display:none">You must provide a Web URL to connect to.</p>
 </div>
 
 </div>

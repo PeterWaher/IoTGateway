@@ -39,6 +39,7 @@
 		<xs:restriction base="xs:string">
 			<xs:enumeration value="TraditionalSocket"/>
 			<xs:enumeration value="BOSH"/>
+			<xs:enumeration value="WS"/>
 		</xs:restriction>
 	</xs:simpleType>
 

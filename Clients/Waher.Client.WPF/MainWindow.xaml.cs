@@ -63,20 +63,22 @@ namespace Waher.Client.WPF
 				currentInstance = this;
 
 			Types.Initialize(typeof(MainWindow).Assembly,
-				typeof(Waher.Content.InternetContent).Assembly,
-				typeof(Waher.Content.Images.ImageCodec).Assembly,
-				typeof(Waher.Content.Markdown.MarkdownDocument).Assembly,
-				typeof(Waher.Content.Xml.XML).Assembly,
-				typeof(Waher.Content.Xsl.XSL).Assembly,
-				typeof(Waher.Networking.XMPP.Sensor.SensorData).Assembly,
-				typeof(Waher.Persistence.Database).Assembly,
-				typeof(Waher.Persistence.Files.FilesProvider).Assembly,
-				typeof(Waher.Script.Expression).Assembly,
-				typeof(Waher.Script.Content.Functions.Encoding.Decode).Assembly,
-				typeof(Waher.Script.Graphs.Graph).Assembly,
-				typeof(Waher.Script.Fractals.FractalGraph).Assembly,
-				typeof(Waher.Script.Persistence.Functions.FindObjects).Assembly,
-				typeof(Waher.Script.Statistics.Functions.Beta).Assembly);
+				typeof(Content.InternetContent).Assembly,
+				typeof(Content.Images.ImageCodec).Assembly,
+				typeof(Content.Markdown.MarkdownDocument).Assembly,
+				typeof(XML).Assembly,
+				typeof(Content.Xsl.XSL).Assembly,
+				typeof(SensorData).Assembly,
+				typeof(Networking.XMPP.BOSH.HttpBinding).Assembly,
+				typeof(Networking.XMPP.WebSocket.WebSocketBinding).Assembly,
+				typeof(Database).Assembly,
+				typeof(FilesProvider).Assembly,
+				typeof(Script.Expression).Assembly,
+				typeof(Script.Content.Functions.Encoding.Decode).Assembly,
+				typeof(Script.Graphs.Graph).Assembly,
+				typeof(Script.Fractals.FractalGraph).Assembly,
+				typeof(Script.Persistence.Functions.FindObjects).Assembly,
+				typeof(Script.Statistics.Functions.Beta).Assembly);
 
 			appDataFolder = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
 			if (!appDataFolder.EndsWith(new string(Path.DirectorySeparatorChar, 1)))

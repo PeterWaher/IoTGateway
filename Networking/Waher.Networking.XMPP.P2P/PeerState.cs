@@ -67,7 +67,7 @@ namespace Waher.Networking.XMPP.P2P
 		/// </summary>
 		/// <param name="Peer">Peer connection.</param>
 		/// <param name="Parent">Parent object.</param>
-		/// <param name="RemoteJID">Remote Full JID</param>
+		/// <param name="RemoteFullJID">Remote Full JID</param>
 		/// <param name="StreamHeader">Stream header</param>
 		/// <param name="StreamFooter">Stream footer</param>
 		/// <param name="StreamId">Stream ID</param>

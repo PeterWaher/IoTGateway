@@ -83,7 +83,7 @@ namespace Waher.Networking.HTTP
 		/// <param name="ClientConnection">Client connection.</param>
 		/// <param name="HttpServer">HTTP Server serving the request.</param>
 		/// <param name="Request">Request being served.</param>
-		internal HttpResponse(Stream ResponseStream, HttpClientConnection ClientConnection, 
+		internal HttpResponse(Stream ResponseStream, HttpClientConnection ClientConnection,
 			HttpServer HttpServer, HttpRequest Request)
 			: base()
 		{
@@ -688,11 +688,6 @@ namespace Waher.Networking.HTTP
 				this.lastPing = TP;
 				this.httpServer.PingRequest(this.httpRequest);
 			}
-		}
-
-		internal void WriteRaw(byte[] Data)
-		{
-			this.responseStream.Write(Data, 0, Data.Length);
 		}
 
 		internal Task WriteRawAsync(byte[] Data)

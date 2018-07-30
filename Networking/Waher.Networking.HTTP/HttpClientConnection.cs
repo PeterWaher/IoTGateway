@@ -152,6 +152,12 @@ namespace Waher.Networking.HTTP
 			get { return this.disposed; }
 		}
 
+#if !WINDOWS_UWP
+		internal bool Encrypted
+		{
+			get { return this.encrypted; }
+		}
+#endif
 		internal async Task BeginRead()
 		{
 			int NrRead;

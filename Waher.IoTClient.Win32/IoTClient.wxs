@@ -242,14 +242,16 @@
               <File Id='Waher.Content.Xsl.dll' Name='Waher.Content.Xsl.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Xsl.dll' Vital='yes'/>
               <File Id='Waher.Events.dll' Name='Waher.Events.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Events.dll' Vital='yes'/>
               <File Id='Waher.Networking.dll' Name='Waher.Networking.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.dll' Vital='yes'/>
-              <File Id='Waher.Networking.XMPP.Concentrator.dll' Name='Waher.Networking.XMPP.Concentrator.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.Concentrator.dll' Vital='yes'/>
-              <File Id='Waher.Networking.XMPP.Control.dll' Name='Waher.Networking.XMPP.Control.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.Control.dll' Vital='yes'/>
-              <File Id='Waher.Networking.XMPP.dll' Name='Waher.Networking.XMPP.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.dll' Vital='yes'/>
+							<File Id='Waher.Networking.XMPP.dll' Name='Waher.Networking.XMPP.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.dll' Vital='yes'/>
+							<File Id='Waher.Networking.XMPP.BOSH.dll' Name='Waher.Networking.XMPP.BOSH.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.BOSH.dll' Vital='yes'/>
+							<File Id='Waher.Networking.XMPP.Concentrator.dll' Name='Waher.Networking.XMPP.Concentrator.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.Concentrator.dll' Vital='yes'/>
+							<File Id='Waher.Networking.XMPP.Control.dll' Name='Waher.Networking.XMPP.Control.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.Control.dll' Vital='yes'/>
 							<File Id='Waher.Networking.XMPP.PEP.dll' Name='Waher.Networking.XMPP.PEP.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.PEP.dll' Vital='yes'/>
 							<File Id='Waher.Networking.XMPP.Provisioning.dll' Name='Waher.Networking.XMPP.Provisioning.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.Provisioning.dll' Vital='yes'/>
 							<File Id='Waher.Networking.XMPP.PubSub.dll' Name='Waher.Networking.XMPP.PubSub.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.PubSub.dll' Vital='yes'/>
 							<File Id='Waher.Networking.XMPP.Sensor.dll' Name='Waher.Networking.XMPP.Sensor.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.Sensor.dll' Vital='yes'/>
 							<File Id='Waher.Networking.XMPP.Synchronization.dll' Name='Waher.Networking.XMPP.Synchronization.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.Synchronization.dll' Vital='yes'/>
+							<File Id='Waher.Networking.XMPP.WebSocket.dll' Name='Waher.Networking.XMPP.WebSocket.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.WebSocket.dll' Vital='yes'/>
 							<File Id='Waher.Persistence.dll' Name='Waher.Persistence.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Persistence.dll' Vital='yes'/>
               <File Id='Waher.Persistence.FilesLW.dll' Name='Waher.Persistence.FilesLW.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Persistence.FilesLW.dll' Vital='yes'/>
               <File Id='Waher.Runtime.Cache.dll' Name='Waher.Runtime.Cache.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Runtime.Cache.dll' Vital='yes'/>
@@ -278,14 +280,16 @@
               <RemoveFile Id='RemoveWaher.Content.Xsl.dll' Name='Waher.Content.Xsl.dll' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Events.dll' Name='Waher.Events.dll' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Networking.dll' Name='Waher.Networking.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveWaher.Networking.XMPP.Concentrator.dll' Name='Waher.Networking.XMPP.Concentrator.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveWaher.Networking.XMPP.Control.dll' Name='Waher.Networking.XMPP.Control.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveWaher.Networking.XMPP.dll' Name='Waher.Networking.XMPP.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Networking.XMPP.dll' Name='Waher.Networking.XMPP.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Networking.XMPP.BOSH.dll' Name='Waher.Networking.XMPP.BOSH.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Networking.XMPP.Concentrator.dll' Name='Waher.Networking.XMPP.Concentrator.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Networking.XMPP.Control.dll' Name='Waher.Networking.XMPP.Control.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.PEP.dll' Name='Waher.Networking.XMPP.PEP.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.Provisioning.dll' Name='Waher.Networking.XMPP.Provisioning.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.PubSub.dll' Name='Waher.Networking.XMPP.PubSub.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.Sensor.dll' Name='Waher.Networking.XMPP.Sensor.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.Synchronization.dll' Name='Waher.Networking.XMPP.Synchronization.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Networking.XMPP.WebSocket.dll' Name='Waher.Networking.XMPP.WebSocket.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Persistence.dll' Name='Waher.Persistence.dll' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Persistence.FilesLW.dll' Name='Waher.Persistence.FilesLW.dll' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Runtime.Cache.dll' Name='Waher.Runtime.Cache.dll' On='uninstall'/>
@@ -313,10 +317,13 @@
               <File Id='Waher.Content.Xsl.pdb' Name='Waher.Content.Xsl.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Xsl.pdb' Vital='yes'/>
               <File Id='Waher.Events.pdb' Name='Waher.Events.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Events.pdb' Vital='yes'/>
               <File Id='Waher.Networking.pdb' Name='Waher.Networking.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.pdb' Vital='yes'/>
-              <File Id='Waher.Networking.XMPP.Concentrator.pdb' Name='Waher.Networking.XMPP.Concentrator.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.Concentrator.pdb' Vital='yes'/>
-              <File Id='Waher.Networking.XMPP.Concentrator.xml' Name='Waher.Networking.XMPP.Concentrator.xml' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.Concentrator.xml' Vital='yes'/>
-              <File Id='Waher.Networking.XMPP.Control.pdb' Name='Waher.Networking.XMPP.Control.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.Control.pdb' Vital='yes'/>
-              <File Id='Waher.Networking.XMPP.pdb' Name='Waher.Networking.XMPP.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.pdb' Vital='yes'/>
+							<File Id='Waher.Networking.XMPP.pdb' Name='Waher.Networking.XMPP.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.pdb' Vital='yes'/>
+							<File Id='Waher.Networking.XMPP.xml' Name='Waher.Networking.XMPP.xml' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.xml' Vital='yes'/>
+							<File Id='Waher.Networking.XMPP.BOSH.pdb' Name='Waher.Networking.XMPP.BOSH.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.BOSH.pdb' Vital='yes'/>
+							<File Id='Waher.Networking.XMPP.BOSH.xml' Name='Waher.Networking.XMPP.BOSH.xml' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.BOSH.xml' Vital='yes'/>
+							<File Id='Waher.Networking.XMPP.Concentrator.pdb' Name='Waher.Networking.XMPP.Concentrator.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.Concentrator.pdb' Vital='yes'/>
+							<File Id='Waher.Networking.XMPP.Concentrator.xml' Name='Waher.Networking.XMPP.Concentrator.xml' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.Concentrator.xml' Vital='yes'/>
+							<File Id='Waher.Networking.XMPP.Control.pdb' Name='Waher.Networking.XMPP.Control.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.Control.pdb' Vital='yes'/>
 							<File Id='Waher.Networking.XMPP.PEP.pdb' Name='Waher.Networking.XMPP.PEP.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.PEP.pdb' Vital='yes'/>
 							<File Id='Waher.Networking.XMPP.PEP.xml' Name='Waher.Networking.XMPP.PEP.xml' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.PEP.xml' Vital='yes'/>
 							<File Id='Waher.Networking.XMPP.Provisioning.pdb' Name='Waher.Networking.XMPP.Provisioning.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.Provisioning.pdb' Vital='yes'/>
@@ -327,8 +334,9 @@
 							<File Id='Waher.Networking.XMPP.Sensor.xml' Name='Waher.Networking.XMPP.Sensor.xml' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.Sensor.xml' Vital='yes'/>
 							<File Id='Waher.Networking.XMPP.Synchronization.pdb' Name='Waher.Networking.XMPP.Synchronization.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.Synchronization.pdb' Vital='yes'/>
 							<File Id='Waher.Networking.XMPP.Synchronization.xml' Name='Waher.Networking.XMPP.Synchronization.xml' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.Synchronization.xml' Vital='yes'/>
-							<File Id='Waher.Networking.XMPP.xml' Name='Waher.Networking.XMPP.xml' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.xml' Vital='yes'/>
-              <File Id='Waher.Persistence.pdb' Name='Waher.Persistence.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Persistence.pdb' Vital='yes'/>
+							<File Id='Waher.Networking.XMPP.WebSocket.pdb' Name='Waher.Networking.XMPP.WebSocket.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.WebSocket.pdb' Vital='yes'/>
+							<File Id='Waher.Networking.XMPP.WebSocket.xml' Name='Waher.Networking.XMPP.WebSocket.xml' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.WebSocket.xml' Vital='yes'/>
+							<File Id='Waher.Persistence.pdb' Name='Waher.Persistence.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Persistence.pdb' Vital='yes'/>
               <File Id='Waher.Persistence.FilesLW.pdb' Name='Waher.Persistence.FilesLW.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Persistence.FilesLW.pdb' Vital='yes'/>
               <File Id='Waher.Runtime.Cache.pdb' Name='Waher.Runtime.Cache.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Runtime.Cache.pdb' Vital='yes'/>
               <File Id='Waher.Runtime.Inventory.pdb' Name='Waher.Runtime.Inventory.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Runtime.Inventory.pdb' Vital='yes'/>
@@ -353,10 +361,13 @@
               <RemoveFile Id='RemoveWaher.Content.Xsl.pdb' Name='Waher.Content.Xsl.pdb' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Events.pdb' Name='Waher.Events.pdb' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Networking.pdb' Name='Waher.Networking.pdb' On='uninstall'/>
-              <RemoveFile Id='RemoveWaher.Networking.XMPP.Concentrator.pdb' Name='Waher.Networking.XMPP.Concentrator.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Networking.XMPP.pdb' Name='Waher.Networking.XMPP.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Networking.XMPP.xml' Name='Waher.Networking.XMPP.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Networking.XMPP.BOSH.pdb' Name='Waher.Networking.XMPP.BOSH.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Networking.XMPP.BOSH.xml' Name='Waher.Networking.XMPP.BOSH.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Networking.XMPP.Concentrator.pdb' Name='Waher.Networking.XMPP.Concentrator.pdb' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Networking.XMPP.Concentrator.xml' Name='Waher.Networking.XMPP.Concentrator.xml' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Networking.XMPP.Control.pdb' Name='Waher.Networking.XMPP.Control.pdb' On='uninstall'/>
-              <RemoveFile Id='RemoveWaher.Networking.XMPP.pdb' Name='Waher.Networking.XMPP.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.PEP.pdb' Name='Waher.Networking.XMPP.PEP.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.PEP.xml' Name='Waher.Networking.XMPP.PEP.xml' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.Provisioning.pdb' Name='Waher.Networking.XMPP.Provisioning.pdb' On='uninstall'/>
@@ -367,8 +378,9 @@
               <RemoveFile Id='RemoveWaher.Networking.XMPP.Sensor.xml' Name='Waher.Networking.XMPP.Sensor.xml' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.Synchronization.pdb' Name='Waher.Networking.XMPP.Synchronization.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.Synchronization.xml' Name='Waher.Networking.XMPP.Synchronization.xml' On='uninstall'/>
-							<RemoveFile Id='RemoveWaher.Networking.XMPP.xml' Name='Waher.Networking.XMPP.xml' On='uninstall'/>
-              <RemoveFile Id='RemoveWaher.Persistence.pdb' Name='Waher.Persistence.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Networking.XMPP.WebSocket.pdb' Name='Waher.Networking.XMPP.WebSocket.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Networking.XMPP.WebSocket.xml' Name='Waher.Networking.XMPP.WebSocket.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Persistence.pdb' Name='Waher.Persistence.pdb' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Persistence.FilesLW.pdb' Name='Waher.Persistence.FilesLW.pdb' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Runtime.Cache.pdb' Name='Waher.Runtime.Cache.pdb' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Runtime.Inventory.pdb' Name='Waher.Runtime.Inventory.pdb' On='uninstall'/>

@@ -194,6 +194,8 @@ namespace Waher.Content.Markdown
 		/// </summary>
 		/// <param name="Markdown">Markdown text</param>
 		/// <param name="Variables">Current set of variables.</param>
+		/// <param name="TransparentExceptionTypes">If an exception is thrown when processing script in markdown, and the exception is of
+		/// any of these types, the exception will be rethrown, instead of shown as an error in the generated output.</param>
 		/// <returns>Preprocessed markdown.</returns>
 		public static string Preprocess(string Markdown, Variables Variables, params Type[] TransparentExceptionTypes)
 		{
@@ -206,6 +208,8 @@ namespace Waher.Content.Markdown
 		/// <param name="Markdown">Markdown text</param>
 		/// <param name="Variables">Current set of variables.</param>
 		/// <param name="FileName">Filename of markdown.</param>
+		/// <param name="TransparentExceptionTypes">If an exception is thrown when processing script in markdown, and the exception is of
+		/// any of these types, the exception will be rethrown, instead of shown as an error in the generated output.</param>
 		/// <returns>Preprocessed markdown.</returns>
 		public static string Preprocess(string Markdown, Variables Variables, string FileName, params Type[] TransparentExceptionTypes)
 		{
@@ -219,6 +223,8 @@ namespace Waher.Content.Markdown
 		/// <param name="Variables">Current set of variables.</param>
 		/// <param name="FileName">Filename of markdown.</param>
 		/// <param name="IsDynamic">If the markdown contained preprocessed script.</param>
+		/// <param name="TransparentExceptionTypes">If an exception is thrown when processing script in markdown, and the exception is of
+		/// any of these types, the exception will be rethrown, instead of shown as an error in the generated output.</param>
 		/// <returns>Preprocessed markdown.</returns>
 		public static string Preprocess(string Markdown, Variables Variables, string FileName, out bool IsDynamic, params Type[] TransparentExceptionTypes)
 		{

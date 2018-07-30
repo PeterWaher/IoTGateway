@@ -37,5 +37,10 @@ namespace Waher.Networking.XMPP
 		/// Creates a session.
 		/// </summary>
 		void CreateSession();
+
+		/// <summary>
+		/// Closes a session.
+		/// </summary>
+		void CloseSession();
 	}
 }

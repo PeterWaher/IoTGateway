@@ -1,4 +1,4 @@
-﻿#define ECHO
+﻿//#define ECHO
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -14,7 +14,7 @@ using Waher.Events;
 using Waher.Runtime.Inventory;
 using Waher.Security;
 
-namespace Waher.Networking.XMPP
+namespace Waher.Networking.XMPP.BOSH
 {
 	/// <summary>
 	/// Implements a HTTP Binding mechanism based on BOSH.
@@ -105,25 +105,12 @@ namespace Waher.Networking.XMPP
 				bindingInterface = BindingInterface,
 				url = URI,
 				xmppClient = Client,
-				active = new bool[] { false },
+				active = new bool[1],
+				httpClients = new HttpClient[1],
 				rid = BitConverter.ToUInt32(XmppClient.GetRandomBytes(4), 0) + 1
 			};
 
-			Result.httpClients = new HttpClient[]
-			{
-				new HttpClient(new HttpClientHandler()
-				{
-#if !NETFW
-					ServerCertificateCustomValidationCallback = Result.RemoteCertificateValidationCallback,
-#endif
-					UseCookies = false
-				})
-				{
-					Timeout = TimeSpan.FromMilliseconds(60000)
-				}
-			};
-
-			Result.httpClients[0].DefaultRequestHeaders.ExpectContinue = false;
+			Result.httpClients = new HttpClient[1];
 
 			return Result;
 		}
@@ -164,7 +151,10 @@ namespace Waher.Networking.XMPP
 			if (this.httpClients != null)
 			{
 				foreach (HttpClient Client in this.httpClients)
-					Client.Dispose();
+				{
+					if (Client != null)
+						Client.Dispose();
+				}
 
 				this.httpClients = null;
 			}
@@ -223,9 +213,9 @@ namespace Waher.Networking.XMPP
 
 					for (i = 0; i < c; i++)
 					{
-						if (this.active[i] && this.httpClients[i] != null)
+						if ((this.active[i] && this.httpClients[i] != null) || i == 0)
 						{
-							this.httpClients[i].Dispose();
+							this.httpClients[i]?.Dispose();
 							this.httpClients[i] = new HttpClient(new HttpClientHandler()
 							{
 #if !NETFW
@@ -439,6 +429,28 @@ namespace Waher.Networking.XMPP
 			}
 		}
 
+		/// <summary>
+		/// Closes a session.
+		/// </summary>
+		public override void CloseSession()
+		{
+			this.terminated = true;
+			if (this.httpClients != null)
+			{
+				int i, c = this.httpClients.Length;
+
+				for (i = 0; i < c; i++)
+				{
+					this.active[i] = false;
+					if (this.httpClients[i] != null)
+					{
+						this.httpClients[i].Dispose();
+						this.httpClients[i] = null;
+					}
+				}
+			}
+		}
+
 		private void GenerateKeysLocked()
 		{
 			int n = XmppClient.GetRandomValue(8, 24);
@@ -601,7 +613,7 @@ namespace Waher.Networking.XMPP
 						{
 							try
 							{
-								DeliveryCallback(this, new EventArgs());
+								DeliveryCallback(this.xmppClient, new EventArgs());
 							}
 							catch (Exception ex)
 							{
@@ -809,7 +821,7 @@ namespace Waher.Networking.XMPP
 						if (Language != null)
 						{
 							sb.Append("' xml:lang='");
-							sb.Append(XML.Encode(From));
+							sb.Append(XML.Encode(Language));
 						}
 
 						sb.Append("' xmlns='");

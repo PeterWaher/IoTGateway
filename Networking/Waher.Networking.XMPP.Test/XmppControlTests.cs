@@ -33,7 +33,10 @@ namespace Waher.Networking.XMPP.Test
 		[AssemblyInitialize]
 		public static void AssemblyInitialize(TestContext Context)
 		{
-			Types.Initialize();
+			Types.Initialize(
+				typeof(XmppClient).Assembly,
+				typeof(BOSH.HttpBinding).Assembly,
+				typeof(WebSocket.WebSocketBinding).Assembly);
 		}
 
 		public override void ConnectClients()

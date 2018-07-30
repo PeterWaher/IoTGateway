@@ -1108,6 +1108,9 @@ namespace Waher.Networking.XMPP
 				this.client = null;
 			}
 #endif
+			if (this.textTransportLayer is IAlternativeTransport AlternativeTransport)
+				AlternativeTransport.CloseSession();
+
 			EventHandler h = this.OnDisposed;
 			if (h != null)
 			{

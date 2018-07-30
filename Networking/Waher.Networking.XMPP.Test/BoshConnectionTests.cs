@@ -23,9 +23,9 @@ namespace Waher.Networking.XMPP.Test
 			return new XmppCredentials()
 			{
 				//Host = "waher.se",
-				//HttpEndpoint = "https://waher.se/http-bind",
+				//UriEndpoint = "https://waher.se/http-bind",
 				Host = "localhost",
-				HttpEndpoint = "https://localhost/http-bind",
+				UriEndpoint = "https://localhost/http-bind",
 				TrustServer = true,
 				Account = "test",
 				Password = "testpwd"

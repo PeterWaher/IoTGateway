@@ -164,6 +164,10 @@
       <Project>{1659833d-9a9a-4147-9237-2ba8d96086bc}</Project>
       <Name>Waher.Things</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Waher.Networking.XMPP.BOSH\Waher.Networking.XMPP.BOSH.csproj">
+      <Project>{3c8f09ed-99ae-425b-891f-74235a0bbb08}</Project>
+      <Name>Waher.Networking.XMPP.BOSH</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Waher.Networking.XMPP.Control\Waher.Networking.XMPP.Control.csproj">
       <Project>{c5151b99-69e3-4ba1-9328-fba82facf159}</Project>
       <Name>Waher.Networking.XMPP.Control</Name>
@@ -183,6 +187,10 @@
     <ProjectReference Include="..\Waher.Networking.XMPP.Synchronization\Waher.Networking.XMPP.Synchronization.csproj">
       <Project>{e4112366-6d17-4b03-8127-0b62c0d42370}</Project>
       <Name>Waher.Networking.XMPP.Synchronization</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Waher.Networking.XMPP.WebSocket\Waher.Networking.XMPP.WebSocket.csproj">
+      <Project>{1846ad1f-9ec3-43ea-a1ce-ce79557f3ff6}</Project>
+      <Name>Waher.Networking.XMPP.WebSocket</Name>
     </ProjectReference>
     <ProjectReference Include="..\Waher.Networking.XMPP\Waher.Networking.XMPP.csproj">
       <Project>{4d96e9bc-6fc0-4866-9e6b-3f5a30de1011}</Project>

@@ -91,7 +91,7 @@ Featured servers:
 <div id="WS" style="display:{{TransportMethod="WS" ? "block" : "none"}}">
 <p>
 <label for="WsUrl">URL:</label>  
-<input id="WsUrl" name="WsUrl" type="url" style="width:40em" value="{{Config.WsUrl}}" />
+<input id="WsUrl" name="WsUrl" type="url" style="width:40em" value="{{Config.WebSocketUrl}}" />
 </p>
 <p id="WsUrlError" class="error" style="display:none">You must provide a Web-socket URL to connect to.</p>
 </div>

@@ -38,6 +38,7 @@ namespace Waher.Networking.XMPP.WebSocket
 		private bool terminated = false;
 		private bool writing = false;
 		private bool closeSent = false;
+		private bool disposed = false;
 
 		/// <summary>
 		/// Implements a Web-socket XMPP protocol, as defined in RFC 7395.
@@ -104,6 +105,7 @@ namespace Waher.Networking.XMPP.WebSocket
 		/// </summary>
 		public override void Dispose()
 		{
+			this.disposed = true;
 			this.terminated = true;
 			this.xmppClient = null;
 
@@ -401,7 +403,7 @@ namespace Waher.Networking.XMPP.WebSocket
 				if (this.xmppClient.HasSniffers)
 					this.xmppClient.ReceiveText(s);
 			}
-			while (!Response.EndOfMessage);
+			while (!Response.EndOfMessage && !this.disposed);
 
 			return sb.ToString();
 		}
@@ -464,10 +466,12 @@ namespace Waher.Networking.XMPP.WebSocket
 
 			try
 			{
-				while (Packet != null)
+				bool HasSniffers = this.xmppClient.HasSniffers;
+				
+				while (Packet != null && !this.disposed)
 				{
-					if (this.xmppClient.HasSniffers)
-						this.xmppClient.TransmitText(Packet);
+					if (HasSniffers)
+						this.xmppClient?.TransmitText(Packet);
 
 					ArraySegment<byte> Buffer = new ArraySegment<byte>(System.Text.Encoding.UTF8.GetBytes(Packet));
 					await this.webSocketClient.SendAsync(Buffer, WebSocketMessageType.Text, true, CancellationToken.None);

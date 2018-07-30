@@ -401,6 +401,9 @@ namespace Waher.IoTGateway.Setup
 			if (!Parameters.TryGetValue("boshUrl", out Obj) || !(Obj is string BoshUrl))
 				throw new BadRequestException();
 
+			if (!Parameters.TryGetValue("wsUrl", out Obj) || !(Obj is string WsUrl))
+				throw new BadRequestException();
+
 			if (!Parameters.TryGetValue("customBinding", out Obj) || !(Obj is bool CustomBinding))
 				throw new BadRequestException();
 
@@ -434,6 +437,7 @@ namespace Waher.IoTGateway.Setup
 			this.host = HostName;
 			this.port = Port;
 			this.boshUrl = BoshUrl.Trim();
+			this.wsUrl = WsUrl.Trim();
 			this.customBinding = CustomBinding;
 			this.trustServer = TrustServer;
 			this.allowInsecureMechanisms = InsecureMechanisms;

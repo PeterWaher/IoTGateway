@@ -11,7 +11,7 @@
     <iconUrl>https://github.com/PeterWaher/IoTGateway/blob/master/Images/Icon.ico?raw=true</iconUrl>
     <repository type="GitHub" url="https://github.com/PeterWaher/IoTGateway"/>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
-    <description>UWP class library providing a simple HTTP server for publishing dynamic content and services, managing user authentication based on a customizable set of users and privileges.</description>
+    <description>UWP class library providing a simple HTTP(S) server for publishing dynamic content and services, managing user authentication based on a customizable set of users and privileges. Supports the WebSocket protocol.</description>
     <copyright>Copyright © Waher Data AB 2016-2018. All rights reserved.</copyright>
     <tags>networking communication http uwp</tags>
     <dependencies>

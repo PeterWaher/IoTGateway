@@ -77,36 +77,67 @@ namespace Waher.Client.WPF.Dialogs
 					Credentials.Port = Port;
 					break;
 
-				case TransportMethod.BOSH:
+				case TransportMethod.WS:
 					Uri Uri;
 					try
 					{
-						Uri = new Uri(this.HttpEndpoint.Text);
+						Uri = new Uri(this.UrlEndpoint.Text);
 					}
 					catch (Exception)
 					{
 						MessageBox.Show(this, "Invalid URI.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-						this.HttpEndpoint.Focus();
+						this.UrlEndpoint.Focus();
 						return;
 					}
 
 					string Scheme = Uri.Scheme.ToLower();
 
-					if (Scheme != "http" && Scheme != "https")
+					if (Scheme != "ws" && Scheme != "wss")
 					{
-						MessageBox.Show(this, "Resource must be an HTTP or HTTPS URI.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-						this.HttpEndpoint.Focus();
+						MessageBox.Show(this, "Resource must be an WS or WSS URI.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+						this.UrlEndpoint.Focus();
 						return;
 					}
 
 					if (!Uri.IsAbsoluteUri)
 					{
 						MessageBox.Show(this, "URI must be an absolute URI.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-						this.HttpEndpoint.Focus();
+						this.UrlEndpoint.Focus();
 						return;
 					}
 
-					Credentials.HttpEndpoint = this.HttpEndpoint.Text;
+					Credentials.UriEndpoint = this.UrlEndpoint.Text;
+					break;
+
+				case TransportMethod.BOSH:
+					try
+					{
+						Uri = new Uri(this.UrlEndpoint.Text);
+					}
+					catch (Exception)
+					{
+						MessageBox.Show(this, "Invalid URI.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+						this.UrlEndpoint.Focus();
+						return;
+					}
+
+					Scheme = Uri.Scheme.ToLower();
+
+					if (Scheme != "http" && Scheme != "https")
+					{
+						MessageBox.Show(this, "Resource must be an HTTP or HTTPS URI.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+						this.UrlEndpoint.Focus();
+						return;
+					}
+
+					if (!Uri.IsAbsoluteUri)
+					{
+						MessageBox.Show(this, "URI must be an absolute URI.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+						this.UrlEndpoint.Focus();
+						return;
+					}
+
+					Credentials.UriEndpoint = this.UrlEndpoint.Text;
 					break;
 			}
 
@@ -123,7 +154,7 @@ namespace Waher.Client.WPF.Dialogs
 			this.XmppServer.IsEnabled = false;
 			this.ConnectionMethod.IsEnabled = false;
 			this.XmppPort.IsEnabled = false;
-			this.HttpEndpoint.IsEnabled = false;
+			this.UrlEndpoint.IsEnabled = false;
 			this.AccountName.IsEnabled = false;
 			this.Password.IsEnabled = false;
 			this.RetypePassword.IsEnabled = false;
@@ -263,7 +294,7 @@ namespace Waher.Client.WPF.Dialogs
 			this.XmppServer.IsEnabled = true;
 			this.ConnectionMethod.IsEnabled = true;
 			this.XmppPort.IsEnabled = true;
-			this.HttpEndpoint.IsEnabled = true;
+			this.UrlEndpoint.IsEnabled = true;
 			this.AccountName.IsEnabled = true;
 			this.Password.IsEnabled = true;
 			this.TrustServerCertificate.IsEnabled = true;
@@ -303,15 +334,16 @@ namespace Waher.Client.WPF.Dialogs
 				case TransportMethod.TraditionalSocket:
 					this.PortLabel.Visibility = Visibility.Visible;
 					this.XmppPort.Visibility = Visibility.Visible;
-					this.HttpEndpointLabel.Visibility = Visibility.Hidden;
-					this.HttpEndpoint.Visibility = Visibility.Hidden;
+					this.UrlEndpointLabel.Visibility = Visibility.Hidden;
+					this.UrlEndpoint.Visibility = Visibility.Hidden;
 					break;
 
 				case TransportMethod.BOSH:
+				case TransportMethod.WS:
 					this.PortLabel.Visibility = Visibility.Hidden;
 					this.XmppPort.Visibility = Visibility.Hidden;
-					this.HttpEndpointLabel.Visibility = Visibility.Visible;
-					this.HttpEndpoint.Visibility = Visibility.Visible;
+					this.UrlEndpointLabel.Visibility = Visibility.Visible;
+					this.UrlEndpoint.Visibility = Visibility.Visible;
 					break;
 			}
 		}

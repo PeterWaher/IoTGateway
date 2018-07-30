@@ -17,7 +17,7 @@
 	<xs:complexType name="XmppAccount">
     <xs:attribute name="host" type="xs:string" use="required"/>
 		<xs:attribute name="transport" type="Transport" use="optional" default="TraditionalSocket"/>
-		<xs:attribute name="httpBindResource" type="xs:anyURI" use="optional"/>
+		<xs:attribute name="urlBindResource" type="xs:anyURI" use="optional"/>
     <xs:attribute name="port" type="PortNumber" use="optional" default="5222"/>
 		<xs:attribute name="account" type="xs:string" use="required"/>
 		<xs:attribute name="password" type="xs:string" use="optional"/>

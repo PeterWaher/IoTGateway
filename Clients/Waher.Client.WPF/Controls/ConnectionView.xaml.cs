@@ -355,7 +355,7 @@ namespace Waher.Client.WPF.Controls
 					Port = XmppCredentials.DefaultPort;
 
 				XmppAccountNode Node = new XmppAccountNode(this.connections, null, Dialog.XmppServer.Text, 
-					(TransportMethod)Dialog.ConnectionMethod.SelectedIndex, Port, Dialog.HttpEndpoint.Text,
+					(TransportMethod)Dialog.ConnectionMethod.SelectedIndex, Port, Dialog.UrlEndpoint.Text,
 					Dialog.AccountName.Text, Dialog.PasswordHash, Dialog.PasswordHashMethod,
 					Dialog.TrustServerCertificate.IsChecked.HasValue && Dialog.TrustServerCertificate.IsChecked.Value,
 					Dialog.AllowInsecureAuthentication.IsChecked.HasValue && Dialog.AllowInsecureAuthentication.IsChecked.Value);

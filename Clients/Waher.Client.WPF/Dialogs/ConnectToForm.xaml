@@ -10,14 +10,15 @@
         <ComboBox Height="23" HorizontalAlignment="Stretch" Margin="12,83,12,0" Name="ConnectionMethod" VerticalAlignment="Top" 
                  ToolTip="Method by which the connection is to be established." SelectedIndex="0" SelectionChanged="ConnectionMethod_SelectionChanged">
             <ComboBoxItem Content="Traditional bidirectional socket"/>
+            <ComboBoxItem Content="Web-socket"/>
             <ComboBoxItem Content="HTTP Transport (BOSH)"/>
         </ComboBox>
         <Label Content="Port:" Height="28" HorizontalAlignment="Left" Margin="12,112,0,0" Name="PortLabel" VerticalAlignment="Top" />
         <TextBox Height="23" HorizontalAlignment="Stretch" Margin="12,133,12,0" Name="XmppPort" VerticalAlignment="Top" Text="5222"
                  ToolTip="Enter port number to connect to. The default port number for XMPP is 5222."/>
-        <Label Content="HTTP Endpoint:" Height="28" HorizontalAlignment="Left" Margin="12,112,0,0" Name="HttpEndpointLabel" VerticalAlignment="Top" Visibility="Hidden" />
-        <TextBox Height="23" HorizontalAlignment="Stretch" Margin="12,133,12,0" Name="HttpEndpoint" VerticalAlignment="Top" Text="" Visibility="Hidden"
-                 ToolTip="Enter URI to the HTTP endpoint that will connect you to the XMPP network. Consult with your broker to find the correct URI."/>
+        <Label Content="URL Endpoint:" Height="28" HorizontalAlignment="Left" Margin="12,112,0,0" Name="UrlEndpointLabel" VerticalAlignment="Top" Visibility="Hidden" />
+        <TextBox Height="23" HorizontalAlignment="Stretch" Margin="12,133,12,0" Name="UrlEndpoint" VerticalAlignment="Top" Text="" Visibility="Hidden"
+                 ToolTip="Enter URL to the endpoint that will be used to connect to the XMPP network. Consult with your broker to find the correct URL."/>
         <Label Content="Account Name:" Height="28" HorizontalAlignment="Left" Margin="12,162,0,0" Name="label4" VerticalAlignment="Top"
                ToolTip="Enter name of account to connect to here."/>
         <TextBox Height="23" HorizontalAlignment="Stretch" Margin="12,183,12,0" Name="AccountName" VerticalAlignment="Top" />

@@ -37,7 +37,8 @@ namespace Waher.Client.WPF.Model
 	public enum TransportMethod
 	{
 		TraditionalSocket = 0,
-		BOSH = 1
+		WS = 1,
+		BOSH = 2
 	}
 
 	/// <summary>
@@ -67,7 +68,7 @@ namespace Waher.Client.WPF.Model
 		private TransportMethod transport = TransportMethod.TraditionalSocket;
 		private string host;
 		private string domain;
-		private string httpBindResource;
+		private string urlBindResource;
 		private int port;
 		private string account;
 		private string password;
@@ -87,13 +88,13 @@ namespace Waher.Client.WPF.Model
 		/// <param name="Host">Host name.</param>
 		/// <param name="Transport">Transport method.</param>
 		/// <param name="Port">Port number.</param>
-		/// <param name="HttpBindResource">HTTP bind resource.</param>
+		/// <param name="UrlBindResource">URL bind resource.</param>
 		/// <param name="Account">Account name.</param>
 		/// <param name="PasswordHash">Password hash.</param>
 		/// <param name="PasswordHashMethod">Password hash method.</param>
 		/// <param name="TrustCertificate">If the server certificate should be trusted.</param>
 		/// <param name="AllowInsecureAuthentication">If insecure authentication mechanisms are to be allowed.</param>
-		public XmppAccountNode(Connections Connections, TreeNode Parent, string Host, TransportMethod Transport, int Port, string HttpBindResource,
+		public XmppAccountNode(Connections Connections, TreeNode Parent, string Host, TransportMethod Transport, int Port, string UrlBindResource,
 			string Account, string PasswordHash, string PasswordHashMethod, bool TrustCertificate, bool AllowInsecureAuthentication)
 			: base(Parent)
 		{
@@ -101,7 +102,7 @@ namespace Waher.Client.WPF.Model
 			this.host = this.domain = Host;
 			this.transport = Transport;
 			this.port = Port;
-			this.httpBindResource = HttpBindResource;
+			this.urlBindResource = UrlBindResource;
 			this.account = Account;
 
 			if (string.IsNullOrEmpty(PasswordHashMethod))
@@ -131,7 +132,7 @@ namespace Waher.Client.WPF.Model
 			this.connections = Connections;
 			this.host = XML.Attribute(E, "host");
 			this.transport = (TransportMethod)XML.Attribute(E, "transport", TransportMethod.TraditionalSocket);
-			this.httpBindResource = XML.Attribute(E, "httpBindResource");
+			this.urlBindResource = XML.Attribute(E, "urlBindResource");
 			this.domain = XML.Attribute(E, "domain", this.host);
 			this.port = XML.Attribute(E, "port", XmppCredentials.DefaultPort);
 			this.account = XML.Attribute(E, "account");
@@ -161,7 +162,8 @@ namespace Waher.Client.WPF.Model
 			switch (this.transport)
 			{
 				case TransportMethod.BOSH:
-					Credentials.HttpEndpoint = this.httpBindResource;
+				case TransportMethod.WS:
+					Credentials.UriEndpoint = this.urlBindResource;
 					break;
 			}
 
@@ -399,7 +401,7 @@ namespace Waher.Client.WPF.Model
 			Output.WriteAttributeString("domain", this.domain);
 			Output.WriteAttributeString("transport", this.transport.ToString());
 			Output.WriteAttributeString("port", this.port.ToString());
-			Output.WriteAttributeString("httpBindResource", this.httpBindResource);
+			Output.WriteAttributeString("urlBindResource", this.urlBindResource);
 
 			Output.WriteAttributeString("account", this.account);
 
@@ -1379,7 +1381,7 @@ namespace Waher.Client.WPF.Model
 
 			Dialog.XmppServer.Text = this.host;
 			Dialog.XmppPort.Text = this.port.ToString();
-			Dialog.HttpEndpoint.Text = this.httpBindResource;
+			Dialog.UrlEndpoint.Text = this.urlBindResource;
 			Dialog.ConnectionMethod.SelectedIndex = (int)this.transport;
 			Dialog.AccountName.Text = this.account;
 			Dialog.Password.Password = this.passwordHash;
@@ -1395,7 +1397,7 @@ namespace Waher.Client.WPF.Model
 			{
 				this.transport = (TransportMethod)Dialog.ConnectionMethod.SelectedIndex;
 				this.host = Dialog.XmppServer.Text;
-				this.httpBindResource = Dialog.HttpEndpoint.Text;
+				this.urlBindResource = Dialog.UrlEndpoint.Text;
 				this.account = Dialog.AccountName.Text;
 				this.passwordHash = Dialog.PasswordHash;
 				this.passwordHashMethod = Dialog.PasswordHashMethod;

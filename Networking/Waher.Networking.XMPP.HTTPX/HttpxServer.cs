@@ -282,8 +282,8 @@ namespace Waher.Networking.XMPP.HTTPX
 			catch (IOException ex)
 			{
 				Log.Critical(ex);
-
-				int Win32ErrorCode = Marshal.GetHRForException(ex) & 0xFFFF;    // TODO: Update to ex.HResult when upgrading to .NET 4.5
+				
+				int Win32ErrorCode = ex.HResult & 0xFFFF;    
 				if (Win32ErrorCode == 0x27 || Win32ErrorCode == 0x70)   // ERROR_HANDLE_DISK_FULL, ERROR_DISK_FULL
 				{
 					this.SendQuickResponse(Request, E2e, Id, From, To, 507, "Insufficient Storage", true, MaxChunkSize);

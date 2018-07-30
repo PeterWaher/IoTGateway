@@ -1306,7 +1306,7 @@ namespace Waher.Persistence.Files
 							break;
 						}
 
-						IndexBTreeFile Index = await this.GetIndexFile(File, 
+						IndexBTreeFile Index = await this.GetIndexFile(File,
 							RegenerationOptions.RegenerateIfFileNotFound, FieldNames);
 
 						break;
@@ -1594,8 +1594,25 @@ namespace Waher.Persistence.Files
 		/// <param name="Objects">Objects to insert.</param>
 		public async Task Delete(params object[] Objects)
 		{
+			List<Exception> Exceptions = null;
+
 			foreach (object Object in Objects)
-				await this.Delete(Object);
+			{
+				try
+				{
+					await this.Delete(Object);
+				}
+				catch (Exception ex)
+				{
+					if (Exceptions == null)
+						Exceptions = new List<Exception>();
+
+					Exceptions.Add(ex);
+				}
+			}
+
+			if (Exceptions != null)
+				throw new AggregateException("Unable to delete some objects.", Exceptions.ToArray());
 		}
 
 		/// <summary>
@@ -1604,8 +1621,25 @@ namespace Waher.Persistence.Files
 		/// <param name="Objects">Objects to insert.</param>
 		public async Task Delete(IEnumerable<object> Objects)
 		{
+			List<Exception> Exceptions = null;
+
 			foreach (object Object in Objects)
-				await this.Delete(Object);
+			{
+				try
+				{
+					await this.Delete(Object);
+				}
+				catch (Exception ex)
+				{
+					if (Exceptions == null)
+						Exceptions = new List<Exception>();
+
+					Exceptions.Add(ex);
+				}
+			}
+
+			if (Exceptions != null)
+				throw new AggregateException("Unable to delete some objects.", Exceptions.ToArray());
 		}
 
 		#endregion

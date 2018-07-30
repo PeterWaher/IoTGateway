@@ -215,8 +215,16 @@ namespace Waher.Persistence.Files
 				if (this.currentSerializer == null)
 					this.currentSerializer = this.provider.GetObjectSerializer(typeof(T));
 
-				object Obj = await this.file.ObjectFile.LoadObject(this.currentObjectId, this.currentSerializer);
-				if (Obj is T T2)
+				object Obj = await this.file.ObjectFile.TryLoadObject(this.currentObjectId, this.currentSerializer);
+
+				if (Obj == null)
+				{
+					this.current = default(T);
+					this.currentTypeCompatible = false;
+
+					// TODO: Delete records pointing to objects that do not exist, after lock has been released.
+				}
+				else if (Obj is T T2)
 				{
 					this.current = T2;
 					this.currentTypeCompatible = true;

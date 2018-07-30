@@ -214,7 +214,10 @@ namespace Waher.Persistence
 		/// <param name="Objects">Objects to insert.</param>
 		public static Task Delete(params object[] Objects)
 		{
-			return Provider.Delete(Objects);
+			if (Objects.Length == 1)
+				return Provider.Delete(Objects[0]);
+			else
+				return Provider.Delete(Objects);
 		}
 
 		/// <summary>

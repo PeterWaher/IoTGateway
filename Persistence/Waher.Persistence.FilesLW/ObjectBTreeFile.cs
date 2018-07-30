@@ -1840,6 +1840,19 @@ namespace Waher.Persistence.Files
 			return await this.ParseObjectLocked(Info, Serializer);
 		}
 
+		internal async Task<object> TryLoadObject(Guid ObjectId, IObjectSerializer Serializer)
+		{
+			await this.Lock();
+			try
+			{
+				return await this.TryLoadObjectLocked(ObjectId, Serializer);
+			}
+			finally
+			{
+				await this.Release();
+			}
+		}
+
 		internal async Task<object> TryLoadObjectLocked(object ObjectId, IObjectSerializer Serializer)
 		{
 			BlockInfo Info = await this.FindNodeLocked(ObjectId);

@@ -346,7 +346,8 @@ namespace Waher.Networking.XMPP.WebSocket
 
 							try
 							{
-								await this.webSocketClient.CloseAsync(WebSocketCloseStatus.NormalClosure, string.Empty, CancellationToken.None);
+								if (this.webSocketClient.State == WebSocketState.Open)
+									await this.webSocketClient.CloseAsync(WebSocketCloseStatus.NormalClosure, string.Empty, CancellationToken.None);
 
 								this.webSocketClient.Dispose();
 								this.webSocketClient = null;

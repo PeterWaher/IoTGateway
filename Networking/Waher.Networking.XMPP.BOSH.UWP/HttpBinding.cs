@@ -495,6 +495,7 @@ namespace Waher.Networking.XMPP.BOSH
 				int ClientIndex = -1;
 				bool AllInactive = false;
 				bool Restart = false;
+				bool HasSniffers = this.xmppClient.HasSniffers;
 				int i;
 
 				if (Packet.StartsWith("<?"))
@@ -629,8 +630,11 @@ namespace Waher.Networking.XMPP.BOSH
 
 					string s = Xml.ToString();
 
-					if (this.xmppClient.HasSniffers)
-						this.xmppClient.TransmitText(s);
+					if (this.disposed)
+						break;
+
+					if (HasSniffers)
+						this.xmppClient?.TransmitText(s);
 
 					HttpContent Content = new StringContent(s, System.Text.Encoding.UTF8, "text/xml");
 

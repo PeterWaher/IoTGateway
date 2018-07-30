@@ -41,7 +41,7 @@ namespace Waher.Networking.HTTP
 		private readonly byte[] inputBuffer;
 		private readonly HttpServer server;
 #if WINDOWS_UWP
-		private StreamSocket client;
+		private readonly StreamSocket client;
 		private Stream inputStream;
 		private Stream outputStream;
 #else
@@ -668,6 +668,56 @@ namespace Waher.Networking.HTTP
 		{
 			this.mode = ConnectionMode.WebSocket;
 			this.webSocket = Socket;
+		}
+
+		/// <summary>
+		/// Checks if the connection is live.
+		/// </summary>
+		/// <returns>If the connection is still live.</returns>
+		internal bool CheckLive()
+		{
+			try
+			{
+				if (this.disposed)
+					return false;
+
+#if WINDOWS_UWP
+				return true;
+#else
+				if (!this.client.Connected)
+					return false;
+
+				// https://msdn.microsoft.com/en-us/library/system.net.sockets.socket.connected.aspx
+
+				bool BlockingBak = this.client.Client.Blocking;
+				try
+				{
+					byte[] Temp = new byte[1];
+
+					this.client.Client.Blocking = false;
+					this.client.Client.Send(Temp, 0, 0);
+
+					return true;
+				}
+				catch (SocketException ex)
+				{
+					int Win32ErrorCode = ex.HResult & 0xFFFF;
+
+					if (Win32ErrorCode == 10035)    // WSAEWOULDBLOCK
+						return true;
+					else
+						return false;
+				}
+				finally
+				{
+					this.client.Client.Blocking = BlockingBak;
+				}
+#endif
+			}
+			catch (Exception)
+			{
+				return false;
+			}
 		}
 
 	}

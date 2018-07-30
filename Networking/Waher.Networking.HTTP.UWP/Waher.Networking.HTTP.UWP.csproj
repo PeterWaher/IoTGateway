@@ -7,7 +7,7 @@
     <ProjectGuid>{5D9D4910-B0D3-4510-A914-D49A548011C7}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Waher.Networking.HTTP.UWP</RootNamespace>
+    <RootNamespace>Waher.Networking.HTTP</RootNamespace>
     <AssemblyName>Waher.Networking.HTTP.UWP</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>

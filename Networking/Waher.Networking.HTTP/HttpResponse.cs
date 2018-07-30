@@ -508,7 +508,7 @@ namespace Waher.Networking.HTTP
 					{
 						Log.Critical(ex);
 
-						int Win32ErrorCode = Marshal.GetHRForException(ex) & 0xFFFF;    // TODO: Update to ex.HResult when upgrading to .NET 4.5
+						int Win32ErrorCode = ex.HResult & 0xFFFF;
 						if (Win32ErrorCode == 0x27 || Win32ErrorCode == 0x70)   // ERROR_HANDLE_DISK_FULL, ERROR_DISK_FULL
 						{
 							this.StatusCode = 507;

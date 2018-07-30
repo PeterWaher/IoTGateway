@@ -948,5 +948,14 @@ namespace Waher.Networking.HTTP.WebSockets
 			this.connection.TransmitBinary(Frame);
 		}
 
+		/// <summary>
+		/// Checks if the connection is live.
+		/// </summary>
+		/// <returns>If the connection is still live.</returns>
+		public bool CheckLive()
+		{
+			return this.connection?.CheckLive() ?? false;
+		}
+
 	}
 }

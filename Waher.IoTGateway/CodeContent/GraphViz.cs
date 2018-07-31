@@ -284,6 +284,8 @@ namespace Waher.IoTGateway.CodeContent
 				return false;
 
 			FileName = FileName.Substring(Gateway.RootFolder.Length).Replace(Path.DirectorySeparatorChar, '/');
+			if (!FileName.StartsWith("/"))
+				FileName = "/" + FileName;
 
 			Output.Append("<figure>");
 			Output.Append("<img src=\"");

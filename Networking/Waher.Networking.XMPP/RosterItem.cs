@@ -345,18 +345,8 @@ namespace Waher.Networking.XMPP
 			object[] P = (object[])e.State;
 			XmppClient Client = (XmppClient)P[0];
 			PresenceEventArgs e2 = (PresenceEventArgs)P[1];
-			StringBuilder Xml = new StringBuilder();
 
-			Xml.Append("<presence from='");
-			Xml.Append(XML.Encode(e2.From));
-			Xml.Append("' to='");
-			Xml.Append(XML.Encode(Client.FullJID));
-			Xml.Append("' type='unavailable'/>");
-
-			XmlDocument Doc = new XmlDocument();
-			Doc.LoadXml(Xml.ToString());
-
-			Client.ProcessPresence(new PresenceEventArgs(Client, Doc.DocumentElement));
+			Client.Unavail(e2);
 		}
 
 		/// <summary>
@@ -432,6 +422,25 @@ namespace Waher.Networking.XMPP
 			}
 
 			return Result;
+		}
+
+		internal PresenceEventArgs[] UnavailAllResources()
+		{
+			this.lastPresence = null;
+
+			lock (this.resources)
+			{
+				int c = this.resources.Count;
+				if (c == 0)
+					return null;
+
+				PresenceEventArgs[] Result = new PresenceEventArgs[c];
+				this.resources.Values.CopyTo(Result, 0);
+
+				this.resources.Clear();
+
+				return Result;
+			}
 		}
 
 	}

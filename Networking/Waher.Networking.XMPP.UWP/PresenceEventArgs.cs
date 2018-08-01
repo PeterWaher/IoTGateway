@@ -110,13 +110,13 @@ namespace Waher.Networking.XMPP
 		private string to;
 		private string id;
 		private string status;
-		private string entityCapabilityVersion = null;
-		private string entityCapabilityNode = null;
-		private string entityCapabilityHashFunction = null;
+		private readonly string entityCapabilityVersion = null;
+		private readonly string entityCapabilityNode = null;
+		private readonly string entityCapabilityHashFunction = null;
 		private int errorCode;
 		private sbyte priority;
 		private bool ok;
-		private bool hasEntityCapabilities = false;
+		private readonly bool hasEntityCapabilities = false;
         private bool updateLastPresence = false;
 
         internal PresenceEventArgs(XmppClient Client, XmlElement Presence)

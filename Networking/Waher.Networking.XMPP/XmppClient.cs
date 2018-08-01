@@ -974,8 +974,49 @@ namespace Waher.Networking.XMPP
 							this.Exception(ex);
 						}
 					}
+
+					if (value == XmppState.Offline || value == XmppState.Error)
+					{
+						RosterItem[] Roster = this.Roster;
+						PresenceEventArgs[] Resources;
+						List<PresenceEventArgs> ToUnavail = null;
+
+						foreach (RosterItem Item in this.roster.Values)
+						{
+							Resources = Item.UnavailAllResources();
+							if (Resources == null)
+								continue;
+
+							if (ToUnavail == null)
+								ToUnavail = new List<PresenceEventArgs>();
+
+							ToUnavail.AddRange(Resources);
+						}
+
+						if (ToUnavail != null)
+						{
+							foreach (PresenceEventArgs e in ToUnavail)
+								this.Unavail(e);
+						}
+					}
 				}
 			}
+		}
+
+		internal void Unavail(PresenceEventArgs e)
+		{
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<presence from='");
+			Xml.Append(XML.Encode(e.From));
+			Xml.Append("' to='");
+			Xml.Append(XML.Encode(this.fullJid));
+			Xml.Append("' type='unavailable'/>");
+
+			XmlDocument Doc = new XmlDocument();
+			Doc.LoadXml(Xml.ToString());
+
+			this.ProcessPresence(new PresenceEventArgs(this, Doc.DocumentElement));
 		}
 
 		/// <summary>

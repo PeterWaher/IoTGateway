@@ -590,6 +590,8 @@ namespace Waher.IoTGateway.Installers
 			Session.Log("Starting browser.");
 			try
 			{
+				Thread.Sleep(5000);		// Give process some time.
+
 				string StartPage = Session["STARTPAGE"];
 				if (StartPage == "unset")
 					StartPage = string.Empty;
@@ -634,7 +636,7 @@ namespace Waher.IoTGateway.Installers
 				StartPage = Protocol + "://localhost" + Port + "/" + StartPage;
 				Session.Log("Start Page: " + StartPage);
 
-				System.Diagnostics.Process.Start(StartPage);
+				Process.Start(StartPage);
 				Session.Log("Browser started.");
 			}
 			catch (Exception ex)

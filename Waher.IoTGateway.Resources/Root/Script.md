@@ -1071,7 +1071,7 @@ The following functions can be used to create fractal images based on Iterated F
 
 `IfsFractals` run on Iterated Function Systems using systems of linear equations. Flame fractals can modify the linear transforms using one or more
 *variations*. There are many different types of variations[^For more information about Flame Fractals and variations, see the paper on
-[The Fractal Flame Algorithm](http://flam3.com/flame.pdf) by Scott Daves and Erik Reckase] that can be used:
+<a href="http://flam3.com/flame.pdf" target="_blank">The Fractal Flame Algorithm</a> by Scott Daves and Erik Reckase] that can be used:
 
 | Flame variations        | Complex variations         | Fractal variations    |
 |-------------------------|----------------------------|-----------------------|

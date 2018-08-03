@@ -20,7 +20,7 @@
       <dependency id="Waher.Events" version="1.0.7"/>
       <dependency id="Waher.Networking" version="1.0.10"/>
       <dependency id="Waher.Networking.XMPP.UWP" version="1.0.32"/>
-      <dependency id="Waher.Persistence" version="1.0.3"/>
+      <dependency id="Waher.Persistence" version="1.0.4"/>
       <dependency id="Waher.Things" version="1.0.22"/>
     </dependencies>
   </metadata>

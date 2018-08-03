@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Xml;
 using System.Threading.Tasks;
 using MongoDB.Driver;
 using MongoDB.Bson;
@@ -756,6 +755,18 @@ namespace Waher.Persistence.MongoDB
 			throw new NotImplementedException("MongoDB provider does not support the Clear method.");  // TODO
 		}
 
+		/// <summary>
+		/// Analyzes the database and exports findings to XML.
+		/// </summary>
+		/// <param name="Output">XML Output.</param>
+		/// <param name="XsltPath">Optional XSLT to use to view the output.</param>
+		/// <param name="ProgramDataFolder">Program data folder. Can be removed from filenames used, when referencing them in the report.</param>
+		/// <param name="ExportData">If data in database is to be exported in output.</param>
+		public void Analyze(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData)
+		{
+			throw new NotImplementedException("MongoDB provider does not support the Analyze method.");  // TODO
+		}
+
 		// TODO:
 		//	* Created field
 		//	* Updated field
@@ -768,4 +779,4 @@ namespace Waher.Persistence.MongoDB
 		//	* SortedDictionary<string,T> fields.
 		//	* Aggregates
 	}
-}
+	}

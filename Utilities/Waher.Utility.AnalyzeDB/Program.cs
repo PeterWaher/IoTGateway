@@ -172,8 +172,6 @@ namespace Waher.Utility.AnalyzeDB
 
 						using (XmlWriter w = XmlWriter.Create(f, Settings))
 						{
-							w.WriteStartDocument();
-
 							if (string.IsNullOrEmpty(XsltPath))
 							{
 								i = ProgramDataFolder.LastIndexOf(Path.DirectorySeparatorChar);
@@ -185,62 +183,7 @@ namespace Waher.Utility.AnalyzeDB
 								}
 							}
 
-							if (!string.IsNullOrEmpty(XsltPath))
-								w.WriteProcessingInstruction("xml-stylesheet", "type=\"text/xsl\" href=\"" + XML.Encode(XsltPath) + "\"");
-
-							w.WriteStartElement("DatabaseStatistics", "http://waher.se/Schema/Persistence/Statistics.xsd");
-
-							foreach (ObjectBTreeFile File in FilesProvider.Files)
-							{
-								w.WriteStartElement("File");
-								w.WriteAttributeString("id", File.Id.ToString());
-								w.WriteAttributeString("collectionName", File.CollectionName);
-								w.WriteAttributeString("fileName", Path.GetRelativePath(ProgramDataFolder, File.FileName));
-								w.WriteAttributeString("blockSize", File.BlockSize.ToString());
-								w.WriteAttributeString("blobFileName", Path.GetRelativePath(ProgramDataFolder, File.BlobFileName));
-								w.WriteAttributeString("blobBlockSize", File.BlobBlockSize.ToString());
-								w.WriteAttributeString("count", File.Count.ToString());
-								w.WriteAttributeString("encoding", File.Encoding.WebName);
-								w.WriteAttributeString("encrypted", CommonTypes.Encode(File.Encrypted));
-								w.WriteAttributeString("inlineObjectSizeLimit", File.InlineObjectSizeLimit.ToString());
-								w.WriteAttributeString("isReadOnly", CommonTypes.Encode(File.IsReadOnly));
-								w.WriteAttributeString("timeoutMs", File.TimeoutMilliseconds.ToString());
-
-								FileStatistics Stat = File.ComputeStatistics().Result;
-								WriteStat(w, File, Stat);
-
-								foreach (IndexBTreeFile Index in File.Indices)
-								{
-									w.WriteStartElement("Index");
-									w.WriteAttributeString("id", Index.IndexFile.Id.ToString());
-									w.WriteAttributeString("fileName", Path.GetRelativePath(ProgramDataFolder, Index.IndexFile.FileName));
-									w.WriteAttributeString("blockSize", Index.IndexFile.BlockSize.ToString());
-									w.WriteAttributeString("blobFileName", Index.IndexFile.BlobFileName);
-									w.WriteAttributeString("blobBlockSize", Index.IndexFile.BlobBlockSize.ToString());
-									w.WriteAttributeString("count", Index.IndexFile.Count.ToString());
-									w.WriteAttributeString("encoding", Index.IndexFile.Encoding.WebName);
-									w.WriteAttributeString("encrypted", CommonTypes.Encode(Index.IndexFile.Encrypted));
-									w.WriteAttributeString("inlineObjectSizeLimit", Index.IndexFile.InlineObjectSizeLimit.ToString());
-									w.WriteAttributeString("isReadOnly", CommonTypes.Encode(Index.IndexFile.IsReadOnly));
-									w.WriteAttributeString("timeoutMs", Index.IndexFile.TimeoutMilliseconds.ToString());
-
-									foreach (string Field in Index.FieldNames)
-										w.WriteElementString("Field", Field);
-
-									Stat = Index.IndexFile.ComputeStatistics().Result;
-									WriteStat(w, Index.IndexFile, Stat);
-
-									w.WriteEndElement();
-								}
-
-								if (Export)
-									File.ExportGraphXML(w, true).Wait();
-
-								w.WriteEndElement();
-							}
-
-							w.WriteEndElement();
-							w.WriteEndDocument();
+							Database.Analyze(w, XsltPath, ProgramDataFolder, Export);
 						}
 					}
 				}
@@ -252,53 +195,6 @@ namespace Waher.Utility.AnalyzeDB
 				Console.Out.WriteLine(ex.Message);
 				return -1;
 			}
-		}
-
-		private static void WriteStat(XmlWriter w, ObjectBTreeFile File, FileStatistics Stat)
-		{
-			w.WriteStartElement("Stat");
-
-			if (!double.IsNaN(Stat.AverageBytesUsedPerBlock))
-				w.WriteAttributeString("avgBytesPerBlock", CommonTypes.Encode(Stat.AverageBytesUsedPerBlock));
-
-			if (!double.IsNaN(Stat.AverageObjectSize))
-				w.WriteAttributeString("avgObjSize", CommonTypes.Encode(Stat.AverageObjectSize));
-
-			if (!double.IsNaN(Stat.AverageObjectsPerBlock))
-				w.WriteAttributeString("avgObjPerBlock", CommonTypes.Encode(Stat.AverageObjectsPerBlock));
-
-			w.WriteAttributeString("hasComments", CommonTypes.Encode(Stat.HasComments));
-			w.WriteAttributeString("isBalanced", CommonTypes.Encode(Stat.IsBalanced));
-			w.WriteAttributeString("isCorrupt", CommonTypes.Encode(Stat.IsCorrupt));
-			w.WriteAttributeString("maxBytesPerBlock", Stat.MaxBytesUsedPerBlock.ToString());
-			w.WriteAttributeString("maxDepth", Stat.MaxDepth.ToString());
-			w.WriteAttributeString("maxObjSize", Stat.MaxObjectSize.ToString());
-			w.WriteAttributeString("maxObjPerBlock", Stat.MaxObjectsPerBlock.ToString());
-			w.WriteAttributeString("minBytesPerBlock", Stat.MinBytesUsedPerBlock.ToString());
-			w.WriteAttributeString("minDepth", Stat.MinDepth.ToString());
-			w.WriteAttributeString("minObjSize", Stat.MinObjectSize.ToString());
-			w.WriteAttributeString("minObjPerBlock", Stat.MinObjectsPerBlock.ToString());
-			w.WriteAttributeString("nrBlobBlocks", Stat.NrBlobBlocks.ToString());
-			w.WriteAttributeString("nrBlobBytes", Stat.NrBlobBytesTotal.ToString());
-			w.WriteAttributeString("nrBlobBytesUnused", Stat.NrBlobBytesUnused.ToString());
-			w.WriteAttributeString("nrBlobBytesUsed", Stat.NrBlobBytesUsed.ToString());
-			w.WriteAttributeString("nrBlocks", Stat.NrBlocks.ToString());
-			w.WriteAttributeString("nrBytes", Stat.NrBytesTotal.ToString());
-			w.WriteAttributeString("nrBytesUnused", Stat.NrBytesUnused.ToString());
-			w.WriteAttributeString("nrBytesUsed", Stat.NrBytesUsed.ToString());
-			w.WriteAttributeString("nrObjects", Stat.NrObjects.ToString());
-			w.WriteAttributeString("usage", CommonTypes.Encode(Stat.Usage));
-
-			if (Stat.NrBlobBytesTotal > 0)
-				w.WriteAttributeString("blobUsage", CommonTypes.Encode((100.0 * Stat.NrBlobBytesUsed) / Stat.NrBlobBytesTotal));
-
-			if (Stat.HasComments)
-			{
-				foreach (string Comment in Stat.Comments)
-					w.WriteElementString("Comment", Comment);
-			}
-
-			w.WriteEndElement();
 		}
 
 	}

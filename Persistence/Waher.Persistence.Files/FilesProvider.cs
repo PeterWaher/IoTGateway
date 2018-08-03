@@ -18,6 +18,7 @@ using Waher.Persistence.Files.Serialization;
 using Waher.Persistence.Files.Serialization.ReferenceTypes;
 using Waher.Persistence.Files.Serialization.ValueTypes;
 using Waher.Persistence.Filters;
+using Waher.Persistence.Files.Statistics;
 
 namespace Waher.Persistence.Files
 {
@@ -1822,5 +1823,160 @@ namespace Waher.Persistence.Files
 
 		#endregion
 
+		#region Analyze
+
+		/// <summary>
+		/// Analyzes the database and exports findings to XML.
+		/// </summary>
+		/// <param name="Output">XML Output.</param>
+		/// <param name="XsltPath">Optional XSLT to use to view the output.</param>
+		/// <param name="ProgramDataFolder">Program data folder. Can be removed from filenames used, when referencing them in the report.</param>
+		/// <param name="ExportData">If data in database is to be exported in output.</param>
+		public void Analyze(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData)
+		{
+			Output.WriteStartDocument();
+
+			if (!string.IsNullOrEmpty(XsltPath))
+				Output.WriteProcessingInstruction("xml-stylesheet", "type=\"text/xsl\" href=\"" + Encode(XsltPath) + "\"");
+
+			Output.WriteStartElement("DatabaseStatistics", "http://waher.se/Schema/Persistence/Statistics.xsd");
+
+			foreach (ObjectBTreeFile File in this.Files)
+			{
+				Output.WriteStartElement("File");
+				Output.WriteAttributeString("id", File.Id.ToString());
+				Output.WriteAttributeString("collectionName", File.CollectionName);
+				Output.WriteAttributeString("fileName", GetRelativePath(ProgramDataFolder, File.FileName));
+				Output.WriteAttributeString("blockSize", File.BlockSize.ToString());
+				Output.WriteAttributeString("blobFileName", GetRelativePath(ProgramDataFolder, File.BlobFileName));
+				Output.WriteAttributeString("blobBlockSize", File.BlobBlockSize.ToString());
+				Output.WriteAttributeString("count", File.Count.ToString());
+				Output.WriteAttributeString("encoding", File.Encoding.WebName);
+#if NETSTANDARD1_5
+				Output.WriteAttributeString("encrypted", Encode(File.Encrypted));
+#endif
+				Output.WriteAttributeString("inlineObjectSizeLimit", File.InlineObjectSizeLimit.ToString());
+				Output.WriteAttributeString("isReadOnly", Encode(File.IsReadOnly));
+				Output.WriteAttributeString("timeoutMs", File.TimeoutMilliseconds.ToString());
+
+				FileStatistics Stat = File.ComputeStatistics().Result;
+				WriteStat(Output, File, Stat);
+
+				foreach (IndexBTreeFile Index in File.Indices)
+				{
+					Output.WriteStartElement("Index");
+					Output.WriteAttributeString("id", Index.IndexFile.Id.ToString());
+					Output.WriteAttributeString("fileName", GetRelativePath(ProgramDataFolder, Index.IndexFile.FileName));
+					Output.WriteAttributeString("blockSize", Index.IndexFile.BlockSize.ToString());
+					Output.WriteAttributeString("blobFileName", Index.IndexFile.BlobFileName);
+					Output.WriteAttributeString("blobBlockSize", Index.IndexFile.BlobBlockSize.ToString());
+					Output.WriteAttributeString("count", Index.IndexFile.Count.ToString());
+					Output.WriteAttributeString("encoding", Index.IndexFile.Encoding.WebName);
+#if NETSTANDARD1_5
+					Output.WriteAttributeString("encrypted", Encode(Index.IndexFile.Encrypted));
+#endif
+					Output.WriteAttributeString("inlineObjectSizeLimit", Index.IndexFile.InlineObjectSizeLimit.ToString());
+					Output.WriteAttributeString("isReadOnly", Encode(Index.IndexFile.IsReadOnly));
+					Output.WriteAttributeString("timeoutMs", Index.IndexFile.TimeoutMilliseconds.ToString());
+
+					foreach (string Field in Index.FieldNames)
+						Output.WriteElementString("Field", Field);
+
+					Stat = Index.IndexFile.ComputeStatistics().Result;
+					WriteStat(Output, Index.IndexFile, Stat);
+
+					Output.WriteEndElement();
+				}
+
+				if (ExportData)
+					File.ExportGraphXML(Output, true).Wait();
+
+				Output.WriteEndElement();
+			}
+
+			Output.WriteEndElement();
+			Output.WriteEndDocument();
+		}
+
+		private static string Encode(bool b)
+		{
+			return b ? "true" : "false";
+		}
+
+		private static string Encode(double d)
+		{
+			return d.ToString().Replace(System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator, ".");
+		}
+
+		private static string Encode(string s)
+		{
+			return s.
+				Replace("&", "&amp;").
+				Replace("<", "&lt;").
+				Replace(">", "&gt;").
+				Replace("\"", "&quot;").
+				Replace("'", "&apos;");
+		}
+
+		private static string GetRelativePath(string ProgramDataFolder, string Path)
+		{
+			if (Path.StartsWith(ProgramDataFolder))
+			{
+				Path = Path.Substring(ProgramDataFolder.Length);
+				if (Path.StartsWith(new string(System.IO.Path.DirectorySeparatorChar, 1)))
+					Path = Path.Substring(1);
+			}
+
+			return Path;
+		}
+
+		private static void WriteStat(XmlWriter w, ObjectBTreeFile File, FileStatistics Stat)
+		{
+			w.WriteStartElement("Stat");
+
+			if (!double.IsNaN(Stat.AverageBytesUsedPerBlock))
+				w.WriteAttributeString("avgBytesPerBlock", Encode(Stat.AverageBytesUsedPerBlock));
+
+			if (!double.IsNaN(Stat.AverageObjectSize))
+				w.WriteAttributeString("avgObjSize", Encode(Stat.AverageObjectSize));
+
+			if (!double.IsNaN(Stat.AverageObjectsPerBlock))
+				w.WriteAttributeString("avgObjPerBlock", Encode(Stat.AverageObjectsPerBlock));
+
+			w.WriteAttributeString("hasComments", Encode(Stat.HasComments));
+			w.WriteAttributeString("isBalanced", Encode(Stat.IsBalanced));
+			w.WriteAttributeString("isCorrupt", Encode(Stat.IsCorrupt));
+			w.WriteAttributeString("maxBytesPerBlock", Stat.MaxBytesUsedPerBlock.ToString());
+			w.WriteAttributeString("maxDepth", Stat.MaxDepth.ToString());
+			w.WriteAttributeString("maxObjSize", Stat.MaxObjectSize.ToString());
+			w.WriteAttributeString("maxObjPerBlock", Stat.MaxObjectsPerBlock.ToString());
+			w.WriteAttributeString("minBytesPerBlock", Stat.MinBytesUsedPerBlock.ToString());
+			w.WriteAttributeString("minDepth", Stat.MinDepth.ToString());
+			w.WriteAttributeString("minObjSize", Stat.MinObjectSize.ToString());
+			w.WriteAttributeString("minObjPerBlock", Stat.MinObjectsPerBlock.ToString());
+			w.WriteAttributeString("nrBlobBlocks", Stat.NrBlobBlocks.ToString());
+			w.WriteAttributeString("nrBlobBytes", Stat.NrBlobBytesTotal.ToString());
+			w.WriteAttributeString("nrBlobBytesUnused", Stat.NrBlobBytesUnused.ToString());
+			w.WriteAttributeString("nrBlobBytesUsed", Stat.NrBlobBytesUsed.ToString());
+			w.WriteAttributeString("nrBlocks", Stat.NrBlocks.ToString());
+			w.WriteAttributeString("nrBytes", Stat.NrBytesTotal.ToString());
+			w.WriteAttributeString("nrBytesUnused", Stat.NrBytesUnused.ToString());
+			w.WriteAttributeString("nrBytesUsed", Stat.NrBytesUsed.ToString());
+			w.WriteAttributeString("nrObjects", Stat.NrObjects.ToString());
+			w.WriteAttributeString("usage", Encode(Stat.Usage));
+
+			if (Stat.NrBlobBytesTotal > 0)
+				w.WriteAttributeString("blobUsage", Encode((100.0 * Stat.NrBlobBytesUsed) / Stat.NrBlobBytesTotal));
+
+			if (Stat.HasComments)
+			{
+				foreach (string Comment in Stat.Comments)
+					w.WriteElementString("Comment", Comment);
+			}
+
+			w.WriteEndElement();
+		}
+
+		#endregion
 	}
 }

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Xml;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Persistence.Filters;
@@ -111,6 +111,15 @@ namespace Waher.Persistence
 		/// <param name="CollectionName">Name of collection to clear.</param>
 		/// <returns>Task object for synchronization purposes.</returns>
 		Task Clear(string CollectionName);
+
+		/// <summary>
+		/// Analyzes the database and exports findings to XML.
+		/// </summary>
+		/// <param name="Output">XML Output.</param>
+		/// <param name="XsltPath">Optional XSLT to use to view the output.</param>
+		/// <param name="ProgramDataFolder">Program data folder. Can be removed from filenames used, when referencing them in the report.</param>
+		/// <param name="ExportData">If data in database is to be exported in output.</param>
+		void Analyze(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData);
 
 	}
 }

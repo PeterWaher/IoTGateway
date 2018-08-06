@@ -5,6 +5,8 @@ using Waher.Content;
 using Waher.Networking.HTTP;
 using Waher.Networking.HTTP.WebSockets;
 using Waher.Runtime.Cache;
+using Waher.Script;
+using Waher.Security;
 
 namespace Waher.IoTGateway
 {
@@ -121,7 +123,7 @@ namespace Waher.IoTGateway
 
 			if (!eventsByTabID.TryGetValue(TabID, out TabQueue Queue))
 			{
-				Queue = new TabQueue(TabID);
+				Queue = new TabQueue(TabID, Request.Session);
 				eventsByTabID[TabID] = Queue;
 			}
 
@@ -208,7 +210,7 @@ namespace Waher.IoTGateway
 				Queue.WebSocket = Socket;
 			else
 			{
-				Queue = new TabQueue(TabID)
+				Queue = new TabQueue(TabID, Socket.HttpRequest.Session)
 				{
 					WebSocket = Socket
 				};
@@ -554,13 +556,15 @@ namespace Waher.IoTGateway
 		private class TabQueue
 		{
 			public string TabID;
+			public Variables Session;
 			public LinkedList<string> Queue = new LinkedList<string>();
 			public HttpResponse Response = null;
 			public WebSocket WebSocket = null;
 
-			public TabQueue(string ID)
+			public TabQueue(string ID, Variables Session)
 			{
 				this.TabID = ID;
+				this.Session = Session;
 			}
 		}
 
@@ -572,7 +576,7 @@ namespace Waher.IoTGateway
 		/// <param name="Data">Event Data (as plain text).</param>
 		public static void PushEvent(string[] TabIDs, string Type, string Data)
 		{
-			PushEvent(TabIDs, Type, Data, false);
+			PushEvent(TabIDs, Type, Data, false, null, null);
 		}
 
 		/// <summary>
@@ -583,6 +587,22 @@ namespace Waher.IoTGateway
 		/// <param name="Data">Event Data (as plain text, or as JSON).</param>
 		/// <param name="DataIsJson">If <paramref name="Data"/> is JSON or plain text.</param>
 		public static void PushEvent(string[] TabIDs, string Type, string Data, bool DataIsJson)
+		{
+			PushEvent(TabIDs, Type, Data, DataIsJson, null, null);
+		}
+
+		/// <summary>
+		/// Puses an event to a set of Tabs, given their Tab IDs.
+		/// </summary>
+		/// <param name="TabIDs">Tab IDs.</param>
+		/// <param name="Type">Event Type.</param>
+		/// <param name="Data">Event Data (as plain text, or as JSON).</param>
+		/// <param name="DataIsJson">If <paramref name="Data"/> is JSON or plain text.</param>
+		/// <param name="UserVariable">Optional user variable. If provided, event is only pushed to clients with a session contining a variable 
+		/// named <paramref name="UserVariable"/> having a value derived from <see cref="IUser"/>.</param>
+		/// <param name="Privileges">Optional privileges. If provided, event is only pushed to clients with a user variable having
+		/// the following set of privileges.</param>
+		public static void PushEvent(string[] TabIDs, string Type, string Data, bool DataIsJson, string UserVariable, params string[] Privileges)
 		{
 			StringBuilder Json = new StringBuilder();
 
@@ -610,6 +630,32 @@ namespace Waher.IoTGateway
 			{
 				if (TabID != null && eventsByTabID.TryGetValue(TabID, out TabQueue Queue))
 				{
+					if (!string.IsNullOrEmpty(UserVariable))
+					{
+						if (!Queue.Session.TryGetVariable(UserVariable, out Variable v) ||
+							!(v.ValueObject is IUser User))
+						{
+							continue;
+						}
+
+						if (Privileges != null)
+						{
+							bool HasPrivileges = true;
+
+							foreach (string Privilege in Privileges)
+							{
+								if (!User.HasPrivilege(Privilege))
+								{
+									HasPrivileges = false;
+									break;
+								}
+							}
+
+							if (!HasPrivileges)
+								continue;
+						}
+					}
+
 					lock (Queue)
 					{
 						if (Queue.WebSocket != null)

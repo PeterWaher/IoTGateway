@@ -192,7 +192,7 @@ namespace Waher.IoTGateway.Setup
 					ClientEvents.PushEvent(new string[] { TabID }, "ShowNext", JSON.Encode(new Dictionary<string, object>()
 					{
 						{ "consent", Consent }
-					}, false), true);
+					}, false), true, "User");
 
 				}
 			}

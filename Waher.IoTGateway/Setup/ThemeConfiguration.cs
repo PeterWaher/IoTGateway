@@ -202,7 +202,7 @@ namespace Waher.IoTGateway.Setup
 					{
 						new KeyValuePair<string, object>("themeId", Def.Id),
 						new KeyValuePair<string, object>("cssUrl", Def.CSSX),
-					}, false), true);
+					}, false), true, "User");
 			}
 			catch (Exception ex)
 			{

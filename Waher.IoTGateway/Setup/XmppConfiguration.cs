@@ -566,7 +566,7 @@ namespace Waher.IoTGateway.Setup
 						Client.SetTag("EncyptionSuccessful", true);
 						if (this.Step == 0)
 						{
-							ClientEvents.PushEvent(new string[] { TabID }, "ConnectionOK0", "Connection established.", false);
+							ClientEvents.PushEvent(new string[] { TabID }, "ConnectionOK0", "Connection established.", false, "User");
 
 							this.client.Dispose();
 							this.client = null;
@@ -589,7 +589,7 @@ namespace Waher.IoTGateway.Setup
 
 						if (this.createAccount && !string.IsNullOrEmpty(this.accountHumanReadableName))
 						{
-							ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Setting vCard.", false);
+							ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Setting vCard.", false, "User");
 
 							StringBuilder Xml = new StringBuilder();
 
@@ -605,7 +605,7 @@ namespace Waher.IoTGateway.Setup
 							await Client.IqSetAsync(this.client.BareJID, Xml.ToString());
 						}
 
-						ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Checking server features.", false);
+						ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Checking server features.", false, "User");
 						ServiceDiscoveryEventArgs e = await Client.ServiceDiscoveryAsync(null, string.Empty, string.Empty);
 
 						if (e.Ok)
@@ -625,12 +625,12 @@ namespace Waher.IoTGateway.Setup
 							this.spam = false;
 						}
 
-						ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Checking account features.", false);
+						ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Checking account features.", false, "User");
 						e = await Client.ServiceDiscoveryAsync(null, Client.BareJID, string.Empty);
 
 						this.pep = e.Ok && this.ContainsIdentity("pep", "pubsub", e);
 
-						ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Checking server components.", false);
+						ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Checking server components.", false, "User");
 						ServiceItemsDiscoveryEventArgs e2 = await Client.ServiceItemsDiscoveryAsync(null, string.Empty, string.Empty);
 
 						this.thingRegistry = string.Empty;
@@ -642,7 +642,7 @@ namespace Waher.IoTGateway.Setup
 						{
 							foreach (Item Item in e2.Items)
 							{
-								ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Checking component features for " + Item.JID, false);
+								ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Checking component features for " + Item.JID, false, "User");
 
 								e = await Client.ServiceDiscoveryAsync(null, Item.JID, string.Empty);
 
@@ -675,7 +675,7 @@ namespace Waher.IoTGateway.Setup
 							{ "pubSub", this.pubSub }
 						};
 
-						ClientEvents.PushEvent(new string[] { TabID }, "ConnectionOK1", JSON.Encode(ConnectionInfo, false), true);
+						ClientEvents.PushEvent(new string[] { TabID }, "ConnectionOK1", JSON.Encode(ConnectionInfo, false), true, "User");
 
 						this.client.Dispose();
 						this.client = null;
@@ -697,8 +697,8 @@ namespace Waher.IoTGateway.Setup
 						{
 							this.customBinding = true;
 
-							ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Unable to connect properly. Looking for alternative ways to connect.", false);
-							ClientEvents.PushEvent(new string[] { TabID }, "ShowCustomProperties", "{\"visible\":true}", true);
+							ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Unable to connect properly. Looking for alternative ways to connect.", false, "User");
+							ClientEvents.PushEvent(new string[] { TabID }, "ShowCustomProperties", "{\"visible\":true}", true, "User");
 
 							using (HttpClient HttpClient = new HttpClient(new HttpClientHandler()
 							{
@@ -757,7 +757,7 @@ namespace Waher.IoTGateway.Setup
 											this.wsUrl = WsUrl;
 											this.transportMethod = XmppTransportMethod.WS;
 
-											ClientEvents.PushEvent(new string[] { TabID }, "ShowTransport", "{\"method\":\"WS\"}", true);
+											ClientEvents.PushEvent(new string[] { TabID }, "ShowTransport", "{\"method\":\"WS\"}", true, "User");
 
 											this.Connect(TabID);
 
@@ -768,7 +768,7 @@ namespace Waher.IoTGateway.Setup
 											this.boshUrl = BoshUrl;
 											this.transportMethod = XmppTransportMethod.BOSH;
 
-											ClientEvents.PushEvent(new string[] { TabID }, "ShowTransport", "{\"method\":\"BOSH\"}", true);
+											ClientEvents.PushEvent(new string[] { TabID }, "ShowTransport", "{\"method\":\"BOSH\"}", true, "User");
 
 											this.Connect(TabID);
 
@@ -793,16 +793,16 @@ namespace Waher.IoTGateway.Setup
 							if (Client.TryGetTag("StartedAuthentication", out Obj) && Obj is bool b && b)
 							{
 								if (this.createAccount)
-									ClientEvents.PushEvent(new string[] { TabID }, "ShowFail2", Msg, false);
+									ClientEvents.PushEvent(new string[] { TabID }, "ShowFail2", Msg, false, "User");
 								else
-									ClientEvents.PushEvent(new string[] { TabID }, "ShowFail1", Msg, false);
+									ClientEvents.PushEvent(new string[] { TabID }, "ShowFail1", Msg, false, "User");
 								return;
 							}
 						}
 
 						if (Error)
 						{
-							ClientEvents.PushEvent(new string[] { TabID }, "ConnectionError", Msg, false);
+							ClientEvents.PushEvent(new string[] { TabID }, "ConnectionError", Msg, false, "User");
 
 							this.client.Dispose();
 							this.client = null;
@@ -849,12 +849,12 @@ namespace Waher.IoTGateway.Setup
 						break;
 				}
 
-				ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", Msg, false);
+				ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", Msg, false, "User");
 			}
 			catch (Exception ex)
 			{
 				Log.Critical(ex);
-				ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", ex.Message, false);
+				ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", ex.Message, false, "User");
 			}
 		}
 

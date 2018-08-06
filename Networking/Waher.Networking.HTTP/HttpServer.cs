@@ -83,6 +83,7 @@ namespace Waher.Networking.HTTP
 		private long nrBytesTx = 0;
 		private long nrCalls = 0;
 #if !WINDOWS_UWP
+		private int? upgradePort = null;
 		private bool closed = false;
 #endif
 
@@ -477,8 +478,7 @@ namespace Waher.Networking.HTTP
 			return Result;
 		}
 
-		private int? upgradePort = null;
-
+#if !WINDOWS_UWP
 		internal int? UpgradePort
 		{
 			get
@@ -494,19 +494,6 @@ namespace Waher.Networking.HTTP
 
 				if (this.listeners != null)
 				{
-#if WINDOWS_UWP
-					foreach (KeyValuePair<StreamSocketListener, bool> Listener in this.listeners)
-					{
-						if (Listener.Value)
-						{
-							if (int.TryParse(Listener.Key.Information.LocalPort, out Port) && !this.failedPorts.ContainsKey(Port))
-							{
-								if (Port == DefaultHttpsPort || !Result.HasValue)
-									Result = Port;
-							}
-						}
-					}
-#else
 					IPEndPoint IPEndPoint;
 
 					foreach (KeyValuePair<TcpListener, bool> Listener in this.listeners)
@@ -521,7 +508,6 @@ namespace Waher.Networking.HTTP
 							}
 						}
 					}
-#endif
 				}
 
 				this.upgradePort = Result;
@@ -530,7 +516,6 @@ namespace Waher.Networking.HTTP
 			}
 		}
 
-#if !WINDOWS_UWP
 		/// <summary>
 		/// Updates the server certificate
 		/// </summary>
@@ -542,9 +527,9 @@ namespace Waher.Networking.HTTP
 		}
 #endif
 
-		#endregion
+#endregion
 
-		#region Connections
+#region Connections
 
 #if WINDOWS_UWP
 

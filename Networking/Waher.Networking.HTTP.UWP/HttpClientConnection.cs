@@ -539,7 +539,7 @@ namespace Waher.Networking.HTTP
 				Response = new HttpResponse(this.outputStream, this, this.server, Request);
 #else
 				Response = new HttpResponse(this.stream, this, this.server, Request);
-#endif
+
 				HttpRequestHeader Header = Request.Header;
 				int? UpgradePort = null;
 
@@ -586,6 +586,7 @@ namespace Waher.Networking.HTTP
 						new KeyValuePair<string, string>("Vary", "Upgrade-Insecure-Requests"));
 				}
 				else
+#endif
 					Resource.Execute(this.server, Request, Response);
 			}
 			catch (HttpException ex)

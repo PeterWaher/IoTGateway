@@ -15,8 +15,8 @@
     <copyright>Copyright © Waher Data AB 2016-2018. All rights reserved.</copyright>
     <tags>networking communication xmpp iot actuator control ieee uwp</tags>
     <dependencies>
-      <dependency id="Waher.Content" version="1.0.11"/>
-      <dependency id="Waher.Content.Xml" version="1.0.3"/>
+      <dependency id="Waher.Content" version="1.0.12"/>
+      <dependency id="Waher.Content.Xml" version="1.0.4"/>
       <dependency id="Waher.Events" version="1.0.7"/>
       <dependency id="Waher.Networking" version="1.0.10"/>
       <dependency id="Waher.Networking.XMPP.UWP" version="1.0.32"/>

@@ -350,7 +350,7 @@ namespace Waher.Networking.UPnP
 		/// <returns>Encoded attribute value.</returns>
 		public static string XmlAttributeEncode(string AttributeValue)
 		{
-			if (AttributeValue.IndexOfAny(reservedCharacters) < 0)
+			if (AttributeValue == null || AttributeValue.IndexOfAny(reservedCharacters) < 0)
 				return AttributeValue;
 
 			return AttributeValue.

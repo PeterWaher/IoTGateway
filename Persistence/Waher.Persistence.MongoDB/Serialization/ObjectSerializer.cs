@@ -1778,7 +1778,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 		/// <returns>String with special characters escaped.</returns>
 		public static string Escape(string s)
 		{
-			if (s.IndexOfAny(specialCharacters) < 0)
+			if (s == null || s.IndexOfAny(specialCharacters) < 0)
 				return s;
 
 			return s.Replace("\\", "\\\\").

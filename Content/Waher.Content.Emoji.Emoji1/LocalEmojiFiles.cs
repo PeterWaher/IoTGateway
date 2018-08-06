@@ -249,7 +249,7 @@ namespace Waher.Content.Emoji.Emoji1
 
 		private static string Encode(string s)
 		{
-			if (s.IndexOfAny(specialCharacters) < 0)
+			if (s == null || s.IndexOfAny(specialCharacters) < 0)
 				return s;
 
 			return s.

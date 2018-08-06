@@ -22,7 +22,7 @@ namespace Waher.Content.Xml
         /// <returns>XML-encoded string.</returns>
         public static string Encode(string s)
         {
-            if (s.IndexOfAny(specialCharacters) < 0)
+            if (s == null || s.IndexOfAny(specialCharacters) < 0)
                 return s;
 
             return s.
@@ -40,7 +40,7 @@ namespace Waher.Content.Xml
         /// <returns>Encoded string</returns>
         public static string HtmlAttributeEncode(string s)
         {
-            if (s.IndexOfAny(specialAttributeCharacters) < 0)
+            if (s == null || s.IndexOfAny(specialAttributeCharacters) < 0)
                 return s;
 
             return s.
@@ -57,7 +57,7 @@ namespace Waher.Content.Xml
         /// <returns>Encoded string</returns>
         public static string HtmlValueEncode(string s)
         {
-            if (s.IndexOfAny(specialValueCharacters) < 0)
+            if (s == null || s.IndexOfAny(specialValueCharacters) < 0)
                 return s;
 
             return s.

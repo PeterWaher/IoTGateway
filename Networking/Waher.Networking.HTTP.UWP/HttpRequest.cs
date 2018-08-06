@@ -16,14 +16,14 @@ namespace Waher.Networking.HTTP
 	/// </summary>
 	public class HttpRequest : IDisposable
 	{
-		private HttpRequestHeader header;
+		private readonly HttpRequestHeader header;
 		private Stream dataStream;
 		private Stream responseStream;
-		private string remoteEndPoint;
+		private readonly string remoteEndPoint;
 		private IUser user = null;
 		private Variables session = null;
 		private string subPath = string.Empty;
-		private long dataLength;
+		private readonly long dataLength;
 		internal HttpClientConnection clientConnection = null;
 
 		/// <summary>

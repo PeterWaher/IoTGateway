@@ -4,7 +4,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Net.Sockets;
-using System.Runtime.InteropServices;
+using System.Text;
 using Waher.Content;
 using Waher.Events;
 using Waher.Networking.Sniffers;
@@ -87,7 +87,7 @@ namespace Waher.Networking.HTTP
 		public void Dispose()
 		{
 			if (!this.disposed)
-			{ 
+			{
 				this.disposed = true;
 
 				if (this.webSocket != null)
@@ -540,7 +540,53 @@ namespace Waher.Networking.HTTP
 #else
 				Response = new HttpResponse(this.stream, this, this.server, Request);
 #endif
-				Resource.Execute(this.server, Request, Response);
+				HttpRequestHeader Header = Request.Header;
+				int? UpgradePort = null;
+
+				if (!this.encrypted &&
+					(Header.UpgradeInsecureRequests?.Upgrade ?? false) &&
+					Header.Host != null &&
+					((UpgradePort = this.server.UpgradePort).HasValue))
+				{
+					StringBuilder Location = new StringBuilder();
+					string s;
+					int i;
+
+					Location.Append("https://");
+
+					s = Header.Host.Value;
+					i = s.IndexOf(':');
+					if (i > 0)
+						s = s.Substring(0, i);
+
+					Location.Append(s);
+
+					if (UpgradePort.Value != HttpServer.DefaultHttpsPort)
+					{
+						Location.Append(':');
+						Location.Append(UpgradePort.Value.ToString());
+					}
+
+					Location.Append(Header.Resource);
+
+					if (!string.IsNullOrEmpty(s = Header.QueryString))
+					{
+						Location.Append('?');
+						Location.Append(Header.QueryString);
+					}
+
+					if (!string.IsNullOrEmpty(s = Header.Fragment))
+					{
+						Location.Append('#');
+						Location.Append(Header.Fragment);
+					}
+
+					this.SendResponse(Request, 307, "Moved Temporarily", false,
+						new KeyValuePair<string, string>("Location", Location.ToString()),
+						new KeyValuePair<string, string>("Vary", "Upgrade-Insecure-Requests"));
+				}
+				else
+					Resource.Execute(this.server, Request, Response);
 			}
 			catch (HttpException ex)
 			{

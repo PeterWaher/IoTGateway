@@ -30,6 +30,7 @@ namespace Waher.Networking.HTTP
 		private HttpFieldReferer referer = null;
 		private HttpFieldRange range = null;
 		private HttpFieldUserAgent userAgent = null;
+		private HttpFieldUpgradeInsecureRequests upgradeInsequreRequests = null;
 		private string method = string.Empty;
 		private string resource = string.Empty;
 		private string queryString = string.Empty;
@@ -223,6 +224,7 @@ namespace Waher.Networking.HTTP
 				case "referer": return this.referer = new HttpFieldReferer(Key, Value);
 				case "range": return this.range = new HttpFieldRange(Key, Value);
 				case "user-agent": return this.userAgent = new HttpFieldUserAgent(Key, Value);
+				case "upgrade-insecure-requests": return this.upgradeInsequreRequests = new HttpFieldUpgradeInsecureRequests(Key, Value);
 				default: return base.ParseField(KeyLower, Key, Value);
 			}
 		}
@@ -311,6 +313,12 @@ namespace Waher.Networking.HTTP
 		/// UserAgent HTTP Field header. (RFC 2616, §14.43)
 		/// </summary>
 		public HttpFieldUserAgent UserAgent { get { return this.userAgent; } }
+
+		/// <summary>
+		/// Upgrade-Insecure-Requests HTTP Field header.
+		/// https://www.w3.org/TR/upgrade-insecure-requests/
+		/// </summary>
+		public HttpFieldUpgradeInsecureRequests UpgradeInsecureRequests { get { return this.upgradeInsequreRequests; } }
 
 		/// <summary>
 		/// If the method is safe, according to §9.1.1, RFC 2616, and the HTTP Method registry at IANA:
@@ -427,7 +435,7 @@ namespace Waher.Networking.HTTP
 
 			if (IncludeFragment && !string.IsNullOrEmpty(this.fragment))
 			{
-				Result.Append('?');
+				Result.Append('#');
 				Result.Append(this.fragment);
 			}
 

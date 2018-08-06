@@ -180,6 +180,7 @@
     <Compile Include="HeaderFields\HttpFieldRange.cs" />
     <Compile Include="HeaderFields\HttpFieldReferer.cs" />
     <Compile Include="HeaderFields\HttpFieldTransferEncoding.cs" />
+    <Compile Include="HeaderFields\HttpFieldUpgradeInsecureRequests.cs" />
     <Compile Include="HeaderFields\HttpFieldUserAgent.cs" />
     <Compile Include="HeaderFields\HttpFieldVia.cs" />
     <Compile Include="HeaderFields\HttpStringValueField.cs" />

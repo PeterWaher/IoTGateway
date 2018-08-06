@@ -335,6 +335,8 @@ namespace Waher.Networking.HTTP
 			{
 				Log.Critical(ex);
 			}
+
+			this.upgradePort = null;
 		}
 #endif
 
@@ -475,6 +477,59 @@ namespace Waher.Networking.HTTP
 			return Result;
 		}
 
+		private int? upgradePort = null;
+
+		internal int? UpgradePort
+		{
+			get
+			{
+				if (this.upgradePort.HasValue)
+					return this.upgradePort;
+
+				if (this.serverCertificate == null)
+					return null;
+
+				int? Result = null;
+				int Port;
+
+				if (this.listeners != null)
+				{
+#if WINDOWS_UWP
+					foreach (KeyValuePair<StreamSocketListener, bool> Listener in this.listeners)
+					{
+						if (Listener.Value)
+						{
+							if (int.TryParse(Listener.Key.Information.LocalPort, out Port) && !this.failedPorts.ContainsKey(Port))
+							{
+								if (Port == DefaultHttpsPort || !Result.HasValue)
+									Result = Port;
+							}
+						}
+					}
+#else
+					IPEndPoint IPEndPoint;
+
+					foreach (KeyValuePair<TcpListener, bool> Listener in this.listeners)
+					{
+						if (Listener.Value)
+						{
+							IPEndPoint = Listener.Key.LocalEndpoint as IPEndPoint;
+							if (IPEndPoint != null && !this.failedPorts.ContainsKey(Port = IPEndPoint.Port))
+							{
+								if (Port == DefaultHttpsPort || !Result.HasValue)
+									Result = Port;
+							}
+						}
+					}
+#endif
+				}
+
+				this.upgradePort = Result;
+
+				return Result;
+			}
+		}
+
 #if !WINDOWS_UWP
 		/// <summary>
 		/// Updates the server certificate
@@ -483,12 +538,13 @@ namespace Waher.Networking.HTTP
 		public void UpdateCertificate(X509Certificate ServerCertificate)
 		{
 			this.serverCertificate = ServerCertificate;
+			this.upgradePort = null;
 		}
 #endif
 
-#endregion
+		#endregion
 
-#region Connections
+		#region Connections
 
 #if WINDOWS_UWP
 

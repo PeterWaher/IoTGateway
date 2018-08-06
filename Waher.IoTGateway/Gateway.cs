@@ -129,6 +129,7 @@ namespace Waher.IoTGateway
 		private static HttpxServer httpxServer = null;
 		private static CoapEndpoint coapEndpoint = null;
 		private static ClientEvents clientEvents = null;
+		private static ClientEventsWebSocket clientEventsWs = null;
 		private static Login login = null;
 		private static Logout logout = null;
 		private static LoggedIn loggedIn = null;
@@ -439,6 +440,7 @@ namespace Waher.IoTGateway
 					SetupResources.AddLast(webServer.Register(HttpFolderResource = new HttpFolderResource(string.Empty, rootFolder, false, false, true, true)));    // TODO: Add authentication mechanisms for PUT & DELETE.
 					SetupResources.AddLast(webServer.Register("/", (req, resp) => throw new TemporaryRedirectException(defaultPage)));
 					SetupResources.AddLast(webServer.Register(clientEvents = new ClientEvents()));
+					SetupResources.AddLast(webServer.Register(clientEventsWs = new ClientEventsWebSocket()));
 					SetupResources.AddLast(webServer.Register(login = new Login()));
 					SetupResources.AddLast(webServer.Register(logout = new Logout()));
 
@@ -553,6 +555,7 @@ namespace Waher.IoTGateway
 				webServer.Register(httpxProxy = new HttpxProxy("/HttpxProxy", xmppClient, MaxChunkSize));
 				webServer.Register("/", (req, resp) => throw new TemporaryRedirectException(defaultPage));
 				webServer.Register(clientEvents = new ClientEvents());
+				webServer.Register(clientEventsWs = new ClientEventsWebSocket());
 				webServer.Register(login = new Login());
 				webServer.Register(logout = new Logout());
 

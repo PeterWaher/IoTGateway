@@ -1,5 +1,95 @@
 ﻿function CheckEvents(TabID)
 {
+    if ("WebSocket" in window)
+        CheckEventsWS(TabID);
+    else
+        CheckEventsXHTTP(TabID);
+}
+
+function CheckEventsWS(TabID)
+{
+    var Location = window.location;
+    var Uri;
+
+    if (Location.protocol == "https:")
+        Uri = "wss:";
+    else
+        Uri = "ws:";
+
+    Uri += "//" + Location.host + "/ClientEventsWS";
+
+    var Socket = new WebSocket(Uri, ["ls"]);
+    var PingTimer = null;
+    var Closed = false;
+
+    Socket.onopen = function ()
+    {
+        Socket.send(JSON.stringify({
+            "cmd": "Register",
+            "tabId": TabID,
+            "location": window.location.href
+        }));
+
+        PingTimer = window.setInterval(function ()
+        {
+            Socket.send(JSON.stringify({
+                "cmd": "Ping"
+            }));
+        }, 10000);
+
+        window.onbeforeunload = function ()
+        {
+            if (Socket != null && Socket.readyState == Socket.OPEN)
+            {
+                Socket.send(JSON.stringify({
+                    "cmd": "Unregister"
+                }));
+
+                Socket.close(1000, "Page closed.");
+                Socket = null;
+            }
+
+            Closed = true;
+        };
+    };
+
+    Socket.onmessage = function (event)
+    {
+        try
+        {
+            Event = JSON.parse(event.data);
+        }
+        catch (e)
+        {
+            throw "Invalid JSON received: " + event.data;
+        }
+
+        EvaluateEvent(Event);
+    };
+
+    Socket.onerror = function ()
+    {
+        delete Socket;
+
+        if (PingTimer !== null)
+        {
+            window.clearInterval(PingTimer);
+            PingTimer = null;
+        }
+
+        if (!Closed)
+        {
+            window.setTimeout(function ()
+            {
+                NeedsReload = true;
+                CheckEventsWS(TabID);
+            }, 5000);
+        }
+    };
+}
+
+function CheckEventsXHTTP(TabID)
+{
     var NeedsReload = false;
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function ()
@@ -34,11 +124,7 @@
                     {
                         c = Events.length;
                         for (i = 0; i < c; i++)
-                        {
-                            Event = Events[i];
-                            if (Event.type.match(/^[a-zA-Z0-9]+$/g))
-                                eval(Event.type + "(Event.data)");
-                        }
+                            EvaluateEvent(Events[i]);
                     }
                 }
                 finally
@@ -81,6 +167,21 @@
     xhttp.setRequestHeader("Content-Type", "text/plain");
     xhttp.setRequestHeader("X-TabID", TabID);
     xhttp.send(window.location.href);
+}
+
+function EvaluateEvent(Event)
+{
+    if (Event != null && Event.type.match(/^[a-zA-Z0-9]+$/g))
+    {
+        try
+        {
+            eval(Event.type + "(Event.data)");
+        }
+        catch (e)
+        {
+            // Ignore
+        }
+    }
 }
 
 function CloseEvents()

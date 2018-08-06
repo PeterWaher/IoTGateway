@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Waher.Content;
 using Waher.Networking.HTTP;
+using Waher.Networking.HTTP.WebSockets;
 using Waher.Runtime.Cache;
 
 namespace Waher.IoTGateway
@@ -87,10 +88,9 @@ namespace Waher.IoTGateway
 			// TODO: Check User authenticated
 
 			object Obj = Request.DecodeData();
-			string Location = Obj as string;
 			string TabID = Request.Header["X-TabID"];
 
-			if (Location == null || string.IsNullOrEmpty(TabID))
+			if (!(Obj is string Location) || string.IsNullOrEmpty(TabID))
 				throw new BadRequestException();
 
 			Uri Uri = new Uri(Location);
@@ -178,6 +178,120 @@ namespace Waher.IoTGateway
 				timeoutByTabID[TabID] = Queue;
 		}
 
+		internal static void RegisterWebSocket(WebSocket Socket, string Location, string TabID)
+		{
+			Uri Uri = new Uri(Location);
+			string Resource = Uri.LocalPath;
+			List<KeyValuePair<string, string>> Query = null;
+			string s;
+			
+			if (!string.IsNullOrEmpty(Uri.Query))
+			{
+				Query = new List<KeyValuePair<string, string>>();
+				int i;
+
+				s = Uri.Query;
+				if (s.StartsWith("?"))
+					s = s.Substring(1);
+
+				foreach (string Part in s.Split('&'))
+				{
+					i = Part.IndexOf('=');
+					if (i < 0)
+						Query.Add(new KeyValuePair<string, string>(Part, string.Empty));
+					else
+						Query.Add(new KeyValuePair<string, string>(Part.Substring(0, i), Part.Substring(i + 1)));
+				}
+			}
+
+			if (eventsByTabID.TryGetValue(TabID, out TabQueue Queue))
+				Queue.WebSocket = Socket;
+			else
+			{
+				Queue = new TabQueue(TabID)
+				{
+					WebSocket = Socket
+				};
+
+				eventsByTabID[TabID] = Queue;
+			}
+
+			lock (locationByTabID)
+			{
+				if (!locationByTabID.TryGetValue(TabID, out s) || s != Resource)
+					locationByTabID[TabID] = Resource;
+			}
+
+			lock (tabIdsByLocation)
+			{
+				if (!tabIdsByLocation.TryGetValue(Resource, out Dictionary<string, List<KeyValuePair<string, string>>> TabIds))
+				{
+					TabIds = new Dictionary<string, List<KeyValuePair<string, string>>>();
+					tabIdsByLocation[Resource] = TabIds;
+				}
+
+				TabIds[TabID] = Query;
+			}
+
+			LinkedList<string> ToSend = null;
+
+			lock (Queue)
+			{
+				if (Queue.Queue.First != null)
+				{
+					ToSend = new LinkedList<string>();
+
+					foreach (string s2 in Queue.Queue)
+						ToSend.AddLast(s2);
+
+					Queue.Queue.Clear();
+				}
+			}
+
+			if (ToSend != null)
+			{
+				foreach (string s2 in ToSend)
+					Socket.Send(s2);
+			}
+		}
+
+		internal static void Ping(string TabID)
+		{
+			eventsByTabID.ContainsKey(TabID);
+		}
+
+		internal static void UnregisterWebSocket(WebSocket Socket, string Location, string TabID)
+		{
+			Uri Uri = new Uri(Location);
+			string Resource = Uri.LocalPath;
+
+			if (eventsByTabID.TryGetValue(TabID, out TabQueue Queue))
+			{
+				lock (Queue)
+				{
+					Queue.WebSocket = null;
+				}
+			}
+
+			lock (locationByTabID)
+			{
+				if (locationByTabID.TryGetValue(TabID, out string s) && s == Resource)
+					locationByTabID.Remove(TabID);
+				else
+					return;
+			}
+
+			lock (tabIdsByLocation)
+			{
+				if (tabIdsByLocation.TryGetValue(Resource, out Dictionary<string, List<KeyValuePair<string, string>>> TabIds))
+				{
+					if (TabIds.Remove(TabID) && TabIds.Count == 0)
+						tabIdsByLocation.Remove(Resource);
+				}
+			}
+		}
+
+
 		private static Cache<string, TabQueue> eventsByTabID = GetQueueCache();
 		private static Cache<string, TabQueue> timeoutByTabID = GetTimeoutCache();
 		private static Dictionary<string, string> locationByTabID = new Dictionary<string, string>();
@@ -235,7 +349,10 @@ namespace Waher.IoTGateway
 			string TabID = Queue.TabID;
 			string Location;
 
-			Queue.Queue.Clear();
+			lock (Queue)
+			{
+				Queue.Queue.Clear();
+			}
 
 			lock (locationByTabID)
 			{
@@ -439,6 +556,7 @@ namespace Waher.IoTGateway
 			public string TabID;
 			public LinkedList<string> Queue = new LinkedList<string>();
 			public HttpResponse Response = null;
+			public WebSocket WebSocket = null;
 
 			public TabQueue(string ID)
 			{
@@ -494,11 +612,13 @@ namespace Waher.IoTGateway
 				{
 					lock (Queue)
 					{
-						if (Queue.Response != null)
+						if (Queue.WebSocket != null)
+							Queue.WebSocket.Send(Json.ToString());
+						else if (Queue.Response != null)
 						{
 							try
 							{
-								Queue.Response.Write("[" + Json + "]");
+								Queue.Response.Write("[" + Json.ToString() + "]");
 								Queue.Response.SendResponse();
 								Queue.Response.Dispose();
 								Queue.Response = null;

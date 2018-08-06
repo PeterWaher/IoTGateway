@@ -10,9 +10,9 @@ namespace Waher.Networking.HTTP.HeaderFields
 	/// </summary>
 	public class HttpFieldContentType : HttpField
 	{
-		private KeyValuePair<string, string>[] fields;
-		private string type;
-		private string charset;
+		private readonly KeyValuePair<string, string>[] fields;
+		private readonly string type;
+		private readonly string charset;
 
 		/// <summary>
 		/// Content-Type HTTP Field header. (RFC 2616, §14.17)

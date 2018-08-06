@@ -7,7 +7,7 @@ namespace Waher.Networking.HTTP.HeaderFields
 	/// <summary>
 	/// If-Match HTTP Field header. (RFC 2616, §14.24)
 	/// </summary>
-	public class HttpFieldIfMatch : HttpField
+	public class HttpFieldIfMatch : HttpStringValueField
 	{
 		/// <summary>
 		/// If-Match HTTP Field header. (RFC 2616, §14.24)

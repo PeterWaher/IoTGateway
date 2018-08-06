@@ -54,9 +54,7 @@ namespace Waher.Networking.HTTP.HeaderFields
 						this.valueByName[P.Key] = P.Value;
 				}
 
-				string Result;
-
-				if (this.valueByName.TryGetValue(CookieName, out Result))
+				if (this.valueByName.TryGetValue(CookieName, out string Result))
 					return Result;
 				else
 					return string.Empty;

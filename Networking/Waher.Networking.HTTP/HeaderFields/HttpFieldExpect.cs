@@ -9,7 +9,7 @@ namespace Waher.Networking.HTTP.HeaderFields
 	/// </summary>
 	public class HttpFieldExpect : HttpField
 	{
-		private bool continue100;
+		private readonly bool continue100;
 
 		/// <summary>
 		/// Expect HTTP Field header. (RFC 2616, §14.20)

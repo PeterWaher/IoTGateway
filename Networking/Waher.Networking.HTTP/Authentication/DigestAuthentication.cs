@@ -14,12 +14,12 @@ namespace Waher.Networking.HTTP.Authentication
 	/// </summary>
 	public class DigestAuthentication : HttpAuthenticationScheme
 	{
-		private Dictionary<string, DateTime> expirationByNonce = new Dictionary<string, DateTime>();
-		private SortedDictionary<DateTime, string> nonceByExpiration = new SortedDictionary<DateTime, string>();
+		private readonly Dictionary<string, DateTime> expirationByNonce = new Dictionary<string, DateTime>();
+		private readonly SortedDictionary<DateTime, string> nonceByExpiration = new SortedDictionary<DateTime, string>();
 		private Random rnd = new Random();
-		private string opaque = Guid.NewGuid().ToString().Replace("-", string.Empty);
-		private IUserSource users;
-		private string realm;
+		private readonly string opaque = Guid.NewGuid().ToString().Replace("-", string.Empty);
+		private readonly IUserSource users;
+		private readonly string realm;
 
 		/// <summary>
 		/// Digest authentication mechanism, as defined in RFC 2617:

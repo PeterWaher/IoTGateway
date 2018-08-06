@@ -182,6 +182,7 @@
     <Compile Include="HeaderFields\HttpFieldTransferEncoding.cs" />
     <Compile Include="HeaderFields\HttpFieldUserAgent.cs" />
     <Compile Include="HeaderFields\HttpFieldVia.cs" />
+    <Compile Include="HeaderFields\HttpStringValueField.cs" />
     <Compile Include="HttpAsynchronousResource.cs" />
     <Compile Include="HttpAuthenticationScheme.cs" />
     <Compile Include="HttpClientConnection.cs" />

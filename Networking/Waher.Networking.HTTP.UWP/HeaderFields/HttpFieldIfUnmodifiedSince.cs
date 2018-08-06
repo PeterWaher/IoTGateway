@@ -31,9 +31,7 @@ namespace Waher.Networking.HTTP.HeaderFields
 			{
 				if (!this.timestamp.HasValue)
 				{
-					DateTimeOffset TP;
-
-					if (CommonTypes.TryParseRfc822(this.Value, out TP))
+					if (CommonTypes.TryParseRfc822(this.Value, out DateTimeOffset TP))
 						this.timestamp = TP;
 				}
 

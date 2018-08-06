@@ -13,8 +13,8 @@ namespace Waher.Networking.HTTP.Authentication
 	/// </summary>
 	public class BasicAuthentication : HttpAuthenticationScheme
 	{
-		private IUserSource users;
-		private string realm;
+		private readonly IUserSource users;
+		private readonly string realm;
 
 		/// <summary>
 		/// Basic authentication mechanism, as defined in RFC 2617:

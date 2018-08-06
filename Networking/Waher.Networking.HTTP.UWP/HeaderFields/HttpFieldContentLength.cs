@@ -32,9 +32,7 @@ namespace Waher.Networking.HTTP.HeaderFields
 					return this.contentLength.Value;
 				else
 				{
-					long l;
-
-					if (!long.TryParse(this.Value, out l))
+					if (!long.TryParse(this.Value, out long l))
 						this.contentLength = -1;
 					else
 						this.contentLength = l;

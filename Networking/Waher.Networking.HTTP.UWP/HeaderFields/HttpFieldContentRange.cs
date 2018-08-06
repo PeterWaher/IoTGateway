@@ -36,20 +36,17 @@ namespace Waher.Networking.HTTP.HeaderFields
 				if (i < 0)
 					return null;
 
-				long First;
-				if (!long.TryParse(s.Substring(6, i - 6), out First))
+				if (!long.TryParse(s.Substring(6, i - 6), out long First))
 					return null;
 
 				int j = s.IndexOf('/', i + 1);
 				if (j < 0)
 					return null;
 
-				long Last;
-				if (!long.TryParse(s.Substring(i + 1, j - i - 1), out Last))
+				if (!long.TryParse(s.Substring(i + 1, j - i - 1), out long Last))
 					return null;
 
-				long Total;
-				if (!long.TryParse(s.Substring(j + 1), out Total))
+				if (!long.TryParse(s.Substring(j + 1), out long Total))
 					return null;
 
 				this.interval = new ContentByteRangeInterval(First, Last, Total);

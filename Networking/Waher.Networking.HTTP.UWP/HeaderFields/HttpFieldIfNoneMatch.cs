@@ -7,7 +7,7 @@ namespace Waher.Networking.HTTP.HeaderFields
 	/// <summary>
 	/// If-None-Match HTTP Field header. (RFC 2616, §14.26)
 	/// </summary>
-	public class HttpFieldIfNoneMatch : HttpField
+	public class HttpFieldIfNoneMatch : HttpStringValueField
 	{
 		/// <summary>
 		/// If-None-Match HTTP Field header. (RFC 2616, §14.26)

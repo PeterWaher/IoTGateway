@@ -168,10 +168,49 @@ namespace Waher.Content.Markdown.Web
 
 				foreach (KeyValuePair<string, bool> P in MetaValues)
 				{
-					if (Session == null || !Session.TryGetVariable(P.Key, out v))
+					if (Session == null)
 					{
 						Authorized = false;
 						break;
+					}
+
+					if (!Session.TryGetVariable(P.Key, out v))
+					{
+						Uri LoginUrl = null;
+						string LoginFileName = null;
+						string FromFolder = Path.GetDirectoryName(FromFileName);
+
+						if (Login != null)
+						{
+							foreach (KeyValuePair<string, bool> P2 in Login)
+							{
+								LoginFileName = Path.Combine(FromFolder, P2.Key.Replace('/', Path.DirectorySeparatorChar));
+								LoginUrl = new Uri(new Uri(URL), P2.Key.Replace(Path.DirectorySeparatorChar, '/'));
+
+								if (File.Exists(LoginFileName))
+									break;
+								else
+									LoginFileName = null;
+							}
+						}
+
+						if (LoginFileName != null)
+						{
+							string LoginMarkdown = File.ReadAllText(LoginFileName);
+							MarkdownDocument LoginDoc = new MarkdownDocument(LoginMarkdown, Settings, LoginFileName, LoginUrl.AbsolutePath,
+								LoginUrl.ToString(), typeof(HttpException));
+
+							if (!Session.TryGetVariable(P.Key, out v))
+							{
+								Authorized = false;
+								break;
+							}
+						}
+						else
+						{
+							Authorized = false;
+							break;
+						}
 					}
 
 					User = v.ValueObject as IUser;

@@ -17,7 +17,9 @@ namespace Waher.Networking.XMPP.PEP
 		private static Dictionary<string, IPersonalEvent> personalEventTypes = GetPersonalEventTypes();
 
 		private PubSubClient pubSubClient;
+		private readonly string pubSubComponentAddress;
 		private readonly Dictionary<Type, PersonalEventNotificationEventHandler[]> handlers = new Dictionary<Type, PersonalEventNotificationEventHandler[]>();
+		private readonly bool hasPubSubComponent;
 
 		/// <summary>
 		/// Client managing the Personal Eventing Protocol (XEP-0163).
@@ -25,9 +27,22 @@ namespace Waher.Networking.XMPP.PEP
 		/// </summary>
 		/// <param name="Client">XMPP Client to use.</param>
 		public PepClient(XmppClient Client)
+			: this(Client, string.Empty)
+		{
+		}
+
+		/// <summary>
+		/// Client managing the Personal Eventing Protocol (XEP-0163).
+		/// https://xmpp.org/extensions/xep-0163.html
+		/// </summary>
+		/// <param name="Client">XMPP Client to use.</param>
+		/// <param name="PubSubComponentAddress">Default Publish/Subscribe component address.</param>
+		public PepClient(XmppClient Client, string PubSubComponentAddress)
 			: base(Client)
 		{
-			this.pubSubClient = new PubSubClient(Client, string.Empty);
+			this.pubSubComponentAddress = PubSubComponentAddress;
+			this.pubSubClient = new PubSubClient(Client, this.pubSubComponentAddress);
+			this.hasPubSubComponent = !string.IsNullOrEmpty(this.pubSubComponentAddress);
 
 			this.pubSubClient.ItemNotification += PubSubClient_ItemNotification;
 		}
@@ -94,7 +109,7 @@ namespace Waher.Networking.XMPP.PEP
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void Publish(string Node, ItemResultEventHandler Callback, object State)
 		{
-			this.pubSubClient?.Publish(Node, Callback, State);
+			this.pubSubClient?.Publish(string.Empty, Node, string.Empty, Callback, State);
 		}
 
 		/// <summary>
@@ -106,7 +121,7 @@ namespace Waher.Networking.XMPP.PEP
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void Publish(string Node, string PayloadXml, ItemResultEventHandler Callback, object State)
 		{
-			this.pubSubClient?.Publish(Node, PayloadXml, Callback, State);
+			this.pubSubClient?.Publish(string.Empty, Node, string.Empty, PayloadXml, Callback, State);
 		}
 
 		/// <summary>
@@ -120,9 +135,9 @@ namespace Waher.Networking.XMPP.PEP
 			string ItemId = PersonalEvent.ItemId;
 
 			if (ItemId == null)
-				this.pubSubClient?.Publish(PersonalEvent.Node, PersonalEvent.PayloadXml, Callback, State);
+				this.pubSubClient?.Publish(string.Empty, PersonalEvent.Node, string.Empty, PersonalEvent.PayloadXml, Callback, State);
 			else
-				this.pubSubClient?.Publish(PersonalEvent.Node, ItemId, PersonalEvent.PayloadXml, Callback, State);
+				this.pubSubClient?.Publish(string.Empty, PersonalEvent.Node, ItemId, PersonalEvent.PayloadXml, Callback, State);
 		}
 
 		/// <summary>
@@ -136,47 +151,66 @@ namespace Waher.Networking.XMPP.PEP
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void Publish(string Node, string ItemId, string PayloadXml, ItemResultEventHandler Callback, object State)
 		{
-			this.pubSubClient?.Publish(Node, ItemId, PayloadXml, Callback, State);
+			this.pubSubClient?.Publish(string.Empty, Node, ItemId, PayloadXml, Callback, State);
 		}
 
 		private void PubSubClient_ItemNotification(object Sender, ItemNotificationEventArgs e)
 		{
-			IPersonalEvent PersonalEvent = null;
-
-			foreach (XmlNode N in e.Item.ChildNodes)
+			if (this.hasPubSubComponent && string.Compare(e.From, this.pubSubComponentAddress, true) == 0)
 			{
-				if (N is XmlElement E && personalEventTypes.TryGetValue(E.LocalName + " " + E.NamespaceURI, out IPersonalEvent PersonalEvent2))
+				try
 				{
-					PersonalEvent = PersonalEvent2.Parse(E);
-					break;
+					this.NonPepItemNotification?.Invoke(this, e);
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
 				}
 			}
-
-			if (PersonalEvent != null)
+			else
 			{
-				PersonalEventNotificationEventHandler[] Handlers;
+				IPersonalEvent PersonalEvent = null;
 
-				lock (this.handlers)
+				foreach (XmlNode N in e.Item.ChildNodes)
 				{
-					if (!this.handlers.TryGetValue(PersonalEvent.GetType(), out Handlers))
-						return;
+					if (N is XmlElement E && personalEventTypes.TryGetValue(E.LocalName + " " + E.NamespaceURI, out IPersonalEvent PersonalEvent2))
+					{
+						PersonalEvent = PersonalEvent2.Parse(E);
+						break;
+					}
 				}
 
-				PersonalEventNotificationEventArgs e2 = new PersonalEventNotificationEventArgs(PersonalEvent, this, e);
-
-				foreach (PersonalEventNotificationEventHandler Handler in Handlers)
+				if (PersonalEvent != null)
 				{
-					try
+					PersonalEventNotificationEventHandler[] Handlers;
+
+					lock (this.handlers)
 					{
-						Handler.Invoke(this, e2);
+						if (!this.handlers.TryGetValue(PersonalEvent.GetType(), out Handlers))
+							return;
 					}
-					catch (Exception ex)
+
+					PersonalEventNotificationEventArgs e2 = new PersonalEventNotificationEventArgs(PersonalEvent, this, e);
+
+					foreach (PersonalEventNotificationEventHandler Handler in Handlers)
 					{
-						Log.Critical(ex);
+						try
+						{
+							Handler.Invoke(this, e2);
+						}
+						catch (Exception ex)
+						{
+							Log.Critical(ex);
+						}
 					}
 				}
 			}
 		}
+
+		/// <summary>
+		/// Event raised when an item notification from the publish/subscribe component that is not related to PEP has been received.
+		/// </summary>
+		public event ItemNotificationEventHandler NonPepItemNotification = null;
 
 		private static Dictionary<string, IPersonalEvent> GetPersonalEventTypes()
 		{

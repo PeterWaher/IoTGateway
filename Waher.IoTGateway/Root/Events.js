@@ -55,9 +55,13 @@ function CheckEventsWS(TabID)
 
     Socket.onmessage = function (event)
     {
+        var s = event.data;
+        if (s == "" || s == null)
+            return;
+
         try
         {
-            Event = JSON.parse(event.data);
+            Event = JSON.parse(s);
         }
         catch (e)
         {
@@ -111,20 +115,25 @@ function CheckEventsXHTTP(TabID)
 
                 try
                 {
-                    try
-                    {
-                        Events = JSON.parse(xhttp.responseText);
-                    }
-                    catch (e)
-                    {
-                        throw "Invalid JSON received: " + xhttp.responseText;
-                    }
+                    var s = xhttp.responseText;
 
-                    if (Events != null)
+                    if (s != null && s != "")
                     {
-                        c = Events.length;
-                        for (i = 0; i < c; i++)
-                            EvaluateEvent(Events[i]);
+                        try
+                        {
+                            Events = JSON.parse(s);
+                        }
+                        catch (e)
+                        {
+                            throw "Invalid JSON received: " + s;
+                        }
+
+                        if (Events != null)
+                        {
+                            c = Events.length;
+                            for (i = 0; i < c; i++)
+                                EvaluateEvent(Events[i]);
+                        }
                     }
                 }
                 finally

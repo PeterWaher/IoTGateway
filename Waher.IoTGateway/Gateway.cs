@@ -848,7 +848,7 @@ namespace Waher.IoTGateway
 			Types.SetModuleParameter("SOCKS5", socksProxy);
 
 			synchronizationClient = new SynchronizationClient(xmppClient);
-			pepClient = new PepClient(xmppClient);
+			pepClient = new PepClient(xmppClient, XmppConfiguration.Instance.PubSub);
 
 			return Task.CompletedTask;
 		}
@@ -1103,60 +1103,33 @@ namespace Waher.IoTGateway
 
 			Log.Informational("Server shutting down.");
 
-			if (gatewayRunning != null)
-			{
-				gatewayRunning.Release();
-				gatewayRunning.Dispose();
-				gatewayRunning = null;
-			}
+			gatewayRunning?.Release();
+			gatewayRunning?.Dispose();
+			gatewayRunning = null;
 
-			if (ibbClient != null)
-			{
-				ibbClient.Dispose();
-				ibbClient = null;
-			}
+			ibbClient?.Dispose();
+			ibbClient = null;
 
-			if (httpxProxy != null)
-			{
-				httpxProxy.Dispose();
-				httpxProxy = null;
-			}
+			httpxProxy?.Dispose();
+			httpxProxy = null;
 
-			if (httpxServer != null)
-			{
-				httpxServer.Dispose();
-				httpxServer = null;
-			}
+			httpxServer?.Dispose();
+			httpxServer = null;
 
-			if (provisioningClient != null)
-			{
-				provisioningClient.Dispose();
-				provisioningClient = null;
-			}
+			provisioningClient?.Dispose();
+			provisioningClient = null;
 
-			if (thingRegistryClient != null)
-			{
-				thingRegistryClient.Dispose();
-				thingRegistryClient = null;
-			}
+			thingRegistryClient?.Dispose();
+			thingRegistryClient = null;
 
-			if (concentratorServer != null)
-			{
-				concentratorServer.Dispose();
-				concentratorServer = null;
-			}
+			concentratorServer?.Dispose();
+			concentratorServer = null;
 
-			if (synchronizationClient != null)
-			{
-				synchronizationClient.Dispose();
-				synchronizationClient = null;
-			}
+			synchronizationClient?.Dispose();
+			synchronizationClient = null;
 
-			if (pepClient != null)
-			{
-				pepClient.Dispose();
-				pepClient = null;
-			}
+			pepClient?.Dispose();
+			pepClient = null;
 
 			if (xmppClient != null)
 			{
@@ -1550,8 +1523,11 @@ namespace Waher.IoTGateway
 			int Port;
 			int i;
 
-			if (Request.Session == null || !Request.Session.TryGetVariable("from", out Variable v) || string.IsNullOrEmpty(From = v.ValueObject as string))
+			if (Request.Session == null)
 				return;
+
+			if (!Request.Session.TryGetVariable("from", out Variable v) || string.IsNullOrEmpty(From = v.ValueObject as string))
+				From = string.Empty;
 
 			if (!loopbackIntefaceAvailable && (XmppConfiguration.Instance == null || !XmppConfiguration.Instance.Complete || configuring))
 			{
@@ -1794,6 +1770,14 @@ namespace Waher.IoTGateway
 		public static PepClient PepClient
 		{
 			get { return pepClient; }
+		}
+
+		/// <summary>
+		/// XMPP Publish/Subscribe (PubSub) Client, if such a component is available on the XMPP broker.
+		/// </summary>
+		public static PubSubClient PubSubClient
+		{
+			get { return pepClient.PubSubClient; }
 		}
 
 		/// <summary>
@@ -2057,7 +2041,7 @@ namespace Waher.IoTGateway
 
 		#endregion
 
-		#region Personal Eventing Protocll
+		#region Personal Eventing Protocoll
 
 		/// <summary>
 		/// Publishes a personal event on the XMPP network.
@@ -2090,6 +2074,16 @@ namespace Waher.IoTGateway
 				return false;
 			else
 				return pepClient.UnregisterHandler(PersonalEventType, Handler);
+		}
+
+		/// <summary>
+		/// Event raisen when an item notification has been received, that is not a personal event, but received from the
+		/// Publish/Subscribe component.
+		/// </summary>
+		public static event ItemNotificationEventHandler PubSubItemNotification
+		{
+			add => pepClient.NonPepItemNotification += value;
+			remove => pepClient.NonPepItemNotification -= value;
 		}
 
 		#endregion

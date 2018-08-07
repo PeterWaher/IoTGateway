@@ -117,7 +117,8 @@ namespace Waher.IoTGateway.WebResources
 			Request.Session["User"] = new User();
 			Request.Session.Remove("LoginError");
 
-			throw new SeeOtherException(From);
+			if (!string.IsNullOrEmpty(From))
+				throw new SeeOtherException(From);
 		}
 
 		private class User : IUser

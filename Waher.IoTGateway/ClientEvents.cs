@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Waher.Content;
 using Waher.Networking.HTTP;
+using Waher.Networking.HTTP.HeaderFields;
 using Waher.Networking.HTTP.WebSockets;
 using Waher.Runtime.Cache;
 using Waher.Script;
@@ -123,7 +124,10 @@ namespace Waher.IoTGateway
 
 			if (!eventsByTabID.TryGetValue(TabID, out TabQueue Queue))
 			{
-				Queue = new TabQueue(TabID, Request.Session);
+				HttpFieldCookie Cookie = Request.Header.Cookie;
+				string HttpSessionID = Cookie == null ? string.Empty : Cookie["HttpSessionID"];
+
+				Queue = new TabQueue(TabID, HttpSessionID, Request.Session);
 				eventsByTabID[TabID] = Queue;
 			}
 
@@ -186,7 +190,7 @@ namespace Waher.IoTGateway
 			string Resource = Uri.LocalPath;
 			List<KeyValuePair<string, string>> Query = null;
 			string s;
-			
+
 			if (!string.IsNullOrEmpty(Uri.Query))
 			{
 				Query = new List<KeyValuePair<string, string>>();
@@ -210,7 +214,10 @@ namespace Waher.IoTGateway
 				Queue.WebSocket = Socket;
 			else
 			{
-				Queue = new TabQueue(TabID, Socket.HttpRequest.Session)
+				HttpFieldCookie Cookie = Socket.HttpRequest.Header.Cookie;
+				string HttpSessionID = Cookie == null ? string.Empty : Cookie["HttpSessionID"];
+
+				Queue = new TabQueue(TabID, HttpSessionID, Socket.HttpRequest.Session)
 				{
 					WebSocket = Socket
 				};
@@ -259,7 +266,8 @@ namespace Waher.IoTGateway
 
 		internal static void Ping(string TabID)
 		{
-			eventsByTabID.ContainsKey(TabID);
+			if (eventsByTabID.TryGetValue(TabID, out TabQueue TabQueue))
+				Gateway.HttpServer.GetSession(TabQueue.SessionID, false);
 		}
 
 		internal static void UnregisterWebSocket(WebSocket Socket, string Location, string TabID)
@@ -556,14 +564,16 @@ namespace Waher.IoTGateway
 		private class TabQueue
 		{
 			public string TabID;
+			public string SessionID;
 			public Variables Session;
 			public LinkedList<string> Queue = new LinkedList<string>();
 			public HttpResponse Response = null;
 			public WebSocket WebSocket = null;
 
-			public TabQueue(string ID, Variables Session)
+			public TabQueue(string ID, string SessionID, Variables Session)
 			{
 				this.TabID = ID;
+				this.SessionID = SessionID;
 				this.Session = Session;
 			}
 		}

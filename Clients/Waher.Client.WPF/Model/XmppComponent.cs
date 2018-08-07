@@ -14,11 +14,11 @@ namespace Waher.Client.WPF.Model
 {
 	public class XmppComponent : TreeNode
 	{
-		private Dictionary<string, bool> features;
-		private string jid;
-		private string name;
-		private string node;
-		private bool canSearch;
+		private readonly Dictionary<string, bool> features;
+		private readonly string jid;
+		private readonly string name;
+		private readonly string node;
+		private readonly bool canSearch;
 
 		public XmppComponent(TreeNode Parent, string JID, string Name, string Node, Dictionary<string, bool> Features)
 			: base(Parent)

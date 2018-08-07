@@ -58,7 +58,7 @@ namespace Waher.Client.WPF.Model.PubSub
 		internal bool SupportsSubscriptionOptions;
 		internal bool SupportsSubscriptionNotifications;
 
-		public PubSubService(TreeNode Parent, string JID, string Name, string Node, Dictionary<string, bool> Features)
+		public PubSubService(TreeNode Parent, string JID, string Name, string Node, Dictionary<string, bool> Features, PubSubClient PubSubClient)
 			: base(Parent, JID, Name, Node, Features)
 		{
 			this.SupportsAccessAuthorize = Features.ContainsKey(PubSubClient.NamespacePubSubAccessAuthorize);
@@ -98,7 +98,7 @@ namespace Waher.Client.WPF.Model.PubSub
 			this.SupportsSubscriptionOptions = Features.ContainsKey(PubSubClient.NamespacePubSubSubscriptionOptions);
 			this.SupportsSubscriptionNotifications = Features.ContainsKey(PubSubClient.NamespacePubSubSubscriptionNotifications);
 
-			this.pubSubClient = new PubSubClient(this.Account.Client, JID);
+			this.pubSubClient = PubSubClient;
 
 			this.children = new SortedDictionary<string, TreeNode>()
 			{
@@ -109,17 +109,6 @@ namespace Waher.Client.WPF.Model.PubSub
 		public PubSubClient PubSubClient
 		{
 			get { return this.pubSubClient; }
-		}
-
-		public override void Dispose()
-		{
-			if (this.pubSubClient != null)
-			{
-				this.pubSubClient.Dispose();
-				this.pubSubClient = null;
-			}
-
-			base.Dispose();
 		}
 
 		public override ImageSource ImageResource => XmppAccountNode.database;

@@ -192,12 +192,25 @@ namespace Waher.Client.WPF.Model
 			this.client.OnNormalMessage += Client_OnNormalMessage;
 
 			this.client.SetPresence(Availability.Chat);
-
-			this.pepClient = new PepClient(this.client);
+			
 			this.sensorClient = new SensorClient(this.client);
 			this.controlClient = new ControlClient(this.client);
 			this.concentratorClient = new ConcentratorClient(this.client);
 			this.synchronizationClient = new SynchronizationClient(this.client);
+
+			this.AddPepClient(string.Empty);
+
+			this.concentratorClient.OnEvent += ConcentratorClient_OnEvent;
+
+			this.client.Connect();
+		}
+
+		private void AddPepClient(string PubSubComponentAddress)
+		{
+			this.pepClient?.Dispose();
+			this.pepClient = null;
+
+			this.pepClient = new PepClient(this.client, PubSubComponentAddress);
 
 			this.pepClient.OnUserActivity += PepClient_OnUserActivity;
 			this.pepClient.OnUserAvatarMetaData += PepClient_OnUserAvatarMetaData;
@@ -205,10 +218,6 @@ namespace Waher.Client.WPF.Model
 			this.pepClient.OnUserMood += PepClient_OnUserMood;
 			this.pepClient.OnUserTune += PepClient_OnUserTune;
 			this.pepClient.RegisterHandler(typeof(SensorData), PepClient_SensorData);
-
-			this.concentratorClient.OnEvent += ConcentratorClient_OnEvent;
-
-			this.client.Connect();
 		}
 
 		private void ConcentratorClient_OnEvent(object Sender, SourceEventMessageEventArgs EventMessage)
@@ -335,41 +344,23 @@ namespace Waher.Client.WPF.Model
 		{
 			base.Dispose();
 
-			if (this.connectionTimer != null)
-			{
-				this.connectionTimer.Dispose();
-				this.connectionTimer = null;
-			}
+			this.connectionTimer?.Dispose();
+			this.connectionTimer = null;
 
-			if (this.pepClient != null)
-			{
-				this.pepClient.Dispose();
-				this.pepClient = null;
-			}
+			this.pepClient?.Dispose();
+			this.pepClient = null;
 
-			if (this.sensorClient != null)
-			{
-				this.sensorClient.Dispose();
-				this.sensorClient = null;
-			}
+			this.sensorClient?.Dispose();
+			this.sensorClient = null;
 
-			if (this.controlClient != null)
-			{
-				this.controlClient.Dispose();
-				this.controlClient = null;
-			}
+			this.controlClient?.Dispose();
+			this.controlClient = null;
 
-			if (this.concentratorClient != null)
-			{
-				this.concentratorClient.Dispose();
-				this.concentratorClient = null;
-			}
+			this.concentratorClient?.Dispose();
+			this.concentratorClient = null;
 
-			if (this.synchronizationClient != null)
-			{
-				this.synchronizationClient.Dispose();
-				this.synchronizationClient = null;
-			}
+			this.synchronizationClient?.Dispose();
+			this.synchronizationClient = null;
 
 			if (this.client != null)
 			{
@@ -1099,7 +1090,10 @@ namespace Waher.Client.WPF.Model
 										Component = ThingRegistry;
 									}
 									else if (e2.HasFeature(PubSubClient.NamespacePubSub))
-										Component = new PubSubService(this, Item.JID, Item.Name, Item.Node, e2.Features);
+									{
+										this.AddPepClient(Item.JID);
+										Component = new PubSubService(this, Item.JID, Item.Name, Item.Node, e2.Features, this.pepClient.PubSubClient);
+									}
 									else if (e2.HasFeature(EventLog.NamespaceEventLogging))
 										Component = new EventLog(this, Item.JID, Item.Name, Item.Node, e2.Features);
 									else

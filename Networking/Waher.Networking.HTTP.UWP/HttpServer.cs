@@ -367,17 +367,11 @@ namespace Waher.Networking.HTTP
 #endif
 			}
 
-			if (this.sessions != null)
-			{
-				this.sessions.Dispose();
-				this.sessions = null;
-			}
+			this.sessions?.Dispose();
+			this.sessions = null;
 
-			if (this.currentRequests != null)
-			{
-				this.currentRequests.Dispose();
-				this.currentRequests = null;
-			}
+			this.currentRequests?.Dispose();
+			this.currentRequests = null;
 		}
 
 		/// <summary>
@@ -527,9 +521,9 @@ namespace Waher.Networking.HTTP
 		}
 #endif
 
-#endregion
+		#endregion
 
-#region Connections
+		#region Connections
 
 #if WINDOWS_UWP
 
@@ -648,9 +642,9 @@ namespace Waher.Networking.HTTP
 
 #endif
 
-#endregion
+		#endregion
 
-#region Resources
+		#region Resources
 
 		/// <summary>
 		/// By default, this property is null. If not null, or empty, every request made to the web server will
@@ -896,9 +890,9 @@ namespace Waher.Networking.HTTP
 			return false;
 		}
 
-#endregion
+		#endregion
 
-#region Sessions
+		#region Sessions
 
 		/// <summary>
 		/// Session timeout. Default is 20 minutes.
@@ -924,17 +918,33 @@ namespace Waher.Networking.HTTP
 		/// <returns>Session states.</returns>
 		public Variables GetSession(string SessionId)
 		{
+			return this.GetSession(SessionId, true);
+		}
+
+		/// <summary>
+		/// Gets the set of session states corresponing to a given session ID. If no such session is known, a new is created.
+		/// </summary>
+		/// <param name="SessionId">Session ID</param>
+		/// <param name="CreateIfNotFound">If a sesion should be created if not found.</param>
+		/// <returns>Session states, or null if not found and not crerated.</returns>
+		public Variables GetSession(string SessionId, bool CreateIfNotFound)
+		{
 			if (this.sessions.TryGetValue(SessionId, out Variables Result))
 				return Result;
 
-			Result = new Variables()
+			if (CreateIfNotFound)
 			{
-				{ "Global", globalVariables }
-			};
+				Result = new Variables()
+				{
+					{ "Global", globalVariables }
+				};
 
-			this.sessions.Add(SessionId, Result);
+				this.sessions.Add(SessionId, Result);
 
-			return Result;
+				return Result;
+			}
+			else
+				return null;
 		}
 
 		private void Sessions_Removed(object Sender, CacheItemEventArgs<string, Variables> e)
@@ -958,9 +968,9 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		public event CacheItemEventHandler<string, Variables> SessionRemoved = null;
 
-#endregion
+		#endregion
 
-#region Statistics
+		#region Statistics
 
 		/// <summary>
 		/// Call this method when data has been received.
@@ -1162,7 +1172,7 @@ namespace Waher.Networking.HTTP
 			}
 		}
 
-#endregion
+		#endregion
 
 		// TODO: Web Service resources
 	}

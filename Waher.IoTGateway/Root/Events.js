@@ -234,7 +234,16 @@ function EndsWith(String, Suffix)
     return String.substring(c - d, c) === Suffix;
 }
 
+function CheckServerInstance(ID)
+{
+    if (ServerID == "")
+        ServerID = ID;
+    else if (ServerID != ID)
+        Reload(null);
+}
+
 var TabID;
+var ServerID = "";
 var EventCheckingEnabled = true;
 
 try

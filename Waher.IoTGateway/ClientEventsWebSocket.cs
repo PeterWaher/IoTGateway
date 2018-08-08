@@ -5,7 +5,7 @@ using Waher.Content;
 using Waher.Networking.HTTP;
 using Waher.Networking.HTTP.HeaderFields;
 using Waher.Networking.HTTP.WebSockets;
-using Waher.Runtime.Cache;
+using Waher.Security;
 
 namespace Waher.IoTGateway
 {
@@ -15,6 +15,8 @@ namespace Waher.IoTGateway
 	/// </summary>
 	public class ClientEventsWebSocket : WebSocketListener
 	{
+		private static readonly string serverId = Hashes.BinaryToString(Gateway.NextBytes(32));
+
 		/// <summary>
 		/// Resource managing asynchronous events to web clients.
 		/// </summary>
@@ -50,6 +52,7 @@ namespace Waher.IoTGateway
 							};
 
 							ClientEvents.RegisterWebSocket(e.Socket, Location, TabID);
+							ClientEvents.PushEvent(new string[] { TabID }, "CheckServerInstance", serverId, false);
 						}
 						break;
 

@@ -130,6 +130,8 @@ namespace Waher.Client.WPF.Model.PubSub
 				{
 					this.Service.PubSubClient.GetLatestItems(this.node, 50, (sender, e) =>
 					{
+						MainWindow.MouseDefault();
+
 						if (e.Ok)
 						{
 							foreach (Networking.XMPP.PubSub.PubSubItem Item in e.Items)

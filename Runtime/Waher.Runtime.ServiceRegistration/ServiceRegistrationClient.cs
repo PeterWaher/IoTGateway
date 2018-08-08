@@ -160,12 +160,10 @@ namespace Waher.Runtime.ServiceRegistration
 			w.WriteEndElement();
 			w.Flush();
 
-			this.client.SendMessage(QoSLevel.Unacknowledged, MessageType.Normal, this.registryJid,
-				Xml.ToString(), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty,
-				(sender, e) =>
-				{
-					T.SetResult(e.Ok);
-				}, null);
+			this.client.SendIqSet(this.registryJid, Xml.ToString(), (sender, e) =>
+			{
+				T.SetResult(e.Ok);
+			}, null);
 
 			return T.Task;
 		}

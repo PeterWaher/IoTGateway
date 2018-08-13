@@ -441,15 +441,14 @@ namespace Waher.IoTGateway.Setup
 			{
 				string URL = this.customCA ? this.acmeDirectory : "https://acme-v02.api.letsencrypt.org/directory";
 				RSAParameters Parameters;
+				CspParameters CspParams = new CspParameters()
+				{
+					Flags = CspProviderFlags.UseMachineKeyStore,
+					KeyContainerName = "IoTGateway:" + URL
+				};
 
 				try
 				{
-					CspParameters CspParams = new CspParameters()
-					{
-						Flags = CspProviderFlags.UseMachineKeyStore,
-						KeyContainerName = "IoTGateway:" + URL
-					};
-
 					bool Ok;
 
 					using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(4096, CspParams))
@@ -567,6 +566,12 @@ namespace Waher.IoTGateway.Setup
 
 					ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Generating new key.", false, "User");
 					await Account.NewKey();
+
+					using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(4096, CspParams))
+					{
+						RSA.ImportParameters(Client.ExportAccountKey(true));
+					}
+
 					ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "New key generated.", false, "User");
 
 					ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Creating order.", false, "User");

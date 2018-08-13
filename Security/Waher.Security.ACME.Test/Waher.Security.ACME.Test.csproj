@@ -65,6 +65,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj">
+      <Project>{7f1b0d78-aa86-445b-9e1f-7df75b9e4c04}</Project>
+      <Name>Waher.Runtime.Inventory</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Waher.Security.ACME\Waher.Security.ACME.csproj">
       <Project>{881a8b62-e2a8-4569-b5af-6be3ae1a7a59}</Project>
       <Name>Waher.Security.ACME</Name>

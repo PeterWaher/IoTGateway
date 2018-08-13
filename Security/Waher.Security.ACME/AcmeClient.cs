@@ -483,9 +483,18 @@ namespace Waher.Security.ACME
 		{
 			if (this.directory == null)
 				await this.GetDirectory();
-
 			RSA NewKey = RSA.Create();
 			NewKey.KeySize = KeySize;
+
+			if (NewKey.KeySize != KeySize)	// Happens when using library from traditioanl .NET FW
+			{
+				Type T = Runtime.Inventory.Types.GetType("System.Security.Cryptography.RSACryptoServiceProvider");
+				if (T == null)
+					throw new Exception("Unable to set RSA key size to anything but default (" + NewKey.KeySize.ToString() + " bits).");
+
+				NewKey = Activator.CreateInstance(T, KeySize) as RSA;
+			}
+
 			RsaSsaPkcsSha256 Jws2 = new RsaSsaPkcsSha256(NewKey);
 
 			try
@@ -496,6 +505,7 @@ namespace Waher.Security.ACME
 					}, new KeyValuePair<string, object>[]
 					{
 						new KeyValuePair<string, object>("account", AccountLocation.ToString()),
+						new KeyValuePair<string, object>("oldkey", this.jws.PublicWebKey),
 						new KeyValuePair<string, object>("newkey", Jws2.PublicWebKey)
 					}, out string Header, out string Payload, out string Signature);
 
@@ -722,6 +732,16 @@ namespace Waher.Security.ACME
 				throw new Exception("Unexpected response returned. Content-Type: " + ContentType);
 
 			return Certificates;
+		}
+
+		/// <summary>
+		/// Exports the account key.
+		/// </summary>
+		/// <param name="IncludePrivateParameters">If private parameters should be included.</param>
+		/// <returns>RSA parameters belonging to account.</returns>
+		public RSAParameters ExportAccountKey(bool IncludePrivateParameters)
+		{
+			return this.jws.RSA.ExportParameters(IncludePrivateParameters);
 		}
 
 	}

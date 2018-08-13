@@ -415,15 +415,14 @@ namespace Waher.Utility.Acme
 		private static async Task Process()
 		{
 			RSAParameters Parameters;
+			CspParameters CspParams = new CspParameters()
+			{
+				Flags = CspProviderFlags.UseMachineKeyStore,
+				KeyContainerName = directory.ToString()
+			};
 
 			try
 			{
-				CspParameters CspParams = new CspParameters()
-				{
-					Flags = CspProviderFlags.UseMachineKeyStore,
-					KeyContainerName = directory.ToString()
-				};
-
 				using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(4096, CspParams))
 				{
 					Parameters = RSA.ExportParameters(true);
@@ -507,6 +506,11 @@ namespace Waher.Utility.Acme
 					LogInformational("Generating new key.");
 
 					await Account.NewKey();
+
+					using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(4096, CspParams))
+					{
+						RSA.ImportParameters(Client.ExportAccountKey(true));
+					}
 
 					LogInformational("New key generated.");
 				}

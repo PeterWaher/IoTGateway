@@ -2,6 +2,7 @@
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Waher.Runtime.Inventory;
 using Waher.Security.PKCS;
 
 namespace Waher.Security.ACME.Test
@@ -11,6 +12,12 @@ namespace Waher.Security.ACME.Test
 	{
 		private const string directory = "https://acme-staging-v02.api.letsencrypt.org/directory";
 		private AcmeClient client;
+
+		[AssemblyInitialize]
+		public static void AssemblyInitialize(TestContext Context)
+		{
+			Types.Initialize();
+		}
 
 		[TestInitialize]
 		public void TestInitialize()
@@ -102,8 +109,8 @@ namespace Waher.Security.ACME.Test
 			Assert.AreEqual(AcmeAccountStatus.valid, Account.Status);
 			Assert.IsNotNull(Account.Contact);
 			Assert.IsTrue(Account.Contact.Length > 1);
-			Assert.AreEqual("mailto:unit.test@waher.se", Account.Contact[0]);
-			Assert.AreEqual("mailto:unit.test2@waher.se", Account.Contact[1]);
+			Assert.IsTrue(Array.IndexOf<string>(Account.Contact, "mailto:unit.test@waher.se") >= 0);
+			Assert.IsTrue(Array.IndexOf<string>(Account.Contact, "mailto:unit.test2@waher.se") >= 0);
 		}
 
 		[TestMethod]
@@ -111,6 +118,17 @@ namespace Waher.Security.ACME.Test
 		{
 			AcmeAccount Account = await this.client.GetAccount();
 			await Account.NewKey();
+
+			CspParameters CspParams = new CspParameters()
+			{
+				Flags = CspProviderFlags.UseMachineKeyStore,
+				KeyContainerName = directory
+			};
+
+			using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(4096, CspParams))
+			{
+				RSA.ImportParameters(this.client.ExportAccountKey(true));
+			}
 		}
 
 		[TestMethod]
@@ -144,7 +162,7 @@ namespace Waher.Security.ACME.Test
 			Assert.IsNotNull(Order2);
 			Assert.AreEqual(Order.AuthorizationUris.Length, Order2.AuthorizationUris.Length);
 			Assert.IsNull(Order2.Certificate);
-			Assert.AreEqual(Order.Expires, Order2.Expires);
+			Assert.AreEqual(Order.Expires?.Date, Order2.Expires?.Date);
 			Assert.AreEqual(Order.Finalize, Order2.Finalize);
 			Assert.AreEqual(Order.Identifiers.Length, Order2.Identifiers.Length);
 			Assert.AreEqual(Order.Location, Order2.Location);
@@ -238,7 +256,7 @@ namespace Waher.Security.ACME.Test
 		{
 			AcmeAccount Account = await this.client.GetAccount();
 			AcmeOrder[] Orders = await Account.GetOrders();
-			
+
 			foreach (AcmeOrder Order in Orders)
 			{
 				Console.Out.WriteLine(Order.Location);

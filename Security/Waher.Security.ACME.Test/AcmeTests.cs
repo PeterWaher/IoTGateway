@@ -25,6 +25,12 @@ namespace Waher.Security.ACME.Test
 					KeyContainerName = directory
 				};
 
+				/*using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(4096, CspParams))
+				{
+					RSA.PersistKeyInCsp = false;
+					RSA.Clear();
+				}*/
+
 				using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(4096, CspParams))
 				{
 					Parameters = RSA.ExportParameters(true);
@@ -68,12 +74,12 @@ namespace Waher.Security.ACME.Test
 		[TestMethod]
 		public async Task ACME_Test_02_CreateAccount()
 		{
-			AcmeAccount Account = await this.client.CreateAccount(new string[] { "mailto:unit.test@example.com" }, true);
+			AcmeAccount Account = await this.client.CreateAccount(new string[] { "mailto:unit.test@waher.se" }, true);
 			Assert.IsNotNull(Account);
 			Assert.AreEqual(AcmeAccountStatus.valid, Account.Status);
 			Assert.IsNotNull(Account.Contact);
 			Assert.IsTrue(Account.Contact.Length > 0);
-			Assert.AreEqual("mailto:unit.test@example.com", Account.Contact[0]);
+			Assert.AreEqual("mailto:unit.test@waher.se", Account.Contact[0]);
 		}
 
 		[TestMethod]
@@ -84,20 +90,20 @@ namespace Waher.Security.ACME.Test
 			Assert.AreEqual(AcmeAccountStatus.valid, Account.Status);
 			Assert.IsNotNull(Account.Contact);
 			Assert.IsTrue(Account.Contact.Length > 0);
-			Assert.AreEqual("mailto:unit.test@example.com", Account.Contact[0]);
+			Assert.AreEqual("mailto:unit.test@waher.se", Account.Contact[0]);
 		}
 
 		[TestMethod]
 		public async Task ACME_Test_04_UpdateAccount()
 		{
 			AcmeAccount Account = await this.client.GetAccount();
-			Account = await Account.Update(new string[] { "mailto:unit.test@example.com", "mailto:unit.test2@example.com" });
+			Account = await Account.Update(new string[] { "mailto:unit.test@waher.se", "mailto:unit.test2@waher.se" });
 			Assert.IsNotNull(Account);
 			Assert.AreEqual(AcmeAccountStatus.valid, Account.Status);
 			Assert.IsNotNull(Account.Contact);
 			Assert.IsTrue(Account.Contact.Length > 1);
-			Assert.AreEqual("mailto:unit.test@example.com", Account.Contact[0]);
-			Assert.AreEqual("mailto:unit.test2@example.com", Account.Contact[1]);
+			Assert.AreEqual("mailto:unit.test@waher.se", Account.Contact[0]);
+			Assert.AreEqual("mailto:unit.test2@waher.se", Account.Contact[1]);
 		}
 
 		[TestMethod]

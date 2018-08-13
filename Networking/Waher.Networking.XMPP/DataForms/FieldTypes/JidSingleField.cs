@@ -79,6 +79,9 @@ namespace Waher.Networking.XMPP.DataForms.FieldTypes
 					this.Error = "Only one value allowed.";
 				else
 				{
+					if (Value.Length == 1 && string.IsNullOrEmpty(Value[0]) && !this.Required)
+						return;
+
 					foreach (string s in Value)
 					{
 						if (!XmppClient.FullJidRegEx.IsMatch(s))

@@ -75,6 +75,9 @@ namespace Waher.Networking.XMPP.DataForms.FieldTypes
 
 			if (!this.HasError && Value != null)
 			{
+				if (Value.Length == 1 && string.IsNullOrEmpty(Value[0]) && !this.Required)
+					return;
+
 				foreach (string s in Value)
 				{
 					if (!XmppClient.FullJidRegEx.IsMatch(s))

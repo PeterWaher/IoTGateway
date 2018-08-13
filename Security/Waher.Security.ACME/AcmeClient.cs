@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Reflection;
 using System.Security.Authentication;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
@@ -58,7 +59,19 @@ namespace Waher.Security.ACME
 				}, true);
 			}
 
-			this.httpClient.DefaultRequestHeaders.Add("User-Agent", typeof(AcmeClient).Namespace);
+			Type T = typeof(AcmeClient);
+			Version Version = T.GetTypeInfo().Assembly.GetName().Version;
+			StringBuilder UserAgent = new StringBuilder();
+
+			UserAgent.Append(T.Namespace);
+			UserAgent.Append('/');
+			UserAgent.Append(Version.Major.ToString());
+			UserAgent.Append('.');
+			UserAgent.Append(Version.Minor.ToString());
+			UserAgent.Append('.');
+			UserAgent.Append(Version.Build.ToString());
+
+			this.httpClient.DefaultRequestHeaders.Add("User-Agent", UserAgent.ToString());
 			this.httpClient.DefaultRequestHeaders.Add("Accept", JwsAlgorithm.JwsContentType);
 			this.httpClient.DefaultRequestHeaders.Add("Accept-Language", "en");
 		}
@@ -470,7 +483,7 @@ namespace Waher.Security.ACME
 		{
 			if (this.directory == null)
 				await this.GetDirectory();
-			
+
 			RSA NewKey = RSA.Create();
 			NewKey.KeySize = KeySize;
 			RsaSsaPkcsSha256 Jws2 = new RsaSsaPkcsSha256(NewKey);

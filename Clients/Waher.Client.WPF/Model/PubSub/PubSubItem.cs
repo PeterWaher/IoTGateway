@@ -9,6 +9,8 @@ using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.DataForms;
+using Waher.Networking.XMPP.DataForms.FieldTypes;
+using Waher.Networking.XMPP.DataForms.DataTypes;
 using Waher.Networking.XMPP.PubSub;
 using Waher.Networking.XMPP.ServiceDiscovery;
 using Waher.Things;
@@ -23,27 +25,37 @@ namespace Waher.Client.WPF.Model.PubSub
 	/// </summary>
 	public class PubSubItem : TreeNode
 	{
-		private readonly XmlDocument xml;
+		private XmlDocument xml;
 		private DateTime? published = null;
 		private readonly string jid = null;
 		private readonly string node = null;
 		private readonly string itemId = null;
-		private readonly string payload = null;
-		private readonly string publisher = null;
-		private readonly string title = null;
-		private readonly string summary = null;
-		private readonly string link = null;
+		private string payload = null;
+		private string publisher = null;
+		private string title = null;
+		private string summary = null;
+		private string link = null;
 
 		public PubSubItem(TreeNode Parent, string Jid, string Node, string ItemId, string Payload, string Publisher)
 			: base(Parent)
 		{
-			XmlElement E;
-
 			this.jid = Jid;
 			this.node = Node;
 			this.itemId = ItemId;
-			this.payload = Payload;
 			this.publisher = Publisher;
+
+			this.Init(Payload);
+		}
+
+		internal void Init(string Payload)
+		{
+			XmlElement E;
+
+			this.payload = Payload;
+			this.publisher = null;
+			this.title = null;
+			this.summary = null;
+			this.link = null;
 
 			this.xml = new XmlDocument();
 
@@ -86,7 +98,7 @@ namespace Waher.Client.WPF.Model.PubSub
 			}
 			catch (Exception)
 			{
-				this.xml = null;	// Not XML payload.
+				this.xml = null;    // Not XML payload.
 			}
 
 			List<Parameter> Parameters = new List<Parameter>();
@@ -153,23 +165,109 @@ namespace Waher.Client.WPF.Model.PubSub
 				return null;
 			}
 		}
-		public override bool CanAddChildren => false;   
-		public override bool CanDelete => false;    // TODO
-		public override bool CanEdit => !string.IsNullOrEmpty(this.link);
+		public override bool CanAddChildren => false;
+		public override bool CanDelete => true;
+		public override bool CanEdit => true;
 
 		public override void Edit()
 		{
-			if (!string.IsNullOrEmpty(this.link))
+			Mouse.OverrideCursor = Cursors.Wait;
+
+			this.Service.PubSubClient.GetItems(this.node, new string[] { this.itemId }, (sender, e) =>
 			{
-				try
+				MainWindow.MouseDefault();
+
+				if (e.Ok)
 				{
-					System.Diagnostics.Process.Start(this.link);
+					if (e.Items.Length == 1)
+					{
+						Networking.XMPP.PubSub.PubSubItem Item = e.Items[0];
+						DataForm Form = null;
+						ParameterDialog Dialog = null;
+
+						Form = new DataForm(this.Service.PubSubClient.Client,
+							(sender2, e2) =>
+							{
+								string Payload = Form["Payload"].ValueString;
+
+								try
+								{
+									XmlDocument Xml = new XmlDocument();
+									Xml.LoadXml(Payload);
+								}
+								catch (Exception ex)
+								{
+									Form["Payload"].Error = ex.Message;
+
+									MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() =>
+									{
+										Dialog = new ParameterDialog(Form);
+										Dialog.ShowDialog();
+									}));
+
+									return;
+								}
+
+								Mouse.OverrideCursor = Cursors.Wait;
+
+								this.Service.PubSubClient.Publish(this.node, this.itemId, Payload, (sender3, e3) =>
+								{
+									MainWindow.MouseDefault();
+
+									if (e3.Ok)
+									{
+										this.Init(Payload);
+										this.OnUpdated();
+									}
+									else
+										MainWindow.ErrorBox("Unable to update item: " + e3.ErrorText);
+								}, null);
+							},
+							(sender2, e2) =>
+							{
+								// Do nothing.
+							}, e.From, e.To,
+							new JidSingleField(null, "Publisher", "Publisher:", false, new string[] { Item.Publisher }, null, "JID of publisher.",
+								null, null, string.Empty, false, true, false),
+							new TextMultiField(null, "Payload", "XML:", false, new string[] { Item.Payload }, null, "XML payload of item.",
+								StringDataType.Instance, null, string.Empty, false, false, false));
+
+						Dialog = new ParameterDialog(Form);
+
+						MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() =>
+						{
+							Dialog.ShowDialog();
+						}));
+					}
 				}
-				catch (Exception ex)
+				else
+					MainWindow.ErrorBox("Unable to get item from server: " + e.ErrorText);
+			}, null);
+		}
+
+		public override void Delete(TreeNode Parent, EventHandler OnDeleted)
+		{
+			Mouse.OverrideCursor = Cursors.Wait;
+
+			this.Service.PubSubClient.Retract(this.node, this.itemId, (sender, e) =>
+			{
+				MainWindow.MouseDefault();
+
+				if (e.Ok)
 				{
-					MainWindow.ErrorBox("Unable to open link: " + ex.Message);
+					try
+					{
+						base.Delete(Parent, OnDeleted);
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
 				}
-			}
+				else
+					MainWindow.ErrorBox("Unable to delete item: " + e.ErrorText);
+
+			}, null);
 		}
 
 	}

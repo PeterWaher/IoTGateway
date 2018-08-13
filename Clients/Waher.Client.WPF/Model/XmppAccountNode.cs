@@ -765,7 +765,7 @@ namespace Waher.Client.WPF.Model
 					if (e.Availability != Availability.Offline && Node.GetType() == typeof(XmppContact))
 						this.client.SendServiceDiscoveryRequest(e.From, this.ServiceDiscoveryResponse, Node);
 				}
-				else if (e.FromBareJID == this.client.BareJID)
+				else if (string.Compare(e.FromBareJID, this.client.BareJID, true) == 0)
 					this.client.Information("Presence from same bare JID. Ignored.");
 				else
 					this.client.Error("Presence from node not found in roster: " + e.FromBareJID);

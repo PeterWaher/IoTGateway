@@ -6,21 +6,21 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Threading;
 using Waher.Content;
 using Waher.Events;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.DataForms.FieldTypes;
+using Waher.Networking.XMPP.DataForms.DataTypes;
 using Waher.Networking.XMPP.PubSub;
 using Waher.Networking.XMPP.ServiceDiscovery;
+using Waher.Client.WPF.Dialogs;
 
 namespace Waher.Client.WPF.Model.PubSub
 {
 	public class PubSubService : XmppComponent
 	{
-		private PubSubClient pubSubClient;
+		private readonly PubSubClient pubSubClient;
 		internal bool SupportsAccessAuthorize;
 		internal bool SupportsAccessOpen;
 		internal bool SupportsAccessPresence;
@@ -104,6 +104,34 @@ namespace Waher.Client.WPF.Model.PubSub
 			{
 				{ string.Empty, new Loading(this) }
 			};
+
+			this.pubSubClient.ItemNotification += PubSubClient_ItemNotification;
+			this.pubSubClient.ItemRetracted += PubSubClient_ItemRetracted;
+			this.pubSubClient.NodePurged += PubSubClient_NodePurged;
+			this.pubSubClient.SubscriptionRequest += PubSubClient_SubscriptionRequest;
+		}
+
+		private void PubSubClient_SubscriptionRequest(object Sender, SubscriptionRequestEventArgs e)
+		{
+			// TODO
+		}
+
+		private void PubSubClient_NodePurged(object Sender, NodeNotificationEventArgs e)
+		{
+			if (this.TryGetChild(e.NodeName, out TreeNode N) && N is PubSubNode Node)
+				Node.Purged(e);
+		}
+
+		private void PubSubClient_ItemRetracted(object Sender, ItemNotificationEventArgs e)
+		{
+			if (this.TryGetChild(e.NodeName, out TreeNode N) && N is PubSubNode Node)
+				Node.ItemRetracted(e);
+		}
+
+		private void PubSubClient_ItemNotification(object Sender, ItemNotificationEventArgs e)
+		{
+			if (this.TryGetChild(e.NodeName, out TreeNode N) && N is PubSubNode Node)
+				Node.ItemNotification(e);
 		}
 
 		public PubSubClient PubSubClient
@@ -125,7 +153,7 @@ namespace Waher.Client.WPF.Model.PubSub
 
 		protected override void LoadChildren()
 		{
-			if (!this.loadingChildren && this.children != null && this.children.Count == 1 && this.children.ContainsKey(string.Empty))
+			if (!this.loadingChildren && !this.IsLoaded)
 			{
 				Mouse.OverrideCursor = Cursors.Wait;
 
@@ -185,6 +213,87 @@ namespace Waher.Client.WPF.Model.PubSub
 
 			base.LoadChildren();
 		}
+
+		public override bool CanAddChildren => true;
+
+		public override void Add()
+		{
+			Mouse.OverrideCursor = Cursors.Wait;
+
+			this.pubSubClient.GetDefaultNodeConfiguration((sender, e) =>
+			{
+				MainWindow.MouseDefault();
+
+				if (e.Ok)
+				{
+					int c = e.Form.Fields.Length;
+					Field[] Fields = new Field[c + 1];
+					DataForm Form = null;
+
+					Array.Copy(e.Form.Fields, 0, Fields, 1, c);
+					Fields[0] = new TextSingleField(null, "Node", "Node Name:", true, new string[] { string.Empty }, null, "Name of the node to create.",
+						StringDataType.Instance, null, string.Empty, false, false, false);
+
+					Form = new DataForm(this.pubSubClient.Client,
+						(sender2, e2) =>
+						{
+							string NodeName = Form["Node"].ValueString;
+							string Title = Form["pubsub#title"]?.ValueString ?? string.Empty;
+
+							if (!Enum.TryParse<NodeType>(Form["pubsub#node_type"]?.ValueString ?? string.Empty, out NodeType Type))
+								Type = NodeType.leaf;
+
+							Mouse.OverrideCursor = Cursors.Wait;
+
+							this.pubSubClient.CreateNode(NodeName, e.Form, (sender3, e3) =>
+							{
+								MainWindow.MouseDefault();
+
+								if (e3.Ok)
+								{
+									if (this.IsLoaded)
+									{
+										PubSubNode Node = new PubSubNode(this, this.pubSubClient.ComponentAddress, NodeName, Title, Type);
+
+										if (this.children == null)
+											this.children = new SortedDictionary<string, TreeNode>() { { Node.Key, Node } };
+										else
+										{
+											lock (this.children)
+											{
+												this.children[Node.Key] = Node;
+											}
+										}
+
+										MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() =>
+										{
+											this.Account?.View?.NodeAdded(this, Node);
+											this.OnUpdated();
+										}));
+									}
+								}
+								else
+									MainWindow.ErrorBox("Unable to create node: " + e3.ErrorText);
+							}, null);
+						},
+						(sender2, e2) =>
+						{
+						// Do nothing.
+					}, string.Empty, string.Empty, Fields);
+
+					ParameterDialog Dialog = new ParameterDialog(Form);
+
+					MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() =>
+					{
+						Dialog.ShowDialog();
+					}));
+				}
+				else
+					MainWindow.ErrorBox("Unable to get default node properties: " + e.ErrorText);
+
+			}, null);
+		}
+
 
 	}
 }

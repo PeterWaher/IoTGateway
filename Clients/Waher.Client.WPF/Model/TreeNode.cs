@@ -279,6 +279,20 @@ namespace Waher.Client.WPF.Model
 			base.OnSelected();
 		}
 
+		protected virtual bool IsLoaded
+		{
+			get
+			{
+				if (this.children == null)
+					return true;
+
+				lock (this.children)
+				{
+					return this.children.Count != 1 || !this.children.ContainsKey(string.Empty);
+				}
+			}
+		}
+
 		/// <summary>
 		/// Method is called to make sure children are loaded.
 		/// </summary>

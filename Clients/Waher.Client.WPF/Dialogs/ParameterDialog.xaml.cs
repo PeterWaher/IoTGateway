@@ -243,7 +243,7 @@ namespace Waher.Client.WPF.Dialogs
 
 			CheckBox = new CheckBox()
 			{
-				Name = "Form_" + Field.Var,
+				Name = VarToName(Field.Var),
 				Content = TextBlock,
 				Margin = new Thickness(0, 3, 0, 3),
 				IsEnabled = !Field.ReadOnly,
@@ -269,11 +269,10 @@ namespace Waher.Client.WPF.Dialogs
 
 		private void CheckBox_Click(object sender, RoutedEventArgs e)
 		{
-			CheckBox CheckBox = sender as CheckBox;
-			if (CheckBox == null)
+			if (!(sender is CheckBox CheckBox))
 				return;
 
-			string Var = CheckBox.Name.Substring(5);
+			string Var = NameToVar(CheckBox.Name);
 			Field Field = this.form[Var];
 			if (Field == null)
 				return;
@@ -364,7 +363,7 @@ namespace Waher.Client.WPF.Dialogs
 
 			GroupBox GroupBox = new GroupBox();
 			Container.Children.Add(GroupBox);
-			GroupBox.Name = "Form_" + Field.Var;
+			GroupBox.Name = VarToName(Field.Var);
 			GroupBox.Header = TextBlock;
 			GroupBox.ToolTip = Field.Description;
 			GroupBox.Margin = new Thickness(5, 5, 5, 5);
@@ -404,19 +403,16 @@ namespace Waher.Client.WPF.Dialogs
 
 		private void MultiListCheckBox_Click(object sender, RoutedEventArgs e)
 		{
-			CheckBox CheckBox = sender as CheckBox;
-			if (CheckBox == null)
+			if (!(sender is CheckBox CheckBox))
 				return;
 
-			StackPanel StackPanel = CheckBox.Parent as StackPanel;
-			if (StackPanel == null)
+			if (!(CheckBox.Parent is StackPanel StackPanel))
 				return;
 
-			GroupBox GroupBox = StackPanel.Parent as GroupBox;
-			if (GroupBox == null)
+			if (!(StackPanel.Parent is GroupBox GroupBox))
 				return;
 
-			string Var = GroupBox.Name.Substring(5);
+			string Var = NameToVar(GroupBox.Name);
 			Field Field = this.form[Var];
 			if (Field == null)
 				return;
@@ -468,7 +464,7 @@ namespace Waher.Client.WPF.Dialogs
 
 			ComboBox ComboBox = new ComboBox()
 			{
-				Name = "Form_" + Field.Var,
+				Name = VarToName(Field.Var),
 				IsReadOnly = Field.ReadOnly,
 				ToolTip = Field.Description,
 				Margin = new Thickness(0, 0, 0, 5)
@@ -516,11 +512,10 @@ namespace Waher.Client.WPF.Dialogs
 
 		private void ComboBox_TextChanged(object sender, TextChangedEventArgs e)
 		{
-			ComboBox ComboBox = sender as ComboBox;
-			if (ComboBox == null)
+			if (!(sender is ComboBox ComboBox))
 				return;
 
-			string Var = ComboBox.Name.Substring(5);
+			string Var = NameToVar(ComboBox.Name);
 			Field Field = this.form[Var];
 			if (Field == null)
 				return;
@@ -550,20 +545,18 @@ namespace Waher.Client.WPF.Dialogs
 
 		private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
-			ComboBox ComboBox = sender as ComboBox;
-			if (ComboBox == null)
+			if (!(sender is ComboBox ComboBox))
 				return;
 
-			string Var = ComboBox.Name.Substring(5);
+			string Var = NameToVar(ComboBox.Name);
 			Field Field = this.form[Var];
 			if (Field == null)
 				return;
 
 			TextBlock ErrorLabel = (TextBlock)ComboBox.Tag;
-			ComboBoxItem Item = ComboBox.SelectedItem as ComboBoxItem;
 			string Value;
 
-			if (Item == null)
+			if (!(ComboBox.SelectedItem is ComboBoxItem Item))
 				Value = string.Empty;
 			else
 				Value = (string)Item.Tag;
@@ -879,7 +872,7 @@ namespace Waher.Client.WPF.Dialogs
 
 			PasswordBox PasswordBox = new PasswordBox()
 			{
-				Name = "Form_" + Field.Var,
+				Name = VarToName(Field.Var),
 				Password = Field.ValueString,
 				IsEnabled = !Field.ReadOnly,
 				ToolTip = Field.Description,
@@ -901,11 +894,10 @@ namespace Waher.Client.WPF.Dialogs
 
 		private void PasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
 		{
-			PasswordBox PasswordBox = sender as PasswordBox;
-			if (PasswordBox == null)
+			if (!(sender is PasswordBox PasswordBox))
 				return;
 
-			string Var = PasswordBox.Name.Substring(5);
+			string Var = NameToVar(PasswordBox.Name);
 			Field Field = this.form[Var];
 			if (Field == null)
 				return;
@@ -943,7 +935,7 @@ namespace Waher.Client.WPF.Dialogs
 
 			TextBox TextBox = new TextBox()
 			{
-				Name = "Form_" + Field.Var,
+				Name = VarToName(Field.Var),
 				Text = Field.ValueString,
 				IsReadOnly = Field.ReadOnly,
 				ToolTip = Field.Description,
@@ -1006,11 +998,10 @@ namespace Waher.Client.WPF.Dialogs
 
 		private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
 		{
-			TextBox TextBox = sender as TextBox;
-			if (TextBox == null)
+			if (!(sender is TextBox TextBox))
 				return;
 
-			string Var = TextBox.Name.Substring(5);
+			string Var = NameToVar(TextBox.Name);
 			Field Field = this.form[Var];
 			if (Field == null)
 				return;
@@ -1176,6 +1167,16 @@ namespace Waher.Client.WPF.Dialogs
 						E.BringIntoView();
 				}
 			}
+		}
+
+		private static string VarToName(string Var)
+		{
+			return "Form_" + Var.Replace("#", "__GATO__");
+		}
+
+		private static string NameToVar(string Name)
+		{
+			return Name.Substring(5).Replace("__GATO__", "#");
 		}
 
 		// TODO: Color picker.

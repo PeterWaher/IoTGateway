@@ -16,8 +16,8 @@ namespace Waher.Client.WPF.Model.Concentrator
 	public class XmppConcentrator : XmppContact
 	{
 		private Dictionary<string, bool> capabilities = null;
-		private Dictionary<string, DataSource> dataSources = new Dictionary<string, DataSource>();
-		private bool suportsEvents;
+		private readonly Dictionary<string, DataSource> dataSources = new Dictionary<string, DataSource>();
+		private readonly bool suportsEvents;
 
 		public XmppConcentrator(TreeNode Parent, XmppClient Client, string BareJid, bool SupportsEventSubscripton)
 			: base(Parent, Client, BareJid)
@@ -87,7 +87,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 
 		protected override void LoadChildren()
 		{
-			if (!this.loadingChildren && this.children != null && this.children.Count == 1 && this.children.ContainsKey(string.Empty))
+			if (!this.loadingChildren && this.IsLoaded)
 			{
 				string FullJid = this.FullJid;
 
@@ -186,7 +186,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 		{
 			base.UnloadChildren();
 
-			if (this.children == null || this.children.Count != 1 || !this.children.ContainsKey(string.Empty))
+			if (!this.IsLoaded)
 			{
 				if (this.children != null)
 					this.NodesRemoved(this.children.Values, this);

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Windows;
 using System.Windows.Media;
 using System.Windows.Input;
 using System.Xml;
@@ -8,12 +9,15 @@ using Waher.Content;
 using Waher.Events;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.DataForms;
+using Waher.Networking.XMPP.DataForms.DataTypes;
+using Waher.Networking.XMPP.DataForms.FieldTypes;
 using Waher.Networking.XMPP.PubSub;
 using Waher.Networking.XMPP.ServiceDiscovery;
 using Waher.Things;
 using Waher.Things.DisplayableParameters;
 using Waher.Things.SensorData;
 using Waher.Client.WPF.Dialogs;
+using System.Windows.Controls;
 
 namespace Waher.Client.WPF.Model.PubSub
 {
@@ -22,10 +26,10 @@ namespace Waher.Client.WPF.Model.PubSub
 	/// </summary>
 	public class PubSubNode : TreeNode
 	{
-		private readonly NodeType nodeType;
+		private NodeType nodeType;
 		private readonly string jid;
 		private readonly string node;
-		private readonly string name;
+		private string name;
 
 		public PubSubNode(TreeNode Parent, string Jid, string Node, string Name, NodeType NodeType)
 			: base(Parent)
@@ -35,6 +39,11 @@ namespace Waher.Client.WPF.Model.PubSub
 			this.name = Name;
 			this.nodeType = NodeType;
 
+			this.SetParameters();
+		}
+
+		private void SetParameters()
+		{
 			List<Parameter> Parameters = new List<Parameter>();
 
 			if (!string.IsNullOrEmpty(this.jid))
@@ -113,13 +122,13 @@ namespace Waher.Client.WPF.Model.PubSub
 			}
 		}
 
-		public override bool CanAddChildren => false;   // TODO
-		public override bool CanDelete => false;    // TODO
-		public override bool CanEdit => false;  // TODO
+		public override bool CanAddChildren => true;
+		public override bool CanDelete => true;
+		public override bool CanEdit => true;
 
 		protected override void LoadChildren()
 		{
-			if (!this.loadingChildren && this.children != null && this.children.Count == 1 && this.children.ContainsKey(string.Empty))
+			if (!this.loadingChildren && !this.IsLoaded)
 			{
 				SortedDictionary<string, TreeNode> Children = new SortedDictionary<string, TreeNode>();
 
@@ -130,6 +139,7 @@ namespace Waher.Client.WPF.Model.PubSub
 				{
 					this.Service.PubSubClient.GetLatestItems(this.node, 50, (sender, e) =>
 					{
+						this.loadingChildren = false;
 						MainWindow.MouseDefault();
 
 						if (e.Ok)
@@ -141,6 +151,12 @@ namespace Waher.Client.WPF.Model.PubSub
 
 							this.OnUpdated();
 							this.Service.NodesAdded(this.children.Values, this);
+
+							this.Service.PubSubClient.Subscribe(this.node, (sender2, e2) =>
+							{
+								if (!e2.Ok)
+									MainWindow.ErrorBox("Unable to subscribe to new items: " + e.ErrorText);
+							}, null);
 						}
 						else
 							MainWindow.ErrorBox(string.IsNullOrEmpty(e.ErrorText) ? "Unable to get latest items." : e.ErrorText);
@@ -270,7 +286,7 @@ namespace Waher.Client.WPF.Model.PubSub
 		{
 			base.UnloadChildren();
 
-			if (this.children == null || this.children.Count != 1 || !this.children.ContainsKey(string.Empty))
+			if (this.IsLoaded)
 			{
 				if (this.children != null)
 					this.Service?.NodesRemoved(this.children.Values, this);
@@ -281,7 +297,248 @@ namespace Waher.Client.WPF.Model.PubSub
 				};
 
 				this.OnUpdated();
+
+				this.Service.PubSubClient.Unsubscribe(this.node, null, null);
 			}
+		}
+
+		public override void Add()
+		{
+			DataForm Form = null;
+			ParameterDialog Dialog = null;
+
+			Form = new DataForm(this.Service.PubSubClient.Client,
+				(sender2, e2) =>
+				{
+					string Payload = Form["Payload"].ValueString;
+					string ItemId = Form["ItemId"].ValueString;
+
+					try
+					{
+						XmlDocument Xml = new XmlDocument();
+						Xml.LoadXml(Payload);
+					}
+					catch (Exception ex)
+					{
+						Form["Payload"].Error = ex.Message;
+
+						MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() =>
+						{
+							Dialog = new ParameterDialog(Form);
+							Dialog.ShowDialog();
+						}));
+
+						return;
+					}
+
+					Mouse.OverrideCursor = Cursors.Wait;
+
+					this.Service.PubSubClient.Publish(this.node, ItemId, Payload, (sender3, e3) =>
+					{
+						MainWindow.MouseDefault();
+
+						if (!e3.Ok)
+							MainWindow.ErrorBox("Unable to add item: " + e3.ErrorText);
+					}, null);
+				},
+				(sender2, e2) =>
+				{
+					// Do nothing.
+				}, string.Empty, string.Empty,
+				new TextSingleField(null, "ItemId", "Item ID:", false, new string[] { string.Empty }, null, "ID of item to create. If not provided, one will be generated for you.",
+					StringDataType.Instance, null, string.Empty, false, false, false),
+				new TextMultiField(null, "Payload", "XML:", false, new string[] { string.Empty }, null, "XML payload of item.",
+					StringDataType.Instance, null, string.Empty, false, false, false));
+
+			Dialog = new ParameterDialog(Form);
+
+			MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() =>
+			{
+				Dialog.ShowDialog();
+			}));
+		}
+
+		internal void ItemNotification(ItemNotificationEventArgs e)
+		{
+			if (this.IsLoaded)
+			{
+				if (this.TryGetChild(e.ItemId, out TreeNode N) && N is PubSubItem Item)
+				{
+					Item.Init(e.Item.InnerXml);
+					Item.OnUpdated();
+				}
+				else
+				{
+					Item = new PubSubItem(this, e.Publisher, e.NodeName, e.ItemId, e.Item.InnerText, e.Publisher);
+
+					if (this.children == null)
+						this.children = new SortedDictionary<string, TreeNode>() { { Item.Key, Item } };
+					else
+					{
+						lock (this.children)
+						{
+							this.children[Item.Key] = Item;
+						}
+					}
+
+					MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() =>
+					{
+						Service?.Account?.View?.NodeAdded(this, Item);
+						this.OnUpdated();
+					}));
+				}
+			}
+		}
+
+		internal void ItemRetracted(ItemNotificationEventArgs e)
+		{
+			if (this.TryGetChild(e.ItemId, out TreeNode N) && this.RemoveChild(N))
+			{
+				MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() =>
+				{
+					Service?.Account?.View?.NodeRemoved(this, N);
+					this.OnUpdated();
+				}));
+			}
+		}
+
+		internal void Purged(NodeNotificationEventArgs e)
+		{
+			if (this.children == null)
+				return;
+
+			TreeNode[] ToRemove;
+
+			lock (this.children)
+			{
+				ToRemove = new TreeNode[this.children.Count];
+				this.children.Values.CopyTo(ToRemove, 0);
+				this.children = null;
+			}
+
+			MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() =>
+			{
+				foreach (TreeNode Node in ToRemove)
+					Service?.Account?.View?.NodeRemoved(this, Node);
+
+				this.OnUpdated();
+			}));
+		}
+
+		public override void AddContexMenuItems(ref string CurrentGroup, ContextMenu Menu)
+		{
+			base.AddContexMenuItems(ref CurrentGroup, Menu);
+
+			CurrentGroup = "PubSubNode";
+
+			MenuItem MenuItem;
+
+			Menu.Items.Add(MenuItem = new MenuItem()
+			{
+				Header = "Purge...",
+				IsEnabled = true,
+			});
+
+			MenuItem.Click += Purge_Click;
+		}
+
+		private void Purge_Click(object sender, RoutedEventArgs e)
+		{
+			if (MessageBox.Show(MainWindow.currentInstance, "Are you sure you want to purge all items in " + this.node + "?", "Are you sure?", MessageBoxButton.YesNo,
+				MessageBoxImage.Question, MessageBoxResult.No) == MessageBoxResult.Yes)
+			{
+				try
+				{
+					this.Service.PubSubClient.PurgeNode(this.node, (sender2, e2) =>
+					{
+						if (!e2.Ok)
+							MainWindow.ErrorBox("Unable to purge the node: " + e2.ErrorText);
+
+					}, null);
+				}
+				catch (Exception ex)
+				{
+					MainWindow.ErrorBox(ex.Message);
+				}
+			}
+		}
+
+		public override void Edit()
+		{
+			Mouse.OverrideCursor = Cursors.Wait;
+
+			this.PubSubClient.GetNodeConfiguration(this.node, (sender, e) =>
+			{
+				MainWindow.MouseDefault();
+
+				if (e.Ok)
+				{
+					DataForm Form = null;
+
+					Form = new DataForm(this.PubSubClient.Client,
+						(sender2, e2) =>
+						{
+							Mouse.OverrideCursor = Cursors.Wait;
+
+							this.PubSubClient.ConfigureNode(this.node, e.Form, (sender3, e3) =>
+							{
+								MainWindow.MouseDefault();
+
+								if (e3.Ok)
+								{
+									this.name = Form["pubsub#title"]?.ValueString ?? string.Empty;
+
+									if (!Enum.TryParse<NodeType>(Form["pubsub#node_type"]?.ValueString ?? string.Empty, out this.nodeType))
+										this.nodeType = NodeType.leaf;
+
+									this.SetParameters();
+									this.OnUpdated();
+								}
+								else
+									MainWindow.ErrorBox("Unable to update node: " + e3.ErrorText);
+							}, null);
+						},
+						(sender2, e2) =>
+						{
+							// Do nothing.
+						}, string.Empty, string.Empty, e.Form.Fields);
+
+					ParameterDialog Dialog = new ParameterDialog(Form);
+
+					MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() =>
+					{
+						Dialog.ShowDialog();
+					}));
+				}
+				else
+					MainWindow.ErrorBox("Unable to get node properties: " + e.ErrorText);
+
+			}, null);
+		}
+
+		public override void Delete(TreeNode Parent, EventHandler OnDeleted)
+		{
+			Mouse.OverrideCursor = Cursors.Wait;
+
+			this.Service.PubSubClient.DeleteNode(this.node, (sender, e) =>
+			{
+				MainWindow.MouseDefault();
+
+				if (e.Ok)
+				{
+					try
+					{
+						base.Delete(Parent, OnDeleted);
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
+				}
+				else
+					MainWindow.ErrorBox("Unable to delete node: " + e.ErrorText);
+
+			}, null);
 		}
 
 	}

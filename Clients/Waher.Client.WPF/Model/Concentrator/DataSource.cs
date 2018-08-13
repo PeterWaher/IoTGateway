@@ -16,11 +16,11 @@ namespace Waher.Client.WPF.Model.Concentrator
 	/// </summary>
 	public class DataSource : TreeNode
 	{
-		private Dictionary<string, Node> nodes = new Dictionary<string, Node>();
+		private readonly Dictionary<string, Node> nodes = new Dictionary<string, Node>();
 		private Timer timer = null;
-		private string key;
-		private string header;
-		private bool hasChildSources;
+		private readonly string key;
+		private readonly string header;
+		private readonly bool hasChildSources;
 		private bool unsubscribed = false;
 
 		public DataSource(TreeNode Parent, string Key, string Header, bool HasChildSources)
@@ -94,7 +94,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 
 		protected override void LoadChildren()
 		{
-			if (!this.loadingChildren && this.children != null && this.children.Count == 1 && this.children.ContainsKey(string.Empty))
+			if (!this.loadingChildren && !this.IsLoaded)
 			{
 				string FullJid = this.Concentrator?.FullJid;
 
@@ -260,7 +260,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 		{
 			base.UnloadChildren();
 
-			if (this.children == null || this.children.Count != 1 || !this.children.ContainsKey(string.Empty))
+			if (this.IsLoaded)
 			{
 				if (this.children != null)
 					this.NodesRemoved(this.children.Values, this);

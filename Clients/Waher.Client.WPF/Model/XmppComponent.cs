@@ -157,7 +157,10 @@ namespace Waher.Client.WPF.Model
 						ToRemove.AddLast(new KeyValuePair<TreeNode, TreeNode>(Node, Child));
 				}
 
-				View.NodeRemoved(Parent, Node);
+				MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() =>
+				{
+					View.NodeRemoved(Parent, Node);
+				}));
 			}
 		}
 

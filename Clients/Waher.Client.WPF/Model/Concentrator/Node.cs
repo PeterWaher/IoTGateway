@@ -156,7 +156,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 
 		protected override void LoadChildren()
 		{
-			if (!this.loadingChildren && this.children != null && this.children.Count == 1 && this.children.ContainsKey(string.Empty))
+			if (!this.loadingChildren && !this.IsLoaded)
 			{
 				string FullJid = this.Concentrator?.FullJid;
 				ConcentratorClient ConcentratorClient = this.ConcentratorClient;
@@ -206,7 +206,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 		{
 			base.UnloadChildren();
 
-			if (this.nodeInfo.HasChildren && (this.children == null || this.children.Count != 1 || !this.children.ContainsKey(string.Empty)))
+			if (this.nodeInfo.HasChildren && this.IsLoaded)
 			{
 				if (this.children != null)
 					this.DataSource?.NodesRemoved(this.children.Values, this);
@@ -387,7 +387,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 
 		internal void Add(Node Node)
 		{
-			if (!this.loadingChildren && (this.children == null || this.children.Count != 1 || !this.children.ContainsKey(string.Empty)))
+			if (!this.loadingChildren && this.IsLoaded)
 			{
 				SortedDictionary<string, TreeNode> Children = new SortedDictionary<string, TreeNode>();
 

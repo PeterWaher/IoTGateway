@@ -87,7 +87,7 @@ namespace Waher.Networking.XMPP.DataForms
 		private Dictionary<string, Field> fieldsByVar = new Dictionary<string, Field>();
 		private DataFormEventHandler onSubmit;
 		private DataFormEventHandler onCancel;
-		private XmppClient client;
+		private readonly XmppClient client;
 		private FormType type;
 		private Field[] fields;
 		private Field[] header;
@@ -96,10 +96,10 @@ namespace Waher.Networking.XMPP.DataForms
 		private string[] instructions;
 		private string title = string.Empty;
 		private object state = null;
-		private string from;
-		private string to;
-		private bool containsPostBackFields = false;
-		private bool hasPages = false;
+		private readonly string from;
+		private readonly string to;
+		private readonly bool containsPostBackFields = false;
+		private readonly bool hasPages = false;
 		private bool hasMedia = false;
 
 		/// <summary>

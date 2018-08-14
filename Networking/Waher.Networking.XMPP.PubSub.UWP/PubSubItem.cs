@@ -15,6 +15,7 @@ namespace Waher.Networking.XMPP.PubSub
 		private string publisher = string.Empty;
 		private string payload = string.Empty;
 		private XmlElement item;
+		private object tag = null;
 
 		/// <summary>
 		/// Represents a published item.
@@ -73,6 +74,15 @@ namespace Waher.Networking.XMPP.PubSub
 		{
 			get { return this.item; }
 			set { this.item = value; }
+		}
+
+		/// <summary>
+		/// Can be used to tag an object to the item on the client side.
+		/// </summary>
+		public object Tag
+		{
+			get { return this.tag; }
+			set { this.tag = value; }
 		}
 
 	}

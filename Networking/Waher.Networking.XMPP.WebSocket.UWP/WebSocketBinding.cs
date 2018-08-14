@@ -475,7 +475,7 @@ namespace Waher.Networking.XMPP.WebSocket
 						this.xmppClient?.TransmitText(Packet);
 
 					ArraySegment<byte> Buffer = new ArraySegment<byte>(System.Text.Encoding.UTF8.GetBytes(Packet));
-					await this.webSocketClient.SendAsync(Buffer, WebSocketMessageType.Text, true, CancellationToken.None);
+					await this.webSocketClient?.SendAsync(Buffer, WebSocketMessageType.Text, true, CancellationToken.None);
 
 					this.bindingInterface.NextPing = DateTime.Now.AddMinutes(1);
 

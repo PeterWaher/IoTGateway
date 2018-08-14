@@ -128,10 +128,9 @@ namespace Waher.Networking.UPnP
 		/// <returns>Return value, if any, null otherwise.</returns>
 		public object Invoke(Dictionary<string, object> InputValues, out Dictionary<string, object> OutputValues, int Timeout)
 		{
-			Task<KeyValuePair<object, Dictionary<string, object>>> Task = this.InvokeAsync(InputValues, Timeout);
-			Task.Wait();
-			OutputValues = Task.Result.Value;
-			return Task.Result.Key;
+			KeyValuePair<object, Dictionary<string, object>> Result = this.InvokeAsync(InputValues, Timeout).Result;
+			OutputValues = Result.Value;
+			return Result.Key;
 		}
 
 		/// <summary>

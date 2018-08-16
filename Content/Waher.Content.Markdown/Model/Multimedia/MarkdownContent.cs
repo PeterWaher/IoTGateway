@@ -102,7 +102,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
 					ParentURL = NewUri.ToString();
 			}
 
-			FileName = Path.Combine(Path.GetDirectoryName(Item.Document.FileName), FileName);
+			FileName = Item.Document.Settings.GetFileName(Item.Document.FileName, FileName);
 
 			if (!string.IsNullOrEmpty(Query))
 			{

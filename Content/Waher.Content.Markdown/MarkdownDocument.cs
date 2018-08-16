@@ -91,7 +91,7 @@ namespace Waher.Content.Markdown
 		public MarkdownDocument(string MarkdownText, MarkdownSettings Settings, string FileName, string ResourceName, string URL,
 			params Type[] TransparentExceptionTypes)
 		{
-			this.markdownText = MarkdownText.Replace("\r\n", "\n").Replace('\r', '\n');
+			this.markdownText = MarkdownText;
 			this.emojiSource = Settings.EmojiSource;
 			this.settings = Settings;
 			this.fileName = FileName;
@@ -100,7 +100,9 @@ namespace Waher.Content.Markdown
 			this.transparentExceptionTypes = TransparentExceptionTypes;
 
 			if (Settings.Variables != null)
-				this.markdownText = Preprocess(this.markdownText, Settings.Variables, this.fileName, out this.isDynamic, TransparentExceptionTypes);
+				this.markdownText = Preprocess(this.markdownText, Settings, this.fileName, out this.isDynamic, TransparentExceptionTypes);
+
+			this.markdownText = this.markdownText.Replace("\r\n", "\n").Replace('\r', '\n');
 
 			List<Block> Blocks = this.ParseTextToBlocks(this.markdownText);
 			List<KeyValuePair<string, bool>> Values = new List<KeyValuePair<string, bool>>();
@@ -193,41 +195,42 @@ namespace Waher.Content.Markdown
 		/// Preprocesses markdown text.
 		/// </summary>
 		/// <param name="Markdown">Markdown text</param>
-		/// <param name="Variables">Current set of variables.</param>
+		/// <param name="Settings">Markdown settings.</param>
 		/// <param name="TransparentExceptionTypes">If an exception is thrown when processing script in markdown, and the exception is of
 		/// any of these types, the exception will be rethrown, instead of shown as an error in the generated output.</param>
 		/// <returns>Preprocessed markdown.</returns>
-		public static string Preprocess(string Markdown, Variables Variables, params Type[] TransparentExceptionTypes)
+		public static string Preprocess(string Markdown, MarkdownSettings Settings, params Type[] TransparentExceptionTypes)
 		{
-			return Preprocess(Markdown, Variables, string.Empty, out bool IsDynamic, TransparentExceptionTypes);
+			return Preprocess(Markdown, Settings, string.Empty, out bool IsDynamic, TransparentExceptionTypes);
 		}
 
 		/// <summary>
 		/// Preprocesses markdown text.
 		/// </summary>
 		/// <param name="Markdown">Markdown text</param>
-		/// <param name="Variables">Current set of variables.</param>
+		/// <param name="Settings">Markdown settings.</param>
 		/// <param name="FileName">Filename of markdown.</param>
 		/// <param name="TransparentExceptionTypes">If an exception is thrown when processing script in markdown, and the exception is of
 		/// any of these types, the exception will be rethrown, instead of shown as an error in the generated output.</param>
 		/// <returns>Preprocessed markdown.</returns>
-		public static string Preprocess(string Markdown, Variables Variables, string FileName, params Type[] TransparentExceptionTypes)
+		public static string Preprocess(string Markdown, MarkdownSettings Settings, string FileName, params Type[] TransparentExceptionTypes)
 		{
-			return Preprocess(Markdown, Variables, FileName, out bool IsDynamic, TransparentExceptionTypes);
+			return Preprocess(Markdown, Settings, FileName, out bool IsDynamic, TransparentExceptionTypes);
 		}
 
 		/// <summary>
 		/// Preprocesses markdown text.
 		/// </summary>
 		/// <param name="Markdown">Markdown text</param>
-		/// <param name="Variables">Current set of variables.</param>
+		/// <param name="Settings">Markdown settings.</param>
 		/// <param name="FileName">Filename of markdown.</param>
 		/// <param name="IsDynamic">If the markdown contained preprocessed script.</param>
 		/// <param name="TransparentExceptionTypes">If an exception is thrown when processing script in markdown, and the exception is of
 		/// any of these types, the exception will be rethrown, instead of shown as an error in the generated output.</param>
 		/// <returns>Preprocessed markdown.</returns>
-		public static string Preprocess(string Markdown, Variables Variables, string FileName, out bool IsDynamic, params Type[] TransparentExceptionTypes)
+		public static string Preprocess(string Markdown, MarkdownSettings Settings, string FileName, out bool IsDynamic, params Type[] TransparentExceptionTypes)
 		{
+			Variables Variables = Settings.Variables;
 			Expression Exp;
 			string Script, s2;
 			object Result;
@@ -246,7 +249,7 @@ namespace Waher.Content.Markdown
 					{
 						if (M.Success)
 						{
-							string FileName2 = Path.Combine(Path.GetDirectoryName(FileName), M2.Groups["ScriptFile"].Value);
+							string FileName2 = Settings.GetFileName(FileName, M2.Groups["ScriptFile"].Value);
 
 							Script = File.ReadAllText(FileName2);
 							Exp = new Expression(Script);
@@ -4214,7 +4217,7 @@ namespace Waher.Content.Markdown
 		{
 			if (this.master == null)
 			{
-				string FileName = Path.Combine(Path.GetDirectoryName(this.fileName), MasterMetaValue);
+				string FileName = this.settings.GetFileName(this.fileName, MasterMetaValue);
 				string MarkdownText = File.ReadAllText(FileName);
 				this.master = new MarkdownDocument(MarkdownText, this.settings)
 				{

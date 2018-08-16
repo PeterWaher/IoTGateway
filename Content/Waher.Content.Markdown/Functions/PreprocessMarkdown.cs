@@ -46,7 +46,7 @@ namespace Waher.Content.Markdown.Functions
 				ParseMetaData = false
 			};
 
-			string Markdown = MarkdownDocument.Preprocess(Argument, Variables);
+			string Markdown = MarkdownDocument.Preprocess(Argument, Settings);
 
 			return new StringValue(Markdown);
         }

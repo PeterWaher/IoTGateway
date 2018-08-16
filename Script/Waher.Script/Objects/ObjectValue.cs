@@ -102,31 +102,31 @@ namespace Waher.Script.Objects
         /// <returns>If conversion was possible.</returns>
         public override bool TryConvertTo(Type DesiredType, out object Value)
         {
-            if (this.value == null)
-            {
-                Value = null;
-                return true;
-            }
-            else if (this.value.GetType() == DesiredType)
-            {
-                Value = this.value;
-                return true;
-            }
-			else if (DesiredType == typeof(object))
+			if (this.value == null)
 			{
-				Value = this.value;
+				Value = null;
 				return true;
 			}
-			else if (DesiredType.GetTypeInfo().IsAssignableFrom(typeof(ObjectValue).GetTypeInfo()))
-            {
-                Value = this;
-                return true;
-            }
-            else
-            {
-                Value = null;
-                return false;
-            }
+			else
+			{
+				TypeInfo TI = DesiredType.GetTypeInfo();
+
+				if (TI.IsAssignableFrom(this.value.GetType().GetTypeInfo()))
+				{
+					Value = this.value;
+					return true;
+				}
+				else if (TI.IsAssignableFrom(typeof(ObjectValue).GetTypeInfo()))
+				{
+					Value = this;
+					return true;
+				}
+				else
+				{
+					Value = null;
+					return false;
+				}
+			}
         }
     }
 }

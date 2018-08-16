@@ -47,7 +47,7 @@ namespace Waher.Content.Markdown.Functions
 				ParseMetaData = true
 			};
 
-			Markdown = MarkdownDocument.Preprocess(Markdown, Variables, Argument);
+			Markdown = MarkdownDocument.Preprocess(Markdown, Settings, Argument);
 
 			Match M = MarkdownDocument.endOfHeader.Match(Markdown);
 			if (M.Success)

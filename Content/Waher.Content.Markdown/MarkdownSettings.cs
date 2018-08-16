@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.IO;
 using Waher.Content.Emoji;
 using Waher.Script;
 
@@ -16,6 +15,7 @@ namespace Waher.Content.Markdown
         private bool parseMetaData;
 		private string httpxProxy = null;
 		private string localHttpxResourcePath = null;
+		private string rootFolder = null;
 		private bool audioAutoplay = true;
 		private bool audioControls = false;
 		private bool videoAutoplay = false;
@@ -154,6 +154,35 @@ namespace Waher.Content.Markdown
 		{
 			get { return this.embedEmojis; }
 			set { this.embedEmojis = value; }
+		}
+
+		/// <summary>
+		/// File system root folder. If file references are absolute, and this property is provided, they are measured relative to this folder.
+		/// </summary>
+		public string RootFolder
+		{
+			get { return this.rootFolder; }
+			set { this.rootFolder = value; }
+		}
+
+		/// <summary>
+		/// Evaluates a file name from a file reference.
+		/// </summary>
+		/// <param name="DocumentFileName">Filename of original markdown document.</param>
+		/// <param name="FileNameReference">Filename reference.</param>
+		/// <returns>Physical filename.</returns>
+		public string GetFileName(string DocumentFileName, string FileNameReference)
+		{
+			char ch;
+
+			if (!string.IsNullOrEmpty(FileNameReference) && 
+				((ch = FileNameReference[0]) == Path.DirectorySeparatorChar || ch == '/') &&
+				!string.IsNullOrEmpty(this.rootFolder))
+			{
+				return Path.Combine(this.rootFolder, FileNameReference.Substring(1));
+			}
+			else
+				return Path.Combine(Path.GetDirectoryName(DocumentFileName), FileNameReference);
 		}
 
 	}

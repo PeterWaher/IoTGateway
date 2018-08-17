@@ -495,6 +495,11 @@ namespace Waher.Content.Markdown
 						Elements.AddLast(new SectionSeparator(this, ++SectionNr, NrColumns));
 					continue;
 				}
+				else if (Block.End == Block.Start && this.IsUnderline(Block.Rows[0], '~', false, false))
+				{
+					Elements.AddLast(new InvisibleBreak(this));
+					continue;
+				}
 				else if (Block.IsPrefixedBy(s2 = "*", true) || Block.IsPrefixedBy(s2 = "+", true) || Block.IsPrefixedBy(s2 = "-", true))
 				{
 					LinkedList<Block> Segments = null;

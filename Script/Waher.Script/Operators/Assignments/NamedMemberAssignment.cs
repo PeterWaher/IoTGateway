@@ -14,7 +14,7 @@ namespace Waher.Script.Operators.Assignments
     /// </summary>
     public class NamedMemberAssignment : BinaryOperator
     {
-        private string name;
+        private readonly string name;
 
         /// <summary>
         /// Named member Assignment operator.
@@ -94,7 +94,7 @@ namespace Waher.Script.Operators.Assignments
                         this.field.SetValue(Left, Right);
                 }
                 else
-                    throw new ScriptRuntimeException("Member not found.", this);
+					throw new ScriptRuntimeException("Member '" + this.name + "' not found on type '" + Type.FullName + "'.", this);
             }
 
             return Right;
@@ -104,9 +104,7 @@ namespace Waher.Script.Operators.Assignments
         private PropertyInfo property = null;
         private FieldInfo field = null;
         private string[] nameIndex = null;
-        private object synchObject = new object();
-
-
+        private readonly object synchObject = new object();
 
     }
 }

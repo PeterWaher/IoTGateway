@@ -95,7 +95,7 @@ namespace Waher.Script.Operators.Membership
 				else if (this.field != null)
 					return Expression.Encapsulate(this.field.GetValue(Instance));
 				else if (Operand.IsScalar)
-					throw new ScriptRuntimeException("Member not found.", this);
+					throw new ScriptRuntimeException("Member '" + this.name + "' not found on type '" + T.FullName + "'.", this);
 			}
 
 			LinkedList<IElement> Elements = new LinkedList<IElement>();
@@ -149,7 +149,7 @@ namespace Waher.Script.Operators.Membership
 				return Expression.Encapsulate(Property.GetValue(Instance, new string[] { Name }));
 
 			if (Operand.IsScalar)
-				throw new ScriptRuntimeException("Member not found.", Node);
+				throw new ScriptRuntimeException("Member '" + Name + "' not found on type '" + T.FullName + "'.", Node);
 
 			LinkedList<IElement> Elements = new LinkedList<IElement>();
 

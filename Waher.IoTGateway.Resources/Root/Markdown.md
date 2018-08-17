@@ -871,6 +871,15 @@ This document is an example of a document that has been divided into sections us
 
 **Note**: Column support is only available in some web clients (HTML). Column support is not available in XAML rendering.
 
+### Invisible breaks
+
+You can add invisible breaks to your markdown. Such breaks can be used by calling applications to divide the document depending on context. An example
+can be to cut the document at a logical place to display a brief version of the document. Invisible breaks are inserted using a block
+consisting of a single row of only tilde signs (`~`). Example:
+
+	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
 ### Tables
 
 Tables are formed by a collection of rows, each row having a given number of cells. A table can also have an optional caption and id. Each column is separated

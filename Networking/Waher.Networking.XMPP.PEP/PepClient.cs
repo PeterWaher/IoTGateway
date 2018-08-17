@@ -169,9 +169,12 @@ namespace Waher.Networking.XMPP.PEP
 			}
 			else
 			{
-				RosterItem Item = this.client[e.FromBareJID];
-				if (Item == null || (Item.State != SubscriptionState.Both && Item.State != SubscriptionState.To))
-					return;
+				if (string.Compare(e.FromBareJID, this.client.BareJID, true) != 0)
+				{
+					RosterItem Item = this.client[e.FromBareJID];
+					if (Item == null || (Item.State != SubscriptionState.Both && Item.State != SubscriptionState.To))
+						return;
+				}
 
 				IPersonalEvent PersonalEvent = null;
 

@@ -156,7 +156,7 @@ namespace Waher.Networking.XMPP.PEP
 
 		private void PubSubClient_ItemNotification(object Sender, ItemNotificationEventArgs e)
 		{
-			if (this.hasPubSubComponent && string.Compare(e.From, this.pubSubComponentAddress, true) == 0)
+			if (this.hasPubSubComponent && e.From.IndexOf('@') < 0)
 			{
 				try
 				{
@@ -169,6 +169,10 @@ namespace Waher.Networking.XMPP.PEP
 			}
 			else
 			{
+				RosterItem Item = this.client[e.FromBareJID];
+				if (Item == null || (Item.State != SubscriptionState.Both && Item.State != SubscriptionState.To))
+					return;
+
 				IPersonalEvent PersonalEvent = null;
 
 				foreach (XmlNode N in e.Item.ChildNodes)

@@ -1558,9 +1558,6 @@ namespace Waher.Networking.XMPP.PubSub
 
 		private void EventNotificationHandler(object Sender, MessageEventArgs e)
 		{
-			if (!string.IsNullOrEmpty(this.componentAddress) && e.From != this.componentAddress)
-				return;
-
 			string SubscriptionId = string.Empty;
 			DateTime? Delay = null;
 

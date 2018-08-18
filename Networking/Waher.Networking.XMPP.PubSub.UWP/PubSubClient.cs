@@ -821,8 +821,13 @@ namespace Waher.Networking.XMPP.PubSub
 			Xml.Append(NamespacePubSub);
 			Xml.Append("'><subscribe node='");
 			Xml.Append(XML.Encode(NodeName));
-			Xml.Append("' jid='");
-			Xml.Append(XML.Encode(Jid));
+
+			if (!string.IsNullOrEmpty(Jid))
+			{
+				Xml.Append("' jid='");
+				Xml.Append(XML.Encode(Jid));
+			}
+
 			Xml.Append("'/>");
 
 			if (Options != null)
@@ -1558,9 +1563,6 @@ namespace Waher.Networking.XMPP.PubSub
 
 		private void EventNotificationHandler(object Sender, MessageEventArgs e)
 		{
-			if (!string.IsNullOrEmpty(this.componentAddress) && e.From != this.componentAddress)
-				return;
-
 			string SubscriptionId = string.Empty;
 			DateTime? Delay = null;
 

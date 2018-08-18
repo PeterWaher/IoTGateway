@@ -45,6 +45,7 @@ namespace Waher.Networking.XMPP.PEP
 			this.hasPubSubComponent = !string.IsNullOrEmpty(this.pubSubComponentAddress);
 
 			this.pubSubClient.ItemNotification += PubSubClient_ItemNotification;
+			this.PubSubClient.ItemRetracted += PubSubClient_ItemRetracted;
 		}
 
 		/// <summary>
@@ -55,6 +56,7 @@ namespace Waher.Networking.XMPP.PEP
 			if (this.pubSubClient != null)
 			{
 				this.pubSubClient.ItemNotification -= PubSubClient_ItemNotification;
+				this.PubSubClient.ItemRetracted -= PubSubClient_ItemRetracted;
 
 				this.pubSubClient.Dispose();
 				this.pubSubClient = null;
@@ -214,10 +216,30 @@ namespace Waher.Networking.XMPP.PEP
 			}
 		}
 
+		private void PubSubClient_ItemRetracted(object Sender, ItemNotificationEventArgs e)
+		{
+			if (this.hasPubSubComponent && e.From.IndexOf('@') < 0)
+			{
+				try
+				{
+					this.NonPepItemRetraction?.Invoke(this, e);
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			}
+		}
+
 		/// <summary>
 		/// Event raised when an item notification from the publish/subscribe component that is not related to PEP has been received.
 		/// </summary>
 		public event ItemNotificationEventHandler NonPepItemNotification = null;
+
+		/// <summary>
+		/// Event raised when an item retraction from the publish/subscribe component that is not related to PEP has been received.
+		/// </summary>
+		public event ItemNotificationEventHandler NonPepItemRetraction = null;
 
 		private static Dictionary<string, IPersonalEvent> GetPersonalEventTypes()
 		{

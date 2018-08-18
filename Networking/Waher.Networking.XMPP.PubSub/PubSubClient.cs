@@ -821,8 +821,13 @@ namespace Waher.Networking.XMPP.PubSub
 			Xml.Append(NamespacePubSub);
 			Xml.Append("'><subscribe node='");
 			Xml.Append(XML.Encode(NodeName));
-			Xml.Append("' jid='");
-			Xml.Append(XML.Encode(Jid));
+
+			if (!string.IsNullOrEmpty(Jid))
+			{
+				Xml.Append("' jid='");
+				Xml.Append(XML.Encode(Jid));
+			}
+
 			Xml.Append("'/>");
 
 			if (Options != null)

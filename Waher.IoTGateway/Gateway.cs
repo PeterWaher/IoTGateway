@@ -1648,7 +1648,7 @@ namespace Waher.IoTGateway
 			IUser User;
 
 			if (Request.Session == null || !Request.Session.TryGetVariable("User", out Variable v) || (User = v.ValueObject as IUser) == null)
-				throw new Networking.HTTP.ForbiddenException();
+				throw new ForbiddenException();
 		}
 
 		#endregion

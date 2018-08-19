@@ -337,6 +337,7 @@ namespace Waher.Persistence.Files
 		public async Task Regenerate()
 		{
 			int c = 0;
+			int d = 0;
 
 			await this.ClearAsync();
 
@@ -344,12 +345,21 @@ namespace Waher.Persistence.Files
 			{
 				while (await e.MoveNextAsync())
 				{
-					c++;
-					await this.SaveNewObject((Guid)e.CurrentObjectId, e.Current, e.CurrentSerializer);
+					object Obj = e.Current;
+
+					if (Obj != null)
+					{
+						c++;
+						await this.SaveNewObject((Guid)e.CurrentObjectId, e.Current, e.CurrentSerializer);
+					}
+					else
+						d++;
 				}
 			}
 
-			Log.Notice("Index regenerated.", this.indexFile.FileName, new KeyValuePair<string, object>("NrObjects", c));
+			Log.Notice("Index regenerated.", this.indexFile.FileName, 
+				new KeyValuePair<string, object>("NrObjects", c),
+				new KeyValuePair<string, object>("NrNotLoadable", d));
 		}
 
 		/// <summary>

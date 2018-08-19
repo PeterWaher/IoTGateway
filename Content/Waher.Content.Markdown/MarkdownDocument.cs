@@ -189,7 +189,7 @@ namespace Waher.Content.Markdown
 		}
 
 		internal static Regex endOfHeader = new Regex(@"\n\s*\n", RegexOptions.Multiline | RegexOptions.Compiled);
-		internal static Regex scriptHeader = new Regex(@"^[Ss][Cc][Rr][Ii][Pp][Tt]:\s*(?'ScriptFile'[^\n]*)", RegexOptions.Multiline | RegexOptions.Compiled);
+		internal static Regex scriptHeader = new Regex(@"^[Ss][Cc][Rr][Ii][Pp][Tt]:\s*(?'ScriptFile'[^\r\n]*)", RegexOptions.Multiline | RegexOptions.Compiled);
 
 		/// <summary>
 		/// Preprocesses markdown text.

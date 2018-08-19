@@ -1926,7 +1926,7 @@ namespace Waher.Networking.XMPP.PubSub
 										foreach (XmlNode N2 in E2.ChildNodes)
 										{
 											if (N2 is XmlElement E3 && E3.LocalName == "item")
-												Items.Add(new PubSubItem(NodeName, E3));
+												Items.Add(new PubSubItem(ServiceAddress, NodeName, E3));
 										}
 									}
 									break;

@@ -12,6 +12,7 @@ namespace Waher.Networking.XMPP.PubSub
 	{
 		private string itemId = string.Empty;
 		private string node = string.Empty;
+		private string serviceAddress = string.Empty;
 		private string publisher = string.Empty;
 		private string payload = string.Empty;
 		private XmlElement item;
@@ -20,11 +21,13 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <summary>
 		/// Represents a published item.
 		/// </summary>
+		/// <param name="ServiceAddress">Service address</param>
 		/// <param name="Node">Node name.</param>
 		/// <param name="Xml">XML definition.</param>
-		public PubSubItem(string Node, XmlElement Xml)
+		public PubSubItem(string ServiceAddress, string Node, XmlElement Xml)
 		{
 			this.node = Node;
+			this.serviceAddress = ServiceAddress;
 			this.item = Xml;
 			this.itemId = XML.Attribute(Xml, "id");
 			this.publisher = XML.Attribute(Xml, "publisher");
@@ -47,6 +50,15 @@ namespace Waher.Networking.XMPP.PubSub
 		{
 			get { return this.node; }
 			set { this.node = value; }
+		}
+
+		/// <summary>
+		/// Address of service hosting the node.
+		/// </summary>
+		public string ServiceAddress
+		{
+			get { return this.serviceAddress; }
+			set { this.serviceAddress = value; }
 		}
 
 		/// <summary>

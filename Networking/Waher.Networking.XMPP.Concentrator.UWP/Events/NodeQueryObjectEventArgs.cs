@@ -17,7 +17,7 @@ namespace Waher.Networking.XMPP.Concentrator
 	/// </summary>
 	public class NodeQueryObjectEventArgs : NodeQueryEventArgs
 	{
-		private QueryObject obj;
+		private readonly QueryObject obj;
 
 		internal NodeQueryObjectEventArgs(QueryObject Object, NodeQuery Query, MessageEventArgs Message)
 			: base(Query, Message)

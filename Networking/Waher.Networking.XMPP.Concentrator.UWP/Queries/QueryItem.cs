@@ -10,7 +10,7 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 	/// </summary>
     public abstract class QueryItem
     {
-		private QueryItem parent;
+		private readonly QueryItem parent;
 
 		/// <summary>
 		/// Abstract base class for all query items.

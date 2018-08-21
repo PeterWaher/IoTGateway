@@ -16,7 +16,7 @@ namespace Waher.Networking.XMPP.Concentrator
 	/// </summary>
 	public class CommandsEventArgs : IqResultEventArgs
 	{
-		private NodeCommand[] result;
+		private readonly NodeCommand[] result;
 
 		internal CommandsEventArgs(NodeCommand[] Result, IqResultEventArgs s)
 			: base(s)

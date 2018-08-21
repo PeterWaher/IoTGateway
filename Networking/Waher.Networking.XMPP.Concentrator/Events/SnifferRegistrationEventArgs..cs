@@ -16,8 +16,8 @@ namespace Waher.Networking.XMPP.Concentrator
 	/// </summary>
 	public class SnifferRegistrationEventArgs : IqResultEventArgs
 	{
-		private string snifferId;
-		private DateTime expires;
+		private readonly string snifferId;
+		private readonly DateTime expires;
 
 		internal SnifferRegistrationEventArgs(string SnifferId, DateTime Expires, IqResultEventArgs Response)
 			: base(Response)

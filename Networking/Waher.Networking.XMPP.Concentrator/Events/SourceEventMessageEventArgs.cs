@@ -19,7 +19,7 @@ namespace Waher.Networking.XMPP.Concentrator
 	/// </summary>
 	public class SourceEventMessageEventArgs : MessageEventArgs
 	{
-		private SourceEvent sourceEvent;
+		private readonly SourceEvent sourceEvent;
 
 		internal SourceEventMessageEventArgs(SourceEvent SourceEvent, MessageEventArgs Message)
 			: base(Message)

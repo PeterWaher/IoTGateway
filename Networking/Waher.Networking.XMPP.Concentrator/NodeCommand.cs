@@ -10,14 +10,14 @@ namespace Waher.Networking.XMPP.Concentrator
 	/// </summary>
     public class NodeCommand
     {
-		private string command;
-		private string name;
-		private CommandType type;
-		private string successString;
-		private string failureString;
-		private string confirmationString;
-		private string sortCategory;
-		private string sortKey;
+		private readonly string command;
+		private readonly string name;
+		private readonly CommandType type;
+		private readonly string successString;
+		private readonly string failureString;
+		private readonly string confirmationString;
+		private readonly string sortCategory;
+		private readonly string sortKey;
 
 		/// <summary>
 		/// Information about a command on a node.

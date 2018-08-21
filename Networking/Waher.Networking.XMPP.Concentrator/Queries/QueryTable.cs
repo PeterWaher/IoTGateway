@@ -11,8 +11,8 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 	/// </summary>
 	public class QueryTable : QueryItem
 	{
-		private Table tableDefinition;
-		private List<Record> records = new List<Record>();
+		private readonly Table tableDefinition;
+		private readonly List<Record> records = new List<Record>();
 		private Record[] recordsFixed = null;
 		private bool isDone = false;
 

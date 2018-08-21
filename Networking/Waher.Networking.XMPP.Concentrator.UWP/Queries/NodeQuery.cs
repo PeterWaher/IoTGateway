@@ -11,23 +11,23 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 	/// </summary>
 	public class NodeQuery : IDisposable
 	{
-		private string queryId;
-		private string to;
-		private string nodeID;
-		private string sourceID;
-		private string partition;
-		private string command;
-		private string language;
-		private string serviceToken;
-		private string deviceToken;
-		private string userToken;
-		private ConcentratorClient client;
+		private readonly string queryId;
+		private readonly string to;
+		private readonly string nodeID;
+		private readonly string sourceID;
+		private readonly string partition;
+		private readonly string command;
+		private readonly string language;
+		private readonly string serviceToken;
+		private readonly string deviceToken;
+		private readonly string userToken;
+		private readonly ConcentratorClient client;
 		private bool isDone = false;
 		private int seqNr = 0;
 		private string title = string.Empty;
-		private List<QueryItem> result = new List<QueryItem>();
+		private readonly List<QueryItem> result = new List<QueryItem>();
 		private QueryItem[] resultFixed = null;
-		private Dictionary<string, QueryTable> tables = new Dictionary<string, QueryTable>();
+		private readonly Dictionary<string, QueryTable> tables = new Dictionary<string, QueryTable>();
 		private QuerySection currentSection = null;
 		private LinkedList<KeyValuePair<int, MessageEventArgs>> queuedMessages = null;
 

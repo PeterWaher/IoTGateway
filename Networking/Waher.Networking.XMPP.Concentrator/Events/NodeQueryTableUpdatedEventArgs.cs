@@ -18,7 +18,7 @@ namespace Waher.Networking.XMPP.Concentrator
 	/// </summary>
 	public class NodeQueryTableUpdatedEventArgs : NodeQueryTableEventArgs
 	{
-		private Record[] newRecords;
+		private readonly Record[] newRecords;
 
 		internal NodeQueryTableUpdatedEventArgs(QueryTable Table, NodeQuery Query, Record[] NewRecords, MessageEventArgs Message)
 			: base(Table, Query, Message)

@@ -118,6 +118,7 @@
     <Compile Include="Events\CommandsEventArgs.cs" />
     <Compile Include="Events\DataSourcesEventArgs.cs" />
     <Compile Include="Events\LocalizedStringsResponseEventArgs..cs" />
+    <Compile Include="Events\NodeCommandResponseEventArgs.cs" />
     <Compile Include="Events\NodeInformationEventArgs.cs" />
     <Compile Include="Events\NodeQueryEventArgs.cs" />
     <Compile Include="Events\NodeQueryEventMessageEventArgs.cs" />

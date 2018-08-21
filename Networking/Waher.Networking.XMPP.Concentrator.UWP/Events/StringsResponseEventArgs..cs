@@ -16,7 +16,7 @@ namespace Waher.Networking.XMPP.Concentrator
 	/// </summary>
 	public class StringsResponseEventArgs : IqResultEventArgs
 	{
-		private string[] result;
+		private readonly string[] result;
 
 		internal StringsResponseEventArgs(string[] Result, IqResultEventArgs Responses)
 			: base(Responses)

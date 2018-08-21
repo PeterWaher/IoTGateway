@@ -11,25 +11,25 @@ namespace Waher.Networking.XMPP.Concentrator
 	/// </summary>
 	public class NodeInformation : IThingReference
 	{
-		private string nodeId;
-		private string sourceId;
-		private string partition;
-		private string nodeType;
-		private string displayName;
-		private NodeState nodeState;
-		private string localId;
-		private string logId;
-		private bool hasChildren;
-		private bool childrenOrdered;
-		private bool isReadable;
-		private bool isControllable;
-		private bool hasCommands;
-		private bool sniffable;
-		private string parentId;
-		private string parentPartition;
-		private DateTime lastChanged;
-		private Parameter[] parameterList;
-		private Message[] messageList;
+		private readonly string nodeId;
+		private readonly string sourceId;
+		private readonly string partition;
+		private readonly string nodeType;
+		private readonly string displayName;
+		private readonly NodeState nodeState;
+		private readonly string localId;
+		private readonly string logId;
+		private readonly bool hasChildren;
+		private readonly bool childrenOrdered;
+		private readonly bool isReadable;
+		private readonly bool isControllable;
+		private readonly bool hasCommands;
+		private readonly bool sniffable;
+		private readonly string parentId;
+		private readonly string parentPartition;
+		private readonly DateTime lastChanged;
+		private readonly Parameter[] parameterList;
+		private readonly Message[] messageList;
 
 		/// <summary>
 		/// Contains information about a node.

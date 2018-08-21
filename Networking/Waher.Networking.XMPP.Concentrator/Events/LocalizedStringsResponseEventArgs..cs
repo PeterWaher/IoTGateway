@@ -32,7 +32,7 @@ namespace Waher.Networking.XMPP.Concentrator
 	/// </summary>
 	public class LocalizedStringsResponseEventArgs : IqResultEventArgs
 	{
-		private LocalizedString[] result;
+		private readonly LocalizedString[] result;
 
 		internal LocalizedStringsResponseEventArgs(LocalizedString[] Result, IqResultEventArgs Responses)
 			: base(Responses)

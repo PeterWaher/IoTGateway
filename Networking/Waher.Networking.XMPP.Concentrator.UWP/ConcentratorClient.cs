@@ -20,19 +20,19 @@ namespace Waher.Networking.XMPP.Concentrator
 	/// <summary>
 	/// Implements an XMPP concentrator client interface.
 	/// 
-	/// The interface is defined in XEP-0326:
-	/// http://xmpp.org/extensions/xep-0326.html
+	/// The interface is defined in the IEEE XMPP IoT extensions:
+	/// https://gitlab.com/IEEE-SA/XMPPI/IoT
 	/// </summary>
 	public class ConcentratorClient : XmppExtension
 	{
-		private Dictionary<string, ISniffer> sniffers = new Dictionary<string, ISniffer>();
-		private Dictionary<string, NodeQuery> queries = new Dictionary<string, NodeQuery>();
+		private readonly Dictionary<string, ISniffer> sniffers = new Dictionary<string, ISniffer>();
+		private readonly Dictionary<string, NodeQuery> queries = new Dictionary<string, NodeQuery>();
 
 		/// <summary>
 		/// Implements an XMPP concentrator client interface.
 		/// 
-		/// The interface is defined in XEP-0326:
-		/// http://xmpp.org/extensions/xep-0326.html
+		/// The interface is defined in the IEEE XMPP IoT extensions:
+		/// https://gitlab.com/IEEE-SA/XMPPI/IoT
 		/// </summary>
 		/// <param name="Client">XMPP Client.</param>
 		public ConcentratorClient(XmppClient Client)
@@ -85,7 +85,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					List<string> Capabilities = new List<string>();
 					XmlElement E;
 
-					if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "getCapabilitiesResponse" && E.NamespaceURI == ConcentratorServer.NamespaceConcentrator)
+					if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "strings" && E.NamespaceURI == ConcentratorServer.NamespaceConcentrator)
 					{
 						foreach (XmlNode N in E)
 						{
@@ -119,16 +119,16 @@ namespace Waher.Networking.XMPP.Concentrator
 			this.client.SendIqGet(To, "<getAllDataSources xmlns='" + ConcentratorServer.NamespaceConcentrator + "'/>", (sender, e) =>
 			{
 				if (Callback != null)
-					this.DataSourcesResponse(e, "getAllDataSourcesResponse", Callback, State);
+					this.DataSourcesResponse(e, Callback, State);
 			}, State);
 		}
 
-		private void DataSourcesResponse(IqResultEventArgs e, string ExpectedElement, DataSourcesEventHandler Callback, object State)
+		private void DataSourcesResponse(IqResultEventArgs e, DataSourcesEventHandler Callback, object State)
 		{
 			List<DataSourceReference> DataSources = new List<DataSourceReference>();
 			XmlElement E;
 
-			if (e.Ok && (E = e.FirstElement) != null && E.LocalName == ExpectedElement && E.NamespaceURI == ConcentratorServer.NamespaceConcentrator)
+			if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "dataSources" && E.NamespaceURI == ConcentratorServer.NamespaceConcentrator)
 			{
 				foreach (XmlNode N in E)
 				{
@@ -163,7 +163,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			this.client.SendIqGet(To, "<getRootDataSources xmlns='" + ConcentratorServer.NamespaceConcentrator + "'/>", (sender, e) =>
 			{
 				if (Callback != null)
-					this.DataSourcesResponse(e, "getRootDataSourcesResponse", Callback, State);
+					this.DataSourcesResponse(e, Callback, State);
 			}, State);
 		}
 
@@ -179,7 +179,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			this.client.SendIqGet(To, "<getChildDataSources xmlns='" + ConcentratorServer.NamespaceConcentrator + "' src='" + XML.Encode(SourceID) + "'/>", (sender, e) =>
 			{
 				if (Callback != null)
-					this.DataSourcesResponse(e, "getChildDataSourcesResponse", Callback, State);
+					this.DataSourcesResponse(e, Callback, State);
 			}, State);
 		}
 
@@ -225,16 +225,16 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			this.client.SendIqGet(To, Xml.ToString(), (sender, e) =>
 			{
-				this.BooleanResponse(e, "containsNodeResponse", Callback, State);
+				this.BooleanResponse(e, Callback, State);
 
 			}, State);
 		}
 
-		private void BooleanResponse(IqResultEventArgs e, string ExpectedElement, BooleanResponseEventHandler Callback, object State)
+		private void BooleanResponse(IqResultEventArgs e, BooleanResponseEventHandler Callback, object State)
 		{
 			XmlElement E;
 
-			if (!e.Ok || (E = e.FirstElement) == null || E.LocalName != ExpectedElement || !CommonTypes.TryParse(E.InnerText, out bool Response))
+			if (!e.Ok || (E = e.FirstElement) == null || E.LocalName != "bool" || !CommonTypes.TryParse(E.InnerText, out bool Response))
 			{
 				e.Ok = false;
 				Response = false;
@@ -319,7 +319,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			this.client.SendIqGet(To, Xml.ToString(), (sender, e) =>
 			{
-				this.BooleansResponse(e, "containsNodesResponse", Callback, State);
+				this.BooleansResponse(e, Callback, State);
 
 			}, State);
 		}
@@ -331,16 +331,16 @@ namespace Waher.Networking.XMPP.Concentrator
 			Xml.Append("'/>");
 		}
 
-		private void BooleansResponse(IqResultEventArgs e, string ExpectedElement, BooleansResponseEventHandler Callback, object State)
+		private void BooleansResponse(IqResultEventArgs e, BooleansResponseEventHandler Callback, object State)
 		{
 			List<bool> Responses = new List<bool>();
 			XmlElement E;
 
-			if (e.Ok && (E = e.FirstElement) != null && E.LocalName == ExpectedElement && E.NamespaceURI == ConcentratorServer.NamespaceConcentrator)
+			if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "bools" && E.NamespaceURI == ConcentratorServer.NamespaceConcentrator)
 			{
 				foreach (XmlNode N in E)
 				{
-					if (N is XmlElement E2 && E2.LocalName == "value")
+					if (N is XmlElement E2 && E2.LocalName == "bool")
 					{
 						if (CommonTypes.TryParse(E2.InnerText, out bool Value))
 							Responses.Add(Value);
@@ -414,7 +414,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			this.client.SendIqGet(To, Xml.ToString(), (sender, e) =>
 			{
-				this.NodeResponse(e, "getNodeResponse", Parameters, Messages, Callback, State);
+				this.NodeResponse(e, Parameters, Messages, Callback, State);
 
 			}, State);
 		}
@@ -440,13 +440,12 @@ namespace Waher.Networking.XMPP.Concentrator
 			}
 		}
 
-		private void NodeResponse(IqResultEventArgs e, string ExpectedElement, bool Parameters, bool Messages,
-			NodeInformationEventHandler Callback, object State)
+		private void NodeResponse(IqResultEventArgs e, bool Parameters, bool Messages, NodeInformationEventHandler Callback, object State)
 		{
 			XmlElement E;
 			NodeInformation NodeInfo = null;
 
-			if (e.Ok && (E = e.FirstElement) != null && E.LocalName == ExpectedElement)
+			if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "nodeInfo")
 			{
 				foreach (XmlNode N in E.ChildNodes)
 				{
@@ -679,24 +678,24 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			this.client.SendIqGet(To, Xml.ToString(), (sender, e) =>
 			{
-				this.NodesResponse(e, "getNodesResponse", Parameters, Messages, Callback, State);
+				this.NodesResponse(e, Parameters, Messages, Callback, State);
 
 			}, State);
 		}
 
-		private void NodesResponse(IqResultEventArgs e, string ExpectedElement, bool Parameters, bool Messages,
+		private void NodesResponse(IqResultEventArgs e, bool Parameters, bool Messages,
 			NodesInformationEventHandler Callback, object State)
 		{
 			XmlElement E;
 			NodeInformation[] NodeInfo;
 
-			if (e.Ok && (E = e.FirstElement) != null && E.LocalName == ExpectedElement)
+			if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "nodeInfos")
 			{
 				List<NodeInformation> Nodes = new List<NodeInformation>();
 
 				foreach (XmlNode N in E.ChildNodes)
 				{
-					if (N is XmlElement E2 && E2.LocalName == "nd")
+					if (N is XmlElement E2 && E2.LocalName == "nodeInfo")
 						Nodes.Add(this.GetNodeInformation(E2, Parameters, Messages));
 				}
 
@@ -784,7 +783,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			this.client.SendIqGet(To, Xml.ToString(), (sender, e) =>
 			{
-				this.NodesResponse(e, "getAllNodesResponse", Parameters, Messages, Callback, State);
+				this.NodesResponse(e, Parameters, Messages, Callback, State);
 
 			}, State);
 		}
@@ -843,7 +842,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				List<string> BaseClasses = new List<string>();
 				XmlElement E;
 
-				if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "getNodeInheritanceResponse" && E.NamespaceURI == ConcentratorServer.NamespaceConcentrator)
+				if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "inheritance" && E.NamespaceURI == ConcentratorServer.NamespaceConcentrator)
 				{
 					foreach (XmlNode N in E)
 					{
@@ -903,7 +902,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			this.client.SendIqGet(To, Xml.ToString(), (sender, e) =>
 			{
-				this.NodesResponse(e, "getRootNodesResponse", Parameters, Messages, Callback, State);
+				this.NodesResponse(e, Parameters, Messages, Callback, State);
 
 			}, State);
 		}
@@ -958,7 +957,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			this.client.SendIqGet(To, Xml.ToString(), (sender, e) =>
 			{
-				this.NodesResponse(e, "getChildNodesResponse", Parameters, Messages, Callback, State);
+				this.NodesResponse(e, Parameters, Messages, Callback, State);
 
 			}, State);
 		}
@@ -1013,7 +1012,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			this.client.SendIqGet(To, Xml.ToString(), (sender, e) =>
 			{
-				this.NodesResponse(e, "getAncestorsResponse", Parameters, Messages, Callback, State);
+				this.NodesResponse(e, Parameters, Messages, Callback, State);
 
 			}, State);
 		}
@@ -1066,7 +1065,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				List<LocalizedString> Types = new List<LocalizedString>();
 				XmlElement E;
 
-				if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "getAddableNodeTypesResponse" && E.NamespaceURI == ConcentratorServer.NamespaceConcentrator)
+				if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "nodeTypes" && E.NamespaceURI == ConcentratorServer.NamespaceConcentrator)
 				{
 					foreach (XmlNode N in E)
 					{
@@ -1157,19 +1156,12 @@ namespace Waher.Networking.XMPP.Concentrator
 				DataForm Form = null;
 				XmlElement E;
 
-				if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "getParametersForNewNodeResponse" && E.NamespaceURI == ConcentratorServer.NamespaceConcentrator)
+				if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "x" && E.NamespaceURI == XmppClient.NamespaceData)
 				{
-					foreach (XmlNode N in E)
+					Form = new DataForm(this.client, E, this.CreateNewNode, this.CancelCreateNewNode, e.From, e.To)
 					{
-						if (N is XmlElement E2 && E2.LocalName == "x")
-						{
-							Form = new DataForm(this.client, E2, this.CreateNewNode, this.CancelCreateNewNode, e.From, e.To)
-							{
-								State = e.State
-							};
-							break;
-						}
-					}
+						State = e.State
+					};
 				}
 				else
 					e.Ok = false;
@@ -1225,20 +1217,12 @@ namespace Waher.Networking.XMPP.Concentrator
 				{
 					foreach (XmlNode N in e.ErrorElement.ChildNodes)
 					{
-						if (N is XmlElement E && E.LocalName == "createNewNodeResponse" && E.NamespaceURI == ConcentratorServer.NamespaceConcentrator)
+						if (N is XmlElement E && E.LocalName == "x" && E.NamespaceURI == XmppClient.NamespaceData)
 						{
-							foreach (XmlNode N2 in E.ChildNodes)
+							Form = new DataForm(this.client, E, this.CreateNewNode, this.CancelCreateNewNode, e.From, e.To)
 							{
-								if (N2 is XmlElement E2 && E2.LocalName == "error" && E.NamespaceURI == ConcentratorServer.NamespaceConcentrator)
-								{
-									string Var = XML.Attribute(E2, "var");
-									string ErrorMsg = E2.InnerText;
-									Field F = Form[Var];
-
-									if (F != null)
-										F.Error = ErrorMsg;
-								}
-							}
+								State = Form.State
+							};
 						}
 					}
 
@@ -1257,7 +1241,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					}
 				}
 
-				this.NodeResponse(e, "createNewNodeResponse", true, true, NodeCallback, State);
+				this.NodeResponse(e, true, true, NodeCallback, State);
 
 			}, P);
 		}
@@ -1379,19 +1363,12 @@ namespace Waher.Networking.XMPP.Concentrator
 				DataForm Form = null;
 				XmlElement E;
 
-				if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "getNodeParametersForEditResponse" && E.NamespaceURI == ConcentratorServer.NamespaceConcentrator)
+				if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "x" && E.NamespaceURI == XmppClient.NamespaceData)
 				{
-					foreach (XmlNode N in E)
+					Form = new DataForm(this.client, E, this.EditNode, this.CancelEditNode, e.From, e.To)
 					{
-						if (N is XmlElement E2 && E2.LocalName == "x")
-						{
-							Form = new DataForm(this.client, E2, this.EditNode, this.CancelEditNode, e.From, e.To)
-							{
-								State = e.State
-							};
-							break;
-						}
-					}
+						State = e.State
+					};
 				}
 				else
 					e.Ok = false;
@@ -1444,20 +1421,12 @@ namespace Waher.Networking.XMPP.Concentrator
 				{
 					foreach (XmlNode N in e.ErrorElement.ChildNodes)
 					{
-						if (N is XmlElement E && E.LocalName == "setNodeParametersAfterEditResponse" && E.NamespaceURI == ConcentratorServer.NamespaceConcentrator)
+						if (N is XmlElement E && E.LocalName == "x" && E.NamespaceURI == XmppClient.NamespaceData)
 						{
-							foreach (XmlNode N2 in E.ChildNodes)
+							Form = new DataForm(this.client, E, this.EditNode, this.CancelEditNode, e.From, e.To)
 							{
-								if (N2 is XmlElement E2 && E2.LocalName == "error" && E.NamespaceURI == ConcentratorServer.NamespaceConcentrator)
-								{
-									string Var = XML.Attribute(E2, "var");
-									string ErrorMsg = E2.InnerText;
-									Field F = Form[Var];
-
-									if (F != null)
-										F.Error = ErrorMsg;
-								}
-							}
+								State = Form.State
+							};
 						}
 					}
 
@@ -1476,7 +1445,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					}
 				}
 
-				this.NodeResponse(e, "setNodeParametersAfterEditResponse", true, true, NodeCallback, State);
+				this.NodeResponse(e, true, true, NodeCallback, State);
 
 			}, P);
 		}
@@ -1552,7 +1521,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				XmlElement E;
 				string SnifferId = null;
 
-				if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "registerSniffer" && E.NamespaceURI == ConcentratorServer.NamespaceConcentrator)
+				if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "sniffer" && E.NamespaceURI == ConcentratorServer.NamespaceConcentrator)
 				{
 					SnifferId = XML.Attribute(E, "snifferId");
 					Expires = XML.Attribute(E, "expires", DateTime.MinValue);
@@ -1767,7 +1736,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				XmlElement E;
 				List<NodeCommand> Commands = new List<NodeCommand>();
 
-				if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "getNodeCommandsResponse" && E.NamespaceURI == ConcentratorServer.NamespaceConcentrator)
+				if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "commands" && E.NamespaceURI == ConcentratorServer.NamespaceConcentrator)
 				{
 					foreach (XmlNode N in E.ChildNodes)
 					{
@@ -1830,7 +1799,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="State">State object to pass on to the node callback method.</param>
 		public void GetCommandParameters(string To, IThingReference Node, string Command, string Language,
 			string ServiceToken, string DeviceToken, string UserToken, DataFormEventHandler FormCallback,
-			IqResultEventHandler CommandCallback, object State)
+			NodeCommandResponseEventHandler CommandCallback, object State)
 		{
 			this.GetCommandParameters(To, Node.NodeId, Node.SourceId, Node.Partition, Command, Language, ServiceToken, DeviceToken, UserToken,
 				FormCallback, CommandCallback, null, State);
@@ -1852,7 +1821,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="CommandCallback">Method to call after executing command.</param>
 		/// <param name="State">State object to pass on to the node callback method.</param>
 		public void GetCommandParameters(string To, string NodeID, string SourceID, string Partition, string Command, string Language,
-			string ServiceToken, string DeviceToken, string UserToken, DataFormEventHandler FormCallback, IqResultEventHandler CommandCallback, object State)
+			string ServiceToken, string DeviceToken, string UserToken, DataFormEventHandler FormCallback, NodeCommandResponseEventHandler CommandCallback, object State)
 		{
 			this.GetCommandParameters(To, NodeID, SourceID, Partition, Command, Language, ServiceToken, DeviceToken, UserToken, FormCallback, CommandCallback, null, State);
 		}
@@ -1900,7 +1869,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		}
 
 		private void GetCommandParameters(string To, string NodeID, string SourceID, string Partition, string Command, string Language,
-			string ServiceToken, string DeviceToken, string UserToken, DataFormEventHandler FormCallback, IqResultEventHandler CommandCallback,
+			string ServiceToken, string DeviceToken, string UserToken, DataFormEventHandler FormCallback, NodeCommandResponseEventHandler CommandCallback,
 			NodeQueryResponseEventHandler QueryCallback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
@@ -1920,19 +1889,12 @@ namespace Waher.Networking.XMPP.Concentrator
 				DataForm Form = null;
 				XmlElement E;
 
-				if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "getCommandParametersResponse" && E.NamespaceURI == ConcentratorServer.NamespaceConcentrator)
+				if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "x" && E.NamespaceURI == XmppClient.NamespaceData)
 				{
-					foreach (XmlNode N in E)
+					Form = new DataForm(this.client, E, this.EditCommandParameters, this.CancelEditCommandParameters, e.From, e.To)
 					{
-						if (N is XmlElement E2 && E2.LocalName == "x")
-						{
-							Form = new DataForm(this.client, E2, this.EditCommandParameters, this.CancelEditCommandParameters, e.From, e.To)
-							{
-								State = e.State
-							};
-							break;
-						}
-					}
+						State = e.State
+					};
 				}
 				else
 					e.Ok = false;
@@ -1965,7 +1927,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			string DeviceToken = (string)P[7];
 			string UserToken = (string)P[8];
 			DataFormEventHandler FormCallback = (DataFormEventHandler)P[9];
-			IqResultEventHandler CommandCallback = (IqResultEventHandler)P[10];
+			NodeCommandResponseEventHandler CommandCallback = (NodeCommandResponseEventHandler)P[10];
 			NodeQueryResponseEventHandler QueryCallback = (NodeQueryResponseEventHandler)P[11];
 			object State = P[12];
 
@@ -1978,14 +1940,14 @@ namespace Waher.Networking.XMPP.Concentrator
 		private void CancelEditCommandParameters(object Sender, DataForm Form)
 		{
 			object[] P = (object[])Form.State;
-			IqResultEventHandler CommandCallback = (IqResultEventHandler)P[10];
+			NodeCommandResponseEventHandler CommandCallback = (NodeCommandResponseEventHandler)P[10];
 			object State = P[11];
 
 			if (CommandCallback != null)
 			{
 				try
 				{
-					CommandCallback(this, new NodeInformationEventArgs(null, new IqResultEventArgs(null, string.Empty, string.Empty, string.Empty, false, State)));
+					CommandCallback.Invoke(this, new NodeCommandResponseEventArgs(Form, new IqResultEventArgs(null, string.Empty, string.Empty, string.Empty, false, State)));
 				}
 				catch (Exception ex)
 				{
@@ -2007,7 +1969,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="Callback">Method to call when operation has been executed.</param>
 		/// <param name="State">State object to pass on to the node callback method.</param>
 		public void ExecuteCommand(string To, IThingReference Node, string Command, string Language,
-			string ServiceToken, string DeviceToken, string UserToken, IqResultEventHandler Callback, object State)
+			string ServiceToken, string DeviceToken, string UserToken, NodeCommandResponseEventHandler Callback, object State)
 		{
 			this.ExecuteCommand(To, Node.NodeId, Node.SourceId, Node.Partition, Command, null, null, Language, ServiceToken, DeviceToken, UserToken,
 				Callback, null, State);
@@ -2028,7 +1990,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="Callback">Method to call when operation has been executed.</param>
 		/// <param name="State">State object to pass on to the node callback method.</param>
 		public void ExecuteCommand(string To, string NodeID, string SourceID, string Partition, string Command, string Language,
-			string ServiceToken, string DeviceToken, string UserToken, IqResultEventHandler Callback, object State)
+			string ServiceToken, string DeviceToken, string UserToken, NodeCommandResponseEventHandler Callback, object State)
 		{
 			this.ExecuteCommand(To, NodeID, SourceID, Partition, Command, null, null, Language, ServiceToken, DeviceToken, UserToken, Callback, null, State);
 		}
@@ -2047,7 +2009,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="Callback">Method to call when operation has been executed.</param>
 		/// <param name="State">State object to pass on to the node callback method.</param>
 		public void ExecuteCommand(string To, IThingReference Node, string Command, DataForm Parameters, string Language,
-			string ServiceToken, string DeviceToken, string UserToken, IqResultEventHandler Callback, object State)
+			string ServiceToken, string DeviceToken, string UserToken, NodeCommandResponseEventHandler Callback, object State)
 		{
 			this.ExecuteCommand(To, Node.NodeId, Node.SourceId, Node.Partition, Command, Parameters, null, Language, ServiceToken, DeviceToken, UserToken,
 				Callback, null, State);
@@ -2069,7 +2031,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="Callback">Method to call when operation has been executed.</param>
 		/// <param name="State">State object to pass on to the node callback method.</param>
 		public void ExecuteCommand(string To, string NodeID, string SourceID, string Partition, string Command, DataForm Parameters, string Language,
-			string ServiceToken, string DeviceToken, string UserToken, IqResultEventHandler Callback, object State)
+			string ServiceToken, string DeviceToken, string UserToken, NodeCommandResponseEventHandler Callback, object State)
 		{
 			this.ExecuteCommand(To, NodeID, SourceID, Partition, Command, Parameters, null, Language, ServiceToken, DeviceToken, UserToken, Callback, null, State);
 		}
@@ -2175,7 +2137,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		}
 
 		private void ExecuteCommand(string To, string NodeID, string SourceID, string Partition, string Command, DataForm Parameters, NodeQuery Query,
-			string Language, string ServiceToken, string DeviceToken, string UserToken, IqResultEventHandler CommandCallback,
+			string Language, string ServiceToken, string DeviceToken, string UserToken, NodeCommandResponseEventHandler CommandCallback,
 			NodeQueryResponseEventHandler QueryCallback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
@@ -2217,35 +2179,26 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			this.client.SendIqSet(To, Xml.ToString(), (sender, e) =>
 			{
-				XmlElement E;
-
-				if (e.Ok && (E = e.FirstElement) != null && E.LocalName == TagName + "Response" && E.NamespaceURI == ConcentratorServer.NamespaceConcentrator)
+				if (!e.Ok && e.ErrorElement != null && e.ErrorType == ErrorType.Modify)
 				{
-					if (Parameters != null)
+					foreach (XmlNode N in e.ErrorElement.ChildNodes)
 					{
-						foreach (XmlNode N2 in E.ChildNodes)
+						if (N is XmlElement E && E.LocalName == "x" && E.NamespaceURI == XmppClient.NamespaceData)
 						{
-							if (N2 is XmlElement E2 && E2.LocalName == "error" && E.NamespaceURI == ConcentratorServer.NamespaceConcentrator)
+							Parameters = new DataForm(this.client, E, this.EditCommandParameters, this.CancelEditCommandParameters, e.From, e.To)
 							{
-								string Var = XML.Attribute(E2, "var");
-								string ErrorMsg = E2.InnerText;
-								Field F = Parameters[Var];
-
-								if (F != null)
-									F.Error = ErrorMsg;
-							}
+								State = Parameters?.State
+							};
 						}
 					}
 				}
-				else
-					e.Ok = false;
 
 				try
 				{
 					if (CommandCallback != null)
-						CommandCallback(this, e);
+						CommandCallback.Invoke(this, new NodeCommandResponseEventArgs(Parameters, e));
 					else
-						QueryCallback?.Invoke(this, new NodeQueryResponseEventArgs(Query, e));
+						QueryCallback?.Invoke(this, new NodeQueryResponseEventArgs(Query, Parameters, e));
 				}
 				catch (Exception ex)
 				{

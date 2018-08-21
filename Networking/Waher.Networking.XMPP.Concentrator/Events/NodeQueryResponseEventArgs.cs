@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Waher.Networking.XMPP.Concentrator.Queries;
+using Waher.Networking.XMPP.DataForms;
 
 namespace Waher.Networking.XMPP.Concentrator
 {
@@ -15,12 +16,12 @@ namespace Waher.Networking.XMPP.Concentrator
 	/// <summary>
 	/// Event arguments for node query events.
 	/// </summary>
-	public class NodeQueryResponseEventArgs : IqResultEventArgs
+	public class NodeQueryResponseEventArgs : NodeCommandResponseEventArgs
 	{
-		private NodeQuery query;
+		private readonly NodeQuery query;
 
-		internal NodeQueryResponseEventArgs(NodeQuery Query, IqResultEventArgs e)
-			: base(e)
+		internal NodeQueryResponseEventArgs(NodeQuery Query, DataForm Parameters, IqResultEventArgs e)
+			: base(Parameters, e)
 		{
 			this.query = Query;
 		}

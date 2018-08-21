@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Waher.Networking.XMPP.Concentrator.UWP")]
-[assembly: AssemblyDescription("Implements the XMPP IoT concentrator extesion XEP-0326. The concentrator interface allows a device to manage a set of internal virtual devices, all sharing the same XMPP connection.")]
+[assembly: AssemblyDescription("Implements the XMPP IoT concentrator as defined by the IEEE XMPP IoT Interface working group. The concentrator interface allows a device to manage a set of internal virtual devices, all sharing the same XMPP connection.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Waher Data AB")]
 [assembly: AssemblyProduct("Waher.IoTGateway")]
@@ -24,5 +24,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("0.1.26")]
+[assembly: AssemblyVersion("1.0.0")]
 [assembly: ComVisible(false)]

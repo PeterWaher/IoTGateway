@@ -3,7 +3,7 @@
     <TargetFramework>netstandard1.3</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <Description>Implements the XMPP IoT concentrator extesion XEP-0326. The concentrator interface allows a device to manage a set of internal virtual devices, all sharing the same XMPP connection.</Description>
+    <Description>Implements the XMPP IoT concentrator as defined by the IEEE XMPP IoT Interface working group. The concentrator interface allows a device to manage a set of internal virtual devices, all sharing the same XMPP connection.</Description>
     <Copyright>Copyright © Waher Data AB 2017-2018. All rights reserved.</Copyright>
     <Authors>Peter Waher</Authors>
     <Company>Waher Data AB</Company>
@@ -13,11 +13,11 @@
     <PackageIconUrl>https://github.com/PeterWaher/IoTGateway/blob/master/Images/Icon.ico?raw=true</PackageIconUrl>
     <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
-    <PackageTags>networking communication xmpp iot concentrator XEP-0326</PackageTags>
+    <PackageTags>networking communication xmpp iot concentrator ieee</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>0.1.26</AssemblyVersion>
-    <FileVersion>0.1.26</FileVersion>
-    <Version>0.1.26</Version>
+    <AssemblyVersion>1.0.0</AssemblyVersion>
+    <FileVersion>1.0.0</FileVersion>
+    <Version>1.0.0</Version>
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Networking\Waher.Networking.XMPP.Concentrator\</UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>

@@ -12,10 +12,10 @@ namespace Waher.Networking.XMPP.Concentrator
 	/// </summary>
 	public class DataSourceReference
 	{
-		private string sourceID;
-		private string name;
-		private bool hasChildren;
-		private DateTime lastChanged;
+		private readonly string sourceID;
+		private readonly string name;
+		private readonly bool hasChildren;
+		private readonly DateTime lastChanged;
 
 		/// <summary>
 		/// Data Source Reference

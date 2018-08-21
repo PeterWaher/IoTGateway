@@ -16,7 +16,7 @@ namespace Waher.Networking.XMPP.Concentrator
 	/// </summary>
 	public class DataSourcesEventArgs : IqResultEventArgs
 	{
-		private DataSourceReference[] dataSources;
+		private readonly DataSourceReference[] dataSources;
 
 		internal DataSourcesEventArgs(DataSourceReference[] DataSources, IqResultEventArgs Response)
 			: base(Response)

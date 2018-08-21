@@ -16,7 +16,7 @@ namespace Waher.Networking.XMPP.Concentrator
 	/// </summary>
 	public class NodeInformationEventArgs : IqResultEventArgs
 	{
-		private NodeInformation nodeInformation;
+		private readonly NodeInformation nodeInformation;
 
 		internal NodeInformationEventArgs(NodeInformation NodeInformation, IqResultEventArgs Response)
 			: base(Response)

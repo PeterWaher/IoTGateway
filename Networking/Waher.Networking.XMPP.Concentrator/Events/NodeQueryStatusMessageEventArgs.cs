@@ -17,7 +17,7 @@ namespace Waher.Networking.XMPP.Concentrator
 	/// </summary>
 	public class NodeQueryStatusMessageEventArgs : NodeQueryEventArgs
 	{
-		private string statusMessage;
+		private readonly string statusMessage;
 
 		internal NodeQueryStatusMessageEventArgs(string StatusMessage, NodeQuery Query, MessageEventArgs Message)
 			: base(Query, Message)

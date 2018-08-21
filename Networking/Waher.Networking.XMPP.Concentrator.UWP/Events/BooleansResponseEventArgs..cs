@@ -16,7 +16,7 @@ namespace Waher.Networking.XMPP.Concentrator
 	/// </summary>
 	public class BooleansResponseEventArgs : IqResultEventArgs
 	{
-		private bool[] result;
+		private readonly bool[] result;
 
 		internal BooleansResponseEventArgs(bool[] Result, IqResultEventArgs Responses)
 			: base(Responses)

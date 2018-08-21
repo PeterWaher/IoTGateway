@@ -11,11 +11,11 @@ namespace Waher.Networking.XMPP.Concentrator
 	/// </summary>
 	public class RemoteSniffer : ISniffer
 	{
-		private string id;
-		private string fullJID;
-		private DateTime expires;
-		private ISniffable node;
-		private ConcentratorServer concentratorServer;
+		private readonly string id;
+		private readonly string fullJID;
+		private readonly DateTime expires;
+		private readonly ISniffable node;
+		private readonly ConcentratorServer concentratorServer;
 
 		/// <summary>
 		/// Class redirecting sniffer output to a remote client.
@@ -70,7 +70,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				this.node.Remove(this);
 
 				StringBuilder Xml = this.GetHeader(Now);
-				Xml.Append("<Expired/>");
+				Xml.Append("<expired/>");
 				this.Send(Xml);
 
 				return true;
@@ -91,9 +91,9 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			StringBuilder Xml = this.GetHeader(Now);
 
-			Xml.Append("<RxBin>");
+			Xml.Append("<rxBin>");
 			Xml.Append(Convert.ToBase64String(Data));
-			Xml.Append("</RxBin>");
+			Xml.Append("</rxBin>");
 
 			this.Send(Xml);
 		}
@@ -130,9 +130,9 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			StringBuilder Xml = this.GetHeader(Now);
 
-			Xml.Append("<TxBin>");
+			Xml.Append("<txBin>");
 			Xml.Append(Convert.ToBase64String(Data));
-			Xml.Append("</TxBin>");
+			Xml.Append("</txBin>");
 
 			this.Send(Xml);
 		}
@@ -149,9 +149,9 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			StringBuilder Xml = this.GetHeader(Now);
 
-			Xml.Append("<Rx>");
+			Xml.Append("<rx>");
 			Xml.Append(XML.Encode(Text));
-			Xml.Append("</Rx>");
+			Xml.Append("</rx>");
 
 			this.Send(Xml);
 		}
@@ -168,9 +168,9 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			StringBuilder Xml = this.GetHeader(Now);
 
-			Xml.Append("<Tx>");
+			Xml.Append("<tx>");
 			Xml.Append(XML.Encode(Text));
-			Xml.Append("</Tx>");
+			Xml.Append("</tx>");
 
 			this.Send(Xml);
 		}
@@ -187,9 +187,9 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			StringBuilder Xml = this.GetHeader(Now);
 
-			Xml.Append("<Info>");
+			Xml.Append("<info>");
 			Xml.Append(XML.Encode(Comment));
-			Xml.Append("</Info>");
+			Xml.Append("</info>");
 
 			this.Send(Xml);
 		}
@@ -206,9 +206,9 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			StringBuilder Xml = this.GetHeader(Now);
 
-			Xml.Append("<Warning>");
+			Xml.Append("<warning>");
 			Xml.Append(XML.Encode(Warning));
-			Xml.Append("</Warning>");
+			Xml.Append("</warning>");
 
 			this.Send(Xml);
 		}
@@ -225,9 +225,9 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			StringBuilder Xml = this.GetHeader(Now);
 
-			Xml.Append("<Error>");
+			Xml.Append("<error>");
 			Xml.Append(XML.Encode(Error));
-			Xml.Append("</Error>");
+			Xml.Append("</error>");
 
 			this.Send(Xml);
 		}
@@ -244,9 +244,9 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			StringBuilder Xml = this.GetHeader(Now);
 
-			Xml.Append("<Exception>");
+			Xml.Append("<exception>");
 			Xml.Append(XML.Encode(Exception));
-			Xml.Append("</Exception>");
+			Xml.Append("</exception>");
 
 			this.Send(Xml);
 		}

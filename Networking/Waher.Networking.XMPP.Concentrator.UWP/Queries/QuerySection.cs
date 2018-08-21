@@ -11,8 +11,8 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 	/// </summary>
 	public class QuerySection : QueryItem
 	{
-		private string header;
-		private List<QueryItem> content = new List<QueryItem>();
+		private readonly string header;
+		private readonly List<QueryItem> content = new List<QueryItem>();
 		private QueryItem[] contentFixed = null;
 
 		/// <summary>

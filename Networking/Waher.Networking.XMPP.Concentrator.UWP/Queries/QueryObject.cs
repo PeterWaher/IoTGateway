@@ -11,7 +11,7 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 	/// </summary>
 	public class QueryObject : QueryItem
 	{
-		private object obj;
+		private readonly object obj;
 
 		/// <summary>
 		/// Represents an object item in the report.

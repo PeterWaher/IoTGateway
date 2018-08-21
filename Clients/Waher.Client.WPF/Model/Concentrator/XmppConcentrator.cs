@@ -87,7 +87,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 
 		protected override void LoadChildren()
 		{
-			if (!this.loadingChildren && this.IsLoaded)
+			if (!this.loadingChildren && !this.IsLoaded)
 			{
 				string FullJid = this.FullJid;
 

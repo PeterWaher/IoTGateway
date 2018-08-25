@@ -146,8 +146,10 @@ namespace Waher.Client.WPF
 					this.Height = WindowHeight;
 
 				Value = Registry.GetValue(registryKey, "ConnectionTreeWidth", (int)this.MainView.ConnectionTree.Width);
-				if (Value != null && Value is int ConnectionTreeWidth && ConnectionTreeWidth > 0)
-					this.MainView.ConnectionsGrid.ColumnDefinitions[0].Width = new GridLength(ConnectionTreeWidth);
+				if (!(Value is int ConnectionTreeWidth) || ConnectionTreeWidth <= 0)
+					ConnectionTreeWidth = 150;
+
+				this.MainView.ConnectionsGrid.ColumnDefinitions[0].Width = new GridLength(ConnectionTreeWidth);
 
 				Value = Registry.GetValue(registryKey, "WindowState", this.WindowState.ToString());
 				if (Value != null && Value is string s && Enum.TryParse<WindowState>(s, out WindowState WindowState))

@@ -506,7 +506,6 @@ namespace Waher.Security.ACME
 					{
 						new KeyValuePair<string, object>("account", AccountLocation.ToString()),
 						new KeyValuePair<string, object>("oldkey", this.jws.PublicWebKey),
-						new KeyValuePair<string, object>("newkey", Jws2.PublicWebKey)
 					}, out string Header, out string Payload, out string Signature);
 
 				AcmeResponse Response = await this.POST(this.directory.KeyChange, AccountLocation,

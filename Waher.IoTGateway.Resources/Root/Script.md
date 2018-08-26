@@ -708,20 +708,22 @@ A corresponding set of hyperbolic functions also exists:
 
 The following table lists available scalar functions:
 
-| Function | Description | Example |
-|----------|-------------|---------|
-| `Abs(z)` | Absolute value (or magnitude of) `z` | `Abs(-1)` |
-| `Ceiling(z)` | Round `z` up to closest integer. | `Ceiling(pi)` |
-| `Ceil(z)` | Alias for `Ceiling(z)`. | `Ceil(-1)` |
-| `Floor(z)` | Round `z` down to closest integer. | `Floor(pi)` |
-| `Max(x,y)` | Largest of `x` and `y`. | `Max(10,a)` |
-| `Min(x,y)` | Smallest of `x` and `y`. | `Min(10,a)` |
-| `Num(x)` | Alias for `Number(x)`. | `Num('100')` |
-| `Number(x)` | Converts `x` to a number. | `Number('100')` |
-| `Round(z)` | Round `z` up or down to closest integer. | `Round(pi)` |
-| `Sign(z)` | Sign of `z` (-1/0/1 + -i/0/+i). | `Sign(pi)` |
-| `Str(x)` | Alias for `String(x)`. | `Str(100)` |
-| `String(x)` | Converts `x` to a string. | String(100)` |
+| Function     | Description                               | Example           |
+|--------------|-------------------------------------------|-------------------|
+| `Abs(z)`     | Absolute value (or magnitude of) `z`      | `Abs(-1)`         |
+| `Bool(x)`    | Alias for `Boolean`.                      | `Bool('true')`    |
+| `Boolean(x)` | Converts `x` to a boolean value.          | `Boolean('true')` |
+| `Ceiling(z)` | Round `z` up to closest integer.          | `Ceiling(pi)`     |
+| `Ceil(z)`    | Alias for `Ceiling(z)`.                   | `Ceil(-1)`        |
+| `Floor(z)`   | Round `z` down to closest integer.        | `Floor(pi)`       |
+| `Max(x,y)`   | Largest of `x` and `y`.                   | `Max(10,a)`       |
+| `Min(x,y)`   | Smallest of `x` and `y`.                  | `Min(10,a)`       |
+| `Num(x)`     | Alias for `Number(x)`.                    | `Num('100')`      |
+| `Number(x)`  | Converts `x` to a number.                 | `Number('100')`   |
+| `Round(z)`   | Round `z` up or down to closest integer.  | `Round(pi)`       |
+| `Sign(z)`    | Sign of `z` (-1/0/1 + -i/0/+i).           | `Sign(pi)`        |
+| `Str(x)`     | Alias for `String(x)`.                    | `Str(100)`        |
+| `String(x)`  | Converts `x` to a string.                 | String(100)`      |
 
 ### Complex Functions
 

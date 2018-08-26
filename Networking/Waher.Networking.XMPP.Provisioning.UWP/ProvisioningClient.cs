@@ -224,7 +224,7 @@ namespace Waher.Networking.XMPP.Provisioning
 			string Base64 = System.Convert.ToBase64String(Bin);
 #else
 			byte[] Bin = Certificate.Export(X509ContentType.Cert);
-			string Base64 = System.Convert.ToBase64String(Bin);
+			string Base64 = Convert.ToBase64String(Bin);
 #endif
 			this.client.SendIqGet(this.provisioningServerAddress, "<getToken xmlns='" + NamespaceProvisioningToken + "'>" + Base64 + "</getToken>",
 				this.GetTokenResponse, new object[] { Certificate, Callback, State });
@@ -244,7 +244,7 @@ namespace Waher.Networking.XMPP.Provisioning
 			{
 				int SeqNr = XML.Attribute(E, "seqnr", 0);
 				string Challenge = E.InnerText;
-				byte[] Bin = System.Convert.FromBase64String(Challenge);
+				byte[] Bin = Convert.FromBase64String(Challenge);
 
 #if WINDOWS_UWP
 				CryptographicKey Key = PersistedKeyProvider.OpenPublicKeyFromCertificate(Certificate, 
@@ -254,8 +254,8 @@ namespace Waher.Networking.XMPP.Provisioning
 				CryptographicBuffer.CopyToByteArray(Buffer, out Bin);
 				string Response = System.Convert.ToBase64String(Bin);
 #else
-				Bin = Certificate.GetRSAPrivateKey().Decrypt(Bin, RSAEncryptionPadding.Pkcs1);
-				string Response = System.Convert.ToBase64String(Bin);
+				Bin = Certificate.GetRSAPrivateKey().Decrypt(Bin, RSAEncryptionPadding.OaepSHA1);
+				string Response = Convert.ToBase64String(Bin);
 #endif
 
 				this.client.SendIqGet(this.provisioningServerAddress, "<getTokenChallengeResponse xmlns='" + NamespaceProvisioningToken + "' seqnr='" +
@@ -359,8 +359,8 @@ namespace Waher.Networking.XMPP.Provisioning
 				CryptographicBuffer.CopyToByteArray(Buffer, out Bin);
 				string Response = System.Convert.ToBase64String(Bin);
 #else
-				Bin = Use.LocalCertificate.GetRSAPrivateKey().Decrypt(Bin, RSAEncryptionPadding.Pkcs1);
-				string Response = System.Convert.ToBase64String(Bin);
+				Bin = Use.LocalCertificate.GetRSAPrivateKey().Decrypt(Bin, RSAEncryptionPadding.OaepSHA1);
+				string Response = Convert.ToBase64String(Bin);
 #endif
 
 				e.IqResult("<tokenChallengeResponse xmlns='" + NamespaceProvisioningToken + "'>" + Response + "</tokenChallengeResponse>");
@@ -389,7 +389,16 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="State">State object that will be passed on to the callback method.</param>
 		public void GetCertificate(string Token, CertificateCallback Callback, object State)
 		{
-			this.client.SendIqGet(this.provisioningServerAddress, "<getCertificate xmlns='" + NamespaceProvisioningToken + "'>" +
+			string Address = this.provisioningServerAddress;
+			int i = Token.IndexOf(':');
+
+			if (i>0)
+			{
+				Address = Token.Substring(0, i);
+				Token = Token.Substring(i + 1);
+			}
+
+			this.client.SendIqGet(Address, "<getCertificate xmlns='" + NamespaceProvisioningToken + "'>" +
 				XML.Encode(Token) + "</getCertificate>", (sender, e) =>
 				{
 					if (Callback != null)

@@ -90,15 +90,14 @@ namespace Waher.IoTGateway.CodeContent
 
 			if (!Directory.Exists(graphVizFolder))
 				Directory.CreateDirectory(graphVizFolder);
-			else
-				DeleteOldFiles(null);
 
-			Gateway.ScheduleEvent(DeleteOldFiles, DateTime.Now.AddDays(Gateway.NextDouble() * 2), null);
+			DeleteOldFiles(null);
 		}
 
 		private static void DeleteOldFiles(object P)
 		{
 			DateTime Old = DateTime.Now.AddDays(-7);
+			int Count = 0;
 
 			foreach (string FileName in Directory.GetFiles(graphVizFolder, "*.*"))
 			{
@@ -107,6 +106,7 @@ namespace Waher.IoTGateway.CodeContent
 					try
 					{
 						File.Delete(FileName);
+						Count++;
 					}
 					catch (Exception ex)
 					{
@@ -114,6 +114,9 @@ namespace Waher.IoTGateway.CodeContent
 					}
 				}
 			}
+
+			if (Count > 0)
+				Log.Informational(Count.ToString() + " old file(s) deleted.", graphVizFolder);
 
 			Gateway.ScheduleEvent(DeleteOldFiles, DateTime.Now.AddDays(Gateway.NextDouble() * 2), null);
 		}

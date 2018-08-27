@@ -122,7 +122,6 @@ namespace Waher.IoTGateway
 		private static ConcentratorServer concentratorServer = null;
 		private static SynchronizationClient synchronizationClient = null;
 		private static PepClient pepClient = null;
-		private static Timer connectionTimer = null;
 		private static X509Certificate2 certificate = null;
 		private static HttpServer webServer = null;
 		private static HttpxProxy httpxProxy = null;
@@ -156,6 +155,7 @@ namespace Waher.IoTGateway
 		private static bool loopbackIntefaceAvailable;
 		private static bool configuring = false;
 		private static bool exportExceptions = false;
+		private static bool stopped = false;
 
 		#region Life Cycle
 
@@ -195,6 +195,7 @@ namespace Waher.IoTGateway
 
 			try
 			{
+				stopped = false;
 				consoleOutput = ConsoleOutput;
 				loopbackIntefaceAvailable = LoopbackIntefaceAvailable;
 
@@ -622,7 +623,7 @@ namespace Waher.IoTGateway
 				Types.SetModuleParameter("Registry", thingRegistryClient);
 				Types.SetModuleParameter("Provisioning", provisioningClient);
 
-				ScheduleEvent(DeleteOldDataSourceEvents, DateTime.Today.AddDays(1).AddHours(4), null);
+				DeleteOldDataSourceEvents(null);
 			}
 			catch (Exception ex)
 			{
@@ -834,10 +835,8 @@ namespace Waher.IoTGateway
 				xmppClient.OnPresenceUnsubscribe += XmppClient_OnPresenceUnsubscribe;
 			}
 
-			DateTime Now = DateTime.Now;
-			int MsToNext = 60000 - (Now.Second * 1000 + Now.Millisecond);
+			scheduler.Add(DateTime.Now.AddMinutes(1), CheckConnection, null);
 
-			connectionTimer = new Timer(CheckConnection, null, MsToNext, 60000);
 			xmppClient.OnStateChanged += XmppClient_OnStateChanged;
 			xmppClient.OnRosterItemUpdated += XmppClient_OnRosterItemUpdated;
 
@@ -860,7 +859,7 @@ namespace Waher.IoTGateway
 			if (Configuration.UseEncryption && Configuration.Certificate != null && Configuration.PrivateKey != null)
 			{
 				UpdateCertificate(Configuration);
-				scheduler.Add(DateTime.Now.AddDays(0.5 + NextDouble()), CheckCertificate, Configuration);
+				scheduler.Add(DateTime.Now.AddHours(0.5 + NextDouble()), CheckCertificate, Configuration);
 			}
 			else
 				certificate = null;
@@ -914,10 +913,13 @@ namespace Waher.IoTGateway
 			{
 				if (Now.AddDays(50) >= certificate.NotAfter)
 				{
+					Log.Notice("Updating certificate");
+
 					if (await Configuration.CreateCertificate())
 					{
-						if (UpdateCertificate(Configuration))
-							webServer.UpdateCertificate(certificate);
+						Log.Notice("Certificate created.");
+						if (!UpdateCertificate(Configuration))
+							Log.Error("Unable to update gatetway with new certificate.");
 					}
 					else
 					{
@@ -968,8 +970,10 @@ namespace Waher.IoTGateway
 			{
 				Log.Critical(ex);
 			}
-
-			ScheduleEvent(DeleteOldDataSourceEvents, DateTime.Today.AddDays(1).AddHours(4), null);
+			finally
+			{
+				ScheduleEvent(DeleteOldDataSourceEvents, DateTime.Today.AddDays(1).AddHours(4), null);
+			}
 		}
 
 		/// <summary>
@@ -1103,6 +1107,11 @@ namespace Waher.IoTGateway
 
 			Log.Informational("Server shutting down.");
 
+			stopped = true;
+
+			scheduler?.Dispose();
+			scheduler = null;
+			
 			gatewayRunning?.Release();
 			gatewayRunning?.Dispose();
 			gatewayRunning = null;
@@ -1150,12 +1159,6 @@ namespace Waher.IoTGateway
 
 				xmppClient.Dispose();
 				xmppClient = null;
-			}
-
-			if (connectionTimer != null)
-			{
-				connectionTimer.Dispose();
-				connectionTimer = null;
 			}
 
 			if (coapEndpoint != null)
@@ -1316,29 +1319,34 @@ namespace Waher.IoTGateway
 
 		private static void CheckConnection(object State)
 		{
-			XmppState? State2 = xmppClient?.State;
-			if (State2.HasValue && (State2 == XmppState.Offline || State2 == XmppState.Error || State2 == XmppState.Authenticating))
+			if (!stopped)
 			{
-				try
-				{
-					xmppClient?.Reconnect();
-				}
-				catch (Exception ex)
-				{
-					Log.Critical(ex);
-				}
-			}
+				scheduler.Add(DateTime.Now.AddMinutes(1), CheckConnection, null);
 
-			EventHandler h = MinuteTick;
-			if (h != null)
-			{
-				try
+				XmppState? State2 = xmppClient?.State;
+				if (State2.HasValue && (State2 == XmppState.Offline || State2 == XmppState.Error || State2 == XmppState.Authenticating))
 				{
-					h(null, new EventArgs());
+					try
+					{
+						xmppClient?.Reconnect();
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
 				}
-				catch (Exception ex)
+
+				EventHandler h = MinuteTick;
+				if (h != null)
 				{
-					Log.Critical(ex);
+					try
+					{
+						h(null, new EventArgs());
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
 				}
 			}
 		}
@@ -1938,10 +1946,7 @@ namespace Waher.IoTGateway
 		/// <returns>Timepoint of when event was scheduled.</returns>
 		public static DateTime ScheduleEvent(ScheduledEventCallback Callback, DateTime When, object State)
 		{
-			if (scheduler != null)
-				return scheduler.Add(When, Callback, State);
-			else
-				return DateTime.MinValue;
+			return scheduler?.Add(When, Callback, State) ?? DateTime.MinValue;
 		}
 
 		/// <summary>

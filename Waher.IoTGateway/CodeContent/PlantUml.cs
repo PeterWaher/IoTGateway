@@ -77,15 +77,14 @@ namespace Waher.IoTGateway.CodeContent
 
 			if (!Directory.Exists(plantUmlFolder))
 				Directory.CreateDirectory(plantUmlFolder);
-			else
-				DeleteOldFiles(null);
 
-			Gateway.ScheduleEvent(DeleteOldFiles, DateTime.Now.AddDays(Gateway.NextDouble() * 2), null);
+			DeleteOldFiles(null);
 		}
 
 		private static void DeleteOldFiles(object P)
 		{
 			DateTime Old = DateTime.Now.AddDays(-7);
+			int Count = 0;
 
 			foreach (string FileName in Directory.GetFiles(plantUmlFolder, "*.*"))
 			{
@@ -94,6 +93,7 @@ namespace Waher.IoTGateway.CodeContent
 					try
 					{
 						File.Delete(FileName);
+						Count++;
 					}
 					catch (Exception ex)
 					{
@@ -101,6 +101,9 @@ namespace Waher.IoTGateway.CodeContent
 					}
 				}
 			}
+
+			if (Count > 0)
+				Log.Informational(Count.ToString() + " old file(s) deleted.", plantUmlFolder);
 
 			Gateway.ScheduleEvent(DeleteOldFiles, DateTime.Now.AddDays(Gateway.NextDouble() * 2), null);
 		}

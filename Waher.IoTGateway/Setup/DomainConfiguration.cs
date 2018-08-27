@@ -882,6 +882,8 @@ namespace Waher.IoTGateway.Setup
 
 						ClientEvents.PushEvent(new string[] { TabID }, "CertificateOk", string.Empty, false, "User");
 
+						Gateway.UpdateCertificate(this);
+
 						return true;
 					}
 				}

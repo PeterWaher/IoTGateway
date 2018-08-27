@@ -867,7 +867,7 @@ namespace Waher.IoTGateway
 			return Task.CompletedTask;
 		}
 
-		private static bool UpdateCertificate(DomainConfiguration Configuration)
+		internal static bool UpdateCertificate(DomainConfiguration Configuration)
 		{
 			try
 			{

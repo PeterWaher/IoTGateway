@@ -375,7 +375,10 @@ namespace Waher.Networking.XMPP.WebSocket
 
 		private async Task<string> ReadText()
 		{
-			WebSocketReceiveResult Response = await this.webSocketClient.ReceiveAsync(this.inputBuffer, CancellationToken.None);
+			WebSocketReceiveResult Response = await this.webSocketClient?.ReceiveAsync(this.inputBuffer, CancellationToken.None);
+			if (Response == null)
+				return string.Empty;
+
 			this.AssureText(Response);
 
 			int Count = Response.Count;
@@ -468,7 +471,7 @@ namespace Waher.Networking.XMPP.WebSocket
 			try
 			{
 				bool HasSniffers = this.xmppClient.HasSniffers;
-				
+
 				while (Packet != null && !this.disposed)
 				{
 					if (HasSniffers)

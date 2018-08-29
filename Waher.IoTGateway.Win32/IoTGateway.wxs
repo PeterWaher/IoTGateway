@@ -536,6 +536,7 @@
               <File Id='Waher.Security.dll' Name='Waher.Security.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.dll' Vital='yes'/>
 							<File Id='Waher.Security.ACME.dll' Name='Waher.Security.ACME.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.ACME.dll' Vital='yes'/>
 							<File Id='Waher.Security.DTLS.dll' Name='Waher.Security.DTLS.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.DTLS.dll' Vital='yes'/>
+							<File Id='Waher.Security.EllipticCurves.dll' Name='Waher.Security.EllipticCurves.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.EllipticCurves.dll' Vital='yes'/>
 							<File Id='Waher.Security.JWS.dll' Name='Waher.Security.JWS.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.JWS.dll' Vital='yes'/>
 							<File Id='Waher.Security.JWT.dll' Name='Waher.Security.JWT.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.JWT.dll' Vital='yes'/>
 							<File Id='Waher.Security.PKCS.dll' Name='Waher.Security.PKCS.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.PKCS.dll' Vital='yes'/>
@@ -602,6 +603,7 @@
               <RemoveFile Id='RemoveWaher.Security.dll' Name='Waher.Security.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Security.ACME.dll' Name='Waher.Security.ACME.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Security.DTLS.dll' Name='Waher.Security.DTLS.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Security.EllipticCurves.dll' Name='Waher.Security.EllipticCurves.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Security.JWS.dll' Name='Waher.Security.JWS.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Security.JWT.dll' Name='Waher.Security.JWT.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Security.PKCS.dll' Name='Waher.Security.PKCS.dll' On='uninstall'/>
@@ -665,6 +667,7 @@
               <File Id='Waher.Security.pdb' Name='Waher.Security.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.pdb' Vital='yes'/>
 							<File Id='Waher.Security.ACME.pdb' Name='Waher.Security.ACME.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.ACME.pdb' Vital='yes'/>
 							<File Id='Waher.Security.DTLS.pdb' Name='Waher.Security.DTLS.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.DTLS.pdb' Vital='yes'/>
+							<File Id='Waher.Security.EllipticCurves.pdb' Name='Waher.Security.EllipticCurves.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.EllipticCurves.pdb' Vital='yes'/>
 							<File Id='Waher.Security.JWS.pdb' Name='Waher.Security.JWS.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.JWS.pdb' Vital='yes'/>
 							<File Id='Waher.Security.JWT.pdb' Name='Waher.Security.JWT.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.JWT.pdb' Vital='yes'/>
 							<File Id='Waher.Security.PKCS.pdb' Name='Waher.Security.PKCS.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.PKCS.pdb' Vital='yes'/>
@@ -724,6 +727,7 @@
               <RemoveFile Id='RemoveWaher.Security.pdb' Name='Waher.Security.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Security.ACME.pdb' Name='Waher.Security.ACME.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Security.DTLS.pdb' Name='Waher.Security.DTLS.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Security.EllipticCurves.pdb' Name='Waher.Security.EllipticCurves.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Security.JWS.pdb' Name='Waher.Security.JWS.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Security.JWT.pdb' Name='Waher.Security.JWT.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Security.PKCS.pdb' Name='Waher.Security.PKCS.pdb' On='uninstall'/>

@@ -158,6 +158,7 @@
     <ProjectReference Include="..\Script\Waher.Script\Waher.Script.csproj" />
     <ProjectReference Include="..\Security\Waher.Security.ACME\Waher.Security.ACME.csproj" />
     <ProjectReference Include="..\Security\Waher.Security.DTLS\Waher.Security.DTLS.csproj" />
+    <ProjectReference Include="..\Security\Waher.Security.EllipticCurves\Waher.Security.EllipticCurves.csproj" />
     <ProjectReference Include="..\Security\Waher.Security.JWS\Waher.Security.JWS.csproj" />
     <ProjectReference Include="..\Security\Waher.Security.JWT\Waher.Security.JWT.csproj" />
     <ProjectReference Include="..\Security\Waher.Security.PKCS\Waher.Security.PKCS.csproj" />

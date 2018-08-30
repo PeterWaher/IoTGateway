@@ -71,6 +71,16 @@ namespace Waher.Security.EllipticCurves
 		}
 
 		/// <summary>
+		/// If the X-coordinate is zero.
+		/// </summary>
+		public bool IsXZero => this.x.IsZero;
+
+		/// <summary>
+		/// If the Y-coordinate is zero.
+		/// </summary>
+		public bool IsYZero => this.y.IsZero;
+
+		/// <summary>
 		/// <see cref="Object.ToString"/>
 		/// </summary>
 		public override string ToString()
@@ -84,6 +94,28 @@ namespace Waher.Security.EllipticCurves
 			sb.Append(')');
 
 			return sb.ToString();
+		}
+
+		/// <summary>
+		/// <see cref="Object.Equals(object)"/>
+		/// </summary>
+		public override bool Equals(object obj)
+		{
+			return obj is PointOnCurve P &&
+				this.x.Equals(P.x) &&
+				this.y.Equals(P.y) &&
+				this.zero.Equals(P.zero);
+		}
+
+		/// <summary>
+		/// <see cref="Object.GetHashCode"/>
+		/// </summary>
+		public override int GetHashCode()
+		{
+			return
+				this.x.GetHashCode() ^
+				this.y.GetHashCode() ^
+				this.zero.GetHashCode();
 		}
 	}
 }

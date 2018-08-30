@@ -67,30 +67,33 @@ namespace Waher.Security.EllipticCurves
 			int i;
 			int c = Math.Min(this.orderBits, Bin.Length << 3);
 
+			P = P.Copy();
 			for (i = 0; i < c; i++)
 			{
 				if ((Bin[i >> 3] & (1 << (i & 7))) != 0)
-					Result = this.Add(Result, P);
+					this.AddTo(Result, P);
 
-				P = this.Double(P);
+				this.Double(P);
 			}
 
 			return Result;
 		}
 
 		/// <summary>
-		/// Adds two points on the curve.
+		/// Adds <paramref name="Q"/> to <paramref name="P"/>.
 		/// </summary>
 		/// <param name="P">Point 1.</param>
 		/// <param name="Q">Point 2.</param>
 		/// <returns>P+Q</returns>
-		public PointOnCurve Add(PointOnCurve P, PointOnCurve Q)
+		public void AddTo(PointOnCurve P, PointOnCurve Q)
 		{
 			if (P.IsZero)
-				return Q;
-			else if (Q.IsZero)
-				return P;
-			else
+			{
+				P.X = Q.X;
+				P.Y = Q.Y;
+				P.IsZero = Q.IsZero;
+			}
+			else if (!Q.IsZero)
 			{
 				BigInteger sDividend = this.Subtract(P.Y, Q.Y);
 				BigInteger sDivisor = this.Subtract(P.X, Q.X);
@@ -99,9 +102,13 @@ namespace Waher.Security.EllipticCurves
 				if (sDivisor.IsZero)
 				{
 					if (sDividend.IsZero)   // P=Q
-						return this.Double(P);
+						this.Double(P);
 					else
-						return PointOnCurve.Zero;   // Infinity point.
+					{
+						P.X = BigInteger.Zero;
+						P.Y = BigInteger.Zero;
+						P.IsZero = true;
+					}
 				}
 				else
 				{
@@ -109,7 +116,8 @@ namespace Waher.Security.EllipticCurves
 					xR = this.Subtract(this.Multiply(s, s), this.Add(P.X, Q.X));
 					yR = this.Add(P.Y, this.Multiply(s, this.Subtract(xR, P.X)));
 
-					return new PointOnCurve(xR, this.p - yR);
+					P.X = xR;
+					P.Y = this.p - yR;
 				}
 			}
 		}
@@ -118,12 +126,9 @@ namespace Waher.Security.EllipticCurves
 		/// Doubles a point on the curve.
 		/// </summary>
 		/// <param name="P">Point</param>
-		/// <returns>2*<paramref name="P"/></returns>
-		public PointOnCurve Double(PointOnCurve P)
+		public void Double(PointOnCurve P)
 		{
-			if (P.IsZero)
-				return P;
-			else
+			if (!P.IsZero)
 			{
 				BigInteger sDividend = this.Add(3 * this.Multiply(P.X, P.X), this.a);
 				BigInteger sDivisor = this.Multiply(Two, P.Y);
@@ -132,7 +137,8 @@ namespace Waher.Security.EllipticCurves
 				BigInteger xR = this.Subtract(this.Multiply(s, s), this.Add(P.X, P.X));
 				BigInteger yR = this.Add(P.Y, this.Multiply(s, this.Subtract(xR, P.X)));
 
-				return new PointOnCurve(xR, this.p - yR);
+				P.X = xR;
+				P.Y = this.p - yR;
 			}
 		}
 
@@ -189,6 +195,7 @@ namespace Waher.Security.EllipticCurves
 			while (D.IsZero || D >= this.n);
 
 			this.publicKey = this.ScalarMultiplication(D, this.g);
+
 			this.d = D;
 		}
 

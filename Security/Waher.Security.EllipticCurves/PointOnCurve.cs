@@ -7,11 +7,11 @@ namespace Waher.Security.EllipticCurves
 	/// <summary>
 	/// Represents a point on a curve.
 	/// </summary>
-	public class PointOnCurve
+	public struct PointOnCurve
 	{
-		private readonly BigInteger x;
-		private readonly BigInteger y;
-		private readonly bool zero;
+		private BigInteger x;
+		private BigInteger y;
+		private bool zero;
 
 		/// <summary>
 		/// Represents a point on a curve.
@@ -38,10 +38,10 @@ namespace Waher.Security.EllipticCurves
 			this.zero = Zero;
 		}
 
-		/// <summary>
-		/// If the point represents zero (infinity).
-		/// </summary>
-		public bool IsZero => this.zero;
+		internal PointOnCurve Copy()
+		{
+			return new PointOnCurve(this.x, this.y, this.zero);
+		}
 
 		/// <summary>
 		/// Zero point on curve (infinity).
@@ -51,12 +51,29 @@ namespace Waher.Security.EllipticCurves
 		/// <summary>
 		/// X-coordinate
 		/// </summary>
-		public BigInteger X => this.x;
+		public BigInteger X
+		{
+			get => this.x;
+			internal set => this.x = value;
+		}
 
 		/// <summary>
 		/// X-coordinate
 		/// </summary>
-		public BigInteger Y => this.y;
+		public BigInteger Y
+		{
+			get => this.y;
+			internal set => this.y = value;
+		}
+
+		/// <summary>
+		/// If the point represents zero (infinity).
+		/// </summary>
+		public bool IsZero
+		{
+			get => this.zero;
+			internal set => this.zero = value;
+		}
 
 		/// <summary>
 		/// <see cref="Object.ToString"/>

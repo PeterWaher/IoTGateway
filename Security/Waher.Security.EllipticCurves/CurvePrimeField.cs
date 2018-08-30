@@ -67,13 +67,12 @@ namespace Waher.Security.EllipticCurves
 			int i;
 			int c = Math.Min(this.orderBits, Bin.Length << 3);
 
-			P = P.Copy();
 			for (i = 0; i < c; i++)
 			{
 				if ((Bin[i >> 3] & (1 << (i & 7))) != 0)
-					this.AddTo(Result, P);
+					this.AddTo(ref Result, P);
 
-				this.Double(P);
+				this.Double(ref P);
 			}
 
 			return Result;
@@ -85,7 +84,7 @@ namespace Waher.Security.EllipticCurves
 		/// <param name="P">Point 1.</param>
 		/// <param name="Q">Point 2.</param>
 		/// <returns>P+Q</returns>
-		public void AddTo(PointOnCurve P, PointOnCurve Q)
+		public void AddTo(ref PointOnCurve P, PointOnCurve Q)
 		{
 			if (P.IsZero)
 			{
@@ -102,7 +101,7 @@ namespace Waher.Security.EllipticCurves
 				if (sDivisor.IsZero)
 				{
 					if (sDividend.IsZero)   // P=Q
-						this.Double(P);
+						this.Double(ref P);
 					else
 					{
 						P.X = BigInteger.Zero;
@@ -126,7 +125,7 @@ namespace Waher.Security.EllipticCurves
 		/// Doubles a point on the curve.
 		/// </summary>
 		/// <param name="P">Point</param>
-		public void Double(PointOnCurve P)
+		public void Double(ref PointOnCurve P)
 		{
 			if (!P.IsZero)
 			{
@@ -178,6 +177,13 @@ namespace Waher.Security.EllipticCurves
 		/// </summary>
 		public void GenerateKeys()
 		{
+			BigInteger D = this.NextRandomNumber();
+			this.publicKey = this.ScalarMultiplication(D, this.g);
+			this.d = D;
+		}
+
+		private BigInteger NextRandomNumber()
+		{
 			byte[] B = new byte[this.orderBytes];
 			BigInteger D;
 
@@ -194,9 +200,7 @@ namespace Waher.Security.EllipticCurves
 			}
 			while (D.IsZero || D >= this.n);
 
-			this.publicKey = this.ScalarMultiplication(D, this.g);
-
-			this.d = D;
+			return D;
 		}
 
 		/// <summary>
@@ -308,6 +312,32 @@ namespace Waher.Security.EllipticCurves
 			Array.Reverse(B);   // Most significant byte first.
 
 			return Hashes.ComputeHash(HashFunction, B);
+		}
+
+		/// <summary>
+		/// Creates a signature of <paramref name="Data"/> using the ECDSA algorithm.
+		/// </summary>
+		/// <param name="Data">Payload to sign.</param>
+		/// <param name="HashFunction">Hash function to use.</param>
+		/// <returns>Signature.</returns>
+		public byte[] Sign(byte[] Data, HashFunction HashFunction)
+		{
+			byte[] Hash = Hashes.ComputeHash(HashFunction, Data);
+			int c = Hash.Length;
+
+			if (c < this.orderBytes)
+				throw new ArgumentException("Hash function returns too small digests.", nameof(HashFunction));
+			else if (c > this.orderBytes)
+				Array.Resize<byte>(ref Hash, this.orderBytes);
+
+			Hash[this.orderBytes - 1] &= this.msbMask;
+			BigInteger e = new BigInteger(Hash);
+			BigInteger k = this.NextRandomNumber();
+			PointOnCurve P1 = this.ScalarMultiplication(k, this.g);
+
+
+
+			return null;
 		}
 
 	}

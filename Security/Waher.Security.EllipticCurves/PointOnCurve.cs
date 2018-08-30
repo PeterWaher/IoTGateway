@@ -38,11 +38,6 @@ namespace Waher.Security.EllipticCurves
 			this.zero = Zero;
 		}
 
-		internal PointOnCurve Copy()
-		{
-			return new PointOnCurve(this.x, this.y, this.zero);
-		}
-
 		/// <summary>
 		/// Zero point on curve (infinity).
 		/// </summary>

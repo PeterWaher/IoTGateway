@@ -299,14 +299,8 @@ namespace Waher.Security.EllipticCurves
 		/// <returns>Shared secret.</returns>
 		public byte[] GetSharedKey(PointOnCurve RemotePublicKey, HashFunction HashFunction)
 		{
-			Console.Out.WriteLine("Local private key: " + this.d.ToString());
-			Console.Out.WriteLine("Local public key: " + this.publicKey.ToString());
-			Console.Out.WriteLine("Remote public key: " + RemotePublicKey.ToString());
-
 			PointOnCurve P = this.ScalarMultiplication(this.d, RemotePublicKey);
 			byte[] B = P.X.ToByteArray();
-
-			Console.Out.WriteLine("P: " + P.ToString());
 
 			if (B.Length != this.orderBytes)
 				Array.Resize<byte>(ref B, this.orderBytes);
@@ -315,5 +309,6 @@ namespace Waher.Security.EllipticCurves
 
 			return Hashes.ComputeHash(HashFunction, B);
 		}
+
 	}
 }

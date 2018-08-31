@@ -179,7 +179,7 @@ namespace Waher.Networking.XMPP.HTTPX
 									break;
 
 								case "s5":
-									// TODO: Implement In-band byte streams support.
+									// TODO: Implement SOCKS5 streams support.
 									break;
 
 								case "jingle":

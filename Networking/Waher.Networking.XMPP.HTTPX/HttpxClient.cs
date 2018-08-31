@@ -27,7 +27,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		private InBandBytestreams.IbbClient ibbClient = null;
 		private P2P.SOCKS5.Socks5Proxy socks5Proxy = null;
 		private IEndToEndEncryption e2e;
-		private int maxChunkSize;
+		private readonly int maxChunkSize;
 
 		/// <summary>
 		/// HTTPX client.
@@ -586,7 +586,7 @@ namespace Waher.Networking.XMPP.HTTPX
 							{
 								if (Rx.E2e)
 								{
-									Rx.Block = this.e2e.Decrypt(Rx.Jid, Rx.Block);
+									Rx.Block = this.e2e.Decrypt(Rec.NextId().ToString(), string.Empty, Rx.Jid, Rx.Block);
 									if (Rx.Block == null)
 									{
 										e.Stream.Dispose();

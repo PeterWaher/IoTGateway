@@ -18,6 +18,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		private readonly string to;
 		private object state = null;
 		private long pos = 0;
+		private int id = 0;
 		private readonly int blockSize;
 		private bool isWriting;
 		private bool done;
@@ -163,7 +164,9 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 
 				if (this.e2e != null)
 				{
-					byte[] Encrypted = this.e2e.Encrypt(this.to, Block);
+					byte[] Encrypted = this.e2e.Encrypt(this.id.ToString(), string.Empty, this.to, Block);
+					this.id++;
+
 					if (Encrypted == null)
 					{
 						this.Dispose();

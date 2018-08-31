@@ -8,6 +8,8 @@ namespace Waher.Networking.XMPP.HTTPX
 {
 	internal abstract class ChunkRecord : IDisposable
 	{
+		private int id = 0;
+
 		internal ChunkRecord()
 		{
 		}
@@ -15,5 +17,10 @@ namespace Waher.Networking.XMPP.HTTPX
 		public abstract void Dispose();
 
 		internal abstract bool ChunkReceived(int Nr, bool Last, byte[] Data);
+
+		internal int NextId()
+		{
+			return this.id++;
+		}
 	}
 }

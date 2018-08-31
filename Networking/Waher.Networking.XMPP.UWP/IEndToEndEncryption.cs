@@ -35,28 +35,34 @@ namespace Waher.Networking.XMPP
 		/// <summary>
 		/// Encrypts binary data that can be sent to an XMPP client out of band.
 		/// </summary>
-		/// <param name="BareJid">Bare JID of recipient.</param>
+		/// <param name="Id">ID Attribute.</param>
+		/// <param name="Type">Type Attribute.</param>
+		/// <param name="To">To attribute.</param>
 		/// <param name="Data">Data to encrypt.</param>
 		/// <returns>Encrypted data, if encryption was possible to the recipient, or null if not.</returns>
-		byte[] Encrypt(string BareJid, byte[] Data);
+		byte[] Encrypt(string Id, string Type, string To, byte[] Data);
 
 		/// <summary>
 		/// Decrypts binary data received from an XMPP client out of band.
 		/// </summary>
-		/// <param name="BareJid">Bare JID of sender.</param>
+		/// <param name="Id">ID Attribute.</param>
+		/// <param name="Type">Type Attribute.</param>
+		/// <param name="To">To attribute.</param>
 		/// <param name="Data">Data to decrypt.</param>
 		/// <returns>Decrypted data, if decryption was possible from the recipient, or null if not.</returns>
-		byte[] Decrypt(string BareJid, byte[] Data);
+		byte[] Decrypt(string Id, string Type, string To, byte[] Data);
 
 		/// <summary>
 		/// Encrypts data into XML that can be sent over XMPP.
 		/// </summary>
 		/// <param name="Client">XMPP client to send the end-to-end encrypted stanza through.</param>
-		/// <param name="BareJid">Bare JID of recipient.</param>
+		/// <param name="Id">ID Attribute.</param>
+		/// <param name="Type">Type Attribute.</param>
+		/// <param name="To">To attribute.</param>
 		/// <param name="DataXml">Data to encrypt.</param>
 		/// <param name="Xml">XML containing the encrypted data will be output here.</param>
 		/// <returns>If encryption was possible to the recipient, or not.</returns>
-		bool Encrypt(XmppClient Client, string BareJid, string DataXml, StringBuilder Xml);
+		bool Encrypt(XmppClient Client, string Id, string Type, string To, string DataXml, StringBuilder Xml);
 
 		/// <summary>
 		/// Sends an end-to-end encrypted message, if possible. If recipient does not support end-to-end

@@ -282,10 +282,13 @@ namespace Waher.Networking.XMPP.P2P
 		{
 			this.Information("Serverless XMPP connection with " + State.RemoteFullJid + " closed.");
 
-			lock (this.peersByFullJid)
+			if (this.peersByFullJid != null)
 			{
-				if (this.peersByFullJid.TryGetValue(State.RemoteFullJid, out PeerState State2) && State2 == State)
-					this.peersByFullJid.Remove(State.RemoteFullJid);
+				lock (this.peersByFullJid)
+				{
+					if (this.peersByFullJid.TryGetValue(State.RemoteFullJid, out PeerState State2) && State2 == State)
+						this.peersByFullJid.Remove(State.RemoteFullJid);
+				}
 			}
 		}
 
@@ -573,14 +576,23 @@ namespace Waher.Networking.XMPP.P2P
 
 			if (this.peersByFullJid != null)
 			{
-				foreach (PeerState State in this.peersByFullJid.Values)
+				PeerState[] States;
+
+				lock (this.peersByFullJid)
+				{
+					States = new PeerState[this.peersByFullJid.Count];
+					this.peersByFullJid.Values.CopyTo(States, 0);
+
+					this.peersByFullJid.Clear();
+				}
+
+				this.peersByFullJid = null;
+
+				foreach (PeerState State in States)
 				{
 					State.ClearCallbacks();
 					State.Close();
 				}
-
-				this.peersByFullJid.Clear();
-				this.peersByFullJid = null;
 			}
 		}
 

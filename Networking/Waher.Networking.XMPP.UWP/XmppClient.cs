@@ -3322,6 +3322,26 @@ namespace Waher.Networking.XMPP
 		}
 
 		/// <summary>
+		/// Generates a new id attribute value.
+		/// </summary>
+		/// <returns></returns>
+		public string NextId()
+		{
+			uint SeqNr;
+
+			lock (this.synchObject)
+			{
+				do
+				{
+					SeqNr = this.seqnr++;
+				}
+				while (this.pendingRequestsBySeqNr.ContainsKey(SeqNr));
+			}
+
+			return SeqNr.ToString();
+		}
+
+		/// <summary>
 		/// Sends an IQ stanza.
 		/// </summary>
 		/// <param name="Id">Optional ID attribute of IQ stanza.</param>
@@ -3337,21 +3357,33 @@ namespace Waher.Networking.XMPP
 		/// <param name="MaxRetryTimeout">Maximum retry timeout. Used if <paramref name="DropOff"/> is true.</param>
 		/// <returns>ID of IQ stanza, if none provided in <paramref name="Id"/>.</returns>
 		public uint SendIq(string Id, string To, string Xml, string Type, IqResultEventHandler Callback, object State,
-			int RetryTimeout, int NrRetries, bool DropOff, int MaxRetryTimeout)
+		int RetryTimeout, int NrRetries, bool DropOff, int MaxRetryTimeout)
 		{
 			PendingRequest PendingRequest = null;
 			DateTime TP;
 			uint SeqNr;
 
-			if (string.IsNullOrEmpty(Id))
+			if (Type == "get" || Type == "set")
 			{
 				lock (this.synchObject)
 				{
-					do
+					if (string.IsNullOrEmpty(Id))
 					{
-						SeqNr = this.seqnr++;
+						do
+						{
+							SeqNr = this.seqnr++;
+						}
+						while (this.pendingRequestsBySeqNr.ContainsKey(SeqNr));
+
+						Id = SeqNr.ToString();
 					}
-					while (this.pendingRequestsBySeqNr.ContainsKey(SeqNr));
+					else
+					{
+						if (!uint.TryParse(Id, out SeqNr))
+							SeqNr = 0;
+						else if (this.pendingRequestsBySeqNr.ContainsKey(SeqNr))
+							throw new ArgumentException("Pending request with that id already exits.", nameof(Id));
+					}
 
 					PendingRequest = new PendingRequest(SeqNr, Callback, State, RetryTimeout, NrRetries, DropOff, MaxRetryTimeout, To);
 					TP = PendingRequest.Timeout;
@@ -3363,11 +3395,9 @@ namespace Waher.Networking.XMPP
 
 					this.pendingRequestsBySeqNr[SeqNr] = PendingRequest;
 					this.pendingRequestsByTimeout[TP] = PendingRequest;
-
-					Id = SeqNr.ToString();
 				}
 			}
-			else
+			else if (!uint.TryParse(Id, out SeqNr))
 				SeqNr = 0;
 
 			StringBuilder XmlOutput = new StringBuilder();

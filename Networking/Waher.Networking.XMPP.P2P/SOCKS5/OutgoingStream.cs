@@ -15,6 +15,8 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		private Socks5Client client;
 		private TemporaryFile tempFile;
 		private readonly IEndToEndEncryption e2e;
+		private readonly string sid;
+		private readonly string from;
 		private readonly string to;
 		private object state = null;
 		private long pos = 0;
@@ -28,19 +30,39 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		/// Class managing the transmission of a SOCKS5 bytestream.
 		/// </summary>
 		/// <param name="Client">XMPP client.</param>
+		/// <param name="StreamId">Stream ID.</param>
+		/// <param name="From">From</param>
 		/// <param name="To">To</param>
 		/// <param name="BlockSize">Block size</param>
 		/// <param name="E2E">End-to-end encryption, if used.</param>
-		public OutgoingStream(XmppClient Client, string To, int BlockSize, IEndToEndEncryption E2E)
+		public OutgoingStream(XmppClient Client, string StreamId, string From, string To, int BlockSize, IEndToEndEncryption E2E)
 		{
 			this.xmppClient = Client;
 			this.client = null;
+			this.sid = StreamId;
+			this.from = From;
 			this.to = To;
 			this.blockSize = BlockSize;
 			this.e2e = E2E;
 			this.isWriting = false;
 			this.done = false;
 			this.tempFile = new TemporaryFile();
+		}
+
+		/// <summary>
+		/// Stream ID
+		/// </summary>
+		public string StreamId
+		{
+			get { return this.sid; }
+		}
+
+		/// <summary>
+		/// Sender of stream.
+		/// </summary>
+		public string From
+		{
+			get { return this.from; }
 		}
 
 		/// <summary>
@@ -164,7 +186,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 
 				if (this.e2e != null)
 				{
-					byte[] Encrypted = this.e2e.Encrypt(this.id.ToString(), string.Empty, this.to, Block);
+					byte[] Encrypted = this.e2e.Encrypt(this.id.ToString(), this.sid, this.from, this.to, Block);
 					this.id++;
 
 					if (Encrypted == null)
@@ -241,6 +263,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 
 		private void SendClose()
 		{
+			this.client.OnWriteQueueEmpty -= this.WriteQueueEmpty;
 			this.client.Send(new byte[] { 0, 0 }); 
 			this.client.CloseWhenDone();
 			this.Dispose();

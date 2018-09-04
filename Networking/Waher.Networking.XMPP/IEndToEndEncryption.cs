@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Threading.Tasks;
+using System.Xml;
 
 namespace Waher.Networking.XMPP
 {
@@ -37,20 +37,22 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		/// <param name="Id">ID Attribute.</param>
 		/// <param name="Type">Type Attribute.</param>
+		/// <param name="From">From attribute.</param>
 		/// <param name="To">To attribute.</param>
 		/// <param name="Data">Data to encrypt.</param>
 		/// <returns>Encrypted data, if encryption was possible to the recipient, or null if not.</returns>
-		byte[] Encrypt(string Id, string Type, string To, byte[] Data);
+		byte[] Encrypt(string Id, string Type, string From, string To, byte[] Data);
 
 		/// <summary>
 		/// Decrypts binary data received from an XMPP client out of band.
 		/// </summary>
 		/// <param name="Id">ID Attribute.</param>
 		/// <param name="Type">Type Attribute.</param>
+		/// <param name="From">From attribute.</param>
 		/// <param name="To">To attribute.</param>
 		/// <param name="Data">Data to decrypt.</param>
 		/// <returns>Decrypted data, if decryption was possible from the recipient, or null if not.</returns>
-		byte[] Decrypt(string Id, string Type, string To, byte[] Data);
+		byte[] Decrypt(string Id, string Type, string From, string To, byte[] Data);
 
 		/// <summary>
 		/// Encrypts data into XML that can be sent over XMPP.
@@ -58,11 +60,24 @@ namespace Waher.Networking.XMPP
 		/// <param name="Client">XMPP client to send the end-to-end encrypted stanza through.</param>
 		/// <param name="Id">ID Attribute.</param>
 		/// <param name="Type">Type Attribute.</param>
+		/// <param name="From">From attribute.</param>
 		/// <param name="To">To attribute.</param>
 		/// <param name="DataXml">Data to encrypt.</param>
 		/// <param name="Xml">XML containing the encrypted data will be output here.</param>
 		/// <returns>If encryption was possible to the recipient, or not.</returns>
-		bool Encrypt(XmppClient Client, string Id, string Type, string To, string DataXml, StringBuilder Xml);
+		bool Encrypt(XmppClient Client, string Id, string Type, string From, string To, string DataXml, StringBuilder Xml);
+
+		/// <summary>
+		/// Decrypts data from XML that has been received over XMPP.
+		/// </summary>
+		/// <param name="Client">XMPP client to send the end-to-end encrypted stanza through.</param>
+		/// <param name="Id">ID Attribute.</param>
+		/// <param name="Type">Type Attribute.</param>
+		/// <param name="From">From attribute.</param>
+		/// <param name="To">To attribute.</param>
+		/// <param name="E2eElement">XML element containing the encrypted data.</param>
+		/// <returns>Decrypted data.</returns>
+		string Decrypt(XmppClient Client, string Id, string Type, string From, string To, XmlElement E2eElement);
 
 		/// <summary>
 		/// Sends an end-to-end encrypted message, if possible. If recipient does not support end-to-end

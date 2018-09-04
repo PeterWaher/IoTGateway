@@ -14,14 +14,14 @@ namespace Waher.Networking.XMPP.HTTPX
 		private static Dictionary<string, HttpxResponse> activeStreams = new Dictionary<string, HttpxResponse>();
 
 		private StringBuilder response = new StringBuilder();
-		private XmppClient client;
-		private IEndToEndEncryption e2e;
-		private InBandBytestreams.IbbClient ibbClient;
-		private P2P.SOCKS5.Socks5Proxy socks5Proxy;
-		private string id;
-		private string to;
-		private string from;
-		private int maxChunkSize;
+		private readonly XmppClient client;
+		private readonly IEndToEndEncryption e2e;
+		private readonly InBandBytestreams.IbbClient ibbClient;
+		private readonly P2P.SOCKS5.Socks5Proxy socks5Proxy;
+		private readonly string id;
+		private readonly string to;
+		private readonly string from;
+		private readonly int maxChunkSize;
 		private bool? chunked = null;
 		private int nr = 0;
 		private string streamId = null;
@@ -98,7 +98,7 @@ namespace Waher.Networking.XMPP.HTTPX
 						this.response.Append("'/></data>");
 						this.ReturnResponse();
 
-						this.socks5Output = new P2P.SOCKS5.OutgoingStream(this.client, XmppClient.GetBareJID(this.to), 49152, this.e2e);
+						this.socks5Output = new P2P.SOCKS5.OutgoingStream(this.client, this.streamId, this.from, this.to, 49152, this.e2e);
 						this.socks5Output.OnAbort += this.IbbOutput_OnAbort;
 
 						this.socks5Proxy.InitiateSession(this.to, this.streamId, this.InitiationCallback, null);

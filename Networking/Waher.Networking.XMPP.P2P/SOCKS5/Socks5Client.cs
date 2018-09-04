@@ -265,7 +265,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		public void Send(byte[] Data)
 		{
 			if (this.state != Socks5State.Connected)
-				throw new IOException("SOCKS5 connection not established yet.");
+				throw new IOException("SOCKS5 connection not open.");
 
 			this.SendPacket(Data);
 		}

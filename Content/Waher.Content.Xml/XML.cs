@@ -240,7 +240,78 @@ namespace Waher.Content.Xml
             return false;
         }
 
-        private static readonly char[] plusMinusZ = new char[] { '+', '-', 'z', 'Z' };
+		/// <summary>
+		/// Tries to decode a string encoded DateTimeOffset.
+		/// </summary>
+		/// <param name="s">Encoded value.</param>
+		/// <param name="Value">Decoded value.</param>
+		/// <returns>If the value could be decoded.</returns>
+		public static bool TryParse(string s, out DateTimeOffset Value)
+		{
+			int i = s.IndexOf('T');
+
+			if (i == 10 || s.Length == 10)
+			{
+				if (!int.TryParse(s.Substring(0, 4), out int Year) ||
+					!int.TryParse(s.Substring(5, 2), out int Month) ||
+					!int.TryParse(s.Substring(8, 2), out int Day))
+				{
+					Value = DateTime.MinValue;
+					return false;
+				}
+
+				if (i == 10)
+				{
+					DateTime DT;
+					TimeSpan Offset;
+					char ch;
+
+					s = s.Substring(11);
+					i = s.IndexOfAny(plusMinusZ);
+
+					if (i < 0)
+					{
+						DT = new DateTime(Year, Month, Day);
+						Offset = TimeSpan.Zero;
+					}
+					else
+					{
+						ch = s[i];
+						if (ch == 'z' || ch == 'Z')
+							Offset = TimeSpan.Zero;
+						else if (!TimeSpan.TryParse(s.Substring(i + 1), out Offset))
+						{
+							Value = new DateTime(Year, Month, Day);
+							return false;
+						}
+
+						if (ch == '-')
+							Offset = -Offset;
+
+						s = s.Substring(0, i);
+
+						DT = new DateTime(Year, Month, Day, 0, 0, 0, DateTimeKind.Utc);
+					}
+
+					if (TimeSpan.TryParse(s, out TimeSpan TS))
+						DT += TS;
+
+					Value = new DateTimeOffset(DT, Offset);
+
+					return true;
+				}
+				else
+				{
+					Value = new DateTime(Year, Month, Day);
+					return true;
+				}
+			}
+
+			Value = DateTime.MinValue;
+			return false;
+		}
+
+		private static readonly char[] plusMinusZ = new char[] { '+', '-', 'z', 'Z' };
 
         #endregion
 

@@ -164,8 +164,24 @@ function SetInputValue(Id, Value)
 
 function ShowStatus(data)
 {
-    var Div = document.getElementById("Status");
-    Div.innerHTML = Div.innerHTML + "<p>" + data + "</p>";
+    var Div;
+
+    if (data.id)
+    {
+        var P = document.getElementById(data.id);
+        if (P != null)
+        {
+            P.innerText = data.message;
+            return;
+        }
+    }
+
+    Div = document.getElementById("Status");
+
+    if (data.id)
+        Div.innerHTML = Div.innerHTML + "<p id='" + data.id + "'>" + data.message + "</p>";
+    else
+        Div.innerHTML = Div.innerHTML + "<p>" + data + "</p>";
 }
 
 function ToggleCustomProperties()

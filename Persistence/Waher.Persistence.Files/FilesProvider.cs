@@ -1739,12 +1739,12 @@ namespace Waher.Persistence.Files
 				this.files.Values.CopyTo(Files, 0);
 			}
 
-			Output.StartExport();
+			await Output.StartExport();
 			try
 			{
 				foreach (ObjectBTreeFile File in Files)
 				{
-					Output.StartCollection(File.CollectionName);
+					await Output.StartCollection(File.CollectionName);
 					try
 					{
 						using (ObjectBTreeFileEnumerator<GenericObject> e = await File.GetTypedEnumeratorAsync<GenericObject>(true))
@@ -1757,11 +1757,11 @@ namespace Waher.Persistence.Files
 								{
 									Obj = e.Current;
 
-									Output.StartObject(Obj.ObjectId.ToString(), Obj.TypeName);
+									await Output.StartObject(Obj.ObjectId.ToString(), Obj.TypeName);
 									try
 									{
 										foreach (KeyValuePair<string, object> P in Obj)
-											Output.ReportProperty(P.Key, P.Value);
+											await Output.ReportProperty(P.Key, P.Value);
 									}
 									catch (Exception ex)
 									{
@@ -1769,11 +1769,11 @@ namespace Waher.Persistence.Files
 									}
 									finally
 									{
-										Output.EndObject();
+										await Output.EndObject();
 									}
 								}
 								else if (e.CurrentObjectId != null)
-									Output.ReportError("Unable to load object " + e.CurrentObjectId.ToString() + ".");
+									await Output.ReportError("Unable to load object " + e.CurrentObjectId.ToString() + ".");
 							}
 						}
 					}
@@ -1783,7 +1783,7 @@ namespace Waher.Persistence.Files
 					}
 					finally
 					{
-						Output.EndCollection();
+						await Output.EndCollection();
 					}
 				}
 			}
@@ -1793,7 +1793,7 @@ namespace Waher.Persistence.Files
 			}
 			finally
 			{
-				Output.EndExport();
+				await Output.EndExport();
 			}
 		}
 

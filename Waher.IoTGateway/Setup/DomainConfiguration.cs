@@ -25,6 +25,11 @@ namespace Waher.IoTGateway.Setup
 	{
 		private static DomainConfiguration instance = null;
 
+		private HttpResource testDomainNames = null;
+		private HttpResource testDomainName = null;
+		private HttpResource testCA = null;
+		private HttpResource acmeChallenge = null;
+
 		private string[] alternativeDomains = null;
 		private byte[] certificate = null;
 		private byte[] privateKey = null;
@@ -226,10 +231,24 @@ namespace Waher.IoTGateway.Setup
 		/// <param name="WebServer">Current Web Server object.</param>
 		public override Task InitSetup(HttpServer WebServer)
 		{
-			WebServer.Register("/Settings/TestDomainNames", null, this.TestDomainNames, true, false, true);
-			WebServer.Register("/Settings/TestDomainName", this.TestDomainName, true, false, true);
-			WebServer.Register("/Settings/TestCA", null, this.TestCA, true, false, true);
-			WebServer.Register("/.well-known/acme-challenge", this.AcmeChallenge, true, true, true);
+			this.testDomainNames = WebServer.Register("/Settings/TestDomainNames", null, this.TestDomainNames, true, false, true);
+			this.testDomainName = WebServer.Register("/Settings/TestDomainName", this.TestDomainName, true, false, true);
+			this.testCA = WebServer.Register("/Settings/TestCA", null, this.TestCA, true, false, true);
+			this.acmeChallenge = WebServer.Register("/.well-known/acme-challenge", this.AcmeChallenge, true, true, true);
+
+			return Task.CompletedTask;
+		}
+
+		/// <summary>
+		/// Unregisters the setup object.
+		/// </summary>
+		/// <param name="WebServer">Current Web Server object.</param>
+		public override Task UnregisterSetup(HttpServer WebServer)
+		{
+			WebServer.Unregister(this.testDomainNames);
+			WebServer.Unregister(this.testDomainName);
+			WebServer.Unregister(this.testCA);
+			WebServer.Unregister(this.acmeChallenge);
 
 			return Task.CompletedTask;
 		}

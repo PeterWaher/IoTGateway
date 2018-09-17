@@ -20,6 +20,7 @@ namespace Waher.IoTGateway.Setup
 	{
 		private static ThemeConfiguration instance = null;
 		private static Dictionary<string, ThemeDefinition> themeDefinitions = new Dictionary<string, ThemeDefinition>();
+		private HttpResource setTheme = null;
 
 		private string themeId = string.Empty;
 
@@ -156,7 +157,18 @@ namespace Waher.IoTGateway.Setup
 				}
 			}
 
-			WebServer.Register("/Settings/SetTheme", null, this.SetTheme, true, false, true);
+			this.setTheme = WebServer.Register("/Settings/SetTheme", null, this.SetTheme, true, false, true);
+		}
+
+		/// <summary>
+		/// Unregisters the setup object.
+		/// </summary>
+		/// <param name="WebServer">Current Web Server object.</param>
+		public override Task UnregisterSetup(HttpServer WebServer)
+		{
+			WebServer.Unregister(this.setTheme);
+
+			return Task.CompletedTask;
 		}
 
 		private void SetTheme(HttpRequest Request, HttpResponse Response)

@@ -2286,7 +2286,7 @@ namespace Waher.Persistence.Files
 		/// <exception cref="IOException">If the object is not found in the database.</exception>
 		public Task<object> DeleteObject(Guid ObjectId)
 		{
-			return this.DeleteObject(ObjectId, this.genericSerializer);
+			return this.DeleteObject(ObjectId, (IObjectSerializer)this.genericSerializer);
 		}
 
 		/// <summary>
@@ -5006,9 +5006,13 @@ namespace Waher.Persistence.Files
 			ObjectSerializer Serializer = this.provider.GetObjectSerializerEx(typeof(T));
 			if (!Serializer.IndicesCreated)
 			{
-				ObjectBTreeFile File = await this.provider.GetFile(Serializer.CollectionName);
+				string CollectionName = Serializer.CollectionName(null);
+				ObjectBTreeFile File = await this.provider.GetFile(CollectionName);
 				if (File != this)
-					throw new ArgumentException("Objects of type " + typeof(T).FullName + " are stored in collection " + Serializer.CollectionName + ",  not " + this.collectionName + ".", nameof(T));
+				{
+					throw new ArgumentException("Objects of type " + typeof(T).FullName + " are stored in collection " + CollectionName +
+						  ",  not " + this.collectionName + ".", nameof(T));
+				}
 
 				foreach (string[] Index in Serializer.Indices)
 					await this.provider.GetIndexFile(File, RegenerationOptions.RegenerateIfIndexNotInstantiated, Index);

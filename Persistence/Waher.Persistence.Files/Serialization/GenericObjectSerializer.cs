@@ -9,32 +9,14 @@ namespace Waher.Persistence.Files.Serialization
 	/// <summary>
 	/// Provides a generic object serializer.
 	/// </summary>
-	public class GenericObjectSerializer : IObjectSerializer
+	public class GenericObjectSerializer : ObjectSerializer
 	{
-		private readonly FilesProvider provider;
-
 		/// <summary>
 		/// Provides a generic object serializer.
 		/// </summary>
 		public GenericObjectSerializer(FilesProvider Provider)
+			: base(typeof(GenericObject), Provider)
 		{
-			this.provider = Provider;
-		}
-
-		/// <summary>
-		/// If the underlying object is nullable.
-		/// </summary>
-		public bool IsNullable
-		{
-			get { return true; }
-		}
-
-		/// <summary>
-		/// What type of object is being serialized.
-		/// </summary>
-		public Type ValueType
-		{
-			get { return typeof(GenericObject); }
 		}
 
 		/// <summary>
@@ -44,7 +26,7 @@ namespace Waher.Persistence.Files.Serialization
 		/// <param name="DataType">Optional datatype. If not provided, will be read from the binary source.</param>
 		/// <param name="Embedded">If the object is embedded into another.</param>
 		/// <returns>Deserialized object.</returns>
-		public object Deserialize(BinaryDeserializer Reader, uint? DataType, bool Embedded)
+		public override object Deserialize(BinaryDeserializer Reader, uint? DataType, bool Embedded)
 		{
 			return this.Deserialize(Reader, DataType, Embedded, true);
 		}
@@ -462,7 +444,7 @@ namespace Waher.Persistence.Files.Serialization
 		/// <param name="WriteTypeCode">If a type code is to be output.</param>
 		/// <param name="Embedded">If the object is embedded into another.</param>
 		/// <param name="Value">The actual object to serialize.</param>
-		public void Serialize(BinarySerializer Writer, bool WriteTypeCode, bool Embedded, object Value)
+		public override void Serialize(BinarySerializer Writer, bool WriteTypeCode, bool Embedded, object Value)
 		{
 			if (Value is GenericObject TypedValue)
 			{
@@ -546,10 +528,123 @@ namespace Waher.Persistence.Files.Serialization
 		/// <param name="Object">Object.</param>
 		/// <param name="Value">Corresponding field or property value, if found, or null otherwise.</param>
 		/// <returns>If the corresponding field or property was found.</returns>
-		public bool TryGetFieldValue(string FieldName, object Object, out object Value)
+		public override bool TryGetFieldValue(string FieldName, object Object, out object Value)
 		{
 			GenericObject Obj = (GenericObject)Object;
 			return Obj.TryGetFieldValue(FieldName, out Value);
+		}
+
+		/// <summary>
+		/// Mamber name of the field or property holding the Object ID, if any. If there are no such member, this property returns null.
+		/// </summary>
+		public override string ObjectIdMemberName => "ObjectId";
+
+		/// <summary>
+		/// If the class has an Object ID field.
+		/// </summary>
+		public override bool HasObjectIdField => true;
+
+		/// <summary>
+		/// If the class has an Object ID.
+		/// </summary>
+		/// <param name="Value">Object reference.</param>
+		public override bool HasObjectId(object Value)
+		{
+			if (Value is GenericObject Obj)
+				return !Obj.ObjectId.Equals(Guid.Empty);
+			else
+				return false;
+		}
+
+		/// <summary>
+		/// Tries to set the object id of an object.
+		/// </summary>
+		/// <param name="Value">Object reference.</param>
+		/// <param name="ObjectId">Object ID</param>
+		/// <returns>If the object has an Object ID field or property that could be set.</returns>
+		public override bool TrySetObjectId(object Value, Guid ObjectId)
+		{
+			if (Value is GenericObject Obj)
+			{
+				Obj.ObjectId = ObjectId;
+				return true;
+			}
+			else
+				return false;
+		}
+
+		/// <summary>
+		/// Gets the Object ID for a given object.
+		/// </summary>
+		/// <param name="Value">Object reference.</param>
+		/// <param name="InsertIfNotFound">Insert object into database with new Object ID, if no Object ID is set.</param>
+		/// <returns>Object ID for <paramref name="Value"/>.</returns>
+		/// <exception cref="NotSupportedException">Thrown, if the corresponding class does not have an Object ID property, 
+		/// or if the corresponding property type is not supported.</exception>
+		public override async Task<Guid> GetObjectId(object Value, bool InsertIfNotFound)
+		{
+			if (Value is GenericObject Obj)
+			{
+				if (!Obj.ObjectId.Equals(Guid.Empty))
+					return Obj.ObjectId;
+
+				if (!InsertIfNotFound)
+					throw new Exception("Object has no Object ID defined.");
+
+				ObjectBTreeFile File = await this.provider.GetFile(Obj.CollectionName);
+				Guid ObjectId;
+
+				if (await File.TryLock(0))
+				{
+					try
+					{
+						ObjectId = await File.SaveNewObjectLocked(Value, this);
+					}
+					finally
+					{
+						await File.Release();
+					}
+
+					foreach (IndexBTreeFile Index in File.Indices)
+						await Index.SaveNewObject(ObjectId, Value, this);
+				}
+				else
+				{
+					Tuple<Guid, Storage.BlockInfo> Rec = await File.PrepareObjectIdForSaveLocked(Value, this);
+
+					ObjectId = Rec.Item1;
+					File.QueueForSave(Value, this);
+				}
+
+				Obj.ObjectId = ObjectId;
+
+				return ObjectId;
+			}
+			else
+				throw new NotSupportedException("Objects of type " + Value.GetType().FullName + " not supported.");
+		}
+
+		/// <summary>
+		/// Checks if a given field value corresponds to the default value for the corresponding field.
+		/// </summary>
+		/// <param name="FieldName">Name of field.</param>
+		/// <param name="Value">Field value.</param>
+		/// <returns>If the field value corresponds to the default value of the corresponding field.</returns>
+		public override bool IsDefaultValue(string FieldName, object Value)
+		{
+			return false;
+		}
+
+		/// <summary>
+		/// Name of collection objects of this type is to be stored in, if available. If not available, this property returns null.
+		/// </summary>
+		/// <param name="Object">Object in the current context. If null, the default collection name is requested.</param>
+		public override string CollectionName(object Object)
+		{
+			if (Object != null && Object is GenericObject Obj)
+				return Obj.CollectionName;
+			else
+				return base.CollectionName(Object);
 		}
 	}
 }

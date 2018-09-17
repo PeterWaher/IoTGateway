@@ -14,7 +14,6 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Schema;
 using Waher.Content;
-using Waher.Content.Emoji;
 using Waher.Content.Emoji.Emoji1;
 using Waher.Content.Markdown.Web;
 using Waher.Content.Xml;
@@ -30,13 +29,10 @@ using Waher.Networking.HTTP;
 using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Concentrator;
-using Waher.Networking.XMPP.Control;
 using Waher.Networking.XMPP.HTTPX;
-using Waher.Networking.XMPP.InBandBytestreams;
 using Waher.Networking.XMPP.PEP;
 using Waher.Networking.XMPP.Provisioning;
 using Waher.Networking.XMPP.PubSub;
-using Waher.Networking.XMPP.Sensor;
 using Waher.Networking.XMPP.Synchronization;
 using Waher.Runtime.Language;
 using Waher.Runtime.Inventory;
@@ -47,7 +43,6 @@ using Waher.Persistence;
 using Waher.Script;
 using Waher.Security;
 using Waher.Things;
-using Waher.Things.ControlParameters;
 using Waher.Things.Metering;
 using Waher.Things.SensorData;
 
@@ -460,34 +455,78 @@ namespace Waher.IoTGateway
 						await Configuration.InitSetup(webServer);
 				}
 
-				foreach (SystemConfiguration Configuration in Configurations)
+				bool ReloadConfigurations;
+
+				do
 				{
-					bool NeedsCleanup = false;
+					ReloadConfigurations = false;
 
-					if (!Configuration.Complete)
+					foreach (SystemConfiguration Configuration in Configurations)
 					{
-						CurrentConfiguration = Configuration;
-						webServer.ResourceOverride = Configuration.Resource;
-						Configuration.SetStaticInstance(Configuration);
+						bool NeedsCleanup = false;
 
-						if (StartingServer != null)
+						if (!Configuration.Complete)
 						{
-							StartingServer.Release();
-							StartingServer.Dispose();
-							StartingServer = null;
+							CurrentConfiguration = Configuration;
+							webServer.ResourceOverride = Configuration.Resource;
+							Configuration.SetStaticInstance(Configuration);
+
+							if (StartingServer != null)
+							{
+								StartingServer.Release();
+								StartingServer.Dispose();
+								StartingServer = null;
+							}
+
+							ClientEvents.PushEvent(ClientEvents.GetTabIDs(), "Reload", string.Empty);
+
+							if (await Configuration.SetupConfiguration(webServer))
+								ReloadConfigurations = true;
+
+							NeedsCleanup = true;
 						}
 
-						ClientEvents.PushEvent(ClientEvents.GetTabIDs(), "Reload", string.Empty);
+						await Configuration.ConfigureSystem();
 
-						await Configuration.SetupConfiguration(webServer);
-						NeedsCleanup = true;
+						if (NeedsCleanup)
+							await Configuration.CleanupAfterConfiguration(webServer);
+
+						if (ReloadConfigurations)
+						{
+							Configured = true;
+
+							foreach (SystemConfiguration SystemConfiguration in await Database.Find<SystemConfiguration>())
+							{
+								string s = SystemConfiguration.GetType().FullName;
+
+								if (webServer != null && SystemConfigurations.TryGetValue(s, out SystemConfiguration OldConfiguration))
+									await OldConfiguration.UnregisterSetup(webServer);
+
+								SystemConfigurations[s] = SystemConfiguration;
+								SystemConfiguration.SetStaticInstance(SystemConfiguration);
+
+								if (webServer != null)
+									await SystemConfiguration.InitSetup(webServer);
+							}
+
+							foreach (SystemConfiguration SystemConfiguration in SystemConfigurations.Values)
+							{
+								if (!SystemConfiguration.Complete)
+								{
+									Configured = false;
+									break;
+								}
+							}
+
+							Configurations = new SystemConfiguration[SystemConfigurations.Count];
+							SystemConfigurations.Values.CopyTo(Configurations, 0);
+							Array.Sort<SystemConfiguration>(Configurations, (c1, c2) => c1.Priority - c2.Priority);
+
+							break;
+						}
 					}
-
-					await Configuration.ConfigureSystem();
-
-					if (NeedsCleanup)
-						await Configuration.CleanupAfterConfiguration(webServer);
 				}
+				while (ReloadConfigurations);
 
 				configuring = false;
 
@@ -1111,7 +1150,7 @@ namespace Waher.IoTGateway
 
 			scheduler?.Dispose();
 			scheduler = null;
-			
+
 			gatewayRunning?.Release();
 			gatewayRunning?.Dispose();
 			gatewayRunning = null;

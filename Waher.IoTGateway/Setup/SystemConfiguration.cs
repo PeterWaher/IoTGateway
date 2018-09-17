@@ -109,10 +109,20 @@ namespace Waher.IoTGateway.Setup
 		}
 
 		/// <summary>
+		/// Unregisters the setup object.
+		/// </summary>
+		/// <param name="WebServer">Current Web Server object.</param>
+		public virtual Task UnregisterSetup(HttpServer WebServer)
+		{
+			return Task.CompletedTask;
+		}
+
+		/// <summary>
 		/// Waits for the user to provide configuration.
 		/// </summary>
 		/// <param name="WebServer">Current Web Server object.</param>
-		public virtual Task SetupConfiguration(HttpServer WebServer)
+		/// <returns>If all system configuration objects must be reloaded from the database.</returns>
+		public virtual Task<bool> SetupConfiguration(HttpServer WebServer)
 		{
 			this.completionSource = new TaskCompletionSource<bool>();
 
@@ -152,15 +162,25 @@ namespace Waher.IoTGateway.Setup
 		/// <summary>
 		/// Sets the configuration task as completed.
 		/// </summary>
-		public virtual async Task MakeCompleted()
+		public virtual Task MakeCompleted()
+		{
+			return this.MakeCompleted(false);
+		}
+
+		/// <summary>
+		/// Sets the configuration task as completed.
+		/// </summary>
+		/// <param name="ReloadConfiguration">If system configuration objects must be reloaded. (Default=false)</param>
+		protected async Task MakeCompleted(bool ReloadConfiguration)
 		{
 			this.complete = true;
 			this.completed = DateTime.Now;
 			this.updated = DateTime.Now;
 
-			await Database.Update(this);
+			if (!ReloadConfiguration)
+				await Database.Update(this);
 
-			this.completionSource?.SetResult(true);
+			this.completionSource?.SetResult(ReloadConfiguration);
 		}
 	}
 }

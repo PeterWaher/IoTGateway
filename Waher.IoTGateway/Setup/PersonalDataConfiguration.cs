@@ -20,6 +20,7 @@ namespace Waher.IoTGateway.Setup
 	{
 		private static PersonalDataConfiguration instance = null;
 		private static IProcessingActivity[] processingActivities = null;
+		private HttpResource consent = null;
 
 		private string informationHash = string.Empty;
 		private bool consented = false;
@@ -100,7 +101,7 @@ namespace Waher.IoTGateway.Setup
 		{
 			await base.InitSetup(WebServer);
 
-			WebServer.Register("/Settings/Consent", null, this.Consent, true, false, true);
+			this.consent = WebServer.Register("/Settings/Consent", null, this.Consent, true, false, true);
 
 			List<IProcessingActivity> Activities = new List<IProcessingActivity>();
 
@@ -153,6 +154,17 @@ namespace Waher.IoTGateway.Setup
 
 				await Database.Update(this);
 			}
+		}
+
+		/// <summary>
+		/// Unregisters the setup object.
+		/// </summary>
+		/// <param name="WebServer">Current Web Server object.</param>
+		public override Task UnregisterSetup(HttpServer WebServer)
+		{
+			WebServer.Unregister(this.consent);
+
+			return Task.CompletedTask;
 		}
 
 		private void Consent(HttpRequest Request, HttpResponse Response)

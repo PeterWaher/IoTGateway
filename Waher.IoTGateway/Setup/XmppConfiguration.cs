@@ -49,6 +49,9 @@ namespace Waher.IoTGateway.Setup
 	{
 		private static XmppConfiguration instance = null;
 
+		private HttpResource connectToHost = null;
+		private HttpResource randomizePassword = null;
+
 		private XmppTransportMethod transportMethod = XmppTransportMethod.C2S;
 		private string host = string.Empty;
 		private int port = XmppCredentials.DefaultPort;
@@ -371,8 +374,20 @@ namespace Waher.IoTGateway.Setup
 		/// <param name="WebServer">Current Web Server object.</param>
 		public override Task InitSetup(HttpServer WebServer)
 		{
-			WebServer.Register("/Settings/ConnectToHost", null, this.ConnectToHost, true, false, true);
-			WebServer.Register("/Settings/RandomizePassword", null, this.RandomizePassword, true, false, true);
+			this.connectToHost = WebServer.Register("/Settings/ConnectToHost", null, this.ConnectToHost, true, false, true);
+			this.randomizePassword = WebServer.Register("/Settings/RandomizePassword", null, this.RandomizePassword, true, false, true);
+
+			return Task.CompletedTask;
+		}
+
+		/// <summary>
+		/// Unregisters the setup object.
+		/// </summary>
+		/// <param name="WebServer">Current Web Server object.</param>
+		public override Task UnregisterSetup(HttpServer WebServer)
+		{
+			WebServer.Unregister(this.connectToHost);
+			WebServer.Unregister(this.randomizePassword);
 
 			return Task.CompletedTask;
 		}

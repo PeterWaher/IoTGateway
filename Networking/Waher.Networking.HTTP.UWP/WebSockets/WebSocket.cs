@@ -619,6 +619,30 @@ namespace Waher.Networking.HTTP.WebSockets
 		private bool writing = false;
 
 		/// <summary>
+		/// Sends a text payload, possibly in multiple frames.
+		/// </summary>
+		/// <param name="Payload">Text to send.</param>
+		/// <param name="MaxFrameLength">Maximum number of characters in each frame.</param>
+		public void Send(string Payload, int MaxFrameLength)
+		{
+			int c = Payload.Length;
+
+			if (c <= MaxFrameLength)
+				this.Send(Payload, false);
+			else
+			{
+				int i = 0;
+				while (i < c)
+				{
+					int j = Math.Min(i + MaxFrameLength, c);
+					string s = Payload.Substring(i, j - i);
+					i = j;
+					this.Send(s, i < c);
+				}
+			}
+		}
+
+		/// <summary>
 		/// Sends a text payload.
 		/// </summary>
 		/// <param name="Payload">Text to send.</param>
@@ -674,29 +698,54 @@ namespace Waher.Networking.HTTP.WebSockets
 		}
 
 		/// <summary>
-		/// Sends a text payload.
+		/// Sends a binary payload, possibly in multiple frames.
 		/// </summary>
-		/// <param name="Payload">Text to send.</param>
+		/// <param name="Payload">Data to send.</param>
+		/// <param name="MaxFrameSize">Maximum number of bytes in each frame.</param>
+		public void Send(byte[] Payload, int MaxFrameSize)
+		{
+			int c = Payload.Length;
+
+			if (c <= MaxFrameSize)
+				this.Send(Payload, false);
+			else
+			{
+				int i = 0;
+				while (i < c)
+				{
+					int j = Math.Min(i + MaxFrameSize, c);
+					byte[] Bin = new byte[j - i];
+					Array.Copy(Payload, i, Bin, 0, j - i);
+					i = j;
+					this.Send(Bin, i < c);
+				}
+			}
+		}
+
+		/// <summary>
+		/// Sends a binary payload.
+		/// </summary>
+		/// <param name="Payload">Data to send.</param>
 		public void Send(byte[] Payload)
 		{
 			this.Send(Payload, false, null);
 		}
 
 		/// <summary>
-		/// Sends a text payload.
+		/// Sends a binary payload.
 		/// </summary>
-		/// <param name="Payload">Text to send.</param>
-		/// <param name="More">If text is fragmented, and more is to come.</param>
+		/// <param name="Payload">Data to send.</param>
+		/// <param name="More">If the data is fragmented, and more is to come.</param>
 		public void Send(byte[] Payload, bool More)
 		{
 			this.Send(Payload, More, null);
 		}
 
 		/// <summary>
-		/// Sends a text payload.
+		/// Sends a binary payload.
 		/// </summary>
-		/// <param name="Payload">Text to send.</param>
-		/// <param name="More">If text is fragmented, and more is to come.</param>
+		/// <param name="Payload">Data to send.</param>
+		/// <param name="More">If the data is fragmented, and more is to come.</param>
 		/// <param name="Callback">Method to call when callback has been sent.</param>
 		public void Send(byte[] Payload, bool More, EventHandler Callback)
 		{
@@ -708,19 +757,19 @@ namespace Waher.Networking.HTTP.WebSockets
 		}
 
 		/// <summary>
-		/// Sends a text payload.
+		/// Sends a binary payload.
 		/// </summary>
-		/// <param name="Payload">Text to send.</param>
+		/// <param name="Payload">Data to send.</param>
 		public Task SendAsync(byte[] Payload)
 		{
 			return this.SendAsync(Payload, false);
 		}
 
 		/// <summary>
-		/// Sends a text payload.
+		/// Sends a binary payload.
 		/// </summary>
-		/// <param name="Payload">Text to send.</param>
-		/// <param name="More">If text is fragmented, and more is to come.</param>
+		/// <param name="Payload">Data to send.</param>
+		/// <param name="More">If the data is fragmented, and more is to come.</param>
 		public Task SendAsync(byte[] Payload, bool More)
 		{
 			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();

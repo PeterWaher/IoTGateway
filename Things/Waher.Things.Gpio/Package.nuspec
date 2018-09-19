@@ -15,9 +15,9 @@
     <copyright>Copyright © Waher Data AB 2017-2018. All rights reserved.</copyright>
     <tags>UWP IoT GPIO</tags>
     <dependencies>
-      <dependency id="Waher.IoTGateway" version="1.0.49"/>
+      <dependency id="Waher.IoTGateway" version="1.0.50"/>
       <dependency id="Waher.Networking.XMPP" version="1.0.34"/>
-      <dependency id="Waher.Persistence" version="1.0.4"/>
+      <dependency id="Waher.Persistence" version="1.0.5"/>
       <dependency id="Waher.Runtime.Language" version="1.0.1"/>
       <dependency id="Waher.Things" version="1.0.22"/>
       <dependency id="Waher.Things.Metering" version="1.0.15"/>

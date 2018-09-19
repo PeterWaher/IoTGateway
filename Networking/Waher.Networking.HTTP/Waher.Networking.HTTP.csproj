@@ -15,9 +15,9 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>networking communication server web http https websockets</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.0.21</AssemblyVersion>
-    <FileVersion>1.0.21</FileVersion>
-    <Version>1.0.21</Version>
+    <AssemblyVersion>1.0.22</AssemblyVersion>
+    <FileVersion>1.0.22</FileVersion>
+    <Version>1.0.22</Version>
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Networking\Waher.Networking.HTTP\</UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>

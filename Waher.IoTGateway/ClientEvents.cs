@@ -260,7 +260,7 @@ namespace Waher.IoTGateway
 			if (ToSend != null)
 			{
 				foreach (string s2 in ToSend)
-					Socket.Send(s2);
+					Socket.Send(s2, 4096);
 			}
 		}
 
@@ -669,7 +669,7 @@ namespace Waher.IoTGateway
 					lock (Queue)
 					{
 						if (Queue.WebSocket != null)
-							Queue.WebSocket.Send(Json.ToString());
+							Queue.WebSocket.Send(Json.ToString(), 4096);
 						else if (Queue.Response != null)
 						{
 							try

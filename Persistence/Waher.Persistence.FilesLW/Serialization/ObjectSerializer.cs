@@ -148,6 +148,11 @@ namespace Waher.Persistence.Files.Serialization
 		/// </summary>
 		public const uint TYPE_OBJECT = 31;
 
+		/// <summary>
+		/// Files provider reference.
+		/// </summary>
+		protected readonly FilesProvider provider;
+
 		private readonly Type type;
 		private readonly System.Reflection.TypeInfo typeInfo;
 		private readonly string collectionName;
@@ -167,10 +172,24 @@ namespace Waher.Persistence.Files.Serialization
 		private readonly Dictionary<string, Member> membersByName = new Dictionary<string, Member>();
 		private readonly Dictionary<ulong, Member> membersByFieldCode = new Dictionary<ulong, Member>();
 		private readonly LinkedList<Member> membersOrdered = new LinkedList<Member>();
-		private readonly FilesProvider provider;
 		private readonly bool isNullable;
 		private readonly bool debug;
 		private bool indicesCreated = false;
+
+		internal ObjectSerializer(Type Type, FilesProvider Provider)
+		{
+			this.type = Type;
+			this.typeInfo = Type.GetTypeInfo();
+			this.provider = Provider;
+			this.debug = false;
+#if NETSTANDARD1_5
+			this.compiled = false;
+#endif
+			this.isNullable = true;
+			this.collectionName = null;
+			this.typeNameSerialization = TypeNameSerialization.FullName;
+			this.indices = new string[0][];
+		}
 
 #if NETSTANDARD1_5
 		/// <summary>
@@ -2070,9 +2089,10 @@ namespace Waher.Persistence.Files.Serialization
 		/// <summary>
 		/// Name of collection objects of this type is to be stored in, if available. If not available, this property returns null.
 		/// </summary>
-		public string CollectionName
+		/// <param name="Object">Object in the current context. If null, the default collection name is requested.</param>
+		public virtual string CollectionName(object Object)
 		{
-			get { return this.collectionName; }
+			return this.collectionName;
 		}
 
 		/// <summary>
@@ -2118,7 +2138,7 @@ namespace Waher.Persistence.Files.Serialization
 		/// <param name="DataType">Data type of object.</param>
 		/// <param name="Embedded">If the object is embedded in another object.</param>
 		/// <returns>A deserialized value.</returns>
-		public object Deserialize(BinaryDeserializer Reader, uint? DataType, bool Embedded)
+		public virtual object Deserialize(BinaryDeserializer Reader, uint? DataType, bool Embedded)
 		{
 #if NETSTANDARD1_5
 			if (this.compiled)
@@ -2557,7 +2577,7 @@ namespace Waher.Persistence.Files.Serialization
 		/// <param name="WriteTypeCode">If a type code is to be written.</param>
 		/// <param name="Embedded">If the object is embedded in another object.</param>
 		/// <param name="Value">Value to serialize.</param>
-		public void Serialize(BinarySerializer Writer, bool WriteTypeCode, bool Embedded, object Value)
+		public virtual void Serialize(BinarySerializer Writer, bool WriteTypeCode, bool Embedded, object Value)
 		{
 #if NETSTANDARD1_5
 			if (this.compiled)
@@ -2831,7 +2851,7 @@ namespace Waher.Persistence.Files.Serialization
 		/// <summary>
 		/// Mamber name of the field or property holding the Object ID, if any. If there are no such member, this property returns null.
 		/// </summary>
-		public string ObjectIdMemberName
+		public virtual string ObjectIdMemberName
 		{
 			get
 			{
@@ -2861,7 +2881,7 @@ namespace Waher.Persistence.Files.Serialization
 		/// <summary>
 		/// If the class has an Object ID field.
 		/// </summary>
-		public bool HasObjectIdField
+		public virtual bool HasObjectIdField
 		{
 			get
 			{
@@ -2878,7 +2898,7 @@ namespace Waher.Persistence.Files.Serialization
 		/// If the class has an Object ID.
 		/// </summary>
 		/// <param name="Value">Object reference.</param>
-		public bool HasObjectId(object Value)
+		public virtual bool HasObjectId(object Value)
 		{
 			object ObjectId;
 
@@ -2918,7 +2938,7 @@ namespace Waher.Persistence.Files.Serialization
 		/// <param name="Value">Object reference.</param>
 		/// <param name="ObjectId">Object ID</param>
 		/// <returns>If the object has an Object ID field or property that could be set.</returns>
-		public bool TrySetObjectId(object Value, Guid ObjectId)
+		public virtual bool TrySetObjectId(object Value, Guid ObjectId)
 		{
 			Type MemberType;
 			object Obj;
@@ -2976,7 +2996,7 @@ namespace Waher.Persistence.Files.Serialization
 		/// <returns>Object ID for <paramref name="Value"/>.</returns>
 		/// <exception cref="NotSupportedException">Thrown, if the corresponding class does not have an Object ID property, 
 		/// or if the corresponding property type is not supported.</exception>
-		public async Task<Guid> GetObjectId(object Value, bool InsertIfNotFound)
+		public virtual async Task<Guid> GetObjectId(object Value, bool InsertIfNotFound)
 		{
 			object Obj;
 
@@ -3086,7 +3106,7 @@ namespace Waher.Persistence.Files.Serialization
 		/// <param name="FieldName">Name of field.</param>
 		/// <param name="Value">Field value.</param>
 		/// <returns>If the field value corresponds to the default value of the corresponding field.</returns>
-		public bool IsDefaultValue(string FieldName, object Value)
+		public virtual bool IsDefaultValue(string FieldName, object Value)
 		{
 			object Default;
 
@@ -3122,7 +3142,7 @@ namespace Waher.Persistence.Files.Serialization
 		/// <param name="Object">Object.</param>
 		/// <param name="Value">Corresponding field or property value, if found, or null otherwise.</param>
 		/// <returns>If the corresponding field or property was found.</returns>
-		public bool TryGetFieldValue(string FieldName, object Object, out object Value)
+		public virtual bool TryGetFieldValue(string FieldName, object Object, out object Value)
 		{
 #if NETSTANDARD1_5
 			if (this.compiled)

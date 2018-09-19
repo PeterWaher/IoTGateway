@@ -4724,7 +4724,7 @@ namespace Waher.Persistence.Files
 			{
 				await this.Release();
 			}
-
+			
 			foreach (IndexBTreeFile Index in this.indices)
 				await Index.ClearAsync();
 		}

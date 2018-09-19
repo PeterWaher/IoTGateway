@@ -1443,14 +1443,14 @@ namespace Waher.Persistence.FilesLW.Test
 			};
 
 			IObjectSerializer S = provider.GetObjectSerializer(typeof(CollectionTest));
-			BinarySerializer Writer = new BinarySerializer(((ObjectSerializer)S).CollectionName, Encoding.UTF8, true);
+			BinarySerializer Writer = new BinarySerializer(((ObjectSerializer)S).CollectionName(Obj), Encoding.UTF8, true);
 
 			S.Serialize(Writer, false, false, Obj);
 
 			byte[] Data = Writer.GetSerialization();
 			this.WriteData(Data);
 
-			BinaryDeserializer Reader = new BinaryDeserializer(((ObjectSerializer)S).CollectionName, Encoding.UTF8, Data, true);
+			BinaryDeserializer Reader = new BinaryDeserializer(((ObjectSerializer)S).CollectionName(Obj), Encoding.UTF8, Data, true);
 
 			CollectionTest Obj2 = (CollectionTest)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 

@@ -180,6 +180,8 @@ function ShowStatus(data)
 
     if (data.id)
         Div.innerHTML = Div.innerHTML + "<p id='" + data.id + "'>" + data.message + "</p>";
+    else if (data.html)
+        Div.innerHTML = Div.innerHTML + data.html;
     else
         Div.innerHTML = Div.innerHTML + "<p>" + data + "</p>";
 }

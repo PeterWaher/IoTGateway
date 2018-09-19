@@ -93,7 +93,7 @@ namespace Waher.Client.WPF
 			{
 				try
 				{
-					databaseProvider = new FilesProvider(appDataFolder + "Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000);
+					databaseProvider = new FilesProvider(appDataFolder + "Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 3600000);
 					Database.Register(databaseProvider);
 
 					Database.Find<Question>(new FilterAnd(new FilterFieldEqualTo("OwnerJID", string.Empty),

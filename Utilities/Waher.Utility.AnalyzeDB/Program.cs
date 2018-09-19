@@ -154,7 +154,7 @@ namespace Waher.Utility.AnalyzeDB
 					typeof(Database).Assembly,
 					typeof(FilesProvider).Assembly);
 
-				using (FilesProvider FilesProvider = new FilesProvider(ProgramDataFolder, "Default", BlockSize, 10000, BlobBlockSize, Encoding, 10000, Encryption, false))
+				using (FilesProvider FilesProvider = new FilesProvider(ProgramDataFolder, "Default", BlockSize, 10000, BlobBlockSize, Encoding, 3600000, Encryption, false))
 				{
 					Database.Register(FilesProvider);
 

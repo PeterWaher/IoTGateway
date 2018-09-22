@@ -250,6 +250,7 @@ language localization, runtime settings, timing and scheduling.
 | **Waher.Runtime.Language**            | .NET Std 1.3  | [NuGet](https://www.nuget.org/packages/Waher.Runtime.Language/)            | The [Waher.Runtime.Language](Runtime/Waher.Runtime.Language) project helps applications with language localization. |
 | **Waher.Runtime.ServiceRegistration** | .NET Std 1.3  | [NuGet](https://www.nuget.org/packages/Waher.Runtime.ServiceRegistration/) | The [Waher.Runtime.ServiceRegistration](Runtime/Waher.Runtime.ServiceRegistration) library allows applications to register themselves with an XMPP-based Service Registry, such as the [IoT Broker](https://waher.se/Broker.md). |
 | **Waher.Runtime.Settings**            | .NET Std 1.3  | [NuGet](https://www.nuget.org/packages/Waher.Runtime.Settings/)            | The [Waher.Runtime.Settings](Runtime/Waher.Runtime.Settings) project helps applications maintain a set of persistent settings. |
+| **Waher.Runtime.Threading**           | .NET Std 1.3  | [NuGet](https://www.nuget.org/packages/Waher.Runtime.Threading/)           | The [Waher.Runtime.Threading](Runtime/Waher.Runtime.Threading) project provides classes for usage in multi-threaded environments providing multiple-read/single-write capabilities. |
 | **Waher.Runtime.Timing**              | .NET Std 1.3  | [NuGet](https://www.nuget.org/packages/Waher.Runtime.Timing/)              | The [Waher.Runtime.Timing](Runtime/Waher.Runtime.Timing) project provides tools for timing and scheduling. |
 
 The folder also contains the following unit test projects:
@@ -257,6 +258,7 @@ The folder also contains the following unit test projects:
 | Project                            | Type          | Project description |
 |------------------------------------|---------------|---------------------|
 | **Waher.Runtime.Language.Test**    | .NET Core 2.0 | The [Waher.Runtime.Language.Test](Runtime/Waher.Runtime.Language.Test) project contains unit tests for the [Waher.Runtime.Language](Runtime/Waher.Runtime.Language) project. |
+| **Waher.Runtime.Threading.Test**   | .NET Core 2.0 | The [Waher.Runtime.Threading.Test](Runtime/Waher.Runtime.Threading.Test) project contains unit tests for the [Waher.Runtime.Threading](Runtime/Waher.Runtime.Threading) project. |
 
 Script
 ----------------------

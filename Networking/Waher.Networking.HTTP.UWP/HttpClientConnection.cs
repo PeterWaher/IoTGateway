@@ -546,6 +546,7 @@ namespace Waher.Networking.HTTP
 				if (!this.encrypted &&
 					(Header.UpgradeInsecureRequests?.Upgrade ?? false) &&
 					Header.Host != null &&
+					string.Compare(Header.Host.Value, "localhost", true) != 0 &&
 					((UpgradePort = this.server.UpgradePort).HasValue))
 				{
 					StringBuilder Location = new StringBuilder();

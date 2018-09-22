@@ -496,6 +496,7 @@ namespace Waher.Persistence.Files
 		/// <summary>
 		/// Locks access to the file.
 		/// </summary>
+		/// <param name="Timeout">Timeout, in milliseconds.</param>
 		/// <returns>Task object.</returns>
 		internal async Task<bool> TryLock(int Timeout)
 		{
@@ -519,15 +520,15 @@ namespace Waher.Persistence.Files
 				this.emptyRoot = false;
 
 				byte[] Block = await this.LoadBlockLocked(0, true);
-				BinaryDeserializer Reader = new Serialization.BinaryDeserializer(this.collectionName, this.encoding, Block);
-				BlockHeader Header = new Storage.BlockHeader(Reader);
+				BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Block);
+				BlockHeader Header = new BlockHeader(Reader);
 				uint BlockIndex;
 
 				while (Header.BytesUsed == 0 && (BlockIndex = Header.LastBlockIndex) != 0)
 				{
 					Block = await this.LoadBlockLocked(((long)BlockIndex) * this.blockSize, true);
 					Reader.Restart(Block, 0);
-					Header = new Storage.BlockHeader(Reader);
+					Header = new BlockHeader(Reader);
 
 					this.RegisterEmptyBlockLocked(BlockIndex);
 				}
@@ -541,7 +542,7 @@ namespace Waher.Persistence.Files
 			if (this.emptyBlocks != null)
 				await this.RemoveEmptyBlocksLocked();
 
-			if (this.blocksToSave != null)
+			if (this.blocksToSave != null && this.blocksToSave.Count > 0 && !this.provider.InBulkMode(this))
 				await this.SaveUnsaved();
 
 			this.fileAccessSemaphore.Release();
@@ -851,8 +852,8 @@ namespace Waher.Persistence.Files
 						ParentBlockIndex = BitConverter.ToUInt32(Block, 10);
 						SourceLocation = ((long)ParentBlockIndex) * this.blockSize;
 						Block = await this.LoadBlockLocked(SourceLocation, true);
-						Reader = new Serialization.BinaryDeserializer(this.collectionName, this.encoding, Block);
-						Header = new Storage.BlockHeader(Reader);
+						Reader = new BinaryDeserializer(this.collectionName, this.encoding, Block);
+						Header = new BlockHeader(Reader);
 
 						if (Header.LastBlockIndex == PrevBlockIndex)
 							Array.Copy(BitConverter.GetBytes(BlockIndex), 0, Block, 6, 4);
@@ -1357,6 +1358,30 @@ namespace Waher.Persistence.Files
 				await Index.SaveNewObject(ObjectId, Object, Serializer);
 
 			return ObjectId;
+		}
+
+		/// <summary>
+		/// Saves a new set of objects to the file.
+		/// </summary>
+		/// <param name="Objects">Objects to persist.</param>
+		/// <param name="Serializer">Object serializer. If not provided, the serializer registered for the corresponding type will be used.</param>
+		public async Task SaveNewObjects(IEnumerable<object> Objects, ObjectSerializer Serializer)
+		{
+			LinkedList<Guid> ObjectIds = new LinkedList<Guid>();
+
+			await this.Lock();
+			try
+			{
+				foreach (object Object in Objects)
+					ObjectIds.AddLast(await this.SaveNewObjectLocked(Object, Serializer));
+			}
+			finally
+			{
+				await this.Release();
+			}
+
+			foreach (IndexBTreeFile Index in this.indices)
+				await Index.SaveNewObjects(ObjectIds, Objects, Serializer);
 		}
 
 		internal async Task<Guid> SaveNewObjectLocked(object Object, ObjectSerializer Serializer)
@@ -2042,6 +2067,52 @@ namespace Waher.Persistence.Files
 				await Index.UpdateObject(ObjectId, Old, Object, Serializer);
 		}
 
+		/// <summary>
+		/// Updates a set of objects in the database.
+		/// </summary>
+		/// <param name="ObjectIds">Object IDs of objects to update.</param>
+		/// <param name="Objects">Objects to update.</param>
+		/// <param name="Serializer">Object serializer to use.</param>
+		/// <returns>Task object that can be used to wait for the asynchronous method to complete.</returns>
+		/// <exception cref="NotSupportedException">Thrown, if the corresponding class does not have an Object ID property, 
+		/// or if the corresponding property type is not supported.</exception>
+		/// <exception cref="IOException">If the object is not found in the database.</exception>
+		public async Task UpdateObjects(IEnumerable<Guid> ObjectIds, IEnumerable<object> Objects, IObjectSerializer Serializer)
+		{
+			LinkedList<object> Olds = new LinkedList<object>();
+			object Old;
+
+			await this.Lock();
+			try
+			{
+				IEnumerator<Guid> e1 = ObjectIds.GetEnumerator();
+				IEnumerator<object> e2 = Objects.GetEnumerator();
+
+				while (e1.MoveNext() && e2.MoveNext())
+				{
+					BlockInfo Info = await this.FindNodeLocked(e1.Current);
+					if (Info == null)
+						throw new KeyNotFoundException("Object not found.");
+
+					Old = await this.ParseObjectLocked(Info, Serializer);
+					Olds.AddLast(Old);
+
+					BinarySerializer Writer = new BinarySerializer(this.collectionName, this.encoding);
+					Serializer.Serialize(Writer, false, false, e2.Current);
+					byte[] Bin = Writer.GetSerialization();
+
+					await this.ReplaceObjectLocked(Bin, Info, true);
+				}
+			}
+			finally
+			{
+				await this.Release();
+			}
+
+			foreach (IndexBTreeFile Index in this.indices)
+				await Index.UpdateObjects(ObjectIds, Olds, Objects, Serializer);
+		}
+
 		internal async Task ReplaceObjectLocked(byte[] Bin, BlockInfo Info, bool DeleteBlob)
 		{
 			byte[] Block = Info.Block;
@@ -2314,6 +2385,34 @@ namespace Waher.Persistence.Files
 				await Index.DeleteObject(ObjectId, DeletedObject, Serializer);
 
 			return DeletedObject;
+		}
+
+		/// <summary>
+		/// Deletes a set of objects from the database.
+		/// </summary>
+		/// <param name="ObjectIds">Object IDs of the objects to delete.</param>
+		/// <param name="Serializer">Binary serializer.</param>
+		/// <returns>Object that was deleted.</returns>
+		/// <exception cref="IOException">If the object is not found in the database.</exception>
+		public async Task<IEnumerable<object>> DeleteObjects(IEnumerable<Guid> ObjectIds, IObjectSerializer Serializer)
+		{
+			LinkedList<object> DeletedObjects = new LinkedList<object>();
+
+			await this.Lock();
+			try
+			{
+				foreach (Guid ObjectId in ObjectIds)
+					DeletedObjects.AddLast(await this.DeleteObjectLocked(ObjectId, false, true, Serializer, null));
+			}
+			finally
+			{
+				await this.Release();
+			}
+
+			foreach (IndexBTreeFile Index in this.indices)
+				await Index.DeleteObjects(ObjectIds, DeletedObjects, Serializer);
+
+			return DeletedObjects;
 		}
 
 		internal async Task<object> DeleteObjectLocked(object ObjectId, bool MergeNodes, bool DeleteAnyBlob,
@@ -2942,7 +3041,7 @@ namespace Waher.Persistence.Files
 
 		private async Task<bool> ForEachObjectAsync(byte[] Block, ForEachAsyncDelegate Method)
 		{
-			BinaryDeserializer Reader = new Serialization.BinaryDeserializer(this.collectionName, this.encoding, Block);
+			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Block);
 			BlockHeader Header = new BlockHeader(Reader);
 			object ObjectId;
 			uint Link;
@@ -2974,7 +3073,7 @@ namespace Waher.Persistence.Files
 
 		private bool ForEachObject(byte[] Block, ForEachDelegate Method)
 		{
-			BinaryDeserializer Reader = new Serialization.BinaryDeserializer(this.collectionName, this.encoding, Block);
+			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Block);
 			BlockHeader Header = new BlockHeader(Reader);
 			object ObjectId;
 			uint Link;
@@ -3006,8 +3105,8 @@ namespace Waher.Persistence.Files
 		{
 			long PhysicalPosition = ((long)BlockIndex) * this.blockSize;
 			byte[] Block = await this.LoadBlockLocked(PhysicalPosition, true);
-			BinaryDeserializer Reader = new Serialization.BinaryDeserializer(this.collectionName, this.encoding, Block);
-			BlockHeader Header = new Storage.BlockHeader(Reader);
+			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Block);
+			BlockHeader Header = new BlockHeader(Reader);
 			byte[] Result = null;
 			object ObjectId;
 			uint Link;
@@ -3149,7 +3248,7 @@ namespace Waher.Persistence.Files
 		{
 			long PhysicalPosition = ((long)BlockIndex) * this.blockSize;
 			byte[] Block = await this.LoadBlockLocked(PhysicalPosition, true);
-			BinaryDeserializer Reader = new Serialization.BinaryDeserializer(this.collectionName, this.encoding, Block);
+			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Block);
 			BlockHeader Header = new BlockHeader(Reader);
 			byte[] Result = null;
 			object ObjectId;
@@ -3684,7 +3783,7 @@ namespace Waher.Persistence.Files
 			int NrBlobBlocks = (int)(BlobFileSize / this.blobBlockSize);
 
 			byte[] Block = await this.LoadBlockLocked(0, false);
-			BinaryDeserializer Reader = new Serialization.BinaryDeserializer(this.collectionName, this.encoding, Block);
+			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Block);
 			BlockHeader Header = new BlockHeader(Reader);
 			FileStatistics Statistics = new FileStatistics((uint)this.blockSize, this.nrBlockLoads, this.nrCacheLoads, this.nrBlockSaves,
 				this.nrBlobBlockLoads, this.nrBlobBlockSaves, this.nrFullFileScans, this.nrSearches);

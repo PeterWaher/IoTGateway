@@ -121,5 +121,23 @@ namespace Waher.Persistence
 		/// <param name="ExportData">If data in database is to be exported in output.</param>
 		void Analyze(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData);
 
+		/// <summary>
+		/// Adds an index to a collection, if one does not already exist.
+		/// </summary>
+		/// <param name="CollectionName">Name of collection.</param>
+		/// <param name="FieldNames">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		Task AddIndex(string CollectionName, string[] FieldNames);
+
+		/// <summary>
+		/// Starts bulk-proccessing of data. Must be followed by a call to <see cref="EndBulk"/>.
+		/// </summary>
+		Task StartBulk();
+
+		/// <summary>
+		/// Ends bulk-processing of data. Must be called once for every call to <see cref="StartBulk"/>.
+		/// </summary>
+		Task EndBulk();
+
 	}
 }

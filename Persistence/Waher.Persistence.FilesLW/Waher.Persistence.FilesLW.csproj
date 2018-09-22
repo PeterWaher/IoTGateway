@@ -14,11 +14,11 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>persistence object database file storage</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.0.35</AssemblyVersion>
-    <FileVersion>1.0.35</FileVersion>
+    <AssemblyVersion>1.0.36</AssemblyVersion>
+    <FileVersion>1.0.36</FileVersion>
     <PreBuildEvent>xcopy "C:\My Projects\IoTGateway\Persistence\Waher.Persistence.Files\*.cs" "C:\My Projects\IoTGateway\Persistence\Waher.Persistence.FilesLW" /Y /S
 </PreBuildEvent>
-    <Version>1.0.35</Version>
+    <Version>1.0.36</Version>
     <PackageIconUrl>https://github.com/PeterWaher/IoTGateway/blob/master/Images/Icon.ico?raw=true</PackageIconUrl>
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Persistence\Waher.Persistence.FilesLW\</UpgradeBackupLocation>
@@ -35,6 +35,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Cache\Waher.Runtime.Cache.csproj" />
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj" />
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Threading\Waher.Runtime.Threading.csproj" />
     <ProjectReference Include="..\Waher.Persistence\Waher.Persistence.csproj" />
   </ItemGroup>
 </Project>

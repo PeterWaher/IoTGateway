@@ -19,8 +19,8 @@ namespace Waher.Persistence.MongoDB
 	/// </summary>
 	public class MongoDBProvider : IDatabaseProvider
 	{
-		private Dictionary<string, IMongoCollection<BsonDocument>> collections = new Dictionary<string, IMongoCollection<BsonDocument>>();
-		private Dictionary<string, ObjectSerializer> serializers = new Dictionary<string, ObjectSerializer>();
+		private readonly Dictionary<string, IMongoCollection<BsonDocument>> collections = new Dictionary<string, IMongoCollection<BsonDocument>>();
+		private readonly Dictionary<string, ObjectSerializer> serializers = new Dictionary<string, ObjectSerializer>();
 		private MongoClient client;
 		private IMongoDatabase database;
 		private string defaultCollectionName;
@@ -656,7 +656,7 @@ namespace Waher.Persistence.MongoDB
 			return First;
 		}
 
-		private Cache<string, object> loadCache = new Cache<string, object>(10000, new TimeSpan(0, 0, 10), new TimeSpan(0, 0, 5));  // TODO: Make parameters configurable.
+		private readonly Cache<string, object> loadCache = new Cache<string, object>(10000, new TimeSpan(0, 0, 10), new TimeSpan(0, 0, 5));  // TODO: Make parameters configurable.
 
 		/// <summary>
 		/// Updates an object in the database.
@@ -765,6 +765,33 @@ namespace Waher.Persistence.MongoDB
 		public void Analyze(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData)
 		{
 			throw new NotImplementedException("MongoDB provider does not support the Analyze method.");  // TODO
+		}
+
+		/// <summary>
+		/// Adds an index to a collection, if one does not already exist.
+		/// </summary>
+		/// <param name="CollectionName">Name of collection.</param>
+		/// <param name="FieldNames">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		public Task AddIndex(string CollectionName, string[] FieldNames)
+		{
+			throw new NotImplementedException("MongoDB provider does not support the AddIndex method.");  // TODO
+		}
+
+		/// <summary>
+		/// Starts bulk-proccessing of data. Must be followed by a call to <see cref="EndBulk"/>.
+		/// </summary>
+		public Task StartBulk()
+		{
+			return Task.CompletedTask;
+		}
+
+		/// <summary>
+		/// Ends bulk-processing of data. Must be called once for every call to <see cref="StartBulk"/>.
+		/// </summary>
+		public Task EndBulk()
+		{
+			return Task.CompletedTask;
 		}
 
 		// TODO:

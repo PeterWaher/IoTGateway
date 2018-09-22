@@ -34,6 +34,23 @@ namespace Waher.Persistence.Serialization
 		Task EndCollection();
 
 		/// <summary>
+		/// Is called when an index in a collection is started.
+		/// </summary>
+		Task StartIndex();
+
+		/// <summary>
+		/// Is called when an index in a collection is finished.
+		/// </summary>
+		Task EndIndex();
+
+		/// <summary>
+		/// Is called when a field in an index is reported.
+		/// </summary>
+		/// <param name="FieldName">Name of field.</param>
+		/// <param name="Ascending">If the field is sorted using ascending sort order.</param>
+		Task ReportIndexField(string FieldName, bool Ascending);
+
+		/// <summary>
 		/// Is called when an object is started.
 		/// </summary>
 		/// <param name="ObjectId"></param>

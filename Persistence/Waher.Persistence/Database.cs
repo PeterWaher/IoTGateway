@@ -273,5 +273,32 @@ namespace Waher.Persistence
 			Provider.Analyze(Output, XsltPath, ProgramDataFolder, ExportData);
 		}
 
+		/// <summary>
+		/// Adds an index to a collection, if one does not already exist.
+		/// </summary>
+		/// <param name="CollectionName">Name of collection.</param>
+		/// <param name="FieldNames">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		public static Task AddIndex(string CollectionName, string[] FieldNames)
+		{
+			return Provider.AddIndex(CollectionName, FieldNames);
+		}
+
+		/// <summary>
+		/// Starts bulk-proccessing of data. Must be followed by a call to <see cref="EndBulk"/>.
+		/// </summary>
+		public static Task StartBulk()
+		{
+			return Provider.StartBulk();
+		}
+
+		/// <summary>
+		/// Ends bulk-processing of data. Must be called once for every call to <see cref="StartBulk"/>.
+		/// </summary>
+		public static Task EndBulk()
+		{
+			return Provider.EndBulk();
+		}
+
 	}
 }

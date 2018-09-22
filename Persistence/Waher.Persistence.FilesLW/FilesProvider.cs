@@ -64,6 +64,7 @@ namespace Waher.Persistence.Files
 		private readonly Dictionary<string, Dictionary<ulong, string>> fieldByCodeByCollection = new Dictionary<string, Dictionary<ulong, string>>();
 		private readonly Dictionary<string, ObjectBTreeFile> files = new Dictionary<string, ObjectBTreeFile>();
 		private readonly Dictionary<string, StringDictionary> nameFiles = new Dictionary<string, StringDictionary>();
+		private readonly Dictionary<ObjectBTreeFile, bool> hasUnsavedData = new Dictionary<ObjectBTreeFile, bool>();
 		private readonly AutoResetEvent serializerAdded = new AutoResetEvent(false);
 		private StringDictionary master;
 		private Cache<long, byte[]> blocks;
@@ -78,6 +79,7 @@ namespace Waher.Persistence.Files
 		private readonly int blobBlockSize;
 		private readonly int timeoutMilliseconds;
 		private int nrFiles = 0;
+		private int bulkCount = 0;
 		private readonly bool debug;
 #if NETSTANDARD1_5
 		private readonly bool encrypted;
@@ -938,6 +940,68 @@ namespace Waher.Persistence.Files
 			this.blocks.Add(this.GetBlockKey(FileId, BlockIndex), Block);
 		}
 
+		/// <summary>
+		/// Starts bulk-proccessing of data. Must be followed by a call to <see cref="EndBulk"/>.
+		/// </summary>
+		public Task StartBulk()
+		{
+			lock (this.synchObj)
+			{
+				this.bulkCount++;
+			}
+
+			return Task.CompletedTask;
+		}
+
+		/// <summary>
+		/// Ends bulk-processing of data. Must be called once for every call to <see cref="StartBulk"/>.
+		/// </summary>
+		public async Task EndBulk()
+		{
+			lock (this.synchObj)
+			{
+				if (this.bulkCount <= 0)
+					throw new InvalidOperationException("Not in bulk mode.");
+
+				this.bulkCount--;
+				if (this.bulkCount > 0)
+					return;
+			}
+
+			ObjectBTreeFile[] Files;
+
+			lock (this.synchObj)
+			{
+				int c = this.hasUnsavedData.Count;
+				if (c == 0)
+					return;
+
+				Files = new ObjectBTreeFile[c];
+				this.hasUnsavedData.Keys.CopyTo(Files, 0);
+				this.hasUnsavedData.Clear();
+			}
+
+			foreach (ObjectBTreeFile File in Files)
+			{
+				await File.Lock();
+				await File.Release();   // Saves unsaved data.
+			}
+		}
+
+		internal bool InBulkMode(ObjectBTreeFile Caller)
+		{
+			lock (this.synchObj)
+			{
+				if (this.bulkCount <= 0)
+					return false;
+				else
+				{
+					this.hasUnsavedData[Caller] = true;
+					return true;
+				}
+			}
+		}
+
 		#endregion
 
 		#region Files
@@ -1076,7 +1140,8 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		/// <param name="File">Object file.</param>
 		/// <param name="RegenerationOptions">Index regeneration options.</param>
-		/// <param name="FieldNames">Indexed fields.</param>
+		/// <param name="FieldNames">Field names to build the index on. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the corresponding field name by a hyphen (minus) sign.</param>
 		/// <returns>Index file.</returns>
 		public async Task<IndexBTreeFile> GetIndexFile(ObjectBTreeFile File, RegenerationOptions RegenerationOptions, params string[] FieldNames)
 		{
@@ -1461,10 +1526,9 @@ namespace Waher.Persistence.Files
 		/// Inserts a collection of objects into the database.
 		/// </summary>
 		/// <param name="Objects">Objects to insert.</param>
-		public async Task Insert(params object[] Objects)
+		public Task Insert(params object[] Objects)
 		{
-			foreach (object Object in Objects)
-				await this.Insert(Object);
+			return this.Insert((IEnumerable<object>)Objects);
 		}
 
 		/// <summary>
@@ -1473,8 +1537,47 @@ namespace Waher.Persistence.Files
 		/// <param name="Objects">Objects to insert.</param>
 		public async Task Insert(IEnumerable<object> Objects)
 		{
+			LinkedList<object> List = new LinkedList<object>();
+			ObjectSerializer Serializer = null;
+			ObjectBTreeFile File = null;
+			string CollectionName = null;
+			string CollectionName2;
+			Type T = null;
+			Type T2;
+
 			foreach (object Object in Objects)
-				await this.Insert(Object);
+			{
+				T2 = Object.GetType();
+				if (Serializer == null || T != T2)
+				{
+					if (List.First != null)
+					{
+						await File.SaveNewObjects(List, Serializer);
+						List.Clear();
+					}
+
+					T = T2;
+					Serializer = this.GetObjectSerializerEx(Object);
+				}
+
+				CollectionName2 = Serializer.CollectionName(Object);
+				if (File == null || CollectionName != CollectionName2)
+				{
+					if (List.First != null)
+					{
+						await File.SaveNewObjects(List, Serializer);
+						List.Clear();
+					}
+
+					CollectionName = CollectionName2;
+					File = await this.GetFile(CollectionName);
+				}
+
+				List.AddLast(Object);
+			}
+
+			if (List.First != null)
+				await File.SaveNewObjects(List, Serializer);
 		}
 
 		/// <summary>
@@ -1535,28 +1638,18 @@ namespace Waher.Persistence.Files
 		/// <param name="Object">Object to insert.</param>
 		public async Task Update(object Object)
 		{
-			if (!(Object is GenericObject GenObj))
-			{
-				ObjectSerializer Serializer = this.GetObjectSerializerEx(Object.GetType());
-				ObjectBTreeFile File = await this.GetFile(Serializer.CollectionName(Object));
-				await File.UpdateObject(Object, Serializer);
-			}
-			else
-			{
-				IObjectSerializer Serializer = this.GetObjectSerializer(Object.GetType());
-				ObjectBTreeFile File = await this.GetFile(GenObj.CollectionName);
-				await File.UpdateObject(GenObj.ObjectId, GenObj, Serializer);
-			}
+			ObjectSerializer Serializer = this.GetObjectSerializerEx(Object.GetType());
+			ObjectBTreeFile File = await this.GetFile(Serializer.CollectionName(Object));
+			await File.UpdateObject(Object, Serializer);
 		}
 
 		/// <summary>
 		/// Updates a collection of objects in the database.
 		/// </summary>
 		/// <param name="Objects">Objects to insert.</param>
-		public async Task Update(params object[] Objects)
+		public Task Update(params object[] Objects)
 		{
-			foreach (object Object in Objects)
-				await this.Update(Object);
+			return this.Update((IEnumerable<object>)Objects);
 		}
 
 		/// <summary>
@@ -1565,8 +1658,50 @@ namespace Waher.Persistence.Files
 		/// <param name="Objects">Objects to insert.</param>
 		public async Task Update(IEnumerable<object> Objects)
 		{
+			LinkedList<object> List = new LinkedList<object>();
+			LinkedList<Guid> ObjectIds = new LinkedList<Guid>();
+			ObjectSerializer Serializer = null;
+			ObjectBTreeFile File = null;
+			string CollectionName = null;
+			string CollectionName2;
+			Type T = null;
+			Type T2;
+
 			foreach (object Object in Objects)
-				await this.Update(Object);
+			{
+				T2 = Object.GetType();
+				if (Serializer == null || T != T2)
+				{
+					if (List.First != null)
+					{
+						await File.UpdateObjects(ObjectIds, List, Serializer);
+						List.Clear();
+						ObjectIds.Clear();
+					}
+
+					T = T2;
+					Serializer = this.GetObjectSerializerEx(Object);
+				}
+
+				CollectionName2 = Serializer.CollectionName(Object);
+				if (File == null || CollectionName != CollectionName2)
+				{
+					if (List.First != null)
+					{
+						await File.UpdateObjects(ObjectIds, List, Serializer);
+						List.Clear();
+						ObjectIds.Clear();
+					}
+
+					CollectionName = CollectionName2;
+					File = await this.GetFile(CollectionName);
+				}
+
+				List.AddLast(Object);
+			}
+
+			if (List.First != null)
+				await File.UpdateObjects(ObjectIds, List, Serializer);
 		}
 
 		/// <summary>
@@ -1575,45 +1710,18 @@ namespace Waher.Persistence.Files
 		/// <param name="Object">Object to insert.</param>
 		public async Task Delete(object Object)
 		{
-			if (!(Object is GenericObject GenObj))
-			{
-				ObjectSerializer Serializer = this.GetObjectSerializerEx(Object.GetType());
-				ObjectBTreeFile File = await this.GetFile(Serializer.CollectionName(Object));
-				await File.DeleteObject(Object, Serializer);
-			}
-			else
-			{
-				IObjectSerializer Serializer = this.GetObjectSerializer(Object.GetType());
-				ObjectBTreeFile File = await this.GetFile(GenObj.CollectionName);
-				await File.DeleteObject(GenObj.ObjectId, Serializer);
-			}
+			ObjectSerializer Serializer = this.GetObjectSerializerEx(Object.GetType());
+			ObjectBTreeFile File = await this.GetFile(Serializer.CollectionName(Object));
+			await File.DeleteObject(Object, Serializer);
 		}
 
 		/// <summary>
 		/// Deletes a collection of objects in the database.
 		/// </summary>
 		/// <param name="Objects">Objects to insert.</param>
-		public async Task Delete(params object[] Objects)
+		public Task Delete(params object[] Objects)
 		{
-			List<Exception> Exceptions = null;
-
-			foreach (object Object in Objects)
-			{
-				try
-				{
-					await this.Delete(Object);
-				}
-				catch (Exception ex)
-				{
-					if (Exceptions == null)
-						Exceptions = new List<Exception>();
-
-					Exceptions.Add(ex);
-				}
-			}
-
-			if (Exceptions != null)
-				throw new AggregateException("Unable to delete some objects.", Exceptions.ToArray());
+			return this.Delete((IEnumerable<object>)Objects);
 		}
 
 		/// <summary>
@@ -1622,25 +1730,47 @@ namespace Waher.Persistence.Files
 		/// <param name="Objects">Objects to insert.</param>
 		public async Task Delete(IEnumerable<object> Objects)
 		{
-			List<Exception> Exceptions = null;
+			LinkedList<Guid> List = new LinkedList<Guid>();
+			ObjectSerializer Serializer = null;
+			ObjectBTreeFile File = null;
+			string CollectionName = null;
+			string CollectionName2;
+			Type T = null;
+			Type T2;
 
 			foreach (object Object in Objects)
 			{
-				try
+				T2 = Object.GetType();
+				if (Serializer == null || T != T2)
 				{
-					await this.Delete(Object);
-				}
-				catch (Exception ex)
-				{
-					if (Exceptions == null)
-						Exceptions = new List<Exception>();
+					if (List.First != null)
+					{
+						await File.DeleteObjects(List, Serializer);
+						List.Clear();
+					}
 
-					Exceptions.Add(ex);
+					T = T2;
+					Serializer = this.GetObjectSerializerEx(Object);
 				}
+
+				CollectionName2 = Serializer.CollectionName(Object);
+				if (File == null || CollectionName != CollectionName2)
+				{
+					if (List.First != null)
+					{
+						await File.DeleteObjects(List, Serializer);
+						List.Clear();
+					}
+
+					CollectionName = CollectionName2;
+					File = await this.GetFile(CollectionName);
+				}
+
+				List.AddLast(await Serializer.GetObjectId(Object, false));
 			}
 
-			if (Exceptions != null)
-				throw new AggregateException("Unable to delete some objects.", Exceptions.ToArray());
+			if (List.First != null)
+				await File.DeleteObjects(List, Serializer);
 		}
 
 		#endregion
@@ -1747,6 +1877,20 @@ namespace Waher.Persistence.Files
 					await Output.StartCollection(File.CollectionName);
 					try
 					{
+						foreach (IndexBTreeFile Index in File.Indices)
+						{
+							await Output.StartIndex();
+
+							string[] FieldNames = Index.FieldNames;
+							bool[] Ascending = Index.Ascending;
+							int i, c = Math.Min(FieldNames.Length, Ascending.Length);
+
+							for (i = 0; i < c; i++)
+								await Output.ReportIndexField(FieldNames[i], Ascending[i]);
+
+							await Output.EndIndex();
+						}
+
 						using (ObjectBTreeFileEnumerator<GenericObject> e = await File.GetTypedEnumeratorAsync<GenericObject>(true))
 						{
 							GenericObject Obj;
@@ -1975,6 +2119,22 @@ namespace Waher.Persistence.Files
 			}
 
 			w.WriteEndElement();
+		}
+
+		#endregion
+
+		#region Indices
+
+		/// <summary>
+		/// Adds an index to a collection, if one does not already exist.
+		/// </summary>
+		/// <param name="CollectionName">Name of collection.</param>
+		/// <param name="FieldNames">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		public async Task AddIndex(string CollectionName, string[] FieldNames)
+		{
+			ObjectBTreeFile File = await this.GetFile(CollectionName);
+			await GetIndexFile(File, RegenerationOptions.RegenerateIfFileNotFound, FieldNames);
 		}
 
 		#endregion

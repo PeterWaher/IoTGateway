@@ -156,6 +156,42 @@ namespace Waher.Persistence.Files
 		}
 
 		/// <summary>
+		/// Saves a new set of objects to the file.
+		/// </summary>
+		/// <param name="ObjectIds">Object IDs</param>
+		/// <param name="Objects">Objects to persist.</param>
+		/// <param name="Serializer">Object serializer.</param>
+		/// <returns>If the object was saved in the index (true), or if the index property values of the object did not exist, or were too big to fit in an index record.</returns>
+		internal async Task<bool> SaveNewObjects(IEnumerable<Guid> ObjectIds, IEnumerable<object> Objects, IObjectSerializer Serializer)
+		{
+			await this.indexFile.Lock();
+			try
+			{
+				IEnumerator<Guid> e1 = ObjectIds.GetEnumerator();
+				IEnumerator<object> e2 = Objects.GetEnumerator();
+
+				while (e1.MoveNext() && e2.MoveNext())
+				{
+					byte[] Bin = this.recordHandler.Serialize(e1.Current, e2.Current, Serializer, MissingFieldAction.Null);
+					if (Bin == null || Bin.Length > this.indexFile.InlineObjectSizeLimit)
+						return false;
+
+					BlockInfo Leaf = await this.indexFile.FindLeafNodeLocked(Bin);
+					if (Leaf == null)
+						throw new IOException("Object is already available in index.");
+
+					await this.indexFile.InsertObjectLocked(Leaf.BlockIndex, Leaf.Header, Leaf.Block, Bin, Leaf.InternalPosition, 0, 0, true, Leaf.LastObject);
+				}
+			}
+			finally
+			{
+				await this.indexFile.Release();
+			}
+
+			return true;
+		}
+
+		/// <summary>
 		/// Deletes an object from the file.
 		/// </summary>
 		/// <param name="ObjectId">Object ID</param>
@@ -183,6 +219,43 @@ namespace Waher.Persistence.Files
 			}
 
 			return true;
+		}
+
+		/// <summary>
+		/// Deletes a set of objects from the file.
+		/// </summary>
+		/// <param name="ObjectIds">Object IDs</param>
+		/// <param name="Objects">Objects to delete.</param>
+		/// <param name="Serializer">Object serializer.</param>
+		/// <returns>If the object was deleted from the index (true), or if the object did not exist in the index.</returns>
+		internal async Task DeleteObjects(IEnumerable<Guid> ObjectIds, IEnumerable<object> Objects, IObjectSerializer Serializer)
+		{
+			await this.indexFile.Lock();
+			try
+			{
+				IEnumerator<Guid> e1 = ObjectIds.GetEnumerator();
+				IEnumerator<object> e2 = Objects.GetEnumerator();
+
+				while (e1.MoveNext() && e2.MoveNext())
+				{
+					try
+					{
+						byte[] Bin = this.recordHandler.Serialize(e1.Current, e2.Current, Serializer, MissingFieldAction.Null);
+						if (Bin == null || Bin.Length > this.indexFile.InlineObjectSizeLimit)
+							continue;
+
+						await this.indexFile.DeleteObjectLocked(Bin, false, true, Serializer, null);
+					}
+					catch (KeyNotFoundException)
+					{
+						continue;
+					}
+				}
+			}
+			finally
+			{
+				await this.indexFile.Release();
+			}
 		}
 
 		/// <summary>
@@ -247,6 +320,77 @@ namespace Waher.Persistence.Files
 			}
 
 			return true;
+		}
+
+		/// <summary>
+		/// Updates a series of objects in the file.
+		/// </summary>
+		/// <param name="ObjectIds">Object IDs</param>
+		/// <param name="OldObjects">Objects that are being changed.</param>
+		/// <param name="NewObjects">New versions of objects.</param>
+		/// <param name="Serializer">Object serializer.</param>
+		/// <returns>If the object was saved in the index (true), or if the index property values of the object did not exist, or were too big to fit in an index record.</returns>
+		internal async Task UpdateObjects(IEnumerable<Guid> ObjectIds,
+			IEnumerable<object> OldObjects, IEnumerable<object> NewObjects,
+			IObjectSerializer Serializer)
+		{
+			await this.indexFile.Lock();
+			try
+			{
+				IEnumerator<Guid> e1 = ObjectIds.GetEnumerator();
+				IEnumerator<object> e2 = OldObjects.GetEnumerator();
+				IEnumerator<object> e3 = NewObjects.GetEnumerator();
+
+				while (e1.MoveNext() && e2.MoveNext() && e3.MoveNext())
+				{
+					byte[] OldBin = this.recordHandler.Serialize(e1.Current, e2.Current, Serializer, MissingFieldAction.Null);
+					if (OldBin != null && OldBin.Length > this.indexFile.InlineObjectSizeLimit)
+						continue;
+
+					byte[] NewBin = this.recordHandler.Serialize(e1.Current, e3.Current, Serializer, MissingFieldAction.Null);
+					if (NewBin != null && NewBin.Length > this.indexFile.InlineObjectSizeLimit)
+						continue;
+
+					if (OldBin == null && NewBin == null)
+						continue;
+
+					int i, c;
+
+					if ((c = OldBin.Length) == NewBin.Length)
+					{
+						for (i = 0; i < c; i++)
+						{
+							if (OldBin[i] != NewBin[i])
+								break;
+						}
+
+						if (i == c)
+							continue;
+					}
+
+					if (OldBin != null)
+					{
+						try
+						{
+							await this.indexFile.DeleteObjectLocked(OldBin, false, true, Serializer, null);
+						}
+						catch (KeyNotFoundException)
+						{
+							// Ignore.
+						}
+					}
+
+					if (NewBin != null)
+					{
+						BlockInfo Leaf = await this.indexFile.FindLeafNodeLocked(NewBin);
+						await this.indexFile.InsertObjectLocked(Leaf.BlockIndex, Leaf.Header, Leaf.Block, NewBin, Leaf.InternalPosition, 0, 0, true, Leaf.LastObject);
+					}
+				}
+			}
+			finally
+			{
+				await this.indexFile.Release();
+			}
 		}
 
 		/// <summary>
@@ -336,6 +480,10 @@ namespace Waher.Persistence.Files
 		/// <returns></returns>
 		public async Task Regenerate()
 		{
+			LinkedList<object> Objects = new LinkedList<object>();
+			LinkedList<Guid> ObjectIds = new LinkedList<Guid>();
+			IObjectSerializer LastSerializer = null;
+			int Count = 0;
 			int c = 0;
 			int d = 0;
 
@@ -346,18 +494,45 @@ namespace Waher.Persistence.Files
 				while (await e.MoveNextAsync())
 				{
 					object Obj = e.Current;
+					IObjectSerializer Serializer = e.CurrentSerializer;
 
 					if (Obj != null)
 					{
+						if (LastSerializer == null || Serializer != LastSerializer)
+						{
+							LastSerializer = Serializer;
+
+							if (Count > 0)
+							{
+								await this.SaveNewObjects(ObjectIds, Objects, LastSerializer);
+								ObjectIds.Clear();
+								Objects.Clear();
+								Count = 0;
+							}
+						}
+
+						ObjectIds.AddLast((Guid)e.CurrentObjectId);
+						Objects.AddLast(Obj);
 						c++;
-						await this.SaveNewObject((Guid)e.CurrentObjectId, e.Current, e.CurrentSerializer);
+						Count++;
+
+						if (Count >= 1000)
+						{
+							await this.SaveNewObjects(ObjectIds, Objects, LastSerializer);
+							ObjectIds.Clear();
+							Objects.Clear();
+							Count = 0;
+						}
 					}
 					else
 						d++;
 				}
+
+				if (Count > 0)
+					await this.SaveNewObjects(ObjectIds, Objects, LastSerializer);
 			}
 
-			Log.Notice("Index regenerated.", this.indexFile.FileName, 
+			Log.Notice("Index regenerated.", this.indexFile.FileName,
 				new KeyValuePair<string, object>("NrObjects", c),
 				new KeyValuePair<string, object>("NrNotLoadable", d));
 		}

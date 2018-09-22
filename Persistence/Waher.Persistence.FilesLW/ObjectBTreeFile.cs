@@ -20,13 +20,14 @@ using Waher.Persistence.Files.Serialization;
 using Waher.Persistence.Files.Statistics;
 using Waher.Persistence.Files.Storage;
 using Waher.Runtime.Inventory;
+using Waher.Runtime.Threading;
 
 namespace Waher.Persistence.Files
 {
 	/// <summary>
 	/// This class manages a binary file where objects are persisted in a B-tree.
 	/// </summary>
-	public class ObjectBTreeFile : IDisposable, ICollection<object>
+	public class ObjectBTreeFile : MultiReadSingleWriteObject, ICollection<object>
 	{
 		internal const int BlockHeaderSize = 14;
 
@@ -38,13 +39,11 @@ namespace Waher.Persistence.Files
 		private FileStream file;
 		private FileStream blobFile;
 		private readonly Encoding encoding;
-		private readonly SemaphoreSlim fileAccessSemaphore = new SemaphoreSlim(1, 1);
 		private SortedDictionary<long, byte[]> blocksToSave = null;
 		private LinkedList<KeyValuePair<object, ObjectSerializer>> objectsToSave = null;
 		private LinkedList<Tuple<Guid, ObjectSerializer, EmbeddedObjectSetter>> objectsToLoad = null;
 		private readonly object synchObject = new object();
 		private readonly IRecordHandler recordHandler;
-		private string lockStackTrace;
 		private ulong nrFullFileScans = 0;
 		private ulong nrSearches = 0;
 		private long bytesAdded = 0;
@@ -352,13 +351,10 @@ namespace Waher.Persistence.Files
 		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>
 		/// </summary>
-		public void Dispose()
+		public override void Dispose()
 		{
-			if (this.file != null)
-			{
-				this.file.Dispose();
-				this.file = null;
-			}
+			this.file?.Dispose();
+			this.file = null;
 
 			if (this.indices != null)
 			{
@@ -369,13 +365,12 @@ namespace Waher.Persistence.Files
 				this.indexList = null;
 			}
 
-			if (this.blobFile != null)
-			{
-				this.blobFile.Dispose();
-				this.blobFile = null;
-			}
+			this.blobFile?.Dispose();
+			this.blobFile = null;
 
 			this.provider.RemoveBlocks(this.id);
+
+			base.Dispose();
 		}
 
 		/// <summary>
@@ -479,41 +474,48 @@ namespace Waher.Persistence.Files
 
 		#region Locks
 
-		/// <summary>
-		/// Locks access to the file.
-		/// </summary>
-		/// <returns>Task object.</returns>
-		internal async Task Lock()
+		internal async Task LockRead()
 		{
-			string Trace = Environment.StackTrace;
+			if (!await this.TryBeginRead(this.timeoutMilliseconds))
+				throw new TimeoutException("Unable to get read access to database.");
+		}
 
-			if (!await this.fileAccessSemaphore.WaitAsync(this.timeoutMilliseconds))
-				throw FilesProvider.TimeoutException(this.lockStackTrace);
-
-			this.lockStackTrace = Trace;
+		internal async Task LockWrite()
+		{
+			if (!await this.TryBeginWrite(this.timeoutMilliseconds))
+				throw new TimeoutException("Unable to get write access to database.");
 		}
 
 		/// <summary>
-		/// Locks access to the file.
+		/// Ends a reading session of the object.
+		/// Must be called once for each call to <see cref="MultiReadSingleWriteObject.BeginRead"/> or successful call to 
+		/// <see cref="MultiReadSingleWriteObject.TryBeginRead(int)"/>.
 		/// </summary>
-		/// <param name="Timeout">Timeout, in milliseconds.</param>
-		/// <returns>Task object.</returns>
-		internal async Task<bool> TryLock(int Timeout)
+		public override async Task EndRead()
 		{
-			if (await this.fileAccessSemaphore.WaitAsync(Timeout))
+			await base.EndRead();
+
+			LinkedList<Tuple<Guid, ObjectSerializer, EmbeddedObjectSetter>> ToLoad;
+
+			lock (this.synchObject)
 			{
-				this.lockStackTrace = Environment.StackTrace;
-				return true;
+				ToLoad = this.objectsToLoad;
+				this.objectsToLoad = null;
 			}
-			else
-				return false;
+
+			if (ToLoad != null)
+			{
+				foreach (Tuple<Guid, ObjectSerializer, EmbeddedObjectSetter> P in ToLoad)
+					P.Item3(await this.LoadObject(P.Item1, P.Item2));
+			}
 		}
 
 		/// <summary>
-		/// Releases the file for access.
+		/// Ends a writing session of the object.
+		/// Must be called once for each call to <see cref="MultiReadSingleWriteObject.BeginWrite"/> or successful call to 
+		/// <see cref="MultiReadSingleWriteObject.TryBeginWrite(int)"/>.
 		/// </summary>
-		/// <returns>Task object.</returns>
-		internal async Task Release()
+		public override async Task EndWrite()
 		{
 			if (this.emptyRoot)
 			{
@@ -545,7 +547,7 @@ namespace Waher.Persistence.Files
 			if (this.blocksToSave != null && this.blocksToSave.Count > 0 && !this.provider.InBulkMode(this))
 				await this.SaveUnsaved();
 
-			this.fileAccessSemaphore.Release();
+			await base.EndWrite();
 
 			LinkedList<KeyValuePair<object, ObjectSerializer>> ToSave;
 			LinkedList<Tuple<Guid, ObjectSerializer, EmbeddedObjectSetter>> ToLoad;
@@ -625,14 +627,14 @@ namespace Waher.Persistence.Files
 
 		private async Task CreateFirstBlock()
 		{
-			await this.Lock();
+			await this.LockWrite();
 			try
 			{
 				await this.CreateNewBlockLocked();
 			}
 			finally
 			{
-				await this.Release();
+				await this.EndWrite();
 			}
 		}
 
@@ -651,14 +653,14 @@ namespace Waher.Persistence.Files
 		/// <returns>Loaded block.</returns>
 		public async Task<byte[]> LoadBlock(long PhysicalPosition)
 		{
-			await this.Lock();
+			await this.LockRead();
 			try
 			{
 				return await this.LoadBlockLocked(PhysicalPosition, true);
 			}
 			finally
 			{
-				await this.Release();
+				await this.EndRead();
 			}
 		}
 
@@ -713,14 +715,14 @@ namespace Waher.Persistence.Files
 		/// <returns>Block to save.</returns>
 		public async Task SaveBlock(long PhysicalPosition, byte[] Block)
 		{
-			await this.Lock();
+			await this.LockWrite();
 			try
 			{
 				this.QueueSaveBlockLocked(PhysicalPosition, Block);
 			}
 			finally
 			{
-				await this.Release();
+				await this.EndWrite();
 			}
 		}
 
@@ -1344,14 +1346,14 @@ namespace Waher.Persistence.Files
 		{
 			Guid ObjectId;
 
-			await this.Lock();
+			await this.LockWrite();
 			try
 			{
 				ObjectId = await this.SaveNewObjectLocked(Object, Serializer);
 			}
 			finally
 			{
-				await this.Release();
+				await this.EndWrite();
 			}
 
 			foreach (IndexBTreeFile Index in this.indices)
@@ -1369,7 +1371,7 @@ namespace Waher.Persistence.Files
 		{
 			LinkedList<Guid> ObjectIds = new LinkedList<Guid>();
 
-			await this.Lock();
+			await this.LockWrite();
 			try
 			{
 				foreach (object Object in Objects)
@@ -1377,7 +1379,7 @@ namespace Waher.Persistence.Files
 			}
 			finally
 			{
-				await this.Release();
+				await this.EndWrite();
 			}
 
 			foreach (IndexBTreeFile Index in this.indices)
@@ -1845,14 +1847,14 @@ namespace Waher.Persistence.Files
 		/// <param name="Serializer">Object serializer. If not provided, the serializer will be deduced from information stored in the file.</param>
 		public async Task<object> LoadObject(Guid ObjectId, IObjectSerializer Serializer)
 		{
-			await this.Lock();
+			await this.LockRead();
 			try
 			{
 				return await this.LoadObjectLocked(ObjectId, Serializer);
 			}
 			finally
 			{
-				await this.Release();
+				await this.EndRead();
 			}
 		}
 
@@ -1867,14 +1869,14 @@ namespace Waher.Persistence.Files
 
 		internal async Task<object> TryLoadObject(Guid ObjectId, IObjectSerializer Serializer)
 		{
-			await this.Lock();
+			await this.LockRead();
 			try
 			{
 				return await this.TryLoadObjectLocked(ObjectId, Serializer);
 			}
 			finally
 			{
-				await this.Release();
+				await this.EndRead();
 			}
 		}
 
@@ -2043,7 +2045,7 @@ namespace Waher.Persistence.Files
 		{
 			object Old;
 
-			await this.Lock();
+			await this.LockWrite();
 			try
 			{
 				BlockInfo Info = await this.FindNodeLocked(ObjectId);
@@ -2060,7 +2062,7 @@ namespace Waher.Persistence.Files
 			}
 			finally
 			{
-				await this.Release();
+				await this.EndWrite();
 			}
 
 			foreach (IndexBTreeFile Index in this.indices)
@@ -2082,7 +2084,7 @@ namespace Waher.Persistence.Files
 			LinkedList<object> Olds = new LinkedList<object>();
 			object Old;
 
-			await this.Lock();
+			await this.LockWrite();
 			try
 			{
 				IEnumerator<Guid> e1 = ObjectIds.GetEnumerator();
@@ -2106,7 +2108,7 @@ namespace Waher.Persistence.Files
 			}
 			finally
 			{
-				await this.Release();
+				await this.EndWrite();
 			}
 
 			foreach (IndexBTreeFile Index in this.indices)
@@ -2371,14 +2373,14 @@ namespace Waher.Persistence.Files
 		{
 			object DeletedObject;
 
-			await this.Lock();
+			await this.LockWrite();
 			try
 			{
 				DeletedObject = await this.DeleteObjectLocked(ObjectId, false, true, Serializer, null);
 			}
 			finally
 			{
-				await this.Release();
+				await this.EndWrite();
 			}
 
 			foreach (IndexBTreeFile Index in this.indices)
@@ -2398,7 +2400,7 @@ namespace Waher.Persistence.Files
 		{
 			LinkedList<object> DeletedObjects = new LinkedList<object>();
 
-			await this.Lock();
+			await this.LockWrite();
 			try
 			{
 				foreach (Guid ObjectId in ObjectIds)
@@ -2406,7 +2408,7 @@ namespace Waher.Persistence.Files
 			}
 			finally
 			{
-				await this.Release();
+				await this.EndWrite();
 			}
 
 			foreach (IndexBTreeFile Index in this.indices)
@@ -3720,14 +3722,14 @@ namespace Waher.Persistence.Files
 		/// <returns>Report</returns>
 		public async Task<string> GetCurrentStateReportAsync(bool WriteStat, bool Properties)
 		{
-			await this.Lock();
+			await this.LockWrite();
 			try
 			{
 				return await this.GetCurrentStateReportAsyncLocked(WriteStat, Properties);
 			}
 			finally
 			{
-				await this.Release();
+				await this.EndWrite();
 			}
 		}
 
@@ -3763,14 +3765,14 @@ namespace Waher.Persistence.Files
 		/// <returns>File statistics.</returns>
 		public async Task<FileStatistics> ComputeStatistics()
 		{
-			await this.Lock();
+			await this.LockWrite();
 			try
 			{
 				return await this.ComputeStatisticsLocked();
 			}
 			finally
 			{
-				await this.Release();
+				await this.EndWrite();
 			}
 		}
 
@@ -4064,14 +4066,14 @@ namespace Waher.Persistence.Files
 		/// <returns>Asynchronous task object.</returns>
 		public async Task ExportGraphXML(StringBuilder Output, bool Properties)
 		{
-			await this.Lock();
+			await this.LockWrite();
 			try
 			{
 				await this.ExportGraphXMLLocked(Output, Properties);
 			}
 			finally
 			{
-				await this.Release();
+				await this.EndWrite();
 			}
 		}
 
@@ -4123,14 +4125,14 @@ namespace Waher.Persistence.Files
 		/// <returns>Asynchronous task object.</returns>
 		public async Task ExportGraphXML(XmlWriter XmlOutput, bool Properties)
 		{
-			await this.Lock();
+			await this.LockWrite();
 			try
 			{
 				await this.ExportGraphXMLLocked(XmlOutput, Properties);
 			}
 			finally
 			{
-				await this.Release();
+				await this.EndWrite();
 			}
 		}
 
@@ -4498,14 +4500,14 @@ namespace Waher.Persistence.Files
 		/// <returns>Total number of objects in subtree.</returns>
 		public async Task<ulong> GetObjectCount(uint BlockIndex, bool IncludeChildren)
 		{
-			await this.Lock();
+			await this.LockRead();
 			try
 			{
 				return await this.GetObjectCountLocked(BlockIndex, IncludeChildren);
 			}
 			finally
 			{
-				await this.Release();
+				await this.EndRead();
 			}
 		}
 
@@ -4576,14 +4578,14 @@ namespace Waher.Persistence.Files
 		/// <exception cref="IOException">If the object is not found.</exception>
 		public async Task<ulong> GetRank(Guid ObjectId)
 		{
-			await this.Lock();
+			await this.LockRead();
 			try
 			{
 				return await GetRankLocked(ObjectId);
 			}
 			finally
 			{
-				await this.Release();
+				await this.EndRead();
 			}
 		}
 
@@ -4709,7 +4711,7 @@ namespace Waher.Persistence.Files
 			Guid ObjectId = await Serializer.GetObjectId(Item, false);
 			GenericObject Obj;
 
-			await this.Lock();
+			await this.LockRead();
 			try
 			{
 				Obj = await this.TryLoadObjectLocked(ObjectId, this.genericSerializer) as GenericObject;
@@ -4720,7 +4722,7 @@ namespace Waher.Persistence.Files
 			}
 			finally
 			{
-				await this.Release();
+				await this.EndRead();
 			}
 
 			if (Obj == null)
@@ -4796,7 +4798,7 @@ namespace Waher.Persistence.Files
 		/// <returns>Task object.</returns>
 		public async Task ClearAsync()
 		{
-			await this.Lock();
+			await this.LockWrite();
 			try
 			{
 				this.file.Dispose();
@@ -4821,9 +4823,9 @@ namespace Waher.Persistence.Files
 			}
 			finally
 			{
-				await this.Release();
+				await this.EndWrite();
 			}
-			
+
 			foreach (IndexBTreeFile Index in this.indices)
 				await Index.ClearAsync();
 		}
@@ -4867,7 +4869,7 @@ namespace Waher.Persistence.Files
 		{
 			ObjectBTreeFileEnumerator<T> e = new ObjectBTreeFileEnumerator<T>(this, this.recordHandler, null);
 			if (Locked)
-				await e.Lock();
+				await e.LockRead();
 
 			return e;
 		}

@@ -138,7 +138,7 @@ namespace Waher.Persistence.Files
 			if (Bin == null || Bin.Length > this.indexFile.InlineObjectSizeLimit)
 				return false;
 
-			await this.indexFile.Lock();
+			await this.indexFile.LockWrite();
 			try
 			{
 				BlockInfo Leaf = await this.indexFile.FindLeafNodeLocked(Bin);
@@ -149,7 +149,7 @@ namespace Waher.Persistence.Files
 			}
 			finally
 			{
-				await this.indexFile.Release();
+				await this.indexFile.EndWrite();
 			}
 
 			return true;
@@ -164,7 +164,7 @@ namespace Waher.Persistence.Files
 		/// <returns>If the object was saved in the index (true), or if the index property values of the object did not exist, or were too big to fit in an index record.</returns>
 		internal async Task<bool> SaveNewObjects(IEnumerable<Guid> ObjectIds, IEnumerable<object> Objects, IObjectSerializer Serializer)
 		{
-			await this.indexFile.Lock();
+			await this.indexFile.LockWrite();
 			try
 			{
 				IEnumerator<Guid> e1 = ObjectIds.GetEnumerator();
@@ -185,7 +185,7 @@ namespace Waher.Persistence.Files
 			}
 			finally
 			{
-				await this.indexFile.Release();
+				await this.indexFile.EndWrite();
 			}
 
 			return true;
@@ -204,7 +204,7 @@ namespace Waher.Persistence.Files
 			if (Bin == null || Bin.Length > this.indexFile.InlineObjectSizeLimit)
 				return false;
 
-			await this.indexFile.Lock();
+			await this.indexFile.LockWrite();
 			try
 			{
 				await this.indexFile.DeleteObjectLocked(Bin, false, true, Serializer, null);
@@ -215,7 +215,7 @@ namespace Waher.Persistence.Files
 			}
 			finally
 			{
-				await this.indexFile.Release();
+				await this.indexFile.EndWrite();
 			}
 
 			return true;
@@ -230,7 +230,7 @@ namespace Waher.Persistence.Files
 		/// <returns>If the object was deleted from the index (true), or if the object did not exist in the index.</returns>
 		internal async Task DeleteObjects(IEnumerable<Guid> ObjectIds, IEnumerable<object> Objects, IObjectSerializer Serializer)
 		{
-			await this.indexFile.Lock();
+			await this.indexFile.LockWrite();
 			try
 			{
 				IEnumerator<Guid> e1 = ObjectIds.GetEnumerator();
@@ -254,7 +254,7 @@ namespace Waher.Persistence.Files
 			}
 			finally
 			{
-				await this.indexFile.Release();
+				await this.indexFile.EndWrite();
 			}
 		}
 
@@ -293,7 +293,7 @@ namespace Waher.Persistence.Files
 					return true;
 			}
 
-			await this.indexFile.Lock();
+			await this.indexFile.LockWrite();
 			try
 			{
 				if (OldBin != null)
@@ -316,7 +316,7 @@ namespace Waher.Persistence.Files
 			}
 			finally
 			{
-				await this.indexFile.Release();
+				await this.indexFile.EndWrite();
 			}
 
 			return true;
@@ -334,7 +334,7 @@ namespace Waher.Persistence.Files
 			IEnumerable<object> OldObjects, IEnumerable<object> NewObjects,
 			IObjectSerializer Serializer)
 		{
-			await this.indexFile.Lock();
+			await this.indexFile.LockWrite();
 			try
 			{
 				IEnumerator<Guid> e1 = ObjectIds.GetEnumerator();
@@ -389,7 +389,7 @@ namespace Waher.Persistence.Files
 			}
 			finally
 			{
-				await this.indexFile.Release();
+				await this.indexFile.EndWrite();
 			}
 		}
 
@@ -441,7 +441,7 @@ namespace Waher.Persistence.Files
 		{
 			IndexBTreeFileEnumerator<T> e = new IndexBTreeFileEnumerator<T>(this, this.recordHandler);
 			if (Locked)
-				await e.Lock();
+				await e.LockRead();
 
 			return e;
 		}
@@ -463,14 +463,14 @@ namespace Waher.Persistence.Files
 			if (Key == null)
 				throw new KeyNotFoundException("Object not found.");
 
-			await this.indexFile.Lock();
+			await this.indexFile.LockRead();
 			try
 			{
 				return await this.indexFile.GetRankLocked(Key);
 			}
 			finally
 			{
-				await this.indexFile.Release();
+				await this.indexFile.EndRead();
 			}
 		}
 
@@ -588,7 +588,7 @@ namespace Waher.Persistence.Files
 			{
 				Result = new IndexBTreeFileEnumerator<T>(this, this.recordHandler);
 				if (Locked)
-					await Result.Lock();
+					await Result.LockRead();
 
 				BlockInfo Leaf = await this.indexFile.FindLeafNodeLocked(Key);
 				Result.SetStartingPoint(Leaf);
@@ -658,7 +658,7 @@ namespace Waher.Persistence.Files
 			{
 				Result = new IndexBTreeFileEnumerator<T>(this, this.recordHandler);
 				if (Locked)
-					await Result.Lock();
+					await Result.LockRead();
 
 				BlockInfo Leaf = await this.indexFile.FindLeafNodeLocked(Key);
 				Result.SetStartingPoint(Leaf);
@@ -730,7 +730,7 @@ namespace Waher.Persistence.Files
 			{
 				Result = new IndexBTreeFileEnumerator<T>(this, this.recordHandler);
 				if (Locked)
-					await Result.Lock();
+					await Result.LockRead();
 
 				BlockInfo Leaf = await this.indexFile.FindLeafNodeLocked(Key);
 				Result.SetStartingPoint(Leaf);
@@ -800,7 +800,7 @@ namespace Waher.Persistence.Files
 			{
 				Result = new IndexBTreeFileEnumerator<T>(this, this.recordHandler);
 				if (Locked)
-					await Result.Lock();
+					await Result.LockRead();
 
 				BlockInfo Leaf = await this.indexFile.FindLeafNodeLocked(Key);
 				Result.SetStartingPoint(Leaf);

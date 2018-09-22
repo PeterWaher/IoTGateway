@@ -99,7 +99,7 @@ namespace Waher.Persistence.Files
 				}
 			}
 
-			await this.dictionaryFile.Lock();
+			await this.dictionaryFile.LockRead();
 			try
 			{
 				BlockInfo Info = await this.dictionaryFile.FindNodeLocked(key);
@@ -107,7 +107,7 @@ namespace Waher.Persistence.Files
 			}
 			finally
 			{
-				await this.dictionaryFile.Release();
+				await this.dictionaryFile.EndRead();
 			}
 		}
 
@@ -157,7 +157,7 @@ namespace Waher.Persistence.Files
 			if (Bin.Length > this.dictionaryFile.InlineObjectSizeLimit)
 				throw new ArgumentException("BLOBs not supported.", nameof(value));
 
-			await this.dictionaryFile.Lock();
+			await this.dictionaryFile.LockWrite();
 			try
 			{
 				BlockInfo Info = await this.dictionaryFile.FindLeafNodeLocked(key);
@@ -175,7 +175,7 @@ namespace Waher.Persistence.Files
 			}
 			finally
 			{
-				await this.dictionaryFile.Release();
+				await this.dictionaryFile.EndWrite();
 			}
 
 			/*try
@@ -230,7 +230,7 @@ namespace Waher.Persistence.Files
 
 			object DeletedObject;
 
-			await this.dictionaryFile.Lock();
+			await this.dictionaryFile.LockWrite();
 			try
 			{
 				DeletedObject = await this.dictionaryFile.DeleteObjectLocked(key, false, true, this.keyValueSerializer, null);
@@ -241,7 +241,7 @@ namespace Waher.Persistence.Files
 			}
 			finally
 			{
-				await this.dictionaryFile.Release();
+				await this.dictionaryFile.EndWrite();
 			}
 
 			return DeletedObject != null;
@@ -289,7 +289,7 @@ namespace Waher.Persistence.Files
 				}
 			}
 
-			await this.dictionaryFile.Lock();
+			await this.dictionaryFile.LockRead();
 			try
 			{
 				object Result = await this.dictionaryFile.TryLoadObjectLocked(key, this.keyValueSerializer);
@@ -300,7 +300,7 @@ namespace Waher.Persistence.Files
 			}
 			finally
 			{
-				await this.dictionaryFile.Release();
+				await this.dictionaryFile.EndRead();
 			}
 		}
 
@@ -325,14 +325,14 @@ namespace Waher.Persistence.Files
 				}
 			}
 
-			await this.dictionaryFile.Lock();
+			await this.dictionaryFile.LockRead();
 			try
 			{
 				return (KeyValuePair<string, object>)await this.dictionaryFile.LoadObjectLocked(key, this.keyValueSerializer);
 			}
 			finally
 			{
-				await this.dictionaryFile.Release();
+				await this.dictionaryFile.EndRead();
 			}
 		}
 
@@ -457,7 +457,7 @@ namespace Waher.Persistence.Files
 			{
 				Result = new ObjectBTreeFileEnumerator<KeyValuePair<string, object>>(this.dictionaryFile, this.recordHandler, this.keyValueSerializer);
 				if (Locked)
-					await Result.Lock();
+					await Result.LockRead();
 			}
 			catch (Exception ex)
 			{

@@ -68,11 +68,11 @@ namespace Waher.Persistence.Files
 		/// Locks the underlying file (if not locked).
 		/// </summary>
 		/// <returns></returns>
-		internal async Task Lock()
+		internal async Task LockRead()
 		{
 			if (!this.locked)
 			{
-				await this.file.Lock();
+				await this.file.LockRead();
 				this.locked = true;
 				this.blockUpdateCounter = this.file.BlockUpdateCounter;
 			}
@@ -94,7 +94,7 @@ namespace Waher.Persistence.Files
 			if (this.locked)
 			{
 				this.locked = false;
-				return this.file.Release();
+				return this.file.EndRead();
 			}
 			else
 				return Task.CompletedTask;
@@ -219,14 +219,14 @@ namespace Waher.Persistence.Files
 						this.currentRank = await this.file.GetRankLocked(this.currentObjectId);
 					else
 					{
-						await this.file.Lock();
+						await this.file.LockRead();
 						try
 						{
 							this.currentRank = await this.file.GetRankLocked(this.currentObjectId);
 						}
 						finally
 						{
-							await this.file.Release();
+							await this.file.EndRead();
 						}
 					}
 				}

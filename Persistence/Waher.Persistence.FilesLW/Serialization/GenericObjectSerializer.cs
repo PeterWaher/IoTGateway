@@ -594,7 +594,7 @@ namespace Waher.Persistence.Files.Serialization
 				ObjectBTreeFile File = await this.provider.GetFile(Obj.CollectionName);
 				Guid ObjectId;
 
-				if (await File.TryLock(0))
+				if (await File.TryBeginWrite(0))
 				{
 					try
 					{
@@ -602,7 +602,7 @@ namespace Waher.Persistence.Files.Serialization
 					}
 					finally
 					{
-						await File.Release();
+						await File.EndWrite();
 					}
 
 					foreach (IndexBTreeFile Index in File.Indices)

@@ -51,11 +51,11 @@ namespace Waher.Persistence.Files
 		/// Locks the underlying file (if not locked).
 		/// </summary>
 		/// <returns></returns>
-		internal async Task Lock()
+		internal async Task LockRead()
 		{
 			if (!this.locked)
 			{
-				await this.e.Lock();
+				await this.e.LockRead();
 				this.locked = true;
 			}
 		}

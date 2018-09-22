@@ -983,8 +983,8 @@ namespace Waher.Persistence.Files
 
 			foreach (ObjectBTreeFile File in Files)
 			{
-				await File.Lock();
-				await File.Release();   // Saves unsaved data.
+				await File.LockWrite();
+				await File.EndWrite();   // Saves unsaved data.
 			}
 		}
 
@@ -1437,7 +1437,7 @@ namespace Waher.Persistence.Files
 
 			if (EmbeddedSetter != null)
 			{
-				if (await File.TryLock(0))
+				if (await File.TryBeginRead(0))
 				{
 					try
 					{
@@ -1445,7 +1445,7 @@ namespace Waher.Persistence.Files
 					}
 					finally
 					{
-						await File.Release();
+						await File.EndRead();
 					}
 				}
 				else
@@ -1472,7 +1472,7 @@ namespace Waher.Persistence.Files
 
 			if (EmbeddedSetter != null)
 			{
-				if (await File.TryLock(0))
+				if (await File.TryBeginRead(0))
 				{
 					try
 					{
@@ -1480,7 +1480,7 @@ namespace Waher.Persistence.Files
 					}
 					finally
 					{
-						await File.Release();
+						await File.EndRead();
 					}
 				}
 				else

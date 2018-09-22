@@ -3033,7 +3033,7 @@ namespace Waher.Persistence.Files.Serialization
 				Guid ObjectId;
 				Type T;
 
-				if (await File.TryLock(0))
+				if (await File.TryBeginWrite(0))
 				{
 					try
 					{
@@ -3041,7 +3041,7 @@ namespace Waher.Persistence.Files.Serialization
 					}
 					finally
 					{
-						await File.Release();
+						await File.EndWrite();
 					}
 
 					foreach (IndexBTreeFile Index in File.Indices)

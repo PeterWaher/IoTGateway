@@ -18,7 +18,7 @@
       <dependency id="Waher.Content" version="1.0.12"/>
       <dependency id="Waher.Content.Emoji" version="1.0.1"/>
       <dependency id="Waher.Content.Markdown" version="1.0.25"/>
-      <dependency id="Waher.Networking.HTTP.UWP" version="1.0.22"/>
+      <dependency id="Waher.Networking.HTTP.UWP" version="1.0.23"/>
       <dependency id="Waher.Runtime.Inventory" version="1.0.6"/>
       <dependency id="Waher.Script" version="1.0.17"/>
       <dependency id="Waher.Security" version="1.0.2"/>

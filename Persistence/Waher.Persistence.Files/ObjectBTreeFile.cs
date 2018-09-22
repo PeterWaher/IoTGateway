@@ -220,7 +220,10 @@ namespace Waher.Persistence.Files
 				{
 					rsa = new RSACryptoServiceProvider(CspParams);
 					if (!FileExists)
-						rsa.PersistKeyInCsp = false;    // Deletes key.
+					{
+						if (this.provider.DeleteObsoleteKeys)
+							rsa.PersistKeyInCsp = false;    // Deletes key.
+					}
 					else if (rsa.KeySize > 1024)
 						KeyGenMode++;
 				}
@@ -1356,8 +1359,18 @@ namespace Waher.Persistence.Files
 				await this.EndWrite();
 			}
 
+			LinkedList<Task> Tasks = null;
+
 			foreach (IndexBTreeFile Index in this.indices)
-				await Index.SaveNewObject(ObjectId, Object, Serializer);
+			{
+				if (Tasks == null)
+					Tasks = new LinkedList<Task>();
+
+				Tasks.AddLast(Index.SaveNewObject(ObjectId, Object, Serializer));
+			}
+
+			if (Tasks != null)
+				await Task.WhenAll(Tasks);
 
 			return ObjectId;
 		}
@@ -1382,8 +1395,18 @@ namespace Waher.Persistence.Files
 				await this.EndWrite();
 			}
 
+			LinkedList<Task> Tasks = null;
+
 			foreach (IndexBTreeFile Index in this.indices)
-				await Index.SaveNewObjects(ObjectIds, Objects, Serializer);
+			{
+				if (Tasks == null)
+					Tasks = new LinkedList<Task>();
+
+				Tasks.AddLast(Index.SaveNewObjects(ObjectIds, Objects, Serializer));
+			}
+
+			if (Tasks != null)
+				await Task.WhenAll(Tasks);
 		}
 
 		internal async Task<Guid> SaveNewObjectLocked(object Object, ObjectSerializer Serializer)
@@ -2065,8 +2088,18 @@ namespace Waher.Persistence.Files
 				await this.EndWrite();
 			}
 
+			LinkedList<Task> Tasks = null;
+
 			foreach (IndexBTreeFile Index in this.indices)
-				await Index.UpdateObject(ObjectId, Old, Object, Serializer);
+			{
+				if (Tasks == null)
+					Tasks = new LinkedList<Task>();
+
+				Tasks.AddLast(Index.UpdateObject(ObjectId, Old, Object, Serializer));
+			}
+
+			if (Tasks != null)
+				await Task.WhenAll(Tasks);
 		}
 
 		/// <summary>
@@ -2111,8 +2144,18 @@ namespace Waher.Persistence.Files
 				await this.EndWrite();
 			}
 
+			LinkedList<Task> Tasks = null;
+
 			foreach (IndexBTreeFile Index in this.indices)
-				await Index.UpdateObjects(ObjectIds, Olds, Objects, Serializer);
+			{
+				if (Tasks == null)
+					Tasks = new LinkedList<Task>();
+
+				Tasks.AddLast(Index.UpdateObjects(ObjectIds, Olds, Objects, Serializer));
+			}
+
+			if (Tasks != null)
+				await Task.WhenAll(Tasks);
 		}
 
 		internal async Task ReplaceObjectLocked(byte[] Bin, BlockInfo Info, bool DeleteBlob)
@@ -2383,8 +2426,18 @@ namespace Waher.Persistence.Files
 				await this.EndWrite();
 			}
 
+			LinkedList<Task> Tasks = null;
+
 			foreach (IndexBTreeFile Index in this.indices)
-				await Index.DeleteObject(ObjectId, DeletedObject, Serializer);
+			{
+				if (Tasks == null)
+					Tasks = new LinkedList<Task>();
+
+				Tasks.AddLast(Index.DeleteObject(ObjectId, DeletedObject, Serializer));
+			}
+
+			if (Tasks != null)
+				await Task.WhenAll(Tasks);
 
 			return DeletedObject;
 		}
@@ -2411,8 +2464,18 @@ namespace Waher.Persistence.Files
 				await this.EndWrite();
 			}
 
+			LinkedList<Task> Tasks = null;
+
 			foreach (IndexBTreeFile Index in this.indices)
-				await Index.DeleteObjects(ObjectIds, DeletedObjects, Serializer);
+			{
+				if (Tasks == null)
+					Tasks = new LinkedList<Task>();
+
+				Tasks.AddLast(Index.DeleteObjects(ObjectIds, DeletedObjects, Serializer));
+			}
+
+			if (Tasks != null)
+				await Task.WhenAll(Tasks);
 
 			return DeletedObjects;
 		}
@@ -4819,6 +4882,12 @@ namespace Waher.Persistence.Files
 
 				this.provider.RemoveBlocks(this.id);
 
+				this.emptyBlocks?.Clear();
+				this.blocksToSave?.Clear();
+				this.objectsToSave?.Clear();
+				this.objectsToLoad?.Clear();
+				this.bytesAdded = 0;
+
 				await this.CreateNewBlockLocked();
 			}
 			finally
@@ -4826,8 +4895,18 @@ namespace Waher.Persistence.Files
 				await this.EndWrite();
 			}
 
+			LinkedList<Task> Tasks = null;
+
 			foreach (IndexBTreeFile Index in this.indices)
-				await Index.ClearAsync();
+			{
+				if (Tasks == null)
+					Tasks = new LinkedList<Task>();
+
+				Tasks.AddLast(Index.ClearAsync());
+			}
+
+			if (Tasks != null)
+				await Task.WhenAll(Tasks);
 		}
 
 		/// <summary>

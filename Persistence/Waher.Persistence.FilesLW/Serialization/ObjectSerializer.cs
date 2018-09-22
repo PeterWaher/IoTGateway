@@ -15,6 +15,7 @@ using Waher.Persistence.Files.Serialization.Model;
 using Waher.Persistence.Serialization;
 using Waher.Persistence.Attributes;
 using Waher.Runtime.Inventory;
+using Waher.Runtime.Threading;
 
 namespace Waher.Persistence.Files.Serialization
 {
@@ -1872,7 +1873,8 @@ namespace Waher.Persistence.Files.Serialization
 					{ Path.Combine(Path.GetDirectoryName(GetLocation(typeof(MemoryStream))), "System.Runtime.Extensions.dll"), true },
 					{ GetLocation(typeof(Types)), true },
 					{ GetLocation(typeof(Database)), true },
-					{ GetLocation(typeof(ObjectSerializer)), true }
+					{ GetLocation(typeof(ObjectSerializer)), true },
+					{ GetLocation(typeof(MultiReadSingleWriteObject)), true }
 				};
 
 				System.Reflection.TypeInfo LoopInfo;

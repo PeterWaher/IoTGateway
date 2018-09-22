@@ -84,6 +84,7 @@ namespace Waher.Persistence.Files
 #if NETSTANDARD1_5
 		private readonly bool encrypted;
 		private readonly bool compiled;
+		private bool deleteObsoleteKeys = true;
 #endif
 
 		#region Constructors
@@ -351,6 +352,15 @@ namespace Waher.Persistence.Files
 		public bool Compiled
 		{
 			get { return this.compiled; }
+		}
+
+		/// <summary>
+		/// If old keys are to be removed, before a new encrypted file is created. (Default=true).
+		/// </summary>
+		public bool DeleteObsoleteKeys
+		{
+			get => this.deleteObsoleteKeys;
+			set => this.deleteObsoleteKeys = value;
 		}
 #endif
 		/// <summary>

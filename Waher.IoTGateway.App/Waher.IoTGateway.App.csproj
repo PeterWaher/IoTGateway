@@ -309,6 +309,10 @@
       <Project>{e97e6869-7fa0-4775-999a-5fbde8061723}</Project>
       <Name>Waher.Runtime.Settings</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Runtime\Waher.Runtime.Threading\Waher.Runtime.Threading.csproj">
+      <Project>{47f772fe-c923-4f5c-83b5-a4bef962ae15}</Project>
+      <Name>Waher.Runtime.Threading</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Runtime\Waher.Runtime.Timing\Waher.Runtime.Timing.csproj">
       <Project>{e98a01a1-66e5-4159-9935-11a8e76f870a}</Project>
       <Name>Waher.Runtime.Timing</Name>

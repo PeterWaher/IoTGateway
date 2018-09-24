@@ -1986,7 +1986,7 @@ namespace Waher.Persistence.Files
 		/// <param name="XsltPath">Optional XSLT to use to view the output.</param>
 		/// <param name="ProgramDataFolder">Program data folder. Can be removed from filenames used, when referencing them in the report.</param>
 		/// <param name="ExportData">If data in database is to be exported in output.</param>
-		public void Analyze(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData)
+		public async Task Analyze(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData)
 		{
 			Output.WriteStartDocument();
 
@@ -2013,7 +2013,7 @@ namespace Waher.Persistence.Files
 				Output.WriteAttributeString("isReadOnly", Encode(File.IsReadOnly));
 				Output.WriteAttributeString("timeoutMs", File.TimeoutMilliseconds.ToString());
 
-				FileStatistics Stat = File.ComputeStatistics().Result;
+				FileStatistics Stat = await File.ComputeStatistics();
 				WriteStat(Output, File, Stat);
 
 				foreach (IndexBTreeFile Index in File.Indices)
@@ -2036,14 +2036,14 @@ namespace Waher.Persistence.Files
 					foreach (string Field in Index.FieldNames)
 						Output.WriteElementString("Field", Field);
 
-					Stat = Index.IndexFile.ComputeStatistics().Result;
+					Stat = await Index.ComputeStatistics();
 					WriteStat(Output, Index.IndexFile, Stat);
 
 					Output.WriteEndElement();
 				}
 
 				if (ExportData)
-					File.ExportGraphXML(Output, true).Wait();
+					await File.ExportGraphXML(Output, true);
 
 				Output.WriteEndElement();
 			}

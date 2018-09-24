@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Persistence.Serialization;
 using Waher.Persistence.Files.Serialization;
+using Waher.Persistence.Files.Statistics;
 using Waher.Persistence.Files.Storage;
 
 namespace Waher.Persistence.Files
@@ -814,6 +815,44 @@ namespace Waher.Persistence.Files
 				}
 
 				System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex).Throw();
+			}
+
+			return Result;
+		}
+
+		/// <summary>
+		/// Goes through the entire file and computes statistics abouts its composition.
+		/// </summary>
+		/// <returns>File statistics.</returns>
+		public virtual async Task<FileStatistics> ComputeStatistics()
+		{
+			FileStatistics Result;
+
+			await this.indexFile.LockWrite();
+			try
+			{
+				Result = await this.indexFile.ComputeStatisticsLocked();
+			}
+			finally
+			{
+				await this.indexFile.EndWrite();
+			}
+
+			if (Result.IsCorrupt)
+			{
+				await this.Regenerate();
+
+				await this.indexFile.LockWrite();
+				try
+				{
+					Result = await this.indexFile.ComputeStatisticsLocked();
+				}
+				finally
+				{
+					await this.indexFile.EndWrite();
+				}
+
+				Result.LogComment("Index was regenerated due to errors found.");
 			}
 
 			return Result;

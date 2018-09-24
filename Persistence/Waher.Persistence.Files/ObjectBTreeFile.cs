@@ -3826,7 +3826,7 @@ namespace Waher.Persistence.Files
 		/// Goes through the entire file and computes statistics abouts its composition.
 		/// </summary>
 		/// <returns>File statistics.</returns>
-		public async Task<FileStatistics> ComputeStatistics()
+		public virtual async Task<FileStatistics> ComputeStatistics()
 		{
 			await this.LockWrite();
 			try
@@ -3839,7 +3839,7 @@ namespace Waher.Persistence.Files
 			}
 		}
 
-		private async Task<FileStatistics> ComputeStatisticsLocked()
+		internal async Task<FileStatistics> ComputeStatisticsLocked()
 		{
 			long FileSize = this.file.Length;
 			int NrBlocks = (int)(FileSize / this.blockSize);
@@ -4830,9 +4830,9 @@ namespace Waher.Persistence.Files
 
 				ulong Result = Task.Result;
 				if (Result > int.MaxValue)
-					throw new OverflowException("File contains " + Result.ToString() + " objects, which is more than can be represented by an Int32 value. Use the GetObjectCount() method instead of the Count property.");
-
-				return (int)Result;
+					return int.MaxValue;
+				else
+					return (int)Result;
 			}
 		}
 

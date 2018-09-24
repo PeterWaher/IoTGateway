@@ -119,7 +119,7 @@ namespace Waher.Persistence
 		/// <param name="XsltPath">Optional XSLT to use to view the output.</param>
 		/// <param name="ProgramDataFolder">Program data folder. Can be removed from filenames used, when referencing them in the report.</param>
 		/// <param name="ExportData">If data in database is to be exported in output.</param>
-		void Analyze(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData);
+		Task Analyze(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData);
 
 		/// <summary>
 		/// Adds an index to a collection, if one does not already exist.

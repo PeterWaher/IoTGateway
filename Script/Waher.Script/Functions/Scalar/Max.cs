@@ -43,11 +43,10 @@ namespace Waher.Script.Functions.Scalar
 		/// <returns>Function result.</returns>
 		public override IElement EvaluateScalar(IElement Argument1, IElement Argument2, Variables Variables)
         {
-            IOrderedSet S = Argument1.AssociatedSet as IOrderedSet;
-            if (S == null)
-                throw new ScriptRuntimeException("Unable to compare elements.", this);
+			if (!(Argument1.AssociatedSet is IOrderedSet S))
+				throw new ScriptRuntimeException("Unable to compare elements.", this);
 
-            if (S.Compare(Argument1, Argument2) > 0)
+			if (S.Compare(Argument1, Argument2) > 0)
                 return Argument1;
             else
                 return Argument2;

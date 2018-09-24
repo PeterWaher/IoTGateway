@@ -41,17 +41,15 @@ namespace Waher.Script.Functions.Scalar
         /// <returns>Function result.</returns>
         public override IElement EvaluateScalar(IElement Argument1, IElement Argument2, Variables Variables)
         {
-            StringValue S = Argument1 as StringValue;
-            if (S == null)
-                throw new ScriptRuntimeException("Expected string in first argument.", this);
+			if (!(Argument1 is StringValue S))
+				throw new ScriptRuntimeException("Expected string in first argument.", this);
 
-            DoubleNumber N = Argument2 as DoubleNumber;
-            double d;
+			double d;
 
-            if (N == null || (d = N.Value) < 0 || d > int.MaxValue || d != Math.Truncate(d))
-                throw new ScriptRuntimeException("Expected nonnegative integer in second argument.", this);
+			if (!(Argument2 is DoubleNumber N) || (d = N.Value) < 0 || d > int.MaxValue || d != Math.Truncate(d))
+				throw new ScriptRuntimeException("Expected nonnegative integer in second argument.", this);
 
-            int i = (int)d;
+			int i = (int)d;
             string s = S.Value;
 
             if (i > s.Length)

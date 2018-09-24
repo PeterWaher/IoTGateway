@@ -42,30 +42,27 @@ namespace Waher.Script.Functions.Runtime
             try
             {
                 IElement E = this.Argument.Evaluate(Variables);
-                DoubleNumber D = E as DoubleNumber;
-                if (D != null)
-                {
-                    if (double.IsNaN(D.Value))
-                        return BooleanValue.False;
-                    else
-                        return BooleanValue.True;
-                }
+				if (E is DoubleNumber D)
+				{
+					if (double.IsNaN(D.Value))
+						return BooleanValue.False;
+					else
+						return BooleanValue.True;
+				}
 
-                ComplexNumber C = E as ComplexNumber;
-                if (C != null)
-                {
-                    if (double.IsNaN(C.Value.Real) || double.IsNaN(C.Value.Imaginary))
-                        return BooleanValue.False;
-                    else
-                        return BooleanValue.True;
-                }
+				if (E is ComplexNumber C)
+				{
+					if (double.IsNaN(C.Value.Real) || double.IsNaN(C.Value.Imaginary))
+						return BooleanValue.False;
+					else
+						return BooleanValue.True;
+				}
 
-                ObjectValue O = E as ObjectValue;
-                if (O != null && O.Value == null)
-                    return BooleanValue.False;
-                else
-                    return BooleanValue.True;
-            }
+				if (E is ObjectValue O && O.Value == null)
+					return BooleanValue.False;
+				else
+					return BooleanValue.True;
+			}
             catch (Exception)
             {
                 return BooleanValue.False;

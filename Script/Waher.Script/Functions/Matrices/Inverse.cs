@@ -47,15 +47,14 @@ namespace Waher.Script.Functions.Matrices
         /// <returns>Function result.</returns>
         public override IElement Evaluate(IElement Argument, Variables Variables)
         {
-            IRingElement E = Argument as IRingElement;
-            if (E != null)
-            {
-                E = E.Invert();
-                if (E != null)
-                    return E;
-            }
+			if (Argument is IRingElement E)
+			{
+				E = E.Invert();
+				if (E != null)
+					return E;
+			}
 
-            return base.Evaluate(Argument, Variables);
+			return base.Evaluate(Argument, Variables);
         }
 
         /// <summary>

@@ -132,14 +132,13 @@ namespace Waher.Script.Functions.Vectors
                 return ObjectValue.Null;
             else
             {
-                IRingElement RE = Result as IRingElement;
-                IRingElement Avg;
+				IRingElement Avg;
 
-                if (RE != null && (Avg = RE.MultiplyRight(new DoubleNumber(1.0 / n))) != null)
-                    return Avg;
-                else
-                    return Operators.Arithmetics.Divide.EvaluateDivision(Result, new DoubleNumber(n), Node);
-            }
+				if (Result is IRingElement RE && (Avg = RE.MultiplyRight(new DoubleNumber(1.0 / n))) != null)
+					return Avg;
+				else
+					return Operators.Arithmetics.Divide.EvaluateDivision(Result, new DoubleNumber(n), Node);
+			}
         }
 
     }

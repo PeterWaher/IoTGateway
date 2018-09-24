@@ -45,9 +45,8 @@ namespace Waher.Script.Functions.Runtime
         public override IElement Evaluate(Variables Variables)
         {
             IElement E = this.Argument.Evaluate(Variables);
-            StringValue S = E as StringValue;
-            string Msg = S != null ? S.Value : E.ToString();
-            Variables.ConsoleOut?.WriteLine(Msg);
+			string Msg = E is StringValue S ? S.Value : E.ToString();
+			Variables.ConsoleOut?.WriteLine(Msg);
             return E;
         }
 

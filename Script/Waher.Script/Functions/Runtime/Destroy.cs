@@ -13,7 +13,7 @@ namespace Waher.Script.Functions.Runtime
     /// </summary>
     public class Destroy : FunctionOneVariable
     {
-        private string variableName = string.Empty;
+        private readonly string variableName = string.Empty;
 
         /// <summary>
         /// Destroys a value. If the function references a variable, the variable is also removed.
@@ -25,10 +25,9 @@ namespace Waher.Script.Functions.Runtime
         public Destroy(ScriptNode Argument, int Start, int Length, Expression Expression)
             : base(Argument, Start, Length, Expression)
         {
-            VariableReference Ref = Argument as VariableReference;
-            if (Ref != null)
-                this.variableName = Ref.VariableName;
-        }
+			if (Argument is VariableReference Ref)
+				this.variableName = Ref.VariableName;
+		}
 
         /// <summary>
         /// Name of variable.
@@ -65,25 +64,22 @@ namespace Waher.Script.Functions.Runtime
 
             if (!string.IsNullOrEmpty(this.variableName))
             {
-                Variable v;
-
-                if (Variables.TryGetVariable(this.variableName, out v))
-                {
-                    Variables.Remove(this.variableName);
-                    Element = v.ValueElement;
-                }
-                else
-                    Element = null;
-            }
+				if (Variables.TryGetVariable(this.variableName, out Variable v))
+				{
+					Variables.Remove(this.variableName);
+					Element = v.ValueElement;
+				}
+				else
+					Element = null;
+			}
             else
                 Element = this.Argument.Evaluate(Variables);
 
             if (Element != null)
             {
-                IDisposable D = Element.AssociatedObjectValue as IDisposable;
-                if (D != null)
-                    D.Dispose();
-            }
+				if (Element.AssociatedObjectValue is IDisposable D)
+					D.Dispose();
+			}
 
             return ObjectValue.Null;
         }

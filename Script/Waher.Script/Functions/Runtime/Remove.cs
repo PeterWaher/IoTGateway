@@ -13,7 +13,7 @@ namespace Waher.Script.Functions.Runtime
     /// </summary>
     public class Remove : Function
     {
-        private string variableName;
+        private readonly string variableName;
 
         /// <summary>
         /// Removes a variable from the variables collection, without destroying its value.
@@ -29,11 +29,10 @@ namespace Waher.Script.Functions.Runtime
                 this.variableName = string.Empty;
             else
             {
-                VariableReference Ref = Argument as VariableReference;
-                if (Ref == null)
-                    throw new SyntaxException("Variable reference expected.", Argument.Start, string.Empty);
+				if (!(Argument is VariableReference Ref))
+					throw new SyntaxException("Variable reference expected.", Argument.Start, string.Empty);
 
-                this.variableName = Ref.VariableName;
+				this.variableName = Ref.VariableName;
             }
         }
 
@@ -68,15 +67,13 @@ namespace Waher.Script.Functions.Runtime
         /// <returns>Result.</returns>
         public override IElement Evaluate(Variables Variables)
         {
-            Variable v;
-
-            if (Variables.TryGetVariable(this.variableName, out v))
-            {
-                Variables.Remove(this.variableName);
-                return v.ValueElement;
-            }
-            else
-                return ObjectValue.Null;
-        }
+			if (Variables.TryGetVariable(this.variableName, out Variable v))
+			{
+				Variables.Remove(this.variableName);
+				return v.ValueElement;
+			}
+			else
+				return ObjectValue.Null;
+		}
     }
 }

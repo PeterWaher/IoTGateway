@@ -13,9 +13,9 @@ namespace Waher.Script.Functions.Runtime
     /// </summary>
     public class Create : Function
     {
-        private ScriptNode type;
-        private ScriptNode[] parameters;
-        private int nrParameters;
+        private readonly ScriptNode type;
+        private readonly ScriptNode[] parameters;
+        private readonly int nrParameters;
 
         /// <summary>
         /// Creates an object of a specific class. The first argument must evaluate to the type that is to be created.
@@ -264,11 +264,10 @@ namespace Waher.Script.Functions.Runtime
         public override IElement Evaluate(Variables Variables)
         {
             IElement E = this.type.Evaluate(Variables);
-            TypeValue TV = E as TypeValue;
-            if (TV == null)
-                throw new ScriptRuntimeException("First argument must evaluate to the type to be created.", this);
+			if (!(E is TypeValue TV))
+				throw new ScriptRuntimeException("First argument must evaluate to the type to be created.", this);
 
-            IElement[] Arguments = null;
+			IElement[] Arguments = null;
             ParameterInfo[] Parameters;
             object[] ParameterValues;
             object Value;
@@ -415,6 +414,6 @@ namespace Waher.Script.Functions.Runtime
         private ConstructorInfo constructor = null;
         private ParameterInfo[] constructorParametersTypes = null;
         private object[] constructorArguments = null;
-        private object synchObject = new object();
+        private readonly object synchObject = new object();
     }
 }

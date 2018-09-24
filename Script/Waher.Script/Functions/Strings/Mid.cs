@@ -51,23 +51,20 @@ namespace Waher.Script.Functions.Scalar
         /// <returns>Function result.</returns>
         public override IElement Evaluate(IElement[] Arguments, Variables Variables)
         {
-            StringValue S = Arguments[0] as StringValue;
-            if (S == null)
-                throw new ScriptRuntimeException("Expected string in first argument.", this);
+			if (!(Arguments[0] is StringValue S))
+				throw new ScriptRuntimeException("Expected string in first argument.", this);
 
-            DoubleNumber Start = Arguments[1] as DoubleNumber;
-            DoubleNumber Len = Arguments[2] as DoubleNumber;
-            double d;
+			double d;
 
-            if (Start == null || (d = Start.Value) < 0 || d > int.MaxValue || d != Math.Truncate(d))
-                throw new ScriptRuntimeException("Expected nonnegative integer in second argument.", this);
+			if (!(Arguments[1] is DoubleNumber Start) || (d = Start.Value) < 0 || d > int.MaxValue || d != Math.Truncate(d))
+				throw new ScriptRuntimeException("Expected nonnegative integer in second argument.", this);
 
-            int pos = (int)d;
+			int pos = (int)d;
 
-            if (Len == null || (d = Start.Value) < 0 || d > int.MaxValue || d != Math.Truncate(d))
-                throw new ScriptRuntimeException("Expected nonnegative integer in third argument.", this);
+			if (!(Arguments[2] is DoubleNumber Len) || (d = Start.Value) < 0 || d > int.MaxValue || d != Math.Truncate(d))
+				throw new ScriptRuntimeException("Expected nonnegative integer in third argument.", this);
 
-            string s = S.Value;
+			string s = S.Value;
             int n = (int)d;
             int len = s.Length;
 

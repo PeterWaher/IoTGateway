@@ -24,17 +24,7 @@ namespace Waher.Persistence.FilesLW.Test
 		[ClassInitialize]
 		public static async Task ClassInitialize(TestContext Context)
 		{
-			if (File.Exists(DBFilesBTreeTests.MasterFileName))
-				File.Delete(DBFilesBTreeTests.MasterFileName);
-
-			if (File.Exists(DBFilesBTreeTests.FileName))
-				File.Delete(DBFilesBTreeTests.FileName);
-
-			if (File.Exists(DBFilesBTreeTests.BlobFileName))
-				File.Delete(DBFilesBTreeTests.BlobFileName);
-
-			if (File.Exists(DBFilesBTreeTests.NamesFileName))
-				File.Delete(DBFilesBTreeTests.NamesFileName);
+			DBFilesBTreeTests.DeleteFiles();
 
 #if !LW
 			provider = new FilesProvider("Data", "Default", BlockSize, BlocksInCache, Math.Max(BlockSize / 2, 1024), Encoding.UTF8, 10000, true);

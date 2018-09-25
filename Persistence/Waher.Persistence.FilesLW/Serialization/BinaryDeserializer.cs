@@ -1,8 +1,7 @@
-﻿using System;
-using System.IO;
-using System.Collections.Generic;
+﻿//#define DEBUG
+
+using System;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Waher.Persistence.Files.Serialization
 {
@@ -16,6 +15,8 @@ namespace Waher.Persistence.Files.Serialization
 		private byte[] data;
 		private int pos;
 		private byte bitOffset = 0;
+		private readonly uint blockLimit;
+		private readonly bool debug;
 
 		/// <summary>
 		/// Manages binary deserialization of data.
@@ -23,8 +24,9 @@ namespace Waher.Persistence.Files.Serialization
 		/// <param name="CollectionName">Name of current collection.</param>
 		/// <param name="Encoding">Encoding to use for text.</param>
 		/// <param name="Data">Binary data to deserialize.</param>
-		public BinaryDeserializer(string CollectionName, Encoding Encoding, byte[] Data)
-			: this(CollectionName, Encoding, Data, 0, false)
+		/// <param name="BlockLimit">Maximum block index + 1</param>
+		public BinaryDeserializer(string CollectionName, Encoding Encoding, byte[] Data, uint BlockLimit)
+			: this(CollectionName, Encoding, Data, BlockLimit, 0, false)
 		{
 		}
 
@@ -34,9 +36,23 @@ namespace Waher.Persistence.Files.Serialization
 		/// <param name="CollectionName">Name of current collection.</param>
 		/// <param name="Encoding">Encoding to use for text.</param>
 		/// <param name="Data">Binary data to deserialize.</param>
+		/// <param name="BlockLimit">Maximum block index + 1</param>
 		/// <param name="Debug">If debug output is to be emitted.</param>
-		public BinaryDeserializer(string CollectionName, Encoding Encoding, byte[] Data, bool Debug)
-			: this(CollectionName, Encoding, Data, 0, Debug)
+		public BinaryDeserializer(string CollectionName, Encoding Encoding, byte[] Data, uint BlockLimit, bool Debug)
+			: this(CollectionName, Encoding, Data, BlockLimit, 0, Debug)
+		{
+		}
+
+		/// <summary>
+		/// Manages binary deserialization of data.
+		/// </summary>
+		/// <param name="CollectionName">Name of current collection.</param>
+		/// <param name="Encoding">Encoding to use for text.</param>
+		/// <param name="Data">Binary data to deserialize.</param>
+		/// <param name="BlockLimit">Maximum block index + 1</param>
+		/// <param name="StartPosition">Starting position.</param>
+		public BinaryDeserializer(string CollectionName, Encoding Encoding, byte[] Data, uint BlockLimit, int StartPosition)
+			: this(CollectionName, Encoding, Data, BlockLimit, StartPosition, false)
 		{
 		}
 
@@ -47,25 +63,16 @@ namespace Waher.Persistence.Files.Serialization
 		/// <param name="Encoding">Encoding to use for text.</param>
 		/// <param name="Data">Binary data to deserialize.</param>
 		/// <param name="StartPosition">Starting position.</param>
-		public BinaryDeserializer(string CollectionName, Encoding Encoding, byte[] Data, int StartPosition)
-			: this(CollectionName, Encoding, Data, StartPosition, false)
-		{
-		}
-
-		/// <summary>
-		/// Manages binary deserialization of data.
-		/// </summary>
-		/// <param name="CollectionName">Name of current collection.</param>
-		/// <param name="Encoding">Encoding to use for text.</param>
-		/// <param name="Data">Binary data to deserialize.</param>
-		/// <param name="StartPosition">Starting position.</param>
+		/// <param name="BlockLimit">Maximum block index + 1</param>
 		/// <param name="Debug">If debug output is to be emitted.</param>
-		public BinaryDeserializer(string CollectionName, Encoding Encoding, byte[] Data, int StartPosition, bool Debug)
+		public BinaryDeserializer(string CollectionName, Encoding Encoding, byte[] Data, uint BlockLimit, int StartPosition, bool Debug)
 		{
 			this.collectionName = CollectionName;
 			this.encoding = Encoding;
 			this.data = Data;
 			this.pos = StartPosition;
+			this.blockLimit = BlockLimit;
+			this.debug = Debug;
 		}
 
 		/// <summary>
@@ -82,7 +89,16 @@ namespace Waher.Persistence.Files.Serialization
 		/// <returns>Deserialized value.</returns>
 		public bool ReadBoolean()
 		{
+#if DEBUG
+			bool Result = this.ReadBit();
+
+			if (this.debug)
+				Console.Out.WriteLine("Bool: " + Result);
+
+			return Result;
+#else
 			return this.ReadBit();
+#endif
 		}
 
 		/// <summary>
@@ -94,7 +110,16 @@ namespace Waher.Persistence.Files.Serialization
 			if (this.bitOffset > 0)
 				this.FlushBits();
 
+#if DEBUG
+			byte Result = this.data[this.pos++];
+
+			if (this.debug)
+				Console.Out.WriteLine("Byte: " + Result);
+
+			return Result;
+#else
 			return this.data[this.pos++];
+#endif
 		}
 
 		/// <summary>
@@ -111,6 +136,11 @@ namespace Waher.Persistence.Files.Serialization
 			Result |= this.data[this.pos];
 
 			this.pos += 2;
+
+#if DEBUG
+			if (this.debug)
+				Console.Out.WriteLine("Short: " + (short)Result);
+#endif
 
 			return (short)Result;
 		}
@@ -133,6 +163,11 @@ namespace Waher.Persistence.Files.Serialization
 			Result |= this.data[this.pos];
 
 			this.pos += 4;
+
+#if DEBUG
+			if (this.debug)
+				Console.Out.WriteLine("Int: " + (int)Result);
+#endif
 
 			return (int)Result;
 		}
@@ -164,6 +199,11 @@ namespace Waher.Persistence.Files.Serialization
 
 			this.pos += 8;
 
+#if DEBUG
+			if (this.debug)
+				Console.Out.WriteLine("Long: " + (long)Result);
+#endif
+
 			return (long)Result;
 		}
 
@@ -176,7 +216,16 @@ namespace Waher.Persistence.Files.Serialization
 			if (this.bitOffset > 0)
 				this.FlushBits();
 
+#if DEBUG
+			sbyte Result = (sbyte)this.data[this.pos++];
+
+			if (this.debug)
+				Console.Out.WriteLine("SByte: " + Result);
+
+			return Result;
+#else
 			return (sbyte)this.data[this.pos++];
+#endif
 		}
 
 		/// <summary>
@@ -193,6 +242,11 @@ namespace Waher.Persistence.Files.Serialization
 			Result |= this.data[this.pos];
 
 			this.pos += 2;
+
+#if DEBUG
+			if (this.debug)
+				Console.Out.WriteLine("UShort: " + Result);
+#endif
 
 			return Result;
 		}
@@ -216,7 +270,26 @@ namespace Waher.Persistence.Files.Serialization
 
 			this.pos += 4;
 
+#if DEBUG
+			if (this.debug)
+				Console.Out.WriteLine("UInt: " + Result);
+#endif
+
 			return Result;
+		}
+
+		/// <summary>
+		/// Reads a block link
+		/// </summary>
+		/// <returns>Deserialized value.</returns>
+		public uint ReadBlockLink()
+		{
+			uint BlockIndex = this.ReadUInt32();
+
+			if (BlockIndex >= this.blockLimit)
+				return 0;
+			else
+				return BlockIndex;
 		}
 
 		/// <summary>
@@ -246,6 +319,11 @@ namespace Waher.Persistence.Files.Serialization
 
 			this.pos += 8;
 
+#if DEBUG
+			if (this.debug)
+				Console.Out.WriteLine("ULong: " + Result);
+#endif
+
 			return Result;
 		}
 
@@ -264,7 +342,16 @@ namespace Waher.Persistence.Files.Serialization
 			for (i = 0; i < 4; i++)
 				A[i] = this.ReadInt32();
 
+#if DEBUG
+			decimal Result = new decimal(A);
+
+			if (this.debug)
+				Console.Out.WriteLine("Decimal: " + Result);
+
+			return Result;
+#else
 			return new decimal(A);
+#endif
 		}
 
 		/// <summary>
@@ -279,7 +366,10 @@ namespace Waher.Persistence.Files.Serialization
 			double Result = BitConverter.ToDouble(this.data, this.pos);
 
 			this.pos += 8;
-
+#if DEBUG
+			if (this.debug)
+				Console.Out.WriteLine("Double: " + Result);
+#endif
 			return Result;
 		}
 
@@ -295,6 +385,10 @@ namespace Waher.Persistence.Files.Serialization
 			float Result = BitConverter.ToSingle(this.data, this.pos);
 
 			this.pos += 4;
+#if DEBUG
+			if (this.debug)
+				Console.Out.WriteLine("Single: " + Result);
+#endif
 
 			return Result;
 		}
@@ -306,7 +400,13 @@ namespace Waher.Persistence.Files.Serialization
 		public DateTime ReadDateTime()
 		{
 			DateTimeKind Kind = (DateTimeKind)this.ReadBits(2);
-			return new DateTime(this.ReadInt64(), Kind);
+			DateTime Result = new DateTime(this.ReadInt64(), Kind);
+
+#if DEBUG
+			if (this.debug)
+				Console.Out.WriteLine("DateTime: " + Result);
+#endif
+			return Result;
 		}
 
 		/// <summary>
@@ -317,8 +417,13 @@ namespace Waher.Persistence.Files.Serialization
 		{
 			long Ticks = this.ReadInt64();
 			TimeSpan Offset = this.ReadTimeSpan();
+			DateTimeOffset Result = new DateTimeOffset(Ticks, Offset);
 
-			return new DateTimeOffset(Ticks, Offset);
+#if DEBUG
+			if (this.debug)
+				Console.Out.WriteLine("DateTimeOffset: " + Result);
+#endif
+			return Result;
 		}
 
 		/// <summary>
@@ -327,7 +432,16 @@ namespace Waher.Persistence.Files.Serialization
 		/// <returns>Deserialized value.</returns>
 		public TimeSpan ReadTimeSpan()
 		{
+#if DEBUG
+			TimeSpan Result = new TimeSpan(this.ReadInt64());
+
+			if (this.debug)
+				Console.Out.WriteLine("TimeSpan: " + Result);
+
+			return Result;
+#else
 			return new TimeSpan(this.ReadInt64());
+#endif
 		}
 
 		/// <summary>
@@ -336,7 +450,16 @@ namespace Waher.Persistence.Files.Serialization
 		/// <returns>Deserialized value.</returns>
 		public char ReadChar()
 		{
+#if DEBUG
+			char Result = (char)this.ReadUInt16();
+
+			if (this.debug)
+				Console.Out.WriteLine("Char: " + Result);
+
+			return Result;
+#else
 			return (char)this.ReadUInt16();
+#endif
 		}
 
 		/// <summary>
@@ -347,7 +470,13 @@ namespace Waher.Persistence.Files.Serialization
 		public Enum ReadEnum(Type EnumType)
 		{
 			string s = this.ReadString();
-			return (Enum)Enum.Parse(EnumType, s);
+			Enum Result = (Enum)Enum.Parse(EnumType, s);
+
+#if DEBUG
+			if (this.debug)
+				Console.Out.WriteLine("Enum: " + Result);
+#endif
+			return Result;
 		}
 
 		/// <summary>
@@ -365,6 +494,10 @@ namespace Waher.Persistence.Files.Serialization
 			Array.Copy(this.data, this.pos, Result, 0, c);
 			this.pos += c;
 
+#if DEBUG
+			if (this.debug)
+				Console.Out.WriteLine("Byte[]: " + System.Convert.ToBase64String(Result));
+#endif
 			return Result;
 		}
 
@@ -380,6 +513,10 @@ namespace Waher.Persistence.Files.Serialization
 			Array.Copy(this.data, this.pos, Result, 0, NrBytes);
 			this.pos += NrBytes;
 
+#if DEBUG
+			if (this.debug)
+				Console.Out.WriteLine("Raw: " + System.Convert.ToBase64String(Result));
+#endif
 			return Result;
 		}
 
@@ -390,11 +527,15 @@ namespace Waher.Persistence.Files.Serialization
 		public string ReadString()
 		{
 			int c = (int)this.ReadVariableLengthUInt64();
-			string s = this.encoding.GetString(this.data, this.pos, c);
+			string Result = this.encoding.GetString(this.data, this.pos, c);
 
 			this.pos += c;
 
-			return s;
+#if DEBUG
+			if (this.debug)
+				Console.Out.WriteLine("String: " + Result);
+#endif
+			return Result;
 		}
 
 		/// <summary>
@@ -410,9 +551,16 @@ namespace Waher.Persistence.Files.Serialization
 			Array.Copy(this.data, this.pos, Data, 0, 16);
 			this.pos += 16;
 
+#if DEBUG
 			Guid Result = new Guid(Data);
 
+			if (this.debug)
+				Console.Out.WriteLine("GUID: " + Result);
+
 			return Result;
+#else
+			return new Guid(Data);
+#endif
 		}
 
 		/// <summary>
@@ -435,6 +583,10 @@ namespace Waher.Persistence.Files.Serialization
 				Result |= (ulong)(((long)(b & 0x7f)) << Offset);
 			}
 
+#if DEBUG
+			if (this.debug)
+				Console.Out.WriteLine("VarUInt: " + Result);
+#endif
 			return Result;
 		}
 
@@ -453,6 +605,10 @@ namespace Waher.Persistence.Files.Serialization
 				this.bitOffset = 0;
 			}
 
+#if DEBUG
+			if (this.debug)
+				Console.Out.WriteLine("Bit: " + Result);
+#endif
 			return Result;
 		}
 
@@ -463,6 +619,9 @@ namespace Waher.Persistence.Files.Serialization
 		/// <returns>Deserialized value.</returns>
 		public uint ReadBits(int NrBits)
 		{
+#if DEBUG
+			int NrBitsBak = NrBits;
+#endif
 			uint Result = 0;
 			int Offset = 0;
 			int c;
@@ -491,6 +650,10 @@ namespace Waher.Persistence.Files.Serialization
 				Offset += c;
 			}
 
+#if DEBUG
+			if (this.debug)
+				Console.Out.WriteLine("Bits" + NrBitsBak + ": " + Result);
+#endif
 			return Result;
 		}
 

@@ -33,32 +33,7 @@ namespace Waher.Persistence.FilesLW.Test
 		[TestInitialize]
 		public async Task TestInitialize()
 		{
-			if (File.Exists(DBFilesBTreeTests.MasterFileName + ".bak"))
-				File.Delete(DBFilesBTreeTests.MasterFileName + ".bak");
-
-			if (File.Exists(DBFilesBTreeTests.MasterFileName))
-			{
-				File.Copy(DBFilesBTreeTests.MasterFileName, DBFilesBTreeTests.MasterFileName + ".bak");
-				File.Delete(DBFilesBTreeTests.MasterFileName);
-			}
-
-			if (File.Exists(DBFilesBTreeTests.FileName + ".bak"))
-				File.Delete(DBFilesBTreeTests.FileName + ".bak");
-
-			if (File.Exists(DBFilesBTreeTests.FileName))
-			{
-				File.Copy(DBFilesBTreeTests.FileName, DBFilesBTreeTests.FileName + ".bak");
-				File.Delete(DBFilesBTreeTests.FileName);
-			}
-
-			if (File.Exists(DBFilesBTreeTests.BlobFileName + ".bak"))
-				File.Delete(DBFilesBTreeTests.BlobFileName + ".bak");
-
-			if (File.Exists(DBFilesBTreeTests.BlobFileName))
-			{
-				File.Copy(DBFilesBTreeTests.BlobFileName, DBFilesBTreeTests.BlobFileName + ".bak");
-				File.Delete(DBFilesBTreeTests.BlobFileName);
-			}
+			DBFilesBTreeTests.DeleteFiles();
 
 			this.provider = new FilesProvider("Data", DBFilesBTreeTests.CollectionName, 8192, BlocksInCache, 8192, Encoding.UTF8, 10000, true);
 			this.file = await this.provider.GetFile("Default");

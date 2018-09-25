@@ -882,10 +882,11 @@ namespace Waher.Persistence.Files.Serialization
 					while (NrElements > 0)
 					{
 						if (S.Deserialize(Reader, ElementDataTypeN, true) is T Item)
-						{
 							Elements.Add(Item);
-							NrElements--;
-						}
+						else
+							Elements.Add(default(T));
+
+						NrElements--;
 					}
 
 					return Elements.ToArray();
@@ -917,7 +918,7 @@ namespace Waher.Persistence.Files.Serialization
 					if (NrElements > int.MaxValue)
 						throw new Exception("Array too long.");
 
-					int i, c = (int)NrElements; ;
+					int i, c = (int)NrElements;
 					Array Result = Array.CreateInstance(T, c);
 
 					uint ElementDataType = Reader.ReadBits(6);
@@ -965,7 +966,12 @@ namespace Waher.Persistence.Files.Serialization
 				foreach (T Item in Value)
 				{
 					if (Item == null)
-						Writer.WriteBits(ObjectSerializer.TYPE_NULL, 6);
+					{
+						if (Nullable)
+							Writer.WriteBits(ObjectSerializer.TYPE_NULL, 6);
+						else
+							throw new Exception("Elements cannot be null.");
+					}
 					else
 					{
 						ItemType = Item.GetType();

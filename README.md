@@ -230,11 +230,11 @@ their annotated class definitions.
 
 The folder also contains the following unit test projects:
 
-| Project                            | Type         | Project description |
-|------------------------------------|--------------|---------------------|
-| **Waher.Persistence.Files.Test**   | .NET 4.6.2   | The [Waher.Persistence.Files.Test](Persistence/Waher.Persistence.Files.Test) project contains unit tests for the [Waher.Persistence.Files](Persistence/Waher.Persistence.Files) project. |
-| **Waher.Persistence.FilesLW.Test** | .NET 4.6.2   | The [Waher.Persistence.FilesLW.Test](Persistence/Waher.Persistence.FilesLW.Test) project contains unit tests for the [Waher.Persistence.FilesLW](Persistence/Waher.Persistence.FilesLW) project. |
-| **Waher.Persistence.MongoDB.Test** | .NET 4.6.2   | The [Waher.Persistence.MongoDB.Test](Persistence/Waher.Persistence.MongoDB.Test) project contains unit tests for the [Waher.Persistence.MongoDB](Persistence/Waher.Persistence.MongoDB) project. |
+| Project                            | Type          | Project description |
+|------------------------------------|---------------|---------------------|
+| **Waher.Persistence.Files.Test**   | .NET Core 2.0 | The [Waher.Persistence.Files.Test](Persistence/Waher.Persistence.Files.Test) project contains unit tests for the [Waher.Persistence.Files](Persistence/Waher.Persistence.Files) project. |
+| **Waher.Persistence.FilesLW.Test** | .NET Core 2.0 | The [Waher.Persistence.FilesLW.Test](Persistence/Waher.Persistence.FilesLW.Test) project contains unit tests for the [Waher.Persistence.FilesLW](Persistence/Waher.Persistence.FilesLW) project. |
+| **Waher.Persistence.MongoDB.Test** | .NET 4.6.2    | The [Waher.Persistence.MongoDB.Test](Persistence/Waher.Persistence.MongoDB.Test) project contains unit tests for the [Waher.Persistence.MongoDB](Persistence/Waher.Persistence.MongoDB) project. |
 
 Runtime
 ----------------------

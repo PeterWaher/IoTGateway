@@ -1,8 +1,9 @@
-﻿using System;
+﻿//#define DEBUG
+
+using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Waher.Persistence.Files.Serialization
 {
@@ -87,6 +88,11 @@ namespace Waher.Persistence.Files.Serialization
 		public void Write(bool Value)
 		{
 			this.WriteBit(Value);
+
+#if DEBUG
+			if (this.debug)
+				Console.Out.WriteLine("Bool: " + Value);
+#endif
 		}
 
 		/// <summary>
@@ -99,6 +105,11 @@ namespace Waher.Persistence.Files.Serialization
 				this.FlushBits();
 
 			this.ms.WriteByte(Value);
+
+#if DEBUG
+			if (this.debug)
+				Console.Out.WriteLine("Byte: " + Value);
+#endif
 		}
 
 		/// <summary>
@@ -109,6 +120,11 @@ namespace Waher.Persistence.Files.Serialization
 		{
 			if (this.bitOffset > 0)
 				this.FlushBits();
+
+#if DEBUG
+			if (this.debug)
+				Console.Out.WriteLine("Short: " + Value);
+#endif
 
 			this.ms.WriteByte((byte)Value);
 			Value >>= 8;
@@ -124,6 +140,11 @@ namespace Waher.Persistence.Files.Serialization
 		{
 			if (this.bitOffset > 0)
 				this.FlushBits();
+
+#if DEBUG
+			if (this.debug)
+				Console.Out.WriteLine("Int: " + Value);
+#endif
 
 			this.ms.WriteByte((byte)Value);
 			Value >>= 8;
@@ -146,6 +167,11 @@ namespace Waher.Persistence.Files.Serialization
 			if (this.bitOffset > 0)
 				this.FlushBits();
 
+#if DEBUG
+			if (this.debug)
+				Console.Out.WriteLine("Long: " + Value);
+#endif
+
 			int i;
 
 			for (i = 0; i < 8; i++)
@@ -165,6 +191,11 @@ namespace Waher.Persistence.Files.Serialization
 				this.FlushBits();
 
 			this.ms.WriteByte((byte)Value);
+
+#if DEBUG
+			if (this.debug)
+				Console.Out.WriteLine("SByte: " + Value);
+#endif
 		}
 
 		/// <summary>
@@ -175,6 +206,11 @@ namespace Waher.Persistence.Files.Serialization
 		{
 			if (this.bitOffset > 0)
 				this.FlushBits();
+
+#if DEBUG
+			if (this.debug)
+				Console.Out.WriteLine("UShort: " + Value);
+#endif
 
 			this.ms.WriteByte((byte)Value);
 			Value >>= 8;
@@ -190,6 +226,11 @@ namespace Waher.Persistence.Files.Serialization
 		{
 			if (this.bitOffset > 0)
 				this.FlushBits();
+
+#if DEBUG
+			if (this.debug)
+				Console.Out.WriteLine("UInt: " + Value);
+#endif
 
 			this.ms.WriteByte((byte)Value);
 			Value >>= 8;
@@ -212,6 +253,11 @@ namespace Waher.Persistence.Files.Serialization
 			if (this.bitOffset > 0)
 				this.FlushBits();
 
+#if DEBUG
+			if (this.debug)
+				Console.Out.WriteLine("ULong: " + Value);
+#endif
+
 			int i;
 
 			for (i = 0; i < 8; i++)
@@ -230,6 +276,11 @@ namespace Waher.Persistence.Files.Serialization
 			if (this.bitOffset > 0)
 				this.FlushBits();
 
+#if DEBUG
+			if (this.debug)
+				Console.Out.WriteLine("Decimal: " + Value);
+#endif
+
 			int[] A = decimal.GetBits(Value);
 			int i;
 
@@ -246,6 +297,11 @@ namespace Waher.Persistence.Files.Serialization
 			if (this.bitOffset > 0)
 				this.FlushBits();
 
+#if DEBUG
+			if (this.debug)
+				Console.Out.WriteLine("Double: " + Value);
+#endif
+
 			this.ms.Write(BitConverter.GetBytes(Value), 0, 8);
 		}
 
@@ -258,6 +314,11 @@ namespace Waher.Persistence.Files.Serialization
 			if (this.bitOffset > 0)
 				this.FlushBits();
 
+#if DEBUG
+			if (this.debug)
+				Console.Out.WriteLine("Single: " + Value);
+#endif
+
 			this.ms.Write(BitConverter.GetBytes(Value), 0, 4);
 		}
 
@@ -269,6 +330,11 @@ namespace Waher.Persistence.Files.Serialization
 		{
 			this.WriteBits((byte)Value.Kind, 2);
 			this.Write(Value.Ticks);
+
+#if DEBUG
+			if (this.debug)
+				Console.Out.WriteLine("DateTime: " + Value);
+#endif
 		}
 
 		/// <summary>
@@ -279,6 +345,11 @@ namespace Waher.Persistence.Files.Serialization
 		{
 			this.Write(Value.Ticks);
 			this.Write(Value.Offset);
+
+#if DEBUG
+			if (this.debug)
+				Console.Out.WriteLine("DateTimeOffset: " + Value);
+#endif
 		}
 
 		/// <summary>
@@ -288,6 +359,11 @@ namespace Waher.Persistence.Files.Serialization
 		public void Write(TimeSpan Value)
 		{
 			this.Write(Value.Ticks);
+
+#if DEBUG
+			if (this.debug)
+				Console.Out.WriteLine("TimeSpan: " + Value);
+#endif
 		}
 
 		/// <summary>
@@ -300,6 +376,11 @@ namespace Waher.Persistence.Files.Serialization
 				this.FlushBits();
 
 			this.ms.Write(BitConverter.GetBytes(Value), 0, 2);
+
+#if DEBUG
+			if (this.debug)
+				Console.Out.WriteLine("Char: " + Value);
+#endif
 		}
 
 		/// <summary>
@@ -309,6 +390,11 @@ namespace Waher.Persistence.Files.Serialization
 		public void Write(Enum Value)
 		{
 			this.Write(Value.ToString());
+
+#if DEBUG
+			if (this.debug)
+				Console.Out.WriteLine("Enum: " + Value);
+#endif
 		}
 
 		/// <summary>
@@ -324,6 +410,11 @@ namespace Waher.Persistence.Files.Serialization
 
 			this.WriteVariableLengthUInt64((uint)c);
 			this.WriteRaw(Value);
+
+#if DEBUG
+			if (this.debug)
+				Console.Out.WriteLine("Byte[]: " + System.Convert.ToBase64String(Value));
+#endif
 		}
 
 		/// <summary>
@@ -338,6 +429,11 @@ namespace Waher.Persistence.Files.Serialization
 			int c = Data.Length;
 
 			this.ms.Write(Data, 0, c);
+
+#if DEBUG
+			if (this.debug)
+				Console.Out.WriteLine("Raw: " + System.Convert.ToBase64String(Data));
+#endif
 		}
 
 		/// <summary>
@@ -346,6 +442,11 @@ namespace Waher.Persistence.Files.Serialization
 		/// <param name="Value">Value</param>
 		public void Write(string Value)
 		{
+#if DEBUG
+			if (this.debug)
+				Console.Out.WriteLine("String: " + Value);
+#endif
+
 			if (Value == null)
 			{
 				if (this.bitOffset > 0)
@@ -364,6 +465,10 @@ namespace Waher.Persistence.Files.Serialization
 		public void Write(Guid Value)
 		{
 			this.WriteRaw(Value.ToByteArray());
+#if DEBUG
+			if (this.debug)
+				Console.Out.WriteLine("GUID: " + Value);
+#endif
 		}
 
 		/// <summary>
@@ -374,6 +479,10 @@ namespace Waher.Persistence.Files.Serialization
 		{
 			if (this.bitOffset > 0)
 				this.FlushBits();
+#if DEBUG
+			if (this.debug)
+				Console.Out.WriteLine("VarUInt: " + Value);
+#endif
 
 			byte b;
 
@@ -405,6 +514,10 @@ namespace Waher.Persistence.Files.Serialization
 				this.bits = 0;
 				this.bitOffset = 0;
 			}
+#if DEBUG
+			if (this.debug)
+				Console.Out.WriteLine("Bit: " + Bit);
+#endif
 		}
 
 		/// <summary>
@@ -415,6 +528,10 @@ namespace Waher.Persistence.Files.Serialization
 		public void WriteBits(uint Value, int NrBits)
 		{
 			int c;
+#if DEBUG
+			if (this.debug)
+				Console.Out.WriteLine("Bits" + NrBits + ": " + Value);
+#endif
 
 			while (NrBits > 0)
 			{

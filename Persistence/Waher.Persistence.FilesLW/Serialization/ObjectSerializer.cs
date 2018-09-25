@@ -610,7 +610,7 @@ namespace Waher.Persistence.Files.Serialization
 						CSharp.Append("\t\t\tthis.serializer");
 						CSharp.Append(Member.Name);
 						CSharp.Append(" = this.provider.GetObjectSerializer(typeof(");
-						CSharp.Append(MemberType.FullName);
+						this.AppendType(MemberType, CSharp);
 						CSharp.AppendLine("));");
 					}
 				}
@@ -671,9 +671,6 @@ namespace Waher.Persistence.Files.Serialization
 					CSharp.AppendLine("\t\t\t\tReader.ReadVariableLengthUInt64();	// Collection name");
 
 					CSharp.AppendLine();
-
-					if (this.debug)
-						CSharp.AppendLine("\t\t\tConsole.Out.WriteLine(DataType.Value);");
 
 					CSharp.AppendLine("\t\t\tif (DataType.Value != " + TYPE_OBJECT + ")");
 					CSharp.AppendLine("\t\t\t\tthrow new Exception(\"Object expected.\");");
@@ -971,7 +968,7 @@ namespace Waher.Persistence.Files.Serialization
 										CSharp.AppendLine("\t\t\t\t\t\t\t\tGuid " + Member.Name + "ObjectId = Reader.ReadGuid();");
 										CSharp.AppendLine("\t\t\t\t\t\t\t\tTask<" + MemberType.FullName + "> " + Member.Name + "Task = this.provider.LoadObject<" + GenericParameterName(MemberType) + ">(" + Member.Name + "ObjectId, (EmbeddedValue) => Result." + Member.Name + " = (" + MemberType.FullName + ")EmbeddedValue);");
 										CSharp.AppendLine("\t\t\t\t\t\t\t\tif (!" + Member.Name + "Task.Wait(10000))");
-										CSharp.AppendLine("\t\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to load referenced object. Database timed out.\");");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\t\tthrow new TimeoutException(\"Unable to load referenced object. Database timed out.\");");
 										CSharp.AppendLine();
 										CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = " + Member.Name + "Task.Result;");
 										CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
@@ -997,6 +994,13 @@ namespace Waher.Persistence.Files.Serialization
 											CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = ReadNullableGuid(Reader, FieldDataType);");
 										else
 											CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = ReadGuid(Reader, FieldDataType);");
+									}
+									else if (MemberType == typeof(DateTimeOffset))
+									{
+										if (Nullable)
+											CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = ReadNullableDateTimeOffset(Reader, FieldDataType);");
+										else
+											CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = ReadDateTimeOffset(Reader, FieldDataType);");
 									}
 									else
 									{
@@ -1259,7 +1263,7 @@ namespace Waher.Persistence.Files.Serialization
 					CSharp.AppendLine(");");
 				}
 
-				CSharp.Append("\t\t\tif (Embedded)");
+				CSharp.AppendLine("\t\t\tif (Embedded)");
 				CSharp.Append("\t\t\t\tWriter.WriteVariableLengthUInt64(");
 				CSharp.Append(this.provider.GetFieldCode(null, string.IsNullOrEmpty(this.collectionName) ? this.provider.DefaultCollectionName : this.collectionName));
 				CSharp.AppendLine(");");
@@ -1706,7 +1710,11 @@ namespace Waher.Persistence.Files.Serialization
 										CSharp.AppendLine("\tObjectSerializer Serializer" + Member.Name + " = this.provider.GetObjectSerializerEx(typeof(" + MemberType.FullName + "));");
 										CSharp.Append(Indent2);
 										CSharp.AppendLine("\tTask<Guid> " + Member.Name + "Task = Serializer" + Member.Name + ".GetObjectId(Value." + Member.Name + ", true);");
-										CSharp.AppendLine("\tFilesProvider.Wait(" + Member.Name + "Task, " + this.provider.TimeoutMilliseconds.ToString() + ");");
+										CSharp.Append(Indent2);
+										CSharp.AppendLine("\tif (!" + Member.Name + "Task.Wait(" + this.provider.TimeoutMilliseconds.ToString() + "))");
+										CSharp.Append(Indent2);
+										CSharp.AppendLine("\t\tthrow new TimeoutException(\"Unable to load referenced object. Database timed out.\");");
+										CSharp.Append(Indent2);
 										CSharp.AppendLine("\tWriter.Write(" + Member.Name + "Task.Result);");
 										CSharp.Append(Indent2);
 										CSharp.AppendLine("}");
@@ -1871,11 +1879,15 @@ namespace Waher.Persistence.Files.Serialization
 					{ Path.Combine(Path.GetDirectoryName(GetLocation(typeof(Encoding))), "System.Text.Encoding.dll"), true },
 					{ Path.Combine(Path.GetDirectoryName(GetLocation(typeof(MemoryStream))), "System.IO.dll"), true },
 					{ Path.Combine(Path.GetDirectoryName(GetLocation(typeof(MemoryStream))), "System.Runtime.Extensions.dll"), true },
+					{ Path.Combine(Path.GetDirectoryName(GetLocation(typeof(Task))), "System.Threading.Tasks.dll"), true },
 					{ GetLocation(typeof(Types)), true },
 					{ GetLocation(typeof(Database)), true },
 					{ GetLocation(typeof(ObjectSerializer)), true },
 					{ GetLocation(typeof(MultiReadSingleWriteObject)), true }
 				};
+
+				if (this.debug)
+					Dependencies[GetLocation(typeof(Console))] = true;
 
 				System.Reflection.TypeInfo LoopInfo;
 				Type Loop = Type;
@@ -1949,11 +1961,19 @@ namespace Waher.Persistence.Files.Serialization
 					throw new Exception("Unable to serialize objects of type " + Type.FullName +
 						". When generating serialization class, the following compiler errors were reported:\r\n" + sb.ToString());
 				}
-
 				Output.Position = 0;
-				Assembly A = AssemblyLoadContext.Default.LoadFromStream(Output, PdbOutput);
-				Type T = A.GetType(Type.Namespace + ".Binary.BinarySerializer" + TypeName + this.provider.Id);
-				this.customSerializer = (IObjectSerializer)Activator.CreateInstance(T, this.provider);
+				Assembly A;
+
+				try
+				{
+					A = AssemblyLoadContext.Default.LoadFromStream(Output, PdbOutput);
+					Type T = A.GetType(Type.Namespace + ".Binary.BinarySerializer" + TypeName + this.provider.Id);
+					this.customSerializer = (IObjectSerializer)Activator.CreateInstance(T, this.provider);
+				}
+				catch (FileLoadException)
+				{
+					this.customSerializer = new ObjectSerializer(Type, Provider, Debug, false);
+				}
 			}
 			else
 			{
@@ -3184,6 +3204,53 @@ namespace Waher.Persistence.Files.Serialization
 				else
 					T = null;
 			}
+		}
+
+		private void AppendType(Type T, StringBuilder sb)
+		{
+			if (T.IsConstructedGenericType)
+			{
+				Type T2 = T.GetGenericTypeDefinition();
+				string s = T2.FullName;
+				int i = s.IndexOf('`');
+
+				if (i > 0)
+					s = s.Substring(0, i);
+
+				sb.Append(s);
+				sb.Append('<');
+
+				bool First = true;
+
+				foreach (Type Arg in T.GenericTypeArguments)
+				{
+					if (First)
+						First = false;
+					else
+						sb.Append(',');
+
+					this.AppendType(Arg, sb);
+				}
+
+				sb.Append('>');
+			}
+			else if (T.HasElementType)
+			{
+				if (T.IsArray)
+				{
+					this.AppendType(T.GetElementType(), sb);
+					sb.Append("[]");
+				}
+				else if (T.IsPointer)
+				{
+					this.AppendType(T.GetElementType(), sb);
+					sb.Append('*');
+				}
+				else
+					sb.Append(T.FullName);
+			}
+			else
+				sb.Append(T.FullName);
 		}
 
 	}

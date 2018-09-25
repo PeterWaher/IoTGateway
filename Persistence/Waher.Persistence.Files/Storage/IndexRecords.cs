@@ -40,6 +40,7 @@ namespace Waher.Persistence.Files.Storage
 	/// </summary>
 	public class IndexRecords : IRecordHandler, IComparer<byte[]>
 	{
+		private IndexBTreeFile index;
 		private readonly string[] fieldNames;
 		private readonly bool[] ascending;
 		private readonly string collectionName;
@@ -53,6 +54,7 @@ namespace Waher.Persistence.Files.Storage
 		/// <param name="CollectionName">Name of current collection.</param>
 		/// <param name="Encoding">Encoding to use for text.</param>
 		/// <param name="KeySizeLimit">Upper size limit of index keys.</param>
+		/// <param name="BlockLimit">Block limit.</param>
 		/// <param name="FieldNames">Field names included in the index. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the corresponding field name by a hyphen (minus) sign.</param>
 		public IndexRecords(string CollectionName, Encoding Encoding, int KeySizeLimit, params string[] FieldNames)
@@ -97,6 +99,15 @@ namespace Waher.Persistence.Files.Storage
 		public bool[] Ascending
 		{
 			get { return this.ascending; }
+		}
+
+		/// <summary>
+		/// Index file.
+		/// </summary>
+		internal IndexBTreeFile Index
+		{
+			get => this.index;
+			set => this.index = value;
 		}
 
 		/// <summary>
@@ -307,8 +318,9 @@ namespace Waher.Persistence.Files.Storage
 				return 1;
 			else
 			{
-				BinaryDeserializer xReader = new BinaryDeserializer(this.collectionName, this.encoding, x);
-				BinaryDeserializer yReader = new BinaryDeserializer(this.collectionName, this.encoding, y);
+				uint BlockLimit = this.index?.IndexFile?.BlockLimit ?? uint.MaxValue;
+				BinaryDeserializer xReader = new BinaryDeserializer(this.collectionName, this.encoding, x, BlockLimit);
+				BinaryDeserializer yReader = new BinaryDeserializer(this.collectionName, this.encoding, y, BlockLimit);
 				uint xType, yType;
 				int i, j, c;
 				long l;
@@ -2343,7 +2355,7 @@ namespace Waher.Persistence.Files.Storage
 		public void ExportKey(object ObjectId, XmlWriter Output)
 		{
 			byte[] Bin = (byte[])ObjectId;
-			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Bin);
+			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Bin, this.index?.IndexFile?.BlockLimit ?? uint.MaxValue);
 
 			if (Reader.BytesLeft > 0 && Reader.ReadBit())
 			{

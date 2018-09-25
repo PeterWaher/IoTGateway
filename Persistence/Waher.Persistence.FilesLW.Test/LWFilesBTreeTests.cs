@@ -28,13 +28,23 @@ namespace Waher.Persistence.FilesLW.Test
 	public abstract class DBFilesBTreeTests
 	{
 		internal const string MasterFileName = "Data\\Files.master";
-		internal const string FileName = "Data\\Default.btree";
-		internal const string BlobFileName = "Data\\Default.blob";
-		internal const string NamesFileName = "Data\\Default.names";
+		internal const string DefaultFileName = "Data\\Default.btree";
+		internal const string DefaultBlobFileName = "Data\\Default.blob";
+		internal const string DefaultNamesFileName = "Data\\Default.names";
+		internal const string TestFileName = "Data\\Test.btree";
+		internal const string TestBlobFileName = "Data\\Test.blob";
+		internal const string TestNamesFileName = "Data\\Test.names";
 		internal const string CollectionName = "Default";
 		internal const string ObjFileName = "Data\\LastObject.bin";
 		internal const string ObjIdFileName = "Data\\LastObjectId.bin";
 		internal const string BlockSizeFileName = "Data\\BlockSize.bin";
+#if NETSTANDARD1_5
+		internal const string Index1FileName = "Data\\Default.btree.50104c1cdc9b0754886b272fc1aaa550747dadf4.index";
+		internal const string Index2FileName = "Data\\Default.btree.40059d366b589d4071aba631a3aa4fc1dc03e357.index";
+#else
+		internal const string Index1FileName = "Data\\Default.btree.Byte.-DateTime.index";
+		internal const string Index2FileName = "Data\\Default.btree.ShortString.index";
+#endif
 		internal const string Folder = "Data";
 		internal const int BlocksInCache = 10000;
 		internal const int ObjectsToEnumerate = 1000;
@@ -58,6 +68,15 @@ namespace Waher.Persistence.FilesLW.Test
 		[TestInitialize]
 		public async Task TestInitialize()
 		{
+			DeleteFiles();
+
+			this.provider = new FilesProvider(Folder, CollectionName, this.BlockSize, BlocksInCache, Math.Max(BlockSize / 2, 1024), Encoding.UTF8, 10000, true);
+			this.file = await this.provider.GetFile(CollectionName);
+			this.start = DateTime.Now;
+		}
+
+		internal static void DeleteFiles()
+		{
 			if (File.Exists(MasterFileName + ".bak"))
 				File.Delete(MasterFileName + ".bak");
 
@@ -67,36 +86,50 @@ namespace Waher.Persistence.FilesLW.Test
 				File.Delete(MasterFileName);
 			}
 
-			if (File.Exists(FileName + ".bak"))
-				File.Delete(FileName + ".bak");
+			if (File.Exists(DefaultFileName + ".bak"))
+				File.Delete(DefaultFileName + ".bak");
 
-			if (File.Exists(FileName))
+			if (File.Exists(DefaultFileName))
 			{
-				File.Copy(FileName, FileName + ".bak");
-				File.Delete(FileName);
+				File.Copy(DefaultFileName, DefaultFileName + ".bak");
+				File.Delete(DefaultFileName);
 			}
 
-			if (File.Exists(BlobFileName + ".bak"))
-				File.Delete(BlobFileName + ".bak");
+			if (File.Exists(DefaultBlobFileName + ".bak"))
+				File.Delete(DefaultBlobFileName + ".bak");
 
-			if (File.Exists(BlobFileName))
+			if (File.Exists(DefaultBlobFileName))
 			{
-				File.Copy(BlobFileName, BlobFileName + ".bak");
-				File.Delete(BlobFileName);
+				File.Copy(DefaultBlobFileName, DefaultBlobFileName + ".bak");
+				File.Delete(DefaultBlobFileName);
 			}
 
-			if (File.Exists(NamesFileName + ".bak"))
-				File.Delete(NamesFileName + ".bak");
+			if (File.Exists(DefaultNamesFileName + ".bak"))
+				File.Delete(DefaultNamesFileName + ".bak");
 
-			if (File.Exists(NamesFileName))
+			if (File.Exists(DefaultNamesFileName))
 			{
-				File.Copy(NamesFileName, NamesFileName + ".bak");
-				File.Delete(NamesFileName);
+				File.Copy(DefaultNamesFileName, DefaultNamesFileName + ".bak");
+				File.Delete(DefaultNamesFileName);
 			}
 
-			this.provider = new FilesProvider(Folder, CollectionName, this.BlockSize, BlocksInCache, Math.Max(BlockSize / 2, 1024), Encoding.UTF8, 10000, true);
-			this.file = await this.provider.GetFile(CollectionName);
-			this.start = DateTime.Now;
+			if (File.Exists(Index1FileName + ".bak"))
+				File.Delete(Index1FileName + ".bak");
+
+			if (File.Exists(Index1FileName))
+			{
+				File.Copy(Index1FileName, Index1FileName + ".bak");
+				File.Delete(Index1FileName);
+			}
+
+			if (File.Exists(Index2FileName + ".bak"))
+				File.Delete(Index2FileName + ".bak");
+
+			if (File.Exists(Index2FileName))
+			{
+				File.Copy(Index2FileName, Index2FileName + ".bak");
+				File.Delete(Index2FileName);
+			}
 		}
 
 		[TestCleanup]
@@ -478,33 +511,52 @@ namespace Waher.Persistence.FilesLW.Test
 		[TestMethod]
 		public async Task DBFiles_BTree_Test_05_SaveNew_Multiple_NoSplit()
 		{
-			await this.TestMultiple(3, true, null);
+			await this.TestMultiple(3, 1, 1, true, null);
 		}
 
-		private async Task TestMultiple(int c, bool AssertIndividually, int? LogStatisticsEvery)
+		private async Task TestMultiple(int NrObjects, int ArraySize, int BulkSize, bool AssertIndividually, int? LogStatisticsEvery)
 		{
 			DateTime Start = DateTime.Now;
 			List<FileStatistics> Stat = null;
 			List<double> Milliseconds = null;
-			int i;
-			Simple[] Objects = new Simple[c];
+			int i = 0, j;
+			Simple[] Objects = new Simple[NrObjects];
+			Simple[] Block = new Simple[ArraySize];
 			Simple Obj2;
+			ObjectSerializer Serializer = this.provider.GetObjectSerializerEx(typeof(Simple));
 
-			for (i = 0; i < c; i++)
+			if (BulkSize > 1)
+				await this.provider.StartBulk();
+
+			while (i < NrObjects)
 			{
-				Objects[i] = CreateSimple(this.MaxStringLength);
-				await this.file.SaveNewObject(Objects[i]);
+				for (j = 0; j < ArraySize; j++)
+				{
+					Block[j] = CreateSimple(this.MaxStringLength);
+					Objects[i++] = Block[j];
+				}
+
+				if (ArraySize > 1)
+					await this.file.SaveNewObjects(Block, Serializer);
+				else
+					await this.file.SaveNewObject(Block[0]);
+
+				if (BulkSize > 1 && i % BulkSize == 0)
+				{
+					await this.provider.EndBulk();
+					await this.provider.StartBulk();
+				}
 
 				if (AssertIndividually)
 				{
 					Console.Out.WriteLine();
-					Console.Out.WriteLine((i + 1).ToString() + " objects:");
+					Console.Out.WriteLine(i.ToString() + " objects:");
 					Console.Out.WriteLine(new string('-', 80));
 
-					await AssertConsistent(this.file, this.provider, i + 1, Objects[i], true);
+					await AssertConsistent(this.file, this.provider, i, Objects[i - 1], true);
 				}
 
-				if (LogStatisticsEvery.HasValue && (i + 1) % LogStatisticsEvery.Value == 0)
+				if (LogStatisticsEvery.HasValue && i % LogStatisticsEvery.Value == 0)
 				{
 					if (Stat == null)
 					{
@@ -519,14 +571,17 @@ namespace Waher.Persistence.FilesLW.Test
 				}
 			}
 
-			for (i = 0; i < c; i++)
+			if (BulkSize > 1)
+				await this.provider.EndBulk();
+
+			for (i = 0; i < NrObjects; i++)
 			{
 				Obj2 = await this.file.LoadObject<Simple>(Objects[i].ObjectId);
 				DBFilesObjectSerializationTests.AssertEqual(Objects[i], Obj2);
 			}
 
 			if (!AssertIndividually)
-				await AssertConsistent(this.file, this.provider, c, null, true);
+				await AssertConsistent(this.file, this.provider, NrObjects, null, true);
 
 			if (Stat != null)
 			{
@@ -554,53 +609,51 @@ namespace Waher.Persistence.FilesLW.Test
 		[TestMethod]
 		public async Task DBFiles_BTree_Test_06_SaveNew_Multiple_NodeSplit()
 		{
-			await this.TestMultiple(100, true, null);
+			await this.TestMultiple(100, 1, 1, true, null);
 		}
 
 		[TestMethod]
 		public async Task DBFiles_BTree_Test_07_SaveNew_1000()
 		{
-			await this.TestMultiple(1000, false, null);
+			await this.TestMultiple(1000, 100, 1000, false, null);
 			await ExportXML(this.file, "Data\\BTree.xml");
 		}
 
 		[TestMethod]
 		public async Task DBFiles_BTree_Test_08_SaveNew_10000()
 		{
-			await this.TestMultiple(10000, false, null);
+			await this.TestMultiple(10000, 100, 1000, false, null);
 			await ExportXML(this.file, "Data\\BTree.xml");
 		}
 
 		[TestMethod]
 		public async Task DBFiles_BTree_Test_09_SaveNew_10000_Statistics()
 		{
-			await this.TestMultiple(10000, false, 100);
+			await this.TestMultiple(10000, 100, 100, false, 100);
 		}
 
 		[TestMethod]
 		public async Task DBFiles_BTree_Test_10_SaveNew_100000()
 		{
-			await this.TestMultiple(100000, false, null);
+			await this.TestMultiple(100000, 100, 1000, false, null);
 		}
 
 		[TestMethod]
 		public async Task DBFiles_BTree_Test_11_SaveNew_100000_Statistics()
 		{
-			await this.TestMultiple(100000, false, 1000);
+			await this.TestMultiple(100000, 100, 1000, false, 1000);
 		}
 
 		[TestMethod]
-		[Ignore]
 		public async Task DBFiles_BTree_Test_12_SaveNew_1000000()
 		{
-			await this.TestMultiple(1000000, false, null);
+			await this.TestMultiple(1000000, 100, 1000, false, null);
 		}
 
 		[TestMethod]
-		[Ignore]
 		public async Task DBFiles_BTree_Test_13_SaveNew_1000000_Statistics()
 		{
-			await this.TestMultiple(1000000, false, 10000);
+			await this.TestMultiple(1000000, 100, 1000, false, 10000);
 		}
 
 		[TestMethod]
@@ -1052,9 +1105,9 @@ namespace Waher.Persistence.FilesLW.Test
 						this.provider.CloseFile(this.file.CollectionName);
 						this.file = null;
 
-						File.Copy(FileName, FileName + ".bak", true);
-						File.Copy(BlobFileName, BlobFileName + ".bak", true);
-						File.Copy(NamesFileName, NamesFileName + ".bak", true);
+						File.Copy(DefaultFileName, DefaultFileName + ".bak", true);
+						File.Copy(DefaultBlobFileName, DefaultBlobFileName + ".bak", true);
+						File.Copy(DefaultNamesFileName, DefaultNamesFileName + ".bak", true);
 
 						this.file = await this.provider.GetFile(CollectionName);
 

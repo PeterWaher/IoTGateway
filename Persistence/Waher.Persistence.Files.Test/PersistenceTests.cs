@@ -13,7 +13,11 @@ namespace Waher.Persistence.Files.Test
 		[ClassInitialize]
 		public static void ClassInitialize(TestContext Context)
 		{
-			if (Database.Provider == null)
+			try
+			{
+				IDatabaseProvider p = Database.Provider;
+			}
+			catch
 			{
 				Database.Register(new FilesProvider("Data", "Default", 8192, 8192, 8192,
 					Encoding.UTF8, 10000, true));

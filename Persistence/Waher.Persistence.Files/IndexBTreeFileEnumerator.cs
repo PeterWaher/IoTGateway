@@ -206,7 +206,7 @@ namespace Waher.Persistence.Files
 		private async Task LoadObject()
 		{
 			byte[] Key = (byte[])this.e.CurrentObjectId;
-			BinaryDeserializer Reader = new BinaryDeserializer(this.file.CollectionName, this.file.Encoding, Key);
+			BinaryDeserializer Reader = new BinaryDeserializer(this.file.CollectionName, this.file.Encoding, Key, this.file.IndexFile.BlockLimit);
 			this.recordHandler.SkipKey(Reader, true);
 			this.currentObjectId = this.recordHandler.ObjectId;
 

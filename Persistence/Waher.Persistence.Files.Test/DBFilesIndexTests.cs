@@ -23,13 +23,6 @@ namespace Waher.Persistence.FilesLW.Test
 	[TestClass]
 	public abstract class DBFilesIndexTests
 	{
-#if NETSTANDARD1_5
-		internal const string Index1FileName = "Data\\Default.btree.50104c1cdc9b0754886b272fc1aaa550747dadf4.index";
-		internal const string Index2FileName = "Data\\Default.btree.40059d366b589d4071aba631a3aa4fc1dc03e357.index";
-#else
-		internal const string Index1FileName = "Data\\Default.btree.Byte.-DateTime.index";
-		internal const string Index2FileName = "Data\\Default.btree.ShortString.index";
-#endif
 		internal const string ObjFileName = "Data\\LastObject.bin";
 		internal const string ObjIdFileName = "Data\\LastObjectId.bin";
 		internal const string BlockSizeFileName = "Data\\BlockSize.bin";
@@ -51,59 +44,7 @@ namespace Waher.Persistence.FilesLW.Test
 		[TestInitialize]
 		public async Task TestInitialize()
 		{
-			if (File.Exists(DBFilesBTreeTests.MasterFileName + ".bak"))
-				File.Delete(DBFilesBTreeTests.MasterFileName + ".bak");
-
-			if (File.Exists(DBFilesBTreeTests.MasterFileName))
-			{
-				File.Copy(DBFilesBTreeTests.MasterFileName, DBFilesBTreeTests.MasterFileName + ".bak");
-				File.Delete(DBFilesBTreeTests.MasterFileName);
-			}
-
-			if (File.Exists(DBFilesBTreeTests.FileName + ".bak"))
-				File.Delete(DBFilesBTreeTests.FileName + ".bak");
-
-			if (File.Exists(DBFilesBTreeTests.FileName))
-			{
-				File.Copy(DBFilesBTreeTests.FileName, DBFilesBTreeTests.FileName + ".bak");
-				File.Delete(DBFilesBTreeTests.FileName);
-			}
-
-			if (File.Exists(DBFilesBTreeTests.BlobFileName + ".bak"))
-				File.Delete(DBFilesBTreeTests.BlobFileName + ".bak");
-
-			if (File.Exists(DBFilesBTreeTests.BlobFileName))
-			{
-				File.Copy(DBFilesBTreeTests.BlobFileName, DBFilesBTreeTests.BlobFileName + ".bak");
-				File.Delete(DBFilesBTreeTests.BlobFileName);
-			}
-
-			if (File.Exists(DBFilesBTreeTests.NamesFileName + ".bak"))
-				File.Delete(DBFilesBTreeTests.NamesFileName + ".bak");
-
-			if (File.Exists(DBFilesBTreeTests.NamesFileName))
-			{
-				File.Copy(DBFilesBTreeTests.NamesFileName, DBFilesBTreeTests.NamesFileName + ".bak");
-				File.Delete(DBFilesBTreeTests.NamesFileName);
-			}
-
-			if (File.Exists(Index1FileName + ".bak"))
-				File.Delete(Index1FileName + ".bak");
-
-			if (File.Exists(Index1FileName))
-			{
-				File.Copy(Index1FileName, Index1FileName + ".bak");
-				File.Delete(Index1FileName);
-			}
-
-			if (File.Exists(Index2FileName + ".bak"))
-				File.Delete(Index2FileName + ".bak");
-
-			if (File.Exists(Index2FileName))
-			{
-				File.Copy(Index2FileName, Index2FileName + ".bak");
-				File.Delete(Index2FileName);
-			}
+			DBFilesBTreeTests.DeleteFiles();
 
 			this.provider = new FilesProvider(DBFilesBTreeTests.Folder, DBFilesBTreeTests.CollectionName, BlockSize, BlocksInCache, Math.Max(BlockSize / 2, 1024), Encoding.UTF8, 10000, true);
 			this.file = await this.provider.GetFile(DBFilesBTreeTests.CollectionName);

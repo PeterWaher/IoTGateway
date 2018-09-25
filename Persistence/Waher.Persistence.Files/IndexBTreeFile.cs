@@ -49,6 +49,7 @@ namespace Waher.Persistence.Files
 #else
 				Provider.Debug, this.recordHandler);
 #endif
+			this.recordHandler.Index = this;
 		}
 
 		/// <summary>

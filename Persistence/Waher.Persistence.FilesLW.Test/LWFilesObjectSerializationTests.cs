@@ -32,31 +32,12 @@ namespace Waher.Persistence.FilesLW.Test
 		[ClassInitialize]
 		public static async Task ClassInitialize(TestContext Context)
 		{
-			if (File.Exists(DBFilesBTreeTests.MasterFileName))
-				File.Delete(DBFilesBTreeTests.MasterFileName);
-
-			if (File.Exists(DBFilesBTreeTests.FileName))
-				File.Delete(DBFilesBTreeTests.FileName);
-
-			if (File.Exists(DBFilesBTreeTests.BlobFileName))
-				File.Delete(DBFilesBTreeTests.BlobFileName);
-
-			if (File.Exists(DBFilesBTreeTests.NamesFileName))
-				File.Delete(DBFilesBTreeTests.NamesFileName);
-
-			if (File.Exists(FileName))
-				File.Delete(FileName);
-
-			if (File.Exists(BlobFileName))
-				File.Delete(BlobFileName);
-
-			if (File.Exists(NamesFileName))
-				File.Delete(NamesFileName);
+			DBFilesBTreeTests.DeleteFiles();
 
 #if !LW
-			provider = new FilesProvider("Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000, true, true);
+			provider = new FilesProvider("Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000, true, true, true);
 #else
-			provider = new FilesProvider("Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000, true);
+			provider = new FilesProvider("Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000);
 #endif
 			file1 = await provider.GetFile("Default");
 			file2 = await provider.GetFile("Test");
@@ -160,7 +141,7 @@ namespace Waher.Persistence.FilesLW.Test
 			byte[] Data = Writer.GetSerialization();
 			this.WriteData(Data);
 
-			BinaryDeserializer Reader = new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, true);
+			BinaryDeserializer Reader = new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue, true);
 
 			Simple Obj2 = (Simple)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
@@ -347,7 +328,7 @@ namespace Waher.Persistence.FilesLW.Test
 			byte[] Data = Writer.GetSerialization();
 			this.WriteData(Data);
 
-			BinaryDeserializer Reader = new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, true);
+			BinaryDeserializer Reader = new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue, true);
 
 			Classes.Nullable Obj2 = (Classes.Nullable)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
@@ -485,7 +466,7 @@ namespace Waher.Persistence.FilesLW.Test
 			byte[] Data = Writer.GetSerialization();
 			this.WriteData(Data);
 
-			BinaryDeserializer Reader = new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, true);
+			BinaryDeserializer Reader = new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue, true);
 
 			Classes.Nullable Obj2 = (Classes.Nullable)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
@@ -599,7 +580,7 @@ namespace Waher.Persistence.FilesLW.Test
 			byte[] Data = Writer.GetSerialization();
 			this.WriteData(Data);
 
-			BinaryDeserializer Reader = new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, true);
+			BinaryDeserializer Reader = new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue, true);
 
 			Default Obj2 = (Default)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
@@ -741,7 +722,7 @@ namespace Waher.Persistence.FilesLW.Test
 			byte[] Data = Writer.GetSerialization();
 			this.WriteData(Data);
 
-			BinaryDeserializer Reader = new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, true);
+			BinaryDeserializer Reader = new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue, true);
 
 			Default Obj2 = (Default)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
@@ -823,7 +804,7 @@ namespace Waher.Persistence.FilesLW.Test
 			byte[] Data = Writer.GetSerialization();
 			this.WriteData(Data);
 
-			BinaryDeserializer Reader = new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, true);
+			BinaryDeserializer Reader = new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue, true);
 
 			SimpleArrays Obj2 = (SimpleArrays)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
@@ -926,7 +907,7 @@ namespace Waher.Persistence.FilesLW.Test
 			byte[] Data = Writer.GetSerialization();
 			this.WriteData(Data);
 
-			BinaryDeserializer Reader = new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, true);
+			BinaryDeserializer Reader = new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue, true);
 
 			NullableArrays Obj2 = (NullableArrays)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
@@ -1057,7 +1038,7 @@ namespace Waher.Persistence.FilesLW.Test
 			byte[] Data = Writer.GetSerialization();
 			this.WriteData(Data);
 
-			BinaryDeserializer Reader = new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, true);
+			BinaryDeserializer Reader = new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue, true);
 
 			Container Obj2 = (Container)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
@@ -1150,7 +1131,7 @@ namespace Waher.Persistence.FilesLW.Test
 			byte[] Data = Writer.GetSerialization();
 			this.WriteData(Data);
 
-			BinaryDeserializer Reader = new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, true);
+			BinaryDeserializer Reader = new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue, true);
 
 			ObjectIdString Obj2 = (ObjectIdString)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
@@ -1205,7 +1186,7 @@ namespace Waher.Persistence.FilesLW.Test
 			byte[] Data = Writer.GetSerialization();
 			this.WriteData(Data);
 
-			BinaryDeserializer Reader = new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, true);
+			BinaryDeserializer Reader = new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue, true);
 
 			ObjectIdByteArray Obj2 = (ObjectIdByteArray)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
@@ -1275,8 +1256,8 @@ namespace Waher.Persistence.FilesLW.Test
 			this.WriteData(Data1);
 			this.WriteData(Data2);
 
-			BinaryDeserializer Reader1 = new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data1, true);
-			BinaryDeserializer Reader2 = new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data2, true);
+			BinaryDeserializer Reader1 = new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data1, uint.MaxValue, true);
+			BinaryDeserializer Reader2 = new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data2, uint.MaxValue, true);
 
 			LocalNameSubclass1 Obj12 = (LocalNameSubclass1)S.Deserialize(Reader1, ObjectSerializer.TYPE_OBJECT, false);
 			LocalNameSubclass2 Obj22 = (LocalNameSubclass2)S.Deserialize(Reader2, ObjectSerializer.TYPE_OBJECT, false);
@@ -1371,8 +1352,8 @@ namespace Waher.Persistence.FilesLW.Test
 			this.WriteData(Data1);
 			this.WriteData(Data2);
 
-			BinaryDeserializer Reader1 = new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data1, true);
-			BinaryDeserializer Reader2 = new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data2, true);
+			BinaryDeserializer Reader1 = new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data1, uint.MaxValue, true);
+			BinaryDeserializer Reader2 = new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data2, uint.MaxValue, true);
 
 			FullNameSubclass1 Obj12 = (FullNameSubclass1)S.Deserialize(Reader1, ObjectSerializer.TYPE_OBJECT, false);
 			FullNameSubclass2 Obj22 = (FullNameSubclass2)S.Deserialize(Reader2, ObjectSerializer.TYPE_OBJECT, false);
@@ -1450,7 +1431,7 @@ namespace Waher.Persistence.FilesLW.Test
 			byte[] Data = Writer.GetSerialization();
 			this.WriteData(Data);
 
-			BinaryDeserializer Reader = new BinaryDeserializer(((ObjectSerializer)S).CollectionName(Obj), Encoding.UTF8, Data, true);
+			BinaryDeserializer Reader = new BinaryDeserializer(((ObjectSerializer)S).CollectionName(Obj), Encoding.UTF8, Data, uint.MaxValue, true);
 
 			CollectionTest Obj2 = (CollectionTest)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
@@ -1521,7 +1502,7 @@ namespace Waher.Persistence.FilesLW.Test
 			byte[] Data = Writer.GetSerialization();
 			this.WriteData(Data);
 
-			BinaryDeserializer Reader = new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, true);
+			BinaryDeserializer Reader = new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue, true);
 
 			ArraysOfArrays Obj2 = (ArraysOfArrays)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 

@@ -122,6 +122,25 @@ namespace Waher.Persistence
 		Task Analyze(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData);
 
 		/// <summary>
+		/// Analyzes the database and repairs it if necessary. Results are exported to XML.
+		/// </summary>
+		/// <param name="Output">XML Output.</param>
+		/// <param name="XsltPath">Optional XSLT to use to view the output.</param>
+		/// <param name="ProgramDataFolder">Program data folder. Can be removed from filenames used, when referencing them in the report.</param>
+		/// <param name="ExportData">If data in database is to be exported in output.</param>
+		Task Repair(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData);
+
+		/// <summary>
+		/// Analyzes the database and exports findings to XML.
+		/// </summary>
+		/// <param name="Output">XML Output.</param>
+		/// <param name="XsltPath">Optional XSLT to use to view the output.</param>
+		/// <param name="ProgramDataFolder">Program data folder. Can be removed from filenames used, when referencing them in the report.</param>
+		/// <param name="ExportData">If data in database is to be exported in output.</param>
+		/// <param name="Repair">If files should be repaired if corruptions are detected.</param>
+		Task Analyze(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData, bool Repair);
+
+		/// <summary>
 		/// Adds an index to a collection, if one does not already exist.
 		/// </summary>
 		/// <param name="CollectionName">Name of collection.</param>

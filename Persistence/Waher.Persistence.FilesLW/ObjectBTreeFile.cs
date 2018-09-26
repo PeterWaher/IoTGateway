@@ -5247,14 +5247,14 @@ namespace Waher.Persistence.Files
 				new KeyValuePair<string, object>("Collection", this.collectionName),
 				new KeyValuePair<string, object>("SortOrder", sb.ToString()));
 
-			SortedDictionary<Searching.SortedCursor<T>.SortRec, Tuple<T, IObjectSerializer, Guid>> SortedObjects;
+			SortedDictionary<Searching.SortedReference<T>, bool> SortedObjects;
 			IndexRecords Records;
 			byte[] Key;
 
 			try
 			{
 				Records = new IndexRecords(this.collectionName, this.encoding, int.MaxValue, SortOrder);
-				SortedObjects = new SortedDictionary<Searching.SortedCursor<T>.SortRec, Tuple<T, IObjectSerializer, Guid>>();
+				SortedObjects = new SortedDictionary<Searching.SortedReference<T>, bool>();
 
 				while (await Result.MoveNextAsync())
 				{
@@ -5262,9 +5262,7 @@ namespace Waher.Persistence.Files
 						continue;
 
 					Key = Records.Serialize(Result.CurrentObjectId, Result.Current, Result.CurrentSerializer, MissingFieldAction.Null);
-
-					SortedObjects[new Searching.SortedCursor<T>.SortRec(Key, Records)] =
-						new Tuple<T, IObjectSerializer, Guid>(Result.Current, Result.CurrentSerializer, Result.CurrentObjectId);
+					SortedObjects[new Searching.SortedReference<T>(Key, Records, Result.Current, Result.CurrentSerializer, Result.CurrentObjectId)] = true;
 				}
 			}
 			finally

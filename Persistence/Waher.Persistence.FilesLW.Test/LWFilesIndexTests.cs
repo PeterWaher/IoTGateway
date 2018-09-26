@@ -320,6 +320,8 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			SortedDictionary<Guid, Simple> Result = new SortedDictionary<Guid, Simple>();
 
+			await this.provider.StartBulk();
+
 			while (NrObjects > 0)
 			{
 				Simple Obj = DBFilesBTreeTests.CreateSimple(this.MaxStringLength);
@@ -327,6 +329,8 @@ namespace Waher.Persistence.FilesLW.Test
 				Result[ObjectId] = Obj;
 				NrObjects--;
 			}
+
+			await this.provider.EndBulk();
 
 			await DBFilesBTreeTests.AssertConsistent(this.file, this.provider, null, null, true);
 

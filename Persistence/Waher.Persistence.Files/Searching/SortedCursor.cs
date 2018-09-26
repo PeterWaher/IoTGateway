@@ -14,10 +14,11 @@ namespace Waher.Persistence.Files.Searching
 	/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
 	internal class SortedCursor<T> : ICursor<T>
 	{
-		private readonly SortedDictionary<SortRec, Tuple<T, IObjectSerializer, Guid>> sortedObjects;
-		private readonly SortedDictionary<SortRec, Tuple<T, IObjectSerializer, Guid>>.ValueCollection.Enumerator e;
+		private readonly SortedDictionary<SortedReference<T>, bool> sortedObjects;
 		private readonly IndexRecords recordHandler;
+		private SortedDictionary<SortedReference<T>, bool>.KeyCollection.Enumerator e;
 		private readonly int timeoutMilliseconds;
+		private bool initialized = false;
 
 		/// <summary>
 		/// Provides a cursor into a sorted set of objects.
@@ -25,31 +26,12 @@ namespace Waher.Persistence.Files.Searching
 		/// <param name="SortedObjects">Sorted set of objects.</param>
 		/// <param name="RecordHandler">Record handler.</param>
 		/// <param name="TimeoutMilliseconds">Time to wait to get access to underlying database.</param>
-		internal SortedCursor(SortedDictionary<SortRec, Tuple<T, IObjectSerializer, Guid>> SortedObjects, IndexRecords RecordHandler,
+		internal SortedCursor(SortedDictionary<SortedReference<T>, bool> SortedObjects, IndexRecords RecordHandler,
 			int TimeoutMilliseconds)
 		{
 			this.sortedObjects = SortedObjects;
 			this.recordHandler = RecordHandler;
-			e = this.sortedObjects.Values.GetEnumerator();
 			this.timeoutMilliseconds = TimeoutMilliseconds;
-		}
-
-		internal class SortRec : IComparable
-		{
-			private byte[] key;
-			private readonly IComparer<byte[]> comparer;
-
-			internal SortRec(byte[] Key, IComparer<byte[]> Comparer)
-			{
-				this.key = Key;
-				this.comparer = Comparer;
-			}
-
-			public int CompareTo(object obj)
-			{
-				SortRec Rec = (SortRec)obj;
-				return this.comparer.Compare(this.key, Rec.key);
-			}
 		}
 
 		/// <summary>
@@ -61,7 +43,7 @@ namespace Waher.Persistence.Files.Searching
 		{
 			get
 			{
-				return this.e.Current.Item1;
+				return this.e.Current.Value;
 			}
 		}
 
@@ -72,7 +54,7 @@ namespace Waher.Persistence.Files.Searching
 		{
 			get
 			{
-				return this.e.Current.Item2;
+				return this.e.Current.Serializer;
 			}
 		}
 
@@ -84,7 +66,7 @@ namespace Waher.Persistence.Files.Searching
 		{
 			get
 			{
-				return e.Current != null;
+				return e.Current.Value != null;
 			}
 		}
 
@@ -97,7 +79,7 @@ namespace Waher.Persistence.Files.Searching
 		{
 			get
 			{
-				return this.e.Current.Item3;
+				return this.e.Current.ObjectId;
 			}
 		}
 
@@ -117,6 +99,12 @@ namespace Waher.Persistence.Files.Searching
 		/// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
 		public Task<bool> MoveNextAsync()
 		{
+			if (!this.initialized)
+			{
+				this.e = this.sortedObjects.Keys.GetEnumerator();
+				this.initialized = true;
+			}
+
 			return Task.FromResult<bool>(this.e.MoveNext());
 		}
 

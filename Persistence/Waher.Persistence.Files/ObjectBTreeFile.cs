@@ -2374,7 +2374,7 @@ namespace Waher.Persistence.Files
 		public async Task<object> DeleteObject(object Object, ObjectSerializer Serializer)
 		{
 			Guid ObjectId = await Serializer.GetObjectId(Object, false);
-			return this.DeleteObject(ObjectId, (IObjectSerializer)Serializer);
+			return await this.DeleteObject(ObjectId, (IObjectSerializer)Serializer);
 		}
 
 		/// <summary>

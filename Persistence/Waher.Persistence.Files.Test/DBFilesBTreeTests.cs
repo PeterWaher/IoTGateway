@@ -693,7 +693,7 @@ namespace Waher.Persistence.FilesLW.Test
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 			Guid? Prev = null;
 
-			foreach (GenericObject Obj in this.file)
+			foreach (Simple Obj in this.file)
 			{
 				if (Prev.HasValue)
 					AssertEx.Less(Prev.Value, Obj.ObjectId);
@@ -808,6 +808,8 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			SortedDictionary<Guid, Simple> Result = new SortedDictionary<Guid, Simple>();
 
+			await this.provider.StartBulk();
+
 			while (NrObjects > 0)
 			{
 				Simple Obj = CreateSimple(this.MaxStringLength);
@@ -815,6 +817,8 @@ namespace Waher.Persistence.FilesLW.Test
 				Result[ObjectId] = Obj;
 				NrObjects--;
 			}
+
+			await this.provider.EndBulk();
 
 			return Result;
 		}
@@ -1038,32 +1042,31 @@ namespace Waher.Persistence.FilesLW.Test
 		[TestMethod]
 		public async Task DBFiles_BTree_Test_31_DeleteObject()
 		{
-			await this.DBFiles_BTree_Test_DeleteObjects(3, true);
+			await this.DBFiles_BTree_Test_DeleteObjects(3, 1, true);
 		}
 
 		[TestMethod]
 		public async Task DBFiles_BTree_Test_32_DeleteObject_100()
 		{
-			await this.DBFiles_BTree_Test_DeleteObjects(100, true);
+			await this.DBFiles_BTree_Test_DeleteObjects(100, 1, true);
 		}
 
 		[TestMethod]
 		public async Task DBFiles_BTree_Test_33_DeleteObject_1000()
 		{
-			await this.DBFiles_BTree_Test_DeleteObjects(1000, false);
+			await this.DBFiles_BTree_Test_DeleteObjects(1000, 100, false);
 		}
 
 		[TestMethod]
 		public async Task DBFiles_BTree_Test_34_DeleteObject_10000()
 		{
-			await this.DBFiles_BTree_Test_DeleteObjects(10000, false);
+			await this.DBFiles_BTree_Test_DeleteObjects(10000, 1000, false);
 		}
 
 		[TestMethod]
-		[Ignore]
 		public async Task DBFiles_BTree_Test_35_DeleteObject_100000()
 		{
-			await this.DBFiles_BTree_Test_DeleteObjects(100000, false);
+			await this.DBFiles_BTree_Test_DeleteObjects(100000, 1000, false);
 		}
 
 		[TestMethod]
@@ -1072,21 +1075,38 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			while (true)
 			{
-				await this.DBFiles_BTree_Test_DeleteObjects(1000, true);
+				await this.DBFiles_BTree_Test_DeleteObjects(1000, 1, true);
 			}
 		}
 
-		private async Task DBFiles_BTree_Test_DeleteObjects(int c, bool CheckForEachObject)
+		private async Task DBFiles_BTree_Test_DeleteObjects(int c, int BulkSize, bool CheckForEachObject)
 		{
 			Random Gen = new Random();
 			Simple[] Objects = new Simple[c];
 			Simple Obj;
 			int i;
 
+			await this.file.ClearAsync();
+
+			if (BulkSize > 1)
+				await this.provider.StartBulk();
+
 			for (i = 0; i < c; i++)
 			{
+				if (BulkSize > 1 && i % BulkSize == 0)
+				{
+					await this.provider.EndBulk();
+					await this.provider.StartBulk();
+				}
+
 				Objects[i] = Obj = CreateSimple(this.MaxStringLength);
 				await this.file.SaveNewObject(Obj);
+			}
+
+			if (BulkSize > 1)
+			{
+				await this.provider.EndBulk();
+				await this.provider.StartBulk();
 			}
 
 			while (c > 0)
@@ -1143,11 +1163,20 @@ namespace Waher.Persistence.FilesLW.Test
 				}
 				else
 					await this.file.DeleteObject(Obj);
+
+				if (BulkSize > 1 && c % BulkSize == 0)
+				{
+					await this.provider.EndBulk();
+					await this.provider.StartBulk();
+				}
 			}
+
+			if (BulkSize > 1)
+				await this.provider.EndBulk();
 
 			FileStatistics Stat = await AssertConsistent(this.file, this.provider, null, null, true);
 
-			AssertEx.Same(0, this.file.Count);
+			AssertEx.Same(0, await this.file.GetObjectCount(0, true));
 			AssertEx.Same(1, Stat.NrBlocks);
 			AssertEx.Same(0, Stat.NrBlobBlocks);
 		}

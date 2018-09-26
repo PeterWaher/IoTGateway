@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Reflection;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.ExceptionServices;
@@ -1986,7 +1986,32 @@ namespace Waher.Persistence.Files
 		/// <param name="XsltPath">Optional XSLT to use to view the output.</param>
 		/// <param name="ProgramDataFolder">Program data folder. Can be removed from filenames used, when referencing them in the report.</param>
 		/// <param name="ExportData">If data in database is to be exported in output.</param>
-		public async Task Analyze(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData)
+		public Task Analyze(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData)
+		{
+			return this.Analyze(Output, XsltPath, ProgramDataFolder, ExportData, false);
+		}
+
+		/// <summary>
+		/// Analyzes the database and repairs it if necessary. Results are exported to XML.
+		/// </summary>
+		/// <param name="Output">XML Output.</param>
+		/// <param name="XsltPath">Optional XSLT to use to view the output.</param>
+		/// <param name="ProgramDataFolder">Program data folder. Can be removed from filenames used, when referencing them in the report.</param>
+		/// <param name="ExportData">If data in database is to be exported in output.</param>
+		public Task Repair(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData)
+		{
+			return this.Analyze(Output, XsltPath, ProgramDataFolder, ExportData, true);
+		}
+
+		/// <summary>
+		/// Analyzes the database and exports findings to XML.
+		/// </summary>
+		/// <param name="Output">XML Output.</param>
+		/// <param name="XsltPath">Optional XSLT to use to view the output.</param>
+		/// <param name="ProgramDataFolder">Program data folder. Can be removed from filenames used, when referencing them in the report.</param>
+		/// <param name="ExportData">If data in database is to be exported in output.</param>
+		/// <param name="Repair">If files should be repaired if corruptions are detected.</param>
+		public async Task Analyze(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData, bool Repair)
 		{
 			Output.WriteStartDocument();
 
@@ -2014,6 +2039,92 @@ namespace Waher.Persistence.Files
 				Output.WriteAttributeString("timeoutMs", File.TimeoutMilliseconds.ToString());
 
 				FileStatistics Stat = await File.ComputeStatistics();
+
+				if (Repair && Stat.IsCorrupt)
+				{
+					string TempFileName = Path.GetTempFileName();
+					string TempBtreeFileName = TempFileName + ".btree";
+					string TempBlobFileName = TempFileName + ".blob";
+
+					using (ObjectBTreeFile TempFile = new ObjectBTreeFile(TempBtreeFileName, File.CollectionName, TempBlobFileName,
+#if NETSTANDARD1_5
+						File.BlockSize, File.BlobBlockSize, this, File.Encoding, File.TimeoutMilliseconds, File.Encrypted, false))
+#else
+						File.BlockSize, File.BlobBlockSize, this, File.Encoding, File.TimeoutMilliseconds, false))
+#endif
+					{
+						int c = 0;
+
+						await this.StartBulk();
+						try
+						{
+							using (ObjectBTreeFileEnumerator<object> e = await File.GetTypedEnumeratorAsync<object>(true))
+							{
+								while (await e.MoveNextAsync())
+								{
+									if (e.CurrentTypeCompatible)
+									{
+										await TempFile.SaveNewObject(e.Current);
+
+										c++;
+										if (c >= 1000)
+										{
+											await this.EndBulk();
+											await this.StartBulk();
+											c = 0;
+										}
+									}
+								}
+							}
+
+							await this.EndBulk();
+							await File.ClearAsync();
+							await this.StartBulk();
+							c = 0;
+
+							using (ObjectBTreeFileEnumerator<object> e = await TempFile.GetTypedEnumeratorAsync<object>(true))
+							{
+								while (await e.MoveNextAsync())
+								{
+									if (e.CurrentTypeCompatible)
+									{
+										await File.SaveNewObject(e.Current);
+
+										c++;
+										if (c >= 1000)
+										{
+											await this.EndBulk();
+											await this.StartBulk();
+											c = 0;
+										}
+									}
+								}
+							}
+						}
+						finally
+						{
+							await this.EndBulk();
+						}
+					}
+
+					Stat = await File.ComputeStatistics();
+					Stat.LogComment("File was regenerated due to errors found.");
+
+					string[] Files = Directory.GetFiles(Path.GetDirectoryName(TempFileName), Path.GetFileName(TempFileName) + "*.*");
+
+					foreach (string FileName in Files)
+					{
+						try
+						{
+							System.IO.File.Delete(FileName);
+						}
+						catch (Exception)
+						{
+							// Ignore
+						}
+					}
+				}
+
 				WriteStat(Output, File, Stat);
 
 				foreach (IndexBTreeFile Index in File.Indices)
@@ -2037,6 +2148,15 @@ namespace Waher.Persistence.Files
 						Output.WriteElementString("Field", Field);
 
 					Stat = await Index.ComputeStatistics();
+
+					if (Repair && Stat.IsCorrupt)
+					{
+						await Index.Regenerate();
+
+						Stat = await Index.ComputeStatistics();
+						Stat.LogComment("Index was regenerated due to errors found.");
+					}
+
 					WriteStat(Output, Index.IndexFile, Stat);
 
 					Output.WriteEndElement();

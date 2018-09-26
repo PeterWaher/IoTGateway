@@ -839,23 +839,6 @@ namespace Waher.Persistence.Files
 				await this.indexFile.EndWrite();
 			}
 
-			if (Result.IsCorrupt)
-			{
-				await this.Regenerate();
-
-				await this.indexFile.LockWrite();
-				try
-				{
-					Result = await this.indexFile.ComputeStatisticsLocked();
-				}
-				finally
-				{
-					await this.indexFile.EndWrite();
-				}
-
-				Result.LogComment("Index was regenerated due to errors found.");
-			}
-
 			return Result;
 		}
 

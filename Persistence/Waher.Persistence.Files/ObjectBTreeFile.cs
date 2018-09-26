@@ -600,11 +600,20 @@ namespace Waher.Persistence.Files
 		{
 			if (this.blocksToSave != null)
 			{
-				foreach (KeyValuePair<long, byte[]> Rec in this.blocksToSave)
-					await this.DoSaveBlockLocked(Rec.Key, Rec.Value);
+				bool Changed = false;
 
-				this.blocksToSave.Clear();
-				this.bytesAdded = 0;
+				foreach (KeyValuePair<long, byte[]> Rec in this.blocksToSave)
+				{
+					await this.DoSaveBlockLocked(Rec.Key, Rec.Value);
+					Changed = true;
+				}
+
+				if (Changed)
+				{
+					this.blocksToSave.Clear();
+					this.bytesAdded = 0;
+					this.blockLimit = (uint)(this.file.Length / this.blockSize);
+				}
 			}
 		}
 

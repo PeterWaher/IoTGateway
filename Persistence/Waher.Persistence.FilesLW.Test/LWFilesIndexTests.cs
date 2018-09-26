@@ -135,9 +135,10 @@ namespace Waher.Persistence.FilesLW.Test
 
 			using (IndexBTreeFileEnumerator<Simple> e = await this.index1.GetTypedEnumerator<Simple>(false))
 			{
-				while (e.MoveNext())
+				while (await e.MoveNextAsync())
 				{
 					Obj = e.Current;
+					Assert.IsNotNull(Obj);
 					Objects2[Obj.ObjectId] = true;
 
 					if (Prev != null)
@@ -157,7 +158,7 @@ namespace Waher.Persistence.FilesLW.Test
 			Rank = 0;
 			using (IndexBTreeFileEnumerator<Simple> e = await this.index2.GetTypedEnumerator<Simple>(false))
 			{
-				while (e.MoveNext())
+				while (await e.MoveNextAsync())
 				{
 					Obj = e.Current;
 					if (Prev != null)
@@ -203,7 +204,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 			using (IndexBTreeFileEnumerator<Simple> e = await this.index1.GetTypedEnumerator<Simple>(true))
 			{
-				while (e.MoveNext())
+				while (await e.MoveNextAsync())
 				{
 					Obj = e.Current;
 					Objects2[Obj.ObjectId] = true;
@@ -225,7 +226,7 @@ namespace Waher.Persistence.FilesLW.Test
 			Rank = 0;
 			using (IndexBTreeFileEnumerator<Simple> e = await this.index2.GetTypedEnumerator<Simple>(true))
 			{
-				while (e.MoveNext())
+				while (await e.MoveNextAsync())
 				{
 					Obj = e.Current;
 					if (Prev != null)
@@ -251,7 +252,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 			using (IndexBTreeFileEnumerator<Simple> e = await this.index1.GetTypedEnumerator<Simple>(true))
 			{
-				while (e.MoveNext())
+				while (await e.MoveNextAsync())
 				{
 					Obj = e.Current;
 					Obj = DBFilesBTreeTests.CreateSimple(this.MaxStringLength);
@@ -362,7 +363,7 @@ namespace Waher.Persistence.FilesLW.Test
 							AssertEx.Same(i + j, e.CurrentRank);
 							AssertEx.Same(Obj.ObjectId, e.CurrentObjectId);
 						}
-						while (e.MoveNext() && j++ < 10);
+						while (await e.MoveNextAsync() && j++ < 10);
 					}
 				}
 				else
@@ -423,7 +424,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 			using (IndexBTreeFileEnumerator<Simple> e = await this.index1.GetTypedEnumerator<Simple>(false))
 			{
-				while (e.MoveNext())
+				while (await e.MoveNextAsync())
 				{
 					Obj = e.Current;
 					if (Prev != null)
@@ -516,7 +517,7 @@ namespace Waher.Persistence.FilesLW.Test
 			{
 				Obj = null;
 
-				while (e.MoveNext())
+				while (await e.MoveNextAsync())
 				{
 					AssertEx.Same(e.Current.ObjectId, e.CurrentObjectId);
 					Assert.IsTrue(Ordered.Remove(e.Current.ObjectId));
@@ -620,7 +621,7 @@ namespace Waher.Persistence.FilesLW.Test
 				using (IndexBTreeFileEnumerator<Simple> e = await this.index1.FindFirstGreaterOrEqualTo<Simple>(true,
 					new KeyValuePair<string, object>("Byte", i)))
 				{
-					while (e.MoveNext())
+					while (await e.MoveNextAsync())
 					{
 						AssertEx.GreaterOrEqual(e.Current.Byte, i);
 						if (e.Current.Byte > i)
@@ -659,7 +660,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 					e.Reset();
 
-					while (e.MoveNext())
+					while (await e.MoveNextAsync())
 					{
 						AssertEx.Greater(e.Current.Byte, i);
 						if (e.Current.Byte > i + 1)

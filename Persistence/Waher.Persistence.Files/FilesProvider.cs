@@ -2022,22 +2022,6 @@ namespace Waher.Persistence.Files
 
 			foreach (ObjectBTreeFile File in this.Files)
 			{
-				Output.WriteStartElement("File");
-				Output.WriteAttributeString("id", File.Id.ToString());
-				Output.WriteAttributeString("collectionName", File.CollectionName);
-				Output.WriteAttributeString("fileName", GetRelativePath(ProgramDataFolder, File.FileName));
-				Output.WriteAttributeString("blockSize", File.BlockSize.ToString());
-				Output.WriteAttributeString("blobFileName", GetRelativePath(ProgramDataFolder, File.BlobFileName));
-				Output.WriteAttributeString("blobBlockSize", File.BlobBlockSize.ToString());
-				Output.WriteAttributeString("count", File.Count.ToString());
-				Output.WriteAttributeString("encoding", File.Encoding.WebName);
-#if NETSTANDARD1_5
-				Output.WriteAttributeString("encrypted", Encode(File.Encrypted));
-#endif
-				Output.WriteAttributeString("inlineObjectSizeLimit", File.InlineObjectSizeLimit.ToString());
-				Output.WriteAttributeString("isReadOnly", Encode(File.IsReadOnly));
-				Output.WriteAttributeString("timeoutMs", File.TimeoutMilliseconds.ToString());
-
 				FileStatistics Stat = await File.ComputeStatistics();
 
 				if (Repair && Stat.IsCorrupt)
@@ -2124,6 +2108,22 @@ namespace Waher.Persistence.Files
 						}
 					}
 				}
+
+				Output.WriteStartElement("File");
+				Output.WriteAttributeString("id", File.Id.ToString());
+				Output.WriteAttributeString("collectionName", File.CollectionName);
+				Output.WriteAttributeString("fileName", GetRelativePath(ProgramDataFolder, File.FileName));
+				Output.WriteAttributeString("blockSize", File.BlockSize.ToString());
+				Output.WriteAttributeString("blobFileName", GetRelativePath(ProgramDataFolder, File.BlobFileName));
+				Output.WriteAttributeString("blobBlockSize", File.BlobBlockSize.ToString());
+				Output.WriteAttributeString("count", File.Count.ToString());
+				Output.WriteAttributeString("encoding", File.Encoding.WebName);
+#if NETSTANDARD1_5
+				Output.WriteAttributeString("encrypted", Encode(File.Encrypted));
+#endif
+				Output.WriteAttributeString("inlineObjectSizeLimit", File.InlineObjectSizeLimit.ToString());
+				Output.WriteAttributeString("isReadOnly", Encode(File.IsReadOnly));
+				Output.WriteAttributeString("timeoutMs", File.TimeoutMilliseconds.ToString());
 
 				WriteStat(Output, File, Stat);
 

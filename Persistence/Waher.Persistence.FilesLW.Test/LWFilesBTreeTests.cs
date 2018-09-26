@@ -38,12 +38,12 @@ namespace Waher.Persistence.FilesLW.Test
 		internal const string ObjFileName = "Data\\LastObject.bin";
 		internal const string ObjIdFileName = "Data\\LastObjectId.bin";
 		internal const string BlockSizeFileName = "Data\\BlockSize.bin";
-#if NETSTANDARD1_5
-		internal const string Index1FileName = "Data\\Default.btree.50104c1cdc9b0754886b272fc1aaa550747dadf4.index";
-		internal const string Index2FileName = "Data\\Default.btree.40059d366b589d4071aba631a3aa4fc1dc03e357.index";
-#else
+#if LW
 		internal const string Index1FileName = "Data\\Default.btree.Byte.-DateTime.index";
 		internal const string Index2FileName = "Data\\Default.btree.ShortString.index";
+#else
+		internal const string Index1FileName = "Data\\Default.btree.50104c1cdc9b0754886b272fc1aaa550747dadf4.index";
+		internal const string Index2FileName = "Data\\Default.btree.40059d366b589d4071aba631a3aa4fc1dc03e357.index";
 #endif
 		internal const string Folder = "Data";
 		internal const int BlocksInCache = 10000;

@@ -887,7 +887,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// </summary>
 		/// <param name="Reference">Optional node reference</param>
 		/// <param name="Values">New momentary values.</param>
-		public void NewMomentaryValues(ThingReference Reference, params Field[] Values)
+		public void NewMomentaryValues(IThingReference Reference, params Field[] Values)
 		{
 			this.NewMomentaryValues(Reference, Values, null);
 		}
@@ -906,7 +906,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// </summary>
 		/// <param name="Reference">Optional node reference</param>
 		/// <param name="Values">New momentary values.</param>
-		public void NewMomentaryValues(ThingReference Reference, IEnumerable<Field> Values)
+		public void NewMomentaryValues(IThingReference Reference, IEnumerable<Field> Values)
 		{
 			this.NewMomentaryValues(Reference, Values, null);
 		}
@@ -918,7 +918,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="Reference">Optional node reference</param>
 		/// <param name="Values">New momentary values.</param>
 		/// <param name="ExceptJID">Only check subscriptions not from this JID.</param>
-		internal void NewMomentaryValues(ThingReference Reference, IEnumerable<Field> Values, string ExceptJID)
+		internal void NewMomentaryValues(IThingReference Reference, IEnumerable<Field> Values, string ExceptJID)
 		{
 			LinkedList<Subscription> Triggered = null;
 
@@ -980,7 +980,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// </summary>
 		/// <param name="Reference">Node reference.</param>
 		/// <returns>If there are subscriptions for the current node.</returns>
-		public bool HasSubscriptions(ThingReference Reference)
+		public bool HasSubscriptions(IThingReference Reference)
 		{
 			lock (this.subscriptionsByThing)
 			{

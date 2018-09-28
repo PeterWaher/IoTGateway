@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Maker.RemoteWiring;
-using Waher.IoTGateway;
 using Waher.Persistence.Attributes;
 using Waher.Runtime.Language;
 using Waher.Things.Attributes;
@@ -117,7 +116,7 @@ namespace Waher.Things.Arduino
 
 		public override void Pin_ValueChanged(PinState NewState)
 		{
-			Gateway.NewMomentaryValues(this, new BooleanField(this, DateTime.Now, "Value", NewState == PinState.HIGH, FieldType.Momentary, FieldQoS.AutomaticReadout,
+			this.NewMomentaryValues(new BooleanField(this, DateTime.Now, "Value", NewState == PinState.HIGH, FieldType.Momentary, FieldQoS.AutomaticReadout,
 				typeof(Module).Namespace, 13));
 		}
 

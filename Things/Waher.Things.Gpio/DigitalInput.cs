@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.Devices.Gpio;
-using Waher.IoTGateway;
 using Waher.Persistence.Attributes;
 using Waher.Runtime.Language;
 using Waher.Things.Attributes;
@@ -134,7 +133,7 @@ namespace Waher.Things.Gpio
 
 		private void Pin_ValueChanged(GpioPin sender, GpioPinValueChangedEventArgs args)
 		{
-			Gateway.NewMomentaryValues(this, new BooleanField(this, DateTime.Now, "Value", args.Edge == GpioPinEdge.RisingEdge, 
+			this.NewMomentaryValues(new BooleanField(this, DateTime.Now, "Value", args.Edge == GpioPinEdge.RisingEdge, 
 				FieldType.Momentary, FieldQoS.AutomaticReadout, typeof(Controller).Namespace, 12));
 		}
 

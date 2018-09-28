@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Maker.RemoteWiring;
-using Waher.IoTGateway;
 using Waher.Content;
 using Waher.Persistence.Attributes;
 using Waher.Runtime.Language;
@@ -230,7 +229,7 @@ namespace Waher.Things.Arduino
 			this.CalcMomentary(Fields, DateTime.Now, Value);
 
 			foreach (Field F in Fields)
-				Gateway.NewMomentaryValues(this, F);
+				this.NewMomentaryValues(F);
 		}
 
 		public override async Task<IEnumerable<Parameter>> GetDisplayableParametersAsync(Language Language, RequestOrigin Caller)

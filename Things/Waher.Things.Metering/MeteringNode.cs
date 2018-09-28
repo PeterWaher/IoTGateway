@@ -12,6 +12,7 @@ using Waher.Runtime.Language;
 using Waher.Things.Attributes;
 using Waher.Things.DisplayableParameters;
 using Waher.Things.Metering.Commands;
+using Waher.Things.SensorData;
 using Waher.Things.SourceEvents;
 
 namespace Waher.Things.Metering
@@ -64,8 +65,7 @@ namespace Waher.Things.Metering
 		/// <returns>true if the specified object is equal to the current object; otherwise, false.</returns>
 		public override bool Equals(object obj)
 		{
-			IThingReference Ref = obj as IThingReference;
-			if (Ref == null)
+			if (!(obj is IThingReference Ref))
 				return false;
 			else
 				return this.nodeId == Ref.NodeId && this.SourceId == Ref.SourceId && this.Partition == Ref.Partition;
@@ -260,7 +260,7 @@ namespace Waher.Things.Metering
 		public virtual async Task LogMessageAsync(MessageType Type, string EventId, string Body)
 		{
 			if (this.objectId == Guid.Empty)
-				throw new Exception("You can only log messages on persisted nodes.");
+				throw new InvalidOperationException("You can only log messages on persisted nodes.");
 
 			bool Updated = false;
 
@@ -339,6 +339,174 @@ namespace Waher.Things.Metering
 				SourceId = this.SourceId,
 				Timestamp = DateTime.Now
 			});
+		}
+
+		/// <summary>
+		/// Removes error messages with an empty event ID from the node.
+		/// </summary>
+		public virtual Task<bool> RemoveErrorAsync()
+		{
+			return this.RemoveMessageAsync(MessageType.Error, string.Empty);
+		}
+
+		/// <summary>
+		/// Removes error messages with a given event ID from the node.
+		/// </summary>
+		/// <param name="EventId">Optional Event ID.</param>
+		public virtual Task<bool> RemoveErrorAsync(string EventId)
+		{
+			return this.RemoveMessageAsync(MessageType.Error, EventId);
+		}
+
+		/// <summary>
+		/// Removes warning messages with an empty event ID from the node.
+		/// </summary>
+		public virtual Task<bool> RemoveWarningAsync()
+		{
+			return this.RemoveMessageAsync(MessageType.Warning, string.Empty);
+		}
+
+		/// <summary>
+		/// Removes warning messages with a given event ID from the node.
+		/// </summary>
+		/// <param name="EventId">Optional Event ID.</param>
+		public virtual Task<bool> RemoveWarningAsync(string EventId)
+		{
+			return this.RemoveMessageAsync(MessageType.Warning, EventId);
+		}
+
+		/// <summary>
+		/// Removes warning messages with an empty event ID from the node.
+		/// </summary>
+		public virtual Task<bool> RemoveInformationAsync()
+		{
+			return this.RemoveMessageAsync(MessageType.Information, string.Empty);
+		}
+
+		/// <summary>
+		/// Removes an informational message on the node.
+		/// </summary>
+		/// <param name="EventId">Optional Event ID.</param>
+		public virtual Task<bool> RemoveInformationAsync(string EventId)
+		{
+			return this.RemoveMessageAsync(MessageType.Information, EventId);
+		}
+
+		/// <summary>
+		/// Removes messages with empty event IDs from the node.
+		/// </summary>
+		/// <param name="Type">Type of message.</param>
+		public virtual Task<bool> RemoveMessageAsync(MessageType Type)
+		{
+			return this.RemoveMessageAsync(Type, string.Empty);
+		}
+
+		/// <summary>
+		/// Logs a message on the node.
+		/// </summary>
+		/// <param name="Type">Type of message.</param>
+		/// <param name="EventId">Optional Event ID.</param>
+		public virtual async Task<bool> RemoveMessageAsync(MessageType Type, string EventId)
+		{
+			if (this.objectId == Guid.Empty)
+				throw new InvalidOperationException("You can only log messages on persisted nodes.");
+
+			bool Removed = false;
+
+			foreach (MeteringMessage Message in await Database.Find<MeteringMessage>(new FilterAnd(
+				new FilterFieldEqualTo("NodeId", this.objectId),
+				new FilterFieldEqualTo("Type", Type),
+				new FilterFieldEqualTo("EventId", EventId))))
+			{
+				await Database.Delete(Message);
+				Removed = true;
+
+				switch (Type)
+				{
+					case MessageType.Error:
+						Log.Informational("Error removed: " + Message.Body, this.nodeId, string.Empty, string.Empty, EventLevel.Minor);
+						break;
+
+					case MessageType.Warning:
+						Log.Informational("Warning removed: " + Message.Body, this.nodeId, string.Empty, string.Empty, EventLevel.Minor);
+						break;
+				}
+			}
+
+			if (Removed)
+			{
+				bool ErrorsFound = false;
+				bool WarningsFound = false;
+				bool InformationFound = false;
+
+				foreach (MeteringMessage Message in await Database.Find<MeteringMessage>(new FilterFieldEqualTo("NodeId", this.objectId)))
+				{
+					switch (Type)
+					{
+						case MessageType.Error:
+							ErrorsFound = true;
+							break;
+
+						case MessageType.Warning:
+							WarningsFound = true;
+							break;
+
+						case MessageType.Information:
+							InformationFound = true;
+							break;
+					}
+				}
+
+				NodeState NewStateSigned;
+				NodeState NewStateUnsigned;
+
+				if (ErrorsFound)
+				{
+					NewStateSigned = NodeState.ErrorSigned;
+					NewStateUnsigned = NodeState.ErrorUnsigned;
+				}
+				else if (WarningsFound)
+				{
+					NewStateSigned = NodeState.WarningSigned;
+					NewStateUnsigned = NodeState.WarningUnsigned;
+				}
+				else if (InformationFound)
+				{
+					NewStateSigned = NodeState.Information;
+					NewStateUnsigned = NodeState.Information;
+				}
+				else 
+				{
+					NewStateSigned = NodeState.None;
+					NewStateUnsigned = NodeState.None;
+				}
+
+				switch (this.state)
+				{
+					case NodeState.ErrorSigned:
+					case NodeState.WarningSigned:
+						if (this.state != NewStateSigned)
+						{
+							this.state = NewStateSigned;
+							await Database.Update(this);
+							this.RaiseUpdate();
+						}
+						break;
+
+					default:
+						if (this.state != NewStateUnsigned)
+						{
+							this.state = NewStateUnsigned;
+							await Database.Update(this);
+							this.RaiseUpdate();
+						}
+						break;
+				}
+
+				await this.NodeStateChanged();
+			}
+
+			return Removed;
 		}
 
 		/// <summary>
@@ -764,8 +932,7 @@ namespace Waher.Things.Metering
 		/// <returns>If the node was moved up.</returns>
 		public virtual Task<bool> MoveUpAsync(RequestOrigin Caller)
 		{
-			MeteringNode Parent = this.Parent as MeteringNode;
-			if (Parent == null)
+			if (!(this.Parent is MeteringNode Parent))
 				return Task.FromResult<bool>(false);
 			else
 				return Parent.MoveUpAsync(this, Caller);
@@ -778,8 +945,7 @@ namespace Waher.Things.Metering
 		/// <returns>If the node was moved down.</returns>
 		public virtual Task<bool> MoveDownAsync(RequestOrigin Caller)
 		{
-			MeteringNode Parent = this.Parent as MeteringNode;
-			if (Parent == null)
+			if (!(this.Parent is MeteringNode Parent))
 				return Task.FromResult<bool>(false);
 			else
 				return Parent.MoveDownAsync(this, Caller);
@@ -876,8 +1042,7 @@ namespace Waher.Things.Metering
 		/// <param name="Child">New child to add.</param>
 		public virtual async Task AddAsync(INode Child)
 		{
-			MeteringNode Node = Child as MeteringNode;
-			if (Node == null)
+			if (!(Child is MeteringNode Node))
 				throw new Exception("Child must be a metering node.");
 
 			if (this.objectId == Guid.Empty)
@@ -995,8 +1160,7 @@ namespace Waher.Things.Metering
 		/// <returns>If the Child node was found and removed.</returns>
 		public virtual async Task<bool> RemoveAsync(INode Child)
 		{
-			MeteringNode Node = Child as MeteringNode;
-			if (Node == null)
+			if (!(Child is MeteringNode Node))
 				throw new Exception("Child must be a metering node.");
 
 			if (!this.childrenLoaded)
@@ -1112,9 +1276,7 @@ namespace Waher.Things.Metering
 			if (Commands1 == null)
 				return Commands2;
 
-			List<ICommand> Result = Commands1 as List<ICommand>;
-
-			if (Result == null)
+			if (!(Commands1 is List<ICommand> Result))
 			{
 				Result = new List<ICommand>();
 
@@ -1179,6 +1341,28 @@ namespace Waher.Things.Metering
 		public virtual Task Removed()
 		{
 			throw new NotSupportedException();
+		}
+
+		#endregion
+
+		#region Momentary values
+
+		/// <summary>
+		/// Reports newly measured values.
+		/// </summary>
+		/// <param name="Values">New momentary values.</param>
+		public void NewMomentaryValues(params Field[] Values)
+		{
+			MeteringTopology.NewMomentaryValues(this, Values);
+		}
+
+		/// <summary>
+		/// Reports newly measured values.
+		/// </summary>
+		/// <param name="Values">New momentary values.</param>
+		public void NewMomentaryValues(IEnumerable<Field> Values)
+		{
+			MeteringTopology.NewMomentaryValues(this, Values);
 		}
 
 		#endregion

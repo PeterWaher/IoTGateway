@@ -10,10 +10,18 @@ using Waher.Runtime.Language;
 using Waher.Runtime.Settings;
 using Waher.Things.DisplayableParameters;
 using Waher.Things.Metering.NodeTypes;
+using Waher.Things.SensorData;
 using Waher.Things.SourceEvents;
 
 namespace Waher.Things.Metering
 {
+	/// <summary>
+	/// Delegate for new momentary values event handlers.
+	/// </summary>
+	/// <param name="Reference">Thing reporting new momentary values.</param>
+	/// <param name="Values">New momentary values.</param>
+	public delegate void NewMomentaryValuesHandler(IThingReference Reference, IEnumerable<Field> Values);
+
 	/// <summary>
 	/// Defines the Metering Topology data source. This data source contains a tree structure of persistent 
 	/// readable and controllable devices
@@ -328,6 +336,21 @@ namespace Waher.Things.Metering
 				Log.Critical(ex);
 			}
 		}
+
+		/// <summary>
+		/// Reports newly measured values.
+		/// </summary>
+		/// <param name="Reference">Optional node reference</param>
+		/// <param name="Values">New momentary values.</param>
+		public static void NewMomentaryValues(IThingReference Reference, IEnumerable<Field> Values)
+		{
+			OnNewMomentaryValues?.Invoke(Reference, Values);
+		}
+
+		/// <summary>
+		/// Event raised when a node in the metering topology reports a new momentary value.
+		/// </summary>
+		public static event NewMomentaryValuesHandler OnNewMomentaryValues = null;
 
 	}
 }

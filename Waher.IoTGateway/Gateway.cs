@@ -662,6 +662,8 @@ namespace Waher.IoTGateway
 				Types.SetModuleParameter("Registry", thingRegistryClient);
 				Types.SetModuleParameter("Provisioning", provisioningClient);
 
+				MeteringTopology.OnNewMomentaryValues += NewMomentaryValues;
+
 				DeleteOldDataSourceEvents(null);
 			}
 			catch (Exception ex)
@@ -2059,7 +2061,7 @@ namespace Waher.IoTGateway
 		/// </summary>
 		/// <param name="Reference">Optional node reference</param>
 		/// <param name="Values">New momentary values.</param>
-		public static void NewMomentaryValues(ThingReference Reference, params Field[] Values)
+		public static void NewMomentaryValues(IThingReference Reference, params Field[] Values)
 		{
 			concentratorServer?.SensorServer?.NewMomentaryValues(Reference, Values);
 		}
@@ -2078,7 +2080,7 @@ namespace Waher.IoTGateway
 		/// </summary>
 		/// <param name="Reference">Optional node reference</param>
 		/// <param name="Values">New momentary values.</param>
-		public static void NewMomentaryValues(ThingReference Reference, IEnumerable<Field> Values)
+		public static void NewMomentaryValues(IThingReference Reference, IEnumerable<Field> Values)
 		{
 			concentratorServer?.SensorServer?.NewMomentaryValues(Reference, Values);
 		}

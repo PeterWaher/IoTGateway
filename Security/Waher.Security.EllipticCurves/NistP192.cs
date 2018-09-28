@@ -9,7 +9,7 @@ namespace Waher.Security.EllipticCurves
 	/// </summary>
 	public class NistP192 : NistPrimeCurve
 	{
-		private static readonly BigInteger p = BigInteger.Pow(2, 192) - BigInteger.Pow(2, 64) - 1;
+		private static readonly BigInteger p0 = BigInteger.Pow(2, 192) - BigInteger.Pow(2, 64) - 1;
 		private static readonly BigInteger n = BigInteger.Parse("6277101735386680763835789423176059013767194773182842284081");
 		private static readonly int nBits = CalcBits(n);
 		private static readonly BigInteger BasePointX = ToBigInteger(new uint[]
@@ -26,7 +26,7 @@ namespace Waher.Security.EllipticCurves
 		/// https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.186-4.pdf
 		/// </summary>
 		public NistP192()
-			: base(p, new PointOnCurve(BasePointX, BasePointY), n, nBits)
+			: base(p0, new PointOnCurve(BasePointX, BasePointY), n, nBits)
 		{
 		}
     }

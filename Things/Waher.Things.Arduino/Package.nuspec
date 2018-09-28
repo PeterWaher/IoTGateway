@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata minClientVersion="3.2">
     <id>Waher.Things.Arduino</id>
-    <version>1.0.2</version>
+    <version>1.0.3</version>
     <title>Waher.Things.Arduino</title>
     <authors>Peter Waher</authors>
     <owners>Waher Data AB</owners>
@@ -24,7 +24,7 @@
       <dependency id="Waher.Runtime.Language" version="1.0.1"/>
       <dependency id="Waher.Script" version="1.0.17"/>
       <dependency id="Waher.Things" version="1.0.22"/>
-      <dependency id="Waher.Things.Metering" version="1.0.15"/>
+      <dependency id="Waher.Things.Metering" version="1.0.17"/>
       <dependency id="Windows-Remote-Arduino" version="1.4.0"/>
     </dependencies>
   </metadata>

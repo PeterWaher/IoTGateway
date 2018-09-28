@@ -160,10 +160,6 @@
       <Project>{c39e8f9b-1386-4cd3-bfa7-3481181d3ba1}</Project>
       <Name>Waher.Script</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Waher.IoTGateway\Waher.IoTGateway.csproj">
-      <Project>{13d7c34c-7381-437e-99d0-37e96e4565f2}</Project>
-      <Name>Waher.IoTGateway</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Waher.Things.Metering\Waher.Things.Metering.csproj">
       <Project>{47d09596-eb38-40a6-b233-e465e3152e44}</Project>
       <Name>Waher.Things.Metering</Name>

@@ -15,15 +15,18 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>IoT Metering</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.0.15</AssemblyVersion>
-    <FileVersion>1.0.15</FileVersion>
-    <Version>1.0.15</Version>
+    <AssemblyVersion>1.0.17</AssemblyVersion>
+    <FileVersion>1.0.17</FileVersion>
+    <Version>1.0.17</Version>
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Things\Waher.Things.Metering\</UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DocumentationFile>bin\Debug\netstandard1.3\.xml</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>C:\My Projects\IoTGateway\Things\Waher.Things.Metering\Waher.Things.Metering.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Content Include="Language\Waher.Things.Metering.en.lng">

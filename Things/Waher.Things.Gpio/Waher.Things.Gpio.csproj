@@ -133,10 +133,6 @@
       <Project>{e11e0021-a85f-466b-92ab-5725c6277b6a}</Project>
       <Name>Waher.Runtime.Language</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Waher.IoTGateway\Waher.IoTGateway.csproj">
-      <Project>{13d7c34c-7381-437e-99d0-37e96e4565f2}</Project>
-      <Name>Waher.IoTGateway</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Waher.Things.Metering\Waher.Things.Metering.csproj">
       <Project>{47d09596-eb38-40a6-b233-e465e3152e44}</Project>
       <Name>Waher.Things.Metering</Name>

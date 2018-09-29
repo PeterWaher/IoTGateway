@@ -13,6 +13,7 @@
 			<Content fileName="Next.js"/>
 			<Content fileName="PersonalData.js"/>
 			<Content fileName="PersonalData.md"/>
+			<Content fileName="Theme.js"/>
 			<Content fileName="Theme.md"/>
 			<Content fileName="XMPP.js"/>
 			<Content fileName="XMPP.md"/>

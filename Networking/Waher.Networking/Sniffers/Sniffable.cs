@@ -47,7 +47,7 @@ namespace Waher.Networking.Sniffers
 		}
 
 		/// <summary>
-		/// <see cref="ISniffable.Add"/>
+		/// <see cref="ISniffable.AddRange"/>
 		/// </summary>
 		public void AddRange(IEnumerable<ISniffer> Sniffers)
 		{
@@ -60,7 +60,7 @@ namespace Waher.Networking.Sniffers
 		}
 
 		/// <summary>
-		/// <see cref="ISniffable.Add"/>
+		/// <see cref="ISniffable.Remove"/>
 		/// </summary>
 		public bool Remove(ISniffer Sniffer)
 		{
@@ -94,7 +94,7 @@ namespace Waher.Networking.Sniffers
 		}
 
 		/// <summary>
-		/// <see cref="ISniffable.Add"/>
+		/// <see cref="ISniffable.GetEnumerator"/>
 		/// </summary>
 		public IEnumerator<ISniffer> GetEnumerator()
 		{
@@ -102,7 +102,7 @@ namespace Waher.Networking.Sniffers
 		}
 
 		/// <summary>
-		/// <see cref="ISniffable.Add"/>
+		/// <see cref="ISniffable.GetEnumerator"/>
 		/// </summary>
 		IEnumerator IEnumerable.GetEnumerator()
 		{

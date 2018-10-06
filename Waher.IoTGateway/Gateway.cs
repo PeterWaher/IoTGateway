@@ -661,6 +661,7 @@ namespace Waher.IoTGateway
 				Types.SetModuleParameter("Control", concentratorServer.ControlServer);
 				Types.SetModuleParameter("Registry", thingRegistryClient);
 				Types.SetModuleParameter("Provisioning", provisioningClient);
+				Types.SetModuleParameter("Scheduler", scheduler);
 
 				MeteringTopology.OnNewMomentaryValues += NewMomentaryValues;
 

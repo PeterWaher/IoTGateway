@@ -1628,47 +1628,47 @@ namespace Waher.Networking.XMPP.Concentrator
 					{
 						switch (E.LocalName)
 						{
-							case "RxBin":
+							case "rxBin":
 								byte[] Bin = Convert.FromBase64String(E.InnerText);
 								Sniffer.ReceiveBinary(Bin);
 								break;
 
-							case "TxBin":
+							case "txBin":
 								Bin = Convert.FromBase64String(E.InnerText);
 								Sniffer.TransmitBinary(Bin);
 								break;
 
-							case "Rx":
+							case "rx":
 								string s = E.InnerText;
 								Sniffer.ReceiveText(s);
 								break;
 
-							case "Tx":
+							case "tx":
 								s = E.InnerText;
 								Sniffer.TransmitText(s);
 								break;
 
-							case "Info":
+							case "info":
 								s = E.InnerText;
 								Sniffer.Information(s);
 								break;
 
-							case "Warning":
+							case "warning":
 								s = E.InnerText;
 								Sniffer.Warning(s);
 								break;
 
-							case "Error":
+							case "error":
 								s = E.InnerText;
 								Sniffer.Error(s);
 								break;
 
-							case "Exception":
+							case "exception":
 								s = E.InnerText;
 								Sniffer.Exception(s);
 								break;
 
-							case "Expired":
+							case "expired":
 								lock (this.sniffers)
 								{
 									this.sniffers.Remove(SnifferId);

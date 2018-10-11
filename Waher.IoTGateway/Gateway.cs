@@ -445,6 +445,7 @@ namespace Waher.IoTGateway
 
 					HttpFolderResource.AllowTypeConversion();
 					MarkdownToHtmlConverter.EmojiSource = emoji1_24x24;
+					MarkdownToHtmlConverter.RootFolder = rootFolder;
 				}
 
 				foreach (SystemConfiguration Configuration in Configurations)
@@ -605,6 +606,7 @@ namespace Waher.IoTGateway
 						Path.Combine(runtimeFolder, "Graphics", "Emoji1.zip"), Path.Combine(appDataFolder, "Graphics"));
 
 					MarkdownToHtmlConverter.EmojiSource = emoji1_24x24;
+					MarkdownToHtmlConverter.RootFolder = rootFolder;
 				}
 
 				HttpFolderResource.AllowTypeConversion();

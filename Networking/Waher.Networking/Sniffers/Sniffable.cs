@@ -17,7 +17,7 @@ namespace Waher.Networking.Sniffers
 	/// </summary>
 	public class Sniffable : ISniffable
 	{
-		private List<ISniffer> sniffers;
+		private readonly List<ISniffer> sniffers;
 		private ISniffer[] staticList;
 		private bool hasSniffers;
 
@@ -94,7 +94,7 @@ namespace Waher.Networking.Sniffers
 		}
 
 		/// <summary>
-		/// <see cref="ISniffable.GetEnumerator"/>
+		/// <see cref="ISniffable.GetEnumerator()"/>
 		/// </summary>
 		public IEnumerator<ISniffer> GetEnumerator()
 		{
@@ -102,7 +102,7 @@ namespace Waher.Networking.Sniffers
 		}
 
 		/// <summary>
-		/// <see cref="ISniffable.GetEnumerator"/>
+		/// <see cref="ISniffable.GetEnumerator()"/>
 		/// </summary>
 		IEnumerator IEnumerable.GetEnumerator()
 		{

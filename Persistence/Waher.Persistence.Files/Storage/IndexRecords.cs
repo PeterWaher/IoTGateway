@@ -54,7 +54,6 @@ namespace Waher.Persistence.Files.Storage
 		/// <param name="CollectionName">Name of current collection.</param>
 		/// <param name="Encoding">Encoding to use for text.</param>
 		/// <param name="KeySizeLimit">Upper size limit of index keys.</param>
-		/// <param name="BlockLimit">Block limit.</param>
 		/// <param name="FieldNames">Field names included in the index. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the corresponding field name by a hyphen (minus) sign.</param>
 		public IndexRecords(string CollectionName, Encoding Encoding, int KeySizeLimit, params string[] FieldNames)

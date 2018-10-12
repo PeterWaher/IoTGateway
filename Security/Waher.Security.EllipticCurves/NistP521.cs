@@ -31,5 +31,10 @@ namespace Waher.Security.EllipticCurves
 			: base(p0, new PointOnCurve(BasePointX, BasePointY), n, nBits)
 		{
 		}
+
+		/// <summary>
+		/// Name of curve.
+		/// </summary>
+		public override string CurveName => "NIST P-192";
 	}
 }

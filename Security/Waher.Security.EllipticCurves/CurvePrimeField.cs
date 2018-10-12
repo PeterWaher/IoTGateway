@@ -58,6 +58,14 @@ namespace Waher.Security.EllipticCurves
 		}
 
 		/// <summary>
+		/// Name of curve.
+		/// </summary>
+		public abstract string CurveName
+		{
+			get;
+		}
+
+		/// <summary>
 		/// Order of curve.
 		/// </summary>
 		public BigInteger Order => this.n;

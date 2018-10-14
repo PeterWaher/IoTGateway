@@ -1051,7 +1051,9 @@ namespace Waher.IoTGateway
 					FileName.StartsWith("microsoft.") ||
 					FileName.StartsWith("windows.") ||
 					FileName.StartsWith("waher.client.") ||
-					FileName.StartsWith("waher.utility."))
+					FileName.StartsWith("waher.utility.") ||
+					FileName.StartsWith("mscordaccore_x86_x86_") ||
+					FileName.StartsWith("sos_x86_x86_"))
 				{
 					return false;
 				}
@@ -1069,7 +1071,6 @@ namespace Waher.IoTGateway
 					case "libglesv2.dll":
 					case "libskiasharp.dll":
 					case "mscordaccore.dll":
-					case "mscordaccore_x86_x86_4.6.00001.0.dll":
 					case "mscordbi.dll":
 					case "mscorlib.dll":
 					case "mscorrc.debug.dll":
@@ -1077,9 +1078,9 @@ namespace Waher.IoTGateway
 					case "netstandard.dll":
 					case "sos.dll":
 					case "sos.netcore.dll":
-					case "sos_x86_x86_4.6.00001.0.dll":
 					case "ucrtbase.dll":
 					case "windowsbase.dll":
+					case "Waher.Persistence.FilesLW.dll":
 						return false;
 				}
 

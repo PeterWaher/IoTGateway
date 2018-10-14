@@ -426,16 +426,18 @@
               <File Id='Microsoft.Win32.Registry.dll' Name='Microsoft.Win32.Registry.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Microsoft.Win32.Registry.dll' Vital='yes' />
               <File Id='Microsoft.VisualBasic.dll' Name='Microsoft.VisualBasic.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Microsoft.VisualBasic.dll' Vital='yes' />
               <File Id='mscordaccore.dll' Name='mscordaccore.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\mscordaccore.dll' Vital='yes' />
-              <File Id='mscordaccore_x86_x86_4.6.00001.0.dll' Name='mscordaccore_x86_x86_4.6.00001.0.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\mscordaccore_x86_x86_4.6.00001.0.dll' Vital='yes' />
-              <File Id='mscordbi.dll' Name='mscordbi.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\mscordbi.dll' Vital='yes' />
+							<File Id='mscordaccore_x86_x86_4.6.00001.0.dll' Name='mscordaccore_x86_x86_4.6.00001.0.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\mscordaccore_x86_x86_4.6.00001.0.dll' Vital='yes' />
+							<File Id='mscordaccore_x86_x86_4.6.26614.01.dll' Name='mscordaccore_x86_x86_4.6.26614.01.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\mscordaccore_x86_x86_4.6.26614.01.dll' Vital='yes' />
+							<File Id='mscordbi.dll' Name='mscordbi.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\mscordbi.dll' Vital='yes' />
               <File Id='mscorlib.dll' Name='mscorlib.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\mscorlib.dll' Vital='yes' />
               <File Id='mscorrc.debug.dll' Name='mscorrc.debug.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\mscorrc.debug.dll' Vital='yes' />
               <File Id='mscorrc.dll' Name='mscorrc.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\mscorrc.dll' Vital='yes' />
               <File Id='netstandard.dll' Name='netstandard.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\netstandard.dll' Vital='yes' />
               <File Id='sos.dll' Name='sos.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\sos.dll' Vital='yes' />
               <File Id='SOS.NETCore.dll' Name='SOS.NETCore.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\SOS.NETCore.dll' Vital='yes' />
-              <File Id='sos_x86_x86_4.6.00001.0.dll' Name='sos_x86_x86_4.6.00001.0.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\sos_x86_x86_4.6.00001.0.dll' Vital='yes' />
-              <File Id='ucrtbase.dll' Name='ucrtbase.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\ucrtbase.dll' Vital='yes' />
+							<File Id='sos_x86_x86_4.6.00001.0.dll' Name='sos_x86_x86_4.6.00001.0.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\sos_x86_x86_4.6.00001.0.dll' Vital='yes' />
+							<File Id='sos_x86_x86_4.6.26614.01.dll' Name='sos_x86_x86_4.6.26614.01.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\sos_x86_x86_4.6.26614.01.dll' Vital='yes' />
+							<File Id='ucrtbase.dll' Name='ucrtbase.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\ucrtbase.dll' Vital='yes' />
               <File Id='WindowsBase.dll' Name='WindowsBase.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\WindowsBase.dll' Vital='yes' />
               <RemoveFile Id='Removeclrcompression.dll' Name='clrcompression.dll' On='uninstall'/>
               <RemoveFile Id='Removeclretwrc.dll' Name='clretwrc.dll' On='uninstall'/>
@@ -452,16 +454,18 @@
               <RemoveFile Id='RemoveMicrosoft.Win32.Registry.dll' Name='Microsoft.Win32.Registry.dll' On='uninstall'/>
               <RemoveFile Id='RemoveMicrosoft.VisualBasic.dll' Name='Microsoft.VisualBasic.dll' On='uninstall'/>
               <RemoveFile Id='Removemscordaccore.dll' Name='mscordaccore.dll' On='uninstall'/>
-              <RemoveFile Id='Removemscordaccore_x86_x86_4.6.00001.0.dll' Name='mscordaccore_x86_x86_4.6.00001.0.dll' On='uninstall'/>
-              <RemoveFile Id='Removemscordbi.dll' Name='mscordbi.dll' On='uninstall'/>
+							<RemoveFile Id='Removemscordaccore_x86_x86_4.6.00001.0.dll' Name='mscordaccore_x86_x86_4.6.00001.0.dll' On='uninstall'/>
+							<RemoveFile Id='Removemscordaccore_x86_x86_4.6.26614.01.dll' Name='mscordaccore_x86_x86_4.6.26614.01.dll' On='uninstall'/>
+							<RemoveFile Id='Removemscordbi.dll' Name='mscordbi.dll' On='uninstall'/>
               <RemoveFile Id='Removemscorlib.dll' Name='mscorlib.dll' On='uninstall'/>
               <RemoveFile Id='Removemscorrc.debug.dll' Name='mscorrc.debug.dll' On='uninstall'/>
               <RemoveFile Id='Removemscorrc.dll' Name='mscorrc.dll' On='uninstall'/>
               <RemoveFile Id='Removenetstandard.dll' Name='netstandard.dll' On='uninstall'/>
               <RemoveFile Id='Removesos.dll' Name='sos.dll' On='uninstall'/>
               <RemoveFile Id='RemoveSOS.NETCore.dll' Name='SOS.NETCore.dll' On='uninstall'/>
-              <RemoveFile Id='Removesos_x86_x86_4.6.00001.0.dll' Name='sos_x86_x86_4.6.00001.0.dll' On='uninstall'/>
-              <RemoveFile Id='Removeucrtbase.dll' Name='ucrtbase.dll' On='uninstall'/>
+							<RemoveFile Id='Removesos_x86_x86_4.6.00001.0.dll' Name='sos_x86_x86_4.6.00001.0.dll' On='uninstall'/>
+							<RemoveFile Id='Removesos_x86_x86_4.6.26614.01.dll' Name='sos_x86_x86_4.6.26614.01.dll' On='uninstall'/>
+							<RemoveFile Id='Removeucrtbase.dll' Name='ucrtbase.dll' On='uninstall'/>
               <RemoveFile Id='RemoveWindowsBase.dll' Name='WindowsBase.dll' On='uninstall'/>
             </Component>
             <Component Id='ExternalLibraries' Guid='81E97453-D3BA-4CA0-8875-3E2DE48A383B'>

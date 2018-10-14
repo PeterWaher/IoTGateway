@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Security.Cryptography;
 using System.Numerics;
+using System.Security.Cryptography;
+using System.Text;
+using System.Xml;
 
 namespace Waher.Security.EllipticCurves
 {
@@ -10,6 +12,16 @@ namespace Waher.Security.EllipticCurves
 	/// </summary>
 	public abstract class CurvePrimeField : ModulusP
 	{
+		/// <summary>
+		/// http://waher.se/Schema/EllipticCurves.xsd
+		/// </summary>
+		public const string Namespace = "http://waher.se/Schema/EllipticCurves.xsd";
+
+		/// <summary>
+		/// "EllipticCurve"
+		/// </summary>
+		public const string ElementName = "EllipticCurve";
+
 		private static readonly RandomNumberGenerator rnd = RandomNumberGenerator.Create();
 		private static readonly BigInteger Two = new BigInteger(2);
 		private readonly ModulusP modN;
@@ -30,7 +42,7 @@ namespace Waher.Security.EllipticCurves
 		/// <param name="A">a Coefficient in the definition of the curve E:	y^2=x^3+a*x+b</param>
 		/// <param name="Order">Order of base-point.</param>
 		/// <param name="OrderBits">Number of bits used to encode order.</param>
-		public CurvePrimeField(BigInteger Prime, PointOnCurve BasePoint, BigInteger A, 
+		public CurvePrimeField(BigInteger Prime, PointOnCurve BasePoint, BigInteger A,
 			BigInteger Order, int OrderBits)
 			: base(Prime)
 		{
@@ -378,6 +390,38 @@ namespace Waher.Security.EllipticCurves
 				return false;
 
 			return BigInteger.Remainder(P2.X, this.n) == r;
+		}
+
+		/// <summary>
+		/// Exports the curve parameters to XML.
+		/// </summary>
+		/// <param name="Output">Output</param>
+		public virtual void Export(XmlWriter Output)
+		{
+			Output.WriteStartElement("EllipticCurve", Namespace);
+			Output.WriteAttributeString("type", this.GetType().FullName);
+			Output.WriteAttributeString("d", this.d.ToString());
+			Output.WriteEndElement();
+		}
+
+		/// <summary>
+		/// Exports the curve parameters to an XML string.
+		/// </summary>
+		public string Export()
+		{
+			XmlWriterSettings Settings = new XmlWriterSettings()
+			{
+				Indent = false,
+				OmitXmlDeclaration = true
+			};
+			StringBuilder sb = new StringBuilder();
+			using (XmlWriter w = XmlWriter.Create(sb, Settings))
+			{
+				this.Export(w);
+				w.Flush();
+			}
+
+			return sb.ToString();
 		}
 
 	}

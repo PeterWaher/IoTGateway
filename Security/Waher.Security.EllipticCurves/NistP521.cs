@@ -35,6 +35,6 @@ namespace Waher.Security.EllipticCurves
 		/// <summary>
 		/// Name of curve.
 		/// </summary>
-		public override string CurveName => "NIST P-192";
+		public override string CurveName => "NIST P-521";
 	}
 }

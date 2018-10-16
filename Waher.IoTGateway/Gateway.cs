@@ -1346,11 +1346,17 @@ namespace Waher.IoTGateway
 			RosterItem Item;
 			string BareJid = e.FromBareJID.ToLower();
 
-			if (string.IsNullOrEmpty(BareJid) || (xmppClient != null && (BareJid == xmppClient.Domain.ToLower() || BareJid == xmppClient.BareJID.ToLower())))
+			if (string.IsNullOrEmpty(BareJid) ||
+				(xmppClient != null && (BareJid == xmppClient.Domain.ToLower() || BareJid == xmppClient.BareJID.ToLower())))
+			{
 				e.Accept();
-
-			else if (BareJid.IndexOf('@') > 0 && (xmppClient == null || (Item = xmppClient.GetRosterItem(BareJid)) == null ||
-				(Item.State != SubscriptionState.Both && Item.State != SubscriptionState.From)))
+			}
+			else if (BareJid.IndexOf('@') > 0 && 
+				(xmppClient == null || 
+				(Item = xmppClient.GetRosterItem(BareJid)) == null ||
+				Item.State == SubscriptionState.None || 
+				Item.State == SubscriptionState.Remove ||
+				Item.State == SubscriptionState.Unknown))
 			{
 				foreach (XmlNode N in e.Stanza.ChildNodes)
 				{

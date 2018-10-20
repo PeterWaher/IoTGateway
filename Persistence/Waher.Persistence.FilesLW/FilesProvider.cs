@@ -2026,6 +2026,7 @@ namespace Waher.Persistence.Files
 
 				if (Repair && Stat.IsCorrupt)
 				{
+					LinkedList<Exception> Exceptions = null;
 					string TempFileName = Path.GetTempFileName();
 					string TempBtreeFileName = TempFileName + ".btree";
 					string TempBlobFileName = TempFileName + ".blob";
@@ -2048,7 +2049,18 @@ namespace Waher.Persistence.Files
 								{
 									if (e.CurrentTypeCompatible)
 									{
-										await TempFile.SaveNewObject(e.Current);
+										try
+										{
+											await TempFile.SaveNewObject(e.Current);
+										}
+										catch (Exception ex)
+										{
+											if (Exceptions == null)
+												Exceptions = new LinkedList<Exception>();
+
+											Exceptions.AddLast(ex);
+											continue;
+										}
 
 										c++;
 										if (c >= 1000)
@@ -2093,6 +2105,12 @@ namespace Waher.Persistence.Files
 
 					Stat = await File.ComputeStatistics();
 					Stat.LogComment("File was regenerated due to errors found.");
+
+					if (Exceptions != null)
+					{
+						foreach (Exception ex in Exceptions)
+							Stat.LogError(ex.Message);
+					}
 
 					string[] Files = Directory.GetFiles(Path.GetDirectoryName(TempFileName), Path.GetFileName(TempFileName) + "*.*");
 

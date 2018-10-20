@@ -739,38 +739,38 @@ namespace Waher.Persistence.Files
 				this.current = default(T);
 			else
 			{
-				if (IsBlob)
-				{
-					this.currentReader.SkipUInt32();
-					Reader = await this.file.LoadBlobLocked(this.currentBlock, Start, null, null);
-					Start = 0;
-				}
-
-				if (this.currentSerializer == null)
-				{
-					ulong TypeCode = Reader.ReadVariableLengthUInt64();
-					string TypeName;
-
-					if (TypeCode == 0)
-						TypeName = string.Empty;
-					else 
-						TypeName = this.file.Provider.GetFieldName(this.currentReader.CollectionName, TypeCode);
-
-					if (string.IsNullOrEmpty(TypeName))
-						this.currentSerializer = this.file.GenericObjectSerializer;
-					else
-					{
-						Type T = Types.GetType(TypeName);
-						if (T != null)
-							this.currentSerializer = this.file.Provider.GetObjectSerializer(T);
-						else
-							this.currentSerializer = this.file.GenericObjectSerializer;
-					}
-				}
-
-				Reader.Position = Start;
 				try
 				{
+					if (IsBlob)
+					{
+						this.currentReader.SkipUInt32();
+						Reader = await this.file.LoadBlobLocked(this.currentBlock, Start, null, null);
+						Start = 0;
+					}
+
+					if (this.currentSerializer == null)
+					{
+						ulong TypeCode = Reader.ReadVariableLengthUInt64();
+						string TypeName;
+
+						if (TypeCode == 0)
+							TypeName = string.Empty;
+						else
+							TypeName = this.file.Provider.GetFieldName(this.currentReader.CollectionName, TypeCode);
+
+						if (string.IsNullOrEmpty(TypeName))
+							this.currentSerializer = this.file.GenericObjectSerializer;
+						else
+						{
+							Type T = Types.GetType(TypeName);
+							if (T != null)
+								this.currentSerializer = this.file.Provider.GetObjectSerializer(T);
+							else
+								this.currentSerializer = this.file.GenericObjectSerializer;
+						}
+					}
+
+					Reader.Position = Start;
 					if (this.currentSerializer.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false) is T Item)
 					{
 						this.current = Item;

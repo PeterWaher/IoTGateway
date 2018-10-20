@@ -1080,7 +1080,7 @@ namespace Waher.IoTGateway
 					case "sos.netcore.dll":
 					case "ucrtbase.dll":
 					case "windowsbase.dll":
-					case "Waher.Persistence.FilesLW.dll":
+					case "waher.persistence.fileslw.dll":
 						return false;
 				}
 

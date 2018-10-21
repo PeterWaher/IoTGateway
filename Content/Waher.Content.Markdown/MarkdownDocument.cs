@@ -165,6 +165,8 @@ namespace Waher.Content.Markdown
 				{
 					if (this.metaData.TryGetValue(Key, out Prev))
 						Values.InsertRange(0, Prev);
+					else if (string.Compare(Key, "Login", true) == 0)
+						this.isDynamic = true;
 
 					this.metaData[Key] = Values.ToArray();
 					Start++;

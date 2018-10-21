@@ -332,9 +332,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Runtime.Threading", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Runtime.Threading.Test", "Runtime\Waher.Runtime.Threading.Test\Waher.Runtime.Threading.Test.csproj", "{C9990F23-AC9D-481F-B488-C54549A1187C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Persistence.Files.Test", "Persistence\Waher.Persistence.Files.Test\Waher.Persistence.Files.Test.csproj", "{A22BA32F-A1BC-443F-A1A5-D3A9D0CEB08C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Persistence.Files.Test", "Persistence\Waher.Persistence.Files.Test\Waher.Persistence.Files.Test.csproj", "{A22BA32F-A1BC-443F-A1A5-D3A9D0CEB08C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Persistence.FilesLW.Test", "Persistence\Waher.Persistence.FilesLW.Test\Waher.Persistence.FilesLW.Test.csproj", "{A1B39CC0-921D-43CE-9119-5A0A5EAC845E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Persistence.FilesLW.Test", "Persistence\Waher.Persistence.FilesLW.Test\Waher.Persistence.FilesLW.Test.csproj", "{A1B39CC0-921D-43CE-9119-5A0A5EAC845E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -2377,8 +2377,6 @@ Global
 		{142C3903-C822-4081-AC2D-DCA8A06F094E}.Debug|x86.Build.0 = Debug|x86
 		{142C3903-C822-4081-AC2D-DCA8A06F094E}.Debug|x86.Deploy.0 = Debug|x86
 		{142C3903-C822-4081-AC2D-DCA8A06F094E}.Release|Any CPU.ActiveCfg = Release|x86
-		{142C3903-C822-4081-AC2D-DCA8A06F094E}.Release|Any CPU.Build.0 = Release|x86
-		{142C3903-C822-4081-AC2D-DCA8A06F094E}.Release|Any CPU.Deploy.0 = Release|x86
 		{142C3903-C822-4081-AC2D-DCA8A06F094E}.Release|ARM.ActiveCfg = Release|ARM
 		{142C3903-C822-4081-AC2D-DCA8A06F094E}.Release|ARM.Build.0 = Release|ARM
 		{142C3903-C822-4081-AC2D-DCA8A06F094E}.Release|ARM.Deploy.0 = Release|ARM

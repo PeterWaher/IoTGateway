@@ -207,92 +207,14 @@ namespace Waher.Persistence.Files
 #if NETSTANDARD1_5
 			if (this.encrypted)
 			{
-				RSACryptoServiceProvider rsa = null;
-				CspParameters CspParams = new CspParameters()
-				{
-					Flags = CspProviderFlags.UseMachineKeyStore |
-						CspProviderFlags.NoPrompt |
-						CspProviderFlags.UseExistingKey,
-					KeyContainerName = this.fileName
-				};
-
-				int KeyGenMode = 0;
-
-				try
-				{
-					rsa = new RSACryptoServiceProvider(CspParams);
-					if (!FileExists)
-					{
-						if (this.provider.DeleteObsoleteKeys)
-							rsa.PersistKeyInCsp = false;    // Deletes key.
-					}
-					else if (rsa.KeySize > 1024)
-						KeyGenMode++;
-				}
-				catch (CryptographicException ex)
-				{
-					if (FileExists)
-						throw new CryptographicException("Unable to get access to cryptographic key to unlock database. Was the database created using another user?", ex);
-				}
-
-				if (!FileExists)
-				{
-					rsa?.Dispose();
-					rsa = null;
-
-					CspParams.Flags = CspProviderFlags.UseMachineKeyStore |
-						CspProviderFlags.NoPrompt;
-
-					try
-					{
-						rsa = new RSACryptoServiceProvider(4096, CspParams);
-					}
-					catch (CryptographicException)
-					{
-						try
-						{
-							rsa = new RSACryptoServiceProvider(CspParams);
-						}
-						catch (CryptographicException ex)
-						{
-							throw new CryptographicException("Unable to get access to cryptographic key to unlock database. Was the database created using another user?", ex);
-						}
-					}
-
-					if (rsa.KeySize > 1024)
-						KeyGenMode++;
-				}
-
-				RSAParameters Parameters = rsa.ExportParameters(true);
-
 				this.aes = Aes.Create();
 				aes.BlockSize = 128;
 				aes.KeySize = 256;
 				aes.Mode = CipherMode.CBC;
 				aes.Padding = PaddingMode.None;
 
-				using (SHA256 Sha256 = SHA256.Create())
-				{
-					if (KeyGenMode == 0)
-					{
-						this.ivSeed = Parameters.P;
-						this.aesKey = Sha256.ComputeHash(Parameters.Q);
-					}
-					else
-					{
-						int pLen = Parameters.P.Length;
-						int qLen = Parameters.Q.Length;
-						byte[] Bin = new byte[pLen + qLen];
-
-						Array.Copy(Parameters.P, 0, Bin, 0, pLen);
-						Array.Copy(Parameters.Q, 0, Bin, pLen, qLen);
-
-						this.aesKey = Sha256.ComputeHash(Bin);
-						this.ivSeed = Sha256.ComputeHash(Parameters.Modulus);
-					}
-
-					this.ivSeedLen = this.ivSeed.Length;
-				}
+				this.provider.GetKeys(this.fileName, FileExists, out this.aesKey, out this.ivSeed);
+				this.ivSeedLen = this.ivSeed.Length;
 			}
 #endif
 			string Folder = Path.GetDirectoryName(this.fileName);

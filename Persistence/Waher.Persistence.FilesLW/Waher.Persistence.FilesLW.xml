@@ -53,6 +53,14 @@
             </summary>
             <param name="EmbeddedObject">Embedded object.</param>
         </member>
+        <member name="T:Waher.Persistence.Files.CustomKeyHandler">
+            <summary>
+            Delegate for custom key callback methods.
+            </summary>
+            <param name="FileName">Name of file.</param>
+            <param name="Key">Key to use</param>
+            <param name="IV">Initiation vector to use</param>
+        </member>
         <member name="T:Waher.Persistence.Files.RegenerationOptions">
             <summary>
             Index regeneration options.

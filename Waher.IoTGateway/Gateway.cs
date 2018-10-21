@@ -221,11 +221,6 @@ namespace Waher.IoTGateway
 						CopyFolders(Path.Combine(runtimeFolder, "Graphics"), Path.Combine(appDataFolder, "Graphics"), true);
 						CopyFolders(Path.Combine(runtimeFolder, "Transforms"), Path.Combine(appDataFolder, "Transforms"), true);
 					}
-					else
-					{
-						appDataFolder = string.Empty;
-						rootFolder = "Root" + Path.DirectorySeparatorChar;
-					}
 				}
 
 				string[] ManifestFiles = Directory.GetFiles(runtimeFolder, "*.manifest", SearchOption.TopDirectoryOnly);

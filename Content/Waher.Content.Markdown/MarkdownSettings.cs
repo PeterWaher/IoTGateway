@@ -21,6 +21,7 @@ namespace Waher.Content.Markdown
 		private bool videoAutoplay = false;
 		private bool videoControls = true;
 		private bool embedEmojis = false;
+		private bool allowScriptTag = true;
 
 		/// <summary>
 		/// Contains settings that the Markdown parser uses to customize its behavior.
@@ -163,6 +164,15 @@ namespace Waher.Content.Markdown
 		{
 			get { return this.rootFolder; }
 			set { this.rootFolder = value; }
+		}
+
+		/// <summary>
+		/// If the HTML SCRIPT tag should be allowed or not.s
+		/// </summary>
+		public bool AllowScriptTag
+		{
+			get { return this.allowScriptTag; }
+			set { this.allowScriptTag = value; }
 		}
 
 		/// <summary>

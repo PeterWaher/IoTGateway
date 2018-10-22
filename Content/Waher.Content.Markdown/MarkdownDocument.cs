@@ -1785,7 +1785,12 @@ namespace Waher.Content.Markdown
 						Text.Append(ch2);
 						Url = Text.ToString();
 
-						if (Url.StartsWith("</") || Url.IndexOf(' ') >= 0)
+						if (!this.settings.AllowScriptTag && (Url.StartsWith("<script", StringComparison.CurrentCultureIgnoreCase) ||
+							Url.StartsWith("</script", StringComparison.CurrentCultureIgnoreCase)))
+						{
+							Elements.AddLast(new InlineCode(this, Url));
+						}
+						else if (Url.StartsWith("</") || Url.IndexOf(' ') >= 0)
 							Elements.AddLast(new InlineHTML(this, Url));
 						else if (Url.IndexOf(':') >= 0)
 							Elements.AddLast(new AutomaticLinkUrl(this, Url.Substring(1, Url.Length - 2)));

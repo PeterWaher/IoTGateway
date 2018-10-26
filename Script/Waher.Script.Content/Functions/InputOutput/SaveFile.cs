@@ -84,7 +84,7 @@ namespace Waher.Script.Content.Functions.InputOutput
 			byte[] Bin = null;
 
 			if (InternetContent.TryGetContentType(Path.GetExtension(FileName), out string ContentType) &&
-				InternetContent.Encodes(Obj, out Grade Grade, out IContentEncoder Encoder))
+				InternetContent.Encodes(Obj, out Grade Grade, out IContentEncoder Encoder, ContentType))
 			{
 				Bin = Encoder.Encode(Obj, System.Text.Encoding.UTF8, out ContentType, ContentType);
 			}

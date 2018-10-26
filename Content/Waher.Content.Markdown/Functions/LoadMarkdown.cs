@@ -47,6 +47,21 @@ namespace Waher.Content.Markdown.Functions
 				ParseMetaData = true
 			};
 
+			if (Variables.TryGetVariable(" MarkdownSettings ", out Variable v) &&
+				v.ValueObject is MarkdownSettings ParentSettings)
+			{
+				Settings.AllowScriptTag = ParentSettings.AllowScriptTag;
+				Settings.AudioAutoplay = ParentSettings.AudioAutoplay;
+				Settings.AudioControls = ParentSettings.AudioControls;
+				Settings.EmbedEmojis = ParentSettings.EmbedEmojis;
+				Settings.EmojiSource = ParentSettings.EmojiSource;
+				Settings.HttpxProxy = ParentSettings.HttpxProxy;
+				Settings.LocalHttpxResourcePath = ParentSettings.LocalHttpxResourcePath;
+				Settings.RootFolder = ParentSettings.RootFolder;
+				Settings.VideoAutoplay = ParentSettings.VideoAutoplay;
+				Settings.VideoControls = ParentSettings.VideoControls;
+			}
+
 			Markdown = MarkdownDocument.Preprocess(Markdown, Settings, Argument);
 
 			Match M = MarkdownDocument.endOfHeader.Match(Markdown);

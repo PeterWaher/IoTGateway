@@ -53,6 +53,7 @@ namespace Waher.Content.Markdown
 		private bool syntaxHighlighting = false;
 		private bool includesTableOfContents = false;
 		private bool isDynamic = false;
+		private bool? allowScriptTag = null;
 
 		/// <summary>
 		/// Contains a markdown document. This markdown document class supports original markdown, as well as several markdown extensions.
@@ -252,8 +253,14 @@ namespace Waher.Content.Markdown
 						if (M.Success)
 						{
 							string FileName2 = Settings.GetFileName(FileName, M2.Groups["ScriptFile"].Value);
-
 							Script = File.ReadAllText(FileName2);
+
+							if (!IsDynamic)
+							{
+								IsDynamic = true;
+								Variables.Add(" MarkdownSettings ", Settings);
+							}
+
 							Exp = new Expression(Script);
 							Exp.Evaluate(Variables);
 						}
@@ -275,7 +282,12 @@ namespace Waher.Content.Markdown
 				try
 				{
 					Exp = new Expression(Script);
-					IsDynamic = true;
+
+					if (!IsDynamic)
+					{
+						IsDynamic = true;
+						Variables.Add(" MarkdownSettings ", Settings);
+					}
 
 					if (Exp.ContainsImplicitPrint)
 					{
@@ -1785,7 +1797,16 @@ namespace Waher.Content.Markdown
 						Text.Append(ch2);
 						Url = Text.ToString();
 
-						if (!this.settings.AllowScriptTag && (Url.StartsWith("<script", StringComparison.CurrentCultureIgnoreCase) ||
+						if (!this.allowScriptTag.HasValue)
+						{
+							this.allowScriptTag = this.metaData.TryGetValue("ALLOWSCRIPTTAG", out KeyValuePair<string, bool>[] Value) &&
+								Value.Length > 0 &&
+								CommonTypes.TryParse(Value[0].Key, out bool b) &&
+								b;
+						}
+
+						if ((!this.settings.AllowScriptTag || !this.allowScriptTag.Value) && 
+							(Url.StartsWith("<script", StringComparison.CurrentCultureIgnoreCase) ||
 							Url.StartsWith("</script", StringComparison.CurrentCultureIgnoreCase)))
 						{
 							Elements.AddLast(new InlineCode(this, Url));
@@ -4420,6 +4441,7 @@ namespace Waher.Content.Markdown
 					switch (MetaData.Key)
 					{
 						case "ACCESS-CONTROL-ALLOW-ORIGIN":
+						case "ALLOWSCRIPTTAG":
 						case "ALTERNATE":
 						case "AUDIOAUTOPLAY":
 						case "AUDIOCONTROLS":

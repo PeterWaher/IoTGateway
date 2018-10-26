@@ -162,15 +162,16 @@ namespace Waher.Content
 		/// <param name="Object">Object to encode.</param>
 		/// <param name="Grade">How well the object can be encoded.</param>
 		/// <param name="Encoder">Best encoder for the object.</param>
+		/// <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
 		/// <returns>If the object can be encoded.</returns>
-		public static bool Encodes(object Object, out Grade Grade, out IContentEncoder Encoder)
+		public static bool Encodes(object Object, out Grade Grade, out IContentEncoder Encoder, params string[] AcceptedContentTypes)
 		{
 			Grade = Grade.NotAtAll;
 			Encoder = null;
 
 			foreach (IContentEncoder Encoder2 in Encoders)
 			{
-				if (Encoder2.Encodes(Object, out Grade Grade2) && Grade2 > Grade)
+				if (Encoder2.Encodes(Object, out Grade Grade2, AcceptedContentTypes) && Grade2 > Grade)
 				{
 					Grade = Grade2;
 					Encoder = Encoder2;
@@ -186,11 +187,12 @@ namespace Waher.Content
 		/// <param name="Object">Object to encode.</param>
 		/// <param name="Encoding">Desired encoding of text. Can be null if no desired encoding is speified.</param>
 		/// <param name="ContentType">Content Type of encoding. Includes information about any text encodings used.</param>
+		/// <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
 		/// <returns>Encoded object.</returns>
 		/// <exception cref="ArgumentException">If the object cannot be encoded.</exception>
-		public static byte[] Encode(object Object, Encoding Encoding, out string ContentType)
+		public static byte[] Encode(object Object, Encoding Encoding, out string ContentType, params string[] AcceptedContentTypes)
 		{
-			if (!Encodes(Object, out Grade Grade, out IContentEncoder Encoder))
+			if (!Encodes(Object, out Grade Grade, out IContentEncoder Encoder, AcceptedContentTypes))
 				throw new ArgumentException("No encoder found to encode the object", nameof(Object));
 
 			return Encoder.Encode(Object, Encoding, out ContentType);

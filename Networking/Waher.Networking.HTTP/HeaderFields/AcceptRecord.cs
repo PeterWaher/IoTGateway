@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Waher.Networking.HTTP
+namespace Waher.Networking.HTTP.HeaderFields
 {
 	/// <summary>
 	/// Corresponds to an item in the Accept, Accept-Charset, Accept-Encoding and Accept-Language header fields.
@@ -72,6 +72,88 @@ namespace Waher.Networking.HTTP
 				else
 					return 1;
 			}
+		}
+
+		/// <summary>
+		/// Checks if a content type is acceptable to the client sending a request.
+		/// </summary>
+		/// <param name="ContentType">Content Type to check.</param>
+		/// <param name="Quality">Quality level of client support.</param>
+		/// <param name="Acceptance">How well the content type was matched by the acceptance criteria.</param>
+		/// <param name="Parameters">Any content type parameters that might be relevant.</param>
+		/// <returns>If content of the given type is acceptable to the client.</returns>
+		public bool IsAcceptable(string ContentType, out double Quality, out ContentTypeAcceptance Acceptance, params KeyValuePair<string, string>[] Parameters)
+		{
+			ContentTypeAcceptance CurrentAcceptance;
+
+			Quality = 0;
+			Acceptance = ContentTypeAcceptance.Wildcard;
+
+			if (string.Compare(ContentType, this.item, true) == 0)
+			{
+				bool? Found;
+
+				CurrentAcceptance = ContentTypeAcceptance.TopAndSubType;
+
+				if (this.parameters != null && Parameters != null)
+				{
+					Found = null;
+
+					foreach (KeyValuePair<string, string> P in this.parameters)
+					{
+						foreach (KeyValuePair<string, string> P2 in Parameters)
+						{
+							if (string.Compare(P.Key, P2.Key, true) == 0)
+							{
+								if (string.Compare(P.Value, P2.Value, true) == 0)
+									Found = true;
+								else
+									Found = false;
+
+								break;
+							}
+						}
+
+						if (Found.HasValue)
+							break;
+					}
+
+					if (Found.HasValue)
+					{
+						if (Found.Value)
+							CurrentAcceptance = ContentTypeAcceptance.TopSubTypeAndParameters;
+						else
+							return false;
+					}
+				}
+			}
+			else
+			{
+				string TopType;
+				int i = ContentType.IndexOf('/');
+
+				if (i < 0)
+					TopType = ContentType;
+				else
+					TopType = ContentType.Substring(0, i);
+
+				if (this.item.EndsWith("/*") && string.Compare(TopType, this.item.Substring(0, this.item.Length - 2)) == 0)
+					CurrentAcceptance = ContentTypeAcceptance.TopTypeOnly;
+				else if (this.item == "*/*")
+					CurrentAcceptance = ContentTypeAcceptance.Wildcard;
+				else
+					return false;
+			}
+
+			if (this.q > Quality)
+			{
+				Quality = this.q;
+				Acceptance = CurrentAcceptance;
+			}
+			else if (this.q == Quality && CurrentAcceptance > Acceptance)
+				Acceptance = CurrentAcceptance;
+
+			return Quality > 0;
 		}
 
 	}

@@ -6,8 +6,9 @@ using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using Waher.Content;
 using Waher.Events;
+using Waher.Networking.HTTP.HeaderFields;
 using Waher.Networking.HTTP.TransferEncodings;
-using Waher.Networking.Sniffers;
+using Waher.Runtime.Inventory;
 using System.Threading.Tasks;
 
 namespace Waher.Networking.HTTP
@@ -662,12 +663,73 @@ namespace Waher.Networking.HTTP
 		/// <param name="Object">Object to return. Object will be encoded using Internet Content encoders, as defined in <see cref="Waher.Content"/>.</param>
 		public void Return(object Object)
 		{
-			byte[] Data = InternetContent.Encode(Object, this.encoding, out string ContentType);
+			HttpFieldAccept Accept = this.httpRequest?.Header?.Accept;
+			byte[] Data;
 
-			this.ContentType = ContentType;
-			this.ContentLength = Data.Length;
+			if (Accept == null)
+				Data = InternetContent.Encode(Object, this.encoding, out string ContentType);
+			else
+			{
+				Data = null;
 
-			this.Write(Data);
+				foreach (AcceptRecord Rec in this.httpRequest.Header.Accept.Records)
+				{
+					switch (Rec.Detail)
+					{
+						case 0: // Wildcard
+							Data = InternetContent.Encode(Object, this.encoding, out string ContentType);
+							break;
+
+						case 1: // Top Type only
+							IContentEncoder Best = null;
+							double BestQuality = 0;
+							string BestContentType = null;
+
+							foreach (IContentEncoder Encoder2 in InternetContent.Encoders)
+							{
+								foreach (string ContentType2 in Encoder2.ContentTypes)
+								{
+									if (Rec.IsAcceptable(ContentType2, out double Quality, out ContentTypeAcceptance Acceptance))
+									{
+										if ((Best == null || Quality > BestQuality) && Encoder2.Encodes(Object, out Grade Grade, ContentType2))
+										{
+											Best = Encoder2;
+											BestQuality = Quality;
+											BestContentType = ContentType2;
+										}
+									}
+								}
+							}
+
+							Data = Best?.Encode(Object, this.encoding, out ContentType, BestContentType);
+							break;
+
+						case 2: // Top & Sub Type
+						case 3: // Top & Sub Type, and parameters
+							if (InternetContent.Encodes(Object, out Grade Grade2, out IContentEncoder Encoder, Rec.Item))
+								Data = Encoder.Encode(Object, this.encoding, out ContentType, Rec.Item);
+							break;
+					}
+
+					if (Data != null)
+						break;
+				}
+			}
+
+			if (Data == null)
+			{
+				this.statusCode = 404;  // Not acceptable
+				this.statusMessage = "Not Acceptable";
+
+				this.SendResponse();
+			}
+			else
+			{
+				this.ContentType = ContentType;
+				this.ContentLength = Data.Length;
+
+				this.Write(Data);
+			}
 		}
 
 		/// <summary>

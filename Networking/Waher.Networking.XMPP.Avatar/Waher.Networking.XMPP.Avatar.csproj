@@ -1,0 +1,47 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard1.3</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <Authors>Peter Waher</Authors>
+    <Company>Waher Data AB</Company>
+    <Product>Waher.IoTGateway</Product>
+    <Description>Class library adding support for managing avatars to the XMPP Client library defined in Waher.Networking.XMPP.</Description>
+    <Copyright>Copyright © Waher Data AB 2018. All rights reserved.</Copyright>
+    <PackageLicenseUrl>https://github.com/PeterWaher/IoTGateway#license</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Networking/Waher.Networking.XMPP.Avatar</PackageProjectUrl>
+    <PackageIconUrl>https://github.com/PeterWaher/IoTGateway/blob/master/Images/Icon.ico?raw=true</PackageIconUrl>
+    <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
+    <RepositoryType>GitHub</RepositoryType>
+    <PackageTags>networking communication xmpp avatar</PackageTags>
+    <NeutralLanguage>English</NeutralLanguage>
+    <AssemblyVersion>1.0.0</AssemblyVersion>
+    <FileVersion>1.0.0</FileVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>C:\My Projects\IoTGateway\Networking\Waher.Networking.XMPP.Avatar\Waher.Networking.XMPP.Avatar.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Images\DefaultAvatar.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Images\DefaultAvatar.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Content\Waher.Content.Xml\Waher.Content.Xml.csproj" />
+    <ProjectReference Include="..\..\Content\Waher.Content\Waher.Content.csproj" />
+    <ProjectReference Include="..\..\Persistence\Waher.Persistence\Waher.Persistence.csproj" />
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Settings\Waher.Runtime.Settings.csproj" />
+    <ProjectReference Include="..\..\Security\Waher.Security\Waher.Security.csproj" />
+    <ProjectReference Include="..\Waher.Networking.XMPP.PEP\Waher.Networking.XMPP.PEP.csproj" />
+    <ProjectReference Include="..\Waher.Networking.XMPP\Waher.Networking.XMPP.csproj" />
+  </ItemGroup>
+
+</Project>

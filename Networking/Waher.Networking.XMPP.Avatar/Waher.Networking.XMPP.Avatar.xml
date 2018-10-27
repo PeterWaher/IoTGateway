@@ -1,0 +1,208 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Waher.Networking.XMPP.Avatar</name>
+    </assembly>
+    <members>
+        <member name="T:Waher.Networking.XMPP.Avatar.Avatar">
+            <summary>
+            Contains information about an avatar.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Avatar.Avatar.#ctor">
+            <summary>
+            Contains information about an avatar.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Avatar.Avatar.#ctor(System.String,System.String,System.Byte[])">
+            <summary>
+            Contains information about an avatar.
+            </summary>
+            <param name="BareJid">Bare JID related to the avatar.</param>
+            <param name="ContentType">Content-Type of the avatar image.</param>
+            <param name="Binary">Binary encoding of the image.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Avatar.Avatar.#ctor(System.String,System.String,System.String,System.Byte[])">
+            <summary>
+            Contains information about an avatar.
+            </summary>
+            <param name="BareJid">Bare JID related to the avatar.</param>
+            <param name="ContentType">Content-Type of the avatar image.</param>
+            <param name="Hash">Hash of the avatar image.</param>
+            <param name="Binary">Binary encoding of the image.</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Avatar.Avatar.ObjectId">
+            <summary>
+            Object ID of avatar.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Avatar.Avatar.BareJid">
+            <summary>
+            Bare JID of avatar.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Avatar.Avatar.Hash">
+            <summary>
+            Hash digest of avatar.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Avatar.Avatar.ContentType">
+            <summary>
+            Content-Type of binary encoding of avatar.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Avatar.Avatar.Binary">
+            <summary>
+            Binary encoding of avatar.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Avatar.AvatarClient">
+            <summary>
+            Provides help with managing avatars.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Avatar.AvatarClient.#ctor(Waher.Networking.XMPP.XmppClient)">
+            <summary>
+            Provides help with managing avatars.
+            </summary>
+            <param name="Client">XMPP Client</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Avatar.AvatarClient.#ctor(Waher.Networking.XMPP.XmppClient,Waher.Networking.XMPP.IEndToEndEncryption)">
+            <summary>
+            Provides help with managing avatars.
+            </summary>
+            <param name="Client">XMPP Client</param>
+            <param name="E2E">End-to-End encryption</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Avatar.AvatarClient.#ctor(Waher.Networking.XMPP.XmppClient,Waher.Networking.XMPP.PEP.PepClient)">
+            <summary>
+            Provides help with managing avatars.
+            </summary>
+            <param name="Client">XMPP Client</param>
+            <param name="PepClient">Personal Eventing Protocol Client</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Avatar.AvatarClient.#ctor(Waher.Networking.XMPP.XmppClient,Waher.Networking.XMPP.PEP.PepClient,Waher.Networking.XMPP.IEndToEndEncryption)">
+            <summary>
+            Provides help with managing avatars.
+            </summary>
+            <param name="Client">XMPP Client</param>
+            <param name="PepClient">Personal Eventing Protocol Client</param>
+            <param name="E2E">End-to-End encryption</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Avatar.AvatarClient.Dispose">
+            <summary>
+            Disposes of the extension.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Avatar.AvatarClient.Extensions">
+            <summary>
+            Implemented extensions.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Avatar.AvatarClient.IncludeAvatarInPresence">
+            <summary>
+            If the local avatar should be included in presence stanzas
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Avatar.AvatarClient.UpdateLocalAvatarAsync(System.String,System.Byte[],System.Boolean)">
+            <summary>
+            Updates the local avatar.
+            </summary>
+            <param name="ContentType">Content-Type of the avatar image.</param>
+            <param name="Binary">Binary encoding of the image.</param>
+            <param name="StoreOnBroker">If the avatar should be stored on the broker.</param>
+        </member>
+        <member name="E:Waher.Networking.XMPP.Avatar.AvatarClient.ValidateAccess">
+            <summary>
+            Event raised when somebody wants to access the avatar of the local client.
+            If the remote endpoint is not authoized, the corresponding stanza exception
+            should be thrown.
+            </summary>
+        </member>
+        <member name="E:Waher.Networking.XMPP.Avatar.AvatarClient.AvatarRemoved">
+            <summary>
+            Event raised when an avatar has been removed.
+            </summary>
+        </member>
+        <member name="E:Waher.Networking.XMPP.Avatar.AvatarClient.AvatarAdded">
+            <summary>
+            Event raised, when an avatar has been added.
+            </summary>
+        </member>
+        <member name="E:Waher.Networking.XMPP.Avatar.AvatarClient.AvatarUpdated">
+            <summary>
+            Event raised, when an avatar has been updated (added or removed).
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Avatar.AvatarClient.GetAvatarAsync(System.String)">
+            <summary>
+            Gets an avatar.
+            </summary>
+            <param name="BareJid">Bare JID of avatar. If empty, the local avatar is returned. If no avatar is found, the
+            default avatar is returned.</param>
+            <returns>Avatar</returns>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Avatar.AvatarClient.LocalAvatar">
+            <summary>
+            Local avatar. Update by calling <see cref="M:Waher.Networking.XMPP.Avatar.AvatarClient.UpdateLocalAvatarAsync(System.String,System.Byte[],System.Boolean)"/>
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Avatar.AvatarClient.DefaultAvatar">
+            <summary>
+            Default avatar.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Avatar.AvatarClient.E2E">
+            <summary>
+            End-to-End encryption interface.
+            </summary>
+        </member>
+        <member name="E:Waher.Networking.XMPP.Avatar.AvatarClient.VCardReceived">
+            <summary>
+            Event raised when a vCard has been received. vCards can be requested to get access to embedded Avatars.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Avatar.AvatarClient.ParseVCard(Waher.Networking.XMPP.IqResultEventArgs)">
+            <summary>
+            Parses a vCard for Avatar information.
+            </summary>
+            <param name="e">vCard response.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Avatar.AvatarClient.ContainsAvatar(System.String)">
+            <summary>
+            Checks if an avatar exists.
+            </summary>
+            <param name="BareJid">Bare JID of contact.</param>
+            <returns>If an avatar with that bare JID is found.</returns>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Avatar.AvatarEventHandler">
+            <summary>
+            Delegate for avatar events.
+            </summary>
+            <param name="Sender">Sender of event.</param>
+            <param name="e">Event arguments.</param>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Avatar.AvatarEventArgs">
+            <summary>
+            Event arguments for avatar events.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Avatar.AvatarEventArgs.#ctor(System.String,Waher.Networking.XMPP.Avatar.Avatar)">
+            <summary>
+            Event arguments for avatar events.
+            </summary>
+            <param name="BareJid">Bare JID of avatar.</param>
+            <param name="Avatar">Avatar</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Avatar.AvatarEventArgs.BareJid">
+            <summary>
+            Bare JID of avatar.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Avatar.AvatarEventArgs.Avatar">
+            <summary>
+            Avatar, or null if removed.
+            </summary>
+        </member>
+    </members>
+</doc>

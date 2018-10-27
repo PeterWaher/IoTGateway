@@ -112,6 +112,7 @@ namespace Waher.IoTGateway
 		private static ProvisioningClient provisioningClient = null;
 		private static XmppCredentials xmppCredentials = null;
 		private static XmppClient xmppClient = null;
+		private static Networking.XMPP.Avatar.AvatarClient avatarClient = null;
 		private static Networking.XMPP.InBandBytestreams.IbbClient ibbClient = null;
 		private static Networking.XMPP.P2P.SOCKS5.Socks5Proxy socksProxy = null;
 		private static ConcentratorServer concentratorServer = null;
@@ -653,11 +654,14 @@ namespace Waher.IoTGateway
 					Sources = await GetDataSources(Sources);
 
 				concentratorServer = new ConcentratorServer(xmppClient, thingRegistryClient, provisioningClient, Sources);
+				avatarClient = new Networking.XMPP.Avatar.AvatarClient(xmppClient);
+
 				Types.SetModuleParameter("Concentrator", concentratorServer);
 				Types.SetModuleParameter("Sensor", concentratorServer.SensorServer);
 				Types.SetModuleParameter("Control", concentratorServer.ControlServer);
 				Types.SetModuleParameter("Registry", thingRegistryClient);
 				Types.SetModuleParameter("Provisioning", provisioningClient);
+				Types.SetModuleParameter("Avatar", avatarClient);
 				Types.SetModuleParameter("Scheduler", scheduler);
 
 				MeteringTopology.OnNewMomentaryValues += NewMomentaryValues;
@@ -1174,6 +1178,9 @@ namespace Waher.IoTGateway
 			concentratorServer?.Dispose();
 			concentratorServer = null;
 
+			avatarClient?.Dispose();
+			avatarClient = null;
+
 			synchronizationClient?.Dispose();
 			synchronizationClient = null;
 
@@ -1184,7 +1191,7 @@ namespace Waher.IoTGateway
 			{
 				using (ManualResetEvent OfflineSent = new ManualResetEvent(false))
 				{
-					xmppClient.SetPresence(Availability.Offline, string.Empty, (sender, e) => OfflineSent.Set());
+					xmppClient.SetPresence(Availability.Offline, (sender, e) => OfflineSent.Set());
 					OfflineSent.WaitOne(1000);
 				}
 
@@ -1808,6 +1815,14 @@ namespace Waher.IoTGateway
 		public static ConcentratorServer ConcentratorServer
 		{
 			get { return concentratorServer; }
+		}
+
+		/// <summary>
+		/// XMPP Concentrator Server.
+		/// </summary>
+		public static Networking.XMPP.Avatar.AvatarClient AvatarClient
+		{
+			get { return avatarClient; }
 		}
 
 		/// <summary>

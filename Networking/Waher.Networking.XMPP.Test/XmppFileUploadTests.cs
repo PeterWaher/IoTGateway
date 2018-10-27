@@ -43,7 +43,7 @@ namespace Waher.Networking.XMPP.Test
 			this.client1.OnConnectionError += new XmppExceptionEventHandler(Client_OnConnectionError1);
 			this.client1.OnError += new XmppExceptionEventHandler(Client_OnError1);
 			this.client1.OnStateChanged += new StateChangedEventHandler(Client_OnStateChanged1);
-			this.client1.SetPresence(Availability.Chat, string.Empty, new KeyValuePair<string, string>("en", "Live and well"));
+			this.client1.SetPresence(Availability.Chat, new KeyValuePair<string, string>("en", "Live and well"));
 			this.client1.Connect();
 
 			this.WaitConnected1(5000);

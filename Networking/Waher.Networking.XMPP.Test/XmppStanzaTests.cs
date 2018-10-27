@@ -87,9 +87,23 @@ namespace Waher.Networking.XMPP.Test
 			}
 
 			Thread.Sleep(500);
-			this.client2.SetPresence(Availability.Chat, "<hola xmlns='bandola'>abc</hola>");
+
+			this.client2.CustomPresenceXml += this.AddCustomXml;
+			try
+			{
+				this.client2.SetPresence(Availability.Chat);
+			}
+			finally
+			{
+				this.client2.CustomPresenceXml -= this.AddCustomXml;
+			}
 
 			Assert.IsTrue(Done.WaitOne(10000), "Presence not delivered properly.");
+		}
+
+		private void AddCustomXml(object Sender, CustomPresenceEventArgs e)
+		{
+			e.Stanza.Append("<hola xmlns='bandola'>abc</hola>");
 		}
 
 		[TestMethod]

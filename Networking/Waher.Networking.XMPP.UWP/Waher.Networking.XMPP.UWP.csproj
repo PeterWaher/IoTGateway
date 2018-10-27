@@ -136,6 +136,7 @@
     <Compile Include="Authentication\SHA1AuthenticationMethod.cs" />
     <Compile Include="BitsOfBinary\BitsOfBinaryEventArgs.cs" />
     <Compile Include="BitsOfBinary\BobClient.cs" />
+    <Compile Include="CustomPresenceEventArgs.cs" />
     <Compile Include="DataForms\DataForm.cs" />
     <Compile Include="DataForms\DataFormEventArgs.cs" />
     <Compile Include="DataForms\DataTypes\AnyUriDataType.cs" />

@@ -73,7 +73,7 @@ namespace Waher.Networking.XMPP.Test
 			this.client1.OnConnectionError += Client_OnConnectionError1;
 			this.client1.OnError += Client_OnError1;
 			this.client1.OnStateChanged += Client_OnStateChanged1;
-			this.client1.SetPresence(Availability.Chat, string.Empty, new KeyValuePair<string, string>("en", "Live and well"));
+			this.client1.SetPresence(Availability.Chat, new KeyValuePair<string, string>("en", "Live and well"));
 			this.client1.Connect();
 
 			this.WaitConnected1(5000);
@@ -90,7 +90,7 @@ namespace Waher.Networking.XMPP.Test
 			this.client2.OnConnectionError += Client_OnConnectionError2;
 			this.client2.OnError += Client_OnError2;
 			this.client2.OnStateChanged += Client_OnStateChanged2;
-			this.client2.SetPresence(Availability.Chat, string.Empty, new KeyValuePair<string, string>("en", "Ready to chat."));
+			this.client2.SetPresence(Availability.Chat, new KeyValuePair<string, string>("en", "Ready to chat."));
 			this.client2.Connect();
 
 			this.WaitConnected2(5000);

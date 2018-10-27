@@ -267,7 +267,7 @@ namespace Waher.Networking.XMPP
 		private StreamSocket client = null;
 		private DataWriter dataWriter = null;
 		private DataReader dataReader = null;
-		private Certificate clientCertificate = null;
+		private readonly Certificate clientCertificate = null;
 		private Certificate serverCertificate = null;
 		private MemoryBuffer memoryBuffer = new MemoryBuffer(BufferSize);
 		private IBuffer buffer = null;
@@ -287,7 +287,6 @@ namespace Waher.Networking.XMPP
 		private readonly Random gen = new Random();
 		private object synchObject = new object();
 		private Availability currentAvailability = Availability.Online;
-		private string customPresenceXml = string.Empty;
 		private KeyValuePair<string, string>[] customPresenceStatus = new KeyValuePair<string, string>[0];
 		private DateTime writeStarted = DateTime.MinValue;
 		private ITextTransportLayer textTransportLayer = null;
@@ -3891,7 +3890,7 @@ namespace Waher.Networking.XMPP
 
 				this.State = XmppState.SettingPresence;
 				if (h == null)
-					this.SetPresence(this.currentAvailability, this.customPresenceXml, this.customPresenceStatus);
+					this.SetPresence(this.currentAvailability, this.customPresenceStatus);
 				else
 				{
 					this.setPresence = true;
@@ -4156,54 +4155,50 @@ namespace Waher.Networking.XMPP
 		}
 
 		/// <summary>
+		/// Event raised when presence is set. Allows custom presence XML to be inserted into presence stanza.
+		/// </summary>
+		public event CustomPresenceEventHandler CustomPresenceXml = null;
+
+		/// <summary>
 		/// Sets the presence of the connection.
+		/// Add a <see cref="CustomPresenceXml"/> event handler to add custom presence XML to the stanza.
 		/// </summary>
 		public void SetPresence()
 		{
-			this.SetPresence(Availability.Online, string.Empty, null, null);
+			this.SetPresence(Availability.Online, null, null);
 		}
 
 		/// <summary>
 		/// Sets the presence of the connection.
+		/// Add a <see cref="CustomPresenceXml"/> event handler to add custom presence XML to the stanza.
 		/// </summary>
 		/// <param name="Availability">Client availability.</param>
 		public void SetPresence(Availability Availability)
 		{
-			this.SetPresence(Availability, string.Empty, null, null);
+			this.SetPresence(Availability, null, null);
 		}
 
 		/// <summary>
 		/// Sets the presence of the connection.
+		/// Add a <see cref="CustomPresenceXml"/> event handler to add custom presence XML to the stanza.
 		/// </summary>
 		/// <param name="Availability">Client availability.</param>
-		/// <param name="CustomXml">Custom XML.</param>
-		public void SetPresence(Availability Availability, string CustomXml)
-		{
-			this.SetPresence(Availability, CustomXml, null, null);
-		}
-
-		/// <summary>
-		/// Sets the presence of the connection.
-		/// </summary>
-		/// <param name="Availability">Client availability.</param>
-		/// <param name="CustomXml">Custom XML.</param>
 		/// <param name="Status">Custom Status message, defined as a set of (language,text) pairs.</param>
-		public void SetPresence(Availability Availability, string CustomXml, params KeyValuePair<string, string>[] Status)
+		public void SetPresence(Availability Availability, params KeyValuePair<string, string>[] Status)
 		{
-			this.SetPresence(Availability, CustomXml, null, Status);
+			this.SetPresence(Availability, null, Status);
 		}
 
 		/// <summary>
 		/// Sets the presence of the connection.
+		/// Add a <see cref="CustomPresenceXml"/> event handler to add custom presence XML to the stanza.
 		/// </summary>
 		/// <param name="Availability">Client availability.</param>
-		/// <param name="CustomXml">Custom XML.</param>
 		/// <param name="Callback">Method to call when stanza has been sent.</param>
 		/// <param name="Status">Custom Status message, defined as a set of (language,text) pairs.</param>
-		public void SetPresence(Availability Availability, string CustomXml, EventHandler Callback, params KeyValuePair<string, string>[] Status)
+		public void SetPresence(Availability Availability, EventHandler Callback, params KeyValuePair<string, string>[] Status)
 		{
 			this.currentAvailability = Availability;
-			this.customPresenceXml = CustomXml;
 			this.customPresenceStatus = Status;
 
 			if (this.state == XmppState.Connected || this.state == XmppState.SettingPresence)
@@ -4212,28 +4207,28 @@ namespace Waher.Networking.XMPP
 
 				switch (Availability)
 				{
-					case XMPP.Availability.Online:
+					case Availability.Online:
 					default:
 						Xml.Append("<presence>");
 						break;
 
-					case XMPP.Availability.Away:
+					case Availability.Away:
 						Xml.Append("<presence><show>away</show>");
 						break;
 
-					case XMPP.Availability.Chat:
+					case Availability.Chat:
 						Xml.Append("<presence><show>chat</show>");
 						break;
 
-					case XMPP.Availability.DoNotDisturb:
+					case Availability.DoNotDisturb:
 						Xml.Append("<presence><show>dnd</show>");
 						break;
 
-					case XMPP.Availability.ExtendedAway:
+					case Availability.ExtendedAway:
 						Xml.Append("<presence><show>xa</show>");
 						break;
 
-					case XMPP.Availability.Offline:
+					case Availability.Offline:
 						Xml.Append("<presence type='unavailable'>");
 						break;
 				}
@@ -4258,8 +4253,7 @@ namespace Waher.Networking.XMPP
 					}
 				}
 
-				if (!string.IsNullOrEmpty(CustomXml))
-					Xml.Append(CustomXml);
+				this.CustomPresenceXml?.Invoke(this, new CustomPresenceEventArgs(Availability, Xml));
 
 				lock (this.synchObject)
 				{

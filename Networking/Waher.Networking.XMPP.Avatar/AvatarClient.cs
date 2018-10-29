@@ -262,7 +262,7 @@ namespace Waher.Networking.XMPP.Avatar
 						HasAvatar = this.contactAvatars.ContainsKey(e.FromBareJID);
 					}
 
-					if (!HasAvatar)
+					if (!HasAvatar && e.Presence.HasChildNodes)
 					{
 						string Hash = null;
 

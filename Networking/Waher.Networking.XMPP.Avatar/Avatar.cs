@@ -16,6 +16,8 @@ namespace Waher.Networking.XMPP.Avatar
 		private string hash = string.Empty;
 		private string contentType = string.Empty;
 		private byte[] binary = null;
+		private int width = 0;
+		private int height = 0;
 
 		/// <summary>
 		/// Contains information about an avatar.
@@ -30,12 +32,16 @@ namespace Waher.Networking.XMPP.Avatar
 		/// <param name="BareJid">Bare JID related to the avatar.</param>
 		/// <param name="ContentType">Content-Type of the avatar image.</param>
 		/// <param name="Binary">Binary encoding of the image.</param>
-		public Avatar(string BareJid, string ContentType, byte[] Binary)
+		/// <param name="Width">Width of avatar, in pixels.</param>
+		/// <param name="Height">Height of avatar, in pixels.</param>
+		public Avatar(string BareJid, string ContentType, byte[] Binary, int Width, int Height)
 		{
 			this.bareJid = BareJid;
 			this.contentType = ContentType;
 			this.binary = Binary;
 			this.hash = Hashes.ComputeSHA1HashString(Binary);
+			this.width = Width;
+			this.height = Height;
 		}
 
 		/// <summary>
@@ -45,12 +51,16 @@ namespace Waher.Networking.XMPP.Avatar
 		/// <param name="ContentType">Content-Type of the avatar image.</param>
 		/// <param name="Hash">Hash of the avatar image.</param>
 		/// <param name="Binary">Binary encoding of the image.</param>
-		public Avatar(string BareJid, string ContentType, string Hash, byte[] Binary)
+		/// <param name="Width">Width of avatar, in pixels.</param>
+		/// <param name="Height">Height of avatar, in pixels.</param>
+		public Avatar(string BareJid, string ContentType, string Hash, byte[] Binary, int Width, int Height)
 		{
 			this.bareJid = BareJid;
 			this.contentType = ContentType;
 			this.binary = Binary;
 			this.hash = Hash;
+			this.width = Width;
+			this.height = Height;
 		}
 
 		/// <summary>
@@ -101,6 +111,26 @@ namespace Waher.Networking.XMPP.Avatar
 		{
 			get { return this.binary; }
 			set { this.binary = value; }
+		}
+
+		/// <summary>
+		/// Width of avatar, in pixels. 0 = No width provided.
+		/// </summary>
+		[DefaultValue(0)]
+		public int Width
+		{
+			get { return this.width; }
+			set { this.width = value; }
+		}
+
+		/// <summary>
+		/// Height of avatar, in pixels. 0 = No height provided.
+		/// </summary>
+		[DefaultValue(0)]
+		public int Height
+		{
+			get { return this.height; }
+			set { this.height = value; }
 		}
 	}
 }

@@ -14,15 +14,17 @@
             Contains information about an avatar.
             </summary>
         </member>
-        <member name="M:Waher.Networking.XMPP.Avatar.Avatar.#ctor(System.String,System.String,System.Byte[])">
+        <member name="M:Waher.Networking.XMPP.Avatar.Avatar.#ctor(System.String,System.String,System.Byte[],System.Int32,System.Int32)">
             <summary>
             Contains information about an avatar.
             </summary>
             <param name="BareJid">Bare JID related to the avatar.</param>
             <param name="ContentType">Content-Type of the avatar image.</param>
             <param name="Binary">Binary encoding of the image.</param>
+            <param name="Width">Width of avatar, in pixels.</param>
+            <param name="Height">Height of avatar, in pixels.</param>
         </member>
-        <member name="M:Waher.Networking.XMPP.Avatar.Avatar.#ctor(System.String,System.String,System.String,System.Byte[])">
+        <member name="M:Waher.Networking.XMPP.Avatar.Avatar.#ctor(System.String,System.String,System.String,System.Byte[],System.Int32,System.Int32)">
             <summary>
             Contains information about an avatar.
             </summary>
@@ -30,6 +32,8 @@
             <param name="ContentType">Content-Type of the avatar image.</param>
             <param name="Hash">Hash of the avatar image.</param>
             <param name="Binary">Binary encoding of the image.</param>
+            <param name="Width">Width of avatar, in pixels.</param>
+            <param name="Height">Height of avatar, in pixels.</param>
         </member>
         <member name="P:Waher.Networking.XMPP.Avatar.Avatar.ObjectId">
             <summary>
@@ -54,6 +58,16 @@
         <member name="P:Waher.Networking.XMPP.Avatar.Avatar.Binary">
             <summary>
             Binary encoding of avatar.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Avatar.Avatar.Width">
+            <summary>
+            Width of avatar, in pixels. 0 = No width provided.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Avatar.Avatar.Height">
+            <summary>
+            Height of avatar, in pixels. 0 = No height provided.
             </summary>
         </member>
         <member name="T:Waher.Networking.XMPP.Avatar.AvatarClient">
@@ -104,12 +118,14 @@
             If the local avatar should be included in presence stanzas
             </summary>
         </member>
-        <member name="M:Waher.Networking.XMPP.Avatar.AvatarClient.UpdateLocalAvatarAsync(System.String,System.Byte[],System.Boolean)">
+        <member name="M:Waher.Networking.XMPP.Avatar.AvatarClient.UpdateLocalAvatarAsync(System.String,System.Byte[],System.Int32,System.Int32,System.Boolean)">
             <summary>
             Updates the local avatar.
             </summary>
             <param name="ContentType">Content-Type of the avatar image.</param>
             <param name="Binary">Binary encoding of the image.</param>
+            <param name="Width">Width of avatar, in pixels. 0 = Not known.</param>
+            <param name="Height">Height of avatar, in pixels. 0 = Not known.</param>
             <param name="StoreOnBroker">If the avatar should be stored on the broker.</param>
         </member>
         <member name="E:Waher.Networking.XMPP.Avatar.AvatarClient.ValidateAccess">
@@ -144,7 +160,7 @@
         </member>
         <member name="P:Waher.Networking.XMPP.Avatar.AvatarClient.LocalAvatar">
             <summary>
-            Local avatar. Update by calling <see cref="M:Waher.Networking.XMPP.Avatar.AvatarClient.UpdateLocalAvatarAsync(System.String,System.Byte[],System.Boolean)"/>
+            Local avatar. Update by calling <see cref="M:Waher.Networking.XMPP.Avatar.AvatarClient.UpdateLocalAvatarAsync(System.String,System.Byte[],System.Int32,System.Int32,System.Boolean)"/>
             </summary>
         </member>
         <member name="P:Waher.Networking.XMPP.Avatar.AvatarClient.DefaultAvatar">

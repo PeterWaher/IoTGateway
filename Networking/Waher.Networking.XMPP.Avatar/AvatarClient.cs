@@ -77,10 +77,13 @@ namespace Waher.Networking.XMPP.Avatar
 			Client.OnRosterItemAdded += Client_OnRosterItemAdded;
 			Client.CustomPresenceXml += Client_CustomPresenceXml;
 
+			if (this.pep != null)
+				this.pep.OnUserAvatarMetaData += Pep_OnUserAvatarMetaData;
+
 			byte[] Bin = Resources.LoadResource(typeof(AvatarClient).Namespace + ".Images.DefaultAvatar.png",
 				typeof(AvatarClient).GetTypeInfo().Assembly);
 
-			this.defaultAvatar = new Avatar(Client.BareJID.ToLower(), "image/png", Bin);
+			this.defaultAvatar = new Avatar(Client.BareJID.ToLower(), "image/png", Bin, 64, 64);
 
 			Task.Run(() => this.LoadAvatar());
 		}
@@ -97,6 +100,9 @@ namespace Waher.Networking.XMPP.Avatar
 			this.client.OnRosterItemRemoved -= Client_OnRosterItemRemoved;
 			this.client.OnRosterItemAdded -= Client_OnRosterItemAdded;
 			this.client.CustomPresenceXml -= Client_CustomPresenceXml;
+
+			if (this.pep != null)
+				this.pep.OnUserAvatarMetaData -= Pep_OnUserAvatarMetaData;
 
 			this.localAvatar = null;
 			this.defaultAvatar = null;
@@ -150,12 +156,14 @@ namespace Waher.Networking.XMPP.Avatar
 		/// </summary>
 		/// <param name="ContentType">Content-Type of the avatar image.</param>
 		/// <param name="Binary">Binary encoding of the image.</param>
+		/// <param name="Width">Width of avatar, in pixels. 0 = Not known.</param>
+		/// <param name="Height">Height of avatar, in pixels. 0 = Not known.</param>
 		/// <param name="StoreOnBroker">If the avatar should be stored on the broker.</param>
-		public async Task UpdateLocalAvatarAsync(string ContentType, byte[] Binary, bool StoreOnBroker)
+		public async Task UpdateLocalAvatarAsync(string ContentType, byte[] Binary, int Width, int Height, bool StoreOnBroker)
 		{
 			if (this.localAvatar == null)
 			{
-				this.localAvatar = new Avatar(this.client.BareJID.ToLower(), ContentType, Binary);
+				this.localAvatar = new Avatar(this.client.BareJID.ToLower(), ContentType, Binary, Width, Height);
 				await Database.Insert(this.localAvatar);
 			}
 			else
@@ -167,19 +175,33 @@ namespace Waher.Networking.XMPP.Avatar
 				await Database.Update(this.localAvatar);
 			}
 
-			if (StoreOnBroker && this.client != null && this.client.State == XmppState.Connected)
+			if (this.client != null && this.client.State == XmppState.Connected)
 			{
-				StringBuilder Request = new StringBuilder();
-				Request.Append("<query xmlns='storage:client:avatar'><data mimetype='");
-				Request.Append(XML.Encode(ContentType));
-				Request.Append("'>");
+				if (StoreOnBroker)
+				{
+					StringBuilder Request = new StringBuilder();
+					Request.Append("<query xmlns='storage:client:avatar'><data mimetype='");
+					Request.Append(XML.Encode(ContentType));
+					Request.Append("'>");
 
-				if (Binary != null)
-					Request.Append(Convert.ToBase64String(Binary));
+					if (Binary != null)
+						Request.Append(Convert.ToBase64String(Binary));
 
-				Request.Append("</data></query>");
+					Request.Append("</data></query>");
 
-				this.client.SendIqSet(this.client.BareJID, Request.ToString(), null, null);
+					this.client.SendIqSet(this.client.BareJID, Request.ToString(), null, null);
+				}
+
+				if (this.pep != null)
+				{
+					this.pep.Publish(new UserAvatarImage()
+					{
+						ContentType = ContentType,
+						Data = Binary,
+						Width = Width,
+						Height = Height
+					});
+				}
 			}
 		}
 
@@ -409,9 +431,9 @@ namespace Waher.Networking.XMPP.Avatar
 					if (Bin != null)
 					{
 						if (string.IsNullOrEmpty(Hash))
-							NewAvatar = new Avatar(BareJid.ToLower(), ContentType, Bin);
+							NewAvatar = new Avatar(BareJid.ToLower(), ContentType, Bin, 0, 0);
 						else
-							NewAvatar = new Avatar(BareJid.ToLower(), ContentType, Hash, Bin);
+							NewAvatar = new Avatar(BareJid.ToLower(), ContentType, Hash, Bin, 0, 0);
 
 						this.contactAvatars[BareJid] = NewAvatar;
 					}
@@ -663,7 +685,7 @@ namespace Waher.Networking.XMPP.Avatar
 							if (!string.IsNullOrEmpty(ContentType) && Data != null)
 							{
 								string BareJid = XmppClient.GetBareJID(e.From).ToLower();
-								Avatar = new Avatar(BareJid, ContentType, Data);
+								Avatar = new Avatar(BareJid, ContentType, Data, 0, 0);
 
 								lock (this.contactAvatars)
 								{
@@ -710,6 +732,72 @@ namespace Waher.Networking.XMPP.Avatar
 					e.Stanza.Append(this.localAvatar.Hash);
 
 				e.Stanza.Append("</hash></x>");
+			}
+		}
+
+		private async void Pep_OnUserAvatarMetaData(object Sender, UserAvatarMetaDataEventArguments e)
+		{
+			try
+			{
+				UserAvatarReference Best = null;
+
+				foreach (UserAvatarReference Ref in e.AvatarMetaData.References)
+				{
+					if (Best == null ||
+						Best.Type != "image/png" ||
+						Ref.Bytes > Best.Bytes)
+					{
+						Best = Ref;
+					}
+				}
+
+				if (Best != null)
+				{
+					Avatar Avatar = await this.GetAvatarAsync(e.FromBareJID);
+
+					if (Avatar == null || Avatar.Hash != Best.Id)
+					{
+						e.GetUserAvatarData(Best, async (sender2, e2) =>
+						{
+							try
+							{
+								if (e2.Ok && e2.AvatarImage != null)
+								{
+									if (Avatar == null)
+									{
+										Avatar = new Avatar(e.FromBareJID, e2.AvatarImage.ContentType, e2.AvatarImage.Data,
+											e2.AvatarImage.Width, e2.AvatarImage.Height)
+										{
+											Hash = Best.Id
+										};
+
+										await Database.Insert(Avatar);
+
+										this.AvatarAdded?.Invoke(this, new AvatarEventArgs(e.FromBareJID, Avatar));
+									}
+									else
+									{
+										Avatar.Hash = Best.Id;
+										Avatar.ContentType = e2.AvatarImage.ContentType;
+										Avatar.Binary = e2.AvatarImage.Data;
+
+										await Database.Update(Avatar);
+
+										this.AvatarUpdated?.Invoke(this, new AvatarEventArgs(e.FromBareJID, Avatar));
+									}
+								}
+							}
+							catch (Exception ex)
+							{
+								Log.Critical(ex);
+							}
+						}, null);
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
 			}
 		}
 

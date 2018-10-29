@@ -127,6 +127,10 @@
       <Project>{03f3b861-5ef2-4d02-9ec2-aaa7374f5e58}</Project>
       <Name>Waher.Content</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj">
+      <Project>{8ae9d52d-28cd-4f83-98de-b6a016f5c7ba}</Project>
+      <Name>Waher.Events</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Persistence\Waher.Persistence\Waher.Persistence.csproj">
       <Project>{0286288f-4af3-4e64-a398-24c8957ceb04}</Project>
       <Name>Waher.Persistence</Name>
@@ -143,9 +147,17 @@
       <Project>{e8115045-7cfb-4fb1-ac25-2ba4ee00485e}</Project>
       <Name>Waher.Networking.XMPP.PEP.UWP</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Waher.Networking.XMPP.PubSub.UWP\Waher.Networking.XMPP.PubSub.UWP.csproj">
+      <Project>{47395fb6-ad33-4c2c-95b3-8fbbbc3b183d}</Project>
+      <Name>Waher.Networking.XMPP.PubSub.UWP</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Waher.Networking.XMPP.UWP\Waher.Networking.XMPP.UWP.csproj">
       <Project>{a41b6f92-8556-443b-bcd9-86e81e99e961}</Project>
       <Name>Waher.Networking.XMPP.UWP</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Waher.Networking\Waher.Networking.csproj">
+      <Project>{9f60a3e1-ee96-4648-8970-76e67b086a63}</Project>
+      <Name>Waher.Networking</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />

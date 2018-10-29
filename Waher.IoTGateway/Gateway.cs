@@ -654,7 +654,7 @@ namespace Waher.IoTGateway
 					Sources = await GetDataSources(Sources);
 
 				concentratorServer = new ConcentratorServer(xmppClient, thingRegistryClient, provisioningClient, Sources);
-				avatarClient = new Networking.XMPP.Avatar.AvatarClient(xmppClient);
+				avatarClient = new Networking.XMPP.Avatar.AvatarClient(xmppClient, pepClient);
 
 				Types.SetModuleParameter("Concentrator", concentratorServer);
 				Types.SetModuleParameter("Sensor", concentratorServer.SensorServer);

@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Waher.Networking.XMPP.BOSH.UWP")]
-[assembly: AssemblyDescription("Class library adding the HTTP alternative binding mechanism (BOSH) to the XMPP client defined in Waher.Networking.XMPP.")]
+[assembly: AssemblyDescription("Class library adding the HTTP alternative binding mechanism (BOSH) to the XMPP client defined in Waher.Networking.XMPP.UWP.")]
 [assembly: AssemblyConfiguration("Waher Data AB")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("Waher.IoTGateway")]

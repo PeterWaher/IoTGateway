@@ -338,6 +338,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Persistence.FilesLW.T
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Networking.XMPP.Avatar", "Networking\Waher.Networking.XMPP.Avatar\Waher.Networking.XMPP.Avatar.csproj", "{4002FB0A-D9B4-4BF2-A07C-B94B29101A39}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.XMPP.Avatar.UWP", "Networking\Waher.Networking.XMPP.Avatar.UWP\Waher.Networking.XMPP.Avatar.UWP.csproj", "{1FED41FF-D1C1-4866-B8FA-22CCD0927ABC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -3091,6 +3093,26 @@ Global
 		{4002FB0A-D9B4-4BF2-A07C-B94B29101A39}.Release|x64.Build.0 = Release|Any CPU
 		{4002FB0A-D9B4-4BF2-A07C-B94B29101A39}.Release|x86.ActiveCfg = Release|Any CPU
 		{4002FB0A-D9B4-4BF2-A07C-B94B29101A39}.Release|x86.Build.0 = Release|Any CPU
+		{1FED41FF-D1C1-4866-B8FA-22CCD0927ABC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1FED41FF-D1C1-4866-B8FA-22CCD0927ABC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1FED41FF-D1C1-4866-B8FA-22CCD0927ABC}.Debug|ARM.ActiveCfg = Debug|ARM
+		{1FED41FF-D1C1-4866-B8FA-22CCD0927ABC}.Debug|ARM.Build.0 = Debug|ARM
+		{1FED41FF-D1C1-4866-B8FA-22CCD0927ABC}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{1FED41FF-D1C1-4866-B8FA-22CCD0927ABC}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{1FED41FF-D1C1-4866-B8FA-22CCD0927ABC}.Debug|x64.ActiveCfg = Debug|x64
+		{1FED41FF-D1C1-4866-B8FA-22CCD0927ABC}.Debug|x64.Build.0 = Debug|x64
+		{1FED41FF-D1C1-4866-B8FA-22CCD0927ABC}.Debug|x86.ActiveCfg = Debug|x86
+		{1FED41FF-D1C1-4866-B8FA-22CCD0927ABC}.Debug|x86.Build.0 = Debug|x86
+		{1FED41FF-D1C1-4866-B8FA-22CCD0927ABC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1FED41FF-D1C1-4866-B8FA-22CCD0927ABC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1FED41FF-D1C1-4866-B8FA-22CCD0927ABC}.Release|ARM.ActiveCfg = Release|ARM
+		{1FED41FF-D1C1-4866-B8FA-22CCD0927ABC}.Release|ARM.Build.0 = Release|ARM
+		{1FED41FF-D1C1-4866-B8FA-22CCD0927ABC}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{1FED41FF-D1C1-4866-B8FA-22CCD0927ABC}.Release|Mixed Platforms.Build.0 = Release|x86
+		{1FED41FF-D1C1-4866-B8FA-22CCD0927ABC}.Release|x64.ActiveCfg = Release|x64
+		{1FED41FF-D1C1-4866-B8FA-22CCD0927ABC}.Release|x64.Build.0 = Release|x64
+		{1FED41FF-D1C1-4866-B8FA-22CCD0927ABC}.Release|x86.ActiveCfg = Release|x86
+		{1FED41FF-D1C1-4866-B8FA-22CCD0927ABC}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -3225,6 +3247,7 @@ Global
 		{A22BA32F-A1BC-443F-A1A5-D3A9D0CEB08C} = {8BFA72A4-289C-4C3B-8B96-87E59612C748}
 		{A1B39CC0-921D-43CE-9119-5A0A5EAC845E} = {8BFA72A4-289C-4C3B-8B96-87E59612C748}
 		{4002FB0A-D9B4-4BF2-A07C-B94B29101A39} = {0EA3132A-669C-4228-8684-3B98AE876BEF}
+		{1FED41FF-D1C1-4866-B8FA-22CCD0927ABC} = {0EA3132A-669C-4228-8684-3B98AE876BEF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {32CF1367-B83E-4CAD-8329-0D1C73AF59F4}

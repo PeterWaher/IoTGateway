@@ -8,8 +8,8 @@ namespace Waher.Networking.XMPP.PEP
 	/// Delegate for user avatar metadata events.
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
-	/// <param name="AvatarMetaData"></param>
-	public delegate void UserAvatarMetaDataEventHandler(object Sender, UserAvatarMetaDataEventArguments AvatarMetaData);
+	/// <param name="e">Event Arguments</param>
+	public delegate void UserAvatarMetaDataEventHandler(object Sender, UserAvatarMetaDataEventArguments e);
 
 	/// <summary>
 	/// Event arguments for user avatar metadata events.

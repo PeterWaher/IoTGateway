@@ -17,7 +17,7 @@ namespace Waher.Networking.XMPP.PEP
 	/// </summary>
 	public class UserAvatarImageEventArguments : ItemsEventArgs
 	{
-		private UserAvatarImage avatarImage;
+		private readonly UserAvatarImage avatarImage;
 
 		internal UserAvatarImageEventArguments(UserAvatarImage AvatarImage, ItemsEventArgs e)
 			: base(e)

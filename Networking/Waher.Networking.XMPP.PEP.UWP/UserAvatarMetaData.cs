@@ -76,14 +76,24 @@ namespace Waher.Networking.XMPP.PEP
 					{
 						Xml.Append("<info bytes='");
 						Xml.Append(Reference.Bytes.ToString());
-						Xml.Append("' height='");
-						Xml.Append(Reference.Height.ToString());
+
+						if (Reference.Height != 0)
+						{
+							Xml.Append("' height='");
+							Xml.Append(Reference.Height.ToString());
+						}
+
 						Xml.Append("' id='");
 						Xml.Append(XML.Encode(Reference.Id));
 						Xml.Append("' type='");
 						Xml.Append(XML.Encode(Reference.Type));
-						Xml.Append("' width='");
-						Xml.Append(Reference.Width.ToString());
+
+						if (Reference.Width != 0)
+						{
+							Xml.Append("' width='");
+							Xml.Append(Reference.Width.ToString());
+						}
+
 						Xml.Append("'/>");
 					}
 				}

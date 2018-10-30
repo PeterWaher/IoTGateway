@@ -13,19 +13,19 @@ namespace Waher.Persistence.Serialization
 	public interface IDatabaseExport
 	{
 		/// <summary>
-		/// Is called when export is started.
+		/// Is called when export of database is started.
 		/// </summary>
 		Task StartExport();
 
 		/// <summary>
-		/// Is called when export is finished.
+		/// Is called when export of database is finished.
 		/// </summary>
 		Task EndExport();
 
 		/// <summary>
 		/// Is called when a collection is started.
 		/// </summary>
-		/// <param name="CollectionName"></param>
+		/// <param name="CollectionName">Name of collection</param>
 		Task StartCollection(string CollectionName);
 
 		/// <summary>
@@ -53,8 +53,8 @@ namespace Waher.Persistence.Serialization
 		/// <summary>
 		/// Is called when an object is started.
 		/// </summary>
-		/// <param name="ObjectId"></param>
-		/// <param name="TypeName"></param>
+		/// <param name="ObjectId">ID of object.</param>
+		/// <param name="TypeName">Type name of object.</param>
 		Task StartObject(string ObjectId, string TypeName);
 
 		/// <summary>

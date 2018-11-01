@@ -1,6 +1,8 @@
 ﻿<Module xmlns="http://waher.se/Schema/ModuleManifest.xsd">
 	<Assembly fileName="Waher.IoTGateway.dll"/>
 	<Folder name="Root">
+		<Content fileName="Backup.md"/>
+		<Content fileName="Backup.js"/>
 		<Content fileName="Copyright.md"/>
 		<Content fileName="Events.js"/>
 		<Content fileName="Login.md"/>
@@ -13,6 +15,8 @@
 			<Content fileName="Next.js"/>
 			<Content fileName="PersonalData.js"/>
 			<Content fileName="PersonalData.md"/>
+			<Content fileName="Restore.js"/>
+			<Content fileName="Restore.md"/>
 			<Content fileName="Theme.js"/>
 			<Content fileName="Theme.md"/>
 			<Content fileName="XMPP.js"/>

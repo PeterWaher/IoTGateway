@@ -23,6 +23,7 @@ using Waher.Events.Files;
 using Waher.Events.Persistence;
 using Waher.Events.XMPP;
 using Waher.IoTGateway.WebResources;
+using Waher.IoTGateway.WebResources.ExportFormats;
 using Waher.IoTGateway.Setup;
 using Waher.Networking.CoAP;
 using Waher.Networking.HTTP;
@@ -128,6 +129,11 @@ namespace Waher.IoTGateway
 		private static Login login = null;
 		private static Logout logout = null;
 		private static LoggedIn loggedIn = null;
+		private static HttpFolderResource exportFolder = null;
+		private static HttpFolderResource keyFolder = null;
+		private static StartExport startExport = null;
+		private static StartAnalyze startAnalyze = null;
+		private static DeleteExport deleteExport = null;
 		private static Scheduler scheduler = null;
 		private static RandomNumberGenerator rnd = null;
 		private static Semaphore gatewayRunning = null;
@@ -435,6 +441,11 @@ namespace Waher.IoTGateway
 					SetupResources.AddLast(webServer.Register(clientEventsWs = new ClientEventsWebSocket()));
 					SetupResources.AddLast(webServer.Register(login = new Login()));
 					SetupResources.AddLast(webServer.Register(logout = new Logout()));
+					SetupResources.AddLast(webServer.Register(exportFolder = new HttpFolderResource("/Export", Export.FullExportFolder, false, false, false, true, loggedIn)));
+					SetupResources.AddLast(webServer.Register(keyFolder = new HttpFolderResource("/Key", Export.FullKeyExportFolder, false, false, false, true, loggedIn)));
+					SetupResources.AddLast(webServer.Register(startExport = new StartExport()));
+					SetupResources.AddLast(webServer.Register(startAnalyze = new StartAnalyze()));
+					SetupResources.AddLast(webServer.Register(deleteExport = new DeleteExport()));
 
 					emoji1_24x24 = new Emoji1LocalFiles(Emoji1SourceFileType.Svg, 24, 24, "/Graphics/Emoji1/svg/%FILENAME%",
 						Path.Combine(runtimeFolder, "Graphics", "Emoji1.zip"), Path.Combine(appDataFolder, "Graphics"));
@@ -595,6 +606,11 @@ namespace Waher.IoTGateway
 				webServer.Register(clientEventsWs = new ClientEventsWebSocket());
 				webServer.Register(login = new Login());
 				webServer.Register(logout = new Logout());
+				webServer.Register(exportFolder = new HttpFolderResource("/Export", Export.FullExportFolder, false, false, false, true, loggedIn));
+				webServer.Register(keyFolder = new HttpFolderResource("/Key", Export.FullKeyExportFolder, false, false, false, true, loggedIn));
+				webServer.Register(startExport = new StartExport());
+				webServer.Register(startAnalyze = new StartAnalyze());
+				webServer.Register(deleteExport = new DeleteExport());
 
 				if (emoji1_24x24 == null)
 				{
@@ -1232,6 +1248,11 @@ namespace Waher.IoTGateway
 			clientEvents = null;
 			login = null;
 			logout = null;
+			exportFolder = null;
+			keyFolder = null;
+			startExport = null;
+			startAnalyze = null;
+			deleteExport = null;
 
 			if (exportExceptions)
 			{
@@ -1370,37 +1391,46 @@ namespace Waher.IoTGateway
 			}
 		}
 
-		private static void CheckConnection(object State)
+		private static async void CheckConnection(object State)
 		{
-			if (!stopped)
+			try
 			{
-				scheduler.Add(DateTime.Now.AddMinutes(1), CheckConnection, null);
-
-				XmppState? State2 = xmppClient?.State;
-				if (State2.HasValue && (State2 == XmppState.Offline || State2 == XmppState.Error || State2 == XmppState.Authenticating))
+				if (!stopped)
 				{
-					try
+					scheduler.Add(DateTime.Now.AddMinutes(1), CheckConnection, null);
+
+					XmppState? State2 = xmppClient?.State;
+					if (State2.HasValue && (State2 == XmppState.Offline || State2 == XmppState.Error || State2 == XmppState.Authenticating))
 					{
-						xmppClient?.Reconnect();
+						try
+						{
+							xmppClient?.Reconnect();
+						}
+						catch (Exception ex)
+						{
+							Log.Critical(ex);
+						}
 					}
-					catch (Exception ex)
+
+					await CheckBackup();
+
+					EventHandler h = MinuteTick;
+					if (h != null)
 					{
-						Log.Critical(ex);
+						try
+						{
+							h(null, new EventArgs());
+						}
+						catch (Exception ex)
+						{
+							Log.Critical(ex);
+						}
 					}
 				}
-
-				EventHandler h = MinuteTick;
-				if (h != null)
-				{
-					try
-					{
-						h(null, new EventArgs());
-					}
-					catch (Exception ex)
-					{
-						Log.Critical(ex);
-					}
-				}
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
 			}
 		}
 
@@ -2107,7 +2137,7 @@ namespace Waher.IoTGateway
 
 		#endregion
 
-		#region Personal Eventing Protocoll
+		#region Personal Eventing Protocol
 
 		/// <summary>
 		/// Publishes a personal event on the XMPP network.
@@ -2154,5 +2184,133 @@ namespace Waher.IoTGateway
 
 		#endregion
 
+		#region Export
+
+		private static async Task<bool> CheckBackup()
+		{
+			bool Result = false;
+
+			try
+			{
+				if (await Export.GetAutomaticBackupsAsync())
+				{
+					DateTime Now = DateTime.Now;
+					TimeSpan Timepoint = await Export.GetBackupTimeAsync();
+					DateTime EstimatedTime = Now.Date + Timepoint;
+					DateTime LastBackup = await Export.GetLastBackupAsync();
+
+					if ((Timepoint.Hours == Now.Hour && Timepoint.Minutes == Now.Minute) ||
+						(lastBackupTimeCheck.HasValue && lastBackupTimeCheck.Value < EstimatedTime && Now >= EstimatedTime) ||
+						LastBackup.AddDays(1) < EstimatedTime)
+					{
+						lastBackupTimeCheck = Now;
+						await Export.SetLastBackupAsync(Now);
+
+						KeyValuePair<string, IExportFormat> Exporter = StartExport.GetExporter("Encrypted");
+						string FileName = Exporter.Key;
+
+						ExportFormat.UpdateClientsFileUpdated(FileName, -1, Now);
+
+						List<string> Folders = new List<string>();
+
+						foreach (Export.FolderCategory FolderCategory in Export.GetRegisteredFolders())
+							Folders.AddRange(FolderCategory.Folders);
+
+						await StartExport.DoExport(Exporter.Value, true, true, Folders.ToArray());
+
+						long KeepDays = await Export.GetKeepDaysAsync();
+						long KeepMonths = await Export.GetKeepMonthsAsync();
+						long KeepYears = await Export.GetKeepYearsAsync();
+						string ExportFolder = Export.FullExportFolder;
+						string KeyFolder = Export.FullKeyExportFolder;
+
+						DeleteOldFiles(ExportFolder, KeepDays, KeepMonths, KeepYears, Now);
+						if (ExportFolder != KeyFolder)
+							DeleteOldFiles(KeyFolder, KeepDays, KeepMonths, KeepYears, Now);
+
+						Result = true;
+
+						OnAfterBackup?.Invoke(typeof(Gateway), new EventArgs());
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+			}
+
+			return Result;
+		}
+
+		private static DateTime? lastBackupTimeCheck = null;
+
+		/// <summary>
+		/// Event raised after a backup has been performed. This event can be used by services to purge the system of old data, without
+		/// affecting any ongoing backup.
+		/// </summary>
+		public static event EventHandler OnAfterBackup = null;
+
+		private static void DeleteOldFiles(string Path, long KeepDays, long KeepMonths, long KeepYears, DateTime Now)
+		{
+			try
+			{
+				string[] Files = Directory.GetFiles(Path, "*.*", SearchOption.TopDirectoryOnly);
+				DateTime CreationTime;
+
+				foreach (string FileName in Files)
+				{
+					try
+					{
+						CreationTime = File.GetCreationTime(FileName);
+
+						if (CreationTime.Day == 1)
+						{
+							if (CreationTime.Month == 1)    // Yearly
+							{
+								if (Now.Year - CreationTime.Year <= KeepYears)
+									continue;
+							}
+							else    // Monthly
+							{
+								if (((Now.Year * 12 + Now.Month) - (CreationTime.Year * 12 + Now.Month)) <= KeepMonths)
+									continue;
+							}
+						}
+						else    // Daily
+						{
+							if ((Now.Date - CreationTime.Date).TotalDays <= KeepDays)
+								continue;
+						}
+
+						File.Delete(FileName);
+						Log.Informational("Backup file deleted.", FileName);
+
+						ExportFormat.UpdateClientsFileDeleted(System.IO.Path.GetFileName(FileName));
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex, FileName);
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+			}
+		}
+
+		internal static void UpdateExportFolder(string Folder)
+		{
+			if (exportFolder != null)
+				exportFolder.FolderPath = Folder;
+		}
+
+		internal static void UpdateExportKeyFolder(string Folder)
+		{
+			if (keyFolder != null)
+				keyFolder.FolderPath = Folder;
+		}
+
+		#endregion
 	}
 }

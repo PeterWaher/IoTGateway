@@ -22,6 +22,7 @@
 			<Content fileName="XMPP.js"/>
 			<Content fileName="XMPP.md"/>
 			<Folder name="PersonalData">
+				<Content fileName="Backups.md"/>
 				<Content fileName="LocalDatabase.md"/>
 				<Content fileName="LocalSensorsAndDevices.md"/>
 				<Content fileName="NetworkIdentity.md"/>

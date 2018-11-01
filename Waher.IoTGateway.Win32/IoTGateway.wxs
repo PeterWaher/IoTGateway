@@ -1140,10 +1140,12 @@
 							<Directory Id='PersonalData' Name='PersonalData'>
 								<Component Id='PersonalDataFiles' Guid='DB697CF1-B906-4181-8535-65B98F24F345'>
 									<RemoveFolder Id='RemovePersonalData' On='uninstall' />
-									<File Id='LocalDatabase.md' Name='LocalDatabase.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\PersonalData\LocalDatabase.md' KeyPath='yes'/>
+									<File Id='Backups.md' Name='Backups.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\PersonalData\Backups.md' KeyPath='yes'/>
+									<File Id='LocalDatabase.md' Name='LocalDatabase.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\PersonalData\LocalDatabase.md'/>
 									<File Id='LocalSensorsAndDevices.md' Name='LocalSensorsAndDevices.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\PersonalData\LocalSensorsAndDevices.md'/>
 									<File Id='NetworkIdentity.md' Name='NetworkIdentity.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\PersonalData\NetworkIdentity.md'/>
 									<File Id='WebPages.md' Name='WebPages.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\PersonalData\WebPages.md'/>
+									<RemoveFile Id='RemoveBackups.md' Name='Backups.md' On='uninstall'/>
 									<RemoveFile Id='RemoveLocalDatabase.md' Name='LocalDatabase.md' On='uninstall'/>
 									<RemoveFile Id='RemoveLocalSensorsAndDevices.md' Name='LocalSensorsAndDevices.md' On='uninstall'/>
 									<RemoveFile Id='RemoveNetworkIdentity.md' Name='NetworkIdentity.md' On='uninstall'/>

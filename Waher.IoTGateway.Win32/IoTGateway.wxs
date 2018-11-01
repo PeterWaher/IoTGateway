@@ -1054,7 +1054,9 @@
                 <RegistryValue Type='string' Name='RootDir' Value='[ROOTDIR]' Action='write'/>
               </RegistryKey>
               <RemoveFolder Id='RemoveRoot' On='uninstall' />
-              <File Id='Calculator.js' Name='Calculator.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Calculator.js' KeyPath='yes'/>
+							<File Id='Backup.js' Name='Backup.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Backup.js' KeyPath='yes'/>
+							<File Id='Backup.md' Name='Backup.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Backup.md'/>
+							<File Id='Calculator.js' Name='Calculator.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Calculator.js'/>
               <File Id='Calculator.md' Name='Calculator.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Calculator.md'/>
               <File Id='Copyright.md' Name='Copyright.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Copyright.md'/>
               <File Id='Emojis.md' Name='Emojis.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Emojis.md'/>
@@ -1066,7 +1068,9 @@
               <File Id='Master.md' Name='Master.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Master.md'/>
               <File Id='Script.md' Name='Script.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Script.md'/>
               <File Id='Smileys.md' Name='Smileys.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Smileys.md'/>
-              <RemoveFile Id='RemoveCalculator.js' Name='Calculator.js' On='uninstall'/>
+							<RemoveFile Id='RemoveBackup.js' Name='Backup.js' On='uninstall'/>
+							<RemoveFile Id='RemoveBackup.md' Name='Backup.md' On='uninstall'/>
+							<RemoveFile Id='RemoveCalculator.js' Name='Calculator.js' On='uninstall'/>
               <RemoveFile Id='RemoveCalculator.md' Name='Calculator.md' On='uninstall'/>
               <RemoveFile Id='RemoveCopyright.md' Name='Copyright.md' On='uninstall'/>
               <RemoveFile Id='RemoveEmojis.md' Name='Emojis.md' On='uninstall'/>
@@ -1110,6 +1114,8 @@
 								<File Id='Introduction.md' Name='Introduction.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Introduction.md'/>
 								<File Id='PersonalData.js' Name='PersonalData.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\PersonalData.js'/>
 								<File Id='PersonalData.md' Name='PersonalData.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\PersonalData.md'/>
+								<File Id='Restore.js' Name='Restore.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Restore.js'/>
+								<File Id='Restore.md' Name='Restore.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Restore.md'/>
 								<File Id='SettingsMaster.md' Name='Master.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Master.md' />
 								<File Id='Next.js' Name='Next.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Next.js'/>
 								<File Id='Theme.js' Name='Theme.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Theme.js'/>
@@ -1122,6 +1128,8 @@
 								<RemoveFile Id='RemoveIntroduction.md' Name='Introduction.md' On='uninstall'/>
 								<RemoveFile Id='RemovePersonalData.js' Name='PersonalData.js' On='uninstall'/>
 								<RemoveFile Id='RemovePersonalData.md' Name='PersonalData.md' On='uninstall'/>
+								<RemoveFile Id='RemoveRestore.js' Name='Restore.js' On='uninstall'/>
+								<RemoveFile Id='RemoveRestore.md' Name='Restore.md' On='uninstall'/>
 								<RemoveFile Id='RemoveSettingsMaster.md' Name='Master.md' On='uninstall'/>
 								<RemoveFile Id='RemoveNext.js' Name='Next.js' On='uninstall'/>
 								<RemoveFile Id='RemoveTheme.js' Name='Theme.js' On='uninstall'/>

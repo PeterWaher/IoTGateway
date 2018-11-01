@@ -39,6 +39,7 @@
     <None Remove="Root\Settings\Next.js" />
     <None Remove="Root\Settings\PersonalData.js" />
     <None Remove="Root\Settings\PersonalData.md" />
+    <None Remove="Root\Settings\PersonalData\Backups.md" />
     <None Remove="Root\Settings\PersonalData\LocalDatabase.md" />
     <None Remove="Root\Settings\PersonalData\LocalSensorsAndDevices.md" />
     <None Remove="Root\Settings\PersonalData\NetworkIdentity.md" />
@@ -77,6 +78,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Root\Settings\PersonalData.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Settings\PersonalData\Backups.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Root\Settings\PersonalData\WebPages.md">

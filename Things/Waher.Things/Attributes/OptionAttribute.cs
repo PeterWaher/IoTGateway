@@ -9,7 +9,7 @@ namespace Waher.Things.Attributes
 	/// <summary>
 	/// Defines an option to display when editing the parameter.
 	/// </summary>
-	[AttributeUsage(AttributeTargets.Property, AllowMultiple = true, Inherited = true)]
+	[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = true, Inherited = true)]
 	public class OptionAttribute : Attribute
 	{
 		private int stringId;

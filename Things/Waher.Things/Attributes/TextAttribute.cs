@@ -25,7 +25,7 @@ namespace Waher.Things.Attributes
 	/// <summary>
 	/// Shows a text segment associated with the parameter.
 	/// </summary>
-	[AttributeUsage(AttributeTargets.Property, AllowMultiple = true, Inherited = true)]
+	[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = true, Inherited = true)]
 	public class TextAttribute : Attribute
 	{
 		private TextPosition position;

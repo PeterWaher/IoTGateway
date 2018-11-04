@@ -9,7 +9,7 @@ namespace Waher.Things.Attributes
 	/// <summary>
 	/// Places the parameter in a localizable section.
 	/// </summary>
-	[AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
+	[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false, Inherited = true)]
 	public class SectionAttribute : Attribute
 	{
 		private int stringId;

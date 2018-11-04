@@ -9,7 +9,7 @@ namespace Waher.Things.Attributes
 	/// <summary>
 	/// Validates input against a regular expression.
 	/// </summary>
-	[AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
+	[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false, Inherited = true)]
 	public class RegularExpressionAttribute : Attribute
 	{
 		private string pattern;

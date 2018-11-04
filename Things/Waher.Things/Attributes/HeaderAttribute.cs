@@ -9,7 +9,7 @@ namespace Waher.Things.Attributes
 	/// <summary>
 	/// Defines a localizable header string for the property.
 	/// </summary>
-	[AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
+	[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false, Inherited = true)]
 	public class HeaderAttribute : Attribute
 	{
 		/// <summary>

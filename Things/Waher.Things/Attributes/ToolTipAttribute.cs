@@ -9,7 +9,7 @@ namespace Waher.Things.Attributes
 	/// <summary>
 	/// Defines a localizable tooltip string for the property.
 	/// </summary>
-	[AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
+	[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false, Inherited = true)]
 	public class ToolTipAttribute : Attribute
 	{
 		private int stringId;

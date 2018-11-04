@@ -697,9 +697,20 @@ namespace Waher.Networking.XMPP
 					this.dataWriter = new DataWriter(this.client.OutputStream);
 #else
 					this.client = new TcpClient();
-					await this.client.ConnectAsync(Host, Port);
-					if (this.client == null)
-						return;
+					try
+					{
+						await this.client.ConnectAsync(Host, Port);
+						if (this.client == null)
+							return;
+					}
+					catch (NullReferenceException)
+					{
+						return;	// Disposed
+					}
+					catch (ObjectDisposedException)
+					{
+						return; // Disposed
+					}
 
 					this.stream = new NetworkStream(this.client.Client, false);
 #endif
@@ -6240,6 +6251,7 @@ namespace Waher.Networking.XMPP
 					{
 						try
 						{
+							this.nextPing = DateTime.Now.AddSeconds(30);
 							this.Warning("Reconnecting.");
 							this.Reconnect();
 						}

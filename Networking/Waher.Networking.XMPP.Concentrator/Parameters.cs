@@ -76,14 +76,23 @@ namespace Waher.Networking.XMPP.Concentrator
 			if (Namespace == null)
 				Namespace = await Language.CreateNamespaceAsync(T.Namespace);
 
-			IEnumerable<PropertyInfo> Properties = T.GetRuntimeProperties();
+			LinkedList<KeyValuePair<PropertyInfo, FieldInfo>> Properties = new LinkedList<KeyValuePair<PropertyInfo, FieldInfo>>();
 
-			foreach (PropertyInfo PI in Properties)
+			foreach (PropertyInfo PI in T.GetRuntimeProperties())
 			{
-				if (!PI.CanRead)
-					continue;
+				if (PI.CanRead)
+					Properties.AddLast(new KeyValuePair<PropertyInfo, FieldInfo>(PI, null));
+			}
 
-				NamespaceStr = PI.DeclaringType.Namespace;
+			foreach (FieldInfo FI in T.GetRuntimeFields())
+				Properties.AddLast(new KeyValuePair<PropertyInfo, FieldInfo>(null, FI));
+
+			foreach (KeyValuePair<PropertyInfo, FieldInfo> Rec in Properties)
+			{
+				PropertyInfo PropertyInfo = Rec.Key;
+				FieldInfo FieldInfo = Rec.Value;
+
+				NamespaceStr = (PropertyInfo?.DeclaringType ?? FieldInfo.DeclaringType).Namespace;
 				if (Namespace == null || NamespaceStr != LastNamespaceStr)
 				{
 					Namespace = await Language.GetNamespaceAsync(NamespaceStr);
@@ -95,11 +104,11 @@ namespace Waher.Networking.XMPP.Concentrator
 				ValidationMethod = null;
 				Options = null;
 				Required = Masked = Alpha = DateOnly = false;
-				ReadOnly = !PI.CanWrite;
+				ReadOnly = PropertyInfo != null && !PropertyInfo.CanWrite;
 				PagePriority = PageAttribute.DefaultPriority;
 				FieldPriority = HeaderAttribute.DefaultPriority;
 
-				foreach (Attribute Attr in PI.GetCustomAttributes())
+				foreach (Attribute Attr in (PropertyInfo?.GetCustomAttributes() ?? FieldInfo.GetCustomAttributes()))
 				{
 					if ((HeaderAttribute = Attr as HeaderAttribute) != null)
 					{
@@ -173,7 +182,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				if (Header == null)
 					continue;
 
-				PropertyType = PI.PropertyType;
+				PropertyType = PropertyInfo?.PropertyType ?? FieldInfo.FieldType;
 				Field = null;
 				Nullable = false;
 
@@ -187,6 +196,9 @@ namespace Waher.Networking.XMPP.Concentrator
 					}
 				}
 
+				string PropertyName = PropertyInfo?.Name ?? FieldInfo.Name;
+				object PropertyValue = (PropertyInfo?.GetValue(EditableObject) ?? FieldInfo.GetValue(EditableObject));
+
 				if (PropertyType == typeof(string[]))
 				{
 					if (ValidationMethod == null)
@@ -194,12 +206,12 @@ namespace Waher.Networking.XMPP.Concentrator
 
 					if (Options == null)
 					{
-						Field = new TextMultiField(Parameters, PI.Name, Header, Required, (string[])PI.GetValue(EditableObject),
+						Field = new TextMultiField(Parameters, PropertyName, Header, Required, (string[])PropertyValue,
 							null, ToolTip, StringDataType.Instance, ValidationMethod, string.Empty, false, ReadOnly, false);
 					}
 					else
 					{
-						Field = new ListMultiField(Parameters, PI.Name, Header, Required, (string[])PI.GetValue(EditableObject),
+						Field = new ListMultiField(Parameters, PropertyName, Header, Required, (string[])PropertyValue,
 							Options.ToArray(), ToolTip, StringDataType.Instance, ValidationMethod, string.Empty, false, ReadOnly, false);
 					}
 				}
@@ -216,11 +228,11 @@ namespace Waher.Networking.XMPP.Concentrator
 							Options.Add(new KeyValuePair<string, string>(Option, Option));
 					}
 
-					s = PI.GetValue(EditableObject)?.ToString();
+					s = PropertyValue?.ToString();
 					if (Nullable && s == null)
 						s = string.Empty;
 
-					Field = new ListSingleField(Parameters, PI.Name, Header, Required, new string[] { s },
+					Field = new ListSingleField(Parameters, PropertyName, Header, Required, new string[] { s },
 						Options.ToArray(), ToolTip, null, ValidationMethod, string.Empty, false, ReadOnly, false);
 				}
 				else if (PropertyType == typeof(bool))
@@ -228,14 +240,12 @@ namespace Waher.Networking.XMPP.Concentrator
 					if (ValidationMethod == null)
 						ValidationMethod = new BasicValidation();
 
-					object Value = PI.GetValue(EditableObject);
-
-					if (Nullable && Value == null)
+					if (Nullable && PropertyValue == null)
 						s = string.Empty;
 					else
-						s = CommonTypes.Encode((bool)Value);
+						s = CommonTypes.Encode((bool)PropertyValue);
 
-					Field = new BooleanField(Parameters, PI.Name, Header, Required, new string[] { s },
+					Field = new BooleanField(Parameters, PropertyName, Header, Required, new string[] { s },
 						Options?.ToArray(), ToolTip, BooleanDataType.Instance, ValidationMethod,
 						string.Empty, false, ReadOnly, false);
 				}
@@ -311,24 +321,24 @@ namespace Waher.Networking.XMPP.Concentrator
 					if (ValidationMethod == null)
 						ValidationMethod = new BasicValidation();
 
-					s = PI.GetValue(EditableObject)?.ToString();
+					s = PropertyValue?.ToString();
 					if (Nullable && s == null)
 						s = string.Empty;
 
 					if (Masked)
 					{
-						Field = new TextPrivateField(Parameters, PI.Name, Header, Required, new string[] { s },
+						Field = new TextPrivateField(Parameters, PropertyName, Header, Required, new string[] { s },
 							Options?.ToArray(), ToolTip, DataType, ValidationMethod,
 							string.Empty, false, ReadOnly, false);
 					}
 					else if (Options == null)
 					{
-						Field = new TextSingleField(Parameters, PI.Name, Header, Required, new string[] { s },
+						Field = new TextSingleField(Parameters, PropertyName, Header, Required, new string[] { s },
 							null, ToolTip, DataType, ValidationMethod, string.Empty, false, ReadOnly, false);
 					}
 					else
 					{
-						Field = new ListSingleField(Parameters, PI.Name, Header, Required, new string[] { s },
+						Field = new ListSingleField(Parameters, PropertyName, Header, Required, new string[] { s },
 							Options.ToArray(), ToolTip, DataType, ValidationMethod, string.Empty, false, ReadOnly, false);
 					}
 				}
@@ -559,11 +569,12 @@ namespace Waher.Networking.XMPP.Concentrator
 			Type T = EditableObject.GetType();
 			string DefaultLanguageCode = GetDefaultLanguageCode(T);
 			List<KeyValuePair<string, string>> Errors = null;
-			PropertyInfo PI;
+			PropertyInfo PropertyInfo;
+			FieldInfo FieldInfo;
 			Language Language = await ConcentratorServer.GetLanguage(e.Query, DefaultLanguageCode);
 			Namespace Namespace = null;
 			Namespace ConcentratorNamespace = await Language.GetNamespaceAsync(typeof(ConcentratorServer).Namespace);
-			LinkedList<KeyValuePair<PropertyInfo, object>> ToSet = null;
+			LinkedList<Tuple<PropertyInfo, FieldInfo, object>> ToSet = null;
 			ValidationMethod ValidationMethod;
 			OptionAttribute OptionAttribute;
 			RegularExpressionAttribute RegularExpressionAttribute;
@@ -591,20 +602,22 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			foreach (Field Field in Form.Fields)
 			{
-				PI = T.GetRuntimeProperty(Field.Var);
-				if (PI == null)
+				PropertyInfo = T.GetRuntimeProperty(Field.Var);
+				FieldInfo = PropertyInfo == null ? T.GetRuntimeField(Field.Var) : null;
+
+				if (PropertyInfo == null && FieldInfo == null)
 				{
 					AddError(ref Errors, Field.Var, await ConcentratorNamespace.GetStringAsync(1, "Property not found."));
 					continue;
 				}
 
-				if (!PI.CanRead || !PI.CanWrite)
+				if (PropertyInfo != null && (!PropertyInfo.CanRead || !PropertyInfo.CanWrite))
 				{
 					AddError(ref Errors, Field.Var, await ConcentratorNamespace.GetStringAsync(2, "Property not editable."));
 					continue;
 				}
 
-				NamespaceStr = PI.DeclaringType.Namespace;
+				NamespaceStr = (PropertyInfo?.DeclaringType ?? FieldInfo.DeclaringType).Namespace;
 				if (Namespace == null || NamespaceStr != LastNamespaceStr)
 				{
 					Namespace = await Language.GetNamespaceAsync(NamespaceStr);
@@ -614,7 +627,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				ValidationMethod = null;
 				ReadOnly = Alpha = DateOnly = HasHeader = HasOptions = ValidOption = false;
 
-				foreach (Attribute Attr in PI.GetCustomAttributes())
+				foreach (Attribute Attr in (PropertyInfo?.GetCustomAttributes() ?? FieldInfo.GetCustomAttributes()))
 				{
 					if (Attr is HeaderAttribute)
 						HasHeader = true;
@@ -646,7 +659,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 				if (ReadOnly)
 				{
-					if (Field.ValueString != PI.GetValue(EditableObject)?.ToString())
+					if (Field.ValueString != (PropertyInfo?.GetValue(EditableObject) ?? FieldInfo?.GetValue(EditableObject))?.ToString())
 						AddError(ref Errors, Field.Var, await ConcentratorNamespace.GetStringAsync(3, "Property is read-only."));
 
 					continue;
@@ -658,7 +671,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					continue;
 				}
 
-				PropertyType = PI.PropertyType;
+				PropertyType = PropertyInfo?.PropertyType ?? FieldInfo.FieldType;
 				ValueToSet = null;
 				ValueToSet2 = null;
 				Parsed = null;
@@ -822,9 +835,9 @@ namespace Waher.Networking.XMPP.Concentrator
 				}
 
 				if (ToSet == null)
-					ToSet = new LinkedList<KeyValuePair<PropertyInfo, object>>();
+					ToSet = new LinkedList<Tuple<PropertyInfo, FieldInfo, object>>();
 
-				ToSet.AddLast(new KeyValuePair<PropertyInfo, object>(PI, ValueToSet2));
+				ToSet.AddLast(new Tuple<PropertyInfo, FieldInfo, object>(PropertyInfo, FieldInfo, ValueToSet2));
 			}
 
 			if (Errors == null)
@@ -835,30 +848,37 @@ namespace Waher.Networking.XMPP.Concentrator
 					Tags = new List<KeyValuePair<string, object>>()
 				};
 
-				foreach (KeyValuePair<PropertyInfo, object> P in ToSet)
+				foreach (Tuple<PropertyInfo, FieldInfo, object> P in ToSet)
 				{
 					try
 					{
 						if (OnlySetChanged)
 						{
-							object Current = P.Key.GetValue(EditableObject);
+							object Current = P.Item1?.GetValue(EditableObject) ?? P.Item2?.GetValue(EditableObject);
 
 							if (Current == null)
 							{
-								if (P.Value == null)
+								if (P.Item3 == null)
 									continue;
 							}
-							else if (P.Value != null && Current.Equals(P.Value))
+							else if (P.Item3 != null && Current.Equals(P.Item3))
 								continue;
 						}
 
-						P.Key.SetValue(EditableObject, P.Value);
-
-						Result.Tags.Add(new KeyValuePair<string, object>(P.Key.Name, P.Value));
+						if (P.Item1 != null)
+						{
+							P.Item1.SetValue(EditableObject, P.Item3);
+							Result.Tags.Add(new KeyValuePair<string, object>(P.Item1.Name, P.Item3));
+						}
+						else
+						{
+							P.Item2.SetValue(EditableObject, P.Item3);
+							Result.Tags.Add(new KeyValuePair<string, object>(P.Item2.Name, P.Item3));
+						}
 					}
 					catch (Exception ex)
 					{
-						AddError(ref Errors, P.Key.Name, ex.Message);
+						AddError(ref Errors, P.Item1?.Name ?? P.Item2.Name, ex.Message);
 					}
 				}
 

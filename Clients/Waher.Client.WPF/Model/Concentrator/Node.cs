@@ -503,7 +503,9 @@ namespace Waher.Client.WPF.Model.Concentrator
 			string FullJid = this.Concentrator?.FullJid;
 			ConcentratorClient ConcentratorClient = this.ConcentratorClient;
 
-			if (Sniffer is TabSniffer TabSniffer && ConcentratorClient != null && !string.IsNullOrEmpty(FullJid))
+			if (Sniffer is TabSniffer TabSniffer &&
+				ConcentratorClient != null && !string.IsNullOrEmpty(FullJid) &&
+				!string.IsNullOrEmpty(TabSniffer.SnifferId))
 			{
 				Mouse.OverrideCursor = Cursors.Wait;
 
@@ -548,6 +550,9 @@ namespace Waher.Client.WPF.Model.Concentrator
 
 				foreach (NodeCommand Command in this.commands)
 				{
+					if (Command.Command == "Search")
+						continue;
+
 					this.GroupSeparator(ref CurrentGroup, Command.SortCategory, Menu);
 
 					Menu.Items.Add(Item = new MenuItem()
@@ -599,7 +604,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 						Mouse.OverrideCursor = Cursors.Wait;
 
 						ConcentratorClient.GetCommandParameters(FullJid, this.NodeId, this.SourceId, this.Partition, Command.Command,
-							ConcentratorClient.Client.Language, string.Empty, string.Empty, string.Empty, (sender2, Form)=>
+							ConcentratorClient.Client.Language, string.Empty, string.Empty, string.Empty, (sender2, Form) =>
 							{
 								MainWindow.MouseDefault();
 
@@ -664,6 +669,47 @@ namespace Waher.Client.WPF.Model.Concentrator
 				else
 					MainWindow.MessageBox(e.ErrorText, "Error", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
 			}
+		}
+
+		public override bool CanSearch
+		{
+			get
+			{
+				if (this.commands != null)
+				{
+					foreach (NodeCommand Command in this.commands)
+					{
+						if (Command.Command == "Search")
+							return true;
+					}
+				}
+
+				return false;
+			}
+		}
+
+		public override void Search()
+		{
+			if (this.commands != null)
+			{
+				foreach (NodeCommand Command in this.commands)
+				{
+					if (Command.Command == "Search")
+					{
+						MenuItem Item = new MenuItem()
+						{
+							Header = Command.Name,
+							IsEnabled = true,
+							Tag = Command
+						};
+
+						this.NodeCommandClick(Item, new System.Windows.RoutedEventArgs());
+						return;
+					}
+				}
+			}
+
+			base.Search();
 		}
 
 	}

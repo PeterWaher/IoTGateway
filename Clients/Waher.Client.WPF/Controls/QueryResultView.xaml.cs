@@ -187,33 +187,40 @@ namespace Waher.Client.WPF.Controls
 		{
 			this.UpdateGui(new ThreadStart(() =>
 			{
-				if (!this.tables.ContainsKey(e.Table.TableDefinition.TableId))
+				try
 				{
-					DataTable Table = new DataTable(e.Table.TableDefinition.Name);
-					GridView GridView = new GridView();
-
-					foreach (Column Column in e.Table.TableDefinition.Columns)
+					if (!this.tables.ContainsKey(e.Table.TableDefinition.TableId))
 					{
-						Table.Columns.Add(Column.ColumnId);
+						DataTable Table = new DataTable(e.Table.TableDefinition.Name);
+						GridView GridView = new GridView();
 
-						// TODO: Alignment 
-
-						GridView.Columns.Add(new GridViewColumn()
+						foreach (Column Column in e.Table.TableDefinition.Columns)
 						{
-							Header = Column.Header,
-							DisplayMemberBinding = new Binding(Column.ColumnId)
-						});
+							Table.Columns.Add(Column.ColumnId);
+
+							// TODO: Alignment 
+
+							GridView.Columns.Add(new GridViewColumn()
+							{
+								Header = Column.Header,
+								DisplayMemberBinding = new Binding(Column.ColumnId)
+							});
+						}
+
+						ListView TableView = new ListView()
+						{
+							ItemsSource = Table.DefaultView,
+							View = GridView
+						};
+
+						this.tables[e.Table.TableDefinition.TableId] = (Table, e.Table.TableDefinition.Columns, TableView);
+
+						this.currentPanel.Children.Add(TableView);
 					}
-
-					ListView TableView = new ListView()
-					{
-						ItemsSource = Table.DefaultView,
-						View = GridView
-					};
-
-					this.tables[e.Table.TableDefinition.TableId] = (Table, e.Table.TableDefinition.Columns, TableView);
-
-					this.currentPanel.Children.Add(TableView);
+				}
+				catch (Exception ex)
+				{
+					this.StatusMessage(ex.Message);
 				}
 			}));
 		}

@@ -116,20 +116,39 @@ namespace Waher.Client.WPF.Controls
 
 					this.Dispatcher.BeginInvoke(new ThreadStart(() =>
 					{
-						SKImage Img;
-
-						if (Ans is Graph G)
+						try
 						{
-							using (SKImage Bmp = G.CreateBitmap(this.variables, out object[] States))
+							SKImage Img;
+
+							if (Ans is Graph G)
 							{
-								this.AddImageBlock(ScriptBlock, Bmp, G, States);
+								using (SKImage Bmp = G.CreateBitmap(this.variables, out object[] States))
+								{
+									this.AddImageBlock(ScriptBlock, Bmp, G, States);
+								}
 							}
+							else if ((Img = Ans.AssociatedObjectValue as SKImage) != null)
+								this.AddImageBlock(ScriptBlock, Img, null, null);
+							else if (Ans.AssociatedObjectValue is Exception ex)
+							{
+								ex = Log.UnnestException(ex);
+
+								if (ex is AggregateException ex2)
+								{
+									foreach (Exception ex3 in ex2.InnerExceptions)
+										ScriptBlock = this.AddTextBlock(ScriptBlock, ex3.Message, Colors.Red, FontWeights.Bold, ex3);
+								}
+								else
+									this.AddTextBlock(ScriptBlock, ex.Message, Colors.Red, FontWeights.Bold, ex);
+							}
+							else
+								this.AddTextBlock(ScriptBlock, Ans.ToString(), Colors.Red, FontWeights.Normal, true);
 						}
-						else if ((Img = Ans.AssociatedObjectValue as SKImage) != null)
-							this.AddImageBlock(ScriptBlock, Img, null, null);
-						else if (Ans.AssociatedObjectValue is Exception ex)
+						catch (Exception ex)
 						{
 							ex = Log.UnnestException(ex);
+							Ans = new ObjectValue(ex);
+							this.variables["Ans"] = Ans;
 
 							if (ex is AggregateException ex2)
 							{
@@ -139,8 +158,6 @@ namespace Waher.Client.WPF.Controls
 							else
 								this.AddTextBlock(ScriptBlock, ex.Message, Colors.Red, FontWeights.Bold, ex);
 						}
-						else
-							this.AddTextBlock(ScriptBlock, Ans.ToString(), Colors.Red, FontWeights.Normal, true);
 					}));
 				}
 				catch (Exception ex)

@@ -1077,7 +1077,7 @@ namespace Waher.Things.Metering
 				{
 					Parameters = await Node.GetDisplayableParameterAraryAsync(Language, RequestOrigin.Empty),
 					NodeType = Node.GetType().FullName,
-					Sniffable = this is ISniffable,
+					Sniffable = Node is ISniffable,
 					DisplayName = await Node.GetTypeNameAsync(Language),
 					HasChildren = Node.HasChildren,
 					ChildrenOrdered = Node.ChildrenOrdered,
@@ -1090,8 +1090,8 @@ namespace Waher.Things.Metering
 					State = Node.State,
 					NodeId = Node.NodeId,
 					Partition = Node.Partition,
-					LogId = MeteringTopology.EmptyIfSame(Node.LogId, Node.NodeId),
-					LocalId = MeteringTopology.EmptyIfSame(Node.LocalId, Node.NodeId),
+					LogId = NodeAdded.EmptyIfSame(Node.LogId, Node.NodeId),
+					LocalId = NodeAdded.EmptyIfSame(Node.LocalId, Node.NodeId),
 					SourceId = Node.SourceId,
 					Timestamp = DateTime.Now
 				};
@@ -1133,8 +1133,8 @@ namespace Waher.Things.Metering
 				NodeId = this.NodeId,
 				OldId = this.oldId,
 				Partition = this.Partition,
-				LogId = MeteringTopology.EmptyIfSame(this.LogId, this.NodeId),
-				LocalId = MeteringTopology.EmptyIfSame(this.LocalId, this.NodeId),
+				LogId = NodeAdded.EmptyIfSame(this.LogId, this.NodeId),
+				LocalId = NodeAdded.EmptyIfSame(this.LocalId, this.NodeId),
 				SourceId = this.SourceId,
 				Timestamp = DateTime.Now
 			});

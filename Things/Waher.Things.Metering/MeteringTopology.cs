@@ -250,8 +250,8 @@ namespace Waher.Things.Metering
 					State = Result.State,
 					NodeId = Result.NodeId,
 					Partition = Result.Partition,
-					LogId = EmptyIfSame(Result.LogId, Result.NodeId),
-					LocalId = EmptyIfSame(Result.LocalId, Result.NodeId),
+					LogId = NodeAdded.EmptyIfSame(Result.LogId, Result.NodeId),
+					LocalId = NodeAdded.EmptyIfSame(Result.LocalId, Result.NodeId),
 					SourceId = Result.SourceId,
 					Timestamp = DateTime.Now
 				});
@@ -263,14 +263,6 @@ namespace Waher.Things.Metering
 			}
 
 			root = Result;
-		}
-
-		internal static string EmptyIfSame(string Value, string Org)
-		{
-			if (Value == Org)
-				return string.Empty;
-			else
-				return Value;
 		}
 
 		/// <summary>

@@ -368,7 +368,7 @@ namespace Waher.Persistence.Files
 			this.serializers[typeof(GenericObject)] = GenericObjectSerializer;
 			this.serializers[typeof(object)] = GenericObjectSerializer;
 
-			this.blocks = new Cache<long, byte[]>(BlocksInCache, TimeSpan.MaxValue, new TimeSpan(0, 1, 0, 0, 0));
+			this.blocks = new Cache<long, byte[]>(BlocksInCache, TimeSpan.MaxValue, TimeSpan.FromHours(1));
 
 			this.master = new StringDictionary(this.folder + "Files.master", string.Empty, string.Empty, this, false);
 

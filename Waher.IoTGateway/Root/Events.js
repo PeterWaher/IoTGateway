@@ -188,7 +188,7 @@ function EvaluateEvent(Event)
         }
         catch (e)
         {
-            // Ignore
+            console.log(e);
         }
     }
 }

@@ -138,7 +138,7 @@ namespace Waher.Networking.XMPP
 			this.sharedSecret = SharedSecret;
 			this.state = XmppState.Offline;
 
-			this.pendingPresenceRequests = new Cache<string, uint>(int.MaxValue, new TimeSpan(0, 1, 0), new TimeSpan(0, 1, 0));
+			this.pendingPresenceRequests = new Cache<string, uint>(int.MaxValue, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1));
 			pendingPresenceRequests.Removed += PendingPresenceRequest_Removed;
 
 			this.RegisterDefaultHandlers();

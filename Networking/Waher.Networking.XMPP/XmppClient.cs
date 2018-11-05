@@ -711,6 +711,10 @@ namespace Waher.Networking.XMPP
 					{
 						return; // Disposed
 					}
+					catch (InvalidOperationException)
+					{
+						return; // Disposed
+					}
 
 					this.stream = new NetworkStream(this.client.Client, false);
 #endif

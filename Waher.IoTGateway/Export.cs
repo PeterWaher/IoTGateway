@@ -484,7 +484,7 @@ namespace Waher.IoTGateway
 		public static async Task<TimeSpan> GetBackupTimeAsync()
 		{
 			if (!backupTime.HasValue)
-				backupTime = await RuntimeSettings.GetAsync("BackupTime", new TimeSpan(5, 0, 0));
+				backupTime = await RuntimeSettings.GetAsync("BackupTime", TimeSpan.FromHours(5));
 
 			return backupTime.Value;
 		}

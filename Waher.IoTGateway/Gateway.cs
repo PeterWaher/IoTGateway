@@ -1023,7 +1023,7 @@ namespace Waher.IoTGateway
 		{
 			try
 			{
-				await MeteringTopology.DeleteOldEvents(new TimeSpan(7, 0, 0, 0));
+				await MeteringTopology.DeleteOldEvents(TimeSpan.FromDays(7));
 			}
 			catch (Exception ex)
 			{

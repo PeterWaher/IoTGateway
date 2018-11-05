@@ -310,7 +310,7 @@ namespace Waher.IoTGateway
 
 		private static Cache<string, TabQueue> GetTimeoutCache()
 		{
-			Cache<string, TabQueue> Result = new Cache<string, TabQueue>(int.MaxValue, TimeSpan.MaxValue, new TimeSpan(0, 0, 20));
+			Cache<string, TabQueue> Result = new Cache<string, TabQueue>(int.MaxValue, TimeSpan.MaxValue, TimeSpan.FromSeconds(20));
 
 			Result.Removed += TimeoutCacheItem_Removed;
 
@@ -346,7 +346,7 @@ namespace Waher.IoTGateway
 
 		private static Cache<string, TabQueue> GetQueueCache()
 		{
-			Cache<string, TabQueue> Result = new Cache<string, TabQueue>(int.MaxValue, TimeSpan.MaxValue, new TimeSpan(0, 0, 30));
+			Cache<string, TabQueue> Result = new Cache<string, TabQueue>(int.MaxValue, TimeSpan.MaxValue, TimeSpan.FromSeconds(30));
 
 			Result.Removed += QueueCacheItem_Removed;
 

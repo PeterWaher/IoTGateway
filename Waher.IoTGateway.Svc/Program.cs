@@ -250,11 +250,11 @@ namespace Waher.IoTGateway.Svc
 					Log.Informational("Installing service.");
 
 					InstallService(ServiceName, DisplayName, Description, StartType, Immediate,
-						new ServiceFailureActions(new TimeSpan(1, 0, 0, 0), null, null, new ScAction[]
+						new ServiceFailureActions(TimeSpan.FromDays(1), null, null, new ScAction[]
 						{
-							new ScAction() { Type = ScActionType.ScActionRestart, Delay = new TimeSpan(0, 1, 0) },
-							new ScAction() { Type = ScActionType.ScActionRestart, Delay = new TimeSpan(0, 1, 0) },
-							new ScAction() { Type = ScActionType.ScActionRestart, Delay = new TimeSpan(0, 1, 0) }
+							new ScAction() { Type = ScActionType.ScActionRestart, Delay = TimeSpan.FromMinutes(1) },
+							new ScAction() { Type = ScActionType.ScActionRestart, Delay = TimeSpan.FromMinutes(1) },
+							new ScAction() { Type = ScActionType.ScActionRestart, Delay = TimeSpan.FromMinutes(1) }
 						}), Credentials);
 				}
 				else if (Uninstall)

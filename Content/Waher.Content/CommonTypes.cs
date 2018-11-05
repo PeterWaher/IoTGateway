@@ -177,107 +177,107 @@ namespace Waher.Content
 					break;
 
 				case "A":
-					TimeZone = new TimeSpan(-1, 0, 0);
+					TimeZone = TimeSpan.FromHours(-1);
 					break;
 
 				case "B":
-					TimeZone = new TimeSpan(-2, 0, 0);
+					TimeZone = TimeSpan.FromHours(-2);
 					break;
 
 				case "C":
-					TimeZone = new TimeSpan(-3, 0, 0);
+					TimeZone = TimeSpan.FromHours(-3);
 					break;
 
 				case "EDT":
 				case "D":
-					TimeZone = new TimeSpan(-4, 0, 0);
+					TimeZone = TimeSpan.FromHours(-4);
 					break;
 
 				case "EST":
 				case "CDT":
 				case "E":
-					TimeZone = new TimeSpan(-5, 0, 0);
+					TimeZone = TimeSpan.FromHours(-5);
 					break;
 
 				case "CST":
 				case "MDT":
 				case "F":
-					TimeZone = new TimeSpan(-6, 0, 0);
+					TimeZone = TimeSpan.FromHours(-6);
 					break;
 
 				case "MST":
 				case "PDT":
 				case "G":
-					TimeZone = new TimeSpan(-7, 0, 0);
+					TimeZone = TimeSpan.FromHours(-7);
 					break;
 
 				case "PST":
 				case "H":
-					TimeZone = new TimeSpan(-8, 0, 0);
+					TimeZone = TimeSpan.FromHours(-8);
 					break;
 
 				case "I":
-					TimeZone = new TimeSpan(-9, 0, 0);
+					TimeZone = TimeSpan.FromHours(-9);
 					break;
 
 				case "K":
-					TimeZone = new TimeSpan(-10, 0, 0);
+					TimeZone = TimeSpan.FromHours(-10);
 					break;
 
 				case "L":
-					TimeZone = new TimeSpan(-11, 0, 0);
+					TimeZone = TimeSpan.FromHours(-11);
 					break;
 
 				case "M":
-					TimeZone = new TimeSpan(-12, 0, 0);
+					TimeZone = TimeSpan.FromHours(-12);
 					break;
 
 				case "N":
-					TimeZone = new TimeSpan(1, 0, 0);
+					TimeZone = TimeSpan.FromHours(1);
 					break;
 
 				case "O":
-					TimeZone = new TimeSpan(2, 0, 0);
+					TimeZone = TimeSpan.FromHours(2);
 					break;
 
 				case "P":
-					TimeZone = new TimeSpan(3, 0, 0);
+					TimeZone = TimeSpan.FromHours(3);
 					break;
 
 				case "Q":
-					TimeZone = new TimeSpan(4, 0, 0);
+					TimeZone = TimeSpan.FromHours(4);
 					break;
 
 				case "R":
-					TimeZone = new TimeSpan(5, 0, 0);
+					TimeZone = TimeSpan.FromHours(5);
 					break;
 
 				case "S":
-					TimeZone = new TimeSpan(6, 0, 0);
+					TimeZone = TimeSpan.FromHours(6);
 					break;
 
 				case "T":
-					TimeZone = new TimeSpan(7, 0, 0);
+					TimeZone = TimeSpan.FromHours(7);
 					break;
 
 				case "U":
-					TimeZone = new TimeSpan(8, 0, 0);
+					TimeZone = TimeSpan.FromHours(8);
 					break;
 
 				case "V":
-					TimeZone = new TimeSpan(9, 0, 0);
+					TimeZone = TimeSpan.FromHours(9);
 					break;
 
 				case "w":
-					TimeZone = new TimeSpan(10, 0, 0);
+					TimeZone = TimeSpan.FromHours(10);
 					break;
 
 				case "X":
-					TimeZone = new TimeSpan(11, 0, 0);
+					TimeZone = TimeSpan.FromHours(11);
 					break;
 
 				case "Y":
-					TimeZone = new TimeSpan(12, 0, 0);
+					TimeZone = TimeSpan.FromHours(12);
 					break;
 
 				default:
@@ -319,107 +319,107 @@ namespace Waher.Content
 					break;
 
 				case "A":
-					Value = new TimeSpan(-1, 0, 0);
+					Value = TimeSpan.FromHours(-1);
 					break;
 
 				case "B":
-					Value = new TimeSpan(-2, 0, 0);
+					Value = TimeSpan.FromHours(-2);
 					break;
 
 				case "C":
-					Value = new TimeSpan(-3, 0, 0);
+					Value = TimeSpan.FromHours(-3);
 					break;
 
 				case "EDT":
 				case "D":
-					Value = new TimeSpan(-4, 0, 0);
+					Value = TimeSpan.FromHours(-4);
 					break;
 
 				case "EST":
 				case "CDT":
 				case "E":
-					Value = new TimeSpan(-5, 0, 0);
+					Value = TimeSpan.FromHours(-5);
 					break;
 
 				case "CST":
 				case "MDT":
 				case "F":
-					Value = new TimeSpan(-6, 0, 0);
+					Value = TimeSpan.FromHours(-6);
 					break;
 
 				case "MST":
 				case "PDT":
 				case "G":
-					Value = new TimeSpan(-7, 0, 0);
+					Value = TimeSpan.FromHours(-7);
 					break;
 
 				case "PST":
 				case "H":
-					Value = new TimeSpan(-8, 0, 0);
+					Value = TimeSpan.FromHours(-8);
 					break;
 
 				case "I":
-					Value = new TimeSpan(-9, 0, 0);
+					Value = TimeSpan.FromHours(-9);
 					break;
 
 				case "K":
-					Value = new TimeSpan(-10, 0, 0);
+					Value = TimeSpan.FromHours(-10);
 					break;
 
 				case "L":
-					Value = new TimeSpan(-11, 0, 0);
+					Value = TimeSpan.FromHours(-11);
 					break;
 
 				case "M":
-					Value = new TimeSpan(-12, 0, 0);
+					Value = TimeSpan.FromHours(-12);
 					break;
 
 				case "N":
-					Value = new TimeSpan(1, 0, 0);
+					Value = TimeSpan.FromHours(1);
 					break;
 
 				case "O":
-					Value = new TimeSpan(2, 0, 0);
+					Value = TimeSpan.FromHours(2);
 					break;
 
 				case "P":
-					Value = new TimeSpan(3, 0, 0);
+					Value = TimeSpan.FromHours(3);
 					break;
 
 				case "Q":
-					Value = new TimeSpan(4, 0, 0);
+					Value = TimeSpan.FromHours(4);
 					break;
 
 				case "R":
-					Value = new TimeSpan(5, 0, 0);
+					Value = TimeSpan.FromHours(5);
 					break;
 
 				case "S":
-					Value = new TimeSpan(6, 0, 0);
+					Value = TimeSpan.FromHours(6);
 					break;
 
 				case "T":
-					Value = new TimeSpan(7, 0, 0);
+					Value = TimeSpan.FromHours(7);
 					break;
 
 				case "U":
-					Value = new TimeSpan(8, 0, 0);
+					Value = TimeSpan.FromHours(8);
 					break;
 
 				case "V":
-					Value = new TimeSpan(9, 0, 0);
+					Value = TimeSpan.FromHours(9);
 					break;
 
 				case "w":
-					Value = new TimeSpan(10, 0, 0);
+					Value = TimeSpan.FromHours(10);
 					break;
 
 				case "X":
-					Value = new TimeSpan(11, 0, 0);
+					Value = TimeSpan.FromHours(11);
 					break;
 
 				case "Y":
-					Value = new TimeSpan(12, 0, 0);
+					Value = TimeSpan.FromHours(12);
 					break;
 
 				default:

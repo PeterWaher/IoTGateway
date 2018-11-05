@@ -232,7 +232,7 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 			{
 				if (this.cache == null)
 				{
-					this.cache = new Cache<string, IncomingStream>(1000, TimeSpan.MaxValue, new TimeSpan(0, 1, 0));
+					this.cache = new Cache<string, IncomingStream>(1000, TimeSpan.MaxValue, TimeSpan.FromMinutes(1));
 					this.cache.Removed += Cache_Removed;
 				}
 			}

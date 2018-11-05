@@ -35,7 +35,7 @@ namespace Waher.Security.DTLS
 			this.udp = new UdpCommunicationLayer(UdpClient);
 			this.dtls = new DtlsEndpoint(Mode, this.udp, Users, RequiredPrivilege, Sniffers);
 
-			this.dtlsStates = new Cache<IPEndPoint, DtlsOverUdpState>(int.MaxValue, TimeSpan.MaxValue, new TimeSpan(1, 0, 0));
+			this.dtlsStates = new Cache<IPEndPoint, DtlsOverUdpState>(int.MaxValue, TimeSpan.MaxValue, TimeSpan.FromHours(1));
 			this.dtlsStates.Removed += DtlsStates_Removed;
 			this.dtls.OnApplicationDataReceived += Dtls_OnApplicationDataReceived;
 			this.dtls.OnHandshakeFailed += Dtls_OnHandshakeFailed;

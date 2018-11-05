@@ -19,7 +19,7 @@ namespace Waher.Runtime.Timing
 	/// </summary>
 	public class Scheduler : IDisposable
 	{
-		private static readonly TimeSpan OnlyOnce = new TimeSpan(0, 0, 0, 0, -1);
+		private static readonly TimeSpan OnlyOnce = TimeSpan.FromMilliseconds(-1);
 
 		private readonly SortedDictionary<DateTime, ScheduledEvent> events = new SortedDictionary<DateTime, ScheduledEvent>();
 		private readonly Random gen = new Random();

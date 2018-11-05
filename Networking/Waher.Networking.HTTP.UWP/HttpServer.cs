@@ -65,8 +65,8 @@ namespace Waher.Networking.HTTP
 		private X509Certificate serverCertificate;
 #endif
 		private readonly Dictionary<string, HttpResource> resources = new Dictionary<string, HttpResource>(StringComparer.CurrentCultureIgnoreCase);
-		private TimeSpan sessionTimeout = new TimeSpan(0, 20, 0);
-		private TimeSpan requestTimeout = new TimeSpan(0, 2, 0);
+		private TimeSpan sessionTimeout = TimeSpan.FromMinutes(20);
+		private TimeSpan requestTimeout = TimeSpan.FromMinutes(2);
 		private Cache<HttpRequest, RequestInfo> currentRequests;
 		private Cache<string, Variables> sessions;
 		private string resourceOverride = null;

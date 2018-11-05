@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using Waher.Persistence.Attributes;
-using Waher.Things.DisplayableParameters;
 
 namespace Waher.Things.SourceEvents
 {
@@ -26,5 +23,23 @@ namespace Waher.Things.SourceEvents
 		{
 			get { return SourceEventType.NodeRemoved; }
 		}
+
+		/// <summary>
+		/// Creates an event object from a node object.
+		/// </summary>
+		/// <param name="Node">Node removed.</param>
+		public static NodeRemoved FromNode(INode Node)
+		{
+			return new NodeRemoved()
+			{
+				NodeId = Node.NodeId,
+				Partition = Node.Partition,
+				LogId = NodeAdded.EmptyIfSame(Node.LogId, Node.NodeId),
+				LocalId = NodeAdded.EmptyIfSame(Node.LocalId, Node.NodeId),
+				SourceId = Node.SourceId,
+				Timestamp = DateTime.Now
+			};
+		}
+
 	}
 }

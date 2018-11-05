@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 using Waher.Persistence.Attributes;
+using Waher.Runtime.Language;
 using Waher.Things.DisplayableParameters;
 
 namespace Waher.Things.SourceEvents
@@ -10,7 +11,7 @@ namespace Waher.Things.SourceEvents
 	/// Node added event.
 	/// </summary>
 	public class NodeAdded : NodeParametersEvent
-    {
+	{
 		private string afterNodeId = string.Empty;
 		private string afterPartition = string.Empty;
 		private string displayName = string.Empty;
@@ -23,6 +24,55 @@ namespace Waher.Things.SourceEvents
 		public NodeAdded()
 			: base()
 		{
+		}
+
+		/// <summary>
+		/// Creates an event object from a node object.
+		/// </summary>
+		/// <param name="Node">Node added.</param>
+		/// <param name="Language">Language</param>
+		/// <param name="Caller">Original caller.</param>
+		/// <param name="Sniffable">If the node is sniffable.</param>
+		public static async Task<NodeAdded> FromNode(INode Node, Language Language, RequestOrigin Caller, bool Sniffable)
+		{
+			List<Parameter> Parameters = new List<Parameter>();
+
+			foreach (Parameter P in await Node.GetDisplayableParametersAsync(Language, Caller))
+				Parameters.Add(P);
+
+			return new NodeAdded()
+			{
+				Parameters = Parameters.ToArray(),
+				NodeType = Node.GetType().FullName,
+				Sniffable = Sniffable,
+				DisplayName = await Node.GetTypeNameAsync(Language),
+				HasChildren = Node.HasChildren,
+				ChildrenOrdered = Node.ChildrenOrdered,
+				IsReadable = Node.IsReadable,
+				IsControllable = Node.IsControllable,
+				HasCommands = Node.HasCommands,
+				ParentId = Node.Parent?.NodeId ?? string.Empty,
+				ParentPartition = Node.Parent?.Partition ?? string.Empty,
+				Updated = DateTime.MinValue,
+				State = Node.State,
+				NodeId = Node.NodeId,
+				Partition = Node.Partition,
+				LogId = EmptyIfSame(Node.LogId, Node.NodeId),
+				LocalId = EmptyIfSame(Node.LocalId, Node.NodeId),
+				SourceId = Node.SourceId,
+				Timestamp = DateTime.Now
+			};
+		}
+
+		/// <summary>
+		/// Returns <paramref name="Id1"/> if different, <see cref="string.Empty"/> if the same.
+		/// </summary>
+		/// <param name="Id1">ID 1</param>
+		/// <param name="Id2">ID 2</param>
+		/// <returns><paramref name="Id1"/> if different, <see cref="string.Empty"/> if the same.</returns>
+		public static string EmptyIfSame(string Id1, string Id2)
+		{
+			return Id1 == Id2 ? string.Empty : Id1;
 		}
 
 		/// <summary>

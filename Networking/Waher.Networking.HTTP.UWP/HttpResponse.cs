@@ -490,10 +490,37 @@ namespace Waher.Networking.HTTP
 						this.StatusCode = ex2.StatusCode;
 						this.StatusMessage = ex2.Message;
 
+						string ContentType = ex2.ContentType;
+
 						foreach (KeyValuePair<string, string> P in ex2.HeaderFields)
+						{
+							if (string.Compare(P.Key, "Content-Type", true) == 0)
+							{
+								if (string.IsNullOrEmpty(ContentType))
+									ContentType = P.Value;
+
+								continue;
+							}
+
 							this.SetHeader(P.Key, P.Value);
+						}
 
 						this.SetHeader("Connection", "close");
+
+						if (ex2.Content != null)
+						{
+							this.ContentType = !string.IsNullOrEmpty(ContentType) ? ContentType : "application/octet-stream";
+							this.Write(ex2.Content);
+						}
+						else if (ex2.ContentObject != null)
+						{
+							if (this.TryEncode(ex2.ContentObject, out byte[] Data, out ContentType))
+							{
+								this.ContentType = ContentType;
+								this.Write(Data);
+							}
+						}
+
 						this.SendResponse();
 					}
 					else if (ex is System.NotImplementedException)
@@ -663,21 +690,42 @@ namespace Waher.Networking.HTTP
 		/// <param name="Object">Object to return. Object will be encoded using Internet Content encoders, as defined in <see cref="Waher.Content"/>.</param>
 		public void Return(object Object)
 		{
+			if (this.TryEncode(Object, out byte[] Data, out string ContentType))
+			{
+				this.ContentType = ContentType;
+				this.ContentLength = Data.Length;
+
+				this.Write(Data);
+			}
+			else
+			{
+				this.statusCode = 404;  // Not acceptable
+				this.statusMessage = "Not Acceptable";
+
+				this.SendResponse();
+			}
+		}
+
+		private bool TryEncode(object Object, out byte[] Data, out string ContentType)
+		{
 			HttpFieldAccept Accept = this.httpRequest?.Header?.Accept;
-			byte[] Data;
 
 			if (Accept == null)
-				Data = InternetContent.Encode(Object, this.encoding, out string ContentType);
+			{
+				Data = InternetContent.Encode(Object, this.encoding, out ContentType);
+				return Data != null;
+			}
 			else
 			{
 				Data = null;
+				ContentType = null;
 
 				foreach (AcceptRecord Rec in this.httpRequest.Header.Accept.Records)
 				{
 					switch (Rec.Detail)
 					{
 						case 0: // Wildcard
-							Data = InternetContent.Encode(Object, this.encoding, out string ContentType);
+							Data = InternetContent.Encode(Object, this.encoding, out ContentType);
 							break;
 
 						case 1: // Top Type only
@@ -712,24 +760,11 @@ namespace Waher.Networking.HTTP
 					}
 
 					if (Data != null)
-						break;
+						return true;
 				}
 			}
 
-			if (Data == null)
-			{
-				this.statusCode = 404;  // Not acceptable
-				this.statusMessage = "Not Acceptable";
-
-				this.SendResponse();
-			}
-			else
-			{
-				this.ContentType = ContentType;
-				this.ContentLength = Data.Length;
-
-				this.Write(Data);
-			}
+			return false;
 		}
 
 		/// <summary>

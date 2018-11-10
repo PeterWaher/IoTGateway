@@ -10,12 +10,36 @@ namespace Waher.Networking.HTTP
 	/// </summary>
 	public class UnavailableForLegalReasonsException : HttpException
 	{
+		private const int Code = 451;
+		private const string Msg = "Unavailable For Legal Reasons";
+
 		/// <summary>
 		/// Defined in the internet draft "A New HTTP Status Code for Legally-restricted Resources". Intended to be used when resource access is 
 		/// denied for legal reasons, e.g. censorship or government-mandated blocked access.
 		/// </summary>
 		public UnavailableForLegalReasonsException()
-			: base(451, "Unavailable For Legal Reasons")
+			: base(Code, Msg)
+		{
+		}
+
+		/// <summary>
+		/// Defined in the internet draft "A New HTTP Status Code for Legally-restricted Resources". Intended to be used when resource access is 
+		/// denied for legal reasons, e.g. censorship or government-mandated blocked access.
+		/// </summary>
+		/// <param name="ContentObject">Any content object to return. The object will be encoded before being sent.</param>
+		public UnavailableForLegalReasonsException(object ContentObject)
+			: base(Code, Msg, ContentObject)
+		{
+		}
+
+		/// <summary>
+		/// Defined in the internet draft "A New HTTP Status Code for Legally-restricted Resources". Intended to be used when resource access is 
+		/// denied for legal reasons, e.g. censorship or government-mandated blocked access.
+		/// </summary>
+		/// <param name="Content">Any encoded content to return.</param>
+		/// <param name="ContentType">The content type of <paramref name="Content"/>, if provided.</param>
+		public UnavailableForLegalReasonsException(byte[] Content, string ContentType)
+			: base(Code, Msg, Content, ContentType)
 		{
 		}
 	}

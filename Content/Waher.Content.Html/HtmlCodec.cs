@@ -130,7 +130,7 @@ namespace Waher.Content.Html
 		/// <returns>If the encoder can encode the given object.</returns>
 		public bool Encodes(object Object, out Grade Grade, params string[] AcceptedContentTypes)
 		{
-			if (Object is HtmlDocument)
+			if (Object is HtmlDocument || (Object is string s && s.TrimEnd().EndsWith("</html>", StringComparison.OrdinalIgnoreCase)))
 			{
 				if (InternetContent.IsAccepted(HtmlContentTypes, AcceptedContentTypes))
 				{
@@ -154,22 +154,31 @@ namespace Waher.Content.Html
 		/// <exception cref="ArgumentException">If the object cannot be encoded.</exception>
 		public byte[] Encode(object Object, Encoding Encoding, out string ContentType, params string[] AcceptedContentTypes)
 		{
-			if (Object is HtmlDocument HtmlDoc &&
-				InternetContent.IsAccepted(HtmlContentTypes, out ContentType, AcceptedContentTypes))
+			if (InternetContent.IsAccepted(HtmlContentTypes, out ContentType, AcceptedContentTypes))
 			{
-				if (Encoding == null)
+				string Html = null;
+
+				if (Object is HtmlDocument HtmlDoc)
+					Html = HtmlDoc.HtmlText;
+				else if (Object is string s)
+					Html = s;
+
+				if (Html != null)
 				{
-					ContentType += "; charset=utf-8";
-					return Encoding.UTF8.GetBytes(HtmlDoc.HtmlText);
-				}
-				else
-				{
-					ContentType += "; charset=" + Encoding.WebName;
-					return Encoding.GetBytes(HtmlDoc.HtmlText);
+					if (Encoding == null)
+					{
+						ContentType += "; charset=utf-8";
+						return Encoding.UTF8.GetBytes(Html);
+					}
+					else
+					{
+						ContentType += "; charset=" + Encoding.WebName;
+						return Encoding.GetBytes(Html);
+					}
 				}
 			}
-			else
-				throw new ArgumentException("Unable to encode object, or content type not accepted.", nameof(Object));
+
+			throw new ArgumentException("Unable to encode object, or content type not accepted.", nameof(Object));
 		}
 	}
 }

@@ -1,0 +1,1801 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Waher.Networking.XMPP.P2P</name>
+    </assembly>
+    <members>
+        <member name="T:Waher.Networking.XMPP.P2P.AddressInfo">
+            <summary>
+            Contains information about peer addresses.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.AddressInfo.#ctor(System.String,System.String,System.Int32,System.String,System.Int32)">
+            <summary>
+            Contains information about peer addresses.
+            </summary>
+            <param name="XmppAddress">XMPP Address (bare JID).</param>
+            <param name="ExternalIp">External IP address.</param>
+            <param name="ExternalPort">External Port number.</param>
+            <param name="LocalIp">Local IP address.</param>
+            <param name="LocalPort">Local Port number.</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.AddressInfo.XmppAddress">
+            <summary>
+            XMPP Address (Bare JID).
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.AddressInfo.ExternalIp">
+            <summary>
+            External IP Address.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.AddressInfo.ExternalPort">
+            <summary>
+            External Port Number.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.AddressInfo.LocalIp">
+            <summary>
+            Local IP Address.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.AddressInfo.LocalPort">
+            <summary>
+            Local Port Number.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.P2P.AvailableEventHandler">
+            <summary>
+            Delegate for availability events.
+            </summary>
+            <param name="Sender">Sender of event.</param>
+            <param name="e">Event arguments.</param>
+        </member>
+        <member name="T:Waher.Networking.XMPP.P2P.AvailableEventArgs">
+            <summary>
+            Event arguments for Availability events.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.AvailableEventArgs.#ctor(Waher.Networking.XMPP.PresenceEventArgs,System.Boolean,System.Boolean)">
+            <summary>
+            Event arguments for Availability events.
+            </summary>
+            <param name="e">Presence event arguments.</param>
+            <param name="HasE2E">If End-to-End encryption information was found in presence stanza.</param>
+            <param name="HasP2P">If Peer-to-peer address information was found in presence stanza.</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.AvailableEventArgs.Presence">
+            <summary>
+            Presence event arguments.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.AvailableEventArgs.HasE2E">
+            <summary>
+            If End-to-End encryption information was found in presence stanza.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.AvailableEventArgs.HasP2P">
+            <summary>
+            If Peer-to-peer address information was found in presence stanza.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.P2P.E2E.Aes256">
+            <summary>
+            Abstract base class for AES-256 based End-to-End encryption schemes.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.P2P.E2E.Aes256.aes">
+            <summary>
+            AES encryption object
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.Aes256.#ctor">
+            <summary>
+            Abstract base class for AES-256 based End-to-End encryption schemes.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.Aes256.Dispose">
+            <summary>
+            <see cref="M:System.IDisposable.Dispose"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.Aes256.Encrypt(System.Byte[],System.Byte[],System.Byte[])">
+            <summary>
+            Encrypts binary data
+            </summary>
+            <param name="Data">Binary Data</param>
+            <param name="Key">Encryption Key</param>
+            <param name="IV">Initiation Vector</param>
+            <returns>Encrypted Data</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.Aes256.Decrypt(System.Byte[],System.Byte[],System.Byte[])">
+            <summary>
+            Decrypts binary data
+            </summary>
+            <param name="Data">Binary Data</param>
+            <param name="Key">Encryption Key</param>
+            <param name="IV">Initiation Vector</param>
+            <returns>Decrypted Data</returns>
+        </member>
+        <member name="T:Waher.Networking.XMPP.P2P.E2E.E2eEndpoint">
+            <summary>
+            Abstract base class for End-to-End encryption schemes.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.E2eEndpoint.Dispose">
+            <summary>
+            <see cref="M:System.IDisposable.Dispose"/>
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.E2eEndpoint.SecurityStrength">
+            <summary>
+            Security strength of End-to-End encryption scheme.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.E2eEndpoint.Encrypt(System.String,System.String,System.String,System.String,System.Byte[])">
+            <summary>
+            Encrypts binary data
+            </summary>
+            <param name="Id">Id attribute</param>
+            <param name="Type">Type attribute</param>
+            <param name="From">From attribute</param>
+            <param name="To">To attribute</param>
+            <param name="Data">Binary data to encrypt</param>
+            <returns>Encrypted data</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.E2eEndpoint.Decrypt(System.String,System.String,System.String,System.String,System.Byte[])">
+            <summary>
+            Decrypts binary data
+            </summary>
+            <param name="Id">Id attribute</param>
+            <param name="Type">Type attribute</param>
+            <param name="From">From attribute</param>
+            <param name="To">To attribute</param>
+            <param name="Data">Binary data to decrypt</param>
+            <returns>Decrypted data</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.E2eEndpoint.Encrypt(System.String,System.String,System.String,System.String,System.Byte[],System.Text.StringBuilder)">
+            <summary>
+            Encrypts Binary data
+            </summary>
+            <param name="Id">Id attribute</param>
+            <param name="Type">Type attribute</param>
+            <param name="From">From attribute</param>
+            <param name="To">To attribute</param>
+            <param name="Data">Binary data to encrypt</param>
+            <param name="Xml">XML output</param>
+            <returns>If encryption was possible</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.E2eEndpoint.CanDecrypt(System.Xml.XmlElement)">
+            <summary>
+            If the scheme can decrypt a given XML element.
+            </summary>
+            <param name="AesElement">XML element with encrypted data.</param>
+            <returns>If the scheme can decrypt the data.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.E2eEndpoint.Decrypt(System.String,System.String,System.String,System.String,System.Xml.XmlElement)">
+            <summary>
+            Decrypts XML data
+            </summary>
+            <param name="Id">Id attribute</param>
+            <param name="Type">Type attribute</param>
+            <param name="From">From attribute</param>
+            <param name="To">To attribute</param>
+            <param name="AesElement">XML element with encrypted data.</param>
+            <returns>Decrypted XMLs</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.E2eEndpoint.GetIV(System.String,System.String,System.String,System.String)">
+            <summary>
+            Gets AES Initiation Vector from stanza attributes.s
+            </summary>
+            <param name="Id">Id attribute</param>
+            <param name="Type">Type attribute</param>
+            <param name="From">From attribute</param>
+            <param name="To">To attribute</param>
+            <returns>AES Initiation vector.</returns>
+        </member>
+        <member name="T:Waher.Networking.XMPP.P2P.E2E.EcAes256">
+            <summary>
+            Abstract base class for Elliptic Curve / AES-256 hybrid ciphers.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.P2P.E2E.EcAes256.publicKey">
+            <summary>
+            Remote public key.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.P2P.E2E.EcAes256.localEndpoint">
+            <summary>
+            Local security endpoint, if available.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.EcAes256.#ctor(System.Byte[],System.Byte[],Waher.Networking.XMPP.P2P.EndpointSecurity)">
+            <summary>
+            Abstract base class for Elliptic Curve / AES-256 hybrid ciphers.s
+            </summary>
+            <param name="X">X-coordinate of remote public key.</param>
+            <param name="Y">Y-coordinate of remote public key.</param>
+            <param name="LocalEndpoint">Local security endpoint, if available.</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.EcAes256.PublicKey">
+            <summary>
+            Remote public key.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.EcAes256.FromNetwork(System.Byte[])">
+            <summary>
+            Converts a <see cref="T:System.Numerics.BigInteger"/> from network binary representation.
+            </summary>
+            <param name="Bin">Network binary representation</param>
+            <returns><see cref="T:System.Numerics.BigInteger"/> representation</returns>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.EcAes256.CurveName">
+            <summary>
+            Name of elliptic curve
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.EcAes256.Curve">
+            <summary>
+            Elliptic Curve
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.EcAes256.PrevCurve">
+            <summary>
+            Previous Elliptic Curve
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.EcAes256.Key">
+            <summary>
+            Shared secret, for underlying AES cipher.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.EcAes256.OldKey">
+            <summary>
+            Previous shared secret, for underlying AES cipher.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.EcAes256.Encrypt(System.String,System.String,System.String,System.String,System.Byte[])">
+            <summary>
+            Encrypts binary data
+            </summary>
+            <param name="Id">Id attribute</param>
+            <param name="Type">Type attribute</param>
+            <param name="From">From attribute</param>
+            <param name="To">To attribute</param>
+            <param name="Data">Binary data to encrypt</param>
+            <returns>Encrypted data</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.EcAes256.Decrypt(System.String,System.String,System.String,System.String,System.Byte[])">
+            <summary>
+            Decrypts binary data
+            </summary>
+            <param name="Id">Id attribute</param>
+            <param name="Type">Type attribute</param>
+            <param name="From">From attribute</param>
+            <param name="To">To attribute</param>
+            <param name="Data">Binary data to decrypt</param>
+            <returns>Decrypted data</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.EcAes256.Encrypt(System.String,System.String,System.String,System.String,System.Byte[],System.Text.StringBuilder)">
+            <summary>
+            Encrypts Binary data
+            </summary>
+            <param name="Id">Id attribute</param>
+            <param name="Type">Type attribute</param>
+            <param name="From">From attribute</param>
+            <param name="To">To attribute</param>
+            <param name="Data">Binary data to encrypt</param>
+            <param name="Xml">XML output</param>
+            <returns>If encryption was possible</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.EcAes256.ToNetwork(System.Numerics.BigInteger)">
+            <summary>
+            Converts a <see cref="T:System.Numerics.BigInteger"/> to network binary representation.
+            </summary>
+            <param name="n"><see cref="T:System.Numerics.BigInteger"/> representation</param>
+            <returns>Network binary representation</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.EcAes256.CanDecrypt(System.Xml.XmlElement)">
+            <summary>
+            If the scheme can decrypt a given XML element.
+            </summary>
+            <param name="AesElement">XML element with encrypted data.</param>
+            <returns>If the scheme can decrypt the data.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.EcAes256.Decrypt(System.String,System.String,System.String,System.String,System.Xml.XmlElement)">
+            <summary>
+            Decrypts XML data
+            </summary>
+            <param name="Id">Id attribute</param>
+            <param name="Type">Type attribute</param>
+            <param name="From">From attribute</param>
+            <param name="To">To attribute</param>
+            <param name="AesElement">XML element with encrypted data.</param>
+            <returns>Decrypted XMLs</returns>
+        </member>
+        <member name="T:Waher.Networking.XMPP.P2P.E2E.NistP192Aes">
+            <summary>
+            NIST P-192 Curve
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP192Aes.#ctor(System.Byte[],System.Byte[],Waher.Networking.XMPP.P2P.EndpointSecurity)">
+            <summary>
+            NIST P-192 Curve
+            </summary>
+            <param name="X">X-coordinate of remote public key.</param>
+            <param name="Y">Y-coordinate of remote public key.</param>
+            <param name="LocalEndpoint">Local security endpoint, if available.</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.NistP192Aes.SecurityStrength">
+            <summary>
+            Security strength of End-to-End encryption scheme.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.NistP192Aes.CurveName">
+            <summary>
+            Name of elliptic curve
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.NistP192Aes.Curve">
+            <summary>
+            Elliptic Curve
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.NistP192Aes.PrevCurve">
+            <summary>
+            Previous Elliptic Curve
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.P2P.E2E.NistP224Aes">
+            <summary>
+            NIST P-224 Curve
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP224Aes.#ctor(System.Byte[],System.Byte[],Waher.Networking.XMPP.P2P.EndpointSecurity)">
+            <summary>
+            NIST P-224 Curve
+            </summary>
+            <param name="X">X-coordinate of remote public key.</param>
+            <param name="Y">Y-coordinate of remote public key.</param>
+            <param name="LocalEndpoint">Local security endpoint, if available.</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.NistP224Aes.SecurityStrength">
+            <summary>
+            Security strength of End-to-End encryption scheme.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.NistP224Aes.CurveName">
+            <summary>
+            Name of elliptic curve
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.NistP224Aes.Curve">
+            <summary>
+            Elliptic Curve
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.NistP224Aes.PrevCurve">
+            <summary>
+            Previous Elliptic Curve
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.P2P.E2E.NistP256Aes">
+            <summary>
+            NIST P-256 Curve
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP256Aes.#ctor(System.Byte[],System.Byte[],Waher.Networking.XMPP.P2P.EndpointSecurity)">
+            <summary>
+            NIST P-256 Curve
+            </summary>
+            <param name="X">X-coordinate of remote public key.</param>
+            <param name="Y">Y-coordinate of remote public key.</param>
+            <param name="LocalEndpoint">Local security endpoint, if available.</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.NistP256Aes.SecurityStrength">
+            <summary>
+            Security strength of End-to-End encryption scheme.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.NistP256Aes.CurveName">
+            <summary>
+            Name of elliptic curve
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.NistP256Aes.Curve">
+            <summary>
+            Elliptic Curve
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.NistP256Aes.PrevCurve">
+            <summary>
+            Previous Elliptic Curve
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.P2P.E2E.NistP384Aes">
+            <summary>
+            NIST P-384 Curve
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP384Aes.#ctor(System.Byte[],System.Byte[],Waher.Networking.XMPP.P2P.EndpointSecurity)">
+            <summary>
+            NIST P-384 Curve
+            </summary>
+            <param name="X">X-coordinate of remote public key.</param>
+            <param name="Y">Y-coordinate of remote public key.</param>
+            <param name="LocalEndpoint">Local security endpoint, if available.</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.NistP384Aes.SecurityStrength">
+            <summary>
+            Security strength of End-to-End encryption scheme.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.NistP384Aes.CurveName">
+            <summary>
+            Name of elliptic curve
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.NistP384Aes.Curve">
+            <summary>
+            Elliptic Curve
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.NistP384Aes.PrevCurve">
+            <summary>
+            Previous Elliptic Curve
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.P2P.E2E.NistP521Aes">
+            <summary>
+            NIST P-521 Curve
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP521Aes.#ctor(System.Byte[],System.Byte[],Waher.Networking.XMPP.P2P.EndpointSecurity)">
+            <summary>
+            NIST P-521 Curve
+            </summary>
+            <param name="X">X-coordinate of remote public key.</param>
+            <param name="Y">Y-coordinate of remote public key.</param>
+            <param name="LocalEndpoint">Local security endpoint, if available.</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.NistP521Aes.SecurityStrength">
+            <summary>
+            Security strength of End-to-End encryption scheme.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.NistP521Aes.CurveName">
+            <summary>
+            Name of elliptic curve
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.NistP521Aes.Curve">
+            <summary>
+            Elliptic Curve
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.NistP521Aes.PrevCurve">
+            <summary>
+            Previous Elliptic Curve
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.P2P.E2E.RsaAes">
+            <summary>
+            RSA / AES-256 hybrid cipher.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaAes.#ctor(System.Int32,System.Byte[],System.Byte[],Waher.Networking.XMPP.P2P.EndpointSecurity)">
+            <summary>
+            RSA / AES-256 hybrid cipher.
+            </summary>
+            <param name="KeySize">Size of key</param>
+            <param name="Modulus">Modulus of RSA public key.</param>
+            <param name="Exponent">Exponent of RSA public key.</param>
+            <param name="LocalEndpoint">Local security endpoint, if available.</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.RsaAes.KeySize">
+            <summary>
+            Size of key
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.RsaAes.Modulus">
+            <summary>
+            Modulus of RSA public key.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.RsaAes.Exponent">
+            <summary>
+            Exponent of RSA public key.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.RsaAes.SecurityStrength">
+            <summary>
+            Security strength of End-to-End encryption scheme.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaAes.Dispose">
+            <summary>
+            <see cref="M:System.IDisposable.Dispose"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaAes.Encrypt(System.String,System.String,System.String,System.String,System.Byte[])">
+            <summary>
+            Encrypts binary data
+            </summary>
+            <param name="Id">Id attribute</param>
+            <param name="Type">Type attribute</param>
+            <param name="From">From attribute</param>
+            <param name="To">To attribute</param>
+            <param name="Data">Binary data to encrypt</param>
+            <returns>Encrypted data</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaAes.Decrypt(System.String,System.String,System.String,System.String,System.Byte[])">
+            <summary>
+            Decrypts binary data
+            </summary>
+            <param name="Id">Id attribute</param>
+            <param name="Type">Type attribute</param>
+            <param name="From">From attribute</param>
+            <param name="To">To attribute</param>
+            <param name="Data">Binary data to decrypt</param>
+            <returns>Decrypted data</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaAes.Encrypt(System.String,System.String,System.String,System.String,System.Byte[],System.Text.StringBuilder)">
+            <summary>
+            Encrypts Binary data
+            </summary>
+            <param name="Id">Id attribute</param>
+            <param name="Type">Type attribute</param>
+            <param name="From">From attribute</param>
+            <param name="To">To attribute</param>
+            <param name="Data">Binary data to encrypt</param>
+            <param name="Xml">XML output</param>
+            <returns>If encryption was possible</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaAes.CanDecrypt(System.Xml.XmlElement)">
+            <summary>
+            If the scheme can decrypt a given XML element.
+            </summary>
+            <param name="AesElement">XML element with encrypted data.</param>
+            <returns>If the scheme can decrypt the data.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaAes.Decrypt(System.String,System.String,System.String,System.String,System.Xml.XmlElement)">
+            <summary>
+            Decrypts XML data
+            </summary>
+            <param name="Id">Id attribute</param>
+            <param name="Type">Type attribute</param>
+            <param name="From">From attribute</param>
+            <param name="To">To attribute</param>
+            <param name="AesElement">XML element with encrypted data.</param>
+            <returns>Decrypted XMLs</returns>
+        </member>
+        <member name="T:Waher.Networking.XMPP.P2P.EndpointSecurity">
+            <summary>
+            Class managing end-to-end encryption.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.P2P.EndpointSecurity.IoTHarmonizationE2E">
+            <summary>
+            urn:ieee:iot:e2e:1.0
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.P2P.EndpointSecurity.IoTHarmonizationP2P">
+            <summary>
+            urn:ieee:iot:p2p:1.0
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.#ctor(Waher.Networking.XMPP.XmppClient,System.Int32)">
+            <summary>
+            Class managing end-to-end encryption.
+            </summary>
+            <param name="Client">XMPP Client</param>
+            <param name="SecurityStrength">Desired security strength.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.#ctor(Waher.Networking.XMPP.XmppClient,Waher.Networking.XMPP.P2P.XmppServerlessMessaging,System.Int32)">
+            <summary>
+            Class managing end-to-end encryption.
+            </summary>
+            <param name="Client">XMPP Client</param>
+            <param name="ServerlessMessaging">Reference to serverless messaging object.</param>
+            <param name="SecurityStrength">Desired security strength.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.Dispose">
+            <summary>
+            <see cref="M:System.IDisposable.Dispose"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.GenerateNewKey">
+            <summary>
+            Generates new local keys.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.RegisterHandlers(Waher.Networking.XMPP.XmppClient)">
+            <summary>
+            Registers XMPP stanza handlers
+            </summary>
+            <param name="Client">XMPP Client</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.UnregisterHandlers(Waher.Networking.XMPP.XmppClient)">
+            <summary>
+            Unregisters XMPP stanza handlers
+            </summary>
+            <param name="Client">XMPP Client</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.ParseE2eInfo(System.Xml.XmlElement,Waher.Networking.XMPP.P2P.EndpointSecurity)">
+            <summary>
+            Parses E2E information from XML.
+            </summary>
+            <param name="E2E">E2E element.</param>
+            <param name="LocalEndpoint">Local endpoint security object, if available.</param>
+            <returns>List of E2E keys.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.AddPeerPkiInfo(System.String,System.Xml.XmlElement)">
+            <summary>
+            Adds E2E information about a peer.
+            </summary>
+            <param name="FullJID">Full JID of peer.</param>
+            <param name="E2E">E2E information.</param>
+            <returns>If information was found and added.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.RemovePeerPkiInfo(System.String)">
+            <summary>
+            Removes E2E information about a peer.
+            </summary>
+            <param name="FullJID">Full JID of peer.</param>
+            <returns>If E2E information was found and removed.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.ContainsKey(System.String)">
+            <summary>
+            If infomation is available for a given endpoint.
+            </summary>
+            <param name="FullJid">Full JID of endpoint.</param>
+            <returns>If E2E information is available.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.GetE2eEndpoints(System.String)">
+            <summary>
+            Gets available E2E options for a given endpoint.
+            </summary>
+            <param name="FullJid">Full JID of endpoint.</param>
+            <returns>Available E2E options for endpoint.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.Encrypt(System.String,System.String,System.String,System.String,System.Byte[])">
+            <summary>
+            Encrypts binary data for transmission to an endpoint.
+            </summary>
+            <param name="Id">Id attribute</param>
+            <param name="Type">Type attribute</param>
+            <param name="From">From attribute</param>
+            <param name="To">To attribute</param>
+            <param name="Data">Binary data</param>
+            <returns>Encrypted data, or null if no E2E information is found for endpoint.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.Decrypt(System.String,System.String,System.String,System.String,System.Byte[])">
+            <summary>
+            Decrypts binary data from an endpoint.
+            </summary>
+            <param name="Id">Id attribute</param>
+            <param name="Type">Type attribute</param>
+            <param name="From">From attribute</param>
+            <param name="To">To attribute</param>
+            <param name="Data">Binary data</param>
+            <returns>Decrypted data, or null if no E2E information is found for endpoint.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.Encrypt(Waher.Networking.XMPP.XmppClient,System.String,System.String,System.String,System.String,System.String,System.Text.StringBuilder)">
+            <summary>
+            Encrypts XML data for transmission to an endpoint.
+            </summary>
+            <param name="Client">XMPP Client</param>
+            <param name="Id">Id attribute</param>
+            <param name="Type">Type attribute</param>
+            <param name="From">From attribute</param>
+            <param name="To">To attribute</param>
+            <param name="DataXml">XML data</param>
+            <param name="Xml">Output</param>
+            <returns>If E2E information was available and encryption was possible.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.SignRsa(System.Byte[])">
+            <summary>
+            Signs binary data using the local private key.
+            </summary>
+            <param name="Data">Binary data</param>
+            <returns>Signature</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.DecryptRsa(System.Byte[])">
+            <summary>
+            Decrypts a key using the local private RSA key.
+            </summary>
+            <param name="Key">Encrypted key</param>
+            <returns>Decrypted key</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.DecryptOldRsa(System.Byte[])">
+            <summary>
+            Decrypts a key using the previous local private RSA key.
+            </summary>
+            <param name="Key">Encrypted key</param>
+            <returns>Decrypted key</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.Decrypt(Waher.Networking.XMPP.XmppClient,System.String,System.String,System.String,System.String,System.Xml.XmlElement)">
+            <summary>
+            Decrypts XML data from an endpoint.
+            </summary>
+            <param name="Client">XMPP Client</param>
+            <param name="Id">Id attribute</param>
+            <param name="Type">Type attribute</param>
+            <param name="From">From attribute</param>
+            <param name="To">To attribute</param>
+            <param name="E2eElement">Encrypted XML data</param>
+            <returns>Decrypted XML.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.IqResult(System.Object,Waher.Networking.XMPP.IqResultEventArgs)">
+            <summary>
+            Response handler for E2E encrypted iq stanzas
+            </summary>
+            <param name="Sender">Sender of event</param>
+            <param name="e">Event arguments</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.SendMessage(Waher.Networking.XMPP.XmppClient,Waher.Networking.XMPP.E2ETransmission,Waher.Networking.XMPP.QoSLevel,Waher.Networking.XMPP.MessageType,System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.String,Waher.Networking.XMPP.DeliveryEventHandler,System.Object)">
+            <summary>
+            Sends an XMPP message to an endpoint.
+            </summary>
+            <param name="Client">XMPP Client</param>
+            <param name="E2ETransmission">End-to-end Encryption options</param>
+            <param name="QoS">Quality of Service options</param>
+            <param name="Type">Type attribute</param>
+            <param name="Id">Id attribute</param>
+            <param name="To">To attribute</param>
+            <param name="CustomXml">Custom XML</param>
+            <param name="Body">Message body</param>
+            <param name="Subject">Subject</param>
+            <param name="Language">Language</param>
+            <param name="ThreadId">Thread ID</param>
+            <param name="ParentThreadId">Parent Thread ID</param>
+            <param name="DeliveryCallback">Method to call when message has been delivered.</param>
+            <param name="State">State object to pass on to <paramref name="DeliveryCallback"/>.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.SendIqGet(Waher.Networking.XMPP.XmppClient,Waher.Networking.XMPP.E2ETransmission,System.String,System.String,Waher.Networking.XMPP.IqResultEventHandler,System.Object)">
+            <summary>
+            Sends an IQ Get stanza
+            </summary>
+            <param name="Client">XMPP Client</param>
+            <param name="E2ETransmission">End-to-end Encryption options</param>
+            <param name="To">To attribute</param>
+            <param name="Xml">Payload XML</param>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
+            <returns>ID of IQ stanza.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.SendIqGet(Waher.Networking.XMPP.XmppClient,Waher.Networking.XMPP.E2ETransmission,System.String,System.String,Waher.Networking.XMPP.IqResultEventHandler,System.Object,System.Int32,System.Int32)">
+            <summary>
+            Sends an IQ Get stanza
+            </summary>
+            <param name="Client">XMPP Client</param>
+            <param name="E2ETransmission">End-to-end Encryption options</param>
+            <param name="To">To attribute</param>
+            <param name="Xml">Payload XML</param>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
+            <param name="RetryTimeout">Retry Timeout, in milliseconds.</param>
+            <param name="NrRetries">Number of retries.</param>
+            <returns>ID of IQ stanza.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.SendIqGet(Waher.Networking.XMPP.XmppClient,Waher.Networking.XMPP.E2ETransmission,System.String,System.String,Waher.Networking.XMPP.IqResultEventHandler,System.Object,System.Int32,System.Int32,System.Boolean,System.Int32)">
+            <summary>
+            Sends an IQ Get stanza
+            </summary>
+            <param name="Client">XMPP Client</param>
+            <param name="E2ETransmission">End-to-end Encryption options</param>
+            <param name="To">To attribute</param>
+            <param name="Xml">Payload XML</param>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
+            <param name="RetryTimeout">Retry Timeout, in milliseconds.</param>
+            <param name="NrRetries">Number of retries.</param>
+            <param name="DropOff">If the retry timeout should be doubled between retries (true), or if the same retry timeout 
+            should be used for all retries. The retry timeout will never exceed <paramref name="MaxRetryTimeout"/>.</param>
+            <param name="MaxRetryTimeout">Maximum retry timeout. Used if <paramref name="DropOff"/> is true.</param>
+            <returns>ID of IQ stanza.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.SendIqSet(Waher.Networking.XMPP.XmppClient,Waher.Networking.XMPP.E2ETransmission,System.String,System.String,Waher.Networking.XMPP.IqResultEventHandler,System.Object)">
+            <summary>
+            Sends an IQ Set stanza
+            </summary>
+            <param name="Client">XMPP Client</param>
+            <param name="E2ETransmission">End-to-end Encryption options</param>
+            <param name="To">To attribute</param>
+            <param name="Xml">Payload XML</param>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
+            <returns>ID of IQ stanza.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.SendIqSet(Waher.Networking.XMPP.XmppClient,Waher.Networking.XMPP.E2ETransmission,System.String,System.String,Waher.Networking.XMPP.IqResultEventHandler,System.Object,System.Int32,System.Int32)">
+            <summary>
+            Sends an IQ Set stanza
+            </summary>
+            <param name="Client">XMPP Client</param>
+            <param name="E2ETransmission">End-to-end Encryption options</param>
+            <param name="To">To attribute</param>
+            <param name="Xml">Payload XML</param>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
+            <param name="RetryTimeout">Retry Timeout, in milliseconds.</param>
+            <param name="NrRetries">Number of retries.</param>
+            <returns>ID of IQ stanza.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.SendIqSet(Waher.Networking.XMPP.XmppClient,Waher.Networking.XMPP.E2ETransmission,System.String,System.String,Waher.Networking.XMPP.IqResultEventHandler,System.Object,System.Int32,System.Int32,System.Boolean,System.Int32)">
+            <summary>
+            Sends an IQ Set stanza
+            </summary>
+            <param name="Client">XMPP Client</param>
+            <param name="E2ETransmission">End-to-end Encryption options</param>
+            <param name="To">To attribute</param>
+            <param name="Xml">Payload XML</param>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
+            <param name="RetryTimeout">Retry Timeout, in milliseconds.</param>
+            <param name="NrRetries">Number of retries.</param>
+            <param name="DropOff">If the retry timeout should be doubled between retries (true), or if the same retry timeout 
+            should be used for all retries. The retry timeout will never exceed <paramref name="MaxRetryTimeout"/>.</param>
+            <param name="MaxRetryTimeout">Maximum retry timeout. Used if <paramref name="DropOff"/> is true.</param>
+            <returns>ID of IQ stanza.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.SendIqResult(Waher.Networking.XMPP.XmppClient,Waher.Networking.XMPP.E2ETransmission,System.String,System.String,System.String)">
+            <summary>
+            Sends an IQ Result stanza
+            </summary>
+            <param name="Client">XMPP Client</param>
+            <param name="E2ETransmission">End-to-end Encryption options</param>
+            <param name="Id">Id attribute</param>
+            <param name="To">To attribute</param>
+            <param name="Xml">Payload XML</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.SendIqError(Waher.Networking.XMPP.XmppClient,Waher.Networking.XMPP.E2ETransmission,System.String,System.String,System.String)">
+            <summary>
+            Sends an IQ Error stanza
+            </summary>
+            <param name="Client">XMPP Client</param>
+            <param name="E2ETransmission">End-to-end Encryption options</param>
+            <param name="Id">Id attribute</param>
+            <param name="To">To attribute</param>
+            <param name="Xml">Payload XML</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.SendIqError(Waher.Networking.XMPP.XmppClient,Waher.Networking.XMPP.E2ETransmission,System.String,System.String,System.Exception)">
+            <summary>
+            Sends an IQ Error stanza
+            </summary>
+            <param name="Client">XMPP Client</param>
+            <param name="E2ETransmission">End-to-end Encryption options</param>
+            <param name="Id">Id attribute</param>
+            <param name="To">To attribute</param>
+            <param name="ex">Exception object</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.SendIq(Waher.Networking.XMPP.XmppClient,Waher.Networking.XMPP.E2ETransmission,System.String,System.String,System.String,System.String,Waher.Networking.XMPP.IqResultEventHandler,System.Object,System.Int32,System.Int32,System.Boolean,System.Int32,System.Boolean)">
+            <summary>
+            Sends an IQ stanza
+            </summary>
+            <param name="Client">XMPP Client</param>
+            <param name="E2ETransmission">End-to-end Encryption options</param>
+            <param name="Id">Id attribute</param>
+            <param name="To">To attribute</param>
+            <param name="Xml">Payload XML</param>
+            <param name="Type">Type attribute</param>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
+            <param name="RetryTimeout">Retry Timeout, in milliseconds.</param>
+            <param name="NrRetries">Number of retries.</param>
+            <param name="DropOff">If the retry timeout should be doubled between retries (true), or if the same retry timeout 
+            should be used for all retries. The retry timeout will never exceed <paramref name="MaxRetryTimeout"/>.</param>
+            <param name="MaxRetryTimeout">Maximum retry timeout. Used if <paramref name="DropOff"/> is true.</param>
+            <param name="PkiSynchronized">If E2E information has been synchronized. If not, and a forbidden response is returned,
+            E2E information is first synchronized, and the operation retried, before conceding failure.</param>
+            <returns>ID of IQ stanza, if none provided in <paramref name="Id"/>.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.AppendE2eInfo(System.Text.StringBuilder)">
+            <summary>
+            Appends E2E information to XML.
+            </summary>
+            <param name="Xml">XML Output.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.SynchronizeE2e(System.String,Waher.Networking.XMPP.IqResultEventHandler)">
+            <summary>
+            Synchronizes End-to-End Encryption and Peer-to-Peer connectivity parameters with a remote entity.
+            </summary>
+            <param name="FullJID">Full JID of remote entity.</param>
+            <param name="Callback">Method to call when response is returned.</param>
+        </member>
+        <member name="E:Waher.Networking.XMPP.P2P.EndpointSecurity.PeerAvailable">
+            <summary>
+            Event raised whenever a peer has become available.
+            </summary>
+        </member>
+        <member name="E:Waher.Networking.XMPP.P2P.EndpointSecurity.PeerUnavailable">
+            <summary>
+            Event raised whenever a peer has become unavailable.
+            </summary>
+        </member>
+        <member name="E:Waher.Networking.XMPP.P2P.EndpointSecurity.PeerUpdated">
+            <summary>
+            Event raised whenever information about a peer has been updated.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.P2P.PeerAddressEventHandler">
+            <summary>
+            Delegate for peer address events.
+            </summary>
+            <param name="Sender">Sender of event.</param>
+            <param name="e">Event arguments.</param>
+        </member>
+        <member name="T:Waher.Networking.XMPP.P2P.PeerAddressEventArgs">
+            <summary>
+            Peer address event arguments.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.PeerAddressEventArgs.#ctor(System.String,System.String,System.Int32,System.String,System.Int32)">
+            <summary>
+            Peer address event arguments.
+            </summary>
+            <param name="FullJid">Full JID of endpoint</param>
+            <param name="ExternalIp">External IP Address</param>
+            <param name="ExternalPort">c</param>
+            <param name="LocalIp">Local IP Address</param>
+            <param name="LocalPort">Local IP Address</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.PeerAddressEventArgs.FullJID">
+            <summary>
+            Full JID of endpoint
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.PeerAddressEventArgs.ExternalIp">
+            <summary>
+            External IP Address.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.PeerAddressEventArgs.ExternalPort">
+            <summary>
+            External Port number.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.PeerAddressEventArgs.LocalIp">
+            <summary>
+            Local IP Address.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.PeerAddressEventArgs.LocalPort">
+            <summary>
+            Local Port number.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.P2P.PeerConnectionEventArgs">
+            <summary>
+            Peer connection event arguments.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.PeerConnectionEventArgs.#ctor(Waher.Networking.XMPP.XmppClient,System.Object,System.String,System.String)">
+            <summary>
+            Peer connection event arguments.
+            </summary>
+            <param name="Client">XMPP client, if aquired, or null otherwise.</param>
+            <param name="State">State object passed to the original request.</param>
+            <param name="LocalJid">JID of the local end-point.</param>
+            <param name="RemoteJid">JID of the remote end-point.</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.PeerConnectionEventArgs.Client">
+            <summary>
+            XMPP client, if aquired, or null otherwise.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.PeerConnectionEventArgs.State">
+            <summary>
+            State object passed to the original request.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.PeerConnectionEventArgs.LocalJid">
+            <summary>
+            JID of the local end-point.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.PeerConnectionEventArgs.RemoteJid">
+            <summary>
+            JID of the remote end-point.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.P2P.PeerState">
+            <summary>
+            Peer connection state.
+            </summary>
+        </member>
+        <member name="E:Waher.Networking.XMPP.P2P.PeerState.OnSent">
+            <summary>
+            Event raised when a text packet has been sent.
+            </summary>
+        </member>
+        <member name="E:Waher.Networking.XMPP.P2P.PeerState.OnReceived">
+            <summary>
+            Event raised when a text packet (XML fragment) has been received.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.PeerState.#ctor(Waher.Networking.PeerToPeer.PeerConnection,Waher.Networking.XMPP.P2P.XmppServerlessMessaging)">
+            <summary>
+            Peer connection state.
+            </summary>
+            <param name="Peer">Peer connection.</param>
+            <param name="Parent">Parent object.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.PeerState.#ctor(Waher.Networking.PeerToPeer.PeerConnection,Waher.Networking.XMPP.P2P.XmppServerlessMessaging,System.String,System.String,System.String,System.String,System.Double,Waher.Networking.XMPP.P2P.PeerConnectionEventHandler,System.Object)">
+            <summary>
+            Peer connection state.
+            </summary>
+            <param name="Peer">Peer connection.</param>
+            <param name="Parent">Parent object.</param>
+            <param name="RemoteFullJID">Remote Full JID</param>
+            <param name="StreamHeader">Stream header</param>
+            <param name="StreamFooter">Stream footer</param>
+            <param name="StreamId">Stream ID</param>
+            <param name="Version">Protocol version</param>
+            <param name="Callback">Callback method</param>
+            <param name="State">State object</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.PeerState.Peer_OnReceived(System.Object,System.Byte[])">
+            <summary>
+            Data received from a peer.
+            </summary>
+            <param name="Sender">Sender</param>
+            <param name="Packet">Binary data.</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.PeerState.State">
+            <summary>
+            Current connection state.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.PeerState.Peer">
+            <summary>
+            Peer-to-peer connection object.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.PeerState.XmppClient">
+            <summary>
+            XMPP client.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.PeerState.Parent">
+            <summary>
+            Parent object.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.PeerState.RemoteFullJid">
+            <summary>
+            Remote Full JID
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.PeerState.Close">
+            <summary>
+            CLoses the connection.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.PeerState.Send(System.String)">
+            <summary>
+            Sends a packet.
+            </summary>
+            <param name="Packet"></param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.PeerState.Send(System.String,System.EventHandler)">
+            <summary>
+            Sends a packet.
+            </summary>
+            <param name="Packet"></param>
+            <param name="Callback">Optional method to call when packet has been sent.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.PeerState.Dispose">
+            <summary>
+            <see cref="M:System.IDisposable.Dispose"/>
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.PeerState.AgeSeconds">
+            <summary>
+            Seconds since object was active.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.P2P.PeerSynchronizedEventHandler">
+            <summary>
+            Delegate for peer synchronization events.
+            </summary>
+            <param name="Sender">Sender of event.</param>
+            <param name="e">Event arguments.</param>
+        </member>
+        <member name="T:Waher.Networking.XMPP.P2P.PeerSynchronizedEventArgs">
+            <summary>
+            Event arguments for peer synchronization events.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.PeerSynchronizedEventArgs.#ctor(System.String,System.Boolean,System.Boolean)">
+            <summary>
+            Event arguments for peer synchronization events.
+            </summary>
+            <param name="FullJID">Full JID of peer.</param>
+            <param name="HasE2E">If End-to-End encryption information was found in presence stanza.</param>
+            <param name="HasP2P">If Peer-to-peer address information was found in presence stanza.</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.PeerSynchronizedEventArgs.FullJID">
+            <summary>
+            Full JID of peer.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.PeerSynchronizedEventArgs.HasE2E">
+            <summary>
+            If End-to-End encryption information was found in presence stanza.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.PeerSynchronizedEventArgs.HasP2P">
+            <summary>
+            If Peer-to-peer address information was found in presence stanza.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.P2P.ResynchEventHandler">
+            <summary>
+            Resynchronization event handler delegate.
+            </summary>
+            <param name="Sender">Sender of event.</param>
+            <param name="e">Event arguments.</param>
+        </member>
+        <member name="T:Waher.Networking.XMPP.P2P.ResynchEventArgs">
+            <summary>
+            Peer connection event arguments.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.ResynchEventArgs.#ctor(System.String,Waher.Networking.XMPP.P2P.ResynchEventHandler)">
+            <summary>
+            Peer connection event arguments.
+            </summary>
+            <param name="RemoteFullJid">Remote Full JID.</param>
+            <param name="Callback">Callback method.</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.ResynchEventArgs.RemoteFullJid">
+            <summary>
+            JID of the remote end-point.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.ResynchEventArgs.Ok">
+            <summary>
+            If the synchronization method succeeded (true) or failed (false).
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.ResynchEventArgs.Done(System.Boolean)">
+            <summary>
+            Method called by callback, to report that the synchronization succeeded (<paramref name="Ok"/>=true), or
+            failed (<paramref name="Ok"/>=false).
+            </summary>
+            <param name="Ok">If the synchronization method succeeded (true) or failed (false).</param>
+        </member>
+        <member name="T:Waher.Networking.XMPP.P2P.SOCKS5.DataReceivedEventHandler">
+            <summary>
+            Delegate for data reception events.
+            </summary>
+            <param name="Sender">Sender of event.</param>
+            <param name="e">Event arguments.</param>
+        </member>
+        <member name="T:Waher.Networking.XMPP.P2P.SOCKS5.DataReceivedEventArgs">
+            <summary>
+            Event arguments for data reception events.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.SOCKS5.DataReceivedEventArgs.#ctor(System.Byte[],Waher.Networking.XMPP.P2P.SOCKS5.Socks5Client,System.Object)">
+            <summary>
+            Event arguments for data reception events.
+            </summary>
+            <param name="Data">Data received.</param>
+            <param name="Stream">SOCKS5 client stream.</param>
+            <param name="State">State</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.SOCKS5.DataReceivedEventArgs.Data">
+            <summary>
+            Data received.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.SOCKS5.DataReceivedEventArgs.Stream">
+            <summary>
+            SOCKS5 client stream.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.SOCKS5.DataReceivedEventArgs.State">
+            <summary>
+            State object.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.P2P.SOCKS5.OutgoingStream">
+            <summary>
+            Class managing the transmission of a SOCKS5 bytestream.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.SOCKS5.OutgoingStream.#ctor(Waher.Networking.XMPP.XmppClient,System.String,System.String,System.String,System.Int32,Waher.Networking.XMPP.IEndToEndEncryption)">
+            <summary>
+            Class managing the transmission of a SOCKS5 bytestream.
+            </summary>
+            <param name="Client">XMPP client.</param>
+            <param name="StreamId">Stream ID.</param>
+            <param name="From">From</param>
+            <param name="To">To</param>
+            <param name="BlockSize">Block size</param>
+            <param name="E2E">End-to-end encryption, if used.</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.SOCKS5.OutgoingStream.StreamId">
+            <summary>
+            Stream ID
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.SOCKS5.OutgoingStream.From">
+            <summary>
+            Sender of stream.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.SOCKS5.OutgoingStream.To">
+            <summary>
+            Recipient of stream.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.SOCKS5.OutgoingStream.BlockSize">
+            <summary>
+            Block Size
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.SOCKS5.OutgoingStream.Aborted">
+            <summary>
+            If the stream has been aborted.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.SOCKS5.OutgoingStream.State">
+            <summary>
+            State object.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.SOCKS5.OutgoingStream.Dispose">
+            <summary>
+            Disposes allocated resources.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.SOCKS5.OutgoingStream.Write(System.Byte[])">
+            <summary>
+            Writes data to the stram.
+            </summary>
+            <param name="Data">Data</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.SOCKS5.OutgoingStream.Write(System.Byte[],System.Int32,System.Int32)">
+            <summary>
+            Writes data to the stram.
+            </summary>
+            <param name="Data">Data</param>
+            <param name="Offset">Offset into array where writing is to start.</param>
+            <param name="Count">Number of bytes to start.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.SOCKS5.OutgoingStream.Opened(Waher.Networking.XMPP.P2P.SOCKS5.Socks5Client)">
+            <summary>
+            Opens the output.
+            </summary>
+            <param name="Client">SOCKS5 client with established connection.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.SOCKS5.OutgoingStream.Close">
+            <summary>
+            Closes the session.
+            </summary>
+        </member>
+        <member name="E:Waher.Networking.XMPP.P2P.SOCKS5.OutgoingStream.OnAbort">
+            <summary>
+            Event raised when stream is aborted.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.P2P.SOCKS5.Command">
+            <summary>
+            SOCKS5 command.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.P2P.SOCKS5.Command.CONNECT">
+            <summary>
+            CONNECT command (1)
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.P2P.SOCKS5.Command.BIND">
+            <summary>
+            BIND command (2)
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.P2P.SOCKS5.Command.UDP_ASSOCIATE">
+            <summary>
+            UDP_ASSOCIATE command (3)
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.P2P.SOCKS5.ResponseEventHandler">
+            <summary>
+            Delegate for SOCKS5 response events.
+            </summary>
+            <param name="Sender">Sender of event.</param>
+            <param name="e">Event arguments.</param>
+        </member>
+        <member name="T:Waher.Networking.XMPP.P2P.SOCKS5.ResponseEventArgs">
+            <summary>
+            Event arguments for SOCKS5 responses.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.SOCKS5.ResponseEventArgs.#ctor(System.Byte,System.Net.IPAddress,System.String,System.Int32)">
+            <summary>
+            Event arguments for SOCKS5 responses.
+            </summary>
+            <param name="ResponseCode">Response code.</param>
+            <param name="IpAddress">IP Address, if applicable, or null otherwise.</param>
+            <param name="DomainName">Domain Name, if applicable, or null otherwise.</param>
+            <param name="Port">Port number.</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.SOCKS5.ResponseEventArgs.Ok">
+            <summary>
+            If response is OK.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.SOCKS5.ResponseEventArgs.IpAddress">
+            <summary>
+            IP Address, or null if destination address is a domain name.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.SOCKS5.ResponseEventArgs.DomainName">
+            <summary>
+            Domain Name, or null if destiation address is an IP address.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.SOCKS5.ResponseEventArgs.PortNumber">
+            <summary>
+            Port Number.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.P2P.SOCKS5.Socks5State">
+            <summary>
+            SOCKS5 connection state.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.P2P.SOCKS5.Socks5State.Offline">
+            <summary>
+            Offline
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.P2P.SOCKS5.Socks5State.Connecting">
+            <summary>
+            Connecting
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.P2P.SOCKS5.Socks5State.Initializing">
+            <summary>
+            Initializing
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.P2P.SOCKS5.Socks5State.Authenticating">
+            <summary>
+            Authenticating
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.P2P.SOCKS5.Socks5State.Authenticated">
+            <summary>
+            Authenticated
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.P2P.SOCKS5.Socks5State.Connected">
+            <summary>
+            Connected
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.P2P.SOCKS5.Socks5State.Error">
+            <summary>
+            Error state
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.P2P.SOCKS5.Socks5Client">
+            <summary>
+            Client used for SOCKS5 communication.
+            
+            SOCKS5 is defined in RFC 1928.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.SOCKS5.Socks5Client.#ctor(System.String,System.Int32,System.String,Waher.Networking.Sniffers.ISniffer[])">
+            <summary>
+            Client used for SOCKS5 communication.
+            </summary>
+            <param name="Host">Host of SOCKS5 stream host.</param>
+            <param name="Port">Port of SOCKS5 stream host.</param>
+            <param name="JID">JID of SOCKS5 stream host.</param>
+            <param name="Sniffers">Optional set of sniffers.</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.SOCKS5.Socks5Client.State">
+            <summary>
+            Current state.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.SOCKS5.Socks5Client.Tag">
+            <summary>
+            Tag
+            </summary>
+        </member>
+        <member name="E:Waher.Networking.XMPP.P2P.SOCKS5.Socks5Client.OnStateChange">
+            <summary>
+            Event raised whenever the state changes.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.SOCKS5.Socks5Client.Host">
+            <summary>
+            Host of SOCKS5 stream host.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.SOCKS5.Socks5Client.Port">
+            <summary>
+            Port of SOCKS5 stream host.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.SOCKS5.Socks5Client.JID">
+            <summary>
+            JID of SOCKS5 stream host.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.SOCKS5.Socks5Client.Dispose">
+            <summary>
+            <see cref="M:System.IDisposable.Dispose"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.SOCKS5.Socks5Client.Send(System.Byte[])">
+            <summary>
+            Send binary data.
+            </summary>
+            <param name="Data">Data</param>
+        </member>
+        <member name="E:Waher.Networking.XMPP.P2P.SOCKS5.Socks5Client.OnWriteQueueEmpty">
+            <summary>
+            Event raised when the write queue is empty.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.SOCKS5.Socks5Client.CloseWhenDone">
+            <summary>
+            Closes the stream when all bytes have been sent.
+            </summary>
+        </member>
+        <member name="E:Waher.Networking.XMPP.P2P.SOCKS5.Socks5Client.OnResponse">
+            <summary>
+            Event raised when a response has been returned.
+            </summary>
+        </member>
+        <member name="E:Waher.Networking.XMPP.P2P.SOCKS5.Socks5Client.OnDataReceived">
+            <summary>
+            Event raised when binary data has been received over an established connection.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.SOCKS5.Socks5Client.CONNECT(System.Net.IPAddress,System.Int32)">
+            <summary>
+            Connects to the target.
+            </summary>
+            <param name="DestinationAddress">Destination Address. Must be a IPv4 or IPv6 address.</param>
+            <param name="Port">Port number.</param>
+            <exception cref="T:System.IO.IOException">If client not connected (yet).</exception>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.SOCKS5.Socks5Client.CONNECT(System.String,System.Int32)">
+            <summary>
+            Connects to the target.
+            </summary>
+            <param name="DestinationDomainName">Destination Domain Name.</param>
+            <param name="Port">Port number.</param>
+            <exception cref="T:System.IO.IOException">If client not connected (yet).</exception>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.SOCKS5.Socks5Client.CONNECT(System.String,System.String,System.String)">
+            <summary>
+            XMPP-specific SOCKS5 connection, as described in XEP-0065:
+            https://xmpp.org/extensions/xep-0065.html
+            </summary>
+            <param name="StreamID">Stream ID</param>
+            <param name="RequesterJID">Requester JID</param>
+            <param name="TargetJID">Target JID</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.SOCKS5.Socks5Client.BIND(System.Net.IPAddress,System.Int32)">
+            <summary>
+            Binds to the target.
+            </summary>
+            <param name="DestinationAddress">Destination Address. Must be a IPv4 or IPv6 address.</param>
+            <param name="Port">Port number.</param>
+            <exception cref="T:System.IO.IOException">If client not connected (yet).</exception>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.SOCKS5.Socks5Client.BIND(System.String,System.Int32)">
+            <summary>
+            Binds to the target.
+            </summary>
+            <param name="DestinationDomainName">Destination Domain Name.</param>
+            <param name="Port">Port number.</param>
+            <exception cref="T:System.IO.IOException">If client not connected (yet).</exception>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.SOCKS5.Socks5Client.UDP_ASSOCIATE(System.Net.IPAddress,System.Int32)">
+            <summary>
+            Establish an association within the UDP relay process.
+            </summary>
+            <param name="DestinationAddress">Destination Address. Must be a IPv4 or IPv6 address.</param>
+            <param name="Port">Port number.</param>
+            <exception cref="T:System.IO.IOException">If client not connected (yet).</exception>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.SOCKS5.Socks5Client.UDP_ASSOCIATE(System.String,System.Int32)">
+            <summary>
+            Establish an association within the UDP relay process.
+            </summary>
+            <param name="DestinationDomainName">Destination Domain Name.</param>
+            <param name="Port">Port number.</param>
+            <exception cref="T:System.IO.IOException">If client not connected (yet).</exception>
+        </member>
+        <member name="T:Waher.Networking.XMPP.P2P.SOCKS5.Socks5Proxy">
+            <summary>
+            Class managing a SOCKS5 proxy associated with the current XMPP server.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.P2P.SOCKS5.Socks5Proxy.Namespace">
+            <summary>
+            http://jabber.org/protocol/bytestreams
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.SOCKS5.Socks5Proxy.#ctor(Waher.Networking.XMPP.XmppClient)">
+            <summary>
+            Class managing a SOCKS5 proxy associated with the current XMPP server.
+            </summary>
+            <param name="Client">XMPP Client.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.SOCKS5.Socks5Proxy.#ctor(Waher.Networking.XMPP.XmppClient,Waher.Networking.XMPP.IEndToEndEncryption)">
+            <summary>
+            Class managing a SOCKS5 proxy associated with the current XMPP server.
+            </summary>
+            <param name="Client">XMPP Client.</param>
+            <param name="E2E">End-to-end encryption interface.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.SOCKS5.Socks5Proxy.Dispose">
+            <summary>
+            <see cref="M:System.IDisposable.Dispose"/>
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.SOCKS5.Socks5Proxy.Extensions">
+            <summary>
+            Implemented extensions.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.SOCKS5.Socks5Proxy.HasProxy">
+            <summary>
+            If a SOCKS5 proxy has been detected.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.SOCKS5.Socks5Proxy.JID">
+            <summary>
+            JID of SOCKS5 proxy.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.SOCKS5.Socks5Proxy.Host">
+            <summary>
+            Host name or IP address of SOCKS5 proxy.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.SOCKS5.Socks5Proxy.Port">
+            <summary>
+            Port number of SOCKS5 proxy.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.SOCKS5.Socks5Proxy.StartSearch(System.EventHandler)">
+            <summary>
+            Starts the search of SOCKS5 proxies.
+            </summary>
+            <param name="Callback">Method to call when search is complete. Properties on this object will have been updated.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.SOCKS5.Socks5Proxy.Use(System.String,System.Int32,System.String)">
+            <summary>
+            Sets the SOCKS5 proxy to use. This method can be called, if searching for a SOCKS5 proxy is not desired, or does not
+            find a proxy.
+            </summary>
+            <param name="Host">SOCKS5 host name.</param>
+            <param name="Port">Port number.</param>
+            <param name="JID">JID of stream host.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.SOCKS5.Socks5Proxy.InitiateSession(System.String,Waher.Networking.XMPP.P2P.SOCKS5.StreamEventHandler,System.Object)">
+            <summary>
+            Initiates a mediated SOCKS5 session with another.
+            </summary>
+            <param name="DestinationJid">JID of destination.</param>
+            <param name="Callback">Method to call when initiation attempt completes.</param>
+            <param name="State">State object to pass on to callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.SOCKS5.Socks5Proxy.InitiateSession(System.String,System.String,Waher.Networking.XMPP.P2P.SOCKS5.StreamEventHandler,System.Object)">
+            <summary>
+            Initiates a mediated SOCKS5 session with another.
+            </summary>
+            <param name="DestinationJid">JID of destination.</param>
+            <param name="StreamId">Stream ID to use.</param>
+            <param name="Callback">Method to call when initiation attempt completes.</param>
+            <param name="State">State object to pass on to callback method.</param>
+        </member>
+        <member name="E:Waher.Networking.XMPP.P2P.SOCKS5.Socks5Proxy.OnOpen">
+            <summary>
+            Event raised when a remote entity tries to open a SOCKS5 bytestream for transmission of data to/from the client.
+            A stream has to be accepted before data can be successfully received.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.P2P.SOCKS5.StreamEventHandler">
+            <summary>
+            Delegate for stream callback methods.
+            </summary>
+            <param name="Sender">Sender of event.</param>
+            <param name="e">Event arguments.</param>
+        </member>
+        <member name="T:Waher.Networking.XMPP.P2P.SOCKS5.StreamEventArgs">
+            <summary>
+            Event arguments for stream callbacks.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.SOCKS5.StreamEventArgs.#ctor(System.Boolean,Waher.Networking.XMPP.P2P.SOCKS5.Socks5Client,System.Object)">
+            <summary>
+            Event arguments for stream callbacks.
+            </summary>
+            <param name="Ok">If request was successful.</param>
+            <param name="Stream">Stream object.</param>
+            <param name="State">State object.</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.SOCKS5.StreamEventArgs.Ok">
+            <summary>
+            If request was successful.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.SOCKS5.StreamEventArgs.Stream">
+            <summary>
+            Stream object.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.SOCKS5.StreamEventArgs.State">
+            <summary>
+            State object.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.P2P.SOCKS5.ValidateStreamEventHandler">
+            <summary>
+            Delegate for stream validation events.
+            </summary>
+            <param name="Sender">Sender of event.</param>
+            <param name="e">Event arguments.</param>
+        </member>
+        <member name="T:Waher.Networking.XMPP.P2P.SOCKS5.ValidateStreamEventArgs">
+            <summary>
+            Event argument for stream validation events.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.SOCKS5.ValidateStreamEventArgs.StreamId">
+            <summary>
+            Stream ID
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.SOCKS5.ValidateStreamEventArgs.AcceptStream(Waher.Networking.XMPP.P2P.SOCKS5.DataReceivedEventHandler,Waher.Networking.XMPP.P2P.SOCKS5.StreamEventHandler,System.Object)">
+            <summary>
+            Call this method to accept the incoming stream.
+            </summary>
+            <param name="DataCallback">Method called when data has been received.</param>
+            <param name="CloseCallback">Method called when stream has been closed.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+            <returns>If the stream acceptance was completed (true), or if somebody else accepted the stream beforehand (false).</returns>
+        </member>
+        <member name="T:Waher.Networking.XMPP.P2P.PeerConnectionEventHandler">
+            <summary>
+            Event handler for peer connection callbacks.
+            </summary>
+            <param name="Sender">Sender of event.</param>
+            <param name="e">Event arguments.</param>
+        </member>
+        <member name="T:Waher.Networking.XMPP.P2P.XmppServerlessMessaging">
+            <summary>
+            Class managing peer-to-peer serveless XMPP communication.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.XmppServerlessMessaging.#ctor(System.String,System.String,Waher.Networking.Sniffers.ISniffer[])">
+            <summary>
+            Class managing peer-to-peer serveless XMPP communication.
+            </summary>
+            <param name="ApplicationName">Name of application, as it will be registered in Internet Gateways.</param>
+            <param name="FullJid">Bare JID of local end-point.</param>
+            <param name="Sniffers">Sniffers</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.XmppServerlessMessaging.#ctor(System.String,System.String,System.Int32,System.Int32,Waher.Networking.Sniffers.ISniffer[])">
+            <summary>
+            Class managing peer-to-peer serveless XMPP communication.
+            </summary>
+            <param name="ApplicationName">Name of application, as it will be registered in Internet Gateways.</param>
+            <param name="FullJid">Bare JID of local end-point.</param>
+            <param name="LocalPort">Desired local port number. If 0, a dynamic port number will be assigned.</param>
+            <param name="ExternalPort">Desired external port number. If 0, a dynamic port number will be assigned.</param>
+            <param name="Sniffers">Sniffers</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.XmppServerlessMessaging.#ctor(System.String,System.String,System.Int32,System.Int32,System.Int32,Waher.Networking.Sniffers.ISniffer[])">
+            <summary>
+            Class managing peer-to-peer serveless XMPP communication.
+            </summary>
+            <param name="ApplicationName">Name of application, as it will be registered in Internet Gateways.</param>
+            <param name="FullJid">Bare JID of local end-point.</param>
+            <param name="LocalPort">Desired local port number. If 0, a dynamic port number will be assigned.</param>
+            <param name="ExternalPort">Desired external port number. If 0, a dynamic port number will be assigned.</param>
+            <param name="Backlog">Connection backlog.</param>
+            <param name="Sniffers">Sniffers</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.XmppServerlessMessaging.Network">
+            <summary>
+            Peer-to-peer network.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.XmppServerlessMessaging.FullJid">
+            <summary>
+            Full JID
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.XmppServerlessMessaging.RemovePeerAddresses(System.String)">
+            <summary>
+            Removes a JID from the recognized set of JIDs.
+            </summary>
+            <param name="FullJID">Full JID.</param>
+        </member>
+        <member name="E:Waher.Networking.XMPP.P2P.XmppServerlessMessaging.PeerAddressRemoved">
+            <summary>
+            Event raised when address information about a peer has been removed.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.XmppServerlessMessaging.ReportPeerAddresses(System.String,System.String,System.Int32,System.String,System.Int32)">
+            <summary>
+            Reports recognized peer addresses.
+            </summary>
+            <param name="FullJID">XMPP Address (full JID).</param>
+            <param name="ExternalIp">External IP address.</param>
+            <param name="ExternalPort">External Port number.</param>
+            <param name="LocalIp">Local IP address.</param>
+            <param name="LocalPort">Local Port number.</param>
+        </member>
+        <member name="E:Waher.Networking.XMPP.P2P.XmppServerlessMessaging.PeerAddressReceived">
+            <summary>
+            Event raised when address information about a peer has been received.
+            </summary>
+        </member>
+        <member name="E:Waher.Networking.XMPP.P2P.XmppServerlessMessaging.OnNewXmppClient">
+            <summary>
+            Event raised when a new XMPP client has been created.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.XmppServerlessMessaging.GetPeerConnection(System.String,Waher.Networking.XMPP.P2P.PeerConnectionEventHandler,System.Object)">
+            <summary>
+            Gets a peer XMPP connection.
+            </summary>
+            <param name="FullJID">Bare JID of peer to connect to.</param>
+            <param name="Callback">Method to call when connection is established.</param>
+            <param name="State">State object to pass on to callback method.</param>
+        </member>
+        <member name="E:Waher.Networking.XMPP.P2P.XmppServerlessMessaging.OnResynch">
+            <summary>
+            Event raised when the peer-to-peer connection parameters need to be updated for a given remote JID.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.XmppServerlessMessaging.CanConnectToPeer(System.String)">
+            <summary>
+            If it is possible to connect directly to a given peer, given it's bare JID.
+            </summary>
+            <param name="FullJID">Full JID.</param>
+            <returns>If it is possible to connect directly to the peer.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.XmppServerlessMessaging.TryGetAddressInfo(System.String,Waher.Networking.XMPP.P2P.AddressInfo@)">
+            <summary>
+            Gets peer-to-peer address information
+            </summary>
+            <param name="FullJID">Full JID</param>
+            <param name="Address">IP address information</param>
+            <returns></returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.XmppServerlessMessaging.Dispose">
+            <summary>
+            <see cref="M:System.IDisposable.Dispose"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.XmppServerlessMessaging.AppendP2pInfo(System.Text.StringBuilder)">
+            <summary>
+            Appends P2P information to XML.
+            </summary>
+            <param name="Xml">XML Output.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.XmppServerlessMessaging.AddPeerAddressInfo(System.String,System.Xml.XmlElement)">
+            <summary>
+            Adds P2P address information about a peer.
+            </summary>
+            <param name="FullJID">Full JID of peer.</param>
+            <param name="P2P">P2P address information.</param>
+            <returns>If information was found and added.</returns>
+        </member>
+    </members>
+</doc>

@@ -2,12 +2,11 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
+using System.Text;
 using System.Xml;
-using Waher.Content;
 using Waher.Events;
 using Waher.Networking.Sniffers;
 using Waher.Networking.PeerToPeer;
-using System.Collections;
 
 namespace Waher.Networking.XMPP.P2P
 {
@@ -136,7 +135,25 @@ namespace Waher.Networking.XMPP.P2P
 			}
 
 			this.Information("Removing JID from set of recognized JIDs: " + FullJID);
+
+			PeerAddressEventHandler h = this.PeerAddressRemoved;
+			if (h != null)
+			{
+				try
+				{
+					h(this, new PeerAddressEventArgs(FullJID, string.Empty, 0, string.Empty, 0));
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			}
 		}
+
+		/// <summary>
+		/// Event raised when address information about a peer has been removed.
+		/// </summary>
+		public event PeerAddressEventHandler PeerAddressRemoved = null;
 
 		/// <summary>
 		/// Reports recognized peer addresses.
@@ -210,7 +227,25 @@ namespace Waher.Networking.XMPP.P2P
 
 			this.Information("P2P information available for " + FullJID + ". External: " + ExternalIp + ":" + ExternalPort.ToString() +
 				", Local: " + LocalIp + ":" + LocalPort.ToString());
+
+			PeerAddressEventHandler h = this.PeerAddressReceived;
+			if (h != null)
+			{
+				try
+				{
+					h(this, new PeerAddressEventArgs(FullJID, ExternalIp, ExternalPort, LocalIp, LocalPort));
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			}
 		}
+
+		/// <summary>
+		/// Event raised when address information about a peer has been received.
+		/// </summary>
+		public event PeerAddressEventHandler PeerAddressReceived = null;
 
 		internal void AuthenticatePeer(PeerConnection Peer, string FullJID)
 		{
@@ -593,6 +628,84 @@ namespace Waher.Networking.XMPP.P2P
 					State.ClearCallbacks();
 					State.Close();
 				}
+			}
+		}
+
+		/// <summary>
+		/// Appends P2P information to XML.
+		/// </summary>
+		/// <param name="Xml">XML Output.</param>
+		public void AppendP2pInfo(StringBuilder Xml)
+		{
+			if (this.p2pNetwork != null && this.p2pNetwork.State == PeerToPeerNetworkState.Ready)
+			{
+				Xml.Append("<p2p xmlns='");
+				Xml.Append(EndpointSecurity.IoTHarmonizationP2P);
+				Xml.Append("' extIp='");
+				Xml.Append(this.p2pNetwork.ExternalAddress.ToString());
+				Xml.Append("' extPort='");
+				Xml.Append(this.p2pNetwork.ExternalEndpoint.Port.ToString());
+				Xml.Append("' locIp='");
+				Xml.Append(this.p2pNetwork.LocalAddress.ToString());
+				Xml.Append("' locPort='");
+				Xml.Append(this.p2pNetwork.LocalEndpoint.Port.ToString());
+				Xml.Append("'/>");
+			}
+		}
+
+		/// <summary>
+		/// Adds P2P address information about a peer.
+		/// </summary>
+		/// <param name="FullJID">Full JID of peer.</param>
+		/// <param name="P2P">P2P address information.</param>
+		/// <returns>If information was found and added.</returns>
+		public bool AddPeerAddressInfo(string FullJID, XmlElement P2P)
+		{
+			string ExtIp = null;
+			int? ExtPort = null;
+			string LocIp = null;
+			int? LocPort = null;
+
+			if (P2P != null)
+			{
+				foreach (XmlAttribute Attr in P2P.Attributes)
+				{
+					switch (Attr.Name)
+					{
+						case "extIp":
+							ExtIp = Attr.Value;
+							break;
+
+						case "extPort":
+							if (int.TryParse(Attr.Value, out int i) && i >= 0 && i < 65536)
+								ExtPort = i;
+							else
+								return false;
+							break;
+
+						case "locIp":
+							LocIp = Attr.Value;
+							break;
+
+						case "locPort":
+							if (int.TryParse(Attr.Value, out i) && i >= 0 && i < 65536)
+								LocPort = i;
+							else
+								return false;
+							break;
+					}
+				}
+			}
+
+			if (ExtIp != null && ExtPort.HasValue && LocIp != null && LocPort.HasValue)
+			{
+				this.ReportPeerAddresses(FullJID, ExtIp, ExtPort.Value, LocIp, LocPort.Value);
+				return true;
+			}
+			else
+			{
+				this.RemovePeerAddresses(FullJID);
+				return false;
 			}
 		}
 

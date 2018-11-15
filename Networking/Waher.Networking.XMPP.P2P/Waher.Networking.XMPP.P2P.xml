@@ -621,13 +621,21 @@
             </summary>
             <param name="Client">XMPP Client</param>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.ParseE2eInfo(System.Xml.XmlElement,Waher.Networking.XMPP.P2P.EndpointSecurity)">
+        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.ParseE2eKeys(System.Xml.XmlElement,Waher.Networking.XMPP.P2P.EndpointSecurity)">
             <summary>
-            Parses E2E information from XML.
+            Parses a set of E2E keys from XML.
             </summary>
             <param name="E2E">E2E element.</param>
             <param name="LocalEndpoint">Local endpoint security object, if available.</param>
             <returns>List of E2E keys.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.ParseE2eKey(System.Xml.XmlElement,Waher.Networking.XMPP.P2P.EndpointSecurity)">
+            <summary>
+            Parses a single E2E key from XML.
+            </summary>
+            <param name="E">E2E element.</param>
+            <param name="LocalEndpoint">Local endpoint security object, if available.</param>
+            <returns>E2E keys, if recognized, or null if not.</returns>
         </member>
         <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.AddPeerPkiInfo(System.String,System.Xml.XmlElement)">
             <summary>

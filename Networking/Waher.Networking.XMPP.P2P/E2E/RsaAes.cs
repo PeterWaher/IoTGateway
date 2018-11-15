@@ -233,7 +233,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
 
 			lock (this.rsa)
 			{
-				if (!this.rsa.VerifyData(Decrypted, Signature, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1))
+				if (!this.rsa.VerifyData(Decrypted, Signature, HashAlgorithmName.SHA256, RSASignaturePadding.Pss))
 					return null;
 			}
 
@@ -318,7 +318,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
 				{
 					lock (this.rsa)
 					{
-						if (!this.rsa.VerifyData(Decrypted, Signature, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1))
+						if (!this.rsa.VerifyData(Decrypted, Signature, HashAlgorithmName.SHA256, RSASignaturePadding.Pss))
 							Decrypted = null;
 					}
 				}
@@ -342,7 +342,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
 
 						lock (this.rsa)
 						{
-							if (!this.rsa.VerifyData(Decrypted, Signature, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1))
+							if (!this.rsa.VerifyData(Decrypted, Signature, HashAlgorithmName.SHA256, RSASignaturePadding.Pss))
 								return null;
 						}
 					}

@@ -89,10 +89,14 @@ namespace Waher.Networking.XMPP.P2P
 				throw new ArgumentException("Key strength too high.", nameof(SecurityStrength));
 
 			this.GenerateNewKey();
-			this.RegisterHandlers(this.client);
 
-			this.client.OnStateChanged += Client_OnStateChanged;
-			this.client.OnPresence += Client_OnPresence;
+			if (this.client != null)
+			{
+				this.RegisterHandlers(this.client);
+
+				this.client.OnStateChanged += Client_OnStateChanged;
+				this.client.OnPresence += Client_OnPresence;
+			}
 		}
 
 		/// <summary>
@@ -175,10 +179,10 @@ namespace Waher.Networking.XMPP.P2P
 		/// <param name="Client">XMPP Client</param>
 		public virtual void RegisterHandlers(XmppClient Client)
 		{
-			Client.RegisterMessageHandler("aes", EndpointSecurity.IoTHarmonizationE2E, this.AesMessageHandler, false);
-			Client.RegisterIqGetHandler("aes", EndpointSecurity.IoTHarmonizationE2E, this.AesIqGetHandler, false);
-			Client.RegisterIqSetHandler("aes", EndpointSecurity.IoTHarmonizationE2E, this.AesIqSetHandler, false);
-			Client.RegisterIqSetHandler("synchE2e", EndpointSecurity.IoTHarmonizationE2E, this.SynchE2eHandler, false);
+			Client?.RegisterMessageHandler("aes", EndpointSecurity.IoTHarmonizationE2E, this.AesMessageHandler, false);
+			Client?.RegisterIqGetHandler("aes", EndpointSecurity.IoTHarmonizationE2E, this.AesIqGetHandler, false);
+			Client?.RegisterIqSetHandler("aes", EndpointSecurity.IoTHarmonizationE2E, this.AesIqSetHandler, false);
+			Client?.RegisterIqSetHandler("synchE2e", EndpointSecurity.IoTHarmonizationE2E, this.SynchE2eHandler, false);
 		}
 
 		/// <summary>
@@ -187,119 +191,122 @@ namespace Waher.Networking.XMPP.P2P
 		/// <param name="Client">XMPP Client</param>
 		public virtual void UnregisterHandlers(XmppClient Client)
 		{
-			Client.UnregisterMessageHandler("aes", EndpointSecurity.IoTHarmonizationE2E, this.AesMessageHandler, false);
-			Client.UnregisterIqGetHandler("aes", EndpointSecurity.IoTHarmonizationE2E, this.AesIqGetHandler, false);
-			Client.UnregisterIqSetHandler("aes", EndpointSecurity.IoTHarmonizationE2E, this.AesIqSetHandler, false);
-			Client.UnregisterIqSetHandler("synchE2e", EndpointSecurity.IoTHarmonizationE2E, this.SynchE2eHandler, false);
+			Client?.UnregisterMessageHandler("aes", EndpointSecurity.IoTHarmonizationE2E, this.AesMessageHandler, false);
+			Client?.UnregisterIqGetHandler("aes", EndpointSecurity.IoTHarmonizationE2E, this.AesIqGetHandler, false);
+			Client?.UnregisterIqSetHandler("aes", EndpointSecurity.IoTHarmonizationE2E, this.AesIqSetHandler, false);
+			Client?.UnregisterIqSetHandler("synchE2e", EndpointSecurity.IoTHarmonizationE2E, this.SynchE2eHandler, false);
 		}
 
 		/// <summary>
-		/// Parses E2E information from XML.
+		/// Parses a set of E2E keys from XML.
 		/// </summary>
 		/// <param name="E2E">E2E element.</param>
 		/// <param name="LocalEndpoint">Local endpoint security object, if available.</param>
 		/// <returns>List of E2E keys.</returns>
-		public static List<E2eEndpoint> ParseE2eInfo(XmlElement E2E, EndpointSecurity LocalEndpoint)
+		public static List<E2eEndpoint> ParseE2eKeys(XmlElement E2E, EndpointSecurity LocalEndpoint)
 		{
 			List<E2eEndpoint> Endpoints = null;
 
 			foreach (XmlNode N in E2E.ChildNodes)
 			{
-				if (N is XmlElement E && E.NamespaceURI == IoTHarmonizationE2E)
+				if (N is XmlElement E)
 				{
-					switch (E.LocalName)
+					E2eEndpoint Endpoint = ParseE2eKey(E, LocalEndpoint);
+
+					if (Endpoint != null)
 					{
-						case "rsaAes":
-							int? KeySize = null;
-							byte[] Modulus = null;
-							byte[] Exponent = null;
+						if (Endpoints == null)
+							Endpoints = new List<E2eEndpoint>();
 
-							foreach (XmlAttribute Attr in E.Attributes)
-							{
-								switch (Attr.Name)
-								{
-									case "size":
-										if (int.TryParse(Attr.Value, out int i))
-											KeySize = i;
-										else
-											return null;
-										break;
-
-									case "mod":
-										Modulus = Convert.FromBase64String(Attr.Value);
-										break;
-
-									case "exp":
-										Exponent = Convert.FromBase64String(Attr.Value);
-										break;
-								}
-							}
-
-							if (KeySize.HasValue && Modulus != null && Exponent != null)
-							{
-								if (Endpoints == null)
-									Endpoints = new List<E2eEndpoint>();
-
-								Endpoints.Add(new RsaAes(KeySize.Value, Modulus, Exponent, LocalEndpoint));
-							}
-							break;
-
-						case "p192Aes":
-						case "p224Aes":
-						case "p256Aes":
-						case "p384Aes":
-						case "p521Aes":
-							byte[] X = null;
-							byte[] Y = null;
-
-							foreach (XmlAttribute Attr in E.Attributes)
-							{
-								switch (Attr.Name)
-								{
-									case "x":
-										X = Convert.FromBase64String(Attr.Value);
-										break;
-
-									case "y":
-										Y = Convert.FromBase64String(Attr.Value);
-										break;
-								}
-							}
-
-							if (X != null && Y != null)
-							{
-								if (Endpoints == null)
-									Endpoints = new List<E2eEndpoint>();
-
-								switch (E.LocalName)
-								{
-									case "p192Aes":
-										Endpoints.Add(new NistP192Aes(X, Y, LocalEndpoint));
-										break;
-
-									case "p224Aes":
-										Endpoints.Add(new NistP224Aes(X, Y, LocalEndpoint));
-										break;
-
-									case "p256Aes":
-										Endpoints.Add(new NistP256Aes(X, Y, LocalEndpoint));
-										break;
-
-									case "p384Aes":
-										Endpoints.Add(new NistP384Aes(X, Y, LocalEndpoint));
-										break;
-
-									case "p521Aes":
-										Endpoints.Add(new NistP521Aes(X, Y, LocalEndpoint));
-										break;
-								}
-							}
-							break;
+						Endpoints.Add(Endpoint);
 					}
+					break;
 				}
 			}
 
 			return Endpoints;
+		}
+
+		/// <summary>
+		/// Parses a single E2E key from XML.
+		/// </summary>
+		/// <param name="E">E2E element.</param>
+		/// <param name="LocalEndpoint">Local endpoint security object, if available.</param>
+		/// <returns>E2E keys, if recognized, or null if not.</returns>
+		public static E2eEndpoint ParseE2eKey(XmlElement E, EndpointSecurity LocalEndpoint)
+		{
+			if (E.NamespaceURI == IoTHarmonizationE2E)
+			{
+				switch (E.LocalName)
+				{
+					case "rsa":
+						int? KeySize = null;
+						byte[] Modulus = null;
+						byte[] Exponent = null;
+
+						foreach (XmlAttribute Attr in E.Attributes)
+						{
+							switch (Attr.Name)
+							{
+								case "size":
+									if (int.TryParse(Attr.Value, out int i))
+										KeySize = i;
+									else
+										return null;
+									break;
+
+								case "mod":
+									Modulus = Convert.FromBase64String(Attr.Value);
+									break;
+
+								case "exp":
+									Exponent = Convert.FromBase64String(Attr.Value);
+									break;
+							}
+						}
+
+						if (KeySize.HasValue && Modulus != null && Exponent != null)
+							return new RsaAes(KeySize.Value, Modulus, Exponent, LocalEndpoint);
+						break;
+
+					case "p192":
+					case "p224":
+					case "p256":
+					case "p384":
+					case "p521":
+						byte[] X = null;
+						byte[] Y = null;
+
+						foreach (XmlAttribute Attr in E.Attributes)
+						{
+							switch (Attr.Name)
+							{
+								case "x":
+									X = Convert.FromBase64String(Attr.Value);
+									break;
+
+								case "y":
+									Y = Convert.FromBase64String(Attr.Value);
+									break;
+							}
+						}
+
+						if (X != null && Y != null)
+						{
+							switch (E.LocalName)
+							{
+								case "p192": return new NistP192Aes(X, Y, LocalEndpoint);
+								case "p224": return new NistP224Aes(X, Y, LocalEndpoint);
+								case "p256": return new NistP256Aes(X, Y, LocalEndpoint);
+								case "p384": return new NistP384Aes(X, Y, LocalEndpoint);
+								case "p521": return new NistP521Aes(X, Y, LocalEndpoint);
+							}
+						}
+						break;
+				}
+			}
+
+			return null;
 		}
 
 		/// <summary>
@@ -317,7 +324,7 @@ namespace Waher.Networking.XMPP.P2P
 				int i;
 
 				if (E2E != null)
-					Endpoints = ParseE2eInfo(E2E, this);
+					Endpoints = ParseE2eKeys(E2E, this);
 
 				if (Endpoints == null)
 				{
@@ -501,7 +508,7 @@ namespace Waher.Networking.XMPP.P2P
 		{
 			lock (this.synchObject)
 			{
-				return this.rsa.SignData(Data, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
+				return this.rsa.SignData(Data, HashAlgorithmName.SHA256, RSASignaturePadding.Pss);
 			}
 		}
 
@@ -1105,27 +1112,27 @@ namespace Waher.Networking.XMPP.P2P
 
 			Xml.Append("<e2e xmlns='");
 			Xml.Append(IoTHarmonizationE2E);
-			Xml.Append("'><p521Aes x='");
+			Xml.Append("'><p521 x='");
 			Xml.Append(Convert.ToBase64String(EcAes256.ToNetwork((P = this.p521.PublicKey).X)));
 			Xml.Append("' y='");
 			Xml.Append(Convert.ToBase64String(EcAes256.ToNetwork(P.Y)));
-			Xml.Append("'/><p384Aes x='");
+			Xml.Append("'/><p384 x='");
 			Xml.Append(Convert.ToBase64String(EcAes256.ToNetwork((P = this.p384.PublicKey).X)));
 			Xml.Append("' y='");
 			Xml.Append(Convert.ToBase64String(EcAes256.ToNetwork(P.Y)));
-			Xml.Append("'/><p256Aes x='");
+			Xml.Append("'/><p256 x='");
 			Xml.Append(Convert.ToBase64String(EcAes256.ToNetwork((P = this.p256.PublicKey).X)));
 			Xml.Append("' y='");
 			Xml.Append(Convert.ToBase64String(EcAes256.ToNetwork(P.Y)));
-			Xml.Append("'/><p224Aes x='");
+			Xml.Append("'/><p224 x='");
 			Xml.Append(Convert.ToBase64String(EcAes256.ToNetwork((P = this.p224.PublicKey).X)));
 			Xml.Append("' y='");
 			Xml.Append(Convert.ToBase64String(EcAes256.ToNetwork(P.Y)));
-			Xml.Append("'/><p192Aes x='");
+			Xml.Append("'/><p192 x='");
 			Xml.Append(Convert.ToBase64String(EcAes256.ToNetwork((P = this.p192.PublicKey).X)));
 			Xml.Append("' y='");
 			Xml.Append(Convert.ToBase64String(EcAes256.ToNetwork(P.Y)));
-			Xml.Append("'/><rsaAes size='");
+			Xml.Append("'/><rsa size='");
 			Xml.Append(this.rsaKeySize.ToString());
 			Xml.Append("' mod='");
 			Xml.Append(this.rsaModulus);

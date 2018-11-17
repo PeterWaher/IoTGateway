@@ -79,6 +79,7 @@ namespace Waher.Networking.HTTP
 		private readonly Dictionary<int, bool> failedPorts = new Dictionary<int, bool>();
 		private DateTime lastStat = DateTime.MinValue;
 		private string eTagSalt = string.Empty;
+		private string name = typeof(HttpServer).Namespace;
 		private long nrBytesRx = 0;
 		private long nrBytesTx = 0;
 		private long nrCalls = 0;
@@ -429,6 +430,16 @@ namespace Waher.Networking.HTTP
 					}
 				}
 			}
+		}
+
+		/// <summary>
+		/// Server name. This string will be shown on the Server header field if nothing else is provided. If it is blank,
+		/// the server header field will be omitted.
+		/// </summary>
+		public string Name
+		{
+			get { return this.name; }
+			set { this.name = value; }
 		}
 
 		/// <summary>

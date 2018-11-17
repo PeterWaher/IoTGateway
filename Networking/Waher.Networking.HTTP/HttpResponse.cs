@@ -590,11 +590,16 @@ namespace Waher.Networking.HTTP
 						Output.Append(CommonTypes.EncodeRfc822(this.expires.Value));
 					}
 
-					Output.Append("\r\nServer: ");
-					if (string.IsNullOrEmpty(this.server))
-						Output.Append("Waher.Networking.HTTP");
-					else
-						Output.Append(this.server + " (Waher.Networking.HTTP)");
+					if (!string.IsNullOrEmpty(this.server))
+					{
+						Output.Append("\r\nServer: ");
+						Output.Append(this.server);
+					}
+					else if (!string.IsNullOrEmpty(this.httpServer.Name))
+					{
+						Output.Append("\r\nServer: ");
+						Output.Append(this.httpServer.Name);
+					}
 
 					if (!string.IsNullOrEmpty(this.contentLanguage))
 					{

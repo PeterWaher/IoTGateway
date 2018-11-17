@@ -2,8 +2,8 @@
 {
     var Request = {
         "TypeOfFile": document.getElementById("TypeOfFile").value
-    }
-    var ExportContents = doc.getElementById("ExportContents");
+    };
+    var ExportContents = document.getElementById("ExportContents");
     var Elements = ExportContents.elements;
     var i, c = Elements.length;
 

@@ -6,6 +6,7 @@ Copyright: Copyright.md
 Master: Master.md
 UserVariable: User
 Login: Login.md
+JavaScript: Events.js
 JavaScript: Backup.js
 
 

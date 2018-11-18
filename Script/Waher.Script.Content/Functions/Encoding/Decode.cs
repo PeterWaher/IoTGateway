@@ -47,11 +47,11 @@ namespace Waher.Script.Content.Functions.Encoding
 
 			if (!(Argument1.AssociatedObjectValue is byte[] Bin))
 			{
-				string s = Expression.ToString(Argument1.AssociatedObjectValue);
+				string s = Argument1 is StringValue S ? S.Value : Expression.ToString(Argument1.AssociatedObjectValue);
 				Bin = Encoding.GetBytes(s);
 			}
 
-			string ContentType = Expression.ToString(Argument2.AssociatedObjectValue);
+			string ContentType = Argument2 is StringValue S2 ? S2.Value : Expression.ToString(Argument2.AssociatedObjectValue);
 
 			return this.DoDecode(Bin, ContentType, Encoding);
 		}

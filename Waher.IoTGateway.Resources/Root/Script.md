@@ -1218,6 +1218,45 @@ The following functions are available in the `Waher.Content.Xsl` library.
 
 =========================================================================================================================================================
 
+Custom Parsers
+--------------------------------------------
+
+The script engine supports custom parses in external modules. Such parses can extend the script engine with new types of constructs in a way
+function extensions cannot. The following subsections describe such extensions, and the libraries that publish them.
+
+### Access to object database
+
+The following extensions are made available by the `Waher.Script.Persistence` library.
+
+#### SELECT
+
+Simplified SQL `SELECT` statements can be executed against the object database. Matrices with named columns are returned. Calculated
+columns are supported. Each record corresponds to an object, and variable references are by default interpreted as members of the current
+object. To explicitly reference the object, you can use the `this` variable. You can also refer to the columns of the result set by using
+the name of the corresponding column.
+
+Syntax:
+
+```
+SELECT [TOP maxcount]
+	* |
+	column1 [name1][, column2 [name2][, ...]]
+FROM
+	type1[, type2[, ...]]
+[WHERE
+	conditions]
+[GROUP BY
+	group1 [groupname1][, group2 [groupname2][, ...]]
+[HAVING
+	groupconditions]]
+[ORDER BY
+	ordercolumn1[, ordercolumn2[, ...]]]
+[OFFSET
+	offset]
+```
+
+=========================================================================================================================================================
+
 Interaction with .NET Code Behind classes
 --------------------------------------------
 

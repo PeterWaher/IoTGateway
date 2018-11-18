@@ -13,15 +13,18 @@ namespace Waher.Script
 	/// </summary>
 	public class Variables : IEnumerable<Variable>
 	{
-		private Dictionary<string, Variable> variables = new Dictionary<string, Variable>();
-        private Stack<Dictionary<string, Variable>> stack = null;
+		/// <summary>
+		/// Internal set of variables.
+		/// </summary>
+		protected Dictionary<string, Variable> variables = new Dictionary<string, Variable>();
+		private Stack<Dictionary<string, Variable>> stack = null;
 		private TextWriter consoleOut = null;
 		private readonly Mutex mutex = new Mutex();
 
-        /// <summary>
-        /// Collection of variables.
-        /// </summary>
-        public Variables(params Variable[] Variables)
+		/// <summary>
+		/// Collection of variables.
+		/// </summary>
+		public Variables(params Variable[] Variables)
 		{
 			foreach (Variable Variable in Variables)
 				this.variables[Variable.Name] = Variable;
@@ -33,7 +36,7 @@ namespace Waher.Script
 		/// <param name="Name">Variable name.</param>
 		/// <param name="Variable">Variable, if found, or null otherwise.</param>
 		/// <returns>If a variable with the corresponding name was found.</returns>
-		public bool TryGetVariable(string Name, out Variable Variable)
+		public virtual bool TryGetVariable(string Name, out Variable Variable)
 		{
 			lock (this.variables)
 			{
@@ -46,9 +49,9 @@ namespace Waher.Script
 		/// </summary>
 		/// <param name="Name">Variable name.</param>
 		/// <returns>If a variable with that name exists.</returns>
-		public bool ContainsVariable(string Name)
+		public virtual bool ContainsVariable(string Name)
 		{
-			lock(this.variables)
+			lock (this.variables)
 			{
 				return this.variables.ContainsKey(Name);
 			}
@@ -94,56 +97,56 @@ namespace Waher.Script
 			this[Name] = Value;
 		}
 
-        /// <summary>
-        /// Removes a varaiable from the collection.
-        /// </summary>
-        /// <param name="VariableName">Name of variable.</param>
-        /// <returns>If the variable was found and removed.</returns>
-        public bool Remove(string VariableName)
-        {
-            lock(this.variables)
-            {
-                return this.variables.Remove(VariableName);
-            }
-        }
+		/// <summary>
+		/// Removes a varaiable from the collection.
+		/// </summary>
+		/// <param name="VariableName">Name of variable.</param>
+		/// <returns>If the variable was found and removed.</returns>
+		public bool Remove(string VariableName)
+		{
+			lock (this.variables)
+			{
+				return this.variables.Remove(VariableName);
+			}
+		}
 
-        /// <summary>
-        /// Pushes the current set of variables to the stack. This state is restored by calling <see cref="Pop"/>.
-        /// Each call to this method must be followed by exactly one call to <see cref="Pop"/>.
-        /// </summary>
-        public void Push()
-        {
-            if (this.stack == null)
-                this.stack = new Stack<Dictionary<string, Variable>>();
+		/// <summary>
+		/// Pushes the current set of variables to the stack. This state is restored by calling <see cref="Pop"/>.
+		/// Each call to this method must be followed by exactly one call to <see cref="Pop"/>.
+		/// </summary>
+		public void Push()
+		{
+			if (this.stack == null)
+				this.stack = new Stack<Dictionary<string, Variable>>();
 
-            this.stack.Push(this.variables);
+			this.stack.Push(this.variables);
 
-            Dictionary<string, Variable> Clone = new Dictionary<string, Variable>();
-            foreach (KeyValuePair<string, Variable> P in this.variables)
-                Clone[P.Key] = new Variable(P.Key, P.Value.ValueElement);
+			Dictionary<string, Variable> Clone = new Dictionary<string, Variable>();
+			foreach (KeyValuePair<string, Variable> P in this.variables)
+				Clone[P.Key] = new Variable(P.Key, P.Value.ValueElement);
 
-            this.variables = Clone;
-        }
+			this.variables = Clone;
+		}
 
-        /// <summary>
-        /// Pops a previously stored set of variables from the stack. Variables are stored on the stack by calling <see cref="Push"/>.
-        /// </summary>
-        public void Pop()
-        {
-            if (this.stack == null)
-                throw new ScriptException("Stack is empty.");
+		/// <summary>
+		/// Pops a previously stored set of variables from the stack. Variables are stored on the stack by calling <see cref="Push"/>.
+		/// </summary>
+		public void Pop()
+		{
+			if (this.stack == null)
+				throw new ScriptException("Stack is empty.");
 
-            this.variables = this.stack.Pop();
-        }
+			this.variables = this.stack.Pop();
+		}
 
-        /// <summary>
-        /// Console out interface. Can be used by functions and script to output data to the console.
-        /// </summary>
-        public TextWriter ConsoleOut
-        {
-            get { return this.consoleOut; }
-            set { this.consoleOut = value; }
-        }
+		/// <summary>
+		/// Console out interface. Can be used by functions and script to output data to the console.
+		/// </summary>
+		public TextWriter ConsoleOut
+		{
+			get { return this.consoleOut; }
+			set { this.consoleOut = value; }
+		}
 
 		/// <summary>
 		/// Locks the collection. The collection is by default thread safe. But if longer transactions require unique access,
@@ -268,7 +271,7 @@ namespace Waher.Script
 			Variable[] VariablesToCopy = this.AvailableVariables;
 			Dictionary<string, Variable> Recipient = Variables.variables;
 
-			lock(Recipient)
+			lock (Recipient)
 			{
 				foreach (Variable Variable in VariablesToCopy)
 					Recipient[Variable.Name] = Variable;

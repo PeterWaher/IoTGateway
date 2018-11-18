@@ -14,13 +14,14 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>script execution parsing</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.0.17</AssemblyVersion>
-    <FileVersion>1.0.17</FileVersion>
-    <Version>1.0.17</Version>
+    <AssemblyVersion>1.0.18</AssemblyVersion>
+    <FileVersion>1.0.18</FileVersion>
+    <Version>1.0.18</Version>
     <PackageIconUrl>https://github.com/PeterWaher/IoTGateway/blob/master/Images/Icon.ico?raw=true</PackageIconUrl>
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Script\Waher.Script\</UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>
+    <PackageId>Waher.Script</PackageId>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DocumentationFile>bin\Debug\netstandard1.3\.xml</DocumentationFile>

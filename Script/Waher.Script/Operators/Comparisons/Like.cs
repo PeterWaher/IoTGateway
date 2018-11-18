@@ -9,6 +9,13 @@ using Waher.Script.Objects;
 
 namespace Waher.Script.Operators.Comparisons
 {
+	/// <summary>
+	/// Delegate for expression transforms.
+	/// </summary>
+	/// <param name="Expression">Like expression</param>
+	/// <returns>Transformed expression</returns>
+	public delegate string ExpressionTransform(string Expression);
+
     /// <summary>
     /// Like
     /// </summary>
@@ -27,6 +34,11 @@ namespace Waher.Script.Operators.Comparisons
         {
         }
 
+		/// <summary>
+		/// Event raised before performing comparison. Can be used to transform expression.
+		/// </summary>
+		public event ExpressionTransform TransformExpression;
+
         /// <summary>
         /// Evaluates the operator on scalar operands.
         /// </summary>
@@ -36,20 +48,22 @@ namespace Waher.Script.Operators.Comparisons
         /// <returns>Result</returns>
         public override IElement EvaluateScalar(IElement Left, IElement Right, Variables Variables)
         {
-            StringValue L = Left as StringValue;
-            if (L == null)
-                throw new ScriptRuntimeException("String values expected.", this);
+			if (!(Left is StringValue L))
+				throw new ScriptRuntimeException("String values expected.", this);
 
-            StringValue R = Right as StringValue;
-            if (R == null)
-                throw new ScriptRuntimeException("String values expected.", this);
+			if (!(Right is StringValue R))
+				throw new ScriptRuntimeException("String values expected.", this);
 
-            string sl = L.Value;
+			string sl = L.Value;
             string sr = R.Value;
             string[] GroupNames;
             Match M;
 
-            lock (this.synchObject)
+			ExpressionTransform h = this.TransformExpression;
+			if (h != null)
+				sr = h(sr);
+
+			lock (this.synchObject)
             {
                 if (this.lastExpression == null || sr != this.lastExpression)
                 {
@@ -57,20 +71,19 @@ namespace Waher.Script.Operators.Comparisons
                     this.regex = new Regex(sr, RegexOptions.Singleline);
 
                     List<string> Names = null;
-                    int i;
 
-                    foreach (string s in this.regex.GetGroupNames())
-                    {
-                        if (!int.TryParse(s, out i))
-                        {
-                            if (Names == null)
-                                Names = new List<string>();
+					foreach (string s in this.regex.GetGroupNames())
+					{
+						if (!int.TryParse(s, out int i))
+						{
+							if (Names == null)
+								Names = new List<string>();
 
-                            Names.Add(s);
-                        }
-                    }
+							Names.Add(s);
+						}
+					}
 
-                    if (Names == null)
+					if (Names == null)
                         this.groupNames = null;
                     else
                         this.groupNames = Names.ToArray();
@@ -90,13 +103,12 @@ namespace Waher.Script.Operators.Comparisons
                         if (G.Success)
                         {
                             string Value = G.Value;
-                            double d;
 
-                            if (double.TryParse(Value.Replace(".", System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator), out d))
-                                Variables[GroupName] = d;
-                            else
-                                Variables[GroupName] = Value;
-                        }
+							if (double.TryParse(Value.Replace(".", System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator), out double d))
+								Variables[GroupName] = d;
+							else
+								Variables[GroupName] = Value;
+						}
                     }
                 }
 
@@ -110,7 +122,7 @@ namespace Waher.Script.Operators.Comparisons
         private Regex regex = null;
         private string[] groupNames = null;
         private string lastExpression = null;
-        private object synchObject = new object();
+        private readonly object synchObject = new object();
 
     }
 }

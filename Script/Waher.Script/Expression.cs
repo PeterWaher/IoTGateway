@@ -34,6 +34,10 @@ namespace Waher.Script
 	/// </summary>
 	public class Expression
 	{
+		private readonly static object searchSynch = new object();
+		private static Dictionary<string, FunctionRef> functions = null;
+		private static Dictionary<string, IConstant> constants = null;
+		private static Dictionary<string, IKeyWord> customKeyWords = null;
 		private static readonly Dictionary<string, bool> keywords = GetKeywords();
 
 		private readonly ScriptNode root;
@@ -110,8 +114,32 @@ namespace Waher.Script
 				{ "XOR", true }
 			};
 
+			if (customKeyWords == null)
+				Search();
+
+			foreach (IKeyWord KeyWord in customKeyWords.Values)
+			{
+				Result[KeyWord.KeyWord.ToUpper()] = true;
+
+				string[] Aliases = KeyWord.Aliases;
+				if (Aliases != null)
+				{
+					foreach (string s in Aliases)
+						Result[s.ToUpper()] = true;
+				}
+
+				Aliases = KeyWord.InternalKeywords;
+				if (Aliases != null)
+				{
+					foreach (string s in Aliases)
+						Result[s.ToUpper()] = true;
+				}
+			}
+
 			return Result;
 		}
+
+		internal int Position => this.pos;
 
 		/// <summary>
 		/// Original script string.
@@ -121,7 +149,7 @@ namespace Waher.Script
 			get { return this.script; }
 		}
 
-		private char NextChar()
+		internal char NextChar()
 		{
 			if (this.pos < this.len)
 				return this.script[this.pos++];
@@ -129,7 +157,7 @@ namespace Waher.Script
 				return (char)0;
 		}
 
-		private char PeekNextChar()
+		internal char PeekNextChar()
 		{
 			if (this.pos < this.len)
 				return this.script[this.pos];
@@ -137,7 +165,7 @@ namespace Waher.Script
 				return (char)0;
 		}
 
-		private string NextToken()
+		internal string NextToken()
 		{
 			this.SkipWhiteSpace();
 
@@ -162,11 +190,13 @@ namespace Waher.Script
 				while (this.pos < this.len && char.IsSymbol(this.script[this.pos]))
 					this.pos++;
 			}
+			else
+				this.pos++;
 
 			return this.script.Substring(Start, this.pos - Start);
 		}
 
-		private string PeekNextToken()
+		internal string PeekNextToken()
 		{
 			int Bak = this.pos;
 			string Token = this.NextToken();
@@ -175,7 +205,7 @@ namespace Waher.Script
 			return Token;
 		}
 
-		private void SkipWhiteSpace()
+		internal void SkipWhiteSpace()
 		{
 			char ch;
 
@@ -183,7 +213,7 @@ namespace Waher.Script
 				this.pos++;
 		}
 
-		private ScriptNode AssertOperandNotNull(ScriptNode Node)
+		internal ScriptNode AssertOperandNotNull(ScriptNode Node)
 		{
 			if (Node == null)
 				throw new SyntaxException("Operand missing.", this.pos, this.script);
@@ -191,7 +221,7 @@ namespace Waher.Script
 			return Node;
 		}
 
-		private ScriptNode AssertRightOperandNotNull(ScriptNode Node)
+		internal ScriptNode AssertRightOperandNotNull(ScriptNode Node)
 		{
 			if (Node == null)
 				throw new SyntaxException("Right operand missing.", this.pos, this.script);
@@ -199,7 +229,7 @@ namespace Waher.Script
 			return Node;
 		}
 
-		private ScriptNode ParseSequence()
+		internal ScriptNode ParseSequence()
 		{
 			ScriptNode Node = this.ParseStatement();
 			this.SkipWhiteSpace();
@@ -248,7 +278,7 @@ namespace Waher.Script
 			return Node;
 		}
 
-		private ScriptNode ParseStatement()
+		internal ScriptNode ParseStatement()
 		{
 			this.SkipWhiteSpace();
 
@@ -458,7 +488,7 @@ namespace Waher.Script
 			}
 		}
 
-		private ScriptNode ParseList()
+		internal ScriptNode ParseList()
 		{
 			ScriptNode Node = this.ParseIf();
 			int Start;
@@ -492,7 +522,7 @@ namespace Waher.Script
 			return Node;
 		}
 
-		private ScriptNode ParseIf()
+		internal ScriptNode ParseIf()
 		{
 			this.SkipWhiteSpace();
 
@@ -551,7 +581,7 @@ namespace Waher.Script
 			return new If(Condition, IfTrue, IfFalse, Start, this.pos - Start, this);
 		}
 
-		private ScriptNode ParseAssignments()
+		internal ScriptNode ParseAssignments()
 		{
 			ScriptNode Left = this.ParseLambdaExpression();
 			if (Left == null)
@@ -886,7 +916,7 @@ namespace Waher.Script
 			}
 		}
 
-		private ScriptNode ParseLambdaExpression()
+		internal ScriptNode ParseLambdaExpression()
 		{
 			ScriptNode Left = this.ParseEquivalence();
 			if (Left == null)
@@ -1040,7 +1070,7 @@ namespace Waher.Script
 			return Left;
 		}
 
-		private ScriptNode ParseEquivalence()
+		internal ScriptNode ParseEquivalence()
 		{
 			ScriptNode Left = this.ParseOrs();
 			if (Left == null)
@@ -1087,7 +1117,7 @@ namespace Waher.Script
 			return Left;
 		}
 
-		private ScriptNode ParseOrs()
+		internal ScriptNode ParseOrs()
 		{
 			ScriptNode Left = this.ParseAnds();
 			if (Left == null)
@@ -1167,7 +1197,7 @@ namespace Waher.Script
 			}
 		}
 
-		private ScriptNode ParseAnds()
+		internal ScriptNode ParseAnds()
 		{
 			ScriptNode Left = this.ParseMembership();
 			if (Left == null)
@@ -1234,7 +1264,7 @@ namespace Waher.Script
 			}
 		}
 
-		private ScriptNode ParseMembership()
+		internal ScriptNode ParseMembership()
 		{
 			ScriptNode Left = this.ParseComparison();
 			if (Left == null)
@@ -1305,7 +1335,7 @@ namespace Waher.Script
 			}
 		}
 
-		private ScriptNode ParseComparison()
+		internal ScriptNode ParseComparison()
 		{
 			ScriptNode Left = this.ParseShifts();
 			if (Left == null)
@@ -1547,7 +1577,7 @@ namespace Waher.Script
 			}
 		}
 
-		private ScriptNode ParseShifts()
+		internal ScriptNode ParseShifts()
 		{
 			ScriptNode Left = this.ParseUnions();
 			if (Left == null)
@@ -1609,7 +1639,7 @@ namespace Waher.Script
 			}
 		}
 
-		private ScriptNode ParseUnions()
+		internal ScriptNode ParseUnions()
 		{
 			ScriptNode Left = this.ParseIntersections();
 			if (Left == null)
@@ -1644,7 +1674,7 @@ namespace Waher.Script
 			}
 		}
 
-		private ScriptNode ParseIntersections()
+		internal ScriptNode ParseIntersections()
 		{
 			ScriptNode Left = this.ParseInterval();
 			if (Left == null)
@@ -1688,7 +1718,7 @@ namespace Waher.Script
 			}
 		}
 
-		private ScriptNode ParseInterval()
+		internal ScriptNode ParseInterval()
 		{
 			ScriptNode From = this.ParseTerms();
 			if (From == null)
@@ -1720,7 +1750,7 @@ namespace Waher.Script
 				return new Interval(From, To, Start, this.pos - Start, this);
 		}
 
-		private ScriptNode ParseTerms()
+		internal ScriptNode ParseTerms()
 		{
 			ScriptNode Left = this.ParseBinomialCoefficients();
 			if (Left == null)
@@ -1786,7 +1816,7 @@ namespace Waher.Script
 			}
 		}
 
-		private ScriptNode ParseBinomialCoefficients()
+		internal ScriptNode ParseBinomialCoefficients()
 		{
 			ScriptNode Left = this.ParseFactors();
 			if (Left == null)
@@ -1809,7 +1839,7 @@ namespace Waher.Script
 			}
 		}
 
-		private ScriptNode ParseFactors()
+		internal ScriptNode ParseFactors()
 		{
 			ScriptNode Left = this.ParsePowers();
 			if (Left == null)
@@ -1943,7 +1973,7 @@ namespace Waher.Script
 			}
 		}
 
-		private ScriptNode ParsePowers()
+		internal ScriptNode ParsePowers()
 		{
 			ScriptNode Left = this.ParseUnaryPrefixOperator();
 			if (Left == null)
@@ -2000,7 +2030,7 @@ namespace Waher.Script
 			}
 		}
 
-		private ScriptNode ParseUnaryPrefixOperator()
+		internal ScriptNode ParseUnaryPrefixOperator()
 		{
 			this.SkipWhiteSpace();
 
@@ -2069,7 +2099,7 @@ namespace Waher.Script
 			}
 		}
 
-		private ScriptNode ParseSuffixOperator()
+		internal ScriptNode ParseSuffixOperator()
 		{
 			ScriptNode Node = this.ParseObject();
 			if (Node == null)
@@ -2409,7 +2439,7 @@ namespace Waher.Script
 			}
 		}
 
-		private Unit ParseUnit(bool PermitPrefix)
+		internal Unit ParseUnit(bool PermitPrefix)
 		{
 			Prefix Prefix;
 			LinkedList<KeyValuePair<AtomicUnit, int>> Factors = new LinkedList<KeyValuePair<AtomicUnit, int>>();
@@ -2963,6 +2993,56 @@ namespace Waher.Script
 
 					constants = Found;
 				}
+
+				if (customKeyWords == null)
+				{
+					Dictionary<string, IKeyWord> Found = new Dictionary<string, IKeyWord>(StringComparer.CurrentCultureIgnoreCase);
+					string[] Aliases;
+					string s;
+					TypeInfo TI;
+
+					foreach (Type T in Types.GetTypesImplementingInterface(typeof(IKeyWord)))
+					{
+						TI = T.GetTypeInfo();
+						if (TI.IsAbstract || TI.IsGenericTypeDefinition)
+							continue;
+
+						try
+						{
+							IKeyWord KeyWord = (IKeyWord)Activator.CreateInstance(T);
+
+							s = KeyWord.KeyWord;
+							if (Found.ContainsKey(s))
+							{
+								Log.Warning("Keyword with name " + s + " previously registered. Keyword ignored.",
+									T.FullName, new KeyValuePair<string, object>("Previous", KeyWord.GetType().FullName));
+							}
+							else
+								Found[s] = KeyWord;
+
+							Aliases = KeyWord.Aliases;
+							if (Aliases != null)
+							{
+								foreach (string Alias in Aliases)
+								{
+									if (Found.ContainsKey(Alias))
+									{
+										Log.Warning("Keyword with name " + Alias + " previously registered. Keyword ignored.",
+											T.FullName, new KeyValuePair<string, object>("Previous", KeyWord.GetType().FullName));
+									}
+									else
+										Found[Alias] = KeyWord;
+								}
+							}
+						}
+						catch (Exception ex)
+						{
+							Log.Critical(ex);
+						}
+					}
+
+					customKeyWords = Found;
+				}
 			}
 		}
 
@@ -2973,11 +3053,7 @@ namespace Waher.Script
 			public int NrParameters;
 		}
 
-		private static Dictionary<string, FunctionRef> functions = null;
-		private static Dictionary<string, IConstant> constants = null;
-		private readonly static object searchSynch = new object();
-
-		private ScriptNode ParseObject()
+		internal ScriptNode ParseObject()
 		{
 			this.SkipWhiteSpace();
 
@@ -3323,6 +3399,20 @@ namespace Waher.Script
 						return new ConstantElement(ObjectValue.Null, Start, this.pos - Start, this);
 
 					default:
+						if (customKeyWords == null)
+							Search();
+						
+						if (customKeyWords.TryGetValue(s, out IKeyWord KeyWord))
+						{
+							ScriptParser Parser = new ScriptParser(this);
+							int PosBak = this.pos;
+
+							if (KeyWord.TryParse(Parser, out Node))
+								return Node;
+							else
+								this.pos = PosBak;
+						}
+
 						return new VariableReference(s, Start, this.pos - Start, this);
 				}
 			}

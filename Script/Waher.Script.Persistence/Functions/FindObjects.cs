@@ -192,12 +192,14 @@ namespace Waher.Script.Persistence.Functions
 			else if (Node is Like)
 			{
 				this.CheckBinaryOperator((BinaryOperator)Node, Variables, out FieldName, out Value);
-				return new FilterFieldLikeRegEx(FieldName, Value.ToString());
+				string RegEx= SQL.Select.WildcardToRegex(Value is string s ? s : Expression.ToString(Value), "*");
+				return new FilterFieldLikeRegEx(FieldName, RegEx);
 			}
 			else if (Node is NotLike)
 			{
 				this.CheckBinaryOperator((BinaryOperator)Node, Variables, out FieldName, out Value);
-				return new FilterNot(new FilterFieldLikeRegEx(FieldName, Value.ToString()));
+				string RegEx= SQL.Select.WildcardToRegex(Value is string s ? s : Expression.ToString(Value), "*");
+				return new FilterNot(new FilterFieldLikeRegEx(FieldName, RegEx));
 			}
 			else
 				throw new ScriptRuntimeException("Invalid operation for filters: " + Node.GetType().FullName, this);
@@ -205,8 +207,7 @@ namespace Waher.Script.Persistence.Functions
 
 		private void CheckBinaryOperator(BinaryOperator Operator, Variables Variables, out string FieldName, out object Value)
 		{
-			VariableReference v = Operator.LeftOperand as VariableReference;
-			if (v == null)
+			if (!(Operator.LeftOperand is VariableReference v))
 				throw new ScriptRuntimeException("Left operands in binary filter operators need to be a variable references, as they refer to field names.", this);
 
 			FieldName = v.VariableName;

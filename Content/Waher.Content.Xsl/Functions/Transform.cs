@@ -49,6 +49,8 @@ namespace Waher.Content.Xsl.Functions
 
 			if (Argument1.AssociatedObjectValue is XmlDocument Xml)
 				s = Xml.OuterXml;
+			else if (Argument1 is StringValue S)
+				s = S.Value;
 			else
 				s = Expression.ToString(Argument1.AssociatedObjectValue);
 

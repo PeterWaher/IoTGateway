@@ -62,6 +62,7 @@
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Numerics" />
     <Reference Include="System.Security.Cryptography.Algorithms, Version=4.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\..\packages\System.Security.Cryptography.Algorithms.4.3.1\lib\net461\System.Security.Cryptography.Algorithms.dll</HintPath>
       <Private>True</Private>
@@ -151,6 +152,10 @@
     <ProjectReference Include="..\..\Content\Waher.Content.Images\Waher.Content.Images.csproj">
       <Project>{292d1142-2caf-4983-802c-c80b6df6504d}</Project>
       <Name>Waher.Content.Images</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Content\Waher.Content.Markdown\Waher.Content.Markdown.csproj">
+      <Project>{e3533ca0-15f4-49e0-a9df-595bd5edf2dd}</Project>
+      <Name>Waher.Content.Markdown</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Content\Waher.Content.Xml\Waher.Content.Xml.csproj">
       <Project>{8aeeb562-a2d3-4061-8384-a9c04920e110}</Project>

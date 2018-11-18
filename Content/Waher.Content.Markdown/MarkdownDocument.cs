@@ -345,9 +345,15 @@ namespace Waher.Content.Markdown
 
 				if (Result != null)
 				{
-					s2 = Result.ToString();
-					Markdown = Markdown.Insert(i, s2);
-					i += s2.Length;
+					if (!(Result is string s3))
+					{
+						StringBuilder Html = new StringBuilder();
+						InlineScript.GenerateHTML(Result, Html, true, Variables);
+						s3 = Html.ToString();
+					}
+
+					Markdown = Markdown.Insert(i, s3);
+					i += s3.Length;
 				}
 
 				i = Markdown.IndexOf("{{", i);

@@ -14,6 +14,7 @@ using Waher.Script.Graphs;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Objects;
+using Waher.Script.Objects.Matrices;
 
 namespace Waher.WebService.Script
 {
@@ -191,7 +192,7 @@ namespace Waher.WebService.Script
 			}
 		}
 
-		private void SendResponse(Variables Variables, IElement Result, StringBuilder sb, HttpResponse Response, 
+		private void SendResponse(Variables Variables, IElement Result, StringBuilder sb, HttpResponse Response,
 			bool More)
 		{
 			Variables["Ans"] = Result;
@@ -293,6 +294,53 @@ namespace Waher.WebService.Script
 				}
 				else
 					s = "<p><font style=\"color:red;font-weight:bold\"><code>" + this.FormatText(XML.HtmlValueEncode(ex.Message)) + "</code></font></p>";
+			}
+			else if (Result is ObjectMatrix M && M.ColumnNames != null)
+			{
+				StringBuilder Html = new StringBuilder();
+
+				s = Result.ToString();
+
+				Html.Append("<div class='clickable' onclick='SetScript(\"");
+				Html.Append(s.ToString().Replace("\r", "\\r").Replace("\n", "\\n").Replace("\t", "\\t").Replace("\"", "\\\"").Replace("'", "\\'"));
+				Html.Append("\");'><table><thead>");
+
+				foreach (string s2 in M.ColumnNames)
+				{
+					Html.Append("<th>");
+					Html.Append(this.FormatText(XML.HtmlValueEncode(s2)));
+					Html.Append("</th>");
+				}
+
+				Html.Append("</thead><tbody>");
+
+				int x, y;
+
+				for (y = 0; y < M.Rows; y++)
+				{
+					Html.Append("<tr>");
+
+					for (x = 0; x < M.Columns; x++)
+					{
+						Html.Append("<td>");
+
+						object Item = M.GetElement(x, y).AssociatedObjectValue;
+						if (Item != null)
+						{
+							if (Item is string s2)
+								Html.Append(this.FormatText(XML.HtmlValueEncode(s2)));
+							else
+								Html.Append(this.FormatText(XML.HtmlValueEncode(Expression.ToString(Item))));
+						}
+
+						Html.Append("</td>");
+					}
+
+					Html.Append("</tr>");
+				}
+
+				Html.Append("</tbody></table></div>");
+				s = Html.ToString();
 			}
 			else
 			{

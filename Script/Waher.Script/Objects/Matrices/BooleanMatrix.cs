@@ -458,7 +458,7 @@ namespace Waher.Script.Objects.Matrices
 			if (Column < 0 || Column >= this.columns || Row < 0 || Row >= this.rows)
 				throw new ScriptException("Index out of bounds.");
 
-			return new BooleanValue(this.Values[Row, Columns]);
+			return new BooleanValue(this.Values[Row, Column]);
 		}
 
 		/// <summary>

@@ -20,6 +20,7 @@ using Waher.Script;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Graphs;
 using Waher.Script.Objects;
+using Waher.Script.Objects.Matrices;
 using Waher.Script.Objects.VectorSpaces;
 using Waher.Script.Operators.Vectors;
 using Waher.Things;
@@ -37,12 +38,12 @@ namespace Waher.Networking.XMPP.Chat
 	/// </summary>
 	public class ChatServer : XmppExtension
 	{
-		private Cache<string, Variables> sessions;
-		private SensorServer sensorServer;
-		private ControlServer controlServer;
-		private ConcentratorServer concentratorServer;
-		private ProvisioningClient provisioningClient;
-		private BobClient bobClient;
+		private readonly Cache<string, Variables> sessions;
+		private readonly SensorServer sensorServer;
+		private readonly ControlServer controlServer;
+		private readonly ConcentratorServer concentratorServer;
+		private readonly ProvisioningClient provisioningClient;
+		private readonly BobClient bobClient;
 		private HttpFileUploadClient httpUpload = null;
 
 		/// <summary>
@@ -1317,6 +1318,46 @@ namespace Waher.Networking.XMPP.Chat
 				{
 					ImageResult(From, Img, Support, Variables, true);
 					return;
+				}
+				else if (Result.AssociatedObjectValue is ObjectMatrix M && M.ColumnNames != null)
+				{
+					StringBuilder Markdown = new StringBuilder();
+
+					foreach (string s2 in M.ColumnNames)
+					{
+						Markdown.Append("| ");
+						Markdown.Append(MarkdownDocument.Encode(s2));
+					}
+
+					Markdown.AppendLine(" |");
+
+					foreach (string s2 in M.ColumnNames)
+						Markdown.Append("|---");
+
+					Markdown.AppendLine("|");
+
+					int x, y;
+
+					for (y = 0; y < M.Rows; y++)
+					{
+						for (x = 0; x < M.Columns; x++)
+						{
+							Markdown.Append("| ");
+
+							object Item = M.GetElement(x, y).AssociatedObjectValue;
+							if (Item != null)
+							{
+								if (Item is string s2)
+									Markdown.Append(MarkdownDocument.Encode(s2));
+								else
+									Markdown.Append(MarkdownDocument.Encode(Waher.Script.Expression.ToString(Item)));
+							}
+						}
+
+						Markdown.AppendLine(" |");
+					}
+
+					this.SendMarkdownChatMessage(From, Markdown.ToString());
 				}
 				else
 				{

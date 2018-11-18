@@ -3,19 +3,23 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using SkiaSharp;
+using Waher.Content.Markdown;
 using Waher.Events;
 using Waher.Runtime.Inventory;
 using Waher.Script.Abstraction.Elements;
-using Waher.Script.Objects;
 using Waher.Script.Exceptions;
 using Waher.Script.Graphs;
+using Waher.Script.Objects;
+using Waher.Script.Objects.Matrices;
 
 namespace Waher.Script.Lab
 {
@@ -198,6 +202,56 @@ namespace Waher.Script.Lab
 							else
 								this.AddTextBlock(ScriptBlock, ex.Message, Colors.Red, FontWeights.Bold);
 						}
+						else if (Ans.AssociatedObjectValue is ObjectMatrix M && M.ColumnNames != null)
+						{
+							StringBuilder Markdown = new StringBuilder();
+
+							foreach (string s2 in M.ColumnNames)
+							{
+								Markdown.Append("| ");
+								Markdown.Append(MarkdownDocument.Encode(s2));
+							}
+
+							Markdown.AppendLine(" |");
+
+							foreach (string s2 in M.ColumnNames)
+								Markdown.Append("|---");
+
+							Markdown.AppendLine("|");
+
+							int x, y;
+
+							for (y = 0; y < M.Rows; y++)
+							{
+								for (x = 0; x < M.Columns; x++)
+								{
+									Markdown.Append("| ");
+
+									object Item = M.GetElement(x, y).AssociatedObjectValue;
+									if (Item != null)
+									{
+										if (Item is string s2)
+											Markdown.Append(MarkdownDocument.Encode(s2));
+										else
+											Markdown.Append(MarkdownDocument.Encode(Waher.Script.Expression.ToString(Item)));
+									}
+								}
+
+								Markdown.AppendLine(" |");
+							}
+
+							MarkdownDocument Doc = new MarkdownDocument(Markdown.ToString());
+							XamlSettings Settings = new XamlSettings()
+							{
+								TableCellRowBackgroundColor1 = "#20404040",
+								TableCellRowBackgroundColor2 = "#10808080"
+							};
+
+							string XAML = Doc.GenerateXAML(Settings);
+
+							if (XamlReader.Parse(XAML) is UIElement Parsed)
+								this.AddBlock(ScriptBlock, Parsed);
+						}
 						else
 							this.AddTextBlock(ScriptBlock, Ans.ToString(), Colors.Red, FontWeights.Normal);
 					});
@@ -226,6 +280,13 @@ namespace Waher.Script.Lab
 
 			ResultBlock.PreviewMouseDown += TextBlock_PreviewMouseDown;
 
+			this.AddBlock(ScriptBlock, ResultBlock);
+
+			return ResultBlock;
+		}
+
+		private UIElement AddBlock(TextBlock ScriptBlock, UIElement ResultBlock)
+		{
 			if (ScriptBlock == null)
 				this.HistoryPanel.Children.Add(ResultBlock);
 			else

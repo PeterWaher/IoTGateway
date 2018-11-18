@@ -10,6 +10,7 @@ using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Objects;
+using Waher.Script.Objects.Matrices;
 
 namespace Waher.Script.Persistence.SQL
 {
@@ -47,7 +48,7 @@ namespace Waher.Script.Persistence.SQL
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-		public Select(ScriptNode[] Columns, ScriptNode[] ColumnNames, ScriptNode[] Sources, ScriptNode[] SourceNames, ScriptNode Where, 
+		public Select(ScriptNode[] Columns, ScriptNode[] ColumnNames, ScriptNode[] Sources, ScriptNode[] SourceNames, ScriptNode Where,
 			ScriptNode[] GroupBy, ScriptNode[] GroupByNames, ScriptNode Having, ScriptNode[] OrderBy, ScriptNode Top, ScriptNode Offset,
 			int Start, int Length, Expression Expression)
 			: base(Start, Length, Expression)
@@ -277,12 +278,52 @@ namespace Waher.Script.Persistence.SQL
 					Elements[i++] = new ObjectValue(null);
 			}
 
-			return new Objects.Matrices.ObjectMatrix(NrRecords, c, Elements);
+			ObjectMatrix Result = new ObjectMatrix(NrRecords, c, Elements);
+			string[] Names = new string[c];
+
+			foreach (KeyValuePair<string, int> P in Columns)
+				Names[P.Value] = P.Key;
+
+			i = 0;
+			if (this.columnNames != null)
+			{
+				while (i < c)
+				{
+					if (this.columnNames[i] is VariableReference Ref)
+						Names[i++] = Ref.VariableName;
+					else
+					{
+						E = this.columnNames[i]?.Evaluate(Variables);
+						if (E == null)
+						{
+							if (Names[i] == null)
+								Names[i] = (i + 1).ToString();
+
+							i++;
+						}
+						else if (E is StringValue S)
+							Names[i++] = S.Value;
+						else
+							Names[i++] = Expression.ToString(E.AssociatedObjectValue);
+					}
+				}
+			}
+
+			while (i < c)
+			{
+				if (Names[i] == null)
+					Names[i] = (i + 1).ToString();
+
+				i++;
+			}
+
+			Result.ColumnNames = Names;
+
+			return Result;
 
 			// TODO: GROUP BY
 			// TODO: HAVING
 			// TODO: Joins
-			// TODO: Column names
 			// TODO: Source names
 			// TODO: Groups names
 		}

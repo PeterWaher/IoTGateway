@@ -8,6 +8,7 @@ using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Script;
 using Waher.Script.Graphs;
+using Waher.Script.Objects.Matrices;
 
 namespace Waher.Content.Markdown.Model.SpanElements
 {
@@ -16,9 +17,9 @@ namespace Waher.Content.Markdown.Model.SpanElements
 	/// </summary>
 	public class InlineScript : MarkdownElement
 	{
-		private Expression expression;
-		private Variables variables;
-		private bool aloneInParagraph;
+		private readonly Expression expression;
+		private readonly Variables variables;
+		private readonly bool aloneInParagraph;
 
 		/// <summary>
 		/// Inline source code.
@@ -76,38 +77,61 @@ namespace Waher.Content.Markdown.Model.SpanElements
 			if (Result == null)
 				return;
 
-			SKImage Img;
-			string s;
+			GenerateHTML(Result, Output, this.aloneInParagraph, this.variables);
+		}
 
+		/// <summary>
+		/// Generates HTML from Script output.
+		/// </summary>
+		/// <param name="Result">Script output.</param>
+		/// <param name="Output">HTML output.</param>
+		/// <param name="AloneInParagraph">If the script output is to be presented alone in a paragraph.</param>
+		/// <param name="Variables">Current variables.</param>
+		public static void GenerateHTML(object Result, StringBuilder Output, bool AloneInParagraph, Variables Variables)
+		{
 			if (Result is Graph G)
 			{
-				using (SKImage Bmp = G.CreateBitmap(this.variables, out GraphSettings GraphSettings))
+				using (SKImage Bmp = G.CreateBitmap(Variables, out GraphSettings GraphSettings))
 				{
 					SKData Data = Bmp.Encode(SKEncodedImageFormat.Png, 100);
 					byte[] Bin = Data.ToArray();
 
-					s = System.Convert.ToBase64String(Bin, 0, Bin.Length);
-					s = "<img border=\"2\" width=\"" + GraphSettings.Width.ToString() + "\" height=\"" + GraphSettings.Height.ToString() +
-						"\" src=\"data:image/png;base64," + s + "\" />";
+					if (AloneInParagraph)
+						Output.Append("<figure>");
 
-					if (this.aloneInParagraph)
-						s = "<figure>" + s + "</figure>";
+					Output.Append("<img border=\"2\" width=\"");
+					Output.Append(GraphSettings.Width.ToString());
+					Output.Append("\" height=\"");
+					Output.Append(GraphSettings.Height.ToString());
+					Output.Append("\" src=\"data:image/png;base64,");
+					Output.Append(Convert.ToBase64String(Bin, 0, Bin.Length));
+					Output.Append("\" />");
+
+					if (AloneInParagraph)
+						Output.Append("</figure>");
 
 					Data.Dispose();
 				}
 			}
-			else if ((Img = Result as SKImage) != null)
+			else if (Result is SKImage Img)
 			{
 				using (SKData Data = Img.Encode(SKEncodedImageFormat.Png, 100))
 				{
 					byte[] Bin = Data.ToArray();
 
-					s = System.Convert.ToBase64String(Bin, 0, Bin.Length);
-					s = "<img border=\"2\" width=\"" + Img.Width.ToString() + "\" height=\"" + Img.Height.ToString() +
-						"\" src=\"data:image/png;base64," + s + "\" />";
+					if (AloneInParagraph)
+						Output.Append("<figure>");
 
-					if (this.aloneInParagraph)
-						s = "<figure>" + s + "</figure>";
+					Output.Append("<img border=\"2\" width=\"");
+					Output.Append(Img.Width.ToString());
+					Output.Append("\" height=\"");
+					Output.Append(Img.Height.ToString());
+					Output.Append("\" src=\"data:image/png;base64,");
+					Output.Append(Convert.ToBase64String(Bin, 0, Bin.Length));
+					Output.Append("\" />");
+
+					if (AloneInParagraph)
+						Output.Append("</figure>");
 				}
 			}
 			else if (Result is Exception ex)
@@ -116,37 +140,85 @@ namespace Waher.Content.Markdown.Model.SpanElements
 
 				if (ex is AggregateException ex2)
 				{
-					StringBuilder sb = new StringBuilder();
-
 					foreach (Exception ex3 in ex2.InnerExceptions)
 					{
-						sb.Append("<p><font style=\"color:red\">");
-						sb.Append(XML.HtmlValueEncode(ex3.Message));
-						sb.AppendLine("</font></p>");
+						Output.Append("<p><font style=\"color:red\">");
+						Output.Append(XML.HtmlValueEncode(ex3.Message));
+						Output.AppendLine("</font></p>");
 					}
-
-					s = sb.ToString();
 				}
 				else
 				{
-					s = "<font style=\"color:red\">" + XML.HtmlValueEncode(ex.Message) + "</font>";
+					if (AloneInParagraph)
+						Output.Append("<p>");
 
-					if (this.aloneInParagraph)
-						s = "<p>" + s + "</p>";
+					Output.Append("<font style=\"color:red\">");
+					Output.Append(XML.HtmlValueEncode(ex.Message));
+					Output.Append("</font>");
+
+					if (AloneInParagraph)
+						Output.Append("</p>");
 				}
+			}
+			else if (Result is ObjectMatrix M && M.ColumnNames != null)
+			{
+				Output.Append("<table><thead>");
+
+				foreach (string s2 in M.ColumnNames)
+				{
+					Output.Append("<th>");
+					Output.Append(FormatText(XML.HtmlValueEncode(s2)));
+					Output.Append("</th>");
+				}
+
+				Output.Append("</thead><tbody>");
+
+				int x, y;
+
+				for (y = 0; y < M.Rows; y++)
+				{
+					Output.Append("<tr>");
+
+					for (x = 0; x < M.Columns; x++)
+					{
+						Output.Append("<td>");
+
+						object Item = M.GetElement(x, y).AssociatedObjectValue;
+						if (Item != null)
+						{
+							if (Item is string s2)
+								Output.Append(FormatText(XML.HtmlValueEncode(s2)));
+							else
+								Output.Append(FormatText(XML.HtmlValueEncode(Expression.ToString(Item))));
+						}
+
+						Output.Append("</td>");
+					}
+
+					Output.Append("</tr>");
+				}
+
+				Output.Append("</tbody></table>");
 			}
 			else
 			{
-				s = XML.HtmlValueEncode(Result.ToString());
+				if (AloneInParagraph)
+					Output.Append("<p>");
 
-				if (this.aloneInParagraph)
-					s = "<p>" + s + "</p>";
+				Output.Append(XML.HtmlValueEncode(Result.ToString()));
+
+				if (AloneInParagraph)
+					Output.Append("</p>");
 			}
 
-			Output.Append(s);
-
-			if (this.aloneInParagraph)
+			if (AloneInParagraph)
 				Output.AppendLine();
+		}
+
+		private static string FormatText(string s)
+		{
+			return s.Replace("\r\n", "\n").Replace("\n", "<br/>").Replace("\r", "<br/>").
+				Replace("\t", "&nbsp;&nbsp;&nbsp;").Replace(" ", "&nbsp;");
 		}
 
 		/// <summary>

@@ -46,6 +46,7 @@ namespace Waher.Script
 		private int pos;
 		private readonly int len;
 		private bool containsImplicitPrint = false;
+		private bool canSkipWhitespace = true;
 
 		/// <summary>
 		/// Class managing a script expression.
@@ -141,6 +142,12 @@ namespace Waher.Script
 
 		internal int Position => this.pos;
 
+		internal bool CanSkipWhitespace
+		{
+			get => this.canSkipWhitespace;
+			set => this.canSkipWhitespace = value;
+		}
+
 		/// <summary>
 		/// Original script string.
 		/// </summary>
@@ -207,10 +214,13 @@ namespace Waher.Script
 
 		internal void SkipWhiteSpace()
 		{
-			char ch;
+			if (this.canSkipWhitespace)
+			{
+				char ch;
 
-			while (this.pos < this.len && ((ch = this.script[this.pos]) <= ' ' || ch == 160))
-				this.pos++;
+				while (this.pos < this.len && ((ch = this.script[this.pos]) <= ' ' || ch == 160))
+					this.pos++;
+			}
 		}
 
 		internal ScriptNode AssertOperandNotNull(ScriptNode Node)
@@ -3406,8 +3416,12 @@ namespace Waher.Script
 						{
 							ScriptParser Parser = new ScriptParser(this);
 							int PosBak = this.pos;
+							bool CanParseWhitespace = this.canSkipWhitespace;
+							bool Result = KeyWord.TryParse(Parser, out Node);
 
-							if (KeyWord.TryParse(Parser, out Node))
+							this.canSkipWhitespace = CanParseWhitespace;
+							
+							if (Result)
 								return Node;
 							else
 								this.pos = PosBak;

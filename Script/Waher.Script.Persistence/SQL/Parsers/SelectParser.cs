@@ -56,7 +56,7 @@ namespace Waher.Script.Persistence.SQL.Parsers
 				if (s == "TOP")
 				{
 					Parser.NextToken();
-					Top = Parser.ParseComparison();
+					Top = Parser.ParseNoWhiteSpace();
 
 					s = Parser.PeekNextToken();
 					if (s == string.Empty)
@@ -78,7 +78,7 @@ namespace Waher.Script.Persistence.SQL.Parsers
 
 					while (true)
 					{
-						ScriptNode Node = Parser.ParseComparison();
+						ScriptNode Node = Parser.ParseNoWhiteSpace();
 						ScriptNode Name = null;
 						
 						Parser.SkipWhiteSpace();
@@ -86,7 +86,7 @@ namespace Waher.Script.Persistence.SQL.Parsers
 						s = Parser.PeekNextToken().ToUpper();
 						if (s != "," && s != "FROM")
 						{
-							Name = Parser.ParseComparison();
+							Name = Parser.ParseNoWhiteSpace();
 							s = Parser.PeekNextToken();
 						}
 						else if (Node is VariableReference Ref)
@@ -111,7 +111,7 @@ namespace Waher.Script.Persistence.SQL.Parsers
 
 				while (true)
 				{
-					ScriptNode Node = Parser.ParseComparison();
+					ScriptNode Node = Parser.ParseNoWhiteSpace();
 					ScriptNode Name = null;
 
 					Parser.SkipWhiteSpace();
@@ -119,7 +119,7 @@ namespace Waher.Script.Persistence.SQL.Parsers
 					s = Parser.PeekNextToken().ToUpper();
 					if (s != "," && s != "WHERE" && s != "GROUP" && s != "ORDER" && s != "OFFSET")
 					{
-						Name = Parser.ParseComparison();
+						Name = Parser.ParseNoWhiteSpace();
 						s = Parser.PeekNextToken().ToUpper();
 					}
 					else if (Node is VariableReference Ref)
@@ -158,7 +158,7 @@ namespace Waher.Script.Persistence.SQL.Parsers
 
 					while (true)
 					{
-						ScriptNode Node = Parser.ParseComparison();
+						ScriptNode Node = Parser.ParseNoWhiteSpace();
 						ScriptNode Name = null;
 
 						Parser.SkipWhiteSpace();
@@ -166,7 +166,7 @@ namespace Waher.Script.Persistence.SQL.Parsers
 						s = Parser.PeekNextToken().ToUpper();
 						if (s != "," && s != "ORDER" && s != "OFFSET")
 						{
-							Name = Parser.ParseComparison();
+							Name = Parser.ParseNoWhiteSpace();
 							s = Parser.PeekNextToken().ToUpper();
 						}
 						else if (Node is VariableReference Ref)
@@ -201,7 +201,7 @@ namespace Waher.Script.Persistence.SQL.Parsers
 
 					while (true)
 					{
-						ScriptNode Node = Parser.ParseComparison();
+						ScriptNode Node = Parser.ParseNoWhiteSpace();
 						OrderBy.Add(Node);
 
 						s = Parser.PeekNextToken().ToUpper();
@@ -217,7 +217,7 @@ namespace Waher.Script.Persistence.SQL.Parsers
 				if (s == "OFFSET")
 				{
 					Parser.NextToken();
-					Offset = Parser.ParseComparison();
+					Offset = Parser.ParseNoWhiteSpace();
 				}
 				
 				Result = new Select(Columns?.ToArray(), ColumnNames?.ToArray(), Sources.ToArray(), SourceNames.ToArray(),
@@ -231,7 +231,6 @@ namespace Waher.Script.Persistence.SQL.Parsers
 				return false;
 			}
 		}
-
 
 	}
 }

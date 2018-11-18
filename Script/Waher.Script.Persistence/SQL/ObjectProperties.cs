@@ -30,7 +30,7 @@ namespace Waher.Script.Persistence.SQL
 		/// <returns>If a variable with that name exists.</returns>
 		public override bool ContainsVariable(string Name)
 		{
-			if (base.ContainsVariable(Name))
+			if (base.ContainsVariable(Name) || string.Compare(Name, "this", true) == 0)
 				return true;
 
 			lock (this.variables)
@@ -67,6 +67,12 @@ namespace Waher.Script.Persistence.SQL
 		{
 			if (base.TryGetVariable(Name, out Variable))
 				return true;
+
+			if (string.Compare(Name, "this", true) == 0)
+			{
+				Variable = new Variable("this", this.obj);
+				return true;
+			}
 
 			Tuple<PropertyInfo, FieldInfo> Rec;
 

@@ -39,6 +39,15 @@ namespace Waher.Script.Model
 		public Expression Expression => this.expression;
 
 		/// <summary>
+		/// If whitespace can be skipped (true), or if it has semantic meaning to the custom parser (false).
+		/// </summary>
+		public bool CanSkipWhitespace
+		{
+			get => this.expression.CanSkipWhitespace;
+			set => this.expression.CanSkipWhitespace = value;
+		}
+
+		/// <summary>
 		/// Returns the next character to be parsed, and moves the position forward one character.
 		/// If no character is available, 0 is returned.
 		/// </summary>

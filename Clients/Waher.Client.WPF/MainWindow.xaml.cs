@@ -70,6 +70,7 @@ namespace Waher.Client.WPF
 				typeof(Content.Xsl.XSL).Assembly,
 				typeof(SensorData).Assembly,
 				typeof(Networking.XMPP.BOSH.HttpBinding).Assembly,
+				typeof(Networking.XMPP.Provisioning.ProvisioningClient).Assembly,
 				typeof(Networking.XMPP.WebSocket.WebSocketBinding).Assembly,
 				typeof(Database).Assembly,
 				typeof(FilesProvider).Assembly,

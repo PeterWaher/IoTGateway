@@ -9,10 +9,10 @@ namespace Waher.Script.Persistence.SQL
 	/// </summary>
 	public class ObjectProperties : Variables
 	{
-		private readonly IDictionary<string, object> dictionary;
-		private readonly object obj;
-		private readonly Type type;
+		private IDictionary<string, object> dictionary;
+		private Type type;
 		private readonly Variables variables2;
+		private object obj;
 		private Dictionary<string, Tuple<PropertyInfo, FieldInfo>> properties = null;
 
 		/// <summary>
@@ -27,6 +27,20 @@ namespace Waher.Script.Persistence.SQL
 			this.dictionary = Object as IDictionary<string, object>;
 			this.type = Object.GetType();
 			this.variables2 = Variables;
+		}
+
+		/// <summary>
+		/// Current object.
+		/// </summary>
+		public object Object
+		{
+			get => this.obj;
+			set
+			{
+				this.obj = value;
+				this.dictionary = value as IDictionary<string, object>;
+				this.type = value.GetType();
+			}
 		}
 
 		/// <summary>

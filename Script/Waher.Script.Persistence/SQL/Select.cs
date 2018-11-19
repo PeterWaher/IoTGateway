@@ -146,6 +146,7 @@ namespace Waher.Script.Persistence.SQL
 			}
 
 			List<string> OrderBy = new List<string>();
+			bool CalculatedOrder = false;
 
 			if (this.orderBy != null)
 			{
@@ -153,6 +154,8 @@ namespace Waher.Script.Persistence.SQL
 				{
 					if (Node is VariableReference Ref)
 						OrderBy.Add(Ref.VariableName);
+					else
+						CalculatedOrder = true;
 				}
 			}
 
@@ -160,8 +163,13 @@ namespace Waher.Script.Persistence.SQL
 			{
 				foreach (ScriptNode Node in this.groupBy)
 				{
-					if (Node is VariableReference Ref && !OrderBy.Contains(Ref.VariableName))
-						OrderBy.Add(Ref.VariableName);
+					if (Node is VariableReference Ref)
+					{
+						if (!OrderBy.Contains(Ref.VariableName))
+							OrderBy.Add(Ref.VariableName);
+					}
+					else
+						CalculatedOrder = true;
 				}
 			}
 
@@ -219,7 +227,18 @@ namespace Waher.Script.Persistence.SQL
 					e = new ConditionalEnumerator(e, Variables, this.having);
 			}
 
+			if (CalculatedOrder)
+			{
+				List<ScriptNode> Order = new List<ScriptNode>();
 
+				if (this.orderBy != null)
+					Order.AddRange(this.orderBy);
+
+				if (this.groupBy != null)
+					Order.AddRange(this.groupBy);
+
+				e = new CustomOrderEnumerator(e, Variables, Order.ToArray());
+			}
 
 			Type LastItemType = null;
 

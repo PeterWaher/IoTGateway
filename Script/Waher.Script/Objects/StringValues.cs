@@ -21,6 +21,11 @@ namespace Waher.Script.Objects
 		}
 
 		/// <summary>
+		/// Instance of the set of string values.
+		/// </summary>
+		public static readonly StringValues Instance = new StringValues();
+
+		/// <summary>
 		/// Checks if the set contains an element.
 		/// </summary>
 		/// <param name="Element">Element.</param>

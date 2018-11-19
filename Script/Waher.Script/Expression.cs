@@ -3411,7 +3411,7 @@ namespace Waher.Script
 					default:
 						if (customKeyWords == null)
 							Search();
-						
+
 						if (customKeyWords.TryGetValue(s, out IKeyWord KeyWord))
 						{
 							ScriptParser Parser = new ScriptParser(this);
@@ -3420,7 +3420,7 @@ namespace Waher.Script
 							bool Result = KeyWord.TryParse(Parser, out Node);
 
 							this.canSkipWhitespace = CanParseWhitespace;
-							
+
 							if (Result)
 								return Node;
 							else
@@ -4001,7 +4001,7 @@ namespace Waher.Script
 			}
 			else if (E1 is ObjectValue O1 && O1.AssociatedObjectValue is Enum Enum1 && E2 is DoubleNumber)
 			{
-				Type T1 =Enum.GetUnderlyingType(Enum1.GetType());
+				Type T1 = Enum.GetUnderlyingType(Enum1.GetType());
 				if (T1 == typeof(int))
 				{
 					E1 = new DoubleNumber(Convert.ToInt32(Enum1));
@@ -4018,6 +4018,18 @@ namespace Waher.Script
 					Set2 = DoubleNumbers.Instance;
 					return true;
 				}
+			}
+			else if (E1 is StringValue)
+			{
+				E2 = new StringValue(E2.ToString());
+				Set2 = StringValues.Instance;
+				return true;
+			}
+			else if (E2 is StringValue)
+			{
+				E1 = new StringValue(E1.ToString());
+				Set1 = StringValues.Instance;
+				return true;
 			}
 
 			return false;   // TODO: Implement Upgrade()

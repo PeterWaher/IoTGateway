@@ -1289,6 +1289,10 @@ Namespaces and types are values, and can be assigned to variables:
 	CG:=System.Collections.Generic;
 	T:=CG.List;
 
+Types and namespaces can be referenced using their *unqualified name* as long as no other type or namespace share the unqualified name.
+If multiple types and/or namespaces share an unqualified name, referencing the unqualified name will return an array of qualified names
+sharing the unqualified name.
+
 ### Calling static methods on types
 
 Static methods on types are available as method calls using the member operator `.`. Parameters in method calls can be included as parameters in the normal fashion:

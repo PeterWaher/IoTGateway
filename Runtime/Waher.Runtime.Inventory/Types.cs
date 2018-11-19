@@ -17,6 +17,7 @@ namespace Waher.Runtime.Inventory
 		private static SortedDictionary<string, SortedDictionary<string, Type>> typesPerNamespace = new SortedDictionary<string, SortedDictionary<string, Type>>();
 		private static SortedDictionary<string, SortedDictionary<string, bool>> namespacesPerNamespace = new SortedDictionary<string, SortedDictionary<string, bool>>();
 		private static SortedDictionary<string, bool> rootNamespaces = new SortedDictionary<string, bool>();
+		private static SortedDictionary<string, object> qualifiedNames = new SortedDictionary<string, object>();
 		private static Assembly[] assemblies = null;
 		private static IModule[] modules = null;
 		private static WaitHandle[] startWaitHandles = null;
@@ -213,6 +214,49 @@ namespace Waher.Runtime.Inventory
 		}
 
 		/// <summary>
+		/// Gets an array (possibly null) of qualified names relating to an unqualified name.
+		/// </summary>
+		/// <param name="UnqualifiedName">Unqualified name.</param>
+		/// <param name="QualifiedNames">Array of qualified names (null if none)</param>
+		/// <returns>If the unqualified name was recognized.</returns>
+		public static bool TryGetQualifiedNames(string UnqualifiedName, out string[] QualifiedNames)
+		{
+			lock (synchObject)
+			{
+				if (!qualifiedNames.TryGetValue(UnqualifiedName, out object Obj))
+				{
+					QualifiedNames = null;
+					return false;
+				}
+
+				if (Obj is string[] A)
+				{
+					QualifiedNames = A;
+					return true;
+				}
+
+				if (Obj is string s)
+				{
+					QualifiedNames = new string[] { s };
+					qualifiedNames[UnqualifiedName] = QualifiedNames;
+					return true;
+				}
+
+				if (Obj is SortedDictionary<string, bool> Sorted)
+				{
+					QualifiedNames = new string[Sorted.Count];
+					Sorted.Keys.CopyTo(QualifiedNames, 0);
+					qualifiedNames[UnqualifiedName] = QualifiedNames;
+					return true;
+				}
+
+				QualifiedNames = new string[] { Obj.ToString() };
+				qualifiedNames[UnqualifiedName] = QualifiedNames;
+				return true;
+			}
+		}
+
+		/// <summary>
 		/// Invalidates type caches. This method should be called after having loaded assemblies dynamically, to make sure any types,
 		/// interfaces and namespaces in the newly loaded assemblies are included.
 		/// </summary>
@@ -227,6 +271,7 @@ namespace Waher.Runtime.Inventory
 				typesPerNamespace.Clear();
 				namespacesPerNamespace.Clear();
 				rootNamespaces.Clear();
+				qualifiedNames.Clear();
 			}
 
 			EventHandler h = OnInvalidated;
@@ -451,6 +496,11 @@ namespace Waher.Runtime.Inventory
 
 					types[TypeName] = Type;
 
+
+					i = TypeName.LastIndexOf('.');
+					if (i >= 0)
+						RegisterQualifiedName(TypeName.Substring(i + 1), TypeName);
+
 					try
 					{
 						foreach (Type Interface in Type.GetTypeInfo().ImplementedInterfaces)
@@ -486,8 +536,9 @@ namespace Waher.Runtime.Inventory
 								typesPerNamespace[Namespace] = Types;
 
 								i = Namespace.LastIndexOf('.');
-								while (i > 0)
+								while (i >= 0)
 								{
+									RegisterQualifiedName(Namespace.Substring(i + 1), Namespace);
 									ParentNamespace = Namespace.Substring(0, i);
 
 									if (!namespacesPerNamespace.TryGetValue(ParentNamespace, out SortedDictionary<string, bool> Namespaces))
@@ -507,7 +558,10 @@ namespace Waher.Runtime.Inventory
 								}
 
 								if (i < 0)
+								{
 									rootNamespaces[Namespace] = true;
+									RegisterQualifiedName(Namespace, Namespace);
+								}
 							}
 
 							LastNamespace = Namespace;
@@ -520,6 +574,43 @@ namespace Waher.Runtime.Inventory
 			}
 
 			isInitialized = true;
+		}
+
+		private static void RegisterQualifiedName(string UnqualifiedName, string QualifiedName)
+		{
+			if (qualifiedNames.TryGetValue(UnqualifiedName, out object Obj))
+			{
+				if (!(Obj is SortedDictionary<string, bool> Qualified))
+				{
+					if (Obj is string s)
+					{
+						Qualified = new SortedDictionary<string, bool>()
+						{
+							{ s, true }
+						};
+					}
+					else if (Obj is string[] A)
+					{
+						Qualified = new SortedDictionary<string, bool>();
+
+						foreach (string s2 in A)
+							Qualified[s2] = true;
+					}
+					else
+					{
+						Qualified = new SortedDictionary<string, bool>()
+						{
+							{ Obj.ToString(), true }
+						};
+					}
+
+					qualifiedNames[UnqualifiedName] = Qualified;
+				}
+
+				Qualified[QualifiedName] = true;
+			}
+			else
+				qualifiedNames[UnqualifiedName] = QualifiedName;
 		}
 
 		private static void CheckIncluded(ref Assembly[] Assemblies, Assembly A)

@@ -84,7 +84,7 @@ namespace Waher.Script.Persistence.SQL.Parsers
 						Parser.SkipWhiteSpace();
 
 						s = Parser.PeekNextToken().ToUpper();
-						if (s != "," && s != "FROM")
+						if (!string.IsNullOrEmpty(s) && s != "," && s != "FROM")
 						{
 							Name = Parser.ParseNoWhiteSpace();
 							s = Parser.PeekNextToken();
@@ -117,7 +117,7 @@ namespace Waher.Script.Persistence.SQL.Parsers
 					Parser.SkipWhiteSpace();
 
 					s = Parser.PeekNextToken().ToUpper();
-					if (s != "," && s != "WHERE" && s != "GROUP" && s != "ORDER" && s != "OFFSET")
+					if (!string.IsNullOrEmpty(s) && s != "," && s != "WHERE" && s != "GROUP" && s != "ORDER" && s != "OFFSET")
 					{
 						Name = Parser.ParseNoWhiteSpace();
 						s = Parser.PeekNextToken().ToUpper();
@@ -164,7 +164,7 @@ namespace Waher.Script.Persistence.SQL.Parsers
 						Parser.SkipWhiteSpace();
 
 						s = Parser.PeekNextToken().ToUpper();
-						if (s != "," && s != "ORDER" && s != "OFFSET")
+						if (!string.IsNullOrEmpty(s) && s != "," && s != "HAVING" && s != "ORDER" && s != "OFFSET")
 						{
 							Name = Parser.ParseNoWhiteSpace();
 							s = Parser.PeekNextToken().ToUpper();

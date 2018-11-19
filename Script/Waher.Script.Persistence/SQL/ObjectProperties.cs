@@ -9,18 +9,24 @@ namespace Waher.Script.Persistence.SQL
 	/// </summary>
 	public class ObjectProperties : Variables
 	{
+		private readonly IDictionary<string, object> dictionary;
 		private readonly object obj;
 		private readonly Type type;
+		private readonly Variables variables2;
 		private Dictionary<string, Tuple<PropertyInfo, FieldInfo>> properties = null;
+
 		/// <summary>
 		/// Object properties.
 		/// </summary>
 		/// <param name="Object">Object</param>
-		public ObjectProperties(object Object)
+		/// <param name="Variables">Variables</param>
+		public ObjectProperties(object Object, Variables Variables)
 			: base()
 		{
 			this.obj = Object;
+			this.dictionary = Object as IDictionary<string, object>;
 			this.type = Object.GetType();
+			this.variables2 = Variables;
 		}
 
 		/// <summary>
@@ -30,7 +36,10 @@ namespace Waher.Script.Persistence.SQL
 		/// <returns>If a variable with that name exists.</returns>
 		public override bool ContainsVariable(string Name)
 		{
-			if (base.ContainsVariable(Name) || string.Compare(Name, "this", true) == 0)
+			if (this.dictionary != null && this.dictionary.ContainsKey(Name))
+				return true;
+
+			if (this.variables2.ContainsVariable(Name) || base.ContainsVariable(Name) || string.Compare(Name, "this", true) == 0)
 				return true;
 
 			lock (this.variables)
@@ -65,12 +74,21 @@ namespace Waher.Script.Persistence.SQL
 		/// <returns>If a variable with the corresponding name was found.</returns>
 		public override bool TryGetVariable(string Name, out Variable Variable)
 		{
+			if (this.variables2.TryGetVariable(Name, out Variable))
+				return true;
+
 			if (base.TryGetVariable(Name, out Variable))
 				return true;
 
 			if (string.Compare(Name, "this", true) == 0)
 			{
 				Variable = new Variable("this", this.obj);
+				return true;
+			}
+
+			if (this.dictionary != null && this.dictionary.TryGetValue(Name, out object Value))
+			{
+				Variable = new Variable(Name, Value);
 				return true;
 			}
 
@@ -102,8 +120,6 @@ namespace Waher.Script.Persistence.SQL
 			}
 			else
 			{
-				object Value;
-
 				if (Rec.Item1 != null)
 					Value = Rec.Item1.GetValue(this.obj);
 				else

@@ -145,19 +145,29 @@ namespace Waher.Script.Persistence.SQL
 					throw new ScriptRuntimeException("Appropriate Database.Find method not found.", this);
 			}
 
-			string[] OrderBy = new string[c = (this.orderBy?.Length ?? 0)];
+			List<string> OrderBy = new List<string>();
 
-			for (i = 0; i < c; i++)
+			if (this.orderBy != null)
 			{
-				if (this.orderBy[i] is VariableReference Ref)
-					OrderBy[i] = Ref.VariableName;
-				else
-					OrderBy[i] = Expression.ToString(this.orderBy[i].Evaluate(Variables));
+				foreach (ScriptNode Node in this.orderBy)
+				{
+					if (Node is VariableReference Ref)
+						OrderBy.Add(Ref.VariableName);
+				}
+			}
+
+			if (this.groupBy != null)
+			{
+				foreach (ScriptNode Node in this.groupBy)
+				{
+					if (Node is VariableReference Ref && !OrderBy.Contains(Ref.VariableName))
+						OrderBy.Add(Ref.VariableName);
+				}
 			}
 
 			MethodInfo Find = findMethod.MakeGenericMethod(T);
 
-			object Obj = Find.Invoke(null, new object[] { Offset, Top, Convert(this.where, Variables), OrderBy });
+			object Obj = Find.Invoke(null, new object[] { Offset, Top, Convert(this.where, Variables), OrderBy.ToArray() });
 			if (!(Obj is Task Task))
 				throw new ScriptRuntimeException("Unexpected response.", this);
 
@@ -187,26 +197,23 @@ namespace Waher.Script.Persistence.SQL
 			else
 				c = 0;
 
+			if (this.where != null)
+				e = new ConditionalEnumerator(e, Variables, this.where);
+
+			if (this.groupBy != null)
+			{
+				e = new GroupEnumerator(e, Variables, this.groupBy, this.groupByNames);
+
+				if (this.having != null)
+					e = new ConditionalEnumerator(e, Variables, this.having);
+			}
+
 			Type LastItemType = null;
 
 			while (e.MoveNext())
 			{
 				object Item = e.Current;
-				ObjectProperties Properties = new ObjectProperties(Item);
-
-				if (this.where != null)
-				{
-					try
-					{
-						E = this.where.Evaluate(Properties);
-						if (!(E is BooleanValue B) || !B.Value)
-							continue;
-					}
-					catch (Exception)
-					{
-						continue;
-					}
-				}
+				ObjectProperties Properties = new ObjectProperties(Item, Variables);
 
 				if (this.columns == null)
 				{

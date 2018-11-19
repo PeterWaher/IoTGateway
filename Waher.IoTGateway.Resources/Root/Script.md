@@ -767,30 +767,31 @@ The following table lists available string-related functions:
 
 The following functions operate on vectors:
 
-| Function | Description | Example |
-|----------|-------------|---------|
-| `And(v)` | Logical or binary AND of all elements in vector | `And([1,2,3,4,5])`, `And([true,false,true])` |
-| `Avg(v)` | Alias for `Average(v)` | `Avg([1,2,3,4,5])` |
-| `Average(v)` | Average of elements in the vector `v`. | `Average([1,2,3,4,5])` |
+| Function      | Description | Example |
+|---------------|-------------|---------|
+| `And(v)`      | Logical or binary AND of all elements in vector | `And([1,2,3,4,5])`, `And([true,false,true])` |
+| `Avg(v)`      | Alias for `Average(v)` | `Avg([1,2,3,4,5])` |
+| `Average(v)`  | Average of elements in the vector `v`. | `Average([1,2,3,4,5])` |
+| `Count(v)`    | Number of elements in the vector `v`. | `Count([1,2,3,4,5])` |
 | `Join(v1,v2[,v3[,v4[,v5[,v6[,v7[,v8[,v9]]]]]]])` | Joins a sequence of vectors, into a larger vector. | `Join(v1,v2)` |
-| `Max(v)` | The largest element in the vector `v`. | `Max([1,2,3,4,5])` |
-| `Median(v)` | The median element in the vector `v`. | `Median([1,2,3,4,5])` |
-| `Min(v)` | The smallest element in the vector `v`. | `Min([1,2,3,4,5])` |
-| `Nand(v)` | Logical or binary NAND of all elements in vector | `Nand([1,2,3,4,5])`, `Nand([true,false,true])` |
-| `Nor(v)` | Logical or binary NOR of all elements in vector | `Nor([1,2,3,4,5])`, `Nor([true,false,true])` |
-| `Ones(N)` | Creates an N-dimensional vector with all elements set to 1. | `Ones(5)` |
-| `Or(v)` | Logical or binary OR of all elements in vector | `Or([1,2,3,4,5])`, `Or([true,false,true])` |
-| `Prod(v)` | Alias for `Product(v)` | `Prod([1,2,3,4,5])` |
-| `Product(v)` | Product of elements in the vector `v`. | `Product([1,2,3,4,5])` |
-| `Reverse(v)` | Returns a vector with the elements of the original vector `v` in reverse order. | `Reverse([1,2,3,4,5])` |
-| `StdDev(v)` | Alias for `StandardDeviation(v)` | `StdDev([1,2,3,4,5])` |
+| `Max(v)`      | The largest element in the vector `v`. | `Max([1,2,3,4,5])` |
+| `Median(v)`   | The median element in the vector `v`. | `Median([1,2,3,4,5])` |
+| `Min(v)`      | The smallest element in the vector `v`. | `Min([1,2,3,4,5])` |
+| `Nand(v)`     | Logical or binary NAND of all elements in vector | `Nand([1,2,3,4,5])`, `Nand([true,false,true])` |
+| `Nor(v)`      | Logical or binary NOR of all elements in vector | `Nor([1,2,3,4,5])`, `Nor([true,false,true])` |
+| `Ones(N)`     | Creates an N-dimensional vector with all elements set to 1. | `Ones(5)` |
+| `Or(v)`       | Logical or binary OR of all elements in vector | `Or([1,2,3,4,5])`, `Or([true,false,true])` |
+| `Prod(v)`     | Alias for `Product(v)` | `Prod([1,2,3,4,5])` |
+| `Product(v)`  | Product of elements in the vector `v`. | `Product([1,2,3,4,5])` |
+| `Reverse(v)`  | Returns a vector with the elements of the original vector `v` in reverse order. | `Reverse([1,2,3,4,5])` |
+| `StdDev(v)`   | Alias for `StandardDeviation(v)` | `StdDev([1,2,3,4,5])` |
 | `StandardDeviation(v)` | Standard deviation of elements in the vector `v`. | `StandardDeviation([1,2,3,4,5])` |
-| `Sum(v)` | Sum of elements in the vector `v`. | `Sum([1,2,3,4,5])` |
-| `Var(v)` | Alias for `Variance(v)` | `Var([1,2,3,4,5])` |
+| `Sum(v)`      | Sum of elements in the vector `v`. | `Sum([1,2,3,4,5])` |
+| `Var(v)`      | Alias for `Variance(v)` | `Var([1,2,3,4,5])` |
 | `Variance(v)` | Variance of elements in the vector `v`. | `Variance([1,2,3,4,5])` |
-| `Xnor(v)` | Logical or binary XNOR of all elements in vector | `Xnor([1,2,3,4,5])`, `Xnor([true,false,true])` |
-| `Xor(v)` | Logical or binary XOR of all elements in vector | `Xor([1,2,3,4,5])`, `Xor([true,false,true])` |
-| `Zeroes(N)` | Creates an N-dimensional vector with all elements set to 0. | `Zeroes(5)` |
+| `Xnor(v)`     | Logical or binary XNOR of all elements in vector | `Xnor([1,2,3,4,5])`, `Xnor([true,false,true])` |
+| `Xor(v)`      | Logical or binary XOR of all elements in vector | `Xor([1,2,3,4,5])`, `Xor([true,false,true])` |
+| `Zeroes(N)`   | Creates an N-dimensional vector with all elements set to 0. | `Zeroes(5)` |
 
 ### Matrix Functions
 

@@ -36,11 +36,10 @@ namespace Waher.Script.Operators.Comparisons
         /// <returns>Result</returns>
         public override IElement EvaluateScalar(IElement Left, IElement Right, Variables Variables)
         {
-            IOrderedSet S = Left.AssociatedSet as IOrderedSet;
-            if (S == null)
-                throw new ScriptRuntimeException("Cannot compare operands.", this);
+			if (!(Left.AssociatedSet is IOrderedSet S))
+				throw new ScriptRuntimeException("Cannot compare operands.", this);
 
-            if (S.Compare(Left, Right) < 0)
+			if (S.Compare(Left, Right) < 0)
                 return BooleanValue.True;
             else
                 return BooleanValue.False;

@@ -167,7 +167,18 @@ namespace Waher.Script.Persistence.SQL
 
 			MethodInfo Find = findMethod.MakeGenericMethod(T);
 
-			object Obj = Find.Invoke(null, new object[] { Offset, Top, Convert(this.where, Variables), OrderBy.ToArray() });
+			object[] FindParameters = new object[] { Offset, Top, Convert(this.where, Variables), OrderBy.ToArray() };
+			bool ManualPaging = this.groupBy != null || this.where != null;
+			bool ManualTop = Top != int.MaxValue && ManualPaging;
+			bool ManualOffset = Offset != 0 && ManualPaging;
+
+			if (ManualTop)
+				FindParameters[1] = int.MaxValue;
+
+			if (ManualOffset)
+				FindParameters[0] = 0;
+
+			object Obj = Find.Invoke(null, FindParameters);
 			if (!(Obj is Task Task))
 				throw new ScriptRuntimeException("Unexpected response.", this);
 
@@ -208,10 +219,18 @@ namespace Waher.Script.Persistence.SQL
 					e = new ConditionalEnumerator(e, Variables, this.having);
 			}
 
+
+
 			Type LastItemType = null;
 
 			while (e.MoveNext())
 			{
+				if (ManualOffset && Offset > 0)
+				{
+					Offset--;
+					continue;
+				}
+
 				object Item = e.Current;
 				ObjectProperties Properties = new ObjectProperties(Item, Variables);
 
@@ -271,6 +290,9 @@ namespace Waher.Script.Persistence.SQL
 
 				Items.AddLast(Rec);
 				NrRecords++;
+
+				if (ManualTop && NrRecords >= Top)
+					break;
 			}
 
 			IElement[] Elements = new IElement[NrRecords * c];
@@ -328,8 +350,6 @@ namespace Waher.Script.Persistence.SQL
 
 			return Result;
 
-			// TODO: GROUP BY
-			// TODO: HAVING
 			// TODO: Joins
 			// TODO: Source names
 			// TODO: Groups names

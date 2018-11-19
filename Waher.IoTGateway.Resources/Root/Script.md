@@ -1251,9 +1251,29 @@ FROM
 [HAVING
 	groupconditions]]
 [ORDER BY
-	ordercolumn1[, ordercolumn2[, ...]]]
+	ordercolumn1[ ASC|DESC][, ordercolumn2[ ASC|DESC][, ...]]]
 [OFFSET
 	offset]
+```
+
+Example:
+
+```
+select
+   Type, 
+   Level, 
+   count(Timestamp) Nr 
+from 
+   PersistedEvent 
+where 
+   Timestamp>Now.AddDays(-1) 
+group by 
+   Type, 
+   Level 
+having 
+   count(Timestamp)>20
+order by
+   count(Timestamp) desc
 ```
 
 =========================================================================================================================================================

@@ -30,7 +30,7 @@ namespace Waher.Script.Persistence.SQL.Parsers
 		/// <summary>
 		/// Any keywords used internally by the custom parser.
 		/// </summary>
-		public string[] InternalKeywords => new string[] { "FROM", "WHERE", "GROUP", "BY", "HAVING", "ORDER", "TOP", "OFFSET" };
+		public string[] InternalKeywords => new string[] { "FROM", "WHERE", "GROUP", "BY", "HAVING", "ORDER", "TOP", "OFFSET", "ASC", "DESC" };
 
 		/// <summary>
 		/// Tries to parse a script node.
@@ -80,7 +80,7 @@ namespace Waher.Script.Persistence.SQL.Parsers
 					{
 						ScriptNode Node = Parser.ParseNoWhiteSpace();
 						ScriptNode Name = null;
-						
+
 						Parser.SkipWhiteSpace();
 
 						s = Parser.PeekNextToken().ToUpper();
@@ -189,7 +189,7 @@ namespace Waher.Script.Persistence.SQL.Parsers
 					}
 				}
 
-				List<ScriptNode> OrderBy = null;
+				List<KeyValuePair<ScriptNode, bool>> OrderBy = null;
 
 				if (s == "ORDER")
 				{
@@ -197,14 +197,28 @@ namespace Waher.Script.Persistence.SQL.Parsers
 					if (Parser.NextToken().ToUpper() != "BY")
 						return false;
 
-					OrderBy = new List<ScriptNode>();
+					OrderBy = new List<KeyValuePair<ScriptNode, bool>>();
 
 					while (true)
 					{
 						ScriptNode Node = Parser.ParseNoWhiteSpace();
-						OrderBy.Add(Node);
 
 						s = Parser.PeekNextToken().ToUpper();
+						if (s == "ASC")
+						{
+							Parser.NextToken();
+							OrderBy.Add(new KeyValuePair<ScriptNode, bool>(Node, true));
+							s = Parser.PeekNextToken().ToUpper();
+						}
+						else if (s == "DESC")
+						{
+							Parser.NextToken();
+							OrderBy.Add(new KeyValuePair<ScriptNode, bool>(Node, false));
+							s = Parser.PeekNextToken().ToUpper();
+						}
+						else
+							OrderBy.Add(new KeyValuePair<ScriptNode, bool>(Node, true));
+
 						if (s != ",")
 							break;
 
@@ -219,7 +233,7 @@ namespace Waher.Script.Persistence.SQL.Parsers
 					Parser.NextToken();
 					Offset = Parser.ParseNoWhiteSpace();
 				}
-				
+
 				Result = new Select(Columns?.ToArray(), ColumnNames?.ToArray(), Sources.ToArray(), SourceNames.ToArray(),
 					Where, GroupBy?.ToArray(), GroupByNames?.ToArray(), Having, OrderBy?.ToArray(), Top, Offset,
 					Parser.Start, Parser.Length, Parser.Expression);

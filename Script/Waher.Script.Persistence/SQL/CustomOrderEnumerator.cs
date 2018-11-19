@@ -14,7 +14,7 @@ namespace Waher.Script.Persistence.SQL
 	/// </summary>
 	public class CustomOrderEnumerator : IEnumerator
 	{
-		private readonly ScriptNode[] order;
+		private readonly KeyValuePair<ScriptNode, bool>[] order;
 		private readonly Variables variables;
 		private readonly IEnumerator e;
 
@@ -24,7 +24,7 @@ namespace Waher.Script.Persistence.SQL
 		/// <param name="ItemEnumerator">Item enumerator</param>
 		/// <param name="Variables">Current set of variables.</param>
 		/// <param name="Order">Custom order.</param>
-		public CustomOrderEnumerator(IEnumerator ItemEnumerator, Variables Variables, ScriptNode[] Order)
+		public CustomOrderEnumerator(IEnumerator ItemEnumerator, Variables Variables, KeyValuePair<ScriptNode, bool>[] Order)
 		{
 			this.variables = Variables;
 			this.order = Order;
@@ -70,18 +70,25 @@ namespace Waher.Script.Persistence.SQL
 
 				int i, j, c = this.order.Length;
 				IElement Ex, Ey;
+				ScriptNode Node;
 
 				for (i = 0; i < c; i++)
 				{
-					Ex = this.order[i].Evaluate(Vx);
-					Ey = this.order[i].Evaluate(Vy);
+					Node = this.order[i].Key;
+					Ex = Node.Evaluate(Vx);
+					Ey = Node.Evaluate(Vy);
 
 					if (!(Ex.AssociatedSet is IOrderedSet S))
-						throw new ScriptRuntimeException("Result not member of an ordered set.", this.order[i]);
+						throw new ScriptRuntimeException("Result not member of an ordered set.", Node);
 
 					j = S.Compare(Ex, Ey);
 					if (j != 0)
-						return j;
+					{
+						if (this.order[i].Value)
+							return j;
+						else
+							return -j;
+					}
 				}
 
 				return 0;

@@ -25,7 +25,7 @@ namespace Waher.Script.Persistence.SQL
 		private readonly ScriptNode[] sourceNames;
 		private readonly ScriptNode[] groupBy;
 		private readonly ScriptNode[] groupByNames;
-		private readonly ScriptNode[] orderBy;
+		private readonly KeyValuePair<ScriptNode, bool>[] orderBy;
 		private readonly ScriptNode top;
 		private readonly ScriptNode where;
 		private readonly ScriptNode having;
@@ -49,8 +49,8 @@ namespace Waher.Script.Persistence.SQL
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
 		public Select(ScriptNode[] Columns, ScriptNode[] ColumnNames, ScriptNode[] Sources, ScriptNode[] SourceNames, ScriptNode Where,
-			ScriptNode[] GroupBy, ScriptNode[] GroupByNames, ScriptNode Having, ScriptNode[] OrderBy, ScriptNode Top, ScriptNode Offset,
-			int Start, int Length, Expression Expression)
+			ScriptNode[] GroupBy, ScriptNode[] GroupByNames, ScriptNode Having, KeyValuePair<ScriptNode, bool>[] OrderBy, ScriptNode Top,
+			ScriptNode Offset, int Start, int Length, Expression Expression)
 			: base(Start, Length, Expression)
 		{
 			this.columns = Columns;
@@ -150,10 +150,15 @@ namespace Waher.Script.Persistence.SQL
 
 			if (this.orderBy != null)
 			{
-				foreach (ScriptNode Node in this.orderBy)
+				foreach (KeyValuePair<ScriptNode, bool> Node in this.orderBy)
 				{
-					if (Node is VariableReference Ref)
-						OrderBy.Add(Ref.VariableName);
+					if (Node.Key is VariableReference Ref)
+					{
+						if (Node.Value)
+							OrderBy.Add(Ref.VariableName);
+						else
+							OrderBy.Add("-" + Ref.VariableName);
+					}
 					else
 						CalculatedOrder = true;
 				}
@@ -229,13 +234,16 @@ namespace Waher.Script.Persistence.SQL
 
 			if (CalculatedOrder)
 			{
-				List<ScriptNode> Order = new List<ScriptNode>();
+				List<KeyValuePair<ScriptNode, bool>> Order = new List<KeyValuePair<ScriptNode, bool>>();
 
 				if (this.orderBy != null)
 					Order.AddRange(this.orderBy);
 
 				if (this.groupBy != null)
-					Order.AddRange(this.groupBy);
+				{
+					foreach (ScriptNode Group in this.groupBy)
+						Order.Add(new KeyValuePair<ScriptNode, bool>(Group, true));
+				}
 
 				e = new CustomOrderEnumerator(e, Variables, Order.ToArray());
 			}

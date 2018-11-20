@@ -34,6 +34,11 @@ namespace Waher.Script.Functions.Analytic
 		}
 
 		/// <summary>
+		/// Optional aliases. If there are no aliases for the function, null is returned.
+		/// </summary>
+		public override string[] Aliases => new string[] { "√" };
+
+		/// <summary>
 		/// Differentiates a script node, if possible.
 		/// </summary>
 		/// <param name="VariableName">Name of variable to differentiate on.</param>

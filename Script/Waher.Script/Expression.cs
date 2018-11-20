@@ -1141,6 +1141,12 @@ namespace Waher.Script
 				this.SkipWhiteSpace();
 				switch (char.ToUpper(this.PeekNextChar()))
 				{
+					case '∨':
+						this.pos++;
+						Right = this.AssertRightOperandNotNull(this.ParseAnds());
+						Left = new Operators.Logical.Or(Left, Right, Start, this.pos - Start, this);
+						break;
+
 					case '|':
 						this.pos++;
 						switch (this.PeekNextChar())
@@ -1221,6 +1227,12 @@ namespace Waher.Script
 				this.SkipWhiteSpace();
 				switch (char.ToUpper(this.PeekNextChar()))
 				{
+					case '∧':
+						this.pos++;
+						Right = this.AssertRightOperandNotNull(this.ParseMembership());
+						Left = new Operators.Logical.And(Left, Right, Start, this.pos - Start, this);
+						break;
+
 					case '&':
 						this.pos++;
 						switch (this.PeekNextChar())
@@ -1291,6 +1303,8 @@ namespace Waher.Script
 					case 'A':
 					case 'I':
 					case 'N':
+					case '∈':
+					case '∉':
 						switch (this.PeekNextToken().ToUpper())
 						{
 							case "IS":
@@ -1305,10 +1319,22 @@ namespace Waher.Script
 								Left = new As(Left, Right, Start, this.pos - Start, this);
 								continue;
 
+							case "∈":
+								this.pos++;
+								Right = this.AssertRightOperandNotNull(this.ParseComparison());
+								Left = new In(Left, Right, Start, this.pos - Start, this);
+								continue;
+
 							case "IN":
 								this.pos += 2;
 								Right = this.AssertRightOperandNotNull(this.ParseComparison());
 								Left = new In(Left, Right, Start, this.pos - Start, this);
+								continue;
+
+							case "∉":
+								this.pos++;
+								Right = this.AssertRightOperandNotNull(this.ParseComparison());
+								Left = new NotIn(Left, Right, Start, this.pos - Start, this);
 								continue;
 
 							case "NOTIN":
@@ -1457,6 +1483,30 @@ namespace Waher.Script
 							Right = this.AssertRightOperandNotNull(this.ParseShifts());
 							Left = new EqualTo(Left, Right, Start, this.pos - Start, this);
 						}
+						break;
+
+					case '≠':
+						this.pos++;
+						Right = this.AssertRightOperandNotNull(this.ParseShifts());
+						Left = new NotEqualTo(Left, Right, Start, this.pos - Start, this);
+						break;
+
+					case '≡':
+						this.pos++;
+						Right = this.AssertRightOperandNotNull(this.ParseShifts());
+						Left = new IdenticalTo(Left, Right, Start, this.pos - Start, this);
+						break;
+
+					case '≤':
+						this.pos++;
+						Right = this.AssertRightOperandNotNull(this.ParseShifts());
+						Left = new LesserThanOrEqualTo(Left, Right, Start, this.pos - Start, this);
+						break;
+
+					case '≥':
+						this.pos++;
+						Right = this.AssertRightOperandNotNull(this.ParseShifts());
+						Left = new GreaterThanOrEqualTo(Left, Right, Start, this.pos - Start, this);
 						break;
 
 					case '!':

@@ -37,7 +37,7 @@ namespace Waher.Script.Functions.Vectors
         /// </summary>
         public override string[] Aliases
         {
-            get { return new string[] { "prod" }; }
+            get { return new string[] { "prod", "∏" }; }
         }
 
         /// <summary>

@@ -32,13 +32,18 @@ namespace Waher.Script.Functions.Vectors
             get { return "sum"; }
         }
 
-        /// <summary>
-        /// Evaluates the function on a vector argument.
-        /// </summary>
-        /// <param name="Argument">Function argument.</param>
-        /// <param name="Variables">Variables collection.</param>
-        /// <returns>Function result.</returns>
-        public override IElement EvaluateVector(IVector Argument, Variables Variables)
+		/// <summary>
+		/// Optional aliases. If there are no aliases for the function, null is returned.
+		/// </summary>
+		public override string[] Aliases => new string[] { "∑" };
+
+		/// <summary>
+		/// Evaluates the function on a vector argument.
+		/// </summary>
+		/// <param name="Argument">Function argument.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Function result.</returns>
+		public override IElement EvaluateVector(IVector Argument, Variables Variables)
         {
             return EvaluateSum(Argument, this);
         }

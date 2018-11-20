@@ -143,7 +143,7 @@ control the execution flow. Example:
 #### Vectors
 
 Vectors can be explicitly created by listing their elements between square brackets `[` and `]`, or implicitly by inserting a `DO`-`WHILE`, `WHILE`-`DO`,
-`FOR`-`TO`[-`STEP`][-`DO`] or `FOR EACH`/`FOREACH`-`IN`[-`DO`] statements between square brackets. Examples:
+`FOR`-`TO`\[-`STEP`\]\[-`DO`\] or `FOR EACH`/`FOREACH`-`IN`\[-`DO`\] statements between square brackets. Examples:
 
 	v:=[1,2,3];
 	v:=[DO x++ WHILE X<10];
@@ -157,7 +157,7 @@ Vectors can be explicitly created by listing their elements between square brack
 #### Matrices
 
 Matrices can be explicitly created by listing their row vectors between square brackets `[` and `]`, or implicitly by inserting a `DO`-`WHILE`, `WHILE`-`DO`,
-`FOR`-`TO`[-`STEP`][-`DO`] or `FOR EACH`/`FOREACH`-`IN`[-`DO`] statements between square brackets. Examples:
+`FOR`-`TO`\[-`STEP`\]\[-`DO`\] or `FOR EACH`/`FOREACH`-`IN`\[-`DO`\] statements between square brackets. Examples:
 
 	M:=[[1,0,0],[0,1,0],[0,0,1]];
 	M:=[DO [x++,x++,x++] WHILE X<10];
@@ -171,7 +171,7 @@ Matrices can be explicitly created by listing their row vectors between square b
 #### Sets
 
 Sets can be explicitly created by listing their elements between braces `{` and `}`, or implicitly by inserting a `DO`-`WHILE`, `WHILE`-`DO`,
-`FOR`-`TO`[-`STEP`][-`DO`] or `FOR EACH`/`FOREACH`-`IN`[-`DO`] statements between braces. Examples:
+`FOR`-`TO`\[-`STEP`\]\[-`DO`\] or `FOR EACH`/`FOREACH`-`IN`\[-`DO`\] statements between braces. Examples:
 
 	S:={1,2,3};
 	S:={DO x++ WHILE X<10};
@@ -773,6 +773,7 @@ The following functions operate on vectors:
 | `Avg(v)`      | Alias for `Average(v)` | `Avg([1,2,3,4,5])` |
 | `Average(v)`  | Average of elements in the vector `v`. | `Average([1,2,3,4,5])` |
 | `Count(v)`    | Number of elements in the vector `v`. | `Count([1,2,3,4,5])` |
+| `Count(v,x)`  | Number of elements in the vector `v` that are equal to `x`. | `Count([1,2,3,2,1],2)` |
 | `Join(v1,v2[,v3[,v4[,v5[,v6[,v7[,v8[,v9]]]]]]])` | Joins a sequence of vectors, into a larger vector. | `Join(v1,v2)` |
 | `Max(v)`      | The largest element in the vector `v`. | `Max([1,2,3,4,5])` |
 | `Median(v)`   | The median element in the vector `v`. | `Median([1,2,3,4,5])` |
@@ -1260,20 +1261,24 @@ Example:
 
 ```
 select
-   Type, 
-   Level, 
-   count(Timestamp) Nr 
-from 
-   PersistedEvent 
+	Hour,
+	count(Type) Nr,
+	count(Type,EventType.Debug) Debug,
+	count(Type,EventType.Informational) Informational,
+	count(Type,EventType.Notice) Notice,
+	count(Type,EventType.Warning) Warning,
+	count(Type,EventType.Error) Error,
+	count(Type,EventType.Critical) Critical,
+	count(Type,EventType.Alert) Alert,
+	count(Type,EventType.Emergency) Emergency
+from
+	PersistedEvent
 where 
-   Timestamp>Now.AddDays(-1) 
+	Timestamp>=Now.AddDays(-1) 
 group by 
-   Type, 
-   Level 
-having 
-   count(Timestamp)>20
+	DateTime(Timestamp.Year,Timestamp.Month,Timestamp.Day,Timestamp.Hour,0,0) Hour
 order by
-   count(Timestamp) desc
+	Hour
 ```
 
 =========================================================================================================================================================

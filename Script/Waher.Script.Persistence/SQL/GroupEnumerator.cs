@@ -134,9 +134,18 @@ namespace Waher.Script.Persistence.SQL
 			{
 				for (i = 0; i < c; i++)
 				{
-					E = this.groupNames[i]?.Evaluate(Variables);
-					if (E != null && E is StringValue S)
-						Result[S.Value] = Last[i];
+					ScriptNode Node = this.groupNames[i];
+					if (Node == null)
+						continue;
+
+					if (Node is VariableReference Ref)
+						Result[Ref.VariableName] = Last[i];
+					else
+					{
+						E = this.groupNames[i]?.Evaluate(Variables);
+						if (E != null && E is StringValue S)
+							Result[S.Value] = Last[i];
+					}
 				}
 			}
 

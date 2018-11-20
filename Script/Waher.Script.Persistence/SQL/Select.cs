@@ -239,10 +239,13 @@ namespace Waher.Script.Persistence.SQL
 				if (this.orderBy != null)
 					Order.AddRange(this.orderBy);
 
-				if (this.groupBy != null)
+				if (this.groupByNames != null)
 				{
-					foreach (ScriptNode Group in this.groupBy)
-						Order.Add(new KeyValuePair<ScriptNode, bool>(Group, true));
+					foreach (ScriptNode Group in this.groupByNames)
+					{
+						if (Group != null)
+							Order.Add(new KeyValuePair<ScriptNode, bool>(Group, true));
+					}
 				}
 
 				e = new CustomOrderEnumerator(e, Variables, Order.ToArray());
@@ -379,7 +382,6 @@ namespace Waher.Script.Persistence.SQL
 
 			// TODO: Joins
 			// TODO: Source names
-			// TODO: Groups names
 		}
 
 		private static MethodInfo findMethod = null;

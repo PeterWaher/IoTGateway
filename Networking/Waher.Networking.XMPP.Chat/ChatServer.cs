@@ -16,13 +16,16 @@ using Waher.Networking.XMPP.HttpFileUpload;
 using Waher.Networking.XMPP.Provisioning;
 using Waher.Networking.XMPP.Sensor;
 using Waher.Runtime.Cache;
+using Waher.Runtime.Inventory;
 using Waher.Script;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Graphs;
+using Waher.Script.Model;
 using Waher.Script.Objects;
 using Waher.Script.Objects.Matrices;
 using Waher.Script.Objects.VectorSpaces;
 using Waher.Script.Operators.Vectors;
+using Waher.Security;
 using Waher.Things;
 using Waher.Things.SensorData;
 using Waher.Things.ControlParameters;
@@ -364,6 +367,20 @@ namespace Waher.Networking.XMPP.Chat
 						}
 
 						this.SendPlainTextChatMessage(e.From, Msg.ToString());
+
+						if (Variables.TryGetVariable(" User ", out v) &&
+							v.ValueObject is User User &&
+							Types.TryGetQualifiedNames(typeof(Expression).Namespace + ".Persistence", out string[] P))
+						{
+							this.provisioningClient.CanRead(e.FromBareJID, FieldType.All, null, null, null, null, null, (sender3, e3) =>
+							{
+								if (e3.CanRead && e3.FieldTypes == FieldType.All)
+								{
+									User.SetPrivilege(typeof(Expression).Namespace + ".Persistence.SQL.Select", true);
+									this.SendPlainTextChatMessage(e.From, "SQL SELECT interface enabled.");
+								}
+							}, null);
+						}
 
 					}, Variables);
 				}
@@ -1301,6 +1318,13 @@ namespace Waher.Networking.XMPP.Chat
 			Variables.ConsoleOut = new StringWriter(sb);
 			try
 			{
+				if (!Variables.TryGetVariable(" User ", out Variable v) ||
+					!(v.ValueObject is IUser User) ||
+					!Exp.ForAll(this.IsAuthorized, User, false))
+				{
+					throw new Exception("Unauthorized to execute expression.");
+				}
+
 				IElement Result = Exp.Root.Evaluate(Variables);
 				Variables["Ans"] = Result;
 
@@ -1376,6 +1400,14 @@ namespace Waher.Networking.XMPP.Chat
 				Variables.ConsoleOut = Bak;
 				Variables.Release();
 			}
+		}
+
+		private bool IsAuthorized(ref ScriptNode Node, object State)
+		{
+			if (State is IUser User)
+				return User.HasPrivilege(Node.GetType().FullName);
+			else
+				return false;
 		}
 
 		private void ImageResult(string To, SKImage Bmp, RemoteXmppSupport Support, Variables Variables, bool AllowHttpUpload)
@@ -1492,7 +1524,12 @@ namespace Waher.Networking.XMPP.Chat
 		{
 			if (!this.sessions.TryGetValue(Address, out Variables Variables))
 			{
-				Variables = new Variables();
+				User User = new User(Address);
+
+				User.SetPrivilege(typeof(Expression).Namespace, true);
+				User.SetPrivilege(typeof(Expression).Namespace + ".Persistence", false);
+
+				Variables = new Variables(new Variable(" User ", User));
 				this.sessions.Add(Address, Variables);
 			}
 

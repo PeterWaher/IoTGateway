@@ -13,7 +13,7 @@ namespace Waher.Script.Operators
     /// </summary>
     public class ElementList : ScriptNode
     {
-        ScriptNode[] elements;
+        private readonly ScriptNode[] elements;
 
         /// <summary>
         /// Represents a list of elements.
@@ -78,5 +78,40 @@ namespace Waher.Script.Operators
             return VectorDefinition.Encapsulate(List, true, this);
         }
 
-    }
+		/// <summary>
+		/// Calls the callback method for all child nodes.
+		/// </summary>
+		/// <param name="Callback">Callback method to call.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		/// <param name="DepthFirst">If calls are made depth first (true) or on each node and then its leaves (false).</param>
+		/// <returns>If the process was completed.</returns>
+		public override bool ForAllChildNodes(ScriptNodeEventHandler Callback, object State, bool DepthFirst)
+		{
+			int i, c = this.elements.Length;
+
+			if (DepthFirst)
+			{
+				if (!ForAllChildNodes(Callback, this.elements, State, DepthFirst))
+					return false;
+			}
+
+			for (i = 0; i < c; i++)
+			{
+				if (!Callback(ref this.elements[i], State))
+					return false;
+			}
+
+			if (!DepthFirst)
+			{
+				for (i = 0; i < c; i++)
+				{
+					if (!ForAllChildNodes(Callback, this.elements, State, DepthFirst))
+						return false;
+				}
+			}
+
+			return true;
+		}
+
+	}
 }

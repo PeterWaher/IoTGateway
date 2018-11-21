@@ -11,7 +11,7 @@ namespace Waher.Script.Operators
 	/// </summary>
 	public class Sequence : ScriptNode
 	{
-		LinkedList<ScriptNode> statements;
+		private readonly LinkedList<ScriptNode> statements;
 
 		/// <summary>
 		/// Represents a sequence of statements.
@@ -47,6 +47,60 @@ namespace Waher.Script.Operators
 				Result = Node.Evaluate(Variables);
 
 			return Result;
+		}
+
+		/// <summary>
+		/// Calls the callback method for all child nodes.
+		/// </summary>
+		/// <param name="Callback">Callback method to call.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		/// <param name="DepthFirst">If calls are made depth first (true) or on each node and then its leaves (false).</param>
+		/// <returns>If the process was completed.</returns>
+		public override bool ForAllChildNodes(ScriptNodeEventHandler Callback, object State, bool DepthFirst)
+		{
+			LinkedListNode<ScriptNode> Loop;
+
+			if (DepthFirst)
+			{
+				Loop = this.statements.First;
+
+				while (Loop != null)
+				{
+					if (!Loop.Value.ForAllChildNodes(Callback, State, DepthFirst))
+						return false;
+
+					Loop = Loop.Next;
+				}
+			}
+
+			Loop = this.statements.First;
+
+			while (Loop != null)
+			{
+				ScriptNode Node = Loop.Value;
+				bool Result = Callback(ref Node, State);
+				Loop.Value = Node;
+
+				if (!Result)
+					return false;
+
+				Loop = Loop.Next;
+			}
+
+			if (!DepthFirst)
+			{
+				Loop = this.statements.First;
+
+				while (Loop != null)
+				{
+					if (!Loop.Value.ForAllChildNodes(Callback, State, DepthFirst))
+						return false;
+
+					Loop = Loop.Next;
+				}
+			}
+
+			return true;
 		}
 
 	}

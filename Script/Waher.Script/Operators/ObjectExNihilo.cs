@@ -10,7 +10,7 @@ namespace Waher.Script.Operators
 	/// </summary>
 	public class ObjectExNihilo : ScriptNode
 	{
-		private LinkedList<KeyValuePair<string, ScriptNode>> members;
+		private readonly LinkedList<KeyValuePair<string, ScriptNode>> members;
 
 		/// <summary>
 		/// Creates an object from nothing.
@@ -48,5 +48,60 @@ namespace Waher.Script.Operators
             return new ObjectValue(Result);
         }
 
-    }
+		/// <summary>
+		/// Calls the callback method for all child nodes.
+		/// </summary>
+		/// <param name="Callback">Callback method to call.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		/// <param name="DepthFirst">If calls are made depth first (true) or on each node and then its leaves (false).</param>
+		/// <returns>If the process was completed.</returns>
+		public override bool ForAllChildNodes(ScriptNodeEventHandler Callback, object State, bool DepthFirst)
+		{
+			LinkedListNode<KeyValuePair<string, ScriptNode>> Loop;
+
+			if (DepthFirst)
+			{
+				Loop = this.members.First;
+
+				while (Loop != null)
+				{
+					if (!Loop.Value.Value.ForAllChildNodes(Callback, State, DepthFirst))
+						return false;
+
+					Loop = Loop.Next;
+				}
+			}
+
+			Loop = this.members.First;
+
+			while (Loop != null)
+			{
+				ScriptNode Node = Loop.Value.Value;
+				bool Result = Callback(ref Node, State);
+				if (Loop.Value.Value != Node)
+					Loop.Value = new KeyValuePair<string, ScriptNode>(Loop.Value.Key, Node);
+
+				if (!Result)
+					return false;
+
+				Loop = Loop.Next;
+			}
+
+			if (!DepthFirst)
+			{
+				Loop = this.members.First;
+
+				while (Loop != null)
+				{
+					if (!Loop.Value.Value.ForAllChildNodes(Callback, State, DepthFirst))
+						return false;
+
+					Loop = Loop.Next;
+				}
+			}
+
+			return true;
+		}
+
+	}
 }

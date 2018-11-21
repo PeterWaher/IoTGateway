@@ -8,7 +8,7 @@ namespace Waher.Script.Model
     /// <summary>
     /// Represents a constant element value.
     /// </summary>
-    public class ConstantElement : ScriptNode, IDifferentiable
+    public class ConstantElement : ScriptLeafNode, IDifferentiable
     {
         private readonly IElement constant;
 

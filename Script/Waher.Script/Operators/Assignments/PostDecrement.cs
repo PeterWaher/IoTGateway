@@ -11,9 +11,9 @@ namespace Waher.Script.Operators.Assignments
 	/// <summary>
 	/// Post-Decrement operator.
 	/// </summary>
-	public class PostDecrement : ScriptNode
+	public class PostDecrement : ScriptLeafNode
 	{
-		private string variableName;
+		private readonly string variableName;
 		
 		/// <summary>
 		/// Post-Decrement operator.

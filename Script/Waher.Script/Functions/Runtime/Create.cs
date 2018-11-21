@@ -13,7 +13,7 @@ namespace Waher.Script.Functions.Runtime
     /// </summary>
     public class Create : Function
     {
-        private readonly ScriptNode type;
+        private ScriptNode type;
         private readonly ScriptNode[] parameters;
         private readonly int nrParameters;
 
@@ -408,7 +408,48 @@ namespace Waher.Script.Functions.Runtime
             return Expression.Encapsulate(this.constructor.Invoke(this.constructorArguments));
         }
 
-        private Type lastType = null;
+		/// <summary>
+		/// Calls the callback method for all child nodes.
+		/// </summary>
+		/// <param name="Callback">Callback method to call.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		/// <param name="DepthFirst">If calls are made depth first (true) or on each node and then its leaves (false).</param>
+		/// <returns>If the process was completed.</returns>
+		public override bool ForAllChildNodes(ScriptNodeEventHandler Callback, object State, bool DepthFirst)
+		{
+			int i;
+
+			if (DepthFirst)
+			{
+				if (!this.type.ForAllChildNodes(Callback, State, DepthFirst))
+					return false;
+
+				if (!ForAllChildNodes(Callback, this.parameters, State, DepthFirst))
+					return false;
+			}
+
+			if (!Callback(ref this.type, State))
+				return false;
+
+			for (i = 0; i < this.nrParameters; i++)
+			{
+				if (!Callback(ref this.parameters[i], State))
+					return false;
+			}
+
+			if (!DepthFirst)
+			{
+				if (!this.type.ForAllChildNodes(Callback, State, DepthFirst))
+					return false;
+
+				if (!ForAllChildNodes(Callback, this.parameters, State, DepthFirst))
+					return false;
+			}
+
+			return true;
+		}
+
+		private Type lastType = null;
         private Type lastGenericType = null;
         private Type[] genericArguments = null;
         private ConstructorInfo constructor = null;

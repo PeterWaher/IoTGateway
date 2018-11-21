@@ -40,7 +40,7 @@ namespace Waher.Script
 		private static Dictionary<string, IKeyWord> customKeyWords = null;
 		private static readonly Dictionary<string, bool> keywords = GetKeywords();
 
-		private readonly ScriptNode root;
+		private ScriptNode root;
 		private string script;
 		private object tag;
 		private int pos;
@@ -4170,6 +4170,33 @@ namespace Waher.Script
 		{
 			get { return this.tag; }
 			set { this.tag = value; }
+		}
+
+		/// <summary>
+		/// Calls the callback method for all script nodes defined for the expression.
+		/// </summary>
+		/// <param name="Callback">Callback method to call.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		/// <param name="DepthFirst">If calls are made depth first (true) or on each node and then its leaves (false).</param>
+		/// <returns>If the process was completed.</returns>
+		public bool ForAll(ScriptNodeEventHandler Callback, object State, bool DepthFirst)
+		{
+			if (DepthFirst)
+			{
+				if (!this.root.ForAllChildNodes(Callback, State, DepthFirst))
+					return false;
+			}
+
+			if (!Callback(ref this.root, State))
+				return false;
+
+			if (!DepthFirst)
+			{
+				if (!this.root.ForAllChildNodes(Callback, State, DepthFirst))
+					return false;
+			}
+
+			return true;
 		}
 
 		// TODO: Optimize constants

@@ -11,9 +11,9 @@ namespace Waher.Script.Operators.Assignments
 	/// <summary>
 	/// Pre-Decrement operator.
 	/// </summary>
-	public class PreDecrement : ScriptNode
+	public class PreDecrement : ScriptLeafNode
 	{
-		private string variableName;
+		private readonly string variableName;
 		
 		/// <summary>
 		/// Pre-Decrement operator.

@@ -11,7 +11,7 @@ namespace Waher.Script.Model
 	/// <summary>
 	/// Represents a variable reference.
 	/// </summary>
-	public sealed class VariableReference : ScriptNode, IDifferentiable
+	public sealed class VariableReference : ScriptLeafNode, IDifferentiable
 	{
 		private readonly string variableName;
 		private readonly bool onlyVariables;

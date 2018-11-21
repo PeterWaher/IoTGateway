@@ -9,6 +9,14 @@ using Waher.Script.Operators.Arithmetics;
 namespace Waher.Script.Model
 {
 	/// <summary>
+	/// Delegate for ScriptNode callback methods.
+	/// </summary>
+	/// <param name="Node">Node being processed. Change the reference to change the structure of the expression.</param>
+	/// <param name="State">State object.</param>
+	/// <returns>true if process is to continue, false if it is completed.</returns>
+	public delegate bool ScriptNodeEventHandler(ref ScriptNode Node, object State);
+
+	/// <summary>
 	/// Base class for all nodes in a parsed script tree.
 	/// </summary>
 	public abstract class ScriptNode
@@ -127,6 +135,74 @@ namespace Waher.Script.Model
 			else
 				throw new ScriptRuntimeException("Argument not differentiable.", this);
 
+		}
+
+		/// <summary>
+		/// Calls the callback method for all child nodes.
+		/// </summary>
+		/// <param name="Callback">Callback method to call.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		/// <param name="DepthFirst">If calls are made depth first (true) or on each node and then its leaves (false).</param>
+		/// <returns>If the process was completed.</returns>
+		public abstract bool ForAllChildNodes(ScriptNodeEventHandler Callback, object State, bool DepthFirst);
+
+		/// <summary>
+		/// Calls the <see cref="ForAll(ScriptNodeEventHandler, ScriptNode[], object, bool)"/> method for all nodes in an array.
+		/// </summary>
+		/// <param name="Callback">Callback method to call.</param>
+		/// <param name="Nodes">Script node array</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		/// <param name="DepthFirst">If calls are made depth first (true) or on each node and then its leaves (false).</param>
+		/// <returns>If the process was completed.</returns>
+		protected static bool ForAllChildNodes(ScriptNodeEventHandler Callback, ScriptNode[] Nodes, object State, bool DepthFirst)
+		{
+			if (Nodes != null)
+			{
+				int i, c = Nodes.Length;
+
+				for (i = 0; i < c; i++)
+				{
+					ScriptNode Node = Nodes[i];
+					if (Node != null)
+					{
+						if (!Node.ForAllChildNodes(Callback, State, DepthFirst))
+							return false;
+					}
+				}
+			}
+
+			return true;
+		}
+
+		/// <summary>
+		/// Calls the callback method for all nodes in an array.
+		/// </summary>
+		/// <param name="Callback">Callback method to call.</param>
+		/// <param name="Nodes">Script node array</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		/// <param name="DepthFirst">If calls are made depth first (true) or on each node and then its leaves (false).</param>
+		/// <returns>If the process was completed.</returns>
+		protected static bool ForAll(ScriptNodeEventHandler Callback, ScriptNode[] Nodes, object State, bool DepthFirst)
+		{
+			if (Nodes != null)
+			{
+				int i, c = Nodes.Length;
+				ScriptNode Node;
+
+				for (i = 0; i < c; i++)
+				{
+					Node = Nodes[i];
+					if (Node != null)
+					{
+						if (!Callback(ref Node, State))
+							return false;
+
+						Nodes[i] = Node;
+					}
+				}
+			}
+
+			return true;
 		}
 	}
 }

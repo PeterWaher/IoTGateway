@@ -11,9 +11,9 @@ namespace Waher.Script.Operators.Assignments
 	/// <summary>
 	/// Pre-Increment operator.
 	/// </summary>
-	public class PreIncrement : ScriptNode
+	public class PreIncrement : ScriptLeafNode
 	{
-		private string variableName;
+		private readonly string variableName;
 		
 		/// <summary>
 		/// Pre-Increment operator.

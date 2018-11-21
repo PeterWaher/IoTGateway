@@ -10,9 +10,9 @@ namespace Waher.Script.Operators
 	/// <summary>
 	/// Represents an implicit string to be printed.
 	/// </summary>
-	public class ImplicitPrint : ScriptNode
+	public class ImplicitPrint : ScriptLeafNode
 	{
-		private string content;
+		private readonly string content;
 
 		/// <summary>
 		/// Represents an implicit string to be printed.

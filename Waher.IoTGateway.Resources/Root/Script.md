@@ -1281,6 +1281,31 @@ order by
 	Hour
 ```
 
+#### DELETE
+
+Simplified SQL `DELETE` statements can be executed against the object database. The number of objects deleted is returned.
+
+Syntax:
+
+```
+DELETE
+FROM
+	type
+[WHERE
+	conditions]
+```
+
+Example:
+
+```
+delete
+from
+	PersistedEvent
+where 
+	Timestamp>=Now.AddDays(-1) and
+	Type=EventType.Informational
+```
+
 =========================================================================================================================================================
 
 Interaction with .NET Code Behind classes

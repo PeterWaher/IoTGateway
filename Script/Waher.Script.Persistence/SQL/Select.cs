@@ -26,10 +26,10 @@ namespace Waher.Script.Persistence.SQL
 		private readonly ScriptNode[] groupBy;
 		private readonly ScriptNode[] groupByNames;
 		private readonly KeyValuePair<ScriptNode, bool>[] orderBy;
-		private readonly ScriptNode top;
-		private readonly ScriptNode where;
-		private readonly ScriptNode having;
-		private readonly ScriptNode offset;
+		private ScriptNode top;
+		private ScriptNode where;
+		private ScriptNode having;
+		private ScriptNode offset;
 
 		/// <summary>
 		/// Executes a SELECT statement against the object database.
@@ -121,30 +121,6 @@ namespace Waher.Script.Persistence.SQL
 			if (!(E.AssociatedObjectValue is Type T))
 				throw new ScriptRuntimeException("Type expected.", this.sources[0]);
 
-			if (findMethod == null)
-			{
-				foreach (MethodInfo MI in typeof(Database).GetTypeInfo().GetDeclaredMethods("Find"))
-				{
-					if (!MI.ContainsGenericParameters)
-						continue;
-
-					ParameterInfo[] Parameters = MI.GetParameters();
-					if (Parameters.Length != 4 ||
-						Parameters[0].ParameterType != typeof(int) ||
-						Parameters[1].ParameterType != typeof(int) ||
-						Parameters[2].ParameterType != typeof(Filter) ||
-						Parameters[3].ParameterType != typeof(string[]))
-					{
-						continue;
-					}
-
-					findMethod = MI;
-				}
-
-				if (findMethod == null)
-					throw new ScriptRuntimeException("Appropriate Database.Find method not found.", this);
-			}
-
 			List<string> OrderBy = new List<string>();
 			bool CalculatedOrder = false;
 
@@ -178,32 +154,11 @@ namespace Waher.Script.Persistence.SQL
 				}
 			}
 
-			MethodInfo Find = findMethod.MakeGenericMethod(T);
-
-			object[] FindParameters = new object[] { Offset, Top, Convert(this.where, Variables), OrderBy.ToArray() };
 			bool ManualPaging = this.groupBy != null || this.where != null;
 			bool ManualTop = Top != int.MaxValue && ManualPaging;
 			bool ManualOffset = Offset != 0 && ManualPaging;
 
-			if (ManualTop)
-				FindParameters[1] = int.MaxValue;
-
-			if (ManualOffset)
-				FindParameters[0] = 0;
-
-			object Obj = Find.Invoke(null, FindParameters);
-			if (!(Obj is Task Task))
-				throw new ScriptRuntimeException("Unexpected response.", this);
-
-			PropertyInfo PI = Task.GetType().GetRuntimeProperty("Result");
-			if (PI == null)
-				throw new ScriptRuntimeException("Unexpected response.", this);
-
-			Obj = PI.GetValue(Task);
-			if (!(Obj is IEnumerable Enumerable))
-				throw new ScriptRuntimeException("Unexpected response.", this);
-
-			IEnumerator e = Enumerable.GetEnumerator();
+			IEnumerator e = Find(T, ManualOffset ? 0 : Offset, ManualTop ? int.MaxValue : Top, this.where, Variables, OrderBy.ToArray(), this);
 			LinkedList<IElement[]> Items = new LinkedList<IElement[]>();
 			Dictionary<string, int> Columns = new Dictionary<string, int>();
 			IElement[] Rec;
@@ -384,16 +339,73 @@ namespace Waher.Script.Persistence.SQL
 			// TODO: Source names
 		}
 
+		internal static IEnumerator Find(Type T, int Offset, int Top, ScriptNode Where, Variables Variables, string[] Order, ScriptNode Node)
+		{
+			object[] FindParameters = new object[] { Offset, Top, Convert(Where, Variables), Order };
+			object Obj = FindMethod.MakeGenericMethod(T).Invoke(null, FindParameters);
+			if (!(Obj is Task Task))
+				throw new ScriptRuntimeException("Unexpected response.", Node);
+
+			PropertyInfo PI = Task.GetType().GetRuntimeProperty("Result");
+			if (PI == null)
+				throw new ScriptRuntimeException("Unexpected response.", Node);
+
+			Obj = PI.GetValue(Task);
+			if (!(Obj is IEnumerable Enumerable))
+				throw new ScriptRuntimeException("Unexpected response.", Node);
+
+			return Enumerable.GetEnumerator();
+		}
+
 		private static MethodInfo findMethod = null;
 
-		private static Filter Convert(ScriptNode Conditions, Variables Variables)
+		/// <summary>
+		/// Generic object database Find method: <see cref="Database.Find{T}(int, int, Filter, string[])"/>
+		/// </summary>
+		public static MethodInfo FindMethod
+		{
+			get
+			{
+				if (findMethod == null)
+				{
+					foreach (MethodInfo MI in typeof(Database).GetTypeInfo().GetDeclaredMethods("Find"))
+					{
+						if (!MI.ContainsGenericParameters)
+							continue;
+
+						ParameterInfo[] Parameters = MI.GetParameters();
+						if (Parameters.Length != 4 ||
+							Parameters[0].ParameterType != typeof(int) ||
+							Parameters[1].ParameterType != typeof(int) ||
+							Parameters[2].ParameterType != typeof(Filter) ||
+							Parameters[3].ParameterType != typeof(string[]))
+						{
+							continue;
+						}
+
+						findMethod = MI;
+					}
+
+					if (findMethod == null)
+						throw new InvalidOperationException("Appropriate Database.Find method not found.");
+				}
+
+				return findMethod;
+			}
+		}
+
+		internal static Filter Convert(ScriptNode Conditions, Variables Variables)
 		{
 			if (Conditions == null)
 				return null;
-			else if (Conditions is Operators.Logical.And And)
+
+			Operators.Logical.And And = Conditions as Operators.Logical.And;
+			Operators.Dual.And And2 = And == null ? Conditions as Operators.Dual.And : null;
+
+			if (And != null || And2 != null)
 			{
-				Filter L = Convert(And.LeftOperand, Variables);
-				Filter R = Convert(And.RightOperand, Variables);
+				Filter L = Convert(And != null ? And.LeftOperand : And2.LeftOperand, Variables);
+				Filter R = Convert(And != null ? And.RightOperand : And2.RightOperand, Variables);
 
 				if (L == null && R == null)
 					return null;
@@ -418,10 +430,14 @@ namespace Waher.Script.Persistence.SQL
 					return new FilterAnd(Filters.ToArray());
 				}
 			}
-			else if (Conditions is Operators.Logical.Or Or)
+
+			Operators.Logical.Or Or = Conditions as Operators.Logical.Or;
+			Operators.Dual.Or Or2 = Or == null ? Conditions as Operators.Dual.Or : null;
+
+			if (Or != null || Or2 != null)
 			{
-				Filter L = Convert(Or.LeftOperand, Variables);
-				Filter R = Convert(Or.RightOperand, Variables);
+				Filter L = Convert(Or != null ? Or.LeftOperand : Or2.LeftOperand, Variables);
+				Filter R = Convert(Or != null ? Or.RightOperand : Or2.RightOperand, Variables);
 
 				if (L == null || R == null)
 					return null;
@@ -442,7 +458,8 @@ namespace Waher.Script.Persistence.SQL
 					return new FilterOr(Filters.ToArray());
 				}
 			}
-			else if (Conditions is Operators.Logical.Not Not)
+
+			if (Conditions is Operators.Logical.Not Not)
 			{
 				Filter F = Convert(Not.Operand, Variables);
 				if (F == null)
@@ -539,6 +556,112 @@ namespace Waher.Script.Persistence.SQL
 		}
 
 		private static readonly char[] regexSpecialCharaters = new char[] { '\\', '^', '$', '{', '}', '[', ']', '(', ')', '.', '*', '+', '?', '|', '<', '>', '-', '&' };
+
+		/// <summary>
+		/// Calls the callback method for all child nodes.
+		/// </summary>
+		/// <param name="Callback">Callback method to call.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		/// <param name="DepthFirst">If calls are made depth first (true) or on each node and then its leaves (false).</param>
+		/// <returns>If the process was completed.</returns>
+		public override bool ForAllChildNodes(ScriptNodeEventHandler Callback, object State, bool DepthFirst)
+		{
+			int i, c;
+
+			if (DepthFirst)
+			{
+				if (!ForAllChildNodes(Callback, this.columns, State, DepthFirst) ||
+					!ForAllChildNodes(Callback, this.columnNames, State, DepthFirst) ||
+					!ForAllChildNodes(Callback, this.sources, State, DepthFirst) ||
+					!ForAllChildNodes(Callback, this.sourceNames, State, DepthFirst) ||
+					!ForAllChildNodes(Callback, this.groupBy, State, DepthFirst) ||
+					!ForAllChildNodes(Callback, this.groupByNames, State, DepthFirst) ||
+					!(this.top?.ForAllChildNodes(Callback, State, DepthFirst) ?? true) ||
+					!(this.where?.ForAllChildNodes(Callback, State, DepthFirst) ?? true) ||
+					!(this.having?.ForAllChildNodes(Callback, State, DepthFirst) ?? true) ||
+					!(this.offset?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
+				{
+					return false;
+				}
+
+				if (this.orderBy != null)
+				{
+					c = this.orderBy.Length;
+					for (i = 0; i < c; i++)
+					{
+						if (!this.orderBy[i].Key.ForAllChildNodes(Callback, State, DepthFirst))
+							return false;
+					}
+				}
+			}
+
+			if (!ForAllChildNodes(Callback, this.columns, State, DepthFirst) ||
+				!ForAllChildNodes(Callback, this.columnNames, State, DepthFirst) ||
+				!ForAllChildNodes(Callback, this.sources, State, DepthFirst) ||
+				!ForAllChildNodes(Callback, this.sourceNames, State, DepthFirst) ||
+				!ForAllChildNodes(Callback, this.groupBy, State, DepthFirst) ||
+				!ForAllChildNodes(Callback, this.groupByNames, State, DepthFirst))
+			{
+				return false;
+			}
+
+			if (this.top != null)
+				Callback(ref this.top, State);
+
+			if (this.where != null)
+				Callback(ref this.where, State);
+
+			if (this.having != null)
+				Callback(ref this.having, State);
+
+			if (this.offset != null)
+				Callback(ref this.offset, State);
+
+			if (this.orderBy != null)
+			{
+				c = this.orderBy.Length;
+				for (i = 0; i < c; i++)
+				{
+					ScriptNode Node = this.orderBy[i].Key;
+					ScriptNode Node0 = Node;
+
+					if (!Callback(ref Node, State))
+						return false;
+
+					if (Node != Node0)
+						this.orderBy[i] = new KeyValuePair<ScriptNode, bool>(Node, this.orderBy[i].Value);
+				}
+			}
+
+			if (!DepthFirst)
+			{
+				if (!ForAllChildNodes(Callback, this.columns, State, DepthFirst) ||
+					!ForAllChildNodes(Callback, this.columnNames, State, DepthFirst) ||
+					!ForAllChildNodes(Callback, this.sources, State, DepthFirst) ||
+					!ForAllChildNodes(Callback, this.sourceNames, State, DepthFirst) ||
+					!ForAllChildNodes(Callback, this.groupBy, State, DepthFirst) ||
+					!ForAllChildNodes(Callback, this.groupByNames, State, DepthFirst) ||
+					!(this.top?.ForAllChildNodes(Callback, State, DepthFirst) ?? true) ||
+					!(this.where?.ForAllChildNodes(Callback, State, DepthFirst) ?? true) ||
+					!(this.having?.ForAllChildNodes(Callback, State, DepthFirst) ?? true) ||
+					!(this.offset?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
+				{
+					return false;
+				}
+
+				if (this.orderBy != null)
+				{
+					c = this.orderBy.Length;
+					for (i = 0; i < c; i++)
+					{
+						if (!this.orderBy[i].Key.ForAllChildNodes(Callback, State, DepthFirst))
+							return false;
+					}
+				}
+			}
+
+			return true;
+		}
 
 	}
 }

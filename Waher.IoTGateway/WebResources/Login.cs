@@ -149,7 +149,7 @@ namespace Waher.IoTGateway.WebResources
 
 			public bool HasPrivilege(string Privilege)
 			{
-				return false;
+				return true;
 			}
 		}
 

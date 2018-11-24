@@ -801,6 +801,20 @@
               <File Id='Waher.Utility.AnalyzeDB.pdb' Name='Waher.Utility.AnalyzeDB.pdb' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.AnalyzeDB\bin\$(var.Configuration)\netcoreapp2.0\Waher.Utility.AnalyzeDB.pdb' Vital='yes' KeyPath='yes'/>
               <RemoveFile Id='RemoveWaher.Utility.AnalyzeDB.pdb' Name='Waher.Utility.AnalyzeDB.pdb' On='uninstall'/>
             </Component>
+						<Component Id='UtilityCsp' Guid='529EE306-678B-4A95-BF7A-9F210ACC4651'>
+							<File Id='Waher.Utility.Csp.exe' Name='Waher.Utility.Csp.exe' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Csp\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.Csp.exe' Vital='yes' KeyPath='yes'/>
+							<File Id='Waher.Utility.Csp.dll' Name='Waher.Utility.Csp.dll' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Csp\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.Csp.dll' Vital='yes'/>
+							<File Id='Waher.Utility.Csp.deps.json' Name='Waher.Utility.Csp.deps.json' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Csp\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.Csp.deps.json' Vital='yes'/>
+							<File Id='Waher.Utility.Csp.runtimeconfig.json' Name='Waher.Utility.Csp.runtimeconfig.json' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Csp\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.Csp.runtimeconfig.json' Vital='yes'/>
+							<RemoveFile Id='RemoveWaher.Utility.Csp.exe' Name='Waher.Utility.Csp.exe' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Utility.Csp.dll' Name='Waher.Utility.Csp.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Utility.Csp.deps.json' Name='Waher.Utility.Csp.deps.json' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Utility.Csp.runtimeconfig.json' Name='Waher.Utility.Csp.runtimeconfig.json' On='uninstall'/>
+						</Component>
+						<Component Id='UtilityCspDebugFiles' Guid='E1FA947F-3706-4261-9C96-587632B34A35'>
+							<File Id='Waher.Utility.Csp.pdb' Name='Waher.Utility.Csp.pdb' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Csp\bin\$(var.Configuration)\netcoreapp2.0\Waher.Utility.Csp.pdb' Vital='yes' KeyPath='yes'/>
+							<RemoveFile Id='RemoveWaher.Utility.Csp.pdb' Name='Waher.Utility.Csp.pdb' On='uninstall'/>
+						</Component>
 						<Component Id='UtilityDeleteDB' Guid='0AB793F8-C124-42B0-B0A2-4FCF2B74A3F6'>
 							<File Id='Waher.Utility.DeleteDB.exe' Name='Waher.Utility.DeleteDB.exe' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.DeleteDB\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.DeleteDB.exe' Vital='yes' KeyPath='yes'/>
 							<File Id='Waher.Utility.DeleteDB.dll' Name='Waher.Utility.DeleteDB.dll' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.DeleteDB\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.DeleteDB.dll' Vital='yes'/>
@@ -1326,6 +1340,7 @@
 				<ComponentRef Id='UtilityAcme' />
 				<ComponentRef Id='UtilityAnalyzeClock' />
 				<ComponentRef Id='UtilityAnalyzeDB' />
+				<ComponentRef Id='UtilityCsp' />
 				<ComponentRef Id='UtilityDeleteDB' />
 				<ComponentRef Id='UtilityInstall' />
 				<ComponentRef Id='UtilityTransform' />
@@ -1336,6 +1351,7 @@
 				<ComponentRef Id='UtilityAcmeDebugFiles' />
 				<ComponentRef Id='UtilityAnalyzeClockDebugFiles' />
 				<ComponentRef Id='UtilityAnalyzeDBDebugFiles' />
+				<ComponentRef Id='UtilityCspDebugFiles' />
 				<ComponentRef Id='UtilityDeleteDBDebugFiles' />
 				<ComponentRef Id='UtilityInstallDebugFiles' />
 				<ComponentRef Id='UtilityTransformDebugFiles' />

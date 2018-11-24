@@ -230,10 +230,11 @@ namespace Waher.Script.Lab
 									object Item = M.GetElement(x, y).AssociatedObjectValue;
 									if (Item != null)
 									{
-										if (Item is string s2)
-											Markdown.Append(MarkdownDocument.Encode(s2));
-										else
-											Markdown.Append(MarkdownDocument.Encode(Waher.Script.Expression.ToString(Item)));
+										if (!(Item is string s2))
+											s2 = Expression.ToString(Item);
+
+										s2 = s2.Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", "<br/>");
+										Markdown.Append(MarkdownDocument.Encode(s2));
 									}
 								}
 

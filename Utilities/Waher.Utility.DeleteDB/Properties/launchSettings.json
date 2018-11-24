@@ -1,0 +1,7 @@
+{
+  "profiles": {
+    "Waher.Utility.DeleteDB": {
+      "commandName": "Project"
+    }
+  }
+}

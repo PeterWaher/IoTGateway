@@ -309,6 +309,8 @@ namespace Waher.IoTGateway.WebResources
 
 						if (WebContent)
 						{
+							await ExportFile(Path.Combine(Gateway.AppDataFolder, "Gateway.config"), Output);
+
 							FileNames = Directory.GetFiles(Gateway.RootFolder, "*.*", SearchOption.TopDirectoryOnly);
 
 							foreach (string FileName in FileNames)

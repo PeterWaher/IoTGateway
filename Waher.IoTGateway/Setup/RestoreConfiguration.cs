@@ -393,7 +393,7 @@ namespace Waher.IoTGateway.Setup
 			}
 		}
 
-		private static async Task<(ICryptoTransform, CryptoStream)> DoImport(TemporaryFile BackupFile, TemporaryFile KeyFile, string TabID, string Extension, 
+		private static async Task<(ICryptoTransform, CryptoStream)> DoImport(TemporaryFile BackupFile, TemporaryFile KeyFile, string TabID, string Extension,
 			ValidateBackupFile Import, bool Overwrite)
 		{
 			ICryptoTransform AesTransform = null;
@@ -451,6 +451,7 @@ namespace Waher.IoTGateway.Setup
 			bool IndexStarted = false;
 			bool ObjectStarted = false;
 			bool FilesStarted = false;
+			bool FirstFile = true;
 
 			if (!r.ReadToFollowing("Export", Export.ExportNamepace))
 				throw new Exception("Invalid backup XML file.");
@@ -691,7 +692,12 @@ namespace Waher.IoTGateway.Setup
 									}
 
 									fs.Position = 0;
-									await Import.ExportFile(FileName, fs);
+									if (FirstFile && FileName.EndsWith("Gateway.config", StringComparison.CurrentCultureIgnoreCase))
+										ImportGatewayConfig(fs);
+									else
+										await Import.ExportFile(FileName, fs);
+
+									FirstFile = false;
 								}
 							}
 							break;
@@ -1260,6 +1266,8 @@ namespace Waher.IoTGateway.Setup
 
 							await Import.StartFiles();
 
+							bool FirstFile = true;
+
 							while (!string.IsNullOrEmpty(FileName = r.ReadString()))
 							{
 								long Length = r.ReadInt64();
@@ -1278,13 +1286,19 @@ namespace Waher.IoTGateway.Setup
 									File.Position = 0;
 									try
 									{
-										await Import.ExportFile(FileName, File);
+										if (FirstFile && FileName.EndsWith("Gateway.config", StringComparison.CurrentCultureIgnoreCase))
+											ImportGatewayConfig(File);
+										else
+											await Import.ExportFile(FileName, File);
+
 										ShowReport(TabID, Import, ref LastReport, Overwrite);
 									}
 									catch (Exception ex)
 									{
 										ShowStatus(TabID, "Unable to restore " + FileName + ": " + ex.Message);
 									}
+
+									FirstFile = false;
 								}
 							}
 
@@ -1299,6 +1313,45 @@ namespace Waher.IoTGateway.Setup
 				await Import.End();
 				ShowReport(TabID, Import, Overwrite);
 			}
+		}
+
+		private static void ImportGatewayConfig(Stream File)
+		{
+			XmlDocument Doc = new XmlDocument();
+			Doc.Load(File);
+
+			string OriginalFileName = Path.Combine(Gateway.AppDataFolder, "Gateway.config");
+			XmlDocument Original = new XmlDocument();
+			Original.Load(OriginalFileName);
+
+			if (Doc.DocumentElement != null && Doc.DocumentElement.LocalName == "GatewayConfiguration")
+			{
+				foreach (XmlNode N in Doc.DocumentElement.ChildNodes)
+				{
+					if (N is XmlElement E)
+					{
+						switch (E.LocalName)
+						{
+							case "ApplicationName":
+								string s = E.InnerText;
+								Gateway.ApplicationName = s;
+								Original.DocumentElement["ApplicationName"].InnerText = s;
+								break;
+
+							case "DefaultPage":
+								s = E.InnerText;
+								Gateway.DefaultPage = s;
+								Original.DocumentElement["DefaultPage"].InnerText = s;
+								break;
+
+							// TODO: Ports ?
+							// TODO: FileFolders ?
+						}
+					}
+				}
+			}
+
+			Original.Save(OriginalFileName);
 		}
 
 		private static object ReadValue(BinaryReader r, byte PropertyType)

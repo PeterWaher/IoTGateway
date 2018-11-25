@@ -1316,6 +1316,7 @@ namespace Waher.IoTGateway
 		public static string DefaultPage
 		{
 			get { return defaultPage; }
+			internal set { defaultPage = value; }
 		}
 
 		/// <summary>
@@ -1324,6 +1325,7 @@ namespace Waher.IoTGateway
 		public static string ApplicationName
 		{
 			get { return applicationName; }
+			internal set { applicationName = value; }
 		}
 
 		/// <summary>

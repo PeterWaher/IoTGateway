@@ -1276,8 +1276,15 @@ namespace Waher.IoTGateway.Setup
 									}
 
 									File.Position = 0;
-									await Import.ExportFile(FileName, File);
-									ShowReport(TabID, Import, ref LastReport, Overwrite);
+									try
+									{
+										await Import.ExportFile(FileName, File);
+										ShowReport(TabID, Import, ref LastReport, Overwrite);
+									}
+									catch (Exception ex)
+									{
+										ShowStatus(TabID, "Unable to restore " + FileName + ": " + ex.Message);
+									}
 								}
 							}
 

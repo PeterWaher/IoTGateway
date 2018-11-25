@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
 using Waher.IoTGateway;
 using Waher.Persistence;
@@ -174,9 +175,46 @@ namespace Waher.IoTGateway.Setup
 			if (!Directory.Exists(Folder))
 				Directory.CreateDirectory(Folder);
 
-			using (FileStream f = System.IO.File.Create(FileName))
+			try
 			{
-				await File.CopyToAsync(f);
+				using (FileStream f = System.IO.File.Create(FileName))
+				{
+					await File.CopyToAsync(f);
+				}
+			}
+			catch (Exception ex)
+			{
+				using (FileStream f = System.IO.File.OpenRead(FileName))
+				{
+					if (File.Length == f.Length)
+					{
+						File.Position = 0;
+
+						byte[] Buf1 = new byte[65536];
+						byte[] Buf2 = new byte[65536];
+						long l = File.Length;
+						int i, c;
+						bool Same = true;
+
+						while ((c = (int)Math.Min(l - File.Position, 65536)) > 0)
+						{
+							File.Read(Buf1, 0, c);
+							f.Read(Buf2, 0, c);
+
+							for (i = 0; i < c; i++)
+							{
+								if (Buf1[i] != Buf2[i])
+								{
+									Same = false;
+									break;
+								}
+							}
+						}
+
+						if (!Same)
+							ExceptionDispatchInfo.Capture(ex).Throw();
+					}
+				}
 			}
 		}
 

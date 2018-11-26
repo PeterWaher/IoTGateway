@@ -57,8 +57,13 @@ namespace Waher.Script.Graphs.Functions.Colors
 		/// <returns>Function result.</returns>
 		public override IElement EvaluateScalar(IElement Argument1, IElement Argument2, Variables Variables)
 		{
-			SKColor Color = Graph.ToColor(Argument1.AssociatedObjectValue);
-			double Alpha = Expression.ToDouble(Argument2.AssociatedObjectValue);
+			return this.Evaluate(Argument1.AssociatedObjectValue, Argument2.AssociatedObjectValue);
+		}
+
+		private IElement Evaluate(object Argument1, object Argument2)
+		{ 
+			SKColor Color = Graph.ToColor(Argument1);
+			double Alpha = Expression.ToDouble(Argument2);
 			byte A;
 
 			if (Alpha < 0)
@@ -69,6 +74,18 @@ namespace Waher.Script.Graphs.Functions.Colors
 				A = (byte)(Alpha + 0.5);
 
 			return new ObjectValue(new SKColor(Color.Red, Color.Green, Color.Blue, A));
+		}
+
+		/// <summary>
+		/// Evaluates the function on two scalar arguments.
+		/// </summary>
+		/// <param name="Argument1">Function argument 1.</param>
+		/// <param name="Argument2">Function argument 2.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Function result.</returns>
+		public override IElement EvaluateScalar(string Argument1, string Argument2, Variables Variables)
+		{
+			return this.Evaluate(Argument1, Argument2);
 		}
 	}
 }

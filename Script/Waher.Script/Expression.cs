@@ -3917,10 +3917,18 @@ namespace Waher.Script
 					return ul;
 				else
 				{
-					if (!double.TryParse(Object.ToString(), out double d))
-						throw new ScriptException("Expected a double value.");
+					string s = Object.ToString();
 
-					return d;
+					if (double.TryParse(s, out double d))
+						return d;
+
+					if (System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator != "." &&
+						double.TryParse(s.Replace(".", System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator), out d))
+					{
+						return d;
+					}
+
+					throw new ScriptException("Expected a double value.");
 				}
 			}
 		}

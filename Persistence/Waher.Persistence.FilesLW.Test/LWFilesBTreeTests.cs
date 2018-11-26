@@ -349,7 +349,8 @@ namespace Waher.Persistence.FilesLW.Test
 		internal static async Task<FileStatistics> AssertConsistent(ObjectBTreeFile File, FilesProvider Provider, int? ExpectedNrObjects, object LastObjectAdded,
 			bool WriteStat)
 		{
-			FileStatistics Statistics = await File.ComputeStatistics();
+			KeyValuePair<FileStatistics, Dictionary<Guid, bool>> P = await File.ComputeStatistics();
+			FileStatistics Statistics = P.Key;
 
 			if (WriteStat)
 			{
@@ -565,7 +566,7 @@ namespace Waher.Persistence.FilesLW.Test
 					}
 
 					Milliseconds.Add((DateTime.Now - Start).TotalMilliseconds / LogStatisticsEvery.Value);
-					Stat.Add(await this.file.ComputeStatistics());
+					Stat.Add((await this.file.ComputeStatistics()).Key);
 
 					Start = DateTime.Now;
 				}

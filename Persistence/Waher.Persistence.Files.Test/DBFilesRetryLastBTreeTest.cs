@@ -113,7 +113,7 @@ namespace Waher.Persistence.FilesLW.Test
 		[Ignore]
 		public async Task DBFiles_RetryLastTest_01_Retry_SaveNew()
 		{
-			FileStatistics StatBefore = await this.file.ComputeStatistics();
+			FileStatistics StatBefore = (await this.file.ComputeStatistics()).Key;
 			Simple Obj = this.LoadSimple();
 			Guid ObjectId = await this.file.SaveNewObject(Obj);
 			Assert.AreNotEqual(Guid.Empty, ObjectId);
@@ -125,7 +125,7 @@ namespace Waher.Persistence.FilesLW.Test
 		[Ignore]
 		public async Task DBFiles_RetryLastTest_02_Retry_Delete()
 		{
-			FileStatistics StatBefore = await this.file.ComputeStatistics();
+			FileStatistics StatBefore = (await this.file.ComputeStatistics()).Key;
 			Guid ObjectId = this.LoadObjectId();
 
 			try

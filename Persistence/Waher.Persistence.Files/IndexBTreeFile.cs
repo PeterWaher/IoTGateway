@@ -824,15 +824,17 @@ namespace Waher.Persistence.Files
 		/// <summary>
 		/// Goes through the entire file and computes statistics abouts its composition.
 		/// </summary>
+		/// <param name="ExistingIds">Object ID available in master file.</param>
 		/// <returns>File statistics.</returns>
-		public virtual async Task<FileStatistics> ComputeStatistics()
+		public virtual async Task<FileStatistics> ComputeStatistics(Dictionary<Guid, bool> ExistingIds)
 		{
 			FileStatistics Result;
 
 			await this.indexFile.LockWrite();
 			try
 			{
-				Result = await this.indexFile.ComputeStatisticsLocked();
+				Dictionary<Guid, bool> ObjectIds = new Dictionary<Guid, bool>();
+				Result = await this.indexFile.ComputeStatisticsLocked(ObjectIds, ExistingIds);
 			}
 			finally
 			{

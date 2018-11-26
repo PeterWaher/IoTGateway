@@ -1383,7 +1383,7 @@ namespace Waher.Persistence.FilesLW.Test
 		public async Task DBFiles_Index_Test_48_Search_Or_AvoidMultipleFullFileScans()
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
-			FileStatistics StatBefore = await this.file.ComputeStatistics();
+			FileStatistics StatBefore = (await this.file.ComputeStatistics()).Key;
 
 			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterOr(
 				new FilterFieldLikeRegEx("ShortString", "[AB].*"),
@@ -1403,7 +1403,7 @@ namespace Waher.Persistence.FilesLW.Test
 					Assert.IsFalse("ABXY".IndexOf(Obj2.ShortString[0]) >= 0);
 			}
 
-			FileStatistics StatAfter = await this.file.ComputeStatistics();
+			FileStatistics StatAfter = (await this.file.ComputeStatistics()).Key;
 			ulong NrFullFileScans = StatAfter.NrFullFileScans - StatBefore.NrFullFileScans;
 			AssertEx.Same(1, NrFullFileScans);
 		}

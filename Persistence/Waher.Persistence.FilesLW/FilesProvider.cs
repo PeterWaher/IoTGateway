@@ -19,6 +19,7 @@ using Waher.Persistence.Files.Serialization.ReferenceTypes;
 using Waher.Persistence.Files.Serialization.ValueTypes;
 using Waher.Persistence.Filters;
 using Waher.Persistence.Files.Statistics;
+using Waher.Persistence.Files.Storage;
 
 namespace Waher.Persistence.Files
 {
@@ -2222,7 +2223,9 @@ namespace Waher.Persistence.Files
 
 			foreach (ObjectBTreeFile File in this.Files)
 			{
-				FileStatistics Stat = await File.ComputeStatistics();
+				KeyValuePair<FileStatistics, Dictionary<Guid, bool>> P = await File.ComputeStatistics();
+				FileStatistics Stat = P.Key;
+				Dictionary<Guid, bool> ObjectIds = P.Value;
 
 				if (Repair && Stat.IsCorrupt)
 				{
@@ -2271,6 +2274,107 @@ namespace Waher.Persistence.Files
 										}
 									}
 								}
+
+								if (Stat.UnreferencedBlocks != null && Stat.UnreferencedBlocks.Length > 0)
+								{
+									foreach (int BlockIndex in Stat.UnreferencedBlocks)
+									{
+										long PhysicalPosition = BlockIndex;
+										PhysicalPosition *= this.blockSize;
+
+										byte[] Block = await File.LoadBlockLocked(PhysicalPosition, false);
+										BinaryDeserializer Reader = new BinaryDeserializer(File.CollectionName, this.encoding, Block, File.BlockLimit);
+										BinaryDeserializer Reader2;
+										BlockHeader Header = new BlockHeader(Reader);
+										int Pos = 14;
+
+										while (Reader.BytesLeft >= 4)
+										{
+											Reader.ReadBlockLink();                    // Block link.
+											object ObjectId = File.RecordHandler.GetKey(Reader);
+											if (ObjectId == null)
+												break;
+
+											uint Len = File.RecordHandler.GetFullPayloadSize(Reader);
+
+											if (Len > 0)
+											{
+												int Pos2 = 0;
+
+												if (Reader.Position - Pos - 4 + Len > File.InlineObjectSizeLimit)
+												{
+													Reader2 = null;
+
+													try
+													{
+														Reader2 = await File.LoadBlobLocked(Block, Pos + 4, null, null);
+														Reader2.Position = 0;
+														Pos2 = Reader2.Data.Length;
+													}
+													catch (Exception)
+													{
+														Reader2 = null;
+													}
+
+													Len = 4;
+													Reader.Position += (int)Len;
+												}
+												else
+												{
+													if (Len > Reader.BytesLeft)
+														break;
+													else
+													{
+														Reader.Position += (int)Len;
+														Pos2 = Reader.Position;
+
+														Reader2 = Reader;
+														Reader2.Position = Pos + 4;
+													}
+												}
+
+												if (Reader2 != null)
+												{
+													object Obj;
+													int Len2;
+
+													try
+													{
+														Obj = File.GenericSerializer.Deserialize(Reader2, ObjectSerializer.TYPE_OBJECT, false, false);
+														Len2 = Pos2 - Reader2.Position;
+													}
+													catch (Exception)
+													{
+														Len2 = 0;
+													}
+
+													if (Len2 != 0)
+														break;
+
+													if (ObjectId is Guid Guid && !ObjectIds.ContainsKey(Guid))
+													{
+														ObjectIds[Guid] = true;
+
+														try
+														{
+															await TempFile.SaveNewObject(e.Current);
+														}
+														catch (Exception ex)
+														{
+															if (Exceptions == null)
+																Exceptions = new LinkedList<Exception>();
+
+															Exceptions.AddLast(ex);
+															continue;
+														}
+													}
+												}
+											}
+
+											Pos = Reader.Position;
+										}
+									}
+								}
 							}
 
 							await this.EndBulk();
@@ -2303,7 +2407,39 @@ namespace Waher.Persistence.Files
 						}
 					}
 
-					Stat = await File.ComputeStatistics();
+#if NETSTANDARD1_5
+					if (File.Encrypted)
+					{
+						try
+						{
+							CspParameters Csp = new CspParameters()
+							{
+								KeyContainerName = TempBtreeFileName,
+								Flags = CspProviderFlags.UseMachineKeyStore | CspProviderFlags.UseExistingKey
+							};
+
+							using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(Csp))
+							{
+								RSA.PersistKeyInCsp = false;    // Deletes key.
+							}
+
+							Csp.KeyContainerName = TempBlobFileName;
+
+							using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(Csp))
+							{
+								RSA.PersistKeyInCsp = false;    // Deletes key.
+							}
+						}
+						catch (Exception)
+						{
+							// Ignore
+						}
+					}
+#endif
+					P = await File.ComputeStatistics();
+					Stat = P.Key;
+					ObjectIds = P.Value;
+
 					Stat.LogComment("File was regenerated due to errors found.");
 
 					if (Exceptions != null)
@@ -2365,13 +2501,13 @@ namespace Waher.Persistence.Files
 					foreach (string Field in Index.FieldNames)
 						Output.WriteElementString("Field", Field);
 
-					Stat = await Index.ComputeStatistics();
+					Stat = await Index.ComputeStatistics(ObjectIds);
 
 					if (Repair && Stat.IsCorrupt)
 					{
 						await Index.Regenerate();
 
-						Stat = await Index.ComputeStatistics();
+						Stat = await Index.ComputeStatistics(ObjectIds);
 						Stat.LogComment("Index was regenerated due to errors found.");
 					}
 

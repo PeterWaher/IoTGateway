@@ -307,6 +307,9 @@ namespace Waher.Persistence.Files
 			base.Dispose();
 		}
 
+		internal IRecordHandler RecordHandler => this.recordHandler;
+		internal GenericObjectSerializer GenericSerializer => this.genericSerializer;
+
 		/// <summary>
 		/// Identifier of the file.
 		/// </summary>
@@ -3693,7 +3696,8 @@ namespace Waher.Persistence.Files
 		private async Task<string> GetCurrentStateReportAsyncLocked(bool WriteStat, bool Properties)
 		{
 			StringBuilder Output = new StringBuilder();
-			FileStatistics Statistics = await this.ComputeStatisticsLocked();
+			Dictionary<Guid, bool> ObjectIds = new Dictionary<Guid, bool>();
+			FileStatistics Statistics = await this.ComputeStatisticsLocked(ObjectIds, null);
 
 			if (Statistics.IsCorrupt)
 				Output.AppendLine("Database is corrupt.");
@@ -3719,13 +3723,15 @@ namespace Waher.Persistence.Files
 		/// <summary>
 		/// Goes through the entire file and computes statistics abouts its composition.
 		/// </summary>
-		/// <returns>File statistics.</returns>
-		public virtual async Task<FileStatistics> ComputeStatistics()
+		/// <returns>File statistics and found Object IDs.</returns>
+		public virtual async Task<KeyValuePair<FileStatistics, Dictionary<Guid, bool>>> ComputeStatistics()
 		{
 			await this.LockWrite();
 			try
 			{
-				return await this.ComputeStatisticsLocked();
+				Dictionary<Guid, bool> ObjectIds = new Dictionary<Guid, bool>();
+				FileStatistics Result = await this.ComputeStatisticsLocked(ObjectIds, null);
+				return new KeyValuePair<FileStatistics, Dictionary<Guid, bool>>(Result, ObjectIds);
 			}
 			finally
 			{
@@ -3733,7 +3739,7 @@ namespace Waher.Persistence.Files
 			}
 		}
 
-		internal async Task<FileStatistics> ComputeStatisticsLocked()
+		internal async Task<FileStatistics> ComputeStatisticsLocked(Dictionary<Guid, bool> ObjectIds, Dictionary<Guid, bool> ExistingIds)
 		{
 			long FileSize = this.file.Length + this.bytesAdded;
 			int NrBlocks = (int)(FileSize / this.blockSize);
@@ -3754,19 +3760,31 @@ namespace Waher.Persistence.Files
 
 			try
 			{
-				await this.AnalyzeBlock(1, 0, 0, Statistics, BlocksReferenced, BlobBlocksReferenced, null, null);
+				await this.AnalyzeBlock(1, 0, 0, Statistics, BlocksReferenced, BlobBlocksReferenced, ObjectIds, ExistingIds, null, null);
+
+				List<int> Blocks = new List<int>();
 
 				for (i = 0; i < NrBlocks; i++)
 				{
 					if (!BlocksReferenced[i])
+					{
 						Statistics.LogError("Block " + i.ToString() + " is not referenced.");
+						Blocks.Add(i);
+					}
 				}
+
+				Statistics.UnreferencedBlocks = Blocks.ToArray();
+				Blocks.Clear();
 
 				for (i = 0; i < NrBlobBlocks; i++)
 				{
 					if (!BlobBlocksReferenced[i])
+					{
 						Statistics.LogError("BLOB Block " + i.ToString() + " is not referenced.");
+					}
 				}
+
+				Statistics.UnreferencedBlobBlocks = Blocks.ToArray();
 			}
 			catch (Exception ex)
 			{
@@ -3782,7 +3800,8 @@ namespace Waher.Persistence.Files
 		}
 
 		private async Task<ulong> AnalyzeBlock(uint Depth, uint ParentIndex, uint BlockIndex, FileStatistics Statistics,
-			BitArray BlocksReferenced, BitArray BlobBlocksReferenced, object MinExclusive, object MaxExclusive)
+			BitArray BlocksReferenced, BitArray BlobBlocksReferenced, Dictionary<Guid, bool> ObjectIds, Dictionary<Guid, bool> ExistingIds,
+			object MinExclusive, object MaxExclusive)
 		{
 			if (BlockIndex >= BlocksReferenced.Length)
 			{
@@ -3835,6 +3854,20 @@ namespace Waher.Persistence.Files
 				if (ObjectId == null)
 					break;
 
+				if (ObjectId is Guid Guid)
+				{
+					if (ObjectIds.ContainsKey(Guid))
+						Statistics.LogError("Object ID " + Guid.ToString() + " occurred multiple times in file.");
+					else
+						ObjectIds[Guid] = true;
+
+					if (ExistingIds != null)
+					{
+						if (!ExistingIds.ContainsKey(Guid))
+							Statistics.LogError("Object ID " + Guid.ToString() + " referenced in file, but no such object exists in master file.");
+					}
+				}
+
 				NrSeparators++;
 
 				if (MinExclusive != null && this.recordHandler.Compare(ObjectId, MinExclusive) <= 0)
@@ -3860,7 +3893,8 @@ namespace Waher.Persistence.Files
 				{
 					NrChildLinks++;
 					Leaf = false;
-					NrObjects += await this.AnalyzeBlock(Depth + 1, BlockIndex, BlockLink, Statistics, BlocksReferenced, BlobBlocksReferenced, MinObjectId, ObjectId);
+					NrObjects += await this.AnalyzeBlock(Depth + 1, BlockIndex, BlockLink, Statistics, 
+						BlocksReferenced, BlobBlocksReferenced, ObjectIds, ExistingIds, MinObjectId, ObjectId);
 				}
 
 				Len = this.recordHandler.GetFullPayloadSize(Reader);
@@ -3960,7 +3994,8 @@ namespace Waher.Persistence.Files
 			{
 				NrChildLinks++;
 				Leaf = false;
-				NrObjects += await this.AnalyzeBlock(Depth + 1, BlockIndex, Header.LastBlockIndex, Statistics, BlocksReferenced, BlobBlocksReferenced, MinObjectId, null);
+				NrObjects += await this.AnalyzeBlock(Depth + 1, BlockIndex, Header.LastBlockIndex, Statistics, 
+					BlocksReferenced, BlobBlocksReferenced, ObjectIds, ExistingIds, MinObjectId, null);
 			}
 
 			if (!Leaf && NrChildLinks != NrSeparators + 1)

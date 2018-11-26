@@ -41,6 +41,8 @@ namespace Waher.Persistence.Files.Statistics
 		private bool isBalanced = true;
 		private List<string> comments = null;
 		private readonly object synchObject = new object();
+		private int[] unreferencedBlocks = null;
+		private int[] unreferencedBlobBlocks = null;
 
 		/// <summary>
 		/// Contains information about a file.
@@ -519,6 +521,24 @@ namespace Waher.Persistence.Files.Statistics
 					return this.comments != null;
 				}
 			}
+		}
+
+		/// <summary>
+		/// Unreferenced blocks, if any.
+		/// </summary>
+		public int[] UnreferencedBlocks
+		{
+			get => this.unreferencedBlocks;
+			internal set => this.unreferencedBlocks = value;
+		}
+
+		/// <summary>
+		/// Unreferenced BLOB blocks, if any.
+		/// </summary>
+		public int[] UnreferencedBlobBlocks
+		{
+			get => this.unreferencedBlobBlocks;
+			internal set => this.unreferencedBlobBlocks = value;
 		}
 
 		internal void ReportBlockStatistics(uint NrBytesUsed, uint NrBytesUnused, uint NrObjects)

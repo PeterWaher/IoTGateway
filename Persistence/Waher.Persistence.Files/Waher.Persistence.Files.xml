@@ -1047,10 +1047,11 @@
             object that is lesser than the limit object. If null is returned, the search operation could
             not be performed.</returns>
         </member>
-        <member name="M:Waher.Persistence.Files.IndexBTreeFile.ComputeStatistics">
+        <member name="M:Waher.Persistence.Files.IndexBTreeFile.ComputeStatistics(System.Collections.Generic.Dictionary{System.Guid,System.Boolean})">
             <summary>
             Goes through the entire file and computes statistics abouts its composition.
             </summary>
+            <param name="ExistingIds">Object ID available in master file.</param>
             <returns>File statistics.</returns>
         </member>
         <member name="T:Waher.Persistence.Files.IndexBTreeFileEnumerator`1">
@@ -1557,7 +1558,7 @@
             <summary>
             Goes through the entire file and computes statistics abouts its composition.
             </summary>
-            <returns>File statistics.</returns>
+            <returns>File statistics and found Object IDs.</returns>
         </member>
         <member name="M:Waher.Persistence.Files.ObjectBTreeFile.ExportGraphXML(System.Boolean)">
             <summary>
@@ -6322,6 +6323,16 @@
         <member name="P:Waher.Persistence.Files.Statistics.FileStatistics.HasComments">
             <summary>
             If comments have been logged.
+            </summary>
+        </member>
+        <member name="P:Waher.Persistence.Files.Statistics.FileStatistics.UnreferencedBlocks">
+            <summary>
+            Unreferenced blocks, if any.
+            </summary>
+        </member>
+        <member name="P:Waher.Persistence.Files.Statistics.FileStatistics.UnreferencedBlobBlocks">
+            <summary>
+            Unreferenced BLOB blocks, if any.
             </summary>
         </member>
         <member name="M:Waher.Persistence.Files.Statistics.FileStatistics.ToString(System.Text.StringBuilder,System.Boolean)">

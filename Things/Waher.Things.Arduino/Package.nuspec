@@ -22,7 +22,7 @@
       <dependency id="Waher.Persistence" version="1.0.7"/>
       <dependency id="Waher.Runtime.Inventory" version="1.0.7"/>
       <dependency id="Waher.Runtime.Language" version="1.0.1"/>
-      <dependency id="Waher.Script" version="1.0.21"/>
+      <dependency id="Waher.Script" version="1.0.22"/>
       <dependency id="Waher.Things" version="1.0.24"/>
       <dependency id="Waher.Things.Metering" version="1.0.18"/>
       <dependency id="Windows-Remote-Arduino" version="1.4.0"/>

@@ -53,20 +53,23 @@ namespace Waher.Script.Model
                     if (DoubleNumber1 != null && DoubleNumber2 != null)
                         return this.EvaluateScalar(DoubleNumber1.Value, DoubleNumber2.Value, Variables);
 
-                    ComplexNumber ComplexNumber1 = Argument1 as ComplexNumber;
-                    ComplexNumber ComplexNumber2 = Argument2 as ComplexNumber;
-                    if (ComplexNumber1 != null && ComplexNumber2 != null)
-                        return this.EvaluateScalar(ComplexNumber1.Value, ComplexNumber2.Value, Variables);
+					if (Argument1 is ComplexNumber ComplexNumber1 &&
+						Argument2 is ComplexNumber ComplexNumber2)
+					{
+						return this.EvaluateScalar(ComplexNumber1.Value, ComplexNumber2.Value, Variables);
+					}
 
-                    BooleanValue BooleanValue1 = Argument1 as BooleanValue;
-                    BooleanValue BooleanValue2 = Argument2 as BooleanValue;
-                    if (BooleanValue1 != null && BooleanValue2 != null)
-                        return this.EvaluateScalar(BooleanValue1.Value, BooleanValue2.Value, Variables);
+					if (Argument1 is BooleanValue BooleanValue1 &&
+						Argument2 is BooleanValue BooleanValue2)
+					{
+						return this.EvaluateScalar(BooleanValue1.Value, BooleanValue2.Value, Variables);
+					}
 
-                    StringValue StringValue1 = Argument1 as StringValue;
-                    StringValue StringValue2 = Argument2 as StringValue;
-                    if (StringValue1 != null && StringValue2 != null)
-                        return this.EvaluateScalar(StringValue1.Value, StringValue2.Value, Variables);
+					if (Argument1 is StringValue StringValue1 &&
+						Argument2 is StringValue StringValue2)
+					{
+						return this.EvaluateScalar(StringValue1.Value, StringValue2.Value, Variables);
+					}
 
 					double arg1, arg2;
 					PhysicalQuantity Q;

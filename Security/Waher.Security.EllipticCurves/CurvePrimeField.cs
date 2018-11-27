@@ -44,6 +44,21 @@ namespace Waher.Security.EllipticCurves
 		/// <param name="OrderBits">Number of bits used to encode order.</param>
 		public CurvePrimeField(BigInteger Prime, PointOnCurve BasePoint, BigInteger A,
 			BigInteger Order, int OrderBits)
+			: this(Prime, BasePoint, A, Order, OrderBits, null)
+		{
+		}
+
+		/// <summary>
+		/// Base class of Elliptic curves over a prime field.
+		/// </summary>
+		/// <param name="Prime">Prime base of field.</param>
+		/// <param name="BasePoint">Base-point.</param>
+		/// <param name="A">a Coefficient in the definition of the curve E:	y^2=x^3+a*x+b</param>
+		/// <param name="Order">Order of base-point.</param>
+		/// <param name="OrderBits">Number of bits used to encode order.</param>
+		/// <param name="D">Private key.</param>
+		public CurvePrimeField(BigInteger Prime, PointOnCurve BasePoint, BigInteger A,
+			BigInteger Order, int OrderBits, BigInteger? D)
 			: base(Prime)
 		{
 			if (Prime <= BigInteger.One)
@@ -66,7 +81,13 @@ namespace Waher.Security.EllipticCurves
 			else
 				this.msbMask >>= MaskBits;
 
-			this.GenerateKeys();
+			if (D.HasValue)
+			{
+				this.publicKey = this.ScalarMultiplication(D.Value, this.g);
+				this.d = D.Value;
+			}
+			else
+				this.GenerateKeys();
 		}
 
 		/// <summary>

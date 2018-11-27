@@ -31,6 +31,16 @@ namespace Waher.Security.EllipticCurves
 		}
 
 		/// <summary>
+		/// NIST P-192 Elliptic Curve, as defined in NIST FIPS BUB 186-4:
+		/// https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.186-4.pdf
+		/// </summary>
+		/// <param name="D">Private key.</param>
+		public NistP192(BigInteger D)
+			: base(p0, new PointOnCurve(BasePointX, BasePointY), n, nBits, D)
+		{
+		}
+
+		/// <summary>
 		/// Name of curve.
 		/// </summary>
 		public override string CurveName => "NIST P-192";

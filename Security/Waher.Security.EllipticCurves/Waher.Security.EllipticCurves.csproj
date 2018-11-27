@@ -27,9 +27,9 @@ NIST P-521</Description>
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>security Elliptic Curve ECC ECDH ECDSA NIST P192 P224 P256 P384 P521</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.0.3</AssemblyVersion>
-    <FileVersion>1.0.3</FileVersion>
-    <Version>1.0.3</Version>
+    <AssemblyVersion>1.0.4</AssemblyVersion>
+    <FileVersion>1.0.4</FileVersion>
+    <Version>1.0.4</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">

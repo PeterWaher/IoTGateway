@@ -1,0 +1,80 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Waher.Networking.XMPP.Contracts</name>
+    </assembly>
+    <members>
+        <member name="T:Waher.Networking.XMPP.Contracts.ContractsClient">
+            <summary>
+            Adds support for legal identities, smart contracts and signatures to an XMPP client.
+            
+            The interface is defined in the IEEE XMPP IoT extensions:
+            https://gitlab.com/IEEE-SA/XMPPI/IoT
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.Contracts.ContractsClient.NamespaceLegalIdentities">
+            <summary>
+            urn:ieee:iot:leg:id:1.0
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.#ctor(Waher.Networking.XMPP.XmppClient,System.String)">
+            <summary>
+            Adds support for legal identities, smart contracts and signatures to an XMPP client.
+            
+            The interface is defined in the IEEE XMPP IoT extensions:
+            https://gitlab.com/IEEE-SA/XMPPI/IoT
+            </summary>
+            <param name="Client">XMPP Client to use.</param>
+            <param name="ComponentAddress">Address to the contracts component.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.Dispose">
+            <summary>
+            Disposes of the extension.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.ContractsClient.Extensions">
+            <summary>
+            Implemented extensions.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetServerPublicKey(Waher.Networking.XMPP.Contracts.PublicKeyEventHandler,System.Object)">
+            <summary>
+            Gets the server public key.
+            </summary>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetServerPublicKey(System.String,Waher.Networking.XMPP.Contracts.PublicKeyEventHandler,System.Object)">
+            <summary>
+            Gets the server public key.
+            </summary>
+            <param name="Address">Address of entity whose public key is requested.</param>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.PublicKeyEventHandler">
+            <summary>
+            Delegate for public key callback methods.
+            </summary>
+            <param name="Sender">Sender</param>
+            <param name="e">Event arguments</param>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.PublicKeyEventArgs">
+            <summary>
+            Event arguments for public key responses
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.PublicKeyEventArgs.#ctor(Waher.Networking.XMPP.IqResultEventArgs,Waher.Networking.XMPP.P2P.E2E.IE2eEndpoint)">
+            <summary>
+            Event arguments for public key responses
+            </summary>
+            <param name="e">IQ response event arguments.</param>
+            <param name="ServerEndpoint">Public key of server endpoint.</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.PublicKeyEventArgs.ServerEndpoint">
+            <summary>
+            Public key of server endpoint.
+            </summary>
+        </member>
+    </members>
+</doc>

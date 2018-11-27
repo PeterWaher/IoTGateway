@@ -17,14 +17,14 @@ namespace Waher.Networking.XMPP.Contracts
 	/// </summary>
 	public class PublicKeyEventArgs : IqResultEventArgs
 	{
-		private readonly E2eEndpoint serverEndpoint;
+		private readonly IE2eEndpoint serverEndpoint;
 
 		/// <summary>
 		/// Event arguments for public key responses
 		/// </summary>
 		/// <param name="e">IQ response event arguments.</param>
 		/// <param name="ServerEndpoint">Public key of server endpoint.</param>
-		public PublicKeyEventArgs(IqResultEventArgs e, E2eEndpoint ServerEndpoint)
+		public PublicKeyEventArgs(IqResultEventArgs e, IE2eEndpoint ServerEndpoint)
 			: base(e)
 		{
 			this.serverEndpoint = ServerEndpoint;
@@ -33,6 +33,6 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <summary>
 		/// Public key of server endpoint.
 		/// </summary>
-		public E2eEndpoint ServerEndpoint => this.serverEndpoint;
+		public IE2eEndpoint ServerEndpoint => this.serverEndpoint;
 	}
 }

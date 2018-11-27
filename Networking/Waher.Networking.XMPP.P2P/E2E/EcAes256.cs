@@ -22,27 +22,92 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		/// </summary>
 		protected readonly PointOnCurve publicKey;
 
-		/// <summary>
-		/// Local security endpoint, if available.
-		/// </summary>
-		protected readonly EndpointSecurity localEndpoint;
-
-		private CurvePrimeField lastCurve = null;
-		private CurvePrimeField lastCurveOld = null;
+		private readonly CurvePrimeField curve;
 		private byte[] sharedKey = null;
 		private byte[] sharedKeyOld = null;
 
 		/// <summary>
 		/// Abstract base class for Elliptic Curve / AES-256 hybrid ciphers.s
 		/// </summary>
+		/// <param name="Curve">Curve instance</param>
+		public EcAes256(CurvePrimeField Curve)
+			: base()
+		{
+			this.curve = Curve;
+			this.publicKey = Curve.PublicKey;
+		}
+
+		/// <summary>
+		/// Abstract base class for Elliptic Curve / AES-256 hybrid ciphers.s
+		/// </summary>
 		/// <param name="X">X-coordinate of remote public key.</param>
 		/// <param name="Y">Y-coordinate of remote public key.</param>
-		/// <param name="LocalEndpoint">Local security endpoint, if available.</param>
-		public EcAes256(byte[] X, byte[] Y, EndpointSecurity LocalEndpoint)
+		public EcAes256(byte[] X, byte[] Y)
 			: base()
 		{
 			this.publicKey = new PointOnCurve(FromNetwork(X), FromNetwork(Y));
-			this.localEndpoint = LocalEndpoint;
+		}
+
+		/// <summary>
+		/// Creates a new endpoint.
+		/// </summary>
+		/// <param name="D">Private key.</param>
+		/// <returns>Endpoint object.</returns>
+		public abstract EcAes256 Create(BigInteger D);
+
+		/// <summary>
+		/// Creates a new endpoint.
+		/// </summary>
+		/// <param name="X">X-coordinate of remote public key.</param>
+		/// <param name="Y">Y-coordinate of remote public key.</param>
+		/// <returns>Endpoint object.</returns>
+		public abstract EcAes256 Create(byte[] X, byte[] Y);
+
+		/// <summary>
+		/// Parses endpoint information from an XML element.
+		/// </summary>
+		/// <param name="Xml">XML element.</param>
+		/// <returns>Parsed key information, if possible, null if XML is not well-defined.</returns>
+		public override IE2eEndpoint Parse(XmlElement Xml)
+		{
+			byte[] X = null;
+			byte[] Y = null;
+
+			foreach (XmlAttribute Attr in Xml.Attributes)
+			{
+				switch (Attr.Name)
+				{
+					case "x":
+						X = Convert.FromBase64String(Attr.Value);
+						break;
+
+					case "y":
+						Y = Convert.FromBase64String(Attr.Value);
+						break;
+				}
+			}
+
+			if (X != null && Y != null)
+				return this.Create(X, Y);
+			else
+				return null;
+		}
+
+		/// <summary>
+		/// Exports the public key information to XML.
+		/// </summary>
+		/// <param name="Xml">XML output</param>
+		public override void ToXml(StringBuilder Xml)
+		{
+			Xml.Append('<');
+			Xml.Append(this.LocalName);
+			Xml.Append(" xmlns='");
+			Xml.Append(this.Namespace);
+			Xml.Append("' x='");
+			Xml.Append(Convert.ToBase64String(EcAes256.ToNetwork(this.publicKey.X)));
+			Xml.Append("' y='");
+			Xml.Append(Convert.ToBase64String(EcAes256.ToNetwork(this.publicKey.Y)));
+			Xml.Append("'/>");
 		}
 
 		/// <summary>
@@ -70,26 +135,17 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		/// <summary>
 		/// Name of elliptic curve
 		/// </summary>
-		public abstract string CurveName
-		{
-			get;
-		}
+		public string CurveName => this.curve.CurveName;
 
 		/// <summary>
 		/// Elliptic Curve
 		/// </summary>
-		protected abstract CurvePrimeField Curve
-		{
-			get;
-		}
+		public CurvePrimeField Curve => this.curve;
 
 		/// <summary>
 		/// Previous Elliptic Curve
 		/// </summary>
-		protected abstract CurvePrimeField PrevCurve
-		{
-			get;
-		}
+		public CurvePrimeField PrevCurve => (this.Previous as EcAes256)?.Curve;
 
 		/// <summary>
 		/// Shared secret, for underlying AES cipher.
@@ -98,11 +154,8 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		{
 			get
 			{
-				if (this.sharedKey == null || this.Curve != this.lastCurve)
-				{
-					this.sharedKey = this.Curve.GetSharedKey(this.publicKey, HashFunction.SHA256);
-					this.lastCurve = this.Curve;
-				}
+				if (this.sharedKey == null)
+					this.sharedKey = this.curve.GetSharedKey(this.publicKey, HashFunction.SHA256);
 
 				return this.sharedKey;
 			}
@@ -115,11 +168,8 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		{
 			get
 			{
-				if (this.sharedKeyOld == null || this.PrevCurve != this.lastCurveOld)
-				{
+				if (this.sharedKeyOld == null)
 					this.sharedKeyOld = this.PrevCurve?.GetSharedKey(this.publicKey, HashFunction.SHA256);
-					this.lastCurveOld = this.PrevCurve;
-				}
 
 				return this.sharedKeyOld;
 			}

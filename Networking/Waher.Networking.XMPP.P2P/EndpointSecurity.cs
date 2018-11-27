@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Numerics;
+using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using System.Xml;
@@ -9,6 +9,7 @@ using Waher.Events;
 using Waher.Networking.PeerToPeer;
 using Waher.Networking.XMPP.P2P.E2E;
 using Waher.Networking.XMPP.StanzaErrors;
+using Waher.Runtime.Inventory;
 using Waher.Security;
 using Waher.Security.EllipticCurves;
 
@@ -29,26 +30,16 @@ namespace Waher.Networking.XMPP.P2P
 		/// </summary>
 		public const string IoTHarmonizationP2P = "urn:ieee:iot:p2p:1.0";
 
-		private readonly Dictionary<string, E2eEndpoint[]> contacts;
+		private static Dictionary<string, IE2eEndpoint> endpointTypes = new Dictionary<string, IE2eEndpoint>();
+		private static bool initialized = false;
+
+		private readonly Dictionary<string, IE2eEndpoint[]> contacts;
 		private XmppClient client;
 		private readonly XmppServerlessMessaging serverlessMessaging;
-		private RSA rsa = null;
-		private RSA rsaOld = null;
-		internal NistP192 p192 = null;
-		internal NistP192 p192Old = null;
-		internal NistP224 p224 = null;
-		internal NistP224 p224Old = null;
-		internal NistP256 p256 = null;
-		internal NistP256 p256Old = null;
-		internal NistP384 p384 = null;
-		internal NistP384 p384Old = null;
-		internal NistP521 p521 = null;
-		internal NistP521 p521Old = null;
+		private IE2eEndpoint[] oldKeys = null;
+		private IE2eEndpoint[] keys = null;
 		private readonly UTF8Encoding encoding = new UTF8Encoding(false, false);
 		private readonly object synchObject = new object();
-		private readonly int rsaKeySize;
-		private string rsaModulus;
-		private string rsaExponent;
 		private readonly int securityStrength;
 
 		/// <summary>
@@ -68,27 +59,47 @@ namespace Waher.Networking.XMPP.P2P
 		/// <param name="ServerlessMessaging">Reference to serverless messaging object.</param>
 		/// <param name="SecurityStrength">Desired security strength.</param>
 		public EndpointSecurity(XmppClient Client, XmppServerlessMessaging ServerlessMessaging, int SecurityStrength)
+			: this(Client, ServerlessMessaging, SecurityStrength, null)
+		{
+		}
+
+		/// <summary>
+		/// Class managing end-to-end encryption.
+		/// </summary>
+		/// <param name="Client">XMPP Client</param>
+		/// <param name="SecurityStrength">Desired security strength.</param>
+		/// <param name="LocalEndpoints">Local endpoints to use</param>
+		public EndpointSecurity(XmppClient Client, int SecurityStrength,
+			IE2eEndpoint[] LocalEndpoints)
+			: this(Client, null, SecurityStrength, LocalEndpoints)
+		{
+		}
+
+		/// <summary>
+		/// Class managing end-to-end encryption.
+		/// </summary>
+		/// <param name="Client">XMPP Client</param>
+		/// <param name="ServerlessMessaging">Reference to serverless messaging object.</param>
+		/// <param name="SecurityStrength">Desired security strength.</param>
+		/// <param name="LocalEndpoints">Local endpoints to use</param>
+		public EndpointSecurity(XmppClient Client, XmppServerlessMessaging ServerlessMessaging,
+			int SecurityStrength, IE2eEndpoint[] LocalEndpoints)
 			: base()
 		{
 			this.securityStrength = SecurityStrength;
 			this.client = Client;
 			this.serverlessMessaging = ServerlessMessaging;
-			this.contacts = new Dictionary<string, E2eEndpoint[]>(StringComparer.CurrentCultureIgnoreCase);
+			this.contacts = new Dictionary<string, IE2eEndpoint[]>(StringComparer.CurrentCultureIgnoreCase);
 
-			if (SecurityStrength <= 80)
-				this.rsaKeySize = 1024;
-			else if (SecurityStrength <= 112)
-				this.rsaKeySize = 2048;
-			else if (SecurityStrength <= 128)
-				this.rsaKeySize = 3072;
-			else if (SecurityStrength <= 192)
-				this.rsaKeySize = 7680;
-			else if (SecurityStrength <= 256)
-				this.rsaKeySize = 15360;
+			if (LocalEndpoints != null)
+			{
+				this.keys = LocalEndpoints;
+
+				if (!initialized)
+					CreateEndpoints(SecurityStrength, 0, int.MaxValue);
+			}
 			else
-				throw new ArgumentException("Key strength too high.", nameof(SecurityStrength));
-
-			this.GenerateNewKey();
+				this.keys = CreateEndpoints(SecurityStrength, 0, int.MaxValue);
 
 			if (this.client != null)
 			{
@@ -97,6 +108,79 @@ namespace Waher.Networking.XMPP.P2P
 				this.client.OnStateChanged += Client_OnStateChanged;
 				this.client.OnPresence += Client_OnPresence;
 			}
+		}
+
+		/// <summary>
+		/// Creates a set of endpoints within a range of security strengths.
+		/// </summary>
+		/// <param name="DesiredSecurityStrength">Desired security strength.</param>
+		/// <param name="MinSecurityStrength">Minimum security strength.</param>
+		/// <param name="MaxSecurityStrength">Maximum security strength.</param>
+		/// <returns>Array of local endpoint keys.</returns>
+		public static IE2eEndpoint[] CreateEndpoints(int DesiredSecurityStrength,
+			int MinSecurityStrength, int MaxSecurityStrength)
+		{
+			return CreateEndpoints(DesiredSecurityStrength, MinSecurityStrength,
+				MaxSecurityStrength, null);
+		}
+
+		/// <summary>
+		/// Creates a set of endpoints within a range of security strengths.
+		/// </summary>
+		/// <param name="DesiredSecurityStrength">Desired security strength.</param>
+		/// <param name="MinSecurityStrength">Minimum security strength.</param>
+		/// <param name="MaxSecurityStrength">Maximum security strength.</param>
+		/// <param name="OnlyIfDerivedFrom">Only return endpoints derived from this type.</param>
+		/// <returns>Array of local endpoint keys.</returns>
+		public static IE2eEndpoint[] CreateEndpoints(int DesiredSecurityStrength,
+			int MinSecurityStrength, int MaxSecurityStrength, Type OnlyIfDerivedFrom)
+		{
+			lock (endpointTypes)
+			{
+				if (!initialized)
+				{
+					Dictionary<string, IE2eEndpoint> E2eTypes = new Dictionary<string, IE2eEndpoint>();
+					TypeInfo TI2 = OnlyIfDerivedFrom?.GetTypeInfo();
+
+					foreach (Type T in Types.GetTypesImplementingInterface(typeof(IE2eEndpoint)))
+					{
+						TypeInfo TI = T.GetTypeInfo();
+						if (TI.IsAbstract)
+							continue;
+
+						if (!(TI2?.IsAssignableFrom(TI) ?? true))
+							continue;
+
+						try
+						{
+							IE2eEndpoint Endpoint = (IE2eEndpoint)Activator.CreateInstance(T);
+							E2eTypes[Endpoint.Namespace + "#" + Endpoint.LocalName] = Endpoint;
+						}
+						catch (Exception ex)
+						{
+							Log.Critical(ex);
+							continue;
+						}
+					}
+
+					endpointTypes = E2eTypes;
+					initialized = true;
+				}
+			}
+
+			List<IE2eEndpoint> Result = new List<IE2eEndpoint>();
+
+			foreach (IE2eEndpoint Endpoint in endpointTypes.Values)
+			{
+				IE2eEndpoint Endpoint2 = Endpoint.Create(DesiredSecurityStrength);
+				int i = Endpoint2.SecurityStrength;
+				if (i >= MinSecurityStrength && i <= MaxSecurityStrength)
+					Result.Add(Endpoint2);
+				else
+					Endpoint2.Dispose();
+			}
+
+			return Result.ToArray();
 		}
 
 		/// <summary>
@@ -113,24 +197,28 @@ namespace Waher.Networking.XMPP.P2P
 				this.client = null;
 			}
 
-			this.rsaOld?.Dispose();
-			this.rsaOld = null;
-
-			if (this.rsa != null)
+			if (this.oldKeys != null)
 			{
-				this.rsa.Dispose();
-				this.rsa = null;
+				foreach (IE2eEndpoint E2e in this.oldKeys)
+					E2e.Dispose();
+			}
 
-				lock (this.contacts)
+			if (this.keys != null)
+			{
+				foreach (IE2eEndpoint E2e in this.keys)
+					E2e.Dispose();
+
+			}
+
+			lock (this.contacts)
+			{
+				foreach (E2eEndpoint[] Endpoints in this.contacts.Values)
 				{
-					foreach (E2eEndpoint[] Endpoints in this.contacts.Values)
-					{
-						foreach (E2eEndpoint Endpoint in Endpoints)
-							Endpoint.Dispose();
-					}
-
-					this.contacts.Clear();
+					foreach (E2eEndpoint Endpoint in Endpoints)
+						Endpoint.Dispose();
 				}
+
+				this.contacts.Clear();
 			}
 		}
 
@@ -147,29 +235,27 @@ namespace Waher.Networking.XMPP.P2P
 		{
 			lock (this.synchObject)
 			{
-				this.rsaOld?.Dispose();
-				this.rsaOld = this.rsa;
-				this.rsa = RSA.Create();
-				this.rsa.KeySize = this.rsaKeySize;
+				IE2eEndpoint[] Keys = this.oldKeys;
 
-				RSAParameters P = this.rsa.ExportParameters(false);
-				this.rsaModulus = Convert.ToBase64String(P.Modulus);
-				this.rsaExponent = Convert.ToBase64String(P.Exponent);
+				this.oldKeys = this.keys;
 
-				this.p192Old = this.p192;
-				this.p192 = new NistP192();
+				if (Keys != null)
+				{
+					foreach (IE2eEndpoint E2e in Keys)
+						E2e.Dispose();
+				}
 
-				this.p224Old = this.p224;
-				this.p224 = new NistP224();
+				int i, c = this.keys.Length;
+				Keys = new IE2eEndpoint[c];
 
-				this.p256Old = this.p256;
-				this.p256 = new NistP256();
+				for (i = 0; i < c; i++)
+				{
+					Keys[i] = this.keys[i].Create(this.securityStrength);
+					Keys[i].Previous = this.keys[i];
+					this.keys[i].Previous = null;
+				}
 
-				this.p384Old = this.p384;
-				this.p384 = new NistP384();
-
-				this.p521Old = this.p521;
-				this.p521 = new NistP521();
+				this.keys = Keys;
 			}
 		}
 
@@ -201,22 +287,21 @@ namespace Waher.Networking.XMPP.P2P
 		/// Parses a set of E2E keys from XML.
 		/// </summary>
 		/// <param name="E2E">E2E element.</param>
-		/// <param name="LocalEndpoint">Local endpoint security object, if available.</param>
 		/// <returns>List of E2E keys.</returns>
-		public static List<E2eEndpoint> ParseE2eKeys(XmlElement E2E, EndpointSecurity LocalEndpoint)
+		public static List<IE2eEndpoint> ParseE2eKeys(XmlElement E2E)
 		{
-			List<E2eEndpoint> Endpoints = null;
+			List<IE2eEndpoint> Endpoints = null;
 
 			foreach (XmlNode N in E2E.ChildNodes)
 			{
 				if (N is XmlElement E)
 				{
-					E2eEndpoint Endpoint = ParseE2eKey(E, LocalEndpoint);
+					IE2eEndpoint Endpoint = ParseE2eKey(E);
 
 					if (Endpoint != null)
 					{
 						if (Endpoints == null)
-							Endpoints = new List<E2eEndpoint>();
+							Endpoints = new List<IE2eEndpoint>();
 
 						Endpoints.Add(Endpoint);
 					}
@@ -231,82 +316,15 @@ namespace Waher.Networking.XMPP.P2P
 		/// Parses a single E2E key from XML.
 		/// </summary>
 		/// <param name="E">E2E element.</param>
-		/// <param name="LocalEndpoint">Local endpoint security object, if available.</param>
 		/// <returns>E2E keys, if recognized, or null if not.</returns>
-		public static E2eEndpoint ParseE2eKey(XmlElement E, EndpointSecurity LocalEndpoint)
+		public static IE2eEndpoint ParseE2eKey(XmlElement E)
 		{
-			if (E.NamespaceURI == IoTHarmonizationE2E)
-			{
-				switch (E.LocalName)
-				{
-					case "rsa":
-						int? KeySize = null;
-						byte[] Modulus = null;
-						byte[] Exponent = null;
+			string Key = E.NamespaceURI + "#" + E.LocalName;
 
-						foreach (XmlAttribute Attr in E.Attributes)
-						{
-							switch (Attr.Name)
-							{
-								case "size":
-									if (int.TryParse(Attr.Value, out int i))
-										KeySize = i;
-									else
-										return null;
-									break;
-
-								case "mod":
-									Modulus = Convert.FromBase64String(Attr.Value);
-									break;
-
-								case "exp":
-									Exponent = Convert.FromBase64String(Attr.Value);
-									break;
-							}
-						}
-
-						if (KeySize.HasValue && Modulus != null && Exponent != null)
-							return new RsaAes(KeySize.Value, Modulus, Exponent, LocalEndpoint);
-						break;
-
-					case "p192":
-					case "p224":
-					case "p256":
-					case "p384":
-					case "p521":
-						byte[] X = null;
-						byte[] Y = null;
-
-						foreach (XmlAttribute Attr in E.Attributes)
-						{
-							switch (Attr.Name)
-							{
-								case "x":
-									X = Convert.FromBase64String(Attr.Value);
-									break;
-
-								case "y":
-									Y = Convert.FromBase64String(Attr.Value);
-									break;
-							}
-						}
-
-						if (X != null && Y != null)
-						{
-							switch (E.LocalName)
-							{
-								case "p192": return new NistP192Aes(X, Y, LocalEndpoint);
-								case "p224": return new NistP224Aes(X, Y, LocalEndpoint);
-								case "p256": return new NistP256Aes(X, Y, LocalEndpoint);
-								case "p384": return new NistP384Aes(X, Y, LocalEndpoint);
-								case "p521": return new NistP521Aes(X, Y, LocalEndpoint);
-							}
-						}
-						break;
-				}
-			}
-
-			return null;
+			if (endpointTypes.TryGetValue(Key, out IE2eEndpoint E2e))
+				return E2e.Parse(E);
+			else
+				return null;
 		}
 
 		/// <summary>
@@ -319,12 +337,12 @@ namespace Waher.Networking.XMPP.P2P
 		{
 			try
 			{
-				List<E2eEndpoint> Endpoints = null;
-				E2eEndpoint[] OldEndpoints = null;
+				List<IE2eEndpoint> Endpoints = null;
+				IE2eEndpoint[] OldEndpoints = null;
 				int i;
 
 				if (E2E != null)
-					Endpoints = ParseE2eKeys(E2E, this);
+					Endpoints = ParseE2eKeys(E2E);
 
 				if (Endpoints == null)
 				{
@@ -345,7 +363,7 @@ namespace Waher.Networking.XMPP.P2P
 
 				if (i != 0)
 				{
-					E2eEndpoint Temp = Endpoints[i];
+					IE2eEndpoint Temp = Endpoints[i];
 					Endpoints.RemoveAt(i);
 					Endpoints.Insert(0, Temp);
 				}
@@ -380,7 +398,7 @@ namespace Waher.Networking.XMPP.P2P
 		/// <returns>If E2E information was found and removed.</returns>
 		public bool RemovePeerPkiInfo(string FullJID)
 		{
-			E2eEndpoint[] List;
+			IE2eEndpoint[] List;
 
 			lock (this.contacts)
 			{
@@ -414,11 +432,11 @@ namespace Waher.Networking.XMPP.P2P
 		/// </summary>
 		/// <param name="FullJid">Full JID of endpoint.</param>
 		/// <returns>Available E2E options for endpoint.</returns>
-		public E2eEndpoint[] GetE2eEndpoints(string FullJid)
+		public IE2eEndpoint[] GetE2eEndpoints(string FullJid)
 		{
 			lock (this.contacts)
 			{
-				if (this.contacts.TryGetValue(FullJid, out E2eEndpoint[] Endpoints))
+				if (this.contacts.TryGetValue(FullJid, out IE2eEndpoint[] Endpoints))
 					return Endpoints;
 				else
 					return new E2eEndpoint[0];
@@ -436,7 +454,7 @@ namespace Waher.Networking.XMPP.P2P
 		/// <returns>Encrypted data, or null if no E2E information is found for endpoint.</returns>
 		public virtual byte[] Encrypt(string Id, string Type, string From, string To, byte[] Data)
 		{
-			E2eEndpoint[] Endpoints;
+			IE2eEndpoint[] Endpoints;
 
 			lock (this.contacts)
 			{
@@ -458,7 +476,7 @@ namespace Waher.Networking.XMPP.P2P
 		/// <returns>Decrypted data, or null if no E2E information is found for endpoint.</returns>
 		public virtual byte[] Decrypt(string Id, string Type, string From, string To, byte[] Data)
 		{
-			E2eEndpoint[] Endpoints;
+			IE2eEndpoint[] Endpoints;
 
 			lock (this.contacts)
 			{
@@ -482,7 +500,7 @@ namespace Waher.Networking.XMPP.P2P
 		/// <returns>If E2E information was available and encryption was possible.</returns>
 		public virtual bool Encrypt(XmppClient Client, string Id, string Type, string From, string To, string DataXml, StringBuilder Xml)
 		{
-			E2eEndpoint[] Endpoints;
+			IE2eEndpoint[] Endpoints;
 
 			lock (this.contacts)
 			{
@@ -497,45 +515,6 @@ namespace Waher.Networking.XMPP.P2P
 				Client.Information(DataXml);
 
 			return Result;
-		}
-
-		/// <summary>
-		/// Signs binary data using the local private key.
-		/// </summary>
-		/// <param name="Data">Binary data</param>
-		/// <returns>Signature</returns>
-		public byte[] SignRsa(byte[] Data)
-		{
-			lock (this.synchObject)
-			{
-				return this.rsa.SignData(Data, HashAlgorithmName.SHA256, RSASignaturePadding.Pss);
-			}
-		}
-
-		/// <summary>
-		/// Decrypts a key using the local private RSA key.
-		/// </summary>
-		/// <param name="Key">Encrypted key</param>
-		/// <returns>Decrypted key</returns>
-		public byte[] DecryptRsa(byte[] Key)
-		{
-			lock (this.synchObject)
-			{
-				return this.rsa.Decrypt(Key, RSAEncryptionPadding.OaepSHA256);
-			}
-		}
-
-		/// <summary>
-		/// Decrypts a key using the previous local private RSA key.
-		/// </summary>
-		/// <param name="Key">Encrypted key</param>
-		/// <returns>Decrypted key</returns>
-		public byte[] DecryptOldRsa(byte[] Key)
-		{
-			lock (this.synchObject)
-			{
-				return this.rsaOld.Decrypt(Key, RSAEncryptionPadding.OaepSHA256);
-			}
 		}
 
 		private void AesMessageHandler(object Sender, MessageEventArgs e)
@@ -574,7 +553,7 @@ namespace Waher.Networking.XMPP.P2P
 		/// <returns>Decrypted XML.</returns>
 		public virtual string Decrypt(XmppClient Client, string Id, string Type, string From, string To, XmlElement E2eElement)
 		{
-			E2eEndpoint[] Endpoints;
+			IE2eEndpoint[] Endpoints;
 
 			lock (this.contacts)
 			{
@@ -1108,37 +1087,14 @@ namespace Waher.Networking.XMPP.P2P
 		/// <param name="Xml">XML Output.</param>
 		public void AppendE2eInfo(StringBuilder Xml)
 		{
-			PointOnCurve P;
-
 			Xml.Append("<e2e xmlns='");
 			Xml.Append(IoTHarmonizationE2E);
-			Xml.Append("'><p521 x='");
-			Xml.Append(Convert.ToBase64String(EcAes256.ToNetwork((P = this.p521.PublicKey).X)));
-			Xml.Append("' y='");
-			Xml.Append(Convert.ToBase64String(EcAes256.ToNetwork(P.Y)));
-			Xml.Append("'/><p384 x='");
-			Xml.Append(Convert.ToBase64String(EcAes256.ToNetwork((P = this.p384.PublicKey).X)));
-			Xml.Append("' y='");
-			Xml.Append(Convert.ToBase64String(EcAes256.ToNetwork(P.Y)));
-			Xml.Append("'/><p256 x='");
-			Xml.Append(Convert.ToBase64String(EcAes256.ToNetwork((P = this.p256.PublicKey).X)));
-			Xml.Append("' y='");
-			Xml.Append(Convert.ToBase64String(EcAes256.ToNetwork(P.Y)));
-			Xml.Append("'/><p224 x='");
-			Xml.Append(Convert.ToBase64String(EcAes256.ToNetwork((P = this.p224.PublicKey).X)));
-			Xml.Append("' y='");
-			Xml.Append(Convert.ToBase64String(EcAes256.ToNetwork(P.Y)));
-			Xml.Append("'/><p192 x='");
-			Xml.Append(Convert.ToBase64String(EcAes256.ToNetwork((P = this.p192.PublicKey).X)));
-			Xml.Append("' y='");
-			Xml.Append(Convert.ToBase64String(EcAes256.ToNetwork(P.Y)));
-			Xml.Append("'/><rsa size='");
-			Xml.Append(this.rsaKeySize.ToString());
-			Xml.Append("' mod='");
-			Xml.Append(this.rsaModulus);
-			Xml.Append("' exp='");
-			Xml.Append(this.rsaExponent);
-			Xml.Append("'/></e2e>");
+			Xml.Append("'>");
+
+			foreach (IE2eEndpoint E2e in this.keys)
+				E2e.ToXml(Xml);
+
+			Xml.Append("</e2e>");
 		}
 
 		/// <summary>

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Numerics;
-using System.Security.Cryptography;
+﻿using System.Numerics;
 using Waher.Security.EllipticCurves;
 
 namespace Waher.Networking.XMPP.P2P.E2E
@@ -14,13 +11,34 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		/// <summary>
 		/// NIST P-521 Curve
 		/// </summary>
-		/// <param name="X">X-coordinate of remote public key.</param>
-		/// <param name="Y">Y-coordinate of remote public key.</param>
-		/// <param name="LocalEndpoint">Local security endpoint, if available.</param>
-		public NistP521Aes(byte[] X, byte[] Y, EndpointSecurity LocalEndpoint)
-			: base(X, Y, LocalEndpoint)
+		public NistP521Aes()
+			: this(new NistP521())
 		{
 		}
+
+		/// <summary>
+		/// NIST P-521 Curve
+		/// </summary>
+		/// <param name="Curve">Curve instance</param>
+		public NistP521Aes(NistP521 Curve)
+			: base(Curve)
+		{
+		}
+
+		/// <summary>
+		/// NIST P-521 Curve
+		/// </summary>
+		/// <param name="X">X-coordinate of remote public key.</param>
+		/// <param name="Y">Y-coordinate of remote public key.</param>
+		public NistP521Aes(byte[] X, byte[] Y)
+			: base(X, Y)
+		{
+		}
+
+		/// <summary>
+		/// Local name of the E2E encryption scheme
+		/// </summary>
+		public override string LocalName => "p521";
 
 		/// <summary>
 		/// Security strength of End-to-End encryption scheme.
@@ -28,18 +46,34 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		public override int SecurityStrength => 256;
 
 		/// <summary>
-		/// Name of elliptic curve
+		/// Creates a new key.
 		/// </summary>
-		public override string CurveName => this.localEndpoint.p521.CurveName;
+		/// <param name="SecurityStrength">Overall desired security strength, if applicable.</param>
+		/// <returns>New E2E endpoint.</returns>
+		public override IE2eEndpoint Create(int SecurityStrength)
+		{
+			return new NistP521Aes();
+		}
 
 		/// <summary>
-		/// Elliptic Curve
+		/// Creates a new endpoint.
 		/// </summary>
-		protected override CurvePrimeField Curve => this.localEndpoint.p521;
+		/// <param name="D">Private key.</param>
+		/// <returns>Endpoint object.</returns>
+		public override EcAes256 Create(BigInteger D)
+		{
+			return new NistP521Aes(new NistP521(D));
+		}
 
 		/// <summary>
-		/// Previous Elliptic Curve
+		/// Creates a new endpoint.
 		/// </summary>
-		protected override CurvePrimeField PrevCurve => this.localEndpoint.p521Old;
+		/// <param name="X">X-coordinate of remote public key.</param>
+		/// <param name="Y">Y-coordinate of remote public key.</param>
+		/// <returns>Endpoint object.</returns>
+		public override EcAes256 Create(byte[] X, byte[] Y)
+		{
+			return new NistP521Aes(X, Y);
+		}
 	}
 }

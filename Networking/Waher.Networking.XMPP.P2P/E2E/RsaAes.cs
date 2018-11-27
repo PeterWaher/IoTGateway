@@ -12,11 +12,38 @@ namespace Waher.Networking.XMPP.P2P.E2E
 	/// </summary>
 	public class RsaAes : Aes256
 	{
-		private readonly EndpointSecurity localEndpoint;
 		private RSA rsa;
 		private readonly byte[] modulus;
 		private readonly byte[] exponent;
 		private readonly int keySize;
+		private readonly string modulusBase64;
+		private readonly string exponentBase64;
+
+		/// <summary>
+		/// RSA / AES-256 hybrid cipher.
+		/// </summary>
+		public RsaAes()
+			: this(RSA.Create())
+		{
+		}
+
+		/// <summary>
+		/// RSA / AES-256 hybrid cipher.
+		/// </summary>
+		/// <param name="Rsa">RSA</param>
+		public RsaAes(RSA Rsa)
+			: base()
+		{
+			this.rsa = Rsa;
+
+			RSAParameters P = this.rsa.ExportParameters(false);
+
+			this.modulus = P.Modulus;
+			this.exponent = P.Exponent;
+
+			this.modulusBase64 = Convert.ToBase64String(P.Modulus);
+			this.exponentBase64 = Convert.ToBase64String(P.Exponent);
+		}
 
 		/// <summary>
 		/// RSA / AES-256 hybrid cipher.
@@ -24,8 +51,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		/// <param name="KeySize">Size of key</param>
 		/// <param name="Modulus">Modulus of RSA public key.</param>
 		/// <param name="Exponent">Exponent of RSA public key.</param>
-		/// <param name="LocalEndpoint">Local security endpoint, if available.</param>
-		public RsaAes(int KeySize, byte[] Modulus, byte[] Exponent, EndpointSecurity LocalEndpoint)
+		public RsaAes(int KeySize, byte[] Modulus, byte[] Exponent)
 			: base()
 		{
 			this.rsa = RSA.Create();
@@ -34,7 +60,8 @@ namespace Waher.Networking.XMPP.P2P.E2E
 			this.keySize = KeySize;
 			this.modulus = Modulus;
 			this.exponent = Exponent;
-			this.localEndpoint = LocalEndpoint;
+			this.modulusBase64 = Convert.ToBase64String(Modulus);
+			this.exponentBase64 = Convert.ToBase64String(Exponent);
 
 			RSAParameters Param = new RSAParameters()
 			{
@@ -44,6 +71,11 @@ namespace Waher.Networking.XMPP.P2P.E2E
 
 			this.rsa.ImportParameters(Param);
 		}
+
+		/// <summary>
+		/// Local name of the E2E encryption scheme
+		/// </summary>
+		public override string LocalName => "rsa";
 
 		/// <summary>
 		/// Size of key
@@ -83,6 +115,91 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		}
 
 		/// <summary>
+		/// Creates a new key.
+		/// </summary>
+		/// <param name="SecurityStrength">Overall desired security strength, if applicable.</param>
+		/// <returns>New E2E endpoint.</returns>
+		public override IE2eEndpoint Create(int SecurityStrength)
+		{
+			int KeySize;
+
+			if (SecurityStrength <= 80)
+				KeySize = 1024;
+			else if (SecurityStrength <= 112)
+				KeySize = 2048;
+			else if (SecurityStrength <= 128)
+				KeySize = 3072;
+			else if (SecurityStrength <= 192)
+				KeySize = 7680;
+			else if (SecurityStrength <= 256)
+				KeySize = 15360;
+			else
+				throw new ArgumentException("Key strength too high.", nameof(SecurityStrength));
+
+			RSA Rsa = RSA.Create();
+			Rsa.KeySize = KeySize;
+
+			return new RsaAes(Rsa);
+		}
+
+		/// <summary>
+		/// Parses endpoint information from an XML element.
+		/// </summary>
+		/// <param name="Xml">XML element.</param>
+		/// <returns>Parsed key information, if possible, null if XML is not well-defined.</returns>
+		public override IE2eEndpoint Parse(XmlElement Xml)
+		{
+			int? KeySize = null;
+			byte[] Modulus = null;
+			byte[] Exponent = null;
+
+			foreach (XmlAttribute Attr in Xml.Attributes)
+			{
+				switch (Attr.Name)
+				{
+					case "size":
+						if (int.TryParse(Attr.Value, out int i))
+							KeySize = i;
+						else
+							return null;
+						break;
+
+					case "mod":
+						Modulus = Convert.FromBase64String(Attr.Value);
+						break;
+
+					case "exp":
+						Exponent = Convert.FromBase64String(Attr.Value);
+						break;
+				}
+			}
+
+			if (KeySize.HasValue && Modulus != null && Exponent != null)
+				return new RsaAes(KeySize.Value, Modulus, Exponent);
+			else
+				return null;
+		}
+
+		/// <summary>
+		/// Exports the public key information to XML.
+		/// </summary>
+		/// <param name="Xml">XML output</param>
+		public override void ToXml(StringBuilder Xml)
+		{
+			Xml.Append('<');
+			Xml.Append(this.LocalName);
+			Xml.Append(" xmlns='");
+			Xml.Append(this.Namespace);
+			Xml.Append("' size='");
+			Xml.Append(this.keySize.ToString());
+			Xml.Append("' mod='");
+			Xml.Append(this.modulusBase64);
+			Xml.Append("' exp='");
+			Xml.Append(this.exponentBase64);
+			Xml.Append("'/>");
+		}
+
+		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>
 		/// </summary>
 		public override void Dispose()
@@ -118,7 +235,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
 				Result = this.Encrypt(Data, this.aes.Key, IV);
 			}
 
-			Signature = this.localEndpoint.SignRsa(Data);
+			Signature = this.Sign(Data);
 
 			byte[] Block = new byte[KeyEncrypted.Length + Signature.Length + Result.Length + 8];
 			int i, j;
@@ -202,7 +319,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
 
 			try
 			{
-				Key = this.localEndpoint.DecryptRsa(KeyEncrypted);
+				Key = this.Decrypt(KeyEncrypted);
 				Decrypted = this.Decrypt(Encrypted, Key, IV);
 			}
 			catch (Exception)
@@ -214,7 +331,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
 			{
 				try
 				{
-					Key = this.localEndpoint.DecryptOldRsa(KeyEncrypted);
+					Key = (this.Previous as RsaAes)?.Decrypt(KeyEncrypted);
 
 					if (Key != null && IV != null)
 					{
@@ -266,7 +383,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
 				Result = this.Encrypt(Data, this.aes.Key, IV);
 			}
 
-			Signature = this.localEndpoint.SignRsa(Data);
+			Signature = this.Sign(Data);
 
 			Xml.Append("<aes xmlns='");
 			Xml.Append(EndpointSecurity.IoTHarmonizationE2E);
@@ -311,7 +428,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
 
 			try
 			{
-				Key = this.localEndpoint.DecryptRsa(KeyEncrypted);
+				Key = this.Decrypt(KeyEncrypted);
 				Decrypted = this.Decrypt(Encrypted, Key, IV);
 
 				if (Decrypted != null)
@@ -332,7 +449,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
 			{
 				try
 				{
-					Key = this.localEndpoint.DecryptOldRsa(KeyEncrypted);
+					Key = (this.Previous as RsaAes)?.Decrypt(KeyEncrypted);
 
 					if (Key != null)
 					{
@@ -356,6 +473,26 @@ namespace Waher.Networking.XMPP.P2P.E2E
 			}
 
 			return Encoding.UTF8.GetString(Decrypted);
+		}
+
+		/// <summary>
+		/// Signs binary data using the local private key.
+		/// </summary>
+		/// <param name="Data">Binary data</param>
+		/// <returns>Signature</returns>
+		public byte[] Sign(byte[] Data)
+		{
+			return this.rsa.SignData(Data, HashAlgorithmName.SHA256, RSASignaturePadding.Pss);
+		}
+
+		/// <summary>
+		/// Decrypts a key using the local private RSA key.
+		/// </summary>
+		/// <param name="Key">Encrypted key</param>
+		/// <returns>Decrypted key</returns>
+		public byte[] Decrypt(byte[] Key)
+		{
+			return this.rsa.Decrypt(Key, RSAEncryptionPadding.OaepSHA256);
 		}
 
 	}

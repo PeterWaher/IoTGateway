@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Numerics;
 using System.Threading.Tasks;
+using System.Text;
 using System.Xml;
+using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Networking.XMPP.P2P;
 using Waher.Networking.XMPP.P2P.E2E;
@@ -213,13 +215,45 @@ namespace Waher.Networking.XMPP.Contracts
 			}, null);
 		}
 
-		public void Apply()
+		public void Apply(params Property[] Properties)
 		{
-			this.Apply(this.componentAddress);
+			this.Apply(this.componentAddress, Properties);
 		}
 
-		public void Apply(string Address)
+		public void Apply(string Address, params Property[] Properties)
 		{
+			this.GetMatchingLocalKey(Address, (sender, e) =>
+			{
+				if (e.Ok)
+				{
+					StringBuilder Xml = new StringBuilder();
+
+					Xml.Append("<apply xmlns='");
+					Xml.Append(NamespaceLegalIdentities);
+					Xml.Append("'><identity><clientPublicKey>");
+					e.Key.ToXml(Xml);
+					Xml.Append("</clientPublicKey>");
+
+					foreach (Property Property in Properties)
+					{
+						Xml.Append("<property name='");
+						Xml.Append(XML.Encode(Property.Name));
+						Xml.Append("' value='");
+						Xml.Append(XML.Encode(Property.Value));
+						Xml.Append("'/>");
+					}
+
+					// TODO: clientSignature
+
+					Xml.Append("</apply");
+
+					// TODO: IQ
+				}
+				else
+				{
+					// TODO
+				}
+			}, null);
 		}
 
 	}

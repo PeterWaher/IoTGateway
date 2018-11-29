@@ -1244,5 +1244,34 @@ namespace Waher.Networking.XMPP.P2P
 		/// </summary>
 		public event PeerSynchronizedEventHandler PeerUpdated = null;
 
+		/// <summary>
+		/// Gets the local key of a given type.
+		/// </summary>
+		/// <param name="Key">Get key of same type.</param>
+		/// <returns>Key, if found, or null if not.</returns>
+		public IE2eEndpoint GetLocalKey(IE2eEndpoint Key)
+		{
+			return this.GetLocalKey(Key.GetType());
+		}
+
+		/// <summary>
+		/// Gets the local key of a given type.
+		/// </summary>
+		/// <param name="KeyType">Type of key to get.</param>
+		/// <returns>Key, if found, or null if not.</returns>
+		public IE2eEndpoint GetLocalKey(Type KeyType)
+		{
+			foreach (IE2eEndpoint Endpoint in this.keys)
+			{
+				if (Endpoint.GetType() == KeyType)
+					return Endpoint;
+			}
+
+			if (!typeof(IE2eEndpoint).GetTypeInfo().IsAssignableFrom(KeyType.GetTypeInfo()))
+				throw new ArgumentException("Not assignable from " + typeof(IE2eEndpoint).FullName, nameof(KeyType));
+
+			return null;
+		}
+
 	}
 }

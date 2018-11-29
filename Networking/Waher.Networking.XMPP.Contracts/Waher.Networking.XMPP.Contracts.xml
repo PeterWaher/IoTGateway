@@ -37,14 +37,14 @@
             Implemented extensions.
             </summary>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetServerPublicKey(Waher.Networking.XMPP.Contracts.PublicKeyEventHandler,System.Object)">
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetServerPublicKey(Waher.Networking.XMPP.Contracts.KeyEventHandler,System.Object)">
             <summary>
             Gets the server public key.
             </summary>
             <param name="Callback">Method to call when response is returned.</param>
             <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetServerPublicKey(System.String,Waher.Networking.XMPP.Contracts.PublicKeyEventHandler,System.Object)">
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetServerPublicKey(System.String,Waher.Networking.XMPP.Contracts.KeyEventHandler,System.Object)">
             <summary>
             Gets the server public key.
             </summary>
@@ -52,26 +52,41 @@
             <param name="Callback">Method to call when response is returned.</param>
             <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
         </member>
-        <member name="T:Waher.Networking.XMPP.Contracts.PublicKeyEventHandler">
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetMatchingLocalKey(Waher.Networking.XMPP.Contracts.KeyEventHandler,System.Object)">
             <summary>
-            Delegate for public key callback methods.
+            Get the local key that matches the server key.
+            </summary>
+            <param name="Callback">Method called when response is available.</param>
+            <param name="State">State object to pass on to callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetMatchingLocalKey(System.String,Waher.Networking.XMPP.Contracts.KeyEventHandler,System.Object)">
+            <summary>
+            Get the local key that matches a given server key.
+            </summary>
+            <param name="Address">Address of server (component).</param>
+            <param name="Callback">Method called when response is available.</param>
+            <param name="State">State object to pass on to callback method.</param>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.KeyEventHandler">
+            <summary>
+            Delegate for key callback methods.
             </summary>
             <param name="Sender">Sender</param>
             <param name="e">Event arguments</param>
         </member>
-        <member name="T:Waher.Networking.XMPP.Contracts.PublicKeyEventArgs">
+        <member name="T:Waher.Networking.XMPP.Contracts.KeyEventArgs">
             <summary>
-            Event arguments for public key responses
+            Event arguments for key responses
             </summary>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.PublicKeyEventArgs.#ctor(Waher.Networking.XMPP.IqResultEventArgs,Waher.Networking.XMPP.P2P.E2E.IE2eEndpoint)">
+        <member name="M:Waher.Networking.XMPP.Contracts.KeyEventArgs.#ctor(Waher.Networking.XMPP.IqResultEventArgs,Waher.Networking.XMPP.P2P.E2E.IE2eEndpoint)">
             <summary>
-            Event arguments for public key responses
+            Event arguments for key responses
             </summary>
             <param name="e">IQ response event arguments.</param>
-            <param name="ServerEndpoint">Public key of server endpoint.</param>
+            <param name="Key">Key.</param>
         </member>
-        <member name="P:Waher.Networking.XMPP.Contracts.PublicKeyEventArgs.ServerEndpoint">
+        <member name="P:Waher.Networking.XMPP.Contracts.KeyEventArgs.Key">
             <summary>
             Public key of server endpoint.
             </summary>

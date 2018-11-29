@@ -1257,6 +1257,20 @@
             Event raised whenever information about a peer has been updated.
             </summary>
         </member>
+        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.GetLocalKey(Waher.Networking.XMPP.P2P.E2E.IE2eEndpoint)">
+            <summary>
+            Gets the local key of a given type.
+            </summary>
+            <param name="Key">Get key of same type.</param>
+            <returns>Key, if found, or null if not.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.GetLocalKey(System.Type)">
+            <summary>
+            Gets the local key of a given type.
+            </summary>
+            <param name="KeyType">Type of key to get.</param>
+            <returns>Key, if found, or null if not.</returns>
+        </member>
         <member name="T:Waher.Networking.XMPP.P2P.PeerAddressEventHandler">
             <summary>
             Delegate for peer address events.

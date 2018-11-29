@@ -6,33 +6,33 @@ using Waher.Networking.XMPP.P2P.E2E;
 namespace Waher.Networking.XMPP.Contracts
 {
 	/// <summary>
-	/// Delegate for public key callback methods.
+	/// Delegate for key callback methods.
 	/// </summary>
 	/// <param name="Sender">Sender</param>
 	/// <param name="e">Event arguments</param>
-	public delegate void PublicKeyEventHandler(object Sender, PublicKeyEventArgs e);
+	public delegate void KeyEventHandler(object Sender, KeyEventArgs e);
 
 	/// <summary>
-	/// Event arguments for public key responses
+	/// Event arguments for key responses
 	/// </summary>
-	public class PublicKeyEventArgs : IqResultEventArgs
+	public class KeyEventArgs : IqResultEventArgs
 	{
-		private readonly IE2eEndpoint serverEndpoint;
+		private readonly IE2eEndpoint key;
 
 		/// <summary>
-		/// Event arguments for public key responses
+		/// Event arguments for key responses
 		/// </summary>
 		/// <param name="e">IQ response event arguments.</param>
-		/// <param name="ServerEndpoint">Public key of server endpoint.</param>
-		public PublicKeyEventArgs(IqResultEventArgs e, IE2eEndpoint ServerEndpoint)
+		/// <param name="Key">Key.</param>
+		public KeyEventArgs(IqResultEventArgs e, IE2eEndpoint Key)
 			: base(e)
 		{
-			this.serverEndpoint = ServerEndpoint;
+			this.key = Key;
 		}
 
 		/// <summary>
 		/// Public key of server endpoint.
 		/// </summary>
-		public IE2eEndpoint ServerEndpoint => this.serverEndpoint;
+		public IE2eEndpoint Key => this.key;
 	}
 }

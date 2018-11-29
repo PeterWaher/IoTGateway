@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Numerics;
 using System.Threading.Tasks;
 using System.Xml;
+using Waher.Events;
 using Waher.Networking.XMPP.P2P;
 using Waher.Networking.XMPP.P2P.E2E;
 using Waher.Runtime.Settings;
@@ -23,6 +24,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		public const string NamespaceLegalIdentities = "urn:ieee:iot:leg:id:1.0";
 
+		private readonly Dictionary<string, KeyEventArgs> matchingKeys = new Dictionary<string, KeyEventArgs>();
 		private EndpointSecurity localEndpoint;
 		private readonly Task<EndpointSecurity> localEndpointTask;
 		private readonly string componentAddress;
@@ -111,7 +113,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
-		public void GetServerPublicKey(PublicKeyEventHandler Callback, object State)
+		public void GetServerPublicKey(KeyEventHandler Callback, object State)
 		{
 			this.GetServerPublicKey(this.componentAddress, Callback, State);
 		}
@@ -122,7 +124,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Address">Address of entity whose public key is requested.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
-		public void GetServerPublicKey(string Address, PublicKeyEventHandler Callback, object State)
+		public void GetServerPublicKey(string Address, KeyEventHandler Callback, object State)
 		{
 			this.client.SendIqGet(Address, "<getPublicKey xmlns='" + NamespaceLegalIdentities + "'/>", (sender, e) =>
 			{
@@ -146,30 +148,70 @@ namespace Waher.Networking.XMPP.Contracts
 				else
 					e.Ok = false;
 
-				Callback?.Invoke(this, new PublicKeyEventArgs(e, ServerEndpoint));
+				Callback?.Invoke(this, new KeyEventArgs(e, ServerEndpoint));
 			}, State);
 		}
 
-		public void GetMatchingLocalKey()
+		/// <summary>
+		/// Get the local key that matches the server key.
+		/// </summary>
+		/// <param name="Callback">Method called when response is available.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void GetMatchingLocalKey(KeyEventHandler Callback, object State)
 		{
-			this.GetMatchingLocalKey(this.componentAddress);
+			this.GetMatchingLocalKey(this.componentAddress, Callback, State);
 		}
 
-		public void GetMatchingLocalKey(string Address)
+		/// <summary>
+		/// Get the local key that matches a given server key.
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="Callback">Method called when response is available.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void GetMatchingLocalKey(string Address, KeyEventHandler Callback, object State)
 		{
+			KeyEventArgs e0;
+
 			lock (this.matchingKeys)
 			{
-				if (this.matchingKeys.TryGetValue(Address, out IE2eEndpoint Endpoint))
-					return Endpoint;
+				if (!this.matchingKeys.TryGetValue(Address, out e0))
+					e0 = null;
+			}
+
+			if (e0 != null)
+			{
+				try
+				{
+					Callback?.Invoke(this, e0);
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
 			}
 
 			this.GetServerPublicKey(Address, (sender, e) =>
 			{
+				IE2eEndpoint LocalKey = null;
+
+				if (e.Ok)
+				{
+					LocalKey = this.localEndpoint.GetLocalKey(e.Key);
+					if (LocalKey == null)
+						e.Ok = false;
+				}
+
+				e0 = new KeyEventArgs(e, LocalKey);
+
+				lock (this.matchingKeys)
+				{
+					this.matchingKeys[Address] = e0;
+				}
+
+				Callback?.Invoke(this, e0);
 
 			}, null);
 		}
-
-		private readonly Dictionary<string, IE2eEndpoint> matchingKeys = new Dictionary<string, IE2eEndpoint>();
 
 		public void Apply()
 		{

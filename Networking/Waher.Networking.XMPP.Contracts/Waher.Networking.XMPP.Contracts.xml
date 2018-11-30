@@ -127,6 +127,38 @@
             <param name="Callback">Method to call when validation is completed</param>
             <param name="State">State object to pass to callback method.</param>
         </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.ValidateAsync(Waher.Networking.XMPP.Contracts.LegalIdentity)">
+            <summary>
+            Validates a legal identity.
+            </summary>
+            <param name="Identity">Legal identity to validate</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetLegalIdentities(Waher.Networking.XMPP.Contracts.LegalIdentitiesEventHandler,System.Object)">
+            <summary>
+            Gets legal identities registered with the account.
+            </summary>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetLegalIdentities(System.String,Waher.Networking.XMPP.Contracts.LegalIdentitiesEventHandler,System.Object)">
+            <summary>
+            Gets legal identities registered with the account.
+            </summary>
+            <param name="Address">Address of entity on which the legal identities are registered.</param>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetLegalIdentitiesAsync">
+            <summary>
+            Gets legal identities registered with the account.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetLegalIdentitiesAsync(System.String)">
+            <summary>
+            Gets legal identities registered with the account.
+            </summary>
+            <param name="Address">Address of entity on which the legal identities are registered.</param>
+        </member>
         <member name="T:Waher.Networking.XMPP.Contracts.IdentityStatus">
             <summary>
             Validation Status of legal identity
@@ -231,6 +263,30 @@
         <member name="P:Waher.Networking.XMPP.Contracts.IdentityValidationEventArgs.State">
             <summary>
             State object.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.LegalIdentitiesEventHandler">
+            <summary>
+            Delegate for legal identities callback methods.
+            </summary>
+            <param name="Sender">Sender</param>
+            <param name="e">Event arguments</param>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.LegalIdentitiesEventArgs">
+            <summary>
+            Event arguments for legal identities responses
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.LegalIdentitiesEventArgs.#ctor(Waher.Networking.XMPP.IqResultEventArgs,Waher.Networking.XMPP.Contracts.LegalIdentity[])">
+            <summary>
+            Event arguments for legal identities responses
+            </summary>
+            <param name="e">IQ response event arguments.</param>
+            <param name="Identities">Legal Identities.</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.LegalIdentitiesEventArgs.Identities">
+            <summary>
+            Legal Identities
             </summary>
         </member>
         <member name="T:Waher.Networking.XMPP.Contracts.IdentityState">

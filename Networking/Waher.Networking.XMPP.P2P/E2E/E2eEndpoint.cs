@@ -140,5 +140,15 @@ namespace Waher.Networking.XMPP.P2P.E2E
 			return IV;
 		}
 
+		/// <summary>
+		/// <see cref="Object.ToString()"/>
+		/// </summary>
+		public override string ToString()
+		{
+			StringBuilder Xml = new StringBuilder();
+			this.ToXml(Xml);
+			return Xml.ToString();
+		}
+
 	}
 }

@@ -101,13 +101,13 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		{
 			Xml.Append('<');
 			Xml.Append(this.LocalName);
-			Xml.Append(" xmlns='");
-			Xml.Append(this.Namespace);
-			Xml.Append("' x='");
+			Xml.Append(" x=\"");
 			Xml.Append(Convert.ToBase64String(EcAes256.ToNetwork(this.publicKey.X)));
-			Xml.Append("' y='");
+			Xml.Append("\" xmlns=\"");
+			Xml.Append(this.Namespace);
+			Xml.Append("\" y=\"");
 			Xml.Append(Convert.ToBase64String(EcAes256.ToNetwork(this.publicKey.Y)));
-			Xml.Append("'/>");
+			Xml.Append("\"/>");
 		}
 
 		/// <summary>
@@ -388,15 +388,15 @@ namespace Waher.Networking.XMPP.P2P.E2E
 			byte[] Signature1 = ToNetwork(Signature.Key);
 			byte[] Signature2 = ToNetwork(Signature.Value);
 
-			Xml.Append("<aes xmlns='");
+			Xml.Append("<aes xmlns=\"");
 			Xml.Append(EndpointSecurity.IoTHarmonizationE2E);
-			Xml.Append("' ec='");
+			Xml.Append("\" ec=\"");
 			Xml.Append(this.CurveName);
-			Xml.Append("' ecdsa1='");
+			Xml.Append("\" ecdsa1=\"");
 			Xml.Append(Convert.ToBase64String(Signature1));
-			Xml.Append("' ecdsa2='");
+			Xml.Append("\" ecdsa2=\"");
 			Xml.Append(Convert.ToBase64String(Signature2));
-			Xml.Append("'>");
+			Xml.Append("\">");
 			Xml.Append(Convert.ToBase64String(Encrypted));
 			Xml.Append("</aes>");
 
@@ -516,6 +516,56 @@ namespace Waher.Networking.XMPP.P2P.E2E
 #endif
 
 			return Encoding.UTF8.GetString(Decrypted);
+		}
+
+		/// <summary>
+		/// Signs binary data using the local private key.
+		/// </summary>
+		/// <param name="Data">Binary data</param>
+		/// <param name="HashFunction">Hash function to use.</param>
+		/// <returns>ECDSA Signature</returns>
+		public KeyValuePair<byte[], byte[]> Sign(byte[] Data, HashFunction HashFunction)
+		{
+			KeyValuePair<BigInteger, BigInteger> Signature = this.curve.Sign(Data, HashFunction);
+			byte[] s1 = ToNetwork(Signature.Key);
+			byte[] s2 = ToNetwork(Signature.Value);
+
+			return new KeyValuePair<byte[], byte[]>(s1, s2);
+		}
+
+		/// <summary>
+		/// Verifies a signature.
+		/// </summary>
+		/// <param name="Data">Data that is signed.</param>
+		/// <param name="X">Public key (X-coordinate)</param>
+		/// <param name="Y">Public key (Y-coordinate)</param>
+		/// <param name="Signature1">First integer in ECDSA signature.</param>
+		/// <param name="Signature2">Second integer in ECDSA signature.</param>
+		/// <param name="HashFunction">Hash function used in signature calculation.</param>
+		/// <returns>If signature is valid.</returns>
+		public bool Verify(byte[] Data, byte[] X, byte[] Y, byte[] Signature1, 
+			byte[] Signature2, HashFunction HashFunction)
+		{
+			return this.Verify(Data, new PointOnCurve(FromNetwork(X), FromNetwork(Y)),
+				Signature1, Signature2, HashFunction);
+		}
+
+		/// <summary>
+		/// Verifies a signature.
+		/// </summary>
+		/// <param name="Data">Data that is signed.</param>
+		/// <param name="PublicKey">Public key</param>
+		/// <param name="Signature1">First integer in ECDSA signature.</param>
+		/// <param name="Signature2">Second integer in ECDSA signature.</param>
+		/// <param name="HashFunction">Hash function used in signature calculation.</param>
+		/// <returns>If signature is valid.</returns>
+		public bool Verify(byte[] Data, PointOnCurve PublicKey, byte[] Signature1,
+			byte[] Signature2, HashFunction HashFunction)
+		{
+			KeyValuePair<BigInteger, BigInteger> Signature = new KeyValuePair<BigInteger, BigInteger>(
+				FromNetwork(Signature1), FromNetwork(Signature2));
+
+			return this.curve.Verify(Data, PublicKey, HashFunction, Signature);
 		}
 
 	}

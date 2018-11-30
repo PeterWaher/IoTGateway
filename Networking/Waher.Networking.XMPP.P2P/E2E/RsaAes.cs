@@ -109,7 +109,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
 					return 128;
 				else if (this.keySize < 15360)
 					return 192;
-				else 
+				else
 					return 256;
 			}
 		}
@@ -188,15 +188,15 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		{
 			Xml.Append('<');
 			Xml.Append(this.LocalName);
-			Xml.Append(" xmlns='");
+			Xml.Append(" xmlns=\"");
 			Xml.Append(this.Namespace);
-			Xml.Append("' size='");
+			Xml.Append("\" size=\"");
 			Xml.Append(this.keySize.ToString());
-			Xml.Append("' mod='");
+			Xml.Append("\" mod=\"");
 			Xml.Append(this.modulusBase64);
-			Xml.Append("' exp='");
+			Xml.Append("\" exp=\"");
 			Xml.Append(this.exponentBase64);
-			Xml.Append("'/>");
+			Xml.Append("\"/>");
 		}
 
 		/// <summary>
@@ -385,13 +385,13 @@ namespace Waher.Networking.XMPP.P2P.E2E
 
 			Signature = this.Sign(Data);
 
-			Xml.Append("<aes xmlns='");
+			Xml.Append("<aes xmlns=\"");
 			Xml.Append(EndpointSecurity.IoTHarmonizationE2E);
-			Xml.Append("' keyRsa='");
+			Xml.Append("\" keyRsa=\"");
 			Xml.Append(Convert.ToBase64String(KeyEncrypted));
-			Xml.Append("' signRsa='");
+			Xml.Append("\" signRsa=\"");
 			Xml.Append(Convert.ToBase64String(Signature));
-			Xml.Append("'>");
+			Xml.Append("\">");
 			Xml.Append(Convert.ToBase64String(Result));
 			Xml.Append("</aes>");
 
@@ -483,6 +483,33 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		public byte[] Sign(byte[] Data)
 		{
 			return this.rsa.SignData(Data, HashAlgorithmName.SHA256, RSASignaturePadding.Pss);
+		}
+
+		/// <summary>
+		/// Verifies a signature.
+		/// </summary>
+		/// <param name="Data">Data that is signed.</param>
+		/// <param name="Signature">Signature</param>
+		/// <param name="KeySize">RSA key size</param>
+		/// <param name="Modulus">Modulus</param>
+		/// <param name="Exponent">Exponent</param>
+		/// <returns></returns>
+		public static bool Verify(byte[] Data, byte[] Signature, int KeySize, byte[] Modulus, byte[] Exponent)
+		{
+			using (RSA Rsa = RSA.Create())
+			{
+				Rsa.KeySize = KeySize;
+
+				RSAParameters P = new RSAParameters()
+				{
+					Modulus = Modulus,
+					Exponent = Exponent
+				};
+
+				Rsa.ImportParameters(P);
+
+				return Rsa.VerifyData(Data, Signature, HashAlgorithmName.SHA256, RSASignaturePadding.Pss);
+			}
 		}
 
 		/// <summary>

@@ -96,7 +96,7 @@ namespace Waher.Networking.XMPP.P2P
 				this.keys = LocalEndpoints;
 
 				if (!initialized)
-					CreateEndpoints(SecurityStrength, 0, int.MaxValue);
+					CreateEndpoints(128, 0, int.MaxValue);
 			}
 			else
 				this.keys = CreateEndpoints(SecurityStrength, 0, int.MaxValue);
@@ -140,15 +140,11 @@ namespace Waher.Networking.XMPP.P2P
 				if (!initialized)
 				{
 					Dictionary<string, IE2eEndpoint> E2eTypes = new Dictionary<string, IE2eEndpoint>();
-					TypeInfo TI2 = OnlyIfDerivedFrom?.GetTypeInfo();
 
 					foreach (Type T in Types.GetTypesImplementingInterface(typeof(IE2eEndpoint)))
 					{
 						TypeInfo TI = T.GetTypeInfo();
 						if (TI.IsAbstract)
-							continue;
-
-						if (!(TI2?.IsAssignableFrom(TI) ?? true))
 							continue;
 
 						try
@@ -169,9 +165,13 @@ namespace Waher.Networking.XMPP.P2P
 			}
 
 			List<IE2eEndpoint> Result = new List<IE2eEndpoint>();
+			TypeInfo OnlyIfDerivedFromType = OnlyIfDerivedFrom?.GetTypeInfo();
 
 			foreach (IE2eEndpoint Endpoint in endpointTypes.Values)
 			{
+				if (!(OnlyIfDerivedFromType?.IsAssignableFrom(Endpoint.GetType().GetTypeInfo()) ?? true))
+					continue;
+
 				IE2eEndpoint Endpoint2 = Endpoint.Create(DesiredSecurityStrength);
 				int i = Endpoint2.SecurityStrength;
 				if (i >= MinSecurityStrength && i <= MaxSecurityStrength)
@@ -181,6 +181,39 @@ namespace Waher.Networking.XMPP.P2P
 			}
 
 			return Result.ToArray();
+		}
+
+		/// <summary>
+		/// Tries to get an existing endpoint, given its qualified name.
+		/// </summary>
+		/// <param name="LocalName">Local name</param>
+		/// <param name="Namespace">Namespace</param>
+		/// <param name="Endpoint">Endpoint, or null if not found.</param>
+		/// <returns>If an endpoint was found with the given name.</returns>
+		public static bool TryGetEndpoint(string LocalName, string Namespace, out IE2eEndpoint Endpoint)
+		{
+			if (!initialized)
+				CreateEndpoints(128, 0, int.MaxValue);
+
+			return endpointTypes.TryGetValue(Namespace + "#" + LocalName, out Endpoint);
+		}
+
+		/// <summary>
+		/// Tries to create a new endpoint, given its qualified name.
+		/// </summary>
+		/// <param name="LocalName">Local name</param>
+		/// <param name="Namespace">Namespace</param>
+		/// <param name="Endpoint">Created endpoint, or null if not found.</param>
+		/// <returns>If an endpoint was found with the given name, and a new instance was created.</returns>
+		public static bool TryCreateEndpoint(string LocalName, string Namespace, out IE2eEndpoint Endpoint)
+		{
+			if (TryGetEndpoint(LocalName, Namespace, out Endpoint))
+			{
+				Endpoint = Endpoint.Create(Endpoint.SecurityStrength);
+				return true;
+			}
+			else
+				return false;
 		}
 
 		/// <summary>
@@ -603,17 +636,17 @@ namespace Waher.Networking.XMPP.P2P
 
 					StringBuilder Xml = new StringBuilder();
 
-					Xml.Append("<iq id='");
+					Xml.Append("<iq id=\"");
 					Xml.Append(e.Id);
-					Xml.Append("' from='");
+					Xml.Append("\" from=\"");
 					Xml.Append(XML.Encode(e.From));
-					Xml.Append("' to='");
+					Xml.Append("\" to=\"");
 					Xml.Append(XML.Encode(e.To));
 
 					if (e.Ok)
-						Xml.Append("' type='result'>");
+						Xml.Append("\" type=\"result\">");
 					else
-						Xml.Append("' type='error'>");
+						Xml.Append("\" type=\"error\">");
 
 					Xml.Append(Content);
 					Xml.Append("</iq>");
@@ -697,15 +730,15 @@ namespace Waher.Networking.XMPP.P2P
 		{
 			StringBuilder Xml = new StringBuilder();
 
-			Xml.Append("<iq id='");
+			Xml.Append("<iq id=\"");
 			Xml.Append(e.Id);
-			Xml.Append("' from='");
+			Xml.Append("\" from=\"");
 			Xml.Append(XML.Encode(e.From));
-			Xml.Append("' to='");
+			Xml.Append("\" to=\"");
 			Xml.Append(XML.Encode(e.To));
-			Xml.Append("' type='");
+			Xml.Append("\" type=\"");
 			Xml.Append(Type);
-			Xml.Append("'>");
+			Xml.Append("\">");
 			Xml.Append(Content);
 			Xml.Append("</iq>");
 
@@ -780,27 +813,27 @@ namespace Waher.Networking.XMPP.P2P
 			switch (Type)
 			{
 				case MessageType.Chat:
-					Xml.Append(" type='chat'");
+					Xml.Append(" type=\"chat\"");
 					break;
 
 				case MessageType.Error:
-					Xml.Append(" type='error'");
+					Xml.Append(" type=\"error\"");
 					break;
 
 				case MessageType.GroupChat:
-					Xml.Append(" type='groupchat'");
+					Xml.Append(" type=\"groupchat\"");
 					break;
 
 				case MessageType.Headline:
-					Xml.Append(" type='headline'");
+					Xml.Append(" type=\"headline\"");
 					break;
 			}
 
 			if (!string.IsNullOrEmpty(Language))
 			{
-				Xml.Append(" xml:lang='");
+				Xml.Append(" xml:lang=\"");
 				Xml.Append(XML.Encode(Language));
-				Xml.Append('\'');
+				Xml.Append('"');
 			}
 
 			Xml.Append('>');
@@ -822,9 +855,9 @@ namespace Waher.Networking.XMPP.P2P
 
 				if (!string.IsNullOrEmpty(ParentThreadId))
 				{
-					Xml.Append(" parent='");
+					Xml.Append(" parent=\"");
 					Xml.Append(XML.Encode(ParentThreadId));
-					Xml.Append("'");
+					Xml.Append('"');
 				}
 
 				Xml.Append(">");
@@ -1087,9 +1120,9 @@ namespace Waher.Networking.XMPP.P2P
 		/// <param name="Xml">XML Output.</param>
 		public void AppendE2eInfo(StringBuilder Xml)
 		{
-			Xml.Append("<e2e xmlns='");
+			Xml.Append("<e2e xmlns=\"");
 			Xml.Append(IoTHarmonizationE2E);
-			Xml.Append("'>");
+			Xml.Append("\">");
 
 			foreach (IE2eEndpoint E2e in this.keys)
 				E2e.ToXml(Xml);
@@ -1127,9 +1160,9 @@ namespace Waher.Networking.XMPP.P2P
 		{
 			StringBuilder Xml = new StringBuilder();
 
-			Xml.Append("<synchE2e xmlns='");
+			Xml.Append("<synchE2e xmlns=\"");
 			Xml.Append(IoTHarmonizationE2E);
-			Xml.Append("'>");
+			Xml.Append("\">");
 
 			this.AppendE2eInfo(Xml);
 			this.serverlessMessaging?.AppendP2pInfo(Xml);

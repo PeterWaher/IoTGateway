@@ -154,7 +154,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 				if (e2.Features.ContainsKey(Namespace))
 				{
 					this.Component = this.Items[this.Pos].JID;
-					this.Proxy.client.SendIqGet(this.Component, "<query xmlns='" + Namespace + "'/>", this.SocksQueryResponse, null);
+					this.Proxy.client.SendIqGet(this.Component, "<query xmlns=\"" + Namespace + "\"/>", this.SocksQueryResponse, null);
 				}
 				else
 					this.Advance();
@@ -276,17 +276,17 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 
 			StringBuilder Xml = new StringBuilder();
 
-			Xml.Append("<query xmlns='");
+			Xml.Append("<query xmlns=\"");
 			Xml.Append(Namespace);
-			Xml.Append("' sid='");
+			Xml.Append("\" sid=\"");
 			Xml.Append(StreamId);
-			Xml.Append("'><streamhost host='");
+			Xml.Append("\"><streamhost host=\"");
 			Xml.Append(this.host);
-			Xml.Append("' jid='");
+			Xml.Append("\" jid=\"");
 			Xml.Append(this.jid);
-			Xml.Append("' port='");
+			Xml.Append("\" port=\"");
 			Xml.Append(this.port.ToString());
-			Xml.Append("'/></query>");
+			Xml.Append("\"/></query>");
 
 			InitiationRec Rec = new InitiationRec()
 			{
@@ -323,11 +323,11 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 					case Socks5State.Connected:
 						StringBuilder Xml = new StringBuilder();
 
-						Xml.Append("<query xmlns='");
+						Xml.Append("<query xmlns=\"");
 						Xml.Append(Namespace);
-						Xml.Append("' sid='");
+						Xml.Append("\" sid=\"");
 						Xml.Append(this.streamId);
-						Xml.Append("'><activate>");
+						Xml.Append("\"><activate>");
 						Xml.Append(this.destinationJid);
 						Xml.Append("</activate></query>");
 
@@ -527,13 +527,13 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 				case Socks5State.Connected:
 					StringBuilder Xml = new StringBuilder();
 
-					Xml.Append("<query xmlns='");
+					Xml.Append("<query xmlns=\"");
 					Xml.Append(Namespace);
-					Xml.Append("' sid='");
+					Xml.Append("\" sid=\"");
 					Xml.Append(State.streamId);
-					Xml.Append("'><streamhost-used jid='");
+					Xml.Append("\"><streamhost-used jid=\"");
 					Xml.Append(Host);
-					Xml.Append("'/></query>");
+					Xml.Append("\"/></query>");
 
 					State.eventargs.IqResult(Xml.ToString());
 					break;

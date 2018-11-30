@@ -229,6 +229,11 @@
             <param name="To">To attribute</param>
             <returns>AES Initiation vector.</returns>
         </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.E2eEndpoint.ToString">
+            <summary>
+            <see cref="M:System.Object.ToString"/>
+            </summary>
+        </member>
         <member name="T:Waher.Networking.XMPP.P2P.E2E.EcAes256">
             <summary>
             Abstract base class for Elliptic Curve / AES-256 hybrid ciphers.
@@ -375,6 +380,37 @@
             <param name="To">To attribute</param>
             <param name="AesElement">XML element with encrypted data.</param>
             <returns>Decrypted XMLs</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.EcAes256.Sign(System.Byte[],Waher.Security.HashFunction)">
+            <summary>
+            Signs binary data using the local private key.
+            </summary>
+            <param name="Data">Binary data</param>
+            <param name="HashFunction">Hash function to use.</param>
+            <returns>ECDSA Signature</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.EcAes256.Verify(System.Byte[],System.Byte[],System.Byte[],System.Byte[],System.Byte[],Waher.Security.HashFunction)">
+            <summary>
+            Verifies a signature.
+            </summary>
+            <param name="Data">Data that is signed.</param>
+            <param name="X">Public key (X-coordinate)</param>
+            <param name="Y">Public key (Y-coordinate)</param>
+            <param name="Signature1">First integer in ECDSA signature.</param>
+            <param name="Signature2">Second integer in ECDSA signature.</param>
+            <param name="HashFunction">Hash function used in signature calculation.</param>
+            <returns>If signature is valid.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.EcAes256.Verify(System.Byte[],Waher.Security.EllipticCurves.PointOnCurve,System.Byte[],System.Byte[],Waher.Security.HashFunction)">
+            <summary>
+            Verifies a signature.
+            </summary>
+            <param name="Data">Data that is signed.</param>
+            <param name="PublicKey">Public key</param>
+            <param name="Signature1">First integer in ECDSA signature.</param>
+            <param name="Signature2">Second integer in ECDSA signature.</param>
+            <param name="HashFunction">Hash function used in signature calculation.</param>
+            <returns>If signature is valid.</returns>
         </member>
         <member name="T:Waher.Networking.XMPP.P2P.E2E.IE2eEndpoint">
             <summary>
@@ -881,6 +917,17 @@
             <param name="Data">Binary data</param>
             <returns>Signature</returns>
         </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaAes.Verify(System.Byte[],System.Byte[],System.Int32,System.Byte[],System.Byte[])">
+            <summary>
+            Verifies a signature.
+            </summary>
+            <param name="Data">Data that is signed.</param>
+            <param name="Signature">Signature</param>
+            <param name="KeySize">RSA key size</param>
+            <param name="Modulus">Modulus</param>
+            <param name="Exponent">Exponent</param>
+            <returns></returns>
+        </member>
         <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaAes.Decrypt(System.Byte[])">
             <summary>
             Decrypts a key using the local private RSA key.
@@ -953,6 +1000,24 @@
             <param name="MaxSecurityStrength">Maximum security strength.</param>
             <param name="OnlyIfDerivedFrom">Only return endpoints derived from this type.</param>
             <returns>Array of local endpoint keys.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.TryGetEndpoint(System.String,System.String,Waher.Networking.XMPP.P2P.E2E.IE2eEndpoint@)">
+            <summary>
+            Tries to get an existing endpoint, given its qualified name.
+            </summary>
+            <param name="LocalName">Local name</param>
+            <param name="Namespace">Namespace</param>
+            <param name="Endpoint">Endpoint, or null if not found.</param>
+            <returns>If an endpoint was found with the given name.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.TryCreateEndpoint(System.String,System.String,Waher.Networking.XMPP.P2P.E2E.IE2eEndpoint@)">
+            <summary>
+            Tries to create a new endpoint, given its qualified name.
+            </summary>
+            <param name="LocalName">Local name</param>
+            <param name="Namespace">Namespace</param>
+            <param name="Endpoint">Created endpoint, or null if not found.</param>
+            <returns>If an endpoint was found with the given name, and a new instance was created.</returns>
         </member>
         <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.Dispose">
             <summary>

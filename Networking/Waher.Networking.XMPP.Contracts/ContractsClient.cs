@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Numerics;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using System.Text;
 using System.Xml;
@@ -9,6 +11,7 @@ using Waher.Events;
 using Waher.Networking.XMPP.P2P;
 using Waher.Networking.XMPP.P2P.E2E;
 using Waher.Runtime.Settings;
+using Waher.Security;
 using Waher.Security.EllipticCurves;
 
 namespace Waher.Networking.XMPP.Contracts
@@ -26,6 +29,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		public const string NamespaceLegalIdentities = "urn:ieee:iot:leg:id:1.0";
 
+		private readonly Dictionary<string, KeyEventArgs> publicKeys = new Dictionary<string, KeyEventArgs>();
 		private readonly Dictionary<string, KeyEventArgs> matchingKeys = new Dictionary<string, KeyEventArgs>();
 		private EndpointSecurity localEndpoint;
 		private readonly Task<EndpointSecurity> localEndpointTask;
@@ -79,7 +83,7 @@ namespace Waher.Networking.XMPP.Contracts
 			string s = Curve.Export();
 			XmlDocument Doc = new XmlDocument();
 			Doc.LoadXml(s);
-			s = Doc.DocumentElement["d"].ToString();
+			s = Doc.DocumentElement.GetAttribute("d");
 			return BigInteger.Parse(s);
 		}
 
@@ -128,30 +132,89 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
 		public void GetServerPublicKey(string Address, KeyEventHandler Callback, object State)
 		{
-			this.client.SendIqGet(Address, "<getPublicKey xmlns='" + NamespaceLegalIdentities + "'/>", (sender, e) =>
-			{
-				IE2eEndpoint ServerEndpoint = null;
-				XmlElement E;
+			KeyEventArgs e0;
 
-				if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "publicKey" && E.NamespaceURI == NamespaceLegalIdentities)
+			lock (this.publicKeys)
+			{
+				if (!this.publicKeys.TryGetValue(Address, out e0))
+					e0 = null;
+			}
+
+			if (e0 != null)
+			{
+				try
 				{
-					foreach (XmlNode N in E.ChildNodes)
+					Callback?.Invoke(this, e0);
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			}
+			else
+			{
+				this.client.SendIqGet(Address, "<getPublicKey xmlns=\"" + NamespaceLegalIdentities + "\"/>", (sender, e) =>
+				{
+					IE2eEndpoint ServerKey = null;
+					XmlElement E;
+
+					if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "publicKey" && E.NamespaceURI == NamespaceLegalIdentities)
 					{
-						if (N is XmlElement E2)
+						foreach (XmlNode N in E.ChildNodes)
 						{
-							ServerEndpoint = EndpointSecurity.ParseE2eKey(E2);
-							if (ServerEndpoint != null)
-								break;
+							if (N is XmlElement E2)
+							{
+								ServerKey = EndpointSecurity.ParseE2eKey(E2);
+								if (ServerKey != null)
+									break;
+							}
 						}
+
+						e.Ok = ServerKey != null;
+					}
+					else
+						e.Ok = false;
+
+					e0 = new KeyEventArgs(e, ServerKey);
+
+					lock (this.publicKeys)
+					{
+						this.publicKeys[Address] = e0;
 					}
 
-					e.Ok = ServerEndpoint != null;
-				}
-				else
-					e.Ok = false;
+					Callback?.Invoke(this, e0);
+				}, State);
+			}
+		}
 
-				Callback?.Invoke(this, new KeyEventArgs(e, ServerEndpoint));
-			}, State);
+		/// <summary>
+		/// Gets the server public key.
+		/// </summary>
+		public Task<IE2eEndpoint> GetServerPublicKeyAsync()
+		{
+			return this.GetServerPublicKeyAsync(this.componentAddress);
+		}
+
+		/// <summary>
+		/// Gets the server public key.
+		/// </summary>
+		/// <param name="Address">Address of entity whose public key is requested.</param>
+		public Task<IE2eEndpoint> GetServerPublicKeyAsync(string Address)
+		{
+			TaskCompletionSource<IE2eEndpoint> Result = new TaskCompletionSource<IE2eEndpoint>();
+
+			this.GetServerPublicKey(Address, (sender, e) =>
+			{
+				if (e.Ok)
+					Result.SetResult(e.Key);
+				else
+				{
+					Result.SetException(new IOException(string.IsNullOrEmpty(e.ErrorText) ?
+						"Unable to get public key." : e.ErrorText));
+				}
+			}, null);
+
+			return Result.Task;
 		}
 
 		/// <summary>
@@ -191,36 +254,84 @@ namespace Waher.Networking.XMPP.Contracts
 					Log.Critical(ex);
 				}
 			}
-
-			this.GetServerPublicKey(Address, (sender, e) =>
+			else
 			{
-				IE2eEndpoint LocalKey = null;
-
-				if (e.Ok)
+				this.GetServerPublicKey(Address, (sender, e) =>
 				{
-					LocalKey = this.localEndpoint.GetLocalKey(e.Key);
-					if (LocalKey == null)
-						e.Ok = false;
-				}
+					IE2eEndpoint LocalKey = null;
 
-				e0 = new KeyEventArgs(e, LocalKey);
+					if (e.Ok)
+					{
+						LocalKey = this.localEndpoint.GetLocalKey(e.Key);
+						if (LocalKey == null)
+							e.Ok = false;
+					}
 
-				lock (this.matchingKeys)
-				{
-					this.matchingKeys[Address] = e0;
-				}
+					e0 = new KeyEventArgs(e, LocalKey);
 
-				Callback?.Invoke(this, e0);
+					lock (this.matchingKeys)
+					{
+						this.matchingKeys[Address] = e0;
+					}
 
-			}, null);
+					Callback?.Invoke(this, e0);
+
+				}, State);
+			}
 		}
 
-		public void Apply(params Property[] Properties)
+
+		/// <summary>
+		/// Get the local key that matches the server key.
+		/// </summary>
+		public Task<IE2eEndpoint> GetMatchingLocalKeyAsync()
 		{
-			this.Apply(this.componentAddress, Properties);
+			return this.GetMatchingLocalKeyAsync(this.componentAddress);
 		}
 
-		public void Apply(string Address, params Property[] Properties)
+		/// <summary>
+		/// Get the local key that matches a given server key.
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		public Task<IE2eEndpoint> GetMatchingLocalKeyAsync(string Address)
+		{
+			TaskCompletionSource<IE2eEndpoint> Result = new TaskCompletionSource<IE2eEndpoint>();
+
+			this.GetMatchingLocalKey(Address, (sender, e) =>
+			{
+				if (e.Ok)
+					Result.SetResult(e.Key);
+				else
+				{
+					Result.SetException(new IOException(string.IsNullOrEmpty(e.ErrorText) ?
+						"Unable to get matching local key." : e.ErrorText));
+				}
+			}, null);
+
+			return Result.Task;
+		}
+
+		/// <summary>
+		/// Applies for a legal identity to be registered.
+		/// </summary>
+		/// <param name="Properties">Properties of the legal identity.</param>
+		/// <param name="Callback">Method to call when registration response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public void Apply(Property[] Properties, LegalIdentityEventHandler Callback,
+			object State)
+		{
+			this.Apply(this.componentAddress, Properties, Callback, State);
+		}
+
+		/// <summary>
+		/// Applies for a legal identity to be registered.
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="Properties">Properties of the legal identity.</param>
+		/// <param name="Callback">Method to call when registration response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public void Apply(string Address, Property[] Properties,
+			LegalIdentityEventHandler Callback, object State)
 		{
 			this.GetMatchingLocalKey(Address, (sender, e) =>
 			{
@@ -228,33 +339,268 @@ namespace Waher.Networking.XMPP.Contracts
 				{
 					StringBuilder Xml = new StringBuilder();
 
-					Xml.Append("<apply xmlns='");
+					Xml.Append("<apply xmlns=\"");
 					Xml.Append(NamespaceLegalIdentities);
-					Xml.Append("'><identity><clientPublicKey>");
-					e.Key.ToXml(Xml);
-					Xml.Append("</clientPublicKey>");
+					Xml.Append("\">");
+
+					StringBuilder Identity = new StringBuilder();
+
+					Identity.Append("<identity><clientPublicKey>");
+					e.Key.ToXml(Identity);
+					Identity.Append("</clientPublicKey>");
 
 					foreach (Property Property in Properties)
 					{
-						Xml.Append("<property name='");
-						Xml.Append(XML.Encode(Property.Name));
-						Xml.Append("' value='");
-						Xml.Append(XML.Encode(Property.Value));
-						Xml.Append("'/>");
+						Identity.Append("<property name=\"");
+						Identity.Append(XML.Encode(Property.Name));
+						Identity.Append("\" value=\"");
+						Identity.Append(XML.Encode(Property.Value));
+						Identity.Append("\"/>");
 					}
 
-					// TODO: clientSignature
+					string s = Identity.ToString();
+					Xml.Append(s);
 
-					Xml.Append("</apply");
+					s += "</identity>";
 
-					// TODO: IQ
+					byte[] Bin = Encoding.UTF8.GetBytes(s);
+
+					if (e.Key is EcAes256 EcAes256)
+					{
+						KeyValuePair<byte[], byte[]> Signature = EcAes256.Sign(Bin, Security.HashFunction.SHA256);
+
+						Xml.Append("<clientSignature s1=\"");
+						Xml.Append(Convert.ToBase64String(Signature.Key));
+						Xml.Append("\" s2=\"");
+						Xml.Append(Convert.ToBase64String(Signature.Value));
+						Xml.Append("\"/>");
+					}
+					else if (e.Key is RsaAes RsaAes)
+					{
+						byte[] Signature = RsaAes.Sign(Bin);
+
+						Xml.Append("<clientSignature s1=\"");
+						Xml.Append(Convert.ToBase64String(Signature));
+						Xml.Append("\"/>");
+					}
+
+					Xml.Append("</identity></apply>");
+
+					this.client.SendIqSet(Address, Xml.ToString(), (sender2, e2) =>
+					{
+						LegalIdentity Identity2 = null;
+						XmlElement E;
+
+						if (e2.Ok && (E = e2.FirstElement) != null &&
+							E.LocalName == "identity" &&
+							E.NamespaceURI == NamespaceLegalIdentities)
+						{
+							Identity2 = LegalIdentity.Parse(E);
+						}
+						else
+							e2.Ok = false;
+
+						Callback?.Invoke(this, new LegalIdentityEventArgs(e2, Identity2));
+					}, e.State);
 				}
 				else
+					Callback?.Invoke(this, new LegalIdentityEventArgs(e, null));
+			}, State);
+		}
+
+
+		/// <summary>
+		/// Applies for a legal identity to be registered.
+		/// </summary>
+		/// <param name="Properties">Properties of the legal identity.</param>
+		public Task<LegalIdentity> ApplyAsync(Property[] Properties)
+		{
+			return this.ApplyAsync(this.componentAddress, Properties);
+		}
+
+		/// <summary>
+		/// Applies for a legal identity to be registered.
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="Properties">Properties of the legal identity.</param>
+		public Task<LegalIdentity> ApplyAsync(string Address, Property[] Properties)
+		{
+			TaskCompletionSource<LegalIdentity> Result = new TaskCompletionSource<LegalIdentity>();
+
+			this.Apply(Address, Properties, (sender, e) =>
+			{
+				if (e.Ok)
+					Result.SetResult(e.Identity);
+				else
 				{
-					// TODO
+					Result.SetException(new IOException(string.IsNullOrEmpty(e.ErrorText) ?
+						"Unable to apply for a legal identity to be registered." : e.ErrorText));
 				}
 			}, null);
+
+			return Result.Task;
 		}
+
+		/// <summary>
+		/// Validates a legal identity.
+		/// </summary>
+		/// <param name="Identity">Legal identity to validate</param>
+		/// <param name="Callback">Method to call when validation is completed</param>
+		/// <param name="State">State object to pass to callback method.</param>
+		public void Validate(LegalIdentity Identity, IdentityValidationEventHandler Callback, object State)
+		{
+			if (Identity == null)
+			{
+				this.ReturnStatus(IdentityStatus.IdentityUndefined, Callback, State);
+				return;
+			}
+
+			if (Identity.State != IdentityState.Approved)
+			{
+				this.ReturnStatus(IdentityStatus.NotApproved, Callback, State);
+				return;
+			}
+
+			DateTime Now = DateTime.Now;
+
+			if (Now < Identity.From)
+			{
+				this.ReturnStatus(IdentityStatus.NotValidYet, Callback, State);
+				return;
+			}
+
+			if (Now > Identity.To)
+			{
+				this.ReturnStatus(IdentityStatus.NotValidAnymore, Callback, State);
+				return;
+			}
+
+			if (string.IsNullOrEmpty(Identity.Provider))
+			{
+				this.ReturnStatus(IdentityStatus.NoTrustProvider, Callback, State);
+				return;
+			}
+
+			if (string.IsNullOrEmpty(Identity.ClientKeyName) ||
+				Identity.ClientPubKey1 == null ||
+				Identity.ClientPubKey1.Length == 0 ||
+				Identity.ClientPubKey2 == null ||
+				Identity.ClientPubKey2.Length == 0)
+			{
+				this.ReturnStatus(IdentityStatus.NoClientPublicKey, Callback, State);
+				return;
+			}
+
+			StringBuilder Xml = new StringBuilder();
+			Identity.Serialize(Xml, false, false, false, false, false);
+			byte[] Data = Encoding.UTF8.GetBytes(Xml.ToString());
+
+			if (Identity.ClientKeyName.StartsWith("RSA") &&
+				int.TryParse(Identity.ClientKeyName.Substring(3), out int KeySize))
+			{
+				if (Identity.ClientSignature1 == null ||
+					Identity.ClientSignature1.Length == 0)
+				{
+					this.ReturnStatus(IdentityStatus.NoClientSignature, Callback, State);
+					return;
+				}
+
+				if (!RsaAes.Verify(Data, Identity.ClientSignature1, KeySize,
+					Identity.ClientPubKey1, Identity.ClientPubKey2))
+				{
+					this.ReturnStatus(IdentityStatus.ClientSignatureInvalid, Callback, State);
+					return;
+				}
+			}
+			else if (EndpointSecurity.TryGetEndpoint(Identity.ClientKeyName,
+				EndpointSecurity.IoTHarmonizationE2E, out IE2eEndpoint LocalKey) &&
+				LocalKey is EcAes256 LocalEc)
+			{
+				if (Identity.ClientSignature1 == null ||
+					Identity.ClientSignature1.Length == 0 ||
+					Identity.ClientSignature2 == null ||
+					Identity.ClientSignature2.Length == 0)
+				{
+					this.ReturnStatus(IdentityStatus.NoClientSignature, Callback, State);
+					return;
+				}
+
+				if (!LocalEc.Verify(Data, Identity.ClientPubKey1, Identity.ClientPubKey2,
+					Identity.ClientSignature1, Identity.ClientSignature2, HashFunction.SHA256))
+				{
+					this.ReturnStatus(IdentityStatus.ClientSignatureInvalid, Callback, State);
+					return;
+				}
+			}
+			else
+			{
+				this.ReturnStatus(IdentityStatus.ClientKeyNotRecognized, Callback, State);
+				return;
+			}
+
+			if (Identity.ServerSignature1 == null ||
+				Identity.ServerSignature1.Length == 0)
+			{
+				this.ReturnStatus(IdentityStatus.NoProviderSignature, Callback, State);
+				return;
+			}
+
+			this.GetServerPublicKey(Identity.Provider, (sender, e) =>
+			{
+				if (e.Ok && e.Key != null)
+				{
+					if (e.Key is RsaAes RsaAes)
+					{
+						if (!RsaAes.Verify(Data, Identity.ServerSignature1, RsaAes.KeySize,
+							RsaAes.Modulus, RsaAes.Exponent))
+						{
+							this.ReturnStatus(IdentityStatus.ProviderSignatureInvalid, Callback, State);
+							return;
+						}
+					}
+					else if (e.Key is EcAes256 LocalEc)
+					{
+						if (Identity.ServerSignature2 == null ||
+							Identity.ServerSignature2.Length == 0)
+						{
+							this.ReturnStatus(IdentityStatus.NoProviderSignature, Callback, State);
+							return;
+						}
+
+						if (!LocalEc.Verify(Data, LocalEc.PublicKey,
+							Identity.ServerSignature1, Identity.ServerSignature2, HashFunction.SHA256))
+						{
+							this.ReturnStatus(IdentityStatus.ProviderSignatureInvalid, Callback, State);
+							return;
+						}
+					}
+					else
+					{
+						this.ReturnStatus(IdentityStatus.ProviderKeyNotRecognized, Callback, State);
+						return;
+					}
+
+					this.ReturnStatus(IdentityStatus.Valid, Callback, State);
+				}
+				else
+					this.ReturnStatus(IdentityStatus.NoProviderPublicKey, Callback, State);
+
+			}, State);
+		}
+
+		private void ReturnStatus(IdentityStatus Status,
+			IdentityValidationEventHandler Callback, object State)
+		{
+			try
+			{
+				Callback?.Invoke(this, new IdentityValidationEventArgs(Status, State));
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+			}
+		}
+
 
 	}
 }

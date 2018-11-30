@@ -24,6 +24,10 @@
     <DocumentationFile>C:\My Projects\IoTGateway\Networking\Waher.Networking.XMPP.Contracts\Waher.Networking.XMPP.Contracts.xml</DocumentationFile>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>C:\My Projects\IoTGateway\Networking\Waher.Networking.XMPP.Contracts\Waher.Networking.XMPP.Contracts.xml</DocumentationFile>
+  </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Settings\Waher.Runtime.Settings.csproj" />
     <ProjectReference Include="..\..\Security\Waher.Security.EllipticCurves\Waher.Security.EllipticCurves.csproj" />

@@ -40,5 +40,13 @@ namespace Waher.Networking.XMPP.Contracts
 			get => this.value;
 			set => this.value = value;
 		}
+
+		/// <summary>
+		/// <see cref="object.ToString()"/>
+		/// </summary>
+		public override string ToString()
+		{
+			return this.name + "=" + this.value;
+		}
 	}
 }

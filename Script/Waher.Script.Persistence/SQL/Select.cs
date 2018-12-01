@@ -10,6 +10,7 @@ using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Objects;
+using Waher.Script.Objects.VectorSpaces;
 using Waher.Script.Objects.Matrices;
 
 namespace Waher.Script.Persistence.SQL
@@ -206,8 +207,6 @@ namespace Waher.Script.Persistence.SQL
 				e = new CustomOrderEnumerator(e, Variables, Order.ToArray());
 			}
 
-			Type LastItemType = null;
-
 			while (e.MoveNext())
 			{
 				if (ManualOffset && Offset > 0)
@@ -220,42 +219,7 @@ namespace Waher.Script.Persistence.SQL
 				ObjectProperties Properties = new ObjectProperties(Item, Variables);
 
 				if (this.columns == null)
-				{
-					Type ItemType = Item.GetType();
-					IEnumerable<PropertyInfo> ItemProperties = ItemType.GetRuntimeProperties();
-					IEnumerable<FieldInfo> ItemFields = ItemType.GetRuntimeFields();
-
-					if (ItemType != LastItemType)
-					{
-						foreach (PropertyInfo Property in ItemProperties)
-						{
-							if (!Columns.ContainsKey(Property.Name))
-								Columns[Property.Name] = c++;
-						}
-
-						foreach (FieldInfo Field in ItemFields)
-						{
-							if (!Columns.ContainsKey(Field.Name))
-								Columns[Field.Name] = c++;
-						}
-
-						LastItemType = ItemType;
-					}
-
-					Rec = new IElement[c];
-
-					foreach (PropertyInfo Property in ItemProperties)
-					{
-						i = Columns[Property.Name];
-						Rec[i] = Expression.Encapsulate(Property.GetValue(Item));
-					}
-
-					foreach (FieldInfo Field in ItemFields)
-					{
-						i = Columns[Field.Name];
-						Rec[i] = Expression.Encapsulate(Field.GetValue(Item));
-					}
-				}
+					Rec = new IElement[1] { Expression.Encapsulate(Item) };
 				else
 				{
 					Rec = new IElement[c];
@@ -280,17 +244,25 @@ namespace Waher.Script.Persistence.SQL
 					break;
 			}
 
-			IElement[] Elements = new IElement[NrRecords * c];
+			IElement[] Elements = new IElement[this.columns == null ? NrRecords : NrRecords * c];
 
 			i = 0;
-			foreach (object[] Record in Items)
+			foreach (IElement[] Record in Items)
 			{
 				foreach (IElement Item in Record)
 					Elements[i++] = Item;
 
-				while (i % c != 0)
-					Elements[i++] = new ObjectValue(null);
+				if (c > 0)
+				{
+					while (i % c != 0)
+						Elements[i++] = new ObjectValue(null);
+				}
 			}
+
+			if (Elements.Length == 1)
+				return Elements[0];
+			else if (this.columns == null)
+				return Operators.Vectors.VectorDefinition.Encapsulate(Elements, false, this);
 
 			ObjectMatrix Result = new ObjectMatrix(NrRecords, c, Elements);
 			string[] Names = new string[c];

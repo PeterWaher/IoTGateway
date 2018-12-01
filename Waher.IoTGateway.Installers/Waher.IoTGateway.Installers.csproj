@@ -51,8 +51,13 @@
     <Compile Include=".bak\Waher.Runtime.Inventory\Grade.cs" />
     <Compile Include=".bak\Waher.Runtime.Inventory\IModule.cs" />
     <Compile Include=".bak\Waher.Runtime.Inventory\Types.cs" />
+    <Compile Include=".bak\Waher.Script\Functions\Runtime\Fields.cs" />
+    <Compile Include=".bak\Waher.Script\Functions\Runtime\MethodLambda.cs" />
+    <Compile Include=".bak\Waher.Script\Functions\Runtime\Methods.cs" />
+    <Compile Include=".bak\Waher.Script\Functions\Runtime\Properties.cs" />
     <Compile Include=".bak\Waher.Script\Model\IDifferentiable.cs" />
     <Compile Include=".bak\Waher.Script\Model\IKeyWord.cs" />
+    <Compile Include=".bak\Waher.Script\Model\ScriptLeafNode.cs" />
     <Compile Include=".bak\Waher.Script\Model\ScriptParser.cs" />
     <Compile Include="CustomAction.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

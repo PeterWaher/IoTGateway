@@ -160,6 +160,9 @@
     <Compile Include="Dialogs\ChangePasswordForm.xaml.cs">
       <DependentUpon>ChangePasswordForm.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\LegalIdentityForm.xaml.cs">
+      <DependentUpon>LegalIdentityForm.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\SelectItemDialog.xaml.cs">
       <DependentUpon>SelectItemDialog.xaml</DependentUpon>
     </Compile>
@@ -205,6 +208,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialogs\ChangePasswordForm.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Dialogs\LegalIdentityForm.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -257,6 +264,7 @@
     <Compile Include="Model\DisplayableParameters.cs" />
     <Compile Include="Model\EventLog.cs" />
     <Compile Include="Model\IMenuAggregator.cs" />
+    <Compile Include="Model\Legal\LegalService.cs" />
     <Compile Include="Model\PubSub\PubSubItem.cs" />
     <Compile Include="Model\PubSub\PubSubNode.cs" />
     <Compile Include="Model\PubSub\PubSubService.cs" />
@@ -375,6 +383,10 @@
     <ProjectReference Include="..\..\Networking\Waher.Networking.XMPP.Concentrator\Waher.Networking.XMPP.Concentrator.csproj">
       <Project>{adf456c6-dc01-460f-9270-dfa4385b92e0}</Project>
       <Name>Waher.Networking.XMPP.Concentrator</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Networking\Waher.Networking.XMPP.Contracts\Waher.Networking.XMPP.Contracts.csproj">
+      <Project>{20cc1df7-d057-4dbe-814c-2ebddd40d82d}</Project>
+      <Name>Waher.Networking.XMPP.Contracts</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Networking\Waher.Networking.XMPP.Control\Waher.Networking.XMPP.Control.csproj">
       <Project>{c5151b99-69e3-4ba1-9328-fba82facf159}</Project>
@@ -602,6 +614,10 @@
   <ItemGroup>
     <Resource Include="Graphics\Properties-icon_16.png" />
     <Resource Include="Graphics\Properties-icon_32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Graphics\Places-user-identity-icon_16.png" />
+    <Resource Include="Graphics\Places-user-identity-icon_32.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\..\packages\SkiaSharp.1.60.1\build\net45\SkiaSharp.targets" Condition="Exists('..\..\packages\SkiaSharp.1.60.1\build\net45\SkiaSharp.targets')" />

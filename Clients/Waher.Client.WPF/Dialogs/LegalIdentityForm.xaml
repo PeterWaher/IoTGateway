@@ -1,0 +1,47 @@
+﻿<Window x:Class="Waher.Client.WPF.Dialogs.LegalIdentityForm"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+        FocusManager.FocusedElement="{Binding ElementName=FirstName}"
+        Title="Register Legal Identity" Height="641" Width="300" WindowStartupLocation="CenterOwner">
+    <Grid Name="FormGrid" FocusManager.FocusedElement="{Binding ElementName=XmppServer}">
+        <Label Content="First Name:" Height="28" HorizontalAlignment="Left" Margin="12,12,0,0" Name="label1" VerticalAlignment="Top" />
+        <TextBox Height="23" HorizontalAlignment="Stretch" Margin="12,33,12,0" Name="FirstName" VerticalAlignment="Top" 
+                 ToolTip="Enter the first name of the legal identity here."/>
+        <Label Content="Middle Name(s):" Height="28" HorizontalAlignment="Left" Margin="12,62,0,0" Name="label2" VerticalAlignment="Top" />
+        <TextBox Height="23" HorizontalAlignment="Stretch" Margin="12,83,12,0" Name="MiddleNames" VerticalAlignment="Top" 
+                 ToolTip="Enter the middle name(s) of the legal identity here."/>
+        <Label Content="Last Name:" Height="28" HorizontalAlignment="Left" Margin="12,112,0,0" Name="label3" VerticalAlignment="Top" />
+        <TextBox Height="23" HorizontalAlignment="Stretch" Margin="12,133,12,0" Name="LastName" VerticalAlignment="Top" 
+                 ToolTip="Enter the last name of the legal identity here."/>
+        <Label Content="Personal Number:" Height="28" HorizontalAlignment="Left" Margin="12,162,0,0" Name="label4" VerticalAlignment="Top" />
+        <TextBox Height="23" HorizontalAlignment="Stretch" Margin="12,183,12,0" Name="PersonalNumber" VerticalAlignment="Top" 
+                 ToolTip="Enter the personal number of the person here, according to the number system used in the corresponding country."/>
+        <Label Content="Address:" Height="28" HorizontalAlignment="Left" Margin="12,212,0,0" Name="label5" VerticalAlignment="Top" />
+        <TextBox Height="23" HorizontalAlignment="Stretch" Margin="12,233,12,0" Name="Address" VerticalAlignment="Top" 
+                 ToolTip="Enter the current address of residence."/>
+        <Label Content="Address, row 2:" Height="28" HorizontalAlignment="Left" Margin="12,262,0,0" Name="label5_1" VerticalAlignment="Top" />
+        <TextBox Height="23" HorizontalAlignment="Stretch" Margin="12,283,12,0" Name="Address2" VerticalAlignment="Top" 
+                 ToolTip="Enter the current address of residence."/>
+        <Label Content="Postal Code (ZIP):" Height="28" HorizontalAlignment="Left" Margin="12,312,0,0" Name="label6" VerticalAlignment="Top" />
+        <TextBox Height="23" HorizontalAlignment="Stretch" Margin="12,333,12,0" Name="PostalCode" VerticalAlignment="Top" 
+                 ToolTip="Enter the current postal code (or ZIP code) of residence."/>
+        <Label Content="Area:" Height="28" HorizontalAlignment="Left" Margin="12,362,0,0" Name="label7" VerticalAlignment="Top" />
+        <TextBox Height="23" HorizontalAlignment="Stretch" Margin="12,383,12,0" Name="Area" VerticalAlignment="Top" 
+                 ToolTip="Enter the current area of residence."/>
+        <Label Content="City:" Height="28" HorizontalAlignment="Left" Margin="12,412,0,0" Name="label8" VerticalAlignment="Top" />
+        <TextBox Height="23" HorizontalAlignment="Stretch" Margin="12,433,12,0" Name="City" VerticalAlignment="Top" 
+                 ToolTip="Enter the current city of residence."/>
+        <Label Content="Region (State):" Height="28" HorizontalAlignment="Left" Margin="12,462,0,0" Name="label9" VerticalAlignment="Top" />
+        <TextBox Height="23" HorizontalAlignment="Stretch" Margin="12,483,12,0" Name="Region" VerticalAlignment="Top" 
+                 ToolTip="Enter the current region (or state) of residence."/>
+        <Label Content="Country:" Height="28" HorizontalAlignment="Left" Margin="12,512,0,0" Name="label10" VerticalAlignment="Top" />
+        <TextBox Height="23" HorizontalAlignment="Stretch" Margin="12,533,12,0" Name="Country" VerticalAlignment="Top" 
+                 ToolTip="Enter the current country of residence."/>
+        <DockPanel Margin="0,573,0,0" Width="160">
+            <Button Content="Register" Height="23" HorizontalAlignment="Left" Name="RegisterButton" VerticalAlignment="Top" Width="75" Click="RegisterButton_Click" 
+                    ToolTip="Closes the window and registers the identity." IsDefault="True" />
+            <Button Content="Cancel" Height="23" HorizontalAlignment="Left" Name="CancelButton" Margin="10,0,0,0" VerticalAlignment="Top" Width="75" Click="CancelButton_Click"
+                    ToolTip="Closes the dialog without registering the identity." IsCancel="True"/>
+        </DockPanel>
+    </Grid>
+</Window>

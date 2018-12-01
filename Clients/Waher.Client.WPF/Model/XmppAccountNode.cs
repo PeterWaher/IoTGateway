@@ -13,6 +13,7 @@ using Waher.Content.Xml;
 using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Concentrator;
+using Waher.Networking.XMPP.Contracts;
 using Waher.Networking.XMPP.Control;
 using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.DataForms.DataTypes;
@@ -28,6 +29,7 @@ using Waher.Things.DisplayableParameters;
 using Waher.Things.SensorData;
 using Waher.Client.WPF.Dialogs;
 using Waher.Client.WPF.Model.Concentrator;
+using Waher.Client.WPF.Model.Legal;
 using Waher.Client.WPF.Model.Provisioning;
 using Waher.Client.WPF.Model.PubSub;
 using Waher.Client.WPF.Model.Things;
@@ -1094,6 +1096,8 @@ namespace Waher.Client.WPF.Model
 										this.AddPepClient(Item.JID);
 										Component = new PubSubService(this, Item.JID, Item.Name, Item.Node, e2.Features, this.pepClient.PubSubClient);
 									}
+									else if (e2.HasFeature(ContractsClient.NamespaceLegalIdentities))
+										Component = new LegalService(this, Item.JID, Item.Name, Item.Node, e2.Features);
 									else if (e2.HasFeature(EventLog.NamespaceEventLogging))
 										Component = new EventLog(this, Item.JID, Item.Name, Item.Node, e2.Features);
 									else

@@ -13,7 +13,7 @@ namespace Waher.Script.Operators
 	/// </summary>
 	public class DynamicFunctionCall : UnaryScalarOperator 
 	{
-		private ScriptNode[] arguments;
+		private readonly ScriptNode[] arguments;
 
 		/// <summary>
 		/// Dynamic function call operator
@@ -45,11 +45,10 @@ namespace Waher.Script.Operators
         /// <returns>Result</returns>
         public override IElement EvaluateScalar(IElement Operand, Variables Variables)
         {
-            LambdaDefinition Lambda = Operand as LambdaDefinition;
-            if (Lambda == null)
-                throw new ScriptRuntimeException("Expected a lambda expression.", this);
+			if (!(Operand.AssociatedObjectValue is ILambdaExpression Lambda))
+				throw new ScriptRuntimeException("Expected a lambda expression.", this);
 
-            int c = this.arguments.Length;
+			int c = this.arguments.Length;
             if (c != Lambda.NrArguments)
                 throw new ScriptRuntimeException("Expected " + Lambda.NrArguments.ToString() + " arguments.", this);
 

@@ -829,9 +829,12 @@ The following functions are useful to control the runtime execution of the scrip
 | `Error(Msg)` | Throws an error/exception. | `Error('Something went wrong.')` |
 | `Exception(Msg)` | Alias for `Error(Msg)`. | `Exception('Something went wrong.')` |
 | `Exists(f)` | Checks if the expression defined by `f` is valid or not. | `Exists(x)` |
+| `Fields(x)` | If `x` is a type, `Fields(x)` returns a vector of field names. If `x` is not a type, `Fields(x)` returns a matrix containing field names and values. | `Properties(Ans)` |
+| `Methods(x)` | If `x` is a type, `Methods(x)` returns a vector of methods represented as strings. If `x` is not a type, `Methods(x)` returns a matrix containing method names and lambda functions that can be used to execute the corresponding methods. | `Methods(Ans)` |
 | `Print(Msg)` | Prints a message to the current console output (which is defined in the variables collection). | `Print(x)` |
 | `PrintLine(Msg)` | Prints a message followed by a newline to the current console output. | `PrintLine(x)` |
 | `PrintLn(Msg)` | Alias for `PrintLine(Msg)`. | `PrintLine(x)` |
+| `Properties(x)` | If `x` is a type, `Properties(x)` returns a vector of property names. If `x` is not a type, `Properties(x)` returns a matrix containing property names and values. | `Properties(Ans)` |
 | `Remove(Var)` | Removes the varable `Var` without destroying its contents. | `Remove(x)` |
 | `Return(x)` | Returns from the current function scope with the value `x`. | `return(Result)` |
 

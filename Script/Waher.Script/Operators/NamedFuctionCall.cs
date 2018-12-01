@@ -55,11 +55,11 @@ namespace Waher.Script.Operators
 		public override IElement Evaluate(Variables Variables)
 		{
 			string s = this.arguments.Length.ToString();
-			LambdaDefinition f;
+			ILambdaExpression f;
 
 			if ((!Variables.TryGetVariable(this.functionName + " " + s, out Variable v) &&
 			   !Variables.TryGetVariable(this.functionName, out v)) ||
-			   ((f = v.ValueElement as LambdaDefinition) == null))
+			   ((f = v.ValueElement as ILambdaExpression) == null))
 			{
 				if (this.arguments.Length == 1)
 					throw new ScriptRuntimeException("No function defined having 1 argument named '" + this.functionName + "' found.", this);

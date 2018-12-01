@@ -34,7 +34,6 @@ namespace Waher.Script.Model
 			get;
 		}
 
-
 		/// <summary>
 		/// Evaluates the lambda expression.
 		/// </summary>

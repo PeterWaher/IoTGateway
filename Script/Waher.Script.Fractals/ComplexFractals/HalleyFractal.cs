@@ -158,7 +158,7 @@ namespace Waher.Script.Fractals.ComplexFractals
 					for (j = 0; j < d; j++)
 						CoefficientsZ[j] = Expression.ToComplex(Vector.GetElement(j).AssociatedObjectValue);
 				}
-				else if (Arguments[i] is ILambdaExpression)
+				else if (Arguments[i].AssociatedObjectValue is ILambdaExpression)
 				{
 					f = (ILambdaExpression)Arguments[i];
 					if (f.NrArguments != 1)

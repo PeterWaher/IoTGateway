@@ -23,19 +23,9 @@ namespace Waher.Networking.XMPP.Contracts
 		Created,
 
 		/// <summary>
-		/// Submitted keys are being challenged.
-		/// </summary>
-		ChallengingKeys,
-
-		/// <summary>
 		/// The legal identity has been rejected.
 		/// </summary>
 		Rejected,
-
-		/// <summary>
-		/// The legal identity is pending confirmation out-of-band.
-		/// </summary>
-		PendingIdentification,
 
 		/// <summary>
 		/// The legal identity is authenticated and approved by the Trust Anchor.

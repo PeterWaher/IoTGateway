@@ -299,19 +299,9 @@
             An application has been received.
             </summary>
         </member>
-        <member name="F:Waher.Networking.XMPP.Contracts.IdentityState.ChallengingKeys">
-            <summary>
-            Submitted keys are being challenged.
-            </summary>
-        </member>
         <member name="F:Waher.Networking.XMPP.Contracts.IdentityState.Rejected">
             <summary>
             The legal identity has been rejected.
-            </summary>
-        </member>
-        <member name="F:Waher.Networking.XMPP.Contracts.IdentityState.PendingIdentification">
-            <summary>
-            The legal identity is pending confirmation out-of-band.
             </summary>
         </member>
         <member name="F:Waher.Networking.XMPP.Contracts.IdentityState.Approved">

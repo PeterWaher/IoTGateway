@@ -704,7 +704,7 @@ namespace Waher.Networking.HTTP
 			}
 			else
 			{
-				this.statusCode = 404;  // Not acceptable
+				this.statusCode = 406;  // Not acceptable
 				this.statusMessage = "Not Acceptable";
 
 				this.SendResponse();

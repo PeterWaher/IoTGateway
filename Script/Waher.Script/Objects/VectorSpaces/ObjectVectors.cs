@@ -60,7 +60,7 @@ namespace Waher.Script.Objects.VectorSpaces
 						Set2 = Element.AssociatedSet;
 						if (!Set.Equals(Set2))
 						{
-							if (!Expression.Upgrade(ref Ref, ref Set, ref Ref2, ref Set2, null))
+							if (!Expression.UpgradeField(ref Ref, ref Set, ref Ref2, ref Set2, null))
 								throw new ScriptException("No common scalar ring found.");
 						}
 					}

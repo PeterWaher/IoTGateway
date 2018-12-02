@@ -72,7 +72,7 @@ namespace Waher.Script.Operators.Arithmetics
 
 					if (!LeftSet.Equals(RightSet))
 					{
-						if (!Expression.Upgrade(ref Left, ref LeftSet, ref Right, ref RightSet, Node))
+						if (!Expression.UpgradeSemiGroup(ref Left, ref LeftSet, ref Right, ref RightSet, Node))
 							throw new ScriptRuntimeException("Incompatible operands.", Node);
 
 						LE = Left as ISemiGroupElement;

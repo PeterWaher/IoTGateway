@@ -44,7 +44,7 @@ namespace Waher.Script.Model
 
                     if (Set1 != Set2)
                     {
-                        if (!Expression.Upgrade(ref Argument1, ref Set1, ref Argument2, ref Set2, this))
+                        if (!Expression.UpgradeField(ref Argument1, ref Set1, ref Argument2, ref Set2, this))
                             return this.EvaluateScalar(Argument1, Argument2, Variables);
                     }
 

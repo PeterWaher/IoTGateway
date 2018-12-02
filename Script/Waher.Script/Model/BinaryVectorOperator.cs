@@ -60,7 +60,7 @@ namespace Waher.Script.Model
 
 					if (!LeftSet.Equals(RightSet) && (UpgradeBehaviour = this.ScalarUpgradeBehaviour) != UpgradeBehaviour.DifferentTypesOk)
 					{
-						if (!Expression.Upgrade(ref Left, ref LeftSet, ref Right, ref RightSet, this))
+						if (!Expression.UpgradeField(ref Left, ref LeftSet, ref Right, ref RightSet, this))
 						{
 							if (UpgradeBehaviour == UpgradeBehaviour.SameTypeRequired)
 								throw new ScriptRuntimeException("Incompatible operands.", this);

@@ -125,7 +125,7 @@ namespace Waher.Script.Operators.Matrices
                     if (!Set.Equals(CommonSuperSet))
                     {
                         Element2 = Element;
-                        if (!Expression.Upgrade(ref Element2, ref Set, ref SuperSetExample, ref CommonSuperSet, Node))
+                        if (!Expression.UpgradeField(ref Element2, ref Set, ref SuperSetExample, ref CommonSuperSet, Node))
                         {
                             CommonSuperSet = null;
                             break;
@@ -154,7 +154,7 @@ namespace Waher.Script.Operators.Matrices
                         else
                         {
                             Element2 = Element;
-                            if (Expression.Upgrade(ref Element2, ref Set, ref SuperSetExample, ref CommonSuperSet, Node) && Element2 is IVectorSpaceElement)
+                            if (Expression.UpgradeField(ref Element2, ref Set, ref SuperSetExample, ref CommonSuperSet, Node) && Element2 is IVectorSpaceElement)
                                 SuperElements.AddLast(Element2);
                             else
                             {

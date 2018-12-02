@@ -217,7 +217,7 @@ namespace Waher.Script.Functions.Vectors
 
 				if (!ResultSet.Equals(Set))
 				{
-					if (Expression.Upgrade(ref ResultRef, ref ResultSet, ref Ref, ref Set, this))
+					if (Expression.UpgradeField(ref ResultRef, ref ResultSet, ref Ref, ref Set, this))
 					{
 						Arguments[0] = ResultRef;
 						Arguments[i] = Ref;
@@ -244,7 +244,7 @@ namespace Waher.Script.Functions.Vectors
 
 				if (!ResultSet.Equals(Set))
 				{
-					if (!Expression.Upgrade(ref ResultRef, ref ResultSet, ref Ref, ref Set, this))
+					if (!Expression.UpgradeField(ref ResultRef, ref ResultSet, ref Ref, ref Set, this))
 						Ref = new ObjectVector(Ref.ChildElements);
 				}
 

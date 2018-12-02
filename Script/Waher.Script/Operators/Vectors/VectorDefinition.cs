@@ -100,7 +100,7 @@ namespace Waher.Script.Operators.Vectors
                     if (!Set.Equals(CommonSuperSet))
                     {
                         Element2 = Element;
-                        if (!Expression.Upgrade(ref Element2, ref Set, ref SuperSetExample, ref CommonSuperSet, Node))
+                        if (!Expression.UpgradeField(ref Element2, ref Set, ref SuperSetExample, ref CommonSuperSet, Node))
                         {
                             CommonSuperSet = null;
                             break;
@@ -132,7 +132,7 @@ namespace Waher.Script.Operators.Vectors
                         else
                         {
                             Element2 = Element;
-                            if (Expression.Upgrade(ref Element2, ref Set, ref SuperSetExample, ref CommonSuperSet, Node))
+                            if (Expression.UpgradeField(ref Element2, ref Set, ref SuperSetExample, ref CommonSuperSet, Node))
                                 SuperElements.AddLast(Element2);
                             else
                             {

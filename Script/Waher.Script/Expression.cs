@@ -3721,14 +3721,23 @@ namespace Waher.Script
 			Output.Append(Value.Month.ToString("D2"));
 			Output.Append(',');
 			Output.Append(Value.Day.ToString("D2"));
-			Output.Append(',');
-			Output.Append(Value.Hour.ToString("D2"));
-			Output.Append(',');
-			Output.Append(Value.Minute.ToString("D2"));
-			Output.Append(',');
-			Output.Append(Value.Second.ToString("D2"));
-			Output.Append(',');
-			Output.Append(Value.Millisecond.ToString("D3"));
+
+			if (Value.Hour != 0 || Value.Minute != 0 || Value.Second != 0 || Value.Millisecond != 0)
+			{
+				Output.Append(',');
+				Output.Append(Value.Hour.ToString("D2"));
+				Output.Append(',');
+				Output.Append(Value.Minute.ToString("D2"));
+				Output.Append(',');
+				Output.Append(Value.Second.ToString("D2"));
+
+				if (Value.Millisecond != 0)
+				{
+					Output.Append(',');
+					Output.Append(Value.Millisecond.ToString("D3"));
+				}
+			}
+
 			Output.Append(')');
 
 			return Output.ToString();
@@ -3751,8 +3760,13 @@ namespace Waher.Script
 			Output.Append(Value.Minutes.ToString("D2"));
 			Output.Append(',');
 			Output.Append(Value.Seconds.ToString("D2"));
-			Output.Append(',');
-			Output.Append(Value.Milliseconds.ToString("D3"));
+
+			if (Value.Milliseconds != 0)
+			{
+				Output.Append(',');
+				Output.Append(Value.Milliseconds.ToString("D3"));
+			}
+
 			Output.Append(')');
 
 			return Output.ToString();
@@ -4027,7 +4041,7 @@ namespace Waher.Script
 		}
 
 		/// <summary>
-		/// Upgrades elements if necessary, trying to make them compatible.
+		/// Upgrades elements if necessary, to a common semi-field, trying to make them compatible.
 		/// </summary>
 		/// <param name="E1">Element 1.</param>
 		/// <param name="Set1">Set containing element 1.</param>
@@ -4035,7 +4049,38 @@ namespace Waher.Script
 		/// <param name="Set2">Set containing element 2.</param>
 		/// <param name="Node">Script node requesting the upgrade.</param>
 		/// <returns>If elements have been upgraded to become compatible.</returns>
-		public static bool Upgrade(ref IElement E1, ref ISet Set1, ref IElement E2, ref ISet Set2, ScriptNode Node)
+		public static bool UpgradeSemiGroup(ref IElement E1, ref ISet Set1, ref IElement E2, ref ISet Set2, ScriptNode Node)
+		{
+			// TODO: Implement pluggable upgrades and a shortest path search to find optimal upgrades.
+
+			if (UpgradeField(ref E1, ref Set1, ref E2, ref Set2, Node))
+				return true;
+			else if (E1 is StringValue)
+			{
+				E2 = new StringValue(E2.ToString());
+				Set2 = StringValues.Instance;
+				return true;
+			}
+			else if (E2 is StringValue)
+			{
+				E1 = new StringValue(E1.ToString());
+				Set1 = StringValues.Instance;
+				return true;
+			}
+
+			return false;
+		}
+
+		/// <summary>
+		/// Upgrades elements if necessary, to a common field extension, trying to make them compatible.
+		/// </summary>
+		/// <param name="E1">Element 1.</param>
+		/// <param name="Set1">Set containing element 1.</param>
+		/// <param name="E2">Element 2.</param>
+		/// <param name="Set2">Set containing element 2.</param>
+		/// <param name="Node">Script node requesting the upgrade.</param>
+		/// <returns>If elements have been upgraded to become compatible.</returns>
+		public static bool UpgradeField(ref IElement E1, ref ISet Set1, ref IElement E2, ref ISet Set2, ScriptNode Node)
 		{
 			// TODO: Implement pluggable upgrades and a shortest path search to find optimal upgrades.
 
@@ -4076,18 +4121,6 @@ namespace Waher.Script
 					Set2 = DoubleNumbers.Instance;
 					return true;
 				}
-			}
-			else if (E1 is StringValue)
-			{
-				E2 = new StringValue(E2.ToString());
-				Set2 = StringValues.Instance;
-				return true;
-			}
-			else if (E2 is StringValue)
-			{
-				E1 = new StringValue(E1.ToString());
-				Set1 = StringValues.Instance;
-				return true;
 			}
 
 			return false;   // TODO: Implement Upgrade()

@@ -581,7 +581,6 @@ namespace Waher.Client.WPF
 		private void ChatMessageReceived(object P)
 		{
 			MessageEventArgs e = (MessageEventArgs)P;
-			ChatView ChatView;
 
 			string Message = e.Body;
 			bool IsMarkdown = false;
@@ -604,23 +603,41 @@ namespace Waher.Client.WPF
 				}
 			}
 
+			this.ChatMessage(e.FromBareJID, XmppClient.GetBareJID(e.To), Message, IsMarkdown);
+		}
+
+		public void ChatMessage(string FromBareJid, string ToBareJid, string Message, bool IsMarkdown)
+		{
+			XmppAccountNode XmppAccountNode;
+			ChatView ChatView;
+
 			foreach (TabItem TabItem in this.Tabs.Items)
 			{
 				ChatView = TabItem.Content as ChatView;
 				if (ChatView == null)
 					continue;
 
-				if (!(ChatView.Node is XmppContact XmppContact))
+				if (ChatView.Node is XmppContact XmppContact)
+				{
+					if (XmppContact.BareJID != FromBareJid)
+						continue;
+
+					XmppAccountNode = XmppContact.XmppAccountNode;
+				}
+				else if (ChatView.Node is Model.XmppComponent XmppComponent)
+				{
+					if (XmppComponent.JID != FromBareJid)
+						continue;
+
+					XmppAccountNode = XmppComponent.Account;
+				}
+				else
 					continue;
 
-				if (XmppContact.BareJID != e.FromBareJID)
-					continue;
-
-				XmppAccountNode XmppAccountNode = XmppContact.XmppAccountNode;
 				if (XmppAccountNode == null)
 					continue;
 
-				if (XmppAccountNode.BareJID != XmppClient.GetBareJID(e.To))
+				if (XmppAccountNode.BareJID != ToBareJid)
 					continue;
 
 				ChatView.ChatMessageReceived(Message, IsMarkdown, this);
@@ -629,15 +646,15 @@ namespace Waher.Client.WPF
 
 			foreach (TreeNode Node in this.MainView.ConnectionTree.Items)
 			{
-				if (!(Node is XmppAccountNode XmppAccountNode))
+				if (!(Node is XmppAccountNode XmppAccountNode2))
 					continue;
 
-				if (XmppAccountNode.BareJID != XmppClient.GetBareJID(e.To))
+				if (XmppAccountNode2.BareJID != ToBareJid)
 					continue;
 
-				if (XmppAccountNode.TryGetChild(e.FromBareJID, out TreeNode ContactNode))
+				if (XmppAccountNode2.TryGetChild(FromBareJid, out TreeNode ContactNode))
 				{
-					TabItem TabItem2 = MainWindow.NewTab(e.FromBareJID);
+					TabItem TabItem2 = MainWindow.NewTab(FromBareJid);
 					this.Tabs.Items.Add(TabItem2);
 
 					ChatView = new ChatView(ContactNode);

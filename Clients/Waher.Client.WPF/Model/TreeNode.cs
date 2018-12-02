@@ -485,7 +485,7 @@ namespace Waher.Client.WPF.Model
 		/// <exception cref="NotSupportedException">If the feature is not supported by the node.</exception>
 		public virtual void SendChatMessage(string Message, MarkdownDocument Markdown)
 		{
-			throw new NotSupportedException();
+			MainWindow.ErrorBox("You are not allowed to chat with this entity.");
 		}
 
 		/// <summary>

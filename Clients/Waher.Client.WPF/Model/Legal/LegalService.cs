@@ -6,19 +6,11 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Threading;
-using Waher.Content;
+using Waher.Content.Markdown;
 using Waher.Events;
 using Waher.Networking.XMPP;
-using Waher.Networking.XMPP.DataForms;
-using Waher.Networking.XMPP.DataForms.FieldTypes;
 using Waher.Networking.XMPP.Contracts;
-using Waher.Persistence;
-using Waher.Persistence.Filters;
-using Waher.Client.WPF.Controls;
-using Waher.Client.WPF.Controls.Questions;
 using Waher.Client.WPF.Dialogs;
-using Waher.Client.WPF.Model.Concentrator;
 
 namespace Waher.Client.WPF.Model.Legal
 {
@@ -30,6 +22,7 @@ namespace Waher.Client.WPF.Model.Legal
 			: base(Parent, JID, Name, Node, Features)
 		{
 			this.contractsClient = new ContractsClient(this.Account.Client, JID);
+			this.contractsClient.IdentityUpdated += ContractsClient_IdentityUpdated;
 		}
 
 		public ContractsClient ContractsClient
@@ -143,10 +136,61 @@ namespace Waher.Client.WPF.Model.Legal
 			}
 		}
 
+		private void ContractsClient_IdentityUpdated(object Sender, LegalIdentityEventArgs e)
+		{
+			StringBuilder Markdown = new StringBuilder();
+
+			Markdown.AppendLine("Legal identity updated:");
+			Output(XmppClient.GetBareJID(e.To), Markdown, e.Identity.GetTags());
+
+			MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() =>
+			{
+				MainWindow.currentInstance.ChatMessage(XmppClient.GetBareJID(e.From), XmppClient.GetBareJID(e.To),
+					Markdown.ToString(), true);
+			}));
+		}
+
+		internal static void Output(string JID, StringBuilder Markdown, KeyValuePair<string, object>[] Tags)
+		{
+			Markdown.AppendLine();
+			Markdown.AppendLine("| Legal Identity ||");
+			Markdown.AppendLine("|:------|:--------|");
+			Markdown.Append("| JID   | ");
+			Markdown.Append(MarkdownDocument.Encode(JID));
+			Markdown.AppendLine(" |");
+
+			foreach (KeyValuePair<string, object> P in Tags)
+			{
+				string s = P.Key;
+
+				switch (s)
+				{
+					case "FIRST": s = "First Name"; break;
+					case "MIDDLE": s = "Middle Name(s)"; break;
+					case "LAST": s = "Last Name"; break;
+					case "PNR": s = "Personal Number"; break;
+					case "ADDR": s = "Address"; break;
+					case "ADDR2": s = "Address, row 2"; break;
+					case "ZIP": s = "Postal Code (ZIP)"; break;
+					case "AREA": s = "Area"; break;
+					case "CITY": s = "City"; break;
+					case "REGION": s = "Region (State)"; break;
+					case "COUNTRY": s = "Country"; break;
+				}
+
+				Markdown.Append("| ");
+				Markdown.Append(MarkdownDocument.Encode(s).Replace("\r\n", "\n").Replace("\n", "<br/>").Replace("\r", "<br/>"));
+				Markdown.Append(" | ");
+				Markdown.Append(MarkdownDocument.Encode(P.Value.ToString()).Replace("\r\n", "\n").Replace("\n", "<br/>").Replace("\r", "<br/>"));
+				Markdown.AppendLine(" |");
+			}
+		}
+
 		private void MyLegalIdentities_Click(object sender, RoutedEventArgs e)
 		{
 			this.contractsClient.GetLegalIdentities((sender2, e2) =>
 			{
+				// TODO
 			}, null);
 		}
 

@@ -38,6 +38,10 @@ namespace Waher.Client.WPF.Model
 			base.Dispose();
 		}
 
+		public string JID => this.jid;
+		public string Name => this.name;
+		public string Node => this.node;
+
 		public override string Key => this.jid;
 		public override ImageSource ImageResource => XmppAccountNode.component;
 		public override string TypeName => "XMPP Server component";

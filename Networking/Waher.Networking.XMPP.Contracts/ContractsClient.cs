@@ -177,9 +177,12 @@ namespace Waher.Networking.XMPP.Contracts
 
 					e0 = new KeyEventArgs(e, ServerKey);
 
-					lock (this.publicKeys)
+					if (e0.Ok)
 					{
-						this.publicKeys[Address] = e0;
+						lock (this.publicKeys)
+						{
+							this.publicKeys[Address] = e0;
+						}
 					}
 
 					Callback?.Invoke(this, e0);
@@ -269,9 +272,12 @@ namespace Waher.Networking.XMPP.Contracts
 
 					e0 = new KeyEventArgs(e, LocalKey);
 
-					lock (this.matchingKeys)
+					if (e0.Ok)
 					{
-						this.matchingKeys[Address] = e0;
+						lock (this.matchingKeys)
+						{
+							this.matchingKeys[Address] = e0;
+						}
 					}
 
 					Callback?.Invoke(this, e0);

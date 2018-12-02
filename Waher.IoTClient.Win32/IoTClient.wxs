@@ -334,7 +334,7 @@
 							<File Id='Waher.Networking.XMPP.Contracts.pdb' Name='Waher.Networking.XMPP.Contracts.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.Contracts.pdb' Vital='yes'/>
 							<File Id='Waher.Networking.XMPP.Control.pdb' Name='Waher.Networking.XMPP.Control.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.Control.pdb' Vital='yes'/>
 							<File Id='Waher.Networking.XMPP.P2P.pdb' Name='Waher.Networking.XMPP.P2P.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.P2P.pdb' Vital='yes'/>
-							<File Id='Waher.Networking.XMPP.P2P.pdb' Name='Waher.Networking.XMPP.P2P.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.P2P.pdb' Vital='yes'/>
+							<File Id='Waher.Networking.XMPP.P2P.xml' Name='Waher.Networking.XMPP.P2P.xml' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.P2P.xml' Vital='yes'/>
 							<File Id='Waher.Networking.XMPP.PEP.pdb' Name='Waher.Networking.XMPP.PEP.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.PEP.pdb' Vital='yes'/>
 							<File Id='Waher.Networking.XMPP.PEP.xml' Name='Waher.Networking.XMPP.PEP.xml' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.PEP.xml' Vital='yes'/>
 							<File Id='Waher.Networking.XMPP.Provisioning.pdb' Name='Waher.Networking.XMPP.Provisioning.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.Provisioning.pdb' Vital='yes'/>

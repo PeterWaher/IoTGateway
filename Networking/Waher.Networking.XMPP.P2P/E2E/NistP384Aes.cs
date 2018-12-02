@@ -31,7 +31,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		/// <param name="X">X-coordinate of remote public key.</param>
 		/// <param name="Y">Y-coordinate of remote public key.</param>
 		public NistP384Aes(byte[] X, byte[] Y)
-			: base(X, Y)
+			: base(X, Y, new NistP384())
 		{
 		}
 

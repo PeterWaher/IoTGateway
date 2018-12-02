@@ -250,12 +250,18 @@
             </summary>
             <param name="Curve">Curve instance</param>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.EcAes256.#ctor(System.Byte[],System.Byte[])">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.EcAes256.#ctor(System.Byte[],System.Byte[],Waher.Security.EllipticCurves.CurvePrimeField)">
             <summary>
             Abstract base class for Elliptic Curve / AES-256 hybrid ciphers.s
             </summary>
             <param name="X">X-coordinate of remote public key.</param>
             <param name="Y">Y-coordinate of remote public key.</param>
+            <param name="ReferenceCurve">Reference curve</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.EcAes256.HasPrivateKey">
+            <summary>
+            If the key contains a private key.
+            </summary>
         </member>
         <member name="M:Waher.Networking.XMPP.P2P.E2E.EcAes256.Create(System.Numerics.BigInteger)">
             <summary>

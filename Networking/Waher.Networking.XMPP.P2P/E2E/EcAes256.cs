@@ -25,6 +25,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		private readonly CurvePrimeField curve;
 		private byte[] sharedKey = null;
 		private byte[] sharedKeyOld = null;
+		private readonly bool hasPrivateKey;
 
 		/// <summary>
 		/// Abstract base class for Elliptic Curve / AES-256 hybrid ciphers.s
@@ -35,6 +36,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		{
 			this.curve = Curve;
 			this.publicKey = Curve.PublicKey;
+			this.hasPrivateKey = true;
 		}
 
 		/// <summary>
@@ -42,11 +44,19 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		/// </summary>
 		/// <param name="X">X-coordinate of remote public key.</param>
 		/// <param name="Y">Y-coordinate of remote public key.</param>
-		public EcAes256(byte[] X, byte[] Y)
+		/// <param name="ReferenceCurve">Reference curve</param>
+		public EcAes256(byte[] X, byte[] Y, CurvePrimeField ReferenceCurve)
 			: base()
 		{
 			this.publicKey = new PointOnCurve(FromNetwork(X), FromNetwork(Y));
+			this.curve = ReferenceCurve;
+			this.hasPrivateKey = false;
 		}
+
+		/// <summary>
+		/// If the key contains a private key.
+		/// </summary>
+		public bool HasPrivateKey => this.hasPrivateKey;
 
 		/// <summary>
 		/// Creates a new endpoint.
@@ -526,6 +536,9 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		/// <returns>ECDSA Signature</returns>
 		public KeyValuePair<byte[], byte[]> Sign(byte[] Data, HashFunction HashFunction)
 		{
+			if (!this.hasPrivateKey)
+				throw new InvalidOperationException("Signing requires private key.");
+
 			KeyValuePair<BigInteger, BigInteger> Signature = this.curve.Sign(Data, HashFunction);
 			byte[] s1 = ToNetwork(Signature.Key);
 			byte[] s2 = ToNetwork(Signature.Value);

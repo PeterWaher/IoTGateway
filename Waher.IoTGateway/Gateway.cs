@@ -30,6 +30,7 @@ using Waher.Networking.HTTP;
 using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Concentrator;
+using Waher.Networking.XMPP.Contracts;
 using Waher.Networking.XMPP.HTTPX;
 using Waher.Networking.XMPP.PEP;
 using Waher.Networking.XMPP.Provisioning;
@@ -119,6 +120,7 @@ namespace Waher.IoTGateway
 		private static ConcentratorServer concentratorServer = null;
 		private static SynchronizationClient synchronizationClient = null;
 		private static PepClient pepClient = null;
+		private static ContractsClient contractsClient = null;
 		private static X509Certificate2 certificate = null;
 		private static HttpServer webServer = null;
 		private static HttpxProxy httpxProxy = null;
@@ -907,6 +909,11 @@ namespace Waher.IoTGateway
 
 			synchronizationClient = new SynchronizationClient(xmppClient);
 			pepClient = new PepClient(xmppClient, XmppConfiguration.Instance.PubSub);
+
+			if (!string.IsNullOrEmpty(XmppConfiguration.Instance.LegalIdentities))
+				contractsClient = new ContractsClient(xmppClient, XmppConfiguration.Instance.LegalIdentities);
+			else
+				contractsClient = null;
 
 			return Task.CompletedTask;
 		}
@@ -1879,6 +1886,14 @@ namespace Waher.IoTGateway
 		public static PubSubClient PubSubClient
 		{
 			get { return pepClient.PubSubClient; }
+		}
+
+		/// <summary>
+		/// XMPP Contracts Client, if such a compoent is available on the XMPP broker.
+		/// </summary>
+		public static ContractsClient ContractsClient
+		{
+			get { return contractsClient; }
 		}
 
 		/// <summary>

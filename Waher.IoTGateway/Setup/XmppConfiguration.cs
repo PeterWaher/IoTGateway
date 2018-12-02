@@ -65,6 +65,7 @@ namespace Waher.IoTGateway.Setup
 		private string provisioning = string.Empty;
 		private string events = string.Empty;
 		private string pubSub = string.Empty;
+		private string legal = string.Empty;
 		private string bareJid = string.Empty;
 		private bool sniffer = false;
 		private bool trustServer = false;
@@ -213,6 +214,16 @@ namespace Waher.IoTGateway.Setup
 		{
 			get { return this.pubSub; }
 			set { this.pubSub = value; }
+		}
+
+		/// <summary>
+		/// JID of legal identities component.
+		/// </summary>
+		[DefaultValueStringEmpty]
+		public string LegalIdentities
+		{
+			get { return this.legal; }
+			set { this.legal = value; }
 		}
 
 		/// <summary>
@@ -652,6 +663,7 @@ namespace Waher.IoTGateway.Setup
 						this.provisioning = string.Empty;
 						this.events = string.Empty;
 						this.pubSub = string.Empty;
+						this.legal = string.Empty;
 
 						if (e2.Ok)
 						{
@@ -672,6 +684,9 @@ namespace Waher.IoTGateway.Setup
 
 								if (e.HasFeature(Waher.Events.XMPP.XmppEventSink.NamespaceEventLogging))
 									this.events = Item.JID;
+
+								if (e.HasFeature(Networking.XMPP.Contracts.ContractsClient.NamespaceLegalIdentities))
+									this.legal = Item.JID;
 							}
 						}
 
@@ -687,7 +702,8 @@ namespace Waher.IoTGateway.Setup
 							{ "thingRegistry", this.thingRegistry },
 							{ "provisioning", this.provisioning },
 							{ "eventLog", this.events },
-							{ "pubSub", this.pubSub }
+							{ "pubSub", this.pubSub },
+							{ "legal", this.legal }
 						};
 
 						ClientEvents.PushEvent(new string[] { TabID }, "ConnectionOK1", JSON.Encode(ConnectionInfo, false), true, "User");

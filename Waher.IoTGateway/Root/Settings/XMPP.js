@@ -242,7 +242,17 @@ function ConnectionOK0(data)
 
 function ConnectionOK1(data)
 {
-    var ServerOk = data.offlineMsg && data.blocking && data.reporting && data.abuse && data.spam && data.pep && data.thingRegistry && data.provisioning && data.pubSub;
+    var ServerOk =
+        data.offlineMsg &&
+        data.blocking &&
+        data.reporting &&
+        data.abuse &&
+        data.spam &&
+        data.pep &&
+        data.thingRegistry &&
+        data.provisioning &&
+        data.pubSub &&
+        data.legal;
 
     ShowStatus(data.msg);
     document.getElementById("NextButton").style.display = "inline";
@@ -263,6 +273,8 @@ function ConnectionOK1(data)
     document.getElementById("ProvisioningJID").innerText = data.provisioning;
     document.getElementById("PubSub").innerText = data.pubSub ? "✓" : "✗";
     document.getElementById("PubSubJID").innerText = data.pubSub;
+    document.getElementById("Legal").innerText = data.legal ? "✓" : "✗";
+    document.getElementById("LegalJID").innerText = data.legal;
     document.getElementById("ServerFeatures").style.display = "block";
 }
 

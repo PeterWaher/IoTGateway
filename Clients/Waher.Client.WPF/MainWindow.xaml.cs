@@ -70,6 +70,7 @@ namespace Waher.Client.WPF
 				typeof(Content.Xsl.XSL).Assembly,
 				typeof(SensorData).Assembly,
 				typeof(Networking.XMPP.BOSH.HttpBinding).Assembly,
+				typeof(Networking.XMPP.P2P.EndpointSecurity).Assembly,
 				typeof(Networking.XMPP.Provisioning.ProvisioningClient).Assembly,
 				typeof(Networking.XMPP.WebSocket.WebSocketBinding).Assembly,
 				typeof(Database).Assembly,
@@ -79,7 +80,9 @@ namespace Waher.Client.WPF
 				typeof(Script.Graphs.Graph).Assembly,
 				typeof(Script.Fractals.FractalGraph).Assembly,
 				typeof(Script.Persistence.Functions.FindObjects).Assembly,
-				typeof(Script.Statistics.Functions.Beta).Assembly);
+				typeof(Script.Statistics.Functions.Beta).Assembly,
+				typeof(Security.IUser).Assembly,
+				typeof(Security.EllipticCurves.CurvePrimeField).Assembly);
 
 			appDataFolder = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
 			if (!appDataFolder.EndsWith(new string(Path.DirectorySeparatorChar, 1)))

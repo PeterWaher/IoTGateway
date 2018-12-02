@@ -392,6 +392,10 @@
       <Project>{c5151b99-69e3-4ba1-9328-fba82facf159}</Project>
       <Name>Waher.Networking.XMPP.Control</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Networking\Waher.Networking.XMPP.P2P\Waher.Networking.XMPP.P2P.csproj">
+      <Project>{97c157a3-b902-4c4b-8722-821be36a939e}</Project>
+      <Name>Waher.Networking.XMPP.P2P</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Networking\Waher.Networking.XMPP.PEP\Waher.Networking.XMPP.PEP.csproj">
       <Project>{2e9216fa-4e3d-4ed8-80a0-3557a7aa4481}</Project>
       <Name>Waher.Networking.XMPP.PEP</Name>
@@ -459,6 +463,14 @@
     <ProjectReference Include="..\..\Script\Waher.Script\Waher.Script.csproj">
       <Project>{c39e8f9b-1386-4cd3-bfa7-3481181d3ba1}</Project>
       <Name>Waher.Script</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Security\Waher.Security.EllipticCurves\Waher.Security.EllipticCurves.csproj">
+      <Project>{1c6cf422-5565-43e1-842b-9fd610bd9a67}</Project>
+      <Name>Waher.Security.EllipticCurves</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Security\Waher.Security\Waher.Security.csproj">
+      <Project>{a248de37-d588-4a5c-b51b-b500c7caaf68}</Project>
+      <Name>Waher.Security</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Things\Waher.Things\Waher.Things.csproj">
       <Project>{1659833d-9a9a-4147-9237-2ba8d96086bc}</Project>

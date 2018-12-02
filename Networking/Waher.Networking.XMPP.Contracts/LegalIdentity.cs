@@ -532,6 +532,60 @@ namespace Waher.Networking.XMPP.Contracts
 				return false;
 		}
 
+		/// <summary>
+		/// Gets tags describing the legal identity.
+		/// </summary>
+		/// <returns>Set of tags</returns>
+		public KeyValuePair<string, object>[] GetTags()
+		{
+			List<KeyValuePair<string, object>> Response = new List<KeyValuePair<string, object>>()
+			{
+				new KeyValuePair<string, object>("ID", this.id),
+				new KeyValuePair<string, object>("Provider", this.provider),
+				new KeyValuePair<string, object>("State", this.state),
+				new KeyValuePair<string, object>("Created", this.created)
+			};
+
+			if (this.updated != DateTime.MinValue)
+				Response.Add(new KeyValuePair<string, object>("Updated", this.updated));
+
+			if (this.from != DateTime.MinValue)
+				Response.Add(new KeyValuePair<string, object>("From", this.from));
+
+			if (this.to != DateTime.MaxValue)
+				Response.Add(new KeyValuePair<string, object>("To", this.to));
+
+			if (this.properties != null)
+			{
+				foreach (Property P in this.properties)
+					Response.Add(new KeyValuePair<string, object>(P.Name, P.Value));
+			}
+
+			return Response.ToArray();
+		}
+
+		/// <summary>
+		/// Access to property values.
+		/// </summary>
+		/// <param name="Key">Property key</param>
+		/// <returns>Corresponding property value, if one is found with the same key, or the empty string, if not.</returns>
+		public string this[string Key]
+		{
+			get
+			{
+				if (this.properties != null)
+				{
+					foreach (Property P in this.properties)
+					{
+						if (P.Name == Key)
+							return P.Value;
+					}
+				}
+
+				return string.Empty;
+			}
+		}
+
 
 	}
 }

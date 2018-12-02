@@ -49,6 +49,8 @@ namespace Waher.Networking.XMPP.Contracts
 			this.componentAddress = ComponentAddress;
 			this.localEndpoint = null;
 			this.localEndpointTask = this.LoadKeys();
+
+			this.client.RegisterMessageHandler("identity", NamespaceLegalIdentities, this.IdentityMessageHandler, true);
 		}
 
 		private async Task<EndpointSecurity> LoadKeys()
@@ -103,6 +105,8 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		public override void Dispose()
 		{
+			this.client.UnregisterMessageHandler("identity", NamespaceLegalIdentities, this.IdentityMessageHandler, true);
+
 			this.localEndpoint?.Dispose();
 			this.localEndpoint = null;
 
@@ -455,13 +459,25 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="State">State object to pass to callback method.</param>
 		public void Validate(LegalIdentity Identity, IdentityValidationEventHandler Callback, object State)
 		{
+			this.Validate(Identity, true, Callback, State);
+		}
+
+		/// <summary>
+		/// Validates a legal identity.
+		/// </summary>
+		/// <param name="Identity">Legal identity to validate</param>
+		/// <param name="ValidateState">If the state attribute should be validated. (Default=true)</param>
+		/// <param name="Callback">Method to call when validation is completed</param>
+		/// <param name="State">State object to pass to callback method.</param>
+		public void Validate(LegalIdentity Identity, bool ValidateState, IdentityValidationEventHandler Callback, object State)
+		{
 			if (Identity == null)
 			{
 				this.ReturnStatus(IdentityStatus.IdentityUndefined, Callback, State);
 				return;
 			}
 
-			if (Identity.State != IdentityState.Approved)
+			if (ValidateState && Identity.State != IdentityState.Approved)
 			{
 				this.ReturnStatus(IdentityStatus.NotApproved, Callback, State);
 				return;
@@ -497,6 +513,12 @@ namespace Waher.Networking.XMPP.Contracts
 				return;
 			}
 
+			if (Identity.ClientSignature1 == null || Identity.ClientSignature1.Length == 0)
+			{
+				this.ReturnStatus(IdentityStatus.NoClientSignature, Callback, State);
+				return;
+			}
+
 			StringBuilder Xml = new StringBuilder();
 			Identity.Serialize(Xml, false, false, false, false, false);
 			byte[] Data = Encoding.UTF8.GetBytes(Xml.ToString());
@@ -504,13 +526,6 @@ namespace Waher.Networking.XMPP.Contracts
 			if (Identity.ClientKeyName.StartsWith("RSA") &&
 				int.TryParse(Identity.ClientKeyName.Substring(3), out int KeySize))
 			{
-				if (Identity.ClientSignature1 == null ||
-					Identity.ClientSignature1.Length == 0)
-				{
-					this.ReturnStatus(IdentityStatus.NoClientSignature, Callback, State);
-					return;
-				}
-
 				if (!RsaAes.Verify(Data, Identity.ClientSignature1, KeySize,
 					Identity.ClientPubKey1, Identity.ClientPubKey2))
 				{
@@ -522,9 +537,7 @@ namespace Waher.Networking.XMPP.Contracts
 				EndpointSecurity.IoTHarmonizationE2E, out IE2eEndpoint LocalKey) &&
 				LocalKey is EcAes256 LocalEc)
 			{
-				if (Identity.ClientSignature1 == null ||
-					Identity.ClientSignature1.Length == 0 ||
-					Identity.ClientSignature2 == null ||
+				if (Identity.ClientSignature2 == null ||
 					Identity.ClientSignature2.Length == 0)
 				{
 					this.ReturnStatus(IdentityStatus.NoClientSignature, Callback, State);
@@ -551,6 +564,10 @@ namespace Waher.Networking.XMPP.Contracts
 				return;
 			}
 
+			Xml.Clear();
+			Identity.Serialize(Xml, false, true, true, true, false);
+			Data = Encoding.UTF8.GetBytes(Xml.ToString());
+
 			this.GetServerPublicKey(Identity.Provider, (sender, e) =>
 			{
 				if (e.Ok && e.Key != null)
@@ -564,7 +581,7 @@ namespace Waher.Networking.XMPP.Contracts
 							return;
 						}
 					}
-					else if (e.Key is EcAes256 LocalEc)
+					else if (e.Key is EcAes256 RemoteEc)
 					{
 						if (Identity.ServerSignature2 == null ||
 							Identity.ServerSignature2.Length == 0)
@@ -573,7 +590,7 @@ namespace Waher.Networking.XMPP.Contracts
 							return;
 						}
 
-						if (!LocalEc.Verify(Data, LocalEc.PublicKey,
+						if (!RemoteEc.Verify(Data, RemoteEc.PublicKey,
 							Identity.ServerSignature1, Identity.ServerSignature2, HashFunction.SHA256))
 						{
 							this.ReturnStatus(IdentityStatus.ProviderSignatureInvalid, Callback, State);
@@ -613,9 +630,19 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Identity">Legal identity to validate</param>
 		public Task<IdentityStatus> ValidateAsync(LegalIdentity Identity)
 		{
+			return this.ValidateAsync(Identity, true);
+		}
+
+		/// <summary>
+		/// Validates a legal identity.
+		/// </summary>
+		/// <param name="Identity">Legal identity to validate</param>
+		/// <param name="ValidateState">If the state attribute should be validated. (Default=true)</param>
+		public Task<IdentityStatus> ValidateAsync(LegalIdentity Identity, bool ValidateState)
+		{
 			TaskCompletionSource<IdentityStatus> Result = new TaskCompletionSource<IdentityStatus>();
 
-			this.Validate(Identity, (sender, e) =>
+			this.Validate(Identity, ValidateState, (sender, e) =>
 			{
 				Result.SetResult(e.Status);
 			}, null);
@@ -699,6 +726,41 @@ namespace Waher.Networking.XMPP.Contracts
 			return Result.Task;
 		}
 
+		private void IdentityMessageHandler(object Sender, MessageEventArgs e)
+		{
+			LegalIdentityEventHandler h = IdentityUpdated;
+
+			if (h != null)
+			{
+				LegalIdentity Identity = LegalIdentity.Parse(e.Content);
+				this.Validate(Identity, false, (sender2, e2) =>
+				{
+					if (e2.Status != IdentityStatus.Valid)
+					{
+						Client.Error("Invalid legal identity received and discarded.");
+
+						Log.Warning("Invalid legal identity received and discarded.", this.client.BareJID, e.From,
+							new KeyValuePair<string, object>("Status", e2.Status));
+						return;
+					}
+
+					try
+					{
+						IdentityUpdated?.Invoke(this, new LegalIdentityEventArgs(new IqResultEventArgs(e.Message, e.Id, e.To, e.From, e.Ok, null), Identity));
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
+				}, null);
+			}
+		}
+
+		/// <summary>
+		/// Event raised whenever the legal identity has been updated by the server.
+		/// The identity is validated before the event is raised. Invalid identities are discarded.
+		/// </summary>
+		public event LegalIdentityEventHandler IdentityUpdated = null;
 
 
 	}

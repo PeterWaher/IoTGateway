@@ -348,7 +348,7 @@ namespace Waher.Content.Markdown
 					if (!(Result is string s3))
 					{
 						StringBuilder Html = new StringBuilder();
-						InlineScript.GenerateHTML(Result, Html, true, Variables);
+						InlineScript.GenerateHTML(Result, Html, false, Variables);
 						s3 = Html.ToString();
 					}
 

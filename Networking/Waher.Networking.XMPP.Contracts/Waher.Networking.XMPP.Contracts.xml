@@ -255,33 +255,33 @@
             <param name="LegalIdentityId">ID of the legal identity to obsolete.</param>
             <returns>Legal identity object corresponding to <paramref name="LegalIdentityId"/>.</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.CompromizeLegalIdentity(System.String,Waher.Networking.XMPP.Contracts.LegalIdentityEventHandler,System.Object)">
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.CompromizedLegalIdentity(System.String,Waher.Networking.XMPP.Contracts.LegalIdentityEventHandler,System.Object)">
             <summary>
-            Compromizes one of the legal identities of the account, given its ID.
+            Reports as Compromized one of the legal identities of the account, given its ID.
             </summary>
             <param name="LegalIdentityId">ID of the legal identity to compromize.</param>
             <param name="Callback">Method to call when response is returned.</param>
             <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.CompromizeLegalIdentity(System.String,System.String,Waher.Networking.XMPP.Contracts.LegalIdentityEventHandler,System.Object)">
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.CompromizedLegalIdentity(System.String,System.String,Waher.Networking.XMPP.Contracts.LegalIdentityEventHandler,System.Object)">
             <summary>
-            Compromizes one of the legal identities of the account, given its ID.
+            Reports as Compromized one of the legal identities of the account, given its ID.
             </summary>
             <param name="Address">Address of entity on which the legal identity are registered.</param>
             <param name="LegalIdentityId">ID of the legal identity to compromize.</param>
             <param name="Callback">Method to call when response is returned.</param>
             <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.CompromizeLegalIdentityAsync(System.String)">
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.CompromizedLegalIdentityAsync(System.String)">
             <summary>
-            Compromizes one of the legal identities of the account, given its ID.
+            Reports as Compromized one of the legal identities of the account, given its ID.
             </summary>
             <param name="LegalIdentityId">ID of the legal identity to compromize.</param>
             <returns>Legal identity object corresponding to <paramref name="LegalIdentityId"/>.</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.CompromizeLegalIdentityAsync(System.String,System.String)">
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.CompromizedLegalIdentityAsync(System.String,System.String)">
             <summary>
-            Compromizes one of the legal identities of the account, given its ID.
+            Reports as Compromized one of the legal identities of the account, given its ID.
             </summary>
             <param name="Address">Address of entity on which the legal identity are registered.</param>
             <param name="LegalIdentityId">ID of the legal identity to compromize.</param>

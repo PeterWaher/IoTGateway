@@ -80,6 +80,22 @@ namespace Waher.Client.WPF.Model.Legal
 			});
 
 			Item.Click += this.MyLegalIdentities_Click;
+
+			Menu.Items.Add(Item = new MenuItem()
+			{
+				Header = "_Obsolete legal identities...",
+				IsEnabled = true
+			});
+
+			Item.Click += this.ObsoleteLegalIdentities_Click;
+
+			Menu.Items.Add(Item = new MenuItem()
+			{
+				Header = "Report legal identities as _compromized...",
+				IsEnabled = true
+			});
+
+			Item.Click += this.CompromizedLegalIdentities_Click;
 		}
 
 		private void RegisterLegalIdentity_Click(object sender, RoutedEventArgs e)
@@ -132,7 +148,7 @@ namespace Waher.Client.WPF.Model.Legal
 				{
 					if (!e2.Ok)
 						MainWindow.ErrorBox(string.IsNullOrEmpty(e2.ErrorText) ? "Unable to register legal identity." : e2.ErrorText);
-				}, null);
+ 				}, null);
 			}
 		}
 
@@ -208,6 +224,80 @@ namespace Waher.Client.WPF.Model.Legal
 									Markdown.ToString(), true);
 							}));
 						}
+					}
+				}
+				else
+					MainWindow.ErrorBox(string.IsNullOrEmpty(e2.ErrorText) ? "Unable to get list of identities." : e2.ErrorText);
+			}, null);
+		}
+
+		private void ObsoleteLegalIdentities_Click(object sender, RoutedEventArgs e)
+		{
+			if (MessageBox.Show(MainWindow.currentInstance, "Are you sure you want to obsolete registered legal identities?",
+				"Confirmation", MessageBoxButton.YesNoCancel, MessageBoxImage.Question, MessageBoxResult.Yes) != MessageBoxResult.Yes)
+			{
+				return;
+			}
+
+			this.contractsClient.GetLegalIdentities((sender2, e2) =>
+			{
+				if (e2.Ok)
+				{
+					if (e2.Identities == null || e2.Identities.Length == 0)
+						MainWindow.MessageBox("No legal identities are regitered.", "Identities", MessageBoxButton.OK, MessageBoxImage.Information);
+					else
+					{
+						int Nr = 0;
+
+						foreach (LegalIdentity Identity in e2.Identities)
+						{
+							if (Identity.State == IdentityState.Approved || Identity.State == IdentityState.Created)
+							{
+								this.contractsClient.ObsoleteLegalIdentity(Identity.Id, null, null);
+								Nr++;
+							}
+						}
+
+						if (Nr == 0)
+							MainWindow.MessageBox("No legal identities found to obsolete.", "Identities", MessageBoxButton.OK, MessageBoxImage.Information);
+					}
+				}
+				else
+					MainWindow.ErrorBox(string.IsNullOrEmpty(e2.ErrorText) ? "Unable to get list of identities." : e2.ErrorText);
+			}, null);
+		}
+
+		private void CompromizedLegalIdentities_Click(object sender, RoutedEventArgs e)
+		{
+			if (MessageBox.Show(MainWindow.currentInstance, "Are you sure you want to report your registered legal identities as compromized?",
+				"Confirmation", MessageBoxButton.YesNoCancel, MessageBoxImage.Question, MessageBoxResult.Yes) != MessageBoxResult.Yes)
+			{
+				return;
+			}
+
+			this.contractsClient.GetLegalIdentities((sender2, e2) =>
+			{
+				if (e2.Ok)
+				{
+					if (e2.Identities == null || e2.Identities.Length == 0)
+						MainWindow.MessageBox("No legal identities are regitered.", "Identities", MessageBoxButton.OK, MessageBoxImage.Information);
+					else
+					{
+						int Nr = 0;
+
+						foreach (LegalIdentity Identity in e2.Identities)
+						{
+							if (Identity.State == IdentityState.Approved || 
+								Identity.State == IdentityState.Created || 
+								Identity.State == IdentityState.Obsoleted)
+							{
+								this.contractsClient.CompromizedLegalIdentity(Identity.Id, null, null);
+								Nr++;
+							}
+						}
+
+						if (Nr == 0)
+							MainWindow.MessageBox("No legal identities found to report as compromized.", "Identities", MessageBoxButton.OK, MessageBoxImage.Information);
 					}
 				}
 				else

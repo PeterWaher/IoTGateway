@@ -141,6 +141,7 @@ namespace Waher.Client.WPF.Model.Legal
 			StringBuilder Markdown = new StringBuilder();
 
 			Markdown.AppendLine("Legal identity updated:");
+			Markdown.AppendLine();
 			Output(XmppClient.GetBareJID(e.To), Markdown, e.Identity.GetTags());
 
 			MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() =>
@@ -152,7 +153,6 @@ namespace Waher.Client.WPF.Model.Legal
 
 		internal static void Output(string JID, StringBuilder Markdown, KeyValuePair<string, object>[] Tags)
 		{
-			Markdown.AppendLine();
 			Markdown.AppendLine("| Legal Identity ||");
 			Markdown.AppendLine("|:------|:--------|");
 			Markdown.Append("| JID   | ");
@@ -190,7 +190,28 @@ namespace Waher.Client.WPF.Model.Legal
 		{
 			this.contractsClient.GetLegalIdentities((sender2, e2) =>
 			{
-				// TODO
+				if (e2.Ok)
+				{
+					if (e2.Identities == null || e2.Identities.Length == 0)
+						MainWindow.MessageBox("No legal identities are regitered.", "Identities", MessageBoxButton.OK, MessageBoxImage.Information);
+					else
+					{
+						foreach (LegalIdentity Identity in e2.Identities)
+						{
+							StringBuilder Markdown = new StringBuilder();
+
+							Output(XmppClient.GetBareJID(e2.To), Markdown, Identity.GetTags());
+
+							MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() =>
+							{
+								MainWindow.currentInstance.ChatMessage(XmppClient.GetBareJID(e2.From), XmppClient.GetBareJID(e2.To),
+									Markdown.ToString(), true);
+							}));
+						}
+					}
+				}
+				else
+					MainWindow.ErrorBox(string.IsNullOrEmpty(e2.ErrorText) ? "Unable to get list of identities." : e2.ErrorText);
 			}, null);
 		}
 

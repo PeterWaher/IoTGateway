@@ -586,6 +586,118 @@ namespace Waher.Networking.XMPP.Contracts
 			}
 		}
 
+		/// <summary>
+		/// <see cref="Object.Equals(object)"/>
+		/// </summary>
+		public override bool Equals(object obj)
+		{
+			if (!(obj is LegalIdentity ID))
+				return false;
+
+			if (!this.id.Equals(ID.id) ||
+				!this.provider.Equals(ID.provider) ||
+				!this.state.Equals(ID.state) ||
+				!this.created.Equals(ID.created) ||
+				!this.updated.Equals(ID.updated) ||
+				!this.from.Equals(ID.from) ||
+				!this.to.Equals(ID.to) ||
+				!this.clientKeyName.Equals(ID.clientKeyName) ||
+				!AreEqual(this.clientPubKey1, ID.clientPubKey1) ||
+				!AreEqual(this.clientPubKey2, ID.clientPubKey2) ||
+				!AreEqual(this.clientSignature1, ID.clientSignature1) ||
+				!AreEqual(this.clientSignature2, ID.clientSignature2) ||
+				!AreEqual(this.serverSignature1, ID.serverSignature1) ||
+				!AreEqual(this.serverSignature2, ID.serverSignature2))
+			{
+				return false;
+			}
+
+			if ((this.properties == null) ^ (ID.properties == null))
+				return false;
+
+			if (this.properties != null)
+			{
+				int i, c = this.properties.Length;
+
+				if (c != ID.properties.Length)
+					return false;
+
+				for (i = 0; i < c; i++)
+				{
+					if (!this.properties[i].Equals(ID.properties[i]))
+						return false;
+				}
+			}
+
+			return true;
+		}
+
+		internal static bool AreEqual(byte[] A1, byte[] A2)
+		{
+			if ((A1 == null) ^ (A2 == null))
+				return false;
+
+			if (A1 == null)
+				return true;
+
+			int i, c = A1.Length;
+			if (c != A2.Length)
+				return false;
+
+			for (i = 0; i < c; i++)
+			{
+				if (A1[i] != A2[i])
+					return false;
+			}
+
+			return true;
+		}
+
+		/// <summary>
+		/// <see cref="object.GetHashCode()"/>
+		/// </summary>
+		public override int GetHashCode()
+		{
+			int Result = this.id.GetHashCode();
+			Result ^= Result << 5 ^ this.provider.GetHashCode();
+			Result ^= Result << 5 ^ this.state.GetHashCode();
+			Result ^= Result << 5 ^ this.created.GetHashCode();
+			Result ^= Result << 5 ^ this.updated.GetHashCode();
+			Result ^= Result << 5 ^ this.from.GetHashCode();
+			Result ^= Result << 5 ^ this.to.GetHashCode();
+			Result ^= Result << 5 ^ this.clientKeyName.GetHashCode();
+			Result ^= Result << 5 ^ GetHashCode(this.clientPubKey1);
+			Result ^= Result << 5 ^ GetHashCode(this.clientPubKey2);
+			Result ^= Result << 5 ^ GetHashCode(this.clientSignature1);
+			Result ^= Result << 5 ^ GetHashCode(this.clientSignature2);
+			Result ^= Result << 5 ^ GetHashCode(this.serverSignature1);
+			Result ^= Result << 5 ^ GetHashCode(this.serverSignature2);
+
+			if (this.properties != null)
+			{
+				int i, c = this.properties.Length;
+
+				for (i = 0; i < c; i++)
+					Result ^= Result << 5 ^ this.properties[i].GetHashCode();
+			}
+
+			return Result;
+		}
+
+		internal static int GetHashCode(byte[] Bin)
+		{
+			int Result = 0;
+
+			if (Bin != null)
+			{
+				int i, c = Bin.Length;
+
+				for (i = 0; i < c; i++)
+					Result ^= Result << 5 ^ Bin[i];
+			}
+
+			return Result;
+		}
 
 	}
 }

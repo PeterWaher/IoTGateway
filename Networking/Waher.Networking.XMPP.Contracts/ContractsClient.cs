@@ -197,6 +197,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <summary>
 		/// Gets the server public key.
 		/// </summary>
+		/// <returns>Server public key.</returns>
 		public Task<IE2eEndpoint> GetServerPublicKeyAsync()
 		{
 			return this.GetServerPublicKeyAsync(this.componentAddress);
@@ -206,6 +207,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// Gets the server public key.
 		/// </summary>
 		/// <param name="Address">Address of entity whose public key is requested.</param>
+		/// <returns>Server public key.</returns>
 		public Task<IE2eEndpoint> GetServerPublicKeyAsync(string Address)
 		{
 			TaskCompletionSource<IE2eEndpoint> Result = new TaskCompletionSource<IE2eEndpoint>();
@@ -294,6 +296,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <summary>
 		/// Get the local key that matches the server key.
 		/// </summary>
+		/// <returns>Local key.</returns>
 		public Task<IE2eEndpoint> GetMatchingLocalKeyAsync()
 		{
 			return this.GetMatchingLocalKeyAsync(this.componentAddress);
@@ -303,6 +306,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// Get the local key that matches a given server key.
 		/// </summary>
 		/// <param name="Address">Address of server (component).</param>
+		/// <returns>Local key.</returns>
 		public Task<IE2eEndpoint> GetMatchingLocalKeyAsync(string Address)
 		{
 			TaskCompletionSource<IE2eEndpoint> Result = new TaskCompletionSource<IE2eEndpoint>();
@@ -423,6 +427,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// Applies for a legal identity to be registered.
 		/// </summary>
 		/// <param name="Properties">Properties of the legal identity.</param>
+		/// <returns>Identity object representing the application.</returns>
 		public Task<LegalIdentity> ApplyAsync(Property[] Properties)
 		{
 			return this.ApplyAsync(this.componentAddress, Properties);
@@ -433,6 +438,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="Address">Address of server (component).</param>
 		/// <param name="Properties">Properties of the legal identity.</param>
+		/// <returns>Identity object representing the application.</returns>
 		public Task<LegalIdentity> ApplyAsync(string Address, Property[] Properties)
 		{
 			TaskCompletionSource<LegalIdentity> Result = new TaskCompletionSource<LegalIdentity>();
@@ -692,6 +698,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// Validates a legal identity.
 		/// </summary>
 		/// <param name="Identity">Legal identity to validate</param>
+		/// <returns>Status of validation.</returns>
 		public Task<IdentityStatus> ValidateAsync(LegalIdentity Identity)
 		{
 			return this.ValidateAsync(Identity, true);
@@ -702,6 +709,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="Identity">Legal identity to validate</param>
 		/// <param name="ValidateState">If the state attribute should be validated. (Default=true)</param>
+		/// <returns>Status of validation.</returns>
 		public Task<IdentityStatus> ValidateAsync(LegalIdentity Identity, bool ValidateState)
 		{
 			TaskCompletionSource<IdentityStatus> Result = new TaskCompletionSource<IdentityStatus>();
@@ -763,6 +771,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <summary>
 		/// Gets legal identities registered with the account.
 		/// </summary>
+		/// <returns>Set of legal identities registered on the account.</returns>
 		public Task<LegalIdentity[]> GetLegalIdentitiesAsync()
 		{
 			return this.GetLegalIdentitiesAsync(this.componentAddress);
@@ -772,6 +781,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// Gets legal identities registered with the account.
 		/// </summary>
 		/// <param name="Address">Address of entity on which the legal identities are registered.</param>
+		/// <returns>Set of legal identities registered on the account.</returns>
 		public Task<LegalIdentity[]> GetLegalIdentitiesAsync(string Address)
 		{
 			TaskCompletionSource<LegalIdentity[]> Result = new TaskCompletionSource<LegalIdentity[]>();
@@ -829,6 +839,75 @@ namespace Waher.Networking.XMPP.Contracts
 		/// The identity is validated before the event is raised. Invalid identities are discarded.
 		/// </summary>
 		public event LegalIdentityEventHandler IdentityUpdated = null;
+
+		/// <summary>
+		/// Gets information about a legal identity given its ID.
+		/// </summary>
+		/// <param name="LegalIdentityId">ID of the legal identity to get.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
+		public void GetLegalIdentity(string LegalIdentityId, LegalIdentityEventHandler Callback, object State)
+		{
+			this.GetLegalIdentity(this.componentAddress, LegalIdentityId, Callback, State);
+		}
+
+		/// <summary>
+		/// Gets information about a legal identity given its ID.
+		/// </summary>
+		/// <param name="Address">Address of entity on which the legal identity are registered.</param>
+		/// <param name="LegalIdentityId">ID of the legal identity to get.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
+		public void GetLegalIdentity(string Address, string LegalIdentityId, LegalIdentityEventHandler Callback, object State)
+		{
+			this.client.SendIqGet(Address, "<getLegalIdentity id=\"" + XML.Encode(LegalIdentityId) + "\" xmlns=\"" +
+				NamespaceLegalIdentities + "\"/>", (sender, e) =>
+			{
+				LegalIdentity Identity = null;
+				XmlElement E;
+
+				if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "identity" && E.NamespaceURI == NamespaceLegalIdentities)
+					Identity = LegalIdentity.Parse(E);
+				else
+					e.Ok = false;
+
+				Callback?.Invoke(this, new LegalIdentityEventArgs(e, Identity));
+			}, State);
+		}
+
+		/// <summary>
+		/// Gets legal identity registered with the account.
+		/// </summary>
+		/// <param name="LegalIdentityId">ID of the legal identity to get.</param>
+		/// <returns>Legal identity object corresponding to <paramref name="LegalIdentityId"/>.</returns>
+		public Task<LegalIdentity> GetLegalIdentityAsync(string LegalIdentityId)
+		{
+			return this.GetLegalIdentityAsync(this.componentAddress, LegalIdentityId);
+		}
+
+		/// <summary>
+		/// Gets legal identity registered with the account.
+		/// </summary>
+		/// <param name="Address">Address of entity on which the legal identity are registered.</param>
+		/// <param name="LegalIdentityId">ID of the legal identity to get.</param>
+		/// <returns>Legal identity object corresponding to <paramref name="LegalIdentityId"/>.</returns>
+		public Task<LegalIdentity> GetLegalIdentityAsync(string Address, string LegalIdentityId)
+		{
+			TaskCompletionSource<LegalIdentity> Result = new TaskCompletionSource<LegalIdentity>();
+
+			this.GetLegalIdentity(Address, LegalIdentityId, (sender, e) =>
+			{
+				if (e.Ok)
+					Result.SetResult(e.Identity);
+				else
+				{
+					Result.SetException(new IOException(string.IsNullOrEmpty(e.ErrorText) ?
+						"Unable to get legal identity." : e.ErrorText));
+				}
+			}, null);
+
+			return Result.Task;
+		}
 
 
 	}

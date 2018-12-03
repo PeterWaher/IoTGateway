@@ -56,12 +56,14 @@
             <summary>
             Gets the server public key.
             </summary>
+            <returns>Server public key.</returns>
         </member>
         <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetServerPublicKeyAsync(System.String)">
             <summary>
             Gets the server public key.
             </summary>
             <param name="Address">Address of entity whose public key is requested.</param>
+            <returns>Server public key.</returns>
         </member>
         <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetMatchingLocalKey(Waher.Networking.XMPP.Contracts.KeyEventHandler,System.Object)">
             <summary>
@@ -82,12 +84,14 @@
             <summary>
             Get the local key that matches the server key.
             </summary>
+            <returns>Local key.</returns>
         </member>
         <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetMatchingLocalKeyAsync(System.String)">
             <summary>
             Get the local key that matches a given server key.
             </summary>
             <param name="Address">Address of server (component).</param>
+            <returns>Local key.</returns>
         </member>
         <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.Apply(Waher.Networking.XMPP.Contracts.Property[],Waher.Networking.XMPP.Contracts.LegalIdentityEventHandler,System.Object)">
             <summary>
@@ -111,6 +115,7 @@
             Applies for a legal identity to be registered.
             </summary>
             <param name="Properties">Properties of the legal identity.</param>
+            <returns>Identity object representing the application.</returns>
         </member>
         <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.ApplyAsync(System.String,Waher.Networking.XMPP.Contracts.Property[])">
             <summary>
@@ -118,6 +123,7 @@
             </summary>
             <param name="Address">Address of server (component).</param>
             <param name="Properties">Properties of the legal identity.</param>
+            <returns>Identity object representing the application.</returns>
         </member>
         <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.Validate(Waher.Networking.XMPP.Contracts.LegalIdentity,Waher.Networking.XMPP.Contracts.IdentityValidationEventHandler,System.Object)">
             <summary>
@@ -141,6 +147,7 @@
             Validates a legal identity.
             </summary>
             <param name="Identity">Legal identity to validate</param>
+            <returns>Status of validation.</returns>
         </member>
         <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.ValidateAsync(Waher.Networking.XMPP.Contracts.LegalIdentity,System.Boolean)">
             <summary>
@@ -148,6 +155,7 @@
             </summary>
             <param name="Identity">Legal identity to validate</param>
             <param name="ValidateState">If the state attribute should be validated. (Default=true)</param>
+            <returns>Status of validation.</returns>
         </member>
         <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetLegalIdentities(Waher.Networking.XMPP.Contracts.LegalIdentitiesEventHandler,System.Object)">
             <summary>
@@ -168,18 +176,52 @@
             <summary>
             Gets legal identities registered with the account.
             </summary>
+            <returns>Set of legal identities registered on the account.</returns>
         </member>
         <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetLegalIdentitiesAsync(System.String)">
             <summary>
             Gets legal identities registered with the account.
             </summary>
             <param name="Address">Address of entity on which the legal identities are registered.</param>
+            <returns>Set of legal identities registered on the account.</returns>
         </member>
         <member name="E:Waher.Networking.XMPP.Contracts.ContractsClient.IdentityUpdated">
             <summary>
             Event raised whenever the legal identity has been updated by the server.
             The identity is validated before the event is raised. Invalid identities are discarded.
             </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetLegalIdentity(System.String,Waher.Networking.XMPP.Contracts.LegalIdentityEventHandler,System.Object)">
+            <summary>
+            Gets information about a legal identity given its ID.
+            </summary>
+            <param name="LegalIdentityId">ID of the legal identity to get.</param>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetLegalIdentity(System.String,System.String,Waher.Networking.XMPP.Contracts.LegalIdentityEventHandler,System.Object)">
+            <summary>
+            Gets information about a legal identity given its ID.
+            </summary>
+            <param name="Address">Address of entity on which the legal identity are registered.</param>
+            <param name="LegalIdentityId">ID of the legal identity to get.</param>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetLegalIdentityAsync(System.String)">
+            <summary>
+            Gets legal identity registered with the account.
+            </summary>
+            <param name="LegalIdentityId">ID of the legal identity to get.</param>
+            <returns>Legal identity object corresponding to <paramref name="LegalIdentityId"/>.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetLegalIdentityAsync(System.String,System.String)">
+            <summary>
+            Gets legal identity registered with the account.
+            </summary>
+            <param name="Address">Address of entity on which the legal identity are registered.</param>
+            <param name="LegalIdentityId">ID of the legal identity to get.</param>
+            <returns>Legal identity object corresponding to <paramref name="LegalIdentityId"/>.</returns>
         </member>
         <member name="T:Waher.Networking.XMPP.Contracts.IdentityStatus">
             <summary>
@@ -463,6 +505,16 @@
             <param name="Key">Property key</param>
             <returns>Corresponding property value, if one is found with the same key, or the empty string, if not.</returns>
         </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.LegalIdentity.Equals(System.Object)">
+            <summary>
+            <see cref="M:System.Object.Equals(System.Object)"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.LegalIdentity.GetHashCode">
+            <summary>
+            <see cref="M:System.Object.GetHashCode"/>
+            </summary>
+        </member>
         <member name="T:Waher.Networking.XMPP.Contracts.LegalIdentityEventHandler">
             <summary>
             Delegate for legal identity callback methods.
@@ -512,6 +564,16 @@
         <member name="M:Waher.Networking.XMPP.Contracts.Property.ToString">
             <summary>
             <see cref="M:System.Object.ToString"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Property.Equals(System.Object)">
+            <summary>
+            <see cref="M:System.Object.Equals(System.Object)"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Property.GetHashCode">
+            <summary>
+            <see cref="M:System.Object.GetHashCode"/>
             </summary>
         </member>
         <member name="T:Waher.Networking.XMPP.Contracts.KeyEventHandler">

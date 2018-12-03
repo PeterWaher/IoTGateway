@@ -48,5 +48,28 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			return this.name + "=" + this.value;
 		}
+
+		/// <summary>
+		/// <see cref="Object.Equals(object)"/>
+		/// </summary>
+		public override bool Equals(object obj)
+		{
+			return
+				obj is Property P &&
+				this.name == P.name &&
+				this.value == P.value;
+		}
+
+		/// <summary>
+		/// <see cref="object.GetHashCode()"/>
+		/// </summary>
+		public override int GetHashCode()
+		{
+			int Result = this.name.GetHashCode();
+			Result ^= Result << 5 ^ this.value.GetHashCode();
+
+			return Result;
+		}
+
 	}
 }

@@ -150,5 +150,15 @@ namespace Waher.Networking.XMPP.P2P.E2E
 			return Xml.ToString();
 		}
 
+		/// <summary>
+		/// <see cref="Object.ToString()"/>
+		/// </summary>
+		public override abstract bool Equals(object obj);
+
+		/// <summary>
+		/// <see cref="Object.GetHashCode()"/>
+		/// </summary>
+		public override abstract int GetHashCode();
+
 	}
 }

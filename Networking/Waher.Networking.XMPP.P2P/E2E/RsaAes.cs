@@ -522,5 +522,28 @@ namespace Waher.Networking.XMPP.P2P.E2E
 			return this.rsa.Decrypt(Key, RSAEncryptionPadding.OaepSHA256);
 		}
 
+		/// <summary>
+		/// <see cref="Object.ToString()"/>
+		/// </summary>
+		public override bool Equals(object obj)
+		{
+			return obj is RsaAes RsaAes &&
+				this.keySize.Equals(RsaAes.keySize) &&
+				this.modulusBase64.Equals(RsaAes.modulusBase64) &&
+				this.exponentBase64.Equals(RsaAes.exponentBase64);
+		}
+
+		/// <summary>
+		/// <see cref="Object.GetHashCode()"/>
+		/// </summary>
+		public override int GetHashCode()
+		{
+			int Result = this.keySize.GetHashCode();
+			Result ^= Result << 5 ^ this.modulusBase64.GetHashCode();
+			Result ^= Result << 5 ^ this.exponentBase64	.GetHashCode();
+
+			return Result;
+		}
+
 	}
 }

@@ -234,6 +234,16 @@
             <see cref="M:System.Object.ToString"/>
             </summary>
         </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.E2eEndpoint.Equals(System.Object)">
+            <summary>
+            <see cref="M:System.Object.ToString"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.E2eEndpoint.GetHashCode">
+            <summary>
+            <see cref="M:System.Object.GetHashCode"/>
+            </summary>
+        </member>
         <member name="T:Waher.Networking.XMPP.P2P.E2E.EcAes256">
             <summary>
             Abstract base class for Elliptic Curve / AES-256 hybrid ciphers.
@@ -417,6 +427,16 @@
             <param name="Signature2">Second integer in ECDSA signature.</param>
             <param name="HashFunction">Hash function used in signature calculation.</param>
             <returns>If signature is valid.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.EcAes256.Equals(System.Object)">
+            <summary>
+            <see cref="M:System.Object.ToString"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.EcAes256.GetHashCode">
+            <summary>
+            <see cref="M:System.Object.GetHashCode"/>
+            </summary>
         </member>
         <member name="T:Waher.Networking.XMPP.P2P.E2E.IE2eEndpoint">
             <summary>
@@ -940,6 +960,16 @@
             </summary>
             <param name="Key">Encrypted key</param>
             <returns>Decrypted key</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaAes.Equals(System.Object)">
+            <summary>
+            <see cref="M:System.Object.ToString"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaAes.GetHashCode">
+            <summary>
+            <see cref="M:System.Object.GetHashCode"/>
+            </summary>
         </member>
         <member name="T:Waher.Networking.XMPP.P2P.EndpointSecurity">
             <summary>

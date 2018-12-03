@@ -556,7 +556,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		/// <param name="Signature2">Second integer in ECDSA signature.</param>
 		/// <param name="HashFunction">Hash function used in signature calculation.</param>
 		/// <returns>If signature is valid.</returns>
-		public bool Verify(byte[] Data, byte[] X, byte[] Y, byte[] Signature1, 
+		public bool Verify(byte[] Data, byte[] X, byte[] Y, byte[] Signature1,
 			byte[] Signature2, HashFunction HashFunction)
 		{
 			return this.Verify(Data, new PointOnCurve(FromNetwork(X), FromNetwork(Y)),
@@ -579,6 +579,29 @@ namespace Waher.Networking.XMPP.P2P.E2E
 				FromNetwork(Signature1), FromNetwork(Signature2));
 
 			return this.curve.Verify(Data, PublicKey, HashFunction, Signature);
+		}
+
+		/// <summary>
+		/// <see cref="Object.ToString()"/>
+		/// </summary>
+		public override bool Equals(object obj)
+		{
+			return obj is EcAes256 EcAes256 &&
+				this.curve.CurveName.Equals(EcAes256.curve.CurveName) &&
+				this.publicKey.X.Equals(EcAes256.publicKey.X) &&
+				this.publicKey.Y.Equals(EcAes256.publicKey.Y);
+		}
+
+		/// <summary>
+		/// <see cref="Object.GetHashCode()"/>
+		/// </summary>
+		public override int GetHashCode()
+		{
+			int Result = this.curve.CurveName.GetHashCode();
+			Result ^= Result << 5 ^ this.publicKey.X.GetHashCode();
+			Result ^= Result << 5 ^ this.publicKey.Y.GetHashCode();
+
+			return Result;
 		}
 
 	}

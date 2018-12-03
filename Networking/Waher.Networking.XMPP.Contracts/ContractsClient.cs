@@ -491,7 +491,7 @@ namespace Waher.Networking.XMPP.Contracts
 				return;
 			}
 
-			if (Now > Identity.To)
+			if (Now.Date > Identity.To)
 			{
 				this.ReturnStatus(IdentityStatus.NotValidAnymore, Callback, State);
 				return;
@@ -568,34 +568,34 @@ namespace Waher.Networking.XMPP.Contracts
 			Identity.Serialize(Xml, false, true, true, true, false);
 			Data = Encoding.UTF8.GetBytes(Xml.ToString());
 
+			bool HasOldPublicKey;
+
+			lock (this.publicKeys)
+			{
+				HasOldPublicKey = this.publicKeys.ContainsKey(Identity.Provider);
+			}
+
 			this.GetServerPublicKey(Identity.Provider, (sender, e) =>
 			{
 				if (e.Ok && e.Key != null)
 				{
+					bool Valid = false;
+
 					if (e.Key is RsaAes RsaAes)
 					{
-						if (!RsaAes.Verify(Data, Identity.ServerSignature1, RsaAes.KeySize,
-							RsaAes.Modulus, RsaAes.Exponent))
-						{
-							this.ReturnStatus(IdentityStatus.ProviderSignatureInvalid, Callback, State);
-							return;
-						}
+						if (RsaAes.Verify(Data, Identity.ServerSignature1, RsaAes.KeySize, RsaAes.Modulus, RsaAes.Exponent))
+							Valid = true;
 					}
 					else if (e.Key is EcAes256 RemoteEc)
 					{
-						if (Identity.ServerSignature2 == null ||
-							Identity.ServerSignature2.Length == 0)
+						if (Identity.ServerSignature2 == null || Identity.ServerSignature2.Length == 0)
 						{
 							this.ReturnStatus(IdentityStatus.NoProviderSignature, Callback, State);
 							return;
 						}
 
-						if (!RemoteEc.Verify(Data, RemoteEc.PublicKey,
-							Identity.ServerSignature1, Identity.ServerSignature2, HashFunction.SHA256))
-						{
-							this.ReturnStatus(IdentityStatus.ProviderSignatureInvalid, Callback, State);
-							return;
-						}
+						if (RemoteEc.Verify(Data, RemoteEc.PublicKey, Identity.ServerSignature1, Identity.ServerSignature2, HashFunction.SHA256))
+							Valid = true;
 					}
 					else
 					{
@@ -603,7 +603,71 @@ namespace Waher.Networking.XMPP.Contracts
 						return;
 					}
 
-					this.ReturnStatus(IdentityStatus.Valid, Callback, State);
+					if (Valid)
+					{
+						this.ReturnStatus(IdentityStatus.Valid, Callback, State);
+						return;
+					}
+
+					if (!HasOldPublicKey)
+					{
+						this.ReturnStatus(IdentityStatus.ProviderSignatureInvalid, Callback, State);
+						return;
+					}
+
+					lock (this.publicKeys)
+					{
+						this.publicKeys.Remove(Identity.Provider);
+					}
+
+					this.GetServerPublicKey(Identity.Provider, (sender2, e2) =>
+					{
+						if (e2.Ok && e2.Key != null)
+						{
+							if (e.Key.Equals(e2.Key))
+							{
+								this.ReturnStatus(IdentityStatus.ProviderSignatureInvalid, Callback, State);
+								return;
+							}
+
+							Valid = false;
+
+							if (e2.Key is RsaAes RsaAes2)
+							{
+								if (RsaAes.Verify(Data, Identity.ServerSignature1, RsaAes2.KeySize, RsaAes2.Modulus, RsaAes2.Exponent))
+									Valid = true;
+							}
+							else if (e2.Key is EcAes256 RemoteEc2)
+							{
+								if (RemoteEc2.Verify(Data, RemoteEc2.PublicKey, Identity.ServerSignature1, Identity.ServerSignature2, HashFunction.SHA256))
+									Valid = true;
+							}
+							else
+							{
+								this.ReturnStatus(IdentityStatus.ProviderKeyNotRecognized, Callback, State);
+								return;
+							}
+
+							if (Valid)
+							{
+								this.ReturnStatus(IdentityStatus.Valid, Callback, State);
+								return;
+							}
+							else
+							{
+								this.ReturnStatus(IdentityStatus.ProviderSignatureInvalid, Callback, State);
+								return;
+							}
+						}
+						else
+							this.ReturnStatus(IdentityStatus.NoProviderPublicKey, Callback, State);
+
+					}, State);
+
+					{
+						this.ReturnStatus(IdentityStatus.ProviderSignatureInvalid, Callback, State);
+						return;
+					}
 				}
 				else
 					this.ReturnStatus(IdentityStatus.NoProviderPublicKey, Callback, State);
@@ -733,26 +797,30 @@ namespace Waher.Networking.XMPP.Contracts
 			if (h != null)
 			{
 				LegalIdentity Identity = LegalIdentity.Parse(e.Content);
-				this.Validate(Identity, false, (sender2, e2) =>
+
+				if (string.Compare(e.FromBareJID, Identity.Provider, true) == 0)
 				{
-					if (e2.Status != IdentityStatus.Valid)
+					this.Validate(Identity, false, (sender2, e2) =>
 					{
-						Client.Error("Invalid legal identity received and discarded.");
+						if (e2.Status != IdentityStatus.Valid)
+						{
+							Client.Error("Invalid legal identity received and discarded.");
 
-						Log.Warning("Invalid legal identity received and discarded.", this.client.BareJID, e.From,
-							new KeyValuePair<string, object>("Status", e2.Status));
-						return;
-					}
+							Log.Warning("Invalid legal identity received and discarded.", this.client.BareJID, e.From,
+								new KeyValuePair<string, object>("Status", e2.Status));
+							return;
+						}
 
-					try
-					{
-						IdentityUpdated?.Invoke(this, new LegalIdentityEventArgs(new IqResultEventArgs(e.Message, e.Id, e.To, e.From, e.Ok, null), Identity));
-					}
-					catch (Exception ex)
-					{
-						Log.Critical(ex);
-					}
-				}, null);
+						try
+						{
+							IdentityUpdated?.Invoke(this, new LegalIdentityEventArgs(new IqResultEventArgs(e.Message, e.Id, e.To, e.From, e.Ok, null), Identity));
+						}
+						catch (Exception ex)
+						{
+							Log.Critical(ex);
+						}
+					}, null);
+				}
 			}
 		}
 

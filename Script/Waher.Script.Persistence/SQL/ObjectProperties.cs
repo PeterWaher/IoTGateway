@@ -88,11 +88,8 @@ namespace Waher.Script.Persistence.SQL
 		/// <returns>If a variable with the corresponding name was found.</returns>
 		public override bool TryGetVariable(string Name, out Variable Variable)
 		{
-			if (this.variables2.TryGetVariable(Name, out Variable))
-				return true;
-
-			if (base.TryGetVariable(Name, out Variable))
-				return true;
+			Tuple<PropertyInfo, FieldInfo> Rec;
+			object Value;
 
 			if (string.Compare(Name, "this", true) == 0)
 			{
@@ -100,13 +97,11 @@ namespace Waher.Script.Persistence.SQL
 				return true;
 			}
 
-			if (this.dictionary != null && this.dictionary.TryGetValue(Name, out object Value))
+			if (this.dictionary != null && this.dictionary.TryGetValue(Name, out Value))
 			{
 				Variable = new Variable(Name, Value);
 				return true;
 			}
-
-			Tuple<PropertyInfo, FieldInfo> Rec;
 
 			lock (this.variables)
 			{
@@ -127,12 +122,7 @@ namespace Waher.Script.Persistence.SQL
 				}
 			}
 
-			if (Rec == null)
-			{
-				Variable = null;
-				return false;
-			}
-			else
+			if (Rec != null)
 			{
 				if (Rec.Item1 != null)
 					Value = Rec.Item1.GetValue(this.obj);
@@ -143,6 +133,15 @@ namespace Waher.Script.Persistence.SQL
 
 				return true;
 			}
+
+			if (this.variables2.TryGetVariable(Name, out Variable))
+				return true;
+
+			if (base.TryGetVariable(Name, out Variable))
+				return true;
+
+			Variable = null;
+			return false;
 		}
 	}
 }

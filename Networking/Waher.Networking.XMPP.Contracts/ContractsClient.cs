@@ -118,6 +118,8 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		public override string[] Extensions => new string[] { };
 
+		#region Server Public Keys
+
 		/// <summary>
 		/// Gets the server public key.
 		/// </summary>
@@ -226,6 +228,10 @@ namespace Waher.Networking.XMPP.Contracts
 			return Result.Task;
 		}
 
+		#endregion
+
+		#region Matching Local Keys
+
 		/// <summary>
 		/// Get the local key that matches the server key.
 		/// </summary>
@@ -292,7 +298,6 @@ namespace Waher.Networking.XMPP.Contracts
 			}
 		}
 
-
 		/// <summary>
 		/// Get the local key that matches the server key.
 		/// </summary>
@@ -324,6 +329,10 @@ namespace Waher.Networking.XMPP.Contracts
 
 			return Result.Task;
 		}
+
+		#endregion
+
+		#region Apply for a Legal Identity
 
 		/// <summary>
 		/// Applies for a legal identity to be registered.
@@ -456,6 +465,10 @@ namespace Waher.Networking.XMPP.Contracts
 
 			return Result.Task;
 		}
+
+		#endregion
+
+		#region Validate Legal Identity
 
 		/// <summary>
 		/// Validates a legal identity.
@@ -722,6 +735,54 @@ namespace Waher.Networking.XMPP.Contracts
 			return Result.Task;
 		}
 
+		#endregion
+
+		#region Legal Identity update event
+
+		private void IdentityMessageHandler(object Sender, MessageEventArgs e)
+		{
+			LegalIdentityEventHandler h = IdentityUpdated;
+
+			if (h != null)
+			{
+				LegalIdentity Identity = LegalIdentity.Parse(e.Content);
+
+				if (string.Compare(e.FromBareJID, Identity.Provider, true) == 0)
+				{
+					this.Validate(Identity, false, (sender2, e2) =>
+					{
+						if (e2.Status != IdentityStatus.Valid)
+						{
+							Client.Error("Invalid legal identity received and discarded.");
+
+							Log.Warning("Invalid legal identity received and discarded.", this.client.BareJID, e.From,
+								new KeyValuePair<string, object>("Status", e2.Status));
+							return;
+						}
+
+						try
+						{
+							IdentityUpdated?.Invoke(this, new LegalIdentityEventArgs(new IqResultEventArgs(e.Message, e.Id, e.To, e.From, e.Ok, null), Identity));
+						}
+						catch (Exception ex)
+						{
+							Log.Critical(ex);
+						}
+					}, null);
+				}
+			}
+		}
+
+		/// <summary>
+		/// Event raised whenever the legal identity has been updated by the server.
+		/// The identity is validated before the event is raised. Invalid identities are discarded.
+		/// </summary>
+		public event LegalIdentityEventHandler IdentityUpdated = null;
+
+		#endregion
+
+		#region Get Legal Identities
+
 		/// <summary>
 		/// Gets legal identities registered with the account.
 		/// </summary>
@@ -800,45 +861,9 @@ namespace Waher.Networking.XMPP.Contracts
 			return Result.Task;
 		}
 
-		private void IdentityMessageHandler(object Sender, MessageEventArgs e)
-		{
-			LegalIdentityEventHandler h = IdentityUpdated;
+		#endregion
 
-			if (h != null)
-			{
-				LegalIdentity Identity = LegalIdentity.Parse(e.Content);
-
-				if (string.Compare(e.FromBareJID, Identity.Provider, true) == 0)
-				{
-					this.Validate(Identity, false, (sender2, e2) =>
-					{
-						if (e2.Status != IdentityStatus.Valid)
-						{
-							Client.Error("Invalid legal identity received and discarded.");
-
-							Log.Warning("Invalid legal identity received and discarded.", this.client.BareJID, e.From,
-								new KeyValuePair<string, object>("Status", e2.Status));
-							return;
-						}
-
-						try
-						{
-							IdentityUpdated?.Invoke(this, new LegalIdentityEventArgs(new IqResultEventArgs(e.Message, e.Id, e.To, e.From, e.Ok, null), Identity));
-						}
-						catch (Exception ex)
-						{
-							Log.Critical(ex);
-						}
-					}, null);
-				}
-			}
-		}
-
-		/// <summary>
-		/// Event raised whenever the legal identity has been updated by the server.
-		/// The identity is validated before the event is raised. Invalid identities are discarded.
-		/// </summary>
-		public event LegalIdentityEventHandler IdentityUpdated = null;
+		#region Get Legal Identity
 
 		/// <summary>
 		/// Gets information about a legal identity given its ID.
@@ -909,6 +934,153 @@ namespace Waher.Networking.XMPP.Contracts
 			return Result.Task;
 		}
 
+		#endregion
+
+		#region Obsolete Legal Identity
+
+		/// <summary>
+		/// Obsoletes one of the legal identities of the account, given its ID.
+		/// </summary>
+		/// <param name="LegalIdentityId">ID of the legal identity to obsolete.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
+		public void ObsoleteLegalIdentity(string LegalIdentityId, LegalIdentityEventHandler Callback, object State)
+		{
+			this.ObsoleteLegalIdentity(this.componentAddress, LegalIdentityId, Callback, State);
+		}
+
+		/// <summary>
+		/// Obsoletes one of the legal identities of the account, given its ID.
+		/// </summary>
+		/// <param name="Address">Address of entity on which the legal identity are registered.</param>
+		/// <param name="LegalIdentityId">ID of the legal identity to obsolete.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
+		public void ObsoleteLegalIdentity(string Address, string LegalIdentityId, LegalIdentityEventHandler Callback, object State)
+		{
+			this.client.SendIqSet(Address, "<obsoleteLegalIdentity id=\"" + XML.Encode(LegalIdentityId) + "\" xmlns=\"" +
+				NamespaceLegalIdentities + "\"/>", (sender, e) =>
+				{
+					LegalIdentity Identity = null;
+					XmlElement E;
+
+					if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "identity" && E.NamespaceURI == NamespaceLegalIdentities)
+						Identity = LegalIdentity.Parse(E);
+					else
+						e.Ok = false;
+
+					Callback?.Invoke(this, new LegalIdentityEventArgs(e, Identity));
+				}, State);
+		}
+
+		/// <summary>
+		/// Obsoletes one of the legal identities of the account, given its ID.
+		/// </summary>
+		/// <param name="LegalIdentityId">ID of the legal identity to obsolete.</param>
+		/// <returns>Legal identity object corresponding to <paramref name="LegalIdentityId"/>.</returns>
+		public Task<LegalIdentity> ObsoleteLegalIdentityAsync(string LegalIdentityId)
+		{
+			return this.ObsoleteLegalIdentityAsync(this.componentAddress, LegalIdentityId);
+		}
+
+		/// <summary>
+		/// Obsoletes one of the legal identities of the account, given its ID.
+		/// </summary>
+		/// <param name="Address">Address of entity on which the legal identity are registered.</param>
+		/// <param name="LegalIdentityId">ID of the legal identity to obsolete.</param>
+		/// <returns>Legal identity object corresponding to <paramref name="LegalIdentityId"/>.</returns>
+		public Task<LegalIdentity> ObsoleteLegalIdentityAsync(string Address, string LegalIdentityId)
+		{
+			TaskCompletionSource<LegalIdentity> Result = new TaskCompletionSource<LegalIdentity>();
+
+			this.ObsoleteLegalIdentity(Address, LegalIdentityId, (sender, e) =>
+			{
+				if (e.Ok)
+					Result.SetResult(e.Identity);
+				else
+				{
+					Result.SetException(new IOException(string.IsNullOrEmpty(e.ErrorText) ?
+						"Unable to obsolete legal identity." : e.ErrorText));
+				}
+			}, null);
+
+			return Result.Task;
+		}
+
+		#endregion
+
+		#region Compromize Legal Identity
+
+		/// <summary>
+		/// Compromizes one of the legal identities of the account, given its ID.
+		/// </summary>
+		/// <param name="LegalIdentityId">ID of the legal identity to compromize.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
+		public void CompromizeLegalIdentity(string LegalIdentityId, LegalIdentityEventHandler Callback, object State)
+		{
+			this.CompromizeLegalIdentity(this.componentAddress, LegalIdentityId, Callback, State);
+		}
+
+		/// <summary>
+		/// Compromizes one of the legal identities of the account, given its ID.
+		/// </summary>
+		/// <param name="Address">Address of entity on which the legal identity are registered.</param>
+		/// <param name="LegalIdentityId">ID of the legal identity to compromize.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
+		public void CompromizeLegalIdentity(string Address, string LegalIdentityId, LegalIdentityEventHandler Callback, object State)
+		{
+			this.client.SendIqSet(Address, "<compromizedLegalIdentity id=\"" + XML.Encode(LegalIdentityId) + "\" xmlns=\"" +
+				NamespaceLegalIdentities + "\"/>", (sender, e) =>
+				{
+					LegalIdentity Identity = null;
+					XmlElement E;
+
+					if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "identity" && E.NamespaceURI == NamespaceLegalIdentities)
+						Identity = LegalIdentity.Parse(E);
+					else
+						e.Ok = false;
+
+					Callback?.Invoke(this, new LegalIdentityEventArgs(e, Identity));
+				}, State);
+		}
+
+		/// <summary>
+		/// Compromizes one of the legal identities of the account, given its ID.
+		/// </summary>
+		/// <param name="LegalIdentityId">ID of the legal identity to compromize.</param>
+		/// <returns>Legal identity object corresponding to <paramref name="LegalIdentityId"/>.</returns>
+		public Task<LegalIdentity> CompromizeLegalIdentityAsync(string LegalIdentityId)
+		{
+			return this.CompromizeLegalIdentityAsync(this.componentAddress, LegalIdentityId);
+		}
+
+		/// <summary>
+		/// Compromizes one of the legal identities of the account, given its ID.
+		/// </summary>
+		/// <param name="Address">Address of entity on which the legal identity are registered.</param>
+		/// <param name="LegalIdentityId">ID of the legal identity to compromize.</param>
+		/// <returns>Legal identity object corresponding to <paramref name="LegalIdentityId"/>.</returns>
+		public Task<LegalIdentity> CompromizeLegalIdentityAsync(string Address, string LegalIdentityId)
+		{
+			TaskCompletionSource<LegalIdentity> Result = new TaskCompletionSource<LegalIdentity>();
+
+			this.CompromizeLegalIdentity(Address, LegalIdentityId, (sender, e) =>
+			{
+				if (e.Ok)
+					Result.SetResult(e.Identity);
+				else
+				{
+					Result.SetException(new IOException(string.IsNullOrEmpty(e.ErrorText) ?
+						"Unable to compromize legal identity." : e.ErrorText));
+				}
+			}, null);
+
+			return Result.Task;
+		}
+
+		#endregion
 
 	}
 }

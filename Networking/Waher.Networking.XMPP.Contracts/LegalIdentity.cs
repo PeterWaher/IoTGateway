@@ -28,9 +28,19 @@ namespace Waher.Networking.XMPP.Contracts
 		Rejected,
 
 		/// <summary>
-		/// The legal identity is authenticated and approved by the Trust Anchor.
+		/// The legal identity is authenticated and approved by the Trust Provider.
 		/// </summary>
-		Approved
+		Approved,
+
+		/// <summary>
+		/// The legal identity has been explicitly obsoleted by its owner, or by the Trust Provider.
+		/// </summary>
+		Obsoleted,
+
+		/// <summary>
+		/// The legal identity has been reported compromized by its owner, or by the Trust Provider.
+		/// </summary>
+		Compromized
 	}
 
 	/// <summary>

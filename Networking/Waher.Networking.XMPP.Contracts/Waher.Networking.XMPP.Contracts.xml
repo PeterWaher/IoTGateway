@@ -321,7 +321,7 @@
             <summary>
             Validates a signature of binary data.
             </summary>
-            <param name="LegalId">Legal identity used to create the signature.</param>
+            <param name="LegalId">Legal identity used to create the signature. If empty, current approved legal identities will be used to validate the signature.</param>
             <param name="Data">Binary data to sign-</param>
             <param name="S1">First signature of data</param>
             <param name="S2">Second signature of data, if available.</param>
@@ -333,7 +333,7 @@
             Validates a signature of binary data.
             </summary>
             <param name="Address">Address of entity on which the legal identity are registered.</param>
-            <param name="LegalId">Legal identity used to create the signature.</param>
+            <param name="LegalId">Legal identity used to create the signature. If empty, current approved legal identities will be used to validate the signature.</param>
             <param name="Data">Binary data to sign-</param>
             <param name="S1">First signature of data</param>
             <param name="S2">Second signature of data, if available.</param>
@@ -344,7 +344,7 @@
             <summary>
             Validates a signature of binary data.
             </summary>
-            <param name="LegalId">Legal identity used to create the signature.</param>
+            <param name="LegalId">Legal identity used to create the signature. If empty, current approved legal identities will be used to validate the signature.</param>
             <param name="Data">Binary data to sign-</param>
             <param name="S1">First signature of data</param>
             <param name="S2">Second signature of data, if available.</param>
@@ -354,7 +354,7 @@
             Validates a signature of binary data.
             </summary>
             <param name="Address">Address of entity on which the legal identity are registered.</param>
-            <param name="LegalId">Legal identity used to create the signature.</param>
+            <param name="LegalId">Legal identity used to create the signature. If empty, current approved legal identities will be used to validate the signature.</param>
             <param name="Data">Binary data to sign-</param>
             <param name="S1">First signature of data</param>
             <param name="S2">Second signature of data, if available.</param>

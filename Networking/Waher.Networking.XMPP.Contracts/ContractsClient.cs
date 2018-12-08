@@ -1177,7 +1177,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <summary>
 		/// Validates a signature of binary data.
 		/// </summary>
-		/// <param name="LegalId">Legal identity used to create the signature.</param>
+		/// <param name="LegalId">Legal identity used to create the signature. If empty, current approved legal identities will be used to validate the signature.</param>
 		/// <param name="Data">Binary data to sign-</param>
 		/// <param name="S1">First signature of data</param>
 		/// <param name="S2">Second signature of data, if available.</param>
@@ -1192,7 +1192,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// Validates a signature of binary data.
 		/// </summary>
 		/// <param name="Address">Address of entity on which the legal identity are registered.</param>
-		/// <param name="LegalId">Legal identity used to create the signature.</param>
+		/// <param name="LegalId">Legal identity used to create the signature. If empty, current approved legal identities will be used to validate the signature.</param>
 		/// <param name="Data">Binary data to sign-</param>
 		/// <param name="S1">First signature of data</param>
 		/// <param name="S2">Second signature of data, if available.</param>
@@ -1202,10 +1202,15 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			StringBuilder Xml = new StringBuilder();
 
-			Xml.Append("<validateSignature id=\"");
-			Xml.Append(XML.Encode(LegalId));
-			Xml.Append("\" data=\"");
+			Xml.Append("<validateSignature data=\"");
 			Xml.Append(Convert.ToBase64String(Data));
+
+			if (!string.IsNullOrEmpty(LegalId))
+			{
+				Xml.Append("\" id=\"");
+				Xml.Append(XML.Encode(LegalId));
+			}
+
 			Xml.Append("\" s1=\"");
 			Xml.Append(Convert.ToBase64String(S1));
 
@@ -1220,23 +1225,23 @@ namespace Waher.Networking.XMPP.Contracts
 			Xml.Append("\"/>");
 
 			this.client.SendIqGet(Address, Xml.ToString(), (sender, e) =>
-				{
-					LegalIdentity Identity = null;
-					XmlElement E;
+			{
+				LegalIdentity Identity = null;
+				XmlElement E;
 
-					if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "identity" && E.NamespaceURI == NamespaceLegalIdentities)
-						Identity = LegalIdentity.Parse(E);
-					else
-						e.Ok = false;
+				if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "identity" && E.NamespaceURI == NamespaceLegalIdentities)
+					Identity = LegalIdentity.Parse(E);
+				else
+					e.Ok = false;
 
-					Callback?.Invoke(this, new LegalIdentityEventArgs(e, Identity));
-				}, State);
+				Callback?.Invoke(this, new LegalIdentityEventArgs(e, Identity));
+			}, State);
 		}
 
 		/// <summary>
 		/// Validates a signature of binary data.
 		/// </summary>
-		/// <param name="LegalId">Legal identity used to create the signature.</param>
+		/// <param name="LegalId">Legal identity used to create the signature. If empty, current approved legal identities will be used to validate the signature.</param>
 		/// <param name="Data">Binary data to sign-</param>
 		/// <param name="S1">First signature of data</param>
 		/// <param name="S2">Second signature of data, if available.</param>
@@ -1249,7 +1254,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// Validates a signature of binary data.
 		/// </summary>
 		/// <param name="Address">Address of entity on which the legal identity are registered.</param>
-		/// <param name="LegalId">Legal identity used to create the signature.</param>
+		/// <param name="LegalId">Legal identity used to create the signature. If empty, current approved legal identities will be used to validate the signature.</param>
 		/// <param name="Data">Binary data to sign-</param>
 		/// <param name="S1">First signature of data</param>
 		/// <param name="S2">Second signature of data, if available.</param>

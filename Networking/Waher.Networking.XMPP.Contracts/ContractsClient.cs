@@ -150,6 +150,11 @@ namespace Waher.Networking.XMPP.Contracts
 			{
 				try
 				{
+					e0 = new KeyEventArgs(e0, e0.Key)
+					{
+						State = State
+					};
+
 					Callback?.Invoke(this, e0);
 				}
 				catch (Exception ex)
@@ -262,6 +267,11 @@ namespace Waher.Networking.XMPP.Contracts
 			{
 				try
 				{
+					e0 = new KeyEventArgs(e0, e0.Key)
+					{
+						State = State
+					};
+
 					Callback?.Invoke(this, e0);
 				}
 				catch (Exception ex)
@@ -430,7 +440,6 @@ namespace Waher.Networking.XMPP.Contracts
 					Callback?.Invoke(this, new LegalIdentityEventArgs(e, null));
 			}, State);
 		}
-
 
 		/// <summary>
 		/// Applies for a legal identity to be registered.
@@ -1082,5 +1091,183 @@ namespace Waher.Networking.XMPP.Contracts
 
 		#endregion
 
+		#region Signatures
+
+		/// <summary>
+		/// Signs binary data with the corresponding private key.
+		/// </summary>
+		/// <param name="Data">Binary data to sign-</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
+		public void Sign(byte[] Data, SignatureEventHandler Callback, object State)
+		{
+			this.Sign(this.componentAddress, Data, Callback, State);
+		}
+
+		/// <summary>
+		/// Signs binary data with the corresponding private key.
+		/// </summary>
+		/// <param name="Address">Address of entity on which the legal identity are registered.</param>
+		/// <param name="Data">Binary data to sign-</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
+		public void Sign(string Address, byte[] Data, SignatureEventHandler Callback, object State)
+		{
+			this.GetMatchingLocalKey(Address, (sender, e) =>
+			{
+				byte[] s1 = null;
+				byte[] s2 = null;
+
+				if (e.Ok)
+				{
+					if (e.Key is EcAes256 EcAes256)
+					{
+						KeyValuePair<byte[], byte[]> Signature = EcAes256.Sign(Data, Security.HashFunction.SHA256);
+
+						s1 = Signature.Key;
+						s2 = Signature.Value;
+					}
+					else if (e.Key is RsaAes RsaAes)
+					{
+						s1 = RsaAes.Sign(Data);
+						s2 = null;
+					}
+					else
+						e.Ok = false;
+				}
+
+				Callback?.Invoke(this, new SignatureEventArgs(e, s1, s2));
+
+			}, State);
+		}
+
+		/// <summary>
+		/// Signs binary data with the corresponding private key.
+		/// </summary>
+		/// <param name="Data">Binary data to sign-</param>
+		public Task<KeyValuePair<byte[], byte[]>> SignAsync(byte[] Data)
+		{
+			return this.SignAsync(this.componentAddress, Data);
+		}
+
+		/// <summary>
+		/// Signs binary data with the corresponding private key.
+		/// </summary>
+		/// <param name="Address">Address of entity on which the legal identity are registered.</param>
+		/// <param name="Data">Binary data to sign-</param>
+		public Task<KeyValuePair<byte[], byte[]>> SignAsync(string Address, byte[] Data)
+		{
+			TaskCompletionSource<KeyValuePair<byte[], byte[]>> Result = new TaskCompletionSource<KeyValuePair<byte[], byte[]>>();
+
+			this.Sign(Address, Data, (sender, e) =>
+			{
+				if (e.Ok)
+					Result.SetResult(new KeyValuePair<byte[], byte[]>(e.S1, e.S2));
+				else
+					Result.SetException(new IOException(string.IsNullOrEmpty(e.ErrorText) ? "Unable to sign data." : e.ErrorText));
+			}, null);
+
+			return Result.Task;
+		}
+
+		#endregion
+
+		#region Validating Signatures
+
+		/// <summary>
+		/// Validates a signature of binary data.
+		/// </summary>
+		/// <param name="LegalId">Legal identity used to create the signature.</param>
+		/// <param name="Data">Binary data to sign-</param>
+		/// <param name="S1">First signature of data</param>
+		/// <param name="S2">Second signature of data, if available.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
+		public void ValidateSignature(string LegalId, byte[] Data, byte[] S1, byte[] S2, LegalIdentityEventHandler Callback, object State)
+		{
+			this.ValidateSignature(this.componentAddress, LegalId, Data, S1, S2, Callback, State);
+		}
+
+		/// <summary>
+		/// Validates a signature of binary data.
+		/// </summary>
+		/// <param name="Address">Address of entity on which the legal identity are registered.</param>
+		/// <param name="LegalId">Legal identity used to create the signature.</param>
+		/// <param name="Data">Binary data to sign-</param>
+		/// <param name="S1">First signature of data</param>
+		/// <param name="S2">Second signature of data, if available.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
+		public void ValidateSignature(string Address, string LegalId, byte[] Data, byte[] S1, byte[] S2, LegalIdentityEventHandler Callback, object State)
+		{
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<validateSignature id=\"");
+			Xml.Append(XML.Encode(LegalId));
+			Xml.Append("\" data=\"");
+			Xml.Append(Convert.ToBase64String(Data));
+			Xml.Append("\" s1=\"");
+			Xml.Append(Convert.ToBase64String(S1));
+
+			if (S2 != null)
+			{
+				Xml.Append("\" s2=\"");
+				Xml.Append(Convert.ToBase64String(S2));
+			}
+
+			Xml.Append("\" xmlns=\"");
+			Xml.Append(NamespaceLegalIdentities);
+			Xml.Append("\"/>");
+
+			this.client.SendIqGet(Address, Xml.ToString(), (sender, e) =>
+				{
+					LegalIdentity Identity = null;
+					XmlElement E;
+
+					if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "identity" && E.NamespaceURI == NamespaceLegalIdentities)
+						Identity = LegalIdentity.Parse(E);
+					else
+						e.Ok = false;
+
+					Callback?.Invoke(this, new LegalIdentityEventArgs(e, Identity));
+				}, State);
+		}
+
+		/// <summary>
+		/// Validates a signature of binary data.
+		/// </summary>
+		/// <param name="LegalId">Legal identity used to create the signature.</param>
+		/// <param name="Data">Binary data to sign-</param>
+		/// <param name="S1">First signature of data</param>
+		/// <param name="S2">Second signature of data, if available.</param>
+		public Task<LegalIdentity> ValidateSignatureAsync(string LegalId, byte[] Data, byte[] S1, byte[] S2)
+		{
+			return this.ValidateSignatureAsync(this.componentAddress, LegalId, Data, S1, S2);
+		}
+
+		/// <summary>
+		/// Validates a signature of binary data.
+		/// </summary>
+		/// <param name="Address">Address of entity on which the legal identity are registered.</param>
+		/// <param name="LegalId">Legal identity used to create the signature.</param>
+		/// <param name="Data">Binary data to sign-</param>
+		/// <param name="S1">First signature of data</param>
+		/// <param name="S2">Second signature of data, if available.</param>
+		public Task<LegalIdentity> ValidateSignatureAsync(string Address, string LegalId, byte[] Data, byte[] S1, byte[] S2)
+		{
+			TaskCompletionSource<LegalIdentity> Result = new TaskCompletionSource<LegalIdentity>();
+
+			this.ValidateSignature(Address, LegalId, Data, S1, S2, (sender, e) =>
+			{
+				if (e.Ok)
+					Result.SetResult(e.Identity);
+				else
+					Result.SetException(new IOException(string.IsNullOrEmpty(e.ErrorText) ? "Unable to sign data." : e.ErrorText));
+			}, null);
+
+			return Result.Task;
+		}
+
+		#endregion
 	}
 }

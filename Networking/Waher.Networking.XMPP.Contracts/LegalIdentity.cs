@@ -509,14 +509,43 @@ namespace Waher.Networking.XMPP.Contracts
 		}
 
 		/// <summary>
-		/// Validates the client signature
+		/// Validates a client signature
 		/// </summary>
+		/// <param name="Data">Binary data being signed.</param>
+		/// <param name="s1">First signature</param>
+		/// <param name="s2">Second signature, if available.</param>
 		/// <returns>If the client signature is correct</returns>
-		public bool ValidateClientSignature()
+		public bool ValidateSignature(byte[] Data, byte[] s1, byte[] s2)
 		{
 			if (!this.HasClientPublicKey)
 				return false;
 
+			if (this.clientKeyName.StartsWith("RSA"))
+			{
+				if (!int.TryParse(this.clientKeyName.Substring(3), out int KeySize))
+					return false;
+
+				return RsaAes.Verify(Data, s1, KeySize, this.clientPubKey1, this.clientPubKey2);
+			}
+			else if (EndpointSecurity.TryCreateEndpoint(this.clientKeyName,
+				EndpointSecurity.IoTHarmonizationE2E, out IE2eEndpoint Endpoint) &&
+				Endpoint is EcAes256 EcAes256)
+			{
+				if (s2 == null)
+					return false;
+
+				return EcAes256.Verify(Data, this.clientPubKey1, this.clientPubKey2, s1, s2, HashFunction.SHA256);
+			}
+			else
+				return false;
+		}
+
+		/// <summary>
+		/// Validates the client signature of the legal identity
+		/// </summary>
+		/// <returns>If the client signature of the legal identity is correct</returns>
+		public bool ValidateClientSignature()
+		{
 			if (!this.HasClientSignature)
 				return false;
 
@@ -524,22 +553,7 @@ namespace Waher.Networking.XMPP.Contracts
 			this.Serialize(Xml, false, false, false, false, false);
 			byte[] Data = Encoding.UTF8.GetBytes(Xml.ToString());
 
-			if (this.clientKeyName.StartsWith("RSA"))
-			{
-				if (!int.TryParse(this.clientKeyName.Substring(3), out int KeySize))
-					return false;
-
-				return RsaAes.Verify(Data, this.clientSignature1, KeySize, this.clientPubKey1, this.clientPubKey2);
-			}
-			else if (EndpointSecurity.TryCreateEndpoint(this.clientKeyName,
-				EndpointSecurity.IoTHarmonizationE2E, out IE2eEndpoint Endpoint) &&
-				Endpoint is EcAes256 EcAes256)
-			{
-				return EcAes256.Verify(Data, this.clientPubKey1, this.clientPubKey2,
-					this.clientSignature1, this.clientSignature2, HashFunction.SHA256);
-			}
-			else
-				return false;
+			return this.ValidateSignature(Data, this.clientSignature1, this.clientSignature2);
 		}
 
 		/// <summary>

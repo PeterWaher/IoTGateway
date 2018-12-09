@@ -159,7 +159,7 @@ namespace Waher.Persistence
 		}
 
 		/// <summary>
-		/// Finds objects of a given class <typeparamref name="T"/>.
+		/// Finds the first object of a given class <typeparamref name="T"/> and deletes the rest.
 		/// </summary>
 		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
 		/// <param name="Filter">Optional filter. Can be null.</param>
@@ -170,6 +170,41 @@ namespace Waher.Persistence
 		public static async Task<T> FindFirstDeleteRest<T>(Filter Filter, params string[] SortOrder)
 		{
 			return await FirstDeleteRest<T>(await Provider.Find<T>(0, int.MaxValue, Filter, SortOrder));
+		}
+
+		/// <summary>
+		/// Finds the first object of a given class <typeparamref name="T"/> and ignores the rest.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>Objects found.</returns>
+		///	<exception cref="TimeoutException">Thrown if a response is not returned from the database within the given number of milliseconds.</exception>
+		public async static Task<T> FindFirstIgnoreRest<T>(params string[] SortOrder)
+		{
+			return FirstIgnoreRest<T>(await Provider.Find<T>(0, int.MaxValue, SortOrder));
+		}
+
+		private static T FirstIgnoreRest<T>(IEnumerable<T> Set)
+		{
+			foreach (T Obj in Set)
+				return Obj;
+
+			return default(T);
+		}
+
+		/// <summary>
+		/// Finds the first object of a given class <typeparamref name="T"/> and ignores the rest.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>Objects found.</returns>
+		///	<exception cref="TimeoutException">Thrown if a response is not returned from the database within the given number of milliseconds.</exception>
+		public static async Task<T> FindFirstIgnoreRest<T>(Filter Filter, params string[] SortOrder)
+		{
+			return FirstIgnoreRest<T>(await Provider.Find<T>(0, int.MaxValue, Filter, SortOrder));
 		}
 
 		/// <summary>

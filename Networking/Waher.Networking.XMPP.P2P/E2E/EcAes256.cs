@@ -1,5 +1,4 @@
-﻿//#define DEBUG_AES
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Security.Cryptography;
@@ -7,6 +6,7 @@ using System.Text;
 using System.Xml;
 using Waher.Content.Xml;
 using Waher.Events;
+using Waher.Runtime.Cache;
 using Waher.Security;
 using Waher.Security.EllipticCurves;
 
@@ -17,15 +17,15 @@ namespace Waher.Networking.XMPP.P2P.E2E
 	/// </summary>
 	public abstract class EcAes256 : Aes256
 	{
+		private static readonly Cache<string, byte[]> sharedSecrets = new Cache<string, byte[]>(int.MaxValue, TimeSpan.MaxValue, TimeSpan.FromDays(1));
+
 		/// <summary>
 		/// Remote public key.
 		/// </summary>
 		protected readonly PointOnCurve publicKey;
-
 		private readonly CurvePrimeField curve;
-		private byte[] sharedKey = null;
-		private byte[] sharedKeyOld = null;
 		private readonly bool hasPrivateKey;
+		private readonly string keyString;
 
 		/// <summary>
 		/// Abstract base class for Elliptic Curve / AES-256 hybrid ciphers.s
@@ -37,6 +37,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
 			this.curve = Curve;
 			this.publicKey = Curve.PublicKey;
 			this.hasPrivateKey = true;
+			this.keyString = this.publicKey.X.ToString() + "," + this.publicKey.Y.ToString();
 		}
 
 		/// <summary>
@@ -51,6 +52,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
 			this.publicKey = new PointOnCurve(FromNetwork(X), FromNetwork(Y));
 			this.curve = ReferenceCurve;
 			this.hasPrivateKey = false;
+			this.keyString = this.publicKey.X.ToString() + "," + this.publicKey.Y.ToString();
 		}
 
 		/// <summary>
@@ -160,29 +162,17 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		/// <summary>
 		/// Shared secret, for underlying AES cipher.
 		/// </summary>
-		public byte[] Key
+		public static byte[] GetSharedKey(EcAes256 LocalKey, EcAes256 RemoteKey)
 		{
-			get
-			{
-				if (this.sharedKey == null)
-					this.sharedKey = this.curve.GetSharedKey(this.publicKey, HashFunction.SHA256);
+			string Key = LocalKey.keyString + ";" + RemoteKey.keyString;
 
-				return this.sharedKey;
-			}
-		}
+			if (sharedSecrets.TryGetValue(Key, out byte[] SharedKey))
+				return SharedKey;
 
-		/// <summary>
-		/// Previous shared secret, for underlying AES cipher.
-		/// </summary>
-		public byte[] OldKey
-		{
-			get
-			{
-				if (this.sharedKeyOld == null)
-					this.sharedKeyOld = this.PrevCurve?.GetSharedKey(this.publicKey, HashFunction.SHA256);
+			SharedKey = LocalKey.curve.GetSharedKey(RemoteKey.publicKey, HashFunction.SHA256);
+			sharedSecrets[Key] = SharedKey;
 
-				return this.sharedKeyOld;
-			}
+			return SharedKey;
 		}
 
 		/// <summary>
@@ -193,32 +183,21 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		/// <param name="From">From attribute</param>
 		/// <param name="To">To attribute</param>
 		/// <param name="Data">Binary data to encrypt</param>
+		/// <param name="LocalEndpoint">Local endpoint of same type.</param>
 		/// <returns>Encrypted data</returns>
-		public override byte[] Encrypt(string Id, string Type, string From, string To, byte[] Data)
+		public override byte[] Encrypt(string Id, string Type, string From, string To, byte[] Data, IE2eEndpoint LocalEndpoint)
 		{
+			if (!(LocalEndpoint is EcAes256 LocalEcAes256))
+				return null;
+
 			byte[] Encrypted;
-			byte[] Key = this.Key;
+			byte[] Key = GetSharedKey(LocalEcAes256, this);
 			byte[] IV = GetIV(Id, Type, From, To);
 			KeyValuePair<BigInteger, BigInteger> Signature;
 
 			Encrypted = this.Encrypt(Data, Key, IV);
 
-			Signature = this.Curve.Sign(Data, HashFunction.SHA256);
-
-#if DEBUG_AES
-			Log.Notice("Encrypting.",
-				new KeyValuePair<string, object>("Id", Id),
-				new KeyValuePair<string, object>("Type", Type),
-				new KeyValuePair<string, object>("To", To),
-				new KeyValuePair<string, object>("Local.X: ", this.Curve.PublicKey.X.ToString()),
-				new KeyValuePair<string, object>("Local.Y: ", this.Curve.PublicKey.Y.ToString()),
-				new KeyValuePair<string, object>("Remote.X: ", this.publicKey.X.ToString()),
-				new KeyValuePair<string, object>("Remote.Y: ", this.publicKey.Y.ToString()),
-				new KeyValuePair<string, object>("Key: ", Convert.ToBase64String(Key)),
-				new KeyValuePair<string, object>("IV: ", Convert.ToBase64String(IV)),
-				new KeyValuePair<string, object>("Signature1: ", Signature.Key.ToString()),
-				new KeyValuePair<string, object>("Signature2: ", Signature.Value.ToString()));
-#endif
+			Signature = LocalEcAes256.Curve.Sign(Data, HashFunction.SHA256);
 
 			byte[] Signature1 = ToNetwork(Signature.Key);
 			byte[] Signature2 = ToNetwork(Signature.Value);
@@ -257,9 +236,13 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		/// <param name="From">From attribute</param>
 		/// <param name="To">To attribute</param>
 		/// <param name="Data">Binary data to decrypt</param>
+		/// <param name="RemoteEndpoint">Remote endpoint of same type.</param>
 		/// <returns>Decrypted data</returns>
-		public override byte[] Decrypt(string Id, string Type, string From, string To, byte[] Data)
+		public override byte[] Decrypt(string Id, string Type, string From, string To, byte[] Data, IE2eEndpoint RemoteEndpoint)
 		{
+			if (!(RemoteEndpoint is EcAes256 RemoteEcAes256))
+				return null;
+
 			if (Data.Length < 6)
 				return null;
 
@@ -294,69 +277,43 @@ namespace Waher.Networking.XMPP.P2P.E2E
 			i += DataLen;
 
 			byte[] Decrypted;
-			byte[] Key = this.Key;
+			byte[] Key = GetSharedKey(this, RemoteEcAes256);
 			byte[] IV = GetIV(Id, Type, From, To);
 			BigInteger r = FromNetwork(Signature1);
 			BigInteger s = FromNetwork(Signature2);
-
-#if DEBUG_AES
-			Log.Notice("Decrypting.",
-				new KeyValuePair<string, object>("Id", Id),
-				new KeyValuePair<string, object>("Type", Type),
-				new KeyValuePair<string, object>("To", To),
-				new KeyValuePair<string, object>("Local.X: ", this.Curve.PublicKey.X.ToString()),
-				new KeyValuePair<string, object>("Local.Y: ", this.Curve.PublicKey.Y.ToString()),
-				new KeyValuePair<string, object>("Remote.X: ", this.publicKey.X.ToString()),
-				new KeyValuePair<string, object>("Remote.Y: ", this.publicKey.Y.ToString()),
-				new KeyValuePair<string, object>("Key: ", Convert.ToBase64String(Key)),
-				new KeyValuePair<string, object>("IV: ", Convert.ToBase64String(IV)),
-				new KeyValuePair<string, object>("Signature1: ", r.ToString()),
-				new KeyValuePair<string, object>("Signature2: ", s.ToString()));
-#endif
 
 			try
 			{
 				Decrypted = this.Decrypt(Encrypted, Key, IV);
 
-				if (Decrypted != null && !this.Curve.Verify(Decrypted, this.publicKey, HashFunction.SHA256, new KeyValuePair<BigInteger, BigInteger>(r, s)))
-					Decrypted = null;
+				if (Decrypted != null && RemoteEcAes256.Curve.Verify(Decrypted, RemoteEcAes256.publicKey, HashFunction.SHA256, new KeyValuePair<BigInteger, BigInteger>(r, s)))
+					return Decrypted;
 			}
 			catch (Exception)
 			{
-				Decrypted = null;
+				// Invalid key
 			}
 
-			if (Decrypted == null)
+			if (this.Previous is EcAes256 PrevEcAes256)
 			{
 				try
 				{
-					Key = this.OldKey;
-
-#if DEBUG_AES
-					Log.Notice("Decrypting (old key).",
-						new KeyValuePair<string, object>("Old.Local.X: ", this.PrevCurve.PublicKey.X.ToString()),
-						new KeyValuePair<string, object>("Old.Local.Y: ", this.PrevCurve.PublicKey.Y.ToString()),
-						new KeyValuePair<string, object>("Old.Key: ", Convert.ToBase64String(Key)));
-#endif
+					Key = GetSharedKey(PrevEcAes256, RemoteEcAes256);
 
 					if (Key != null)
 					{
 						Decrypted = this.Decrypt(Encrypted, Key, IV);
-						if (Decrypted == null)
-							return null;
-						else if (!this.PrevCurve.Verify(Decrypted, this.publicKey, HashFunction.SHA256, new KeyValuePair<BigInteger, BigInteger>(r, s)))
-							return null;
+						if (Decrypted != null && RemoteEcAes256.Curve.Verify(Decrypted, RemoteEcAes256.publicKey, HashFunction.SHA256, new KeyValuePair<BigInteger, BigInteger>(r, s)))
+							return Decrypted;
 					}
-					else
-						return null;
 				}
 				catch (Exception)
 				{
-					return null;    // Invalid keys.
+					// Invalid key
 				}
 			}
 
-			return Decrypted;
+			return null;
 		}
 
 		/// <summary>
@@ -368,33 +325,22 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		/// <param name="To">To attribute</param>
 		/// <param name="Data">Binary data to encrypt</param>
 		/// <param name="Xml">XML output</param>
+		/// <param name="LocalEndpoint">Local endpoint of same type.</param>
 		/// <returns>If encryption was possible</returns>
-		public override bool Encrypt(string Id, string Type, string From, string To, byte[] Data, StringBuilder Xml)
+		public override bool Encrypt(string Id, string Type, string From, string To, byte[] Data, StringBuilder Xml, IE2eEndpoint LocalEndpoint)
 		{
+			if (!(LocalEndpoint is EcAes256 LocalEcAes256))
+				return false;
+
 			byte[] Encrypted;
-			byte[] Key = this.Key;
+			byte[] Key = GetSharedKey(LocalEcAes256, this);
 			byte[] IV = GetIV(Id, Type, From, To);
 			KeyValuePair<BigInteger, BigInteger> Signature;
 
 			Encrypted = this.Encrypt(Data, Key, IV);
-			Signature = this.Curve.Sign(Data, HashFunction.SHA256);
 
-#if DEBUG_AES
-			Log.Notice("Encrypting.",
-				new KeyValuePair<string, object>("Id", Id),
-				new KeyValuePair<string, object>("Type", Type),
-				new KeyValuePair<string, object>("To", To),
-				new KeyValuePair<string, object>("Local.X: ", this.Curve.PublicKey.X.ToString()),
-				new KeyValuePair<string, object>("Local.Y: ", this.Curve.PublicKey.Y.ToString()),
-				new KeyValuePair<string, object>("Remote.X: ", this.publicKey.X.ToString()),
-				new KeyValuePair<string, object>("Remote.Y: ", this.publicKey.Y.ToString()),
-				new KeyValuePair<string, object>("Key: ", Convert.ToBase64String(Key)),
-				new KeyValuePair<string, object>("IV: ", Convert.ToBase64String(IV)),
-				new KeyValuePair<string, object>("Data: ", Encoding.UTF8.GetString(Data)),
-				new KeyValuePair<string, object>("Encrypted: ", Convert.ToBase64String(Encrypted)),
-				new KeyValuePair<string, object>("Signature1: ", Signature.Key.ToString()),
-				new KeyValuePair<string, object>("Signature2: ", Signature.Value.ToString()));
-#endif
+			Signature = LocalEcAes256.Curve.Sign(Data, HashFunction.SHA256);
+
 			byte[] Signature1 = ToNetwork(Signature.Key);
 			byte[] Signature2 = ToNetwork(Signature.Value);
 
@@ -452,80 +398,54 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		/// <param name="From">From attribute</param>
 		/// <param name="To">To attribute</param>
 		/// <param name="AesElement">XML element with encrypted data.</param>
+		/// <param name="RemoteEndpoint">Remote endpoint of same type.</param>
 		/// <returns>Decrypted XMLs</returns>
-		public override string Decrypt(string Id, string Type, string From, string To, XmlElement AesElement)
+		public override string Decrypt(string Id, string Type, string From, string To, XmlElement AesElement, IE2eEndpoint RemoteEndpoint)
 		{
+			if (!(RemoteEndpoint is EcAes256 RemoteEcAes256))
+				return null;
+
 			byte[] Encrypted = Convert.FromBase64String(AesElement.InnerText);
 			byte[] Decrypted;
-			byte[] Key = this.Key;
+			byte[] Key = GetSharedKey(this, RemoteEcAes256);
 			byte[] IV = this.GetIV(Id, Type, From, To);
 			byte[] Signature1 = Convert.FromBase64String(XML.Attribute(AesElement, "ecdsa1"));
 			byte[] Signature2 = Convert.FromBase64String(XML.Attribute(AesElement, "ecdsa2"));
 			BigInteger r = FromNetwork(Signature1);
 			BigInteger s = FromNetwork(Signature2);
 
-
-#if DEBUG_AES
-			Log.Notice("Decrypting.",
-				new KeyValuePair<string, object>("Id", Id),
-				new KeyValuePair<string, object>("Type", Type),
-				new KeyValuePair<string, object>("To", To),
-				new KeyValuePair<string, object>("Local.X: ", this.Curve.PublicKey.X.ToString()),
-				new KeyValuePair<string, object>("Local.Y: ", this.Curve.PublicKey.Y.ToString()),
-				new KeyValuePair<string, object>("Remote.X: ", this.publicKey.X.ToString()),
-				new KeyValuePair<string, object>("Remote.Y: ", this.publicKey.Y.ToString()),
-				new KeyValuePair<string, object>("Key: ", Convert.ToBase64String(Key)),
-				new KeyValuePair<string, object>("IV: ", Convert.ToBase64String(IV)),
-				new KeyValuePair<string, object>("Encrypted: ", Convert.ToBase64String(Encrypted)),
-				new KeyValuePair<string, object>("Signature1: ", r.ToString()),
-				new KeyValuePair<string, object>("Signature2: ", s.ToString()));
-#endif
 			try
 			{
 				Decrypted = this.Decrypt(Encrypted, Key, IV);
 
-				if (Decrypted != null && !this.Curve.Verify(Decrypted, this.publicKey, HashFunction.SHA256, new KeyValuePair<BigInteger, BigInteger>(r, s)))
-					Decrypted = null;
+				if (Decrypted != null && RemoteEcAes256.Curve.Verify(Decrypted, RemoteEcAes256.publicKey, HashFunction.SHA256, new KeyValuePair<BigInteger, BigInteger>(r, s)))
+					return Encoding.UTF8.GetString(Decrypted);
 			}
 			catch (Exception)
 			{
-				Decrypted = null;
+				// Invalid key
 			}
 
-			if (Decrypted == null)
+			if (this.Previous is EcAes256 PrevEcAes256)
 			{
 				try
 				{
-					Key = this.OldKey;
+					Key = GetSharedKey(PrevEcAes256, RemoteEcAes256);
 
-#if DEBUG_AES
-					Log.Notice("Decrypting (old key).",
-						new KeyValuePair<string, object>("Old.Local.X: ", this.PrevCurve.PublicKey.X.ToString()),
-						new KeyValuePair<string, object>("Old.Local.Y: ", this.PrevCurve.PublicKey.Y.ToString()),
-						new KeyValuePair<string, object>("Old.Key: ", Convert.ToBase64String(Key)));
-#endif
 					if (Key != null)
 					{
 						Decrypted = this.Decrypt(Encrypted, Key, IV);
-						if (Decrypted == null)
-							return null;
-						else if (!this.PrevCurve.Verify(Decrypted, this.publicKey, HashFunction.SHA256, new KeyValuePair<BigInteger, BigInteger>(r, s)))
-							return null;
+						if (Decrypted != null && RemoteEcAes256.Curve.Verify(Decrypted, RemoteEcAes256.publicKey, HashFunction.SHA256, new KeyValuePair<BigInteger, BigInteger>(r, s)))
+							return Encoding.UTF8.GetString(Decrypted);
 					}
-					else
-						return null;
 				}
 				catch (Exception)
 				{
-					return null;    // Invalid keys.
+					// Invalid key
 				}
 			}
 
-#if DEBUG_AES
-			Log.Notice("Decrypted: " + Encoding.UTF8.GetString(Decrypted));
-#endif
-
-			return Encoding.UTF8.GetString(Decrypted);
+			return null;
 		}
 
 		/// <summary>
@@ -559,8 +479,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		public bool Verify(byte[] Data, byte[] X, byte[] Y, byte[] Signature1,
 			byte[] Signature2, HashFunction HashFunction)
 		{
-			return this.Verify(Data, new PointOnCurve(FromNetwork(X), FromNetwork(Y)),
-				Signature1, Signature2, HashFunction);
+			return this.Verify(Data, new PointOnCurve(FromNetwork(X), FromNetwork(Y)), Signature1, Signature2, HashFunction);
 		}
 
 		/// <summary>

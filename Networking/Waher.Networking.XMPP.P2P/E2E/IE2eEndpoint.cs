@@ -71,8 +71,9 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		/// <param name="From">From attribute</param>
 		/// <param name="To">To attribute</param>
 		/// <param name="Data">Binary data to encrypt</param>
+		/// <param name="LocalEndpoint">Local endpoint of same type.</param>
 		/// <returns>Encrypted data</returns>
-		byte[] Encrypt(string Id, string Type, string From, string To, byte[] Data);
+		byte[] Encrypt(string Id, string Type, string From, string To, byte[] Data, IE2eEndpoint LocalEndpoint);
 
 		/// <summary>
 		/// Decrypts binary data
@@ -82,8 +83,9 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		/// <param name="From">From attribute</param>
 		/// <param name="To">To attribute</param>
 		/// <param name="Data">Binary data to decrypt</param>
+		/// <param name="RemoteEndpoint">Remote endpoint of same type.</param>
 		/// <returns>Decrypted data</returns>
-		byte[] Decrypt(string Id, string Type, string From, string To, byte[] Data);
+		byte[] Decrypt(string Id, string Type, string From, string To, byte[] Data, IE2eEndpoint RemoteEndpoint);
 
 		/// <summary>
 		/// Encrypts Binary data
@@ -94,8 +96,9 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		/// <param name="To">To attribute</param>
 		/// <param name="Data">Binary data to encrypt</param>
 		/// <param name="Xml">XML output</param>
+		/// <param name="LocalEndpoint">Local endpoint of same type.</param>
 		/// <returns>If encryption was possible</returns>
-		bool Encrypt(string Id, string Type, string From, string To, byte[] Data, StringBuilder Xml);
+		bool Encrypt(string Id, string Type, string From, string To, byte[] Data, StringBuilder Xml, IE2eEndpoint LocalEndpoint);
 
 		/// <summary>
 		/// If the scheme can decrypt a given XML element.
@@ -112,8 +115,9 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		/// <param name="From">From attribute</param>
 		/// <param name="To">To attribute</param>
 		/// <param name="AesElement">XML element with encrypted data.</param>
+		/// <param name="RemoteEndpoint">Remote endpoint of same type.</param>
 		/// <returns>Decrypted XMLs</returns>
-		string Decrypt(string Id, string Type, string From, string To, XmlElement AesElement);
+		string Decrypt(string Id, string Type, string From, string To, XmlElement AesElement, IE2eEndpoint RemoteEndpoint);
 
 	}
 }

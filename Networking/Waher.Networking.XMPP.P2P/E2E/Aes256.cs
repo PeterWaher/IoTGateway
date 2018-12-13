@@ -133,7 +133,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
 			}
 			while (b >= 0x80);
 
-			if (c + i > Data.Length)
+			if (c < 0 || c + i > Data.Length)
 				return null;
 
 			byte[] Decrypted = new byte[c];

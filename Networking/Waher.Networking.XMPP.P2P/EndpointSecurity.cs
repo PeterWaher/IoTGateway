@@ -494,7 +494,11 @@ namespace Waher.Networking.XMPP.P2P
 					return null;
 			}
 
-			return Endpoints[0].Encrypt(Id, Type, From, To, Data);
+			IE2eEndpoint LocalEndpoint = this.FindLocalEndpoint(Endpoints[0]);
+			if (LocalEndpoint == null)
+				return null;
+
+			return Endpoints[0].Encrypt(Id, Type, From, To, Data, LocalEndpoint);
 		}
 
 		/// <summary>
@@ -516,7 +520,11 @@ namespace Waher.Networking.XMPP.P2P
 					return null;
 			}
 
-			return Endpoints[0].Decrypt(Id, Type, From, To, Data);
+			IE2eEndpoint LocalEndpoint = this.FindLocalEndpoint(Endpoints[0]);
+			if (LocalEndpoint == null)
+				return null;
+
+			return LocalEndpoint.Decrypt(Id, Type, From, To, Data, Endpoints[0]);
 		}
 
 		/// <summary>
@@ -540,13 +548,33 @@ namespace Waher.Networking.XMPP.P2P
 					return false;
 			}
 
+			IE2eEndpoint LocalEndpoint = this.FindLocalEndpoint(Endpoints[0]);
+			if (LocalEndpoint == null)
+				return false;
+
 			byte[] Data = this.encoding.GetBytes(DataXml);
-			bool Result = Endpoints[0].Encrypt(Id, Type, From, To, Data, Xml);
+			bool Result = Endpoints[0].Encrypt(Id, Type, From, To, Data, Xml, LocalEndpoint);
 
 			if (Client.HasSniffers && Client.TryGetTag("ShowE2E", out object Obj) && Obj is bool && (bool)Obj)
 				Client.Information(DataXml);
 
 			return Result;
+		}
+
+		private IE2eEndpoint FindLocalEndpoint(IE2eEndpoint RemoteEndpoint)
+		{
+			IE2eEndpoint[] Endpoints = this.keys;
+			int c = Endpoints.Length;
+			int i;
+			Type T = RemoteEndpoint.GetType();
+
+			for (i=0;i<c;i++)
+			{
+				if (Endpoints[i].GetType() == T)
+					return Endpoints[i];
+			}
+
+			return null;
 		}
 
 		private void AesMessageHandler(object Sender, MessageEventArgs e)
@@ -597,12 +625,16 @@ namespace Waher.Networking.XMPP.P2P
 			{
 				if (Endpoint.CanDecrypt(E2eElement))
 				{
-					string Xml = Endpoint.Decrypt(Id, Type, From, To, E2eElement);
+					IE2eEndpoint LocalEndpoint = this.FindLocalEndpoint(Endpoint);
+					if (LocalEndpoint != null)
+					{
+						string Xml = LocalEndpoint.Decrypt(Id, Type, From, To, E2eElement, Endpoint);
 
-					if (Client.HasSniffers && Client.TryGetTag("ShowE2E", out object Obj) && Obj is bool && (bool)Obj)
-						Client.Information(Xml);
+						if (Xml != null && Client.HasSniffers && Client.TryGetTag("ShowE2E", out object Obj) && Obj is bool && (bool)Obj)
+							Client.Information(Xml);
 
-					return Xml;
+						return Xml;
+					}
 				}
 			}
 

@@ -167,7 +167,7 @@
             </summary>
             <param name="Xml">XML output</param>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.E2eEndpoint.Encrypt(System.String,System.String,System.String,System.String,System.Byte[])">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.E2eEndpoint.Encrypt(System.String,System.String,System.String,System.String,System.Byte[],Waher.Networking.XMPP.P2P.E2E.IE2eEndpoint)">
             <summary>
             Encrypts binary data
             </summary>
@@ -176,9 +176,10 @@
             <param name="From">From attribute</param>
             <param name="To">To attribute</param>
             <param name="Data">Binary data to encrypt</param>
+            <param name="LocalEndpoint">Local endpoint of same type.</param>
             <returns>Encrypted data</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.E2eEndpoint.Decrypt(System.String,System.String,System.String,System.String,System.Byte[])">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.E2eEndpoint.Decrypt(System.String,System.String,System.String,System.String,System.Byte[],Waher.Networking.XMPP.P2P.E2E.IE2eEndpoint)">
             <summary>
             Decrypts binary data
             </summary>
@@ -187,9 +188,10 @@
             <param name="From">From attribute</param>
             <param name="To">To attribute</param>
             <param name="Data">Binary data to decrypt</param>
+            <param name="RemoteEndpoint">Remote endpoint of same type.</param>
             <returns>Decrypted data</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.E2eEndpoint.Encrypt(System.String,System.String,System.String,System.String,System.Byte[],System.Text.StringBuilder)">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.E2eEndpoint.Encrypt(System.String,System.String,System.String,System.String,System.Byte[],System.Text.StringBuilder,Waher.Networking.XMPP.P2P.E2E.IE2eEndpoint)">
             <summary>
             Encrypts Binary data
             </summary>
@@ -199,6 +201,7 @@
             <param name="To">To attribute</param>
             <param name="Data">Binary data to encrypt</param>
             <param name="Xml">XML output</param>
+            <param name="LocalEndpoint">Local endpoint of same type.</param>
             <returns>If encryption was possible</returns>
         </member>
         <member name="M:Waher.Networking.XMPP.P2P.E2E.E2eEndpoint.CanDecrypt(System.Xml.XmlElement)">
@@ -208,7 +211,7 @@
             <param name="AesElement">XML element with encrypted data.</param>
             <returns>If the scheme can decrypt the data.</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.E2eEndpoint.Decrypt(System.String,System.String,System.String,System.String,System.Xml.XmlElement)">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.E2eEndpoint.Decrypt(System.String,System.String,System.String,System.String,System.Xml.XmlElement,Waher.Networking.XMPP.P2P.E2E.IE2eEndpoint)">
             <summary>
             Decrypts XML data
             </summary>
@@ -217,6 +220,7 @@
             <param name="From">From attribute</param>
             <param name="To">To attribute</param>
             <param name="AesElement">XML element with encrypted data.</param>
+            <param name="RemoteEndpoint">Remote endpoint of same type.</param>
             <returns>Decrypted XMLs</returns>
         </member>
         <member name="M:Waher.Networking.XMPP.P2P.E2E.E2eEndpoint.GetIV(System.String,System.String,System.String,System.String)">
@@ -328,17 +332,12 @@
             Previous Elliptic Curve
             </summary>
         </member>
-        <member name="P:Waher.Networking.XMPP.P2P.E2E.EcAes256.Key">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.EcAes256.GetSharedKey(Waher.Networking.XMPP.P2P.E2E.EcAes256,Waher.Networking.XMPP.P2P.E2E.EcAes256)">
             <summary>
             Shared secret, for underlying AES cipher.
             </summary>
         </member>
-        <member name="P:Waher.Networking.XMPP.P2P.E2E.EcAes256.OldKey">
-            <summary>
-            Previous shared secret, for underlying AES cipher.
-            </summary>
-        </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.EcAes256.Encrypt(System.String,System.String,System.String,System.String,System.Byte[])">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.EcAes256.Encrypt(System.String,System.String,System.String,System.String,System.Byte[],Waher.Networking.XMPP.P2P.E2E.IE2eEndpoint)">
             <summary>
             Encrypts binary data
             </summary>
@@ -347,9 +346,10 @@
             <param name="From">From attribute</param>
             <param name="To">To attribute</param>
             <param name="Data">Binary data to encrypt</param>
+            <param name="LocalEndpoint">Local endpoint of same type.</param>
             <returns>Encrypted data</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.EcAes256.Decrypt(System.String,System.String,System.String,System.String,System.Byte[])">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.EcAes256.Decrypt(System.String,System.String,System.String,System.String,System.Byte[],Waher.Networking.XMPP.P2P.E2E.IE2eEndpoint)">
             <summary>
             Decrypts binary data
             </summary>
@@ -358,9 +358,10 @@
             <param name="From">From attribute</param>
             <param name="To">To attribute</param>
             <param name="Data">Binary data to decrypt</param>
+            <param name="RemoteEndpoint">Remote endpoint of same type.</param>
             <returns>Decrypted data</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.EcAes256.Encrypt(System.String,System.String,System.String,System.String,System.Byte[],System.Text.StringBuilder)">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.EcAes256.Encrypt(System.String,System.String,System.String,System.String,System.Byte[],System.Text.StringBuilder,Waher.Networking.XMPP.P2P.E2E.IE2eEndpoint)">
             <summary>
             Encrypts Binary data
             </summary>
@@ -370,6 +371,7 @@
             <param name="To">To attribute</param>
             <param name="Data">Binary data to encrypt</param>
             <param name="Xml">XML output</param>
+            <param name="LocalEndpoint">Local endpoint of same type.</param>
             <returns>If encryption was possible</returns>
         </member>
         <member name="M:Waher.Networking.XMPP.P2P.E2E.EcAes256.ToNetwork(System.Numerics.BigInteger)">
@@ -386,7 +388,7 @@
             <param name="AesElement">XML element with encrypted data.</param>
             <returns>If the scheme can decrypt the data.</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.EcAes256.Decrypt(System.String,System.String,System.String,System.String,System.Xml.XmlElement)">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.EcAes256.Decrypt(System.String,System.String,System.String,System.String,System.Xml.XmlElement,Waher.Networking.XMPP.P2P.E2E.IE2eEndpoint)">
             <summary>
             Decrypts XML data
             </summary>
@@ -395,6 +397,7 @@
             <param name="From">From attribute</param>
             <param name="To">To attribute</param>
             <param name="AesElement">XML element with encrypted data.</param>
+            <param name="RemoteEndpoint">Remote endpoint of same type.</param>
             <returns>Decrypted XMLs</returns>
         </member>
         <member name="M:Waher.Networking.XMPP.P2P.E2E.EcAes256.Sign(System.Byte[],Waher.Security.HashFunction)">
@@ -483,7 +486,7 @@
             </summary>
             <param name="Xml">XML output</param>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.IE2eEndpoint.Encrypt(System.String,System.String,System.String,System.String,System.Byte[])">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.IE2eEndpoint.Encrypt(System.String,System.String,System.String,System.String,System.Byte[],Waher.Networking.XMPP.P2P.E2E.IE2eEndpoint)">
             <summary>
             Encrypts binary data
             </summary>
@@ -492,9 +495,10 @@
             <param name="From">From attribute</param>
             <param name="To">To attribute</param>
             <param name="Data">Binary data to encrypt</param>
+            <param name="LocalEndpoint">Local endpoint of same type.</param>
             <returns>Encrypted data</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.IE2eEndpoint.Decrypt(System.String,System.String,System.String,System.String,System.Byte[])">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.IE2eEndpoint.Decrypt(System.String,System.String,System.String,System.String,System.Byte[],Waher.Networking.XMPP.P2P.E2E.IE2eEndpoint)">
             <summary>
             Decrypts binary data
             </summary>
@@ -503,9 +507,10 @@
             <param name="From">From attribute</param>
             <param name="To">To attribute</param>
             <param name="Data">Binary data to decrypt</param>
+            <param name="RemoteEndpoint">Remote endpoint of same type.</param>
             <returns>Decrypted data</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.IE2eEndpoint.Encrypt(System.String,System.String,System.String,System.String,System.Byte[],System.Text.StringBuilder)">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.IE2eEndpoint.Encrypt(System.String,System.String,System.String,System.String,System.Byte[],System.Text.StringBuilder,Waher.Networking.XMPP.P2P.E2E.IE2eEndpoint)">
             <summary>
             Encrypts Binary data
             </summary>
@@ -515,6 +520,7 @@
             <param name="To">To attribute</param>
             <param name="Data">Binary data to encrypt</param>
             <param name="Xml">XML output</param>
+            <param name="LocalEndpoint">Local endpoint of same type.</param>
             <returns>If encryption was possible</returns>
         </member>
         <member name="M:Waher.Networking.XMPP.P2P.E2E.IE2eEndpoint.CanDecrypt(System.Xml.XmlElement)">
@@ -524,7 +530,7 @@
             <param name="AesElement">XML element with encrypted data.</param>
             <returns>If the scheme can decrypt the data.</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.IE2eEndpoint.Decrypt(System.String,System.String,System.String,System.String,System.Xml.XmlElement)">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.IE2eEndpoint.Decrypt(System.String,System.String,System.String,System.String,System.Xml.XmlElement,Waher.Networking.XMPP.P2P.E2E.IE2eEndpoint)">
             <summary>
             Decrypts XML data
             </summary>
@@ -533,6 +539,7 @@
             <param name="From">From attribute</param>
             <param name="To">To attribute</param>
             <param name="AesElement">XML element with encrypted data.</param>
+            <param name="RemoteEndpoint">Remote endpoint of same type.</param>
             <returns>Decrypted XMLs</returns>
         </member>
         <member name="T:Waher.Networking.XMPP.P2P.E2E.NistP192Aes">
@@ -884,7 +891,7 @@
             <see cref="M:System.IDisposable.Dispose"/>
             </summary>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaAes.Encrypt(System.String,System.String,System.String,System.String,System.Byte[])">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaAes.Encrypt(System.String,System.String,System.String,System.String,System.Byte[],Waher.Networking.XMPP.P2P.E2E.IE2eEndpoint)">
             <summary>
             Encrypts binary data
             </summary>
@@ -893,9 +900,10 @@
             <param name="From">From attribute</param>
             <param name="To">To attribute</param>
             <param name="Data">Binary data to encrypt</param>
+            <param name="LocalEndpoint">Local endpoint of same type.</param>
             <returns>Encrypted data</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaAes.Decrypt(System.String,System.String,System.String,System.String,System.Byte[])">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaAes.Decrypt(System.String,System.String,System.String,System.String,System.Byte[],Waher.Networking.XMPP.P2P.E2E.IE2eEndpoint)">
             <summary>
             Decrypts binary data
             </summary>
@@ -904,9 +912,10 @@
             <param name="From">From attribute</param>
             <param name="To">To attribute</param>
             <param name="Data">Binary data to decrypt</param>
+            <param name="RemoteEndpoint">Remote endpoint of same type.</param>
             <returns>Decrypted data</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaAes.Encrypt(System.String,System.String,System.String,System.String,System.Byte[],System.Text.StringBuilder)">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaAes.Encrypt(System.String,System.String,System.String,System.String,System.Byte[],System.Text.StringBuilder,Waher.Networking.XMPP.P2P.E2E.IE2eEndpoint)">
             <summary>
             Encrypts Binary data
             </summary>
@@ -916,6 +925,7 @@
             <param name="To">To attribute</param>
             <param name="Data">Binary data to encrypt</param>
             <param name="Xml">XML output</param>
+            <param name="LocalEndpoint">Local endpoint of same type.</param>
             <returns>If encryption was possible</returns>
         </member>
         <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaAes.CanDecrypt(System.Xml.XmlElement)">
@@ -925,7 +935,7 @@
             <param name="AesElement">XML element with encrypted data.</param>
             <returns>If the scheme can decrypt the data.</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaAes.Decrypt(System.String,System.String,System.String,System.String,System.Xml.XmlElement)">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaAes.Decrypt(System.String,System.String,System.String,System.String,System.Xml.XmlElement,Waher.Networking.XMPP.P2P.E2E.IE2eEndpoint)">
             <summary>
             Decrypts XML data
             </summary>
@@ -934,6 +944,7 @@
             <param name="From">From attribute</param>
             <param name="To">To attribute</param>
             <param name="AesElement">XML element with encrypted data.</param>
+            <param name="RemoteEndpoint">Remote endpoint of same type.</param>
             <returns>Decrypted XMLs</returns>
         </member>
         <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaAes.Sign(System.Byte[])">

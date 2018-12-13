@@ -219,8 +219,9 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		/// <param name="From">From attribute</param>
 		/// <param name="To">To attribute</param>
 		/// <param name="Data">Binary data to encrypt</param>
+		/// <param name="LocalEndpoint">Local endpoint of same type.</param>
 		/// <returns>Encrypted data</returns>
-		public override byte[] Encrypt(string Id, string Type, string From, string To, byte[] Data)
+		public override byte[] Encrypt(string Id, string Type, string From, string To, byte[] Data, IE2eEndpoint LocalEndpoint)
 		{
 			byte[] Result;
 			byte[] KeyEncrypted;
@@ -236,7 +237,9 @@ namespace Waher.Networking.XMPP.P2P.E2E
 				Result = this.Encrypt(Data, this.aes.Key, IV);
 			}
 
-			Signature = this.Sign(Data);
+			Signature = (LocalEndpoint as RsaAes)?.Sign(Data);
+			if (Signature == null)
+				return null;
 
 			byte[] Block = new byte[KeyEncrypted.Length + Signature.Length + Result.Length + 8];
 			int i, j;
@@ -273,9 +276,13 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		/// <param name="From">From attribute</param>
 		/// <param name="To">To attribute</param>
 		/// <param name="Data">Binary data to decrypt</param>
+		/// <param name="RemoteEndpoint">Remote endpoint of same type.</param>
 		/// <returns>Decrypted data</returns>
-		public override byte[] Decrypt(string Id, string Type, string From, string To, byte[] Data)
+		public override byte[] Decrypt(string Id, string Type, string From, string To, byte[] Data, IE2eEndpoint RemoteEndpoint)
 		{
+			if (!(RemoteEndpoint is RsaAes RemoteRsaAes))
+				return null;
+
 			if (Data.Length < 10)
 				return null;
 
@@ -349,9 +356,9 @@ namespace Waher.Networking.XMPP.P2P.E2E
 				}
 			}
 
-			lock (this.rsa)
+			lock (RemoteRsaAes.rsa)
 			{
-				if (!this.rsa.VerifyData(Decrypted, Signature, HashAlgorithmName.SHA256, RSASignaturePadding.Pss))
+				if (!RemoteRsaAes.rsa.VerifyData(Decrypted, Signature, HashAlgorithmName.SHA256, RSASignaturePadding.Pss))
 					return null;
 			}
 
@@ -367,8 +374,9 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		/// <param name="To">To attribute</param>
 		/// <param name="Data">Binary data to encrypt</param>
 		/// <param name="Xml">XML output</param>
+		/// <param name="LocalEndpoint">Local endpoint of same type.</param>
 		/// <returns>If encryption was possible</returns>
-		public override bool Encrypt(string Id, string Type, string From, string To, byte[] Data, StringBuilder Xml)
+		public override bool Encrypt(string Id, string Type, string From, string To, byte[] Data, StringBuilder Xml, IE2eEndpoint LocalEndpoint)
 		{
 			byte[] Result;
 			byte[] KeyEncrypted;
@@ -384,7 +392,9 @@ namespace Waher.Networking.XMPP.P2P.E2E
 				Result = this.Encrypt(Data, this.aes.Key, IV);
 			}
 
-			Signature = this.Sign(Data);
+			Signature = (LocalEndpoint as RsaAes)?.Sign(Data);
+			if (Signature == null)
+				return false;
 
 			Xml.Append("<aes xmlns=\"");
 			Xml.Append(EndpointSecurity.IoTHarmonizationE2E);
@@ -417,9 +427,13 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		/// <param name="From">From attribute</param>
 		/// <param name="To">To attribute</param>
 		/// <param name="AesElement">XML element with encrypted data.</param>
+		/// <param name="RemoteEndpoint">Remote endpoint of same type.</param>
 		/// <returns>Decrypted XMLs</returns>
-		public override string Decrypt(string Id, string Type, string From, string To, XmlElement AesElement)
+		public override string Decrypt(string Id, string Type, string From, string To, XmlElement AesElement, IE2eEndpoint RemoteEndpoint)
 		{
+			if (!(RemoteEndpoint is RsaAes RemoteRsaAes))
+				return null;
+
 			byte[] KeyEncrypted = Convert.FromBase64String(XML.Attribute(AesElement, "keyRsa"));
 			byte[] Signature = Convert.FromBase64String(XML.Attribute(AesElement, "signRsa"));
 			byte[] Encrypted = Convert.FromBase64String(AesElement.InnerText);
@@ -434,9 +448,9 @@ namespace Waher.Networking.XMPP.P2P.E2E
 
 				if (Decrypted != null)
 				{
-					lock (this.rsa)
+					lock (RemoteRsaAes.rsa)
 					{
-						if (!this.rsa.VerifyData(Decrypted, Signature, HashAlgorithmName.SHA256, RSASignaturePadding.Pss))
+						if (!RemoteRsaAes.rsa.VerifyData(Decrypted, Signature, HashAlgorithmName.SHA256, RSASignaturePadding.Pss))
 							Decrypted = null;
 					}
 				}
@@ -458,9 +472,9 @@ namespace Waher.Networking.XMPP.P2P.E2E
 						if (Decrypted == null)
 							return null;
 
-						lock (this.rsa)
+						lock (RemoteRsaAes.rsa)
 						{
-							if (!this.rsa.VerifyData(Decrypted, Signature, HashAlgorithmName.SHA256, RSASignaturePadding.Pss))
+							if (!RemoteRsaAes.rsa.VerifyData(Decrypted, Signature, HashAlgorithmName.SHA256, RSASignaturePadding.Pss))
 								return null;
 						}
 					}
@@ -541,7 +555,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		{
 			int Result = this.keySize.GetHashCode();
 			Result ^= Result << 5 ^ this.modulusBase64.GetHashCode();
-			Result ^= Result << 5 ^ this.exponentBase64	.GetHashCode();
+			Result ^= Result << 5 ^ this.exponentBase64.GetHashCode();
 
 			return Result;
 		}

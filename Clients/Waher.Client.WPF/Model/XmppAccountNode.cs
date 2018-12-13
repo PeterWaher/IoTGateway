@@ -1415,7 +1415,7 @@ namespace Waher.Client.WPF.Model
 				SensorData.Fields != null &&
 				this.TryGetChild(e.FromBareJID, out TreeNode Node))
 			{
-				List<Parameter> Parameters = new List<Parameter>();
+				List<Waher.Things.DisplayableParameters.Parameter> Parameters = new List<Waher.Things.DisplayableParameters.Parameter>();
 
 				foreach (Waher.Things.SensorData.Field F in SensorData.Fields)
 				{
@@ -1424,7 +1424,8 @@ namespace Waher.Client.WPF.Model
 					else if (F is Int64Field I64)
 						Parameters.Add(new Int64Parameter(F.Name, F.Name, I64.Value));
 					else
-						Parameters.Add(new StringParameter(F.Name, F.Name, F.ValueString));
+						Parameters.Add(new Waher.Things.DisplayableParameters.
+							StringParameter(F.Name, F.Name, F.ValueString));
 				}
 
 				Node.Add(Parameters.ToArray());
@@ -1437,13 +1438,13 @@ namespace Waher.Client.WPF.Model
 			if (this.TryGetChild(e.FromBareJID, out TreeNode Node))
 			{
 				Node.Add(
-					new StringParameter("Tune_Artist", "Artist", e.Tune.Artist),
-					new StringParameter("Tune_Length", "Length", e.Tune.Length?.ToString() ?? string.Empty),
-					new StringParameter("Tune_Rating", "Rating", e.Tune.Rating?.ToString() ?? string.Empty),
-					new StringParameter("Tune_Source", "Source", e.Tune.Source),
-					new StringParameter("Tune_Title", "Title", e.Tune.Title),
-					new StringParameter("Tune_Track", "Track", e.Tune.Track),
-					new StringParameter("Tune_URI", "URI", e.Tune.Uri?.ToString() ?? string.Empty));
+					new Waher.Things.DisplayableParameters.StringParameter("Tune_Artist", "Artist", e.Tune.Artist),
+					new Waher.Things.DisplayableParameters.StringParameter("Tune_Length", "Length", e.Tune.Length?.ToString() ?? string.Empty),
+					new Waher.Things.DisplayableParameters.StringParameter("Tune_Rating", "Rating", e.Tune.Rating?.ToString() ?? string.Empty),
+					new Waher.Things.DisplayableParameters.StringParameter("Tune_Source", "Source", e.Tune.Source),
+					new Waher.Things.DisplayableParameters.StringParameter("Tune_Title", "Title", e.Tune.Title),
+					new Waher.Things.DisplayableParameters.StringParameter("Tune_Track", "Track", e.Tune.Track),
+					new Waher.Things.DisplayableParameters.StringParameter("Tune_URI", "URI", e.Tune.Uri?.ToString() ?? string.Empty));
 
 				Node.OnUpdated();
 			}
@@ -1454,8 +1455,8 @@ namespace Waher.Client.WPF.Model
 			if (this.TryGetChild(e.FromBareJID, out TreeNode Node))
 			{
 				Node.Add(
-					new StringParameter("Mood_Mood", "Mood", e.Mood.Mood?.ToString() ?? string.Empty),
-					new StringParameter("Mood_Text", "Text", e.Mood.Text));
+					new Waher.Things.DisplayableParameters.StringParameter("Mood_Mood", "Mood", e.Mood.Mood?.ToString() ?? string.Empty),
+					new Waher.Things.DisplayableParameters.StringParameter("Mood_Text", "Text", e.Mood.Text));
 
 				Node.OnUpdated();
 			}
@@ -1466,29 +1467,29 @@ namespace Waher.Client.WPF.Model
 			if (this.TryGetChild(e.FromBareJID, out TreeNode Node))
 			{
 				Node.Add(
-					new StringParameter("Location_Artist", "Accuracy", e.Location.Accuracy?.ToString() ?? string.Empty),
-					new StringParameter("Location_Alt", "Alt", e.Location.Alt?.ToString() ?? string.Empty),
-					new StringParameter("Location_AltAccuracy", "AltAccuracy", e.Location.AltAccuracy?.ToString() ?? string.Empty),
-					new StringParameter("Location_Area", "Area", e.Location.Area ?? string.Empty),
-					new StringParameter("Location_Bearing", "Bearing", e.Location.Bearing?.ToString() ?? string.Empty),
-					new StringParameter("Location_Building", "Building", e.Location.Building ?? string.Empty),
-					new StringParameter("Location_Country", "Country", e.Location.Country ?? string.Empty),
-					new StringParameter("Location_CountryCode", "CountryCode", e.Location.CountryCode ?? string.Empty),
-					new StringParameter("Location_Datum", "Datum", e.Location.Datum ?? string.Empty),
-					new StringParameter("Location_Description", "Description", e.Location.Description ?? string.Empty),
-					new StringParameter("Location_Floor", "Floor", e.Location.Floor ?? string.Empty),
-					new StringParameter("Location_Lat", "Lat", e.Location.Lat?.ToString() ?? string.Empty),
-					new StringParameter("Location_Lon", "Lon", e.Location.Lon?.ToString() ?? string.Empty),
-					new StringParameter("Location_Locality", "Locality", e.Location.Locality ?? string.Empty),
-					new StringParameter("Location_PostalCode", "PostalCode", e.Location.PostalCode ?? string.Empty),
-					new StringParameter("Location_Region", "Region", e.Location.Region ?? string.Empty),
-					new StringParameter("Location_Room", "Room", e.Location.Room ?? string.Empty),
-					new StringParameter("Location_Speed", "Speed", e.Location.Speed?.ToString() ?? string.Empty),
-					new StringParameter("Location_Street", "Street", e.Location.Street ?? string.Empty),
-					new StringParameter("Location_Text", "Text", e.Location.Text ?? string.Empty),
-					new StringParameter("Location_Timestamp", "Timestamp", e.Location.Timestamp?.ToString() ?? string.Empty),
-					new StringParameter("Location_TimeZone", "TimeZone", e.Location.TimeZone ?? string.Empty),
-					new StringParameter("Location_URI", "URI", e.Location.Uri?.ToString() ?? string.Empty));
+					new Waher.Things.DisplayableParameters.StringParameter("Location_Artist", "Accuracy", e.Location.Accuracy?.ToString() ?? string.Empty),
+					new Waher.Things.DisplayableParameters.StringParameter("Location_Alt", "Alt", e.Location.Alt?.ToString() ?? string.Empty),
+					new Waher.Things.DisplayableParameters.StringParameter("Location_AltAccuracy", "AltAccuracy", e.Location.AltAccuracy?.ToString() ?? string.Empty),
+					new Waher.Things.DisplayableParameters.StringParameter("Location_Area", "Area", e.Location.Area ?? string.Empty),
+					new Waher.Things.DisplayableParameters.StringParameter("Location_Bearing", "Bearing", e.Location.Bearing?.ToString() ?? string.Empty),
+					new Waher.Things.DisplayableParameters.StringParameter("Location_Building", "Building", e.Location.Building ?? string.Empty),
+					new Waher.Things.DisplayableParameters.StringParameter("Location_Country", "Country", e.Location.Country ?? string.Empty),
+					new Waher.Things.DisplayableParameters.StringParameter("Location_CountryCode", "CountryCode", e.Location.CountryCode ?? string.Empty),
+					new Waher.Things.DisplayableParameters.StringParameter("Location_Datum", "Datum", e.Location.Datum ?? string.Empty),
+					new Waher.Things.DisplayableParameters.StringParameter("Location_Description", "Description", e.Location.Description ?? string.Empty),
+					new Waher.Things.DisplayableParameters.StringParameter("Location_Floor", "Floor", e.Location.Floor ?? string.Empty),
+					new Waher.Things.DisplayableParameters.StringParameter("Location_Lat", "Lat", e.Location.Lat?.ToString() ?? string.Empty),
+					new Waher.Things.DisplayableParameters.StringParameter("Location_Lon", "Lon", e.Location.Lon?.ToString() ?? string.Empty),
+					new Waher.Things.DisplayableParameters.StringParameter("Location_Locality", "Locality", e.Location.Locality ?? string.Empty),
+					new Waher.Things.DisplayableParameters.StringParameter("Location_PostalCode", "PostalCode", e.Location.PostalCode ?? string.Empty),
+					new Waher.Things.DisplayableParameters.StringParameter("Location_Region", "Region", e.Location.Region ?? string.Empty),
+					new Waher.Things.DisplayableParameters.StringParameter("Location_Room", "Room", e.Location.Room ?? string.Empty),
+					new Waher.Things.DisplayableParameters.StringParameter("Location_Speed", "Speed", e.Location.Speed?.ToString() ?? string.Empty),
+					new Waher.Things.DisplayableParameters.StringParameter("Location_Street", "Street", e.Location.Street ?? string.Empty),
+					new Waher.Things.DisplayableParameters.StringParameter("Location_Text", "Text", e.Location.Text ?? string.Empty),
+					new Waher.Things.DisplayableParameters.StringParameter("Location_Timestamp", "Timestamp", e.Location.Timestamp?.ToString() ?? string.Empty),
+					new Waher.Things.DisplayableParameters.StringParameter("Location_TimeZone", "TimeZone", e.Location.TimeZone ?? string.Empty),
+					new Waher.Things.DisplayableParameters.StringParameter("Location_URI", "URI", e.Location.Uri?.ToString() ?? string.Empty));
 
 				Node.OnUpdated();
 			}
@@ -1499,9 +1500,9 @@ namespace Waher.Client.WPF.Model
 			if (this.TryGetChild(e.FromBareJID, out TreeNode Node))
 			{
 				Node.Add(
-					new StringParameter("Activity_General", "General", e.Activity.GeneralActivity?.ToString() ?? string.Empty),
-					new StringParameter("Activity_Specific", "Specific", e.Activity.SpecificActivity?.ToString() ?? string.Empty),
-					new StringParameter("Activity_Text", "Text", e.Activity.Text));
+					new Waher.Things.DisplayableParameters.StringParameter("Activity_General", "General", e.Activity.GeneralActivity?.ToString() ?? string.Empty),
+					new Waher.Things.DisplayableParameters.StringParameter("Activity_Specific", "Specific", e.Activity.SpecificActivity?.ToString() ?? string.Empty),
+					new Waher.Things.DisplayableParameters.StringParameter("Activity_Text", "Text", e.Activity.Text));
 
 				Node.OnUpdated();
 			}

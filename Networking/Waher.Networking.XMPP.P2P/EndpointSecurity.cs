@@ -338,7 +338,6 @@ namespace Waher.Networking.XMPP.P2P
 
 						Endpoints.Add(Endpoint);
 					}
-					break;
 				}
 			}
 

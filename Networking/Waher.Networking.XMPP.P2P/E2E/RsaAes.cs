@@ -38,6 +38,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
 
 			RSAParameters P = this.rsa.ExportParameters(false);
 
+			this.keySize = this.rsa.KeySize;
 			this.modulus = P.Modulus;
 			this.exponent = P.Exponent;
 

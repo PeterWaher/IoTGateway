@@ -85,6 +85,16 @@
             Until when the contract is valid (if signed)
             </summary>
         </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Contract.SignAfter">
+            <summary>
+            Signatures will only be accepted after this point in time.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Contract.SignBefore">
+            <summary>
+            Signatures will only be accepted until this point in time.
+            </summary>
+        </member>
         <member name="P:Waher.Networking.XMPP.Contracts.Contract.Visibility">
             <summary>
             Contrat Visibility

@@ -40,6 +40,8 @@ namespace Waher.Networking.XMPP.Contracts
 		private DateTime updated = DateTime.MinValue;
 		private DateTime from = DateTime.MinValue;
 		private DateTime to = DateTime.MaxValue;
+		private DateTime signAfter = DateTime.MinValue;
+		private DateTime signBefore = DateTime.MaxValue;
 		private Duration duration = null;
 		private Duration archiveReq = null;
 		private Duration archiveOpt = null;
@@ -131,6 +133,24 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			get { return this.to; }
 			set { this.to = value; }
+		}
+
+		/// <summary>
+		/// Signatures will only be accepted after this point in time.
+		/// </summary>
+		public DateTime SignAfter
+		{
+			get { return this.signAfter; }
+			set { this.signAfter = value; }
+		}
+
+		/// <summary>
+		/// Signatures will only be accepted until this point in time.
+		/// </summary>
+		public DateTime SignBefore
+		{
+			get { return this.signBefore; }
+			set { this.signBefore = value; }
 		}
 
 		/// <summary>
@@ -340,6 +360,20 @@ namespace Waher.Networking.XMPP.Contracts
 							return null;
 						break;
 
+					case "signAfter":
+						if (DateTime.TryParse(Attr.Value, out DateTime TP))
+							Result.signAfter = TP;
+						else
+							return null;
+						break;
+
+					case "signBefore":
+						if (DateTime.TryParse(Attr.Value, out TP))
+							Result.signBefore = TP;
+						else
+							return null;
+						break;
+
 					case "canActAsTemplate":
 						if (CommonTypes.TryParse(Attr.Value, out bool b))
 							Result.canActAsTemplate = b;
@@ -361,7 +395,8 @@ namespace Waher.Networking.XMPP.Contracts
 			if (!HasVisibility ||
 				Result.duration == null ||
 				Result.archiveReq == null ||
-				Result.archiveOpt == null)
+				Result.archiveOpt == null ||
+				Result.signBefore <= Result.signAfter)
 			{
 				return null;
 			}
@@ -965,6 +1000,20 @@ namespace Waher.Networking.XMPP.Contracts
 			{
 				Xml.Append(" id=\"");
 				Xml.Append(XML.Encode(this.contractId));
+				Xml.Append('"');
+			}
+
+			if (this.signAfter > DateTime.MinValue)
+			{
+				Xml.Append(" signAfter=\"");
+				Xml.Append(XML.Encode(this.signAfter));
+				Xml.Append('"');
+			}
+
+			if (this.signBefore > DateTime.MinValue)
+			{
+				Xml.Append(" signBefore=\"");
+				Xml.Append(XML.Encode(this.signBefore));
 				Xml.Append('"');
 			}
 

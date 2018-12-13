@@ -6,8 +6,10 @@ using System.Security.Cryptography;
 using System.Threading.Tasks;
 using System.Text;
 using System.Xml;
+using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Events;
+using Waher.Networking.XMPP.Contracts.HumanReadable;
 using Waher.Networking.XMPP.P2P;
 using Waher.Networking.XMPP.P2P.E2E;
 using Waher.Runtime.Settings;
@@ -28,6 +30,11 @@ namespace Waher.Networking.XMPP.Contracts
 		/// urn:ieee:iot:leg:id:1.0
 		/// </summary>
 		public const string NamespaceLegalIdentities = "urn:ieee:iot:leg:id:1.0";
+
+		/// <summary>
+		/// urn:ieee:iot:leg:sc:1.0
+		/// </summary>
+		public const string NamespaceSmartContracts = "urn:ieee:iot:leg:sc:1.0";
 
 		private readonly Dictionary<string, KeyEventArgs> publicKeys = new Dictionary<string, KeyEventArgs>();
 		private readonly Dictionary<string, KeyEventArgs> matchingKeys = new Dictionary<string, KeyEventArgs>();
@@ -1271,6 +1278,108 @@ namespace Waher.Networking.XMPP.Contracts
 			}, null);
 
 			return Result.Task;
+		}
+
+		#endregion
+
+		#region Create Contract
+
+		/// <summary>
+		/// Creates a new contract.
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="ForMachines">Machine-readable content.</param>
+		/// <param name="ForHumans">Human-readable localized content. Provide one object for each language supported by the contract.</param>
+		/// <param name="Roles">Roles defined in contract.</param>
+		/// <param name="Parts">Parts defined in contract.</param>
+		/// <param name="Parameters">Any contractual parameters defined for the contract.</param>
+		/// <param name="Visibility">Visibility of the contract.</param>
+		/// <param name="PartsMode">How parts are defined in the contract. If equal to <see cref="ContractParts.ExplicitlyDefined"/>,
+		/// then the explicitly defined parts must be provided in <paramref name="Parts"/>.</param>
+		/// <param name="Duration">Duration of the contract, once signed.</param>
+		/// <param name="ArchiveRequired">Required archivation duration, after signed contract has become obsolete.</param>
+		/// <param name="ArchiveOptional">Optional archivation duration, after required archivation duration has elapsed.</param>
+		/// <param name="CanActAsTemplate">If the contract can act as a template.</param>
+		/// <param name="Callback">Method to call when registration response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public void CreateContract(string Address, XmlDocument ForMachines, HumanReadableText[] ForHumans, Role[] Roles,
+			Part[] Parts, Parameter[] Parameters, ContractVisibility Visibility, ContractParts PartsMode, Duration Duration,
+			Duration ArchiveRequired, Duration ArchiveOptional, bool CanActAsTemplate, LegalIdentityEventHandler Callback, object State)
+		{
+			/*
+			this.GetMatchingLocalKey(Address, (sender, e) =>
+			{
+				if (e.Ok)
+				{
+					StringBuilder Xml = new StringBuilder();
+
+					Xml.Append("<apply xmlns=\"");
+					Xml.Append(NamespaceLegalIdentities);
+					Xml.Append("\">");
+
+					StringBuilder Identity = new StringBuilder();
+
+					Identity.Append("<identity><clientPublicKey>");
+					e.Key.ToXml(Identity);
+					Identity.Append("</clientPublicKey>");
+
+					foreach (Property Property in Properties)
+					{
+						Identity.Append("<property name=\"");
+						Identity.Append(XML.Encode(Property.Name));
+						Identity.Append("\" value=\"");
+						Identity.Append(XML.Encode(Property.Value));
+						Identity.Append("\"/>");
+					}
+
+					string s = Identity.ToString();
+					Xml.Append(s);
+
+					s += "</identity>";
+
+					byte[] Bin = Encoding.UTF8.GetBytes(s);
+
+					if (e.Key is EcAes256 EcAes256)
+					{
+						KeyValuePair<byte[], byte[]> Signature = EcAes256.Sign(Bin, Security.HashFunction.SHA256);
+
+						Xml.Append("<clientSignature s1=\"");
+						Xml.Append(Convert.ToBase64String(Signature.Key));
+						Xml.Append("\" s2=\"");
+						Xml.Append(Convert.ToBase64String(Signature.Value));
+						Xml.Append("\"/>");
+					}
+					else if (e.Key is RsaAes RsaAes)
+					{
+						byte[] Signature = RsaAes.Sign(Bin);
+
+						Xml.Append("<clientSignature s1=\"");
+						Xml.Append(Convert.ToBase64String(Signature));
+						Xml.Append("\"/>");
+					}
+
+					Xml.Append("</identity></apply>");
+
+					this.client.SendIqSet(Address, Xml.ToString(), (sender2, e2) =>
+					{
+						LegalIdentity Identity2 = null;
+						XmlElement E;
+
+						if (e2.Ok && (E = e2.FirstElement) != null &&
+							E.LocalName == "identity" &&
+							E.NamespaceURI == NamespaceLegalIdentities)
+						{
+							Identity2 = LegalIdentity.Parse(E);
+						}
+						else
+							e2.Ok = false;
+
+						Callback?.Invoke(this, new LegalIdentityEventArgs(e2, Identity2));
+					}, e.State);
+				}
+				else
+					Callback?.Invoke(this, new LegalIdentityEventArgs(e, null));
+			}, State);*/
 		}
 
 		#endregion

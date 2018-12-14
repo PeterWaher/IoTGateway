@@ -22,14 +22,14 @@ namespace Waher.Networking.XMPP.Contracts
 			{
 				Xml.Append(" s1=\"");
 				Xml.Append(Convert.ToBase64String(this.S1));
-				Xml.Append("'");
+				Xml.Append('"');
 			}
 
 			if (this.S2 != null)
 			{
 				Xml.Append(" s2=\"");
 				Xml.Append(Convert.ToBase64String(this.S2));
-				Xml.Append("'");
+				Xml.Append('"');
 			}
 
 			Xml.Append(" timestamp=\"");

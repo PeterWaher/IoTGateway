@@ -16,7 +16,7 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements
 		/// <param name="Xml">XML Output.</param>
 		public override void Serialize(StringBuilder Xml)
 		{
-			Serialize(Xml, this.Elements, "paragraph");
+			Serialize(Xml, this.Elements, "item");
 		}
 
 		/// <summary>

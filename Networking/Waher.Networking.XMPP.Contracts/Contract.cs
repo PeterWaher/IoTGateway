@@ -1047,7 +1047,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			Xml.Append('>');
 
-			Xml.Append(this.forMachines);
+			Xml.Append(this.forMachines.OuterXml);
 
 			if (this.roles != null)
 			{

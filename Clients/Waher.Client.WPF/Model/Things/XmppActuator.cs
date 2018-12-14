@@ -77,7 +77,7 @@ namespace Waher.Client.WPF.Model.Things
 				if (XmppAccountNode != null && (SensorClient = XmppAccountNode.SensorClient) != null)
 				{
 					return SensorClient.Subscribe(this.RosterItem.LastPresenceFullJid, FieldType.Momentary, Rules,
-						new Duration(false, 0, 0, 0, 0, 0, 1), new Duration(false, 0, 0, 0, 0, 1, 0), false);
+						Duration.FromSeconds(1), Duration.FromMinutes(1), false);
 				}
 				else
 					return null;

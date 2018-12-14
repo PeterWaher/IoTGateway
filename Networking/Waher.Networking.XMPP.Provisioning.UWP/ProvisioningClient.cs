@@ -36,7 +36,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		private readonly string provisioningServerAddress;
 		private string ownerJid = string.Empty;
 		private DateTime lastCheck = DateTime.MinValue;
-		private Duration cacheUnusedLifetime = new Duration(false, 0, 13, 0, 0, 0, 0);
+		private Duration cacheUnusedLifetime = Duration.FromMonths(13);
 		private bool managePresenceSubscriptionRequests = true;
 
 		/// <summary>

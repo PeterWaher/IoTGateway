@@ -25,6 +25,21 @@ namespace Waher.Content
 		/// Represents a duration value, as defined by the xsd:duration data type:
 		/// http://www.w3.org/TR/xmlschema-2/#duration
 		/// </summary>
+		public Duration()
+		{
+			this.years = 0;
+			this.months = 0;
+			this.days = 0;
+			this.hours = 0;
+			this.minutes = 0;
+			this.seconds = 0;
+			this.negation = false;
+		}
+
+		/// <summary>
+		/// Represents a duration value, as defined by the xsd:duration data type:
+		/// http://www.w3.org/TR/xmlschema-2/#duration
+		/// </summary>
 		/// <param name="Negation">If the duration is negative (true) or positive (false).</param>
 		/// <param name="Years">Number of years.</param>
 		/// <param name="Months">Number of months.</param>
@@ -107,37 +122,65 @@ namespace Waher.Content
 		/// <summary>
 		/// Number of years.
 		/// </summary>
-		public int Years { get { return this.years; } }
+		public int Years
+		{
+			get { return this.years; }
+			set { this.years = value; }
+		}
 
 		/// <summary>
 		/// Number of months.
 		/// </summary>
-		public int Months { get { return this.months; } }
+		public int Months
+		{
+			get { return this.months; }
+			set { this.months = value; }
+		}
 
 		/// <summary>
 		/// Number of days.
 		/// </summary>
-		public int Days { get { return this.days; } }
+		public int Days
+		{
+			get { return this.days; }
+			set { this.days = value; }
+		}
 
 		/// <summary>
 		/// Number of hours.
 		/// </summary>
-		public int Hours { get { return this.hours; } }
+		public int Hours
+		{
+			get { return this.hours; }
+			set { this.hours = value; }
+		}
 
 		/// <summary>
 		/// Number of minutes.
 		/// </summary>
-		public int Minutes { get { return this.minutes; } }
+		public int Minutes
+		{
+			get { return this.minutes; }
+			set { this.minutes = value; }
+		}
 
 		/// <summary>
 		/// Number of seconds.
 		/// </summary>
-		public double Seconds { get { return this.seconds; } }
+		public double Seconds
+		{
+			get { return this.seconds; }
+			set { this.seconds = value; }
+		}
 
 		/// <summary>
 		/// If the duration is negative (true) or positive (false).
 		/// </summary>
-		public bool Negation { get { return this.negation; } }
+		public bool Negation
+		{
+			get { return this.negation; }
+			set { this.negation = value; }
+		}
 
 		/// <summary>
 		/// Adds a duration to a <see cref="DateTime"/> value.
@@ -434,5 +477,65 @@ namespace Waher.Content
 		/// Zero value
 		/// </summary>
 		public static readonly Duration Zero = new Duration(false, 0, 0, 0, 0, 0, 0);
+
+		/// <summary>
+		/// Creates a <see cref="Duration"/> object from a given number of years.
+		/// </summary>
+		/// <param name="Years">Number of years.</param>
+		/// <returns><see cref="Duration"/> object.</returns>
+		public static Duration FromYears(int Years)
+		{
+			return new Duration(Years < 0, Math.Abs(Years), 0, 0, 0, 0, 0);
+		}
+
+		/// <summary>
+		/// Creates a <see cref="Duration"/> object from a given number of months.
+		/// </summary>
+		/// <param name="Months">Number of months.</param>
+		/// <returns><see cref="Duration"/> object.</returns>
+		public static Duration FromMonths(int Months)
+		{
+			return new Duration(Months < 0, 0, Math.Abs(Months), 0, 0, 0, 0);
+		}
+
+		/// <summary>
+		/// Creates a <see cref="Duration"/> object from a given number of days.
+		/// </summary>
+		/// <param name="Days">Number of days.</param>
+		/// <returns><see cref="Duration"/> object.</returns>
+		public static Duration FromDays(int Days)
+		{
+			return new Duration(Days < 0, 0, 0, Math.Abs(Days), 0, 0, 0);
+		}
+
+		/// <summary>
+		/// Creates a <see cref="Duration"/> object from a given number of hours.
+		/// </summary>
+		/// <param name="Hours">Number of hours.</param>
+		/// <returns><see cref="Duration"/> object.</returns>
+		public static Duration FromHours(int Hours)
+		{
+			return new Duration(Hours < 0, 0, 0, 0, Math.Abs(Hours), 0, 0);
+		}
+
+		/// <summary>
+		/// Creates a <see cref="Duration"/> object from a given number of minutes.
+		/// </summary>
+		/// <param name="Minutes">Number of minutes.</param>
+		/// <returns><see cref="Duration"/> object.</returns>
+		public static Duration FromMinutes(int Minutes)
+		{
+			return new Duration(Minutes < 0, 0, 0, 0, 0,Math.Abs(Minutes), 0);
+		}
+
+		/// <summary>
+		/// Creates a <see cref="Duration"/> object from a given number of seconds.
+		/// </summary>
+		/// <param name="Seconds">Number of seconds.</param>
+		/// <returns><see cref="Duration"/> object.</returns>
+		public static Duration FromSeconds(int Seconds)
+		{
+			return new Duration(Seconds < 0, 0, 0, 0, 0, 0, Math.Abs(Seconds));
+		}
 	}
 }

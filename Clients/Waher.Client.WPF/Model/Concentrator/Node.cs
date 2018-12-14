@@ -263,7 +263,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 			{
 				return SensorClient.Subscribe(Concentrator.RosterItem.LastPresenceFullJid,
 					new ThingReference[] { new ThingReference(this.nodeInfo.NodeId, this.nodeInfo.SourceId, this.nodeInfo.Partition) },
-					FieldType.Momentary, Rules, new Duration(false, 0, 0, 0, 0, 0, 1), new Duration(false, 0, 0, 0, 0, 1, 0), false);
+					FieldType.Momentary, Rules, Duration.FromSeconds(1), Duration.FromMinutes(1), false);
 			}
 			else
 				return null;

@@ -1510,7 +1510,7 @@ namespace Waher.Networking.XMPP.Contracts
 			Xml.Append("\" duration=\"");
 			Xml.Append(Duration.ToString());
 			Xml.Append("\" id=\"");
-				Xml.Append(XML.Encode(TemplateId));
+			Xml.Append(XML.Encode(TemplateId));
 			Xml.Append('"');
 
 			if (SignAfter.HasValue && SignAfter > DateTime.MinValue)
@@ -1646,6 +1646,51 @@ namespace Waher.Networking.XMPP.Contracts
 				}, null);
 
 			return Result.Task;
+		}
+
+		#endregion
+
+		#region Get Created Contracts
+
+		/// <summary>
+		/// Get contracts the account has created.
+		/// </summary>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public void GetCreatedContracts(IdReferencesEventHandler Callback, object State)
+		{
+			this.GetCreatedContracts(this.componentAddress, Callback, State);
+		}
+
+		/// <summary>
+		/// Get contracts the account has created.
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public void GetCreatedContracts(string Address, IdReferencesEventHandler Callback, object State)
+		{
+			this.client.SendIqGet(Address, "<getCreatedContracts xmlns='" + NamespaceSmartContracts + "'/>", (sender, e) =>
+			{
+				XmlElement E = e.FirstElement;
+				List<string> IDs = new List<string>();
+
+				if (e.Ok && E != null)
+				{
+					foreach (XmlNode N in E.ChildNodes)
+					{
+						if (N is XmlElement E2 && E2.LocalName == "ref" && E2.NamespaceURI == NamespaceSmartContracts)
+						{
+							string Id = XML.Attribute(E2, "id");
+							IDs.Add(Id);
+						}
+					}
+				}
+				else
+					e.Ok = false;
+
+				Callback?.Invoke(this, new IdReferencesEventArgs(e, IDs.ToArray()));
+			}, State);
 		}
 
 		#endregion

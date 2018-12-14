@@ -740,6 +740,21 @@
             <param name="SignBefore">Signatures will only be accepted until this point in time, if provided.</param>
             <param name="CanActAsTemplate">If the contract can act as a template.</param>
         </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetCreatedContracts(Waher.Networking.XMPP.Contracts.IdReferencesEventHandler,System.Object)">
+            <summary>
+            Get contracts the account has created.
+            </summary>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetCreatedContracts(System.String,Waher.Networking.XMPP.Contracts.IdReferencesEventHandler,System.Object)">
+            <summary>
+            Get contracts the account has created.
+            </summary>
+            <param name="Address">Address of server (component).</param>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+        </member>
         <member name="T:Waher.Networking.XMPP.Contracts.ContractState">
             <summary>
             Recognized contract states
@@ -912,6 +927,30 @@
         <member name="P:Waher.Networking.XMPP.Contracts.IdentityValidationEventArgs.State">
             <summary>
             State object.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.IdReferencesEventHandler">
+            <summary>
+            Delegate for ID References callback methods.
+            </summary>
+            <param name="Sender">Sender</param>
+            <param name="e">Event arguments</param>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.IdReferencesEventArgs">
+            <summary>
+            Event arguments for ID References responses
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.IdReferencesEventArgs.#ctor(Waher.Networking.XMPP.IqResultEventArgs,System.String[])">
+            <summary>
+            Event arguments for ID References responses
+            </summary>
+            <param name="e">IQ response event arguments.</param>
+            <param name="References">ID References.</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.IdReferencesEventArgs.References">
+            <summary>
+            ID References
             </summary>
         </member>
         <member name="T:Waher.Networking.XMPP.Contracts.LegalIdentitiesEventHandler">

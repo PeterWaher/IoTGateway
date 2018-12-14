@@ -314,7 +314,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			HasStatus = false;
 
-			foreach (XmlAttribute Attr in Xml.ChildNodes)
+			foreach (XmlAttribute Attr in Xml.Attributes)
 			{
 				switch (Attr.Name)
 				{
@@ -396,6 +396,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			List<HumanReadableText> ForHumans = new List<HumanReadableText>();
 			List<Role> Roles = new List<Role>();
+			List<Parameter> Parameters = new List<Parameter>();
 			List<ClientSignature> Signatures = new List<ClientSignature>();
 			XmlElement Content = null;
 			HumanReadableText Text;
@@ -411,7 +412,7 @@ namespace Waher.Networking.XMPP.Contracts
 				{
 					Content = E;
 					First = false;
-					break;
+					continue;
 				}
 
 				switch (E.LocalName)
@@ -594,8 +595,6 @@ namespace Waher.Networking.XMPP.Contracts
 						break;
 
 					case "parameters":
-						List<Parameter> Parameters = new List<Parameter>();
-
 						foreach (XmlNode N2 in E.ChildNodes)
 						{
 							if (N2 is XmlElement E2)
@@ -831,6 +830,7 @@ namespace Waher.Networking.XMPP.Contracts
 				return null;
 
 			Result.roles = Roles.ToArray();
+			Result.parameters = Parameters.ToArray();
 			Result.forMachines = Content;
 			Result.forMachinesLocalName = Content.LocalName;
 			Result.forMachinesNamespace = Content.NamespaceURI;
@@ -868,19 +868,25 @@ namespace Waher.Networking.XMPP.Contracts
 
 			if (Xml.NamespaceURI != CurrentNamespace && string.IsNullOrEmpty(Xml.Prefix))
 			{
+				if (Attributes == null)
+					Attributes = new SortedDictionary<string, string>();
+
 				Attributes["xmlns"] = Xml.NamespaceURI;
 				CurrentNamespace = Xml.NamespaceURI;
 			}
 			else
-				Attributes.Remove("xmlns");
+				Attributes?.Remove("xmlns");
 
-			foreach (KeyValuePair<string, string> Attr in Attributes)
+			if (Attributes != null)
 			{
-				Output.Append(' ');
-				Output.Append(Attr.Key);
-				Output.Append("=\"");
-				Output.Append(XML.Encode(Attr.Value));
-				Output.Append('"');
+				foreach (KeyValuePair<string, string> Attr in Attributes)
+				{
+					Output.Append(' ');
+					Output.Append(Attr.Key);
+					Output.Append("=\"");
+					Output.Append(XML.Encode(Attr.Value));
+					Output.Append('"');
+				}
 			}
 
 			bool HasElements = false;

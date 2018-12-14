@@ -18,14 +18,13 @@ namespace Waher.Networking.XMPP.Contracts
 	/// </summary>
 	public class Contract
 	{
-		private string objectId = null;
 		private string contractId = null;
 		private string templateId = string.Empty;
 		private string provider = null;
-		private string forMachines = null;
 		private string forMachinesLocalName = null;
 		private string forMachinesNamespace = null;
 		private byte[] contentSchemaHash = null;
+		private XmlElement forMachines = null;
 		private Role[] roles = null;
 		private Part[] parts = null;
 		private Parameter[] parameters = null;
@@ -40,8 +39,8 @@ namespace Waher.Networking.XMPP.Contracts
 		private DateTime updated = DateTime.MinValue;
 		private DateTime from = DateTime.MinValue;
 		private DateTime to = DateTime.MaxValue;
-		private DateTime signAfter = DateTime.MinValue;
-		private DateTime signBefore = DateTime.MaxValue;
+		private DateTime? signAfter = null;
+		private DateTime? signBefore = null;
 		private Duration duration = null;
 		private Duration archiveReq = null;
 		private Duration archiveOpt = null;
@@ -52,15 +51,6 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		public Contract()
 		{
-		}
-
-		/// <summary>
-		/// Object ID
-		/// </summary>
-		public string ObjectId
-		{
-			get { return this.objectId; }
-			set { this.objectId = value; }
 		}
 
 		/// <summary>
@@ -138,7 +128,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <summary>
 		/// Signatures will only be accepted after this point in time.
 		/// </summary>
-		public DateTime SignAfter
+		public DateTime? SignAfter
 		{
 			get { return this.signAfter; }
 			set { this.signAfter = value; }
@@ -147,7 +137,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <summary>
 		/// Signatures will only be accepted until this point in time.
 		/// </summary>
-		public DateTime SignBefore
+		public DateTime? SignBefore
 		{
 			get { return this.signBefore; }
 			set { this.signBefore = value; }
@@ -248,10 +238,15 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <summary>
 		/// Machine-readable contents of the contract.
 		/// </summary>
-		public string ForMachines
+		public XmlElement ForMachines
 		{
 			get { return this.forMachines; }
-			set { this.forMachines = value; }
+			set
+			{
+				this.forMachines = value;
+				this.forMachinesLocalName = value?.LocalName;
+				this.forMachinesNamespace = value?.NamespaceURI;
+			}
 		}
 
 		/// <summary>
@@ -260,7 +255,6 @@ namespace Waher.Networking.XMPP.Contracts
 		public string ForMachinesNamespace
 		{
 			get { return this.forMachinesNamespace; }
-			set { this.forMachinesNamespace = value; }
 		}
 
 		/// <summary>
@@ -269,7 +263,6 @@ namespace Waher.Networking.XMPP.Contracts
 		public string ForMachinesLocalName
 		{
 			get { return this.forMachinesLocalName; }
-			set { this.forMachinesLocalName = value; }
 		}
 
 		/// <summary>
@@ -611,13 +604,33 @@ namespace Waher.Networking.XMPP.Contracts
 								if (string.IsNullOrEmpty(Name))
 									return null;
 
+								Descriptions = new List<HumanReadableText>();
+
+								foreach (XmlNode N3 in E2.ChildNodes)
+								{
+									if (N3 is XmlElement E3)
+									{
+										if (E3.LocalName == "description")
+										{
+											Text = HumanReadableText.Parse(E3);
+											if (Text == null || !Text.IsWellDefined)
+												return null;
+
+											Descriptions.Add(Text);
+										}
+										else
+											return null;
+									}
+								}
+
 								switch (E2.LocalName)
 								{
 									case "stringParameter":
 										Parameters.Add(new StringParameter()
 										{
 											Name = Name,
-											Value = XML.Attribute(E2, "value")
+											Value = XML.Attribute(E2, "value"),
+											Descriptions = Descriptions.ToArray()
 										});
 										break;
 
@@ -625,7 +638,8 @@ namespace Waher.Networking.XMPP.Contracts
 										Parameters.Add(new NumericalParameter()
 										{
 											Name = Name,
-											Value = XML.Attribute(E2, "value", 0.0)
+											Value = XML.Attribute(E2, "value", 0.0),
+											Descriptions = Descriptions.ToArray()
 										});
 										break;
 
@@ -816,11 +830,8 @@ namespace Waher.Networking.XMPP.Contracts
 			if (Content == null || ForHumans.Count == 0 || !PartsDefined)
 				return null;
 
-			StringBuilder ForMachines = new StringBuilder();
-			NormalizeXml(Content, ForMachines, ContractsClient.NamespaceSmartContracts);
-
 			Result.roles = Roles.ToArray();
-			Result.forMachines = ForMachines.ToString();
+			Result.forMachines = Content;
 			Result.forMachinesLocalName = Content.LocalName;
 			Result.forMachinesNamespace = Content.NamespaceURI;
 			Result.forHumans = ForHumans.ToArray();
@@ -1003,17 +1014,17 @@ namespace Waher.Networking.XMPP.Contracts
 				Xml.Append('"');
 			}
 
-			if (this.signAfter > DateTime.MinValue)
+			if (this.signAfter.HasValue)
 			{
 				Xml.Append(" signAfter=\"");
-				Xml.Append(XML.Encode(this.signAfter));
+				Xml.Append(XML.Encode(this.signAfter.Value));
 				Xml.Append('"');
 			}
 
-			if (this.signBefore > DateTime.MinValue)
+			if (this.signBefore.HasValue)
 			{
 				Xml.Append(" signBefore=\"");
-				Xml.Append(XML.Encode(this.signBefore));
+				Xml.Append(XML.Encode(this.signBefore.Value));
 				Xml.Append('"');
 			}
 

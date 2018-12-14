@@ -38,5 +38,16 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements
 			}
 		}
 
+		/// <summary>
+		/// Generates markdown for the human-readable text.
+		/// </summary>
+		/// <param name="Markdown">Markdown output.</param>
+		/// <param name="SectionLevel">Current section level.</param>
+		/// <param name="Contract">Contract, of which the human-readable text is part.</param>
+		public override void GenerateMarkdown(StringBuilder Markdown, int SectionLevel, Contract Contract)
+		{
+			foreach (HumanReadableElement E in this.Body)
+				E.GenerateMarkdown(Markdown, SectionLevel, Contract);
+		}
 	}
 }

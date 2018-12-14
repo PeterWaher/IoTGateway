@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Waher.Networking.XMPP.Contracts.HumanReadable;
 
 namespace Waher.Networking.XMPP.Contracts
 {
@@ -9,7 +10,17 @@ namespace Waher.Networking.XMPP.Contracts
 	/// </summary>
 	public abstract class Parameter
 	{
+		private HumanReadableText[] descriptions = null;
 		private string name;
+
+		/// <summary>
+		/// Discriptions of the role, in different languages.
+		/// </summary>
+		public HumanReadableText[] Descriptions
+		{
+			get => this.descriptions;
+			set => this.descriptions = value;
+		}
 
 		/// <summary>
 		/// Parameter name

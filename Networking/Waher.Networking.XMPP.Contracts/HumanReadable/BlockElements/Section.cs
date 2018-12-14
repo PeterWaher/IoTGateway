@@ -50,5 +50,40 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements
 			Xml.Append("</section>");
 		}
 
+		/// <summary>
+		/// Generates markdown for the human-readable text.
+		/// </summary>
+		/// <param name="Markdown">Markdown output.</param>
+		/// <param name="SectionLevel">Current section level.</param>
+		/// <param name="Contract">Contract, of which the human-readable text is part.</param>
+		public override void GenerateMarkdown(StringBuilder Markdown, int SectionLevel, Contract Contract)
+		{
+			StringBuilder Markdown2;
+
+			if (SectionLevel >= 3)
+			{
+				Markdown2 = Markdown;
+				Markdown.Append(new string('#', SectionLevel));
+				Markdown.Append(' ');
+			}
+			else
+				Markdown2 = new StringBuilder();
+
+			foreach (InlineElement E in this.header)
+				E.GenerateMarkdown(Markdown2, SectionLevel, Contract);
+
+			if (SectionLevel < 3)
+			{
+				string s = Markdown2.ToString();
+				Markdown.AppendLine(s);
+				Markdown.Append(new string(SectionLevel == 1 ? '=' : '-', s.Length + 3));
+			}
+
+			Markdown.AppendLine();
+			Markdown.AppendLine();
+
+			base.GenerateMarkdown(Markdown, SectionLevel + 1, Contract);
+		}
+
 	}
 }

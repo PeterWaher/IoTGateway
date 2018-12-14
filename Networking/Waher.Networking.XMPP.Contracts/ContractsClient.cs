@@ -1287,11 +1287,10 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <summary>
 		/// Creates a new contract.
 		/// </summary>
-		/// <param name="Address">Address of server (component).</param>
 		/// <param name="ForMachines">Machine-readable content.</param>
 		/// <param name="ForHumans">Human-readable localized content. Provide one object for each language supported by the contract.</param>
 		/// <param name="Roles">Roles defined in contract.</param>
-		/// <param name="Parts">Parts defined in contract.</param>
+		/// <param name="Parts">Parts defined in contract. Can be empty or null, if creating an open contract or a template.</param>
 		/// <param name="Parameters">Any contractual parameters defined for the contract.</param>
 		/// <param name="Visibility">Visibility of the contract.</param>
 		/// <param name="PartsMode">How parts are defined in the contract. If equal to <see cref="ContractParts.ExplicitlyDefined"/>,
@@ -1299,87 +1298,354 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Duration">Duration of the contract, once signed.</param>
 		/// <param name="ArchiveRequired">Required archivation duration, after signed contract has become obsolete.</param>
 		/// <param name="ArchiveOptional">Optional archivation duration, after required archivation duration has elapsed.</param>
+		/// <param name="SignAfter">Signatures will only be accepted after this point in time, if provided.</param>
+		/// <param name="SignBefore">Signatures will only be accepted until this point in time, if provided.</param>
 		/// <param name="CanActAsTemplate">If the contract can act as a template.</param>
 		/// <param name="Callback">Method to call when registration response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void CreateContract(string Address, XmlDocument ForMachines, HumanReadableText[] ForHumans, Role[] Roles,
+		public void CreateContract(XmlElement ForMachines, HumanReadableText[] ForHumans, Role[] Roles,
 			Part[] Parts, Parameter[] Parameters, ContractVisibility Visibility, ContractParts PartsMode, Duration Duration,
-			Duration ArchiveRequired, Duration ArchiveOptional, bool CanActAsTemplate, LegalIdentityEventHandler Callback, object State)
+			Duration ArchiveRequired, Duration ArchiveOptional, DateTime? SignAfter, DateTime? SignBefore, bool CanActAsTemplate,
+			SmartContractEventHandler Callback, object State)
 		{
-			/*
-			this.GetMatchingLocalKey(Address, (sender, e) =>
+			this.CreateContract(this.componentAddress, ForMachines, ForHumans, Roles, Parts, Parameters, Visibility, PartsMode,
+				Duration, ArchiveRequired, ArchiveOptional, SignAfter, SignBefore, CanActAsTemplate, Callback, State);
+		}
+
+		/// <summary>
+		/// Creates a new contract.
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="ForMachines">Machine-readable content.</param>
+		/// <param name="ForHumans">Human-readable localized content. Provide one object for each language supported by the contract.</param>
+		/// <param name="Roles">Roles defined in contract.</param>
+		/// <param name="Parts">Parts defined in contract. Can be empty or null, if creating an open contract or a template.</param>
+		/// <param name="Parameters">Any contractual parameters defined for the contract.</param>
+		/// <param name="Visibility">Visibility of the contract.</param>
+		/// <param name="PartsMode">How parts are defined in the contract. If equal to <see cref="ContractParts.ExplicitlyDefined"/>,
+		/// then the explicitly defined parts must be provided in <paramref name="Parts"/>.</param>
+		/// <param name="Duration">Duration of the contract, once signed.</param>
+		/// <param name="ArchiveRequired">Required archivation duration, after signed contract has become obsolete.</param>
+		/// <param name="ArchiveOptional">Optional archivation duration, after required archivation duration has elapsed.</param>
+		/// <param name="SignAfter">Signatures will only be accepted after this point in time, if provided.</param>
+		/// <param name="SignBefore">Signatures will only be accepted until this point in time, if provided.</param>
+		/// <param name="CanActAsTemplate">If the contract can act as a template.</param>
+		/// <param name="Callback">Method to call when registration response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public void CreateContract(string Address, XmlElement ForMachines, HumanReadableText[] ForHumans, Role[] Roles,
+			Part[] Parts, Parameter[] Parameters, ContractVisibility Visibility, ContractParts PartsMode, Duration Duration,
+			Duration ArchiveRequired, Duration ArchiveOptional, DateTime? SignAfter, DateTime? SignBefore, bool CanActAsTemplate,
+			SmartContractEventHandler Callback, object State)
+		{
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<createContract xmlns=\"");
+			Xml.Append(NamespaceSmartContracts);
+			Xml.Append("\">");
+
+			Contract Contract = new Contract()
 			{
-				if (e.Ok)
+				ForMachines = ForMachines,
+				ForHumans = ForHumans,
+				Roles = Roles,
+				Parts = Parts,
+				Parameters = Parameters,
+				Visibility = Visibility,
+				PartsMode = PartsMode,
+				Duration = Duration,
+				ArchiveRequired = ArchiveRequired,
+				ArchiveOptional = ArchiveOptional,
+				SignAfter = SignAfter,
+				SignBefore = SignBefore,
+				CanActAsTemplate = CanActAsTemplate
+			};
+
+			Contract.Serialize(Xml, false, false, false, false, false);
+
+			Xml.Append("</createContract>");
+
+			this.client.SendIqSet(Address, Xml.ToString(), (sender, e) =>
+			{
+				Contract Contract2 = null;
+				XmlElement E;
+
+				if (e.Ok && (E = e.FirstElement) != null &&
+					E.LocalName == "contract" &&
+					E.NamespaceURI == NamespaceSmartContracts)
 				{
-					StringBuilder Xml = new StringBuilder();
-
-					Xml.Append("<apply xmlns=\"");
-					Xml.Append(NamespaceLegalIdentities);
-					Xml.Append("\">");
-
-					StringBuilder Identity = new StringBuilder();
-
-					Identity.Append("<identity><clientPublicKey>");
-					e.Key.ToXml(Identity);
-					Identity.Append("</clientPublicKey>");
-
-					foreach (Property Property in Properties)
-					{
-						Identity.Append("<property name=\"");
-						Identity.Append(XML.Encode(Property.Name));
-						Identity.Append("\" value=\"");
-						Identity.Append(XML.Encode(Property.Value));
-						Identity.Append("\"/>");
-					}
-
-					string s = Identity.ToString();
-					Xml.Append(s);
-
-					s += "</identity>";
-
-					byte[] Bin = Encoding.UTF8.GetBytes(s);
-
-					if (e.Key is EcAes256 EcAes256)
-					{
-						KeyValuePair<byte[], byte[]> Signature = EcAes256.Sign(Bin, Security.HashFunction.SHA256);
-
-						Xml.Append("<clientSignature s1=\"");
-						Xml.Append(Convert.ToBase64String(Signature.Key));
-						Xml.Append("\" s2=\"");
-						Xml.Append(Convert.ToBase64String(Signature.Value));
-						Xml.Append("\"/>");
-					}
-					else if (e.Key is RsaAes RsaAes)
-					{
-						byte[] Signature = RsaAes.Sign(Bin);
-
-						Xml.Append("<clientSignature s1=\"");
-						Xml.Append(Convert.ToBase64String(Signature));
-						Xml.Append("\"/>");
-					}
-
-					Xml.Append("</identity></apply>");
-
-					this.client.SendIqSet(Address, Xml.ToString(), (sender2, e2) =>
-					{
-						LegalIdentity Identity2 = null;
-						XmlElement E;
-
-						if (e2.Ok && (E = e2.FirstElement) != null &&
-							E.LocalName == "identity" &&
-							E.NamespaceURI == NamespaceLegalIdentities)
-						{
-							Identity2 = LegalIdentity.Parse(E);
-						}
-						else
-							e2.Ok = false;
-
-						Callback?.Invoke(this, new LegalIdentityEventArgs(e2, Identity2));
-					}, e.State);
+					Contract2 = Contract.Parse(E, out bool HasStatus);
 				}
 				else
-					Callback?.Invoke(this, new LegalIdentityEventArgs(e, null));
-			}, State);*/
+					e.Ok = false;
+
+				Callback?.Invoke(this, new SmartContractEventArgs(e, Contract2));
+			}, State);
+		}
+
+		/// <summary>
+		/// Creates a new contract.
+		/// </summary>
+		/// <param name="ForMachines">Machine-readable content.</param>
+		/// <param name="ForHumans">Human-readable localized content. Provide one object for each language supported by the contract.</param>
+		/// <param name="Roles">Roles defined in contract.</param>
+		/// <param name="Parts">Parts defined in contract. Can be empty or null, if creating an open contract or a template.</param>
+		/// <param name="Parameters">Any contractual parameters defined for the contract.</param>
+		/// <param name="Visibility">Visibility of the contract.</param>
+		/// <param name="PartsMode">How parts are defined in the contract. If equal to <see cref="ContractParts.ExplicitlyDefined"/>,
+		/// then the explicitly defined parts must be provided in <paramref name="Parts"/>.</param>
+		/// <param name="Duration">Duration of the contract, once signed.</param>
+		/// <param name="ArchiveRequired">Required archivation duration, after signed contract has become obsolete.</param>
+		/// <param name="ArchiveOptional">Optional archivation duration, after required archivation duration has elapsed.</param>
+		/// <param name="SignAfter">Signatures will only be accepted after this point in time, if provided.</param>
+		/// <param name="SignBefore">Signatures will only be accepted until this point in time, if provided.</param>
+		/// <param name="CanActAsTemplate">If the contract can act as a template.</param>
+		public Task<Contract> CreateContractAsync(XmlElement ForMachines, HumanReadableText[] ForHumans, Role[] Roles,
+			Part[] Parts, Parameter[] Parameters, ContractVisibility Visibility, ContractParts PartsMode, Duration Duration,
+			Duration ArchiveRequired, Duration ArchiveOptional, DateTime? SignAfter, DateTime? SignBefore, bool CanActAsTemplate)
+		{
+			return this.CreateContractAsync(this.componentAddress, ForMachines, ForHumans, Roles, Parts, Parameters, Visibility,
+				PartsMode, Duration, ArchiveRequired, ArchiveOptional, SignAfter, SignBefore, CanActAsTemplate);
+		}
+
+		/// <summary>
+		/// Creates a new contract.
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="ForMachines">Machine-readable content.</param>
+		/// <param name="ForHumans">Human-readable localized content. Provide one object for each language supported by the contract.</param>
+		/// <param name="Roles">Roles defined in contract.</param>
+		/// <param name="Parts">Parts defined in contract. Can be empty or null, if creating an open contract or a template.</param>
+		/// <param name="Parameters">Any contractual parameters defined for the contract.</param>
+		/// <param name="Visibility">Visibility of the contract.</param>
+		/// <param name="PartsMode">How parts are defined in the contract. If equal to <see cref="ContractParts.ExplicitlyDefined"/>,
+		/// then the explicitly defined parts must be provided in <paramref name="Parts"/>.</param>
+		/// <param name="Duration">Duration of the contract, once signed.</param>
+		/// <param name="ArchiveRequired">Required archivation duration, after signed contract has become obsolete.</param>
+		/// <param name="ArchiveOptional">Optional archivation duration, after required archivation duration has elapsed.</param>
+		/// <param name="SignAfter">Signatures will only be accepted after this point in time, if provided.</param>
+		/// <param name="SignBefore">Signatures will only be accepted until this point in time, if provided.</param>
+		/// <param name="CanActAsTemplate">If the contract can act as a template.</param>
+		public Task<Contract> CreateContractAsync(string Address, XmlElement ForMachines, HumanReadableText[] ForHumans, Role[] Roles,
+			Part[] Parts, Parameter[] Parameters, ContractVisibility Visibility, ContractParts PartsMode, Duration Duration,
+			Duration ArchiveRequired, Duration ArchiveOptional, DateTime? SignAfter, DateTime? SignBefore, bool CanActAsTemplate)
+		{
+			TaskCompletionSource<Contract> Result = new TaskCompletionSource<Contract>();
+
+			this.CreateContract(Address, ForMachines, ForHumans, Roles, Parts, Parameters, Visibility, PartsMode, Duration,
+				ArchiveRequired, ArchiveOptional, SignAfter, SignBefore, CanActAsTemplate, (sender, e) =>
+			{
+				if (e.Ok)
+					Result.SetResult(e.Contract);
+				else
+				{
+					Result.SetException(new IOException(string.IsNullOrEmpty(e.ErrorText) ?
+						"Unable to create the contract." : e.ErrorText));
+				}
+			}, null);
+
+			return Result.Task;
+		}
+
+		#endregion
+
+		#region Create Contract From Template
+
+		/// <summary>
+		/// Creates a new contract from a template.
+		/// </summary>
+		/// <param name="TemplateId">ID of contract to be used as a template.</param>
+		/// <param name="Parts">Parts defined in contract. Can be empty or null, if creating an open contract or a template.</param>
+		/// <param name="Parameters">Any contractual parameters defined for the contract.</param>
+		/// <param name="Visibility">Visibility of the contract.</param>
+		/// <param name="PartsMode">How parts are defined in the contract. If equal to <see cref="ContractParts.ExplicitlyDefined"/>,
+		/// then the explicitly defined parts must be provided in <paramref name="Parts"/>.</param>
+		/// <param name="Duration">Duration of the contract, once signed.</param>
+		/// <param name="ArchiveRequired">Required archivation duration, after signed contract has become obsolete.</param>
+		/// <param name="ArchiveOptional">Optional archivation duration, after required archivation duration has elapsed.</param>
+		/// <param name="SignAfter">Signatures will only be accepted after this point in time, if provided.</param>
+		/// <param name="SignBefore">Signatures will only be accepted until this point in time, if provided.</param>
+		/// <param name="CanActAsTemplate">If the contract can act as a template.</param>
+		/// <param name="Callback">Method to call when registration response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public void CreateContract(string TemplateId, Part[] Parts, Parameter[] Parameters, ContractVisibility Visibility,
+			ContractParts PartsMode, Duration Duration, Duration ArchiveRequired, Duration ArchiveOptional, DateTime? SignAfter,
+			DateTime? SignBefore, bool CanActAsTemplate, SmartContractEventHandler Callback, object State)
+		{
+			this.CreateContract(this.componentAddress, TemplateId, Parts, Parameters, Visibility, PartsMode,
+				Duration, ArchiveRequired, ArchiveOptional, SignAfter, SignBefore, CanActAsTemplate, Callback, State);
+		}
+
+		/// <summary>
+		/// Creates a new contract from a template.
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="TemplateId">ID of contract to be used as a template.</param>
+		/// <param name="Parts">Parts defined in contract. Can be empty or null, if creating an open contract or a template.</param>
+		/// <param name="Parameters">Any contractual parameters defined for the contract.</param>
+		/// <param name="Visibility">Visibility of the contract.</param>
+		/// <param name="PartsMode">How parts are defined in the contract. If equal to <see cref="ContractParts.ExplicitlyDefined"/>,
+		/// then the explicitly defined parts must be provided in <paramref name="Parts"/>.</param>
+		/// <param name="Duration">Duration of the contract, once signed.</param>
+		/// <param name="ArchiveRequired">Required archivation duration, after signed contract has become obsolete.</param>
+		/// <param name="ArchiveOptional">Optional archivation duration, after required archivation duration has elapsed.</param>
+		/// <param name="SignAfter">Signatures will only be accepted after this point in time, if provided.</param>
+		/// <param name="SignBefore">Signatures will only be accepted until this point in time, if provided.</param>
+		/// <param name="CanActAsTemplate">If the contract can act as a template.</param>
+		/// <param name="Callback">Method to call when registration response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public void CreateContract(string Address, string TemplateId, Part[] Parts, Parameter[] Parameters, ContractVisibility Visibility,
+			ContractParts PartsMode, Duration Duration, Duration ArchiveRequired, Duration ArchiveOptional, DateTime? SignAfter,
+			DateTime? SignBefore, bool CanActAsTemplate, SmartContractEventHandler Callback, object State)
+		{
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<createContract xmlns=\"");
+			Xml.Append(NamespaceSmartContracts);
+			Xml.Append("\"><template archiveOpt=\"");
+			Xml.Append(ArchiveOptional.ToString());
+			Xml.Append("\" archiveReq=\"");
+			Xml.Append(ArchiveRequired.ToString());
+			Xml.Append("\" canActAsTemplate=\"");
+			Xml.Append(CommonTypes.Encode(CanActAsTemplate));
+			Xml.Append("\" duration=\"");
+			Xml.Append(Duration.ToString());
+			Xml.Append("\" id=\"");
+				Xml.Append(XML.Encode(TemplateId));
+			Xml.Append('"');
+
+			if (SignAfter.HasValue && SignAfter > DateTime.MinValue)
+			{
+				Xml.Append(" signAfter=\"");
+				Xml.Append(XML.Encode(SignAfter.Value));
+				Xml.Append('"');
+			}
+
+			if (SignBefore.HasValue && SignBefore < DateTime.MaxValue)
+			{
+				Xml.Append(" signBefore=\"");
+				Xml.Append(XML.Encode(SignBefore.Value));
+				Xml.Append('"');
+			}
+
+			Xml.Append(" visibility=\"");
+			Xml.Append(Visibility.ToString());
+			Xml.Append("\"><parts>");
+
+			switch (PartsMode)
+			{
+				case ContractParts.Open:
+					Xml.Append("<open/>");
+					break;
+
+				case ContractParts.TemplateOnly:
+					Xml.Append("<templateOnly/>");
+					break;
+
+				case ContractParts.ExplicitlyDefined:
+					if (Parts != null)
+					{
+						foreach (Part Part in Parts)
+						{
+							Xml.Append("<part legalId=\"");
+							Xml.Append(XML.Encode(Part.LegalId));
+							Xml.Append("\" role=\"");
+							Xml.Append(XML.Encode(Part.Role));
+							Xml.Append("\"/>");
+						}
+					}
+					break;
+			}
+
+			Xml.Append("</parts>");
+
+			if (Parameters != null && Parameters.Length > 0)
+			{
+				Xml.Append("<parameters>");
+
+				foreach (Parameter Parameter in Parameters)
+					Parameter.Serialize(Xml);
+
+				Xml.Append("</parameters>");
+			}
+
+			Xml.Append("</template></createContract>");
+
+			this.client.SendIqSet(Address, Xml.ToString(), (sender, e) =>
+			{
+				Contract Contract2 = null;
+				XmlElement E;
+
+				if (e.Ok && (E = e.FirstElement) != null &&
+					E.LocalName == "contract" &&
+					E.NamespaceURI == NamespaceSmartContracts)
+				{
+					Contract2 = Contract.Parse(E, out bool HasStatus);
+				}
+				else
+					e.Ok = false;
+
+				Callback?.Invoke(this, new SmartContractEventArgs(e, Contract2));
+			}, State);
+		}
+
+		/// <summary>
+		/// Creates a new contract from a template.
+		/// </summary>
+		/// <param name="TemplateId">ID of contract to be used as a template.</param>
+		/// <param name="Parts">Parts defined in contract. Can be empty or null, if creating an open contract or a template.</param>
+		/// <param name="Parameters">Any contractual parameters defined for the contract.</param>
+		/// <param name="Visibility">Visibility of the contract.</param>
+		/// <param name="PartsMode">How parts are defined in the contract. If equal to <see cref="ContractParts.ExplicitlyDefined"/>,
+		/// then the explicitly defined parts must be provided in <paramref name="Parts"/>.</param>
+		/// <param name="Duration">Duration of the contract, once signed.</param>
+		/// <param name="ArchiveRequired">Required archivation duration, after signed contract has become obsolete.</param>
+		/// <param name="ArchiveOptional">Optional archivation duration, after required archivation duration has elapsed.</param>
+		/// <param name="SignAfter">Signatures will only be accepted after this point in time, if provided.</param>
+		/// <param name="SignBefore">Signatures will only be accepted until this point in time, if provided.</param>
+		/// <param name="CanActAsTemplate">If the contract can act as a template.</param>
+		public Task<Contract> CreateContractAsync(string TemplateId, Part[] Parts, Parameter[] Parameters, ContractVisibility Visibility,
+			ContractParts PartsMode, Duration Duration, Duration ArchiveRequired, Duration ArchiveOptional, DateTime? SignAfter,
+			DateTime? SignBefore, bool CanActAsTemplate)
+		{
+			return this.CreateContractAsync(this.componentAddress, TemplateId, Parts, Parameters, Visibility,
+				PartsMode, Duration, ArchiveRequired, ArchiveOptional, SignAfter, SignBefore, CanActAsTemplate);
+		}
+
+		/// <summary>
+		/// Creates a new contract from a template.
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="TemplateId">ID of contract to be used as a template.</param>
+		/// <param name="Parts">Parts defined in contract. Can be empty or null, if creating an open contract or a template.</param>
+		/// <param name="Parameters">Any contractual parameters defined for the contract.</param>
+		/// <param name="Visibility">Visibility of the contract.</param>
+		/// <param name="PartsMode">How parts are defined in the contract. If equal to <see cref="ContractParts.ExplicitlyDefined"/>,
+		/// then the explicitly defined parts must be provided in <paramref name="Parts"/>.</param>
+		/// <param name="Duration">Duration of the contract, once signed.</param>
+		/// <param name="ArchiveRequired">Required archivation duration, after signed contract has become obsolete.</param>
+		/// <param name="ArchiveOptional">Optional archivation duration, after required archivation duration has elapsed.</param>
+		/// <param name="SignAfter">Signatures will only be accepted after this point in time, if provided.</param>
+		/// <param name="SignBefore">Signatures will only be accepted until this point in time, if provided.</param>
+		/// <param name="CanActAsTemplate">If the contract can act as a template.</param>
+		public Task<Contract> CreateContractAsync(string Address, string TemplateId, Part[] Parts, Parameter[] Parameters,
+			ContractVisibility Visibility, ContractParts PartsMode, Duration Duration, Duration ArchiveRequired, Duration ArchiveOptional,
+			DateTime? SignAfter, DateTime? SignBefore, bool CanActAsTemplate)
+		{
+			TaskCompletionSource<Contract> Result = new TaskCompletionSource<Contract>();
+
+			this.CreateContract(Address, TemplateId, Parts, Parameters, Visibility, PartsMode, Duration,
+				ArchiveRequired, ArchiveOptional, SignAfter, SignBefore, CanActAsTemplate, (sender, e) =>
+				{
+					if (e.Ok)
+						Result.SetResult(e.Contract);
+					else
+					{
+						Result.SetException(new IOException(string.IsNullOrEmpty(e.ErrorText) ?
+							"Unable to create the contract." : e.ErrorText));
+					}
+				}, null);
+
+			return Result.Task;
 		}
 
 		#endregion

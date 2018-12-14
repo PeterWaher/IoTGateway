@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
 using Waher.Content.Xml;
+using Waher.Networking.XMPP.Contracts.HumanReadable;
 
 namespace Waher.Networking.XMPP.Contracts
 {
@@ -35,7 +36,18 @@ namespace Waher.Networking.XMPP.Contracts
 			Xml.Append(XML.Encode(this.Name));
 			Xml.Append("\" value=\"");
 			Xml.Append(XML.Encode(this.value));
-			Xml.Append("\"/>");
+
+			if (this.Descriptions == null || this.Descriptions.Length == 0)
+				Xml.Append("\"/>");
+			else
+			{
+				Xml.Append("\">");
+
+				foreach (HumanReadableText Description in this.Descriptions)
+					Description.Serialize(Xml, "description", false);
+
+				Xml.Append("</stringParameter>");
+			}
 		}
 	}
 }

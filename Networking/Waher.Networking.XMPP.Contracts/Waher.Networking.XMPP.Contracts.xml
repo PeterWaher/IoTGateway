@@ -40,11 +40,6 @@
             Contains the definition of a contract
             </summary>
         </member>
-        <member name="P:Waher.Networking.XMPP.Contracts.Contract.ObjectId">
-            <summary>
-            Object ID
-            </summary>
-        </member>
         <member name="P:Waher.Networking.XMPP.Contracts.Contract.ContractId">
             <summary>
             Contract identity
@@ -589,15 +584,14 @@
             <param name="S1">First signature of data</param>
             <param name="S2">Second signature of data, if available.</param>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.CreateContract(System.String,System.Xml.XmlDocument,Waher.Networking.XMPP.Contracts.HumanReadable.HumanReadableText[],Waher.Networking.XMPP.Contracts.Role[],Waher.Networking.XMPP.Contracts.Part[],Waher.Networking.XMPP.Contracts.Parameter[],Waher.Networking.XMPP.Contracts.ContractVisibility,Waher.Networking.XMPP.Contracts.ContractParts,Waher.Content.Duration,Waher.Content.Duration,Waher.Content.Duration,System.Boolean,Waher.Networking.XMPP.Contracts.LegalIdentityEventHandler,System.Object)">
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.CreateContract(System.Xml.XmlElement,Waher.Networking.XMPP.Contracts.HumanReadable.HumanReadableText[],Waher.Networking.XMPP.Contracts.Role[],Waher.Networking.XMPP.Contracts.Part[],Waher.Networking.XMPP.Contracts.Parameter[],Waher.Networking.XMPP.Contracts.ContractVisibility,Waher.Networking.XMPP.Contracts.ContractParts,Waher.Content.Duration,Waher.Content.Duration,Waher.Content.Duration,System.Nullable{System.DateTime},System.Nullable{System.DateTime},System.Boolean,Waher.Networking.XMPP.Contracts.SmartContractEventHandler,System.Object)">
             <summary>
             Creates a new contract.
             </summary>
-            <param name="Address">Address of server (component).</param>
             <param name="ForMachines">Machine-readable content.</param>
             <param name="ForHumans">Human-readable localized content. Provide one object for each language supported by the contract.</param>
             <param name="Roles">Roles defined in contract.</param>
-            <param name="Parts">Parts defined in contract.</param>
+            <param name="Parts">Parts defined in contract. Can be empty or null, if creating an open contract or a template.</param>
             <param name="Parameters">Any contractual parameters defined for the contract.</param>
             <param name="Visibility">Visibility of the contract.</param>
             <param name="PartsMode">How parts are defined in the contract. If equal to <see cref="F:Waher.Networking.XMPP.Contracts.ContractParts.ExplicitlyDefined"/>,
@@ -605,9 +599,146 @@
             <param name="Duration">Duration of the contract, once signed.</param>
             <param name="ArchiveRequired">Required archivation duration, after signed contract has become obsolete.</param>
             <param name="ArchiveOptional">Optional archivation duration, after required archivation duration has elapsed.</param>
+            <param name="SignAfter">Signatures will only be accepted after this point in time, if provided.</param>
+            <param name="SignBefore">Signatures will only be accepted until this point in time, if provided.</param>
             <param name="CanActAsTemplate">If the contract can act as a template.</param>
             <param name="Callback">Method to call when registration response is returned.</param>
             <param name="State">State object to pass on to the callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.CreateContract(System.String,System.Xml.XmlElement,Waher.Networking.XMPP.Contracts.HumanReadable.HumanReadableText[],Waher.Networking.XMPP.Contracts.Role[],Waher.Networking.XMPP.Contracts.Part[],Waher.Networking.XMPP.Contracts.Parameter[],Waher.Networking.XMPP.Contracts.ContractVisibility,Waher.Networking.XMPP.Contracts.ContractParts,Waher.Content.Duration,Waher.Content.Duration,Waher.Content.Duration,System.Nullable{System.DateTime},System.Nullable{System.DateTime},System.Boolean,Waher.Networking.XMPP.Contracts.SmartContractEventHandler,System.Object)">
+            <summary>
+            Creates a new contract.
+            </summary>
+            <param name="Address">Address of server (component).</param>
+            <param name="ForMachines">Machine-readable content.</param>
+            <param name="ForHumans">Human-readable localized content. Provide one object for each language supported by the contract.</param>
+            <param name="Roles">Roles defined in contract.</param>
+            <param name="Parts">Parts defined in contract. Can be empty or null, if creating an open contract or a template.</param>
+            <param name="Parameters">Any contractual parameters defined for the contract.</param>
+            <param name="Visibility">Visibility of the contract.</param>
+            <param name="PartsMode">How parts are defined in the contract. If equal to <see cref="F:Waher.Networking.XMPP.Contracts.ContractParts.ExplicitlyDefined"/>,
+            then the explicitly defined parts must be provided in <paramref name="Parts"/>.</param>
+            <param name="Duration">Duration of the contract, once signed.</param>
+            <param name="ArchiveRequired">Required archivation duration, after signed contract has become obsolete.</param>
+            <param name="ArchiveOptional">Optional archivation duration, after required archivation duration has elapsed.</param>
+            <param name="SignAfter">Signatures will only be accepted after this point in time, if provided.</param>
+            <param name="SignBefore">Signatures will only be accepted until this point in time, if provided.</param>
+            <param name="CanActAsTemplate">If the contract can act as a template.</param>
+            <param name="Callback">Method to call when registration response is returned.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.CreateContractAsync(System.Xml.XmlElement,Waher.Networking.XMPP.Contracts.HumanReadable.HumanReadableText[],Waher.Networking.XMPP.Contracts.Role[],Waher.Networking.XMPP.Contracts.Part[],Waher.Networking.XMPP.Contracts.Parameter[],Waher.Networking.XMPP.Contracts.ContractVisibility,Waher.Networking.XMPP.Contracts.ContractParts,Waher.Content.Duration,Waher.Content.Duration,Waher.Content.Duration,System.Nullable{System.DateTime},System.Nullable{System.DateTime},System.Boolean)">
+            <summary>
+            Creates a new contract.
+            </summary>
+            <param name="ForMachines">Machine-readable content.</param>
+            <param name="ForHumans">Human-readable localized content. Provide one object for each language supported by the contract.</param>
+            <param name="Roles">Roles defined in contract.</param>
+            <param name="Parts">Parts defined in contract. Can be empty or null, if creating an open contract or a template.</param>
+            <param name="Parameters">Any contractual parameters defined for the contract.</param>
+            <param name="Visibility">Visibility of the contract.</param>
+            <param name="PartsMode">How parts are defined in the contract. If equal to <see cref="F:Waher.Networking.XMPP.Contracts.ContractParts.ExplicitlyDefined"/>,
+            then the explicitly defined parts must be provided in <paramref name="Parts"/>.</param>
+            <param name="Duration">Duration of the contract, once signed.</param>
+            <param name="ArchiveRequired">Required archivation duration, after signed contract has become obsolete.</param>
+            <param name="ArchiveOptional">Optional archivation duration, after required archivation duration has elapsed.</param>
+            <param name="SignAfter">Signatures will only be accepted after this point in time, if provided.</param>
+            <param name="SignBefore">Signatures will only be accepted until this point in time, if provided.</param>
+            <param name="CanActAsTemplate">If the contract can act as a template.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.CreateContractAsync(System.String,System.Xml.XmlElement,Waher.Networking.XMPP.Contracts.HumanReadable.HumanReadableText[],Waher.Networking.XMPP.Contracts.Role[],Waher.Networking.XMPP.Contracts.Part[],Waher.Networking.XMPP.Contracts.Parameter[],Waher.Networking.XMPP.Contracts.ContractVisibility,Waher.Networking.XMPP.Contracts.ContractParts,Waher.Content.Duration,Waher.Content.Duration,Waher.Content.Duration,System.Nullable{System.DateTime},System.Nullable{System.DateTime},System.Boolean)">
+            <summary>
+            Creates a new contract.
+            </summary>
+            <param name="Address">Address of server (component).</param>
+            <param name="ForMachines">Machine-readable content.</param>
+            <param name="ForHumans">Human-readable localized content. Provide one object for each language supported by the contract.</param>
+            <param name="Roles">Roles defined in contract.</param>
+            <param name="Parts">Parts defined in contract. Can be empty or null, if creating an open contract or a template.</param>
+            <param name="Parameters">Any contractual parameters defined for the contract.</param>
+            <param name="Visibility">Visibility of the contract.</param>
+            <param name="PartsMode">How parts are defined in the contract. If equal to <see cref="F:Waher.Networking.XMPP.Contracts.ContractParts.ExplicitlyDefined"/>,
+            then the explicitly defined parts must be provided in <paramref name="Parts"/>.</param>
+            <param name="Duration">Duration of the contract, once signed.</param>
+            <param name="ArchiveRequired">Required archivation duration, after signed contract has become obsolete.</param>
+            <param name="ArchiveOptional">Optional archivation duration, after required archivation duration has elapsed.</param>
+            <param name="SignAfter">Signatures will only be accepted after this point in time, if provided.</param>
+            <param name="SignBefore">Signatures will only be accepted until this point in time, if provided.</param>
+            <param name="CanActAsTemplate">If the contract can act as a template.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.CreateContract(System.String,Waher.Networking.XMPP.Contracts.Part[],Waher.Networking.XMPP.Contracts.Parameter[],Waher.Networking.XMPP.Contracts.ContractVisibility,Waher.Networking.XMPP.Contracts.ContractParts,Waher.Content.Duration,Waher.Content.Duration,Waher.Content.Duration,System.Nullable{System.DateTime},System.Nullable{System.DateTime},System.Boolean,Waher.Networking.XMPP.Contracts.SmartContractEventHandler,System.Object)">
+            <summary>
+            Creates a new contract from a template.
+            </summary>
+            <param name="TemplateId">ID of contract to be used as a template.</param>
+            <param name="Parts">Parts defined in contract. Can be empty or null, if creating an open contract or a template.</param>
+            <param name="Parameters">Any contractual parameters defined for the contract.</param>
+            <param name="Visibility">Visibility of the contract.</param>
+            <param name="PartsMode">How parts are defined in the contract. If equal to <see cref="F:Waher.Networking.XMPP.Contracts.ContractParts.ExplicitlyDefined"/>,
+            then the explicitly defined parts must be provided in <paramref name="Parts"/>.</param>
+            <param name="Duration">Duration of the contract, once signed.</param>
+            <param name="ArchiveRequired">Required archivation duration, after signed contract has become obsolete.</param>
+            <param name="ArchiveOptional">Optional archivation duration, after required archivation duration has elapsed.</param>
+            <param name="SignAfter">Signatures will only be accepted after this point in time, if provided.</param>
+            <param name="SignBefore">Signatures will only be accepted until this point in time, if provided.</param>
+            <param name="CanActAsTemplate">If the contract can act as a template.</param>
+            <param name="Callback">Method to call when registration response is returned.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.CreateContract(System.String,System.String,Waher.Networking.XMPP.Contracts.Part[],Waher.Networking.XMPP.Contracts.Parameter[],Waher.Networking.XMPP.Contracts.ContractVisibility,Waher.Networking.XMPP.Contracts.ContractParts,Waher.Content.Duration,Waher.Content.Duration,Waher.Content.Duration,System.Nullable{System.DateTime},System.Nullable{System.DateTime},System.Boolean,Waher.Networking.XMPP.Contracts.SmartContractEventHandler,System.Object)">
+            <summary>
+            Creates a new contract from a template.
+            </summary>
+            <param name="Address">Address of server (component).</param>
+            <param name="TemplateId">ID of contract to be used as a template.</param>
+            <param name="Parts">Parts defined in contract. Can be empty or null, if creating an open contract or a template.</param>
+            <param name="Parameters">Any contractual parameters defined for the contract.</param>
+            <param name="Visibility">Visibility of the contract.</param>
+            <param name="PartsMode">How parts are defined in the contract. If equal to <see cref="F:Waher.Networking.XMPP.Contracts.ContractParts.ExplicitlyDefined"/>,
+            then the explicitly defined parts must be provided in <paramref name="Parts"/>.</param>
+            <param name="Duration">Duration of the contract, once signed.</param>
+            <param name="ArchiveRequired">Required archivation duration, after signed contract has become obsolete.</param>
+            <param name="ArchiveOptional">Optional archivation duration, after required archivation duration has elapsed.</param>
+            <param name="SignAfter">Signatures will only be accepted after this point in time, if provided.</param>
+            <param name="SignBefore">Signatures will only be accepted until this point in time, if provided.</param>
+            <param name="CanActAsTemplate">If the contract can act as a template.</param>
+            <param name="Callback">Method to call when registration response is returned.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.CreateContractAsync(System.String,Waher.Networking.XMPP.Contracts.Part[],Waher.Networking.XMPP.Contracts.Parameter[],Waher.Networking.XMPP.Contracts.ContractVisibility,Waher.Networking.XMPP.Contracts.ContractParts,Waher.Content.Duration,Waher.Content.Duration,Waher.Content.Duration,System.Nullable{System.DateTime},System.Nullable{System.DateTime},System.Boolean)">
+            <summary>
+            Creates a new contract from a template.
+            </summary>
+            <param name="TemplateId">ID of contract to be used as a template.</param>
+            <param name="Parts">Parts defined in contract. Can be empty or null, if creating an open contract or a template.</param>
+            <param name="Parameters">Any contractual parameters defined for the contract.</param>
+            <param name="Visibility">Visibility of the contract.</param>
+            <param name="PartsMode">How parts are defined in the contract. If equal to <see cref="F:Waher.Networking.XMPP.Contracts.ContractParts.ExplicitlyDefined"/>,
+            then the explicitly defined parts must be provided in <paramref name="Parts"/>.</param>
+            <param name="Duration">Duration of the contract, once signed.</param>
+            <param name="ArchiveRequired">Required archivation duration, after signed contract has become obsolete.</param>
+            <param name="ArchiveOptional">Optional archivation duration, after required archivation duration has elapsed.</param>
+            <param name="SignAfter">Signatures will only be accepted after this point in time, if provided.</param>
+            <param name="SignBefore">Signatures will only be accepted until this point in time, if provided.</param>
+            <param name="CanActAsTemplate">If the contract can act as a template.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.CreateContractAsync(System.String,System.String,Waher.Networking.XMPP.Contracts.Part[],Waher.Networking.XMPP.Contracts.Parameter[],Waher.Networking.XMPP.Contracts.ContractVisibility,Waher.Networking.XMPP.Contracts.ContractParts,Waher.Content.Duration,Waher.Content.Duration,Waher.Content.Duration,System.Nullable{System.DateTime},System.Nullable{System.DateTime},System.Boolean)">
+            <summary>
+            Creates a new contract from a template.
+            </summary>
+            <param name="Address">Address of server (component).</param>
+            <param name="TemplateId">ID of contract to be used as a template.</param>
+            <param name="Parts">Parts defined in contract. Can be empty or null, if creating an open contract or a template.</param>
+            <param name="Parameters">Any contractual parameters defined for the contract.</param>
+            <param name="Visibility">Visibility of the contract.</param>
+            <param name="PartsMode">How parts are defined in the contract. If equal to <see cref="F:Waher.Networking.XMPP.Contracts.ContractParts.ExplicitlyDefined"/>,
+            then the explicitly defined parts must be provided in <paramref name="Parts"/>.</param>
+            <param name="Duration">Duration of the contract, once signed.</param>
+            <param name="ArchiveRequired">Required archivation duration, after signed contract has become obsolete.</param>
+            <param name="ArchiveOptional">Optional archivation duration, after required archivation duration has elapsed.</param>
+            <param name="SignAfter">Signatures will only be accepted after this point in time, if provided.</param>
+            <param name="SignBefore">Signatures will only be accepted until this point in time, if provided.</param>
+            <param name="CanActAsTemplate">If the contract can act as a template.</param>
         </member>
         <member name="T:Waher.Networking.XMPP.Contracts.ContractState">
             <summary>
@@ -676,325 +807,6 @@
             <summary>
             Contract is accessible by everyone requesting it. It is also searchable.
             </summary>
-        </member>
-        <member name="T:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.BlockElement">
-            <summary>
-            Abstract base class for inline elements.
-            </summary>
-        </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.BlockElement.Parse(System.Xml.XmlElement)">
-            <summary>
-            Parses XML for a set of block elements.
-            </summary>
-            <param name="Xml">XML representation</param>
-            <returns>Array of block elements</returns>
-        </member>
-        <member name="T:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.Blocks">
-            <summary>
-            Abstract base class for sets of blocks.
-            </summary>
-        </member>
-        <member name="P:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.Blocks.Body">
-            <summary>
-            Body elements
-            </summary>
-        </member>
-        <member name="P:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.Blocks.IsWellDefined">
-            <summary>
-            Checks if the element is well-defined.
-            </summary>
-        </member>
-        <member name="T:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.BulletList">
-            <summary>
-            Bullet list
-            </summary>
-        </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.BulletList.Serialize(System.Text.StringBuilder)">
-            <summary>
-            Serializes the element in normalized form.
-            </summary>
-            <param name="Xml">XML Output.</param>
-        </member>
-        <member name="T:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.InlineBlock">
-            <summary>
-            Abstract base class of blocks with inline elements.
-            </summary>
-        </member>
-        <member name="P:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.InlineBlock.Elements">
-            <summary>
-            Inline elements
-            </summary>
-        </member>
-        <member name="P:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.InlineBlock.IsWellDefined">
-            <summary>
-            Checks if the element is well-defined.
-            </summary>
-        </member>
-        <member name="T:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.Item">
-            <summary>
-            An item in an item list.
-            </summary>
-        </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.Item.Serialize(System.Text.StringBuilder)">
-            <summary>
-            Serializes the element in normalized form.
-            </summary>
-            <param name="Xml">XML Output.</param>
-        </member>
-        <member name="T:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.ItemList">
-            <summary>
-            Abstract base class for item lists
-            </summary>
-        </member>
-        <member name="P:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.ItemList.Items">
-            <summary>
-            Items
-            </summary>
-        </member>
-        <member name="P:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.ItemList.IsWellDefined">
-            <summary>
-            Checks if the element is well-defined.
-            </summary>
-        </member>
-        <member name="T:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.NumberedList">
-            <summary>
-            Numbered list
-            </summary>
-        </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.NumberedList.Serialize(System.Text.StringBuilder)">
-            <summary>
-            Serializes the element in normalized form.
-            </summary>
-            <param name="Xml">XML Output.</param>
-        </member>
-        <member name="T:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.Paragraph">
-            <summary>
-            Paragaph of text.
-            </summary>
-        </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.Paragraph.Serialize(System.Text.StringBuilder)">
-            <summary>
-            Serializes the element in normalized form.
-            </summary>
-            <param name="Xml">XML Output.</param>
-        </member>
-        <member name="T:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.Section">
-            <summary>
-            A section consisting of a header and a body.
-            </summary>
-        </member>
-        <member name="P:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.Section.Header">
-            <summary>
-            Header elements
-            </summary>
-        </member>
-        <member name="P:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.Section.IsWellDefined">
-            <summary>
-            Checks if the element is well-defined.
-            </summary>
-        </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.Section.Serialize(System.Text.StringBuilder)">
-            <summary>
-            Serializes the element in normalized form.
-            </summary>
-            <param name="Xml">XML Output.</param>
-        </member>
-        <member name="T:Waher.Networking.XMPP.Contracts.HumanReadable.HumanReadableElement">
-            <summary>
-            Abstract base class for human readable elements.
-            </summary>
-        </member>
-        <member name="P:Waher.Networking.XMPP.Contracts.HumanReadable.HumanReadableElement.IsWellDefined">
-            <summary>
-            Checks if the element is well-defined.
-            </summary>
-        </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.HumanReadableElement.Serialize(System.Text.StringBuilder)">
-            <summary>
-            Serializes the element in normalized form.
-            </summary>
-            <param name="Xml">XML Output.</param>
-        </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.HumanReadableElement.Serialize(System.Text.StringBuilder,System.Collections.Generic.IEnumerable{Waher.Networking.XMPP.Contracts.HumanReadable.HumanReadableElement})">
-            <summary>
-            Serializes the element in normalized form.
-            </summary>
-            <param name="Xml">XML Output.</param>
-            <param name="Elements">Elements to serialize.</param>
-        </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.HumanReadableElement.Serialize(System.Text.StringBuilder,System.Collections.Generic.IEnumerable{Waher.Networking.XMPP.Contracts.HumanReadable.HumanReadableElement},System.String)">
-            <summary>
-            Serializes the element in normalized form.
-            </summary>
-            <param name="Xml">XML Output.</param>
-            <param name="Elements">Elements to serialize.</param>
-            <param name="EncapsulatingElementName">Encapsulating element name.</param>
-        </member>
-        <member name="T:Waher.Networking.XMPP.Contracts.HumanReadable.HumanReadableText">
-            <summary>
-            Class representing human-readable text.
-            </summary>
-        </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.HumanReadableText.Parse(System.Xml.XmlElement)">
-            <summary>
-            Class representing human-readable text.
-            </summary>
-            <param name="Xml">XML representation.</param>
-            <returns>Human-readable text.</returns>
-        </member>
-        <member name="P:Waher.Networking.XMPP.Contracts.HumanReadable.HumanReadableText.Language">
-            <summary>
-            Optional language
-            </summary>
-        </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.HumanReadableText.Serialize(System.Text.StringBuilder)">
-            <summary>
-            Serializes the element in normalized form.
-            </summary>
-            <param name="Xml">XML Output.</param>
-        </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.HumanReadableText.Serialize(System.Text.StringBuilder,System.String,System.Boolean)">
-            <summary>
-            Serializes the human-readable text, in normalized form.
-            </summary>
-            <param name="Xml">XML Output</param>
-            <param name="TagName">Local name of the text.</param>
-            <param name="IncludeNamespace">If namespace attribute should be included.</param>
-        </member>
-        <member name="T:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Bold">
-            <summary>
-            Bold text
-            </summary>
-        </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Bold.Serialize(System.Text.StringBuilder)">
-            <summary>
-            Serializes the element in normalized form.
-            </summary>
-            <param name="Xml">XML Output.</param>
-        </member>
-        <member name="T:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Formatting">
-            <summary>
-            Abstract base class for inline formatting elements.
-            </summary>
-        </member>
-        <member name="P:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Formatting.Elements">
-            <summary>
-            Embedded elements
-            </summary>
-        </member>
-        <member name="P:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Formatting.IsWellDefined">
-            <summary>
-            Checks if the element is well-defined.
-            </summary>
-        </member>
-        <member name="T:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.InlineElement">
-            <summary>
-            Abstract base class for inline elements.
-            </summary>
-        </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.InlineElement.Parse(System.Xml.XmlElement)">
-            <summary>
-            Parses XML for a set of inline elements.
-            </summary>
-            <param name="Xml">XML representation</param>
-            <returns>Array of inline elements</returns>
-        </member>
-        <member name="T:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Italic">
-            <summary>
-            Italic text
-            </summary>
-        </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Italic.Serialize(System.Text.StringBuilder)">
-            <summary>
-            Serializes the element in normalized form.
-            </summary>
-            <param name="Xml">XML Output.</param>
-        </member>
-        <member name="T:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Parameter">
-            <summary>
-            Is replaced by parameter value
-            </summary>
-        </member>
-        <member name="P:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Parameter.Name">
-            <summary>
-            Name of parameter
-            </summary>
-        </member>
-        <member name="P:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Parameter.IsWellDefined">
-            <summary>
-            Checks if the element is well-defined.
-            </summary>
-        </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Parameter.Serialize(System.Text.StringBuilder)">
-            <summary>
-            Serializes the element in normalized form.
-            </summary>
-            <param name="Xml">XML Output.</param>
-        </member>
-        <member name="T:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.StrikeThrough">
-            <summary>
-            Text that is stricken through
-            </summary>
-        </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.StrikeThrough.Serialize(System.Text.StringBuilder)">
-            <summary>
-            Serializes the element in normalized form.
-            </summary>
-            <param name="Xml">XML Output.</param>
-        </member>
-        <member name="T:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Subscript">
-            <summary>
-            Sub text
-            </summary>
-        </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Subscript.Serialize(System.Text.StringBuilder)">
-            <summary>
-            Serializes the element in normalized form.
-            </summary>
-            <param name="Xml">XML Output.</param>
-        </member>
-        <member name="T:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Superscript">
-            <summary>
-            Superscript text
-            </summary>
-        </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Superscript.Serialize(System.Text.StringBuilder)">
-            <summary>
-            Serializes the element in normalized form.
-            </summary>
-            <param name="Xml">XML Output.</param>
-        </member>
-        <member name="T:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Text">
-            <summary>
-            Text
-            </summary>
-        </member>
-        <member name="P:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Text.Value">
-            <summary>
-            Text
-            </summary>
-        </member>
-        <member name="P:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Text.IsWellDefined">
-            <summary>
-            Checks if the element is well-defined.
-            </summary>
-        </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Text.Serialize(System.Text.StringBuilder)">
-            <summary>
-            Serializes the element in normalized form.
-            </summary>
-            <param name="Xml">XML Output.</param>
-        </member>
-        <member name="T:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Underline">
-            <summary>
-            Underline text
-            </summary>
-        </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Underline.Serialize(System.Text.StringBuilder)">
-            <summary>
-            Serializes the element in normalized form.
-            </summary>
-            <param name="Xml">XML Output.</param>
         </member>
         <member name="T:Waher.Networking.XMPP.Contracts.IdentityStatus">
             <summary>
@@ -1125,6 +937,599 @@
             <summary>
             Legal Identities
             </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.LegalIdentityEventHandler">
+            <summary>
+            Delegate for legal identity callback methods.
+            </summary>
+            <param name="Sender">Sender</param>
+            <param name="e">Event arguments</param>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.LegalIdentityEventArgs">
+            <summary>
+            Event arguments for legal identity responses
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.LegalIdentityEventArgs.#ctor(Waher.Networking.XMPP.IqResultEventArgs,Waher.Networking.XMPP.Contracts.LegalIdentity)">
+            <summary>
+            Event arguments for legal identity responses
+            </summary>
+            <param name="e">IQ response event arguments.</param>
+            <param name="Identity">Legal Identity.</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.LegalIdentityEventArgs.Identity">
+            <summary>
+            Legal Identity
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.KeyEventHandler">
+            <summary>
+            Delegate for key callback methods.
+            </summary>
+            <param name="Sender">Sender</param>
+            <param name="e">Event arguments</param>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.KeyEventArgs">
+            <summary>
+            Event arguments for key responses
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.KeyEventArgs.#ctor(Waher.Networking.XMPP.IqResultEventArgs,Waher.Networking.XMPP.P2P.E2E.IE2eEndpoint)">
+            <summary>
+            Event arguments for key responses
+            </summary>
+            <param name="e">IQ response event arguments.</param>
+            <param name="Key">Key.</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.KeyEventArgs.Key">
+            <summary>
+            Public key of server endpoint.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.SignatureEventHandler">
+            <summary>
+            Delegate for signature callback methods.
+            </summary>
+            <param name="Sender">Sender</param>
+            <param name="e">Event arguments</param>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.SignatureEventArgs">
+            <summary>
+            Event arguments for signature responses
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.SignatureEventArgs.#ctor(Waher.Networking.XMPP.IqResultEventArgs,System.Byte[],System.Byte[])">
+            <summary>
+            Event arguments for signature responses
+            </summary>
+            <param name="e">IQ response event arguments.</param>
+            <param name="S1">First signature</param>
+            <param name="S2">Second signature, if available</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.SignatureEventArgs.S1">
+            <summary>
+            First signature
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.SignatureEventArgs.S2">
+            <summary>
+            Second signature, if available
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.SmartContractEventHandler">
+            <summary>
+            Delegate for smart contract callback methods.
+            </summary>
+            <param name="Sender">Sender</param>
+            <param name="e">Event arguments</param>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.SmartContractEventArgs">
+            <summary>
+            Event arguments for smart contract responses
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.SmartContractEventArgs.#ctor(Waher.Networking.XMPP.IqResultEventArgs,Waher.Networking.XMPP.Contracts.Contract)">
+            <summary>
+            Event arguments for smart contract responses
+            </summary>
+            <param name="e">IQ response event arguments.</param>
+            <param name="Contract">Smart Contract.</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.SmartContractEventArgs.Contract">
+            <summary>
+            Smart Contract
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.SmartContractsEventHandler">
+            <summary>
+            Delegate for smart contracts callback methods.
+            </summary>
+            <param name="Sender">Sender</param>
+            <param name="e">Event arguments</param>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.SmartContractsEventArgs">
+            <summary>
+            Event arguments for smart contracts responses
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.SmartContractsEventArgs.#ctor(Waher.Networking.XMPP.IqResultEventArgs,Waher.Networking.XMPP.Contracts.Contract[])">
+            <summary>
+            Event arguments for smart contracts responses
+            </summary>
+            <param name="e">IQ response event arguments.</param>
+            <param name="Contracts">Smart Contracts.</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.SmartContractsEventArgs.Contracts">
+            <summary>
+            Smart Contracts
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.BlockElement">
+            <summary>
+            Abstract base class for inline elements.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.BlockElement.Parse(System.Xml.XmlElement)">
+            <summary>
+            Parses XML for a set of block elements.
+            </summary>
+            <param name="Xml">XML representation</param>
+            <returns>Array of block elements</returns>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.Blocks">
+            <summary>
+            Abstract base class for sets of blocks.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.Blocks.Body">
+            <summary>
+            Body elements
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.Blocks.IsWellDefined">
+            <summary>
+            Checks if the element is well-defined.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.Blocks.GenerateMarkdown(System.Text.StringBuilder,System.Int32,Waher.Networking.XMPP.Contracts.Contract)">
+            <summary>
+            Generates markdown for the human-readable text.
+            </summary>
+            <param name="Markdown">Markdown output.</param>
+            <param name="SectionLevel">Current section level.</param>
+            <param name="Contract">Contract, of which the human-readable text is part.</param>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.BulletList">
+            <summary>
+            Bullet list
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.BulletList.Serialize(System.Text.StringBuilder)">
+            <summary>
+            Serializes the element in normalized form.
+            </summary>
+            <param name="Xml">XML Output.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.BulletList.GenerateMarkdown(System.Text.StringBuilder,System.Int32,Waher.Networking.XMPP.Contracts.Contract)">
+            <summary>
+            Generates markdown for the human-readable text.
+            </summary>
+            <param name="Markdown">Markdown output.</param>
+            <param name="SectionLevel">Current section level.</param>
+            <param name="Contract">Contract, of which the human-readable text is part.</param>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.InlineBlock">
+            <summary>
+            Abstract base class of blocks with inline elements.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.InlineBlock.Elements">
+            <summary>
+            Inline elements
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.InlineBlock.IsWellDefined">
+            <summary>
+            Checks if the element is well-defined.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.Item">
+            <summary>
+            An item in an item list.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.Item.Serialize(System.Text.StringBuilder)">
+            <summary>
+            Serializes the element in normalized form.
+            </summary>
+            <param name="Xml">XML Output.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.Item.GenerateMarkdown(System.Text.StringBuilder,System.Int32,Waher.Networking.XMPP.Contracts.Contract)">
+            <summary>
+            Generates markdown for the human-readable text.
+            </summary>
+            <param name="Markdown">Markdown output.</param>
+            <param name="SectionLevel">Current section level.</param>
+            <param name="Contract">Contract, of which the human-readable text is part.</param>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.ItemList">
+            <summary>
+            Abstract base class for item lists
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.ItemList.Items">
+            <summary>
+            Items
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.ItemList.IsWellDefined">
+            <summary>
+            Checks if the element is well-defined.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.NumberedList">
+            <summary>
+            Numbered list
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.NumberedList.Serialize(System.Text.StringBuilder)">
+            <summary>
+            Serializes the element in normalized form.
+            </summary>
+            <param name="Xml">XML Output.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.NumberedList.GenerateMarkdown(System.Text.StringBuilder,System.Int32,Waher.Networking.XMPP.Contracts.Contract)">
+            <summary>
+            Generates markdown for the human-readable text.
+            </summary>
+            <param name="Markdown">Markdown output.</param>
+            <param name="SectionLevel">Current section level.</param>
+            <param name="Contract">Contract, of which the human-readable text is part.</param>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.Paragraph">
+            <summary>
+            Paragaph of text.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.Paragraph.Serialize(System.Text.StringBuilder)">
+            <summary>
+            Serializes the element in normalized form.
+            </summary>
+            <param name="Xml">XML Output.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.Paragraph.GenerateMarkdown(System.Text.StringBuilder,System.Int32,Waher.Networking.XMPP.Contracts.Contract)">
+            <summary>
+            Generates markdown for the human-readable text.
+            </summary>
+            <param name="Markdown">Markdown output.</param>
+            <param name="SectionLevel">Current section level.</param>
+            <param name="Contract">Contract, of which the human-readable text is part.</param>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.Section">
+            <summary>
+            A section consisting of a header and a body.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.Section.Header">
+            <summary>
+            Header elements
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.Section.IsWellDefined">
+            <summary>
+            Checks if the element is well-defined.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.Section.Serialize(System.Text.StringBuilder)">
+            <summary>
+            Serializes the element in normalized form.
+            </summary>
+            <param name="Xml">XML Output.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.Section.GenerateMarkdown(System.Text.StringBuilder,System.Int32,Waher.Networking.XMPP.Contracts.Contract)">
+            <summary>
+            Generates markdown for the human-readable text.
+            </summary>
+            <param name="Markdown">Markdown output.</param>
+            <param name="SectionLevel">Current section level.</param>
+            <param name="Contract">Contract, of which the human-readable text is part.</param>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.HumanReadable.HumanReadableElement">
+            <summary>
+            Abstract base class for human readable elements.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.HumanReadable.HumanReadableElement.IsWellDefined">
+            <summary>
+            Checks if the element is well-defined.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.HumanReadableElement.Serialize(System.Text.StringBuilder)">
+            <summary>
+            Serializes the element in normalized form.
+            </summary>
+            <param name="Xml">XML Output.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.HumanReadableElement.Serialize(System.Text.StringBuilder,System.Collections.Generic.IEnumerable{Waher.Networking.XMPP.Contracts.HumanReadable.HumanReadableElement})">
+            <summary>
+            Serializes the element in normalized form.
+            </summary>
+            <param name="Xml">XML Output.</param>
+            <param name="Elements">Elements to serialize.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.HumanReadableElement.Serialize(System.Text.StringBuilder,System.Collections.Generic.IEnumerable{Waher.Networking.XMPP.Contracts.HumanReadable.HumanReadableElement},System.String)">
+            <summary>
+            Serializes the element in normalized form.
+            </summary>
+            <param name="Xml">XML Output.</param>
+            <param name="Elements">Elements to serialize.</param>
+            <param name="EncapsulatingElementName">Encapsulating element name.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.HumanReadableElement.GenerateMarkdown(System.Text.StringBuilder,System.Int32,Waher.Networking.XMPP.Contracts.Contract)">
+            <summary>
+            Generates markdown for the human-readable text.
+            </summary>
+            <param name="Markdown">Markdown output.</param>
+            <param name="SectionLevel">Current section level.</param>
+            <param name="Contract">Contract, of which the human-readable text is part.</param>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.HumanReadable.HumanReadableText">
+            <summary>
+            Class representing human-readable text.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.HumanReadableText.Parse(System.Xml.XmlElement)">
+            <summary>
+            Class representing human-readable text.
+            </summary>
+            <param name="Xml">XML representation.</param>
+            <returns>Human-readable text.</returns>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.HumanReadable.HumanReadableText.Language">
+            <summary>
+            Optional language
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.HumanReadableText.Serialize(System.Text.StringBuilder)">
+            <summary>
+            Serializes the element in normalized form.
+            </summary>
+            <param name="Xml">XML Output.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.HumanReadableText.Serialize(System.Text.StringBuilder,System.String,System.Boolean)">
+            <summary>
+            Serializes the human-readable text, in normalized form.
+            </summary>
+            <param name="Xml">XML Output</param>
+            <param name="TagName">Local name of the text.</param>
+            <param name="IncludeNamespace">If namespace attribute should be included.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.HumanReadableText.GenerateMarkdown(Waher.Networking.XMPP.Contracts.Contract)">
+            <summary>
+            Generates markdown for the human-readable text.
+            </summary>
+            <param name="Contract">Contract, of which the human-readable text is part.</param>
+            <returns>Markdown</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.HumanReadableText.GeneratePlainText(Waher.Networking.XMPP.Contracts.Contract)">
+            <summary>
+            Generates plain text for the human-readable text.
+            </summary>
+            <param name="Contract">Contract, of which the human-readable text is part.</param>
+            <returns>Plain text</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.HumanReadableText.GenerateHTML(Waher.Networking.XMPP.Contracts.Contract)">
+            <summary>
+            Generates HTML for the human-readable text.
+            </summary>
+            <param name="Contract">Contract, of which the human-readable text is part.</param>
+            <returns>HTML</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.HumanReadableText.GenerateXAML(Waher.Networking.XMPP.Contracts.Contract)">
+            <summary>
+            Generates XAML for the human-readable text.
+            </summary>
+            <param name="Contract">Contract, of which the human-readable text is part.</param>
+            <returns>XAML</returns>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Bold">
+            <summary>
+            Bold text
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Bold.Serialize(System.Text.StringBuilder)">
+            <summary>
+            Serializes the element in normalized form.
+            </summary>
+            <param name="Xml">XML Output.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Bold.GenerateMarkdown(System.Text.StringBuilder,System.Int32,Waher.Networking.XMPP.Contracts.Contract)">
+            <summary>
+            Generates markdown for the human-readable text.
+            </summary>
+            <param name="Markdown">Markdown output.</param>
+            <param name="SectionLevel">Current section level.</param>
+            <param name="Contract">Contract, of which the human-readable text is part.</param>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Formatting">
+            <summary>
+            Abstract base class for inline formatting elements.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Formatting.Elements">
+            <summary>
+            Embedded elements
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Formatting.IsWellDefined">
+            <summary>
+            Checks if the element is well-defined.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.InlineElement">
+            <summary>
+            Abstract base class for inline elements.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.InlineElement.Parse(System.Xml.XmlElement)">
+            <summary>
+            Parses XML for a set of inline elements.
+            </summary>
+            <param name="Xml">XML representation</param>
+            <returns>Array of inline elements</returns>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Italic">
+            <summary>
+            Italic text
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Italic.Serialize(System.Text.StringBuilder)">
+            <summary>
+            Serializes the element in normalized form.
+            </summary>
+            <param name="Xml">XML Output.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Italic.GenerateMarkdown(System.Text.StringBuilder,System.Int32,Waher.Networking.XMPP.Contracts.Contract)">
+            <summary>
+            Generates markdown for the human-readable text.
+            </summary>
+            <param name="Markdown">Markdown output.</param>
+            <param name="SectionLevel">Current section level.</param>
+            <param name="Contract">Contract, of which the human-readable text is part.</param>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Parameter">
+            <summary>
+            Is replaced by parameter value
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Parameter.Name">
+            <summary>
+            Name of parameter
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Parameter.IsWellDefined">
+            <summary>
+            Checks if the element is well-defined.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Parameter.Serialize(System.Text.StringBuilder)">
+            <summary>
+            Serializes the element in normalized form.
+            </summary>
+            <param name="Xml">XML Output.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Parameter.GenerateMarkdown(System.Text.StringBuilder,System.Int32,Waher.Networking.XMPP.Contracts.Contract)">
+            <summary>
+            Generates markdown for the human-readable text.
+            </summary>
+            <param name="Markdown">Markdown output.</param>
+            <param name="SectionLevel">Current section level.</param>
+            <param name="Contract">Contract, of which the human-readable text is part.</param>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.StrikeThrough">
+            <summary>
+            Text that is stricken through
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.StrikeThrough.Serialize(System.Text.StringBuilder)">
+            <summary>
+            Serializes the element in normalized form.
+            </summary>
+            <param name="Xml">XML Output.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.StrikeThrough.GenerateMarkdown(System.Text.StringBuilder,System.Int32,Waher.Networking.XMPP.Contracts.Contract)">
+            <summary>
+            Generates markdown for the human-readable text.
+            </summary>
+            <param name="Markdown">Markdown output.</param>
+            <param name="SectionLevel">Current section level.</param>
+            <param name="Contract">Contract, of which the human-readable text is part.</param>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Subscript">
+            <summary>
+            Sub text
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Subscript.Serialize(System.Text.StringBuilder)">
+            <summary>
+            Serializes the element in normalized form.
+            </summary>
+            <param name="Xml">XML Output.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Subscript.GenerateMarkdown(System.Text.StringBuilder,System.Int32,Waher.Networking.XMPP.Contracts.Contract)">
+            <summary>
+            Generates markdown for the human-readable text.
+            </summary>
+            <param name="Markdown">Markdown output.</param>
+            <param name="SectionLevel">Current section level.</param>
+            <param name="Contract">Contract, of which the human-readable text is part.</param>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Superscript">
+            <summary>
+            Superscript text
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Superscript.Serialize(System.Text.StringBuilder)">
+            <summary>
+            Serializes the element in normalized form.
+            </summary>
+            <param name="Xml">XML Output.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Superscript.GenerateMarkdown(System.Text.StringBuilder,System.Int32,Waher.Networking.XMPP.Contracts.Contract)">
+            <summary>
+            Generates markdown for the human-readable text.
+            </summary>
+            <param name="Markdown">Markdown output.</param>
+            <param name="SectionLevel">Current section level.</param>
+            <param name="Contract">Contract, of which the human-readable text is part.</param>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Text">
+            <summary>
+            Text
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Text.Value">
+            <summary>
+            Text
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Text.IsWellDefined">
+            <summary>
+            Checks if the element is well-defined.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Text.Serialize(System.Text.StringBuilder)">
+            <summary>
+            Serializes the element in normalized form.
+            </summary>
+            <param name="Xml">XML Output.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Text.GenerateMarkdown(System.Text.StringBuilder,System.Int32,Waher.Networking.XMPP.Contracts.Contract)">
+            <summary>
+            Generates markdown for the human-readable text.
+            </summary>
+            <param name="Markdown">Markdown output.</param>
+            <param name="SectionLevel">Current section level.</param>
+            <param name="Contract">Contract, of which the human-readable text is part.</param>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Underline">
+            <summary>
+            Underline text
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Underline.Serialize(System.Text.StringBuilder)">
+            <summary>
+            Serializes the element in normalized form.
+            </summary>
+            <param name="Xml">XML Output.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Underline.GenerateMarkdown(System.Text.StringBuilder,System.Int32,Waher.Networking.XMPP.Contracts.Contract)">
+            <summary>
+            Generates markdown for the human-readable text.
+            </summary>
+            <param name="Markdown">Markdown output.</param>
+            <param name="SectionLevel">Current section level.</param>
+            <param name="Contract">Contract, of which the human-readable text is part.</param>
         </member>
         <member name="T:Waher.Networking.XMPP.Contracts.IdentityState">
             <summary>
@@ -1307,30 +1712,6 @@
             <see cref="M:System.Object.GetHashCode"/>
             </summary>
         </member>
-        <member name="T:Waher.Networking.XMPP.Contracts.LegalIdentityEventHandler">
-            <summary>
-            Delegate for legal identity callback methods.
-            </summary>
-            <param name="Sender">Sender</param>
-            <param name="e">Event arguments</param>
-        </member>
-        <member name="T:Waher.Networking.XMPP.Contracts.LegalIdentityEventArgs">
-            <summary>
-            Event arguments for legal identity responses
-            </summary>
-        </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.LegalIdentityEventArgs.#ctor(Waher.Networking.XMPP.IqResultEventArgs,Waher.Networking.XMPP.Contracts.LegalIdentity)">
-            <summary>
-            Event arguments for legal identity responses
-            </summary>
-            <param name="e">IQ response event arguments.</param>
-            <param name="Identity">Legal Identity.</param>
-        </member>
-        <member name="P:Waher.Networking.XMPP.Contracts.LegalIdentityEventArgs.Identity">
-            <summary>
-            Legal Identity
-            </summary>
-        </member>
         <member name="T:Waher.Networking.XMPP.Contracts.NumericalParameter">
             <summary>
             Numerical contractual parameter
@@ -1355,6 +1736,11 @@
         <member name="T:Waher.Networking.XMPP.Contracts.Parameter">
             <summary>
             Abstract base class for contractual parameters
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Parameter.Descriptions">
+            <summary>
+            Discriptions of the role, in different languages.
             </summary>
         </member>
         <member name="P:Waher.Networking.XMPP.Contracts.Parameter.Name">
@@ -1445,30 +1831,6 @@
             <see cref="M:System.Object.GetHashCode"/>
             </summary>
         </member>
-        <member name="T:Waher.Networking.XMPP.Contracts.KeyEventHandler">
-            <summary>
-            Delegate for key callback methods.
-            </summary>
-            <param name="Sender">Sender</param>
-            <param name="e">Event arguments</param>
-        </member>
-        <member name="T:Waher.Networking.XMPP.Contracts.KeyEventArgs">
-            <summary>
-            Event arguments for key responses
-            </summary>
-        </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.KeyEventArgs.#ctor(Waher.Networking.XMPP.IqResultEventArgs,Waher.Networking.XMPP.P2P.E2E.IE2eEndpoint)">
-            <summary>
-            Event arguments for key responses
-            </summary>
-            <param name="e">IQ response event arguments.</param>
-            <param name="Key">Key.</param>
-        </member>
-        <member name="P:Waher.Networking.XMPP.Contracts.KeyEventArgs.Key">
-            <summary>
-            Public key of server endpoint.
-            </summary>
-        </member>
         <member name="T:Waher.Networking.XMPP.Contracts.Role">
             <summary>
             Class defining a role
@@ -1530,36 +1892,6 @@
             Serializes the signature, in normalized form.
             </summary>
             <param name="Xml">XML Output</param>
-        </member>
-        <member name="T:Waher.Networking.XMPP.Contracts.SignatureEventHandler">
-            <summary>
-            Delegate for signature callback methods.
-            </summary>
-            <param name="Sender">Sender</param>
-            <param name="e">Event arguments</param>
-        </member>
-        <member name="T:Waher.Networking.XMPP.Contracts.SignatureEventArgs">
-            <summary>
-            Event arguments for signature responses
-            </summary>
-        </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.SignatureEventArgs.#ctor(Waher.Networking.XMPP.IqResultEventArgs,System.Byte[],System.Byte[])">
-            <summary>
-            Event arguments for signature responses
-            </summary>
-            <param name="e">IQ response event arguments.</param>
-            <param name="S1">First signature</param>
-            <param name="S2">Second signature, if available</param>
-        </member>
-        <member name="P:Waher.Networking.XMPP.Contracts.SignatureEventArgs.S1">
-            <summary>
-            First signature
-            </summary>
-        </member>
-        <member name="P:Waher.Networking.XMPP.Contracts.SignatureEventArgs.S2">
-            <summary>
-            Second signature, if available
-            </summary>
         </member>
         <member name="T:Waher.Networking.XMPP.Contracts.StringParameter">
             <summary>

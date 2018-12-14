@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using Waher.Content.Markdown;
 using Waher.Content.Xml;
 
 namespace Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements
@@ -34,6 +35,18 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements
 			Xml.Append("<parameter name=\"");
 			Xml.Append(XML.Encode(this.name));
 			Xml.Append("\"/>");
+		}
+
+		/// <summary>
+		/// Generates markdown for the human-readable text.
+		/// </summary>
+		/// <param name="Markdown">Markdown output.</param>
+		/// <param name="SectionLevel">Current section level.</param>
+		/// <param name="Contract">Contract, of which the human-readable text is part.</param>
+		public override void GenerateMarkdown(StringBuilder Markdown, int SectionLevel, Contract Contract)
+		{
+			string s = Contract[this.name].ToString();
+			Markdown.Append(MarkdownDocument.Encode(s));
 		}
 	}
 }

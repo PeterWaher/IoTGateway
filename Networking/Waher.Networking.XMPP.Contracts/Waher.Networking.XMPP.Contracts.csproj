@@ -30,6 +30,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Content\Waher.Content.Markdown\Waher.Content.Markdown.csproj" />
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Settings\Waher.Runtime.Settings.csproj" />
     <ProjectReference Include="..\..\Security\Waher.Security.EllipticCurves\Waher.Security.EllipticCurves.csproj" />
     <ProjectReference Include="..\Waher.Networking.XMPP.P2P\Waher.Networking.XMPP.P2P.csproj" />

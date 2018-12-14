@@ -1,7 +1,7 @@
 IoTGateway
 ======================
 
-**IoTGateway** is a C# implementation of an IoT gateway. It is self contained, and includes all libraries and frameworks 
+**IoTGateway** is a C# implementation of an IoT gateway. It is self-contained, and includes all libraries and frameworks 
 it needs to operate. You can install it by using the following [IoT Gateway Setup application](Executables/IoTGatewaySetup.exe?raw=true).
 Example applications also include binary downloads.
 

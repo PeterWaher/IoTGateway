@@ -58,6 +58,7 @@ namespace Waher.Networking.XMPP.Contracts
 			this.localEndpointTask = this.LoadKeys();
 
 			this.client.RegisterMessageHandler("identity", NamespaceLegalIdentities, this.IdentityMessageHandler, true);
+			this.client.RegisterMessageHandler("contractSigned", NamespaceSmartContracts, this.ContractSignedMessageHandler, true);
 		}
 
 		private async Task<EndpointSecurity> LoadKeys()
@@ -113,6 +114,7 @@ namespace Waher.Networking.XMPP.Contracts
 		public override void Dispose()
 		{
 			this.client.UnregisterMessageHandler("identity", NamespaceLegalIdentities, this.IdentityMessageHandler, true);
+			this.client.UnregisterMessageHandler("contractSigned", NamespaceSmartContracts, this.ContractSignedMessageHandler, true);
 
 			this.localEndpoint?.Dispose();
 			this.localEndpoint = null;
@@ -757,7 +759,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 		private void IdentityMessageHandler(object Sender, MessageEventArgs e)
 		{
-			LegalIdentityEventHandler h = IdentityUpdated;
+			LegalIdentityEventHandler h = this.IdentityUpdated;
 
 			if (h != null)
 			{
@@ -1884,6 +1886,28 @@ namespace Waher.Networking.XMPP.Contracts
 
 			return Result.Task;
 		}
+
+		#endregion
+
+		#region Contract Signature event
+
+		private void ContractSignedMessageHandler(object Sender, MessageEventArgs e)
+		{
+			ContractSignedEventHandler h = this.ContractSigned;
+
+			if (h != null)
+			{
+				string ContractId = XML.Attribute(e.Content, "contractId");
+				string LegalId = XML.Attribute(e.Content, "legalId");
+
+				h(this, new ContractSignedEventArgs(ContractId, LegalId));
+			}
+		}
+
+		/// <summary>
+		/// Event raised whenever a contract has been signed.
+		/// </summary>
+		public event ContractSignedEventHandler ContractSigned = null;
 
 		#endregion
 	}

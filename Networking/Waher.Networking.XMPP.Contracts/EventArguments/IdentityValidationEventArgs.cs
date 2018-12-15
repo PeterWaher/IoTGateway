@@ -99,7 +99,7 @@ namespace Waher.Networking.XMPP.Contracts
 		private readonly object state;
 
 		/// <summary>
-		/// Event arguments for validation responses
+		/// Event arguments for identity validation responses
 		/// </summary>
 		/// <param name="Status">Validation status</param>
 		/// <param name="State">State object</param>

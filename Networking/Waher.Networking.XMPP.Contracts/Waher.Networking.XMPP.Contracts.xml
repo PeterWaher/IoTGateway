@@ -844,6 +844,11 @@
             </summary>
             <param name="Address">Address of server (component).</param>
         </member>
+        <member name="E:Waher.Networking.XMPP.Contracts.ContractsClient.ContractSigned">
+            <summary>
+            Event raised whenever a contract has been signed.
+            </summary>
+        </member>
         <member name="T:Waher.Networking.XMPP.Contracts.ContractState">
             <summary>
             Recognized contract states
@@ -910,6 +915,33 @@
         <member name="F:Waher.Networking.XMPP.Contracts.ContractVisibility.PublicSearchable">
             <summary>
             Contract is accessible by everyone requesting it. It is also searchable.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.ContractSignedEventHandler">
+            <summary>
+            Delegate for contract signature event handlers.
+            </summary>
+            <param name="Sender">Sender</param>
+            <param name="e">Event arguments</param>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.ContractSignedEventArgs">
+            <summary>
+            Event arguments for contract signature events
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractSignedEventArgs.#ctor(System.String,System.String)">
+            <summary>
+            Event arguments for contract signature events
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.ContractSignedEventArgs.ContractId">
+            <summary>
+            ID of contract being signed.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.ContractSignedEventArgs.LegalId">
+            <summary>
+            ID of legal identity signing the contract.
             </summary>
         </member>
         <member name="T:Waher.Networking.XMPP.Contracts.IdentityStatus">
@@ -1003,7 +1035,7 @@
         </member>
         <member name="M:Waher.Networking.XMPP.Contracts.IdentityValidationEventArgs.#ctor(Waher.Networking.XMPP.Contracts.IdentityStatus,System.Object)">
             <summary>
-            Event arguments for validation responses
+            Event arguments for identity validation responses
             </summary>
             <param name="Status">Validation status</param>
             <param name="State">State object</param>

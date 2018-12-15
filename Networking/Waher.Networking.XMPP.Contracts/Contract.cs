@@ -686,6 +686,13 @@ namespace Waher.Networking.XMPP.Contracts
 										return null;
 									break;
 
+								case "transferable":
+									if (CommonTypes.TryParse(Attr.Value, out bool b))
+										Signature.Transferable = b;
+									else
+										return null;
+									break;
+
 								case "s1":
 									Signature.S1 = Convert.FromBase64String(Attr.Value);
 									break;
@@ -1047,7 +1054,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			Xml.Append('>');
 
-			Xml.Append(this.forMachines.OuterXml);
+			NormalizeXml(this.forMachines, Xml, ContractsClient.NamespaceSmartContracts);
 
 			if (this.roles != null)
 			{

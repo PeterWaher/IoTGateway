@@ -24,6 +24,12 @@
             Role of the legal identity in the contract.
             </summary>
         </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.ClientSignature.Transferable">
+            <summary>
+            If the signature is transferable to contracts based on the current contract as a template,
+            and if no parameters and attributes change in the contract.
+            </summary>
+        </member>
         <member name="M:Waher.Networking.XMPP.Contracts.ClientSignature.Serialize(System.Text.StringBuilder)">
             <summary>
             Serializes the signature, in normalized form.
@@ -754,6 +760,63 @@
             <param name="Address">Address of server (component).</param>
             <param name="Callback">Method to call when response is returned.</param>
             <param name="State">State object to pass on to the callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetCreatedContractsAsync">
+            <summary>
+            Get contracts the account has created.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetCreatedContractsAsync(System.String)">
+            <summary>
+            Get contracts the account has created.
+            </summary>
+            <param name="Address">Address of server (component).</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.SignContract(Waher.Networking.XMPP.Contracts.Contract,System.String,System.Boolean,Waher.Networking.XMPP.Contracts.SmartContractEventHandler,System.Object)">
+            <summary>
+            Signs a contract
+            </summary>
+            <param name="Contract">Smart Contract to sign.</param>
+            <param name="Role">Role of the legal idenity, in the contract.</param>
+            <param name="Transferable">If the signature should be transferable or not.
+            Transferable signatures are copied to contracts based on the current contract as a template,
+            and only if no parameters and attributes are changed. (Otherwise the signature would break.)</param>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.SignContract(System.String,Waher.Networking.XMPP.Contracts.Contract,System.String,System.Boolean,Waher.Networking.XMPP.Contracts.SmartContractEventHandler,System.Object)">
+            <summary>
+            Signs a contract
+            </summary>
+            <param name="Address">Address of server (component).</param>
+            <param name="Contract">Smart Contract to sign.</param>
+            <param name="Role">Role of the legal idenity, in the contract.</param>
+            <param name="Transferable">If the signature should be transferable or not.
+            Transferable signatures are copied to contracts based on the current contract as a template,
+            and only if no parameters and attributes are changed. (Otherwise the signature would break.)</param>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.SignContractAsync(Waher.Networking.XMPP.Contracts.Contract,System.String,System.Boolean)">
+            <summary>
+            Signs a contract
+            </summary>
+            <param name="Contract">Smart Contract to sign.</param>
+            <param name="Role">Role of the legal idenity, in the contract.</param>
+            <param name="Transferable">If the signature should be transferable or not.
+            Transferable signatures are copied to contracts based on the current contract as a template,
+            and only if no parameters and attributes are changed. (Otherwise the signature would break.)</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.SignContractAsync(System.String,Waher.Networking.XMPP.Contracts.Contract,System.String,System.Boolean)">
+            <summary>
+            Signs a contract
+            </summary>
+            <param name="Address">Address of server (component).</param>
+            <param name="Contract">Smart Contract to sign.</param>
+            <param name="Role">Role of the legal idenity, in the contract.</param>
+            <param name="Transferable">If the signature should be transferable or not.
+            Transferable signatures are copied to contracts based on the current contract as a template,
+            and only if no parameters and attributes are changed. (Otherwise the signature would break.)</param>
         </member>
         <member name="T:Waher.Networking.XMPP.Contracts.ContractState">
             <summary>

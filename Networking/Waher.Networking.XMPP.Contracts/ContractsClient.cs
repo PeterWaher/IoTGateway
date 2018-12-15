@@ -1364,22 +1364,27 @@ namespace Waher.Networking.XMPP.Contracts
 
 			Xml.Append("</createContract>");
 
-			this.client.SendIqSet(Address, Xml.ToString(), (sender, e) =>
+			this.client.SendIqSet(Address, Xml.ToString(), this.ContractResponse, new object[] { Callback, State });
+		}
+
+		private void ContractResponse(object Sender, IqResultEventArgs e)
+		{
+			object[] P = (object[])e.State;
+			SmartContractEventHandler Callback = (SmartContractEventHandler)P[0];
+			Contract Contract = null;
+			XmlElement E;
+
+			if (e.Ok && (E = e.FirstElement) != null &&
+				E.LocalName == "contract" &&
+				E.NamespaceURI == NamespaceSmartContracts)
 			{
-				Contract Contract2 = null;
-				XmlElement E;
+				Contract = Contract.Parse(E, out bool HasStatus);
+			}
+			else
+				e.Ok = false;
 
-				if (e.Ok && (E = e.FirstElement) != null &&
-					E.LocalName == "contract" &&
-					E.NamespaceURI == NamespaceSmartContracts)
-				{
-					Contract2 = Contract.Parse(E, out bool HasStatus);
-				}
-				else
-					e.Ok = false;
-
-				Callback?.Invoke(this, new SmartContractEventArgs(e, Contract2));
-			}, State);
+			e.State = P[1];
+			Callback?.Invoke(this, new SmartContractEventArgs(e, Contract));
 		}
 
 		/// <summary>
@@ -1570,22 +1575,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			Xml.Append("</template></createContract>");
 
-			this.client.SendIqSet(Address, Xml.ToString(), (sender, e) =>
-			{
-				Contract Contract2 = null;
-				XmlElement E;
-
-				if (e.Ok && (E = e.FirstElement) != null &&
-					E.LocalName == "contract" &&
-					E.NamespaceURI == NamespaceSmartContracts)
-				{
-					Contract2 = Contract.Parse(E, out bool HasStatus);
-				}
-				else
-					e.Ok = false;
-
-				Callback?.Invoke(this, new SmartContractEventArgs(e, Contract2));
-			}, State);
+			this.client.SendIqSet(Address, Xml.ToString(), this.ContractResponse, new object[] { Callback, State });
 		}
 
 		/// <summary>
@@ -1691,6 +1681,146 @@ namespace Waher.Networking.XMPP.Contracts
 
 				Callback?.Invoke(this, new IdReferencesEventArgs(e, IDs.ToArray()));
 			}, State);
+		}
+
+		/// <summary>
+		/// Get contracts the account has created.
+		/// </summary>
+		public Task<string[]> GetCreatedContractsAsync()
+		{
+			return this.GetCreatedContractsAsync(this.componentAddress);
+		}
+
+		/// <summary>
+		/// Get contracts the account has created.
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		public Task<string[]> GetCreatedContractsAsync(string Address)
+		{
+			TaskCompletionSource<string[]> Result = new TaskCompletionSource<string[]>();
+
+			this.GetCreatedContracts(Address, (sender, e) =>
+				{
+					if (e.Ok)
+						Result.SetResult(e.References);
+					else
+					{
+						Result.SetException(new IOException(string.IsNullOrEmpty(e.ErrorText) ?
+							"Unable to get created contracts." : e.ErrorText));
+					}
+				}, null);
+
+			return Result.Task;
+		}
+
+		#endregion
+
+		#region Sign Contract
+
+		/// <summary>
+		/// Signs a contract
+		/// </summary>
+		/// <param name="Contract">Smart Contract to sign.</param>
+		/// <param name="Role">Role of the legal idenity, in the contract.</param>
+		/// <param name="Transferable">If the signature should be transferable or not.
+		/// Transferable signatures are copied to contracts based on the current contract as a template,
+		/// and only if no parameters and attributes are changed. (Otherwise the signature would break.)</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public void SignContract(Contract Contract, string Role, bool Transferable, SmartContractEventHandler Callback, object State)
+		{
+			this.SignContract(this.componentAddress, Contract, Role, Transferable, Callback, State);
+		}
+
+		/// <summary>
+		/// Signs a contract
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="Contract">Smart Contract to sign.</param>
+		/// <param name="Role">Role of the legal idenity, in the contract.</param>
+		/// <param name="Transferable">If the signature should be transferable or not.
+		/// Transferable signatures are copied to contracts based on the current contract as a template,
+		/// and only if no parameters and attributes are changed. (Otherwise the signature would break.)</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public void SignContract(string Address, Contract Contract, string Role, bool Transferable, 
+			SmartContractEventHandler Callback, object State)
+		{
+			StringBuilder Xml = new StringBuilder();
+			Contract.Serialize(Xml, false, false, false, false, false);
+			byte[] Data = Encoding.UTF8.GetBytes(Xml.ToString());
+
+			this.Sign(Address, Data, (sender, e) =>
+			{
+				if (e.Ok)
+				{
+					Xml.Clear();
+					Xml.Append("<signContract xmlns='");
+					Xml.Append(NamespaceSmartContracts);
+					Xml.Append("' id='");
+					Xml.Append(XML.Encode(Contract.ContractId));
+					Xml.Append("' role='");
+					Xml.Append(XML.Encode(Role));
+
+					if (Transferable)
+						Xml.Append("' transferable='true");
+
+					Xml.Append("' s1='");
+					Xml.Append(Convert.ToBase64String(e.S1));
+
+					if (e.S2 != null)
+					{
+						Xml.Append("' s2='");
+						Xml.Append(Convert.ToBase64String(e.S2));
+					}
+
+					Xml.Append("'/>");
+
+					this.client.SendIqSet(Address, Xml.ToString(), this.ContractResponse, new object[] { Callback, State });
+				}
+				else
+					Callback?.Invoke(this, new SmartContractEventArgs(e, null));
+			}, State);
+		}
+
+		/// <summary>
+		/// Signs a contract
+		/// </summary>
+		/// <param name="Contract">Smart Contract to sign.</param>
+		/// <param name="Role">Role of the legal idenity, in the contract.</param>
+		/// <param name="Transferable">If the signature should be transferable or not.
+		/// Transferable signatures are copied to contracts based on the current contract as a template,
+		/// and only if no parameters and attributes are changed. (Otherwise the signature would break.)</param>
+		public Task<Contract> SignContractAsync(Contract Contract, string Role, bool Transferable)
+		{
+			return this.SignContractAsync(this.componentAddress, Contract, Role, Transferable);
+		}
+
+		/// <summary>
+		/// Signs a contract
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="Contract">Smart Contract to sign.</param>
+		/// <param name="Role">Role of the legal idenity, in the contract.</param>
+		/// <param name="Transferable">If the signature should be transferable or not.
+		/// Transferable signatures are copied to contracts based on the current contract as a template,
+		/// and only if no parameters and attributes are changed. (Otherwise the signature would break.)</param>
+		public Task<Contract> SignContractAsync(string Address, Contract Contract, string Role, bool Transferable)
+		{
+			TaskCompletionSource<Contract> Result = new TaskCompletionSource<Contract>();
+
+			this.SignContract(Address, Contract, Role, Transferable, (sender, e) =>
+			{
+				if (e.Ok)
+					Result.SetResult(e.Contract);
+				else
+				{
+					Result.SetException(new IOException(string.IsNullOrEmpty(e.ErrorText) ?
+						"Unable to sign the contract." : e.ErrorText));
+				}
+			}, null);
+
+			return Result.Task;
 		}
 
 		#endregion

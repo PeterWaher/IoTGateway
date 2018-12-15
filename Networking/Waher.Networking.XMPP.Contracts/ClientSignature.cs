@@ -13,6 +13,7 @@ namespace Waher.Networking.XMPP.Contracts
 		private string legalId = null;
 		private string bareJid = null;
 		private string role = null;
+		private bool transferable = false;
 
 		/// <summary>
 		/// ID of legal identity signing the contract.
@@ -39,6 +40,16 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			get => this.role;
 			set => this.role = value;
+		}
+
+		/// <summary>
+		/// If the signature is transferable to contracts based on the current contract as a template,
+		/// and if no parameters and attributes change in the contract.
+		/// </summary>
+		public bool Transferable
+		{
+			get => this.transferable;
+			set => this.transferable = value;
 		}
 
 		/// <summary>

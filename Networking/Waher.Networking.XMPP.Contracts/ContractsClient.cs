@@ -59,6 +59,8 @@ namespace Waher.Networking.XMPP.Contracts
 
 			this.client.RegisterMessageHandler("identity", NamespaceLegalIdentities, this.IdentityMessageHandler, true);
 			this.client.RegisterMessageHandler("contractSigned", NamespaceSmartContracts, this.ContractSignedMessageHandler, true);
+			this.client.RegisterMessageHandler("contractUpdated", NamespaceSmartContracts, this.ContractUpdatedMessageHandler, false);
+			this.client.RegisterMessageHandler("contractDeleted", NamespaceSmartContracts, this.ContractDeletedMessageHandler, false);
 		}
 
 		private async Task<EndpointSecurity> LoadKeys()
@@ -115,6 +117,8 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			this.client.UnregisterMessageHandler("identity", NamespaceLegalIdentities, this.IdentityMessageHandler, true);
 			this.client.UnregisterMessageHandler("contractSigned", NamespaceSmartContracts, this.ContractSignedMessageHandler, true);
+			this.client.UnregisterMessageHandler("contractUpdated", NamespaceSmartContracts, this.ContractUpdatedMessageHandler, false);
+			this.client.UnregisterMessageHandler("contractDeleted", NamespaceSmartContracts, this.ContractDeletedMessageHandler, false);
 
 			this.localEndpoint?.Dispose();
 			this.localEndpoint = null;
@@ -757,6 +761,22 @@ namespace Waher.Networking.XMPP.Contracts
 
 		#region Legal Identity update event
 
+		private bool IsFromTrustProvider(string Id, string From)
+		{
+			int i = Id.IndexOf('@');
+			if (i < 0)
+				return false;
+
+			Id = Id.Substring(i + 1);
+
+			i = From.IndexOf('@');
+			if (i >= 0)
+				return false;
+
+			return (string.Compare(Id, From, true) == 0 ||
+				From.EndsWith("." + Id, StringComparison.CurrentCultureIgnoreCase));
+		}
+
 		private void IdentityMessageHandler(object Sender, MessageEventArgs e)
 		{
 			LegalIdentityEventHandler h = this.IdentityUpdated;
@@ -764,6 +784,9 @@ namespace Waher.Networking.XMPP.Contracts
 			if (h != null)
 			{
 				LegalIdentity Identity = LegalIdentity.Parse(e.Content);
+
+				if (!this.IsFromTrustProvider(Identity.Id, e.From))
+					return;
 
 				if (string.Compare(e.FromBareJID, Identity.Provider, true) == 0)
 				{
@@ -1662,7 +1685,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="State">State object to pass on to the callback method.</param>
 		public void GetCreatedContracts(string Address, IdReferencesEventHandler Callback, object State)
 		{
-			this.client.SendIqGet(Address, "<getCreatedContracts xmlns='" + NamespaceSmartContracts + "'/>", 
+			this.client.SendIqGet(Address, "<getCreatedContracts xmlns='" + NamespaceSmartContracts + "'/>",
 				this.IdReferencesResponse, new object[] { Callback, State });
 		}
 
@@ -1949,8 +1972,6 @@ namespace Waher.Networking.XMPP.Contracts
 		/// Gets a contract
 		/// </summary>
 		/// <param name="ContractId">ID of contract to get.</param>
-		/// Transferable getatures are copied to contracts based on the current contract as a template,
-		/// and only if no parameters and attributes are changed. (Otherwise the getature would break.)</param>
 		public Task<Contract> GetContractAsync(string ContractId)
 		{
 			return this.GetContractAsync(this.componentAddress, ContractId);
@@ -1961,8 +1982,6 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="Address">Address of server (component).</param>
 		/// <param name="ContractId">ID of contract to get.</param>
-		/// Transferable getatures are copied to contracts based on the current contract as a template,
-		/// and only if no parameters and attributes are changed. (Otherwise the getature would break.)</param>
 		public Task<Contract> GetContractAsync(string Address, string ContractId)
 		{
 			TaskCompletionSource<Contract> Result = new TaskCompletionSource<Contract>();
@@ -2021,8 +2040,6 @@ namespace Waher.Networking.XMPP.Contracts
 		/// Obsoletes a contract
 		/// </summary>
 		/// <param name="ContractId">ID of contract to obsolete.</param>
-		/// Transferable obsoleteatures are copied to contracts based on the current contract as a template,
-		/// and only if no parameters and attributes are changed. (Otherwise the obsoleteature would break.)</param>
 		public Task<Contract> ObsoleteContractAsync(string ContractId)
 		{
 			return this.ObsoleteContractAsync(this.componentAddress, ContractId);
@@ -2033,8 +2050,6 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="Address">Address of server (component).</param>
 		/// <param name="ContractId">ID of contract to obsolete.</param>
-		/// Transferable obsoleteatures are copied to contracts based on the current contract as a template,
-		/// and only if no parameters and attributes are changed. (Otherwise the obsoleteature would break.)</param>
 		public Task<Contract> ObsoleteContractAsync(string Address, string ContractId)
 		{
 			TaskCompletionSource<Contract> Result = new TaskCompletionSource<Contract>();
@@ -2093,8 +2108,6 @@ namespace Waher.Networking.XMPP.Contracts
 		/// Deletes a contract
 		/// </summary>
 		/// <param name="ContractId">ID of contract to delete.</param>
-		/// Transferable deleteatures are copied to contracts based on the current contract as a template,
-		/// and only if no parameters and attributes are changed. (Otherwise the deleteature would break.)</param>
 		public Task<Contract> DeleteContractAsync(string ContractId)
 		{
 			return this.DeleteContractAsync(this.componentAddress, ContractId);
@@ -2105,8 +2118,6 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="Address">Address of server (component).</param>
 		/// <param name="ContractId">ID of contract to delete.</param>
-		/// Transferable deleteatures are copied to contracts based on the current contract as a template,
-		/// and only if no parameters and attributes are changed. (Otherwise the deleteature would break.)</param>
 		public Task<Contract> DeleteContractAsync(string Address, string ContractId)
 		{
 			TaskCompletionSource<Contract> Result = new TaskCompletionSource<Contract>();
@@ -2124,6 +2135,54 @@ namespace Waher.Networking.XMPP.Contracts
 
 			return Result.Task;
 		}
+
+		#endregion
+
+		#region Contract Updated event
+
+		private void ContractUpdatedMessageHandler(object Sender, MessageEventArgs e)
+		{
+			ContractReferenceEventHandler h = this.ContractUpdated;
+
+			if (h != null)
+			{
+				string ContractId = XML.Attribute(e.Content, "contractId");
+
+				if (!this.IsFromTrustProvider(ContractId, e.From))
+					return;
+
+				h(this, new ContractReferenceEventArgs(ContractId));
+			}
+		}
+
+		/// <summary>
+		/// Event raised whenever a contract has been updated.
+		/// </summary>
+		public event ContractReferenceEventHandler ContractUpdated = null;
+
+		#endregion
+
+		#region Contract Deleted event
+
+		private void ContractDeletedMessageHandler(object Sender, MessageEventArgs e)
+		{
+			ContractReferenceEventHandler h = this.ContractDeleted;
+
+			if (h != null)
+			{
+				string ContractId = XML.Attribute(e.Content, "contractId");
+
+				if (!this.IsFromTrustProvider(ContractId, e.From))
+					return;
+
+				h(this, new ContractReferenceEventArgs(ContractId));
+			}
+		}
+
+		/// <summary>
+		/// Event raised whenever a contract has been deleted.
+		/// </summary>
+		public event ContractReferenceEventHandler ContractDeleted = null;
 
 		#endregion
 	}

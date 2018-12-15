@@ -15,25 +15,18 @@ namespace Waher.Networking.XMPP.Contracts
 	/// <summary>
 	/// Event arguments for contract signature events
 	/// </summary>
-	public class ContractSignedEventArgs : EventArgs
+	public class ContractSignedEventArgs : ContractReferenceEventArgs
 	{
-		private string contractId;
-		private string legalId;
+		private readonly string legalId;
 
 		/// <summary>
 		/// Event arguments for contract signature events
 		/// </summary>
 		public ContractSignedEventArgs(string ContractId, string LegalId)
-			: base()
+			: base(ContractId)
 		{
-			this.contractId = ContractId;
 			this.legalId = LegalId;
 		}
-
-		/// <summary>
-		/// ID of contract being signed.
-		/// </summary>
-		public string ContractId => this.contractId;
 
 		/// <summary>
 		/// ID of legal identity signing the contract.

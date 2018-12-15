@@ -866,8 +866,19 @@
             <param name="Callback">Method to call when response is returned.</param>
             <param name="State">State object to pass on to the callback method.</param>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:Waher.Networking.XMPP.Contracts.ContractsClient.GetContractAsync(System.String)" -->
-        <!-- Badly formed XML comment ignored for member "M:Waher.Networking.XMPP.Contracts.ContractsClient.GetContractAsync(System.String,System.String)" -->
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetContractAsync(System.String)">
+            <summary>
+            Gets a contract
+            </summary>
+            <param name="ContractId">ID of contract to get.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetContractAsync(System.String,System.String)">
+            <summary>
+            Gets a contract
+            </summary>
+            <param name="Address">Address of server (component).</param>
+            <param name="ContractId">ID of contract to get.</param>
+        </member>
         <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.ObsoleteContract(System.String,Waher.Networking.XMPP.Contracts.SmartContractEventHandler,System.Object)">
             <summary>
             Obsoletes a contract
@@ -885,8 +896,19 @@
             <param name="Callback">Method to call when response is returned.</param>
             <param name="State">State object to pass on to the callback method.</param>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:Waher.Networking.XMPP.Contracts.ContractsClient.ObsoleteContractAsync(System.String)" -->
-        <!-- Badly formed XML comment ignored for member "M:Waher.Networking.XMPP.Contracts.ContractsClient.ObsoleteContractAsync(System.String,System.String)" -->
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.ObsoleteContractAsync(System.String)">
+            <summary>
+            Obsoletes a contract
+            </summary>
+            <param name="ContractId">ID of contract to obsolete.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.ObsoleteContractAsync(System.String,System.String)">
+            <summary>
+            Obsoletes a contract
+            </summary>
+            <param name="Address">Address of server (component).</param>
+            <param name="ContractId">ID of contract to obsolete.</param>
+        </member>
         <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.DeleteContract(System.String,Waher.Networking.XMPP.Contracts.SmartContractEventHandler,System.Object)">
             <summary>
             Deletes a contract
@@ -904,8 +926,29 @@
             <param name="Callback">Method to call when response is returned.</param>
             <param name="State">State object to pass on to the callback method.</param>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:Waher.Networking.XMPP.Contracts.ContractsClient.DeleteContractAsync(System.String)" -->
-        <!-- Badly formed XML comment ignored for member "M:Waher.Networking.XMPP.Contracts.ContractsClient.DeleteContractAsync(System.String,System.String)" -->
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.DeleteContractAsync(System.String)">
+            <summary>
+            Deletes a contract
+            </summary>
+            <param name="ContractId">ID of contract to delete.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.DeleteContractAsync(System.String,System.String)">
+            <summary>
+            Deletes a contract
+            </summary>
+            <param name="Address">Address of server (component).</param>
+            <param name="ContractId">ID of contract to delete.</param>
+        </member>
+        <member name="E:Waher.Networking.XMPP.Contracts.ContractsClient.ContractUpdated">
+            <summary>
+            Event raised whenever a contract has been updated.
+            </summary>
+        </member>
+        <member name="E:Waher.Networking.XMPP.Contracts.ContractsClient.ContractDeleted">
+            <summary>
+            Event raised whenever a contract has been deleted.
+            </summary>
+        </member>
         <member name="T:Waher.Networking.XMPP.Contracts.ContractState">
             <summary>
             Recognized contract states
@@ -974,6 +1017,28 @@
             Contract is accessible by everyone requesting it. It is also searchable.
             </summary>
         </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.ContractReferenceEventHandler">
+            <summary>
+            Delegate for event handlers referencing a contract.
+            </summary>
+            <param name="Sender">Sender</param>
+            <param name="e">Event arguments</param>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.ContractReferenceEventArgs">
+            <summary>
+            Event arguments for events referencing a contract.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractReferenceEventArgs.#ctor(System.String)">
+            <summary>
+            Event arguments for events referencing a contract.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.ContractReferenceEventArgs.ContractId">
+            <summary>
+            ID of contract being signed.
+            </summary>
+        </member>
         <member name="T:Waher.Networking.XMPP.Contracts.ContractSignedEventHandler">
             <summary>
             Delegate for contract signature event handlers.
@@ -989,11 +1054,6 @@
         <member name="M:Waher.Networking.XMPP.Contracts.ContractSignedEventArgs.#ctor(System.String,System.String)">
             <summary>
             Event arguments for contract signature events
-            </summary>
-        </member>
-        <member name="P:Waher.Networking.XMPP.Contracts.ContractSignedEventArgs.ContractId">
-            <summary>
-            ID of contract being signed.
             </summary>
         </member>
         <member name="P:Waher.Networking.XMPP.Contracts.ContractSignedEventArgs.LegalId">

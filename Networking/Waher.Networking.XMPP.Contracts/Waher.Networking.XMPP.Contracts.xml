@@ -949,6 +949,36 @@
             Event raised whenever a contract has been deleted.
             </summary>
         </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.UpdateContract(Waher.Networking.XMPP.Contracts.Contract,Waher.Networking.XMPP.Contracts.SmartContractEventHandler,System.Object)">
+            <summary>
+            Updates a contract
+            </summary>
+            <param name="Contract">Contract to update.</param>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.UpdateContract(System.String,Waher.Networking.XMPP.Contracts.Contract,Waher.Networking.XMPP.Contracts.SmartContractEventHandler,System.Object)">
+            <summary>
+            Updates a contract
+            </summary>
+            <param name="Address">Address of server (component).</param>
+            <param name="Contract">Contract to update.</param>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.UpdateContractAsync(Waher.Networking.XMPP.Contracts.Contract)">
+            <summary>
+            Updates a contract
+            </summary>
+            <param name="Contract">Contract to update.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.UpdateContractAsync(System.String,Waher.Networking.XMPP.Contracts.Contract)">
+            <summary>
+            Updates a contract
+            </summary>
+            <param name="Address">Address of server (component).</param>
+            <param name="Contract">Contract to update.</param>
+        </member>
         <member name="T:Waher.Networking.XMPP.Contracts.ContractState">
             <summary>
             Recognized contract states

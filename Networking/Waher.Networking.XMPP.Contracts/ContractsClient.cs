@@ -2185,5 +2185,75 @@ namespace Waher.Networking.XMPP.Contracts
 		public event ContractReferenceEventHandler ContractDeleted = null;
 
 		#endregion
+
+		#region Update Contract
+
+		/// <summary>
+		/// Updates a contract
+		/// </summary>
+		/// <param name="Contract">Contract to update.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public void UpdateContract(Contract Contract, SmartContractEventHandler Callback, object State)
+		{
+			this.UpdateContract(this.componentAddress, Contract, Callback, State);
+		}
+
+		/// <summary>
+		/// Updates a contract
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="Contract">Contract to update.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public void UpdateContract(string Address, Contract Contract,
+			SmartContractEventHandler Callback, object State)
+		{
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<updateContract xmlns='");
+			Xml.Append(NamespaceSmartContracts);
+			Xml.Append("'>");
+
+			Contract.Serialize(Xml, false, true, true, false, false);
+
+			Xml.Append("</updateContract>");
+
+			this.client.SendIqSet(Address, Xml.ToString(), this.ContractResponse, new object[] { Callback, State });
+		}
+
+		/// <summary>
+		/// Updates a contract
+		/// </summary>
+		/// <param name="Contract">Contract to update.</param>
+		public Task<Contract> UpdateContractAsync(Contract Contract)
+		{
+			return this.UpdateContractAsync(this.componentAddress, Contract);
+		}
+
+		/// <summary>
+		/// Updates a contract
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="Contract">Contract to update.</param>
+		public Task<Contract> UpdateContractAsync(string Address, Contract Contract)
+		{
+			TaskCompletionSource<Contract> Result = new TaskCompletionSource<Contract>();
+
+			this.UpdateContract(Address, Contract, (sender, e) =>
+			{
+				if (e.Ok)
+					Result.SetResult(e.Contract);
+				else
+				{
+					Result.SetException(new IOException(string.IsNullOrEmpty(e.ErrorText) ?
+						"Unable to update the contract." : e.ErrorText));
+				}
+			}, null);
+
+			return Result.Task;
+		}
+
+		#endregion
 	}
 }

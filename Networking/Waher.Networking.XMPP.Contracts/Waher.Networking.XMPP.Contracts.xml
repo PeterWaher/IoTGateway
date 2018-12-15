@@ -540,6 +540,7 @@
             Signs binary data with the corresponding private key.
             </summary>
             <param name="Data">Binary data to sign-</param>
+            <returns>Digital signature.</returns>
         </member>
         <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.SignAsync(System.String,System.Byte[])">
             <summary>
@@ -547,6 +548,7 @@
             </summary>
             <param name="Address">Address of entity on which the legal identity are registered.</param>
             <param name="Data">Binary data to sign-</param>
+            <returns>Digital signature.</returns>
         </member>
         <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.ValidateSignature(System.String,System.Byte[],System.Byte[],System.Byte[],Waher.Networking.XMPP.Contracts.LegalIdentityEventHandler,System.Object)">
             <summary>
@@ -579,6 +581,7 @@
             <param name="Data">Binary data to sign-</param>
             <param name="S1">First signature of data</param>
             <param name="S2">Second signature of data, if available.</param>
+            <returns>Legal identity object.</returns>
         </member>
         <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.ValidateSignatureAsync(System.String,System.String,System.Byte[],System.Byte[],System.Byte[])">
             <summary>
@@ -589,6 +592,7 @@
             <param name="Data">Binary data to sign-</param>
             <param name="S1">First signature of data</param>
             <param name="S2">Second signature of data, if available.</param>
+            <returns>Legal identity object.</returns>
         </member>
         <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.CreateContract(System.Xml.XmlElement,Waher.Networking.XMPP.Contracts.HumanReadable.HumanReadableText[],Waher.Networking.XMPP.Contracts.Role[],Waher.Networking.XMPP.Contracts.Part[],Waher.Networking.XMPP.Contracts.Parameter[],Waher.Networking.XMPP.Contracts.ContractVisibility,Waher.Networking.XMPP.Contracts.ContractParts,Waher.Content.Duration,Waher.Content.Duration,Waher.Content.Duration,System.Nullable{System.DateTime},System.Nullable{System.DateTime},System.Boolean,Waher.Networking.XMPP.Contracts.SmartContractEventHandler,System.Object)">
             <summary>
@@ -651,6 +655,7 @@
             <param name="SignAfter">Signatures will only be accepted after this point in time, if provided.</param>
             <param name="SignBefore">Signatures will only be accepted until this point in time, if provided.</param>
             <param name="CanActAsTemplate">If the contract can act as a template.</param>
+            <returns>Contract.</returns>
         </member>
         <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.CreateContractAsync(System.String,System.Xml.XmlElement,Waher.Networking.XMPP.Contracts.HumanReadable.HumanReadableText[],Waher.Networking.XMPP.Contracts.Role[],Waher.Networking.XMPP.Contracts.Part[],Waher.Networking.XMPP.Contracts.Parameter[],Waher.Networking.XMPP.Contracts.ContractVisibility,Waher.Networking.XMPP.Contracts.ContractParts,Waher.Content.Duration,Waher.Content.Duration,Waher.Content.Duration,System.Nullable{System.DateTime},System.Nullable{System.DateTime},System.Boolean)">
             <summary>
@@ -671,6 +676,7 @@
             <param name="SignAfter">Signatures will only be accepted after this point in time, if provided.</param>
             <param name="SignBefore">Signatures will only be accepted until this point in time, if provided.</param>
             <param name="CanActAsTemplate">If the contract can act as a template.</param>
+            <returns>Contract.</returns>
         </member>
         <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.CreateContract(System.String,Waher.Networking.XMPP.Contracts.Part[],Waher.Networking.XMPP.Contracts.Parameter[],Waher.Networking.XMPP.Contracts.ContractVisibility,Waher.Networking.XMPP.Contracts.ContractParts,Waher.Content.Duration,Waher.Content.Duration,Waher.Content.Duration,System.Nullable{System.DateTime},System.Nullable{System.DateTime},System.Boolean,Waher.Networking.XMPP.Contracts.SmartContractEventHandler,System.Object)">
             <summary>
@@ -727,6 +733,7 @@
             <param name="SignAfter">Signatures will only be accepted after this point in time, if provided.</param>
             <param name="SignBefore">Signatures will only be accepted until this point in time, if provided.</param>
             <param name="CanActAsTemplate">If the contract can act as a template.</param>
+            <returns>Contract.</returns>
         </member>
         <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.CreateContractAsync(System.String,System.String,Waher.Networking.XMPP.Contracts.Part[],Waher.Networking.XMPP.Contracts.Parameter[],Waher.Networking.XMPP.Contracts.ContractVisibility,Waher.Networking.XMPP.Contracts.ContractParts,Waher.Content.Duration,Waher.Content.Duration,Waher.Content.Duration,System.Nullable{System.DateTime},System.Nullable{System.DateTime},System.Boolean)">
             <summary>
@@ -745,6 +752,7 @@
             <param name="SignAfter">Signatures will only be accepted after this point in time, if provided.</param>
             <param name="SignBefore">Signatures will only be accepted until this point in time, if provided.</param>
             <param name="CanActAsTemplate">If the contract can act as a template.</param>
+            <returns>Contract.</returns>
         </member>
         <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetCreatedContracts(Waher.Networking.XMPP.Contracts.IdReferencesEventHandler,System.Object)">
             <summary>
@@ -765,12 +773,14 @@
             <summary>
             Get contracts the account has created.
             </summary>
+            <returns>Contract IDs</returns>
         </member>
         <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetCreatedContractsAsync(System.String)">
             <summary>
             Get contracts the account has created.
             </summary>
             <param name="Address">Address of server (component).</param>
+            <returns>Contract IDs</returns>
         </member>
         <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.SignContract(Waher.Networking.XMPP.Contracts.Contract,System.String,System.Boolean,Waher.Networking.XMPP.Contracts.SmartContractEventHandler,System.Object)">
             <summary>
@@ -806,6 +816,7 @@
             <param name="Transferable">If the signature should be transferable or not.
             Transferable signatures are copied to contracts based on the current contract as a template,
             and only if no parameters and attributes are changed. (Otherwise the signature would break.)</param>
+            <returns>Contract</returns>
         </member>
         <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.SignContractAsync(System.String,Waher.Networking.XMPP.Contracts.Contract,System.String,System.Boolean)">
             <summary>
@@ -817,6 +828,7 @@
             <param name="Transferable">If the signature should be transferable or not.
             Transferable signatures are copied to contracts based on the current contract as a template,
             and only if no parameters and attributes are changed. (Otherwise the signature would break.)</param>
+            <returns>Contract</returns>
         </member>
         <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetSignedContracts(Waher.Networking.XMPP.Contracts.IdReferencesEventHandler,System.Object)">
             <summary>
@@ -837,12 +849,14 @@
             <summary>
             Get contracts the account has signed.
             </summary>
+            <returns>Contract IDs</returns>
         </member>
         <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetSignedContractsAsync(System.String)">
             <summary>
             Get contracts the account has signed.
             </summary>
             <param name="Address">Address of server (component).</param>
+            <returns>Contract IDs</returns>
         </member>
         <member name="E:Waher.Networking.XMPP.Contracts.ContractsClient.ContractSigned">
             <summary>
@@ -871,6 +885,7 @@
             Gets a contract
             </summary>
             <param name="ContractId">ID of contract to get.</param>
+            <returns>Contract</returns>
         </member>
         <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetContractAsync(System.String,System.String)">
             <summary>
@@ -878,6 +893,7 @@
             </summary>
             <param name="Address">Address of server (component).</param>
             <param name="ContractId">ID of contract to get.</param>
+            <returns>Contract</returns>
         </member>
         <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.ObsoleteContract(System.String,Waher.Networking.XMPP.Contracts.SmartContractEventHandler,System.Object)">
             <summary>
@@ -901,6 +917,7 @@
             Obsoletes a contract
             </summary>
             <param name="ContractId">ID of contract to obsolete.</param>
+            <returns>Contract</returns>
         </member>
         <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.ObsoleteContractAsync(System.String,System.String)">
             <summary>
@@ -908,6 +925,7 @@
             </summary>
             <param name="Address">Address of server (component).</param>
             <param name="ContractId">ID of contract to obsolete.</param>
+            <returns>Contract</returns>
         </member>
         <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.DeleteContract(System.String,Waher.Networking.XMPP.Contracts.SmartContractEventHandler,System.Object)">
             <summary>
@@ -931,6 +949,7 @@
             Deletes a contract
             </summary>
             <param name="ContractId">ID of contract to delete.</param>
+            <returns>Contract</returns>
         </member>
         <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.DeleteContractAsync(System.String,System.String)">
             <summary>
@@ -938,6 +957,7 @@
             </summary>
             <param name="Address">Address of server (component).</param>
             <param name="ContractId">ID of contract to delete.</param>
+            <returns>Contract</returns>
         </member>
         <member name="E:Waher.Networking.XMPP.Contracts.ContractsClient.ContractUpdated">
             <summary>
@@ -971,6 +991,7 @@
             Updates a contract
             </summary>
             <param name="Contract">Contract to update.</param>
+            <returns>Contract</returns>
         </member>
         <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.UpdateContractAsync(System.String,Waher.Networking.XMPP.Contracts.Contract)">
             <summary>
@@ -978,6 +999,7 @@
             </summary>
             <param name="Address">Address of server (component).</param>
             <param name="Contract">Contract to update.</param>
+            <returns>Contract</returns>
         </member>
         <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetSchemas(Waher.Networking.XMPP.Contracts.SchemaReferencesEventHandler,System.Object)">
             <summary>
@@ -998,12 +1020,82 @@
             <summary>
             Gets available schemas.
             </summary>
+            <returns>XML Schema references.</returns>
         </member>
         <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetSchemasAsync(System.String)">
             <summary>
             Gets available schemas.
             </summary>
             <param name="Address">Address of server (component).</param>
+            <returns>XML Schema references.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetSchema(System.String,Waher.Networking.XMPP.Contracts.SchemaEventHandler,System.Object)">
+            <summary>
+            Gets a schema.
+            </summary>
+            <param name="Namespace">Namespace of schema to get.</param>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetSchema(System.String,Waher.Networking.XMPP.Contracts.SchemaDigest,Waher.Networking.XMPP.Contracts.SchemaEventHandler,System.Object)">
+            <summary>
+            Gets a schema.
+            </summary>
+            <param name="Namespace">Namespace of schema to get.</param>
+            <param name="Digest">Specifies a specific schema version. If not provided (or null), the most recently recorded schema will be returned.</param>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetSchema(System.String,System.String,Waher.Networking.XMPP.Contracts.SchemaEventHandler,System.Object)">
+            <summary>
+            Gets a schema.
+            </summary>
+            <param name="Address">Address of server (component).</param>
+            <param name="Namespace">Namespace of schema to get.</param>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetSchema(System.String,System.String,Waher.Networking.XMPP.Contracts.SchemaDigest,Waher.Networking.XMPP.Contracts.SchemaEventHandler,System.Object)">
+            <summary>
+            Gets a schema.
+            </summary>
+            <param name="Address">Address of server (component).</param>
+            <param name="Namespace">Namespace of schema to get.</param>
+            <param name="Digest">Specifies a specific schema version. If not provided (or null), the most recently recorded schema will be returned.</param>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetSchemaAsync(System.String)">
+            <summary>
+            Gets a schema.
+            </summary>
+            <param name="Namespace">Namespace of schema to get.</param>
+            <returns>Binary XML schema.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetSchemaAsync(System.String,Waher.Networking.XMPP.Contracts.SchemaDigest)">
+            <summary>
+            Gets a schema.
+            </summary>
+            <param name="Namespace">Namespace of schema to get.</param>
+            <param name="Digest">Specifies a specific schema version. If not provided (or null), the most recently recorded schema will be returned.</param>
+            <returns>Binary XML schema.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetSchemaAsync(System.String,System.String)">
+            <summary>
+            Gets a schema.
+            </summary>
+            <param name="Address">Address of server (component).</param>
+            <param name="Namespace">Namespace of schema to get.</param>
+            <returns>Binary XML schema.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetSchemaAsync(System.String,System.String,Waher.Networking.XMPP.Contracts.SchemaDigest)">
+            <summary>
+            Gets a schema.
+            </summary>
+            <param name="Address">Address of server (component).</param>
+            <param name="Namespace">Namespace of schema to get.</param>
+            <param name="Digest">Specifies a specific schema version. If not provided (or null), the most recently recorded schema will be returned.</param>
+            <returns>Binary XML schema.</returns>
         </member>
         <member name="T:Waher.Networking.XMPP.Contracts.ContractState">
             <summary>
@@ -1319,21 +1411,45 @@
             Public key of server endpoint.
             </summary>
         </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.SchemaEventHandler">
+            <summary>
+            Delegate for schema callback methods.
+            </summary>
+            <param name="Sender">Sender</param>
+            <param name="e">Event arguments</param>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.SchemaEventArgs">
+            <summary>
+            Event arguments for schema responses
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.SchemaEventArgs.#ctor(Waher.Networking.XMPP.IqResultEventArgs,System.Byte[])">
+            <summary>
+            Event arguments for schema responses
+            </summary>
+            <param name="e">IQ response event arguments.</param>
+            <param name="Schema">XML Schema.</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.SchemaEventArgs.Schema">
+            <summary>
+            Binary XML Schema.
+            </summary>
+        </member>
         <member name="T:Waher.Networking.XMPP.Contracts.SchemaReferencesEventHandler">
             <summary>
-            Delegate for ID References callback methods.
+            Delegate for Schema References callback methods.
             </summary>
             <param name="Sender">Sender</param>
             <param name="e">Event arguments</param>
         </member>
         <member name="T:Waher.Networking.XMPP.Contracts.SchemaReferencesEventArgs">
             <summary>
-            Event arguments for ID References responses
+            Event arguments for Schema References responses
             </summary>
         </member>
         <member name="M:Waher.Networking.XMPP.Contracts.SchemaReferencesEventArgs.#ctor(Waher.Networking.XMPP.IqResultEventArgs,Waher.Networking.XMPP.Contracts.SchemaReference[])">
             <summary>
-            Event arguments for ID References responses
+            Event arguments for Schema References responses
             </summary>
             <param name="e">IQ response event arguments.</param>
             <param name="References">Schema References.</param>

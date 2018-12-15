@@ -6,6 +6,7 @@ using System.Security.Cryptography;
 using System.Threading.Tasks;
 using System.Text;
 using System.Xml;
+using System.Xml.Schema;
 using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Events;
@@ -1177,6 +1178,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// Signs binary data with the corresponding private key.
 		/// </summary>
 		/// <param name="Data">Binary data to sign-</param>
+		/// <returns>Digital signature.</returns>
 		public Task<KeyValuePair<byte[], byte[]>> SignAsync(byte[] Data)
 		{
 			return this.SignAsync(this.componentAddress, Data);
@@ -1187,6 +1189,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="Address">Address of entity on which the legal identity are registered.</param>
 		/// <param name="Data">Binary data to sign-</param>
+		/// <returns>Digital signature.</returns>
 		public Task<KeyValuePair<byte[], byte[]>> SignAsync(string Address, byte[] Data)
 		{
 			TaskCompletionSource<KeyValuePair<byte[], byte[]>> Result = new TaskCompletionSource<KeyValuePair<byte[], byte[]>>();
@@ -1277,6 +1280,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Data">Binary data to sign-</param>
 		/// <param name="S1">First signature of data</param>
 		/// <param name="S2">Second signature of data, if available.</param>
+		/// <returns>Legal identity object.</returns>
 		public Task<LegalIdentity> ValidateSignatureAsync(string LegalId, byte[] Data, byte[] S1, byte[] S2)
 		{
 			return this.ValidateSignatureAsync(this.componentAddress, LegalId, Data, S1, S2);
@@ -1290,6 +1294,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Data">Binary data to sign-</param>
 		/// <param name="S1">First signature of data</param>
 		/// <param name="S2">Second signature of data, if available.</param>
+		/// <returns>Legal identity object.</returns>
 		public Task<LegalIdentity> ValidateSignatureAsync(string Address, string LegalId, byte[] Data, byte[] S1, byte[] S2)
 		{
 			TaskCompletionSource<LegalIdentity> Result = new TaskCompletionSource<LegalIdentity>();
@@ -1429,6 +1434,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="SignAfter">Signatures will only be accepted after this point in time, if provided.</param>
 		/// <param name="SignBefore">Signatures will only be accepted until this point in time, if provided.</param>
 		/// <param name="CanActAsTemplate">If the contract can act as a template.</param>
+		/// <returns>Contract.</returns>
 		public Task<Contract> CreateContractAsync(XmlElement ForMachines, HumanReadableText[] ForHumans, Role[] Roles,
 			Part[] Parts, Parameter[] Parameters, ContractVisibility Visibility, ContractParts PartsMode, Duration Duration,
 			Duration ArchiveRequired, Duration ArchiveOptional, DateTime? SignAfter, DateTime? SignBefore, bool CanActAsTemplate)
@@ -1455,6 +1461,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="SignAfter">Signatures will only be accepted after this point in time, if provided.</param>
 		/// <param name="SignBefore">Signatures will only be accepted until this point in time, if provided.</param>
 		/// <param name="CanActAsTemplate">If the contract can act as a template.</param>
+		/// <returns>Contract.</returns>
 		public Task<Contract> CreateContractAsync(string Address, XmlElement ForMachines, HumanReadableText[] ForHumans, Role[] Roles,
 			Part[] Parts, Parameter[] Parameters, ContractVisibility Visibility, ContractParts PartsMode, Duration Duration,
 			Duration ArchiveRequired, Duration ArchiveOptional, DateTime? SignAfter, DateTime? SignBefore, bool CanActAsTemplate)
@@ -1618,6 +1625,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="SignAfter">Signatures will only be accepted after this point in time, if provided.</param>
 		/// <param name="SignBefore">Signatures will only be accepted until this point in time, if provided.</param>
 		/// <param name="CanActAsTemplate">If the contract can act as a template.</param>
+		/// <returns>Contract.</returns>
 		public Task<Contract> CreateContractAsync(string TemplateId, Part[] Parts, Parameter[] Parameters, ContractVisibility Visibility,
 			ContractParts PartsMode, Duration Duration, Duration ArchiveRequired, Duration ArchiveOptional, DateTime? SignAfter,
 			DateTime? SignBefore, bool CanActAsTemplate)
@@ -1642,6 +1650,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="SignAfter">Signatures will only be accepted after this point in time, if provided.</param>
 		/// <param name="SignBefore">Signatures will only be accepted until this point in time, if provided.</param>
 		/// <param name="CanActAsTemplate">If the contract can act as a template.</param>
+		/// <returns>Contract.</returns>
 		public Task<Contract> CreateContractAsync(string Address, string TemplateId, Part[] Parts, Parameter[] Parameters,
 			ContractVisibility Visibility, ContractParts PartsMode, Duration Duration, Duration ArchiveRequired, Duration ArchiveOptional,
 			DateTime? SignAfter, DateTime? SignBefore, bool CanActAsTemplate)
@@ -1717,6 +1726,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <summary>
 		/// Get contracts the account has created.
 		/// </summary>
+		/// <returns>Contract IDs</returns>
 		public Task<string[]> GetCreatedContractsAsync()
 		{
 			return this.GetCreatedContractsAsync(this.componentAddress);
@@ -1726,6 +1736,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// Get contracts the account has created.
 		/// </summary>
 		/// <param name="Address">Address of server (component).</param>
+		/// <returns>Contract IDs</returns>
 		public Task<string[]> GetCreatedContractsAsync(string Address)
 		{
 			TaskCompletionSource<string[]> Result = new TaskCompletionSource<string[]>();
@@ -1822,6 +1833,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Transferable">If the signature should be transferable or not.
 		/// Transferable signatures are copied to contracts based on the current contract as a template,
 		/// and only if no parameters and attributes are changed. (Otherwise the signature would break.)</param>
+		/// <returns>Contract</returns>
 		public Task<Contract> SignContractAsync(Contract Contract, string Role, bool Transferable)
 		{
 			return this.SignContractAsync(this.componentAddress, Contract, Role, Transferable);
@@ -1836,6 +1848,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Transferable">If the signature should be transferable or not.
 		/// Transferable signatures are copied to contracts based on the current contract as a template,
 		/// and only if no parameters and attributes are changed. (Otherwise the signature would break.)</param>
+		/// <returns>Contract</returns>
 		public Task<Contract> SignContractAsync(string Address, Contract Contract, string Role, bool Transferable)
 		{
 			TaskCompletionSource<Contract> Result = new TaskCompletionSource<Contract>();
@@ -1883,6 +1896,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <summary>
 		/// Get contracts the account has signed.
 		/// </summary>
+		/// <returns>Contract IDs</returns>
 		public Task<string[]> GetSignedContractsAsync()
 		{
 			return this.GetSignedContractsAsync(this.componentAddress);
@@ -1892,6 +1906,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// Get contracts the account has signed.
 		/// </summary>
 		/// <param name="Address">Address of server (component).</param>
+		/// <returns>Contract IDs</returns>
 		public Task<string[]> GetSignedContractsAsync(string Address)
 		{
 			TaskCompletionSource<string[]> Result = new TaskCompletionSource<string[]>();
@@ -1972,6 +1987,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// Gets a contract
 		/// </summary>
 		/// <param name="ContractId">ID of contract to get.</param>
+		/// <returns>Contract</returns>
 		public Task<Contract> GetContractAsync(string ContractId)
 		{
 			return this.GetContractAsync(this.componentAddress, ContractId);
@@ -1982,6 +1998,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="Address">Address of server (component).</param>
 		/// <param name="ContractId">ID of contract to get.</param>
+		/// <returns>Contract</returns>
 		public Task<Contract> GetContractAsync(string Address, string ContractId)
 		{
 			TaskCompletionSource<Contract> Result = new TaskCompletionSource<Contract>();
@@ -2040,6 +2057,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// Obsoletes a contract
 		/// </summary>
 		/// <param name="ContractId">ID of contract to obsolete.</param>
+		/// <returns>Contract</returns>
 		public Task<Contract> ObsoleteContractAsync(string ContractId)
 		{
 			return this.ObsoleteContractAsync(this.componentAddress, ContractId);
@@ -2050,6 +2068,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="Address">Address of server (component).</param>
 		/// <param name="ContractId">ID of contract to obsolete.</param>
+		/// <returns>Contract</returns>
 		public Task<Contract> ObsoleteContractAsync(string Address, string ContractId)
 		{
 			TaskCompletionSource<Contract> Result = new TaskCompletionSource<Contract>();
@@ -2108,6 +2127,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// Deletes a contract
 		/// </summary>
 		/// <param name="ContractId">ID of contract to delete.</param>
+		/// <returns>Contract</returns>
 		public Task<Contract> DeleteContractAsync(string ContractId)
 		{
 			return this.DeleteContractAsync(this.componentAddress, ContractId);
@@ -2118,6 +2138,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="Address">Address of server (component).</param>
 		/// <param name="ContractId">ID of contract to delete.</param>
+		/// <returns>Contract</returns>
 		public Task<Contract> DeleteContractAsync(string Address, string ContractId)
 		{
 			TaskCompletionSource<Contract> Result = new TaskCompletionSource<Contract>();
@@ -2226,6 +2247,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// Updates a contract
 		/// </summary>
 		/// <param name="Contract">Contract to update.</param>
+		/// <returns>Contract</returns>
 		public Task<Contract> UpdateContractAsync(Contract Contract)
 		{
 			return this.UpdateContractAsync(this.componentAddress, Contract);
@@ -2236,6 +2258,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="Address">Address of server (component).</param>
 		/// <param name="Contract">Contract to update.</param>
+		/// <returns>Contract</returns>
 		public Task<Contract> UpdateContractAsync(string Address, Contract Contract)
 		{
 			TaskCompletionSource<Contract> Result = new TaskCompletionSource<Contract>();
@@ -2319,6 +2342,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <summary>
 		/// Gets available schemas.
 		/// </summary>
+		/// <returns>XML Schema references.</returns>
 		public Task<SchemaReference[]> GetSchemasAsync()
 		{
 			return this.GetSchemasAsync(this.componentAddress);
@@ -2328,6 +2352,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// Gets available schemas.
 		/// </summary>
 		/// <param name="Address">Address of server (component).</param>
+		/// <returns>XML Schema references.</returns>
 		public Task<SchemaReference[]> GetSchemasAsync(string Address)
 		{
 			TaskCompletionSource<SchemaReference[]> Result = new TaskCompletionSource<SchemaReference[]>();
@@ -2340,6 +2365,146 @@ namespace Waher.Networking.XMPP.Contracts
 				{
 					Result.SetException(new IOException(string.IsNullOrEmpty(e.ErrorText) ?
 						"Unable to get schemas." : e.ErrorText));
+				}
+			}, null);
+
+			return Result.Task;
+		}
+
+		#endregion
+
+		#region Get Schema
+
+		/// <summary>
+		/// Gets a schema.
+		/// </summary>
+		/// <param name="Namespace">Namespace of schema to get.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public void GetSchema(string Namespace, SchemaEventHandler Callback, object State)
+		{
+			this.GetSchema(this.componentAddress, Namespace, null, Callback, State);
+		}
+
+		/// <summary>
+		/// Gets a schema.
+		/// </summary>
+		/// <param name="Namespace">Namespace of schema to get.</param>
+		/// <param name="Digest">Specifies a specific schema version. If not provided (or null), the most recently recorded schema will be returned.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public void GetSchema(string Namespace, SchemaDigest Digest, SchemaEventHandler Callback, object State)
+		{
+			this.GetSchema(this.componentAddress, Namespace, Digest, Callback, State);
+		}
+
+		/// <summary>
+		/// Gets a schema.
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="Namespace">Namespace of schema to get.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public void GetSchema(string Address, string Namespace, SchemaEventHandler Callback, object State)
+		{
+			this.GetSchema(Address, Namespace, null, Callback, State);
+		}
+
+		/// <summary>
+		/// Gets a schema.
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="Namespace">Namespace of schema to get.</param>
+		/// <param name="Digest">Specifies a specific schema version. If not provided (or null), the most recently recorded schema will be returned.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public void GetSchema(string Address, string Namespace, SchemaDigest Digest, SchemaEventHandler Callback, object State)
+		{
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<getSchema xmlns='");
+			Xml.Append(NamespaceSmartContracts);
+			Xml.Append("' namespace='");
+			Xml.Append(XML.Encode(Namespace));
+
+			if (Digest == null)
+				Xml.Append("'/>");
+			else
+			{
+				Xml.Append("'><digest function='");
+				Xml.Append(Digest.Function.ToString());
+				Xml.Append("'>");
+				Xml.Append(Convert.ToBase64String(Digest.Digest));
+				Xml.Append("</digest></getSchema>");
+			}
+
+			this.client.SendIqGet(Address, Xml.ToString(),
+				(sender, e) =>
+				{
+					XmlElement E = e.FirstElement;
+					byte[] Schema = null;
+
+					if (e.Ok && E != null && E.LocalName == "schema" && E.NamespaceURI == NamespaceSmartContracts)
+						Schema = Convert.FromBase64String(E.InnerText);
+					else
+						e.Ok = false;
+
+					Callback?.Invoke(this, new SchemaEventArgs(e, Schema));
+
+				}, State);
+		}
+
+		/// <summary>
+		/// Gets a schema.
+		/// </summary>
+		/// <param name="Namespace">Namespace of schema to get.</param>
+		/// <returns>Binary XML schema.</returns>
+		public Task<byte[]> GetSchemaAsync(string Namespace)
+		{
+			return this.GetSchemaAsync(this.componentAddress, Namespace, null);
+		}
+
+		/// <summary>
+		/// Gets a schema.
+		/// </summary>
+		/// <param name="Namespace">Namespace of schema to get.</param>
+		/// <param name="Digest">Specifies a specific schema version. If not provided (or null), the most recently recorded schema will be returned.</param>
+		/// <returns>Binary XML schema.</returns>
+		public Task<byte[]> GetSchemaAsync(string Namespace, SchemaDigest Digest)
+		{
+			return this.GetSchemaAsync(this.componentAddress, Namespace, Digest);
+		}
+
+		/// <summary>
+		/// Gets a schema.
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="Namespace">Namespace of schema to get.</param>
+		/// <returns>Binary XML schema.</returns>
+		public Task<byte[]> GetSchemaAsync(string Address, string Namespace)
+		{
+			return this.GetSchemaAsync(Address, Namespace, null);
+		}
+
+		/// <summary>
+		/// Gets a schema.
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="Namespace">Namespace of schema to get.</param>
+		/// <param name="Digest">Specifies a specific schema version. If not provided (or null), the most recently recorded schema will be returned.</param>
+		/// <returns>Binary XML schema.</returns>
+		public Task<byte[]> GetSchemaAsync(string Address, string Namespace, SchemaDigest Digest)
+		{
+			TaskCompletionSource<byte[]> Result = new TaskCompletionSource<byte[]>();
+
+			this.GetSchema(Address, Namespace, Digest, (sender, e) =>
+			{
+				if (e.Ok)
+					Result.SetResult(e.Schema);
+				else
+				{
+					Result.SetException(new IOException(string.IsNullOrEmpty(e.ErrorText) ?
+						"Unable to get schema." : e.ErrorText));
 				}
 			}, null);
 

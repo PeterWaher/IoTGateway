@@ -849,6 +849,25 @@
             Event raised whenever a contract has been signed.
             </summary>
         </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetContract(System.String,Waher.Networking.XMPP.Contracts.SmartContractEventHandler,System.Object)">
+            <summary>
+            Gets a contract
+            </summary>
+            <param name="ContractId">ID of contract to get.</param>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetContract(System.String,System.String,Waher.Networking.XMPP.Contracts.SmartContractEventHandler,System.Object)">
+            <summary>
+            Gets a contract
+            </summary>
+            <param name="Address">Address of server (component).</param>
+            <param name="ContractId">ID of contract to get.</param>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:Waher.Networking.XMPP.Contracts.ContractsClient.GetContractAsync(System.String)" -->
+        <!-- Badly formed XML comment ignored for member "M:Waher.Networking.XMPP.Contracts.ContractsClient.GetContractAsync(System.String,System.String)" -->
         <member name="T:Waher.Networking.XMPP.Contracts.ContractState">
             <summary>
             Recognized contract states

@@ -1910,5 +1910,77 @@ namespace Waher.Networking.XMPP.Contracts
 		public event ContractSignedEventHandler ContractSigned = null;
 
 		#endregion
+
+		#region Get Contract
+
+		/// <summary>
+		/// Gets a contract
+		/// </summary>
+		/// <param name="ContractId">ID of contract to get.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public void GetContract(string ContractId, SmartContractEventHandler Callback, object State)
+		{
+			this.GetContract(this.componentAddress, ContractId, Callback, State);
+		}
+
+		/// <summary>
+		/// Gets a contract
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="ContractId">ID of contract to get.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public void GetContract(string Address, string ContractId,
+			SmartContractEventHandler Callback, object State)
+		{
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<getContract xmlns='");
+			Xml.Append(NamespaceSmartContracts);
+			Xml.Append("' id='");
+			Xml.Append(XML.Encode(ContractId));
+			Xml.Append("'/>");
+
+			this.client.SendIqGet(Address, Xml.ToString(), this.ContractResponse, new object[] { Callback, State });
+		}
+
+		/// <summary>
+		/// Gets a contract
+		/// </summary>
+		/// <param name="ContractId">ID of contract to get.</param>
+		/// Transferable getatures are copied to contracts based on the current contract as a template,
+		/// and only if no parameters and attributes are changed. (Otherwise the getature would break.)</param>
+		public Task<Contract> GetContractAsync(string ContractId)
+		{
+			return this.GetContractAsync(this.componentAddress, ContractId);
+		}
+
+		/// <summary>
+		/// Gets a contract
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="ContractId">ID of contract to get.</param>
+		/// Transferable getatures are copied to contracts based on the current contract as a template,
+		/// and only if no parameters and attributes are changed. (Otherwise the getature would break.)</param>
+		public Task<Contract> GetContractAsync(string Address, string ContractId)
+		{
+			TaskCompletionSource<Contract> Result = new TaskCompletionSource<Contract>();
+
+			this.GetContract(Address, ContractId, (sender, e) =>
+			{
+				if (e.Ok)
+					Result.SetResult(e.Contract);
+				else
+				{
+					Result.SetException(new IOException(string.IsNullOrEmpty(e.ErrorText) ?
+						"Unable to get the contract." : e.ErrorText));
+				}
+			}, null);
+
+			return Result.Task;
+		}
+
+		#endregion
 	}
 }

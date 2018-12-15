@@ -2521,7 +2521,7 @@
             If the object specifies a point (true) or a range (false).
             </summary>
         </member>
-        <member name="P:Waher.Persistence.Files.Searching.RangeInfo.IsOpenEnded">
+        <member name="P:Waher.Persistence.Files.Searching.RangeInfo.IsOpenEndedRange">
             <summary>
             If the range is open-ended.
             </summary>

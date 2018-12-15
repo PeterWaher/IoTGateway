@@ -17,6 +17,7 @@ namespace Waher.Persistence.Files.Searching
 		private bool minInclusive;
 		private bool maxInclusive;
 		private bool isRange;
+		private bool isPoint;
 
 		/// <summary>
 		/// Contains information about a range in a search operation.
@@ -88,15 +89,15 @@ namespace Waher.Persistence.Files.Searching
 		/// </summary>
 		public bool IsPoint
 		{
-			get { return !this.isRange; }
+			get { return this.isPoint; }
 		}
 
 		/// <summary>
 		/// If the range is open-ended.
 		/// </summary>
-		public bool IsOpenEnded
+		public bool IsOpenEndedRange
 		{
-			get { return this.min == null || this.max == null; }
+			get { return this.IsRange && (this.min == null || this.max == null); }
 		}
 
 		/// <summary>
@@ -104,7 +105,7 @@ namespace Waher.Persistence.Files.Searching
 		/// </summary>
 		public bool HasMin
 		{
-			get { return this.min != null; }
+			get { return (this.isRange && this.min != null) || (this.isPoint && this.point != null); }
 		}
 
 		/// <summary>
@@ -112,7 +113,7 @@ namespace Waher.Persistence.Files.Searching
 		/// </summary>
 		public bool HasMax
 		{
-			get { return this.max != null; }
+			get { return (this.isRange && this.max != null) || (this.isPoint && this.point != null); }
 		}
 
 		/// <summary>
@@ -134,8 +135,6 @@ namespace Waher.Persistence.Files.Searching
 						return false;
 
 					this.min = null;
-					this.point = Value;
-					this.isRange = false;
 				}
 
 				if (this.max != null)
@@ -146,19 +145,21 @@ namespace Waher.Persistence.Files.Searching
 						return false;
 
 					this.max = null;
-					this.point = Value;
-					this.isRange = false;
 				}
 
+				this.point = Value;
+				this.isRange = false;
+				this.isPoint = true;
 				return true;
 			}
-			else if (this.point != null)
+			else if (this.isPoint)
 			{
 				i = Comparison.Compare(this.point, Value);
 				return (i.HasValue && i.Value == 0);
 			}
 			else
 			{
+				this.isPoint = true;
 				this.point = Value;
 				return true;
 			}
@@ -238,7 +239,7 @@ namespace Waher.Persistence.Files.Searching
 
 				return true;
 			}
-			else if (this.point != null)
+			else if (this.isPoint)
 			{
 				i = Comparison.Compare(this.point, Value);
 
@@ -328,7 +329,7 @@ namespace Waher.Persistence.Files.Searching
 
 				return true;
 			}
-			else if (this.point != null)
+			else if (this.isPoint)
 			{
 				i = Comparison.Compare(this.point, Value);
 
@@ -367,6 +368,7 @@ namespace Waher.Persistence.Files.Searching
 			Destination.minInclusive = this.minInclusive;
 			Destination.maxInclusive = this.maxInclusive;
 			Destination.isRange = this.isRange;
+			Destination.isPoint = this.isPoint;
 		}
 
 	}

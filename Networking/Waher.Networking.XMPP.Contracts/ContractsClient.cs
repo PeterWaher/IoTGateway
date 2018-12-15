@@ -2255,5 +2255,98 @@ namespace Waher.Networking.XMPP.Contracts
 		}
 
 		#endregion
+
+		#region Get Schemas
+
+		/// <summary>
+		/// Gets available schemas.
+		/// </summary>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public void GetSchemas(SchemaReferencesEventHandler Callback, object State)
+		{
+			this.GetSchemas(this.componentAddress, Callback, State);
+		}
+
+		/// <summary>
+		/// Gets available schemas.
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public void GetSchemas(string Address, SchemaReferencesEventHandler Callback, object State)
+		{
+			this.client.SendIqGet(Address, "<getSchemas xmlns='" + NamespaceSmartContracts + "'/>",
+				(sender, e) =>
+				{
+					XmlElement E = e.FirstElement;
+					List<SchemaReference> Schemas = new List<SchemaReference>();
+
+					if (e.Ok && E != null && E.LocalName == "schemas" && E.NamespaceURI == NamespaceSmartContracts)
+					{
+						foreach (XmlNode N in E.ChildNodes)
+						{
+							if (N is XmlElement E2 && E2.LocalName == "schemaRef" && E2.NamespaceURI == NamespaceSmartContracts)
+							{
+								string Namespace = XML.Attribute(E2, "namespace");
+								List<SchemaDigest> Digests = new List<SchemaDigest>();
+
+								foreach (XmlNode N2 in E2.ChildNodes)
+								{
+									if (N2 is XmlElement E3 && E3.LocalName == "digest" && E3.NamespaceURI == NamespaceSmartContracts)
+									{
+										if (!Enum.TryParse<HashFunction>(XML.Attribute(E3, "function"), out HashFunction Function))
+											continue;
+
+										byte[] Digest = Convert.FromBase64String(E3.InnerText);
+
+										Digests.Add(new SchemaDigest(Function, Digest));
+									}
+								}
+
+								Schemas.Add(new SchemaReference(Namespace, Digests.ToArray()));
+							}
+						}
+					}
+					else
+						e.Ok = false;
+
+					Callback?.Invoke(this, new SchemaReferencesEventArgs(e, Schemas.ToArray()));
+
+				}, State);
+		}
+
+		/// <summary>
+		/// Gets available schemas.
+		/// </summary>
+		public Task<SchemaReference[]> GetSchemasAsync()
+		{
+			return this.GetSchemasAsync(this.componentAddress);
+		}
+
+		/// <summary>
+		/// Gets available schemas.
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		public Task<SchemaReference[]> GetSchemasAsync(string Address)
+		{
+			TaskCompletionSource<SchemaReference[]> Result = new TaskCompletionSource<SchemaReference[]>();
+
+			this.GetSchemas(Address, (sender, e) =>
+			{
+				if (e.Ok)
+					Result.SetResult(e.References);
+				else
+				{
+					Result.SetException(new IOException(string.IsNullOrEmpty(e.ErrorText) ?
+						"Unable to get schemas." : e.ErrorText));
+				}
+			}, null);
+
+			return Result.Task;
+		}
+
+		#endregion
+
 	}
 }

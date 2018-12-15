@@ -979,6 +979,32 @@
             <param name="Address">Address of server (component).</param>
             <param name="Contract">Contract to update.</param>
         </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetSchemas(Waher.Networking.XMPP.Contracts.SchemaReferencesEventHandler,System.Object)">
+            <summary>
+            Gets available schemas.
+            </summary>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetSchemas(System.String,Waher.Networking.XMPP.Contracts.SchemaReferencesEventHandler,System.Object)">
+            <summary>
+            Gets available schemas.
+            </summary>
+            <param name="Address">Address of server (component).</param>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetSchemasAsync">
+            <summary>
+            Gets available schemas.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetSchemasAsync(System.String)">
+            <summary>
+            Gets available schemas.
+            </summary>
+            <param name="Address">Address of server (component).</param>
+        </member>
         <member name="T:Waher.Networking.XMPP.Contracts.ContractState">
             <summary>
             Recognized contract states
@@ -1291,6 +1317,30 @@
         <member name="P:Waher.Networking.XMPP.Contracts.KeyEventArgs.Key">
             <summary>
             Public key of server endpoint.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.SchemaReferencesEventHandler">
+            <summary>
+            Delegate for ID References callback methods.
+            </summary>
+            <param name="Sender">Sender</param>
+            <param name="e">Event arguments</param>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.SchemaReferencesEventArgs">
+            <summary>
+            Event arguments for ID References responses
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.SchemaReferencesEventArgs.#ctor(Waher.Networking.XMPP.IqResultEventArgs,Waher.Networking.XMPP.Contracts.SchemaReference[])">
+            <summary>
+            Event arguments for ID References responses
+            </summary>
+            <param name="e">IQ response event arguments.</param>
+            <param name="References">Schema References.</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.SchemaReferencesEventArgs.References">
+            <summary>
+            Schema References
             </summary>
         </member>
         <member name="T:Waher.Networking.XMPP.Contracts.SignatureEventHandler">
@@ -2161,6 +2211,50 @@
         <member name="P:Waher.Networking.XMPP.Contracts.Role.MaxCount">
             <summary>
             Largest amount of signatures of this role required for a legally binding contract.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.SchemaDigest">
+            <summary>
+            Contains a schema digest
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.SchemaDigest.#ctor(Waher.Security.HashFunction,System.Byte[])">
+            <summary>
+            Contains a schema digest
+            </summary>
+            <param name="Function">Hash function</param>
+            <param name="Digest">Digest</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.SchemaDigest.Digest">
+            <summary>
+            Hash Digest of schema file
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.SchemaDigest.Function">
+            <summary>
+            Hash Function used to calculate the digest.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.SchemaReference">
+            <summary>
+            References a XML Schema used for validating machine-readable contents in smart contracts.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.SchemaReference.#ctor(System.String,Waher.Networking.XMPP.Contracts.SchemaDigest[])">
+            <summary>
+            References a XML Schema used for validating machine-readable contents in smart contracts.
+            </summary>
+            <param name="Namespace">Schema namespace</param>
+            <param name="Digests">Digests of available versions.</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.SchemaReference.Namespace">
+            <summary>
+            Namespace of schema
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.SchemaReference.Digests">
+            <summary>
+            Hash of schema
             </summary>
         </member>
         <member name="T:Waher.Networking.XMPP.Contracts.ServerSignature">

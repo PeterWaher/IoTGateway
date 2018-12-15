@@ -116,7 +116,7 @@
             Optional time to archive a signed smart contract, after it becomes obsolete, and after its required archivation period.
             </summary>
         </member>
-        <member name="P:Waher.Networking.XMPP.Contracts.Contract.ContentSchemaHash">
+        <member name="P:Waher.Networking.XMPP.Contracts.Contract.ContentSchemaDigest">
             <summary>
             The hash digest of the schema used to validate the machine-readable contents (<see cref="P:Waher.Networking.XMPP.Contracts.Contract.ForMachines"/>) of the smart contract,
             if such a schema was used.

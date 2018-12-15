@@ -23,7 +23,7 @@ namespace Waher.Networking.XMPP.Contracts
 		private string provider = null;
 		private string forMachinesLocalName = null;
 		private string forMachinesNamespace = null;
-		private byte[] contentSchemaHash = null;
+		private byte[] contentSchemaDigest = null;
 		private XmlElement forMachines = null;
 		private Role[] roles = null;
 		private Part[] parts = null;
@@ -183,10 +183,10 @@ namespace Waher.Networking.XMPP.Contracts
 		/// The hash digest of the schema used to validate the machine-readable contents (<see cref="ForMachines"/>) of the smart contract,
 		/// if such a schema was used.
 		/// </summary>
-		public byte[] ContentSchemaHash
+		public byte[] ContentSchemaDigest
 		{
-			get { return this.contentSchemaHash; }
-			set { this.contentSchemaHash = value; }
+			get { return this.contentSchemaDigest; }
+			set { this.contentSchemaDigest = value; }
 		}
 
 		/// <summary>
@@ -763,8 +763,8 @@ namespace Waher.Networking.XMPP.Contracts
 									Result.templateId = Attr.Value;
 									break;
 
-								case "schemaHash":
-									Result.contentSchemaHash = Convert.FromBase64String(Attr.Value);
+								case "schemaDigest":
+									Result.contentSchemaDigest = Convert.FromBase64String(Attr.Value);
 									break;
 
 								case "schemaHashFunction":
@@ -1140,10 +1140,10 @@ namespace Waher.Networking.XMPP.Contracts
 				Xml.Append("\" provider=\"");
 				Xml.Append(XML.Encode(this.provider));
 
-				if (this.contentSchemaHash != null && this.contentSchemaHash.Length > 0)
+				if (this.contentSchemaDigest != null && this.contentSchemaDigest.Length > 0)
 				{
-					Xml.Append("\" schemaHash=\"");
-					Xml.Append(Convert.ToBase64String(this.contentSchemaHash));
+					Xml.Append("\" schemaDigest=\"");
+					Xml.Append(Convert.ToBase64String(this.contentSchemaDigest));
 
 					Xml.Append("\" schemaHashFunction=\"");
 					Xml.Append(this.contentSchemaHashFunction.ToString());

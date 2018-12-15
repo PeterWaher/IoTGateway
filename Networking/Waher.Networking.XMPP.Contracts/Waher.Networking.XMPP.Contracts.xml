@@ -868,6 +868,44 @@
         </member>
         <!-- Badly formed XML comment ignored for member "M:Waher.Networking.XMPP.Contracts.ContractsClient.GetContractAsync(System.String)" -->
         <!-- Badly formed XML comment ignored for member "M:Waher.Networking.XMPP.Contracts.ContractsClient.GetContractAsync(System.String,System.String)" -->
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.ObsoleteContract(System.String,Waher.Networking.XMPP.Contracts.SmartContractEventHandler,System.Object)">
+            <summary>
+            Obsoletes a contract
+            </summary>
+            <param name="ContractId">ID of contract to obsolete.</param>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.ObsoleteContract(System.String,System.String,Waher.Networking.XMPP.Contracts.SmartContractEventHandler,System.Object)">
+            <summary>
+            Obsoletes a contract
+            </summary>
+            <param name="Address">Address of server (component).</param>
+            <param name="ContractId">ID of contract to obsolete.</param>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:Waher.Networking.XMPP.Contracts.ContractsClient.ObsoleteContractAsync(System.String)" -->
+        <!-- Badly formed XML comment ignored for member "M:Waher.Networking.XMPP.Contracts.ContractsClient.ObsoleteContractAsync(System.String,System.String)" -->
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.DeleteContract(System.String,Waher.Networking.XMPP.Contracts.SmartContractEventHandler,System.Object)">
+            <summary>
+            Deletes a contract
+            </summary>
+            <param name="ContractId">ID of contract to delete.</param>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.DeleteContract(System.String,System.String,Waher.Networking.XMPP.Contracts.SmartContractEventHandler,System.Object)">
+            <summary>
+            Deletes a contract
+            </summary>
+            <param name="Address">Address of server (component).</param>
+            <param name="ContractId">ID of contract to delete.</param>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:Waher.Networking.XMPP.Contracts.ContractsClient.DeleteContractAsync(System.String)" -->
+        <!-- Badly formed XML comment ignored for member "M:Waher.Networking.XMPP.Contracts.ContractsClient.DeleteContractAsync(System.String,System.String)" -->
         <member name="T:Waher.Networking.XMPP.Contracts.ContractState">
             <summary>
             Recognized contract states

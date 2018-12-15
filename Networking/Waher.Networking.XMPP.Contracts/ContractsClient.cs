@@ -1982,5 +1982,149 @@ namespace Waher.Networking.XMPP.Contracts
 		}
 
 		#endregion
+
+		#region Obsolete Contract
+
+		/// <summary>
+		/// Obsoletes a contract
+		/// </summary>
+		/// <param name="ContractId">ID of contract to obsolete.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public void ObsoleteContract(string ContractId, SmartContractEventHandler Callback, object State)
+		{
+			this.ObsoleteContract(this.componentAddress, ContractId, Callback, State);
+		}
+
+		/// <summary>
+		/// Obsoletes a contract
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="ContractId">ID of contract to obsolete.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public void ObsoleteContract(string Address, string ContractId,
+			SmartContractEventHandler Callback, object State)
+		{
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<obsoleteContract xmlns='");
+			Xml.Append(NamespaceSmartContracts);
+			Xml.Append("' id='");
+			Xml.Append(XML.Encode(ContractId));
+			Xml.Append("'/>");
+
+			this.client.SendIqSet(Address, Xml.ToString(), this.ContractResponse, new object[] { Callback, State });
+		}
+
+		/// <summary>
+		/// Obsoletes a contract
+		/// </summary>
+		/// <param name="ContractId">ID of contract to obsolete.</param>
+		/// Transferable obsoleteatures are copied to contracts based on the current contract as a template,
+		/// and only if no parameters and attributes are changed. (Otherwise the obsoleteature would break.)</param>
+		public Task<Contract> ObsoleteContractAsync(string ContractId)
+		{
+			return this.ObsoleteContractAsync(this.componentAddress, ContractId);
+		}
+
+		/// <summary>
+		/// Obsoletes a contract
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="ContractId">ID of contract to obsolete.</param>
+		/// Transferable obsoleteatures are copied to contracts based on the current contract as a template,
+		/// and only if no parameters and attributes are changed. (Otherwise the obsoleteature would break.)</param>
+		public Task<Contract> ObsoleteContractAsync(string Address, string ContractId)
+		{
+			TaskCompletionSource<Contract> Result = new TaskCompletionSource<Contract>();
+
+			this.ObsoleteContract(Address, ContractId, (sender, e) =>
+			{
+				if (e.Ok)
+					Result.SetResult(e.Contract);
+				else
+				{
+					Result.SetException(new IOException(string.IsNullOrEmpty(e.ErrorText) ?
+						"Unable to obsolete the contract." : e.ErrorText));
+				}
+			}, null);
+
+			return Result.Task;
+		}
+
+		#endregion
+
+		#region Delete Contract
+
+		/// <summary>
+		/// Deletes a contract
+		/// </summary>
+		/// <param name="ContractId">ID of contract to delete.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public void DeleteContract(string ContractId, SmartContractEventHandler Callback, object State)
+		{
+			this.DeleteContract(this.componentAddress, ContractId, Callback, State);
+		}
+
+		/// <summary>
+		/// Deletes a contract
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="ContractId">ID of contract to delete.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public void DeleteContract(string Address, string ContractId,
+			SmartContractEventHandler Callback, object State)
+		{
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<deleteContract xmlns='");
+			Xml.Append(NamespaceSmartContracts);
+			Xml.Append("' id='");
+			Xml.Append(XML.Encode(ContractId));
+			Xml.Append("'/>");
+
+			this.client.SendIqSet(Address, Xml.ToString(), this.ContractResponse, new object[] { Callback, State });
+		}
+
+		/// <summary>
+		/// Deletes a contract
+		/// </summary>
+		/// <param name="ContractId">ID of contract to delete.</param>
+		/// Transferable deleteatures are copied to contracts based on the current contract as a template,
+		/// and only if no parameters and attributes are changed. (Otherwise the deleteature would break.)</param>
+		public Task<Contract> DeleteContractAsync(string ContractId)
+		{
+			return this.DeleteContractAsync(this.componentAddress, ContractId);
+		}
+
+		/// <summary>
+		/// Deletes a contract
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="ContractId">ID of contract to delete.</param>
+		/// Transferable deleteatures are copied to contracts based on the current contract as a template,
+		/// and only if no parameters and attributes are changed. (Otherwise the deleteature would break.)</param>
+		public Task<Contract> DeleteContractAsync(string Address, string ContractId)
+		{
+			TaskCompletionSource<Contract> Result = new TaskCompletionSource<Contract>();
+
+			this.DeleteContract(Address, ContractId, (sender, e) =>
+			{
+				if (e.Ok)
+					Result.SetResult(e.Contract);
+				else
+				{
+					Result.SetException(new IOException(string.IsNullOrEmpty(e.ErrorText) ?
+						"Unable to delete the contract." : e.ErrorText));
+				}
+			}, null);
+
+			return Result.Task;
+		}
+
+		#endregion
 	}
 }

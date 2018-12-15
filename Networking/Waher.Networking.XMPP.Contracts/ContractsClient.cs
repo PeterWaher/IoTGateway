@@ -1660,27 +1660,33 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="State">State object to pass on to the callback method.</param>
 		public void GetCreatedContracts(string Address, IdReferencesEventHandler Callback, object State)
 		{
-			this.client.SendIqGet(Address, "<getCreatedContracts xmlns='" + NamespaceSmartContracts + "'/>", (sender, e) =>
-			{
-				XmlElement E = e.FirstElement;
-				List<string> IDs = new List<string>();
+			this.client.SendIqGet(Address, "<getCreatedContracts xmlns='" + NamespaceSmartContracts + "'/>", 
+				this.IdReferencesResponse, new object[] { Callback, State });
+		}
 
-				if (e.Ok && E != null)
+		private void IdReferencesResponse(object Sender, IqResultEventArgs e)
+		{
+			object[] P = (object[])e.State;
+			IdReferencesEventHandler Callback = (IdReferencesEventHandler)P[0];
+			XmlElement E = e.FirstElement;
+			List<string> IDs = new List<string>();
+
+			if (e.Ok && E != null)
+			{
+				foreach (XmlNode N in E.ChildNodes)
 				{
-					foreach (XmlNode N in E.ChildNodes)
+					if (N is XmlElement E2 && E2.LocalName == "ref" && E2.NamespaceURI == NamespaceSmartContracts)
 					{
-						if (N is XmlElement E2 && E2.LocalName == "ref" && E2.NamespaceURI == NamespaceSmartContracts)
-						{
-							string Id = XML.Attribute(E2, "id");
-							IDs.Add(Id);
-						}
+						string Id = XML.Attribute(E2, "id");
+						IDs.Add(Id);
 					}
 				}
-				else
-					e.Ok = false;
+			}
+			else
+				e.Ok = false;
 
-				Callback?.Invoke(this, new IdReferencesEventArgs(e, IDs.ToArray()));
-			}, State);
+			e.State = P[1];
+			Callback?.Invoke(this, new IdReferencesEventArgs(e, IDs.ToArray()));
 		}
 
 		/// <summary>
@@ -1743,7 +1749,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// and only if no parameters and attributes are changed. (Otherwise the signature would break.)</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void SignContract(string Address, Contract Contract, string Role, bool Transferable, 
+		public void SignContract(string Address, Contract Contract, string Role, bool Transferable,
 			SmartContractEventHandler Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
@@ -1817,6 +1823,62 @@ namespace Waher.Networking.XMPP.Contracts
 				{
 					Result.SetException(new IOException(string.IsNullOrEmpty(e.ErrorText) ?
 						"Unable to sign the contract." : e.ErrorText));
+				}
+			}, null);
+
+			return Result.Task;
+		}
+
+		#endregion
+
+		#region Get Signed Contracts
+
+		/// <summary>
+		/// Get contracts the account has signed.
+		/// </summary>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public void GetSignedContracts(IdReferencesEventHandler Callback, object State)
+		{
+			this.GetSignedContracts(this.componentAddress, Callback, State);
+		}
+
+		/// <summary>
+		/// Get contracts the account has signed.
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public void GetSignedContracts(string Address, IdReferencesEventHandler Callback, object State)
+		{
+			this.client.SendIqGet(Address, "<getSignedContracts xmlns='" + NamespaceSmartContracts + "'/>",
+				this.IdReferencesResponse, new object[] { Callback, State });
+		}
+
+		/// <summary>
+		/// Get contracts the account has signed.
+		/// </summary>
+		public Task<string[]> GetSignedContractsAsync()
+		{
+			return this.GetSignedContractsAsync(this.componentAddress);
+		}
+
+		/// <summary>
+		/// Get contracts the account has signed.
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		public Task<string[]> GetSignedContractsAsync(string Address)
+		{
+			TaskCompletionSource<string[]> Result = new TaskCompletionSource<string[]>();
+
+			this.GetSignedContracts(Address, (sender, e) =>
+			{
+				if (e.Ok)
+					Result.SetResult(e.References);
+				else
+				{
+					Result.SetException(new IOException(string.IsNullOrEmpty(e.ErrorText) ?
+						"Unable to get signed contracts." : e.ErrorText));
 				}
 			}, null);
 

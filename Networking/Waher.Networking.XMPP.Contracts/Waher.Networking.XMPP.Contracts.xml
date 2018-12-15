@@ -818,6 +818,32 @@
             Transferable signatures are copied to contracts based on the current contract as a template,
             and only if no parameters and attributes are changed. (Otherwise the signature would break.)</param>
         </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetSignedContracts(Waher.Networking.XMPP.Contracts.IdReferencesEventHandler,System.Object)">
+            <summary>
+            Get contracts the account has signed.
+            </summary>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetSignedContracts(System.String,Waher.Networking.XMPP.Contracts.IdReferencesEventHandler,System.Object)">
+            <summary>
+            Get contracts the account has signed.
+            </summary>
+            <param name="Address">Address of server (component).</param>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetSignedContractsAsync">
+            <summary>
+            Get contracts the account has signed.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetSignedContractsAsync(System.String)">
+            <summary>
+            Get contracts the account has signed.
+            </summary>
+            <param name="Address">Address of server (component).</param>
+        </member>
         <member name="T:Waher.Networking.XMPP.Contracts.ContractState">
             <summary>
             Recognized contract states

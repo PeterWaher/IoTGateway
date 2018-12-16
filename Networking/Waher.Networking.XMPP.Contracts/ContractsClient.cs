@@ -2644,5 +2644,102 @@ namespace Waher.Networking.XMPP.Contracts
 
 		#endregion
 
+		#region Get Network Identities of a contract
+
+		/// <summary>
+		/// Gets available network identities related to a contract.
+		/// </summary>
+		/// <param name="ContractId">Get network identities related to the contract identified by this identity.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public void GetContractNetworkIdentities(string ContractId, NetworkIdentitiesEventHandler Callback, object State)
+		{
+			this.GetContractNetworkIdentities(this.componentAddress, ContractId, Callback, State);
+		}
+
+		/// <summary>
+		/// Gets available network identities related to a contract.
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="ContractId">Get network identities related to the contract identified by this identity.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public void GetContractNetworkIdentities(string Address, string ContractId, NetworkIdentitiesEventHandler Callback, object State)
+		{
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<getNetworkIdentities xmlns='");
+			Xml.Append(NamespaceSmartContracts);
+			Xml.Append("' contractId='");
+			Xml.Append(XML.Encode(ContractId));
+			Xml.Append("'/>");
+
+			this.client.SendIqGet(Address, Xml.ToString(), (sender, e) =>
+			{
+				NetworkIdentity[] Identities = null;
+				XmlElement E;
+
+				if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "networkIdentities" && E.NamespaceURI == NamespaceSmartContracts)
+				{
+					List<NetworkIdentity> IdentitiesList = new List<NetworkIdentity>();
+
+					foreach (XmlNode N in E.ChildNodes)
+					{
+						if (N is XmlElement E2 &&
+							E2.LocalName == "networkIdentity" &&
+							E2.NamespaceURI == E.NamespaceURI)
+						{
+							string BareJid = XML.Attribute(E2, "bareJid");
+							string LegalId = XML.Attribute(E2, "legalId");
+
+							IdentitiesList.Add(new NetworkIdentity(BareJid, LegalId));
+						}
+					}
+
+					Identities = IdentitiesList.ToArray();
+				}
+				else
+					e.Ok = false;
+
+				Callback?.Invoke(this, new NetworkIdentitiesEventArgs(e, Identities));
+			}, State);
+		}
+
+		/// <summary>
+		/// Gets available network identities related to a contract.
+		/// </summary>
+		/// <param name="ContractId">Get network identities related to the contract identified by this identity.</param>
+		/// <returns>Network identities.</returns>
+		public Task<NetworkIdentity[]> GetContractNetworkIdentitiesAsync(string ContractId)
+		{
+			return this.GetContractNetworkIdentitiesAsync(this.componentAddress, ContractId);
+		}
+
+		/// <summary>
+		/// Gets available network identities related to a contract.
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="ContractId">Get network identities related to the contract identified by this identity.</param>
+		/// <returns>Network identities.</returns>
+		public Task<NetworkIdentity[]> GetContractNetworkIdentitiesAsync(string Address, string ContractId)
+		{
+			TaskCompletionSource<NetworkIdentity[]> Result = new TaskCompletionSource<NetworkIdentity[]>();
+
+			this.GetContractNetworkIdentities(Address, ContractId, (sender, e) =>
+			{
+				if (e.Ok)
+					Result.SetResult(e.Identities);
+				else
+				{
+					Result.SetException(new IOException(string.IsNullOrEmpty(e.ErrorText) ?
+						"Unable to get network identities." : e.ErrorText));
+				}
+			}, null);
+
+			return Result.Task;
+		}
+
+		#endregion
+
 	}
 }

@@ -1169,6 +1169,38 @@
             <param name="Historic">If legal identities at the time of signature are to be returned. (Default=true).</param>
             <returns>Legal identities.</returns>
         </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetContractNetworkIdentities(System.String,Waher.Networking.XMPP.Contracts.NetworkIdentitiesEventHandler,System.Object)">
+            <summary>
+            Gets available network identities related to a contract.
+            </summary>
+            <param name="ContractId">Get network identities related to the contract identified by this identity.</param>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetContractNetworkIdentities(System.String,System.String,Waher.Networking.XMPP.Contracts.NetworkIdentitiesEventHandler,System.Object)">
+            <summary>
+            Gets available network identities related to a contract.
+            </summary>
+            <param name="Address">Address of server (component).</param>
+            <param name="ContractId">Get network identities related to the contract identified by this identity.</param>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetContractNetworkIdentitiesAsync(System.String)">
+            <summary>
+            Gets available network identities related to a contract.
+            </summary>
+            <param name="ContractId">Get network identities related to the contract identified by this identity.</param>
+            <returns>Network identities.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetContractNetworkIdentitiesAsync(System.String,System.String)">
+            <summary>
+            Gets available network identities related to a contract.
+            </summary>
+            <param name="Address">Address of server (component).</param>
+            <param name="ContractId">Get network identities related to the contract identified by this identity.</param>
+            <returns>Network identities.</returns>
+        </member>
         <member name="T:Waher.Networking.XMPP.Contracts.ContractState">
             <summary>
             Recognized contract states
@@ -1457,6 +1489,30 @@
         <member name="P:Waher.Networking.XMPP.Contracts.LegalIdentityEventArgs.Identity">
             <summary>
             Legal Identity
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.NetworkIdentitiesEventHandler">
+            <summary>
+            Delegate for network identities callback methods.
+            </summary>
+            <param name="Sender">Sender</param>
+            <param name="e">Event arguments</param>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.NetworkIdentitiesEventArgs">
+            <summary>
+            Event arguments for network identities responses
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.NetworkIdentitiesEventArgs.#ctor(Waher.Networking.XMPP.IqResultEventArgs,Waher.Networking.XMPP.Contracts.NetworkIdentity[])">
+            <summary>
+            Event arguments for network identities responses
+            </summary>
+            <param name="e">IQ response event arguments.</param>
+            <param name="Identities">Network Identities.</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.NetworkIdentitiesEventArgs.Identities">
+            <summary>
+            Network Identities
             </summary>
         </member>
         <member name="T:Waher.Networking.XMPP.Contracts.KeyEventHandler">
@@ -2255,6 +2311,28 @@
         <member name="M:Waher.Networking.XMPP.Contracts.LegalIdentity.GetHashCode">
             <summary>
             <see cref="M:System.Object.GetHashCode"/>
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.NetworkIdentity">
+            <summary>
+            Contains a network identity related to a legal identity
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.NetworkIdentity.#ctor(System.String,System.String)">
+            <summary>
+            Contains a network identity related to a legal identity
+            </summary>
+            <param name="BareJid">Bare JID</param>
+            <param name="LegalId">Legal ID</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.NetworkIdentity.BareJid">
+            <summary>
+            Bare JID
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.NetworkIdentity.LegalId">
+            <summary>
+            Legal ID
             </summary>
         </member>
         <member name="T:Waher.Networking.XMPP.Contracts.NumericalParameter">

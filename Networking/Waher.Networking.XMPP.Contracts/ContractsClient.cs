@@ -843,32 +843,38 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
 		public void GetLegalIdentities(string Address, LegalIdentitiesEventHandler Callback, object State)
 		{
-			this.client.SendIqGet(Address, "<getLegalIdentities xmlns=\"" + NamespaceLegalIdentities + "\"/>", (sender, e) =>
+			this.client.SendIqGet(Address, "<getLegalIdentities xmlns=\"" + NamespaceLegalIdentities + "\"/>",
+				this.IdentitiesResponse, new object[] { Callback, State });
+		}
+
+		private void IdentitiesResponse(object Sender, IqResultEventArgs e)
+		{
+			object[] P = (object[])e.State;
+			LegalIdentitiesEventHandler Callback = (LegalIdentitiesEventHandler)P[0];
+			LegalIdentity[] Identities = null;
+			XmlElement E;
+
+			if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "identities" && E.NamespaceURI == NamespaceLegalIdentities)
 			{
-				LegalIdentity[] Identities = null;
-				XmlElement E;
+				List<LegalIdentity> IdentitiesList = new List<LegalIdentity>();
 
-				if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "identities" && E.NamespaceURI == NamespaceLegalIdentities)
+				foreach (XmlNode N in E.ChildNodes)
 				{
-					List<LegalIdentity> IdentitiesList = new List<LegalIdentity>();
-
-					foreach (XmlNode N in E.ChildNodes)
+					if (N is XmlElement E2 &&
+						E2.LocalName == "identity" &&
+						E2.NamespaceURI == E.NamespaceURI)
 					{
-						if (N is XmlElement E2 &&
-							E2.LocalName == "identity" &&
-							E2.NamespaceURI == E.NamespaceURI)
-						{
-							IdentitiesList.Add(LegalIdentity.Parse(E2));
-						}
+						IdentitiesList.Add(LegalIdentity.Parse(E2));
 					}
-
-					Identities = IdentitiesList.ToArray();
 				}
-				else
-					e.Ok = false;
 
-				Callback?.Invoke(this, new LegalIdentitiesEventArgs(e, Identities));
-			}, State);
+				Identities = IdentitiesList.ToArray();
+			}
+			else
+				e.Ok = false;
+
+			e.State = P[1];
+			Callback?.Invoke(this, new LegalIdentitiesEventArgs(e, Identities));
 		}
 
 		/// <summary>
@@ -2505,6 +2511,131 @@ namespace Waher.Networking.XMPP.Contracts
 				{
 					Result.SetException(new IOException(string.IsNullOrEmpty(e.ErrorText) ?
 						"Unable to get schema." : e.ErrorText));
+				}
+			}, null);
+
+			return Result.Task;
+		}
+
+		#endregion
+
+		#region Get Legal Identities of a contract
+
+		/// <summary>
+		/// Gets available legal identities related to a contract.
+		/// </summary>
+		/// <param name="ContractId">Get legal identities related to the contract identified by this identity.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public void GetContractLegalIdentities(string ContractId, LegalIdentitiesEventHandler Callback, object State)
+		{
+			this.GetContractLegalIdentities(this.componentAddress, ContractId, false, true, Callback, State);
+		}
+
+		/// <summary>
+		/// Gets available legal identities related to a contract.
+		/// </summary>
+		/// <param name="ContractId">Get legal identities related to the contract identified by this identity.</param>
+		/// <param name="Current">If current legal identities are to be returned. (Default=false).</param>
+		/// <param name="Historic">If legal identities at the time of signature are to be returned. (Default=true).</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public void GetContractLegalIdentities(string ContractId, bool Current, bool Historic, LegalIdentitiesEventHandler Callback, object State)
+		{
+			this.GetContractLegalIdentities(this.componentAddress, ContractId, Current, Historic, Callback, State);
+		}
+
+		/// <summary>
+		/// Gets available legal identities related to a contract.
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="ContractId">Get legal identities related to the contract identified by this identity.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public void GetContractLegalIdentities(string Address, string ContractId, LegalIdentitiesEventHandler Callback, object State)
+		{
+			this.GetContractLegalIdentities(Address, ContractId, false, true, Callback, State);
+		}
+
+		/// <summary>
+		/// Gets available legal identities related to a contract.
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="ContractId">Get legal identities related to the contract identified by this identity.</param>
+		/// <param name="Current">If current legal identities are to be returned. (Default=false).</param>
+		/// <param name="Historic">If legal identities at the time of signature are to be returned. (Default=true).</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public void GetContractLegalIdentities(string Address, string ContractId, bool Current, bool Historic, LegalIdentitiesEventHandler Callback, object State)
+		{
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<getLegalIdentities xmlns='");
+			Xml.Append(NamespaceSmartContracts);
+			Xml.Append("' contractId='");
+			Xml.Append(XML.Encode(ContractId));
+			Xml.Append("' current='");
+			Xml.Append(CommonTypes.Encode(Current));
+			Xml.Append("' historic='");
+			Xml.Append(CommonTypes.Encode(Historic));
+			Xml.Append("'/>");
+
+			this.client.SendIqGet(Address, Xml.ToString(), this.IdentitiesResponse, new object[] { Callback, State });
+		}
+
+		/// <summary>
+		/// Gets available legal identities related to a contract.
+		/// </summary>
+		/// <param name="ContractId">Get legal identities related to the contract identified by this identity.</param>
+		/// <returns>Legal identities.</returns>
+		public Task<LegalIdentity[]> GetContractLegalIdentitiesAsync(string ContractId)
+		{
+			return this.GetContractLegalIdentitiesAsync(this.componentAddress, ContractId, false, true);
+		}
+
+		/// <summary>
+		/// Gets available legal identities related to a contract.
+		/// </summary>
+		/// <param name="ContractId">Get legal identities related to the contract identified by this identity.</param>
+		/// <param name="Current">If current legal identities are to be returned. (Default=false).</param>
+		/// <param name="Historic">If legal identities at the time of signature are to be returned. (Default=true).</param>
+		/// <returns>Legal identities.</returns>
+		public Task<LegalIdentity[]> GetContractLegalIdentitiesAsync(string ContractId, bool Current, bool Historic)
+		{
+			return this.GetContractLegalIdentitiesAsync(this.componentAddress, ContractId, Current, Historic);
+		}
+
+		/// <summary>
+		/// Gets available legal identities related to a contract.
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="ContractId">Get legal identities related to the contract identified by this identity.</param>
+		/// <returns>Legal identities.</returns>
+		public Task<LegalIdentity[]> GetContractLegalIdentitiesAsync(string Address, string ContractId)
+		{
+			return this.GetContractLegalIdentitiesAsync(Address, ContractId, false, true);
+		}
+
+		/// <summary>
+		/// Gets available legal identities related to a contract.
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="ContractId">Get legal identities related to the contract identified by this identity.</param>
+		/// <param name="Current">If current legal identities are to be returned. (Default=false).</param>
+		/// <param name="Historic">If legal identities at the time of signature are to be returned. (Default=true).</param>
+		/// <returns>Legal identities.</returns>
+		public Task<LegalIdentity[]> GetContractLegalIdentitiesAsync(string Address, string ContractId, bool Current, bool Historic)
+		{
+			TaskCompletionSource<LegalIdentity[]> Result = new TaskCompletionSource<LegalIdentity[]>();
+
+			this.GetContractLegalIdentities(Address, ContractId, Current, Historic, (sender, e) =>
+			{
+				if (e.Ok)
+					Result.SetResult(e.Identities);
+				else
+				{
+					Result.SetException(new IOException(string.IsNullOrEmpty(e.ErrorText) ?
+						"Unable to get legal identities." : e.ErrorText));
 				}
 			}, null);
 

@@ -1097,6 +1097,78 @@
             <param name="Digest">Specifies a specific schema version. If not provided (or null), the most recently recorded schema will be returned.</param>
             <returns>Binary XML schema.</returns>
         </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetContractLegalIdentities(System.String,Waher.Networking.XMPP.Contracts.LegalIdentitiesEventHandler,System.Object)">
+            <summary>
+            Gets available legal identities related to a contract.
+            </summary>
+            <param name="ContractId">Get legal identities related to the contract identified by this identity.</param>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetContractLegalIdentities(System.String,System.Boolean,System.Boolean,Waher.Networking.XMPP.Contracts.LegalIdentitiesEventHandler,System.Object)">
+            <summary>
+            Gets available legal identities related to a contract.
+            </summary>
+            <param name="ContractId">Get legal identities related to the contract identified by this identity.</param>
+            <param name="Current">If current legal identities are to be returned. (Default=false).</param>
+            <param name="Historic">If legal identities at the time of signature are to be returned. (Default=true).</param>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetContractLegalIdentities(System.String,System.String,Waher.Networking.XMPP.Contracts.LegalIdentitiesEventHandler,System.Object)">
+            <summary>
+            Gets available legal identities related to a contract.
+            </summary>
+            <param name="Address">Address of server (component).</param>
+            <param name="ContractId">Get legal identities related to the contract identified by this identity.</param>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetContractLegalIdentities(System.String,System.String,System.Boolean,System.Boolean,Waher.Networking.XMPP.Contracts.LegalIdentitiesEventHandler,System.Object)">
+            <summary>
+            Gets available legal identities related to a contract.
+            </summary>
+            <param name="Address">Address of server (component).</param>
+            <param name="ContractId">Get legal identities related to the contract identified by this identity.</param>
+            <param name="Current">If current legal identities are to be returned. (Default=false).</param>
+            <param name="Historic">If legal identities at the time of signature are to be returned. (Default=true).</param>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetContractLegalIdentitiesAsync(System.String)">
+            <summary>
+            Gets available legal identities related to a contract.
+            </summary>
+            <param name="ContractId">Get legal identities related to the contract identified by this identity.</param>
+            <returns>Legal identities.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetContractLegalIdentitiesAsync(System.String,System.Boolean,System.Boolean)">
+            <summary>
+            Gets available legal identities related to a contract.
+            </summary>
+            <param name="ContractId">Get legal identities related to the contract identified by this identity.</param>
+            <param name="Current">If current legal identities are to be returned. (Default=false).</param>
+            <param name="Historic">If legal identities at the time of signature are to be returned. (Default=true).</param>
+            <returns>Legal identities.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetContractLegalIdentitiesAsync(System.String,System.String)">
+            <summary>
+            Gets available legal identities related to a contract.
+            </summary>
+            <param name="Address">Address of server (component).</param>
+            <param name="ContractId">Get legal identities related to the contract identified by this identity.</param>
+            <returns>Legal identities.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetContractLegalIdentitiesAsync(System.String,System.String,System.Boolean,System.Boolean)">
+            <summary>
+            Gets available legal identities related to a contract.
+            </summary>
+            <param name="Address">Address of server (component).</param>
+            <param name="ContractId">Get legal identities related to the contract identified by this identity.</param>
+            <param name="Current">If current legal identities are to be returned. (Default=false).</param>
+            <param name="Historic">If legal identities at the time of signature are to be returned. (Default=true).</param>
+            <returns>Legal identities.</returns>
+        </member>
         <member name="T:Waher.Networking.XMPP.Contracts.ContractState">
             <summary>
             Recognized contract states

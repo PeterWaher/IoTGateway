@@ -2490,6 +2490,7 @@ namespace Waher.Persistence.Files.Storage
 			string s, s2;
 			int i = 0;
 			int j;
+			int NrConstantsFound = 0;
 			bool Ascending;
 
 			for (j = 0; j < c; j++)
@@ -2517,7 +2518,10 @@ namespace Waher.Persistence.Files.Storage
 					else if (ConstantFields == null || Array.IndexOf<string>(ConstantFields, s2) < 0)
 						return false;
 					else
+					{
+						NrConstantsFound++;
 						i++;
+					}
 				}
 
 				if (i >= d)
@@ -2529,7 +2533,27 @@ namespace Waher.Persistence.Files.Storage
 				i++;
 			}
 
-			return true;
+			if (ConstantFields != null)
+			{
+				int e = ConstantFields.Length;
+
+				while (i < d && NrConstantsFound < e)
+				{
+					s2 = this.fieldNames[i];
+
+					if (Array.IndexOf<string>(ConstantFields, s2) < 0)
+						return false;
+					else
+					{
+						NrConstantsFound++;
+						i++;
+					}
+				}
+
+				return NrConstantsFound == e;
+			}
+			else
+				return true;
 		}
 
 		/// <summary>
@@ -2552,6 +2576,7 @@ namespace Waher.Persistence.Files.Storage
 			string s, s2;
 			int i = 0;
 			int j;
+			int NrConstantsFound = 0;
 			bool Ascending;
 
 			for (j = 0; j < c; j++)
@@ -2579,7 +2604,10 @@ namespace Waher.Persistence.Files.Storage
 					else if (ConstantFields == null || Array.IndexOf<string>(ConstantFields, s2) < 0)
 						return false;
 					else
+					{
+						NrConstantsFound++;
 						i++;
+					}
 				}
 
 				if (i >= d)
@@ -2591,7 +2619,27 @@ namespace Waher.Persistence.Files.Storage
 				i++;
 			}
 
-			return true;
+			if (ConstantFields != null)
+			{
+				int e = ConstantFields.Length;
+
+				while (i < d && NrConstantsFound < e)
+				{
+					s2 = this.fieldNames[i];
+
+					if (Array.IndexOf<string>(ConstantFields, s2) < 0)
+						return false;
+					else
+					{
+						NrConstantsFound++;
+						i++;
+					}
+				}
+
+				return NrConstantsFound == e;
+			}
+			else
+				return true;
 		}
 
 	}

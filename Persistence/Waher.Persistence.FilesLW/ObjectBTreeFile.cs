@@ -5521,6 +5521,9 @@ namespace Waher.Persistence.Files
 					{
 						Cursor = await Index.FindFirstGreaterOrEqualTo<T>(Locked, new KeyValuePair<string, object>(FilterFieldValue.FieldName, Value));
 						UntilFirstFail = Index.SameSortOrder(Filter2.ConstantFields, SortOrder);
+
+						if (!UntilFirstFail)
+							Log.Notice("Search resulted in large part of the file to be scanned. Consider either adding indices, or enumerate objects using an object enumerator.", this.fileName, string.Empty, "DBOpt");
 					}
 
 					return new Searching.FilteredCursor<T>(Cursor, Filter2, UntilFirstFail, true, this.timeoutMilliseconds, this.provider);

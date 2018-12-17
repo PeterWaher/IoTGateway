@@ -22,5 +22,15 @@ namespace Waher.Networking.XMPP.Contracts.Search
 		/// Local XML element name of filter.
 		/// </summary>
 		public override string ElementName => "localName";
+
+		/// <summary>
+		/// Sort order
+		/// </summary>
+		internal override int Order => 1;
+
+		/// <summary>
+		/// Maximum number of occurrences in a search.
+		/// </summary>
+		internal override int MaxOccurs => 1;
 	}
 }

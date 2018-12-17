@@ -2747,14 +2747,180 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <summary>
 		/// Performs a search of public smart contracts.
 		/// </summary>
+		/// <param name="Filter">Search filters.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public void Search(SearchFilter[] Filter, SearchResultEventHandler Callback, object State)
+		{
+			this.Search(this.componentAddress, 0, int.MaxValue, Filter, Callback, State);
+		}
+
+		/// <summary>
+		/// Performs a search of public smart contracts.
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="Filter">Search filters.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public void Search(string Address, SearchFilter[] Filter, SearchResultEventHandler Callback, object State)
+		{
+			this.Search(Address, 0, int.MaxValue, Filter, Callback, State);
+		}
+
+		/// <summary>
+		/// Performs a search of public smart contracts.
+		/// </summary>
+		/// <param name="Offset">Result will start with the response at this offset into result set.</param>
+		/// <param name="MaxCount">Result will be limited to this number of items.</param>
+		/// <param name="Filter">Search filters.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public void Search(int Offset, int MaxCount, SearchFilter[] Filter, SearchResultEventHandler Callback, object State)
+		{
+			this.Search(this.componentAddress, Offset, MaxCount, Filter, Callback, State);
+		}
+
+		/// <summary>
+		/// Performs a search of public smart contracts.
+		/// </summary>
 		/// <param name="Address">Address of server (component).</param>
 		/// <param name="Offset">Result will start with the response at this offset into result set.</param>
 		/// <param name="MaxCount">Result will be limited to this number of items.</param>
 		/// <param name="Filter">Search filters.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void Search(string Address, int Offset, int MaxCount, SearchFilter[] Filter, IqResultEventHandler Callback, object State)
+		public void Search(string Address, int Offset, int MaxCount, SearchFilter[] Filter, SearchResultEventHandler Callback, object State)
 		{
+			if (Offset < 0)
+				throw new ArgumentException("Offsets cannot be negative.", nameof(Offset));
+
+			if (MaxCount <= 0)
+				throw new ArgumentException("Must be postitive.", nameof(MaxCount));
+
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<searchPublicContracts xmlns='");
+			Xml.Append(NamespaceSmartContracts);
+
+			if (Offset > 0)
+			{
+				Xml.Append("' offset='");
+				Xml.Append(Offset.ToString());
+			}
+
+			if (MaxCount < int.MaxValue)
+			{
+				Xml.Append("' maxCount='");
+				Xml.Append(MaxCount.ToString());
+			}
+
+			Xml.Append("'>");
+
+			Filter = (SearchFilter[])Filter.Clone();
+			Array.Sort<SearchFilter>(Filter, (f1, f2) => f1.Order - f2.Order);
+
+			int PrevOrder = 0;
+			int PrevOrderCount = 0;
+			int Order;
+
+			foreach (SearchFilter F in Filter)
+			{
+				Order = F.Order;
+				if (Order != PrevOrder)
+				{
+					PrevOrder = Order;
+					PrevOrderCount = 1;
+				}
+				else
+				{
+					PrevOrderCount++;
+					if (PrevOrderCount >= F.MaxOccurs)
+					{
+						throw new ArgumentException("Maximum number of occurrences of " + F.GetType().FullName + " in a search is " +
+							F.MaxOccurs.ToString() + ".", nameof(Filter));
+					}
+				}
+
+				F.Serialize(Xml);
+			}
+
+			Xml.Append("</searchPublicContracts>");
+
+			this.client.SendIqGet(Address, Xml.ToString(), (sender, e) =>
+			{
+				XmlElement E = e.FirstElement;
+				List<string> IDs = null;
+				bool More = false;
+
+				if (e.Ok && E != null && E.LocalName == "searchResult" && E.NamespaceURI == NamespaceSmartContracts)
+				{
+					More = XML.Attribute(E, "more", false);
+					IDs = new List<string>();
+
+					foreach (XmlNode N in E.ChildNodes)
+					{
+						if (N is XmlElement E2 && E2.LocalName == "ref" && E2.NamespaceURI == NamespaceSmartContracts)
+						{
+							string Id = XML.Attribute(E2, "id");
+							IDs.Add(Id);
+						}
+					}
+				}
+				else
+					e.Ok = false;
+
+				Callback?.Invoke(this, new SearchResultEventArgs(e, Offset, MaxCount, More, IDs?.ToArray()));
+			}, State);
+		}
+
+		/// <summary>
+		/// Performs a search of public smart contracts.
+		/// </summary>
+		/// <param name="Filter">Search filters.</param>
+		/// <returns>Search result.</returns>
+		public Task<SearchResultEventArgs> SearchAsync(SearchFilter[] Filter)
+		{
+			return this.SearchAsync(this.componentAddress, 0, int.MaxValue, Filter);
+		}
+
+		/// <summary>
+		/// Performs a search of public smart contracts.
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="Filter">Search filters.</param>
+		public Task<SearchResultEventArgs> SearchAsync(string Address, SearchFilter[] Filter)
+		{
+			return this.SearchAsync(Address, 0, int.MaxValue, Filter);
+		}
+
+		/// <summary>
+		/// Performs a search of public smart contracts.
+		/// </summary>
+		/// <param name="Offset">Result will start with the response at this offset into result set.</param>
+		/// <param name="MaxCount">Result will be limited to this number of items.</param>
+		/// <param name="Filter">Search filters.</param>
+		public Task<SearchResultEventArgs> SearchAsync(int Offset, int MaxCount, SearchFilter[] Filter)
+		{
+			return this.SearchAsync(this.componentAddress, Offset, MaxCount, Filter);
+		}
+
+		/// <summary>
+		/// Performs a search of public smart contracts.
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="Offset">Result will start with the response at this offset into result set.</param>
+		/// <param name="MaxCount">Result will be limited to this number of items.</param>
+		/// <param name="Filter">Search filters.</param>
+		public Task<SearchResultEventArgs> SearchAsync(string Address, int Offset, int MaxCount, SearchFilter[] Filter)
+		{
+			TaskCompletionSource<SearchResultEventArgs> Result = new TaskCompletionSource<SearchResultEventArgs>();
+
+			this.Search(Address, Offset, MaxCount, Filter, (sender, e) =>
+			{
+				Result.SetResult(e);
+			}, null);
+
+			return Result.Task;
 		}
 
 		#endregion

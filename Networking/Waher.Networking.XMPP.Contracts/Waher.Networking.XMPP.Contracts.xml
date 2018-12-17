@@ -1201,6 +1201,75 @@
             <param name="ContractId">Get network identities related to the contract identified by this identity.</param>
             <returns>Network identities.</returns>
         </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.Search(Waher.Networking.XMPP.Contracts.Search.SearchFilter[],Waher.Networking.XMPP.Contracts.SearchResultEventHandler,System.Object)">
+            <summary>
+            Performs a search of public smart contracts.
+            </summary>
+            <param name="Filter">Search filters.</param>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.Search(System.String,Waher.Networking.XMPP.Contracts.Search.SearchFilter[],Waher.Networking.XMPP.Contracts.SearchResultEventHandler,System.Object)">
+            <summary>
+            Performs a search of public smart contracts.
+            </summary>
+            <param name="Address">Address of server (component).</param>
+            <param name="Filter">Search filters.</param>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.Search(System.Int32,System.Int32,Waher.Networking.XMPP.Contracts.Search.SearchFilter[],Waher.Networking.XMPP.Contracts.SearchResultEventHandler,System.Object)">
+            <summary>
+            Performs a search of public smart contracts.
+            </summary>
+            <param name="Offset">Result will start with the response at this offset into result set.</param>
+            <param name="MaxCount">Result will be limited to this number of items.</param>
+            <param name="Filter">Search filters.</param>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.Search(System.String,System.Int32,System.Int32,Waher.Networking.XMPP.Contracts.Search.SearchFilter[],Waher.Networking.XMPP.Contracts.SearchResultEventHandler,System.Object)">
+            <summary>
+            Performs a search of public smart contracts.
+            </summary>
+            <param name="Address">Address of server (component).</param>
+            <param name="Offset">Result will start with the response at this offset into result set.</param>
+            <param name="MaxCount">Result will be limited to this number of items.</param>
+            <param name="Filter">Search filters.</param>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.SearchAsync(Waher.Networking.XMPP.Contracts.Search.SearchFilter[])">
+            <summary>
+            Performs a search of public smart contracts.
+            </summary>
+            <param name="Filter">Search filters.</param>
+            <returns>Search result.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.SearchAsync(System.String,Waher.Networking.XMPP.Contracts.Search.SearchFilter[])">
+            <summary>
+            Performs a search of public smart contracts.
+            </summary>
+            <param name="Address">Address of server (component).</param>
+            <param name="Filter">Search filters.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.SearchAsync(System.Int32,System.Int32,Waher.Networking.XMPP.Contracts.Search.SearchFilter[])">
+            <summary>
+            Performs a search of public smart contracts.
+            </summary>
+            <param name="Offset">Result will start with the response at this offset into result set.</param>
+            <param name="MaxCount">Result will be limited to this number of items.</param>
+            <param name="Filter">Search filters.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.SearchAsync(System.String,System.Int32,System.Int32,Waher.Networking.XMPP.Contracts.Search.SearchFilter[])">
+            <summary>
+            Performs a search of public smart contracts.
+            </summary>
+            <param name="Address">Address of server (component).</param>
+            <param name="Offset">Result will start with the response at this offset into result set.</param>
+            <param name="MaxCount">Result will be limited to this number of items.</param>
+            <param name="Filter">Search filters.</param>
+        </member>
         <member name="T:Waher.Networking.XMPP.Contracts.ContractState">
             <summary>
             Recognized contract states
@@ -1585,6 +1654,48 @@
         <member name="P:Waher.Networking.XMPP.Contracts.SchemaReferencesEventArgs.References">
             <summary>
             Schema References
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.SearchResultEventHandler">
+            <summary>
+            Delegate for Search Result callback methods.
+            </summary>
+            <param name="Sender">Sender</param>
+            <param name="e">Event arguments</param>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.SearchResultEventArgs">
+            <summary>
+            Event arguments for Search Result responses
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.SearchResultEventArgs.#ctor(Waher.Networking.XMPP.IqResultEventArgs,System.Int32,System.Int32,System.Boolean,System.String[])">
+            <summary>
+            Event arguments for Search Result responses
+            </summary>
+            <param name="e">IQ response event arguments.</param>
+            <param name="Offset">Result starts with the response at this offset into result set.</param>
+            <param name="MaxCount">Result is limited to this number of items.</param>
+            <param name="More">If more results are available on the server.</param>
+            <param name="References">Search Result.</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.SearchResultEventArgs.Offset">
+            <summary>
+            Result starts with the response at this offset into result set.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.SearchResultEventArgs.MaxCount">
+            <summary>
+            Result is limited to this number of items.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.SearchResultEventArgs.More">
+            <summary>
+            If more results are available on the server.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.SearchResultEventArgs.References">
+            <summary>
+            Contract references
             </summary>
         </member>
         <member name="T:Waher.Networking.XMPP.Contracts.SignatureEventHandler">
@@ -2603,6 +2714,16 @@
             Local XML element name of filter.
             </summary>
         </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Search.FilterCreated.Order">
+            <summary>
+            Sort order
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Search.FilterCreated.MaxOccurs">
+            <summary>
+            Maximum number of occurrences in a search.
+            </summary>
+        </member>
         <member name="T:Waher.Networking.XMPP.Contracts.Search.FilterDuration">
             <summary>
             Places restrictions on when public contracts were created.
@@ -2617,6 +2738,16 @@
         <member name="P:Waher.Networking.XMPP.Contracts.Search.FilterDuration.ElementName">
             <summary>
             Local XML element name of filter.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Search.FilterDuration.Order">
+            <summary>
+            Sort order
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Search.FilterDuration.MaxOccurs">
+            <summary>
+            Maximum number of occurrences in a search.
             </summary>
         </member>
         <member name="T:Waher.Networking.XMPP.Contracts.Search.FilterFrom">
@@ -2635,6 +2766,16 @@
             Local XML element name of filter.
             </summary>
         </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Search.FilterFrom.Order">
+            <summary>
+            Sort order
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Search.FilterFrom.MaxOccurs">
+            <summary>
+            Maximum number of occurrences in a search.
+            </summary>
+        </member>
         <member name="T:Waher.Networking.XMPP.Contracts.Search.FilterMachineContentLocalName">
             <summary>
             Abstract base class for search filters relating to the local name of the machine-readable content of contracts.
@@ -2649,6 +2790,16 @@
         <member name="P:Waher.Networking.XMPP.Contracts.Search.FilterMachineContentLocalName.ElementName">
             <summary>
             Local XML element name of filter.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Search.FilterMachineContentLocalName.Order">
+            <summary>
+            Sort order
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Search.FilterMachineContentLocalName.MaxOccurs">
+            <summary>
+            Maximum number of occurrences in a search.
             </summary>
         </member>
         <member name="T:Waher.Networking.XMPP.Contracts.Search.FilterMachineContentLocalNameEquality">
@@ -2687,6 +2838,16 @@
         <member name="P:Waher.Networking.XMPP.Contracts.Search.FilterMachineContentNamespace.ElementName">
             <summary>
             Local XML element name of filter.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Search.FilterMachineContentNamespace.Order">
+            <summary>
+            Sort order
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Search.FilterMachineContentNamespace.MaxOccurs">
+            <summary>
+            Maximum number of occurrences in a search.
             </summary>
         </member>
         <member name="T:Waher.Networking.XMPP.Contracts.Search.FilterMachineContentNamespaceEquality">
@@ -2739,6 +2900,16 @@
             </summary>
             <param name="Xml">XML output.</param>
         </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Search.FilterParameter.Order">
+            <summary>
+            Sort order
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Search.FilterParameter.MaxOccurs">
+            <summary>
+            Maximum number of occurrences in a search.
+            </summary>
+        </member>
         <member name="T:Waher.Networking.XMPP.Contracts.Search.FilterRole">
             <summary>
             Abstract base class for search filters relating to the roles of contracts.
@@ -2753,6 +2924,16 @@
         <member name="P:Waher.Networking.XMPP.Contracts.Search.FilterRole.ElementName">
             <summary>
             Local XML element name of filter.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Search.FilterRole.Order">
+            <summary>
+            Sort order
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Search.FilterRole.MaxOccurs">
+            <summary>
+            Maximum number of occurrences in a search.
             </summary>
         </member>
         <member name="T:Waher.Networking.XMPP.Contracts.Search.FilterRoleEquality">
@@ -2793,6 +2974,16 @@
             Local XML element name of filter.
             </summary>
         </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Search.FilterTemplate.Order">
+            <summary>
+            Sort order
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Search.FilterTemplate.MaxOccurs">
+            <summary>
+            Maximum number of occurrences in a search.
+            </summary>
+        </member>
         <member name="T:Waher.Networking.XMPP.Contracts.Search.FilterTemplateEquality">
             <summary>
             Return public contracts based on a template that is equal to this value.
@@ -2831,6 +3022,16 @@
             Local XML element name of filter.
             </summary>
         </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Search.FilterTo.Order">
+            <summary>
+            Sort order
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Search.FilterTo.MaxOccurs">
+            <summary>
+            Maximum number of occurrences in a search.
+            </summary>
+        </member>
         <member name="T:Waher.Networking.XMPP.Contracts.Search.FilterUpdated">
             <summary>
             Places restrictions on when public contracts were last updated.
@@ -2845,6 +3046,16 @@
         <member name="P:Waher.Networking.XMPP.Contracts.Search.FilterUpdated.ElementName">
             <summary>
             Local XML element name of filter.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Search.FilterUpdated.Order">
+            <summary>
+            Sort order
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Search.FilterUpdated.MaxOccurs">
+            <summary>
+            Maximum number of occurrences in a search.
             </summary>
         </member>
         <member name="T:Waher.Networking.XMPP.Contracts.Search.GreaterThanNumber">
@@ -3208,6 +3419,16 @@
         <member name="P:Waher.Networking.XMPP.Contracts.Search.SearchFilter.ElementName">
             <summary>
             Local XML element name of filter.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Search.SearchFilter.Order">
+            <summary>
+            Sort order
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Search.SearchFilter.MaxOccurs">
+            <summary>
+            Maximum number of occurrences in a search.
             </summary>
         </member>
         <member name="T:Waher.Networking.XMPP.Contracts.Search.SearchFilterDateTimeOperand">

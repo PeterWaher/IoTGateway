@@ -50,5 +50,21 @@ namespace Waher.Networking.XMPP.Contracts.Search
 		{
 			get;
 		}
+
+		/// <summary>
+		/// Sort order
+		/// </summary>
+		internal abstract int Order
+		{
+			get;
+		}
+
+		/// <summary>
+		/// Maximum number of occurrences in a search.
+		/// </summary>
+		internal abstract int MaxOccurs
+		{
+			get;
+		}
 	}
 }

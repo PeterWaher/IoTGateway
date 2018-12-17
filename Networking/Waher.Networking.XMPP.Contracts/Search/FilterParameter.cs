@@ -57,5 +57,15 @@ namespace Waher.Networking.XMPP.Contracts.Search
 
 			Xml.Append("</parameter>");
 		}
+
+		/// <summary>
+		/// Sort order
+		/// </summary>
+		internal override int Order => 5;
+
+		/// <summary>
+		/// Maximum number of occurrences in a search.
+		/// </summary>
+		internal override int MaxOccurs => int.MaxValue;
 	}
 }

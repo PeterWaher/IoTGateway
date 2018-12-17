@@ -11,6 +11,7 @@ using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Networking.XMPP.Contracts.HumanReadable;
+using Waher.Networking.XMPP.Contracts.Search;
 using Waher.Networking.XMPP.P2P;
 using Waher.Networking.XMPP.P2P.E2E;
 using Waher.Runtime.Settings;
@@ -2741,5 +2742,21 @@ namespace Waher.Networking.XMPP.Contracts
 
 		#endregion
 
+		#region Search Public Contracts
+
+		/// <summary>
+		/// Performs a search of public smart contracts.
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="Offset">Result will start with the response at this offset into result set.</param>
+		/// <param name="MaxCount">Result will be limited to this number of items.</param>
+		/// <param name="Filter">Search filters.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public void Search(string Address, int Offset, int MaxCount, SearchFilter[] Filter, IqResultEventHandler Callback, object State)
+		{
+		}
+
+		#endregion
 	}
 }

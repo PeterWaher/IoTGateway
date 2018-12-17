@@ -2523,6 +2523,807 @@
             Hash of schema
             </summary>
         </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.Search.EqualToDateTime">
+            <summary>
+            Limits searches to items with values equal to this value.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Search.EqualToDateTime.#ctor(System.DateTime)">
+            <summary>
+            Limits searches to items with values equal to this value.
+            </summary>
+            <param name="Value">DateTime value</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Search.EqualToDateTime.OperandName">
+            <summary>
+            Local XML element name of double operand.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.Search.EqualToDuration">
+            <summary>
+            Limits searches to items with values equal to this value.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Search.EqualToDuration.#ctor(Waher.Content.Duration)">
+            <summary>
+            Limits searches to items with values equal to this value.
+            </summary>
+            <param name="Value">Duration value</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Search.EqualToDuration.OperandName">
+            <summary>
+            Local XML element name of double operand.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.Search.EqualToNumber">
+            <summary>
+            Limits searches to items with values equal to this value.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Search.EqualToNumber.#ctor(System.Double)">
+            <summary>
+            Limits searches to items with values equal to this value.
+            </summary>
+            <param name="Value">Number value</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Search.EqualToNumber.OperandName">
+            <summary>
+            Local XML element name of double operand.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.Search.EqualToString">
+            <summary>
+            Limits searches to items with values equal to this value.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Search.EqualToString.#ctor(System.String)">
+            <summary>
+            Limits searches to items with values equal to this value.
+            </summary>
+            <param name="Value">String value</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Search.EqualToString.OperandName">
+            <summary>
+            Local XML element name of string operand.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.Search.FilterCreated">
+            <summary>
+            Places restrictions on when public contracts were created.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Search.FilterCreated.#ctor(Waher.Networking.XMPP.Contracts.Search.SearchFilterOperand[])">
+            <summary>
+            Places restrictions on when public contracts were created.
+            </summary>
+            <param name="Operands">Operands</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Search.FilterCreated.ElementName">
+            <summary>
+            Local XML element name of filter.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.Search.FilterDuration">
+            <summary>
+            Places restrictions on when public contracts were created.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Search.FilterDuration.#ctor(Waher.Networking.XMPP.Contracts.Search.SearchFilterOperand[])">
+            <summary>
+            Places restrictions on when public contracts were created.
+            </summary>
+            <param name="Operands">Operands</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Search.FilterDuration.ElementName">
+            <summary>
+            Local XML element name of filter.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.Search.FilterFrom">
+            <summary>
+            Places restrictions on when public contracts became legally binding.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Search.FilterFrom.#ctor(Waher.Networking.XMPP.Contracts.Search.SearchFilterOperand[])">
+            <summary>
+            Places restrictions on when public contracts became legally binding.
+            </summary>
+            <param name="Operands">Operands</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Search.FilterFrom.ElementName">
+            <summary>
+            Local XML element name of filter.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.Search.FilterMachineContentLocalName">
+            <summary>
+            Abstract base class for search filters relating to the local name of the machine-readable content of contracts.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Search.FilterMachineContentLocalName.#ctor(Waher.Networking.XMPP.Contracts.Search.SearchFilterOperand[])">
+            <summary>
+            Abstract base class for search filters relating to the local name of the machine-readable content of contracts.
+            </summary>
+            <param name="Operands">Operands</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Search.FilterMachineContentLocalName.ElementName">
+            <summary>
+            Local XML element name of filter.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.Search.FilterMachineContentLocalNameEquality">
+            <summary>
+            Return public contracts in which the local name of the contents is equal to this value.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Search.FilterMachineContentLocalNameEquality.#ctor(System.String)">
+            <summary>
+            Return public contracts in which the local name of the contents is equal to this value.
+            </summary>
+            <param name="Value">String value</param>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.Search.FilterMachineContentLocalNameRegEx">
+            <summary>
+            Return public contracts in which the local name of the contents matches this regular expression.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Search.FilterMachineContentLocalNameRegEx.#ctor(System.String)">
+            <summary>
+            Return public contracts in which the local name of the contents matches this regular expression.
+            </summary>
+            <param name="Value">String value</param>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.Search.FilterMachineContentNamespace">
+            <summary>
+            Abstract base class for search filters relating to the namespace of the machine-readable content of contracts.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Search.FilterMachineContentNamespace.#ctor(Waher.Networking.XMPP.Contracts.Search.SearchFilterOperand[])">
+            <summary>
+            Abstract base class for search filters relating to the namespace of the machine-readable content of contracts.
+            </summary>
+            <param name="Operands">Operands</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Search.FilterMachineContentNamespace.ElementName">
+            <summary>
+            Local XML element name of filter.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.Search.FilterMachineContentNamespaceEquality">
+            <summary>
+            Return public contracts in which the namespace of the contents is equal to this value.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Search.FilterMachineContentNamespaceEquality.#ctor(System.String)">
+            <summary>
+            Return public contracts in which the namespace of the contents is equal to this value.
+            </summary>
+            <param name="Value">String value</param>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.Search.FilterMachineContentNamespaceRegEx">
+            <summary>
+            Return public contracts in which the namespace of the contents matches this regular expression.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Search.FilterMachineContentNamespaceRegEx.#ctor(System.String)">
+            <summary>
+            Return public contracts in which the namespace of the contents matches this regular expression.
+            </summary>
+            <param name="Value">String value</param>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.Search.FilterParameter">
+            <summary>
+            Abstract base class for search filters relating to the roles of contracts.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Search.FilterParameter.#ctor(System.String,Waher.Networking.XMPP.Contracts.Search.SearchFilterOperand[])">
+            <summary>
+            Abstract base class for search filters relating to the roles of contracts.
+            </summary>
+            <param name="Name">Parameter Name</param>
+            <param name="Operands">Operands</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Search.FilterParameter.Name">
+            <summary>
+            Parameter name.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Search.FilterParameter.ElementName">
+            <summary>
+            Local XML element name of filter.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Search.FilterParameter.Serialize(System.Text.StringBuilder)">
+            <summary>
+            Serializes the search filter to XML.
+            </summary>
+            <param name="Xml">XML output.</param>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.Search.FilterRole">
+            <summary>
+            Abstract base class for search filters relating to the roles of contracts.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Search.FilterRole.#ctor(Waher.Networking.XMPP.Contracts.Search.SearchFilterOperand[])">
+            <summary>
+            Abstract base class for search filters relating to the roles of contracts.
+            </summary>
+            <param name="Operands">Operands</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Search.FilterRole.ElementName">
+            <summary>
+            Local XML element name of filter.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.Search.FilterRoleEquality">
+            <summary>
+            Return public contracts defining a role equal to this value.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Search.FilterRoleEquality.#ctor(System.String)">
+            <summary>
+            Return public contracts defining a role equal to this value.
+            </summary>
+            <param name="Value">String value</param>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.Search.FilterRoleRegEx">
+            <summary>
+            Return public contracts defining a role matching this regular expression.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Search.FilterRoleRegEx.#ctor(System.String)">
+            <summary>
+            Return public contracts defining a role matching this regular expression.
+            </summary>
+            <param name="Value">String value</param>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.Search.FilterTemplate">
+            <summary>
+            Abstract base class for search filters relating to the template of contracts.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Search.FilterTemplate.#ctor(Waher.Networking.XMPP.Contracts.Search.SearchFilterOperand[])">
+            <summary>
+            Abstract base class for search filters relating to the template of contracts.
+            </summary>
+            <param name="Operands">Operands</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Search.FilterTemplate.ElementName">
+            <summary>
+            Local XML element name of filter.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.Search.FilterTemplateEquality">
+            <summary>
+            Return public contracts based on a template that is equal to this value.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Search.FilterTemplateEquality.#ctor(System.String)">
+            <summary>
+            Return public contracts based on a template that matches this regular expression.
+            </summary>
+            <param name="Value">String value</param>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.Search.FilterTemplateRegEx">
+            <summary>
+            Return public contracts based on a template that matches this regular expression.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Search.FilterTemplateRegEx.#ctor(System.String)">
+            <summary>
+            Return public contracts based on a template that matches this regular expression.
+            </summary>
+            <param name="Value">String value</param>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.Search.FilterTo">
+            <summary>
+            Places restrictions on when public contracts cease to be legally binding.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Search.FilterTo.#ctor(Waher.Networking.XMPP.Contracts.Search.SearchFilterOperand[])">
+            <summary>
+            Places restrictions on when public contracts cease to be legally binding.
+            </summary>
+            <param name="Operands">Operands</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Search.FilterTo.ElementName">
+            <summary>
+            Local XML element name of filter.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.Search.FilterUpdated">
+            <summary>
+            Places restrictions on when public contracts were last updated.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Search.FilterUpdated.#ctor(Waher.Networking.XMPP.Contracts.Search.SearchFilterOperand[])">
+            <summary>
+            Places restrictions on when public contracts were last updated.
+            </summary>
+            <param name="Operands">Operands</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Search.FilterUpdated.ElementName">
+            <summary>
+            Local XML element name of filter.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.Search.GreaterThanNumber">
+            <summary>
+            Limits searches to items with values greater than this value.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Search.GreaterThanNumber.#ctor(System.Double)">
+            <summary>
+            Limits searches to items with values greater than this value.
+            </summary>
+            <param name="Value">Number value</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Search.GreaterThanNumber.OperandName">
+            <summary>
+            Local XML element name of string operand.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.Search.GreaterThanDateTime">
+            <summary>
+            Limits searches to items with values greater than this value.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Search.GreaterThanDateTime.#ctor(System.DateTime)">
+            <summary>
+            Limits searches to items with values greater than this value.
+            </summary>
+            <param name="Value">DateTime value</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Search.GreaterThanDateTime.OperandName">
+            <summary>
+            Local XML element name of string operand.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.Search.GreaterThanDuration">
+            <summary>
+            Limits searches to items with values greater than this value.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Search.GreaterThanDuration.#ctor(Waher.Content.Duration)">
+            <summary>
+            Limits searches to items with values greater than this value.
+            </summary>
+            <param name="Value">Duration value</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Search.GreaterThanDuration.OperandName">
+            <summary>
+            Local XML element name of string operand.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.Search.GreaterThanOrEqualToNumber">
+            <summary>
+            Limits searches to items with values greater than or equal to this value.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Search.GreaterThanOrEqualToNumber.#ctor(System.Double)">
+            <summary>
+            Limits searches to items with values greater than or equal to this value.
+            </summary>
+            <param name="Value">Number value</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Search.GreaterThanOrEqualToNumber.OperandName">
+            <summary>
+            Local XML element name of string operand.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.Search.GreaterThanOrEqualToDateTime">
+            <summary>
+            Limits searches to items with values greater than or equal to this value.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Search.GreaterThanOrEqualToDateTime.#ctor(System.DateTime)">
+            <summary>
+            Limits searches to items with values greater than or equal to this value.
+            </summary>
+            <param name="Value">DateTime value</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Search.GreaterThanOrEqualToDateTime.OperandName">
+            <summary>
+            Local XML element name of string operand.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.Search.GreaterThanOrEqualToDuration">
+            <summary>
+            Limits searches to items with values greater than or equal to this value.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Search.GreaterThanOrEqualToDuration.#ctor(Waher.Content.Duration)">
+            <summary>
+            Limits searches to items with values greater than or equal to this value.
+            </summary>
+            <param name="Value">Duration value</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Search.GreaterThanOrEqualToDuration.OperandName">
+            <summary>
+            Local XML element name of string operand.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.Search.GreaterThanOrEqualToString">
+            <summary>
+            Limits searches to items with values greater than or equal to this value.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Search.GreaterThanOrEqualToString.#ctor(System.String)">
+            <summary>
+            Limits searches to items with values greater than or equal to this value.
+            </summary>
+            <param name="Value">String value</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Search.GreaterThanOrEqualToString.OperandName">
+            <summary>
+            Local XML element name of string operand.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.Search.GreaterThanString">
+            <summary>
+            Limits searches to items with values greater than this value.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Search.GreaterThanString.#ctor(System.String)">
+            <summary>
+            Limits searches to items with values greater than this value.
+            </summary>
+            <param name="Value">String value</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Search.GreaterThanString.OperandName">
+            <summary>
+            Local XML element name of string operand.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.Search.LesserThanNumber">
+            <summary>
+            Limits searches to items with values lesser than this value.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Search.LesserThanNumber.#ctor(System.Double)">
+            <summary>
+            Limits searches to items with values lesser than this value.
+            </summary>
+            <param name="Value">Number value</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Search.LesserThanNumber.OperandName">
+            <summary>
+            Local XML element name of string operand.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.Search.LesserThanDateTime">
+            <summary>
+            Limits searches to items with values lesser than this value.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Search.LesserThanDateTime.#ctor(System.DateTime)">
+            <summary>
+            Limits searches to items with values lesser than this value.
+            </summary>
+            <param name="Value">DateTime value</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Search.LesserThanDateTime.OperandName">
+            <summary>
+            Local XML element name of string operand.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.Search.LesserThanDuration">
+            <summary>
+            Limits searches to items with values lesser than this value.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Search.LesserThanDuration.#ctor(Waher.Content.Duration)">
+            <summary>
+            Limits searches to items with values lesser than this value.
+            </summary>
+            <param name="Value">Duration value</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Search.LesserThanDuration.OperandName">
+            <summary>
+            Local XML element name of string operand.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.Search.LesserThanOrEqualToNumber">
+            <summary>
+            Limits searches to items with values lesser than or equal to this value.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Search.LesserThanOrEqualToNumber.#ctor(System.Double)">
+            <summary>
+            Limits searches to items with values lesser than or equal to this value.
+            </summary>
+            <param name="Value">Number value</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Search.LesserThanOrEqualToNumber.OperandName">
+            <summary>
+            Local XML element name of string operand.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.Search.LesserThanOrEqualToDateTime">
+            <summary>
+            Limits searches to items with values lesser than or equal to this value.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Search.LesserThanOrEqualToDateTime.#ctor(System.DateTime)">
+            <summary>
+            Limits searches to items with values lesser than or equal to this value.
+            </summary>
+            <param name="Value">DateTime value</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Search.LesserThanOrEqualToDateTime.OperandName">
+            <summary>
+            Local XML element name of string operand.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.Search.LesserThanOrEqualToDuration">
+            <summary>
+            Limits searches to items with values lesser than or equal to this value.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Search.LesserThanOrEqualToDuration.#ctor(Waher.Content.Duration)">
+            <summary>
+            Limits searches to items with values lesser than or equal to this value.
+            </summary>
+            <param name="Value">Duration value</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Search.LesserThanOrEqualToDuration.OperandName">
+            <summary>
+            Local XML element name of string operand.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.Search.LesserThanOrEqualToString">
+            <summary>
+            Limits searches to items with values lesser than or equal to this value.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Search.LesserThanOrEqualToString.#ctor(System.String)">
+            <summary>
+            Limits searches to items with values lesser than or equal to this value.
+            </summary>
+            <param name="Value">String value</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Search.LesserThanOrEqualToString.OperandName">
+            <summary>
+            Local XML element name of string operand.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.Search.LesserThanString">
+            <summary>
+            Limits searches to items with values lesser than this value.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Search.LesserThanString.#ctor(System.String)">
+            <summary>
+            Limits searches to items with values lesser than this value.
+            </summary>
+            <param name="Value">String value</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Search.LesserThanString.OperandName">
+            <summary>
+            Local XML element name of string operand.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.Search.LikeRegEx">
+            <summary>
+            Limits searches to items with values like this value, using a regular expression.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Search.LikeRegEx.#ctor(System.String)">
+            <summary>
+            Limits searches to items with values like this value, using a regular expression.
+            </summary>
+            <param name="Value">Regular expression</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Search.LikeRegEx.OperandName">
+            <summary>
+            Local XML element name of string operand.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.Search.NotEqualToNumber">
+            <summary>
+            Limits searches to items with values note equal to this value.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Search.NotEqualToNumber.#ctor(System.Double)">
+            <summary>
+            Limits searches to items with values note equal to this value.
+            </summary>
+            <param name="Value">Number value</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Search.NotEqualToNumber.OperandName">
+            <summary>
+            Local XML element name of string operand.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.Search.NotEqualToDateTime">
+            <summary>
+            Limits searches to items with values note equal to this value.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Search.NotEqualToDateTime.#ctor(System.DateTime)">
+            <summary>
+            Limits searches to items with values note equal to this value.
+            </summary>
+            <param name="Value">DateTime value</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Search.NotEqualToDateTime.OperandName">
+            <summary>
+            Local XML element name of string operand.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.Search.NotEqualToDuration">
+            <summary>
+            Limits searches to items with values note equal to this value.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Search.NotEqualToDuration.#ctor(Waher.Content.Duration)">
+            <summary>
+            Limits searches to items with values note equal to this value.
+            </summary>
+            <param name="Value">Duration value</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Search.NotEqualToDuration.OperandName">
+            <summary>
+            Local XML element name of string operand.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.Search.NotEqualToString">
+            <summary>
+            Limits searches to items with values note equal to this value.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Search.NotEqualToString.#ctor(System.String)">
+            <summary>
+            Limits searches to items with values note equal to this value.
+            </summary>
+            <param name="Value">String value</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Search.NotEqualToString.OperandName">
+            <summary>
+            Local XML element name of string operand.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.Search.SearchFilter">
+            <summary>
+            Abstract base class for Smart Contract Search filters.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Search.SearchFilter.#ctor(Waher.Networking.XMPP.Contracts.Search.SearchFilterOperand[])">
+            <summary>
+            Abstract base class for Smart Contract Search filters.
+            </summary>
+            <param name="Operands">Operands</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Search.SearchFilter.Operands">
+            <summary>
+            Operands.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Search.SearchFilter.Serialize(System.Text.StringBuilder)">
+            <summary>
+            Serializes the search filter to XML.
+            </summary>
+            <param name="Xml">XML output.</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Search.SearchFilter.ElementName">
+            <summary>
+            Local XML element name of filter.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.Search.SearchFilterDateTimeOperand">
+            <summary>
+            Abstract base class for <see cref="T:System.DateTime"/>-valued Smart Contract Search filter operands.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Search.SearchFilterDateTimeOperand.#ctor(System.DateTime)">
+            <summary>
+            Abstract base class for <see cref="T:System.DateTime"/>-valued Smart Contract Search filter operands.
+            </summary>
+            <param name="Value">String value</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Search.SearchFilterDateTimeOperand.Value">
+            <summary>
+            <see cref="T:System.DateTime"/> value.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Search.SearchFilterDateTimeOperand.Serialize(System.Text.StringBuilder,System.String)">
+            <summary>
+            Serializes the search filter to XML.
+            </summary>
+            <param name="Xml">XML output.</param>
+            <param name="ElementSuffix">Suffix, to append to element name during serialization.</param>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.Search.SearchFilterDurationOperand">
+            <summary>
+            Abstract base class for <see cref="T:Waher.Content.Duration"/>-valued Smart Contract Search filter operands.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Search.SearchFilterDurationOperand.#ctor(Waher.Content.Duration)">
+            <summary>
+            Abstract base class for <see cref="T:Waher.Content.Duration"/>-valued Smart Contract Search filter operands.
+            </summary>
+            <param name="Value">String value</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Search.SearchFilterDurationOperand.Value">
+            <summary>
+            <see cref="T:Waher.Content.Duration"/> value.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Search.SearchFilterDurationOperand.Serialize(System.Text.StringBuilder,System.String)">
+            <summary>
+            Serializes the search filter to XML.
+            </summary>
+            <param name="Xml">XML output.</param>
+            <param name="ElementSuffix">Suffix, to append to element name during serialization.</param>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.Search.SearchFilterNumberOperand">
+            <summary>
+            Abstract base class for Numerical Smart Contract Search filter operands.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Search.SearchFilterNumberOperand.#ctor(System.Double)">
+            <summary>
+            Abstract base class for Numerical Smart Contract Search filter operands.
+            </summary>
+            <param name="Value">String value</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Search.SearchFilterNumberOperand.Value">
+            <summary>
+            Numerical value.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Search.SearchFilterNumberOperand.Serialize(System.Text.StringBuilder,System.String)">
+            <summary>
+            Serializes the search filter to XML.
+            </summary>
+            <param name="Xml">XML output.</param>
+            <param name="ElementSuffix">Suffix, to append to element name during serialization.</param>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.Search.SearchFilterOperand">
+            <summary>
+            Abstract base class for Contract Search filter operands.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Search.SearchFilterOperand.#ctor">
+            <summary>
+            Abstract base class for Contract Search filter operands.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Search.SearchFilterOperand.Serialize(System.Text.StringBuilder,System.String)">
+            <summary>
+            Serializes the search filter operand to XML.
+            </summary>
+            <param name="Xml">XML output.</param>
+            <param name="ElementSuffix">Suffix, to append to element name during serialization.</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Search.SearchFilterOperand.OperandName">
+            <summary>
+            Local XML element name of string operand.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.Search.SearchFilterStringOperand">
+            <summary>
+            Abstract base class for String-valued Smart Contract Search filter operands.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Search.SearchFilterStringOperand.#ctor(System.String)">
+            <summary>
+            Abstract base class for String-valued Smart Contract Search filter operands.
+            </summary>
+            <param name="Value">String value</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Search.SearchFilterStringOperand.Value">
+            <summary>
+            String value.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Search.SearchFilterStringOperand.Serialize(System.Text.StringBuilder,System.String)">
+            <summary>
+            Serializes the search filter to XML.
+            </summary>
+            <param name="Xml">XML output.</param>
+            <param name="ElementSuffix">Suffix, to append to element name during serialization.</param>
+        </member>
         <member name="T:Waher.Networking.XMPP.Contracts.ServerSignature">
             <summary>
             Represents a server signature on a contract.

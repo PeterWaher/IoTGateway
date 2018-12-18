@@ -798,7 +798,8 @@ namespace Waher.Persistence.FilesLW.Test
 				TimeSpan = new TimeSpan[] { DateTime.Now.TimeOfDay, TimeSpan.Zero },
 				Guid = new Guid[] { Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid() },
 				NormalEnum = new NormalEnum[] { NormalEnum.Option3, NormalEnum.Option1, NormalEnum.Option4 },
-				FlagsEnum = new FlagsEnum[] { FlagsEnum.Option1 | FlagsEnum.Option4, FlagsEnum.Option3 }
+				FlagsEnum = new FlagsEnum[] { FlagsEnum.Option1 | FlagsEnum.Option4, FlagsEnum.Option3 },
+				CIStrings = new CaseInsensitiveString[] { "a", "b", "c", "Today, there will be a lot of ☀." }
 			};
 
 			IObjectSerializer S = provider.GetObjectSerializer(typeof(SimpleArrays));
@@ -840,6 +841,7 @@ namespace Waher.Persistence.FilesLW.Test
 			AssertEx.Same(Obj.Guid, GenObj["Guid"]);
 			AssertEx.Same(new string[] { Obj.NormalEnum[0].ToString(), Obj.NormalEnum[1].ToString(), Obj.NormalEnum[2].ToString() }, GenObj["NormalEnum"]);
 			AssertEx.Same(new int[] { (int)Obj.FlagsEnum[0], (int)Obj.FlagsEnum[1] }, GenObj["FlagsEnum"]);
+			AssertEx.Same(Obj.CIStrings, GenObj["CIStrings"]);
 
 			Writer.Restart();
 
@@ -876,6 +878,7 @@ namespace Waher.Persistence.FilesLW.Test
 			AssertEx.Same(Obj.Guid, Obj2.Guid);
 			AssertEx.Same(Obj.NormalEnum, Obj2.NormalEnum);
 			AssertEx.Same(Obj.FlagsEnum, Obj2.FlagsEnum);
+			AssertEx.Same(Obj.CIStrings, Obj2.CIStrings);
 		}
 
 		[TestMethod]
@@ -1492,6 +1495,7 @@ namespace Waher.Persistence.FilesLW.Test
 				Double = new double[][] { new double[] { 1, 2, 3 }, new double[] { 2, 3, 4 } },
 				Single = new float[][] { new float[] { 1, 2, 3 }, new float[] { 2, 3, 4 } },
 				String = new string[][] { new string[] { "a", "b", "c", "Today, there will be a lot of ☀." }, new string[] { "a", "b", "c" } },
+				CIStrings = new CaseInsensitiveString[][] { new CaseInsensitiveString[] { "a", "b", "c", "Today, there will be a lot of ☀." }, new CaseInsensitiveString[] { "a", "b", "c" } },
 				DateTime = new DateTime[][] { new DateTime[] { DateTime.Now, DateTime.Today, DateTime.MinValue, DateTime.MaxValue }, new DateTime[] { DateTime.MinValue, DateTime.MaxValue } },
 				TimeSpan = new TimeSpan[][] { new TimeSpan[] { DateTime.Now.TimeOfDay, TimeSpan.Zero }, new TimeSpan[] { TimeSpan.MinValue, TimeSpan.MaxValue } },
 				Guid = new Guid[][] { new Guid[] { Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid() }, new Guid[] { Guid.NewGuid(), Guid.NewGuid() } },
@@ -1533,6 +1537,7 @@ namespace Waher.Persistence.FilesLW.Test
 			AssertEx.Same(Obj.Double, GenObj["Double"]);
 			AssertEx.Same(Obj.Single, GenObj["Single"]);
 			AssertEx.Same(Obj.String, GenObj["String"]);
+			AssertEx.Same(Obj.CIStrings, GenObj["CIStrings"]);
 			AssertEx.Same(Obj.DateTime, GenObj["DateTime"]);
 			AssertEx.Same(Obj.TimeSpan, GenObj["TimeSpan"]);
 			AssertEx.Same(Obj.Guid, GenObj["Guid"]);
@@ -1569,6 +1574,7 @@ namespace Waher.Persistence.FilesLW.Test
 			AssertEx.Same(Obj.Double, Obj2.Double);
 			AssertEx.Same(Obj.Single, Obj2.Single);
 			AssertEx.Same(Obj.String, Obj2.String);
+			AssertEx.Same(Obj.CIStrings, Obj2.CIStrings);
 			AssertEx.Same(Obj.DateTime, Obj2.DateTime);
 			AssertEx.Same(Obj.TimeSpan, Obj2.TimeSpan);
 			AssertEx.Same(Obj.Guid, Obj2.Guid);

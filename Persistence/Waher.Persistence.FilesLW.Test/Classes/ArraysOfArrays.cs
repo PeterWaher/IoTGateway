@@ -32,6 +32,7 @@ namespace Waher.Persistence.FilesLW.Test.Classes
 		public TimeSpan[][] TimeSpan;
 		public Guid[][] Guid;
 		public NormalEnum[][] NormalEnum;
+		public CaseInsensitiveString[][] CIStrings;
 		public FlagsEnum[][] FlagsEnum;
 		public Embedded[][] MultipleEmbedded;
 		public Embedded[][] MultipleEmbeddedNullable;

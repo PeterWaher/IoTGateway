@@ -1714,7 +1714,8 @@ namespace Waher.Persistence.FilesLW.Test
 					AssertEx.Less(Obj.Byte, 200);
 					AssertEx.Greater(Obj.DateTime, MinDT);
 					AssertEx.Less(Obj.DateTime, MaxDT);
-					Assert.IsTrue(Obj.CIString[0] >= 'A' && Obj.CIString[0] <= 'Z');
+					Assert.IsTrue(char.ToUpper(Obj.CIString[0]) >= 'A' && 
+						char.ToUpper(Obj.CIString[0]) <= 'Z');
 					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
 				}
 
@@ -1737,12 +1738,13 @@ namespace Waher.Persistence.FilesLW.Test
 				new FilterFieldLikeRegEx("CIString", "[XY].*")), true))
 			{
 				Simple Obj;
+				CaseInsensitiveString s = "ABXY";
 
 				while (await Cursor.MoveNextAsync())
 				{
 					Obj = Cursor.Current;
 					Assert.IsNotNull(Obj);
-					Assert.IsTrue("ABXY".IndexOf(Obj.CIString[0]) >= 0);
+					Assert.IsTrue(s.IndexOf(Obj.CIString[0]) >= 0);
 					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
 				}
 

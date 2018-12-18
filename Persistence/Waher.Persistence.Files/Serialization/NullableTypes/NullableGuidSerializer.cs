@@ -43,7 +43,8 @@ namespace Waher.Persistence.Files.Serialization.NullableTypes
 			switch (DataType.Value)
 			{
 				case ObjectSerializer.TYPE_GUID: return (Guid?)Reader.ReadGuid();
-				case ObjectSerializer.TYPE_STRING: return (Guid?)Guid.Parse(Reader.ReadString());
+				case ObjectSerializer.TYPE_STRING:
+				case ObjectSerializer.TYPE_CI_STRING: return (Guid?)Guid.Parse(Reader.ReadString());
 				case ObjectSerializer.TYPE_NULL: return null;
 				default: throw new Exception("Expected a nullable Guid value.");
 			}

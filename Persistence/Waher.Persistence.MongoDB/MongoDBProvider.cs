@@ -830,5 +830,6 @@ namespace Waher.Persistence.MongoDB
 		//	* Dictionary<string,T> fields.
 		//	* SortedDictionary<string,T> fields.
 		//	* Aggregates
+		//  * Case insensitive strings.
 	}
 	}

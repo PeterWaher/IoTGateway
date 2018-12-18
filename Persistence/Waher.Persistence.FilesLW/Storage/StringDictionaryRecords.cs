@@ -226,9 +226,7 @@ namespace Waher.Persistence.Files.Storage
 					break;
 
 				case ObjectSerializer.TYPE_STRING:
-					Reader.SkipString();
-					break;
-
+				case ObjectSerializer.TYPE_CI_STRING:
 				case ObjectSerializer.TYPE_ENUM:
 					Reader.SkipString();
 					break;

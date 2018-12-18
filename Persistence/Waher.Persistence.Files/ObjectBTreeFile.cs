@@ -4447,6 +4447,10 @@ namespace Waher.Persistence.Files
 					XmlOutput.WriteElementString("String", Searching.Comparison.ToString(Item, TypeCode));
 					break;
 
+				case ObjectSerializer.TYPE_CI_STRING:
+					XmlOutput.WriteElementString("CiString", Searching.Comparison.ToString(Item, TypeCode));
+					break;
+
 				case ObjectSerializer.TYPE_TIMESPAN:
 					XmlOutput.WriteElementString("TimeSpan", Searching.Comparison.ToString(Item, TypeCode));
 					break;

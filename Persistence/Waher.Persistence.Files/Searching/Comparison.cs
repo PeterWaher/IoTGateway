@@ -34,7 +34,17 @@ namespace Waher.Persistence.Files.Searching
 			if (xTypeCode == yTypeCode)
 				return true;
 
-			if (yTypeCode == ObjectSerializer.TYPE_STRING)
+			if (xTypeCode == ObjectSerializer.TYPE_CI_STRING)
+			{
+				y = new CaseInsensitiveString(ToString(y, yTypeCode));
+				return true;
+			}
+			else if (yTypeCode == ObjectSerializer.TYPE_CI_STRING)
+			{
+				x = new CaseInsensitiveString(ToString(x, xTypeCode));
+				return true;
+			}
+			else if (yTypeCode == ObjectSerializer.TYPE_STRING)
 			{
 				x = ToString(x, xTypeCode);
 				return true;
@@ -170,6 +180,7 @@ namespace Waher.Persistence.Files.Searching
 					break;
 
 				case ObjectSerializer.TYPE_STRING:
+				case ObjectSerializer.TYPE_CI_STRING:
 					break;
 
 				case ObjectSerializer.TYPE_ENUM:
@@ -412,6 +423,17 @@ namespace Waher.Persistence.Files.Searching
 					else
 						return false;
 
+				case ObjectSerializer.TYPE_CI_STRING:
+					CaseInsensitiveString s2 = (CaseInsensitiveString)Value;
+					s = s2.Value;
+					if (Increment(ref s))
+					{
+						Value = new CaseInsensitiveString(s);
+						return true;
+					}
+					else
+						return false;
+
 				case ObjectSerializer.TYPE_ENUM:
 					s = Value.ToString();
 					if (Increment(ref s))
@@ -611,6 +633,19 @@ namespace Waher.Persistence.Files.Searching
 		}
 
 		/// <summary>
+		/// Increments <paramref name="Value"/> to the smallest value greater than <paramref name="Value"/>.
+		/// </summary>
+		/// <param name="Value">Value</param>
+		/// <returns>If operation was successful.</returns>
+		public static bool Increment(ref CaseInsensitiveString Value)
+		{
+			string s = Value.Value;
+			Increment(ref s);
+			Value = new CaseInsensitiveString(s);
+			return true;
+		}
+
+		/// <summary>
 		/// Decrements <paramref name="Value"/> to the largest value smaller than <paramref name="Value"/>.
 		/// </summary>
 		/// <param name="Value">Value</param>
@@ -804,6 +839,17 @@ namespace Waher.Persistence.Files.Searching
 					if (Decrement(ref s))
 					{
 						Value = s;
+						return true;
+					}
+					else
+						return false;
+
+				case ObjectSerializer.TYPE_CI_STRING:
+					CaseInsensitiveString s2 = (CaseInsensitiveString)Value;
+					s = s2.Value;
+					if (Decrement(ref s))
+					{
+						Value = new CaseInsensitiveString(s);
 						return true;
 					}
 					else
@@ -1009,6 +1055,21 @@ namespace Waher.Persistence.Files.Searching
 			else
 				Value = Value.Substring(0, c - 1) + ((char)(ch - 1)) + char.MaxValue;
 
+			return true;
+		}
+
+		/// <summary>
+		/// Decrements <paramref name="Value"/> to the largest value smaller than <paramref name="Value"/>.
+		/// </summary>
+		/// <param name="Value">Value</param>
+		/// <returns>If operation was successful.</returns>
+		public static bool Decrement(ref CaseInsensitiveString Value)
+		{
+			string s = Value.Value;
+			if (!Decrement(ref s))
+				return false;
+
+			Value = new CaseInsensitiveString(s);
 			return true;
 		}
 

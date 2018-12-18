@@ -137,6 +137,7 @@ namespace Waher.Persistence.Files.Serialization.Model
 				case ObjectSerializer.TYPE_GUID:
 				case ObjectSerializer.TYPE_ARRAY:
 				case ObjectSerializer.TYPE_DATETIMEOFFSET:
+				case ObjectSerializer.TYPE_CI_STRING:
 				default:
 					this.memberTypeCode = TypeCode.Object;
 					break;

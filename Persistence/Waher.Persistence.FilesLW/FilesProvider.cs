@@ -573,6 +573,7 @@ namespace Waher.Persistence.Files
 				case ObjectSerializer.TYPE_TIMESPAN: return typeof(TimeSpan);
 				case ObjectSerializer.TYPE_CHAR: return typeof(char);
 				case ObjectSerializer.TYPE_STRING: return typeof(string);
+				case ObjectSerializer.TYPE_CI_STRING: return typeof(CaseInsensitiveString);
 				case ObjectSerializer.TYPE_ENUM: return typeof(Enum);
 				case ObjectSerializer.TYPE_BYTEARRAY: return typeof(byte[]);
 				case ObjectSerializer.TYPE_GUID: return typeof(Guid);
@@ -643,12 +644,16 @@ namespace Waher.Persistence.Files
 				return ObjectSerializer.TYPE_CHAR;
 			else if (FieldDataType == typeof(string))
 				return ObjectSerializer.TYPE_STRING;
+			else if (FieldDataType == typeof(CaseInsensitiveString))
+				return ObjectSerializer.TYPE_CI_STRING;
 			else if (FieldDataType == typeof(TimeSpan))
 				return ObjectSerializer.TYPE_TIMESPAN;
 			else if (FieldDataType == typeof(byte[]))
 				return ObjectSerializer.TYPE_BYTEARRAY;
 			else if (FieldDataType == typeof(Guid))
 				return ObjectSerializer.TYPE_GUID;
+			else if (FieldDataType == typeof(CaseInsensitiveString))
+				return ObjectSerializer.TYPE_CI_STRING;
 			else if (TI.IsArray)
 				return ObjectSerializer.TYPE_ARRAY;
 			else if (FieldDataType == typeof(void))

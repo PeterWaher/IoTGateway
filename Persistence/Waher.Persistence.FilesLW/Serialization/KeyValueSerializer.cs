@@ -160,6 +160,10 @@ namespace Waher.Persistence.Files.Serialization
 					Value = Reader.ReadString();
 					break;
 
+				case ObjectSerializer.TYPE_CI_STRING:
+					Value = new CaseInsensitiveString(Reader.ReadString());
+					break;
+
 				case ObjectSerializer.TYPE_ENUM:
 					Value = Reader.ReadString();
 					break;

@@ -115,6 +115,9 @@ namespace Waher.Persistence.Files.Serialization
 				case ObjectSerializer.TYPE_STRING:
 					return Reader.ReadString();
 
+				case ObjectSerializer.TYPE_CI_STRING:
+					return new CaseInsensitiveString(Reader.ReadString());
+
 				case ObjectSerializer.TYPE_ENUM:
 					return Reader.ReadString();
 
@@ -230,6 +233,10 @@ namespace Waher.Persistence.Files.Serialization
 						Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadString()));
 						break;
 
+					case ObjectSerializer.TYPE_CI_STRING:
+						Properties.AddLast(new KeyValuePair<string, object>(FieldName, new CaseInsensitiveString(Reader.ReadString())));
+						break;
+
 					case ObjectSerializer.TYPE_BYTEARRAY:
 						Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadByteArray()));
 						break;
@@ -283,6 +290,7 @@ namespace Waher.Persistence.Files.Serialization
 				case ObjectSerializer.TYPE_CHAR: return this.ReadArray<char>(Reader, NrElements, ElementDataType);
 				case ObjectSerializer.TYPE_STRING:
 				case ObjectSerializer.TYPE_ENUM: return this.ReadArray<string>(Reader, NrElements, ElementDataType);
+				case ObjectSerializer.TYPE_CI_STRING: return this.ReadArray<CaseInsensitiveString>(Reader, NrElements, ElementDataType);
 				case ObjectSerializer.TYPE_BYTEARRAY: return this.ReadArray<byte[]>(Reader, NrElements, ElementDataType);
 				case ObjectSerializer.TYPE_GUID: return this.ReadArray<Guid>(Reader, NrElements, ElementDataType);
 				case ObjectSerializer.TYPE_ARRAY: return this.ReadArrayOfArrays(Reader, NrElements);
@@ -407,6 +415,10 @@ namespace Waher.Persistence.Files.Serialization
 					case ObjectSerializer.TYPE_STRING:
 					case ObjectSerializer.TYPE_ENUM:
 						Elements.Add(Reader.ReadString());
+						break;
+
+					case ObjectSerializer.TYPE_CI_STRING:
+						Elements.Add(new CaseInsensitiveString(Reader.ReadString()));
 						break;
 
 					case ObjectSerializer.TYPE_BYTEARRAY:

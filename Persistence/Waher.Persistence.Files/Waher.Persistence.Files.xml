@@ -2027,6 +2027,13 @@
             <param name="Value">Value</param>
             <returns>If operation was successful.</returns>
         </member>
+        <member name="M:Waher.Persistence.Files.Searching.Comparison.Increment(Waher.Persistence.CaseInsensitiveString@)">
+            <summary>
+            Increments <paramref name="Value"/> to the smallest value greater than <paramref name="Value"/>.
+            </summary>
+            <param name="Value">Value</param>
+            <returns>If operation was successful.</returns>
+        </member>
         <member name="M:Waher.Persistence.Files.Searching.Comparison.Decrement(System.Object@)">
             <summary>
             Decrements <paramref name="Value"/> to the largest value smaller than <paramref name="Value"/>.
@@ -2056,6 +2063,13 @@
             <returns>If operation was successful.</returns>
         </member>
         <member name="M:Waher.Persistence.Files.Searching.Comparison.Decrement(System.String@)">
+            <summary>
+            Decrements <paramref name="Value"/> to the largest value smaller than <paramref name="Value"/>.
+            </summary>
+            <param name="Value">Value</param>
+            <returns>If operation was successful.</returns>
+        </member>
+        <member name="M:Waher.Persistence.Files.Searching.Comparison.Decrement(Waher.Persistence.CaseInsensitiveString@)">
             <summary>
             Decrements <paramref name="Value"/> to the largest value smaller than <paramref name="Value"/>.
             </summary>
@@ -5195,6 +5209,11 @@
             Represents a <see cref="T:System.DateTimeOffset"/>
             </summary>
         </member>
+        <member name="F:Waher.Persistence.Files.Serialization.ObjectSerializer.TYPE_CI_STRING">
+            <summary>
+            Represents a <see cref="T:Waher.Persistence.CaseInsensitiveString"/>
+            </summary>
+        </member>
         <member name="F:Waher.Persistence.Files.Serialization.ObjectSerializer.TYPE_MIN">
             <summary>
             Represents the smallest possible value for the field type being searched or filtered.
@@ -5431,6 +5450,53 @@
             <param name="Value">The actual object to serialize.</param>
         </member>
         <member name="M:Waher.Persistence.Files.Serialization.ReferenceTypes.ByteArraySerializer.TryGetFieldValue(System.String,System.Object,System.Object@)">
+            <summary>
+            Gets the value of a field or property of an object, given its name.
+            </summary>
+            <param name="FieldName">Name of field or property.</param>
+            <param name="Object">Object.</param>
+            <param name="Value">Corresponding field or property value, if found, or null otherwise.</param>
+            <returns>If the corresponding field or property was found.</returns>
+        </member>
+        <member name="T:Waher.Persistence.Files.Serialization.ReferenceTypes.CaseInsensitiveStringSerializer">
+            <summary>
+            Serializes a <see cref="T:Waher.Persistence.CaseInsensitiveString"/> value.
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.Files.Serialization.ReferenceTypes.CaseInsensitiveStringSerializer.#ctor">
+            <summary>
+            Serializes a <see cref="T:Waher.Persistence.CaseInsensitiveString"/> value.
+            </summary>
+        </member>
+        <member name="P:Waher.Persistence.Files.Serialization.ReferenceTypes.CaseInsensitiveStringSerializer.ValueType">
+            <summary>
+            What type of object is being serialized.
+            </summary>
+        </member>
+        <member name="P:Waher.Persistence.Files.Serialization.ReferenceTypes.CaseInsensitiveStringSerializer.IsNullable">
+            <summary>
+            If the value being serialized, can be null.
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.Files.Serialization.ReferenceTypes.CaseInsensitiveStringSerializer.Deserialize(Waher.Persistence.Files.Serialization.BinaryDeserializer,System.Nullable{System.UInt32},System.Boolean)">
+            <summary>
+            Deserializes an object from a binary source.
+            </summary>
+            <param name="Reader">Binary deserializer.</param>
+            <param name="DataType">Optional datatype. If not provided, will be read from the binary source.</param>
+            <param name="Embedded">If the object is embedded into another.</param>
+            <returns>Deserialized object.</returns>
+        </member>
+        <member name="M:Waher.Persistence.Files.Serialization.ReferenceTypes.CaseInsensitiveStringSerializer.Serialize(Waher.Persistence.Files.Serialization.BinarySerializer,System.Boolean,System.Boolean,System.Object)">
+            <summary>
+            Serializes an object to a binary destination.
+            </summary>
+            <param name="Writer">Binary destination.</param>
+            <param name="WriteTypeCode">If a type code is to be output.</param>
+            <param name="Embedded">If the object is embedded into another.</param>
+            <param name="Value">The actual object to serialize.</param>
+        </member>
+        <member name="M:Waher.Persistence.Files.Serialization.ReferenceTypes.CaseInsensitiveStringSerializer.TryGetFieldValue(System.String,System.Object,System.Object@)">
             <summary>
             Gets the value of a field or property of an object, given its name.
             </summary>

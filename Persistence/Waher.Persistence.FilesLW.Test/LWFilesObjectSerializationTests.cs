@@ -80,7 +80,8 @@ namespace Waher.Persistence.FilesLW.Test
 				DateTimeOffset = DateTimeOffset.Now,
 				Guid = Guid.NewGuid(),
 				NormalEnum = NormalEnum.Option3,
-				FlagsEnum = FlagsEnum.Option1 | FlagsEnum.Option4
+				FlagsEnum = FlagsEnum.Option1 | FlagsEnum.Option4,
+				CIString = "Hello World!"
 			};
 
 			Obj.TimeSpan = Obj.DateTime.TimeOfDay;
@@ -131,6 +132,8 @@ namespace Waher.Persistence.FilesLW.Test
 			AssertEx.Same(Obj.NormalEnum, Value);
 			Assert.IsTrue(S.TryGetFieldValue("FlagsEnum", Obj, out Value));
 			AssertEx.Same(Obj.FlagsEnum, Value);
+			Assert.IsTrue(S.TryGetFieldValue("CIString", Obj, out Value));
+			AssertEx.Same(Obj.CIString, Value);
 
 			BinarySerializer Writer = new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8, true);
 
@@ -191,6 +194,7 @@ namespace Waher.Persistence.FilesLW.Test
 			AssertEx.Same(Obj.Guid, Obj2.Guid);
 			AssertEx.Same(Obj.NormalEnum, Obj2.NormalEnum);
 			AssertEx.Same(Obj.FlagsEnum, Obj2.FlagsEnum);
+			AssertEx.Same(Obj.CIString, Obj2.CIString);
 			AssertEx.Same(Obj.ObjectId, Obj2.ObjectId);
 		}
 
@@ -218,6 +222,7 @@ namespace Waher.Persistence.FilesLW.Test
 			AssertEx.Same(Obj.Guid, GenObj["Guid"]);
 			AssertEx.Same(Obj.NormalEnum.ToString(), GenObj["NormalEnum"]);
 			AssertEx.Same((int)Obj.FlagsEnum, GenObj["FlagsEnum"]);
+			AssertEx.Same(Obj.CIString, GenObj["CIString"]);
 			AssertEx.Same(Obj.ObjectId, GenObj.ObjectId);
 		}
 

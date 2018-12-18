@@ -39,6 +39,7 @@ namespace Waher.Persistence.FilesLW.Test.Classes
 		public Guid Guid;
 		public NormalEnum NormalEnum;
 		public FlagsEnum FlagsEnum;
+		public CaseInsensitiveString CIString;
 
 		public Simple()
 		{

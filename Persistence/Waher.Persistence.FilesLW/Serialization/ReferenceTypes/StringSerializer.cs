@@ -51,7 +51,8 @@ namespace Waher.Persistence.Files.Serialization.ReferenceTypes
 			switch (DataType.Value)
 			{
 				case ObjectSerializer.TYPE_ENUM:
-				case ObjectSerializer.TYPE_STRING: return Reader.ReadString();
+				case ObjectSerializer.TYPE_STRING:
+				case ObjectSerializer.TYPE_CI_STRING: return Reader.ReadString();
 				case ObjectSerializer.TYPE_CHAR: return new string(Reader.ReadChar(), 1);
 				case ObjectSerializer.TYPE_BOOLEAN: return Reader.ReadBoolean().ToString();
 				case ObjectSerializer.TYPE_BYTE: return Reader.ReadString().ToString();

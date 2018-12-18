@@ -44,7 +44,8 @@ namespace Waher.Persistence.Files.Serialization.ValueTypes
 			{
 				case ObjectSerializer.TYPE_DATETIME: return (DateTimeOffset)Reader.ReadDateTime();
 				case ObjectSerializer.TYPE_DATETIMEOFFSET: return Reader.ReadDateTimeOffset();
-				case ObjectSerializer.TYPE_STRING: return DateTimeOffset.Parse(Reader.ReadString());
+				case ObjectSerializer.TYPE_STRING:
+				case ObjectSerializer.TYPE_CI_STRING: return DateTimeOffset.Parse(Reader.ReadString());
 				case ObjectSerializer.TYPE_MIN: return DateTimeOffset.MinValue;
 				case ObjectSerializer.TYPE_MAX: return DateTimeOffset.MaxValue;
 				case ObjectSerializer.TYPE_NULL: return null;

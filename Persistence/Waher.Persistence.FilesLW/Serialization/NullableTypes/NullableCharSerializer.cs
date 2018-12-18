@@ -59,6 +59,7 @@ namespace Waher.Persistence.Files.Serialization.NullableTypes
 				case ObjectSerializer.TYPE_NULL: return null;
 
 				case ObjectSerializer.TYPE_STRING:
+				case ObjectSerializer.TYPE_CI_STRING:
 					string s = Reader.ReadString();
 					return string.IsNullOrEmpty(s) ? (char?)0 : s[0];
 

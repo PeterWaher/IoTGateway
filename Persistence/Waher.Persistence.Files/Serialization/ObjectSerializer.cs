@@ -125,6 +125,11 @@ namespace Waher.Persistence.Files.Serialization
 		public const uint TYPE_DATETIMEOFFSET = 19;
 
 		/// <summary>
+		/// Represents a <see cref="CaseInsensitiveString"/>
+		/// </summary>
+		public const uint TYPE_CI_STRING = 20;
+
+		/// <summary>
 		/// Represents the smallest possible value for the field type being searched or filtered.
 		/// </summary>
 		public const uint TYPE_MIN = 27;
@@ -819,6 +824,7 @@ namespace Waher.Persistence.Files.Serialization
 							CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
 							CSharp.AppendLine();
 							CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_STRING + ":");
+							CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_CI_STRING + ":");
 							CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (" + MemberType.FullName + ")Enum.Parse(typeof(" + MemberType.FullName + "), Reader.ReadString());");
 							CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
 							CSharp.AppendLine();
@@ -1150,6 +1156,14 @@ namespace Waher.Persistence.Files.Serialization
 											CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
 										}
 
+										if (MemberTypeInfo.IsAssignableFrom(typeof(CaseInsensitiveString)))
+										{
+											CSharp.AppendLine();
+											CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_CI_STRING + ":");
+											CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (" + MemberType.FullName + ")ReadString(Reader, FieldDataType);");
+											CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+										}
+
 										if (MemberTypeInfo.IsAssignableFrom(typeof(byte[])))
 										{
 											CSharp.AppendLine();
@@ -1342,7 +1356,7 @@ namespace Waher.Persistence.Files.Serialization
 					if (HasDefaultValue)
 					{
 						if (DefaultValue == null)
-							CSharp.AppendLine("\t\t\tif (((object)Value." + Member.Name + ") != null)");
+							CSharp.AppendLine("\t\t\tif (((object)Value." + Member.Name + ") != (" + MemberType.FullName + ")null)");
 						else
 							CSharp.AppendLine("\t\t\tif (!default" + Member.Name + ".Equals(Value." + Member.Name + "))");
 
@@ -1697,7 +1711,7 @@ namespace Waher.Persistence.Files.Serialization
 									else if (ByReference)
 									{
 										CSharp.Append(Indent2);
-										CSharp.AppendLine("if (Value." + Member.Name + " == null)");
+										CSharp.AppendLine("if (Value." + Member.Name + " == (" + MemberType.FullName + ")null)");
 										CSharp.Append(Indent2);
 										CSharp.AppendLine("\tWriter.WriteBits(" + TYPE_NULL + ", 6);");
 										CSharp.Append(Indent2);
@@ -1760,6 +1774,36 @@ namespace Waher.Persistence.Files.Serialization
 										if (Nullable)
 											CSharp.Append(".Value");
 										CSharp.AppendLine(");");
+									}
+									else if (MemberType == typeof(CaseInsensitiveString))
+									{
+										CSharp.Append(Indent2);
+										CSharp.Append("if (Value.");
+										CSharp.Append(Member.Name);
+										CSharp.AppendLine(" == (" + MemberType.FullName + ")null)");
+
+										CSharp.Append(Indent2);
+										CSharp.Append("\tWriter.WriteBits(");
+										CSharp.Append(TYPE_NULL);
+										CSharp.AppendLine(", 6);");
+
+										CSharp.Append(Indent2);
+										CSharp.AppendLine("else");
+										CSharp.Append(Indent2);
+										CSharp.AppendLine("{");
+
+										CSharp.Append(Indent2);
+										CSharp.Append("\tWriter.WriteBits(");
+										CSharp.Append(TYPE_CI_STRING);
+										CSharp.AppendLine(", 6);");
+
+										CSharp.Append(Indent2);
+										CSharp.Append("\tWriter.Write(Value.");
+										CSharp.Append(Member.Name);
+										CSharp.AppendLine(".Value);");
+
+										CSharp.Append(Indent2);
+										CSharp.AppendLine("}");
 									}
 									else
 									{
@@ -2339,6 +2383,10 @@ namespace Waher.Persistence.Files.Serialization
 								Member.Set(Result, GeneratedObjectSerializerBase.ReadString(Reader, FieldDataType));
 								break;
 
+							case TYPE_CI_STRING:
+								Member.Set(Result, new CaseInsensitiveString(GeneratedObjectSerializerBase.ReadString(Reader, FieldDataType)));
+								break;
+
 							case TYPE_UINT16:
 								if (Member.Nullable)
 									Member.Set(Result, GeneratedObjectSerializerBase.ReadNullableUInt16(Reader, FieldDataType));
@@ -2438,6 +2486,7 @@ namespace Waher.Persistence.Files.Serialization
 										break;
 
 									case TYPE_STRING:
+									case TYPE_CI_STRING:
 										Member.Set(Result, Enum.Parse(Member.MemberType, Reader.ReadString()));
 										break;
 
@@ -2557,6 +2606,10 @@ namespace Waher.Persistence.Files.Serialization
 
 										case TYPE_STRING:
 											Member.Set(Result, Reader.ReadString());
+											break;
+
+										case TYPE_CI_STRING:
+											Member.Set(Result, new CaseInsensitiveString(Reader.ReadString()));
 											break;
 
 										case TYPE_BYTEARRAY:
@@ -2720,6 +2773,11 @@ namespace Waher.Persistence.Files.Serialization
 							case TYPE_STRING:
 								Writer.WriteBits(TYPE_STRING, 6);
 								Writer.Write((string)MemberValue);
+								break;
+
+							case TYPE_CI_STRING:
+								Writer.WriteBits(TYPE_CI_STRING, 6);
+								Writer.Write(((CaseInsensitiveString)MemberValue).Value);
 								break;
 
 							case TYPE_UINT16:

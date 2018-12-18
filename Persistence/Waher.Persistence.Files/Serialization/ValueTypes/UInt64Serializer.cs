@@ -54,7 +54,8 @@ namespace Waher.Persistence.Files.Serialization.ValueTypes
 				case ObjectSerializer.TYPE_DECIMAL: return (ulong)Reader.ReadDecimal();
 				case ObjectSerializer.TYPE_DOUBLE: return (ulong)Reader.ReadDouble();
 				case ObjectSerializer.TYPE_SINGLE: return (ulong)Reader.ReadSingle();
-				case ObjectSerializer.TYPE_STRING: return ulong.Parse(Reader.ReadString());
+				case ObjectSerializer.TYPE_STRING:
+				case ObjectSerializer.TYPE_CI_STRING: return ulong.Parse(Reader.ReadString());
 				case ObjectSerializer.TYPE_MIN: return ulong.MinValue;
 				case ObjectSerializer.TYPE_MAX: return ulong.MaxValue;
 				case ObjectSerializer.TYPE_NULL: return null;

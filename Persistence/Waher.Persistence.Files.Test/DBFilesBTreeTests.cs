@@ -189,6 +189,7 @@ namespace Waher.Persistence.FilesLW.Test
 				ch[i] = (char)gen.Next(32, 127);
 
 			Result.ShortString = new string(ch);
+			Result.CIString = Result.ShortString;
 
 			switch (gen.Next(4))
 			{

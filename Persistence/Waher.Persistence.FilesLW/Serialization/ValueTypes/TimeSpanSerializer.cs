@@ -43,7 +43,8 @@ namespace Waher.Persistence.Files.Serialization.ValueTypes
 			switch (DataType.Value)
 			{
 				case ObjectSerializer.TYPE_TIMESPAN: return Reader.ReadTimeSpan();
-				case ObjectSerializer.TYPE_STRING: return TimeSpan.Parse(Reader.ReadString());
+				case ObjectSerializer.TYPE_STRING:
+				case ObjectSerializer.TYPE_CI_STRING: return TimeSpan.Parse(Reader.ReadString());
 				case ObjectSerializer.TYPE_MIN: return TimeSpan.MinValue;
 				case ObjectSerializer.TYPE_MAX: return TimeSpan.MaxValue;
 				case ObjectSerializer.TYPE_NULL: return null;

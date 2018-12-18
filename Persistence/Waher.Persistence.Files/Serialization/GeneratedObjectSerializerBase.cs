@@ -121,7 +121,8 @@ namespace Waher.Persistence.Files.Serialization
 				case ObjectSerializer.TYPE_DECIMAL: return (byte)Reader.ReadDecimal();
 				case ObjectSerializer.TYPE_DOUBLE: return (byte)Reader.ReadDouble();
 				case ObjectSerializer.TYPE_SINGLE: return (byte)Reader.ReadSingle();
-				case ObjectSerializer.TYPE_STRING: return byte.Parse(Reader.ReadString());
+				case ObjectSerializer.TYPE_STRING:
+				case ObjectSerializer.TYPE_CI_STRING: return byte.Parse(Reader.ReadString());
 				default:
 					throw new ArgumentException("Expected a byte value, but was a " +
 						FilesProvider.GetFieldDataTypeName(FieldDataType) + ".", nameof(FieldDataType));
@@ -166,7 +167,8 @@ namespace Waher.Persistence.Files.Serialization
 				case ObjectSerializer.TYPE_DECIMAL: return (sbyte)Reader.ReadDecimal();
 				case ObjectSerializer.TYPE_DOUBLE: return (sbyte)Reader.ReadDouble();
 				case ObjectSerializer.TYPE_SINGLE: return (sbyte)Reader.ReadSingle();
-				case ObjectSerializer.TYPE_STRING: return sbyte.Parse(Reader.ReadString());
+				case ObjectSerializer.TYPE_STRING:
+				case ObjectSerializer.TYPE_CI_STRING: return sbyte.Parse(Reader.ReadString());
 				default:
 					throw new ArgumentException("Expected a signed byte value, but was a " +
 						FilesProvider.GetFieldDataTypeName(FieldDataType) + ".", nameof(FieldDataType));
@@ -211,7 +213,8 @@ namespace Waher.Persistence.Files.Serialization
 				case ObjectSerializer.TYPE_DECIMAL: return (short)Reader.ReadDecimal();
 				case ObjectSerializer.TYPE_DOUBLE: return (short)Reader.ReadDouble();
 				case ObjectSerializer.TYPE_SINGLE: return (short)Reader.ReadSingle();
-				case ObjectSerializer.TYPE_STRING: return short.Parse(Reader.ReadString());
+				case ObjectSerializer.TYPE_STRING:
+				case ObjectSerializer.TYPE_CI_STRING: return short.Parse(Reader.ReadString());
 				default:
 					throw new ArgumentException("Expected a 16-bit integer value, but was a " +
 						FilesProvider.GetFieldDataTypeName(FieldDataType) + ".", nameof(FieldDataType));
@@ -256,7 +259,8 @@ namespace Waher.Persistence.Files.Serialization
 				case ObjectSerializer.TYPE_DECIMAL: return (int)Reader.ReadDecimal();
 				case ObjectSerializer.TYPE_DOUBLE: return (int)Reader.ReadDouble();
 				case ObjectSerializer.TYPE_SINGLE: return (int)Reader.ReadSingle();
-				case ObjectSerializer.TYPE_STRING: return int.Parse(Reader.ReadString());
+				case ObjectSerializer.TYPE_STRING:
+				case ObjectSerializer.TYPE_CI_STRING: return int.Parse(Reader.ReadString());
 				default:
 					throw new ArgumentException("Expected a 32-bit integer value, but was a " +
 						FilesProvider.GetFieldDataTypeName(FieldDataType) + ".", nameof(FieldDataType));
@@ -317,7 +321,8 @@ namespace Waher.Persistence.Files.Serialization
 				case ObjectSerializer.TYPE_DECIMAL: return (long)Reader.ReadDecimal();
 				case ObjectSerializer.TYPE_DOUBLE: return (long)Reader.ReadDouble();
 				case ObjectSerializer.TYPE_SINGLE: return (long)Reader.ReadSingle();
-				case ObjectSerializer.TYPE_STRING: return long.Parse(Reader.ReadString());
+				case ObjectSerializer.TYPE_STRING:
+				case ObjectSerializer.TYPE_CI_STRING: return long.Parse(Reader.ReadString());
 				default:
 					throw new ArgumentException("Expected a 64-bit integer value, but was a " +
 						FilesProvider.GetFieldDataTypeName(FieldDataType) + ".", nameof(FieldDataType));
@@ -362,7 +367,8 @@ namespace Waher.Persistence.Files.Serialization
 				case ObjectSerializer.TYPE_DECIMAL: return (ushort)Reader.ReadDecimal();
 				case ObjectSerializer.TYPE_DOUBLE: return (ushort)Reader.ReadDouble();
 				case ObjectSerializer.TYPE_SINGLE: return (ushort)Reader.ReadSingle();
-				case ObjectSerializer.TYPE_STRING: return ushort.Parse(Reader.ReadString());
+				case ObjectSerializer.TYPE_STRING:
+				case ObjectSerializer.TYPE_CI_STRING: return ushort.Parse(Reader.ReadString());
 				default:
 					throw new ArgumentException("Expected a 16-bit unsigned integer value, but was a " +
 						FilesProvider.GetFieldDataTypeName(FieldDataType) + ".", nameof(FieldDataType));
@@ -407,7 +413,8 @@ namespace Waher.Persistence.Files.Serialization
 				case ObjectSerializer.TYPE_DECIMAL: return (uint)Reader.ReadDecimal();
 				case ObjectSerializer.TYPE_DOUBLE: return (uint)Reader.ReadDouble();
 				case ObjectSerializer.TYPE_SINGLE: return (uint)Reader.ReadSingle();
-				case ObjectSerializer.TYPE_STRING: return uint.Parse(Reader.ReadString());
+				case ObjectSerializer.TYPE_STRING:
+				case ObjectSerializer.TYPE_CI_STRING: return uint.Parse(Reader.ReadString());
 				default:
 					throw new ArgumentException("Expected a 32-bit unsigned integer value, but was a " +
 						FilesProvider.GetFieldDataTypeName(FieldDataType) + ".", nameof(FieldDataType));
@@ -452,7 +459,8 @@ namespace Waher.Persistence.Files.Serialization
 				case ObjectSerializer.TYPE_DECIMAL: return (ulong)Reader.ReadDecimal();
 				case ObjectSerializer.TYPE_DOUBLE: return (ulong)Reader.ReadDouble();
 				case ObjectSerializer.TYPE_SINGLE: return (ulong)Reader.ReadSingle();
-				case ObjectSerializer.TYPE_STRING: return ulong.Parse(Reader.ReadString());
+				case ObjectSerializer.TYPE_STRING:
+				case ObjectSerializer.TYPE_CI_STRING: return ulong.Parse(Reader.ReadString());
 				default:
 					throw new ArgumentException("Expected a 64-bit unsigned integer value, but was a " +
 						FilesProvider.GetFieldDataTypeName(FieldDataType) + ".", nameof(FieldDataType));
@@ -497,7 +505,8 @@ namespace Waher.Persistence.Files.Serialization
 				case ObjectSerializer.TYPE_DECIMAL: return Reader.ReadDecimal();
 				case ObjectSerializer.TYPE_DOUBLE: return (decimal)Reader.ReadDouble();
 				case ObjectSerializer.TYPE_SINGLE: return (decimal)Reader.ReadSingle();
-				case ObjectSerializer.TYPE_STRING: return decimal.Parse(Reader.ReadString());
+				case ObjectSerializer.TYPE_STRING:
+				case ObjectSerializer.TYPE_CI_STRING: return decimal.Parse(Reader.ReadString());
 				default:
 					throw new ArgumentException("Expected a decimal value, but was a " +
 						FilesProvider.GetFieldDataTypeName(FieldDataType) + ".", nameof(FieldDataType));
@@ -542,7 +551,8 @@ namespace Waher.Persistence.Files.Serialization
 				case ObjectSerializer.TYPE_DECIMAL: return (double)Reader.ReadDecimal();
 				case ObjectSerializer.TYPE_DOUBLE: return Reader.ReadDouble();
 				case ObjectSerializer.TYPE_SINGLE: return Reader.ReadSingle();
-				case ObjectSerializer.TYPE_STRING: return double.Parse(Reader.ReadString());
+				case ObjectSerializer.TYPE_STRING:
+				case ObjectSerializer.TYPE_CI_STRING: return double.Parse(Reader.ReadString());
 				default:
 					throw new ArgumentException("Expected a double value, but was a " +
 						FilesProvider.GetFieldDataTypeName(FieldDataType) + ".", nameof(FieldDataType));
@@ -587,7 +597,8 @@ namespace Waher.Persistence.Files.Serialization
 				case ObjectSerializer.TYPE_DECIMAL: return (float)Reader.ReadDecimal();
 				case ObjectSerializer.TYPE_DOUBLE: return (float)Reader.ReadDouble();
 				case ObjectSerializer.TYPE_SINGLE: return Reader.ReadSingle();
-				case ObjectSerializer.TYPE_STRING: return float.Parse(Reader.ReadString());
+				case ObjectSerializer.TYPE_STRING:
+				case ObjectSerializer.TYPE_CI_STRING: return float.Parse(Reader.ReadString());
 				default:
 					throw new ArgumentException("Expected a single value, but was a " +
 						FilesProvider.GetFieldDataTypeName(FieldDataType) + ".", nameof(FieldDataType));
@@ -635,6 +646,7 @@ namespace Waher.Persistence.Files.Serialization
 				case ObjectSerializer.TYPE_SINGLE: return (char)Reader.ReadSingle();
 
 				case ObjectSerializer.TYPE_STRING:
+				case ObjectSerializer.TYPE_CI_STRING:
 					string s = Reader.ReadString();
 					if (string.IsNullOrEmpty(s))
 						return (char)0;
@@ -675,7 +687,8 @@ namespace Waher.Persistence.Files.Serialization
 			{
 				case ObjectSerializer.TYPE_DATETIME: return Reader.ReadDateTime();
 				case ObjectSerializer.TYPE_DATETIMEOFFSET: return Reader.ReadDateTimeOffset().DateTime;
-				case ObjectSerializer.TYPE_STRING: return DateTime.Parse(Reader.ReadString());
+				case ObjectSerializer.TYPE_STRING:
+				case ObjectSerializer.TYPE_CI_STRING: return DateTime.Parse(Reader.ReadString());
 
 				default:
 					throw new ArgumentException("Expected a date & time value, but was a " +
@@ -711,7 +724,8 @@ namespace Waher.Persistence.Files.Serialization
 			{
 				case ObjectSerializer.TYPE_DATETIME: return (DateTimeOffset)Reader.ReadDateTime();
 				case ObjectSerializer.TYPE_DATETIMEOFFSET: return Reader.ReadDateTimeOffset();
-				case ObjectSerializer.TYPE_STRING: return DateTimeOffset.Parse(Reader.ReadString());
+				case ObjectSerializer.TYPE_STRING:
+				case ObjectSerializer.TYPE_CI_STRING: return DateTimeOffset.Parse(Reader.ReadString());
 
 				default:
 					throw new ArgumentException("Expected a date & time value with offset, but was a " +
@@ -746,7 +760,8 @@ namespace Waher.Persistence.Files.Serialization
 			switch (FieldDataType)
 			{
 				case ObjectSerializer.TYPE_TIMESPAN: return Reader.ReadTimeSpan();
-				case ObjectSerializer.TYPE_STRING: return TimeSpan.Parse(Reader.ReadString());
+				case ObjectSerializer.TYPE_STRING:
+				case ObjectSerializer.TYPE_CI_STRING: return TimeSpan.Parse(Reader.ReadString());
 
 				default:
 					throw new ArgumentException("Expected a time span value, but was a " +
@@ -781,7 +796,8 @@ namespace Waher.Persistence.Files.Serialization
 			switch (FieldDataType)
 			{
 				case ObjectSerializer.TYPE_GUID: return Reader.ReadGuid();
-				case ObjectSerializer.TYPE_STRING: return Guid.Parse(Reader.ReadString());
+				case ObjectSerializer.TYPE_STRING:
+				case ObjectSerializer.TYPE_CI_STRING: return Guid.Parse(Reader.ReadString());
 
 				default:
 					throw new ArgumentException("Expected a GUID value, but was a " +
@@ -815,7 +831,8 @@ namespace Waher.Persistence.Files.Serialization
 		{
 			switch (FieldDataType)
 			{
-				case ObjectSerializer.TYPE_STRING: return Reader.ReadString();
+				case ObjectSerializer.TYPE_STRING:
+				case ObjectSerializer.TYPE_CI_STRING: return Reader.ReadString();
 				case ObjectSerializer.TYPE_ENUM: return Reader.ReadString();
 				case ObjectSerializer.TYPE_NULL: return null;
 				case ObjectSerializer.TYPE_CHAR: return new string(Reader.ReadChar(), 1);

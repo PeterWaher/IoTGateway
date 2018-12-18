@@ -12,7 +12,9 @@ namespace Waher.Persistence.Files.Searching
 	/// </summary>
 	public class FilterFieldLikeRegEx : F.FilterFieldLikeRegEx, IApplicableFilter
 	{
-		private readonly Regex regex;
+		private Regex regexCs = null;
+		private Regex regexCi = null;
+		private readonly string expression;
 
 		/// <summary>
 		/// This filter selects objects that have a named field matching a given regular expression.
@@ -22,7 +24,7 @@ namespace Waher.Persistence.Files.Searching
 		public FilterFieldLikeRegEx(string FieldName, string RegularExpression)
 			: base(FieldName, RegularExpression)
 		{
-			this.regex = new Regex(RegularExpression, RegexOptions.Singleline);
+			this.expression = expression;
 		}
 
 		/// <summary>
@@ -57,8 +59,36 @@ namespace Waher.Persistence.Files.Searching
 					return false;
 			}
 
-			string s = Value.ToString();
-			Match M = this.regex.Match(s);
+			Match M;
+
+			if (Value is string s)
+			{
+				if (this.regexCs == null)
+					this.regexCs = new Regex(RegularExpression, RegexOptions.Singleline);
+
+				M = this.regexCs.Match(s);
+			}
+			else if (Value is CaseInsensitiveString cis)
+			{
+				if (this.regexCi == null)
+					this.regexCi = new Regex(RegularExpression, RegexOptions.Singleline | RegexOptions.IgnoreCase);
+
+				M = this.regexCi.Match(s = cis.Value);
+			}
+			else
+			{
+				s = Value.ToString();
+
+				if (this.regexCs != null)
+					M = this.regexCs.Match(s);
+				else if (this.regexCi != null)
+					M = this.regexCi.Match(s);
+				else
+				{
+					this.regexCs = new Regex(RegularExpression, RegexOptions.Singleline);
+					M = this.regexCs.Match(s);
+				}
+			}
 
 			return M.Success && M.Index == 0 && M.Length == s.Length;
 		}
@@ -71,7 +101,18 @@ namespace Waher.Persistence.Files.Searching
 		/// </summary>
 		public Regex Regex
 		{
-			get { return this.regex; }
+			get
+			{
+				if (this.regexCs != null)
+					return this.regexCs;
+				else if (this.regexCi != null)
+					return this.regexCi;
+				else
+				{
+					this.regexCs = new Regex(RegularExpression, RegexOptions.Singleline);
+					return this.regexCs;
+				}
+			}
 		}
 	}
 }

@@ -54,7 +54,8 @@ namespace Waher.Persistence.Files.Serialization.NullableTypes
 				case ObjectSerializer.TYPE_DECIMAL: return (ushort?)Reader.ReadDecimal();
 				case ObjectSerializer.TYPE_DOUBLE: return (ushort?)Reader.ReadDouble();
 				case ObjectSerializer.TYPE_SINGLE: return (ushort?)Reader.ReadSingle();
-				case ObjectSerializer.TYPE_STRING: return (ushort?)ushort.Parse(Reader.ReadString());
+				case ObjectSerializer.TYPE_STRING:
+				case ObjectSerializer.TYPE_CI_STRING: return (ushort?)ushort.Parse(Reader.ReadString());
 				case ObjectSerializer.TYPE_MIN: return ushort.MinValue;
 				case ObjectSerializer.TYPE_MAX: return ushort.MaxValue;
 				case ObjectSerializer.TYPE_NULL: return null;

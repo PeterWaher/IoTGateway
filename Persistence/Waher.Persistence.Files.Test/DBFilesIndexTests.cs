@@ -32,6 +32,7 @@ namespace Waher.Persistence.FilesLW.Test
 		protected ObjectBTreeFile file;
 		protected IndexBTreeFile index1;
 		protected IndexBTreeFile index2;
+		protected IndexBTreeFile index3;
 		protected FilesProvider provider;
 		protected Random gen = new Random();
 		protected DateTime start;
@@ -51,6 +52,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 			this.index1 = await this.provider.GetIndexFile(this.file, RegenerationOptions.DontRegenerate, "Byte", "-DateTime");
 			this.index2 = await this.provider.GetIndexFile(this.file, RegenerationOptions.DontRegenerate, "ShortString");
+			this.index3 = await this.provider.GetIndexFile(this.file, RegenerationOptions.DontRegenerate, "CIString");
 
 			this.start = DateTime.Now;
 		}
@@ -124,6 +126,11 @@ namespace Waher.Persistence.FilesLW.Test
 			return ((IComparable)Obj1["ShortString"]).CompareTo(Obj2["ShortString"]);
 		}
 
+		private int Index3Compare(GenericObject Obj1, GenericObject Obj2)
+		{
+			return ((IComparable)Obj1["CIString"]).CompareTo(Obj2["CIString"]);
+		}
+
 		[TestMethod]
 		public async Task DBFiles_Index_Test_02_TypedEnumeration()
 		{
@@ -192,6 +199,11 @@ namespace Waher.Persistence.FilesLW.Test
 		private int Index2Compare(Simple Obj1, Simple Obj2)
 		{
 			return Obj1.ShortString.CompareTo(Obj2.ShortString);
+		}
+
+		private int Index3Compare(Simple Obj1, Simple Obj2)
+		{
+			return Obj1.CIString.CompareTo(Obj2.CIString);
 		}
 
 		[TestMethod]
@@ -1563,6 +1575,263 @@ namespace Waher.Persistence.FilesLW.Test
 				foreach (Simple Obj2 in Objects2.Values)
 					AssertEx.Greater(Obj2.Byte, 10);
 			}
+		}
+
+		[TestMethod]
+		public async Task DBFiles_Index_Test_53_Search_FilterLikeRegEx_CaseInsensitive()
+		{
+			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
+
+			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterFieldLikeRegEx("CIString", "A.*B.*"), true))
+			{
+				Simple Obj;
+
+				while (await Cursor.MoveNextAsync())
+				{
+					Obj = Cursor.Current;
+					Assert.IsNotNull(Obj);
+					Assert.IsTrue(Obj.CIString.StartsWith("A"));
+					Assert.IsTrue(Obj.CIString.Contains("B"));
+					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
+				}
+
+				foreach (Simple Obj2 in Objects.Values)
+					Assert.IsFalse(Obj2.CIString.StartsWith("A") && Obj2.CIString.Contains("B"));
+			}
+		}
+
+		[TestMethod]
+		public async Task DBFiles_Index_Test_54_Search_FilterLikeRegEx_2_CaseInsensitive()
+		{
+			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
+
+			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterFieldLikeRegEx("CIString", "[AB].*"), true))
+			{
+				Simple Obj;
+
+				while (await Cursor.MoveNextAsync())
+				{
+					Obj = Cursor.Current;
+					Assert.IsNotNull(Obj);
+					Assert.IsTrue(Obj.CIString.StartsWith("A") || Obj.CIString.StartsWith("B"));
+					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
+				}
+
+				foreach (Simple Obj2 in Objects.Values)
+					Assert.IsFalse(Obj2.CIString.StartsWith("A") || Obj2.CIString.StartsWith("B"));
+			}
+		}
+
+		[TestMethod]
+		public async Task DBFiles_Index_Test_55_Search_FilterNot_LikeRegEx_CaseInsensitive()
+		{
+			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
+
+			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue,
+				new FilterNot(new FilterFieldLikeRegEx("CIString", "A.*B.*")), true))
+			{
+				Simple Obj;
+
+				while (await Cursor.MoveNextAsync())
+				{
+					Obj = Cursor.Current;
+					Assert.IsNotNull(Obj);
+					Assert.IsFalse(Obj.CIString.StartsWith("A") && Obj.CIString.Contains("B"));
+					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
+				}
+
+				foreach (Simple Obj2 in Objects.Values)
+					Assert.IsTrue(Obj2.CIString.StartsWith("A") && Obj2.CIString.Contains("B"));
+			}
+		}
+
+		[TestMethod]
+		public async Task DBFiles_Index_Test_56_Search_FilterNot_LikeRegEx_2_CaseInsensitive()
+		{
+			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
+
+			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterNot(new FilterFieldLikeRegEx("CIString", "[AB].*")), true))
+			{
+				Simple Obj;
+
+				while (await Cursor.MoveNextAsync())
+				{
+					Obj = Cursor.Current;
+					Assert.IsNotNull(Obj);
+					Assert.IsFalse(Obj.CIString.StartsWith("A") || Obj.CIString.StartsWith("B"));
+					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
+				}
+
+				foreach (Simple Obj2 in Objects.Values)
+					Assert.IsTrue(Obj2.CIString.StartsWith("A") || Obj2.CIString.StartsWith("B"));
+			}
+		}
+
+		[TestMethod]
+		public async Task DBFiles_Index_Test_57_Search_FilterOr_CaseInsensitive()
+		{
+			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
+
+			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterOr(
+				new FilterFieldEqualTo("Byte", 100),
+				new FilterFieldEqualTo("Byte", 200),
+				new FilterFieldLikeRegEx("CIString", "A.*")), true))
+			{
+				Simple Obj;
+
+				while (await Cursor.MoveNextAsync())
+				{
+					Obj = Cursor.Current;
+					Assert.IsNotNull(Obj);
+					Assert.IsTrue(Obj.Byte == 100 || Obj.Byte == 200 || Obj.CIString.StartsWith("A"));
+					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
+				}
+
+				foreach (Simple Obj2 in Objects.Values)
+					Assert.IsFalse(Obj2.Byte == 100 || Obj2.Byte == 200 || Obj2.CIString.StartsWith("A"));
+			}
+		}
+
+		[TestMethod]
+		public async Task DBFiles_Index_Test_58_Search_TwoRanges_Open_AdditionalFilter_CaseInsensitive()
+		{
+			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
+			Simple Obj;
+			bool b;
+
+			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterAnd(
+				new FilterFieldGreaterThan("Byte", 100),
+				new FilterFieldLesserThan("Byte", 200),
+				new FilterFieldGreaterThan("DateTime", MinDT),
+				new FilterFieldLesserThan("DateTime", MaxDT),
+				new FilterFieldLikeRegEx("CIString", "[A-Z].*")), true))
+			{
+				while (await Cursor.MoveNextAsync())
+				{
+					Obj = Cursor.Current;
+					Assert.IsNotNull(Obj);
+					AssertEx.Greater(Obj.Byte, 100);
+					AssertEx.Less(Obj.Byte, 200);
+					AssertEx.Greater(Obj.DateTime, MinDT);
+					AssertEx.Less(Obj.DateTime, MaxDT);
+					Assert.IsTrue(Obj.CIString[0] >= 'A' && Obj.CIString[0] <= 'Z');
+					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
+				}
+
+				foreach (Simple Obj2 in Objects.Values)
+				{
+					b = Obj2.Byte <= 100 || Obj2.Byte >= 200 || Obj2.DateTime <= MinDT || Obj2.DateTime >= MaxDT || Obj2.CIString[0] < 'A' || Obj2.CIString[0] > 'Z';
+					Assert.IsTrue(b);
+				}
+			}
+		}
+
+		[TestMethod]
+		public async Task DBFiles_Index_Test_59_Search_Or_AvoidMultipleFullFileScans_CaseInsensitive()
+		{
+			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
+			FileStatistics StatBefore = (await this.file.ComputeStatistics()).Key;
+
+			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterOr(
+				new FilterFieldLikeRegEx("CIString", "[AB].*"),
+				new FilterFieldLikeRegEx("CIString", "[XY].*")), true))
+			{
+				Simple Obj;
+
+				while (await Cursor.MoveNextAsync())
+				{
+					Obj = Cursor.Current;
+					Assert.IsNotNull(Obj);
+					Assert.IsTrue("ABXY".IndexOf(Obj.CIString[0]) >= 0);
+					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
+				}
+
+				foreach (Simple Obj2 in Objects.Values)
+					Assert.IsFalse("ABXY".IndexOf(Obj2.CIString[0]) >= 0);
+			}
+
+			FileStatistics StatAfter = (await this.file.ComputeStatistics()).Key;
+			ulong NrFullFileScans = StatAfter.NrFullFileScans - StatBefore.NrFullFileScans;
+			AssertEx.Same(1, NrFullFileScans);
+		}
+
+		[TestMethod]
+		public async Task DBFiles_Index_Test_60_Search_SortOrder_CaseInsensitive()
+		{
+			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
+			Simple Prev = null;
+			Simple Obj;
+			bool b;
+
+			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterAnd(
+				new FilterFieldGreaterThan("DateTime", MinDT),
+				new FilterFieldLesserThan("DateTime", MaxDT),
+				new FilterOr(
+					new FilterFieldGreaterThan("Byte", 200),
+					new FilterFieldLesserThan("Byte", 100))), true, "SByte", "CIString"))
+			{
+				while (await Cursor.MoveNextAsync())
+				{
+					Obj = Cursor.Current;
+					Assert.IsNotNull(Obj);
+					Assert.IsTrue(Obj.Byte < 100 || Obj.Byte > 200);
+					AssertEx.Greater(Obj.DateTime, MinDT);
+					AssertEx.Less(Obj.DateTime, MaxDT);
+					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
+
+					if (Prev != null)
+					{
+						Assert.IsTrue(Prev.SByte < Obj.SByte ||
+							(Prev.SByte == Obj.SByte && string.Compare(Prev.CIString, Obj.CIString) <= 0));
+					}
+
+					Prev = Obj;
+				}
+
+				foreach (Simple Obj2 in Objects.Values)
+				{
+					b = Obj2.DateTime <= MinDT || Obj2.DateTime >= MaxDT || (Obj2.Byte >= 100 && Obj2.Byte <= 200);
+					Assert.IsTrue(b);
+				}
+			}
+		}
+
+		[TestMethod]
+		public async Task DBFiles_Index_Test_61_Search_Paging_CaseInsensitive()
+		{
+			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
+			List<Simple> Ordered = new List<Simple>();
+			int i;
+
+			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterAnd(
+				new FilterFieldGreaterThan("DateTime", MinDT),
+				new FilterFieldLesserThan("DateTime", MaxDT),
+				new FilterOr(
+					new FilterFieldGreaterThan("Byte", 200),
+					new FilterFieldLesserThan("Byte", 100))), true, "SByte", "CIString"))
+			{
+				while (await Cursor.MoveNextAsync())
+				{
+					Ordered.Add(Cursor.Current);
+				}
+			}
+
+			i = 20;
+
+			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(20, 10, new FilterAnd(
+				new FilterFieldGreaterThan("DateTime", MinDT),
+				new FilterFieldLesserThan("DateTime", MaxDT),
+				new FilterOr(
+					new FilterFieldGreaterThan("Byte", 200),
+					new FilterFieldLesserThan("Byte", 100))), true, "SByte", "CIString"))
+			{
+				while (await Cursor.MoveNextAsync())
+				{
+					DBFilesObjectSerializationTests.AssertEqual(Ordered[i++], Cursor.Current);
+				}
+			}
+
+			AssertEx.LessOrEqual(i, 40);
 		}
 
 	}

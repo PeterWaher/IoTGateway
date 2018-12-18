@@ -80,7 +80,8 @@ namespace Waher.Persistence.Files.Serialization.NullableTypes
 				case ObjectSerializer.TYPE_DECIMAL: return this.ToNullable(Enum.ToObject(this.enumType, Reader.ReadDecimal()));
 				case ObjectSerializer.TYPE_DOUBLE: return this.ToNullable(Enum.ToObject(this.enumType, Reader.ReadDouble()));
 				case ObjectSerializer.TYPE_SINGLE: return this.ToNullable(Enum.ToObject(this.enumType, Reader.ReadSingle()));
-				case ObjectSerializer.TYPE_STRING: return this.ToNullable(Enum.Parse(this.enumType, Reader.ReadString()));
+				case ObjectSerializer.TYPE_STRING:
+				case ObjectSerializer.TYPE_CI_STRING: return this.ToNullable(Enum.Parse(this.enumType, Reader.ReadString()));
 				case ObjectSerializer.TYPE_ENUM: return this.ToNullable(Reader.ReadEnum(this.enumType));
 				case ObjectSerializer.TYPE_NULL: return null;
 				default: throw new Exception("Expected an enum value.");

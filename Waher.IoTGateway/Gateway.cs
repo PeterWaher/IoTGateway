@@ -141,8 +141,8 @@ namespace Waher.IoTGateway
 		private static Semaphore gatewayRunning = null;
 		private static Emoji1LocalFiles emoji1_24x24 = null;
 		private static StreamWriter exceptionFile = null;
-		private static string domain = null;
-		private static string ownerJid = null;
+		private static CaseInsensitiveString domain = null;
+		private static CaseInsensitiveString ownerJid = null;
 		private static string appDataFolder;
 		private static string runtimeFolder;
 		private static string rootFolder;
@@ -1288,7 +1288,7 @@ namespace Waher.IoTGateway
 		/// <summary>
 		/// Domain name.
 		/// </summary>
-		public static string Domain
+		public static CaseInsensitiveString Domain
 		{
 			get { return domain; }
 		}

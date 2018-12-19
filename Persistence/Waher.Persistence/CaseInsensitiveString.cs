@@ -274,6 +274,30 @@ namespace Waher.Persistence
 		}
 
 		/// <summary>
+		/// Addition operator
+		/// </summary>
+		public static CaseInsensitiveString operator +(CaseInsensitiveString S1, CaseInsensitiveString S2)
+		{
+			return new CaseInsensitiveString(S1.value + S2.value);
+		}
+
+		/// <summary>
+		/// Addition operator
+		/// </summary>
+		public static string operator +(CaseInsensitiveString S1, string S2)
+		{
+			return S1.value + S2;
+		}
+
+		/// <summary>
+		/// Addition operator
+		/// </summary>
+		public static string operator +(string S1, CaseInsensitiveString S2)
+		{
+			return S1 + S2.value;
+		}
+
+		/// <summary>
 		/// Empty case-insensitive string
 		/// </summary>
 		public static readonly CaseInsensitiveString Empty = new CaseInsensitiveString(string.Empty);
@@ -1065,18 +1089,7 @@ namespace Waher.Persistence
 		/// </exception>
 		public static CaseInsensitiveString Join(CaseInsensitiveString separator, params CaseInsensitiveString[] value)
 		{
-			return new CaseInsensitiveString(string.Join(separator.value, ToStringArray(value)));
-		}
-
-		private static string[] ToStringArray(CaseInsensitiveString[] A)
-		{
-			int i, c = A.Length;
-			string[] B = new string[c];
-
-			for (i = 0; i < c; i++)
-				B[i] = A[i].value;
-
-			return B;
+			return new CaseInsensitiveString(string.Join(separator.value, value.ToStringArray()));
 		}
 
 		/// <summary>
@@ -1139,7 +1152,7 @@ namespace Waher.Persistence
 		/// </exception>
 		public static CaseInsensitiveString Join(CaseInsensitiveString separator, CaseInsensitiveString[] value, int startIndex, int count)
 		{
-			return new CaseInsensitiveString(string.Join(separator.value, ToStringArray(value), startIndex, count));
+			return new CaseInsensitiveString(string.Join(separator.value, value.ToStringArray(), startIndex, count));
 		}
 
 		/// <summary>

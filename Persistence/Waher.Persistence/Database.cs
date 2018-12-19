@@ -360,5 +360,37 @@ namespace Waher.Persistence
 			return Provider.EndBulk();
 		}
 
+		/// <summary>
+		/// Converts a case insensitive string array to a normal string array.
+		/// </summary>
+		/// <param name="A">Case insensitive string array-</param>
+		/// <returns>Normal string array.</returns>
+		public static string[] ToStringArray(this CaseInsensitiveString[] A)
+		{
+			int i, c = A.Length;
+			string[] B = new string[c];
+
+			for (i = 0; i < c; i++)
+				B[i] = A[i].Value;
+
+			return B;
+		}
+
+		/// <summary>
+		/// Converts a case insensitive string array to a normal string array.
+		/// </summary>
+		/// <param name="A">Case insensitive string array-</param>
+		/// <returns>Normal string array.</returns>
+		public static CaseInsensitiveString[] ToCaseInsensitiveStringArray(this string[] A)
+		{
+			int i, c = A.Length;
+			CaseInsensitiveString[] B = new CaseInsensitiveString[c];
+
+			for (i = 0; i < c; i++)
+				B[i] = A[i];
+
+			return B;
+		}
+
 	}
 }

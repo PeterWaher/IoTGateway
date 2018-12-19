@@ -93,11 +93,8 @@ namespace Waher.Client.WPF.Controls.Chat
 			if (!Message.EndsWith("\n"))
 				this.building.Append(Environment.NewLine);
 
-			if (this.timer != null)
-			{
-				this.timer.Dispose();
-				this.timer = null;
-			}
+			this.timer?.Dispose();
+			this.timer = null;
 
 			this.timer = new Timer(this.Refresh, new object[] { ChatListView, MainWindow }, 1000, Timeout.Infinite);
 		}
@@ -106,11 +103,8 @@ namespace Waher.Client.WPF.Controls.Chat
 		{
 			try
 			{
-				if (this.timer != null)
-				{
-					this.timer.Dispose();
-					this.timer = null;
-				}
+				this.timer?.Dispose();
+				this.timer = null;
 
 				object[] P2 = (object[])P;
 				ListView ChatListView = (ListView)P2[0];

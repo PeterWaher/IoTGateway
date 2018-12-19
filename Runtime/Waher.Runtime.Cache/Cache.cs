@@ -45,11 +45,8 @@ namespace Waher.Runtime.Cache
 		/// </summary>
 		public void Dispose()
 		{
-			if (this.timer != null)
-			{
-				this.timer.Dispose();
-				this.timer = null;
-			}
+			this.timer?.Dispose();
+			this.timer = null;
 
 			this.Clear();
 		}
@@ -197,7 +194,7 @@ namespace Waher.Runtime.Cache
 		{
 			get
 			{
-				lock(this.synchObject)
+				lock (this.synchObject)
 				{
 					return this.valuesByKey.Count;
 				}

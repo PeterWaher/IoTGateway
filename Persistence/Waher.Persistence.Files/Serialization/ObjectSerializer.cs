@@ -1356,7 +1356,7 @@ namespace Waher.Persistence.Files.Serialization
 					if (HasDefaultValue)
 					{
 						if (DefaultValue is null)
-							CSharp.AppendLine("\t\t\tif (((object)Value." + Member.Name + ") != (" + MemberType.FullName + ")null)");
+							CSharp.AppendLine("\t\t\tif (!((object)Value." + Member.Name + " is null))");
 						else
 							CSharp.AppendLine("\t\t\tif (!default" + Member.Name + ".Equals(Value." + Member.Name + "))");
 
@@ -1711,7 +1711,7 @@ namespace Waher.Persistence.Files.Serialization
 									else if (ByReference)
 									{
 										CSharp.Append(Indent2);
-										CSharp.AppendLine("if (Value." + Member.Name + " == (" + MemberType.FullName + ")null)");
+										CSharp.AppendLine("if (Value." + Member.Name + " is null)");
 										CSharp.Append(Indent2);
 										CSharp.AppendLine("\tWriter.WriteBits(" + TYPE_NULL + ", 6);");
 										CSharp.Append(Indent2);
@@ -1780,7 +1780,7 @@ namespace Waher.Persistence.Files.Serialization
 										CSharp.Append(Indent2);
 										CSharp.Append("if (Value.");
 										CSharp.Append(Member.Name);
-										CSharp.AppendLine(" == (" + MemberType.FullName + ")null)");
+										CSharp.AppendLine(" is null)");
 
 										CSharp.Append(Indent2);
 										CSharp.Append("\tWriter.WriteBits(");

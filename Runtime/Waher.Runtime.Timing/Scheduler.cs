@@ -43,11 +43,8 @@ namespace Waher.Runtime.Timing
 			{
 				this.disposed = true;
 
-				if (this.timer != null)
-				{
-					this.timer.Dispose();
-					this.timer = null;
-				}
+				this.timer?.Dispose();
+				this.timer = null;
 
 				this.events.Clear();
 			}
@@ -76,11 +73,8 @@ namespace Waher.Runtime.Timing
 
 		private void RecalcTimerLocked()
 		{
-			if (this.timer != null)
-			{
-				this.timer.Dispose();
-				this.timer = null;
-			}
+			this.timer?.Dispose();
+			this.timer = null;
 
 			LinkedList<DateTime> ToRemove = null;
 			DateTime Now = DateTime.Now;

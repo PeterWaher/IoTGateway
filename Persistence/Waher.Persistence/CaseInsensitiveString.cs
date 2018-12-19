@@ -25,12 +25,12 @@ namespace Waher.Persistence
 		/// <summary>
 		/// String-representation of the case-insensitive string. (Representation is case sensitive.)
 		/// </summary>
-		public string Value => this.value;
+		public string Value => this?.value;
 
 		/// <summary>
 		/// Lower-case representation of the case-insensitive string.
 		/// </summary>
-		public string LowerCase => this.lowerCase;
+		public string LowerCase => this?.lowerCase;
 
 		/// <summary>
 		/// <see cref="Object.ToString"/>
@@ -1003,7 +1003,7 @@ namespace Waher.Persistence
 		/// </returns>
 		public static bool IsNullOrEmpty(CaseInsensitiveString value)
 		{
-			return string.IsNullOrEmpty(value.value);
+			return string.IsNullOrEmpty(value?.value);
 		}
 
 		/// <summary>
@@ -1019,7 +1019,7 @@ namespace Waher.Persistence
 		/// </returns>
 		public static bool IsNullOrWhiteSpace(CaseInsensitiveString value)
 		{
-			return string.IsNullOrWhiteSpace(value.value);
+			return string.IsNullOrWhiteSpace(value?.value);
 		}
 
 		/// <summary>

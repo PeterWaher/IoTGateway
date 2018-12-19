@@ -187,7 +187,7 @@ namespace Waher.Runtime.Language
 		public async Task<string> GetStringAsync(Type Type, int Id, string Default)
 		{
 			Namespace Namespace = await this.GetNamespaceAsync(Type.Namespace);
-			if (Namespace == null)
+			if (Namespace is null)
 				Namespace = await this.CreateNamespaceAsync(Type.Namespace);
 
 			return await Namespace.GetStringAsync(Id, Default);

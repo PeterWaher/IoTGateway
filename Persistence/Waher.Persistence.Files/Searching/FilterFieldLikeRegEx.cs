@@ -24,7 +24,7 @@ namespace Waher.Persistence.Files.Searching
 		public FilterFieldLikeRegEx(string FieldName, string RegularExpression)
 			: base(FieldName, RegularExpression)
 		{
-			this.expression = expression;
+			this.expression = RegularExpression;
 		}
 
 		/// <summary>
@@ -63,14 +63,14 @@ namespace Waher.Persistence.Files.Searching
 
 			if (Value is string s)
 			{
-				if (this.regexCs == null)
+				if (this.regexCs is null)
 					this.regexCs = new Regex(RegularExpression, RegexOptions.Singleline);
 
 				M = this.regexCs.Match(s);
 			}
 			else if (Value is CaseInsensitiveString cis)
 			{
-				if (this.regexCi == null)
+				if (this.regexCi is null)
 					this.regexCi = new Regex(RegularExpression, RegexOptions.Singleline | RegexOptions.IgnoreCase);
 
 				M = this.regexCi.Match(s = cis.Value);

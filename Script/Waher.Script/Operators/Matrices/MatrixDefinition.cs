@@ -58,7 +58,7 @@ namespace Waher.Script.Operators.Matrices
             {
                 Vector = Row as IVectorSpaceElement;
 
-                if (Vector == null)
+                if (Vector is null)
                 {
                     Columns = -1;
                     break;
@@ -106,18 +106,18 @@ namespace Waher.Script.Operators.Matrices
 
             foreach (IElement Element in Elements)
             {
-                if (CommonSuperSet == null)
+                if (CommonSuperSet is null)
                 {
                     SuperSetExample = Element;
 
-                    if (Element == null)
+                    if (Element is null)
                         CommonSuperSet = new ObjectValues();
                     else
                         CommonSuperSet = Element.AssociatedSet;
                 }
                 else
                 {
-                    if (Element == null)
+                    if (Element is null)
                         Set = new ObjectValues();
                     else
                         Set = Element.AssociatedSet;
@@ -144,7 +144,7 @@ namespace Waher.Script.Operators.Matrices
 
                     foreach (IElement Element in Elements)
                     {
-                        if (Element == null)
+                        if (Element is null)
                             Set = new ObjectValues();
                         else
                             Set = Element.AssociatedSet;
@@ -194,7 +194,7 @@ namespace Waher.Script.Operators.Matrices
             IMatrix Matrix = CheckAgainst as IMatrix;
             int c = Elements.Length;
 
-            if (Matrix == null || Matrix.Rows != c)
+            if (Matrix is null || Matrix.Rows != c)
                 throw new ScriptRuntimeException("Pattern mismatch.", this);
 
             IVector RowVectors = Matrix as IVector;

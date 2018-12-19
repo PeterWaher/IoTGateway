@@ -145,7 +145,7 @@ namespace Waher.Content.Markdown
 								}
 							}
 
-							if (s2 == null)
+							if (s2 is null)
 								break;
 						}
 						else
@@ -509,7 +509,7 @@ namespace Waher.Content.Markdown
 					int NrColumns = Block.Rows[0].Split(whiteSpace, StringSplitOptions.RemoveEmptyEntries).Length;
 					HasSections = true;
 
-					if (Elements.First == null)
+					if (Elements.First is null)
 						InitialNrColumns = NrColumns;
 					else
 						Elements.AddLast(new SectionSeparator(this, ++SectionNr, NrColumns));
@@ -531,7 +531,7 @@ namespace Waher.Content.Markdown
 						s = Block.Rows[d];
 						if (IsPrefixedBy(s, s2, true))
 						{
-							if (Segments == null)
+							if (Segments is null)
 								Segments = new LinkedList<Block>();
 
 							Segments.AddLast(new Block(Block.Rows, Block.Positions, 0, i, d - 1));
@@ -542,7 +542,7 @@ namespace Waher.Content.Markdown
 					if (Segments != null)
 						Segments.AddLast(new Block(Block.Rows, Block.Positions, 0, i, c));
 
-					if (Segments == null)
+					if (Segments is null)
 					{
 						LinkedList<MarkdownElement> Items = this.ParseBlocks(Block.RemovePrefix(s2, 4));
 
@@ -598,7 +598,7 @@ namespace Waher.Content.Markdown
 						s = Block.Rows[d];
 						if (IsPrefixedBy(s, "#.", true))
 						{
-							if (Segments == null)
+							if (Segments is null)
 								Segments = new LinkedList<Block>();
 
 							Segments.AddLast(new Block(Block.Rows, Block.Positions, 0, i, d - 1));
@@ -609,7 +609,7 @@ namespace Waher.Content.Markdown
 					if (Segments != null)
 						Segments.AddLast(new Block(Block.Rows, Block.Positions, 0, i, c));
 
-					if (Segments == null)
+					if (Segments is null)
 					{
 						LinkedList<MarkdownElement> Items = this.ParseBlocks(Block.RemovePrefix("#.", 4));
 
@@ -666,7 +666,7 @@ namespace Waher.Content.Markdown
 						s = Block.Rows[d];
 						if (IsPrefixedBy(s, s3 = "[ ]", true) || IsPrefixedBy(s, s3 = "[x]", true) || IsPrefixedBy(s, s3 = "[X]", true))
 						{
-							if (Segments == null)
+							if (Segments is null)
 								Segments = new LinkedList<KeyValuePair<Block, string>>();
 
 							Segments.AddLast(new KeyValuePair<Block, string>(new Block(Block.Rows, Block.Positions, 0, i, d - 1), s2));
@@ -678,7 +678,7 @@ namespace Waher.Content.Markdown
 					if (Segments != null)
 						Segments.AddLast(new KeyValuePair<Block, string>(new Block(Block.Rows, Block.Positions, 0, i, c), s2));
 
-					if (Segments == null)
+					if (Segments is null)
 					{
 						LinkedList<MarkdownElement> Items = this.ParseBlocks(Block.RemovePrefix(s2, 4));
 
@@ -734,7 +734,7 @@ namespace Waher.Content.Markdown
 						s = Block.Rows[d];
 						if (IsPrefixedByNumber(s, out j))
 						{
-							if (Segments == null)
+							if (Segments is null)
 								Segments = new LinkedList<KeyValuePair<int, Block>>();
 
 							Segments.AddLast(new KeyValuePair<int, Block>(Index, new Block(Block.Rows, Block.Positions, 0, i, d - 1)));
@@ -746,7 +746,7 @@ namespace Waher.Content.Markdown
 					if (Segments != null)
 						Segments.AddLast(new KeyValuePair<int, Block>(Index, new Block(Block.Rows, Block.Positions, 0, i, c)));
 
-					if (Segments == null)
+					if (Segments is null)
 					{
 						s = Index.ToString();
 						LinkedList<MarkdownElement> Items = this.ParseBlocks(Block.RemovePrefix(s + ".", Math.Max(4, s.Length + 2)));
@@ -813,13 +813,13 @@ namespace Waher.Content.Markdown
 						for (i = 0; i < c; i++)
 						{
 							s = Row[i];
-							if (s == null)
+							if (s is null)
 								Headers[j][i] = null;
 							else
 							{
 								CellElements = this.ParseBlock(new string[] { Row[i] }, new int[] { Positions[i] });
 
-								if (CellElements.First != null && CellElements.First.Next == null)
+								if (CellElements.First != null && CellElements.First.Next is null)
 									Headers[j][i] = CellElements.First.Value;
 								else
 									Headers[j][i] = new NestedBlock(this, CellElements);
@@ -837,13 +837,13 @@ namespace Waher.Content.Markdown
 						for (i = 0; i < c; i++)
 						{
 							s = Row[i];
-							if (s == null)
+							if (s is null)
 								DataRows[j][i] = null;
 							else
 							{
 								CellElements = this.ParseBlock(new string[] { Row[i] }, new int[] { Positions[i] });
 
-								if (CellElements.First != null && CellElements.First.Next == null)
+								if (CellElements.First != null && CellElements.First.Next is null)
 									DataRows[j][i] = CellElements.First.Value;
 								else
 									DataRows[j][i] = new NestedBlock(this, CellElements);
@@ -872,10 +872,10 @@ namespace Waher.Content.Markdown
 							Description.AddLast(E);
 					}
 
-					if (Description.First == null)
+					if (Description.First is null)
 						continue;
 
-					if (Description.First.Next == null)
+					if (Description.First.Next is null)
 						DefinitionDescriptions = new DefinitionDescriptions(this, Description);
 					else
 						DefinitionDescriptions = new DefinitionDescriptions(this, new NestedBlock(this, Description));
@@ -901,10 +901,10 @@ namespace Waher.Content.Markdown
 					for (i = Block.Start; i <= c; i++)
 					{
 						Term = this.ParseBlock(Rows, Block.Positions, i, i);
-						if (Term.First == null)
+						if (Term.First is null)
 							continue;
 
-						if (Term.First.Next == null)
+						if (Term.First.Next is null)
 							Terms.AddLast(Term.First.Value);
 						else
 							Terms.AddLast(new NestedBlock(this, Term));
@@ -931,7 +931,7 @@ namespace Waher.Content.Markdown
 					if (BlockIndex > i)
 						Footnote.AddChildren(this.ParseBlocks(Blocks, i + 1, BlockIndex));
 
-					if (this.footnoteNumbers == null)
+					if (this.footnoteNumbers is null)
 					{
 						this.footnoteNumbers = new Dictionary<string, int>();
 						this.footnoteOrder = new List<string>();
@@ -990,7 +990,7 @@ namespace Waher.Content.Markdown
 				{
 					if (Content.First.Value is InlineHTML && Content.Last.Value is InlineHTML)
 						Elements.AddLast(new HtmlBlock(this, Content));
-					else if (Content.First.Next == null && Content.First.Value.OutsideParagraph)
+					else if (Content.First.Next is null && Content.First.Value.OutsideParagraph)
 					{
 						if (Content.First.Value is MarkdownElementChildren MarkdownElementChildren &&
 							MarkdownElementChildren.JoinOverParagraphs && Elements.Last != null &&
@@ -1152,7 +1152,7 @@ namespace Waher.Content.Markdown
 						}
 						else
 						{
-							if (this.emojiSource == null)
+							if (this.emojiSource is null)
 								ch2 = (char)0;
 
 							switch (ch2)
@@ -1362,7 +1362,7 @@ namespace Waher.Content.Markdown
 									Url = Text.ToString();
 									Text.Clear();
 
-									if (this.footnoteNumbers == null)
+									if (this.footnoteNumbers is null)
 									{
 										this.footnoteNumbers = new Dictionary<string, int>();
 										this.footnoteOrder = new List<string>();
@@ -1572,7 +1572,7 @@ namespace Waher.Content.Markdown
 									}
 
 									State.RestoreState();
-									Elements.AddLast(new Multimedia(this, ChildElements, Elements.First == null && State.PeekNextChar() == 0,
+									Elements.AddLast(new Multimedia(this, ChildElements, Elements.First is null && State.PeekNextChar() == 0,
 										Items.ToArray()));
 								}
 								else
@@ -1633,7 +1633,7 @@ namespace Waher.Content.Markdown
 										E.GeneratePlainText(Text);
 
 									this.references[Text.ToString().ToLower()] = new Multimedia(this, null,
-										Elements.First == null && State.PeekNextChar() == 0, Items.ToArray());
+										Elements.First is null && State.PeekNextChar() == 0, Items.ToArray());
 
 									Text.Clear();
 								}
@@ -1659,7 +1659,7 @@ namespace Waher.Content.Markdown
 								if (ch == '!')
 								{
 									Elements.AddLast(new MultimediaReference(this, ChildElements, Title,
-										Elements.First == null && State.PeekNextChar() == 0));
+										Elements.First is null && State.PeekNextChar() == 0));
 								}
 								else
 									Elements.AddLast(new LinkReference(this, ChildElements, Title));
@@ -1988,12 +1988,12 @@ namespace Waher.Content.Markdown
 						break;
 
 					case '{':
-						if (this.settings.Variables == null)
+						if (this.settings.Variables is null)
 						{
 							int Pos = State.CurrentPosition - 1;
 							if (Pos < this.markdownText.Length && this.markdownText[Pos] == '{')
 							{
-								if (this.toInsert == null)
+								if (this.toInsert is null)
 									this.toInsert = new SortedDictionary<int, string>(new ReversePosition());
 
 								this.toInsert[Pos] = "\\";
@@ -2022,7 +2022,7 @@ namespace Waher.Content.Markdown
 						{
 							Expression Exp = new Expression(Text.ToString());
 							State.DiscardBackup();
-							Elements.AddLast(new InlineScript(this, Exp, this.settings.Variables, Elements.First == null && State.PeekNextChar() == 0));
+							Elements.AddLast(new InlineScript(this, Exp, this.settings.Variables, Elements.First is null && State.PeekNextChar() == 0));
 							Text.Clear();
 							this.isDynamic = true;
 						}
@@ -2593,7 +2593,7 @@ namespace Waher.Content.Markdown
 
 					case '=':
 						ch2 = State.PeekNextCharSameRow();
-						if (this.emojiSource == null && ch2 != '=')
+						if (this.emojiSource is null && ch2 != '=')
 							ch2 = (char)0;
 
 						switch (ch2)
@@ -3193,19 +3193,19 @@ namespace Waher.Content.Markdown
 								for (i = State.Start; i < State.Current; i++)
 								{
 									Item = this.ParseBlock(State.Rows, State.Positions, i, i);
-									if (Item.First == null)
+									if (Item.First is null)
 										continue;
 
-									if (TotItem == null)
+									if (TotItem is null)
 									{
-										if (Item.First.Next == null)
+										if (Item.First.Next is null)
 											TotItem = Item;
 										else
 											TotItem.AddLast(Item.First.Value);
 									}
 									else
 									{
-										if (TotItem == null)
+										if (TotItem is null)
 											TotItem = new LinkedList<MarkdownElement>();
 
 										TotItem.AddLast(new NestedBlock(this, Item));
@@ -4254,7 +4254,7 @@ namespace Waher.Content.Markdown
 
 		private void LoadMasterIfNotLoaded(string MasterMetaValue)
 		{
-			if (this.master == null)
+			if (this.master is null)
 			{
 				string FileName = this.settings.GetFileName(this.fileName, MasterMetaValue);
 				string MarkdownText = File.ReadAllText(FileName);
@@ -4320,7 +4320,7 @@ namespace Waher.Content.Markdown
 				{
 					foreach (KeyValuePair<string, bool> P in Values)
 					{
-						if (sb == null)
+						if (sb is null)
 							sb = new StringBuilder();
 						else
 							sb.Append(' ');
@@ -4367,7 +4367,7 @@ namespace Waher.Content.Markdown
 				{
 					foreach (KeyValuePair<string, bool> P in Values)
 					{
-						if (sb == null)
+						if (sb is null)
 							sb = new StringBuilder();
 						else
 							sb.Append(" ");
@@ -4395,7 +4395,7 @@ namespace Waher.Content.Markdown
 
 				if (this.metaData.TryGetValue("AUTHOR", out Values))
 				{
-					if (sb == null || string.IsNullOrEmpty(s2 = sb.ToString()))
+					if (sb is null || string.IsNullOrEmpty(s2 = sb.ToString()))
 						sb = new StringBuilder("Author:");
 					else
 					{
@@ -4416,7 +4416,7 @@ namespace Waher.Content.Markdown
 
 				if (this.metaData.TryGetValue("DATE", out Values))
 				{
-					if (sb == null || string.IsNullOrEmpty(s2 = sb.ToString()))
+					if (sb is null || string.IsNullOrEmpty(s2 = sb.ToString()))
 						sb = new StringBuilder("Date:");
 					else
 					{
@@ -4645,7 +4645,7 @@ namespace Waher.Content.Markdown
 				Output.AppendLine("<body>");
 			}
 
-			bool AddSection = (!Inclusion && this.detail == null && this.elements.First != null && !(this.elements.First.Value is Sections));
+			bool AddSection = (!Inclusion && this.detail is null && this.elements.First != null && !(this.elements.First.Value is Sections));
 			if (AddSection)
 				Output.AppendLine("<section>");
 
@@ -5384,7 +5384,7 @@ namespace Waher.Content.Markdown
 		/// <returns>If a footnote with the given key was found.</returns>
 		public bool TryGetFootnoteNumber(string Key, out int Number)
 		{
-			if (this.footnoteNumbers == null)
+			if (this.footnoteNumbers is null)
 			{
 				Number = 0;
 				return false;
@@ -5401,7 +5401,7 @@ namespace Waher.Content.Markdown
 		/// <returns>If a footnote with the given key was found.</returns>
 		public bool TryGetFootnote(string Key, out Footnote Footnote)
 		{
-			if (this.footnotes == null)
+			if (this.footnotes is null)
 			{
 				Footnote = null;
 				return false;
@@ -5418,7 +5418,7 @@ namespace Waher.Content.Markdown
 		{
 			get
 			{
-				if (this.footnoteOrder == null)
+				if (this.footnoteOrder is null)
 					return new string[0];
 				else
 					return this.footnoteOrder.ToArray();

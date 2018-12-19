@@ -290,7 +290,7 @@ namespace Waher.Networking.PeerToPeer
 							break;
 
 						Player Player = this.Deserialize(Input);
-						if (Player == null)
+						if (Player is null)
 							break;
 
 #if LineListener
@@ -327,7 +327,7 @@ namespace Waher.Networking.PeerToPeer
 							break;
 
 						Player = this.Deserialize(Input);
-						if (Player == null)
+						if (Player is null)
 							break;
 
 #if LineListener
@@ -345,7 +345,7 @@ namespace Waher.Networking.PeerToPeer
 						for (i = 0; i < c; i++)
 						{
 							Player = this.Deserialize(Input);
-							if (Player == null)
+							if (Player is null)
 							{
 #if LineListener
 							Console.Out.Write("," + this.localPlayer.ToString());
@@ -488,7 +488,7 @@ namespace Waher.Networking.PeerToPeer
 			PeerConnection Connection = (PeerConnection)Sender;
 			Player Player;
 
-			if (Connection.StateObject == null)
+			if (Connection.StateObject is null)
 			{
 				BinaryInput Input = new BinaryInput(Packet);
 				Guid PlayerId;
@@ -522,7 +522,7 @@ namespace Waher.Networking.PeerToPeer
 						return;
 					}
 
-					if (Player.Connection == null)
+					if (Player.Connection is null)
 						this.connectionCount++;
 					else
 						Player.Connection.Dispose();
@@ -550,7 +550,7 @@ namespace Waher.Networking.PeerToPeer
 				if (AllConnected)
 					this.State = MultiPlayerState.Ready;
 
-				if (Packet == null)
+				if (Packet is null)
 					return;
 			}
 			else
@@ -706,7 +706,7 @@ namespace Waher.Networking.PeerToPeer
 		{
 			PeerConnection Connection = (PeerConnection)sender;
 			Player Player = (Player)Connection.StateObject;
-			if (Player == null)
+			if (Player is null)
 				return;
 
 			if (Player.Connection != Connection)

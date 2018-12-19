@@ -125,7 +125,7 @@ namespace Waher.Things.Arduino
 			try
 			{
 				RemoteDevice Device = this.Device;
-				if (Device == null)
+				if (Device is null)
 					throw new Exception("Device not ready.");
 
 				List<Field> Fields = new List<Field>();
@@ -166,7 +166,7 @@ namespace Waher.Things.Arduino
 		{
 			Fields.Add(new Int32Field(this, Now, "Raw", Raw, FieldType.Momentary, FieldQoS.AutomaticReadout, typeof(Module).Namespace, 26));
 
-			if (this.exp == null && !string.IsNullOrEmpty(this.expression))
+			if (this.exp is null && !string.IsNullOrEmpty(this.expression))
 				this.exp = new Expression(this.expression);
 
 			if (this.exp != null)

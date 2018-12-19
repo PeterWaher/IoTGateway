@@ -36,14 +36,14 @@ namespace Waher.Script.Operators.Assignments
 		{
             IElement Left = this.left.Evaluate(Variables);
             IVector V = Left as IVector;
-            if (V == null)
+            if (V is null)
                 throw new ScriptRuntimeException("Vector element assignment can only be performed on vectors.", this);
 
             IElement Index = this.middle.Evaluate(Variables);
             DoubleNumber IE = Index as DoubleNumber;
             double d;
 
-            if (IE == null || (d=IE.Value) < 0 || d > int.MaxValue || d != Math.Truncate(d))
+            if (IE is null || (d=IE.Value) < 0 || d > int.MaxValue || d != Math.Truncate(d))
                 throw new ScriptRuntimeException("Index must be a non-negative integer.", this);
 
             IElement Value = this.right.Evaluate(Variables);

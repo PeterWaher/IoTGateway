@@ -48,7 +48,7 @@ namespace Waher.Script.Objects.VectorSpaces
 		{
 			get
 			{
-				if (this.values == null)
+				if (this.values is null)
 				{
 					double[] v = new double[this.dimension];
 					int i = 0;
@@ -70,7 +70,7 @@ namespace Waher.Script.Objects.VectorSpaces
 		{
 			get
 			{
-				if (this.elements == null)
+				if (this.elements is null)
 				{
 					int i;
 					IElement[] v = new IElement[this.dimension];
@@ -108,7 +108,7 @@ namespace Waher.Script.Objects.VectorSpaces
 		{
 			get
 			{
-				if (this.associatedVectorSpace == null)
+				if (this.associatedVectorSpace is null)
 					this.associatedVectorSpace = new DoubleVectors(this.dimension);
 
 				return this.associatedVectorSpace;
@@ -259,7 +259,7 @@ namespace Waher.Script.Objects.VectorSpaces
 		{
 			get
 			{
-				if (this.zero == null)
+				if (this.zero is null)
 					this.zero = new DoubleVector(new double[this.dimension]);
 
 				return this.zero;

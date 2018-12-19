@@ -70,7 +70,7 @@ namespace Waher.Security.JWT
 		/// <returns>If the token is correctly signed and valid.</returns>
 		public bool IsValid(JwtToken Token)
 		{
-			if (Token.Algorithm == null || !(Token.Algorithm is HmacSha256) || Token.Signature == null)
+			if (Token.Algorithm is null || !(Token.Algorithm is HmacSha256) || Token.Signature is null)
 				return false;
 
 			if (Token.Expiration != null || Token.NotBefore != null)

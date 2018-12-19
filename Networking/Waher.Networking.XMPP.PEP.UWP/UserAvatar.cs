@@ -61,7 +61,7 @@ namespace Waher.Networking.XMPP.PEP
 		{
 			get
 			{
-				if (this.sha1Hash == null)
+				if (this.sha1Hash is null)
 					this.sha1Hash = Hashes.ComputeSHA1HashString(this.data);
 
 				return this.sha1Hash;

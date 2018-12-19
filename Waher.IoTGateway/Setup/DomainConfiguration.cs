@@ -563,7 +563,7 @@ namespace Waher.IoTGateway.Setup
 						}
 						else
 						{
-							if (Account.Contact == null || Account.Contact.Length != 1 || Account.Contact[0] != "mailto:" + this.contactEMail)
+							if (Account.Contact is null || Account.Contact.Length != 1 || Account.Contact[0] != "mailto:" + this.contactEMail)
 							{
 								ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Updating contact URIs in account.", false, "User");
 								Account = await Account.Update(new string[] { "mailto:" + this.contactEMail });
@@ -692,7 +692,7 @@ namespace Waher.IoTGateway.Setup
 							}
 						}
 
-						if (Order.Certificate == null)
+						if (Order.Certificate is null)
 							throw new Exception("No certificate URI provided.");
 
 						ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Downloading certificate.", false, "User");
@@ -727,7 +727,7 @@ namespace Waher.IoTGateway.Setup
 							if (string.IsNullOrEmpty(this.openSslPath) || !File.Exists(this.openSslPath))
 							{
 								Files = GetFiles(new string(Path.DirectorySeparatorChar, 1), "openssl.exe");
-								if (Files == null)
+								if (Files is null)
 								{
 									List<string> Files2 = new List<string>();
 
@@ -792,7 +792,7 @@ namespace Waher.IoTGateway.Setup
 								{
 									foreach (string OpenSslFile in Files)
 									{
-										if (CertFileName == null)
+										if (CertFileName is null)
 										{
 											ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Generating temporary certificate file.", false, "User");
 
@@ -862,7 +862,7 @@ namespace Waher.IoTGateway.Setup
 										break;
 									}
 
-									if (this.pfx == null)
+									if (this.pfx is null)
 									{
 										this.openSslPath = string.Empty;
 										ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Unable to convert to PFX using OpenSSL.", false, "User");

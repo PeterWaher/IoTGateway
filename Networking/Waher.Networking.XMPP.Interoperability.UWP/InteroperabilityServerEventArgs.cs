@@ -82,7 +82,7 @@ namespace Waher.Networking.XMPP.Interoperability
 		{
 			get
 			{
-				if (this.thingRef == null)
+				if (this.thingRef is null)
 					this.thingRef = new ThingReference(this.nodeId, this.sourceId, this.partition);
 
 				return this.thingRef;

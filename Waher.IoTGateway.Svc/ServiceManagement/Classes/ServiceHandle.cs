@@ -68,7 +68,7 @@ namespace Waher.IoTGateway.Svc.ServiceManagement.Classes
 
 		public virtual void SetFailureActions(ServiceFailureActions serviceFailureActions)
 		{
-			ServiceFailureActionsInfo failureActions = serviceFailureActions == null ? ServiceFailureActionsInfo.Default : new ServiceFailureActionsInfo(serviceFailureActions.ResetPeriod, serviceFailureActions.RebootMessage, serviceFailureActions.RestartCommand, serviceFailureActions.Actions);
+			ServiceFailureActionsInfo failureActions = serviceFailureActions is null ? ServiceFailureActionsInfo.Default : new ServiceFailureActionsInfo(serviceFailureActions.ResetPeriod, serviceFailureActions.RebootMessage, serviceFailureActions.RestartCommand, serviceFailureActions.Actions);
 			IntPtr lpFailureActions = Marshal.AllocHGlobal(Marshal.SizeOf<ServiceFailureActionsInfo>());
 			try
 			{

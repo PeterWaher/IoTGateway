@@ -93,7 +93,7 @@ namespace Waher.Script.Objects
 		public override ICommutativeRingElement Multiply(ICommutativeRingElement Element)
 		{
 			PhysicalQuantity E = Element as PhysicalQuantity;
-			if (E == null)
+			if (E is null)
 			{
 				if (Element is DoubleNumber n)
 					return new PhysicalQuantity(this.magnitude * n.Value, this.unit);
@@ -134,7 +134,7 @@ namespace Waher.Script.Objects
 		{
 			PhysicalQuantity E = Element as PhysicalQuantity;
 
-			if (E == null)
+			if (E is null)
 			{
 				if (Element is DoubleNumber n)
 					return new PhysicalQuantity(this.magnitude + n.Value, this.unit);
@@ -162,7 +162,7 @@ namespace Waher.Script.Objects
 		public override bool Equals(object obj)
 		{
 			PhysicalQuantity E = obj as PhysicalQuantity;
-			if (E == null)
+			if (E is null)
 				return false;
 			if (this.unit.Equals(E.unit))
 				return this.magnitude == E.magnitude;
@@ -305,7 +305,7 @@ namespace Waher.Script.Objects
 		public int CompareTo(object obj)
 		{
 			PhysicalQuantity Q = obj as PhysicalQuantity;
-			if (Q == null)
+			if (Q is null)
 				throw new ScriptException("Values not comparable.");
 
 			if (this.unit.Equals(Q.unit))

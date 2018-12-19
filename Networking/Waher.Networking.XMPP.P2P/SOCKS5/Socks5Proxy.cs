@@ -268,7 +268,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 					this.streams[StreamId] = null;
 			}
 
-			if (StreamId == null)
+			if (StreamId is null)
 			{
 				this.Callback(Callback, State, false, null, null);
 				return;
@@ -447,7 +447,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 			foreach (XmlNode N in e.Query.ChildNodes)
 			{
 				E = N as XmlElement;
-				if (E == null)
+				if (E is null)
 					continue;
 
 				if (E.LocalName == "streamhost" && E.NamespaceURI == Namespace)
@@ -477,7 +477,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 				}
 			}
 
-			if (e2.DataCallback == null || e2.CloseCallback == null)
+			if (e2.DataCallback is null || e2.CloseCallback is null)
 				throw new NotAcceptableException("Stream not expected.", e.IQ);
 
 			Socks5Client Client;

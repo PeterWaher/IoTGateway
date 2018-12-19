@@ -48,7 +48,7 @@ namespace Waher.Script.Objects.VectorSpaces
         {
             get
             {
-                if (this.values == null)
+                if (this.values is null)
                 {
                     bool[] v = new bool[this.dimension];
                     int i = 0;
@@ -70,7 +70,7 @@ namespace Waher.Script.Objects.VectorSpaces
         {
             get
             {
-                if (this.elements == null)
+                if (this.elements is null)
                 {
                     int i;
                     IElement[] v = new IElement[this.dimension];
@@ -102,7 +102,7 @@ namespace Waher.Script.Objects.VectorSpaces
 
             foreach (bool d in this.Values)
             {
-                if (sb == null)
+                if (sb is null)
                     sb = new StringBuilder("[");
                 else
                     sb.Append(", ");
@@ -110,7 +110,7 @@ namespace Waher.Script.Objects.VectorSpaces
                 sb.Append(Expression.ToString(d));
             }
 
-            if (sb == null)
+            if (sb is null)
                 return "[]";
             else
             {
@@ -126,7 +126,7 @@ namespace Waher.Script.Objects.VectorSpaces
         {
             get
             {
-                if (this.associatedVectorSpace == null)
+                if (this.associatedVectorSpace is null)
                     this.associatedVectorSpace = new BooleanVectors(this.dimension);
 
                 return this.associatedVectorSpace;
@@ -151,7 +151,7 @@ namespace Waher.Script.Objects.VectorSpaces
         public override IVectorSpaceElement MultiplyScalar(IFieldElement Scalar)
         {
             BooleanValue BooleanValue = Scalar as BooleanValue;
-            if (BooleanValue == null)
+            if (BooleanValue is null)
                 return null;
 
             bool d = BooleanValue.Value;
@@ -173,7 +173,7 @@ namespace Waher.Script.Objects.VectorSpaces
         public override IAbelianGroupElement Add(IAbelianGroupElement Element)
         {
             BooleanVector BooleanVector = Element as BooleanVector;
-            if (BooleanVector == null)
+            if (BooleanVector is null)
                 return null;
 
             int i;
@@ -206,7 +206,7 @@ namespace Waher.Script.Objects.VectorSpaces
         public override bool Equals(object obj)
         {
             BooleanVector BooleanVector = obj as BooleanVector;
-            if (BooleanVector == null)
+            if (BooleanVector is null)
                 return false;
 
             int i;
@@ -274,7 +274,7 @@ namespace Waher.Script.Objects.VectorSpaces
         {
             get
             {
-                if (this.zero == null)
+                if (this.zero is null)
                     this.zero = new BooleanVector(new bool[this.dimension]);
 
                 return this.zero;
@@ -309,7 +309,7 @@ namespace Waher.Script.Objects.VectorSpaces
                 throw new ScriptException("Index out of bounds.");
 
             BooleanValue V = Value as BooleanValue;
-            if (V == null)
+            if (V is null)
                 throw new ScriptException("Elements in a boolean vector are required to be boolean values.");
 
             bool[] Values = this.Values;

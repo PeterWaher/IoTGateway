@@ -294,7 +294,7 @@ namespace Waher.Networking.XMPP.BOSH
 				ResponseXml = new XmlDocument();
 				ResponseXml.LoadXml(XmlResponse);
 
-				if ((Body = ResponseXml.DocumentElement) == null || Body.LocalName != "body" ||
+				if ((Body = ResponseXml.DocumentElement) is null || Body.LocalName != "body" ||
 					Body.NamespaceURI != HttpBindNamespace)
 				{
 					throw new Exception("Unexpected response returned.");
@@ -559,7 +559,7 @@ namespace Waher.Networking.XMPP.BOSH
 						Xml.Append(this.keys.First.Value);
 
 						this.keys.RemoveFirst();
-						if (this.keys.First == null)
+						if (this.keys.First is null)
 						{
 							this.GenerateKeysLocked();
 
@@ -767,7 +767,7 @@ namespace Waher.Networking.XMPP.BOSH
 										StreamPrefix = Attr.LocalName;
 									else
 									{
-										if (Namespaces == null)
+										if (Namespaces is null)
 											Namespaces = new LinkedList<KeyValuePair<string, string>>();
 
 										Namespaces.AddLast(new KeyValuePair<string, string>(Attr.Prefix, Attr.Value));

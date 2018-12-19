@@ -44,7 +44,7 @@ namespace Waher.Script.Objects.Sets
         public override bool Equals(object obj)
         {
             SetDifference S = obj as SetDifference;
-            if (S == null)
+            if (S is null)
                 return false;
 
             return (this.set1.Equals(S.set1) && this.set2.Equals(S.set2));
@@ -72,7 +72,7 @@ namespace Waher.Script.Objects.Sets
                     return this.elements.Keys;
 
                 ICollection<IElement> E1 = this.set1.ChildElements;
-                if (E1 == null)
+                if (E1 is null)
                     return null;
 
                 Dictionary<IElement, bool> Elements = new Dictionary<IElement, bool>();
@@ -106,7 +106,7 @@ namespace Waher.Script.Objects.Sets
             get
             {
                 ICollection<IElement> Elements = this.ChildElements;
-                if (Elements == null)
+                if (Elements is null)
                     return this;
 
                 object[] Elements2 = new object[Elements.Count];
@@ -127,7 +127,7 @@ namespace Waher.Script.Objects.Sets
             get
             {
                 ICollection<IElement> ChildElements = this.ChildElements;
-                if (ChildElements == null)
+                if (ChildElements is null)
                     return null;
                 else
                     return ChildElements.Count;

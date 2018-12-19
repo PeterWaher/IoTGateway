@@ -265,7 +265,7 @@ namespace Waher.Networking.LWM2M
 		/// </summary>
 		public override async Task ApplyBootstrapInfo()
 		{
-			if (this.ObjectId == null)
+			if (this.ObjectId is null)
 				await Database.Insert(this);
 			else
 				await Database.Update(this);
@@ -371,8 +371,8 @@ namespace Waher.Networking.LWM2M
 						if (s != "coaps")
 							return null;
 
-						if (this.publicKeyOrIdentity == null ||
-							this.secretKey == null)
+						if (this.publicKeyOrIdentity is null ||
+							this.secretKey is null)
 						{
 							return null;
 						}

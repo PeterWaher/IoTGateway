@@ -58,7 +58,7 @@ namespace Waher.IoTGateway.WebResources
 		{
 			try
 			{
-				if (!Request.HasData || Request.Session == null)
+				if (!Request.HasData || Request.Session is null)
 					throw new BadRequestException();
 
 				object Obj = Request.DecodeData();

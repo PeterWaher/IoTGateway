@@ -111,10 +111,10 @@ namespace Waher.Networking.XMPP.DataForms.ValidationMethods
 		public override bool Merge(ValidationMethod SecondaryValidationMethod, DataType DataType)
 		{
 			ListRangeValidation V2 = SecondaryValidationMethod as ListRangeValidation;
-			if (V2 == null)
+			if (V2 is null)
 				return false;
 
-			if ((this.additional == null) ^ (V2.additional == null))
+			if ((this.additional is null) ^ (V2.additional is null))
 				return false;
 
 			if (!this.additional.Merge(V2.additional, DataType))

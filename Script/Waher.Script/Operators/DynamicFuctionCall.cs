@@ -59,7 +59,7 @@ namespace Waher.Script.Operators
             for (i = 0; i < c; i++)
 			{
 				Node = this.arguments[i];
-				if (Node == null)
+				if (Node is null)
 					Arg[i] = ObjectValue.Null;
 				else
 					Arg[i] = Node.Evaluate(Variables);

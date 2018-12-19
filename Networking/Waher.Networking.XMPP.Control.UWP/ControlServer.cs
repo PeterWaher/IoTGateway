@@ -106,13 +106,13 @@ namespace Waher.Networking.XMPP.Control
 		public async Task<Dictionary<string, ControlParameter>> GetControlParametersByName(IThingReference Node)
 		{
 			GetControlParametersEventHandler h = this.OnGetControlParameters;
-			if (h == null)
+			if (h is null)
 				return this.controlParametersByName;
 			else
 			{
 				ControlParameter[] Parameters = await h(Node);
 
-				if (Parameters == null)
+				if (Parameters is null)
 					return null;
 
 				Dictionary<string, ControlParameter> Result = new Dictionary<string, ControlParameter>();
@@ -132,7 +132,7 @@ namespace Waher.Networking.XMPP.Control
 		public Task<ControlParameter[]> GetControlParameters(IThingReference Node)
 		{
 			GetControlParametersEventHandler h = this.OnGetControlParameters;
-			if (h == null)
+			if (h is null)
 				return Task.FromResult<ControlParameter[]>(this.controlParameters);
 			else
 				return h(Node);
@@ -193,7 +193,7 @@ namespace Waher.Networking.XMPP.Control
 				string UserToken = XML.Attribute(e.Query, "ut");
 
 				LinkedList<IThingReference> Nodes = null;
-				SortedDictionary<string, bool> ParameterNames = this.provisioningClient == null ? null : new SortedDictionary<string, bool>();
+				SortedDictionary<string, bool> ParameterNames = this.provisioningClient is null ? null : new SortedDictionary<string, bool>();
 				LinkedList<ControlOperation> Operations = new LinkedList<ControlOperation>();
 				ControlParameter Parameter;
 				DataForm Form = null;
@@ -203,25 +203,25 @@ namespace Waher.Networking.XMPP.Control
 				foreach (XmlNode N in e.Query.ChildNodes)
 				{
 					E = N as XmlElement;
-					if (E == null)
+					if (E is null)
 						continue;
 
 					switch (E.LocalName)
 					{
 						case "nd":
-							if (Nodes == null)
+							if (Nodes is null)
 								Nodes = new LinkedList<IThingReference>();
 
 							string NodeId = XML.Attribute(E, "id");
 							string SourceId = XML.Attribute(E, "src");
 							string Partition = XML.Attribute(E, "pt");
 
-							if (this.OnGetNode == null)
+							if (this.OnGetNode is null)
 								Nodes.AddLast(new ThingReference(NodeId, SourceId, Partition));
 							else
 							{
 								IThingReference Ref = await this.OnGetNode(NodeId, SourceId, Partition);
-								if (Ref == null)
+								if (Ref is null)
 									throw new ItemNotFoundException("Node not found.", e.IQ);
 
 								Nodes.AddLast(Ref);
@@ -267,7 +267,7 @@ namespace Waher.Networking.XMPP.Control
 				foreach (XmlNode N in e.Query.ChildNodes)
 				{
 					E = N as XmlElement;
-					if (E == null)
+					if (E is null)
 						continue;
 
 					switch (E.LocalName)
@@ -277,11 +277,11 @@ namespace Waher.Networking.XMPP.Control
 							foreach (IThingReference Node in Nodes ?? NoNodes)
 							{
 								Parameter = await this.GetParameter(Node, Name, e);
-								if (Parameter == null)
+								if (Parameter is null)
 									return;
 
 								BooleanControlParameter BooleanControlParameter = Parameter as BooleanControlParameter;
-								if (BooleanControlParameter == null)
+								if (BooleanControlParameter is null)
 								{
 									ParameterWrongType(Name, e);
 									return;
@@ -296,11 +296,11 @@ namespace Waher.Networking.XMPP.Control
 							foreach (IThingReference Node in Nodes ?? NoNodes)
 							{
 								Parameter = await this.GetParameter(Node, Name, e);
-								if (Parameter == null)
+								if (Parameter is null)
 									return;
 
 								ColorControlParameter ColorControlParameter = Parameter as ColorControlParameter;
-								if (ColorControlParameter == null)
+								if (ColorControlParameter is null)
 								{
 									ParameterWrongType(Name, e);
 									return;
@@ -315,11 +315,11 @@ namespace Waher.Networking.XMPP.Control
 							foreach (IThingReference Node in Nodes ?? NoNodes)
 							{
 								Parameter = await this.GetParameter(Node, Name, e);
-								if (Parameter == null)
+								if (Parameter is null)
 									return;
 
 								DateControlParameter DateControlParameter = Parameter as DateControlParameter;
-								if (DateControlParameter == null)
+								if (DateControlParameter is null)
 								{
 									ParameterWrongType(Name, e);
 									return;
@@ -334,11 +334,11 @@ namespace Waher.Networking.XMPP.Control
 							foreach (IThingReference Node in Nodes ?? NoNodes)
 							{
 								Parameter = await this.GetParameter(Node, Name, e);
-								if (Parameter == null)
+								if (Parameter is null)
 									return;
 
 								DateTimeControlParameter DateTimeControlParameter = Parameter as DateTimeControlParameter;
-								if (DateTimeControlParameter == null)
+								if (DateTimeControlParameter is null)
 								{
 									ParameterWrongType(Name, e);
 									return;
@@ -353,11 +353,11 @@ namespace Waher.Networking.XMPP.Control
 							foreach (IThingReference Node in Nodes ?? NoNodes)
 							{
 								Parameter = await this.GetParameter(Node, Name, e);
-								if (Parameter == null)
+								if (Parameter is null)
 									return;
 
 								DoubleControlParameter DoubleControlParameter = Parameter as DoubleControlParameter;
-								if (DoubleControlParameter == null)
+								if (DoubleControlParameter is null)
 								{
 									ParameterWrongType(Name, e);
 									return;
@@ -372,11 +372,11 @@ namespace Waher.Networking.XMPP.Control
 							foreach (IThingReference Node in Nodes ?? NoNodes)
 							{
 								Parameter = await this.GetParameter(Node, Name, e);
-								if (Parameter == null)
+								if (Parameter is null)
 									return;
 
 								DurationControlParameter DurationControlParameter = Parameter as DurationControlParameter;
-								if (DurationControlParameter == null)
+								if (DurationControlParameter is null)
 								{
 									ParameterWrongType(Name, e);
 									return;
@@ -391,7 +391,7 @@ namespace Waher.Networking.XMPP.Control
 							foreach (IThingReference Node in Nodes ?? NoNodes)
 							{
 								Parameter = await this.GetParameter(Node, Name, e);
-								if (Parameter == null)
+								if (Parameter is null)
 									return;
 
 								string StringValue = XML.Attribute(E, "v");
@@ -399,7 +399,7 @@ namespace Waher.Networking.XMPP.Control
 								if (Parameter is EnumControlParameter EnumControlParameter)
 								{
 									Type T = Types.GetType(XML.Attribute(E, "t"));
-									if (T == null)
+									if (T is null)
 									{
 										e.IqError("<error type='modify'><bad-request xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/><paramError xmlns=\"" +
 											ControlClient.NamespaceControl + "\" n=\"" + Name + "\">Type not found.</paramError></error>");
@@ -445,11 +445,11 @@ namespace Waher.Networking.XMPP.Control
 							foreach (IThingReference Node in Nodes ?? NoNodes)
 							{
 								Parameter = await this.GetParameter(Node, Name, e);
-								if (Parameter == null)
+								if (Parameter is null)
 									return;
 
 								Int32ControlParameter Int32ControlParameter = Parameter as Int32ControlParameter;
-								if (Int32ControlParameter == null)
+								if (Int32ControlParameter is null)
 								{
 									ParameterWrongType(Name, e);
 									return;
@@ -464,11 +464,11 @@ namespace Waher.Networking.XMPP.Control
 							foreach (IThingReference Node in Nodes ?? NoNodes)
 							{
 								Parameter = await this.GetParameter(Node, Name, e);
-								if (Parameter == null)
+								if (Parameter is null)
 									return;
 
 								Int64ControlParameter Int64ControlParameter = Parameter as Int64ControlParameter;
-								if (Int64ControlParameter == null)
+								if (Int64ControlParameter is null)
 								{
 									ParameterWrongType(Name, e);
 									return;
@@ -483,7 +483,7 @@ namespace Waher.Networking.XMPP.Control
 							foreach (IThingReference Node in Nodes ?? NoNodes)
 							{
 								Parameter = await this.GetParameter(Node, Name, e);
-								if (Parameter == null)
+								if (Parameter is null)
 									return;
 
 								if (Parameter is StringControlParameter StringControlParameter)
@@ -503,11 +503,11 @@ namespace Waher.Networking.XMPP.Control
 							foreach (IThingReference Node in Nodes ?? NoNodes)
 							{
 								Parameter = await this.GetParameter(Node, Name, e);
-								if (Parameter == null)
+								if (Parameter is null)
 									return;
 
 								TimeControlParameter TimeControlParameter = Parameter as TimeControlParameter;
-								if (TimeControlParameter == null)
+								if (TimeControlParameter is null)
 								{
 									ParameterWrongType(Name, e);
 									return;
@@ -523,7 +523,7 @@ namespace Waher.Networking.XMPP.Control
 							foreach (IThingReference Node in Nodes ?? NoNodes)
 							{
 								Parameters = await this.GetControlParametersByName(Node);
-								if (Parameters == null)
+								if (Parameters is null)
 								{
 									NotFound(e);
 									return;
@@ -689,7 +689,7 @@ namespace Waher.Networking.XMPP.Control
 		{
 			Dictionary<string, ControlParameter> Parameters = await this.GetControlParametersByName(Node);
 
-			if (Parameters == null)
+			if (Parameters is null)
 			{
 				NotFound(e);
 				return null;
@@ -717,24 +717,24 @@ namespace Waher.Networking.XMPP.Control
 				foreach (XmlNode N in e.Query.ChildNodes)
 				{
 					E = N as XmlElement;
-					if (E == null)
+					if (E is null)
 						continue;
 
 					if (E.LocalName == "nd")
 					{
-						if (Nodes == null)
+						if (Nodes is null)
 							Nodes = new LinkedList<IThingReference>();
 
 						string NodeId = XML.Attribute(E, "id");
 						string SourceId = XML.Attribute(E, "src");
 						string Partition = XML.Attribute(E, "pt");
 
-						if (this.OnGetNode == null)
+						if (this.OnGetNode is null)
 							Nodes.AddLast(new ThingReference(NodeId, SourceId, Partition));
 						else
 						{
 							IThingReference Ref = await this.OnGetNode(NodeId, SourceId, Partition);
-							if (Ref == null)
+							if (Ref is null)
 								throw new ItemNotFoundException("Node not found.", e.IQ);
 
 							Nodes.AddLast(Ref);
@@ -744,10 +744,10 @@ namespace Waher.Networking.XMPP.Control
 
 				ControlParameter[] Parameters;
 
-				if (Nodes == null)
+				if (Nodes is null)
 				{
 					Parameters = await this.GetControlParameters(null);
-					if (Parameters == null)
+					if (Parameters is null)
 					{
 						NotFound(e);
 						return;
@@ -764,10 +764,10 @@ namespace Waher.Networking.XMPP.Control
 
 					foreach (IThingReference Node in Nodes)
 					{
-						if (Parameters1 == null)
+						if (Parameters1 is null)
 						{
 							Parameters = await this.GetControlParameters(Node);
-							if (Parameters == null)
+							if (Parameters is null)
 							{
 								NotFound(e);
 								return;
@@ -781,7 +781,7 @@ namespace Waher.Networking.XMPP.Control
 						else
 						{
 							Parameters2 = await this.GetControlParametersByName(Node);
-							if (Parameters2 == null)
+							if (Parameters2 is null)
 							{
 								NotFound(e);
 								return;
@@ -791,7 +791,7 @@ namespace Waher.Networking.XMPP.Control
 							{
 								if (!Parameters2.TryGetValue(P.Key, out ControlParameter P2) || !P.Value.Equals(P2))
 								{
-									if (ToRemove == null)
+									if (ToRemove is null)
 										ToRemove = new LinkedList<string>();
 
 									ToRemove.AddLast(P.Key);
@@ -884,7 +884,7 @@ namespace Waher.Networking.XMPP.Control
 			Output.WriteAttributeString("xmlns", "xdl", null, XmppClient.NamespaceDataLayout);
 			Output.WriteAttributeString("xmlns", "xdd", null, XmppClient.NamespaceDynamicForms);
 
-			if (Nodes == null)
+			if (Nodes is null)
 			{
 				FirstNode = null;
 				Output.WriteElementString("title", this.client.BareJID);
@@ -893,7 +893,7 @@ namespace Waher.Networking.XMPP.Control
 			{
 				FirstNode = Nodes.First.Value;
 
-				if (Nodes.First.Next == null)
+				if (Nodes.First.Next is null)
 					Output.WriteElementString("title", Nodes.First.Value.NodeId);
 				else
 					Output.WriteElementString("title", Nodes.Count.ToString() + " nodes");

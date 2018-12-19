@@ -189,7 +189,7 @@ namespace Waher.Networking.HTTP
 		public void AddHttpPorts(params int[] HttpPorts)
 #endif
 		{
-			if (HttpPorts == null)
+			if (HttpPorts is null)
 				return;
 
 			try
@@ -283,7 +283,7 @@ namespace Waher.Networking.HTTP
 		/// <param name="HttpsPorts">HTTP ports</param>
 		public void AddHttpsPorts(params int[] HttpsPorts)
 		{
-			if (HttpsPorts == null)
+			if (HttpsPorts is null)
 				return;
 
 			try
@@ -491,7 +491,7 @@ namespace Waher.Networking.HTTP
 				if (this.upgradePort.HasValue)
 					return this.upgradePort;
 
-				if (this.serverCertificate == null)
+				if (this.serverCertificate is null)
 					return null;
 
 				int? Result = null;
@@ -554,7 +554,7 @@ namespace Waher.Networking.HTTP
 			}
 			catch (Exception ex)
 			{
-				if (this.listeners == null)
+				if (this.listeners is null)
 					return;
 
 				Log.Critical(ex);
@@ -607,7 +607,7 @@ namespace Waher.Networking.HTTP
 			}
 			catch (Exception ex)
 			{
-				if (this.closed || this.listeners == null)
+				if (this.closed || this.listeners is null)
 					return;
 
 				Log.Critical(ex);
@@ -676,7 +676,7 @@ namespace Waher.Networking.HTTP
 			get { return this.resourceOverrideFilter?.ToString(); }
 			set
 			{
-				if (value == null)
+				if (value is null)
 					this.resourceOverrideFilter = null;
 				else
 					this.resourceOverrideFilter = new Regex(value, RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Singleline);
@@ -842,7 +842,7 @@ namespace Waher.Networking.HTTP
 		/// <returns>If the resource was found and removed.</returns>
 		public bool Unregister(HttpResource Resource)
 		{
-			if (Resource == null)
+			if (Resource is null)
 				return false;
 
 			lock (this.resources)
@@ -871,7 +871,7 @@ namespace Waher.Networking.HTTP
 
 			if (!string.IsNullOrEmpty(this.resourceOverride))
 			{
-				if (this.resourceOverrideFilter == null || this.resourceOverrideFilter.IsMatch(ResourceName))
+				if (this.resourceOverrideFilter is null || this.resourceOverrideFilter.IsMatch(ResourceName))
 					ResourceName = this.resourceOverride;
 			}
 
@@ -1019,7 +1019,7 @@ namespace Waher.Networking.HTTP
 		/// <param name="SubPath">Sub-path of request.</param>
 		public void RequestReceived(HttpRequest Request, string ClientAddress, HttpResource Resource, string SubPath)
 		{
-			if (Request == null)
+			if (Request is null)
 				return;
 
 			HttpFieldUserAgent UserAgent;

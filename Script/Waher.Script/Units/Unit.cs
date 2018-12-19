@@ -132,7 +132,7 @@ namespace Waher.Script.Units
 		public override bool Equals(object obj)
 		{
 			Unit U = obj as Unit;
-			if (U == null)
+			if (U is null)
 				return false;
 
 			if (this.prefix != U.prefix || this.factors.Count != U.factors.Count)
@@ -200,7 +200,7 @@ namespace Waher.Script.Units
 			{
 				if (Factor.Value > 0)
 				{
-					if (Numerator == null)
+					if (Numerator is null)
 					{
 						if (IncludePrefix)
 							Numerator = new StringBuilder(Prefixes.ToString(this.prefix));
@@ -227,7 +227,7 @@ namespace Waher.Script.Units
 				}
 				else
 				{
-					if (Denominator == null)
+					if (Denominator is null)
 						Denominator = new StringBuilder();
 					else
 						Denominator.Append('⋅');
@@ -250,7 +250,7 @@ namespace Waher.Script.Units
 				}
 			}
 
-			if (Numerator == null)
+			if (Numerator is null)
 			{
 				if (IncludePrefix)
 					Numerator = new StringBuilder(Prefixes.ToString(this.prefix));
@@ -390,7 +390,7 @@ namespace Waher.Script.Units
 
 			lock (synchObject)
 			{
-				if (baseUnits == null)
+				if (baseUnits is null)
 					Search();
 
 				bool HasNonBase = false;
@@ -458,7 +458,7 @@ namespace Waher.Script.Units
 			while (Loop != null && Loop.Value.Key.Name != Name)
 				Loop = Loop.Next;
 
-			if (Loop == null)
+			if (Loop is null)
 				Factors.AddLast(new KeyValuePair<AtomicUnit, int>(AtomicUnit, Exponent));
 			else
 				Loop.Value = new KeyValuePair<AtomicUnit, int>(AtomicUnit, Loop.Value.Value + Exponent);
@@ -476,7 +476,7 @@ namespace Waher.Script.Units
 
 			lock (synchObject)
 			{
-				if (baseUnits == null)
+				if (baseUnits is null)
 					Search();
 
 				bool HasNonReference = false;
@@ -581,7 +581,7 @@ namespace Waher.Script.Units
 
 			lock (synchObject)
 			{
-				if (baseUnits == null)
+				if (baseUnits is null)
 					Search();
 
 				bool HasNonReference = false;
@@ -772,7 +772,7 @@ namespace Waher.Script.Units
 		{
 			lock (synchObject)
 			{
-				if (compoundUnits == null)
+				if (compoundUnits is null)
 					Search();
 
 				return compoundUnits.TryGetValue(Name, out Factors);
@@ -788,7 +788,7 @@ namespace Waher.Script.Units
 		{
 			lock (synchObject)
 			{
-				if (baseUnits == null)
+				if (baseUnits is null)
 					Search();
 
 				return baseUnits.ContainsKey(Name) || derivedUnits.ContainsKey(Name);

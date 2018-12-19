@@ -225,7 +225,7 @@ namespace Waher.Security.ACME
 		/// </summary>
 		public Task<AcmeOrder[]> GetOrders()
 		{
-			if (this.orders == null)
+			if (this.orders is null)
 				throw new Exception("Account object did not report a URI for the list of orders.");
 
 			return this.Client.GetOrders(this.Location, this.orders);

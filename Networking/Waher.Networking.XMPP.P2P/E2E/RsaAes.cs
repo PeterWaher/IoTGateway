@@ -238,7 +238,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
 			}
 
 			Signature = (LocalEndpoint as RsaAes)?.Sign(Data);
-			if (Signature == null)
+			if (Signature is null)
 				return null;
 
 			byte[] Block = new byte[KeyEncrypted.Length + Signature.Length + Result.Length + 8];
@@ -335,7 +335,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
 				Decrypted = null;
 			}
 
-			if (Decrypted == null)
+			if (Decrypted is null)
 			{
 				try
 				{
@@ -344,7 +344,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
 					if (Key != null && IV != null)
 					{
 						Decrypted = this.Decrypt(Encrypted, Key, IV);
-						if (Decrypted == null)
+						if (Decrypted is null)
 							return null;
 					}
 					else
@@ -393,7 +393,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
 			}
 
 			Signature = (LocalEndpoint as RsaAes)?.Sign(Data);
-			if (Signature == null)
+			if (Signature is null)
 				return false;
 
 			Xml.Append("<aes xmlns=\"");
@@ -460,7 +460,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
 				Decrypted = null;
 			}
 
-			if (Decrypted == null)
+			if (Decrypted is null)
 			{
 				try
 				{
@@ -469,7 +469,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
 					if (Key != null)
 					{
 						Decrypted = this.Decrypt(Encrypted, Key, IV);
-						if (Decrypted == null)
+						if (Decrypted is null)
 							return null;
 
 						lock (RemoteRsaAes.rsa)

@@ -501,7 +501,7 @@ namespace Waher.Persistence.Files.Statistics
 			{
 				lock (this.synchObject)
 				{
-					if (this.comments == null)
+					if (this.comments is null)
 						return new string[0];
 					else
 						return this.comments.ToArray();
@@ -614,7 +614,7 @@ namespace Waher.Persistence.Files.Statistics
 			{
 				this.isCorrupt = true;
 
-				if (this.comments == null)
+				if (this.comments is null)
 					this.comments = new List<string>();
 
 				this.comments.Add(Message);
@@ -625,7 +625,7 @@ namespace Waher.Persistence.Files.Statistics
 		{
 			lock (this.synchObject)
 			{
-				if (this.comments == null)
+				if (this.comments is null)
 					this.comments = new List<string>();
 
 				this.comments.Add(Message);

@@ -176,7 +176,7 @@ namespace Waher.Networking.XMPP
 			foreach (XmlNode N in Message.ChildNodes)
 			{
 				E = N as XmlElement;
-				if (E == null)
+				if (E is null)
 					continue;
 
 				if (E.NamespaceURI == Message.NamespaceURI)
@@ -241,7 +241,7 @@ namespace Waher.Networking.XMPP
 							break;
 					}
 				}
-				else if (this.content == null)
+				else if (this.content is null)
 					this.content = E;
 			}
 

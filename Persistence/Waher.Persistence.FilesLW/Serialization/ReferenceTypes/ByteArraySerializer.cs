@@ -65,7 +65,7 @@ namespace Waher.Persistence.Files.Serialization.ReferenceTypes
 		/// <param name="Value">The actual object to serialize.</param>
 		public void Serialize(BinarySerializer Writer, bool WriteTypeCode, bool Embedded, object Value)
 		{
-			if (Value == null)
+			if (Value is null)
 			{
 				if (WriteTypeCode)
 					Writer.WriteBits(ObjectSerializer.TYPE_NULL, 6);

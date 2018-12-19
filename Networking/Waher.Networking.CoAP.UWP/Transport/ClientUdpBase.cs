@@ -88,7 +88,7 @@ namespace Waher.Networking.CoAP.Transport
 
 					lock (this.outputQueue)
 					{
-						if (this.outputQueue.First == null)
+						if (this.outputQueue.First is null)
 						{
 							this.isWriting = false;
 							Message = null;

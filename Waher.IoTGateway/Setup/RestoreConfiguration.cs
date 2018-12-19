@@ -145,7 +145,7 @@ namespace Waher.IoTGateway.Setup
 				!int.TryParse(F.Value, out int BlockNr) ||
 				!Request.Header.TryGetHeaderField("X-More", out F) ||
 				!CommonTypes.TryParse(F.Value, out bool More) ||
-				(Cookie = Request.Header.Cookie) == null ||
+				(Cookie = Request.Header.Cookie) is null ||
 				string.IsNullOrEmpty(HttpSessionID = Cookie["HttpSessionID"]))
 			{
 				throw new BadRequestException();
@@ -210,7 +210,7 @@ namespace Waher.IoTGateway.Setup
 			if (!Request.HasData ||
 				!Request.Header.TryGetHeaderField("X-TabID", out HttpField F) ||
 				string.IsNullOrEmpty(TabID = F.Value) ||
-				(Cookie = Request.Header.Cookie) == null ||
+				(Cookie = Request.Header.Cookie) is null ||
 				string.IsNullOrEmpty(HttpSessionID = Cookie["HttpSessionID"]))
 			{
 				throw new BadRequestException();
@@ -283,7 +283,7 @@ namespace Waher.IoTGateway.Setup
 				else
 					ShowStatus(TabID, "Validating backup.");
 
-				if (BackupFile == null || string.IsNullOrEmpty(BackupFileName))
+				if (BackupFile is null || string.IsNullOrEmpty(BackupFileName))
 					throw new Exception("No backup file selected.");
 
 				string Extension = Path.GetExtension(BackupFileName);
@@ -416,7 +416,7 @@ namespace Waher.IoTGateway.Setup
 					break;
 
 				case ".bak":
-					if (KeyFile == null)
+					if (KeyFile is null)
 						throw new Exception("No key file provided.");
 
 					KeyFile.Position = 0;
@@ -1072,7 +1072,7 @@ namespace Waher.IoTGateway.Setup
 				switch (PropertyType)
 				{
 					case "Array":
-						if (T == null)
+						if (T is null)
 							T = typeof(object);
 
 						List<object> List = new List<object>();
@@ -1100,7 +1100,7 @@ namespace Waher.IoTGateway.Setup
 						break;
 
 					case "Obj":
-						if (T == null)
+						if (T is null)
 							T = typeof(GenericObject);
 
 						GenericObject GenObj = new GenericObject(string.Empty, ElementType, Guid.Empty);

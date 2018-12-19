@@ -30,7 +30,7 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements
 			{
 				foreach (InlineElement E in this.header)
 				{
-					if (E == null || !E.IsWellDefined)
+					if (E is null || !E.IsWellDefined)
 						return false;
 				}
 

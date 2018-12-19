@@ -447,7 +447,7 @@ namespace Waher.Persistence.Files.Serialization
 				Console.Out.WriteLine("String: " + Value);
 #endif
 
-			if (Value == null)
+			if (Value is null)
 			{
 				if (this.bitOffset > 0)
 					this.FlushBits();

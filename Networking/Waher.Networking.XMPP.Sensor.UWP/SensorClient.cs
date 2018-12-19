@@ -589,7 +589,7 @@ namespace Waher.Networking.XMPP.Sensor
 
 				if (E.LocalName == "err")
 				{
-					if (Errors == null)
+					if (Errors is null)
 						Errors = new List<ThingError>();
 
 					Errors.Add(new ThingError(Thing, Timestamp, E.InnerText));
@@ -606,7 +606,7 @@ namespace Waher.Networking.XMPP.Sensor
 					string Unit = string.Empty;
 					bool Writable = false;
 
-					if (Fields == null)
+					if (Fields is null)
 						Fields = new List<Field>();
 
 					foreach (XmlAttribute Attr in E.Attributes)

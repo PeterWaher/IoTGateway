@@ -40,7 +40,7 @@ namespace Waher.Content.Xsl
 		{
 			using (Stream f = Assembly.GetManifestResourceStream(ResourceName))
 			{
-				if (f == null)
+				if (f is null)
 					throw new ArgumentException("Resource not found: " + ResourceName, nameof(ResourceName));
 
 				XmlValidator Validator = new XmlValidator(ResourceName);
@@ -74,7 +74,7 @@ namespace Waher.Content.Xsl
 		{
 			using (Stream f = Assembly.GetManifestResourceStream(ResourceName))
 			{
-				if (f == null)
+				if (f is null)
 					throw new ArgumentException("Resource not found: " + ResourceName, nameof(ResourceName));
 
 				using (XmlReader r = XmlReader.Create(f))
@@ -114,7 +114,7 @@ namespace Waher.Content.Xsl
 			params XmlSchema[] Schemas)
 		{
 			if (!string.IsNullOrEmpty(ExpectedRootElement) &&
-				(Xml.DocumentElement == null ||
+				(Xml.DocumentElement is null ||
 				Xml.DocumentElement.LocalName != ExpectedRootElement ||
 				Xml.DocumentElement.NamespaceURI != ExpectedRootElementNamespace))
 			{

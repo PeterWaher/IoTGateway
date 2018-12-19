@@ -129,7 +129,7 @@ namespace Waher.Networking.XMPP.Sensor
 		{
 			lock (this.synchObject)
 			{
-				if (this.errors == null)
+				if (this.errors is null)
 					this.errors = new List<ThingError>();
 
 				this.errors.AddRange(Errors);
@@ -153,7 +153,7 @@ namespace Waher.Networking.XMPP.Sensor
 		{
 			lock (this.synchObject)
 			{
-				if (this.readFields == null)
+				if (this.readFields is null)
 					this.readFields = new List<Field>();
 
 				foreach (Field Field in Fields)
@@ -205,7 +205,7 @@ namespace Waher.Networking.XMPP.Sensor
 			{
 				lock (this.synchObject)
 				{
-					if (this.errors == null)
+					if (this.errors is null)
 						return new ThingError[0];
 					else
 						return this.errors.ToArray();
@@ -222,7 +222,7 @@ namespace Waher.Networking.XMPP.Sensor
 			{
 				lock (this.synchObject)
 				{
-					if (this.readFields == null)
+					if (this.readFields is null)
 						return new Field[0];
 					else
 						return this.readFields.ToArray();
@@ -274,7 +274,7 @@ namespace Waher.Networking.XMPP.Sensor
 
 		internal void Done()
 		{
-			if (this.errors == null)
+			if (this.errors is null)
 				this.State = SensorDataReadoutState.Done;
 			else
 				this.State = SensorDataReadoutState.Failure;

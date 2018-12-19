@@ -88,11 +88,11 @@ namespace Waher.Script.Graphs.Functions.Plots
 		public override IElement Evaluate(IElement[] Arguments, Variables Variables)
 		{
 			IVector X = Arguments[0] as IVector;
-			if (X == null)
+			if (X is null)
 				throw new ScriptRuntimeException("Expected vector for X argument.", this);
 
 			IVector Y = Arguments[1] as IVector;
-			if (Y == null)
+			if (Y is null)
 				throw new ScriptRuntimeException("Expected vector for Y argument.", this);
 
 			int Dimension = X.Dimension;
@@ -102,7 +102,7 @@ namespace Waher.Script.Graphs.Functions.Plots
 			IElement AreaColor = Arguments.Length <= 2 ? null : Arguments[2];
 
 			return new Graph2D(X, Y, this.DrawGraph, false, true, this,
-				AreaColor == null ? new SKColor(SKColors.Red.Red, SKColors.Red.Green, SKColors.Red.Blue, 192) : AreaColor.AssociatedObjectValue);
+				AreaColor is null ? new SKColor(SKColors.Red.Red, SKColors.Red.Green, SKColors.Red.Blue, 192) : AreaColor.AssociatedObjectValue);
 		}
 
 		private void DrawGraph(SKCanvas Canvas, SKPoint[] Points, object[] Parameters, SKPoint[] PrevPoints, object[] PrevParameters,
@@ -122,13 +122,13 @@ namespace Waher.Script.Graphs.Functions.Plots
 
 				Path = Plot2DCurve.CreateSpline(Points);
 
-				if (PrevPoints == null)
+				if (PrevPoints is null)
 				{
 					IElement Zero;
 					ISet Set = DrawingArea.MinY.AssociatedSet;
 					IGroup Group = Set as IGroup;
 
-					if (Group == null)
+					if (Group is null)
 						Zero = new DoubleNumber(0);
 					else
 						Zero = Group.AdditiveIdentity;

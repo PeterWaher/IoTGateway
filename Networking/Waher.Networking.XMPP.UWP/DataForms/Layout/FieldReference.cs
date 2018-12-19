@@ -38,7 +38,7 @@ namespace Waher.Networking.XMPP.DataForms.Layout
 		internal override bool RemoveExcluded()
 		{
 			Field F = this.Form[this.var];
-			return F == null || F.Exclude;
+			return F is null || F.Exclude;
 		}
 
 		internal override void Serialize(StringBuilder Output)

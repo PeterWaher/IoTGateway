@@ -40,7 +40,7 @@ namespace Waher.Networking.UPnP.Services
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
 			
-			if (actionDelAPSettings == null)
+			if (actionDelAPSettings is null)
 				actionDelAPSettings = this.service.GetAction("DelAPSettings");
 
 			this.actionDelAPSettings.Invoke(out OutputValues,
@@ -54,7 +54,7 @@ namespace Waher.Networking.UPnP.Services
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
 			
-			if (actionDelSTASettings == null)
+			if (actionDelSTASettings is null)
 				actionDelSTASettings = this.service.GetAction("DelSTASettings");
 
 			this.actionDelSTASettings.Invoke(out OutputValues,
@@ -68,7 +68,7 @@ namespace Waher.Networking.UPnP.Services
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
 			
-			if (actionGetAPSettings == null)
+			if (actionGetAPSettings is null)
 				actionGetAPSettings = this.service.GetAction("GetAPSettings");
 
 			this.actionGetAPSettings.Invoke(out OutputValues,
@@ -84,7 +84,7 @@ namespace Waher.Networking.UPnP.Services
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
 			
-			if (actionGetDeviceInfo == null)
+			if (actionGetDeviceInfo is null)
 				actionGetDeviceInfo = this.service.GetAction("GetDeviceInfo");
 
 			this.actionGetDeviceInfo.Invoke(out OutputValues);
@@ -99,7 +99,7 @@ namespace Waher.Networking.UPnP.Services
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
 			
-			if (actionGetSTASettings == null)
+			if (actionGetSTASettings is null)
 				actionGetSTASettings = this.service.GetAction("GetSTASettings");
 
 			this.actionGetSTASettings.Invoke(out OutputValues,
@@ -115,7 +115,7 @@ namespace Waher.Networking.UPnP.Services
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
 			
-			if (actionPutMessage == null)
+			if (actionPutMessage is null)
 				actionPutMessage = this.service.GetAction("PutMessage");
 
 			this.actionPutMessage.Invoke(out OutputValues,
@@ -131,7 +131,7 @@ namespace Waher.Networking.UPnP.Services
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
 			
-			if (actionPutWLANResponse == null)
+			if (actionPutWLANResponse is null)
 				actionPutWLANResponse = this.service.GetAction("PutWLANResponse");
 
 			this.actionPutWLANResponse.Invoke(out OutputValues,
@@ -147,7 +147,7 @@ namespace Waher.Networking.UPnP.Services
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
 			
-			if (actionRebootAP == null)
+			if (actionRebootAP is null)
 				actionRebootAP = this.service.GetAction("RebootAP");
 
 			this.actionRebootAP.Invoke(out OutputValues,
@@ -161,7 +161,7 @@ namespace Waher.Networking.UPnP.Services
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
 			
-			if (actionRebootSTA == null)
+			if (actionRebootSTA is null)
 				actionRebootSTA = this.service.GetAction("RebootSTA");
 
 			this.actionRebootSTA.Invoke(out OutputValues,
@@ -175,7 +175,7 @@ namespace Waher.Networking.UPnP.Services
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
 			
-			if (actionResetAP == null)
+			if (actionResetAP is null)
 				actionResetAP = this.service.GetAction("ResetAP");
 
 			this.actionResetAP.Invoke(out OutputValues,
@@ -189,7 +189,7 @@ namespace Waher.Networking.UPnP.Services
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
 			
-			if (actionResetSTA == null)
+			if (actionResetSTA is null)
 				actionResetSTA = this.service.GetAction("ResetSTA");
 
 			this.actionResetSTA.Invoke(out OutputValues,
@@ -203,7 +203,7 @@ namespace Waher.Networking.UPnP.Services
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
 			
-			if (actionSetAPSettings == null)
+			if (actionSetAPSettings is null)
 				actionSetAPSettings = this.service.GetAction("SetAPSettings");
 
 			this.actionSetAPSettings.Invoke(out OutputValues,
@@ -217,7 +217,7 @@ namespace Waher.Networking.UPnP.Services
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
 			
-			if (actionSetSelectedRegistrar == null)
+			if (actionSetSelectedRegistrar is null)
 				actionSetSelectedRegistrar = this.service.GetAction("SetSelectedRegistrar");
 
 			this.actionSetSelectedRegistrar.Invoke(out OutputValues,
@@ -231,7 +231,7 @@ namespace Waher.Networking.UPnP.Services
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
 			
-			if (actionSetSTASettings == null)
+			if (actionSetSTASettings is null)
 				actionSetSTASettings = this.service.GetAction("SetSTASettings");
 
 			this.actionSetSTASettings.Invoke(out OutputValues);

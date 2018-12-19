@@ -185,7 +185,7 @@ namespace Waher.Events.MQTT
 				Xml.Append("<tag name='");
 				Xml.Append(XML.Encode(Tag.Key));
 
-				if (Tag.Value == null)
+				if (Tag.Value is null)
 					Xml.Append("' value=''/>");
 				else
 				{

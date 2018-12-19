@@ -47,7 +47,7 @@ namespace Waher.Things.Metering
 		{
 			lastChanged = RuntimeSettings.Get(MeteringTopology.SourceID + ".LastChanged", DateTime.MinValue);
 
-			if (instance == null)
+			if (instance is null)
 				instance = this;
 		}
 
@@ -187,7 +187,7 @@ namespace Waher.Things.Metering
 		{
 			get
 			{
-				if (root == null)
+				if (root is null)
 					LoadRoot().Wait();
 
 				yield return root;
@@ -201,7 +201,7 @@ namespace Waher.Things.Metering
 		{
 			get
 			{
-				if (root == null)
+				if (root is null)
 					LoadRoot().Wait();
 
 				return root;
@@ -216,14 +216,14 @@ namespace Waher.Things.Metering
 			{
 				if (Node is Root)
 				{
-					if (Result == null)
+					if (Result is null)
 						Result = (Root)Node;
 					else
 						await Database.Delete(Node);
 				}
 			}
 
-			if (Result == null)
+			if (Result is null)
 			{
 				Result = new Root()
 				{

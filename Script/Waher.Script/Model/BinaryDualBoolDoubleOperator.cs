@@ -61,7 +61,7 @@ namespace Waher.Script.Model
 				if (Result != null)
 					return Result;
 
-				if (R == null)
+				if (R is null)
 					R = this.right.Evaluate(Variables);
 
 				BR = R as BooleanValue;
@@ -73,7 +73,7 @@ namespace Waher.Script.Model
 			}
 			else
 			{
-				if (R == null)
+				if (R is null)
 					R = this.right.Evaluate(Variables);
 
 				BR = R as BooleanValue;

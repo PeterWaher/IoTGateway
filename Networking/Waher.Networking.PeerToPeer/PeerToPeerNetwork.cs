@@ -309,7 +309,7 @@ namespace Waher.Networking.PeerToPeer
 		{
 			try
 			{
-				if (this.upnpClient == null)
+				if (this.upnpClient is null)
 				{
 					this.upnpClient = new UPnPClient(this.sniffers);
 					this.upnpClient.OnDeviceFound += new UPnPDeviceLocationEventHandler(UpnpClient_OnDeviceFound);
@@ -348,10 +348,10 @@ namespace Waher.Networking.PeerToPeer
 				if (Doc != null)
 				{
 					UPnPService Service = Doc.GetService("urn:schemas-upnp-org:service:WANIPConnection:1");
-					if (Service == null)
+					if (Service is null)
 					{
 						Service = Doc.GetService("urn:schemas-upnp-org:service:WANIPConnection:2");
-						if (Service == null)
+						if (Service is null)
 							return;
 					}
 
@@ -476,7 +476,7 @@ namespace Waher.Networking.PeerToPeer
 						}
 					}
 				}
-				while (this.tcpListener == null);
+				while (this.tcpListener is null);
 
 				this.localEndpoint = new IPEndPoint(this.localAddress, LocalPort);
 

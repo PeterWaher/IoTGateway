@@ -68,7 +68,7 @@ namespace Waher.Script.Content.Functions.Encoding
 
 				foreach (string[] Rec in Records)
 				{
-					if (Rec == null)
+					if (Rec is null)
 						continue;
 
 					c = Rec.Length;
@@ -86,7 +86,7 @@ namespace Waher.Script.Content.Functions.Encoding
 					{
 						foreach (string s in Rec)
 						{
-							if (s == null || string.IsNullOrEmpty(s))
+							if (s is null || string.IsNullOrEmpty(s))
 								Elements.AddLast(new ObjectValue(null));
 							else if (CommonTypes.TryParse(s, out double dbl))
 								Elements.AddLast(new DoubleNumber(dbl));

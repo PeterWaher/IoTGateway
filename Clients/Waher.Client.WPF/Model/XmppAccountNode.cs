@@ -436,7 +436,7 @@ namespace Waher.Client.WPF.Model
 		{
 			get
 			{
-				if (this.client == null)
+				if (this.client is null)
 					return offline;
 				else
 				{
@@ -497,7 +497,7 @@ namespace Waher.Client.WPF.Model
 						return "Connected.";
 
 					case XmppState.Error:
-						if (this.lastError == null)
+						if (this.lastError is null)
 							return "In an error state.";
 						else
 							return this.lastError.Message;
@@ -538,7 +538,7 @@ namespace Waher.Client.WPF.Model
 			LinkedList<RosterItem> Resubscribe = null;
 			LinkedList<RosterItem> Reunsubscribe = null;
 
-			if (Contacts == null)
+			if (Contacts is null)
 				Contacts = new SortedDictionary<string, TreeNode>();
 
 			lock (Contacts)
@@ -562,7 +562,7 @@ namespace Waher.Client.WPF.Model
 
 						Contacts[Item.BareJid] = Contact;
 
-						if (Added == null)
+						if (Added is null)
 							Added = new LinkedList<TreeNode>();
 
 						Added.AddLast(Contact);
@@ -571,14 +571,14 @@ namespace Waher.Client.WPF.Model
 					switch (Item.PendingSubscription)
 					{
 						case PendingSubscription.Subscribe:
-							if (Resubscribe == null)
+							if (Resubscribe is null)
 								Resubscribe = new LinkedList<RosterItem>();
 
 							Resubscribe.AddLast(Item);
 							break;
 
 						case PendingSubscription.Unsubscribe:
-							if (Reunsubscribe == null)
+							if (Reunsubscribe is null)
 								Reunsubscribe = new LinkedList<RosterItem>();
 
 							Reunsubscribe.AddLast(Item);
@@ -586,7 +586,7 @@ namespace Waher.Client.WPF.Model
 					}
 				}
 
-				if (this.children == null)
+				if (this.children is null)
 					this.children = Contacts;
 				else
 				{
@@ -595,7 +595,7 @@ namespace Waher.Client.WPF.Model
 						if (P.Value is XmppContact Contact &&
 							!Existing.ContainsKey(Contact.BareJID))
 						{
-							if (Removed == null)
+							if (Removed is null)
 								Removed = new LinkedList<KeyValuePair<string, TreeNode>>();
 
 							Removed.AddLast(P);
@@ -644,7 +644,7 @@ namespace Waher.Client.WPF.Model
 
 		private void Client_OnRosterItemUpdated(object Sender, RosterItem Item)
 		{
-			if (this.children == null)
+			if (this.children is null)
 				this.CheckRoster();
 			else
 			{
@@ -731,7 +731,7 @@ namespace Waher.Client.WPF.Model
 
 		private void Client_OnRosterItemRemoved(object Sender, RosterItem Item)
 		{
-			if (this.children == null)
+			if (this.children is null)
 				this.CheckRoster();
 			else
 			{
@@ -748,7 +748,7 @@ namespace Waher.Client.WPF.Model
 
 		private void Client_OnPresence(object Sender, PresenceEventArgs e)
 		{
-			if (this.children == null)
+			if (this.children is null)
 				this.CheckRoster();
 			else
 			{
@@ -908,7 +908,7 @@ namespace Waher.Client.WPF.Model
 					e.Accept();
 
 					RosterItem Item = this.client.GetRosterItem(e.FromBareJID);
-					if (Item == null || Item.State == SubscriptionState.None || Item.State == SubscriptionState.From)
+					if (Item is null || Item.State == SubscriptionState.None || Item.State == SubscriptionState.From)
 						this.client.RequestPresenceSubscription(e.FromBareJID);
 
 					this.client.SetPresence(Availability.Chat);
@@ -952,7 +952,7 @@ namespace Waher.Client.WPF.Model
 		{
 			get
 			{
-				if (this.client == null)
+				if (this.client is null)
 					return string.Empty;
 				else
 					return this.client.BareJID;
@@ -1004,7 +1004,7 @@ namespace Waher.Client.WPF.Model
 
 		public override bool RemoveSniffer(ISniffer Sniffer)
 		{
-			if (this.client == null)
+			if (this.client is null)
 				return false;
 			else
 				return this.client.Remove(Sniffer);
@@ -1079,7 +1079,7 @@ namespace Waher.Client.WPF.Model
 							XmppComponent Component = null;
 							ThingRegistry ThingRegistry = null;
 
-							if (this.children == null)
+							if (this.children is null)
 								this.children = new SortedDictionary<string, TreeNode>();
 
 							lock (this.children)

@@ -146,7 +146,7 @@ namespace Waher.Security.DTLS.Ciphers
 			Offset += N;
 
 			if (State.localEndpoint.Users.TryGetUser(UserId, out IUser User) && 
-				(State.localEndpoint.RequiredPrivilege == null ||
+				(State.localEndpoint.RequiredPrivilege is null ||
 				User.HasPrivilege(State.localEndpoint.RequiredPrivilege)))
 			{
 				string s;
@@ -155,7 +155,7 @@ namespace Waher.Security.DTLS.Ciphers
 				if (!string.IsNullOrEmpty(s = User.PasswordHash))
 					Key = Hashes.StringToBinary(s);
 
-				if (Key == null)
+				if (Key is null)
 					Key = Encoding.UTF8.GetBytes(User.PasswordHash);
 
 				State.credentials = new PresharedKey(Identity, Key);

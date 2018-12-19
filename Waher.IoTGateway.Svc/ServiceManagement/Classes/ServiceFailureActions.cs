@@ -55,7 +55,7 @@ namespace Waher.IoTGateway.Svc.ServiceManagement.Classes
 
 		public bool Equals(ServiceFailureActions other)
 		{
-			if (other == null)
+			if (other is null)
 			{
 				return false;
 			}

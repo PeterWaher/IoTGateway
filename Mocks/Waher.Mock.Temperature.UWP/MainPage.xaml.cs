@@ -30,16 +30,16 @@ namespace Waher.Mock.Temperature.UWP
 		{
 			this.InitializeComponent();
 
-			if (sniffer == null)
+			if (sniffer is null)
 				sniffer = new ListViewSniffer(this.SnifferListView);
 
-			if (eventSink == null)
+			if (eventSink is null)
 			{
 				eventSink = new ListViewEventSink("List View Event Sink.", this.EventsListView);
 				Log.Register(eventSink);
 			}
 
-			if (instance == null)
+			if (instance is null)
 				instance = this;
 
 			App.OwnershipChanged += App_OwnershipChanged;

@@ -66,7 +66,7 @@ namespace Waher.Script.Objects.Matrices
 		public override bool Contains(IElement Element)
 		{
 			ObjectMatrix M = Element as ObjectMatrix;
-			if (M == null)
+			if (M is null)
 				return false;
 
 			return M.Rows == this.rows && M.Columns == this.columns;

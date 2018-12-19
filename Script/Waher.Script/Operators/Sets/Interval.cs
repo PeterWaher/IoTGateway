@@ -49,16 +49,16 @@ namespace Waher.Script.Operators.Sets
 		{
             IElement From = this.left.Evaluate(Variables);
             IElement To = this.middle.Evaluate(Variables);
-            IElement StepSize = this.right == null ? null : this.right.Evaluate(Variables);
+            IElement StepSize = this.right is null ? null : this.right.Evaluate(Variables);
 
             DoubleNumber F = From as DoubleNumber;
             DoubleNumber T = To as DoubleNumber;
             DoubleNumber S = StepSize as DoubleNumber;
 
-            if (F == null || T == null || (S == null && StepSize != null))
+            if (F is null || T is null || (S is null && StepSize != null))
                 throw new ScriptRuntimeException("The interval operator requires double-valued operands.", this);
 
-            return new Objects.Sets.Interval(F.Value, T.Value, true, true, S == null ? (double?)null : S.Value);
+            return new Objects.Sets.Interval(F.Value, T.Value, true, true, S is null ? (double?)null : S.Value);
         }
     }
 }

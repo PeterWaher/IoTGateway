@@ -338,7 +338,7 @@ namespace Waher.Security.DTLS
 					Record.fragment = null;
 				}
 
-				if (Record.fragment == null)
+				if (Record.fragment is null)
 				{
 					this.Error(DateTime.Now.ToString("T") + " Packet dropped. Decryption failed.");
 					State.acceptRollbackPrevEpoch = true;
@@ -609,7 +609,7 @@ namespace Waher.Security.DTLS
 									if (!ciphersPerCode.TryGetValue(CipherSuite, out State.pendingCipher))
 										State.pendingCipher = null;
 
-									if (State.pendingCipher == null || CompressionMethod != 0)
+									if (State.pendingCipher is null || CompressionMethod != 0)
 									{
 										this.HandshakeFailure(State, "Cipher and compression mode agreement not reached.",
 											AlertDescription.handshake_failure);
@@ -696,7 +696,7 @@ namespace Waher.Security.DTLS
 									}
 								}
 
-								if (Cipher == null || !NullCompression)
+								if (Cipher is null || !NullCompression)
 								{
 									this.SendAlert(AlertLevel.warning, AlertDescription.handshake_failure, State);
 									break;
@@ -787,7 +787,7 @@ namespace Waher.Security.DTLS
 								break;
 
 							case HandshakeType.finished:
-								if (State.currentCipher == null)
+								if (State.currentCipher is null)
 									break;
 
 								byte[] VerifyData = new byte[12];
@@ -952,10 +952,10 @@ namespace Waher.Security.DTLS
 
 		internal static bool AreEqual(byte[] A1, byte[] A2)
 		{
-			if ((A1 == null) ^ (A2 == null))
+			if ((A1 is null) ^ (A2 is null))
 				return false;
 
-			if (A1 == null)
+			if (A1 is null)
 				return true;
 
 			int i, c = A1.Length;
@@ -1181,7 +1181,7 @@ namespace Waher.Security.DTLS
 				this.SniffMsg(Readable, 0, false, State);
 			}
 
-			if (More && State.buffer == null)
+			if (More && State.buffer is null)
 				State.buffer = new MemoryStream();
 
 			if (State.buffer != null)

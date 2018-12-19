@@ -106,7 +106,7 @@ namespace Waher.Networking.XMPP.DataForms.ValidationMethods
 		public override bool Merge(ValidationMethod SecondaryValidationMethod, DataType DataType)
 		{
 			RangeValidation V2 = SecondaryValidationMethod as RangeValidation;
-			if (V2 == null)
+			if (V2 is null)
 				return false;
 
 			if (string.IsNullOrEmpty(this.min) ^ string.IsNullOrEmpty(V2.min))
@@ -118,7 +118,7 @@ namespace Waher.Networking.XMPP.DataForms.ValidationMethods
 			if (this.min == V2.min && this.max == V2.max)
 				return true;
 
-			if (DataType == null)
+			if (DataType is null)
 				return false;
 
 			object Min, Max;
@@ -133,7 +133,7 @@ namespace Waher.Networking.XMPP.DataForms.ValidationMethods
 				else
 				{
 					Min = DataType.Parse(this.min);
-					if (Min == null)
+					if (Min is null)
 						return false;
 				}
 
@@ -142,12 +142,12 @@ namespace Waher.Networking.XMPP.DataForms.ValidationMethods
 				else
 				{
 					Min2 = DataType.Parse(V2.min);
-					if (Min2 == null)
+					if (Min2 is null)
 						return false;
 				}
 
 				Comparable = Min as IComparable;
-				if (Comparable == null)
+				if (Comparable is null)
 					return false;
 
 				try
@@ -170,7 +170,7 @@ namespace Waher.Networking.XMPP.DataForms.ValidationMethods
 				else
 				{
 					Max = DataType.Parse(this.max);
-					if (Max == null)
+					if (Max is null)
 						return false;
 				}
 
@@ -179,12 +179,12 @@ namespace Waher.Networking.XMPP.DataForms.ValidationMethods
 				else
 				{
 					Max2 = DataType.Parse(V2.max);
-					if (Max2 == null)
+					if (Max2 is null)
 						return false;
 				}
 
 				Comparable = Max as IComparable;
-				if (Comparable == null)
+				if (Comparable is null)
 					return false;
 
 				try

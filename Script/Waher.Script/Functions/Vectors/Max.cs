@@ -101,19 +101,19 @@ namespace Waher.Script.Functions.Vectors
 
             foreach (IElement E in Values.ChildElements)
             {
-				if (E.AssociatedObjectValue == null)
+				if (E.AssociatedObjectValue is null)
 					continue;
 
-				if (Result == null || S.Compare(Result, E) < 0)
+				if (Result is null || S.Compare(Result, E) < 0)
                 {
                     Result = E;
                     S = Result.AssociatedSet as IOrderedSet;
-                    if (S == null)
+                    if (S is null)
                         throw new ScriptRuntimeException("Cannot compare operands.", Node);
                 }
             }
 
-            if (Result == null)
+            if (Result is null)
                 return ObjectValue.Null;
             else
                 return Result;

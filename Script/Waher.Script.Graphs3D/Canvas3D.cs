@@ -1228,7 +1228,7 @@ namespace Waher.Script.Graphs3D
 			for (i = 0; i < NrRecs; i++)
 			{
 				Rec = Recs[i];
-				if (Rec == null)
+				if (Rec is null)
 					continue;
 
 				Y = i + MinY;
@@ -1268,7 +1268,7 @@ namespace Waher.Script.Graphs3D
 			int i = (int)(y + 0.5f) - MinY;
 			ScanLineRec Rec = Records[i];
 
-			if (Rec == null)
+			if (Rec is null)
 			{
 				Records[i] = new ScanLineRec()
 				{
@@ -1294,7 +1294,7 @@ namespace Waher.Script.Graphs3D
 			}
 			else
 			{
-				if (Rec.nodes == null)
+				if (Rec.nodes is null)
 				{
 					Rec.nodes = new LinkedList<KeyValuePair<float, float>>();
 					Rec.nodes.AddLast(new KeyValuePair<float, float>(Rec.x0, Rec.z0));
@@ -1310,9 +1310,9 @@ namespace Waher.Script.Graphs3D
 					Loop = Loop.Next;
 				}
 
-				if (Loop == null)
+				if (Loop is null)
 					Rec.nodes.AddLast(new KeyValuePair<float, float>(x, z));
-				else if (Prev == null)
+				else if (Prev is null)
 					Rec.nodes.AddFirst(new KeyValuePair<float, float>(x, z));
 				else
 					Rec.nodes.AddAfter(Prev, new KeyValuePair<float, float>(x, z));

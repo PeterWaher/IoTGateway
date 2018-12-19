@@ -43,7 +43,7 @@ namespace Waher.Script.Objects.Sets
         public override bool Equals(object obj)
         {
             FiniteSet S = obj as FiniteSet;
-            if (S == null)
+            if (S is null)
                 return false;
 
             if (this.elements.Count != S.elements.Count)
@@ -92,7 +92,7 @@ namespace Waher.Script.Objects.Sets
 
             foreach (IElement Element in this.elements.Keys)
             {
-                if (sb == null)
+                if (sb is null)
                     sb = new StringBuilder("{");
                 else
                     sb.Append(", ");
@@ -100,7 +100,7 @@ namespace Waher.Script.Objects.Sets
                 sb.Append(Element.ToString());
             }
 
-            if (sb == null)
+            if (sb is null)
                 return "{}";
             else
             {

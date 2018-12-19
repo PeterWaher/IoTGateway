@@ -29,7 +29,7 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements
 			{
 				foreach (InlineElement E in this.elements)
 				{
-					if (E == null || !E.IsWellDefined)
+					if (E is null || !E.IsWellDefined)
 						return false;
 				}
 

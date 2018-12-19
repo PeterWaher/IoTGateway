@@ -39,7 +39,7 @@ namespace Waher.Script.Abstraction.Sets
 		public override IEuclidianDomainElement Divide(IEuclidianDomainElement Left, IEuclidianDomainElement Right, out IEuclidianDomainElement Remainder)
 		{
 			EuclidianDomainElement Result = this.Divide(Left, Right) as EuclidianDomainElement;
-			if (Result == null)
+			if (Result is null)
 				Remainder = null;
 			else
 				Remainder = Result.AssociatedAbelianGroup.Zero as EuclidianDomainElement;

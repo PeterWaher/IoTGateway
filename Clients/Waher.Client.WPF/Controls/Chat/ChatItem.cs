@@ -53,7 +53,7 @@ namespace Waher.Client.WPF.Controls.Chat
 			this.timestamp = this.lastUpdated = DateTime.Now;
 			this.message = Message;
 
-			if (Markdown == null)
+			if (Markdown is null)
 			{
 				XamlSettings Settings = new XamlSettings();
 				this.formattedMessage = new TextBlock()
@@ -81,7 +81,7 @@ namespace Waher.Client.WPF.Controls.Chat
 
 		internal void Append(string Message, ListView ChatListView, MainWindow MainWindow)
 		{
-			if (this.building == null)
+			if (this.building is null)
 			{
 				this.building = new StringBuilder(this.message);
 
@@ -195,7 +195,7 @@ namespace Waher.Client.WPF.Controls.Chat
 		private void Hyperlink_Click(object sender, RoutedEventArgs e)
 		{
 			Hyperlink Link = e.Source as Hyperlink;
-			if (Link == null)
+			if (Link is null)
 				return;
 
 			string Uri = Link.NavigateUri.ToString();

@@ -107,7 +107,7 @@ namespace Waher.Networking.XMPP.P2P
 		/// <param name="FullJID">Full JID.</param>
 		public void RemovePeerAddresses(string FullJID)
 		{
-			string ThisExternalIp = this.p2pNetwork.ExternalAddress == null ? string.Empty : this.p2pNetwork.ExternalAddress.ToString();
+			string ThisExternalIp = this.p2pNetwork.ExternalAddress is null ? string.Empty : this.p2pNetwork.ExternalAddress.ToString();
 
 			lock (this.addressesByFullJid)
 			{
@@ -168,7 +168,7 @@ namespace Waher.Networking.XMPP.P2P
 			Dictionary<int, AddressInfo> Infos;
 			string ThisExternalIp;
 
-			if (this.p2pNetwork.ExternalAddress == null)
+			if (this.p2pNetwork.ExternalAddress is null)
 				ThisExternalIp = string.Empty;
 			else
 				ThisExternalIp = this.p2pNetwork.ExternalAddress.ToString();
@@ -383,7 +383,7 @@ namespace Waher.Networking.XMPP.P2P
 			string Header = null;
 			bool b;
 
-			if (this.p2pNetwork == null || this.p2pNetwork.State != PeerToPeerNetworkState.Ready)
+			if (this.p2pNetwork is null || this.p2pNetwork.State != PeerToPeerNetworkState.Ready)
 			{
 				if (Callback != null)
 				{
@@ -417,7 +417,7 @@ namespace Waher.Networking.XMPP.P2P
 
 				if (b)
 				{
-					if (Result.AgeSeconds >= 30 && (Result.HasCallbacks || Result.XmppClient == null || !Result.Peer.Tcp.Connected))
+					if (Result.AgeSeconds >= 30 && (Result.HasCallbacks || Result.XmppClient is null || !Result.Peer.Tcp.Connected))
 					{
 						this.peersByFullJid.Remove(FullJID);
 						Old = Result;
@@ -510,7 +510,7 @@ namespace Waher.Networking.XMPP.P2P
 					}
 				}
 
-				if (Connection == null)
+				if (Connection is null)
 				{
 					lock (this.peersByFullJid)
 					{

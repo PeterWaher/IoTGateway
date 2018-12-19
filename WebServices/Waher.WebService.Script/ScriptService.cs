@@ -75,7 +75,7 @@ namespace Waher.WebService.Script
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public void POST(HttpRequest Request, HttpResponse Response)
 		{
-			if (Request.Session == null)
+			if (Request.Session is null)
 				throw new BadRequestException();
 
 			object Obj = Request.HasData ? Request.DecodeData() : null;

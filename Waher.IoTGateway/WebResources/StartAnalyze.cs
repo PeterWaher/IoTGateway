@@ -145,7 +145,7 @@ namespace Waher.IoTGateway.WebResources
 				fs.Dispose();
 				fs = null;
 
-				if (xslt == null)
+				if (xslt is null)
 					xslt = XSL.LoadTransform(typeof(Gateway).Namespace + ".Transforms.DbStatXmlToHtml.xslt");
 				
 				string s = File.ReadAllText(FullPath);

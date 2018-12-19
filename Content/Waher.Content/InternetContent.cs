@@ -70,7 +70,7 @@ namespace Waher.Content
 		{
 			get
 			{
-				if (canEncodeContentTypes == null)
+				if (canEncodeContentTypes is null)
 				{
 					SortedDictionary<string, bool> ContentTypes = new SortedDictionary<string, bool>();
 
@@ -97,7 +97,7 @@ namespace Waher.Content
 		{
 			get
 			{
-				if (canEncodeFileExtensions == null)
+				if (canEncodeFileExtensions is null)
 				{
 					SortedDictionary<string, bool> FileExtensions = new SortedDictionary<string, bool>();
 
@@ -124,7 +124,7 @@ namespace Waher.Content
 		{
 			get
 			{
-				if (encoders == null)
+				if (encoders is null)
 				{
 					List<IContentEncoder> Encoders = new List<IContentEncoder>();
 					IContentEncoder Encoder;
@@ -262,7 +262,7 @@ namespace Waher.Content
 		{
 			get
 			{
-				if (canDecodeContentTypes == null)
+				if (canDecodeContentTypes is null)
 				{
 					SortedDictionary<string, bool> ContentTypes = new SortedDictionary<string, bool>();
 
@@ -289,7 +289,7 @@ namespace Waher.Content
 		{
 			get
 			{
-				if (canDecodeFileExtensions == null)
+				if (canDecodeFileExtensions is null)
 				{
 					SortedDictionary<string, bool> FileExtensions = new SortedDictionary<string, bool>();
 
@@ -316,7 +316,7 @@ namespace Waher.Content
 		{
 			get
 			{
-				if (decoders == null)
+				if (decoders is null)
 				{
 					List<IContentDecoder> Decoders = new List<IContentDecoder>();
 					IContentDecoder Decoder;
@@ -552,7 +552,7 @@ namespace Waher.Content
 		{
 			get
 			{
-				if (converters == null)
+				if (converters is null)
 					FindConverters();
 
 				return converters;
@@ -574,7 +574,7 @@ namespace Waher.Content
 		{
 			lock (convertersByStep)
 			{
-				if (converters == null)
+				if (converters is null)
 					FindConverters();
 
 				string PathKey = FromContentType + " -> " + ToContentType;
@@ -753,7 +753,7 @@ namespace Waher.Content
 		{
 			lock (convertersByStep)
 			{
-				if (converters == null)
+				if (converters is null)
 					FindConverters();
 
 				if (!convertersByFrom.TryGetValue(FromContentType, out List<IContentConverter> Converters))

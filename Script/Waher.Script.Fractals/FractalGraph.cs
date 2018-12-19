@@ -77,7 +77,7 @@ namespace Waher.Script.Fractals
 			else
 				i = this.i1 - Y * (this.i1 - this.i0) / this.height;
 
-			if (this.fractalZoomScript == null)
+			if (this.fractalZoomScript is null)
 				return "[" + Expression.ToString(r) + ";" + Expression.ToString(i) + "]";
 
 			return this.fractalZoomScript(r, i, this.size, this.state);

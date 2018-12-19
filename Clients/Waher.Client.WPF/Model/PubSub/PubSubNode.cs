@@ -371,7 +371,7 @@ namespace Waher.Client.WPF.Model.PubSub
 				{
 					Item = new PubSubItem(this, e.Publisher, e.NodeName, e.ItemId, e.Item.InnerText, e.Publisher);
 
-					if (this.children == null)
+					if (this.children is null)
 						this.children = new SortedDictionary<string, TreeNode>() { { Item.Key, Item } };
 					else
 					{
@@ -404,7 +404,7 @@ namespace Waher.Client.WPF.Model.PubSub
 
 		internal void Purged(NodeNotificationEventArgs e)
 		{
-			if (this.children == null)
+			if (this.children is null)
 				return;
 
 			TreeNode[] ToRemove;

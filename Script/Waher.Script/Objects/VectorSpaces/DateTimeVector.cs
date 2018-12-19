@@ -48,7 +48,7 @@ namespace Waher.Script.Objects.VectorSpaces
         {
             get
             {
-                if (this.values == null)
+                if (this.values is null)
                 {
 					DateTime[] v = new DateTime[this.dimension];
                     int i = 0;
@@ -70,7 +70,7 @@ namespace Waher.Script.Objects.VectorSpaces
         {
             get
             {
-                if (this.elements == null)
+                if (this.elements is null)
                 {
                     int i;
                     IElement[] v = new IElement[this.dimension];
@@ -102,7 +102,7 @@ namespace Waher.Script.Objects.VectorSpaces
 
             foreach (DateTime d in this.Values)
             {
-                if (sb == null)
+                if (sb is null)
                     sb = new StringBuilder("[");
                 else
                     sb.Append(", ");
@@ -110,7 +110,7 @@ namespace Waher.Script.Objects.VectorSpaces
                 sb.Append(Expression.ToString(d));
             }
 
-            if (sb == null)
+            if (sb is null)
                 return "[]";
             else
             {
@@ -126,7 +126,7 @@ namespace Waher.Script.Objects.VectorSpaces
         {
             get
             {
-                if (this.associatedVectorSpace == null)
+                if (this.associatedVectorSpace is null)
                     this.associatedVectorSpace = new DateTimeVectors(this.dimension);
 
                 return this.associatedVectorSpace;
@@ -180,7 +180,7 @@ namespace Waher.Script.Objects.VectorSpaces
         public override bool Equals(object obj)
         {
             DateTimeVector DateTimeVector = obj as DateTimeVector;
-            if (DateTimeVector == null)
+            if (DateTimeVector is null)
                 return false;
 
             int i;
@@ -248,7 +248,7 @@ namespace Waher.Script.Objects.VectorSpaces
         {
             get
             {
-                if (this.zero == null)
+                if (this.zero is null)
                     this.zero = new DateTimeVector(new DateTime[this.dimension]);
 
                 return this.zero;
@@ -283,7 +283,7 @@ namespace Waher.Script.Objects.VectorSpaces
                 throw new ScriptException("Index out of bounds.");
 
             DateTimeValue V = Value as DateTimeValue;
-            if (V == null)
+            if (V is null)
                 throw new ScriptException("Elements in a boolean vector are required to be boolean values.");
 
 			DateTime[] Values = this.Values;

@@ -107,7 +107,7 @@ namespace Waher.Script.Fractals.ComplexFractals
                 f = null;
                 fDef = null;
 
-				if (Obj == null)
+				if (Obj is null)
 					i++;
 			}
 
@@ -123,7 +123,7 @@ namespace Waher.Script.Fractals.ComplexFractals
                 Palette = ColorModels.RandomLinearAnalogousHSL.CreatePalette(1024, 16, out int Seed, this, Variables);
                 ColorExpression = "RandomLinearAnalogousHSL(1024,16," + Seed.ToString() + ")";
 
-				if (i < c && this.Arguments[i] == null)
+				if (i < c && this.Arguments[i] is null)
 					i++;
 			}
 
@@ -324,7 +324,7 @@ namespace Waher.Script.Fractals.ComplexFractals
                     Obj = f.Evaluate(P, v);
                     Row = Obj.AssociatedObjectValue as Complex[];
 
-                    if (Row == null)
+                    if (Row is null)
                     {
                         throw new ScriptRuntimeException("Lambda expression must be able to accept complex vectors, " +
                             "and return complex vectors of equal length. Type returned: " +

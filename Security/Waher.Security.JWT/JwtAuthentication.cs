@@ -60,7 +60,7 @@ namespace Waher.Security.JWT
 					if (!this.factory.IsValid(Token))
 						return false;
 
-					if (Token.Subject == null)
+					if (Token.Subject is null)
 						return false;
 
 					return this.users.TryGetUser(Token.Subject, out User);

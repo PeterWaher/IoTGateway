@@ -25,7 +25,7 @@ namespace Waher.Script.Functions.Runtime
         public Remove(ScriptNode Argument, int Start, int Length, Expression Expression)
             : base(Start, Length, Expression)
         {
-            if (Argument == null)
+            if (Argument is null)
                 this.variableName = string.Empty;
             else
             {

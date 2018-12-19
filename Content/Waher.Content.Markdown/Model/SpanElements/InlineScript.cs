@@ -74,7 +74,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		public override void GenerateHTML(StringBuilder Output)
 		{
 			object Result = this.EvaluateExpression();
-			if (Result == null)
+			if (Result is null)
 				return;
 
 			GenerateHTML(Result, Output, this.aloneInParagraph, this.variables);
@@ -228,7 +228,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		public override void GeneratePlainText(StringBuilder Output)
 		{
 			object Result = this.EvaluateExpression();
-			if (Result == null)
+			if (Result is null)
 				return;
 
 			Output.Append(Result.ToString());
@@ -249,7 +249,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		public override void GenerateXAML(XmlWriter Output, XamlSettings Settings, TextAlignment TextAlignment)
 		{
 			object Result = this.EvaluateExpression();
-			if (Result == null)
+			if (Result is null)
 				return;
 
 			SKImage Img;

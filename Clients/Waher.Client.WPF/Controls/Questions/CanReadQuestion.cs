@@ -179,7 +179,7 @@ namespace Waher.Client.WPF.Controls.Questions
 
 			this.fieldsListBox = ListBox;
 
-			if (this.availableFieldNames == null)
+			if (this.availableFieldNames is null)
 			{
 				if (this.fieldNames != null)
 				{
@@ -201,7 +201,7 @@ namespace Waher.Client.WPF.Controls.Questions
 					ListBox.Items.Add(new ListBoxItem()
 					{
 						Content = FieldName,
-						IsSelected = (this.fieldNames == null || Array.IndexOf<string>(this.fieldNames, FieldName) >= 0),
+						IsSelected = (this.fieldNames is null || Array.IndexOf<string>(this.fieldNames, FieldName) >= 0),
 						Tag = FieldName
 					});
 				}
@@ -209,7 +209,7 @@ namespace Waher.Client.WPF.Controls.Questions
 
 			StackPanel StackPanel = AddAllClearButtons(Details, ListBox);
 
-			if (this.availableFieldNames == null)
+			if (this.availableFieldNames is null)
 			{
 				StackPanel.Children.Add(Button = new Button()
 				{
@@ -346,7 +346,7 @@ namespace Waher.Client.WPF.Controls.Questions
 			((Button)sender).IsEnabled = false;
 
 			RosterItem Item = Client[this.JID];
-			if (Item == null || Item.State == SubscriptionState.None || Item.State == SubscriptionState.From)
+			if (Item is null || Item.State == SubscriptionState.None || Item.State == SubscriptionState.From)
 			{
 				if (!this.registered)
 				{
@@ -418,7 +418,7 @@ namespace Waher.Client.WPF.Controls.Questions
 					DispatcherOperation Op = MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() =>
 					{
 						SortedDictionary<string, bool> Selected = null;
-						bool AllSelected = this.fieldNames == null;
+						bool AllSelected = this.fieldNames is null;
 
 						if (!AllSelected)
 						{
@@ -486,7 +486,7 @@ namespace Waher.Client.WPF.Controls.Questions
 					All = false;
 			}
 
-			if (this.availableFieldNames == null || !All)
+			if (this.availableFieldNames is null || !All)
 				return Result.ToArray();
 			else
 				return null;

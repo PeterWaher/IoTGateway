@@ -61,7 +61,7 @@ namespace Waher.Script.Objects
 			IComparable c1 = o1.Value as IComparable;
 			IComparable c2 = o2.Value as IComparable;
 
-			if (c1 == null || c2 == null)
+			if (c1 is null || c2 is null)
 				throw new ScriptException("Values not comparable.");
 
 			return c1.CompareTo(c2);

@@ -120,7 +120,7 @@ namespace Waher.Security.JWT
 
 			string s = Token.Header + "." + Token.Payload + "." + Token.Signature;
 
-			if (Encoding == null)
+			if (Encoding is null)
 				return Encoding.ASCII.GetBytes(s);
 			else
 				return Encoding.GetBytes(s);

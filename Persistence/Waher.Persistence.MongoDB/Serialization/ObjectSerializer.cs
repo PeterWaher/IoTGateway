@@ -46,13 +46,13 @@ namespace Waher.Persistence.MongoDB.Serialization
 			this.provider = Provider;
 
 			CollectionNameAttribute CollectionNameAttribute = Type.GetCustomAttribute<CollectionNameAttribute>(true);
-			if (CollectionNameAttribute == null)
+			if (CollectionNameAttribute is null)
 				this.collectionName = null;
 			else
 				this.collectionName = CollectionNameAttribute.Name;
 
 			TypeNameAttribute TypeNameAttribute = Type.GetCustomAttribute<TypeNameAttribute>(true);
-			if (TypeNameAttribute == null)
+			if (TypeNameAttribute is null)
 			{
 				this.typeFieldName = "_type";
 				this.typeNameSerialization = TypeNameSerialization.FullName;
@@ -109,7 +109,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 				}
 				else if ((PI = Member as PropertyInfo) != null)
 				{
-					if (PI.GetMethod == null || PI.SetMethod == null)
+					if (PI.GetMethod is null || PI.SetMethod is null)
 						continue;
 
 					if (PI.GetIndexParameters().Length > 0)
@@ -154,7 +154,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 
 						CSharp.Append("\t\tprivate static readonly ");
 
-						if (DefaultValue == null)
+						if (DefaultValue is null)
 							CSharp.Append("object");
 						else
 							CSharp.Append(DefaultValue.GetType().FullName);
@@ -163,7 +163,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 						CSharp.Append(Member.Name);
 						CSharp.Append(" = ");
 
-						if (DefaultValue == null)
+						if (DefaultValue is null)
 							CSharp.Append("null");
 						else if (DefaultValue is string)
 						{
@@ -322,7 +322,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 				}
 				else if ((PI = Member as PropertyInfo) != null)
 				{
-					if (PI.GetMethod == null || PI.SetMethod == null)
+					if (PI.GetMethod is null || PI.SetMethod is null)
 						continue;
 
 					if (PI.GetIndexParameters().Length > 0)
@@ -398,7 +398,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 
 				CSharp.AppendLine();
 				CSharp.AppendLine("\t\t\tType DesiredType = Waher.Script.Types.GetType(TypeName);");
-				CSharp.AppendLine("\t\t\tif (DesiredType == null)");
+				CSharp.AppendLine("\t\t\tif (DesiredType is null)");
 				CSharp.AppendLine("\t\t\t\tthrow new Exception(\"Class of type \" + TypeName + \" not found.\");");
 				CSharp.AppendLine();
 				CSharp.AppendLine("\t\t\tReader.ReturnToBookmark(Bookmark);");
@@ -438,7 +438,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 					}
 					else if ((PI = Member as PropertyInfo) != null)
 					{
-						if (PI.GetMethod == null || PI.SetMethod == null)
+						if (PI.GetMethod is null || PI.SetMethod is null)
 							continue;
 
 						if (PI.GetIndexParameters().Length > 0)
@@ -1281,7 +1281,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 				}
 				else if ((PI = Member as PropertyInfo) != null)
 				{
-					if (PI.GetMethod == null || PI.SetMethod == null)
+					if (PI.GetMethod is null || PI.SetMethod is null)
 						continue;
 
 					if (PI.GetIndexParameters().Length > 0)
@@ -1339,7 +1339,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 				{
 					CSharp.AppendLine();
 
-					if (DefaultValue == null)
+					if (DefaultValue is null)
 						CSharp.AppendLine("\t\t\tif (((object)Value." + Member.Name + ") != null)");
 					else
 						CSharp.AppendLine("\t\t\tif (!default" + Member.Name + ".Equals(Value." + Member.Name + "))");
@@ -1508,7 +1508,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 								CSharp.Append(Indent2);
 								CSharp.Append("if ( Value.");
 								CSharp.Append(Member.Name);
-								CSharp.AppendLine(" == null)");
+								CSharp.AppendLine(" is null)");
 								CSharp.Append(Indent2);
 								CSharp.AppendLine("\tWriter.WriteNull();");
 								CSharp.Append(Indent2);
@@ -1549,7 +1549,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 									CSharp.AppendLine("{");
 
 									CSharp.Append(Indent2);
-									CSharp.AppendLine("\tif (Item == null)");
+									CSharp.AppendLine("\tif (Item is null)");
 									CSharp.Append(Indent2);
 									CSharp.AppendLine("\t\tWriter.WriteNull();");
 									CSharp.Append(Indent2);
@@ -1585,7 +1585,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 								else if (ByReference)
 								{
 									CSharp.Append(Indent2);
-									CSharp.AppendLine("if (Value." + Member.Name + " == null)");
+									CSharp.AppendLine("if (Value." + Member.Name + " is null)");
 									CSharp.Append(Indent2);
 									CSharp.AppendLine("\tWriter.WriteNull();");
 									CSharp.Append(Indent2);
@@ -1706,7 +1706,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 			{
 				bool IndexFound = false;
 
-				if (Collection == null)
+				if (Collection is null)
 				{
 					if (string.IsNullOrEmpty(this.collectionName))
 						Collection = this.provider.DefaultCollection;
@@ -1750,7 +1750,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 
 					foreach (string FieldName in CompoundIndexAttribute.FieldNames)
 					{
-						if (Index == null)
+						if (Index is null)
 						{
 							if (FieldName.StartsWith("-"))
 								Index = Builders<BsonDocument>.IndexKeys.Descending(this.ToShortName(FieldName.Substring(1)));
@@ -1778,7 +1778,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 		/// <returns>String with special characters escaped.</returns>
 		public static string Escape(string s)
 		{
-			if (s == null || s.IndexOfAny(specialCharacters) < 0)
+			if (s is null || s.IndexOfAny(specialCharacters) < 0)
 				return s;
 
 			return s.Replace("\\", "\\\\").
@@ -1959,7 +1959,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 			else
 				throw new NotSupportedException("No Object ID member found in objects of type " + Value.GetType().FullName + ".");
 
-			if (Obj == null)
+			if (Obj is null)
 			{
 				if (!InsertIfNotFound)
 					throw new Exception("Object has no Object ID defined.");
@@ -2022,10 +2022,10 @@ namespace Waher.Persistence.MongoDB.Serialization
 			if (!this.defaultValues.TryGetValue(FieldName, out object Default))
 				return false;
 
-			if ((Value == null) ^ (Default == null))
+			if ((Value is null) ^ (Default is null))
 				return false;
 
-			if (Value == null)
+			if (Value is null)
 				return true;
 
 			return Default.Equals(Value);

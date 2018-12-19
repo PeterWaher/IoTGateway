@@ -49,7 +49,7 @@ namespace Waher.Script.Graphs
 		public override ISemiGroupElement AddLeft(ISemiGroupElement Element)
 		{
 			Graph G = Element as Graph;
-			if (G == null)
+			if (G is null)
 				return null;
 
 			GraphSettings Settings = new GraphSettings()
@@ -60,7 +60,7 @@ namespace Waher.Script.Graphs
 
 			SKImage Bmp = G.CreateBitmap(Settings);
 
-			if (this.bitmap == null)
+			if (this.bitmap is null)
 				return new GraphBitmap(Bmp);
 
 			using (SKSurface Surface = SKSurface.Create(Math.Max(Bmp.Width, this.width), Math.Max(Bmp.Height, this.height),
@@ -85,7 +85,7 @@ namespace Waher.Script.Graphs
 		public override ISemiGroupElement AddRight(ISemiGroupElement Element)
 		{
 			Graph G = Element as Graph;
-			if (G == null)
+			if (G is null)
 				return null;
 
 			GraphSettings Settings = new GraphSettings()
@@ -96,7 +96,7 @@ namespace Waher.Script.Graphs
 
 			SKImage Bmp = G.CreateBitmap(Settings);
 
-			if (this.bitmap == null)
+			if (this.bitmap is null)
 				return new GraphBitmap(Bmp);
 
 			using (SKSurface Surface = SKSurface.Create(Math.Max(Bmp.Width, this.width), Math.Max(Bmp.Height, this.height),

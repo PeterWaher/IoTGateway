@@ -53,7 +53,7 @@ namespace Waher.Script.Objects.Matrices
 		{
 			get
 			{
-				if (this.values == null)
+				if (this.values is null)
 				{
 					double[,] v = new double[this.rows, this.columns];
 					int x = 0;
@@ -83,7 +83,7 @@ namespace Waher.Script.Objects.Matrices
 		{
 			get
 			{
-				if (this.elements == null)
+				if (this.elements is null)
 				{
 					int x, y, i = 0;
 					IElement[] v = new IElement[this.rows * this.columns];
@@ -129,7 +129,7 @@ namespace Waher.Script.Objects.Matrices
 
 			for (y = 0; y < this.rows; y++)
 			{
-				if (sb == null)
+				if (sb is null)
 					sb = new StringBuilder("[[");
 				else
 					sb.Append(",\r\n [");
@@ -148,7 +148,7 @@ namespace Waher.Script.Objects.Matrices
 				sb.Append(']');
 			}
 
-			if (sb == null)
+			if (sb is null)
 				sb = new StringBuilder("[[]]");
 			else
 				sb.Append(']');
@@ -163,7 +163,7 @@ namespace Waher.Script.Objects.Matrices
 		{
 			get
 			{
-				if (this.associatedMatrixSpace == null)
+				if (this.associatedMatrixSpace is null)
 					this.associatedMatrixSpace = new DoubleMatrices(this.rows, this.columns);
 
 				return this.associatedMatrixSpace;
@@ -441,7 +441,7 @@ namespace Waher.Script.Objects.Matrices
 		public override bool Equals(object obj)
 		{
 			DoubleMatrix Matrix = obj as DoubleMatrix;
-			if (Matrix == null)
+			if (Matrix is null)
 				return false;
 
 			if (this.columns != Matrix.columns || this.rows != Matrix.rows)
@@ -522,7 +522,7 @@ namespace Waher.Script.Objects.Matrices
 		{
 			get
 			{
-				if (this.zero == null)
+				if (this.zero is null)
 					this.zero = new DoubleMatrix(new double[this.rows, this.columns]);
 
 				return this.zero;
@@ -630,7 +630,7 @@ namespace Waher.Script.Objects.Matrices
                 throw new ScriptException("Index out of bounds.");
 
             DoubleVector V = Value as DoubleVector;
-            if (V == null)
+            if (V is null)
                 throw new ScriptException("Row vectors in a double matrix are required to be double vectors.");
 
             if (V.Dimension != this.columns)
@@ -672,7 +672,7 @@ namespace Waher.Script.Objects.Matrices
                 throw new ScriptException("Index out of bounds.");
 
             DoubleNumber V = Value as DoubleNumber;
-            if (V == null)
+            if (V is null)
                 throw new ScriptException("Elements in a double matrix must be double values.");
 
             double[,] M = this.Values;
@@ -735,7 +735,7 @@ namespace Waher.Script.Objects.Matrices
                 throw new ScriptException("Vector dimension does not match number of columns");
 
             DoubleVector V = Vector as DoubleVector;
-            if (V == null)
+            if (V is null)
                 throw new ScriptException("Row vectors in a double matrix must be double vectors.");
 
             double[] V2 = V.Values;
@@ -761,7 +761,7 @@ namespace Waher.Script.Objects.Matrices
                 throw new ScriptException("Vector dimension does not match number of rows");
 
             DoubleVector V = Vector as DoubleVector;
-            if (V == null)
+            if (V is null)
                 throw new ScriptException("Column vectors in a double matrix must be double vectors.");
 
             double[] V2 = V.Values;

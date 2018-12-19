@@ -583,7 +583,7 @@ namespace Waher.Networking.XMPP.Control
 		{
 			object[] P = (object[])e.State;
 			SetResultCallback Callback = (SetResultCallback)P[0];
-			if (Callback == null)
+			if (Callback is null)
 				return;
 
 			object State = P[1];
@@ -601,13 +601,13 @@ namespace Waher.Networking.XMPP.Control
 					foreach (XmlNode N in E.ChildNodes)
 					{
 						E2 = N as XmlElement;
-						if (E2 == null)
+						if (E2 is null)
 							continue;
 
 						switch (N.LocalName)
 						{
 							case "nd":
-								if (Nodes == null)
+								if (Nodes is null)
 									Nodes = new List<ThingReference>();
 
 								Nodes.Add(new ThingReference(
@@ -618,7 +618,7 @@ namespace Waher.Networking.XMPP.Control
 								break;
 
 							case "p":
-								if (ParameterNames == null)
+								if (ParameterNames is null)
 									ParameterNames = new List<string>();
 
 								ParameterNames.Add(XML.Attribute(E2, "n"));
@@ -763,7 +763,7 @@ namespace Waher.Networking.XMPP.Control
 		{
 			object[] P = (object[])e.State;
 			DataFormResultEventHandler Callback = (DataFormResultEventHandler)P[0];
-			if (Callback == null)
+			if (Callback is null)
 				return;
 
 			object State = P[1];

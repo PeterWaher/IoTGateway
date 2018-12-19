@@ -157,7 +157,7 @@ namespace Waher.Security.PKCS
 
 			if (Negative)
 			{
-				if (Value == null || Value.Length == 0)
+				if (Value is null || Value.Length == 0)
 					Value = new byte[] { 0xff };
 				else if (Value[0] < 0x80)
 				{
@@ -170,7 +170,7 @@ namespace Waher.Security.PKCS
 			}
 			else
 			{
-				if (Value == null || Value.Length == 0)
+				if (Value is null || Value.Length == 0)
 					Value = new byte[] { 0 };
 				else if (Value[0] >= 0x80)
 				{
@@ -459,7 +459,7 @@ namespace Waher.Security.PKCS
 
 		private void Start(byte Expected)
 		{
-			if (this.stack == null)
+			if (this.stack is null)
 				this.stack = new LinkedList<KeyValuePair<byte, List<byte>>>();
 
 			this.stack.AddLast(new KeyValuePair<byte, List<byte>>(Expected, this.output));
@@ -477,7 +477,7 @@ namespace Waher.Security.PKCS
 
 		private void End(byte Type)
 		{
-			if (this.stack == null || this.stack.Last == null)
+			if (this.stack is null || this.stack.Last is null)
 				throw new Exception("Not properly started.");
 
 			if (Type != this.stack.Last.Value.Key)

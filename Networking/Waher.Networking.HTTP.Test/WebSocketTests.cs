@@ -117,7 +117,7 @@ namespace Waher.Networking.HTTP.Test
 		{
 			this.webSocketListener.Accept += (sender, e) =>
 			{
-				if (e.Socket == null)
+				if (e.Socket is null)
 					Assert.Fail("Socket not set.");
 
 				if (!e.Socket.HttpRequest.Header.TryGetHeaderField("Origin", out HttpField Origin) ||
@@ -129,7 +129,7 @@ namespace Waher.Networking.HTTP.Test
 
 			this.webSocketListener.Connected += (sender, e) =>
 			{
-				if (e.Socket == null)
+				if (e.Socket is null)
 					Assert.Fail("Socket not set.");
 			};
 

@@ -101,7 +101,7 @@ namespace Waher.Networking.XMPP.Sensor
 		{
 			get
 			{
-				if (this.fields == null)
+				if (this.fields is null)
 					return new string[0];
 				else
 				{

@@ -50,7 +50,7 @@ namespace Waher.Content.Markdown.Model
 		public virtual void AddChildren(IEnumerable<MarkdownElement> NewChildren)
 		{
 			LinkedList<MarkdownElement> Children = this.children as LinkedList<MarkdownElement>;
-			if (Children == null)
+			if (Children is null)
 			{
 				Children = new LinkedList<MarkdownElement>();
 				foreach (MarkdownElement E in this.children)

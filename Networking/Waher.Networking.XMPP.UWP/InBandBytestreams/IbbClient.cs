@@ -168,7 +168,7 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 				}
 			}
 
-			if (e2.DataCallback == null || e2.CloseCallback == null)
+			if (e2.DataCallback is null || e2.CloseCallback is null)
 				throw new NotAcceptableException("Stream not expected.", e.IQ);
 
 			this.AssertCacheCreated();
@@ -194,7 +194,7 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 
 			lock (this.synchObject)
 			{
-				if (this.cache == null)
+				if (this.cache is null)
 					Input = null;
 				else if (this.cache.TryGetValue(Key, out Input))
 					this.cache.Remove(Key);
@@ -202,7 +202,7 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 					Input = null;
 			}
 
-			if (Input == null)
+			if (Input is null)
 			{
 				lock (this.output)
 				{
@@ -230,7 +230,7 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 		{
 			lock (this.synchObject)
 			{
-				if (this.cache == null)
+				if (this.cache is null)
 				{
 					this.cache = new Cache<string, IncomingStream>(1000, TimeSpan.MaxValue, TimeSpan.FromMinutes(1));
 					this.cache.Removed += Cache_Removed;
@@ -290,7 +290,7 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 
 		private bool HandleIncomingData(XmlElement Data, string From)
 		{
-			if (Data == null)
+			if (Data is null)
 				return false;
 
 			int Seq = XML.Attribute(Data, "seq", 0);
@@ -300,7 +300,7 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 
 			lock (this.synchObject)
 			{
-				if (this.cache == null)
+				if (this.cache is null)
 					return false;
 
 				if (!this.cache.TryGetValue(Key, out Input))

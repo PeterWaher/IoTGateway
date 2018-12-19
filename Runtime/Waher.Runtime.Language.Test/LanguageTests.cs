@@ -47,7 +47,7 @@ namespace Waher.Runtime.Language.Test
 		public async Task Language_Test_01_GetLanguage()
 		{
 			Language Language = await Translator.GetLanguageAsync("en");
-			if (Language == null)
+			if (Language is null)
 				Language = await Translator.CreateLanguageAsync("en", "English", null, 0, 0);
 			Assert.IsNotNull(Language);
 		}
@@ -72,7 +72,7 @@ namespace Waher.Runtime.Language.Test
 		{
 			Language Language = await Translator.GetLanguageAsync("en");
 			Namespace Namespace = await Language.GetNamespaceAsync("Test");
-			if (Namespace == null)
+			if (Namespace is null)
 				Namespace = await Language.CreateNamespaceAsync("Test");
 		}
 

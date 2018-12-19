@@ -49,7 +49,7 @@ namespace Waher.Script.Objects.VectorSpaces
 		{
 			get 
 			{
-                if (this.zero == null)
+                if (this.zero is null)
                 {
                     Complex[] v = new Complex[this.dimension];
                     int i;
@@ -72,7 +72,7 @@ namespace Waher.Script.Objects.VectorSpaces
 		public override bool Contains(IElement Element)
 		{
 			ComplexVector v = Element as ComplexVector;
-			if (v == null)
+			if (v is null)
 				return false;
 
 			return v.Dimension == this.dimension;

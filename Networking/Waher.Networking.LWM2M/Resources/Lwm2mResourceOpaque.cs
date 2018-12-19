@@ -38,10 +38,10 @@ namespace Waher.Networking.LWM2M
 		/// </summary>
 		public override async Task ReadPersistedValue()
 		{
-			string s = this.value == null ? string.Empty :
+			string s = this.value is null ? string.Empty :
 				await RuntimeSettings.GetAsync(this.Path, Hashes.BinaryToString(this.value));
 
-			if (s == null)
+			if (s is null)
 				this.value = null;
 			else
 				this.value = Hashes.StringToBinary(s);

@@ -788,7 +788,7 @@ namespace Waher.Content
 		/// <returns>Escaped string.</returns>
 		public static string Escape(string s, char[] CharactersToEscape, string EscapeSequence)
 		{
-			if (s == null)
+			if (s is null)
 				return null;
 
 			int i = s.IndexOfAny(CharactersToEscape);
@@ -824,7 +824,7 @@ namespace Waher.Content
 		/// <returns>Escaped string.</returns>
 		public static string Escape(string s, char[] CharactersToEscape, string[] EscapeSequences)
 		{
-			if (s == null)
+			if (s is null)
 				return null;
 
 			int i = s.IndexOfAny(CharactersToEscape);

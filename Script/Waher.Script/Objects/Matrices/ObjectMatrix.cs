@@ -75,7 +75,7 @@ namespace Waher.Script.Objects.Matrices
 		{
 			get
 			{
-				if (this.values == null)
+				if (this.values is null)
 				{
 					IElement[,] v = new IElement[this.rows, this.columns];
 					int x = 0;
@@ -105,7 +105,7 @@ namespace Waher.Script.Objects.Matrices
 		{
 			get
 			{
-				if (this.elements == null)
+				if (this.elements is null)
 				{
 					int x, y, i = 0;
 					IElement[] v = new IElement[this.rows * this.columns];
@@ -191,7 +191,7 @@ namespace Waher.Script.Objects.Matrices
 
 			for (y = 0; y < this.rows; y++)
 			{
-				if (sb == null)
+				if (sb is null)
 					sb = new StringBuilder("[[");
 				else
 					sb.Append(",\r\n [");
@@ -210,7 +210,7 @@ namespace Waher.Script.Objects.Matrices
 				sb.Append(']');
 			}
 
-			if (sb == null)
+			if (sb is null)
 				sb = new StringBuilder("[[]]");
 			else
 				sb.Append(']');
@@ -225,7 +225,7 @@ namespace Waher.Script.Objects.Matrices
 		{
 			get
 			{
-				if (this.associatedMatrixSpace == null)
+				if (this.associatedMatrixSpace is null)
 					this.associatedMatrixSpace = new ObjectMatrices(this.rows, this.columns);
 
 				return this.associatedMatrixSpace;
@@ -284,7 +284,7 @@ namespace Waher.Script.Objects.Matrices
 
 						for (z = 0; z < this.rows; z++)
 						{
-							if (n == null)
+							if (n is null)
 								n = Operators.Arithmetics.Multiply.EvaluateMultiplication(Values2[y, z], Values[z, x], null);
 							else
 								n = Operators.Arithmetics.Add.EvaluateAddition(n,
@@ -343,7 +343,7 @@ namespace Waher.Script.Objects.Matrices
 
 						for (z = 0; z < this.columns; z++)
 						{
-							if (n == null)
+							if (n is null)
 								n = Operators.Arithmetics.Multiply.EvaluateMultiplication(Values[y, z], Values2[z, x], null);
 							else
 							{
@@ -442,7 +442,7 @@ namespace Waher.Script.Objects.Matrices
 		public override bool Equals(object obj)
 		{
 			ObjectMatrix Matrix = obj as ObjectMatrix;
-			if (Matrix == null)
+			if (Matrix is null)
 				return false;
 
 			if (this.columns != Matrix.columns || this.rows != Matrix.rows)
@@ -563,7 +563,7 @@ namespace Waher.Script.Objects.Matrices
 					x = 0;
 					foreach (IElement Element in this.elements)
 					{
-						if (Row == null)
+						if (Row is null)
 							Row = new LinkedList<IElement>();
 
 						Row.AddLast(Element);
@@ -646,7 +646,7 @@ namespace Waher.Script.Objects.Matrices
 				throw new ScriptException("Index out of bounds.");
 
 			IVector V = Value as IVector;
-			if (V == null)
+			if (V is null)
 				throw new ScriptException("Invalid row vector.");
 
 			if (V.Dimension != this.columns)

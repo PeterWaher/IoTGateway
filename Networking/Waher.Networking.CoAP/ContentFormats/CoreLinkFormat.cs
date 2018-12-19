@@ -117,10 +117,10 @@ namespace Waher.Networking.CoAP.ContentFormats
 		public byte[] Encode(object Object, Encoding Encoding, out string ContentType, params string[] AcceptedContentTypes)
 		{
 			LinkDocument Doc = Object as LinkDocument;
-			if (Doc == null)
+			if (Doc is null)
 				throw new ArgumentException("Object not a CoRE link document.", nameof(Object));
 
-			if (Encoding == null)
+			if (Encoding is null)
 				Encoding = Encoding.UTF8;
 
 			ContentType = LinkFormatContentType + "; charset=" + Encoding.WebName;

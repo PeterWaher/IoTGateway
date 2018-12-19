@@ -76,7 +76,7 @@ namespace Waher.Networking.XMPP.DataForms.ValidationMethods
 		public override bool Merge(ValidationMethod SecondaryValidationMethod, DataType DataType)
 		{
 			RegexValidation V2 = SecondaryValidationMethod as RegexValidation;
-			if (V2 == null)
+			if (V2 is null)
 				return false;
 
 			return this.regex == V2.regex;

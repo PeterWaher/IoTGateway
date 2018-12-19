@@ -50,7 +50,7 @@ namespace Waher.Script.Operators.Membership
 			Type T;
 
 			T = Value as Type;
-			if (T == null)
+			if (T is null)
 			{
 				Instance = Value;
 				T = Value.GetType();
@@ -77,9 +77,9 @@ namespace Waher.Script.Operators.Membership
 						else
 						{
 							this.property = T.GetRuntimeProperty("Item");
-							if (this.property == null)
+							if (this.property is null)
 								this.nameIndex = null;
-							else if (this.nameIndex == null)
+							else if (this.nameIndex is null)
 								this.nameIndex = new string[] { this.name };
 						}
 					}
@@ -128,7 +128,7 @@ namespace Waher.Script.Operators.Membership
 			Type T;
 
 			T = Value as Type;
-			if (T == null)
+			if (T is null)
 			{
 				Instance = Value;
 				T = Value.GetType();

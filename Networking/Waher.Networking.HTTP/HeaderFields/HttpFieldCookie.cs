@@ -30,7 +30,7 @@ namespace Waher.Networking.HTTP.HeaderFields
 		{
 			get
 			{
-				if (this.cookies == null)
+				if (this.cookies is null)
 					this.cookies = CommonTypes.ParseFieldValues(this.Value);
 
 				return this.cookies;
@@ -46,7 +46,7 @@ namespace Waher.Networking.HTTP.HeaderFields
 		{
 			get
 			{
-				if (this.valueByName == null)
+				if (this.valueByName is null)
 				{
 					this.valueByName = new Dictionary<string, string>();
 

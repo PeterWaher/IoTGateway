@@ -41,7 +41,7 @@ namespace Waher.Script.Operators.Arithmetics
 			if (E != null)
 			{
 				E = E.Invert();
-				if (E == null)
+				if (E is null)
 					throw new ScriptRuntimeException("Operand not invertible.", this);
 				else
 					return E;

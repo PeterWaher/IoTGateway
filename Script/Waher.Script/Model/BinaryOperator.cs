@@ -61,7 +61,7 @@ namespace Waher.Script.Model
 					this.right is IDifferentiable Right)
 				{
 					string s = Left.DefaultVariableName;
-					if (s == null)
+					if (s is null)
 						return null;
 					else if (s == Right.DefaultVariableName)
 						return s;

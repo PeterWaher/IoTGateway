@@ -77,7 +77,7 @@ namespace Waher.Persistence.Files.Searching
 		{
 			get
 			{
-				if (this.currentRange == null)
+				if (this.currentRange is null)
 					throw new InvalidOperationException("Enumeration not started or has already ended.");
 				else
 					return this.currentRange;
@@ -144,7 +144,7 @@ namespace Waher.Persistence.Files.Searching
 
 			while (true)
 			{
-				if (this.currentRange == null)
+				if (this.currentRange is null)
 				{
 					List<KeyValuePair<string, object>> SearchParameters = new List<KeyValuePair<string, object>>();
 					List<KeyValuePair<string, IApplicableFilter>> StartFilters = null;
@@ -158,7 +158,7 @@ namespace Waher.Persistence.Files.Searching
 
 						if (Range.IsPoint)
 						{
-							if (EndFilters == null)
+							if (EndFilters is null)
 								EndFilters = new List<KeyValuePair<string, IApplicableFilter>>();
 
 							SearchParameters.Add(new KeyValuePair<string, object>(Range.FieldName, Range.Point));
@@ -172,7 +172,7 @@ namespace Waher.Persistence.Files.Searching
 
 								if (this.ascending[i])
 								{
-									if (StartFilters == null)
+									if (StartFilters is null)
 										StartFilters = new List<KeyValuePair<string, IApplicableFilter>>();
 
 									if (Range.MinInclusive)
@@ -189,7 +189,7 @@ namespace Waher.Persistence.Files.Searching
 								}
 								else
 								{
-									if (EndFilters == null)
+									if (EndFilters is null)
 										EndFilters = new List<KeyValuePair<string, IApplicableFilter>>();
 
 									if (Range.MinInclusive)
@@ -205,7 +205,7 @@ namespace Waher.Persistence.Files.Searching
 
 								if (!this.ascending[i])
 								{
-									if (StartFilters == null)
+									if (StartFilters is null)
 										StartFilters = new List<KeyValuePair<string, IApplicableFilter>>();
 
 									if (Range.MaxInclusive)
@@ -222,7 +222,7 @@ namespace Waher.Persistence.Files.Searching
 								}
 								else
 								{
-									if (EndFilters == null)
+									if (EndFilters is null)
 										EndFilters = new List<KeyValuePair<string, IApplicableFilter>>();
 
 									if (Range.MaxInclusive)
@@ -290,7 +290,7 @@ namespace Waher.Persistence.Files.Searching
 					}
 				}
 
-				if (this.endRangeFilters != null && OutOfStartRangeField == null)
+				if (this.endRangeFilters != null && OutOfStartRangeField is null)
 				{
 					foreach (KeyValuePair<string, IApplicableFilter> Filter in this.endRangeFilters)
 					{
@@ -363,7 +363,7 @@ namespace Waher.Persistence.Files.Searching
 
 			while (true)
 			{
-				if (this.currentRange == null)
+				if (this.currentRange is null)
 				{
 					List<KeyValuePair<string, object>> SearchParameters = new List<KeyValuePair<string, object>>();
 					List<KeyValuePair<string, IApplicableFilter>> StartFilters = null;
@@ -377,7 +377,7 @@ namespace Waher.Persistence.Files.Searching
 
 						if (Range.IsPoint)
 						{
-							if (EndFilters == null)
+							if (EndFilters is null)
 								EndFilters = new List<KeyValuePair<string, IApplicableFilter>>();
 
 							SearchParameters.Add(new KeyValuePair<string, object>(Range.FieldName, Range.Point));
@@ -391,7 +391,7 @@ namespace Waher.Persistence.Files.Searching
 
 								if (this.ascending[i])
 								{
-									if (EndFilters == null)
+									if (EndFilters is null)
 										EndFilters = new List<KeyValuePair<string, IApplicableFilter>>();
 
 									if (Range.MinInclusive)
@@ -401,7 +401,7 @@ namespace Waher.Persistence.Files.Searching
 								}
 								else
 								{
-									if (StartFilters == null)
+									if (StartFilters is null)
 										StartFilters = new List<KeyValuePair<string, IApplicableFilter>>();
 
 									if (Range.MinInclusive)
@@ -424,7 +424,7 @@ namespace Waher.Persistence.Files.Searching
 
 								if (this.ascending[i])
 								{
-									if (StartFilters == null)
+									if (StartFilters is null)
 										StartFilters = new List<KeyValuePair<string, IApplicableFilter>>();
 
 									if (Range.MaxInclusive)
@@ -441,7 +441,7 @@ namespace Waher.Persistence.Files.Searching
 								}
 								else
 								{
-									if (EndFilters == null)
+									if (EndFilters is null)
 										EndFilters = new List<KeyValuePair<string, IApplicableFilter>>();
 
 									if (Range.MaxInclusive)
@@ -509,7 +509,7 @@ namespace Waher.Persistence.Files.Searching
 					}
 				}
 
-				if (this.endRangeFilters != null && OutOfStartRangeField == null)
+				if (this.endRangeFilters != null && OutOfStartRangeField is null)
 				{
 					foreach (KeyValuePair<string, IApplicableFilter> Filter in this.endRangeFilters)
 					{

@@ -48,7 +48,7 @@ namespace Waher.Networking.HTTP
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public void POST(HttpRequest Request, HttpResponse Response)
 		{
-			if (this.post == null)
+			if (this.post is null)
 				throw new MethodNotAllowedException(this.AllowedMethods);
 			else
 				this.post(Request, Response);

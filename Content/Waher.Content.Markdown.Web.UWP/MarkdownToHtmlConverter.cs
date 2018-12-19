@@ -181,7 +181,7 @@ namespace Waher.Content.Markdown.Web
 
 				foreach (KeyValuePair<string, bool> P in MetaValues)
 				{
-					if (Session == null)
+					if (Session is null)
 					{
 						Authorized = false;
 						break;
@@ -227,7 +227,7 @@ namespace Waher.Content.Markdown.Web
 					}
 
 					User = v.ValueObject as IUser;
-					if (User == null)
+					if (User is null)
 					{
 						Authorized = false;
 						break;

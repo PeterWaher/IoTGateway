@@ -48,7 +48,7 @@ namespace Waher.Script.Objects.VectorSpaces
 		{
 			get 
 			{
-				if (this.zero == null)
+				if (this.zero is null)
 					this.zero = new BooleanVector(new bool[this.dimension]);
 				
 				return this.zero;
@@ -63,7 +63,7 @@ namespace Waher.Script.Objects.VectorSpaces
 		public override bool Contains(IElement Element)
 		{
 			BooleanVector v = Element as BooleanVector;
-			if (v == null)
+			if (v is null)
 				return false;
 
 			return v.Dimension == this.dimension;

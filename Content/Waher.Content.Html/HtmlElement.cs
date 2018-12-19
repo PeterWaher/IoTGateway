@@ -37,7 +37,7 @@ namespace Waher.Content.Html
 
 		internal void Add(HtmlNode Node)
 		{
-			if (this.children == null)
+			if (this.children is null)
 				this.children = new LinkedList<HtmlNode>();
 
 			this.children.AddLast(Node);
@@ -45,7 +45,7 @@ namespace Waher.Content.Html
 
 		internal void AddAttribute(HtmlAttribute Attribute)
 		{
-			if (this.attributes == null)
+			if (this.attributes is null)
 				this.attributes = new LinkedList<HtmlAttribute>();
 
 			this.attributes.AddLast(Attribute);

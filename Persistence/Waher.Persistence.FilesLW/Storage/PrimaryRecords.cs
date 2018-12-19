@@ -124,14 +124,14 @@ namespace Waher.Persistence.Files.Storage
 		///		Greater than zero x is greater than y.</returns>
 		public int Compare(object x, object y)
 		{
-			if (x == null)
+			if (x is null)
 			{
-				if (y == null)
+				if (y is null)
 					return 0;
 				else
 					return -1;
 			}
-			else if (y == null)
+			else if (y is null)
 				return 1;
 			else
 				return ((Guid)x).CompareTo((Guid)y);

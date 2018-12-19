@@ -56,7 +56,7 @@ namespace Waher.Security.PKCS
 
 		private void Push()
 		{
-			if (this.stack == null)
+			if (this.stack is null)
 				this.stack = new LinkedList<DerEncoder>();
 
 			this.stack.AddLast(this.der);
@@ -65,7 +65,7 @@ namespace Waher.Security.PKCS
 
 		private byte[] Pop()
 		{
-			if (this.stack == null || this.stack.Last == null)
+			if (this.stack is null || this.stack.Last is null)
 				throw new InvalidOperationException("Stack empty.");
 
 			byte[] Result = this.der.ToArray();
@@ -145,7 +145,7 @@ namespace Waher.Security.PKCS
 
 		private void AssertBegun()
 		{
-			if (this.der == null)
+			if (this.der is null)
 				throw new InvalidOperationException("Encoding not begun.");
 		}
 

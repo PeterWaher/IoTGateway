@@ -60,10 +60,10 @@ namespace Waher.Script.Fractals.ColorModels
                 object Obj = Arguments[i++].AssociatedObjectValue;
 
                 Colors = Obj as SKColor[];
-                if (Colors == null)
+                if (Colors is null)
                 {
                     Array a = Obj as Array;
-                    if (a == null)
+                    if (a is null)
                         throw new ScriptRuntimeException("A fixed set of colors needs to be provided in calls to LinearColors().", this);
 
                     int d = a.GetLength(0);

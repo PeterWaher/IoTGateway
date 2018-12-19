@@ -919,7 +919,7 @@ namespace Waher.IoTGateway.Setup
 		{
 			get
 			{
-				if (featuredServers == null)
+				if (featuredServers is null)
 				{
 					string[] Result = new string[clp.Count];
 					clp.Keys.CopyTo(Result, 0);

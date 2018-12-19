@@ -50,7 +50,7 @@ namespace Waher.Networking.XMPP.Sensor
 
 		private static string[] ExtractFieldNames(FieldSubscriptionRule[] FieldRules)
 		{
-			if (FieldRules == null)
+			if (FieldRules is null)
 				return null;
 
 			int i, c = FieldRules.Length;

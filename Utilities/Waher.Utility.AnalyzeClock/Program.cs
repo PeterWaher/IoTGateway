@@ -290,7 +290,7 @@ namespace Waher.Utility.AnalyzeClock
 					if (Jid.Contains("@") && !Jid.Contains("/"))
 					{
 						RosterItem Contact = Client.GetRosterItem(Jid);
-						if (Contact == null || (Contact.State != SubscriptionState.Both && Contact.State != SubscriptionState.To))
+						if (Contact is null || (Contact.State != SubscriptionState.Both && Contact.State != SubscriptionState.To))
 						{
 							Done.Reset();
 

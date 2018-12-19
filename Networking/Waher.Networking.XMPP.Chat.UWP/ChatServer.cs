@@ -256,18 +256,18 @@ namespace Waher.Networking.XMPP.Chat
 				INode SelectedNode = null;
 				int i;
 
-				if (this.httpUpload == null)
+				if (this.httpUpload is null)
 				{
 					this.httpUpload = new HttpFileUploadClient(this.client);
 					this.httpUpload.Discover(null);
 				}
 
-				if (!Variables.TryGetVariable(" Menu ", out Variable v) || (Menu = v.ValueObject as SortedDictionary<int, KeyValuePair<string, object>>) == null)
+				if (!Variables.TryGetVariable(" Menu ", out Variable v) || (Menu = v.ValueObject as SortedDictionary<int, KeyValuePair<string, object>>) is null)
 					Menu = null;
 
 				if (this.concentratorServer != null)
 				{
-					if (!Variables.TryGetVariable(" Source ", out v) || (SelectedSource = v.ValueObject as IDataSource) == null)
+					if (!Variables.TryGetVariable(" Source ", out v) || (SelectedSource = v.ValueObject as IDataSource) is null)
 					{
 						if (this.concentratorServer.RootDataSources.Length == 1)
 						{
@@ -291,11 +291,11 @@ namespace Waher.Networking.XMPP.Chat
 						Variables[" Node "] = SelectedNode;
 					}
 
-					if (!Variables.TryGetVariable(" Node ", out v) || (SelectedNode = v.ValueObject as INode) == null)
+					if (!Variables.TryGetVariable(" Node ", out v) || (SelectedNode = v.ValueObject as INode) is null)
 						SelectedNode = null;
 				}
 
-				if (!Variables.TryGetVariable(" Support ", out v) || (Support = v.ValueObject as RemoteXmppSupport) == null)
+				if (!Variables.TryGetVariable(" Support ", out v) || (Support = v.ValueObject as RemoteXmppSupport) is null)
 				{
 					Support = new RemoteXmppSupport();
 
@@ -397,7 +397,7 @@ namespace Waher.Networking.XMPP.Chat
 					Support.Markdown |= true;
 				}
 
-				if (s == null || string.IsNullOrEmpty(s = s.Trim()))
+				if (s is null || string.IsNullOrEmpty(s = s.Trim()))
 					return;
 
 				switch (s.ToLower())
@@ -425,7 +425,7 @@ namespace Waher.Networking.XMPP.Chat
 
 						if (this.concentratorServer != null)
 						{
-							if (SelectedNode == null)
+							if (SelectedNode is null)
 							{
 								this.Error(e.From, "No node selected.", Support);
 								break;
@@ -563,9 +563,9 @@ namespace Waher.Networking.XMPP.Chat
 						break;
 
 					case "/":
-						if (this.concentratorServer == null)
+						if (this.concentratorServer is null)
 							this.SendPlainTextChatMessage(e.From, "Device is not a concentrator.");
-						else if (SelectedSource == null)
+						else if (SelectedSource is null)
 							this.SendPlainTextChatMessage(e.From, "No source selected.");
 						else
 						{
@@ -595,7 +595,7 @@ namespace Waher.Networking.XMPP.Chat
 						break;
 
 					case "//":
-						if (this.concentratorServer == null)
+						if (this.concentratorServer is null)
 							this.SendPlainTextChatMessage(e.From, "Device is not a concentrator.");
 						else
 						{
@@ -622,7 +622,7 @@ namespace Waher.Networking.XMPP.Chat
 						break;
 
 					case ":=":
-						if (SelectedNode == null)
+						if (SelectedNode is null)
 							this.Error(e.From, "No node selected.", Support);
 						else if (SelectedNode is IActuator Actuator)
 						{
@@ -641,7 +641,7 @@ namespace Waher.Networking.XMPP.Chat
 								if (i == 0 && Item.Value is SortedDictionary<int, KeyValuePair<string, object>> PreviousMenu)
 								{
 									Menu = PreviousMenu;
-									if (Menu == null)
+									if (Menu is null)
 										this.Error(e.From, "There's no previous menu.", Support);
 									else
 										this.SendMenu(e.From, Menu, Variables, Support);
@@ -668,7 +668,7 @@ namespace Waher.Networking.XMPP.Chat
 								}
 								else if (Menu.TryGetValue(-1, out Obj))
 								{
-									if (Obj.Value == null)
+									if (Obj.Value is null)
 									{
 										foreach (IDataSource RootSource in this.concentratorServer.DataSources)
 										{
@@ -724,7 +724,7 @@ namespace Waher.Networking.XMPP.Chat
 
 							if (this.concentratorServer != null)
 							{
-								if (SelectedSource == null)
+								if (SelectedSource is null)
 								{
 									this.Error(e.From, "No source selected.", Support);
 									break;
@@ -738,7 +738,7 @@ namespace Waher.Networking.XMPP.Chat
 									Node = this.CheckMenuValue(Menu, Field.Substring(0, i)) as INode;
 									Field = this.CheckMenuKey(Menu, Field.Substring(i + 1));
 
-									if (Node == null)
+									if (Node is null)
 									{
 										this.Error(e.From, "Node not found.", Support);
 										break;
@@ -750,7 +750,7 @@ namespace Waher.Networking.XMPP.Chat
 								{
 									Node = SelectedNode;
 
-									if (Node == null || !Node.IsReadable)
+									if (Node is null || !Node.IsReadable)
 									{
 										if (SelectedSource != null && await SelectedSource.GetNodeAsync(new ThingReference(Field, SelectedSource.SourceID, string.Empty)) is INode Node2)
 										{
@@ -863,7 +863,7 @@ namespace Waher.Networking.XMPP.Chat
 
 								if (this.concentratorServer != null)
 								{
-									if (SelectedSource == null)
+									if (SelectedSource is null)
 									{
 										this.Error(e.From, "No source selected.", Support);
 										break;
@@ -876,7 +876,7 @@ namespace Waher.Networking.XMPP.Chat
 										ParameterName = this.CheckMenuKey(Menu, ParameterName.Substring(i + 1));
 
 										Node = this.CheckMenuValue(Menu, s) as INode;
-										if (Node == null && SelectedSource != null && await SelectedSource.GetNodeAsync(new ThingReference(s, SelectedSource.SourceID, string.Empty)) is INode Node3)
+										if (Node is null && SelectedSource != null && await SelectedSource.GetNodeAsync(new ThingReference(s, SelectedSource.SourceID, string.Empty)) is INode Node3)
 											Node = Node3;
 									}
 									else
@@ -894,7 +894,7 @@ namespace Waher.Networking.XMPP.Chat
 											Node = SelectedNode;
 									}
 
-									if (Node == null && Menu != null && Menu.TryGetValue(-2, out KeyValuePair<string, object> P) && P.Value is INode Node2)
+									if (Node is null && Menu != null && Menu.TryGetValue(-2, out KeyValuePair<string, object> P) && P.Value is INode Node2)
 										Node = Node2;
 
 									ThingRef = Node;
@@ -978,7 +978,7 @@ namespace Waher.Networking.XMPP.Chat
 												}
 											}
 
-											if (P0 == null)
+											if (P0 is null)
 												this.Execute(s, e.From, Support);
 											else if (this.provisioningClient != null)
 											{
@@ -1056,7 +1056,7 @@ namespace Waher.Networking.XMPP.Chat
 
 							foreach (ControlParameter P in Parameters)
 							{
-								if (e2.ParameterNames == null || Array.IndexOf<string>(e2.ParameterNames, P.Name) >= 0)
+								if (e2.ParameterNames is null || Array.IndexOf<string>(e2.ParameterNames, P.Name) >= 0)
 								{
 									Parameters2.Add(P);
 									Menu[++i] = new KeyValuePair<string, object>(P.Name, P.Name + " (" + P.GetStringValue(SelectedNode) + ")");
@@ -1121,7 +1121,7 @@ namespace Waher.Networking.XMPP.Chat
 			};
 			int i = 0;
 
-			if (SelectedNode == null)
+			if (SelectedNode is null)
 			{
 				Menu[-1] = new KeyValuePair<string, object>(null, SelectedSource);
 
@@ -1161,7 +1161,7 @@ namespace Waher.Networking.XMPP.Chat
 			};
 			int i = 0;
 
-			if (SelectedSource == null)
+			if (SelectedSource is null)
 			{
 				this.SendPlainTextChatMessage(e.From, "Root data sources:");
 
@@ -1487,7 +1487,7 @@ namespace Waher.Networking.XMPP.Chat
 				Dictionary<string, bool> ContentIDs;
 
 				if (!Variables.TryGetVariable(" ContentIDs ", out Variable v) ||
-					(ContentIDs = v.ValueObject as Dictionary<string, bool>) == null)
+					(ContentIDs = v.ValueObject as Dictionary<string, bool>) is null)
 				{
 					ContentIDs = new Dictionary<string, bool>();
 					Variables[" ContentIDs "] = ContentIDs;
@@ -1633,7 +1633,7 @@ namespace Waher.Networking.XMPP.Chat
 
 								Variables[this.PascalCasing(s) + Suffix] = VectorDefinition.Encapsulate(Values.ToArray(), true, null);
 
-								if (Series == null)
+								if (Series is null)
 								{
 									Series = new SortedDictionary<string, SeriesTypes>();
 									Types = Type;
@@ -1737,7 +1737,7 @@ namespace Waher.Networking.XMPP.Chat
 								Expression.Append("plot2dline(TP, V, \"Red\")");
 							}
 
-							if (Exp == null)
+							if (Exp is null)
 								Exp = new List<KeyValuePair<string, string>>();
 
 							s = Expression.ToString();

@@ -953,7 +953,7 @@ namespace Waher.Networking.XMPP.Provisioning
 						foreach (XmlNode N2 in E2.ChildNodes)
 						{
 							E3 = N2 as XmlElement;
-							if (E3 == null)
+							if (E3 is null)
 								continue;
 
 							Name = XML.Attribute(E3, "name");

@@ -34,7 +34,7 @@ namespace Waher.Script.Units
 		public override bool Equals(object obj)
 		{
 			AtomicUnit U = obj as AtomicUnit;
-			if (U == null)
+			if (U is null)
 				return false;
 			else
 				return this.name.Equals(U.name);

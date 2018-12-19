@@ -198,16 +198,16 @@ namespace Waher.Client.WPF.Model.Concentrator
 				return;
 
 			XmppConcentrator Concentrator = this.Concentrator;
-			if (Concentrator == null)
+			if (Concentrator is null)
 				return;
 
 			XmppAccountNode XmppAccountNode = Concentrator.XmppAccountNode;
-			if (XmppAccountNode == null)
+			if (XmppAccountNode is null)
 				return;
 
 			string FullJid = Concentrator.FullJid;
 			ConcentratorClient ConcentratorClient = XmppAccountNode?.ConcentratorClient;
-			if (ConcentratorClient == null)
+			if (ConcentratorClient is null)
 				return;
 
 			if (this.timer != null)
@@ -240,16 +240,16 @@ namespace Waher.Client.WPF.Model.Concentrator
 			}
 
 			XmppConcentrator Concentrator = this.Concentrator;
-			if (Concentrator == null)
+			if (Concentrator is null)
 				return;
 
 			XmppAccountNode XmppAccountNode = Concentrator.XmppAccountNode;
-			if (XmppAccountNode == null)
+			if (XmppAccountNode is null)
 				return;
 
 			string FullJid = Concentrator.FullJid;
 			ConcentratorClient ConcentratorClient = XmppAccountNode?.ConcentratorClient;
-			if (ConcentratorClient == null)
+			if (ConcentratorClient is null)
 				return;
 
 			XmppAccountNode.ConcentratorClient.Unsubscribe(FullJid, this.key, SourceEventType.All, "en",

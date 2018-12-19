@@ -100,7 +100,7 @@ namespace Waher.Security.ACME
 		/// <returns>Directory object.</returns>
 		public async Task<AcmeDirectory> GetDirectory()
 		{
-			if (this.directory == null)
+			if (this.directory is null)
 				this.directory = new AcmeDirectory(this, (await this.GET(this.directoryEndpoint)).Payload);
 
 			return this.directory;
@@ -153,7 +153,7 @@ namespace Waher.Security.ACME
 				return s;
 			}
 
-			if (this.directory == null)
+			if (this.directory is null)
 				await this.GetDirectory();
 
 			HttpRequestMessage Request = new HttpRequestMessage(HttpMethod.Head, this.directory.NewNonce);
@@ -176,7 +176,7 @@ namespace Waher.Security.ACME
 		{
 			get
 			{
-				if (this.directory == null)
+				if (this.directory is null)
 					return this.GetDirectory();
 				else
 					return Task.FromResult<AcmeDirectory>(this.directory);
@@ -197,7 +197,7 @@ namespace Waher.Security.ACME
 			string PayloadString;
 			string Signature;
 
-			if (KeyID == null)
+			if (KeyID is null)
 			{
 				this.jws.Sign(new KeyValuePair<string, object>[]
 				{
@@ -257,7 +257,7 @@ namespace Waher.Security.ACME
 
 			if (string.IsNullOrEmpty(AcmeResponse.Json))
 				AcmeResponse.Payload = null;
-			else if ((AcmeResponse.Payload = JSON.Parse(AcmeResponse.Json) as IEnumerable<KeyValuePair<string, object>>) == null)
+			else if ((AcmeResponse.Payload = JSON.Parse(AcmeResponse.Json) as IEnumerable<KeyValuePair<string, object>>) is null)
 				throw new Exception("Unexpected response returned.");
 
 			if (Response.IsSuccessStatusCode)
@@ -384,7 +384,7 @@ namespace Waher.Security.ACME
 		/// <returns>ACME account object.</returns>
 		public async Task<AcmeAccount> CreateAccount(string[] ContactURLs, bool TermsOfServiceAgreed)
 		{
-			if (this.directory == null)
+			if (this.directory is null)
 				await this.GetDirectory();
 
 			AcmeResponse Response = await this.POST(this.directory.NewAccount, null,
@@ -393,7 +393,7 @@ namespace Waher.Security.ACME
 
 			AcmeAccount Account;
 
-			if (Response.Payload == null)
+			if (Response.Payload is null)
 			{
 				Response = await this.POST(Response.Location, Response.Location);
 				Account = new AcmeAccount(this, Response.Location, Response.Payload);
@@ -430,13 +430,13 @@ namespace Waher.Security.ACME
 		/// <returns>ACME account object.</returns>
 		public async Task<AcmeAccount> GetAccount()
 		{
-			if (this.directory == null)
+			if (this.directory is null)
 				await this.GetDirectory();
 
 			AcmeResponse Response = await this.POST(this.directory.NewAccount, null,
 				new KeyValuePair<string, object>("onlyReturnExisting", true));
 
-			if (Response.Payload == null)
+			if (Response.Payload is null)
 				Response = await this.POST(Response.Location, Response.Location);
 
 			return new AcmeAccount(this, Response.Location, Response.Payload);
@@ -450,7 +450,7 @@ namespace Waher.Security.ACME
 		/// <returns>New account object.</returns>
 		public async Task<AcmeAccount> UpdateAccount(Uri AccountLocation, string[] Contact)
 		{
-			if (this.directory == null)
+			if (this.directory is null)
 				await this.GetDirectory();
 
 			AcmeResponse Response = await this.POST(AccountLocation, AccountLocation,
@@ -466,7 +466,7 @@ namespace Waher.Security.ACME
 		/// <returns>New account object.</returns>
 		public async Task<AcmeAccount> DeactivateAccount(Uri AccountLocation)
 		{
-			if (this.directory == null)
+			if (this.directory is null)
 				await this.GetDirectory();
 
 			AcmeResponse Response = await this.POST(AccountLocation, AccountLocation,
@@ -481,7 +481,7 @@ namespace Waher.Security.ACME
 		/// <param name="AccountLocation">URL of the account resource.</param>
 		public async Task<AcmeAccount> NewKey(Uri AccountLocation)
 		{
-			if (this.directory == null)
+			if (this.directory is null)
 				await this.GetDirectory();
 			RSA NewKey = RSA.Create();
 			NewKey.KeySize = KeySize;
@@ -489,7 +489,7 @@ namespace Waher.Security.ACME
 			if (NewKey.KeySize != KeySize)	// Happens when using library from traditioanl .NET FW
 			{
 				Type T = Runtime.Inventory.Types.GetType("System.Security.Cryptography.RSACryptoServiceProvider");
-				if (T == null)
+				if (T is null)
 					throw new Exception("Unable to set RSA key size to anything but default (" + NewKey.KeySize.ToString() + " bits).");
 
 				NewKey = Activator.CreateInstance(T, KeySize) as RSA;
@@ -535,7 +535,7 @@ namespace Waher.Security.ACME
 		public async Task<AcmeOrder> OrderCertificate(Uri AccountLocation, AcmeIdentifier[] Identifiers,
 			DateTime? NotBefore, DateTime? NotAfter)
 		{
-			if (this.directory == null)
+			if (this.directory is null)
 				await this.GetDirectory();
 
 			int i, c = Identifiers.Length;
@@ -658,7 +658,7 @@ namespace Waher.Security.ACME
 		{
 			get
 			{
-				if (this.jwkThumbprint == null)
+				if (this.jwkThumbprint is null)
 				{
 					SortedDictionary<string, object> Sorted = new SortedDictionary<string, object>();
 

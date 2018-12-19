@@ -88,7 +88,7 @@ namespace Waher.Script.Graphs
 				ex = X.GetElement(i);
 				ey = Y.GetElement(i);
 
-				if (ex.AssociatedObjectValue == null || ey.AssociatedObjectValue == null)
+				if (ex.AssociatedObjectValue is null || ey.AssociatedObjectValue is null)
 				{
 					HasNull = true;
 					break;
@@ -117,7 +117,7 @@ namespace Waher.Script.Graphs
 					ex = X.GetElement(i);
 					ey = Y.GetElement(i);
 
-					if (ex.AssociatedObjectValue == null || ey.AssociatedObjectValue == null)
+					if (ex.AssociatedObjectValue is null || ey.AssociatedObjectValue is null)
 					{
 						if (X2.First != null)
 						{
@@ -175,7 +175,7 @@ namespace Waher.Script.Graphs
 			IVector X2V = (IVector)X.Encapsulate(X2, Node);
 			IVector Y2V = (IVector)Y.Encapsulate(Y2, Node);
 
-			if (this.axisTypeX == null)
+			if (this.axisTypeX is null)
 			{
 				this.axisTypeX = X2V.GetType();
 				this.axisTypeY = Y2V.GetType();
@@ -319,13 +319,13 @@ namespace Waher.Script.Graphs
 		/// <returns>Result, if understood, null otherwise.</returns>
 		public override ISemiGroupElement AddRight(ISemiGroupElement Element)
 		{
-			if (this.x.First == null)
+			if (this.x.First is null)
 				return Element;
 
 			if (!(Element is Graph2D G))
 				return null;
 
-			if (G.x.First == null)
+			if (G.x.First is null)
 				return this;
 
 			Graph2D Result = new Graph2D()

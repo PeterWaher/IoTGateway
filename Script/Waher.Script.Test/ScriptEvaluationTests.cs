@@ -110,7 +110,7 @@ namespace Waher.Script.Test
 				if (Convert.ToDouble(Expected) != d)
 					Assert.Fail("Expected " + Expected.ToString() + ", but got " + Result.ToString() + ": " + Script);
 			}
-			else if (Expected == null)
+			else if (Expected is null)
 			{
 				if (Result != null)
 					Assert.Fail("Expected null: " + Script);

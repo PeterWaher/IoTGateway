@@ -73,7 +73,7 @@ namespace Waher.Client.WPF.Controls
 
 			lock (this.guiQueue)
 			{
-				Call = this.guiQueue.First == null;
+				Call = this.guiQueue.First is null;
 				this.guiQueue.AddLast(P);
 			}
 
@@ -90,7 +90,7 @@ namespace Waher.Client.WPF.Controls
 			{
 				lock (this.guiQueue)
 				{
-					if (this.guiQueue.First == null)
+					if (this.guiQueue.First is null)
 						return;
 
 					P = this.guiQueue.First.Value;
@@ -178,7 +178,7 @@ namespace Waher.Client.WPF.Controls
 			this.UpdateGui(new ThreadStart(() =>
 			{
 				this.currentPanel = this.currentPanel.Parent as StackPanel;
-				if (this.currentPanel == null)
+				if (this.currentPanel is null)
 					this.currentPanel = this.ReportPanel;
 			}));
 		}
@@ -247,7 +247,7 @@ namespace Waher.Client.WPF.Controls
 						for (i = 0; i < d; i++)
 						{
 							Obj = Record.Elements[i];
-							if (Obj == null)
+							if (Obj is null)
 								continue;
 
 							Column = Columns[i];
@@ -293,7 +293,7 @@ namespace Waher.Client.WPF.Controls
 			this.UpdateGui(new ThreadStart(() =>
 			{
 				object Obj = e.Object.Object;
-				if (Obj == null)
+				if (Obj is null)
 					return;
 
 				// TODO: Images

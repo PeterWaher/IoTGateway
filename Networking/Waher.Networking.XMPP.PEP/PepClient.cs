@@ -136,7 +136,7 @@ namespace Waher.Networking.XMPP.PEP
 		{
 			string ItemId = PersonalEvent.ItemId;
 
-			if (ItemId == null)
+			if (ItemId is null)
 				this.pubSubClient?.Publish(string.Empty, PersonalEvent.Node, string.Empty, PersonalEvent.PayloadXml, Callback, State);
 			else
 				this.pubSubClient?.Publish(string.Empty, PersonalEvent.Node, ItemId, PersonalEvent.PayloadXml, Callback, State);
@@ -174,7 +174,7 @@ namespace Waher.Networking.XMPP.PEP
 				if (string.Compare(e.FromBareJID, this.client.BareJID, true) != 0)
 				{
 					RosterItem Item = this.client[e.FromBareJID];
-					if (Item == null || (Item.State != SubscriptionState.Both && Item.State != SubscriptionState.To))
+					if (Item is null || (Item.State != SubscriptionState.Both && Item.State != SubscriptionState.To))
 						return;
 				}
 
@@ -292,7 +292,7 @@ namespace Waher.Networking.XMPP.PEP
 				if (!this.handlers.TryGetValue(PersonalEventType, out PersonalEventNotificationEventHandler[] Handlers))
 					Handlers = null;
 
-				if (Handlers == null)
+				if (Handlers is null)
 					Handlers = new PersonalEventNotificationEventHandler[] { Handler };
 				else
 				{
@@ -362,7 +362,7 @@ namespace Waher.Networking.XMPP.PEP
 		{
 			add
 			{
-				if (this.onUserLocation == null)
+				if (this.onUserLocation is null)
 					this.RegisterHandler(typeof(UserLocation), this.UserLocationEventHandler);
 
 				this.onUserLocation += value;
@@ -372,7 +372,7 @@ namespace Waher.Networking.XMPP.PEP
 			{
 				this.onUserLocation -= value;
 
-				if (this.onUserLocation == null)
+				if (this.onUserLocation is null)
 					this.UnregisterHandler(typeof(UserLocation), this.UserLocationEventHandler);
 			}
 		}
@@ -436,7 +436,7 @@ namespace Waher.Networking.XMPP.PEP
 		{
 			add
 			{
-				if (this.onUserAvatarMetaData == null)
+				if (this.onUserAvatarMetaData is null)
 					this.RegisterHandler(typeof(UserAvatarMetaData), this.UserAvatarMetaDataEventHandler);
 
 				this.onUserAvatarMetaData += value;
@@ -446,7 +446,7 @@ namespace Waher.Networking.XMPP.PEP
 			{
 				this.onUserAvatarMetaData -= value;
 
-				if (this.onUserAvatarMetaData == null)
+				if (this.onUserAvatarMetaData is null)
 					this.UnregisterHandler(typeof(UserAvatarMetaData), this.UserAvatarMetaDataEventHandler);
 			}
 		}
@@ -537,7 +537,7 @@ namespace Waher.Networking.XMPP.PEP
 		{
 			add
 			{
-				if (this.onUserMood == null)
+				if (this.onUserMood is null)
 					this.RegisterHandler(typeof(UserMood), this.UserMoodEventHandler);
 
 				this.onUserMood += value;
@@ -547,7 +547,7 @@ namespace Waher.Networking.XMPP.PEP
 			{
 				this.onUserMood -= value;
 
-				if (this.onUserMood == null)
+				if (this.onUserMood is null)
 					this.UnregisterHandler(typeof(UserMood), this.UserMoodEventHandler);
 			}
 		}
@@ -596,7 +596,7 @@ namespace Waher.Networking.XMPP.PEP
 		{
 			add
 			{
-				if (this.onUserActivity == null)
+				if (this.onUserActivity is null)
 					this.RegisterHandler(typeof(UserActivity), this.UserActivityEventHandler);
 
 				this.onUserActivity += value;
@@ -606,7 +606,7 @@ namespace Waher.Networking.XMPP.PEP
 			{
 				this.onUserActivity -= value;
 
-				if (this.onUserActivity == null)
+				if (this.onUserActivity is null)
 					this.UnregisterHandler(typeof(UserActivity), this.UserActivityEventHandler);
 			}
 		}
@@ -648,7 +648,7 @@ namespace Waher.Networking.XMPP.PEP
 		{
 			add
 			{
-				if (this.onUserTune == null)
+				if (this.onUserTune is null)
 					this.RegisterHandler(typeof(UserTune), this.UserTuneEventHandler);
 
 				this.onUserTune += value;
@@ -658,7 +658,7 @@ namespace Waher.Networking.XMPP.PEP
 			{
 				this.onUserTune -= value;
 
-				if (this.onUserTune == null)
+				if (this.onUserTune is null)
 					this.UnregisterHandler(typeof(UserTune), this.UserTuneEventHandler);
 			}
 		}

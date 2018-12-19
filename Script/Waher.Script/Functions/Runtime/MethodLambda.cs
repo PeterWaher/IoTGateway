@@ -41,7 +41,7 @@ namespace Waher.Script.Functions.Runtime
 		{
 			get
 			{
-				if (this.argumentNames == null)
+				if (this.argumentNames is null)
 				{
 					int i, c = this.parameters.Length;
 					string[] Names = new string[c];
@@ -63,7 +63,7 @@ namespace Waher.Script.Functions.Runtime
 		{
 			get
 			{
-				if (this.argumentTypes == null)
+				if (this.argumentTypes is null)
 				{
 					int i, c = this.parameters.Length;
 					ArgumentType[] Types = new ArgumentType[c];

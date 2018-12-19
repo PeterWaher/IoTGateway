@@ -93,7 +93,7 @@ namespace Waher.Networking.LWM2M.ContentFormats
 		/// <param name="Identifier">Identifier.</param>
 		public virtual void Begin(IdentifierType IdentifierType, ushort Identifier)
 		{
-			if (this.nested == null)
+			if (this.nested is null)
 				this.nested = new LinkedList<Tuple<IdentifierType?, ushort?, MemoryStream>>();
 
 			this.nested.AddLast(new Tuple<IdentifierType?, ushort?, MemoryStream>(
@@ -109,7 +109,7 @@ namespace Waher.Networking.LWM2M.ContentFormats
 		/// </summary>
 		public virtual void End()
 		{
-			if (this.nested == null || this.nested.Last == null)
+			if (this.nested is null || this.nested.Last is null)
 				throw new Exception("No nested TLV available.");
 
 			byte[] Payload = this.ms.ToArray();

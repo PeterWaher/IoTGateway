@@ -201,7 +201,7 @@ namespace Waher.Events.MQTT
 			Event Event = new Event(Timestamp, Type, Message, Object, Actor, EventId, Level, Facility, Module, StackTrace, Tags.ToArray());
 			EventEventHandler h = this.OnEvent;
 			
-			if (h == null)
+			if (h is null)
 				Log.Event(Event);
 			else
 			{

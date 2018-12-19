@@ -45,7 +45,7 @@ namespace Waher.Script.Operators.Conditional
                 }
                 finally
                 {
-                    if (Bak == null)
+                    if (Bak is null)
                         Variables.Remove("Exception");
                     else
                         Variables["Exception"] = Bak;

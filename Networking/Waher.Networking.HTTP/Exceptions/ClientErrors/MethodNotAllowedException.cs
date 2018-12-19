@@ -48,7 +48,7 @@ namespace Waher.Networking.HTTP
 
 			foreach (string Method in Methods)
 			{
-				if (Output == null)
+				if (Output is null)
 					Output = new StringBuilder();
 				else
 					Output.Append(", ");
@@ -56,7 +56,7 @@ namespace Waher.Networking.HTTP
 				Output.Append(Method);
 			}
 
-			if (Output == null)
+			if (Output is null)
 				return string.Empty;
 			else
 				return Output.ToString();

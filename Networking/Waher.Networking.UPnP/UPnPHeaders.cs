@@ -80,7 +80,7 @@ namespace Waher.Networking.UPnP
 					this.responseMessage = null;
 					for (i = 2; i < P.Length; i++)
 					{
-						if (this.responseMessage == null)
+						if (this.responseMessage is null)
 							this.responseMessage = P[i];
 						else
 							this.responseMessage += " " + P[i];

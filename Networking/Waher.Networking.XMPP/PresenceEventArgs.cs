@@ -220,7 +220,7 @@ namespace Waher.Networking.XMPP
 			foreach (XmlNode N in Presence.ChildNodes)
 			{
 				E = N as XmlElement;
-				if (E == null)
+				if (E is null)
 					continue;
 
 				if (E.NamespaceURI == Presence.NamespaceURI)
@@ -309,7 +309,7 @@ namespace Waher.Networking.XMPP
 					this.entityCapabilityHashFunction = XML.Attribute(E, "hash");
 					this.hasEntityCapabilities = true;
 				}
-				else if (this.content == null)
+				else if (this.content is null)
 					this.content = E;
 			}
 

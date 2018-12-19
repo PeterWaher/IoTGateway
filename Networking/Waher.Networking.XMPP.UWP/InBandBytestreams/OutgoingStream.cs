@@ -111,7 +111,7 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 		/// <param name="Count">Number of bytes to start.</param>
 		public void Write(byte[] Data, int Offset, int Count)
 		{
-			if (this.tempFile == null || this.aborted || this.done)
+			if (this.tempFile is null || this.aborted || this.done)
 				throw new IOException("Stream not open");
 
 			lock (this.tempFile)
@@ -179,7 +179,7 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 
 		private void BlockAck(object Sender, IqResultEventArgs e)
 		{
-			if (this.tempFile == null || this.aborted)
+			if (this.tempFile is null || this.aborted)
 				return;
 
 			if (!e.Ok)

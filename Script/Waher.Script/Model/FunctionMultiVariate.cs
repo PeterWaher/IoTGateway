@@ -123,7 +123,7 @@ namespace Waher.Script.Model
 			for (i = 0; i < this.nrArguments; i++)
 			{
 				Node = this.arguments[i];
-				if (Node == null)
+				if (Node is null)
 					Arg[i] = ObjectValue.Null;
 				else
 					Arg[i] = Node.Evaluate(Variables);
@@ -170,7 +170,7 @@ namespace Waher.Script.Model
 								throw new ScriptRuntimeException("Argument dimensions not consistent.", this);
 
 							e[i] = ChildElements.GetEnumerator();
-							if (Encapsulation == null)
+							if (Encapsulation is null)
 								Encapsulation = Argument.Encapsulate;
 						}
 						break;
@@ -191,7 +191,7 @@ namespace Waher.Script.Model
 								Vectors.AddLast(M.GetRow(j));
 
 							e[i] = Vectors.GetEnumerator();
-							if (Encapsulation == null)
+							if (Encapsulation is null)
 								Encapsulation = Operators.LambdaDefinition.EncapsulateToVector;
 						}
 						else if ((S = Argument as ISet) != null)
@@ -206,7 +206,7 @@ namespace Waher.Script.Model
 								throw new ScriptRuntimeException("Argument dimensions not consistent.", this);
 
 							e[i] = S.ChildElements.GetEnumerator();
-							if (Encapsulation == null)
+							if (Encapsulation is null)
 								Encapsulation = Argument.Encapsulate;
 						}
 						else
@@ -240,7 +240,7 @@ namespace Waher.Script.Model
 							ChildElements = Argument.ChildElements;
 
 							e[i] = ChildElements.GetEnumerator();
-							if (Encapsulation == null)
+							if (Encapsulation is null)
 								Encapsulation = Operators.LambdaDefinition.EncapsulateToVector;
 						}
 						else
@@ -270,7 +270,7 @@ namespace Waher.Script.Model
 								throw new ScriptRuntimeException("Argument dimensions not consistent.", this);
 
 							e[i] = S.ChildElements.GetEnumerator();
-							if (Encapsulation == null)
+							if (Encapsulation is null)
 								Encapsulation = Argument.Encapsulate;
 						}
 						else
@@ -294,7 +294,7 @@ namespace Waher.Script.Model
 				{
 					for (i = 0; i < this.nrArguments; i++)
 					{
-						if (e[i] == null || !e[i].MoveNext())
+						if (e[i] is null || !e[i].MoveNext())
 							Arguments2[i] = Arguments[i];
 						else
 							Arguments2[i] = e[i].Current;

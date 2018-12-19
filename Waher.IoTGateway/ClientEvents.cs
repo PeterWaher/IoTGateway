@@ -85,7 +85,7 @@ namespace Waher.IoTGateway
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public void POST(HttpRequest Request, HttpResponse Response)
 		{
-			if (!Request.HasData || Request.Session == null)
+			if (!Request.HasData || Request.Session is null)
 				throw new BadRequestException();
 
 			// TODO: Check User authenticated
@@ -125,7 +125,7 @@ namespace Waher.IoTGateway
 			if (!eventsByTabID.TryGetValue(TabID, out TabQueue Queue))
 			{
 				HttpFieldCookie Cookie = Request.Header.Cookie;
-				string HttpSessionID = Cookie == null ? string.Empty : Cookie["HttpSessionID"];
+				string HttpSessionID = Cookie is null ? string.Empty : Cookie["HttpSessionID"];
 
 				Queue = new TabQueue(TabID, HttpSessionID, Request.Session);
 				eventsByTabID[TabID] = Queue;
@@ -156,7 +156,7 @@ namespace Waher.IoTGateway
 				{
 					foreach (string Event in Queue.Queue)
 					{
-						if (Json == null)
+						if (Json is null)
 							Json = new StringBuilder("[");
 						else
 							Json.Append(',');
@@ -215,7 +215,7 @@ namespace Waher.IoTGateway
 			else
 			{
 				HttpFieldCookie Cookie = Socket.HttpRequest.Header.Cookie;
-				string HttpSessionID = Cookie == null ? string.Empty : Cookie["HttpSessionID"];
+				string HttpSessionID = Cookie is null ? string.Empty : Cookie["HttpSessionID"];
 
 				Queue = new TabQueue(TabID, HttpSessionID, Socket.HttpRequest.Session)
 				{
@@ -429,7 +429,7 @@ namespace Waher.IoTGateway
 			{
 				if (tabIdsByLocation.TryGetValue(Location, out Dictionary<string, List<KeyValuePair<string, string>>> TabIDs))
 				{
-					if (QueryFilter == null || QueryFilter.Length == 0)
+					if (QueryFilter is null || QueryFilter.Length == 0)
 					{
 						Result = new string[TabIDs.Count];
 						TabIDs.Keys.CopyTo(Result, 0);
@@ -446,7 +446,7 @@ namespace Waher.IoTGateway
 
 							foreach (KeyValuePair<string, string> Q in QueryFilter)
 							{
-								if (Q.Value == null)
+								if (Q.Value is null)
 								{
 									Found = true;
 
@@ -633,7 +633,7 @@ namespace Waher.IoTGateway
 
 			string s = Json.ToString();
 
-			if (TabIDs == null)
+			if (TabIDs is null)
 				TabIDs = eventsByTabID.GetKeys();
 
 			foreach (string TabID in TabIDs)

@@ -116,7 +116,7 @@ namespace Waher.Script
 		/// </summary>
 		public void Push()
 		{
-			if (this.stack == null)
+			if (this.stack is null)
 				this.stack = new Stack<Dictionary<string, Variable>>();
 
 			this.stack.Push(this.variables);
@@ -133,7 +133,7 @@ namespace Waher.Script
 		/// </summary>
 		public void Pop()
 		{
-			if (this.stack == null)
+			if (this.stack is null)
 				throw new ScriptException("Stack is empty.");
 
 			this.variables = this.stack.Pop();

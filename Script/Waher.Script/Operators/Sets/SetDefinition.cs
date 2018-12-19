@@ -64,7 +64,7 @@ namespace Waher.Script.Operators.Sets
             ISet Set = CheckAgainst as ISet;
             int? Size;
 
-            if (Set == null || !(Size = Set.Size).HasValue || Size.Value != Elements.Length)
+            if (Set is null || !(Size = Set.Size).HasValue || Size.Value != Elements.Length)
                 throw new ScriptRuntimeException("Pattern mismatch.", this);
 
             int i = 0;

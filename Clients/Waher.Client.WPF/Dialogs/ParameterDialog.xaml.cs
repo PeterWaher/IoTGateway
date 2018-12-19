@@ -117,7 +117,7 @@ namespace Waher.Client.WPF.Dialogs
 				foreach (LayoutElement Element in Page.Elements)
 				{
 					Control = this.Layout(Container, Element, Form);
-					if (First == null)
+					if (First is null)
 						First = Control;
 				}
 
@@ -162,7 +162,7 @@ namespace Waher.Client.WPF.Dialogs
 			foreach (LayoutElement Element in Section.Elements)
 			{
 				Control = this.Layout(StackPanel, Element, Form);
-				if (First == null)
+				if (First is null)
 					First = Control;
 			}
 
@@ -184,7 +184,7 @@ namespace Waher.Client.WPF.Dialogs
 		private Control Layout(Panel Container, FieldReference FieldReference, DataForm Form)
 		{
 			Field Field = Form[FieldReference.Var];
-			if (Field == null)
+			if (Field is null)
 				return null;
 
 			Control Result = null;
@@ -218,7 +218,7 @@ namespace Waher.Client.WPF.Dialogs
 			else if (Field is MediaField)
 				this.Layout(Container, (MediaField)Field, Form);
 
-			if (MakeVisible && this.makeVisible == null)
+			if (MakeVisible && this.makeVisible is null)
 				this.makeVisible = Result;
 
 			return Result;
@@ -274,7 +274,7 @@ namespace Waher.Client.WPF.Dialogs
 
 			string Var = NameToVar(CheckBox.Name);
 			Field Field = this.form[Var];
-			if (Field == null)
+			if (Field is null)
 				return;
 
 			if (CheckBox.IsChecked.HasValue)
@@ -414,7 +414,7 @@ namespace Waher.Client.WPF.Dialogs
 
 			string Var = NameToVar(GroupBox.Name);
 			Field Field = this.form[Var];
-			if (Field == null)
+			if (Field is null)
 				return;
 
 			List<string> Values = new List<string>();
@@ -422,7 +422,7 @@ namespace Waher.Client.WPF.Dialogs
 			foreach (UIElement Element in StackPanel.Children)
 			{
 				CheckBox = Element as CheckBox;
-				if (CheckBox == null)
+				if (CheckBox is null)
 					continue;
 
 				if (CheckBox.IsChecked.HasValue && CheckBox.IsChecked.Value)
@@ -451,7 +451,7 @@ namespace Waher.Client.WPF.Dialogs
 			foreach (UIElement Element in StackPanel.Children)
 			{
 				CheckBox = Element as CheckBox;
-				if (CheckBox == null)
+				if (CheckBox is null)
 					continue;
 
 				CheckBox.Background = Background;
@@ -517,7 +517,7 @@ namespace Waher.Client.WPF.Dialogs
 
 			string Var = NameToVar(ComboBox.Name);
 			Field Field = this.form[Var];
-			if (Field == null)
+			if (Field is null)
 				return;
 
 			TextBlock ErrorLabel = (TextBlock)ComboBox.Tag;
@@ -550,7 +550,7 @@ namespace Waher.Client.WPF.Dialogs
 
 			string Var = NameToVar(ComboBox.Name);
 			Field Field = this.form[Var];
-			if (Field == null)
+			if (Field is null)
 				return;
 
 			TextBlock ErrorLabel = (TextBlock)ComboBox.Tag;
@@ -899,7 +899,7 @@ namespace Waher.Client.WPF.Dialogs
 
 			string Var = NameToVar(PasswordBox.Name);
 			Field Field = this.form[Var];
-			if (Field == null)
+			if (Field is null)
 				return;
 
 			Field.SetValue(PasswordBox.Password);
@@ -1003,7 +1003,7 @@ namespace Waher.Client.WPF.Dialogs
 
 			string Var = NameToVar(TextBox.Name);
 			Field Field = this.form[Var];
-			if (Field == null)
+			if (Field is null)
 				return;
 
 			TextBlock ErrorLabel = (TextBlock)TextBox.Tag;

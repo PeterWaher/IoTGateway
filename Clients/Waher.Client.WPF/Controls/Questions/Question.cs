@@ -174,7 +174,7 @@ namespace Waher.Client.WPF.Controls.Questions
 			{
 				if (Question.IsResolvedBy(this))
 				{
-					if (ToRemove == null)
+					if (ToRemove is null)
 						ToRemove = new LinkedList<Question>();
 
 					ToRemove.AddLast(Question);

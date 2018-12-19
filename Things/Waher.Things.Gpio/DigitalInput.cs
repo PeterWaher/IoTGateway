@@ -76,7 +76,7 @@ namespace Waher.Things.Gpio
 		{
 			try
 			{
-				if (this.pin == null)
+				if (this.pin is null)
 				{
 					if (!this.Controller.TryOpenPin(this.PinNr, GpioSharingMode.SharedReadOnly, out this.pin, out GpioOpenStatus Status))
 					{

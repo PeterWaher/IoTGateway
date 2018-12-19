@@ -183,7 +183,7 @@ namespace Waher.Networking.LWM2M
 		/// </summary>
 		public override async Task ApplyBootstrapInfo()
 		{
-			if (this.ObjectId == null)
+			if (this.ObjectId is null)
 				await Database.Insert(this);
 			else
 				await Database.Update(this);
@@ -214,11 +214,11 @@ namespace Waher.Networking.LWM2M
 			Lwm2mSecurityObjectInstance SecurityInfo = Client.GetSecurityInfo(
 				(ushort)this.shortServerId.IntegerValue.Value);
 
-			if (SecurityInfo == null)
+			if (SecurityInfo is null)
 				return false;
 
 			Lwm2mServerReference Ref = SecurityInfo.GetServerReference(false);
-			if (Ref == null)
+			if (Ref is null)
 				return false;
 
 			Client.Register(this.lifetimeSeconds.IntegerValue.HasValue ? 

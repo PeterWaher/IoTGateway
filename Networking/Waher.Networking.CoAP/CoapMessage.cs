@@ -148,7 +148,7 @@ namespace Waher.Networking.CoAP
 		/// <returns>If a parameter with the gíven name was found.</returns>
 		public bool TryGetUriQueryParameter(string Name, out string Value)
 		{
-			if (this.uriQuery == null)
+			if (this.uriQuery is null)
 			{
 				Value = null;
 				return false;
@@ -229,7 +229,7 @@ namespace Waher.Networking.CoAP
 		/// <returns>If a location parameter was found with the given name.</returns>
 		public bool TryGetLocationQueryParameter(string Name, out string Value)
 		{
-			if (this.locationQuery == null)
+			if (this.locationQuery is null)
 			{
 				Value = null;
 				return false;
@@ -298,7 +298,7 @@ namespace Waher.Networking.CoAP
 		/// <returns>Decoded payload.</returns>
 		public object Decode()
 		{
-			if (this.payload == null)
+			if (this.payload is null)
 				return null;
 			else if (!this.contentFormat.HasValue)
 				return this.payload;
@@ -313,7 +313,7 @@ namespace Waher.Networking.CoAP
 		/// <returns>If the content format is acceptable or not.</returns>
 		public bool IsAcceptable(int ContentFormat)
 		{
-			if (this.accept == null)
+			if (this.accept is null)
 				return true;
 
 			if (ContentFormat < 0)

@@ -35,11 +35,11 @@ namespace Waher.Persistence.Files.Serialization.NullableTypes
 				}
 			}
 
-			if (this.constructor == null)
+			if (this.constructor is null)
 				throw new ArgumentException("Generic nullable type lacks required constructor.", nameof(EnumType));
 
 			this.valueProperty = this.genericType.GetRuntimeProperty("Value");
-			if (this.valueProperty == null)
+			if (this.valueProperty is null)
 				throw new ArgumentException("Generic nullable type lacks required Value property.", nameof(EnumType));
 		}
 
@@ -104,7 +104,7 @@ namespace Waher.Persistence.Files.Serialization.NullableTypes
 		{
 			if (WriteTypeCode)
 			{
-				if (Value == null)
+				if (Value is null)
 				{
 					Writer.WriteBits(ObjectSerializer.TYPE_NULL, 6);
 					return;
@@ -112,7 +112,7 @@ namespace Waher.Persistence.Files.Serialization.NullableTypes
 				else
 					Writer.WriteBits(ObjectSerializer.TYPE_ENUM, 6);
 			}
-			else if (Value == null)
+			else if (Value is null)
 				throw new NullReferenceException("Value cannot be null.");
 
 			Writer.Write((Enum)this.valueProperty.GetMethod.Invoke(Value, null));

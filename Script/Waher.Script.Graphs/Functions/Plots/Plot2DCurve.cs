@@ -100,11 +100,11 @@ namespace Waher.Script.Graphs.Functions.Plots
 		public override IElement Evaluate(IElement[] Arguments, Variables Variables)
 		{
 			IVector X = Arguments[0] as IVector;
-			if (X == null)
+			if (X is null)
 				throw new ScriptRuntimeException("Expected vector for X argument.", this);
 
 			IVector Y = Arguments[1] as IVector;
-			if (Y == null)
+			if (Y is null)
 				throw new ScriptRuntimeException("Expected vector for Y argument.", this);
 
 			int Dimension = X.Dimension;
@@ -115,8 +115,8 @@ namespace Waher.Script.Graphs.Functions.Plots
 			IElement Size = Arguments.Length <= 3 ? null : Arguments[3];
 
 			return new Graph2D(X, Y, this.DrawGraph, false, false, this,
-				Color == null ? SKColors.Red : Color.AssociatedObjectValue,
-				Size == null ? 2.0 : Size.AssociatedObjectValue);
+				Color is null ? SKColors.Red : Color.AssociatedObjectValue,
+				Size is null ? 2.0 : Size.AssociatedObjectValue);
 		}
 
 		private void DrawGraph(SKCanvas Canvas, SKPoint[] Points, object[] Parameters, SKPoint[] PrevPoints, object[] PrevParameters,
@@ -164,7 +164,7 @@ namespace Waher.Script.Graphs.Functions.Plots
 			if (c == 0)
 				throw new ArgumentException("No points provided.", nameof(Points));
 
-			if (AppendTo == null)
+			if (AppendTo is null)
 			{
 				AppendTo = new SKPath();
 				AppendTo.MoveTo(Points[0]);

@@ -120,7 +120,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 				}
 			}
 
-			if (Handlers == null)
+			if (Handlers is null)
 				return null;
 
 			ICodeContent Best = null;

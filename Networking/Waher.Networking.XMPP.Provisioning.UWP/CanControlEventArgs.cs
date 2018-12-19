@@ -38,7 +38,7 @@ namespace Waher.Networking.XMPP.Provisioning
 			{
 				if (N is XmlElement E && E.LocalName == "p")
 				{
-					if (Parameters == null)
+					if (Parameters is null)
 						Parameters = new List<string>();
 
 					Parameters.Add(XML.Attribute(E, "n"));

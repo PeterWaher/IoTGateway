@@ -41,14 +41,14 @@ namespace Waher.Script.Operators.Conditional
             {
                 if (b.Value)
                     return this.middle.Evaluate(Variables);
-                else if (this.right == null)
+                else if (this.right is null)
                     return ObjectValue.Null;
                 else
                     return this.right.Evaluate(Variables);
             }
 
             IElement IfTrue = this.middle.Evaluate(Variables);
-            IElement IfFalse = this.right == null ? ObjectValue.Null : this.right.Evaluate(Variables);
+            IElement IfFalse = this.right is null ? ObjectValue.Null : this.right.Evaluate(Variables);
 
             return this.Evaluate(Condition, IfTrue, IfFalse);
         }
@@ -87,8 +87,8 @@ namespace Waher.Script.Operators.Conditional
                 IEnumerator<IElement> e2 = IfTrueElements != null ? IfTrueElements.GetEnumerator() : null;
                 IEnumerator<IElement> e3 = IfFalseElements != null ? IfFalseElements.GetEnumerator() : null;
 
-                while (e1.MoveNext() && (e2 == null || e2.MoveNext()) && (e3 == null || e3.MoveNext()))
-                    Elements.AddLast(this.Evaluate(e1.Current, e2 == null ? IfTrue : e2.Current, e3 == null ? IfFalse : e3.Current));
+                while (e1.MoveNext() && (e2 is null || e2.MoveNext()) && (e3 is null || e3.MoveNext()))
+                    Elements.AddLast(this.Evaluate(e1.Current, e2 is null ? IfTrue : e2.Current, e3 is null ? IfFalse : e3.Current));
 
                 return Condition.Encapsulate(Elements, this);
             }

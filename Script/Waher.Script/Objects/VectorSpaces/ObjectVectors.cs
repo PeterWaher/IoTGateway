@@ -50,7 +50,7 @@ namespace Waher.Script.Objects.VectorSpaces
 
 				foreach (IElement Element in this.referenceVector.Elements)
 				{
-					if (Set == null)
+					if (Set is null)
 					{
 						Ref = Element;
 						Set = Element.AssociatedSet;
@@ -67,7 +67,7 @@ namespace Waher.Script.Objects.VectorSpaces
 				}
 
 				this.scalarRing = Set as IRing;
-				if (this.scalarRing == null)
+				if (this.scalarRing is null)
 					throw new ScriptException("No common scalar ring found.");
 
 				return this.scalarRing;
@@ -87,7 +87,7 @@ namespace Waher.Script.Objects.VectorSpaces
 					return this.scalarField;
 
 				this.scalarField = this.ScalarRing as IField;
-				if (this.scalarField == null)
+				if (this.scalarField is null)
 					throw new ScriptException("No common scalar field found.");
 
 				return this.scalarField;
@@ -115,7 +115,7 @@ namespace Waher.Script.Objects.VectorSpaces
 		public override bool Contains(IElement Element)
 		{
 			ObjectVector v = Element as ObjectVector;
-			if (v == null)
+			if (v is null)
 				return false;
 
 			return v.Dimension == this.dimension;

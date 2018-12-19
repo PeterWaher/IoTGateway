@@ -64,7 +64,7 @@ namespace Waher.Script.Objects
 		public override bool Equals(object obj)
 		{
 			TypeValue E = obj as TypeValue;
-			if (E == null)
+			if (E is null)
 				return false;
 			else
 				return this.value.Equals(E.value);
@@ -75,7 +75,7 @@ namespace Waher.Script.Objects
 		/// </summary>
 		public override int GetHashCode()
 		{
-			if (this.value == null)
+			if (this.value is null)
 				return 0;
 			else
 				return this.value.GetHashCode();

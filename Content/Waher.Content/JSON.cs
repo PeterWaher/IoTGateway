@@ -579,7 +579,7 @@ namespace Waher.Content
 
 		private static void Encode(object Object, int? Indent, StringBuilder Json)
 		{
-			if (Object == null)
+			if (Object is null)
 				Json.Append("null");
 			else
 			{

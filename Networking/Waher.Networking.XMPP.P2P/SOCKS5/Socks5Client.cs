@@ -296,7 +296,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 
 					lock (this.queue)
 					{
-						if (this.queue.First == null)
+						if (this.queue.First is null)
 						{
 							this.isWriting = false;
 							Data = null;

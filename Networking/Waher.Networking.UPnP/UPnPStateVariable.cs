@@ -313,14 +313,14 @@ namespace Waher.Networking.UPnP
 					byte[] Bin;
 
 					Bin = Value as byte[];
-					if (Bin == null)
+					if (Bin is null)
 						Bin = SerializeToBinary(Value);
 
 					return System.Convert.ToBase64String(Bin);
 
 				case "bin.hex":
 					Bin = Value as byte[];
-					if (Bin == null)
+					if (Bin is null)
 						Bin = SerializeToBinary(Value);
 
 					StringBuilder sb = new StringBuilder();

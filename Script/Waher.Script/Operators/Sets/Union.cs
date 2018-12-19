@@ -35,12 +35,12 @@ namespace Waher.Script.Operators.Sets
 		{
             IElement L = this.left.Evaluate(Variables);
             ISet S1 = L as ISet;
-            if (S1 == null)
+            if (S1 is null)
                 S1 = new FiniteSet(new IElement[] { L });
 
             IElement R = this.right.Evaluate(Variables);
             ISet S2 = R as ISet;
-            if (S2 == null)
+            if (S2 is null)
                 S2 = new FiniteSet(new IElement[] { R });
 
             return new UnionSet(S1, S2);

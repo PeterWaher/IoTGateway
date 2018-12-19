@@ -29,7 +29,7 @@ namespace Waher.Script.Abstraction.Sets
 			ICommutativeRingElement L = Left as ICommutativeRingElement;
 			ICommutativeRingElement R = Right as ICommutativeRingElement;
 
-			if (L == null || R == null)
+			if (L is null || R is null)
 				return base.RightDivide(Left, Right);
 			else
 				return this.Divide(L, R);

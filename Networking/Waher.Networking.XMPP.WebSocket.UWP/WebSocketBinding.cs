@@ -189,7 +189,7 @@ namespace Waher.Networking.XMPP.WebSocket
 
 				XmlElement Open;
 
-				if ((Open = ResponseXml.DocumentElement) == null || Open.LocalName != "open" ||
+				if ((Open = ResponseXml.DocumentElement) is null || Open.LocalName != "open" ||
 					Open.NamespaceURI != FramingNamespace)
 				{
 					throw new Exception("Unexpected response returned.");
@@ -231,7 +231,7 @@ namespace Waher.Networking.XMPP.WebSocket
 									StreamPrefix = Attr.LocalName;
 								else
 								{
-									if (Namespaces == null)
+									if (Namespaces is null)
 										Namespaces = new LinkedList<KeyValuePair<string, string>>();
 
 									Namespaces.AddLast(new KeyValuePair<string, string>(Attr.Prefix, Attr.Value));
@@ -330,7 +330,7 @@ namespace Waher.Networking.XMPP.WebSocket
 		/// </summary>
 		public override void CloseSession()
 		{
-			if (this.webSocketClient == null)
+			if (this.webSocketClient is null)
 				this.terminated = true;
 			else
 			{
@@ -376,7 +376,7 @@ namespace Waher.Networking.XMPP.WebSocket
 		private async Task<string> ReadText()
 		{
 			WebSocketReceiveResult Response = await this.webSocketClient?.ReceiveAsync(this.inputBuffer, CancellationToken.None);
-			if (Response == null)
+			if (Response is null)
 				return string.Empty;
 
 			this.AssureText(Response);
@@ -440,7 +440,7 @@ namespace Waher.Networking.XMPP.WebSocket
 			if (this.terminated)
 				return;
 
-			if (Packet == null)
+			if (Packet is null)
 				throw new ArgumentException("Null payloads not allowed.", nameof(Packet));
 
 			if (Packet.StartsWith("<?"))

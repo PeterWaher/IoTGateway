@@ -40,7 +40,7 @@ namespace Waher.Networking.UPnP.Services
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
 			
-			if (actionAddPortMapping == null)
+			if (actionAddPortMapping is null)
 				actionAddPortMapping = this.service.GetAction("AddPortMapping");
 
 			this.actionAddPortMapping.Invoke(out OutputValues,
@@ -61,7 +61,7 @@ namespace Waher.Networking.UPnP.Services
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
 			
-			if (actionGetExternalIPAddress == null)
+			if (actionGetExternalIPAddress is null)
 				actionGetExternalIPAddress = this.service.GetAction("GetExternalIPAddress");
 
 			this.actionGetExternalIPAddress.Invoke(out OutputValues);
@@ -76,7 +76,7 @@ namespace Waher.Networking.UPnP.Services
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
 			
-			if (actionDeletePortMapping == null)
+			if (actionDeletePortMapping is null)
 				actionDeletePortMapping = this.service.GetAction("DeletePortMapping");
 
 			this.actionDeletePortMapping.Invoke(out OutputValues,
@@ -92,7 +92,7 @@ namespace Waher.Networking.UPnP.Services
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
 			
-			if (actionSetConnectionType == null)
+			if (actionSetConnectionType is null)
 				actionSetConnectionType = this.service.GetAction("SetConnectionType");
 
 			this.actionSetConnectionType.Invoke(out OutputValues,
@@ -106,7 +106,7 @@ namespace Waher.Networking.UPnP.Services
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
 			
-			if (actionGetConnectionTypeInfo == null)
+			if (actionGetConnectionTypeInfo is null)
 				actionGetConnectionTypeInfo = this.service.GetAction("GetConnectionTypeInfo");
 
 			this.actionGetConnectionTypeInfo.Invoke(out OutputValues);
@@ -122,7 +122,7 @@ namespace Waher.Networking.UPnP.Services
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
 			
-			if (actionRequestConnection == null)
+			if (actionRequestConnection is null)
 				actionRequestConnection = this.service.GetAction("RequestConnection");
 
 			this.actionRequestConnection.Invoke(out OutputValues);
@@ -135,7 +135,7 @@ namespace Waher.Networking.UPnP.Services
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
 			
-			if (actionForceTermination == null)
+			if (actionForceTermination is null)
 				actionForceTermination = this.service.GetAction("ForceTermination");
 
 			this.actionForceTermination.Invoke(out OutputValues);
@@ -148,7 +148,7 @@ namespace Waher.Networking.UPnP.Services
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
 			
-			if (actionGetStatusInfo == null)
+			if (actionGetStatusInfo is null)
 				actionGetStatusInfo = this.service.GetAction("GetStatusInfo");
 
 			this.actionGetStatusInfo.Invoke(out OutputValues);
@@ -165,7 +165,7 @@ namespace Waher.Networking.UPnP.Services
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
 			
-			if (actionGetNATRSIPStatus == null)
+			if (actionGetNATRSIPStatus is null)
 				actionGetNATRSIPStatus = this.service.GetAction("GetNATRSIPStatus");
 
 			this.actionGetNATRSIPStatus.Invoke(out OutputValues);
@@ -181,7 +181,7 @@ namespace Waher.Networking.UPnP.Services
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
 			
-			if (actionGetGenericPortMappingEntry == null)
+			if (actionGetGenericPortMappingEntry is null)
 				actionGetGenericPortMappingEntry = this.service.GetAction("GetGenericPortMappingEntry");
 
 			this.actionGetGenericPortMappingEntry.Invoke(out OutputValues,
@@ -204,7 +204,7 @@ namespace Waher.Networking.UPnP.Services
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
 			
-			if (actionGetSpecificPortMappingEntry == null)
+			if (actionGetSpecificPortMappingEntry is null)
 				actionGetSpecificPortMappingEntry = this.service.GetAction("GetSpecificPortMappingEntry");
 
 			this.actionGetSpecificPortMappingEntry.Invoke(out OutputValues,

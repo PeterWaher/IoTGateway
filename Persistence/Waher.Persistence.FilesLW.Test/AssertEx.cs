@@ -31,7 +31,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 		public static void Same(object Left, object Right)
 		{
-			if (Left == null && Right == null)
+			if (Left is null && Right is null)
 				return;
 
 			Assert.IsNotNull(Left);

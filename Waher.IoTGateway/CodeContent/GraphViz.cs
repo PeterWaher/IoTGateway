@@ -199,7 +199,7 @@ namespace Waher.IoTGateway.CodeContent
 				if (!CommonTypes.TryParse(FolderName.Substring(8), out double Version))
 					Version = 1.0;
 
-				if (BestFolder == null || Version > BestVersion)
+				if (BestFolder is null || Version > BestVersion)
 				{
 					BestFolder = SubFolder;
 					BestVersion = Version;
@@ -283,7 +283,7 @@ namespace Waher.IoTGateway.CodeContent
 		public bool GenerateHTML(StringBuilder Output, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
 			string FileName = this.GetFileName(Language, Rows, out string Title, out string MapFileName, out string Hash);
-			if (FileName == null)
+			if (FileName is null)
 				return false;
 
 			FileName = FileName.Substring(Gateway.RootFolder.Length).Replace(Path.DirectorySeparatorChar, '/');
@@ -457,7 +457,7 @@ namespace Waher.IoTGateway.CodeContent
 		public bool GenerateXAML(XmlWriter Output, XamlSettings Settings, TextAlignment TextAlignment, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
 			string FileName = this.GetFileName(Language, Rows, out string Title, out string MapFileName, out string Hash);
-			if (FileName == null)
+			if (FileName is null)
 				return false;
 
 			Output.WriteStartElement("Image");

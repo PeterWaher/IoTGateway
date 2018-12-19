@@ -109,22 +109,22 @@ namespace Waher.Script.Functions.Vectors
             foreach (IElement E in Argument.ChildElements)
             {
                 RE = E as IRingElement;
-                if (RE == null)
+                if (RE is null)
                     throw new ScriptRuntimeException("Elements cannot be multiplied.", this);
 
-                if (Result == null)
+                if (Result is null)
                     Result = RE;
                 else
                 {
                     Product = Result.MultiplyRight(RE);
-                    if (Product == null)
+                    if (Product is null)
                         Product = (IRingElement)Operators.Arithmetics.Multiply.EvaluateMultiplication(Result, RE, this);
 
                     Result = Product;
                 }
             }
 
-            if (Result == null)
+            if (Result is null)
                 return ObjectValue.Null;
             else
                 return Result;

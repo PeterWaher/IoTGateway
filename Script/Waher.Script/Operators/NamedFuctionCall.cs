@@ -59,7 +59,7 @@ namespace Waher.Script.Operators
 
 			if ((!Variables.TryGetVariable(this.functionName + " " + s, out Variable v) &&
 			   !Variables.TryGetVariable(this.functionName, out v)) ||
-			   ((f = v.ValueElement as ILambdaExpression) == null))
+			   ((f = v.ValueElement as ILambdaExpression) is null))
 			{
 				if (this.arguments.Length == 1)
 					throw new ScriptRuntimeException("No function defined having 1 argument named '" + this.functionName + "' found.", this);
@@ -74,7 +74,7 @@ namespace Waher.Script.Operators
 			for (i = 0; i < c; i++)
 			{
 				Node = this.arguments[i];
-				if (Node == null)
+				if (Node is null)
 					Arg[i] = ObjectValue.Null;
 				else
 					Arg[i] = Node.Evaluate(Variables);

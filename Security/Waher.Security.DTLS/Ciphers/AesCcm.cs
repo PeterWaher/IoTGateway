@@ -120,7 +120,7 @@ namespace Waher.Security.DTLS.Ciphers
 			{
 				// §A.2. Formatting of the Input Data 
 
-				int a = AssociatedData == null ? 0 : AssociatedData.Length;
+				int a = AssociatedData is null ? 0 : AssociatedData.Length;
 				byte[] B;
 				int i, j, k;
 				int Q = Plaintext.Length;
@@ -291,7 +291,7 @@ namespace Waher.Security.DTLS.Ciphers
 					XOR(Result, j, Math.Min(16, Q - j), S, 0, 16);
 				}
 
-				int a = AssociatedData == null ? 0 : AssociatedData.Length;
+				int a = AssociatedData is null ? 0 : AssociatedData.Length;
 				byte[] B;
 
 				// §A.2.2. Formatting of the Associated Data:

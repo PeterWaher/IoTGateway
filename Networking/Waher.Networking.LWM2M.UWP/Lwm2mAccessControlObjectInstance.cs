@@ -219,7 +219,7 @@ namespace Waher.Networking.LWM2M
 		/// </summary>
 		public override async Task ApplyBootstrapInfo()
 		{
-			if (this.ObjectId == null)
+			if (this.ObjectId is null)
 				await Database.Insert(this);
 			else
 				await Database.Update(this);

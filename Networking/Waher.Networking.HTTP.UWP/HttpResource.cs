@@ -230,7 +230,7 @@ namespace Waher.Networking.HTTP
 				HttpFieldCookie Cookie;
 				string HttpSessionID;
 
-				if ((Cookie = Request.Header.Cookie) == null || string.IsNullOrEmpty(HttpSessionID = Cookie["HttpSessionID"]))
+				if ((Cookie = Request.Header.Cookie) is null || string.IsNullOrEmpty(HttpSessionID = Cookie["HttpSessionID"]))
 				{
 					HttpSessionID = System.Convert.ToBase64String(Hashes.ComputeSHA512Hash(Guid.NewGuid().ToByteArray()));
 					Response.SetCookie(new HTTP.Cookie("HttpSessionID", HttpSessionID, null, "/", null, false, true));
@@ -250,7 +250,7 @@ namespace Waher.Networking.HTTP
 						if (Header.Range != null)
 						{
 							ByteRangeInterval FirstInterval = Header.Range.FirstInterval;
-							if (FirstInterval == null)
+							if (FirstInterval is null)
 								throw new RangeNotSatisfiableException();
 							else
 							{
@@ -286,7 +286,7 @@ namespace Waher.Networking.HTTP
 						if (Header.ContentRange != null)
 						{
 							ContentByteRangeInterval Interval = Header.ContentRange.Interval;
-							if (Interval == null)
+							if (Interval is null)
 								throw new RangeNotSatisfiableException();
 							else
 								this.postRanges.POST(Request, Response, Interval);
@@ -322,7 +322,7 @@ namespace Waher.Networking.HTTP
 						if (Header.ContentRange != null)
 						{
 							ContentByteRangeInterval Interval = Header.ContentRange.Interval;
-							if (Interval == null)
+							if (Interval is null)
 								throw new RangeNotSatisfiableException();
 							else
 								this.putRanges.PUT(Request, Response, Interval);
@@ -353,21 +353,21 @@ namespace Waher.Networking.HTTP
 					break;
 
 				case "DELETE":
-					if (this.delete == null)
+					if (this.delete is null)
 						throw new MethodNotAllowedException(this.allowedMethods);
 					else
 						this.delete.DELETE(Request, Response);
 					break;
 
 				case "OPTIONS":
-					if (this.options == null)
+					if (this.options is null)
 						throw new MethodNotAllowedException(this.allowedMethods);
 					else
 						this.options.OPTIONS(Request, Response);
 					break;
 
 				case "TRACE":
-					if (this.trace == null)
+					if (this.trace is null)
 						throw new MethodNotAllowedException(this.allowedMethods);
 					else
 						this.trace.TRACE(Request, Response);

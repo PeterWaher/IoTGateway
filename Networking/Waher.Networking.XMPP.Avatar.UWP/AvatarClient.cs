@@ -161,7 +161,7 @@ namespace Waher.Networking.XMPP.Avatar
 		/// <param name="StoreOnBroker">If the avatar should be stored on the broker.</param>
 		public async Task UpdateLocalAvatarAsync(string ContentType, byte[] Binary, int Width, int Height, bool StoreOnBroker)
 		{
-			if (this.localAvatar == null)
+			if (this.localAvatar is null)
 			{
 				this.localAvatar = new Avatar(this.client.BareJID.ToLower(), ContentType, Binary, Width, Height);
 				await Database.Insert(this.localAvatar);
@@ -170,7 +170,7 @@ namespace Waher.Networking.XMPP.Avatar
 			{
 				this.localAvatar.Binary = Binary;
 				this.localAvatar.ContentType = ContentType;
-				this.localAvatar.Hash = Binary == null ? string.Empty : Hashes.ComputeSHA1HashString(Binary);
+				this.localAvatar.Hash = Binary is null ? string.Empty : Hashes.ComputeSHA1HashString(Binary);
 
 				await Database.Update(this.localAvatar);
 			}
@@ -218,7 +218,7 @@ namespace Waher.Networking.XMPP.Avatar
 
 			Avatar Avatar = this.localAvatar;
 
-			if (Avatar == null)
+			if (Avatar is null)
 				Avatar = this.defaultAvatar;
 
 			StringBuilder Response = new StringBuilder();
@@ -280,7 +280,7 @@ namespace Waher.Networking.XMPP.Avatar
 							{
 								if (string.IsNullOrEmpty(Hash))
 									this.contactAvatars.Remove(BareJID);
-								else if (Avatar == null || Avatar.Hash != Hash)
+								else if (Avatar is null || Avatar.Hash != Hash)
 								{
 									if (Avatar != null)
 										this.contactAvatars[BareJID] = null;
@@ -309,7 +309,7 @@ namespace Waher.Networking.XMPP.Avatar
 
 										foreach (Avatar Avatar2 in Avatars)
 										{
-											if (Avatar == null && (Hash == null || Hash == Avatar2.Hash))
+											if (Avatar is null && (Hash is null || Hash == Avatar2.Hash))
 												Avatar = Avatar2;
 											else
 												await Database.Delete(Avatar2);
@@ -387,7 +387,7 @@ namespace Waher.Networking.XMPP.Avatar
 				foreach (XmlNode N in E.ChildNodes)
 				{
 					E2 = N as XmlElement;
-					if (E2 == null)
+					if (E2 is null)
 						continue;
 
 					if (E2.LocalName == "data")
@@ -508,7 +508,7 @@ namespace Waher.Networking.XMPP.Avatar
 
 			if (string.IsNullOrEmpty(BareJid) || BareJid == this.client.BareJID)
 			{
-				if (this.localAvatar == null)
+				if (this.localAvatar is null)
 					return this.defaultAvatar;
 				else
 					return this.localAvatar;
@@ -730,7 +730,7 @@ namespace Waher.Networking.XMPP.Avatar
 
 				foreach (UserAvatarReference Ref in e.AvatarMetaData.References)
 				{
-					if (Best == null ||
+					if (Best is null ||
 						Best.Type != "image/png" ||
 						Ref.Bytes > Best.Bytes)
 					{
@@ -742,7 +742,7 @@ namespace Waher.Networking.XMPP.Avatar
 				{
 					Avatar Avatar = await this.GetAvatarAsync(e.FromBareJID);
 
-					if (Avatar == null || Avatar.Hash != Best.Id)
+					if (Avatar is null || Avatar.Hash != Best.Id)
 					{
 						e.GetUserAvatarData(Best, async (sender2, e2) =>
 						{
@@ -750,7 +750,7 @@ namespace Waher.Networking.XMPP.Avatar
 							{
 								if (e2.Ok && e2.AvatarImage != null)
 								{
-									if (Avatar == null)
+									if (Avatar is null)
 									{
 										Avatar = new Avatar(e.FromBareJID, e2.AvatarImage.ContentType, e2.AvatarImage.Data,
 											e2.AvatarImage.Width, e2.AvatarImage.Height)

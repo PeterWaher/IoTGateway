@@ -156,7 +156,7 @@ namespace Waher.IoTGateway
 		{
 			get
 			{
-				if (exportFolderValue == null)
+				if (exportFolderValue is null)
 					exportFolderValue = RuntimeSettings.Get("ExportFolder", string.Empty);
 
 				return exportFolderValue;
@@ -183,7 +183,7 @@ namespace Waher.IoTGateway
 		{
 			get
 			{
-				if (exportKeyFolderValue == null)
+				if (exportKeyFolderValue is null)
 					exportKeyFolderValue = RuntimeSettings.Get("ExportKeyFolder", string.Empty);
 
 				return exportKeyFolderValue;
@@ -308,7 +308,7 @@ namespace Waher.IoTGateway
 		{
 			get
 			{
-				if (exportType == null)
+				if (exportType is null)
 					exportType = RuntimeSettings.Get("ExportType", "Encrypted");
 
 				return exportType;

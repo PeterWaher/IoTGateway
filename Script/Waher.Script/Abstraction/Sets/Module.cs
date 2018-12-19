@@ -35,7 +35,7 @@ namespace Waher.Script.Abstraction.Sets
 		public virtual ILeftModuleElement MultiplyScalarLeft(IRingElement Scalar, ILeftModuleElement ModuleElement)
 		{
 			IModuleElement E = ModuleElement as IModuleElement;
-			if (E == null)
+			if (E is null)
 				return null;
 			else
 				return this.MultiplyScalar(Scalar, E);
@@ -50,7 +50,7 @@ namespace Waher.Script.Abstraction.Sets
 		public virtual IRightModuleElement MultiplyScalarRight(IRightModuleElement ModuleElement, IRingElement Scalar)
 		{
 			IModuleElement E = ModuleElement as IModuleElement;
-			if (E == null)
+			if (E is null)
 				return null;
 			else
 				return this.MultiplyScalar(Scalar, E);

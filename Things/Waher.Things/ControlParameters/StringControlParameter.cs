@@ -203,7 +203,7 @@ namespace Waher.Things.ControlParameters
 		{
 			get
 			{
-				if (this.options == null)
+				if (this.options is null)
 					return "text-single";
 				else
 					return "list-single";
@@ -220,7 +220,7 @@ namespace Waher.Things.ControlParameters
 			if (this.options != null)
 			{
 				int i = 0;
-				int c = this.labels == null ? 0 : this.labels.Length;
+				int c = this.labels is null ? 0 : this.labels.Length;
 
 				foreach (string Option in this.options)
 				{

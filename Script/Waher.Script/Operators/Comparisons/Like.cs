@@ -65,7 +65,7 @@ namespace Waher.Script.Operators.Comparisons
 
 			lock (this.synchObject)
             {
-                if (this.lastExpression == null || sr != this.lastExpression)
+                if (this.lastExpression is null || sr != this.lastExpression)
                 {
                     this.lastExpression = sr;
                     this.regex = new Regex(sr, RegexOptions.Singleline);
@@ -76,14 +76,14 @@ namespace Waher.Script.Operators.Comparisons
 					{
 						if (!int.TryParse(s, out int i))
 						{
-							if (Names == null)
+							if (Names is null)
 								Names = new List<string>();
 
 							Names.Add(s);
 						}
 					}
 
-					if (Names == null)
+					if (Names is null)
                         this.groupNames = null;
                     else
                         this.groupNames = Names.ToArray();

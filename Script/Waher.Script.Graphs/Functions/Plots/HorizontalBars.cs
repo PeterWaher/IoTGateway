@@ -70,11 +70,11 @@ namespace Waher.Script.Graphs.Functions.Plots
 		public override IElement Evaluate(IElement[] Arguments, Variables Variables)
 		{
 			IVector Labels = Arguments[0] as IVector;
-			if (Labels == null)
+			if (Labels is null)
 				throw new ScriptRuntimeException("Expected vector for Labels argument.", this);
 
 			IVector Values = Arguments[1] as IVector;
-			if (Values == null)
+			if (Values is null)
 				throw new ScriptRuntimeException("Expected vector for Values argument.", this);
 
 			int Dimension = Labels.Dimension;
@@ -84,7 +84,7 @@ namespace Waher.Script.Graphs.Functions.Plots
 			IElement Color = Arguments.Length <= 2 ? null : Arguments[2];
 
 			return new Graph2D(Values, Labels, this.DrawGraph, true, false, this,
-				Color == null ? SKColors.Red : Color.AssociatedObjectValue);
+				Color is null ? SKColors.Red : Color.AssociatedObjectValue);
 		}
 
 		private void DrawGraph(SKCanvas Canvas, SKPoint[] Points, object[] Parameters, SKPoint[] PrevPoints, object[] PrevParameters,

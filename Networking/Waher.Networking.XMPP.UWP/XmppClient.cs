@@ -475,7 +475,7 @@ namespace Waher.Networking.XMPP
 			{
 				Uri URI = new Uri(Credentials.UriEndpoint);
 
-				if (alternativeBindingMechanisms == null)
+				if (alternativeBindingMechanisms is null)
 				{
 					alternativeBindingMechanisms = Types.GetTypesImplementingInterface(typeof(IAlternativeTransport));
 					Types.OnInvalidated += Types_OnInvalidated;
@@ -687,7 +687,7 @@ namespace Waher.Networking.XMPP
 				this.serverFeatures = null;
 				this.serverComponents = null;
 
-				if (this.textTransportLayer == null)
+				if (this.textTransportLayer is null)
 				{
 #if WINDOWS_UWP
 					this.client = new StreamSocket();
@@ -700,7 +700,7 @@ namespace Waher.Networking.XMPP
 					try
 					{
 						await this.client.ConnectAsync(Host, Port);
-						if (this.client == null)
+						if (this.client is null)
 							return;
 					}
 					catch (NullReferenceException)
@@ -998,10 +998,10 @@ namespace Waher.Networking.XMPP
 						foreach (RosterItem Item in this.roster.Values)
 						{
 							Resources = Item.UnavailAllResources();
-							if (Resources == null)
+							if (Resources is null)
 								continue;
 
-							if (ToUnavail == null)
+							if (ToUnavail is null)
 								ToUnavail = new List<PresenceEventArgs>();
 
 							ToUnavail.AddRange(Resources);
@@ -1290,7 +1290,7 @@ namespace Waher.Networking.XMPP
 						this.dataWriter.WriteBytes(Packet);
 						await this.dataWriter.StoreAsync();
 
-						if (this.dataWriter == null)
+						if (this.dataWriter is null)
 						{
 							this.isWriting = false;
 							return;
@@ -1301,7 +1301,7 @@ namespace Waher.Networking.XMPP
 					{
 						await this.stream.WriteAsync(Packet, 0, Packet.Length);
 
-						if (this.stream == null)
+						if (this.stream is null)
 						{
 							this.isWriting = false;
 							return;
@@ -1329,7 +1329,7 @@ namespace Waher.Networking.XMPP
 					{
 						LinkedListNode<KeyValuePair<string, EventHandler>> Next = this.outputQueue.First;
 
-						if (Next == null)
+						if (Next is null)
 						{
 							Xml = null;
 							Packet = null;
@@ -1373,7 +1373,7 @@ namespace Waher.Networking.XMPP
 						break;
 
 					CryptographicBuffer.CopyToByteArray(DataRead, out byte[] Data);
-					if (Data == null)
+					if (Data is null)
 						break;
 
 					int NrRead = Data.Length;
@@ -1398,13 +1398,13 @@ namespace Waher.Networking.XMPP
 					else
 						break;
 #else
-					if (this.stream == null)
+					if (this.stream is null)
 						break;
 
 					int NrRead = await this.stream.ReadAsync(this.buffer, 0, BufferSize);
 					string s;
 
-					if (this.stream == null)
+					if (this.stream is null)
 						return;
 
 					if (NrRead > 0)
@@ -1780,7 +1780,7 @@ namespace Waher.Networking.XMPP
 				foreach (XmlNode N in Doc.DocumentElement.ChildNodes)
 				{
 					E = N as XmlElement;
-					if (E == null)
+					if (E is null)
 						continue;
 
 					switch (E.LocalName)
@@ -1863,7 +1863,7 @@ namespace Waher.Networking.XMPP
 							break;
 
 						case "features":
-							if (E.FirstChild == null)
+							if (E.FirstChild is null)
 								this.AdvanceUntilConnected();
 							else
 							{
@@ -1970,7 +1970,7 @@ namespace Waher.Networking.XMPP
 									this.SendIqGet(string.Empty, "<query xmlns='" + NamespaceRegister + "'/>", this.RegistrationFormReceived, null);
 									break;
 								}
-								else if (E.FirstChild == null)
+								else if (E.FirstChild is null)
 									throw new XmppException("Unable to authenticate user.", E);
 								else
 								{
@@ -1985,14 +1985,14 @@ namespace Waher.Networking.XMPP
 							}
 							else
 							{
-								if (E.FirstChild == null)
+								if (E.FirstChild is null)
 									throw new XmppException("Unable to start TLS negotiation.", E);
 								else
 									throw GetStreamExceptionObject(E);
 							}
 
 						case "challenge":
-							if (this.authenticationMethod == null)
+							if (this.authenticationMethod is null)
 								throw new XmppException("No authentication method selected.", E);
 							else
 							{
@@ -2017,7 +2017,7 @@ namespace Waher.Networking.XMPP
 								throw StreamException;
 
 						case "success":
-							if (this.authenticationMethod == null)
+							if (this.authenticationMethod is null)
 								throw new XmppException("No authentication method selected.", E);
 							else
 							{
@@ -2050,7 +2050,7 @@ namespace Waher.Networking.XMPP
 		private bool ValidateSender(XmlElement Stanza, string From, string FromBareJid)
 		{
 			ValidateSenderEventHandler h = this.OnValidateSender;
-			if (h == null)
+			if (h is null)
 				return true;
 
 			ValidateSenderEventArgs e = new ValidateSenderEventArgs(this, Stanza, From, FromBareJid);
@@ -2093,7 +2093,7 @@ namespace Waher.Networking.XMPP
 			{
 				foreach (XmlElement E in e.Message.ChildNodes)
 				{
-					if (FormHandler == null && E.LocalName == "x" && E.NamespaceURI == NamespaceData)
+					if (FormHandler is null && E.LocalName == "x" && E.NamespaceURI == NamespaceData)
 					{
 						Form = new DataForm(this, E, this.MessageFormSubmitted, this.MessageFormCancelled, e.From, e.To)
 						{
@@ -2344,7 +2344,7 @@ namespace Waher.Networking.XMPP
 				}
 			}
 
-			if (h == null)
+			if (h is null)
 				this.SendIqError(e.Id, e.From, "<error type='cancel'><feature-not-implemented xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/></error>");
 			else
 			{
@@ -2788,7 +2788,7 @@ namespace Waher.Networking.XMPP
 
 		private void StartAuthentication()
 		{
-			if (this.authenticationMethod == null)
+			if (this.authenticationMethod is null)
 			{
 				if (this.allowScramSHA1 && this.authenticationMechanisms.ContainsKey("SCRAM-SHA-1") &&
 					(string.IsNullOrEmpty(this.passwordHashMethod) || this.passwordHashMethod == "SCRAM-SHA-1"))
@@ -3904,7 +3904,7 @@ namespace Waher.Networking.XMPP
 				EventHandler h = this.OnConnectionPresence;
 
 				this.State = XmppState.SettingPresence;
-				if (h == null)
+				if (h is null)
 					this.SetPresence(this.currentAvailability, this.customPresenceStatus);
 				else
 				{
@@ -3993,7 +3993,7 @@ namespace Waher.Networking.XMPP
 
 			set
 			{
-				if (value == null)
+				if (value is null)
 					this.RemoveRosterItem(BareJID, null, null);
 				else if (BareJID != value.BareJid)
 					throw new ArgumentException("Bare JIDs don't match.", nameof(BareJID));
@@ -4308,7 +4308,7 @@ namespace Waher.Networking.XMPP
 
 				Xml.Append("</presence>");
 
-				if (Callback == null)
+				if (Callback is null)
 					Callback = this.PresenceSent;
 
 				this.BeginWrite(Xml.ToString(), Callback);
@@ -4527,7 +4527,7 @@ namespace Waher.Networking.XMPP
 				}
 			}
 
-			if (Item == null)
+			if (Item is null)
 				throw new BadRequestException(string.Empty, e.Query);
 
 			RosterItemEventHandler h;
@@ -5074,7 +5074,7 @@ namespace Waher.Networking.XMPP
 		public void AddExtendedServiceDiscoveryInformation(DataForm Information)
 		{
 			Field FormTypeField = Information["FORM_TYPE"];
-			if (FormTypeField == null)
+			if (FormTypeField is null)
 				throw new ArgumentException("Extended Service Discovery Information forms must contain a FORM_TYPE field.", nameof(Information));
 
 			string FormType = FormTypeField.ValueString;
@@ -5231,7 +5231,7 @@ namespace Waher.Networking.XMPP
 									case "x":
 										DataForm Form = new DataForms.DataForm(this, (XmlElement)N2, null, null, e.From, e.To);
 										Field FormType = Form["FORM_TYPE"];
-										if (FormType == null)
+										if (FormType is null)
 											break;
 
 										ExtendedInformation[FormType.ValueString] = Form;
@@ -5822,7 +5822,7 @@ namespace Waher.Networking.XMPP
 								}
 							}
 
-							if (SearchForm == null)
+							if (SearchForm is null)
 							{
 								List<Field> Fields = new List<Field>();
 								string Tooltip = "Use asterisks (*) to do wildcard searches.";
@@ -5944,14 +5944,14 @@ namespace Waher.Networking.XMPP
 
 		internal static string Concat(params string[] Rows)
 		{
-			if (Rows == null)
+			if (Rows is null)
 				return string.Empty;
 
 			StringBuilder sb = null;
 
 			foreach (string s in Rows)
 			{
-				if (sb == null)
+				if (sb is null)
 					sb = new StringBuilder(s);
 				else
 				{
@@ -5960,7 +5960,7 @@ namespace Waher.Networking.XMPP
 				}
 			}
 
-			if (sb == null)
+			if (sb is null)
 				return string.Empty;
 			else
 				return sb.ToString();
@@ -6277,7 +6277,7 @@ namespace Waher.Networking.XMPP
 					{
 						if (P.Key <= Now)
 						{
-							if (Retries == null)
+							if (Retries is null)
 								Retries = new List<PendingRequest>();
 
 							Retries.Add(P.Value);
@@ -6658,7 +6658,7 @@ namespace Waher.Networking.XMPP
 					}
 				}
 
-				if (Result == null)
+				if (Result is null)
 					e.Ok = false;
 
 				if (Callback != null)

@@ -94,7 +94,7 @@ namespace Waher.Networking.XMPP.P2P
 
 		internal void AddCallback(PeerConnectionEventHandler Callback, object State)
 		{
-			if (this.callbacks == null)
+			if (this.callbacks is null)
 				this.callbacks = new LinkedList<KeyValuePair<PeerConnectionEventHandler, object>>();
 
 			this.callbacks.AddLast(new KeyValuePair<PeerConnectionEventHandler, object>(Callback, State));
@@ -130,7 +130,7 @@ namespace Waher.Networking.XMPP.P2P
 			string s = this.encoding.GetString(Packet, 0, Packet.Length);
 
 			this.lastActivity = DateTime.Now;
-			if (this.xmppClient == null)
+			if (this.xmppClient is null)
 				this.parent.ReceiveText(s);
 
 			if (!this.ParseIncoming(s))

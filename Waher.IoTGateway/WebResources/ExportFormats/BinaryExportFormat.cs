@@ -200,13 +200,13 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 					FieldInfo FI = null;
 
 					PI = T.GetProperty("_inputBufferIndex", BindingFlags.Instance | BindingFlags.NonPublic);
-					if (PI == null)
+					if (PI is null)
 					{
 						FI = T.GetField("_inputBufferIndex", BindingFlags.Instance | BindingFlags.NonPublic);
-						if (FI == null)
+						if (FI is null)
 						{
 							PI = T.GetProperty("_InputBufferIndex", BindingFlags.Instance | BindingFlags.NonPublic);
-							if (PI == null)
+							if (PI is null)
 								FI = T.GetField("_InputBufferIndex", BindingFlags.Instance | BindingFlags.NonPublic);
 						}
 					}
@@ -405,7 +405,7 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 		/// <param name="PropertyValue">Property value.</param>
 		public override Task ReportProperty(string PropertyName, object PropertyValue)
 		{
-			if (PropertyValue == null)
+			if (PropertyValue is null)
 			{
 				this.w.Write(TYPE_NULL);
 				if (PropertyName != null)
@@ -618,7 +618,7 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 		{
 			if (!string.IsNullOrEmpty(Message))
 			{
-				if (this.errors == null)
+				if (this.errors is null)
 					this.errors = new LinkedList<string>();
 
 				this.errors.AddLast(Message);
@@ -633,7 +633,7 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 		/// <param name="Exception">Exception object.</param>
 		public override Task ReportException(Exception Exception)
 		{
-			if (this.exceptions == null)
+			if (this.exceptions is null)
 				this.exceptions = new LinkedList<Exception>();
 
 			this.exceptions.AddLast(Exception);

@@ -50,7 +50,7 @@ namespace Waher.Script.Operators.Calculus
 
 			for (i = 0; i < this.nrDifferentiations; i++)
 			{
-				if (Node == null)
+				if (Node is null)
 					return DoubleNumber.ZeroElement;
 
 				Result = this.DifferentiateOnce(Node, Variables);

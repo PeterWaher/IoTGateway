@@ -45,7 +45,7 @@ namespace Waher.Things.Arduino
 			try
 			{
 				RemoteDevice Device = this.Device;
-				if (Device == null)
+				if (Device is null)
 					throw new Exception("Device not ready.");
 
 				List<Field> Fields = new List<Field>();
@@ -91,7 +91,7 @@ namespace Waher.Things.Arduino
 		public ControlParameter[] GetControlParameters()
 		{
 			RemoteDevice Device = this.Device;
-			if (Device == null)
+			if (Device is null)
 				return new ControlParameter[0];
 
 			return new ControlParameter[]

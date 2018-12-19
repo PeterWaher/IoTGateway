@@ -126,7 +126,7 @@ namespace Waher.Networking.HTTP.WebSockets
 					}
 				}
 
-				if (WebSocketProtocol == null)
+				if (WebSocketProtocol is null)
 					throw new NotSupportedException();
 			}
 
@@ -146,7 +146,7 @@ namespace Waher.Networking.HTTP.WebSockets
 				// TODO: §9.1
 			}
 
-			if (Request.clientConnection == null)
+			if (Request.clientConnection is null)
 				throw new ForbiddenException();
 
 			WebSocket Socket = new WebSocket(this, Request, Response);

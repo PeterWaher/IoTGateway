@@ -82,7 +82,7 @@ namespace Waher.IoTGateway.Cssx
 		/// <exception cref="ArgumentException">If the object cannot be decoded.</exception>
 		public object Decode(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
 		{
-			if (Encoding == null)
+			if (Encoding is null)
 				return System.Text.Encoding.UTF8.GetString(Data);
 			else
 				return Encoding.GetString(Data);

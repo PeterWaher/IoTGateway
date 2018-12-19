@@ -72,7 +72,7 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 		/// <returns>If the stream acceptance was completed (true), or if somebody else accepted the stream beforehand (false).</returns>
 		public bool AcceptStream(DataReceivedEventHandler DataCallback, StreamClosedEventHandler CloseCallback, object State)
 		{
-			if (this.dataCallback == null)
+			if (this.dataCallback is null)
 			{
 				this.dataCallback = DataCallback;
 				this.closeCallback = CloseCallback;

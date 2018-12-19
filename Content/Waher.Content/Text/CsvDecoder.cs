@@ -83,7 +83,7 @@ namespace Waher.Content.Text
 		{
 			string s;
 
-			if (Encoding == null)
+			if (Encoding is null)
 				s = Encoding.UTF8.GetString(Data);
 			else
 				s = Encoding.GetString(Data);

@@ -49,7 +49,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		public override void GeneratePlainText(StringBuilder Output)
 		{
 			string s = Html.HtmlEntity.EntityToCharacter(this.entity);
-			if (s == null)
+			if (s is null)
 				this.GenerateHTML(Output);
 			else
 				Output.Append(s);
@@ -72,7 +72,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		public override void GenerateXAML(XmlWriter Output, XamlSettings Settings, TextAlignment TextAlignment)
 		{
 			string s = Html.HtmlEntity.EntityToCharacter(this.entity);
-			if (s == null)
+			if (s is null)
 				Output.WriteRaw("&" + this.entity + ";");
 			else
 				Output.WriteValue(s);

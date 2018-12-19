@@ -223,7 +223,7 @@ namespace Waher.Events.Console
 
 		private void AddTag(StringBuilder Output, int Width, string Key, object Value, bool First, bool WriteLine)
 		{
-			string ValueStr = Value == null ? string.Empty : Value.ToString();
+			string ValueStr = Value is null ? string.Empty : Value.ToString();
 			int i = Output.ToString().Length % Width;
 
 			if (i + Key.Length + 1 + ValueStr.Length + (First ? 0 : 2) > Width)

@@ -75,7 +75,7 @@ namespace Waher.Script.Objects
                 foreach (IElement E in Element.ChildElements)
                 {
                     SE = E as ISemiGroupElement;
-                    if (SE == null)
+                    if (SE is null)
                         Elements.AddLast(new StringValue(E.AssociatedObjectValue.ToString() + this.value));
                     else
                         Elements.AddLast(this.AddLeft(SE));
@@ -102,7 +102,7 @@ namespace Waher.Script.Objects
                 foreach (IElement E in Element.ChildElements)
                 {
                     SE = E as ISemiGroupElement;
-                    if (SE == null)
+                    if (SE is null)
                         Elements.AddLast(new StringValue(this.value + E.AssociatedObjectValue.ToString()));
                     else
                         Elements.AddLast(this.AddRight(SE));
@@ -118,7 +118,7 @@ namespace Waher.Script.Objects
         public override bool Equals(object obj)
         {
             StringValue E = obj as StringValue;
-            if (E == null)
+            if (E is null)
                 return false;
             else
                 return this.value == E.value;

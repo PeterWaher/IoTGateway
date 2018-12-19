@@ -220,7 +220,7 @@ namespace Waher.Networking.XMPP.HTTPX
 				}
 
 				RosterItem Item = this.defaultXmppClient.GetRosterItem(BareJID);
-				if (Item == null)
+				if (Item is null)
 				{
 					if (!XmppClient.BareJidRegEx.IsMatch(BareJID))
 						throw new BadRequestException();
@@ -278,7 +278,7 @@ namespace Waher.Networking.XMPP.HTTPX
 
 			try
 			{
-				if (e.Client == null)
+				if (e.Client is null)
 					this.SendRequest(this.httpxClient, Rec.fullJID, Rec.method, Rec.fullJID, Rec.localUrl, Rec.request, Rec.response);
 				else
 				{
@@ -523,7 +523,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			{
 				get
 				{
-					if (this.ETag == null || !this.LastModified.HasValue)
+					if (this.ETag is null || !this.LastModified.HasValue)
 						return false;
 
 					if (this.CacheControl != null)

@@ -233,7 +233,7 @@ namespace Waher.Networking.HTTP.TransferEncodings
 		/// </summary>
 		public override void ContentSent()
 		{
-			if (this.output == null)
+			if (this.output is null)
 				return;
 
 			if (this.pos > 0)

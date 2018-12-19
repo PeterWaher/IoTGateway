@@ -202,7 +202,7 @@ namespace Waher.Script.Fractals.IFS
 					if (LambdaExpressions != null)
 						throw new ScriptRuntimeException("Cannot mix homogenous 2D-transforms with lambda expressions.", this);
 
-					if (Matrices == null)
+					if (Matrices is null)
 						Matrices = new List<DoubleMatrix>();
 
 					Matrices.Add(M);
@@ -214,7 +214,7 @@ namespace Waher.Script.Fractals.IFS
 					if (Matrices != null)
 						throw new ScriptRuntimeException("Cannot mix homogenous 2D-transforms with lambda expressions.", this);
 
-					if (LambdaExpressions == null)
+					if (LambdaExpressions is null)
 						LambdaExpressions = new List<ILambdaExpression>();
 
 					LambdaExpressions.Add(Lambda);

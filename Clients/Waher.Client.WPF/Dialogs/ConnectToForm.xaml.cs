@@ -326,7 +326,7 @@ namespace Waher.Client.WPF.Dialogs
 
 		private void ConnectionMethod_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
-			if (this.PortLabel == null)
+			if (this.PortLabel is null)
 				return;
 
 			switch ((TransportMethod)this.ConnectionMethod.SelectedIndex)

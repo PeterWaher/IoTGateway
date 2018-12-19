@@ -231,7 +231,7 @@ namespace Waher.Networking.XMPP.DataForms
 						break;
 
 					case "page":
-						if (Pages == null)
+						if (Pages is null)
 							Pages = new List<Page>();
 
 						Pages.Add(new Page(this, (XmlElement)N));
@@ -243,7 +243,7 @@ namespace Waher.Networking.XMPP.DataForms
 			this.fields = Fields.ToArray();
 			this.records = Records.ToArray();
 
-			if (this.header == null)
+			if (this.header is null)
 				this.header = new Field[0];
 
 			if (this.hasPages = (Pages != null))
@@ -450,14 +450,14 @@ namespace Waher.Networking.XMPP.DataForms
 						break;
 
 					case "value":
-						if (ValueStrings == null)
+						if (ValueStrings is null)
 							ValueStrings = new List<string>();
 
 						ValueStrings.Add(N2.InnerText);
 						break;
 
 					case "option":
-						if (OptionStrings == null)
+						if (OptionStrings is null)
 							OptionStrings = new List<KeyValuePair<string, string>>();
 
 						string OptionLabel = XML.Attribute((XmlElement)N2, "label");
@@ -611,7 +611,7 @@ namespace Waher.Networking.XMPP.DataForms
 					break;
 			}
 
-			if (ValidationMethod == null)
+			if (ValidationMethod is null)
 				ValidationMethod = new BasicValidation();
 
 			switch (Type)
@@ -677,7 +677,7 @@ namespace Waher.Networking.XMPP.DataForms
 					break;
 
 				default:
-					if (Media == null)
+					if (Media is null)
 					{
 						Field = new TextSingleField(this, Var, Label, Required,
 							ValueStrings?.ToArray(), OptionStrings?.ToArray(),

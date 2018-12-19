@@ -386,9 +386,9 @@ namespace Waher.Networking.XMPP.Contracts
 			}
 
 			if (!HasVisibility ||
-				Result.duration == null ||
-				Result.archiveReq == null ||
-				Result.archiveOpt == null ||
+				Result.duration is null ||
+				Result.archiveReq is null ||
+				Result.archiveOpt is null ||
 				Result.signBefore <= Result.signAfter)
 			{
 				return null;
@@ -474,7 +474,7 @@ namespace Waher.Networking.XMPP.Contracts
 								if (E2.LocalName == "description")
 								{
 									Text = HumanReadableText.Parse(E2);
-									if (Text == null || !Text.IsWellDefined)
+									if (Text is null || !Text.IsWellDefined)
 										return null;
 
 									Descriptions.Add(Text);
@@ -551,7 +551,7 @@ namespace Waher.Networking.XMPP.Contracts
 											}
 										}
 
-										if (LegalId == null || RoleRef == null || string.IsNullOrEmpty(LegalId) || string.IsNullOrEmpty(RoleRef))
+										if (LegalId is null || RoleRef is null || string.IsNullOrEmpty(LegalId) || string.IsNullOrEmpty(RoleRef))
 											return null;
 
 										bool RoleFound = false;
@@ -568,7 +568,7 @@ namespace Waher.Networking.XMPP.Contracts
 										if (!RoleFound)
 											return null;
 
-										if (Parts == null)
+										if (Parts is null)
 											Parts = new List<Part>();
 
 										Parts.Add(new Part()
@@ -612,7 +612,7 @@ namespace Waher.Networking.XMPP.Contracts
 										if (E3.LocalName == "description")
 										{
 											Text = HumanReadableText.Parse(E3);
-											if (Text == null || !Text.IsWellDefined)
+											if (Text is null || !Text.IsWellDefined)
 												return null;
 
 											Descriptions.Add(Text);
@@ -654,7 +654,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 					case "humanReadableText":
 						Text = HumanReadableText.Parse(E);
-						if (Text == null || !Text.IsWellDefined)
+						if (Text is null || !Text.IsWellDefined)
 							return null;
 
 						ForHumans.Add(Text);
@@ -716,7 +716,7 @@ namespace Waher.Networking.XMPP.Contracts
 							string.IsNullOrEmpty(Signature.BareJid) ||
 							string.IsNullOrEmpty(Signature.Role) ||
 							Signature.Timestamp == DateTime.MinValue ||
-							Signature.S1 == null)
+							Signature.S1 is null)
 						{
 							return null;
 						}
@@ -820,7 +820,7 @@ namespace Waher.Networking.XMPP.Contracts
 						}
 
 						if (ServerSignature.Timestamp == DateTime.MinValue ||
-							ServerSignature.S1 == null)
+							ServerSignature.S1 is null)
 						{
 							return null;
 						}
@@ -833,7 +833,7 @@ namespace Waher.Networking.XMPP.Contracts
 				}
 			}
 
-			if (Content == null || ForHumans.Count == 0 || !PartsDefined)
+			if (Content is null || ForHumans.Count == 0 || !PartsDefined)
 				return null;
 
 			Result.roles = Roles.ToArray();
@@ -867,7 +867,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			foreach (XmlAttribute Attr in Xml.Attributes)
 			{
-				if (Attributes == null)
+				if (Attributes is null)
 					Attributes = new SortedDictionary<string, string>();
 
 				Attributes[Attr.Name] = Attr.Value;
@@ -875,7 +875,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			if (Xml.NamespaceURI != CurrentNamespace && string.IsNullOrEmpty(Xml.Prefix))
 			{
-				if (Attributes == null)
+				if (Attributes is null)
 					Attributes = new SortedDictionary<string, string>();
 
 				Attributes["xmlns"] = Xml.NamespaceURI;
@@ -929,7 +929,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <returns>If the contract is legally binding.</returns>
 		public bool IsLegallyBinding(bool CheckCurrentTime)
 		{
-			if (this.clientSignatures == null || this.serverSignature == null)
+			if (this.clientSignatures is null || this.serverSignature is null)
 				return false;
 
 			switch (this.state)
@@ -947,7 +947,7 @@ namespace Waher.Networking.XMPP.Contracts
 					return false;
 
 				case ContractParts.ExplicitlyDefined:
-					if (this.parts == null)
+					if (this.parts is null)
 						return false;
 
 					foreach (Part Part in this.parts)

@@ -132,7 +132,7 @@ namespace Waher.Content.Html
 								Url = Value
 							};
 
-							if (Images == null)
+							if (Images is null)
 								Images = new List<ImageInformation>();
 
 							Images.Add(LastImage);
@@ -170,7 +170,7 @@ namespace Waher.Content.Html
 								Url = Value
 							};
 
-							if (Audio == null)
+							if (Audio is null)
 								Audio = new List<AudioInformation>();
 
 							Audio.Add(LastAudio);
@@ -205,7 +205,7 @@ namespace Waher.Content.Html
 							break;
 
 						case "og:locale:alternate":
-							if (LocaleAlternate == null)
+							if (LocaleAlternate is null)
 								LocaleAlternate = new List<string>();
 
 							LocaleAlternate.Add(Value);
@@ -221,7 +221,7 @@ namespace Waher.Content.Html
 								Url = Value
 							};
 
-							if (Video == null)
+							if (Video is null)
 								Video = new List<VideoInformation>();
 
 							Video.Add(LastVideo);
@@ -366,10 +366,10 @@ namespace Waher.Content.Html
 			PageMetaData Meta = obj as PageMetaData;
 			int i, c;
 
-			if ((this == null) ^ (Meta == null))
+			if ((this is null) ^ (Meta is null))
 				return false;
 
-			if (this == null)
+			if (this is null)
 				return true;
 
 			if (this.title != Meta.title ||
@@ -383,7 +383,7 @@ namespace Waher.Content.Html
 				return false;
 			}
 
-			if ((this.localeAlternate == null) ^ (Meta.localeAlternate == null))
+			if ((this.localeAlternate is null) ^ (Meta.localeAlternate is null))
 				return false;
 
 			if (this.localeAlternate != null)
@@ -398,7 +398,7 @@ namespace Waher.Content.Html
 				}
 			}
 
-			if ((this.images == null) ^ (Meta.images == null))
+			if ((this.images is null) ^ (Meta.images is null))
 				return false;
 
 			if (this.images != null)
@@ -413,7 +413,7 @@ namespace Waher.Content.Html
 				}
 			}
 
-			if ((this.audio == null) ^ (Meta.audio == null))
+			if ((this.audio is null) ^ (Meta.audio is null))
 				return false;
 
 			if (this.audio != null)
@@ -428,7 +428,7 @@ namespace Waher.Content.Html
 				}
 			}
 
-			if ((this.video == null) ^ (Meta.video == null))
+			if ((this.video is null) ^ (Meta.video is null))
 				return false;
 
 			if (this.video != null)

@@ -55,7 +55,7 @@ namespace Waher.Script.Objects.VectorSpaces
 		public override bool Contains(IElement Element)
 		{
 			DateTimeVector v = Element as DateTimeVector;
-			if (v == null)
+			if (v is null)
 				return false;
 
 			return v.Dimension == this.dimension;

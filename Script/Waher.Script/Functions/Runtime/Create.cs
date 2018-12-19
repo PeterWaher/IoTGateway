@@ -285,7 +285,7 @@ namespace Waher.Script.Functions.Runtime
                     {
                         E = this.parameters[i].Evaluate(Variables);
                         TV = E as TypeValue;
-                        if (TV == null)
+                        if (TV is null)
                             throw new ScriptRuntimeException("Generic type arguments must evaluate to types to be used.", this);
 
                         if (this.genericArguments[i] != TV.Value)
@@ -317,7 +317,7 @@ namespace Waher.Script.Functions.Runtime
                         {
                             E = this.parameters[i].Evaluate(Variables);
                             TV = E as TypeValue;
-                            if (TV == null)
+                            if (TV is null)
                                 throw new ScriptRuntimeException("Generic type arguments must evaluate to types to be used.", this);
 
                             this.genericArguments[i] = TV.Value;
@@ -363,7 +363,7 @@ namespace Waher.Script.Functions.Runtime
                     }
                 }
 
-                if (this.constructor == null)
+                if (this.constructor is null)
                 {
                     IEnumerable<ConstructorInfo> Constructors;
 
@@ -385,7 +385,7 @@ namespace Waher.Script.Functions.Runtime
                             if (!Arguments[i].TryConvertTo(Parameters[i].ParameterType, out Value))
                                 break;
 
-                            if (ParameterValues == null)
+                            if (ParameterValues is null)
                                 ParameterValues = new object[Parameters.Length];
 
                             ParameterValues[i] = Value;
@@ -400,7 +400,7 @@ namespace Waher.Script.Functions.Runtime
                         break;
                     }
                     
-                    if (this.constructor == null)
+                    if (this.constructor is null)
                         throw new ScriptRuntimeException("Invalid number or type of parameters.", this);
                 }
             }

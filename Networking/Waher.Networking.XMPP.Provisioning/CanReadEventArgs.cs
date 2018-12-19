@@ -82,7 +82,7 @@ namespace Waher.Networking.XMPP.Provisioning
 			{
 				if (N is XmlElement E && E.LocalName == "f")
 				{
-					if (Fields == null)
+					if (Fields is null)
 						Fields = new List<string>();
 
 					Fields.Add(XML.Attribute(E, "n"));

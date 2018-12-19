@@ -149,7 +149,7 @@ namespace Waher.Script.Objects.Sets
 		{
 			get
 			{
-				if (this.childElements == null)
+				if (this.childElements is null)
 					this.GenerateChildElements();
 
 				return this.childElements;
@@ -186,7 +186,7 @@ namespace Waher.Script.Objects.Sets
 		/// <returns>Double-valued array</returns>
 		public double[] GetArray()
 		{
-			if (this.vector == null)
+			if (this.vector is null)
 			{
 				List<double> Result = new List<double>();
 
@@ -287,7 +287,7 @@ namespace Waher.Script.Objects.Sets
 		/// <returns>Vector element.</returns>
 		public IElement GetElement(int Index)
 		{
-			if (this.childElements == null)
+			if (this.childElements is null)
 				this.GenerateChildElements();
 
 			return this.childElements[Index];

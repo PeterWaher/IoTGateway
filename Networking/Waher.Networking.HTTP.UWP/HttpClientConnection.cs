@@ -182,7 +182,7 @@ namespace Waher.Networking.HTTP
 
 					if (this.mode == ConnectionMode.Http)
 					{
-						if (this.header == null)
+						if (this.header is null)
 							Continue = this.BinaryHeaderReceived(this.inputBuffer, 0, NrRead);
 						else
 							Continue = this.BinaryDataReceived(this.inputBuffer, 0, NrRead);
@@ -214,7 +214,7 @@ namespace Waher.Networking.HTTP
 
 				if (this.b1 == CR && this.b2 == LF && this.b3 == CR && b == LF) // RFC 2616, §2.2
 				{
-					if (this.headerStream == null)
+					if (this.headerStream is null)
 						Header = InternetContent.ISO_8859_1.GetString(Data, Offset, i - Offset - 3);
 					else
 					{
@@ -226,7 +226,7 @@ namespace Waher.Networking.HTTP
 				}
 				else if (this.b3 == LF && b == LF)  // RFC 2616, §19.3
 				{
-					if (this.headerStream == null)
+					if (this.headerStream is null)
 						Header = InternetContent.ISO_8859_1.GetString(Data, Offset, i - Offset - 1);
 					else
 					{
@@ -265,7 +265,7 @@ namespace Waher.Networking.HTTP
 					return true;
 			}
 
-			if (this.headerStream == null)
+			if (this.headerStream is null)
 				this.headerStream = new MemoryStream();
 
 			this.headerStream.Write(Data, Offset, NrRead);
@@ -290,7 +290,7 @@ namespace Waher.Networking.HTTP
 
 		private bool BinaryDataReceived(byte[] Data, int Offset, int NrRead)
 		{
-			if (this.dataStream == null)
+			if (this.dataStream is null)
 			{
 				HttpFieldTransferEncoding TransferEncoding = this.header.TransferEncoding;
 				if (TransferEncoding != null)
@@ -434,7 +434,7 @@ namespace Waher.Networking.HTTP
 							}
 						}
 
-						if (Request.User == null)
+						if (Request.User is null)
 						{
 							List<KeyValuePair<string, string>> Challenges = new List<KeyValuePair<string, string>>();
 
@@ -479,12 +479,12 @@ namespace Waher.Networking.HTTP
 			}
 			catch (HttpException ex)
 			{
-				Result = (Request.Header.Expect == null || !Request.Header.Expect.Continue100 || Request.HasData);
+				Result = (Request.Header.Expect is null || !Request.Header.Expect.Continue100 || Request.HasData);
 				this.SendResponse(Request, ex.StatusCode, ex.Message, !Result, ex.HeaderFields);
 			}
 			catch (System.NotImplementedException ex)
 			{
-				Result = (Request.Header.Expect == null || !Request.Header.Expect.Continue100 || Request.HasData);
+				Result = (Request.Header.Expect is null || !Request.Header.Expect.Continue100 || Request.HasData);
 
 				Log.Critical(ex);
 
@@ -504,7 +504,7 @@ namespace Waher.Networking.HTTP
 			}
 			catch (Exception ex)
 			{
-				Result = (Request.Header.Expect == null || !Request.Header.Expect.Continue100 || Request.HasData);
+				Result = (Request.Header.Expect is null || !Request.Header.Expect.Continue100 || Request.HasData);
 
 				Log.Critical(ex);
 
@@ -517,7 +517,7 @@ namespace Waher.Networking.HTTP
 
 		private KeyValuePair<string, string>[] Merge(KeyValuePair<string, string>[] Headers, LinkedList<Cookie> Cookies)
 		{
-			if (Cookies == null || Cookies.First == null)
+			if (Cookies is null || Cookies.First is null)
 				return Headers;
 
 			List<KeyValuePair<string, string>> Result = new List<KeyValuePair<string, string>>();
@@ -592,7 +592,7 @@ namespace Waher.Networking.HTTP
 			}
 			catch (HttpException ex)
 			{
-				if (Response == null || !Response.HeaderSent)
+				if (Response is null || !Response.HeaderSent)
 				{
 					try
 					{
@@ -610,7 +610,7 @@ namespace Waher.Networking.HTTP
 			{
 				Log.Critical(ex);
 
-				if (Response == null || !Response.HeaderSent)
+				if (Response is null || !Response.HeaderSent)
 				{
 					try
 					{

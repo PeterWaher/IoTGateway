@@ -101,7 +101,7 @@ namespace Waher.Script.Persistence.Functions
 		public override IElement Evaluate(IElement[] Arguments, Variables Variables)
 		{
 			Type T = Arguments[0].AssociatedObjectValue as Type;
-			if (T == null)
+			if (T is null)
 				throw new ScriptRuntimeException("First parameter must be a type.", this);
 
 			int Offset = (int)Expression.ToDouble(Arguments[1].AssociatedObjectValue);
@@ -115,7 +115,7 @@ namespace Waher.Script.Persistence.Functions
 			for (i = 0; i < c; i++)
 				SortOrder[i] = V.GetElement(i).AssociatedObjectValue.ToString();
 
-			if (Filter == null && FilterObj != null)
+			if (Filter is null && FilterObj != null)
 			{
 				Expression Exp = new Expression(FilterObj.ToString());
 				Filter = this.Convert(Exp.Root, Variables);

@@ -138,7 +138,7 @@ namespace Waher.Networking.PeerToPeer
 
 			foreach (KeyValuePair<string, string> P in this.playerMetaInfo)
 			{
-				if (sb == null)
+				if (sb is null)
 				{
 					sb = new StringBuilder(this.publicEndpoint.ToString());
 					sb.Append(":");
@@ -151,7 +151,7 @@ namespace Waher.Networking.PeerToPeer
 				sb.Append(P.Value);
 			}
 
-			if (sb == null)
+			if (sb is null)
 				return base.ToString();
 			else
 				return sb.ToString();

@@ -174,7 +174,7 @@ namespace Waher.Persistence.Files.Storage
 			uint TypeCode;
 			Type T;
 
-			if (Value == null)
+			if (Value is null)
 			{
 				T = null;
 				TypeCode = ObjectSerializer.TYPE_NULL;
@@ -310,14 +310,14 @@ namespace Waher.Persistence.Files.Storage
 		///		Greater than zero x is greater than y.</returns>
 		public int Compare(byte[] x, byte[] y)
 		{
-			if (x == null)
+			if (x is null)
 			{
-				if (y == null)
+				if (y is null)
 					return 0;
 				else
 					return -1;
 			}
-			else if (y == null)
+			else if (y is null)
 				return 1;
 			else
 			{
@@ -2653,7 +2653,7 @@ namespace Waher.Persistence.Files.Storage
 		/// <returns>If the index matches the sort order. (The index ordering is allowed to be more specific.)</returns>
 		public bool SameSortOrder(string[] ConstantFields, string[] SortOrder)
 		{
-			if (SortOrder == null)
+			if (SortOrder is null)
 				return true;
 
 			int c = SortOrder.Length;
@@ -2689,7 +2689,7 @@ namespace Waher.Persistence.Files.Storage
 
 					if (s == s2)
 						break;
-					else if (ConstantFields == null || Array.IndexOf<string>(ConstantFields, s2) < 0)
+					else if (ConstantFields is null || Array.IndexOf<string>(ConstantFields, s2) < 0)
 						return false;
 					else
 					{
@@ -2739,7 +2739,7 @@ namespace Waher.Persistence.Files.Storage
 		/// <returns>If the index matches the sort order. (The index ordering is allowed to be more specific.)</returns>
 		public bool ReverseSortOrder(string[] ConstantFields, string[] SortOrder)
 		{
-			if (SortOrder == null)
+			if (SortOrder is null)
 				return false;
 
 			int c = SortOrder.Length;
@@ -2775,7 +2775,7 @@ namespace Waher.Persistence.Files.Storage
 
 					if (s == s2)
 						break;
-					else if (ConstantFields == null || Array.IndexOf<string>(ConstantFields, s2) < 0)
+					else if (ConstantFields is null || Array.IndexOf<string>(ConstantFields, s2) < 0)
 						return false;
 					else
 					{

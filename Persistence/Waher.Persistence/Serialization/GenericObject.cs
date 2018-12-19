@@ -110,7 +110,7 @@ namespace Waher.Persistence.Serialization
 		{
 			get
 			{
-				if (this.propertiesByName == null)
+				if (this.propertiesByName is null)
 					this.BuildDictionary();
 
 				if (this.propertiesByName.TryGetValue(PropertyName, out object Result))
@@ -121,7 +121,7 @@ namespace Waher.Persistence.Serialization
 
 			set
 			{
-				if (this.propertiesByName == null)
+				if (this.propertiesByName is null)
 					this.BuildDictionary();
 
 				this.propertiesByName[PropertyName] = value;
@@ -137,7 +137,7 @@ namespace Waher.Persistence.Serialization
 		/// <returns>If the corresponding field or property was found.</returns>
 		public bool TryGetFieldValue(string PropertyName, out object Value)
 		{
-			if (this.propertiesByName == null)
+			if (this.propertiesByName is null)
 				this.BuildDictionary();
 
 			return this.propertiesByName.TryGetValue(PropertyName, out Value);
@@ -150,7 +150,7 @@ namespace Waher.Persistence.Serialization
 		/// <returns>If the property was found and removed.</returns>
 		public bool Remove(string PropertyName)
 		{
-			if (this.propertiesByName == null)
+			if (this.propertiesByName is null)
 				this.BuildDictionary();
 
 			if (!this.propertiesByName.Remove(PropertyName))
@@ -201,7 +201,7 @@ namespace Waher.Persistence.Serialization
 		{
 			get
 			{
-				if (this.propertiesByName == null)
+				if (this.propertiesByName is null)
 					this.BuildDictionary();
 
 				return this.propertiesByName.Count;
@@ -232,7 +232,7 @@ namespace Waher.Persistence.Serialization
 		/// </summary>
 		public void Clear()
 		{
-			if (this.propertiesByName == null)
+			if (this.propertiesByName is null)
 				this.propertiesByName = new Dictionary<string, object>();
 			else
 				this.propertiesByName.Clear();
@@ -245,14 +245,14 @@ namespace Waher.Persistence.Serialization
 		/// </summary>
 		public bool Contains(KeyValuePair<string, object> item)
 		{
-			if (this.propertiesByName == null)
+			if (this.propertiesByName is null)
 				this.BuildDictionary();
 
 			if (!this.propertiesByName.TryGetValue(item.Key, out object Value))
 				return false;
 
-			if (Value == null)
-				return item.Value == null;
+			if (Value is null)
+				return item.Value is null;
 
 			return Value.Equals(item.Value);
 		}
@@ -271,13 +271,13 @@ namespace Waher.Persistence.Serialization
 		/// </summary>
 		public bool Remove(KeyValuePair<string, object> item)
 		{
-			if (this.propertiesByName == null)
+			if (this.propertiesByName is null)
 				this.BuildDictionary();
 
 			if (!this.propertiesByName.TryGetValue(item.Key, out object Value))
 				return false;
 
-			if (Value == null)
+			if (Value is null)
 			{
 				if (item.Value != null)
 					return false;
@@ -305,10 +305,10 @@ namespace Waher.Persistence.Serialization
 				return false;
 			}
 
-			if (this.propertiesByName == null)
+			if (this.propertiesByName is null)
 				this.BuildDictionary();
 
-			if (GenObj.propertiesByName == null)
+			if (GenObj.propertiesByName is null)
 				GenObj.BuildDictionary();
 
 			if (this.propertiesByName.Count != GenObj.propertiesByName.Count)
@@ -319,7 +319,7 @@ namespace Waher.Persistence.Serialization
 				if (!GenObj.propertiesByName.TryGetValue(P.Key, out object Value))
 					return false;
 
-				if (Value == null ^ P.Value == null)
+				if (Value is null ^ P.Value is null)
 					return false;
 
 				if (Value != null && !Value.Equals(P.Value))
@@ -334,7 +334,7 @@ namespace Waher.Persistence.Serialization
 		/// </summary>
 		public override int GetHashCode()
 		{
-			if (this.propertiesByName == null)
+			if (this.propertiesByName is null)
 				this.BuildDictionary();
 
 			int Result = this.objectId.GetHashCode() ^
@@ -357,7 +357,7 @@ namespace Waher.Persistence.Serialization
 		/// <returns>If the object has a property with the given name.</returns>
 		public bool HasProperty(string PropertyName)
 		{
-			if (this.propertiesByName == null)
+			if (this.propertiesByName is null)
 				this.BuildDictionary();
 
 			return this.propertiesByName.ContainsKey(PropertyName);

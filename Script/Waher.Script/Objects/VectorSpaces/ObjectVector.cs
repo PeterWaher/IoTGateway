@@ -84,7 +84,7 @@ namespace Waher.Script.Objects.VectorSpaces
 		{
 			get
 			{
-				if (this.values == null)
+				if (this.values is null)
 				{
 					IElement[] v = new IElement[this.dimension];
 					this.elements.CopyTo(v, 0);
@@ -123,7 +123,7 @@ namespace Waher.Script.Objects.VectorSpaces
 
 			foreach (IElement Element in this.elements)
 			{
-				if (sb == null)
+				if (sb is null)
 					sb = new StringBuilder("[");
 				else
 					sb.Append(", ");
@@ -132,7 +132,7 @@ namespace Waher.Script.Objects.VectorSpaces
 					sb.Append(Element.ToString());
 			}
 
-			if (sb == null)
+			if (sb is null)
 				return "[]";
 			else
 			{
@@ -148,7 +148,7 @@ namespace Waher.Script.Objects.VectorSpaces
 		{
 			get
 			{
-				if (this.associatedVectorSpace == null)
+				if (this.associatedVectorSpace is null)
 					this.associatedVectorSpace = new ObjectVectors(this);
 
 				return this.associatedVectorSpace;
@@ -172,7 +172,7 @@ namespace Waher.Script.Objects.VectorSpaces
 
 				foreach (IElement E in this.elements)
 				{
-					if (E == null)
+					if (E is null)
 						V[i++] = null;
 					else
 						V[i++] = E.AssociatedObjectValue;
@@ -244,7 +244,7 @@ namespace Waher.Script.Objects.VectorSpaces
 		public override bool Equals(object obj)
 		{
 			ObjectVector ObjectVector = obj as ObjectVector;
-			if (ObjectVector == null)
+			if (ObjectVector is null)
 				return false;
 
 			if (ObjectVector.dimension != this.dimension)

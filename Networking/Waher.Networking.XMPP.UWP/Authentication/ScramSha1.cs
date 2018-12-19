@@ -59,7 +59,7 @@ namespace Waher.Networking.XMPP.Authentication
 			}
 
 			if (string.IsNullOrEmpty(this.serverNonce) || !this.serverNonce.StartsWith(this.nonce) ||
-				this.salt == null || this.nrIterations <= 0)
+				this.salt is null || this.nrIterations <= 0)
 			{
 				throw new XmppException("Invalid challenge.");
 			}

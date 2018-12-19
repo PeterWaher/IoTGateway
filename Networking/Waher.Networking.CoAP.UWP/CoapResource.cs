@@ -182,7 +182,7 @@ namespace Waher.Networking.CoAP
 					{
 						if (Key2.StartsWith(Prefix))
 						{
-							if (ToRemove == null)
+							if (ToRemove is null)
 								ToRemove = new LinkedList<string>();
 
 							ToRemove.AddLast(Key2);
@@ -210,7 +210,7 @@ namespace Waher.Networking.CoAP
 		{
 			lock (this.registrations)
 			{
-				if (this.registeredMessages == null)
+				if (this.registeredMessages is null)
 				{
 					this.registeredMessages = new ObservationRegistration[this.registrations.Count];
 					this.registrations.Values.CopyTo(this.registeredMessages, 0);
@@ -236,7 +236,7 @@ namespace Waher.Networking.CoAP
 			if (Interval <= TimeSpan.Zero)
 				throw new ArgumentOutOfRangeException("Interval must be positive.", nameof(Interval));
 
-			if (this.endpoint == null)
+			if (this.endpoint is null)
 				throw new Exception("Resource not registered.");
 
 			if (this.nextTrigger > DateTime.MinValue)
@@ -281,7 +281,7 @@ namespace Waher.Networking.CoAP
 		/// <param name="Registrations">Registrations to trigger.</param>
 		public void Trigger(params ObservationRegistration[] Registrations)
 		{
-			if (Registrations == null || Registrations.Length == 0)
+			if (Registrations is null || Registrations.Length == 0)
 				return;
 
 			foreach (ObservationRegistration Registration in Registrations)

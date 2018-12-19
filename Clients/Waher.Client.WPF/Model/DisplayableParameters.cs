@@ -36,7 +36,7 @@ namespace Waher.Client.WPF.Model
 		{
 			get
 			{
-				if (this.ordered == null)
+				if (this.ordered is null)
 				{
 					Parameter[] Ordered = new Parameter[this.parameters.Count];
 					this.parameters.Values.CopyTo(Ordered, 0);

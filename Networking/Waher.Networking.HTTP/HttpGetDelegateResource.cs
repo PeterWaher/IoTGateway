@@ -89,7 +89,7 @@ namespace Waher.Networking.HTTP
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public void GET(HttpRequest Request, HttpResponse Response)
 		{
-			if (this.get == null)
+			if (this.get is null)
 				throw new MethodNotAllowedException(this.AllowedMethods);
 			else
 				this.get(Request, Response);

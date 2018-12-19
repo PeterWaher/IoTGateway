@@ -73,7 +73,7 @@ namespace Waher.Script.Functions.DateAndTime
 			for (i = 0; i < c; i++)
 			{
 				n = Arguments[i] as DoubleNumber;
-				if (n == null)
+				if (n is null)
 					throw new ScriptRuntimeException("Expected number arguments.", this);
 
 				d[i] = n.Value;

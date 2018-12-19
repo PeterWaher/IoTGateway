@@ -506,7 +506,7 @@ namespace Waher.Runtime.Inventory
 						foreach (Type Interface in Type.GetTypeInfo().ImplementedInterfaces)
 						{
 							InterfaceName = Interface.FullName;
-							if (InterfaceName == null)
+							if (InterfaceName is null)
 								continue;   // Generic interface.
 
 							if (!typesPerInterface.TryGetValue(InterfaceName, out Types))

@@ -31,7 +31,7 @@ namespace Waher.Script.Fractals.IFS.Variations.Fractals
 
 		public override IElement Evaluate(IElement[] Arguments, Variables Variables)
 		{
-			if (Arguments[1] == null || Arguments[1].AssociatedObjectValue == null)
+			if (Arguments[1] is null || Arguments[1].AssociatedObjectValue is null)
 			{
 				return new JuliaStepVariation(Expression.ToComplex(Arguments[0].AssociatedObjectValue),
 					this.Arguments[0], this.Start, this.Length, this.Expression);

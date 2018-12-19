@@ -333,7 +333,7 @@ namespace Waher.Networking.XMPP.P2P
 
 					if (Endpoint != null)
 					{
-						if (Endpoints == null)
+						if (Endpoints is null)
 							Endpoints = new List<IE2eEndpoint>();
 
 						Endpoints.Add(Endpoint);
@@ -376,7 +376,7 @@ namespace Waher.Networking.XMPP.P2P
 				if (E2E != null)
 					Endpoints = ParseE2eKeys(E2E);
 
-				if (Endpoints == null)
+				if (Endpoints is null)
 				{
 					this.RemovePeerPkiInfo(FullJID);
 					return false;
@@ -495,7 +495,7 @@ namespace Waher.Networking.XMPP.P2P
 			}
 
 			IE2eEndpoint LocalEndpoint = this.FindLocalEndpoint(Endpoints[0]);
-			if (LocalEndpoint == null)
+			if (LocalEndpoint is null)
 				return null;
 
 			return Endpoints[0].Encrypt(Id, Type, From, To, Data, LocalEndpoint);
@@ -521,7 +521,7 @@ namespace Waher.Networking.XMPP.P2P
 			}
 
 			IE2eEndpoint LocalEndpoint = this.FindLocalEndpoint(Endpoints[0]);
-			if (LocalEndpoint == null)
+			if (LocalEndpoint is null)
 				return null;
 
 			return LocalEndpoint.Decrypt(Id, Type, From, To, Data, Endpoints[0]);
@@ -549,7 +549,7 @@ namespace Waher.Networking.XMPP.P2P
 			}
 
 			IE2eEndpoint LocalEndpoint = this.FindLocalEndpoint(Endpoints[0]);
-			if (LocalEndpoint == null)
+			if (LocalEndpoint is null)
 				return false;
 
 			byte[] Data = this.encoding.GetBytes(DataXml);
@@ -581,7 +581,7 @@ namespace Waher.Networking.XMPP.P2P
 		{
 			XmppClient Client = Sender as XmppClient;
 			string Xml = this.Decrypt(Client, e.Id, e.Message.GetAttribute("type"), e.From, e.To, e.Content);
-			if (Xml == null)
+			if (Xml is null)
 			{
 				Client.Error("Unable to decrypt or verify message.");
 				return;
@@ -659,7 +659,7 @@ namespace Waher.Networking.XMPP.P2P
 				if (Callback != null)
 				{
 					string Content = this.Decrypt(Client, e.Id, e.Response.GetAttribute("type"), e.From, e.To, E);
-					if (Content == null)
+					if (Content is null)
 					{
 						Client.Error("Unable to decrypt or verify response.");
 						return;
@@ -739,7 +739,7 @@ namespace Waher.Networking.XMPP.P2P
 
 		private bool IsForbidden(XmlElement E)
 		{
-			if (E == null)
+			if (E is null)
 				return false;
 
 			XmlElement E2;
@@ -747,7 +747,7 @@ namespace Waher.Networking.XMPP.P2P
 			foreach (XmlNode N in E.ChildNodes)
 			{
 				E2 = N as XmlElement;
-				if (E2 == null)
+				if (E2 is null)
 					continue;
 
 				if (E2.LocalName == "forbidden" && E2.NamespaceURI == XmppClient.NamespaceXmppStanzas)
@@ -780,7 +780,7 @@ namespace Waher.Networking.XMPP.P2P
 		{
 			XmppClient Client = Sender as XmppClient;
 			string Content = this.Decrypt(Client, e.Id, e.IQ.GetAttribute("type"), e.From, e.To, e.Query);
-			if (Content == null)
+			if (Content is null)
 			{
 				Client.Error("Unable to decrypt or verify request.");
 				e.IqError(new ForbiddenException("Unable to decrypt or verify message.", e.IQ));
@@ -798,7 +798,7 @@ namespace Waher.Networking.XMPP.P2P
 		{
 			XmppClient Client = Sender as XmppClient;
 			string Content = this.Decrypt(Client, e.Id, e.IQ.GetAttribute("type"), e.From, e.To, e.Query);
-			if (Content == null)
+			if (Content is null)
 			{
 				Client.Error("Unable to decrypt or verify request.");
 				e.IqError(new ForbiddenException("Unable to decrypt or verify message.", e.IQ));
@@ -1241,7 +1241,7 @@ namespace Waher.Networking.XMPP.P2P
 			RosterItem Item;
 
 			if (e.FromBareJid != this.client.BareJID &&
-				((Item = this.client.GetRosterItem(e.FromBareJid)) == null ||
+				((Item = this.client.GetRosterItem(e.FromBareJid)) is null ||
 				Item.State == SubscriptionState.None ||
 				Item.State == SubscriptionState.Remove ||
 				Item.State == SubscriptionState.Unknown))

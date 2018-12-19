@@ -189,9 +189,9 @@ namespace Waher.Security.DTLS.Ciphers
 		{
 			int c1, c2;
 
-			if (A1 == null || (c1 = A1.Length) == 0)
+			if (A1 is null || (c1 = A1.Length) == 0)
 				return A2;
-			else if (A2 == null || (c2 = A2.Length) == 0)
+			else if (A2 is null || (c2 = A2.Length) == 0)
 				return A1;
 
 			byte[] Result = new byte[c1 + c2];
@@ -210,7 +210,7 @@ namespace Waher.Security.DTLS.Ciphers
 		/// <param name="Resendable">If flight of records is resendable.</param>
 		public virtual void SendFinished(DtlsEndpoint Endpoint, EndpointState State, bool Resendable)
 		{
-			if (State.masterSecret == null)
+			if (State.masterSecret is null)
 				Endpoint.SendAlert(AlertLevel.fatal, AlertDescription.handshake_failure, State);
 			else
 			{
@@ -250,7 +250,7 @@ namespace Waher.Security.DTLS.Ciphers
 		/// <returns>If the <paramref name="VerifyData"/> is valid or not.</returns>
 		public virtual bool VerifyFinished(byte[] VerifyData, EndpointState State)
 		{
-			if (State.masterSecret == null)
+			if (State.masterSecret is null)
 				return false;
 
 			string Label;

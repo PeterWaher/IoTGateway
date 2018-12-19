@@ -46,15 +46,15 @@ namespace Waher.Script.Operators.Vectors
         public override IElement Evaluate(Variables Variables)
 		{
             ICommutativeRingWithIdentityElement From = this.left.Evaluate(Variables) as ICommutativeRingWithIdentityElement;
-            if (From == null)
+            if (From is null)
                 throw new ScriptRuntimeException("Invalid range.", this);
 
             ICommutativeRingWithIdentityElement To = this.middle.Evaluate(Variables) as ICommutativeRingWithIdentityElement;
-            if (To == null)
+            if (To is null)
                 throw new ScriptRuntimeException("Invalid range.", this);
 
             IOrderedSet S = From.AssociatedSet as IOrderedSet;
-            if (S == null)
+            if (S is null)
                 throw new ScriptRuntimeException("Cannot compare range.", this);
 
             IElement Step;
@@ -96,7 +96,7 @@ namespace Waher.Script.Operators.Vectors
                 else
                 {
                     From = Operators.Arithmetics.Add.EvaluateAddition(From, Step, this) as ICommutativeRingWithIdentityElement;
-                    if (From == null)
+                    if (From is null)
                         throw new ScriptRuntimeException("Invalid step size.", this);
 
                     if (Direction > 0)

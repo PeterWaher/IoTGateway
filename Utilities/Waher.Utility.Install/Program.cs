@@ -183,7 +183,7 @@ namespace Waher.Utility.Install
 			Log.Informational("Parsing " + DepsJsonFileName);
 
 			Dictionary<string, object> Deps = JSON.Parse(s) as Dictionary<string, object>;
-			if (Deps == null)
+			if (Deps is null)
 				throw new Exception("Invalid deps.json file. Unable to install.");
 
 			Log.Informational("Loading manifest file.");
@@ -416,7 +416,7 @@ namespace Waher.Utility.Install
 			Log.Informational("Parsing " + DepsJsonFileName);
 
 			Dictionary<string, object> Deps = JSON.Parse(s) as Dictionary<string, object>;
-			if (Deps == null)
+			if (Deps is null)
 				throw new Exception("Invalid deps.json file. Unable to install.");
 
 			Log.Informational("Loading manifest file.");

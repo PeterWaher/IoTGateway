@@ -158,7 +158,7 @@ namespace Waher.Things
 		public override bool Equals(object obj)
 		{
 			IThingReference Ref = obj as IThingReference;
-			if (Ref == null)
+			if (Ref is null)
 				return false;
 			else
 				return this.SameThing(Ref);

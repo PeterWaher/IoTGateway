@@ -349,7 +349,7 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			get
 			{
-				if (this.clientKeyName == null)
+				if (this.clientKeyName is null)
 					return false;
 
 				if (this.clientKeyName.StartsWith("RSA"))
@@ -531,7 +531,7 @@ namespace Waher.Networking.XMPP.Contracts
 				EndpointSecurity.IoTHarmonizationE2E, out IE2eEndpoint Endpoint) &&
 				Endpoint is EcAes256 EcAes256)
 			{
-				if (s2 == null)
+				if (s2 is null)
 					return false;
 
 				return EcAes256.Verify(Data, this.clientPubKey1, this.clientPubKey2, s1, s2, HashFunction.SHA256);
@@ -636,7 +636,7 @@ namespace Waher.Networking.XMPP.Contracts
 				return false;
 			}
 
-			if ((this.properties == null) ^ (ID.properties == null))
+			if ((this.properties is null) ^ (ID.properties is null))
 				return false;
 
 			if (this.properties != null)
@@ -658,10 +658,10 @@ namespace Waher.Networking.XMPP.Contracts
 
 		internal static bool AreEqual(byte[] A1, byte[] A2)
 		{
-			if ((A1 == null) ^ (A2 == null))
+			if ((A1 is null) ^ (A2 is null))
 				return false;
 
-			if (A1 == null)
+			if (A1 is null)
 				return true;
 
 			int i, c = A1.Length;

@@ -40,7 +40,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		{
 			IEmojiSource EmojiSource = this.Document.EmojiSource;
 
-			if (EmojiSource == null)
+			if (EmojiSource is null)
 			{
 				Output.Append(':');
 				Output.Append(this.emoji.ShortName);

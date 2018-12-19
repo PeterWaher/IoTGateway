@@ -141,7 +141,7 @@ namespace Waher.Persistence.Files.Searching
 		/// <returns>If the index matches the sort order. (The index ordering is allowed to be more specific.)</returns>
 		public bool SameSortOrder(string[] ConstantFields, string[] SortOrder)
 		{
-			if (SortOrder == null || SortOrder.Length != 1)
+			if (SortOrder is null || SortOrder.Length != 1)
 				return false;
 
 			string s = this.serializer.ObjectIdMemberName;
@@ -157,7 +157,7 @@ namespace Waher.Persistence.Files.Searching
 		/// <returns>If the index matches the sort order. (The index ordering is allowed to be more specific.)</returns>
 		public bool ReverseSortOrder(string[] ConstantFields, string[] SortOrder)
 		{
-			if (SortOrder == null || SortOrder.Length != 1)
+			if (SortOrder is null || SortOrder.Length != 1)
 				return false;
 
 			string s = this.serializer.ObjectIdMemberName;

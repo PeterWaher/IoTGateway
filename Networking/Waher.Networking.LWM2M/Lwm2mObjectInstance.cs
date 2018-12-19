@@ -429,7 +429,7 @@ namespace Waher.Networking.LWM2M
 						}
 					}
 
-					if (ToWrite == null)
+					if (ToWrite is null)
 					{
 						Response.Respond(CoapCode.BadRequest);
 						return;

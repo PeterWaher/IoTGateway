@@ -315,7 +315,7 @@ namespace Waher.Persistence.MongoDB
 			else
 				Collection = this.GetCollection(CollectionName);
 
-			if (Filter == null)
+			if (Filter is null)
 				BsonFilter = new BsonDocument();
 			else
 				BsonFilter = this.Convert(Filter, Serializer);
@@ -359,7 +359,7 @@ namespace Waher.Persistence.MongoDB
 
 				foreach (string SortBy in SortOrder)
 				{
-					if (SortDefinition == null)
+					if (SortDefinition is null)
 					{
 						if (SortBy.StartsWith("-"))
 							SortDefinition = Builders<BsonDocument>.Sort.Descending(Serializer.ToShortName(SortBy.Substring(1)));
@@ -589,7 +589,7 @@ namespace Waher.Persistence.MongoDB
 
 		private Exception UnhandledFilterValueDataType(string TypeName, string FieldName, object Value)
 		{
-			if (Value == null)
+			if (Value is null)
 			{
 				return new NotSupportedException("Null filter values for field " + TypeName + "." + FieldName +
 					  " not supported.");

@@ -444,7 +444,7 @@ namespace Waher.Networking.XMPP.Synchronization
 							if (this.isClienBareJid)
 							{
 								RosterItem Item = this.client.GetRosterItem(Jid);
-								if (Item == null || !Item.HasLastPresence)
+								if (Item is null || !Item.HasLastPresence)
 									break;
 
 								Jid = Item.LastPresenceFullJid;

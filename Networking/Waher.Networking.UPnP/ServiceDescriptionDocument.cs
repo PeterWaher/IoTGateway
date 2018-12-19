@@ -167,7 +167,7 @@ namespace Waher.Networking.UPnP
 		public Task<KeyValuePair<object, Dictionary<string, object>>> InvokeAsync(string ActionName, int Timeout, params KeyValuePair<string, object>[] InputValues)
 		{
 			UPnPAction Action = this.GetAction(ActionName);
-			if (Action == null)
+			if (Action is null)
 				throw new ArgumentException("Action not found: " + ActionName, nameof(ActionName));
 
 			return Action.InvokeAsync(Timeout, InputValues);
@@ -184,7 +184,7 @@ namespace Waher.Networking.UPnP
 		public Task<KeyValuePair<object, Dictionary<string, object>>> InvokeAsync(string ActionName, Dictionary<string, object> InputValues, int Timeout)
 		{
 			UPnPAction Action = this.GetAction(ActionName);
-			if (Action == null)
+			if (Action is null)
 				throw new ArgumentException("Action not found: " + ActionName, nameof(ActionName));
 
 			return Action.InvokeAsync(InputValues, Timeout);

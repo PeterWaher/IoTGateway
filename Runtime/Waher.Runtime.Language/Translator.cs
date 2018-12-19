@@ -164,7 +164,7 @@ namespace Waher.Runtime.Language
 		{
 			get
 			{
-				if (defaultLanguageCode == null)
+				if (defaultLanguageCode is null)
 					defaultLanguageCode = RuntimeSettings.Get("DefaultLanguage", "en");
 
 				return defaultLanguageCode;
@@ -189,7 +189,7 @@ namespace Waher.Runtime.Language
 		{
 			string Code = DefaultLanguageCode;
 			Language Result = await GetLanguageAsync(Code);
-			if (Result == null)
+			if (Result is null)
 				Result = await CreateLanguageAsync(Code, Code == "en" ? "English" : Code, null, 0, 0);
 
 			return Result;
@@ -221,7 +221,7 @@ namespace Waher.Runtime.Language
 					case XmlNodeType.CDATA:
 					case XmlNodeType.SignificantWhitespace:
 					case XmlNodeType.Whitespace:
-						if (Value == null)
+						if (Value is null)
 							Value = Xml.Value;
 						else
 							Value += Xml.Value;

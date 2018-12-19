@@ -63,7 +63,7 @@ namespace Waher.Content.Html
 
 		private void AssertParsed()
 		{
-			if (this.root == null)
+			if (this.root is null)
 				this.Parse();
 		}
 
@@ -607,7 +607,7 @@ namespace Waher.Content.Html
 						}
 						else if (ch == '>')
 						{
-							if (this.dtd == null)
+							if (this.dtd is null)
 								this.dtd = new LinkedList<DtdInstruction>();
 
 							DtdInstruction Dtd = new DtdInstruction(this, CurrentElement, Pos - 2, Pos, string.Empty);
@@ -983,7 +983,7 @@ namespace Waher.Content.Html
 					case 14: // Skip DTD
 						if (ch == '>')
 						{
-							if (this.dtd == null)
+							if (this.dtd is null)
 								this.dtd = new LinkedList<DtdInstruction>();
 
 							s = sb.ToString();
@@ -1088,7 +1088,7 @@ namespace Waher.Content.Html
 					case 20:    // End of processing instruction?
 						if (ch == '>')
 						{
-							if (this.processingInstructions == null)
+							if (this.processingInstructions is null)
 								this.processingInstructions = new LinkedList<ProcessingInstruction>();
 
 							s = sb.ToString();
@@ -1401,7 +1401,7 @@ namespace Waher.Content.Html
 				case "ADDRESS":
 					Address Address = new Address(this, Parent, Start);
 					Result = Address;
-					if (this.address == null)
+					if (this.address is null)
 						this.address = new LinkedList<Address>();
 					this.address.AddLast(Address);
 					break;
@@ -1411,7 +1411,7 @@ namespace Waher.Content.Html
 				case "ARTICLE":
 					Article Article = new Article(this, Parent, Start);
 					Result = Article;
-					if (this.article == null)
+					if (this.article is null)
 						this.article = new LinkedList<Article>();
 					this.article.AddLast(Article);
 					break;
@@ -1419,7 +1419,7 @@ namespace Waher.Content.Html
 				case "ASIDE":
 					Aside Aside = new Aside(this, Parent, Start);
 					Result = Aside;
-					if (this.aside == null)
+					if (this.aside is null)
 						this.aside = new LinkedList<Aside>();
 					this.aside.AddLast(Aside);
 					break;
@@ -1427,7 +1427,7 @@ namespace Waher.Content.Html
 				case "AUDIO":
 					Elements.Audio Audio = new Elements.Audio(this, Parent, Start);
 					Result = Audio;
-					if (this.audio == null)
+					if (this.audio is null)
 						this.audio = new LinkedList<Elements.Audio>();
 					this.audio.AddLast(Audio);
 					break;
@@ -1444,7 +1444,7 @@ namespace Waher.Content.Html
 				case "BODY":
 					Body Body = new Body(this, Parent, Start);
 					Result = Body;
-					if (this.body == null)
+					if (this.body is null)
 						this.body = Body;
 					break;
 
@@ -1456,7 +1456,7 @@ namespace Waher.Content.Html
 				case "CITE":
 					Cite Cite = new Cite(this, Parent, Start);
 					Result = Cite;
-					if (this.cite == null)
+					if (this.cite is null)
 						this.cite = new LinkedList<Cite>();
 					this.cite.AddLast(Cite);
 					break;
@@ -1469,7 +1469,7 @@ namespace Waher.Content.Html
 				case "DATA":
 					Data Data = new Data(this, Parent, Start);
 					Result = Data;
-					if (this.data == null)
+					if (this.data is null)
 						this.data = new LinkedList<Data>();
 					this.data.AddLast(Data);
 					break;
@@ -1480,7 +1480,7 @@ namespace Waher.Content.Html
 				case "DETAILS":
 					Details Details = new Details(this, Parent, Start);
 					Result = Details;
-					if (this.details == null)
+					if (this.details is null)
 						this.details = new LinkedList<Details>();
 					this.details.AddLast(Details);
 					break;
@@ -1489,7 +1489,7 @@ namespace Waher.Content.Html
 				case "DIALOG":
 					Dialog Dialog = new Dialog(this, Parent, Start);
 					Result = Dialog;
-					if (this.dialog == null)
+					if (this.dialog is null)
 						this.dialog = new LinkedList<Dialog>();
 					this.dialog.AddLast(Dialog);
 					break;
@@ -1506,7 +1506,7 @@ namespace Waher.Content.Html
 				case "FIGURE":
 					Figure Figure = new Figure(this, Parent, Start);
 					Result = Figure;
-					if (this.figure == null)
+					if (this.figure is null)
 						this.figure = new LinkedList<Figure>();
 					this.figure.AddLast(Figure);
 					break;
@@ -1515,7 +1515,7 @@ namespace Waher.Content.Html
 				case "FOOTER":
 					Footer Footer = new Footer(this, Parent, Start);
 					Result = Footer;
-					if (this.footer == null)
+					if (this.footer is null)
 						this.footer = new LinkedList<Footer>();
 					this.footer.AddLast(Footer);
 					break;
@@ -1523,7 +1523,7 @@ namespace Waher.Content.Html
 				case "FORM":
 					Form Form = new Form(this, Parent, Start);
 					Result = Form;
-					if (this.form == null)
+					if (this.form is null)
 						this.form = new LinkedList<Form>();
 					this.form.AddLast(Form);
 					break;
@@ -1542,14 +1542,14 @@ namespace Waher.Content.Html
 				case "HEAD":
 					Head Head = new Head(this, Parent, Start);
 					Result = Head;
-					if (this.head == null)
+					if (this.head is null)
 						this.head = Head;
 					break;
 
 				case "HEADER":
 					Header Header = new Header(this, Parent, Start);
 					Result = Header;
-					if (this.header == null)
+					if (this.header is null)
 						this.header = new LinkedList<Header>();
 					this.header.AddLast(Header);
 					break;
@@ -1559,7 +1559,7 @@ namespace Waher.Content.Html
 				case "HTML":
 					Elements.Html Html = new Elements.Html(this, Parent, Start);
 					Result = Html;
-					if (this.html == null)
+					if (this.html is null)
 						this.html = Html;
 					break;
 
@@ -1569,7 +1569,7 @@ namespace Waher.Content.Html
 				case "IMG":
 					Img Img = new Img(this, Parent, Start);
 					Result = Img;
-					if (this.img == null)
+					if (this.img is null)
 						this.img = new LinkedList<Img>();
 					this.img.AddLast(Img);
 					break;
@@ -1585,7 +1585,7 @@ namespace Waher.Content.Html
 				case "LINK":
 					Link Link = new Link(this, Parent, Start);
 					Result = Link;
-					if (this.link == null)
+					if (this.link is null)
 						this.link = new LinkedList<Link>();
 					this.link.AddLast(Link);
 					break;
@@ -1594,7 +1594,7 @@ namespace Waher.Content.Html
 				case "MAIN":
 					Main Main = new Main(this, Parent, Start);
 					Result = Main;
-					if (this.main == null)
+					if (this.main is null)
 						this.main = new LinkedList<Main>();
 					this.main.AddLast(Main);
 					break;
@@ -1607,7 +1607,7 @@ namespace Waher.Content.Html
 				case "META":
 					Meta Meta = new Meta(this, Parent, Start);
 					Result = Meta;
-					if (this.meta == null)
+					if (this.meta is null)
 						this.meta = new LinkedList<Meta>();
 					this.meta.AddLast(Meta);
 					break;
@@ -1617,7 +1617,7 @@ namespace Waher.Content.Html
 				case "NAV":
 					Nav Nav = new Nav(this, Parent, Start);
 					Result = Nav;
-					if (this.nav == null)
+					if (this.nav is null)
 						this.nav = new LinkedList<Nav>();
 					this.nav.AddLast(Nav);
 					break;
@@ -1637,7 +1637,7 @@ namespace Waher.Content.Html
 				case "PICTURE":
 					Picture Picture = new Picture(this, Parent, Start);
 					Result = Picture;
-					if (this.picture == null)
+					if (this.picture is null)
 						this.picture = new LinkedList<Picture>();
 					this.picture.AddLast(Picture);
 					break;
@@ -1655,7 +1655,7 @@ namespace Waher.Content.Html
 				case "SCRIPT":
 					Elements.Script Script = new Elements.Script(this, Parent, Start);
 					Result = Script;
-					if (this.script == null)
+					if (this.script is null)
 						this.script = new LinkedList<Elements.Script>();
 					this.script.AddLast(Script);
 					break;
@@ -1663,7 +1663,7 @@ namespace Waher.Content.Html
 				case "SECTION":
 					Section Section = new Section(this, Parent, Start);
 					Result = Section;
-					if (this.section == null)
+					if (this.section is null)
 						this.section = new LinkedList<Section>();
 					this.section.AddLast(Section);
 					break;
@@ -1680,7 +1680,7 @@ namespace Waher.Content.Html
 				case "STYLE":
 					Style Style = new Style(this, Parent, Start);
 					Result = Style;
-					if (this.style == null)
+					if (this.style is null)
 						this.style = new LinkedList<Style>();
 					this.style.AddLast(Style);
 					break;
@@ -1689,7 +1689,7 @@ namespace Waher.Content.Html
 				case "SUMMARY":
 					Summary Summary = new Summary(this, Parent, Start);
 					Result = Summary;
-					if (this.summary == null)
+					if (this.summary is null)
 						this.summary = new LinkedList<Summary>();
 					this.summary.AddLast(Summary);
 					break;
@@ -1706,7 +1706,7 @@ namespace Waher.Content.Html
 				case "TIME":
 					Time Time = new Time(this, Parent, Start);
 					Result = Time;
-					if (this.time == null)
+					if (this.time is null)
 						this.time = new LinkedList<Time>();
 					this.time.AddLast(Time);
 					break;
@@ -1714,7 +1714,7 @@ namespace Waher.Content.Html
 				case "TITLE":
 					Title Title = new Title(this, Parent, Start);
 					Result = Title;
-					if (this.title == null)
+					if (this.title is null)
 						this.title = Title;
 					break;
 
@@ -1727,7 +1727,7 @@ namespace Waher.Content.Html
 				case "VIDEO":
 					Elements.Video Video = new Elements.Video(this, Parent, Start);
 					Result = Video;
-					if (this.video == null)
+					if (this.video is null)
 						this.video = new LinkedList<Elements.Video>();
 					this.video.AddLast(Video);
 					break;
@@ -1737,9 +1737,9 @@ namespace Waher.Content.Html
 				default: Result = new HtmlElement(this, Parent, Start, TagName); break;
 			}
 
-			if (Parent == null)
+			if (Parent is null)
 			{
-				if (this.root == null)
+				if (this.root is null)
 					this.root = Result;
 			}
 			else

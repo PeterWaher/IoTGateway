@@ -82,7 +82,7 @@ namespace Waher.Content.Markdown.Model
 		{
 			get
 			{
-				if (this.extension == null)
+				if (this.extension is null)
 				{
 					int i = this.url.IndexOfAny(QuestionOrHash);
 					if (i > 0)
@@ -115,7 +115,7 @@ namespace Waher.Content.Markdown.Model
 		{
 			get
 			{
-				if (this.contentType == null)
+				if (this.contentType is null)
 					this.contentType = InternetContent.GetContentType(this.Extension);
 
 				return this.contentType;

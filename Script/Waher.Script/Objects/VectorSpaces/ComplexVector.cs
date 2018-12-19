@@ -49,7 +49,7 @@ namespace Waher.Script.Objects.VectorSpaces
 		{
 			get
 			{
-				if (this.values == null)
+				if (this.values is null)
 				{
 					Complex[] v = new Complex[this.dimension];
 					int i = 0;
@@ -71,7 +71,7 @@ namespace Waher.Script.Objects.VectorSpaces
 		{
 			get
 			{
-				if (this.elements == null)
+				if (this.elements is null)
 				{
 					int i;
 					IElement[] v = new IElement[this.dimension];
@@ -109,7 +109,7 @@ namespace Waher.Script.Objects.VectorSpaces
 		{
 			get
 			{
-				if (this.associatedVectorSpace == null)
+				if (this.associatedVectorSpace is null)
 					this.associatedVectorSpace = new ComplexVectors(this.dimension);
 
 				return this.associatedVectorSpace;
@@ -135,10 +135,10 @@ namespace Waher.Script.Objects.VectorSpaces
 		{
 			ComplexNumber ComplexNumber = Scalar as ComplexNumber;
 			Complex d;
-			if (ComplexNumber == null)
+			if (ComplexNumber is null)
 			{
 				DoubleNumber DoubleNumber = Scalar as DoubleNumber;
-				if (DoubleNumber == null)
+				if (DoubleNumber is null)
 					return null;
 				else
 					d = new Complex(DoubleNumber.Value, 0);
@@ -164,7 +164,7 @@ namespace Waher.Script.Objects.VectorSpaces
 		public override IAbelianGroupElement Add(IAbelianGroupElement Element)
 		{
 			ComplexVector ComplexVector = Element as ComplexVector;
-			if (ComplexVector == null)
+			if (ComplexVector is null)
 				return null;
 
 			int i;
@@ -203,7 +203,7 @@ namespace Waher.Script.Objects.VectorSpaces
 		public override bool Equals(object obj)
 		{
 			ComplexVector ComplexVector = obj as ComplexVector;
-			if (ComplexVector == null)
+			if (ComplexVector is null)
 				return false;
 
 			int i;
@@ -271,7 +271,7 @@ namespace Waher.Script.Objects.VectorSpaces
 		{
 			get
 			{
-				if (this.zero == null)
+				if (this.zero is null)
 					this.zero = new ComplexVector(new Complex[this.dimension]);
 
 				return this.zero;
@@ -306,7 +306,7 @@ namespace Waher.Script.Objects.VectorSpaces
 				throw new ScriptException("Index out of bounds.");
 
 			ComplexNumber V = Value as ComplexNumber;
-			if (V == null)
+			if (V is null)
 				throw new ScriptException("Elements in a complex vector are required to be complex values.");
 
 			Complex[] Values = this.Values;

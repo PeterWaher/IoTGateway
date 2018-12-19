@@ -59,7 +59,7 @@ namespace Waher.Client.WPF
 
 		public MainWindow()
 		{
-			if (currentInstance == null)
+			if (currentInstance is null)
 				currentInstance = this;
 
 			Types.Initialize(typeof(MainWindow).Assembly,
@@ -239,7 +239,7 @@ namespace Waher.Client.WPF
 		{
 			TreeNode Node = this.SelectedNode;
 
-			if (Node == null)
+			if (Node is null)
 			{
 				this.AddButton.IsEnabled = false;
 				this.EditButton.IsEnabled = false;
@@ -275,13 +275,13 @@ namespace Waher.Client.WPF
 		{
 			get
 			{
-				if (this.Tabs == null)
+				if (this.Tabs is null)
 					return null;
 
 				if (this.Tabs.SelectedIndex != 0)
 					return null;
 
-				if (this.MainView == null || this.MainView.ConnectionTree == null)
+				if (this.MainView is null || this.MainView.ConnectionTree is null)
 					return null;
 
 				return this.MainView.SelectedNode;
@@ -292,7 +292,7 @@ namespace Waher.Client.WPF
 		{
 			MainWindow MainWindow = Element as MainWindow;
 
-			while (MainWindow == null && Element != null)
+			while (MainWindow is null && Element != null)
 			{
 				Element = Element.Parent as FrameworkElement;
 				MainWindow = Element as MainWindow;
@@ -310,7 +310,7 @@ namespace Waher.Client.WPF
 		private void Add_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
 			TreeNode Node = this.SelectedNode;
-			if (Node == null || !Node.CanAddChildren)
+			if (Node is null || !Node.CanAddChildren)
 				return;
 
 			Node.Add();
@@ -325,7 +325,7 @@ namespace Waher.Client.WPF
 		private void Refresh_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
 			TreeNode Node = this.SelectedNode;
-			if (Node == null || !Node.CanRecycle)
+			if (Node is null || !Node.CanRecycle)
 				return;
 
 			Node.Recycle(this);
@@ -340,7 +340,7 @@ namespace Waher.Client.WPF
 		private void Delete_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
 			TreeNode Node = this.SelectedNode;
-			if (Node == null || !Node.CanDelete)
+			if (Node is null || !Node.CanDelete)
 				return;
 
 			if (System.Windows.MessageBox.Show(this, "Are you sure you want to remove " + Node.Header + "?", "Are you sure?", MessageBoxButton.YesNo,
@@ -366,7 +366,7 @@ namespace Waher.Client.WPF
 		private void Edit_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
 			TreeNode Node = this.SelectedNode;
-			if (Node == null || !Node.CanEdit)
+			if (Node is null || !Node.CanEdit)
 				return;
 
 			Node.Edit();
@@ -381,7 +381,7 @@ namespace Waher.Client.WPF
 		private void Sniff_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
 			TreeNode Node = this.SelectedNode;
-			if (Node == null || !Node.IsSniffable)
+			if (Node is null || !Node.IsSniffable)
 				return;
 
 			SnifferView View;
@@ -389,7 +389,7 @@ namespace Waher.Client.WPF
 			foreach (TabItem Tab in this.Tabs.Items)
 			{
 				View = Tab.Content as SnifferView;
-				if (View == null)
+				if (View is null)
 					continue;
 
 				if (View.Node == Node)
@@ -441,7 +441,7 @@ namespace Waher.Client.WPF
 		private void Chat_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
 			TreeNode Node = this.SelectedNode;
-			if (Node == null || !Node.CanChat)
+			if (Node is null || !Node.CanChat)
 				return;
 
 			ChatView View;
@@ -449,7 +449,7 @@ namespace Waher.Client.WPF
 			foreach (TabItem Tab in this.Tabs.Items)
 			{
 				View = Tab.Content as ChatView;
-				if (View == null)
+				if (View is null)
 					continue;
 
 				if (View.Node == Node)
@@ -614,7 +614,7 @@ namespace Waher.Client.WPF
 			foreach (TabItem TabItem in this.Tabs.Items)
 			{
 				ChatView = TabItem.Content as ChatView;
-				if (ChatView == null)
+				if (ChatView is null)
 					continue;
 
 				if (ChatView.Node is XmppContact XmppContact)
@@ -634,7 +634,7 @@ namespace Waher.Client.WPF
 				else
 					continue;
 
-				if (XmppAccountNode == null)
+				if (XmppAccountNode is null)
 					continue;
 
 				if (XmppAccountNode.BareJID != ToBareJid)
@@ -687,11 +687,11 @@ namespace Waher.Client.WPF
 		private void ReadMomentary_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
 			TreeNode Node = this.SelectedNode;
-			if (Node == null || !Node.CanReadSensorData)
+			if (Node is null || !Node.CanReadSensorData)
 				return;
 
 			SensorDataClientRequest Request = Node.StartSensorDataMomentaryReadout();
-			if (Request == null)
+			if (Request is null)
 				return;
 
 			TabItem TabItem = MainWindow.NewTab(Node.Header);
@@ -712,11 +712,11 @@ namespace Waher.Client.WPF
 		private void ReadDetailed_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
 			TreeNode Node = this.SelectedNode;
-			if (Node == null || !Node.CanReadSensorData)
+			if (Node is null || !Node.CanReadSensorData)
 				return;
 
 			SensorDataClientRequest Request = Node.StartSensorDataFullReadout();
-			if (Request == null)
+			if (Request is null)
 				return;
 
 			TabItem TabItem = MainWindow.NewTab(Node.Header);
@@ -737,7 +737,7 @@ namespace Waher.Client.WPF
 		private void SubscribeToMomentary_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
 			TreeNode Node = this.SelectedNode;
-			if (Node == null || !Node.CanSubscribeToSensorData)
+			if (Node is null || !Node.CanSubscribeToSensorData)
 				return;
 
 			SensorDataClientRequest Request;
@@ -747,7 +747,7 @@ namespace Waher.Client.WPF
 			else
 				Request = Node.SubscribeSensorDataMomentaryReadout(new FieldSubscriptionRule[0]);
 
-			if (Request == null)
+			if (Request is null)
 				return;
 
 			TabItem TabItem = MainWindow.NewTab(Node.Header);
@@ -768,7 +768,7 @@ namespace Waher.Client.WPF
 		private void Configure_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
 			TreeNode Node = this.SelectedNode;
-			if (Node == null || !Node.CanConfigure)
+			if (Node is null || !Node.CanConfigure)
 				return;
 
 			Mouse.OverrideCursor = Cursors.Wait;
@@ -819,7 +819,7 @@ namespace Waher.Client.WPF
 		private void Search_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
 			TreeNode Node = this.SelectedNode;
-			if (Node == null || !Node.CanSearch)
+			if (Node is null || !Node.CanSearch)
 				return;
 
 			try
@@ -863,7 +863,7 @@ namespace Waher.Client.WPF
 				try
 				{
 					LinkedList<Question> Questions = new LinkedList<Question>();
-					bool Found = Question == null;
+					bool Found = Question is null;
 
 					foreach (Question Question2 in await Database.Find<Question>(new FilterAnd(new FilterFieldEqualTo("OwnerJID", Owner?.BareJID),
 						new FilterFieldEqualTo("ProvisioningJID", ProvisioningClient?.ProvisioningServerAddress)), "Created"))
@@ -881,7 +881,7 @@ namespace Waher.Client.WPF
 					{
 						DispatcherOperation Op = MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() =>
 						{
-							if (QuestionView == null)
+							if (QuestionView is null)
 								QuestionView = this.CreateQuestionTab(Owner, ProvisioningClient);
 
 							foreach (Question Question2 in Questions)

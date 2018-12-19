@@ -122,12 +122,12 @@ namespace Waher.Content.Markdown.Model.BlockElements
 				for (i = 0; i < this.columns; i++)
 				{
 					E = Row[i];
-					if (E == null)
+					if (E is null)
 						continue;
 
 					k = 1;
 					j = i + 1;
-					while (j < this.columns && Row[j++] == null)
+					while (j < this.columns && Row[j++] is null)
 						k++;
 
 					Output.Append("<th style=\"text-align:");
@@ -156,12 +156,12 @@ namespace Waher.Content.Markdown.Model.BlockElements
 				for (i = 0; i < this.columns; i++)
 				{
 					E = Row[i];
-					if (E == null)
+					if (E is null)
 						continue;
 
 					k = 1;
 					j = i + 1;
-					while (j < this.columns && Row[j++] == null)
+					while (j < this.columns && Row[j++] is null)
 						k++;
 
 					Output.Append("<td style=\"text-align:");
@@ -199,7 +199,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 
 				foreach (MarkdownElement E in Row)
 				{
-					if (E == null)
+					if (E is null)
 						continue;
 
 					if (First)
@@ -219,7 +219,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 
 				foreach (MarkdownElement E in Row)
 				{
-					if (E == null)
+					if (E is null)
 						continue;
 
 					if (First)
@@ -294,12 +294,12 @@ namespace Waher.Content.Markdown.Model.BlockElements
 			for (Column = 0, NrColumns = CurrentRow.Length; Column < NrColumns; Column++)
 			{
 				E = CurrentRow[Column];
-				if (E == null)
+				if (E is null)
 					continue;
 
 				TextAlignment = this.alignments[Column];
 				ColSpan = Column + 1;
-				while (ColSpan < NrColumns && CurrentRow[ColSpan] == null)
+				while (ColSpan < NrColumns && CurrentRow[ColSpan] is null)
 					ColSpan++;
 
 				ColSpan -= Column;
@@ -413,7 +413,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 
 				foreach (MarkdownElement E in Row)
 				{
-					if (E == null)
+					if (E is null)
 						Output.WriteElementString("Continue", string.Empty);
 					else
 					{
@@ -432,7 +432,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 
 				foreach (MarkdownElement E in Row)
 				{
-					if (E == null)
+					if (E is null)
 						Output.WriteElementString("Continue", string.Empty);
 					else
 					{

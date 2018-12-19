@@ -31,7 +31,7 @@ namespace Waher.Client.WPF.Model
 			get
 			{
 				XmppAccountNode Node = this.XmppAccountNode;
-				if (Node == null)
+				if (Node is null)
 					return false;
 
 				XmppClient Client = Node.Client;

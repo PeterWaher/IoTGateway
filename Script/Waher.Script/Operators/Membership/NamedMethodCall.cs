@@ -69,7 +69,7 @@ namespace Waher.Script.Operators.Membership
 			bool DoExtend = false;
 
 			T = Object as Type;
-			if (T == null)
+			if (T is null)
 			{
 				T = Object.GetType();
 				Instance = Object;
@@ -135,9 +135,9 @@ namespace Waher.Script.Operators.Membership
 					}
 				}
 
-				if (this.method == null)
+				if (this.method is null)
 				{
-					if (this.methods == null)
+					if (this.methods is null)
 						this.methods = this.GetMethods(T);
 
 					List<KeyValuePair<string, int>> ByRef = null;
@@ -149,7 +149,7 @@ namespace Waher.Script.Operators.Membership
 					{
 						DoExtend = false;
 
-						if (Instance == null)
+						if (Instance is null)
 						{
 							if (!P.Key.IsStatic)
 								continue;
@@ -166,7 +166,7 @@ namespace Waher.Script.Operators.Membership
 
 							if (PT.IsByRef && Arguments[i].TryConvertTo(PT.GetElementType(), out Value))
 							{
-								if (ParameterValues == null)
+								if (ParameterValues is null)
 								{
 									Extend = new bool[this.nrParameters];
 									ParameterValues = new object[this.nrParameters];
@@ -175,7 +175,7 @@ namespace Waher.Script.Operators.Membership
 								Extend[i] = false;
 								ParameterValues[i] = Value;
 
-								if (ByRef == null)
+								if (ByRef is null)
 									ByRef = new List<KeyValuePair<string, int>>();
 
 								if ((Ref = this.parameters[i] as VariableReference) != null)
@@ -185,7 +185,7 @@ namespace Waher.Script.Operators.Membership
 							}
 							else if (Arguments[i].TryConvertTo(PT, out Value))
 							{
-								if (ParameterValues == null)
+								if (ParameterValues is null)
 								{
 									Extend = new bool[this.nrParameters];
 									ParameterValues = new object[this.nrParameters];
@@ -199,7 +199,7 @@ namespace Waher.Script.Operators.Membership
 								if (Arguments[i].IsScalar)
 									break;
 
-								if (Extend == null)
+								if (Extend is null)
 								{
 									Extend = new bool[this.nrParameters];
 									ParameterValues = new object[this.nrParameters];
@@ -231,7 +231,7 @@ namespace Waher.Script.Operators.Membership
 						break;
 					}
 
-					if (this.method == null)
+					if (this.method is null)
 						throw new ScriptRuntimeException("Invalid number or type of parameters.", this);
 				}
 			}
@@ -294,7 +294,7 @@ namespace Waher.Script.Operators.Membership
 					else
 					{
 						Children = Arguments[i].ChildElements;
-						if (First == null)
+						if (First is null)
 						{
 							Enumerators = new IEnumerator<IElement>[this.nrParameters];
 							First = Arguments[i];
@@ -308,7 +308,7 @@ namespace Waher.Script.Operators.Membership
 				}
 			}
 
-			if (First == null)
+			if (First is null)
 				return Expression.Encapsulate(Method.Invoke(Object, ArgumentValues));
 
 			LinkedList<IElement> Elements = new LinkedList<IElement>();

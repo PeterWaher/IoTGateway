@@ -53,7 +53,7 @@ namespace Waher.Events.Persistence
 			this.module = Event.Module;
 			this.stackTrace = Event.StackTrace;
 
-			if (Event.Tags == null)
+			if (Event.Tags is null)
 				this.tags = null;
 			else
 			{

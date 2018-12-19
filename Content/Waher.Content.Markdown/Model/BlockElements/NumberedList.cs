@@ -46,7 +46,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 				Expected++;
 				Item = E as NumberedItem;
 
-				if (Item == null)
+				if (Item is null)
 					E.GenerateHTML(Output);
 				else if (Item.Number == Expected)
 				{

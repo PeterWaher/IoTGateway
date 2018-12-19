@@ -132,7 +132,7 @@ namespace Waher.Security.DTLS
 
 		internal void CalcClientHandshakeHash()
 		{
-			if (this.clientHandshakeHash == null)
+			if (this.clientHandshakeHash is null)
 			{
 				using (IncrementalHash H = IncrementalHash.CreateHash(HashAlgorithmName.SHA256))
 				{
@@ -157,7 +157,7 @@ namespace Waher.Security.DTLS
 
 		internal void CalcServerHandshakeHash()
 		{
-			if (this.serverHandshakeHash == null)
+			if (this.serverHandshakeHash is null)
 			{
 				using (IncrementalHash H = IncrementalHash.CreateHash(HashAlgorithmName.SHA256))
 				{

@@ -39,14 +39,14 @@ namespace Waher.Script.Persistence.SQL
 
 			Items.Sort((x, y) =>
 			{
-				if (x == null)
+				if (x is null)
 				{
-					if (y == null)
+					if (y is null)
 						return 0;
 					else
 						return -1;
 				}
-				else if (y == null)
+				else if (y is null)
 					return 1;
 
 				Type Tx = x.GetType();

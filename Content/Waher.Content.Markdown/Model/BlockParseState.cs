@@ -192,7 +192,7 @@ namespace Waher.Content.Markdown.Model
 				LineBreakAfter = this.lineBreakAfter
 			};
 
-			if (this.backup == null)
+			if (this.backup is null)
 				this.backup = new LinkedList<StateBackup>();
 
 			this.backup.AddFirst(Backup);
@@ -200,7 +200,7 @@ namespace Waher.Content.Markdown.Model
 
 		public void RestoreState()
 		{
-			if (this.backup == null || this.backup.First == null)
+			if (this.backup is null || this.backup.First is null)
 				throw new Exception("No state backup to restore.");
 
 			StateBackup Backup = this.backup.First.Value;
@@ -215,7 +215,7 @@ namespace Waher.Content.Markdown.Model
 
 		public void DiscardBackup()
 		{
-			if (this.backup == null || this.backup.First == null)
+			if (this.backup is null || this.backup.First is null)
 				throw new Exception("No state backup to discard.");
 
 			this.backup.RemoveFirst();

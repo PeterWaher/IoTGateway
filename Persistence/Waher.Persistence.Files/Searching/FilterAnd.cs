@@ -33,9 +33,9 @@ namespace Waher.Persistence.Files.Searching
 
 		internal static string[] MergeConstantFields(string[] ConstantFields1, string[] ConstantFields2)
 		{
-			if (ConstantFields1 == null)
+			if (ConstantFields1 is null)
 				return ConstantFields2;
-			else if (ConstantFields2 == null)
+			else if (ConstantFields2 is null)
 				return ConstantFields1;
 			else
 			{
@@ -46,7 +46,7 @@ namespace Waher.Persistence.Files.Searching
 					if (Array.IndexOf<string>(ConstantFields1, s) >= 0)
 						continue;
 
-					if (Union == null)
+					if (Union is null)
 					{
 						Union = new List<string>();
 						Union.AddRange(ConstantFields1);
@@ -55,7 +55,7 @@ namespace Waher.Persistence.Files.Searching
 					Union.Add(s);
 				}
 
-				if (Union == null)
+				if (Union is null)
 					return ConstantFields1;
 				else
 					return Union.ToArray();

@@ -963,7 +963,7 @@ namespace Waher.Persistence.Files.Serialization
 		/// <param name="Value">Value to serialize.</param>
 		public static void WriteArray<T>(FilesProvider Provider, BinarySerializer Writer, T[] Value)
 		{
-			if (Value == null)
+			if (Value is null)
 				Writer.WriteBits(ObjectSerializer.TYPE_NULL, 6);
 			else
 			{
@@ -1013,7 +1013,7 @@ namespace Waher.Persistence.Files.Serialization
 		/// <param name="Value">Value to serialize.</param>
 		public static void WriteArray(Type T, FilesProvider Provider, BinarySerializer Writer, Array Value)
 		{
-			if (Value == null)
+			if (Value is null)
 				Writer.WriteBits(ObjectSerializer.TYPE_NULL, 6);
 			else
 			{
@@ -1032,7 +1032,7 @@ namespace Waher.Persistence.Files.Serialization
 
 				foreach (object Item in Value)
 				{
-					if (Item == null)
+					if (Item is null)
 						Writer.WriteBits(ObjectSerializer.TYPE_NULL, 6);
 					else
 					{

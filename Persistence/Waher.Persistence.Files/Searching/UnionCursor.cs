@@ -56,7 +56,7 @@ namespace Waher.Persistence.Files.Searching
 		{
 			get
 			{
-				if (this.currentCursor == null)
+				if (this.currentCursor is null)
 					throw new InvalidOperationException("Enumeration not started or has already ended.");
 				else
 					return this.currentCursor;
@@ -123,7 +123,7 @@ namespace Waher.Persistence.Files.Searching
 
 			while (true)
 			{
-				if (this.currentCursor == null)
+				if (this.currentCursor is null)
 				{
 					if (this.currentCursorPosition >= this.nrCursors)
 						return false;

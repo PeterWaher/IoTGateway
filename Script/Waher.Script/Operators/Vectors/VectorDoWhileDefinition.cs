@@ -41,7 +41,7 @@ namespace Waher.Script.Operators.Vectors
                 Elements.AddLast(this.left.Evaluate(Variables));
 
                 Condition = this.right.Evaluate(Variables) as BooleanValue;
-                if (Condition == null)
+                if (Condition is null)
                     throw new ScriptRuntimeException("Condition must evaluate to a boolean value.", this);
             }
             while (Condition.Value);

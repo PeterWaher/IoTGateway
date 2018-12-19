@@ -47,7 +47,7 @@ namespace Waher.Script.Operators.Vectors
 		{
             IElement S = this.left.Evaluate(Variables);
             ICollection<IElement> Elements = S as ICollection<IElement>;
-            if (Elements == null)
+            if (Elements is null)
             {
                 if (S is IVector Vector)
                     Elements = Vector.VectorElements;

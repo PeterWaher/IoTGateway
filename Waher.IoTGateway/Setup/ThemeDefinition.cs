@@ -328,7 +328,7 @@ namespace Waher.IoTGateway.Setup
 				d = Img.Height - Height;
 				SqrError += d * d;
 
-				if (Best == null || SqrError < BestSqrError)
+				if (Best is null || SqrError < BestSqrError)
 				{
 					Best = Img;
 					BestSqrError = SqrError;

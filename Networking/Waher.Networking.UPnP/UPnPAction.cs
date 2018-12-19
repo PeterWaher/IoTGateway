@@ -214,7 +214,7 @@ namespace Waher.Networking.UPnP
 				ResponseXml = new XmlDocument();
 				ResponseXml.Load(Stream);
 
-				if (ResponseXml.DocumentElement == null ||
+				if (ResponseXml.DocumentElement is null ||
 					ResponseXml.DocumentElement.LocalName != "Envelope" ||
 					ResponseXml.DocumentElement.NamespaceURI != "http://schemas.xmlsoap.org/soap/envelope/")
 				{
@@ -222,14 +222,14 @@ namespace Waher.Networking.UPnP
 				}
 
 				XmlElement ResponseBody = GetChildElement(ResponseXml.DocumentElement, "Body", "http://schemas.xmlsoap.org/soap/envelope/");
-				if (ResponseBody == null)
+				if (ResponseBody is null)
 					throw new Exception("Response body not found.");
 
 				XmlElement ActionResponse = GetChildElement(ResponseBody, this.name + "Response", this.parent.Service.ServiceType);
-				if (ActionResponse == null)
+				if (ActionResponse is null)
 				{
 					XmlElement ResponseFault = GetChildElement(ResponseBody, "Fault", "http://schemas.xmlsoap.org/soap/envelope/");
-					if (ResponseFault == null)
+					if (ResponseFault is null)
 						throw new Exception("Unable to parse response.");
 
 					string FaultCode = string.Empty;
@@ -285,7 +285,7 @@ namespace Waher.Networking.UPnP
 				foreach (XmlNode N in ActionResponse.ChildNodes)
 				{
 					E = N as XmlElement;
-					if (E == null)
+					if (E is null)
 						continue;
 
 					if (this.argumentByName.TryGetValue(E.LocalName, out UPnPArgument Argument2))
@@ -295,15 +295,15 @@ namespace Waher.Networking.UPnP
 							object Value2 = Variable.XmlStringToValue(E.InnerText);
 							OutputValues[E.LocalName] = Value2;
 
-							if (First == null)
+							if (First is null)
 								First = Value2;
 
-							if (Argument2.ReturnValue && Result == null)
+							if (Argument2.ReturnValue && Result is null)
 								Result = Value2;
 						}
 						else
 						{
-							if (First == null)
+							if (First is null)
 								First = E.InnerXml;
 
 							OutputValues[E.LocalName] = E.InnerXml;
@@ -311,7 +311,7 @@ namespace Waher.Networking.UPnP
 					}
 					else
 					{
-						if (First == null)
+						if (First is null)
 							First = E.InnerXml;
 
 						OutputValues[E.LocalName] = E.InnerXml;
@@ -319,7 +319,7 @@ namespace Waher.Networking.UPnP
 				}
 			}
 
-			if (Result == null)
+			if (Result is null)
 				Result = First;
 
 			return new KeyValuePair<object, Dictionary<string, object>>(Result, OutputValues);
@@ -332,7 +332,7 @@ namespace Waher.Networking.UPnP
 			foreach (XmlNode N in E.ChildNodes)
 			{
 				E2 = N as XmlElement;
-				if (E2 == null)
+				if (E2 is null)
 					continue;
 
 				if (E2.LocalName == LocalName && E2.NamespaceURI == Namespace)
@@ -349,7 +349,7 @@ namespace Waher.Networking.UPnP
 		/// <returns>Encoded attribute value.</returns>
 		public static string XmlAttributeEncode(string AttributeValue)
 		{
-			if (AttributeValue == null || AttributeValue.IndexOfAny(reservedCharacters) < 0)
+			if (AttributeValue is null || AttributeValue.IndexOfAny(reservedCharacters) < 0)
 				return AttributeValue;
 
 			return AttributeValue.

@@ -87,7 +87,7 @@ namespace Waher.Content.Xml.Text
 		{
 			XmlDocument Doc = new XmlDocument();
 
-			if (Encoding == null)
+			if (Encoding is null)
 			{
 				using (MemoryStream ms = new MemoryStream(Data))
 				{
@@ -173,7 +173,7 @@ namespace Waher.Content.Xml.Text
 					ms = new MemoryStream();
 					Settings = XML.WriterSettings(false, false);
 
-					if (Encoding == null)
+					if (Encoding is null)
 					{
 						Settings.Encoding = Encoding.UTF8;
 						ContentType = "text/xml; charset=utf-8";

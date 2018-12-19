@@ -36,7 +36,7 @@ namespace Waher.Networking.LWM2M
 		/// <param name="RemoteEndpoint">Host name or IP address of Remote endpoint.</param>
 		/// <param name="Credentials">Optional credentials to use to establish DTLS session, if required.</param>
 		public Lwm2mServerReference(string RemoteEndpoint, IDtlsCredentials Credentials)
-			: this(RemoteEndpoint, Credentials == null ? CoapEndpoint.DefaultCoapPort : CoapEndpoint.DefaultCoapsPort, Credentials)
+			: this(RemoteEndpoint, Credentials is null ? CoapEndpoint.DefaultCoapPort : CoapEndpoint.DefaultCoapsPort, Credentials)
 		{
 		}
 
@@ -69,7 +69,7 @@ namespace Waher.Networking.LWM2M
 			sb.Append("://");
 			sb.Append(this.remoteEndpoint);
 
-			if (this.credentials == null)
+			if (this.credentials is null)
 			{
 				if (Port != CoapEndpoint.DefaultCoapPort)
 				{

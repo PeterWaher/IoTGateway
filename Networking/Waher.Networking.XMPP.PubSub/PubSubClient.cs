@@ -438,7 +438,7 @@ namespace Waher.Networking.XMPP.PubSub
 					}
 				}
 
-				if (Form == null)
+				if (Form is null)
 					e.Ok = false;
 				else
 					Configuration = new NodeConfiguration(Form);
@@ -634,7 +634,7 @@ namespace Waher.Networking.XMPP.PubSub
 					}
 				}
 
-				if (Form == null)
+				if (Form is null)
 					e.Ok = false;
 				else
 					Configuration = new NodeConfiguration(Form);
@@ -1066,7 +1066,7 @@ namespace Waher.Networking.XMPP.PubSub
 					}
 				}
 
-				if (Form == null)
+				if (Form is null)
 					e.Ok = false;
 				else
 					Options = new SubscriptionOptions(Form);
@@ -1287,7 +1287,7 @@ namespace Waher.Networking.XMPP.PubSub
 					}
 				}
 
-				if (Form == null)
+				if (Form is null)
 					e.Ok = false;
 				else
 					Options = new SubscriptionOptions(Form);
@@ -1884,7 +1884,7 @@ namespace Waher.Networking.XMPP.PubSub
 				Xml.Append(Count.Value.ToString());
 			}
 
-			if (ItemIds == null)
+			if (ItemIds is null)
 				Xml.Append("'/>");
 			else
 			{

@@ -73,7 +73,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			Page DefaultPage = null;
 			Page Page;
 
-			if (Namespace == null)
+			if (Namespace is null)
 				Namespace = await Language.CreateNamespaceAsync(T.Namespace);
 
 			LinkedList<KeyValuePair<PropertyInfo, FieldInfo>> Properties = new LinkedList<KeyValuePair<PropertyInfo, FieldInfo>>();
@@ -93,7 +93,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				FieldInfo FieldInfo = Rec.Value;
 
 				NamespaceStr = (PropertyInfo?.DeclaringType ?? FieldInfo.DeclaringType).Namespace;
-				if (Namespace == null || NamespaceStr != LastNamespaceStr)
+				if (Namespace is null || NamespaceStr != LastNamespaceStr)
 				{
 					Namespace = await Language.GetNamespaceAsync(NamespaceStr);
 					LastNamespaceStr = NamespaceStr;
@@ -142,14 +142,14 @@ namespace Waher.Networking.XMPP.Concentrator
 					}
 					else if ((TextAttribute = Attr as TextAttribute) != null)
 					{
-						if (TextAttributes == null)
+						if (TextAttributes is null)
 							TextAttributes = new LinkedList<TextAttribute>();
 
 						TextAttributes.AddLast(TextAttribute);
 					}
 					else if ((OptionAttribute = Attr as OptionAttribute) != null)
 					{
-						if (Options == null)
+						if (Options is null)
 							Options = new List<KeyValuePair<string, string>>();
 
 						StringId = OptionAttribute.StringId;
@@ -179,7 +179,7 @@ namespace Waher.Networking.XMPP.Concentrator
 						DateOnly = true;
 				}
 
-				if (Header == null)
+				if (Header is null)
 					continue;
 
 				PropertyType = PropertyInfo?.PropertyType ?? FieldInfo.FieldType;
@@ -201,10 +201,10 @@ namespace Waher.Networking.XMPP.Concentrator
 
 				if (PropertyType == typeof(string[]))
 				{
-					if (ValidationMethod == null)
+					if (ValidationMethod is null)
 						ValidationMethod = new BasicValidation();
 
-					if (Options == null)
+					if (Options is null)
 					{
 						Field = new TextMultiField(Parameters, PropertyName, Header, Required, (string[])PropertyValue,
 							null, ToolTip, StringDataType.Instance, ValidationMethod, string.Empty, false, ReadOnly, false);
@@ -217,10 +217,10 @@ namespace Waher.Networking.XMPP.Concentrator
 				}
 				else if (PropertyType.GetTypeInfo().IsEnum)
 				{
-					if (ValidationMethod == null)
+					if (ValidationMethod is null)
 						ValidationMethod = new BasicValidation();
 
-					if (Options == null)
+					if (Options is null)
 					{
 						Options = new List<KeyValuePair<string, string>>();
 
@@ -229,7 +229,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					}
 
 					s = PropertyValue?.ToString();
-					if (Nullable && s == null)
+					if (Nullable && s is null)
 						s = string.Empty;
 
 					Field = new ListSingleField(Parameters, PropertyName, Header, Required, new string[] { s },
@@ -237,10 +237,10 @@ namespace Waher.Networking.XMPP.Concentrator
 				}
 				else if (PropertyType == typeof(bool))
 				{
-					if (ValidationMethod == null)
+					if (ValidationMethod is null)
 						ValidationMethod = new BasicValidation();
 
-					if (Nullable && PropertyValue == null)
+					if (Nullable && PropertyValue is null)
 						s = string.Empty;
 					else
 						s = CommonTypes.Encode((bool)PropertyValue);
@@ -267,28 +267,28 @@ namespace Waher.Networking.XMPP.Concentrator
 					{
 						DataType = ShortDataType.Instance;
 
-						if (ValidationMethod == null)
+						if (ValidationMethod is null)
 							ValidationMethod = new RangeValidation(byte.MinValue.ToString(), byte.MaxValue.ToString());
 					}
 					else if (PropertyType == typeof(ushort))
 					{
 						DataType = IntDataType.Instance;
 
-						if (ValidationMethod == null)
+						if (ValidationMethod is null)
 							ValidationMethod = new RangeValidation(ushort.MinValue.ToString(), ushort.MaxValue.ToString());
 					}
 					else if (PropertyType == typeof(uint))
 					{
 						DataType = LongDataType.Instance;
 
-						if (ValidationMethod == null)
+						if (ValidationMethod is null)
 							ValidationMethod = new RangeValidation(uint.MinValue.ToString(), uint.MaxValue.ToString());
 					}
 					else if (PropertyType == typeof(ulong))
 					{
 						DataType = IntegerDataType.Instance;
 
-						if (ValidationMethod == null)
+						if (ValidationMethod is null)
 							ValidationMethod = new RangeValidation(ulong.MinValue.ToString(), ulong.MaxValue.ToString());
 					}
 					else if (PropertyType == typeof(DateTime))
@@ -318,11 +318,11 @@ namespace Waher.Networking.XMPP.Concentrator
 					else
 						DataType = StringDataType.Instance;
 
-					if (ValidationMethod == null)
+					if (ValidationMethod is null)
 						ValidationMethod = new BasicValidation();
 
 					s = PropertyValue?.ToString();
-					if (Nullable && s == null)
+					if (Nullable && s is null)
 						s = string.Empty;
 
 					if (Masked)
@@ -331,7 +331,7 @@ namespace Waher.Networking.XMPP.Concentrator
 							Options?.ToArray(), ToolTip, DataType, ValidationMethod,
 							string.Empty, false, ReadOnly, false);
 					}
-					else if (Options == null)
+					else if (Options is null)
 					{
 						Field = new TextSingleField(Parameters, PropertyName, Header, Required, new string[] { s },
 							null, ToolTip, DataType, ValidationMethod, string.Empty, false, ReadOnly, false);
@@ -343,12 +343,12 @@ namespace Waher.Networking.XMPP.Concentrator
 					}
 				}
 
-				if (Field == null)
+				if (Field is null)
 					continue;
 
 				if (string.IsNullOrEmpty(PageLabel))
 				{
-					if (DefaultPage == null)
+					if (DefaultPage is null)
 					{
 						DefaultPage = new Page(Parameters, string.Empty)
 						{
@@ -416,7 +416,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				}
 				else
 				{
-					if (SectionByPageAndSectionLabel == null)
+					if (SectionByPageAndSectionLabel is null)
 						SectionByPageAndSectionLabel = new Dictionary<string, Section>();
 
 					s = PageLabel + " \xa0 " + SectionLabel;
@@ -534,7 +534,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 		private static void AddError(ref List<KeyValuePair<string, string>> Errors, string Field, string Error)
 		{
-			if (Errors == null)
+			if (Errors is null)
 				Errors = new List<KeyValuePair<string, string>>();
 
 			Errors.Add(new KeyValuePair<string, string>(Field, Error));
@@ -594,18 +594,18 @@ namespace Waher.Networking.XMPP.Concentrator
 			bool ValidOption;
 			bool Nullable;
 
-			if (Namespace == null)
+			if (Namespace is null)
 				Namespace = await Language.CreateNamespaceAsync(T.Namespace);
 
-			if (ConcentratorNamespace == null)
+			if (ConcentratorNamespace is null)
 				ConcentratorNamespace = await Language.CreateNamespaceAsync(typeof(ConcentratorServer).Namespace);
 
 			foreach (Field Field in Form.Fields)
 			{
 				PropertyInfo = T.GetRuntimeProperty(Field.Var);
-				FieldInfo = PropertyInfo == null ? T.GetRuntimeField(Field.Var) : null;
+				FieldInfo = PropertyInfo is null ? T.GetRuntimeField(Field.Var) : null;
 
-				if (PropertyInfo == null && FieldInfo == null)
+				if (PropertyInfo is null && FieldInfo is null)
 				{
 					AddError(ref Errors, Field.Var, await ConcentratorNamespace.GetStringAsync(1, "Property not found."));
 					continue;
@@ -618,7 +618,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				}
 
 				NamespaceStr = (PropertyInfo?.DeclaringType ?? FieldInfo.DeclaringType).Namespace;
-				if (Namespace == null || NamespaceStr != LastNamespaceStr)
+				if (Namespace is null || NamespaceStr != LastNamespaceStr)
 				{
 					Namespace = await Language.GetNamespaceAsync(NamespaceStr);
 					LastNamespaceStr = NamespaceStr;
@@ -694,7 +694,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				{
 					if (PropertyType == typeof(string[]))
 					{
-						if (ValidationMethod == null)
+						if (ValidationMethod is null)
 							ValidationMethod = new BasicValidation();
 
 						ValueToSet = ValueToSet2 = Parsed = Field.ValueStrings;
@@ -702,7 +702,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					}
 					else if (PropertyType.GetTypeInfo().IsEnum)
 					{
-						if (ValidationMethod == null)
+						if (ValidationMethod is null)
 							ValidationMethod = new BasicValidation();
 
 						try
@@ -717,7 +717,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					}
 					else if (PropertyType == typeof(bool))
 					{
-						if (ValidationMethod == null)
+						if (ValidationMethod is null)
 							ValidationMethod = new BasicValidation();
 
 						if (!CommonTypes.TryParse(Field.ValueString, out bool b))
@@ -745,28 +745,28 @@ namespace Waher.Networking.XMPP.Concentrator
 						{
 							DataType = ShortDataType.Instance;
 
-							if (ValidationMethod == null)
+							if (ValidationMethod is null)
 								ValidationMethod = new RangeValidation(byte.MinValue.ToString(), byte.MaxValue.ToString());
 						}
 						else if (PropertyType == typeof(ushort))
 						{
 							DataType = IntDataType.Instance;
 
-							if (ValidationMethod == null)
+							if (ValidationMethod is null)
 								ValidationMethod = new RangeValidation(ushort.MinValue.ToString(), ushort.MaxValue.ToString());
 						}
 						else if (PropertyType == typeof(uint))
 						{
 							DataType = LongDataType.Instance;
 
-							if (ValidationMethod == null)
+							if (ValidationMethod is null)
 								ValidationMethod = new RangeValidation(uint.MinValue.ToString(), uint.MaxValue.ToString());
 						}
 						else if (PropertyType == typeof(ulong))
 						{
 							DataType = IntegerDataType.Instance;
 
-							if (ValidationMethod == null)
+							if (ValidationMethod is null)
 								ValidationMethod = new RangeValidation(ulong.MinValue.ToString(), ulong.MaxValue.ToString());
 						}
 						else if (PropertyType == typeof(DateTime))
@@ -796,12 +796,12 @@ namespace Waher.Networking.XMPP.Concentrator
 						else
 							DataType = null;
 
-						if (ValidationMethod == null)
+						if (ValidationMethod is null)
 							ValidationMethod = new BasicValidation();
 
 						try
 						{
-							if (DataType == null)
+							if (DataType is null)
 							{
 								ValueToSet = Field.ValueString;
 								ValueToSet2 = Activator.CreateInstance(PropertyType, ValueToSet);
@@ -823,7 +823,7 @@ namespace Waher.Networking.XMPP.Concentrator
 						}
 					}
 
-					if (Parsed == null)
+					if (Parsed is null)
 						Parsed = new object[] { ValueToSet };
 
 					ValidationMethod.Validate(Field, DataType, Parsed, Field.ValueStrings);
@@ -834,13 +834,13 @@ namespace Waher.Networking.XMPP.Concentrator
 					}
 				}
 
-				if (ToSet == null)
+				if (ToSet is null)
 					ToSet = new LinkedList<Tuple<PropertyInfo, FieldInfo, object>>();
 
 				ToSet.AddLast(new Tuple<PropertyInfo, FieldInfo, object>(PropertyInfo, FieldInfo, ValueToSet2));
 			}
 
-			if (Errors == null)
+			if (Errors is null)
 			{
 				SetEditableFormResult Result = new SetEditableFormResult()
 				{
@@ -856,9 +856,9 @@ namespace Waher.Networking.XMPP.Concentrator
 						{
 							object Current = P.Item1?.GetValue(EditableObject) ?? P.Item2?.GetValue(EditableObject);
 
-							if (Current == null)
+							if (Current is null)
 							{
-								if (P.Item3 == null)
+								if (P.Item3 is null)
 									continue;
 							}
 							else if (P.Item3 != null && Current.Equals(P.Item3))
@@ -909,7 +909,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					continue;
 
 				F2 = SecondaryForm[F.Var];
-				if (F2 == null || !F.Merge(F2))
+				if (F2 is null || !F.Merge(F2))
 					F.Exclude = true;
 			}
 		}

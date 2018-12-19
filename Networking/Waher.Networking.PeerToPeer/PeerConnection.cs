@@ -550,14 +550,14 @@ namespace Waher.Networking.PeerToPeer
 
 						if ((short)(PacketNr - this.lastReceivedPacket) > 0)
 						{
-							if (FirstPacket == null)
+							if (FirstPacket is null)
 							{
 								FirstPacket = Packet;
 								FirstPacketNr = PacketNr;
 							}
 							else
 							{
-								if (LostPackets == null)
+								if (LostPackets is null)
 									LostPackets = new LinkedList<KeyValuePair<ushort, byte[]>>();
 
 								LostPackets.AddFirst(new KeyValuePair<ushort, byte[]>(PacketNr, Packet));   // Reverse order

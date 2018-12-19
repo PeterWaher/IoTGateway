@@ -115,7 +115,7 @@ namespace Waher.Script
 				{ "XOR", true }
 			};
 
-			if (customKeyWords == null)
+			if (customKeyWords is null)
 				Search();
 
 			foreach (IKeyWord KeyWord in customKeyWords.Values)
@@ -225,7 +225,7 @@ namespace Waher.Script
 
 		internal ScriptNode AssertOperandNotNull(ScriptNode Node)
 		{
-			if (Node == null)
+			if (Node is null)
 				throw new SyntaxException("Operand missing.", this.pos, this.script);
 
 			return Node;
@@ -233,7 +233,7 @@ namespace Waher.Script
 
 		internal ScriptNode AssertRightOperandNotNull(ScriptNode Node)
 		{
-			if (Node == null)
+			if (Node is null)
 				throw new SyntaxException("Right operand missing.", this.pos, this.script);
 
 			return Node;
@@ -244,9 +244,9 @@ namespace Waher.Script
 			ScriptNode Node = this.ParseStatement();
 			this.SkipWhiteSpace();
 
-			if (Node == null)
+			if (Node is null)
 			{
-				while (Node == null && this.PeekNextChar() == ';')
+				while (Node is null && this.PeekNextChar() == ';')
 				{
 					this.pos++;
 					Node = this.ParseStatement();
@@ -254,7 +254,7 @@ namespace Waher.Script
 				}
 			}
 
-			if (Node == null)
+			if (Node is null)
 				return null;
 
 			int Start = Node.Start;
@@ -274,7 +274,7 @@ namespace Waher.Script
 					{
 						this.pos++;
 						Node2 = this.ParseStatement();
-						if (Node2 == null)
+						if (Node2 is null)
 							break;
 
 						Statements.AddLast(Node2);
@@ -344,11 +344,11 @@ namespace Waher.Script
 						case "FOREACH":
 							this.pos += 7;
 							In In = this.AssertOperandNotNull(this.ParseList()) as In;
-							if (In == null)
+							if (In is null)
 								throw new SyntaxException("IN statement expected", this.pos, this.script);
 
 							VariableReference Ref = In.LeftOperand as VariableReference;
-							if (Ref == null)
+							if (Ref is null)
 								throw new SyntaxException("Variable reference expected", Ref.Start, this.script);
 
 							this.SkipWhiteSpace();
@@ -371,11 +371,11 @@ namespace Waher.Script
 							{
 								this.pos += 4;
 								In = this.AssertOperandNotNull(this.ParseList()) as In;
-								if (In == null)
+								if (In is null)
 									throw new SyntaxException("IN statement expected", this.pos, this.script);
 
 								Ref = In.LeftOperand as VariableReference;
-								if (Ref == null)
+								if (Ref is null)
 									throw new SyntaxException("Variable reference expected", Ref.Start, this.script);
 
 								this.SkipWhiteSpace();
@@ -503,7 +503,7 @@ namespace Waher.Script
 			ScriptNode Node = this.ParseIf();
 			int Start;
 
-			if (Node == null)   // Allow null
+			if (Node is null)   // Allow null
 				Start = this.pos;
 			else
 				Start = Node.Start;
@@ -568,7 +568,7 @@ namespace Waher.Script
 			else
 			{
 				Condition = this.ParseAssignments();
-				if (Condition == null)
+				if (Condition is null)
 					return null;
 
 				this.SkipWhiteSpace();
@@ -594,7 +594,7 @@ namespace Waher.Script
 		internal ScriptNode ParseAssignments()
 		{
 			ScriptNode Left = this.ParseLambdaExpression();
-			if (Left == null)
+			if (Left is null)
 				return null;
 
 			int Start = Left.Start;
@@ -639,7 +639,7 @@ namespace Waher.Script
 								{
 									ArgumentType = ArgumentType.Vector;
 
-									if ((Ref = ((ToVector)Argument).Operand as VariableReference) == null)
+									if ((Ref = ((ToVector)Argument).Operand as VariableReference) is null)
 									{
 										throw new SyntaxException("Expected variable reference, with optional scalar, vector, set or matrix attribute types.",
 											Argument.Start, this.script);
@@ -649,7 +649,7 @@ namespace Waher.Script
 								{
 									ArgumentType = ArgumentType.Matrix;
 
-									if ((Ref = ((ToMatrix)Argument).Operand as VariableReference) == null)
+									if ((Ref = ((ToMatrix)Argument).Operand as VariableReference) is null)
 									{
 										throw new SyntaxException("Expected variable reference, with optional scalar, vector, set or matrix attribute types.",
 											Argument.Start, this.script);
@@ -659,7 +659,7 @@ namespace Waher.Script
 								{
 									ArgumentType = ArgumentType.Set;
 
-									if ((Ref = ((ToSet)Argument).Operand as VariableReference) == null)
+									if ((Ref = ((ToSet)Argument).Operand as VariableReference) is null)
 									{
 										throw new SyntaxException("Expected variable reference, with optional scalar, vector, set or matrix attribute types.",
 											Argument.Start, this.script);
@@ -670,7 +670,7 @@ namespace Waher.Script
 									ArgumentType = ArgumentType.Scalar;
 
 									VectorDefinition Def = (VectorDefinition)Argument;
-									if (Def.Elements.Length != 1 || (Ref = Def.Elements[0] as VariableReference) == null)
+									if (Def.Elements.Length != 1 || (Ref = Def.Elements[0] as VariableReference) is null)
 									{
 										throw new SyntaxException("Expected variable reference, with optional scalar, vector, set or matrix attribute types.",
 											Argument.Start, this.script);
@@ -710,7 +710,7 @@ namespace Waher.Script
 					{
 						this.pos++;
 
-						if (Ref == null)
+						if (Ref is null)
 							throw new SyntaxException("The += operator can only work on variable references.", this.pos, this.script);
 
 						ScriptNode Right = this.AssertRightOperandNotNull(this.ParseStatement());
@@ -728,7 +728,7 @@ namespace Waher.Script
 					{
 						this.pos++;
 
-						if (Ref == null)
+						if (Ref is null)
 							throw new SyntaxException("The -= operator can only work on variable references.", this.pos, this.script);
 
 						ScriptNode Right = this.AssertRightOperandNotNull(this.ParseStatement());
@@ -747,7 +747,7 @@ namespace Waher.Script
 					{
 						this.pos++;
 
-						if (Ref == null)
+						if (Ref is null)
 							throw new SyntaxException("The *= operator can only work on variable references.", this.pos, this.script);
 
 						ScriptNode Right = this.AssertRightOperandNotNull(this.ParseStatement());
@@ -765,7 +765,7 @@ namespace Waher.Script
 					{
 						this.pos++;
 
-						if (Ref == null)
+						if (Ref is null)
 							throw new SyntaxException("The /= operator can only work on variable references.", this.pos, this.script);
 
 						ScriptNode Right = this.AssertRightOperandNotNull(this.ParseStatement());
@@ -783,7 +783,7 @@ namespace Waher.Script
 					{
 						this.pos++;
 
-						if (Ref == null)
+						if (Ref is null)
 							throw new SyntaxException("The ^= operator can only work on variable references.", this.pos, this.script);
 
 						ScriptNode Right = this.AssertRightOperandNotNull(this.ParseStatement());
@@ -802,7 +802,7 @@ namespace Waher.Script
 						case '=':
 							this.pos++;
 
-							if (Ref == null)
+							if (Ref is null)
 								throw new SyntaxException("The &= operator can only work on variable references.", this.pos, this.script);
 
 							ScriptNode Right = this.AssertRightOperandNotNull(this.ParseStatement());
@@ -814,7 +814,7 @@ namespace Waher.Script
 							{
 								this.pos++;
 
-								if (Ref == null)
+								if (Ref is null)
 									throw new SyntaxException("The &&= operator can only work on variable references.", this.pos, this.script);
 
 								Right = this.AssertRightOperandNotNull(this.ParseStatement());
@@ -838,7 +838,7 @@ namespace Waher.Script
 						case '=':
 							this.pos++;
 
-							if (Ref == null)
+							if (Ref is null)
 								throw new SyntaxException("The |= operator can only work on variable references.", this.pos, this.script);
 
 							ScriptNode Right = this.AssertRightOperandNotNull(this.ParseStatement());
@@ -850,7 +850,7 @@ namespace Waher.Script
 							{
 								this.pos++;
 
-								if (Ref == null)
+								if (Ref is null)
 									throw new SyntaxException("The ||= operator can only work on variable references.", this.pos, this.script);
 
 								Right = this.AssertRightOperandNotNull(this.ParseStatement());
@@ -876,7 +876,7 @@ namespace Waher.Script
 						{
 							this.pos++;
 
-							if (Ref == null)
+							if (Ref is null)
 								throw new SyntaxException("The <<= operator can only work on variable references.", this.pos, this.script);
 
 							ScriptNode Right = this.AssertRightOperandNotNull(this.ParseStatement());
@@ -903,7 +903,7 @@ namespace Waher.Script
 						{
 							this.pos++;
 
-							if (Ref == null)
+							if (Ref is null)
 								throw new SyntaxException("The >>= operator can only work on variable references.", this.pos, this.script);
 
 							ScriptNode Right = this.AssertRightOperandNotNull(this.ParseStatement());
@@ -929,7 +929,7 @@ namespace Waher.Script
 		internal ScriptNode ParseLambdaExpression()
 		{
 			ScriptNode Left = this.ParseEquivalence();
-			if (Left == null)
+			if (Left is null)
 				return null;
 
 			this.SkipWhiteSpace();
@@ -953,7 +953,7 @@ namespace Waher.Script
 					else if (Left is ToVector)
 					{
 						Ref = ((ToVector)Left).Operand as VariableReference;
-						if (Ref == null)
+						if (Ref is null)
 						{
 							throw new SyntaxException("Expected variable reference, with optional scalar, vector, set or matrix attribute types.",
 								Left.Start, this.script);
@@ -965,7 +965,7 @@ namespace Waher.Script
 					else if (Left is ToMatrix)
 					{
 						Ref = ((ToMatrix)Left).Operand as VariableReference;
-						if (Ref == null)
+						if (Ref is null)
 						{
 							throw new SyntaxException("Expected variable reference, with optional scalar, vector, set or matrix attribute types.",
 								Left.Start, this.script);
@@ -977,7 +977,7 @@ namespace Waher.Script
 					else if (Left is ToSet)
 					{
 						Ref = ((ToSet)Left).Operand as VariableReference;
-						if (Ref == null)
+						if (Ref is null)
 						{
 							throw new SyntaxException("Expected variable reference, with optional scalar, vector, set or matrix attribute types.",
 								Left.Start, this.script);
@@ -988,7 +988,7 @@ namespace Waher.Script
 					}
 					else if (Left is VectorDefinition Def)
 					{
-						if (Def.Elements.Length != 1 || (Ref = Def.Elements[0] as VariableReference) == null)
+						if (Def.Elements.Length != 1 || (Ref = Def.Elements[0] as VariableReference) is null)
 						{
 							throw new SyntaxException("Expected variable reference, with optional scalar, vector, set or matrix attribute types.",
 								Left.Start, this.script);
@@ -1015,7 +1015,7 @@ namespace Waher.Script
 							else if (Argument is ToVector)
 							{
 								Ref = ((ToVector)Argument).Operand as VariableReference;
-								if (Ref == null)
+								if (Ref is null)
 								{
 									throw new SyntaxException("Expected variable reference, with optional scalar, vector, set or matrix attribute types.",
 										Argument.Start, this.script);
@@ -1026,7 +1026,7 @@ namespace Waher.Script
 							else if (Argument is ToMatrix)
 							{
 								Ref = ((ToMatrix)Argument).Operand as VariableReference;
-								if (Ref == null)
+								if (Ref is null)
 								{
 									throw new SyntaxException("Expected variable reference, with optional scalar, vector, set or matrix attribute types.",
 										Argument.Start, this.script);
@@ -1037,7 +1037,7 @@ namespace Waher.Script
 							else if (Argument is ToSet)
 							{
 								Ref = ((ToSet)Argument).Operand as VariableReference;
-								if (Ref == null)
+								if (Ref is null)
 								{
 									throw new SyntaxException("Expected variable reference, with optional scalar, vector, set or matrix attribute types.",
 										Argument.Start, this.script);
@@ -1047,7 +1047,7 @@ namespace Waher.Script
 							}
 							else if (Argument is VectorDefinition Def2)
 							{
-								if (Def2.Elements.Length != 1 || (Ref = Def2.Elements[0] as VariableReference) == null)
+								if (Def2.Elements.Length != 1 || (Ref = Def2.Elements[0] as VariableReference) is null)
 								{
 									throw new SyntaxException("Expected variable reference, with optional scalar, vector, set or matrix attribute types.",
 										Left.Start, this.script);
@@ -1068,7 +1068,7 @@ namespace Waher.Script
 						throw new SyntaxException("Invalid argument list.", Left.Start, this.script);
 
 					ScriptNode Operand = this.ParseEquivalence();
-					if (Operand == null)
+					if (Operand is null)
 						throw new SyntaxException("Lambda function body missing.", this.pos, this.script);
 
 					return new LambdaDefinition(ArgumentNames, ArgumentTypes, Operand, Start, this.pos - Start, this);
@@ -1083,7 +1083,7 @@ namespace Waher.Script
 		internal ScriptNode ParseEquivalence()
 		{
 			ScriptNode Left = this.ParseOrs();
-			if (Left == null)
+			if (Left is null)
 				return null;
 
 			int Start = Left.Start;
@@ -1130,7 +1130,7 @@ namespace Waher.Script
 		internal ScriptNode ParseOrs()
 		{
 			ScriptNode Left = this.ParseAnds();
-			if (Left == null)
+			if (Left is null)
 				return null;
 
 			ScriptNode Right;
@@ -1216,7 +1216,7 @@ namespace Waher.Script
 		internal ScriptNode ParseAnds()
 		{
 			ScriptNode Left = this.ParseMembership();
-			if (Left == null)
+			if (Left is null)
 				return null;
 
 			ScriptNode Right;
@@ -1289,7 +1289,7 @@ namespace Waher.Script
 		internal ScriptNode ParseMembership()
 		{
 			ScriptNode Left = this.ParseComparison();
-			if (Left == null)
+			if (Left is null)
 				return null;
 
 			ScriptNode Right;
@@ -1374,7 +1374,7 @@ namespace Waher.Script
 		internal ScriptNode ParseComparison()
 		{
 			ScriptNode Left = this.ParseShifts();
-			if (Left == null)
+			if (Left is null)
 				return null;
 
 			ScriptNode Right;
@@ -1640,7 +1640,7 @@ namespace Waher.Script
 		internal ScriptNode ParseShifts()
 		{
 			ScriptNode Left = this.ParseUnions();
-			if (Left == null)
+			if (Left is null)
 				return null;
 
 			ScriptNode Right;
@@ -1702,7 +1702,7 @@ namespace Waher.Script
 		internal ScriptNode ParseUnions()
 		{
 			ScriptNode Left = this.ParseIntersections();
-			if (Left == null)
+			if (Left is null)
 				return null;
 
 			ScriptNode Right;
@@ -1737,7 +1737,7 @@ namespace Waher.Script
 		internal ScriptNode ParseIntersections()
 		{
 			ScriptNode Left = this.ParseInterval();
-			if (Left == null)
+			if (Left is null)
 				return null;
 
 			ScriptNode Right;
@@ -1781,7 +1781,7 @@ namespace Waher.Script
 		internal ScriptNode ParseInterval()
 		{
 			ScriptNode From = this.ParseTerms();
-			if (From == null)
+			if (From is null)
 				return null;
 
 			this.SkipWhiteSpace();
@@ -1813,7 +1813,7 @@ namespace Waher.Script
 		internal ScriptNode ParseTerms()
 		{
 			ScriptNode Left = this.ParseBinomialCoefficients();
-			if (Left == null)
+			if (Left is null)
 				return null;
 
 			ScriptNode Right;
@@ -1879,7 +1879,7 @@ namespace Waher.Script
 		internal ScriptNode ParseBinomialCoefficients()
 		{
 			ScriptNode Left = this.ParseFactors();
-			if (Left == null)
+			if (Left is null)
 				return null;
 
 			ScriptNode Right;
@@ -1902,7 +1902,7 @@ namespace Waher.Script
 		internal ScriptNode ParseFactors()
 		{
 			ScriptNode Left = this.ParsePowers();
-			if (Left == null)
+			if (Left is null)
 				return null;
 
 			ScriptNode Right;
@@ -2036,7 +2036,7 @@ namespace Waher.Script
 		internal ScriptNode ParsePowers()
 		{
 			ScriptNode Left = this.ParseUnaryPrefixOperator();
-			if (Left == null)
+			if (Left is null)
 				return null;
 
 			ScriptNode Right;
@@ -2162,7 +2162,7 @@ namespace Waher.Script
 		internal ScriptNode ParseSuffixOperator()
 		{
 			ScriptNode Node = this.ParseObject();
-			if (Node == null)
+			if (Node is null)
 				return null;
 
 			int Start = Node.Start;
@@ -2192,7 +2192,7 @@ namespace Waher.Script
 						ScriptNode Right = this.AssertRightOperandNotNull(this.ParseObject());
 						VariableReference Ref = Right as VariableReference;
 
-						if (Ref == null)
+						if (Ref is null)
 							Node = new DynamicMember(Node, Right, Start, this.pos - Start, this);
 						else
 							Node = new NamedMember(Node, Ref.VariableName, Start, this.pos - Start, this);
@@ -2210,11 +2210,11 @@ namespace Waher.Script
 						this.pos++;
 
 						Ref = Node as VariableReference;
-						if (Ref == null)
+						if (Ref is null)
 						{
 							if (Node is NamedMember NamedMember)
 							{
-								if (Right == null)
+								if (Right is null)
 									Node = new NamedMethodCall(NamedMember.Operand, NamedMember.Name, new ScriptNode[0], Start, this.pos - Start, this);
 								else if (Right.GetType() == typeof(ElementList))
 									Node = new NamedMethodCall(NamedMember.Operand, NamedMember.Name, ((ElementList)Right).Elements, Start, this.pos - Start, this);
@@ -2223,7 +2223,7 @@ namespace Waher.Script
 							}// TODO: Dynamic named method call.
 							else
 							{
-								if (Right == null)
+								if (Right is null)
 									Node = new DynamicFunctionCall(Node, new ScriptNode[0], Start, this.pos - Start, this);
 								else if (Right.GetType() == typeof(ElementList))
 									Node = new DynamicFunctionCall(Node, ((ElementList)Right).Elements, Start, this.pos - Start, this);
@@ -2239,7 +2239,7 @@ namespace Waher.Script
 					case '[':
 						this.pos++;
 						Right = this.ParseList();
-						if (Right == null)
+						if (Right is null)
 							Node = new ToVector(Node, Start, this.pos - Start, this);
 						else if (Right.GetType() == typeof(ElementList))
 						{
@@ -2247,14 +2247,14 @@ namespace Waher.Script
 
 							if (List.Elements.Length == 2)
 							{
-								if (List.Elements[0] == null)
+								if (List.Elements[0] is null)
 								{
-									if (List.Elements[1] == null)
+									if (List.Elements[1] is null)
 										Node = new ToMatrix(Node, Start, this.pos - Start, this);
 									else
 										Node = new RowVector(Node, List.Elements[1], Start, this.pos - Start, this);
 								}
-								else if (List.Elements[1] == null)
+								else if (List.Elements[1] is null)
 									Node = new ColumnVector(Node, List.Elements[0], Start, this.pos - Start, this);
 								else
 									Node = new MatrixIndex(Node, List.Elements[0], List.Elements[1], Start, this.pos - Start, this);
@@ -2294,7 +2294,7 @@ namespace Waher.Script
 						{
 							this.pos++;
 							Ref = Node as VariableReference;
-							if (Ref == null)
+							if (Ref is null)
 							{
 								this.pos -= 2;  // Can be a prefix operator.
 								return Node;
@@ -2315,7 +2315,7 @@ namespace Waher.Script
 						{
 							this.pos++;
 							Ref = Node as VariableReference;
-							if (Ref == null)
+							if (Ref is null)
 							{
 								this.pos -= 2;  // Can be a prefix operator.
 								return Node;
@@ -2468,7 +2468,7 @@ namespace Waher.Script
 							Bak = this.pos;
 
 							Unit Unit = this.ParseUnit(true);
-							if (Unit == null)
+							if (Unit is null)
 							{
 								this.pos = Bak;
 								return Node;
@@ -2551,7 +2551,7 @@ namespace Waher.Script
 				{
 					Unit Unit = this.ParseUnit(false);
 
-					if (Unit == null)
+					if (Unit is null)
 					{
 						this.pos = Start;
 						return null;
@@ -2706,7 +2706,7 @@ namespace Waher.Script
 					else
 						Exponent = 1;
 
-					if (CompoundFactors == null)
+					if (CompoundFactors is null)
 					{
 						if (LastDivision)
 							Factors.AddLast(new KeyValuePair<AtomicUnit, int>(new AtomicUnit(Name), -Exponent));
@@ -2753,7 +2753,7 @@ namespace Waher.Script
 
 			this.pos = LastCompletion;
 
-			if (Factors.First == null)
+			if (Factors.First is null)
 			{
 				this.pos = Start;
 				return null;
@@ -2769,7 +2769,7 @@ namespace Waher.Script
 			ElementList ElementList = null;
 			object[] P;
 
-			if (Arguments == null)
+			if (Arguments is null)
 			{
 				NrParameters = 0;
 				P = new object[3];
@@ -2793,7 +2793,7 @@ namespace Waher.Script
 			P[NrParameters + 2] = Expression;
 
 			F = functions;
-			if (F == null)
+			if (F is null)
 			{
 				Search();
 				F = functions;
@@ -2805,7 +2805,7 @@ namespace Waher.Script
 			{
 				if (ElementList != null)
 					return new NamedFunctionCall(FunctionName, ElementList.Elements, Start, Length, Expression);
-				else if (Arguments == null)
+				else if (Arguments is null)
 					return new NamedFunctionCall(FunctionName, new ScriptNode[0], Start, Length, Expression);
 				else
 					return new NamedFunctionCall(FunctionName, new ScriptNode[] { Arguments }, Start, Length, Expression);
@@ -2815,7 +2815,7 @@ namespace Waher.Script
 		internal static bool TryGetConstant(string Name, out IElement ValueElement)
 		{
 			Dictionary<string, IConstant> C = constants;
-			if (C == null)
+			if (C is null)
 			{
 				Search();
 				C = constants;
@@ -2837,7 +2837,7 @@ namespace Waher.Script
 			Dictionary<string, FunctionRef> F;
 
 			F = functions;
-			if (F == null)
+			if (F is null)
 			{
 				Search();
 				F = functions;
@@ -2872,7 +2872,7 @@ namespace Waher.Script
 		{
 			lock (searchSynch)
 			{
-				if (functions == null)
+				if (functions is null)
 				{
 					Dictionary<int, object[]> ParameterValuesPerNrParameters = new Dictionary<int, object[]>();
 					Dictionary<string, FunctionRef> Found = new Dictionary<string, FunctionRef>(StringComparer.CurrentCultureIgnoreCase);
@@ -2932,7 +2932,7 @@ namespace Waher.Script
 								}
 
 								Function = CI.Invoke(ParameterValues) as Function;
-								if (Function == null)
+								if (Function is null)
 									continue;
 
 								s = Function.FunctionName + " " + (c - 3).ToString();
@@ -3004,7 +3004,7 @@ namespace Waher.Script
 					functions = Found;
 				}
 
-				if (constants == null)
+				if (constants is null)
 				{
 					Dictionary<string, IConstant> Found = new Dictionary<string, IConstant>(StringComparer.CurrentCultureIgnoreCase);
 					string[] Aliases;
@@ -3054,7 +3054,7 @@ namespace Waher.Script
 					constants = Found;
 				}
 
-				if (customKeyWords == null)
+				if (customKeyWords is null)
 				{
 					Dictionary<string, IKeyWord> Found = new Dictionary<string, IKeyWord>(StringComparer.CurrentCultureIgnoreCase);
 					string[] Aliases;
@@ -3459,7 +3459,7 @@ namespace Waher.Script
 						return new ConstantElement(ObjectValue.Null, Start, this.pos - Start, this);
 
 					default:
-						if (customKeyWords == null)
+						if (customKeyWords is null)
 							Search();
 
 						if (customKeyWords.TryGetValue(s, out IKeyWord KeyWord))
@@ -3661,7 +3661,7 @@ namespace Waher.Script
 
 			foreach (double d in Value)
 			{
-				if (sb == null)
+				if (sb is null)
 					sb = new StringBuilder("[");
 				else
 					sb.Append(", ");
@@ -3669,7 +3669,7 @@ namespace Waher.Script
 				sb.Append(ToString(d));
 			}
 
-			if (sb == null)
+			if (sb is null)
 				return "[]";
 			else
 			{
@@ -3689,7 +3689,7 @@ namespace Waher.Script
 
 			foreach (Complex z in Value)
 			{
-				if (sb == null)
+				if (sb is null)
 					sb = new StringBuilder("[");
 				else
 					sb.Append(", ");
@@ -3697,7 +3697,7 @@ namespace Waher.Script
 				sb.Append(Expression.ToString(z));
 			}
 
-			if (sb == null)
+			if (sb is null)
 				return "[]";
 			else
 			{
@@ -3884,7 +3884,7 @@ namespace Waher.Script
 
 				return sb.ToString();
 			}
-			else if (Value == null)
+			else if (Value is null)
 				return "null";
 			else
 				return Value.ToString();
@@ -3967,7 +3967,7 @@ namespace Waher.Script
 		/// <returns>Encapsulated object.</returns>
 		public static IElement Encapsulate(object Value)
 		{
-			if (Value == null)
+			if (Value is null)
 				return ObjectValue.Null;
 			else if (Value is double db)
 				return new DoubleNumber(db);

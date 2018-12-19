@@ -102,7 +102,7 @@ namespace Waher.Client.WPF.Controls.Questions
 
 			this.parametersListBox = ListBox;
 
-			if (this.availableParameterNames == null)
+			if (this.availableParameterNames is null)
 			{
 				if (this.parameterNames != null)
 				{
@@ -124,7 +124,7 @@ namespace Waher.Client.WPF.Controls.Questions
 					ListBox.Items.Add(new ListBoxItem()
 					{
 						Content = ParameterName,
-						IsSelected = (this.parameterNames == null || Array.IndexOf<string>(this.parameterNames, ParameterName) >= 0),
+						IsSelected = (this.parameterNames is null || Array.IndexOf<string>(this.parameterNames, ParameterName) >= 0),
 						Tag = ParameterName
 					});
 				}
@@ -132,7 +132,7 @@ namespace Waher.Client.WPF.Controls.Questions
 
 			StackPanel StackPanel = CanReadQuestion.AddAllClearButtons(Details, ListBox);
 
-			if (this.availableParameterNames == null)
+			if (this.availableParameterNames is null)
 			{
 				StackPanel.Children.Add(Button = new Button()
 				{
@@ -217,7 +217,7 @@ namespace Waher.Client.WPF.Controls.Questions
 			((Button)sender).IsEnabled = false;
 
 			RosterItem Item = Client[this.JID];
-			if (Item == null || Item.State == SubscriptionState.None || Item.State == SubscriptionState.From)
+			if (Item is null || Item.State == SubscriptionState.None || Item.State == SubscriptionState.From)
 			{
 				if (!this.registered)
 				{
@@ -292,7 +292,7 @@ namespace Waher.Client.WPF.Controls.Questions
 					DispatcherOperation Op = MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() =>
 					{
 						SortedDictionary<string, bool> Selected = null;
-						bool AllSelected = this.parameterNames == null;
+						bool AllSelected = this.parameterNames is null;
 
 						if (!AllSelected)
 						{
@@ -341,7 +341,7 @@ namespace Waher.Client.WPF.Controls.Questions
 					All = false;
 			}
 
-			if (this.availableParameterNames == null || !All)
+			if (this.availableParameterNames is null || !All)
 				return Result.ToArray();
 			else
 				return null;

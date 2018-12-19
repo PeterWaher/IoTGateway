@@ -90,7 +90,7 @@ namespace Waher.Networking.CoAP
 		/// <exception cref="CoapException">If an error occurred when processing the method.</exception>
 		public void GET(CoapMessage Request, CoapResponse Response)
 		{
-			if (this.get == null)
+			if (this.get is null)
 				throw new CoapException(CoapCode.MethodNotAllowed);
 			else
 				this.get(Request, Response);

@@ -51,7 +51,7 @@ namespace Waher.IoTGateway.WebResources
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public void GET(HttpRequest Request, HttpResponse Response)
 		{
-			if (Request.Session == null)
+			if (Request.Session is null)
 				throw new BadRequestException();
 
 			Request.Session.Remove("User");

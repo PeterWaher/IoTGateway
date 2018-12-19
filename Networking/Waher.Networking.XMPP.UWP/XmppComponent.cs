@@ -488,7 +488,7 @@ namespace Waher.Networking.XMPP
 					await this.dataWriter.StoreAsync();
 #else
 					await this.stream.WriteAsync(Packet, 0, Packet.Length);
-					if (this.stream == null)
+					if (this.stream is null)
 					{
 						this.isWriting = false;
 						return;
@@ -514,7 +514,7 @@ namespace Waher.Networking.XMPP
 					{
 						LinkedListNode<KeyValuePair<string, EventHandler>> Next = this.outputQueue.First;
 
-						if (Next == null)
+						if (Next is null)
 						{
 							Xml = null;
 							Packet = null;
@@ -558,7 +558,7 @@ namespace Waher.Networking.XMPP
 						break;
 
 					CryptographicBuffer.CopyToByteArray(DataRead, out byte[] Data);
-					if (Data == null)
+					if (Data is null)
 						break;
 
 					int NrRead = Data.Length;
@@ -574,13 +574,13 @@ namespace Waher.Networking.XMPP
 					else
 						break;
 #else
-					if (this.stream == null)
+					if (this.stream is null)
 						break;
 
 					int NrRead = await this.stream.ReadAsync(this.buffer, 0, BufferSize);
 					string s;
 
-					if (this.stream == null)
+					if (this.stream is null)
 						break;
 
 					if (NrRead > 0)
@@ -950,7 +950,7 @@ namespace Waher.Networking.XMPP
 				foreach (XmlNode N in Doc.DocumentElement.ChildNodes)
 				{
 					E = N as XmlElement;
-					if (E == null)
+					if (E is null)
 						continue;
 
 					switch (E.LocalName)
@@ -1161,7 +1161,7 @@ namespace Waher.Networking.XMPP
 			else
 				Callback = null;
 
-			if (Callback == null)
+			if (Callback is null)
 			{
 				switch (e.Type)
 				{
@@ -1237,7 +1237,7 @@ namespace Waher.Networking.XMPP
 				}
 			}
 
-			if (h == null)
+			if (h is null)
 				this.SendIqError(e.Id, e.To, e.From, "<error type='cancel'><feature-not-implemented xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/></error>");
 			else
 			{
@@ -2525,7 +2525,7 @@ namespace Waher.Networking.XMPP
 		public bool TryGetRosterItem(string BareJid, out RosterItem Item)
 		{
 			GetRosterItemEventHandler h = this.OnGetRosterItem;
-			if (h == null)
+			if (h is null)
 			{
 				Item = null;
 				return false;
@@ -2691,7 +2691,7 @@ namespace Waher.Networking.XMPP
 					{
 						if (P.Key <= Now)
 						{
-							if (Retries == null)
+							if (Retries is null)
 								Retries = new List<PendingRequest>();
 
 							Retries.Add(P.Value);

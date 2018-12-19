@@ -61,8 +61,8 @@ namespace Waher.Networking.XMPP.Test
 
 			RosterItem Item1 = this.client1.GetRosterItem(this.client2.BareJID);
 			RosterItem Item2 = this.client2.GetRosterItem(this.client1.BareJID);
-			if (Item1 == null || (Item1.State != SubscriptionState.Both && Item1.State != SubscriptionState.To) ||
-				Item2 == null || (Item2.State != SubscriptionState.Both && Item2.State != SubscriptionState.From))
+			if (Item1 is null || (Item1.State != SubscriptionState.Both && Item1.State != SubscriptionState.To) ||
+				Item2 is null || (Item2.State != SubscriptionState.Both && Item2.State != SubscriptionState.From))
 			{
 				ManualResetEvent Done2 = new ManualResetEvent(false);
 				ManualResetEvent Error2 = new ManualResetEvent(false);

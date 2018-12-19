@@ -115,11 +115,11 @@ namespace Waher.Networking.XMPP.Sensor
 			{
 				if ((Field.Type & FieldType.Momentary) != 0)
 				{
-					if (this.momentaryFields == null)
+					if (this.momentaryFields is null)
 						this.momentaryFields = new Dictionary<ThingReference, List<Field>>();
 
 					Ref = Field.Thing;
-					if (Ref == null)
+					if (Ref is null)
 						Ref = ThingReference.Empty;
 
 					if (Ref != LastNode)
@@ -246,7 +246,7 @@ namespace Waher.Networking.XMPP.Sensor
 				{
 					Checked = false;
 
-					if (LastThing == null || !LastThing.SameThing(Field.Thing))
+					if (LastThing is null || !LastThing.SameThing(Field.Thing))
 					{
 						if (IsIncluded != null && !IsIncluded(Field.Name, Field.Timestamp, Field.Type))
 							continue;
@@ -316,7 +316,7 @@ namespace Waher.Networking.XMPP.Sensor
 			{
 				foreach (ThingError Error in Errors)
 				{
-					if (LastThing == null || !LastThing.SameThing(Error))
+					if (LastThing is null || !LastThing.SameThing(Error))
 					{
 						if (TimestampOpen)
 						{
@@ -559,7 +559,7 @@ namespace Waher.Networking.XMPP.Sensor
 
 			foreach (ThingError Error in Errors)
 			{
-				if (!string.IsNullOrEmpty(Error.NodeId) && (LastThing == null || !Error.SameThing(Error)))
+				if (!string.IsNullOrEmpty(Error.NodeId) && (LastThing is null || !Error.SameThing(Error)))
 				{
 					if (TimestampOpen)
 					{

@@ -73,7 +73,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		{
 			get
 			{
-				if (this.handler == null)
+				if (this.handler is null)
 					this.handler = GetMultimediaHandler(this.items);
 
 				return this.handler;
@@ -135,7 +135,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 			{
 				lock (synchObject)
 				{
-					if (handlers == null)
+					if (handlers is null)
 					{
 						List<IMultimediaContent> Handlers = new List<IMultimediaContent>();
 						IMultimediaContent Handler;

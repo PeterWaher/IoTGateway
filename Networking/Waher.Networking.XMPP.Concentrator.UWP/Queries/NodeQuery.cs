@@ -388,7 +388,7 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 
 			lock (this.result)
 			{
-				if (this.currentSection == null)
+				if (this.currentSection is null)
 					return;
 
 				Section = this.currentSection;
@@ -459,7 +459,7 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 
 		internal void Queue(int SequenceNr, MessageEventArgs e)
 		{
-			if (this.queuedMessages == null)
+			if (this.queuedMessages is null)
 			{
 				this.queuedMessages = new LinkedList<KeyValuePair<int, MessageEventArgs>>();
 				this.queuedMessages.AddLast(new KeyValuePair<int, MessageEventArgs>(SequenceNr, e));
@@ -475,7 +475,7 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 						this.queuedMessages.AddBefore(Loop, new KeyValuePair<int, MessageEventArgs>(SequenceNr, e));
 						Loop = null;
 					}
-					else if (Loop.Next == null)
+					else if (Loop.Next is null)
 					{
 						this.queuedMessages.AddAfter(Loop, new KeyValuePair<int, MessageEventArgs>(SequenceNr, e));
 						Loop = null;
@@ -509,7 +509,7 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 			{
 				this.queuedMessages.RemoveFirst();
 
-				if (this.queuedMessages.First == null)
+				if (this.queuedMessages.First is null)
 					this.queuedMessages = null;
 
 				return P.Value;

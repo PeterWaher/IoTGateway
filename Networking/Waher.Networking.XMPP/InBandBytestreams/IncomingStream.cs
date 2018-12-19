@@ -101,7 +101,7 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 				{
 					long ExpectedPos = (Seq - this.expectedSeq) * this.blockSize;
 
-					if (this.tempFile == null)
+					if (this.tempFile is null)
 						this.tempFile = new TemporaryFile();
 
 					if (this.tempFile.Length < ExpectedPos)
@@ -145,7 +145,7 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 					{
 						c = (int)Math.Min(NrBytes, this.blockSize);
 
-						if (Buf == null || c != Buf.Length)
+						if (Buf is null || c != Buf.Length)
 							Buf = new byte[c];
 
 						File.Read(Buf, 0, c);

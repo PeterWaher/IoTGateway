@@ -129,7 +129,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		/// <param name="Count">Number of bytes to start.</param>
 		public void Write(byte[] Data, int Offset, int Count)
 		{
-			if (this.tempFile == null || this.aborted || this.done)
+			if (this.tempFile is null || this.aborted || this.done)
 				throw new IOException("Stream not open");
 
 			lock (this.tempFile)
@@ -189,7 +189,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 					byte[] Encrypted = this.e2e.Encrypt(this.id.ToString(), this.sid, this.from, this.to, Block);
 					this.id++;
 
-					if (Encrypted == null)
+					if (Encrypted is null)
 					{
 						this.Dispose();
 						return;
@@ -210,7 +210,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 
 		private void WriteQueueEmpty(object Sender, EventArgs e)
 		{
-			if (this.tempFile == null)
+			if (this.tempFile is null)
 				return;
 
 			lock (this.tempFile)

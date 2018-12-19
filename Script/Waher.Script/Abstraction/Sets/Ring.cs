@@ -48,7 +48,7 @@ namespace Waher.Script.Abstraction.Sets
 		public virtual IRingElement RightDivide(IRingElement Left, IRingElement Right)
 		{
 			IRingElement Inverse = Right.Invert();
-			if (Inverse == null)
+			if (Inverse is null)
 				return null;
 			else
 				return this.Multiply(Left, Inverse) as IRingElement;
@@ -63,7 +63,7 @@ namespace Waher.Script.Abstraction.Sets
 		public virtual IRingElement LeftDivide(IRingElement Left, IRingElement Right)
 		{
 			IRingElement Inverse = Left.Invert();
-			if (Inverse == null)
+			if (Inverse is null)
 				return null;
 			else
 				return this.Multiply(Inverse, Right) as IRingElement;

@@ -288,7 +288,7 @@ namespace Waher.Script.Lab
 
 		private UIElement AddBlock(TextBlock ScriptBlock, UIElement ResultBlock)
 		{
-			if (ScriptBlock == null)
+			if (ScriptBlock is null)
 				this.HistoryPanel.Children.Add(ResultBlock);
 			else
 				this.HistoryPanel.Children.Insert(this.HistoryPanel.Children.IndexOf(ScriptBlock) + 1, ResultBlock);

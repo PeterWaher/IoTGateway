@@ -349,11 +349,11 @@ namespace Waher.Persistence.Files
 						}
 					}
 
-					if (DefaultConstructor == null)
+					if (DefaultConstructor is null)
 						continue;
 
 					S = DefaultConstructor.Invoke(Types.NoParameters) as IObjectSerializer;
-					if (S == null)
+					if (S is null)
 						continue;
 				}
 				catch (Exception)
@@ -590,7 +590,7 @@ namespace Waher.Persistence.Files
 		/// <returns>Corresponding data type code.</returns>
 		public static uint GetFieldDataTypeCode(object Value)
 		{
-			if (Value == null)
+			if (Value is null)
 				return ObjectSerializer.TYPE_NULL;
 			else
 				return GetFieldDataTypeCode(Value.GetType());
@@ -844,7 +844,7 @@ namespace Waher.Persistence.Files
 				}
 			}
 
-			if (List == null)
+			if (List is null)
 			{
 				Task<ulong> Task = this.GetFieldCodeAsync(Collection, FieldName);
 				FilesProvider.Wait(Task, this.timeoutMilliseconds);
@@ -900,7 +900,7 @@ namespace Waher.Persistence.Files
 				}
 			}
 
-			if (List == null)
+			if (List is null)
 			{
 				await this.GetFile(Collection);     // Generates structures.
 
@@ -978,7 +978,7 @@ namespace Waher.Persistence.Files
 				}
 			}
 
-			if (List2 == null)
+			if (List2 is null)
 			{
 				await this.GetFile(Collection);
 				Result = await this.GetFieldNameAsync(Collection, FieldCode);
@@ -1523,7 +1523,7 @@ namespace Waher.Persistence.Files
 
 			while ((i = s.IndexOfAny(forbiddenCharacters, i)) >= 0)
 			{
-				if (ch == null)
+				if (ch is null)
 					ch = s.ToCharArray();
 
 				ch[i] = '_';
@@ -1561,9 +1561,9 @@ namespace Waher.Persistence.Files
 						string CollectionName = Rows[1];
 						ObjectBTreeFile File = await this.GetFile(CollectionName, false);
 
-						if (File == null)
+						if (File is null)
 						{
-							if (ToRemove == null)
+							if (ToRemove is null)
 								ToRemove = new LinkedList<string>();
 
 							ToRemove.AddLast(P.Key);
@@ -1579,9 +1579,9 @@ namespace Waher.Persistence.Files
 						Array.Copy(Rows, 2, FieldNames, 0, Rows.Length - 2);
 
 						File = await this.GetFile(CollectionName, false);
-						if (File == null)
+						if (File is null)
 						{
-							if (ToRemove == null)
+							if (ToRemove is null)
 								ToRemove = new LinkedList<string>();
 
 							ToRemove.AddLast(P.Key);
@@ -1764,7 +1764,7 @@ namespace Waher.Persistence.Files
 			foreach (object Object in Objects)
 			{
 				T2 = Object.GetType();
-				if (Serializer == null || T != T2)
+				if (Serializer is null || T != T2)
 				{
 					if (List.First != null)
 					{
@@ -1777,7 +1777,7 @@ namespace Waher.Persistence.Files
 				}
 
 				CollectionName2 = Serializer.CollectionName(Object);
-				if (File == null || CollectionName != CollectionName2)
+				if (File is null || CollectionName != CollectionName2)
 				{
 					if (List.First != null)
 					{
@@ -1886,7 +1886,7 @@ namespace Waher.Persistence.Files
 			foreach (object Object in Objects)
 			{
 				T2 = Object.GetType();
-				if (Serializer == null || T != T2)
+				if (Serializer is null || T != T2)
 				{
 					if (List.First != null)
 					{
@@ -1900,7 +1900,7 @@ namespace Waher.Persistence.Files
 				}
 
 				CollectionName2 = Serializer.CollectionName(Object);
-				if (File == null || CollectionName != CollectionName2)
+				if (File is null || CollectionName != CollectionName2)
 				{
 					if (List.First != null)
 					{
@@ -1957,7 +1957,7 @@ namespace Waher.Persistence.Files
 			foreach (object Object in Objects)
 			{
 				T2 = Object.GetType();
-				if (Serializer == null || T != T2)
+				if (Serializer is null || T != T2)
 				{
 					if (List.First != null)
 					{
@@ -1970,7 +1970,7 @@ namespace Waher.Persistence.Files
 				}
 
 				CollectionName2 = Serializer.CollectionName(Object);
-				if (File == null || CollectionName != CollectionName2)
+				if (File is null || CollectionName != CollectionName2)
 				{
 					if (List.First != null)
 					{
@@ -2263,7 +2263,7 @@ namespace Waher.Persistence.Files
 										}
 										catch (Exception ex)
 										{
-											if (Exceptions == null)
+											if (Exceptions is null)
 												Exceptions = new LinkedList<Exception>();
 
 											Exceptions.AddLast(ex);
@@ -2297,7 +2297,7 @@ namespace Waher.Persistence.Files
 										{
 											Reader.ReadBlockLink();                    // Block link.
 											object ObjectId = File.RecordHandler.GetKey(Reader);
-											if (ObjectId == null)
+											if (ObjectId is null)
 												break;
 
 											uint Len = File.RecordHandler.GetFullPayloadSize(Reader);
@@ -2366,7 +2366,7 @@ namespace Waher.Persistence.Files
 														}
 														catch (Exception ex)
 														{
-															if (Exceptions == null)
+															if (Exceptions is null)
 																Exceptions = new LinkedList<Exception>();
 
 															Exceptions.AddLast(ex);

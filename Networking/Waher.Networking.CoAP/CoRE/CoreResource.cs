@@ -51,7 +51,7 @@ namespace Waher.Networking.CoAP.CoRE
 			{
 				if (Option is CoapOptionUriQuery Query)
 				{
-					if (Filter == null)
+					if (Filter is null)
 						Filter = new LinkedList<KeyValuePair<string, string>>();
 
 					Filter.AddLast(new KeyValuePair<string, string>(Query.Key, Query.KeyValue));
@@ -163,7 +163,7 @@ namespace Waher.Networking.CoAP.CoRE
 
 		private bool Matches(string Pattern, int[] Values)
 		{
-			if (Values == null)
+			if (Values is null)
 				return false;
 
 			foreach (int Value in Values)
@@ -177,7 +177,7 @@ namespace Waher.Networking.CoAP.CoRE
 
 		private bool Matches(string Pattern, string[] Values)
 		{
-			if (Values == null)
+			if (Values is null)
 				return false;
 
 			foreach (string Value in Values)
@@ -191,7 +191,7 @@ namespace Waher.Networking.CoAP.CoRE
 
 		private bool Matches(string Pattern, string Value)
 		{
-			if (Value == null)
+			if (Value is null)
 				return false;
 
 			if (Pattern.EndsWith("*"))

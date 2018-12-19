@@ -299,7 +299,7 @@ namespace Waher.Script.Graphs
 			{
 				DoubleNumber dMax = Max as DoubleNumber;
 
-				if (!(Min is DoubleNumber dMin) || dMax == null)
+				if (!(Min is DoubleNumber dMin) || dMax is null)
 					throw new ScriptException("Incompatible values.");
 
 				return Scale(((DoubleVector)Vector).Values, dMin.Value, dMax.Value, Offset, Size);
@@ -308,7 +308,7 @@ namespace Waher.Script.Graphs
 			{
 				DoubleNumber dMax = Max as DoubleNumber;
 
-				if (!(Min is DoubleNumber dMin) || dMax == null)
+				if (!(Min is DoubleNumber dMin) || dMax is null)
 					throw new ScriptException("Incompatible values.");
 
 				return Scale(((Interval)Vector).GetArray(), dMin.Value, dMax.Value, Offset, Size);
@@ -317,7 +317,7 @@ namespace Waher.Script.Graphs
 			{
 				DateTimeValue dMax = Max as DateTimeValue;
 
-				if (!(Min is DateTimeValue dMin) || dMax == null)
+				if (!(Min is DateTimeValue dMin) || dMax is null)
 					throw new ScriptException("Incompatible values.");
 
 				return Scale(((DateTimeVector)Vector).Values, dMin.Value, dMax.Value, Offset, Size);
@@ -363,7 +363,7 @@ namespace Waher.Script.Graphs
 						foreach (IElement E in Vector.ChildElements)
 						{
 							D = E as DoubleNumber;
-							if (D == null)
+							if (D is null)
 								throw new ScriptException("Incompatible values.");
 
 							Vector2[i++] = D.Value;
@@ -385,7 +385,7 @@ namespace Waher.Script.Graphs
 							foreach (IElement E in Vector.ChildElements)
 							{
 								DT = E as DateTimeValue;
-								if (DT == null)
+								if (DT is null)
 									throw new ScriptException("Incompatible values.");
 
 								Vector2[i++] = DT.Value;
@@ -528,7 +528,7 @@ namespace Waher.Script.Graphs
 		/// <returns>Pen object.</returns>
 		public static SKPaint ToPen(object Object, object Size)
 		{
-			double Width = Size == null ? 1 : Expression.ToDouble(Size);
+			double Width = Size is null ? 1 : Expression.ToDouble(Size);
 
 			if (Object is SKPaint Pen)
 				return Pen;

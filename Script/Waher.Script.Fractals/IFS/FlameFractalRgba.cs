@@ -189,7 +189,7 @@ namespace Waher.Script.Fractals.IFS
                 }
                 else if (FlameItem is SKColor || FlameItem is string)
                 {
-                    if (CurrentFunction == null)
+                    if (CurrentFunction is null)
                     {
                         M = new DoubleMatrix(new double[,] { { 1, 0 }, { 0, 1 } });
                         CurrentFunction = new FlameFunction(M, this);
@@ -200,7 +200,7 @@ namespace Waher.Script.Fractals.IFS
                 }
                 else if (FlameItem is IFlameVariation)
                 {
-                    if (CurrentFunction == null)
+                    if (CurrentFunction is null)
                     {
                         M = new DoubleMatrix(new double[,] { { 1, 0 }, { 0, 1 } });
                         CurrentFunction = new FlameFunction(M, this);
@@ -211,7 +211,7 @@ namespace Waher.Script.Fractals.IFS
                 }
                 else if (FlameItem is ILambdaExpression)
                 {
-                    if (CurrentFunction == null)
+                    if (CurrentFunction is null)
                     {
                         M = new DoubleMatrix(new double[,] { { 1, 0 }, { 0, 1 } });
                         CurrentFunction = new FlameFunction(M, this);
@@ -226,7 +226,7 @@ namespace Waher.Script.Fractals.IFS
                     {
                         Weight = Expression.ToDouble(FlameItem);
 
-                        if (CurrentFunction == null)
+                        if (CurrentFunction is null)
                         {
                             M = new DoubleMatrix(new double[,] { { 1, 0 }, { 0, 1 } });
                             CurrentFunction = new FlameFunction(M, this);
@@ -578,10 +578,10 @@ namespace Waher.Script.Fractals.IFS
                     {
                         try
                         {
-                            if (T[i] == null)
+                            if (T[i] is null)
                                 continue;
 
-                            if (Done[i] == null || !Done[i].WaitOne(0))
+                            if (Done[i] is null || !Done[i].WaitOne(0))
                                 T[i].Abort();
                         }
                         catch (Exception)

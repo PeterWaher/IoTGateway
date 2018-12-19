@@ -250,13 +250,13 @@ namespace Waher.Persistence.Files.Serialization
 				this.isNullable = !this.typeInfo.IsValueType;
 
 			CollectionNameAttribute CollectionNameAttribute = this.typeInfo.GetCustomAttribute<CollectionNameAttribute>(true);
-			if (CollectionNameAttribute == null)
+			if (CollectionNameAttribute is null)
 				this.collectionName = null;
 			else
 				this.collectionName = CollectionNameAttribute.Name;
 
 			TypeNameAttribute TypeNameAttribute = this.typeInfo.GetCustomAttribute<TypeNameAttribute>(true);
-			if (TypeNameAttribute == null)
+			if (TypeNameAttribute is null)
 			{
 				this.typeFieldName = "_type";
 				this.typeNameSerialization = TypeNameSerialization.FullName;
@@ -327,10 +327,10 @@ namespace Waher.Persistence.Files.Serialization
 					}
 					else if ((PI = Member as PropertyInfo) != null)
 					{
-						if ((MI = PI.GetMethod) == null || !MI.IsPublic || MI.IsStatic)
+						if ((MI = PI.GetMethod) is null || !MI.IsPublic || MI.IsStatic)
 							continue;
 
-						if ((MI = PI.SetMethod) == null || !MI.IsPublic || MI.IsStatic)
+						if ((MI = PI.SetMethod) is null || !MI.IsPublic || MI.IsStatic)
 							continue;
 
 						if (PI.GetIndexParameters().Length > 0)
@@ -378,7 +378,7 @@ namespace Waher.Persistence.Files.Serialization
 
 							CSharp.Append("\t\tprivate static readonly ");
 
-							if (DefaultValue == null)
+							if (DefaultValue is null)
 								CSharp.Append("object");
 							else
 								CSharp.Append(MemberType.FullName);
@@ -387,7 +387,7 @@ namespace Waher.Persistence.Files.Serialization
 							CSharp.Append(Member.Name);
 							CSharp.Append(" = ");
 
-							if (DefaultValue == null)
+							if (DefaultValue is null)
 								CSharp.Append("null");
 							else
 							{
@@ -555,10 +555,10 @@ namespace Waher.Persistence.Files.Serialization
 					}
 					else if ((PI = Member as PropertyInfo) != null)
 					{
-						if ((MI = PI.GetMethod) == null || !MI.IsPublic || MI.IsStatic)
+						if ((MI = PI.GetMethod) is null || !MI.IsPublic || MI.IsStatic)
 							continue;
 
-						if ((MI = PI.SetMethod) == null || !MI.IsPublic || MI.IsStatic)
+						if ((MI = PI.SetMethod) is null || !MI.IsPublic || MI.IsStatic)
 							continue;
 
 						if (PI.GetIndexParameters().Length > 0)
@@ -655,7 +655,7 @@ namespace Waher.Persistence.Files.Serialization
 
 					CSharp.AppendLine();
 					CSharp.AppendLine("\t\t\tType DesiredType = Waher.Runtime.Inventory.Types.GetType(TypeName);");
-					CSharp.AppendLine("\t\t\tif (DesiredType == null)");
+					CSharp.AppendLine("\t\t\tif (DesiredType is null)");
 					CSharp.AppendLine("\t\t\t\tDesiredType = typeof(GenericObject);");
 					CSharp.AppendLine();
 					CSharp.AppendLine("\t\t\tif (DesiredType != typeof(" + Type.FullName + "))");
@@ -717,10 +717,10 @@ namespace Waher.Persistence.Files.Serialization
 						}
 						else if ((PI = Member as PropertyInfo) != null)
 						{
-							if ((MI = PI.GetMethod) == null || !MI.IsPublic || MI.IsStatic)
+							if ((MI = PI.GetMethod) is null || !MI.IsPublic || MI.IsStatic)
 								continue;
 
-							if ((MI = PI.SetMethod) == null || !MI.IsPublic || MI.IsStatic)
+							if ((MI = PI.SetMethod) is null || !MI.IsPublic || MI.IsStatic)
 								continue;
 
 							if (PI.GetIndexParameters().Length > 0)
@@ -1241,7 +1241,7 @@ namespace Waher.Persistence.Files.Serialization
 				{
 					CSharp.AppendLine("\t\t\tif (WriteTypeCode)");
 					CSharp.AppendLine("\t\t\t{");
-					CSharp.AppendLine("\t\t\t\tif (Value == null)");
+					CSharp.AppendLine("\t\t\t\tif (Value is null)");
 					CSharp.AppendLine("\t\t\t\t{");
 					CSharp.AppendLine("\t\t\t\t\tWriter.WriteBits(" + TYPE_NULL + ", 6);");
 					CSharp.AppendLine("\t\t\t\t\treturn;");
@@ -1249,7 +1249,7 @@ namespace Waher.Persistence.Files.Serialization
 					CSharp.AppendLine("\t\t\t\telse");
 					CSharp.AppendLine("\t\t\t\t\tWriter.WriteBits(" + TYPE_OBJECT + ", 6);");
 					CSharp.AppendLine("\t\t\t}");
-					CSharp.AppendLine("\t\t\telse if (Value == null)");
+					CSharp.AppendLine("\t\t\telse if (Value is null)");
 					CSharp.AppendLine("\t\t\t\tthrow new NullReferenceException(\"Value cannot be null.\");");
 				}
 				else
@@ -1294,10 +1294,10 @@ namespace Waher.Persistence.Files.Serialization
 					}
 					else if ((PI = Member as PropertyInfo) != null)
 					{
-						if ((MI = PI.GetMethod) == null || !MI.IsPublic || MI.IsStatic)
+						if ((MI = PI.GetMethod) is null || !MI.IsPublic || MI.IsStatic)
 							continue;
 
-						if ((MI = PI.SetMethod) == null || !MI.IsPublic || MI.IsStatic)
+						if ((MI = PI.SetMethod) is null || !MI.IsPublic || MI.IsStatic)
 							continue;
 
 						if (PI.GetIndexParameters().Length > 0)
@@ -1355,7 +1355,7 @@ namespace Waher.Persistence.Files.Serialization
 
 					if (HasDefaultValue)
 					{
-						if (DefaultValue == null)
+						if (DefaultValue is null)
 							CSharp.AppendLine("\t\t\tif (((object)Value." + Member.Name + ") != (" + MemberType.FullName + ")null)");
 						else
 							CSharp.AppendLine("\t\t\tif (!default" + Member.Name + ".Equals(Value." + Member.Name + "))");
@@ -1632,7 +1632,7 @@ namespace Waher.Persistence.Files.Serialization
 									CSharp.Append(Indent2);
 									CSharp.Append("if (Value.");
 									CSharp.Append(Member.Name);
-									CSharp.AppendLine(" == null)");
+									CSharp.AppendLine(" is null)");
 
 									CSharp.Append(Indent2);
 									CSharp.Append("\tWriter.WriteBits(");
@@ -1843,7 +1843,7 @@ namespace Waher.Persistence.Files.Serialization
 				if (this.debug)
 					CSharp.AppendLine("\t\t\t\tConsole.Out.WriteLine();");
 
-				if (ObjectIdMemberType == null)
+				if (ObjectIdMemberType is null)
 					CSharp.AppendLine("\t\t\t\tWriterBak.Write(Waher.Persistence.Files.ObjectBTreeFile.CreateDatabaseGUID());");
 				else
 				{
@@ -2042,10 +2042,10 @@ namespace Waher.Persistence.Files.Serialization
 					}
 					else if ((PI = MemberInfo as PropertyInfo) != null)
 					{
-						if ((MI = PI.GetMethod) == null || !MI.IsPublic || MI.IsStatic)
+						if ((MI = PI.GetMethod) is null || !MI.IsPublic || MI.IsStatic)
 							continue;
 
-						if ((MI = PI.SetMethod) == null || !MI.IsPublic || MI.IsStatic)
+						if ((MI = PI.SetMethod) is null || !MI.IsPublic || MI.IsStatic)
 							continue;
 
 						if (PI.GetIndexParameters().Length > 0)
@@ -2134,7 +2134,7 @@ namespace Waher.Persistence.Files.Serialization
 		/// <returns>String with special characters escaped.</returns>
 		public static string Escape(string s)
 		{
-			if (s == null)
+			if (s is null)
 				return string.Empty;
 
 			if (s.IndexOfAny(specialCharacters) < 0)
@@ -2235,7 +2235,7 @@ namespace Waher.Persistence.Files.Serialization
 						TypeName = this.type.Namespace + "." + TypeName;
 
 					Type DesiredType = Waher.Runtime.Inventory.Types.GetType(TypeName);
-					if (DesiredType == null)
+					if (DesiredType is null)
 						DesiredType = typeof(GenericObject);
 
 					if (DesiredType != this.type)
@@ -2667,7 +2667,7 @@ namespace Waher.Persistence.Files.Serialization
 
 				if (WriteTypeCode)
 				{
-					if (Value == null)
+					if (Value is null)
 					{
 						Writer.WriteBits(TYPE_NULL, 6);
 						return;
@@ -2675,7 +2675,7 @@ namespace Waher.Persistence.Files.Serialization
 					else
 						Writer.WriteBits(TYPE_OBJECT, 6);
 				}
-				else if (Value == null)
+				else if (Value is null)
 					throw new NullReferenceException("Value cannot be null.");
 
 				if (this.typeNameSerialization == TypeNameSerialization.None)
@@ -2704,7 +2704,7 @@ namespace Waher.Persistence.Files.Serialization
 					Writer.WriteVariableLengthUInt64(Member.FieldCode);
 
 					object MemberValue = Member.Get(Value);
-					if (MemberValue == null)
+					if (MemberValue is null)
 						Writer.WriteBits(TYPE_NULL, 6);
 					else
 					{
@@ -2856,7 +2856,7 @@ namespace Waher.Persistence.Files.Serialization
 
 				if (!Embedded)
 				{
-					if (this.objectIdMember == null)
+					if (this.objectIdMember is null)
 						WriterBak.Write(Waher.Persistence.Files.ObjectBTreeFile.CreateDatabaseGUID());
 					else
 					{
@@ -3003,7 +3003,7 @@ namespace Waher.Persistence.Files.Serialization
 			}
 #endif
 
-			if (ObjectId == null)
+			if (ObjectId is null)
 				return false;
 
 			if (ObjectId is Guid && ObjectId.Equals(Guid.Empty))
@@ -3101,7 +3101,7 @@ namespace Waher.Persistence.Files.Serialization
 			}
 #endif
 
-			if (Obj == null || (Obj is Guid && Obj.Equals(Guid.Empty)))
+			if (Obj is null || (Obj is Guid && Obj.Equals(Guid.Empty)))
 			{
 				if (!InsertIfNotFound)
 					throw new Exception("Object has no Object ID defined.");
@@ -3206,10 +3206,10 @@ namespace Waher.Persistence.Files.Serialization
 #if NETSTANDARD1_5
 			}
 #endif
-			if ((Value == null) ^ (Default == null))
+			if ((Value is null) ^ (Default is null))
 				return false;
 
-			if (Value == null)
+			if (Value is null)
 				return true;
 
 			return Default.Equals(Value);

@@ -255,7 +255,7 @@ namespace Waher.Client.WPF.Model.PubSub
 									{
 										PubSubNode Node = new PubSubNode(this, this.pubSubClient.ComponentAddress, NodeName, Title, Type);
 
-										if (this.children == null)
+										if (this.children is null)
 											this.children = new SortedDictionary<string, TreeNode>() { { Node.Key, Node } };
 										else
 										{

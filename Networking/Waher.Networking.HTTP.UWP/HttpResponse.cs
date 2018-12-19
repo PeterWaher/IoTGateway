@@ -308,7 +308,7 @@ namespace Waher.Networking.HTTP
 					break;
 
 				default:
-					if (this.customHeaders == null)
+					if (this.customHeaders is null)
 						this.customHeaders = new Dictionary<string, string>();
 
 					this.customHeaders[FieldName] = Value;
@@ -462,7 +462,7 @@ namespace Waher.Networking.HTTP
 				if (this.httpServer != null)
 					this.httpServer.RequestResponded(this.httpRequest, this.statusCode);
 
-				if (this.transferEncoding == null)
+				if (this.transferEncoding is null)
 					this.StartSendResponse(false);
 				else
 					this.transferEncoding.ContentSent();
@@ -570,9 +570,9 @@ namespace Waher.Networking.HTTP
 
 		private void StartSendResponse(bool ExpectContent)
 		{
-			if (this.transferEncoding == null)
+			if (this.transferEncoding is null)
 			{
-				if (this.desiredTransferEncoding == null)
+				if (this.desiredTransferEncoding is null)
 				{
 					StringBuilder Output = new StringBuilder();
 
@@ -673,7 +673,7 @@ namespace Waher.Networking.HTTP
 					string Header = Output.ToString();
 					byte[] HeaderBin = InternetContent.ISO_8859_1.GetBytes(Header);
 
-					if (this.responseStream == null || this.clientConnection.Disposed)
+					if (this.responseStream is null || this.clientConnection.Disposed)
 						return;
 
 					this.responseStream.Write(HeaderBin, 0, HeaderBin.Length);
@@ -715,7 +715,7 @@ namespace Waher.Networking.HTTP
 		{
 			HttpFieldAccept Accept = this.httpRequest?.Header?.Accept;
 
-			if (Accept == null)
+			if (Accept is null)
 			{
 				Data = InternetContent.Encode(Object, this.encoding, out ContentType);
 				return Data != null;
@@ -744,7 +744,7 @@ namespace Waher.Networking.HTTP
 								{
 									if (Rec.IsAcceptable(ContentType2, out double Quality, out ContentTypeAcceptance Acceptance))
 									{
-										if ((Best == null || Quality > BestQuality) && Encoder2.Encodes(Object, out Grade Grade, ContentType2))
+										if ((Best is null || Quality > BestQuality) && Encoder2.Encodes(Object, out Grade Grade, ContentType2))
 										{
 											Best = Encoder2;
 											BestQuality = Quality;
@@ -780,7 +780,7 @@ namespace Waher.Networking.HTTP
 		{
 			DateTime TP;
 
-			if (this.transferEncoding == null)
+			if (this.transferEncoding is null)
 				this.StartSendResponse(true);
 
 			this.transferEncoding.Encode(Data, 0, Data.Length);
@@ -807,7 +807,7 @@ namespace Waher.Networking.HTTP
 		{
 			DateTime TP;
 
-			if (this.transferEncoding == null)
+			if (this.transferEncoding is null)
 				this.StartSendResponse(true);
 
 			this.transferEncoding.Encode(Data, Offset, Count);
@@ -890,7 +890,7 @@ namespace Waher.Networking.HTTP
 		/// <param name="Cookie">Cookie.</param>
 		public void SetCookie(Cookie Cookie)
 		{
-			if (this.cookies == null)
+			if (this.cookies is null)
 				this.cookies = new LinkedList<Cookie>();
 
 			this.cookies.AddLast(Cookie);

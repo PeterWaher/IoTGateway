@@ -109,7 +109,7 @@ namespace Waher.Networking.XMPP
 				foreach (XmlNode N in Response.ChildNodes)
 				{
 					E = N as XmlElement;
-					if (E == null)
+					if (E is null)
 						continue;
 
 					if (E.LocalName == "error" && E.NamespaceURI == Response.NamespaceURI)

@@ -81,7 +81,7 @@ namespace Waher.Persistence.Files.Searching
 
 		internal static string ToString(object Value)
 		{
-			if (Value == null)
+			if (Value is null)
 				return string.Empty;
 			else
 				return ToString(Value, FilesProvider.GetFieldDataTypeCode(Value.GetType()));
@@ -203,8 +203,8 @@ namespace Waher.Persistence.Files.Searching
 		/// </returns>
 		public static int? Compare(object Value1, object Value2)
 		{
-			bool IsNull1 = Value1 == null;
-			bool IsNull2 = Value2 == null;
+			bool IsNull1 = Value1 is null;
+			bool IsNull2 = Value2 is null;
 
 			if (IsNull1 ^ IsNull2)
 			{
@@ -232,7 +232,7 @@ namespace Waher.Persistence.Files.Searching
 		/// <returns>If operation was successful.</returns>
 		public static bool Increment(ref object Value)
 		{
-			if (Value == null)
+			if (Value is null)
 				return false;
 
 			Type T = Value.GetType();
@@ -652,7 +652,7 @@ namespace Waher.Persistence.Files.Searching
 		/// <returns>If operation was successful.</returns>
 		public static bool Decrement(ref object Value)
 		{
-			if (Value == null)
+			if (Value is null)
 				return false;
 
 			Type T = Value.GetType();

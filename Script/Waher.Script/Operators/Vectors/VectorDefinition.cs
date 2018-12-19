@@ -38,7 +38,7 @@ namespace Waher.Script.Operators.Vectors
 
             foreach (ScriptNode Node in this.Elements)
 			{
-				if (Node == null)
+				if (Node is null)
 					VectorElements.AddLast(ObjectValue.Null);
 				else
 					VectorElements.AddLast(Node.Evaluate(Variables));
@@ -70,7 +70,7 @@ namespace Waher.Script.Operators.Vectors
                 if (CanEncapsulateAsMatrix && SameDimensions)
                 {
                     Vector = Element as IVectorSpaceElement;
-                    if (Vector == null)
+                    if (Vector is null)
                         SameDimensions = false;
                     else
                     {
@@ -81,18 +81,18 @@ namespace Waher.Script.Operators.Vectors
                     }
                 }
 
-                if (CommonSuperSet == null)
+                if (CommonSuperSet is null)
                 {
                     SuperSetExample = Element;
 
-                    if (Element == null)
+                    if (Element is null)
                         CommonSuperSet = new ObjectValues();
                     else
                         CommonSuperSet = Element.AssociatedSet;
                 }
                 else
                 {
-                    if (Element == null)
+                    if (Element is null)
                         Set = new ObjectValues();
                     else
                         Set = Element.AssociatedSet;
@@ -122,7 +122,7 @@ namespace Waher.Script.Operators.Vectors
 
                     foreach (IElement Element in Elements)
                     {
-                        if (Element == null)
+                        if (Element is null)
                             Set = new ObjectValues();
                         else
                             Set = Element.AssociatedSet;
@@ -173,7 +173,7 @@ namespace Waher.Script.Operators.Vectors
             ScriptNode[] Elements = this.Elements;
 
             IVector Vector = CheckAgainst as IVector;
-            if (Vector == null || Vector.Dimension != Elements.Length)
+            if (Vector is null || Vector.Dimension != Elements.Length)
                 throw new ScriptRuntimeException("Pattern mismatch.", this);
 
             int i = 0;

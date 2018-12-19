@@ -204,7 +204,7 @@ namespace Waher.Client.WPF.Controls
 			foreach (XmlNode N in Xml.DocumentElement.ChildNodes)
 			{
 				E = N as XmlElement;
-				if (E == null)
+				if (E is null)
 					continue;
 
 				if (!Enum.TryParse<SniffItemType>(E.LocalName, out SniffItemType Type))

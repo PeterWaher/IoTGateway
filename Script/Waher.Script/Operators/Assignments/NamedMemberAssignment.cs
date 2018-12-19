@@ -69,9 +69,9 @@ namespace Waher.Script.Operators.Assignments
                         else
                         {
 							this.property = Type.GetRuntimeProperty("Item");
-							if (this.property == null)
+							if (this.property is null)
                                 this.nameIndex = null;
-                            else if (this.nameIndex == null)
+                            else if (this.nameIndex is null)
                                 this.nameIndex = new string[] { this.name };
                         }
                     }

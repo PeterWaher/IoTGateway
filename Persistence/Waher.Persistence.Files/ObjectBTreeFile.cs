@@ -197,7 +197,7 @@ namespace Waher.Persistence.Files
 #endif
 			this.debug = Debug;
 
-			if (RecordHandler == null)
+			if (RecordHandler is null)
 				this.recordHandler = new PrimaryRecords(this.inlineObjectSizeLimit);
 			else
 				this.recordHandler = RecordHandler;
@@ -568,7 +568,7 @@ namespace Waher.Persistence.Files
 				}
 			}
 
-			if (Block == null)
+			if (Block is null)
 			{
 				Block = new byte[this.blockSize];
 				PhysicalPosition = this.file.Length + this.bytesAdded;
@@ -688,7 +688,7 @@ namespace Waher.Persistence.Files
 			if ((PhysicalPosition % this.blockSize) != 0)
 				throw new ArgumentException("Block positions must be multiples of the block size.", nameof(PhysicalPosition));
 
-			if (Block == null || Block.Length != this.blockSize)
+			if (Block is null || Block.Length != this.blockSize)
 				throw new ArgumentException("Block not of the correct block size.", nameof(Block));
 
 			uint BlockIndex = (uint)(PhysicalPosition / this.blockSize);
@@ -702,7 +702,7 @@ namespace Waher.Persistence.Files
 				}
 			}
 
-			if (this.blocksToSave == null)
+			if (this.blocksToSave is null)
 				this.blocksToSave = new SortedDictionary<long, byte[]>();
 
 			this.blocksToSave[PhysicalPosition] = Block;
@@ -763,7 +763,7 @@ namespace Waher.Persistence.Files
 #endif
 		private void RegisterEmptyBlockLocked(uint Block)
 		{
-			if (this.emptyBlocks == null)
+			if (this.emptyBlocks is null)
 				this.emptyBlocks = new SortedDictionary<uint, bool>(new ReverseOrder());
 
 			this.emptyBlocks[Block] = true;
@@ -866,7 +866,7 @@ namespace Waher.Persistence.Files
 
 		internal async Task<byte[]> SaveBlobLocked(byte[] Bin)
 		{
-			if (this.blobFile == null)
+			if (this.blobFile is null)
 				throw new IOException("BLOBs not supported in this file.");
 
 			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Bin, this.blockLimit);
@@ -938,7 +938,7 @@ namespace Waher.Persistence.Files
 
 		internal async Task<BinaryDeserializer> LoadBlobLocked(byte[] Block, int Pos, BitArray BlobBlocksReferenced, FileStatistics Statistics)
 		{
-			if (this.blobFile == null)
+			if (this.blobFile is null)
 				throw new IOException("BLOBs not supported in this file.");
 
 			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Block, this.blockLimit, Pos);
@@ -991,7 +991,7 @@ namespace Waher.Persistence.Files
 
 				Reader.Restart(DecryptedBlock, 0);
 				ObjectId2 = this.recordHandler.GetKey(Reader);
-				if (ObjectId2 == null || this.recordHandler.Compare(ObjectId2, ObjectId) != 0)
+				if (ObjectId2 is null || this.recordHandler.Compare(ObjectId2, ObjectId) != 0)
 					throw new IOException("Block linked to by BLOB " + ObjectId.ToString() + " was actually marked as " + ObjectId2.ToString() + ".");
 
 				Prev = Reader.ReadUInt32();
@@ -1027,7 +1027,7 @@ namespace Waher.Persistence.Files
 
 		private async Task DeleteBlobLocked(byte[] Bin, int Offset)
 		{
-			if (this.blobFile == null)
+			if (this.blobFile is null)
 				throw new IOException("BLOBs not supported in this file.");
 
 			SortedDictionary<uint, bool> BlocksToRemoveSorted = new SortedDictionary<uint, bool>();
@@ -1080,7 +1080,7 @@ namespace Waher.Persistence.Files
 
 				Reader.Restart(DecryptedBlock, 0);
 				ObjectId2 = this.recordHandler.GetKey(Reader);
-				if (ObjectId2 == null || this.recordHandler.Compare(ObjectId2, ObjectId) != 0)
+				if (ObjectId2 is null || this.recordHandler.Compare(ObjectId2, ObjectId) != 0)
 					break;
 
 				BlocksToRemoveSorted[BlobBlockIndex] = true;
@@ -1127,7 +1127,7 @@ namespace Waher.Persistence.Files
 
 				Reader.Restart(DecryptedBlock, 0);
 				ObjectId2 = this.recordHandler.GetKey(Reader);
-				if (ObjectId2 == null || this.recordHandler.Compare(ObjectId2, ObjectId) != 0)
+				if (ObjectId2 is null || this.recordHandler.Compare(ObjectId2, ObjectId) != 0)
 					ReplacementBlocks.AddFirst(new KeyValuePair<uint, byte[]>(BlobBlockIndex, DecryptedBlock));
 			}
 
@@ -1372,7 +1372,7 @@ namespace Waher.Persistence.Files
 		{
 			lock (this.synchObject)
 			{
-				if (this.objectsToSave == null)
+				if (this.objectsToSave is null)
 					this.objectsToSave = new LinkedList<KeyValuePair<object, ObjectSerializer>>();
 
 				this.objectsToSave.AddLast(new KeyValuePair<object, ObjectSerializer>(Object, Serializer));
@@ -1390,7 +1390,7 @@ namespace Waher.Persistence.Files
 				ObjectId = await Serializer.GetObjectId(Object, false);
 				Leaf = await this.FindLeafNodeLocked(ObjectId);
 
-				if (Leaf == null)
+				if (Leaf is null)
 					throw new IOException("Object with same Object ID already exists.");
 			}
 			else
@@ -1399,7 +1399,7 @@ namespace Waher.Persistence.Files
 				{
 					ObjectId = CreateDatabaseGUID();
 				}
-				while ((Leaf = await this.FindLeafNodeLocked(ObjectId)) == null);
+				while ((Leaf = await this.FindLeafNodeLocked(ObjectId)) is null);
 
 				if (!Serializer.TrySetObjectId(Object, ObjectId))
 					throw new NotSupportedException("Unable to set Object ID.");
@@ -1515,7 +1515,7 @@ namespace Waher.Persistence.Files
 
 					BlockLink = Reader.ReadBlockLink();                  // Block link.
 					ObjectId = this.recordHandler.GetKey(Reader);
-					IsEmpty = (ObjectId == null);
+					IsEmpty = (ObjectId is null);
 					if (IsEmpty)
 						break;
 
@@ -1667,7 +1667,7 @@ namespace Waher.Persistence.Files
 
 				ChildLink = Reader.ReadBlockLink();                  // Block link.
 				ObjectId = this.recordHandler.GetKey(Reader);
-				if (ObjectId == null)
+				if (ObjectId is null)
 					break;
 
 				Len = this.recordHandler.GetPayloadSize(Reader);
@@ -1733,7 +1733,7 @@ namespace Waher.Persistence.Files
 					BlockLink = Reader.ReadBlockLink();                  // Block link.
 					ObjectId2 = this.recordHandler.GetKey(Reader);
 
-					IsEmpty = (ObjectId2 == null);
+					IsEmpty = (ObjectId2 is null);
 					if (IsEmpty)
 					{
 						Comparison = 1;
@@ -1821,7 +1821,7 @@ namespace Waher.Persistence.Files
 		internal async Task<object> LoadObjectLocked(object ObjectId, IObjectSerializer Serializer)
 		{
 			BlockInfo Info = await this.FindNodeLocked(ObjectId);
-			if (Info == null)
+			if (Info is null)
 				throw new KeyNotFoundException("Object not found.");
 
 			return await this.ParseObjectLocked(Info, Serializer);
@@ -1843,7 +1843,7 @@ namespace Waher.Persistence.Files
 		internal async Task<object> TryLoadObjectLocked(object ObjectId, IObjectSerializer Serializer)
 		{
 			BlockInfo Info = await this.FindNodeLocked(ObjectId);
-			if (Info == null)
+			if (Info is null)
 				return null;
 			else
 				return await this.ParseObjectLocked(Info, Serializer);
@@ -1853,7 +1853,7 @@ namespace Waher.Persistence.Files
 		{
 			lock (this.synchObject)
 			{
-				if (this.objectsToLoad == null)
+				if (this.objectsToLoad is null)
 					this.objectsToLoad = new LinkedList<Tuple<Guid, ObjectSerializer, EmbeddedObjectSetter>>();
 
 				this.objectsToLoad.AddLast(new Tuple<Guid, ObjectSerializer, EmbeddedObjectSetter>(ObjectId, Serializer, Setter));
@@ -1874,7 +1874,7 @@ namespace Waher.Persistence.Files
 				Pos = 0;
 			}
 
-			if (Serializer == null)
+			if (Serializer is null)
 			{
 				string TypeName = this.recordHandler.GetPayloadType(Reader);
 				if (string.IsNullOrEmpty(TypeName))
@@ -1898,7 +1898,7 @@ namespace Waher.Persistence.Files
 		{
 			uint BlockIndex = 0;
 
-			if (ObjectId == null || (ObjectId is Guid && ObjectId.Equals(Guid.Empty)))
+			if (ObjectId is null || (ObjectId is Guid && ObjectId.Equals(Guid.Empty)))
 				return null;
 
 			while (true)
@@ -1924,7 +1924,7 @@ namespace Waher.Persistence.Files
 					BlockLink = Reader.ReadBlockLink();                  // Block link.
 					ObjectId2 = this.recordHandler.GetKey(Reader);
 
-					IsEmpty = (ObjectId2 == null);
+					IsEmpty = (ObjectId2 is null);
 					if (IsEmpty)
 					{
 						Comparison = 1;
@@ -2009,7 +2009,7 @@ namespace Waher.Persistence.Files
 			try
 			{
 				BlockInfo Info = await this.FindNodeLocked(ObjectId);
-				if (Info == null)
+				if (Info is null)
 					throw new KeyNotFoundException("Object not found.");
 
 				Old = await this.ParseObjectLocked(Info, Serializer);
@@ -2053,7 +2053,7 @@ namespace Waher.Persistence.Files
 				while (e1.MoveNext() && e2.MoveNext())
 				{
 					BlockInfo Info = await this.FindNodeLocked(e1.Current);
-					if (Info == null)
+					if (Info is null)
 						throw new KeyNotFoundException("Object not found.");
 
 					Old = await this.ParseObjectLocked(Info, Serializer);
@@ -2157,7 +2157,7 @@ namespace Waher.Persistence.Files
 
 					BlockLink = Reader.ReadBlockLink();                    // Block link.
 					ObjectId = this.recordHandler.GetKey(Reader);
-					IsEmpty = ObjectId == null;
+					IsEmpty = ObjectId is null;
 					if (IsEmpty)
 						break;
 
@@ -2381,7 +2381,7 @@ namespace Waher.Persistence.Files
 			IObjectSerializer Serializer, object OldObject)
 		{
 			BlockInfo Info = await this.FindNodeLocked(ObjectId);
-			if (Info == null)
+			if (Info is null)
 				throw new KeyNotFoundException("Object not found.");
 
 			byte[] Block = Info.Block;
@@ -2537,28 +2537,28 @@ namespace Waher.Persistence.Files
 					bool Reshuffled = false;
 					byte[] NewSeparator = await this.TryExtractLargestObjectLocked(LeftBlockLink, false, false);
 
-					if (NewSeparator == null)
+					if (NewSeparator is null)
 					{
 						NewSeparator = await this.TryExtractSmallestObjectLocked(RightBlockLink, false, false);
 
-						if (NewSeparator == null)
+						if (NewSeparator is null)
 						{
 							Reshuffled = true;
 							NewSeparator = await this.TryExtractLargestObjectLocked(LeftBlockLink, true, false);
 
-							if (NewSeparator == null)
+							if (NewSeparator is null)
 							{
 								NewSeparator = await this.TryExtractSmallestObjectLocked(RightBlockLink, true, false);
 
-								if (NewSeparator == null)
+								if (NewSeparator is null)
 								{
 									NewSeparator = await this.TryExtractLargestObjectLocked(LeftBlockLink, false, true);
 
-									if (NewSeparator == null)
+									if (NewSeparator is null)
 									{
 										NewSeparator = await this.TryExtractSmallestObjectLocked(RightBlockLink, false, true);
 
-										if (NewSeparator == null)
+										if (NewSeparator is null)
 											return await this.DeleteObjectLocked(ObjectId, true, false, Serializer, OldObject);
 									}
 								}
@@ -2601,7 +2601,7 @@ namespace Waher.Persistence.Files
 
 		private async Task ReinsertMergeOverflow(MergeResult MergeResult, uint BlockIndex)
 		{
-			if (MergeResult.Separator == null)
+			if (MergeResult.Separator is null)
 				return;
 
 			// Update block object counts:
@@ -2666,7 +2666,7 @@ namespace Waher.Persistence.Files
 
 						if (Link != 0)
 						{
-							if (Links == null)
+							if (Links is null)
 								Links = new LinkedList<uint>();
 
 							Links.AddLast(Link);
@@ -2678,13 +2678,13 @@ namespace Waher.Persistence.Files
 					BlockIndex = BitConverter.ToUInt32(Block, 6);
 					if (BlockIndex != 0)
 					{
-						if (Links == null)
+						if (Links is null)
 							Links = new LinkedList<uint>();
 
 						Links.AddLast(BlockIndex);
 					}
 
-					if (Links == null || Links.First == null)
+					if (Links is null || Links.First is null)
 						Block = null;
 					else
 					{
@@ -2711,17 +2711,17 @@ namespace Waher.Persistence.Files
 			{
 				Object = await this.RotateLeftLocked(Header.LastBlockIndex, BlockIndex);
 
-				if (Object == null)
+				if (Object is null)
 					Object = await this.RotateRightLocked(BlockIndex, Header.ParentBlockIndex);
 			}
 			else
 			{
 				Object = await this.RotateLeftLocked(BlockIndex, Header.ParentBlockIndex);
-				if (Object == null)
+				if (Object is null)
 					Object = await this.RotateRightLocked(BlockIndex, Header.ParentBlockIndex);
 			}
 
-			if (Object == null)
+			if (Object is null)
 			{
 				if (BlockIndex != 0)
 					await this.MergeEmptyBlockWithSiblingLocked(BlockIndex, Header.ParentBlockIndex);
@@ -2749,7 +2749,7 @@ namespace Waher.Persistence.Files
 					this.QueueSaveBlockLocked(((long)BlockIndex) * this.blockSize, Block);
 
 					byte[] Object2 = await this.RotateLeftLocked(NewChildBlockIndex, BlockIndex);
-					if (Object2 == null && BlockIndex != 0)
+					if (Object2 is null && BlockIndex != 0)
 						Object2 = await this.RotateRightLocked(BlockIndex, Header.ParentBlockIndex);
 
 					if (Object2 != null)
@@ -2962,7 +2962,7 @@ namespace Waher.Persistence.Files
 				Separator = Splitter.ParentObject
 			};
 
-			if (Splitter.ParentObject == null)
+			if (Splitter.ParentObject is null)
 			{
 				if (Size != 0)
 				{
@@ -3015,7 +3015,7 @@ namespace Waher.Persistence.Files
 
 				Link = Reader.ReadBlockLink();
 				ObjectId = this.recordHandler.GetKey(Reader);
-				if (ObjectId == null)
+				if (ObjectId is null)
 					break;
 
 				Len = this.recordHandler.GetPayloadSize(Reader);
@@ -3047,7 +3047,7 @@ namespace Waher.Persistence.Files
 
 				Link = Reader.ReadBlockLink();
 				ObjectId = this.recordHandler.GetKey(Reader);
-				if (ObjectId == null)
+				if (ObjectId is null)
 					break;
 
 				Len = this.recordHandler.GetPayloadSize(Reader);
@@ -3079,7 +3079,7 @@ namespace Waher.Persistence.Files
 			{
 				Result = await this.TryExtractLargestObjectLocked(Header.LastBlockIndex, AllowRotation, AllowMerge);
 
-				if (Result == null && AllowMerge)
+				if (Result is null && AllowMerge)
 				{
 					LastPos = 0;
 					do
@@ -3087,7 +3087,7 @@ namespace Waher.Persistence.Files
 						Pos = Reader.Position;
 						Link = Reader.ReadBlockLink();
 						ObjectId = this.recordHandler.GetKey(Reader);
-						if (ObjectId == null)
+						if (ObjectId is null)
 							break;
 
 						Len = this.recordHandler.GetPayloadSize(Reader);
@@ -3109,7 +3109,7 @@ namespace Waher.Persistence.Files
 
 						MergeResult MergeResult = await this.MergeBlocksLocked(Link, Separator, Header.LastBlockIndex);
 
-						if (MergeResult.Separator == null)
+						if (MergeResult.Separator is null)
 						{
 							this.RegisterEmptyBlockLocked(Header.LastBlockIndex);
 							Header.LastBlockIndex = Link;
@@ -3142,7 +3142,7 @@ namespace Waher.Persistence.Files
 						return null;
 
 					ObjectId = this.recordHandler.GetKey(Reader);
-					if (ObjectId == null)
+					if (ObjectId is null)
 					{
 						Reader.Position = Pos;
 						break;
@@ -3231,7 +3231,7 @@ namespace Waher.Persistence.Files
 					{
 						Result = await this.TryExtractSmallestObjectLocked(Link, AllowRotation, AllowMerge);
 
-						if (Result == null && AllowMerge)
+						if (Result is null && AllowMerge)
 						{
 							uint RightLink;
 
@@ -3245,7 +3245,7 @@ namespace Waher.Persistence.Files
 								Second = Reader.Position;
 								RightLink = Reader.ReadBlockLink();
 								ObjectId = this.recordHandler.GetKey(Reader);
-								if (ObjectId == null)
+								if (ObjectId is null)
 									RightLink = Header.LastBlockIndex;
 
 								c = Second - First - 4;
@@ -3254,7 +3254,7 @@ namespace Waher.Persistence.Files
 
 								MergeResult MergeResult = await this.MergeBlocksLocked(Link, Separator, RightLink);
 
-								if (MergeResult.Separator == null)
+								if (MergeResult.Separator is null)
 								{
 									this.RegisterEmptyBlockLocked(RightLink);
 
@@ -3287,7 +3287,7 @@ namespace Waher.Persistence.Files
 				else
 				{
 					ObjectId = this.recordHandler.GetKey(Reader);
-					if (ObjectId == null)
+					if (ObjectId is null)
 					{
 						Reader.Position = Pos;
 						break;
@@ -3394,7 +3394,7 @@ namespace Waher.Persistence.Files
 
 				BlockLink = Reader.ReadBlockLink();                  // Block link.
 				ObjectId = this.recordHandler.GetKey(Reader);
-				IsEmpty = ObjectId == null;
+				IsEmpty = ObjectId is null;
 				if (IsEmpty)
 					return null;
 
@@ -3408,14 +3408,14 @@ namespace Waher.Persistence.Files
 
 			bool Reshuffled = false;
 			byte[] Object = await this.TryExtractSmallestObjectLocked(BlockLink, false, false);
-			if (Object == null)
+			if (Object is null)
 			{
 				Reshuffled = true;
 				Object = await this.TryExtractSmallestObjectLocked(BlockLink, true, false);
-				if (Object == null)
+				if (Object is null)
 				{
 					Object = await this.TryExtractSmallestObjectLocked(BlockLink, false, true);
-					if (Object == null)
+					if (Object is null)
 						return null;
 				}
 			}
@@ -3437,7 +3437,7 @@ namespace Waher.Persistence.Files
 
 					BlockLink = Reader.ReadBlockLink();                  // Block link.
 					ObjectId = this.recordHandler.GetKey(Reader);
-					IsEmpty = ObjectId == null;
+					IsEmpty = ObjectId is null;
 					if (IsEmpty)
 					{
 						BlockInfo Leaf = await this.FindLeafNodeLocked(this.GetObjectId(Object));
@@ -3498,7 +3498,7 @@ namespace Waher.Persistence.Files
 
 				BlockLink = Reader.ReadBlockLink();                  // Block link.
 				ObjectId = this.recordHandler.GetKey(Reader);
-				IsEmpty = ObjectId == null;
+				IsEmpty = ObjectId is null;
 				if (IsEmpty)
 				{
 					BlockLink = PrevBlockLink;
@@ -3528,14 +3528,14 @@ namespace Waher.Persistence.Files
 
 			bool Reshuffled = false;
 			byte[] Object = await this.TryExtractLargestObjectLocked(PrevBlockLink, false, false);
-			if (Object == null)
+			if (Object is null)
 			{
 				Reshuffled = true;
 				Object = await this.TryExtractLargestObjectLocked(PrevBlockLink, true, false);
-				if (Object == null)
+				if (Object is null)
 				{
 					Object = await this.TryExtractLargestObjectLocked(PrevBlockLink, false, true);
-					if (Object == null)
+					if (Object is null)
 						return null;
 				}
 			}
@@ -3557,7 +3557,7 @@ namespace Waher.Persistence.Files
 
 					BlockLink = Reader.ReadBlockLink();                  // Block link.
 					ObjectId = this.recordHandler.GetKey(Reader);
-					IsEmpty = ObjectId == null;
+					IsEmpty = ObjectId is null;
 					if (IsEmpty)
 					{
 						BlockLink = PrevBlockLink;
@@ -3745,7 +3745,7 @@ namespace Waher.Persistence.Files
 			int NrBlocks = (int)(FileSize / this.blockSize);
 			this.blockLimit = (uint)NrBlocks;
 
-			long BlobFileSize = this.blobFile == null ? 0 : this.blobFile.Length;
+			long BlobFileSize = this.blobFile is null ? 0 : this.blobFile.Length;
 			int NrBlobBlocks = (int)(BlobFileSize / this.blobBlockSize);
 			this.blobBlockLimit = (uint)NrBlobBlocks;
 
@@ -3851,7 +3851,7 @@ namespace Waher.Persistence.Files
 			{
 				BlockLink = Reader.ReadBlockLink();                    // Block link.
 				ObjectId = this.recordHandler.GetKey(Reader);
-				if (ObjectId == null)
+				if (ObjectId is null)
 					break;
 
 				if (ObjectId is Guid Guid)
@@ -4192,7 +4192,7 @@ namespace Waher.Persistence.Files
 #endif
 						DecryptedBlock = (byte[])BlobBlock.Clone();
 
-					if (Reader == null)
+					if (Reader is null)
 						Reader = new BinaryDeserializer(this.collectionName, this.encoding, DecryptedBlock, this.blockLimit);
 					else
 						Reader.Restart(DecryptedBlock, 0);
@@ -4246,7 +4246,7 @@ namespace Waher.Persistence.Files
 				Pos = Reader.Position;
 				BlockLink = Reader.ReadBlockLink();                    // Block link.
 				ObjectId = this.recordHandler.GetKey(Reader);
-				if (ObjectId == null)
+				if (ObjectId is null)
 					break;
 
 				Len = this.recordHandler.GetFullPayloadSize(Reader);
@@ -4330,14 +4330,14 @@ namespace Waher.Persistence.Files
 				switch (TypeCode)
 				{
 					case ObjectSerializer.TYPE_ARRAY:
-						if (Arrays == null)
+						if (Arrays is null)
 							Arrays = new LinkedList<KeyValuePair<string, Array>>();
 
 						Arrays.AddLast(new KeyValuePair<string, Array>(s, (Array)Value));
 						break;
 
 					case ObjectSerializer.TYPE_OBJECT:
-						if (Objects == null)
+						if (Objects is null)
 							Objects = new LinkedList<KeyValuePair<string, GenericObject>>();
 
 						Objects.AddLast(new KeyValuePair<string, GenericObject>(s, (GenericObject)Value));
@@ -4547,7 +4547,7 @@ namespace Waher.Persistence.Files
 
 				BlockLink = Reader.ReadBlockLink();                    // Block link.
 				ObjectId = this.recordHandler.GetKey(Reader);
-				if (ObjectId == null)
+				if (ObjectId is null)
 					break;
 
 				NrObjects++;
@@ -4592,7 +4592,7 @@ namespace Waher.Persistence.Files
 		internal async Task<ulong> GetRankLocked(object ObjectId)
 		{
 			BlockInfo Info = await this.FindNodeLocked(ObjectId);
-			if (Info == null)
+			if (Info is null)
 				throw new KeyNotFoundException("Object not found.");
 
 			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Info.Block, this.blockLimit, BlockHeaderSize);
@@ -4610,7 +4610,7 @@ namespace Waher.Persistence.Files
 
 				BlockLink = Reader.ReadBlockLink();                  // Block link.
 				ObjectId2 = this.recordHandler.GetKey(Reader);
-				IsEmpty = ObjectId2 == null;
+				IsEmpty = ObjectId2 is null;
 				if (IsEmpty)
 					break;
 
@@ -4641,7 +4641,7 @@ namespace Waher.Persistence.Files
 								break;
 
 							ObjectId2 = this.recordHandler.GetKey(Reader);
-							IsEmpty = ObjectId2 == null;
+							IsEmpty = ObjectId2 is null;
 							if (IsEmpty)
 								break;
 
@@ -4699,7 +4699,7 @@ namespace Waher.Persistence.Files
 		/// <returns>If the object is stored in the file.</returns>
 		public async Task<bool> ContainsAsync(object Item)
 		{
-			if (Item == null)
+			if (Item is null)
 				return false;
 
 			if (!(this.provider.GetObjectSerializer(Item.GetType()) is ObjectSerializer Serializer))
@@ -4725,7 +4725,7 @@ namespace Waher.Persistence.Files
 				await this.EndRead();
 			}
 
-			if (Obj == null)
+			if (Obj is null)
 				return false;
 
 			try
@@ -4943,7 +4943,7 @@ namespace Waher.Persistence.Files
 		{
 			string s, s2;
 
-			if (SortOrder == null || SortOrder.Length == 0)
+			if (SortOrder is null || SortOrder.Length == 0)
 				return this.FindBestIndex(out BestNrFields, Property);
 
 			s = SortOrder[0];
@@ -4979,10 +4979,10 @@ namespace Waher.Persistence.Files
 		{
 			string s2;
 
-			if (SortOrder == null || SortOrder.Length == 0)
+			if (SortOrder is null || SortOrder.Length == 0)
 				return this.FindBestIndex(out BestNrFields, Properties);
 
-			if (Properties == null || Properties.Length == 0)
+			if (Properties is null || Properties.Length == 0)
 				return this.FindBestIndex(out BestNrFields, SortOrder);
 
 			List<string> Order = new List<string>();
@@ -5133,7 +5133,7 @@ namespace Waher.Persistence.Files
 
 			try
 			{
-				if (Filter == null)
+				if (Filter is null)
 				{
 					Result = null;
 
@@ -5150,7 +5150,7 @@ namespace Waher.Persistence.Files
 						}
 					}
 
-					if (Result == null)
+					if (Result is null)
 					{
 						this.nrFullFileScans++;
 						Result = await this.GetTypedEnumeratorAsync<T>(Locked);
@@ -5253,7 +5253,7 @@ namespace Waher.Persistence.Files
 						{
 							if (!(Filter2 is FilterFieldNotEqualTo))
 							{
-								if (Properties == null)
+								if (Properties is null)
 									Properties = new List<string>();
 
 								FieldName = ((FilterFieldValue)Filter2).FieldName;
@@ -5266,14 +5266,14 @@ namespace Waher.Persistence.Files
 							Searching.FilterFieldLikeRegEx FilterFieldLikeRegEx2 = (Searching.FilterFieldLikeRegEx)this.ConvertFilter(Filter2);
 							string ConstantPrefix = this.GetRegExConstantPrefix(FilterFieldLikeRegEx.RegularExpression, FilterFieldLikeRegEx2.Regex);
 
-							if (RegExFields == null)
+							if (RegExFields is null)
 								RegExFields = new LinkedList<KeyValuePair<Searching.FilterFieldLikeRegEx, string>>();
 
 							RegExFields.AddLast(new KeyValuePair<Searching.FilterFieldLikeRegEx, string>(FilterFieldLikeRegEx2, ConstantPrefix));
 
 							if (!string.IsNullOrEmpty(ConstantPrefix))
 							{
-								if (Properties == null)
+								if (Properties is null)
 									Properties = new List<string>();
 
 								FieldName = FilterFieldLikeRegEx2.FieldName;
@@ -5286,7 +5286,7 @@ namespace Waher.Persistence.Files
 					IndexBTreeFile Index;
 					int NrFields;
 
-					if (Properties == null)
+					if (Properties is null)
 					{
 						NrFields = 0;
 						Index = null;
@@ -5299,7 +5299,7 @@ namespace Waher.Persistence.Files
 							NrFields = Properties.Count;
 					}
 
-					if (Index == null)
+					if (Index is null)
 					{
 						this.nrFullFileScans++;
 						Log.Notice("Search resulted in entire file to be scanned. Consider either adding indices, or enumerate objects using an object enumerator.", this.fileName, string.Empty, "DBOpt");
@@ -5330,7 +5330,7 @@ namespace Waher.Persistence.Files
 						{
 							if (!FieldOrder.TryGetValue(FilterFieldValue.FieldName, out i) || Filter2 is FilterFieldNotEqualTo)
 							{
-								if (AdditionalFields == null)
+								if (AdditionalFields is null)
 								{
 									AdditionalFields = new List<Searching.IApplicableFilter>();
 									AdditionalFields2 = new List<Filter>();
@@ -5391,7 +5391,7 @@ namespace Waher.Persistence.Files
 
 							RegExFields.RemoveFirst();
 
-							if (AdditionalFields == null)
+							if (AdditionalFields is null)
 							{
 								AdditionalFields = new List<Searching.IApplicableFilter>();
 								AdditionalFields2 = new List<Filter>();
@@ -5413,7 +5413,7 @@ namespace Waher.Persistence.Files
 
 					if (Consistent)
 					{
-						if (AdditionalFields == null)
+						if (AdditionalFields is null)
 							return new Searching.RangesCursor<T>(Index, RangeInfo, null, Locked, this.provider);
 						else
 							return new Searching.RangesCursor<T>(Index, RangeInfo, AdditionalFields.ToArray(), Locked, this.provider);
@@ -5472,7 +5472,7 @@ namespace Waher.Persistence.Files
 				IndexBTreeFile Index = this.FindBestIndex(out int NrFields, FilterFieldValue.FieldName, SortOrder);
 				ICursor<T> Cursor;
 
-				if (Index == null)
+				if (Index is null)
 				{
 					if (Filter is FilterFieldEqualTo)
 					{
@@ -5615,7 +5615,7 @@ namespace Waher.Persistence.Files
 					Searching.FilterFieldLikeRegEx FilterFieldLikeRegEx2 = (Searching.FilterFieldLikeRegEx)this.ConvertFilter(Filter);
 					IndexBTreeFile Index = this.FindBestIndex(out int NrFields, FilterFieldLikeRegEx.FieldName, SortOrder);
 
-					string ConstantPrefix = Index == null ? string.Empty : this.GetRegExConstantPrefix(FilterFieldLikeRegEx.RegularExpression, FilterFieldLikeRegEx2.Regex);
+					string ConstantPrefix = Index is null ? string.Empty : this.GetRegExConstantPrefix(FilterFieldLikeRegEx.RegularExpression, FilterFieldLikeRegEx2.Regex);
 
 					if (string.IsNullOrEmpty(ConstantPrefix))
 					{
@@ -5654,7 +5654,7 @@ namespace Waher.Persistence.Files
 						{
 							if (!(Filter2 is FilterFieldNotEqualTo))
 							{
-								if (Properties == null)
+								if (Properties is null)
 									Properties = new List<string>();
 
 								Properties.Add(((FilterFieldValue)Filter2).FieldName);
@@ -5665,14 +5665,14 @@ namespace Waher.Persistence.Files
 							Searching.FilterFieldLikeRegEx FilterFieldLikeRegEx2 = (Searching.FilterFieldLikeRegEx)this.ConvertFilter(Filter2);
 							string ConstantPrefix = this.GetRegExConstantPrefix(FilterFieldLikeRegEx.RegularExpression, FilterFieldLikeRegEx2.Regex);
 
-							if (RegExFields == null)
+							if (RegExFields is null)
 								RegExFields = new LinkedList<KeyValuePair<Searching.FilterFieldLikeRegEx, string>>();
 
 							RegExFields.AddLast(new KeyValuePair<Searching.FilterFieldLikeRegEx, string>(FilterFieldLikeRegEx2, ConstantPrefix));
 
 							if (!string.IsNullOrEmpty(ConstantPrefix))
 							{
-								if (Properties == null)
+								if (Properties is null)
 									Properties = new List<string>();
 
 								Properties.Add(FilterFieldLikeRegEx2.FieldName);
@@ -5680,7 +5680,7 @@ namespace Waher.Persistence.Files
 						}
 					}
 
-					IndexBTreeFile Index = Properties == null ? null : this.FindBestIndex(out int NrFields, Properties.ToArray());
+					IndexBTreeFile Index = Properties is null ? null : this.FindBestIndex(out int NrFields, Properties.ToArray());
 					return Index != null;
 				}
 				else if (Filter is FilterOr)
@@ -5715,7 +5715,7 @@ namespace Waher.Persistence.Files
 				object Value = FilterFieldValue.Value;
 				IndexBTreeFile Index = this.FindBestIndex(FilterFieldValue.FieldName);
 
-				if (Index == null)
+				if (Index is null)
 					return true;
 
 				if (Filter is FilterFieldEqualTo ||
@@ -5738,7 +5738,7 @@ namespace Waher.Persistence.Files
 					Searching.FilterFieldLikeRegEx FilterFieldLikeRegEx2 = (Searching.FilterFieldLikeRegEx)this.ConvertFilter(Filter);
 					IndexBTreeFile Index = this.FindBestIndex(FilterFieldLikeRegEx.FieldName);
 
-					string ConstantPrefix = Index == null ? string.Empty : this.GetRegExConstantPrefix(FilterFieldLikeRegEx.RegularExpression, FilterFieldLikeRegEx2.Regex);
+					string ConstantPrefix = Index is null ? string.Empty : this.GetRegExConstantPrefix(FilterFieldLikeRegEx.RegularExpression, FilterFieldLikeRegEx2.Regex);
 
 					if (string.IsNullOrEmpty(ConstantPrefix))
 						return true;
@@ -5846,7 +5846,7 @@ namespace Waher.Persistence.Files
 
 								l = int.Parse(RegularExpression.Substring(j, k));
 
-								if (GroupNumbers == null)
+								if (GroupNumbers is null)
 									GroupNumbers = Regex.GetGroupNumbers();
 
 								if (Array.IndexOf<int>(GroupNumbers, l) >= 0)
@@ -5877,7 +5877,7 @@ namespace Waher.Persistence.Files
 
 		private Searching.IApplicableFilter ConvertFilter(Filter Filter)
 		{
-			if (Filter == null)
+			if (Filter is null)
 				return null;
 			else if (Filter is FilterChildren FilterChildren)
 			{

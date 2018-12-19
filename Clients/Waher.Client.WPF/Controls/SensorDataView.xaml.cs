@@ -114,7 +114,7 @@ namespace Waher.Client.WPF.Controls
 				foreach (ThingError Error in NewErrors)
 				{
 					Key = Error.Key;
-					if (LastKey == null || Key != LastKey)
+					if (LastKey is null || Key != LastKey)
 					{
 						LastKey = Key;
 						this.failed[Key] = true;
@@ -145,7 +145,7 @@ namespace Waher.Client.WPF.Controls
 				foreach (Field Field in NewFields)
 				{
 					Key = Field.Thing.Key;
-					if (LastKey == null || Key != LastKey)
+					if (LastKey is null || Key != LastKey)
 					{
 						LastKey = Key;
 						this.nodes[Key] = true;
@@ -386,7 +386,7 @@ namespace Waher.Client.WPF.Controls
 			foreach (XmlNode N in Xml.DocumentElement.ChildNodes)
 			{
 				E = N as XmlElement;
-				if (E == null)
+				if (E is null)
 					continue;
 
 				switch (E.LocalName)

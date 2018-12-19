@@ -234,7 +234,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		{
 			XmlElement E;
 
-			if (!e.Ok || (E = e.FirstElement) == null || E.LocalName != "bool" || !CommonTypes.TryParse(E.InnerText, out bool Response))
+			if (!e.Ok || (E = e.FirstElement) is null || E.LocalName != "bool" || !CommonTypes.TryParse(E.InnerText, out bool Response))
 			{
 				e.Ok = false;
 				Response = false;
@@ -456,7 +456,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					}
 				}
 
-				if (NodeInfo == null)
+				if (NodeInfo is null)
 					e.Ok = false;
 			}
 			else
@@ -2395,7 +2395,7 @@ namespace Waher.Networking.XMPP.Concentrator
 								{
 									if (N2 is XmlElement E2 && E2.LocalName == "record")
 									{
-										if (Record == null)
+										if (Record is null)
 											Record = new List<object>();
 										else
 											Record.Clear();

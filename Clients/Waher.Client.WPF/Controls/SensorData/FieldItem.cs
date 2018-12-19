@@ -101,7 +101,7 @@ namespace Waher.Client.WPF.Controls.SensorData
 		{
 			get
 			{
-				if (this.statusString == null)
+				if (this.statusString is null)
 				{
 					StringBuilder Output = null;
 
@@ -110,7 +110,7 @@ namespace Waher.Client.WPF.Controls.SensorData
 						if (!this.field.QoS.HasFlag(Value))
 							continue;
 
-						if (Output == null)
+						if (Output is null)
 							Output = new StringBuilder();
 						else
 							Output.Append(", ");
@@ -151,7 +151,7 @@ namespace Waher.Client.WPF.Controls.SensorData
 		{
 			get
 			{
-				if (this.typeString == null)
+				if (this.typeString is null)
 				{
 					StringBuilder Output = null;
 
@@ -160,7 +160,7 @@ namespace Waher.Client.WPF.Controls.SensorData
 						if (!this.field.Type.HasFlag(Value))
 							continue;
 
-						if (Output == null)
+						if (Output is null)
 							Output = new StringBuilder();
 						else
 							Output.Append(", ");

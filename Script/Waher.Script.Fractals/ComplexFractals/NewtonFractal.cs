@@ -131,7 +131,7 @@ namespace Waher.Script.Fractals.ComplexFractals
 			{
 				R = Complex.One;
 
-				if (i < c && this.Arguments[i] == null)
+				if (i < c && this.Arguments[i] is null)
 					i++;
 			}
 
@@ -183,7 +183,7 @@ namespace Waher.Script.Fractals.ComplexFractals
 				Palette = ColorModels.RandomLinearAnalogousHSL.CreatePalette(128, 4, out int Seed, this, Variables);
 				ColorExpression = "RandomLinearAnalogousHSL(128,4," + Seed.ToString() + ")";
 
-				if (i < c && this.Arguments[i] == null)
+				if (i < c && this.Arguments[i] is null)
 					i++;
 			}
 
@@ -654,7 +654,7 @@ namespace Waher.Script.Fractals.ComplexFractals
 					Row2 = Obj.AssociatedObjectValue as Complex[];
 					Row3 = Obj2.AssociatedObjectValue as Complex[];
 
-					if (Row2 == null || Row3 == null)
+					if (Row2 is null || Row3 is null)
 					{
 						throw new ScriptRuntimeException("Lambda expression (and its first derivative) must be able to accept complex vectors, " +
 							"and return complex vectors of equal length. Type returned: " +

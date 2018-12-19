@@ -66,7 +66,7 @@ namespace Waher.Script.Persistence.SQL
 			this.orderBy = OrderBy;
 			this.offset = Offset;
 
-			if (this.columnNames == null ^ this.columns == null)
+			if (this.columnNames is null ^ this.columns is null)
 				throw new ArgumentException("Columns and ColumnNames must both be null or not null.", nameof(ColumnNames));
 
 			if (this.columns != null && this.columns.Length != this.columnNames.Length)
@@ -75,7 +75,7 @@ namespace Waher.Script.Persistence.SQL
 			if (this.sources.Length != this.sourceNames.Length)
 				throw new ArgumentException("Sources and SourceNames must be of equal length.", nameof(SourceNames));
 
-			if (this.columnNames == null ^ this.columns == null)
+			if (this.columnNames is null ^ this.columns is null)
 				throw new ArgumentException("GroupBy and GroupByNames must both be null or not null.", nameof(GroupByNames));
 
 			if (this.columns != null && this.columns.Length != this.columnNames.Length)
@@ -218,7 +218,7 @@ namespace Waher.Script.Persistence.SQL
 				object Item = e.Current;
 				ObjectProperties Properties = new ObjectProperties(Item, Variables);
 
-				if (this.columns == null)
+				if (this.columns is null)
 					Rec = new IElement[1] { Expression.Encapsulate(Item) };
 				else
 				{
@@ -244,7 +244,7 @@ namespace Waher.Script.Persistence.SQL
 					break;
 			}
 
-			IElement[] Elements = new IElement[this.columns == null ? NrRecords : NrRecords * c];
+			IElement[] Elements = new IElement[this.columns is null ? NrRecords : NrRecords * c];
 
 			i = 0;
 			foreach (IElement[] Record in Items)
@@ -261,7 +261,7 @@ namespace Waher.Script.Persistence.SQL
 
 			if (Elements.Length == 1)
 				return Elements[0];
-			else if (this.columns == null)
+			else if (this.columns is null)
 				return Operators.Vectors.VectorDefinition.Encapsulate(Elements, false, this);
 
 			ObjectMatrix Result = new ObjectMatrix(NrRecords, c, Elements);
@@ -280,9 +280,9 @@ namespace Waher.Script.Persistence.SQL
 					else
 					{
 						E = this.columnNames[i]?.Evaluate(Variables);
-						if (E == null)
+						if (E is null)
 						{
-							if (Names[i] == null)
+							if (Names[i] is null)
 								Names[i] = (i + 1).ToString();
 
 							i++;
@@ -297,7 +297,7 @@ namespace Waher.Script.Persistence.SQL
 
 			while (i < c)
 			{
-				if (Names[i] == null)
+				if (Names[i] is null)
 					Names[i] = (i + 1).ToString();
 
 				i++;
@@ -319,7 +319,7 @@ namespace Waher.Script.Persistence.SQL
 				throw new ScriptRuntimeException("Unexpected response.", Node);
 
 			PropertyInfo PI = Task.GetType().GetRuntimeProperty("Result");
-			if (PI == null)
+			if (PI is null)
 				throw new ScriptRuntimeException("Unexpected response.", Node);
 
 			Obj = PI.GetValue(Task);
@@ -338,7 +338,7 @@ namespace Waher.Script.Persistence.SQL
 		{
 			get
 			{
-				if (findMethod == null)
+				if (findMethod is null)
 				{
 					foreach (MethodInfo MI in typeof(Database).GetTypeInfo().GetDeclaredMethods("Find"))
 					{
@@ -358,7 +358,7 @@ namespace Waher.Script.Persistence.SQL
 						findMethod = MI;
 					}
 
-					if (findMethod == null)
+					if (findMethod is null)
 						throw new InvalidOperationException("Appropriate Database.Find method not found.");
 				}
 
@@ -368,22 +368,22 @@ namespace Waher.Script.Persistence.SQL
 
 		internal static Filter Convert(ScriptNode Conditions, Variables Variables)
 		{
-			if (Conditions == null)
+			if (Conditions is null)
 				return null;
 
 			Operators.Logical.And And = Conditions as Operators.Logical.And;
-			Operators.Dual.And And2 = And == null ? Conditions as Operators.Dual.And : null;
+			Operators.Dual.And And2 = And is null ? Conditions as Operators.Dual.And : null;
 
 			if (And != null || And2 != null)
 			{
 				Filter L = Convert(And != null ? And.LeftOperand : And2.LeftOperand, Variables);
 				Filter R = Convert(And != null ? And.RightOperand : And2.RightOperand, Variables);
 
-				if (L == null && R == null)
+				if (L is null && R is null)
 					return null;
-				else if (L == null)
+				else if (L is null)
 					return R;
-				else if (R == null)
+				else if (R is null)
 					return L;
 				else
 				{
@@ -404,14 +404,14 @@ namespace Waher.Script.Persistence.SQL
 			}
 
 			Operators.Logical.Or Or = Conditions as Operators.Logical.Or;
-			Operators.Dual.Or Or2 = Or == null ? Conditions as Operators.Dual.Or : null;
+			Operators.Dual.Or Or2 = Or is null ? Conditions as Operators.Dual.Or : null;
 
 			if (Or != null || Or2 != null)
 			{
 				Filter L = Convert(Or != null ? Or.LeftOperand : Or2.LeftOperand, Variables);
 				Filter R = Convert(Or != null ? Or.RightOperand : Or2.RightOperand, Variables);
 
-				if (L == null || R == null)
+				if (L is null || R is null)
 					return null;
 				else
 				{
@@ -434,7 +434,7 @@ namespace Waher.Script.Persistence.SQL
 			if (Conditions is Operators.Logical.Not Not)
 			{
 				Filter F = Convert(Not.Operand, Variables);
-				if (F == null)
+				if (F is null)
 					return null;
 				else
 					return new FilterNot(F);

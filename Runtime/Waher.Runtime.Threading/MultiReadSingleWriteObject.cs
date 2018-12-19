@@ -86,7 +86,7 @@ namespace Waher.Runtime.Threading
 					return Task.CompletedTask;
 
 				this.nrReaders--;
-				if (this.nrReaders > 0 || this.noReadersOrWriters.First == null)
+				if (this.nrReaders > 0 || this.noReadersOrWriters.First is null)
 					return Task.CompletedTask;
 
 				List = this.noReadersOrWriters;

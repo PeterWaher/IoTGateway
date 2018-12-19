@@ -62,7 +62,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		/// <returns>If the stream acceptance was completed (true), or if somebody else accepted the stream beforehand (false).</returns>
 		public bool AcceptStream(DataReceivedEventHandler DataCallback, StreamEventHandler CloseCallback, object State)
 		{
-			if (this.dataCallback == null)
+			if (this.dataCallback is null)
 			{
 				this.dataCallback = DataCallback;
 				this.closeCallback = CloseCallback;

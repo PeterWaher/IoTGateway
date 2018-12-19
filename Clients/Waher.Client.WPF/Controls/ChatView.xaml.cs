@@ -44,7 +44,7 @@ namespace Waher.Client.WPF.Controls
 
 		internal static void InitEmojis()
 		{
-			if (emoji1_24x24 == null)
+			if (emoji1_24x24 is null)
 			{
 				string Folder = Assembly.GetExecutingAssembly().Location;
 				if (string.IsNullOrEmpty(Folder))
@@ -321,7 +321,7 @@ namespace Waher.Client.WPF.Controls
 			foreach (XmlNode N in Xml.DocumentElement.ChildNodes)
 			{
 				E = N as XmlElement;
-				if (E == null)
+				if (E is null)
 					continue;
 
 				if (!Enum.TryParse<ChatItemType>(E.LocalName, out ChatItemType Type))

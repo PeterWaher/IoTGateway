@@ -185,7 +185,7 @@ namespace Waher.Networking.XMPP.DataForms
 		{
 			this.error = string.Empty;
 
-			if ((Value == null || Value.Length == 0 || (Value.Length == 1 && string.IsNullOrEmpty(Value[0]))) && !(this.validationMethod is ListRangeValidation))
+			if ((Value is null || Value.Length == 0 || (Value.Length == 1 && string.IsNullOrEmpty(Value[0]))) && !(this.validationMethod is ListRangeValidation))
 			{
 				if (this.required)
 					this.error = "Required field.";
@@ -199,7 +199,7 @@ namespace Waher.Networking.XMPP.DataForms
 					foreach (string s in Value)
 					{
 						object Obj = this.dataType.Parse(s);
-						if (Obj == null)
+						if (Obj is null)
 							this.error = "Invalid input.";
 						else
 							Parsed.Add(Obj);
@@ -381,9 +381,9 @@ namespace Waher.Networking.XMPP.DataForms
 				this.postBack != SecondaryField.postBack ||
 				this.description != SecondaryField.description ||
 				this.required != SecondaryField.required ||
-				(this.dataType == null) ^ (SecondaryField.dataType == null) ||
-				(this.validationMethod == null) ^ (SecondaryField.validationMethod == null) ||
-				(this.options == null) ^ (SecondaryField.options == null))
+				(this.dataType is null) ^ (SecondaryField.dataType is null) ||
+				(this.validationMethod is null) ^ (SecondaryField.validationMethod is null) ||
+				(this.options is null) ^ (SecondaryField.options is null))
 			{
 				return false;
 			}
@@ -433,13 +433,13 @@ namespace Waher.Networking.XMPP.DataForms
 
 						if (O1.Key == O2.Key && O1.Value == O2.Value)
 						{
-							if (NewOptions == null)
+							if (NewOptions is null)
 								NewOptions = new List<KeyValuePair<string, string>>();
 
 							NewOptions.Add(O1);
 						}
 
-						if (NewOptions == null)
+						if (NewOptions is null)
 							return false;
 
 						this.options = NewOptions.ToArray();

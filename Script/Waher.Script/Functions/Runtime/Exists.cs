@@ -58,7 +58,7 @@ namespace Waher.Script.Functions.Runtime
 						return BooleanValue.True;
 				}
 
-				if (E is ObjectValue O && O.Value == null)
+				if (E is ObjectValue O && O.Value is null)
 					return BooleanValue.False;
 				else
 					return BooleanValue.True;

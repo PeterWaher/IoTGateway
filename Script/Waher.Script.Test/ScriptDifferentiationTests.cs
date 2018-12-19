@@ -22,7 +22,7 @@ namespace Waher.Script.Test
 				");" + Script);
 			Graph Result = Exp.Evaluate(v) as Graph;
 
-			if (Result == null)
+			if (Result is null)
 				Assert.Fail("Expected graph.");
 
 			GraphSettings Settings = new GraphSettings();

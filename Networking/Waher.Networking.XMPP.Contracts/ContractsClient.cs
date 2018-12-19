@@ -105,7 +105,7 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			get
 			{
-				if (this.localEndpoint == null)
+				if (this.localEndpoint is null)
 					return this.localEndpointTask.Result;
 				else
 					return this.localEndpoint;
@@ -303,7 +303,7 @@ namespace Waher.Networking.XMPP.Contracts
 					if (e.Ok)
 					{
 						LocalKey = this.localEndpoint.GetLocalKey(e.Key);
-						if (LocalKey == null)
+						if (LocalKey is null)
 							e.Ok = false;
 					}
 
@@ -514,7 +514,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="State">State object to pass to callback method.</param>
 		public void Validate(LegalIdentity Identity, bool ValidateState, IdentityValidationEventHandler Callback, object State)
 		{
-			if (Identity == null)
+			if (Identity is null)
 			{
 				this.ReturnStatus(IdentityStatus.IdentityUndefined, Callback, State);
 				return;
@@ -547,16 +547,16 @@ namespace Waher.Networking.XMPP.Contracts
 			}
 
 			if (string.IsNullOrEmpty(Identity.ClientKeyName) ||
-				Identity.ClientPubKey1 == null ||
+				Identity.ClientPubKey1 is null ||
 				Identity.ClientPubKey1.Length == 0 ||
-				Identity.ClientPubKey2 == null ||
+				Identity.ClientPubKey2 is null ||
 				Identity.ClientPubKey2.Length == 0)
 			{
 				this.ReturnStatus(IdentityStatus.NoClientPublicKey, Callback, State);
 				return;
 			}
 
-			if (Identity.ClientSignature1 == null || Identity.ClientSignature1.Length == 0)
+			if (Identity.ClientSignature1 is null || Identity.ClientSignature1.Length == 0)
 			{
 				this.ReturnStatus(IdentityStatus.NoClientSignature, Callback, State);
 				return;
@@ -580,7 +580,7 @@ namespace Waher.Networking.XMPP.Contracts
 				EndpointSecurity.IoTHarmonizationE2E, out IE2eEndpoint LocalKey) &&
 				LocalKey is EcAes256 LocalEc)
 			{
-				if (Identity.ClientSignature2 == null ||
+				if (Identity.ClientSignature2 is null ||
 					Identity.ClientSignature2.Length == 0)
 				{
 					this.ReturnStatus(IdentityStatus.NoClientSignature, Callback, State);
@@ -600,7 +600,7 @@ namespace Waher.Networking.XMPP.Contracts
 				return;
 			}
 
-			if (Identity.ServerSignature1 == null ||
+			if (Identity.ServerSignature1 is null ||
 				Identity.ServerSignature1.Length == 0)
 			{
 				this.ReturnStatus(IdentityStatus.NoProviderSignature, Callback, State);
@@ -631,7 +631,7 @@ namespace Waher.Networking.XMPP.Contracts
 					}
 					else if (e.Key is EcAes256 RemoteEc)
 					{
-						if (Identity.ServerSignature2 == null || Identity.ServerSignature2.Length == 0)
+						if (Identity.ServerSignature2 is null || Identity.ServerSignature2.Length == 0)
 						{
 							this.ReturnStatus(IdentityStatus.NoProviderSignature, Callback, State);
 							return;
@@ -2434,7 +2434,7 @@ namespace Waher.Networking.XMPP.Contracts
 			Xml.Append("' namespace='");
 			Xml.Append(XML.Encode(Namespace));
 
-			if (Digest == null)
+			if (Digest is null)
 				Xml.Append("'/>");
 			else
 			{

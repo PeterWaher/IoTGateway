@@ -314,7 +314,7 @@ namespace Waher.Networking.HTTP.WebSockets
 							else
 								this.payload = null;
 						}
-						else if (this.payload == null)
+						else if (this.payload is null)
 						{
 							if (!this.fin || this.payloadLen >= 65536)
 								this.payload = new TemporaryFile();
@@ -553,7 +553,7 @@ namespace Waher.Networking.HTTP.WebSockets
 
 		private async void BeginWriteRaw(byte[] Frame, EventHandler Callback)
 		{
-			if (Frame == null)
+			if (Frame is null)
 				throw new ArgumentException("Frame cannot be null.", nameof(Frame));
 
 			try
@@ -589,7 +589,7 @@ namespace Waher.Networking.HTTP.WebSockets
 					{
 						LinkedListNode<KeyValuePair<byte[], EventHandler>> Next;
 
-						if ((Next = this.queue.First) == null)
+						if ((Next = this.queue.First) is null)
 						{
 							this.writing = false;
 							Frame = null;
@@ -979,7 +979,7 @@ namespace Waher.Networking.HTTP.WebSockets
 			byte[] Frame;
 			byte[] Bin;
 
-			if (this.payload == null)
+			if (this.payload is null)
 				Bin = null;
 			else
 			{

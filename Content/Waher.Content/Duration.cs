@@ -354,10 +354,10 @@ namespace Waher.Content
 		/// <returns>If <paramref name="D1"/>==<paramref name="D2"/>.</returns>
 		public static bool operator ==(Duration D1, Duration D2)
 		{
-			if (((object)D1) == null ^ ((object)D2) == null)
+			if (((object)D1) is null ^ ((object)D2) is null)
 				return false;
 
-			if ((object)D1 == null)
+			if ((object)D1 is null)
 				return true;
 
 			DateTime Now = DateTime.Today;
@@ -375,10 +375,10 @@ namespace Waher.Content
 		/// <returns>If <paramref name="D1"/>!=<paramref name="D2"/>.</returns>
 		public static bool operator !=(Duration D1, Duration D2)
 		{
-			if (((object)D1) == null ^ ((object)D2) == null)
+			if (((object)D1) is null ^ ((object)D2) is null)
 				return true;
 
-			if ((object)D1 == null)
+			if ((object)D1 is null)
 				return false;
 
 			DateTime Now = DateTime.Today;
@@ -396,7 +396,7 @@ namespace Waher.Content
 		public override bool Equals(object obj)
 		{
 			Duration D = obj as Duration;
-			if (D == null)
+			if (D is null)
 				return false;
 
 			return this == D;

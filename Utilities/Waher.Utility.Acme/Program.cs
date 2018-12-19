@@ -107,21 +107,21 @@ namespace Waher.Utility.Acme
 							if (i >= c)
 								throw new Exception("Missing directory URI.");
 
-							if (directory == null)
+							if (directory is null)
 								directory = new Uri(args[i++]);
 							else
 								throw new Exception("Only one directory URI allowed.");
 							break;
 
 						case "-le":
-							if (directory == null)
+							if (directory is null)
 								directory = new Uri("https://acme-v02.api.letsencrypt.org/directory");
 							else
 								throw new Exception("Only one directory URI allowed.");
 							break;
 
 						case "-let":
-							if (directory == null)
+							if (directory is null)
 								directory = new Uri("https://acme-staging-v02.api.letsencrypt.org/directory");
 							else
 								throw new Exception("Only one directory URI allowed.");
@@ -131,10 +131,10 @@ namespace Waher.Utility.Acme
 							if (i >= c)
 								throw new Exception("Missing contact e-mail.");
 
-							if (contactURLs == null)
+							if (contactURLs is null)
 								contactURLs = new List<string>();
 
-							if (eMail == null)
+							if (eMail is null)
 								eMail = args[i];
 
 							contactURLs.Add("mailto:" + args[i++]);
@@ -144,7 +144,7 @@ namespace Waher.Utility.Acme
 							if (i >= c)
 								throw new Exception("Missing contact URI.");
 
-							if (contactURLs == null)
+							if (contactURLs is null)
 								contactURLs = new List<string>();
 
 							contactURLs.Add(args[i++]);
@@ -154,7 +154,7 @@ namespace Waher.Utility.Acme
 							if (i >= c)
 								throw new Exception("Missing domain name.");
 
-							if (domainNames == null)
+							if (domainNames is null)
 								domainNames = new List<string>();
 
 							domainNames.Add(args[i++]);
@@ -184,7 +184,7 @@ namespace Waher.Utility.Acme
 							if (i >= c)
 								throw new Exception("Missing HTTP root folder.");
 
-							if (httpRootFolder == null)
+							if (httpRootFolder is null)
 								httpRootFolder = args[i++];
 							else
 								throw new Exception("Only one HTTP Root Folder allowed.");
@@ -220,7 +220,7 @@ namespace Waher.Utility.Acme
 							if (i >= c)
 								throw new Exception("Missing country name.");
 
-							if (country == null)
+							if (country is null)
 								country = args[i++];
 							else
 								throw new Exception("Only one country name allowed.");
@@ -230,7 +230,7 @@ namespace Waher.Utility.Acme
 							if (i >= c)
 								throw new Exception("Missing locality name.");
 
-							if (locality == null)
+							if (locality is null)
 								locality = args[i++];
 							else
 								throw new Exception("Only one locality name allowed.");
@@ -240,7 +240,7 @@ namespace Waher.Utility.Acme
 							if (i >= c)
 								throw new Exception("Missing state or province name.");
 
-							if (stateOrProvince == null)
+							if (stateOrProvince is null)
 								stateOrProvince = args[i++];
 							else
 								throw new Exception("Only one state or province name allowed.");
@@ -250,7 +250,7 @@ namespace Waher.Utility.Acme
 							if (i >= c)
 								throw new Exception("Missing organization name.");
 
-							if (organization == null)
+							if (organization is null)
 								organization = args[i++];
 							else
 								throw new Exception("Only one organization name allowed.");
@@ -260,7 +260,7 @@ namespace Waher.Utility.Acme
 							if (i >= c)
 								throw new Exception("Missing organizational unit name.");
 
-							if (organizationalUnit == null)
+							if (organizationalUnit is null)
 								organizationalUnit = args[i++];
 							else
 								throw new Exception("Only one organizational unit name allowed.");
@@ -270,7 +270,7 @@ namespace Waher.Utility.Acme
 							if (i >= c)
 								throw new Exception("Missing file name.");
 
-							if (fileName == null)
+							if (fileName is null)
 								fileName = args[i++];
 							else
 								throw new Exception("Only one file name allowed.");
@@ -361,7 +361,7 @@ namespace Waher.Utility.Acme
 					return;
 				}
 
-				if (directory == null)
+				if (directory is null)
 					directory = new Uri("https://acme-v02.api.letsencrypt.org/directory");
 
 				if (!pollingInterval.HasValue)
@@ -373,7 +373,7 @@ namespace Waher.Utility.Acme
 				if (verbose)
 					Console.BackgroundColor = ConsoleColor.Black;
 
-				if (fileName == null)
+				if (fileName is null)
 					throw new Exception("File name not provided.");
 
 				if (string.IsNullOrEmpty(password))
@@ -573,7 +573,7 @@ namespace Waher.Utility.Acme
 										string ChallengeFileName = Path.Combine(httpRootFolder, HttpChallenge.Token);
 										File.WriteAllBytes(ChallengeFileName, Encoding.ASCII.GetBytes(HttpChallenge.KeyAuthorization));
 
-										if (FileNames == null)
+										if (FileNames is null)
 											FileNames = new List<string>();
 
 										FileNames.Add(ChallengeFileName);
@@ -713,7 +713,7 @@ namespace Waher.Utility.Acme
 								}
 							}
 
-							if (Order.Certificate == null)
+							if (Order.Certificate is null)
 								throw new Exception("No certificate URI provided.");
 
 							LogInformational("Downloading certificate.",
@@ -867,10 +867,10 @@ namespace Waher.Utility.Acme
 		{
 			int i, c;
 
-			if (A1 == null ^ A2 == null)
+			if (A1 is null ^ A2 is null)
 				return false;
 
-			if (A1 == null)
+			if (A1 is null)
 				return true;
 
 			c = A1.Length;

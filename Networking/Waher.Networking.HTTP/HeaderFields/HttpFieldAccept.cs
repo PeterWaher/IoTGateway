@@ -55,7 +55,7 @@ namespace Waher.Networking.HTTP.HeaderFields
 		{
 			get
 			{
-				if (this.records == null)
+				if (this.records is null)
 					this.records = Parse(this.Value);
 
 				return this.records;
@@ -289,7 +289,7 @@ namespace Waher.Networking.HTTP.HeaderFields
 							ParameterName = sb.ToString().Trim();
 							sb.Clear();
 
-							if (Parameters == null)
+							if (Parameters is null)
 								Parameters = new List<KeyValuePair<string, string>>();
 
 							Parameters.Add(new KeyValuePair<string, string>(ParameterName, string.Empty));
@@ -322,7 +322,7 @@ namespace Waher.Networking.HTTP.HeaderFields
 								Record.Quality = q;
 							else
 							{
-								if (Parameters == null)
+								if (Parameters is null)
 									Parameters = new List<KeyValuePair<string, string>>();
 
 								Parameters.Add(new KeyValuePair<string, string>(ParameterName, ParameterValue));
@@ -394,7 +394,7 @@ namespace Waher.Networking.HTTP.HeaderFields
 					ParameterName = sb.ToString().Trim();
 					if (!string.IsNullOrEmpty(ParameterName))
 					{
-						if (Parameters == null)
+						if (Parameters is null)
 							Parameters = new List<KeyValuePair<string, string>>();
 
 						Parameters.Add(new KeyValuePair<string, string>(ParameterName, string.Empty));
@@ -417,7 +417,7 @@ namespace Waher.Networking.HTTP.HeaderFields
 						Record.Quality = q;
 					else
 					{
-						if (Parameters == null)
+						if (Parameters is null)
 							Parameters = new List<KeyValuePair<string, string>>();
 
 						Parameters.Add(new KeyValuePair<string, string>(ParameterName, ParameterValue));

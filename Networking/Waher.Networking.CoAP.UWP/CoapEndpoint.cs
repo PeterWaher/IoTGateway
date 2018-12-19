@@ -225,7 +225,7 @@ namespace Waher.Networking.CoAP
 #if WINDOWS_UWP
 			foreach (HostName HostName in NetworkInformation.GetHostNames())
 			{
-				if (HostName.IPInformation == null)
+				if (HostName.IPInformation is null)
 					continue;
 
 				foreach (ConnectionProfile Profile in NetworkInformation.GetConnectionProfiles())
@@ -687,14 +687,14 @@ namespace Waher.Networking.CoAP
 						break;
 
 					case 8:
-						if (IncomingMessage.LocationPath == null)
+						if (IncomingMessage.LocationPath is null)
 							IncomingMessage.LocationPath = "/" + ((CoapOptionLocationPath)Option).Value;
 						else
 							IncomingMessage.LocationPath = IncomingMessage.LocationPath + "/" + ((CoapOptionLocationPath)Option).Value;
 						break;
 
 					case 11:
-						if (IncomingMessage.Path == null)
+						if (IncomingMessage.Path is null)
 							IncomingMessage.Path = "/" + ((CoapOptionUriPath)Option).Value;
 						else
 							IncomingMessage.Path = IncomingMessage.Path + "/" + ((CoapOptionUriPath)Option).Value;
@@ -723,7 +723,7 @@ namespace Waher.Networking.CoAP
 						break;
 
 					case 15:
-						if (IncomingMessage.UriQuery == null)
+						if (IncomingMessage.UriQuery is null)
 							IncomingMessage.UriQuery = new Dictionary<string, string>();
 
 						CoapOptionKeyValue Query = (CoapOptionKeyValue)Option;
@@ -736,7 +736,7 @@ namespace Waher.Networking.CoAP
 						break;
 
 					case 20:
-						if (IncomingMessage.LocationQuery == null)
+						if (IncomingMessage.LocationQuery is null)
 							IncomingMessage.LocationQuery = new Dictionary<string, string>();
 
 						Query = (CoapOptionLocationQuery)Option;
@@ -796,7 +796,7 @@ namespace Waher.Networking.CoAP
 						OutgoingMessage = null;
 				}
 
-				if (OutgoingMessage == null && Type == CoapMessageType.RST && MessageId == this.lastNonMsgId)
+				if (OutgoingMessage is null && Type == CoapMessageType.RST && MessageId == this.lastNonMsgId)
 				{
 					OutgoingMessage = this.lastNonMsg;
 					this.lastNonMsg = null;
@@ -838,7 +838,7 @@ namespace Waher.Networking.CoAP
 								OutgoingMessage.options = Remove(OutgoingMessage.options, 27);     // Remove Block1 option, if available.
 
 								IncomingMessage.Payload = OutgoingMessage.BlockReceived(Client, IncomingMessage);
-								if (IncomingMessage.Payload == null)
+								if (IncomingMessage.Payload is null)
 									OutgoingMessage = null;
 							}
 
@@ -993,7 +993,7 @@ namespace Waher.Networking.CoAP
 							}
 						}
 
-						if (ObserveResponse == null)
+						if (ObserveResponse is null)
 							this.ProcessRequest(Resource, Client, IncomingMessage, false);
 						else
 							this.ProcessRequest(Resource, Client, IncomingMessage, false, ObserveResponse);
@@ -1417,7 +1417,7 @@ namespace Waher.Networking.CoAP
 		/// <returns>If the resource was found and removed.</returns>
 		public bool Unregister(CoapResource Resource)
 		{
-			if (Resource == null)
+			if (Resource is null)
 				return false;
 
 			lock (this.resources)
@@ -1488,7 +1488,7 @@ namespace Waher.Networking.CoAP
 					LastNumber += Delta;
 
 					Value = Option.GetValue();
-					Length = Value == null ? 0 : Value.Length;
+					Length = Value is null ? 0 : Value.Length;
 
 					if (Delta < 13)
 						b = (byte)(Delta << 4);
@@ -1556,7 +1556,7 @@ namespace Waher.Networking.CoAP
 		/// <returns>If an option with the given option number was found.</returns>
 		public static bool HasOption(CoapOption[] Options, int OptionNumber)
 		{
-			if (Options == null)
+			if (Options is null)
 				return false;
 
 			foreach (CoapOption Option in Options)
@@ -1586,7 +1586,7 @@ namespace Waher.Networking.CoAP
 
 				if (Option.OptionNumber == OptionNumber)
 				{
-					if (Result == null)
+					if (Result is null)
 					{
 						Result = new List<CoapOption>();
 						for (j = 0; j < i; j++)
@@ -1597,7 +1597,7 @@ namespace Waher.Networking.CoAP
 					Result.Add(Option);
 			}
 
-			if (Result == null)
+			if (Result is null)
 				return Options;
 			else
 				return Result.ToArray();
@@ -1611,9 +1611,9 @@ namespace Waher.Networking.CoAP
 		/// <returns>Merged set of options.</returns>
 		public static CoapOption[] Merge(CoapOption[] Options1, params CoapOption[] Options2)
 		{
-			if (Options1 == null || Options1.Length == 0)
+			if (Options1 is null || Options1.Length == 0)
 				return Options2;
-			else if (Options2 == null || Options2.Length == 0)
+			else if (Options2 is null || Options2.Length == 0)
 				return Options1;
 			else
 			{
@@ -1655,7 +1655,7 @@ namespace Waher.Networking.CoAP
 			if (!IsBlockSizeValid(BlockSize))
 				throw new ArgumentException("Invalid block size.", nameof(BlockSize));
 
-			if (BlockNr * BlockSize > (Payload == null ? 0 : Payload.Length))
+			if (BlockNr * BlockSize > (Payload is null ? 0 : Payload.Length))
 				throw new ArgumentException("Invalid block number.", nameof(BlockNr));
 
 			if (Payload != null && Payload.Length > BlockSize)

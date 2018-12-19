@@ -89,7 +89,7 @@ namespace Waher.Things.Gpio
 		{
 			try
 			{
-				if (this.pin == null)
+				if (this.pin is null)
 				{
 					if (!this.Controller.TryOpenPin(this.PinNr, GpioSharingMode.Exclusive, out this.pin, out GpioOpenStatus Status))
 					{
@@ -163,7 +163,7 @@ namespace Waher.Things.Gpio
 
 		private bool? GetValue(IThingReference Node)
 		{
-			if (this.pin == null)
+			if (this.pin is null)
 			{
 				if (!this.Controller.TryOpenPin(this.PinNr, GpioSharingMode.Exclusive, out this.pin, out GpioOpenStatus Status))
 					return null;
@@ -176,7 +176,7 @@ namespace Waher.Things.Gpio
 
 		private void SetValue(IThingReference Node, bool Value)
 		{
-			if (this.pin == null)
+			if (this.pin is null)
 			{
 				if (!this.Controller.TryOpenPin(this.PinNr, GpioSharingMode.Exclusive, out this.pin, out GpioOpenStatus Status))
 					throw new Exception(this.GetStatusMessage(Status));

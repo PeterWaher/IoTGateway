@@ -129,7 +129,7 @@ namespace Waher.Networking.XMPP
 		{
 			get
 			{
-				if (this.toBareJid == null)
+				if (this.toBareJid is null)
 					this.toBareJid = XmppClient.GetBareJID(this.to);
 
 				return this.toBareJid;
@@ -143,7 +143,7 @@ namespace Waher.Networking.XMPP
 		{
 			get
 			{
-				if (this.fromBareJid == null)
+				if (this.fromBareJid is null)
 					this.fromBareJid = XmppClient.GetBareJID(this.from);
 
 				return this.fromBareJid;

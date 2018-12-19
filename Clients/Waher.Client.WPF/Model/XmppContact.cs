@@ -67,13 +67,13 @@ namespace Waher.Client.WPF.Model
 			get
 			{
 				XmppAccountNode AccountNode = this.XmppAccountNode;
-				if (AccountNode == null || !AccountNode.IsOnline)
+				if (AccountNode is null || !AccountNode.IsOnline)
 					return Availability.Offline;
 
 				RosterItem Item = this.client[this.bareJid];
 				PresenceEventArgs e = Item?.LastPresence;
 
-				if (e == null)
+				if (e is null)
 					return Availability.Offline;
 				else
 					return e.Availability;
@@ -85,11 +85,11 @@ namespace Waher.Client.WPF.Model
 			get
 			{
 				XmppAccountNode AccountNode = this.XmppAccountNode;
-				if (AccountNode == null || !AccountNode.IsOnline)
+				if (AccountNode is null || !AccountNode.IsOnline)
 					return SubscriptionState.Unknown;
 
 				RosterItem Item = this.client[this.bareJid];
-				if (Item == null)
+				if (Item is null)
 					return SubscriptionState.Unknown;
 				else
 					return Item.State;
@@ -173,14 +173,14 @@ namespace Waher.Client.WPF.Model
 			get
 			{
 				XmppAccountNode AccountNode = this.XmppAccountNode;
-				if (AccountNode == null)
+				if (AccountNode is null)
 					return string.Empty;
 				else if (!AccountNode.IsOnline)
 					return AccountNode.BareJID + " is not connected.";
 
 				PresenceEventArgs e = this.RosterItem?.LastPresence;
 
-				if (e == null)
+				if (e is null)
 					return "Status unknown. No presence received.";
 				else
 				{
@@ -254,7 +254,7 @@ namespace Waher.Client.WPF.Model
 				TreeNode Loop = this.Parent;
 				XmppAccountNode Result = Loop as XmppAccountNode;
 
-				while (Result == null && Loop != null)
+				while (Result is null && Loop != null)
 				{
 					Loop = Loop.Parent;
 					Result = Loop as XmppAccountNode;
@@ -269,7 +269,7 @@ namespace Waher.Client.WPF.Model
 			XmppAccountNode XmppAccountNode = this.XmppAccountNode;
 			if (XmppAccountNode != null)
 			{
-				if (Markdown == null)
+				if (Markdown is null)
 					XmppAccountNode.Client.SendChatMessage(this.RosterItem?.LastPresenceFullJid, Message);
 				else
 				{

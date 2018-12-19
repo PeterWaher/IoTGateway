@@ -217,7 +217,7 @@ namespace Waher.Events
 		/// <returns>If the event sink should be avoided.</returns>
 		public void Avoid(IEventSink EventSink)
 		{
-			if (this.toAvoid == null)
+			if (this.toAvoid is null)
 				this.toAvoid = new LinkedList<IEventSink>();
 
 			if (!this.toAvoid.Contains(EventSink))

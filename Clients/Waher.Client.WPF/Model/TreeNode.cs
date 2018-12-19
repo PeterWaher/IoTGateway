@@ -52,7 +52,7 @@ namespace Waher.Client.WPF.Model
 		{
 			get
 			{
-				if (this.children == null)
+				if (this.children is null)
 					return null;
 				else
 				{
@@ -71,7 +71,7 @@ namespace Waher.Client.WPF.Model
 		{
 			get
 			{
-				if (this.children == null)
+				if (this.children is null)
 					return null;
 
 				TreeNode[] Children;
@@ -204,7 +204,7 @@ namespace Waher.Client.WPF.Model
 
 		public virtual void Add(params Parameter[] Parameters)
 		{
-			if (this.parameters == null)
+			if (this.parameters is null)
 				this.parameters = new DisplayableParameters(Parameters);
 			else
 				this.parameters.AddRange(Parameters);
@@ -283,7 +283,7 @@ namespace Waher.Client.WPF.Model
 		{
 			get
 			{
-				if (this.children == null)
+				if (this.children is null)
 					return true;
 
 				lock (this.children)

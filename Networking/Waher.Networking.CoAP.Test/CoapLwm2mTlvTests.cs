@@ -302,7 +302,7 @@ namespace Waher.Networking.CoAP.Test
 
 		public static void AssertEqual(byte[] Expected, byte[] A)
 		{
-			if (A == null)
+			if (A is null)
 				throw new ArgumentException("Array is null.", nameof(A));
 
 			int i, c = Expected.Length;

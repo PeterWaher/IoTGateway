@@ -185,7 +185,7 @@ namespace Waher.Networking.XMPP.Provisioning
 				e.Accept();
 
 				RosterItem Item = this.client.GetRosterItem(e.FromBareJID);
-				if (Item == null || Item.State == SubscriptionState.None || Item.State == SubscriptionState.From)
+				if (Item is null || Item.State == SubscriptionState.None || Item.State == SubscriptionState.From)
 					this.client.RequestPresenceSubscription(e.FromBareJID);
 			}
 			else
@@ -527,7 +527,7 @@ namespace Waher.Networking.XMPP.Provisioning
 
 				return true;
 			}
-			else if (Nodes == null)
+			else if (Nodes is null)
 			{
 				ToCheck = null;
 				Permitted = null;
@@ -555,7 +555,7 @@ namespace Waher.Networking.XMPP.Provisioning
 
 					if (Safe)
 					{
-						if (Permitted2 == null)
+						if (Permitted2 is null)
 						{
 							ToCheck2 = new LinkedList<IThingReference>();
 							Permitted2 = new LinkedList<IThingReference>();
@@ -575,7 +575,7 @@ namespace Waher.Networking.XMPP.Provisioning
 						ToCheck2.AddLast(Ref);
 				}
 
-				if (Permitted2 == null)
+				if (Permitted2 is null)
 				{
 					ToCheck = Nodes;
 					Permitted = null;
@@ -587,7 +587,7 @@ namespace Waher.Networking.XMPP.Provisioning
 					ToCheck = ToCheck2;
 					Permitted = Permitted2;
 
-					return ToCheck2.First == null;
+					return ToCheck2.First is null;
 				}
 			}
 		}
@@ -614,7 +614,7 @@ namespace Waher.Networking.XMPP.Provisioning
 					try
 					{
 						IThingReference[] Nodes2 = Permitted as IThingReference[];
-						if (Nodes2 == null && Permitted != null)
+						if (Nodes2 is null && Permitted != null)
 						{
 							List<IThingReference> List = new List<IThingReference>();
 							List.AddRange(Permitted);
@@ -622,7 +622,7 @@ namespace Waher.Networking.XMPP.Provisioning
 						}
 
 						string[] FieldNames2 = FieldNames as string[];
-						if (FieldNames2 == null && FieldNames != null)
+						if (FieldNames2 is null && FieldNames != null)
 						{
 							List<string> List = new List<string>();
 							List.AddRange(FieldNames);
@@ -677,7 +677,7 @@ namespace Waher.Networking.XMPP.Provisioning
 					Xml.Append("' h='true");
 			}
 
-			if (ToCheck == null && FieldNames == null)
+			if (ToCheck is null && FieldNames is null)
 				Xml.Append("'/>");
 			else
 			{
@@ -774,7 +774,7 @@ namespace Waher.Networking.XMPP.Provisioning
 							switch (N.LocalName)
 							{
 								case "nd":
-									if (Nodes2 == null)
+									if (Nodes2 is null)
 										Nodes2 = new List<IThingReference>();
 
 									E = (XmlElement)N;
@@ -799,7 +799,7 @@ namespace Waher.Networking.XMPP.Provisioning
 									break;
 
 								case "f":
-									if (Fields2 == null)
+									if (Fields2 is null)
 										Fields2 = new List<string>();
 
 									Fields2.Add(XML.Attribute((XmlElement)N, "n"));
@@ -905,7 +905,7 @@ namespace Waher.Networking.XMPP.Provisioning
 					try
 					{
 						IThingReference[] Nodes2 = Nodes as IThingReference[];
-						if (Nodes2 == null && Nodes != null)
+						if (Nodes2 is null && Nodes != null)
 						{
 							List<IThingReference> List = new List<IThingReference>();
 							List.AddRange(Nodes);
@@ -913,7 +913,7 @@ namespace Waher.Networking.XMPP.Provisioning
 						}
 
 						string[] ParameterNames2 = ParameterNames as string[];
-						if (ParameterNames2 == null && ParameterNames != null)
+						if (ParameterNames2 is null && ParameterNames != null)
 						{
 							List<string> List = new List<string>();
 							List.AddRange(ParameterNames);
@@ -945,7 +945,7 @@ namespace Waher.Networking.XMPP.Provisioning
 			this.AppendTokens(Xml, "dt", DeviceTokens);
 			this.AppendTokens(Xml, "ut", UserTokens);
 
-			if (ToCheck == null && ParameterNames == null)
+			if (ToCheck is null && ParameterNames is null)
 				Xml.Append("'/>");
 			else
 			{
@@ -1002,7 +1002,7 @@ namespace Waher.Networking.XMPP.Provisioning
 							switch (N.LocalName)
 							{
 								case "nd":
-									if (Nodes2 == null)
+									if (Nodes2 is null)
 										Nodes2 = new List<IThingReference>();
 
 									E = (XmlElement)N;
@@ -1027,7 +1027,7 @@ namespace Waher.Networking.XMPP.Provisioning
 									break;
 
 								case "parameter":
-									if (ParameterNames2 == null)
+									if (ParameterNames2 is null)
 										ParameterNames2 = new List<string>();
 
 									ParameterNames2.Add(XML.Attribute((XmlElement)N, "name"));
@@ -1470,7 +1470,7 @@ namespace Waher.Networking.XMPP.Provisioning
 							Xml.Append(" h='true'");
 					}
 
-					if (FieldNames == null || FieldNames.Length == 0)
+					if (FieldNames is null || FieldNames.Length == 0)
 						Xml.Append("/>");
 					else
 					{
@@ -1659,7 +1659,7 @@ namespace Waher.Networking.XMPP.Provisioning
 				{
 					Xml.Append("<partial");
 
-					if (ParameterNames == null || ParameterNames.Length == 0)
+					if (ParameterNames is null || ParameterNames.Length == 0)
 						Xml.Append("/>");
 					else
 					{

@@ -91,7 +91,7 @@ namespace Waher.Runtime.Timing
 				TimeLeft = Event.Key - Now;
 				if (TimeLeft <= TimeSpan.Zero)
 				{
-					if (ToRemove == null)
+					if (ToRemove is null)
 						ToRemove = new LinkedList<DateTime>();
 
 					ToRemove.AddLast(Event.Key);

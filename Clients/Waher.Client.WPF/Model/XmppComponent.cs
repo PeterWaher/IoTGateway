@@ -121,11 +121,11 @@ namespace Waher.Client.WPF.Model
 		public void NodesAdded(IEnumerable<TreeNode> Nodes, TreeNode Parent)
 		{
 			XmppAccountNode XmppAccountNode = this.Account;
-			if (XmppAccountNode == null)
+			if (XmppAccountNode is null)
 				return;
 
 			ConnectionView View = XmppAccountNode.View;
-			if (View == null)
+			if (View is null)
 				return;
 
 			foreach (TreeNode Node in Nodes)
@@ -135,11 +135,11 @@ namespace Waher.Client.WPF.Model
 		public void NodesRemoved(IEnumerable<TreeNode> Nodes, TreeNode Parent)
 		{
 			XmppAccountNode XmppAccountNode = this.Account;
-			if (XmppAccountNode == null)
+			if (XmppAccountNode is null)
 				return;
 
 			Controls.ConnectionView View = XmppAccountNode.View;
-			if (View == null)
+			if (View is null)
 				return;
 
 			LinkedList<KeyValuePair<TreeNode, TreeNode>> ToRemove = new LinkedList<KeyValuePair<TreeNode, TreeNode>>();

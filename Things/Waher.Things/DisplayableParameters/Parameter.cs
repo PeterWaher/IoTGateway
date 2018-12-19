@@ -59,7 +59,7 @@ namespace Waher.Things.DisplayableParameters
 			{
 				object Obj = this.UntypedValue;
 
-				if (Obj == null)
+				if (Obj is null)
 					return string.Empty;
 				else
 					return Obj.ToString();

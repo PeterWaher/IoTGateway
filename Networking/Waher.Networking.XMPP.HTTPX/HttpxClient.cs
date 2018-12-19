@@ -571,7 +571,7 @@ namespace Waher.Networking.XMPP.HTTPX
 
 							Rx.BlockPos = 0;
 
-							if (Rx.Block == null || Rx.Block.Length != Rx.BlockSize)
+							if (Rx.Block is null || Rx.Block.Length != Rx.BlockSize)
 								Rx.Block = new byte[Rx.BlockSize];
 
 							Rx.State++;
@@ -592,7 +592,7 @@ namespace Waher.Networking.XMPP.HTTPX
 								{
 									string Id = Rec.NextId().ToString();
 									Rx.Block = this.e2e.Decrypt(Id, Rx.StreamId, Rx.From, Rx.To, Rx.Block);
-									if (Rx.Block == null)
+									if (Rx.Block is null)
 									{
 										e.Stream.Dispose();
 										return;

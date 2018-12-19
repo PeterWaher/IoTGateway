@@ -209,7 +209,7 @@ namespace Waher.Networking.LWM2M
 				return;
 			}
 
-			if (Request.Accept == null)
+			if (Request.Accept is null)
 				Writer = new TextWriter();
 			else if (Request.IsAcceptable(Tlv.ContentFormatCode))
 				Writer = new TlvWriter();

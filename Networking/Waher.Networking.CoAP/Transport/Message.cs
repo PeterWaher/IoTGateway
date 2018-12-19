@@ -53,7 +53,7 @@ namespace Waher.Networking.CoAP.Transport
 
 		internal byte[] BlockReceived(ClientBase Client, CoapMessage IncomingMessage)
 		{
-			if (this.payloadResponseStream == null)
+			if (this.payloadResponseStream is null)
 				this.payloadResponseStream = new MemoryStream();
 
 			if (IncomingMessage.Payload != null)
@@ -112,7 +112,7 @@ namespace Waher.Networking.CoAP.Transport
 							break;
 
 						case 11:
-							if (Path == null)
+							if (Path is null)
 								Path = "/";
 							else
 								Path += "/";

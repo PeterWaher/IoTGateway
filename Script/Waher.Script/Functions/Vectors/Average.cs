@@ -128,7 +128,7 @@ namespace Waher.Script.Functions.Vectors
             IElement Result = Vectors.Sum.EvaluateSum(Vector, Node);
             int n = Vector.Dimension;
 
-            if (Result == null)
+            if (Result is null)
                 return ObjectValue.Null;
             else
             {

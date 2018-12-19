@@ -58,16 +58,16 @@ namespace Waher.Script.Persistence.SQL
 
 			lock (this.variables)
 			{
-				if (this.properties == null)
+				if (this.properties is null)
 					this.properties = new Dictionary<string, Tuple<PropertyInfo, FieldInfo>>();
 
 				if (this.properties.TryGetValue(Name, out Tuple<PropertyInfo, FieldInfo> Rec))
 					return Rec != null;
 
 				PropertyInfo PI = this.type.GetRuntimeProperty(Name);
-				FieldInfo FI = PI == null ? this.type.GetRuntimeField(Name) : null;
+				FieldInfo FI = PI is null ? this.type.GetRuntimeField(Name) : null;
 
-				if (PI == null && FI == null)
+				if (PI is null && FI is null)
 				{
 					this.properties[Name] = null;
 					return false;
@@ -105,15 +105,15 @@ namespace Waher.Script.Persistence.SQL
 
 			lock (this.variables)
 			{
-				if (this.properties == null)
+				if (this.properties is null)
 					this.properties = new Dictionary<string, Tuple<PropertyInfo, FieldInfo>>();
 
 				if (!this.properties.TryGetValue(Name, out Rec))
 				{
 					PropertyInfo PI = this.type.GetRuntimeProperty(Name);
-					FieldInfo FI = PI == null ? this.type.GetRuntimeField(Name) : null;
+					FieldInfo FI = PI is null ? this.type.GetRuntimeField(Name) : null;
 
-					if (PI == null && FI == null)
+					if (PI is null && FI is null)
 						Rec = null;
 					else
 						Rec = new Tuple<PropertyInfo, FieldInfo>(PI, FI);

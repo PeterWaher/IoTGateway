@@ -134,7 +134,7 @@ namespace Waher.Service.PcSensor
 						e.Accept();     // TODO: Provisioning
 
 						RosterItem Item = Client.GetRosterItem(e.FromBareJID);
-						if (Item == null || Item.State == SubscriptionState.None || Item.State == SubscriptionState.From)
+						if (Item is null || Item.State == SubscriptionState.None || Item.State == SubscriptionState.From)
 							Client.RequestPresenceSubscription(e.FromBareJID);
 
 						Client.SetPresence(Availability.Chat);
@@ -216,7 +216,7 @@ namespace Waher.Service.PcSensor
 							{
 								if (CategoryIncluded.TryGetValue(FieldName, out InstanceNames))
 								{
-									if (InstanceNames == null)
+									if (InstanceNames is null)
 										continue;
 								}
 								else

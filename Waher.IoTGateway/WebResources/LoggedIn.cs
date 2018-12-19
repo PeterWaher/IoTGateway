@@ -45,7 +45,7 @@ namespace Waher.IoTGateway.WebResources
 
 			User = null;
 
-			if (Variables == null &&
+			if (Variables is null &&
 				(Cookie = Request.Header.Cookie) != null &&
 				!string.IsNullOrEmpty(HttpSessionID = Cookie["HttpSessionID"]))
 			{

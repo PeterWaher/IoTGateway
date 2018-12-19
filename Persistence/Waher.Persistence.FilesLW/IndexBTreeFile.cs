@@ -137,14 +137,14 @@ namespace Waher.Persistence.Files
 		internal async Task<bool> SaveNewObject(Guid ObjectId, object Object, IObjectSerializer Serializer)
 		{
 			byte[] Bin = this.recordHandler.Serialize(ObjectId, Object, Serializer, MissingFieldAction.Null);
-			if (Bin == null || Bin.Length > this.indexFile.InlineObjectSizeLimit)
+			if (Bin is null || Bin.Length > this.indexFile.InlineObjectSizeLimit)
 				return false;
 
 			await this.indexFile.LockWrite();
 			try
 			{
 				BlockInfo Leaf = await this.indexFile.FindLeafNodeLocked(Bin);
-				if (Leaf == null)
+				if (Leaf is null)
 					throw new IOException("Object is already available in index.");
 
 				await this.indexFile.InsertObjectLocked(Leaf.BlockIndex, Leaf.Header, Leaf.Block, Bin, Leaf.InternalPosition, 0, 0, true, Leaf.LastObject);
@@ -175,11 +175,11 @@ namespace Waher.Persistence.Files
 				while (e1.MoveNext() && e2.MoveNext())
 				{
 					byte[] Bin = this.recordHandler.Serialize(e1.Current, e2.Current, Serializer, MissingFieldAction.Null);
-					if (Bin == null || Bin.Length > this.indexFile.InlineObjectSizeLimit)
+					if (Bin is null || Bin.Length > this.indexFile.InlineObjectSizeLimit)
 						return false;
 
 					BlockInfo Leaf = await this.indexFile.FindLeafNodeLocked(Bin);
-					if (Leaf == null)
+					if (Leaf is null)
 						throw new IOException("Object is already available in index.");
 
 					await this.indexFile.InsertObjectLocked(Leaf.BlockIndex, Leaf.Header, Leaf.Block, Bin, Leaf.InternalPosition, 0, 0, true, Leaf.LastObject);
@@ -203,7 +203,7 @@ namespace Waher.Persistence.Files
 		internal async Task<bool> DeleteObject(Guid ObjectId, object Object, IObjectSerializer Serializer)
 		{
 			byte[] Bin = this.recordHandler.Serialize(ObjectId, Object, Serializer, MissingFieldAction.Null);
-			if (Bin == null || Bin.Length > this.indexFile.InlineObjectSizeLimit)
+			if (Bin is null || Bin.Length > this.indexFile.InlineObjectSizeLimit)
 				return false;
 
 			await this.indexFile.LockWrite();
@@ -243,7 +243,7 @@ namespace Waher.Persistence.Files
 					try
 					{
 						byte[] Bin = this.recordHandler.Serialize(e1.Current, e2.Current, Serializer, MissingFieldAction.Null);
-						if (Bin == null || Bin.Length > this.indexFile.InlineObjectSizeLimit)
+						if (Bin is null || Bin.Length > this.indexFile.InlineObjectSizeLimit)
 							continue;
 
 						await this.indexFile.DeleteObjectLocked(Bin, false, true, Serializer, null);
@@ -278,7 +278,7 @@ namespace Waher.Persistence.Files
 			if (NewBin != null && NewBin.Length > this.indexFile.InlineObjectSizeLimit)
 				return false;
 
-			if (OldBin == null && NewBin == null)
+			if (OldBin is null && NewBin is null)
 				return false;
 
 			int i, c;
@@ -353,7 +353,7 @@ namespace Waher.Persistence.Files
 					if (NewBin != null && NewBin.Length > this.indexFile.InlineObjectSizeLimit)
 						continue;
 
-					if (OldBin == null && NewBin == null)
+					if (OldBin is null && NewBin is null)
 						continue;
 
 					int i, c;
@@ -462,7 +462,7 @@ namespace Waher.Persistence.Files
 			IObjectSerializer Serializer = this.objectFile.Provider.GetObjectSerializer(ObjectType);
 
 			byte[] Key = this.recordHandler.Serialize(ObjectId, Object, Serializer, MissingFieldAction.Null);
-			if (Key == null)
+			if (Key is null)
 				throw new KeyNotFoundException("Object not found.");
 
 			await this.indexFile.LockRead();
@@ -500,7 +500,7 @@ namespace Waher.Persistence.Files
 
 					if (Obj != null)
 					{
-						if (LastSerializer == null || Serializer != LastSerializer)
+						if (LastSerializer is null || Serializer != LastSerializer)
 						{
 							LastSerializer = Serializer;
 

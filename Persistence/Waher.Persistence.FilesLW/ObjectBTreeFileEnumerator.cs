@@ -55,7 +55,7 @@ namespace Waher.Persistence.Files
 
 			this.Reset();
 
-			if (this.defaultSerializer == null && typeof(T) != typeof(object))
+			if (this.defaultSerializer is null && typeof(T) != typeof(object))
 				this.defaultSerializer = this.file.Provider.GetObjectSerializer(typeof(T));
 		}
 
@@ -334,7 +334,7 @@ namespace Waher.Persistence.Files
 						Pos = this.currentReader.Position;
 
 						ObjectId = this.recordHandler.GetKey(this.currentReader);
-						if (IsEmpty = (ObjectId == null))
+						if (IsEmpty = (ObjectId is null))
 							break;
 
 						Len = this.recordHandler.GetPayloadSize(this.currentReader);
@@ -354,7 +354,7 @@ namespace Waher.Persistence.Files
 					return true;
 				}
 			}
-			while (ObjectId == null);
+			while (ObjectId is null);
 
 			this.Reset();
 			return false;
@@ -367,7 +367,7 @@ namespace Waher.Persistence.Files
 			this.currentHeader = StartingPoint.Header;
 			this.currentObjPos = StartingPoint.InternalPosition;
 
-			if (this.currentReader == null)
+			if (this.currentReader is null)
 				this.currentReader = new BinaryDeserializer(this.file.CollectionName, this.file.Encoding, this.currentBlock, this.file.BlockLimit, StartingPoint.InternalPosition);
 			else
 				this.currentReader.Restart(this.currentBlock, StartingPoint.InternalPosition);
@@ -397,7 +397,7 @@ namespace Waher.Persistence.Files
 				this.currentBlockIndex = BlockLink;
 				this.currentBlock = await this.LoadBlock(this.currentBlockIndex);
 
-				if (this.currentReader == null)
+				if (this.currentReader is null)
 					this.currentReader = new BinaryDeserializer(this.file.CollectionName, this.file.Encoding, this.currentBlock, this.file.BlockLimit);
 				else
 					this.currentReader.Restart(this.currentBlock, 0);
@@ -407,7 +407,7 @@ namespace Waher.Persistence.Files
 				BlockLink = this.currentReader.ReadBlockLink();
 				Pos = this.currentReader.Position;
 				ObjectId = this.recordHandler.GetKey(this.currentReader);
-				IsEmpty = (ObjectId == null);
+				IsEmpty = (ObjectId is null);
 
 				if (IsEmpty)
 					BlockLink = this.currentHeader.LastBlockIndex;
@@ -434,7 +434,7 @@ namespace Waher.Persistence.Files
 							Pos = this.currentReader.Position;
 
 							ObjectId = this.recordHandler.GetKey(this.currentReader);
-							IsEmpty = (ObjectId == null);
+							IsEmpty = (ObjectId is null);
 							if (IsEmpty)
 								break;
 
@@ -560,7 +560,7 @@ namespace Waher.Persistence.Files
 						Pos = this.currentReader.Position;
 
 						ObjectId = this.recordHandler.GetKey(this.currentReader);
-						IsEmpty = (ObjectId == null);
+						IsEmpty = (ObjectId is null);
 						if (IsEmpty)
 							break;
 
@@ -585,7 +585,7 @@ namespace Waher.Persistence.Files
 						Pos = this.currentReader.Position;
 
 						ObjectId = this.recordHandler.GetKey(this.currentReader);
-						IsEmpty = (ObjectId == null);
+						IsEmpty = (ObjectId is null);
 						if (IsEmpty)
 							break;
 
@@ -645,7 +645,7 @@ namespace Waher.Persistence.Files
 				this.currentBlockIndex = BlockLink;
 				this.currentBlock = await this.LoadBlock(this.currentBlockIndex);
 
-				if (this.currentReader == null)
+				if (this.currentReader is null)
 					this.currentReader = new BinaryDeserializer(this.file.CollectionName, this.file.Encoding, this.currentBlock, this.file.BlockLimit);
 				else
 					this.currentReader.Restart(this.currentBlock, 0);
@@ -664,7 +664,7 @@ namespace Waher.Persistence.Files
 
 				BlockLink = this.currentReader.ReadBlockLink();
 				ObjectId = this.recordHandler.GetKey(this.currentReader);
-				IsEmpty = (ObjectId == null);
+				IsEmpty = (ObjectId is null);
 				if (IsEmpty)
 					break;
 
@@ -677,7 +677,7 @@ namespace Waher.Persistence.Files
 			this.currentReader.Position = LastPos;
 			BlockLink = this.currentReader.ReadBlockLink();
 			ObjectId = this.recordHandler.GetKey(this.currentReader);
-			IsEmpty = (ObjectId == null);
+			IsEmpty = (ObjectId is null);
 
 			if (IsEmpty)
 			{
@@ -696,7 +696,7 @@ namespace Waher.Persistence.Files
 
 						BlockLink = this.currentReader.ReadBlockLink();
 						ObjectId = this.recordHandler.GetKey(this.currentReader);
-						IsEmpty = (ObjectId == null);
+						IsEmpty = (ObjectId is null);
 						if (IsEmpty)
 							break;
 
@@ -709,7 +709,7 @@ namespace Waher.Persistence.Files
 					this.currentReader.Position = LastPos;
 					BlockLink = this.currentReader.ReadBlockLink();
 					ObjectId = this.recordHandler.GetKey(this.currentReader);
-					IsEmpty = (ObjectId == null);
+					IsEmpty = (ObjectId is null);
 				}
 
 				if (IsEmpty)
@@ -748,7 +748,7 @@ namespace Waher.Persistence.Files
 						Start = 0;
 					}
 
-					if (this.currentSerializer == null)
+					if (this.currentSerializer is null)
 					{
 						ulong TypeCode = Reader.ReadVariableLengthUInt64();
 						string TypeName;
@@ -831,7 +831,7 @@ namespace Waher.Persistence.Files
 				this.currentBlockIndex = BlockIndex;
 				this.currentBlock = await this.LoadBlock(this.currentBlockIndex);
 
-				if (this.currentReader == null)
+				if (this.currentReader is null)
 					this.currentReader = new BinaryDeserializer(this.file.CollectionName, this.file.Encoding, this.currentBlock, this.file.BlockLimit);
 				else
 					this.currentReader.Restart(this.currentBlock, 0);
@@ -845,7 +845,7 @@ namespace Waher.Persistence.Files
 					BlockLink = this.currentReader.ReadBlockLink();                  // Block link.
 					ObjectId2 = this.recordHandler.GetKey(this.currentReader);                         // Object ID of object.
 
-					IsEmpty = (ObjectId2 == null);
+					IsEmpty = (ObjectId2 is null);
 					if (IsEmpty)
 					{
 						Comparison = 1;
@@ -942,7 +942,7 @@ namespace Waher.Persistence.Files
 				BlockLink = Reader.ReadBlockLink();                  // Block link.
 				ObjectId = this.recordHandler.GetKey(Reader);                         // Object ID of object.
 
-				IsEmpty = (ObjectId == null);
+				IsEmpty = (ObjectId is null);
 				if (IsEmpty)
 					break;
 

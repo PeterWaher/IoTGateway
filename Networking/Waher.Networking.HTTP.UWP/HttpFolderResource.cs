@@ -125,7 +125,7 @@ namespace Waher.Networking.HTTP
 			HttpRequestHeader Header = Request.Header;
 			DateTimeOffset? Limit;
 
-			if (Header.IfMatch == null && Header.IfUnmodifiedSince != null && (Limit = Header.IfUnmodifiedSince.Timestamp).HasValue)
+			if (Header.IfMatch is null && Header.IfUnmodifiedSince != null && (Limit = Header.IfUnmodifiedSince.Timestamp).HasValue)
 			{
 				string FullPath = this.GetFullPath(Request);
 				if (File.Exists(FullPath))
@@ -257,7 +257,7 @@ namespace Waher.Networking.HTTP
 				}
 			}
 
-			if (Rec == null)
+			if (Rec is null)
 			{
 				Rec = new CacheRec()
 				{
@@ -379,7 +379,7 @@ namespace Waher.Networking.HTTP
 			{
 				bool Acceptable = Header.Accept.IsAcceptable(ContentType, out double Quality, out ContentTypeAcceptance TypeAcceptance, null);
 
-				if ((!Acceptable || TypeAcceptance == ContentTypeAcceptance.Wildcard) && (this.allowTypeConversionFrom == null ||
+				if ((!Acceptable || TypeAcceptance == ContentTypeAcceptance.Wildcard) && (this.allowTypeConversionFrom is null ||
 					(this.allowTypeConversionFrom.TryGetValue(ContentType, out bool Allowed) && Allowed)))
 				{
 					IContentConverter Converter = null;
@@ -401,7 +401,7 @@ namespace Waher.Networking.HTTP
 						}
 					}
 
-					if (Converter == null)
+					if (Converter is null)
 					{
 						IContentConverter[] Converters = InternetContent.GetConverters(ContentType);
 
@@ -475,7 +475,7 @@ namespace Waher.Networking.HTTP
 						}
 						finally
 						{
-							if (f2 == null)
+							if (f2 is null)
 								f.Dispose();
 							else if (!Ok)
 							{
@@ -673,7 +673,7 @@ namespace Waher.Networking.HTTP
 			Progress.BlockSize = (int)Math.Min(BufferSize, i);
 			Progress.Buffer = new byte[Progress.BlockSize];
 
-			if (FirstInterval.Next == null)
+			if (FirstInterval.Next is null)
 			{
 				Progress.Boundary = null;
 				Progress.ContentType = null;

@@ -65,7 +65,7 @@ namespace Waher.Script.Operators.Arithmetics
 					if (n < 0)
 					{
 						LE = LE.Invert();
-						if (LE == null)
+						if (LE is null)
 							throw new ScriptRuntimeException("Base element not invertible.", Node);
 
 						n = -n;
@@ -84,7 +84,7 @@ namespace Waher.Script.Operators.Arithmetics
 					{
 						if ((n & 1) == 1)
 						{
-							if (Result == null)
+							if (Result is null)
 								Result = LE;
 							else
 								Result = (IRingElement)Multiply.EvaluateMultiplication(Result, LE, Node);

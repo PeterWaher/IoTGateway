@@ -459,11 +459,11 @@ namespace Waher.Networking.MQTT
 #if WINDOWS_UWP
 					this.dataWriter.WriteBytes(Packet);
 					await this.dataWriter.StoreAsync();
-					if (this.dataWriter == null)
+					if (this.dataWriter is null)
 						return;
 #else
 					await this.stream.WriteAsync(Packet, 0, Packet.Length);
-					if (this.stream == null)
+					if (this.stream is null)
 						return;
 #endif
 					if (Callback != null)
@@ -484,7 +484,7 @@ namespace Waher.Networking.MQTT
 					{
 						LinkedListNode<OutputRecord> Next = this.outputQueue.First;
 
-						if (Next == null)
+						if (Next is null)
 							this.isWriting = false;
 						else
 						{
@@ -539,7 +539,7 @@ namespace Waher.Networking.MQTT
 						if (Now < P.Key)
 							break;
 
-						if (Resend == null)
+						if (Resend is null)
 							Resend = new LinkedList<KeyValuePair<DateTime, OutputRecord>>();
 
 						Resend.AddLast(P);
@@ -601,7 +601,7 @@ namespace Waher.Networking.MQTT
 					else
 					{
 						CryptographicBuffer.CopyToByteArray(DataRead, out Data);
-						if (Data == null)
+						if (Data is null)
 							NrRead = 0;
 						else
 							NrRead = Data.Length;

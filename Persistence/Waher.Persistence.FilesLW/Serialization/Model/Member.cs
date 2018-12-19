@@ -289,10 +289,10 @@ namespace Waher.Persistence.Files.Serialization.Model
 
 			object Value = this.Get(Object);
 
-			if ((this.defaultValue == null) ^ (Value == null))
+			if ((this.defaultValue is null) ^ (Value is null))
 				return false;
 
-			if (this.defaultValue == null)
+			if (this.defaultValue is null)
 				return true;
 
 			return this.defaultValue.Equals(Value);
@@ -314,7 +314,7 @@ namespace Waher.Persistence.Files.Serialization.Model
 			{
 				sb.Append(", default: ");
 
-				if (this.defaultValue == null)
+				if (this.defaultValue is null)
 					sb.Append("null");
 				else
 					sb.Append(this.defaultValue.ToString());

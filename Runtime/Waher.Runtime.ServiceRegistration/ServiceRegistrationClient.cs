@@ -80,7 +80,7 @@ namespace Waher.Runtime.ServiceRegistration
 			string BareJid = this.client.BareJID.ToLower();
 			bool New;
 
-			if (Registration == null)
+			if (Registration is null)
 			{
 				Registration = new Registration()
 				{
@@ -191,10 +191,10 @@ namespace Waher.Runtime.ServiceRegistration
 		/// <returns></returns>
 		public static bool Equals<T>(T[] Array1, T[] Array2)
 		{
-			if ((Array1 == null) ^ (Array2 == null))
+			if ((Array1 is null) ^ (Array2 is null))
 				return false;
 
-			if (Array1 == null)
+			if (Array1 is null)
 				return true;
 
 			int i, c = Array1.Length;

@@ -28,7 +28,7 @@ namespace Waher.Networking.HTTP.HeaderFields
 		{
 			get
 			{
-				if (this.records == null)
+				if (this.records is null)
 					this.records = HttpFieldAccept.Parse(this.Value);
 
 				return this.records;

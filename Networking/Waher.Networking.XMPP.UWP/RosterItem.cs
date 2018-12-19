@@ -173,7 +173,7 @@ namespace Waher.Networking.XMPP
 				this.lastPresence = Prev?.lastPresence;
 			}
 
-			if (this.resources == null)
+			if (this.resources is null)
 				this.resources = new Dictionary<string, PresenceEventArgs>();
 		}
 

@@ -109,7 +109,7 @@ namespace Waher.Client.WPF.Controls
 									if (P.Id == "NodeId" || P.Id == "Type")
 										continue;
 
-									if (Headers == null)
+									if (Headers is null)
 										Headers = new Dictionary<string, bool>();
 
 									if (!Headers.ContainsKey(P.Id))
@@ -382,7 +382,7 @@ namespace Waher.Client.WPF.Controls
 			ChildNode.Updated -= this.Node_Updated;
 			ChildNode.Removed(this.MainWindow);
 
-			if (Parent == null)
+			if (Parent is null)
 			{
 				this.connections.Delete(ChildNode);
 				this.ConnectionTree.Items.Remove(ChildNode);

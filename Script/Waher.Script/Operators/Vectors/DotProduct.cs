@@ -42,7 +42,7 @@ namespace Waher.Script.Operators.Vectors
 
 			while (e1.MoveNext() && e2.MoveNext())
 			{
-				if (Result == null)
+				if (Result is null)
 					Result = Operators.Arithmetics.Multiply.EvaluateMultiplication(e1.Current, e2.Current, this);
 				else
 				{
@@ -51,7 +51,7 @@ namespace Waher.Script.Operators.Vectors
 				}
 			}
 
-			if (Result == null)
+			if (Result is null)
 				throw new ScriptRuntimeException("Cannot operate on zero-dimension vectors.", this);
 
 			return Result;

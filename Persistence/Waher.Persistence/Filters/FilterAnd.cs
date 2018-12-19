@@ -77,7 +77,7 @@ namespace Waher.Persistence.Filters
 				}
 				else if (Filter is FilterOr)
 				{
-					if (Ors == null)
+					if (Ors is null)
 						Ors = new List<Filter[]>();
 
 					Ors.Add(((FilterOr)Filter).ChildFilters);
@@ -86,7 +86,7 @@ namespace Waher.Persistence.Filters
 					Children.Add(Filter);
 			}
 
-			if (Ors == null)
+			if (Ors is null)
 				return new FilterAnd(Children.ToArray());
 
 			int c = Ors.Count;

@@ -38,7 +38,7 @@ namespace Waher.Networking.XMPP.Contracts
 			Xml.Append("\" value=\"");
 			Xml.Append(CommonTypes.Encode(this.value));
 
-			if (this.Descriptions == null || this.Descriptions.Length == 0)
+			if (this.Descriptions is null || this.Descriptions.Length == 0)
 				Xml.Append("\"/>");
 			else
 			{

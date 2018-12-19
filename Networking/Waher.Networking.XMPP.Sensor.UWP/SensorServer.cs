@@ -129,7 +129,7 @@ namespace Waher.Networking.XMPP.Sensor
 						if (!Subscriptions2.Remove(Subscription))
 							continue;
 
-						if (Subscriptions2.First == null)
+						if (Subscriptions2.First is null)
 							this.subscriptionsByThing.Remove(Ref);
 					}
 				}
@@ -263,7 +263,7 @@ namespace Waher.Networking.XMPP.Sensor
 					switch (N.LocalName)
 					{
 						case "nd":
-							if (Nodes == null)
+							if (Nodes is null)
 								Nodes = new List<IThingReference>();
 
 							E = (XmlElement)N;
@@ -271,12 +271,12 @@ namespace Waher.Networking.XMPP.Sensor
 							SourceId = XML.Attribute(E, "src");
 							Partition = XML.Attribute(E, "pt");
 
-							if (this.OnGetNode == null)
+							if (this.OnGetNode is null)
 								Nodes.Add(new ThingReference(NodeId, SourceId, Partition));
 							else
 							{
 								IThingReference Ref = await this.OnGetNode(NodeId, SourceId, Partition);
-								if (Ref == null)
+								if (Ref is null)
 									throw new ItemNotFoundException("Node not found.", e.IQ);
 
 								Nodes.Add(Ref);
@@ -284,7 +284,7 @@ namespace Waher.Networking.XMPP.Sensor
 							break;
 
 						case "f":
-							if (Fields == null)
+							if (Fields is null)
 								Fields = new List<string>();
 
 							Fields.Add(XML.Attribute((XmlElement)N, "n"));
@@ -368,7 +368,7 @@ namespace Waher.Networking.XMPP.Sensor
 			Request.Started = true;
 
 			SensorDataReadoutEventHandler h = this.OnExecuteReadoutRequest;
-			if (h == null)
+			if (h is null)
 			{
 				this.client.SendMessage(MessageType.Normal, Request.RemoteJID, "<done xmlns='" + SensorClient.NamespaceSensorData + "' id='" +
 					XML.Encode(Request.Id) + "'/>", string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
@@ -550,7 +550,7 @@ namespace Waher.Networking.XMPP.Sensor
 					switch (N.LocalName)
 					{
 						case "nd":
-							if (Nodes == null)
+							if (Nodes is null)
 								Nodes = new List<IThingReference>();
 
 							E = (XmlElement)N;
@@ -558,12 +558,12 @@ namespace Waher.Networking.XMPP.Sensor
 							SourceId = XML.Attribute(E, "src");
 							Partition = XML.Attribute(E, "pt");
 
-							if (this.OnGetNode == null)
+							if (this.OnGetNode is null)
 								Nodes.Add(new ThingReference(NodeId, SourceId, Partition));
 							else
 							{
 								IThingReference Ref = await this.OnGetNode(NodeId, SourceId, Partition);
-								if (Ref == null)
+								if (Ref is null)
 									throw new ItemNotFoundException("Node not found.", e.IQ);
 
 								Nodes.Add(Ref);
@@ -571,7 +571,7 @@ namespace Waher.Networking.XMPP.Sensor
 							break;
 
 						case "f":
-							if (Fields == null)
+							if (Fields is null)
 								Fields = new Dictionary<string, FieldSubscriptionRule>();
 
 							string FieldName = null;
@@ -630,7 +630,7 @@ namespace Waher.Networking.XMPP.Sensor
 							{
 								if (e2.FieldsNames != null)
 								{
-									if (Fields == null)
+									if (Fields is null)
 									{
 										Fields = new Dictionary<string, FieldSubscriptionRule>();
 
@@ -650,7 +650,7 @@ namespace Waher.Networking.XMPP.Sensor
 										{
 											if (!FieldNames.ContainsKey(FieldName))
 											{
-												if (ToRemove == null)
+												if (ToRemove is null)
 													ToRemove = new LinkedList<string>();
 
 												ToRemove.AddLast(FieldName);
@@ -700,7 +700,7 @@ namespace Waher.Networking.XMPP.Sensor
 				string Key = e.From + " " + Id;
 				string[] Fields2;
 
-				if (FieldNames == null)
+				if (FieldNames is null)
 					Fields2 = null;
 				else
 				{
@@ -731,7 +731,7 @@ namespace Waher.Networking.XMPP.Sensor
 				}
 			}
 
-			if (Nodes == null)
+			if (Nodes is null)
 				Nodes = new ThingReference[] { ThingReference.Empty };
 
 			lock (this.subscriptionsByThing)
@@ -847,7 +847,7 @@ namespace Waher.Networking.XMPP.Sensor
 				if (!Subscriptions.Remove(Subscription))
 					continue;
 
-				if (Subscriptions.First == null)
+				if (Subscriptions.First is null)
 					this.subscriptionsByThing.Remove(Ref);
 			}
 
@@ -922,7 +922,7 @@ namespace Waher.Networking.XMPP.Sensor
 		{
 			LinkedList<Subscription> Triggered = null;
 
-			if (Reference == null)
+			if (Reference is null)
 				Reference = ThingReference.Empty;
 
 			lock (this.subscriptionsByThing)
@@ -941,7 +941,7 @@ namespace Waher.Networking.XMPP.Sensor
 					if (!Subscription.IsTriggered(Values))
 						continue;
 
-					if (Triggered == null)
+					if (Triggered is null)
 						Triggered = new LinkedList<Subscription>();
 
 					Triggered.AddLast(Subscription);

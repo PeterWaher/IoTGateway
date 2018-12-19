@@ -128,7 +128,7 @@ namespace Waher.Networking.UPnP
 		/// <returns>Device object, if found, null otherwise.</returns>
 		public UPnPDevice GetDevice(string DeviceType)
 		{
-			if (this.device == null)
+			if (this.device is null)
 				return null;
 			else
 				return this.device.GetDevice(DeviceType);
@@ -141,7 +141,7 @@ namespace Waher.Networking.UPnP
 		/// <returns>Service object, if found, null otherwise.</returns>
 		public UPnPService GetService(string ServiceType)
 		{
-			if (this.device == null)
+			if (this.device is null)
 				return null;
 			else
 				return this.device.GetService(ServiceType);

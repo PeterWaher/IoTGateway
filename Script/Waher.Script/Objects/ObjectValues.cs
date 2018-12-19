@@ -61,11 +61,11 @@ namespace Waher.Script.Objects
 			IComparable c1 = o1.Value as IComparable;
 			IComparable c2 = o2.Value as IComparable;
 
-			if (c1 == null || c2 == null)
+			if (c1 is null || c2 is null)
 			{
-				if (c1 == null && c2 == null)
+				if (c1 is null && c2 is null)
 					return 0;
-				else if (c1 == null)
+				else if (c1 is null)
 					return -1;
 				else
 					return 1;

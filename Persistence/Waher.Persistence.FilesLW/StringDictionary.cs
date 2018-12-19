@@ -147,7 +147,7 @@ namespace Waher.Persistence.Files
 		{
 			//Console.Out.WriteLine(key + ":=" + value.ToString() + " <" + value.GetType().FullName + ">");
 
-			if (key == null)
+			if (key is null)
 				throw new ArgumentNullException("key is null.", "key");
 
 			Type Type = value.GetType();
@@ -217,7 +217,7 @@ namespace Waher.Persistence.Files
 		/// <exception cref="ArgumentNullException">key is null.</exception>
 		public async Task<bool> RemoveAsync(string key)
 		{
-			if (key == null)
+			if (key is null)
 				throw new ArgumentNullException("key is null.", "key");
 
 			if (this.inMemory != null)
@@ -277,7 +277,7 @@ namespace Waher.Persistence.Files
 		/// <exception cref="ArgumentNullException">key is null.</exception>
 		public async Task<KeyValuePair<bool, KeyValuePair<string, object>>> TryGetValueAsync(string key)
 		{
-			if (key == null)
+			if (key is null)
 				throw new ArgumentNullException("key is null.", "key");
 
 			if (this.inMemory != null)
@@ -293,7 +293,7 @@ namespace Waher.Persistence.Files
 			try
 			{
 				object Result = await this.dictionaryFile.TryLoadObjectLocked(key, this.keyValueSerializer);
-				if (Result == null)
+				if (Result is null)
 					return new KeyValuePair<bool, KeyValuePair<string, object>>(false, new KeyValuePair<string, object>(key, null));
 				else
 					return new KeyValuePair<bool, KeyValuePair<string, object>>(true, (KeyValuePair<string, object>)Result);
@@ -313,7 +313,7 @@ namespace Waher.Persistence.Files
 		/// <exception cref="KeyNotFoundException">If <paramref name="key"/> was not found.</exception>
 		public async Task<KeyValuePair<string, object>> GetValueAsync(string key)
 		{
-			if (key == null)
+			if (key is null)
 				throw new ArgumentNullException("key is null.", "key");
 
 			if (this.inMemory != null)
@@ -498,7 +498,7 @@ namespace Waher.Persistence.Files
 		{
 			get
 			{
-				if (this.keyCollection == null)
+				if (this.keyCollection is null)
 					this.keyCollection = new KeyCollection(this);
 
 				return this.keyCollection;
@@ -514,7 +514,7 @@ namespace Waher.Persistence.Files
 		{
 			get
 			{
-				if (this.valueCollection == null)
+				if (this.valueCollection is null)
 					this.valueCollection = new ValueCollection(this);
 
 				return this.valueCollection;

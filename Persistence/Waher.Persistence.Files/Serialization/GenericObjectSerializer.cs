@@ -469,7 +469,7 @@ namespace Waher.Persistence.Files.Serialization
 
 				if (WriteTypeCode)
 				{
-					if (TypedValue == null)
+					if (TypedValue is null)
 					{
 						Writer.WriteBits(ObjectSerializer.TYPE_NULL, 6);
 						return;
@@ -477,7 +477,7 @@ namespace Waher.Persistence.Files.Serialization
 					else
 						Writer.WriteBits(ObjectSerializer.TYPE_OBJECT, 6);
 				}
-				else if (TypedValue == null)
+				else if (TypedValue is null)
 					throw new NullReferenceException("Value cannot be null.");
 
 				if (string.IsNullOrEmpty(TypedValue.TypeName))
@@ -493,7 +493,7 @@ namespace Waher.Persistence.Files.Serialization
 					Writer.WriteVariableLengthUInt64(this.provider.GetFieldCode(TypedValue.CollectionName, Property.Key));
 
 					Obj = Property.Value;
-					if (Obj == null)
+					if (Obj is null)
 						Writer.WriteBits(ObjectSerializer.TYPE_NULL, 6);
 					else
 					{

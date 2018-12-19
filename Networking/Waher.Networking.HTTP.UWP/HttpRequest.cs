@@ -40,7 +40,7 @@ namespace Waher.Networking.HTTP
 			this.responseStream = ResponseStream;
 			this.remoteEndPoint = RemoteEndPoint;
 
-			if (this.dataStream == null)
+			if (this.dataStream is null)
 				this.dataLength = 0;
 			else
 			{
@@ -63,7 +63,7 @@ namespace Waher.Networking.HTTP
 		/// <returns>Decoded data.</returns>
 		public object DecodeData()
 		{
-			if (this.dataStream == null)
+			if (this.dataStream is null)
 				return null;
 
 			long l = this.dataStream.Length;
@@ -76,7 +76,7 @@ namespace Waher.Networking.HTTP
 			this.dataStream.Read(Data, 0, Len);
 
 			HttpFieldContentType ContentType = this.header.ContentType;
-			if (ContentType == null)
+			if (ContentType is null)
 				return Data;
 
 			return InternetContent.Decode(ContentType.Type, Data, ContentType.Encoding, ContentType.Fields, 

@@ -48,7 +48,7 @@ namespace Waher.Script.Operators
 
             foreach (ScriptNode E in this.elements)
             {
-                if (E == null)
+                if (E is null)
                     List.AddLast((IElement)null);
                 else
                     List.AddLast(E.Evaluate(Variables));

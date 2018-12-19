@@ -150,7 +150,7 @@ namespace Waher.Things.ControlParameters
 			Output.WriteStartElement("xdv", "validate", null);
 			Output.WriteAttributeString("xmlns", "xdc", null, "urn:xmpp:xdata:color");
 
-			if (Value == null || !Value.HasAlpha)
+			if (Value is null || !Value.HasAlpha)
 			{
 				Output.WriteAttributeString("datatype", "xdc:color");
 				Output.WriteElementString("xdv", "regex", null, "^[0-9a-fA-F]{6}$");

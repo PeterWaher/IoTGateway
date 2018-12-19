@@ -37,7 +37,7 @@ namespace Waher.Script.Operators.Conditional
             BooleanValue Condition;
 
             Condition = this.left.Evaluate(Variables) as BooleanValue;
-            if (Condition == null)
+            if (Condition is null)
                 throw new ScriptRuntimeException("Condition must evaluate to a boolean value.", this);
 
             while (Condition.Value)
@@ -45,11 +45,11 @@ namespace Waher.Script.Operators.Conditional
                 Last = this.right.Evaluate(Variables);
 
                 Condition = this.left.Evaluate(Variables) as BooleanValue;
-                if (Condition == null)
+                if (Condition is null)
                     throw new ScriptRuntimeException("Condition must evaluate to a boolean value.", this);
             }
 
-            if (Last == null)
+            if (Last is null)
                 return ObjectValue.Null;
             else
                 return Last;

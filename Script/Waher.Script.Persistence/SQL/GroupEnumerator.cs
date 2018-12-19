@@ -61,7 +61,7 @@ namespace Waher.Script.Persistence.SQL
 
 				Variables = new ObjectProperties(e.Current, this.variables);
 
-				if (Last == null)
+				if (Last is null)
 				{
 					Last = new object[c];
 
@@ -80,7 +80,7 @@ namespace Waher.Script.Persistence.SQL
 						o1 = Last[i];
 						o2 = E.AssociatedObjectValue;
 
-						if (o1 == null ^ o2 == null)
+						if (o1 is null ^ o2 is null)
 							break;
 
 						if (o1 != null && !o1.Equals(o2))
@@ -104,7 +104,7 @@ namespace Waher.Script.Persistence.SQL
 					this.fields = T.GetRuntimeFields();
 				}
 
-				if (Aggregated == null)
+				if (Aggregated is null)
 					Aggregated = new Dictionary<string, List<object>>();
 
 				foreach (PropertyInfo PI in this.properties)
@@ -122,7 +122,7 @@ namespace Waher.Script.Persistence.SQL
 				}
 			}
 
-			if (Aggregated == null)
+			if (Aggregated is null)
 				return false;
 
 			Dictionary<string, object> Result = new Dictionary<string, object>();
@@ -135,7 +135,7 @@ namespace Waher.Script.Persistence.SQL
 				for (i = 0; i < c; i++)
 				{
 					ScriptNode Node = this.groupNames[i];
-					if (Node == null)
+					if (Node is null)
 						continue;
 
 					if (Node is VariableReference Ref)

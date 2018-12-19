@@ -208,7 +208,7 @@ namespace Waher.Client.WPF.Model.Legal
 			{
 				if (e2.Ok)
 				{
-					if (e2.Identities == null || e2.Identities.Length == 0)
+					if (e2.Identities is null || e2.Identities.Length == 0)
 						MainWindow.MessageBox("No legal identities are regitered.", "Identities", MessageBoxButton.OK, MessageBoxImage.Information);
 					else
 					{
@@ -243,7 +243,7 @@ namespace Waher.Client.WPF.Model.Legal
 			{
 				if (e2.Ok)
 				{
-					if (e2.Identities == null || e2.Identities.Length == 0)
+					if (e2.Identities is null || e2.Identities.Length == 0)
 						MainWindow.MessageBox("No legal identities are regitered.", "Identities", MessageBoxButton.OK, MessageBoxImage.Information);
 					else
 					{
@@ -279,7 +279,7 @@ namespace Waher.Client.WPF.Model.Legal
 			{
 				if (e2.Ok)
 				{
-					if (e2.Identities == null || e2.Identities.Length == 0)
+					if (e2.Identities is null || e2.Identities.Length == 0)
 						MainWindow.MessageBox("No legal identities are regitered.", "Identities", MessageBoxButton.OK, MessageBoxImage.Information);
 					else
 					{

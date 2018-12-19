@@ -134,7 +134,7 @@ namespace Waher.Networking.XMPP.DataForms.Layout
 		/// <param name="Element">Layout element.</param>
 		public void Add(LayoutElement Element)
 		{
-			if (this.dynamicElements == null)
+			if (this.dynamicElements is null)
 			{
 				this.dynamicElements = new List<LayoutElement>();
 				this.dynamicElements.AddRange(this.staticElements);
@@ -145,7 +145,7 @@ namespace Waher.Networking.XMPP.DataForms.Layout
 
 		internal override bool RemoveExcluded()
 		{
-			if (this.dynamicElements == null)
+			if (this.dynamicElements is null)
 			{
 				this.dynamicElements = new List<LayoutElement>();
 				this.dynamicElements.AddRange(this.staticElements);
@@ -213,7 +213,7 @@ namespace Waher.Networking.XMPP.DataForms.Layout
 				Field fx = this.Form[frx.Var];
 				Field fy = this.Form[fry.Var];
 
-				if (fx == null || fy == null)
+				if (fx is null || fy is null)
 					return 0;
 
 				i = fx.Priority - fy.Priority;

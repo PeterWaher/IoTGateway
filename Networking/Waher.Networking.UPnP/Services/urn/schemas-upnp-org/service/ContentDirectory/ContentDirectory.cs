@@ -33,7 +33,7 @@ namespace Waher.Networking.UPnP.Services
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
 			
-			if (actionGetSearchCapabilities == null)
+			if (actionGetSearchCapabilities is null)
 				actionGetSearchCapabilities = this.service.GetAction("GetSearchCapabilities");
 
 			this.actionGetSearchCapabilities.Invoke(out OutputValues);
@@ -48,7 +48,7 @@ namespace Waher.Networking.UPnP.Services
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
 			
-			if (actionGetSortCapabilities == null)
+			if (actionGetSortCapabilities is null)
 				actionGetSortCapabilities = this.service.GetAction("GetSortCapabilities");
 
 			this.actionGetSortCapabilities.Invoke(out OutputValues);
@@ -63,7 +63,7 @@ namespace Waher.Networking.UPnP.Services
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
 			
-			if (actionGetSystemUpdateID == null)
+			if (actionGetSystemUpdateID is null)
 				actionGetSystemUpdateID = this.service.GetAction("GetSystemUpdateID");
 
 			this.actionGetSystemUpdateID.Invoke(out OutputValues);
@@ -78,7 +78,7 @@ namespace Waher.Networking.UPnP.Services
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
 			
-			if (actionBrowse == null)
+			if (actionBrowse is null)
 				actionBrowse = this.service.GetAction("Browse");
 
 			this.actionBrowse.Invoke(out OutputValues,
@@ -102,7 +102,7 @@ namespace Waher.Networking.UPnP.Services
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
 			
-			if (actionSearch == null)
+			if (actionSearch is null)
 				actionSearch = this.service.GetAction("Search");
 
 			this.actionSearch.Invoke(out OutputValues,
@@ -126,7 +126,7 @@ namespace Waher.Networking.UPnP.Services
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
 			
-			if (actionUpdateObject == null)
+			if (actionUpdateObject is null)
 				actionUpdateObject = this.service.GetAction("UpdateObject");
 
 			this.actionUpdateObject.Invoke(out OutputValues,
@@ -142,7 +142,7 @@ namespace Waher.Networking.UPnP.Services
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
 			
-			if (actionX_GetRemoteSharingStatus == null)
+			if (actionX_GetRemoteSharingStatus is null)
 				actionX_GetRemoteSharingStatus = this.service.GetAction("X_GetRemoteSharingStatus");
 
 			this.actionX_GetRemoteSharingStatus.Invoke(out OutputValues);

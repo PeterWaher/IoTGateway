@@ -38,7 +38,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 
 		private void CheckCapabilities()
 		{
-			if (this.capabilities == null)
+			if (this.capabilities is null)
 			{
 				string FullJid = this.FullJid;
 
@@ -70,13 +70,13 @@ namespace Waher.Client.WPF.Model.Concentrator
 			get
 			{
 				XmppAccountNode AccountNode = this.XmppAccountNode;
-				if (AccountNode == null || !AccountNode.IsOnline)
+				if (AccountNode is null || !AccountNode.IsOnline)
 					return null;
 
 				RosterItem Item = AccountNode.Client[this.BareJID];
 				PresenceEventArgs e = Item?.LastPresence;
 
-				if (e == null || e.Availability == Availability.Offline)
+				if (e is null || e.Availability == Availability.Offline)
 					return null;
 				else
 					return e.From;

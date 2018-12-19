@@ -29,13 +29,13 @@ namespace Waher.Script.Abstraction.Sets
 			IEuclidianDomainElement L = Left as IEuclidianDomainElement;
 			IEuclidianDomainElement R = Right as IEuclidianDomainElement;
 
-			if (L == null || R == null)
+			if (L is null || R is null)
 				return base.Divide(Left, Right);
 			else
 			{
 				IEuclidianDomainElement Remainder;
 				IEuclidianDomainElement Result = this.Divide(L, R, out Remainder);
-				if (Result == null || !Remainder.Equals(Remainder.AssociatedAbelianGroup.Zero))
+				if (Result is null || !Remainder.Equals(Remainder.AssociatedAbelianGroup.Zero))
 					return null;
 				else
 					return Result;

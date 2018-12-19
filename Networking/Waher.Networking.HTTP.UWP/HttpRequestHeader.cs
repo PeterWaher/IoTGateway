@@ -174,9 +174,9 @@ namespace Waher.Networking.HTTP
 		{
 			get
 			{
-				if (this.queryParameters == null)
+				if (this.queryParameters is null)
 				{
-					if (this.query == null)
+					if (this.query is null)
 						this.queryParameters = new KeyValuePair<string, string>[0];
 					else
 					{

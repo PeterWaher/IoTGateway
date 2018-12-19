@@ -136,7 +136,7 @@ namespace Waher.Networking.XMPP.Sensor
 		{
 			get
 			{
-				if (this.payloadXml == null)
+				if (this.payloadXml is null)
 				{
 					StringBuilder Xml = new StringBuilder();
 					XmlWriter w = XmlWriter.Create(Xml, XML.WriterSettings(false, true));

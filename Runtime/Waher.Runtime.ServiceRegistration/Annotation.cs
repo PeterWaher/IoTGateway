@@ -94,10 +94,10 @@ namespace Waher.Runtime.ServiceRegistration
 		{
 			int c, d;
 
-			if (Annotations1 == null || (c = Annotations1.Length) == 0)
+			if (Annotations1 is null || (c = Annotations1.Length) == 0)
 				return Annotations2;
 
-			if (Annotations2 == null || (d = Annotations2.Length) == 0)
+			if (Annotations2 is null || (d = Annotations2.Length) == 0)
 				return Annotations1;
 
 			Annotation[] Result = new Annotation[c + d];

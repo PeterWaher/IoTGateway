@@ -238,7 +238,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
 
 			lock (synchObject)
 			{
-				if (temporaryFiles == null)
+				if (temporaryFiles is null)
 				{
 					temporaryFiles = new Dictionary<string, bool>();
 					Log.Terminating += CurrentDomain_ProcessExit;

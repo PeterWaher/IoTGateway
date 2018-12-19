@@ -87,7 +87,7 @@ namespace Waher.Content.Html
 		{
 			string Html;
 
-			if (Encoding == null)
+			if (Encoding is null)
 				Html = Encoding.UTF8.GetString(Data);
 			else
 				Html = Encoding.GetString(Data);
@@ -165,7 +165,7 @@ namespace Waher.Content.Html
 
 				if (Html != null)
 				{
-					if (Encoding == null)
+					if (Encoding is null)
 					{
 						ContentType += "; charset=utf-8";
 						return Encoding.UTF8.GetBytes(Html);

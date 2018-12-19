@@ -87,7 +87,7 @@ namespace Waher.Client.WPF.Model.Provisioning
 				IsFriendQuestion Question = await Database.FindFirstDeleteRest<IsFriendQuestion>(new FilterAnd(
 					new FilterFieldEqualTo("Key", e.Key), new FilterFieldEqualTo("JID", e.JID)));
 
-				if (Question == null)
+				if (Question is null)
 				{
 					Question = new IsFriendQuestion()
 					{
@@ -118,7 +118,7 @@ namespace Waher.Client.WPF.Model.Provisioning
 				CanReadQuestion Question = await Database.FindFirstDeleteRest<CanReadQuestion>(new FilterAnd(
 					new FilterFieldEqualTo("Key", e.Key), new FilterFieldEqualTo("JID", e.JID)));
 
-				if (Question == null)
+				if (Question is null)
 				{
 					Question = new CanReadQuestion()
 					{
@@ -157,7 +157,7 @@ namespace Waher.Client.WPF.Model.Provisioning
 				CanControlQuestion Question = await Database.FindFirstDeleteRest<CanControlQuestion>(new FilterAnd(
 					new FilterFieldEqualTo("Key", e.Key), new FilterFieldEqualTo("JID", e.JID)));
 
-				if (Question == null)
+				if (Question is null)
 				{
 					Question = new CanControlQuestion()
 					{
@@ -472,7 +472,7 @@ namespace Waher.Client.WPF.Model.Provisioning
 
 						MainWindow.SuccessBox(Msg.ToString());
 
-						if (this.Account.Client.GetRosterItem(e.JID) == null)
+						if (this.Account.Client.GetRosterItem(e.JID) is null)
 							this.Account.Client.RequestPresenceSubscription(e.JID);
 					}
 					else

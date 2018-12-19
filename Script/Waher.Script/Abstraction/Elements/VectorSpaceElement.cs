@@ -25,7 +25,7 @@ namespace Waher.Script.Abstraction.Elements
 		public override ILeftModuleElement MultiplyScalarLeft(IRingElement Scalar)
 		{
 			IFieldElement FieldElement = Scalar as IFieldElement;
-			if (FieldElement == null)
+			if (FieldElement is null)
 				return null;
 			else
 				return this.MultiplyScalar(FieldElement);
@@ -39,7 +39,7 @@ namespace Waher.Script.Abstraction.Elements
 		public override IRightModuleElement MultiplyScalarRight(IRingElement Scalar)
 		{
 			IFieldElement FieldElement = Scalar as IFieldElement;
-			if (FieldElement == null)
+			if (FieldElement is null)
 				return null;
 			else
 				return this.MultiplyScalar(FieldElement);
@@ -53,7 +53,7 @@ namespace Waher.Script.Abstraction.Elements
 		public override IModuleElement MultiplyScalar(IRingElement Scalar)
 		{
 			IFieldElement FieldElement = Scalar as IFieldElement;
-			if (FieldElement == null)
+			if (FieldElement is null)
 				return null;
 			else
 				return this.MultiplyScalar(FieldElement);

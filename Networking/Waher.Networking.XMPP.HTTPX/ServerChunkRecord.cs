@@ -86,7 +86,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			}
 			else if (Nr > this.nextChunk)
 			{
-				if (this.chunks == null)
+				if (this.chunks is null)
 					this.chunks = new SortedDictionary<int, Chunk>();
 
 				this.chunks[Nr] = new Chunk(Nr, Last, Data);

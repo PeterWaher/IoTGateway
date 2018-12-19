@@ -90,7 +90,7 @@ namespace Waher.Content.Html
 
 		internal void Add(HtmlNode Segment)
 		{
-			if (this.segments == null)
+			if (this.segments is null)
 				this.segments = new LinkedList<HtmlNode>();
 
 			this.segments.AddLast(Segment);
@@ -109,7 +109,7 @@ namespace Waher.Content.Html
 		{
 			get
 			{
-				if (this.value == null)
+				if (this.value is null)
 				{
 					if (this.segments != null)
 					{

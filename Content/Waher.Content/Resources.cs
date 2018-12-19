@@ -48,7 +48,7 @@ namespace Waher.Content
 				A = Types.GetFirstAssemblyReferenceInNamespace(ParentNamespace);
 			}
 
-			if (A == null)
+			if (A is null)
 				throw new ArgumentException("Assembly not found for resource " + ResourceName + ".", nameof(ResourceName));
 
 			return A;
@@ -76,7 +76,7 @@ namespace Waher.Content
 		{
 			using (Stream f = Assembly.GetManifestResourceStream(ResourceName))
 			{
-				if (f == null)
+				if (f is null)
 					throw new ArgumentException("Resource not found: " + ResourceName, nameof(ResourceName));
 
 				if (f.Length > int.MaxValue)
@@ -135,7 +135,7 @@ namespace Waher.Content
 		public static X509Certificate2 LoadCertificate(string ResourceName, string Password, Assembly Assembly)
 		{
 			byte[] Data = LoadResource(ResourceName, Assembly);
-			if (Password == null)
+			if (Password is null)
 				return new X509Certificate2(Data);
 			else
 				return new X509Certificate2(Data, Password);

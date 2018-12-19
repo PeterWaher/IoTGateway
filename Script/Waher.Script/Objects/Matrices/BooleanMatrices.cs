@@ -49,7 +49,7 @@ namespace Waher.Script.Objects.Matrices
 		{
 			get 
 			{
-				if (this.zero == null)
+				if (this.zero is null)
 					this.zero = new BooleanMatrix(new bool[this.rows, this.columns]);
 				
 				return this.zero;
@@ -72,7 +72,7 @@ namespace Waher.Script.Objects.Matrices
 		public override bool Contains(IElement Element)
 		{
 			BooleanMatrix M = Element as BooleanMatrix;
-			if (M == null)
+			if (M is null)
 				return false;
 
 			return M.Rows == this.rows && M.Columns == this.columns;

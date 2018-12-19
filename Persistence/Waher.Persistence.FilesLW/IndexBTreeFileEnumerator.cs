@@ -212,12 +212,12 @@ namespace Waher.Persistence.Files
 
 			try
 			{
-				if (this.currentSerializer == null)
+				if (this.currentSerializer is null)
 					this.currentSerializer = this.provider.GetObjectSerializer(typeof(T));
 
 				object Obj = await this.file.ObjectFile.TryLoadObject(this.currentObjectId, this.currentSerializer);
 
-				if (Obj == null)
+				if (Obj is null)
 				{
 					this.current = default(T);
 					this.currentTypeCompatible = false;

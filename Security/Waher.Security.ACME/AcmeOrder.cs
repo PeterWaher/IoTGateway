@@ -201,7 +201,7 @@ namespace Waher.Security.ACME
 		/// <returns>Arary of authorization objects.</returns>
 		public async Task<AcmeAuthorization[]> GetAuthorizations()
 		{
-			if (this.authorizations == null)
+			if (this.authorizations is null)
 			{
 				int i, c = this.authorizationUris.Length;
 				AcmeAuthorization[] Result = new AcmeAuthorization[c];
@@ -243,7 +243,7 @@ namespace Waher.Security.ACME
 		/// <returns>Certificate chain.</returns>
 		public Task<X509Certificate2[]> DownloadCertificate()
 		{
-			if (this.certificate == null)
+			if (this.certificate is null)
 				throw new Exception("No certificate URI available.");
 
 			return this.Client.DownloadCertificate(this.certificate);

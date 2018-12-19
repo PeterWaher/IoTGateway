@@ -35,7 +35,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 		{
 			this.nodeInfo = NodeInfo;
 
-			if (this.nodeInfo.ParameterList == null)
+			if (this.nodeInfo.ParameterList is null)
 				this.parameters = null;
 			else
 				this.parameters = new DisplayableParameters(this.nodeInfo.ParameterList);
@@ -143,11 +143,11 @@ namespace Waher.Client.WPF.Model.Concentrator
 			get
 			{
 				XmppConcentrator Concentrator = this.Concentrator;
-				if (Concentrator == null)
+				if (Concentrator is null)
 					return null;
 
 				XmppAccountNode AccountNode = Concentrator.XmppAccountNode;
-				if (AccountNode == null)
+				if (AccountNode is null)
 					return null;
 
 				return AccountNode.ConcentratorClient;
@@ -291,11 +291,11 @@ namespace Waher.Client.WPF.Model.Concentrator
 			get
 			{
 				XmppConcentrator Concentrator = this.Concentrator;
-				if (Concentrator == null)
+				if (Concentrator is null)
 					return false;
 
 				XmppAccountNode XmppAccountNode = Concentrator.XmppAccountNode;
-				if (XmppAccountNode == null)
+				if (XmppAccountNode is null)
 					return false;
 
 				XmppClient Client = XmppAccountNode.Client;
@@ -523,7 +523,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 		{
 			base.SelectionChanged();
 
-			if (this.nodeInfo != null && this.nodeInfo.HasCommands && this.commands == null)
+			if (this.nodeInfo != null && this.nodeInfo.HasCommands && this.commands is null)
 			{
 				string FullJid = this.Concentrator?.FullJid;
 				ConcentratorClient ConcentratorClient = this.ConcentratorClient;

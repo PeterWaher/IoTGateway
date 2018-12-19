@@ -29,7 +29,7 @@ namespace Waher.Script.Abstraction.Sets
 			IAbelianGroupElement L = Left as IAbelianGroupElement;
 			IAbelianGroupElement R = Right as IAbelianGroupElement;
 
-			if (L == null || R == null)
+			if (L is null || R is null)
 				return base.RightSubtract(Left, Right);
 			else
 				return this.Subtract(L, R);
@@ -46,7 +46,7 @@ namespace Waher.Script.Abstraction.Sets
 			IAbelianGroupElement L = Left as IAbelianGroupElement;
 			IAbelianGroupElement R = Right as IAbelianGroupElement;
 
-			if (L == null || R == null)
+			if (L is null || R is null)
 				return base.LeftSubtract(Left, Right);
 			else
 				return this.Subtract(R, L);

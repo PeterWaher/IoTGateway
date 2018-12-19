@@ -560,7 +560,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 				if (LogStatisticsEvery.HasValue && i % LogStatisticsEvery.Value == 0)
 				{
-					if (Stat == null)
+					if (Stat is null)
 					{
 						Milliseconds = new List<double>();
 						Stat = new List<FileStatistics>();

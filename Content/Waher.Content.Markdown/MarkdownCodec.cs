@@ -85,12 +85,12 @@ namespace Waher.Content.Markdown
 		{
 			string s;
 
-			if (Encoding == null)
+			if (Encoding is null)
 				s = System.Text.Encoding.UTF8.GetString(Data);
 			else
 				s = Encoding.GetString(Data);
 
-			if (BaseUri == null)
+			if (BaseUri is null)
 				return new MarkdownDocument(s);
 			else
 				return new MarkdownDocument(s, new MarkdownSettings(), string.Empty, string.Empty, BaseUri.ToString());
@@ -129,10 +129,10 @@ namespace Waher.Content.Markdown
 		public byte[] Encode(object Object, Encoding Encoding, out string ContentType, params string[] AcceptedContentTypes)
 		{
 			MarkdownDocument MarkdownDocument = Object as MarkdownDocument;
-			if (MarkdownDocument == null)
+			if (MarkdownDocument is null)
 				throw new ArgumentException("Object not a markdown document.", nameof(Object));
 
-			if (Encoding == null)
+			if (Encoding is null)
 			{
 				ContentType = "text/markdown; charset=utf-8";
 				return System.Text.Encoding.UTF8.GetBytes(Object.ToString());

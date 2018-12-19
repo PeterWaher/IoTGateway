@@ -52,7 +52,7 @@ namespace Waher.Things.Metering
 		/// <param name="Node">Metering node.</param>
 		public static implicit operator ThingReference(MeteringNode Node)
 		{
-			if (Node.thingReference == null)
+			if (Node.thingReference is null)
 				Node.thingReference = new ThingReference(Node.nodeId, Node.SourceId, Node.Partition);
 
 			return Node.thingReference;
@@ -136,7 +136,7 @@ namespace Waher.Things.Metering
 				this.nodeId = value;
 				this.thingReference = null;
 
-				if (this.oldId == null && !string.IsNullOrEmpty(value))
+				if (this.oldId is null && !string.IsNullOrEmpty(value))
 					this.oldId = value;
 			}
 		}
@@ -657,7 +657,7 @@ namespace Waher.Things.Metering
 					return null;
 
 				this.parent = this.LoadParent().Result;
-				if (this.parent == null)
+				if (this.parent is null)
 					throw new Exception("Parent not found.");
 
 				return this.parent;
@@ -708,7 +708,7 @@ namespace Waher.Things.Metering
 
 			lock (this.synchObject)
 			{
-				if (this.children == null)
+				if (this.children is null)
 					return new INode[0];
 				else
 					return this.children.ToArray();
@@ -729,7 +729,7 @@ namespace Waher.Things.Metering
 
 				foreach (MeteringNode Child in Children2)
 				{
-					if (this.children == null)
+					if (this.children is null)
 						this.children = new List<MeteringNode>();
 
 					this.children.Add(Child);
@@ -813,7 +813,7 @@ namespace Waher.Things.Metering
 		public virtual async Task<IEnumerable<Parameter>> GetDisplayableParametersAsync(Language Language, RequestOrigin Caller)
 		{
 			Namespace Namespace = await Language.GetNamespaceAsync(typeof(MeteringNode).Namespace);
-			if (Namespace == null)
+			if (Namespace is null)
 				Namespace = await Language.CreateNamespaceAsync(typeof(MeteringNode).Namespace);
 
 			LinkedList<Parameter> Result = new LinkedList<Parameter>();
@@ -959,7 +959,7 @@ namespace Waher.Things.Metering
 		/// <returns>If the child node was moved up.</returns>
 		public virtual async Task<bool> MoveUpAsync(MeteringNode Child, RequestOrigin Caller)
 		{
-			if (!this.ChildrenOrdered || this.children == null)
+			if (!this.ChildrenOrdered || this.children is null)
 				return false;
 
 			if (!await this.CanEditAsync(Caller) || !await Child.CanEditAsync(Caller))
@@ -994,7 +994,7 @@ namespace Waher.Things.Metering
 		/// <returns>If the child node was moved down.</returns>
 		public virtual async Task<bool> MoveDownAsync(MeteringNode Child, RequestOrigin Caller)
 		{
-			if (!this.ChildrenOrdered || this.children == null)
+			if (!this.ChildrenOrdered || this.children is null)
 				return false;
 
 			if (!await this.CanEditAsync(Caller) || !await Child.CanEditAsync(Caller))
@@ -1058,7 +1058,7 @@ namespace Waher.Things.Metering
 
 			lock (this.synchObject)
 			{
-				if (this.children == null)
+				if (this.children is null)
 					this.children = new List<MeteringNode>();
 				else if ((c = this.children.Count) > 0)
 					After = this.children[c - 1];
@@ -1273,7 +1273,7 @@ namespace Waher.Things.Metering
 		{
 			IEnumerable<ICommand> Commands1 = await Commands;
 
-			if (Commands1 == null)
+			if (Commands1 is null)
 				return Commands2;
 
 			if (!(Commands1 is List<ICommand> Result))

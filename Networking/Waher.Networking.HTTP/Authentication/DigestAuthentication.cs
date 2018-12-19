@@ -105,8 +105,8 @@ namespace Waher.Networking.HTTP.Authentication
 					}
 				}
 
-				if (this.realm != Realm || Qop == null || Nonce == null || Cnonce == null || Nc == null ||
-					Uri == null || Response == null || UserName == null || (!Auth && !AuthInt))
+				if (this.realm != Realm || Qop is null || Nonce is null || Cnonce is null || Nc is null ||
+					Uri is null || Response is null || UserName is null || (!Auth && !AuthInt))
 				{
 					return false;
 				}
@@ -130,7 +130,7 @@ namespace Waher.Networking.HTTP.Authentication
 					{
 						if (Pair.Key <= TP)
 						{
-							if (ToRemove == null)
+							if (ToRemove is null)
 								ToRemove = new LinkedList<DateTime>();
 
 							ToRemove.AddLast(Pair.Key);

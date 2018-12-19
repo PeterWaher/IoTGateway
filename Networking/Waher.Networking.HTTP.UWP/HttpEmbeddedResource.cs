@@ -107,10 +107,10 @@ namespace Waher.Networking.HTTP
 		{
 			using (Stream f = this.assembly.GetManifestResourceStream(this.embeddedResourceName))
 			{
-				if (f == null)
+				if (f is null)
 					throw new NotFoundException();
 
-				if (this.etag == null)
+				if (this.etag is null)
 					this.etag = this.ComputeETag(f);
 
 				if (Request.Header.IfNoneMatch != null && Request.Header.IfNoneMatch.Value == this.etag)

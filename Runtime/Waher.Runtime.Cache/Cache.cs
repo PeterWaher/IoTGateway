@@ -74,7 +74,7 @@ namespace Waher.Runtime.Cache
 							if (P.Key > Limit)
 								break;
 
-							if (ToRemove1 == null)
+							if (ToRemove1 is null)
 								ToRemove1 = new LinkedList<CacheItem<KeyType, ValueType>>();
 
 							ToRemove1.AddLast(this.valuesByKey[P.Value]);
@@ -100,7 +100,7 @@ namespace Waher.Runtime.Cache
 							if (P.Key > Limit)
 								break;
 
-							if (ToRemove2 == null)
+							if (ToRemove2 is null)
 								ToRemove2 = new LinkedList<CacheItem<KeyType, ValueType>>();
 
 							ToRemove2.AddLast(this.valuesByKey[P.Value]);

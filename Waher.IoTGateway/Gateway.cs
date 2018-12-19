@@ -339,7 +339,7 @@ namespace Waher.IoTGateway
 				else
 					DatabaseProvider = null;
 
-				if (DatabaseProvider == null)
+				if (DatabaseProvider is null)
 					throw new Exception("Database provider not defined. Make sure the GetDatabaseProvider event has an appropriate event handler.");
 
 				Database.Register(DatabaseProvider);
@@ -614,7 +614,7 @@ namespace Waher.IoTGateway
 				webServer.Register(startAnalyze = new StartAnalyze());
 				webServer.Register(deleteExport = new DeleteExport());
 
-				if (emoji1_24x24 == null)
+				if (emoji1_24x24 is null)
 				{
 					emoji1_24x24 = new Emoji1LocalFiles(Emoji1SourceFileType.Svg, 24, 24, "/Graphics/Emoji1/svg/%FILENAME%",
 						Path.Combine(runtimeFolder, "Graphics", "Emoji1.zip"), Path.Combine(appDataFolder, "Graphics"));
@@ -1384,8 +1384,8 @@ namespace Waher.IoTGateway
 				e.Accept();
 			}
 			else if (BareJid.IndexOf('@') > 0 && 
-				(xmppClient == null || 
-				(Item = xmppClient.GetRosterItem(BareJid)) == null ||
+				(xmppClient is null || 
+				(Item = xmppClient.GetRosterItem(BareJid)) is null ||
 				Item.State == SubscriptionState.None || 
 				Item.State == SubscriptionState.Remove ||
 				Item.State == SubscriptionState.Unknown))
@@ -1479,7 +1479,7 @@ namespace Waher.IoTGateway
 			e.Accept();
 
 			RosterItem Item = xmppClient.GetRosterItem(e.FromBareJID);
-			if (Item == null || Item.State == SubscriptionState.None || Item.State == SubscriptionState.From)
+			if (Item is null || Item.State == SubscriptionState.None || Item.State == SubscriptionState.From)
 				xmppClient.RequestPresenceSubscription(e.FromBareJID);
 
 			xmppClient.SetPresence(Availability.Chat);
@@ -1505,7 +1505,7 @@ namespace Waher.IoTGateway
 		/// <returns>If the login-operation was successful or not.</returns>
 		public static async Task<LoginResult> DoMainXmppLogin(string UserName, string Password, string RemoteEndPoint)
 		{
-			if (xmppClient == null || xmppClient.UserName != UserName)
+			if (xmppClient is null || xmppClient.UserName != UserName)
 			{
 				Log.Notice("Invalid login.", UserName, RemoteEndPoint, "LoginFailure", EventLevel.Minor);
 				return LoginResult.InvalidLogin;
@@ -1623,13 +1623,13 @@ namespace Waher.IoTGateway
 			int Port;
 			int i;
 
-			if (Request.Session == null)
+			if (Request.Session is null)
 				return;
 
 			if (!Request.Session.TryGetVariable("from", out Variable v) || string.IsNullOrEmpty(From = v.ValueObject as string))
 				From = string.Empty;
 
-			if (!loopbackIntefaceAvailable && (XmppConfiguration.Instance == null || !XmppConfiguration.Instance.Complete || configuring))
+			if (!loopbackIntefaceAvailable && (XmppConfiguration.Instance is null || !XmppConfiguration.Instance.Complete || configuring))
 			{
 				Log.Informational("User logged in by default, since XMPP not configued and loopback interface not available.", string.Empty, Request.RemoteEndPoint, "LoginSuccessful", EventLevel.Minor);
 				Login.DoLogin(Request, From);
@@ -1651,7 +1651,7 @@ namespace Waher.IoTGateway
 				return;
 
 #if !MONO
-			if (XmppConfiguration.Instance == null || !XmppConfiguration.Instance.Complete || configuring)
+			if (XmppConfiguration.Instance is null || !XmppConfiguration.Instance.Complete || configuring)
 #endif
 			{
 				Log.Informational("Local user logged in.", string.Empty, Request.RemoteEndPoint, "LoginSuccessful", EventLevel.Minor);
@@ -1747,7 +1747,7 @@ namespace Waher.IoTGateway
 		{
 			IUser User;
 
-			if (Request.Session == null || !Request.Session.TryGetVariable("User", out Variable v) || (User = v.ValueObject as IUser) == null)
+			if (Request.Session is null || !Request.Session.TryGetVariable("User", out Variable v) || (User = v.ValueObject as IUser) is null)
 				throw new ForbiddenException();
 		}
 
@@ -1952,7 +1952,7 @@ namespace Waher.IoTGateway
 					h = null;
 			}
 
-			if (h == null)
+			if (h is null)
 			{
 				Log.Warning("Service command lacking command handler invoked.", CommandNr.ToString());
 				return false;
@@ -2183,7 +2183,7 @@ namespace Waher.IoTGateway
 		/// <returns>If the event handler was found and removed.</returns>
 		public static bool UnregisterHandler(Type PersonalEventType, PersonalEventNotificationEventHandler Handler)
 		{
-			if (pepClient == null)
+			if (pepClient is null)
 				return false;
 			else
 				return pepClient.UnregisterHandler(PersonalEventType, Handler);

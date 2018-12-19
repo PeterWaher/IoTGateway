@@ -97,7 +97,7 @@ namespace Waher.Persistence.Files.Searching
 		/// </summary>
 		public bool IsOpenEndedRange
 		{
-			get { return this.IsRange && (this.min == null || this.max == null); }
+			get { return this.IsRange && (this.min is null || this.max is null); }
 		}
 
 		/// <summary>

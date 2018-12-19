@@ -130,7 +130,7 @@ namespace Waher.Mock.Temperature
 						e.Accept();     // TODO: Provisioning
 
 						RosterItem Item = Client.GetRosterItem(e.FromBareJID);
-						if (Item == null || Item.State == SubscriptionState.None || Item.State == SubscriptionState.From)
+						if (Item is null || Item.State == SubscriptionState.None || Item.State == SubscriptionState.From)
 							Client.RequestPresenceSubscription(e.FromBareJID);
 
 						Client.SetPresence(Availability.Chat);

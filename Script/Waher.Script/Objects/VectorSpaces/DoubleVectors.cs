@@ -46,7 +46,7 @@ namespace Waher.Script.Objects.VectorSpaces
 		{
 			get 
 			{
-				if (this.zero == null)
+				if (this.zero is null)
 					this.zero = new DoubleVector(new double[this.dimension]);
 				
 				return this.zero;

@@ -94,7 +94,7 @@ namespace Waher.Script.Functions.Vectors
         {
 			IOrderedSet S2 = e2.AssociatedSet as IOrderedSet;
 
-			if (!(e1.AssociatedSet is IOrderedSet S1) || S2 == null || S1 != S2)
+			if (!(e1.AssociatedSet is IOrderedSet S1) || S2 is null || S1 != S2)
 				throw new ScriptRuntimeException("Cannot order elements.", this);
 
 			return S1.Compare(e1, e2);

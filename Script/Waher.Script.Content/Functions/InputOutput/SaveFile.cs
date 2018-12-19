@@ -89,7 +89,7 @@ namespace Waher.Script.Content.Functions.InputOutput
 				Bin = Encoder.Encode(Obj, System.Text.Encoding.UTF8, out ContentType, ContentType);
 			}
 
-			if (Bin == null)
+			if (Bin is null)
 				Bin = InternetContent.Encode(Obj, System.Text.Encoding.UTF8, out ContentType);
 
 			File.WriteAllBytes(FileName, Bin);

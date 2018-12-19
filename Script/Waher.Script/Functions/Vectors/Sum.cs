@@ -117,22 +117,22 @@ namespace Waher.Script.Functions.Vectors
             foreach (IElement E in Vector.ChildElements)
             {
                 SE = E as ISemiGroupElement;
-                if (SE == null)
+                if (SE is null)
                     throw new ScriptRuntimeException("Elements not addable.", Node);
 
-                if (Result == null)
+                if (Result is null)
                     Result = SE;
                 else
                 {
                     Sum = Result.AddRight(SE);
-                    if (Sum == null)
+                    if (Sum is null)
                         Sum = (ISemiGroupElement)Operators.Arithmetics.Add.EvaluateAddition(Result, SE, Node);
 
                     Result = Sum;
                 }
             }
 
-            if (Result == null)
+            if (Result is null)
                 return ObjectValue.Null;
             else
                 return Result;

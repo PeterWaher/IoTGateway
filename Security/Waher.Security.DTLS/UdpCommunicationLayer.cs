@@ -97,7 +97,7 @@ namespace Waher.Security.DTLS
 
 					lock (this.outputQueue)
 					{
-						if (this.outputQueue.First == null)
+						if (this.outputQueue.First is null)
 						{
 							this.isWriting = false;
 							Packet = null;

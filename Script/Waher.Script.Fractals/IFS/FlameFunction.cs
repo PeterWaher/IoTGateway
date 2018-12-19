@@ -239,9 +239,6 @@ namespace Waher.Script.Fractals.IFS
                             this.zv.Value = new Complex(x2, y2);
                             Complex z = Expression.ToComplex(this.variations2[i].Evaluate(this.complexParameters, Variables).AssociatedObjectValue);
 
-                            if (z == null)
-                                throw new ScriptRuntimeException("Expected imaginary value as a result.", this.node);
-
                             x3 += w * z.Real;
                             y3 += w * z.Imaginary;
                         }

@@ -85,7 +85,7 @@ namespace Waher.Content.Text
 		{
 			string s;
 
-			if (Encoding == null)
+			if (Encoding is null)
 				s = Encoding.UTF8.GetString(Data);
 			else
 				s = Encoding.GetString(Data);
@@ -130,7 +130,7 @@ namespace Waher.Content.Text
 					Grade = Grade.Ok;
 					return true;
 				}
-				else if (Object == null ||
+				else if (Object is null ||
 					Object is IEnumerable ||
 					Object is string ||
 					Object is bool ||
@@ -170,7 +170,7 @@ namespace Waher.Content.Text
 			string Json = JSON.Encode(Object, false);
 			ContentType = "application/json";
 
-			if (Encoding == null)
+			if (Encoding is null)
 				Encoding = Encoding.UTF8;
 
 			return Encoding.GetBytes(Json);

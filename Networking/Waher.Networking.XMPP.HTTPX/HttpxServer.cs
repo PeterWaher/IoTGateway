@@ -134,7 +134,7 @@ namespace Waher.Networking.XMPP.HTTPX
 								case "text":
 									MemoryStream ms = new MemoryStream();
 
-									if (Header.ContentType == null)
+									if (Header.ContentType is null)
 										Header.Add(new HttpField("Content-Type", "text/plain"));
 
 									byte[] Data = Header.ContentType.Encoding.GetBytes(N2.InnerText);
@@ -145,7 +145,7 @@ namespace Waher.Networking.XMPP.HTTPX
 								case "xml":
 									ms = new MemoryStream();
 
-									if (Header.ContentType == null)
+									if (Header.ContentType is null)
 										Header.Add(new HttpField("Content-Type", "text/xml"));
 
 									Data = Header.ContentType.Encoding.GetBytes(N2.InnerText);
@@ -191,7 +191,7 @@ namespace Waher.Networking.XMPP.HTTPX
 				}
 			}
 
-			if (Header == null)
+			if (Header is null)
 				Header = new HttpRequestHeader(Method, Resource, Version, "httpx", HeaderFields.ToArray());
 
 			this.Process(e.Id, e.From, e.To, new HttpRequest(Header, DataStream, null, e.From), e.E2eEncryption,
@@ -222,7 +222,7 @@ namespace Waher.Networking.XMPP.HTTPX
 							}
 						}
 
-						if (Request.User == null)
+						if (Request.User is null)
 						{
 							List<KeyValuePair<string, string>> Challenges = new List<KeyValuePair<string, string>>();
 
@@ -268,12 +268,12 @@ namespace Waher.Networking.XMPP.HTTPX
 			}
 			catch (HttpException ex)
 			{
-				Result = (Request.Header.Expect == null || !Request.Header.Expect.Continue100 || Request.HasData);
+				Result = (Request.Header.Expect is null || !Request.Header.Expect.Continue100 || Request.HasData);
 				this.SendQuickResponse(Request, E2e, Id, From, To, ex.StatusCode, ex.Message, !Result, MaxChunkSize, ex.HeaderFields);
 			}
 			catch (System.NotImplementedException ex)
 			{
-				Result = (Request.Header.Expect == null || !Request.Header.Expect.Continue100 || Request.HasData);
+				Result = (Request.Header.Expect is null || !Request.Header.Expect.Continue100 || Request.HasData);
 
 				Log.Critical(ex);
 
@@ -295,7 +295,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			}
 			catch (Exception ex)
 			{
-				Result = (Request.Header.Expect == null || !Request.Header.Expect.Continue100 || Request.HasData);
+				Result = (Request.Header.Expect is null || !Request.Header.Expect.Continue100 || Request.HasData);
 
 				Log.Critical(ex);
 
@@ -320,14 +320,14 @@ namespace Waher.Networking.XMPP.HTTPX
 			}
 			catch (HttpException ex)
 			{
-				if (Response == null || !Response.HeaderSent)
+				if (Response is null || !Response.HeaderSent)
 					this.SendQuickResponse(Request, E2e, Id, From, To, ex.StatusCode, ex.Message, true, MaxChunkSize, ex.HeaderFields);
 			}
 			catch (Exception ex)
 			{
 				Log.Critical(ex);
 
-				if (Response == null || !Response.HeaderSent)
+				if (Response is null || !Response.HeaderSent)
 					this.SendQuickResponse(Request, E2e, Id, From, To, 500, "Internal Server Error", true, MaxChunkSize);
 			}
 			finally

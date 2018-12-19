@@ -72,7 +72,7 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable
 				Xml.Append('"');
 			}
 
-			if (this.Body == null || this.Body.Length == 0)
+			if (this.Body is null || this.Body.Length == 0)
 				Xml.Append("/>");
 			else
 			{

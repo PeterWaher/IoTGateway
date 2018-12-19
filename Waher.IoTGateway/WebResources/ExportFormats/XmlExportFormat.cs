@@ -158,7 +158,7 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 		/// <param name="PropertyValue">Property value.</param>
 		public override async Task ReportProperty(string PropertyName, object PropertyValue)
 		{
-			if (PropertyValue == null)
+			if (PropertyValue is null)
 			{
 				await this.output.WriteStartElementAsync(string.Empty, "Null", Export.ExportNamepace);
 				if (PropertyName != null)
@@ -342,7 +342,7 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 								else
 									j = (int)d;
 
-								if (Buf == null)
+								if (Buf is null)
 								{
 									if (i == 0 && j == c)
 										Buf = Bin;
@@ -472,7 +472,7 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 				else
 					j = (int)d;
 
-				if (Buf == null)
+				if (Buf is null)
 					Buf = new byte[j];
 
 				await File.ReadAsync(Buf, 0, j);

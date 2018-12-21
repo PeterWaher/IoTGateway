@@ -303,10 +303,11 @@ namespace Waher.Persistence.Files.Serialization
 				CSharp.AppendLine("using System.Reflection;");
 				CSharp.AppendLine("using System.Text;");
 				CSharp.AppendLine("using System.Threading.Tasks;");
-				CSharp.AppendLine("using Waher.Persistence.Serialization;");
-				CSharp.AppendLine("using Waher.Persistence.Filters;");
+				CSharp.AppendLine("using Waher.Persistence;");
 				CSharp.AppendLine("using Waher.Persistence.Files;");
 				CSharp.AppendLine("using Waher.Persistence.Files.Serialization;");
+				CSharp.AppendLine("using Waher.Persistence.Filters;");
+				CSharp.AppendLine("using Waher.Persistence.Serialization;");
 				CSharp.AppendLine("using Waher.Runtime.Inventory;");
 				CSharp.AppendLine();
 				CSharp.AppendLine("namespace " + Type.Namespace + ".Binary");
@@ -1357,6 +1358,10 @@ namespace Waher.Persistence.Files.Serialization
 					{
 						if (DefaultValue is null)
 							CSharp.AppendLine("\t\t\tif (!((object)Value." + Member.Name + " is null))");
+						else if (MemberType == typeof(string) && DefaultValue is string s2 && string.IsNullOrEmpty(s2))
+							CSharp.AppendLine("\t\t\tif (!string.IsNullOrEmpty(Value." + Member.Name + "))");
+						else if (MemberType == typeof(CaseInsensitiveString) && DefaultValue is CaseInsensitiveString s3 && CaseInsensitiveString.IsNullOrEmpty(s3))
+							CSharp.AppendLine("\t\t\tif (!CaseInsensitiveString.IsNullOrEmpty(Value." + Member.Name + "))");
 						else
 							CSharp.AppendLine("\t\t\tif (!default" + Member.Name + ".Equals(Value." + Member.Name + "))");
 

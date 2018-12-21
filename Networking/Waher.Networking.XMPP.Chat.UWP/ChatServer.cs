@@ -368,18 +368,29 @@ namespace Waher.Networking.XMPP.Chat
 
 						this.SendPlainTextChatMessage(e.From, Msg.ToString());
 
-						if (Variables.TryGetVariable(" User ", out v) &&
-							v.ValueObject is User User &&
-							Types.TryGetQualifiedNames(typeof(Expression).Namespace + ".Persistence", out string[] P))
+						if (this.provisioningClient != null)
 						{
-							this.provisioningClient.CanRead(e.FromBareJID, FieldType.All, null, null, null, null, null, (sender3, e3) =>
+							if (Variables.TryGetVariable(" User ", out v) &&
+								v.ValueObject is User User &&
+								Types.TryGetQualifiedNames(typeof(Expression).Namespace + ".Persistence", out string[] P))
 							{
-								if (e3.CanRead && e3.FieldTypes == FieldType.All)
+								if (string.Compare(e.FromBareJID, this.provisioningClient.OwnerJid, true) == 0)
 								{
-									User.SetPrivilege(typeof(Expression).Namespace + ".Persistence.SQL.Select", true);
-									this.SendPlainTextChatMessage(e.From, "SQL SELECT interface enabled.");
+									User.SetPrivilege(typeof(Expression).Namespace + ".Persistence", true);
+									this.SendPlainTextChatMessage(e.From, "SQL interface enabled.");
 								}
-							}, null);
+								else
+								{
+									this.provisioningClient.CanRead(e.FromBareJID, FieldType.All, null, null, null, null, null, (sender3, e3) =>
+									{
+										if (e3.CanRead && e3.FieldTypes == FieldType.All)
+										{
+											User.SetPrivilege(typeof(Expression).Namespace + ".Persistence.SQL.Select", true);
+											this.SendPlainTextChatMessage(e.From, "SQL SELECT interface enabled.");
+										}
+									}, null);
+								}
+							}
 						}
 
 					}, Variables);

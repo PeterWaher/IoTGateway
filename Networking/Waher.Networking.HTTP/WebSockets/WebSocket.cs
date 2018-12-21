@@ -164,17 +164,11 @@ namespace Waher.Networking.HTTP.WebSockets
 		/// </summary>
 		public void Dispose()
 		{
-			if (this.payload != null)
-			{
-				this.payload.Dispose();
-				this.payload = null;
-			}
+			this.payload?.Dispose();
+			this.payload = null;
 
-			if (this.connection != null)
-			{
-				this.connection.Dispose();
-				this.connection = null;
-			}
+			this.connection?.Dispose();
+			this.connection = null;
 
 			EventHandler h = this.Disposed;
 			if (h != null)
@@ -423,10 +417,11 @@ namespace Waher.Networking.HTTP.WebSockets
 
 								case WebSocketOpcode.Ping:
 									this.Pong();
+									this.RaiseHeartbeat();
 									break;
 
 								case WebSocketOpcode.Pong:
-									// Ignore
+									this.RaiseHeartbeat();
 									break;
 							}
 
@@ -1004,6 +999,23 @@ namespace Waher.Networking.HTTP.WebSockets
 		public bool CheckLive()
 		{
 			return this.connection?.CheckLive() ?? false;
+		}
+
+		/// <summary>
+		/// Event raised when a client heart-beat has been received.
+		/// </summary>
+		public event WebSocketEventHandler Heartbeat = null;
+
+		internal void RaiseHeartbeat()
+		{
+			try
+			{
+				this.Heartbeat?.Invoke(this, new WebSocketEventArgs(this));
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+			}
 		}
 
 	}

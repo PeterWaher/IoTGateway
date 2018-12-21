@@ -116,7 +116,7 @@ namespace Waher.Persistence
 		/// <returns>Case-sensitive string.</returns>
 		public static implicit operator string(CaseInsensitiveString S)
 		{
-			return S.value;
+			return S?.value;
 		}
 
 		/// <summary>

@@ -370,9 +370,9 @@ namespace Waher.Persistence.Files.Serialization
 							break;
 						}
 
-						if (Attr is DefaultValueAttribute)
+						if (Attr is DefaultValueAttribute DefaultValueAttribute)
 						{
-							DefaultValue = ((DefaultValueAttribute)Attr).Value;
+							DefaultValue = DefaultValueAttribute.Value;
 							NrDefault++;
 
 							this.defaultValues[Member.Name] = DefaultValue;
@@ -399,10 +399,15 @@ namespace Waher.Persistence.Files.Serialization
 									CSharp.Append(')');
 								}
 
-								if (DefaultValue is string)
+								if (DefaultValue is string s2)
 								{
-									if (string.IsNullOrEmpty((string)DefaultValue))
-										CSharp.Append("string.Empty");
+									if (string.IsNullOrEmpty(s2))
+									{
+										if (MemberType == typeof(CaseInsensitiveString))
+											CSharp.Append("CaseInsensitiveString.Empty");
+										else
+											CSharp.Append("string.Empty");
+									}
 									else
 									{
 										CSharp.Append("\"");
@@ -449,13 +454,12 @@ namespace Waher.Persistence.Files.Serialization
 										CSharp.Append("\")");
 									}
 								}
-								else if (DefaultValue is Enum)
+								else if (DefaultValue is Enum e)
 								{
 									Type DefaultValueType = DefaultValue.GetType();
 
 									if (DefaultValueType.GetTypeInfo().IsDefined(typeof(FlagsAttribute), false))
 									{
-										Enum e = (Enum)DefaultValue;
 										bool First = true;
 
 										foreach (object Value in Enum.GetValues(DefaultValueType))
@@ -483,9 +487,9 @@ namespace Waher.Persistence.Files.Serialization
 										CSharp.Append(DefaultValue.ToString());
 									}
 								}
-								else if (DefaultValue is bool)
+								else if (DefaultValue is bool b)
 								{
-									if ((bool)DefaultValue)
+									if (b)
 										CSharp.Append("true");
 									else
 										CSharp.Append("false");
@@ -604,8 +608,8 @@ namespace Waher.Persistence.Files.Serialization
 							ObjectIdMemberType = MemberType;
 							HasObjectId = true;
 						}
-						//else if (Attr is ShortNameAttribute)
-						//	ShortName = ((ShortNameAttribute)Attr).Name;
+						//else if (Attr is ShortNameAttribute ShortNameAttribute)
+						//	ShortName = ShortNameAttribute.Name;
 					}
 
 					if (Ignore || HasObjectId)
@@ -760,8 +764,8 @@ namespace Waher.Persistence.Files.Serialization
 							if (Attr is ByReferenceAttribute)
 								ByReference = true;
 
-							//if (Attr is ShortNameAttribute)
-							//	ShortName = ((ShortNameAttribute)Attr).Name;
+							//if (Attr is ShortNameAttribute ShortNameAttribute)
+							//	ShortName = ShortNameAttribute.Name;
 						}
 
 						if (Ignore)
@@ -1336,13 +1340,13 @@ namespace Waher.Persistence.Files.Serialization
 							Ignore = true;
 							break;
 						}
-						else if (Attr is DefaultValueAttribute)
+						else if (Attr is DefaultValueAttribute DefaultValueAttribute)
 						{
 							HasDefaultValue = true;
-							DefaultValue = ((DefaultValueAttribute)Attr).Value;
+							DefaultValue = DefaultValueAttribute.Value;
 						}
-						//else if (Attr is ShortNameAttribute)
-						//	ShortName = ((ShortNameAttribute)Attr).Name;
+						//else if (Attr is ShortNameAttribute ShortNameAttribute)
+						//	ShortName = ShortNameAttribute.Name;
 						else if (Attr is ObjectIdAttribute)
 							ObjectIdField = true;
 						else if (Attr is ByReferenceAttribute)
@@ -2070,10 +2074,13 @@ namespace Waher.Persistence.Files.Serialization
 							Ignore = true;
 							break;
 						}
-						else if (Attr is DefaultValueAttribute)
+						else if (Attr is DefaultValueAttribute DefaultValueAttribute)
 						{
-							DefaultValue = ((DefaultValueAttribute)Attr).Value;
+							DefaultValue = DefaultValueAttribute.Value;
 							NrDefault++;
+
+							if (DefaultValue is string s && Member.MemberType == typeof(CaseInsensitiveString))
+								DefaultValue = new CaseInsensitiveString(s);
 
 							if (DefaultValue != null && DefaultValue.GetType() != Member.MemberType)
 								DefaultValue = Convert.ChangeType(DefaultValue, Member.MemberType);
@@ -3175,12 +3182,12 @@ namespace Waher.Persistence.Files.Serialization
 
 				return ObjectId;
 			}
-			else if (Obj is Guid)
-				return (Guid)Obj;
-			else if (Obj is string)
-				return new Guid((string)Obj);
-			else if (Obj is byte[])
-				return new Guid((byte[])Obj);
+			else if (Obj is Guid Guid)
+				return Guid;
+			else if (Obj is string s)
+				return new Guid(s);
+			else if (Obj is byte[] Bin)
+				return new Guid(Bin);
 			else
 				throw new NotSupportedException("Unsupported type for Object ID members: " + Obj.GetType().FullName);
 		}

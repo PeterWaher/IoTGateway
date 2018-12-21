@@ -5,13 +5,14 @@ using System.Text;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
+using Waher.Script.Objects;
 
 namespace Waher.Script.Operators.Membership
 {
 	/// <summary>
 	/// Named member operator
 	/// </summary>
-	public class NamedMember : UnaryOperator
+	public class NamedMember : NullCheckUnaryOperator
 	{
 		private readonly string name;
 
@@ -20,11 +21,12 @@ namespace Waher.Script.Operators.Membership
 		/// </summary>
 		/// <param name="Operand">Operand.</param>
 		/// <param name="Name">Name</param>
+		/// <param name="NullCheck">If null should be returned if operand is null.</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-		public NamedMember(ScriptNode Operand, string Name, int Start, int Length, Expression Expression)
-			: base(Operand, Start, Length, Expression)
+		public NamedMember(ScriptNode Operand, string Name, bool NullCheck, int Start, int Length, Expression Expression)
+			: base(Operand, NullCheck, Start, Length, Expression)
 		{
 			this.name = Name;
 		}
@@ -47,6 +49,10 @@ namespace Waher.Script.Operators.Membership
 			IElement Operand = this.op.Evaluate(Variables);
 			object Value = Operand.AssociatedObjectValue;
 			object Instance;
+
+			if (Value is null && this.nullCheck)
+				return ObjectValue.Null;
+
 			Type T;
 
 			T = Value as Type;
@@ -101,7 +107,7 @@ namespace Waher.Script.Operators.Membership
 			LinkedList<IElement> Elements = new LinkedList<IElement>();
 
 			foreach (IElement E in Operand.ChildElements)
-				Elements.AddLast(EvaluateDynamic(E, this.name, this));
+				Elements.AddLast(EvaluateDynamic(E, this.name, this.nullCheck, this));
 
 			return Operand.Encapsulate(Elements, this);
 		}
@@ -121,11 +127,14 @@ namespace Waher.Script.Operators.Membership
 		/// <param name="Name">Name of member.</param>
 		/// <param name="Node">Script node performing the evaluation.</param>
 		/// <returns>Result.</returns>
-		public static IElement EvaluateDynamic(IElement Operand, string Name, ScriptNode Node)
+		public static IElement EvaluateDynamic(IElement Operand, string Name, bool NullCheck, ScriptNode Node)
 		{
 			object Value = Operand.AssociatedObjectValue;
 			object Instance;
 			Type T;
+
+			if (Value is null && NullCheck)
+				return ObjectValue.Null;
 
 			T = Value as Type;
 			if (T is null)
@@ -154,7 +163,7 @@ namespace Waher.Script.Operators.Membership
 			LinkedList<IElement> Elements = new LinkedList<IElement>();
 
 			foreach (IElement E in Operand.ChildElements)
-				Elements.AddLast(EvaluateDynamic(E, Name, Node));
+				Elements.AddLast(EvaluateDynamic(E, Name, NullCheck, Node));
 
 			return Operand.Encapsulate(Elements, Node);
 		}

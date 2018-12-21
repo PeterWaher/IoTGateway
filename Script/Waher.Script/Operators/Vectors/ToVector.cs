@@ -10,7 +10,7 @@ namespace Waher.Script.Operators.Vectors
 	/// <summary>
 	/// To-Vector operator.
 	/// </summary>
-	public class ToVector : UnaryOperator 
+	public class ToVector : NullCheckUnaryOperator
 	{
 		/// <summary>
 		/// To-Vector operator.
@@ -19,8 +19,8 @@ namespace Waher.Script.Operators.Vectors
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-		public ToVector(ScriptNode Operand, int Start, int Length, Expression Expression)
-			: base(Operand, Start, Length, Expression)
+		public ToVector(ScriptNode Operand, bool NullCheck, int Start, int Length, Expression Expression)
+			: base(Operand, NullCheck, Start, Length, Expression)
 		{
 		}
 
@@ -36,15 +36,16 @@ namespace Waher.Script.Operators.Vectors
             if (E is IVectorSpaceElement)
                 return E;
 
-            IVector V = E as IVector;
-            if (V != null)
-                return VectorDefinition.Encapsulate(V.VectorElements, false, this);
+			if (E is IVector V)
+				return VectorDefinition.Encapsulate(V.VectorElements, false, this);
 
-            ISet S = E as ISet;
-            if (S != null)
-                return VectorDefinition.Encapsulate(S.ChildElements, false, this);
+			if (E is ISet S)
+				return VectorDefinition.Encapsulate(S.ChildElements, false, this);
 
-            return VectorDefinition.Encapsulate(new IElement[] { E }, false, this);
+			if (this.nullCheck && E.AssociatedObjectValue is null)
+				return E;
+
+			return VectorDefinition.Encapsulate(new IElement[] { E }, false, this);
         }
     }
 }

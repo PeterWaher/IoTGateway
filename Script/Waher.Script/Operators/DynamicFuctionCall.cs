@@ -11,7 +11,7 @@ namespace Waher.Script.Operators
 	/// <summary>
 	/// Dynamic function call operator
 	/// </summary>
-	public class DynamicFunctionCall : UnaryScalarOperator 
+	public class DynamicFunctionCall : NullCheckUnaryScalarOperator
 	{
 		private readonly ScriptNode[] arguments;
 
@@ -20,11 +20,12 @@ namespace Waher.Script.Operators
 		/// </summary>
 		/// <param name="Function">Function</param>
 		/// <param name="Arguments">Arguments</param>
+		/// <param name="NullCheck">If null should be returned if operand is null.</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-		public DynamicFunctionCall(ScriptNode Function, ScriptNode[] Arguments, int Start, int Length, Expression Expression)
-			: base(Function, Start, Length, Expression)
+		public DynamicFunctionCall(ScriptNode Function, ScriptNode[] Arguments, bool NullCheck, int Start, int Length, Expression Expression)
+			: base(Function, NullCheck, Start, Length, Expression)
 		{
 			this.arguments = Arguments;
 		}
@@ -45,7 +46,11 @@ namespace Waher.Script.Operators
         /// <returns>Result</returns>
         public override IElement EvaluateScalar(IElement Operand, Variables Variables)
         {
-			if (!(Operand.AssociatedObjectValue is ILambdaExpression Lambda))
+			object Obj = Operand.AssociatedObjectValue;
+			if (Obj is null && this.nullCheck)
+				return ObjectValue.Null;
+
+			if (!(Obj is ILambdaExpression Lambda))
 				throw new ScriptRuntimeException("Expected a lambda expression.", this);
 
 			int c = this.arguments.Length;

@@ -5,13 +5,14 @@ using System.Text;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
+using Waher.Script.Objects;
 
 namespace Waher.Script.Operators.Membership
 {
 	/// <summary>
 	/// Named method call operator.
 	/// </summary>
-	public class NamedMethodCall : UnaryOperator
+	public class NamedMethodCall : NullCheckUnaryOperator
 	{
 		private readonly string name;
 		private readonly ScriptNode[] parameters;
@@ -23,11 +24,13 @@ namespace Waher.Script.Operators.Membership
 		/// <param name="Operand">Operand.</param>
 		/// <param name="Name">Name</param>
 		/// <param name="Parameters">Method arguments.</param>
+		/// <param name="NullCheck">If null should be returned if operand is null.</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-		public NamedMethodCall(ScriptNode Operand, string Name, ScriptNode[] Parameters, int Start, int Length, Expression Expression)
-			: base(Operand, Start, Length, Expression)
+		public NamedMethodCall(ScriptNode Operand, string Name, ScriptNode[] Parameters, bool NullCheck, 
+			int Start, int Length, Expression Expression)
+			: base(Operand, NullCheck, Start, Length, Expression)
 		{
 			this.name = Name;
 			this.parameters = Parameters;
@@ -67,6 +70,9 @@ namespace Waher.Script.Operators.Membership
 			object Instance;
 			int i;
 			bool DoExtend = false;
+
+			if (Object is null && this.nullCheck)
+				return ObjectValue.Null;
 
 			T = Object as Type;
 			if (T is null)

@@ -15,20 +15,23 @@ namespace Waher.Script.Operators
 	{
 		private readonly string functionName;
 		private readonly ScriptNode[] arguments;
+		private readonly bool nullCheck;
 
 		/// <summary>
 		/// Named function call operator
 		/// </summary>
 		/// <param name="FunctionName">Function</param>
 		/// <param name="Arguments">Arguments</param>
+		/// <param name="NullCheck">If null should be returned if operand is null.</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-		public NamedFunctionCall(string FunctionName, ScriptNode[] Arguments, int Start, int Length, Expression Expression)
+		public NamedFunctionCall(string FunctionName, ScriptNode[] Arguments, bool NullCheck, int Start, int Length, Expression Expression)
 			: base(Start, Length, Expression)
 		{
 			this.functionName = FunctionName;
 			this.arguments = Arguments;
+			this.nullCheck = NullCheck;
 		}
 
 		/// <summary>
@@ -61,7 +64,9 @@ namespace Waher.Script.Operators
 			   !Variables.TryGetVariable(this.functionName, out v)) ||
 			   ((f = v.ValueElement as ILambdaExpression) is null))
 			{
-				if (this.arguments.Length == 1)
+				if (this.nullCheck)
+					return ObjectValue.Null;
+				else if (this.arguments.Length == 1)
 					throw new ScriptRuntimeException("No function defined having 1 argument named '" + this.functionName + "' found.", this);
 				else
 					throw new ScriptRuntimeException("No function defined having " + s + " arguments named '" + this.functionName + "' found.", this);

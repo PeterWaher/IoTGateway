@@ -11,18 +11,19 @@ namespace Waher.Script.Operators.Membership
 	/// <summary>
 	/// Dynamic member operator
 	/// </summary>
-	public class DynamicMember : BinaryOperator 
+	public class DynamicMember : NullCheckBinaryOperator
 	{
 		/// <summary>
 		/// Dynamic member operator
 		/// </summary>
 		/// <param name="Left">Left operand.</param>
 		/// <param name="Right">Right operand.</param>
+		/// <param name="NullCheck">If null should be returned if left operand is null.</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-		public DynamicMember(ScriptNode Left, ScriptNode Right, int Start, int Length, Expression Expression)
-			: base(Left, Right, Start, Length, Expression)
+		public DynamicMember(ScriptNode Left, ScriptNode Right, bool NullCheck, int Start, int Length, Expression Expression)
+			: base(Left, Right, NullCheck, Start, Length, Expression)
 		{
 		}
 
@@ -34,9 +35,12 @@ namespace Waher.Script.Operators.Membership
 		public override IElement Evaluate(Variables Variables)
 		{
             IElement Operand = this.left.Evaluate(Variables);
-            IElement Name = this.right.Evaluate(Variables);
+			if (this.nullCheck && Operand.AssociatedObjectValue is null)
+				return Operand;
 
-            return EvaluateDynamicMember(Operand, Name, this);
+			IElement Name = this.right.Evaluate(Variables);
+
+            return EvaluateDynamicMember(Operand, Name, this.nullCheck, this);
 		}
 
 		/// <summary>
@@ -44,9 +48,10 @@ namespace Waher.Script.Operators.Membership
 		/// </summary>
 		/// <param name="Operand">Operand</param>
 		/// <param name="Member">Member</param>
+		/// <param name="NullCheck">If null should be returned if left operand is null.</param>
 		/// <param name="Node">Script node.</param>
 		/// <returns>Resulting value.</returns>
-        public static IElement EvaluateDynamicMember(IElement Operand, IElement Member, ScriptNode Node)
+		public static IElement EvaluateDynamicMember(IElement Operand, IElement Member, bool NullCheck, ScriptNode Node)
         {
             if (Member.IsScalar)
             {
@@ -54,7 +59,7 @@ namespace Waher.Script.Operators.Membership
                 if (s is null)
                     throw new ScriptRuntimeException("Member names must be strings.", Node);
 
-                return NamedMember.EvaluateDynamic(Operand, s.Value, Node);
+                return NamedMember.EvaluateDynamic(Operand, s.Value, NullCheck, Node);
             }
             else
             {
@@ -63,7 +68,7 @@ namespace Waher.Script.Operators.Membership
                     LinkedList<IElement> Elements = new LinkedList<IElement>();
 
                     foreach (IElement E in Member.ChildElements)
-                        Elements.AddLast(EvaluateDynamicMember(Operand, E, Node));
+                        Elements.AddLast(EvaluateDynamicMember(Operand, E, NullCheck, Node));
 
                     return Member.Encapsulate(Elements, Node);
                 }
@@ -81,7 +86,7 @@ namespace Waher.Script.Operators.Membership
                         try
                         {
                             while (eOperand.MoveNext() && eMember.MoveNext())
-                                Elements.AddLast(EvaluateDynamicMember(eOperand.Current, eMember.Current, Node));
+                                Elements.AddLast(EvaluateDynamicMember(eOperand.Current, eMember.Current, NullCheck, Node));
                         }
                         finally
                         {
@@ -100,7 +105,7 @@ namespace Waher.Script.Operators.Membership
                             LinkedList<IElement> MemberResult = new LinkedList<IElement>();
 
                             foreach (IElement MemberChild in MemberElements)
-                                MemberResult.AddLast(EvaluateDynamicMember(OperandChild, MemberChild, Node));
+                                MemberResult.AddLast(EvaluateDynamicMember(OperandChild, MemberChild, NullCheck, Node));
 
                             OperandResult.AddLast(Member.Encapsulate(MemberResult, Node));
                         }

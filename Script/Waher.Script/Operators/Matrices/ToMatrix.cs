@@ -10,7 +10,7 @@ namespace Waher.Script.Operators.Matrices
     /// <summary>
     /// To-Matrix operator.
     /// </summary>
-    public class ToMatrix : UnaryOperator
+    public class ToMatrix : NullCheckUnaryOperator
     {
         /// <summary>
         /// To-Matrix operator.
@@ -19,8 +19,8 @@ namespace Waher.Script.Operators.Matrices
         /// <param name="Start">Start position in script expression.</param>
         /// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-        public ToMatrix(ScriptNode Operand, int Start, int Length, Expression Expression)
-            : base(Operand, Start, Length, Expression)
+        public ToMatrix(ScriptNode Operand, bool NullCheck, int Start, int Length, Expression Expression)
+            : base(Operand, NullCheck, Start, Length, Expression)
         {
         }
 
@@ -32,8 +32,11 @@ namespace Waher.Script.Operators.Matrices
         public override IElement Evaluate(Variables Variables)
         {
             IElement E = this.op.Evaluate(Variables);
+			if (this.nullCheck && E.AssociatedObjectValue is null)
+				return E;
 
-            if (E is IMatrix)
+
+			if (E is IMatrix)
                 return E;
 
             if (E is IVector V)

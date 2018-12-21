@@ -218,23 +218,46 @@ Suffix-operators are written after the operand to which they are applied. The fo
 | `[,Y]`        | Matrix row vector operator                  | `M[,y]`      |
 | `[,]`         | To matrix, if not already                   | `a[,]`       |
 | `{}`          | To set, if not already                      | `a{}`        |
-| `++`          | Post-Increment                              | `a++`       |
-| `--`          | Post-Decrement                              | `a--`       |
-| `%`           | Percent                                     | `10%`       |
-| `‰`           | Per thousand                                | `20‰`       |
-| `‱`         | Per ten thousand                           | `30‱`     |
-| `°`           | Degrees to radians                          | `sin(100°)` |
-| `'`           | Default differentiation (prim)              | `f'(x)`     |
-| `′`           | Default differentiation (prim)              | `f′(x)`     |
-| `"`           | Default second-order differentiation (bis)  | `f"(x)`     |
-| `″`           | Default second-order differentiation (bis)  | `f″(x)`     |
-| `‴`           | Default third-order differentiation         | `f‴(x)`     |
-| `T`           | Transposed matrix                           | `M T`       |
-| `H`           | Conjugate Transposed matrix                 | `M H`       |
-| `†`           | Conjugate Transposed matrix                 | `M†`        |
-| `!`           | Faculty                                     | `n!`        |
-| `!!`          | Semi-Faculty                                | `n!!`       |
-| Physical unit | Defines a physical quantity.                | `10 m/s`    |
+| `++`          | Post-Increment                              | `a++`        |
+| `--`          | Post-Decrement                              | `a--`        |
+| `%`           | Percent                                     | `10%`        |
+| `‰`           | Per thousand                                | `20‰`        |
+| `%0`          | Per thousand                                | `20%0`       |
+| `‱`          | Per ten thousand                            | `30‱`       |
+| `‰0`          | Per ten thousand                            | `30‰0`       |
+| `%00`         | Per ten thousand                            | `30%00`      |
+| `°`           | Degrees to radians                          | `sin(100°)`  |
+| `'`           | Default differentiation (prim)              | `f'(x)`      |
+| `′`           | Default differentiation (prim)              | `f′(x)`      |
+| `"`           | Default second-order differentiation (bis)  | `f"(x)`      |
+| `″`           | Default second-order differentiation (bis)  | `f″(x)`      |
+| `‴`           | Default third-order differentiation         | `f‴(x)`      |
+| `T`           | Transposed matrix                           | `M T`        |
+| `H`           | Conjugate Transposed matrix                 | `M H`        |
+| `†`           | Conjugate Transposed matrix                 | `M†`         |
+| `!`           | Faculty                                     | `n!`         |
+| `!!`          | Semi-Faculty                                | `n!!`        |
+| Physical unit | Defines a physical quantity.                | `10 m/s`     |
+
+Some suffix operators canbe prefixed by a `?` character, to include a *null check` of the operand. If the operand is `null`, the operator
+is not evaluated, and `null` is returned. The following table lists null-checked suffix operators:
+
+| Operator       | Description                                 | Example       |
+|:--------------:|:--------------------------------------------|:-------------:|
+| `?.`           | Member operator                             | `obj?.Member` |
+| `?(` List `)`  | Function evaluation                         | `f?(a,b,c)`   |
+| `?[]`          | To vector, if not already                   | `a?[]`        |
+| `?[Index]`     | Vector index operator                       | `v?[i]`       |
+| `?[X,Y]`       | Matrix index operator                       | `M?[x,y]`     |
+| `?[X,]`        | Matrix colum vector operator                | `M?[x,]`      |
+| `?[,Y]`        | Matrix row vector operator                  | `M?[,y]`      |
+| `?[,]`         | To matrix, if not already                   | `a?[,]`       |
+| `?{}`          | To set, if not already                      | `a?{}`        |
+| `?'`           | Default differentiation (prim)              | `f?'(x)`      |
+| `?′`           | Default differentiation (prim)              | `f?′(x)`      |
+| `?"`           | Default second-order differentiation (bis)  | `f?"(x)`      |
+| `?″`           | Default second-order differentiation (bis)  | `f?″(x)`      |
+| `?‴`           | Default third-order differentiation         | `f?‴(x)`      |
 
 **Note**: Since script is late-bound, most operators support dynamic and static bindings, where traditional languages only support static bindings.
 The following is permitted, for example:
@@ -558,12 +581,15 @@ for the function. Each argument `x` can be defined to belong to one of five cate
 ### Conditional IF
 
 Conditional `IF`-statements can be written in various ways. Either using the `IF` and `THEN` keywords, followed by the optional `ELSE` keyword, or by
-using the `?` operator, followed by the optional `:` operator. Examples:
+using the `?` operator, followed by the optional `:` operator. There is also a quick null-check statement.
+
+Examples:
 
 	IF Condition THEN IfTrueStatement
 	IF Condition THEN IfTrueStatement ELSE IfFalseStatement
 	Condition ? IfTrueStatement
 	Condition ? IfTrueStatement : IfFalseStatement
+	Statement ?? IfNullStatement
 
 **Note**: `IF`, `THEN` and `ELSE` are case insensitive. They are written here using upper case for clarity.
 

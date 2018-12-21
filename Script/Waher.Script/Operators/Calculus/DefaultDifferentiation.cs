@@ -11,20 +11,21 @@ namespace Waher.Script.Operators.Calculus
 	/// <summary>
 	/// Default Differentiation operator.
 	/// </summary>
-	public class DefaultDifferentiation : UnaryOperator
+	public class DefaultDifferentiation : NullCheckUnaryOperator
 	{
-		private int nrDifferentiations;
+		private readonly int nrDifferentiations;
 
 		/// <summary>
 		/// Default Differentiation operator.
 		/// </summary>
 		/// <param name="Operand">Operand.</param>
 		/// <param name="NrDifferentiations">Number of differentiations.</param>
+		/// <param name="NullCheck">If null should be returned if left operand is null.</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-		public DefaultDifferentiation(ScriptNode Operand, int NrDifferentiations, int Start, int Length, Expression Expression)
-			: base(Operand, Start, Length, Expression)
+		public DefaultDifferentiation(ScriptNode Operand, int NrDifferentiations, bool NullCheck, int Start, int Length, Expression Expression)
+			: base(Operand, NullCheck, Start, Length, Expression)
 		{
 			this.nrDifferentiations = NrDifferentiations;
 		}
@@ -83,6 +84,8 @@ namespace Waher.Script.Operators.Calculus
 						else
 							throw new ScriptRuntimeException(VariableReference.VariableName + " not differentiable.", this);
 					}
+					else if (this.nullCheck)
+						return ObjectValue.Null;
 					else
 						throw new ScriptRuntimeException(VariableReference.VariableName + " not defined.", this);
 				}

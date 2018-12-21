@@ -12,18 +12,19 @@ namespace Waher.Script.Operators.Vectors
 	/// <summary>
 	/// Vector Index operator.
 	/// </summary>
-	public class VectorIndex : BinaryOperator 
+	public class VectorIndex : NullCheckBinaryOperator
 	{
 		/// <summary>
 		/// Vector Index operator.
 		/// </summary>
 		/// <param name="Left">Left operand.</param>
 		/// <param name="Right">Right operand.</param>
+		/// <param name="NullCheck">If null should be returned if left operand is null.</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-		public VectorIndex(ScriptNode Left, ScriptNode Right, int Start, int Length, Expression Expression)
-			: base(Left, Right, Start, Length, Expression)
+		public VectorIndex(ScriptNode Left, ScriptNode Right, bool NullCheck, int Start, int Length, Expression Expression)
+			: base(Left, Right, NullCheck, Start, Length, Expression)
 		{
 		}
 
@@ -35,9 +36,12 @@ namespace Waher.Script.Operators.Vectors
 		public override IElement Evaluate(Variables Variables)
 		{
             IElement Left = this.left.Evaluate(Variables);
-            IElement Right = this.right.Evaluate(Variables);
+			if (this.nullCheck && Left.AssociatedObjectValue is null)
+				return Left;
 
-            return EvaluateIndex(Left, Right, this);
+			IElement Right = this.right.Evaluate(Variables);
+
+            return EvaluateIndex(Left, Right, this.nullCheck, this);
         }
 
         /// <summary>
@@ -47,21 +51,26 @@ namespace Waher.Script.Operators.Vectors
         /// <param name="Index">Index</param>
         /// <param name="Node">Node performing the operation.</param>
         /// <returns>Result</returns>
-        public static IElement EvaluateIndex(IElement Vector, IElement Index, ScriptNode Node)
+        public static IElement EvaluateIndex(IElement Vector, IElement Index, bool NullCheck, ScriptNode Node)
         {
-            if (Vector is IVector V)
-                return EvaluateIndex(V, Index, Node);
-            else if (Vector.IsScalar)
-                throw new ScriptRuntimeException("The index operator operates on vectors.", Node);
-            else
-            {
-                LinkedList<IElement> Elements = new LinkedList<IElement>();
+			if (Vector is IVector V)
+				return EvaluateIndex(V, Index, Node);
+			else if (Vector.IsScalar)
+			{
+				if (NullCheck && Vector.AssociatedObjectValue is null)
+					return Vector;
 
-                foreach (IElement E in Vector.ChildElements)
-                    Elements.AddLast(EvaluateIndex(E, Index, Node));
+				throw new ScriptRuntimeException("The index operator operates on vectors.", Node);
+			}
+			else
+			{
+				LinkedList<IElement> Elements = new LinkedList<IElement>();
 
-                return Vector.Encapsulate(Elements, Node);
-            }
+				foreach (IElement E in Vector.ChildElements)
+					Elements.AddLast(EvaluateIndex(E, Index, NullCheck, Node));
+
+				return Vector.Encapsulate(Elements, Node);
+			}
         }
 
         /// <summary>

@@ -214,7 +214,8 @@ namespace Waher.Script.Test
 			this.Test("a<b ? a", a);
 			this.Test("a>b ? a", null);
 			this.Test("a<b ? a : b", a);
-			this.Test("a>b ? a : b", b);
+			this.Test("a ?? b", a);
+			this.Test("null ?? b", b);
 
 			this.Test("IF b<=[a,b,c] THEN a ELSE b", new double[] { b, a, a });
 			this.Test("b<=[a,b,c] ? [1,2,3] : [4,5,6]", new double[] { 4, 2, 3 });
@@ -1084,5 +1085,20 @@ namespace Waher.Script.Test
 			this.Test("DateTime(2016,3,11).AddDays(10)", new DateTime(2016, 3, 21));
 			this.Test("DateTime(2016,3,11).AddDays(1..3)", new DateTime[] { new DateTime(2016, 3, 12), new DateTime(2016, 3, 13), new DateTime(2016, 3, 14) });
 		}
+
+		[TestMethod]
+		public void Evaluation_Test_44_NullCheckBinarySuffixOperators()
+		{
+			this.Test("null?.Test", null);
+			this.Test("f?(1,2,3)", null);
+			this.Test("null?[]", null);
+			this.Test("null?{}", null);
+			this.Test("null?[i]", null);
+			this.Test("null?[x,y]", null);
+			this.Test("null?[x,]", null);
+			this.Test("null?[,y]", null);
+			this.Test("null?[,]", null);
+		}
+
 	}
 }

@@ -88,6 +88,7 @@ namespace Waher.Script.Test
 			this.Test("IF Condition THEN IfTrueStatement ELSE IfFalseStatement");
 			this.Test("Condition ? IfTrueStatement");
 			this.Test("Condition ? IfTrueStatement : IfFalseStatement");
+			this.Test("Statement ?? IfNullStatement");
 		}
 
 		[TestMethod]
@@ -361,5 +362,29 @@ namespace Waher.Script.Test
             this.Test("n OVER k");
         }
 
-    }
+		[TestMethod]
+		public void Parsing_Test_33_UnaryNullCheckSuffixOperators()
+		{
+			this.Test("f?'(x)");
+			this.Test("f?′(x)");
+			this.Test("f?\"(x)");
+			this.Test("f?″(x)");
+			this.Test("f?‴(x)");
+		}
+
+		[TestMethod]
+		public void Parsing_Test_34_BinaryNullCheckSuffixOperators()
+		{
+			this.Test("obj?.Member");
+			this.Test("f?(a,b,c)");
+			this.Test("a?[]");
+			this.Test("a?{}");
+			this.Test("v?[i]");
+			this.Test("M?[x,y]");
+			this.Test("M?[x,]");
+			this.Test("M?[,y]");
+			this.Test("a?[,]");
+		}
+
+	}
 }

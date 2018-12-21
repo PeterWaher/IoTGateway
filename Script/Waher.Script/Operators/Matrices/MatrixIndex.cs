@@ -11,7 +11,7 @@ namespace Waher.Script.Operators.Matrices
 	/// <summary>
 	/// Matrix Index operator.
 	/// </summary>
-	public class MatrixIndex : TernaryOperator
+	public class MatrixIndex : NullCheckTernaryOperator
 	{
 		/// <summary>
 		/// Matrix Index operator.
@@ -19,11 +19,12 @@ namespace Waher.Script.Operators.Matrices
 		/// <param name="Left">Left operand.</param>
 		/// <param name="X">X-coordinate operand.</param>
 		/// <param name="Y">Y-coordinate operand.</param>
+		/// <param name="NullCheck">If null should be returned if left operand is null.</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-		public MatrixIndex(ScriptNode Left, ScriptNode X, ScriptNode Y, int Start, int Length, Expression Expression)
-			: base(Left, X, Y, Start, Length, Expression)
+		public MatrixIndex(ScriptNode Left, ScriptNode X, ScriptNode Y, bool NullCheck, int Start, int Length, Expression Expression)
+			: base(Left, X, Y, NullCheck, Start, Length, Expression)
 		{
 		}
 
@@ -35,10 +36,13 @@ namespace Waher.Script.Operators.Matrices
 		public override IElement Evaluate(Variables Variables)
 		{
             IElement Left = this.left.Evaluate(Variables);
+			if (this.nullCheck && Left.AssociatedObjectValue is null)
+				return Left;
+
             IElement Middle = this.middle.Evaluate(Variables);
             IElement Right = this.right.Evaluate(Variables);
 
-            return EvaluateIndex(Left, Middle, Right, this);
+            return EvaluateIndex(Left, Middle, Right, this.nullCheck, this);
         }
 
         /// <summary>
@@ -49,18 +53,23 @@ namespace Waher.Script.Operators.Matrices
         /// <param name="IndexY">Y-Index</param>
         /// <param name="Node">Node performing the operation.</param>
         /// <returns>Result</returns>
-        public static IElement EvaluateIndex(IElement Matrix, IElement IndexX, IElement IndexY, ScriptNode Node)
+        public static IElement EvaluateIndex(IElement Matrix, IElement IndexX, IElement IndexY, bool NullCheck, ScriptNode Node)
         {
             if (Matrix is IMatrix M)
                 return EvaluateIndex(M, IndexX, IndexY, Node);
             else if (Matrix.IsScalar)
+			{
+				if (NullCheck && Matrix.AssociatedObjectValue is null)
+					return Matrix;
+
                 throw new ScriptRuntimeException("The index operator operates on matrices.", Node);
-            else
+			}
+			else
             {
                 LinkedList<IElement> Elements = new LinkedList<IElement>();
 
                 foreach (IElement E in Matrix.ChildElements)
-                    Elements.AddLast(EvaluateIndex(E, IndexX, IndexY, Node));
+                    Elements.AddLast(EvaluateIndex(E, IndexX, IndexY, NullCheck, Node));
 
                 return Matrix.Encapsulate(Elements, Node);
             }
@@ -76,10 +85,7 @@ namespace Waher.Script.Operators.Matrices
 		/// <returns>Result</returns>
 		public static IElement EvaluateIndex(IMatrix Matrix, IElement IndexX, IElement IndexY, ScriptNode Node)
         {
-            DoubleNumber X = IndexX as DoubleNumber;
-            DoubleNumber Y = IndexY as DoubleNumber;
-
-            if (X != null && Y != null)
+            if (IndexX is DoubleNumber X && IndexY is DoubleNumber Y)
             {
                 double x = X.Value;
                 double y = Y.Value;

@@ -576,16 +576,41 @@ namespace Waher.Script
 					return Condition;
 
 				this.pos++;
-				IfTrue = this.AssertOperandNotNull(this.ParseStatement());
 
-				this.SkipWhiteSpace();
-				if (this.PeekNextChar() == ':')
+				switch (this.PeekNextChar())
 				{
-					this.pos++;
-					IfFalse = this.AssertOperandNotNull(this.ParseStatement());
+					case '.':
+					case '(':
+					case '[':
+					case '{':
+					case '\'':
+					case '′':
+					case '"':
+					case '″':
+					case '‴':
+						this.pos--;
+						return Condition;   // Null-check operator
+
+					case '?':
+						this.pos++;
+						IfTrue = this.AssertOperandNotNull(this.ParseStatement());
+
+						return new NullCheck(Condition, IfTrue, Start, this.pos - Start, this);
+
+					default:
+						IfTrue = this.AssertOperandNotNull(this.ParseStatement());
+
+						this.SkipWhiteSpace();
+						if (this.PeekNextChar() == ':')
+						{
+							this.pos++;
+							IfFalse = this.AssertOperandNotNull(this.ParseStatement());
+						}
+						else
+							IfFalse = null;
+
+						break;
 				}
-				else
-					IfFalse = null;
 			}
 
 			return new If(Condition, IfTrue, IfFalse, Start, this.pos - Start, this);
@@ -2165,6 +2190,7 @@ namespace Waher.Script
 			if (Node is null)
 				return null;
 
+			bool NullCheck = false;
 			int Start = Node.Start;
 			char ch;
 
@@ -2173,6 +2199,34 @@ namespace Waher.Script
 				this.SkipWhiteSpace();
 				switch (ch = this.PeekNextChar())
 				{
+					case '?':
+						if (NullCheck)
+						{
+							this.pos--;
+							return Node;
+						}
+
+						this.pos++;
+						ch = this.PeekNextChar();
+						switch (ch)
+						{
+							case '.':
+							case '(':
+							case '[':
+							case '{':
+							case '\'':
+							case '′':
+							case '"':
+							case '″':
+							case '‴':
+								NullCheck = true;
+								continue;
+
+							default:
+								this.pos--;
+								return Node;
+						}
+
 					case '.':
 						this.pos++;
 
@@ -2193,11 +2247,11 @@ namespace Waher.Script
 						VariableReference Ref = Right as VariableReference;
 
 						if (Ref is null)
-							Node = new DynamicMember(Node, Right, Start, this.pos - Start, this);
+							Node = new DynamicMember(Node, Right, NullCheck, Start, this.pos - Start, this);
 						else
-							Node = new NamedMember(Node, Ref.VariableName, Start, this.pos - Start, this);
+							Node = new NamedMember(Node, Ref.VariableName, NullCheck, Start, this.pos - Start, this);
 
-						continue;
+						break;
 
 					case '(':
 						this.pos++;
@@ -2215,32 +2269,32 @@ namespace Waher.Script
 							if (Node is NamedMember NamedMember)
 							{
 								if (Right is null)
-									Node = new NamedMethodCall(NamedMember.Operand, NamedMember.Name, new ScriptNode[0], Start, this.pos - Start, this);
+									Node = new NamedMethodCall(NamedMember.Operand, NamedMember.Name, new ScriptNode[0], NullCheck, Start, this.pos - Start, this);
 								else if (Right.GetType() == typeof(ElementList))
-									Node = new NamedMethodCall(NamedMember.Operand, NamedMember.Name, ((ElementList)Right).Elements, Start, this.pos - Start, this);
+									Node = new NamedMethodCall(NamedMember.Operand, NamedMember.Name, ((ElementList)Right).Elements, NullCheck, Start, this.pos - Start, this);
 								else
-									Node = new NamedMethodCall(NamedMember.Operand, NamedMember.Name, new ScriptNode[] { Right }, Start, this.pos - Start, this);
+									Node = new NamedMethodCall(NamedMember.Operand, NamedMember.Name, new ScriptNode[] { Right }, NullCheck, Start, this.pos - Start, this);
 							}// TODO: Dynamic named method call.
 							else
 							{
 								if (Right is null)
-									Node = new DynamicFunctionCall(Node, new ScriptNode[0], Start, this.pos - Start, this);
+									Node = new DynamicFunctionCall(Node, new ScriptNode[0], NullCheck, Start, this.pos - Start, this);
 								else if (Right.GetType() == typeof(ElementList))
-									Node = new DynamicFunctionCall(Node, ((ElementList)Right).Elements, Start, this.pos - Start, this);
+									Node = new DynamicFunctionCall(Node, ((ElementList)Right).Elements, NullCheck, Start, this.pos - Start, this);
 								else
-									Node = new DynamicFunctionCall(Node, new ScriptNode[] { Right }, Start, this.pos - Start, this);
+									Node = new DynamicFunctionCall(Node, new ScriptNode[] { Right }, NullCheck, Start, this.pos - Start, this);
 							}
 						}
 						else
-							Node = GetFunction(Ref.VariableName, Right, Start, this.pos - Start, this);
+							Node = GetFunction(Ref.VariableName, Right, NullCheck, Start, this.pos - Start, this);
 
-						continue;
+						break;
 
 					case '[':
 						this.pos++;
 						Right = this.ParseList();
 						if (Right is null)
-							Node = new ToVector(Node, Start, this.pos - Start, this);
+							Node = new ToVector(Node, NullCheck, Start, this.pos - Start, this);
 						else if (Right.GetType() == typeof(ElementList))
 						{
 							ElementList List = (ElementList)Right;
@@ -2250,27 +2304,27 @@ namespace Waher.Script
 								if (List.Elements[0] is null)
 								{
 									if (List.Elements[1] is null)
-										Node = new ToMatrix(Node, Start, this.pos - Start, this);
+										Node = new ToMatrix(Node, NullCheck, Start, this.pos - Start, this);
 									else
-										Node = new RowVector(Node, List.Elements[1], Start, this.pos - Start, this);
+										Node = new RowVector(Node, List.Elements[1], NullCheck, Start, this.pos - Start, this);
 								}
 								else if (List.Elements[1] is null)
-									Node = new ColumnVector(Node, List.Elements[0], Start, this.pos - Start, this);
+									Node = new ColumnVector(Node, List.Elements[0], NullCheck, Start, this.pos - Start, this);
 								else
-									Node = new MatrixIndex(Node, List.Elements[0], List.Elements[1], Start, this.pos - Start, this);
+									Node = new MatrixIndex(Node, List.Elements[0], List.Elements[1], NullCheck, Start, this.pos - Start, this);
 							}
 							else
-								Node = new DynamicIndex(Node, List, Start, this.pos - Start, this);
+								Node = new DynamicIndex(Node, List, NullCheck, Start, this.pos - Start, this);
 						}
 						else
-							Node = new VectorIndex(Node, Right, Start, this.pos - Start, this);
+							Node = new VectorIndex(Node, Right, NullCheck, Start, this.pos - Start, this);
 
 						this.SkipWhiteSpace();
 						if (this.PeekNextChar() != ']')
 							throw new SyntaxException("Expected ].", this.pos, this.script);
 
 						this.pos++;
-						continue;
+						break;
 
 					case '{':
 						int Bak = this.pos;
@@ -2279,8 +2333,8 @@ namespace Waher.Script
 						if (this.PeekNextChar() == '}')
 						{
 							this.pos++;
-							Node = new ToSet(Node, Start, this.pos - Start, this);
-							continue;
+							Node = new ToSet(Node, NullCheck, Start, this.pos - Start, this);
+							break;
 						}
 						else
 						{
@@ -2300,8 +2354,11 @@ namespace Waher.Script
 								return Node;
 							}
 
+							if (NullCheck)
+								throw new SyntaxException("Null-checked post increment operator not defined.", this.pos, this.script);
+
 							Node = new PostIncrement(Ref.VariableName, Start, this.pos - Start, this);
-							continue;
+							break;
 						}
 						else
 						{
@@ -2321,8 +2378,11 @@ namespace Waher.Script
 								return Node;
 							}
 
+							if (NullCheck)
+								throw new SyntaxException("Null-checked post decrement operator not defined.", this.pos, this.script);
+
 							Node = new PostDecrement(Ref.VariableName, Start, this.pos - Start, this);
-							continue;
+							break;
 						}
 						else
 						{
@@ -2332,21 +2392,56 @@ namespace Waher.Script
 
 					case '%':
 						this.pos++;
-						Node = new Percent(Node, Start, this.pos - Start, this);
-						continue;
+
+						if (NullCheck)
+							throw new SyntaxException("Null-checked % operator not defined.", this.pos, this.script);
+
+						if (this.PeekNextChar() == '0')
+						{
+							this.pos++;
+
+							if (this.PeekNextChar() == '0')
+							{
+								this.pos++;
+								Node = new Perdiezmil(Node, Start, this.pos - Start, this);
+							}
+							else
+								Node = new Permil(Node, Start, this.pos - Start, this);
+						}
+						else
+							Node = new Percent(Node, Start, this.pos - Start, this);
+						break;
 
 					case '‰':
 						this.pos++;
-						Node = new Permil(Node, Start, this.pos - Start, this);
-						continue;
+
+						if (NullCheck)
+							throw new SyntaxException("Null-checked ‰ operator not defined.", this.pos, this.script);
+
+						if (this.PeekNextChar() == '0')
+						{
+							this.pos++;
+							Node = new Perdiezmil(Node, Start, this.pos - Start, this);
+						}
+						else
+							Node = new Permil(Node, Start, this.pos - Start, this);
+						break;
 
 					case '‱':
 						this.pos++;
+
+						if (NullCheck)
+							throw new SyntaxException("Null-checked ‱ operator not defined.", this.pos, this.script);
+
 						Node = new Perdiezmil(Node, Start, this.pos - Start, this);
-						continue;
+						break;
 
 					case '°':
 						this.pos++;
+
+						if (NullCheck)
+							throw new SyntaxException("Null-checked ° operator not defined.", this.pos, this.script);
+
 						if ((ch = this.PeekNextChar()) == 'C' || ch == 'F')
 						{
 							this.pos++;
@@ -2374,7 +2469,7 @@ namespace Waher.Script
 						else
 							Node = new DegToRad(Node, Start, this.pos - Start, this);
 
-						continue;
+						break;
 
 					case '\'':
 					case '"':
@@ -2408,8 +2503,8 @@ namespace Waher.Script
 							break;
 						}
 
-						Node = new DefaultDifferentiation(Node, i, Start, this.pos - Start, this);
-						continue;
+						Node = new DefaultDifferentiation(Node, i, NullCheck, Start, this.pos - Start, this);
+						break;
 
 					case 'T':
 						this.pos++;
@@ -2421,8 +2516,11 @@ namespace Waher.Script
 						}
 						else
 						{
+							if (NullCheck)
+								throw new SyntaxException("Null-checked T operator not defined.", this.pos, this.script);
+
 							Node = new Transpose(Node, Start, this.pos - Start, this);
-							continue;
+							break;
 						}
 
 					case 'H':
@@ -2435,23 +2533,32 @@ namespace Waher.Script
 						}
 						else
 						{
+							if (NullCheck)
+								throw new SyntaxException("Null-checked H operator not defined.", this.pos, this.script);
+
 							Node = new ConjugateTranspose(Node, Start, this.pos - Start, this);
-							continue;
+							break;
 						}
 
 					case '†':
+						if (NullCheck)
+							throw new SyntaxException("Null-checked † operator not defined.", this.pos, this.script);
+
 						this.pos++;
 						Node = new ConjugateTranspose(Node, Start, this.pos - Start, this);
-						continue;
+						break;
 
 					case '!':
+						if (NullCheck)
+							throw new SyntaxException("Null-checked ! operator not defined.", this.pos, this.script);
+
 						this.pos++;
 						switch (this.PeekNextChar())
 						{
 							case '!':
 								this.pos++;
 								Node = new SemiFaculty(Node, Start, this.pos - Start, this);
-								continue;
+								break;
 
 							case '=':
 								this.pos--;
@@ -2459,10 +2566,14 @@ namespace Waher.Script
 
 							default:
 								Node = new Faculty(Node, Start, this.pos - Start, this);
-								continue;
+								break;
 						}
+						break;
 
 					default:
+						if (NullCheck)
+							throw new SyntaxException("Null-checked unit operator not defined.", this.pos, this.script);
+
 						if (char.IsLetter(ch))
 						{
 							Bak = this.pos;
@@ -2496,6 +2607,8 @@ namespace Waher.Script
 							return Node;
 						break;
 				}
+
+				NullCheck = false;
 			}
 		}
 
@@ -2762,7 +2875,7 @@ namespace Waher.Script
 			return new Unit(Prefix, Factors);
 		}
 
-		private static ScriptNode GetFunction(string FunctionName, ScriptNode Arguments, int Start, int Length, Expression Expression)
+		private static ScriptNode GetFunction(string FunctionName, ScriptNode Arguments, bool NullCheck, int Start, int Length, Expression Expression)
 		{
 			Dictionary<string, FunctionRef> F;
 			int NrParameters;
@@ -2804,11 +2917,11 @@ namespace Waher.Script
 			else
 			{
 				if (ElementList != null)
-					return new NamedFunctionCall(FunctionName, ElementList.Elements, Start, Length, Expression);
+					return new NamedFunctionCall(FunctionName, ElementList.Elements, NullCheck, Start, Length, Expression);
 				else if (Arguments is null)
-					return new NamedFunctionCall(FunctionName, new ScriptNode[0], Start, Length, Expression);
+					return new NamedFunctionCall(FunctionName, new ScriptNode[0], NullCheck, Start, Length, Expression);
 				else
-					return new NamedFunctionCall(FunctionName, new ScriptNode[] { Arguments }, Start, Length, Expression);
+					return new NamedFunctionCall(FunctionName, new ScriptNode[] { Arguments }, NullCheck, Start, Length, Expression);
 			}
 		}
 

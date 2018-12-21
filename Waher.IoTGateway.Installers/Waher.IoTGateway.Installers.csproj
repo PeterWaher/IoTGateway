@@ -57,8 +57,13 @@
     <Compile Include=".bak\Waher.Script\Functions\Runtime\Properties.cs" />
     <Compile Include=".bak\Waher.Script\Model\IDifferentiable.cs" />
     <Compile Include=".bak\Waher.Script\Model\IKeyWord.cs" />
+    <Compile Include=".bak\Waher.Script\Model\NullCheckBinaryOperator.cs" />
+    <Compile Include=".bak\Waher.Script\Model\NullCheckTernaryOperator.cs" />
+    <Compile Include=".bak\Waher.Script\Model\NullCheckUnaryOperator.cs" />
+    <Compile Include=".bak\Waher.Script\Model\NullCheckUnaryScalarOperator.cs" />
     <Compile Include=".bak\Waher.Script\Model\ScriptLeafNode.cs" />
     <Compile Include=".bak\Waher.Script\Model\ScriptParser.cs" />
+    <Compile Include=".bak\Waher.Script\Operators\Conditional\NullCheck.cs" />
     <Compile Include="CustomAction.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include=".bak\Waher.Content.Xml\XML.cs" />

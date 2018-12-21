@@ -11,7 +11,7 @@ namespace Waher.Script.Operators.Matrices
 	/// <summary>
 	/// Row Vector operator.
 	/// </summary>
-	public class RowVector : BinaryOperator
+	public class RowVector : NullCheckBinaryOperator
 	{
 		/// <summary>
 		/// Row Vector operator.
@@ -21,8 +21,8 @@ namespace Waher.Script.Operators.Matrices
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-		public RowVector(ScriptNode Left, ScriptNode Y, int Start, int Length, Expression Expression)
-			: base(Left, Y, Start, Length, Expression)
+		public RowVector(ScriptNode Left, ScriptNode Y, bool NullCheck, int Start, int Length, Expression Expression)
+			: base(Left, Y, NullCheck, Start, Length, Expression)
 		{
 		}
 
@@ -34,9 +34,12 @@ namespace Waher.Script.Operators.Matrices
 		public override IElement Evaluate(Variables Variables)
 		{
             IElement Left = this.left.Evaluate(Variables);
-            IElement Right = this.right.Evaluate(Variables);
+			if (this.nullCheck && Left.AssociatedObjectValue is null)
+				return Left;
 
-            return EvaluateIndex(Left, Right, this);
+			IElement Right = this.right.Evaluate(Variables);
+
+            return EvaluateIndex(Left, Right, this.nullCheck, this);
         }
 
         /// <summary>
@@ -46,18 +49,23 @@ namespace Waher.Script.Operators.Matrices
         /// <param name="Index">Index</param>
         /// <param name="Node">Node performing the operation.</param>
         /// <returns>Result</returns>
-        public static IElement EvaluateIndex(IElement Matrix, IElement Index, ScriptNode Node)
+        public static IElement EvaluateIndex(IElement Matrix, IElement Index, bool NullCheck, ScriptNode Node)
         {
 			if (Matrix is IMatrix M)
 				return EvaluateIndex(M, Index, Node);
             else if (Matrix.IsScalar)
-                throw new ScriptRuntimeException("The row index operator operates on matrices.", Node);
-            else
+			{
+				if (NullCheck && Matrix.AssociatedObjectValue is null)
+					return Matrix;
+
+				throw new ScriptRuntimeException("The row index operator operates on matrices.", Node);
+			}
+			else
             {
                 LinkedList<IElement> Elements = new LinkedList<IElement>();
 
                 foreach (IElement E in Matrix.ChildElements)
-                    Elements.AddLast(EvaluateIndex(E, Index, Node));
+                    Elements.AddLast(EvaluateIndex(E, Index, NullCheck, Node));
 
                 return Matrix.Encapsulate(Elements, Node);
             }

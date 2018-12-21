@@ -11,7 +11,7 @@ namespace Waher.Script.Operators.Assignments
 	/// </summary>
 	public class DynamicIndexAssignment : UnaryOperator 
 	{
-		DynamicIndex dynamicIndex;
+		private readonly DynamicIndex dynamicIndex;
 
 		/// <summary>
 		/// Dynamic Index Assignment operator.

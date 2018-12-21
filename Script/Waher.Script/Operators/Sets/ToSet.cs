@@ -10,7 +10,7 @@ namespace Waher.Script.Operators.Sets
 	/// <summary>
 	/// To-Set operator.
 	/// </summary>
-	public class ToSet : UnaryOperator 
+	public class ToSet : NullCheckUnaryOperator
 	{
 		/// <summary>
 		/// To-Set operator.
@@ -19,8 +19,8 @@ namespace Waher.Script.Operators.Sets
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-		public ToSet(ScriptNode Operand, int Start, int Length, Expression Expression)
-			: base(Operand, Start, Length, Expression)
+		public ToSet(ScriptNode Operand, bool NullCheck, int Start, int Length, Expression Expression)
+			: base(Operand, NullCheck, Start, Length, Expression)
 		{
 		}
 
@@ -36,11 +36,13 @@ namespace Waher.Script.Operators.Sets
             if (E is ISet)
                 return E;
 
-            IVector V = E as IVector;
-            if (V != null)
-                return SetDefinition.Encapsulate(V.VectorElements, this);
+			if (E is IVector V)
+				return SetDefinition.Encapsulate(V.VectorElements, this);
 
-            return SetDefinition.Encapsulate(new IElement[] { E }, this);
+			if (this.nullCheck && E.AssociatedObjectValue is null)
+				return E;
+
+			return SetDefinition.Encapsulate(new IElement[] { E }, this);
         }
     }
 }

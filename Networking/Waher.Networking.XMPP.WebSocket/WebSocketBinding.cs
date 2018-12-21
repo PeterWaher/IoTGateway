@@ -109,11 +109,8 @@ namespace Waher.Networking.XMPP.WebSocket
 			this.terminated = true;
 			this.xmppClient = null;
 
-			if (this.webSocketClient != null)
-			{
-				this.webSocketClient.Dispose();
-				this.webSocketClient = null;
-			}
+			this.webSocketClient?.Dispose();
+			this.webSocketClient = null;
 		}
 
 		private void RaiseOnSent(string Payload)
@@ -164,13 +161,11 @@ namespace Waher.Networking.XMPP.WebSocket
 					this.closeSent = false;
 					this.queue.Clear();
 
-					if (this.webSocketClient != null)
-					{
-						this.webSocketClient.Dispose();
-						this.webSocketClient = null;
-					}
+					this.webSocketClient?.Dispose();
+					this.webSocketClient = null;
 
 					this.webSocketClient = new ClientWebSocket();
+					this.webSocketClient.Options.KeepAliveInterval = TimeSpan.FromSeconds(30);
 				}
 
 				await this.webSocketClient.ConnectAsync(this.url, CancellationToken.None);

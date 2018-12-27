@@ -12,14 +12,18 @@ namespace Waher.Script.Test
 		[AssemblyInitialize]
 		public static void AssemblyInitialize(TestContext Context)
 		{
-			Types.Initialize(typeof(Expression).Assembly, 
-				typeof(Graphs.Graph).Assembly, 
+			Types.Initialize(typeof(Expression).Assembly,
+				typeof(Graphs.Graph).Assembly,
 				typeof(System.Text.RegularExpressions.Regex).Assembly);
 		}
 
 		private void Test(string Script)
 		{
-			new Expression(Script);
+			Expression Exp1 = new Expression(Script);
+			Expression Exp2 = new Expression(Script);
+
+			Assert.AreEqual(Exp1.Root, Exp2.Root, "Script nodes from equal scripts not equal.");
+			Assert.AreEqual(Exp1.Root.GetHashCode(), Exp2.Root.GetHashCode(), "Script nodes from equal scripts does not have equal hash values.");
 		}
 
 		[TestMethod]
@@ -99,9 +103,9 @@ namespace Waher.Script.Test
 			this.Test("(x,[y])->sin(x)*exp(-1/y^2)");
 			this.Test("(x[],y[,])->sin(x)*exp(-1/y^2)");
 			this.Test("(x{},y[,])->sin(x)*exp(-1/y^2)");
-        }
+		}
 
-        [TestMethod]
+		[TestMethod]
 		public void Parsing_Test_07_Implication()
 		{
 			this.Test("a => b");
@@ -305,7 +309,7 @@ namespace Waher.Script.Test
 
 		[TestMethod]
 		public void Parsing_Test_25_Vectors()
-		{ 
+		{
 			this.Test("v:=[1,2,3];");
 			this.Test("v:=[DO x++ WHILE X<10];");
 			this.Test("v:=[WHILE x<10 : x++];");
@@ -356,11 +360,11 @@ namespace Waher.Script.Test
 			this.Test("π");
 		}
 
-        [TestMethod]
-        public void Parsing_Test_32_BinomialCoefficients()
-        {
-            this.Test("n OVER k");
-        }
+		[TestMethod]
+		public void Parsing_Test_32_BinomialCoefficients()
+		{
+			this.Test("n OVER k");
+		}
 
 		[TestMethod]
 		public void Parsing_Test_33_NullCheckSuffixOperators()

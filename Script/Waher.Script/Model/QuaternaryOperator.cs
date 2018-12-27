@@ -98,7 +98,7 @@ namespace Waher.Script.Model
 		public override bool Equals(object obj)
 		{
 			return obj is QuaternaryOperator O &&
-				this.middle2.Equals(O.middle2) &&
+				AreEqual(this.middle2, O.middle2) &&
 				base.Equals(obj);
 		}
 
@@ -108,7 +108,7 @@ namespace Waher.Script.Model
 		public override int GetHashCode()
 		{
 			int Result = base.GetHashCode();
-			Result ^= Result << 5 ^ this.middle2.GetHashCode();
+			Result ^= Result << 5 ^ GetHashCode(this.middle2);
 			return Result;
 		}
 

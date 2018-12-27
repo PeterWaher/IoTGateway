@@ -119,7 +119,7 @@ namespace Waher.Script.Operators
 		public override bool Equals(object obj)
 		{
 			return obj is ElementList O &&
-				this.elements.Equals(O.elements) &&
+				AreEqual(this.elements, O.elements) &&
 				base.Equals(obj);
 		}
 
@@ -129,7 +129,7 @@ namespace Waher.Script.Operators
 		public override int GetHashCode()
 		{
 			int Result = base.GetHashCode();
-			Result ^= Result << 5 ^ this.elements.GetHashCode();
+			Result ^= Result << 5 ^ GetHashCode(this.elements);
 			return Result;
 		}
 

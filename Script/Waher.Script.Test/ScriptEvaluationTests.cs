@@ -803,6 +803,7 @@ namespace Waher.Script.Test
 			this.Test("i", Complex.ImaginaryOne);
 			this.Test("C", ComplexNumbers.Instance);
 			this.Test("R", RealNumbers.Instance);
+			this.Test("Z", Integers.Instance);
 			this.Test("EmptySet", EmptySet.Instance);
 			this.Test("∅", EmptySet.Instance);
 			this.Test("Now.Date", DateTime.Now.Date);

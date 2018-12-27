@@ -3331,7 +3331,15 @@ namespace Waher.Script
 				{
 					this.pos++;
 
-					if (Node is VariableReference || Node is ConstantElement)
+					bool DoubleColon = false;
+
+					if (this.PeekNextChar() == ':')
+					{
+						this.pos++;
+						DoubleColon = true;
+					}
+
+					if (!DoubleColon && (Node is VariableReference || Node is ConstantElement))
 					{
 						LinkedList<KeyValuePair<string, ScriptNode>> Members = new LinkedList<KeyValuePair<string, ScriptNode>>();
 						Dictionary<string, bool> MembersFound = new Dictionary<string, bool>();
@@ -3386,7 +3394,7 @@ namespace Waher.Script
 					ScriptNode Condition = this.ParseStatement();
 					ScriptNode SuperSet;
 
-					if (Node is In In)
+					if (Node is In In && !(Node is NotIn))
 					{
 						SuperSet = In.RightOperand;
 						Node = In.LeftOperand;
@@ -3400,7 +3408,7 @@ namespace Waher.Script
 
 					this.pos++;
 
-					return new ImplicitSubSet(Node, SuperSet, Condition, Start, this.pos - Start, this);
+					return new ImplicitSubSet(Node, SuperSet, Condition, DoubleColon, Start, this.pos - Start, this);
 				}
 
 				if (ch != '}')

@@ -285,7 +285,7 @@ namespace Waher.Script.Model
 		/// <summary>
 		/// Calculates a hash code for the contents of an array.
 		/// </summary>
-		/// <param name="A">Array</param>
+		/// <param name="Set">Enumerable set.</param>
 		/// <returns>Hash code</returns>
 		public static int GetHashCode(IEnumerable Set)
 		{

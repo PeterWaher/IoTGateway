@@ -18,6 +18,7 @@ namespace Waher.Script.Objects.Sets
 		private readonly ScriptNode condition;
 		private readonly Variables variables = null;
 		private FiniteSet finiteSet = null;
+		private bool doubleColon;
 
 		/// <summary>
 		/// Represents a subset
@@ -26,11 +27,13 @@ namespace Waher.Script.Objects.Sets
 		/// <param name="SuperSet">Optional superset.</param>
 		/// <param name="Condition">Condition subset members must fulfill.</param><
 		/// <param name="Variables">Refernce to variables.</param>
-		public SubSet(ScriptNode Pattern, ISet SuperSet, ScriptNode Condition, Variables Variables)
+		/// <param name="DoubleColon">If double-colon was used to create subset.</param>
+		public SubSet(ScriptNode Pattern, ISet SuperSet, ScriptNode Condition, Variables Variables, bool DoubleColon)
 		{
 			this.pattern = Pattern;
 			this.superSet = SuperSet;
 			this.condition = Condition;
+			this.doubleColon = DoubleColon;
 			this.variables = new Variables();
 
 			Variables.CopyTo(this.variables);
@@ -184,6 +187,7 @@ namespace Waher.Script.Objects.Sets
 
 			return
 				this.pattern.Equals(S.pattern) &&
+				this.doubleColon.Equals(S.doubleColon) &&
 				this.condition.Equals(S.condition);
 		}
 
@@ -195,6 +199,7 @@ namespace Waher.Script.Objects.Sets
 				Result ^= Result << 5 ^ this.superSet.GetHashCode();
 
 			Result ^= Result << 5 ^ this.condition.GetHashCode();
+			Result ^= Result << 5 ^ this.doubleColon.GetHashCode();
 
 			return Result;
 		}
@@ -219,6 +224,10 @@ namespace Waher.Script.Objects.Sets
 			}
 
 			sb.Append(':');
+
+			if (this.doubleColon)
+				sb.Append(':');
+
 			sb.Append(this.condition.SubExpression);
 			sb.Append('}');
 

@@ -13,9 +13,13 @@ namespace Waher.Script.Operators.Sets
 	/// </summary>
 	public class ImplicitSubSet : TernaryOperator
 	{
-		public ImplicitSubSet(ScriptNode Pattern, ScriptNode SuperSet, ScriptNode Condition, int Start, int Length, Expression Expression)
+		private readonly bool doubleColon;
+
+		public ImplicitSubSet(ScriptNode Pattern, ScriptNode SuperSet, ScriptNode Condition, bool DoubleColon,
+			int Start, int Length, Expression Expression)
 			: base(Pattern, SuperSet, Condition, Start, Length, Expression)
 		{
+			this.doubleColon = DoubleColon;
 		}
 
 		public override IElement Evaluate(Variables Variables)
@@ -32,7 +36,27 @@ namespace Waher.Script.Operators.Sets
 					throw new ScriptRuntimeException("Superset did not evaluate to a set.", this);
 			}
 
-			return new SubSet(this.left, SuperSet, this.right, Variables);
+			return new SubSet(this.left, SuperSet, this.right, Variables, this.doubleColon);
+		}
+
+		/// <summary>
+		/// <see cref="Object.Equals(object)"/>
+		/// </summary>
+		public override bool Equals(object obj)
+		{
+			return obj is ImplicitSubSet O &&
+				this.doubleColon.Equals(O.doubleColon) &&
+				base.Equals(obj);
+		}
+
+		/// <summary>
+		/// <see cref="Object.GetHashCode()"/>
+		/// </summary>
+		public override int GetHashCode()
+		{
+			int Result = base.GetHashCode();
+			Result ^= Result << 5 ^ this.doubleColon.GetHashCode();
+			return Result;
 		}
 	}
 }

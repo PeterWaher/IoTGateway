@@ -158,7 +158,7 @@ Vectors can be explicitly created by listing their elements between square brack
 	v:=[FOREACH x IN 1..10|0.1 : x^2];
 	v:=[FOR EACH x IN 1..10|0.1 : x^2];
 
-**Note*: `DO` can be exchanged with `:`, or completely omitted, except in the `DO`-`WHILE` case.
+**Note**: `DO` can be exchanged with `:`, or completely omitted, except in the `DO`-`WHILE` case.
 
 #### Matrices
 
@@ -172,7 +172,7 @@ Matrices can be explicitly created by listing their row vectors between square b
 	M:=[FOREACH x IN 1..10|0.1 : [x^2,x^3,x^4]];
 	M:=[FOR EACH x IN 1..10|0.1 : [x^2,x^3,x^4]];
 
-**Note*: `DO` can be exchanged with `:`, or completely omitted, except in the `DO`-`WHILE` case.
+**Note**: `DO` can be exchanged with `:`, or completely omitted, except in the `DO`-`WHILE` case.
 
 #### Sets
 
@@ -186,7 +186,25 @@ Sets can be explicitly created by listing their elements between braces `{` and 
 	S:={FOREACH x IN 1..10|0.1 : x^2};
 	S:={FOR EACH x IN 1..10|0.1 : x^2};
 
-**Note*: `DO` can be exchanged with `:`, or completely omitted, except in the `DO`-`WHILE` case.
+**Note**: `DO` can be exchanged with `:`, or completely omitted, except in the `DO`-`WHILE` case.
+
+##### Subsets
+
+Sets can also be created implicitly, by imposing a condition on the elements of a referenced superset (thereby creating a subset), or
+on a construct whose components are identified using the built-in pattern matching algorithm. Examples:
+
+	S:={x in Z:x>10}
+	S2:={x in S:x<20}
+	S:={[a,b]: a>b}
+	S:={x::x>10}
+	S:={v[]:count(v)>3}
+	S:={s{}:count(s)>3}
+	S:={M[,]:M.Columns>M.Rows}
+
+**Note**: To differentiate between creating an [object ex nihilo](#objectExNihilo), and creating a subset, when no superset is defined,
+two consequtive colons (`:`) can be used. `{x::x>10}` creates a set of all items that are comparable to `10` and are greater.
+`{x:x>10}` creates an [object ex nihilo](#objectExNihilo) with one member `x` that will have a boolean value corresponding to the
+greater-than comparison of the variable `x` with `10`.
 
 #### Object Ex nihilo
 
@@ -529,12 +547,16 @@ A variable assignment is defined using the `:=` operator. Example:
 	Variable := Value
 
 If the left side is not a variable reference, a pattern matching algorithm is employed that tries to assign all implicitly available variable references
-by comparing both sides. Example:
+by comparing both sides. 
+
+Examples:
 
 	[x,y]:=f(a,b,c)
+	v[]:=f(a,b,c)
 
-In the above example, the function `f`, which takes three parameters, is supposed to return a vector of two elements. If it does, the variables `x` and
-`y` are assigned the elements of this return vector.
+In the first example, the function `f`, which takes three parameters, is supposed to return a vector of two elements. If it does, 
+the variables `x` and `y` are assigned the elements of this return vector. In the second example, the `v` is supposed to be a assigned
+a vector. If the result of the function call is not a vector, it is converted to a vector before being assigned to `v`.
 
 There's also a set of aritmethic operators that act directly on a variable value. These are also categorized as assignment operators, and have the same
 [order of presedence][]. These operators are:

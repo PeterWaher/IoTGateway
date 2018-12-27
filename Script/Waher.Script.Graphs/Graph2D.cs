@@ -431,31 +431,30 @@ namespace Waher.Script.Graphs
 		/// </summary>
 		public override int GetHashCode()
 		{
-			int Result =
-				this.minX.GetHashCode() ^
-				this.maxX.GetHashCode() ^
-				this.minY.GetHashCode() ^
-				this.maxY.GetHashCode() ^
-				this.axisTypeX.GetHashCode() ^
-				this.axisTypeY.GetHashCode() ^
-				this.title.GetHashCode() ^
-				this.labelX.GetHashCode() ^
-				this.labelY.GetHashCode() ^
-				this.showXAxis.GetHashCode() ^
-				this.showYAxis.GetHashCode() ^
-				this.showGrid.GetHashCode();
+			int Result = this.minX.GetHashCode();
+			Result ^= Result << 5 ^ this.maxX.GetHashCode();
+			Result ^= Result << 5 ^ this.minY.GetHashCode();
+			Result ^= Result << 5 ^ this.maxY.GetHashCode();
+			Result ^= Result << 5 ^ this.axisTypeX.GetHashCode();
+			Result ^= Result << 5 ^ this.axisTypeY.GetHashCode();
+			Result ^= Result << 5 ^ this.title.GetHashCode();
+			Result ^= Result << 5 ^ this.labelX.GetHashCode();
+			Result ^= Result << 5 ^ this.labelY.GetHashCode();
+			Result ^= Result << 5 ^ this.showXAxis.GetHashCode();
+			Result ^= Result << 5 ^ this.showYAxis.GetHashCode();
+			Result ^= Result << 5 ^ this.showGrid.GetHashCode();
 
 			foreach (IElement E in this.x)
-				Result ^= E.GetHashCode();
+				Result ^= Result << 5 ^ E.GetHashCode();
 
 			foreach (IElement E in this.y)
-				Result ^= E.GetHashCode();
+				Result ^= Result << 5 ^ E.GetHashCode();
 
 			foreach (object Obj in this.parameters)
-				Result ^= Obj.GetHashCode();
+				Result ^= Result << 5 ^ Obj.GetHashCode();
 
 			foreach (DrawCallback Callback in this.callbacks)
-				Result ^= Callback.GetHashCode();
+				Result ^= Result << 5 ^ Callback.GetHashCode();
 
 			return Result;
 		}

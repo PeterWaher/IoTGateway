@@ -1087,7 +1087,7 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public void Evaluation_Test_44_NullCheckBinarySuffixOperators()
+		public void Evaluation_Test_44_NullCheckSuffixOperators()
 		{
 			this.Test("null?.Test", null);
 			this.Test("f?(1,2,3)", null);
@@ -1098,6 +1098,34 @@ namespace Waher.Script.Test
 			this.Test("null?[x,]", null);
 			this.Test("null?[,y]", null);
 			this.Test("null?[,]", null);
+		}
+
+		[TestMethod]
+		public void Parsing_Test_55_Subsets()
+		{
+			this.Test("S:={x in Z:x>10};5 in S", false);
+			this.Test("S:={x in Z:x>10};15 in S", true);
+			this.Test("S:={x in Z:x>10};25 in S", true);
+			this.Test("S:={x in Z:x>10};S2:={x in S:x<20};5 in S2", false);
+			this.Test("S:={x in Z:x>10};S2:={x in S:x<20};15 in S2", true);
+			this.Test("S:={x in Z:x>10};S2:={x in S:x<20};25 in S2", false);
+			this.Test("S:=1..20;S2:={x in S:x>10};5 in S2", false);
+			this.Test("S:=1..20;S2:={x in S:x>10};15 in S2", true);
+			this.Test("S:=1..20;S2:={x in S:x>10};25 in S2", false);
+			this.Test("S:={[a,b]: a>b};[1,2] in S", false);
+			this.Test("S:={[a,b]: a>b};[2,1] in S", true);
+			this.Test("S:={[a,b]: a>b};[2,1,0] in S", false);
+			this.Test("S:={v[]:count(v)>3};[1,2] in S", false);
+			this.Test("S:={v[]:count(v)>3};[1,2,3] in S", false);
+			this.Test("S:={v[]:count(v)>3};[1,2,3,4] in S", true);
+			this.Test("S:={s{}:count(s)>3};{1,2} in S", false);
+			this.Test("S:={s{}:count(s)>3};{1,2,3} in S", false);
+			this.Test("S:={s{}:count(s)>3};{1,2,3,4} in S", true);
+			this.Test("S:={M[,]:M.Columns>M.Rows};[[1,2],[3,4]] in S", false);
+			this.Test("S:={M[,]:M.Columns>M.Rows};[[1,2,3],[3,4,4]] in S", true);
+			this.Test("S:={M[,]:M.Columns>M.Rows};[[1,2],[3,4],[5,6]] in S", false);
+			this.Test("S:={x::x>\"Hello\"};\"ABC\" in S", false);
+			this.Test("S:={x::x>\"Hello\"};\"XYZ\" in S", true);
 		}
 
 	}

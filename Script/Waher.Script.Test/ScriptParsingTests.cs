@@ -363,17 +363,7 @@ namespace Waher.Script.Test
         }
 
 		[TestMethod]
-		public void Parsing_Test_33_UnaryNullCheckSuffixOperators()
-		{
-			this.Test("f?'(x)");
-			this.Test("f?′(x)");
-			this.Test("f?\"(x)");
-			this.Test("f?″(x)");
-			this.Test("f?‴(x)");
-		}
-
-		[TestMethod]
-		public void Parsing_Test_34_BinaryNullCheckSuffixOperators()
+		public void Parsing_Test_33_NullCheckSuffixOperators()
 		{
 			this.Test("obj?.Member");
 			this.Test("f?(a,b,c)");
@@ -384,6 +374,19 @@ namespace Waher.Script.Test
 			this.Test("M?[x,]");
 			this.Test("M?[,y]");
 			this.Test("a?[,]");
+		}
+
+		[TestMethod]
+		public void Parsing_Test_34_Subsets()
+		{
+			this.Test("S:={x in Z:x>10}");
+			this.Test("S2:={x in S:x<20}");
+			this.Test("S:=1..20;S2:={x in S:x>10}");
+			this.Test("S:={[a,b]: a>b}");
+			this.Test("S:={v[]:count(v)>3}");
+			this.Test("S:={s{}:count(s)>3}");
+			this.Test("S:={M[,]:M.Columns>M.Rows}");
+			this.Test("S:={x::x>\"Hello\"}");
 		}
 
 	}

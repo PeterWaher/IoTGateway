@@ -118,9 +118,14 @@ namespace Waher.Script.Functions.Vectors
             {
                 SE = E as ISemiGroupElement;
                 if (SE is null)
-                    throw new ScriptRuntimeException("Elements not addable.", Node);
+				{
+					if (Vector.ChildElements.Count == 1)
+						return E;
+					else
+						throw new ScriptRuntimeException("Elements not addable.", Node);
+				}
 
-                if (Result is null)
+				if (Result is null)
                     Result = SE;
                 else
                 {

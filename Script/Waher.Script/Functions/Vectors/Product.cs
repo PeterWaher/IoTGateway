@@ -109,8 +109,13 @@ namespace Waher.Script.Functions.Vectors
             foreach (IElement E in Argument.ChildElements)
             {
                 RE = E as IRingElement;
-                if (RE is null)
-                    throw new ScriptRuntimeException("Elements cannot be multiplied.", this);
+				if (RE is null)
+				{
+					if (Argument.ChildElements.Count == 1)
+						return E;
+					else
+						throw new ScriptRuntimeException("Elements cannot be multiplied.", this);
+				}
 
                 if (Result is null)
                     Result = RE;

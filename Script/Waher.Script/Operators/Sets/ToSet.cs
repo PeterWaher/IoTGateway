@@ -16,6 +16,7 @@ namespace Waher.Script.Operators.Sets
 		/// To-Set operator.
 		/// </summary>
 		/// <param name="Operand">Operand.</param>
+		/// <param name="NullCheck">If null should be returned if left operand is null.</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>

@@ -12,14 +12,15 @@ namespace Waher.Script.Operators.Matrices
     /// </summary>
     public class ToMatrix : NullCheckUnaryOperator
     {
-        /// <summary>
-        /// To-Matrix operator.
-        /// </summary>
-        /// <param name="Operand">Operand.</param>
-        /// <param name="Start">Start position in script expression.</param>
-        /// <param name="Length">Length of expression covered by node.</param>
+		/// <summary>
+		/// To-Matrix operator.
+		/// </summary>
+		/// <param name="Operand">Operand.</param>
+		/// <param name="NullCheck">If null should be returned if left operand is null.</param>
+		/// <param name="Start">Start position in script expression.</param>
+		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-        public ToMatrix(ScriptNode Operand, bool NullCheck, int Start, int Length, Expression Expression)
+		public ToMatrix(ScriptNode Operand, bool NullCheck, int Start, int Length, Expression Expression)
             : base(Operand, NullCheck, Start, Length, Expression)
         {
         }

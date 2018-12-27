@@ -45,15 +45,16 @@ namespace Waher.Script.Operators.Matrices
             return EvaluateIndex(Left, Middle, Right, this.nullCheck, this);
         }
 
-        /// <summary>
-        /// Evaluates the matrix index operator.
-        /// </summary>
-        /// <param name="Matrix">Matrix</param>
-        /// <param name="IndexX">X-Index</param>
-        /// <param name="IndexY">Y-Index</param>
-        /// <param name="Node">Node performing the operation.</param>
-        /// <returns>Result</returns>
-        public static IElement EvaluateIndex(IElement Matrix, IElement IndexX, IElement IndexY, bool NullCheck, ScriptNode Node)
+		/// <summary>
+		/// Evaluates the matrix index operator.
+		/// </summary>
+		/// <param name="Matrix">Matrix</param>
+		/// <param name="IndexX">X-Index</param>
+		/// <param name="IndexY">Y-Index</param>
+		/// <param name="NullCheck">If null should be returned if left operand is null.</param>
+		/// <param name="Node">Node performing the operation.</param>
+		/// <returns>Result</returns>
+		public static IElement EvaluateIndex(IElement Matrix, IElement IndexX, IElement IndexY, bool NullCheck, ScriptNode Node)
         {
             if (Matrix is IMatrix M)
                 return EvaluateIndex(M, IndexX, IndexY, Node);

@@ -44,14 +44,15 @@ namespace Waher.Script.Operators.Vectors
             return EvaluateIndex(Left, Right, this.nullCheck, this);
         }
 
-        /// <summary>
-        /// Evaluates the vector index operator.
-        /// </summary>
-        /// <param name="Vector">Vector</param>
-        /// <param name="Index">Index</param>
-        /// <param name="Node">Node performing the operation.</param>
-        /// <returns>Result</returns>
-        public static IElement EvaluateIndex(IElement Vector, IElement Index, bool NullCheck, ScriptNode Node)
+		/// <summary>
+		/// Evaluates the vector index operator.
+		/// </summary>
+		/// <param name="Vector">Vector</param>
+		/// <param name="NullCheck">If null should be returned if left operand is null.</param>
+		/// <param name="Index">Index</param>
+		/// <param name="Node">Node performing the operation.</param>
+		/// <returns>Result</returns>
+		public static IElement EvaluateIndex(IElement Vector, IElement Index, bool NullCheck, ScriptNode Node)
         {
 			if (Vector is IVector V)
 				return EvaluateIndex(V, Index, Node);

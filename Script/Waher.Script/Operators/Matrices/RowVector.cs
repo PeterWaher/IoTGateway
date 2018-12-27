@@ -18,6 +18,7 @@ namespace Waher.Script.Operators.Matrices
 		/// </summary>
 		/// <param name="Left">Left operand.</param>
 		/// <param name="Y">Y-coordinate operand.</param>
+		/// <param name="NullCheck">If null should be returned if left operand is null.</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>

@@ -48,6 +48,7 @@ namespace Waher.Script.Operators.Matrices
 		/// </summary>
 		/// <param name="Matrix">Matrix</param>
 		/// <param name="Index">Index</param>
+		/// <param name="NullCheck">If null should be returned if left operand is null.</param>
 		/// <param name="Node">Node performing the operation.</param>
 		/// <returns>Result</returns>
 		public static IElement EvaluateIndex(IElement Matrix, IElement Index, bool NullCheck, ScriptNode Node)

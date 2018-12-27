@@ -89,7 +89,7 @@ The following table lists constants recognized by `Waher.Script`. For lists of c
 corresponding libraries.
 
 | Constant               | Description                                               |
-|:----------------------:|----------------------------------------------------------|
+|:----------------------:|-----------------------------------------------------------|
 | `e`                    | Euler's number                                            |
 | `π`, `pi`              | Pi                                                        |
 | `ε`, `eps`, `epsilon`  | Smallest positive double value that is greater than zero. |
@@ -97,9 +97,15 @@ corresponding libraries.
 | `i`                    | Imaginary unit                                            |
 | `C`                    | Set of complex numbers                                    |
 | `R`                    | Set of real numbers                                       |
+| `Z`                    | Set of integer numbers                                    |
 | `∅`, `EmptySet`        | The empty set                                             |
-| `Now`                  | Current date and time                                     |
-| `Today`                | Current date                                              |
+
+There are also a set of predefined variables:
+
+| Variable               | Description                                              |
+|:----------------------:|----------------------------------------------------------|
+| `Now`                  | Current date and time                                    |
+| `Today`                | Current date                                             |
 
 **Note**: Names are case sensitive. `r` and `R` point to different objects.
 

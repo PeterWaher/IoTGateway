@@ -77,5 +77,13 @@ namespace Waher.Script.Objects.Sets
             get { return 0; }
         }
 
-    }
+		/// <summary>
+		/// <see cref="Object.ToString()"/>
+		/// </summary>
+		public override string ToString()
+		{
+			return "∅";	
+		}
+
+	}
 }

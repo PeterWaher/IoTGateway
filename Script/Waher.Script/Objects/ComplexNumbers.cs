@@ -67,5 +67,12 @@ namespace Waher.Script.Objects
         /// </summary>
         public static readonly ComplexNumbers Instance = new ComplexNumbers();
 
-    }
+		/// <summary>
+		/// <see cref="object.ToString"/>
+		/// </summary>
+		public override string ToString()
+		{
+			return "ℂ";
+		}
+	}
 }

@@ -33,7 +33,7 @@ namespace Waher.Script.Constants
 		/// </summary>
 		public string[] Aliases
 		{
-			get { return null; }
+			get { return new string[] { "ℂ" }; }
 		}
 
 		/// <summary>

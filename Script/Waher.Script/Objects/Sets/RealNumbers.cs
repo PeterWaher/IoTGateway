@@ -55,5 +55,13 @@ namespace Waher.Script.Objects.Sets
         {
             return hashCode;
         }
-    }
+
+		/// <summary>
+		/// <see cref="Object.ToString()"/>
+		/// </summary>
+		public override string ToString()
+		{
+			return "ℝ";
+		}
+	}
 }

@@ -172,17 +172,29 @@ namespace Waher.Script.Model
         /// <returns>Function result.</returns>
         public virtual IElement EvaluateScalar(IElement Argument1, IElement Argument2, Variables Variables)
         {
-            throw new ScriptRuntimeException("Type of scalar not supported.", this);
-        }
+			object v1 = Argument1.AssociatedObjectValue;
+			object v2 = Argument2.AssociatedObjectValue;
 
-        /// <summary>
-        /// Evaluates the function on two scalar arguments.
-        /// </summary>
-        /// <param name="Argument1">Function argument 1.</param>
-        /// <param name="Argument2">Function argument 2.</param>
-        /// <param name="Variables">Variables collection.</param>
-        /// <returns>Function result.</returns>
-        public virtual IElement EvaluateScalar(double Argument1, double Argument2, Variables Variables)
+			if (Expression.TryConvert<string>(v1, out string s1) && Expression.TryConvert<string>(v2, out string s2))
+				return this.EvaluateScalar(s1, s2, Variables);
+			else if (Expression.TryConvert<double>(v1, out double d1) && Expression.TryConvert<double>(v2, out double d2))
+				return this.EvaluateScalar(d1, d2, Variables);
+			else if (Expression.TryConvert<bool>(v1, out bool b1) && Expression.TryConvert<bool>(v2, out bool b2))
+				return this.EvaluateScalar(b1, b2, Variables);
+			else if (Expression.TryConvert<Complex>(v1, out Complex z1) && Expression.TryConvert<Complex>(v2, out Complex z2))
+				return this.EvaluateScalar(z1, z2, Variables);
+			else
+				throw new ScriptRuntimeException("Type of scalar not supported.", this);
+		}
+
+		/// <summary>
+		/// Evaluates the function on two scalar arguments.
+		/// </summary>
+		/// <param name="Argument1">Function argument 1.</param>
+		/// <param name="Argument2">Function argument 2.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Function result.</returns>
+		public virtual IElement EvaluateScalar(double Argument1, double Argument2, Variables Variables)
         {
             throw new ScriptRuntimeException("Double-valued arguments not supported.", this);
         }

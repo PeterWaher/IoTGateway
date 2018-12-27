@@ -585,11 +585,6 @@ namespace Waher.Script
 					case '(':
 					case '[':
 					case '{':
-					case '\'':
-					case '′':
-					case '"':
-					case '″':
-					case '‴':
 						this.pos--;
 						return Condition;   // Null-check operator
 
@@ -2216,11 +2211,6 @@ namespace Waher.Script
 							case '(':
 							case '[':
 							case '{':
-							case '\'':
-							case '′':
-							case '"':
-							case '″':
-							case '‴':
 								NullCheck = true;
 								continue;
 
@@ -2479,6 +2469,9 @@ namespace Waher.Script
 					case '″':
 					case '‴':
 						int i = 0;
+
+						if (NullCheck)
+							throw new SyntaxException("Null-checked differencial operators not defined.", this.pos, this.script);
 
 						while (true)
 						{

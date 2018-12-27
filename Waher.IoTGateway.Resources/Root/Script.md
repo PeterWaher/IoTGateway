@@ -253,11 +253,6 @@ is not evaluated, and `null` is returned. The following table lists null-checked
 | `?[,Y]`        | Matrix row vector operator                  | `M?[,y]`      |
 | `?[,]`         | To matrix, if not already                   | `a?[,]`       |
 | `?{}`          | To set, if not already                      | `a?{}`        |
-| `?'`           | Default differentiation (prim)              | `f?'(x)`      |
-| `?′`           | Default differentiation (prim)              | `f?′(x)`      |
-| `?"`           | Default second-order differentiation (bis)  | `f?"(x)`      |
-| `?″`           | Default second-order differentiation (bis)  | `f?″(x)`      |
-| `?‴`           | Default third-order differentiation         | `f?‴(x)`      |
 
 **Note**: Since script is late-bound, most operators support dynamic and static bindings, where traditional languages only support static bindings.
 The following is permitted, for example:

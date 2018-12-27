@@ -104,7 +104,18 @@ namespace Waher.Script.Model
         /// <returns>Function result.</returns>
         public virtual IElement EvaluateScalar(IElement Argument, Variables Variables)
         {
-            throw new ScriptRuntimeException("Type of scalar not supported.", this);
+			object Value = Argument.AssociatedObjectValue;
+
+			if (Expression.TryConvert<string>(Value, out string s))
+				return this.EvaluateScalar(s, Variables);
+			else if (Expression.TryConvert<double>(Value, out double d))
+				return this.EvaluateScalar(d, Variables);
+			else if (Expression.TryConvert<bool>(Value, out bool b))
+				return this.EvaluateScalar(b, Variables);
+			else if (Expression.TryConvert<Complex>(Value, out Complex z))
+				return this.EvaluateScalar(z, Variables);
+			else
+				throw new ScriptRuntimeException("Type of scalar not supported.", this);
         }
 
         /// <summary>

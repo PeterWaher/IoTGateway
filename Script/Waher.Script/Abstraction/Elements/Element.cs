@@ -99,9 +99,8 @@ namespace Waher.Script.Abstraction.Elements
                 return true;
             }
 
-            Value = null;
-            return false;
-        }
+			return Expression.TryConvert(this.AssociatedObjectValue, DesiredType, out Value);
+		}
 
-    }
+	}
 }

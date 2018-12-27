@@ -169,15 +169,12 @@ namespace Waher.Script.Objects
                 return true;
             }
             else
-            {
-                Value = null;
-                return false;
-            }
-        }
+				return Expression.TryConvert(this.value, DesiredType, out Value);
+		}
 
-        /// <summary>
-        /// The empty string.
-        /// </summary>
-        public static readonly StringValue Empty = new StringValue(string.Empty);
+		/// <summary>
+		/// The empty string.
+		/// </summary>
+		public static readonly StringValue Empty = new StringValue(string.Empty);
     }
 }

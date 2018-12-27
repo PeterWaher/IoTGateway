@@ -25,6 +25,7 @@ using Waher.Script.Operators.Matrices;
 using Waher.Script.Operators.Membership;
 using Waher.Script.Operators.Sets;
 using Waher.Script.Operators.Vectors;
+using Waher.Script.TypeConversion;
 using Waher.Script.Units;
 
 namespace Waher.Script
@@ -35,6 +36,7 @@ namespace Waher.Script
 	public class Expression
 	{
 		private readonly static object searchSynch = new object();
+		private static Dictionary<Type, Dictionary<Type, ITypeConverter>> converters = null;
 		private static Dictionary<string, FunctionRef> functions = null;
 		private static Dictionary<string, IConstant> constants = null;
 		private static Dictionary<string, IKeyWord> customKeyWords = null;
@@ -4351,6 +4353,175 @@ namespace Waher.Script
 			}
 
 			return true;
+		}
+
+		/// <summary>
+		/// Tries to convert an object <paramref name="Value"/> to an object of type <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">Desired type.</typeparam>
+		/// <param name="Value">Value to convert.</param>
+		/// <param name="Result">Conversion result.</param>
+		/// <returns>If conversion was successful.</returns>
+		public static bool TryConvert<T>(object Value, out T Result)
+		{
+			if (!TryConvert(Value, typeof(T), out object Obj) || !(Obj is T Result2))
+			{
+				Result = default(T);
+				return false;
+			}
+
+			Result = Result2;
+			return true;
+		}
+
+		/// <summary>
+		/// Tries to convert an object <paramref name="Value"/> to an object of type <paramref name="DesiredType"/>.
+		/// </summary>
+		/// <param name="Value">Value to convert.</param>
+		/// <param name="DesiredType">Desired type.</param>
+		/// <param name="Result">Conversion result.</param>
+		/// <returns>If conversion was successful.</returns>
+		public static bool TryConvert(object Value, Type DesiredType, out object Result)
+		{
+			Type T = Value.GetType();
+			TypeInfo TI = T.GetTypeInfo();
+
+			if (DesiredType.GetTypeInfo().IsAssignableFrom(TI))
+			{
+				Result = Value;
+				return true;
+			}
+
+			if (converters == null)
+			{
+				Dictionary<Type, Dictionary<Type, ITypeConverter>> Converters = GetTypeConverters();
+
+				if (converters == null)
+				{
+					converters = Converters;
+					Types.OnInvalidated += (sender, e) => converters = GetTypeConverters();
+				}
+			}
+
+			lock (converters)
+			{
+				if (!converters.TryGetValue(T, out Dictionary<Type, ITypeConverter> Converters))
+				{
+					Result = null;
+					return false;
+				}
+
+				if (Converters.TryGetValue(DesiredType, out ITypeConverter Converter))
+				{
+					Result = Converter?.Convert(Value);
+					return !(Converter is null);
+				}
+
+				Dictionary<Type, bool> Explored = new Dictionary<Type, bool>() { { T, true } };
+				LinkedList<ITypeConverter> Search = new LinkedList<ITypeConverter>();
+
+				foreach (ITypeConverter Converter3 in Converters.Values)
+				{
+					Search.AddLast(Converter3);
+					Explored[Converter3.To] = true;
+				}
+
+				while (!(Search.First is null))
+				{
+					ITypeConverter C = Search.First.Value;
+					Search.RemoveFirst();
+
+					if (converters.TryGetValue(C.To, out Dictionary<Type, ITypeConverter> Converters2))
+					{
+						if (Converters2.TryGetValue(DesiredType, out ITypeConverter Converter2))
+						{
+							ConversionSequence ConversionSequence;
+
+							if (C is ConversionSequence Sequence)
+							{
+								int c = Sequence.Converters.Length + 1;
+								ITypeConverter[] A = new ITypeConverter[c];
+								Sequence.Converters.CopyTo(A, 0);
+								A[c - 1] = Converter2;
+
+								ConversionSequence = new ConversionSequence(A);
+							}
+							else
+								ConversionSequence = new ConversionSequence(C, Converter2);
+
+							Converters[DesiredType] = ConversionSequence;
+							Result = ConversionSequence.Convert(Value);
+							return true;
+						}
+
+						foreach (ITypeConverter Converter3 in Converters2.Values)
+						{
+							if (!Explored.ContainsKey(Converter3.To))
+							{
+								Search.AddLast(Converter3);
+								Explored[Converter3.To] = true;
+							}
+						}
+					}
+				}
+
+				Converters[DesiredType] = null;
+				Result = null;
+				return false;
+			}
+		}
+
+		private static Dictionary<Type, Dictionary<Type, ITypeConverter>> GetTypeConverters()
+		{
+			Dictionary<Type, Dictionary<Type, ITypeConverter>> Converters = new Dictionary<Type, Dictionary<Type, ITypeConverter>>();
+
+			foreach (Type T2 in Types.GetTypesImplementingInterface(typeof(ITypeConverter)))
+			{
+				TypeInfo TI2 = T2.GetTypeInfo();
+				if (TI2.IsAbstract)
+					continue;
+
+				ConstructorInfo DefaultConstructor = null;
+
+				foreach (ConstructorInfo CI in TI2.DeclaredConstructors)
+				{
+					if (CI.GetParameters().Length == 0)
+					{
+						DefaultConstructor = CI;
+						break;
+					}
+				}
+
+				if (DefaultConstructor == null)
+					continue;
+
+				try
+				{
+					ITypeConverter Converter = (ITypeConverter)DefaultConstructor.Invoke(Types.NoParameters);
+					Type From = Converter.From;
+					Type To = Converter.To;
+
+					if (!Converters.TryGetValue(From, out Dictionary<Type, ITypeConverter> List))
+					{
+						List = new Dictionary<Type, ITypeConverter>();
+						Converters[From] = List;
+					}
+
+					if (List.TryGetValue(To, out ITypeConverter Converter2))
+					{
+						Log.Warning("There's already a type converter registered converting from " +
+							From.FullName + " to " + To.FullName, Converter2.GetType().FullName);
+					}
+					else
+						List[To] = Converter;
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex, T2.FullName);
+				}
+			}
+
+			return Converters;
 		}
 
 		// TODO: Optimize constants

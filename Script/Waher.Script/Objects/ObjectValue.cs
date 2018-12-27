@@ -122,11 +122,8 @@ namespace Waher.Script.Objects
 					return true;
 				}
 				else
-				{
-					Value = null;
-					return false;
-				}
+					return Expression.TryConvert(this.value, DesiredType, out Value);
 			}
-        }
+		}
     }
 }

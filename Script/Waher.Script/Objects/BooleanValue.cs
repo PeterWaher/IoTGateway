@@ -158,21 +158,18 @@ namespace Waher.Script.Objects
         /// <returns>If conversion was possible.</returns>
         public override bool TryConvertTo(Type DesiredType, out object Value)
         {
-            if (DesiredType == typeof(bool))
-            {
-                Value = this.value;
-                return true;
-            }
+			if (DesiredType == typeof(bool))
+			{
+				Value = this.value;
+				return true;
+			}
 			else if (DesiredType.GetTypeInfo().IsAssignableFrom(typeof(bool).GetTypeInfo()))
 			{
 				Value = this.value;
 				return true;
 			}
 			else
-			{
-                Value = null;
-                return false;
-            }
+				return Expression.TryConvert(this.value, DesiredType, out Value);
         }
     }
 }

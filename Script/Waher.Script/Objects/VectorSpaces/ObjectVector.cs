@@ -384,10 +384,7 @@ namespace Waher.Script.Objects.VectorSpaces
 				return true;
 			}
 			else
-			{
-				Value = null;
-				return false;
-			}
+				return Expression.TryConvert(this.Values, DesiredType, out Value);
 		}
 
 	}

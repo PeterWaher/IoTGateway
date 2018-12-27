@@ -43,15 +43,13 @@ namespace Waher.Script.Operators.Arithmetics
 		/// <returns>Result</returns>
 		public virtual IElement Evaluate(IElement Operand)
 		{
-			DoubleNumber DOp = Operand as DoubleNumber;
-			if (DOp != null)
+			if (Operand is DoubleNumber DOp)
 			{
 				double d = DOp.Value;
 				return new DoubleNumber(d * d * d);
 			}
 
-			IRingElement E = Operand as IRingElement;
-			if (E != null)
+			if (Operand is IRingElement E)
 			{
 				IRingElement E2 = (IRingElement)Multiply.EvaluateMultiplication(E, E, this);
 				return Multiply.EvaluateMultiplication(E2, E, this);

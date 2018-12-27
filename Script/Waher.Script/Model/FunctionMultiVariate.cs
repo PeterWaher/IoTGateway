@@ -349,5 +349,27 @@ namespace Waher.Script.Model
 			return true;
 		}
 
+		/// <summary>
+		/// <see cref="Object.Equals(object)"/>
+		/// </summary>
+		public override bool Equals(object obj)
+		{
+			return obj is FunctionMultiVariate O &&
+				AreEqual(this.arguments, O.arguments) &&
+				AreEqual(this.argumentTypes, O.argumentTypes) &&
+				base.Equals(obj);
+		}
+
+		/// <summary>
+		/// <see cref="Object.GetHashCode()"/>
+		/// </summary>
+		public override int GetHashCode()
+		{
+			int Result = base.GetHashCode();
+			Result ^= Result << 5 ^ GetHashCode(this.arguments);
+			Result ^= Result << 5 ^ GetHashCode(this.argumentTypes);
+			return Result;
+		}
+
 	}
 }

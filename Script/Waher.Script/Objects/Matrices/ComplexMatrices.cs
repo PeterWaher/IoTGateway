@@ -96,9 +96,8 @@ namespace Waher.Script.Objects.Matrices
         /// <returns>If elements are equal.</returns>
         public override bool Equals(object obj)
         {
-            ComplexMatrices S = obj as ComplexMatrices;
-            return (S != null && S.rows == this.rows && S.columns == this.columns);
-        }
+			return (obj is ComplexMatrices S && S.rows == this.rows && S.columns == this.columns);
+		}
 
         /// <summary>
         /// Calculates a hash code of the element.

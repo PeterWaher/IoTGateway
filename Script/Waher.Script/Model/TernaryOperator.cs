@@ -82,5 +82,25 @@ namespace Waher.Script.Model
 			return true;
 		}
 
+		/// <summary>
+		/// <see cref="Object.Equals(object)"/>
+		/// </summary>
+		public override bool Equals(object obj)
+		{
+			return obj is TernaryOperator O &&
+				this.middle.Equals(O.middle) &&
+				base.Equals(obj);
+		}
+
+		/// <summary>
+		/// <see cref="Object.GetHashCode()"/>
+		/// </summary>
+		public override int GetHashCode()
+		{
+			int Result = base.GetHashCode();
+			Result ^= Result << 5 ^ this.middle.GetHashCode();
+			return Result;
+		}
+
 	}
 }

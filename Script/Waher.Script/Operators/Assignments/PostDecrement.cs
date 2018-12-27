@@ -11,10 +11,8 @@ namespace Waher.Script.Operators.Assignments
 	/// <summary>
 	/// Post-Decrement operator.
 	/// </summary>
-	public class PostDecrement : ScriptLeafNode
+	public class PostDecrement : ScriptLeafNodeVariableReference
 	{
-		private readonly string variableName;
-		
 		/// <summary>
 		/// Post-Decrement operator.
 		/// </summary>
@@ -23,17 +21,8 @@ namespace Waher.Script.Operators.Assignments
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
 		public PostDecrement(string VariableName, int Start, int Length, Expression Expression)
-			: base(Start, Length, Expression)
+			: base(VariableName, Start, Length, Expression)
 		{
-			this.variableName = VariableName;
-		}
-
-		/// <summary>
-		/// Name of variable
-		/// </summary>
-		public string VariableName
-		{
-			get { return this.variableName; }
 		}
 
 		/// <summary>

@@ -635,5 +635,77 @@ namespace Waher.Script.Persistence.SQL
 			return true;
 		}
 
+		/// <summary>
+		/// <see cref="Object.Equals(object)"/>
+		/// </summary>
+		public override bool Equals(object obj)
+		{
+			if (!(obj is Select O &&
+				AreEqual(this.columns, O.columns) &&
+				AreEqual(this.columnNames, O.columnNames) &&
+				AreEqual(this.sources, O.sources) &&
+				AreEqual(this.sourceNames, O.sourceNames) &&
+				AreEqual(this.groupBy, O.groupBy) &&
+				AreEqual(this.groupByNames, O.groupByNames) &&
+				AreEqual(this.top, O.top) &&
+				AreEqual(this.where, O.where) &&
+				AreEqual(this.having, O.having) &&
+				AreEqual(this.offset, O.offset) &&
+				base.Equals(obj)))
+			{
+				return false;
+			}
+
+			IEnumerator e1 = this.orderBy.GetEnumerator();
+			IEnumerator e2 = O.orderBy.GetEnumerator();
+
+			while (true)
+			{
+				bool b1 = e1.MoveNext();
+				bool b2 = e2.MoveNext();
+
+				if (b1 ^ b2)
+					return false;
+
+				if (!b1)
+					return true;
+
+				KeyValuePair<ScriptNode, bool> Item1 = (KeyValuePair<ScriptNode, bool>)e1.Current;
+				KeyValuePair<ScriptNode, bool> Item2 = (KeyValuePair<ScriptNode, bool>)e2.Current;
+
+				if (!Item1.Key.Equals(Item2.Key) ||
+					!Item1.Value.Equals(Item2.Value))
+				{
+					return false;
+				}
+			}
+		}
+		
+		/// <summary>
+		/// <see cref="Object.GetHashCode()"/>
+		/// </summary>
+		public override int GetHashCode()
+		{
+			int Result = base.GetHashCode();
+			Result ^= Result << 5 ^ GetHashCode(this.columns);
+			Result ^= Result << 5 ^ GetHashCode(this.columnNames);
+			Result ^= Result << 5 ^ GetHashCode(this.sources);
+			Result ^= Result << 5 ^ GetHashCode(this.sourceNames);
+			Result ^= Result << 5 ^ GetHashCode(this.groupBy);
+			Result ^= Result << 5 ^ GetHashCode(this.groupByNames);
+			Result ^= Result << 5 ^ GetHashCode(this.top);
+			Result ^= Result << 5 ^ GetHashCode(this.where);
+			Result ^= Result << 5 ^ GetHashCode(this.having);
+			Result ^= Result << 5 ^ GetHashCode(this.offset);
+
+			foreach (KeyValuePair<ScriptNode, bool> P in this.orderBy)
+			{
+				Result ^= Result << 5 ^ P.Key.GetHashCode();
+				Result ^= Result << 5 ^ P.Value.GetHashCode();
+			}
+
+			return Result;
+		}
+
 	}
 }

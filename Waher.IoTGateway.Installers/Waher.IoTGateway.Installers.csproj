@@ -51,6 +51,7 @@
     <Compile Include=".bak\Waher.Runtime.Inventory\Grade.cs" />
     <Compile Include=".bak\Waher.Runtime.Inventory\IModule.cs" />
     <Compile Include=".bak\Waher.Runtime.Inventory\Types.cs" />
+    <Compile Include=".bak\Waher.Script\Constants\Z.cs" />
     <Compile Include=".bak\Waher.Script\Functions\Runtime\Fields.cs" />
     <Compile Include=".bak\Waher.Script\Functions\Runtime\MethodLambda.cs" />
     <Compile Include=".bak\Waher.Script\Functions\Runtime\Methods.cs" />
@@ -62,8 +63,13 @@
     <Compile Include=".bak\Waher.Script\Model\NullCheckUnaryOperator.cs" />
     <Compile Include=".bak\Waher.Script\Model\NullCheckUnaryScalarOperator.cs" />
     <Compile Include=".bak\Waher.Script\Model\ScriptLeafNode.cs" />
+    <Compile Include=".bak\Waher.Script\Model\ScriptLeafNodeVariableReference.cs" />
     <Compile Include=".bak\Waher.Script\Model\ScriptParser.cs" />
+    <Compile Include=".bak\Waher.Script\Objects\Sets\Integers.cs" />
+    <Compile Include=".bak\Waher.Script\Objects\Sets\SubSet.cs" />
     <Compile Include=".bak\Waher.Script\Operators\Conditional\NullCheck.cs" />
+    <Compile Include=".bak\Waher.Script\TypeConversion\ConversionSequence.cs" />
+    <Compile Include=".bak\Waher.Script\TypeConversion\ITypeConverter.cs" />
     <Compile Include="CustomAction.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include=".bak\Waher.Content.Xml\XML.cs" />

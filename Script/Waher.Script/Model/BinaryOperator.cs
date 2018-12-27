@@ -108,5 +108,27 @@ namespace Waher.Script.Model
 
 			return true;
 		}
+
+		/// <summary>
+		/// <see cref="Object.Equals(object)"/>
+		/// </summary>
+		public override bool Equals(object obj)
+		{
+			return obj is BinaryOperator O &&
+				this.left.Equals(O.left) &&
+				this.right.Equals(O.right) &&
+				base.Equals(obj);
+		}
+
+		/// <summary>
+		/// <see cref="Object.GetHashCode()"/>
+		/// </summary>
+		public override int GetHashCode()
+		{
+			int Result = base.GetHashCode();
+			Result ^= Result << 5 ^ this.left.GetHashCode();
+			Result ^= Result << 5 ^ this.right.GetHashCode();
+			return Result;
+		}
 	}
 }

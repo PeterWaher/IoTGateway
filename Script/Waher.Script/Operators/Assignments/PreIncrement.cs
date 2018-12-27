@@ -11,10 +11,8 @@ namespace Waher.Script.Operators.Assignments
 	/// <summary>
 	/// Pre-Increment operator.
 	/// </summary>
-	public class PreIncrement : ScriptLeafNode
+	public class PreIncrement : ScriptLeafNodeVariableReference
 	{
-		private readonly string variableName;
-		
 		/// <summary>
 		/// Pre-Increment operator.
 		/// </summary>
@@ -23,17 +21,8 @@ namespace Waher.Script.Operators.Assignments
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
 		public PreIncrement(string VariableName, int Start, int Length, Expression Expression)
-			: base(Start, Length, Expression)
+			: base(VariableName, Start, Length, Expression)
 		{
-			this.variableName = VariableName;
-		}
-
-		/// <summary>
-		/// Name of variable
-		/// </summary>
-		public string VariableName
-		{
-			get { return this.variableName; }
 		}
 
 		/// <summary>
@@ -43,20 +32,17 @@ namespace Waher.Script.Operators.Assignments
 		/// <returns>Result.</returns>
 		public override IElement Evaluate(Variables Variables)
 		{
-			Variable v;
-
-			if (!Variables.TryGetVariable(this.variableName, out v))
+			if (!Variables.TryGetVariable(this.variableName, out Variable v))
 				throw new ScriptRuntimeException("Variable not found: " + this.variableName, this);
 
 			IElement Value = v.ValueElement;
-			DoubleNumber n = Value as DoubleNumber;
 
-			if (n != null)
+			if (Value is DoubleNumber n)
 				Value = new DoubleNumber(n.Value + 1);
 			else
 				Value = Increment(Value, this);
 
-            Variables[this.variableName] = Value;
+			Variables[this.variableName] = Value;
 
             return Value;
 		}
@@ -69,8 +55,7 @@ namespace Waher.Script.Operators.Assignments
 		/// <returns>Incremented value.</returns>
 		public static IElement Increment(IElement Value, ScriptNode Node)
 		{
-			ICommutativeRingWithIdentityElement e = Value as ICommutativeRingWithIdentityElement;
-			if (e != null)
+			if (Value is ICommutativeRingWithIdentityElement e)
 				return Operators.Arithmetics.Add.EvaluateAddition(Value, e.One, Node);
 			else if (Value.IsScalar)
 				throw new ScriptRuntimeException("Unable to increment variable.", Node);

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Exceptions;
@@ -21,7 +22,7 @@ namespace Waher.Script.Functions.Vectors
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
 		public Count(ScriptNode Vector, int Start, int Length, Expression Expression)
-			: base(new ScriptNode[] { Vector }, new ArgumentType[] { ArgumentType.Vector }, Start, Length, Expression)
+			: base(new ScriptNode[] { Vector }, new ArgumentType[] { ArgumentType.Normal }, Start, Length, Expression)
 		{
 		}
 
@@ -34,7 +35,7 @@ namespace Waher.Script.Functions.Vectors
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
 		public Count(ScriptNode Vector, ScriptNode Item, int Start, int Length, Expression Expression)
-			: base(new ScriptNode[] { Vector, Item }, new ArgumentType[] { ArgumentType.Vector, ArgumentType.Scalar }, 
+			: base(new ScriptNode[] { Vector, Item }, new ArgumentType[] { ArgumentType.Normal, ArgumentType.Scalar }, 
 				  Start, Length, Expression)
 		{
 		}
@@ -63,16 +64,22 @@ namespace Waher.Script.Functions.Vectors
 		/// <returns>Function result.</returns>
 		public override IElement Evaluate(IElement[] Arguments, Variables Variables)
 		{
-			if (!(Arguments[0] is IVector v))
-				throw new ScriptRuntimeException("First argument expected to be a vector.", this);
+			ICollection<IElement> ChildElements;
+
+			if (Arguments[0] is IVector v)
+				ChildElements = v.VectorElements;
+			else if (Arguments[0] is ISet S)
+				ChildElements = S.ChildElements;
+			else
+				throw new ScriptRuntimeException("First argument expected to be a vector or a set.", this);
 
 			if (Arguments.Length == 1)
-				return new DoubleNumber(v.Dimension);
+				return new DoubleNumber(ChildElements.Count);
 
 			IElement Item0 = Arguments[1];
 			int Count = 0;
 
-			foreach (IElement Item in v.VectorElements)
+			foreach (IElement Item in ChildElements)
 			{
 				if (Item.Equals(Item0))
 					Count++;

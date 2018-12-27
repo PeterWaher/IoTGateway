@@ -119,5 +119,29 @@ namespace Waher.Script.Operators
 
 			return true;
 		}
+
+		/// <summary>
+		/// <see cref="Object.Equals(object)"/>
+		/// </summary>
+		public override bool Equals(object obj)
+		{
+			return obj is NamedFunctionCall O &&
+				this.functionName.Equals(O.functionName) &&
+				this.nullCheck.Equals(O.nullCheck) &&
+				AreEqual(this.arguments, O.arguments) &&
+				base.Equals(obj);
+		}
+
+		/// <summary>
+		/// <see cref="Object.GetHashCode()"/>
+		/// </summary>
+		public override int GetHashCode()
+		{
+			int Result = base.GetHashCode();
+			Result ^= Result << 5 ^ this.functionName.GetHashCode();
+			Result ^= Result << 5 ^ this.nullCheck.GetHashCode();
+			Result ^= Result << 5 ^ GetHashCode(this.arguments);
+			return Result;
+		}
 	}
 }

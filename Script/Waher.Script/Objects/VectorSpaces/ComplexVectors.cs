@@ -85,8 +85,7 @@ namespace Waher.Script.Objects.VectorSpaces
 		/// <returns>If elements are equal.</returns>
 		public override bool Equals(object obj)
 		{
-			ComplexVectors v = obj as ComplexVectors;
-			return (v != null && v.dimension == this.dimension);
+			return (obj is ComplexVectors v && v.dimension == this.dimension);
 		}
 
 		/// <summary>

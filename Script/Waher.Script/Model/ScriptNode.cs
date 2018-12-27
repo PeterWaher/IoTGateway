@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using Waher.Script.Abstraction.Elements;
@@ -203,6 +204,102 @@ namespace Waher.Script.Model
 			}
 
 			return true;
+		}
+
+		/// <summary>
+		/// <see cref="Object.Equals(object)"/>
+		/// </summary>
+		public override bool Equals(object obj)
+		{
+			return this.GetType() == obj.GetType();
+		}
+
+		/// <summary>
+		/// <see cref="Object.GetHashCode()"/>
+		/// </summary>
+		public override int GetHashCode()
+		{
+			return this.GetType().GetHashCode();
+		}
+
+		/// <summary>
+		/// Compares if two script nodes are equal.
+		/// </summary>
+		/// <param name="S1">Node 1. Can be null.</param>
+		/// <param name="S2">Node 2. Can be null.</param>
+		/// <returns>If the size and contents of the arrays are equal</returns>
+		public static bool AreEqual(ScriptNode S1, ScriptNode S2)
+		{
+			if (S1 is null ^ S2 is null)
+				return false;
+
+			if (!(S1 is null) && !S1.Equals(S2))
+				return false;
+
+			return true;
+		}
+
+		/// <summary>
+		/// Compares if the contents of two enumerable sets are equal
+		/// </summary>
+		/// <param name="A1">Array 1</param>
+		/// <param name="A2">Array 2</param>
+		/// <returns>If the size and contents of the arrays are equal</returns>
+		public static bool AreEqual(IEnumerable A1, IEnumerable A2)
+		{
+			IEnumerator e1 = A1.GetEnumerator();
+			IEnumerator e2 = A2.GetEnumerator();
+
+			while (true)
+			{
+				bool b1 = e1.MoveNext();
+				bool b2 = e2.MoveNext();
+
+				if (b1 ^ b2)
+					return false;
+
+				if (!b1)
+					return true;
+
+				object Item1 = e1.Current;
+				object Item2 = e2.Current;
+
+				if (Item1 is null ^ Item2 is null)
+					return false;
+
+				if (!(Item1 is null) && !Item1.Equals(Item2))
+					return false;
+			}
+		}
+
+		/// <summary>
+		/// Calculates a hash code for the contents of an array.
+		/// </summary>
+		/// <param name="Node">Node. Can be null.</param>
+		/// <returns>Hash code</returns>
+		public static int GetHashCode(ScriptNode Node)
+		{
+			return Node?.GetHashCode() ?? 0;
+		}
+
+		/// <summary>
+		/// Calculates a hash code for the contents of an array.
+		/// </summary>
+		/// <param name="A">Array</param>
+		/// <returns>Hash code</returns>
+		public static int GetHashCode(IEnumerable Set)
+		{
+			int Result = 0;
+
+			foreach (object Item in Set)
+			{
+				if (Item != null)
+					Result ^= Result << 5 ^ Item.GetHashCode();
+				else
+					Result ^= Result << 5;
+			}
+
+			return Result;
 		}
 	}
 }

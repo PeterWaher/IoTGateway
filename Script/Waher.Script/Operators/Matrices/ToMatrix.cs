@@ -25,17 +25,20 @@ namespace Waher.Script.Operators.Matrices
         {
         }
 
-        /// <summary>
-        /// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
-        /// </summary>
-        /// <param name="Variables">Variables collection.</param>
-        /// <returns>Result.</returns>
-        public override IElement Evaluate(Variables Variables)
-        {
-            IElement E = this.op.Evaluate(Variables);
+		/// <summary>
+		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+		/// </summary>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Result.</returns>
+		public override IElement Evaluate(Variables Variables)
+		{
+			return this.ConvertToMatrix(this.op.Evaluate(Variables));
+		}
+
+		private IElement ConvertToMatrix(IElement E)
+		{ 
 			if (this.nullCheck && E.AssociatedObjectValue is null)
 				return E;
-
 
 			if (E is IMatrix)
                 return E;
@@ -51,5 +54,15 @@ namespace Waher.Script.Operators.Matrices
 
             return MatrixDefinition.Encapsulate(new IElement[] { E }, 1, 1, this);
         }
-    }
+
+		/// <summary>
+		/// Performs a pattern match operation.
+		/// </summary>
+		/// <param name="CheckAgainst">Value to check against.</param>
+		/// <param name="AlreadyFound">Variables already identified.</param>
+		public override void PatternMatch(IElement CheckAgainst, Dictionary<string, IElement> AlreadyFound)
+		{
+			this.op.PatternMatch(this.ConvertToMatrix(CheckAgainst), AlreadyFound);
+		}
+	}
 }

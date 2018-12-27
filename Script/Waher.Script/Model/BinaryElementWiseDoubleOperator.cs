@@ -35,10 +35,9 @@ namespace Waher.Script.Model
 		{
 			IElement L = this.left.Evaluate(Variables);
 			IElement R = this.right.Evaluate(Variables);
-			DoubleNumber DL = L as DoubleNumber;
 			DoubleNumber DR = R as DoubleNumber;
 
-			if (DL != null && DR != null)
+			if (L is DoubleNumber DL && DR != null)
 				return this.Evaluate(DL.Value, DR.Value);
 			else
 				return this.Evaluate(L, R, Variables);

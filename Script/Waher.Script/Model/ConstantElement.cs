@@ -69,5 +69,25 @@ namespace Waher.Script.Model
 		/// Default variable name, if any, null otherwise.
 		/// </summary>
 		public string DefaultVariableName => null;
+
+		/// <summary>
+		/// <see cref="object.Equals(object)"/>
+		/// </summary>
+		public override bool Equals(object obj)
+		{
+			return obj is ConstantElement O &&
+				this.constant.Equals(O.constant) &&
+				base.Equals(obj);
+		}
+
+		/// <summary>
+		/// <see cref="object.GetHashCode()"/>
+		/// </summary>
+		public override int GetHashCode()
+		{
+			int Result = base.GetHashCode();
+			Result ^= Result << 5 ^ this.constant.GetHashCode();
+			return Result;
+		}
 	}
 }

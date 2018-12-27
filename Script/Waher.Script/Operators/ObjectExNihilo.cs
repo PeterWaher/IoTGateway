@@ -40,13 +40,13 @@ namespace Waher.Script.Operators
 		/// <returns>Result.</returns>
 		public override IElement Evaluate(Variables Variables)
 		{
-            Dictionary<string, IElement> Result = new Dictionary<string, IElement>();
+			Dictionary<string, IElement> Result = new Dictionary<string, IElement>();
 
-            foreach (KeyValuePair<string, ScriptNode> P in this.members)
-                Result[P.Key] = P.Value.Evaluate(Variables);
+			foreach (KeyValuePair<string, ScriptNode> P in this.members)
+				Result[P.Key] = P.Value.Evaluate(Variables);
 
-            return new ObjectValue(Result);
-        }
+			return new ObjectValue(Result);
+		}
 
 		/// <summary>
 		/// Calls the callback method for all child nodes.
@@ -101,6 +101,55 @@ namespace Waher.Script.Operators
 			}
 
 			return true;
+		}
+
+		/// <summary>
+		/// <see cref="object.Equals(object)"/>
+		/// </summary>
+		public override bool Equals(object obj)
+		{
+			if (!(obj is ObjectExNihilo O) || !base.Equals(obj))
+				return false;
+
+			LinkedList<KeyValuePair<string, ScriptNode>>.Enumerator e1 = this.members.GetEnumerator();
+			LinkedList<KeyValuePair<string, ScriptNode>>.Enumerator e2 = O.members.GetEnumerator();
+
+			while (true)
+			{
+				bool b1 = e1.MoveNext();
+				bool b2 = e2.MoveNext();
+
+				if (b1 ^ b2)
+					return false;
+
+				if (!b1)
+					return true;
+
+				KeyValuePair<string, ScriptNode> Item1 = e1.Current;
+				KeyValuePair<string, ScriptNode> Item2 = e2.Current;
+
+				if (!Item1.Key.Equals(Item2.Key) ||
+					!Item1.Value.Equals(Item2.Value))
+				{
+					return false;
+				}
+			}
+		}
+
+		/// <summary>
+		/// <see cref="object.GetHashCode()"/>
+		/// </summary>
+		public override int GetHashCode()
+		{
+			int Result = base.GetHashCode();
+
+			foreach (KeyValuePair<string, ScriptNode> P in this.members)
+			{
+				Result ^= Result << 5 ^ P.Key.GetHashCode();
+				Result ^= Result << 5 ^ P.Value.GetHashCode();
+			}
+
+			return Result;
 		}
 
 	}

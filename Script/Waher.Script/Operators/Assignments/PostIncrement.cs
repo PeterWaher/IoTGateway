@@ -11,10 +11,8 @@ namespace Waher.Script.Operators.Assignments
 	/// <summary>
 	/// Post-Increment operator.
 	/// </summary>
-	public class PostIncrement : ScriptLeafNode
+	public class PostIncrement : ScriptLeafNodeVariableReference
 	{
-		private readonly string variableName;
-		
 		/// <summary>
 		/// Post-Increment operator.
 		/// </summary>
@@ -23,17 +21,8 @@ namespace Waher.Script.Operators.Assignments
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
 		public PostIncrement(string VariableName, int Start, int Length, Expression Expression)
-			: base(Start, Length, Expression)
+			: base(VariableName, Start, Length, Expression)
 		{
-			this.variableName = VariableName;
-		}
-
-		/// <summary>
-		/// Name of variable
-		/// </summary>
-		public string VariableName
-		{
-			get { return this.variableName; }
 		}
 
 		/// <summary>

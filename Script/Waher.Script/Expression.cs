@@ -2285,6 +2285,13 @@ namespace Waher.Script
 					case '[':
 						this.pos++;
 						Right = this.ParseList();
+
+						this.SkipWhiteSpace();
+						if (this.PeekNextChar() != ']')
+							throw new SyntaxException("Expected ].", this.pos, this.script);
+
+						this.pos++;
+
 						if (Right is null)
 							Node = new ToVector(Node, NullCheck, Start, this.pos - Start, this);
 						else if (Right.GetType() == typeof(ElementList))
@@ -2310,12 +2317,6 @@ namespace Waher.Script
 						}
 						else
 							Node = new VectorIndex(Node, Right, NullCheck, Start, this.pos - Start, this);
-
-						this.SkipWhiteSpace();
-						if (this.PeekNextChar() != ']')
-							throw new SyntaxException("Expected ].", this.pos, this.script);
-
-						this.pos++;
 						break;
 
 					case '{':
@@ -3328,32 +3329,15 @@ namespace Waher.Script
 				this.SkipWhiteSpace();
 				if ((ch = this.PeekNextChar()) == ':')
 				{
-					LinkedList<KeyValuePair<string, ScriptNode>> Members = new LinkedList<KeyValuePair<string, ScriptNode>>();
-					Dictionary<string, bool> MembersFound = new Dictionary<string, bool>();
-					ConstantElement ConstantElement;
-					StringValue StringValue;
-					string s;
-
-					if (Node is VariableReference)
-						s = ((VariableReference)Node).VariableName;
-					else if ((ConstantElement = Node as ConstantElement) != null && (StringValue = ConstantElement.Constant as StringValue) != null)
-						s = StringValue.Value;
-					else
-						throw new SyntaxException("Expected a variable reference or a string constant.", this.pos, this.script);
-
 					this.pos++;
-					MembersFound[s] = true;
-					Members.AddLast(new KeyValuePair<string, ScriptNode>(s, this.ParseLambdaExpression()));
 
-					this.SkipWhiteSpace();
-					while ((ch = this.PeekNextChar()) == ',')
+					if (Node is VariableReference || Node is ConstantElement)
 					{
-						this.pos++;
-						Node = this.ParseStatement();
-
-						this.SkipWhiteSpace();
-						if (this.PeekNextChar() != ':')
-							throw new SyntaxException("Expected :.", this.pos, this.script);
+						LinkedList<KeyValuePair<string, ScriptNode>> Members = new LinkedList<KeyValuePair<string, ScriptNode>>();
+						Dictionary<string, bool> MembersFound = new Dictionary<string, bool>();
+						ConstantElement ConstantElement;
+						StringValue StringValue;
+						string s;
 
 						if (Node is VariableReference)
 							s = ((VariableReference)Node).VariableName;
@@ -3362,21 +3346,61 @@ namespace Waher.Script
 						else
 							throw new SyntaxException("Expected a variable reference or a string constant.", this.pos, this.script);
 
-						if (MembersFound.ContainsKey(s))
-							throw new SyntaxException("Member already defined.", this.pos, this.script);
-
-						this.pos++;
 						MembersFound[s] = true;
 						Members.AddLast(new KeyValuePair<string, ScriptNode>(s, this.ParseLambdaExpression()));
 
 						this.SkipWhiteSpace();
+						while ((ch = this.PeekNextChar()) == ',')
+						{
+							this.pos++;
+							Node = this.ParseStatement();
+
+							this.SkipWhiteSpace();
+							if (this.PeekNextChar() != ':')
+								throw new SyntaxException("Expected :.", this.pos, this.script);
+
+							if (Node is VariableReference)
+								s = ((VariableReference)Node).VariableName;
+							else if ((ConstantElement = Node as ConstantElement) != null && (StringValue = ConstantElement.Constant as StringValue) != null)
+								s = StringValue.Value;
+							else
+								throw new SyntaxException("Expected a variable reference or a string constant.", this.pos, this.script);
+
+							if (MembersFound.ContainsKey(s))
+								throw new SyntaxException("Member already defined.", this.pos, this.script);
+
+							this.pos++;
+							MembersFound[s] = true;
+							Members.AddLast(new KeyValuePair<string, ScriptNode>(s, this.ParseLambdaExpression()));
+
+							this.SkipWhiteSpace();
+						}
+
+						if (ch != '}')
+							throw new SyntaxException("Expected }.", this.pos, this.script);
+
+						this.pos++;
+						return new ObjectExNihilo(Members, Start, this.pos - Start, this);
 					}
 
-					if (ch != '}')
+					ScriptNode Condition = this.ParseStatement();
+					ScriptNode SuperSet;
+
+					if (Node is In In)
+					{
+						SuperSet = In.RightOperand;
+						Node = In.LeftOperand;
+					}
+					else
+						SuperSet = null;
+
+					this.SkipWhiteSpace();
+					if (this.PeekNextChar()!='}')
 						throw new SyntaxException("Expected }.", this.pos, this.script);
 
 					this.pos++;
-					return new ObjectExNihilo(Members, Start, this.pos - Start, this);
+
+					return new ImplicitSubSet(Node, SuperSet, Condition, Start, this.pos - Start, this);
 				}
 
 				if (ch != '}')
@@ -4577,9 +4601,6 @@ namespace Waher.Script
 			Reverse
 			Slice
 			Sort
-
-			Sets:
-			Subset
 
 		*/
 	}

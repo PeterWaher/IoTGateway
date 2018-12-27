@@ -32,10 +32,16 @@ namespace Waher.Script.Operators.Sets
 		/// <returns>Result.</returns>
 		public override IElement Evaluate(Variables Variables)
 		{
-            IElement E = this.op.Evaluate(Variables);
+			return this.ConvertToSet(this.op.Evaluate(Variables));
+		}
 
-            if (E is ISet)
-                return E;
+		private IElement ConvertToSet(IElement E)
+		{
+			if (this.nullCheck && E.AssociatedObjectValue is null)
+				return E;
+
+			if (E is ISet)
+				return E;
 
 			if (E is IVector V)
 				return SetDefinition.Encapsulate(V.VectorElements, this);
@@ -44,6 +50,16 @@ namespace Waher.Script.Operators.Sets
 				return E;
 
 			return SetDefinition.Encapsulate(new IElement[] { E }, this);
-        }
-    }
+		}
+
+		/// <summary>
+		/// Performs a pattern match operation.
+		/// </summary>
+		/// <param name="CheckAgainst">Value to check against.</param>
+		/// <param name="AlreadyFound">Variables already identified.</param>
+		public override void PatternMatch(IElement CheckAgainst, Dictionary<string, IElement> AlreadyFound)
+		{
+			this.op.PatternMatch(this.ConvertToSet(CheckAgainst), AlreadyFound);
+		}
+	}
 }

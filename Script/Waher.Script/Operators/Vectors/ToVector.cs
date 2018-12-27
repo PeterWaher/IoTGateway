@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
+using Waher.Script.Exceptions;
 using Waher.Script.Model;
 
 namespace Waher.Script.Operators.Vectors
@@ -32,10 +33,16 @@ namespace Waher.Script.Operators.Vectors
 		/// <returns>Result.</returns>
 		public override IElement Evaluate(Variables Variables)
 		{
-            IElement E = this.op.Evaluate(Variables);
+			return ConvertToVector(this.op.Evaluate(Variables));
+        }
 
-            if (E is IVectorSpaceElement)
-                return E;
+		private IElement ConvertToVector(IElement E)
+		{
+			if (this.nullCheck && E.AssociatedObjectValue is null)
+				return E;
+
+			if (E is IVectorSpaceElement)
+				return E;
 
 			if (E is IVector V)
 				return VectorDefinition.Encapsulate(V.VectorElements, false, this);
@@ -47,6 +54,17 @@ namespace Waher.Script.Operators.Vectors
 				return E;
 
 			return VectorDefinition.Encapsulate(new IElement[] { E }, false, this);
-        }
-    }
+		}
+
+		/// <summary>
+		/// Performs a pattern match operation.
+		/// </summary>
+		/// <param name="CheckAgainst">Value to check against.</param>
+		/// <param name="AlreadyFound">Variables already identified.</param>
+		public override void PatternMatch(IElement CheckAgainst, Dictionary<string, IElement> AlreadyFound)
+		{
+			this.op.PatternMatch(this.ConvertToVector(CheckAgainst), AlreadyFound);
+		}
+
+	}
 }

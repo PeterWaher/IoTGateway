@@ -68,8 +68,7 @@ namespace Waher.Script.Objects.VectorSpaces
 		/// <returns>If elements are equal.</returns>
 		public override bool Equals(object obj)
 		{
-			DateTimeVectors v = obj as DateTimeVectors;
-			return (v != null && v.dimension == this.dimension);
+			return (obj is DateTimeVectors v && v.dimension == this.dimension);
 		}
 
 		/// <summary>

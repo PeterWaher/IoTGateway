@@ -12,8 +12,8 @@ namespace Waher.Script.Objects.VectorSpaces
 	/// </summary>
 	public sealed class ObjectVectors : VectorSpace
 	{
-		private ObjectVector referenceVector;
-		private int dimension;
+		private readonly ObjectVector referenceVector;
+		private readonly int dimension;
 
 		/// <summary>
 		/// Pseudo-vector space of Object-valued vectors.
@@ -128,8 +128,7 @@ namespace Waher.Script.Objects.VectorSpaces
 		/// <returns>If elements are equal.</returns>
 		public override bool Equals(object obj)
 		{
-			ObjectVectors v = obj as ObjectVectors;
-			return (v != null && v.dimension == this.dimension);
+			return (obj is ObjectVectors v && v.dimension == this.dimension);
 		}
 
 		/// <summary>

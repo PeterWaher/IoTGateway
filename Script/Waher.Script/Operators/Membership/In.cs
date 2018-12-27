@@ -48,65 +48,64 @@ namespace Waher.Script.Operators.Membership
         /// <returns>Result</returns>
         public virtual IElement Evaluate(IElement Left, IElement Right)
         {
-            ISet Set;
-            if ((Set = Right as ISet) != null)
-                return this.Evaluate(Left, Set);
-            else if (Right.IsScalar)
-                throw new ScriptRuntimeException("Right operand in an IN operation must be a set.", this);
-            else
-            {
-                if (Left.IsScalar)
-                {
-                    LinkedList<IElement> Elements = new LinkedList<IElement>();
+			if (Right is ISet Set)
+				return this.Evaluate(Left, Set);
+			else if (Right.IsScalar)
+				throw new ScriptRuntimeException("Right operand in an IN operation must be a set.", this);
+			else
+			{
+				if (Left.IsScalar)
+				{
+					LinkedList<IElement> Elements = new LinkedList<IElement>();
 
-                    foreach (IElement E in Right.ChildElements)
-                        Elements.AddLast(this.Evaluate(Left, E));
+					foreach (IElement E in Right.ChildElements)
+						Elements.AddLast(this.Evaluate(Left, E));
 
-                    return Right.Encapsulate(Elements, this);
-                }
-                else
-                {
-                    ICollection<IElement> LeftChildren = Left.ChildElements;
-                    ICollection<IElement> RightChildren = Right.ChildElements;
+					return Right.Encapsulate(Elements, this);
+				}
+				else
+				{
+					ICollection<IElement> LeftChildren = Left.ChildElements;
+					ICollection<IElement> RightChildren = Right.ChildElements;
 
-                    if (LeftChildren.Count == RightChildren.Count)
-                    {
-                        LinkedList<IElement> Elements = new LinkedList<IElement>();
-                        IEnumerator<IElement> eLeft = LeftChildren.GetEnumerator();
-                        IEnumerator<IElement> eRight = RightChildren.GetEnumerator();
+					if (LeftChildren.Count == RightChildren.Count)
+					{
+						LinkedList<IElement> Elements = new LinkedList<IElement>();
+						IEnumerator<IElement> eLeft = LeftChildren.GetEnumerator();
+						IEnumerator<IElement> eRight = RightChildren.GetEnumerator();
 
-                        try
-                        {
-                            while (eLeft.MoveNext() && eRight.MoveNext())
-                                Elements.AddLast(this.Evaluate(eLeft.Current, eRight.Current));
-                        }
-                        finally
-                        {
-                            eLeft.Dispose();
-                            eRight.Dispose();
-                        }
+						try
+						{
+							while (eLeft.MoveNext() && eRight.MoveNext())
+								Elements.AddLast(this.Evaluate(eLeft.Current, eRight.Current));
+						}
+						finally
+						{
+							eLeft.Dispose();
+							eRight.Dispose();
+						}
 
-                        return Left.Encapsulate(Elements, this);
-                    }
-                    else
-                    {
-                        LinkedList<IElement> LeftResult = new LinkedList<IElement>();
+						return Left.Encapsulate(Elements, this);
+					}
+					else
+					{
+						LinkedList<IElement> LeftResult = new LinkedList<IElement>();
 
-                        foreach (IElement LeftChild in LeftChildren)
-                        {
-                            LinkedList<IElement> RightResult = new LinkedList<IElement>();
+						foreach (IElement LeftChild in LeftChildren)
+						{
+							LinkedList<IElement> RightResult = new LinkedList<IElement>();
 
-                            foreach (IElement RightChild in RightChildren)
-                                RightResult.AddLast(this.Evaluate(LeftChild, RightChild));
+							foreach (IElement RightChild in RightChildren)
+								RightResult.AddLast(this.Evaluate(LeftChild, RightChild));
 
-                            LeftResult.AddLast(Right.Encapsulate(RightResult, this));
-                        }
+							LeftResult.AddLast(Right.Encapsulate(RightResult, this));
+						}
 
-                        return Left.Encapsulate(LeftResult, this);
-                    }
-                }
-            }
-        }
+						return Left.Encapsulate(LeftResult, this);
+					}
+				}
+			}
+		}
 
         /// <summary>
         /// Evaluates the operator.

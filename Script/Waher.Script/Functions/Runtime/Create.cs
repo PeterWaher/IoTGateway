@@ -456,5 +456,27 @@ namespace Waher.Script.Functions.Runtime
         private ParameterInfo[] constructorParametersTypes = null;
         private object[] constructorArguments = null;
         private readonly object synchObject = new object();
-    }
+
+		/// <summary>
+		/// <see cref="Object.Equals(object)"/>
+		/// </summary>
+		public override bool Equals(object obj)
+		{
+			return obj is Create O &&
+				this.type.Equals(O.type) &&
+				AreEqual(this.parameters, O.parameters) &&
+				base.Equals(obj);
+		}
+
+		/// <summary>
+		/// <see cref="Object.GetHashCode()"/>
+		/// </summary>
+		public override int GetHashCode()
+		{
+			int Result = base.GetHashCode();
+			Result ^= Result << 5 ^ this.type.GetHashCode();
+			Result ^= Result << 5 ^ GetHashCode(this.parameters);
+			return Result;
+		}
+	}
 }

@@ -79,8 +79,7 @@ namespace Waher.Script.Objects.Matrices
 		/// <returns>If elements are equal.</returns>
 		public override bool Equals(object obj)
 		{
-			ObjectMatrices S = obj as ObjectMatrices;
-			return (S != null && S.rows == this.rows && S.columns == this.columns);
+			return (obj is ObjectMatrices S && S.rows == this.rows && S.columns == this.columns);
 		}
 
 		/// <summary>

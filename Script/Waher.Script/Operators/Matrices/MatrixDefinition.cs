@@ -197,22 +197,21 @@ namespace Waher.Script.Operators.Matrices
             if (Matrix is null || Matrix.Rows != c)
                 throw new ScriptRuntimeException("Pattern mismatch.", this);
 
-            IVector RowVectors = Matrix as IVector;
-            int i;
+			int i;
 
-            if (RowVectors != null)
-            {
-                i = 0;
+			if (Matrix is IVector RowVectors)
+			{
+				i = 0;
 
-                foreach (IElement E in RowVectors.VectorElements)
-                    Elements[i++].PatternMatch(E, AlreadyFound);
-            }
-            else
-            {
-                for (i = 0; i < c; i++)
-                    Elements[i].PatternMatch(Matrix.GetRow(i), AlreadyFound);
-            }
-        }
+				foreach (IElement E in RowVectors.VectorElements)
+					Elements[i++].PatternMatch(E, AlreadyFound);
+			}
+			else
+			{
+				for (i = 0; i < c; i++)
+					Elements[i].PatternMatch(Matrix.GetRow(i), AlreadyFound);
+			}
+		}
 
     }
 }

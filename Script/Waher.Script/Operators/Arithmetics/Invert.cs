@@ -37,8 +37,7 @@ namespace Waher.Script.Operators.Arithmetics
 
 		private IElement Evaluate(IElement Element)
 		{
-			IRingElement E = Element as IRingElement;
-			if (E != null)
+			if (Element is IRingElement E)
 			{
 				E = E.Invert();
 				if (E is null)

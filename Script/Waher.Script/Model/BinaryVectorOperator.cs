@@ -47,10 +47,9 @@ namespace Waher.Script.Model
 		/// <returns>Result</returns>
 		public virtual IElement Evaluate(IElement Left, IElement Right)
 		{
-			IVector VL;
 			IVector VR;
 
-			if ((VL = Left as IVector) != null)
+			if (Left is IVector VL)
 			{
 				if ((VR = Right as IVector) != null)
 				{

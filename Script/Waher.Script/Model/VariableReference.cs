@@ -11,9 +11,8 @@ namespace Waher.Script.Model
 	/// <summary>
 	/// Represents a variable reference.
 	/// </summary>
-	public sealed class VariableReference : ScriptLeafNode, IDifferentiable
+	public sealed class VariableReference : ScriptLeafNodeVariableReference, IDifferentiable
 	{
-		private readonly string variableName;
 		private readonly bool onlyVariables;
 
 		/// <summary>
@@ -24,9 +23,8 @@ namespace Waher.Script.Model
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
 		public VariableReference(string VariableName, int Start, int Length, Expression Expression)
-			: base(Start, Length, Expression)
+			: base(VariableName, Start, Length, Expression)
 		{
-			this.variableName = VariableName;
 			this.onlyVariables = false;
 		}
 
@@ -40,18 +38,9 @@ namespace Waher.Script.Model
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
 		public VariableReference(string VariableName, bool OnlyVariables, int Start, int Length, Expression Expression)
-			: base(Start, Length, Expression)
+			: base(VariableName, Start, Length, Expression)
 		{
-			this.variableName = VariableName;
 			this.onlyVariables = OnlyVariables;
-		}
-
-		/// <summary>
-		/// Variable Name.
-		/// </summary>
-		public string VariableName
-		{
-			get { return this.variableName; }
 		}
 
 		/// <summary>
@@ -143,6 +132,26 @@ namespace Waher.Script.Model
 		/// Default variable name, if any, null otherwise.
 		/// </summary>
 		public string DefaultVariableName => this.variableName;
+
+		/// <summary>
+		/// <see cref="Object.Equals(object)"/>
+		/// </summary>
+		public override bool Equals(object obj)
+		{
+			return obj is VariableReference O &&
+				this.onlyVariables.Equals(O.onlyVariables) &&
+				base.Equals(obj);
+		}
+
+		/// <summary>
+		/// <see cref="Object.GetHashCode()"/>
+		/// </summary>
+		public override int GetHashCode()
+		{
+			int Result = base.GetHashCode();
+			Result ^= Result << 5 ^ this.onlyVariables.GetHashCode();
+			return Result;
+		}
 
 	}
 }

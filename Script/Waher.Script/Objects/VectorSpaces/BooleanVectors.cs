@@ -76,8 +76,7 @@ namespace Waher.Script.Objects.VectorSpaces
 		/// <returns>If elements are equal.</returns>
 		public override bool Equals(object obj)
 		{
-			BooleanVectors v = obj as BooleanVectors;
-			return (v != null && v.dimension == this.dimension);
+			return (obj is BooleanVectors v && v.dimension == this.dimension);
 		}
 
 		/// <summary>

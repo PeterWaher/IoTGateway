@@ -67,7 +67,7 @@ namespace Waher.Script.Objects.Sets
             int i = 0;
 
             foreach (IElement E in this.elements.Keys)
-                i ^= E.GetHashCode();
+				i ^= i << 5 ^ E.GetHashCode();
 
             return i;
         }

@@ -2608,7 +2608,7 @@
           "Waher.Content.Xml": "1.0.5",
           "Waher.Runtime.Cache": "1.0.2",
           "Waher.Script": "1.0.25",
-          "Waher.Script.Graphs": "1.0.10"
+          "Waher.Script.Graphs": "1.0.11"
         }
       },
       "Waher.Content.Xml/1.0.5": {
@@ -2851,7 +2851,7 @@
           "Waher.Runtime.Inventory": "1.0.7"
         }
       },
-      "Waher.Script.Graphs/1.0.10": {
+      "Waher.Script.Graphs/1.0.11": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -5438,7 +5438,7 @@
           "Waher.Content.Xml": "1.0.5",
           "Waher.Runtime.Cache": "1.0.2",
           "Waher.Script": "1.0.25",
-          "Waher.Script.Graphs": "1.0.10"
+          "Waher.Script.Graphs": "1.0.11"
         }
       },
       "Waher.Content.Xml/1.0.5": {
@@ -5681,7 +5681,7 @@
           "Waher.Runtime.Inventory": "1.0.7"
         }
       },
-      "Waher.Script.Graphs/1.0.10": {
+      "Waher.Script.Graphs/1.0.11": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -8304,7 +8304,7 @@
           "Waher.Content.Xml": "1.0.5",
           "Waher.Runtime.Cache": "1.0.2",
           "Waher.Script": "1.0.25",
-          "Waher.Script.Graphs": "1.0.10"
+          "Waher.Script.Graphs": "1.0.11"
         }
       },
       "Waher.Content.Xml/1.0.5": {
@@ -8547,7 +8547,7 @@
           "Waher.Runtime.Inventory": "1.0.7"
         }
       },
-      "Waher.Script.Graphs/1.0.10": {
+      "Waher.Script.Graphs/1.0.11": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -11143,7 +11143,7 @@
           "Waher.Content.Xml": "1.0.5",
           "Waher.Runtime.Cache": "1.0.2",
           "Waher.Script": "1.0.25",
-          "Waher.Script.Graphs": "1.0.10"
+          "Waher.Script.Graphs": "1.0.11"
         }
       },
       "Waher.Content.Xml/1.0.5": {
@@ -11386,7 +11386,7 @@
           "Waher.Runtime.Inventory": "1.0.7"
         }
       },
-      "Waher.Script.Graphs/1.0.10": {
+      "Waher.Script.Graphs/1.0.11": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -14018,7 +14018,7 @@
           "Waher.Content.Xml": "1.0.5",
           "Waher.Runtime.Cache": "1.0.2",
           "Waher.Script": "1.0.25",
-          "Waher.Script.Graphs": "1.0.10"
+          "Waher.Script.Graphs": "1.0.11"
         }
       },
       "Waher.Content.Xml/1.0.5": {
@@ -14261,7 +14261,7 @@
           "Waher.Runtime.Inventory": "1.0.7"
         }
       },
-      "Waher.Script.Graphs/1.0.10": {
+      "Waher.Script.Graphs/1.0.11": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -16857,7 +16857,7 @@
           "Waher.Content.Xml": "1.0.5",
           "Waher.Runtime.Cache": "1.0.2",
           "Waher.Script": "1.0.25",
-          "Waher.Script.Graphs": "1.0.10"
+          "Waher.Script.Graphs": "1.0.11"
         }
       },
       "Waher.Content.Xml/1.0.5": {
@@ -17100,7 +17100,7 @@
           "Waher.Runtime.Inventory": "1.0.7"
         }
       },
-      "Waher.Script.Graphs/1.0.10": {
+      "Waher.Script.Graphs/1.0.11": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -19732,7 +19732,7 @@
           "Waher.Content.Xml": "1.0.5",
           "Waher.Runtime.Cache": "1.0.2",
           "Waher.Script": "1.0.25",
-          "Waher.Script.Graphs": "1.0.10"
+          "Waher.Script.Graphs": "1.0.11"
         }
       },
       "Waher.Content.Xml/1.0.5": {
@@ -19975,7 +19975,7 @@
           "Waher.Runtime.Inventory": "1.0.7"
         }
       },
-      "Waher.Script.Graphs/1.0.10": {
+      "Waher.Script.Graphs/1.0.11": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -30000,7 +30000,7 @@
       "path": "../../Script/Waher.Script/Waher.Script.csproj",
       "msbuildProject": "../../Script/Waher.Script/Waher.Script.csproj"
     },
-    "Waher.Script.Graphs/1.0.10": {
+    "Waher.Script.Graphs/1.0.11": {
       "type": "project",
       "path": "../../Script/Waher.Script.Graphs/Waher.Script.Graphs.csproj",
       "msbuildProject": "../../Script/Waher.Script.Graphs/Waher.Script.Graphs.csproj"

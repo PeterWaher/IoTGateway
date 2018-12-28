@@ -3257,62 +3257,94 @@ namespace Waher.Script
 				Node = this.ParseStatement();
 
 				this.SkipWhiteSpace();
-				if (this.PeekNextChar() != ']')
-					throw new SyntaxException("Expected ].", this.pos, this.script);
+				switch (this.PeekNextChar())
+				{
+					case ']':
+						this.pos++;
 
-				this.pos++;
-
-				if (Node is For For)
-				{
-					if (IsVectorDefinition(For.RightOperand))
-						return new MatrixForDefinition(For, Start, this.pos - Start, this);
-					else
-						return new VectorForDefinition(For, Start, this.pos - Start, this);
-				}
-				else if (Node is ForEach ForEach)
-				{
-					if (IsVectorDefinition(ForEach.RightOperand))
-						return new MatrixForEachDefinition(ForEach, Start, this.pos - Start, this);
-					else
-						return new VectorForEachDefinition(ForEach, Start, this.pos - Start, this);
-				}
-				else if (Node is DoWhile DoWhile)
-				{
-					if (IsVectorDefinition(DoWhile.LeftOperand))
-						return new MatrixDoWhileDefinition(DoWhile, Start, this.pos - Start, this);
-					else
-						return new VectorDoWhileDefinition(DoWhile, Start, this.pos - Start, this);
-				}
-				else if (Node is WhileDo WhileDo)
-				{
-					if (IsVectorDefinition(WhileDo.RightOperand))
-						return new MatrixWhileDoDefinition(WhileDo, Start, this.pos - Start, this);
-					else
-						return new VectorWhileDoDefinition(WhileDo, Start, this.pos - Start, this);
-				}
-				else if (Node.GetType() == typeof(ElementList))
-				{
-					ElementList ElementList = (ElementList)Node;
-					bool AllVectors = true;
-
-					foreach (ScriptNode Element in ElementList.Elements)
-					{
-						if (!IsVectorDefinition(Element))
+						if (Node is For For)
 						{
-							AllVectors = false;
-							break;
+							if (IsVectorDefinition(For.RightOperand))
+								return new MatrixForDefinition(For, Start, this.pos - Start, this);
+							else
+								return new VectorForDefinition(For, Start, this.pos - Start, this);
 						}
-					}
+						else if (Node is ForEach ForEach)
+						{
+							if (IsVectorDefinition(ForEach.RightOperand))
+								return new MatrixForEachDefinition(ForEach, Start, this.pos - Start, this);
+							else
+								return new VectorForEachDefinition(ForEach, Start, this.pos - Start, this);
+						}
+						else if (Node is DoWhile DoWhile)
+						{
+							if (IsVectorDefinition(DoWhile.LeftOperand))
+								return new MatrixDoWhileDefinition(DoWhile, Start, this.pos - Start, this);
+							else
+								return new VectorDoWhileDefinition(DoWhile, Start, this.pos - Start, this);
+						}
+						else if (Node is WhileDo WhileDo)
+						{
+							if (IsVectorDefinition(WhileDo.RightOperand))
+								return new MatrixWhileDoDefinition(WhileDo, Start, this.pos - Start, this);
+							else
+								return new VectorWhileDoDefinition(WhileDo, Start, this.pos - Start, this);
+						}
+						else if (Node.GetType() == typeof(ElementList))
+						{
+							ElementList ElementList = (ElementList)Node;
+							bool AllVectors = true;
 
-					if (AllVectors)
-						return new MatrixDefinition(((ElementList)Node).Elements, Start, this.pos - Start, this);
-					else
-						return new VectorDefinition(((ElementList)Node).Elements, Start, this.pos - Start, this);
+							foreach (ScriptNode Element in ElementList.Elements)
+							{
+								if (!IsVectorDefinition(Element))
+								{
+									AllVectors = false;
+									break;
+								}
+							}
+
+							if (AllVectors)
+								return new MatrixDefinition(((ElementList)Node).Elements, Start, this.pos - Start, this);
+							else
+								return new VectorDefinition(((ElementList)Node).Elements, Start, this.pos - Start, this);
+						}
+						else if (IsVectorDefinition(Node))
+							return new MatrixDefinition(new ScriptNode[] { Node }, Start, this.pos - Start, this);
+						else
+							return new VectorDefinition(new ScriptNode[] { Node }, Start, this.pos - Start, this);
+
+					case ':':
+						this.pos++;
+
+						ScriptNode Temp = this.ParseList();
+						ScriptNode[] Conditions;
+						ScriptNode SuperSet;
+
+						if (Temp is ElementList List)
+							Conditions = List.Elements;
+						else
+							Conditions = new ScriptNode[] { Temp };
+
+						if (Node is In In && !(Node is NotIn))
+						{
+							SuperSet = In.RightOperand;
+							Node = In.LeftOperand;
+						}
+						else
+							SuperSet = null;
+
+						this.SkipWhiteSpace();
+						if (this.PeekNextChar() != ']')
+							throw new SyntaxException("Expected ].", this.pos, this.script);
+
+						this.pos++;
+
+						return new ImplicitVectorDefinition(Node, SuperSet, Conditions, Start, this.pos - Start, this);
+
+					default:
+						throw new SyntaxException("Expected ] or :.", this.pos, this.script);
 				}
-				else if (IsVectorDefinition(Node))
-					return new MatrixDefinition(new ScriptNode[] { Node }, Start, this.pos - Start, this);
-				else
-					return new VectorDefinition(new ScriptNode[] { Node }, Start, this.pos - Start, this);
 			}
 			else if (ch == '{')
 			{

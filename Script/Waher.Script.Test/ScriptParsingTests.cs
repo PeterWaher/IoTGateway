@@ -381,7 +381,7 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public void Parsing_Test_34_Subsets()
+		public void Parsing_Test_34_ImplicitSetNotation()
 		{
 			this.Test("S:={x in Z:x>10}");
 			this.Test("S2:={x in S:x<20}");
@@ -393,6 +393,23 @@ namespace Waher.Script.Test
 			this.Test("S:={s{}:count(s)>3}");
 			this.Test("S:={M[,]:M.Columns>M.Rows}");
 			this.Test("S:={x::x>\"Hello\"}");
+			this.Test("v:=[1,2,3,4,5,6,7,8,9,10];{x in v:x>5}");
+		}
+
+		[TestMethod]
+		public void Parsing_Test_35_ImplicitVectorNotation()
+		{
+			this.Test("v:=[1,2,3,4,5,6,7,8,9,10];[x in v:x>5]");
+			this.Test("v:=1..100;[x in v:floor(sqrt(x))^2=x]");
+			this.Test("X:=1..10;P:=[x^2:x in X]");
+		}
+
+		[TestMethod]
+		public void Parsing_Test_36_ImplicitMatrixNotation()
+		{
+			this.Test("v:=1..100;[[x,y]:x in v,(y:=floor(sqrt(x)))^2=x]");
+			this.Test("X:=1..10;Y:=20..30;P:=[[x,y]:x in X, y in Y]");
+			this.Test("M:=Identity(5);[Reverse(Row):Row in M]");
 		}
 
 	}

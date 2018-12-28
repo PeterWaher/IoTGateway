@@ -5,6 +5,7 @@ using Waher.Script.Abstraction.Sets;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Objects.Sets;
+using Waher.Script.Operators.Membership;
 
 namespace Waher.Script.Operators.Sets
 {
@@ -13,7 +14,8 @@ namespace Waher.Script.Operators.Sets
 	/// </summary>
 	public class ImplicitSetDefinition : BinaryOperator
 	{
-		private readonly ScriptNode[] conditions;
+		private readonly In[] setConditions;
+		private readonly ScriptNode[] otherConditions;
 		private readonly bool doubleColon;
 
 		/// <summary>
@@ -30,8 +32,62 @@ namespace Waher.Script.Operators.Sets
 			int Start, int Length, Expression Expression)
 			: base(Pattern, SuperSet, Start, Length, Expression)
 		{
-			this.conditions = Conditions;
 			this.doubleColon = DoubleColon;
+
+			SeparateConditions(Conditions, out this.setConditions, out this.otherConditions);
+		}
+
+		/// <summary>
+		/// Separates conditions into set membership conditions and other types of conditions.
+		/// </summary>
+		/// <param name="Conditions">Conditions</param>
+		/// <param name="SetConditions">Set membership conditions. Can be set to null, if none found.</param>
+		/// <param name="OtherConditions">Other conditions</param>
+		public static void SeparateConditions(ScriptNode[] Conditions, out In[] SetConditions, out ScriptNode[] OtherConditions)
+		{
+			List<In> SetConditionList = null;
+			List<ScriptNode> OtherConditionList = null;
+			int i, j, c = Conditions.Length;
+
+			for (i = 0; i < c; i++)
+			{
+				ScriptNode Condition = Conditions[i];
+				if (Condition is In In)
+				{
+					if (SetConditionList is null)
+					{
+						SetConditionList = new List<In>();
+
+						if (i > 0)
+						{
+							OtherConditionList = new List<ScriptNode>();
+
+							for (j = 0; j < i; j++)
+								OtherConditionList.Add(Conditions[j]);
+						}
+					}
+
+					SetConditionList.Add(In);
+				}
+				else if (!(SetConditionList is null))
+				{
+					if (OtherConditionList is null)
+						OtherConditionList = new List<ScriptNode>();
+
+					OtherConditionList.Add(Condition);
+				}
+			}
+
+			if (!(SetConditionList is null))
+			{
+				OtherConditions = OtherConditionList?.ToArray();
+				SetConditions = SetConditionList.ToArray();
+			}
+			else
+			{
+				OtherConditions = Conditions;
+				SetConditions = null;
+			}
 		}
 
 		public override IElement Evaluate(Variables Variables)
@@ -48,7 +104,7 @@ namespace Waher.Script.Operators.Sets
 					throw new ScriptRuntimeException("Unable to evaluate superset into a set.", this.right);
 			}
 
-			return new ImplicitSet(this.left, SuperSet, this.conditions, Variables, this.doubleColon);
+			return new ImplicitSet(this.left, SuperSet, this.setConditions, this.otherConditions, Variables, this.doubleColon);
 		}
 
 		/// <summary>
@@ -58,7 +114,8 @@ namespace Waher.Script.Operators.Sets
 		{
 			return obj is ImplicitSetDefinition O &&
 				this.doubleColon.Equals(O.doubleColon) &&
-				AreEqual(this.conditions, O.conditions) &&
+				AreEqual(this.setConditions, O.setConditions) &&
+				AreEqual(this.otherConditions, O.otherConditions) &&
 				base.Equals(obj);
 		}
 
@@ -69,7 +126,8 @@ namespace Waher.Script.Operators.Sets
 		{
 			int Result = base.GetHashCode();
 			Result ^= Result << 5 ^ this.doubleColon.GetHashCode();
-			Result ^= Result << 5 ^ GetHashCode(this.conditions);
+			Result ^= Result << 5 ^ GetHashCode(this.setConditions);
+			Result ^= Result << 5 ^ GetHashCode(this.otherConditions);
 			return Result;
 		}
 	}

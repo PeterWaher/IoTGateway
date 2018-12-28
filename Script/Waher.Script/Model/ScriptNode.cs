@@ -269,6 +269,12 @@ namespace Waher.Script.Model
 		/// <returns>If the size and contents of the arrays are equal</returns>
 		public static bool AreEqual(IEnumerable A1, IEnumerable A2)
 		{
+			if (A1 is null ^ A2 is null)
+				return false;
+
+			if (A1 is null)
+				return true;
+
 			IEnumerator e1 = A1.GetEnumerator();
 			IEnumerator e2 = A2.GetEnumerator();
 
@@ -313,12 +319,15 @@ namespace Waher.Script.Model
 		{
 			int Result = 0;
 
-			foreach (object Item in Set)
+			if (!(Set is null))
 			{
-				if (!(Item is null))
-					Result ^= Result << 5 ^ Item.GetHashCode();
-				else
-					Result ^= Result << 5;
+				foreach (object Item in Set)
+				{
+					if (!(Item is null))
+						Result ^= Result << 5 ^ Item.GetHashCode();
+					else
+						Result ^= Result << 5;
+				}
 			}
 
 			return Result;

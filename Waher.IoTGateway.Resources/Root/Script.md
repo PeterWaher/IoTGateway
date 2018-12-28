@@ -148,10 +148,15 @@ control the execution flow. Example:
 
 #### Vectors
 
-Vectors can be explicitly created by listing their elements between square brackets `[` and `]`, or implicitly by inserting a `DO`-`WHILE`, `WHILE`-`DO`,
-`FOR`-`TO`\[-`STEP`\]\[-`DO`\] or `FOR EACH`/`FOREACH`-`IN`\[-`DO`\] statements between square brackets. Examples:
+Vectors can be explicitly created by listing their elements between square brackets `[` and `]`. Example:
 
 	v:=[1,2,3];
+
+##### Loop construction of vector
+
+Vectors can also be created using any of the `DO`-`WHILE`, `WHILE`-`DO`, `FOR`-`TO`\[-`STEP`\]\[-`DO`\] or `FOR EACH`/`FOREACH`-`IN`\[-`DO`\] 
+statements between braces. Examples:
+
 	v:=[DO x++ WHILE X<10];
 	v:=[WHILE x<10 : x++];
 	v:=[FOR x:=1 TO 20 STEP 3 : x];
@@ -160,12 +165,37 @@ Vectors can be explicitly created by listing their elements between square brack
 
 **Note**: `DO` can be exchanged with `:`, or completely omitted, except in the `DO`-`WHILE` case.
 
+##### Implicit vector notation
+
+Vectors can also be defined implicitly using an implicit vector notation:
+
+	[Expression[ in Elements]:Condition1[,Condition2[,...[ConditionN]]]]
+
+This allows you to define vectors based on the contents of other vectors. Example:
+
+	X:=1..10;
+	P:=[x^2:x in X]
+
+##### Selecting elements
+
+Smaller vectors can be created from larger vectors, by allowing the expression in the implicit vector definition to be a simple variable reference 
+representing an element in the larger vector, and then allowing the conditions in the definition to limit the elements belonging to the shorter
+vector. Example:
+
+	v:=1..100;
+	[x in v:floor(sqrt(x))^2=x]
+
 #### Matrices
 
-Matrices can be explicitly created by listing their row vectors between square brackets `[` and `]`, or implicitly by inserting a `DO`-`WHILE`, `WHILE`-`DO`,
-`FOR`-`TO`\[-`STEP`\]\[-`DO`\] or `FOR EACH`/`FOREACH`-`IN`\[-`DO`\] statements between square brackets. Examples:
+Matrices can be explicitly created by listing their row vectors between square brackets `[` and `]`. Example:
 
 	M:=[[1,0,0],[0,1,0],[0,0,1]];
+
+##### Loop construction of matrix
+
+Matrices can also be created using any of the `DO`-`WHILE`, `WHILE`-`DO`, `FOR`-`TO`\[-`STEP`\]\[-`DO`\] or `FOR EACH`/`FOREACH`-`IN`\[-`DO`\] 
+statements between braces. Examples:
+
 	M:=[DO [x++,x++,x++] WHILE X<10];
 	M:=[WHILE x<10 : [x++,x++,x++]];
 	M:=[FOR y:=1 TO 20 : [FOR x:=1 TO 20 : x=y ? 1 : 0]];
@@ -173,6 +203,13 @@ Matrices can be explicitly created by listing their row vectors between square b
 	M:=[FOR EACH x IN 1..10|0.1 : [x^2,x^3,x^4]];
 
 **Note**: `DO` can be exchanged with `:`, or completely omitted, except in the `DO`-`WHILE` case.
+
+##### Implicit matrix notation
+
+Matrices can also be defined implicitly using implicit vector notation, where the `Expression` evaluates to row vectors. Example:
+
+	M:=Identity(5);
+	[Reverse(Row):Row in M]
 
 #### Sets
 
@@ -184,7 +221,7 @@ Sets can be explicitly created by listing their elements between braces `{` and 
 
 	S:={1,2,3};
 
-##### Loop construct of set
+##### Loop construction of set
 
 Sets can also be created using any of the `DO`-`WHILE`, `WHILE`-`DO`, `FOR`-`TO`\[-`STEP`\]\[-`DO`\] or `FOR EACH`/`FOREACH`-`IN`\[-`DO`\] 
 statements between braces. Examples:

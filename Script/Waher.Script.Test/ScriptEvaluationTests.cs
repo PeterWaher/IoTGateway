@@ -1104,7 +1104,7 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public void Parsing_Test_55_Subsets()
+		public void Parsing_Test_55_ImplicitSetNotation()
 		{
 			this.Test("S:={x in Z:x>10};5 in S", false);
 			this.Test("S:={x in Z:x>10};15 in S", true);
@@ -1138,6 +1138,23 @@ namespace Waher.Script.Test
 			this.Test("S:={M[,]:M.Columns>M.Rows};[[1,2],[3,4],[5,6]] in S", false);
 			this.Test("S:={x::x>\"Hello\"};\"ABC\" in S", false);
 			this.Test("S:={x::x>\"Hello\"};\"XYZ\" in S", true);
+			this.Test("v:=[1,2,3,4,5,6,7,8,9,10];{x in v:x>5}[]", new double[] { 6, 7, 8, 9, 10 });
+		}
+
+		[TestMethod]
+		public void Parsing_Test_56_ImplicitVectorNotation()
+		{
+			this.Test("v:=[1,2,3,4,5,6,7,8,9,10];[x in v:x>5]", new double[] { 6, 7, 8, 9, 10 });
+			this.Test("v:=1..100;[x in v:floor(sqrt(x))^2=x]", new double[] { 1, 4, 9, 16, 25, 36, 49, 64, 81, 100 });
+			this.Test("X:=1..10;P:=[x^2:x in X]", new double[] { 1, 4, 9, 16, 25, 36, 49, 64, 81, 100 });
+		}
+
+		[TestMethod]
+		public void Parsing_Test_57_ImplicitMatrixNotation()
+		{
+			this.Test("v:=1..100;[[x,y]:x in v,(y:=floor(sqrt(x)))^2=x]", new double[,] { { 1, 1 },{ 4, 2 }, { 9, 3 }, { 16, 4 },{ 25, 5 },{ 36, 6 },{ 49, 7 },{ 64, 8 },{ 81, 9 },{ 100, 10 } });
+			this.Test("X:=1..2;Y:=5..7;P:=[[x,y]:x in X, y in Y]", new double[,] { { 1, 5 }, { 2, 5 }, { 1, 6 }, { 2, 6 }, { 1, 7 }, { 2, 7 } });
+			this.Test("M:=Identity(2);[Reverse(Row):Row in M]", new double[,] { { 0, 1 }, { 1, 0 } });
 		}
 
 	}

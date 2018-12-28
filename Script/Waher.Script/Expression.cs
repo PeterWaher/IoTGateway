@@ -3391,8 +3391,14 @@ namespace Waher.Script
 						return new ObjectExNihilo(Members, Start, this.pos - Start, this);
 					}
 
-					ScriptNode Condition = this.ParseStatement();
+					ScriptNode Temp = this.ParseList();
+					ScriptNode[] Conditions;
 					ScriptNode SuperSet;
+
+					if (Temp is ElementList List)
+						Conditions = List.Elements;
+					else
+						Conditions = new ScriptNode[] { Temp };
 
 					if (Node is In In && !(Node is NotIn))
 					{
@@ -3408,7 +3414,7 @@ namespace Waher.Script
 
 					this.pos++;
 
-					return new ImplicitSetDefinition(Node, SuperSet, Condition, DoubleColon, Start, this.pos - Start, this);
+					return new ImplicitSetDefinition(Node, SuperSet, Conditions, DoubleColon, Start, this.pos - Start, this);
 				}
 
 				if (ch != '}')

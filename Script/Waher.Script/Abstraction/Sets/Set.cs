@@ -74,7 +74,7 @@ namespace Waher.Script.Abstraction.Sets
         {
             get
             {
-                throw new ScriptException("Set not enumerable.");
+                throw new ScriptException("Enumeration of set elements requires its finite members to be defined.");
             }
         }
 

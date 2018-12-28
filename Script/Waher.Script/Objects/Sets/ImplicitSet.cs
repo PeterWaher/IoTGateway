@@ -5,36 +5,72 @@ using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
+using Waher.Script.Operators.Membership;
 
 namespace Waher.Script.Objects.Sets
 {
 	/// <summary>
-	/// Represents a subset
+	/// Represents an implicitly defined set
 	/// </summary>
 	public class ImplicitSet : Set
 	{
 		private readonly ScriptNode pattern;
 		private readonly ISet superSet;
-		private readonly ScriptNode condition;
+		private readonly ScriptNode[] conditions;
+		private readonly In[] finitSetConditions;
 		private readonly Variables variables = null;
 		private FiniteSet finiteSet = null;
 		private bool doubleColon;
 
 		/// <summary>
-		/// Represents a subset
+		/// Represents an implicitly defined set
 		/// </summary>
 		/// <param name="Pattern">Pattern of elements.</param>
 		/// <param name="SuperSet">Optional superset.</param>
-		/// <param name="Condition">Condition subset members must fulfill.</param><
+		/// <param name="Conditions">Condition subset members must fulfill.</param><
 		/// <param name="Variables">Refernce to variables.</param>
 		/// <param name="DoubleColon">If double-colon was used to create subset.</param>
-		public ImplicitSet(ScriptNode Pattern, ISet SuperSet, ScriptNode Condition, Variables Variables, bool DoubleColon)
+		public ImplicitSet(ScriptNode Pattern, ISet SuperSet, ScriptNode[] Conditions, Variables Variables, bool DoubleColon)
 		{
 			this.pattern = Pattern;
 			this.superSet = SuperSet;
-			this.condition = Condition;
 			this.doubleColon = DoubleColon;
 			this.variables = new Variables();
+
+			List<In> FinitSetConditions = null;
+			List<ScriptNode> OtherConditions = null;
+			int i, j, c = Conditions.Length;
+
+			for (i = 0; i < c; i++)
+			{
+				ScriptNode Condition = Conditions[i];
+				if (Condition is In In)
+				{
+					if (FinitSetConditions == null)
+					{
+						FinitSetConditions = new List<In>();
+						OtherConditions = new List<ScriptNode>();
+
+						for (j = 0; j < i; j++)
+							OtherConditions.Add(Conditions[j]);
+					}
+
+					FinitSetConditions.Add(In);
+				}
+				else if (OtherConditions != null)
+					OtherConditions.Add(Condition);
+			}
+
+			if (FinitSetConditions != null)
+			{
+				this.conditions = OtherConditions.ToArray();
+				this.finitSetConditions = FinitSetConditions.ToArray();
+			}
+			else
+			{
+				this.conditions = Conditions;
+				this.finitSetConditions = null;
+			}
 
 			Variables.CopyTo(this.variables);
 		}
@@ -66,14 +102,7 @@ namespace Waher.Script.Objects.Sets
 						foreach (KeyValuePair<string, IElement> P in Variables)
 							this.variables[P.Key] = P.Value;
 
-						IElement Result = this.condition.Evaluate(this.variables);
-
-						if (Result is BooleanValue B)
-							return B.Value;
-						else if (Expression.TryConvert<bool>(Result.AssociatedObjectValue, out bool b))
-							return b;
-						else
-							return false;
+						return this.SatisfiesConditions();
 					}
 					finally
 					{
@@ -84,7 +113,31 @@ namespace Waher.Script.Objects.Sets
 				{
 					return false;
 				}
+
 			}
+		}
+
+		private bool SatisfiesConditions()
+		{
+			foreach (ScriptNode Condition in this.conditions)
+			{
+				IElement Result = Condition.Evaluate(this.variables);
+
+				if (Result is BooleanValue B)
+				{
+					if (!B.Value)
+						return false;
+				}
+				else if (Expression.TryConvert<bool>(Result.AssociatedObjectValue, out bool b))
+				{
+					if (!b)
+						return false;
+				}
+				else
+					return false;
+			}
+
+			return true;
 		}
 
 		/// <summary>
@@ -142,19 +195,7 @@ namespace Waher.Script.Objects.Sets
 						foreach (KeyValuePair<string, IElement> P in Variables)
 							this.variables[P.Key] = P.Value;
 
-						IElement Result = this.condition.Evaluate(this.variables);
-
-						if (Result is BooleanValue B)
-						{
-							if (!B.Value)
-								continue;
-						}
-						else if (Expression.TryConvert<bool>(Result.AssociatedObjectValue, out bool b))
-						{
-							if (!b)
-								continue;
-						}
-						else
+						if (!this.SatisfiesConditions())
 							continue;
 					}
 					catch (Exception)
@@ -188,7 +229,7 @@ namespace Waher.Script.Objects.Sets
 			return
 				this.pattern.Equals(S.pattern) &&
 				this.doubleColon.Equals(S.doubleColon) &&
-				this.condition.Equals(S.condition);
+				ScriptNode.AreEqual(this.conditions, S.conditions);
 		}
 
 		public override int GetHashCode()
@@ -198,7 +239,7 @@ namespace Waher.Script.Objects.Sets
 			if (this.superSet != null)
 				Result ^= Result << 5 ^ this.superSet.GetHashCode();
 
-			Result ^= Result << 5 ^ this.condition.GetHashCode();
+			Result ^= Result << 5 ^ ScriptNode.GetHashCode(this.conditions);
 			Result ^= Result << 5 ^ this.doubleColon.GetHashCode();
 
 			return Result;
@@ -228,7 +269,18 @@ namespace Waher.Script.Objects.Sets
 			if (this.doubleColon)
 				sb.Append(':');
 
-			sb.Append(this.condition.SubExpression);
+			bool First = true;
+
+			foreach (ScriptNode Condition in this.conditions)
+			{
+				if (First)
+					First = false;
+				else
+					sb.Append(',');
+
+				sb.Append(Condition.SubExpression);
+			}
+
 			sb.Append('}');
 
 			return sb.ToString();

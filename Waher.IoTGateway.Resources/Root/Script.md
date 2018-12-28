@@ -176,10 +176,19 @@ Matrices can be explicitly created by listing their row vectors between square b
 
 #### Sets
 
-Sets can be explicitly created by listing their elements between braces `{` and `}`, or implicitly by inserting a `DO`-`WHILE`, `WHILE`-`DO`,
-`FOR`-`TO`\[-`STEP`\]\[-`DO`\] or `FOR EACH`/`FOREACH`-`IN`\[-`DO`\] statements between braces. Examples:
+Sets are unordered collections of items that can be used in script. There are numerous ways to define sets.
+
+##### Explicit definition of sets
+
+Sets can be explicitly created by listing their elements between braces `{` and `}`. Example:
 
 	S:={1,2,3};
+
+##### Loop construct of set
+
+Sets can also be created using any of the `DO`-`WHILE`, `WHILE`-`DO`, `FOR`-`TO`\[-`STEP`\]\[-`DO`\] or `FOR EACH`/`FOREACH`-`IN`\[-`DO`\] 
+statements between braces. Examples:
+
 	S:={DO x++ WHILE X<10};
 	S:={WHILE x<10 : x++};
 	S:={FOR x:=1 TO 20 STEP 3 : x};
@@ -188,14 +197,16 @@ Sets can be explicitly created by listing their elements between braces `{` and 
 
 **Note**: `DO` can be exchanged with `:`, or completely omitted, except in the `DO`-`WHILE` case.
 
-##### Subsets
+##### Implicit set notation
 
-Sets can also be created implicitly, by imposing a condition on the elements of a referenced superset (thereby creating a subset), or
-on a construct whose components are identified using the built-in pattern matching algorithm. Examples:
+Sets can also be defined implicitly using implicit set notation:
 
-	S:={x in Z:x>10}
-	S2:={x in S:x<20}
+	{Expression[ in Superset]:Condition1[,Condition2[,...[ConditionN]]]}
+
+This allows you to define infinite sets. Examples:
+
 	S:={[a,b]: a>b}
+	S:={[a,b]: a in Z, b in Z, a>b}
 	S:={x::x>10}
 	S:={v[]:count(v)>3}
 	S:={s{}:count(s)>3}
@@ -205,6 +216,14 @@ on a construct whose components are identified using the built-in pattern matchi
 two consequtive colons (`:`) can be used. `{x::x>10}` creates a set of all items that are comparable to `10` and are greater.
 `{x:x>10}` creates an [object ex nihilo](#objectExNihilo) with one member `x` that will have a boolean value corresponding to the
 greater-than comparison of the variable `x` with `10`.
+
+##### Subsets
+
+Subsets can be creted by allowing the expression in the implicit set definition to be a simple variable reference belonging to a superset, 
+and then allowing the conditions in the definition to limit the elements belonging to the subset. Examples:
+
+	S:={x in Z:x>10}
+	S2:={x in S:x<20}
 
 #### Object Ex nihilo
 

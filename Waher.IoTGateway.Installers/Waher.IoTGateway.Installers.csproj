@@ -65,9 +65,10 @@
     <Compile Include=".bak\Waher.Script\Model\ScriptLeafNode.cs" />
     <Compile Include=".bak\Waher.Script\Model\ScriptLeafNodeVariableReference.cs" />
     <Compile Include=".bak\Waher.Script\Model\ScriptParser.cs" />
+    <Compile Include=".bak\Waher.Script\Objects\Sets\ImplicitSet.cs" />
     <Compile Include=".bak\Waher.Script\Objects\Sets\Integers.cs" />
-    <Compile Include=".bak\Waher.Script\Objects\Sets\SubSet.cs" />
     <Compile Include=".bak\Waher.Script\Operators\Conditional\NullCheck.cs" />
+    <Compile Include=".bak\Waher.Script\Operators\Sets\ImplicitSetDefinition.cs" />
     <Compile Include=".bak\Waher.Script\TypeConversion\ConversionSequence.cs" />
     <Compile Include=".bak\Waher.Script\TypeConversion\ITypeConverter.cs" />
     <Compile Include="CustomAction.cs" />

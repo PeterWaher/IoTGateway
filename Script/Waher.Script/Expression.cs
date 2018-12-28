@@ -3408,7 +3408,7 @@ namespace Waher.Script
 
 					this.pos++;
 
-					return new ImplicitSubSet(Node, SuperSet, Condition, DoubleColon, Start, this.pos - Start, this);
+					return new ImplicitSetDefinition(Node, SuperSet, Condition, DoubleColon, Start, this.pos - Start, this);
 				}
 
 				if (ch != '}')

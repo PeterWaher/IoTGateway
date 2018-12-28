@@ -11,7 +11,7 @@ namespace Waher.Script.Objects.Sets
 	/// <summary>
 	/// Represents a subset
 	/// </summary>
-	public class SubSet : Set
+	public class ImplicitSet : Set
 	{
 		private readonly ScriptNode pattern;
 		private readonly ISet superSet;
@@ -28,7 +28,7 @@ namespace Waher.Script.Objects.Sets
 		/// <param name="Condition">Condition subset members must fulfill.</param><
 		/// <param name="Variables">Refernce to variables.</param>
 		/// <param name="DoubleColon">If double-colon was used to create subset.</param>
-		public SubSet(ScriptNode Pattern, ISet SuperSet, ScriptNode Condition, Variables Variables, bool DoubleColon)
+		public ImplicitSet(ScriptNode Pattern, ISet SuperSet, ScriptNode Condition, Variables Variables, bool DoubleColon)
 		{
 			this.pattern = Pattern;
 			this.superSet = SuperSet;
@@ -176,7 +176,7 @@ namespace Waher.Script.Objects.Sets
 
 		public override bool Equals(object obj)
 		{
-			if (!(obj is SubSet S))
+			if (!(obj is ImplicitSet S))
 				return false;
 
 			if (this.superSet is null ^ S.superSet is null)

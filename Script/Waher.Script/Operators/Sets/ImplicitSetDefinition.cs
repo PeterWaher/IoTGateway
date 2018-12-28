@@ -11,11 +11,11 @@ namespace Waher.Script.Operators.Sets
 	/// <summary>
 	/// Defines a Subset, by implicitly limiting its members to members of an optional superset, matching a given condition.
 	/// </summary>
-	public class ImplicitSubSet : TernaryOperator
+	public class ImplicitSetDefinition : TernaryOperator
 	{
 		private readonly bool doubleColon;
 
-		public ImplicitSubSet(ScriptNode Pattern, ScriptNode SuperSet, ScriptNode Condition, bool DoubleColon,
+		public ImplicitSetDefinition(ScriptNode Pattern, ScriptNode SuperSet, ScriptNode Condition, bool DoubleColon,
 			int Start, int Length, Expression Expression)
 			: base(Pattern, SuperSet, Condition, Start, Length, Expression)
 		{
@@ -36,7 +36,7 @@ namespace Waher.Script.Operators.Sets
 					throw new ScriptRuntimeException("Superset did not evaluate to a set.", this);
 			}
 
-			return new SubSet(this.left, SuperSet, this.right, Variables, this.doubleColon);
+			return new ImplicitSet(this.left, SuperSet, this.right, Variables, this.doubleColon);
 		}
 
 		/// <summary>
@@ -44,7 +44,7 @@ namespace Waher.Script.Operators.Sets
 		/// </summary>
 		public override bool Equals(object obj)
 		{
-			return obj is ImplicitSubSet O &&
+			return obj is ImplicitSetDefinition O &&
 				this.doubleColon.Equals(O.doubleColon) &&
 				base.Equals(obj);
 		}

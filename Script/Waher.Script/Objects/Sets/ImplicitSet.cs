@@ -256,7 +256,8 @@ namespace Waher.Script.Objects.Sets
 
 				for (i = 0; i < c; i++)
 				{
-					if (!(this.finitSetConditions[i].RightOperand.Evaluate(this.variables) is ISet Set))
+					ISet Set = ToSet(this.finitSetConditions[i].RightOperand.Evaluate(this.variables));
+					if (Set is null)
 						return false;
 
 					Size = Set.Size;

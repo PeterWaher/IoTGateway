@@ -133,5 +133,6 @@ namespace Waher.Script.Objects.Sets
         {
             get { return this.elements.Count; }
         }
+
     }
 }

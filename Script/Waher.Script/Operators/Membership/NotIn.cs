@@ -39,5 +39,22 @@ namespace Waher.Script.Operators.Membership
             else
                 return BooleanValue.True;
         }
-    }
+
+		/// <summary>
+		/// Evaluates the operator.
+		/// </summary>
+		/// <param name="Left">Left value.</param>
+		/// <param name="Right">Right value.</param>
+		/// <returns>Result</returns>
+		public override IElement Evaluate(IElement Left, IVector Right)
+		{
+			foreach (IElement Element in Right.ChildElements)
+			{
+				if (Left.Equals(Element))
+					return BooleanValue.False;
+			}
+
+			return BooleanValue.True;
+		}
+	}
 }

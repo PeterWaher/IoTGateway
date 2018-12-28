@@ -93,5 +93,45 @@ namespace Waher.Script.Abstraction.Sets
         {
             get { return null; }
         }
-    }
+
+		/// <summary>
+		/// Converts (if necessary) the element <paramref name="E"/> into a set.
+		/// </summary>
+		/// <param name="E">Element</param>
+		/// <returns>Set, or null if not possible to convert.</returns>
+		public static ISet ToSet(IElement E)
+		{
+			ISet Result = E as ISet;
+			if (Result is null)
+			{
+				if (E is IVector Vector)
+					Result = new FiniteSet(Vector.ChildElements);
+				else
+				{
+					object Obj = E.AssociatedObjectValue;
+					Result = Obj as ISet;
+					if (Result is null)
+					{
+						if (Obj is IEnumerable<IElement> Elements)
+							Result = new FiniteSet(Elements);
+						else if (Obj is IEnumerable<object> Objects)
+						{
+							LinkedList<IElement> List = new LinkedList<IElement>();
+
+							foreach (object x in Objects)
+								List.AddLast(Expression.Encapsulate(x));
+
+							Result = new FiniteSet(List);
+						}
+						else
+							return null;
+					}
+				}
+			}
+
+			return Result;
+		}
+
+
+	}
 }

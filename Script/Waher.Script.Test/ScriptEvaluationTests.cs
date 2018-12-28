@@ -397,12 +397,14 @@ namespace Waher.Script.Test
 			this.Test("a IN R", true);
 			this.Test("a IN EmptySet", false);
 			this.Test("[a,b] IN R", false);
-			this.Test("a IN [R,EmptySet]", new bool[] { true, false });
+			this.Test("a IN {a,b,c}", true);
+			this.Test("a IN [a,b,c]", true);
 
 			this.Test("a NOT IN R", false);
 			this.Test("a NOTIN EmptySet", true);
 			this.Test("[a,b] NOT IN R", true);
-			this.Test("a NOTIN [R,EmptySet]", new bool[] { false, true });
+			this.Test("a NOTIN {a,b,c}", false);
+			this.Test("a NOTIN [a,b,c]", false);
 		}
 
 		[TestMethod]

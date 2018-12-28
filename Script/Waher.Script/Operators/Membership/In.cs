@@ -9,47 +9,49 @@ using Waher.Script.Objects;
 
 namespace Waher.Script.Operators.Membership
 {
-    /// <summary>
-    /// In operator
-    /// </summary>
-    public class In : BinaryOperator
-    {
-        /// <summary>
-        /// In operator
-        /// </summary>
-        /// <param name="Left">Left operand.</param>
-        /// <param name="Right">Right operand.</param>
-        /// <param name="Start">Start position in script expression.</param>
-        /// <param name="Length">Length of expression covered by node.</param>
+	/// <summary>
+	/// In operator
+	/// </summary>
+	public class In : BinaryOperator
+	{
+		/// <summary>
+		/// In operator
+		/// </summary>
+		/// <param name="Left">Left operand.</param>
+		/// <param name="Right">Right operand.</param>
+		/// <param name="Start">Start position in script expression.</param>
+		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-        public In(ScriptNode Left, ScriptNode Right, int Start, int Length, Expression Expression)
-            : base(Left, Right, Start, Length, Expression)
-        {
-        }
+		public In(ScriptNode Left, ScriptNode Right, int Start, int Length, Expression Expression)
+			: base(Left, Right, Start, Length, Expression)
+		{
+		}
 
-        /// <summary>
-        /// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
-        /// </summary>
-        /// <param name="Variables">Variables collection.</param>
-        /// <returns>Result.</returns>
-        public override IElement Evaluate(Variables Variables)
-        {
-            IElement Left = this.left.Evaluate(Variables);
-            IElement Right = this.right.Evaluate(Variables);
+		/// <summary>
+		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+		/// </summary>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Result.</returns>
+		public override IElement Evaluate(Variables Variables)
+		{
+			IElement Left = this.left.Evaluate(Variables);
+			IElement Right = this.right.Evaluate(Variables);
 
-            return this.Evaluate(Left, Right);
-        }
+			return this.Evaluate(Left, Right);
+		}
 
-        /// <summary>
-        /// Evaluates the operator.
-        /// </summary>
-        /// <param name="Left">Left value.</param>
-        /// <param name="Right">Right value.</param>
-        /// <returns>Result</returns>
-        public virtual IElement Evaluate(IElement Left, IElement Right)
-        {
+		/// <summary>
+		/// Evaluates the operator.
+		/// </summary>
+		/// <param name="Left">Left value.</param>
+		/// <param name="Right">Right value.</param>
+		/// <returns>Result</returns>
+		public virtual IElement Evaluate(IElement Left, IElement Right)
+		{
 			if (Right is ISet Set)
 				return this.Evaluate(Left, Set);
+			else if (Right is IVector Vector)
+				return this.Evaluate(Left, Vector);
 			else if (Right.IsScalar)
 				throw new ScriptRuntimeException("Right operand in an IN operation must be a set.", this);
 			else
@@ -107,19 +109,36 @@ namespace Waher.Script.Operators.Membership
 			}
 		}
 
-        /// <summary>
-        /// Evaluates the operator.
-        /// </summary>
-        /// <param name="Left">Left value.</param>
-        /// <param name="Right">Right value.</param>
-        /// <returns>Result</returns>
-        public virtual IElement Evaluate(IElement Left, ISet Right)
-        {
-            if (Right.Contains(Left))
-                return BooleanValue.True;
-            else
-                return BooleanValue.False;
-        }
+		/// <summary>
+		/// Evaluates the operator.
+		/// </summary>
+		/// <param name="Left">Left value.</param>
+		/// <param name="Right">Right value.</param>
+		/// <returns>Result</returns>
+		public virtual IElement Evaluate(IElement Left, ISet Right)
+		{
+			if (Right.Contains(Left))
+				return BooleanValue.True;
+			else
+				return BooleanValue.False;
+		}
 
-    }
+		/// <summary>
+		/// Evaluates the operator.
+		/// </summary>
+		/// <param name="Left">Left value.</param>
+		/// <param name="Right">Right value.</param>
+		/// <returns>Result</returns>
+		public virtual IElement Evaluate(IElement Left, IVector Right)
+		{
+			foreach (IElement Element in Right.ChildElements)
+			{
+				if (Left.Equals(Element))
+					return BooleanValue.True;
+			}
+
+			return BooleanValue.False;
+		}
+
+	}
 }

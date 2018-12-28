@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Text;
+using System.Collections.Generic;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Exceptions;
@@ -43,9 +43,9 @@ namespace Waher.Script.Operators.Sets
 			else
 			{
 				IElement E = this.right.Evaluate(Variables);
-				SuperSet = E.AssociatedObjectValue as ISet;
-				if (SuperSet is null)
-					throw new ScriptRuntimeException("Superset did not evaluate to a set.", this);
+				SuperSet = Set.ToSet(E);
+				if (SuperSet == null)
+					throw new ScriptRuntimeException("Unable to evaluate superset into a set.", this.right);
 			}
 
 			return new ImplicitSet(this.left, SuperSet, this.conditions, Variables, this.doubleColon);

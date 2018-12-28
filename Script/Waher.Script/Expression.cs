@@ -4594,7 +4594,6 @@ namespace Waher.Script
 		}
 
 		// TODO: Optimize constants
-		// TODO: Implicit sets with conditions. {x:x in Z}, {x in Z: x>10}, {[a,b]: a>b}
 		// TODO: Integers (0d, 0x, 0o, 0b), Big Integers (0D, 0X, 0O, 0B)
 		// TODO: Upgrade
 		// TODO: Matrix*Vector = Vector

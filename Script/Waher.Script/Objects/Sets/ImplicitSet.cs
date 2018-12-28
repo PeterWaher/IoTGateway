@@ -49,21 +49,30 @@ namespace Waher.Script.Objects.Sets
 					if (FinitSetConditions == null)
 					{
 						FinitSetConditions = new List<In>();
-						OtherConditions = new List<ScriptNode>();
 
-						for (j = 0; j < i; j++)
-							OtherConditions.Add(Conditions[j]);
+						if (i > 0)
+						{
+							OtherConditions = new List<ScriptNode>();
+
+							for (j = 0; j < i; j++)
+								OtherConditions.Add(Conditions[j]);
+						}
 					}
 
 					FinitSetConditions.Add(In);
 				}
-				else if (OtherConditions != null)
+				else if (FinitSetConditions != null)
+				{
+					if (OtherConditions == null)
+						OtherConditions = new List<ScriptNode>();
+
 					OtherConditions.Add(Condition);
+				}
 			}
 
 			if (FinitSetConditions != null)
 			{
-				this.conditions = OtherConditions.ToArray();
+				this.conditions = OtherConditions?.ToArray();
 				this.finitSetConditions = FinitSetConditions.ToArray();
 			}
 			else
@@ -120,25 +129,37 @@ namespace Waher.Script.Objects.Sets
 
 		private bool SatisfiesConditions()
 		{
-			foreach (ScriptNode Condition in this.conditions)
+			if (this.finitSetConditions != null)
 			{
-				IElement Result = Condition.Evaluate(this.variables);
+				foreach (ScriptNode Condition in this.finitSetConditions)
+				{
+					if (!this.SatisfiesCondition(Condition))
+						return false;
+				}
+			}
 
-				if (Result is BooleanValue B)
+			if (this.conditions != null)
+			{
+				foreach (ScriptNode Condition in this.conditions)
 				{
-					if (!B.Value)
+					if (!this.SatisfiesCondition(Condition))
 						return false;
 				}
-				else if (Expression.TryConvert<bool>(Result.AssociatedObjectValue, out bool b))
-				{
-					if (!b)
-						return false;
-				}
-				else
-					return false;
 			}
 
 			return true;
+		}
+
+		private bool SatisfiesCondition(ScriptNode Condition)
+		{
+			IElement Result = Condition.Evaluate(this.variables);
+
+			if (Result is BooleanValue B)
+				return B.Value;
+			else if (Expression.TryConvert<bool>(Result.AssociatedObjectValue, out bool b))
+				return b;
+			else
+				return false;
 		}
 
 		/// <summary>

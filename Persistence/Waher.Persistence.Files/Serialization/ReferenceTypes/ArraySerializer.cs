@@ -90,7 +90,7 @@ namespace Waher.Persistence.Files.Serialization.ReferenceTypes
 
 				foreach (T Item in Array)
 				{
-					if (Item == null)
+					if (Item is null)
 						Writer.WriteBits(ObjectSerializer.TYPE_NULL, 6);
 					else
 					{

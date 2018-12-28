@@ -367,7 +367,7 @@ namespace Waher.Persistence
 		/// <returns>Normal string array.</returns>
 		public static string[] ToStringArray(this CaseInsensitiveString[] A)
 		{
-			if (A == null)
+			if (A is null)
 				return null;
 
 			int i, c = A.Length;
@@ -386,7 +386,7 @@ namespace Waher.Persistence
 		/// <returns>Normal string array.</returns>
 		public static CaseInsensitiveString[] ToCaseInsensitiveStringArray(this string[] A)
 		{
-			if (A == null)
+			if (A is null)
 				return null;
 
 			int i, c = A.Length;

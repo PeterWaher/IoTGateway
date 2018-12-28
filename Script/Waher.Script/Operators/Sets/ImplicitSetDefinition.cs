@@ -28,13 +28,13 @@ namespace Waher.Script.Operators.Sets
 		{
 			ISet SuperSet;
 
-			if (this.right == null)
+			if (this.right is null)
 				SuperSet = null;
 			else
 			{
 				IElement E = this.right.Evaluate(Variables);
 				SuperSet = E.AssociatedObjectValue as ISet;
-				if (SuperSet == null)
+				if (SuperSet is null)
 					throw new ScriptRuntimeException("Superset did not evaluate to a set.", this);
 			}
 

@@ -982,7 +982,7 @@ namespace Waher.Persistence.Files.Serialization
 
 				foreach (T Item in Value)
 				{
-					if (Item == null)
+					if (Item is null)
 					{
 						if (Nullable)
 							Writer.WriteBits(ObjectSerializer.TYPE_NULL, 6);

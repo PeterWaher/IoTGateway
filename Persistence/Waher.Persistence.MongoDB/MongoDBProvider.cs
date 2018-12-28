@@ -642,13 +642,13 @@ namespace Waher.Persistence.MongoDB
 
 			foreach (T Item in ReferencedObjects)
 			{
-				if (First == null)
+				if (First is null)
 					First = Item;
 				else
 					throw new Exception("Multiple objects of type T found with object ID " + ObjectId.ToString());
 			}
 
-			if (First == null)
+			if (First is null)
 				throw new Exception("Referenced object of type T not found: " + ObjectId.ToString());
 
 			this.loadCache.Add(Key, First);     // Speeds up readout if reading multiple objects referencing a few common sub-objects.

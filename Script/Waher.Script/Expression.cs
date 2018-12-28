@@ -4423,11 +4423,11 @@ namespace Waher.Script
 				return true;
 			}
 
-			if (converters == null)
+			if (converters is null)
 			{
 				Dictionary<Type, Dictionary<Type, ITypeConverter>> Converters = GetTypeConverters();
 
-				if (converters == null)
+				if (converters is null)
 				{
 					converters = Converters;
 					Types.OnInvalidated += (sender, e) => converters = GetTypeConverters();
@@ -4523,7 +4523,7 @@ namespace Waher.Script
 					}
 				}
 
-				if (DefaultConstructor == null)
+				if (DefaultConstructor is null)
 					continue;
 
 				try

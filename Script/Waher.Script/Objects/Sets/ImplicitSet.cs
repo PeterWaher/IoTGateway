@@ -46,7 +46,7 @@ namespace Waher.Script.Objects.Sets
 				ScriptNode Condition = Conditions[i];
 				if (Condition is In In)
 				{
-					if (FinitSetConditions == null)
+					if (FinitSetConditions is null)
 					{
 						FinitSetConditions = new List<In>();
 
@@ -63,7 +63,7 @@ namespace Waher.Script.Objects.Sets
 				}
 				else if (FinitSetConditions != null)
 				{
-					if (OtherConditions == null)
+					if (OtherConditions is null)
 						OtherConditions = new List<ScriptNode>();
 
 					OtherConditions.Add(Condition);
@@ -110,7 +110,7 @@ namespace Waher.Script.Objects.Sets
 							foreach (KeyValuePair<string, IElement> P in Variables)
 								this.variables[P.Key] = P.Value;
 
-							return this.SatisfiesConditions();
+							return this.SatisfiesConditions(true);
 						}
 						finally
 						{
@@ -127,9 +127,9 @@ namespace Waher.Script.Objects.Sets
 			}
 		}
 
-		private bool SatisfiesConditions()
+		private bool SatisfiesConditions(bool CheckFiniteSetConditions)
 		{
-			if (this.finitSetConditions != null)
+			if (CheckFiniteSetConditions && !(this.finitSetConditions is null))
 			{
 				foreach (ScriptNode Condition in this.finitSetConditions)
 				{
@@ -198,54 +198,193 @@ namespace Waher.Script.Objects.Sets
 
 		private bool CalcSubset()
 		{
-			if (this.superSet == null || !this.superSet.Size.HasValue)
-				return false;
-
-			Dictionary<string, IElement> Variables = new Dictionary<string, IElement>();
-			LinkedList<IElement> Items = new LinkedList<IElement>();
-
-			this.variables.Push();
-			try
+			if (this.superSet != null && this.superSet.Size.HasValue)
 			{
-				foreach (IElement Element in this.superSet.ChildElements)
+				Dictionary<string, IElement> Variables = new Dictionary<string, IElement>();
+				LinkedList<IElement> Items = new LinkedList<IElement>();
+
+				this.variables.Push();
+				try
 				{
-					Variables.Clear();
-					switch (this.pattern.PatternMatch(Element, Variables))
+					foreach (IElement Element in this.superSet.ChildElements)
 					{
-						case PatternMatchResult.Match:
+						Variables.Clear();
+						switch (this.pattern.PatternMatch(Element, Variables))
+						{
+							case PatternMatchResult.Match:
+								foreach (KeyValuePair<string, IElement> P in Variables)
+									this.variables[P.Key] = P.Value;
+
+								try
+								{
+									if (!this.SatisfiesConditions(true))
+										continue;
+								}
+								catch (Exception)
+								{
+									continue;
+								}
+
+								break;
+
+							case PatternMatchResult.NoMatch:
+								continue;
+
+							case PatternMatchResult.Unknown:
+							default:
+								return false;
+						}
+
+						Items.AddLast(Element);
+					}
+				}
+				finally
+				{
+					this.variables.Pop();
+				}
+
+				this.finiteSet = new FiniteSet(Items);
+				return true;
+			}
+			else if (this.superSet is null && this.finitSetConditions != null)
+			{
+				int i, c = this.finitSetConditions.Length;
+				ISet[] Sets = new ISet[c];
+				IEnumerator<IElement>[] Enumerators = new IEnumerator<IElement>[c];
+				string[][] AffectedVariables = new string[c][];
+				int? Size;
+
+				for (i = 0; i < c; i++)
+				{
+					if (!(this.finitSetConditions[i].RightOperand.Evaluate(this.variables) is ISet Set))
+						return false;
+
+					Size = Set.Size;
+					if (!Size.HasValue)
+						return false;
+
+					Sets[i] = Set;
+					Enumerators[i] = Set.ChildElements.GetEnumerator();
+					if (!Enumerators[i].MoveNext())
+						return false;
+				}
+
+				this.variables.Push();
+				try
+				{
+					LinkedList<IElement> Items = new LinkedList<IElement>();
+					Dictionary<string, IElement> Variables = new Dictionary<string, IElement>();
+					IEnumerator<IElement> e;
+					bool Collision = false;
+					bool Match;
+					int j = c - 1;
+
+					do
+					{
+						if (Collision)
+							Variables.Clear();
+						else
+						{
+							for (i = 0; i <= j; i++)
+							{
+								if (!(AffectedVariables[i] is null))
+								{
+									foreach (string s in AffectedVariables[i])
+										Variables.Remove(s);
+								}
+							}
+						}
+
+						Match = true;
+
+						for (i = 0; Match && (i <= j || (Collision && i < c)); i++)
+						{
+							e = Enumerators[i];
+
+							if (AffectedVariables[i] is null)
+							{
+								Dictionary<string, IElement> v = new Dictionary<string, IElement>();
+
+								switch (this.finitSetConditions[i].LeftOperand.PatternMatch(e.Current, v))
+								{
+									case PatternMatchResult.Match:
+										string[] v2 = new string[v.Count];
+										v.Keys.CopyTo(v2, 0);
+										AffectedVariables[i] = v2;
+
+										foreach (KeyValuePair<string, IElement> P in v)
+										{
+											if (Variables.TryGetValue(P.Key, out IElement E))
+											{
+												Collision = true;
+
+												if (!e.Current.Equals(E))
+													Match = false;
+											}
+											else
+												Variables[P.Key] = P.Value;
+										}
+										break;
+
+									case PatternMatchResult.NoMatch:
+										Match = false;
+										break;
+
+									case PatternMatchResult.Unknown:
+									default:
+										return false;
+								}
+							}
+							else
+							{
+								switch (this.finitSetConditions[i].LeftOperand.PatternMatch(e.Current, Variables))
+								{
+									case PatternMatchResult.Match:
+										break;
+
+									case PatternMatchResult.NoMatch:
+										Match = false;
+										break;
+
+									case PatternMatchResult.Unknown:
+									default:
+										return false;
+								}
+							}
+						}
+
+						if (Match)
+						{
 							foreach (KeyValuePair<string, IElement> P in Variables)
 								this.variables[P.Key] = P.Value;
 
-							try
-							{
-								if (!this.SatisfiesConditions())
-									continue;
-							}
-							catch (Exception)
-							{
-								continue;
-							}
+							if (this.SatisfiesConditions(false))
+								Items.AddLast(this.pattern.Evaluate(this.variables));
+						}
 
-							break;
+						for (j = 0; j < c; j++)
+						{
+							e = Enumerators[j];
+							if (e.MoveNext())
+								break;
 
-						case PatternMatchResult.NoMatch:
-							continue;
-
-						case PatternMatchResult.Unknown:
-						default:
-							return false;
+							e.Reset();
+							e.MoveNext();
+						}
 					}
+					while (j < c);
 
-					Items.AddLast(Element);
+					this.finiteSet = new FiniteSet(Items);
+					return true;
 				}
-			}
-			finally
-			{
-				this.variables.Pop();
-			}
+				finally
+				{
+					this.variables.Pop();
+				}
 
-			this.finiteSet = new FiniteSet(Items);
-			return true;
+			}
+			else
+				return false;
 		}
 
 		public override bool Equals(object obj)
@@ -304,14 +443,30 @@ namespace Waher.Script.Objects.Sets
 
 			bool First = true;
 
-			foreach (ScriptNode Condition in this.conditions)
+			if (this.finitSetConditions != null)
 			{
-				if (First)
-					First = false;
-				else
-					sb.Append(',');
+				foreach (ScriptNode Condition in this.finitSetConditions)
+				{
+					if (First)
+						First = false;
+					else
+						sb.Append(',');
 
-				sb.Append(Condition.SubExpression);
+					sb.Append(Condition.SubExpression);
+				}
+			}
+
+			if (this.conditions != null)
+			{
+				foreach (ScriptNode Condition in this.conditions)
+				{
+					if (First)
+						First = false;
+					else
+						sb.Append(',');
+
+					sb.Append(Condition.SubExpression);
+				}
 			}
 
 			sb.Append('}');

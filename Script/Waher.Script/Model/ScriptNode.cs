@@ -9,6 +9,9 @@ using Waher.Script.Operators.Arithmetics;
 
 namespace Waher.Script.Model
 {
+	/// <summary>
+	/// Status result of a pattern matching operation.
+	/// </summary>
 	public enum PatternMatchResult
 	{
 		/// <summary>

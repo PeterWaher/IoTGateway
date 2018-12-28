@@ -37,6 +37,13 @@ namespace Waher.Script.Operators
 			return Result;
 		}
 
+		/// <summary>
+		/// Performs a pattern-matching operation
+		/// </summary>
+		/// <param name="Branch">Branch to examine</param>
+		/// <param name="Value">Value to examine against</param>
+		/// <param name="Variables">Current set of variables where corresponding variable references will be set.</param>
+		/// <param name="Node">Node performing pattern matching operation.</param>
 		public static void Match(ScriptNode Branch, IElement Value, Variables Variables, ScriptNode Node)
 		{
 			Dictionary<string, IElement> AlreadyFound = new Dictionary<string, IElement>();

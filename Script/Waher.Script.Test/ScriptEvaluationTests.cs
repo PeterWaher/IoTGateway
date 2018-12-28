@@ -1120,6 +1120,11 @@ namespace Waher.Script.Test
 			this.Test("S:={[a,b]: a in Z, b in Z, a>b};[2,1] in S", true);
 			this.Test("S:={[a,b]: a in Z, b in Z, a>b};[2.1,1] in S", false);
 			this.Test("S:={[a,b]: a in Z, b in Z, a>b};[2,1,0] in S", false);
+			this.Test("S:={[a,b,c]:a in 1..2, b in 10..13, c in 100..104};count(S)", 40);
+			this.Test("S:={[a,b,c]:a in 1..2, b in 10..13, c in 100..104};[2,13,104] in S", true);
+			this.Test("S:={[a,b,c]:a in 1..2, b in 10..13, c in 100..104};[6,13,104] in S", false);
+			this.Test("S:={[a,b,c]:a in 1..2, b in 10..13, c in 100..104};[2,16,104] in S", false);
+			this.Test("S:={[a,b,c]:a in 1..2, b in 10..13, c in 100..104};[2,13,114] in S", false);
 			this.Test("S:={v[]:count(v)>3};[1,2] in S", false);
 			this.Test("S:={v[]:count(v)>3};[1,2,3] in S", false);
 			this.Test("S:={v[]:count(v)>3};[1,2,3,4] in S", true);

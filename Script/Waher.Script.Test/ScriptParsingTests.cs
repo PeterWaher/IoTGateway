@@ -388,6 +388,7 @@ namespace Waher.Script.Test
 			this.Test("S:=1..20;S2:={x in S:x>10}");
 			this.Test("S:={[a,b]: a>b}");
 			this.Test("S:={[a,b]: a in Z, b in Z, a>b}");
+			this.Test("S:={[a,b,c]:a in 1..2, b in 10..13, c in 100..104}");
 			this.Test("S:={v[]:count(v)>3}");
 			this.Test("S:={s{}:count(s)>3}");
 			this.Test("S:={M[,]:M.Columns>M.Rows}");

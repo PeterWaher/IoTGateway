@@ -207,6 +207,7 @@ This allows you to define infinite sets. Examples:
 
 	S:={[a,b]: a>b}
 	S:={[a,b]: a in Z, b in Z, a>b}
+	S:={[a,b,c]:a in 1..2, b in 10..13, c in 100..104}
 	S:={x::x>10}
 	S:={v[]:count(v)>3}
 	S:={s{}:count(s)>3}

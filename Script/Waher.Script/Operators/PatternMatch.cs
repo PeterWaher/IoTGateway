@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Exceptions;
 using Waher.Script.Model;
 
 namespace Waher.Script.Operators
@@ -32,14 +33,28 @@ namespace Waher.Script.Operators
         public override IElement Evaluate(Variables Variables)
         {
             IElement Result = this.right.Evaluate(Variables);
-            Dictionary<string, IElement> AlreadyFound = new Dictionary<string, IElement>();
+			Match(this.left, Result, Variables, this);
+			return Result;
+		}
 
-            this.left.PatternMatch(Result, AlreadyFound);
+		public static void Match(ScriptNode Branch, IElement Value, Variables Variables, ScriptNode Node)
+		{
+			Dictionary<string, IElement> AlreadyFound = new Dictionary<string, IElement>();
 
-            foreach (KeyValuePair<string, IElement> P in AlreadyFound)
-                Variables[P.Key] = P.Value;
+			switch (Branch.PatternMatch(Value, AlreadyFound))
+			{
+				case PatternMatchResult.Match:
+					foreach (KeyValuePair<string, IElement> P in AlreadyFound)
+						Variables[P.Key] = P.Value;
+					break;
 
-            return Result;
-        }
-    }
+				case PatternMatchResult.NoMatch:
+					throw new ScriptRuntimeException("Pattern mismatch.", Node);
+
+				case PatternMatchResult.Unknown:
+				default:
+					throw new ScriptRuntimeException("Unable to compute pattern match.", Node);
+			}
+		}
+	}
 }

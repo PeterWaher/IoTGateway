@@ -57,9 +57,10 @@ namespace Waher.Script.Operators.Sets
 		/// </summary>
 		/// <param name="CheckAgainst">Value to check against.</param>
 		/// <param name="AlreadyFound">Variables already identified.</param>
-		public override void PatternMatch(IElement CheckAgainst, Dictionary<string, IElement> AlreadyFound)
+		/// <returns>Pattern match result</returns>
+		public override PatternMatchResult PatternMatch(IElement CheckAgainst, Dictionary<string, IElement> AlreadyFound)
 		{
-			this.op.PatternMatch(this.ConvertToSet(CheckAgainst), AlreadyFound);
+			return this.op.PatternMatch(this.ConvertToSet(CheckAgainst), AlreadyFound);
 		}
 	}
 }

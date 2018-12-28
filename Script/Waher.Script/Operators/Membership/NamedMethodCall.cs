@@ -263,13 +263,7 @@ namespace Waher.Script.Operators.Membership
 					{
 						j = this.byReference[i].Value;
 						if (string.IsNullOrEmpty(s = this.byReference[i].Key))
-						{
-							Dictionary<string, IElement> Found = new Dictionary<string, IElement>();
-							this.parameters[j].PatternMatch(Expression.Encapsulate(this.methodArguments[j]), Found);
-
-							foreach (KeyValuePair<string, IElement> P in Found)
-								Variables[P.Key] = P.Value;
-						}
+							Operators.PatternMatch.Match(this.parameters[j], Expression.Encapsulate(this.methodArguments[j]), Variables, this);
 						else
 							Variables[s] = this.methodArguments[j];
 					}

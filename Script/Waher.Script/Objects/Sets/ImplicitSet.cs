@@ -91,29 +91,30 @@ namespace Waher.Script.Objects.Sets
 
 				Dictionary<string, IElement> Variables = new Dictionary<string, IElement>();
 
-				try
+				switch (this.pattern.PatternMatch(Element, Variables))
 				{
-					this.pattern.PatternMatch(Element, Variables);
+					case PatternMatchResult.Match:
+						this.variables.Push();
+						try
+						{
 
-					this.variables.Push();
-					try
-					{
+							foreach (KeyValuePair<string, IElement> P in Variables)
+								this.variables[P.Key] = P.Value;
 
-						foreach (KeyValuePair<string, IElement> P in Variables)
-							this.variables[P.Key] = P.Value;
+							return this.SatisfiesConditions();
+						}
+						finally
+						{
+							this.variables.Pop();
+						}
 
-						return this.SatisfiesConditions();
-					}
-					finally
-					{
-						this.variables.Pop();
-					}
+					case PatternMatchResult.NoMatch:
+						return false;
+
+					case PatternMatchResult.Unknown:
+					default:
+						throw new ScriptRuntimeException("Unable to compute pattern match.", this.pattern);
 				}
-				catch (Exception)
-				{
-					return false;
-				}
-
 			}
 		}
 
@@ -187,20 +188,31 @@ namespace Waher.Script.Objects.Sets
 			{
 				foreach (IElement Element in this.superSet.ChildElements)
 				{
-					try
+					Variables.Clear();
+					switch (this.pattern.PatternMatch(Element, Variables))
 					{
-						Variables.Clear();
-						this.pattern.PatternMatch(Element, Variables);
+						case PatternMatchResult.Match:
+							foreach (KeyValuePair<string, IElement> P in Variables)
+								this.variables[P.Key] = P.Value;
 
-						foreach (KeyValuePair<string, IElement> P in Variables)
-							this.variables[P.Key] = P.Value;
+							try
+							{
+								if (!this.SatisfiesConditions())
+									continue;
+							}
+							catch (Exception)
+							{
+								continue;
+							}
 
-						if (!this.SatisfiesConditions())
+							break;
+
+						case PatternMatchResult.NoMatch:
 							continue;
-					}
-					catch (Exception)
-					{
-						continue;
+
+						case PatternMatchResult.Unknown:
+						default:
+							return false;
 					}
 
 					Items.AddLast(Element);

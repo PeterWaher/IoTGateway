@@ -52,25 +52,39 @@ namespace Waher.Script.Operators.Sets
             return new FiniteSet(Elements);
         }
 
-        /// <summary>
-        /// Performs a pattern match operation.
-        /// </summary>
-        /// <param name="CheckAgainst">Value to check against.</param>
-        /// <param name="AlreadyFound">Variables already identified.</param>
-        public override void PatternMatch(IElement CheckAgainst, Dictionary<string, IElement> AlreadyFound)
-        {
-            ScriptNode[] Elements = this.Elements;
+		/// <summary>
+		/// Performs a pattern match operation.
+		/// </summary>
+		/// <param name="CheckAgainst">Value to check against.</param>
+		/// <param name="AlreadyFound">Variables already identified.</param>
+		/// <returns>Pattern match result</returns>
+		public override PatternMatchResult PatternMatch(IElement CheckAgainst, Dictionary<string, IElement> AlreadyFound)
+		{
+			ScriptNode[] Elements = this.Elements;
 
             ISet Set = CheckAgainst as ISet;
             int? Size;
 
-            if (Set is null || !(Size = Set.Size).HasValue || Size.Value != Elements.Length)
-                throw new ScriptRuntimeException("Pattern mismatch.", this);
+			if (Set is null)
+				return PatternMatchResult.NoMatch;
 
-            int i = 0;
+			if (!(Size = Set.Size).HasValue)
+				return PatternMatchResult.Unknown;
 
-            foreach (IElement E in Set.ChildElements)
-                Elements[i++].PatternMatch(E, AlreadyFound);
+			if (Size.Value != Elements.Length)
+				return PatternMatchResult.NoMatch;
+
+			PatternMatchResult Result;
+			int i = 0;
+
+			foreach (IElement E in Set.ChildElements)
+			{
+				Result = Elements[i++].PatternMatch(E, AlreadyFound);
+				if (Result != PatternMatchResult.Match)
+					return Result;
+			}
+
+			return PatternMatchResult.Match;
         }
 
     }

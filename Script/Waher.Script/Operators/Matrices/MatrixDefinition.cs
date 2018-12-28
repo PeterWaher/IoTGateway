@@ -188,15 +188,17 @@ namespace Waher.Script.Operators.Matrices
         /// </summary>
         /// <param name="CheckAgainst">Value to check against.</param>
         /// <param name="AlreadyFound">Variables already identified.</param>
-        public override void PatternMatch(IElement CheckAgainst, Dictionary<string, IElement> AlreadyFound)
+		/// <returns>Pattern match result</returns>
+        public override PatternMatchResult PatternMatch(IElement CheckAgainst, Dictionary<string, IElement> AlreadyFound)
         {
             ScriptNode[] Elements = this.Elements;
             IMatrix Matrix = CheckAgainst as IMatrix;
             int c = Elements.Length;
 
-            if (Matrix is null || Matrix.Rows != c)
-                throw new ScriptRuntimeException("Pattern mismatch.", this);
+			if (Matrix is null || Matrix.Rows != c)
+				return PatternMatchResult.NoMatch;
 
+			PatternMatchResult Result;
 			int i;
 
 			if (Matrix is IVector RowVectors)
@@ -204,13 +206,23 @@ namespace Waher.Script.Operators.Matrices
 				i = 0;
 
 				foreach (IElement E in RowVectors.VectorElements)
-					Elements[i++].PatternMatch(E, AlreadyFound);
+				{
+					Result = Elements[i++].PatternMatch(E, AlreadyFound);
+					if (Result != PatternMatchResult.Match)
+						return Result;
+				}
 			}
 			else
 			{
 				for (i = 0; i < c; i++)
-					Elements[i].PatternMatch(Matrix.GetRow(i), AlreadyFound);
+				{
+					Result = Elements[i].PatternMatch(Matrix.GetRow(i), AlreadyFound);
+					if (Result != PatternMatchResult.Match)
+						return Result;
+				}
 			}
+
+			return PatternMatchResult.Match;
 		}
 
     }

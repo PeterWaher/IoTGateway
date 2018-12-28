@@ -43,15 +43,15 @@ namespace Waher.Script.Model
             return this.constant;
         }
 
-        /// <summary>
-        /// Performs a pattern match operation.
-        /// </summary>
-        /// <param name="CheckAgainst">Value to check against.</param>
-        /// <param name="AlreadyFound">Variables already identified.</param>
-        public override void PatternMatch(IElement CheckAgainst, Dictionary<string, IElement> AlreadyFound)
-        {
-            if (!this.constant.Equals(CheckAgainst))
-                throw new ScriptRuntimeException("Pattern mismatch.", this);
+		/// <summary>
+		/// Performs a pattern match operation.
+		/// </summary>
+		/// <param name="CheckAgainst">Value to check against.</param>
+		/// <param name="AlreadyFound">Variables already identified.</param>
+		/// <returns>Pattern match result</returns>
+		public override PatternMatchResult PatternMatch(IElement CheckAgainst, Dictionary<string, IElement> AlreadyFound)
+		{
+			return this.constant.Equals(CheckAgainst) ? PatternMatchResult.Match : PatternMatchResult.NoMatch;
         }
 
 		/// <summary>

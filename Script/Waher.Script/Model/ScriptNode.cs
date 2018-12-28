@@ -9,6 +9,24 @@ using Waher.Script.Operators.Arithmetics;
 
 namespace Waher.Script.Model
 {
+	public enum PatternMatchResult
+	{
+		/// <summary>
+		/// Script branch matches pattern
+		/// </summary>
+		Match,
+
+		/// <summary>
+		/// Script branch does not match pattern
+		/// </summary>
+		NoMatch,
+
+		/// <summary>
+		/// Pattern match could not be evaluated.
+		/// </summary>
+		Unknown
+	}
+
 	/// <summary>
 	/// Delegate for ScriptNode callback methods.
 	/// </summary>
@@ -68,9 +86,10 @@ namespace Waher.Script.Model
 		/// </summary>
 		/// <param name="CheckAgainst">Value to check against.</param>
 		/// <param name="AlreadyFound">Variables already identified.</param>
-		public virtual void PatternMatch(IElement CheckAgainst, Dictionary<string, IElement> AlreadyFound)
+		/// <returns>Pattern match result</returns>
+		public virtual PatternMatchResult PatternMatch(IElement CheckAgainst, Dictionary<string, IElement> AlreadyFound)
 		{
-			throw new ScriptRuntimeException("Pattern mismatch.", this);
+			return PatternMatchResult.Unknown;
 		}
 
 		/// <summary>

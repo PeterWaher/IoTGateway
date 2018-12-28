@@ -163,23 +163,31 @@ namespace Waher.Script.Operators.Vectors
             return new ObjectVector(Elements);
         }
 
-        /// <summary>
-        /// Performs a pattern match operation.
-        /// </summary>
-        /// <param name="CheckAgainst">Value to check against.</param>
-        /// <param name="AlreadyFound">Variables already identified.</param>
-        public override void PatternMatch(IElement CheckAgainst, Dictionary<string, IElement> AlreadyFound)
-        {
-            ScriptNode[] Elements = this.Elements;
+		/// <summary>
+		/// Performs a pattern match operation.
+		/// </summary>
+		/// <param name="CheckAgainst">Value to check against.</param>
+		/// <param name="AlreadyFound">Variables already identified.</param>
+		/// <returns>Pattern match result</returns>
+		public override PatternMatchResult PatternMatch(IElement CheckAgainst, Dictionary<string, IElement> AlreadyFound)
+		{
+			ScriptNode[] Elements = this.Elements;
 
             IVector Vector = CheckAgainst as IVector;
-            if (Vector is null || Vector.Dimension != Elements.Length)
-                throw new ScriptRuntimeException("Pattern mismatch.", this);
+			if (Vector is null || Vector.Dimension != Elements.Length)
+				return PatternMatchResult.NoMatch;
 
-            int i = 0;
+			PatternMatchResult Result;
+			int i = 0;
 
             foreach (IElement E in Vector.ChildElements)
-                Elements[i++].PatternMatch(E, AlreadyFound);
+			{
+				Result = Elements[i++].PatternMatch(E, AlreadyFound);
+				if (Result != PatternMatchResult.Match)
+					return Result;
+			}
+
+			return PatternMatchResult.Match;
         }
 
     }

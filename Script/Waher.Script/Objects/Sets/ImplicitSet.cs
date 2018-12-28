@@ -174,6 +174,15 @@ namespace Waher.Script.Objects.Sets
 			}
 		}
 
+		/// <summary>
+		/// Calculates elements specified using implicit notation.
+		/// </summary>
+		/// <param name="Pattern">Pattern forming elements.</param>
+		/// <param name="SuperSetElements">Optional super-set of elements. Can be null.</param>
+		/// <param name="SetConditions">Set membership conditions that need to be fulfilled.</param>
+		/// <param name="OtherConditions">Other conditions that need to be fulfilled.</param>
+		/// <param name="Variables">Current set of variables.</param>
+		/// <returns>Enumerable set of elements, or null if not able to calculate element set.</returns>
 		public static IEnumerable<IElement> CalculateElements(ScriptNode Pattern, IEnumerable<IElement> SuperSetElements,
 			In[] SetConditions, ScriptNode[] OtherConditions, Variables Variables)
 		{
@@ -401,6 +410,9 @@ namespace Waher.Script.Objects.Sets
 			return null;
 		}
 
+		/// <summary>
+		/// <see cref="object.Equals(object)"/>
+		/// </summary>
 		public override bool Equals(object obj)
 		{
 			if (!(obj is ImplicitSet S))
@@ -419,6 +431,9 @@ namespace Waher.Script.Objects.Sets
 				ScriptNode.AreEqual(this.setConditions, S.setConditions);
 		}
 
+		/// <summary>
+		/// <see cref="object.GetHashCode"/>
+		/// </summary>
 		public override int GetHashCode()
 		{
 			int Result = this.pattern.GetHashCode();

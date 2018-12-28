@@ -209,7 +209,7 @@ namespace Waher.Script.Operators
                     case ArgumentType.Vector:
                         if (Argument is IVectorSpaceElement)
                             e[i] = null;
-                        else if ((M = Argument as IMatrix) != null)
+                        else if (!((M = Argument as IMatrix) is null))
                         {
                             if (Dimension < 0)
                                 Dimension = M.Rows;
@@ -225,7 +225,7 @@ namespace Waher.Script.Operators
                             if (Encapsulation is null)
                                 Encapsulation = EncapsulateToVector;
                         }
-                        else if ((S = Argument as ISet) != null)
+                        else if (!((S = Argument as ISet) is null))
                         {
                             int? Size = S.Size;
                             if (!Size.HasValue)
@@ -250,12 +250,12 @@ namespace Waher.Script.Operators
                     case ArgumentType.Set:
                         if (Argument is ISet)
                             e[i] = null;
-                        else if ((V = Argument as IVectorSpaceElement) != null)
+                        else if (!((V = Argument as IVectorSpaceElement) is null))
                         {
                             Arguments[i] = SetDefinition.Encapsulate(V.ChildElements, this);
                             e[i] = null;
                         }
-                        else if ((M = Argument as IMatrix) != null)
+                        else if (!((M = Argument as IMatrix) is null))
                         {
                             if (Dimension < 0)
                                 Dimension = M.Rows;
@@ -284,12 +284,12 @@ namespace Waher.Script.Operators
                     case ArgumentType.Matrix:
                         if (Argument is IMatrix)
                             e[i] = null;
-                        else if ((V = Argument as IVectorSpaceElement) != null)
+                        else if (!((V = Argument as IVectorSpaceElement) is null))
                         {
                             Arguments[i] = MatrixDefinition.Encapsulate(V.ChildElements, 1, V.Dimension, this);
                             e[i] = null;
                         }
-                        else if ((S = Argument as ISet) != null)
+                        else if (!((S = Argument as ISet) is null))
                         {
                             int? Size = S.Size;
                             if (!Size.HasValue)
@@ -316,7 +316,7 @@ namespace Waher.Script.Operators
                 }
             }
 
-            if (Encapsulation != null)
+            if (!(Encapsulation is null))
             {
                 LinkedList<IElement> Result = new LinkedList<IElement>();
                 IElement[] Arguments2 = new IElement[this.nrArguments];

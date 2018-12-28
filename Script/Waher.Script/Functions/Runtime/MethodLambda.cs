@@ -104,7 +104,7 @@ namespace Waher.Script.Functions.Runtime
 			for (i = 0; i < c; i++)
 			{
 				Obj = Arguments[i].AssociatedObjectValue;
-				if (Obj != null)
+				if (!(Obj is null))
 				{
 					T = Obj.GetType();
 					T0 = this.parameters[i].ParameterType;

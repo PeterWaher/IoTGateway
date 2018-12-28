@@ -64,7 +64,7 @@ namespace Waher.Script.Operators
 			{
 				Loop = this.statements.First;
 
-				while (Loop != null)
+				while (!(Loop is null))
 				{
 					if (!Loop.Value.ForAllChildNodes(Callback, State, DepthFirst))
 						return false;
@@ -75,7 +75,7 @@ namespace Waher.Script.Operators
 
 			Loop = this.statements.First;
 
-			while (Loop != null)
+			while (!(Loop is null))
 			{
 				ScriptNode Node = Loop.Value;
 				bool Result = Callback(ref Node, State);
@@ -91,7 +91,7 @@ namespace Waher.Script.Operators
 			{
 				Loop = this.statements.First;
 
-				while (Loop != null)
+				while (!(Loop is null))
 				{
 					if (!Loop.Value.ForAllChildNodes(Callback, State, DepthFirst))
 						return false;

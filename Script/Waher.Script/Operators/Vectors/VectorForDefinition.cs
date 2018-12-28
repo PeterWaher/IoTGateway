@@ -61,7 +61,7 @@ namespace Waher.Script.Operators.Vectors
             int Direction = S.Compare(From, To);
             bool Done;
 
-            if (this.middle2 != null)
+            if (!(this.middle2 is null))
             {
                 Step = this.middle2.Evaluate(Variables);
 

@@ -47,7 +47,7 @@ namespace Waher.Script.Operators.Assignments
 			Type Type = LeftValue.GetType();
 
 			PropertyInfo Property = Type.GetRuntimeProperty(Name);
-			if (Property != null)
+			if (!(Property is null))
 			{
 				Type = Property.PropertyType;
 				if (!Type.GetTypeInfo().IsAssignableFrom(Right.GetType().GetTypeInfo()))
@@ -58,7 +58,7 @@ namespace Waher.Script.Operators.Assignments
 			else
 			{
 				FieldInfo Field = Type.GetRuntimeField(Name);
-				if (Field != null)
+				if (!(Field is null))
 				{
 					Type = Field.FieldType;
 					if (!Type.GetTypeInfo().IsAssignableFrom(Right.GetType().GetTypeInfo()))
@@ -69,7 +69,7 @@ namespace Waher.Script.Operators.Assignments
 				else
 				{
 					Property = Type.GetRuntimeProperty("Item");
-					if (Property != null)
+					if (!(Property is null))
 					{
 						Type = Property.PropertyType;
 						if (!Type.GetTypeInfo().IsAssignableFrom(Right.GetType().GetTypeInfo()))

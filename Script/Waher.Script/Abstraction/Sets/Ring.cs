@@ -29,11 +29,11 @@ namespace Waher.Script.Abstraction.Sets
 			IRingElement Result;
 
 			Result = Left.MultiplyRight(Right);
-			if (Result != null)
+			if (!(Result is null))
 				return Result;
 
 			Result = Right.MultiplyLeft(Left);
-			if (Result != null)
+			if (!(Result is null))
 				return Result;
 
 			return null;

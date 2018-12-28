@@ -71,7 +71,7 @@ namespace Waher.Script.Model
 					return new Namespace(this.variableName);
 
 				ValueElement = Expression.GetFunctionLambdaDefinition(this.variableName, this.Start, this.Length, this.Expression);
-				if (ValueElement != null)
+				if (!(ValueElement is null))
 					return ValueElement;
 
 				if (Types.TryGetQualifiedNames(this.variableName, out string[] QualifiedNames))
@@ -80,7 +80,7 @@ namespace Waher.Script.Model
 					{
 						Type T = Types.GetType(QualifiedNames[0]);
 
-						if (T != null)
+						if (!(T is null))
 							return new TypeValue(T);
 						else
 							return new Namespace(QualifiedNames[0]);

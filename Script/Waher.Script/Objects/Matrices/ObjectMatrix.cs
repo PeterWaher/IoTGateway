@@ -147,7 +147,7 @@ namespace Waher.Script.Objects.Matrices
 			get { return this.columnNames; }
 			set
 			{
-				if (value != null && value.Length != this.columns)
+				if (!(value is null) && value.Length != this.columns)
 					throw new ArgumentException("Number of columns does not match actual number of columns.", nameof(value));
 
 				this.columnNames = value;
@@ -164,7 +164,7 @@ namespace Waher.Script.Objects.Matrices
 		{
 			get
 			{
-				if (this.columnNames != null)
+				if (!(this.columnNames is null))
 				{
 					int i, c = this.columnNames.Length;
 
@@ -267,7 +267,7 @@ namespace Waher.Script.Objects.Matrices
 
 				return new ObjectMatrix(v);
 			}
-			else if ((Matrix = Element as ObjectMatrix) != null)
+			else if (!((Matrix = Element as ObjectMatrix) is null))
 			{
 				if (Matrix.columns != this.rows)
 					return null;
@@ -326,7 +326,7 @@ namespace Waher.Script.Objects.Matrices
 
 				return new ObjectMatrix(v);
 			}
-			else if ((Matrix = Element as ObjectMatrix) != null)
+			else if (!((Matrix = Element as ObjectMatrix) is null))
 			{
 				if (this.columns != Matrix.rows)
 					return null;
@@ -395,7 +395,7 @@ namespace Waher.Script.Objects.Matrices
 
 				return new ObjectMatrix(v);
 			}
-			else if ((Matrix = Element as ObjectMatrix) != null)
+			else if (!((Matrix = Element as ObjectMatrix) is null))
 			{
 				if (this.columns != Matrix.columns || this.rows != Matrix.rows)
 					return null;
@@ -538,13 +538,13 @@ namespace Waher.Script.Objects.Matrices
 		{
 			get
 			{
-				if (this.rowVectors != null)
+				if (!(this.rowVectors is null))
 					return this.rowVectors;
 
 				LinkedList<IElement> Rows = new LinkedList<IElement>();
 				int x, y;
 
-				if (this.values != null)
+				if (!(this.values is null))
 				{
 					for (y = 0; y < this.rows; y++)
 					{
@@ -576,7 +576,7 @@ namespace Waher.Script.Objects.Matrices
 						}
 					}
 
-					if (Row != null)
+					if (!(Row is null))
 						Rows.AddLast(Operators.Vectors.VectorDefinition.Encapsulate(Row, false, null));
 				}
 

@@ -194,7 +194,7 @@ namespace Waher.Script.Objects.Matrices
 			double n;
 			int x, y, z;
 
-			if (Number != null)
+			if (!(Number is null))
 			{
 				n = Number.Value;
 				v = new double[this.rows, this.columns];
@@ -207,7 +207,7 @@ namespace Waher.Script.Objects.Matrices
 
 				return new DoubleMatrix(v);
 			}
-			else if ((Matrix = Element as DoubleMatrix) != null)
+			else if (!((Matrix = Element as DoubleMatrix) is null))
 			{
 				if (Matrix.columns != this.rows)
 					return null;
@@ -248,7 +248,7 @@ namespace Waher.Script.Objects.Matrices
 			double n;
 			int x, y, z;
 
-			if (Number != null)
+			if (!(Number is null))
 			{
 				n = Number.Value;
 				v = new double[this.rows, this.columns];
@@ -261,7 +261,7 @@ namespace Waher.Script.Objects.Matrices
 
 				return new DoubleMatrix(v);
 			}
-			else if ((Matrix = Element as DoubleMatrix) != null)
+			else if (!((Matrix = Element as DoubleMatrix) is null))
 			{
 				if (this.columns != Matrix.rows)
 					return null;
@@ -381,7 +381,7 @@ namespace Waher.Script.Objects.Matrices
 			double n;
 			int x, y;
 
-			if (Number != null)
+			if (!(Number is null))
 			{
 				n = Number.Value;
 				v = new double[this.rows, this.columns];
@@ -394,7 +394,7 @@ namespace Waher.Script.Objects.Matrices
 
 				return new DoubleMatrix(v);
 			}
-			else if ((Matrix = Element as DoubleMatrix) != null)
+			else if (!((Matrix = Element as DoubleMatrix) is null))
 			{
 				if (this.columns != Matrix.columns || this.rows != Matrix.rows)
 					return null;
@@ -546,7 +546,7 @@ namespace Waher.Script.Objects.Matrices
 		{
 			get
 			{
-				if (this.rowVectors != null)
+				if (!(this.rowVectors is null))
 					return this.rowVectors;
 
 				double[,] v = this.Values;

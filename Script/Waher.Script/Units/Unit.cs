@@ -258,7 +258,7 @@ namespace Waher.Script.Units
 					Numerator = new StringBuilder();
 			}
 
-			if (Denominator != null)
+			if (!(Denominator is null))
 			{
 				Numerator.Append('/');
 
@@ -302,7 +302,7 @@ namespace Waher.Script.Units
 				Loop = Result.First;
 				Found = false;
 
-				while (Loop != null && !Found)
+				while (!(Loop is null) && !Found)
 				{
 					if (Loop.Value.Key.Name == Name)
 					{
@@ -354,7 +354,7 @@ namespace Waher.Script.Units
 				Loop = Result.First;
 				Found = false;
 
-				while (Loop != null && !Found)
+				while (!(Loop is null) && !Found)
 				{
 					if (Loop.Value.Key.Name == Name)
 					{
@@ -455,7 +455,7 @@ namespace Waher.Script.Units
 			LinkedListNode<KeyValuePair<AtomicUnit, int>> Loop = Factors.First;
 			string Name = AtomicUnit.Name;
 
-			while (Loop != null && Loop.Value.Key.Name != Name)
+			while (!(Loop is null) && Loop.Value.Key.Name != Name)
 				Loop = Loop.Next;
 
 			if (Loop is null)

@@ -134,7 +134,7 @@ namespace Waher.Script.Functions.Vectors
             {
 				IRingElement Avg;
 
-				if (Result is IRingElement RE && (Avg = RE.MultiplyRight(new DoubleNumber(1.0 / n))) != null)
+				if (Result is IRingElement RE && !((Avg = RE.MultiplyRight(new DoubleNumber(1.0 / n))) is null))
 					return Avg;
 				else
 					return Operators.Arithmetics.Divide.EvaluateDivision(Result, new DoubleNumber(n), Node);

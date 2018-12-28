@@ -52,7 +52,7 @@ namespace Waher.Script.Operators.Arithmetics
 			DoubleNumber DL = Left as DoubleNumber;
 			DoubleNumber DR = Right as DoubleNumber;
 
-			if (DL != null && DR != null)
+			if (!(DL is null) && !(DR is null))
 			{
 				double dl = DL.Value;
 				if (dl < long.MinValue || dl > long.MaxValue || dl != Math.Truncate(dl))
@@ -83,7 +83,7 @@ namespace Waher.Script.Operators.Arithmetics
 						IEuclidianDomainElement LE = Left as IEuclidianDomainElement;
 						IEuclidianDomainElement RE = Right as IEuclidianDomainElement;
 
-						if (LE != null && RE != null)
+						if (!(LE is null) && !(RE is null))
 						{
 							((IEuclidianDomain)LeftSet).Divide(LE, RE, out IEuclidianDomainElement Result);
 							return Result;

@@ -52,14 +52,14 @@ namespace Waher.Script.Operators.Arithmetics
 			ISemiGroupElement RE = Right as ISemiGroupElement;
 			IElement Result;
 
-			if (Left is ISemiGroupElement LE && RE != null)
+			if (Left is ISemiGroupElement LE && !(RE is null))
 			{
 				Result = LE.AddRight(RE);
-				if (Result != null)
+				if (!(Result is null))
 					return Result;
 
 				Result = RE.AddLeft(LE);
-				if (Result != null)
+				if (!(Result is null))
 					return Result;
 			}
 
@@ -77,14 +77,14 @@ namespace Waher.Script.Operators.Arithmetics
 
 						LE = Left as ISemiGroupElement;
 						RE = Right as ISemiGroupElement;
-						if (LE != null && RE != null)
+						if (!(LE is null) && !(RE is null))
 						{
 							Result = LE.AddRight(RE);
-							if (Result != null)
+							if (!(Result is null))
 								return Result;
 
 							Result = RE.AddLeft(LE);
-							if (Result != null)
+							if (!(Result is null))
 								return Result;
 						}
 					}

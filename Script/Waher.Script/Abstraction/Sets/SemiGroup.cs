@@ -29,11 +29,11 @@ namespace Waher.Script.Abstraction.Sets
 			ISemiGroupElement Result;
 
 			Result = Left.AddRight(Right);
-			if (Result != null)
+			if (!(Result is null))
 				return Result;
 
 			Result = Right.AddLeft(Left);
-			if (Result != null)
+			if (!(Result is null))
 				return Result;
 
 			return null;

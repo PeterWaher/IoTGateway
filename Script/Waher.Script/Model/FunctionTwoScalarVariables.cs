@@ -50,7 +50,7 @@ namespace Waher.Script.Model
 
                     DoubleNumber DoubleNumber1 = Argument1 as DoubleNumber;
                     DoubleNumber DoubleNumber2 = Argument2 as DoubleNumber;
-                    if (DoubleNumber1 != null && DoubleNumber2 != null)
+                    if (!(DoubleNumber1 is null) && !(DoubleNumber2 is null))
                         return this.EvaluateScalar(DoubleNumber1.Value, DoubleNumber2.Value, Variables);
 
 					if (Argument1 is ComplexNumber ComplexNumber1 &&
@@ -74,23 +74,23 @@ namespace Waher.Script.Model
 					double arg1, arg2;
 					PhysicalQuantity Q;
 
-					if (DoubleNumber1 != null)
+					if (!(DoubleNumber1 is null))
 						arg1 = DoubleNumber1.Value;
 					else
 					{
 						Q = Argument1 as PhysicalQuantity;
-						if (Q != null)
+						if (!(Q is null))
 							arg1 = Q.Magnitude;
 						else
 							return this.EvaluateScalar(Argument1, Argument2, Variables);
 					}
 
-					if (DoubleNumber2 != null)
+					if (!(DoubleNumber2 is null))
 						arg2 = DoubleNumber2.Value;
 					else
 					{
 						Q = Argument2 as PhysicalQuantity;
-						if (Q != null)
+						if (!(Q is null))
 							arg2 = Q.Magnitude;
 						else
 							return this.EvaluateScalar(Argument1, Argument2, Variables);

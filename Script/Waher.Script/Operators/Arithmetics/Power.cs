@@ -52,10 +52,10 @@ namespace Waher.Script.Operators.Arithmetics
 		{
 			DoubleNumber DR = Right as DoubleNumber;
 
-			if (Left is DoubleNumber DL && DR != null)
+			if (Left is DoubleNumber DL && !(DR is null))
 				return new DoubleNumber(Math.Pow(DL.Value, DR.Value));
 
-			if (Left is IRingElement LE && DR != null)
+			if (Left is IRingElement LE && !(DR is null))
 			{
 				double d = DR.Value;
 				if (d >= long.MinValue && d <= long.MaxValue && Math.Truncate(d) == d)

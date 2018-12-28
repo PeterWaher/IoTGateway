@@ -179,14 +179,14 @@ namespace Waher.Script.Model
 		/// <returns>If the process was completed.</returns>
 		protected static bool ForAllChildNodes(ScriptNodeEventHandler Callback, ScriptNode[] Nodes, object State, bool DepthFirst)
 		{
-			if (Nodes != null)
+			if (!(Nodes is null))
 			{
 				int i, c = Nodes.Length;
 
 				for (i = 0; i < c; i++)
 				{
 					ScriptNode Node = Nodes[i];
-					if (Node != null)
+					if (!(Node is null))
 					{
 						if (!Node.ForAllChildNodes(Callback, State, DepthFirst))
 							return false;
@@ -207,7 +207,7 @@ namespace Waher.Script.Model
 		/// <returns>If the process was completed.</returns>
 		protected static bool ForAll(ScriptNodeEventHandler Callback, ScriptNode[] Nodes, object State, bool DepthFirst)
 		{
-			if (Nodes != null)
+			if (!(Nodes is null))
 			{
 				int i, c = Nodes.Length;
 				ScriptNode Node;
@@ -215,7 +215,7 @@ namespace Waher.Script.Model
 				for (i = 0; i < c; i++)
 				{
 					Node = Nodes[i];
-					if (Node != null)
+					if (!(Node is null))
 					{
 						if (!Callback(ref Node, State))
 							return false;
@@ -315,7 +315,7 @@ namespace Waher.Script.Model
 
 			foreach (object Item in Set)
 			{
-				if (Item != null)
+				if (!(Item is null))
 					Result ^= Result << 5 ^ Item.GetHashCode();
 				else
 					Result ^= Result << 5;

@@ -60,7 +60,7 @@ namespace Waher.Script.Operators.Comparisons
             Match M;
 
 			ExpressionTransform h = this.TransformExpression;
-			if (h != null)
+			if (!(h is null))
 				sr = h(sr);
 
 			lock (this.synchObject)
@@ -95,7 +95,7 @@ namespace Waher.Script.Operators.Comparisons
 
             if (M.Success)
             {
-                if (GroupNames != null)
+                if (!(GroupNames is null))
                 {
                     foreach (string GroupName in GroupNames)
                     {

@@ -27,7 +27,7 @@ namespace Waher.Script.Objects.Sets
 		/// </summary>
 		/// <param name="Pattern">Pattern of elements.</param>
 		/// <param name="SuperSet">Optional superset.</param>
-		/// <param name="Conditions">Condition subset members must fulfill.</param><
+		/// <param name="Conditions">Condition subset members must fulfill.</param>
 		/// <param name="Variables">Refernce to variables.</param>
 		/// <param name="DoubleColon">If double-colon was used to create subset.</param>
 		public ImplicitSet(ScriptNode Pattern, ISet SuperSet, ScriptNode[] Conditions, Variables Variables, bool DoubleColon)
@@ -61,7 +61,7 @@ namespace Waher.Script.Objects.Sets
 
 					FinitSetConditions.Add(In);
 				}
-				else if (FinitSetConditions != null)
+				else if (!(FinitSetConditions is null))
 				{
 					if (OtherConditions is null)
 						OtherConditions = new List<ScriptNode>();
@@ -70,7 +70,7 @@ namespace Waher.Script.Objects.Sets
 				}
 			}
 
-			if (FinitSetConditions != null)
+			if (!(FinitSetConditions is null))
 			{
 				this.conditions = OtherConditions?.ToArray();
 				this.finitSetConditions = FinitSetConditions.ToArray();
@@ -91,11 +91,11 @@ namespace Waher.Script.Objects.Sets
 		/// <returns>If the element is contained in the set.</returns>
 		public override bool Contains(IElement Element)
 		{
-			if (this.finiteSet != null)
+			if (!(this.finiteSet is null))
 				return this.finiteSet.Contains(Element);
 			else
 			{
-				if (this.superSet != null && !this.superSet.Contains(Element))
+				if (!(this.superSet is null) && !this.superSet.Contains(Element))
 					return false;
 
 				Dictionary<string, IElement> Variables = new Dictionary<string, IElement>();
@@ -138,7 +138,7 @@ namespace Waher.Script.Objects.Sets
 				}
 			}
 
-			if (this.conditions != null)
+			if (!(this.conditions is null))
 			{
 				foreach (ScriptNode Condition in this.conditions)
 				{
@@ -169,7 +169,7 @@ namespace Waher.Script.Objects.Sets
 		{
 			get
 			{
-				if (this.finiteSet != null)
+				if (!(this.finiteSet is null))
 					return this.finiteSet.ChildElements;
 
 				if (!this.CalcSubset())
@@ -186,7 +186,7 @@ namespace Waher.Script.Objects.Sets
 		{
 			get
 			{
-				if (this.finiteSet != null)
+				if (!(this.finiteSet is null))
 					return this.finiteSet.Size;
 
 				if (!this.CalcSubset())
@@ -198,7 +198,7 @@ namespace Waher.Script.Objects.Sets
 
 		private bool CalcSubset()
 		{
-			if (this.superSet != null && this.superSet.Size.HasValue)
+			if (!(this.superSet is null) && this.superSet.Size.HasValue)
 			{
 				Dictionary<string, IElement> Variables = new Dictionary<string, IElement>();
 				LinkedList<IElement> Items = new LinkedList<IElement>();
@@ -246,7 +246,7 @@ namespace Waher.Script.Objects.Sets
 				this.finiteSet = new FiniteSet(Items);
 				return true;
 			}
-			else if (this.superSet is null && this.finitSetConditions != null)
+			else if (this.superSet is null && !(this.finitSetConditions is null))
 			{
 				int i, c = this.finitSetConditions.Length;
 				ISet[] Sets = new ISet[c];
@@ -408,7 +408,7 @@ namespace Waher.Script.Objects.Sets
 		{
 			int Result = this.pattern.GetHashCode();
 
-			if (this.superSet != null)
+			if (!(this.superSet is null))
 				Result ^= Result << 5 ^ this.superSet.GetHashCode();
 
 			Result ^= Result << 5 ^ ScriptNode.GetHashCode(this.conditions);
@@ -422,7 +422,7 @@ namespace Waher.Script.Objects.Sets
 		/// </summary>
 		public override string ToString()
 		{
-			if (this.finiteSet != null)
+			if (!(this.finiteSet is null))
 				return this.finiteSet.ToString();
 
 			StringBuilder sb = new StringBuilder();
@@ -430,7 +430,7 @@ namespace Waher.Script.Objects.Sets
 			sb.Append('{');
 			sb.Append(this.pattern.SubExpression);
 
-			if (this.superSet != null)
+			if (!(this.superSet is null))
 			{
 				sb.Append('∈');
 				sb.Append(this.superSet.ToString());
@@ -443,7 +443,7 @@ namespace Waher.Script.Objects.Sets
 
 			bool First = true;
 
-			if (this.finitSetConditions != null)
+			if (!(this.finitSetConditions is null))
 			{
 				foreach (ScriptNode Condition in this.finitSetConditions)
 				{
@@ -456,7 +456,7 @@ namespace Waher.Script.Objects.Sets
 				}
 			}
 
-			if (this.conditions != null)
+			if (!(this.conditions is null))
 			{
 				foreach (ScriptNode Condition in this.conditions)
 				{

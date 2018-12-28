@@ -38,7 +38,7 @@ namespace Waher.Script.Operators.Arithmetics
 		{
 			DoubleNumber DR = Right as DoubleNumber;
 
-			if (Left is DoubleNumber DL && DR != null)
+			if (Left is DoubleNumber DL && !(DR is null))
 				return new DoubleNumber(DR.Value / DL.Value);
 			else
 				return LeftDivide.EvaluateDivision(Left, Right, this);

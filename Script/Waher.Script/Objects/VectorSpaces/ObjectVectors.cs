@@ -40,7 +40,7 @@ namespace Waher.Script.Objects.VectorSpaces
 		{
 			get
 			{
-				if (this.scalarRing != null)
+				if (!(this.scalarRing is null))
 					return this.scalarRing;
 
 				IElement Ref = null;
@@ -83,7 +83,7 @@ namespace Waher.Script.Objects.VectorSpaces
 		{
 			get
 			{
-				if (this.scalarField != null)
+				if (!(this.scalarField is null))
 					return this.scalarField;
 
 				this.scalarField = this.ScalarRing as IField;

@@ -51,11 +51,11 @@ namespace Waher.Script.Operators.Conditional
                 IVector Vector = S as IVector;
 				IEnumerable Enumerable;
 
-				if (Vector != null)
+				if (!(Vector is null))
 					Elements = Vector.VectorElements;
 				else if (!S.IsScalar)
 					Elements = S.ChildElements;
-				else if ((Enumerable = S.AssociatedObjectValue as IEnumerable) != null)
+				else if (!((Enumerable = S.AssociatedObjectValue as IEnumerable) is null))
 				{
 					IEnumerator e = Enumerable.GetEnumerator();
 

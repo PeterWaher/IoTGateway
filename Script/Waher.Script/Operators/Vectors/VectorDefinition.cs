@@ -114,7 +114,7 @@ namespace Waher.Script.Operators.Vectors
             if (CanEncapsulateAsMatrix && SameDimensions && Columns.HasValue)
                 return Operators.Matrices.MatrixDefinition.Encapsulate(Elements, Node);
 
-            if (CommonSuperSet != null)
+            if (!(CommonSuperSet is null))
             {
                 if (Upgraded)
                 {
@@ -143,11 +143,11 @@ namespace Waher.Script.Operators.Vectors
                         }
                     }
 
-                    if (SuperElements != null)
+                    if (!(SuperElements is null))
                         Elements = SuperElements;
                 }
 
-                if (CommonSuperSet != null)
+                if (!(CommonSuperSet is null))
                 {
                     if (CommonSuperSet is DoubleNumbers)
                         return new DoubleVector(Elements);

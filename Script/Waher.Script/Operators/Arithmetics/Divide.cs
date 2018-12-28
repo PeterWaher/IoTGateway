@@ -52,17 +52,17 @@ namespace Waher.Script.Operators.Arithmetics
 			IElement Result;
 			IRingElement Temp;
 
-			if (Left is IRingElement LE && RE != null)
+			if (Left is IRingElement LE && !(RE is null))
 			{
 				Temp = RE.Invert();
-				if (Temp != null)
+				if (!(Temp is null))
 				{
 					Result = LE.MultiplyRight(Temp);
-					if (Result != null)
+					if (!(Result is null))
 						return Result;
 
 					Result = Temp.MultiplyLeft(LE);
-					if (Result != null)
+					if (!(Result is null))
 						return Result;
 				}
 			}
@@ -81,17 +81,17 @@ namespace Waher.Script.Operators.Arithmetics
 
 						LE = Left as IRingElement;
 						RE = Right as IRingElement;
-						if (LE != null && RE != null)
+						if (!(LE is null) && !(RE is null))
 						{
 							Temp = RE.Invert();
-							if (Temp != null)
+							if (!(Temp is null))
 							{
 								Result = LE.MultiplyRight(Temp);
-								if (Result != null)
+								if (!(Result is null))
 									return Result;
 
 								Result = Temp.MultiplyLeft(LE);
-								if (Result != null)
+								if (!(Result is null))
 									return Result;
 							}
 						}

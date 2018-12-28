@@ -125,14 +125,14 @@ namespace Waher.Script
 				Result[KeyWord.KeyWord.ToUpper()] = true;
 
 				string[] Aliases = KeyWord.Aliases;
-				if (Aliases != null)
+				if (!(Aliases is null))
 				{
 					foreach (string s in Aliases)
 						Result[s.ToUpper()] = true;
 				}
 
 				Aliases = KeyWord.InternalKeywords;
-				if (Aliases != null)
+				if (!(Aliases is null))
 				{
 					foreach (string s in Aliases)
 						Result[s.ToUpper()] = true;
@@ -261,11 +261,11 @@ namespace Waher.Script
 
 			int Start = Node.Start;
 
-			if (Node != null && this.PeekNextChar() == ';')
+			if (!(Node is null) && this.PeekNextChar() == ';')
 			{
 				this.pos++;
 				ScriptNode Node2 = this.ParseStatement();
-				if (Node2 != null)
+				if (!(Node2 is null))
 				{
 					LinkedList<ScriptNode> Statements = new LinkedList<ScriptNode>();
 					Statements.AddLast(Node);
@@ -633,7 +633,7 @@ namespace Waher.Script
 						this.pos++;
 						ScriptNode Right = this.AssertRightOperandNotNull(this.ParseStatement());
 
-						if (Ref != null)
+						if (!(Ref is null))
 							return new Assignment(Ref.VariableName, Right, Start, this.pos - Start, this);
 						else if (Left is NamedMember)
 							return new NamedMemberAssignment((NamedMember)Left, Right, Start, this.pos - Start, this);
@@ -698,7 +698,7 @@ namespace Waher.Script
 											Argument.Start, this.script);
 									}
 								}
-								else if ((Ref = Argument as VariableReference) != null)
+								else if (!((Ref = Argument as VariableReference) is null))
 								{
 									ArgumentType = ArgumentType.Normal;
 								}
@@ -1032,7 +1032,7 @@ namespace Waher.Script
 						{
 							Argument = List.Elements[i];
 
-							if ((Ref = Argument as VariableReference) != null)
+							if (!((Ref = Argument as VariableReference) is null))
 								ArgumentTypes[i] = ArgumentType.Normal;
 							else if (Argument is ToVector)
 							{
@@ -2912,7 +2912,7 @@ namespace Waher.Script
 				return (Function)Ref.Constructor.Invoke(P);
 			else
 			{
-				if (ElementList != null)
+				if (!(ElementList is null))
 					return new NamedFunctionCall(FunctionName, ElementList.Elements, NullCheck, Start, Length, Expression);
 				else if (Arguments is null)
 					return new NamedFunctionCall(FunctionName, new ScriptNode[0], NullCheck, Start, Length, Expression);
@@ -3067,7 +3067,7 @@ namespace Waher.Script
 								}
 
 								Aliases = Function.Aliases;
-								if (Aliases != null)
+								if (!(Aliases is null))
 								{
 									foreach (string Alias in Aliases)
 									{
@@ -3140,7 +3140,7 @@ namespace Waher.Script
 								Found[s] = Constant;
 
 							Aliases = Constant.Aliases;
-							if (Aliases != null)
+							if (!(Aliases is null))
 							{
 								foreach (string Alias in Aliases)
 								{
@@ -3190,7 +3190,7 @@ namespace Waher.Script
 								Found[s] = KeyWord;
 
 							Aliases = KeyWord.Aliases;
-							if (Aliases != null)
+							if (!(Aliases is null))
 							{
 								foreach (string Alias in Aliases)
 								{
@@ -3349,8 +3349,11 @@ namespace Waher.Script
 
 						if (Node is VariableReference)
 							s = ((VariableReference)Node).VariableName;
-						else if ((ConstantElement = Node as ConstantElement) != null && (StringValue = ConstantElement.Constant as StringValue) != null)
+						else if (!((ConstantElement = Node as ConstantElement) is null) &&
+							!((StringValue = ConstantElement.Constant as StringValue) is null))
+						{
 							s = StringValue.Value;
+						}
 						else
 							throw new SyntaxException("Expected a variable reference or a string constant.", this.pos, this.script);
 
@@ -3369,8 +3372,11 @@ namespace Waher.Script
 
 							if (Node is VariableReference)
 								s = ((VariableReference)Node).VariableName;
-							else if ((ConstantElement = Node as ConstantElement) != null && (StringValue = ConstantElement.Constant as StringValue) != null)
+							else if (!((ConstantElement = Node as ConstantElement) is null) &&
+								!((StringValue = ConstantElement.Constant as StringValue) is null))
+							{
 								s = StringValue.Value;
+							}
 							else
 								throw new SyntaxException("Expected a variable reference or a string constant.", this.pos, this.script);
 
@@ -3743,7 +3749,7 @@ namespace Waher.Script
 				Exp = new Expression(Script);
 				Result = Exp.Evaluate(Variables);
 
-				if (Result != null)
+				if (!(Result is null))
 				{
 					s2 = Result.ToString();
 					s = s.Insert(i, s2);
@@ -4291,7 +4297,7 @@ namespace Waher.Script
 		public void Preview(IElement Result)
 		{
 			PreviewEventHandler h = this.OnPreview;
-			if (h != null)
+			if (!(h is null))
 			{
 				try
 				{
@@ -4309,7 +4315,7 @@ namespace Waher.Script
 		/// </summary>
 		public bool HandlesPreview
 		{
-			get { return this.OnPreview != null; }
+			get { return !(this.OnPreview is null); }
 		}
 
 		/// <summary>
@@ -4324,7 +4330,7 @@ namespace Waher.Script
 		public void Status(string Result)
 		{
 			StatusEventHandler h = this.OnStatus;
-			if (h != null)
+			if (!(h is null))
 			{
 				try
 				{
@@ -4342,7 +4348,7 @@ namespace Waher.Script
 		/// </summary>
 		public bool HandlesStatus
 		{
-			get { return this.OnStatus != null; }
+			get { return !(this.OnStatus is null); }
 		}
 
 		/// <summary>

@@ -54,19 +54,19 @@ namespace Waher.Script.Operators.Arithmetics
 			IElement Result;
 			IRingElement Temp;
 
-			if (Left is IRingElement LE && RE != null)
+			if (Left is IRingElement LE && !(RE is null))
 			{
 				// TODO: Optimize in case of matrices. It's more efficient to employ a solve algorithm than to compute the inverse and the multiply.
 
 				Temp = LE.Invert();
-				if (Temp != null)
+				if (!(Temp is null))
 				{
 					Result = RE.MultiplyLeft(Temp);
-					if (Result != null)
+					if (!(Result is null))
 						return Result;
 
 					Result = Temp.MultiplyRight(RE);
-					if (Result != null)
+					if (!(Result is null))
 						return Result;
 				}
 			}
@@ -85,17 +85,17 @@ namespace Waher.Script.Operators.Arithmetics
 
 						LE = Left as IRingElement;
 						RE = Right as IRingElement;
-						if (LE != null && RE != null)
+						if (!(LE is null) && !(RE is null))
 						{
 							Temp = LE.Invert();
-							if (Temp != null)
+							if (!(Temp is null))
 							{
 								Result = RE.MultiplyLeft(Temp);
-								if (Result != null)
+								if (!(Result is null))
 									return Result;
 
 								Result = Temp.MultiplyRight(RE);
-								if (Result != null)
+								if (!(Result is null))
 									return Result;
 							}
 						}
@@ -128,7 +128,7 @@ namespace Waher.Script.Operators.Arithmetics
 				{
 					ISet Set2 = Right as ISet;
 
-					if (Left is ISet Set1 && Set2 != null)
+					if (Left is ISet Set1 && !(Set2 is null))
 						return new SetDifference(Set1, Set2);
 					else
 					{

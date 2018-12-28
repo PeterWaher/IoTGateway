@@ -47,11 +47,11 @@ namespace Waher.Script.Operators
 		public override IElement EvaluateScalar(IElement Operand, Variables Variables)
 		{
 			DoubleNumber D = Operand as DoubleNumber;
-			if (D != null)
+			if (!(D is null))
 				return new PhysicalQuantity(D.Value, this.unit);
 
 			PhysicalQuantity Q = Operand as PhysicalQuantity;
-			if (Q != null)
+			if (!(Q is null))
 			{
 				double Magnitude;
 

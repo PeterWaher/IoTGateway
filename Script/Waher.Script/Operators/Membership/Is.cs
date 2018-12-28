@@ -37,12 +37,12 @@ namespace Waher.Script.Operators.Membership
         public override IElement Evaluate(IElement Left, IElement Right, Variables Variables)
         {
             TypeValue TypeValue;
-            if ((TypeValue = Right as TypeValue) != null)
+            if (!((TypeValue = Right as TypeValue) is null))
             {
                 Type T = TypeValue.Value;
                 object Obj = Left.AssociatedObjectValue;
 
-				if (Obj != null && T.GetTypeInfo().IsAssignableFrom(Obj.GetType().GetTypeInfo()))
+				if (!(Obj is null) && T.GetTypeInfo().IsAssignableFrom(Obj.GetType().GetTypeInfo()))
 					return BooleanValue.True;
                 else
                     return BooleanValue.False;
@@ -61,12 +61,12 @@ namespace Waher.Script.Operators.Membership
         public override IElement EvaluateScalar(IElement Left, IElement Right, Variables Variables)
         {
             TypeValue TypeValue;
-            if ((TypeValue = Right as TypeValue) != null)
+            if (!((TypeValue = Right as TypeValue) is null))
             {
                 Type T = TypeValue.Value;
                 object Obj = Left.AssociatedObjectValue;
 
-				if (Obj != null && T.GetTypeInfo().IsAssignableFrom(Obj.GetType().GetTypeInfo()))
+				if (!(Obj is null) && T.GetTypeInfo().IsAssignableFrom(Obj.GetType().GetTypeInfo()))
 					return BooleanValue.True;
                 else
                     return BooleanValue.False;

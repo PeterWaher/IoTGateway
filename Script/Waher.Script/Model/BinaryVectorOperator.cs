@@ -51,7 +51,7 @@ namespace Waher.Script.Model
 
 			if (Left is IVector VL)
 			{
-				if ((VR = Right as IVector) != null)
+				if (!((VR = Right as IVector) is null))
 				{
 					ISet LeftSet = Left.AssociatedSet;
 					ISet RightSet = Right.AssociatedSet;
@@ -80,7 +80,7 @@ namespace Waher.Script.Model
 			}
 			else
 			{
-				if ((VR = Right as IVector) != null)
+				if (!((VR = Right as IVector) is null))
 				{
 					LinkedList<IElement> Result = new LinkedList<IElement>();
 

@@ -37,7 +37,7 @@ namespace Waher.Script.Model
 			IElement R = this.right.Evaluate(Variables);
 			DoubleNumber DR = R as DoubleNumber;
 
-			if (L is DoubleNumber DL && DR != null)
+			if (L is DoubleNumber DL && !(DR is null))
 				return this.Evaluate(DL.Value, DR.Value);
 			else
 				return this.Evaluate(L, R, Variables);
@@ -63,7 +63,7 @@ namespace Waher.Script.Model
 
 				try
 				{
-					b = (RM = LS as IRightModule) != null && RM.ScalarRing.Contains(Right);
+					b = !((RM = LS as IRightModule) is null) && RM.ScalarRing.Contains(Right);
 				}
 				catch (Exception)
 				{
@@ -83,7 +83,7 @@ namespace Waher.Script.Model
 
 				try
 				{
-					b = (LM = RS as ILeftModule) != null && LM.ScalarRing.Contains(Left);
+					b = !((LM = RS as ILeftModule) is null) && LM.ScalarRing.Contains(Left);
 				}
 				catch (Exception)
 				{

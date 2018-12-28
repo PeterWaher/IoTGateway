@@ -15,7 +15,7 @@ namespace Waher.Script.Objects.Matrices
 	/// Complex-valued matrix.
 	/// </summary>
 	public sealed class ComplexMatrix : RingElement, IVector, IMatrix
-    {
+	{
 		private Complex[,] values;
 		private ICollection<IElement> elements;
 		private int rows;
@@ -195,7 +195,7 @@ namespace Waher.Script.Objects.Matrices
 			Complex n;
 			int x, y, z;
 
-			if (Number != null)
+			if (!(Number is null))
 			{
 				n = Number.Value;
 				v = new Complex[this.rows, this.columns];
@@ -208,12 +208,12 @@ namespace Waher.Script.Objects.Matrices
 
 				return new ComplexMatrix(v);
 			}
-			else if ((Matrix = Element as ComplexMatrix) != null)
+			else if (!((Matrix = Element as ComplexMatrix) is null))
 			{
 				if (Matrix.columns != this.rows)
 					return null;
 
-                Complex[,] Values2 = Matrix.Values;
+				Complex[,] Values2 = Matrix.Values;
 
 				v = new Complex[Matrix.rows, this.columns];
 				for (y = 0; y < Matrix.rows; y++)
@@ -249,7 +249,7 @@ namespace Waher.Script.Objects.Matrices
 			Complex n;
 			int x, y, z;
 
-			if (Number != null)
+			if (!(Number is null))
 			{
 				n = Number.Value;
 				v = new Complex[this.rows, this.columns];
@@ -262,14 +262,14 @@ namespace Waher.Script.Objects.Matrices
 
 				return new ComplexMatrix(v);
 			}
-			else if ((Matrix = Element as ComplexMatrix) != null)
+			else if (!((Matrix = Element as ComplexMatrix) is null))
 			{
 				if (this.columns != Matrix.rows)
 					return null;
 
-                Complex[,] Values2 = Matrix.Values;
+				Complex[,] Values2 = Matrix.Values;
 
-                v = new Complex[this.rows, Matrix.columns];
+				v = new Complex[this.rows, Matrix.columns];
 				for (y = 0; y < this.rows; y++)
 				{
 					for (x = 0; x < Matrix.columns; x++)
@@ -302,7 +302,7 @@ namespace Waher.Script.Objects.Matrices
 			int c2 = this.columns << 1;
 			Complex[,] v = new Complex[this.rows, c2];
 			double a, b;
-            Complex w;
+			Complex w;
 			int x, y, z, u;
 
 			for (y = 0; y < this.rows; y++)
@@ -383,7 +383,7 @@ namespace Waher.Script.Objects.Matrices
 			Complex n;
 			int x, y;
 
-			if (Number != null)
+			if (!(Number is null))
 			{
 				n = Number.Value;
 				v = new Complex[this.rows, this.columns];
@@ -396,14 +396,14 @@ namespace Waher.Script.Objects.Matrices
 
 				return new ComplexMatrix(v);
 			}
-			else if ((Matrix = Element as ComplexMatrix) != null)
+			else if (!((Matrix = Element as ComplexMatrix) is null))
 			{
 				if (this.columns != Matrix.columns || this.rows != Matrix.rows)
 					return null;
 
-                Complex[,] Values2 = Matrix.Values;
+				Complex[,] Values2 = Matrix.Values;
 
-                v = new Complex[this.rows, this.columns];
+				v = new Complex[this.rows, this.columns];
 				for (y = 0; y < this.rows; y++)
 				{
 					for (x = 0; x < this.columns; x++)
@@ -449,9 +449,9 @@ namespace Waher.Script.Objects.Matrices
 			if (this.columns != Matrix.columns || this.rows != Matrix.rows)
 				return false;
 
-            Complex[,] V1 = this.Values;
-            Complex[,] V2 = Matrix.Values;
-            int x, y;
+			Complex[,] V1 = this.Values;
+			Complex[,] V2 = Matrix.Values;
+			int x, y;
 
 			for (y = 0; y < this.rows; y++)
 			{
@@ -548,7 +548,7 @@ namespace Waher.Script.Objects.Matrices
 		{
 			get
 			{
-				if (this.rowVectors != null)
+				if (!(this.rowVectors is null))
 					return this.rowVectors;
 
 				Complex[,] v = this.Values;
@@ -573,216 +573,216 @@ namespace Waher.Script.Objects.Matrices
 
 		private LinkedList<IElement> rowVectors = null;
 
-        /// <summary>
-        /// Returns a transposed matrix.
-        /// </summary>
-        /// <returns>Transposed matrix.</returns>
-        public IMatrix Transpose()
-        {
-            Complex[,] v = new Complex[this.columns, this.rows];
-            Complex[,] Values = this.Values;
-            int x, y;
+		/// <summary>
+		/// Returns a transposed matrix.
+		/// </summary>
+		/// <returns>Transposed matrix.</returns>
+		public IMatrix Transpose()
+		{
+			Complex[,] v = new Complex[this.columns, this.rows];
+			Complex[,] Values = this.Values;
+			int x, y;
 
-            for (y = 0; y < this.rows; y++)
-            {
-                for (x = 0; x < this.columns; x++)
-                    v[x, y] = Values[y, x];
-            }
+			for (y = 0; y < this.rows; y++)
+			{
+				for (x = 0; x < this.columns; x++)
+					v[x, y] = Values[y, x];
+			}
 
-            return new ComplexMatrix(v);
-        }
+			return new ComplexMatrix(v);
+		}
 
-        /// <summary>
-        /// Returns a conjugate transposed matrix.
-        /// </summary>
-        /// <returns>Conjugate transposed matrix.</returns>
-        public IMatrix ConjugateTranspose()
-        {
-            Complex[,] v = new Complex[this.columns, this.rows];
-            Complex[,] Values = this.Values;
-            int x, y;
+		/// <summary>
+		/// Returns a conjugate transposed matrix.
+		/// </summary>
+		/// <returns>Conjugate transposed matrix.</returns>
+		public IMatrix ConjugateTranspose()
+		{
+			Complex[,] v = new Complex[this.columns, this.rows];
+			Complex[,] Values = this.Values;
+			int x, y;
 
-            for (y = 0; y < this.rows; y++)
-            {
-                for (x = 0; x < this.columns; x++)
-                    v[x, y] = Complex.Conjugate(Values[y, x]);
-            }
+			for (y = 0; y < this.rows; y++)
+			{
+				for (x = 0; x < this.columns; x++)
+					v[x, y] = Complex.Conjugate(Values[y, x]);
+			}
 
-            return new ComplexMatrix(v);
-        }
+			return new ComplexMatrix(v);
+		}
 
-        /// <summary>
-        /// Gets an element of the vector.
-        /// </summary>
-        /// <param name="Index">Zero-based index into the vector.</param>
-        /// <returns>Vector element.</returns>
-        public IElement GetElement(int Index)
-        {
-            if (Index < 0 || Index >= this.rows)
-                throw new ScriptException("Index out of bounds.");
+		/// <summary>
+		/// Gets an element of the vector.
+		/// </summary>
+		/// <param name="Index">Zero-based index into the vector.</param>
+		/// <returns>Vector element.</returns>
+		public IElement GetElement(int Index)
+		{
+			if (Index < 0 || Index >= this.rows)
+				throw new ScriptException("Index out of bounds.");
 
-            Complex[,] M = this.Values;
-            Complex[] V = new Complex[this.columns];
-            int i;
+			Complex[,] M = this.Values;
+			Complex[] V = new Complex[this.columns];
+			int i;
 
-            for (i = 0; i < this.columns; i++)
-                V[i] = M[Index, i];
+			for (i = 0; i < this.columns; i++)
+				V[i] = M[Index, i];
 
-            return new ComplexVector(V);
-        }
+			return new ComplexVector(V);
+		}
 
-        /// <summary>
-        /// Sets an element in the vector.
-        /// </summary>
-        /// <param name="Index">Index.</param>
-        /// <param name="Value">Element to set.</param>
-        public void SetElement(int Index, IElement Value)
-        {
-            if (Index < 0 || Index >= this.rows)
-                throw new ScriptException("Index out of bounds.");
+		/// <summary>
+		/// Sets an element in the vector.
+		/// </summary>
+		/// <param name="Index">Index.</param>
+		/// <param name="Value">Element to set.</param>
+		public void SetElement(int Index, IElement Value)
+		{
+			if (Index < 0 || Index >= this.rows)
+				throw new ScriptException("Index out of bounds.");
 
-            ComplexVector V = Value as ComplexVector;
-            if (V is null)
-                throw new ScriptException("Row vectors in a Complex matrix are required to be Complex vectors.");
+			ComplexVector V = Value as ComplexVector;
+			if (V is null)
+				throw new ScriptException("Row vectors in a Complex matrix are required to be Complex vectors.");
 
-            if (V.Dimension != this.columns)
-                throw new ScriptException("Dimension mismatch.");
+			if (V.Dimension != this.columns)
+				throw new ScriptException("Dimension mismatch.");
 
-            Complex[] V2 = V.Values;
-            Complex[,] M = this.Values;
-            this.elements = null;
+			Complex[] V2 = V.Values;
+			Complex[,] M = this.Values;
+			this.elements = null;
 
-            int i;
+			int i;
 
-            for (i = 0; i < this.columns; i++)
-                M[Index, i] = V2[i];
-        }
+			for (i = 0; i < this.columns; i++)
+				M[Index, i] = V2[i];
+		}
 
-        /// <summary>
-        /// Gets an element of the matrix.
-        /// </summary>
-        /// <param name="Column">Zero-based column index into the matrix.</param>
-        /// <param name="Row">Zero-based row index into the matrix.</param>
-        /// <returns>Vector element.</returns>
-        public IElement GetElement(int Column, int Row)
-        {
-            if (Column < 0 || Column >= this.columns || Row < 0 || Row >= this.rows)
-                throw new ScriptException("Index out of bounds.");
+		/// <summary>
+		/// Gets an element of the matrix.
+		/// </summary>
+		/// <param name="Column">Zero-based column index into the matrix.</param>
+		/// <param name="Row">Zero-based row index into the matrix.</param>
+		/// <returns>Vector element.</returns>
+		public IElement GetElement(int Column, int Row)
+		{
+			if (Column < 0 || Column >= this.columns || Row < 0 || Row >= this.rows)
+				throw new ScriptException("Index out of bounds.");
 
-            return new ComplexNumber(this.Values[Row, Column]);
-        }
+			return new ComplexNumber(this.Values[Row, Column]);
+		}
 
-        /// <summary>
-        /// Sets an element in the matrix.
-        /// </summary>
-        /// <param name="Column">Zero-based column index into the matrix.</param>
-        /// <param name="Row">Zero-based row index into the matrix.</param>
-        /// <param name="Value">Element value.</param>
-        public void SetElement(int Column, int Row, IElement Value)
-        {
-            if (Column < 0 || Column >= this.columns || Row < 0 || Row >= this.rows)
-                throw new ScriptException("Index out of bounds.");
+		/// <summary>
+		/// Sets an element in the matrix.
+		/// </summary>
+		/// <param name="Column">Zero-based column index into the matrix.</param>
+		/// <param name="Row">Zero-based row index into the matrix.</param>
+		/// <param name="Value">Element value.</param>
+		public void SetElement(int Column, int Row, IElement Value)
+		{
+			if (Column < 0 || Column >= this.columns || Row < 0 || Row >= this.rows)
+				throw new ScriptException("Index out of bounds.");
 
-            ComplexNumber V = Value as ComplexNumber;
-            if (V is null)
-                throw new ScriptException("Elements in a Complex matrix must be Complex values.");
+			ComplexNumber V = Value as ComplexNumber;
+			if (V is null)
+				throw new ScriptException("Elements in a Complex matrix must be Complex values.");
 
-            Complex[,] M = this.Values;
-            this.elements = null;
+			Complex[,] M = this.Values;
+			this.elements = null;
 
-            M[Row, Column] = V.Value;
-        }
+			M[Row, Column] = V.Value;
+		}
 
-        /// <summary>
-        /// Gets a row vector from the matrix.
-        /// </summary>
-        /// <param name="Row">Zero-based row index into the matrix.</param>
-        /// <returns>Vector element.</returns>
-        public IElement GetRow(int Row)
-        {
-            if (Row < 0 || Row >= this.rows)
-                throw new ScriptException("Index out of bounds.");
+		/// <summary>
+		/// Gets a row vector from the matrix.
+		/// </summary>
+		/// <param name="Row">Zero-based row index into the matrix.</param>
+		/// <returns>Vector element.</returns>
+		public IElement GetRow(int Row)
+		{
+			if (Row < 0 || Row >= this.rows)
+				throw new ScriptException("Index out of bounds.");
 
-            Complex[,] M = this.Values;
-            Complex[] V = new Complex[this.columns];
-            int i;
+			Complex[,] M = this.Values;
+			Complex[] V = new Complex[this.columns];
+			int i;
 
-            for (i = 0; i < this.columns; i++)
-                V[i] = M[Row, i];
+			for (i = 0; i < this.columns; i++)
+				V[i] = M[Row, i];
 
-            return new ComplexVector(V);
-        }
+			return new ComplexVector(V);
+		}
 
-        /// <summary>
-        /// Gets a column vector from the matrix.
-        /// </summary>
-        /// <param name="Column">Zero-based column index into the matrix.</param>
-        /// <returns>Vector element.</returns>
-        public IElement GetColumn(int Column)
-        {
-            if (Column < 0 || Column >= this.columns)
-                throw new ScriptException("Index out of bounds.");
+		/// <summary>
+		/// Gets a column vector from the matrix.
+		/// </summary>
+		/// <param name="Column">Zero-based column index into the matrix.</param>
+		/// <returns>Vector element.</returns>
+		public IElement GetColumn(int Column)
+		{
+			if (Column < 0 || Column >= this.columns)
+				throw new ScriptException("Index out of bounds.");
 
-            Complex[,] M = this.Values;
-            Complex[] V = new Complex[this.rows];
-            int i;
+			Complex[,] M = this.Values;
+			Complex[] V = new Complex[this.rows];
+			int i;
 
-            for (i = 0; i < this.rows; i++)
-                V[i] = M[i, Column];
+			for (i = 0; i < this.rows; i++)
+				V[i] = M[i, Column];
 
-            return new ComplexVector(V);
-        }
+			return new ComplexVector(V);
+		}
 
-        /// <summary>
-        /// Gets a row vector from the matrix.
-        /// </summary>
-        /// <param name="Row">Zero-based row index into the matrix.</param>
-        /// <param name="Vector">New row vector.</param>
-        public void SetRow(int Row, IVector Vector)
-        {
-            if (Row < 0 || Row >= this.rows)
-                throw new ScriptException("Index out of bounds.");
+		/// <summary>
+		/// Gets a row vector from the matrix.
+		/// </summary>
+		/// <param name="Row">Zero-based row index into the matrix.</param>
+		/// <param name="Vector">New row vector.</param>
+		public void SetRow(int Row, IVector Vector)
+		{
+			if (Row < 0 || Row >= this.rows)
+				throw new ScriptException("Index out of bounds.");
 
-            if (Vector.Dimension != this.columns)
-                throw new ScriptException("Vector dimension does not match number of columns");
+			if (Vector.Dimension != this.columns)
+				throw new ScriptException("Vector dimension does not match number of columns");
 
-            ComplexVector V = Vector as ComplexVector;
-            if (V is null)
-                throw new ScriptException("Row vectors in a Complex matrix must be Complex vectors.");
+			ComplexVector V = Vector as ComplexVector;
+			if (V is null)
+				throw new ScriptException("Row vectors in a Complex matrix must be Complex vectors.");
 
-            Complex[] V2 = V.Values;
-            Complex[,] M = this.Values;
-            this.elements = null;
-            int i = 0;
+			Complex[] V2 = V.Values;
+			Complex[,] M = this.Values;
+			this.elements = null;
+			int i = 0;
 
-            for (i = 0; i < this.columns; i++)
-                M[Row, i] = V2[i];
-        }
+			for (i = 0; i < this.columns; i++)
+				M[Row, i] = V2[i];
+		}
 
-        /// <summary>
-        /// Gets a column vector from the matrix.
-        /// </summary>
-        /// <param name="Column">Zero-based column index into the matrix.</param>
-        /// <param name="Vector">New column vector.</param>
-        public void SetColumn(int Column, IVector Vector)
-        {
-            if (Column < 0 || Column >= this.columns)
-                throw new ScriptException("Index out of bounds.");
+		/// <summary>
+		/// Gets a column vector from the matrix.
+		/// </summary>
+		/// <param name="Column">Zero-based column index into the matrix.</param>
+		/// <param name="Vector">New column vector.</param>
+		public void SetColumn(int Column, IVector Vector)
+		{
+			if (Column < 0 || Column >= this.columns)
+				throw new ScriptException("Index out of bounds.");
 
-            if (Vector.Dimension != this.rows)
-                throw new ScriptException("Vector dimension does not match number of rows");
+			if (Vector.Dimension != this.rows)
+				throw new ScriptException("Vector dimension does not match number of rows");
 
-            ComplexVector V = Vector as ComplexVector;
-            if (V is null)
-                throw new ScriptException("Column vectors in a Complex matrix must be Complex vectors.");
+			ComplexVector V = Vector as ComplexVector;
+			if (V is null)
+				throw new ScriptException("Column vectors in a Complex matrix must be Complex vectors.");
 
-            Complex[] V2 = V.Values;
-            Complex[,] M = this.Values;
-            this.elements = null;
-            int i = 0;
+			Complex[] V2 = V.Values;
+			Complex[,] M = this.Values;
+			this.elements = null;
+			int i = 0;
 
-            for (i = 0; i < this.rows; i++)
-                M[i, Column] = V2[i];
-        }
-    }
+			for (i = 0; i < this.rows; i++)
+				M[i, Column] = V2[i];
+		}
+	}
 }

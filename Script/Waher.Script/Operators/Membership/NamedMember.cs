@@ -70,7 +70,7 @@ namespace Waher.Script.Operators.Membership
 				{
 					this.type = T;
 					this.property = T.GetRuntimeProperty(this.name);
-					if (this.property != null)
+					if (!(this.property is null))
 					{
 						this.field = null;
 						this.nameIndex = null;
@@ -78,7 +78,7 @@ namespace Waher.Script.Operators.Membership
 					else
 					{
 						this.field = T.GetRuntimeField(this.name);
-						if (this.field != null)
+						if (!(this.field is null))
 							this.nameIndex = null;
 						else
 						{
@@ -91,14 +91,14 @@ namespace Waher.Script.Operators.Membership
 					}
 				}
 
-				if (this.property != null)
+				if (!(this.property is null))
 				{
-					if (this.nameIndex != null)
+					if (!(this.nameIndex is null))
 						return Expression.Encapsulate(this.property.GetValue(Instance, this.nameIndex));
 					else
 						return Expression.Encapsulate(this.property.GetValue(Instance, null));
 				}
-				else if (this.field != null)
+				else if (!(this.field is null))
 					return Expression.Encapsulate(this.field.GetValue(Instance));
 				else if (Operand.IsScalar)
 					throw new ScriptRuntimeException("Member '" + this.name + "' not found on type '" + T.FullName + "'.", this);
@@ -147,15 +147,15 @@ namespace Waher.Script.Operators.Membership
 				Instance = null;
 
 			PropertyInfo Property = T.GetRuntimeProperty(Name);
-			if (Property != null)
+			if (!(Property is null))
 				return Expression.Encapsulate(Property.GetValue(Instance, null));
 
 			FieldInfo Field = T.GetRuntimeField(Name);
-			if (Field != null)
+			if (!(Field is null))
 				return Expression.Encapsulate(Field.GetValue(Instance));
 
 			Property = T.GetRuntimeProperty("Item");
-			if (Property != null)
+			if (!(Property is null))
 				return Expression.Encapsulate(Property.GetValue(Instance, new string[] { Name }));
 
 			if (Operand.IsScalar)

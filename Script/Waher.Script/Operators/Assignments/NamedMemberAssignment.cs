@@ -56,7 +56,7 @@ namespace Waher.Script.Operators.Assignments
                 {
                     this.type = Type;
                     this.property = Type.GetRuntimeProperty(this.name);
-                    if (this.property != null)
+                    if (!(this.property is null))
                     {
                         this.field = null;
                         this.nameIndex = null;
@@ -64,7 +64,7 @@ namespace Waher.Script.Operators.Assignments
                     else
                     {
                         this.field = Type.GetRuntimeField(this.name);
-                        if (this.field != null)
+                        if (!(this.field is null))
                             this.nameIndex = null;
                         else
                         {
@@ -77,7 +77,7 @@ namespace Waher.Script.Operators.Assignments
                     }
                 }
 
-                if (this.property != null)
+                if (!(this.property is null))
                 {
                     Type = this.property.PropertyType;
                     if (!Type.GetTypeInfo().IsAssignableFrom(Right.GetType().GetTypeInfo()))
@@ -85,7 +85,7 @@ namespace Waher.Script.Operators.Assignments
                     else
                         this.property.SetValue(LeftValue, Right, this.nameIndex);
                 }
-                else if (this.field != null)
+                else if (!(this.field is null))
                 {
                     Type = this.field.FieldType;
                     if (!Type.GetTypeInfo().IsAssignableFrom(Right.GetType().GetTypeInfo()))

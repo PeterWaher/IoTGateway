@@ -51,14 +51,14 @@ namespace Waher.Script.Operators.Arithmetics
 			IRingElement RE = Right as IRingElement;
 			IElement Result;
 
-			if (Left is IRingElement LE && RE != null)
+			if (Left is IRingElement LE && !(RE is null))
 			{
 				Result = LE.MultiplyRight(RE);
-				if (Result != null)
+				if (!(Result is null))
 					return Result;
 
 				Result = RE.MultiplyLeft(LE);
-				if (Result != null)
+				if (!(Result is null))
 					return Result;
 			}
 
@@ -76,14 +76,14 @@ namespace Waher.Script.Operators.Arithmetics
 
 						LE = Left as IRingElement;
 						RE = Right as IRingElement;
-						if (LE != null && RE != null)
+						if (!(LE is null) && !(RE is null))
 						{
 							Result = LE.MultiplyRight(RE);
-							if (Result != null)
+							if (!(Result is null))
 								return Result;
 
 							Result = RE.MultiplyLeft(LE);
-							if (Result != null)
+							if (!(Result is null))
 								return Result;
 						}
 					}

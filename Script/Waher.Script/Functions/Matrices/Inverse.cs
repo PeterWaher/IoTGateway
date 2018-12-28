@@ -50,7 +50,7 @@ namespace Waher.Script.Functions.Matrices
 			if (Argument is IRingElement E)
 			{
 				E = E.Invert();
-				if (E != null)
+				if (!(E is null))
 					return E;
 			}
 

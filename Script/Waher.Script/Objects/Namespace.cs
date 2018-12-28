@@ -88,7 +88,7 @@ namespace Waher.Script.Objects
                 Type T;
 
                 T = Types.GetType(FullName);
-                if (T != null)
+                if (!(T is null))
                     return new TypeValue(T);
 
                 if (Types.IsSubNamespace(this.value, Name))

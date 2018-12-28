@@ -128,7 +128,7 @@ namespace Waher.Script.Objects.VectorSpaces
 				else
 					sb.Append(", ");
 
-				if (Element != null)
+				if (!(Element is null))
 					sb.Append(Element.ToString());
 			}
 
@@ -164,7 +164,7 @@ namespace Waher.Script.Objects.VectorSpaces
 		{
 			get
 			{
-				if (this.associatedObjectValue != null)
+				if (!(this.associatedObjectValue is null))
 					return this.associatedObjectValue;
 
 				object[] V = new object[this.dimension];

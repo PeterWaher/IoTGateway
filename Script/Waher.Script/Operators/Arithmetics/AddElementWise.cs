@@ -39,7 +39,7 @@ namespace Waher.Script.Operators.Arithmetics
 			DoubleNumber DL = Left as DoubleNumber;
 			DoubleNumber DR = Right as DoubleNumber;
 
-			if (DL != null && DR != null)
+			if (!(DL is null) && !(DR is null))
 				return new DoubleNumber(DL.Value + DR.Value);
 			else
 				return Add.EvaluateAddition(Left, Right, this);

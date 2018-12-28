@@ -44,7 +44,7 @@ namespace Waher.Script.Model
 				DoubleNumber DL = L as DoubleNumber;
 				DoubleNumber DR = R as DoubleNumber;
 
-				if (DL != null && DR != null)
+				if (!(DL is null) && !(DR is null))
 					return this.Evaluate(DL.Value, DR.Value);
 				else
 					this.bothDouble = false;
@@ -54,11 +54,11 @@ namespace Waher.Script.Model
 			BooleanValue BR;
 			IElement Result;
 
-			if (this.bothBool.HasValue && this.bothBool.Value && BL != null)
+			if (this.bothBool.HasValue && this.bothBool.Value && !(BL is null))
 			{
 				bool LValue = BL.Value;
 				Result = this.EvaluateOptimizedResult(LValue);
-				if (Result != null)
+				if (!(Result is null))
 					return Result;
 
 				if (R is null)
@@ -66,7 +66,7 @@ namespace Waher.Script.Model
 
 				BR = R as BooleanValue;
 
-				if (BR != null)
+				if (!(BR is null))
 					return this.Evaluate(LValue, BR.Value);
 				else
 					this.bothBool = false;
@@ -78,7 +78,7 @@ namespace Waher.Script.Model
 
 				BR = R as BooleanValue;
 
-				if (BL != null && BR != null)
+				if (!(BL is null) && !(BR is null))
 				{
 					if (!this.bothBool.HasValue)
 						this.bothBool = true;
@@ -92,7 +92,7 @@ namespace Waher.Script.Model
 					DoubleNumber DL = L as DoubleNumber;
 					DoubleNumber DR = R as DoubleNumber;
 
-					if (DL != null && DR != null)
+					if (!(DL is null) && !(DR is null))
 					{
 						if (!this.bothDouble.HasValue)
 							this.bothDouble = true;
@@ -119,37 +119,37 @@ namespace Waher.Script.Model
 			BooleanValue BL = Left as BooleanValue;
 			BooleanValue BR = Right as BooleanValue;
 
-			if (BL != null && BR != null)
+			if (!(BL is null) && !(BR is null))
 				return this.Evaluate(BL.Value, BR.Value);
 			else
 			{
 				DoubleNumber DL = Left as DoubleNumber;
 				DoubleNumber DR = Right as DoubleNumber;
 
-				if (DL != null && DR != null)
+				if (!(DL is null) && !(DR is null))
 					return this.Evaluate(DL.Value, DR.Value);
 				else
 				{
 					double l, r;
 					PhysicalQuantity Q;
 
-					if (DL != null)
+					if (!(DL is null))
 						l = DL.Value;
 					else
 					{
 						Q = Left as PhysicalQuantity;
-						if (Q != null)
+						if (!(Q is null))
 							l = Q.Magnitude;
 						else
 							throw new ScriptRuntimeException("Scalar operands must be double values or physical magnitudes.", this);
 					}
 
-					if (DR != null)
+					if (!(DR is null))
 						r = DR.Value;
 					else
 					{
 						Q = Right as PhysicalQuantity;
-						if (Q != null)
+						if (!(Q is null))
 							r = Q.Magnitude;
 						else
 							throw new ScriptRuntimeException("Scalar operands must be double values or physical magnitudes.", this);

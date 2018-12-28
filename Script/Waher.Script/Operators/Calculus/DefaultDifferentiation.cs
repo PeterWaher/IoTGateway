@@ -77,7 +77,7 @@ namespace Waher.Script.Operators.Calculus
 				else
 				{
 					LambdaDefinition f = Expression.GetFunctionLambdaDefinition(VariableReference.VariableName, this.Start, this.Length, this.Expression);
-					if (f != null)
+					if (!(f is null))
 					{
 						if (f is IDifferentiable Differentiable)
 							return this.DifferentiateOnce(Differentiable, Variables);

@@ -97,7 +97,7 @@ namespace Waher.Script.Operators.Membership
 				for (i = 0; i < this.nrParameters; i++)
 					Arguments[i] = this.parameters[i].Evaluate(Variables);
 
-				if (this.method != null)
+				if (!(this.method is null))
 				{
 					if (this.methodParametersTypes.Length != this.nrParameters)
 					{
@@ -184,7 +184,7 @@ namespace Waher.Script.Operators.Membership
 								if (ByRef is null)
 									ByRef = new List<KeyValuePair<string, int>>();
 
-								if ((Ref = this.parameters[i] as VariableReference) != null)
+								if (!((Ref = this.parameters[i] as VariableReference) is null))
 									ByRef.Add(new KeyValuePair<string, int>(Ref.VariableName, i));
 								else
 									ByRef.Add(new KeyValuePair<string, int>(null, i));
@@ -219,9 +219,7 @@ namespace Waher.Script.Operators.Membership
 
 						if (i < this.nrParameters)
 						{
-							if (ByRef != null)
-								ByRef.Clear();
-
+							ByRef?.Clear();
 							continue;
 						}
 
@@ -230,7 +228,7 @@ namespace Waher.Script.Operators.Membership
 						this.methodArguments = ParameterValues;
 						this.methodArgumentExtensions = Extend;
 
-						if (ByRef != null && ByRef.Count > 0)
+						if (!(ByRef is null) && ByRef.Count > 0)
 							this.byReference = ByRef.ToArray();
 						else
 							this.byReference = null;
@@ -244,7 +242,7 @@ namespace Waher.Script.Operators.Membership
 
 			if (DoExtend)
 			{
-				if (this.byReference != null)
+				if (!(this.byReference is null))
 					throw new ScriptException("Canonical extensions of method calls having reference type arguments not supported.");	// TODO
 
 				return this.EvaluateCanonical(Instance, this.method, this.methodParametersTypes, Arguments,
@@ -254,7 +252,7 @@ namespace Waher.Script.Operators.Membership
 			{
 				Value = this.method.Invoke(Instance, this.methodArguments);
 
-				if (this.byReference != null)
+				if (!(this.byReference is null))
 				{
 					int j, c = this.byReference.Length;
 					string s;

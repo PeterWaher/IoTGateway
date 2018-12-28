@@ -53,17 +53,17 @@ namespace Waher.Script.Operators.Arithmetics
 			IElement Result;
 			IGroupElement Temp;
 
-			if (LE != null && RE != null)
+			if (!(LE is null) && !(RE is null))
 			{
 				Temp = RE.Negate();
-				if (Temp != null)
+				if (!(Temp is null))
 				{
 					Result = LE.AddRight(Temp);
-					if (Result != null)
+					if (!(Result is null))
 						return Result;
 
 					Result = Temp.AddLeft(LE);
-					if (Result != null)
+					if (!(Result is null))
 						return Result;
 				}
 			}
@@ -82,17 +82,17 @@ namespace Waher.Script.Operators.Arithmetics
 
 						LE = Left as IGroupElement;
 						RE = Right as IGroupElement;
-						if (LE != null && RE != null)
+						if (!(LE is null) && !(RE is null))
 						{
 							Temp = RE.Negate();
-							if (Temp != null)
+							if (!(Temp is null))
 							{
 								Result = LE.AddRight(Temp);
-								if (Result != null)
+								if (!(Result is null))
 									return Result;
 
 								Result = Temp.AddLeft(LE);
-								if (Result != null)
+								if (!(Result is null))
 									return Result;
 							}
 						}

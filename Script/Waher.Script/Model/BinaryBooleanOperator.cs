@@ -41,17 +41,17 @@ namespace Waher.Script.Model
 			IElement Result;
 			IElement R;
 
-			if (this.bothBool.HasValue && this.bothBool.Value && BL != null)
+			if (this.bothBool.HasValue && this.bothBool.Value && !(BL is null))
 			{
 				bool LValue = BL.Value;
 				Result = this.EvaluateOptimizedResult(LValue);
-				if (Result != null)
+				if (!(Result is null))
 					return Result;
 
 				R = this.right.Evaluate(Variables);
 				BR = R as BooleanValue;
 
-				if (BR != null)
+				if (!(BR is null))
 					return this.Evaluate(LValue, BR.Value);
 				else
 					this.bothBool = false;
@@ -61,7 +61,7 @@ namespace Waher.Script.Model
 				R = this.right.Evaluate(Variables);
 				BR = R as BooleanValue;
 
-				if (BL != null && BR != null)
+				if (!(BL is null) && !(BR is null))
 				{
 					if (!this.bothBool.HasValue)
 						this.bothBool = true;
@@ -90,7 +90,7 @@ namespace Waher.Script.Model
 			BooleanValue BL = Left as BooleanValue;
 			BooleanValue BR = Right as BooleanValue;
 
-			if (BL != null && BR != null)
+			if (!(BL is null) && !(BR is null))
 				return this.Evaluate(BL.Value, BR.Value);
 			else
 				throw new ScriptRuntimeException("Scalar operands must be boolean values.", this);

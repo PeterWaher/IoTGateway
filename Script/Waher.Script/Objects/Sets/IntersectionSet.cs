@@ -68,7 +68,7 @@ namespace Waher.Script.Objects.Sets
         {
             get
             {
-                if (this.elements != null)
+                if (!(this.elements is null))
                     return this.elements.Keys;
 
                 ICollection<IElement> E1 = this.set1.ChildElements;

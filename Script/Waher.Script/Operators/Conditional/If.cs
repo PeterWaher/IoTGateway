@@ -37,7 +37,7 @@ namespace Waher.Script.Operators.Conditional
             IElement Condition = this.left.Evaluate(Variables);
             BooleanValue b = Condition as BooleanValue;
 
-            if (b != null)
+            if (!(b is null))
             {
                 if (b.Value)
                     return this.middle.Evaluate(Variables);
@@ -59,7 +59,7 @@ namespace Waher.Script.Operators.Conditional
             {
                 BooleanValue b = Condition as BooleanValue;
 
-                if (b != null)
+                if (!(b is null))
                 {
                     if (b.Value)
                         return IfTrue;
@@ -77,15 +77,15 @@ namespace Waher.Script.Operators.Conditional
                 ICollection<IElement> IfFalseElements = IfFalse.IsScalar ? null : IfFalse.ChildElements;
                 int c = ConditionElements.Count;
 
-                if ((IfTrueElements != null && IfTrueElements.Count != c) ||
-                    (IfFalseElements != null && IfFalseElements.Count != c))
+                if ((!(IfTrueElements is null) && IfTrueElements.Count != c) ||
+                    (!(IfFalseElements is null) && IfFalseElements.Count != c))
                 {
                     throw new ScriptRuntimeException("Operand dimension mismatch.", this);
                 }
 
                 IEnumerator<IElement> e1 = ConditionElements.GetEnumerator();
-                IEnumerator<IElement> e2 = IfTrueElements != null ? IfTrueElements.GetEnumerator() : null;
-                IEnumerator<IElement> e3 = IfFalseElements != null ? IfFalseElements.GetEnumerator() : null;
+                IEnumerator<IElement> e2 = !(IfTrueElements is null) ? IfTrueElements.GetEnumerator() : null;
+                IEnumerator<IElement> e3 = !(IfFalseElements is null) ? IfFalseElements.GetEnumerator() : null;
 
                 while (e1.MoveNext() && (e2 is null || e2.MoveNext()) && (e3 is null || e3.MoveNext()))
                     Elements.AddLast(this.Evaluate(e1.Current, e2 is null ? IfTrue : e2.Current, e3 is null ? IfFalse : e3.Current));

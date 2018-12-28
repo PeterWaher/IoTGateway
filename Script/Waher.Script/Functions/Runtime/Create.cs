@@ -275,7 +275,7 @@ namespace Waher.Script.Functions.Runtime
 
             lock (this.synchObject)
             {
-                if (this.lastType == TV.Value && this.lastGenericType != null)
+                if (this.lastType == TV.Value && !(this.lastGenericType is null))
                 {
                     c = this.genericArguments.Length;
                     if (this.nrParameters < c)
@@ -335,7 +335,7 @@ namespace Waher.Script.Functions.Runtime
                     this.lastType = TV.Value;
                     this.constructor = null;
                 }
-                else if (this.genericArguments != null)
+                else if (!(this.genericArguments is null))
                     c = this.genericArguments.Length;
                 else
                     c = 0;
@@ -344,7 +344,7 @@ namespace Waher.Script.Functions.Runtime
                 for (i = c; i < this.nrParameters; i++)
                     Arguments[i - c] = this.parameters[i].Evaluate(Variables);
 
-                if (this.constructor != null)
+                if (!(this.constructor is null))
                 {
                     if (this.constructorParametersTypes.Length != this.nrParameters - c)
                         this.constructor = null;
@@ -367,7 +367,7 @@ namespace Waher.Script.Functions.Runtime
                 {
                     IEnumerable<ConstructorInfo> Constructors;
 
-                    if (this.lastGenericType != null)
+                    if (!(this.lastGenericType is null))
                         Constructors = this.lastGenericType.GetTypeInfo().DeclaredConstructors;
                     else
                         Constructors = this.lastType.GetTypeInfo().DeclaredConstructors;

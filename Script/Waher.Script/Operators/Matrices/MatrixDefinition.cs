@@ -136,7 +136,7 @@ namespace Waher.Script.Operators.Matrices
                 }
             }
 
-            if (CommonSuperSet != null)
+            if (!(CommonSuperSet is null))
             {
                 if (Upgraded)
                 {
@@ -165,11 +165,11 @@ namespace Waher.Script.Operators.Matrices
                         }
                     }
 
-                    if (SuperElements != null)
+                    if (!(SuperElements is null))
                         Elements = SuperElements;
                 }
 
-                if (CommonSuperSet != null)
+                if (!(CommonSuperSet is null))
                 {
                     if (CommonSuperSet is DoubleNumbers)
                         return new DoubleMatrix(Rows, Columns, Elements);

@@ -16,6 +16,16 @@ namespace Waher.Script.Operators.Sets
 		private readonly ScriptNode[] conditions;
 		private readonly bool doubleColon;
 
+		/// <summary>
+		/// Defines a set, by implicitly limiting its members to members of an optional superset, matching given conditions.
+		/// </summary>
+		/// <param name="Pattern">Pattern defining elements in the set.</param>
+		/// <param name="SuperSet">Optional superset, if defining subset.</param>
+		/// <param name="Conditions">Conditions of elements in the set.</param>
+		/// <param name="DoubleColon">If double-colon was used to define the set.</param>
+		/// <param name="Start">Start position in script expression.</param>
+		/// <param name="Length">Length of expression covered by node.</param>
+		/// <param name="Expression">Expression containing script.</param>
 		public ImplicitSetDefinition(ScriptNode Pattern, ScriptNode SuperSet, ScriptNode[] Conditions, bool DoubleColon,
 			int Start, int Length, Expression Expression)
 			: base(Pattern, SuperSet, Start, Length, Expression)

@@ -41,7 +41,7 @@ namespace Waher.Script.Operators.Vectors
 			DoubleVector dv1 = Left as DoubleVector;
 			DoubleVector dv2 = Right as DoubleVector;
 
-			if (dv1 != null && dv2 != null)
+			if (!(dv1 is null) && !(dv2 is null))
 			{
 				double[] d1 = dv1.Values;
 				double[] d2 = dv2.Values;

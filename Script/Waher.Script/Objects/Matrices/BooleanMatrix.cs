@@ -347,7 +347,7 @@ namespace Waher.Script.Objects.Matrices
 		{
 			get
 			{
-				if (this.rowVectors != null)
+				if (!(this.rowVectors is null))
 					return this.rowVectors;
 
 				bool[,] v = this.Values;

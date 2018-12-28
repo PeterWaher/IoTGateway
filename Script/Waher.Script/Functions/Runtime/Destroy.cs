@@ -75,7 +75,7 @@ namespace Waher.Script.Functions.Runtime
             else
                 Element = this.Argument.Evaluate(Variables);
 
-            if (Element != null)
+            if (!(Element is null))
             {
 				if (Element.AssociatedObjectValue is IDisposable D)
 					D.Dispose();

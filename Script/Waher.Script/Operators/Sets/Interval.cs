@@ -55,7 +55,7 @@ namespace Waher.Script.Operators.Sets
             DoubleNumber T = To as DoubleNumber;
             DoubleNumber S = StepSize as DoubleNumber;
 
-            if (F is null || T is null || (S is null && StepSize != null))
+            if (F is null || T is null || (S is null && !(StepSize is null)))
                 throw new ScriptRuntimeException("The interval operator requires double-valued operands.", this);
 
             return new Objects.Sets.Interval(F.Value, T.Value, true, true, S is null ? (double?)null : S.Value);

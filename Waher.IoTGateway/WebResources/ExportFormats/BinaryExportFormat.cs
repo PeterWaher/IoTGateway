@@ -121,6 +121,11 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 		public const byte TYPE_DATETIMEOFFSET = 19;
 
 		/// <summary>
+		/// Represents a <see cref="CaseInsensitiveString"/>
+		/// </summary>
+		public const byte TYPE_CI_STRING = 20;
+
+		/// <summary>
 		/// Represents the smallest possible value for the field type being searched or filtered.
 		/// </summary>
 		public const byte TYPE_MIN = 27;
@@ -558,6 +563,13 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 							this.w.Write((byte)DT.Kind);
 							this.w.Write(DT.Ticks);
 							this.w.Write(TS.Ticks);
+						}
+						else if (PropertyValue is CaseInsensitiveString CiString)
+						{
+							this.w.Write(TYPE_CI_STRING);
+							if (PropertyName != null)
+								this.w.Write(PropertyName);
+							this.w.Write(CiString.Value);
 						}
 						else if (PropertyValue is byte[] Bin)
 						{

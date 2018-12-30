@@ -60,9 +60,14 @@ namespace Waher.IoTGateway.Cssx
 				Cssx = rd.ReadToEnd();
 			}
 
-			Session.Push();
+			bool Pushed = false;
+
+			Session.Lock();
 			try
 			{
+				Session.Push();
+				Pushed = true;
+
 				ThemeDefinition Def = Theme.CurrerntTheme;
 				if (Def != null)
 				{
@@ -147,7 +152,10 @@ namespace Waher.IoTGateway.Cssx
 			}
 			finally
 			{
-				Session.Pop();
+				if (Pushed)
+					Session.Pop();
+
+				Session.Release();
 			}
 
 			return false;

@@ -397,8 +397,8 @@ namespace Waher.IoTGateway.WebResources
 		{
 			using (FileStream fs = File.OpenRead(FileName))
 			{
-				if (FileName.StartsWith(Gateway.RootFolder))
-					FileName = FileName.Substring(Gateway.RootFolder.Length);
+				if (FileName.StartsWith(Gateway.AppDataFolder))
+					FileName = FileName.Substring(Gateway.AppDataFolder.Length);
 
 				await Output.ExportFile(FileName, fs);
 			}

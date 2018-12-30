@@ -674,7 +674,7 @@ namespace Waher.IoTGateway.Setup
 								if (Path.IsPathRooted(FileName))
 									throw new Exception("Absolute path names not allowed: " + FileName);
 
-								FileName = Path.Combine(Gateway.RootFolder, FileName);
+								FileName = Path.Combine(Gateway.AppDataFolder, FileName);
 
 								using (TemporaryFile fs = new TemporaryFile())
 								{
@@ -813,6 +813,10 @@ namespace Waher.IoTGateway.Setup
 								Value = r.Value;
 								break;
 
+							case "S64":
+								Value = Encoding.UTF8.GetString(Convert.FromBase64String(r.Value));
+								break;
+
 							case "Null":
 								Value = null;
 								break;
@@ -852,6 +856,14 @@ namespace Waher.IoTGateway.Setup
 
 									throw new Exception("Invalid character value.");
 								}
+								break;
+
+							case "CIS":
+								Value = new CaseInsensitiveString(r.Value);
+								break;
+
+							case "CIS64":
+								Value = new CaseInsensitiveString(Encoding.UTF8.GetString(Convert.FromBase64String(r.Value)));
 								break;
 
 							case "DT":
@@ -1272,7 +1284,10 @@ namespace Waher.IoTGateway.Setup
 							{
 								long Length = r.ReadInt64();
 
-								FileName = Path.Combine(Gateway.RootFolder, FileName);
+								FileName = Path.Combine(Gateway.AppDataFolder, FileName);
+
+								if (Path.IsPathRooted(FileName))
+									throw new Exception("Absolute path names not allowed: " + FileName);
 
 								using (TemporaryFile File = new TemporaryFile())
 								{
@@ -1399,6 +1414,9 @@ namespace Waher.IoTGateway.Setup
 					Ticks = r.ReadInt64();
 					TimeSpan TS = new TimeSpan(Ticks);
 					return new DateTimeOffset(DT, TS);
+
+				case BinaryExportFormat.TYPE_CI_STRING:
+					return new CaseInsensitiveString(r.ReadString());
 
 				case BinaryExportFormat.TYPE_ARRAY:
 					string TypeName = r.ReadString();

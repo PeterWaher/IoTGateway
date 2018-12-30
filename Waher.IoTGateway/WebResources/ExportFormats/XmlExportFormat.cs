@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content;
 using Waher.Content.Xml;
-using Waher.Networking.XMPP;
+using Waher.Persistence;
 using Waher.Persistence.Serialization;
 
 namespace Waher.IoTGateway.WebResources.ExportFormats
@@ -266,11 +266,26 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 						break;
 
 					case TypeCode.String:
-						await this.output.WriteStartElementAsync(string.Empty, "S", Export.ExportNamepace);
-						if (PropertyName != null)
-							await this.output.WriteAttributeStringAsync(string.Empty, "n", string.Empty, PropertyName);
-						await this.output.WriteAttributeStringAsync(string.Empty, "v", string.Empty, PropertyValue.ToString());
-						await this.output.WriteEndElementAsync();
+						string s = PropertyValue.ToString();
+						try
+						{
+							XmlConvert.VerifyXmlChars(s);
+							await this.output.WriteStartElementAsync(string.Empty, "S", Export.ExportNamepace);
+							if (PropertyName != null)
+								await this.output.WriteAttributeStringAsync(string.Empty, "n", string.Empty, PropertyName);
+							await this.output.WriteAttributeStringAsync(string.Empty, "v", string.Empty, s);
+							await this.output.WriteEndElementAsync();
+						}
+						catch (XmlException)
+						{
+							byte[] Bin = Encoding.UTF8.GetBytes(s);
+							s = Convert.ToBase64String(Bin);
+							await this.output.WriteStartElementAsync(string.Empty, "S64", Export.ExportNamepace);
+							if (PropertyName != null)
+								await this.output.WriteAttributeStringAsync(string.Empty, "n", string.Empty, PropertyName);
+							await this.output.WriteAttributeStringAsync(string.Empty, "v", string.Empty, s);
+							await this.output.WriteEndElementAsync();
+						}
 						break;
 
 					case TypeCode.UInt16:
@@ -321,6 +336,29 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 								await this.output.WriteAttributeStringAsync(string.Empty, "n", string.Empty, PropertyName);
 							await this.output.WriteAttributeStringAsync(string.Empty, "v", string.Empty, XML.Encode(DTO));
 							await this.output.WriteEndElementAsync();
+						}
+						else if (PropertyValue is CaseInsensitiveString Cis)
+						{
+							s = Cis.Value;
+							try
+							{
+								XmlConvert.VerifyXmlChars(s);
+								await this.output.WriteStartElementAsync(string.Empty, "CIS", Export.ExportNamepace);
+								if (PropertyName != null)
+									await this.output.WriteAttributeStringAsync(string.Empty, "n", string.Empty, PropertyName);
+								await this.output.WriteAttributeStringAsync(string.Empty, "v", string.Empty, s);
+								await this.output.WriteEndElementAsync();
+							}
+							catch (XmlException)
+							{
+								byte[] Bin = Encoding.UTF8.GetBytes(s);
+								s = Convert.ToBase64String(Bin);
+								await this.output.WriteStartElementAsync(string.Empty, "CIS64", Export.ExportNamepace);
+								if (PropertyName != null)
+									await this.output.WriteAttributeStringAsync(string.Empty, "n", string.Empty, PropertyName);
+								await this.output.WriteAttributeStringAsync(string.Empty, "v", string.Empty, s);
+								await this.output.WriteEndElementAsync();
+							}
 						}
 						else if (PropertyValue is byte[] Bin)
 						{

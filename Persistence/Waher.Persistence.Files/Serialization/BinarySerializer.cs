@@ -61,6 +61,7 @@ namespace Waher.Persistence.Files.Serialization
 		{
 			this.collectionName = CollectionName;
 			this.encoding = Encoding;
+			this.debug = false;
 			this.ms = Output;
 			this.ms.Position = 0;
 		}

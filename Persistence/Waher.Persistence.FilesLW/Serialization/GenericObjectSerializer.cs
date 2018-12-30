@@ -465,7 +465,7 @@ namespace Waher.Persistence.Files.Serialization
 				object Obj;
 
 				if (!Embedded)
-					Writer = new BinarySerializer(Writer.CollectionName, Writer.Encoding, true);
+					Writer = new BinarySerializer(Writer.CollectionName, Writer.Encoding, this.provider.Debug);
 
 				if (WriteTypeCode)
 				{

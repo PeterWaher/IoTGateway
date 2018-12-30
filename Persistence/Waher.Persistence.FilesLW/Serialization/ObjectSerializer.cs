@@ -1153,17 +1153,11 @@ namespace Waher.Persistence.Files.Serialization
 											CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
 										}
 
-										if (MemberTypeInfo.IsAssignableFrom(typeof(string)))
+										if (MemberTypeInfo.IsAssignableFrom(typeof(string)) ||
+											MemberTypeInfo.IsAssignableFrom(typeof(CaseInsensitiveString)))
 										{
 											CSharp.AppendLine();
 											CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_STRING + ":");
-											CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (" + MemberType.FullName + ")ReadString(Reader, FieldDataType);");
-											CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-										}
-
-										if (MemberTypeInfo.IsAssignableFrom(typeof(CaseInsensitiveString)))
-										{
-											CSharp.AppendLine();
 											CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_CI_STRING + ":");
 											CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (" + MemberType.FullName + ")ReadString(Reader, FieldDataType);");
 											CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");

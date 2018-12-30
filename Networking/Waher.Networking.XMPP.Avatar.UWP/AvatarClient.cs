@@ -750,7 +750,7 @@ namespace Waher.Networking.XMPP.Avatar
 							{
 								if (e2.Ok && e2.AvatarImage != null)
 								{
-									if (Avatar is null)
+									if (Avatar is null || Avatar?.ObjectId is null)
 									{
 										Avatar = new Avatar(e.FromBareJID, e2.AvatarImage.ContentType, e2.AvatarImage.Data,
 											e2.AvatarImage.Width, e2.AvatarImage.Height)

@@ -72,7 +72,7 @@ namespace Waher.Networking.HTTP.HeaderFields
 				if (string.IsNullOrEmpty(this.charset))
 					return Encoding.UTF8;
 				else
-					return System.Text.Encoding.GetEncoding(this.charset);
+					return Encoding.GetEncoding(this.charset);
 			}
 		}
 

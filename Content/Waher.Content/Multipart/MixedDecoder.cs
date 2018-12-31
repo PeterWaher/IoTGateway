@@ -64,7 +64,7 @@ namespace Waher.Content.Multipart
 		/// <returns>If the decoder can decode an object with the given type.</returns>
 		public bool Decodes(string ContentType, out Grade Grade)
 		{
-			if (ContentType == FormDataDecoder.ContentType)
+			if (ContentType == MixedDecoder.ContentType)
 			{
 				Grade = Grade.Excellent;
 				return true;
@@ -88,11 +88,11 @@ namespace Waher.Content.Multipart
 		/// <exception cref="ArgumentException">If the object cannot be decoded.</exception>
 		public object Decode(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
 		{
-			List<object> List = new List<object>();
+			List<EmbeddedContent> List = new List<EmbeddedContent>();
 
 			FormDataDecoder.Decode(Data, Fields, null, List, BaseUri);
 
-			return List;
+			return new MixedContent(List.ToArray());
 		}
 
 		/// <summary>
@@ -105,7 +105,7 @@ namespace Waher.Content.Multipart
 		{
 			if (FileExtension.ToLower() == "mixed")
 			{
-				ContentType = FormDataDecoder.ContentType;
+				ContentType = MixedDecoder.ContentType;
 				return true;
 			}
 			else

@@ -95,24 +95,27 @@ namespace Waher.Content.Multipart
 			return Form;
 		}
 
-		internal static void Decode(byte[] Data, KeyValuePair<string, string>[] Fields, Dictionary<string, object> Form, 
-			List<object> List, Uri BaseUri)
-		{ 
+		internal static void Decode(byte[] Data, KeyValuePair<string, string>[] Fields, Dictionary<string, object> Form,
+			List<EmbeddedContent> List, Uri BaseUri)
+		{
 			string Boundary = null;
 
-			foreach (KeyValuePair<string, string> P in Fields)
+			if (Fields != null)
 			{
-				if (P.Key.ToUpper() == "BOUNDARY")
+				foreach (KeyValuePair<string, string> P in Fields)
 				{
-					Boundary = P.Value;
-					break;
+					if (P.Key.ToUpper() == "BOUNDARY")
+					{
+						Boundary = P.Value;
+						break;
+					}
 				}
 			}
 
 			if (string.IsNullOrEmpty(Boundary))
 				throw new Exception("No boundary defined.");
 
-			byte[] BoundaryBin = System.Text.Encoding.ASCII.GetBytes(Boundary);
+			byte[] BoundaryBin = Encoding.ASCII.GetBytes(Boundary);
 			int Start = 0;
 			int i = 0;
 			int c = Data.Length;
@@ -144,15 +147,14 @@ namespace Waher.Content.Multipart
 						if (Data[i - 1 - k] == '\n' && Data[i - 2 - k] == '\r')
 							k += 2;
 
-						string Header = System.Text.Encoding.ASCII.GetString(Data, Start, j - Start);
+						string Header = Encoding.ASCII.GetString(Data, Start, j - Start);
 						string Key, Value;
 						byte[] Data2 = new byte[i - j - 4 - k];
-						string ContentType2 = "text/plain";
-						string ContentDisposition = string.Empty;
-						string ContentTransferEncoding = string.Empty;
-						string Name = string.Empty;
-						string FileName = string.Empty;
-						object Obj;
+						EmbeddedContent EmbeddedContent = new EmbeddedContent()
+						{
+							ContentType = "text/plain",
+							Raw = Data2
+						};
 
 						Array.Copy(Data, j + 4, Data2, 0, i - j - 4 - k);
 
@@ -168,117 +170,75 @@ namespace Waher.Content.Multipart
 							switch (Key.ToUpper())
 							{
 								case "CONTENT-TYPE":
-									ContentType2 = Value;
+									EmbeddedContent.ContentType = Value;
+									j = Value.IndexOf(';');
+									if (j >= 0)
+									{
+										ParseContentFields(Value.Substring(j + 1).Trim(), EmbeddedContent);
+										Value = Value.Substring(0, j).Trim();
+									}
 									break;
 
 								case "CONTENT-DISPOSITION":
-
 									j = Value.IndexOf(';');
-									if (j < 0)
-										ContentDisposition = Value;
-									else
+									if (j >= 0)
 									{
-										ContentDisposition = Value.Substring(0, j).Trim();
+										ParseContentFields(Value.Substring(j + 1).Trim(), EmbeddedContent);
+										Value = Value.Substring(0, j).Trim();
+									}
 
-										foreach (KeyValuePair<string, string> Field in CommonTypes.ParseFieldValues(Value.Substring(j + 1).Trim()))
-										{
-											switch (Field.Key.ToUpper())
-											{
-												case "NAME":
-													Name = Field.Value;
-													break;
+									switch (Value.ToUpper())
+									{
+										case "INLINE":
+											EmbeddedContent.Disposition = ContentDisposition.Inline;
+											break;
 
-												case "FILENAME":
-													FileName = Field.Value;
-													break;
-											}
-										}
+										case "ATTACHMENT":
+											EmbeddedContent.Disposition = ContentDisposition.Attachment;
+											break;
 									}
 									break;
 
 								case "CONTENT-TRANSFER-ENCODING":
-									ContentTransferEncoding = Value;
+									EmbeddedContent.TransferEncoding = Value;
+									break;
+
+								case "CONTENT-ID":
+									EmbeddedContent.ID = Value;
+									break;
+
+								case "CONTENT-DESCRIPTION":
+									EmbeddedContent.Description = Value;
 									break;
 							}
 						}
 
-						if (!string.IsNullOrEmpty(ContentTransferEncoding))
+						if (!string.IsNullOrEmpty(EmbeddedContent.TransferEncoding))
 						{
-							switch (ContentTransferEncoding.ToUpper())
-							{
-								case "7BIT":
-								case "8BIT":
-								case "BINARY":
-									break;
-
-								case "BASE64":
-									string s = System.Text.Encoding.ASCII.GetString(Data2);
-									Data2 = Convert.FromBase64String(s);
-									break;
-
-								case "QUOTED-PRINTABLE":
-									MemoryStream ms = new MemoryStream();
-									byte b;
-									char ch;
-									for (j = 0, k = Data2.Length; j < k; j++)
-									{
-										b = Data2[j];
-
-										if (b == (byte)'=' && j + 2 < k)
-										{
-											b = 0;
-											ch = (char)Data2[++j];
-
-											if (ch >= '0' && ch <= '9')
-												b = (byte)(ch - '0');
-											else if (ch >= 'a' && ch <= 'f')
-												b = (byte)(ch - 'a' + 10);
-											else if (ch >= 'A' && ch <= 'F')
-												b = (byte)(ch - 'A' + 10);
-
-											b <<= 4;
-
-											ch = (char)Data2[++j];
-
-											if (ch >= '0' && ch <= '9')
-												b |= (byte)(ch - '0');
-											else if (ch >= 'a' && ch <= 'f')
-												b |= (byte)(ch - 'a' + 10);
-											else if (ch >= 'A' && ch <= 'F')
-												b |= (byte)(ch - 'A' + 10);
-										}
-
-										ms.WriteByte(b);
-									}
-
-									ms.Capacity = (int)ms.Position;
-									Data2 = ms.ToArray();
-									ms.Dispose();
-									break;
-
-								default:
-									throw new Exception("Unrecognized Content-Transfer-Encoding: " + ContentTransferEncoding);
-							}
+							if (TryTransferDecode(Data2, EmbeddedContent.TransferEncoding, out Data2))
+								EmbeddedContent.TransferDecoded = Data2;
+							else
+								throw new Exception("Unrecognized Content-Transfer-Encoding: " + EmbeddedContent.TransferEncoding);
 						}
 
-						Obj = InternetContent.Decode(ContentType2, Data2, BaseUri);
+						EmbeddedContent.Decoded = InternetContent.Decode(EmbeddedContent.ContentType, Data2, BaseUri);
 
 						if (Form != null)
 						{
-							Form[Name] = Obj;
+							Form[EmbeddedContent.Name] = EmbeddedContent.Decoded;
 
-							if (!(Obj is byte[]))
-								Form[Name + "_Binary"] = Data2;
+							if (!(EmbeddedContent.Decoded is byte[]))
+								Form[EmbeddedContent.Name + "_Binary"] = Data2;
 
-							if (!string.IsNullOrEmpty(ContentType2))
-								Form[Name + "_ContentType"] = ContentType2;
+							if (!string.IsNullOrEmpty(EmbeddedContent.ContentType))
+								Form[EmbeddedContent.Name + "_ContentType"] = EmbeddedContent.ContentType;
 
-							if (!string.IsNullOrEmpty(FileName))
-								Form[Name + "_FileName"] = FileName;
+							if (!string.IsNullOrEmpty(EmbeddedContent.FileName))
+								Form[EmbeddedContent.Name + "_FileName"] = EmbeddedContent.FileName;
 						}
 
 						if (List != null)
-							List.Add(Obj);
+							List.Add(EmbeddedContent);
 					}
 
 					i += d;
@@ -289,6 +249,94 @@ namespace Waher.Content.Multipart
 				}
 				else
 					i++;
+			}
+		}
+
+		private static void ParseContentFields(string s, EmbeddedContent EmbeddedContent)
+		{
+			foreach (KeyValuePair<string, string> Field in CommonTypes.ParseFieldValues(s))
+			{
+				switch (Field.Key.ToUpper())
+				{
+					case "NAME":
+						EmbeddedContent.Name = Field.Value;
+						break;
+
+					case "FILENAME":
+						EmbeddedContent.FileName = Field.Value;
+						break;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Tries to decode transfer-encoded binary data.
+		/// </summary>
+		/// <param name="Encoded">Transfer-encoded binary data.</param>
+		/// <param name="TransferEncoding">Transfer-encoding used.</param>
+		/// <param name="Decoded">Decoded binary data.</param>
+		/// <returns>If decoding was successful.</returns>
+		public static bool TryTransferDecode(byte[] Encoded, string TransferEncoding, out byte[] Decoded)
+		{
+			switch (TransferEncoding.ToUpper())
+			{
+				case "7BIT":
+				case "8BIT":
+				case "BINARY":
+				case "":
+				case null:
+					Decoded = Encoded;
+					return true;
+
+				case "BASE64":
+					string s = Encoding.ASCII.GetString(Encoded);
+					Decoded = Convert.FromBase64String(s);
+					return true;
+
+				case "QUOTED-PRINTABLE":
+					MemoryStream ms = new MemoryStream();
+					byte b;
+					char ch;
+					int j, k;
+
+					for (j = 0, k = Encoded.Length; j < k; j++)
+					{
+						b = Encoded[j];
+
+						if (b == (byte)'=' && j + 2 < k)
+						{
+							b = 0;
+							ch = (char)Encoded[++j];
+
+							if (ch >= '0' && ch <= '9')
+								b = (byte)(ch - '0');
+							else if (ch >= 'a' && ch <= 'f')
+								b = (byte)(ch - 'a' + 10);
+							else if (ch >= 'A' && ch <= 'F')
+								b = (byte)(ch - 'A' + 10);
+
+							b <<= 4;
+
+							ch = (char)Encoded[++j];
+
+							if (ch >= '0' && ch <= '9')
+								b |= (byte)(ch - '0');
+							else if (ch >= 'a' && ch <= 'f')
+								b |= (byte)(ch - 'a' + 10);
+							else if (ch >= 'A' && ch <= 'F')
+								b |= (byte)(ch - 'A' + 10);
+						}
+
+						ms.WriteByte(b);
+					}
+
+					Decoded = ms.ToArray();
+					ms.Dispose();
+					return true;
+
+				default:
+					Decoded = null;
+					return false;
 			}
 		}
 

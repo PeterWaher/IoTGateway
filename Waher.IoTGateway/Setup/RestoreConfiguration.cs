@@ -1166,7 +1166,6 @@ namespace Waher.IoTGateway.Setup
 						break;
 				}
 
-				Bin.Capacity = (int)Bin.Position;
 				Value = Bin.ToArray();
 			}
 

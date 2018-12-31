@@ -120,7 +120,7 @@ namespace Waher.Content.Multipart
 			int i = 0;
 			int c = Data.Length;
 			int d = BoundaryBin.Length;
-			int j, k;
+			int j, k, l, m;
 
 			while (i < c)
 			{
@@ -158,7 +158,26 @@ namespace Waher.Content.Multipart
 
 						Array.Copy(Data, j + 4, Data2, 0, i - j - 4 - k);
 
-						foreach (string Row in Header.Split(CommonTypes.CRLF))
+						string[] Rows = Header.Split(CommonTypes.CRLF);
+						l = Rows.Length;
+						m = -1;
+
+						for (j = 0; j < l; j++)
+						{
+							Key = Rows[j];
+							if (!string.IsNullOrEmpty(Key))
+							{
+								if (char.IsWhiteSpace(Key[0]) && m >= 0)
+								{
+									Rows[m] += Key;
+									Rows[j] = string.Empty;
+								}
+								else
+									m = j;
+							}
+						}
+
+						foreach (string Row in Rows)
 						{
 							j = Row.IndexOf(':');
 							if (j < 0)

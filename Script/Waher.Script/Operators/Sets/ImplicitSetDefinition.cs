@@ -105,7 +105,7 @@ namespace Waher.Script.Operators.Sets
 			{
 				IElement E = this.right.Evaluate(Variables);
 				SuperSet = Set.ToSet(E);
-				if (SuperSet == null)
+				if (SuperSet is null)
 					throw new ScriptRuntimeException("Unable to evaluate superset into a set.", this.right);
 			}
 

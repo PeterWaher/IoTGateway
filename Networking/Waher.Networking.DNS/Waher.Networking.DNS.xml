@@ -4,19 +4,116 @@
         <name>Waher.Networking.DNS</name>
     </assembly>
     <members>
+        <member name="T:Waher.Networking.DNS.Communication.DnsMessage">
+            <summary>
+            Represents a DNS message
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.DNS.Communication.DnsMessage.#ctor(System.Byte[])">
+            <summary>
+            Represents a DNS message
+            </summary>
+            <param name="Data">Binary representation of a DNS message.</param>
+        </member>
+        <member name="P:Waher.Networking.DNS.Communication.DnsMessage.ID">
+            <summary>
+            Message identifier
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.DNS.Communication.DnsMessage.Response">
+            <summary>
+            If a Response (true) or a query (false)
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.DNS.Communication.DnsMessage.OpCode">
+            <summary>
+            Operation code
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.DNS.Communication.DnsMessage.AuthoritativeAnswer">
+            <summary>
+            Responding name server is an authority for the domain name in question section
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.DNS.Communication.DnsMessage.Truncation">
+            <summary>
+            Message was truncated due to length greater than that permitted on the transmission channel
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.DNS.Communication.DnsMessage.RecursionDesired">
+            <summary>
+            Directs the name server to pursue the query recursively
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.DNS.Communication.DnsMessage.RecursionAvailable">
+            <summary>
+            Denotes whether recursive query support is available in the name server
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.DNS.Communication.DnsMessage.RCode">
+            <summary>
+            Response code
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.DNS.Communication.DnsMessage.Questions">
+            <summary>
+            Question section
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.DNS.Communication.DnsMessage.Answer">
+            <summary>
+            Answer section
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.DNS.Communication.DnsMessage.Authority">
+            <summary>
+            Authority section
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.DNS.Communication.DnsMessage.Additional">
+            <summary>
+            Additional section
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.DNS.Communication.Question">
+            <summary>
+            Contains information about a DNS Question
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.DNS.Communication.Question.#ctor(System.String,Waher.Networking.DNS.Enumerations.QTYPE,Waher.Networking.DNS.Enumerations.QCLASS)">
+            <summary>
+            Contains information about a DNS Question
+            </summary>
+            <param name="QNAME">Qujery Name</param>
+            <param name="QTYPE">Query Type</param>
+            <param name="QCLASS">Query Class</param>
+        </member>
+        <member name="P:Waher.Networking.DNS.Communication.Question.QNAME">
+            <summary>
+            Query Name
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.DNS.Communication.Question.QTYPE">
+            <summary>
+            Query TYPE
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.DNS.Communication.Question.QCLASS">
+            <summary>
+            Query CLASS
+            </summary>
+        </member>
         <member name="T:Waher.Networking.DNS.DnsResolver">
             <summary>
-            DNS resolver
+            DNS resolver, as defined in:
+            
+            RFC 1034: https://tools.ietf.org/html/rfc1034: DOMAIN NAMES - CONCEPTS AND FACILITIES
+            RFC 1035: https://tools.ietf.org/html/rfc1035: DOMAIN NAMES - IMPLEMENTATION AND SPECIFICATION
             </summary>
         </member>
-        <member name="M:Waher.Networking.DNS.DnsResolver.#ctor">
+        <member name="F:Waher.Networking.DNS.DnsResolver.DefaultDnsPort">
             <summary>
-            DNS resolver
-            </summary>
-        </member>
-        <member name="M:Waher.Networking.DNS.DnsResolver.Dispose">
-            <summary>
-            <see cref="M:System.IDisposable.Dispose"/>
+            53
             </summary>
         </member>
         <member name="P:Waher.Networking.DNS.DnsResolver.DnsServerAddresses">
@@ -30,6 +127,723 @@
             </summary>
             <param name="HostName">Host Name</param>
             <returns>If <paramref name="HostName"/> is a valid ARPHANET host name.</returns>
+        </member>
+        <member name="T:Waher.Networking.DNS.Enumerations.CLASS">
+            <summary>
+            TYPE fields are used in resource records.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Enumerations.CLASS.IN">
+            <summary>
+            the Internet
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Enumerations.CLASS.CS">
+            <summary>
+            the CSNET class (Obsolete - used only for examples in some obsolete RFCs)
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Enumerations.CLASS.CH">
+            <summary>
+            the CHAOS class
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Enumerations.CLASS.HS">
+            <summary>
+            Hesiod[Dyer 87]
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.DNS.Enumerations.OpCode">
+            <summary>
+            DNS Operation Codes
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Enumerations.OpCode.Query">
+            <summary>
+            Query (RFC 1035)
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Enumerations.OpCode.InverseQuery">
+            <summary>
+            Inverse Query, Obsolete (RFC 3425)
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Enumerations.OpCode.Status">
+            <summary>
+            Status (RFC 1035)
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Enumerations.OpCode.Notify">
+            <summary>
+            Notify (RFC 1996)
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Enumerations.OpCode.Update">
+            <summary>
+            Update (RFC 2136)
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Enumerations.OpCode.DnsStateful">
+            <summary>
+            DNS Stateful Operations
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.DNS.Enumerations.QCLASS">
+            <summary>
+            QCLASS fields appear in the question section of a query.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Enumerations.QCLASS.IN">
+            <summary>
+            the Internet
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Enumerations.QCLASS.CS">
+            <summary>
+            the CSNET class (Obsolete - used only for examples in some obsolete RFCs)
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Enumerations.QCLASS.CH">
+            <summary>
+            the CHAOS class
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Enumerations.QCLASS.HS">
+            <summary>
+            Hesiod[Dyer 87]
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Enumerations.QCLASS.Wildcard">
+            <summary>
+            (*) any class
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.DNS.Enumerations.QTYPE">
+            <summary>
+            QTYPE fields appear in the question part of a query.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Enumerations.QTYPE.A">
+            <summary>
+            a host address
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Enumerations.QTYPE.NS">
+            <summary>
+            An authoritative name server
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Enumerations.QTYPE.MD">
+            <summary>
+            a mail destination (Obsolete - use MX)
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Enumerations.QTYPE.MF">
+            <summary>
+            a mail forwarder (Obsolete - use MX)
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Enumerations.QTYPE.CNAME">
+            <summary>
+            the canonical name for an alias
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Enumerations.QTYPE.SOA">
+            <summary>
+            marks the start of a zone of authority
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Enumerations.QTYPE.MB">
+            <summary>
+            a mailbox domain name (EXPERIMENTAL)
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Enumerations.QTYPE.MG">
+            <summary>
+            a mail group member (EXPERIMENTAL)
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Enumerations.QTYPE.MR">
+            <summary>
+            a mail rename domain name (EXPERIMENTAL)
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Enumerations.QTYPE.NULL">
+            <summary>
+            a null RR (EXPERIMENTAL)
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Enumerations.QTYPE.WKS">
+            <summary>
+            a well known service description
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Enumerations.QTYPE.PTR">
+            <summary>
+            a domain name pointer
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Enumerations.QTYPE.HINFO">
+            <summary>
+            host information
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Enumerations.QTYPE.MINFO">
+            <summary>
+            mailbox or mail list information
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Enumerations.QTYPE.MX">
+            <summary>
+            mail exchange
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Enumerations.QTYPE.TXT">
+            <summary>
+             text strings
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Enumerations.QTYPE.AXFR">
+            <summary>
+            A request for a transfer of an entire zone
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Enumerations.QTYPE.MAILB">
+            <summary>
+            A request for mailbox-related records (MB, MG or MR)
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Enumerations.QTYPE.MAILA">
+            <summary>
+            A request for mail agent RRs (Obsolete - see MX)
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Enumerations.QTYPE.Wildcard">
+            <summary>
+            (*) A request for all records
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.DNS.Enumerations.RCode">
+            <summary>
+            DNS Response Code
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Enumerations.RCode.NoError">
+            <summary>
+            No Error [RFC1035]
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Enumerations.RCode.FormErr">
+            <summary>
+            Format Error [RFC1035]
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Enumerations.RCode.ServFail">
+            <summary>
+            Server Failure [RFC1035]
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Enumerations.RCode.NXDomain">
+            <summary>
+            Non-Existent Domain [RFC1035]
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Enumerations.RCode.NotImp">
+            <summary>
+            Not Implemented [RFC1035]
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Enumerations.RCode.Refused">
+            <summary>
+            Query Refused [RFC1035]
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Enumerations.RCode.YXDomain">
+            <summary>
+            Name Exists when it should not [RFC2136] [RFC6672]
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Enumerations.RCode.YXRRSet">
+            <summary>
+            RR Set Exists when it should not [RFC2136]
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Enumerations.RCode.NXRRSet">
+            <summary>
+            RR Set that should exist does not [RFC2136]
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Enumerations.RCode.NotAuth">
+            <summary>
+            Server Not Authoritative for zone [RFC2136]
+            Not Authorized [RFC2845]
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Enumerations.RCode.NotZone">
+            <summary>
+            Name not contained in zone [RFC2136]
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Enumerations.RCode.DSOTYPENI">
+            <summary>
+            DSO-TYPE Not Implemented [RFC-ietf-dnsop-session-signal-20]
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Enumerations.RCode.BADVERS">
+            <summary>
+            Bad OPT Version [RFC6891]
+            TSIG Signature Failure [RFC2845]
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Enumerations.RCode.BADKEY">
+            <summary>
+            Key not recognized [RFC2845]
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Enumerations.RCode.BADTIME">
+            <summary>
+            Signature out of time window [RFC2845]
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Enumerations.RCode.BADMODE">
+            <summary>
+            Bad TKEY Mode [RFC2930]
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Enumerations.RCode.BADNAME">
+            <summary>
+            Duplicate key name [RFC2930]
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Enumerations.RCode.BADALG">
+            <summary>
+            Algorithm not supported [RFC2930]
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Enumerations.RCode.BADTRUNC">
+            <summary>
+            Bad Truncation [RFC4635]
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Enumerations.RCode.BADCOOKIE">
+            <summary>
+            Bad/missing Server Cookie [RFC7873]
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.DNS.Enumerations.TYPE">
+            <summary>
+            TYPE fields are used in resource records.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Enumerations.TYPE.A">
+            <summary>
+            a host address
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Enumerations.TYPE.NS">
+            <summary>
+            An authoritative name server
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Enumerations.TYPE.MD">
+            <summary>
+            a mail destination (Obsolete - use MX)
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Enumerations.TYPE.MF">
+            <summary>
+            a mail forwarder (Obsolete - use MX)
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Enumerations.TYPE.CNAME">
+            <summary>
+            the canonical name for an alias
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Enumerations.TYPE.SOA">
+            <summary>
+            marks the start of a zone of authority
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Enumerations.TYPE.MB">
+            <summary>
+            a mailbox domain name (EXPERIMENTAL)
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Enumerations.TYPE.MG">
+            <summary>
+            a mail group member (EXPERIMENTAL)
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Enumerations.TYPE.MR">
+            <summary>
+            a mail rename domain name (EXPERIMENTAL)
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Enumerations.TYPE.NULL">
+            <summary>
+            a null RR (EXPERIMENTAL)
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Enumerations.TYPE.WKS">
+            <summary>
+            a well known service description
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Enumerations.TYPE.PTR">
+            <summary>
+            a domain name pointer
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Enumerations.TYPE.HINFO">
+            <summary>
+            host information
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Enumerations.TYPE.MINFO">
+            <summary>
+            mailbox or mail list information
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Enumerations.TYPE.MX">
+            <summary>
+            mail exchange
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Enumerations.TYPE.TXT">
+            <summary>
+             text strings
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.DNS.ResourceRecords.A">
+            <summary>
+            Internet Address
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.DNS.ResourceRecords.A.#ctor(System.Net.IPAddress)">
+            <summary>
+            Internet Address
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.DNS.ResourceRecords.CNAME">
+            <summary>
+            Canonical NAME
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.DNS.ResourceRecords.CNAME.#ctor(System.String)">
+            <summary>
+            Canonical NAME
+            </summary>
+            <param name="Name">
+            A domain name which specifies the canonical or primary
+            name for the owner.The owner name is an alias.
+            </param>
+        </member>
+        <member name="T:Waher.Networking.DNS.ResourceRecords.HINFO">
+            <summary>
+            General information about a host.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.DNS.ResourceRecords.HINFO.#ctor(System.String,System.String)">
+            <summary>
+            General information about a host.
+            </summary>
+            <param name="CPU">Specifies the CPU type.</param>
+            <param name="OS">Specifies the Operating System type.</param>
+        </member>
+        <member name="P:Waher.Networking.DNS.ResourceRecords.HINFO.CPU">
+            <summary>
+            Specifies the CPU type.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.DNS.ResourceRecords.HINFO.OS">
+            <summary>
+            Specifies the OS type.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.DNS.ResourceRecords.MB">
+            <summary>
+            Mailbox (Experimental)
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.DNS.ResourceRecords.MB.#ctor(System.String)">
+            <summary>
+            Mailbox (Experimental)
+            </summary>
+            <param name="Name">Host which has the specified mailbox.</param>
+        </member>
+        <member name="T:Waher.Networking.DNS.ResourceRecords.MD">
+            <summary>
+            Mail delivery (Obsolete)
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.DNS.ResourceRecords.MD.#ctor(System.String)">
+            <summary>
+            Mail delivery (Obsolete)
+            </summary>
+            <param name="Name">
+            Host which has a mail agent for the domain which should be able to 
+            deliver mail for the domain.
+            </param>
+        </member>
+        <member name="T:Waher.Networking.DNS.ResourceRecords.MF">
+            <summary>
+            Mail forwarding (Obsolete)
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.DNS.ResourceRecords.MF.#ctor(System.String)">
+            <summary>
+            Mail forwarding (Obsolete)
+            </summary>
+            <param name="Name">
+            Host which has a mail agent for the domain which should be able to 
+            forward mail for the domain.
+            </param>
+        </member>
+        <member name="T:Waher.Networking.DNS.ResourceRecords.MG">
+            <summary>
+            Mail group (Experimental)
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.DNS.ResourceRecords.MG.#ctor(System.String)">
+            <summary>
+            Mail group (Experimental)
+            </summary>
+            <param name="Name">Host which specifies a mailbox which is a
+            member of the mail group specified by the domain name.</param>
+        </member>
+        <member name="T:Waher.Networking.DNS.ResourceRecords.MINFO">
+            <summary>
+            Mail information about a host. (Experimental)
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.DNS.ResourceRecords.MINFO.#ctor(System.String,System.String)">
+            <summary>
+            Mail information about a host. (Experimental)
+            </summary>
+            <param name="RMailBx">Specifies a mailbox which is
+            responsible for the mailing list or mailbox.</param>
+            <param name="EMailBx">Specifies a mailbox which is to
+            receive error messages related to the mailing list or
+            mailbox specified by the owner of the MINFO RR(similar
+            to the ERRORS-TO: field which has been proposed).</param>
+        </member>
+        <member name="P:Waher.Networking.DNS.ResourceRecords.MINFO.RMailBx">
+            <summary>
+            Specifies a mailbox which is
+            responsible for the mailing list or mailbox.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.DNS.ResourceRecords.MINFO.EMailBx">
+            <summary>
+            Specifies a mailbox which is to
+            receive error messages related to the mailing list or
+            mailbox specified by the owner of the MINFO RR(similar
+            to the ERRORS-TO: field which has been proposed).
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.DNS.ResourceRecords.MR">
+            <summary>
+            Mailbox Renaming (Experimental)
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.DNS.ResourceRecords.MR.#ctor(System.String)">
+            <summary>
+            Mailbox Renaming (Experimental)
+            </summary>
+            <param name="Name">specifies a mailbox which is the
+            proper rename of the specified mailbox.</param>
+        </member>
+        <member name="T:Waher.Networking.DNS.ResourceRecords.MX">
+            <summary>
+            Mailbox eXchange
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.DNS.ResourceRecords.MX.#ctor(System.UInt16,System.String)">
+            <summary>
+            Mailbox eXchange
+            </summary>
+            <param name="Preference">Preference given to
+            this RR among others at the same owner.Lower values
+            are preferred.</param>
+            <param name="Name">Specifies a host willing to act as
+            a mail exchange for the owner name.</param>
+        </member>
+        <member name="P:Waher.Networking.DNS.ResourceRecords.MX.Preference">
+            <summary>
+            Preference given to this RR among others at the same owner.Lower values
+            are preferred.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.DNS.ResourceRecords.NS">
+            <summary>
+            Name Server
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.DNS.ResourceRecords.NS.#ctor(System.String)">
+            <summary>
+            Name Server
+            </summary>
+            <param name="Name">Specifies a host which should be
+            authoritative for the specified class and domain.</param>
+        </member>
+        <member name="T:Waher.Networking.DNS.ResourceRecords.NULL">
+            <summary>
+            NULL (Experimental)
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.DNS.ResourceRecords.NULL.#ctor(System.Byte[])">
+            <summary>
+            NULL (Experimental)
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.DNS.ResourceRecords.NULL.Data">
+            <summary>
+            Binary data
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.DNS.ResourceRecords.PTR">
+            <summary>
+            Pointer
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.DNS.ResourceRecords.PTR.#ctor(System.String)">
+            <summary>
+            Pointer
+            </summary>
+            <param name="Name">Points to some location in the domain name space.</param>
+        </member>
+        <member name="T:Waher.Networking.DNS.ResourceRecords.ResourceAddressRecord">
+            <summary>
+            Abstract base class for Resource Address Records.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.DNS.ResourceRecords.ResourceAddressRecord.#ctor(System.Net.IPAddress)">
+            <summary>
+            Abstract base class for Resource Address Records.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.DNS.ResourceRecords.ResourceAddressRecord.Address">
+            <summary>
+            IP address
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.DNS.ResourceRecords.ResourceNameRecord">
+            <summary>
+            Abstract base class for resource records referring to a name.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.DNS.ResourceRecords.ResourceNameRecord.#ctor(System.String)">
+            <summary>
+            Abstract base class for resource records referring to a name.
+            </summary>
+            <param name="Name">Name being referred to.</param>
+        </member>
+        <member name="P:Waher.Networking.DNS.ResourceRecords.ResourceNameRecord.Name">
+            <summary>
+            Name being referred to.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.DNS.ResourceRecords.ResourceRecord">
+            <summary>
+            Abstract base class for a resource record.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.DNS.ResourceRecords.ResourceRecord.Create(System.IO.Stream)">
+            <summary>
+            Creates a resource record from its binary representation-
+            </summary>
+            <param name="Data">Binary representation of a resource record.</param>
+            <returns>Resource Record.</returns>
+        </member>
+        <member name="T:Waher.Networking.DNS.ResourceRecords.SOA">
+            <summary>
+            Start Of zone Authority
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.DNS.ResourceRecords.SOA.#ctor(System.String,System.String,System.UInt32,System.UInt32,System.UInt32,System.UInt32,System.UInt32)">
+            <summary>
+            Start Of zone Authority
+            </summary>
+            <param name="MNAME">Name server that was the original or primary source of data for this zone</param>
+            <param name="RNAME">Specifies the mailbox of the person responsible for this zone</param>
+            <param name="SERIAL">Version number of the original copy of the zone.</param>
+            <param name="REFRESH">Time interval before the zone should be refreshed</param>
+            <param name="RETRY">Interval that should elapse before a failed refresh should be retried</param>
+            <param name="EXPIRE">Specifies the upper limit on the time interval that can elapse before 
+            the zone is no longer authoritative</param>
+            <param name="MINIMUM">Minimum TTL field that should be exported with any RR from this zone</param>
+        </member>
+        <member name="P:Waher.Networking.DNS.ResourceRecords.SOA.MName">
+            <summary>
+            Name server that was the original or primary source of data for this zone
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.DNS.ResourceRecords.SOA.RName">
+            <summary>
+            Specifies the mailbox of the person responsible for this zone
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.DNS.ResourceRecords.SOA.Serial">
+            <summary>
+            Version number of the original copy of the zone.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.DNS.ResourceRecords.SOA.Refresh">
+            <summary>
+            Time interval before the zone should be refreshed
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.DNS.ResourceRecords.SOA.Retry">
+            <summary>
+            Interval that should elapse before a failed refresh should be retried
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.DNS.ResourceRecords.SOA.Expire">
+            <summary>
+            Specifies the upper limit on the time interval that can elapse before 
+            the zone is no longer authoritative
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.DNS.ResourceRecords.SOA.Minimum">
+            <summary>
+            Minimum TTL field that should be exported with any RR from this zone
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.DNS.ResourceRecords.TXT">
+            <summary>
+            Descriptive text
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.DNS.ResourceRecords.TXT.#ctor(System.String[])">
+            <summary>
+            Descriptive text
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.DNS.ResourceRecords.TXT.Text">
+            <summary>
+            Descriptive text.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.DNS.ResourceRecords.WKS">
+            <summary>
+            Well Known Services, as defined in RFC 1010
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.DNS.ResourceRecords.WKS.#ctor(System.Net.IPAddress,System.Byte,System.Collections.BitArray)">
+            <summary>
+            Well Known Services
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.DNS.ResourceRecords.WKS.Protocol">
+            <summary>
+            Protocol Number
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.DNS.ResourceRecords.WKS.BitMap">
+            <summary>
+            Service Bit-map
+            </summary>
         </member>
     </members>
 </doc>

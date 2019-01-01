@@ -23,6 +23,8 @@ namespace Waher.Networking.DNS
 		public const int DefaultDnsPort = 53;
 
 		private static readonly Regex arpanetHostName = new Regex(@"^[a-zA-Z]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?([.][a-zA-Z]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$", RegexOptions.Compiled | RegexOptions.Singleline);
+		private static readonly object synchObject = new object();
+		private static ushort nextId = 0;
 
 		/// <summary>
 		/// Available DNS Server Addresses.
@@ -92,9 +94,42 @@ namespace Waher.Networking.DNS
 		{
 			StringBuilder sb = null;
 			string s;
+			bool Continue = true;
 
-			while (!string.IsNullOrEmpty(s = ReadName(Data)))
+			while (Continue)
 			{
+				int Len = Data.ReadByte();
+				if (Len == 0)
+					break;
+
+				switch (Len & 192)
+				{
+					case 0:
+						byte[] Bin = new byte[Len];
+						Data.Read(Bin, 0, Len);
+
+						s = Encoding.ASCII.GetString(Bin);
+						break;
+
+					case 192:
+						ushort Offset = (byte)(Len & 63);
+						Offset <<= 8;
+						Offset |= (byte)(Data.ReadByte());
+
+						long Bak = Data.Position;
+
+						Data.Position = Offset;
+
+						s = ReadName(Data);
+
+						Data.Position = Bak;
+						Continue = false;
+						break;
+
+					default:
+						throw new NotSupportedException("Unsupported Label Type.");
+				}
+
 				if (sb is null)
 					sb = new StringBuilder();
 				else
@@ -106,32 +141,16 @@ namespace Waher.Networking.DNS
 			return sb?.ToString() ?? string.Empty;
 		}
 
-		internal static string ReadLabel(Stream Data)
+		internal static string ReadString(Stream Data)
 		{
 			int Len = Data.ReadByte();
 			if (Len == 0)
 				return string.Empty;
 
-			switch (Len & 192)
-			{
-				case 0:
-					byte[] Bin = new byte[Len];
-					Data.Read(Bin, 0, Len);
+			byte[] Bin = new byte[Len];
+			Data.Read(Bin, 0, Len);
 
-					return Encoding.ASCII.GetString(Bin);
-
-				case 192:
-					long Bak = Data.Position;
-					Data.Position = Len & 63;
-
-					string s = ReadName(Data);
-
-					Data.Position = Bak;
-					return s;
-
-				default:
-					throw new NotSupportedException("Unsupported Label Type.");
-			}
+			return Encoding.ASCII.GetString(Bin);
 		}
 
 		internal static ResourceRecord[] ReadResourceRecords(Stream Data, ushort Count)
@@ -149,6 +168,45 @@ namespace Waher.Networking.DNS
 			}
 
 			return Result.ToArray();
+		}
+
+		/// <summary>
+		/// Next Message ID
+		/// </summary>
+		internal static ushort NextID
+		{
+			get
+			{
+				lock (synchObject)
+				{
+					return nextId++;
+				}
+			}
+		}
+
+		internal static void WriteName(string Name, Stream Output)
+		{
+			if (!IsValidArpanetHostName(Name))
+				throw new ArgumentException("Not a valid Host Name.", nameof(Name));
+
+			string[] Parts = Name.Split('.');
+			byte[] Bin;
+
+			foreach (string Part in Parts)
+			{
+				Output.WriteByte((byte)Part.Length);
+
+				Bin = Encoding.ASCII.GetBytes(Part);
+				Output.Write(Bin, 0, Bin.Length);
+			}
+
+			Output.WriteByte(0);
+		}
+
+		internal static void WriteUInt16(ushort Value, Stream Output)
+		{
+			Output.WriteByte((byte)(Value >> 8));
+			Output.WriteByte((byte)Value);
 		}
 
 	}

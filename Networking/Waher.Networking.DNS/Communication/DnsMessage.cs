@@ -35,7 +35,7 @@ namespace Waher.Networking.DNS.Communication
 				this.id = DnsResolver.ReadUInt16(ms);
 
 				byte b = (byte)ms.ReadByte();
-				this.response = (b & 80) != 0;
+				this.response = (b & 0x80) != 0;
 				this.opCode = (OpCode)((b >> 3) & 15);
 				this.authoritativeAnswer = (b & 4) != 0;
 				this.truncation = (b & 2) != 0;

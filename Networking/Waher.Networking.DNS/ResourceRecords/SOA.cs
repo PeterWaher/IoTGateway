@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Waher.Networking.DNS.Enumerations;
 
 namespace Waher.Networking.DNS.ResourceRecords
 {
@@ -20,6 +21,10 @@ namespace Waher.Networking.DNS.ResourceRecords
 		/// <summary>
 		/// Start Of zone Authority
 		/// </summary>
+		/// <param name="Name">Name</param>
+		/// <param name="Type">Resource Record Type</param>
+		/// <param name="Class">Resource Record Class</param>
+		/// <param name="Ttl">Time to live</param>
 		/// <param name="MNAME">Name server that was the original or primary source of data for this zone</param>
 		/// <param name="RNAME">Specifies the mailbox of the person responsible for this zone</param>
 		/// <param name="SERIAL">Version number of the original copy of the zone.</param>
@@ -28,8 +33,10 @@ namespace Waher.Networking.DNS.ResourceRecords
 		/// <param name="EXPIRE">Specifies the upper limit on the time interval that can elapse before 
 		/// the zone is no longer authoritative</param>
 		/// <param name="MINIMUM">Minimum TTL field that should be exported with any RR from this zone</param>
-		public SOA(string MNAME, string RNAME, uint SERIAL, uint REFRESH,
+		public SOA(string Name, TYPE Type, CLASS Class, uint Ttl, 
+			string MNAME, string RNAME, uint SERIAL, uint REFRESH,
 			uint RETRY, uint EXPIRE, uint MINIMUM)
+			: base(Name, Type, Class, Ttl)
 		{
 			this.mName = MNAME;
 			this.rName = RNAME;
@@ -75,5 +82,15 @@ namespace Waher.Networking.DNS.ResourceRecords
 		/// Minimum TTL field that should be exported with any RR from this zone
 		/// </summary>
 		public uint Minimum => this.minimum;
+
+		/// <summary>
+		/// <see cref="Object.ToString()"/>
+		/// </summary>
+		public override string ToString()
+		{
+			return base.ToString() + "\t" + this.mName + "\t" + this.rName +
+				"\t" + this.serial + "\t" + this.refresh + "\t" + this.retry + 
+				"\t" + this.expire + "\t" + this.minimum;
+		}
 	}
 }

@@ -55,16 +55,16 @@ namespace Waher.Networking.CoAP
 		private static Dictionary<int, ICoapContentFormat> contentFormatsByCode = null;
 		private static Dictionary<string, ICoapContentFormat> contentFormatsByContentType = null;
 
-		private Dictionary<ushort, Message> outgoingMessages = new Dictionary<ushort, Message>();
-		private Dictionary<ulong, Message> activeTokens = new Dictionary<ulong, Message>();
-		private Dictionary<string, CoapResource> resources = new Dictionary<string, CoapResource>(StringComparer.CurrentCultureIgnoreCase);
+		private readonly Dictionary<ushort, Message> outgoingMessages = new Dictionary<ushort, Message>();
+		private readonly Dictionary<ulong, Message> activeTokens = new Dictionary<ulong, Message>();
+		private readonly Dictionary<string, CoapResource> resources = new Dictionary<string, CoapResource>(StringComparer.CurrentCultureIgnoreCase);
 		private Random gen = new Random();
 		private Scheduler scheduler;
-		private LinkedList<ClientBase> coapOutgoing = new LinkedList<ClientBase>();
-		private LinkedList<ClientBase> coapIncoming = new LinkedList<ClientBase>();
-		private Cache<string, ResponseCacheRec> blockedResponses = new Cache<string, ResponseCacheRec>(int.MaxValue, TimeSpan.MaxValue, TimeSpan.FromMinutes(1));
-		private IUserSource users;
-		private string requiredPrivilege;
+		private readonly LinkedList<ClientBase> coapOutgoing = new LinkedList<ClientBase>();
+		private readonly LinkedList<ClientBase> coapIncoming = new LinkedList<ClientBase>();
+		private readonly Cache<string, ResponseCacheRec> blockedResponses = new Cache<string, ResponseCacheRec>(int.MaxValue, TimeSpan.MaxValue, TimeSpan.FromMinutes(1));
+		private readonly IUserSource users;
+		private readonly string requiredPrivilege;
 		private ushort msgId = 0;
 		private uint tokenMsb = 0;
 		private ushort lastNonMsgId = 0;
@@ -417,7 +417,7 @@ namespace Waher.Networking.CoAP
 
 			this.scheduler = new Scheduler();
 
-			this.Register(new CoRE.CoreResource(this));
+			this.Register(new CoreResource(this));
 		}
 
 		/// <summary>
@@ -425,11 +425,8 @@ namespace Waher.Networking.CoAP
 		/// </summary>
 		public void Dispose()
 		{
-			if (this.scheduler != null)
-			{
-				this.scheduler.Dispose();
-				this.scheduler = null;
-			}
+			this.scheduler?.Dispose();
+			this.scheduler = null;
 
 			foreach (ClientBase Client in this.coapOutgoing)
 			{
@@ -958,7 +955,7 @@ namespace Waher.Networking.CoAP
 									break;
 								}
 								else
-									Resource = null; 
+									Resource = null;
 							}
 
 							i = Path.LastIndexOf('/');

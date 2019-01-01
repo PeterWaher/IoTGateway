@@ -69,6 +69,7 @@
     <Compile Include=".bak\Waher.Script\Objects\Sets\Integers.cs" />
     <Compile Include=".bak\Waher.Script\Operators\Conditional\NullCheck.cs" />
     <Compile Include=".bak\Waher.Script\Operators\Sets\ImplicitSetDefinition.cs" />
+    <Compile Include=".bak\Waher.Script\Operators\Vectors\ImplicitVectorDefinition.cs" />
     <Compile Include=".bak\Waher.Script\TypeConversion\ConversionSequence.cs" />
     <Compile Include=".bak\Waher.Script\TypeConversion\ITypeConverter.cs" />
     <Compile Include="CustomAction.cs" />

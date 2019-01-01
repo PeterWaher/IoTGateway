@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Waher.Networking.DNS</name>
+    </assembly>
+    <members>
+        <member name="T:Waher.Networking.DNS.DnsResolver">
+            <summary>
+            DNS resolver
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.DNS.DnsResolver.#ctor">
+            <summary>
+            DNS resolver
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.DNS.DnsResolver.Dispose">
+            <summary>
+            <see cref="M:System.IDisposable.Dispose"/>
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.DNS.DnsResolver.DnsServerAddresses">
+            <summary>
+            Available DNS Server Addresses.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.DNS.DnsResolver.IsValidArpanetHostName(System.String)">
+            <summary>
+            Checks if a host name is a valid ARPHANET host name.
+            </summary>
+            <param name="HostName">Host Name</param>
+            <returns>If <paramref name="HostName"/> is a valid ARPHANET host name.</returns>
+        </member>
+    </members>
+</doc>

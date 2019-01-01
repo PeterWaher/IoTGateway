@@ -170,6 +170,7 @@ The [Networking](Networking) folder contains libraries that manage different asp
 | **Waher.Networking**                           | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Networking/)                          | The [Waher.Networking](Networking/Waher.Networking) project provides the basic architecture and tools for all networking libraries.  This includes sniffers, etc. |
 | **Waher.Networking.CoAP**                      | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Networking.CoAP/)                     | The [Waher.Networking.CoAP](Networking/Waher.Networking.CoAP) project provides a simple CoAP endpoint client with DTLS support. |
 | **Waher.Networking.CoAP.UWP**                  | UWP          | [NuGet](https://www.nuget.org/packages/Waher.Networking.CoAP.UWP/)                 | The [Waher.Networking.CoAP.UWP](Networking/Waher.Networking.CoAP.UWP) project provides a Universal Windows Platform compatible version of the **Waher.Networking.CoAP** Library. This library can be used to develop applications for Windows 10, on for instance Rasperry Pi. |
+| **Waher.Networking.DNS**                       | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Networking.DNS/)                      | The [Waher.Networking.DNS](Networking/Waher.Networking.DNS) project provides a custom DNS resolver that help applications resolve names and services easily. |
 | **Waher.Networking.HTTP**                      | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Networking.HTTP/)                     | The [Waher.Networking.HTTP](Networking/Waher.Networking.HTTP) project provides a simple HTTP server for publishing dynamic content and managing user authentication based on a customizable set of users and privileges. Supports the WebSocket protocol. |
 | **Waher.Networking.HTTP.UWP**                  | UWP          | [NuGet](https://www.nuget.org/packages/Waher.Networking.HTTP.UWP/)                 | The [Waher.Networking.HTTP.UWP](Networking/Waher.Networking.HTTP.UWP) project provides a Universal Windows Platform compatible version of the **Waher.Networking.HTTP** Library. This library can be used to develop applications for Windows 10, on for instance Rasperry Pi. |
 | **Waher.Networking.LWM2M**                     | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Networking.LWM2M/)                    | The [Waher.Networking.LWM2M](Networking/Waher.Networking.LWM2M) project provides LWM2M interfaces for your application, using the CoAP library defined in [Waher.Networking.CoAP](Networking/Waher.Networking.CoAP). |
@@ -210,12 +211,13 @@ The [Networking](Networking) folder contains libraries that manage different asp
 
 The folder also contains the following unit test projects:
 
-| Project                            | Type         | Project description |
-|------------------------------------|--------------|---------------------|
-| **Waher.Networking.CoAP.Test**     | .NET 4.6.2   | The [Waher.Networking.CoAP.Test](Networking/Waher.Networking.CoAP.Test) project contains unit-tests for the [Waher.Networking.CoAP](Networking/Waher.Networking.CoAP) library. |
-| **Waher.Networking.HTTP.Test**     | .NET 4.6.2   | The [Waher.Networking.HTTP.Test](Networking/Waher.Networking.HTTP.Test) project contains unit-tests for the [Waher.Networking.HTTP](Networking/Waher.Networking.HTTP) library. |
-| **Waher.Networking.MQTT.Test**     | .NET 4.6.2   | The [Waher.Networking.MQTT.Test](Networking/Waher.Networking.MQTT.Test) project contains unit-tests for the [Waher.Networking.MQTT](Networking/Waher.Networking.MQTT) library. |
-| **Waher.Networking.XMPP.Test**     | .NET 4.6.2   | The [Waher.Networking.XMPP.Test](Networking/Waher.Networking.XMPP.Test) project contains unit-tests for the [Waher.Networking.XMPP](Networking/Waher.Networking.XMPP) library and add-ons. |
+| Project                            | Type          | Project description |
+|------------------------------------|---------------|---------------------|
+| **Waher.Networking.CoAP.Test**     | .NET 4.6.2    | The [Waher.Networking.CoAP.Test](Networking/Waher.Networking.CoAP.Test) project contains unit-tests for the [Waher.Networking.CoAP](Networking/Waher.Networking.CoAP) library. |
+| **Waher.Networking.DNS.Test**      | .NET Core 2.0 | The [Waher.Networking.DNS.Test](Networking/Waher.Networking.DNS.Test) project contains unit-tests for the [Waher.Networking.DNS](Networking/Waher.Networking.DNS) library. |
+| **Waher.Networking.HTTP.Test**     | .NET 4.6.2    | The [Waher.Networking.HTTP.Test](Networking/Waher.Networking.HTTP.Test) project contains unit-tests for the [Waher.Networking.HTTP](Networking/Waher.Networking.HTTP) library. |
+| **Waher.Networking.MQTT.Test**     | .NET 4.6.2    | The [Waher.Networking.MQTT.Test](Networking/Waher.Networking.MQTT.Test) project contains unit-tests for the [Waher.Networking.MQTT](Networking/Waher.Networking.MQTT) library. |
+| **Waher.Networking.XMPP.Test**     | .NET 4.6.2    | The [Waher.Networking.XMPP.Test](Networking/Waher.Networking.XMPP.Test) project contains unit-tests for the [Waher.Networking.XMPP](Networking/Waher.Networking.XMPP) library and add-ons. |
 
 Persistence
 ----------------------

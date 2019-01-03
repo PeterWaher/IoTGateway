@@ -69,112 +69,24 @@ namespace Waher.Networking.DNS.ResourceRecords
 
 			switch (TYPE)
 			{
-				case TYPE.A:
-					byte[] Bin = new byte[4];
-					Data.Read(Bin, 0, 4);
-					IPAddress Address = new IPAddress(Bin);
-
-					Response = new A(NAME, TYPE, CLASS, TTL, Address);
-					break;
-
-				case TYPE.NS:
-					string Name2 = DnsResolver.ReadName(Data);
-					Response = new NS(NAME, TYPE, CLASS, TTL, Name2);
-					break;
-
-				case TYPE.MD:
-					Name2 = DnsResolver.ReadName(Data);
-					Response = new MD(NAME, TYPE, CLASS, TTL, Name2);
-					break;
-
-				case TYPE.MF:
-					Name2 = DnsResolver.ReadName(Data);
-					Response = new MF(NAME, TYPE, CLASS, TTL, Name2);
-					break;
-
-				case TYPE.CNAME:
-					Name2 = DnsResolver.ReadName(Data);
-					Response = new CNAME(NAME, TYPE, CLASS, TTL, Name2);
-					break;
-
-				case TYPE.SOA:
-					string MNAME = DnsResolver.ReadName(Data);
-					string RNAME = DnsResolver.ReadName(Data);
-					uint SERIAL = DnsResolver.ReadUInt32(Data);
-					uint REFRESH = DnsResolver.ReadUInt32(Data);
-					uint RETRY = DnsResolver.ReadUInt32(Data);
-					uint EXPIRE = DnsResolver.ReadUInt32(Data);
-					uint MINIMUM = DnsResolver.ReadUInt32(Data);
-					Response = new SOA(NAME, TYPE, CLASS, TTL, MNAME, RNAME, SERIAL, REFRESH, RETRY, EXPIRE, MINIMUM);
-					break;
-
-				case TYPE.MB:
-					Name2 = DnsResolver.ReadName(Data);
-					Response = new MB(NAME, TYPE, CLASS, TTL, Name2);
-					break;
-
-				case TYPE.MG:
-					Name2 = DnsResolver.ReadName(Data);
-					Response = new MG(NAME, TYPE, CLASS, TTL, Name2);
-					break;
-
-				case TYPE.MR:
-					Name2 = DnsResolver.ReadName(Data);
-					Response = new MR(NAME, TYPE, CLASS, TTL, Name2);
-					break;
-
-				case TYPE.NULL:
-					int c = (int)(EndPos - Data.Position);
-					Bin = new byte[c];
-					Data.Read(Bin, 0, c);
-
-					Response = new NULL(NAME, TYPE, CLASS, TTL, Bin);
-					break;
-
-				case TYPE.WKS:
-					Bin = new byte[4];
-					Data.Read(Bin, 0, 4);
-					Address = new IPAddress(Bin);
-					byte Protocol = (byte)Data.ReadByte();
-					c = (int)(EndPos - Data.Position);
-					Bin = new byte[c];
-					Data.Read(Bin, 0, c);
-					BitArray BitMap = new BitArray(Bin);
-
-					Response = new WKS(NAME, TYPE, CLASS, TTL, Address, Protocol, BitMap);
-					break;
-
-				case TYPE.PTR:
-					Name2 = DnsResolver.ReadName(Data);
-					Response = new PTR(NAME, TYPE, CLASS, TTL, Name2);
-					break;
-
-				case TYPE.HINFO:
-					string Cpu = DnsResolver.ReadString(Data);
-					string Os = DnsResolver.ReadString(Data);
-					Response = new HINFO(NAME, TYPE, CLASS, TTL, Cpu, Os);
-					break;
-
-				case TYPE.MINFO:
-					string RMailBx = DnsResolver.ReadName(Data);
-					string EMailBx = DnsResolver.ReadName(Data);
-					Response = new MINFO(NAME, TYPE, CLASS, TTL, RMailBx, EMailBx);
-					break;
-
-				case TYPE.MX:
-					ushort Preference = DnsResolver.ReadUInt16(Data);
-					string Exchange = DnsResolver.ReadName(Data);
-					Response = new MX(NAME, TYPE, CLASS, TTL, Preference, Exchange);
-					break;
-
-				case TYPE.TXT:
-					List<string> Text = new List<string>();
-
-					while (Data.Position < EndPos)
-						Text.Add(DnsResolver.ReadString(Data));
-
-					Response = new TXT(NAME, TYPE, CLASS, TTL, Text.ToArray());
-					break;
+				case TYPE.A: Response = new A(NAME, TYPE, CLASS, TTL, Data); break;
+				case TYPE.NS: Response = new NS(NAME, TYPE, CLASS, TTL, Data); break;
+				case TYPE.MD: Response = new MD(NAME, TYPE, CLASS, TTL, Data); break;
+				case TYPE.MF: Response = new MF(NAME, TYPE, CLASS, TTL, Data); break;
+				case TYPE.CNAME: Response = new CNAME(NAME, TYPE, CLASS, TTL, Data); break;
+				case TYPE.SOA: Response = new SOA(NAME, TYPE, CLASS, TTL, Data); break;
+				case TYPE.MB: Response = new MB(NAME, TYPE, CLASS, TTL, Data); break;
+				case TYPE.MG: Response = new MG(NAME, TYPE, CLASS, TTL, Data); break;
+				case TYPE.MR: Response = new MR(NAME, TYPE, CLASS, TTL, Data); break;
+				case TYPE.NULL: Response = new NULL(NAME, TYPE, CLASS, TTL, Data, EndPos); break;
+				case TYPE.WKS: Response = new WKS(NAME, TYPE, CLASS, TTL, Data, EndPos); break;
+				case TYPE.PTR: Response = new PTR(NAME, TYPE, CLASS, TTL, Data); break;
+				case TYPE.HINFO: Response = new HINFO(NAME, TYPE, CLASS, TTL, Data); break;
+				case TYPE.MINFO: Response = new MINFO(NAME, TYPE, CLASS, TTL, Data); break;
+				case TYPE.MX: Response = new MX(NAME, TYPE, CLASS, TTL, Data); break;
+				case TYPE.TXT: Response = new TXT(NAME, TYPE, CLASS, TTL, Data, EndPos); break;
+				case TYPE.AAAA: Response = new AAAA(NAME, TYPE, CLASS, TTL, Data); break;
+				case TYPE.SRV: Response = new SRV(NAME, TYPE, CLASS, TTL, Data); break;
 
 				default:
 					Response = null;    // Unrecognized Resource Record.

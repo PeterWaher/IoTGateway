@@ -85,8 +85,18 @@ namespace Waher.Networking.DNS.Enumerations
 		MX = 15,
 
 		/// <summary>
-		///  text strings
+		/// text strings
 		/// </summary>
-		TXT = 16
+		TXT = 16,
+
+		/// <summary>
+		/// IPv6 host address (RFC 3596)
+		/// </summary>
+		AAAA = 28,
+
+		/// <summary>
+		/// Server Selection (RFC 2782)
+		/// </summary>
+		SRV = 33
 	}
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using Waher.Networking.DNS.Enumerations;
 
@@ -19,11 +20,17 @@ namespace Waher.Networking.DNS.ResourceRecords
 		/// <param name="Type">Resource Record Type</param>
 		/// <param name="Class">Resource Record Class</param>
 		/// <param name="Ttl">Time to live</param>
-		/// <param name="Text">Descriptive text.</param>
-		public TXT(string Name, TYPE Type, CLASS Class, uint Ttl, string[] Text)
+		/// <param name="Data">RR-specific binary data.</param>
+		/// <param name="EndPos">End position of record.</param>
+		public TXT(string Name, TYPE Type, CLASS Class, uint Ttl, Stream Data, long EndPos)
 			: base(Name, Type, Class, Ttl)
 		{
-			this.text = Text;
+			List<string> Text = new List<string>();
+
+			while (Data.Position < EndPos)
+				Text.Add(DnsResolver.ReadString(Data));
+
+			this.text = Text.ToArray();
 		}
 
 		/// <summary>

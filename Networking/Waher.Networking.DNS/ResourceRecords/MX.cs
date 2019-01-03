@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.IO;
 using Waher.Networking.DNS.Enumerations;
 
 namespace Waher.Networking.DNS.ResourceRecords
@@ -8,9 +8,10 @@ namespace Waher.Networking.DNS.ResourceRecords
 	/// <summary>
 	/// Mailbox eXchange
 	/// </summary>
-	public class MX : ResourceNameRecord
+	public class MX : ResourceRecord
 	{
 		private readonly ushort preference;
+		private readonly string exchange;
 
 		/// <summary>
 		/// Mailbox eXchange
@@ -19,15 +20,12 @@ namespace Waher.Networking.DNS.ResourceRecords
 		/// <param name="Type">Resource Record Type</param>
 		/// <param name="Class">Resource Record Class</param>
 		/// <param name="Ttl">Time to live</param>
-		/// <param name="Preference">Preference given to
-		/// this RR among others at the same owner.Lower values
-		/// are preferred.</param>
-		/// <param name="Name2">Specifies a host willing to act as
-		/// a mail exchange for the owner name.</param>
-		public MX(string Name, TYPE Type, CLASS Class, uint Ttl, ushort Preference, string Name2)
-			: base(Name, Type, Class, Ttl, Name2)
+		/// <param name="Data">RR-specific binary data.</param>
+		public MX(string Name, TYPE Type, CLASS Class, uint Ttl, Stream Data)
+			: base(Name, Type, Class, Ttl)
 		{
-			this.preference = Preference;
+			this.preference = DnsResolver.ReadUInt16(Data);
+			this.exchange = DnsResolver.ReadName(Data);
 		}
 
 		/// <summary>

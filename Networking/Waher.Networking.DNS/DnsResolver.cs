@@ -14,6 +14,8 @@ namespace Waher.Networking.DNS
 	/// 
 	/// RFC 1034: https://tools.ietf.org/html/rfc1034: DOMAIN NAMES - CONCEPTS AND FACILITIES
 	/// RFC 1035: https://tools.ietf.org/html/rfc1035: DOMAIN NAMES - IMPLEMENTATION AND SPECIFICATION
+	/// RFC 2782: https://tools.ietf.org/html/rfc2782: A DNS RR for specifying the location of services (DNS SRV)
+	/// RFC 3596: https://tools.ietf.org/html/rfc3596: DNS Extensions to Support IP Version 6
 	/// </summary>
 	public static class DnsResolver
 	{
@@ -23,6 +25,7 @@ namespace Waher.Networking.DNS
 		public const int DefaultDnsPort = 53;
 
 		private static readonly Regex arpanetHostName = new Regex(@"^[a-zA-Z]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?([.][a-zA-Z]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$", RegexOptions.Compiled | RegexOptions.Singleline);
+		private static readonly Regex arpanetHostNameUnderscore = new Regex(@"^[_a-zA-Z]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?([.][_a-zA-Z]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$", RegexOptions.Compiled | RegexOptions.Singleline);
 		private static readonly object synchObject = new object();
 		private static ushort nextId = 0;
 
@@ -59,6 +62,17 @@ namespace Waher.Networking.DNS
 		/// <returns>If <paramref name="HostName"/> is a valid ARPHANET host name.</returns>
 		public static bool IsValidArpanetHostName(string HostName)
 		{
+			return IsValidArpanetHostName(HostName, false);
+		}
+
+		/// <summary>
+		/// Checks if a host name is a valid ARPHANET host name.
+		/// </summary>
+		/// <param name="HostName">Host Name</param>
+		/// <param name="AllowUnderscore">If underscore characters are permitted.</param>
+		/// <returns>If <paramref name="HostName"/> is a valid ARPHANET host name.</returns>
+		public static bool IsValidArpanetHostName(string HostName, bool AllowUnderscore)
+		{
 			if (HostName.Length > 255)
 				return false;
 
@@ -66,7 +80,10 @@ namespace Waher.Networking.DNS
 
 			lock (arpanetHostName)
 			{
-				M = arpanetHostName.Match(HostName);
+				if (AllowUnderscore)
+					M = arpanetHostNameUnderscore.Match(HostName);
+				else
+					M = arpanetHostName.Match(HostName);
 			}
 
 			return (M.Success && M.Index == 0 && M.Length == HostName.Length);
@@ -184,20 +201,46 @@ namespace Waher.Networking.DNS
 			}
 		}
 
-		internal static void WriteName(string Name, Stream Output)
+		internal static void WriteName(string Name, Stream Output,
+			Dictionary<string, ushort> NamePositions)
 		{
-			if (!IsValidArpanetHostName(Name))
+			if (!IsValidArpanetHostName(Name, true))
 				throw new ArgumentException("Not a valid Host Name.", nameof(Name));
 
-			string[] Parts = Name.Split('.');
-			byte[] Bin;
-
-			foreach (string Part in Parts)
+			while (!string.IsNullOrEmpty(Name))
 			{
-				Output.WriteByte((byte)Part.Length);
+				if (NamePositions.TryGetValue(Name, out ushort Pos))
+				{
+					byte b = (byte)(Pos >> 8);
+					b |= 0xc0;
 
-				Bin = Encoding.ASCII.GetBytes(Part);
-				Output.Write(Bin, 0, Bin.Length);
+					Output.WriteByte(b);
+					Output.WriteByte((byte)(Pos & 0xff));
+					return;
+				}
+				else
+				{
+					NamePositions[Name] = (ushort)Output.Position;
+
+					int i = Name.IndexOf('.');
+					string Label;
+
+					if (i < 0)
+					{
+						Label = Name;
+						Name = string.Empty;
+					}
+					else
+					{
+						Label = Name.Substring(0, i);
+						Name = Name.Substring(i + 1);
+					}
+
+					Output.WriteByte((byte)Label.Length);
+
+					byte[] Bin = Encoding.ASCII.GetBytes(Label);
+					Output.Write(Bin, 0, Bin.Length);
+				}
 			}
 
 			Output.WriteByte(0);

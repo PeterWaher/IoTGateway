@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.IO;
 using Waher.Networking.DNS.Enumerations;
 
 namespace Waher.Networking.DNS.ResourceRecords
@@ -19,11 +19,14 @@ namespace Waher.Networking.DNS.ResourceRecords
 		/// <param name="Type">Resource Record Type</param>
 		/// <param name="Class">Resource Record Class</param>
 		/// <param name="Ttl">Time to live</param>
-		/// <param name="Data">Undefined data.</param>
-		public NULL(string Name, TYPE Type, CLASS Class, uint Ttl, byte[] Data)
+		/// <param name="Data">RR-specific binary data.</param>
+		/// <param name="EndPos">End position of record.</param>
+		public NULL(string Name, TYPE Type, CLASS Class, uint Ttl, Stream Data, long EndPos)
 			: base(Name, Type, Class, Ttl)
 		{
-			this.data = Data;
+			int c = (int)(EndPos - Data.Position);
+			this.data = new byte[c];
+			Data.Read(this.data, 0, c);
 		}
 
 		/// <summary>

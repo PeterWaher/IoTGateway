@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.IO;
 using Waher.Networking.DNS.Enumerations;
 
 namespace Waher.Networking.DNS.ResourceRecords
@@ -17,12 +17,9 @@ namespace Waher.Networking.DNS.ResourceRecords
 		/// <param name="Type">Resource Record Type</param>
 		/// <param name="Class">Resource Record Class</param>
 		/// <param name="Ttl">Time to live</param>
-		/// <param name="Name2">
-		/// A domain name which specifies the canonical or primary
-		/// name for the owner.The owner name is an alias.
-		/// </param>
-		public CNAME(string Name, TYPE Type, CLASS Class, uint Ttl, string Name2)
-			: base(Name, Type, Class, Ttl, Name2)
+		/// <param name="Data">RR-specific binary data.</param>
+		public CNAME(string Name, TYPE Type, CLASS Class, uint Ttl, Stream Data)
+			: base(Name, Type, Class, Ttl, Data)
 		{
 		}
 	}

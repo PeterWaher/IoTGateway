@@ -15,38 +15,18 @@ using Waher.Runtime.Timing;
 namespace Waher.Networking.DNS.Communication
 {
 	/// <summary>
-	/// Implements a DNS TCP-based client, as defined in:
-	/// 
-	/// RFC 1035: https://tools.ietf.org/html/rfc1035: DOMAIN NAMES - IMPLEMENTATION AND SPECIFICATION
+	/// Implements a DNS UDP-based client.
 	/// </summary>
-	public class DnsUdpClient : Sniffable, IDisposable
+	public class DnsUdpClient : DnsClient
 	{
-		/// <summary>
-		/// Default Timeout, in milliseconds (30000 ms)
-		/// </summary>
-		public const int DefaultTimeout = 30000;
-
-		private readonly Dictionary<ushort, Rec> outgoingMessages = new Dictionary<ushort, Rec>();
-		private readonly Random gen = new Random();
 		private readonly IPEndPoint dnsEndpoint;
-		private readonly LinkedList<byte[]> outputQueue = new LinkedList<byte[]>();
-		private Scheduler scheduler;
 		private UdpClient udp = null;
-		private bool isWriting = false;
-		private bool disposed = false;
-
-		private class Rec
-		{
-			public ushort ID;
-			public byte[] Output;
-			public DnsMessageEventHandler Callback;
-			public object State;
-		}
 
 		/// <summary>
 		/// Implements a DNS TCP-based client.
 		/// </summary>
 		public DnsUdpClient()
+			: base()
 		{
 			foreach (NetworkInterface Interface in NetworkInterface.GetAllNetworkInterfaces())
 			{
@@ -95,7 +75,7 @@ namespace Waher.Networking.DNS.Communication
 					this.udp.Client.Bind(new IPEndPoint(Address, 0));
 
 					this.BeginReceive();
-					this.scheduler = new Scheduler();
+					this.Init();
 
 					return;
 				}
@@ -137,194 +117,26 @@ namespace Waher.Networking.DNS.Communication
 			}
 		}
 
-		private async void BeginTransmit(ushort ID, byte[] Message, DnsMessageEventHandler Callback, object State)
+		/// <summary>
+		/// Sends a message to a destination.
+		/// </summary>
+		/// <param name="Message">Message</param>
+		/// <param name="Destination">Destination. If null, default destination
+		/// is assumed.</param>
+		protected override Task SendAsync(byte[] Message, IPEndPoint Destination)
 		{
-			if (this.disposed)
-				return;
-
-			if (!(Callback is null))
-			{
-				Rec Rec = new Rec()
-				{
-					ID = ID,
-					Output = Message,
-					Callback = Callback,
-					State = State
-				};
-
-				lock (this.outgoingMessages)
-				{
-					this.outgoingMessages[ID] = Rec;
-				}
-
-				this.scheduler.Add(DateTime.Now.AddSeconds(2), this.CheckRetry, Rec);
-			}
-
-			lock (this.outputQueue)
-			{
-				if (this.isWriting)
-				{
-					this.outputQueue.AddLast(Message);
-					return;
-				}
-				else
-					this.isWriting = true;
-			}
-
-			try
-			{
-				while (Message != null)
-				{
-					this.TransmitBinary(Message);
-
-					await this.udp.SendAsync(Message, Message.Length, this.dnsEndpoint);
-
-					if (this.disposed)
-						return;
-
-					lock (this.outputQueue)
-					{
-						if (this.outputQueue.First is null)
-						{
-							this.isWriting = false;
-							Message = null;
-						}
-						else
-						{
-							Message = this.outputQueue.First.Value;
-							this.outputQueue.RemoveFirst();
-						}
-					}
-				}
-			}
-			catch (Exception ex)
-			{
-				this.Error(ex.Message);
-			}
-		}
-
-		private void CheckRetry(object P)
-		{
-			Rec Rec = (Rec)P;
-
-			lock (this.outgoingMessages)
-			{
-				if (!this.outgoingMessages.ContainsKey(Rec.ID))
-					return;
-			}
-
-			this.BeginTransmit(Rec.ID, Rec.Output, Rec.Callback, Rec.State);
-		}
-
-		private void ProcessIncomingMessage(DnsMessage Message)
-		{
-			if (Message.Response)
-			{
-				Rec Rec;
-
-				lock (this.outgoingMessages)
-				{
-					if (this.outgoingMessages.TryGetValue(Message.ID, out Rec))
-						this.outgoingMessages.Remove(Message.ID);
-					else
-						return;
-				}
-
-				try
-				{
-					Rec.Callback?.Invoke(this, new DnsMessageEventArgs(Message, Rec.State));
-				}
-				catch (Exception ex)
-				{
-					Log.Critical(ex);
-				}
-			}
+			return this.udp.SendAsync(Message, Message.Length, Destination ?? this.dnsEndpoint);
 		}
 
 		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>
 		/// </summary>
-		public void Dispose()
+		public override void Dispose()
 		{
-			this.disposed = true;
+			base.Dispose();
 
 			this.udp?.Dispose();
 			this.udp = null;
-
-			this.scheduler?.Dispose();
-			this.scheduler = null;
-		}
-
-		/// <summary>
-		/// Execute a DNS query.
-		/// </summary>
-		/// <param name="QNAME">Query Name</param>
-		/// <param name="QTYPE">Query Type</param>
-		/// <param name="QCLASS">Query Class</param>
-		/// <param name="Callback">Method to call when response is returned.</param>
-		/// <param name="State">State object to pass on to callback method.</param>
-		public void Query(string QNAME, QTYPE QTYPE, QCLASS QCLASS, DnsMessageEventHandler Callback, object State)
-		{
-			using (MemoryStream ms = new MemoryStream())
-			{
-				ushort ID = DnsResolver.NextID;
-
-				DnsResolver.WriteUInt16(ID, ms);
-				ms.WriteByte((byte)((int)OpCode.Query << 3));
-				ms.WriteByte((byte)RCode.NoError);
-
-				DnsResolver.WriteUInt16(1, ms);     // Query Count
-				DnsResolver.WriteUInt16(0, ms);     // Answer Count
-				DnsResolver.WriteUInt16(0, ms);     // Authoritative Count
-				DnsResolver.WriteUInt16(0, ms);     // Additional Count
-				DnsResolver.WriteName(QNAME, ms);
-				DnsResolver.WriteUInt16((ushort)QTYPE, ms);
-				DnsResolver.WriteUInt16((ushort)QCLASS, ms);
-
-				byte[] Packet = ms.ToArray();
-
-				this.BeginTransmit(ID, Packet, Callback, State);
-			}
-		}
-
-		/// <summary>
-		/// Execute a DNS query.
-		/// </summary>
-		/// <param name="QNAME">Query Name</param>
-		/// <param name="QTYPE">Query Type</param>
-		/// <param name="QCLASS">Query Class</param>
-		public Task<DnsMessage> QueryAsync(string QNAME, QTYPE QTYPE, QCLASS QCLASS)
-		{
-			return this.QueryAsync(QNAME, QTYPE, QCLASS, DefaultTimeout);
-		}
-
-		/// <summary>
-		/// Execute a DNS query.
-		/// </summary>
-		/// <param name="QNAME">Query Name</param>
-		/// <param name="QTYPE">Query Type</param>
-		/// <param name="QCLASS">Query Class</param>
-		/// <param name="Timeout">Timeout, in milliseconds.</param>
-		public Task<DnsMessage> QueryAsync(string QNAME, QTYPE QTYPE, QCLASS QCLASS, int Timeout)
-		{
-			TaskCompletionSource<DnsMessage> Result = new TaskCompletionSource<DnsMessage>();
-			DateTime TP;
-
-			TP = this.scheduler.Add(DateTime.Now.AddMilliseconds(Timeout), (P) =>
-			{
-				((TaskCompletionSource<DnsMessage>)P).TrySetException(
-					new TimeoutException("No response returned within the given time."));
-			}, Result);
-
-
-			this.Query(QNAME, QTYPE, QCLASS, (sender, e) =>
-			{
-				this.scheduler?.Remove(TP);
-
-				((TaskCompletionSource<DnsMessage>)e.State).TrySetResult(e.Message);
-			}, Result);
-
-			return Result.Task;
 		}
 
 	}

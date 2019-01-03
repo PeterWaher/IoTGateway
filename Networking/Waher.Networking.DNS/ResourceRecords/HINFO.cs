@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.IO;
 using Waher.Networking.DNS.Enumerations;
 
 namespace Waher.Networking.DNS.ResourceRecords
@@ -20,13 +20,12 @@ namespace Waher.Networking.DNS.ResourceRecords
 		/// <param name="Type">Resource Record Type</param>
 		/// <param name="Class">Resource Record Class</param>
 		/// <param name="Ttl">Time to live</param>
-		/// <param name="CPU">Specifies the CPU type.</param>
-		/// <param name="OS">Specifies the Operating System type.</param>
-		public HINFO(string Name, TYPE Type, CLASS Class, uint Ttl, string CPU, string OS)
+		/// <param name="Data">RR-specific binary data.</param>
+		public HINFO(string Name, TYPE Type, CLASS Class, uint Ttl, Stream Data)
 			: base(Name, Type, Class, Ttl)
 		{
-			this.cpu = CPU;
-			this.os = OS;
+			this.cpu = DnsResolver.ReadString(Data);
+			this.os = DnsResolver.ReadString(Data);
 		}
 
 		/// <summary>

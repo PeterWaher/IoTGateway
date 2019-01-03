@@ -90,6 +90,16 @@ namespace Waher.Networking.DNS.Enumerations
 		TXT = 16,
 
 		/// <summary>
+		/// IPv6 host address (RFC 3596)
+		/// </summary>
+		AAAA = 28,
+
+		/// <summary>
+		/// Server Selection (RFC 2782)
+		/// </summary>
+		SRV = 33,
+
+		/// <summary>
 		/// A request for a transfer of an entire zone
 		/// </summary>
 		AXFR = 252,

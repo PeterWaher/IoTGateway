@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.IO;
 using Waher.Networking.DNS.Enumerations;
 
 namespace Waher.Networking.DNS.ResourceRecords
@@ -8,7 +8,7 @@ namespace Waher.Networking.DNS.ResourceRecords
 	/// <summary>
 	/// Mail information about a host. (Experimental)
 	/// </summary>
-	public class MINFO : ResourceRecord	
+	public class MINFO : ResourceRecord
 	{
 		private readonly string rMailBx;
 		private readonly string eMailBx;
@@ -20,17 +20,12 @@ namespace Waher.Networking.DNS.ResourceRecords
 		/// <param name="Type">Resource Record Type</param>
 		/// <param name="Class">Resource Record Class</param>
 		/// <param name="Ttl">Time to live</param>
-		/// <param name="RMailBx">Specifies a mailbox which is
-		/// responsible for the mailing list or mailbox.</param>
-		/// <param name="EMailBx">Specifies a mailbox which is to
-		/// receive error messages related to the mailing list or
-		/// mailbox specified by the owner of the MINFO RR(similar
-		/// to the ERRORS-TO: field which has been proposed).</param>
-		public MINFO(string Name, TYPE Type, CLASS Class, uint Ttl, string RMailBx, string EMailBx)
+		/// <param name="Data">RR-specific binary data.</param>
+		public MINFO(string Name, TYPE Type, CLASS Class, uint Ttl, Stream Data)
 			: base(Name, Type, Class, Ttl)
 		{
-			this.rMailBx = RMailBx;
-			this.eMailBx = EMailBx;
+			this.rMailBx = DnsResolver.ReadName(Data);
+			this.eMailBx = DnsResolver.ReadName(Data);
 		}
 
 		/// <summary>

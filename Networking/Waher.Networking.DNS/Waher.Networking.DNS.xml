@@ -4,6 +4,137 @@
         <name>Waher.Networking.DNS</name>
     </assembly>
     <members>
+        <member name="T:Waher.Networking.DNS.Communication.DnsClient">
+            <summary>
+            Abstract base class for DNS clients.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Communication.DnsClient.DefaultTimeout">
+            <summary>
+            Default Timeout, in milliseconds (30000 ms)
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Communication.DnsClient.disposed">
+            <summary>
+            If the object has been disposed
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.DNS.Communication.DnsClient.#ctor">
+            <summary>
+            Abstract base class for DNS clients.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.DNS.Communication.DnsClient.Init">
+            <summary>
+            Called when DNS client is ready to be initialized.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.DNS.Communication.DnsClient.BeginTransmit(System.UInt16,System.Byte[],Waher.Networking.DNS.Communication.DnsMessageEventHandler,System.Object)">
+            <summary>
+            Sends a message to a DNS server.
+            </summary>
+            <param name="ID">Message ID</param>
+            <param name="Message">Encoded message</param>
+            <param name="Callback">method to call when a response is returned.</param>
+            <param name="State">State object to pass on to callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.DNS.Communication.DnsClient.SendAsync(System.Byte[],System.Net.IPEndPoint)">
+            <summary>
+            Sends a message to a destination.
+            </summary>
+            <param name="Message">Message</param>
+            <param name="Destination">Destination. If null, default destination
+            is assumed.</param>
+        </member>
+        <member name="M:Waher.Networking.DNS.Communication.DnsClient.ProcessIncomingMessage(Waher.Networking.DNS.Communication.DnsMessage)">
+            <summary>
+            Processes an incoming message.
+            </summary>
+            <param name="Message">DNS Message</param>
+        </member>
+        <member name="M:Waher.Networking.DNS.Communication.DnsClient.Dispose">
+            <summary>
+            <see cref="M:System.IDisposable.Dispose"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.DNS.Communication.DnsClient.SendRequest(Waher.Networking.DNS.Enumerations.OpCode,System.Boolean,Waher.Networking.DNS.Communication.Question[],Waher.Networking.DNS.Communication.DnsMessageEventHandler,System.Object)">
+            <summary>
+            Sends a DNS Request
+            </summary>
+            <param name="OpCode">OpCode</param>
+            <param name="Recursive">If recursive evaluation is desired.
+            (Recursive evaluation is optional on behalf of the DNS server.</param>
+            <param name="Questions">Questions</param>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.DNS.Communication.DnsClient.SendRequestAsync(Waher.Networking.DNS.Enumerations.OpCode,System.Boolean,Waher.Networking.DNS.Communication.Question[],System.Int32)">
+            <summary>
+            Sends a DNS Request
+            </summary>
+            <param name="OpCode">OpCode</param>
+            <param name="Recursive">If recursive evaluation is desired.
+            (Recursive evaluation is optional on behalf of the DNS server.</param>
+            <param name="Questions">Questions</param>
+            <param name="Timeout">Timeout, in milliseconds.</param>
+        </member>
+        <member name="M:Waher.Networking.DNS.Communication.DnsClient.Query(System.String,Waher.Networking.DNS.Enumerations.QTYPE,Waher.Networking.DNS.Enumerations.QCLASS,Waher.Networking.DNS.Communication.DnsMessageEventHandler,System.Object)">
+            <summary>
+            Execute a DNS query.
+            </summary>
+            <param name="QNAME">Query Name</param>
+            <param name="QTYPE">Query Type</param>
+            <param name="QCLASS">Query Class</param>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.DNS.Communication.DnsClient.Query(System.String,Waher.Networking.DNS.Enumerations.QTYPE[],Waher.Networking.DNS.Enumerations.QCLASS,Waher.Networking.DNS.Communication.DnsMessageEventHandler,System.Object)">
+            <summary>
+            Execute a DNS query.
+            </summary>
+            <param name="QNAME">Query Name</param>
+            <param name="QTYPEs">Query Types</param>
+            <param name="QCLASS">Query Class</param>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.DNS.Communication.DnsClient.Query(Waher.Networking.DNS.Communication.Question[],Waher.Networking.DNS.Communication.DnsMessageEventHandler,System.Object)">
+            <summary>
+            Execute a DNS query.
+            </summary>
+            <param name="Questions">Questions</param>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.DNS.Communication.DnsClient.QueryAsync(System.String,Waher.Networking.DNS.Enumerations.QTYPE,Waher.Networking.DNS.Enumerations.QCLASS)">
+            <summary>
+            Execute a DNS query.
+            </summary>
+            <param name="QNAME">Query Name</param>
+            <param name="QTYPE">Query Type</param>
+            <param name="QCLASS">Query Class</param>
+        </member>
+        <member name="M:Waher.Networking.DNS.Communication.DnsClient.QueryAsync(System.String,Waher.Networking.DNS.Enumerations.QTYPE[],Waher.Networking.DNS.Enumerations.QCLASS)">
+            <summary>
+            Execute a DNS query.
+            </summary>
+            <param name="QNAME">Query Name</param>
+            <param name="QTYPEs">Query Type</param>
+            <param name="QCLASS">Query Class</param>
+        </member>
+        <member name="M:Waher.Networking.DNS.Communication.DnsClient.QueryAsync(Waher.Networking.DNS.Communication.Question[])">
+            <summary>
+            Execute a DNS query.
+            </summary>
+            <param name="Questions">Questions</param>
+        </member>
+        <member name="M:Waher.Networking.DNS.Communication.DnsClient.QueryAsync(Waher.Networking.DNS.Communication.Question[],System.Int32)">
+            <summary>
+            Execute a DNS query.
+            </summary>
+            <param name="Questions">Questions</param>
+            <param name="Timeout">Timeout, in milliseconds.</param>
+        </member>
         <member name="T:Waher.Networking.DNS.Communication.DnsMessage">
             <summary>
             Represents a DNS message
@@ -106,14 +237,7 @@
         </member>
         <member name="T:Waher.Networking.DNS.Communication.DnsUdpClient">
             <summary>
-            Implements a DNS TCP-based client, as defined in:
-            
-            RFC 1035: https://tools.ietf.org/html/rfc1035: DOMAIN NAMES - IMPLEMENTATION AND SPECIFICATION
-            </summary>
-        </member>
-        <member name="F:Waher.Networking.DNS.Communication.DnsUdpClient.DefaultTimeout">
-            <summary>
-            Default Timeout, in milliseconds (30000 ms)
+            Implements a DNS UDP-based client.
             </summary>
         </member>
         <member name="M:Waher.Networking.DNS.Communication.DnsUdpClient.#ctor">
@@ -121,37 +245,18 @@
             Implements a DNS TCP-based client.
             </summary>
         </member>
+        <member name="M:Waher.Networking.DNS.Communication.DnsUdpClient.SendAsync(System.Byte[],System.Net.IPEndPoint)">
+            <summary>
+            Sends a message to a destination.
+            </summary>
+            <param name="Message">Message</param>
+            <param name="Destination">Destination. If null, default destination
+            is assumed.</param>
+        </member>
         <member name="M:Waher.Networking.DNS.Communication.DnsUdpClient.Dispose">
             <summary>
             <see cref="M:System.IDisposable.Dispose"/>
             </summary>
-        </member>
-        <member name="M:Waher.Networking.DNS.Communication.DnsUdpClient.Query(System.String,Waher.Networking.DNS.Enumerations.QTYPE,Waher.Networking.DNS.Enumerations.QCLASS,Waher.Networking.DNS.Communication.DnsMessageEventHandler,System.Object)">
-            <summary>
-            Execute a DNS query.
-            </summary>
-            <param name="QNAME">Query Name</param>
-            <param name="QTYPE">Query Type</param>
-            <param name="QCLASS">Query Class</param>
-            <param name="Callback">Method to call when response is returned.</param>
-            <param name="State">State object to pass on to callback method.</param>
-        </member>
-        <member name="M:Waher.Networking.DNS.Communication.DnsUdpClient.QueryAsync(System.String,Waher.Networking.DNS.Enumerations.QTYPE,Waher.Networking.DNS.Enumerations.QCLASS)">
-            <summary>
-            Execute a DNS query.
-            </summary>
-            <param name="QNAME">Query Name</param>
-            <param name="QTYPE">Query Type</param>
-            <param name="QCLASS">Query Class</param>
-        </member>
-        <member name="M:Waher.Networking.DNS.Communication.DnsUdpClient.QueryAsync(System.String,Waher.Networking.DNS.Enumerations.QTYPE,Waher.Networking.DNS.Enumerations.QCLASS,System.Int32)">
-            <summary>
-            Execute a DNS query.
-            </summary>
-            <param name="QNAME">Query Name</param>
-            <param name="QTYPE">Query Type</param>
-            <param name="QCLASS">Query Class</param>
-            <param name="Timeout">Timeout, in milliseconds.</param>
         </member>
         <member name="T:Waher.Networking.DNS.Communication.Question">
             <summary>
@@ -192,6 +297,8 @@
             
             RFC 1034: https://tools.ietf.org/html/rfc1034: DOMAIN NAMES - CONCEPTS AND FACILITIES
             RFC 1035: https://tools.ietf.org/html/rfc1035: DOMAIN NAMES - IMPLEMENTATION AND SPECIFICATION
+            RFC 2782: https://tools.ietf.org/html/rfc2782: A DNS RR for specifying the location of services (DNS SRV)
+            RFC 3596: https://tools.ietf.org/html/rfc3596: DNS Extensions to Support IP Version 6
             </summary>
         </member>
         <member name="F:Waher.Networking.DNS.DnsResolver.DefaultDnsPort">
@@ -209,6 +316,14 @@
             Checks if a host name is a valid ARPHANET host name.
             </summary>
             <param name="HostName">Host Name</param>
+            <returns>If <paramref name="HostName"/> is a valid ARPHANET host name.</returns>
+        </member>
+        <member name="M:Waher.Networking.DNS.DnsResolver.IsValidArpanetHostName(System.String,System.Boolean)">
+            <summary>
+            Checks if a host name is a valid ARPHANET host name.
+            </summary>
+            <param name="HostName">Host Name</param>
+            <param name="AllowUnderscore">If underscore characters are permitted.</param>
             <returns>If <paramref name="HostName"/> is a valid ARPHANET host name.</returns>
         </member>
         <member name="P:Waher.Networking.DNS.DnsResolver.NextID">
@@ -389,6 +504,16 @@
         <member name="F:Waher.Networking.DNS.Enumerations.QTYPE.TXT">
             <summary>
              text strings
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Enumerations.QTYPE.AAAA">
+            <summary>
+            IPv6 host address (RFC 3596)
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Enumerations.QTYPE.SRV">
+            <summary>
+            Server Selection (RFC 2782)
             </summary>
         </member>
         <member name="F:Waher.Networking.DNS.Enumerations.QTYPE.AXFR">
@@ -600,7 +725,17 @@
         </member>
         <member name="F:Waher.Networking.DNS.Enumerations.TYPE.TXT">
             <summary>
-             text strings
+            text strings
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Enumerations.TYPE.AAAA">
+            <summary>
+            IPv6 host address (RFC 3596)
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.Enumerations.TYPE.SRV">
+            <summary>
+            Server Selection (RFC 2782)
             </summary>
         </member>
         <member name="T:Waher.Networking.DNS.ResourceRecords.A">
@@ -608,7 +743,7 @@
             Internet Address
             </summary>
         </member>
-        <member name="M:Waher.Networking.DNS.ResourceRecords.A.#ctor(System.String,Waher.Networking.DNS.Enumerations.TYPE,Waher.Networking.DNS.Enumerations.CLASS,System.UInt32,System.Net.IPAddress)">
+        <member name="M:Waher.Networking.DNS.ResourceRecords.A.#ctor(System.String,Waher.Networking.DNS.Enumerations.TYPE,Waher.Networking.DNS.Enumerations.CLASS,System.UInt32,System.IO.Stream)">
             <summary>
             Internet Address
             </summary>
@@ -616,14 +751,39 @@
             <param name="Type">Resource Record Type</param>
             <param name="Class">Resource Record Class</param>
             <param name="Ttl">Time to live</param>
-            <param name="Address">Referenced IP Address</param>
+            <param name="Data">RR-specific binary data.</param>
+        </member>
+        <member name="P:Waher.Networking.DNS.ResourceRecords.A.AddressSize">
+            <summary>
+            IP Address size.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.DNS.ResourceRecords.AAAA">
+            <summary>
+            Internet Address
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.DNS.ResourceRecords.AAAA.#ctor(System.String,Waher.Networking.DNS.Enumerations.TYPE,Waher.Networking.DNS.Enumerations.CLASS,System.UInt32,System.IO.Stream)">
+            <summary>
+            Internet Address
+            </summary>
+            <param name="Name">Name</param>
+            <param name="Type">Resource Record Type</param>
+            <param name="Class">Resource Record Class</param>
+            <param name="Ttl">Time to live</param>
+            <param name="Data">RR-specific binary data.</param>
+        </member>
+        <member name="P:Waher.Networking.DNS.ResourceRecords.AAAA.AddressSize">
+            <summary>
+            IP Address size.
+            </summary>
         </member>
         <member name="T:Waher.Networking.DNS.ResourceRecords.CNAME">
             <summary>
             Canonical NAME
             </summary>
         </member>
-        <member name="M:Waher.Networking.DNS.ResourceRecords.CNAME.#ctor(System.String,Waher.Networking.DNS.Enumerations.TYPE,Waher.Networking.DNS.Enumerations.CLASS,System.UInt32,System.String)">
+        <member name="M:Waher.Networking.DNS.ResourceRecords.CNAME.#ctor(System.String,Waher.Networking.DNS.Enumerations.TYPE,Waher.Networking.DNS.Enumerations.CLASS,System.UInt32,System.IO.Stream)">
             <summary>
             Canonical NAME
             </summary>
@@ -631,17 +791,14 @@
             <param name="Type">Resource Record Type</param>
             <param name="Class">Resource Record Class</param>
             <param name="Ttl">Time to live</param>
-            <param name="Name2">
-            A domain name which specifies the canonical or primary
-            name for the owner.The owner name is an alias.
-            </param>
+            <param name="Data">RR-specific binary data.</param>
         </member>
         <member name="T:Waher.Networking.DNS.ResourceRecords.HINFO">
             <summary>
             General information about a host.
             </summary>
         </member>
-        <member name="M:Waher.Networking.DNS.ResourceRecords.HINFO.#ctor(System.String,Waher.Networking.DNS.Enumerations.TYPE,Waher.Networking.DNS.Enumerations.CLASS,System.UInt32,System.String,System.String)">
+        <member name="M:Waher.Networking.DNS.ResourceRecords.HINFO.#ctor(System.String,Waher.Networking.DNS.Enumerations.TYPE,Waher.Networking.DNS.Enumerations.CLASS,System.UInt32,System.IO.Stream)">
             <summary>
             General information about a host.
             </summary>
@@ -649,8 +806,7 @@
             <param name="Type">Resource Record Type</param>
             <param name="Class">Resource Record Class</param>
             <param name="Ttl">Time to live</param>
-            <param name="CPU">Specifies the CPU type.</param>
-            <param name="OS">Specifies the Operating System type.</param>
+            <param name="Data">RR-specific binary data.</param>
         </member>
         <member name="P:Waher.Networking.DNS.ResourceRecords.HINFO.CPU">
             <summary>
@@ -672,7 +828,7 @@
             Mailbox (Experimental)
             </summary>
         </member>
-        <member name="M:Waher.Networking.DNS.ResourceRecords.MB.#ctor(System.String,Waher.Networking.DNS.Enumerations.TYPE,Waher.Networking.DNS.Enumerations.CLASS,System.UInt32,System.String)">
+        <member name="M:Waher.Networking.DNS.ResourceRecords.MB.#ctor(System.String,Waher.Networking.DNS.Enumerations.TYPE,Waher.Networking.DNS.Enumerations.CLASS,System.UInt32,System.IO.Stream)">
             <summary>
             Mailbox (Experimental)
             </summary>
@@ -680,14 +836,14 @@
             <param name="Type">Resource Record Type</param>
             <param name="Class">Resource Record Class</param>
             <param name="Ttl">Time to live</param>
-            <param name="Name2">Host which has the specified mailbox.</param>
+            <param name="Data">RR-specific binary data.</param>
         </member>
         <member name="T:Waher.Networking.DNS.ResourceRecords.MD">
             <summary>
             Mail delivery (Obsolete)
             </summary>
         </member>
-        <member name="M:Waher.Networking.DNS.ResourceRecords.MD.#ctor(System.String,Waher.Networking.DNS.Enumerations.TYPE,Waher.Networking.DNS.Enumerations.CLASS,System.UInt32,System.String)">
+        <member name="M:Waher.Networking.DNS.ResourceRecords.MD.#ctor(System.String,Waher.Networking.DNS.Enumerations.TYPE,Waher.Networking.DNS.Enumerations.CLASS,System.UInt32,System.IO.Stream)">
             <summary>
             Mail delivery (Obsolete)
             </summary>
@@ -695,17 +851,14 @@
             <param name="Type">Resource Record Type</param>
             <param name="Class">Resource Record Class</param>
             <param name="Ttl">Time to live</param>
-            <param name="Name2">
-            Host which has a mail agent for the domain which should be able to 
-            deliver mail for the domain.
-            </param>
+            <param name="Data">RR-specific binary data.</param>
         </member>
         <member name="T:Waher.Networking.DNS.ResourceRecords.MF">
             <summary>
             Mail forwarding (Obsolete)
             </summary>
         </member>
-        <member name="M:Waher.Networking.DNS.ResourceRecords.MF.#ctor(System.String,Waher.Networking.DNS.Enumerations.TYPE,Waher.Networking.DNS.Enumerations.CLASS,System.UInt32,System.String)">
+        <member name="M:Waher.Networking.DNS.ResourceRecords.MF.#ctor(System.String,Waher.Networking.DNS.Enumerations.TYPE,Waher.Networking.DNS.Enumerations.CLASS,System.UInt32,System.IO.Stream)">
             <summary>
             Mail forwarding (Obsolete)
             </summary>
@@ -713,17 +866,14 @@
             <param name="Type">Resource Record Type</param>
             <param name="Class">Resource Record Class</param>
             <param name="Ttl">Time to live</param>
-            <param name="Name2">
-            Host which has a mail agent for the domain which should be able to 
-            forward mail for the domain.
-            </param>
+            <param name="Data">RR-specific binary data.</param>
         </member>
         <member name="T:Waher.Networking.DNS.ResourceRecords.MG">
             <summary>
             Mail group (Experimental)
             </summary>
         </member>
-        <member name="M:Waher.Networking.DNS.ResourceRecords.MG.#ctor(System.String,Waher.Networking.DNS.Enumerations.TYPE,Waher.Networking.DNS.Enumerations.CLASS,System.UInt32,System.String)">
+        <member name="M:Waher.Networking.DNS.ResourceRecords.MG.#ctor(System.String,Waher.Networking.DNS.Enumerations.TYPE,Waher.Networking.DNS.Enumerations.CLASS,System.UInt32,System.IO.Stream)">
             <summary>
             Mail group (Experimental)
             </summary>
@@ -731,15 +881,14 @@
             <param name="Type">Resource Record Type</param>
             <param name="Class">Resource Record Class</param>
             <param name="Ttl">Time to live</param>
-            <param name="Name2">Host which specifies a mailbox which is a
-            member of the mail group specified by the domain name.</param>
+            <param name="Data">RR-specific binary data.</param>
         </member>
         <member name="T:Waher.Networking.DNS.ResourceRecords.MINFO">
             <summary>
             Mail information about a host. (Experimental)
             </summary>
         </member>
-        <member name="M:Waher.Networking.DNS.ResourceRecords.MINFO.#ctor(System.String,Waher.Networking.DNS.Enumerations.TYPE,Waher.Networking.DNS.Enumerations.CLASS,System.UInt32,System.String,System.String)">
+        <member name="M:Waher.Networking.DNS.ResourceRecords.MINFO.#ctor(System.String,Waher.Networking.DNS.Enumerations.TYPE,Waher.Networking.DNS.Enumerations.CLASS,System.UInt32,System.IO.Stream)">
             <summary>
             Mail information about a host. (Experimental)
             </summary>
@@ -747,12 +896,7 @@
             <param name="Type">Resource Record Type</param>
             <param name="Class">Resource Record Class</param>
             <param name="Ttl">Time to live</param>
-            <param name="RMailBx">Specifies a mailbox which is
-            responsible for the mailing list or mailbox.</param>
-            <param name="EMailBx">Specifies a mailbox which is to
-            receive error messages related to the mailing list or
-            mailbox specified by the owner of the MINFO RR(similar
-            to the ERRORS-TO: field which has been proposed).</param>
+            <param name="Data">RR-specific binary data.</param>
         </member>
         <member name="P:Waher.Networking.DNS.ResourceRecords.MINFO.RMailBx">
             <summary>
@@ -778,7 +922,7 @@
             Mailbox Renaming (Experimental)
             </summary>
         </member>
-        <member name="M:Waher.Networking.DNS.ResourceRecords.MR.#ctor(System.String,Waher.Networking.DNS.Enumerations.TYPE,Waher.Networking.DNS.Enumerations.CLASS,System.UInt32,System.String)">
+        <member name="M:Waher.Networking.DNS.ResourceRecords.MR.#ctor(System.String,Waher.Networking.DNS.Enumerations.TYPE,Waher.Networking.DNS.Enumerations.CLASS,System.UInt32,System.IO.Stream)">
             <summary>
             Mailbox Renaming (Experimental)
             </summary>
@@ -786,15 +930,14 @@
             <param name="Type">Resource Record Type</param>
             <param name="Class">Resource Record Class</param>
             <param name="Ttl">Time to live</param>
-            <param name="Name2">specifies a mailbox which is the
-            proper rename of the specified mailbox.</param>
+            <param name="Data">RR-specific binary data.</param>
         </member>
         <member name="T:Waher.Networking.DNS.ResourceRecords.MX">
             <summary>
             Mailbox eXchange
             </summary>
         </member>
-        <member name="M:Waher.Networking.DNS.ResourceRecords.MX.#ctor(System.String,Waher.Networking.DNS.Enumerations.TYPE,Waher.Networking.DNS.Enumerations.CLASS,System.UInt32,System.UInt16,System.String)">
+        <member name="M:Waher.Networking.DNS.ResourceRecords.MX.#ctor(System.String,Waher.Networking.DNS.Enumerations.TYPE,Waher.Networking.DNS.Enumerations.CLASS,System.UInt32,System.IO.Stream)">
             <summary>
             Mailbox eXchange
             </summary>
@@ -802,11 +945,7 @@
             <param name="Type">Resource Record Type</param>
             <param name="Class">Resource Record Class</param>
             <param name="Ttl">Time to live</param>
-            <param name="Preference">Preference given to
-            this RR among others at the same owner.Lower values
-            are preferred.</param>
-            <param name="Name2">Specifies a host willing to act as
-            a mail exchange for the owner name.</param>
+            <param name="Data">RR-specific binary data.</param>
         </member>
         <member name="P:Waher.Networking.DNS.ResourceRecords.MX.Preference">
             <summary>
@@ -824,7 +963,7 @@
             Name Server
             </summary>
         </member>
-        <member name="M:Waher.Networking.DNS.ResourceRecords.NS.#ctor(System.String,Waher.Networking.DNS.Enumerations.TYPE,Waher.Networking.DNS.Enumerations.CLASS,System.UInt32,System.String)">
+        <member name="M:Waher.Networking.DNS.ResourceRecords.NS.#ctor(System.String,Waher.Networking.DNS.Enumerations.TYPE,Waher.Networking.DNS.Enumerations.CLASS,System.UInt32,System.IO.Stream)">
             <summary>
             Name Server
             </summary>
@@ -832,15 +971,14 @@
             <param name="Type">Resource Record Type</param>
             <param name="Class">Resource Record Class</param>
             <param name="Ttl">Time to live</param>
-            <param name="Name2">Specifies a host which should be
-            authoritative for the specified class and domain.</param>
+            <param name="Data">RR-specific binary data.</param>
         </member>
         <member name="T:Waher.Networking.DNS.ResourceRecords.NULL">
             <summary>
             NULL (Experimental)
             </summary>
         </member>
-        <member name="M:Waher.Networking.DNS.ResourceRecords.NULL.#ctor(System.String,Waher.Networking.DNS.Enumerations.TYPE,Waher.Networking.DNS.Enumerations.CLASS,System.UInt32,System.Byte[])">
+        <member name="M:Waher.Networking.DNS.ResourceRecords.NULL.#ctor(System.String,Waher.Networking.DNS.Enumerations.TYPE,Waher.Networking.DNS.Enumerations.CLASS,System.UInt32,System.IO.Stream,System.Int64)">
             <summary>
             NULL (Experimental)
             </summary>
@@ -848,7 +986,8 @@
             <param name="Type">Resource Record Type</param>
             <param name="Class">Resource Record Class</param>
             <param name="Ttl">Time to live</param>
-            <param name="Data">Undefined data.</param>
+            <param name="Data">RR-specific binary data.</param>
+            <param name="EndPos">End position of record.</param>
         </member>
         <member name="P:Waher.Networking.DNS.ResourceRecords.NULL.Data">
             <summary>
@@ -860,7 +999,7 @@
             Pointer
             </summary>
         </member>
-        <member name="M:Waher.Networking.DNS.ResourceRecords.PTR.#ctor(System.String,Waher.Networking.DNS.Enumerations.TYPE,Waher.Networking.DNS.Enumerations.CLASS,System.UInt32,System.String)">
+        <member name="M:Waher.Networking.DNS.ResourceRecords.PTR.#ctor(System.String,Waher.Networking.DNS.Enumerations.TYPE,Waher.Networking.DNS.Enumerations.CLASS,System.UInt32,System.IO.Stream)">
             <summary>
             Pointer
             </summary>
@@ -868,14 +1007,14 @@
             <param name="Type">Resource Record Type</param>
             <param name="Class">Resource Record Class</param>
             <param name="Ttl">Time to live</param>
-            <param name="Name2">Points to some location in the domain name space.</param>
+            <param name="Data">RR-specific binary data.</param>
         </member>
         <member name="T:Waher.Networking.DNS.ResourceRecords.ResourceAddressRecord">
             <summary>
             Abstract base class for Resource Address Records.
             </summary>
         </member>
-        <member name="M:Waher.Networking.DNS.ResourceRecords.ResourceAddressRecord.#ctor(System.String,Waher.Networking.DNS.Enumerations.TYPE,Waher.Networking.DNS.Enumerations.CLASS,System.UInt32,System.Net.IPAddress)">
+        <member name="M:Waher.Networking.DNS.ResourceRecords.ResourceAddressRecord.#ctor(System.String,Waher.Networking.DNS.Enumerations.TYPE,Waher.Networking.DNS.Enumerations.CLASS,System.UInt32,System.IO.Stream)">
             <summary>
             Abstract base class for Resource Address Records.
             </summary>
@@ -883,7 +1022,12 @@
             <param name="Type">Resource Record Type</param>
             <param name="Class">Resource Record Class</param>
             <param name="Ttl">Time to live</param>
-            <param name="Address">Referenced IP Address</param>
+            <param name="Data">RR-specific binary data.</param>
+        </member>
+        <member name="P:Waher.Networking.DNS.ResourceRecords.ResourceAddressRecord.AddressSize">
+            <summary>
+            IP Address size.
+            </summary>
         </member>
         <member name="P:Waher.Networking.DNS.ResourceRecords.ResourceAddressRecord.Address">
             <summary>
@@ -900,7 +1044,7 @@
             Abstract base class for resource records referring to a name.
             </summary>
         </member>
-        <member name="M:Waher.Networking.DNS.ResourceRecords.ResourceNameRecord.#ctor(System.String,Waher.Networking.DNS.Enumerations.TYPE,Waher.Networking.DNS.Enumerations.CLASS,System.UInt32,System.String)">
+        <member name="M:Waher.Networking.DNS.ResourceRecords.ResourceNameRecord.#ctor(System.String,Waher.Networking.DNS.Enumerations.TYPE,Waher.Networking.DNS.Enumerations.CLASS,System.UInt32,System.IO.Stream)">
             <summary>
             Abstract base class for resource records referring to a name.
             </summary>
@@ -908,7 +1052,7 @@
             <param name="Type">Resource Record Type</param>
             <param name="Class">Resource Record Class</param>
             <param name="Ttl">Time to live</param>
-            <param name="Name2">Name being referred to.</param>
+            <param name="Data">RR-specific binary data.</param>
         </member>
         <member name="P:Waher.Networking.DNS.ResourceRecords.ResourceNameRecord.Name2">
             <summary>
@@ -971,7 +1115,7 @@
             Start Of zone Authority
             </summary>
         </member>
-        <member name="M:Waher.Networking.DNS.ResourceRecords.SOA.#ctor(System.String,Waher.Networking.DNS.Enumerations.TYPE,Waher.Networking.DNS.Enumerations.CLASS,System.UInt32,System.String,System.String,System.UInt32,System.UInt32,System.UInt32,System.UInt32,System.UInt32)">
+        <member name="M:Waher.Networking.DNS.ResourceRecords.SOA.#ctor(System.String,Waher.Networking.DNS.Enumerations.TYPE,Waher.Networking.DNS.Enumerations.CLASS,System.UInt32,System.IO.Stream)">
             <summary>
             Start Of zone Authority
             </summary>
@@ -979,14 +1123,7 @@
             <param name="Type">Resource Record Type</param>
             <param name="Class">Resource Record Class</param>
             <param name="Ttl">Time to live</param>
-            <param name="MNAME">Name server that was the original or primary source of data for this zone</param>
-            <param name="RNAME">Specifies the mailbox of the person responsible for this zone</param>
-            <param name="SERIAL">Version number of the original copy of the zone.</param>
-            <param name="REFRESH">Time interval before the zone should be refreshed</param>
-            <param name="RETRY">Interval that should elapse before a failed refresh should be retried</param>
-            <param name="EXPIRE">Specifies the upper limit on the time interval that can elapse before 
-            the zone is no longer authoritative</param>
-            <param name="MINIMUM">Minimum TTL field that should be exported with any RR from this zone</param>
+            <param name="Data">RR-specific binary data.</param>
         </member>
         <member name="P:Waher.Networking.DNS.ResourceRecords.SOA.MName">
             <summary>
@@ -1029,12 +1166,62 @@
             <see cref="M:System.Object.ToString"/>
             </summary>
         </member>
+        <member name="T:Waher.Networking.DNS.ResourceRecords.SRV">
+            <summary>
+            Server Selection
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.DNS.ResourceRecords.SRV.#ctor(System.String,Waher.Networking.DNS.Enumerations.TYPE,Waher.Networking.DNS.Enumerations.CLASS,System.UInt32,System.IO.Stream)">
+            <summary>
+            Mailbox eXchange
+            </summary>
+            <param name="Name">Name</param>
+            <param name="Type">Resource Record Type</param>
+            <param name="Class">Resource Record Class</param>
+            <param name="Ttl">Time to live</param>
+            <param name="Data">RR-specific binary data.</param>
+        </member>
+        <member name="P:Waher.Networking.DNS.ResourceRecords.SRV.Service">
+            <summary>
+            Service name.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.DNS.ResourceRecords.SRV.Protocol">
+            <summary>
+            Protocol name
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.DNS.ResourceRecords.SRV.Priority">
+            <summary>
+            Priority
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.DNS.ResourceRecords.SRV.Weight">
+            <summary>
+            Weight
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.DNS.ResourceRecords.SRV.Port">
+            <summary>
+            Port
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.DNS.ResourceRecords.SRV.TargetHost">
+            <summary>
+            Target Host
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.DNS.ResourceRecords.SRV.ToString">
+            <summary>
+            <see cref="M:System.Object.ToString"/>
+            </summary>
+        </member>
         <member name="T:Waher.Networking.DNS.ResourceRecords.TXT">
             <summary>
             Descriptive text
             </summary>
         </member>
-        <member name="M:Waher.Networking.DNS.ResourceRecords.TXT.#ctor(System.String,Waher.Networking.DNS.Enumerations.TYPE,Waher.Networking.DNS.Enumerations.CLASS,System.UInt32,System.String[])">
+        <member name="M:Waher.Networking.DNS.ResourceRecords.TXT.#ctor(System.String,Waher.Networking.DNS.Enumerations.TYPE,Waher.Networking.DNS.Enumerations.CLASS,System.UInt32,System.IO.Stream,System.Int64)">
             <summary>
             Descriptive text
             </summary>
@@ -1042,7 +1229,8 @@
             <param name="Type">Resource Record Type</param>
             <param name="Class">Resource Record Class</param>
             <param name="Ttl">Time to live</param>
-            <param name="Text">Descriptive text.</param>
+            <param name="Data">RR-specific binary data.</param>
+            <param name="EndPos">End position of record.</param>
         </member>
         <member name="P:Waher.Networking.DNS.ResourceRecords.TXT.Text">
             <summary>
@@ -1059,7 +1247,7 @@
             Well Known Services, as defined in RFC 1010
             </summary>
         </member>
-        <member name="M:Waher.Networking.DNS.ResourceRecords.WKS.#ctor(System.String,Waher.Networking.DNS.Enumerations.TYPE,Waher.Networking.DNS.Enumerations.CLASS,System.UInt32,System.Net.IPAddress,System.Byte,System.Collections.BitArray)">
+        <member name="M:Waher.Networking.DNS.ResourceRecords.WKS.#ctor(System.String,Waher.Networking.DNS.Enumerations.TYPE,Waher.Networking.DNS.Enumerations.CLASS,System.UInt32,System.IO.Stream,System.Int64)">
             <summary>
             Well Known Services
             </summary>
@@ -1067,9 +1255,13 @@
             <param name="Type">Resource Record Type</param>
             <param name="Class">Resource Record Class</param>
             <param name="Ttl">Time to live</param>
-            <param name="Address">IP Address</param>
-            <param name="Protocol">Protocol</param>
-            <param name="BitMap">Bit Map of supported well-known services.</param>
+            <param name="Data">RR-specific binary data.</param>
+            <param name="EndPos">End position of record.</param>
+        </member>
+        <member name="P:Waher.Networking.DNS.ResourceRecords.WKS.AddressSize">
+            <summary>
+            IP Address size.
+            </summary>
         </member>
         <member name="P:Waher.Networking.DNS.ResourceRecords.WKS.Protocol">
             <summary>

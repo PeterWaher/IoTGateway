@@ -27,7 +27,7 @@ namespace Waher.Networking.DNS.Test
 		}
 
 		[TestMethod]
-		public async Task Test_01_Standard_Query()
+		public async Task Test_01_Standard_Query_A()
 		{
 			DnsMessage Message = await this.client.QueryAsync("waher.se", QTYPE.A, QCLASS.IN);
 			Assert.IsTrue(Message.Response);
@@ -38,6 +38,22 @@ namespace Waher.Networking.DNS.Test
 		public async Task Test_02_Standard_Query_NonExistantDomain()
 		{
 			DnsMessage Message = await this.client.QueryAsync("dettanamnfinnsinte.se", QTYPE.A, QCLASS.IN);
+			Assert.IsTrue(Message.Response);
+			this.Print(Message);
+		}
+
+		[TestMethod]
+		public async Task Test_03_Standard_Query_MX()
+		{
+			DnsMessage Message = await this.client.QueryAsync("hotmail.com", QTYPE.MX, QCLASS.IN);
+			Assert.IsTrue(Message.Response);
+			this.Print(Message);
+		}
+
+		[TestMethod]
+		public async Task Test_04_Standard_Query_SRV()
+		{
+			DnsMessage Message = await this.client.QueryAsync("_xmpp-client._tcp.jabber.org", QTYPE.SRV, QCLASS.IN);
 			Assert.IsTrue(Message.Response);
 			this.Print(Message);
 		}

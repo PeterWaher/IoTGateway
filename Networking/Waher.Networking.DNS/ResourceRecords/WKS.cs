@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections;
-using System.Net;
+using System.IO;
 using Waher.Networking.DNS.Enumerations;
 
 namespace Waher.Networking.DNS.ResourceRecords
@@ -20,16 +20,25 @@ namespace Waher.Networking.DNS.ResourceRecords
 		/// <param name="Type">Resource Record Type</param>
 		/// <param name="Class">Resource Record Class</param>
 		/// <param name="Ttl">Time to live</param>
-		/// <param name="Address">IP Address</param>
-		/// <param name="Protocol">Protocol</param>
-		/// <param name="BitMap">Bit Map of supported well-known services.</param>
-		public WKS(string Name, TYPE Type, CLASS Class, uint Ttl, 
-			IPAddress Address, byte Protocol, BitArray BitMap)
-			: base(Name, Type, Class, Ttl, Address)
+		/// <param name="Data">RR-specific binary data.</param>
+		/// <param name="EndPos">End position of record.</param>
+		public WKS(string Name, TYPE Type, CLASS Class, uint Ttl, Stream Data, long EndPos)
+			: base(Name, Type, Class, Ttl, Data)
 		{
+			this.protocol = (byte)Data.ReadByte();
+			int c = (int)(EndPos - Data.Position);
+			byte[] Bin = new byte[c];
+			Data.Read(Bin, 0, c);
+			BitArray BitMap = new BitArray(Bin);
+
 			this.protocol = Protocol;
 			this.bitMap = BitMap;
 		}
+
+		/// <summary>
+		/// IP Address size.
+		/// </summary>
+		protected override int AddressSize => 4;
 
 		/// <summary>
 		/// Protocol Number

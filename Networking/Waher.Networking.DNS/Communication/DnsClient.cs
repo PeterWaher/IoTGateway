@@ -31,7 +31,7 @@ namespace Waher.Networking.DNS.Communication
 
 		private readonly Dictionary<ushort, Rec> outgoingMessages = new Dictionary<ushort, Rec>();
 		private readonly Random gen = new Random();
-		private readonly LinkedList<byte[]> outputQueue = new LinkedList<byte[]>();
+		private readonly LinkedList<KeyValuePair<byte[], IPEndPoint>> outputQueue = new LinkedList<KeyValuePair<byte[], IPEndPoint>>();
 		private Scheduler scheduler;
 		private bool isWriting = false;
 
@@ -39,6 +39,7 @@ namespace Waher.Networking.DNS.Communication
 		{
 			public ushort ID;
 			public byte[] Output;
+			public IPEndPoint Destination;
 			public DnsMessageEventHandler Callback;
 			public object State;
 		}
@@ -63,9 +64,10 @@ namespace Waher.Networking.DNS.Communication
 		/// </summary>
 		/// <param name="ID">Message ID</param>
 		/// <param name="Message">Encoded message</param>
+		/// <param name="Destination">Destination. If null, default destination is assumed.</param>
 		/// <param name="Callback">method to call when a response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		protected async void BeginTransmit(ushort ID, byte[] Message, DnsMessageEventHandler Callback, object State)
+		protected async void BeginTransmit(ushort ID, byte[] Message, IPEndPoint Destination, DnsMessageEventHandler Callback, object State)
 		{
 			if (this.disposed)
 				return;
@@ -76,6 +78,7 @@ namespace Waher.Networking.DNS.Communication
 				{
 					ID = ID,
 					Output = Message,
+					Destination = Destination,
 					Callback = Callback,
 					State = State
 				};
@@ -92,7 +95,7 @@ namespace Waher.Networking.DNS.Communication
 			{
 				if (this.isWriting)
 				{
-					this.outputQueue.AddLast(Message);
+					this.outputQueue.AddLast(new KeyValuePair<byte[], IPEndPoint>(Message, Destination));
 					return;
 				}
 				else
@@ -105,7 +108,7 @@ namespace Waher.Networking.DNS.Communication
 				{
 					this.TransmitBinary(Message);
 
-					await this.SendAsync(Message, null);
+					await this.SendAsync(Message, Destination);
 
 					if (this.disposed)
 						return;
@@ -119,7 +122,8 @@ namespace Waher.Networking.DNS.Communication
 						}
 						else
 						{
-							Message = this.outputQueue.First.Value;
+							Message = this.outputQueue.First.Value.Key;
+							Destination = this.outputQueue.First.Value.Value;
 							this.outputQueue.RemoveFirst();
 						}
 					}
@@ -135,8 +139,7 @@ namespace Waher.Networking.DNS.Communication
 		/// Sends a message to a destination.
 		/// </summary>
 		/// <param name="Message">Message</param>
-		/// <param name="Destination">Destination. If null, default destination
-		/// is assumed.</param>
+		/// <param name="Destination">Destination. If null, default destination is assumed.</param>
 		protected abstract Task SendAsync(byte[] Message, IPEndPoint Destination);
 
 		private void CheckRetry(object P)
@@ -149,7 +152,7 @@ namespace Waher.Networking.DNS.Communication
 					return;
 			}
 
-			this.BeginTransmit(Rec.ID, Rec.Output, Rec.Callback, Rec.State);
+			this.BeginTransmit(Rec.ID, Rec.Output, Rec.Destination, Rec.Callback, Rec.State);
 		}
 
 		/// <summary>
@@ -199,10 +202,11 @@ namespace Waher.Networking.DNS.Communication
 		/// <param name="Recursive">If recursive evaluation is desired.
 		/// (Recursive evaluation is optional on behalf of the DNS server.</param>
 		/// <param name="Questions">Questions</param>
+		/// <param name="Destination">Destination. If null, default destination is assumed.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void SendRequest(OpCode OpCode, bool Recursive, Question[] Questions,
-			DnsMessageEventHandler Callback, object State)
+		public void SendRequest(OpCode OpCode, bool Recursive, Question[] Questions, 
+			IPEndPoint Destination, DnsMessageEventHandler Callback, object State)
 		{
 			using (MemoryStream Request = new MemoryStream())
 			{
@@ -240,8 +244,7 @@ namespace Waher.Networking.DNS.Communication
 
 				byte[] Packet = Request.ToArray();
 
-				this.BeginTransmit(ID, Packet, Callback, State);
-
+				this.BeginTransmit(ID, Packet, Destination, Callback, State);
 			}
 		}
 
@@ -252,9 +255,10 @@ namespace Waher.Networking.DNS.Communication
 		/// <param name="Recursive">If recursive evaluation is desired.
 		/// (Recursive evaluation is optional on behalf of the DNS server.</param>
 		/// <param name="Questions">Questions</param>
+		/// <param name="Destination">Destination. If null, default destination is assumed.</param>
 		/// <param name="Timeout">Timeout, in milliseconds.</param>
 		public Task<DnsMessage> SendRequestAsync(OpCode OpCode, bool Recursive, 
-			Question[] Questions, int Timeout)
+			Question[] Questions, IPEndPoint Destination, int Timeout)
 		{
 			TaskCompletionSource<DnsMessage> Result = new TaskCompletionSource<DnsMessage>();
 			DateTime TP;
@@ -266,7 +270,7 @@ namespace Waher.Networking.DNS.Communication
 			}, Result);
 
 
-			this.SendRequest(OpCode, Recursive, Questions, (sender, e) =>
+			this.SendRequest(OpCode, Recursive, Questions, Destination, (sender, e) =>
 			{
 				this.scheduler?.Remove(TP);
 
@@ -282,11 +286,12 @@ namespace Waher.Networking.DNS.Communication
 		/// <param name="QNAME">Query Name</param>
 		/// <param name="QTYPE">Query Type</param>
 		/// <param name="QCLASS">Query Class</param>
+		/// <param name="Destination">Destination. If null, default destination is assumed.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void Query(string QNAME, QTYPE QTYPE, QCLASS QCLASS, DnsMessageEventHandler Callback, object State)
+		public void Query(string QNAME, QTYPE QTYPE, QCLASS QCLASS, IPEndPoint Destination, DnsMessageEventHandler Callback, object State)
 		{
-			this.Query(new Question[] { new Question(QNAME, QTYPE, QCLASS) }, Callback, State);
+			this.Query(new Question[] { new Question(QNAME, QTYPE, QCLASS) }, Destination, Callback, State);
 		}
 
 		/// <summary>
@@ -295,22 +300,24 @@ namespace Waher.Networking.DNS.Communication
 		/// <param name="QNAME">Query Name</param>
 		/// <param name="QTYPEs">Query Types</param>
 		/// <param name="QCLASS">Query Class</param>
+		/// <param name="Destination">Destination. If null, default destination is assumed.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void Query(string QNAME, QTYPE[] QTYPEs, QCLASS QCLASS, DnsMessageEventHandler Callback, object State)
+		public void Query(string QNAME, QTYPE[] QTYPEs, QCLASS QCLASS, IPEndPoint Destination, DnsMessageEventHandler Callback, object State)
 		{
-			this.Query(ToQuestions(QNAME, QTYPEs, QCLASS), Callback, State);
+			this.Query(ToQuestions(QNAME, QTYPEs, QCLASS), Destination, Callback, State);
 		}
 
 		/// <summary>
 		/// Execute a DNS query.
 		/// </summary>
 		/// <param name="Questions">Questions</param>
+		/// <param name="Destination">Destination. If null, default destination is assumed.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void Query(Question[] Questions, DnsMessageEventHandler Callback, object State)
+		public void Query(Question[] Questions, IPEndPoint Destination, DnsMessageEventHandler Callback, object State)
 		{
-			this.SendRequest(OpCode.Query, false, Questions, Callback, State);
+			this.SendRequest(OpCode.Query, false, Questions, Destination, Callback, State);
 		}
 
 		/// <summary>
@@ -319,9 +326,10 @@ namespace Waher.Networking.DNS.Communication
 		/// <param name="QNAME">Query Name</param>
 		/// <param name="QTYPE">Query Type</param>
 		/// <param name="QCLASS">Query Class</param>
-		public Task<DnsMessage> QueryAsync(string QNAME, QTYPE QTYPE, QCLASS QCLASS)
+		/// <param name="Destination">Destination. If null, default destination is assumed.</param>
+		public Task<DnsMessage> QueryAsync(string QNAME, QTYPE QTYPE, QCLASS QCLASS, IPEndPoint Destination)
 		{
-			return this.QueryAsync(new Question[] { new Question(QNAME, QTYPE, QCLASS) });
+			return this.QueryAsync(new Question[] { new Question(QNAME, QTYPE, QCLASS) }, Destination);
 		}
 
 		/// <summary>
@@ -330,28 +338,31 @@ namespace Waher.Networking.DNS.Communication
 		/// <param name="QNAME">Query Name</param>
 		/// <param name="QTYPEs">Query Type</param>
 		/// <param name="QCLASS">Query Class</param>
-		public Task<DnsMessage> QueryAsync(string QNAME, QTYPE[] QTYPEs, QCLASS QCLASS)
+		/// <param name="Destination">Destination. If null, default destination is assumed.</param>
+		public Task<DnsMessage> QueryAsync(string QNAME, QTYPE[] QTYPEs, QCLASS QCLASS, IPEndPoint Destination)
 		{
-			return this.QueryAsync(ToQuestions(QNAME, QTYPEs, QCLASS));
+			return this.QueryAsync(ToQuestions(QNAME, QTYPEs, QCLASS), Destination);
 		}
 
 		/// <summary>
 		/// Execute a DNS query.
 		/// </summary>
 		/// <param name="Questions">Questions</param>
-		public Task<DnsMessage> QueryAsync(Question[] Questions)
+		/// <param name="Destination">Destination. If null, default destination is assumed.</param>
+		public Task<DnsMessage> QueryAsync(Question[] Questions, IPEndPoint Destination)
 		{
-			return this.QueryAsync(Questions, DefaultTimeout);
+			return this.QueryAsync(Questions, Destination, DefaultTimeout);
 		}
 
 		/// <summary>
 		/// Execute a DNS query.
 		/// </summary>
 		/// <param name="Questions">Questions</param>
+		/// <param name="Destination">Destination. If null, default destination is assumed.</param>
 		/// <param name="Timeout">Timeout, in milliseconds.</param>
-		public Task<DnsMessage> QueryAsync(Question[] Questions, int Timeout)
+		public Task<DnsMessage> QueryAsync(Question[] Questions, IPEndPoint Destination, int Timeout)
 		{
-			return this.SendRequestAsync(OpCode.Query, false, Questions, Timeout);
+			return this.SendRequestAsync(OpCode.Query, false, Questions, Destination, Timeout);
 		}
 
 		private static Question[] ToQuestions(string QNAME, QTYPE[] QTYPEs, QCLASS QCLASS)

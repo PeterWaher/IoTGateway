@@ -66,7 +66,7 @@ namespace Waher.Networking.DNS.ResourceRecords
 		public byte[] AddressBytes
 		{
 			get => this.address?.GetAddressBytes();
-			set => this.address = value == null ? null : new IPAddress(value);
+			set => this.address = value is null ? null : new IPAddress(value);
 		}
 
 		/// <summary>

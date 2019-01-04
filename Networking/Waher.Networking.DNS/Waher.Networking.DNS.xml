@@ -29,12 +29,13 @@
             Called when DNS client is ready to be initialized.
             </summary>
         </member>
-        <member name="M:Waher.Networking.DNS.Communication.DnsClient.BeginTransmit(System.UInt16,System.Byte[],Waher.Networking.DNS.Communication.DnsMessageEventHandler,System.Object)">
+        <member name="M:Waher.Networking.DNS.Communication.DnsClient.BeginTransmit(System.UInt16,System.Byte[],System.Net.IPEndPoint,Waher.Networking.DNS.Communication.DnsMessageEventHandler,System.Object)">
             <summary>
             Sends a message to a DNS server.
             </summary>
             <param name="ID">Message ID</param>
             <param name="Message">Encoded message</param>
+            <param name="Destination">Destination. If null, default destination is assumed.</param>
             <param name="Callback">method to call when a response is returned.</param>
             <param name="State">State object to pass on to callback method.</param>
         </member>
@@ -43,8 +44,7 @@
             Sends a message to a destination.
             </summary>
             <param name="Message">Message</param>
-            <param name="Destination">Destination. If null, default destination
-            is assumed.</param>
+            <param name="Destination">Destination. If null, default destination is assumed.</param>
         </member>
         <member name="M:Waher.Networking.DNS.Communication.DnsClient.ProcessIncomingMessage(Waher.Networking.DNS.Communication.DnsMessage)">
             <summary>
@@ -57,7 +57,7 @@
             <see cref="M:System.IDisposable.Dispose"/>
             </summary>
         </member>
-        <member name="M:Waher.Networking.DNS.Communication.DnsClient.SendRequest(Waher.Networking.DNS.Enumerations.OpCode,System.Boolean,Waher.Networking.DNS.Communication.Question[],Waher.Networking.DNS.Communication.DnsMessageEventHandler,System.Object)">
+        <member name="M:Waher.Networking.DNS.Communication.DnsClient.SendRequest(Waher.Networking.DNS.Enumerations.OpCode,System.Boolean,Waher.Networking.DNS.Communication.Question[],System.Net.IPEndPoint,Waher.Networking.DNS.Communication.DnsMessageEventHandler,System.Object)">
             <summary>
             Sends a DNS Request
             </summary>
@@ -65,10 +65,11 @@
             <param name="Recursive">If recursive evaluation is desired.
             (Recursive evaluation is optional on behalf of the DNS server.</param>
             <param name="Questions">Questions</param>
+            <param name="Destination">Destination. If null, default destination is assumed.</param>
             <param name="Callback">Method to call when response is returned.</param>
             <param name="State">State object to pass on to callback method.</param>
         </member>
-        <member name="M:Waher.Networking.DNS.Communication.DnsClient.SendRequestAsync(Waher.Networking.DNS.Enumerations.OpCode,System.Boolean,Waher.Networking.DNS.Communication.Question[],System.Int32)">
+        <member name="M:Waher.Networking.DNS.Communication.DnsClient.SendRequestAsync(Waher.Networking.DNS.Enumerations.OpCode,System.Boolean,Waher.Networking.DNS.Communication.Question[],System.Net.IPEndPoint,System.Int32)">
             <summary>
             Sends a DNS Request
             </summary>
@@ -76,63 +77,71 @@
             <param name="Recursive">If recursive evaluation is desired.
             (Recursive evaluation is optional on behalf of the DNS server.</param>
             <param name="Questions">Questions</param>
+            <param name="Destination">Destination. If null, default destination is assumed.</param>
             <param name="Timeout">Timeout, in milliseconds.</param>
         </member>
-        <member name="M:Waher.Networking.DNS.Communication.DnsClient.Query(System.String,Waher.Networking.DNS.Enumerations.QTYPE,Waher.Networking.DNS.Enumerations.QCLASS,Waher.Networking.DNS.Communication.DnsMessageEventHandler,System.Object)">
+        <member name="M:Waher.Networking.DNS.Communication.DnsClient.Query(System.String,Waher.Networking.DNS.Enumerations.QTYPE,Waher.Networking.DNS.Enumerations.QCLASS,System.Net.IPEndPoint,Waher.Networking.DNS.Communication.DnsMessageEventHandler,System.Object)">
             <summary>
             Execute a DNS query.
             </summary>
             <param name="QNAME">Query Name</param>
             <param name="QTYPE">Query Type</param>
             <param name="QCLASS">Query Class</param>
+            <param name="Destination">Destination. If null, default destination is assumed.</param>
             <param name="Callback">Method to call when response is returned.</param>
             <param name="State">State object to pass on to callback method.</param>
         </member>
-        <member name="M:Waher.Networking.DNS.Communication.DnsClient.Query(System.String,Waher.Networking.DNS.Enumerations.QTYPE[],Waher.Networking.DNS.Enumerations.QCLASS,Waher.Networking.DNS.Communication.DnsMessageEventHandler,System.Object)">
+        <member name="M:Waher.Networking.DNS.Communication.DnsClient.Query(System.String,Waher.Networking.DNS.Enumerations.QTYPE[],Waher.Networking.DNS.Enumerations.QCLASS,System.Net.IPEndPoint,Waher.Networking.DNS.Communication.DnsMessageEventHandler,System.Object)">
             <summary>
             Execute a DNS query.
             </summary>
             <param name="QNAME">Query Name</param>
             <param name="QTYPEs">Query Types</param>
             <param name="QCLASS">Query Class</param>
+            <param name="Destination">Destination. If null, default destination is assumed.</param>
             <param name="Callback">Method to call when response is returned.</param>
             <param name="State">State object to pass on to callback method.</param>
         </member>
-        <member name="M:Waher.Networking.DNS.Communication.DnsClient.Query(Waher.Networking.DNS.Communication.Question[],Waher.Networking.DNS.Communication.DnsMessageEventHandler,System.Object)">
+        <member name="M:Waher.Networking.DNS.Communication.DnsClient.Query(Waher.Networking.DNS.Communication.Question[],System.Net.IPEndPoint,Waher.Networking.DNS.Communication.DnsMessageEventHandler,System.Object)">
             <summary>
             Execute a DNS query.
             </summary>
             <param name="Questions">Questions</param>
+            <param name="Destination">Destination. If null, default destination is assumed.</param>
             <param name="Callback">Method to call when response is returned.</param>
             <param name="State">State object to pass on to callback method.</param>
         </member>
-        <member name="M:Waher.Networking.DNS.Communication.DnsClient.QueryAsync(System.String,Waher.Networking.DNS.Enumerations.QTYPE,Waher.Networking.DNS.Enumerations.QCLASS)">
+        <member name="M:Waher.Networking.DNS.Communication.DnsClient.QueryAsync(System.String,Waher.Networking.DNS.Enumerations.QTYPE,Waher.Networking.DNS.Enumerations.QCLASS,System.Net.IPEndPoint)">
             <summary>
             Execute a DNS query.
             </summary>
             <param name="QNAME">Query Name</param>
             <param name="QTYPE">Query Type</param>
             <param name="QCLASS">Query Class</param>
+            <param name="Destination">Destination. If null, default destination is assumed.</param>
         </member>
-        <member name="M:Waher.Networking.DNS.Communication.DnsClient.QueryAsync(System.String,Waher.Networking.DNS.Enumerations.QTYPE[],Waher.Networking.DNS.Enumerations.QCLASS)">
+        <member name="M:Waher.Networking.DNS.Communication.DnsClient.QueryAsync(System.String,Waher.Networking.DNS.Enumerations.QTYPE[],Waher.Networking.DNS.Enumerations.QCLASS,System.Net.IPEndPoint)">
             <summary>
             Execute a DNS query.
             </summary>
             <param name="QNAME">Query Name</param>
             <param name="QTYPEs">Query Type</param>
             <param name="QCLASS">Query Class</param>
+            <param name="Destination">Destination. If null, default destination is assumed.</param>
         </member>
-        <member name="M:Waher.Networking.DNS.Communication.DnsClient.QueryAsync(Waher.Networking.DNS.Communication.Question[])">
+        <member name="M:Waher.Networking.DNS.Communication.DnsClient.QueryAsync(Waher.Networking.DNS.Communication.Question[],System.Net.IPEndPoint)">
             <summary>
             Execute a DNS query.
             </summary>
             <param name="Questions">Questions</param>
+            <param name="Destination">Destination. If null, default destination is assumed.</param>
         </member>
-        <member name="M:Waher.Networking.DNS.Communication.DnsClient.QueryAsync(Waher.Networking.DNS.Communication.Question[],System.Int32)">
+        <member name="M:Waher.Networking.DNS.Communication.DnsClient.QueryAsync(Waher.Networking.DNS.Communication.Question[],System.Net.IPEndPoint,System.Int32)">
             <summary>
             Execute a DNS query.
             </summary>
             <param name="Questions">Questions</param>
+            <param name="Destination">Destination. If null, default destination is assumed.</param>
             <param name="Timeout">Timeout, in milliseconds.</param>
         </member>
         <member name="T:Waher.Networking.DNS.Communication.DnsMessage">
@@ -235,22 +244,27 @@
             State object
             </summary>
         </member>
-        <member name="T:Waher.Networking.DNS.Communication.DnsQuery">
+        <member name="T:Waher.Networking.DNS.Communication.DnsResponse">
             <summary>
             Stored DNS Query
             </summary>
         </member>
-        <member name="M:Waher.Networking.DNS.Communication.DnsQuery.#ctor">
+        <member name="M:Waher.Networking.DNS.Communication.DnsResponse.#ctor">
             <summary>
             Stored DNS Query
             </summary>
         </member>
-        <member name="P:Waher.Networking.DNS.Communication.DnsQuery.Name">
+        <member name="P:Waher.Networking.DNS.Communication.DnsResponse.ObjectId">
+            <summary>
+            Object ID
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.DNS.Communication.DnsResponse.Name">
             <summary>
             Domain name
             </summary>
         </member>
-        <member name="P:Waher.Networking.DNS.Communication.DnsQuery.Type">
+        <member name="P:Waher.Networking.DNS.Communication.DnsResponse.Type">
             <summary>
             Question TYPE
             </summary>
@@ -342,6 +356,84 @@
             <summary>
             Next Message ID
             </summary>
+        </member>
+        <member name="M:Waher.Networking.DNS.DnsResolver.Resolve(System.String,Waher.Networking.DNS.Enumerations.QTYPE,Waher.Networking.DNS.Enumerations.QCLASS)">
+            <summary>
+            Resolves a DNS name.
+            </summary>
+            <param name="Name">Domain Name to resolve</param>
+            <param name="TYPE">Resource Record Type of interest.</param>
+            <param name="CLASS">Resource Record Class of interest.</param>
+            <returns>Answer to the query</returns>
+            <exception cref="T:System.IO.IOException">If the domain name could not be resolved for the TYPE and CLASS provided.</exception>
+        </member>
+        <member name="M:Waher.Networking.DNS.DnsResolver.Resolve(System.String,Waher.Networking.DNS.Enumerations.QTYPE,System.Nullable{Waher.Networking.DNS.Enumerations.TYPE},Waher.Networking.DNS.Enumerations.QCLASS)">
+            <summary>
+            Resolves a DNS name.
+            </summary>
+            <param name="Name">Domain Name to resolve</param>
+            <param name="TYPE">Resource Record Type of interest.</param>
+            <param name="ExceptionType">If no answer of type <paramref name="TYPE"/> is found, records of this type can also be accepted.</param>
+            <param name="CLASS">Resource Record Class of interest.</param>
+            <returns>Answer to the query</returns>
+            <exception cref="T:System.IO.IOException">If the domain name could not be resolved for the TYPE and CLASS provided.</exception>
+        </member>
+        <member name="M:Waher.Networking.DNS.DnsResolver.LookupIP4Addresses(System.String)">
+            <summary>
+            Looks up the IPv4 addresses related to a given domain name.
+            </summary>
+            <param name="DomainName">Domain name.</param>
+            <returns>IPv4 address found related to the domain name.</returns>
+            <exception cref="T:System.ArgumentException">If the name does not exist.</exception>
+            <exception cref="T:System.IO.IOException">If the name could not be resolved.</exception>
+        </member>
+        <member name="M:Waher.Networking.DNS.DnsResolver.LookupIP6Addresses(System.String)">
+            <summary>
+            Looks up the IPv6 addresses related to a given domain name.
+            </summary>
+            <param name="DomainName">Domain name.</param>
+            <returns>IPv6 address found related to the domain name.</returns>
+            <exception cref="T:System.ArgumentException">If the name does not exist.</exception>
+            <exception cref="T:System.IO.IOException">If the name could not be resolved.</exception>
+        </member>
+        <member name="M:Waher.Networking.DNS.DnsResolver.LookupMailExchange(System.String)">
+            <summary>
+            Looks up the Mail Exchanges related to a given domain name.
+            </summary>
+            <param name="DomainName">Domain name.</param>
+            <returns>Mail Exchanges found related to the domain name.</returns>
+            <exception cref="T:System.ArgumentException">If the name does not exist.</exception>
+            <exception cref="T:System.IO.IOException">If the name could not be resolved.</exception>
+        </member>
+        <member name="M:Waher.Networking.DNS.DnsResolver.LookupDomainName(System.Net.IPAddress)">
+            <summary>
+            Looks up the domain name pointing to a specific IP address.
+            
+            Note: The response is not necessarily unique or authoritative.
+            </summary>
+            <param name="Address">IP Address</param>
+            <returns>Domain Name pointing to the address</returns>
+        </member>
+        <member name="M:Waher.Networking.DNS.DnsResolver.LookupServiceEndpoint(System.String,System.String,System.String)">
+            <summary>
+            Looks up a service endpoint for a domain. If multiple are available,
+            an appropriate one is selected as defined by RFC 2782.
+            </summary>
+            <param name="DomainName">Domain name.</param>
+            <param name="ServiceName">Service name.</param>
+            <param name="Protocol">Protocol name. Example: "tcp", "udp", etc.</param>
+            <returns>Service Endpoint for service.</returns>
+            <exception cref="T:System.IO.IOException">If service endpoint could not be resolved.</exception>
+        </member>
+        <member name="M:Waher.Networking.DNS.DnsResolver.LookupServiceEndpoints(System.String,System.String,System.String)">
+            <summary>
+            Looks up a available service endpoints for a domain.
+            </summary>
+            <param name="DomainName">Domain name.</param>
+            <param name="ServiceName">Service name.</param>
+            <param name="Protocol">Protocol name. Example: "tcp", "udp", etc.</param>
+            <returns>Service Endpoints for service.</returns>
+            <exception cref="T:System.IO.IOException">If service endpoint could not be resolved.</exception>
         </member>
         <member name="T:Waher.Networking.DNS.Enumerations.CLASS">
             <summary>

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
+using Waher.Networking.DNS.Communication;
 using Waher.Networking.DNS.Enumerations;
 using Waher.Persistence.Attributes;
 
@@ -12,7 +13,7 @@ namespace Waher.Networking.DNS.ResourceRecords
 	/// </summary>
 	public class SRV : ResourceRecord
 	{
-		private static readonly Regex srvName = new Regex("^_`(?'Service'[^.]*)[.]_`(?'Protocol'[^.]*)[.](?'Name'.*)$", RegexOptions.Singleline | RegexOptions.Compiled);
+		private static readonly Regex srvName = new Regex("^_(?'Service'[^.]*)[.]_(?'Protocol'[^.]*)[.](?'Name'.*)$", RegexOptions.Singleline | RegexOptions.Compiled);
 
 		private string service;
 		private string protocol;
@@ -60,10 +61,10 @@ namespace Waher.Networking.DNS.ResourceRecords
 			this.protocol = M.Groups["Protocol"].Value;
 			this.Name = M.Groups["Name"].Value;
 
-			this.priority = Priority;
-			this.weight = Weight;
-			this.port = Port;
-			this.targetHost = TargetHost;
+			this.priority = DnsClient.ReadUInt16(Data);
+			this.weight = DnsClient.ReadUInt16(Data);
+			this.port = DnsClient.ReadUInt16(Data);
+			this.targetHost = DnsClient.ReadName(Data);
 		}
 
 		/// <summary>

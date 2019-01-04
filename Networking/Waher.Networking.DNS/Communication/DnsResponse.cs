@@ -12,19 +12,32 @@ namespace Waher.Networking.DNS.Communication
 	/// </summary>
 	[CollectionName("DnsCache")]
 	[Index("Name", "Type", "Class")]
-	class DnsQuery
+	public class DnsResponse
 	{
+		private Guid objectId = Guid.Empty;
 		private string name = string.Empty;
 		private QTYPE type = QTYPE.A;
 		private QCLASS _class = QCLASS.IN;
 		private DateTime expires = DateTime.MinValue;
 		private ResourceRecord[] answer = null;
+		private ResourceRecord[] authority = null;
+		private ResourceRecord[] additional = null;
 
 		/// <summary>
 		/// Stored DNS Query
 		/// </summary>
-		public DnsQuery()
+		public DnsResponse()
 		{
+		}
+
+		/// <summary>
+		/// Object ID
+		/// </summary>
+		[ObjectId]
+		public Guid ObjectId
+		{
+			get => this.objectId;
+			set => this.objectId = value;
 		}
 
 		/// <summary>
@@ -66,6 +79,20 @@ namespace Waher.Networking.DNS.Communication
 		{
 			get => this.answer;
 			set => this.answer = value;
+		}
+
+		[DefaultValueNull]
+		public ResourceRecord[] Authority
+		{
+			get => this.authority;
+			set => this.authority = value;
+		}
+
+		[DefaultValueNull]
+		public ResourceRecord[] Additional
+		{
+			get => this.additional;
+			set => this.additional = value;
 		}
 	}
 }

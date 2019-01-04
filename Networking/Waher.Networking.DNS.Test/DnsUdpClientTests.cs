@@ -30,7 +30,7 @@ namespace Waher.Networking.DNS.Test
 		[TestMethod]
 		public async Task Test_01_Standard_Query_A()
 		{
-			DnsMessage Message = await this.client.QueryAsync("google.com", QTYPE.A, QCLASS.IN);
+			DnsMessage Message = await this.client.QueryAsync("google.com", QTYPE.A, QCLASS.IN, null);
 			Assert.IsTrue(Message.Response);
 			this.Print(Message);
 		}
@@ -38,7 +38,7 @@ namespace Waher.Networking.DNS.Test
 		[TestMethod]
 		public async Task Test_02_Standard_Query_AAAA()
 		{
-			DnsMessage Message = await this.client.QueryAsync("google.com", QTYPE.AAAA, QCLASS.IN);
+			DnsMessage Message = await this.client.QueryAsync("google.com", QTYPE.AAAA, QCLASS.IN, null);
 			Assert.IsTrue(Message.Response);
 			this.Print(Message);
 		}
@@ -46,7 +46,7 @@ namespace Waher.Networking.DNS.Test
 		[TestMethod]
 		public async Task Test_03_Standard_Query_NonExistantDomain()
 		{
-			DnsMessage Message = await this.client.QueryAsync("dettanamnfinnsinte.se", QTYPE.A, QCLASS.IN);
+			DnsMessage Message = await this.client.QueryAsync("dettanamnfinnsinte.se", QTYPE.A, QCLASS.IN, null);
 			Assert.IsTrue(Message.Response);
 			this.Print(Message);
 		}
@@ -54,7 +54,7 @@ namespace Waher.Networking.DNS.Test
 		[TestMethod]
 		public async Task Test_04_Standard_Query_MX()
 		{
-			DnsMessage Message = await this.client.QueryAsync("hotmail.com", QTYPE.MX, QCLASS.IN);
+			DnsMessage Message = await this.client.QueryAsync("hotmail.com", QTYPE.MX, QCLASS.IN, null);
 			Assert.IsTrue(Message.Response);
 			this.Print(Message);
 		}
@@ -62,7 +62,7 @@ namespace Waher.Networking.DNS.Test
 		[TestMethod]
 		public async Task Test_05_Standard_Query_SRV()
 		{
-			DnsMessage Message = await this.client.QueryAsync("_xmpp-client._tcp.jabber.org", QTYPE.SRV, QCLASS.IN);
+			DnsMessage Message = await this.client.QueryAsync("_xmpp-client._tcp.jabber.org", QTYPE.SRV, QCLASS.IN, null);
 			Assert.IsTrue(Message.Response);
 			this.Print(Message);
 		}
@@ -70,7 +70,7 @@ namespace Waher.Networking.DNS.Test
 		[TestMethod]
 		public async Task Test_06_Standard_Query_Reverse_IP4_Lookup()
 		{
-			DnsMessage Message = await this.client.QueryAsync("172.217.21.174.IN-ADDR.ARPA", QTYPE.PTR, QCLASS.IN);
+			DnsMessage Message = await this.client.QueryAsync("172.217.21.174.IN-ADDR.ARPA", QTYPE.PTR, QCLASS.IN, null);
 			Assert.IsTrue(Message.Response);
 			this.Print(Message);
 		}
@@ -104,7 +104,7 @@ namespace Waher.Networking.DNS.Test
 				sb.Append('.');
 			}
 			sb.Append("IP6.ARPA");
-			DnsMessage Message = await this.client.QueryAsync(sb.ToString(), QTYPE.PTR, QCLASS.IN);
+			DnsMessage Message = await this.client.QueryAsync(sb.ToString(), QTYPE.PTR, QCLASS.IN, null);
 			Assert.IsTrue(Message.Response);
 			this.Print(Message);
 		}

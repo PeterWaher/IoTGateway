@@ -39,7 +39,8 @@ namespace Waher.Networking.DNS.ResourceRecords
 		/// </summary>
 		public override string ToString()
 		{
-			return base.ToString() + "\t" + this.preference.ToString();
+			return base.ToString() + "\t" + this.preference.ToString() + 
+				"\t" + this.exchange;
 		}
 	}
 }

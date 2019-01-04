@@ -318,14 +318,6 @@
             <param name="HostName">Host Name</param>
             <returns>If <paramref name="HostName"/> is a valid ARPHANET host name.</returns>
         </member>
-        <member name="M:Waher.Networking.DNS.DnsResolver.IsValidArpanetHostName(System.String,System.Boolean)">
-            <summary>
-            Checks if a host name is a valid ARPHANET host name.
-            </summary>
-            <param name="HostName">Host Name</param>
-            <param name="AllowUnderscore">If underscore characters are permitted.</param>
-            <returns>If <paramref name="HostName"/> is a valid ARPHANET host name.</returns>
-        </member>
         <member name="P:Waher.Networking.DNS.DnsResolver.NextID">
             <summary>
             Next Message ID

@@ -25,7 +25,6 @@ namespace Waher.Networking.DNS
 		public const int DefaultDnsPort = 53;
 
 		private static readonly Regex arpanetHostName = new Regex(@"^[a-zA-Z]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?([.][a-zA-Z]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$", RegexOptions.Compiled | RegexOptions.Singleline);
-		private static readonly Regex arpanetHostNameUnderscore = new Regex(@"^[_a-zA-Z]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?([.][_a-zA-Z]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$", RegexOptions.Compiled | RegexOptions.Singleline);
 		private static readonly object synchObject = new object();
 		private static ushort nextId = 0;
 
@@ -62,17 +61,6 @@ namespace Waher.Networking.DNS
 		/// <returns>If <paramref name="HostName"/> is a valid ARPHANET host name.</returns>
 		public static bool IsValidArpanetHostName(string HostName)
 		{
-			return IsValidArpanetHostName(HostName, false);
-		}
-
-		/// <summary>
-		/// Checks if a host name is a valid ARPHANET host name.
-		/// </summary>
-		/// <param name="HostName">Host Name</param>
-		/// <param name="AllowUnderscore">If underscore characters are permitted.</param>
-		/// <returns>If <paramref name="HostName"/> is a valid ARPHANET host name.</returns>
-		public static bool IsValidArpanetHostName(string HostName, bool AllowUnderscore)
-		{
 			if (HostName.Length > 255)
 				return false;
 
@@ -80,10 +68,7 @@ namespace Waher.Networking.DNS
 
 			lock (arpanetHostName)
 			{
-				if (AllowUnderscore)
-					M = arpanetHostNameUnderscore.Match(HostName);
-				else
-					M = arpanetHostName.Match(HostName);
+				M = arpanetHostName.Match(HostName);
 			}
 
 			return (M.Success && M.Index == 0 && M.Length == HostName.Length);
@@ -204,9 +189,6 @@ namespace Waher.Networking.DNS
 		internal static void WriteName(string Name, Stream Output,
 			Dictionary<string, ushort> NamePositions)
 		{
-			if (!IsValidArpanetHostName(Name, true))
-				throw new ArgumentException("Not a valid Host Name.", nameof(Name));
-
 			while (!string.IsNullOrEmpty(Name))
 			{
 				if (NamePositions.TryGetValue(Name, out ushort Pos))

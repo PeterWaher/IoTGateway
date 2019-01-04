@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using Waher.Networking.DNS.Enumerations;
+using Waher.Persistence.Attributes;
 
 namespace Waher.Networking.DNS.ResourceRecords
 {
@@ -10,8 +11,18 @@ namespace Waher.Networking.DNS.ResourceRecords
 	/// </summary>
 	public class HINFO : ResourceRecord
 	{
-		private readonly string cpu;
-		private readonly string os;
+		private string cpu;
+		private string os;
+
+		/// <summary>
+		/// General information about a host.
+		/// </summary>
+		public HINFO()
+			: base()
+		{
+			this.cpu = string.Empty;
+			this.os = string.Empty;
+		}
 
 		/// <summary>
 		/// General information about a host.
@@ -31,12 +42,22 @@ namespace Waher.Networking.DNS.ResourceRecords
 		/// <summary>
 		/// Specifies the CPU type.
 		/// </summary>
-		public string CPU => this.cpu;
+		[DefaultValueStringEmpty]
+		public string CPU
+		{
+			get => this.cpu;
+			set => this.cpu = value;
+		}
 
 		/// <summary>
 		/// Specifies the OS type.
 		/// </summary>
-		public string OS => this.os;
+		[DefaultValueStringEmpty]
+		public string OS
+		{
+			get => this.os;
+			set => this.os = value;
+		}
 
 		/// <summary>
 		/// <see cref="Object.ToString()"/>

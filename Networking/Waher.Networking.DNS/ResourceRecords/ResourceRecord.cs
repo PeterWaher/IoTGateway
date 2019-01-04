@@ -4,18 +4,33 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using Waher.Networking.DNS.Enumerations;
+using Waher.Persistence.Attributes;
 
 namespace Waher.Networking.DNS.ResourceRecords
 {
 	/// <summary>
 	/// Abstract base class for a resource record.
 	/// </summary>
+	[CollectionName("DnsCache")]
+	[TypeName(TypeNameSerialization.LocalName)]
+	[Index("Name", "Type", "Class")]
 	public abstract class ResourceRecord
 	{
-		private readonly string name;
-		private readonly TYPE type;
-		private readonly CLASS _class;
-		private readonly uint ttl;
+		private string name;
+		private TYPE type;
+		private CLASS _class;
+		private uint ttl;
+
+		/// <summary>
+		/// Abstract base class for a resource record.
+		/// </summary>
+		public ResourceRecord()
+		{
+			this.name = string.Empty;
+			this.type = TYPE.A;
+			this._class = CLASS.IN;
+			this.ttl = 0;
+		}
 
 		/// <summary>
 		/// Abstract base class for a resource record.
@@ -35,22 +50,42 @@ namespace Waher.Networking.DNS.ResourceRecords
 		/// <summary>
 		/// Name
 		/// </summary>
-		public string Name => this.name;
+		[DefaultValueStringEmpty]
+		public string Name
+		{
+			get => this.name;
+			set => this.name = value;
+		}
 
 		/// <summary>
 		/// Resource Record Type
 		/// </summary>
-		public TYPE Type => this.type;
+		[DefaultValue(TYPE.A)]
+		public TYPE Type
+		{
+			get => this.type;
+			set => this.type = value;
+		}
 
 		/// <summary>
 		/// Resource Record Class
 		/// </summary>
-		public CLASS Class => this._class;
+		[DefaultValue(CLASS.IN)]
+		public CLASS Class
+		{
+			get => this._class;
+			set => this._class = value;
+		}
 
 		/// <summary>
 		/// Time To Live
 		/// </summary>
-		public uint Ttl => this.ttl;
+		[DefaultValue(0)]
+		public uint Ttl
+		{
+			get => this.ttl;
+			set => this.ttl = value;
+		}
 
 		/// <summary>
 		/// Creates a resource record from its binary representation-

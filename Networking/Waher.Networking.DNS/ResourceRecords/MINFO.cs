@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using Waher.Networking.DNS.Enumerations;
+using Waher.Persistence.Attributes;
 
 namespace Waher.Networking.DNS.ResourceRecords
 {
@@ -10,8 +11,18 @@ namespace Waher.Networking.DNS.ResourceRecords
 	/// </summary>
 	public class MINFO : ResourceRecord
 	{
-		private readonly string rMailBx;
-		private readonly string eMailBx;
+		private string rMailBx;
+		private string eMailBx;
+
+		/// <summary>
+		/// Mail information about a host. (Experimental)
+		/// </summary>
+		public MINFO()
+			: base()
+		{
+			this.rMailBx = string.Empty;
+			this.eMailBx = string.Empty;
+		}
 
 		/// <summary>
 		/// Mail information about a host. (Experimental)
@@ -32,7 +43,12 @@ namespace Waher.Networking.DNS.ResourceRecords
 		/// Specifies a mailbox which is
 		/// responsible for the mailing list or mailbox.
 		/// </summary>
-		public string RMailBx => this.rMailBx;
+		[DefaultValueStringEmpty]
+		public string RMailBx
+		{
+			get => this.rMailBx;
+			set => this.rMailBx = value;
+		}
 
 		/// <summary>
 		/// Specifies a mailbox which is to
@@ -40,7 +56,12 @@ namespace Waher.Networking.DNS.ResourceRecords
 		/// mailbox specified by the owner of the MINFO RR(similar
 		/// to the ERRORS-TO: field which has been proposed).
 		/// </summary>
-		public string EMailBx => this.eMailBx;
+		[DefaultValueStringEmpty]
+		public string EMailBx
+		{
+			get => this.eMailBx;
+			set => this.eMailBx = value;
+		}
 
 		/// <summary>
 		/// <see cref="Object.ToString()"/>

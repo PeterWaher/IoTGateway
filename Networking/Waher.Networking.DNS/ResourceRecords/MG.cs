@@ -13,6 +13,14 @@ namespace Waher.Networking.DNS.ResourceRecords
 		/// <summary>
 		/// Mail group (Experimental)
 		/// </summary>
+		public MG()
+			: base()
+		{
+		}
+
+		/// <summary>
+		/// Mail group (Experimental)
+		/// </summary>
 		/// <param name="Name">Name</param>
 		/// <param name="Type">Resource Record Type</param>
 		/// <param name="Class">Resource Record Class</param>

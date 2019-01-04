@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using Waher.Networking.DNS.Enumerations;
+using Waher.Persistence.Attributes;
 
 namespace Waher.Networking.DNS.ResourceRecords
 {
@@ -11,7 +12,16 @@ namespace Waher.Networking.DNS.ResourceRecords
 	/// </summary>
 	public class TXT : ResourceRecord
 	{
-		private readonly string[] text;
+		private string[] text;
+
+		/// <summary>
+		/// Descriptive text
+		/// </summary>
+		public TXT()
+			: base()
+		{
+			this.text = null;
+		}
 
 		/// <summary>
 		/// Descriptive text
@@ -36,7 +46,12 @@ namespace Waher.Networking.DNS.ResourceRecords
 		/// <summary>
 		/// Descriptive text.
 		/// </summary>
-		public string[] Text => this.text;
+		[DefaultValueNull]
+		public string[] Text
+		{
+			get => this.text;
+			set => this.text = value;
+		}
 
 		/// <summary>
 		/// <see cref="object.ToString()"/>

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using Waher.Networking.DNS.Enumerations;
+using Waher.Persistence.Attributes;
 
 namespace Waher.Networking.DNS.ResourceRecords
 {
@@ -10,13 +11,28 @@ namespace Waher.Networking.DNS.ResourceRecords
 	/// </summary>
 	public class SOA : ResourceRecord
 	{
-		private readonly string mName;
-		private readonly string rName;
-		private readonly uint serial;
-		private readonly uint refresh;
-		private readonly uint retry;
-		private readonly uint expire;
-		private readonly uint minimum;
+		private string mName;
+		private string rName;
+		private uint serial;
+		private uint refresh;
+		private uint retry;
+		private uint expire;
+		private uint minimum;
+
+		/// <summary>
+		/// Start Of zone Authority
+		/// </summary>
+		public SOA()
+			: base()
+		{
+			this.mName = string.Empty;
+			this.rName = string.Empty;
+			this.serial = 0;
+			this.refresh = 0;
+			this.retry = 0;
+			this.expire = 0;
+			this.minimum = 0;
+		}
 
 		/// <summary>
 		/// Start Of zone Authority
@@ -41,38 +57,73 @@ namespace Waher.Networking.DNS.ResourceRecords
 		/// <summary>
 		/// Name server that was the original or primary source of data for this zone
 		/// </summary>
-		public string MName => this.mName;
+		[DefaultValueStringEmpty]
+		public string MName
+		{
+			get => this.mName;
+			set => this.mName = value;
+		}
 
 		/// <summary>
 		/// Specifies the mailbox of the person responsible for this zone
 		/// </summary>
-		public string RName => this.rName;
+		[DefaultValueStringEmpty]
+		public string RName
+		{
+			get => this.rName;
+			set => this.rName = value;
+		}
 
 		/// <summary>
 		/// Version number of the original copy of the zone.
 		/// </summary>
-		public uint Serial => this.serial;
+		[DefaultValue(0)]
+		public uint Serial
+		{
+			get => this.serial;
+			set => this.serial = value;
+		}
 
 		/// <summary>
 		/// Time interval before the zone should be refreshed
 		/// </summary>
-		public uint Refresh => this.refresh;
+		[DefaultValue(0)]
+		public uint Refresh
+		{
+			get => this.refresh;
+			set => this.refresh = value;
+		}
 
 		/// <summary>
 		/// Interval that should elapse before a failed refresh should be retried
 		/// </summary>
-		public uint Retry => this.retry;
+		[DefaultValue(0)]
+		public uint Retry
+		{
+			get => this.retry;
+			set => this.retry = value;
+		}
 
 		/// <summary>
 		/// Specifies the upper limit on the time interval that can elapse before 
 		/// the zone is no longer authoritative
 		/// </summary>
-		public uint Expire => this.expire;
+		[DefaultValue(0)]
+		public uint Expire
+		{
+			get => this.expire;
+			set => this.expire = value;
+		}
 
 		/// <summary>
 		/// Minimum TTL field that should be exported with any RR from this zone
 		/// </summary>
-		public uint Minimum => this.minimum;
+		[DefaultValue(0)]
+		public uint Minimum
+		{
+			get => this.minimum;
+			set => this.minimum = value;
+		}
 
 		/// <summary>
 		/// <see cref="Object.ToString()"/>

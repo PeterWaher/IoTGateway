@@ -735,6 +735,11 @@
             Internet Address
             </summary>
         </member>
+        <member name="M:Waher.Networking.DNS.ResourceRecords.A.#ctor">
+            <summary>
+            Internet Address
+            </summary>
+        </member>
         <member name="M:Waher.Networking.DNS.ResourceRecords.A.#ctor(System.String,Waher.Networking.DNS.Enumerations.TYPE,Waher.Networking.DNS.Enumerations.CLASS,System.UInt32,System.IO.Stream)">
             <summary>
             Internet Address
@@ -752,12 +757,17 @@
         </member>
         <member name="T:Waher.Networking.DNS.ResourceRecords.AAAA">
             <summary>
-            Internet Address
+            IPv6 Address
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.DNS.ResourceRecords.AAAA.#ctor">
+            <summary>
+            IPv6 Address
             </summary>
         </member>
         <member name="M:Waher.Networking.DNS.ResourceRecords.AAAA.#ctor(System.String,Waher.Networking.DNS.Enumerations.TYPE,Waher.Networking.DNS.Enumerations.CLASS,System.UInt32,System.IO.Stream)">
             <summary>
-            Internet Address
+            IPv6 Address
             </summary>
             <param name="Name">Name</param>
             <param name="Type">Resource Record Type</param>
@@ -775,6 +785,11 @@
             Canonical NAME
             </summary>
         </member>
+        <member name="M:Waher.Networking.DNS.ResourceRecords.CNAME.#ctor">
+            <summary>
+            Canonical NAME
+            </summary>
+        </member>
         <member name="M:Waher.Networking.DNS.ResourceRecords.CNAME.#ctor(System.String,Waher.Networking.DNS.Enumerations.TYPE,Waher.Networking.DNS.Enumerations.CLASS,System.UInt32,System.IO.Stream)">
             <summary>
             Canonical NAME
@@ -786,6 +801,11 @@
             <param name="Data">RR-specific binary data.</param>
         </member>
         <member name="T:Waher.Networking.DNS.ResourceRecords.HINFO">
+            <summary>
+            General information about a host.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.DNS.ResourceRecords.HINFO.#ctor">
             <summary>
             General information about a host.
             </summary>
@@ -820,6 +840,11 @@
             Mailbox (Experimental)
             </summary>
         </member>
+        <member name="M:Waher.Networking.DNS.ResourceRecords.MB.#ctor">
+            <summary>
+            Mailbox (Experimental)
+            </summary>
+        </member>
         <member name="M:Waher.Networking.DNS.ResourceRecords.MB.#ctor(System.String,Waher.Networking.DNS.Enumerations.TYPE,Waher.Networking.DNS.Enumerations.CLASS,System.UInt32,System.IO.Stream)">
             <summary>
             Mailbox (Experimental)
@@ -831,6 +856,11 @@
             <param name="Data">RR-specific binary data.</param>
         </member>
         <member name="T:Waher.Networking.DNS.ResourceRecords.MD">
+            <summary>
+            Mail delivery (Obsolete)
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.DNS.ResourceRecords.MD.#ctor">
             <summary>
             Mail delivery (Obsolete)
             </summary>
@@ -850,6 +880,11 @@
             Mail forwarding (Obsolete)
             </summary>
         </member>
+        <member name="M:Waher.Networking.DNS.ResourceRecords.MF.#ctor">
+            <summary>
+            Mail forwarding (Obsolete)
+            </summary>
+        </member>
         <member name="M:Waher.Networking.DNS.ResourceRecords.MF.#ctor(System.String,Waher.Networking.DNS.Enumerations.TYPE,Waher.Networking.DNS.Enumerations.CLASS,System.UInt32,System.IO.Stream)">
             <summary>
             Mail forwarding (Obsolete)
@@ -865,6 +900,11 @@
             Mail group (Experimental)
             </summary>
         </member>
+        <member name="M:Waher.Networking.DNS.ResourceRecords.MG.#ctor">
+            <summary>
+            Mail group (Experimental)
+            </summary>
+        </member>
         <member name="M:Waher.Networking.DNS.ResourceRecords.MG.#ctor(System.String,Waher.Networking.DNS.Enumerations.TYPE,Waher.Networking.DNS.Enumerations.CLASS,System.UInt32,System.IO.Stream)">
             <summary>
             Mail group (Experimental)
@@ -876,6 +916,11 @@
             <param name="Data">RR-specific binary data.</param>
         </member>
         <member name="T:Waher.Networking.DNS.ResourceRecords.MINFO">
+            <summary>
+            Mail information about a host. (Experimental)
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.DNS.ResourceRecords.MINFO.#ctor">
             <summary>
             Mail information about a host. (Experimental)
             </summary>
@@ -914,6 +959,11 @@
             Mailbox Renaming (Experimental)
             </summary>
         </member>
+        <member name="M:Waher.Networking.DNS.ResourceRecords.MR.#ctor">
+            <summary>
+            Mailbox Renaming (Experimental)
+            </summary>
+        </member>
         <member name="M:Waher.Networking.DNS.ResourceRecords.MR.#ctor(System.String,Waher.Networking.DNS.Enumerations.TYPE,Waher.Networking.DNS.Enumerations.CLASS,System.UInt32,System.IO.Stream)">
             <summary>
             Mailbox Renaming (Experimental)
@@ -925,6 +975,11 @@
             <param name="Data">RR-specific binary data.</param>
         </member>
         <member name="T:Waher.Networking.DNS.ResourceRecords.MX">
+            <summary>
+            Mailbox eXchange
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.DNS.ResourceRecords.MX.#ctor">
             <summary>
             Mailbox eXchange
             </summary>
@@ -945,12 +1000,22 @@
             are preferred.
             </summary>
         </member>
+        <member name="P:Waher.Networking.DNS.ResourceRecords.MX.Exchange">
+            <summary>
+            Specifies a host willing to act as a mail exchange for the owner name
+            </summary>
+        </member>
         <member name="M:Waher.Networking.DNS.ResourceRecords.MX.ToString">
             <summary>
             <see cref="M:System.Object.ToString"/>
             </summary>
         </member>
         <member name="T:Waher.Networking.DNS.ResourceRecords.NS">
+            <summary>
+            Name Server
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.DNS.ResourceRecords.NS.#ctor">
             <summary>
             Name Server
             </summary>
@@ -966,6 +1031,11 @@
             <param name="Data">RR-specific binary data.</param>
         </member>
         <member name="T:Waher.Networking.DNS.ResourceRecords.NULL">
+            <summary>
+            NULL (Experimental)
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.DNS.ResourceRecords.NULL.#ctor">
             <summary>
             NULL (Experimental)
             </summary>
@@ -991,6 +1061,11 @@
             Pointer
             </summary>
         </member>
+        <member name="M:Waher.Networking.DNS.ResourceRecords.PTR.#ctor">
+            <summary>
+            Pointer
+            </summary>
+        </member>
         <member name="M:Waher.Networking.DNS.ResourceRecords.PTR.#ctor(System.String,Waher.Networking.DNS.Enumerations.TYPE,Waher.Networking.DNS.Enumerations.CLASS,System.UInt32,System.IO.Stream)">
             <summary>
             Pointer
@@ -1002,6 +1077,11 @@
             <param name="Data">RR-specific binary data.</param>
         </member>
         <member name="T:Waher.Networking.DNS.ResourceRecords.ResourceAddressRecord">
+            <summary>
+            Abstract base class for Resource Address Records.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.DNS.ResourceRecords.ResourceAddressRecord.#ctor">
             <summary>
             Abstract base class for Resource Address Records.
             </summary>
@@ -1026,12 +1106,22 @@
             IP address
             </summary>
         </member>
+        <member name="P:Waher.Networking.DNS.ResourceRecords.ResourceAddressRecord.AddressBytes">
+            <summary>
+            IP Address Bytes
+            </summary>
+        </member>
         <member name="M:Waher.Networking.DNS.ResourceRecords.ResourceAddressRecord.ToString">
             <summary>
             <see cref="M:System.Object.ToString"/>
             </summary>
         </member>
         <member name="T:Waher.Networking.DNS.ResourceRecords.ResourceNameRecord">
+            <summary>
+            Abstract base class for resource records referring to a name.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.DNS.ResourceRecords.ResourceNameRecord.#ctor">
             <summary>
             Abstract base class for resource records referring to a name.
             </summary>
@@ -1057,6 +1147,11 @@
             </summary>
         </member>
         <member name="T:Waher.Networking.DNS.ResourceRecords.ResourceRecord">
+            <summary>
+            Abstract base class for a resource record.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.DNS.ResourceRecords.ResourceRecord.#ctor">
             <summary>
             Abstract base class for a resource record.
             </summary>
@@ -1103,6 +1198,11 @@
             </summary>
         </member>
         <member name="T:Waher.Networking.DNS.ResourceRecords.SOA">
+            <summary>
+            Start Of zone Authority
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.DNS.ResourceRecords.SOA.#ctor">
             <summary>
             Start Of zone Authority
             </summary>
@@ -1163,9 +1263,14 @@
             Server Selection
             </summary>
         </member>
+        <member name="M:Waher.Networking.DNS.ResourceRecords.SRV.#ctor">
+            <summary>
+            Server Selection
+            </summary>
+        </member>
         <member name="M:Waher.Networking.DNS.ResourceRecords.SRV.#ctor(System.String,Waher.Networking.DNS.Enumerations.TYPE,Waher.Networking.DNS.Enumerations.CLASS,System.UInt32,System.IO.Stream)">
             <summary>
-            Mailbox eXchange
+            Server Selection
             </summary>
             <param name="Name">Name</param>
             <param name="Type">Resource Record Type</param>
@@ -1213,6 +1318,11 @@
             Descriptive text
             </summary>
         </member>
+        <member name="M:Waher.Networking.DNS.ResourceRecords.TXT.#ctor">
+            <summary>
+            Descriptive text
+            </summary>
+        </member>
         <member name="M:Waher.Networking.DNS.ResourceRecords.TXT.#ctor(System.String,Waher.Networking.DNS.Enumerations.TYPE,Waher.Networking.DNS.Enumerations.CLASS,System.UInt32,System.IO.Stream,System.Int64)">
             <summary>
             Descriptive text
@@ -1237,6 +1347,11 @@
         <member name="T:Waher.Networking.DNS.ResourceRecords.WKS">
             <summary>
             Well Known Services, as defined in RFC 1010
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.DNS.ResourceRecords.WKS.#ctor">
+            <summary>
+            Well Known Services
             </summary>
         </member>
         <member name="M:Waher.Networking.DNS.ResourceRecords.WKS.#ctor(System.String,Waher.Networking.DNS.Enumerations.TYPE,Waher.Networking.DNS.Enumerations.CLASS,System.UInt32,System.IO.Stream,System.Int64)">

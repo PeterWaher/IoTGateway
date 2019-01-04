@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using Waher.Networking.DNS.Enumerations;
+using Waher.Persistence.Attributes;
 
 namespace Waher.Networking.DNS.ResourceRecords
 {
@@ -11,7 +12,16 @@ namespace Waher.Networking.DNS.ResourceRecords
 	/// </summary>
 	public abstract class ResourceAddressRecord : ResourceRecord
 	{
-		private readonly IPAddress address;
+		private IPAddress address;
+
+		/// <summary>
+		/// Abstract base class for Resource Address Records.
+		/// </summary>
+		public ResourceAddressRecord()
+			: base()
+		{
+			this.address = null;
+		}
 
 		/// <summary>
 		/// Abstract base class for Resource Address Records.
@@ -42,14 +52,29 @@ namespace Waher.Networking.DNS.ResourceRecords
 		/// <summary>
 		/// IP address
 		/// </summary>
-		public IPAddress Address => this.address;
+		[IgnoreMember]
+		public IPAddress Address
+		{
+			get => this.address;
+			set => this.address = value;
+		}
+
+		/// <summary>
+		/// IP Address Bytes
+		/// </summary>
+		[DefaultValueNull]
+		public byte[] AddressBytes
+		{
+			get => this.address?.GetAddressBytes();
+			set => this.address = value == null ? null : new IPAddress(value);
+		}
 
 		/// <summary>
 		/// <see cref="object.ToString()"/>
 		/// </summary>
 		public override string ToString()
 		{
-			return base.ToString() + "\t" + this.address.ToString();
+			return base.ToString() + "\t" + this.address?.ToString();
 		}
 	}
 }

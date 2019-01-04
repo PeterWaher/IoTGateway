@@ -6,12 +6,20 @@ using Waher.Networking.DNS.Enumerations;
 namespace Waher.Networking.DNS.ResourceRecords
 {
 	/// <summary>
-	/// Internet Address
+	/// IPv6 Address
 	/// </summary>
 	public class AAAA : ResourceAddressRecord
 	{
 		/// <summary>
-		/// Internet Address
+		/// IPv6 Address
+		/// </summary>
+		public AAAA()
+			: base()
+		{
+		}
+
+		/// <summary>
+		/// IPv6 Address
 		/// </summary>
 		/// <param name="Name">Name</param>
 		/// <param name="Type">Resource Record Type</param>

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using Waher.Networking.DNS.Enumerations;
+using Waher.Persistence.Attributes;
 
 namespace Waher.Networking.DNS.ResourceRecords
 {
@@ -11,7 +12,16 @@ namespace Waher.Networking.DNS.ResourceRecords
 	/// </summary>
 	public class ResourceNameRecord : ResourceRecord
 	{
-		private readonly string name2;
+		private string name2;
+
+		/// <summary>
+		/// Abstract base class for resource records referring to a name.
+		/// </summary>
+		public ResourceNameRecord()
+			: base()
+		{
+			this.name2 = string.Empty;
+		}
 
 		/// <summary>
 		/// Abstract base class for resource records referring to a name.
@@ -31,7 +41,12 @@ namespace Waher.Networking.DNS.ResourceRecords
 		/// <summary>
 		/// Name being referred to.
 		/// </summary>
-		public string Name2 => this.name2;
+		[DefaultValueStringEmpty]
+		public string Name2
+		{
+			get => this.name2;
+			set => this.name2 = value;
+		}
 
 		/// <summary>
 		/// <see cref="object.ToString()"/>

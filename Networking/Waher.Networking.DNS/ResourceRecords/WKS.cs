@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Collections;
 using System.IO;
 using Waher.Networking.DNS.Enumerations;
+using Waher.Persistence.Attributes;
 
 namespace Waher.Networking.DNS.ResourceRecords
 {
@@ -10,8 +10,18 @@ namespace Waher.Networking.DNS.ResourceRecords
 	/// </summary>
 	public class WKS : ResourceAddressRecord
 	{
-		private readonly byte protocol;
-		private readonly BitArray bitMap;
+		private byte protocol;
+		private byte[] bitMap;
+
+		/// <summary>
+		/// Well Known Services
+		/// </summary>
+		public WKS()
+			: base()
+		{
+			this.protocol = 0;
+			this.bitMap = null;
+		}
 
 		/// <summary>
 		/// Well Known Services
@@ -27,12 +37,8 @@ namespace Waher.Networking.DNS.ResourceRecords
 		{
 			this.protocol = (byte)Data.ReadByte();
 			int c = (int)(EndPos - Data.Position);
-			byte[] Bin = new byte[c];
-			Data.Read(Bin, 0, c);
-			BitArray BitMap = new BitArray(Bin);
-
-			this.protocol = Protocol;
-			this.bitMap = BitMap;
+			this.bitMap = new byte[c];
+			Data.Read(bitMap, 0, c);
 		}
 
 		/// <summary>
@@ -43,12 +49,22 @@ namespace Waher.Networking.DNS.ResourceRecords
 		/// <summary>
 		/// Protocol Number
 		/// </summary>
-		public byte Protocol => this.protocol;
+		[DefaultValue((byte)0)]
+		public byte Protocol
+		{
+			get => this.protocol;
+			set => this.protocol = value;
+		}
 
 		/// <summary>
 		/// Service Bit-map
 		/// </summary>
-		public BitArray BitMap => this.bitMap;
+		[DefaultValueNull]
+		public byte[] BitMap
+		{
+			get => this.bitMap;
+			set => this.bitMap = value;
+		}
 
 		/// <summary>
 		/// <see cref="object.ToString()"/>

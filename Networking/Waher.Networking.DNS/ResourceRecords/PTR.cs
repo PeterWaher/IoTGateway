@@ -13,6 +13,14 @@ namespace Waher.Networking.DNS.ResourceRecords
 		/// <summary>
 		/// Pointer
 		/// </summary>
+		public PTR()
+			: base()
+		{
+		}
+
+		/// <summary>
+		/// Pointer
+		/// </summary>
 		/// <param name="Name">Name</param>
 		/// <param name="Type">Resource Record Type</param>
 		/// <param name="Class">Resource Record Class</param>

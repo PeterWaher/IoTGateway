@@ -13,6 +13,14 @@ namespace Waher.Networking.DNS.ResourceRecords
 		/// <summary>
 		/// Canonical NAME
 		/// </summary>
+		public CNAME()
+			: base()
+		{
+		}
+
+		/// <summary>
+		/// Canonical NAME
+		/// </summary>
 		/// <param name="Name">Name</param>
 		/// <param name="Type">Resource Record Type</param>
 		/// <param name="Class">Resource Record Class</param>

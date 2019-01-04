@@ -14,6 +14,14 @@ namespace Waher.Networking.DNS.ResourceRecords
 		/// <summary>
 		/// Internet Address
 		/// </summary>
+		public A()
+			: base()
+		{
+		}
+
+		/// <summary>
+		/// Internet Address
+		/// </summary>
 		/// <param name="Name">Name</param>
 		/// <param name="Type">Resource Record Type</param>
 		/// <param name="Class">Resource Record Class</param>

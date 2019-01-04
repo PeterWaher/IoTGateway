@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using Waher.Networking.DNS.Enumerations;
+using Waher.Persistence.Attributes;
 
 namespace Waher.Networking.DNS.ResourceRecords
 {
@@ -10,7 +11,16 @@ namespace Waher.Networking.DNS.ResourceRecords
 	/// </summary>
 	public class NULL : ResourceRecord
 	{
-		private readonly byte[] data;
+		private byte[] data;
+
+		/// <summary>
+		/// NULL (Experimental)
+		/// </summary>
+		public NULL()
+			: base()
+		{
+			this.data = null;
+		}
 
 		/// <summary>
 		/// NULL (Experimental)
@@ -32,6 +42,11 @@ namespace Waher.Networking.DNS.ResourceRecords
 		/// <summary>
 		/// Binary data
 		/// </summary>
-		public byte[] Data => this.data;
+		[DefaultValueNull]
+		public byte[] Data
+		{
+			get => this.data;
+			set => this.data = value;
+		}
 	}
 }

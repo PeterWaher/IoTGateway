@@ -14,6 +14,14 @@ namespace Waher.Networking.DNS.ResourceRecords
 		/// <summary>
 		/// Mail delivery (Obsolete)
 		/// </summary>
+		public MD()
+			: base()
+		{
+		}
+
+		/// <summary>
+		/// Mail delivery (Obsolete)
+		/// </summary>
 		/// <param name="Name">Name</param>
 		/// <param name="Type">Resource Record Type</param>
 		/// <param name="Class">Resource Record Class</param>

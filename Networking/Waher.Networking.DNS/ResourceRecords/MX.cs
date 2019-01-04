@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using Waher.Networking.DNS.Enumerations;
+using Waher.Persistence.Attributes;
 
 namespace Waher.Networking.DNS.ResourceRecords
 {
@@ -10,8 +11,18 @@ namespace Waher.Networking.DNS.ResourceRecords
 	/// </summary>
 	public class MX : ResourceRecord
 	{
-		private readonly ushort preference;
-		private readonly string exchange;
+		private ushort preference;
+		private string exchange;
+
+		/// <summary>
+		/// Mailbox eXchange
+		/// </summary>
+		public MX()
+			: base()
+		{
+			this.preference = 0;
+			this.exchange = string.Empty;
+		}
 
 		/// <summary>
 		/// Mailbox eXchange
@@ -32,7 +43,22 @@ namespace Waher.Networking.DNS.ResourceRecords
 		/// Preference given to this RR among others at the same owner.Lower values
 		/// are preferred.
 		/// </summary>
-		public ushort Preference => this.preference;
+		[DefaultValue((ushort)0)]
+		public ushort Preference
+		{
+			get => this.preference;
+			set => this.preference = value;
+		}
+
+		/// <summary>
+		/// Specifies a host willing to act as a mail exchange for the owner name
+		/// </summary>
+		[DefaultValueStringEmpty]
+		public string Exchange
+		{
+			get => this.exchange;
+			set => this.exchange = value;
+		}
 
 		/// <summary>
 		/// <see cref="Object.ToString()"/>

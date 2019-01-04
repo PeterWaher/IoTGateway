@@ -11,9 +11,7 @@ namespace Waher.Networking.DNS.ResourceRecords
 	/// <summary>
 	/// Abstract base class for a resource record.
 	/// </summary>
-	[CollectionName("DnsCache")]
 	[TypeName(TypeNameSerialization.LocalName)]
-	[Index("Name", "Type", "Class")]
 	public abstract class ResourceRecord
 	{
 		private string name;

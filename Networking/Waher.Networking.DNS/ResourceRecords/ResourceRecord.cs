@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using Waher.Networking.DNS.Communication;
 using Waher.Networking.DNS.Enumerations;
 using Waher.Persistence.Attributes;
 
@@ -92,11 +93,11 @@ namespace Waher.Networking.DNS.ResourceRecords
 		/// <returns>Resource Record.</returns>
 		internal static ResourceRecord Create(Stream Data)
 		{
-			string NAME = DnsResolver.ReadName(Data);
-			TYPE TYPE = (TYPE)DnsResolver.ReadUInt16(Data);
-			CLASS CLASS = (CLASS)DnsResolver.ReadUInt16(Data);
-			uint TTL = DnsResolver.ReadUInt32(Data);
-			ushort RDLENGTH = DnsResolver.ReadUInt16(Data);
+			string NAME = DnsClient.ReadName(Data);
+			TYPE TYPE = (TYPE)DnsClient.ReadUInt16(Data);
+			CLASS CLASS = (CLASS)DnsClient.ReadUInt16(Data);
+			uint TTL = DnsClient.ReadUInt32(Data);
+			ushort RDLENGTH = DnsClient.ReadUInt16(Data);
 			long EndPos = Data.Position + RDLENGTH;
 			ResourceRecord Response;
 

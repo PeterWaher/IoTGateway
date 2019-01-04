@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using Waher.Networking.DNS.Communication;
 using Waher.Networking.DNS.Enumerations;
 using Waher.Persistence.Attributes;
 
@@ -45,13 +46,13 @@ namespace Waher.Networking.DNS.ResourceRecords
 		public SOA(string Name, TYPE Type, CLASS Class, uint Ttl, Stream Data) 
 			: base(Name, Type, Class, Ttl)
 		{
-			this.mName = DnsResolver.ReadName(Data);
-			this.rName= DnsResolver.ReadName(Data);
-			this.serial = DnsResolver.ReadUInt32(Data);
-			this.refresh = DnsResolver.ReadUInt32(Data);
-			this.retry = DnsResolver.ReadUInt32(Data);
-			this.expire = DnsResolver.ReadUInt32(Data);
-			this.minimum = DnsResolver.ReadUInt32(Data);
+			this.mName = DnsClient.ReadName(Data);
+			this.rName= DnsClient.ReadName(Data);
+			this.serial = DnsClient.ReadUInt32(Data);
+			this.refresh = DnsClient.ReadUInt32(Data);
+			this.retry = DnsClient.ReadUInt32(Data);
+			this.expire = DnsClient.ReadUInt32(Data);
+			this.minimum = DnsClient.ReadUInt32(Data);
 		}
 
 		/// <summary>

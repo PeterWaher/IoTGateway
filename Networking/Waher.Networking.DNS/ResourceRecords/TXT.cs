@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using Waher.Networking.DNS.Communication;
 using Waher.Networking.DNS.Enumerations;
 using Waher.Persistence.Attributes;
 
@@ -38,7 +39,7 @@ namespace Waher.Networking.DNS.ResourceRecords
 			List<string> Text = new List<string>();
 
 			while (Data.Position < EndPos)
-				Text.Add(DnsResolver.ReadString(Data));
+				Text.Add(DnsClient.ReadString(Data));
 
 			this.text = Text.ToArray();
 		}

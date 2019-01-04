@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using Waher.Networking.DNS.Communication;
 using Waher.Networking.DNS.Enumerations;
 using Waher.Persistence.Attributes;
 
@@ -35,7 +36,7 @@ namespace Waher.Networking.DNS.ResourceRecords
 			Stream Data)
 			: base(Name, Type, Class, Ttl)
 		{
-			this.name2 = DnsResolver.ReadName(Data);
+			this.name2 = DnsClient.ReadName(Data);
 		}
 
 		/// <summary>

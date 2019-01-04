@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using Waher.Networking.DNS.Communication;
 using Waher.Networking.DNS.Enumerations;
 using Waher.Persistence.Attributes;
 
@@ -35,8 +36,8 @@ namespace Waher.Networking.DNS.ResourceRecords
 		public MINFO(string Name, TYPE Type, CLASS Class, uint Ttl, Stream Data)
 			: base(Name, Type, Class, Ttl)
 		{
-			this.rMailBx = DnsResolver.ReadName(Data);
-			this.eMailBx = DnsResolver.ReadName(Data);
+			this.rMailBx = DnsClient.ReadName(Data);
+			this.eMailBx = DnsClient.ReadName(Data);
 		}
 
 		/// <summary>

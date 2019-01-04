@@ -235,6 +235,26 @@
             State object
             </summary>
         </member>
+        <member name="T:Waher.Networking.DNS.Communication.DnsQuery">
+            <summary>
+            Stored DNS Query
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.DNS.Communication.DnsQuery.#ctor">
+            <summary>
+            Stored DNS Query
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.DNS.Communication.DnsQuery.Name">
+            <summary>
+            Domain name
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.DNS.Communication.DnsQuery.Type">
+            <summary>
+            Question TYPE
+            </summary>
+        </member>
         <member name="T:Waher.Networking.DNS.Communication.DnsUdpClient">
             <summary>
             Implements a DNS UDP-based client.

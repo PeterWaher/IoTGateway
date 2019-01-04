@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using Waher.Networking.DNS.Communication;
 using Waher.Networking.DNS.Enumerations;
 using Waher.Persistence.Attributes;
 
@@ -35,8 +36,8 @@ namespace Waher.Networking.DNS.ResourceRecords
 		public MX(string Name, TYPE Type, CLASS Class, uint Ttl, Stream Data)
 			: base(Name, Type, Class, Ttl)
 		{
-			this.preference = DnsResolver.ReadUInt16(Data);
-			this.exchange = DnsResolver.ReadName(Data);
+			this.preference = DnsClient.ReadUInt16(Data);
+			this.exchange = DnsClient.ReadName(Data);
 		}
 
 		/// <summary>

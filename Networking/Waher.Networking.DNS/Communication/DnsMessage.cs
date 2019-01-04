@@ -32,7 +32,7 @@ namespace Waher.Networking.DNS.Communication
 		{
 			using (MemoryStream ms = new MemoryStream(Data))
 			{
-				this.id = DnsResolver.ReadUInt16(ms);
+				this.id = DnsClient.ReadUInt16(ms);
 
 				byte b = (byte)ms.ReadByte();
 				this.response = (b & 0x80) != 0;
@@ -45,26 +45,26 @@ namespace Waher.Networking.DNS.Communication
 				this.recursionAvailable = (b & 128) != 0;
 				this.rCode = (RCode)(b & 31);
 
-				ushort QDCOUNT = DnsResolver.ReadUInt16(ms);
-				ushort ANCOUNT = DnsResolver.ReadUInt16(ms);
-				ushort NSCOUNT = DnsResolver.ReadUInt16(ms);
-				ushort ARCOUNT = DnsResolver.ReadUInt16(ms);
+				ushort QDCOUNT = DnsClient.ReadUInt16(ms);
+				ushort ANCOUNT = DnsClient.ReadUInt16(ms);
+				ushort NSCOUNT = DnsClient.ReadUInt16(ms);
+				ushort ARCOUNT = DnsClient.ReadUInt16(ms);
 
 				this.questions = new Question[QDCOUNT];
 				ushort i;
 
 				for (i = 0; i < QDCOUNT; i++)
 				{
-					string QNAME = DnsResolver.ReadName(ms);
-					QTYPE QTYPE = (QTYPE)DnsResolver.ReadUInt16(ms);
-					QCLASS QCLASS = (QCLASS)DnsResolver.ReadUInt16(ms);
+					string QNAME = DnsClient.ReadName(ms);
+					QTYPE QTYPE = (QTYPE)DnsClient.ReadUInt16(ms);
+					QCLASS QCLASS = (QCLASS)DnsClient.ReadUInt16(ms);
 
 					this.questions[i] = new Question(QNAME, QTYPE, QCLASS);
 				}
 
-				this.answer = DnsResolver.ReadResourceRecords(ms, ANCOUNT);
-				this.authority = DnsResolver.ReadResourceRecords(ms, NSCOUNT);
-				this.additional = DnsResolver.ReadResourceRecords(ms, ARCOUNT);
+				this.answer = DnsClient.ReadResourceRecords(ms, ANCOUNT);
+				this.authority = DnsClient.ReadResourceRecords(ms, NSCOUNT);
+				this.additional = DnsClient.ReadResourceRecords(ms, ARCOUNT);
 			}
 		}
 

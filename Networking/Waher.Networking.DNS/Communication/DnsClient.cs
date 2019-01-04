@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net;
-using System.Net.NetworkInformation;
-using System.Net.Sockets;
 using System.IO;
+using System.Net;
+using System.Text;
 using System.Threading.Tasks;
 using Waher.Events;
+using Waher.Networking.DNS.Communication;
 using Waher.Networking.DNS.Enumerations;
 using Waher.Networking.DNS.ResourceRecords;
 using Waher.Networking.Sniffers;
@@ -208,7 +208,7 @@ namespace Waher.Networking.DNS.Communication
 			{
 				ushort ID = DnsResolver.NextID;
 
-				DnsResolver.WriteUInt16(ID, Request);
+				DnsClient.WriteUInt16(ID, Request);
 
 				byte b = (byte)((int)OpCode.Query << 3);
 				if (Recursive)
@@ -224,18 +224,18 @@ namespace Waher.Networking.DNS.Communication
 				if (c > ushort.MaxValue)
 					throw new ArgumentException("Too many questions in request.", nameof(Questions));
 
-				DnsResolver.WriteUInt16((ushort)c, Request);    // Query Count
-				DnsResolver.WriteUInt16(0, Request);            // Answer Count
-				DnsResolver.WriteUInt16(0, Request);            // Authoritative Count
-				DnsResolver.WriteUInt16(0, Request);            // Additional Count
+				DnsClient.WriteUInt16((ushort)c, Request);    // Query Count
+				DnsClient.WriteUInt16(0, Request);            // Answer Count
+				DnsClient.WriteUInt16(0, Request);            // Authoritative Count
+				DnsClient.WriteUInt16(0, Request);            // Additional Count
 
 				Dictionary<string, ushort> NamePositions = new Dictionary<string, ushort>();
 
 				foreach (Question Q in Questions)
 				{
-					DnsResolver.WriteName(Q.QNAME, Request, NamePositions);
-					DnsResolver.WriteUInt16((ushort)Q.QTYPE, Request);
-					DnsResolver.WriteUInt16((ushort)Q.QCLASS, Request);
+					DnsClient.WriteName(Q.QNAME, Request, NamePositions);
+					DnsClient.WriteUInt16((ushort)Q.QTYPE, Request);
+					DnsClient.WriteUInt16((ushort)Q.QCLASS, Request);
 				}
 
 				byte[] Packet = Request.ToArray();
@@ -363,6 +363,152 @@ namespace Waher.Networking.DNS.Communication
 				Questions[i] = new Question(QNAME, QTYPEs[i], QCLASS);
 
 			return Questions;
+		}
+
+		internal static uint ReadUInt32(Stream Data)
+		{
+			ushort Result = ReadUInt16(Data);
+			Result <<= 16;
+			Result |= ReadUInt16(Data);
+
+			return Result;
+		}
+
+		internal static ushort ReadUInt16(Stream Data)
+		{
+			ushort Result = (byte)Data.ReadByte();
+			Result <<= 8;
+			Result |= (byte)Data.ReadByte();
+
+			return Result;
+		}
+
+		internal static string ReadName(Stream Data)
+		{
+			StringBuilder sb = null;
+			string s;
+			bool Continue = true;
+
+			while (Continue)
+			{
+				int Len = Data.ReadByte();
+				if (Len == 0)
+					break;
+
+				switch (Len & 192)
+				{
+					case 0:
+						byte[] Bin = new byte[Len];
+						Data.Read(Bin, 0, Len);
+
+						s = Encoding.ASCII.GetString(Bin);
+						break;
+
+					case 192:
+						ushort Offset = (byte)(Len & 63);
+						Offset <<= 8;
+						Offset |= (byte)(Data.ReadByte());
+
+						long Bak = Data.Position;
+
+						Data.Position = Offset;
+
+						s = ReadName(Data);
+
+						Data.Position = Bak;
+						Continue = false;
+						break;
+
+					default:
+						throw new NotSupportedException("Unsupported Label Type.");
+				}
+
+				if (sb is null)
+					sb = new StringBuilder();
+				else
+					sb.Append('.');
+
+				sb.Append(s);
+			}
+
+			return sb?.ToString() ?? string.Empty;
+		}
+
+		internal static string ReadString(Stream Data)
+		{
+			int Len = Data.ReadByte();
+			if (Len == 0)
+				return string.Empty;
+
+			byte[] Bin = new byte[Len];
+			Data.Read(Bin, 0, Len);
+
+			return Encoding.ASCII.GetString(Bin);
+		}
+
+		internal static ResourceRecord[] ReadResourceRecords(Stream Data, ushort Count)
+		{
+			List<ResourceRecord> Result = new List<ResourceRecord>();
+			ResourceRecord Rec;
+
+			while (Count > 0)
+			{
+				Count--;
+				Rec = ResourceRecord.Create(Data);
+
+				if (!(Rec is null))
+					Result.Add(Rec);
+			}
+
+			return Result.ToArray();
+		}
+
+		internal static void WriteName(string Name, Stream Output,
+			Dictionary<string, ushort> NamePositions)
+		{
+			while (!string.IsNullOrEmpty(Name))
+			{
+				if (NamePositions.TryGetValue(Name, out ushort Pos))
+				{
+					byte b = (byte)(Pos >> 8);
+					b |= 0xc0;
+
+					Output.WriteByte(b);
+					Output.WriteByte((byte)(Pos & 0xff));
+					return;
+				}
+				else
+				{
+					NamePositions[Name] = (ushort)Output.Position;
+
+					int i = Name.IndexOf('.');
+					string Label;
+
+					if (i < 0)
+					{
+						Label = Name;
+						Name = string.Empty;
+					}
+					else
+					{
+						Label = Name.Substring(0, i);
+						Name = Name.Substring(i + 1);
+					}
+
+					Output.WriteByte((byte)Label.Length);
+
+					byte[] Bin = Encoding.ASCII.GetBytes(Label);
+					Output.Write(Bin, 0, Bin.Length);
+				}
+			}
+
+			Output.WriteByte(0);
+		}
+
+		internal static void WriteUInt16(ushort Value, Stream Output)
+		{
+			Output.WriteByte((byte)(Value >> 8));
+			Output.WriteByte((byte)Value);
 		}
 
 	}

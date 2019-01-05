@@ -70,7 +70,12 @@ namespace Waher.Networking.DNS.Test
 		[TestMethod]
 		public async Task Test_05_Resolve_Mail_Exchange()
 		{
-			string[] ExchangeHosts = await DnsResolver.LookupMailExchange("hotmail.com");
+			await this.TestExchange("hotmail.com");
+		}
+
+		private async Task TestExchange(string Domain)
+		{
+			string[] ExchangeHosts = await DnsResolver.LookupMailExchange(Domain);
 			foreach (string ExchangeHost in ExchangeHosts)
 			{
 				Console.Out.WriteLine(ExchangeHost);
@@ -84,15 +89,7 @@ namespace Waher.Networking.DNS.Test
 		[TestMethod]
 		public async Task Test_06_Resolve_Mail_Exchange_2()
 		{
-			string[] ExchangeHosts = await DnsResolver.LookupMailExchange("gmail.com");
-			foreach (string ExchangeHost in ExchangeHosts)
-			{
-				Console.Out.WriteLine(ExchangeHost);
-
-				IPAddress[] Addresses = await DnsResolver.LookupIP4Addresses(ExchangeHost);
-				foreach (IPAddress Address in Addresses)
-					Console.Out.WriteLine(Address);
-			}
+			await this.TestExchange("gmail.com");
 		}
 
 		[TestMethod]
@@ -132,6 +129,18 @@ namespace Waher.Networking.DNS.Test
 			IPAddress[] Addresses = await DnsResolver.LookupIP4Addresses("bücher.com");
 			foreach (IPAddress Address in Addresses)
 				Console.Out.WriteLine(Address);
+		}
+
+		[TestMethod]
+		public async Task Test_12_Resolve_Mail_Exchange_3()
+		{
+			await this.TestExchange("waher.se");
+		}
+
+		[TestMethod]
+		public async Task Test_13_Resolve_Mail_Exchange_4()
+		{
+			await this.TestExchange("extas.is");
 		}
 	}
 }

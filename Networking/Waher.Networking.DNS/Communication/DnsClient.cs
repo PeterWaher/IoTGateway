@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Net;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Events;
@@ -10,6 +12,7 @@ using Waher.Networking.DNS.Enumerations;
 using Waher.Networking.DNS.ResourceRecords;
 using Waher.Networking.Sniffers;
 using Waher.Runtime.Cache;
+using Waher.Runtime.Inventory;
 using Waher.Runtime.Timing;
 
 namespace Waher.Networking.DNS.Communication
@@ -28,6 +31,11 @@ namespace Waher.Networking.DNS.Communication
 		/// If the object has been disposed
 		/// </summary>
 		protected bool disposed = false;
+
+		private static object idnMapping = null;
+		private static MethodInfo getAscii = null;
+		private static MethodInfo getUnicode = null;
+		private static bool initialized = false;
 
 		private readonly Dictionary<ushort, Rec> outgoingMessages = new Dictionary<ushort, Rec>();
 		private readonly Random gen = new Random();
@@ -396,6 +404,9 @@ namespace Waher.Networking.DNS.Communication
 
 		internal static string ReadName(Stream Data)
 		{
+			if (!initialized)
+				Initialize();
+
 			StringBuilder sb = null;
 			string s;
 			bool Continue = true;
@@ -413,6 +424,10 @@ namespace Waher.Networking.DNS.Communication
 						Data.Read(Bin, 0, Len);
 
 						s = Encoding.ASCII.GetString(Bin);
+
+						if (!(getUnicode is null))
+							s = (string)getUnicode.Invoke(idnMapping, new object[] { s });
+
 						break;
 
 					case 192:
@@ -477,6 +492,9 @@ namespace Waher.Networking.DNS.Communication
 		internal static void WriteName(string Name, Stream Output,
 			Dictionary<string, ushort> NamePositions)
 		{
+			if (!initialized)
+				Initialize();
+
 			while (!string.IsNullOrEmpty(Name))
 			{
 				if (NamePositions.TryGetValue(Name, out ushort Pos))
@@ -506,6 +524,9 @@ namespace Waher.Networking.DNS.Communication
 						Name = Name.Substring(i + 1);
 					}
 
+					if (!(getAscii is null))
+						Label = (string)getAscii.Invoke(idnMapping, new object[] { Label });
+					
 					Output.WriteByte((byte)Label.Length);
 
 					byte[] Bin = Encoding.ASCII.GetBytes(Label);
@@ -520,6 +541,26 @@ namespace Waher.Networking.DNS.Communication
 		{
 			Output.WriteByte((byte)(Value >> 8));
 			Output.WriteByte((byte)Value);
+		}
+
+		private static void Initialize()
+		{
+			initialized = true;
+			Type T = Types.GetType("System.Globalization.IdnMapping");
+			if (T is null)
+			{
+				idnMapping = null;
+				getAscii = null;
+				getUnicode = null;
+			}
+			else
+			{
+				Type[] Parameters = new Type[] { typeof(string) };
+
+				idnMapping = Activator.CreateInstance(T);
+				getAscii = T.GetRuntimeMethod("GetAscii", Parameters);
+				getUnicode = T.GetRuntimeMethod("GetUnicode", Parameters);
+			}
 		}
 
 	}

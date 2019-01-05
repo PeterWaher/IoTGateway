@@ -125,5 +125,13 @@ namespace Waher.Networking.DNS.Test
 			foreach (SRV SRV in Endpoints)
 				Console.Out.WriteLine(SRV.ToString());
 		}
+
+		[TestMethod]
+		public async Task Test_11_International_Domain_Names()
+		{
+			IPAddress[] Addresses = await DnsResolver.LookupIP4Addresses("bücher.com");
+			foreach (IPAddress Address in Addresses)
+				Console.Out.WriteLine(Address);
+		}
 	}
 }

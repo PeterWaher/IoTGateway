@@ -60,6 +60,9 @@ namespace Waher.Networking.DNS.Communication
 			set => this.type = value;
 		}
 
+		/// <summary>
+		/// Question CLASS
+		/// </summary>
 		[DefaultValue(QCLASS.IN)]
 		public QCLASS Class
 		{
@@ -67,6 +70,9 @@ namespace Waher.Networking.DNS.Communication
 			set => this._class = value;
 		}
 
+		/// <summary>
+		/// When record expires
+		/// </summary>
 		[DefaultValueDateTimeMinValue]
 		public DateTime Expires
 		{
@@ -74,6 +80,9 @@ namespace Waher.Networking.DNS.Communication
 			set => this.expires = value;
 		}
 
+		/// <summary>
+		/// Answer resource records
+		/// </summary>
 		[DefaultValueNull]
 		public ResourceRecord[] Answer
 		{
@@ -81,6 +90,9 @@ namespace Waher.Networking.DNS.Communication
 			set => this.answer = value;
 		}
 
+		/// <summary>
+		/// Authority resource records
+		/// </summary>
 		[DefaultValueNull]
 		public ResourceRecord[] Authority
 		{
@@ -88,6 +100,9 @@ namespace Waher.Networking.DNS.Communication
 			set => this.authority = value;
 		}
 
+		/// <summary>
+		/// Additional resource records
+		/// </summary>
 		[DefaultValueNull]
 		public ResourceRecord[] Additional
 		{

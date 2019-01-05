@@ -94,7 +94,7 @@ namespace Waher.Networking.Sniffers
 		}
 
 		/// <summary>
-		/// <see cref="ISniffable.GetEnumerator()"/>
+		/// Gets a typed enumerator.
 		/// </summary>
 		public IEnumerator<ISniffer> GetEnumerator()
 		{
@@ -102,7 +102,7 @@ namespace Waher.Networking.Sniffers
 		}
 
 		/// <summary>
-		/// <see cref="ISniffable.GetEnumerator()"/>
+		/// Gets an untyped enumerator.
 		/// </summary>
 		IEnumerator IEnumerable.GetEnumerator()
 		{

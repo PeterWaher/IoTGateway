@@ -269,6 +269,31 @@
             Question TYPE
             </summary>
         </member>
+        <member name="P:Waher.Networking.DNS.Communication.DnsResponse.Class">
+            <summary>
+            Question CLASS
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.DNS.Communication.DnsResponse.Expires">
+            <summary>
+            When record expires
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.DNS.Communication.DnsResponse.Answer">
+            <summary>
+            Answer resource records
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.DNS.Communication.DnsResponse.Authority">
+            <summary>
+            Authority resource records
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.DNS.Communication.DnsResponse.Additional">
+            <summary>
+            Additional resource records
+            </summary>
+        </member>
         <member name="T:Waher.Networking.DNS.Communication.DnsUdpClient">
             <summary>
             Implements a DNS UDP-based client.

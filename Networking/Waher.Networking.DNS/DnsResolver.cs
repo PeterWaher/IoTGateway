@@ -545,12 +545,12 @@ namespace Waher.Networking.DNS
 		/// Looks up an IP Address in a DNS Block List.
 		/// </summary>
 		/// <param name="Address">IP Address</param>
-		/// <param name="BlockListDomainName">Block List Domain Name.</param>
+		/// <param name="BlackListDomainName">Black List Domain Name.</param>
 		/// <returns>null, if IP Address is NOT on list. Otherwise, it contains the reasons why it is on the list.</returns>
 		/// <exception cref="ArgumentOutOfRangeException">IP Address not supported.</exception>
-		public static async Task<string[]> LookupBlockList(IPAddress Address, string BlockListDomainName)
+		public static async Task<string[]> LookupBlackList(IPAddress Address, string BlackListDomainName)
 		{
-			string Name = AddressToName(Address, BlockListDomainName, null);
+			string Name = AddressToName(Address, BlackListDomainName, null);
 			ResourceRecord[] As;
 
 			try

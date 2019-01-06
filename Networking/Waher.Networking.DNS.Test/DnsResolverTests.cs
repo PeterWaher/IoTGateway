@@ -152,14 +152,14 @@ namespace Waher.Networking.DNS.Test
 		[TestMethod]
 		public async Task Test_15_Resolve_DNSBL_Lookup_OK_IP()
 		{
-			string[] Reasons = await DnsResolver.LookupBlockList(IPAddress.Parse("194.9.95.112"), "zen.spamhaus.org");
+			string[] Reasons = await DnsResolver.LookupBlackList(IPAddress.Parse("194.9.95.112"), "zen.spamhaus.org");
 			Assert.IsNull(Reasons);
 		}
 
 		[TestMethod]
 		public async Task Test_16_Resolve_DNSBL_Lookup_Spam_IP()
 		{
-			string[] Reasons = await DnsResolver.LookupBlockList(IPAddress.Parse("208.109.80.60"), "zen.spamhaus.org");
+			string[] Reasons = await DnsResolver.LookupBlackList(IPAddress.Parse("179.49.7.95"), "zen.spamhaus.org");
 			Assert.IsNotNull(Reasons);
 			foreach (string Reason in Reasons)
 				Console.Out.WriteLine(Reason);

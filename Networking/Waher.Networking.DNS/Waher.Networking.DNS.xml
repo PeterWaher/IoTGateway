@@ -358,6 +358,7 @@
             RFC 1035: https://tools.ietf.org/html/rfc1035: DOMAIN NAMES - IMPLEMENTATION AND SPECIFICATION
             RFC 2782: https://tools.ietf.org/html/rfc2782: A DNS RR for specifying the location of services (DNS SRV)
             RFC 3596: https://tools.ietf.org/html/rfc3596: DNS Extensions to Support IP Version 6
+            RFC 5782: https://tools.ietf.org/html/rfc5782: DNS Blacklists and Whitelists
             </summary>
         </member>
         <member name="F:Waher.Networking.DNS.DnsResolver.DefaultDnsPort">
@@ -438,6 +439,15 @@
             </summary>
             <param name="Address">IP Address</param>
             <returns>Domain Name pointing to the address</returns>
+        </member>
+        <member name="M:Waher.Networking.DNS.DnsResolver.LookupBlockList(System.Net.IPAddress,System.String)">
+            <summary>
+            Looks up an IP Address in a DNS Block List.
+            </summary>
+            <param name="Address">IP Address</param>
+            <param name="BlockListDomainName">Block List Domain Name.</param>
+            <returns>null, if IP Address is NOT on list. Otherwise, it contains the reasons why it is on the list.</returns>
+            <exception cref="T:System.ArgumentOutOfRangeException">IP Address not supported.</exception>
         </member>
         <member name="M:Waher.Networking.DNS.DnsResolver.LookupServiceEndpoint(System.String,System.String,System.String)">
             <summary>

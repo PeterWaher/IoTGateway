@@ -21,6 +21,7 @@ namespace Waher.Networking.DNS
 	/// RFC 1035: https://tools.ietf.org/html/rfc1035: DOMAIN NAMES - IMPLEMENTATION AND SPECIFICATION
 	/// RFC 2782: https://tools.ietf.org/html/rfc2782: A DNS RR for specifying the location of services (DNS SRV)
 	/// RFC 3596: https://tools.ietf.org/html/rfc3596: DNS Extensions to Support IP Version 6
+	/// RFC 5782: https://tools.ietf.org/html/rfc5782: DNS Blacklists and Whitelists
 	/// </summary>
 	public static class DnsResolver
 	{
@@ -459,28 +460,36 @@ namespace Waher.Networking.DNS
 			return Result;
 		}
 
-		/// <summary>
-		/// Looks up the domain name pointing to a specific IP address.
-		/// 
-		/// Note: The response is not necessarily unique or authoritative.
-		/// </summary>
-		/// <param name="Address">IP Address</param>
-		/// <returns>Domain Name pointing to the address</returns>
-		public static async Task<string[]> LookupDomainName(IPAddress Address)
+		public static string AddressToName(IPAddress Address, string IP4DomainName, string IP6DomainName)
 		{
 			byte[] Bin = Address.GetAddressBytes();
-			string Name;
 
 			switch (Bin.Length)
 			{
 				case 4:
-					Name = Address.ToString() + ".IN-ADDR.ARPA";
-					break;
+					if (string.IsNullOrEmpty(IP4DomainName))
+						throw new ArgumentOutOfRangeException("IPv4 addresses not supported.");
 
-				case 16:
 					StringBuilder sb = new StringBuilder();
 					int i;
+
+					for (i = 3; i >= 0; i--)
+					{
+						sb.Append(Bin[i].ToString());
+						sb.Append('.');
+					}
+
+					sb.Append(IP4DomainName);
+
+					return sb.ToString();
+
+				case 16:
+					if (string.IsNullOrEmpty(IP6DomainName))
+						throw new ArgumentOutOfRangeException("IPv6 addresses not supported.");
+
 					byte b, b2;
+
+					sb = new StringBuilder();
 
 					for (i = 15; i >= 0; i--)
 					{
@@ -501,14 +510,26 @@ namespace Waher.Networking.DNS
 
 						sb.Append('.');
 					}
-					sb.Append("IP6.ARPA");
-					Name = sb.ToString();
-					break;
+
+					sb.Append(IP6DomainName);
+
+					return sb.ToString();
 
 				default:
-					throw new ArgumentException("Unrecognized IP address.", nameof(Address));
+					throw new ArgumentOutOfRangeException("Unrecognized IP address.", nameof(Address));
 			}
+		}
 
+		/// <summary>
+		/// Looks up the domain name pointing to a specific IP address.
+		/// 
+		/// Note: The response is not necessarily unique or authoritative.
+		/// </summary>
+		/// <param name="Address">IP Address</param>
+		/// <returns>Domain Name pointing to the address</returns>
+		public static async Task<string[]> LookupDomainName(IPAddress Address)
+		{
+			string Name = AddressToName(Address, "IN-ADDR.ARPA", "IP6.ARPA");
 			List<string> Result = new List<string>();
 
 			foreach (ResourceRecord RR in await Resolve(Name, QTYPE.PTR, QCLASS.IN))
@@ -518,6 +539,64 @@ namespace Waher.Networking.DNS
 			}
 
 			return Result.ToArray();
+		}
+
+		/// <summary>
+		/// Looks up an IP Address in a DNS Block List.
+		/// </summary>
+		/// <param name="Address">IP Address</param>
+		/// <param name="BlockListDomainName">Block List Domain Name.</param>
+		/// <returns>null, if IP Address is NOT on list. Otherwise, it contains the reasons why it is on the list.</returns>
+		/// <exception cref="ArgumentOutOfRangeException">IP Address not supported.</exception>
+		public static async Task<string[]> LookupBlockList(IPAddress Address, string BlockListDomainName)
+		{
+			string Name = AddressToName(Address, BlockListDomainName, null);
+			ResourceRecord[] As;
+
+			try
+			{
+				As = await Resolve(Name, QTYPE.A, QCLASS.IN);
+			}
+			catch (ArgumentException)
+			{
+				return null;
+			}
+
+			List<string> Result = null;
+
+			try
+			{
+				foreach (ResourceRecord RR in await Resolve(Name, QTYPE.TXT, QCLASS.IN))
+				{
+					if (RR is TXT TXT)
+					{
+						if (Result is null)
+							Result = new List<string>();
+
+						Result.AddRange(TXT.Text);
+					}
+				}
+
+				if (!(Result is null))
+					return Result.ToArray();
+			}
+			catch (Exception)
+			{
+				// Ignore
+			}
+
+			foreach (ResourceRecord RR in As)
+			{
+				if (RR is A A)
+				{
+					if (Result is null)
+						Result = new List<string>();
+
+					Result.Add(A.Address.ToString());
+				}
+			}
+
+			return Result?.ToArray();
 		}
 
 		/// <summary>

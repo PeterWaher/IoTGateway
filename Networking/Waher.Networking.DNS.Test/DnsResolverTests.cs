@@ -142,5 +142,27 @@ namespace Waher.Networking.DNS.Test
 		{
 			await this.TestExchange("extas.is");
 		}
+
+		[TestMethod]
+		public async Task Test_14_Resolve_Mail_Exchange_5()
+		{
+			await this.TestExchange("littlesister.se");
+		}
+
+		[TestMethod]
+		public async Task Test_15_Resolve_DNSBL_Lookup_OK_IP()
+		{
+			string[] Reasons = await DnsResolver.LookupBlockList(IPAddress.Parse("194.9.95.112"), "zen.spamhaus.org");
+			Assert.IsNull(Reasons);
+		}
+
+		[TestMethod]
+		public async Task Test_16_Resolve_DNSBL_Lookup_Spam_IP()
+		{
+			string[] Reasons = await DnsResolver.LookupBlockList(IPAddress.Parse("208.109.80.60"), "zen.spamhaus.org");
+			Assert.IsNotNull(Reasons);
+			foreach (string Reason in Reasons)
+				Console.Out.WriteLine(Reason);
+		}
 	}
 }

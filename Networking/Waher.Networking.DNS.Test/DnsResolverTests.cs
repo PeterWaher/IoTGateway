@@ -164,5 +164,29 @@ namespace Waher.Networking.DNS.Test
 			foreach (string Reason in Reasons)
 				Console.Out.WriteLine(Reason);
 		}
+
+		[TestMethod]
+		public async Task Test_17_Resolve_Reverse_IP4_Lookup()
+		{
+			string[] DomainNames = await DnsResolver.LookupDomainName(IPAddress.Parse("90.224.165.60"));
+			foreach (string DomainName in DomainNames)
+				Console.Out.WriteLine(DomainName);
+		}
+
+		[TestMethod]
+		public async Task Test_18_Resolve_TXT()
+		{
+			string[] Text = await DnsResolver.LookupText("hotmail.com");
+			foreach (string Row in Text)
+				Console.Out.WriteLine(Row);
+		}
+
+		[TestMethod]
+		public async Task Test_19_Resolve_TXT_2()
+		{
+			string[] Text = await DnsResolver.LookupText("waher.se");
+			foreach (string Row in Text)
+				Console.Out.WriteLine(Row);
+		}
 	}
 }

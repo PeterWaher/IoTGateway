@@ -431,6 +431,16 @@
             <exception cref="T:System.ArgumentException">If the name does not exist.</exception>
             <exception cref="T:System.IO.IOException">If the name could not be resolved.</exception>
         </member>
+        <member name="M:Waher.Networking.DNS.DnsResolver.AddressToName(System.Net.IPAddress,System.String,System.String)">
+            <summary>
+            Converts an IP Address to a domain name for reverse IP lookup, or DNSBL lookup.
+            </summary>
+            <param name="Address">IP Address</param>
+            <param name="IP4DomainName">IP4 Domain Name</param>
+            <param name="IP6DomainName">IP6 Domain Name</param>
+            <returns>Domain Name representing IP address.</returns>
+            <exception cref="T:System.ArgumentOutOfRangeException">If Address Type does not have a corresponding domain name.</exception>
+        </member>
         <member name="M:Waher.Networking.DNS.DnsResolver.LookupDomainName(System.Net.IPAddress)">
             <summary>
             Looks up the domain name pointing to a specific IP address.
@@ -440,12 +450,19 @@
             <param name="Address">IP Address</param>
             <returns>Domain Name pointing to the address</returns>
         </member>
-        <member name="M:Waher.Networking.DNS.DnsResolver.LookupBlockList(System.Net.IPAddress,System.String)">
+        <member name="M:Waher.Networking.DNS.DnsResolver.LookupText(System.String)">
+            <summary>
+            Looks up text (TXT) records for a name.
+            </summary>
+            <param name="Name">Domain name.</param>
+            <returns>Available text.</returns>
+        </member>
+        <member name="M:Waher.Networking.DNS.DnsResolver.LookupBlackList(System.Net.IPAddress,System.String)">
             <summary>
             Looks up an IP Address in a DNS Block List.
             </summary>
             <param name="Address">IP Address</param>
-            <param name="BlockListDomainName">Block List Domain Name.</param>
+            <param name="BlackListDomainName">Black List Domain Name.</param>
             <returns>null, if IP Address is NOT on list. Otherwise, it contains the reasons why it is on the list.</returns>
             <exception cref="T:System.ArgumentOutOfRangeException">IP Address not supported.</exception>
         </member>

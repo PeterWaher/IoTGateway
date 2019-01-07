@@ -550,6 +550,24 @@ namespace Waher.Networking.DNS
 		}
 
 		/// <summary>
+		/// Looks up text (TXT) records for a name.
+		/// </summary>
+		/// <param name="Name">Domain name.</param>
+		/// <returns>Available text.</returns>
+		public static async Task<string[]> LookupText(string Name)
+		{
+			List<string> Result = new List<string>();
+
+			foreach (ResourceRecord RR in await Resolve(Name, QTYPE.TXT, QCLASS.IN))
+			{
+				if (RR is TXT TXT)
+					Result.AddRange(TXT.Text);
+			}
+
+			return Result.ToArray();
+		}
+
+		/// <summary>
 		/// Looks up an IP Address in a DNS Block List.
 		/// </summary>
 		/// <param name="Address">IP Address</param>

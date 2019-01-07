@@ -460,6 +460,14 @@ namespace Waher.Networking.DNS
 			return Result;
 		}
 
+		/// <summary>
+		/// Converts an IP Address to a domain name for reverse IP lookup, or DNSBL lookup.
+		/// </summary>
+		/// <param name="Address">IP Address</param>
+		/// <param name="IP4DomainName">IP4 Domain Name</param>
+		/// <param name="IP6DomainName">IP6 Domain Name</param>
+		/// <returns>Domain Name representing IP address.</returns>
+		/// <exception cref="ArgumentOutOfRangeException">If Address Type does not have a corresponding domain name.</exception>
 		public static string AddressToName(IPAddress Address, string IP4DomainName, string IP6DomainName)
 		{
 			byte[] Bin = Address.GetAddressBytes();

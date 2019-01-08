@@ -27,7 +27,7 @@ namespace Waher.Networking.DNS.SPF
 		/// <param name="HelloDomain">Domain as presented by the client in the HELO or EHLO command.</param>
 		/// <param name="HostDomain">Domain of the current host, performing SPF authentication.</param>
 		/// <returns>Result of SPF evaluation, together with an optional explanation string,
-		/// if one exists, and the result indicates a failure.</returns>
+		/// if one exists, and if the result indicates a failure.</returns>
 		public static Task<KeyValuePair<SpfResult, string>> CheckHost(IPAddress Address, string DomainName, string Sender,
 			string HelloDomain, string HostDomain)
 		{
@@ -42,7 +42,7 @@ namespace Waher.Networking.DNS.SPF
 		/// </summary>
 		/// <param name="Term">Information about current query.</param>
 		/// <returns>Result of SPF evaluation, together with an optional explanation string,
-		/// if one exists, and the result indicates a failure.</returns>
+		/// if one exists, and if the result indicates a failure.</returns>
 		internal static async Task<KeyValuePair<SpfResult, string>> CheckHost(Term Term)
 		{
 			Exp Explanation = null;

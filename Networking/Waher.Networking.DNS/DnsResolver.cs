@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Waher.Networking.DNS.Communication;
 using Waher.Networking.DNS.Enumerations;
 using Waher.Networking.DNS.ResourceRecords;
+using Waher.Networking.DNS.SPF;
 using Waher.Persistence;
 using Waher.Persistence.Filters;
 
@@ -22,6 +23,9 @@ namespace Waher.Networking.DNS
 	/// RFC 2782: https://tools.ietf.org/html/rfc2782: A DNS RR for specifying the location of services (DNS SRV)
 	/// RFC 3596: https://tools.ietf.org/html/rfc3596: DNS Extensions to Support IP Version 6
 	/// RFC 5782: https://tools.ietf.org/html/rfc5782: DNS Blacklists and Whitelists
+	/// RFC 7208: https://tools.ietf.org/html/rfc7208: Sender Policy Framework (SPF) for Authorizing Use of Domains in Email, Version 1
+
+
 	/// </summary>
 	public static class DnsResolver
 	{
@@ -737,5 +741,26 @@ namespace Waher.Networking.DNS
 				return rnd.Next(MaxValue);
 			}
 		}
+
+		/// <summary>
+		/// Checks if a client is authorized to operate under a given domain name. This is done by evaluating
+		/// SPF records for the domain, in accordance with:
+		/// 
+		/// RFC 7208: https://tools.ietf.org/html/rfc7208: Sender Policy Framework (SPF) for Authorizing Use of Domains
+		/// </summary>
+		/// <param name="Address">the IP address of the client that wants to operate under a given domain.</param>
+		/// <param name="DomainName">The domain that provides the sought-after authorization information; initially, 
+		/// the domain portion of the "MAIL FROM" or "HELO" identity (for SMTP).</param>
+		/// <param name="Sender">The claimed sender (in SMTO: the "MAIL FROM" or "HELO" identity).</param>
+		/// <param name="HelloDomain">Domain as presented by the client during initial hndshake (in SMTP, the HELO or EHLO command).</param>
+		/// <param name="HostDomain">Domain of the current host, performing SPF authentication.</param>
+		/// <returns>Result of SPF evaluation, together with an optional explanation string,
+		/// if one exists, and if the result indicates a failure.</returns>
+		public static Task<KeyValuePair<SpfResult, string>> CheckHost(IPAddress Address, string DomainName, string Sender,
+			string HelloDomain, string HostDomain)
+		{
+			return SpfResolver.CheckHost(Address, DomainName, Sender, HelloDomain, HostDomain);
+		}
+
 	}
 }

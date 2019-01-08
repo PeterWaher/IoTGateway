@@ -8,23 +8,23 @@ using Waher.Runtime.Inventory;
 namespace Waher.Content.Multipart
 {
 	/// <summary>
-	/// Decoder of alternative data.
+	/// Decoder of mixed data.
 	/// 
 	/// http://www.w3.org/Protocols/rfc1341/7_2_Multipart.html
 	/// </summary>
-	public class AlternativeDecoder : IContentDecoder
+	public class MixedCodec : IContentDecoder
 	{
 		/// <summary>
-		/// multipart/alternative
+		/// multipart/mixed
 		/// </summary>
-		public const string ContentType = "multipart/alternative";
+		public const string ContentType = "multipart/mixed";
 
 		/// <summary>
-		/// Decoder of alternative data.
+		/// Decoder of mixed data.
 		/// 
 		/// http://www.w3.org/Protocols/rfc1341/7_2_Multipart.html
 		/// </summary>
-		public AlternativeDecoder()
+		public MixedCodec()
 		{
 		}
 
@@ -51,7 +51,7 @@ namespace Waher.Content.Multipart
 			{
 				return new string[]
 				{
-					"alternative"
+					"mixed"
 				};
 			}
 		}
@@ -64,7 +64,7 @@ namespace Waher.Content.Multipart
 		/// <returns>If the decoder can decode an object with the given type.</returns>
 		public bool Decodes(string ContentType, out Grade Grade)
 		{
-			if (ContentType == AlternativeDecoder.ContentType)
+			if (ContentType == MixedCodec.ContentType)
 			{
 				Grade = Grade.Excellent;
 				return true;
@@ -92,7 +92,7 @@ namespace Waher.Content.Multipart
 
 			FormDataDecoder.Decode(Data, Fields, null, List, BaseUri);
 
-			return new ContentAlternatives(List.ToArray());
+			return new MixedContent(List.ToArray());
 		}
 
 		/// <summary>
@@ -103,9 +103,9 @@ namespace Waher.Content.Multipart
 		/// <returns>If the extension was recognized.</returns>
 		public bool TryGetContentType(string FileExtension, out string ContentType)
 		{
-			if (FileExtension.ToLower() == "alternative")
+			if (FileExtension.ToLower() == "mixed")
 			{
-				ContentType = AlternativeDecoder.ContentType;
+				ContentType = MixedCodec.ContentType;
 				return true;
 			}
 			else
@@ -113,6 +113,50 @@ namespace Waher.Content.Multipart
 				ContentType = string.Empty;
 				return false;
 			}
+		}
+
+		/// <summary>
+		/// If the encoder encodes a given object.
+		/// </summary>
+		/// <param name="Object">Object to encode.</param>
+		/// <param name="Grade">How well the encoder encodes the object.</param>
+		/// <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
+		/// <returns>If the encoder can encode the given object.</returns>
+		public bool Encodes(object Object, out Grade Grade, params string[] AcceptedContentTypes)
+		{
+			if (Object is MixedContent &&
+				InternetContent.IsAccepted(ContentTypes, AcceptedContentTypes))
+			{
+				Grade = Grade.Ok;
+				return true;
+			}
+			else
+			{
+				Grade = Grade.NotAtAll;
+				return false;
+			}
+		}
+
+		/// <summary>
+		/// Encodes an object.
+		/// </summary>
+		/// <param name="Object">Object to encode.</param>
+		/// <param name="Encoding">Desired encoding of text. Can be null if no desired encoding is speified.</param>
+		/// <param name="ContentType">Content Type of encoding. Includes information about any text encodings used.</param>
+		/// <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
+		/// <returns>Encoded object.</returns>
+		/// <exception cref="ArgumentException">If the object cannot be encoded.</exception>
+		public byte[] Encode(object Object, Encoding Encoding, out string ContentType, params string[] AcceptedContentTypes)
+		{
+			if (Object is MixedContent Mixed &&
+				InternetContent.IsAccepted(ContentTypes, AcceptedContentTypes))
+			{
+				string Boundary = Guid.NewGuid().ToString();
+				ContentType = MixedCodec.ContentType + "; boundary=\"" + Boundary + "\"";
+				return FormDataDecoder.Encode(Mixed.Content, Boundary);
+			}
+			else
+				throw new ArgumentException("Unable to encode object, or content type not accepted.", nameof(Object));
 		}
 	}
 }

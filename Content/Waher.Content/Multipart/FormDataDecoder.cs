@@ -378,5 +378,85 @@ namespace Waher.Content.Multipart
 				return false;
 			}
 		}
+
+		/// <summary>
+		/// Encodes multi-part content
+		/// </summary>
+		/// <param name="Content">Multi-part content.</param>
+		/// <param name="Boundary">Boundary to use.</param>
+		/// <returns>Encoded multi-part content.</returns>
+		public static byte[] Encode(IEnumerable<EmbeddedContent> Content, string Boundary)
+		{
+			using (MemoryStream ms = new MemoryStream())
+			{
+				StringBuilder Header = new StringBuilder();
+
+				foreach (EmbeddedContent Alternative in Content)
+				{
+					Alternative.AssertEncoded();
+
+					Header.Clear();
+					Header.Append("\r\n--");
+					Header.Append(Boundary);
+					Header.Append("\r\nContent-Transfer-Encoding: ");
+					Header.Append(Alternative.TransferEncoding);
+					Header.Append("\r\nContent-Type: ");
+					Header.Append(Alternative.ContentType);
+
+					if (!string.IsNullOrEmpty(Alternative.Name))
+					{
+						Header.Append("; name=\"");
+						Header.Append(Alternative.Name.Replace("\"", "\\\""));
+						Header.Append("\"");
+					}
+
+					if (Alternative.Disposition != ContentDisposition.Unknown ||
+						!string.IsNullOrEmpty(Alternative.FileName))
+					{
+						Header.Append("\r\nContent-Disposition: ");
+
+						switch (Alternative.Disposition)
+						{
+							case ContentDisposition.Inline:
+								Header.Append("inline");
+								break;
+
+							case ContentDisposition.Attachment:
+							default:
+								Header.Append("attachment");
+								break;
+						}
+
+						if (!string.IsNullOrEmpty(Alternative.FileName))
+						{
+							Header.Append("; filename=\"");
+							Header.Append(Alternative.FileName.Replace("\"", "\\\""));
+							Header.Append("\"");
+						}
+					}
+
+					if (!string.IsNullOrEmpty(Alternative.ID))
+					{
+						Header.Append("\r\nContent-ID: ");
+						Header.Append(Alternative.ID);
+					}
+
+					if (!string.IsNullOrEmpty(Alternative.Description))
+					{
+						Header.Append("\r\nContent-Description: ");
+						Header.Append(Alternative.Description);
+					}
+
+					Header.Append("\r\n\r\n");
+
+					byte[] HeaderBin = Encoding.ASCII.GetBytes(Header.ToString());
+
+					ms.Write(HeaderBin, 0, HeaderBin.Length);
+					ms.Write(Alternative.Raw, 0, Alternative.Raw.Length);
+				}
+
+				return ms.ToArray();
+			}
+		}
 	}
 }

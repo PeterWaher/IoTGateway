@@ -149,5 +149,23 @@ namespace Waher.Content.Multipart
 			else
 				return base.ToString();
 		}
+
+		internal void AssertEncoded()
+		{
+			if (!(this.raw is null))
+				return;
+
+			if (this.transferDecoded is null)
+			{
+				this.transferDecoded = InternetContent.Encode(this.decoded, Encoding.UTF8, out this.contentType);
+				this.raw = null;
+			}
+
+			if (this.raw is null)
+			{
+				this.raw = Encoding.ASCII.GetBytes(Convert.ToBase64String(this.transferDecoded));
+				this.transferEncoding = "base64";
+			}
+		}
 	}
 }

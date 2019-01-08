@@ -1549,5 +1549,327 @@
             <see cref="M:System.Object.ToString"/>
             </summary>
         </member>
+        <!-- Badly formed XML comment ignored for member "T:Waher.Networking.DNS.SPF.Mechanisms.A" -->
+        <!-- Badly formed XML comment ignored for member "M:Waher.Networking.DNS.SPF.Mechanisms.A.#ctor(Waher.Networking.DNS.SPF.Term,Waher.Networking.DNS.SPF.SpfQualifier)" -->
+        <member name="T:Waher.Networking.DNS.SPF.Mechanisms.All">
+            <summary>
+            The "all" mechanism is a test that always matches.  It is used as the
+            rightmost mechanism in a record to provide an explicit default.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.DNS.SPF.Mechanisms.All.#ctor(Waher.Networking.DNS.SPF.Term,Waher.Networking.DNS.SPF.SpfQualifier)">
+            <summary>
+            The "all" mechanism is a test that always matches.  It is used as the
+            rightmost mechanism in a record to provide an explicit default.
+            </summary>
+            <param name="Term">Term</param>
+            <param name="Qualifier">Qualifier</param>
+        </member>
+        <member name="T:Waher.Networking.DNS.SPF.Mechanisms.Exists">
+            <summary>
+            This mechanism is used to construct an arbitrary domain name that is
+            used for a DNS A record query.It allows for complicated schemes
+            involving arbitrary parts of the mail envelope to determine what is
+            permitted.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.DNS.SPF.Mechanisms.Exists.#ctor(Waher.Networking.DNS.SPF.Term,Waher.Networking.DNS.SPF.SpfQualifier)">
+            <summary>
+            This mechanism is used to construct an arbitrary domain name that is
+            used for a DNS A record query.It allows for complicated schemes
+            involving arbitrary parts of the mail envelope to determine what is
+            permitted.
+            </summary>
+            <param name="Term">Term</param>
+            <param name="Qualifier">Qualifier</param>
+        </member>
+        <member name="T:Waher.Networking.DNS.SPF.Mechanisms.Exp">
+            <summary>
+            If check_host() results in a "fail" due to a mechanism match (such as
+            "-all"), and the "exp" modifier is present, then the explanation
+            string returned is computed as described below.If no "exp" modifier
+            is present, then either a default explanation string or an empty
+            explanation string MUST be returned to the calling application.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.DNS.SPF.Mechanisms.Exp.#ctor(Waher.Networking.DNS.SPF.Term,Waher.Networking.DNS.SPF.SpfQualifier)">
+            <summary>
+            If check_host() results in a "fail" due to a mechanism match (such as
+            "-all"), and the "exp" modifier is present, then the explanation
+            string returned is computed as described below.If no "exp" modifier
+            is present, then either a default explanation string or an empty
+            explanation string MUST be returned to the calling application.
+            </summary>
+            <param name="Term">Term</param>
+            <param name="Qualifier">Qualifier</param>
+        </member>
+        <member name="P:Waher.Networking.DNS.SPF.Mechanisms.Exp.Separator">
+            <summary>
+            Mechanism separator
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.DNS.SPF.Mechanisms.Include">
+            <summary>
+            The "include" mechanism triggers a recursive evaluation of check_host().
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.DNS.SPF.Mechanisms.Include.#ctor(Waher.Networking.DNS.SPF.Term,Waher.Networking.DNS.SPF.SpfQualifier)">
+            <summary>
+            The "include" mechanism triggers a recursive evaluation of check_host().
+            </summary>
+            <param name="Term">Term</param>
+            <param name="Qualifier">Qualifier</param>
+        </member>
+        <member name="T:Waher.Networking.DNS.SPF.Mechanisms.Ip">
+            <summary>
+            Abstract base class for IP-based SPF mechanisms.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.SPF.Mechanisms.Ip.address">
+            <summary>
+            IP Address
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.SPF.Mechanisms.Ip.cidr">
+            <summary>
+            CIDR
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.DNS.SPF.Mechanisms.Ip.#ctor(Waher.Networking.DNS.SPF.Term,Waher.Networking.DNS.SPF.SpfQualifier)">
+            <summary>
+            Abstract base class for IP-based SPF mechanisms.
+            </summary>
+            <param name="Term">Term</param>
+            <param name="Qualifier">Qualifier</param>
+        </member>
+        <!-- Badly formed XML comment ignored for member "T:Waher.Networking.DNS.SPF.Mechanisms.Ip4" -->
+        <!-- Badly formed XML comment ignored for member "M:Waher.Networking.DNS.SPF.Mechanisms.Ip4.#ctor(Waher.Networking.DNS.SPF.Term,Waher.Networking.DNS.SPF.SpfQualifier)" -->
+        <!-- Badly formed XML comment ignored for member "T:Waher.Networking.DNS.SPF.Mechanisms.Ip6" -->
+        <!-- Badly formed XML comment ignored for member "M:Waher.Networking.DNS.SPF.Mechanisms.Ip6.#ctor(Waher.Networking.DNS.SPF.Term,Waher.Networking.DNS.SPF.SpfQualifier)" -->
+        <member name="T:Waher.Networking.DNS.SPF.Mechanisms.Mechanism">
+            <summary>
+            Abstract base class for SPF Mechanisms.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.SPF.Mechanisms.Mechanism.qualifier">
+            <summary>
+            Qualifier
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.DNS.SPF.Mechanisms.Mechanism.#ctor(Waher.Networking.DNS.SPF.Term,Waher.Networking.DNS.SPF.SpfQualifier)">
+            <summary>
+            Abstract base class for SPF Mechanisms.
+            </summary>
+            <param name="Term">Term</param>
+            <param name="Qualifier">Qualifier</param>
+        </member>
+        <member name="T:Waher.Networking.DNS.SPF.Mechanisms.MechanismDomainCidrSpec">
+            <summary>
+            Abstract base class for SPF mechanisms with a domain specification and
+            an optional CIDR specification.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.DNS.SPF.Mechanisms.MechanismDomainCidrSpec.#ctor(Waher.Networking.DNS.SPF.Term,Waher.Networking.DNS.SPF.SpfQualifier)">
+            <summary>
+            Abstract base class for SPF mechanisms with a domain specification and
+            an optional CIDR specification.
+            </summary>
+            <param name="Term">Term</param>
+            <param name="Qualifier">Qualifier</param>
+        </member>
+        <member name="T:Waher.Networking.DNS.SPF.Mechanisms.MechanismDomainSpec">
+            <summary>
+            Abstract base class for SPF mechanisms with a domain specification.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.DNS.SPF.Mechanisms.MechanismDomainSpec.#ctor(Waher.Networking.DNS.SPF.Term,Waher.Networking.DNS.SPF.SpfQualifier)">
+            <summary>
+            Abstract base class for SPF mechanisms with a domain specification.
+            </summary>
+            <param name="Term">Term</param>
+            <param name="Qualifier">Qualifier</param>
+        </member>
+        <member name="M:Waher.Networking.DNS.SPF.Mechanisms.MechanismDomainSpec.Expand">
+            <summary>
+            Expands any macros in the domain specification.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.SPF.Mechanisms.MechanismDomainSpec.UnixEpoch">
+            <summary>
+            UNIX Epoch, started at 1970-01-01, 00:00:00 (GMT)
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.DNS.SPF.Mechanisms.MechanismDomainSpec.Separator">
+            <summary>
+            Mechanism separator
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.DNS.SPF.Mechanisms.MechanismDomainSpec.DomainRequired">
+            <summary>
+            If the domain specification is required.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.DNS.SPF.Mechanisms.MechanismDomainSpec.Domain">
+            <summary>
+            Domain specification
+            </summary>
+        </member>
+        <!-- Badly formed XML comment ignored for member "T:Waher.Networking.DNS.SPF.Mechanisms.Mx" -->
+        <!-- Badly formed XML comment ignored for member "M:Waher.Networking.DNS.SPF.Mechanisms.Mx.#ctor(Waher.Networking.DNS.SPF.Term,Waher.Networking.DNS.SPF.SpfQualifier)" -->
+        <!-- Badly formed XML comment ignored for member "T:Waher.Networking.DNS.SPF.Mechanisms.Ptr" -->
+        <!-- Badly formed XML comment ignored for member "M:Waher.Networking.DNS.SPF.Mechanisms.Ptr.#ctor(Waher.Networking.DNS.SPF.Term,Waher.Networking.DNS.SPF.SpfQualifier)" -->
+        <member name="P:Waher.Networking.DNS.SPF.Mechanisms.Ptr.DomainRequired">
+            <summary>
+            If the domain specification is required.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.DNS.SPF.Mechanisms.Redirect">
+            <summary>
+            The "redirect" modifier is intended for consolidating both
+            authorizations and policy into a common set to be shared within a
+            single ADMD.It is possible to control both authorized hosts and
+            policy for an arbitrary number of domains from a single record.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.DNS.SPF.Mechanisms.Redirect.#ctor(Waher.Networking.DNS.SPF.Term,Waher.Networking.DNS.SPF.SpfQualifier)">
+            <summary>
+            The "redirect" modifier is intended for consolidating both
+            authorizations and policy into a common set to be shared within a
+            single ADMD.It is possible to control both authorized hosts and
+            policy for an arbitrary number of domains from a single record.
+            </summary>
+            <param name="Term">Term</param>
+            <param name="Qualifier">Qualifier</param>
+        </member>
+        <member name="P:Waher.Networking.DNS.SPF.Mechanisms.Redirect.Separator">
+            <summary>
+            Mechanism separator
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.DNS.SPF.SpfResolver">
+            <summary>
+            Resolves a SPF string, as defined in:
+            
+            RFC 7208: https://tools.ietf.org/html/rfc7208: Sender Policy Framework (SPF) for Authorizing Use of Domains in Email, Version 1
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.DNS.SPF.SpfResolver.CheckHost(System.Net.IPAddress,System.String,System.String,System.String,System.String)">
+            <summary>
+            Fetches SPF records, parses them, and
+            evaluates them to determine whether a particular host is or is not
+            permitted to send mail with a given identity.
+            </summary>
+            <param name="Address">the IP address of the SMTP client that is emitting
+            the mail, either IPv4 or IPv6.</param>
+            <param name="DomainName">The domain that provides the sought-after authorization
+            information; initially, the domain portion of the
+            "MAIL FROM" or "HELO" identity.</param>
+            <param name="Sender">the "MAIL FROM" or "HELO" identity.</param>
+            <param name="HelloDomain">Domain as presented by the client in the HELO or EHLO command.</param>
+            <param name="HostDomain">Domain of the current host, performing SPF authentication.</param>
+            <returns>Result of SPF evaluation.</returns>
+        </member>
+        <member name="T:Waher.Networking.DNS.SPF.SpfResult">
+            <summary>
+            Result of a SPF (Sender Policy Framework) evaluation.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.SPF.SpfResult.None">
+            <summary>
+            A result of "none" means either (a) no syntactically valid DNS domain
+            name was extracted from the SMTP session that could be used as the
+            one to be authorized, or (b) no SPF records were retrieved from
+            the DNS.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.SPF.SpfResult.Neutral">
+            <summary>
+            A "neutral" result means the ADMD has explicitly stated that it is
+            not asserting whether the IP address is authorized.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.SPF.SpfResult.Pass">
+            <summary>
+             A "pass" result is an explicit statement that the client is
+             authorized to inject mail with the given identity.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.SPF.SpfResult.Fail">
+            <summary>
+            A "fail" result is an explicit statement that the client is not
+            authorized to use the domain in the given identity.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.SPF.SpfResult.SoftFail">
+            <summary>
+            A "softfail" result is a weak statement by the publishing ADMD that
+            the host is probably not authorized.  It has not published a
+            stronger, more definitive policy that results in a "fail".
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.SPF.SpfResult.TemporaryError">
+            <summary>
+            A "temperror" result means the SPF verifier encountered a transient
+            (generally DNS) error while performing the check.  A later retry may
+            succeed without further DNS operator action.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.SPF.SpfResult.PermanentError">
+            <summary>
+            A "permerror" result means the domain's published records could not
+            be correctly interpreted.  This signals an error condition that
+            definitely requires DNS operator intervention to be resolved.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.DNS.SPF.SpfQualifier">
+            <summary>
+            SPF Mechanism qualifier
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.SPF.SpfQualifier.Pass">
+            <summary>
+            If a mechanism matches, it results in a pass
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.SPF.SpfQualifier.Fail">
+            <summary>
+            If a mechanism matches, it results in a fail
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.SPF.SpfQualifier.SoftFail">
+            <summary>
+            If a mechanism matches, it results in a softFail
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.SPF.SpfQualifier.Neutral">
+            <summary>
+            If a mechanism matches, it results in a neutral
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.DNS.SPF.Term">
+            <summary>
+            SPF Term
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.DNS.SPF.Term.#ctor(System.String,System.String,System.Net.IPAddress,System.String,System.String)">
+            <summary>
+            SPF Term
+            </summary>
+            <param name="Sender">the "MAIL FROM" or "HELO" identity.</param>
+            <param name="Domain">The domain that provides the sought-after authorization
+            information; initially, the domain portion of the
+            "MAIL FROM" or "HELO" identity.</param>
+            <param name="Ip">the IP address of the SMTP client that is emitting
+            the mail, either IPv4 or IPv6.</param>
+            <param name="HelloDomain">Domain as presented by the client in the HELO or EHLO command.</param>
+            <param name="HostDomain">Domain of the current host, performing SPF authentication.</param>
+            <returns>Result of SPF evaluation.</returns>
+        </member>
+        <member name="M:Waher.Networking.DNS.SPF.Term.Reset(System.String)">
+            <summary>
+            Resets the string representation of the term.
+            </summary>
+            <param name="String">String-representation of term.</param>
+        </member>
     </members>
 </doc>

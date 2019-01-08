@@ -38,7 +38,6 @@ namespace Waher.Networking.DNS.Communication
 		private static bool initialized = false;
 
 		private readonly Dictionary<ushort, Rec> outgoingMessages = new Dictionary<ushort, Rec>();
-		private readonly Random gen = new Random();
 		private readonly LinkedList<KeyValuePair<byte[], IPEndPoint>> outputQueue = new LinkedList<KeyValuePair<byte[], IPEndPoint>>();
 		private Scheduler scheduler;
 		private bool isWriting = false;

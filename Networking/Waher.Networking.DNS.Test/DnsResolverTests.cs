@@ -188,5 +188,13 @@ namespace Waher.Networking.DNS.Test
 			foreach (string Row in Text)
 				Console.Out.WriteLine(Row);
 		}
+
+		[TestMethod]
+		public async Task Test_20_Resolve_TXT_3()
+		{
+			string[] Text = await DnsResolver.LookupText("extas.is");
+			foreach (string Row in Text)
+				Console.Out.WriteLine(Row);
+		}
 	}
 }

@@ -730,5 +730,12 @@ namespace Waher.Networking.DNS
 			return Result.ToArray();
 		}
 
+		internal static int Next(int MaxValue)
+		{
+			lock (rnd)
+			{
+				return rnd.Next(MaxValue);
+			}
+		}
 	}
 }

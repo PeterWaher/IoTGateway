@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading.Tasks;
 
 namespace Waher.Networking.DNS.SPF.Mechanisms
 {
@@ -68,6 +68,16 @@ namespace Waher.Networking.DNS.SPF.Mechanisms
 			}
 			else
 				this.cidr = Max;
+		}
+
+		/// <summary>
+		/// Checks if the mechamism matches the current request.
+		/// </summary>
+		/// <returns>Match result</returns>
+		public override Task<SpfResult> Matches()
+		{
+			bool Result = MechanismDomainCidrSpec.Matches(new IPAddress[] { this.address }, this.term, this.cidr);
+			return Task.FromResult<SpfResult>(Result ? SpfResult.Pass : SpfResult.Fail);
 		}
 
 	}

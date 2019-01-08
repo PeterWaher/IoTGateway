@@ -1549,8 +1549,28 @@
             <see cref="M:System.Object.ToString"/>
             </summary>
         </member>
-        <!-- Badly formed XML comment ignored for member "T:Waher.Networking.DNS.SPF.Mechanisms.A" -->
-        <!-- Badly formed XML comment ignored for member "M:Waher.Networking.DNS.SPF.Mechanisms.A.#ctor(Waher.Networking.DNS.SPF.Term,Waher.Networking.DNS.SPF.SpfQualifier)" -->
+        <member name="T:Waher.Networking.DNS.SPF.Mechanisms.A">
+            <summary>
+            This mechanism matches if &lt;ip&gt; is one of the &lt;target-name&gt;'s IP
+            addresses.For clarity, this means the "a" mechanism also matches
+            AAAA records.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.DNS.SPF.Mechanisms.A.#ctor(Waher.Networking.DNS.SPF.Term,Waher.Networking.DNS.SPF.SpfQualifier)">
+            <summary>
+            This mechanism matches if &lt;ip&gt; is one of the &lt;target-name&gt;'s IP
+            addresses.For clarity, this means the "a" mechanism also matches
+            AAAA records.
+            </summary>
+            <param name="Term">Term</param>
+            <param name="Qualifier">Qualifier</param>
+        </member>
+        <member name="M:Waher.Networking.DNS.SPF.Mechanisms.A.Matches">
+            <summary>
+            Checks if the mechamism matches the current request.
+            </summary>
+            <returns>Match result</returns>
+        </member>
         <member name="T:Waher.Networking.DNS.SPF.Mechanisms.All">
             <summary>
             The "all" mechanism is a test that always matches.  It is used as the
@@ -1564,6 +1584,12 @@
             </summary>
             <param name="Term">Term</param>
             <param name="Qualifier">Qualifier</param>
+        </member>
+        <member name="M:Waher.Networking.DNS.SPF.Mechanisms.All.Matches">
+            <summary>
+            Checks if the mechamism matches the current request.
+            </summary>
+            <returns>Match result</returns>
         </member>
         <member name="T:Waher.Networking.DNS.SPF.Mechanisms.Exists">
             <summary>
@@ -1582,6 +1608,12 @@
             </summary>
             <param name="Term">Term</param>
             <param name="Qualifier">Qualifier</param>
+        </member>
+        <member name="M:Waher.Networking.DNS.SPF.Mechanisms.Exists.Matches">
+            <summary>
+            Checks if the mechamism matches the current request.
+            </summary>
+            <returns>Match result</returns>
         </member>
         <member name="T:Waher.Networking.DNS.SPF.Mechanisms.Exp">
             <summary>
@@ -1608,6 +1640,18 @@
             Mechanism separator
             </summary>
         </member>
+        <member name="M:Waher.Networking.DNS.SPF.Mechanisms.Exp.Matches">
+            <summary>
+            Checks if the mechamism matches the current request.
+            </summary>
+            <returns>Match result</returns>
+        </member>
+        <member name="M:Waher.Networking.DNS.SPF.Mechanisms.Exp.Evaluate">
+            <summary>
+            Evaluates the explanation.
+            </summary>
+            <returns></returns>
+        </member>
         <member name="T:Waher.Networking.DNS.SPF.Mechanisms.Include">
             <summary>
             The "include" mechanism triggers a recursive evaluation of check_host().
@@ -1619,6 +1663,12 @@
             </summary>
             <param name="Term">Term</param>
             <param name="Qualifier">Qualifier</param>
+        </member>
+        <member name="M:Waher.Networking.DNS.SPF.Mechanisms.Include.Matches">
+            <summary>
+            Checks if the mechamism matches the current request.
+            </summary>
+            <returns>Match result</returns>
         </member>
         <member name="T:Waher.Networking.DNS.SPF.Mechanisms.Ip">
             <summary>
@@ -1642,10 +1692,36 @@
             <param name="Term">Term</param>
             <param name="Qualifier">Qualifier</param>
         </member>
-        <!-- Badly formed XML comment ignored for member "T:Waher.Networking.DNS.SPF.Mechanisms.Ip4" -->
-        <!-- Badly formed XML comment ignored for member "M:Waher.Networking.DNS.SPF.Mechanisms.Ip4.#ctor(Waher.Networking.DNS.SPF.Term,Waher.Networking.DNS.SPF.SpfQualifier)" -->
-        <!-- Badly formed XML comment ignored for member "T:Waher.Networking.DNS.SPF.Mechanisms.Ip6" -->
-        <!-- Badly formed XML comment ignored for member "M:Waher.Networking.DNS.SPF.Mechanisms.Ip6.#ctor(Waher.Networking.DNS.SPF.Term,Waher.Networking.DNS.SPF.SpfQualifier)" -->
+        <member name="M:Waher.Networking.DNS.SPF.Mechanisms.Ip.Matches">
+            <summary>
+            Checks if the mechamism matches the current request.
+            </summary>
+            <returns>Match result</returns>
+        </member>
+        <member name="T:Waher.Networking.DNS.SPF.Mechanisms.Ip4">
+            <summary>
+            This mechanisms tests whether &lt;ip&gt; is contained within a given IP4 network.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.DNS.SPF.Mechanisms.Ip4.#ctor(Waher.Networking.DNS.SPF.Term,Waher.Networking.DNS.SPF.SpfQualifier)">
+            <summary>
+            This mechanisms tests whether &lt;ip&gt; is contained within a given IP4 network.
+            </summary>
+            <param name="Term">Term</param>
+            <param name="Qualifier">Qualifier</param>
+        </member>
+        <member name="T:Waher.Networking.DNS.SPF.Mechanisms.Ip6">
+            <summary>
+            This mechanisms tests whether &lt;ip&gt; is contained within a given IP6 network.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.DNS.SPF.Mechanisms.Ip6.#ctor(Waher.Networking.DNS.SPF.Term,Waher.Networking.DNS.SPF.SpfQualifier)">
+            <summary>
+            This mechanisms tests whether &lt;ip&gt; is contained within a given IP6 network.
+            </summary>
+            <param name="Term">Term</param>
+            <param name="Qualifier">Qualifier</param>
+        </member>
         <member name="T:Waher.Networking.DNS.SPF.Mechanisms.Mechanism">
             <summary>
             Abstract base class for SPF Mechanisms.
@@ -1656,6 +1732,11 @@
             Qualifier
             </summary>
         </member>
+        <member name="F:Waher.Networking.DNS.SPF.Mechanisms.Mechanism.term">
+            <summary>
+            Current request.
+            </summary>
+        </member>
         <member name="M:Waher.Networking.DNS.SPF.Mechanisms.Mechanism.#ctor(Waher.Networking.DNS.SPF.Term,Waher.Networking.DNS.SPF.SpfQualifier)">
             <summary>
             Abstract base class for SPF Mechanisms.
@@ -1663,10 +1744,36 @@
             <param name="Term">Term</param>
             <param name="Qualifier">Qualifier</param>
         </member>
+        <member name="P:Waher.Networking.DNS.SPF.Mechanisms.Mechanism.Qualifier">
+            <summary>
+            Mechanism qualifier
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.DNS.SPF.Mechanisms.Mechanism.Expand">
+            <summary>
+            Expands any macros in the domain specification.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.DNS.SPF.Mechanisms.Mechanism.Matches">
+            <summary>
+            Checks if the mechamism matches the current request.
+            </summary>
+            <returns>Match result</returns>
+        </member>
         <member name="T:Waher.Networking.DNS.SPF.Mechanisms.MechanismDomainCidrSpec">
             <summary>
             Abstract base class for SPF mechanisms with a domain specification and
             an optional CIDR specification.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.SPF.Mechanisms.MechanismDomainCidrSpec.ip4Cidr">
+            <summary>
+            IPv4 CIDR
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.DNS.SPF.Mechanisms.MechanismDomainCidrSpec.ip6Cidr">
+            <summary>
+            IPv6 CIDR
             </summary>
         </member>
         <member name="M:Waher.Networking.DNS.SPF.Mechanisms.MechanismDomainCidrSpec.#ctor(Waher.Networking.DNS.SPF.Term,Waher.Networking.DNS.SPF.SpfQualifier)">
@@ -1676,6 +1783,21 @@
             </summary>
             <param name="Term">Term</param>
             <param name="Qualifier">Qualifier</param>
+        </member>
+        <member name="P:Waher.Networking.DNS.SPF.Mechanisms.MechanismDomainCidrSpec.DomainRequired">
+            <summary>
+            If the domain specification is required.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.DNS.SPF.Mechanisms.MechanismDomainCidrSpec.Matches(System.Net.IPAddress[],Waher.Networking.DNS.SPF.Term,System.Int32)">
+            <summary>
+            Checks if the client IP address matches any of a given set of IP Addresses,
+            taking CIDR into account.
+            </summary>
+            <param name="Addresses">Addresses to check</param>
+            <param name="Term">Current query</param>
+            <param name="Cidr">CIDR</param>
+            <returns>Match result</returns>
         </member>
         <member name="T:Waher.Networking.DNS.SPF.Mechanisms.MechanismDomainSpec">
             <summary>
@@ -1714,14 +1836,57 @@
             Domain specification
             </summary>
         </member>
-        <!-- Badly formed XML comment ignored for member "T:Waher.Networking.DNS.SPF.Mechanisms.Mx" -->
-        <!-- Badly formed XML comment ignored for member "M:Waher.Networking.DNS.SPF.Mechanisms.Mx.#ctor(Waher.Networking.DNS.SPF.Term,Waher.Networking.DNS.SPF.SpfQualifier)" -->
-        <!-- Badly formed XML comment ignored for member "T:Waher.Networking.DNS.SPF.Mechanisms.Ptr" -->
-        <!-- Badly formed XML comment ignored for member "M:Waher.Networking.DNS.SPF.Mechanisms.Ptr.#ctor(Waher.Networking.DNS.SPF.Term,Waher.Networking.DNS.SPF.SpfQualifier)" -->
+        <member name="P:Waher.Networking.DNS.SPF.Mechanisms.MechanismDomainSpec.TargetDomain">
+            <summary>
+            Target domain.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.DNS.SPF.Mechanisms.Mx">
+            <summary>
+            This mechanism matches if &lt;ip&gt; is one of the MX hosts for a domain name.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.DNS.SPF.Mechanisms.Mx.#ctor(Waher.Networking.DNS.SPF.Term,Waher.Networking.DNS.SPF.SpfQualifier)">
+            <summary>
+            This mechanism matches if &lt;ip&gt; is one of the MX hosts for a domain name.
+            </summary>
+            <param name="Term">Term</param>
+            <param name="Qualifier">Qualifier</param>
+        </member>
+        <member name="M:Waher.Networking.DNS.SPF.Mechanisms.Mx.Matches">
+            <summary>
+            Checks if the mechamism matches the current request.
+            </summary>
+            <returns>Match result</returns>
+        </member>
+        <member name="T:Waher.Networking.DNS.SPF.Mechanisms.Ptr">
+            <summary>
+            This mechanism tests whether the DNS reverse-mapping for &lt;ip&gt; exists
+            and correctly points to a domain name within a particular domain.
+            This mechanism SHOULD NOT be published.See the note at the end of
+            this section for more information.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.DNS.SPF.Mechanisms.Ptr.#ctor(Waher.Networking.DNS.SPF.Term,Waher.Networking.DNS.SPF.SpfQualifier)">
+            <summary>
+            This mechanism tests whether the DNS reverse-mapping for &lt;ip&gt; exists
+            and correctly points to a domain name within a particular domain.
+            This mechanism SHOULD NOT be published.See the note at the end of
+            this section for more information.
+            </summary>
+            <param name="Term">Term</param>
+            <param name="Qualifier">Qualifier</param>
+        </member>
         <member name="P:Waher.Networking.DNS.SPF.Mechanisms.Ptr.DomainRequired">
             <summary>
             If the domain specification is required.
             </summary>
+        </member>
+        <member name="M:Waher.Networking.DNS.SPF.Mechanisms.Ptr.Matches">
+            <summary>
+            Checks if the mechamism matches the current request.
+            </summary>
+            <returns>Match result</returns>
         </member>
         <member name="T:Waher.Networking.DNS.SPF.Mechanisms.Redirect">
             <summary>
@@ -1746,6 +1911,12 @@
             Mechanism separator
             </summary>
         </member>
+        <member name="M:Waher.Networking.DNS.SPF.Mechanisms.Redirect.Matches">
+            <summary>
+            Checks if the mechamism matches the current request.
+            </summary>
+            <returns>Match result</returns>
+        </member>
         <member name="T:Waher.Networking.DNS.SPF.SpfResolver">
             <summary>
             Resolves a SPF string, as defined in:
@@ -1767,7 +1938,18 @@
             <param name="Sender">the "MAIL FROM" or "HELO" identity.</param>
             <param name="HelloDomain">Domain as presented by the client in the HELO or EHLO command.</param>
             <param name="HostDomain">Domain of the current host, performing SPF authentication.</param>
-            <returns>Result of SPF evaluation.</returns>
+            <returns>Result of SPF evaluation, together with an optional explanation string,
+            if one exists, and the result indicates a failure.</returns>
+        </member>
+        <member name="M:Waher.Networking.DNS.SPF.SpfResolver.CheckHost(Waher.Networking.DNS.SPF.Term)">
+            <summary>
+            Fetches SPF records, parses them, and
+            evaluates them to determine whether a particular host is or is not
+            permitted to send mail with a given identity.
+            </summary>
+            <param name="Term">Information about current query.</param>
+            <returns>Result of SPF evaluation, together with an optional explanation string,
+            if one exists, and the result indicates a failure.</returns>
         </member>
         <member name="T:Waher.Networking.DNS.SPF.SpfResult">
             <summary>

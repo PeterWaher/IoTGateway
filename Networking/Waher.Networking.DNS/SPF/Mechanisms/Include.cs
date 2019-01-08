@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 
 namespace Waher.Networking.DNS.SPF.Mechanisms
 {
@@ -18,5 +18,43 @@ namespace Waher.Networking.DNS.SPF.Mechanisms
 			: base(Term, Qualifier)
 		{
 		}
+
+		/// <summary>
+		/// Checks if the mechamism matches the current request.
+		/// </summary>
+		/// <returns>Match result</returns>
+		public override async Task<SpfResult> Matches()
+		{
+			string Bak = this.term.domain;
+			this.term.domain = this.Domain;
+			try
+			{
+				KeyValuePair<SpfResult, string> Result = await SpfResolver.CheckHost(this.term);
+
+				switch (Result.Key)
+				{
+					case SpfResult.Pass:
+						return SpfResult.Pass;
+
+					case SpfResult.Fail:
+					case SpfResult.SoftFail:
+					case SpfResult.Neutral:
+						return SpfResult.Fail;
+
+					case SpfResult.TemporaryError:
+						return SpfResult.TemporaryError;
+
+					case SpfResult.PermanentError:
+					case SpfResult.None:
+					default:
+						return SpfResult.PermanentError;
+				}
+			}
+			finally
+			{
+				this.term.domain = Bak;
+			}
+		}
+
 	}
 }

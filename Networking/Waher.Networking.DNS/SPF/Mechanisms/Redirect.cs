@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 
 namespace Waher.Networking.DNS.SPF.Mechanisms
 {
@@ -29,5 +29,15 @@ namespace Waher.Networking.DNS.SPF.Mechanisms
 		/// Mechanism separator
 		/// </summary>
 		public override char Separator => '=';
+
+		/// <summary>
+		/// Checks if the mechamism matches the current request.
+		/// </summary>
+		/// <returns>Match result</returns>
+		public override Task<SpfResult> Matches()
+		{
+			return Task.FromResult<SpfResult>(SpfResult.Fail);
+		}
+
 	}
 }

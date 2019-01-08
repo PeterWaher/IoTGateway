@@ -157,6 +157,7 @@ namespace Waher.Networking.DNS.Test
 		}
 
 		[TestMethod]
+		[Ignore]
 		public async Task Test_16_Resolve_DNSBL_Lookup_Spam_IP()
 		{
 			string[] Reasons = await DnsResolver.LookupBlackList(IPAddress.Parse("179.49.7.95"), "zen.spamhaus.org");

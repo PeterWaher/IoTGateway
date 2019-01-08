@@ -41,7 +41,7 @@ namespace Waher.Networking.DNS.SPF
 		internal int pos = 0;
 		internal int dnsLookupsLeft = 10;
 		internal readonly string sender;
-		internal readonly string domain;
+		internal string domain;
 		internal readonly string helloDomain;
 		internal readonly string hostDomain;
 		internal readonly IPAddress ip;

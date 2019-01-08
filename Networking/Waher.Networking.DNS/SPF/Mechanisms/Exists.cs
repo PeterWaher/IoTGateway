@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Net;
+using System.Threading.Tasks;
 
 namespace Waher.Networking.DNS.SPF.Mechanisms
 {
@@ -23,6 +23,29 @@ namespace Waher.Networking.DNS.SPF.Mechanisms
 		public Exists(Term Term, SpfQualifier Qualifier)
 			: base(Term, Qualifier)
 		{
+		}
+
+		/// <summary>
+		/// Checks if the mechamism matches the current request.
+		/// </summary>
+		/// <returns>Match result</returns>
+		public override async Task<SpfResult> Matches()
+		{
+			if (this.term.dnsLookupsLeft-- <= 0)
+				throw new Exception("DNS Lookup maximum reached.");
+
+			try
+			{
+				IPAddress[] Addresses = await DnsResolver.LookupIP4Addresses(Domain);   // Always IPv4, regardless of connection type.
+				if (Addresses is null || Addresses.Length == 0)
+					return SpfResult.Fail;
+				else
+					return SpfResult.Pass;
+			}
+			catch (Exception)
+			{
+				return SpfResult.Fail;
+			}
 		}
 	}
 }

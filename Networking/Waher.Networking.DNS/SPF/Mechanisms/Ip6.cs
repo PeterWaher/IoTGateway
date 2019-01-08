@@ -1,16 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
+using System.Threading.Tasks;
 
 namespace Waher.Networking.DNS.SPF.Mechanisms
 {
 	/// <summary>
-	/// This mechanisms tests whether <ip> is contained within a given IP6 network.
+	/// This mechanisms tests whether &lt;ip&gt; is contained within a given IP6 network.
 	/// </summary>
 	public class Ip6 : Ip
 	{
 		/// <summary>
-		/// This mechanisms tests whether <ip> is contained within a given IP6 network.
+		/// This mechanisms tests whether &lt;ip&gt; is contained within a given IP6 network.
 		/// </summary>
 		/// <param name="Term">Term</param>
 		/// <param name="Qualifier">Qualifier</param>

@@ -12,7 +12,6 @@ namespace Waher.Networking.DNS.SPF.Mechanisms
 	/// </summary>
 	public abstract class MechanismDomainSpec : Mechanism
 	{
-		private readonly Term term;
 		private string domain;
 		private bool expanded = false;
 
@@ -24,8 +23,6 @@ namespace Waher.Networking.DNS.SPF.Mechanisms
 		public MechanismDomainSpec(Term Term, SpfQualifier Qualifier)
 			: base(Term, Qualifier)
 		{
-			this.term = Term;
-
 			if (Term.PeekNextChar() == this.Separator)
 			{
 				Term.NextChar();
@@ -45,7 +42,7 @@ namespace Waher.Networking.DNS.SPF.Mechanisms
 		/// <summary>
 		/// Expands any macros in the domain specification.
 		/// </summary>
-		public async Task Expand()
+		public override async Task Expand()
 		{
 			if (this.expanded)
 				return;
@@ -217,7 +214,6 @@ namespace Waher.Networking.DNS.SPF.Mechanisms
 										{
 											// Second, check if sub-domain is found.
 
-											s = null;
 											foreach (string DomainName in DomainNames)
 											{
 												if (DomainName.EndsWith("." + this.term.domain, StringComparison.CurrentCultureIgnoreCase) &&
@@ -357,7 +353,7 @@ namespace Waher.Networking.DNS.SPF.Mechanisms
 
 			foreach (IPAddress Addr in Addresses)
 			{
-				if (Addr.ToString() == Temp)
+				if (string.Compare(Addr.ToString(), Temp, true) == 0)
 					return true;
 			}
 
@@ -392,5 +388,10 @@ namespace Waher.Networking.DNS.SPF.Mechanisms
 		/// Domain specification
 		/// </summary>
 		public string Domain => this.domain;
+
+		/// <summary>
+		/// Target domain.
+		/// </summary>
+		public string TargetDomain => string.IsNullOrEmpty(this.domain) ? this.term.domain : this.domain;
 	}
 }

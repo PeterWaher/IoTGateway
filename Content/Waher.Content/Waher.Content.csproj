@@ -6,7 +6,7 @@
     <Authors>Peter Waher</Authors>
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
-    <Description>Library that provides basic abstraction for Internet Content Type, and basic encodings and decodings. This includes handling and parsing of common data types.</Description>
+    <Description>Library that provides basic abstraction for Internet Content Type, and basic encodings and decodings. This includes handling and parsing of common data types, text, JSON, CSV, binary data and multi-part content, forms, etc.</Description>
     <Copyright>Copyright © Waher Data AB 2016-2019. All rights reserved.</Copyright>
     <PackageLicenseUrl>https://github.com/PeterWaher/IoTGateway#license</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Content/Waher.Content</PackageProjectUrl>

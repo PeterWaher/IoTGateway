@@ -69,7 +69,7 @@ namespace Waher.Networking.DNS.SPF
 					TermStrings = s.Substring(6).Trim().Split(space, StringSplitOptions.RemoveEmptyEntries);
 				}
 			}
-			catch (ArgumentException)
+			catch (Exception)
 			{
 				return new KeyValuePair<SpfResult, string>(SpfResult.None, "No SPF records found.");
 			}

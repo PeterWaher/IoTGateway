@@ -151,7 +151,7 @@ namespace Waher.Content.Markdown
 			{
 				case "md":
 				case "markdown":
-					ContentType = ContentType;
+					ContentType = MarkdownCodec.ContentType;
 					return true;
 
 				default:

@@ -240,10 +240,7 @@ namespace Waher.Client.WPF.Model
 			{
 				Availability Availability = this.Availability;
 
-				return Availability == Availability.Chat ||
-					Availability == Availability.Online ||
-					Availability == Availability.Away ||
-					Availability == Availability.ExtendedAway;
+				return Availability != Availability.DoNotDisturb;
 			}
 		}
 

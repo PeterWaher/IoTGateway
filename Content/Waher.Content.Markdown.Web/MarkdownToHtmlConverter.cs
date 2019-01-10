@@ -37,7 +37,7 @@ namespace Waher.Content.Markdown.Web
 			{
 				return new string[]
 				{
-					"text/markdown"
+					MarkdownCodec.ContentType
 				};
 			}
 		}

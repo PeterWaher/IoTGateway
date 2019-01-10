@@ -300,7 +300,7 @@ namespace Waher.Networking.XMPP.Chat
 					Support = new RemoteXmppSupport();
 
 					if (e.Content != null && e.Content.LocalName == "content" && e.Content.NamespaceURI == "urn:xmpp:content" &&
-						XML.Attribute(e.Content, "type") == "text/markdown")
+						XML.Attribute(e.Content, "type") == MarkdownCodec.ContentType)
 					{
 						Support.Markdown = true;
 					}
@@ -398,7 +398,7 @@ namespace Waher.Networking.XMPP.Chat
 
 				string s = e.Body;
 				if (e.Content != null && e.Content.LocalName == "content" && e.Content.NamespaceURI == "urn:xmpp:content" &&
-					XML.Attribute(e.Content, "type") == "text/markdown")
+					XML.Attribute(e.Content, "type") == MarkdownCodec.ContentType)
 				{
 					string s2 = e.Content.InnerText;
 

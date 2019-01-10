@@ -19,28 +19,16 @@ namespace Waher.Content.Markdown
 		}
 
 		/// <summary>
-		/// Image content types.
+		/// Markdown content type.
 		/// </summary>
-		public static readonly string[] ImageContentTypes = new string[]
-		{
-			"text/markdown"
-		};
-
-		/// <summary>
-		/// Image content types.
-		/// </summary>
-		public static readonly string[] ImageFileExtensions = new string[]
-		{
-			"md",
-			"markdown"
-		};
+		public const string ContentType = "text/markdown";
 
 		/// <summary>
 		/// Supported content types.
 		/// </summary>
 		public string[] ContentTypes
 		{
-			get { return ImageContentTypes; }
+			get { return new string[] { ContentType }; }
 		}
 
 		/// <summary>
@@ -48,7 +36,14 @@ namespace Waher.Content.Markdown
 		/// </summary>
 		public string[] FileExtensions
 		{
-			get { return ImageFileExtensions; }
+			get
+			{
+				return new string[]
+				{
+					"md",
+					"markdown"
+				};
+			}
 		}
 
 		/// <summary>
@@ -59,7 +54,7 @@ namespace Waher.Content.Markdown
 		/// <returns>If the decoder can decode an object with the given type.</returns>
 		public bool Decodes(string ContentType, out Grade Grade)
 		{
-			if (Array.IndexOf<string>(ImageContentTypes, ContentType) >= 0)
+			if (Array.IndexOf<string>(ContentTypes, ContentType) >= 0)
 			{
 				Grade = Grade.Excellent;
 				return true;
@@ -156,7 +151,7 @@ namespace Waher.Content.Markdown
 			{
 				case "md":
 				case "markdown":
-					ContentType = "text/markdown";
+					ContentType = ContentType;
 					return true;
 
 				default:

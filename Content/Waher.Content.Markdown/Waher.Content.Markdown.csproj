@@ -8,17 +8,17 @@
     <Product>Waher.IoTGateway</Product>
     <Description>Contains a Markdown parser that can generate HTML, XAML and text.
 Syntax supported: https://waher.se/Markdown.md</Description>
-    <Copyright>Copyright © Waher Data AB 2016-2018. All rights reserved.</Copyright>
+    <Copyright>Copyright © Waher Data AB 2016-2019. All rights reserved.</Copyright>
     <PackageLicenseUrl>https://github.com/PeterWaher/IoTGateway#license</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Content/Waher.Content.Markdown</PackageProjectUrl>
     <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>markdown parser HTML XAML</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.0.31</AssemblyVersion>
-    <FileVersion>1.0.31</FileVersion>
+    <AssemblyVersion>1.0.32</AssemblyVersion>
+    <FileVersion>1.0.32</FileVersion>
     <PackageIconUrl>https://github.com/PeterWaher/IoTGateway/blob/master/Images/Icon.ico?raw=true</PackageIconUrl>
-    <Version>1.0.31</Version>
+    <Version>1.0.32</Version>
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Content\Waher.Content.Markdown\</UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>

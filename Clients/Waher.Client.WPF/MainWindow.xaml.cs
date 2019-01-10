@@ -11,6 +11,7 @@ using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using Microsoft.Win32;
+using Waher.Content.Markdown;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Networking.XMPP;
@@ -590,7 +591,7 @@ namespace Waher.Client.WPF
 				if (N.LocalName == "content" && N.NamespaceURI == "urn:xmpp:content")
 				{
 					string Type = XML.Attribute((XmlElement)N, "type");
-					if (Type == "text/markdown")
+					if (Type == MarkdownCodec.ContentType)
 					{
 						IsMarkdown = true;
 

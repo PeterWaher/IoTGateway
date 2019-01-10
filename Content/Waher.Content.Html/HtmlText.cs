@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Xml;
+using Waher.Content.Xml;
 
 namespace Waher.Content.Html
 {
@@ -9,7 +10,7 @@ namespace Waher.Content.Html
 	/// </summary>
     public class HtmlText : HtmlNode
     {
-		private string text;
+		private readonly string text;
 		private bool? isWhiteSpace;
 
 		/// <summary>
@@ -62,7 +63,8 @@ namespace Waher.Content.Html
 		/// <param name="Output">XML Output</param>
 		public override void Export(XmlWriter Output)
 		{
-			Output.WriteValue(this.text);
+			Output.Flush();
+			Output.WriteRaw(XML.Encode(this.text));
 		}
 	}
 }

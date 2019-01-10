@@ -12,7 +12,7 @@ namespace Waher.Content.Html
 	{
 		private LinkedList<HtmlAttribute> attributes = null;
 		private LinkedList<HtmlNode> children = null;
-		private string name;
+		private readonly string name;
 
 		/// <summary>
 		/// Base class for all HTML elements.

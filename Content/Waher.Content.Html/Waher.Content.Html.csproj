@@ -8,7 +8,7 @@
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
     <Description>Provides a simple HTML document parser that can be used to extract information from web pages. Social Meta-data can be easily extracted from page. Information is taken from Open Graph meta data or Twitter Card meta data, as well as standard HTML meta data.</Description>
-    <Copyright>Copyright © Waher Data AB 2018. All rights reserved.</Copyright>
+    <Copyright>Copyright © Waher Data AB 2018-2019. All rights reserved.</Copyright>
     <PackageLicenseUrl>https://github.com/PeterWaher/IoTGateway#license</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Content/Waher.Content.Html</PackageProjectUrl>
     <PackageIconUrl>https://github.com/PeterWaher/IoTGateway/blob/master/Images/Icon.ico?raw=true</PackageIconUrl>
@@ -16,9 +16,9 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>Parser HTML Open Graph OG Twitter Card MetaData Meta</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.0.4</AssemblyVersion>
-    <FileVersion>1.0.4</FileVersion>
-    <Version>1.0.4</Version>
+    <AssemblyVersion>1.0.5</AssemblyVersion>
+    <FileVersion>1.0.5</FileVersion>
+    <Version>1.0.5</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -26,6 +26,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Waher.Content.Xml\Waher.Content.Xml.csproj" />
     <ProjectReference Include="..\Waher.Content\Waher.Content.csproj" />
   </ItemGroup>
 

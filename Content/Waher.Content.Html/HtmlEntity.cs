@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Xml;
+using Waher.Content.Xml;
 
 namespace Waher.Content.Html
 {
@@ -9,7 +10,7 @@ namespace Waher.Content.Html
 	/// </summary>
     public class HtmlEntity : HtmlNode
     {
-		private string entityName;
+		private readonly string entityName;
 
 		/// <summary>
 		/// HTML Entity
@@ -51,7 +52,8 @@ namespace Waher.Content.Html
 		/// <param name="Output">XML Output</param>
 		public override void Export(XmlWriter Output)
 		{
-			Output.WriteValue(this.ToString());
+			Output.Flush();
+			Output.WriteRaw(XML.Encode(this.ToString()));
 		}
 
 		/// <summary>

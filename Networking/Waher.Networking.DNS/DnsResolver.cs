@@ -24,8 +24,6 @@ namespace Waher.Networking.DNS
 	/// RFC 3596: https://tools.ietf.org/html/rfc3596: DNS Extensions to Support IP Version 6
 	/// RFC 5782: https://tools.ietf.org/html/rfc5782: DNS Blacklists and Whitelists
 	/// RFC 7208: https://tools.ietf.org/html/rfc7208: Sender Policy Framework (SPF) for Authorizing Use of Domains in Email, Version 1
-
-
 	/// </summary>
 	public static class DnsResolver
 	{

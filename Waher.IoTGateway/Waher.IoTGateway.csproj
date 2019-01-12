@@ -37,6 +37,8 @@
     <None Remove="Root\Settings\Introduction.md" />
     <None Remove="Root\Settings\Master.md" />
     <None Remove="Root\Settings\Next.js" />
+    <None Remove="Root\Settings\Notification.js" />
+    <None Remove="Root\Settings\Notification.md" />
     <None Remove="Root\Settings\PersonalData.js" />
     <None Remove="Root\Settings\PersonalData.md" />
     <None Remove="Root\Settings\PersonalData\Backups.md" />
@@ -72,6 +74,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Root\Settings\Config.cssx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Settings\Notification.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Settings\Notification.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Root\Settings\PersonalData.js">

@@ -15,6 +15,8 @@ using System.Xml;
 using System.Xml.Schema;
 using Waher.Content;
 using Waher.Content.Emoji.Emoji1;
+using Waher.Content.Html;
+using Waher.Content.Markdown;
 using Waher.Content.Markdown.Web;
 using Waher.Content.Xml;
 using Waher.Content.Xsl;
@@ -918,7 +920,10 @@ namespace Waher.IoTGateway
 				contractsClient = null;
 
 			if (XmppConfiguration.Instance.Mail)
+			{
 				mailClient = new MailClient(xmppClient);
+				mailClient.MailReceived += MailClient_MailReceived;
+			}
 			else
 				mailClient = null;
 
@@ -2344,5 +2349,89 @@ namespace Waher.IoTGateway
 		}
 
 		#endregion
+
+		#region Notifications
+
+		private static void MailClient_MailReceived(object Sender, MailEventArgs e)
+		{
+			MailReceived?.Invoke(Sender, e);
+		}
+
+		/// <summary>
+		/// Event raised when a mail has been received.
+		/// </summary>
+		public static MailEventHandler MailReceived = null;
+
+		/// <summary>
+		/// Sends a notification message to configured notification recipients.
+		/// </summary>
+		/// <param name="Markdown">Markdown of message.</param>
+		public static void SendNotification(string Markdown)
+		{
+			try
+			{
+				CaseInsensitiveString[] Addresses = GetNotificationAddresses();
+				MarkdownSettings Settings = new MarkdownSettings()
+				{
+					ParseMetaData = false
+				};
+				MarkdownDocument Doc = new MarkdownDocument(Markdown, Settings);
+				string Text = Doc.GeneratePlainText();
+				string Html = HtmlDocument.GetBody(Doc.GenerateHTML());
+
+				foreach (CaseInsensitiveString Admin in Addresses)
+					SendNotification(Admin, Markdown, Text, Html);
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+			}
+		}
+
+		/// <summary>
+		/// Returns configured notification addresses.
+		/// </summary>
+		/// <returns>Array of addresses</returns>
+		public static CaseInsensitiveString[] GetNotificationAddresses()
+		{
+			return NotificationConfiguration.Instance.Addresses;
+		}
+
+		private static void SendNotification(string To, string Markdown, string Text, string Html)
+		{
+			if (Gateway.XmppClient != null && Gateway.XmppClient.State == Networking.XMPP.XmppState.Connected)
+			{
+				RosterItem Item = Gateway.XmppClient.GetRosterItem(To);
+				if (Item is null || (Item.State != SubscriptionState.To && Item.State != SubscriptionState.Both))
+				{
+					xmppClient.RequestPresenceSubscription(To);
+					ScheduleEvent(Resend, DateTime.Now.AddMinutes(15), new string[] { To, Markdown, Text, Html });
+				}
+				else
+				{
+					StringBuilder Xml = new StringBuilder();
+
+					Xml.Append("<content xmlns=\"urn:xmpp:content\" type=\"text/markdown\">");
+					Xml.Append(XML.Encode(Markdown));
+					Xml.Append("</content><html xmlns='http://jabber.org/protocol/xhtml-im'><body xmlns='http://www.w3.org/1999/xhtml'>");
+					Xml.Append(Html);
+					Xml.Append("</body></html>");
+
+					xmppClient.SendMessage(MessageType.Chat, To, Xml.ToString(), Text, string.Empty, string.Empty, string.Empty, string.Empty);
+				}
+			}
+			else
+				ScheduleEvent(Resend, DateTime.Now.AddSeconds(30), new string[] { To, Markdown, Text, Html });
+		}
+
+		private static void Resend(object P)
+		{
+			string[] P2 = (string[])P;
+			SendNotification(P2[0], P2[1], P2[2], P2[3]);
+		}
+
+
+		#endregion
+
 	}
 }

@@ -1152,6 +1152,8 @@
 								<File Id='Domain.js' Name='Domain.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Domain.js'/>
 								<File Id='Domain.md' Name='Domain.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Domain.md'/>
 								<File Id='Introduction.md' Name='Introduction.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Introduction.md'/>
+								<File Id='Notification.js' Name='Notification.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Notification.js'/>
+								<File Id='Notification.md' Name='Notification.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Notification.md'/>
 								<File Id='PersonalData.js' Name='PersonalData.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\PersonalData.js'/>
 								<File Id='PersonalData.md' Name='PersonalData.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\PersonalData.md'/>
 								<File Id='Restore.js' Name='Restore.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Restore.js'/>
@@ -1166,6 +1168,8 @@
 								<RemoveFile Id='RemoveDomain.js' Name='Domain.js' On='uninstall'/>
 								<RemoveFile Id='RemoveDomain.md' Name='Domain.md' On='uninstall'/>
 								<RemoveFile Id='RemoveIntroduction.md' Name='Introduction.md' On='uninstall'/>
+								<RemoveFile Id='RemoveNotification.js' Name='Notification.js' On='uninstall'/>
+								<RemoveFile Id='RemoveNotification.md' Name='Notification.md' On='uninstall'/>
 								<RemoveFile Id='RemovePersonalData.js' Name='PersonalData.js' On='uninstall'/>
 								<RemoveFile Id='RemovePersonalData.md' Name='PersonalData.md' On='uninstall'/>
 								<RemoveFile Id='RemoveRestore.js' Name='Restore.js' On='uninstall'/>

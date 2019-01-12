@@ -1,0 +1,264 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Waher.Networking.XMPP.Mail</name>
+    </assembly>
+    <members>
+        <member name="T:Waher.Networking.XMPP.Mail.EmbeddedObjectReference">
+            <summary>
+            Contains a reference to an object embedded in a mail.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Mail.EmbeddedObjectReference.#ctor(System.String,System.String,System.String,System.String,System.String,System.String,System.Int32)">
+            <summary>
+            Contains a reference to an object embedded in a mail.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Mail.EmbeddedObjectReference.ContentType">
+            <summary>
+            Content-Type of embedded object
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Mail.EmbeddedObjectReference.Description">
+            <summary>
+            Description, if available.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Mail.EmbeddedObjectReference.FileName">
+            <summary>
+            Filename, if available.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Mail.EmbeddedObjectReference.Name">
+            <summary>
+            Name, if available.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Mail.EmbeddedObjectReference.Id">
+            <summary>
+            Content-ID of embedded object, if available.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Mail.EmbeddedObjectReference.EmbeddedObjectId">
+            <summary>
+            ID of embedded object, in broker.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Mail.EmbeddedObjectReference.Size">
+            <summary>
+            Size of embedded object.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Mail.MailClient">
+            <summary>
+            Client providing support for server mail-extension.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.Mail.MailClient.NamespaceMail">
+            <summary>
+            http://jabber.org/protocol/pubsub
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Mail.MailClient.#ctor(Waher.Networking.XMPP.XmppClient)">
+            <summary>
+            Client providing support for server mail-extension.
+            </summary>
+            <param name="Client">XMPP Client to use.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Mail.MailClient.Dispose">
+            <summary>
+            <see cref="M:System.IDisposable.Dispose"/>
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Mail.MailClient.Extensions">
+            <summary>
+            Implemented extensions.
+            </summary>
+        </member>
+        <member name="E:Waher.Networking.XMPP.Mail.MailClient.MailReceived">
+            <summary>
+            This event is raised when a mail message has been received.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Mail.MailClient.Get(System.String,Waher.Networking.XMPP.Mail.MessageObjectEventHandler,System.Object)">
+            <summary>
+            Gets a message object from the broker.
+            </summary>
+            <param name="ObjectId">ID of the message object to get.</param>
+            <param name="Callback">Method to call when response has been returned.</param>
+            <param name="State">State object to pass on to callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Mail.MailClient.Delete(System.String,Waher.Networking.XMPP.IqResultEventHandler,System.Object)">
+            <summary>
+            Deletes a message object from the broker.
+            </summary>
+            <param name="ObjectId">ID of the message object to delete.</param>
+            <param name="Callback">Method to call when response has been returned.</param>
+            <param name="State">State object to pass on to callback method.</param>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Mail.Priority">
+            <summary>
+            Mail priority
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.Mail.Priority.High">
+            <summary>
+            High (1)
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.Mail.Priority.Normal">
+            <summary>
+            Normal (3)
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.Mail.Priority.Low">
+            <summary>
+            Low (5)
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Mail.MailEventHandler">
+            <summary>
+            Delegate for mail event handlers.
+            </summary>
+            <param name="Sender">Sender of event.</param>
+            <param name="e">Event arguments</param>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Mail.MailEventArgs">
+            <summary>
+            Event arguments for mail message events
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Mail.MailEventArgs.#ctor(Waher.Networking.XMPP.Mail.MailClient,Waher.Networking.XMPP.MessageEventArgs,System.String,System.String,Waher.Networking.XMPP.Mail.Priority,System.DateTimeOffset,System.String,System.String,System.String,System.Int32,System.String,System.Collections.Generic.KeyValuePair{System.String,System.String}[],Waher.Networking.XMPP.Mail.EmbeddedObjectReference[],Waher.Networking.XMPP.Mail.EmbeddedObjectReference[],System.String,System.String,System.String)">
+            <summary>
+            Event arguments for mail message events
+            </summary>
+            <param name="e">Message stanza event arguments</param>
+            <param name="Client">Mail Client</param>
+            <param name="ContentType">Mail Content-Type</param>
+            <param name="MessageId">Message-ID, if available.</param>
+            <param name="Priority">Message Priority</param>
+            <param name="Date">Message Date</param>
+            <param name="FromMail">From Address, as provided in the MAIL FROM command.</param>
+            <param name="FromHeader">From Address, as provided in the mail headers.</param>
+            <param name="Sender">Sender address, as provided in the mail headers.</param>
+            <param name="Size">Size of message contents.</param>
+            <param name="MailObjectId">Mail object ID in broker.</param>
+            <param name="Headers">Mail headers</param>
+            <param name="Attachments">Attachments, if available.</param>
+            <param name="Inline">Inline objects, if available.</param>
+            <param name="PlainText">Plain-text body, if available.</param>
+            <param name="Html">HTML body, if available.</param>
+            <param name="Markdown">Markdown body, if available.</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Mail.MailEventArgs.Client">
+            <summary>
+            Mail Client.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Mail.MailEventArgs.ContentType">
+            <summary>
+            Mail Content-Type
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Mail.MailEventArgs.MessageId">
+            <summary>
+            Message-ID, if available.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Mail.MailEventArgs.Priority">
+            <summary>
+            Message Priority
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Mail.MailEventArgs.Date">
+            <summary>
+            Message Date
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Mail.MailEventArgs.FromMail">
+            <summary>
+            From Address, as provided in the MAIL FROM command.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Mail.MailEventArgs.FromHeader">
+            <summary>
+            From Address, as provided in the mail headers.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Mail.MailEventArgs.Sender">
+            <summary>
+            Sender address, as provided in the mail headers.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Mail.MailEventArgs.Size">
+            <summary>
+            Size of message contents.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Mail.MailEventArgs.MailObjectId">
+            <summary>
+            Mail object ID in broker.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Mail.MailEventArgs.Headers">
+            <summary>
+            Mail headers
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Mail.MailEventArgs.Attachments">
+            <summary>
+            Attachments, if available.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Mail.MailEventArgs.Inline">
+            <summary>
+            Inline objects, if available.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Mail.MailEventArgs.PlainText">
+            <summary>
+            Plain-text body, if available.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Mail.MailEventArgs.Html">
+            <summary>
+            HTML body, if available.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Mail.MailEventArgs.Markdown">
+            <summary>
+            Markdown body, if available.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Mail.MessageObjectEventHandler">
+            <summary>
+            Delegate for message object callback functions.
+            </summary>
+            <param name="Sender">Caller</param>
+            <param name="e">Event arguments</param>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Mail.MessageObjectEventArgs">
+            <summary>
+            Message object event arguments.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Mail.MessageObjectEventArgs.#ctor(Waher.Networking.XMPP.IqResultEventArgs,System.String,System.Byte[])">
+            <summary>
+            Message object event arguments.
+            </summary>
+            <param name="e">Result event arguments.</param>
+            <param name="ContentType">Content-Type of message object.</param>
+            <param name="Data">Binary representation of message object.</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Mail.MessageObjectEventArgs.ContentType">
+            <summary>
+            Content-Type of message object.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Mail.MessageObjectEventArgs.Data">
+            <summary>
+            Binary representation of message object.
+            </summary>
+        </member>
+    </members>
+</doc>

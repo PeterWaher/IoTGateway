@@ -348,7 +348,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Networking.XMPP.Contr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Networking.DNS", "Networking\Waher.Networking.DNS\Waher.Networking.DNS.csproj", "{D342F994-F114-447B-9BEB-9634EE02FE0F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.DNS.Test", "Networking\Waher.Networking.DNS.Test\Waher.Networking.DNS.Test.csproj", "{DEB84572-7ABF-463B-A2DE-3A881041E8CC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Networking.DNS.Test", "Networking\Waher.Networking.DNS.Test\Waher.Networking.DNS.Test.csproj", "{DEB84572-7ABF-463B-A2DE-3A881041E8CC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.XMPP.Mail", "Networking\Waher.Networking.XMPP.Mail\Waher.Networking.XMPP.Mail.csproj", "{CD99AABE-ECFF-440A-9C74-13AFC0BEF602}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -3223,6 +3225,26 @@ Global
 		{DEB84572-7ABF-463B-A2DE-3A881041E8CC}.Release|x64.Build.0 = Release|Any CPU
 		{DEB84572-7ABF-463B-A2DE-3A881041E8CC}.Release|x86.ActiveCfg = Release|Any CPU
 		{DEB84572-7ABF-463B-A2DE-3A881041E8CC}.Release|x86.Build.0 = Release|Any CPU
+		{CD99AABE-ECFF-440A-9C74-13AFC0BEF602}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CD99AABE-ECFF-440A-9C74-13AFC0BEF602}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CD99AABE-ECFF-440A-9C74-13AFC0BEF602}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{CD99AABE-ECFF-440A-9C74-13AFC0BEF602}.Debug|ARM.Build.0 = Debug|Any CPU
+		{CD99AABE-ECFF-440A-9C74-13AFC0BEF602}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{CD99AABE-ECFF-440A-9C74-13AFC0BEF602}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{CD99AABE-ECFF-440A-9C74-13AFC0BEF602}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{CD99AABE-ECFF-440A-9C74-13AFC0BEF602}.Debug|x64.Build.0 = Debug|Any CPU
+		{CD99AABE-ECFF-440A-9C74-13AFC0BEF602}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{CD99AABE-ECFF-440A-9C74-13AFC0BEF602}.Debug|x86.Build.0 = Debug|Any CPU
+		{CD99AABE-ECFF-440A-9C74-13AFC0BEF602}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CD99AABE-ECFF-440A-9C74-13AFC0BEF602}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CD99AABE-ECFF-440A-9C74-13AFC0BEF602}.Release|ARM.ActiveCfg = Release|Any CPU
+		{CD99AABE-ECFF-440A-9C74-13AFC0BEF602}.Release|ARM.Build.0 = Release|Any CPU
+		{CD99AABE-ECFF-440A-9C74-13AFC0BEF602}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{CD99AABE-ECFF-440A-9C74-13AFC0BEF602}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{CD99AABE-ECFF-440A-9C74-13AFC0BEF602}.Release|x64.ActiveCfg = Release|Any CPU
+		{CD99AABE-ECFF-440A-9C74-13AFC0BEF602}.Release|x64.Build.0 = Release|Any CPU
+		{CD99AABE-ECFF-440A-9C74-13AFC0BEF602}.Release|x86.ActiveCfg = Release|Any CPU
+		{CD99AABE-ECFF-440A-9C74-13AFC0BEF602}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -3363,6 +3385,7 @@ Global
 		{20CC1DF7-D057-4DBE-814C-2EBDDD40D82D} = {0EA3132A-669C-4228-8684-3B98AE876BEF}
 		{D342F994-F114-447B-9BEB-9634EE02FE0F} = {0EA3132A-669C-4228-8684-3B98AE876BEF}
 		{DEB84572-7ABF-463B-A2DE-3A881041E8CC} = {0EA3132A-669C-4228-8684-3B98AE876BEF}
+		{CD99AABE-ECFF-440A-9C74-13AFC0BEF602} = {0EA3132A-669C-4228-8684-3B98AE876BEF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {32CF1367-B83E-4CAD-8329-0D1C73AF59F4}

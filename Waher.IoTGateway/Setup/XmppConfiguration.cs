@@ -78,6 +78,7 @@ namespace Waher.IoTGateway.Setup
 		private bool abuse = false;
 		private bool spam = false;
 		private bool pep = false;
+		private bool mail = false;
 
 		private XmppClient client = null;
 		private bool createAccount = false;
@@ -344,6 +345,16 @@ namespace Waher.IoTGateway.Setup
 		{
 			get { return this.pep; }
 			set { this.pep = value; }
+		}
+
+		/// <summary>
+		/// If mail is supported by the server.
+		/// </summary>
+		[DefaultValue(false)]
+		public bool Mail
+		{
+			get { return this.mail; }
+			set { this.mail = value; }
 		}
 
 		/// <summary>
@@ -641,6 +652,7 @@ namespace Waher.IoTGateway.Setup
 							this.reporting = e.HasFeature(Networking.XMPP.Abuse.AbuseClient.NamespaceReporting);
 							this.abuse = e.HasFeature(Networking.XMPP.Abuse.AbuseClient.NamespaceAbuseReason);
 							this.spam = e.HasFeature(Networking.XMPP.Abuse.AbuseClient.NamespaceSpamReason);
+							this.mail = e.HasFeature("urn:xmpp:smtp");
 						}
 						else
 						{
@@ -649,6 +661,7 @@ namespace Waher.IoTGateway.Setup
 							this.reporting = false;
 							this.abuse = false;
 							this.spam = false;
+							this.mail = false;
 						}
 
 						ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Checking account features.", false, "User");
@@ -698,6 +711,7 @@ namespace Waher.IoTGateway.Setup
 							{ "reporting", this.reporting },
 							{ "abuse", this.abuse },
 							{ "spam", this.spam },
+							{ "mail", this.mail },
 							{ "pep", this.pep ? this.bareJid : string.Empty },
 							{ "thingRegistry", this.thingRegistry },
 							{ "provisioning", this.provisioning },

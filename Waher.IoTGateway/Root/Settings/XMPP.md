@@ -174,6 +174,7 @@ limit applications using the server to interoperate accordingly.
 | Reporting | <span id="Reporting">{{Config.Reporting ? "✓" : "✗"}}</span> | N/A |
 | Abuse reporting | <span id="AbuseReporting">{{Config.Abuse ? "✓" : "✗"}}</span> | N/A |
 | Spam reporting | <span id="SpamReporting">{{Config.Spam ? "✓" : "✗"}}</span> | N/A |
+| Mail support | <span id="MailSupport">{{Config.Mail ? "✓" : "✗"}}</span> | N/A |
 | Personal Eventing | <span id="Pep">{{Config.PersonalEventing ? "✓" : "✗"}}</span> | <span id="PepJID">{{Config.PersonalEventing ? Config.BareJid : ""}}</span> |
 | Thing Registry | <span id="ThingRegistry">{{empty(Config.ThingRegistry) ? "✗" : "✓"}}</span> | <span id="ThingRegistryJID">{{Config.ThingRegistry}}</span> |
 | Provisioning | <span id="Provisioning">{{empty(Config.Provisioning) ? "✗" : "✓"}}</span> | <span id="ProvisioningJID">{{Config.Provisioning}}</span> |

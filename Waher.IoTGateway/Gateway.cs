@@ -32,6 +32,7 @@ using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Concentrator;
 using Waher.Networking.XMPP.Contracts;
 using Waher.Networking.XMPP.HTTPX;
+using Waher.Networking.XMPP.Mail;
 using Waher.Networking.XMPP.PEP;
 using Waher.Networking.XMPP.Provisioning;
 using Waher.Networking.XMPP.PubSub;
@@ -121,6 +122,7 @@ namespace Waher.IoTGateway
 		private static SynchronizationClient synchronizationClient = null;
 		private static PepClient pepClient = null;
 		private static ContractsClient contractsClient = null;
+		private static MailClient mailClient = null;
 		private static X509Certificate2 certificate = null;
 		private static HttpServer webServer = null;
 		private static HttpxProxy httpxProxy = null;
@@ -914,6 +916,11 @@ namespace Waher.IoTGateway
 				contractsClient = new ContractsClient(xmppClient, XmppConfiguration.Instance.LegalIdentities);
 			else
 				contractsClient = null;
+
+			if (XmppConfiguration.Instance.Mail)
+				mailClient = new MailClient(xmppClient);
+			else
+				mailClient = null;
 
 			return Task.CompletedTask;
 		}
@@ -1894,6 +1901,14 @@ namespace Waher.IoTGateway
 		public static ContractsClient ContractsClient
 		{
 			get { return contractsClient; }
+		}
+
+		/// <summary>
+		/// XMPP Mail Client, if support for mail-extensions is available on the XMPP broker.
+		/// </summary>
+		public static MailClient MailClient
+		{
+			get { return mailClient; }
 		}
 
 		/// <summary>

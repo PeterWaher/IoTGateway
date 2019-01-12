@@ -248,6 +248,7 @@ function ConnectionOK1(data)
         data.reporting &&
         data.abuse &&
         data.spam &&
+        data.mail &&
         data.pep &&
         data.thingRegistry &&
         data.provisioning &&
@@ -265,6 +266,7 @@ function ConnectionOK1(data)
     document.getElementById("Reporting").innerText = data.reporting ? "✓" : "✗";
     document.getElementById("AbuseReporting").innerText = data.abuse ? "✓" : "✗";
     document.getElementById("SpamReporting").innerText = data.spam ? "✓" : "✗";
+    document.getElementById("MailSupport").innerText = data.mail ? "✓" : "✗";
     document.getElementById("Pep").innerText = data.pep ? "✓" : "✗";
     document.getElementById("PepJID").innerText = data.pep;
     document.getElementById("ThingRegistry").innerText = data.thingRegistry ? "✓" : "✗";

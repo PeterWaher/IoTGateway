@@ -266,13 +266,17 @@ namespace Waher.Client.WPF.Model
 			XmppAccountNode XmppAccountNode = this.XmppAccountNode;
 			if (XmppAccountNode != null)
 			{
+				string To = this.RosterItem?.LastPresenceFullJid;
+				if (string.IsNullOrEmpty(To))
+					To = this.bareJid;
+
 				if (Markdown is null)
-					XmppAccountNode.Client.SendChatMessage(this.RosterItem?.LastPresenceFullJid, Message);
+					XmppAccountNode.Client.SendChatMessage(To, Message);
 				else
 				{
 					string PlainText = Markdown.GeneratePlainText().Trim();
 
-					XmppAccountNode.Client.SendMessage(QoSLevel.Unacknowledged, MessageType.Chat, this.RosterItem?.LastPresenceFullJid,
+					XmppAccountNode.Client.SendMessage(QoSLevel.Unacknowledged, MessageType.Chat, To,
 						"<content xmlns=\"urn:xmpp:content\" type=\"text/markdown\">" + XML.Encode(Message) + "</content>", PlainText,
 						string.Empty, string.Empty, string.Empty, string.Empty, null, null);
 				}

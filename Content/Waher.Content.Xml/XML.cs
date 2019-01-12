@@ -468,14 +468,34 @@ namespace Waher.Content.Xml
                 return DefaultValue;
         }
 
-        /// <summary>
-        /// Gets the value of an XML attribute.
-        /// </summary>
-        /// <param name="E">XML Element</param>
-        /// <param name="Name">Name of attribute</param>
-        /// <param name="DefaultValue">Default value.</param>
-        /// <returns>Value of attribute, if found, or the default value, if not found.</returns>
-        public static Enum Attribute(XmlElement E, string Name, Enum DefaultValue)
+		/// <summary>
+		/// Gets the value of an XML attribute.
+		/// </summary>
+		/// <param name="E">XML Element</param>
+		/// <param name="Name">Name of attribute</param>
+		/// <param name="DefaultValue">Default value.</param>
+		/// <returns>Value of attribute, if found, or the default value, if not found.</returns>
+		public static DateTimeOffset Attribute(XmlElement E, string Name, DateTimeOffset DefaultValue)
+		{
+			if (E.HasAttribute(Name))
+			{
+				if (TryParse(E.GetAttribute(Name), out DateTimeOffset Result))
+					return Result;
+				else
+					return DefaultValue;
+			}
+			else
+				return DefaultValue;
+		}
+
+		/// <summary>
+		/// Gets the value of an XML attribute.
+		/// </summary>
+		/// <param name="E">XML Element</param>
+		/// <param name="Name">Name of attribute</param>
+		/// <param name="DefaultValue">Default value.</param>
+		/// <returns>Value of attribute, if found, or the default value, if not found.</returns>
+		public static Enum Attribute(XmlElement E, string Name, Enum DefaultValue)
         {
             if (E.HasAttribute(Name))
             {

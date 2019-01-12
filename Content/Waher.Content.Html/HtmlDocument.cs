@@ -1769,5 +1769,32 @@ namespace Waher.Content.Html
 			return new PageMetaData(this);
 		}
 
+		/// <summary>
+		/// Extracts the contents of the BODY element in a HTML string.
+		/// </summary>
+		/// <param name="Html">HTML string</param>
+		/// <returns>BODY contents.</returns>
+		public static string GetBody(string Html)
+		{
+			int i = Html.IndexOf("<body>", StringComparison.CurrentCultureIgnoreCase);
+			if (i > 0)
+				Html = Html.Substring(i + 6).TrimStart();
+
+			i = Html.IndexOf("</body>", StringComparison.CurrentCultureIgnoreCase);
+			Html = Html.Substring(0, i).TrimEnd();
+
+			if (Html.StartsWith("<section>", StringComparison.CurrentCultureIgnoreCase) &&
+				Html.EndsWith("</section>", StringComparison.CurrentCultureIgnoreCase))
+			{
+				string Html2 = Html.Substring(9).TrimStart();
+				Html2 = Html2.Substring(0, Html2.Length - 10).TrimEnd();
+
+				if (!Html2.Contains("<section>"))
+					Html = Html2;
+			}
+
+			return Html;
+		}
+
 	}
 }

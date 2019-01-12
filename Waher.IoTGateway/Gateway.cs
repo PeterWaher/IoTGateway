@@ -1217,6 +1217,9 @@ namespace Waher.IoTGateway
 			pepClient?.Dispose();
 			pepClient = null;
 
+			mailClient?.Dispose();
+			mailClient = null;
+
 			if (xmppClient != null)
 			{
 				using (ManualResetEvent OfflineSent = new ManualResetEvent(false))
@@ -1238,11 +1241,8 @@ namespace Waher.IoTGateway
 				xmppClient = null;
 			}
 
-			if (coapEndpoint != null)
-			{
-				coapEndpoint.Dispose();
-				coapEndpoint = null;
-			}
+			coapEndpoint?.Dispose();
+			coapEndpoint = null;
 
 			if (webServer != null)
 			{
@@ -1390,10 +1390,10 @@ namespace Waher.IoTGateway
 			{
 				e.Accept();
 			}
-			else if (BareJid.IndexOf('@') > 0 && 
-				(xmppClient is null || 
+			else if (BareJid.IndexOf('@') > 0 &&
+				(xmppClient is null ||
 				(Item = xmppClient.GetRosterItem(BareJid)) is null ||
-				Item.State == SubscriptionState.None || 
+				Item.State == SubscriptionState.None ||
 				Item.State == SubscriptionState.Remove ||
 				Item.State == SubscriptionState.Unknown))
 			{

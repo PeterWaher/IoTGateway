@@ -2368,6 +2368,37 @@ namespace Waher.IoTGateway
 		/// <param name="Markdown">Markdown of message.</param>
 		public static void SendNotification(string Markdown)
 		{
+			SendNotification(Markdown, string.Empty, false);
+		}
+
+		/// <summary>
+		/// Sends a notification message to configured notification recipients.
+		/// </summary>
+		/// <param name="Markdown">Markdown of message.</param>
+		/// <param name="MessageId">Message ID</param>
+		public static void SendNotification(string Markdown, string MessageId)
+		{
+			SendNotification(Markdown, MessageId, false);
+		}
+
+		/// <summary>
+		/// Sends a notification message to configured notification recipients.
+		/// </summary>
+		/// <param name="Markdown">Markdown of message.</param>
+		/// <param name="MessageId">Message ID</param>
+		public static void SendNotificationUpdate(string Markdown, string MessageId)
+		{
+			SendNotification(Markdown, MessageId, true);
+		}
+
+		/// <summary>
+		/// Sends a notification message to configured notification recipients.
+		/// </summary>
+		/// <param name="Markdown">Markdown of message.</param>
+		/// <param name="MessageId">Message ID</param>
+		/// <param name="Update">If its an update notification</param>
+		private static void SendNotification(string Markdown, string MessageId, bool Update)
+		{
 			try
 			{
 				CaseInsensitiveString[] Addresses = GetNotificationAddresses();
@@ -2380,7 +2411,7 @@ namespace Waher.IoTGateway
 				string Html = HtmlDocument.GetBody(Doc.GenerateHTML());
 
 				foreach (CaseInsensitiveString Admin in Addresses)
-					SendNotification(Admin, Markdown, Text, Html);
+					SendNotification(Admin, Markdown, Text, Html, MessageId, Update);
 			}
 			catch (Exception ex)
 			{
@@ -2397,7 +2428,7 @@ namespace Waher.IoTGateway
 			return NotificationConfiguration.Instance.Addresses;
 		}
 
-		private static void SendNotification(string To, string Markdown, string Text, string Html)
+		private static void SendNotification(string To, string Markdown, string Text, string Html, string MessageId, bool Update)
 		{
 			if (Gateway.XmppClient != null && Gateway.XmppClient.State == Networking.XMPP.XmppState.Connected)
 			{
@@ -2405,7 +2436,7 @@ namespace Waher.IoTGateway
 				if (Item is null || (Item.State != SubscriptionState.To && Item.State != SubscriptionState.Both))
 				{
 					xmppClient.RequestPresenceSubscription(To);
-					ScheduleEvent(Resend, DateTime.Now.AddMinutes(15), new string[] { To, Markdown, Text, Html });
+					ScheduleEvent(Resend, DateTime.Now.AddMinutes(15), new object[] { To, Markdown, Text, Html, MessageId, Update });
 				}
 				else
 				{
@@ -2417,17 +2448,27 @@ namespace Waher.IoTGateway
 					Xml.Append(Html);
 					Xml.Append("</body></html>");
 
-					xmppClient.SendMessage(MessageType.Chat, To, Xml.ToString(), Text, string.Empty, string.Empty, string.Empty, string.Empty);
+					if (Update && !string.IsNullOrEmpty(MessageId))
+					{
+						Xml.Append("<replace id='");
+						Xml.Append(MessageId);
+						Xml.Append("' xmlns='urn:xmpp:message-correct:0'/>");
+
+						MessageId = string.Empty;
+					}
+
+					xmppClient.SendMessage(QoSLevel.Unacknowledged, MessageType.Chat, MessageId, To, Xml.ToString(), Text, 
+						string.Empty, string.Empty, string.Empty, string.Empty, null, null);
 				}
 			}
 			else
-				ScheduleEvent(Resend, DateTime.Now.AddSeconds(30), new string[] { To, Markdown, Text, Html });
+				ScheduleEvent(Resend, DateTime.Now.AddSeconds(30), new object[] { To, Markdown, Text, Html, MessageId, Update });
 		}
 
 		private static void Resend(object P)
 		{
-			string[] P2 = (string[])P;
-			SendNotification(P2[0], P2[1], P2[2], P2[3]);
+			object[] P2 = (string[])P;
+			SendNotification((string)P2[0], (string)P2[1], (string)P2[2], (string)P2[3], (string)P2[4], (bool)P2[5]);
 		}
 
 

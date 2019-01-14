@@ -120,7 +120,14 @@ namespace Waher.IoTGateway.Setup
 				}
 			}
 
-			Activities.Sort((A1, A2) => A1.Priority - A2.Priority);
+			Activities.Sort((A1, A2) =>
+			{
+				int i = A1.Priority - A2.Priority;
+				if (i != 0)
+					return i;
+
+				return A1.GetType().FullName.CompareTo(A2.GetType().FullName);
+			});
 
 			processingActivities = Activities.ToArray();
 

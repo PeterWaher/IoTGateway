@@ -37,7 +37,11 @@ enter one or more addresses below to which notifications will be sent.
 
 <p>Press the Test button to send a test-notification to the notification addresses.</p>
 <p id="TestError" class="error" style="display:none">Unable to send a notification. Please verify the addresses, and try again.</p>
-<p id="NextMessage" class="message" style="display:none">Notification sent. Please check that they are received properly. (You might need to check the spam folder.)</p>
+<p id="NextMessage" class="message" style="display:none">Notification sent. Please check that they are received properly.
+{{if Waher.IoTGateway.Setup.XmppConfiguration.Instance.Mail then ]]
+(You might need to check the spam folder.)
+[[}}
+</p>
 
 <button type='button' onclick='TestAddresses()'>Test</button>
 <button id='NextButton' type='button' onclick='Next()'>Next</button>

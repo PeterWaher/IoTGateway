@@ -245,9 +245,9 @@ namespace Waher.Networking.XMPP.P2P
 
 			lock (this.contacts)
 			{
-				foreach (E2eEndpoint[] Endpoints in this.contacts.Values)
+				foreach (IE2eEndpoint[] Endpoints in this.contacts.Values)
 				{
-					foreach (E2eEndpoint Endpoint in Endpoints)
+					foreach (IE2eEndpoint Endpoint in Endpoints)
 						Endpoint.Dispose();
 				}
 
@@ -410,7 +410,7 @@ namespace Waher.Networking.XMPP.P2P
 
 				if (OldEndpoints != null)
 				{
-					foreach (E2eEndpoint Endpoint in OldEndpoints)
+					foreach (IE2eEndpoint Endpoint in OldEndpoints)
 						Endpoint.Dispose();
 				}
 
@@ -440,7 +440,7 @@ namespace Waher.Networking.XMPP.P2P
 					this.contacts.Remove(FullJID);
 			}
 
-			foreach (E2eEndpoint Endpoint in List)
+			foreach (IE2eEndpoint Endpoint in List)
 				Endpoint.Dispose();
 
 			return true;
@@ -621,7 +621,7 @@ namespace Waher.Networking.XMPP.P2P
 					return null;
 			}
 
-			foreach (E2eEndpoint Endpoint in Endpoints)
+			foreach (IE2eEndpoint Endpoint in Endpoints)
 			{
 				if (Endpoint.CanDecrypt(E2eElement))
 				{

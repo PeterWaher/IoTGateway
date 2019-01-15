@@ -2360,7 +2360,7 @@ namespace Waher.IoTGateway
 		/// <summary>
 		/// Event raised when a mail has been received.
 		/// </summary>
-		public static MailEventHandler MailReceived = null;
+		public static event MailEventHandler MailReceived = null;
 
 		/// <summary>
 		/// Sends a notification message to configured notification recipients.

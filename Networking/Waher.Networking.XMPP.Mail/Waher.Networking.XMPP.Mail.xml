@@ -88,6 +88,12 @@
             <param name="Callback">Method to call when response has been returned.</param>
             <param name="State">State object to pass on to callback method.</param>
         </member>
+        <member name="M:Waher.Networking.XMPP.Mail.MailClient.GetAsync(System.String)">
+            <summary>
+            Gets a message object from the broker.
+            </summary>
+            <param name="ObjectId">ID of the message object to get.</param>
+        </member>
         <member name="M:Waher.Networking.XMPP.Mail.MailClient.Delete(System.String,Waher.Networking.XMPP.IqResultEventHandler,System.Object)">
             <summary>
             Deletes a message object from the broker.
@@ -95,6 +101,12 @@
             <param name="ObjectId">ID of the message object to delete.</param>
             <param name="Callback">Method to call when response has been returned.</param>
             <param name="State">State object to pass on to callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Mail.MailClient.DeleteAsync(System.String)">
+            <summary>
+            Deletes a message object from the broker.
+            </summary>
+            <param name="ObjectId">ID of the message object to delete.</param>
         </member>
         <member name="T:Waher.Networking.XMPP.Mail.Priority">
             <summary>
@@ -228,6 +240,28 @@
         <member name="P:Waher.Networking.XMPP.Mail.MailEventArgs.Markdown">
             <summary>
             Markdown body, if available.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Mail.MessageObject">
+            <summary>
+            Contains the binary representation of a message object.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Mail.MessageObject.#ctor(System.Byte[],System.String)">
+            <summary>
+            Contains the binary representation of a message object.
+            </summary>
+            <param name="Data">Binary representation of object.</param>
+            <param name="ContentType">Internet Content Type</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Mail.MessageObject.Data">
+            <summary>
+            Binary representation of message object.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Mail.MessageObject.ContentType">
+            <summary>
+            Internet Content Type.
             </summary>
         </member>
         <member name="T:Waher.Networking.XMPP.Mail.MessageObjectEventHandler">

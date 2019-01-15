@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content.Xml;
 using Waher.Events;
@@ -216,6 +217,25 @@ namespace Waher.Networking.XMPP.Mail
 		}
 
 		/// <summary>
+		/// Gets a message object from the broker.
+		/// </summary>
+		/// <param name="ObjectId">ID of the message object to get.</param>
+		public Task<MessageObject> GetAsync(string ObjectId)
+		{
+			TaskCompletionSource<MessageObject> Result = new TaskCompletionSource<MessageObject>();
+			
+			this.Get(ObjectId, (sender, e) =>
+			{
+				if (e.Ok)
+					Result.TrySetResult(new MessageObject(e.Data, e.ContentType));
+				else
+					Result.TrySetException(new Exception(string.IsNullOrEmpty(e.ErrorText) ? "Unable to get message object." : e.ErrorText));
+			}, null);
+
+			return Result.Task;
+		}
+
+		/// <summary>
 		/// Deletes a message object from the broker.
 		/// </summary>
 		/// <param name="ObjectId">ID of the message object to delete.</param>
@@ -225,6 +245,25 @@ namespace Waher.Networking.XMPP.Mail
 		{
 			this.client.SendIqSet(this.client.Domain, "<delete xmlns='" + NamespaceMail + "' cid='" + XML.Encode(ObjectId) + "'/>",
 				Callback, State);
+		}
+
+		/// <summary>
+		/// Deletes a message object from the broker.
+		/// </summary>
+		/// <param name="ObjectId">ID of the message object to delete.</param>
+		public Task DeleteAsync(string ObjectId)
+		{
+			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
+
+			this.Get(ObjectId, (sender, e) =>
+			{
+				if (e.Ok)
+					Result.TrySetResult(true);
+				else
+					Result.TrySetException(new Exception(string.IsNullOrEmpty(e.ErrorText) ? "Unable to delete message object." : e.ErrorText));
+			}, null);
+
+			return Result.Task;
 		}
 
 	}

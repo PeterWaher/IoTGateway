@@ -236,7 +236,7 @@ namespace Waher.IoTGateway.Setup
 			this.testCA = WebServer.Register("/Settings/TestCA", null, this.TestCA, true, false, true);
 			this.acmeChallenge = WebServer.Register("/.well-known/acme-challenge", this.AcmeChallenge, true, true, true);
 
-			return Task.CompletedTask;
+			return base.InitSetup(WebServer);
 		}
 
 		/// <summary>
@@ -250,7 +250,7 @@ namespace Waher.IoTGateway.Setup
 			WebServer.Unregister(this.testCA);
 			WebServer.Unregister(this.acmeChallenge);
 
-			return Task.CompletedTask;
+			return base.UnregisterSetup(WebServer);
 		}
 
 		private void TestDomainNames(HttpRequest Request, HttpResponse Response)

@@ -44,7 +44,11 @@ enter one or more addresses below to which notifications will be sent.
 </p>
 
 <button type='button' onclick='TestAddresses()'>Test</button>
+{{if Waher.IoTGateway.Gateway.Configuring then ]]
 <button id='NextButton' type='button' onclick='Next()'>Next</button>
+[[ else ]]
+<button id='OkButton' type='button' onclick='Ok()'>OK</button>
+[[;}}
 
 </fieldset>
 </form>

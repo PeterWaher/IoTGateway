@@ -171,7 +171,7 @@ namespace Waher.IoTGateway.Setup
 		{
 			WebServer.Unregister(this.consent);
 
-			return Task.CompletedTask;
+			return base.UnregisterSetup(WebServer);
 		}
 
 		private void Consent(HttpRequest Request, HttpResponse Response)

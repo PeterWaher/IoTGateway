@@ -85,7 +85,7 @@ namespace Waher.IoTGateway.Setup
 
 			WebServer.SessionRemoved += WebServer_SessionRemoved;
 
-			return Task.CompletedTask;
+			return base.InitSetup(WebServer);
 		}
 
 		/// <summary>
@@ -98,7 +98,7 @@ namespace Waher.IoTGateway.Setup
 			WebServer.Unregister(this.uploadKey);
 			WebServer.Unregister(this.restore);
 
-			return Task.CompletedTask;
+			return base.UnregisterSetup(WebServer);
 		}
 
 		private void WebServer_SessionRemoved(object Sender, Runtime.Cache.CacheItemEventArgs<string, Variables> e)

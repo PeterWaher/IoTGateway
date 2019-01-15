@@ -97,11 +97,11 @@ namespace Waher.IoTGateway.Setup
 		/// Initializes the setup object.
 		/// </summary>
 		/// <param name="WebServer">Current Web Server object.</param>
-		public override async Task InitSetup(HttpServer WebServer)
+		public override Task InitSetup(HttpServer WebServer)
 		{
-			await base.InitSetup(WebServer);
-
 			this.testAddresses = WebServer.Register("/Settings/TestNotificationAddresses", null, this.TestNotificationAddresses, true, false, true);
+
+			return base.InitSetup(WebServer);
 		}
 
 		/// <summary>
@@ -112,7 +112,7 @@ namespace Waher.IoTGateway.Setup
 		{
 			WebServer.Unregister(this.testAddresses);
 
-			return Task.CompletedTask;
+			return base.UnregisterSetup(WebServer);
 		}
 
 		private void TestNotificationAddresses(HttpRequest Request, HttpResponse Response)

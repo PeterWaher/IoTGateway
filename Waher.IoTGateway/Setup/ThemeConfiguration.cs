@@ -168,7 +168,7 @@ namespace Waher.IoTGateway.Setup
 		{
 			WebServer.Unregister(this.setTheme);
 
-			return Task.CompletedTask;
+			return base.UnregisterSetup(WebServer);
 		}
 
 		private void SetTheme(HttpRequest Request, HttpResponse Response)

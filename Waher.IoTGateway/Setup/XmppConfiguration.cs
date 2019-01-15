@@ -399,7 +399,7 @@ namespace Waher.IoTGateway.Setup
 			this.connectToHost = WebServer.Register("/Settings/ConnectToHost", null, this.ConnectToHost, true, false, true);
 			this.randomizePassword = WebServer.Register("/Settings/RandomizePassword", null, this.RandomizePassword, true, false, true);
 
-			return Task.CompletedTask;
+			return base.InitSetup(WebServer);
 		}
 
 		/// <summary>
@@ -411,7 +411,7 @@ namespace Waher.IoTGateway.Setup
 			WebServer.Unregister(this.connectToHost);
 			WebServer.Unregister(this.randomizePassword);
 
-			return Task.CompletedTask;
+			return base.UnregisterSetup(WebServer);
 		}
 
 		private void ConnectToHost(HttpRequest Request, HttpResponse Response)

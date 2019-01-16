@@ -7,18 +7,18 @@
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
     <Description>Library that provides an object database that stores objects in local files. Storage, indices, searching and retrieval is based solely on meta-data provided through the corresponding class definitions. Object serializers are created dynamically.</Description>
-    <Copyright>Copyright © Waher Data AB 2016-2018. All rights reserved.</Copyright>
+    <Copyright>Copyright © Waher Data AB 2016-2019. All rights reserved.</Copyright>
     <PackageLicenseUrl>https://github.com/PeterWaher/IoTGateway#license</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Persistence/Waher.Persistence.FilesLW</PackageProjectUrl>
     <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>persistence object database file storage</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.0.46</AssemblyVersion>
-    <FileVersion>1.0.46</FileVersion>
+    <AssemblyVersion>1.0.47</AssemblyVersion>
+    <FileVersion>1.0.47</FileVersion>
     <PreBuildEvent>xcopy "C:\My Projects\IoTGateway\Persistence\Waher.Persistence.Files\*.cs" "C:\My Projects\IoTGateway\Persistence\Waher.Persistence.FilesLW" /Y /S
 </PreBuildEvent>
-    <Version>1.0.46</Version>
+    <Version>1.0.47</Version>
     <PackageIconUrl>https://github.com/PeterWaher/IoTGateway/blob/master/Images/Icon.ico?raw=true</PackageIconUrl>
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Persistence\Waher.Persistence.FilesLW\</UpgradeBackupLocation>

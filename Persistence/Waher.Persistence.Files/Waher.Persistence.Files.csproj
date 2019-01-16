@@ -7,16 +7,16 @@
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
     <Description>Library that provides an object database that stores objects in local AES-256 encrypted files. Storage, indices, searching and retrieval is based solely on meta-data provided through the corresponding class definitions. Object serializers are created dynamically. Dynamic code is compiled.</Description>
-    <Copyright>Copyright © Waher Data AB 2016-2018. All rights reserved.</Copyright>
+    <Copyright>Copyright © Waher Data AB 2016-2019. All rights reserved.</Copyright>
     <PackageLicenseUrl>https://github.com/PeterWaher/IoTGateway#license</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Persistence/Waher.Persistence.Files</PackageProjectUrl>
     <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>persistence object database enryption file storage encryption</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.0.46</AssemblyVersion>
-    <FileVersion>1.0.46</FileVersion>
-    <Version>1.0.46</Version>
+    <AssemblyVersion>1.0.47</AssemblyVersion>
+    <FileVersion>1.0.47</FileVersion>
+    <Version>1.0.47</Version>
     <PackageIconUrl>https://github.com/PeterWaher/IoTGateway/blob/master/Images/Icon.ico?raw=true</PackageIconUrl>
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Persistence\Waher.Persistence.Files\</UpgradeBackupLocation>

@@ -221,7 +221,7 @@ namespace Waher.Security.SPF.Test
 				{
 					Answer = new ResourceRecord[]
 					{
-							new TXT(Domain, TYPE.TXT, CLASS.IN, 3600, ms, B2.Length)
+						new TXT(Domain, TYPE.TXT, CLASS.IN, 3600, ms, B2.Length)
 					},
 					Type = QTYPE.TXT,
 					Class = QCLASS.IN,

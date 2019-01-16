@@ -42,42 +42,44 @@ namespace Waher.Networking.DNS.Communication
 				if ((c = Properties.DnsAddresses.Count) == 0)
 					continue;
 
-				this.dnsEndpoint = new IPEndPoint(Properties.DnsAddresses[0], DnsResolver.DefaultDnsPort);
-
-				AddressFamily AddressFamily = this.dnsEndpoint.AddressFamily;
-
 				foreach (UnicastIPAddressInformation UnicastAddress in Properties.UnicastAddresses)
 				{
-					if (UnicastAddress.Address.AddressFamily != AddressFamily)
-						continue;
-
-					IPAddress Address = UnicastAddress.Address;
-
-					try
+					foreach (IPAddress DnsAddress in Properties.DnsAddresses)
 					{
-						this.udp = new UdpClient(AddressFamily)
+						this.dnsEndpoint = new IPEndPoint(DnsAddress, DnsResolver.DefaultDnsPort);
+
+						AddressFamily AddressFamily = this.dnsEndpoint.AddressFamily;
+						if (UnicastAddress.Address.AddressFamily != AddressFamily)
+							continue;
+
+						IPAddress Address = UnicastAddress.Address;
+
+						try
 						{
-							DontFragment = true,
-							MulticastLoopback = false
-						};
-					}
-					catch (NotSupportedException)
-					{
-						continue;
-					}
-					catch (Exception ex)
-					{
-						Log.Critical(ex);
-						continue;
-					}
+							this.udp = new UdpClient(AddressFamily)
+							{
+								DontFragment = true,
+								MulticastLoopback = false
+							};
+						}
+						catch (NotSupportedException)
+						{
+							continue;
+						}
+						catch (Exception ex)
+						{
+							Log.Critical(ex);
+							continue;
+						}
 
-					this.udp.Ttl = 30;
-					this.udp.Client.Bind(new IPEndPoint(Address, 0));
+						this.udp.Ttl = 30;
+						this.udp.Client.Bind(new IPEndPoint(Address, 0));
 
-					this.BeginReceive();
-					this.Init();
+						this.BeginReceive();
+						this.Init();
 
-					return;
+						return;
+					}
 				}
 			}
 

@@ -2351,6 +2351,7 @@ namespace Waher.Persistence.Files
 													catch (Exception)
 													{
 														Len2 = 0;
+														Obj = null;
 													}
 
 													if (Len2 != 0)
@@ -2360,17 +2361,20 @@ namespace Waher.Persistence.Files
 													{
 														ObjectIds[Guid] = true;
 
-														try
+														if (!(Obj is null))
 														{
-															await TempFile.SaveNewObject(e.Current);
-														}
-														catch (Exception ex)
-														{
-															if (Exceptions is null)
-																Exceptions = new LinkedList<Exception>();
+															try
+															{
+																await TempFile.SaveNewObject(Obj);
+															}
+															catch (Exception ex)
+															{
+																if (Exceptions is null)
+																	Exceptions = new LinkedList<Exception>();
 
-															Exceptions.AddLast(ex);
-															continue;
+																Exceptions.AddLast(ex);
+																continue;
+															}
 														}
 													}
 												}

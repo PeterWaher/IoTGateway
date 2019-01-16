@@ -250,12 +250,22 @@ namespace Waher.Security.SPF
 			}
 			catch (Exception ex)
 			{
-				return new KeyValuePair<SpfResult, string>(SpfResult.PermanentError, "Unable to evaluate SPF record: " + ex.Message);
+				return new KeyValuePair<SpfResult, string>(SpfResult.PermanentError, "Unable to evaluate SPF record: " + FirstRow(ex.Message));
 			}
 
 			return new KeyValuePair<SpfResult, string>(SpfResult.Neutral, null);
 		}
 
+		private static string FirstRow(string s)
+		{
+			int i = s.IndexOfAny(CRLF);
+			if (i < 0)
+				return s;
+			else
+				return s.Substring(0, i);
+		}
+
 		private static readonly char[] space = new char[] { ' ' };
+		private static readonly char[] CRLF = new char[] { '\r', '\n' };
 	}
 }

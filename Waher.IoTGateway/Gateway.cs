@@ -2467,10 +2467,9 @@ namespace Waher.IoTGateway
 
 		private static void Resend(object P)
 		{
-			object[] P2 = (string[])P;
+			object[] P2 = (object[])P;
 			SendNotification((string)P2[0], (string)P2[1], (string)P2[2], (string)P2[3], (string)P2[4], (bool)P2[5]);
 		}
-
 
 		#endregion
 

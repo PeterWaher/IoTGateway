@@ -27,13 +27,14 @@ namespace Waher.Security.SPF
 		/// <param name="Sender">the "MAIL FROM" or "HELO" identity.</param>
 		/// <param name="HelloDomain">Domain as presented by the client in the HELO or EHLO command.</param>
 		/// <param name="HostDomain">Domain of the current host, performing SPF authentication.</param>
+		/// <param name="SpfExpressions">SPF Expressions that can be used, in case a domain lacks SPF records in the DNS.</param>
 		/// <returns>Result of SPF evaluation, together with an optional explanation string,
 		/// if one exists, and if the result indicates a failure.</returns>
 		public static Task<KeyValuePair<SpfResult, string>> CheckHost(IPAddress Address, string DomainName, string Sender,
-			string HelloDomain, string HostDomain)
+			string HelloDomain, string HostDomain, params SpfExpression[] SpfExpressions)
 		{
 			Term Term = new Term(Sender, DomainName, Address, HelloDomain, HostDomain);
-			return CheckHost(Term);
+			return CheckHost(Term, SpfExpressions);
 		}
 
 		/// <summary>
@@ -42,9 +43,10 @@ namespace Waher.Security.SPF
 		/// permitted to send mail with a given identity.
 		/// </summary>
 		/// <param name="Term">Information about current query.</param>
+		/// <param name="SpfExpressions">SPF Expressions that can be used, in case a domain lacks SPF records in the DNS.</param>
 		/// <returns>Result of SPF evaluation, together with an optional explanation string,
 		/// if one exists, and if the result indicates a failure.</returns>
-		internal static async Task<KeyValuePair<SpfResult, string>> CheckHost(Term Term)
+		internal static async Task<KeyValuePair<SpfResult, string>> CheckHost(Term Term, SpfExpression[] SpfExpressions)
 		{
 			Exp Explanation = null;
 			string[] TermStrings = null;
@@ -65,18 +67,36 @@ namespace Waher.Security.SPF
 						continue;
 
 					if (!(TermStrings is null))
-						return new KeyValuePair<SpfResult, string>(SpfResult.PermanentError, "Multiple SPF records found.");
+						return new KeyValuePair<SpfResult, string>(SpfResult.PermanentError, "Multiple SPF records found for " + Term.domain + ".");
 
 					TermStrings = s.Substring(6).Trim().Split(space, StringSplitOptions.RemoveEmptyEntries);
 				}
 			}
 			catch (Exception)
 			{
-				return new KeyValuePair<SpfResult, string>(SpfResult.None, "No SPF records found.");
+				TermStrings = null;
 			}
 
 			if (TermStrings is null)
-				return new KeyValuePair<SpfResult, string>(SpfResult.None, "No SPF records found.");
+			{
+				if (!(SpfExpressions is null))
+				{
+					foreach (SpfExpression Expression in SpfExpressions)
+					{
+						if (Expression.IsApplicable(Term.domain))
+						{
+							if (Expression.Spf.StartsWith("v=spf1"))
+							{
+								TermStrings = Expression.Spf.Substring(6).Trim().Split(space, StringSplitOptions.RemoveEmptyEntries);
+								break;
+							}
+						}
+					}
+				}
+
+				if (TermStrings is null)
+					return new KeyValuePair<SpfResult, string>(SpfResult.None, "No SPF records found " + Term.domain + ".");
+			}
 
 			// Syntax evaluation first, §4.6
 
@@ -128,7 +148,7 @@ namespace Waher.Security.SPF
 							break;
 
 						case "include":
-							Mechanisms.AddLast(new Include(Term, Qualifier));
+							Mechanisms.AddLast(new Include(Term, Qualifier, SpfExpressions));
 							break;
 
 						case "a":
@@ -209,7 +229,7 @@ namespace Waher.Security.SPF
 					Term.domain = Redirect.Domain;
 					try
 					{
-						KeyValuePair<SpfResult, string> Result = await SpfResolver.CheckHost(Term);
+						KeyValuePair<SpfResult, string> Result = await SpfResolver.CheckHost(Term, SpfExpressions);
 
 						if (Result.Key == SpfResult.None)
 							return new KeyValuePair<SpfResult, string>(SpfResult.PermanentError, Explanation == null ? null : await Explanation.Evaluate());

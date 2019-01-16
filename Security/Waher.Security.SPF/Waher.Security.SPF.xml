@@ -112,12 +112,13 @@
             The "include" mechanism triggers a recursive evaluation of check_host().
             </summary>
         </member>
-        <member name="M:Waher.Security.SPF.Mechanisms.Include.#ctor(Waher.Security.SPF.Term,Waher.Security.SPF.SpfQualifier)">
+        <member name="M:Waher.Security.SPF.Mechanisms.Include.#ctor(Waher.Security.SPF.Term,Waher.Security.SPF.SpfQualifier,Waher.Security.SPF.SpfExpression[])">
             <summary>
             The "include" mechanism triggers a recursive evaluation of check_host().
             </summary>
             <param name="Term">Term</param>
             <param name="Qualifier">Qualifier</param>
+            <param name="SpfRecords">SPF Expressions that can be used, in case a domain lacks SPF records in the DNS.</param>
         </member>
         <member name="M:Waher.Security.SPF.Mechanisms.Include.Matches">
             <summary>
@@ -372,6 +373,41 @@
             </summary>
             <returns>Match result</returns>
         </member>
+        <member name="T:Waher.Security.SPF.SpfExpression">
+            <summary>
+            Contains information about a SPF string.
+            </summary>
+        </member>
+        <member name="M:Waher.Security.SPF.SpfExpression.#ctor(System.String,System.Boolean,System.String)">
+            <summary>
+            Contains information about a SPF string.
+            </summary>
+            <param name="Domain"></param>
+            <param name="IncludeSubdomains"></param>
+            <param name="Spf"></param>
+        </member>
+        <member name="P:Waher.Security.SPF.SpfExpression.Domain">
+            <summary>
+            Domain name.
+            </summary>
+        </member>
+        <member name="P:Waher.Security.SPF.SpfExpression.Spf">
+            <summary>
+            SPF expression.
+            </summary>
+        </member>
+        <member name="P:Waher.Security.SPF.SpfExpression.IncludeSubdomains">
+            <summary>
+            If expression is valid for subdomains to <see cref="P:Waher.Security.SPF.SpfExpression.Domain"/> also.
+            </summary>
+        </member>
+        <member name="M:Waher.Security.SPF.SpfExpression.IsApplicable(System.String)">
+            <summary>
+            Checks if the expression is applicable to a given domain.
+            </summary>
+            <param name="Domain">Domain to check.</param>
+            <returns>If the expression is applicable.</returns>
+        </member>
         <member name="T:Waher.Security.SPF.SpfResolver">
             <summary>
             Resolves a SPF string, as defined in:
@@ -379,7 +415,7 @@
             RFC 7208: https://tools.ietf.org/html/rfc7208: Sender Policy Framework (SPF) for Authorizing Use of Domains in Email, Version 1
             </summary>
         </member>
-        <member name="M:Waher.Security.SPF.SpfResolver.CheckHost(System.Net.IPAddress,System.String,System.String,System.String,System.String)">
+        <member name="M:Waher.Security.SPF.SpfResolver.CheckHost(System.Net.IPAddress,System.String,System.String,System.String,System.String,Waher.Security.SPF.SpfExpression[])">
             <summary>
             Fetches SPF records, parses them, and
             evaluates them to determine whether a particular host is or is not
@@ -393,16 +429,18 @@
             <param name="Sender">the "MAIL FROM" or "HELO" identity.</param>
             <param name="HelloDomain">Domain as presented by the client in the HELO or EHLO command.</param>
             <param name="HostDomain">Domain of the current host, performing SPF authentication.</param>
+            <param name="SpfExpressions">SPF Expressions that can be used, in case a domain lacks SPF records in the DNS.</param>
             <returns>Result of SPF evaluation, together with an optional explanation string,
             if one exists, and if the result indicates a failure.</returns>
         </member>
-        <member name="M:Waher.Security.SPF.SpfResolver.CheckHost(Waher.Security.SPF.Term)">
+        <member name="M:Waher.Security.SPF.SpfResolver.CheckHost(Waher.Security.SPF.Term,Waher.Security.SPF.SpfExpression[])">
             <summary>
             Fetches SPF records, parses them, and
             evaluates them to determine whether a particular host is or is not
             permitted to send mail with a given identity.
             </summary>
             <param name="Term">Information about current query.</param>
+            <param name="SpfExpressions">SPF Expressions that can be used, in case a domain lacks SPF records in the DNS.</param>
             <returns>Result of SPF evaluation, together with an optional explanation string,
             if one exists, and if the result indicates a failure.</returns>
         </member>

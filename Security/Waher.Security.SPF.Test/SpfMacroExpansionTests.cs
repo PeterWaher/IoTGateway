@@ -1,18 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections.Generic;
 using System.Net;
-using System.IO;
-using System.Text;
 using System.Threading.Tasks;
-using Waher.Networking.DNS;
-using Waher.Networking.DNS.Communication;
-using Waher.Networking.DNS.Enumerations;
-using Waher.Networking.DNS.ResourceRecords;
-using Waher.Persistence;
-using Waher.Persistence.Files;
-using Waher.Persistence.Filters;
-using Waher.Runtime.Inventory;
 using Waher.Security.SPF.Mechanisms;
 
 namespace Waher.Security.SPF.Test
@@ -20,28 +8,7 @@ namespace Waher.Security.SPF.Test
 	[TestClass]
 	public class SpfMacroExpansionTests
 	{
-		private static FilesProvider filesProvider = null;
-
 		private Term term;
-
-		[AssemblyInitialize]
-		public static void AssemblyInitialize(TestContext Context)
-		{
-			Types.Initialize(
-				typeof(Database).Assembly,
-				typeof(FilesProvider).Assembly,
-				typeof(DnsResolver).Assembly);
-
-			filesProvider = new FilesProvider("Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000, true);
-			Database.Register(filesProvider);
-		}
-
-		[AssemblyCleanup]
-		public static void AssemblyCleanup()
-		{
-			filesProvider?.Dispose();
-			filesProvider = null;
-		}
 
 		[TestInitialize]
 		public void TestInitialize()
@@ -181,60 +148,6 @@ namespace Waher.Security.SPF.Test
 				"email.example.com", "example.com");
 
 			await this.Test("%{ir}.%{v}._spf.%{d2}", "1.0.b.c.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.8.b.d.0.1.0.0.2.ip6._spf.example.com");
-		}
-
-		[TestMethod]
-		public async Task Test_21_SPF_Evaluation_1()
-		{
-			KeyValuePair<SpfResult, string> Result = await SpfResolver.CheckHost(
-				IPAddress.Parse("194.9.95.112"), "littlesister.se",
-				"testaccount@littlesister.se", "smtp.outgoing.loopia.se", "extas.is");
-			Assert.AreEqual(SpfResult.Pass, Result.Key, Result.Value);
-		}
-
-		[TestMethod]
-		public async Task Test_22_SPF_Evaluation_2()
-		{
-			await this.TestSpfString("v=spf1 include:_spf.google.com ~all",
-				"mobilgirot.com", "testaccount@mobilgirot.com",
-				IPAddress.Parse("209.85.221.49"), "mail-wr1-f49.google.com",
-				"extas.is");
-		}
-
-		private async Task TestSpfString(string SpfString, string Domain,
-			string Sender, IPAddress Address, string CallerHost, string Host)
-		{
-			byte[] B1 = Encoding.ASCII.GetBytes(SpfString);
-			byte[] B2 = new byte[B1.Length + 1];
-			B2[0] = (byte)B1.Length;
-			B1.CopyTo(B2, 1);
-
-			using (MemoryStream ms = new MemoryStream(B2))
-			{
-				await Database.Delete(
-					await Database.Find<DnsResponse>(new FilterAnd(
-						new FilterFieldEqualTo("Name", Domain),
-						new FilterFieldEqualTo("Type", QTYPE.TXT),
-						new FilterFieldEqualTo("Class", QCLASS.IN))));
-
-				DnsResponse Resp = new DnsResponse()
-				{
-					Answer = new ResourceRecord[]
-					{
-						new TXT(Domain, TYPE.TXT, CLASS.IN, 3600, ms, B2.Length)
-					},
-					Type = QTYPE.TXT,
-					Class = QCLASS.IN,
-					Expires = DateTime.Now.AddHours(1),
-					Name = Domain
-				};
-
-				await Database.Insert(Resp);
-			}
-
-			KeyValuePair<SpfResult, string> Result = await SpfResolver.CheckHost(
-				Address, Domain, Sender, CallerHost, Host);
-			Assert.AreEqual(SpfResult.Pass, Result.Key, Result.Value);
 		}
 	}
 }

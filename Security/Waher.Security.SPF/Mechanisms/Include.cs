@@ -9,14 +9,18 @@ namespace Waher.Security.SPF.Mechanisms
 	/// </summary>
 	public class Include : MechanismDomainSpec	
 	{
+		private SpfExpression[] spfExpressions;
+
 		/// <summary>
 		/// The "include" mechanism triggers a recursive evaluation of check_host().
 		/// </summary>
 		/// <param name="Term">Term</param>
 		/// <param name="Qualifier">Qualifier</param>
-		public Include(Term Term, SpfQualifier Qualifier)
+		/// <param name="SpfRecords">SPF Expressions that can be used, in case a domain lacks SPF records in the DNS.</param>
+		public Include(Term Term, SpfQualifier Qualifier, params SpfExpression[] SpfExpressions)
 			: base(Term, Qualifier)
 		{
+			this.spfExpressions = SpfExpressions;
 		}
 
 		/// <summary>
@@ -29,7 +33,7 @@ namespace Waher.Security.SPF.Mechanisms
 			this.term.domain = this.Domain;
 			try
 			{
-				KeyValuePair<SpfResult, string> Result = await SpfResolver.CheckHost(this.term);
+				KeyValuePair<SpfResult, string> Result = await SpfResolver.CheckHost(this.term, this.spfExpressions);
 
 				switch (Result.Key)
 				{

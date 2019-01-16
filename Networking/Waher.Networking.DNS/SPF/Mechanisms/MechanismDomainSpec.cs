@@ -35,7 +35,7 @@ namespace Waher.Networking.DNS.SPF.Mechanisms
 
 				this.domain = Term.s.Substring(Start, Term.pos - Start);
 			}
-			else if (!this.DomainRequired)
+			else if (this.DomainRequired)
 				throw new Exception(this.Separator + " expected.");
 		}
 

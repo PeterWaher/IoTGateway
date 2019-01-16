@@ -227,9 +227,9 @@ namespace Waher.Networking.DNS.SPF
 
 				}
 			}
-			catch (Exception)
+			catch (Exception ex)
 			{
-				return new KeyValuePair<SpfResult, string>(SpfResult.PermanentError, "Unable to evaluate SPF record.");
+				return new KeyValuePair<SpfResult, string>(SpfResult.PermanentError, "Unable to evaluate SPF record: " + ex.Message);
 			}
 
 			return new KeyValuePair<SpfResult, string>(SpfResult.Neutral, null);

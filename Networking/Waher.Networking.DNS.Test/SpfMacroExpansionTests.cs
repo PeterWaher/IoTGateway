@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using Waher.Networking.DNS.SPF;
@@ -149,6 +150,15 @@ namespace Waher.Networking.DNS.Test
 				"email.example.com", "example.com");
 
 			await this.Test("%{ir}.%{v}._spf.%{d2}", "1.0.b.c.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.8.b.d.0.1.0.0.2.ip6._spf.example.com");
+		}
+
+		[TestMethod]
+		public async Task Test_21_SPF_Evaluation()
+		{
+			KeyValuePair<SpfResult, string> Result = await SpfResolver.CheckHost(
+				IPAddress.Parse("194.9.95.112"), "littlesister.se", 
+				"peter@littlesister.se", "smtp.outgoing.loopia.se", "extas.is");
+			Assert.AreEqual(SpfResult.Pass, Result.Key, Result.Value);
 		}
 	}
 }

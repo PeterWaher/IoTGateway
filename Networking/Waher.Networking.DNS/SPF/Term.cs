@@ -74,7 +74,7 @@ namespace Waher.Networking.DNS.SPF
 		/// <param name="String">String-representation of term.</param>
 		public void Reset(string String)
 		{
-			this.s = String.Trim();
+			this.s = String?.Trim() ?? string.Empty;
 			this.len = this.s.Length;
 			this.pos = 0;
 		}

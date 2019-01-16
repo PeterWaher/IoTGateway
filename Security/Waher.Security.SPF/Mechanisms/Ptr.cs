@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Networking.DNS;
 
-namespace Waher.Networking.DNS.SPF.Mechanisms
+namespace Waher.Security.SPF.Mechanisms
 {
 	/// <summary>
 	/// This mechanism tests whether the DNS reverse-mapping for &lt;ip&gt; exists

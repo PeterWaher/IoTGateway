@@ -3,7 +3,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 
-namespace Waher.Networking.DNS.SPF.Mechanisms
+namespace Waher.Security.SPF.Mechanisms
 {
 	/// <summary>
 	/// Abstract base class for IP-based SPF mechanisms.

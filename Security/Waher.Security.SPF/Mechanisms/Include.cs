@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Waher.Networking.DNS.SPF.Mechanisms
+namespace Waher.Security.SPF.Mechanisms
 {
 	/// <summary>
 	/// The "include" mechanism triggers a recursive evaluation of check_host().

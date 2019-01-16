@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Net;
 using System.Threading.Tasks;
+using Waher.Networking.DNS;
 
-namespace Waher.Networking.DNS.SPF.Mechanisms
+namespace Waher.Security.SPF.Mechanisms
 {
 	/// <summary>
 	/// This mechanism is used to construct an arbitrary domain name that is

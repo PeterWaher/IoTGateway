@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
-using Waher.Networking.DNS.SPF.Mechanisms;
+using Waher.Networking.DNS;
+using Waher.Security.SPF.Mechanisms;
 
-namespace Waher.Networking.DNS.SPF
+namespace Waher.Security.SPF
 {
 	/// <summary>
 	/// Resolves a SPF string, as defined in:

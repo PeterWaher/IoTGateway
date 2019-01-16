@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
+using Waher.Networking.DNS;
 
-namespace Waher.Networking.DNS.SPF.Mechanisms
+namespace Waher.Security.SPF.Mechanisms
 {
 	/// <summary>
 	/// This mechanism matches if &lt;ip&gt; is one of the &lt;target-name&gt;'s IP

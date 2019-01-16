@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using Waher.Networking.DNS.Communication;
 using Waher.Networking.DNS.Enumerations;
 using Waher.Networking.DNS.ResourceRecords;
-using Waher.Networking.DNS.SPF;
 using Waher.Persistence;
 using Waher.Persistence.Filters;
 
@@ -732,32 +731,21 @@ namespace Waher.Networking.DNS
 			return Result.ToArray();
 		}
 
-		internal static int Next(int MaxValue)
+		/// <summary>
+		/// Returns a non-negative random integer that is less than the specified maximum.
+		/// </summary>
+		/// <param name="MaxValue">The exclusive upper bound of the random number to be generated. maxValue must
+		/// be greater than or equal to 0.</param>
+		/// <returns>A 32-bit signed integer that is greater than or equal to 0, and less than maxValue;
+		/// that is, the range of return values ordinarily includes 0 but not maxValue. However,
+		/// if maxValue equals 0, maxValue is returned.</returns>
+		/// <exception cref="ArgumentOutOfRangeException">maxValue is less than 0</exception>
+		public static int Next(int MaxValue)
 		{
 			lock (rnd)
 			{
 				return rnd.Next(MaxValue);
 			}
-		}
-
-		/// <summary>
-		/// Checks if a client is authorized to operate under a given domain name. This is done by evaluating
-		/// SPF records for the domain, in accordance with:
-		/// 
-		/// RFC 7208: https://tools.ietf.org/html/rfc7208: Sender Policy Framework (SPF) for Authorizing Use of Domains
-		/// </summary>
-		/// <param name="Address">the IP address of the client that wants to operate under a given domain.</param>
-		/// <param name="DomainName">The domain that provides the sought-after authorization information; initially, 
-		/// the domain portion of the "MAIL FROM" or "HELO" identity (for SMTP).</param>
-		/// <param name="Sender">The claimed sender (in SMTO: the "MAIL FROM" or "HELO" identity).</param>
-		/// <param name="HelloDomain">Domain as presented by the client during initial hndshake (in SMTP, the HELO or EHLO command).</param>
-		/// <param name="HostDomain">Domain of the current host, performing SPF authentication.</param>
-		/// <returns>Result of SPF evaluation, together with an optional explanation string,
-		/// if one exists, and if the result indicates a failure.</returns>
-		public static Task<KeyValuePair<SpfResult, string>> CheckHost(IPAddress Address, string DomainName, string Sender,
-			string HelloDomain, string HostDomain)
-		{
-			return SpfResolver.CheckHost(Address, DomainName, Sender, HelloDomain, HostDomain);
 		}
 
 	}

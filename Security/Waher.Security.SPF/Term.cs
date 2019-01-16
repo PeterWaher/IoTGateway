@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net;
-using Waher.Networking.DNS.SPF.Mechanisms;
+using Waher.Security.SPF.Mechanisms;
 
-namespace Waher.Networking.DNS.SPF
+namespace Waher.Security.SPF
 {
 	/// <summary>
 	/// SPF Mechanism qualifier

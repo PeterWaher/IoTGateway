@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Waher.Networking.DNS.SPF
+namespace Waher.Security.SPF
 {
 	/// <summary>
 	/// Result of a SPF (Sender Policy Framework) evaluation.

@@ -1,16 +1,41 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 using System.Net;
+using System.Text;
 using System.Threading.Tasks;
-using Waher.Networking.DNS.SPF;
-using Waher.Networking.DNS.SPF.Mechanisms;
+using Waher.Networking.DNS;
+using Waher.Persistence;
+using Waher.Persistence.Files;
+using Waher.Runtime.Inventory;
+using Waher.Security.SPF.Mechanisms;
 
-namespace Waher.Networking.DNS.Test
+namespace Waher.Security.SPF.Test
 {
 	[TestClass]
 	public class SpfMacroExpansionTests
 	{
+		private static FilesProvider filesProvider = null;
+
 		private Term term;
+
+		[AssemblyInitialize]
+		public static void AssemblyInitialize(TestContext Context)
+		{
+			Types.Initialize(
+				typeof(Database).Assembly,
+				typeof(FilesProvider).Assembly,
+				typeof(DnsResolver).Assembly);
+
+			filesProvider = new FilesProvider("Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000, true);
+			Database.Register(filesProvider);
+		}
+
+		[AssemblyCleanup]
+		public static void AssemblyCleanup()
+		{
+			filesProvider?.Dispose();
+			filesProvider = null;
+		}
 
 		[TestInitialize]
 		public void TestInitialize()

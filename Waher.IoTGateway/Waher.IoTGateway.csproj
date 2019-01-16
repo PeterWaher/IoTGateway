@@ -15,9 +15,9 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>IoT Gateway HTTP CoAP MQTT XMPP LWM2M DNS</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.0.68</AssemblyVersion>
-    <FileVersion>1.0.68</FileVersion>
-    <Version>1.0.68</Version>
+    <AssemblyVersion>1.0.69</AssemblyVersion>
+    <FileVersion>1.0.69</FileVersion>
+    <Version>1.0.69</Version>
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Waher.IoTGateway\</UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>
@@ -199,6 +199,7 @@
     <ProjectReference Include="..\Security\Waher.Security.JWS\Waher.Security.JWS.csproj" />
     <ProjectReference Include="..\Security\Waher.Security.JWT\Waher.Security.JWT.csproj" />
     <ProjectReference Include="..\Security\Waher.Security.PKCS\Waher.Security.PKCS.csproj" />
+    <ProjectReference Include="..\Security\Waher.Security.SPF\Waher.Security.SPF.csproj" />
     <ProjectReference Include="..\Security\Waher.Security\Waher.Security.csproj" />
     <ProjectReference Include="..\Things\Waher.Things.Metering\Waher.Things.Metering.csproj" />
     <ProjectReference Include="..\Things\Waher.Things\Waher.Things.csproj" />

@@ -50,7 +50,7 @@ namespace Waher.Content.Test
 			Assert.IsNotNull(PlainText);
 			Console.Out.WriteLine(PlainText);
 			Console.Out.WriteLine();
-
+			
 			HtmlDocument Html = Alternatives.Content[1].Decoded as HtmlDocument;
 			Assert.IsNotNull(Html);
 			Console.Out.WriteLine(Html.HtmlText);

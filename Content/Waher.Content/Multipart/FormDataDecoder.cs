@@ -340,6 +340,12 @@ namespace Waher.Content.Multipart
 
 								continue;
 							}
+							else
+							{
+								ms.WriteByte((byte)'=');
+								ms.WriteByte((byte)ch);
+								continue;
+							}
 
 							b <<= 4;
 

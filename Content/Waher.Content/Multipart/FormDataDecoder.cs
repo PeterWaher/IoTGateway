@@ -333,6 +333,13 @@ namespace Waher.Content.Multipart
 								b = (byte)(ch - 'a' + 10);
 							else if (ch >= 'A' && ch <= 'F')
 								b = (byte)(ch - 'A' + 10);
+							else if (ch == '\r')
+							{
+								if (Encoded[j + 1] == (byte)'\n')
+									j++;
+
+								continue;
+							}
 
 							b <<= 4;
 

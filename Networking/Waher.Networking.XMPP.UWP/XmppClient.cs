@@ -241,7 +241,7 @@ namespace Waher.Networking.XMPP
 
 		private const int BufferSize = 65536;
 		private const int KeepAliveTimeSeconds = 30;
-		private const int MaxFragmentSize = 1000000;
+		private const int MaxFragmentSize = 40000000;
 
 		private readonly LinkedList<KeyValuePair<string, EventHandler>> outputQueue = new LinkedList<KeyValuePair<string, EventHandler>>();
 		private readonly Dictionary<string, bool> authenticationMechanisms = new Dictionary<string, bool>();
@@ -686,6 +686,7 @@ namespace Waher.Networking.XMPP
 				this.serverCertificateValid = false;
 				this.serverFeatures = null;
 				this.serverComponents = null;
+				this.fragmentLength = 0;
 
 				if (this.textTransportLayer is null)
 				{

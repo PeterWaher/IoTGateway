@@ -919,13 +919,8 @@ namespace Waher.IoTGateway
 			else
 				contractsClient = null;
 
-			if (XmppConfiguration.Instance.Mail)
-			{
-				mailClient = new MailClient(xmppClient);
-				mailClient.MailReceived += MailClient_MailReceived;
-			}
-			else
-				mailClient = null;
+			mailClient = new MailClient(xmppClient);
+			mailClient.MailReceived += MailClient_MailReceived;
 
 			return Task.CompletedTask;
 		}

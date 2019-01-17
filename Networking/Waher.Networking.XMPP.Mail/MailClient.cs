@@ -255,7 +255,7 @@ namespace Waher.Networking.XMPP.Mail
 		{
 			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
 
-			this.Get(ObjectId, (sender, e) =>
+			this.Delete(ObjectId, (sender, e) =>
 			{
 				if (e.Ok)
 					Result.TrySetResult(true);

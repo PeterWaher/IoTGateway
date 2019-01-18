@@ -579,7 +579,7 @@ namespace Waher.Content.Html
 						}
 						else if (ch == '?')
 							State = 19;
-						else if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || (ch >= '0' && ch <= '9'))
+						else if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || (ch >= '0' && ch <= '9') || ch=='.' || ch=='_' || ch == '-' || ch == ':')
 						{
 							sb.Append(ch);
 							Empty = false;

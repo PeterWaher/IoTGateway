@@ -7,7 +7,7 @@
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
     <Description>Class library providing a simple HTTP(S) server for publishing dynamic content and services, managing user authentication based on a customizable set of users and privileges. Supports the WebSocket protocol.</Description>
-    <Copyright>Copyright © Waher Data AB 2016-2018. All rights reserved.</Copyright>
+    <Copyright>Copyright © Waher Data AB 2016-2019. All rights reserved.</Copyright>
     <PackageLicenseUrl>https://github.com/PeterWaher/IoTGateway#license</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Networking/Waher.Networking.HTTP</PackageProjectUrl>
     <PackageIconUrl>https://github.com/PeterWaher/IoTGateway/blob/master/Images/Icon.ico?raw=true</PackageIconUrl>
@@ -15,9 +15,9 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>networking communication server web http https websockets</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.0.28</AssemblyVersion>
-    <FileVersion>1.0.28</FileVersion>
-    <Version>1.0.28</Version>
+    <AssemblyVersion>1.0.29</AssemblyVersion>
+    <FileVersion>1.0.29</FileVersion>
+    <Version>1.0.29</Version>
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Networking\Waher.Networking.HTTP\</UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>

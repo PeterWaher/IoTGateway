@@ -125,7 +125,7 @@ namespace Waher.Networking.HTTP.HeaderFields
 		/// <returns>If content of the given type is acceptable to the client.</returns>
 		public bool IsAcceptable(string ContentType)
 		{
-			return this.IsAcceptable(ContentType, out double Quality, out ContentTypeAcceptance Acceptance, null);
+			return this.IsAcceptable(ContentType, out double Quality, out ContentTypeAcceptance Acceptance);
 		}
 
 		/// <summary>
@@ -136,7 +136,7 @@ namespace Waher.Networking.HTTP.HeaderFields
 		/// <returns>If content of the given type is acceptable to the client.</returns>
 		public bool IsAcceptable(string ContentType, out double Quality)
 		{
-			return this.IsAcceptable(ContentType, out Quality, out ContentTypeAcceptance Acceptance, null);
+			return this.IsAcceptable(ContentType, out Quality, out ContentTypeAcceptance Acceptance);
 		}
 
 		/// <summary>
@@ -148,7 +148,14 @@ namespace Waher.Networking.HTTP.HeaderFields
 		/// <returns>If content of the given type is acceptable to the client.</returns>
 		public bool IsAcceptable(string ContentType, out double Quality, out ContentTypeAcceptance Acceptance)
 		{
-			return this.IsAcceptable(ContentType, out Quality, out Acceptance, null);
+			int i = ContentType.IndexOf(';');
+			if (i < 0)
+				return this.IsAcceptable(ContentType, out Quality, out Acceptance, null);
+			else
+			{
+				return this.IsAcceptable(ContentType.Substring(0, i).Trim(), out Quality, out Acceptance,
+					CommonTypes.ParseFieldValues(ContentType.Substring(i + 1).Trim()));
+			}
 		}
 
 		/// <summary>

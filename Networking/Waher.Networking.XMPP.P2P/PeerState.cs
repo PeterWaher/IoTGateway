@@ -266,8 +266,10 @@ namespace Waher.Networking.XMPP.P2P
                         }
                         else if (ch == '/')
                             this.inputState++;
-                        else
-                            this.inputState += 2;
+						else if (ch == '!')
+							this.inputState = 13;
+						else
+							this.inputState += 2;
                         break;
 
                     case 7: // Waiting for end of closing tag
@@ -387,7 +389,211 @@ namespace Waher.Networking.XMPP.P2P
                             this.inputState -= 2;
                         break;
 
-                    default:
+					case 13:    // Third character in start of comment
+						this.fragment.Append(ch);
+						if (++this.fragmentLength > MaxFragmentSize)
+						{
+							this.ToError();
+							return false;
+						}
+						else if (ch == '-')
+							this.inputState++;
+						else if (ch == '[')
+							this.inputState = 18;
+						else
+						{
+							this.ToError();
+							return false;
+						}
+						break;
+
+					case 14:    // Fourth character in start of comment
+						this.fragment.Append(ch);
+						if (++this.fragmentLength > MaxFragmentSize)
+						{
+							this.ToError();
+							return false;
+						}
+						else if (ch == '-')
+							this.inputState++;
+						else
+						{
+							this.ToError();
+							return false;
+						}
+						break;
+
+					case 15:    // In comment
+						this.fragment.Append(ch);
+						if (++this.fragmentLength > MaxFragmentSize)
+						{
+							this.ToError();
+							return false;
+						}
+						else if (ch == '-')
+							this.inputState++;
+						break;
+
+					case 16:    // Second character in end of comment
+						this.fragment.Append(ch);
+						if (++this.fragmentLength > MaxFragmentSize)
+						{
+							this.ToError();
+							return false;
+						}
+						else if (ch == '-')
+							this.inputState++;
+						else
+							this.inputState--;
+						break;
+
+					case 17:    // Third character in end of comment
+						this.fragment.Append(ch);
+						if (++this.fragmentLength > MaxFragmentSize)
+						{
+							this.ToError();
+							return false;
+						}
+						else if (ch == '>')
+							this.inputState = 5;
+						else
+							this.inputState -= 2;
+						break;
+
+					case 18:    // Fourth character in start of CDATA
+						this.fragment.Append(ch);
+						if (++this.fragmentLength > MaxFragmentSize)
+						{
+							this.ToError();
+							return false;
+						}
+						else if (ch == 'C')
+							this.inputState++;
+						else
+						{
+							this.ToError();
+							return false;
+						}
+						break;
+
+					case 19:    // Fifth character in start of CDATA
+						this.fragment.Append(ch);
+						if (++this.fragmentLength > MaxFragmentSize)
+						{
+							this.ToError();
+							return false;
+						}
+						else if (ch == 'D')
+							this.inputState++;
+						else
+						{
+							this.ToError();
+							return false;
+						}
+						break;
+
+					case 20:    // Sixth character in start of CDATA
+						this.fragment.Append(ch);
+						if (++this.fragmentLength > MaxFragmentSize)
+						{
+							this.ToError();
+							return false;
+						}
+						else if (ch == 'A')
+							this.inputState++;
+						else
+						{
+							this.ToError();
+							return false;
+						}
+						break;
+
+					case 21:    // Seventh character in start of CDATA
+						this.fragment.Append(ch);
+						if (++this.fragmentLength > MaxFragmentSize)
+						{
+							this.ToError();
+							return false;
+						}
+						else if (ch == 'T')
+							this.inputState++;
+						else
+						{
+							this.ToError();
+							return false;
+						}
+						break;
+
+					case 22:    // Eighth character in start of CDATA
+						this.fragment.Append(ch);
+						if (++this.fragmentLength > MaxFragmentSize)
+						{
+							this.ToError();
+							return false;
+						}
+						else if (ch == 'A')
+							this.inputState++;
+						else
+						{
+							this.ToError();
+							return false;
+						}
+						break;
+
+					case 23:    // Ninth character in start of CDATA
+						this.fragment.Append(ch);
+						if (++this.fragmentLength > MaxFragmentSize)
+						{
+							this.ToError();
+							return false;
+						}
+						else if (ch == '[')
+							this.inputState++;
+						else
+						{
+							this.ToError();
+							return false;
+						}
+						break;
+
+					case 24:    // In CDATA
+						this.fragment.Append(ch);
+						if (++this.fragmentLength > MaxFragmentSize)
+						{
+							this.ToError();
+							return false;
+						}
+						else if (ch == ']')
+							this.inputState++;
+						break;
+
+					case 25:    // Second character in end of CDATA
+						this.fragment.Append(ch);
+						if (++this.fragmentLength > MaxFragmentSize)
+						{
+							this.ToError();
+							return false;
+						}
+						else if (ch == ']')
+							this.inputState++;
+						else
+							this.inputState--;
+						break;
+
+					case 26:    // Third character in end of CDATA
+						this.fragment.Append(ch);
+						if (++this.fragmentLength > MaxFragmentSize)
+						{
+							this.ToError();
+							return false;
+						}
+						else if (ch == '>')
+							this.inputState = 5;
+						else
+							this.inputState -= 2;
+						break;
+
+					default:
                         break;
                 }
             }

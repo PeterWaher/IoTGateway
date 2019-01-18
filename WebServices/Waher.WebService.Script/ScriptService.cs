@@ -303,7 +303,7 @@ namespace Waher.WebService.Script
 
 				Html.Append("<div class='clickable' onclick='SetScript(\"");
 				Html.Append(s.ToString().Replace("\r", "\\r").Replace("\n", "\\n").Replace("\t", "\\t").Replace("\"", "\\\"").Replace("'", "\\'"));
-				Html.Append("\");'><table><thead>");
+				Html.Append("\");'><table><thead><tr>");
 
 				foreach (string s2 in M.ColumnNames)
 				{
@@ -312,7 +312,7 @@ namespace Waher.WebService.Script
 					Html.Append("</th>");
 				}
 
-				Html.Append("</thead><tbody>");
+				Html.Append("</tr></thead><tbody>");
 
 				int x, y;
 

@@ -162,7 +162,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 			}
 			else if (Result is ObjectMatrix M && M.ColumnNames != null)
 			{
-				Output.Append("<table><thead>");
+				Output.Append("<table><thead><tr>");
 
 				foreach (string s2 in M.ColumnNames)
 				{
@@ -171,7 +171,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 					Output.Append("</th>");
 				}
 
-				Output.Append("</thead><tbody>");
+				Output.Append("</tr></thead><tbody>");
 
 				int x, y;
 

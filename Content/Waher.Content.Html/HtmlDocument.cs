@@ -11,7 +11,7 @@ namespace Waher.Content.Html
 	/// </summary>
 	public class HtmlDocument
 	{
-		private string htmlText;
+		private readonly string htmlText;
 		private HtmlElement root = null;
 		private Elements.Html html = null;
 		private Title title = null;
@@ -579,7 +579,7 @@ namespace Waher.Content.Html
 						}
 						else if (ch == '?')
 							State = 19;
-						else if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || (ch >= '0' && ch <= '9') || ch=='.' || ch=='_' || ch == '-' || ch == ':')
+						else if (IsNameCharacter(ch))
 						{
 							sb.Append(ch);
 							Empty = false;

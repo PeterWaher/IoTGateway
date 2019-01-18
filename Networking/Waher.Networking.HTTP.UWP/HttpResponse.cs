@@ -706,9 +706,22 @@ namespace Waher.Networking.HTTP
 			{
 				this.statusCode = 406;  // Not acceptable
 				this.statusMessage = "Not Acceptable";
-
-				this.SendResponse();
 			}
+
+			this.SendResponse();
+		}
+
+		/// <summary>
+		/// Returns an encoded object to the client. This method can only be called once per response, and only as the only method 
+		/// that returns a response to the client.
+		/// </summary>
+		public void Return(string ContentType, byte[] Data)
+		{
+			this.ContentType = ContentType;
+			this.ContentLength = Data.Length;
+
+			this.Write(Data);
+			this.SendResponse();
 		}
 
 		private bool TryEncode(object Object, out byte[] Data, out string ContentType)

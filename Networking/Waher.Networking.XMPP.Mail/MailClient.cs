@@ -147,7 +147,13 @@ namespace Waher.Networking.XMPP.Mail
 								{
 									if (N2 is XmlElement E2 && E2.LocalName == "body")
 									{
-										Html = E2.InnerXml;
+										Html = E2.OuterXml;		// InnerXml introduces xmlns attributes on all child elements.
+
+										int i = Html.IndexOf('>');
+										Html = Html.Substring(i + 1);
+
+										i = Html.LastIndexOf('<');
+										Html = Html.Substring(0, i);
 										break;
 									}
 								}

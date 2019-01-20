@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content.Xml;
@@ -188,18 +189,44 @@ namespace Waher.Networking.XMPP.Mail
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void Get(string ObjectId, MessageObjectEventHandler Callback, object State)
 		{
-			this.client.SendIqGet(this.client.Domain, "<get xmlns='" + NamespaceMail + "' cid='" + XML.Encode(ObjectId) + "'/>",
-				(sender, e) =>
+			this.Get(ObjectId, string.Empty, Callback, State);
+		}
+
+		/// <summary>
+		/// Gets a message object from the broker.
+		/// </summary>
+		/// <param name="ObjectId">ID of the message object to get.</param>
+		/// <param name="ContentType">Content-Type of response, if only part of the mail object is desired.</param>
+		/// <param name="Callback">Method to call when response has been returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void Get(string ObjectId, string ContentType, MessageObjectEventHandler Callback, object State)
+		{
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<get xmlns='");
+			Xml.Append(NamespaceMail);
+			Xml.Append("' cid='");
+			Xml.Append(XML.Encode(ObjectId));
+
+			if (!string.IsNullOrEmpty(ContentType))
+			{
+				Xml.Append("' type='");
+				Xml.Append(XML.Encode(ContentType));
+			}
+
+			Xml.Append("'/>");
+
+			this.client.SendIqGet(this.client.Domain, Xml.ToString(), (sender, e) =>
 				{
 					XmlElement E;
-					string ContentType = null;
+					string ResponseContentType = null;
 					byte[] Data = null;
 
 					if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "content" && E.NamespaceURI == NamespaceMail)
 					{
 						try
 						{
-							ContentType = XML.Attribute(E, "contentType");
+							ResponseContentType = XML.Attribute(E, "type");
 							Data = Convert.FromBase64String(E.InnerText);
 						}
 						catch (Exception)
@@ -212,7 +239,7 @@ namespace Waher.Networking.XMPP.Mail
 
 					try
 					{
-						Callback?.Invoke(this, new MessageObjectEventArgs(e, ContentType, Data));
+						Callback?.Invoke(this, new MessageObjectEventArgs(e, ResponseContentType, Data));
 					}
 					catch (Exception ex)
 					{
@@ -228,9 +255,19 @@ namespace Waher.Networking.XMPP.Mail
 		/// <param name="ObjectId">ID of the message object to get.</param>
 		public Task<MessageObject> GetAsync(string ObjectId)
 		{
+			return GetAsync(ObjectId, string.Empty);
+		}
+
+		/// <summary>
+		/// Gets a message object from the broker.
+		/// </summary>
+		/// <param name="ObjectId">ID of the message object to get.</param>
+		/// <param name="ContentType">Content-Type of response, if only part of the mail object is desired.</param>
+		public Task<MessageObject> GetAsync(string ObjectId, string ContentType)
+		{
 			TaskCompletionSource<MessageObject> Result = new TaskCompletionSource<MessageObject>();
 			
-			this.Get(ObjectId, (sender, e) =>
+			this.Get(ObjectId, ContentType, (sender, e) =>
 			{
 				if (e.Ok)
 					Result.TrySetResult(new MessageObject(e.Data, e.ContentType));

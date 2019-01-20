@@ -88,11 +88,27 @@
             <param name="Callback">Method to call when response has been returned.</param>
             <param name="State">State object to pass on to callback method.</param>
         </member>
+        <member name="M:Waher.Networking.XMPP.Mail.MailClient.Get(System.String,System.String,Waher.Networking.XMPP.Mail.MessageObjectEventHandler,System.Object)">
+            <summary>
+            Gets a message object from the broker.
+            </summary>
+            <param name="ObjectId">ID of the message object to get.</param>
+            <param name="ContentType">Content-Type of response, if only part of the mail object is desired.</param>
+            <param name="Callback">Method to call when response has been returned.</param>
+            <param name="State">State object to pass on to callback method.</param>
+        </member>
         <member name="M:Waher.Networking.XMPP.Mail.MailClient.GetAsync(System.String)">
             <summary>
             Gets a message object from the broker.
             </summary>
             <param name="ObjectId">ID of the message object to get.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Mail.MailClient.GetAsync(System.String,System.String)">
+            <summary>
+            Gets a message object from the broker.
+            </summary>
+            <param name="ObjectId">ID of the message object to get.</param>
+            <param name="ContentType">Content-Type of response, if only part of the mail object is desired.</param>
         </member>
         <member name="M:Waher.Networking.XMPP.Mail.MailClient.Delete(System.String,Waher.Networking.XMPP.IqResultEventHandler,System.Object)">
             <summary>

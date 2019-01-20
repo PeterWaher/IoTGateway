@@ -18,7 +18,7 @@
     <ProjectTypeGuids>{A5A43C5B-DE2A-4C0C-9213-0A381AF9435A};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WindowsXamlEnableOverview>true</WindowsXamlEnableOverview>
     <PackageCertificateKeyFile>Waher.IoTGateway.App_TemporaryKey.pfx</PackageCertificateKeyFile>
-    <PackageCertificateThumbprint>BA76B44BAE1339500FB9E1B5783BA59DBA1153C2</PackageCertificateThumbprint>
+    <PackageCertificateThumbprint>65B1665F5967E863FBDFFF47366C759F153ED072</PackageCertificateThumbprint>
     <AppxBundlePlatforms>x86|x64|arm</AppxBundlePlatforms>
     <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
     <AppxBundle>Always</AppxBundle>

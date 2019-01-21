@@ -284,6 +284,21 @@ namespace Waher.Content.Multipart
 					case "FILENAME":
 						EmbeddedContent.FileName = Field.Value;
 						break;
+
+					case "SIZE":
+						if (int.TryParse(Field.Value, out int i))
+							EmbeddedContent.Size = i;
+						break;
+
+					case "CREATION-DATE":
+						if (CommonTypes.TryParseRfc822(Field.Value, out DateTimeOffset DTO))
+							EmbeddedContent.CreationDate = DTO;
+						break;
+
+					case "MODIFICATION-DATE":
+						if (CommonTypes.TryParseRfc822(Field.Value, out DTO))
+							EmbeddedContent.ModificationDate = DTO;
+						break;
 				}
 			}
 		}

@@ -40,6 +40,9 @@ namespace Waher.Content.Multipart
 		private byte[] raw = null;
 		private byte[] transferDecoded = null;
 		private object decoded = null;
+		private int? size = null;
+		private DateTimeOffset? creationDate = null;
+		private DateTimeOffset? modificationDate = null;
 
 		/// <summary>
 		/// Content-Type of embedded object.
@@ -135,6 +138,33 @@ namespace Waher.Content.Multipart
 		{
 			get => this.description;
 			set => this.description = value;
+		}
+
+		/// <summary>
+		/// Size of content, if available.
+		/// </summary>
+		public int? Size
+		{
+			get => this.size;
+			set => this.size = value;
+		}
+
+		/// <summary>
+		/// Creation-Date of content, if available.
+		/// </summary>
+		public DateTimeOffset? CreationDate
+		{
+			get => this.creationDate;
+			set => this.creationDate = value;
+		}
+
+		/// <summary>
+		/// Modification-Date of content, if available.
+		/// </summary>
+		public DateTimeOffset? ModificationDate
+		{
+			get => this.modificationDate;
+			set => this.modificationDate = value;
 		}
 
 		/// <summary>

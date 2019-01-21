@@ -3904,6 +3904,7 @@ namespace Waher.Content.Markdown
 							case '"':
 							case '^':
 							case '%':
+							case '&':
 							case '=':
 							case ':':
 							case '|':

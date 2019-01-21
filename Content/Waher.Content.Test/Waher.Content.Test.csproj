@@ -17,11 +17,19 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Data\0b9e5696-c32a-4418-a246-babb188e5beb.bin" />
+    <None Remove="Data\0b9e5696-c32a-4418-a246-babb188e5beb.txt" />
     <None Remove="Data\6a00b78b-ebb7-4da7-a8cd-65dd09d3ac59.bin" />
     <None Remove="Data\6a00b78b-ebb7-4da7-a8cd-65dd09d3ac59.txt" />
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="Data\0b9e5696-c32a-4418-a246-babb188e5beb.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\0b9e5696-c32a-4418-a246-babb188e5beb.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Data\6a00b78b-ebb7-4da7-a8cd-65dd09d3ac59.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

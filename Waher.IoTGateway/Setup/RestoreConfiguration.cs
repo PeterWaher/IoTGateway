@@ -178,7 +178,7 @@ namespace Waher.IoTGateway.Setup
 
 			Request.DataStream.CopyTo(File);
 
-			ShowStatus(TabID, Name + "Bytes", File.Length.ToString() + " bytes received of " + Name + " file.");
+			ShowStatus(TabID, Name + "Bytes", Export.FormatBytes(File.Length) + " received of " + Name + " file.");
 
 			Response.StatusCode = 200;
 		}
@@ -672,7 +672,12 @@ namespace Waher.IoTGateway.Setup
 								string FileName = r.Value;
 
 								if (Path.IsPathRooted(FileName))
-									throw new Exception("Absolute path names not allowed: " + FileName);
+								{
+									if (FileName.StartsWith(Gateway.AppDataFolder))
+										FileName = FileName.Substring(Gateway.AppDataFolder.Length);
+									else
+										throw new Exception("Absolute path names not allowed: " + FileName);
+								}
 
 								FileName = Path.Combine(Gateway.AppDataFolder, FileName);
 
@@ -1286,7 +1291,12 @@ namespace Waher.IoTGateway.Setup
 								FileName = Path.Combine(Gateway.AppDataFolder, FileName);
 
 								if (Path.IsPathRooted(FileName))
-									throw new Exception("Absolute path names not allowed: " + FileName);
+								{
+									if (FileName.StartsWith(Gateway.AppDataFolder))
+										FileName = FileName.Substring(Gateway.AppDataFolder.Length);
+									else
+										throw new Exception("Absolute path names not allowed: " + FileName);
+								}
 
 								using (TemporaryFile File = new TemporaryFile())
 								{

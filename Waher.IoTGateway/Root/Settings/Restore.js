@@ -6,7 +6,7 @@
     var Element = document.getElementById("RestoreProperties");
     Element.style.display = Checked ? "block" : "none";
 
-    Element = document.getElementById("NextButton");
+    Element = GetNextButton();
     Element.style.display = Checked ? "none" : "inline";
 
     Element = document.getElementById("RestoreButton");
@@ -14,6 +14,15 @@
 
     if (Checked)
         document.getElementById("BackupFile").focus();
+}
+
+function GetNextButton()
+{
+    var Element = document.getElementById("NextButton");
+    if (Element)
+        return Element;
+
+    return document.getElementById("OkButton");
 }
 
 function ToggleOverwriteExisting()
@@ -159,7 +168,7 @@ function Restore()
 
 function RestoreFinished(Data)
 {
-    var Element = document.getElementById("NextButton");
+    var Element = GetNextButton();
     Element.style.display = Data.ok ? "inline" : "none";
 
     window.alert(Data.message);
@@ -167,6 +176,6 @@ function RestoreFinished(Data)
 
 function HideNext()
 {
-    var Element = document.getElementById("NextButton");
+    var Element = GetNextButton();
     Element.style.display = "none";
 }

@@ -992,7 +992,7 @@ namespace Waher.Persistence.Files
 				Reader.Restart(DecryptedBlock, 0);
 				ObjectId2 = this.recordHandler.GetKey(Reader);
 				if (ObjectId2 is null || this.recordHandler.Compare(ObjectId2, ObjectId) != 0)
-					throw new IOException("Block linked to by BLOB " + ObjectId.ToString() + " was actually marked as " + ObjectId2.ToString() + ".");
+					throw new IOException("Block linked to by BLOB " + ObjectId.ToString() + " (" + this.collectionName + ") was actually marked as " + ObjectId2.ToString() + ".");
 
 				Prev = Reader.ReadUInt32();
 				if (Prev != ExpectedPrev)
@@ -3893,7 +3893,7 @@ namespace Waher.Persistence.Files
 				{
 					NrChildLinks++;
 					Leaf = false;
-					NrObjects += await this.AnalyzeBlock(Depth + 1, BlockIndex, BlockLink, Statistics, 
+					NrObjects += await this.AnalyzeBlock(Depth + 1, BlockIndex, BlockLink, Statistics,
 						BlocksReferenced, BlobBlocksReferenced, ObjectIds, ExistingIds, MinObjectId, ObjectId);
 				}
 
@@ -3994,7 +3994,7 @@ namespace Waher.Persistence.Files
 			{
 				NrChildLinks++;
 				Leaf = false;
-				NrObjects += await this.AnalyzeBlock(Depth + 1, BlockIndex, Header.LastBlockIndex, Statistics, 
+				NrObjects += await this.AnalyzeBlock(Depth + 1, BlockIndex, Header.LastBlockIndex, Statistics,
 					BlocksReferenced, BlobBlocksReferenced, ObjectIds, ExistingIds, MinObjectId, null);
 			}
 
@@ -5303,7 +5303,7 @@ namespace Waher.Persistence.Files
 					{
 						this.nrFullFileScans++;
 						Log.Notice("Search resulted in entire file to be scanned. Consider either adding indices, or enumerate objects using an object enumerator.", this.fileName, string.Empty, "DBOpt");
-						return new Searching.FilteredCursor<T>(await this.GetTypedEnumeratorAsync<T>(Locked), 
+						return new Searching.FilteredCursor<T>(await this.GetTypedEnumeratorAsync<T>(Locked),
 							this.ConvertFilter(Filter), false, true, this.timeoutMilliseconds, this.provider);
 					}
 
@@ -5438,7 +5438,7 @@ namespace Waher.Persistence.Files
 					{
 						this.nrFullFileScans++;
 						Log.Notice("Search resulted in entire file to be scanned. Consider either adding indices, or enumerate objects using an object enumerator.", this.fileName, string.Empty, "DBOpt");
-						return new Searching.FilteredCursor<T>(await this.GetTypedEnumeratorAsync<T>(Locked), 
+						return new Searching.FilteredCursor<T>(await this.GetTypedEnumeratorAsync<T>(Locked),
 							this.ConvertFilter(Filter), false, true, this.timeoutMilliseconds, this.provider);
 					}
 					else
@@ -5457,7 +5457,7 @@ namespace Waher.Persistence.Files
 					{
 						this.nrFullFileScans++;
 						Log.Notice("Search resulted in entire file to be scanned. Consider either adding indices, or enumerate objects using an object enumerator.", this.fileName, string.Empty, "DBOpt");
-						return new Searching.FilteredCursor<T>(await this.GetTypedEnumeratorAsync<T>(Locked), 
+						return new Searching.FilteredCursor<T>(await this.GetTypedEnumeratorAsync<T>(Locked),
 							this.ConvertFilter(Filter), false, true, this.timeoutMilliseconds, this.provider);
 					}
 					else
@@ -5505,7 +5505,7 @@ namespace Waher.Persistence.Files
 
 					this.nrFullFileScans++;
 					Log.Notice("Search resulted in entire file to be scanned. Consider either adding indices, or enumerate objects using an object enumerator.", this.fileName, string.Empty, "DBOpt");
-					return new Searching.FilteredCursor<T>(await this.GetTypedEnumeratorAsync<T>(Locked), 
+					return new Searching.FilteredCursor<T>(await this.GetTypedEnumeratorAsync<T>(Locked),
 						this.ConvertFilter(Filter), false, true, this.timeoutMilliseconds, this.provider);
 				}
 
@@ -5536,7 +5536,7 @@ namespace Waher.Persistence.Files
 				{
 					this.nrFullFileScans++;
 					Log.Notice("Search resulted in entire file to be scanned. Consider either adding indices, or enumerate objects using an object enumerator.", this.fileName, string.Empty, "DBOpt");
-					return new Searching.FilteredCursor<T>(await this.GetTypedEnumeratorAsync<T>(Locked), 
+					return new Searching.FilteredCursor<T>(await this.GetTypedEnumeratorAsync<T>(Locked),
 						this.ConvertFilter(Filter), false, true, this.timeoutMilliseconds, this.provider);
 				}
 				else
@@ -5627,7 +5627,7 @@ namespace Waher.Persistence.Files
 					else
 					{
 						return new Searching.FilteredCursor<T>(
-							await Index.FindFirstGreaterOrEqualTo<T>(Locked, 
+							await Index.FindFirstGreaterOrEqualTo<T>(Locked,
 							new KeyValuePair<string, object>(FilterFieldLikeRegEx.FieldName, ConstantPrefix)),
 							FilterFieldLikeRegEx2, false, true, this.timeoutMilliseconds, this.provider);
 					}

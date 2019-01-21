@@ -78,12 +78,7 @@ namespace Waher.Content.Markdown
 		/// <exception cref="ArgumentException">If the object cannot be decoded.</exception>
 		public object Decode(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
 		{
-			string s;
-
-			if (Encoding is null)
-				s = System.Text.Encoding.UTF8.GetString(Data);
-			else
-				s = Encoding.GetString(Data);
+			string s = CommonTypes.GetString(Data, Encoding ?? Encoding.UTF8);
 
 			if (BaseUri is null)
 				return new MarkdownDocument(s);

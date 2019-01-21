@@ -97,10 +97,7 @@ namespace Waher.Content.Text
 		/// <exception cref="ArgumentException">If the object cannot be decoded.</exception>
 		public object Decode(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
 		{
-			if (Encoding is null)
-				return System.Text.Encoding.UTF8.GetString(Data);
-			else
-				return Encoding.GetString(Data);
+			return CommonTypes.GetString(Data, Encoding);
 		}
 
 		/// <summary>
@@ -193,7 +190,7 @@ namespace Waher.Content.Text
 				if (Encoding is null)
 				{
 					ContentType = "text/plain; charset=utf-8";
-					return System.Text.Encoding.UTF8.GetBytes(Object.ToString());
+					return Encoding.UTF8.GetBytes(Object.ToString());
 				}
 				else
 				{

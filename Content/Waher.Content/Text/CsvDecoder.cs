@@ -81,13 +81,7 @@ namespace Waher.Content.Text
 		/// <exception cref="ArgumentException">If the object cannot be decoded.</exception>
 		public object Decode(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
 		{
-			string s;
-
-			if (Encoding is null)
-				s = Encoding.UTF8.GetString(Data);
-			else
-				s = Encoding.GetString(Data);
-
+			string s = CommonTypes.GetString(Data, Encoding);
 			return CSV.Parse(s);
 		}
 

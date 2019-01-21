@@ -85,13 +85,7 @@ namespace Waher.Content.Html
 		/// <exception cref="ArgumentException">If the object cannot be decoded.</exception>
 		public object Decode(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
 		{
-			string Html;
-
-			if (Encoding is null)
-				Html = Encoding.UTF8.GetString(Data);
-			else
-				Html = Encoding.GetString(Data);
-
+			string Html = CommonTypes.GetString(Data, Encoding);
 			return new HtmlDocument(Html);
 		}
 

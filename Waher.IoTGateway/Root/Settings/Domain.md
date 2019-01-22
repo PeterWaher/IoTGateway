@@ -36,7 +36,7 @@ machine where the application is running. If you don't use a domain name, you ca
 <p>
 <label for="DomainName">Domain Name:</label>  
 <input id="DomainName" name="DomainName" type="text" style="width:20em" title="Domain name used to identify the machine." oninput="DomainNameInput(this)"
-	value="{{ConfigClass:=Waher.IoTGateway.Setup.DomainConfiguration;Config:=ConfigClass.Instance;Config.Domain}}" {{Config.Step=0 ? "autofocus" : ""}}/>
+	value="{{Config.Domain}}" {{Config.Step=0 ? "autofocus" : ""}}/>
 <span id="DomainName2" style="display:none">{{Config.Domain}}</span>
 </p>
 

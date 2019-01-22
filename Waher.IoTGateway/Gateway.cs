@@ -2106,6 +2106,33 @@ namespace Waher.IoTGateway
 		}
 
 		/// <summary>
+		/// Returns a non-negative random integer that is less than the specified maximum.
+		/// </summary>
+		/// <param name="Max">The exclusive upper bound of the random number to be generated. maxValue must
+		/// be greater than or equal to 0.</param>
+		/// <returns>A 32-bit signed integer that is greater than or equal to 0, and less than <paramref name="Max"/>;
+		/// that is, the range of return values ordinarily includes 0 but not <paramref name="Max"/>. However,
+		/// if <paramref name="Max"/> equals 0, <paramref name="Max"/> is returned.</returns>
+		public static int NextInteger(int Max)
+		{
+			if (Max < 0)
+				throw new ArgumentOutOfRangeException("Must be non-negative.", nameof(Max));
+
+			if (Max == 0)
+				return 0;
+
+			int Result;
+
+			do
+			{
+				Result = (int)(NextDouble() * Max);
+			}
+			while (Result >= Max);
+
+			return Result;
+		}
+
+		/// <summary>
 		/// Generates an array of random bytes.
 		/// </summary>
 		/// <param name="NrBytes">Number of random bytes to generate.</param>

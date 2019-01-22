@@ -37,10 +37,10 @@ namespace Waher.Networking.XMPP.Authentication
 				Client.PasswordHashMethod = "CRAM-MD5";
 			}
 
-			byte[] HMAC = this.HMAC(System.Text.Encoding.UTF8.GetBytes(Pwd), ChallengeBinary);
+			byte[] HMAC = this.HMAC(Encoding.UTF8.GetBytes(Pwd), ChallengeBinary);
 			string CRAM = Client.UserName + " " + HEX(HMAC);
 
-			return Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(CRAM));
+			return Convert.ToBase64String(Encoding.UTF8.GetBytes(CRAM));
 		}
 
 		/// <summary>

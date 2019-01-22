@@ -12,7 +12,7 @@ namespace Waher.Content.Multipart
 	/// 
 	/// http://www.w3.org/Protocols/rfc1341/7_2_Multipart.html
 	/// </summary>
-	public class MixedCodec : IContentDecoder
+	public class MixedCodec : IContentDecoder, IContentEncoder
 	{
 		/// <summary>
 		/// multipart/mixed

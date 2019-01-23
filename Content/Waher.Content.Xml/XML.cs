@@ -684,13 +684,16 @@ namespace Waher.Content.Xml
 				if (string.IsNullOrEmpty(Xml.Trim()))
 					return Empty;
 
+				if (Fragment)
+					Xml = "<Root>" + Xml + "</Root>";
+
 				XmlDocument Doc = new XmlDocument();
 				using (StringReader r = new StringReader(Xml))
 				{
 					XmlReaderSettings Settings = new XmlReaderSettings()
 					{
 						CheckCharacters = true,
-						ConformanceLevel = Fragment ? ConformanceLevel.Fragment : ConformanceLevel.Document,
+						ConformanceLevel = ConformanceLevel.Document,
 						DtdProcessing = DTD ? DtdProcessing.Ignore : DtdProcessing.Prohibit,
 						IgnoreComments = false,
 						IgnoreProcessingInstructions = false,
@@ -741,7 +744,7 @@ namespace Waher.Content.Xml
 
 				return true;
 			}
-			catch (Exception)
+			catch (Exception ex)
 			{
 				return false;
 			}

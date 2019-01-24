@@ -268,7 +268,7 @@
           <xsl:attribute name="class">
             <xsl:value-of select="$FileColor"/>
           </xsl:attribute>
-          <td/>
+          <td></td>
           <td colspan="22">
             <xsl:value-of select="."/>
           </td>
@@ -286,15 +286,15 @@
         <td class="Right">
           <xsl:value-of select="dbstat:Stat/@blobBlockSize"/>
         </td>
-        <td/>
+        <td></td>
         <td class="Center">
           <xsl:value-of select="dbstat:Stat/@encoding"/>
         </td>
         <td class="Center">
           <xsl:value-of select="dbstat:Stat/@encrypted"/>
         </td>
-        <td/>
-        <td/>
+        <td></td>
+        <td></td>
         <td class="Right">
           <xsl:value-of select="dbstat:Stat/@nrBlobBlocks"/>
         </td>
@@ -310,17 +310,17 @@
         <td class="Right">
           <xsl:value-of select="dbstat:Stat/@blobUsage"/>
         </td>
-        <td/>
-        <td/>
-        <td/>
-        <td/>
-        <td/>
-        <td/>
-        <td/>
-        <td/>
-        <td/>
-        <td/>
-        <td/>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
       </tr>
     </xsl:if>
     <xsl:for-each select="dbstat:Index">

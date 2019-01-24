@@ -148,6 +148,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Content\Waher.Content.Dsn\Waher.Content.Dsn.csproj" />
     <ProjectReference Include="..\Content\Waher.Content.Emoji.Emoji1\Waher.Content.Emoji.Emoji1.csproj" />
     <ProjectReference Include="..\Content\Waher.Content.Emoji\Waher.Content.Emoji.csproj" />
     <ProjectReference Include="..\Content\Waher.Content.Html\Waher.Content.Html.csproj" />

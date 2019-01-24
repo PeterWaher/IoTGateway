@@ -95,7 +95,15 @@ namespace Waher.Content.Multipart
 			return Form;
 		}
 
-		internal static void Decode(byte[] Data, KeyValuePair<string, string>[] Fields, Dictionary<string, object> Form,
+		/// <summary>
+		/// Decodes a multipart object
+		/// </summary>
+		/// <param name="Data">Binary representation</param>
+		/// <param name="Fields">Content-Type fields</param>
+		/// <param name="Form">Resulting Form, or null if not of interest.</param>
+		/// <param name="List">Decoded embedded objects will be added to this list.</param>
+		/// <param name="BaseUri">Bare URI</param>
+		public static void Decode(byte[] Data, KeyValuePair<string, string>[] Fields, Dictionary<string, object> Form,
 			List<EmbeddedContent> List, Uri BaseUri)
 		{
 			string Boundary = null;

@@ -398,8 +398,8 @@ namespace Waher.Networking.XMPP.HTTPX
 			else
 			{
 				Version = 0.0;
-				StatusCode = 505;
-				StatusMessage = "HTTP Version Not Supported";
+				StatusCode = 503;
+				StatusMessage = "Service Unavailable";
 				Response = new HttpResponse();
 			}
 

@@ -1,4 +1,4 @@
-﻿function TestAddresses()
+﻿function TestAddresses(DoTest,GoToNext)
 {
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function ()
@@ -13,6 +13,14 @@
                     document.getElementById("NextMessage").style.display = "block";
                 else
                     document.getElementById("TestError").style.display = "block";
+
+                if (!DoTest)
+                {
+                    if (GoToNext)
+                        Next();
+                    else
+                        Ok();
+                }
             }
         }
     };
@@ -23,5 +31,5 @@
     xhttp.open("POST", "/Settings/TestNotificationAddresses", true);
     xhttp.setRequestHeader("Content-Type", "text/plain");
     xhttp.setRequestHeader("X-TabID", TabID);
-    xhttp.send(document.getElementById("NotificationAddresses").value);
+    xhttp.send(" " + document.getElementById("NotificationAddresses").value);
 }

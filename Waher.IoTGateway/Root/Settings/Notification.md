@@ -43,11 +43,11 @@ enter one or more addresses below to which notifications will be sent.
 [[}}
 </p>
 
-<button type='button' onclick='TestAddresses()'>Test</button>
+<button type='button' onclick='TestAddresses(true,false)'>Test</button>
 {{if Waher.IoTGateway.Gateway.Configuring then ]]
-<button id='NextButton' type='button' onclick='Next()'>Next</button>
+<button id='NextButton' type='button' onclick='TestAddresses(false,true)'>Next</button>
 [[ else ]]
-<button id='OkButton' type='button' onclick='Ok()'>OK</button>
+<button id='OkButton' type='button' onclick='TestAddresses(false,false)'>OK</button>
 [[;}}
 
 </fieldset>

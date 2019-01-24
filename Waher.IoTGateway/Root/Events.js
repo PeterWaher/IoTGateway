@@ -184,6 +184,7 @@ function EvaluateEvent(Event)
     {
         try
         {
+            console.log(Event.type);
             eval(Event.type + "(Event.data)");
         }
         catch (e)

@@ -1,0 +1,85 @@
+--=_0ecacef3429196a439015a7f857bc5f7
+Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+
+report
+
+-------- Original Message --------
+Subject: Successful Mail Delivery Report
+Date: 2019-01-23 22:15
+ From: MAILER-DAEMON@s554.loopia.se (Mail Delivery System)
+To: stuart@littlesister.se
+
+This is the mail system at host s554.loopia.se.
+
+Your message was successfully delivered to the destination(s)
+listed below. If the message was delivered to mailbox you will
+receive no further notifications. Otherwise you may still receive
+notifications of mail delivery errors from other systems.
+
+                    The mail system
+
+<peter@waher.se>: delivery via waher.se[90.224.165.60]:25: 250 2.6.0
+     <e272eb6aa58d95a2c8d1ba4554fdaf51@littlesister.se> Message accepted 
+for
+     delivery.
+
+Return-Path: <stuart@littlesister.se>
+Received: from s554.loopia.se (localhost [127.0.0.1])
+	by s554.loopia.se (Postfix) with ESMTP id 0DC1E1F17438
+	for <peter@waher.se>; Wed, 23 Jan 2019 22:15:51 +0100 (CET)
+Received: from s645.loopia.se (unknown [172.21.200.108])
+	by s554.loopia.se (Postfix) with ESMTP id E3C61797A64
+	for <peter@waher.se>; Wed, 23 Jan 2019 22:15:50 +0100 (CET)
+Received: from s405.loopia.se (unknown [172.21.200.105])
+	by s645.loopia.se (Postfix) with ESMTP id C091813BF335
+	for <peter@waher.se>; Wed, 23 Jan 2019 22:15:50 +0100 (CET)
+X-Virus-Scanned: amavisd-new at amavis.loopia.se
+X-Spam-Flag: NO
+X-Spam-Score: -1
+X-Spam-Level:
+X-Spam-Status: No, score=-1 tagged_above=-999 required=6.2
+	tests=[ALL_TRUSTED=-1] autolearn=disabled
+Received: from s645.loopia.se ([172.21.200.105])
+	by s405.loopia.se (s405.loopia.se [172.21.200.135]) (amavisd-new, port 
+10024)
+	with LMTP id 9zGxDu9RKy5f for <peter@waher.se>;
+	Wed, 23 Jan 2019 22:15:50 +0100 (CET)
+X-Loopia-Auth: webmail
+X-Loopia-User: stuart@littlesister.se
+Received: from webmail.loopia.se (webmail.outgoing.loopia.se 
+[93.188.1.198])
+	(Authenticated sender: stuart@littlesister.se)
+	by s645.loopia.se (Postfix) with ESMTPA id 5614813BF326
+	for <peter@waher.se>; Wed, 23 Jan 2019 22:15:50 +0100 (CET)
+MIME-Version: 1.0
+Content-Type: multipart/mixed;
+  boundary="=_0f6da4f342c891a25e65b6c014d8b657"
+Date: Wed, 23 Jan 2019 22:15:50 +0100
+ From: stuart@littlesister.se
+To: peter@waher.se
+Subject: Evening Test
+X-Priority: 2 (High)
+Return-Receipt-To: stuart@littlesister.se
+Disposition-Notification-To: stuart@littlesister.se
+Message-ID: <e272eb6aa58d95a2c8d1ba4554fdaf51@littlesister.se>
+X-Sender: stuart@littlesister.se
+User-Agent: Loopia Webmail/1.3.8
+--=_0ecacef3429196a439015a7f857bc5f7
+Content-Transfer-Encoding: base64
+Content-Type: message/delivery-status;
+ name="Delivery report"
+Content-Disposition: attachment;
+ filename="Delivery report";
+ size=444
+
+UmVwb3J0aW5nLU1UQTogZG5zOyBzNTU0Lmxvb3BpYS5zZQ0KWC1Qb3N0Zml4LVF1ZXVlLUlEOiAw
+REMxRTFGMTc0MzgNClgtUG9zdGZpeC1TZW5kZXI6IHJmYzgyMjsgc3R1YXJ0QGxpdHRsZXNpc3Rl
+ci5zZQ0KQXJyaXZhbC1EYXRlOiBXZWQsIDIzIEphbiAyMDE5IDIyOjE1OjUxICswMTAwIChDRVQp
+DQoNCkZpbmFsLVJlY2lwaWVudDogcmZjODIyOyBwZXRlckB3YWhlci5zZQ0KT3JpZ2luYWwtUmVj
+aXBpZW50OiByZmM4MjI7cGV0ZXJAd2FoZXIuc2UNCkFjdGlvbjogcmVsYXllZA0KU3RhdHVzOiAy
+LjYuMA0KUmVtb3RlLU1UQTogZG5zOyB3YWhlci5zZQ0KRGlhZ25vc3RpYy1Db2RlOiBzbXRwOyAy
+NTAgMi42LjANCiAgICA8ZTI3MmViNmFhNThkOTVhMmM4ZDFiYTQ1NTRmZGFmNTFAbGl0dGxlc2lz
+dGVyLnNlPiBNZXNzYWdlIGFjY2VwdGVkIGZvcg0KICAgIGRlbGl2ZXJ5Lg0K
+--=_0ecacef3429196a439015a7f857bc5f7--

@@ -98,12 +98,12 @@ namespace Waher.IoTGateway
 
 			Uri Uri = new Uri(Location);
 			string Resource = Uri.LocalPath;
-			List<KeyValuePair<string, string>> Query = null;
+			List<(string, string, string)> Query = null;
 			string s;
 
 			if (!string.IsNullOrEmpty(Uri.Query))
 			{
-				Query = new List<KeyValuePair<string, string>>();
+				Query = new List<(string, string, string)>();
 				int i;
 
 				s = Uri.Query;
@@ -114,9 +114,12 @@ namespace Waher.IoTGateway
 				{
 					i = Part.IndexOf('=');
 					if (i < 0)
-						Query.Add(new KeyValuePair<string, string>(Part, string.Empty));
+						Query.Add((Part, string.Empty, string.Empty));
 					else
-						Query.Add(new KeyValuePair<string, string>(Part.Substring(0, i), Part.Substring(i + 1)));
+					{
+						string s2 = Part.Substring(i + 1);
+						Query.Add((Part.Substring(0, i), s2, System.Net.WebUtility.UrlDecode(s2)));
+					}
 				}
 			}
 
@@ -139,9 +142,9 @@ namespace Waher.IoTGateway
 
 			lock (tabIdsByLocation)
 			{
-				if (!tabIdsByLocation.TryGetValue(Resource, out Dictionary<string, List<KeyValuePair<string, string>>> TabIds))
+				if (!tabIdsByLocation.TryGetValue(Resource, out Dictionary<string, List<(string, string, string)>> TabIds))
 				{
-					TabIds = new Dictionary<string, List<KeyValuePair<string, string>>>();
+					TabIds = new Dictionary<string, List<(string, string, string)>>();
 					tabIdsByLocation[Resource] = TabIds;
 				}
 
@@ -188,12 +191,12 @@ namespace Waher.IoTGateway
 		{
 			Uri Uri = new Uri(Location);
 			string Resource = Uri.LocalPath;
-			List<KeyValuePair<string, string>> Query = null;
+			List<(string, string, string)> Query = null;
 			string s;
 
 			if (!string.IsNullOrEmpty(Uri.Query))
 			{
-				Query = new List<KeyValuePair<string, string>>();
+				Query = new List<(string, string, string)>();
 				int i;
 
 				s = Uri.Query;
@@ -204,9 +207,12 @@ namespace Waher.IoTGateway
 				{
 					i = Part.IndexOf('=');
 					if (i < 0)
-						Query.Add(new KeyValuePair<string, string>(Part, string.Empty));
+						Query.Add((Part, string.Empty, string.Empty));
 					else
-						Query.Add(new KeyValuePair<string, string>(Part.Substring(0, i), Part.Substring(i + 1)));
+					{
+						string s2 = Part.Substring(i + 1);
+						Query.Add((Part.Substring(0, i), s2, System.Net.WebUtility.UrlDecode(s2)));
+					}
 				}
 			}
 
@@ -233,9 +239,9 @@ namespace Waher.IoTGateway
 
 			lock (tabIdsByLocation)
 			{
-				if (!tabIdsByLocation.TryGetValue(Resource, out Dictionary<string, List<KeyValuePair<string, string>>> TabIds))
+				if (!tabIdsByLocation.TryGetValue(Resource, out Dictionary<string, List<(string, string, string)>> TabIds))
 				{
-					TabIds = new Dictionary<string, List<KeyValuePair<string, string>>>();
+					TabIds = new Dictionary<string, List<(string, string, string)>>();
 					tabIdsByLocation[Resource] = TabIds;
 				}
 
@@ -293,7 +299,7 @@ namespace Waher.IoTGateway
 
 			lock (tabIdsByLocation)
 			{
-				if (tabIdsByLocation.TryGetValue(Resource, out Dictionary<string, List<KeyValuePair<string, string>>> TabIds))
+				if (tabIdsByLocation.TryGetValue(Resource, out Dictionary<string, List<(string, string, string)>> TabIds))
 				{
 					if (TabIds.Remove(TabID) && TabIds.Count == 0)
 						tabIdsByLocation.Remove(Resource);
@@ -305,8 +311,8 @@ namespace Waher.IoTGateway
 		private static Cache<string, TabQueue> eventsByTabID = GetQueueCache();
 		private static Cache<string, TabQueue> timeoutByTabID = GetTimeoutCache();
 		private static Dictionary<string, string> locationByTabID = new Dictionary<string, string>();
-		private static Dictionary<string, Dictionary<string, List<KeyValuePair<string, string>>>> tabIdsByLocation =
-			new Dictionary<string, Dictionary<string, List<KeyValuePair<string, string>>>>(StringComparer.OrdinalIgnoreCase);
+		private static Dictionary<string, Dictionary<string, List<(string, string, string)>>> tabIdsByLocation =
+			new Dictionary<string, Dictionary<string, List<(string, string, string)>>>(StringComparer.OrdinalIgnoreCase);
 
 		private static Cache<string, TabQueue> GetTimeoutCache()
 		{
@@ -376,7 +382,7 @@ namespace Waher.IoTGateway
 			{
 				lock (tabIdsByLocation)
 				{
-					if (tabIdsByLocation.TryGetValue(Location, out Dictionary<string, List<KeyValuePair<string, string>>> TabIDs))
+					if (tabIdsByLocation.TryGetValue(Location, out Dictionary<string, List<(string, string, string)>> TabIDs))
 					{
 						if (TabIDs.Remove(TabID) && TabIDs.Count == 0)
 							tabIdsByLocation.Remove(Location);
@@ -427,7 +433,7 @@ namespace Waher.IoTGateway
 
 			lock (tabIdsByLocation)
 			{
-				if (tabIdsByLocation.TryGetValue(Location, out Dictionary<string, List<KeyValuePair<string, string>>> TabIDs))
+				if (tabIdsByLocation.TryGetValue(Location, out Dictionary<string, List<(string, string, string)>> TabIDs))
 				{
 					if (QueryFilter is null || QueryFilter.Length == 0)
 					{
@@ -440,7 +446,7 @@ namespace Waher.IoTGateway
 						bool Found;
 						bool IsMatch;
 
-						foreach (KeyValuePair<string, List<KeyValuePair<string, string>>> P in TabIDs)
+						foreach (KeyValuePair<string, List<(string, string, string)>> P in TabIDs)
 						{
 							IsMatch = true;
 
@@ -452,9 +458,9 @@ namespace Waher.IoTGateway
 
 									if (P.Value != null)
 									{
-										foreach (KeyValuePair<string, string> Q2 in P.Value)
+										foreach ((string, string, string) Q2 in P.Value)
 										{
-											if (Q2.Key == Q.Key)
+											if (Q2.Item1 == Q.Key)
 											{
 												Found = false;
 												break;
@@ -474,9 +480,11 @@ namespace Waher.IoTGateway
 
 									if (P.Value != null)
 									{
-										foreach (KeyValuePair<string, string> Q2 in P.Value)
+										foreach ((string, string, string) Q2 in P.Value)
 										{
-											if (Q2.Key == Q.Key && string.Compare(Q2.Value, Q.Value, IgnoreCase) == 0)
+											if (Q2.Item1 == Q.Key && 
+												(string.Compare(Q2.Item2, Q.Value, IgnoreCase) == 0 ||
+												string.Compare(Q2.Item3, Q.Value, IgnoreCase) == 0))
 											{
 												Found = true;
 												break;
@@ -523,7 +531,7 @@ namespace Waher.IoTGateway
 
 				default:
 					Dictionary<string, bool> Result = new Dictionary<string, bool>();
-					Dictionary<string, List<KeyValuePair<string, string>>> TabIDs;
+					Dictionary<string, List<(string, string, string)>> TabIDs;
 
 					lock (tabIdsByLocation)
 					{

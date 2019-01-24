@@ -279,19 +279,26 @@ namespace Waher.Networking.XMPP.HTTPX
 			try
 			{
 				if (e.Client is null)
-					this.SendRequest(this.httpxClient, Rec.fullJID, Rec.method, Rec.fullJID, Rec.localUrl, Rec.request, Rec.response);
+				{
+					this.SendRequest(this.httpxClient, Rec.fullJID, Rec.method, XmppClient.GetBareJID(Rec.fullJID),
+						Rec.localUrl, Rec.request, Rec.response);
+				}
 				else
 				{
 					HttpxClient HttpxClient;
-					
+
 					if (e.Client.SupportsFeature(HttpxClient.Namespace) &&
 						e.Client.TryGetTag("HttpxClient", out object Obj) &&
 						(HttpxClient = Obj as HttpxClient) != null)
 					{
-						this.SendRequest(HttpxClient, Rec.fullJID, Rec.method, Rec.fullJID, Rec.localUrl, Rec.request, Rec.response);
+						this.SendRequest(HttpxClient, Rec.fullJID, Rec.method, XmppClient.GetBareJID(Rec.fullJID),
+							Rec.localUrl, Rec.request, Rec.response);
 					}
 					else
-						this.SendRequest(this.httpxClient, Rec.fullJID, Rec.method, Rec.fullJID, Rec.localUrl, Rec.request, Rec.response);
+					{
+						this.SendRequest(this.httpxClient, Rec.fullJID, Rec.method, XmppClient.GetBareJID(Rec.fullJID),
+							Rec.localUrl, Rec.request, Rec.response);
+					}
 				}
 			}
 			catch (Exception ex)

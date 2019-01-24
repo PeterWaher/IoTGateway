@@ -532,7 +532,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 					Xml.Append("\" sid=\"");
 					Xml.Append(State.streamId);
 					Xml.Append("\"><streamhost-used jid=\"");
-					Xml.Append(Host);
+					Xml.Append(Client.Host);
 					Xml.Append("\"/></query>");
 
 					State.eventargs.IqResult(Xml.ToString());

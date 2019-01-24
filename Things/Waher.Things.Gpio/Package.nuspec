@@ -12,7 +12,7 @@
     <repository type="GitHub" url="https://github.com/PeterWaher/IoTGateway"/>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <description>UWP class library that publishes nodes for interaction with onboard General Purpose Input/Output (GPIO) modules.</description>
-    <copyright>Copyright © Waher Data AB 2017-2018. All rights reserved.</copyright>
+    <copyright>Copyright © Waher Data AB 2017-2019. All rights reserved.</copyright>
     <tags>UWP IoT GPIO</tags>
     <dependencies>
       <dependency id="Waher.IoTGateway" version="1.0.73"/>

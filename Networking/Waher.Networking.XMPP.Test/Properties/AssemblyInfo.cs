@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Waher Data AB")]
 [assembly: AssemblyProduct("Waher.IoTGateway")]
-[assembly: AssemblyCopyright("Copyright © Waher Data AB 2015-2018. All rights reserved.")]
+[assembly: AssemblyCopyright("Copyright © Waher Data AB 2015-2019. All rights reserved.")]
 [assembly: AssemblyTrademark("IoT Gateway")]
 [assembly: AssemblyCulture("")]
 

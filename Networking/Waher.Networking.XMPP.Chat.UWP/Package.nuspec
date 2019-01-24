@@ -15,7 +15,7 @@
     <copyright>Copyright © Waher Data AB 2015-2018. All rights reserved.</copyright>
     <tags>networking communication xmpp iot chat</tags>
     <dependencies>
-      <dependency id="Waher.Content" version="1.0.18"/>
+      <dependency id="Waher.Content" version="1.0.19"/>
       <dependency id="Waher.Content.Emoji" version="1.0.1"/>
       <dependency id="Waher.Content.Markdown" version="1.0.34"/>
       <dependency id="Waher.Content.Xml" version="1.0.7"/>

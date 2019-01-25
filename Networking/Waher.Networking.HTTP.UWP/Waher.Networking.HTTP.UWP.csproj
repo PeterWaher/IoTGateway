@@ -213,6 +213,7 @@
     <Compile Include="TransferEncoding.cs" />
     <Compile Include="TransferEncodings\ChunkedTransferEncoding.cs" />
     <Compile Include="TransferEncodings\ContentLengthEncoding.cs" />
+    <Compile Include="TransferEncodings\InternalTransfer.cs" />
     <Compile Include="WebSockets\WebSocket.cs" />
     <Compile Include="WebSockets\WebSocketBinaryEventArgs.cs" />
     <Compile Include="WebSockets\WebSocketClosedEventArgs.cs" />

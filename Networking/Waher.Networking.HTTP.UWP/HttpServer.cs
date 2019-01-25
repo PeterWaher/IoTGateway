@@ -20,10 +20,12 @@ using Windows.Storage.Streams;
 #else
 using System.Security.Cryptography.X509Certificates;
 #endif
+using Waher.Content.Multipart;
 using Waher.Events;
 using Waher.Events.Statistics;
 using Waher.Networking.HTTP.HeaderFields;
 using Waher.Networking.Sniffers;
+using Waher.Networking.HTTP.TransferEncodings;
 using Waher.Runtime.Cache;
 using Waher.Script;
 
@@ -1181,6 +1183,49 @@ namespace Waher.Networking.HTTP
 				if (this.currentRequests != null)
 					this.currentRequests.MaxTimeUnused = value;
 			}
+		}
+
+		#endregion
+
+		#region GET
+
+		/// <summary>
+		/// Performs an internal GET operation.
+		/// </summary>
+		/// <param name="LocalUrl">Local URL</param>
+		/// <param name="Session">Session variables, if available, or null if not.</param>
+		/// <returns>Status Code, Content-Type and binary representation of resource, if available.</returns>
+		public async Task<Tuple<int, string, byte[]>> GET(string LocalUrl, Variables Session)
+		{
+			string ResourceName = LocalUrl;
+			int i = ResourceName.IndexOf('?');
+			if (i >= 0)
+				ResourceName = ResourceName.Substring(0, i);
+
+			if (this.TryGetResource(LocalUrl, out HttpResource Resource, out string SubPath) &&
+				Resource is IHttpGetMethod GetMethod)
+			{
+				using (MemoryStream ms = new MemoryStream())
+				{
+					HttpRequest Request = new HttpRequest(new HttpRequestHeader("GET " + LocalUrl + " HTTP/1.1", "http"), null,
+						ms, string.Empty)
+					{
+						Session = Session
+					};
+
+					InternalTransfer InternalTransfer = new InternalTransfer(ms);
+					HttpResponse Response = new HttpResponse(InternalTransfer, this, Request);
+
+					this.RequestReceived(Request, string.Empty, Resource, SubPath);
+					GetMethod.GET(Request, Response);
+
+					await InternalTransfer.WaitUntilSent(10000);
+
+					return new Tuple<int, string, byte[]>(Response.StatusCode, Response.ContentType, ms.ToArray());
+				}
+			}
+			else
+				return new Tuple<int, string, byte[]>(404, string.Empty, null);
 		}
 
 		#endregion

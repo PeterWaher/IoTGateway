@@ -139,5 +139,25 @@ namespace Waher.Content.Test
 			Assert.AreEqual("smtp", Dsn.PerRecipients[0].DiagnosticCodeType);
 		}
 
+		[TestMethod]
+		public void Test_04_BoundaryAtEnd()
+		{
+			object Decoded = this.Decode("1773459c-3649-4bb4-a33c-a15651665e92");
+
+			ContentAlternatives Alternatives = Decoded as ContentAlternatives;
+			Assert.IsNotNull(Alternatives);
+
+			Assert.AreEqual(2, Alternatives.Content.Length);
+			string PlainText = Alternatives.Content[0].Decoded as string;
+			Assert.IsNotNull(PlainText);
+			Console.Out.WriteLine(PlainText);
+			Console.Out.WriteLine();
+
+			HtmlDocument Html = Alternatives.Content[1].Decoded as HtmlDocument;
+			Assert.IsNotNull(Html);
+			Console.Out.WriteLine(Html.HtmlText);
+			Console.Out.WriteLine();
+		}
+
 	}
 }

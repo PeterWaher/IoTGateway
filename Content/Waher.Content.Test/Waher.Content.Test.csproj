@@ -21,6 +21,8 @@
     <None Remove="Data\015dd6dd-ed9f-4139-995b-513f7464dd6f.txt" />
     <None Remove="Data\0b9e5696-c32a-4418-a246-babb188e5beb.bin" />
     <None Remove="Data\0b9e5696-c32a-4418-a246-babb188e5beb.txt" />
+    <None Remove="Data\1773459c-3649-4bb4-a33c-a15651665e92.bin" />
+    <None Remove="Data\1773459c-3649-4bb4-a33c-a15651665e92.txt" />
     <None Remove="Data\6a00b78b-ebb7-4da7-a8cd-65dd09d3ac59.bin" />
     <None Remove="Data\6a00b78b-ebb7-4da7-a8cd-65dd09d3ac59.txt" />
     <None Remove="Data\Offline.xml" />
@@ -37,6 +39,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Data\0b9e5696-c32a-4418-a246-babb188e5beb.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\1773459c-3649-4bb4-a33c-a15651665e92.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\1773459c-3649-4bb4-a33c-a15651665e92.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Data\6a00b78b-ebb7-4da7-a8cd-65dd09d3ac59.bin">

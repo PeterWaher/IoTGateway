@@ -128,9 +128,10 @@ namespace Waher.Content.Multipart
 			int i = 0;
 			int c = Data.Length;
 			int d = BoundaryBin.Length;
-			int j, k, l, m;
+			int j;
+			int Max = c - d;
 
-			while (i < c)
+			while (i < Max)
 			{
 				for (j = 0; j < d; j++)
 				{
@@ -140,133 +141,7 @@ namespace Waher.Content.Multipart
 
 				if (j == d)
 				{
-					for (j = Start; j < i; j++)
-					{
-						if (Data[j] == '\r' && Data[j + 1] == '\n' && Data[j + 2] == '\r' && Data[j + 3] == '\n')
-							break;
-					}
-
-					if (j < i)
-					{
-						k = 0;
-						if (Data[i - 1] == '-' && Data[i - 2] == '-')
-							k = 2;
-
-						if (Data[i - 1 - k] == '\n' && Data[i - 2 - k] == '\r')
-							k += 2;
-
-						string Header = Encoding.ASCII.GetString(Data, Start, j - Start);
-						string Key, Value;
-						byte[] Data2 = new byte[i - j - 4 - k];
-						EmbeddedContent EmbeddedContent = new EmbeddedContent()
-						{
-							ContentType = "text/plain",
-							Raw = Data2
-						};
-
-						Array.Copy(Data, j + 4, Data2, 0, i - j - 4 - k);
-
-						string[] Rows = Header.Split(CommonTypes.CRLF);
-						l = Rows.Length;
-						m = -1;
-
-						for (j = 0; j < l; j++)
-						{
-							Key = Rows[j];
-							if (!string.IsNullOrEmpty(Key))
-							{
-								if (char.IsWhiteSpace(Key[0]) && m >= 0)
-								{
-									Rows[m] += Key;
-									Rows[j] = string.Empty;
-								}
-								else
-									m = j;
-							}
-						}
-
-						foreach (string Row in Rows)
-						{
-							j = Row.IndexOf(':');
-							if (j < 0)
-								continue;
-
-							Key = Row.Substring(0, j).Trim();
-							Value = Row.Substring(j + 1).Trim();
-
-							switch (Key.ToUpper())
-							{
-								case "CONTENT-TYPE":
-									EmbeddedContent.ContentType = Value;
-									j = Value.IndexOf(';');
-									if (j >= 0)
-									{
-										ParseContentFields(Value.Substring(j + 1).Trim(), EmbeddedContent);
-										Value = Value.Substring(0, j).Trim();
-									}
-									break;
-
-								case "CONTENT-DISPOSITION":
-									j = Value.IndexOf(';');
-									if (j >= 0)
-									{
-										ParseContentFields(Value.Substring(j + 1).Trim(), EmbeddedContent);
-										Value = Value.Substring(0, j).Trim();
-									}
-
-									switch (Value.ToUpper())
-									{
-										case "INLINE":
-											EmbeddedContent.Disposition = ContentDisposition.Inline;
-											break;
-
-										case "ATTACHMENT":
-											EmbeddedContent.Disposition = ContentDisposition.Attachment;
-											break;
-									}
-									break;
-
-								case "CONTENT-TRANSFER-ENCODING":
-									EmbeddedContent.TransferEncoding = Value;
-									break;
-
-								case "CONTENT-ID":
-									EmbeddedContent.ID = Value;
-									break;
-
-								case "CONTENT-DESCRIPTION":
-									EmbeddedContent.Description = Value;
-									break;
-							}
-						}
-
-						if (!string.IsNullOrEmpty(EmbeddedContent.TransferEncoding))
-						{
-							if (TryTransferDecode(Data2, EmbeddedContent.TransferEncoding, out Data2))
-								EmbeddedContent.TransferDecoded = Data2;
-							else
-								throw new Exception("Unrecognized Content-Transfer-Encoding: " + EmbeddedContent.TransferEncoding);
-						}
-
-						EmbeddedContent.Decoded = InternetContent.Decode(EmbeddedContent.ContentType, Data2, BaseUri);
-
-						if (Form != null)
-						{
-							Form[EmbeddedContent.Name] = EmbeddedContent.Decoded;
-
-							if (!(EmbeddedContent.Decoded is byte[]))
-								Form[EmbeddedContent.Name + "_Binary"] = Data2;
-
-							if (!string.IsNullOrEmpty(EmbeddedContent.ContentType))
-								Form[EmbeddedContent.Name + "_ContentType"] = EmbeddedContent.ContentType;
-
-							if (!string.IsNullOrEmpty(EmbeddedContent.FileName))
-								Form[EmbeddedContent.Name + "_FileName"] = EmbeddedContent.FileName;
-						}
-
-						if (List != null)
-							List.Add(EmbeddedContent);
-					}
+					AddPart(Data, Start, i, Form, List, BaseUri);
 
 					i += d;
 					while (i < c && Data[i] <= 32)
@@ -276,6 +151,152 @@ namespace Waher.Content.Multipart
 				}
 				else
 					i++;
+			}
+
+			if (Start < c)
+				AddPart(Data, Start, c, Form, List, BaseUri);
+		}
+
+		private static void AddPart(byte[] Data, int Start, int i,
+			Dictionary<string, object> Form, List<EmbeddedContent> List, Uri BaseUri)
+		{
+			int j, k, l, m;
+			int Max = i - 3;
+
+			for (j = Start; j < Max; j++)
+			{
+				if (Data[j] == '\r' && Data[j + 1] == '\n' && Data[j + 2] == '\r' && Data[j + 3] == '\n')
+					break;
+			}
+
+			if (j == Start)
+				return;
+
+			if (j < i)
+			{
+				k = 0;
+				if (i >= 2 && Data[i - 1] == '-' && Data[i - 2] == '-')
+				{
+					k = 2;
+
+					if (i >= 4 && Data[i - 1 - k] == '\n' && Data[i - 2 - k] == '\r')
+						k += 2;
+				}
+
+				if (i - j - 4 - k <= 0)
+					return;
+
+				string Header = Encoding.ASCII.GetString(Data, Start, j - Start);
+				string Key, Value;
+				byte[] Data2 = new byte[i - j - 4 - k];
+				EmbeddedContent EmbeddedContent = new EmbeddedContent()
+				{
+					ContentType = "text/plain",
+					Raw = Data2
+				};
+
+				Array.Copy(Data, j + 4, Data2, 0, i - j - 4 - k);
+
+				string[] Rows = Header.Split(CommonTypes.CRLF);
+				l = Rows.Length;
+				m = -1;
+
+				for (j = 0; j < l; j++)
+				{
+					Key = Rows[j];
+					if (!string.IsNullOrEmpty(Key))
+					{
+						if (char.IsWhiteSpace(Key[0]) && m >= 0)
+						{
+							Rows[m] += Key;
+							Rows[j] = string.Empty;
+						}
+						else
+							m = j;
+					}
+				}
+
+				foreach (string Row in Rows)
+				{
+					j = Row.IndexOf(':');
+					if (j < 0)
+						continue;
+
+					Key = Row.Substring(0, j).Trim();
+					Value = Row.Substring(j + 1).Trim();
+
+					switch (Key.ToUpper())
+					{
+						case "CONTENT-TYPE":
+							EmbeddedContent.ContentType = Value;
+							j = Value.IndexOf(';');
+							if (j >= 0)
+							{
+								ParseContentFields(Value.Substring(j + 1).Trim(), EmbeddedContent);
+								Value = Value.Substring(0, j).Trim();
+							}
+							break;
+
+						case "CONTENT-DISPOSITION":
+							j = Value.IndexOf(';');
+							if (j >= 0)
+							{
+								ParseContentFields(Value.Substring(j + 1).Trim(), EmbeddedContent);
+								Value = Value.Substring(0, j).Trim();
+							}
+
+							switch (Value.ToUpper())
+							{
+								case "INLINE":
+									EmbeddedContent.Disposition = ContentDisposition.Inline;
+									break;
+
+								case "ATTACHMENT":
+									EmbeddedContent.Disposition = ContentDisposition.Attachment;
+									break;
+							}
+							break;
+
+						case "CONTENT-TRANSFER-ENCODING":
+							EmbeddedContent.TransferEncoding = Value;
+							break;
+
+						case "CONTENT-ID":
+							EmbeddedContent.ID = Value;
+							break;
+
+						case "CONTENT-DESCRIPTION":
+							EmbeddedContent.Description = Value;
+							break;
+					}
+				}
+
+				if (!string.IsNullOrEmpty(EmbeddedContent.TransferEncoding))
+				{
+					if (TryTransferDecode(Data2, EmbeddedContent.TransferEncoding, out Data2))
+						EmbeddedContent.TransferDecoded = Data2;
+					else
+						throw new Exception("Unrecognized Content-Transfer-Encoding: " + EmbeddedContent.TransferEncoding);
+				}
+
+				EmbeddedContent.Decoded = InternetContent.Decode(EmbeddedContent.ContentType, Data2, BaseUri);
+
+				if (Form != null)
+				{
+					Form[EmbeddedContent.Name] = EmbeddedContent.Decoded;
+
+					if (!(EmbeddedContent.Decoded is byte[]))
+						Form[EmbeddedContent.Name + "_Binary"] = Data2;
+
+					if (!string.IsNullOrEmpty(EmbeddedContent.ContentType))
+						Form[EmbeddedContent.Name + "_ContentType"] = EmbeddedContent.ContentType;
+
+					if (!string.IsNullOrEmpty(EmbeddedContent.FileName))
+						Form[EmbeddedContent.Name + "_FileName"] = EmbeddedContent.FileName;
+				}
+
+				if (List != null)
+					List.Add(EmbeddedContent);
 			}
 		}
 

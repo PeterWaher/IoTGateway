@@ -23,8 +23,8 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 
 		private Cache<string, IncomingStream> cache = null;
 		private Dictionary<string, OutgoingStream> output = new Dictionary<string, OutgoingStream>();
-		private object synchObject = new object();
-		private int maxBlockSize;
+		private readonly object synchObject = new object();
+		private readonly int maxBlockSize;
 
 		/// <summary>
 		/// Class sending and receiving binary streams over XMPP using XEP-0047: In-band Bytestreams:

@@ -78,7 +78,7 @@ namespace Waher.Networking.XMPP.BitsOfBinary
 		/// <returns>Content ID</returns>
 		public string StoreData(byte[] Data, string ContentType, DateTime? Expires)
 		{
-			string Hash = Waher.Security.Hashes.ComputeSHA256HashString(Data);
+			string Hash = Security.Hashes.ComputeSHA256HashString(Data);
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<data xmlns='");

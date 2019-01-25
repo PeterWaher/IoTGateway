@@ -60,6 +60,22 @@ namespace Waher.IoTGateway.Cssx
 				Cssx = rd.ReadToEnd();
 			}
 
+			string Css = Convert(Cssx, Session);
+
+			byte[] Data = Utf8WithBOM.GetBytes(Css);
+			To.Write(Data, 0, Data.Length);
+
+			return false;
+		}
+
+		/// <summary>
+		/// Converts CSSX to CSS, using the current theme
+		/// </summary>
+		/// <param name="Cssx">CSSX</param>
+		/// <param name="Session">Current session</param>
+		/// <returns>CSS</returns>
+		public static string Convert(string Cssx, Variables Session)
+		{
 			bool Pushed = false;
 
 			Session.Lock();
@@ -147,8 +163,7 @@ namespace Waher.IoTGateway.Cssx
 				if (i < c)
 					Result.Append(Cssx.Substring(i));
 
-				byte[] Data = Utf8WithBOM.GetBytes(Result.ToString());
-				To.Write(Data, 0, Data.Length);
+				return Result.ToString();
 			}
 			finally
 			{
@@ -157,8 +172,6 @@ namespace Waher.IoTGateway.Cssx
 
 				Session.Release();
 			}
-
-			return false;
 		}
 
 		internal static readonly Encoding Utf8WithBOM = new UTF8Encoding(true);

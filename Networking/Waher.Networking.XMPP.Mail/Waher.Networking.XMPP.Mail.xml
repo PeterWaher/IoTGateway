@@ -124,6 +124,16 @@
             </summary>
             <param name="ObjectId">ID of the message object to delete.</param>
         </member>
+        <member name="M:Waher.Networking.XMPP.Mail.MailClient.AppendContent(System.String,System.String,System.Byte[],Waher.Content.Multipart.ContentDisposition,System.Text.StringBuilder)">
+            <summary>
+            Appends embedded content to a message XML output.
+            </summary>
+            <param name="ContentId">Content ID</param>
+            <param name="ContentType">Content-Type of embedded content.</param>
+            <param name="ContentData">Binary encoding of content to embed.</param>
+            <param name="Disposition">Content disposition.</param>
+            <param name="Xml">XML output.</param>
+        </member>
         <member name="T:Waher.Networking.XMPP.Mail.Priority">
             <summary>
             Mail priority

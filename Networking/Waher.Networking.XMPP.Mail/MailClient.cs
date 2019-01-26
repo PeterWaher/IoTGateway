@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using Waher.Content.Multipart;
 using Waher.Content.Xml;
 using Waher.Events;
 
@@ -307,6 +308,35 @@ namespace Waher.Networking.XMPP.Mail
 			}, null);
 
 			return Result.Task;
+		}
+
+		/// <summary>
+		/// Appends embedded content to a message XML output.
+		/// </summary>
+		/// <param name="ContentId">Content ID</param>
+		/// <param name="ContentType">Content-Type of embedded content.</param>
+		/// <param name="ContentData">Binary encoding of content to embed.</param>
+		/// <param name="Disposition">Content disposition.</param>
+		/// <param name="Xml">XML output.</param>
+		public void AppendContent(string ContentId, string ContentType, byte[] ContentData, ContentDisposition Disposition,
+			StringBuilder Xml)
+		{
+			Xml.Append("<content xmlns='");
+			Xml.Append(NamespaceMail);
+			Xml.Append("' cid='");
+			Xml.Append(XML.Encode(ContentId));
+			Xml.Append("' type='");
+			Xml.Append(XML.Encode(ContentType));
+
+			if (Disposition != ContentDisposition.Unknown)
+			{
+				Xml.Append("' disposition='");
+				Xml.Append(XML.Encode(Disposition.ToString()));
+			}
+
+			Xml.Append("'>");
+			Xml.Append(Convert.ToBase64String(ContentData));		// TODO: Chunked transfer
+			Xml.Append("</content>");
 		}
 
 	}

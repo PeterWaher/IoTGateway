@@ -183,5 +183,43 @@ namespace Waher.Content.Html
 		{
 			get { return false; }
 		}
+
+		/// <summary>
+		/// If the element has an attribute with a given (case-insensitive) name.
+		/// </summary>
+		/// <param name="Name">Case-insensitive attribute name.</param>
+		/// <returns>If such an attribute exists.</returns>
+		public bool HasAttribute(string Name)
+		{
+			if (this.attributes is null)
+				return false;
+
+			foreach (HtmlAttribute Attr in this.attributes)
+			{
+				if (string.Compare(Attr.Name, Name, true) == 0)
+					return true;
+			}
+
+			return false;
+		}
+
+		/// <summary>
+		/// Gets a given attribute value, if available. The empty string is returned if the attribute does not exist.
+		/// </summary>
+		/// <param name="Name">Case-insensitive attribute name.</param>
+		/// <returns>Attribute value.</returns>
+		public string GetAttribute(string Name)
+		{
+			if (this.attributes is null)
+				return string.Empty;
+
+			foreach (HtmlAttribute Attr in this.attributes)
+			{
+				if (string.Compare(Attr.Name, Name, true) == 0)
+					return Attr.Value;
+			}
+
+			return string.Empty;
+		}
 	}
 }

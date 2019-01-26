@@ -420,7 +420,7 @@ figure img
     box-shadow: 0.3em 0.3em 0.3em rgba(0,0,0,0.5);
 }
 
-figure figcaption 
+figure figcaption
 {
     text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
     padding: 0.7em;
@@ -501,7 +501,7 @@ li > ol
     margin-left:-1em;
 }
 
-ul.taskList 
+ul.taskList
 {
     list-style-type: none;
 }
@@ -567,7 +567,7 @@ th
     background-color: ¤ButtonColor¤;
     color: ¤ButtonTextColor¤;
 }
- 
+
 th, td
 {
     padding: 0.2em 0.6em 0.2em 0.6em;

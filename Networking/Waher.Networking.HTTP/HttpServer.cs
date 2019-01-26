@@ -1210,7 +1210,8 @@ namespace Waher.Networking.HTTP
 					HttpRequest Request = new HttpRequest(new HttpRequestHeader("GET " + LocalUrl + " HTTP/1.1", "http"), null,
 						ms, string.Empty)
 					{
-						Session = Session
+						Session = Session,
+						SubPath = SubPath
 					};
 
 					InternalTransfer InternalTransfer = new InternalTransfer(ms);

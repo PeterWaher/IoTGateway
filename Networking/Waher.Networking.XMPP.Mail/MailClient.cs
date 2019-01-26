@@ -317,9 +317,12 @@ namespace Waher.Networking.XMPP.Mail
 		/// <param name="ContentType">Content-Type of embedded content.</param>
 		/// <param name="ContentData">Binary encoding of content to embed.</param>
 		/// <param name="Disposition">Content disposition.</param>
+		/// <param name="Name">Name attribute</param>
+		/// <param name="FileName">File-name attribute</param>
+		/// <param name="Description">Content description.</param>
 		/// <param name="Xml">XML output.</param>
 		public void AppendContent(string ContentId, string ContentType, byte[] ContentData, ContentDisposition Disposition,
-			StringBuilder Xml)
+			string Name, string FileName, string Description, StringBuilder Xml)
 		{
 			Xml.Append("<content xmlns='");
 			Xml.Append(NamespaceMail);
@@ -332,6 +335,24 @@ namespace Waher.Networking.XMPP.Mail
 			{
 				Xml.Append("' disposition='");
 				Xml.Append(XML.Encode(Disposition.ToString()));
+			}
+
+			if (!string.IsNullOrEmpty(Name))
+			{
+				Xml.Append("' name='");
+				Xml.Append(XML.Encode(Name));
+			}
+
+			if (!string.IsNullOrEmpty(FileName))
+			{
+				Xml.Append("' fileName='");
+				Xml.Append(XML.Encode(FileName));
+			}
+
+			if (!string.IsNullOrEmpty(Description))
+			{
+				Xml.Append("' description='");
+				Xml.Append(XML.Encode(Description));
 			}
 
 			Xml.Append("'>");

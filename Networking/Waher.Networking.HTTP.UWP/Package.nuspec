@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata minClientVersion="3.2">
     <id>Waher.Networking.HTTP.UWP</id>
-    <version>1.0.29</version>
+    <version>1.0.30</version>
     <title>Waher.Networking.HTTP.UWP</title>
     <authors>Peter Waher</authors>
     <owners>Waher Data AB</owners>
@@ -15,7 +15,7 @@
     <copyright>Copyright © Waher Data AB 2016-2019. All rights reserved.</copyright>
     <tags>networking communication http uwp</tags>
     <dependencies>
-      <dependency id="Waher.Content" version="1.0.19"/>
+      <dependency id="Waher.Content" version="1.0.20"/>
       <dependency id="Waher.Events" version="1.0.7"/>
       <dependency id="Waher.Events.Statistics" version="1.0.3"/>
       <dependency id="Waher.Networking" version="1.0.11"/>

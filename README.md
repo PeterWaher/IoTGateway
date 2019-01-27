@@ -123,7 +123,7 @@ The folder also contains the following unit test projects:
 | Project                            | Type          | Project description |
 |------------------------------------|---------------|---------------------|
 | **Waher.Content.Html.Test**        | .NET 4.6.2    | The [Waher.Content.Html.Test](Content/Waher.Content.Html.Test) project contains unit tests for the **Waher.Content.Html** project. |
-| **Waher.Content.Markdown.Test**    | .NET 4.6.2    | The [Waher.Content.Markdown.Test](Content/Waher.Content.Markdown.Test) project contains unit tests for the **Waher.Content.Markdown** project. |
+| **Waher.Content.Markdown.Test**    | .NET Core 2.0 | The [Waher.Content.Markdown.Test](Content/Waher.Content.Markdown.Test) project contains unit tests for the **Waher.Content.Markdown** project. |
 | **Waher.Content.Test**             | .NET Core 2.0 | The [Waher.Content.Test](Content/Waher.Content.Test) project contains unit tests for the **Waher.Content** project. |
 
 

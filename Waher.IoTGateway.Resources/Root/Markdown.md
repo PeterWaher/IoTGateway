@@ -240,7 +240,15 @@ sequences have been added to the **IoT Gateway** version of markdown, as shown i
 
 ### Emojis
 
-Emojis are supported, and included into the document using the shortname syntax `:shortname:`.
+Emojis are supported, and included into the document using the shortname syntax `:shortname:`. You can provide more *emphasis* by using
+more colons before and after: `::shortname::`, `:::shortname:::`, `::::shortname::::`, etc., each resulting in a larger emoji:
+
+	:smiley:, ::smiley::, :::smiley:::, ::::smiley::::, :::::smiley:::::, etc...
+
+Result in:
+
+:smiley:, ::smiley::, :::smiley:::, ::::smiley::::, :::::smiley:::::, etc...
+
 For a list of supported emojis, click [here](Emojis.md).
 
 ### Smileys

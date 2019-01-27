@@ -55,13 +55,13 @@ namespace Waher.Content.Emoji.Emoji1
 	/// </summary>
 	public class Emoji1LocalFiles : IEmojiSource, IDisposable
 	{
-		private Emoji1SourceFileType sourceFileType;
+		private readonly Emoji1SourceFileType sourceFileType;
 		private ManualResetEvent initialized = new ManualResetEvent(false);
-		private string zipFileName;
-		private string programDataFolder;
-		private string imageUrl;
-		private int width;
-		private int height;
+		private readonly string zipFileName;
+		private readonly string programDataFolder;
+		private readonly string imageUrl;
+		private readonly int width;
+		private readonly int height;
 
 		/// <summary>
 		/// Provides emojis from Emoji One (http://emojione.com/) stored as local files.
@@ -234,17 +234,49 @@ namespace Waher.Content.Emoji.Emoji1
 		/// <param name="EmbedImage">If image should be embedded into the generated HTML, using the data URI scheme.</param>
 		public void GenerateHTML(StringBuilder Output, EmojiInfo Emoji, bool EmbedImage)
 		{
+		}
+
+		/// <summary>
+		/// Generates HTML for a given Emoji.
+		/// </summary>
+		/// <param name="Output">Output</param>
+		/// <param name="Emoji">Emoji</param>
+		/// <param name="Level">Level (number of colons used to define the emoji)</param>
+		/// <param name="EmbedImage">If image should be embedded into the generated HTML, using the data URI scheme.</param>
+		public void GenerateHTML(StringBuilder Output, EmojiInfo Emoji, int Level, bool EmbedImage)
+		{
 			Output.Append("<img alt=\":");
 			Output.Append(Encode(Emoji.ShortName));
 			Output.Append(":\" title=\"");
 			Output.Append(Encode(Emoji.Description));
 			Output.Append("\" width=\"");
-			Output.Append(this.width.ToString());
+			Output.Append(this.CalcSize(this.width, Level).ToString());
 			Output.Append("\" height=\"");
-			Output.Append(this.height.ToString());
+			Output.Append(this.CalcSize(this.height, Level).ToString());
 			Output.Append("\" src=\"");
 			Output.Append(Encode(this.GetUrl(Emoji, EmbedImage)));
 			Output.Append("\"/>");
+		}
+
+		/// <summary>
+		/// Calculates the size of an emoji.
+		/// </summary>
+		/// <param name="OrgSize">Original size.</param>
+		/// <param name="Level">Level</param>
+		/// <returns>Resulting size.</returns>
+		public int CalcSize(int OrgSize, int Level)
+		{
+			while (Level > 1)
+			{
+				OrgSize = (OrgSize * 4) / 3;
+				if (--Level == 1)
+					return OrgSize;
+
+				OrgSize = (OrgSize * 3) / 2;
+				Level--;
+			}
+
+			return OrgSize;
 		}
 
 		private static string Encode(string s)
@@ -309,9 +341,22 @@ namespace Waher.Content.Emoji.Emoji1
 		/// <param name="Height">Height of emoji.</param>
 		public void GetImageSource(EmojiInfo Emoji, out string Url, out int Width, out int Height)
 		{
+			this.GetImageSource(Emoji, 1, out Url, out Width, out Height);
+		}
+
+		/// <summary>
+		/// Gets the image source of an emoji.
+		/// </summary>
+		/// <param name="Emoji">Emoji</param>
+		/// <param name="Level">Level (number of colons used to define the emoji)</param>
+		/// <param name="Url">URL to emoji.</param>
+		/// <param name="Width">Width of emoji.</param>
+		/// <param name="Height">Height of emoji.</param>
+		public void GetImageSource(EmojiInfo Emoji, int Level, out string Url, out int Width, out int Height)
+		{
 			Url = this.GetUrl(Emoji, false);
-			Width = this.width;
-			Height = this.height;
+			Width = this.CalcSize(this.width, Level);
+			Height = this.CalcSize(this.height, Level);
 		}
 
 		/// <summary>

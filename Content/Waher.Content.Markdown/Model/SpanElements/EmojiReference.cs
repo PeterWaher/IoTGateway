@@ -11,7 +11,9 @@ namespace Waher.Content.Markdown.Model.SpanElements
 	/// </summary>
 	public class EmojiReference : MarkdownElement
 	{
-		private EmojiInfo emoji;
+		private readonly EmojiInfo emoji;
+		private readonly int level;
+		private readonly string delimiter;
 
 		/// <summary>
 		/// Represents an Emoji.
@@ -19,9 +21,22 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="Document">Markdown document.</param>
 		/// <param name="Emoji">Emoji reference.</param>
 		public EmojiReference(MarkdownDocument Document, EmojiInfo Emoji)
+			: this(Document, Emoji, 1)
+		{
+		}
+
+		/// <summary>
+		/// Represents an Emoji.
+		/// </summary>
+		/// <param name="Document">Markdown document.</param>
+		/// <param name="Emoji">Emoji reference.</param>
+		/// <param name="Level">Level (number of colons used to define the emoji)</param>
+		public EmojiReference(MarkdownDocument Document, EmojiInfo Emoji, int Level)
 			: base(Document)
 		{
 			this.emoji = Emoji;
+			this.level = Level;
+			this.delimiter = Level == 1 ? ":" : new string(':', Level);
 		}
 
 		/// <summary>
@@ -30,6 +45,14 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		public EmojiInfo Emoji
 		{
 			get { return this.emoji; }
+		}
+
+		/// <summary>
+		/// Level (number of colons used to define the emoji)
+		/// </summary>
+		public int Level
+		{
+			get { return this.level; }
 		}
 
 		/// <summary>
@@ -42,14 +65,14 @@ namespace Waher.Content.Markdown.Model.SpanElements
 
 			if (EmojiSource is null)
 			{
-				Output.Append(':');
+				Output.Append(this.delimiter);
 				Output.Append(this.emoji.ShortName);
-				Output.Append(':');
+				Output.Append(this.delimiter);
 			}
 			else if (!EmojiSource.EmojiSupported(this.emoji))
 				Output.Append(this.emoji.Unicode);
 			else
-				EmojiSource.GenerateHTML(Output, this.emoji, this.Document.Settings.EmbedEmojis);
+				EmojiSource.GenerateHTML(Output, this.emoji, this.level, this.Document.Settings.EmbedEmojis);
 		}
 
 		/// <summary>
@@ -66,7 +89,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// </summary>
 		public override string ToString()
 		{
-			return ":" + this.emoji.ShortName + ":";
+			return this.delimiter + this.emoji.ShortName + this.delimiter;
 		}
 
 		/// <summary>
@@ -77,7 +100,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="TextAlignment">Alignment of text in element.</param>
 		public override void GenerateXAML(XmlWriter Output, XamlSettings Settings, TextAlignment TextAlignment)
 		{
-			this.Document.EmojiSource.GetImageSource(this.emoji, out string Url, out int Width, out int Height);
+			this.Document.EmojiSource.GetImageSource(this.emoji, this.level, out string Url, out int Width, out int Height);
 
 			Output.WriteStartElement("Image");
 			Output.WriteAttributeString("Source", Url);
@@ -114,6 +137,10 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		{
 			Output.WriteStartElement("Emoji");
 			Output.WriteAttributeString("shortName", this.emoji.ShortName);
+
+			if (this.level > 1)
+				Output.WriteAttributeString("level", this.level.ToString());
+
 			Output.WriteEndElement();
 		}
 	}

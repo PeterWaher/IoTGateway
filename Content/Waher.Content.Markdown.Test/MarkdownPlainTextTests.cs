@@ -6,6 +6,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Content;
 using Waher.Content.Images;
 using Waher.Content.Emoji.Emoji1;
+using Waher.Persistence;
+using Waher.Persistence.Files;
 using Waher.Script;
 using Waher.Script.Graphs;
 
@@ -14,6 +16,8 @@ namespace Waher.Content.Markdown.Test
 	[TestClass]
 	public class MarkdownPlainTextTests
 	{
+		private static FilesProvider filesProvider = null;
+
 		[AssemblyInitialize]
 		public static void AssemblyInitialize(TestContext Context)
 		{
@@ -23,7 +27,22 @@ namespace Waher.Content.Markdown.Test
 				typeof(Graph).Assembly,
 				typeof(MarkdownDocument).Assembly,
 				typeof(CommonTypes).Assembly,
+				typeof(Database).Assembly,
+				typeof(FilesProvider).Assembly,
 				typeof(ImageCodec).Assembly);
+
+			filesProvider = new FilesProvider("Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000, true);
+			Database.Register(filesProvider);
+		}
+
+		[AssemblyCleanup]
+		public static void AssemblyCleanup()
+		{
+			if (filesProvider != null)
+			{
+				filesProvider.Dispose();
+				filesProvider = null;
+			}
 		}
 
 		private void DoTest(string MarkdownFileName, string PlainTextFileName)

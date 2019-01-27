@@ -1811,7 +1811,7 @@ namespace Waher.Content.Markdown
 								b;
 						}
 
-						if ((!this.settings.AllowScriptTag || !this.allowScriptTag.Value) && 
+						if ((!this.settings.AllowScriptTag || !this.allowScriptTag.Value) &&
 							(Url.StartsWith("<script", StringComparison.CurrentCultureIgnoreCase) ||
 							Url.StartsWith("</script", StringComparison.CurrentCultureIgnoreCase)))
 						{
@@ -3261,6 +3261,14 @@ namespace Waher.Content.Markdown
 						}
 						else if (this.emojiSource != null)
 						{
+							int LeftLevel = 1;
+							while (ch2 == ':')
+							{
+								LeftLevel++;
+								State.NextCharSameRow();
+								ch2 = State.PeekNextCharSameRow();
+							}
+
 							if (char.IsLetter(ch2) || char.IsDigit(ch2) || ch2 == '+')
 							{
 								this.AppendAnyText(Elements, Text);
@@ -3275,12 +3283,18 @@ namespace Waher.Content.Markdown
 									{
 										case 'D':
 											State.NextCharSameRow();
+											if (LeftLevel > 1)
+												Text.Append(new string(':', LeftLevel - 1));
+
 											this.AppendAnyText(Elements, Text);
 											Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_smiley));
 											break;
 
 										case 'L':
 											State.NextCharSameRow();
+											if (LeftLevel > 1)
+												Text.Append(new string(':', LeftLevel - 1));
+
 											this.AppendAnyText(Elements, Text);
 											Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_confused));
 											break;
@@ -3291,6 +3305,9 @@ namespace Waher.Content.Markdown
 										case 'Þ':
 										case 'þ':
 											State.NextCharSameRow();
+											if (LeftLevel > 1)
+												Text.Append(new string(':', LeftLevel - 1));
+
 											this.AppendAnyText(Elements, Text);
 											Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_stuck_out_tongue));
 											break;
@@ -3298,6 +3315,9 @@ namespace Waher.Content.Markdown
 										case 'O':
 										case 'o':
 											State.NextCharSameRow();
+											if (LeftLevel > 1)
+												Text.Append(new string(':', LeftLevel - 1));
+
 											this.AppendAnyText(Elements, Text);
 											Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_open_mouth));
 											break;
@@ -3305,6 +3325,9 @@ namespace Waher.Content.Markdown
 										case 'X':
 										case 'x':
 											State.NextCharSameRow();
+											if (LeftLevel > 1)
+												Text.Append(new string(':', LeftLevel - 1));
+
 											this.AppendAnyText(Elements, Text);
 											Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_no_mouth));
 											break;
@@ -3327,22 +3350,39 @@ namespace Waher.Content.Markdown
 
 								if (ch3 == ':')
 								{
+									int RightLevel = 0;
+
+									while (ch3 == ':' && RightLevel < LeftLevel)
+									{
+										RightLevel++;
+										State.NextCharSameRow();
+										ch3 = State.PeekNextCharSameRow();
+									}
+
 									Title = Text.ToString().ToLower();
 
 									if (EmojiUtilities.TryGetEmoji(Title, out EmojiInfo Emoji))
 									{
-										State.NextCharSameRow();
-										Elements.AddLast(new EmojiReference(this, Emoji));
+										if (LeftLevel > RightLevel)
+											Elements.AddLast(new InlineText(this, new string(':', LeftLevel - RightLevel)));
+
+										Elements.AddLast(new EmojiReference(this, Emoji, RightLevel));
 										Text.Clear();
 									}
 									else
-										Text.Insert(0, ':');
+									{
+										Text.Insert(0, new string(':', LeftLevel));
+										Text.Append(new string(':', RightLevel));
+									}
 								}
 								else
-									Text.Insert(0, ':');
+									Text.Insert(0, new string(':', LeftLevel));
 							}
 							else
 							{
+								if (LeftLevel > 1)
+									Text.Append(new string(':', LeftLevel - 1));
+
 								switch (ch2)
 								{
 									case '\'':

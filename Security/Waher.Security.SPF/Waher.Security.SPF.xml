@@ -118,7 +118,7 @@
             </summary>
             <param name="Term">Term</param>
             <param name="Qualifier">Qualifier</param>
-            <param name="SpfRecords">SPF Expressions that can be used, in case a domain lacks SPF records in the DNS.</param>
+            <param name="SpfExpressions">SPF Expressions that can be used, in case a domain lacks SPF records in the DNS.</param>
         </member>
         <member name="M:Waher.Security.SPF.Mechanisms.Include.Matches">
             <summary>

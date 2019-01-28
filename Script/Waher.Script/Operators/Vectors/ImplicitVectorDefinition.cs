@@ -23,7 +23,6 @@ namespace Waher.Script.Operators.Vectors
 		/// <param name="Pattern">Pattern defining elements in the set.</param>
 		/// <param name="Vector">Optional vector, if defining vector from members of a previous vector.</param>
 		/// <param name="Conditions">Conditions of elements in the set.</param>
-		/// <param name="DoubleColon">If double-colon was used to define the set.</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>

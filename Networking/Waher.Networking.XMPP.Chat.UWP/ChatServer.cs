@@ -233,7 +233,8 @@ namespace Waher.Networking.XMPP.Chat
 			if (Support.Html)
 			{
 				Xml.Append("<html xmlns='http://jabber.org/protocol/xhtml-im'><body xmlns='http://www.w3.org/1999/xhtml'>");
-				Xml.Append(HtmlDocument.GetBody(Doc.GenerateHTML()));
+				HtmlDocument Doc2 = new HtmlDocument(Doc.GenerateHTML());
+				XmlEncode(Doc2.Body, Xml);
 				Xml.Append("</body></html>");
 			}
 
@@ -264,6 +265,73 @@ namespace Waher.Networking.XMPP.Chat
 		}
 
 		private static readonly MarkdownSettings markdownSettings = new MarkdownSettings(null, false);
+
+		private static void XmlEncode(HtmlNode N, StringBuilder Output)
+		{
+			if (N is HtmlElement E)
+			{
+				Output.Append('<');
+				Output.Append(E.Name);
+
+				if (E.HasAttributes)
+				{
+					foreach (HtmlAttribute Attr in E.Attributes)
+					{
+						if (Attr.Name.IndexOf(':') >= 0)
+							continue;
+
+						Output.Append(' ');
+						Output.Append(Attr.Name);
+						Output.Append("=\"");
+						Output.Append(XML.HtmlAttributeEncode(Attr.Value));
+						Output.Append('"');
+					}
+				}
+
+				if (E.HasChildren)
+				{
+					Output.Append('>');
+
+					foreach (HtmlNode N2 in E.Children)
+						XmlEncode(N2, Output);
+
+					Output.Append("</");
+					Output.Append(E.Name);
+					Output.Append('>');
+				}
+				else if (E.IsEmptyElement)
+					Output.Append("/>");
+				else
+				{
+					Output.Append("></");
+					Output.Append(E.Name);
+					Output.Append('>');
+				}
+			}
+			else if (N is HtmlText Text)
+				Output.Append(XML.Encode(Text.InlineText));
+			else if (N is HtmlEntity Entity)
+			{
+				switch (Entity.EntityName.ToLower())
+				{
+					case "lt":
+					case "gt":
+					case "quot":
+					case "apos":
+					case "amp":
+						Output.Append('&');
+						Output.Append(Entity.EntityName);
+						Output.Append(';');
+						break;
+
+					default:
+						Output.Append(HtmlEntity.EntityToCharacter(Entity.EntityName));
+						break;
+				}
+			}
+			else if (N is CDATA CDATA)
+				Output.Append(XML.Encode(CDATA.Content));
+		}
 
 		private async void Client_OnChatMessage(object Sender, MessageEventArgs e)
 		{

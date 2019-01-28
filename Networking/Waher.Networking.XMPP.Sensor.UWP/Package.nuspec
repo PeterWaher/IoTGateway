@@ -19,12 +19,12 @@
       <dependency id="Waher.Content.Xml" version="1.0.7"/>
       <dependency id="Waher.Events" version="1.0.7"/>
       <dependency id="Waher.Networking" version="1.0.11"/>
-      <dependency id="Waher.Networking.XMPP.UWP" version="1.0.38"/>
+      <dependency id="Waher.Networking.XMPP.UWP" version="1.0.39"/>
 			<dependency id="Waher.Networking.XMPP.PEP.UWP" version="1.0.7"/>
 			<dependency id="Waher.Networking.XMPP.Provisioning.UWP" version="1.0.19"/>
 			<dependency id="Waher.Networking.XMPP.PubSub.UWP" version="1.0.6"/>
 			<dependency id="Waher.Runtime.Timing" version="1.0.2"/>
-      <dependency id="Waher.Things" version="1.0.24"/>
+      <dependency id="Waher.Things" version="1.0.25"/>
     </dependencies>
   </metadata>
   <files>

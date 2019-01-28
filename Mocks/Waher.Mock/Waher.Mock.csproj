@@ -4,7 +4,7 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <Description>Simplifies the creation of small networked applications.</Description>
-    <Copyright>Copyright © Waher Data AB 2015-2017. All rights reserved.</Copyright>
+    <Copyright>Copyright © Waher Data AB 2015-2019. All rights reserved.</Copyright>
     <Authors>Peter Waher</Authors>
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
@@ -15,9 +15,9 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>mock networking iot app</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.0.1</AssemblyVersion>
-    <FileVersion>1.0.1</FileVersion>
-    <Version>1.0.1</Version>
+    <AssemblyVersion>1.0.2</AssemblyVersion>
+    <FileVersion>1.0.2</FileVersion>
+    <Version>1.0.2</Version>
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Mocks\Waher.Mock\</UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>

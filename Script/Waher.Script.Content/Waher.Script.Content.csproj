@@ -8,7 +8,7 @@
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
     <Description>Contains script extensions for loading, fetching or processing content.</Description>
-    <Copyright>Copyright © Waher Data AB 2016-2018. All rights reserved.</Copyright>
+    <Copyright>Copyright © Waher Data AB 2016-2019. All rights reserved.</Copyright>
     <PackageLicenseUrl>https://github.com/PeterWaher/IoTGateway#license</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Script/Waher.Script.Content</PackageProjectUrl>
     <PackageIconUrl>https://github.com/PeterWaher/IoTGateway/blob/master/Images/Icon.ico?raw=true</PackageIconUrl>
@@ -16,9 +16,9 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>script execution parsing content</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.0.3</AssemblyVersion>
-    <FileVersion>1.0.3</FileVersion>
-    <Version>1.0.3</Version>
+    <AssemblyVersion>1.0.4</AssemblyVersion>
+    <FileVersion>1.0.4</FileVersion>
+    <Version>1.0.4</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

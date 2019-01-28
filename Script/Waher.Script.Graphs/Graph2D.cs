@@ -468,7 +468,7 @@ namespace Waher.Script.Graphs
 		/// <returns>Bitmap</returns>
 		public override SKImage CreateBitmap(GraphSettings Settings, out object[] States)
 		{
-			using (SKSurface Surface = SKSurface.Create(Settings.Width, Settings.Height, SKImageInfo.PlatformColorType, SKAlphaType.Premul))
+			using (SKSurface Surface = SKSurface.Create(new SKImageInfo(Settings.Width, Settings.Height, SKImageInfo.PlatformColorType, SKAlphaType.Premul)))
 			{
 				SKCanvas Canvas = Surface.Canvas;
 
@@ -501,7 +501,7 @@ namespace Waher.Script.Graphs
 					IsAntialias = true,
 					Style = SKPaintStyle.Fill,
 					Color = Settings.AxisColor,
-					Typeface = SKTypeface.FromFamilyName(Settings.FontName, SKTypefaceStyle.Normal),
+					Typeface = SKTypeface.FromFamilyName(Settings.FontName, SKFontStyle.Normal),
 					TextSize = (float)Settings.LabelFontSize
 				};
 				float Size;
@@ -645,7 +645,7 @@ namespace Waher.Script.Graphs
 					IsAntialias = true,
 					Style = SKPaintStyle.Fill,
 					Color = Settings.AxisColor,
-					Typeface = SKTypeface.FromFamilyName(Settings.FontName, SKTypefaceStyle.Bold),
+					Typeface = SKTypeface.FromFamilyName(Settings.FontName, SKFontStyle.Bold),
 					TextSize = (float)(Settings.LabelFontSize * 1.5)
 				};
 

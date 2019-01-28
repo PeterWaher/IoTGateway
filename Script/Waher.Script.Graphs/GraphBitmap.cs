@@ -13,8 +13,8 @@ namespace Waher.Script.Graphs
 	public class GraphBitmap : Graph, IDisposable
 	{
 		private SKImage bitmap;
-		private int width;
-		private int height;
+		private readonly int width;
+		private readonly int height;
 
 		/// <summary>
 		/// Handles bitmap-based graphs.
@@ -63,8 +63,8 @@ namespace Waher.Script.Graphs
 			if (this.bitmap is null)
 				return new GraphBitmap(Bmp);
 
-			using (SKSurface Surface = SKSurface.Create(Math.Max(Bmp.Width, this.width), Math.Max(Bmp.Height, this.height),
-				SKImageInfo.PlatformColorType, SKAlphaType.Premul))
+			using (SKSurface Surface = SKSurface.Create(new SKImageInfo(Math.Max(Bmp.Width, this.width), Math.Max(Bmp.Height, this.height),
+				SKImageInfo.PlatformColorType, SKAlphaType.Premul)))
 			{
 				SKCanvas Canvas = Surface.Canvas;
 
@@ -99,8 +99,8 @@ namespace Waher.Script.Graphs
 			if (this.bitmap is null)
 				return new GraphBitmap(Bmp);
 
-			using (SKSurface Surface = SKSurface.Create(Math.Max(Bmp.Width, this.width), Math.Max(Bmp.Height, this.height),
-				SKImageInfo.PlatformColorType, SKAlphaType.Premul))
+			using (SKSurface Surface = SKSurface.Create(new SKImageInfo(Math.Max(Bmp.Width, this.width), 
+				Math.Max(Bmp.Height, this.height), SKImageInfo.PlatformColorType, SKAlphaType.Premul)))
 			{
 				SKCanvas Canvas = Surface.Canvas;
 
@@ -175,8 +175,7 @@ namespace Waher.Script.Graphs
 		/// </summary>
 		public override bool Equals(object obj)
 		{
-			GraphBitmap B = obj as GraphBitmap;
-			return (B != null && this.bitmap.Equals(B.bitmap));
+			return (obj is GraphBitmap B && this.bitmap.Equals(B.bitmap));
 		}
 
 		/// <summary>

@@ -45,7 +45,7 @@ namespace Waher.Script.Fractals.ColorModels
             SKColor cl;
             int j;
 
-			using (SKSurface Surface = SKSurface.Create(Width, 100, SKImageInfo.PlatformColorType, SKAlphaType.Premul))
+			using (SKSurface Surface = SKSurface.Create(new SKImageInfo(Width, 100, SKImageInfo.PlatformColorType, SKAlphaType.Premul)))
 			{
 				SKCanvas Canvas = Surface.Canvas;
 

@@ -7,7 +7,7 @@
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
     <Description>Helps applications with the creation and validation of Java Web Tokens (JWT), as defined in RFC 7519.</Description>
-    <Copyright>Copyright © Waher Data AB 2017-2018. All rights reserved.</Copyright>
+    <Copyright>Copyright © Waher Data AB 2017-2019. All rights reserved.</Copyright>
     <PackageLicenseUrl>https://github.com/PeterWaher/IoTGateway#license</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Security/Waher.Security.JWT</PackageProjectUrl>
     <PackageIconUrl>https://github.com/PeterWaher/IoTGateway/blob/master/Images/Icon.ico?raw=true</PackageIconUrl>
@@ -15,12 +15,12 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>Security Authentication JWT</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <Version>1.0.5</Version>
+    <Version>1.0.6</Version>
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Security\Waher.Security.JWT\</UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>
-    <AssemblyVersion>1.0.5</AssemblyVersion>
-    <FileVersion>1.0.5</FileVersion>
+    <AssemblyVersion>1.0.6</AssemblyVersion>
+    <FileVersion>1.0.6</FileVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DocumentationFile>bin\Debug\netstandard1.3\Waher.Security.JWT.xml</DocumentationFile>

@@ -2,7 +2,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard1.3</TargetFramework>
     <Description>Implements the XMPP IoT provisioning extesion as defined by the IEEE XMPP IoT Interface working group.</Description>
-    <Copyright>Copyright © Waher Data AB 2016-2018. All rights reserved.</Copyright>
+    <Copyright>Copyright © Waher Data AB 2016-2019. All rights reserved.</Copyright>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <Authors>Peter Waher</Authors>
@@ -15,9 +15,9 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>networking communication xmpp iot provisioning xep-0324</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.0.19</AssemblyVersion>
-    <FileVersion>1.0.19</FileVersion>
-    <Version>1.0.19</Version>
+    <AssemblyVersion>1.0.20</AssemblyVersion>
+    <FileVersion>1.0.20</FileVersion>
+    <Version>1.0.20</Version>
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Networking\Waher.Networking.XMPP.Provisioning\</UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>

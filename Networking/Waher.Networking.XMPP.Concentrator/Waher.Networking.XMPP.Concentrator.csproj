@@ -4,7 +4,7 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <Description>Implements the XMPP IoT concentrator as defined by the IEEE XMPP IoT Interface working group. The concentrator interface allows a device to manage a set of internal virtual devices, all sharing the same XMPP connection.</Description>
-    <Copyright>Copyright © Waher Data AB 2017-2018. All rights reserved.</Copyright>
+    <Copyright>Copyright © Waher Data AB 2017-2019. All rights reserved.</Copyright>
     <Authors>Peter Waher</Authors>
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
@@ -15,9 +15,9 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>networking communication xmpp iot concentrator ieee</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.0.2</AssemblyVersion>
-    <FileVersion>1.0.2</FileVersion>
-    <Version>1.0.2</Version>
+    <AssemblyVersion>1.0.3</AssemblyVersion>
+    <FileVersion>1.0.3</FileVersion>
+    <Version>1.0.3</Version>
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Networking\Waher.Networking.XMPP.Concentrator\</UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>

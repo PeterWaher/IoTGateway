@@ -193,7 +193,7 @@ namespace Waher.Content
 		public static byte[] Encode(object Object, Encoding Encoding, out string ContentType, params string[] AcceptedContentTypes)
 		{
 			if (!Encodes(Object, out Grade Grade, out IContentEncoder Encoder, AcceptedContentTypes))
-				throw new ArgumentException("No encoder found to encode the object", nameof(Object));
+				throw new ArgumentException("No encoder found to encode objects of type " + (Object?.GetType()?.FullName) + ".", nameof(Object));
 
 			return Encoder.Encode(Object, Encoding, out ContentType);
 		}

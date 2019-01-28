@@ -223,12 +223,12 @@ namespace Waher.Networking.XMPP.Chat
 		private void SendChatMessage(string To, string OrgSubject, string OrgCommand, string Markdown, RemoteXmppSupport Support,
 			params Tuple<string, string, byte[]>[] EmbeddedContent)
 		{
+			if (Support.Mail && !string.IsNullOrEmpty(OrgCommand))
+				Markdown = ">\t" + OrgCommand + "\r\n\r\n" + Markdown;
+
 			MarkdownDocument Doc = new MarkdownDocument(Markdown, markdownSettings);
 			string PlainText = Doc.GeneratePlainText();
 			StringBuilder Xml = new StringBuilder();
-
-			if (Support.Mail && !string.IsNullOrEmpty(OrgCommand))
-				Markdown = ">\t" + OrgCommand + "\r\n\r\n" + Markdown;
 
 			if (Support.Html)
 			{

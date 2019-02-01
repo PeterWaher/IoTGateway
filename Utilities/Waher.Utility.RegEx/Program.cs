@@ -35,6 +35,7 @@ namespace Waher.Utility.RegEx
 		/// -iw                   Ignore pattern whitespace.
 		/// -m                    Multi-line matching
 		/// -n                    Single-line matching
+		/// -t                    Test Mode. Files are not updated.
 		/// -?                    Help.
 		/// </summary>
 		static int Main(string[] args)
@@ -50,6 +51,7 @@ namespace Waher.Utility.RegEx
 			bool Subfolders = false;
 			bool Help = false;
 			bool Print = false;
+			bool Test = false;
 			int i = 0;
 			int c = args.Length;
 			string s;
@@ -112,6 +114,10 @@ namespace Waher.Utility.RegEx
 
 						case "-o":
 							Print = true;
+							break;
+
+						case "-t":
+							Test = true;
 							break;
 
 						case "-?":
@@ -179,6 +185,7 @@ namespace Waher.Utility.RegEx
 					Console.Out.WriteLine("-iw                   Ignore pattern whitespace.");
 					Console.Out.WriteLine("-m                    Multi-line matching");
 					Console.Out.WriteLine("-n                    Single-line matching");
+					Console.Out.WriteLine("-t                    Test Mode. Files are not updated.");
 					Console.Out.WriteLine("-?                    Help.");
 					return 0;
 				}
@@ -324,8 +331,8 @@ namespace Waher.Utility.RegEx
 							if (Print)
 								Console.Out.WriteLine();
 
-							//if (!string.IsNullOrEmpty(ReplaceExpression) && Text2 != Text)
-							//	File.WriteAllText(FileName, Text2, Encoding);
+							if (!Test && !string.IsNullOrEmpty(ReplaceExpression) && Text2 != Text)
+								File.WriteAllText(FileName, Text2, Encoding);
 						}
 					}
 				}

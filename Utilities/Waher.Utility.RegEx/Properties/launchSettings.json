@@ -2,7 +2,7 @@
   "profiles": {
     "Waher.Utility.RegEx": {
       "commandName": "Project",
-      "commandLineArgs": "-p \"C:\\My Projects\\IoTGateway\\*.csproj\" -p \"C:\\My Projects\\IoTGateway\\*.cs\" -p \"C:\\My Projects\\IoTGateway\\*.nuspec\" -f \"Copyright © (?'Name'\\w+( *\\w+)*)\\s*(?'From'\\d{4})(-(?'To'\\d{4}))?\" -x \"C:\\Downloads\\Temp\\1.xml\" -s -o -n"
+      "commandLineArgs": "-p \"C:\\My Projects\\IoTGateway\\*.csproj\" -p \"C:\\My Projects\\IoTGateway\\*.cs\" -p \"C:\\My Projects\\IoTGateway\\*.nuspec\" -f \"Copyright © (?'Name'\\w+( *\\w+)*)\\s*(?'From'\\d{4})(-(?'To'\\d{4}))?\" -x \"C:\\Downloads\\Temp\\1.xml\" -s -o -n -t"
     }
   }
 }

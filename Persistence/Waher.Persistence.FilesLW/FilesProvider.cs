@@ -2017,7 +2017,7 @@ namespace Waher.Persistence.Files
 			{
 				CloseOutput = false,
 				ConformanceLevel = ConformanceLevel.Document,
-				Encoding = System.Text.Encoding.UTF8,
+				Encoding = Encoding.UTF8,
 				Indent = true,
 				IndentChars = "\t",
 				NewLineChars = "\r\n",

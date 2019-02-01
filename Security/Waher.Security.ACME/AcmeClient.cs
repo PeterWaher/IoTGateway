@@ -118,7 +118,7 @@ namespace Waher.Security.ACME
 			if (string.IsNullOrEmpty(CharSet))
 				Encoding = Encoding.UTF8;
 			else
-				Encoding = System.Text.Encoding.GetEncoding(CharSet);
+				Encoding = InternetContent.GetEncoding(CharSet);
 
 			string JsonResponse = Encoding.GetString(Bin);
 
@@ -236,7 +236,7 @@ namespace Waher.Security.ACME
 			if (string.IsNullOrEmpty(CharSet))
 				Encoding = Encoding.UTF8;
 			else
-				Encoding = System.Text.Encoding.GetEncoding(CharSet);
+				Encoding = InternetContent.GetEncoding(CharSet);
 
 			AcmeResponse AcmeResponse = new AcmeResponse()
 			{

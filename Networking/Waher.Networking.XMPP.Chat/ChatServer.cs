@@ -318,21 +318,55 @@ namespace Waher.Networking.XMPP.Chat
 				Output.Append(XML.Encode(Text.InlineText));
 			else if (N is HtmlEntity Entity)
 			{
-				switch (Entity.EntityName.ToLower())
+				if (N is HtmlEntityUnicode EntityUnicode)
 				{
-					case "lt":
-					case "gt":
-					case "quot":
-					case "apos":
-					case "amp":
-						Output.Append('&');
-						Output.Append(Entity.EntityName);
-						Output.Append(';');
-						break;
+					char ch = (char)EntityUnicode.Code;
 
-					default:
-						Output.Append(HtmlEntity.EntityToCharacter(Entity.EntityName));
-						break;
+					switch (ch)
+					{
+						case '<':
+							Output.Append("&lt;");
+							break;
+
+						case '>':
+							Output.Append("&gt;");
+							break;
+
+						case '"':
+							Output.Append("&quot;");
+							break;
+
+						case '\'':
+							Output.Append("&apos;");
+							break;
+
+						case '&':
+							Output.Append("&amp;");
+							break;
+
+						default:
+							Output.Append(ch);
+							break;
+					}
+				}
+				else
+				{
+					switch (Entity.EntityName.ToLower())
+					{
+						case "lt":
+						case "gt":
+						case "quot":
+						case "apos":
+						case "amp":
+							Output.Append('&');
+							Output.Append(Entity.EntityName);
+							Output.Append(';');
+							break;
+
+						default:
+							Output.Append(HtmlEntity.EntityToCharacter(Entity.EntityName));
+							break;
+					}
 				}
 			}
 			else if (N is CDATA CDATA)

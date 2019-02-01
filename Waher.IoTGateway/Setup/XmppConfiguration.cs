@@ -769,7 +769,7 @@ namespace Waher.IoTGateway.Setup
 									if (string.IsNullOrEmpty(CharSet))
 										Encoding = Encoding.UTF8;
 									else
-										Encoding = System.Text.Encoding.GetEncoding(CharSet);
+										Encoding = InternetContent.GetEncoding(CharSet);
 
 									string XmlResponse = Encoding.GetString(Bin);
 									XmlDocument Doc = new XmlDocument();

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -18,7 +19,9 @@ namespace Waher.Utility.RegEx
 		/// 
 		/// -p PATH               Path to start the search. If not provided, the
 		///                       current path will be used, with *.* as search
-		///                       pattern.
+		///                       pattern. Can be used multiple times to search
+		///                       through multiple paths, or use multiple search
+		///                       patterns.
 		/// -f REGEX              Regular expression to use for finding matches.
 		/// -r REPLACE            If used, will be used to replace found matches.
 		/// -x FILENAME           Export findings to an XML file.
@@ -36,10 +39,11 @@ namespace Waher.Utility.RegEx
 		/// </summary>
 		static int Main(string[] args)
 		{
+			FileStream FileOutput = null;
 			XmlWriter Output = null;
 			Encoding Encoding = Encoding.Default;
 			RegexOptions Options = RegexOptions.Compiled;
-			string Path = null;
+			List<string> Paths = new List<string>();
 			string Expression = null;
 			string ReplaceExpression = null;
 			string XmlFileName = null;
@@ -62,10 +66,7 @@ namespace Waher.Utility.RegEx
 							if (i >= c)
 								throw new Exception("Missing path.");
 
-							if (string.IsNullOrEmpty(Path))
-								Path = args[i++];
-							else
-								throw new Exception("Only one path allowed.");
+							Paths.Add(args[i++]);
 							break;
 
 						case "-f":
@@ -162,7 +163,9 @@ namespace Waher.Utility.RegEx
 					Console.Out.WriteLine();
 					Console.Out.WriteLine("-p PATH               Path to start the search. If not provided, the");
 					Console.Out.WriteLine("                      current path will be used, with *.* as search");
-					Console.Out.WriteLine("                      pattern.");
+					Console.Out.WriteLine("                      pattern. Can be used multiple times to search");
+					Console.Out.WriteLine("                      through multiple paths, or use multiple search");
+					Console.Out.WriteLine("                      patterns.");
 					Console.Out.WriteLine("-f REGEX              Regular expression to use for finding matches.");
 					Console.Out.WriteLine("-r REPLACE            If used, will be used to replace found matches.");
 					Console.Out.WriteLine("-x FILENAME           Export findings to an XML file.");
@@ -186,26 +189,8 @@ namespace Waher.Utility.RegEx
 				Regex Regex = new Regex(Expression, Options);
 				string SearchPattern;
 
-				if (string.IsNullOrEmpty(Path))
-				{
-					Path = Directory.GetCurrentDirectory();
-					SearchPattern = "*.*";
-				}
-				else if (Directory.Exists(Path))
-					SearchPattern = "*.*";
-				else
-				{
-					SearchPattern = System.IO.Path.GetFileName(Path);
-					Path = System.IO.Path.GetDirectoryName(Path);
-
-					if (!Directory.Exists(Path))
-						throw new Exception("Path does not exist.");
-				}
-
-				string[] FileNames = Directory.GetFiles(Path, SearchPattern, Subfolders ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
-
-				if (Print)
-					Console.Out.WriteLine(FileNames.Length + " file(s) found.");
+				if (Paths.Count == 0)
+					Paths.Add(Directory.GetCurrentDirectory());
 
 				if (!string.IsNullOrEmpty(XmlFileName))
 				{
@@ -223,83 +208,109 @@ namespace Waher.Utility.RegEx
 						WriteEndDocumentOnClose = true
 					};
 
-					Output = XmlWriter.Create(XmlFileName, Settings);
+					FileOutput = File.Create(XmlFileName);
+					Output = XmlWriter.Create(FileOutput, Settings);
 				}
 
 				Output?.WriteStartDocument();
 				Output?.WriteStartElement("Files", "http://waher.se/schema/RegExMatches.xsd");
 
-				foreach (string FileName in FileNames)
+				Dictionary<string, bool> Processed = new Dictionary<string, bool>();
+
+				foreach (string Path0 in Paths)
 				{
-					byte[] Data = File.ReadAllBytes(FileName);
-					string Text = CommonTypes.GetString(Data, Encoding);
-					string Text2 = Text;
-					int Offset = 0;
+					string Path = Path0;
 
-					MatchCollection Matches = Regex.Matches(Text);
-					c = Matches.Count;
-
-					if (c > 0)
+					if (Directory.Exists(Path))
+						SearchPattern = "*.*";
+					else
 					{
-						Output?.WriteStartElement("File");
-						Output?.WriteAttributeString("name", FileName);
-						Output?.WriteAttributeString("count", c.ToString());
+						SearchPattern = System.IO.Path.GetFileName(Path);
+						Path = System.IO.Path.GetDirectoryName(Path);
 
-						if (Print)
-						{
-							Console.Out.WriteLine("File: " + FileName);
-							Console.Out.WriteLine(new string('-', Math.Max(20, FileName.Length + 5)));
-							Console.Out.WriteLine("Matches: " + c.ToString());
-						}
+						if (!Directory.Exists(Path))
+							throw new Exception("Path does not exist.");
+					}
 
-						foreach (Match M in Matches)
+					string[] FileNames = Directory.GetFiles(Path, SearchPattern, Subfolders ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
+
+					foreach (string FileName in FileNames)
+					{
+						if (Processed.ContainsKey(FileName))
+							continue;
+
+						Processed[FileName] = true;
+
+						byte[] Data = File.ReadAllBytes(FileName);
+						string Text = CommonTypes.GetString(Data, Encoding);
+						string Text2 = Text;
+						int Offset = 0;
+
+						MatchCollection Matches = Regex.Matches(Text);
+						c = Matches.Count;
+
+						if (c > 0)
 						{
-							Output?.WriteStartElement("Match");
-							Output?.WriteAttributeString("index", M.Index.ToString());
-							Output?.WriteAttributeString("length", M.Length.ToString());
-							Output?.WriteAttributeString("value", M.Value);
+							Output?.WriteStartElement("File");
+							Output?.WriteAttributeString("name", FileName);
+							Output?.WriteAttributeString("count", c.ToString());
 
 							if (Print)
-								Console.Out.WriteLine("Pos " + M.Index.ToString() + ": " + M.Value);
-
-							if (!string.IsNullOrEmpty(ReplaceExpression))
 							{
-								string ReplaceWith = M.Result(ReplaceExpression);
-
-								i = M.Index + Offset;
-								Text2 = Text2.Remove(i, M.Length).Insert(i, ReplaceWith);
-								Offset += ReplaceWith.Length - M.Length;
-
-								Output?.WriteAttributeString("replacedWith", ReplaceWith);
-
-								if (Print)
-									Console.Out.WriteLine("Replaced with: " + ReplaceWith);
+								Console.Out.WriteLine("File: " + FileName);
+								Console.Out.WriteLine(new string('-', Math.Max(20, FileName.Length + 5)));
+								Console.Out.WriteLine("Matches: " + c.ToString());
 							}
 
-							foreach (Group G in M.Groups)
+							foreach (Match M in Matches)
 							{
-								if (int.TryParse(G.Name, out i))
-									continue;
-
-								Output?.WriteStartElement("Group");
-								Output?.WriteAttributeString("name", G.Name);
-								Output?.WriteAttributeString("count", G.Value);
-								Output?.WriteEndElement();
+								Output?.WriteStartElement("Match");
+								Output?.WriteAttributeString("index", M.Index.ToString());
+								Output?.WriteAttributeString("length", M.Length.ToString());
+								Output?.WriteAttributeString("value", M.Value);
 
 								if (Print)
-									Console.Out.WriteLine(G.Name + ": " + G.Value);
+									Console.Out.WriteLine("Pos " + M.Index.ToString() + ": " + M.Value);
+
+								if (!string.IsNullOrEmpty(ReplaceExpression))
+								{
+									string ReplaceWith = M.Result(ReplaceExpression);
+
+									i = M.Index + Offset;
+									Text2 = Text2.Remove(i, M.Length).Insert(i, ReplaceWith);
+									Offset += ReplaceWith.Length - M.Length;
+
+									Output?.WriteAttributeString("replacedWith", ReplaceWith);
+
+									if (Print)
+										Console.Out.WriteLine("Replaced with: " + ReplaceWith);
+								}
+
+								foreach (Group G in M.Groups)
+								{
+									if (int.TryParse(G.Name, out i))
+										continue;
+
+									Output?.WriteStartElement("Group");
+									Output?.WriteAttributeString("name", G.Name);
+									Output?.WriteAttributeString("count", G.Value);
+									Output?.WriteEndElement();
+
+									if (Print)
+										Console.Out.WriteLine(G.Name + ": " + G.Value);
+								}
+
+								Output?.WriteEndElement();
 							}
 
 							Output?.WriteEndElement();
+
+							if (Print)
+								Console.Out.WriteLine();
+
+							//if (!string.IsNullOrEmpty(ReplaceExpression) && Text2 != Text)
+							//	File.WriteAllText(FileName, Text2, Encoding);
 						}
-
-						Output?.WriteEndElement();
-
-						if (Print)
-							Console.Out.WriteLine();
-
-						if (!string.IsNullOrEmpty(ReplaceExpression) && Text2 != Text)
-							File.WriteAllText(FileName, Text2, Encoding);
 					}
 				}
 
@@ -318,6 +329,7 @@ namespace Waher.Utility.RegEx
 				Output?.Flush();
 				Output?.Close();
 				Output?.Dispose();
+				FileOutput?.Dispose();
 			}
 		}
 	}

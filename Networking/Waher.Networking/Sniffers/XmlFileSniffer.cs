@@ -121,7 +121,8 @@ namespace Waher.Networking.Sniffers
 				NewLineChars = "\r\n",
 				NewLineHandling = NewLineHandling.Entitize,
 				NewLineOnAttributes = false,
-				OmitXmlDeclaration = false
+				OmitXmlDeclaration = false,
+				WriteEndDocumentOnClose = true
 			};
 
 			string FolderName = Path.GetDirectoryName(FileName);

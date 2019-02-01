@@ -213,9 +213,12 @@ namespace Waher.Utility.RegEx
 				}
 
 				Output?.WriteStartDocument();
-				Output?.WriteStartElement("Files", "http://waher.se/schema/RegExMatches.xsd");
+				Output?.WriteStartElement("Search", "http://waher.se/schema/RegExMatches.xsd");
+				Output?.WriteStartElement("Files");
 
-				Dictionary<string, bool> Processed = new Dictionary<string, bool>();
+				Dictionary<string, bool> FileProcessed = new Dictionary<string, bool>();
+				Dictionary<string, bool> FileMatches = new Dictionary<string, bool>();
+				SortedDictionary<string, SortedDictionary<string, int>> GroupCount = new SortedDictionary<string, SortedDictionary<string, int>>();
 
 				foreach (string Path0 in Paths)
 				{
@@ -236,10 +239,10 @@ namespace Waher.Utility.RegEx
 
 					foreach (string FileName in FileNames)
 					{
-						if (Processed.ContainsKey(FileName))
+						if (FileProcessed.ContainsKey(FileName))
 							continue;
 
-						Processed[FileName] = true;
+						FileProcessed[FileName] = true;
 
 						byte[] Data = File.ReadAllBytes(FileName);
 						string Text = CommonTypes.GetString(Data, Encoding);
@@ -251,6 +254,8 @@ namespace Waher.Utility.RegEx
 
 						if (c > 0)
 						{
+							FileMatches[FileName] = true;
+
 							Output?.WriteStartElement("File");
 							Output?.WriteAttributeString("name", FileName);
 							Output?.WriteAttributeString("count", c.ToString());
@@ -298,6 +303,17 @@ namespace Waher.Utility.RegEx
 
 									if (Print)
 										Console.Out.WriteLine(G.Name + ": " + G.Value);
+
+									if (!GroupCount.TryGetValue(G.Name, out SortedDictionary<string, int> Counts))
+									{
+										Counts = new SortedDictionary<string, int>();
+										GroupCount[G.Name] = Counts;
+									}
+
+									if (Counts.TryGetValue(G.Value, out int Count))
+										Counts[G.Value] = Count + 1;
+									else
+										Counts[G.Value] = 1;
 								}
 
 								Output?.WriteEndElement();
@@ -312,6 +328,40 @@ namespace Waher.Utility.RegEx
 							//	File.WriteAllText(FileName, Text2, Encoding);
 						}
 					}
+				}
+
+				Output?.WriteEndElement(); 
+
+				Output?.WriteStartElement("Statistics");
+				Output?.WriteAttributeString("fileCount", FileProcessed.Count.ToString());
+				Output?.WriteAttributeString("fileMatchCount", FileMatches.Count.ToString());
+
+				if (Print)
+				{
+					Console.Out.WriteLine("Files processed: " + FileProcessed.Count.ToString());
+					Console.Out.WriteLine("Files matched: " + FileMatches.Count.ToString());
+				}
+
+				foreach (KeyValuePair<string, SortedDictionary<string, int>> GroupStat in GroupCount)
+				{
+					Output?.WriteStartElement("Group");
+					Output?.WriteAttributeString("name", GroupStat.Key);
+
+					if (Print)
+						Console.Out.WriteLine(GroupStat.Key + ":");
+
+					foreach (KeyValuePair<string, int> Rec in GroupStat.Value)
+					{
+						Output?.WriteStartElement("Group");
+						Output?.WriteAttributeString("value", Rec.Key);
+						Output?.WriteAttributeString("count", Rec.Value.ToString());
+						Output?.WriteEndElement();
+
+						if (Print)
+							Console.Out.WriteLine("\t" + Rec.Key + ": " + Rec.Value.ToString());
+					}
+
+					Output?.WriteEndElement();
 				}
 
 				Output?.WriteEndElement();

@@ -112,6 +112,34 @@ namespace Waher.Content.Html
 		}
 
 		/// <summary>
+		/// Inner Text
+		/// </summary>
+		public string InnerText
+		{
+			get
+			{
+				StringBuilder sb = new StringBuilder();
+
+				if (this.children != null)
+				{
+					foreach (HtmlNode N in this.children)
+					{
+						if (N is HtmlText Text)
+							sb.Append(Text.InlineText);
+						else if (N is HtmlElement Element)
+							sb.Append(Element.InnerText);
+						else if (N is HtmlEntity Entity)
+							sb.Append(Entity.ToString());
+						else if (N is CDATA CDATA)
+							sb.Append(CDATA.Content);
+					}
+				}
+
+				return sb.ToString();
+			}
+		}
+
+		/// <summary>
 		/// Start tag.
 		/// </summary>
 		public string StartTag

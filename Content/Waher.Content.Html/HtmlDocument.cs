@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 using System.Xml;
 using Waher.Content.Html.Elements;
@@ -810,13 +811,13 @@ namespace Waher.Content.Html
 						}
 						else if (ch == '>')
 						{
-							CurrentElement.AddAttribute(new HtmlAttribute(this, CurrentElement, StartOfAttribute, Pos - 1, Name, string.Empty));
+							CurrentElement.AddAttribute(new HtmlAttribute(this, CurrentElement, StartOfAttribute, Pos - 1, Name, Name));
 							StartOfText = Pos + 1;
 							State = 0;
 						}
 						else if (ch == '/')
 						{
-							CurrentElement.AddAttribute(new HtmlAttribute(this, CurrentElement, StartOfAttribute, Pos - 1, Name, string.Empty));
+							CurrentElement.AddAttribute(new HtmlAttribute(this, CurrentElement, StartOfAttribute, Pos - 1, Name, Name));
 							State = 9;
 						}
 						else if (ch > ' ' && ch != 160)
@@ -824,6 +825,15 @@ namespace Waher.Content.Html
 							sb.Append(ch);
 							Empty = false;
 							State++;
+						}
+						else    // Empty attribute
+						{
+							CurrentElement.AddAttribute(new HtmlAttribute(this, CurrentElement, StartOfAttribute, Pos - 1, Name, Name));
+
+							sb.Clear();
+							Empty = true;
+
+							State = 5;
 						}
 						break;
 
@@ -874,26 +884,15 @@ namespace Waher.Content.Html
 						}
 						break;
 
-					case 10: // Entity
+					case 10: // First character of entity
 						if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || (ch >= '0' && ch <= '9'))
 						{
 							sb.Append(ch);
 							Empty = false;
+							State = 30;
 						}
-						else if (ch == ';')
-						{
-							if (CurrentElement != null && CurrentElement.IsEmptyElement)
-								CurrentElement = CurrentElement.Parent as HtmlElement;
-
-							s = sb.ToString();
-							CurrentElement?.Add(new HtmlEntity(this, CurrentElement, Pos - s.Length - 1, Pos, s));
-
-							sb.Clear();
-							Empty = true;
-
-							StartOfText = Pos + 1;
-							State = 0;
-						}
+						else if (ch == '#')
+							State = 31;
 						else
 						{
 							sb.Insert(0, '&');
@@ -945,22 +944,15 @@ namespace Waher.Content.Html
 						}
 						break;
 
-					case 12: // Entity in attribute value
+					case 12: // First character of entity in attribute value
 						if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || (ch >= '0' && ch <= '9'))
 						{
 							sb.Append(ch);
 							Empty = false;
+							State = 34;
 						}
-						else if (ch == ';')
-						{
-							s = sb.ToString();
-							CurrentAttribute.Add(new HtmlEntity(this, CurrentAttribute, Pos - s.Length - 1, Pos, s));
-
-							sb.Clear();
-							Empty = true;
-
-							State = 11;
-						}
+						else if (ch == '#')
+							State = 35;
 						else
 						{
 							sb.Insert(0, '&');
@@ -1240,6 +1232,214 @@ namespace Waher.Content.Html
 						}
 						break;
 
+					case 30: // Entity name
+						if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || (ch >= '0' && ch <= '9'))
+							sb.Append(ch);
+						else if (ch == ';')
+						{
+							if (CurrentElement != null && CurrentElement.IsEmptyElement)
+								CurrentElement = CurrentElement.Parent as HtmlElement;
+
+							s = sb.ToString();
+							CurrentElement?.Add(new HtmlEntity(this, CurrentElement, Pos - s.Length - 1, Pos, s));
+
+							sb.Clear();
+							Empty = true;
+
+							StartOfText = Pos + 1;
+							State = 0;
+						}
+						else
+						{
+							sb.Insert(0, '&');
+							sb.Append(ch);
+							Empty = false;
+							StartOfText = Pos + 1 - sb.Length;
+							State = 0;
+						}
+						break;
+
+					case 31: // First entity number
+						if (ch >= '0' && ch <= '9')
+						{
+							State++;
+							sb.Append(ch);
+						}
+						else if (ch == 'x' || ch == 'X')
+							State += 2;
+						else if (ch == ';' && int.TryParse(s = sb.ToString(), out int Code))
+						{
+							if (CurrentElement != null && CurrentElement.IsEmptyElement)
+								CurrentElement = CurrentElement.Parent as HtmlElement;
+
+							CurrentElement?.Add(new HtmlEntityUnicode(this, CurrentElement, Pos - s.Length - 1, Pos, "#" + s, Code));
+
+							sb.Clear();
+							Empty = true;
+
+							StartOfText = Pos + 1;
+							State = 0;
+						}
+						else
+						{
+							sb.Insert(0, "&#");
+							sb.Append(ch);
+							Empty = false;
+							StartOfText = Pos + 1 - sb.Length;
+							State = 0;
+						}
+						break;
+
+					case 32: // Entity number
+						if (ch >= '0' && ch <= '9')
+							sb.Append(ch);
+						else if (ch == ';' && int.TryParse(s = sb.ToString(), out int Code))
+						{
+							if (CurrentElement != null && CurrentElement.IsEmptyElement)
+								CurrentElement = CurrentElement.Parent as HtmlElement;
+
+							CurrentElement?.Add(new HtmlEntityUnicode(this, CurrentElement, Pos - s.Length - 1, Pos, "#" + s, Code));
+
+							sb.Clear();
+							Empty = true;
+
+							StartOfText = Pos + 1;
+							State = 0;
+						}
+						else
+						{
+							sb.Insert(0, "&#");
+							sb.Append(ch);
+							Empty = false;
+							StartOfText = Pos + 1 - sb.Length;
+							State = 0;
+						}
+						break;
+
+					case 33: // Hexadecimal entity number
+						if ((ch >= '0' && ch <= '9') || (ch >= 'a' && ch <= 'f') || (ch >= 'A' && ch <= 'F'))
+							sb.Append(ch);
+						else if (ch == ';' && int.TryParse(s = sb.ToString(), NumberStyles.HexNumber, null, out int Code))
+						{
+							if (CurrentElement != null && CurrentElement.IsEmptyElement)
+								CurrentElement = CurrentElement.Parent as HtmlElement;
+
+							CurrentElement?.Add(new HtmlEntityUnicode(this, CurrentElement, Pos - s.Length - 1, Pos, "#x" + s, Code));
+
+							sb.Clear();
+							Empty = true;
+
+							StartOfText = Pos + 1;
+							State = 0;
+						}
+						else
+						{
+							sb.Insert(0, "&#x");
+							sb.Append(ch);
+							Empty = false;
+							StartOfText = Pos + 1 - sb.Length;
+							State = 0;
+						}
+						break;
+
+					case 34: // Entity name in attribute value
+						if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || (ch >= '0' && ch <= '9'))
+							sb.Append(ch);
+						else if (ch == ';')
+						{
+							s = sb.ToString();
+							CurrentAttribute.Add(new HtmlEntity(this, CurrentAttribute, Pos - s.Length - 1, Pos, s));
+
+							sb.Clear();
+							Empty = true;
+
+							StartOfText = Pos + 1;
+							State = 11;
+						}
+						else
+						{
+							sb.Insert(0, '&');
+							sb.Append(ch);
+							Empty = false;
+							StartOfText = Pos + 1 - sb.Length;
+							State = 11;
+						}
+						break;
+
+					case 35: // First entity number in attribute value
+						if (ch >= '0' && ch <= '9')
+						{
+							State++;
+							sb.Append(ch);
+						}
+						else if (ch == 'x' || ch == 'X')
+							State += 2;
+						else if (ch == ';' && int.TryParse(s = sb.ToString(), out int Code))
+						{
+							CurrentAttribute.Add(new HtmlEntityUnicode(this, CurrentAttribute, Pos - s.Length - 1, Pos, s, Code));
+
+							sb.Clear();
+							Empty = true;
+
+							StartOfText = Pos + 1;
+							State = 11;
+						}
+						else
+						{
+							sb.Insert(0, "&#");
+							sb.Append(ch);
+							Empty = false;
+							StartOfText = Pos + 1 - sb.Length;
+							State = 11;
+						}
+						break;
+
+					case 36: // Entity number in attribute value
+						if (ch >= '0' && ch <= '9')
+							sb.Append(ch);
+						else if (ch == ';' && int.TryParse(s = sb.ToString(), out int Code))
+						{
+							CurrentAttribute.Add(new HtmlEntityUnicode(this, CurrentAttribute, Pos - s.Length - 1, Pos, s, Code));
+
+							sb.Clear();
+							Empty = true;
+
+							StartOfText = Pos + 1;
+							State = 11;
+						}
+						else
+						{
+							sb.Insert(0, "&#");
+							sb.Append(ch);
+							Empty = false;
+							StartOfText = Pos + 1 - sb.Length;
+							State = 11;
+						}
+						break;
+
+					case 37: // Hexadecimal entity number
+						if ((ch >= '0' && ch <= '9') || (ch >= 'a' && ch <= 'f') || (ch >= 'A' && ch <= 'F'))
+							sb.Append(ch);
+						else if (ch == ';' && int.TryParse(s = sb.ToString(), NumberStyles.HexNumber, null, out int Code))
+						{
+							CurrentAttribute.Add(new HtmlEntityUnicode(this, CurrentAttribute, Pos - s.Length - 1, Pos, s, Code));
+
+							sb.Clear();
+							Empty = true;
+
+							StartOfText = Pos + 1;
+							State = 11;
+						}
+						else
+						{
+							sb.Insert(0, "&#x");
+							sb.Append(ch);
+							Empty = false;
+							StartOfText = Pos + 1 - sb.Length;
+							State = 11;
+						}
+						break;
+
 					default:
 						throw new Exception("Internal error: Unrecognized state.");
 				}
@@ -1260,14 +1460,20 @@ namespace Waher.Content.Html
 						break;
 
 					case 6: // Attribute name
-						CurrentElement.AddAttribute(new HtmlAttribute(this, CurrentElement, StartOfAttribute, Pos - 1, sb.ToString(), string.Empty));
+						s = sb.ToString();
+						CurrentElement.AddAttribute(new HtmlAttribute(this, CurrentElement, StartOfAttribute, Pos - 1, s, s));
+						break;
+
+					case 7: // Waiting for value
+						CurrentElement.AddAttribute(new HtmlAttribute(this, CurrentElement, StartOfAttribute, Pos - 1, Name, Name));
 						break;
 
 					case 8: // Non-encapsulated attribute value
 						CurrentElement.AddAttribute(new HtmlAttribute(this, CurrentElement, StartOfAttribute, Pos - 1, Name, sb.ToString()));
 						break;
 
-					case 10: // Entity
+					case 10: // First character of entity
+					case 30: // Entity name
 						if (CurrentElement != null && CurrentElement.IsEmptyElement)
 							CurrentElement = CurrentElement.Parent as HtmlElement;
 
@@ -1287,11 +1493,81 @@ namespace Waher.Content.Html
 						CurrentAttribute.EndPosition = Pos - 1;
 						break;
 
-					case 12: // Entity in attribute value
+					case 12: // First character of entity in attribute value
+					case 34: // Entity name in attribute value
 						sb.Insert(0, '&');
 						s = sb.ToString();
 						CurrentAttribute.Add(new HtmlText(this, CurrentElement, Pos - s.Length, Pos - 1, s));
 						break;
+
+					case 16:    // In comment
+					case 17:    // Second hyphen?
+					case 18:    // End of comment
+						if (CurrentElement != null && CurrentElement.IsEmptyElement)
+							CurrentElement = CurrentElement.Parent as HtmlElement;
+
+						s = sb.ToString();
+						CurrentElement?.Add(new Comment(this, CurrentElement, Pos - s.Length - 5, Pos, s));
+						break;
+
+					case 19:    // In processing instruction
+					case 20:    // End of processing instruction?
+						if (this.processingInstructions is null)
+							this.processingInstructions = new LinkedList<ProcessingInstruction>();
+
+						s = sb.ToString();
+						ProcessingInstruction PI = new ProcessingInstruction(this, CurrentElement, Pos - s.Length - 3, Pos, s);
+
+						if (CurrentElement != null && CurrentElement.IsEmptyElement)
+							CurrentElement = CurrentElement.Parent as HtmlElement;
+
+						CurrentElement?.Add(PI);
+						this.processingInstructions.AddLast(PI);
+						break;
+
+					case 27:    // In CDATA
+					case 28:
+					case 29:
+						if (CurrentElement != null && CurrentElement.IsEmptyElement)
+							CurrentElement = CurrentElement.Parent as HtmlElement;
+
+						s = sb.ToString();
+						CurrentElement?.Add(new CDATA(this, CurrentElement, Pos - s.Length, Pos - 1, s));
+						break;
+
+					case 31: // First entity number
+					case 32: // Entity number
+						if (CurrentElement != null && CurrentElement.IsEmptyElement)
+							CurrentElement = CurrentElement.Parent as HtmlElement;
+
+						sb.Insert(0, "&#");
+						s = sb.ToString();
+						CurrentElement?.Add(new HtmlText(this, CurrentElement, Pos - s.Length, Pos - 1, s));
+						break;
+
+					case 33: // Hexadecimal entity number
+						if (CurrentElement != null && CurrentElement.IsEmptyElement)
+							CurrentElement = CurrentElement.Parent as HtmlElement;
+
+						sb.Insert(0, "&#x");
+						s = sb.ToString();
+						CurrentElement?.Add(new HtmlText(this, CurrentElement, Pos - s.Length, Pos - 1, s));
+						break;
+
+
+					case 35: // First entity number in attribute value
+					case 36: // Entity number in attribute value
+						sb.Insert(0, "&#");
+						s = sb.ToString();
+						CurrentAttribute.Add(new HtmlText(this, CurrentElement, Pos - s.Length, Pos - 1, s));
+						break;
+
+					case 37: // Hexadecimal entity number
+						sb.Insert(0, "&#x");
+						s = sb.ToString();
+						CurrentAttribute.Add(new HtmlText(this, CurrentElement, Pos - s.Length, Pos - 1, s));
+						break;
+
 				}
 			}
 

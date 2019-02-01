@@ -2100,7 +2100,24 @@ namespace Waher.Content.Html
 				case "xopf": return "𝕩";
 				case "yopf": return "𝕪";
 				case "zopf": return "𝕫";
-				default: return null;
+				default:
+					if (!Entity.StartsWith("#"))
+						return null;
+
+					Entity = Entity.Substring(1);
+					if (Entity.StartsWith("x", StringComparison.CurrentCultureIgnoreCase))
+					{
+						Entity = Entity.Substring(1);
+						if (int.TryParse(Entity,System.Globalization.NumberStyles.HexNumber,null,out int i))
+							return new string((char)i, 1);
+					}
+					else
+					{
+						if (int.TryParse(Entity, out int i))
+							return new string((char)i, 1);
+					}
+
+					return null;
 			}
 		}
 

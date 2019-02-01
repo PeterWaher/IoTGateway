@@ -71,6 +71,7 @@ namespace Waher.Content.Html
 						switch (Attr.Name)
 						{
 							case "property":
+							case "name":
 								Name = Attr.Value;
 								break;
 
@@ -251,7 +252,7 @@ namespace Waher.Content.Html
 			}
 
 			if (string.IsNullOrEmpty(this.title) && Doc.Title != null)
-				this.title = Doc.Title.InnerHtml.Trim();
+				this.title = Doc.Title.InnerText.Trim();
 
 			this.images = Images?.ToArray();
 			this.audio = Audio?.ToArray();

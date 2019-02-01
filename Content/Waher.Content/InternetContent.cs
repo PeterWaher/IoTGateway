@@ -429,49 +429,53 @@ namespace Waher.Content
 				foreach (KeyValuePair<string, string> Field in Fields)
 				{
 					if (Field.Key.ToUpper() == "CHARSET")
-					{
-						// Reference: http://www.iana.org/assignments/character-sets/character-sets.xhtml
-						switch (Field.Value.ToUpper())
-						{
-							case "ASCII":
-							case "US-ASCII":
-								Encoding = Encoding.ASCII;
-								break;
-
-							case "UTF-16LE":
-							case "UTF-16":
-								Encoding = Encoding.Unicode;
-								break;
-
-							case "UTF-16BE":
-								Encoding = Encoding.BigEndianUnicode;
-								break;
-
-							case "UTF-32":
-							case "UTF-32LE":
-								Encoding = Encoding.UTF32;
-								break;
-
-							case "UNICODE-1-1-UTF-7":
-							case "UTF-7":
-								Encoding = Encoding.UTF7;
-								break;
-
-							case "UTF-8":
-								Encoding = Encoding.UTF8;
-								break;
-
-							default:
-								Encoding = Encoding.GetEncoding(Field.Value);
-								break;
-						}
-					}
+						Encoding = GetEncoding(Field.Value);
 				}
 			}
 			else
 				Fields = new KeyValuePair<string, string>[0];
 
 			return Decode(ContentType, Data, Encoding, Fields, BaseUri);
+		}
+
+		/// <summary>
+		/// Gets a character encoding from its name.
+		/// </summary>
+		/// <param name="CharacterSet">Name of character set.</param>
+		/// <returns>Encoding.</returns>
+		public static Encoding GetEncoding(string CharacterSet)
+		{
+			if (string.IsNullOrEmpty(CharacterSet))
+				return null;
+
+			// Reference: http://www.iana.org/assignments/character-sets/character-sets.xhtml
+			switch (CharacterSet.ToUpper())
+			{
+				case "ASCII":
+				case "US-ASCII":
+					return Encoding.ASCII;
+
+				case "UTF-16LE":
+				case "UTF-16":
+					return Encoding.Unicode;
+
+				case "UTF-16BE":
+					return Encoding.BigEndianUnicode;
+
+				case "UTF-32":
+				case "UTF-32LE":
+					return Encoding.UTF32;
+
+				case "UNICODE-1-1-UTF-7":
+				case "UTF-7":
+					return Encoding.UTF7;
+
+				case "UTF-8":
+					return Encoding.UTF8;
+
+				default:
+					return Encoding.GetEncoding(CharacterSet);
+			}
 		}
 
 		#endregion

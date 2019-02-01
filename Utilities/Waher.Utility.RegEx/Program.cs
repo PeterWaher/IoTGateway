@@ -225,6 +225,7 @@ namespace Waher.Utility.RegEx
 
 				Dictionary<string, bool> FileProcessed = new Dictionary<string, bool>();
 				Dictionary<string, bool> FileMatches = new Dictionary<string, bool>();
+				Dictionary<string, bool> FileUpdates = new Dictionary<string, bool>();
 				SortedDictionary<string, SortedDictionary<string, int>> GroupCount = new SortedDictionary<string, SortedDictionary<string, int>>();
 
 				foreach (string Path0 in Paths)
@@ -270,7 +271,7 @@ namespace Waher.Utility.RegEx
 							if (Print)
 							{
 								Console.Out.WriteLine("File: " + FileName);
-								Console.Out.WriteLine(new string('-', Math.Max(20, FileName.Length + 5)));
+								Console.Out.WriteLine(new string('-', Math.Max(20, FileName.Length + 10)));
 								Console.Out.WriteLine("Matches: " + c.ToString());
 							}
 
@@ -331,17 +332,23 @@ namespace Waher.Utility.RegEx
 							if (Print)
 								Console.Out.WriteLine();
 
-							if (!Test && !string.IsNullOrEmpty(ReplaceExpression) && Text2 != Text)
-								File.WriteAllText(FileName, Text2, Encoding);
+							if (!string.IsNullOrEmpty(ReplaceExpression) && Text2 != Text)
+							{
+								FileUpdates[FileName] = true;
+
+								if (!Test)
+									File.WriteAllText(FileName, Text2, Encoding);
+							}
 						}
 					}
 				}
 
-				Output?.WriteEndElement(); 
+				Output?.WriteEndElement();
 
 				Output?.WriteStartElement("Statistics");
 				Output?.WriteAttributeString("fileCount", FileProcessed.Count.ToString());
 				Output?.WriteAttributeString("fileMatchCount", FileMatches.Count.ToString());
+				Output?.WriteAttributeString("fileUpdateCount", FileUpdates.Count.ToString());
 
 				if (Print)
 				{

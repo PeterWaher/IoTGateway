@@ -793,6 +793,20 @@
               <File Id='Waher.Utility.Install.pdb' Name='Waher.Utility.Install.pdb' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Install\bin\$(var.Configuration)\netcoreapp2.0\Waher.Utility.Install.pdb' Vital='yes' KeyPath='yes'/>
               <RemoveFile Id='RemoveWaher.Utility.Install.pdb' Name='Waher.Utility.Install.pdb' On='uninstall'/>
             </Component>
+            <Component Id='UtilityRegEx' Guid='5cb528a1-a1bc-4f38-b36c-40c22820467b'>
+              <File Id='Waher.Utility.RegEx.exe' Name='Waher.Utility.RegEx.exe' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.RegEx\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.RegEx.exe' Vital='yes' KeyPath='yes'/>
+              <File Id='Waher.Utility.RegEx.dll' Name='Waher.Utility.RegEx.dll' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.RegEx\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.RegEx.dll' Vital='yes'/>
+              <File Id='Waher.Utility.RegEx.deps.json' Name='Waher.Utility.RegEx.deps.json' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.RegEx\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.RegEx.deps.json' Vital='yes'/>
+              <File Id='Waher.Utility.RegEx.runtimeconfig.json' Name='Waher.Utility.RegEx.runtimeconfig.json' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.RegEx\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.RegEx.runtimeconfig.json' Vital='yes'/>
+              <RemoveFile Id='RemoveWaher.Utility.RegEx.exe' Name='Waher.Utility.RegEx.exe' On='uninstall'/>
+              <RemoveFile Id='RemoveWaher.Utility.RegEx.dll' Name='Waher.Utility.RegEx.dll' On='uninstall'/>
+              <RemoveFile Id='RemoveWaher.Utility.RegEx.deps.json' Name='Waher.Utility.RegEx.deps.json' On='uninstall'/>
+              <RemoveFile Id='RemoveWaher.Utility.RegEx.runtimeconfig.json' Name='Waher.Utility.RegEx.runtimeconfig.json' On='uninstall'/>
+            </Component>
+            <Component Id='UtilityRegExDebugFiles' Guid='b6358806-b8c0-494f-9c82-26a9899340d6'>
+              <File Id='Waher.Utility.RegEx.pdb' Name='Waher.Utility.RegEx.pdb' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.RegEx\bin\$(var.Configuration)\netcoreapp2.0\Waher.Utility.RegEx.pdb' Vital='yes' KeyPath='yes'/>
+              <RemoveFile Id='RemoveWaher.Utility.RegEx.pdb' Name='Waher.Utility.RegEx.pdb' On='uninstall'/>
+            </Component>
 						<Component Id='UtilityAnalyzeClock' Guid='807ab87a-c605-4cce-9992-d61dc009f780'>
 							<File Id='Waher.Utility.AnalyzeClock.exe' Name='Waher.Utility.AnalyzeClock.exe' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.AnalyzeClock\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.AnalyzeClock.exe' Vital='yes' KeyPath='yes'/>
 							<File Id='Waher.Utility.AnalyzeClock.dll' Name='Waher.Utility.AnalyzeClock.dll' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.AnalyzeClock\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.AnalyzeClock.dll' Vital='yes'/>
@@ -1367,6 +1381,7 @@
 				<ComponentRef Id='UtilityCsp' />
 				<ComponentRef Id='UtilityDeleteDB' />
 				<ComponentRef Id='UtilityInstall' />
+				<ComponentRef Id='UtilityRegEx' />
 				<ComponentRef Id='UtilityTransform' />
 			</Feature>
       <Feature Id='DebugFiles' Title='Debug Files' Description='Provides debug files. This will help debugging, since it provides more information in case something goes wrong.' Level='1000'>
@@ -1378,6 +1393,7 @@
 				<ComponentRef Id='UtilityCspDebugFiles' />
 				<ComponentRef Id='UtilityDeleteDBDebugFiles' />
 				<ComponentRef Id='UtilityInstallDebugFiles' />
+				<ComponentRef Id='UtilityRegExDebugFiles' />
 				<ComponentRef Id='UtilityTransformDebugFiles' />
 			</Feature>
     </Feature>

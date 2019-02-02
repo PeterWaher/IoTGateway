@@ -1,4 +1,4 @@
-﻿Title: IoT Gateway Menu
+Title: IoT Gateway Menu
 Description: Main menu of the IoT Gateway
 Date: 2016-02-08
 Author: Peter Waher
@@ -25,6 +25,6 @@ CSS: {{Theme.CSSX}}
 </main>
 <footer>
 <span>
-This page is hosted by [**IoT Gateway**](https://github.com/PeterWaher/IoTGateway). (c) [Waher Data AB](http://waher.se/) 2016-2018. All rights reserved.
+This page is hosted by [**IoT Gateway**](https://github.com/PeterWaher/IoTGateway). (c) [Waher Data AB](http://waher.se/) 2016-2019. All rights reserved.
 </span>
 </footer>

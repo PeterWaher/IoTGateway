@@ -1,4 +1,4 @@
-﻿Title: IoT Gateway Setup
+Title: IoT Gateway Setup
 Description: Main menu durin setup
 Date: 2018-06-02
 Author: Peter Waher
@@ -25,6 +25,6 @@ CSS: {{Theme.CSSX}}
 </main>
 <footer>
 <span>
-This page is hosted by [**IoT Gateway**](https://github.com/PeterWaher/IoTGateway). (c) [Waher Data AB](http://waher.se/) 2016-2018. All rights reserved.
+This page is hosted by [**IoT Gateway**](https://github.com/PeterWaher/IoTGateway). (c) [Waher Data AB](http://waher.se/) 2016-2019. All rights reserved.
 </span>
 </footer>

@@ -7,7 +7,7 @@
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
     <Description>The Waher.Events.Persistence project creates an even sink that stores incoming (logged) events in the local object database, as defined by Waher.Persistence. Event life time in the database is defined in the constructor. Searches can be made for historical events.</Description>
-    <Copyright>Copyright © Waher Data AB 2017-2018. All rights reserved.</Copyright>
+    <Copyright>Copyright © Waher Data AB 2017-2019. All rights reserved.</Copyright>
     <PackageLicenseUrl>https://github.com/PeterWaher/IoTGateway#license</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Events/Waher.Events.Persistence</PackageProjectUrl>
     <PackageIconUrl>https://github.com/PeterWaher/IoTGateway/blob/master/Images/Icon.ico?raw=true</PackageIconUrl>

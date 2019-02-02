@@ -8,7 +8,7 @@
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
     <Description>Command-line tool that helps you delete an object database created by the Waher.Persistence.Files or Waher.Persistence.FilesLW libraries, such as the IoT Gateway database, including any cryptographic keys stored in the CSP.</Description>
-    <Copyright>Copyright © Waher Data AB 2018. All rights reserved.</Copyright>
+    <Copyright>Copyright © Waher Data AB 2018-2019. All rights reserved.</Copyright>
     <PackageLicenseUrl>https://github.com/PeterWaher/IoTGateway#license</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Utilities/Waher.Utility.DeleteDB</PackageProjectUrl>
     <PackageIconUrl>https://github.com/PeterWaher/IoTGateway/blob/master/Images/Icon.ico?raw=true</PackageIconUrl>

@@ -19,7 +19,7 @@ NIST P-224
 NIST P-256
 NIST P-384
 NIST P-521</Description>
-    <Copyright>Copyright © Waher Data AB 2018. All rights reserved.</Copyright>
+    <Copyright>Copyright © Waher Data AB 2018-2019. All rights reserved.</Copyright>
     <PackageLicenseUrl>https://github.com/PeterWaher/IoTGateway#license</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Security/Waher.Security.EllipticCurves</PackageProjectUrl>
     <PackageIconUrl>https://github.com/PeterWaher/IoTGateway/blob/master/Images/Icon.ico?raw=true</PackageIconUrl>

@@ -199,7 +199,7 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 			sb.Append(FileName.EndsWith(".key", StringComparison.CurrentCultureIgnoreCase) ? "true" : "false");
 			sb.Append("}");
 
-			string[] TabIDs = ClientEvents.GetTabIDsForLocation("/Backup.md");
+			string[] TabIDs = ClientEvents.GetTabIDsForLocation("/Settings/Backup.md");
 
 			ClientEvents.PushEvent(TabIDs, "UpdateExport", sb.ToString(), true, "User");
 		}
@@ -216,7 +216,7 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 			sb.Append(CommonTypes.JsonStringEncode(FileName));
 			sb.Append("\"}");
 
-			string[] TabIDs = ClientEvents.GetTabIDsForLocation("/Backup.md");
+			string[] TabIDs = ClientEvents.GetTabIDsForLocation("/Settings/Backup.md");
 
 			ClientEvents.PushEvent(TabIDs, "FileDeleted", sb.ToString(), true, "User");
 		}

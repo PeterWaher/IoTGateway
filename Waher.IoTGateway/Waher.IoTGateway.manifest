@@ -1,12 +1,12 @@
 ﻿<Module xmlns="http://waher.se/Schema/ModuleManifest.xsd">
 	<Assembly fileName="Waher.IoTGateway.dll"/>
 	<Folder name="Root">
-		<Content fileName="Backup.md"/>
-		<Content fileName="Backup.js"/>
 		<Content fileName="Copyright.md"/>
 		<Content fileName="Events.js"/>
 		<Content fileName="Login.md"/>
 		<Folder name="Settings">
+			<Content fileName="Backup.md"/>
+			<Content fileName="Backup.js"/>
 			<Content fileName="Config.cssx"/>
 			<Content fileName="Domain.js"/>
 			<Content fileName="Domain.md"/>

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Waher.Events;
 using Waher.IoTGateway;
 using Waher.Runtime.Settings;
+using Waher.IoTGateway.Setup;
 using Waher.IoTGateway.WebResources.ExportFormats;
 
 namespace Waher.IoTGateway
@@ -169,7 +170,7 @@ namespace Waher.IoTGateway
 					exportFolderValue = value;
 					RuntimeSettings.Set("ExportFolder", exportFolderValue);
 
-					Gateway.UpdateExportFolder(FullExportFolder);
+					BackupConfiguration.Instance?.UpdateExportFolder(FullExportFolder);
 				}
 			}
 		}
@@ -196,7 +197,7 @@ namespace Waher.IoTGateway
 					exportKeyFolderValue = value;
 					RuntimeSettings.Set("ExportKeyFolder", exportKeyFolderValue);
 
-					Gateway.UpdateExportKeyFolder(FullKeyExportFolder);
+					BackupConfiguration.Instance?.UpdateExportKeyFolder(FullKeyExportFolder);
 				}
 			}
 		}

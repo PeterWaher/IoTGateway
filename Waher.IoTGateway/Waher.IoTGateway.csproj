@@ -58,10 +58,10 @@
     <None Remove="Waher.IoTGateway.manifest" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Root\Backup.js">
+    <Content Include="Root\Settings\Backup.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Root\Backup.md">
+    <Content Include="Root\Settings\Backup.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Root\Copyright.md">

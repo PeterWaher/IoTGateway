@@ -136,11 +136,6 @@ namespace Waher.IoTGateway
 		private static Login login = null;
 		private static Logout logout = null;
 		private static LoggedIn loggedIn = null;
-		private static HttpFolderResource exportFolder = null;
-		private static HttpFolderResource keyFolder = null;
-		private static StartExport startExport = null;
-		private static StartAnalyze startAnalyze = null;
-		private static DeleteExport deleteExport = null;
 		private static Scheduler scheduler = null;
 		private static RandomNumberGenerator rnd = null;
 		private static Semaphore gatewayRunning = null;
@@ -448,11 +443,6 @@ namespace Waher.IoTGateway
 					SetupResources.AddLast(webServer.Register(clientEventsWs = new ClientEventsWebSocket()));
 					SetupResources.AddLast(webServer.Register(login = new Login()));
 					SetupResources.AddLast(webServer.Register(logout = new Logout()));
-					SetupResources.AddLast(webServer.Register(exportFolder = new HttpFolderResource("/Export", Export.FullExportFolder, false, false, false, true, loggedIn)));
-					SetupResources.AddLast(webServer.Register(keyFolder = new HttpFolderResource("/Key", Export.FullKeyExportFolder, false, false, false, true, loggedIn)));
-					SetupResources.AddLast(webServer.Register(startExport = new StartExport()));
-					SetupResources.AddLast(webServer.Register(startAnalyze = new StartAnalyze()));
-					SetupResources.AddLast(webServer.Register(deleteExport = new DeleteExport()));
 
 					emoji1_24x24 = new Emoji1LocalFiles(Emoji1SourceFileType.Svg, 24, 24, "/Graphics/Emoji1/svg/%FILENAME%",
 						Path.Combine(runtimeFolder, "Graphics", "Emoji1.zip"), Path.Combine(appDataFolder, "Graphics"));
@@ -613,11 +603,6 @@ namespace Waher.IoTGateway
 				webServer.Register(clientEventsWs = new ClientEventsWebSocket());
 				webServer.Register(login = new Login());
 				webServer.Register(logout = new Logout());
-				webServer.Register(exportFolder = new HttpFolderResource("/Export", Export.FullExportFolder, false, false, false, true, loggedIn));
-				webServer.Register(keyFolder = new HttpFolderResource("/Key", Export.FullKeyExportFolder, false, false, false, true, loggedIn));
-				webServer.Register(startExport = new StartExport());
-				webServer.Register(startAnalyze = new StartAnalyze());
-				webServer.Register(deleteExport = new DeleteExport());
 
 				if (emoji1_24x24 is null)
 				{
@@ -1280,11 +1265,6 @@ namespace Waher.IoTGateway
 			clientEvents = null;
 			login = null;
 			logout = null;
-			exportFolder = null;
-			keyFolder = null;
-			startExport = null;
-			startAnalyze = null;
-			deleteExport = null;
 
 			if (exportExceptions)
 			{
@@ -2374,18 +2354,6 @@ namespace Waher.IoTGateway
 			{
 				Log.Critical(ex);
 			}
-		}
-
-		internal static void UpdateExportFolder(string Folder)
-		{
-			if (exportFolder != null)
-				exportFolder.FolderPath = Folder;
-		}
-
-		internal static void UpdateExportKeyFolder(string Folder)
-		{
-			if (keyFolder != null)
-				keyFolder.FolderPath = Folder;
 		}
 
 		#endregion

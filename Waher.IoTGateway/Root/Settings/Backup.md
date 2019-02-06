@@ -6,12 +6,17 @@ Copyright: Copyright.md
 Master: Master.md
 UserVariable: User
 Login: Login.md
-JavaScript: Events.js
-JavaScript: Backup.js
+JavaScript: /Events.js
+JavaScript: /Settings/Backup.js
+JavaScript: /Settings/Next.js
 
 
 Backups
 ==============
+
+To protect your data, daily backups are performed. Below you can configure when these backups are performed, and where files will be stored.
+Backup files can be restored on this machine, or another machine at a later time. You can also create manual backups and export the data
+in the database. Click the **Next** button below to continue.
 
 <form action="UpdateBackupSettings" method="post" enctype="multipart/form-data">
 <fieldset>
@@ -130,6 +135,11 @@ the Analyze button to analyze the database and generate a report.
 <button type="button" onclick="StartExport();">Backup</button>
 <button type="button" onclick="StartAnalyze(false);">Analyze</button>
 <button type="button" onclick="StartAnalyze(true);">Repair</button>
+{{if Waher.IoTGateway.Gateway.Configuring then ]]
+<button id='NextButton' type='button' onclick='Next()'>Next</button>
+[[ else ]]
+<button id='OkButton' type='button' onclick='Ok()'>OK</button>
+[[;}}
 </p>
 
 </form>

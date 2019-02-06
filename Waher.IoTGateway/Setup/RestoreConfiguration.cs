@@ -109,6 +109,8 @@ namespace Waher.IoTGateway.Setup
 			WebServer.Unregister(this.uploadKey);
 			WebServer.Unregister(this.restore);
 
+			WebServer.SessionRemoved -= WebServer_SessionRemoved;
+
 			return base.UnregisterSetup(WebServer);
 		}
 

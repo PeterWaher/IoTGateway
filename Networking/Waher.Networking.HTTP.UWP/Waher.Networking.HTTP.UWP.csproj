@@ -160,6 +160,7 @@
     <Compile Include="HeaderFields\HttpFieldAcceptCharset.cs" />
     <Compile Include="HeaderFields\HttpFieldAcceptEncoding.cs" />
     <Compile Include="HeaderFields\HttpFieldAcceptLanguage.cs" />
+    <Compile Include="HeaderFields\HttpFieldAcceptRecords.cs" />
     <Compile Include="HeaderFields\HttpFieldAuthorization.cs" />
     <Compile Include="HeaderFields\HttpFieldContentEncoding.cs" />
     <Compile Include="HeaderFields\HttpFieldContentLanguage.cs" />

@@ -7,10 +7,8 @@ namespace Waher.Networking.HTTP.HeaderFields
 	/// <summary>
 	/// Accept-Encoding HTTP Field header. (RFC 2616, §14.3)
 	/// </summary>
-	public class HttpFieldAcceptEncoding : HttpField
+	public class HttpFieldAcceptEncoding : HttpFieldAcceptRecords
 	{
-		private AcceptRecord[] records = null;
-
 		/// <summary>
 		/// Accept-Encoding HTTP Field header. (RFC 2616, §14.3)
 		/// </summary>
@@ -19,20 +17,6 @@ namespace Waher.Networking.HTTP.HeaderFields
 		public HttpFieldAcceptEncoding(string Key, string Value)
 			: base(Key, Value)
 		{
-		}
-
-		/// <summary>
-		/// Accept records, sorted by acceptability by the client.
-		/// </summary>
-		public AcceptRecord[] Records
-		{
-			get
-			{
-				if (this.records is null)
-					this.records = HttpFieldAccept.Parse(this.Value);
-
-				return this.records;
-			}
 		}
 	}
 }

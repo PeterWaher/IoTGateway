@@ -377,9 +377,9 @@ namespace Waher.Networking.HTTP
 
 			if (Header.Accept != null)
 			{
-				bool Acceptable = Header.Accept.IsAcceptable(ContentType, out double Quality, out ContentTypeAcceptance TypeAcceptance, null);
+				bool Acceptable = Header.Accept.IsAcceptable(ContentType, out double Quality, out AcceptanceLevel TypeAcceptance, null);
 
-				if ((!Acceptable || TypeAcceptance == ContentTypeAcceptance.Wildcard) && (this.allowTypeConversionFrom is null ||
+				if ((!Acceptable || TypeAcceptance == AcceptanceLevel.Wildcard) && (this.allowTypeConversionFrom is null ||
 					(this.allowTypeConversionFrom.TryGetValue(ContentType, out bool Allowed) && Allowed)))
 				{
 					IContentConverter Converter = null;

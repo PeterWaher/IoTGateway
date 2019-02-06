@@ -82,18 +82,18 @@ namespace Waher.Networking.HTTP.HeaderFields
 		/// <param name="Acceptance">How well the content type was matched by the acceptance criteria.</param>
 		/// <param name="Parameters">Any content type parameters that might be relevant.</param>
 		/// <returns>If content of the given type is acceptable to the client.</returns>
-		public bool IsAcceptable(string ContentType, out double Quality, out ContentTypeAcceptance Acceptance, params KeyValuePair<string, string>[] Parameters)
+		public bool IsAcceptable(string ContentType, out double Quality, out AcceptanceLevel Acceptance, params KeyValuePair<string, string>[] Parameters)
 		{
-			ContentTypeAcceptance CurrentAcceptance;
+			AcceptanceLevel CurrentAcceptance;
 
 			Quality = 0;
-			Acceptance = ContentTypeAcceptance.Wildcard;
+			Acceptance = AcceptanceLevel.Wildcard;
 
 			if (string.Compare(ContentType, this.item, true) == 0)
 			{
 				bool? Found;
 
-				CurrentAcceptance = ContentTypeAcceptance.TopAndSubType;
+				CurrentAcceptance = AcceptanceLevel.TopAndSubType;
 
 				if (this.parameters != null && Parameters != null)
 				{
@@ -121,7 +121,7 @@ namespace Waher.Networking.HTTP.HeaderFields
 					if (Found.HasValue)
 					{
 						if (Found.Value)
-							CurrentAcceptance = ContentTypeAcceptance.TopSubTypeAndParameters;
+							CurrentAcceptance = AcceptanceLevel.TopSubTypeAndParameters;
 						else
 							return false;
 					}
@@ -138,9 +138,9 @@ namespace Waher.Networking.HTTP.HeaderFields
 					TopType = ContentType.Substring(0, i);
 
 				if (this.item.EndsWith("/*") && string.Compare(TopType, this.item.Substring(0, this.item.Length - 2)) == 0)
-					CurrentAcceptance = ContentTypeAcceptance.TopTypeOnly;
+					CurrentAcceptance = AcceptanceLevel.TopTypeOnly;
 				else if (this.item == "*/*")
-					CurrentAcceptance = ContentTypeAcceptance.Wildcard;
+					CurrentAcceptance = AcceptanceLevel.Wildcard;
 				else
 					return false;
 			}

@@ -755,7 +755,7 @@ namespace Waher.Networking.HTTP
 							{
 								foreach (string ContentType2 in Encoder2.ContentTypes)
 								{
-									if (Rec.IsAcceptable(ContentType2, out double Quality, out ContentTypeAcceptance Acceptance))
+									if (Rec.IsAcceptable(ContentType2, out double Quality, out AcceptanceLevel Acceptance))
 									{
 										if ((Best is null || Quality > BestQuality) && Encoder2.Encodes(Object, out Grade Grade, ContentType2))
 										{

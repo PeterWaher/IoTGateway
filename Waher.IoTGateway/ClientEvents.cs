@@ -273,7 +273,7 @@ namespace Waher.IoTGateway
 		internal static void Ping(string TabID)
 		{
 			if (eventsByTabID.TryGetValue(TabID, out TabQueue TabQueue))
-				Gateway.HttpServer.GetSession(TabQueue.SessionID, false);
+				Gateway.HttpServer?.GetSession(TabQueue.SessionID, false);
 		}
 
 		internal static void UnregisterWebSocket(WebSocket Socket, string Location, string TabID)

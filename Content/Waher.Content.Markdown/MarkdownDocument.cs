@@ -5534,7 +5534,20 @@ namespace Waher.Content.Markdown
 		/// </summary>
 		public MarkdownDocument Detail
 		{
-			get { return this.detail; }
+			get
+			{
+				if (!(this.detail is null))
+					return this.detail;
+
+				if (this.master is null)
+					return null;
+
+				MarkdownDocument Doc = this.master.Detail;
+				if (Doc != this)
+					return Doc;
+
+				return null;
+			}
 			set { this.detail = value; }
 		}
 

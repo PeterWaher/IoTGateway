@@ -132,6 +132,7 @@ namespace Waher.IoTGateway
 		private static CoapEndpoint coapEndpoint = null;
 		private static ClientEvents clientEvents = null;
 		private static ClientEventsWebSocket clientEventsWs = null;
+		private static SystemConfiguration[] configurations;
 		private static Login login = null;
 		private static Logout logout = null;
 		private static LoggedIn loggedIn = null;
@@ -412,9 +413,9 @@ namespace Waher.IoTGateway
 					}
 				}
 
-				SystemConfiguration[] Configurations = new SystemConfiguration[SystemConfigurations.Count];
-				SystemConfigurations.Values.CopyTo(Configurations, 0);
-				Array.Sort<SystemConfiguration>(Configurations, (c1, c2) => c1.Priority - c2.Priority);
+				configurations = new SystemConfiguration[SystemConfigurations.Count];
+				SystemConfigurations.Values.CopyTo(configurations, 0);
+				Array.Sort<SystemConfiguration>(configurations, (c1, c2) => c1.Priority - c2.Priority);
 
 				HttpFolderResource HttpFolderResource;
 				ISystemConfiguration CurrentConfiguration = null;
@@ -461,7 +462,7 @@ namespace Waher.IoTGateway
 					MarkdownToHtmlConverter.RootFolder = rootFolder;
 				}
 
-				foreach (SystemConfiguration Configuration in Configurations)
+				foreach (SystemConfiguration Configuration in configurations)
 				{
 					Configuration.SetStaticInstance(Configuration);
 
@@ -475,7 +476,7 @@ namespace Waher.IoTGateway
 				{
 					ReloadConfigurations = false;
 
-					foreach (SystemConfiguration Configuration in Configurations)
+					foreach (SystemConfiguration Configuration in configurations)
 					{
 						bool NeedsCleanup = false;
 
@@ -532,9 +533,9 @@ namespace Waher.IoTGateway
 								}
 							}
 
-							Configurations = new SystemConfiguration[SystemConfigurations.Count];
-							SystemConfigurations.Values.CopyTo(Configurations, 0);
-							Array.Sort<SystemConfiguration>(Configurations, (c1, c2) => c1.Priority - c2.Priority);
+							configurations = new SystemConfiguration[SystemConfigurations.Count];
+							SystemConfigurations.Values.CopyTo(configurations, 0);
+							Array.Sort<SystemConfiguration>(configurations, (c1, c2) => c1.Priority - c2.Priority);
 
 							break;
 						}
@@ -581,7 +582,7 @@ namespace Waher.IoTGateway
 					else
 						webServer = new HttpServer(GetConfigPorts("HTTP"), null, null);
 
-					foreach (SystemConfiguration Configuration in Configurations)
+					foreach (SystemConfiguration Configuration in configurations)
 						await Configuration.InitSetup(webServer);
 				}
 
@@ -802,6 +803,12 @@ namespace Waher.IoTGateway
 			}
 		}
 
+		private enum CopyOptions
+		{
+			IfNewer,
+			Always
+		}
+
 		private static void CheckContentFiles(XmlElement Element, string RuntimeFolder, string RuntimeSubfolder, string AppDataSubFolder)
 		{
 			bool AppDataFolderChecked = false;
@@ -819,6 +826,7 @@ namespace Waher.IoTGateway
 
 						case "Content":
 							Name = XML.Attribute(E, "fileName");
+							CopyOptions CopyOptions = (CopyOptions)XML.Attribute(E, "copy", CopyOptions.IfNewer);
 
 							string s = Path.Combine(RuntimeSubfolder, Name);
 							if (!File.Exists(s))
@@ -838,7 +846,7 @@ namespace Waher.IoTGateway
 
 							string s2 = Path.Combine(AppDataSubFolder, Name);
 
-							if (!File.Exists(s2))
+							if (!File.Exists(s2) || CopyOptions == CopyOptions.Always)
 								File.Copy(s, s2);
 							else
 							{
@@ -1639,7 +1647,7 @@ namespace Waher.IoTGateway
 			if (!loopbackIntefaceAvailable && (XmppConfiguration.Instance is null || !XmppConfiguration.Instance.Complete || configuring))
 			{
 				Log.Informational("User logged in by default, since XMPP not configued and loopback interface not available.", string.Empty, Request.RemoteEndPoint, "LoginSuccessful", EventLevel.Minor);
-				Login.DoLogin(Request, From);
+				Login.DoLogin(Request, From, true);
 				return;
 			}
 
@@ -1662,7 +1670,7 @@ namespace Waher.IoTGateway
 #endif
 			{
 				Log.Informational("Local user logged in.", string.Empty, Request.RemoteEndPoint, "LoginSuccessful", EventLevel.Minor);
-				Login.DoLogin(Request, From);
+				Login.DoLogin(Request, From, true);
 				return;
 			}
 
@@ -1716,7 +1724,7 @@ namespace Waher.IoTGateway
 						if (P.SessionId == CurrentSession)
 						{
 							Log.Informational("Local user logged in.", string.Empty, Request.RemoteEndPoint, "LoginSuccessful", EventLevel.Minor);
-							Login.DoLogin(Request, From);
+							Login.DoLogin(Request, From, true);
 							break;
 						}
 					}
@@ -2479,7 +2487,7 @@ namespace Waher.IoTGateway
 						MessageId = string.Empty;
 					}
 
-					xmppClient.SendMessage(QoSLevel.Unacknowledged, MessageType.Chat, MessageId, To, Xml.ToString(), Text, 
+					xmppClient.SendMessage(QoSLevel.Unacknowledged, MessageType.Chat, MessageId, To, Xml.ToString(), Text,
 						string.Empty, string.Empty, string.Empty, string.Empty, null, null);
 				}
 			}
@@ -2491,6 +2499,93 @@ namespace Waher.IoTGateway
 		{
 			object[] P2 = (object[])P;
 			SendNotification((string)P2[0], (string)P2[1], (string)P2[2], (string)P2[3], (string)P2[4], (bool)P2[5]);
+		}
+
+		#endregion
+
+		#region Localization
+
+		/// <summary>
+		/// Gets the best suited language for a request.
+		/// </summary>
+		/// <param name="Request">Request object</param>
+		/// <param name="LanguageVariableName">Variable name of current language selection, if any.</param>
+		/// <returns>Language object.</returns>
+		public static async Task<Language> GetLanguageAsync(HttpRequest Request, string LanguageVariableName)
+		{
+			Variables Session = Request.Session;
+
+			if (!string.IsNullOrEmpty(LanguageVariableName) &&
+				Session.TryGetVariable(LanguageVariableName, out Variable v) &&
+				v.ValueObject is string LanguageCode)
+			{
+				return await Translator.GetLanguageAsync(LanguageCode);
+			}
+
+			if (Request.Header.AcceptLanguage is null)
+			{
+				Language Result = await Translator.GetDefaultLanguageAsync();
+
+				if (!(Session is null) && !string.IsNullOrEmpty(LanguageVariableName))
+					Session[LanguageVariableName] = Result.Code;
+
+				return Result;
+			}
+
+			List<string> Alternatives = new List<string>();
+
+			foreach (Language Language in await Translator.GetLanguagesAsync())
+				Alternatives.Add(Language.Code);
+
+			string Best = Request.Header.AcceptLanguage.GetBestAlternative(Alternatives.ToArray());
+			if (string.IsNullOrEmpty(Best))
+				throw new NotAcceptableException();
+
+			if (!(Session is null) && !string.IsNullOrEmpty(LanguageVariableName))
+				Session[LanguageVariableName] = Best;
+
+			return await Translator.GetLanguageAsync(Best);
+		}
+
+		#endregion
+
+		#region Settings
+
+		/// <summary>
+		/// Gets the settings menu.
+		/// </summary>
+		/// <param name="Request">Current HTTP Request</param>
+		/// <param name="UserVariable">Name of user variable</param>
+		/// <param name="LanguageVariable">Name of language variable.</param>
+		/// <returns></returns>
+		public static WebMenuItem[] GetSettingsMenu(HttpRequest Request, string UserVariable, string LanguageVariable)
+		{
+			List<WebMenuItem> Result = new List<WebMenuItem>();
+			Variables Session = Request.Session;
+			Language Language = GetLanguageAsync(Request, LanguageVariable).Result;
+
+			if (Session is null ||
+				!Session.TryGetVariable(UserVariable, out Variable v) ||
+				!(v.ValueObject is IUser User))
+			{
+				Result.Add(new WebMenuItem("Login", "/Login.md"));
+			}
+			else
+			{
+				if (!(configurations is null))
+				{
+					foreach (SystemConfiguration Configuration in configurations)
+					{
+						if (User.HasPrivilege(Configuration.GetType().FullName))
+							Result.Add(new WebMenuItem(Configuration.Title(Language), Configuration.Resource));
+					}
+				}
+
+				if (!Session.TryGetVariable(" AutoLogin ", out v) || !(v.ValueObject is bool AutoLogin) || !AutoLogin)
+					Result.Add(new WebMenuItem("Logout", "/Logout"));
+			}
+
+			return Result.ToArray();
 		}
 
 		#endregion

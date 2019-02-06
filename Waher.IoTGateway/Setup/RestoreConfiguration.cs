@@ -21,6 +21,7 @@ using Waher.Persistence;
 using Waher.Persistence.Serialization;
 using Waher.Runtime.Inventory;
 using Waher.Script;
+using Waher.Runtime.Language;
 
 namespace Waher.IoTGateway.Setup
 {
@@ -55,6 +56,16 @@ namespace Waher.IoTGateway.Setup
 		/// Priority of the setting. Configurations are sorted in ascending order.
 		/// </summary>
 		public override int Priority => 150;
+
+		/// <summary>
+		/// Gets a title for the system configuration.
+		/// </summary>
+		/// <param name="Language">Current language.</param>
+		/// <returns>Title string</returns>
+		public override string Title(Language Language)
+		{
+			return "Restore";
+		}
 
 		/// <summary>
 		/// Is called during startup to configure the system.

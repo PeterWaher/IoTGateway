@@ -10,6 +10,7 @@ using Waher.Persistence;
 using Waher.Persistence.Attributes;
 using Waher.Runtime.Inventory;
 using Waher.IoTGateway.Setup.PersonalData;
+using Waher.Runtime.Language;
 
 namespace Waher.IoTGateway.Setup
 {
@@ -75,6 +76,16 @@ namespace Waher.IoTGateway.Setup
 		/// Priority of the setting. Configurations are sorted in ascending order.
 		/// </summary>
 		public override int Priority => 100;
+
+		/// <summary>
+		/// Gets a title for the system configuration.
+		/// </summary>
+		/// <param name="Language">Current language.</param>
+		/// <returns>Title string</returns>
+		public override string Title(Language Language)
+		{
+			return "Personal Data";
+		}
 
 		/// <summary>
 		/// Is called during startup to configure the system.

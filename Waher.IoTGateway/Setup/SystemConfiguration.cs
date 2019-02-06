@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Waher.Networking.HTTP;
 using Waher.Persistence;
 using Waher.Persistence.Attributes;
+using Waher.Runtime.Language;
 
 namespace Waher.IoTGateway.Setup
 {
@@ -87,6 +88,13 @@ namespace Waher.IoTGateway.Setup
 		{
 			get;
 		}
+
+		/// <summary>
+		/// Gets a title for the system configuration.
+		/// </summary>
+		/// <param name="Language">Current language.</param>
+		/// <returns>Title string</returns>
+		public abstract string Title(Language Language);
 
 		/// <summary>
 		/// Is called during startup to configure the system.

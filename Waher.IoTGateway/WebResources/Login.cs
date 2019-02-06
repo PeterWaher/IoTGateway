@@ -84,7 +84,7 @@ namespace Waher.IoTGateway.WebResources
 				if (LoginResult == LoginResult.Successful)
 				{
 					Log.Informational("User logged in.", UserName, Request.RemoteEndPoint, "LoginSuccessful", EventLevel.Minor);
-					DoLogin(Request, From);
+					DoLogin(Request, From, false);
 				}
 				else
 				{
@@ -112,9 +112,10 @@ namespace Waher.IoTGateway.WebResources
 			}
 		}
 
-		internal static void DoLogin(HttpRequest Request, string From)
+		internal static void DoLogin(HttpRequest Request, string From, bool AutoLogin)
 		{
 			Request.Session["User"] = new User();
+			Request.Session[" AutoLogin "] = AutoLogin;
 			Request.Session.Remove("LoginError");
 
 			if (!string.IsNullOrEmpty(From))

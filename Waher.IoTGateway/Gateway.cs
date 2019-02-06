@@ -238,10 +238,10 @@ namespace Waher.IoTGateway
 				}
 
 				string[] ManifestFiles = Directory.GetFiles(runtimeFolder, "*.manifest", SearchOption.TopDirectoryOnly);
+				Dictionary<string, CopyOptions> ContentOptions = new Dictionary<string, CopyOptions>();
 
 				foreach (string ManifestFile in ManifestFiles)
-					CheckContentFiles(ManifestFile);
-
+					CheckContentFiles(ManifestFile, ContentOptions);
 
 				Types.SetModuleParameter("AppData", appDataFolder);
 				Types.SetModuleParameter("Root", rootFolder);
@@ -787,7 +787,7 @@ namespace Waher.IoTGateway
 			return true;
 		}
 
-		private static void CheckContentFiles(string ManifestFileName)
+		private static void CheckContentFiles(string ManifestFileName, Dictionary<string, CopyOptions> ContentOptions)
 		{
 			try
 			{
@@ -795,7 +795,7 @@ namespace Waher.IoTGateway
 				Doc.Load(ManifestFileName);
 
 				if (Doc.DocumentElement != null && Doc.DocumentElement.LocalName == "Module" && Doc.DocumentElement.NamespaceURI == "http://waher.se/Schema/ModuleManifest.xsd")
-					CheckContentFiles(Doc.DocumentElement, runtimeFolder, runtimeFolder, appDataFolder);
+					CheckContentFiles(Doc.DocumentElement, runtimeFolder, runtimeFolder, appDataFolder, ContentOptions);
 			}
 			catch (Exception ex)
 			{
@@ -809,7 +809,8 @@ namespace Waher.IoTGateway
 			Always
 		}
 
-		private static void CheckContentFiles(XmlElement Element, string RuntimeFolder, string RuntimeSubfolder, string AppDataSubFolder)
+		private static void CheckContentFiles(XmlElement Element, string RuntimeFolder, string RuntimeSubfolder, string AppDataSubFolder,
+			Dictionary<string, CopyOptions> ContentOptions)
 		{
 			bool AppDataFolderChecked = false;
 
@@ -821,7 +822,8 @@ namespace Waher.IoTGateway
 					{
 						case "Folder":
 							string Name = XML.Attribute(E, "name");
-							CheckContentFiles(E, RuntimeFolder, Path.Combine(RuntimeSubfolder, Name), Path.Combine(AppDataSubFolder, Name));
+							CheckContentFiles(E, RuntimeFolder, Path.Combine(RuntimeSubfolder, Name), Path.Combine(AppDataSubFolder, Name), 
+								ContentOptions);
 							break;
 
 						case "Content":
@@ -846,15 +848,23 @@ namespace Waher.IoTGateway
 
 							string s2 = Path.Combine(AppDataSubFolder, Name);
 
-							if (!File.Exists(s2) || CopyOptions == CopyOptions.Always)
-								File.Copy(s, s2);
+							if (CopyOptions == CopyOptions.Always || !File.Exists(s2))
+							{
+								File.Copy(s, s2, true);
+								ContentOptions[s2] = CopyOptions;
+							}
 							else
 							{
 								DateTime TP = File.GetLastWriteTime(s);
 								DateTime TP2 = File.GetLastWriteTime(s2);
 
-								if (TP > TP2)
+								if (TP > TP2 &&
+									(!ContentOptions.TryGetValue(s2, out CopyOptions CopyOptions2) ||
+									CopyOptions2 != CopyOptions.Always))
+								{
 									File.Copy(s, s2, true);
+									ContentOptions[s2] = CopyOptions;
+								}
 							}
 							break;
 					}

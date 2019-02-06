@@ -201,7 +201,7 @@ namespace Waher.Utility.Install
 			string AppFolder = Path.GetDirectoryName(ServerApplication);
 
 			string DestManifestFileName = Path.Combine(AppFolder, Path.GetFileName(ManifestFile));
-			CopyFileIfNewer(ManifestFile, DestManifestFileName, false);
+			CopyFileIfNewer(ManifestFile, DestManifestFileName, null, false);
 
 			Log.Informational("Source folder: " + SourceFolder);
 			Log.Informational("App folder: " + AppFolder);
@@ -213,13 +213,13 @@ namespace Waher.Utility.Install
 					string FileName = XML.Attribute(E, "fileName");
 					string SourceFileName = Path.Combine(SourceFolder, FileName);
 
-					if (CopyFileIfNewer(SourceFileName, Path.Combine(AppFolder, FileName), true))
+					if (CopyFileIfNewer(SourceFileName, Path.Combine(AppFolder, FileName), null, true))
 					{
 						if (FileName.EndsWith(".dll", StringComparison.CurrentCultureIgnoreCase))
 						{
 							string PdbFileName = FileName.Substring(0, FileName.Length - 4) + ".pdb";
 							if (File.Exists(PdbFileName))
-								CopyFileIfNewer(Path.Combine(SourceFolder, PdbFileName), Path.Combine(AppFolder, PdbFileName), false);
+								CopyFileIfNewer(Path.Combine(SourceFolder, PdbFileName), Path.Combine(AppFolder, PdbFileName), null, false);
 						}
 					}
 
@@ -297,7 +297,7 @@ namespace Waher.Utility.Install
 			File.WriteAllText(DepsJsonFileName, s, Encoding.UTF8);
 		}
 
-		private static bool CopyFileIfNewer(string From, string To, bool OnlyIfNewer)
+		private static bool CopyFileIfNewer(string From, string To, string To2, bool OnlyIfNewer)
 		{
 			if (From == To)
 			{
@@ -326,6 +326,12 @@ namespace Waher.Utility.Install
 
 			Log.Informational("Copying " + From + " to " + To);
 			File.Copy(From, To, true);
+
+			if (!string.IsNullOrEmpty(To2))
+			{
+				Log.Informational("Copying " + From + " to " + To2);
+				File.Copy(From, To2, true);
+			}
 
 			return true;
 		}
@@ -356,7 +362,10 @@ namespace Waher.Utility.Install
 								Directory.CreateDirectory(DataFolder);
 							}
 
-							CopyFileIfNewer(Path.Combine(SourceFolder, FileName), Path.Combine(DataFolder, FileName),
+							CopyFileIfNewer(
+								Path.Combine(SourceFolder, FileName), 
+								Path.Combine(DataFolder, FileName),
+								Path.Combine(AppFolder, FileName),
 								CopyOptions == CopyOptions.IfNewer);
 							break;
 

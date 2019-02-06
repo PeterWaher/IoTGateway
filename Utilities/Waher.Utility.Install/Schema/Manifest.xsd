@@ -28,8 +28,16 @@
     <xs:annotation>
       <xs:documentation>Defines content to be placed in the application data folder.</xs:documentation>
     </xs:annotation>
-    <xs:attribute name="fileName" type="xs:string" use="required"/>
-  </xs:complexType>
+		<xs:attribute name="fileName" type="xs:string" use="required"/>
+		<xs:attribute name="copy" type="CopyOptions" use="optional" default="IfNewer"/>
+	</xs:complexType>
+
+	<xs:simpleType name="CopyOptions">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="IfNewer"/>
+			<xs:enumeration value="Always"/>
+		</xs:restriction>
+	</xs:simpleType>
 
   <xs:complexType name="Folder">
     <xs:annotation>

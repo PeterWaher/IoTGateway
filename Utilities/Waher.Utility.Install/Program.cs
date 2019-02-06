@@ -330,6 +330,12 @@ namespace Waher.Utility.Install
 			return true;
 		}
 
+		private enum CopyOptions
+		{
+			IfNewer,
+			Always
+		}
+
 		private static void CopyContent(string SourceFolder, string AppFolder, string DataFolder, XmlElement Parent)
 		{
 			foreach (XmlNode N in Parent.ChildNodes)
@@ -340,6 +346,7 @@ namespace Waher.Utility.Install
 					{
 						case "Content":
 							string FileName = XML.Attribute(E, "fileName");
+							CopyOptions CopyOptions = (CopyOptions)XML.Attribute(E, "copy", CopyOptions.IfNewer);
 
 							Log.Informational("Content file: " + FileName);
 
@@ -349,7 +356,8 @@ namespace Waher.Utility.Install
 								Directory.CreateDirectory(DataFolder);
 							}
 
-							CopyFileIfNewer(Path.Combine(SourceFolder, FileName), Path.Combine(DataFolder, FileName), true);
+							CopyFileIfNewer(Path.Combine(SourceFolder, FileName), Path.Combine(DataFolder, FileName),
+								CopyOptions == CopyOptions.IfNewer);
 							break;
 
 						case "Folder":

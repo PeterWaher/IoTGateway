@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Waher.Script;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Objects;
@@ -38,11 +39,12 @@ namespace Waher.IoTGateway.Setup
 		}
 
 		/// <summary>
-		/// Constant value element.
+		/// Gets the constant value element.
 		/// </summary>
-		public IElement ValueElement
+		/// <param name="Variables">Current set of variables.</param>
+		public IElement GetValueElement(Variables Variables)
 		{
-			get { return new ObjectValue(currentDefinition); }
+			return new ObjectValue(currentDefinition);
 		}
 		
 		/// <summary>

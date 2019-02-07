@@ -27,11 +27,9 @@ namespace Waher.Script.Model
 		}
 
 		/// <summary>
-		/// Constant value element.
+		/// Gets the constant value element.
 		/// </summary>
-		IElement ValueElement
-		{
-			get;
-		}
+		/// <param name="Variables">Current set of variables.</param>
+		IElement GetValueElement(Variables Variables);
 	}
 }

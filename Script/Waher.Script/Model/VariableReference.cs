@@ -64,7 +64,7 @@ namespace Waher.Script.Model
 
 			if (!this.onlyVariables)
 			{
-				if (Expression.TryGetConstant(this.variableName, out IElement ValueElement))
+				if (Expression.TryGetConstant(this.variableName, Variables, out IElement ValueElement))
 					return ValueElement;
 
 				if (Types.IsRootNamespace(this.variableName))

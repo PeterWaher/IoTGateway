@@ -8,15 +8,15 @@ using Waher.Script.Objects.Sets;
 
 namespace Waher.Script.Constants
 {
-    /// <summary>
-    /// Current date and time.
-    /// </summary>
-    public class Now : IConstant
+	/// <summary>
+	/// Current date and time.
+	/// </summary>
+	public class Now : IConstant
 	{
-        /// <summary>
-        /// Current date and time.
-        /// </summary>
-        public Now()
+		/// <summary>
+		/// Current date and time.
+		/// </summary>
+		public Now()
 		{
 		}
 
@@ -37,11 +37,12 @@ namespace Waher.Script.Constants
 		}
 
 		/// <summary>
-		/// Constant value element.
+		/// Gets the constant value element.
 		/// </summary>
-		public IElement ValueElement
+		/// <param name="Variables">Current set of variables.</param>
+		public IElement GetValueElement(Variables Variables)
 		{
-			get { return new DateTimeValue(DateTime.Now); }
+			return new DateTimeValue(DateTime.Now);
 		}
 
 	}

@@ -36,11 +36,12 @@ namespace Waher.Script.Constants
 		}
 
 		/// <summary>
-		/// Constant value element.
+		/// Gets the constant value element.
 		/// </summary>
-		public IElement ValueElement
+		/// <param name="Variables">Current set of variables.</param>
+		public IElement GetValueElement(Variables Variables)
 		{
-			get { return pi; }
+			return pi;
 		}
 
 		private static readonly DoubleNumber pi = new DoubleNumber(Math.PI);

@@ -2921,7 +2921,7 @@ namespace Waher.Script
 			}
 		}
 
-		internal static bool TryGetConstant(string Name, out IElement ValueElement)
+		internal static bool TryGetConstant(string Name, Variables Variables, out IElement ValueElement)
 		{
 			Dictionary<string, IConstant> C = constants;
 			if (C is null)
@@ -2936,7 +2936,7 @@ namespace Waher.Script
 				return false;
 			}
 
-			ValueElement = Constant.ValueElement;
+			ValueElement = Constant.GetValueElement(Variables);
 			return true;
 		}
 

@@ -36,11 +36,12 @@ namespace Waher.Script.Constants
 		}
 
 		/// <summary>
-		/// Constant value element.
+		/// Gets the constant value element.
 		/// </summary>
-		public IElement ValueElement
+		/// <param name="Variables">Current set of variables.</param>
+		public IElement GetValueElement(Variables Variables)
 		{
-			get { return epsilon; }
+			return epsilon;
 		}
 
 		private static readonly DoubleNumber epsilon = new DoubleNumber(double.Epsilon);

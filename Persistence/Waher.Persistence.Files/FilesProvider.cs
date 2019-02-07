@@ -1189,7 +1189,7 @@ namespace Waher.Persistence.Files
 		}
 
 		private async Task SaveUnsaved()
-		{ 
+		{
 			ObjectBTreeFile[] Files;
 
 			lock (this.synchObj)
@@ -2737,16 +2737,13 @@ namespace Waher.Persistence.Files
 
 		private void WriteTimestamp(string FileName)
 		{
-			if (Database.Provider is FilesProvider FilesProvider)
+			try
 			{
-				try
-				{
-					File.WriteAllText(Path.Combine(FilesProvider.Folder, FileName), DateTime.Now.Ticks.ToString());
-				}
-				catch (Exception ex)
-				{
-					Log.Critical(ex);
-				}
+				File.WriteAllText(Path.Combine(this.folder, FileName), DateTime.Now.Ticks.ToString());
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
 			}
 		}
 

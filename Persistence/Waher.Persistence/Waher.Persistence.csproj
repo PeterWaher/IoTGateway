@@ -14,9 +14,9 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>persistence object database</PackageTags>
     <NeutralLanguage>en</NeutralLanguage>
-    <AssemblyVersion>1.0.9</AssemblyVersion>
-    <FileVersion>1.0.9</FileVersion>
-    <Version>1.0.9</Version>
+    <AssemblyVersion>1.0.10</AssemblyVersion>
+    <FileVersion>1.0.10</FileVersion>
+    <Version>1.0.10</Version>
     <PackageIconUrl>https://github.com/PeterWaher/IoTGateway/blob/master/Images/Icon.ico?raw=true</PackageIconUrl>
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Persistence\Waher.Persistence\</UpgradeBackupLocation>

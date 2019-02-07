@@ -1206,7 +1206,7 @@
 							<Directory Id='PersonalData' Name='PersonalData'>
 								<Component Id='PersonalDataFiles' Guid='4C73E63A-EA2B-4BE9-9DFA-228538513FA2'>
 									<RemoveFolder Id='RemovePersonalData' On='uninstall' />
-									<File Id='PiiBackups.md' Name='Backups.md' DiskId='1' Source='..\..\..\Waher.Service.LittleSister\bin\$(var.Configuration)\netstandard2.0\Root\Settings\PersonalData\Backups.md' Vital='yes' KeyPath='yes'/>
+									<File Id='PiiBackups.md' Name='Backups.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\PersonalData\Backups.md' Vital='yes' KeyPath='yes'/>
 									<File Id='PiiLocalDatabase.md' Name='LocalDatabase.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\PersonalData\LocalDatabase.md'/>
 									<File Id='PiiLocalSensorsAndDevices.md' Name='LocalSensorsAndDevices.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\PersonalData\LocalSensorsAndDevices.md'/>
 									<File Id='PiiNetworkIdentity.md' Name='NetworkIdentity.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\PersonalData\NetworkIdentity.md'/>

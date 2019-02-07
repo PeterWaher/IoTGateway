@@ -561,6 +561,13 @@
             <param name="ExportData">If data in database is to be exported in output.</param>
             <param name="Repair">If files should be repaired if corruptions are detected.</param>
         </member>
+        <member name="M:Waher.Persistence.Files.FilesProvider.RepairIfInproperShutdown(System.String)">
+            <summary>
+            Checks if the database needs repairing. This is done by checking the last start and stop timetamps to detect
+            inproper shutdowns.
+            </summary>
+            <param name="XsltPath">Path to optional XSLT file for the resulting report.</param>
+        </member>
         <member name="M:Waher.Persistence.Files.FilesProvider.AddIndex(System.String,System.String[])">
             <summary>
             Adds an index to a collection, if one does not already exist.
@@ -568,6 +575,21 @@
             <param name="CollectionName">Name of collection.</param>
             <param name="FieldNames">Sort order. Each string represents a field name. By default, sort order is ascending.
             If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+        </member>
+        <member name="M:Waher.Persistence.Files.FilesProvider.Start">
+            <summary>
+            Called when processing starts.
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.Files.FilesProvider.Stop">
+            <summary>
+            Called when processing ends.
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.Files.FilesProvider.Flush">
+            <summary>
+            Persists any pending changes.
+            </summary>
         </member>
         <member name="T:Waher.Persistence.Files.ICursor`1">
             <summary>

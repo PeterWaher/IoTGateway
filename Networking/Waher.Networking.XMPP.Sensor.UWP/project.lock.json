@@ -2560,7 +2560,8 @@
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
-          "NETStandard.Library": "1.6.1"
+          "NETStandard.Library": "1.6.1",
+          "Waher.Runtime.Inventory": "1.0.7"
         }
       },
       "Waher.Runtime.Cache/1.0.2": {
@@ -5176,7 +5177,8 @@
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
-          "NETStandard.Library": "1.6.1"
+          "NETStandard.Library": "1.6.1",
+          "Waher.Runtime.Inventory": "1.0.7"
         }
       },
       "Waher.Runtime.Cache/1.0.2": {
@@ -7828,7 +7830,8 @@
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
-          "NETStandard.Library": "1.6.1"
+          "NETStandard.Library": "1.6.1",
+          "Waher.Runtime.Inventory": "1.0.7"
         }
       },
       "Waher.Runtime.Cache/1.0.2": {
@@ -10453,7 +10456,8 @@
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
-          "NETStandard.Library": "1.6.1"
+          "NETStandard.Library": "1.6.1",
+          "Waher.Runtime.Inventory": "1.0.7"
         }
       },
       "Waher.Runtime.Cache/1.0.2": {
@@ -13114,7 +13118,8 @@
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
-          "NETStandard.Library": "1.6.1"
+          "NETStandard.Library": "1.6.1",
+          "Waher.Runtime.Inventory": "1.0.7"
         }
       },
       "Waher.Runtime.Cache/1.0.2": {
@@ -15739,7 +15744,8 @@
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
-          "NETStandard.Library": "1.6.1"
+          "NETStandard.Library": "1.6.1",
+          "Waher.Runtime.Inventory": "1.0.7"
         }
       },
       "Waher.Runtime.Cache/1.0.2": {
@@ -18400,7 +18406,8 @@
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
-          "NETStandard.Library": "1.6.1"
+          "NETStandard.Library": "1.6.1",
+          "Waher.Runtime.Inventory": "1.0.7"
         }
       },
       "Waher.Runtime.Cache/1.0.2": {

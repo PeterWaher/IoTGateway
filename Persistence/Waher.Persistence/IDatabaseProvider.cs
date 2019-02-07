@@ -158,5 +158,20 @@ namespace Waher.Persistence
 		/// </summary>
 		Task EndBulk();
 
+		/// <summary>
+		/// Called when processing starts.
+		/// </summary>
+		Task Start();
+
+		/// <summary>
+		/// Called when processing ends.
+		/// </summary>
+		Task Stop();
+
+		/// <summary>
+		/// Persists any pending changes.
+		/// </summary>
+		Task Flush();
+
 	}
 }

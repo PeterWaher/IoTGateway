@@ -99,6 +99,8 @@ namespace Waher.Client.WPF
 				try
 				{
 					databaseProvider = new FilesProvider(appDataFolder + "Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 3600000);
+					databaseProvider.RepairIfInproperShutdown(appDataFolder + "Transforms" + Path.DirectorySeparatorChar + "DbStatXmlToHtml.xslt").Wait();
+					databaseProvider.Start().Wait();
 					Database.Register(databaseProvider);
 
 					Database.Find<Question>(new FilterAnd(new FilterFieldEqualTo("OwnerJID", string.Empty),
@@ -191,6 +193,9 @@ namespace Waher.Client.WPF
 			Registry.SetValue(registryKey, "FileName", this.MainView.FileName, RegistryValueKind.String);
 
 			Log.Terminate();
+
+			databaseProvider.Stop();
+			databaseProvider.Flush();
 		}
 		private void ConnectTo_Executed(object sender, ExecutedRoutedEventArgs e)
 		{

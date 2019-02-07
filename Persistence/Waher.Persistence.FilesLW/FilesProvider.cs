@@ -11,6 +11,7 @@ using System.Text;
 using System.Xml;
 using System.Threading;
 using System.Threading.Tasks;
+using Waher.Events;
 using Waher.Runtime.Cache;
 using Waher.Runtime.Inventory;
 using Waher.Persistence.Serialization;
@@ -1172,7 +1173,7 @@ namespace Waher.Persistence.Files
 		/// <summary>
 		/// Ends bulk-processing of data. Must be called once for every call to <see cref="StartBulk"/>.
 		/// </summary>
-		public async Task EndBulk()
+		public Task EndBulk()
 		{
 			lock (this.synchObj)
 			{
@@ -1181,9 +1182,14 @@ namespace Waher.Persistence.Files
 
 				this.bulkCount--;
 				if (this.bulkCount > 0)
-					return;
+					return Task.CompletedTask;
 			}
 
+			return this.SaveUnsaved();
+		}
+
+		private async Task SaveUnsaved()
+		{ 
 			ObjectBTreeFile[] Files;
 
 			lock (this.synchObj)
@@ -2614,6 +2620,74 @@ namespace Waher.Persistence.Files
 			w.WriteEndElement();
 		}
 
+		/// <summary>
+		/// Checks if the database needs repairing. This is done by checking the last start and stop timetamps to detect
+		/// inproper shutdowns.
+		/// </summary>
+		/// <param name="XsltPath">Path to optional XSLT file for the resulting report.</param>
+		public async Task RepairIfInproperShutdown(string XsltPath)
+		{
+			string StartFileName = this.folder + "Start.txt";
+			string StopFileName = this.folder + "Stop.txt";
+			long? Start = null;
+			long? Stop = null;
+			string s;
+
+			if (File.Exists(StartFileName))
+			{
+				s = File.ReadAllText(StartFileName);
+				if (long.TryParse(s, out long l))
+					Start = l;
+			}
+
+			if (File.Exists(StopFileName))
+			{
+				s = File.ReadAllText(StopFileName);
+				if (long.TryParse(s, out long l))
+					Stop = l;
+			}
+
+			if (!Start.HasValue || !Stop.HasValue || Start.Value > Stop.Value)
+			{
+				s = this.folder + "AutoRepair";
+				if (!Directory.Exists(s))
+					Directory.CreateDirectory(s);
+
+				s += Path.DirectorySeparatorChar + DateTime.Now.ToString("yyyy-MM-ddTHH.mm.ss.ffffff") + ".xml";
+				XmlWriterSettings Settings = new XmlWriterSettings()
+				{
+					Encoding = Encoding.UTF8,
+					Indent = true,
+					IndentChars = "\t",
+					NewLineChars = "\r\n",
+					NewLineHandling = NewLineHandling.Entitize,
+					NewLineOnAttributes = false,
+					OmitXmlDeclaration = false,
+					WriteEndDocumentOnClose = true,
+					CloseOutput = true
+				};
+
+				using (FileStream fs = File.Create(s))
+				{
+					using (XmlWriter w = XmlWriter.Create(fs, Settings))
+					{
+						if (!Start.HasValue)
+						{
+							Log.Notice("First time checking database for errors.",
+								string.Empty, string.Empty, "AutoRepair", new KeyValuePair<string, object>("Report", s));
+						}
+						else
+						{
+							Log.Warning("Service not properly terminated. Checking database for errors.",
+								string.Empty, string.Empty, "AutoRepair", new KeyValuePair<string, object>("Report", s));
+						}
+
+						await this.Repair(w, XsltPath, this.folder, false);
+					}
+				}
+			}
+		}
+
 		#endregion
 
 		#region Indices
@@ -2628,6 +2702,52 @@ namespace Waher.Persistence.Files
 		{
 			ObjectBTreeFile File = await this.GetFile(CollectionName);
 			await GetIndexFile(File, RegenerationOptions.RegenerateIfFileNotFound, FieldNames);
+		}
+
+		#endregion
+
+		#region Life-Cycle
+
+		/// <summary>
+		/// Called when processing starts.
+		/// </summary>
+		public Task Start()
+		{
+			WriteTimestamp("Start.txt");
+			return Task.CompletedTask;
+		}
+
+		/// <summary>
+		/// Called when processing ends.
+		/// </summary>
+		public Task Stop()
+		{
+			return Task.CompletedTask;
+		}
+
+		/// <summary>
+		/// Persists any pending changes.
+		/// </summary>
+		public async Task Flush()
+		{
+			await this.SaveUnsaved();
+
+			WriteTimestamp("Stop.txt");
+		}
+
+		private void WriteTimestamp(string FileName)
+		{
+			if (Database.Provider is FilesProvider FilesProvider)
+			{
+				try
+				{
+					File.WriteAllText(Path.Combine(FilesProvider.Folder, FileName), DateTime.Now.Ticks.ToString());
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			}
 		}
 
 		#endregion

@@ -1185,100 +1185,108 @@ namespace Waher.IoTGateway
 			Log.Informational("Server shutting down.");
 
 			stopped = true;
-
-			scheduler?.Dispose();
-			scheduler = null;
-
-			gatewayRunning?.Release();
-			gatewayRunning?.Dispose();
-			gatewayRunning = null;
-
-			ibbClient?.Dispose();
-			ibbClient = null;
-
-			httpxProxy?.Dispose();
-			httpxProxy = null;
-
-			httpxServer?.Dispose();
-			httpxServer = null;
-
-			provisioningClient?.Dispose();
-			provisioningClient = null;
-
-			thingRegistryClient?.Dispose();
-			thingRegistryClient = null;
-
-			concentratorServer?.Dispose();
-			concentratorServer = null;
-
-			avatarClient?.Dispose();
-			avatarClient = null;
-
-			synchronizationClient?.Dispose();
-			synchronizationClient = null;
-
-			pepClient?.Dispose();
-			pepClient = null;
-
-			mailClient?.Dispose();
-			mailClient = null;
-
-			if (xmppClient != null)
+			try
 			{
-				using (ManualResetEvent OfflineSent = new ManualResetEvent(false))
+				Types.StopAllModules();
+
+				scheduler?.Dispose();
+				scheduler = null;
+
+				gatewayRunning?.Release();
+				gatewayRunning?.Dispose();
+				gatewayRunning = null;
+
+				ibbClient?.Dispose();
+				ibbClient = null;
+
+				httpxProxy?.Dispose();
+				httpxProxy = null;
+
+				httpxServer?.Dispose();
+				httpxServer = null;
+
+				provisioningClient?.Dispose();
+				provisioningClient = null;
+
+				thingRegistryClient?.Dispose();
+				thingRegistryClient = null;
+
+				concentratorServer?.Dispose();
+				concentratorServer = null;
+
+				avatarClient?.Dispose();
+				avatarClient = null;
+
+				synchronizationClient?.Dispose();
+				synchronizationClient = null;
+
+				pepClient?.Dispose();
+				pepClient = null;
+
+				mailClient?.Dispose();
+				mailClient = null;
+
+				if (xmppClient != null)
 				{
-					xmppClient.SetPresence(Availability.Offline, (sender, e) => OfflineSent.Set());
-					OfflineSent.WaitOne(1000);
+					using (ManualResetEvent OfflineSent = new ManualResetEvent(false))
+					{
+						xmppClient.SetPresence(Availability.Offline, (sender, e) => OfflineSent.Set());
+						OfflineSent.WaitOne(1000);
+					}
+
+					foreach (ISniffer Sniffer in xmppClient.Sniffers)
+					{
+						XmppClient.Remove(Sniffer);
+
+						Disposable = Sniffer as IDisposable;
+						if (Disposable != null)
+							Disposable.Dispose();
+					}
+
+					xmppClient.Dispose();
+					xmppClient = null;
 				}
 
-				foreach (ISniffer Sniffer in xmppClient.Sniffers)
-				{
-					XmppClient.Remove(Sniffer);
+				coapEndpoint?.Dispose();
+				coapEndpoint = null;
 
-					Disposable = Sniffer as IDisposable;
-					if (Disposable != null)
-						Disposable.Dispose();
+				if (webServer != null)
+				{
+					foreach (ISniffer Sniffer in webServer.Sniffers)
+					{
+						webServer.Remove(Sniffer);
+
+						Disposable = Sniffer as IDisposable;
+						if (Disposable != null)
+							Disposable.Dispose();
+					}
+
+					webServer.Dispose();
+					webServer = null;
 				}
 
-				xmppClient.Dispose();
-				xmppClient = null;
+				clientEvents = null;
+				login = null;
+				logout = null;
+
+				if (exportExceptions)
+				{
+					exportExceptions = false;
+
+					lock (exceptionFile)
+					{
+						exceptionFile.WriteLine(new string('-', 80));
+						exceptionFile.Write("End of export: ");
+						exceptionFile.WriteLine(DateTime.Now.ToString());
+
+						exceptionFile.Flush();
+						exceptionFile.Close();
+					}
+				}
 			}
-
-			coapEndpoint?.Dispose();
-			coapEndpoint = null;
-
-			if (webServer != null)
+			finally
 			{
-				foreach (ISniffer Sniffer in webServer.Sniffers)
-				{
-					webServer.Remove(Sniffer);
-
-					Disposable = Sniffer as IDisposable;
-					if (Disposable != null)
-						Disposable.Dispose();
-				}
-
-				webServer.Dispose();
-				webServer = null;
-			}
-
-			clientEvents = null;
-			login = null;
-			logout = null;
-
-			if (exportExceptions)
-			{
-				exportExceptions = false;
-
-				lock (exceptionFile)
-				{
-					exceptionFile.WriteLine(new string('-', 80));
-					exceptionFile.Write("End of export: ");
-					exceptionFile.WriteLine(DateTime.Now.ToString());
-
-					exceptionFile.Flush();
-					exceptionFile.Close();
-				}
+				Persistence.LifeCycle.DatabaseModule.Flush();
 			}
 		}
 

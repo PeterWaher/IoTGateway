@@ -819,6 +819,30 @@ namespace Waher.Persistence.MongoDB
 			return Task.CompletedTask;
 		}
 
+		/// <summary>
+		/// Called when processing starts.
+		/// </summary>
+		public Task Start()
+		{
+			return Task.CompletedTask;
+		}
+
+		/// <summary>
+		/// Called when processing ends.
+		/// </summary>
+		public Task Stop()
+		{
+			return Task.CompletedTask;
+		}
+
+		/// <summary>
+		/// Persists any pending changes.
+		/// </summary>
+		public Task Flush()
+		{
+			return Task.CompletedTask;
+		}
+
 		// TODO:
 		//	* Created field
 		//	* Updated field

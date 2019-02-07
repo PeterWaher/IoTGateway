@@ -296,6 +296,14 @@ namespace Waher.Runtime.Inventory
 
 		private static void OnProcessExit(object Sender, EventArgs e)
 		{
+			StopAllModules();
+		}
+
+		/// <summary>
+		/// Stops all modules.
+		/// </summary>
+		public static void StopAllModules()
+		{
 			if (isInitialized)
 			{
 				IModule[] Modules = Types.Modules;
@@ -313,6 +321,8 @@ namespace Waher.Runtime.Inventory
 							Log.Critical(ex);
 						}
 					}
+
+					modules = new IModule[0];
 				}
 			}
 		}
@@ -342,42 +352,47 @@ namespace Waher.Runtime.Inventory
 		/// started within the time period defined by <paramref name="Timeout"/>.</returns>
 		public static bool StartAllModules(int Timeout)
 		{
-			List<WaitHandle> Handles = new List<WaitHandle>();
-			List<IModule> Modules = new List<IModule>();
-			IModule Module;
-			WaitHandle Handle;
-			TypeInfo TI;
-
-			foreach (Type T in GetTypesImplementingInterface(typeof(IModule)))
+			if (modules is null || modules.Length == 0)
 			{
-				TI = T.GetTypeInfo();
-				if (TI.IsAbstract || TI.IsGenericTypeDefinition)
-					continue;
+				List<WaitHandle> Handles = new List<WaitHandle>();
+				List<IModule> Modules = new List<IModule>();
+				IModule Module;
+				WaitHandle Handle;
+				TypeInfo TI;
 
-				try
+				foreach (Type T in GetTypesImplementingInterface(typeof(IModule)))
 				{
-					Log.Informational("Starting module.", T.FullName);
+					TI = T.GetTypeInfo();
+					if (TI.IsAbstract || TI.IsGenericTypeDefinition)
+						continue;
 
-					Module = (IModule)Activator.CreateInstance(T);
-					Handle = Module.Start();
-					if (Handle != null)
-						Handles.Add(Handle);
+					try
+					{
+						Log.Informational("Starting module.", T.FullName);
 
-					Modules.Add(Module);
+						Module = (IModule)Activator.CreateInstance(T);
+						Handle = Module.Start();
+						if (Handle != null)
+							Handles.Add(Handle);
+
+						Modules.Add(Module);
+					}
+					catch (Exception ex)
+					{
+						Log.Error("Unable to start module: " + ex.Message, T.FullName);
+					}
 				}
-				catch (Exception ex)
-				{
-					Log.Error("Unable to start module: " + ex.Message, T.FullName);
-				}
+
+				startWaitHandles = Handles.ToArray();
+				modules = Modules.ToArray();
+
+				if (startWaitHandles.Length == 0)
+					return true;
+
+				return WaitHandle.WaitAll(startWaitHandles, Timeout);
 			}
-
-			startWaitHandles = Handles.ToArray();
-			modules = Modules.ToArray();
-
-			if (startWaitHandles.Length == 0)
+			else
 				return true;
-
-			return WaitHandle.WaitAll(startWaitHandles, Timeout);
 		}
 
 		/// <summary>

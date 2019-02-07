@@ -1327,6 +1327,17 @@ The following functions are available in the `Waher.Content.Xsl` library.
 
 [TransformExample]: Calculator.md?Expression=Transform(LoadFile(%22Data.xml%22),LoadFile(%22Transform.xslt%22))
 
+#### Web Extensions (Waher.Networking.HTTP)
+
+Script can be embeded in transformable web content, such as [Markdown documents](/Markdown.md#script). The following predefined variables 
+can be used from embedded script in such files:
+
+| Variable               | Description                                              |
+|:----------------------:|----------------------------------------------------------|
+| `Request`              | The current HttpRequest object.                          |
+| `Response`             | The current HttpResponse object.                         |
+| `Posted`               | Any decoded data posted to the resource.                 |
+
 =========================================================================================================================================================
 
 Custom Parsers

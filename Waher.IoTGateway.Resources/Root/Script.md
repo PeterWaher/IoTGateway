@@ -1327,10 +1327,72 @@ The following functions are available in the `Waher.Content.Xsl` library.
 
 [TransformExample]: Calculator.md?Expression=Transform(LoadFile(%22Data.xml%22),LoadFile(%22Transform.xslt%22))
 
-#### Web Extensions (Waher.Networking.HTTP)
+#### Web Extensions (Waher.Networking.HTTP\[.UWP\])
 
-Script can be embeded in transformable web content, such as [Markdown documents](/Markdown.md#script). The following predefined variables 
-can be used from embedded script in such files:
+Script can be embeded in transformable web content, such as [Markdown documents](/Markdown.md#script). The following functions are 
+available in the `Waher.Networking.HTTP` and `Waher.Networking.HTTP.UWP` libraries.
+
+| Function                          | Description | Example |
+|-----------------------------------|-------------|---------|
+| `HttpError(Code,Message,Content)` | Returns an HTTP Error to the client y throwing an `HttpException` exception. | `HttpError(400,"Bad Request","Missing parameters.")` |
+
+In the following subsections, specialized HTTP Error functions are listed.
+
+##### Redirections
+
+The following functions return HTTP redirection responses back to he client:
+
+| Function                    | Code | Description |
+|-----------------------------|-----:|-------------|
+| Found(Location)             |  302 | Returns the Found redirection back to the client.              |
+| MovedPermanently(Location)  |  301 | Returns the Moved Permanently redirection back to the client.  |
+| NotModified(Content)        |  304 | Returns the Not Modified message back to the client.           |
+| SeeOther(Location)          |  303 | Returns the See Other redirection back to the client.          |
+| TemporaryRedirect(Location) |  307 | Returns the Temporary Redirect redirection back to the client. |
+| UseProxy(Location)          |  305 | Returns the Use Proxy redirection back to the client.          |
+
+##### Client Errors
+
+The following functions return HTTP client error responses back to he client:
+
+| Function                            | Code | Description |
+|-------------------------------------|-----:|-------------|
+| BadRequest(Content)                 |  400 | Returns the Bad Request client error message back to the client.                   |
+| Conflict(Content)				      |  409 | Returns the Conflict client error message back to the client.                      |
+| FailedDependency(Content)		      |  424 | Returns the Failed Dependency client error message back to the client.             |
+| Forbidden(Content)                  |  403 | Returns the Forbidden client error message back to the client.                     |
+| Gone(Content)					      |  410 | Returns the Gone client error message back to the client.                          |
+| Locked(Content)				      |  423 | Returns the Locked client error message back to the client.                        |
+| MisdirectedRequest(Content)	      |  421 | Returns the Misdirected Request client error message back to the client.           |
+| NotAcceptable(Content)			  |  406 | Returns the Not Acceptable client error message back to the client.                |
+| NotFound(Content)				      |  404 | Returns the Not Found client error message back to the client.                     |
+| PreconditionFailed(Content)	      |  411 | Returns the Precondition Failed client error message back to the client.           |
+| PreconditionRequired(Content)	      |  428 | Returns the Precondition Required client error message back to the client.         |
+| RangeNotSatisfiable(Content)	      |  416 | Returns the Range Not Satisfiable client error message back to the client.         |
+| RequestTimeout(Content)		      |  408 | Returns the Request Timeout client error message back to the client.               |
+| TooManyRequests(Content)		      |  429 | Returns the Too Many Requests client error message back to the client.             |
+| UnavailableForLegalReasons(Content) |  451 | Returns the Unavailable For Legal Reasons client error message back to the client. |
+| UnprocessableEntity(Content)	      |  422 | Returns the Unprocessable Entity client error message back to the client.          |
+| UnsupportedMediaType(Content)       |  415 | Returns the Unsupported Media Type client error message back to the client.        |
+
+##### Server Errors
+
+The following functions return HTTP server error responses back to he client:
+
+| Function                               | Code | Description |
+|----------------------------------------|-----:|-------------|
+| BadGateway(Content)                    |  502 | Returns the Bad Gateway server error message back to the client.                   |
+| GatewayTimeout(Content)                |  504 | Returns the Gateway Timeout server error message back to the client.                   |
+| InsufficientStorage(Content)           |  507 | Returns the Insufficient Storage server error message back to the client.                   |
+| InternalServerError(Content)           |  500 | Returns the Internal Server Error server error message back to the client.                   |
+| LoopDetected(Content)                  |  508 | Returns the Loop Detected server error message back to the client.                   |
+| NetworkAuthenticationRequired(Content) |  511 | Returns the Network Authentication Required server error message back to the client.                   |
+| NotExtended(Content)                   |  510 | Returns the Not Extended server error message back to the client.                   |
+| NotImplemented(Content)                |  501 | Returns the Not Implemented server error message back to the client.                   |
+| ServiceUnavailable(Content)            |  503 | Returns the Service Unavailable server error message back to the client.                   |
+| VariantAlsoNegotiates(Content)         |  506 | Returns the Variant Also Negotiates server error message back to the client.                   |
+
+The following predefined variables are available in such web content files:
 
 | Variable               | Description                                              |
 |:----------------------:|----------------------------------------------------------|

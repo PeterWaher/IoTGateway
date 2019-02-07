@@ -211,6 +211,40 @@
     <Compile Include="Interfaces\IHttpPutRangesMethod.cs" />
     <Compile Include="Interfaces\IHttpTraceMethod.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ScriptExtensions\Functions\ClientErrors\BadRequest.cs" />
+    <Compile Include="ScriptExtensions\Functions\ClientErrors\Conflict.cs" />
+    <Compile Include="ScriptExtensions\Functions\ClientErrors\FailedDependency.cs" />
+    <Compile Include="ScriptExtensions\Functions\ClientErrors\Forbidden.cs" />
+    <Compile Include="ScriptExtensions\Functions\ClientErrors\Gone.cs" />
+    <Compile Include="ScriptExtensions\Functions\ClientErrors\Locked.cs" />
+    <Compile Include="ScriptExtensions\Functions\ClientErrors\MisdirectedRequest.cs" />
+    <Compile Include="ScriptExtensions\Functions\ClientErrors\NotAcceptable.cs" />
+    <Compile Include="ScriptExtensions\Functions\ClientErrors\NotFound.cs" />
+    <Compile Include="ScriptExtensions\Functions\ClientErrors\PreconditionFailed.cs" />
+    <Compile Include="ScriptExtensions\Functions\ClientErrors\PreconditionRequired.cs" />
+    <Compile Include="ScriptExtensions\Functions\ClientErrors\RangeNotSatisfiable.cs" />
+    <Compile Include="ScriptExtensions\Functions\ClientErrors\RequestTimeout.cs" />
+    <Compile Include="ScriptExtensions\Functions\ClientErrors\TooManyRequests.cs" />
+    <Compile Include="ScriptExtensions\Functions\ClientErrors\UnavailableForLegalReasons.cs" />
+    <Compile Include="ScriptExtensions\Functions\ClientErrors\UnprocessableEntity.cs" />
+    <Compile Include="ScriptExtensions\Functions\ClientErrors\UnsupportedMediaType.cs" />
+    <Compile Include="ScriptExtensions\Functions\HttpError.cs" />
+    <Compile Include="ScriptExtensions\Functions\Redirections\Found.cs" />
+    <Compile Include="ScriptExtensions\Functions\Redirections\MovedPermanently.cs" />
+    <Compile Include="ScriptExtensions\Functions\Redirections\NotModified.cs" />
+    <Compile Include="ScriptExtensions\Functions\Redirections\SeeOther.cs" />
+    <Compile Include="ScriptExtensions\Functions\Redirections\TemporaryRedirect.cs" />
+    <Compile Include="ScriptExtensions\Functions\Redirections\UseProxy.cs" />
+    <Compile Include="ScriptExtensions\Functions\ServerErrors\BadGateway.cs" />
+    <Compile Include="ScriptExtensions\Functions\ServerErrors\GatewayTimeout.cs" />
+    <Compile Include="ScriptExtensions\Functions\ServerErrors\InsufficientStorage.cs" />
+    <Compile Include="ScriptExtensions\Functions\ServerErrors\InternalServerError.cs" />
+    <Compile Include="ScriptExtensions\Functions\ServerErrors\LoopDetected.cs" />
+    <Compile Include="ScriptExtensions\Functions\ServerErrors\NetworkAuthenticationRequired.cs" />
+    <Compile Include="ScriptExtensions\Functions\ServerErrors\NotExtended.cs" />
+    <Compile Include="ScriptExtensions\Functions\ServerErrors\NotImplemented.cs" />
+    <Compile Include="ScriptExtensions\Functions\ServerErrors\ServiceUnavailable.cs" />
+    <Compile Include="ScriptExtensions\Functions\ServerErrors\VariantAlsoNegotiates.cs" />
     <Compile Include="ScriptExtensions\Posted.cs" />
     <Compile Include="TransferEncoding.cs" />
     <Compile Include="TransferEncodings\ChunkedTransferEncoding.cs" />
@@ -272,6 +306,10 @@ xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\Exceptions\ServerErrors\*.
 xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\HeaderFields\*.cs" "$(ProjectDir)HeaderFields" /Y
 xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\Interfaces\*.cs" "$(ProjectDir)Interfaces" /Y
 xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\ScriptExtensions\*.cs" "$(ProjectDir)ScriptExtensions" /Y
+xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\ScriptExtensions\Functions\*.cs" "$(ProjectDir)ScriptExtensions\Functions" /Y
+xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\ScriptExtensions\Functions\ClientErrors\*.cs" "$(ProjectDir)ScriptExtensions\Functions\ClientErrors" /Y
+xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\ScriptExtensions\Functions\Redirections\*.cs" "$(ProjectDir)ScriptExtensions\Functions\Redirections" /Y
+xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\ScriptExtensions\Functions\ServerErrors\*.cs" "$(ProjectDir)ScriptExtensions\Functions\ServerErrors" /Y
 xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\TransferEncodings\*.cs" "$(ProjectDir)TransferEncodings" /Y
 xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\WebSockets\*.cs" "$(ProjectDir)WebSockets" /Y
 </PreBuildEvent>

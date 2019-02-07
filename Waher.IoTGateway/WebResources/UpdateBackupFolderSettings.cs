@@ -6,15 +6,22 @@ using Waher.Networking.HTTP;
 
 namespace Waher.IoTGateway.WebResources
 {
+	/// <summary>
+	/// Web Resource for updating where backup files are storeed.
+	/// </summary>
 	public class UpdateBackupFolderSettings : HttpSynchronousResource, IHttpPostMethod
 	{
-		public const int MaxAvatarSize = 64;
-
+		/// <summary>
+		/// Web Resource for updating where backup files are storeed.
+		/// </summary>
 		public UpdateBackupFolderSettings()
 			: base("/UpdateBackupFolderSettings")
 		{
 		}
 
+		/// <summary>
+		/// If the resource handles sub-paths.
+		/// </summary>
 		public override bool HandlesSubPaths
 		{
 			get
@@ -23,6 +30,9 @@ namespace Waher.IoTGateway.WebResources
 			}
 		}
 
+		/// <summary>
+		/// If the resource uses user sessions.
+		/// </summary>
 		public override bool UserSessions
 		{
 			get
@@ -31,8 +41,17 @@ namespace Waher.IoTGateway.WebResources
 			}
 		}
 
+		/// <summary>
+		/// If the POST method is allowed.
+		/// </summary>
 		public bool AllowsPOST => true;
 
+		/// <summary>
+		/// Executes the POST method on the resource.
+		/// </summary>
+		/// <param name="Request">HTTP Request</param>
+		/// <param name="Response">HTTP Response</param>
+		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public void POST(HttpRequest Request, HttpResponse Response)
 		{
 			Gateway.AssertUserAuthenticated(Request);

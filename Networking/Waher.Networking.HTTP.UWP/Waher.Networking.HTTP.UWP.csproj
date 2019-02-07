@@ -211,6 +211,7 @@
     <Compile Include="Interfaces\IHttpPutRangesMethod.cs" />
     <Compile Include="Interfaces\IHttpTraceMethod.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ScriptExtensions\Posted.cs" />
     <Compile Include="TransferEncoding.cs" />
     <Compile Include="TransferEncodings\ChunkedTransferEncoding.cs" />
     <Compile Include="TransferEncodings\ContentLengthEncoding.cs" />
@@ -270,6 +271,7 @@ xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\Exceptions\Redirections\*.
 xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\Exceptions\ServerErrors\*.cs" "$(ProjectDir)Exceptions\ServerErrors" /Y
 xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\HeaderFields\*.cs" "$(ProjectDir)HeaderFields" /Y
 xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\Interfaces\*.cs" "$(ProjectDir)Interfaces" /Y
+xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\ScriptExtensions\*.cs" "$(ProjectDir)ScriptExtensions" /Y
 xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\TransferEncodings\*.cs" "$(ProjectDir)TransferEncodings" /Y
 xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\WebSockets\*.cs" "$(ProjectDir)WebSockets" /Y
 </PreBuildEvent>

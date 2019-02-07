@@ -6,8 +6,7 @@ using System.Threading.Tasks;
 using System.Net;
 using Waher.Content;
 using Waher.Networking.HTTP.HeaderFields;
-using Waher.Runtime.Inventory;
-using Waher.Security;
+using Waher.Script;
 
 namespace Waher.Networking.HTTP
 {
@@ -15,7 +14,8 @@ namespace Waher.Networking.HTTP
 	/// Publishes a folder with all its files and subfolders through HTTP GET, with optional support for PUT and DELETE.
 	/// If PUT and DELETE are allowed, users (if authenticated) can update the contents of the folder.
 	/// </summary>
-	public class HttpFolderResource : HttpAsynchronousResource, IHttpGetMethod, IHttpGetRangesMethod, IHttpPutMethod, IHttpPutRangesMethod, IHttpDeleteMethod
+	public class HttpFolderResource : HttpAsynchronousResource, IHttpGetMethod, IHttpGetRangesMethod, 
+		IHttpPutMethod, IHttpPutRangesMethod, IHttpDeleteMethod, IHttpPostMethod
 	{
 		private const int BufferSize = 32768;
 
@@ -94,6 +94,11 @@ namespace Waher.Networking.HTTP
 		/// If the DELETE method is allowed.
 		/// </summary>
 		public bool AllowsDELETE => this.allowDelete;
+
+		/// <summary>
+		/// If the POST method is allowed.
+		/// </summary>
+		public bool AllowsPOST => this.userSessions;
 
 		/// <summary>
 		/// Any authentication schemes used to authenticate users before access is granted to the corresponding resource.
@@ -861,5 +866,28 @@ namespace Waher.Networking.HTTP
 			}
 		}
 
+		/// <summary>
+		/// Executes the POST method on the resource.
+		/// </summary>
+		/// <param name="Request">HTTP Request</param>
+		/// <param name="Response">HTTP Response</param>
+		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
+		public void POST(HttpRequest Request, HttpResponse Response)
+		{
+			Variables Session = Request.Session;
+			if (Session is null)
+				throw new MethodNotAllowedException(this.AllowedMethods);
+
+			string Referer = Request.Header.Referer?.Value;
+
+			Session[" LastPost "] = Request.DecodeData();
+			Session[" LastPostResource "] = Request.SubPath;
+			Session[" LastPostReferer "] = Referer;
+
+			if (!string.IsNullOrEmpty(Referer))
+				throw new SeeOtherException(Referer);  // PRG pattern.
+
+			Response.SendResponse();
+		}
 	}
 }

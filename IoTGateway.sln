@@ -358,7 +358,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Content.Dsn", "Conten
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Content.Markdown.Test", "Content\Waher.Content.Markdown.Test\Waher.Content.Markdown.Test.csproj", "{3EBAA65C-D483-443D-8D1B-9C9B7AF7CF8F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Utility.RegEx", "Utilities\Waher.Utility.RegEx\Waher.Utility.RegEx.csproj", "{0E7ED836-C42C-44C6-8568-146EE4B3C900}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Utility.RegEx", "Utilities\Waher.Utility.RegEx\Waher.Utility.RegEx.csproj", "{0E7ED836-C42C-44C6-8568-146EE4B3C900}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -2508,29 +2508,29 @@ namespace Waher.IoTGateway
 				return await Translator.GetLanguageAsync(LanguageCode);
 			}
 
-			if (Request.Header.AcceptLanguage is null)
+			if (!(Request.Header.AcceptLanguage is null))
 			{
-				Language Result = await Translator.GetDefaultLanguageAsync();
+				List<string> Alternatives = new List<string>();
 
-				if (!(Session is null) && !string.IsNullOrEmpty(LanguageVariableName))
-					Session[LanguageVariableName] = Result.Code;
+				foreach (Language Language in await Translator.GetLanguagesAsync())
+					Alternatives.Add(Language.Code);
 
-				return Result;
+				string Best = Request.Header.AcceptLanguage.GetBestAlternative(Alternatives.ToArray());
+				if (!string.IsNullOrEmpty(Best))
+				{
+					if (!(Session is null) && !string.IsNullOrEmpty(LanguageVariableName))
+						Session[LanguageVariableName] = Best;
+
+					return await Translator.GetLanguageAsync(Best);
+				}
 			}
 
-			List<string> Alternatives = new List<string>();
-
-			foreach (Language Language in await Translator.GetLanguagesAsync())
-				Alternatives.Add(Language.Code);
-
-			string Best = Request.Header.AcceptLanguage.GetBestAlternative(Alternatives.ToArray());
-			if (string.IsNullOrEmpty(Best))
-				throw new NotAcceptableException();
+			Language Result = await Translator.GetDefaultLanguageAsync();
 
 			if (!(Session is null) && !string.IsNullOrEmpty(LanguageVariableName))
-				Session[LanguageVariableName] = Best;
+				Session[LanguageVariableName] = Result.Code;
 
-			return await Translator.GetLanguageAsync(Best);
+			return Result;
 		}
 
 		#endregion

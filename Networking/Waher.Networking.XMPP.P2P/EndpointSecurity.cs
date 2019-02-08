@@ -568,7 +568,7 @@ namespace Waher.Networking.XMPP.P2P
 			int i;
 			Type T = RemoteEndpoint.GetType();
 
-			for (i=0;i<c;i++)
+			for (i = 0; i < c; i++)
 			{
 				if (Endpoints[i].GetType() == T)
 					return Endpoints[i];
@@ -1265,18 +1265,17 @@ namespace Waher.Networking.XMPP.P2P
 					{
 						if (N is XmlElement E)
 						{
-							if (E.NamespaceURI == IoTHarmonizationE2E)
+							switch (E.LocalName)
 							{
-								switch (E.LocalName)
-								{
-									case "e2e":
+								case "e2e":
+									if (E.NamespaceURI == IoTHarmonizationE2E)
 										E2E = E;
-										break;
+									break;
 
-									case "p2p":
+								case "p2p":
+									if (E.NamespaceURI == IoTHarmonizationP2P)
 										P2P = E;
-										break;
-								}
+									break;
 							}
 						}
 					}

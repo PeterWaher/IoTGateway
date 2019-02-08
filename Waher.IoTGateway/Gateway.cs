@@ -260,89 +260,156 @@ namespace Waher.IoTGateway
 				XSL.Validate("Gateway.config", Config, "GatewayConfiguration", "http://waher.se/Schema/GatewayConfiguration.xsd",
 					XSL.LoadSchema(typeof(Gateway).Namespace + ".Schema.GatewayConfiguration.xsd", typeof(Gateway).Assembly));
 
-				applicationName = Config.DocumentElement["ApplicationName"].InnerText;
-				defaultPage = Config.DocumentElement["DefaultPage"].InnerText;
-
-				XmlElement ExportExceptions = Config.DocumentElement["ExportExceptions"];
-				if (ExportExceptions != null)
+				foreach (XmlNode N in Config.DocumentElement.ChildNodes)
 				{
-					exceptionFolder = Path.Combine(appDataFolder, XML.Attribute(ExportExceptions, "folder", "Exceptions"));
-
-					if (!Directory.Exists(exceptionFolder))
-						Directory.CreateDirectory(exceptionFolder);
-
-					DateTime Now = DateTime.Now;
-
-					exceptionFileName = Path.Combine(exceptionFolder, Now.Year.ToString("D4") + "-" + Now.Month.ToString("D2") + "-" + Now.Day.ToString("D2") +
-						" " + Now.Hour.ToString("D2") + "." + Now.Minute.ToString("D2") + "." + Now.Second.ToString("D2") + ".txt");
-					exceptionFile = File.CreateText(exceptionFileName);
-					exportExceptions = true;
-
-					exceptionFile.Write("Start of export: ");
-					exceptionFile.WriteLine(DateTime.Now.ToString());
-
-					AppDomain.CurrentDomain.FirstChanceException += (sender, e) =>
+					if (N is XmlElement E)
 					{
-						if (!exportExceptions || e.Exception.StackTrace.Contains("FirstChanceExceptionEventArgs"))
-							return;
-
-						lock (exceptionFile)
+						switch (E.LocalName)
 						{
-							exceptionFile.WriteLine(new string('-', 80));
-							exceptionFile.Write("Type: ");
+							case "ApplicationName":
+								applicationName = E.InnerText;
+								break;
 
-							if (e.Exception != null)
-								exceptionFile.WriteLine(e.Exception.GetType().FullName);
-							else
-								exceptionFile.WriteLine("null");
+							case "DefaultPage":
+								defaultPage = E.InnerText;
+								break;
 
-							exceptionFile.Write("Time: ");
-							exceptionFile.WriteLine(DateTime.Now.ToString());
+							case "ExportExceptions":
+								exceptionFolder = Path.Combine(appDataFolder, XML.Attribute(E, "folder", "Exceptions"));
 
-							if (e.Exception != null)
-							{
-								LinkedList<Exception> Exceptions = new LinkedList<Exception>();
-								Exceptions.AddLast(e.Exception);
+								if (!Directory.Exists(exceptionFolder))
+									Directory.CreateDirectory(exceptionFolder);
 
-								while (Exceptions.First != null)
+								DateTime Now = DateTime.Now;
+
+								exceptionFileName = Path.Combine(exceptionFolder, Now.Year.ToString("D4") + "-" + Now.Month.ToString("D2") + "-" + Now.Day.ToString("D2") +
+									" " + Now.Hour.ToString("D2") + "." + Now.Minute.ToString("D2") + "." + Now.Second.ToString("D2") + ".txt");
+								exceptionFile = File.CreateText(exceptionFileName);
+								exportExceptions = true;
+
+								exceptionFile.Write("Start of export: ");
+								exceptionFile.WriteLine(DateTime.Now.ToString());
+
+								AppDomain.CurrentDomain.FirstChanceException += (sender, e) =>
 								{
-									Exception ex = Exceptions.First.Value;
-									Exceptions.RemoveFirst();
+									if (!exportExceptions || e.Exception.StackTrace.Contains("FirstChanceExceptionEventArgs"))
+										return;
 
-									exceptionFile.WriteLine();
-
-									exceptionFile.WriteLine(ex.Message);
-									exceptionFile.WriteLine();
-									exceptionFile.WriteLine(ex.StackTrace);
-									exceptionFile.WriteLine();
-
-									if (ex is AggregateException ex2)
+									lock (exceptionFile)
 									{
-										foreach (Exception ex3 in ex2.InnerExceptions)
-											Exceptions.AddLast(ex3);
-									}
-									else if (ex.InnerException != null)
-										Exceptions.AddLast(ex.InnerException);
-								}
-							}
+										exceptionFile.WriteLine(new string('-', 80));
+										exceptionFile.Write("Type: ");
 
-							exceptionFile.Flush();
+										if (e.Exception != null)
+											exceptionFile.WriteLine(e.Exception.GetType().FullName);
+										else
+											exceptionFile.WriteLine("null");
+
+										exceptionFile.Write("Time: ");
+										exceptionFile.WriteLine(DateTime.Now.ToString());
+
+										if (e.Exception != null)
+										{
+											LinkedList<Exception> Exceptions = new LinkedList<Exception>();
+											Exceptions.AddLast(e.Exception);
+
+											while (Exceptions.First != null)
+											{
+												Exception ex = Exceptions.First.Value;
+												Exceptions.RemoveFirst();
+
+												exceptionFile.WriteLine();
+
+												exceptionFile.WriteLine(ex.Message);
+												exceptionFile.WriteLine();
+												exceptionFile.WriteLine(ex.StackTrace);
+												exceptionFile.WriteLine();
+
+												if (ex is AggregateException ex2)
+												{
+													foreach (Exception ex3 in ex2.InnerExceptions)
+														Exceptions.AddLast(ex3);
+												}
+												else if (ex.InnerException != null)
+													Exceptions.AddLast(ex.InnerException);
+											}
+										}
+
+										exceptionFile.Flush();
+									}
+								};
+								break;
+
+							case "Database":
+								IDatabaseProvider DatabaseProvider;
+
+								if (GetDatabaseProvider != null)
+									DatabaseProvider = await GetDatabaseProvider(E);
+								else
+									DatabaseProvider = null;
+
+								if (DatabaseProvider is null)
+									throw new Exception("Database provider not defined. Make sure the GetDatabaseProvider event has an appropriate event handler.");
+
+								Database.Register(DatabaseProvider);
+								break;
+
+							case "MongoDB":
+								string Host = null;
+								int? Port = null;
+								string DatabaseName = null;
+								string DefaultCollectionName = null;
+
+								foreach (XmlAttribute Attr in E.Attributes)
+								{
+									switch (Attr.Name)
+									{
+										case "host":
+											Host = Attr.Value;
+											break;
+
+										case "port":
+											if (int.TryParse(Attr.Value, out int i))
+												Port = i;
+											break;
+
+										case "databaseName":
+											DatabaseName = Attr.Value;
+											break;
+
+										case "defaultCollectionName":
+											DefaultCollectionName = Attr.Value;
+											break;
+									}
+								}
+
+								if (!string.IsNullOrEmpty(Host))
+								{
+									if (Port.HasValue)
+										Database.Register(new Persistence.MongoDB.MongoDBProvider(Host, Port.Value, DatabaseName, DefaultCollectionName));
+									else
+										Database.Register(new Persistence.MongoDB.MongoDBProvider(Host, DatabaseName, DefaultCollectionName));
+								}
+								else
+									Database.Register(new Persistence.MongoDB.MongoDBProvider(DatabaseName, DefaultCollectionName));
+								break;
+
+							case "Ports":
+								foreach (XmlNode N2 in E.ChildNodes)
+								{
+									if (N2.LocalName == "Port")
+									{
+										XmlElement E2 = (XmlElement)N2;
+										string Protocol = XML.Attribute(E2, "protocol");
+										if (!string.IsNullOrEmpty(Protocol) && int.TryParse(E2.InnerText, out int Port2))
+											ports.AddLast(new KeyValuePair<string, int>(Protocol, Port2));
+									}
+								}
+								break;
 						}
-					};
+					}
 				}
 
-				XmlElement DatabaseConfig = Config.DocumentElement["Database"];
-				IDatabaseProvider DatabaseProvider;
-
-				if (GetDatabaseProvider != null)
-					DatabaseProvider = await GetDatabaseProvider(DatabaseConfig);
-				else
-					DatabaseProvider = null;
-
-				if (DatabaseProvider is null)
-					throw new Exception("Database provider not defined. Make sure the GetDatabaseProvider event has an appropriate event handler.");
-
-				Database.Register(DatabaseProvider);
 
 				PersistedEventLog PersistedEventLog = new PersistedEventLog(7, new TimeSpan(4, 15, 0));
 				Log.Register(PersistedEventLog);
@@ -534,17 +601,6 @@ namespace Waher.IoTGateway
 				while (ReloadConfigurations);
 
 				configuring = false;
-
-				foreach (XmlNode N in Config.DocumentElement["Ports"].ChildNodes)
-				{
-					if (N.LocalName == "Port")
-					{
-						XmlElement E = (XmlElement)N;
-						string Protocol = XML.Attribute(E, "protocol");
-						if (!string.IsNullOrEmpty(Protocol) && int.TryParse(E.InnerText, out int Port))
-							ports.AddLast(new KeyValuePair<string, int>(Protocol, Port));
-					}
-				}
 
 				if (webServer != null)
 				{

@@ -308,6 +308,8 @@ namespace Waher.Utility.Install
 			if (!File.Exists(From))
 				throw new Exception("File not found: " + From);
 
+			bool Copy1 = true;
+
 			if (OnlyIfNewer && File.Exists(To))
 			{
 				DateTime ToTP = File.GetLastWriteTimeUtc(To);
@@ -320,17 +322,41 @@ namespace Waher.Utility.Install
 						new KeyValuePair<string, object>("ToTP", ToTP),
 						new KeyValuePair<string, object>("From", From),
 						new KeyValuePair<string, object>("To", To));
-					return false;
+					Copy1 = false;
 				}
 			}
 
-			Log.Informational("Copying " + From + " to " + To);
-			File.Copy(From, To, true);
+			if (Copy1)
+			{
+				Log.Informational("Copying " + From + " to " + To);
+				File.Copy(From, To, true);
+			}
 
 			if (!string.IsNullOrEmpty(To2))
 			{
-				Log.Informational("Copying " + From + " to " + To2);
-				File.Copy(From, To2, true);
+				bool Copy2 = true;
+
+				if (OnlyIfNewer && File.Exists(To2))
+				{
+					DateTime ToTP = File.GetLastWriteTimeUtc(To2);
+					DateTime FromTP = File.GetLastWriteTimeUtc(From);
+
+					if (ToTP >= FromTP)
+					{
+						Log.Warning("Skipping file. Destination folder contains newer version: " + From,
+							new KeyValuePair<string, object>("FromTP", FromTP),
+							new KeyValuePair<string, object>("ToTP", ToTP),
+							new KeyValuePair<string, object>("From", From),
+							new KeyValuePair<string, object>("To", To2));
+						Copy2 = false;
+					}
+				}
+
+				if (Copy2)
+				{
+					Log.Informational("Copying " + From + " to " + To2);
+					File.Copy(From, To2, true);
+				}
 			}
 
 			return true;
@@ -363,7 +389,7 @@ namespace Waher.Utility.Install
 							}
 
 							CopyFileIfNewer(
-								Path.Combine(SourceFolder, FileName), 
+								Path.Combine(SourceFolder, FileName),
 								Path.Combine(DataFolder, FileName),
 								Path.Combine(AppFolder, FileName),
 								CopyOptions == CopyOptions.IfNewer);

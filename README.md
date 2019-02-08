@@ -233,7 +233,7 @@ their annotated class definitions.
 | **Waher.Persistence**              | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Persistence/)         | The [Waher.Persistence](Persistence/Waher.Persistence) project provides the central interfaces for interaction with object databases. All modules can use the static **Database** class to persist and find objects in the preconfigured object database. |
 | **Waher.Persistence.Files**        | .NET Std 1.5 | [NuGet](https://www.nuget.org/packages/Waher.Persistence.Files/)   | The [Waher.Persistence.Files](Persistence/Waher.Persistence.Files) project defines a library that provides an object database that stores objects in local AES-256 encrypted files. Storage, indices, searching and retrieval is based solely on meta-data provided through the corresponding class definitions. Object serializers are created dynamically. Dynamic code is compiled. Access is provided through the [Waher.Persistence](Persistence/Waher.Persistence) library. |
 | **Waher.Persistence.FilesLW**      | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Persistence.FilesLW/) | The [Waher.Persistence.FilesLW](Persistence/Waher.Persistence.FilesLW) project defines a library that provides an object database that stores objects in local files. Storage, indices, searching and retrieval is based solely on meta-data provided through the corresponding class definitions. Object serializers are created dynamically. Access is provided through the [Waher.Persistence](Persistence/Waher.Persistence) library. |
-| **Waher.Persistence.MongoDB**      | .NET 4.6.2   |                                                                    | The [Waher.Persistence.MongoDB](Persistence/Waher.Persistence.MongoDB) project provides a [MongoDB](https://www.mongodb.org/) database provider that can be used for object persistence through the **Waher.Persistence** library. |
+| **Waher.Persistence.MongoDB**      | .NET Std 1.5 |                                                                    | The [Waher.Persistence.MongoDB](Persistence/Waher.Persistence.MongoDB) project provides a [MongoDB](https://www.mongodb.org/) database provider that can be used for object persistence through the **Waher.Persistence** library. |
 
 The folder also contains the following unit test projects:
 
@@ -241,7 +241,7 @@ The folder also contains the following unit test projects:
 |------------------------------------|---------------|---------------------|
 | **Waher.Persistence.Files.Test**   | .NET Core 2.0 | The [Waher.Persistence.Files.Test](Persistence/Waher.Persistence.Files.Test) project contains unit tests for the [Waher.Persistence.Files](Persistence/Waher.Persistence.Files) project. |
 | **Waher.Persistence.FilesLW.Test** | .NET Core 2.0 | The [Waher.Persistence.FilesLW.Test](Persistence/Waher.Persistence.FilesLW.Test) project contains unit tests for the [Waher.Persistence.FilesLW](Persistence/Waher.Persistence.FilesLW) project. |
-| **Waher.Persistence.MongoDB.Test** | .NET 4.6.2    | The [Waher.Persistence.MongoDB.Test](Persistence/Waher.Persistence.MongoDB.Test) project contains unit tests for the [Waher.Persistence.MongoDB](Persistence/Waher.Persistence.MongoDB) project. |
+| **Waher.Persistence.MongoDB.Test** | .NET Core 2.0 | The [Waher.Persistence.MongoDB.Test](Persistence/Waher.Persistence.MongoDB.Test) project contains unit tests for the [Waher.Persistence.MongoDB](Persistence/Waher.Persistence.MongoDB) project. |
 
 Runtime
 ----------------------

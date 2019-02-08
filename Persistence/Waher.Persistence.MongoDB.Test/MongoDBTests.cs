@@ -1,53 +1,51 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using NUnit.Framework;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Persistence;
 using Waher.Persistence.Filters;
 using Waher.Persistence.MongoDB;
+using Waher.Runtime.Inventory;
 using Waher.Things;
 using Waher.Things.SensorData;
 
 namespace Waher.Persistence.MongoDB.Test
 {
-	[TestFixture]
+	[TestClass]
 	public class MongoDBTests
 	{
-		[TestFixtureSetUp]
-		public void TestFixtureSetUp()
+		[AssemblyInitialize]
+		public static void AssemblyInitialize(TestContext Context)
 		{
-			try
-			{
-				Database.Register(new MongoDBProvider("MongoDBTest", "Default"));
-			}
-			catch (Exception)
-			{
-				// Ignore: The register method can only be executed once.
-			}
+			Types.Initialize(typeof(MongoDBProvider).Assembly, 
+				typeof(MongoDBTests).Assembly, 
+				typeof(Types).Assembly,
+				typeof(ThingReference).Assembly);
+
+			Database.Register(new MongoDBProvider("MongoDBTest", "Default"));
 		}
 
-		[Test]
-		public void Test_01_Insert()
+		[TestMethod]
+		public async Task Test_01_Insert()
 		{
 			ThingReference Node = new ThingReference("Node1");
-			Database.Insert(Node);
+			await Database.Insert(Node);
 		}
 
-		[Test]
-		public void Test_02_InsertMany()
+		[TestMethod]
+		public async Task Test_02_InsertMany()
 		{
-			Database.Insert(new ThingReference("Node2"), new ThingReference("Node3"), new ThingReference("Node4"));
+			await Database.Insert(new ThingReference("Node2"), new ThingReference("Node3"), new ThingReference("Node4"));
 		}
 
-		[Test]
-		public void Test_03_InsertManyDifferent()
+		[TestMethod]
+		public async Task Test_03_InsertManyDifferent()
 		{
 			ThingReference Ref = new ThingReference("Node1");
 			DateTime TP = DateTime.Now;
 
-			Database.Insert(
+			await Database.Insert(
 				new QuantityField(Ref, TP, "Temperature", 12.3, 1, "°C", FieldType.Momentary, FieldQoS.AutomaticReadout, "TestModule", 1, 2, 3),
 				new BooleanField(Ref, TP, "Error", false, FieldType.Status, FieldQoS.AutomaticReadout, "TestModule", 2),
 				new DateTimeField(Ref, TP, "Last Battery Change", new DateTime(2016, 2, 13, 10, 50, 25), FieldType.Status, FieldQoS.AutomaticReadout, "TestModule", 3),
@@ -56,78 +54,63 @@ namespace Waher.Persistence.MongoDB.Test
 				new StringField(Ref, TP, "Serial Number", "1234567890", FieldType.Identity, FieldQoS.AutomaticReadout, "TestModule", 6));
 		}
 
-		[Test]
-		public void Test_04_Find()
+		[TestMethod]
+		public async Task Test_04_Find()
 		{
-			Task<IEnumerable<ThingReference>> Task = Database.Find<ThingReference>();
-			Assert.IsTrue(Task.Wait(5000));
-			IEnumerable<ThingReference> ThingReferences = Task.Result;
+			IEnumerable<ThingReference> ThingReferences = await Database.Find<ThingReference>();
 
 			foreach (ThingReference ThingReference in ThingReferences)
 				Console.Out.WriteLine(ThingReference.ToString());
 		}
 
-		[Test]
-		public void Test_05_FindFilter()
+		[TestMethod]
+		public async Task Test_05_FindFilter()
 		{
-			Task<IEnumerable<ThingReference>> Task = Database.Find<ThingReference>(new FilterFieldEqualTo("NodeId", "Node2"));
-			Assert.IsTrue(Task.Wait(5000));
-			IEnumerable<ThingReference> ThingReferences = Task.Result;
+			IEnumerable<ThingReference> ThingReferences = await Database.Find<ThingReference>(new FilterFieldEqualTo("NodeId", "Node2"));
 
 			foreach (ThingReference ThingReference in ThingReferences)
 				Console.Out.WriteLine(ThingReference.ToString());
 		}
 
-		[Test]
-		public void Test_06_FindFilterSort()
+		[TestMethod]
+		public async Task Test_06_FindFilterSort()
 		{
-			Task<IEnumerable<ThingReference>> Task = Database.Find<ThingReference>(new FilterFieldLikeRegEx("NodeId", "Node(2|3)"), "-NodeId");
-			Assert.IsTrue(Task.Wait(5000));
-			IEnumerable<ThingReference> ThingReferences = Task.Result;
+			IEnumerable<ThingReference> ThingReferences = await Database.Find<ThingReference>(new FilterFieldLikeRegEx("NodeId", "Node(2|3)"), "-NodeId");
 
 			foreach (ThingReference ThingReference in ThingReferences)
 				Console.Out.WriteLine(ThingReference.ToString());
 		}
 
-		[Test]
-		public void Test_07_FindInherited()
+		[TestMethod]
+		public async Task Test_07_FindInherited()
 		{
-			Task<IEnumerable<Field>> Task = Database.Find<Field>();
-			Assert.IsTrue(Task.Wait(5000));
-			IEnumerable<Field> Fields = Task.Result;
+			IEnumerable<Field> Fields = await Database.Find<Field>();
 
 			foreach (Field Field in Fields)
 				Console.Out.WriteLine(Field.ToString());
 		}
 
-		[Test]
-		public void Test_08_Update()
+		[TestMethod]
+		public async Task Test_08_Update()
 		{
-			Task<IEnumerable<ThingReference>> Task = Database.Find<ThingReference>();
-			Assert.IsTrue(Task.Wait(5000));
-			IEnumerable<ThingReference> ThingReferences = Task.Result;
+			IEnumerable<ThingReference> ThingReferences = await Database.Find<ThingReference>();
 
 			foreach (ThingReference ThingReference in ThingReferences)
 				ThingReference.SourceId = "Source 1";
 
-			Database.Update(ThingReferences);
+			await Database.Update(ThingReferences);
 
-			Task = Database.Find<ThingReference>();
-			Assert.IsTrue(Task.Wait(5000));
-			ThingReferences = Task.Result;
+			ThingReferences = await Database.Find<ThingReference>();
 
 			foreach (ThingReference ThingReference in ThingReferences)
 				Console.Out.WriteLine(ThingReference.ToString());
 		}
 
-		[Test]
-		public void Test_09_Delete()
+		[TestMethod]
+		public async Task Test_09_Delete()
 		{
-			Task<IEnumerable<Field>> Task = Database.Find<Field>();
-			Assert.IsTrue(Task.Wait(5000));
-			IEnumerable<Field> Fields = Task.Result;
-
-			Database.Delete(Fields);
+			IEnumerable<Field> Fields = await Database.Find<Field>();
+			await Database.Delete(Fields);
 		}
 
 	}

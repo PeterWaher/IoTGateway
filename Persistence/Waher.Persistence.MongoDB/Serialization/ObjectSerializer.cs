@@ -3,16 +3,21 @@ using System.CodeDom.Compiler;
 using System.Reflection;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
+using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.CSharp;
+using System.Runtime.Loader;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.Emit;
 using MongoDB.Bson;
 using MongoDB.Bson.IO;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using Waher.Persistence.Attributes;
 using Waher.Persistence.Filters;
+using Waher.Runtime.Inventory;
+using Waher.Runtime.Threading;
 
 namespace Waher.Persistence.MongoDB.Serialization
 {
@@ -21,17 +26,18 @@ namespace Waher.Persistence.MongoDB.Serialization
 	/// </summary>
 	public class ObjectSerializer : IBsonDocumentSerializer
 	{
-		private Dictionary<string, string> shortNamesByFieldName = new Dictionary<string, string>();
-		private Dictionary<string, object> defaultValues = new Dictionary<string, object>();
-		private Dictionary<string, Type> memberTypes = new Dictionary<string, Type>();
-		private Type type;
-		private string collectionName;
-		private string typeFieldName;
-		private IBsonSerializer customSerializer;
-		private TypeNameSerialization typeNameSerialization;
-		private MongoDBProvider provider;
-		private FieldInfo objectIdFieldInfo = null;
-		private PropertyInfo objectIdPropertyInfo = null;
+		private readonly Dictionary<string, string> shortNamesByFieldName = new Dictionary<string, string>();
+		private readonly Dictionary<string, object> defaultValues = new Dictionary<string, object>();
+		private readonly Dictionary<string, Type> memberTypes = new Dictionary<string, Type>();
+		private readonly Type type;
+		private readonly System.Reflection.TypeInfo typeInfo;
+		private readonly string collectionName;
+		private readonly string typeFieldName;
+		private readonly IBsonSerializer customSerializer;
+		private readonly TypeNameSerialization typeNameSerialization;
+		private readonly MongoDBProvider provider;
+		private readonly FieldInfo objectIdFieldInfo = null;
+		private readonly PropertyInfo objectIdPropertyInfo = null;
 
 		/// <summary>
 		/// Serializes a type to BSON, taking into account attributes defined in <see cref="Waher.Persistence.Attributes"/>.
@@ -43,15 +49,16 @@ namespace Waher.Persistence.MongoDB.Serialization
 			string TypeName = Type.Name;
 
 			this.type = Type;
+			this.typeInfo = Type.GetTypeInfo();
 			this.provider = Provider;
 
-			CollectionNameAttribute CollectionNameAttribute = Type.GetCustomAttribute<CollectionNameAttribute>(true);
+			CollectionNameAttribute CollectionNameAttribute = this.typeInfo.GetCustomAttribute<CollectionNameAttribute>(true);
 			if (CollectionNameAttribute is null)
 				this.collectionName = null;
 			else
 				this.collectionName = CollectionNameAttribute.Name;
 
-			TypeNameAttribute TypeNameAttribute = Type.GetCustomAttribute<TypeNameAttribute>(true);
+			TypeNameAttribute TypeNameAttribute = this.typeInfo.GetCustomAttribute<TypeNameAttribute>(true);
 			if (TypeNameAttribute is null)
 			{
 				this.typeFieldName = "_type";
@@ -63,11 +70,12 @@ namespace Waher.Persistence.MongoDB.Serialization
 				this.typeNameSerialization = TypeNameAttribute.TypeNameSerialization;
 			}
 
-			if (Type.IsAbstract && this.typeNameSerialization == TypeNameSerialization.None)
+			if (this.typeInfo.IsAbstract && this.typeNameSerialization == TypeNameSerialization.None)
 				throw new Exception("Serializers for abstract classes require type names to be serialized.");
 
 			StringBuilder CSharp = new StringBuilder();
 			Type MemberType;
+			System.Reflection.TypeInfo MemberTypeInfo;
 			FieldInfo FI;
 			PropertyInfo PI;
 			object DefaultValue;
@@ -92,15 +100,15 @@ namespace Waher.Persistence.MongoDB.Serialization
 			CSharp.AppendLine("using Waher.Persistence.Filters;");
 			CSharp.AppendLine("using Waher.Persistence.MongoDB;");
 			CSharp.AppendLine("using Waher.Persistence.MongoDB.Serialization;");
-			CSharp.AppendLine("using Waher.Script;");
+			CSharp.AppendLine("using Waher.Runtime.Inventory;");
 			CSharp.AppendLine();
-			CSharp.AppendLine("namespace " + Type.Namespace + ".Bson");
+			CSharp.AppendLine("namespace " + this.type.Namespace + ".Bson");
 			CSharp.AppendLine("{");
-			CSharp.AppendLine("\tpublic class BsonSerializer" + TypeName + " : IBsonSerializer");
+			CSharp.AppendLine("\tpublic class BsonSerializer" + TypeName + this.provider.Id + " : IBsonSerializer");
 			CSharp.AppendLine("\t{");
 			CSharp.AppendLine("\t\tprivate MongoDBProvider provider;");
 
-			foreach (MemberInfo Member in Type.GetMembers(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))
+			foreach (MemberInfo Member in this.typeInfo.GetMembers(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))
 			{
 				if ((FI = Member as FieldInfo) != null)
 				{
@@ -122,12 +130,13 @@ namespace Waher.Persistence.MongoDB.Serialization
 
 				this.memberTypes[Member.Name] = MemberType;
 
+				MemberTypeInfo = MemberType.GetTypeInfo();
 				Ignore = false;
 				ShortName = null;
 				ByReference = false;
 				Nullable = false;
 
-				if (MemberType.IsGenericType)
+				if (MemberTypeInfo.IsGenericType)
 				{
 					Type GT = MemberType.GetGenericTypeDefinition();
 					if (GT == typeof(Nullable<>))
@@ -218,8 +227,9 @@ namespace Waher.Persistence.MongoDB.Serialization
 						else if (DefaultValue is Enum)
 						{
 							Type DefaultValueType = DefaultValue.GetType();
+							System.Reflection.TypeInfo DefaultValueTypeInfo = DefaultValueType.GetTypeInfo();
 
-							if (DefaultValueType.IsDefined(typeof(FlagsAttribute)))
+							if (DefaultValueTypeInfo.IsDefined(typeof(FlagsAttribute)))
 							{
 								Enum e = (Enum)DefaultValue;
 								bool First = true;
@@ -308,12 +318,12 @@ namespace Waher.Persistence.MongoDB.Serialization
 			if (NrDefault > 0)
 				CSharp.AppendLine();
 
-			CSharp.AppendLine("\t\tpublic BsonSerializer" + TypeName + "(MongoDBProvider Provider)");
+			CSharp.AppendLine("\t\tpublic BsonSerializer" + TypeName + this.provider.Id + "(MongoDBProvider Provider)");
 			CSharp.AppendLine("\t\t{");
 			CSharp.AppendLine("\t\t\tthis.provider = Provider;");
 
 
-			foreach (MemberInfo Member in Type.GetMembers(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))
+			foreach (MemberInfo Member in this.typeInfo.GetMembers(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))
 			{
 				if ((FI = Member as FieldInfo) != null)
 				{
@@ -333,11 +343,12 @@ namespace Waher.Persistence.MongoDB.Serialization
 				else
 					continue;
 
+				MemberTypeInfo = MemberType.GetTypeInfo();
 				Ignore = false;
 				ByReference = false;
 				Nullable = false;
 
-				if (MemberType.IsGenericType)
+				if (MemberTypeInfo.IsGenericType)
 				{
 					Type GT = MemberType.GetGenericTypeDefinition();
 					if (GT == typeof(Nullable<>))
@@ -374,7 +385,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 
 			CSharp.AppendLine("\t\t}");
 			CSharp.AppendLine();
-			CSharp.AppendLine("\t\tpublic Type ValueType { get { return typeof(" + Type.FullName + "); } }");
+			CSharp.AppendLine("\t\tpublic Type ValueType { get { return typeof(" + this.type.FullName + "); } }");
 			CSharp.AppendLine();
 			CSharp.AppendLine("\t\tpublic object Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)");
 			CSharp.AppendLine("\t\t{");
@@ -394,29 +405,29 @@ namespace Waher.Persistence.MongoDB.Serialization
 				CSharp.AppendLine("\t\t\tstring TypeName = Reader.ReadString();");
 
 				if (this.typeNameSerialization == TypeNameSerialization.LocalName)
-					CSharp.AppendLine("\t\t\tTypeName = \"" + Type.Namespace + ".\" + TypeName;");
+					CSharp.AppendLine("\t\t\tTypeName = \"" + this.type.Namespace + ".\" + TypeName;");
 
 				CSharp.AppendLine();
-				CSharp.AppendLine("\t\t\tType DesiredType = Waher.Script.Types.GetType(TypeName);");
+				CSharp.AppendLine("\t\t\tType DesiredType = Waher.Runtime.Inventory.Types.GetType(TypeName);");
 				CSharp.AppendLine("\t\t\tif (DesiredType is null)");
 				CSharp.AppendLine("\t\t\t\tthrow new Exception(\"Class of type \" + TypeName + \" not found.\");");
 				CSharp.AppendLine();
 				CSharp.AppendLine("\t\t\tReader.ReturnToBookmark(Bookmark);");
 				CSharp.AppendLine();
-				CSharp.AppendLine("\t\t\tif (DesiredType != typeof(" + Type.FullName + "))");
+				CSharp.AppendLine("\t\t\tif (DesiredType != typeof(" + this.type.FullName + "))");
 				CSharp.AppendLine("\t\t\t{");
 				CSharp.AppendLine("\t\t\t\tObjectSerializer Serializer2 = this.provider.GetObjectSerializer(DesiredType);");
 				CSharp.AppendLine("\t\t\t\treturn Serializer2.Deserialize(context, args);");
 				CSharp.AppendLine("\t\t\t}");
 			}
 
-			if (Type.IsAbstract)
+			if (this.typeInfo.IsAbstract)
 				CSharp.AppendLine("\t\t\tthrow new Exception(\"Unable to create an instance of an abstract class.\");");
 			else
 			{
 				CSharp.AppendLine();
 				CSharp.AppendLine("\t\t\tReader.ReadStartDocument();");
-				CSharp.AppendLine("\t\t\tResult = new " + Type.FullName + "();");
+				CSharp.AppendLine("\t\t\tResult = new " + this.type.FullName + "();");
 				CSharp.AppendLine();
 				CSharp.AppendLine("\t\t\twhile (Reader.State == BsonReaderState.Type)");
 				CSharp.AppendLine("\t\t\t{");
@@ -429,7 +440,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 				CSharp.AppendLine("\t\t\t\tswitch (FieldName)");
 				CSharp.AppendLine("\t\t\t\t{");
 
-				foreach (MemberInfo Member in Type.GetMembers(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))
+				foreach (MemberInfo Member in this.typeInfo.GetMembers(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))
 				{
 					if ((FI = Member as FieldInfo) != null)
 					{
@@ -449,13 +460,14 @@ namespace Waher.Persistence.MongoDB.Serialization
 					else
 						continue;
 
+					MemberTypeInfo = MemberType.GetTypeInfo();
 					Ignore = false;
 					ShortName = null;
 					ObjectIdField = false;
 					ByReference = false;
 					Nullable = false;
 
-					if (MemberType.IsGenericType)
+					if (MemberTypeInfo.IsGenericType)
 					{
 						Type GT = MemberType.GetGenericTypeDefinition();
 						if (GT == typeof(Nullable<>))
@@ -518,7 +530,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 						if (!string.IsNullOrEmpty(ShortName) && ShortName != Member.Name)
 							CSharp.AppendLine("\t\t\t\t\tcase \"" + ShortName + "\":");
 
-						if (MemberType.IsEnum)
+						if (MemberTypeInfo.IsEnum)
 						{
 							CSharp.AppendLine("\t\t\t\t\t\tswitch (BsonType)");
 							CSharp.AppendLine("\t\t\t\t\t\t{");
@@ -1081,7 +1093,6 @@ namespace Waher.Persistence.MongoDB.Serialization
 									CSharp.AppendLine("\t\t\t\t\t\t}");
 									break;
 
-								case TypeCode.DBNull:
 								case TypeCode.Empty:
 								default:
 									throw new Exception("Invalid member type: " + Member.MemberType.ToString());
@@ -1096,7 +1107,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 										CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Array:");
 										CSharp.AppendLine("\t\t\t\t\t\t\t\tList<" + MemberType.FullName + "> Elements" + Member.Name + " = new List<" + MemberType.FullName + ">();");
 
-										if (MemberType.IsClass && MemberType != typeof(string))
+										if (MemberTypeInfo.IsClass && MemberType != typeof(string))
 											CSharp.AppendLine("\t\t\t\t\t\t\t\tIBsonSerializer S = this.provider.GetObjectSerializer(typeof(" + MemberType.FullName + "));");
 										else
 											CSharp.AppendLine("\t\t\t\t\t\t\t\tIBsonSerializer S = BsonSerializer.LookupSerializer(typeof(" + MemberType.FullName + "));");
@@ -1272,7 +1283,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 					break;
 			}
 
-			foreach (MemberInfo Member in Type.GetMembers(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))
+			foreach (MemberInfo Member in this.typeInfo.GetMembers(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))
 			{
 				if ((FI = Member as FieldInfo) != null)
 				{
@@ -1292,6 +1303,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 				else
 					continue;
 
+				MemberTypeInfo = MemberType.GetTypeInfo();
 				Ignore = false;
 				ShortName = null;
 				HasDefaultValue = false;
@@ -1300,7 +1312,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 				ByReference = false;
 				Nullable = false;
 
-				if (MemberType.IsGenericType)
+				if (MemberTypeInfo.IsGenericType)
 				{
 					Type GT = MemberType.GetGenericTypeDefinition();
 					if (GT == typeof(Nullable<>))
@@ -1412,7 +1424,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 					else
 						Indent2 = Indent;
 
-					if (MemberType.IsEnum)
+					if (MemberTypeInfo.IsEnum)
 					{
 						CSharp.Append(Indent2);
 						CSharp.Append("Writer.WriteInt32((int)Value.");
@@ -1528,7 +1540,6 @@ namespace Waher.Persistence.MongoDB.Serialization
 								CSharp.AppendLine(");");
 								break;
 
-							case TypeCode.DBNull:
 							case TypeCode.Empty:
 							default:
 								throw new Exception("Invalid member type: " + Member.MemberType.ToString());
@@ -1640,69 +1651,110 @@ namespace Waher.Persistence.MongoDB.Serialization
 			CSharp.AppendLine("\t}");
 			CSharp.AppendLine("}");
 
-			CSharpCodeProvider CodeProvider = new CSharpCodeProvider();
-			Dictionary<string, bool> Dependencies = new Dictionary<string, bool>()
-			{
-				{ typeof(IEnumerable).Assembly.Location.Replace("mscorlib.dll", "System.Runtime.dll"), true },
-				{ typeof(Database).Assembly.Location, true },
-				{ typeof(ObjectSerializer).Assembly.Location, true }
-			};
 
+			string CSharpCode = CSharp.ToString();
+
+			Dictionary<string, bool> Dependencies = new Dictionary<string, bool>()
+				{
+					{ GetLocation(typeof(object)), true },
+					{ Path.Combine(Path.GetDirectoryName(GetLocation(typeof(object))), "System.Runtime.dll"), true },
+					{ Path.Combine(Path.GetDirectoryName(GetLocation(typeof(Encoding))), "System.Text.Encoding.dll"), true },
+					{ Path.Combine(Path.GetDirectoryName(GetLocation(typeof(MemoryStream))), "System.IO.dll"), true },
+					{ Path.Combine(Path.GetDirectoryName(GetLocation(typeof(MemoryStream))), "System.Runtime.Extensions.dll"), true },
+					{ Path.Combine(Path.GetDirectoryName(GetLocation(typeof(Task))), "System.Threading.Tasks.dll"), true },
+					{ GetLocation(typeof(Types)), true },
+					{ GetLocation(typeof(Database)), true },
+					{ GetLocation(typeof(ObjectSerializer)), true },
+					{ GetLocation(typeof(MultiReadSingleWriteObject)), true },
+					{ GetLocation(typeof(MongoClient)), true },
+					{ GetLocation(typeof(BsonDocument)), true }
+				};
+
+			System.Reflection.TypeInfo LoopInfo;
 			Type Loop = Type;
+			string s = Path.Combine(Path.GetDirectoryName(GetLocation(typeof(object))), "netstandard.dll");
+
+			if (File.Exists(s))
+				Dependencies[s] = true;
 
 			while (Loop != null)
 			{
-				Dependencies[Loop.Assembly.Location] = true;
+				LoopInfo = Loop.GetTypeInfo();
+				Dependencies[GetLocation(Loop)] = true;
 
-				foreach (Type Interface in Loop.GetInterfaces())
-					Dependencies[Interface.Assembly.Location] = true;
+				foreach (Type Interface in LoopInfo.ImplementedInterfaces)
+				{
+					s = GetLocation(Interface);
+					Dependencies[s] = true;
+				}
 
-				Loop = Loop.BaseType;
+				foreach (MemberInfo MI2 in LoopInfo.DeclaredMembers)
+				{
+					FI = MI2 as FieldInfo;
+					if (FI != null && !((s = GetLocation(FI.FieldType)).EndsWith("mscorlib.dll") || s.EndsWith("System.Runtime.dll") || s.EndsWith("System.Private.CoreLib.dll")))
+						Dependencies[s] = true;
+
+					PI = MI2 as PropertyInfo;
+					if (PI != null && !((s = GetLocation(PI.PropertyType)).EndsWith("mscorlib.dll") || s.EndsWith("System.Runtime.dll") || s.EndsWith("System.Private.CoreLib.dll")))
+						Dependencies[s] = true;
+				}
+
+				Loop = LoopInfo.BaseType;
 				if (Loop == typeof(object))
 					break;
 			}
 
-			string[] Assemblies = new string[Dependencies.Count];
-			CompilerParameters Options;
+			List<MetadataReference> References = new List<MetadataReference>();
 
-			Dependencies.Keys.CopyTo(Assemblies, 0);
-			Options = new CompilerParameters(Assemblies);
+			foreach (string Location in Dependencies.Keys)
+			{
+				if (!string.IsNullOrEmpty(Location))
+					References.Add(MetadataReference.CreateFromFile(Location));
+			}
 
-			CompilerResults CompilerResults = CodeProvider.CompileAssemblyFromSource(Options, CSharp.ToString());
+			CSharpCompilation Compilation = CSharpCompilation.Create("WPFA." + this.type.FullName,
+				new SyntaxTree[] { CSharpSyntaxTree.ParseText(CSharpCode) },
+				References, new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 
-			if (CompilerResults.Errors.Count > 0)
+			MemoryStream Output = new MemoryStream();
+			MemoryStream PdbOutput = new MemoryStream();
+
+			EmitResult CompilerResults = Compilation.Emit(Output, pdbStream: PdbOutput);
+
+			if (!CompilerResults.Success)
 			{
 				StringBuilder sb = new StringBuilder();
 
-				foreach (CompilerError Error in CompilerResults.Errors)
+				foreach (Diagnostic Error in CompilerResults.Diagnostics)
 				{
 					sb.AppendLine();
-					sb.Append(Error.Line.ToString());
+					sb.Append(Error.Location.ToString());
 					sb.Append(": ");
-					sb.Append(Error.ErrorText);
+					sb.Append(Error.GetMessage());
 				}
 
 				sb.AppendLine();
 				sb.AppendLine();
 				sb.AppendLine("Code generated:");
 				sb.AppendLine();
-				sb.AppendLine(CSharp.ToString());
+				sb.AppendLine(CSharpCode);
 
 				throw new Exception("Unable to serialize objects of type " + Type.FullName +
 					". When generating serialization class, the following compiler errors were reported:\r\n" + sb.ToString());
 			}
+			Output.Position = 0;
+			Assembly A;
 
-			Assembly A = CompilerResults.CompiledAssembly;
-			Type T = A.GetType(Type.Namespace + ".Bson.BsonSerializer" + TypeName);
-			ConstructorInfo CI = T.GetConstructor(new Type[] { typeof(MongoDBProvider) });
-			this.customSerializer = (IBsonSerializer)CI.Invoke(new object[] { this.provider });
+			A = AssemblyLoadContext.Default.LoadFromStream(Output, PdbOutput);
+			Type T = A.GetType(Type.Namespace + ".Bson.BsonSerializer" + TypeName + this.provider.Id);
+			this.customSerializer = (IBsonSerializer)Activator.CreateInstance(T, this.provider);
 
 			BsonSerializer.RegisterSerializer(Type, this);
 
 			IMongoCollection<BsonDocument> Collection = null;
 			List<BsonDocument> Indices = null;
 
-			foreach (IndexAttribute CompoundIndexAttribute in Type.GetCustomAttributes<IndexAttribute>(true))
+			foreach (IndexAttribute CompoundIndexAttribute in this.typeInfo.GetCustomAttributes<IndexAttribute>(true))
 			{
 				bool IndexFound = false;
 
@@ -1769,6 +1821,17 @@ namespace Waher.Persistence.MongoDB.Serialization
 					Collection.Indexes.CreateOneAsync(Index);
 				}
 			}
+		}
+
+		private static string GetLocation(Type T)
+		{
+			System.Reflection.TypeInfo TI = T.GetTypeInfo();
+			string s = TI.Assembly.Location;
+
+			if (!string.IsNullOrEmpty(s))
+				return s;
+
+			return Path.Combine(Path.GetDirectoryName(GetLocation(typeof(Database))), TI.Module.ScopeName);
 		}
 
 		/// <summary>

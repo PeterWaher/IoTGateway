@@ -23,6 +23,7 @@ namespace Waher.Persistence.MongoDB
 		private readonly Dictionary<string, ObjectSerializer> serializers = new Dictionary<string, ObjectSerializer>();
 		private MongoClient client;
 		private IMongoDatabase database;
+		private string id;
 		private string defaultCollectionName;
 		private string lastCollectionName = null;
 		private string lastSerializerName = null;
@@ -87,11 +88,20 @@ namespace Waher.Persistence.MongoDB
 
 		private void Init(MongoClientSettings Settings, string DatabaseName, string DefaultCollectionName)
 		{
+			this.id = Guid.NewGuid().ToString().Replace("-", string.Empty);
 			this.client = new MongoClient(Settings);
 			this.database = this.client.GetDatabase(DatabaseName);
 
 			this.defaultCollectionName = DefaultCollectionName;
 			this.defaultCollection = this.GetCollection(this.defaultCollectionName);
+		}
+
+		/// <summary>
+		/// An ID of the files provider. It's unique, and constant during the life-time of the FilesProvider class.
+		/// </summary>
+		public string Id
+		{
+			get { return this.id; }
 		}
 
 		/// <summary>

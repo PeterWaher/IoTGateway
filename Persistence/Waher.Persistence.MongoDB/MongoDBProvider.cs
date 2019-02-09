@@ -621,12 +621,18 @@ namespace Waher.Persistence.MongoDB
 		{
 			ObjectId OID;
 
-			if (ObjectId is ObjectId)
-				OID = (ObjectId)ObjectId;
-			else if (ObjectId is string)
-				OID = new ObjectId((string)ObjectId);
-			else if (ObjectId is byte[])
-				OID = new ObjectId((byte[])ObjectId);
+			if (ObjectId is ObjectId ObjId)
+				OID = ObjId;
+			else if (ObjectId is string s)
+				OID = new ObjectId(s);
+			else if (ObjectId is byte[] A)
+				OID = new ObjectId(A);
+			else if (ObjectId is Guid Guid)
+			{
+				A = Guid.ToByteArray();
+				Array.Resize<byte>(ref A, 12);
+				OID = new ObjectId(A);
+			}
 			else
 				throw new NotSupportedException("Unsupported type for Object ID: " + ObjectId.GetType().FullName);
 

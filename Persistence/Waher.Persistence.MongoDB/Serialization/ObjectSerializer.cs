@@ -306,8 +306,12 @@ namespace Waher.Persistence.MongoDB.Serialization
 				if (Ignore)
 					continue;
 
-				if (Type.GetTypeCode(MemberType) == TypeCode.Object && !MemberType.IsArray &&
-					!ByReference && MemberType != typeof(TimeSpan) && MemberType != typeof(TimeSpan))
+				if (Type.GetTypeCode(MemberType) == TypeCode.Object &&
+					!MemberType.IsArray &&
+					!ByReference && 
+					MemberType != typeof(TimeSpan) && 
+					MemberType != typeof(Guid) &&
+					MemberType != typeof(DateTimeOffset))
 				{
 					CSharp.Append("\t\tprivate static readonly ObjectSerializer serializer");
 					CSharp.Append(Member.Name);
@@ -372,10 +376,14 @@ namespace Waher.Persistence.MongoDB.Serialization
 				if (Ignore)
 					continue;
 
-				if (Type.GetTypeCode(MemberType) == TypeCode.Object && !MemberType.IsArray &&
-					!ByReference && MemberType != typeof(TimeSpan) && MemberType != typeof(string))
+				if (Type.GetTypeCode(MemberType) == TypeCode.Object && 
+					!MemberType.IsArray &&
+					!ByReference && 
+					MemberType != typeof(TimeSpan) && 
+					MemberType != typeof(Guid) &&
+					MemberType != typeof(DateTimeOffset))
 				{
-					CSharp.Append("\t\t\tthis.serializer");
+					CSharp.Append("\t\t\tserializer");
 					CSharp.Append(Member.Name);
 					CSharp.Append(" = this.provider.GetObjectSerializer(typeof(");
 					CSharp.Append(MemberType.FullName);
@@ -514,14 +522,18 @@ namespace Waher.Persistence.MongoDB.Serialization
 							CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = ObjectId.ToString();");
 						else if (MemberType == typeof(byte[]))
 							CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = ObjectId.ToByteArray();");
+						else if (MemberType == typeof(Guid))
+						{
+							CSharp.AppendLine("\t\t\t\t\t\t\t\tbyte[] Temp" + Member.Name + " = new byte[16];");
+							CSharp.AppendLine("\t\t\t\t\t\t\t\tArray.Copy(ObjectId.ToByteArray(), 0, Temp" + Member.Name + ", 0, 12);");
+							CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = new Guid(Temp" + Member.Name + ");");
+						}
 
 						CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
 						CSharp.AppendLine();
 						CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
 						CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Object ID parameter _id must be an Object ID value, but was a \" + BsonType.ToString() + \".\");");
 						CSharp.AppendLine("\t\t\t\t\t\t}");
-						CSharp.AppendLine("\t\t\t\t\t\tbreak;");
-						CSharp.AppendLine();
 					}
 					else
 					{
@@ -1183,12 +1195,56 @@ namespace Waher.Persistence.MongoDB.Serialization
 										CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected a string value, but was a \" + BsonType.ToString() + \".\");");
 										CSharp.AppendLine("\t\t\t\t\t\t}");
 									}
+									else if (MemberType == typeof(Guid))
+									{
+										CSharp.AppendLine("\t\t\t\t\t\tswitch (BsonType)");
+										CSharp.AppendLine("\t\t\t\t\t\t{");
+										CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.String:");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Guid.Parse(Reader.ReadString());");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+										if (Nullable)
+										{
+											CSharp.AppendLine();
+											CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Null:");
+											CSharp.AppendLine("\t\t\t\t\t\t\t\tReader.ReadNull();");
+											CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = null;");
+											CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+										}
+										CSharp.AppendLine();
+										CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected a string value, but was a \" + BsonType.ToString() + \".\");");
+										CSharp.AppendLine("\t\t\t\t\t\t}");
+									}
+									else if (MemberType == typeof(DateTimeOffset))
+									{
+										CSharp.AppendLine("\t\t\t\t\t\tswitch (BsonType)");
+										CSharp.AppendLine("\t\t\t\t\t\t{");
+										CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.DateTime:");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = " + typeof(ObjectSerializer).FullName + ".UnixEpoch.AddMilliseconds(Reader.ReadDateTime());");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+										CSharp.AppendLine();
+										CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.String:");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = DateTimeOffset.Parse(Reader.ReadString());");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+										if (Nullable)
+										{
+											CSharp.AppendLine();
+											CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Null:");
+											CSharp.AppendLine("\t\t\t\t\t\t\t\tReader.ReadNull();");
+											CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = null;");
+											CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+										}
+										CSharp.AppendLine();
+										CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected a DateTime value, but was a \" + BsonType.ToString() + \".\");");
+										CSharp.AppendLine("\t\t\t\t\t\t}");
+									}
 									else
 									{
 										CSharp.AppendLine("\t\t\t\t\t\tswitch (BsonType)");
 										CSharp.AppendLine("\t\t\t\t\t\t{");
 										CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Document:");
-										CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = this.serializer" + Member.Name + ".Deserialize(context, args);");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = serializer" + Member.Name + ".Deserialize(context, args);");
 										CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
 										CSharp.AppendLine();
 										CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Null:");
@@ -1389,6 +1445,15 @@ namespace Waher.Persistence.MongoDB.Serialization
 					{
 						CSharp.Append(Indent);
 						CSharp.AppendLine("\tWriter.WriteObjectId(new ObjectId(ObjectId));");
+					}
+					else if (MemberType == typeof(Guid))
+					{
+						CSharp.Append(Indent);
+						CSharp.AppendLine("byte[] ObjectId2 = new byte[12];");
+						CSharp.Append(Indent);
+						CSharp.AppendLine("Array.Copy(ObjectId.ToByteArray(), 0, ObjectId2, 0, 12);");
+						CSharp.Append(Indent);
+						CSharp.AppendLine("\tWriter.WriteObjectId(new ObjectId(ObjectId2));");
 					}
 					else
 						throw new Exception("Invalid Object ID type.");
@@ -1619,10 +1684,28 @@ namespace Waher.Persistence.MongoDB.Serialization
 										CSharp.Append(".Value");
 									CSharp.AppendLine(".ToString());");
 								}
+								else if (MemberType == typeof(Guid))
+								{
+									CSharp.Append(Indent2);
+									CSharp.Append("Writer.WriteString(Value.");
+									CSharp.Append(Member.Name);
+									if (Nullable)
+										CSharp.Append(".Value");
+									CSharp.AppendLine(".ToString());");
+								}
+								else if (MemberType == typeof(DateTimeOffset))
+								{
+									CSharp.Append(Indent2);
+									CSharp.Append("Writer.WriteString(Value.");
+									CSharp.Append(Member.Name);
+									if (Nullable)
+										CSharp.Append(".Value");
+									CSharp.AppendLine(".ToString());");
+								}
 								else
 								{
 									CSharp.Append(Indent2);
-									CSharp.Append("this.serializer");
+									CSharp.Append("serializer");
 									CSharp.Append(Member.Name);
 									CSharp.Append(".Serialize(context, args, Value.");
 									CSharp.Append(Member.Name);
@@ -1997,12 +2080,24 @@ namespace Waher.Persistence.MongoDB.Serialization
 		/// <param name="Value">Object reference.</param>
 		public bool HasObjectId(object Value)
 		{
+			object ObjectId;
+
 			if (this.objectIdFieldInfo != null)
-				return this.objectIdFieldInfo.GetValue(Value) != null;
+				ObjectId = this.objectIdFieldInfo.GetValue(Value);
 			else if (this.objectIdPropertyInfo != null)
-				return this.objectIdPropertyInfo.GetValue(Value) != null;
+				ObjectId = this.objectIdPropertyInfo.GetValue(Value);
 			else
 				return false;
+
+			if (ObjectId is null)
+				return false;
+
+			if (ObjectId is string s)
+				return !string.IsNullOrEmpty(s);
+			else if (ObjectId is Guid Guid)
+				return Guid != Guid.Empty;
+			else
+				return true;
 		}
 
 		/// <summary>
@@ -2051,6 +2146,12 @@ namespace Waher.Persistence.MongoDB.Serialization
 					Obj = ObjectId.ToString();
 				else if (MemberType == typeof(byte[]))
 					Obj = ObjectId.ToByteArray();
+				else if (MemberType == typeof(Guid))
+				{
+					byte[] A = new byte[16];
+					Array.Copy(ObjectId.ToByteArray(), 0, A, 0, 12);
+					Obj = new Guid(A);
+				}
 				else
 					throw new NotSupportedException("Unsupported type for Object ID members: " + MemberType.FullName);
 
@@ -2064,12 +2165,18 @@ namespace Waher.Persistence.MongoDB.Serialization
 
 				return ObjectId;
 			}
-			else if (Obj is ObjectId)
-				return (ObjectId)Obj;
-			else if (Obj is string)
-				return new ObjectId((string)Obj);
-			else if (Obj is byte[])
-				return new ObjectId((byte[])Obj);
+			else if (Obj is ObjectId ObjectId)
+				return ObjectId;
+			else if (Obj is string s)
+				return new ObjectId(s);
+			else if (Obj is byte[] A)
+				return new ObjectId(A);
+			else if (Obj is Guid Guid)
+			{
+				A = Guid.ToByteArray();
+				Array.Resize<byte>(ref A, 12);
+				return new ObjectId(A);
+			}
 			else
 				throw new NotSupportedException("Unsupported type for Object ID members: " + Obj.GetType().FullName);
 		}

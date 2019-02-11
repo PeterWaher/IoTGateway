@@ -292,10 +292,22 @@ namespace Waher.Persistence.Files.Serialization
 		/// <exception cref="ArgumentException">If the <paramref name="FieldDataType"/> was invalid.</exception>
 		public static object ReadNullableEnum(BinaryDeserializer Reader, uint FieldDataType, Type EnumType)
 		{
-			if (FieldDataType == ObjectSerializer.TYPE_NULL)
-				return null;
-			else
-				return Enum.ToObject(EnumType, ReadInt32(Reader, FieldDataType));
+			switch (FieldDataType)
+			{
+				case ObjectSerializer.TYPE_BYTE: return Enum.ToObject(EnumType, (int)ReadByte(Reader, FieldDataType));
+				case ObjectSerializer.TYPE_INT16: return Enum.ToObject(EnumType, (int)ReadInt16(Reader, FieldDataType));
+				case ObjectSerializer.TYPE_INT32: return Enum.ToObject(EnumType, ReadInt32(Reader, FieldDataType));
+				case ObjectSerializer.TYPE_INT64: return Enum.ToObject(EnumType, ReadInt64(Reader, FieldDataType));
+				case ObjectSerializer.TYPE_SBYTE: return Enum.ToObject(EnumType, (int)ReadSByte(Reader, FieldDataType));
+				case ObjectSerializer.TYPE_UINT16: return Enum.ToObject(EnumType, (int)ReadUInt16(Reader, FieldDataType));
+				case ObjectSerializer.TYPE_UINT32: return Enum.ToObject(EnumType, (long)ReadUInt32(Reader, FieldDataType));
+				case ObjectSerializer.TYPE_STRING:
+				case ObjectSerializer.TYPE_CI_STRING: return Enum.Parse(EnumType, Reader.ReadString());
+				case ObjectSerializer.TYPE_NULL: return null;
+				default:
+					throw new ArgumentException("Expected an enumerated value, but was a " +
+						FilesProvider.GetFieldDataTypeName(FieldDataType) + ".", nameof(FieldDataType));
+			}
 		}
 
 		/// <summary>
@@ -996,6 +1008,7 @@ namespace Waher.Persistence.Files.Serialization
 						{
 							S = Provider.GetObjectSerializer(ItemType);
 							LastType = ItemType;
+							Nullable = S.IsNullable;
 						}
 
 						S.Serialize(Writer, Nullable, true, Item);
@@ -1033,7 +1046,12 @@ namespace Waher.Persistence.Files.Serialization
 				foreach (object Item in Value)
 				{
 					if (Item is null)
-						Writer.WriteBits(ObjectSerializer.TYPE_NULL, 6);
+					{
+						if (Nullable)
+							Writer.WriteBits(ObjectSerializer.TYPE_NULL, 6);
+						else
+							throw new Exception("Elements cannot be null.");
+					}
 					else
 					{
 						ItemType = Item.GetType();
@@ -1041,6 +1059,7 @@ namespace Waher.Persistence.Files.Serialization
 						{
 							S = Provider.GetObjectSerializer(ItemType);
 							LastType = ItemType;
+							Nullable = S.IsNullable;
 						}
 
 						S.Serialize(Writer, Nullable, true, Item);

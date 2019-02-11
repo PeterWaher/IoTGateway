@@ -91,7 +91,12 @@ namespace Waher.Persistence.Files.Serialization.ReferenceTypes
 				foreach (T Item in Array)
 				{
 					if (Item == null)
-						Writer.WriteBits(ObjectSerializer.TYPE_NULL, 6);
+					{
+						if (Nullable)
+							Writer.WriteBits(ObjectSerializer.TYPE_NULL, 6);
+						else
+							throw new Exception("Elements cannot be null.");
+					}
 					else
 					{
 						ItemType = Item.GetType();
@@ -99,6 +104,7 @@ namespace Waher.Persistence.Files.Serialization.ReferenceTypes
 						{
 							S = this.provider.GetObjectSerializer(ItemType);
 							LastType = ItemType;
+							Nullable = S.IsNullable;
 						}
 
 						S.Serialize(Writer, Nullable, true, Item);

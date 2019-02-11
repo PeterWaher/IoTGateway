@@ -55,7 +55,7 @@ namespace Waher.Persistence.Files.Serialization.ReferenceTypes
 				case ObjectSerializer.TYPE_CI_STRING: return Reader.ReadString();
 				case ObjectSerializer.TYPE_CHAR: return new string(Reader.ReadChar(), 1);
 				case ObjectSerializer.TYPE_BOOLEAN: return Reader.ReadBoolean().ToString();
-				case ObjectSerializer.TYPE_BYTE: return Reader.ReadString().ToString();
+				case ObjectSerializer.TYPE_BYTE: return Reader.ReadByte().ToString();
 				case ObjectSerializer.TYPE_INT16: return Reader.ReadInt16().ToString();
 				case ObjectSerializer.TYPE_INT32: return Reader.ReadInt32().ToString();
 				case ObjectSerializer.TYPE_INT64: return Reader.ReadInt64().ToString();

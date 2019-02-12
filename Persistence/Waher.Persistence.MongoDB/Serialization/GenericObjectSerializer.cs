@@ -102,6 +102,8 @@ namespace Waher.Persistence.MongoDB.Serialization
 				if (ValueType == BsonType.EndOfDocument)
 					break;
 
+				FieldName = Reader.ReadName();
+
 				switch (ValueType)
 				{
 					case BsonType.Array:
@@ -168,8 +170,6 @@ namespace Waher.Persistence.MongoDB.Serialization
 						throw new Exception("Unrecognized data type: " + ValueType.ToString());
 				}
 
-				FieldName = Reader.ReadName();
-
 				switch (FieldName)
 				{
 					case "_id":
@@ -198,6 +198,8 @@ namespace Waher.Persistence.MongoDB.Serialization
 						break;
 				}
 			}
+
+			Reader.ReadEndDocument();
 
 			return new GenericObject(CollectionName, TypeName, ObjectId, Properties);
 		}

@@ -856,9 +856,6 @@ namespace Waher.Persistence.MongoDB.Serialization
 						}
 
 						Elements.Add((T)S.Deserialize(Reader, ElementType, true));
-
-						if (Reader.ReadBsonType() == BsonType.EndOfDocument)
-							break;
 					}
 
 					Reader.ReadEndArray();
@@ -907,9 +904,6 @@ namespace Waher.Persistence.MongoDB.Serialization
 						}
 
 						Elements.Add(S.Deserialize(Reader, ElementType, true));
-
-						if (Reader.ReadBsonType() == BsonType.EndOfDocument)
-							break;
 					}
 
 					Reader.ReadEndArray();

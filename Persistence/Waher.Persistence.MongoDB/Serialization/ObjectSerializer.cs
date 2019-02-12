@@ -1184,7 +1184,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 										CSharp.AppendLine();
 										CSharp.AppendLine("\t\t\t\t\t\t\t\tReader.ReadStartArray();");
 										CSharp.AppendLine();
-										CSharp.AppendLine("\t\t\t\t\t\t\t\twhile (Reader.State != BsonReaderState.EndOfDocument)");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\twhile (Reader.State != BsonReaderState.EndOfArray)");
 										CSharp.AppendLine("\t\t\t\t\t\t\t\t{");
 										CSharp.AppendLine("\t\t\t\t\t\t\t\t\tBsonType? ElementType = null;");
 										CSharp.AppendLine("\t\t\t\t\t\t\t\t\tif (Reader.State == BsonReaderState.Type)");
@@ -1938,8 +1938,6 @@ namespace Waher.Persistence.MongoDB.Serialization
 			CSharp.AppendLine("}");
 
 			string CSharpCode = CSharp.ToString();
-
-			//File.WriteAllText(@"C:\Downloads\Temp\1\" + Type.FullName + ".cs", CSharpCode); // TODO: Remove
 
 			Dictionary<string, bool> Dependencies = new Dictionary<string, bool>()
 			{

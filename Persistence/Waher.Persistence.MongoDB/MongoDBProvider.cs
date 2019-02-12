@@ -1146,7 +1146,7 @@ namespace Waher.Persistence.MongoDB
 					List<string> FieldNames = new List<string>();
 
 					Output.WriteStartElement("Index");
-					
+
 					foreach (BsonElement E in Index.Elements)
 					{
 						switch (E.Name)
@@ -1195,9 +1195,101 @@ namespace Waher.Persistence.MongoDB
 		/// </summary>
 		/// <param name="Output">Database will be output to this interface.</param>
 		/// <returns>Task object for synchronization purposes.</returns>
-		public Task Export(IDatabaseExport Output)
+		public async Task Export(IDatabaseExport Output)
 		{
-			throw new NotImplementedException("MongoDB provider does not support the Export method.");  // TODO
+			await Output.StartExport();
+			try
+			{
+				ObjectSerializer Serializer = this.GetObjectSerializerEx(typeof(GenericObject));
+				BsonDeserializationArgs Args = new BsonDeserializationArgs()
+				{
+					NominalType = typeof(GenericObject)
+				};
+
+				foreach (string CollectionName in (await this.database.ListCollectionNamesAsync()).ToEnumerable())
+				{
+					IMongoCollection<BsonDocument> Collection = this.database.GetCollection<BsonDocument>(CollectionName);
+
+					await Output.StartCollection(CollectionName);
+					try
+					{
+						foreach (BsonDocument Index in (await Collection.Indexes.ListAsync()).ToEnumerable())
+						{
+							await Output.StartIndex();
+
+							foreach (BsonElement E in Index.Elements)
+							{
+								if (E.Name == "key")
+								{
+									foreach (BsonElement E2 in E.Value.AsBsonDocument.Elements)
+										await Output.ReportIndexField(E2.Name, E2.Value.AsInt32 > 0);
+
+									break;
+								}
+							}
+
+							await Output.EndIndex();
+						}
+
+						foreach (BsonDocument Doc in (await Collection.FindAsync<BsonDocument>(Builders<BsonDocument>.Filter.Empty)).ToEnumerable())
+						{
+							BsonDocumentReader Reader = new BsonDocumentReader(Doc);
+							BsonDeserializationContext Context = BsonDeserializationContext.CreateRoot(Reader);
+
+							object Object = Serializer.Deserialize(Context, Args);
+							
+							if (Object is GenericObject Obj)
+							{
+								await Output.StartObject(Obj.ObjectId.ToString(), Obj.TypeName);
+								try
+								{
+									foreach (KeyValuePair<string, object> P in Obj)
+										await Output.ReportProperty(P.Key, P.Value);
+								}
+								catch (Exception ex)
+								{
+									this.ReportException(ex, Output);
+								}
+								finally
+								{
+									await Output.EndObject();
+								}
+							}
+							else if (!(Object is null))
+								await Output.ReportError("Unable to load object " + Doc["_id"].AsString	+ ".");
+						}
+					}
+					catch (Exception ex)
+					{
+						this.ReportException(ex, Output);
+					}
+					finally
+					{
+						await Output.EndCollection();
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				this.ReportException(ex, Output);
+			}
+			finally
+			{
+				await Output.EndExport();
+			}
+		}
+
+		private void ReportException(Exception ex, IDatabaseExport Output)
+		{
+			ex = Waher.Events.Log.UnnestException(ex);
+
+			if (ex is AggregateException ex2)
+			{
+				foreach (Exception ex3 in ex2.InnerExceptions)
+					Output.ReportException(ex3);
+			}
+			else
+				Output.ReportException(ex);
 		}
 
 		/// <summary>

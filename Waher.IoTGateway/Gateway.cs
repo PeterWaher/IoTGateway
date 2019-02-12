@@ -628,6 +628,8 @@ namespace Waher.IoTGateway
 					else
 						webServer = new HttpServer(GetConfigPorts("HTTP"), null, null);
 
+					loggedIn = new LoggedIn(webServer);
+
 					foreach (SystemConfiguration Configuration in configurations)
 						await Configuration.InitSetup(webServer);
 				}

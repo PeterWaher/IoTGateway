@@ -55,5 +55,14 @@ namespace Waher.Persistence.MongoDB.Serialization
 		/// <returns>If the corresponding field or property was found.</returns>
 		bool TryGetFieldValue(string FieldName, object Object, out object Value);
 
+		/// <summary>
+		/// Gets the type of a field or property of an object, given its name.
+		/// </summary>
+		/// <param name="FieldName">Name of field or property.</param>
+		/// <param name="Object">Object.</param>
+		/// <param name="FieldType">Corresponding field or property type, if found, or null otherwise.</param>
+		/// <returns>If the corresponding field or property was found.</returns>
+		bool TryGetFieldType(string FieldName, object Object, out Type FieldType);
+
 	}
 }

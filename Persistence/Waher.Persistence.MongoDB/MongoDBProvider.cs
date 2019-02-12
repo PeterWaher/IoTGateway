@@ -538,8 +538,8 @@ namespace Waher.Persistence.MongoDB
 					BsonDocumentReader Reader = new BsonDocumentReader(Document);
 					BsonDeserializationContext Context = BsonDeserializationContext.CreateRoot(Reader);
 
-					T Obj = (T)Serializer.Deserialize(Context, Args);
-					Result.AddLast(Obj);
+					if (Serializer.Deserialize(Context, Args) is T Obj)
+						Result.AddLast(Obj);
 				}
 			}
 
@@ -577,26 +577,60 @@ namespace Waher.Persistence.MongoDB
 			{
 				object Value = FilterFieldValue.Value;
 				string FieldName = Serializer.ToShortName(FilterFieldValue.FieldName, ref Value);
+				bool HasType = Serializer.TryGetFieldType(FilterFieldValue.FieldName, Value, out Type FieldType);
 				bool IsDefaultValue = Serializer.IsDefaultValue(FilterFieldValue.FieldName, Value);
 
 				if (Filter is FilterFieldEqualTo)
 				{
 					if (IsDefaultValue)
 						return Builders<BsonDocument>.Filter.Eq<string>(FieldName, null);
-					else if (Value is string)
-						return Builders<BsonDocument>.Filter.Eq<string>(FieldName, (string)Value);
-					else if (Value is int)
-						return Builders<BsonDocument>.Filter.Eq<int>(FieldName, (int)Value);
-					else if (Value is long)
-						return Builders<BsonDocument>.Filter.Eq<long>(FieldName, (long)Value);
-					else if (Value is double)
-						return Builders<BsonDocument>.Filter.Eq<double>(FieldName, (double)Value);
-					else if (Value is bool)
-						return Builders<BsonDocument>.Filter.Eq<bool>(FieldName, (bool)Value);
-					else if (Value is DateTime)
-						return Builders<BsonDocument>.Filter.Eq<DateTime>(FieldName, (DateTime)Value);
-					else if (Value is ObjectId)
-						return Builders<BsonDocument>.Filter.Eq<ObjectId>(FieldName, (ObjectId)Value);
+					else if (Value is string s)
+					{
+						if (HasType && FieldType == typeof(CaseInsensitiveString))
+							return Builders<BsonDocument>.Filter.Eq<string>(FieldName + "_L", s);
+						else
+							return Builders<BsonDocument>.Filter.Eq<string>(FieldName, s);
+					}
+					else if (Value is CaseInsensitiveString cis)
+						return Builders<BsonDocument>.Filter.Eq<string>(FieldName + "_L", cis.LowerCase);
+					else if (Value is sbyte i8)
+						return Builders<BsonDocument>.Filter.Eq<int>(FieldName, i8);
+					else if (Value is short i16)
+						return Builders<BsonDocument>.Filter.Eq<int>(FieldName, i16);
+					else if (Value is int i32)
+						return Builders<BsonDocument>.Filter.Eq<int>(FieldName, i32);
+					else if (Value is long i64)
+						return Builders<BsonDocument>.Filter.Eq<long>(FieldName, i64);
+					else if (Value is byte ui8)
+						return Builders<BsonDocument>.Filter.Eq<int>(FieldName, ui8);
+					else if (Value is ushort ui16)
+						return Builders<BsonDocument>.Filter.Eq<int>(FieldName, ui16);
+					else if (Value is uint ui32)
+						return Builders<BsonDocument>.Filter.Eq<long>(FieldName, ui32);
+					else if (Value is ulong ui64)
+						return Builders<BsonDocument>.Filter.Eq<Decimal128>(FieldName, ui64);
+					else if (Value is double d)
+						return Builders<BsonDocument>.Filter.Eq<double>(FieldName, d);
+					else if (Value is float f)
+						return Builders<BsonDocument>.Filter.Eq<double>(FieldName, f);
+					else if (Value is decimal d2)
+						return Builders<BsonDocument>.Filter.Eq<Decimal128>(FieldName, d2);
+					else if (Value is bool b)
+						return Builders<BsonDocument>.Filter.Eq<bool>(FieldName, b);
+					else if (Value is DateTime DT)
+						return Builders<BsonDocument>.Filter.Eq<long>(FieldName, (long)(DT - ObjectSerializer.UnixEpoch).TotalMilliseconds);
+					else if (Value is DateTimeOffset DTO)
+					{
+						return Builders<BsonDocument>.Filter.And(
+							Builders<BsonDocument>.Filter.Eq<long>(FieldName + ".tp", (long)(DTO.DateTime - ObjectSerializer.UnixEpoch).TotalMilliseconds),
+							Builders<BsonDocument>.Filter.Eq<string>(FieldName + ".tz", DTO.Offset.ToString()));
+					}
+					else if (Value is TimeSpan TS)
+						return Builders<BsonDocument>.Filter.Eq<string>(FieldName, TS.ToString());
+					else if (Value is Guid Guid)
+						return Builders<BsonDocument>.Filter.Eq<string>(FieldName, Guid.ToString());
+					else if (Value is ObjectId ObjectId)
+						return Builders<BsonDocument>.Filter.Eq<ObjectId>(FieldName, ObjectId);
 					else
 						throw this.UnhandledFilterValueDataType(Serializer.ValueType.FullName, FieldName, Value);
 				}
@@ -604,39 +638,99 @@ namespace Waher.Persistence.MongoDB
 				{
 					if (IsDefaultValue)
 						return Builders<BsonDocument>.Filter.Ne<string>(FieldName, null);
-					else if (Value is string)
-						return Builders<BsonDocument>.Filter.Ne<string>(FieldName, (string)Value);
-					else if (Value is int)
-						return Builders<BsonDocument>.Filter.Ne<int>(FieldName, (int)Value);
-					else if (Value is long)
-						return Builders<BsonDocument>.Filter.Ne<long>(FieldName, (long)Value);
-					else if (Value is double)
-						return Builders<BsonDocument>.Filter.Ne<double>(FieldName, (double)Value);
-					else if (Value is bool)
-						return Builders<BsonDocument>.Filter.Ne<bool>(FieldName, (bool)Value);
-					else if (Value is DateTime)
-						return Builders<BsonDocument>.Filter.Ne<DateTime>(FieldName, (DateTime)Value);
-					else if (Value is ObjectId)
-						return Builders<BsonDocument>.Filter.Ne<ObjectId>(FieldName, (ObjectId)Value);
+					else if (Value is string s)
+					{
+						if (HasType && FieldType == typeof(CaseInsensitiveString))
+							return Builders<BsonDocument>.Filter.Ne<string>(FieldName + "_L", s);
+						else
+							return Builders<BsonDocument>.Filter.Ne<string>(FieldName, s);
+					}
+					else if (Value is CaseInsensitiveString cis)
+						return Builders<BsonDocument>.Filter.Ne<string>(FieldName + "_L", cis.LowerCase);
+					else if (Value is sbyte i8)
+						return Builders<BsonDocument>.Filter.Ne<int>(FieldName, i8);
+					else if (Value is short i16)
+						return Builders<BsonDocument>.Filter.Ne<int>(FieldName, i16);
+					else if (Value is int i32)
+						return Builders<BsonDocument>.Filter.Ne<int>(FieldName, i32);
+					else if (Value is long i64)
+						return Builders<BsonDocument>.Filter.Ne<long>(FieldName, i64);
+					else if (Value is byte ui8)
+						return Builders<BsonDocument>.Filter.Ne<int>(FieldName, ui8);
+					else if (Value is ushort ui16)
+						return Builders<BsonDocument>.Filter.Ne<int>(FieldName, ui16);
+					else if (Value is uint ui32)
+						return Builders<BsonDocument>.Filter.Ne<long>(FieldName, ui32);
+					else if (Value is ulong ui64)
+						return Builders<BsonDocument>.Filter.Ne<Decimal128>(FieldName, ui64);
+					else if (Value is double d)
+						return Builders<BsonDocument>.Filter.Ne<double>(FieldName, d);
+					else if (Value is float f)
+						return Builders<BsonDocument>.Filter.Ne<double>(FieldName, f);
+					else if (Value is decimal d2)
+						return Builders<BsonDocument>.Filter.Ne<Decimal128>(FieldName, d2);
+					else if (Value is bool b)
+						return Builders<BsonDocument>.Filter.Ne<bool>(FieldName, b);
+					else if (Value is DateTime DT)
+						return Builders<BsonDocument>.Filter.Ne<long>(FieldName, (long)(DT - ObjectSerializer.UnixEpoch).TotalMilliseconds);
+					else if (Value is DateTimeOffset DTO)
+					{
+						return Builders<BsonDocument>.Filter.Or(
+							Builders<BsonDocument>.Filter.Ne<long>(FieldName + ".tp", (long)(DTO.DateTime - ObjectSerializer.UnixEpoch).TotalMilliseconds),
+							Builders<BsonDocument>.Filter.Ne<string>(FieldName + ".tz", DTO.Offset.ToString()));
+					}
+					else if (Value is TimeSpan TS)
+						return Builders<BsonDocument>.Filter.Ne<string>(FieldName, TS.ToString());
+					else if (Value is Guid Guid)
+						return Builders<BsonDocument>.Filter.Ne<string>(FieldName, Guid.ToString());
+					else if (Value is ObjectId ObjectId)
+						return Builders<BsonDocument>.Filter.Ne<ObjectId>(FieldName, ObjectId);
 					else
 						throw this.UnhandledFilterValueDataType(Serializer.ValueType.FullName, FieldName, Value);
 				}
 				else if (Filter is FilterFieldGreaterThan)
 				{
-					if (Value is string)
-						return Builders<BsonDocument>.Filter.Gt<string>(FieldName, (string)Value);
-					else if (Value is int)
-						return Builders<BsonDocument>.Filter.Gt<int>(FieldName, (int)Value);
-					else if (Value is long)
-						return Builders<BsonDocument>.Filter.Gt<long>(FieldName, (long)Value);
-					else if (Value is double)
-						return Builders<BsonDocument>.Filter.Gt<double>(FieldName, (double)Value);
-					else if (Value is bool)
-						return Builders<BsonDocument>.Filter.Gt<bool>(FieldName, (bool)Value);
-					else if (Value is DateTime)
-						return Builders<BsonDocument>.Filter.Gt<DateTime>(FieldName, (DateTime)Value);
-					else if (Value is ObjectId)
-						return Builders<BsonDocument>.Filter.Gt<ObjectId>(FieldName, (ObjectId)Value);
+					if (Value is string s)
+					{
+						if (HasType && FieldType == typeof(CaseInsensitiveString))
+							return Builders<BsonDocument>.Filter.Gt<string>(FieldName + "_L", s);
+						else
+							return Builders<BsonDocument>.Filter.Gt<string>(FieldName, s);
+					}
+					else if (Value is CaseInsensitiveString cis)
+						return Builders<BsonDocument>.Filter.Gt<string>(FieldName + "_L", cis.LowerCase);
+					else if (Value is sbyte i8)
+						return Builders<BsonDocument>.Filter.Gt<int>(FieldName, i8);
+					else if (Value is short i16)
+						return Builders<BsonDocument>.Filter.Gt<int>(FieldName, i16);
+					else if (Value is int i32)
+						return Builders<BsonDocument>.Filter.Gt<int>(FieldName, i32);
+					else if (Value is long i64)
+						return Builders<BsonDocument>.Filter.Gt<long>(FieldName, i64);
+					else if (Value is byte ui8)
+						return Builders<BsonDocument>.Filter.Gt<int>(FieldName, ui8);
+					else if (Value is ushort ui16)
+						return Builders<BsonDocument>.Filter.Gt<int>(FieldName, ui16);
+					else if (Value is uint ui32)
+						return Builders<BsonDocument>.Filter.Gt<long>(FieldName, ui32);
+					else if (Value is ulong ui64)
+						return Builders<BsonDocument>.Filter.Gt<Decimal128>(FieldName, ui64);
+					else if (Value is double d)
+						return Builders<BsonDocument>.Filter.Gt<double>(FieldName, d);
+					else if (Value is float f)
+						return Builders<BsonDocument>.Filter.Gt<double>(FieldName, f);
+					else if (Value is decimal d2)
+						return Builders<BsonDocument>.Filter.Gt<Decimal128>(FieldName, d2);
+					else if (Value is bool b)
+						return Builders<BsonDocument>.Filter.Gt<bool>(FieldName, b);
+					else if (Value is DateTime DT)
+						return Builders<BsonDocument>.Filter.Gt<long>(FieldName, (long)(DT - ObjectSerializer.UnixEpoch).TotalMilliseconds);
+					else if (Value is TimeSpan TS)
+						return Builders<BsonDocument>.Filter.Gt<string>(FieldName, TS.ToString());
+					else if (Value is Guid Guid)
+						return Builders<BsonDocument>.Filter.Gt<string>(FieldName, Guid.ToString());
+					else if (Value is ObjectId ObjectId)
+						return Builders<BsonDocument>.Filter.Gt<ObjectId>(FieldName, ObjectId);
 					else
 						throw this.UnhandledFilterValueDataType(Serializer.ValueType.FullName, FieldName, Value);
 				}
@@ -647,39 +741,93 @@ namespace Waher.Persistence.MongoDB
 						return this.Convert(new FilterOr(new FilterFieldGreaterThan(FieldName, Value),
 							new FilterFieldEqualTo(FieldName, Value)), Serializer);
 					}
-					else if (Value is string)
-						return Builders<BsonDocument>.Filter.Gte<string>(FieldName, (string)Value);
-					else if (Value is int)
-						return Builders<BsonDocument>.Filter.Gte<int>(FieldName, (int)Value);
-					else if (Value is long)
-						return Builders<BsonDocument>.Filter.Gte<long>(FieldName, (long)Value);
-					else if (Value is double)
-						return Builders<BsonDocument>.Filter.Gte<double>(FieldName, (double)Value);
-					else if (Value is bool)
-						return Builders<BsonDocument>.Filter.Gte<bool>(FieldName, (bool)Value);
-					else if (Value is DateTime)
-						return Builders<BsonDocument>.Filter.Gte<DateTime>(FieldName, (DateTime)Value);
-					else if (Value is ObjectId)
-						return Builders<BsonDocument>.Filter.Gte<ObjectId>(FieldName, (ObjectId)Value);
+					else if (Value is string s)
+					{
+						if (HasType && FieldType == typeof(CaseInsensitiveString))
+							return Builders<BsonDocument>.Filter.Gte<string>(FieldName + "_L", s);
+						else
+							return Builders<BsonDocument>.Filter.Gte<string>(FieldName, s);
+					}
+					else if (Value is CaseInsensitiveString cis)
+						return Builders<BsonDocument>.Filter.Gte<string>(FieldName + "_L", cis.LowerCase);
+					else if (Value is sbyte i8)
+						return Builders<BsonDocument>.Filter.Gte<int>(FieldName, i8);
+					else if (Value is short i16)
+						return Builders<BsonDocument>.Filter.Gte<int>(FieldName, i16);
+					else if (Value is int i32)
+						return Builders<BsonDocument>.Filter.Gte<int>(FieldName, i32);
+					else if (Value is long i64)
+						return Builders<BsonDocument>.Filter.Gte<long>(FieldName, i64);
+					else if (Value is byte ui8)
+						return Builders<BsonDocument>.Filter.Gte<int>(FieldName, ui8);
+					else if (Value is ushort ui16)
+						return Builders<BsonDocument>.Filter.Gte<int>(FieldName, ui16);
+					else if (Value is uint ui32)
+						return Builders<BsonDocument>.Filter.Gte<long>(FieldName, ui32);
+					else if (Value is ulong ui64)
+						return Builders<BsonDocument>.Filter.Gte<Decimal128>(FieldName, ui64);
+					else if (Value is double d)
+						return Builders<BsonDocument>.Filter.Gte<double>(FieldName, d);
+					else if (Value is float f)
+						return Builders<BsonDocument>.Filter.Gte<double>(FieldName, f);
+					else if (Value is decimal d2)
+						return Builders<BsonDocument>.Filter.Gte<Decimal128>(FieldName, d2);
+					else if (Value is bool b)
+						return Builders<BsonDocument>.Filter.Gte<bool>(FieldName, b);
+					else if (Value is DateTime DT)
+						return Builders<BsonDocument>.Filter.Gte<long>(FieldName, (long)(DT - ObjectSerializer.UnixEpoch).TotalMilliseconds);
+					else if (Value is TimeSpan TS)
+						return Builders<BsonDocument>.Filter.Gte<string>(FieldName, TS.ToString());
+					else if (Value is Guid Guid)
+						return Builders<BsonDocument>.Filter.Gte<string>(FieldName, Guid.ToString());
+					else if (Value is ObjectId ObjectId)
+						return Builders<BsonDocument>.Filter.Gte<ObjectId>(FieldName, ObjectId);
 					else
 						throw this.UnhandledFilterValueDataType(Serializer.ValueType.FullName, FieldName, Value);
 				}
 				else if (Filter is FilterFieldLesserThan)
 				{
-					if (Value is string)
-						return Builders<BsonDocument>.Filter.Lt<string>(FieldName, (string)Value);
-					else if (Value is int)
-						return Builders<BsonDocument>.Filter.Lt<int>(FieldName, (int)Value);
-					else if (Value is long)
-						return Builders<BsonDocument>.Filter.Lt<long>(FieldName, (long)Value);
-					else if (Value is double)
-						return Builders<BsonDocument>.Filter.Lt<double>(FieldName, (double)Value);
-					else if (Value is bool)
-						return Builders<BsonDocument>.Filter.Lt<bool>(FieldName, (bool)Value);
-					else if (Value is DateTime)
-						return Builders<BsonDocument>.Filter.Lt<DateTime>(FieldName, (DateTime)Value);
-					else if (Value is ObjectId)
-						return Builders<BsonDocument>.Filter.Lt<ObjectId>(FieldName, (ObjectId)Value);
+					if (Value is string s)
+					{
+						if (HasType && FieldType == typeof(CaseInsensitiveString))
+							return Builders<BsonDocument>.Filter.Lt<string>(FieldName + "_L", s);
+						else
+							return Builders<BsonDocument>.Filter.Lt<string>(FieldName, s);
+					}
+					else if (Value is CaseInsensitiveString cis)
+						return Builders<BsonDocument>.Filter.Lt<string>(FieldName + "_L", cis.LowerCase);
+					else if (Value is sbyte i8)
+						return Builders<BsonDocument>.Filter.Lt<int>(FieldName, i8);
+					else if (Value is short i16)
+						return Builders<BsonDocument>.Filter.Lt<int>(FieldName, i16);
+					else if (Value is int i32)
+						return Builders<BsonDocument>.Filter.Lt<int>(FieldName, i32);
+					else if (Value is long i64)
+						return Builders<BsonDocument>.Filter.Lt<long>(FieldName, i64);
+					else if (Value is byte ui8)
+						return Builders<BsonDocument>.Filter.Lt<int>(FieldName, ui8);
+					else if (Value is ushort ui16)
+						return Builders<BsonDocument>.Filter.Lt<int>(FieldName, ui16);
+					else if (Value is uint ui32)
+						return Builders<BsonDocument>.Filter.Lt<long>(FieldName, ui32);
+					else if (Value is ulong ui64)
+						return Builders<BsonDocument>.Filter.Lt<Decimal128>(FieldName, ui64);
+					else if (Value is double d)
+						return Builders<BsonDocument>.Filter.Lt<double>(FieldName, d);
+					else if (Value is float f)
+						return Builders<BsonDocument>.Filter.Lt<double>(FieldName, f);
+					else if (Value is decimal d2)
+						return Builders<BsonDocument>.Filter.Lt<Decimal128>(FieldName, d2);
+					else if (Value is bool b)
+						return Builders<BsonDocument>.Filter.Lt<bool>(FieldName, b);
+					else if (Value is DateTime DT)
+						return Builders<BsonDocument>.Filter.Lt<long>(FieldName, (long)(DT - ObjectSerializer.UnixEpoch).TotalMilliseconds);
+					else if (Value is TimeSpan TS)
+						return Builders<BsonDocument>.Filter.Lt<string>(FieldName, TS.ToString());
+					else if (Value is Guid Guid)
+						return Builders<BsonDocument>.Filter.Lt<string>(FieldName, Guid.ToString());
+					else if (Value is ObjectId ObjectId)
+						return Builders<BsonDocument>.Filter.Lt<ObjectId>(FieldName, ObjectId);
 					else
 						throw this.UnhandledFilterValueDataType(Serializer.ValueType.FullName, FieldName, Value);
 				}
@@ -690,20 +838,47 @@ namespace Waher.Persistence.MongoDB
 						return this.Convert(new FilterOr(new FilterFieldLesserThan(FieldName, Value),
 							new FilterFieldEqualTo(FieldName, Value)), Serializer);
 					}
-					else if (Value is string)
-						return Builders<BsonDocument>.Filter.Lte<string>(FieldName, (string)Value);
-					else if (Value is int)
-						return Builders<BsonDocument>.Filter.Lte<int>(FieldName, (int)Value);
-					else if (Value is long)
-						return Builders<BsonDocument>.Filter.Lte<long>(FieldName, (long)Value);
-					else if (Value is double)
-						return Builders<BsonDocument>.Filter.Lte<double>(FieldName, (double)Value);
-					else if (Value is bool)
-						return Builders<BsonDocument>.Filter.Lte<bool>(FieldName, (bool)Value);
-					else if (Value is DateTime)
-						return Builders<BsonDocument>.Filter.Lte<DateTime>(FieldName, (DateTime)Value);
-					else if (Value is ObjectId)
-						return Builders<BsonDocument>.Filter.Lte<ObjectId>(FieldName, (ObjectId)Value);
+					else if (Value is string s)
+					{
+						if (HasType && FieldType == typeof(CaseInsensitiveString))
+							return Builders<BsonDocument>.Filter.Lte<string>(FieldName + "_L", s);
+						else
+							return Builders<BsonDocument>.Filter.Lte<string>(FieldName, s);
+					}
+					else if (Value is CaseInsensitiveString cis)
+						return Builders<BsonDocument>.Filter.Lte<string>(FieldName + "_L", cis.LowerCase);
+					else if (Value is sbyte i8)
+						return Builders<BsonDocument>.Filter.Lte<int>(FieldName, i8);
+					else if (Value is short i16)
+						return Builders<BsonDocument>.Filter.Lte<int>(FieldName, i16);
+					else if (Value is int i32)
+						return Builders<BsonDocument>.Filter.Lte<int>(FieldName, i32);
+					else if (Value is long i64)
+						return Builders<BsonDocument>.Filter.Lte<long>(FieldName, i64);
+					else if (Value is byte ui8)
+						return Builders<BsonDocument>.Filter.Lte<int>(FieldName, ui8);
+					else if (Value is ushort ui16)
+						return Builders<BsonDocument>.Filter.Lte<int>(FieldName, ui16);
+					else if (Value is uint ui32)
+						return Builders<BsonDocument>.Filter.Lte<long>(FieldName, ui32);
+					else if (Value is ulong ui64)
+						return Builders<BsonDocument>.Filter.Lte<Decimal128>(FieldName, ui64);
+					else if (Value is double d)
+						return Builders<BsonDocument>.Filter.Lte<double>(FieldName, d);
+					else if (Value is float f)
+						return Builders<BsonDocument>.Filter.Lte<double>(FieldName, f);
+					else if (Value is decimal d2)
+						return Builders<BsonDocument>.Filter.Lte<Decimal128>(FieldName, d2);
+					else if (Value is bool b)
+						return Builders<BsonDocument>.Filter.Lte<bool>(FieldName, b);
+					else if (Value is DateTime DT)
+						return Builders<BsonDocument>.Filter.Lte<long>(FieldName, (long)(DT - ObjectSerializer.UnixEpoch).TotalMilliseconds);
+					else if (Value is TimeSpan TS)
+						return Builders<BsonDocument>.Filter.Lte<string>(FieldName, TS.ToString());
+					else if (Value is Guid Guid)
+						return Builders<BsonDocument>.Filter.Lte<string>(FieldName, Guid.ToString());
+					else if (Value is ObjectId ObjectId)
+						return Builders<BsonDocument>.Filter.Lte<ObjectId>(FieldName, ObjectId);
 					else
 						throw this.UnhandledFilterValueDataType(Serializer.ValueType.FullName, FieldName, Value);
 				}
@@ -775,8 +950,8 @@ namespace Waher.Persistence.MongoDB
 		{
 			string Key = typeof(T).FullName + " " + ObjectId.ToString();
 
-			if (this.loadCache.TryGetValue(Key, out object Obj) && Obj is T)
-				return (T)Obj;
+			if (this.loadCache.TryGetValue(Key, out object Obj) && Obj is T Result)
+				return Result;
 
 			ObjectSerializer S = this.GetObjectSerializerEx(typeof(T));
 			IEnumerable<T> ReferencedObjects = await this.Find<T>(0, 2, new FilterFieldEqualTo(S.ObjectIdMemberName, ObjectId));
@@ -911,16 +1086,6 @@ namespace Waher.Persistence.MongoDB
 		}
 
 		/// <summary>
-		/// Performs an export of the entire database.
-		/// </summary>
-		/// <param name="Output">Database will be output to this interface.</param>
-		/// <returns>Task object for synchronization purposes.</returns>
-		public Task Export(IDatabaseExport Output)
-		{
-			throw new NotImplementedException("MongoDB provider does not support the Export method.");  // TODO
-		}
-
-		/// <summary>
 		/// Analyzes the database and exports findings to XML.
 		/// </summary>
 		/// <param name="Output">XML Output.</param>
@@ -929,7 +1094,7 @@ namespace Waher.Persistence.MongoDB
 		/// <param name="ExportData">If data in database is to be exported in output.</param>
 		public Task Analyze(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData)
 		{
-			throw new NotImplementedException("MongoDB provider does not support the Analyze method.");  // TODO
+			return this.Analyze(Output, XsltPath, ProgramDataFolder, ExportData, false);
 		}
 
 		/// <summary>
@@ -941,7 +1106,7 @@ namespace Waher.Persistence.MongoDB
 		/// <param name="ExportData">If data in database is to be exported in output.</param>
 		public Task Repair(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData)
 		{
-			throw new NotImplementedException("MongoDB provider does not support the Repair method.");  // TODO
+			return this.Analyze(Output, XsltPath, ProgramDataFolder, ExportData, true);
 		}
 
 		/// <summary>
@@ -952,9 +1117,57 @@ namespace Waher.Persistence.MongoDB
 		/// <param name="ProgramDataFolder">Program data folder. Can be removed from filenames used, when referencing them in the report.</param>
 		/// <param name="ExportData">If data in database is to be exported in output.</param>
 		/// <param name="Repair">If files should be repaired if corruptions are detected.</param>
-		public Task Analyze(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData, bool Repair)
+		public async Task Analyze(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData, bool Repair)
 		{
-			throw new NotImplementedException("MongoDB provider does not support the Analyze method.");  // TODO
+			Output.WriteStartDocument();
+
+			if (!string.IsNullOrEmpty(XsltPath))
+				Output.WriteProcessingInstruction("xml-stylesheet", "type=\"text/xsl\" href=\"" + Encode(XsltPath) + "\"");
+
+			Output.WriteStartElement("DatabaseStatistics", "http://waher.se/Schema/Persistence/Statistics.xsd");
+
+			foreach (string CollectionName in (await this.database.ListCollectionNamesAsync()).ToEnumerable())
+			{
+				IMongoCollection<BsonDocument> Collection = this.database.GetCollection<BsonDocument>(CollectionName);
+
+				Output.WriteStartElement("File");
+				Output.WriteAttributeString("id", Collection.CollectionNamespace.FullName);
+				Output.WriteAttributeString("collectionName", CollectionName);
+				Output.WriteAttributeString("count", (await Collection.CountDocumentsAsync(null)).ToString());
+				Output.WriteAttributeString("encoding", Collection.Settings.WriteEncoding.WebName);
+
+				if (Collection.Settings.WriteConcern.WTimeout.HasValue)
+					Output.WriteAttributeString("timeoutMs", ((int)Collection.Settings.WriteConcern.WTimeout.Value.TotalMilliseconds).ToString());
+
+				foreach (BsonDocument Index in (await Collection.Indexes.ListAsync()).ToEnumerable())
+				{
+				}
+
+				Output.WriteEndElement();
+			}
+
+			Output.WriteEndElement();
+			Output.WriteEndDocument();
+		}
+
+		private static string Encode(string s)
+		{
+			return s.
+				Replace("&", "&amp;").
+				Replace("<", "&lt;").
+				Replace(">", "&gt;").
+				Replace("\"", "&quot;").
+				Replace("'", "&apos;");
+		}
+
+		/// <summary>
+		/// Performs an export of the entire database.
+		/// </summary>
+		/// <param name="Output">Database will be output to this interface.</param>
+		/// <returns>Task object for synchronization purposes.</returns>
+		public Task Export(IDatabaseExport Output)
+		{
+			throw new NotImplementedException("MongoDB provider does not support the Export method.");  // TODO
 		}
 
 		/// <summary>

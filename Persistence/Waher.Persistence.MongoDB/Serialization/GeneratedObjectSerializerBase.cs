@@ -59,6 +59,15 @@ namespace Waher.Persistence.MongoDB.Serialization
 		public abstract bool TryGetFieldValue(string FieldName, object Object, out object Value);
 
 		/// <summary>
+		/// Gets the type of a field or property of an object, given its name.
+		/// </summary>
+		/// <param name="FieldName">Name of field or property.</param>
+		/// <param name="Object">Object.</param>
+		/// <param name="FieldType">Corresponding field or property type, if found, or null otherwise.</param>
+		/// <returns>If the corresponding field or property was found.</returns>
+		public abstract bool TryGetFieldType(string FieldName, object Object, out Type FieldType);
+
+		/// <summary>
 		/// Reads a boolean value.
 		/// </summary>
 		/// <param name="Reader">Binary reader.</param>
@@ -856,6 +865,10 @@ namespace Waher.Persistence.MongoDB.Serialization
 
 					return Elements.ToArray();
 
+				case BsonType.Binary:
+					object Temp = Reader.ReadBytes();
+					return (T[])Temp;
+
 				case BsonType.Null:
 					return null;
 
@@ -907,6 +920,18 @@ namespace Waher.Persistence.MongoDB.Serialization
 					int c = Elements.Count;
 					Array Result = Array.CreateInstance(T, c);
 					Array.Copy(Elements.ToArray(), 0, Result, 0, c);
+
+					return Result;
+
+				case BsonType.Binary:
+					byte[] Bin = Reader.ReadBytes();
+
+					if (T is null || T == typeof(byte))
+						return Bin;
+
+					c = Bin.Length;
+					Result = Array.CreateInstance(T, c);
+					Array.Copy(Bin, 0, Result, 0, c);
 
 					return Result;
 

@@ -285,6 +285,28 @@ namespace Waher.Persistence.MongoDB.Serialization
 		}
 
 		/// <summary>
+		/// Gets the type of a field or property of an object, given its name.
+		/// </summary>
+		/// <param name="FieldName">Name of field or property.</param>
+		/// <param name="Object">Object.</param>
+		/// <param name="FieldType">Corresponding field or property type, if found, or null otherwise.</param>
+		/// <returns>If the corresponding field or property was found.</returns>
+		public override bool TryGetFieldType(string FieldName, object Object, out Type FieldType)
+		{
+			GenericObject Obj = (GenericObject)Object;
+			if (Obj.TryGetFieldValue(FieldName, out object Value))
+			{
+				FieldType = Value?.GetType() ?? typeof(object);
+				return true;
+			}
+			else
+			{
+				FieldType = null;
+				return false;
+			}
+		}
+
+		/// <summary>
 		/// Mamber name of the field or property holding the Object ID, if any. If there are no such member, this property returns null.
 		/// </summary>
 		public override string ObjectIdMemberName => "ObjectId";

@@ -1255,6 +1255,10 @@ namespace Waher.Persistence.MongoDB.Serialization
 										CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.String:");
 										CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Guid.Parse(Reader.ReadString());");
 										CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+										CSharp.AppendLine();
+										CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.ObjectId:");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = ObjectIdToGuid(Reader.ReadObjectId());");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
 										if (Nullable)
 										{
 											CSharp.AppendLine();
@@ -1771,7 +1775,19 @@ namespace Waher.Persistence.MongoDB.Serialization
 								else if (MemberType == typeof(Guid))
 								{
 									CSharp.Append(Indent2);
-									CSharp.Append("Writer.WriteString(Value.");
+									CSharp.Append("if (TryConvertToObjectId(Value.");
+									CSharp.Append(Member.Name);
+									CSharp.Append(", out ObjectId ");
+									CSharp.Append(Member.Name);
+									CSharp.AppendLine("ObjId))");
+									CSharp.Append(Indent2);
+									CSharp.Append("\tWriter.WriteObjectId(");
+									CSharp.Append(Member.Name);
+									CSharp.AppendLine("ObjId);");
+									CSharp.Append(Indent2);
+									CSharp.Append("else");
+									CSharp.Append(Indent2);
+									CSharp.Append("\tWriter.WriteString(Value.");
 									CSharp.Append(Member.Name);
 									if (Nullable)
 										CSharp.Append(".Value");
@@ -2084,14 +2100,6 @@ namespace Waher.Persistence.MongoDB.Serialization
 		public static readonly DateTime UnixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
 		/// <summary>
-		/// Name of collection objects of this type is to be stored in, if available. If not available, this property returns null.
-		/// </summary>
-		public string CollectionName
-		{
-			get { return this.collectionName; }
-		}
-
-		/// <summary>
 		/// Gets the type of the value.
 		/// </summary>
 		public Type ValueType
@@ -2302,7 +2310,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 
 				Type ValueType = Value.GetType();
 				ObjectSerializer Serializer = this.provider.GetObjectSerializerEx(ValueType);
-				string CollectionName = Serializer.CollectionName;
+				string CollectionName = Serializer.CollectionName(Value);
 				IMongoCollection<BsonDocument> Collection;
 
 				if (string.IsNullOrEmpty(CollectionName))
@@ -2369,6 +2377,15 @@ namespace Waher.Persistence.MongoDB.Serialization
 				return true;
 
 			return Default.Equals(Value);
+		}
+
+		/// <summary>
+		/// Name of collection objects of this type is to be stored in, if available. If not available, this property returns null.
+		/// </summary>
+		/// <param name="Object">Object in the current context. If null, the default collection name is requested.</param>
+		public virtual string CollectionName(object Object)
+		{
+			return this.collectionName;
 		}
 
 		/// <summary>

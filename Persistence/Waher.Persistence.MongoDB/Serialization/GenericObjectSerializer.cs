@@ -341,5 +341,17 @@ namespace Waher.Persistence.MongoDB.Serialization
 			return false;
 		}
 
+		/// <summary>
+		/// Name of collection objects of this type is to be stored in, if available. If not available, this property returns null.
+		/// </summary>
+		/// <param name="Object">Object in the current context. If null, the default collection name is requested.</param>
+		public override string CollectionName(object Object)
+		{
+			if (Object != null && Object is GenericObject Obj)
+				return Obj.CollectionName;
+			else
+				return base.CollectionName(Object);
+		}
+
 	}
 }

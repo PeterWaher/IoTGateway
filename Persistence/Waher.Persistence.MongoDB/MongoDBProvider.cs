@@ -153,6 +153,14 @@ namespace Waher.Persistence.MongoDB
 		}
 
 		/// <summary>
+		/// Number of bytes used by an Object ID.
+		/// </summary>
+		public int ObjectIdByteCount
+		{
+			get => 12;
+		}
+
+		/// <summary>
 		/// Gets a collection.
 		/// </summary>
 		/// <param name="CollectionName">Name of collection.</param>
@@ -321,7 +329,7 @@ namespace Waher.Persistence.MongoDB
 		public async Task Insert(object Object)
 		{
 			ObjectSerializer Serializer = this.GetObjectSerializerEx(Object);
-			string CollectionName = Serializer.CollectionName;
+			string CollectionName = Serializer.CollectionName(Object);
 			IMongoCollection<BsonDocument> Collection;
 
 			if (string.IsNullOrEmpty(CollectionName))
@@ -377,7 +385,7 @@ namespace Waher.Persistence.MongoDB
 				if (Type != LastType)
 				{
 					Serializer = this.GetObjectSerializerEx(Type);
-					CollectionName = Serializer.CollectionName;
+					CollectionName = Serializer.CollectionName(Object);
 					LastType = Type;
 
 					if (CollectionName == LastCollectionName)
@@ -438,7 +446,7 @@ namespace Waher.Persistence.MongoDB
 		public Task<IEnumerable<T>> Find<T>(int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
 		{
 			ObjectSerializer Serializer = this.GetObjectSerializerEx(typeof(T));
-			string CollectionName = Serializer.CollectionName;
+			string CollectionName = Serializer.CollectionName(null);
 			IMongoCollection<BsonDocument> Collection;
 			FilterDefinition<BsonDocument> BsonFilter;
 
@@ -469,7 +477,7 @@ namespace Waher.Persistence.MongoDB
 			params string[] SortOrder)
 		{
 			ObjectSerializer Serializer = this.GetObjectSerializerEx(typeof(T));
-			string CollectionName = Serializer.CollectionName;
+			string CollectionName = Serializer.CollectionName(null);
 			IMongoCollection<BsonDocument> Collection;
 
 			if (string.IsNullOrEmpty(CollectionName))
@@ -800,7 +808,7 @@ namespace Waher.Persistence.MongoDB
 		{
 			ObjectSerializer Serializer = this.GetObjectSerializerEx(Object);
 			ObjectId ObjectId = await Serializer.GetObjectId(Object, false);
-			string CollectionName = Serializer.CollectionName;
+			string CollectionName = Serializer.CollectionName(Object);
 			IMongoCollection<BsonDocument> Collection;
 
 			if (string.IsNullOrEmpty(CollectionName))
@@ -839,7 +847,7 @@ namespace Waher.Persistence.MongoDB
 		{
 			ObjectSerializer Serializer = this.GetObjectSerializerEx(Object);
 			ObjectId ObjectId = await Serializer.GetObjectId(Object, false);
-			string CollectionName = Serializer.CollectionName;
+			string CollectionName = Serializer.CollectionName(Object);
 			IMongoCollection<BsonDocument> Collection;
 
 			if (string.IsNullOrEmpty(CollectionName))

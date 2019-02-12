@@ -1034,12 +1034,31 @@ namespace Waher.Persistence.MongoDB.Serialization
 			return new ObjectId(A);
 		}
 
+		public static bool TryConvertToObjectId(Guid Guid, out ObjectId ObjectId)
+		{
+			byte[] A = Guid.ToByteArray();
+			int i;
+
+			for (i = 12; i < 16; i++)
+			{
+				if (A[i] != 0)
+				{
+					ObjectId = ObjectId.Empty;
+					return false;
+				}
+			}
+
+			Array.Resize<byte>(ref A, 12);
+
+			ObjectId = new ObjectId(A);
+			return true;
+		}
+
 		/// <summary>
 		/// Converts a MongoDB Object ID to a GUID
 		/// </summary>
 		/// <param name="Guid">GUID</param>
 		/// <returns>Object ID</returns>
-		/// <exception cref="Exception">If GUID contains more than 12 bytes of information.</exception>
 		public static Guid ObjectIdToGuid(ObjectId ObjectId)
 		{
 			byte[] A = new byte[16];

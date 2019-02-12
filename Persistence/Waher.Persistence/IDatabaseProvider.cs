@@ -173,5 +173,12 @@ namespace Waher.Persistence
 		/// </summary>
 		Task Flush();
 
+		/// <summary>
+		/// Number of bytes used by an Object ID.
+		/// </summary>
+		int ObjectIdByteCount
+		{
+			get;
+		}
 	}
 }

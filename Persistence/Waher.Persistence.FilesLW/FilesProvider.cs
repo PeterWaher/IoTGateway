@@ -410,6 +410,14 @@ namespace Waher.Persistence.Files
 		}
 
 		/// <summary>
+		/// Number of bytes used by an Object ID.
+		/// </summary>
+		public int ObjectIdByteCount
+		{
+			get => 16;
+		}
+
+		/// <summary>
 		/// Size of a block in the B-tree. The size must be a power of two, and should be at least the same
 		/// size as a sector on the storage device. Smaller block sizes (2, 4 kB) are suitable for online transaction processing, where
 		/// a lot of updates to the database occurs. Larger block sizes (8, 16, 32 kB) are suitable for decision support systems.
@@ -2351,7 +2359,7 @@ namespace Waher.Persistence.Files
 
 													try
 													{
-														Obj = File.GenericSerializer.Deserialize(Reader2, ObjectSerializer.TYPE_OBJECT, false, false);
+														Obj = File.GenericSerializer.Deserialize(Reader2, ObjectSerializer.TYPE_OBJECT, false, true);
 														Len2 = Pos2 - Reader2.Position;
 													}
 													catch (Exception)

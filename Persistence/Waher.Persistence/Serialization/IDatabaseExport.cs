@@ -55,7 +55,8 @@ namespace Waher.Persistence.Serialization
 		/// </summary>
 		/// <param name="ObjectId">ID of object.</param>
 		/// <param name="TypeName">Type name of object.</param>
-		Task StartObject(string ObjectId, string TypeName);
+		/// <returns>Object ID of object, after optional mapping.</returns>
+		Task<string> StartObject(string ObjectId, string TypeName);
 
 		/// <summary>
 		/// Is called when an object is finished.

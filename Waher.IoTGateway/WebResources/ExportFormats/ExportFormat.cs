@@ -116,7 +116,7 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 		/// </summary>
 		/// <param name="ObjectId">ID of object.</param>
 		/// <param name="TypeName">Type name of object.</param>
-		public abstract Task StartObject(string ObjectId, string TypeName);
+		public abstract Task<string> StartObject(string ObjectId, string TypeName);
 
 		/// <summary>
 		/// Is called when an object is finished.

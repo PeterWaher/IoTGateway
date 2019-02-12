@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Waher.IoTGateway.WebResources.ExportFormats;
+using Waher.Persistence;
+using Waher.Security;
 
 namespace Waher.IoTGateway.Setup
 {
@@ -31,21 +33,43 @@ namespace Waher.IoTGateway.Setup
 		/// </summary>
 		protected string typeName = null;
 
+		/// <summary>
+		/// Object ID map, if available
+		/// </summary>
+		protected readonly Dictionary<string, string> objectIdMap;
+
+		/// <summary>
+		/// If Object IDs are mapped.
+		/// </summary>
+		protected readonly bool mapObjectIds;
+
 		private readonly string fileName;
+		private readonly int objectIdByteCount;
 		private long nrCollections = 0;
 		private long nrIndices = 0;
 		private long nrObjects = 0;
 		private long nrProperties = 0;
 		private long nrFiles = 0;
 		private long nrFileBytes = 0;
-
 		/// <summary>
 		/// Class validating the status of a backup file.
 		/// </summary>
 		/// <param name="FileName">Name of file</param>
-		public ValidateBackupFile(string FileName)
+		/// <param name="ObjectIdMap">Object ID Mapping, if available.</param>
+		public ValidateBackupFile(string FileName, Dictionary<string, string> ObjectIdMap)
 		{
 			this.fileName = FileName;
+
+			if ((this.objectIdByteCount = Database.Provider.ObjectIdByteCount) < 16)
+			{
+				this.objectIdMap = ObjectIdMap ?? new Dictionary<string, string>(StringComparer.CurrentCultureIgnoreCase);
+				this.mapObjectIds = true;
+			}
+			else
+			{
+				this.objectIdMap = null;
+				this.mapObjectIds = false;
+			}
 		}
 
 		/// <summary>
@@ -82,6 +106,11 @@ namespace Waher.IoTGateway.Setup
 		/// Number of file byets processed.
 		/// </summary>
 		public long NrFileBytes => this.nrFileBytes;
+
+		/// <summary>
+		/// Object ID mapping, if available.
+		/// </summary>
+		public Dictionary<string, string> ObjectIdMap => this.objectIdMap;
 
 		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>
@@ -181,13 +210,72 @@ namespace Waher.IoTGateway.Setup
 		/// </summary>
 		/// <param name="ObjectId">ID of object.</param>
 		/// <param name="TypeName">Type name of object.</param>
-		public virtual Task StartObject(string ObjectId, string TypeName)
+		public virtual Task<string> StartObject(string ObjectId, string TypeName)
 		{
+			if (this.mapObjectIds)
+			{
+				string ObjectId0 = ObjectId;
+
+				if (!this.objectIdMap.TryGetValue(ObjectId0, out ObjectId))
+				{
+					byte[] A;
+					int i, c;
+
+					if (System.Guid.TryParse(ObjectId0, out Guid Guid))
+						A = Guid.ToByteArray();
+					else
+						A = Hashes.StringToBinary(ObjectId0);
+
+					if (!(A is null) && (c = A.Length) != this.objectIdByteCount)
+					{
+						if (c > this.objectIdByteCount)
+						{
+							if (c == 16)
+							{
+								for (i = this.objectIdByteCount; i < c; i++)
+									A[i] = 0;
+
+								ObjectId = new Guid(A).ToString();
+							}
+							else
+							{
+								Array.Resize<byte>(ref A, this.objectIdByteCount);
+								ObjectId = Hashes.BinaryToString(A);
+							}
+						}
+						else
+						{
+							Array.Resize<byte>(ref A, this.objectIdByteCount);
+
+							if (this.objectIdByteCount == 16)
+								ObjectId = new Guid(A).ToString();
+							else
+								ObjectId = Hashes.BinaryToString(A);
+						}
+
+						while (this.objectIdMap.ContainsKey(ObjectId))
+						{
+							if (this.objectIdByteCount == 16)
+								ObjectId = Guid.NewGuid().ToString();
+							else
+							{
+								A = Gateway.NextBytes(this.objectIdByteCount);
+								ObjectId = Hashes.BinaryToString(A);
+							}
+						}
+
+						this.objectIdMap[ObjectId0] = ObjectId;
+					}
+					else
+						ObjectId = ObjectId0;
+				}
+			}
+
 			this.objectId = ObjectId;
 			this.typeName = TypeName;
 			this.nrObjects++;
 
-			return Task.CompletedTask;
+			return Task.FromResult<string>(ObjectId);
 		}
 
 		/// <summary>

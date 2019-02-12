@@ -300,14 +300,14 @@ namespace Waher.IoTGateway.Setup
 					throw new Exception("No backup file selected.");
 
 				string Extension = Path.GetExtension(BackupFileName);
-				ValidateBackupFile Import = new ValidateBackupFile(BackupFileName);
+				ValidateBackupFile Import = new ValidateBackupFile(BackupFileName, null);
 
 				(AesTransform1, cs1) = await DoImport(BackupFile, KeyFile, TabID, Extension, Import, false);
 
 				if (Overwrite)
 				{
 					ShowStatus(TabID, "Restoring backup.");
-					Import = new RestoreBackupFile(BackupFileName);
+					Import = new RestoreBackupFile(BackupFileName, Import.ObjectIdMap);
 
 					(AesTransform2, cs2) = await DoImport(BackupFile, KeyFile, TabID, Extension, Import, true);
 					this.reloadConfiguration = true;

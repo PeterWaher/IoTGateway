@@ -385,12 +385,12 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 		/// </summary>
 		/// <param name="ObjectId">ID of object.</param>
 		/// <param name="TypeName">Type name of object.</param>
-		public override Task StartObject(string ObjectId, string TypeName)
+		public override Task<string> StartObject(string ObjectId, string TypeName)
 		{
 			this.w.Write((byte)2);
 			this.w.Write(ObjectId);
 			this.w.Write(TypeName);
-			return Task.CompletedTask;
+			return Task.FromResult<string>(ObjectId);
 		}
 
 		/// <summary>

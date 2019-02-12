@@ -135,11 +135,13 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 		/// </summary>
 		/// <param name="ObjectId">ID of object.</param>
 		/// <param name="TypeName">Type name of object.</param>
-		public override async Task StartObject(string ObjectId, string TypeName)
+		public override async Task<string> StartObject(string ObjectId, string TypeName)
 		{
 			await this.output.WriteStartElementAsync(string.Empty, "Obj", Export.ExportNamepace);
 			await this.output.WriteAttributeStringAsync(string.Empty, "id", string.Empty, ObjectId);
 			await this.output.WriteAttributeStringAsync(string.Empty, "type", string.Empty, TypeName);
+
+			return ObjectId;
 		}
 
 		/// <summary>

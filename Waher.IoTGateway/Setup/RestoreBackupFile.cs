@@ -4,9 +4,9 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
-using Waher.IoTGateway;
 using Waher.Persistence;
 using Waher.Persistence.Serialization;
+using Waher.Security;
 
 namespace Waher.IoTGateway.Setup
 {
@@ -23,8 +23,9 @@ namespace Waher.IoTGateway.Setup
 		/// Class restoring the contents of a backup file.
 		/// </summary>
 		/// <param name="FileName">Name of file</param>
-		public RestoreBackupFile(string FileName)
-			: base(FileName)
+		/// <param name="ObjectIdMap">Object ID Mapping, if available.</param>
+		public RestoreBackupFile(string FileName, Dictionary<string, string> ObjectIdMap)
+			: base(FileName, ObjectIdMap)
 		{
 		}
 
@@ -95,10 +96,11 @@ namespace Waher.IoTGateway.Setup
 		/// </summary>
 		/// <param name="ObjectId">ID of object.</param>
 		/// <param name="TypeName">Type name of object.</param>
-		public override Task StartObject(string ObjectId, string TypeName)
+		public override async Task<string> StartObject(string ObjectId, string TypeName)
 		{
+			ObjectId = await base.StartObject(ObjectId, TypeName);
 			this.obj = new GenericObject(this.collectionName, TypeName, Guid.Parse(ObjectId));
-			return base.StartObject(ObjectId, TypeName);
+			return ObjectId;
 		}
 
 		/// <summary>
@@ -138,7 +140,51 @@ namespace Waher.IoTGateway.Setup
 		public override Task ReportProperty(string PropertyName, object PropertyValue)
 		{
 			if (this.obj != null)
+			{
+				if (this.mapObjectIds)
+				{
+					if (PropertyValue is string s)
+					{
+						if (this.objectIdMap.TryGetValue(s, out s))
+							PropertyValue = s;
+					}
+					else if (PropertyValue is Guid id)
+					{
+						s = id.ToString();
+
+						if (this.objectIdMap.TryGetValue(s, out string s2))
+						{
+							if (Guid.TryParse(s2, out id))
+								PropertyValue = id;
+							else
+								PropertyValue = s2;
+						}
+					}
+					else if (PropertyValue is byte[] bin)
+					{
+						s = Hashes.BinaryToString(bin);
+
+						if (this.objectIdMap.TryGetValue(s, out string s2))
+						{
+							if (Guid.TryParse(s2, out id))
+								PropertyValue = id;
+							else
+							{
+								byte[] bin2 = Hashes.StringToBinary(s2);
+
+								if (bin2 is null)
+									PropertyValue = s2;
+								else if (bin2.Length == 16)
+									PropertyValue = new Guid(bin2);
+								else
+									PropertyValue = bin2;
+							}
+						}
+					}
+				}
+
 				this.obj[PropertyName] = PropertyValue;
+			}
 
 			return base.ReportProperty(PropertyName, PropertyValue);
 		}

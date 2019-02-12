@@ -2115,7 +2115,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 		/// <returns>A deserialized value.</returns>
 		public object Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)
 		{
-			return this.customSerializer.Deserialize(context.Reader, null, false);
+			return this.Deserialize(context.Reader, null, false);
 		}
 
 		/// <summary>
@@ -2126,13 +2126,13 @@ namespace Waher.Persistence.MongoDB.Serialization
 		/// <param name="value">The value.</param>
 		public void Serialize(BsonSerializationContext context, BsonSerializationArgs args, object value)
 		{
-			this.customSerializer.Serialize(context.Writer, true, false, value);
+			this.Serialize(context.Writer, true, false, value);
 		}
 
 		/// <summary>
 		/// Deserializes an object from a binary source.
 		/// </summary>
-		/// <param name="Reader">Binary deserializer.</param>
+		/// <param name="Reader">Binary deserializer.</param>n
 		/// <param name="DataType">Optional datatype. If not provided, will be read from the binary source.</param>
 		/// <param name="Embedded">If the object is embedded into another.</param>
 		/// <returns>Deserialized object.</returns>

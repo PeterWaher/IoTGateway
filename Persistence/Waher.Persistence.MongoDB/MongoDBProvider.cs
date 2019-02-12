@@ -1133,14 +1133,44 @@ namespace Waher.Persistence.MongoDB
 				Output.WriteStartElement("File");
 				Output.WriteAttributeString("id", Collection.CollectionNamespace.FullName);
 				Output.WriteAttributeString("collectionName", CollectionName);
-				Output.WriteAttributeString("count", (await Collection.CountDocumentsAsync(null)).ToString());
-				Output.WriteAttributeString("encoding", Collection.Settings.WriteEncoding.WebName);
+				Output.WriteAttributeString("count", (await Collection.CountDocumentsAsync(Builders<BsonDocument>.Filter.Empty)).ToString());
+
+				if (!(Collection.Settings.WriteEncoding is null))
+					Output.WriteAttributeString("encoding", Collection.Settings.WriteEncoding.WebName);
 
 				if (Collection.Settings.WriteConcern.WTimeout.HasValue)
 					Output.WriteAttributeString("timeoutMs", ((int)Collection.Settings.WriteConcern.WTimeout.Value.TotalMilliseconds).ToString());
 
 				foreach (BsonDocument Index in (await Collection.Indexes.ListAsync()).ToEnumerable())
 				{
+					List<string> FieldNames = new List<string>();
+
+					Output.WriteStartElement("Index");
+					
+					foreach (BsonElement E in Index.Elements)
+					{
+						switch (E.Name)
+						{
+							case "key":
+								foreach (BsonElement E2 in E.Value.AsBsonDocument.Elements)
+								{
+									if (E2.Value.AsInt32 < 0)
+										FieldNames.Add("-" + E2.Name);
+									else
+										FieldNames.Add(E2.Name);
+								}
+								break;
+
+							case "name":
+								Output.WriteAttributeString("id", E.Value.AsString);
+								break;
+						}
+					}
+
+					foreach (string Field in FieldNames)
+						Output.WriteElementString("Field", Field);
+
+					Output.WriteEndElement();
 				}
 
 				Output.WriteEndElement();

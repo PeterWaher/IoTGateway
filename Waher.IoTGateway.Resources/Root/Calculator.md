@@ -7,7 +7,7 @@ Master: Master.md
 JavaScript: Calculator.js
 Parameter: Expression
 UserVariable: User
-Login: Login.md
+Login: /Login.md
 
 Script calculator
 =============================

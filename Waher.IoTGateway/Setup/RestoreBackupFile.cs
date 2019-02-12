@@ -4,6 +4,7 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
+using Waher.Events;
 using Waher.Persistence;
 using Waher.Persistence.Serialization;
 using Waher.Security;
@@ -18,6 +19,7 @@ namespace Waher.IoTGateway.Setup
 		private readonly List<object> objects = new List<object>();
 		private GenericObject obj = null;
 		private int nrObjectsInBulk = 0;
+		private int nrObjectsFailed = 0;
 
 		/// <summary>
 		/// Class restoring the contents of a backup file.
@@ -28,6 +30,11 @@ namespace Waher.IoTGateway.Setup
 			: base(FileName, ObjectIdMap)
 		{
 		}
+
+		/// <summary>
+		/// Number of objects that have not been possible to import.
+		/// </summary>
+		public int NrObjectsFailed => this.nrObjectsFailed;
 
 		/// <summary>
 		/// Starts export
@@ -73,7 +80,16 @@ namespace Waher.IoTGateway.Setup
 			int c = this.objects.Count;
 			if (c > 0)
 			{
-				await Database.Insert(this.objects);
+				try
+				{
+					await Database.Insert(this.objects);
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+					this.nrObjectsFailed += this.objects.Count;
+				}
+
 				this.objects.Clear();
 
 				this.nrObjectsInBulk += c;
@@ -118,7 +134,16 @@ namespace Waher.IoTGateway.Setup
 				int c = this.objects.Count;
 				if (c >= 100)
 				{
-					await Database.Insert(this.objects);
+					try
+					{
+						await Database.Insert(this.objects);
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+						this.nrObjectsFailed += this.objects.Count;
+					}
+
 					this.objects.Clear();
 
 					this.nrObjectsInBulk += c;

@@ -364,11 +364,19 @@ namespace Waher.IoTGateway.Setup
 							Result.Append(" file");
 
 						Result.Append(" (");
-						Result.Append(Import.NrFileBytes.ToString());
-						if (Import.NrFileBytes > 1)
-							Result.AppendLine(" bytes).");
+						Result.Append(Export.FormatBytes(Import.NrFileBytes));
+						Result.AppendLine(").");
+					}
+
+					if (Import is RestoreBackupFile Restore && Restore.NrObjectsFailed > 0)
+					{
+						Result.Append(Restore.NrObjectsFailed.ToString());
+						if (Import.NrProperties > 1)
+							Result.Append(" objects");
 						else
-							Result.AppendLine(" byte).");
+							Result.Append(" object");
+
+						Result.AppendLine(" failed.");
 					}
 				}
 
@@ -789,7 +797,10 @@ namespace Waher.IoTGateway.Setup
 				ShowStatus(TabID, "NrProperties" + Suffix, Import.NrProperties.ToString() + " properties.");
 
 			if (Import.NrFiles > 0)
-				ShowStatus(TabID, "NrFiles" + Suffix, Import.NrFiles.ToString() + " files (" + Import.NrFileBytes.ToString() + " bytes).");
+				ShowStatus(TabID, "NrFiles" + Suffix, Import.NrFiles.ToString() + " files (" + Export.FormatBytes(Import.NrFileBytes) + ").");
+
+			if (Import is RestoreBackupFile Restore && Restore.NrObjectsFailed > 0)
+				ShowStatus(TabID, "NrFailed" + Suffix, Restore.NrObjectsFailed.ToString() + " objects failed.");
 		}
 
 		private static async Task<KeyValuePair<string, object>> ReadValue(XmlReader r)

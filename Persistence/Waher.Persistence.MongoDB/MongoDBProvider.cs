@@ -577,7 +577,7 @@ namespace Waher.Persistence.MongoDB
 			{
 				object Value = FilterFieldValue.Value;
 				string FieldName = Serializer.ToShortName(FilterFieldValue.FieldName, ref Value);
-				bool HasType = Serializer.TryGetFieldType(FilterFieldValue.FieldName, Value, out Type FieldType);
+				bool HasType = Serializer.TryGetFieldType(FilterFieldValue.FieldName, null, out Type FieldType);
 				bool IsDefaultValue = Serializer.IsDefaultValue(FilterFieldValue.FieldName, Value);
 
 				if (Filter is FilterFieldEqualTo)

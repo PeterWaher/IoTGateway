@@ -1237,14 +1237,19 @@ namespace Waher.Persistence.MongoDB
 							BsonDeserializationContext Context = BsonDeserializationContext.CreateRoot(Reader);
 
 							object Object = Serializer.Deserialize(Context, Args);
-							
+
 							if (Object is GenericObject Obj)
 							{
 								await Output.StartObject(Obj.ObjectId.ToString(), Obj.TypeName);
 								try
 								{
 									foreach (KeyValuePair<string, object> P in Obj)
-										await Output.ReportProperty(P.Key, P.Value);
+									{
+										if (P.Value is ObjectId ObjectId)
+											await Output.ReportProperty(P.Key, GeneratedObjectSerializerBase.ObjectIdToGuid(ObjectId));
+										else
+											await Output.ReportProperty(P.Key, P.Value);
+									}
 								}
 								catch (Exception ex)
 								{
@@ -1256,7 +1261,7 @@ namespace Waher.Persistence.MongoDB
 								}
 							}
 							else if (!(Object is null))
-								await Output.ReportError("Unable to load object " + Doc["_id"].AsString	+ ".");
+								await Output.ReportError("Unable to load object " + Doc["_id"].AsString + ".");
 						}
 					}
 					catch (Exception ex)

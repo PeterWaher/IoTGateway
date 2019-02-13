@@ -80,6 +80,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 					return Reader.ReadBytes();
 
 				case BsonType.Null:
+					Reader.ReadNull();
 					return null;
 
 				default:
@@ -152,6 +153,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 
 					case BsonType.Null:
 						Value = null;
+						Reader.ReadNull();
 						break;
 
 					case BsonType.ObjectId:

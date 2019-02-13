@@ -461,7 +461,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 			CSharp.AppendLine("\t\t\t\tDataType = Reader.ReadBsonType();");
 			CSharp.AppendLine("\t\t\t\tswitch (DataType.Value)");
 			CSharp.AppendLine("\t\t\t\t{");
-			CSharp.AppendLine("\t\t\t\t\tcase BsonType.Null: return null;");
+			CSharp.AppendLine("\t\t\t\t\tcase BsonType.Null: Reader.ReadNull(); return null;");
 			CSharp.AppendLine("\t\t\t\t\tcase BsonType.Document: break;");
 			CSharp.AppendLine("\t\t\t\t\tdefault: throw new Exception(\"Expected object document or null.\");");
 			CSharp.AppendLine("\t\t\t\t}");
@@ -1233,6 +1233,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 										CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
 										CSharp.AppendLine();
 										CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Null:");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tReader.ReadNull();");
 										CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + MemberName + " = null;");
 										CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
 										CSharp.AppendLine();
@@ -1359,6 +1360,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 										CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
 										CSharp.AppendLine();
 										CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Null:");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tReader.ReadNull();");
 										CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + MemberName + " = null;");
 										CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
 										CSharp.AppendLine();

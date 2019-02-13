@@ -277,7 +277,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 				case BsonType.Int32: return Enum.ToObject(EnumType, ReadInt32(Reader, FieldDataType));
 				case BsonType.Int64: return Enum.ToObject(EnumType, ReadInt64(Reader, FieldDataType));
 				case BsonType.String: return Enum.Parse(EnumType, Reader.ReadString());
-				case BsonType.Null: return null;
+				case BsonType.Null: Reader.ReadNull(); return null;
 				default:
 					throw new ArgumentException("Expected an enumerated value, but was a " + FieldDataType.ToString() + ".", nameof(FieldDataType));
 			}
@@ -867,6 +867,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 					return (T[])Temp;
 
 				case BsonType.Null:
+					Reader.ReadNull();
 					return null;
 
 				default:
@@ -930,6 +931,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 					return Result;
 
 				case BsonType.Null:
+					Reader.ReadNull();
 					return null;
 
 				default:

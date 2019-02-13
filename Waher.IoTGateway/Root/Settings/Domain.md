@@ -115,7 +115,7 @@ to provide is the URL to their ACME Directory below.
 
 <button id='TestAcmeButton' type='button' onclick='TestAcme()'>Test</button>
 {{if Waher.IoTGateway.Gateway.Configuring then ]]
-<button id='NextButton' type='button' onclick='Next()' style='display:{{Config.Step>1 ? "inline-block" : "none"}}'>Next</button>
+<button id='NextButton' type='button' onclick='Next()' style='display:((Config.Step>1 ? "inline-block" : "none"))'>Next</button>
 [[ else ]]
 <button id='OkButton' type='button' onclick='Ok()'>OK</button>
 [[;}}

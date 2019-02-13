@@ -59,7 +59,7 @@ namespace Waher.Script.Operators.Membership
 			if (T is null)
 			{
 				Instance = Value;
-				T = Value.GetType();
+				T = Value?.GetType() ?? typeof(object);
 			}
 			else
 				Instance = null;

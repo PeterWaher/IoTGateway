@@ -53,18 +53,18 @@ namespace Waher.Persistence.MongoDB.Serialization.ReferenceTypes
 
 			switch (DataType.Value)
 			{
-				case BsonType.Boolean: return Reader.ReadBoolean().ToString();
-				case BsonType.DateTime: return ObjectSerializer.UnixEpoch.AddMilliseconds(Reader.ReadDateTime()).ToString();
-				case BsonType.Decimal128: return Reader.ReadDecimal128().ToString();
-				case BsonType.Double: return Reader.ReadDouble().ToString();
-				case BsonType.Int32: return Reader.ReadInt32().ToString();
-				case BsonType.Int64: return Reader.ReadInt64().ToString();
-				case BsonType.JavaScript: return Reader.ReadJavaScript();
-				case BsonType.JavaScriptWithScope: return Reader.ReadJavaScriptWithScope();
+				case BsonType.Boolean: return new CaseInsensitiveString(Reader.ReadBoolean().ToString());
+				case BsonType.DateTime: return new CaseInsensitiveString(ObjectSerializer.UnixEpoch.AddMilliseconds(Reader.ReadDateTime()).ToString());
+				case BsonType.Decimal128: return new CaseInsensitiveString(Reader.ReadDecimal128().ToString());
+				case BsonType.Double: return new CaseInsensitiveString(Reader.ReadDouble().ToString());
+				case BsonType.Int32: return new CaseInsensitiveString(Reader.ReadInt32().ToString());
+				case BsonType.Int64: return new CaseInsensitiveString(Reader.ReadInt64().ToString());
+				case BsonType.JavaScript: return new CaseInsensitiveString(Reader.ReadJavaScript());
+				case BsonType.JavaScriptWithScope: return new CaseInsensitiveString(Reader.ReadJavaScriptWithScope());
 				case BsonType.Null: Reader.ReadNull(); return null;
-				case BsonType.ObjectId: return Reader.ReadObjectId().ToString();
-				case BsonType.String: return Reader.ReadString();
-				case BsonType.Symbol: return Reader.ReadSymbol();
+				case BsonType.ObjectId: return new CaseInsensitiveString(Reader.ReadObjectId().ToString());
+				case BsonType.String: return new CaseInsensitiveString(Reader.ReadString());
+				case BsonType.Symbol: return new CaseInsensitiveString(Reader.ReadSymbol());
 				default: throw new Exception("Expected a case-insensitive string value.");
 			}
 		}

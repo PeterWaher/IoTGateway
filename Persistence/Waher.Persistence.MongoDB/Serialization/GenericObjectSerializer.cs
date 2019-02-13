@@ -88,6 +88,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 			}
 
 			LinkedList<KeyValuePair<string, object>> Properties = new LinkedList<KeyValuePair<string, object>>();
+			LinkedList<KeyValuePair<string, object>> LowerCase = null;
 			string TypeName = string.Empty;
 			Guid ObjectId = Guid.Empty;
 			string CollectionName = string.Empty;
@@ -196,8 +197,51 @@ namespace Waher.Persistence.MongoDB.Serialization
 						break;
 
 					default:
-						Properties.AddLast(new KeyValuePair<string, object>(FieldName, Value));
+						if (FieldName.EndsWith("_L"))
+						{
+							string s = FieldName.Substring(0, FieldName.Length - 2);
+							bool Ignore = false;
+
+							foreach (KeyValuePair<string, object> P in Properties)
+							{
+								if (P.Key == s)
+								{
+									Ignore = true;
+									break;
+								}
+							}
+
+							if (!Ignore)
+							{
+								if (LowerCase is null)
+									LowerCase = new LinkedList<KeyValuePair<string, object>>();
+
+								LowerCase.AddLast(new KeyValuePair<string, object>(s, Value));
+							}
+						}
+						else
+							Properties.AddLast(new KeyValuePair<string, object>(FieldName, Value));
 						break;
+				}
+			}
+
+			if (!(LowerCase is null))
+			{
+				foreach (KeyValuePair<string, object> P in LowerCase)
+				{
+					bool Ignore = false;
+
+					foreach (KeyValuePair<string, object> P2 in Properties)
+					{
+						if (P2.Key == P.Key)
+						{
+							Ignore = true;
+							break;
+						}
+					}
+
+					if (!Ignore)
+						Properties.AddLast(new KeyValuePair<string, object>(P.Key + "_L", P.Value));
 				}
 			}
 
@@ -258,6 +302,12 @@ namespace Waher.Persistence.MongoDB.Serialization
 					{
 						if (Obj is GenericObject)
 							this.Serialize(Writer, true, true, Obj);
+						else if (Obj is CaseInsensitiveString cis)
+						{
+							Writer.WriteString(cis.Value);
+							Writer.WriteName(Field.Key + "_L");
+							Writer.WriteString(cis.LowerCase);
+						}
 						else
 						{
 							Serializer = this.Provider.GetObjectSerializer(Obj.GetType());
@@ -297,8 +347,8 @@ namespace Waher.Persistence.MongoDB.Serialization
 		/// <returns>If the corresponding field or property was found.</returns>
 		public override bool TryGetFieldType(string FieldName, object Object, out Type FieldType)
 		{
-			GenericObject Obj = (GenericObject)Object;
-			if (Obj.TryGetFieldValue(FieldName, out object Value))
+			if (Object is GenericObject Obj &&
+				Obj.TryGetFieldValue(FieldName, out object Value))
 			{
 				FieldType = Value?.GetType() ?? typeof(object);
 				return true;

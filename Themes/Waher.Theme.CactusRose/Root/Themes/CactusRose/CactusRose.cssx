@@ -93,6 +93,47 @@ nav > ul > li > a:hover
     background-color: rgba(0,0,0,0.5);
 }
 
+nav > ul > li > ul
+{
+    display:none;
+}
+
+nav > ul > li:hover > ul
+{
+    display:block;
+    position:absolute;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: rgba(0,0,0,0.75);
+}
+
+nav > ul > li > ul > li
+{
+    border-left: 1px solid rgba(255,255,255,0.7);
+    border-bottom: 1px solid rgba(255,255,255,0.7);
+    border-right: 1px solid rgba(255,255,255,0.7);
+    background-clip: content-box;
+	white-space:nowrap;
+	transition: opacity 0.25s ease-out;
+	color:white;
+}
+
+nav > ul > li > ul > li > a
+{
+    display: block;
+    text-align: center;
+    padding: 0.5em 1em;
+    text-decoration: none;
+    color: ¤MenuTextColor¤;
+}
+
+nav > ul > li > ul > li > a:hover
+{
+    background-color: rgba(0,0,0,0.5);
+}
+
 .active
 {
     background-color: ¤ButtonColor¤;

@@ -163,10 +163,14 @@ namespace Waher.Persistence.Serialization
 
 		private void BuildDictionary()
 		{
-			this.propertiesByName = new Dictionary<string, object>();
+			this.propertiesByName = this.properties as Dictionary<string, object>;
+			if (this.propertiesByName is null)
+			{
+				this.propertiesByName = new Dictionary<string, object>();
 
-			foreach (KeyValuePair<string, object> P in this.properties)
-				this.propertiesByName[P.Key] = P.Value;
+				foreach (KeyValuePair<string, object> P in this.properties)
+					this.propertiesByName[P.Key] = P.Value;
+			}
 		}
 
 		private void BuildEnumerable()

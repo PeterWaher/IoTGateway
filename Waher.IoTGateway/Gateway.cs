@@ -24,9 +24,10 @@ using Waher.Events;
 using Waher.Events.Files;
 using Waher.Events.Persistence;
 using Waher.Events.XMPP;
+using Waher.IoTGateway.Events;
+using Waher.IoTGateway.Setup;
 using Waher.IoTGateway.WebResources;
 using Waher.IoTGateway.WebResources.ExportFormats;
-using Waher.IoTGateway.Setup;
 using Waher.Networking.CoAP;
 using Waher.Networking.HTTP;
 using Waher.Networking.Sniffers;
@@ -1022,7 +1023,7 @@ namespace Waher.IoTGateway
 				try
 				{
 					webServer?.UpdateCertificate(Certificate);
-					OnNewCertificate?.Invoke(certificate, new EventArgs());
+					OnNewCertificate?.Invoke(typeof(Gateway), new Events.CertificateEventArgs(certificate));
 				}
 				catch (Exception ex)
 				{
@@ -1093,7 +1094,7 @@ namespace Waher.IoTGateway
 		/// <summary>
 		/// Event raised when a new server certificate has been generated.
 		/// </summary>
-		public static EventHandler OnNewCertificate = null;
+		public static event CertificateEventHandler OnNewCertificate = null;
 
 		private static async void DeleteOldDataSourceEvents(object P)
 		{
@@ -2544,63 +2545,6 @@ namespace Waher.IoTGateway
 		{
 			object[] P2 = (object[])P;
 			SendNotification((string)P2[0], (string)P2[1], (string)P2[2], (string)P2[3], (string)P2[4], (bool)P2[5]);
-		}
-
-		private class AlertNotifier : EventSink
-		{
-			public AlertNotifier(string ObjectID)
-				: base(ObjectID)
-			{
-			}
-
-			public override Task Queue(Event Event)
-			{
-				switch (Event.Type)
-				{
-					case EventType.Alert:
-					case EventType.Emergency:
-						StringBuilder Markdown = new StringBuilder();
-
-						if (Event.Type == EventType.Alert)
-							Markdown.AppendLine("Alert");
-						else
-							Markdown.AppendLine("Emergency");
-
-						Markdown.AppendLine("===============");
-						Markdown.AppendLine();
-
-						this.AppendLabel("Timestamp", Event.Timestamp.ToShortDateString() + ", " + Event.Timestamp.ToLongTimeString(), Markdown);
-						this.AppendLabel("Event ID", Event.EventId, Markdown);
-						this.AppendLabel("Actor", Event.Actor, Markdown);
-						this.AppendLabel("Object", Event.Object, Markdown);
-						this.AppendLabel("Module", Event.Module, Markdown);
-						this.AppendLabel("Facility", Event.Facility, Markdown);
-
-						if (!(Event.Tags is null))
-						{
-							foreach (KeyValuePair<string, object> P in Event.Tags)
-								this.AppendLabel(P.Key, P.Value?.ToString(), Markdown);
-						}
-
-						Markdown.AppendLine();
-						Markdown.Append(MarkdownDocument.Encode(Event.Message));
-
-						SendNotification(Markdown.ToString());
-						break;
-				}
-
-				return Task.CompletedTask;
-			}
-
-			private void AppendLabel(string Label, string Value, StringBuilder Markdown)
-			{
-				if (!string.IsNullOrEmpty(Value))
-				{
-					Markdown.Append(Label);
-					Markdown.Append(": ");
-					Markdown.AppendLine(MarkdownDocument.Encode(Value));
-				}
-			}
 		}
 
 		#endregion

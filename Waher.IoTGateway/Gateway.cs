@@ -210,6 +210,7 @@ namespace Waher.IoTGateway
 				appDataFolder += "IoT Gateway" + Path.DirectorySeparatorChar;
 				rootFolder = appDataFolder + "Root" + Path.DirectorySeparatorChar;
 
+				Log.Register(new AlertNotifier("Alert Notifier"));
 				Log.Register(new XmlFileEventSink("XML File Event Sink",
 					appDataFolder + "Events" + Path.DirectorySeparatorChar + "Event Log %YEAR%-%MONTH%-%DAY%T%HOUR%.xml",
 					appDataFolder + "Transforms" + Path.DirectorySeparatorChar + "EventXmlToHtml.xslt", 7));
@@ -865,7 +866,7 @@ namespace Waher.IoTGateway
 					{
 						case "Folder":
 							string Name = XML.Attribute(E, "name");
-							CheckContentFiles(E, RuntimeFolder, Path.Combine(RuntimeSubfolder, Name), Path.Combine(AppDataSubFolder, Name), 
+							CheckContentFiles(E, RuntimeFolder, Path.Combine(RuntimeSubfolder, Name), Path.Combine(AppDataSubFolder, Name),
 								ContentOptions);
 							break;
 
@@ -2543,6 +2544,63 @@ namespace Waher.IoTGateway
 		{
 			object[] P2 = (object[])P;
 			SendNotification((string)P2[0], (string)P2[1], (string)P2[2], (string)P2[3], (string)P2[4], (bool)P2[5]);
+		}
+
+		private class AlertNotifier : EventSink
+		{
+			public AlertNotifier(string ObjectID)
+				: base(ObjectID)
+			{
+			}
+
+			public override Task Queue(Event Event)
+			{
+				switch (Event.Type)
+				{
+					case EventType.Alert:
+					case EventType.Emergency:
+						StringBuilder Markdown = new StringBuilder();
+
+						if (Event.Type == EventType.Alert)
+							Markdown.AppendLine("Alert");
+						else
+							Markdown.AppendLine("Emergency");
+
+						Markdown.AppendLine("===============");
+						Markdown.AppendLine();
+
+						this.AppendLabel("Timestamp", Event.Timestamp.ToShortDateString() + ", " + Event.Timestamp.ToLongTimeString(), Markdown);
+						this.AppendLabel("Event ID", Event.EventId, Markdown);
+						this.AppendLabel("Actor", Event.Actor, Markdown);
+						this.AppendLabel("Object", Event.Object, Markdown);
+						this.AppendLabel("Module", Event.Module, Markdown);
+						this.AppendLabel("Facility", Event.Facility, Markdown);
+
+						if (!(Event.Tags is null))
+						{
+							foreach (KeyValuePair<string, object> P in Event.Tags)
+								this.AppendLabel(P.Key, P.Value?.ToString(), Markdown);
+						}
+
+						Markdown.AppendLine();
+						Markdown.Append(MarkdownDocument.Encode(Event.Message));
+
+						SendNotification(Markdown.ToString());
+						break;
+				}
+
+				return Task.CompletedTask;
+			}
+
+			private void AppendLabel(string Label, string Value, StringBuilder Markdown)
+			{
+				if (!string.IsNullOrEmpty(Value))
+				{
+					Markdown.Append(Label);
+					Markdown.Append(": ");
+					Markdown.AppendLine(MarkdownDocument.Encode(Value));
+				}
+			}
 		}
 
 		#endregion

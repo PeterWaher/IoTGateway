@@ -40,13 +40,29 @@ namespace Waher.Script.Functions.Scalar
             get { return new string[] { "empty" }; }
         }
 
-        /// <summary>
-        /// Evaluates the function on a scalar argument.
-        /// </summary>
-        /// <param name="Argument">Function argument.</param>
-        /// <param name="Variables">Variables collection.</param>
-        /// <returns>Function result.</returns>
-        public override IElement EvaluateScalar(string Argument, Variables Variables)
+		/// <summary>
+		/// Evaluates the function on a scalar argument.
+		/// </summary>
+		/// <param name="Argument">Function argument.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Function result.</returns>
+		public override IElement EvaluateScalar(IElement Argument, Variables Variables)
+		{
+			object Value = Argument.AssociatedObjectValue;
+
+			if (Value is null)
+				return BooleanValue.True;
+
+			return base.EvaluateScalar(Argument, Variables);
+		}
+
+		/// <summary>
+		/// Evaluates the function on a scalar argument.
+		/// </summary>
+		/// <param name="Argument">Function argument.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Function result.</returns>
+		public override IElement EvaluateScalar(string Argument, Variables Variables)
         {
             if (string.IsNullOrEmpty(Argument))
                 return BooleanValue.True;

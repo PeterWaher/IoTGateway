@@ -85,6 +85,7 @@ namespace Waher.Persistence.Files
 		private readonly string id;
 		private readonly string defaultCollectionName;
 		private readonly string folder;
+		private string autoRepairReportFolder = string.Empty;
 		private readonly int blockSize;
 		private readonly int blobBlockSize;
 		private readonly int timeoutMilliseconds;
@@ -399,6 +400,15 @@ namespace Waher.Persistence.Files
 		public string Folder
 		{
 			get { return this.folder; }
+		}
+
+		/// <summary>
+		/// Folder for Auto-Repair reports. If empty or null, <see cref="Folder"/>\AutoRepair will be used. 
+		/// </summary>
+		public string AutoRepairReportFolder
+		{
+			get => this.autoRepairReportFolder;
+			set => this.autoRepairReportFolder = value;
 		}
 
 		/// <summary>
@@ -2657,11 +2667,16 @@ namespace Waher.Persistence.Files
 
 			if (!Start.HasValue || !Stop.HasValue || Start.Value > Stop.Value)
 			{
-				s = this.folder + "AutoRepair";
+				if (string.IsNullOrEmpty(this.autoRepairReportFolder))
+					s = this.folder + "AutoRepair";
+				else
+					s = this.autoRepairReportFolder;
+
 				if (!Directory.Exists(s))
 					Directory.CreateDirectory(s);
 
-				s += Path.DirectorySeparatorChar + DateTime.Now.ToString("yyyy-MM-ddTHH.mm.ss.ffffff") + ".xml";
+				s = Path.Combine(s, DateTime.Now.ToString("AutoRepair yyyy-MM-ddTHH.mm.ss.ffffff") + ".xml");
+
 				XmlWriterSettings Settings = new XmlWriterSettings()
 				{
 					Encoding = Encoding.UTF8,

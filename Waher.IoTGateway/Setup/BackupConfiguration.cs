@@ -18,6 +18,7 @@ using Waher.IoTGateway.Setup;
 using Waher.Networking.HTTP;
 using Waher.Networking.HTTP.HeaderFields;
 using Waher.Persistence;
+using Waher.Persistence.Files;
 using Waher.Persistence.Serialization;
 using Waher.Runtime.Inventory;
 using Waher.Script;
@@ -71,6 +72,9 @@ namespace Waher.IoTGateway.Setup
 		/// </summary>
 		public override Task ConfigureSystem()
 		{
+			this.UpdateExportFolder(Export.FullExportFolder);
+			this.UpdateExportKeyFolder(Export.FullKeyExportFolder);
+
 			return Task.CompletedTask;
 		}
 
@@ -121,6 +125,9 @@ namespace Waher.IoTGateway.Setup
 		{
 			if (this.exportFolder != null)
 				this.exportFolder.FolderPath = Folder;
+
+			if (Database.Provider is FilesProvider FilesProvider)
+				FilesProvider.AutoRepairReportFolder = Folder;
 		}
 
 		internal void UpdateExportKeyFolder(string Folder)

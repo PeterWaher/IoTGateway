@@ -415,6 +415,7 @@ namespace Waher.Networking.HTTP
 			{
 				if (this.server.TryGetResource(Request.Header.Resource, out HttpResource Resource, out string SubPath))
 				{
+					Request.Resource = Resource;
 #if WINDOWS_UWP
 					this.server.RequestReceived(Request, this.client.Information.RemoteAddress.ToString() + ":" + this.client.Information.RemotePort, 
 						Resource, SubPath);

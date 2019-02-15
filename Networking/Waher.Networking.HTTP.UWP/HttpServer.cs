@@ -1211,7 +1211,8 @@ namespace Waher.Networking.HTTP
 						ms, string.Empty)
 					{
 						Session = Session,
-						SubPath = SubPath
+						SubPath = SubPath,
+						Resource = Resource
 					};
 
 					InternalTransfer InternalTransfer = new InternalTransfer(ms);

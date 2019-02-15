@@ -208,6 +208,8 @@ namespace Waher.Networking.XMPP.HTTPX
 			{
 				if (this.server.TryGetResource(Request.Header.Resource, out HttpResource Resource, out string SubPath))
 				{
+					Request.Resource = Resource;
+
 					this.server.RequestReceived(Request, From, Resource, SubPath);
 
 					AuthenticationSchemes = Resource.GetAuthenticationSchemes(Request);

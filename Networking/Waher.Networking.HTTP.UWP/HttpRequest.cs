@@ -23,6 +23,7 @@ namespace Waher.Networking.HTTP
 		private IUser user = null;
 		private Variables session = null;
 		private string subPath = string.Empty;
+		private HttpResource resource = null;
 		private readonly long dataLength;
 		internal HttpClientConnection clientConnection = null;
 
@@ -126,6 +127,15 @@ namespace Waher.Networking.HTTP
             get { return this.session; }
             set { this.session = value; }
         }
+
+		/// <summary>
+		/// Resource being accessed.
+		/// </summary>
+		public HttpResource Resource
+		{
+			get { return this.resource; }
+			set { this.resource = value; }
+		}
 
 		/// <summary>
 		/// Remote end-point.

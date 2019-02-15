@@ -33,7 +33,7 @@ namespace Waher.Networking.CoAP.Transport
 			{
 				while (!this.disposed)
 				{
-					UdpReceiveResult Data = await this.Client.ReceiveAsync();
+					UdpReceiveResult Data = await this.Client?.ReceiveAsync();
 					if (this.disposed)
 						return;
 

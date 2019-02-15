@@ -15,6 +15,7 @@ namespace Waher.Persistence
 	public static class Database
 	{
 		private static IDatabaseProvider provider = null;
+		private static bool locked = false;
 
 		/// <summary>
 		/// Registers a database provider for use from the static <see cref="Database"/> class, 
@@ -25,10 +26,24 @@ namespace Waher.Persistence
 		/// <param name="DatabaseProvider">Database provider to use.</param>
 		public static void Register(IDatabaseProvider DatabaseProvider)
 		{
-			if (provider != null)
+			Register(DatabaseProvider, true);
+		}
+
+		/// <summary>
+		/// Registers a database provider for use from the static <see cref="Database"/> class, 
+		/// throughout the lifetime of the application.
+		/// 
+		/// Note: Only one database provider can be registered.
+		/// </summary>
+		/// <param name="DatabaseProvider">Database provider to use.</param>
+		/// <param name="Lock">If the database provider should be locked for the restof the running time of the application.</param>
+		public static void Register(IDatabaseProvider DatabaseProvider, bool Lock)
+		{
+			if (provider != null && locked)
 				throw new Exception("A database provider is already registered.");
 
 			provider = DatabaseProvider;
+			locked = Lock;
 		}
 
 		/// <summary>

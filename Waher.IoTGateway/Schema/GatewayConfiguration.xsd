@@ -19,77 +19,48 @@
 						<xs:documentation>Default web page.</xs:documentation>
 					</xs:annotation>
 				</xs:element>
-				<xs:choice minOccurs="1" maxOccurs="1">
-					<xs:element name="Database">
-						<xs:annotation>
-							<xs:documentation>Defines the use of a local file-based object database.</xs:documentation>
-						</xs:annotation>
-						<xs:complexType>
-							<xs:attribute name="folder" type="xs:string" use="required">
-								<xs:annotation>
-									<xs:documentation>Folder, relative to the application data folder, where object database files will be stored.</xs:documentation>
-								</xs:annotation>
-							</xs:attribute>
-							<xs:attribute name="defaultCollectionName" type="xs:string" use="required">
-								<xs:annotation>
-									<xs:documentation>Name of the collection to use, if the class definition lacks a collection definition.</xs:documentation>
-								</xs:annotation>
-							</xs:attribute>
-							<xs:attribute name="blockSize" type="BlockSize" use="required">
-								<xs:annotation>
-									<xs:documentation>Number of bytes of each B-Tree block in the database.</xs:documentation>
-								</xs:annotation>
-							</xs:attribute>
-							<xs:attribute name="blocksInCache" type="xs:positiveInteger" use="required">
-								<xs:annotation>
-									<xs:documentation>Number of blocks to maintain in internal memory.</xs:documentation>
-								</xs:annotation>
-							</xs:attribute>
-							<xs:attribute name="blobBlockSize" type="BlockSize" use="required">
-								<xs:annotation>
-									<xs:documentation>Number of bytes of each BLOB block in the database.</xs:documentation>
-								</xs:annotation>
-							</xs:attribute>
-							<xs:attribute name="timeoutMs" type="xs:positiveInteger" use="required">
-								<xs:annotation>
-									<xs:documentation>Timeout of database operations, in milliseconds.</xs:documentation>
-								</xs:annotation>
-							</xs:attribute>
-							<xs:attribute name="encrypted" type="xs:boolean" use="required">
-								<xs:annotation>
-									<xs:documentation>If the database is encrypted.</xs:documentation>
-								</xs:annotation>
-							</xs:attribute>
-						</xs:complexType>
-					</xs:element>
-					<xs:element name="MongoDB">
-						<xs:annotation>
-							<xs:documentation>Defines the use of an object database hosted by MongoDB.</xs:documentation>
-						</xs:annotation>
-						<xs:complexType>
-							<xs:attribute name="host" type="xs:string" use="optional">
-								<xs:annotation>
-									<xs:documentation>Optional MongoDB host name. If not provided, the database is assumed to run on the same machine.</xs:documentation>
-								</xs:annotation>
-							</xs:attribute>
-							<xs:attribute name="port" type="PortNumber" use="optional">
-								<xs:annotation>
-									<xs:documentation>Optional port number for the connection.</xs:documentation>
-								</xs:annotation>
-							</xs:attribute>
-							<xs:attribute name="databaseName" type="xs:string" use="required">
-								<xs:annotation>
-									<xs:documentation>Name of the database to use.</xs:documentation>
-								</xs:annotation>
-							</xs:attribute>
-							<xs:attribute name="defaultCollectionName" type="xs:string" use="required">
-								<xs:annotation>
-									<xs:documentation>Name of the collection to use, if the class definition lacks a collection definition.</xs:documentation>
-								</xs:annotation>
-							</xs:attribute>
-						</xs:complexType>
-					</xs:element>
-				</xs:choice>
+				<xs:element name="Database">
+					<xs:annotation>
+						<xs:documentation>Defines the use of a local file-based object database.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:attribute name="folder" type="xs:string" use="required">
+							<xs:annotation>
+								<xs:documentation>Folder, relative to the application data folder, where object database files will be stored.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name="defaultCollectionName" type="xs:string" use="required">
+							<xs:annotation>
+								<xs:documentation>Name of the collection to use, if the class definition lacks a collection definition.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name="blockSize" type="BlockSize" use="required">
+							<xs:annotation>
+								<xs:documentation>Number of bytes of each B-Tree block in the database.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name="blocksInCache" type="xs:positiveInteger" use="required">
+							<xs:annotation>
+								<xs:documentation>Number of blocks to maintain in internal memory.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name="blobBlockSize" type="BlockSize" use="required">
+							<xs:annotation>
+								<xs:documentation>Number of bytes of each BLOB block in the database.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name="timeoutMs" type="xs:positiveInteger" use="required">
+							<xs:annotation>
+								<xs:documentation>Timeout of database operations, in milliseconds.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name="encrypted" type="xs:boolean" use="required">
+							<xs:annotation>
+								<xs:documentation>If the database is encrypted.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+					</xs:complexType>
+				</xs:element>
 				<xs:element name="Ports">
 					<xs:complexType>
 						<xs:sequence>

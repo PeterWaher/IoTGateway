@@ -32,6 +32,9 @@
     <None Remove="Root\Events.js" />
     <None Remove="Root\Login.md" />
     <None Remove="Root\Settings\Config.cssx" />
+    <None Remove="Root\Settings\Database.js" />
+    <None Remove="Root\Settings\Database.md" />
+    <None Remove="Root\Settings\Database\MongoDB.md" />
     <None Remove="Root\Settings\Domain.js" />
     <None Remove="Root\Settings\Domain.md" />
     <None Remove="Root\Settings\Introduction.md" />
@@ -74,6 +77,15 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Root\Settings\Config.cssx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Settings\Database.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Settings\Database.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Settings\Database\MongoDB.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Root\Settings\Notification.js">

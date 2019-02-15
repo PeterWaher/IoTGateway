@@ -353,47 +353,7 @@ namespace Waher.IoTGateway
 								if (DatabaseProvider is null)
 									throw new Exception("Database provider not defined. Make sure the GetDatabaseProvider event has an appropriate event handler.");
 
-								Database.Register(DatabaseProvider);
-								break;
-
-							case "MongoDB":
-								string Host = null;
-								int? Port = null;
-								string DatabaseName = null;
-								string DefaultCollectionName = null;
-
-								foreach (XmlAttribute Attr in E.Attributes)
-								{
-									switch (Attr.Name)
-									{
-										case "host":
-											Host = Attr.Value;
-											break;
-
-										case "port":
-											if (int.TryParse(Attr.Value, out int i))
-												Port = i;
-											break;
-
-										case "databaseName":
-											DatabaseName = Attr.Value;
-											break;
-
-										case "defaultCollectionName":
-											DefaultCollectionName = Attr.Value;
-											break;
-									}
-								}
-
-								if (!string.IsNullOrEmpty(Host))
-								{
-									if (Port.HasValue)
-										Database.Register(new Persistence.MongoDB.MongoDBProvider(Host, Port.Value, DatabaseName, DefaultCollectionName));
-									else
-										Database.Register(new Persistence.MongoDB.MongoDBProvider(Host, DatabaseName, DefaultCollectionName));
-								}
-								else
-									Database.Register(new Persistence.MongoDB.MongoDBProvider(DatabaseName, DefaultCollectionName));
+								Database.Register(DatabaseProvider, false);
 								break;
 
 							case "Ports":
@@ -411,7 +371,6 @@ namespace Waher.IoTGateway
 						}
 					}
 				}
-
 
 				PersistedEventLog PersistedEventLog = new PersistedEventLog(7, new TimeSpan(4, 15, 0));
 				Log.Register(PersistedEventLog);
@@ -2549,52 +2508,6 @@ namespace Waher.IoTGateway
 
 		#endregion
 
-		#region Localization
-
-		/// <summary>
-		/// Gets the best suited language for a request.
-		/// </summary>
-		/// <param name="Request">Request object</param>
-		/// <param name="LanguageVariableName">Variable name of current language selection, if any.</param>
-		/// <returns>Language object.</returns>
-		public static async Task<Language> GetLanguageAsync(HttpRequest Request, string LanguageVariableName)
-		{
-			Variables Session = Request.Session;
-
-			if (!string.IsNullOrEmpty(LanguageVariableName) &&
-				Session.TryGetVariable(LanguageVariableName, out Variable v) &&
-				v.ValueObject is string LanguageCode)
-			{
-				return await Translator.GetLanguageAsync(LanguageCode);
-			}
-
-			if (!(Request.Header.AcceptLanguage is null))
-			{
-				List<string> Alternatives = new List<string>();
-
-				foreach (Language Language in await Translator.GetLanguagesAsync())
-					Alternatives.Add(Language.Code);
-
-				string Best = Request.Header.AcceptLanguage.GetBestAlternative(Alternatives.ToArray());
-				if (!string.IsNullOrEmpty(Best))
-				{
-					if (!(Session is null) && !string.IsNullOrEmpty(LanguageVariableName))
-						Session[LanguageVariableName] = Best;
-
-					return await Translator.GetLanguageAsync(Best);
-				}
-			}
-
-			Language Result = await Translator.GetDefaultLanguageAsync();
-
-			if (!(Session is null) && !string.IsNullOrEmpty(LanguageVariableName))
-				Session[LanguageVariableName] = Result.Code;
-
-			return Result;
-		}
-
-		#endregion
-
 		#region Settings
 
 		/// <summary>
@@ -2602,13 +2515,12 @@ namespace Waher.IoTGateway
 		/// </summary>
 		/// <param name="Request">Current HTTP Request</param>
 		/// <param name="UserVariable">Name of user variable</param>
-		/// <param name="LanguageVariable">Name of language variable.</param>
 		/// <returns></returns>
-		public static WebMenuItem[] GetSettingsMenu(HttpRequest Request, string UserVariable, string LanguageVariable)
+		public static WebMenuItem[] GetSettingsMenu(HttpRequest Request, string UserVariable)
 		{
 			List<WebMenuItem> Result = new List<WebMenuItem>();
 			Variables Session = Request.Session;
-			Language Language = GetLanguageAsync(Request, LanguageVariable).Result;
+			Language Language = ScriptExtensions.Language.GetLanguageAsync(Session).Result;
 
 			if (Session is null ||
 				!Session.TryGetVariable(UserVariable, out Variable v) ||

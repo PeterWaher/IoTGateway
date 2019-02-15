@@ -1179,6 +1179,8 @@
 								<File Id='Backup.js' Name='Backup.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Backup.js' KeyPath='yes'/>
 								<File Id='Backup.md' Name='Backup.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Backup.md'/>
 								<File Id='Config.cssx' Name='Config.cssx' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Config.cssx'/>
+								<File Id='Database.js' Name='Database.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Database.js'/>
+								<File Id='Database.md' Name='Database.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Database.md'/>
 								<File Id='Domain.js' Name='Domain.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Domain.js'/>
 								<File Id='Domain.md' Name='Domain.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Domain.md'/>
 								<File Id='Introduction.md' Name='Introduction.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Introduction.md'/>
@@ -1197,6 +1199,8 @@
 								<RemoveFile Id='RemoveBackup.js' Name='Backup.js' On='uninstall'/>
 								<RemoveFile Id='RemoveBackup.md' Name='Backup.md' On='uninstall'/>
 								<RemoveFile Id='RemoveConfig.cssx' Name='Config.cssx' On='uninstall'/>
+								<RemoveFile Id='RemoveDatabase.js' Name='Database.js' On='uninstall'/>
+								<RemoveFile Id='RemoveDatabase.md' Name='Database.md' On='uninstall'/>
 								<RemoveFile Id='RemoveDomain.js' Name='Domain.js' On='uninstall'/>
 								<RemoveFile Id='RemoveDomain.md' Name='Domain.md' On='uninstall'/>
 								<RemoveFile Id='RemoveIntroduction.md' Name='Introduction.md' On='uninstall'/>
@@ -1213,6 +1217,13 @@
 								<RemoveFile Id='RemoveXMPP.js' Name='XMPP.js' On='uninstall'/>
 								<RemoveFile Id='RemoveXMPP.md' Name='XMPP.md' On='uninstall'/>
 							</Component>
+							<Directory Id='Database' Name='Database'>
+								<Component Id='DatabaseFiles' Guid='1F5D29D1-7E5F-425E-BD02-151A6B117F3D'>
+									<RemoveFolder Id='RemoveDatabase' On='uninstall' />
+									<File Id='MongoDB.md' Name='MongoDB.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Database\MongoDB.md' Vital='yes' KeyPath='yes'/>
+									<RemoveFile Id='RemoveMongoDB.md' Name='MongoDB.md' On='uninstall'/>
+								</Component>
+							</Directory>
 							<Directory Id='PersonalData' Name='PersonalData'>
 								<Component Id='PersonalDataFiles' Guid='4C73E63A-EA2B-4BE9-9DFA-228538513FA2'>
 									<RemoveFolder Id='RemovePersonalData' On='uninstall' />
@@ -1367,6 +1378,7 @@
         <ComponentRef Id='AudioFiles' />
         <ComponentRef Id='ImageFiles' />
 				<ComponentRef Id='SettingsFiles' />
+				<ComponentRef Id='DatabaseFiles'/>
 				<ComponentRef Id='PersonalDataFiles'/>
 				<ComponentRef Id='TemplateFiles' />
 				<ComponentRef Id='CactusRoseFiles'/>

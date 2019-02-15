@@ -8,6 +8,8 @@
 			<Content fileName="Backup.md"/>
 			<Content fileName="Backup.js"/>
 			<Content fileName="Config.cssx"/>
+			<Content fileName="Database.js"/>
+			<Content fileName="Database.md"/>
 			<Content fileName="Domain.js"/>
 			<Content fileName="Domain.md"/>
 			<Content fileName="Introduction.md"/>
@@ -23,6 +25,9 @@
 			<Content fileName="Theme.md"/>
 			<Content fileName="XMPP.js"/>
 			<Content fileName="XMPP.md"/>
+			<Folder name="Database">
+				<Content fileName="MongoDB.md"/>
+			</Folder>
 			<Folder name="PersonalData">
 				<Content fileName="Backups.md"/>
 				<Content fileName="LocalDatabase.md"/>

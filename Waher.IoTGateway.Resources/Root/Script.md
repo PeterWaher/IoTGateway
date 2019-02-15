@@ -1394,11 +1394,21 @@ The following functions return HTTP server error responses back to he client:
 
 The following predefined variables are available in such web content files:
 
-| Variable               | Description                                              |
-|:----------------------:|----------------------------------------------------------|
-| `Request`              | The current HttpRequest object.                          |
-| `Response`             | The current HttpResponse object.                         |
-| `Posted`               | Any decoded data posted to the resource.                 |
+| Variable       | Description                                              |
+|:--------------:|----------------------------------------------------------|
+| `Request`      | The current HttpRequest object.                          |
+| `Response`     | The current HttpResponse object.                         |
+| `Posted`       | Any decoded data posted to the resource.                 |
+
+#### Gateway Extensions (Waher.IoTGateway)
+
+The following predefined variables are available in web pages hosted by the IoT Gateway:
+
+| Variable       | Description                                              |
+|:--------------:|----------------------------------------------------------|
+| `Language`     | The language object of the current session.              |
+| `Namespace`    | The language namespace object of the current page.       |
+
 
 =========================================================================================================================================================
 

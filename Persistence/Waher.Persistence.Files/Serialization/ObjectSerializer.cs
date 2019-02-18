@@ -2873,7 +2873,7 @@ namespace Waher.Persistence.Files.Serialization
 						if (this.objectIdMember.MemberFieldDataTypeCode == TYPE_GUID)
 						{
 							ObjectIdType = 1;
-							if (!(ObjectId is null)) && !ObjectId.Equals(Guid.Empty))
+							if (!(ObjectId is null) && !ObjectId.Equals(Guid.Empty))
 							{
 								WriterBak.Write((Guid)ObjectId);
 								HasGuid = true;

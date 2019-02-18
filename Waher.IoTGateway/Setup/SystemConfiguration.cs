@@ -186,7 +186,12 @@ namespace Waher.IoTGateway.Setup
 			this.updated = DateTime.Now;
 
 			if (!ReloadConfiguration)
-				await Database.Update(this);
+			{
+				if (this.Priority <= 0)
+					await Gateway.InternalDatabase.Update(this);
+				else
+					await Database.Update(this);
+			}
 
 			this.completionSource?.SetResult(ReloadConfiguration);
 		}

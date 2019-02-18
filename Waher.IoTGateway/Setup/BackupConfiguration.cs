@@ -75,6 +75,9 @@ namespace Waher.IoTGateway.Setup
 			this.UpdateExportFolder(Export.FullExportFolder);
 			this.UpdateExportKeyFolder(Export.FullKeyExportFolder);
 
+			if (Gateway.InternalDatabase is FilesProvider FilesProvider)
+				FilesProvider.AutoRepairReportFolder = Export.FullExportFolder;
+
 			return Task.CompletedTask;
 		}
 
@@ -126,7 +129,7 @@ namespace Waher.IoTGateway.Setup
 			if (this.exportFolder != null)
 				this.exportFolder.FolderPath = Folder;
 
-			if (Database.Provider is FilesProvider FilesProvider)
+			if (Gateway.InternalDatabase is FilesProvider FilesProvider)
 				FilesProvider.AutoRepairReportFolder = Folder;
 		}
 

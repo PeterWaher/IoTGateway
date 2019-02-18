@@ -28,7 +28,7 @@ namespace Waher.IoTGateway.Setup
 
 		private IDatabasePlugin databasePlugin = null;
 		private string databasePluginName = null;
-		private IDatabaseSettings databasePluginSettings = null;
+		private DatabaseSettings databasePluginSettings = null;
 
 		/// <summary>
 		/// Full name of database plugin class.
@@ -44,7 +44,7 @@ namespace Waher.IoTGateway.Setup
 		/// Settings for database plugin.
 		/// </summary>
 		[DefaultValueNull]
-		public IDatabaseSettings DatabasePluginSettings
+		public DatabaseSettings DatabasePluginSettings
 		{
 			get => this.databasePluginSettings;
 			set => this.databasePluginSettings = value;
@@ -84,7 +84,7 @@ namespace Waher.IoTGateway.Setup
 		/// <summary>
 		/// Priority of the setting. Configurations are sorted in ascending order.
 		/// </summary>
-		public override int Priority => 50;
+		public override int Priority => 0;
 
 		/// <summary>
 		/// Gets a title for the system configuration.
@@ -203,7 +203,8 @@ namespace Waher.IoTGateway.Setup
 			{
 				{ "html", Html },
 				{ "isDone", this.Step >= 1 },
-				{ "hasSettings", HasSettings }
+				{ "hasSettings", HasSettings },
+				{ "restart", Database.Locked }
 			}, false));
 		}
 
@@ -236,10 +237,16 @@ namespace Waher.IoTGateway.Setup
 				if (Save)
 				{
 					this.Step = 1;
-					await Database.Update(this);
+					await Gateway.InternalDatabase.Update(this);
 				}
 
 				Response.ContentType = "text/plain";
+
+				if (Database.Locked)
+					Response.Write("2");
+				else
+					Response.Write("1");
+
 				Response.SendResponse();
 			}
 			catch (Exception ex)

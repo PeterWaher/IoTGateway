@@ -42,7 +42,7 @@ namespace Waher.IoTGateway.Setup
 		/// <summary>
 		/// Priority of the setting. Configurations are sorted in ascending order.
 		/// </summary>
-		public override int Priority => 0;
+		public override int Priority => -100;
 
 		/// <summary>
 		/// Gets a title for the system configuration.

@@ -29,7 +29,7 @@ namespace Waher.IoTGateway.Setup.Databases
 		/// Creates a new settings object.
 		/// </summary>
 		/// <returns>Settings object.</returns>
-		IDatabaseSettings CreateNewSettings();
+		DatabaseSettings CreateNewSettings();
 
 		/// <summary>
 		/// Configures a database connection using the provided settings object.

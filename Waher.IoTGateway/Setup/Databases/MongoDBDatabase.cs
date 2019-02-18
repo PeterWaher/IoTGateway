@@ -36,7 +36,7 @@ namespace Waher.IoTGateway.Setup.Databases
 		/// Creates a new settings object.
 		/// </summary>
 		/// <returns>Settings object.</returns>
-		public IDatabaseSettings CreateNewSettings()
+		public DatabaseSettings CreateNewSettings()
 		{
 			return new MongoDBSettings();
 		}

@@ -8,8 +8,7 @@ namespace Waher.IoTGateway.Setup.Databases
 	/// <summary>
 	/// MongoDB Settings.
 	/// </summary>
-	[TypeName(TypeNameSerialization.FullName)]
-	public class MongoDBSettings : IDatabaseSettings
+	public class MongoDBSettings : DatabaseSettings
 	{
 		private string host = string.Empty;
 		private string database = "IoTGateway";

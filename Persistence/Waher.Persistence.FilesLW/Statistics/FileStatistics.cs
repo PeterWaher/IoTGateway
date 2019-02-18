@@ -518,7 +518,7 @@ namespace Waher.Persistence.Files.Statistics
 			{
 				lock (this.synchObject)
 				{
-					return this.comments != null;
+					return !(this.comments is null);
 				}
 			}
 		}

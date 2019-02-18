@@ -146,7 +146,7 @@ namespace Waher.Persistence.Files
 		public FilesProvider(string Folder, string DefaultCollectionName, int BlockSize, int BlocksInCache, int BlobBlockSize,
 			Encoding Encoding, int TimeoutMilliseconds, CustomKeyHandler CustomKeyMethod)
 			: this(Folder, DefaultCollectionName, BlockSize, BlocksInCache, BlobBlockSize, Encoding, TimeoutMilliseconds,
-				  CustomKeyMethod != null, false, true, CustomKeyMethod)
+				  !(CustomKeyMethod is null), false, true, CustomKeyMethod)
 		{
 		}
 
@@ -196,7 +196,7 @@ namespace Waher.Persistence.Files
 		public FilesProvider(string Folder, string DefaultCollectionName, int BlockSize, int BlocksInCache, int BlobBlockSize,
 			Encoding Encoding, int TimeoutMilliseconds, CustomKeyHandler CustomKeyMethod, bool Debug)
 			: this(Folder, DefaultCollectionName, BlockSize, BlocksInCache, BlobBlockSize, Encoding, TimeoutMilliseconds,
-				  CustomKeyMethod != null, Debug, true, CustomKeyMethod)
+				  !(CustomKeyMethod is null), Debug, true, CustomKeyMethod)
 		{
 		}
 #else
@@ -273,7 +273,7 @@ namespace Waher.Persistence.Files
 		public FilesProvider(string Folder, string DefaultCollectionName, int BlockSize, int BlocksInCache, int BlobBlockSize,
 			Encoding Encoding, int TimeoutMilliseconds, CustomKeyHandler CustomKeyMethod, bool Debug, bool Compiled)
 			: this(Folder, DefaultCollectionName, BlockSize, BlocksInCache, BlobBlockSize, Encoding, TimeoutMilliseconds,
-				  CustomKeyMethod != null, Debug, Compiled, CustomKeyMethod)
+				  !(CustomKeyMethod is null), Debug, Compiled, CustomKeyMethod)
 		{
 		}
 #else
@@ -499,13 +499,10 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		public void Dispose()
 		{
-			if (this.master != null)
-			{
-				this.master.Dispose();
-				this.master = null;
-			}
+			this.master?.Dispose();
+			this.master = null;
 
-			if (this.files != null)
+			if (!(this.files is null))
 			{
 				foreach (ObjectBTreeFile File in this.files.Values)
 					File.Dispose();
@@ -513,7 +510,7 @@ namespace Waher.Persistence.Files
 				this.files.Clear();
 			}
 
-			if (this.nameFiles != null)
+			if (!(this.nameFiles is null))
 			{
 				foreach (StringDictionary File in this.nameFiles.Values)
 					File.Dispose();
@@ -521,20 +518,17 @@ namespace Waher.Persistence.Files
 				this.nameFiles.Clear();
 			}
 
-			if (this.blocks != null)
-			{
-				this.blocks.Dispose();
-				this.blocks = null;
-			}
+			this.blocks?.Dispose();
+			this.blocks = null;
 
-			if (this.serializers != null)
+			if (!(this.serializers is null))
 			{
 				IDisposable d;
 
 				foreach (IObjectSerializer Serializer in this.serializers.Values)
 				{
 					d = Serializer as IDisposable;
-					if (d != null)
+					if (!(d is null))
 					{
 						try
 						{
@@ -723,7 +717,7 @@ namespace Waher.Persistence.Files
 				else
 					Result = null;
 
-				if (Result != null)
+				if (!(Result is null))
 				{
 					this.serializers[Type] = Result;
 					this.serializerAdded.Set();
@@ -801,7 +795,7 @@ namespace Waher.Persistence.Files
 
 			sb.Append("Unable to get access to underlying database.");
 
-			if (Trace != null)
+			if (!(Trace is null))
 			{
 				sb.AppendLine();
 				sb.AppendLine();
@@ -1013,7 +1007,7 @@ namespace Waher.Persistence.Files
 #if NETSTANDARD1_5
 		internal void GetKeys(string FileName, bool FileExists, out byte[] Key, out byte[] IV)
 		{
-			if (this.customKeyMethod != null)
+			if (!(this.customKeyMethod is null))
 			{
 				this.customKeyMethod(FileName, out Key, out IV);
 
@@ -1553,7 +1547,7 @@ namespace Waher.Persistence.Files
 				ch[i] = '_';
 			}
 
-			if (ch != null)
+			if (!(ch is null))
 				s = new string(ch);
 
 			s = this.folder + s;
@@ -1619,7 +1613,7 @@ namespace Waher.Persistence.Files
 				}
 			}
 
-			if (ToRemove != null)
+			if (!(ToRemove is null))
 			{
 				foreach (string s in ToRemove)
 					await this.master.RemoveAsync(s);
@@ -1675,7 +1669,7 @@ namespace Waher.Persistence.Files
 			ObjectSerializer Serializer = this.GetObjectSerializerEx(typeof(T));
 			ObjectBTreeFile File = await this.GetFile(Serializer.CollectionName(null));
 
-			if (EmbeddedSetter != null)
+			if (!(EmbeddedSetter is null))
 			{
 				if (await File.TryBeginRead(0))
 				{
@@ -1710,7 +1704,7 @@ namespace Waher.Persistence.Files
 			ObjectSerializer Serializer = this.GetObjectSerializerEx(T);
 			ObjectBTreeFile File = await this.GetFile(Serializer.CollectionName(null));
 
-			if (EmbeddedSetter != null)
+			if (!(EmbeddedSetter is null))
 			{
 				if (await File.TryBeginRead(0))
 				{
@@ -1790,7 +1784,7 @@ namespace Waher.Persistence.Files
 				T2 = Object.GetType();
 				if (Serializer is null || T != T2)
 				{
-					if (List.First != null)
+					if (!(List.First is null))
 					{
 						await File.SaveNewObjects(List, Serializer);
 						List.Clear();
@@ -1803,7 +1797,7 @@ namespace Waher.Persistence.Files
 				CollectionName2 = Serializer.CollectionName(Object);
 				if (File is null || CollectionName != CollectionName2)
 				{
-					if (List.First != null)
+					if (!(List.First is null))
 					{
 						await File.SaveNewObjects(List, Serializer);
 						List.Clear();
@@ -1816,7 +1810,7 @@ namespace Waher.Persistence.Files
 				List.AddLast(Object);
 			}
 
-			if (List.First != null)
+			if (!(List.First is null))
 				await File.SaveNewObjects(List, Serializer);
 		}
 
@@ -1912,7 +1906,7 @@ namespace Waher.Persistence.Files
 				T2 = Object.GetType();
 				if (Serializer is null || T != T2)
 				{
-					if (List.First != null)
+					if (!(List.First is null))
 					{
 						await File.UpdateObjects(ObjectIds, List, Serializer);
 						List.Clear();
@@ -1926,7 +1920,7 @@ namespace Waher.Persistence.Files
 				CollectionName2 = Serializer.CollectionName(Object);
 				if (File is null || CollectionName != CollectionName2)
 				{
-					if (List.First != null)
+					if (!(List.First is null))
 					{
 						await File.UpdateObjects(ObjectIds, List, Serializer);
 						List.Clear();
@@ -1940,7 +1934,7 @@ namespace Waher.Persistence.Files
 				List.AddLast(Object);
 			}
 
-			if (List.First != null)
+			if (!(List.First is null))
 				await File.UpdateObjects(ObjectIds, List, Serializer);
 		}
 
@@ -1983,7 +1977,7 @@ namespace Waher.Persistence.Files
 				T2 = Object.GetType();
 				if (Serializer is null || T != T2)
 				{
-					if (List.First != null)
+					if (!(List.First is null))
 					{
 						await File.DeleteObjects(List, Serializer);
 						List.Clear();
@@ -1996,7 +1990,7 @@ namespace Waher.Persistence.Files
 				CollectionName2 = Serializer.CollectionName(Object);
 				if (File is null || CollectionName != CollectionName2)
 				{
-					if (List.First != null)
+					if (!(List.First is null))
 					{
 						await File.DeleteObjects(List, Serializer);
 						List.Clear();
@@ -2009,7 +2003,7 @@ namespace Waher.Persistence.Files
 				List.AddLast(await Serializer.GetObjectId(Object, false));
 			}
 
-			if (List.First != null)
+			if (!(List.First is null))
 				await File.DeleteObjects(List, Serializer);
 		}
 
@@ -2156,7 +2150,7 @@ namespace Waher.Persistence.Files
 										await Output.EndObject();
 									}
 								}
-								else if (e.CurrentObjectId != null)
+								else if (!(e.CurrentObjectId is null))
 									await Output.ReportError("Unable to load object " + e.CurrentObjectId.ToString() + ".");
 							}
 						}
@@ -2304,7 +2298,7 @@ namespace Waher.Persistence.Files
 									}
 								}
 
-								if (Stat.UnreferencedBlocks != null && Stat.UnreferencedBlocks.Length > 0)
+								if (!(Stat.UnreferencedBlocks is null) && Stat.UnreferencedBlocks.Length > 0)
 								{
 									foreach (int BlockIndex in Stat.UnreferencedBlocks)
 									{
@@ -2362,7 +2356,7 @@ namespace Waher.Persistence.Files
 													}
 												}
 
-												if (Reader2 != null)
+												if (!(Reader2 is null))
 												{
 													object Obj;
 													int Len2;
@@ -2475,7 +2469,7 @@ namespace Waher.Persistence.Files
 
 					Stat.LogComment("File was regenerated due to errors found.");
 
-					if (Exceptions != null)
+					if (!(Exceptions is null))
 					{
 						foreach (Exception ex in Exceptions)
 							Stat.LogError(ex.Message);

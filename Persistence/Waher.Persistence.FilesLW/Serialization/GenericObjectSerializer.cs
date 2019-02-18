@@ -653,7 +653,7 @@ namespace Waher.Persistence.Files.Serialization
 		/// <param name="Object">Object in the current context. If null, the default collection name is requested.</param>
 		public override string CollectionName(object Object)
 		{
-			if (Object != null && Object is GenericObject Obj)
+			if (!(Object is null) && Object is GenericObject Obj)
 				return Obj.CollectionName;
 			else
 				return base.CollectionName(Object);

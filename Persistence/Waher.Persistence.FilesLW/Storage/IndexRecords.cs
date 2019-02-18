@@ -2707,7 +2707,7 @@ namespace Waher.Persistence.Files.Storage
 				i++;
 			}
 
-			if (ConstantFields != null)
+			if (!(ConstantFields is null))
 			{
 				int e = ConstantFields.Length;
 
@@ -2793,7 +2793,7 @@ namespace Waher.Persistence.Files.Storage
 				i++;
 			}
 
-			if (ConstantFields != null)
+			if (!(ConstantFields is null))
 			{
 				int e = ConstantFields.Length;
 

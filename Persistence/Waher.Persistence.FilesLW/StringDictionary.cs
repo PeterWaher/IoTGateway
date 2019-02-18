@@ -62,13 +62,10 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		public void Dispose()
 		{
-			if (this.dictionaryFile != null)
-			{
-				this.dictionaryFile.Dispose();
-				this.dictionaryFile = null;
+			this.dictionaryFile?.Dispose();
+			this.dictionaryFile = null;
 
-				this.recordHandler = null;
-			}
+			this.recordHandler = null;
 		}
 
 		/// <summary>
@@ -90,7 +87,7 @@ namespace Waher.Persistence.Files
 		/// <returns>true if the System.Collections.Generic.IDictionary{string,object} contains an element with the key; otherwise, false.</returns>
 		public async Task<bool> ContainsKeyAsync(string key)
 		{
-			if (this.inMemory != null)
+			if (!(this.inMemory is null))
 			{
 				lock (this.inMemory)
 				{
@@ -103,7 +100,7 @@ namespace Waher.Persistence.Files
 			try
 			{
 				BlockInfo Info = await this.dictionaryFile.FindNodeLocked(key);
-				return Info != null;
+				return !(Info is null);
 			}
 			finally
 			{
@@ -161,7 +158,7 @@ namespace Waher.Persistence.Files
 			try
 			{
 				BlockInfo Info = await this.dictionaryFile.FindLeafNodeLocked(key);
-				if (Info != null)
+				if (!(Info is null))
 					await this.dictionaryFile.InsertObjectLocked(Info.BlockIndex, Info.Header, Info.Block, Bin, Info.InternalPosition, 0, 0, true, Info.LastObject);
 				else
 				{
@@ -187,7 +184,7 @@ namespace Waher.Persistence.Files
 				Console.Out.WriteLine(ex.StackTrace);
 			}*/
 
-			if (this.inMemory != null)
+			if (!(this.inMemory is null))
 			{
 				lock (this.inMemory)
 				{
@@ -220,7 +217,7 @@ namespace Waher.Persistence.Files
 			if (key is null)
 				throw new ArgumentNullException("key is null.", "key");
 
-			if (this.inMemory != null)
+			if (!(this.inMemory is null))
 			{
 				lock (this.inMemory)
 				{
@@ -244,7 +241,7 @@ namespace Waher.Persistence.Files
 				await this.dictionaryFile.EndWrite();
 			}
 
-			return DeletedObject != null;
+			return !(DeletedObject is null);
 		}
 
 		/// <summary>
@@ -280,7 +277,7 @@ namespace Waher.Persistence.Files
 			if (key is null)
 				throw new ArgumentNullException("key is null.", "key");
 
-			if (this.inMemory != null)
+			if (!(this.inMemory is null))
 			{
 				lock (this.inMemory)
 				{
@@ -316,7 +313,7 @@ namespace Waher.Persistence.Files
 			if (key is null)
 				throw new ArgumentNullException("key is null.", "key");
 
-			if (this.inMemory != null)
+			if (!(this.inMemory is null))
 			{
 				lock (this.inMemory)
 				{
@@ -351,7 +348,7 @@ namespace Waher.Persistence.Files
 		{
 			this.dictionaryFile.Clear();
 
-			if (this.inMemory != null)
+			if (!(this.inMemory is null))
 			{
 				lock (this.inMemory)
 				{
@@ -461,11 +458,8 @@ namespace Waher.Persistence.Files
 			}
 			catch (Exception ex)
 			{
-				if (Result != null)
-				{
-					Result.Dispose();
-					Result = null;
-				}
+				Result?.Dispose();
+				Result = null;
 
 				System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex).Throw();
 			}

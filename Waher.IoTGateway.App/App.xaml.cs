@@ -165,7 +165,7 @@ namespace Waher.IoTGateway.App
 			}
 		}
 
-		private static async Task<IDatabaseProvider> GetDatabase(XmlElement DatabaseConfig)
+		private static Task<IDatabaseProvider> GetDatabase(XmlElement DatabaseConfig)
 		{
 			if (CommonTypes.TryParse(DatabaseConfig.Attributes["encrypted"].Value, out bool Encrypted) && Encrypted)
 				throw new Exception("Encrypted database storage not supported on this platform.");
@@ -178,9 +178,7 @@ namespace Waher.IoTGateway.App
 				int.Parse(DatabaseConfig.Attributes["timeoutMs"].Value),
 				false);
 
-			await Result.RepairIfInproperShutdown(Gateway.AppDataFolder + "Transforms" + Path.DirectorySeparatorChar + "DbStatXmlToHtml.xslt");
-
-			return Result;
+			return Task.FromResult<IDatabaseProvider>(Result);
 		}
 
 		private async Task<MetaDataTag[]> GetMetaData(MetaDataTag[] MetaData)

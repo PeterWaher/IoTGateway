@@ -114,6 +114,7 @@ namespace Waher.IoTGateway
 		private static LinkedList<KeyValuePair<string, int>> ports = new LinkedList<KeyValuePair<string, int>>();
 		private static Dictionary<int, EventHandler> serviceCommandByNr = new Dictionary<int, EventHandler>();
 		private static Dictionary<EventHandler, int> serviceCommandNrByCallback = new Dictionary<EventHandler, int>();
+		private static IDatabaseProvider internalProvider = null;
 		private static ThingRegistryClient thingRegistryClient = null;
 		private static ProvisioningClient provisioningClient = null;
 		private static XmppCredentials xmppCredentials = null;
@@ -353,7 +354,14 @@ namespace Waher.IoTGateway
 								if (DatabaseProvider is null)
 									throw new Exception("Database provider not defined. Make sure the GetDatabaseProvider event has an appropriate event handler.");
 
+								internalProvider = DatabaseProvider;
 								Database.Register(DatabaseProvider, false);
+
+								if (DatabaseProvider is Persistence.Files.FilesProvider FilesProvider)
+								{
+									FilesProvider.AutoRepairReportFolder = Path.Combine(AppDataFolder, "Backup");
+									await FilesProvider.RepairIfInproperShutdown(Gateway.AppDataFolder + "Transforms" + Path.DirectorySeparatorChar + "DbStatXmlToHtml.xslt");
+								}
 								break;
 
 							case "Ports":
@@ -1208,6 +1216,9 @@ namespace Waher.IoTGateway
 			{
 				Types.StopAllModules();
 
+				if (!(internalProvider is null) && Database.Provider != internalProvider)
+					internalProvider.Stop();
+
 				scheduler?.Dispose();
 				scheduler = null;
 
@@ -1306,6 +1317,9 @@ namespace Waher.IoTGateway
 			finally
 			{
 				Persistence.LifeCycle.DatabaseModule.Flush();
+
+				if (!(internalProvider is null) && Database.Provider != internalProvider)
+					internalProvider.Flush();
 			}
 		}
 
@@ -1381,6 +1395,14 @@ namespace Waher.IoTGateway
 		public static bool Configuring
 		{
 			get { return configuring; }
+		}
+
+		/// <summary>
+		/// Internal Database provider.
+		/// </summary>
+		public static IDatabaseProvider InternalDatabase
+		{
+			get { return internalProvider; }
 		}
 
 		/// <summary>

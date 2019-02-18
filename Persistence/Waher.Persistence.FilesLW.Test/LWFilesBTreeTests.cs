@@ -762,7 +762,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(AggregateException))]
+		[ExpectedException(typeof(InvalidOperationException))]
 		public async Task DBFiles_BTree_Test_20_UnlockedChangeEnumeration()
 		{
 			await this.CreateObjects(Math.Min(ObjectsToEnumerate, 1000));

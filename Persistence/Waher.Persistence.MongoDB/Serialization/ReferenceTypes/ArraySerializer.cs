@@ -101,7 +101,6 @@ namespace Waher.Persistence.MongoDB.Serialization.ReferenceTypes
 						{
 							S = this.provider.GetObjectSerializer(ItemType);
 							LastType = ItemType;
-							Nullable = S.IsNullable;
 						}
 
 						S.Serialize(Writer, Nullable, true, Item);

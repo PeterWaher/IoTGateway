@@ -975,7 +975,6 @@ namespace Waher.Persistence.MongoDB.Serialization
 						{
 							S = Provider.GetObjectSerializer(ItemType);
 							LastType = ItemType;
-							Nullable = S.IsNullable;
 						}
 
 						S.Serialize(Writer, Nullable, true, Item);
@@ -1022,7 +1021,6 @@ namespace Waher.Persistence.MongoDB.Serialization
 						{
 							S = Provider.GetObjectSerializer(ItemType);
 							LastType = ItemType;
-							Nullable = S.IsNullable;
 						}
 
 						S.Serialize(Writer, Nullable, true, Item);

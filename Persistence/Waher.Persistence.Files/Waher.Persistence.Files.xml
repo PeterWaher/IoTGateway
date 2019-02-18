@@ -221,9 +221,19 @@
             Base folder of where files will be stored.
             </summary>
         </member>
+        <member name="P:Waher.Persistence.Files.FilesProvider.AutoRepairReportFolder">
+            <summary>
+            Folder for Auto-Repair reports. If empty or null, <see cref="P:Waher.Persistence.Files.FilesProvider.Folder"/>\AutoRepair will be used. 
+            </summary>
+        </member>
         <member name="P:Waher.Persistence.Files.FilesProvider.Id">
             <summary>
             An ID of the files provider. It's unique, and constant during the life-time of the FilesProvider class.
+            </summary>
+        </member>
+        <member name="P:Waher.Persistence.Files.FilesProvider.ObjectIdByteCount">
+            <summary>
+            Number of bytes used by an Object ID.
             </summary>
         </member>
         <member name="P:Waher.Persistence.Files.FilesProvider.BlockSize">

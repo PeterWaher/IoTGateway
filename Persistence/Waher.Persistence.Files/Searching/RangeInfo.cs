@@ -105,7 +105,7 @@ namespace Waher.Persistence.Files.Searching
 		/// </summary>
 		public bool HasMin
 		{
-			get { return (this.isRange && this.min != null) || (this.isPoint && this.point != null); }
+			get { return (this.isRange && !(this.min is null)) || (this.isPoint && !(this.point is null)); }
 		}
 
 		/// <summary>
@@ -113,7 +113,7 @@ namespace Waher.Persistence.Files.Searching
 		/// </summary>
 		public bool HasMax
 		{
-			get { return (this.isRange && this.max != null) || (this.isPoint && this.point != null); }
+			get { return (this.isRange && !(this.max is null)) || (this.isPoint && !(this.point is null)); }
 		}
 
 		/// <summary>
@@ -127,7 +127,7 @@ namespace Waher.Persistence.Files.Searching
 
 			if (this.isRange)
 			{
-				if (this.min != null)
+				if (!(this.min is null))
 				{
 					i = Comparison.Compare(this.min, Value);
 
@@ -137,7 +137,7 @@ namespace Waher.Persistence.Files.Searching
 					this.min = null;
 				}
 
-				if (this.max != null)
+				if (!(this.max is null))
 				{
 					i = Comparison.Compare(this.max, Value);
 
@@ -180,7 +180,7 @@ namespace Waher.Persistence.Files.Searching
 
 			if (this.isRange)
 			{
-				if (this.min != null)
+				if (!(this.min is null))
 				{
 					i = Comparison.Compare(this.min, Value);
 
@@ -220,7 +220,7 @@ namespace Waher.Persistence.Files.Searching
 					Smaller = true;
 				}
 
-				if (this.max != null)
+				if (!(this.max is null))
 				{
 					i = Comparison.Compare(this.max, this.min);
 					if (!i.HasValue || i.Value < 0)
@@ -270,7 +270,7 @@ namespace Waher.Persistence.Files.Searching
 
 			if (this.isRange)
 			{
-				if (this.max != null)
+				if (!(this.max is null))
 				{
 					i = Comparison.Compare(this.max, Value);
 
@@ -310,7 +310,7 @@ namespace Waher.Persistence.Files.Searching
 					Smaller = true;
 				}
 
-				if (this.min != null)
+				if (!(this.min is null))
 				{
 					i = Comparison.Compare(this.max, this.min);
 					if (!i.HasValue || i.Value < 0)

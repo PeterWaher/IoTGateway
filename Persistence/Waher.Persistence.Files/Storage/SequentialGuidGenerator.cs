@@ -126,13 +126,10 @@ namespace Waher.Persistence.Files.Storage
 		/// </summary>
 		public void Dispose()
 		{
-			if (this.gen != null)
-			{
 #if NETSTANDARD1_5
-				this.gen.Dispose();
+			this.gen?.Dispose();
 #endif
-				this.gen = null;
-			}
+			this.gen = null;
 		}
 	}
 }

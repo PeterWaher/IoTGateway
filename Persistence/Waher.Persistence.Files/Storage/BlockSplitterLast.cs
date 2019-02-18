@@ -19,7 +19,7 @@ namespace Waher.Persistence.Files.Storage
 		{
 			int c = 4 + Len;
 
-			if (this.ParentObject != null)
+			if (!(this.ParentObject is null))
 			{
 				if (this.RightSizeSubtree < uint.MaxValue)
 				{

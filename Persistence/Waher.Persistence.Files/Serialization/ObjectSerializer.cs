@@ -318,7 +318,7 @@ namespace Waher.Persistence.Files.Serialization
 
 				foreach (MemberInfo Member in Members)
 				{
-					if ((FI = Member as FieldInfo) != null)
+					if (!((FI = Member as FieldInfo) is null))
 					{
 						if (!FI.IsPublic || FI.IsStatic)
 							continue;
@@ -326,7 +326,7 @@ namespace Waher.Persistence.Files.Serialization
 						PI = null;
 						MemberType = FI.FieldType;
 					}
-					else if ((PI = Member as PropertyInfo) != null)
+					else if (!((PI = Member as PropertyInfo) is null))
 					{
 						if ((MI = PI.GetMethod) is null || !MI.IsPublic || MI.IsStatic)
 							continue;
@@ -550,7 +550,7 @@ namespace Waher.Persistence.Files.Serialization
 
 				foreach (MemberInfo Member in Members)
 				{
-					if ((FI = Member as FieldInfo) != null)
+					if (!((FI = Member as FieldInfo) is null))
 					{
 						if (!FI.IsPublic || FI.IsStatic)
 							continue;
@@ -558,7 +558,7 @@ namespace Waher.Persistence.Files.Serialization
 						PI = null;
 						MemberType = FI.FieldType;
 					}
-					else if ((PI = Member as PropertyInfo) != null)
+					else if (!((PI = Member as PropertyInfo) is null))
 					{
 						if ((MI = PI.GetMethod) is null || !MI.IsPublic || MI.IsStatic)
 							continue;
@@ -689,7 +689,7 @@ namespace Waher.Persistence.Files.Serialization
 					CSharp.AppendLine("\t\t\tResult = new " + Type.FullName + "();");
 					CSharp.AppendLine();
 
-					if (ObjectIdMember != null)
+					if (!(ObjectIdMember is null))
 					{
 						if (ObjectIdMemberType == typeof(Guid))
 							CSharp.AppendLine("\t\t\tResult." + ObjectIdMember.Name + " = ObjectId;");
@@ -712,7 +712,7 @@ namespace Waher.Persistence.Files.Serialization
 
 					foreach (MemberInfo Member in Members)
 					{
-						if ((FI = Member as FieldInfo) != null)
+						if (!((FI = Member as FieldInfo) is null))
 						{
 							if (!FI.IsPublic || FI.IsStatic)
 								continue;
@@ -720,7 +720,7 @@ namespace Waher.Persistence.Files.Serialization
 							PI = null;
 							MemberType = FI.FieldType;
 						}
-						else if ((PI = Member as PropertyInfo) != null)
+						else if (!((PI = Member as PropertyInfo) is null))
 						{
 							if ((MI = PI.GetMethod) is null || !MI.IsPublic || MI.IsStatic)
 								continue;
@@ -1283,7 +1283,7 @@ namespace Waher.Persistence.Files.Serialization
 
 				foreach (MemberInfo Member in Members)
 				{
-					if ((FI = Member as FieldInfo) != null)
+					if (!((FI = Member as FieldInfo) is null))
 					{
 						if (!FI.IsPublic || FI.IsStatic)
 							continue;
@@ -1291,7 +1291,7 @@ namespace Waher.Persistence.Files.Serialization
 						PI = null;
 						MemberType = FI.FieldType;
 					}
-					else if ((PI = Member as PropertyInfo) != null)
+					else if (!((PI = Member as PropertyInfo) is null))
 					{
 						if ((MI = PI.GetMethod) is null || !MI.IsPublic || MI.IsStatic)
 							continue;
@@ -1862,7 +1862,7 @@ namespace Waher.Persistence.Files.Serialization
 					}
 					else if (ObjectIdMemberType == typeof(byte[]))
 					{
-						CSharp.AppendLine("\t\t\t\tif (ObjectId != null)");
+						CSharp.AppendLine("\t\t\t\tif (!(ObjectId is null))");
 						CSharp.AppendLine("\t\t\t\t\tWriterBak.Write(new Guid(ObjectId));");
 					}
 					else
@@ -1943,7 +1943,7 @@ namespace Waher.Persistence.Files.Serialization
 				if (File.Exists(s))
 					Dependencies[s] = true;
 
-				while (Loop != null)
+				while (!(Loop is null))
 				{
 					LoopInfo = Loop.GetTypeInfo();
 					Dependencies[GetLocation(Loop)] = true;
@@ -1957,11 +1957,11 @@ namespace Waher.Persistence.Files.Serialization
 					foreach (MemberInfo MI2 in LoopInfo.DeclaredMembers)
 					{
 						FI = MI2 as FieldInfo;
-						if (FI != null && !((s = GetLocation(FI.FieldType)).EndsWith("mscorlib.dll") || s.EndsWith("System.Runtime.dll") || s.EndsWith("System.Private.CoreLib.dll")))
+						if (!(FI is null) && !((s = GetLocation(FI.FieldType)).EndsWith("mscorlib.dll") || s.EndsWith("System.Runtime.dll") || s.EndsWith("System.Private.CoreLib.dll")))
 							Dependencies[s] = true;
 
 						PI = MI2 as PropertyInfo;
-						if (PI != null && !((s = GetLocation(PI.PropertyType)).EndsWith("mscorlib.dll") || s.EndsWith("System.Runtime.dll") || s.EndsWith("System.Private.CoreLib.dll")))
+						if (!(PI is null) && !((s = GetLocation(PI.PropertyType)).EndsWith("mscorlib.dll") || s.EndsWith("System.Runtime.dll") || s.EndsWith("System.Private.CoreLib.dll")))
 							Dependencies[s] = true;
 					}
 
@@ -2035,7 +2035,7 @@ namespace Waher.Persistence.Files.Serialization
 
 				foreach (MemberInfo MemberInfo in GetMembers(this.typeInfo))
 				{
-					if ((FI = MemberInfo as FieldInfo) != null)
+					if (!((FI = MemberInfo as FieldInfo) is null))
 					{
 						if (!FI.IsPublic || FI.IsStatic)
 							continue;
@@ -2043,7 +2043,7 @@ namespace Waher.Persistence.Files.Serialization
 						PI = null;
 						Member = new FieldMember(FI, this.provider.GetFieldCode(this.collectionName, FI.Name));
 					}
-					else if ((PI = MemberInfo as PropertyInfo) != null)
+					else if (!((PI = MemberInfo as PropertyInfo) is null))
 					{
 						if ((MI = PI.GetMethod) is null || !MI.IsPublic || MI.IsStatic)
 							continue;
@@ -2076,7 +2076,7 @@ namespace Waher.Persistence.Files.Serialization
 							if (DefaultValue is string s && Member.MemberType == typeof(CaseInsensitiveString))
 								DefaultValue = new CaseInsensitiveString(s);
 
-							if (DefaultValue != null && DefaultValue.GetType() != Member.MemberType)
+							if (!(DefaultValue is null) && DefaultValue.GetType() != Member.MemberType)
 								DefaultValue = Convert.ChangeType(DefaultValue, Member.MemberType);
 
 							Member.DefaultValue = DefaultValue;
@@ -2263,7 +2263,7 @@ namespace Waher.Persistence.Files.Serialization
 
 				Result = Activator.CreateInstance(this.type);
 
-				if (this.objectIdMember != null)
+				if (!(this.objectIdMember is null))
 				{
 					switch (this.objectIdMember.MemberFieldDataTypeCode)
 					{
@@ -2873,7 +2873,7 @@ namespace Waher.Persistence.Files.Serialization
 						if (this.objectIdMember.MemberFieldDataTypeCode == TYPE_GUID)
 						{
 							ObjectIdType = 1;
-							if (ObjectId != null && !ObjectId.Equals(Guid.Empty))
+							if (!(ObjectId is null)) && !ObjectId.Equals(Guid.Empty))
 							{
 								WriterBak.Write((Guid)ObjectId);
 								HasGuid = true;
@@ -2893,7 +2893,7 @@ namespace Waher.Persistence.Files.Serialization
 						{
 							byte[] bin = (byte[])ObjectId;
 							ObjectIdType = 3;
-							if (bin != null)
+							if (!(bin is null))
 							{
 								WriterBak.Write(new Guid(bin));
 								HasGuid = true;
@@ -2944,9 +2944,9 @@ namespace Waher.Persistence.Files.Serialization
 #if NETSTANDARD1_5
 				if (this.compiled)
 				{
-					if (this.objectIdFieldInfo != null)
+					if (!(this.objectIdFieldInfo is null))
 						return this.objectIdFieldInfo.Name;
-					else if (this.objectIdPropertyInfo != null)
+					else if (!(this.objectIdPropertyInfo is null))
 						return this.objectIdPropertyInfo.Name;
 					else
 						return null;
@@ -2954,7 +2954,7 @@ namespace Waher.Persistence.Files.Serialization
 				else
 				{
 #endif
-					if (this.objectIdMember != null)
+					if (!(this.objectIdMember is null))
 						return this.objectIdMember.Name;
 					else
 						return null;
@@ -2973,10 +2973,10 @@ namespace Waher.Persistence.Files.Serialization
 			{
 #if NETSTANDARD1_5
 				if (this.compiled)
-					return this.objectIdFieldInfo != null || this.objectIdPropertyInfo != null;
+					return !(this.objectIdFieldInfo is null) || this.objectIdPropertyInfo != null;
 				else
 #endif
-					return this.objectIdMember != null;
+					return !(this.objectIdMember is null);
 			}
 		}
 
@@ -2991,9 +2991,9 @@ namespace Waher.Persistence.Files.Serialization
 #if NETSTANDARD1_5
 			if (this.compiled)
 			{
-				if (this.objectIdFieldInfo != null)
+				if (!(this.objectIdFieldInfo is null))
 					ObjectId = this.objectIdFieldInfo.GetValue(Value);
-				else if (this.objectIdPropertyInfo != null)
+				else if (!(this.objectIdPropertyInfo is null))
 					ObjectId = this.objectIdPropertyInfo.GetValue(Value);
 				else
 					return false;
@@ -3001,7 +3001,7 @@ namespace Waher.Persistence.Files.Serialization
 			else
 			{
 #endif
-				if (this.objectIdMember != null)
+				if (!(this.objectIdMember is null))
 					ObjectId = this.objectIdMember.Get(Value);
 				else
 					return false;
@@ -3032,9 +3032,9 @@ namespace Waher.Persistence.Files.Serialization
 #if NETSTANDARD1_5
 			if (this.compiled)
 			{
-				if (this.objectIdFieldInfo != null)
+				if (!(this.objectIdFieldInfo is null))
 					MemberType = this.objectIdFieldInfo.FieldType;
-				else if (this.objectIdPropertyInfo != null)
+				else if (!(this.objectIdPropertyInfo is null))
 					MemberType = this.objectIdPropertyInfo.PropertyType;
 				else
 					return false;
@@ -3042,7 +3042,7 @@ namespace Waher.Persistence.Files.Serialization
 			else
 			{
 #endif
-				if (this.objectIdMember != null)
+				if (!(this.objectIdMember is null))
 					MemberType = this.objectIdMember.MemberType;
 				else
 					return false;
@@ -3062,7 +3062,7 @@ namespace Waher.Persistence.Files.Serialization
 #if NETSTANDARD1_5
 			if (this.compiled)
 			{
-				if (this.objectIdFieldInfo != null)
+				if (!(this.objectIdFieldInfo is null))
 					this.objectIdFieldInfo.SetValue(Value, Obj);
 				else
 					this.objectIdPropertyInfo.SetValue(Value, Obj);
@@ -3089,9 +3089,9 @@ namespace Waher.Persistence.Files.Serialization
 #if NETSTANDARD1_5
 			if (this.compiled)
 			{
-				if (this.objectIdFieldInfo != null)
+				if (!(this.objectIdFieldInfo is null))
 					Obj = this.objectIdFieldInfo.GetValue(Value);
-				else if (this.objectIdPropertyInfo != null)
+				else if (!(this.objectIdPropertyInfo is null))
 					Obj = this.objectIdPropertyInfo.GetValue(Value);
 				else
 					throw new NotSupportedException("No Object ID member found in objects of type " + Value.GetType().FullName + ".");
@@ -3099,7 +3099,7 @@ namespace Waher.Persistence.Files.Serialization
 			else
 			{
 #endif
-				if (this.objectIdMember != null)
+				if (!(this.objectIdMember is null))
 					Obj = this.objectIdMember.Get(Value);
 				else
 					throw new NotSupportedException("No Object ID member found in objects of type " + Value.GetType().FullName + ".");
@@ -3144,7 +3144,7 @@ namespace Waher.Persistence.Files.Serialization
 #if NETSTANDARD1_5
 				if (this.compiled)
 				{
-					if (this.objectIdFieldInfo != null)
+					if (!(this.objectIdFieldInfo is null))
 						T = this.objectIdFieldInfo.FieldType;
 					else
 						T = this.objectIdPropertyInfo.PropertyType;
@@ -3165,7 +3165,7 @@ namespace Waher.Persistence.Files.Serialization
 #if NETSTANDARD1_5
 				if (this.compiled)
 				{
-					if (this.objectIdFieldInfo != null)
+					if (!(this.objectIdFieldInfo is null))
 						this.objectIdFieldInfo.SetValue(Value, Obj);
 					else
 						this.objectIdPropertyInfo.SetValue(Value, Obj);
@@ -3258,12 +3258,12 @@ namespace Waher.Persistence.Files.Serialization
 		/// <returns>Enumerated set of members.</returns>
 		public static IEnumerable<MemberInfo> GetMembers(System.Reflection.TypeInfo T)
 		{
-			while (T != null)
+			while (!(T is null))
 			{
 				foreach (MemberInfo MI in T.DeclaredMembers)
 					yield return MI;
 
-				if (T.BaseType != null)
+				if (!(T.BaseType is null))
 					T = T.BaseType.GetTypeInfo();
 				else
 					T = null;

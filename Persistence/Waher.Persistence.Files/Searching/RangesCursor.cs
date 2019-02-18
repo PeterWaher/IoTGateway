@@ -125,7 +125,7 @@ namespace Waher.Persistence.Files.Searching
 		/// </summary>
 		public void Dispose()
 		{
-			if (this.currentRange != null)
+			if (!(this.currentRange is null))
 			{
 				this.currentRange.Dispose();
 				this.currentRange = null;
@@ -265,7 +265,7 @@ namespace Waher.Persistence.Files.Searching
 				bool Ok = true;
 				bool Smaller;
 
-				if (this.additionalfilters != null)
+				if (!(this.additionalfilters is null))
 				{
 					foreach (IApplicableFilter Filter in this.additionalfilters)
 					{
@@ -277,7 +277,7 @@ namespace Waher.Persistence.Files.Searching
 					}
 				}
 
-				if (this.startRangeFilters != null)
+				if (!(this.startRangeFilters is null))
 				{
 					foreach (KeyValuePair<string, IApplicableFilter> Filter in this.startRangeFilters)
 					{
@@ -290,7 +290,7 @@ namespace Waher.Persistence.Files.Searching
 					}
 				}
 
-				if (this.endRangeFilters != null && OutOfStartRangeField is null)
+				if (!(this.endRangeFilters is null) && OutOfStartRangeField is null)
 				{
 					foreach (KeyValuePair<string, IApplicableFilter> Filter in this.endRangeFilters)
 					{
@@ -309,7 +309,7 @@ namespace Waher.Persistence.Files.Searching
 					{
 						if (this.ascending[i])
 						{
-							if (this.currentLimits[i].SetMin(FieldValue, OutOfStartRangeField != null, out Smaller) && Smaller)
+							if (this.currentLimits[i].SetMin(FieldValue, !(OutOfStartRangeField is null), out Smaller) && Smaller)
 							{
 								i++;
 								this.limitsUpdatedAt = i;
@@ -323,7 +323,7 @@ namespace Waher.Persistence.Files.Searching
 						}
 						else
 						{
-							if (this.currentLimits[i].SetMax(FieldValue, OutOfStartRangeField != null, out Smaller) && Smaller)
+							if (this.currentLimits[i].SetMax(FieldValue, !(OutOfStartRangeField is null), out Smaller) && Smaller)
 							{
 								i++;
 								this.limitsUpdatedAt = i;
@@ -340,7 +340,7 @@ namespace Waher.Persistence.Files.Searching
 
 				if (Ok)
 					return true;
-				else if (OutOfStartRangeField != null || OutOfEndRangeField != null)
+				else if (!(OutOfStartRangeField is null) || !(OutOfEndRangeField is null))
 				{
 					this.currentRange.Dispose();
 					this.currentRange = null;
@@ -484,7 +484,7 @@ namespace Waher.Persistence.Files.Searching
 				bool Ok = true;
 				bool Smaller;
 
-				if (this.additionalfilters != null)
+				if (!(this.additionalfilters is null))
 				{
 					foreach (IApplicableFilter Filter in this.additionalfilters)
 					{
@@ -496,7 +496,7 @@ namespace Waher.Persistence.Files.Searching
 					}
 				}
 
-				if (this.startRangeFilters != null)
+				if (!(this.startRangeFilters is null))
 				{
 					foreach (KeyValuePair<string, IApplicableFilter> Filter in this.startRangeFilters)
 					{
@@ -509,7 +509,7 @@ namespace Waher.Persistence.Files.Searching
 					}
 				}
 
-				if (this.endRangeFilters != null && OutOfStartRangeField is null)
+				if (!(this.endRangeFilters is null) && OutOfStartRangeField is null)
 				{
 					foreach (KeyValuePair<string, IApplicableFilter> Filter in this.endRangeFilters)
 					{
@@ -528,7 +528,7 @@ namespace Waher.Persistence.Files.Searching
 					{
 						if (this.ascending[i])
 						{
-							if (this.currentLimits[i].SetMax(FieldValue, OutOfStartRangeField != null, out Smaller) && Smaller)
+							if (this.currentLimits[i].SetMax(FieldValue, !(OutOfStartRangeField is null), out Smaller) && Smaller)
 							{
 								i++;
 								this.limitsUpdatedAt = i;
@@ -542,7 +542,7 @@ namespace Waher.Persistence.Files.Searching
 						}
 						else
 						{
-							if (this.currentLimits[i].SetMin(FieldValue, OutOfStartRangeField != null, out Smaller) && Smaller)
+							if (this.currentLimits[i].SetMin(FieldValue, !(OutOfStartRangeField is null), out Smaller) && Smaller)
 							{
 								i++;
 								this.limitsUpdatedAt = i;
@@ -559,7 +559,7 @@ namespace Waher.Persistence.Files.Searching
 
 				if (Ok)
 					return true;
-				else if (OutOfStartRangeField != null || OutOfEndRangeField != null)
+				else if (!(OutOfStartRangeField is null) || !(OutOfEndRangeField is null))
 				{
 					this.currentRange.Dispose();
 					this.currentRange = null;

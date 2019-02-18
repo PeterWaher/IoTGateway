@@ -57,14 +57,11 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		public void Dispose()
 		{
-			if (this.indexFile != null)
-			{
-				this.indexFile.Dispose();
-				this.indexFile = null;
+			this.indexFile?.Dispose();
+			this.indexFile = null;
 
-				this.objectFile = null;
-				this.recordHandler = null;
-			}
+			this.objectFile = null;
+			this.recordHandler = null;
 		}
 
 		/// <summary>
@@ -271,11 +268,11 @@ namespace Waher.Persistence.Files
 		internal async Task<bool> UpdateObject(Guid ObjectId, object OldObject, object NewObject, IObjectSerializer Serializer)
 		{
 			byte[] OldBin = this.recordHandler.Serialize(ObjectId, OldObject, Serializer, MissingFieldAction.Null);
-			if (OldBin != null && OldBin.Length > this.indexFile.InlineObjectSizeLimit)
+			if (!(OldBin is null) && OldBin.Length > this.indexFile.InlineObjectSizeLimit)
 				return false;
 
 			byte[] NewBin = this.recordHandler.Serialize(ObjectId, NewObject, Serializer, MissingFieldAction.Null);
-			if (NewBin != null && NewBin.Length > this.indexFile.InlineObjectSizeLimit)
+			if (!(NewBin is null) && NewBin.Length > this.indexFile.InlineObjectSizeLimit)
 				return false;
 
 			if (OldBin is null && NewBin is null)
@@ -298,7 +295,7 @@ namespace Waher.Persistence.Files
 			await this.indexFile.LockWrite();
 			try
 			{
-				if (OldBin != null)
+				if (!(OldBin is null))
 				{
 					try
 					{
@@ -310,7 +307,7 @@ namespace Waher.Persistence.Files
 					}
 				}
 
-				if (NewBin != null)
+				if (!(NewBin is null))
 				{
 					BlockInfo Leaf = await this.indexFile.FindLeafNodeLocked(NewBin);
 					await this.indexFile.InsertObjectLocked(Leaf.BlockIndex, Leaf.Header, Leaf.Block, NewBin, Leaf.InternalPosition, 0, 0, true, Leaf.LastObject);
@@ -346,11 +343,11 @@ namespace Waher.Persistence.Files
 				while (e1.MoveNext() && e2.MoveNext() && e3.MoveNext())
 				{
 					byte[] OldBin = this.recordHandler.Serialize(e1.Current, e2.Current, Serializer, MissingFieldAction.Null);
-					if (OldBin != null && OldBin.Length > this.indexFile.InlineObjectSizeLimit)
+					if (!(OldBin is null) && OldBin.Length > this.indexFile.InlineObjectSizeLimit)
 						continue;
 
 					byte[] NewBin = this.recordHandler.Serialize(e1.Current, e3.Current, Serializer, MissingFieldAction.Null);
-					if (NewBin != null && NewBin.Length > this.indexFile.InlineObjectSizeLimit)
+					if (!(NewBin is null) && NewBin.Length > this.indexFile.InlineObjectSizeLimit)
 						continue;
 
 					if (OldBin is null && NewBin is null)
@@ -370,7 +367,7 @@ namespace Waher.Persistence.Files
 							continue;
 					}
 
-					if (OldBin != null)
+					if (!(OldBin is null))
 					{
 						try
 						{
@@ -382,7 +379,7 @@ namespace Waher.Persistence.Files
 						}
 					}
 
-					if (NewBin != null)
+					if (!(NewBin is null))
 					{
 						BlockInfo Leaf = await this.indexFile.FindLeafNodeLocked(NewBin);
 						await this.indexFile.InsertObjectLocked(Leaf.BlockIndex, Leaf.Header, Leaf.Block, NewBin, Leaf.InternalPosition, 0, 0, true, Leaf.LastObject);
@@ -498,7 +495,7 @@ namespace Waher.Persistence.Files
 					object Obj = e.Current;
 					IObjectSerializer Serializer = e.CurrentSerializer;
 
-					if (Obj != null)
+					if (!(Obj is null))
 					{
 						if (LastSerializer is null || Serializer != LastSerializer)
 						{
@@ -597,11 +594,8 @@ namespace Waher.Persistence.Files
 			}
 			catch (Exception ex)
 			{
-				if (Result != null)
-				{
-					Result.Dispose();
-					Result = null;
-				}
+				Result?.Dispose();
+				Result = null;
 
 				System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex).Throw();
 			}
@@ -667,11 +661,8 @@ namespace Waher.Persistence.Files
 			}
 			catch (Exception ex)
 			{
-				if (Result != null)
-				{
-					Result.Dispose();
-					Result = null;
-				}
+				Result?.Dispose();
+				Result = null;
 
 				System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex).Throw();
 			}
@@ -739,11 +730,8 @@ namespace Waher.Persistence.Files
 			}
 			catch (Exception ex)
 			{
-				if (Result != null)
-				{
-					Result.Dispose();
-					Result = null;
-				}
+				Result?.Dispose();
+				Result = null;
 
 				System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex).Throw();
 			}
@@ -809,11 +797,8 @@ namespace Waher.Persistence.Files
 			}
 			catch (Exception ex)
 			{
-				if (Result != null)
-				{
-					Result.Dispose();
-					Result = null;
-				}
+				Result?.Dispose();
+				Result = null;
 
 				System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex).Throw();
 			}

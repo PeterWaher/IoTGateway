@@ -263,7 +263,7 @@ namespace Waher.Persistence.Files
 
 			if (!this.hasCurrent)
 			{
-				if (this.startingPoint != null)
+				if (!(this.startingPoint is null))
 				{
 					this.GoToStartingPoint(this.startingPoint);
 					this.hasCurrent = true;
@@ -288,7 +288,7 @@ namespace Waher.Persistence.Files
 
 				Pos = this.currentReader.Position;
 				ObjectId = this.recordHandler.GetKey(this.currentReader);
-				if (ObjectId != null)
+				if (!(ObjectId is null))
 				{
 					await this.LoadObject(ObjectId, Pos);
 					return true;
@@ -485,7 +485,7 @@ namespace Waher.Persistence.Files
 
 			if (!this.hasCurrent)
 			{
-				if (this.startingPoint != null)
+				if (!(this.startingPoint is null))
 				{
 					this.GoToStartingPoint(this.startingPoint);
 					this.hasCurrent = true;
@@ -763,7 +763,7 @@ namespace Waher.Persistence.Files
 						else
 						{
 							Type T = Types.GetType(TypeName);
-							if (T != null)
+							if (!(T is null))
 								this.currentSerializer = this.file.Provider.GetObjectSerializer(T);
 							else
 								this.currentSerializer = this.file.GenericObjectSerializer;
@@ -1045,7 +1045,7 @@ namespace Waher.Persistence.Files
 		{
 			if (!this.hasCurrent)
 			{
-				if (this.startingPoint != null)
+				if (!(this.startingPoint is null))
 					return new Bookmark(this.file, this.startingPoint);
 				else
 				{

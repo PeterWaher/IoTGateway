@@ -33,11 +33,8 @@ namespace Waher.Persistence.Files.Serialization
 
 		public void Dispose()
 		{
-			if (this.e != null)
-			{
-				this.e.Dispose();
-				this.e = null;
-			}
+			this.e?.Dispose();
+			this.e = null;
 		}
 
 		public bool MoveNext()

@@ -81,7 +81,7 @@ namespace Waher.Persistence.Files.Serialization
 					else
 					{
 						Type T = Types.GetType(TypeName);
-						if (T != null)
+						if (!(T is null))
 							Serializer = this.provider.GetObjectSerializer(T);
 						else
 							Serializer = this.genericSerializer;

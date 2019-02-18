@@ -104,11 +104,8 @@ namespace Waher.Persistence.Files.Searching
 		/// </summary>
 		public void Dispose()
 		{
-			if (this.currentCursor != null)
-			{
-				this.currentCursor.Dispose();
-				this.currentCursor = null;
-			}
+			this.currentCursor?.Dispose();
+			this.currentCursor = null;
 		}
 
 		/// <summary>
@@ -158,7 +155,7 @@ namespace Waher.Persistence.Files.Searching
 		/// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
 		public Task<bool> MovePreviousAsync()
 		{
-			return this.MoveNextAsync();	// Union operator not ordered.
+			return this.MoveNextAsync();    // Union operator not ordered.
 		}
 
 		public IEnumerator<T> GetEnumerator()

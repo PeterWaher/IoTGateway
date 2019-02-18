@@ -79,9 +79,9 @@ namespace Waher.Persistence.Files.Searching
 			{
 				s = Value.ToString();
 
-				if (this.regexCs != null)
+				if (!(this.regexCs is null))
 					M = this.regexCs.Match(s);
-				else if (this.regexCi != null)
+				else if (!(this.regexCi is null))
 					M = this.regexCi.Match(s);
 				else
 				{
@@ -103,9 +103,9 @@ namespace Waher.Persistence.Files.Searching
 		{
 			get
 			{
-				if (this.regexCs != null)
+				if (!(this.regexCs is null))
 					return this.regexCs;
-				else if (this.regexCi != null)
+				else if (!(this.regexCi is null))
 					return this.regexCi;
 				else
 				{

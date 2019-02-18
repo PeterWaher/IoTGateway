@@ -1008,7 +1008,6 @@ namespace Waher.Persistence.Files.Serialization
 						{
 							S = Provider.GetObjectSerializer(ItemType);
 							LastType = ItemType;
-							Nullable = S.IsNullable;
 						}
 
 						S.Serialize(Writer, Nullable, true, Item);
@@ -1059,7 +1058,6 @@ namespace Waher.Persistence.Files.Serialization
 						{
 							S = Provider.GetObjectSerializer(ItemType);
 							LastType = ItemType;
-							Nullable = S.IsNullable;
 						}
 
 						S.Serialize(Writer, Nullable, true, Item);

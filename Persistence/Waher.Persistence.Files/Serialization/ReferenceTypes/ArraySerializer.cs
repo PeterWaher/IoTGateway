@@ -104,7 +104,6 @@ namespace Waher.Persistence.Files.Serialization.ReferenceTypes
 						{
 							S = this.provider.GetObjectSerializer(ItemType);
 							LastType = ItemType;
-							Nullable = S.IsNullable;
 						}
 
 						S.Serialize(Writer, Nullable, true, Item);

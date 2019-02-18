@@ -672,7 +672,7 @@ namespace Waher.Persistence.Files.Serialization
 				}
 
 				if (this.typeInfo.IsAbstract)
-					CSharp.AppendLine("\t\t\tthrow new Exception(\"Unable to create an instance of an abstract class.\");");
+					CSharp.AppendLine("\t\t\tthrow new Exception(\"Unable to create an instance of the abstract class " + this.type.FullName + ".\");");
 				else
 				{
 					CSharp.AppendLine();
@@ -2126,7 +2126,7 @@ namespace Waher.Persistence.Files.Serialization
 				if (GT == typeof(Nullable<>))
 				{
 					Type = Type.GenericTypeArguments[0];
-					return Type.FullName + "?";
+					return "Nullable<" + Type.FullName + ">";
 				}
 			}
 
@@ -2253,7 +2253,7 @@ namespace Waher.Persistence.Files.Serialization
 				}
 
 				if (this.typeInfo.IsAbstract)
-					throw new Exception("Unable to create an instance of an abstract class.");
+					throw new Exception("Unable to create an instance of the abstract class " + this.type.FullName + ".");
 
 				if (Embedded)
 					Reader.ReadVariableLengthUInt64();  // Collection name

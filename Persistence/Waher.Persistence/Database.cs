@@ -61,6 +61,14 @@ namespace Waher.Persistence
 		}
 
 		/// <summary>
+		/// If the datbase provider has been locked for the rest of the run-time of the application.
+		/// </summary>
+		public static bool Locked
+		{
+			get { return locked; }
+		}
+
+		/// <summary>
 		/// Inserts an object into the default collection of the database.
 		/// </summary>
 		/// <param name="Object">Object to insert.</param>

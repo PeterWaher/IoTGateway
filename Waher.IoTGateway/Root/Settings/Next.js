@@ -1,5 +1,10 @@
 ﻿function Next()
 {
+    ConfigComplete("ConfigComplete");
+}
+
+function ConfigComplete(Command)
+{
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function ()
     {
@@ -18,7 +23,7 @@
 
     CloseEvents();
 
-    xhttp.open("POST", "/Settings/ConfigComplete", true);
+    xhttp.open("POST", "/Settings/" + Command, true);
     xhttp.setRequestHeader("Connection", "close");
     xhttp.send("");
 }

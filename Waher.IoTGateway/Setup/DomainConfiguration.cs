@@ -964,5 +964,14 @@ namespace Waher.IoTGateway.Setup
 			Response.Write(Encoding.ASCII.GetBytes(this.token));
 		}
 
+		/// <summary>
+		/// Simplified configuration by configuring simple default values.
+		/// </summary>
+		/// <returns>If the configuration was changed.</returns>
+		public override Task<bool> SimplifiedConfiguration()
+		{
+			return Task.FromResult<bool>(true);
+		}
+
 	}
 }

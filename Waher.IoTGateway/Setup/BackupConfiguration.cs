@@ -139,5 +139,14 @@ namespace Waher.IoTGateway.Setup
 				this.keyFolder.FolderPath = Folder;
 		}
 
+		/// <summary>
+		/// Simplified configuration by configuring simple default values.
+		/// </summary>
+		/// <returns>If the configuration was changed.</returns>
+		public override Task<bool> SimplifiedConfiguration()
+		{
+			return Task.FromResult<bool>(true);
+		}
+
 	}
 }

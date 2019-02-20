@@ -29,6 +29,8 @@ namespace Waher.IoTGateway.Setup
 	{
 		private static Introduction instance = null;
 
+		private HttpResource simplified = null;
+
 		/// <summary>
 		/// Current instance of configuration.
 		/// </summary>
@@ -70,6 +72,48 @@ namespace Waher.IoTGateway.Setup
 		{
 			instance = Configuration as Introduction;
 		}
-	
+
+		/// <summary>
+		/// Waits for the user to provide configuration.
+		/// </summary>
+		/// <param name="WebServer">Current Web Server object.</param>
+		/// <returns>If all system configuration objects must be reloaded from the database.</returns>
+		public override Task<bool> SetupConfiguration(HttpServer WebServer)
+		{
+			this.simplified = WebServer.Register("/Settings/Simplified", null, this.Simplified, false, false, true);
+
+			return base.SetupConfiguration(WebServer);
+		}
+
+		/// <summary>
+		/// Cleans up after configuration has been performed.
+		/// </summary>
+		/// <param name="WebServer">Current Web Server object.</param>
+		public override Task CleanupAfterConfiguration(HttpServer WebServer)
+		{
+			WebServer.Unregister(this.simplified);
+
+			return base.SetupConfiguration(WebServer);
+		}
+
+		private async void Simplified(HttpRequest Request, HttpResponse Response)
+		{
+			try
+			{
+				Gateway.AssertUserAuthenticated(Request);
+
+				
+
+				Response.StatusCode = 200;
+				await this.MakeCompleted();
+
+				Response.SendResponse();
+			}
+			catch (Exception ex)
+			{
+				Response.SendResponse(ex);
+			}
+		}
+
 	}
 }

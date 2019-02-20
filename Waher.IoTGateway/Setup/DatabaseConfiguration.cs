@@ -255,5 +255,21 @@ namespace Waher.IoTGateway.Setup
 			}
 		}
 
+		/// <summary>
+		/// Simplified configuration by configuring simple default values.
+		/// </summary>
+		/// <returns>If the configuration was changed.</returns>
+		public override Task<bool> SimplifiedConfiguration()
+		{
+			InternalDatabase Plugin = new InternalDatabase();
+
+			this.databasePlugin = Plugin;
+			this.databasePluginName = Plugin.GetType().FullName;
+			this.databasePluginSettings = Plugin.CreateNewSettings();
+			this.Step = 1;
+
+			return Task.FromResult<bool>(true);
+		}
+
 	}
 }

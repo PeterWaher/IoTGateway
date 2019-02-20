@@ -2533,6 +2533,24 @@ namespace Waher.IoTGateway
 		#region Settings
 
 		/// <summary>
+		/// Simplified configuration.
+		/// </summary>
+		internal static async Task SimplifiedConfiguration()
+		{
+			foreach (SystemConfiguration Configuration in configurations)
+			{
+				if (!Configuration.Complete)
+				{
+					if (await Configuration.SimplifiedConfiguration())
+					{
+						await Configuration.MakeCompleted();
+						await Database.Update(Configuration);
+					}
+				}
+			}
+		}
+
+		/// <summary>
 		/// Gets the settings menu.
 		/// </summary>
 		/// <param name="Request">Current HTTP Request</param>

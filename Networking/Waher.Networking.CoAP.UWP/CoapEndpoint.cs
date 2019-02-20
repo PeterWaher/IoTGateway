@@ -298,7 +298,6 @@ namespace Waher.Networking.CoAP
 							}
 
 							Outgoing.EnableBroadcast = !Encrypted;
-							Outgoing.MulticastLoopback = false;
 							Outgoing.Ttl = 30;
 							Outgoing.Client.Bind(new IPEndPoint(Address, 0));
 

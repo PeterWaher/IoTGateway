@@ -1053,6 +1053,12 @@ namespace Waher.Persistence.MongoDB.Serialization
 			return new ObjectId(A);
 		}
 
+		/// <summary>
+		/// Tries to convert a GUID to a MongoDB Object ID.
+		/// </summary>
+		/// <param name="Guid">GUID</param>
+		/// <param name="ObjectId">Resulting Object ID</param>
+		/// <returns>If a conversion could be made.</returns>
 		public static bool TryConvertToObjectId(Guid Guid, out ObjectId ObjectId)
 		{
 			byte[] A = Guid.ToByteArray();
@@ -1076,7 +1082,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 		/// <summary>
 		/// Converts a MongoDB Object ID to a GUID
 		/// </summary>
-		/// <param name="Guid">GUID</param>
+		/// <param name="ObjectId">Object ID</param>
 		/// <returns>Object ID</returns>
 		public static Guid ObjectIdToGuid(ObjectId ObjectId)
 		{

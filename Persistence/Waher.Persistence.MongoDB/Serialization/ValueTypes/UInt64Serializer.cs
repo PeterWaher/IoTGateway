@@ -32,11 +32,12 @@ namespace Waher.Persistence.MongoDB.Serialization.ValueTypes
 		}
 
 		/// <summary>
-		/// Deserializes a value.
+		/// Deserializes an object from a binary source.
 		/// </summary>
-		/// <param name="context">The deserialization context.</param>
-		/// <param name="args">The deserialization args.</param>
-		/// <returns>A deserialized value.</returns>
+		/// <param name="Reader">Binary deserializer.</param>
+		/// <param name="DataType">Optional datatype. If not provided, will be read from the binary source.</param>
+		/// <param name="Embedded">If the object is embedded into another.</param>
+		/// <returns>Deserialized object.</returns>
 		public override object Deserialize(IBsonReader Reader, BsonType? DataType, bool Embedded)
 		{
 			if (!DataType.HasValue)

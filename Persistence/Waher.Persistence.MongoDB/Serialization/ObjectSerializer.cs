@@ -2300,6 +2300,9 @@ namespace Waher.Persistence.MongoDB.Serialization
 			}
 		}
 
+		/// <summary>
+		/// If the underlying object is nullable.
+		/// </summary>
 		public virtual bool IsNullable => this.isNullable;
 
 		/// <summary>

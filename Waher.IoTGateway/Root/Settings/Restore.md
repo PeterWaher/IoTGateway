@@ -56,7 +56,7 @@ existing data with the contents of the backup file. If not checked, the backup f
 {{if Waher.IoTGateway.Gateway.Configuring then ]]
 <button id='NextButton' type='button' onclick='Next()'>Next</button>
 [[ else ]]
-<button id='OkButton' type='button' onclick='Ok()'>OK</button>
+<button id='NextButton' type='button' onclick='Ok()'>OK</button>
 [[;}}
 <button id='RestoreButton' type='button' onclick='Restore()' style='display:none'>Verify</button>
 </p>

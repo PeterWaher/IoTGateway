@@ -38,7 +38,7 @@ A theme defines a general look and feel for web pages. Select the theme you like
 {{if Waher.IoTGateway.Gateway.Configuring then ]]
 <button id='NextButton' type='button' onclick='Next()' style='display:((Config.Step>0 ? "inline-block" : "none"))'>Next</button>
 [[ else ]]
-<button id='OkButton' type='button' onclick='Ok()'>OK</button>
+<button id='NextButton' type='button' onclick='Ok()'>OK</button>
 [[;}}
 
 </fieldset>

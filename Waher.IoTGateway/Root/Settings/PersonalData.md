@@ -37,7 +37,7 @@ it is important for you to know what personal data is being processed and how.
 </p>
 <button id='NextButton' type='button' onclick='Next()' style='display:((Config.Consented ? "inline-block" : "none"))'>Next</button>
 [[ else ]]
-<button id='OkButton' type='button' onclick='Ok()'>OK</button>
+<button id='NextButton' type='button' onclick='Ok()'>OK</button>
 [[;}}
 
 </form>

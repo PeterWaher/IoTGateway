@@ -59,9 +59,9 @@ Database connection successful. Press the Next button to save settings and conti
 <p>
 <button id="TestButton" type='button' onclick='TestSettings(false)' style='display:{{HasSettings?"inline":"none"}}'>Test</button>
 {{if Waher.IoTGateway.Gateway.Configuring then ]]
-<button id='OkButton' type='button' onclick='TestSettings(true)' style='display:((Config.Step>0?"inline":"none"))'>Next</button>
+<button id='NextButton' type='button' onclick='TestSettings(true)' style='display:((Config.Step>0?"inline":"none"))'>Next</button>
 [[ else ]]
-<button id='OkButton' type='button' onclick='TestSettings(true)' style='display:((Config.Step>0?"inline":"none"))'>OK</button>
+<button id='NextButton' type='button' onclick='TestSettings(true)' style='display:((Config.Step>0?"inline":"none"))'>OK</button>
 [[}}
 </p>
 

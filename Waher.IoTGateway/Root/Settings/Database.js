@@ -11,7 +11,7 @@
 
                 document.getElementById("PluginSettings").innerHTML = Response.html;
                 document.getElementById("TestButton").style.display = Response.hasSettings ? "inline" : "none";
-                document.getElementById("OkButton").style.display = Response.isDone ? "inline" : "none";
+                document.getElementById("NextButton").style.display = Response.isDone ? "inline" : "none";
                 document.getElementById("Ok").style.display = Response.isDone ? "inline" : "none";
                 document.getElementById("Restart").style.display = Response.isDone && Response.restart ? "inline" : "none";
             }
@@ -38,7 +38,7 @@ function TestSettings(Save)
         {
             if (xhttp.status === 200)
             {
-                document.getElementById("OkButton").style.display = "inline";
+                document.getElementById("NextButton").style.display = "inline";
                 document.getElementById("Ok").style.display = "inline";
                 document.getElementById("Fail").style.display = "none";
                 document.getElementById("Restart").style.display = xhttp.responseText === "2" ? "inline" : "none";

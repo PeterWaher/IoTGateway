@@ -138,7 +138,7 @@ the Analyze button to analyze the database and generate a report.
 {{if Waher.IoTGateway.Gateway.Configuring then ]]
 <button id='NextButton' type='button' onclick='Next()'>Next</button>
 [[ else ]]
-<button id='OkButton' type='button' onclick='Ok()'>OK</button>
+<button id='NextButton' type='button' onclick='Ok()'>OK</button>
 [[;}}
 </p>
 

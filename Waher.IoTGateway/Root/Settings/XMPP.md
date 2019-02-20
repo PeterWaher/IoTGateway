@@ -160,7 +160,7 @@ Password is incorrect, or a new account was not permitted to be created.
 {{if Waher.IoTGateway.Gateway.Configuring then ]]
 <button id='NextButton' type='button' onclick='Next()' style='display:((Config.Step>1 ? "inline-block" : "none"))'>Next</button>
 [[ else ]]
-<button id='OkButton' type='button' onclick='Ok()'>OK</button>
+<button id='NextButton' type='button' onclick='Ok()'>OK</button>
 [[;}}
 
 </fieldset>

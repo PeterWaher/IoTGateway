@@ -11,18 +11,15 @@ namespace Waher.Networking.CoAP.Transport
 	{
 		public UdpClient Client;
 		private bool disposed = false;
-		private LinkedList<Message> outputQueue = new LinkedList<Message>();
+		private readonly LinkedList<Message> outputQueue = new LinkedList<Message>();
 		private bool isWriting = false;
 
 		public override void Dispose()
 		{
 			this.disposed = true;
 
-			if (this.Client != null)
-			{
-				this.Client.Dispose();
-				this.Client = null;
-			}
+			this.Client?.Dispose();
+			this.Client = null;
 		}
 
 		public override bool IsEncrypted => false;

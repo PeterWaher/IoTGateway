@@ -2669,7 +2669,7 @@ namespace Waher.Persistence.Files
 				if (!Directory.Exists(s))
 					Directory.CreateDirectory(s);
 
-				s = Path.Combine(s, "AutoRepair " + DateTime.Now.ToString("yyyy -MM-ddTHH.mm.ss.ffffff") + ".xml");
+				s = Path.Combine(s, "AutoRepair " + DateTime.Now.ToString("yyyy-MM-ddTHH.mm.ss.ffffff") + ".xml");
 
 				XmlWriterSettings Settings = new XmlWriterSettings()
 				{

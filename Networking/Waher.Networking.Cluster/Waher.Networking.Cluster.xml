@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Waher.Networking.Cluster</name>
+    </assembly>
+    <members>
+        <member name="T:Waher.Networking.Cluster.ClusterEndpoint">
+            <summary>
+            Represents one endpoint (or participant) in the network cluster.
+            </summary>
+        </member>
+    </members>
+</doc>

@@ -285,10 +285,7 @@ namespace Waher.Utility.Install
 				}
 			}
 
-			if (SourceFolder == AppFolder)
-				Log.Warning("Skipping copying of content. Source and application folders the same. Assuming content files are located where they should be.");
-			else
-				CopyContent(SourceFolder, AppFolder, ProgramDataFolder, Module);
+			CopyContent(SourceFolder, AppFolder, ProgramDataFolder, Module);
 
 			Log.Informational("Encoding JSON");
 			s = JSON.Encode(Deps, true);
@@ -299,18 +296,12 @@ namespace Waher.Utility.Install
 
 		private static bool CopyFileIfNewer(string From, string To, string To2, bool OnlyIfNewer)
 		{
-			if (From == To)
-			{
-				Log.Warning("Skipping file. Copying to same location: " + From);
-				return false;
-			}
-
 			if (!File.Exists(From))
 				throw new Exception("File not found: " + From);
 
-			bool Copy1 = true;
+			bool Copy1 = From != To;
 
-			if (OnlyIfNewer && File.Exists(To))
+			if (Copy1 && OnlyIfNewer && File.Exists(To))
 			{
 				DateTime ToTP = File.GetLastWriteTimeUtc(To);
 				DateTime FromTP = File.GetLastWriteTimeUtc(From);
@@ -334,9 +325,9 @@ namespace Waher.Utility.Install
 
 			if (!string.IsNullOrEmpty(To2))
 			{
-				bool Copy2 = true;
+				bool Copy2 = From != To2;
 
-				if (OnlyIfNewer && File.Exists(To2))
+				if (Copy2 && OnlyIfNewer && File.Exists(To2))
 				{
 					DateTime ToTP = File.GetLastWriteTimeUtc(To2);
 					DateTime FromTP = File.GetLastWriteTimeUtc(From);
@@ -386,6 +377,12 @@ namespace Waher.Utility.Install
 							{
 								Log.Informational("Creating folder " + DataFolder + ".");
 								Directory.CreateDirectory(DataFolder);
+							}
+
+							if (!string.IsNullOrEmpty(AppFolder) && !Directory.Exists(AppFolder))
+							{
+								Log.Informational("Creating folder " + AppFolder + ".");
+								Directory.CreateDirectory(AppFolder);
 							}
 
 							CopyFileIfNewer(

@@ -3,7 +3,7 @@ Description: Allows the user to restore the contents of a backup.
 Date: 2018-09-14
 Author: Peter Waher
 Copyright: /Copyright.md
-Master: Master.md
+Master: {{(Configuring:=Waher.IoTGateway.Gateway.Configuring) ? "Master.md" : "/Master.md"}}
 JavaScript: /Events.js
 JavaScript: /Settings/Next.js
 JavaScript: /Settings/Restore.js
@@ -53,7 +53,7 @@ existing data with the contents of the backup file. If not checked, the backup f
 </div>
 
 <p>
-{{if Waher.IoTGateway.Gateway.Configuring then ]]
+{{if Configuring then ]]
 <button id='NextButton' type='button' onclick='Next()'>Next</button>
 [[ else ]]
 <button id='NextButton' type='button' onclick='Ok()'>OK</button>

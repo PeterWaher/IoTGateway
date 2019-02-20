@@ -3,7 +3,7 @@ Description: Allows the user to configure database settings.
 Date: 2019-02-15
 Author: Peter Waher
 Copyright: /Copyright.md
-Master: Master.md
+Master: {{(Configuring:=Waher.IoTGateway.Gateway.Configuring) ? "Master.md" : "/Master.md"}}
 JavaScript: /Events.js
 JavaScript: /Settings/Database.js
 JavaScript: /Settings/Next.js
@@ -58,7 +58,7 @@ Database connection successful. Press the Next button to save settings and conti
 
 <p>
 <button id="TestButton" type='button' onclick='TestSettings(false)' style='display:{{HasSettings?"inline":"none"}}'>Test</button>
-{{if Waher.IoTGateway.Gateway.Configuring then ]]
+{{if Configuring then ]]
 <button id='NextButton' type='button' onclick='TestSettings(true)' style='display:((Config.Step>0?"inline":"none"))'>Next</button>
 [[ else ]]
 <button id='NextButton' type='button' onclick='TestSettings(true)' style='display:((Config.Step>0?"inline":"none"))'>OK</button>

@@ -3,7 +3,7 @@ Description: Main page of the IoT Gateway
 Date: 2016-02-02
 Author: Peter Waher
 Copyright: Copyright.md
-Master: Master.md
+Master: /Master.md
 
 ==================================       ======================================
 

@@ -3,7 +3,7 @@ Description: This page allows you to configure backups and perform manual export
 Date: 2017-01-27
 Author: Peter Waher
 Copyright: Copyright.md
-Master: Master.md
+Master: {{(Configuring:=Waher.IoTGateway.Gateway.Configuring) ? "Master.md" : "/Master.md"}}
 UserVariable: User
 Login: /Login.md
 JavaScript: /Events.js
@@ -135,7 +135,7 @@ the Analyze button to analyze the database and generate a report.
 <button type="button" onclick="StartExport();">Backup</button>
 <button type="button" onclick="StartAnalyze(false);">Analyze</button>
 <button type="button" onclick="StartAnalyze(true);">Repair</button>
-{{if Waher.IoTGateway.Gateway.Configuring then ]]
+{{if Configuring then ]]
 <button id='NextButton' type='button' onclick='Next()'>Next</button>
 [[ else ]]
 <button id='NextButton' type='button' onclick='Ok()'>OK</button>

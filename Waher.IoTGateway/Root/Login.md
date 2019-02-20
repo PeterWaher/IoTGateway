@@ -2,7 +2,7 @@
 Description: IoT Gateway login page.
 Date: 2016-12-25
 Author: Peter Waher
-Master: Master.md
+Master: /Master.md
 Parameter: from
 
 ============================================================================================================================================

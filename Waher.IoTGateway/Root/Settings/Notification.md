@@ -3,7 +3,7 @@ Description: Allows the user to configure notification settings.
 Date: 2019-01-12
 Author: Peter Waher
 Copyright: /Copyright.md
-Master: Master.md
+Master: {{(Configuring:=Waher.IoTGateway.Gateway.Configuring) ? "Master.md" : "/Master.md"}}
 JavaScript: /Events.js
 JavaScript: /Settings/Notification.js
 JavaScript: /Settings/Next.js
@@ -44,7 +44,7 @@ enter one or more addresses below to which notifications will be sent.
 </p>
 
 <button type='button' onclick='TestAddresses(true,false)'>Test</button>
-{{if Waher.IoTGateway.Gateway.Configuring then ]]
+{{if Configuring then ]]
 <button id='NextButton' type='button' onclick='TestAddresses(false,true)'>Next</button>
 [[ else ]]
 <button id='NextButton' type='button' onclick='TestAddresses(false,false)'>OK</button>

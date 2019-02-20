@@ -3,7 +3,7 @@ Description: Allows the user to configure domain settings.
 Date: 2018-05-28
 Author: Peter Waher
 Copyright: /Copyright.md
-Master: Master.md
+Master: {{(Configuring:=Waher.IoTGateway.Gateway.Configuring) ? "Master.md" : "/Master.md"}}
 JavaScript: /Events.js
 JavaScript: /Settings/Domain.js
 JavaScript: /Settings/XMPP.js
@@ -114,7 +114,7 @@ to provide is the URL to their ACME Directory below.
 <p id="NextMessage2" class="message" style="display:none">Certificate for the server successfully created.</p>
 
 <button id='TestAcmeButton' type='button' onclick='TestAcme()'>Test</button>
-{{if Waher.IoTGateway.Gateway.Configuring then ]]
+{{if Configuring then ]]
 <button id='NextButton' type='button' onclick='Next()' style='display:((Config.Step>1 ? "inline-block" : "none"))'>Next</button>
 [[ else ]]
 <button id='NextButton' type='button' onclick='Ok()'>OK</button>
@@ -123,7 +123,7 @@ to provide is the URL to their ACME Directory below.
 </div>
 
 <div id="NotEncryptionProperties" style="display:{{Config.UseEncryption ? "none" : "block"}}">
-{{if Waher.IoTGateway.Gateway.Configuring then ]]
+{{if Configuring then ]]
 <button type='button' onclick='Next()'>Next</button>
 [[ else ]]
 <button type='button' onclick='Ok()'>OK</button>
@@ -134,7 +134,7 @@ to provide is the URL to their ACME Directory below.
 </div>
 
 <div id="NotDomainNameProperties" style="display:{{Config.UseDomainName ? "none" : "block"}}">
-{{if Waher.IoTGateway.Gateway.Configuring then ]]
+{{if Configuring then ]]
 <button type='button' onclick='Next()'>Next</button>
 [[ else ]]
 <button type='button' onclick='Ok()'>OK</button>

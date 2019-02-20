@@ -3,7 +3,7 @@ Description: Calculator based on script, as understood by the IoT Gateway.
 Date: 2016-03-01
 Author: Peter Waher
 Copyright: Copyright.md
-Master: Master.md
+Master: /Master.md
 JavaScript: Calculator.js
 Parameter: Expression
 UserVariable: User

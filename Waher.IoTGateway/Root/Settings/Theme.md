@@ -3,7 +3,7 @@ Description: Allows the user to configure theme settings.
 Date: 2018-06-15
 Author: Peter Waher
 Copyright: /Copyright.md
-Master: Master.md
+Master: {{(Configuring:=Waher.IoTGateway.Gateway.Configuring) ? "Master.md" : "/Master.md"}}
 JavaScript: /Events.js
 JavaScript: /Settings/Theme.js
 JavaScript: /Settings/Next.js
@@ -35,7 +35,7 @@ A theme defines a general look and feel for web pages. Select the theme you like
 [[;}}
 </div>
 
-{{if Waher.IoTGateway.Gateway.Configuring then ]]
+{{if Configuring then ]]
 <button id='NextButton' type='button' onclick='Next()' style='display:((Config.Step>0 ? "inline-block" : "none"))'>Next</button>
 [[ else ]]
 <button id='NextButton' type='button' onclick='Ok()'>OK</button>

@@ -3,7 +3,7 @@ Description: Allows the user to configure XMPP settings.
 Date: 2018-05-10
 Author: Peter Waher
 Copyright: /Copyright.md
-Master: Master.md
+Master: {{(Configuring:=Waher.IoTGateway.Gateway.Configuring) ? "Master.md" : "/Master.md"}}
 JavaScript: /Events.js
 JavaScript: /Settings/XMPP.js
 JavaScript: /Settings/Next.js
@@ -157,7 +157,7 @@ Password is incorrect, or a new account was not permitted to be created.
 <p id="NextMessage" class="message" style="display:none">Connection successful. Press the Next button to save settings and continue.</p>
 
 <button type='button' onclick='ConnectToHost()'>Connect</button>
-{{if Waher.IoTGateway.Gateway.Configuring then ]]
+{{if Configuring then ]]
 <button id='NextButton' type='button' onclick='Next()' style='display:((Config.Step>1 ? "inline-block" : "none"))'>Next</button>
 [[ else ]]
 <button id='NextButton' type='button' onclick='Ok()'>OK</button>

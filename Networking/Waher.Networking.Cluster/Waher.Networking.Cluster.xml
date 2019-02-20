@@ -9,5 +9,38 @@
             Represents one endpoint (or participant) in the network cluster.
             </summary>
         </member>
+        <member name="M:Waher.Networking.Cluster.ClusterEndpoint.#ctor(System.Net.IPAddress,System.Int32,System.String,Waher.Networking.Sniffers.ISniffer[])">
+            <summary>
+            Represents one endpoint (or participant) in the network cluster.
+            </summary>
+            <param name="MulticastAddress">UDP Multicast address used for cluster communication.</param>
+            <param name="Port">Port used in cluster communication</param>
+            <param name="SharedSecret">Shared secret. Used to encrypt and decrypt communication. Secret is UTF-8 encoded and then hashed before being fed to AES.</param>
+            <param name="Sniffers">Optional set of sniffers to use.</param>
+        </member>
+        <member name="M:Waher.Networking.Cluster.ClusterEndpoint.#ctor(System.Net.IPAddress,System.Int32,System.Byte[],Waher.Networking.Sniffers.ISniffer[])">
+            <summary>
+            Represents one endpoint (or participant) in the network cluster.
+            </summary>
+            <param name="MulticastAddress">UDP Multicast address used for cluster communication.</param>
+            <param name="Port">Port used in cluster communication</param>
+            <param name="SharedSecret">Shared secret. Used to encrypt and decrypt communication. Secret is hashed before being fed to AES.</param>
+            <param name="Sniffers">Optional set of sniffers to use.</param>
+        </member>
+        <member name="M:Waher.Networking.Cluster.ClusterEndpoint.#ctor(System.Net.IPAddress,System.Int32,System.Byte[],System.Boolean,Waher.Networking.Sniffers.ISniffer[])">
+            <summary>
+            Represents one endpoint (or participant) in the network cluster.
+            </summary>
+            <param name="MulticastAddress">UDP Multicast address used for cluster communication.</param>
+            <param name="Port">Port used in cluster communication</param>
+            <param name="SharedSecret">Shared secret. Used to encrypt and decrypt communication. Secret is hashed before being fed to AES.</param>
+            <param name="AllowLoopback">If communication over the loopback interface should be permitted. (Default=false)</param>
+            <param name="Sniffers">Optional set of sniffers to use.</param>
+        </member>
+        <member name="M:Waher.Networking.Cluster.ClusterEndpoint.Dispose">
+            <summary>
+            <see cref="M:System.IDisposable.Dispose"/>
+            </summary>
+        </member>
     </members>
 </doc>

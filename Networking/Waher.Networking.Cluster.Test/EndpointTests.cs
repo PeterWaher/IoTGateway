@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Networking.Sniffers;
-
+using Waher.Networking.Cluster.Test.TestObjects;
 namespace Waher.Networking.Cluster.Test
 {
 	[TestClass]
@@ -14,6 +14,14 @@ namespace Waher.Networking.Cluster.Test
 		private static readonly IPAddress clusterAddress = IPAddress.Parse("224.0.0.0");
 		private ClusterEndpoint endpoint1 = null;
 		private ClusterEndpoint endpoint2 = null;
+
+		[AssemblyInitialize]
+		public static void AssemblyInitialize(TestContext Context)
+		{
+			Waher.Runtime.Inventory.Types.Initialize(
+				typeof(EndpointTests).Assembly,
+				typeof(Waher.Networking.Cluster.ClusterEndpoint).Assembly);
+		}
 
 		[TestInitialize]
 		public void TestInitialize()
@@ -39,7 +47,7 @@ namespace Waher.Networking.Cluster.Test
 		}
 
 		[TestMethod]
-		public void Test_01_Send()
+		public void Test_01_Send_Unacknowledged_Message()
 		{
 			ManualResetEvent Done = new ManualResetEvent(false);
 
@@ -48,7 +56,12 @@ namespace Waher.Networking.Cluster.Test
 				Done.Set();
 			};
 
-			this.endpoint2.Transmit(new byte[] { 1, 2, 3, 4, 5 });
+			this.endpoint2.SendMessageUnacknowledged(new Message()
+			{
+				S1 = "Hello",
+				S2 = "World",
+				S3 = "!"
+			});
 
 			Assert.IsTrue(Done.WaitOne(5000));
 		}

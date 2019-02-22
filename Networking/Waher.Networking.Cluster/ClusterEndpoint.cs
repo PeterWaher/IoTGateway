@@ -3,10 +3,14 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
+using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using Waher.Events;
+using Waher.Networking.Cluster.Serialization;
+using Waher.Networking.Cluster.Serialization.Properties;
 using Waher.Networking.Sniffers;
+using Waher.Runtime.Inventory;
 using Waher.Security;
 #if WINDOWS_UWP
 using Windows.Networking;
@@ -413,12 +417,123 @@ namespace Waher.Networking.Cluster
 
 		public event EventHandler OnDataReceived = null;
 
-		public void Transmit(byte[] Message)
+		private void Transmit(byte[] Message)
 		{
 			this.TransmitBinary(Message);
 
 			foreach (ClusterUdpClient Client in this.clients)
 				Client.BeginTransmit(Message);
+		}
+
+		/// <summary>
+		/// Sends an unacknowledged message
+		/// </summary>
+		/// <param name="Message">Message object</param>
+		public void SendMessageUnacknowledged(IClusterMessage Message)
+		{
+			Serializer Output = new Serializer();
+
+			try
+			{
+				ObjectInfo Info = GetObjectInfo(Message.GetType());
+
+				Output.WriteByte(0);    // Unacknowledged message.
+				Info.Serialize(Output, Message);
+				this.Transmit(Output.ToArray());
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+			}
+			finally
+			{
+				Output.Dispose();
+			}
+		}
+
+		private static ObjectInfo GetObjectInfo(Type T)
+		{
+			lock (objectInfo)
+			{
+				if (objectInfo.TryGetValue(T, out ObjectInfo Result))
+					return Result;
+			}
+
+			if (propertyTypes is null)
+				Init();
+
+			List<IProperty> Properties = null;
+			TypeInfo TI = T.GetTypeInfo();
+
+			foreach (PropertyInfo PI in TI.DeclaredProperties)
+			{
+				if (PI.GetMethod is null || PI.SetMethod is null)
+					continue;
+
+				if (!propertyTypes.TryGetValue(PI.PropertyType, out IProperty Property))
+					continue;
+
+				if (Properties is null)
+					Properties = new List<IProperty>();
+
+				Properties.Add(Property);
+			}
+
+			return new ObjectInfo()
+			{
+				Name = T.FullName,
+				Properties = Properties?.ToArray()
+			};
+		}
+
+		private class ObjectInfo
+		{
+			public IProperty[] Properties;
+			public string Name;
+
+			public void Serialize(Serializer Output, object Object)
+			{
+				Output.WriteName(this.Name);
+
+				if (!(this.Properties is null))
+				{
+					foreach (IProperty Property in this.Properties)
+					{
+						Output.WriteName(Property.Name);
+						Property.Serialize(Output, Object);
+					}
+				}
+			}
+		}
+
+		private static Dictionary<Type, IProperty> propertyTypes = null;
+		private static Dictionary<Type, ObjectInfo> objectInfo = new Dictionary<Type, ObjectInfo>();
+
+		public static void Init()
+		{
+			Dictionary<Type, IProperty> PropertyTypes = new Dictionary<Type, IProperty>();
+
+			foreach (Type T in Types.GetTypesImplementingInterface(typeof(IProperty)))
+			{
+				TypeInfo TI = T.GetTypeInfo();
+				if (TI.IsAbstract)
+					continue;
+
+				try
+				{
+					IProperty Property = (IProperty)Activator.CreateInstance(T, Types.NoParameters);
+					PropertyTypes[T] = Property;
+				}
+				catch (Exception)
+				{
+					continue;
+				}
+			}
+
+			if (propertyTypes is null)
+				Types.OnInvalidated += (sender, e) => Init();
+
+			propertyTypes = PropertyTypes;
 		}
 
 	}

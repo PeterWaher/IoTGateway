@@ -5,14 +5,14 @@ using System.Reflection;
 namespace Waher.Networking.Cluster.Serialization.Properties
 {
 	/// <summary>
-	/// UInt32 property
+	/// Binary property
 	/// </summary>
-	public class UInt32Property : Property
+	public class BinaryProperty : Property
 	{
 		/// <summary>
 		/// Property Type
 		/// </summary>
-		public override Type PropertyType => typeof(uint);
+		public override Type PropertyType => typeof(byte[]);
 
 		/// <summary>
 		/// Serializes the property value of an object.
@@ -21,7 +21,7 @@ namespace Waher.Networking.Cluster.Serialization.Properties
 		/// <param name="Value">Value to serialize</param>
 		public override void Serialize(Serializer Output, object Value)
 		{
-			Output.WriteUInt32((uint)Value);
+			Output.WriteBinary((byte[])Value);
 		}
 
 		/// <summary>
@@ -32,7 +32,7 @@ namespace Waher.Networking.Cluster.Serialization.Properties
 		/// <returns>Deserialized value.</returns>
 		public override object Deserialize(Deserializer Input, Type ExpectedType)
 		{
-			return Input.ReadUInt32();
+			return Input.ReadBinary();
 		}
 	}
 }

@@ -29,7 +29,8 @@ namespace Waher.Networking.Cluster.Serialization.Properties
 		/// Deserializes the property value
 		/// </summary>
 		/// <param name="Input">Binary representation.</param>
+		/// <param name="ExpectedType">Expected Type</param>
 		/// <returns>Deserialized value.</returns>
-		object Deserialize(Deserializer Input);
+		object Deserialize(Deserializer Input, Type ExpectedType);
 	}
 }

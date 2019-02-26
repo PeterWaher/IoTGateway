@@ -77,6 +77,21 @@ namespace Waher.Networking.Cluster.Serialization
 		}
 
 		/// <summary>
+		/// Writes binary data to the output.
+		/// </summary>
+		/// <param name="Value">Value</param>
+		public void WriteBinary(byte[] Value)
+		{
+			if (Value is null)
+				this.ms.WriteByte(0);
+			else
+			{
+				this.WriteVarUInt64((ulong)Value.Length + 1);
+				this.ms.Write(Value, 0, Value.Length);
+			}
+		}
+
+		/// <summary>
 		/// Writes a string to the output.
 		/// </summary>
 		/// <param name="Value">Value</param>

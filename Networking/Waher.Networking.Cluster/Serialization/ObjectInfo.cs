@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
-using Waher.Networking.Cluster.Serialization.Properties;
+using Waher.Runtime.Inventory;
 
 namespace Waher.Networking.Cluster.Serialization
 {
@@ -12,7 +11,6 @@ namespace Waher.Networking.Cluster.Serialization
 	{
 		private Dictionary<string, PropertyReference> sorted = null;
 		public PropertyReference[] Properties;
-		public string TypeName;
 		public Type Type;
 
 		/// <summary>
@@ -22,11 +20,22 @@ namespace Waher.Networking.Cluster.Serialization
 		/// <param name="Object">Object to serialize.</param>
 		public void Serialize(Serializer Output, object Object)
 		{
-			Output.WriteString(this.TypeName);
-
-			if (!(this.Properties is null))
+			if (Object is null)
+				Output.WriteByte(0);
+			else
 			{
-				foreach (PropertyReference Property in this.Properties)
+				Type T = Object.GetType();
+				ObjectInfo Info = this;
+
+				if (T == this.Type)
+					Output.WriteString(string.Empty);
+				else
+				{
+					Output.WriteString(T.FullName);
+					Info = ClusterEndpoint.GetObjectInfo(T);
+				}
+
+				foreach (PropertyReference Property in Info.Properties)
 				{
 					Output.WriteString(Property.Name);
 					object Value = Property.Info.GetValue(Object);
@@ -43,27 +52,43 @@ namespace Waher.Networking.Cluster.Serialization
 		/// <param name="Input">Binary input</param>
 		/// <returns>Deserialized object.</returns>
 		/// <exception cref="KeyNotFoundException">If the corresponding type, or any of the embedded properties, could not be found.</exception>
-		public object Deserialize(Deserializer Input)
+		public object Deserialize(Deserializer Input, Type ExpectedType)
 		{
-			if (this.sorted is null)
+			string TypeName = Input.ReadString();
+			ObjectInfo Info;
+
+			if (TypeName is null)
+				return null;
+			else if (string.IsNullOrEmpty(TypeName))
+				Info = this;
+			else
+			{
+				Type T = Types.GetType(TypeName);
+				if (T is null)
+					throw new KeyNotFoundException("Type name not recognized: " + TypeName);
+
+				Info = ClusterEndpoint.GetObjectInfo(T);
+			}
+
+			if (Info.sorted is null)
 			{
 				Dictionary<string, PropertyReference> Sorted = new Dictionary<string, PropertyReference>();
 
-				foreach (PropertyReference P in this.Properties)
+				foreach (PropertyReference P in Info.Properties)
 					Sorted[P.Name] = P;
 
-				this.sorted = Sorted;
+				Info.sorted = Sorted;
 			}
 
-			object Result = Activator.CreateInstance(this.Type);
+			object Result = Activator.CreateInstance(Info.Type);
 			string PropertyName = Input.ReadString();
 
 			while (!string.IsNullOrEmpty(PropertyName))
 			{
-				if (!this.sorted.TryGetValue(PropertyName, out PropertyReference P))
-					throw new KeyNotFoundException("Property Name not found: " + P.Info.DeclaringType.FullName + "." + P.Name);
+				if (!Info.sorted.TryGetValue(PropertyName, out PropertyReference P))
+					throw new KeyNotFoundException("Property Name not found: " + Info.Type.FullName + "." + PropertyName);
 
-				P.Info.SetValue(Result, P.Property.Deserialize(Input));
+				P.Info.SetValue(Result, P.Property.Deserialize(Input, P.Property.PropertyType));
 
 				PropertyName = Input.ReadString();
 			}

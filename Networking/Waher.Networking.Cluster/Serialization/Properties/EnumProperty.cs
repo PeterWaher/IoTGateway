@@ -46,8 +46,9 @@ namespace Waher.Networking.Cluster.Serialization.Properties
 		/// Deserializes the property value
 		/// </summary>
 		/// <param name="Input">Binary representation.</param>
+		/// <param name="ExpectedType">Expected Type</param>
 		/// <returns>Deserialized value.</returns>
-		public override object Deserialize(Deserializer Input)
+		public override object Deserialize(Deserializer Input, Type ExpectedType)
 		{
 			if (this.asInt)
 				return Enum.ToObject(this.enumType, Input.ReadInt32());

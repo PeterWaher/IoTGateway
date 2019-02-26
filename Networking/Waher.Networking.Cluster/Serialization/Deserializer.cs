@@ -31,7 +31,7 @@ namespace Waher.Networking.Cluster.Serialization
 		}
 
 		/// <summary>
-		/// Reads a boolean value to the output.
+		/// Reads a boolean value from the input.
 		/// </summary>
 		/// <returns>Value</returns>
 		public bool ReadBoolean()
@@ -40,7 +40,7 @@ namespace Waher.Networking.Cluster.Serialization
 		}
 
 		/// <summary>
-		/// Reads a byte to the output.
+		/// Reads a byte from the input.
 		/// </summary>
 		/// <returns>Value</returns>
 		public byte ReadByte()
@@ -49,7 +49,7 @@ namespace Waher.Networking.Cluster.Serialization
 		}
 
 		/// <summary>
-		/// Reads a variable-length unsigned integer to the output.
+		/// Reads a variable-length unsigned integer from the input.
 		/// </summary>
 		/// <returns>Value</returns>
 		public ulong ReadVarUInt64()
@@ -69,7 +69,29 @@ namespace Waher.Networking.Cluster.Serialization
 		}
 
 		/// <summary>
-		/// Reads a string to the output.
+		/// Reads binary data from the input.
+		/// </summary>
+		/// <returns>Value</returns>
+		public byte[] ReadBinary()
+		{
+			ulong Len = this.ReadVarUInt64();
+
+			if (Len == 0)
+				return null;
+
+			Len--;
+			if (Len > int.MaxValue)
+				throw new Exception("Invalid binary serialization.");
+
+			int c = (int)Len;
+			byte[] Bin = new byte[c];
+			this.ms.Read(Bin, 0, c);
+
+			return Bin;
+		}
+
+		/// <summary>
+		/// Reads a string from the input.
 		/// </summary>
 		/// <returns>Value</returns>
 		public string ReadString()
@@ -85,7 +107,11 @@ namespace Waher.Networking.Cluster.Serialization
 					return string.Empty;
 
 				default:
-					int c = (int)(Len - 1);
+					Len--;
+					if (Len > int.MaxValue)
+						throw new Exception("Invalid string serialization.");
+
+					int c = (int)Len;
 					byte[] Bin = new byte[c];
 					this.ms.Read(Bin, 0, c);
 					return Encoding.UTF8.GetString(Bin);
@@ -93,7 +119,7 @@ namespace Waher.Networking.Cluster.Serialization
 		}
 
 		/// <summary>
-		/// Reads a 8-bit signed integer to the output.
+		/// Reads a 8-bit signed integer from the input.
 		/// </summary>
 		/// <returns>Value</returns>
 		public sbyte ReadInt8()
@@ -102,7 +128,7 @@ namespace Waher.Networking.Cluster.Serialization
 		}
 
 		/// <summary>
-		/// Reads a 16-bit signed integer to the output.
+		/// Reads a 16-bit signed integer from the input.
 		/// </summary>
 		/// <returns>Value</returns>
 		public short ReadInt16()
@@ -114,7 +140,7 @@ namespace Waher.Networking.Cluster.Serialization
 		}
 
 		/// <summary>
-		/// Reads a 32-bit signed integer to the output.
+		/// Reads a 32-bit signed integer from the input.
 		/// </summary>
 		/// <returns>Value</returns>
 		public int ReadInt32()
@@ -126,7 +152,7 @@ namespace Waher.Networking.Cluster.Serialization
 		}
 
 		/// <summary>
-		/// Reads a 64-bit signed integer to the output.
+		/// Reads a 64-bit signed integer from the input.
 		/// </summary>
 		/// <returns>Value</returns>
 		public long ReadInt64()
@@ -138,7 +164,7 @@ namespace Waher.Networking.Cluster.Serialization
 		}
 
 		/// <summary>
-		/// Reads a 8-bit unsigned integer to the output.
+		/// Reads a 8-bit unsigned integer from the input.
 		/// </summary>
 		/// <returns>Value</returns>
 		public byte ReadUInt8()
@@ -147,7 +173,7 @@ namespace Waher.Networking.Cluster.Serialization
 		}
 
 		/// <summary>
-		/// Reads a 16-bit unsigned integer to the output.
+		/// Reads a 16-bit unsigned integer from the input.
 		/// </summary>
 		/// <returns>Value</returns>
 		public ushort ReadUInt16()
@@ -159,7 +185,7 @@ namespace Waher.Networking.Cluster.Serialization
 		}
 
 		/// <summary>
-		/// Reads a 32-bit unsigned integer to the output.
+		/// Reads a 32-bit unsigned integer from the input.
 		/// </summary>
 		/// <returns>Value</returns>
 		public uint ReadUInt32()
@@ -171,7 +197,7 @@ namespace Waher.Networking.Cluster.Serialization
 		}
 
 		/// <summary>
-		/// Reads a 64-bit unsigned integer to the output.
+		/// Reads a 64-bit unsigned integer from the input.
 		/// </summary>
 		/// <returns>Value</returns>
 		public ulong ReadUInt64()
@@ -183,7 +209,7 @@ namespace Waher.Networking.Cluster.Serialization
 		}
 
 		/// <summary>
-		/// Reads a single-precision floating point number to the output.
+		/// Reads a single-precision floating point number from the input.
 		/// </summary>
 		/// <returns>Value</returns>
 		public float ReadSingle()
@@ -194,7 +220,7 @@ namespace Waher.Networking.Cluster.Serialization
 		}
 
 		/// <summary>
-		/// Reads a double-precision floating point number to the output.
+		/// Reads a double-precision floating point number from the input.
 		/// </summary>
 		/// <returns>Value</returns>
 		public double ReadDouble()
@@ -205,7 +231,7 @@ namespace Waher.Networking.Cluster.Serialization
 		}
 
 		/// <summary>
-		/// Reads a decimal number to the output.
+		/// Reads a decimal number from the input.
 		/// </summary>
 		/// <returns>Value</returns>
 		public decimal ReadDecimal()
@@ -220,7 +246,7 @@ namespace Waher.Networking.Cluster.Serialization
 		}
 
 		/// <summary>
-		/// Reads a character to the output.
+		/// Reads a character from the input.
 		/// </summary>
 		/// <returns>Value</returns>
 		public char ReadCharacter()
@@ -229,7 +255,7 @@ namespace Waher.Networking.Cluster.Serialization
 		}
 
 		/// <summary>
-		/// Reads a <see cref="DateTime"/> to the output.
+		/// Reads a <see cref="DateTime"/> from the input.
 		/// </summary>
 		/// <returns>Value</returns>
 		public DateTime ReadDateTime()
@@ -241,7 +267,7 @@ namespace Waher.Networking.Cluster.Serialization
 		}
 
 		/// <summary>
-		/// Reads a <see cref="TimeSpan"/> to the output.
+		/// Reads a <see cref="TimeSpan"/> from the input.
 		/// </summary>
 		/// <returns>Value</returns>
 		public TimeSpan ReadTimeSpan()
@@ -251,7 +277,7 @@ namespace Waher.Networking.Cluster.Serialization
 		}
 
 		/// <summary>
-		/// Reads a <see cref="DateTimeOffset"/> to the output.
+		/// Reads a <see cref="DateTimeOffset"/> from the input.
 		/// </summary>
 		/// <returns>Value</returns>
 		public DateTimeOffset ReadDateTimeOffset()
@@ -263,7 +289,7 @@ namespace Waher.Networking.Cluster.Serialization
 		}
 
 		/// <summary>
-		/// Reads a <see cref="Guid"/> to the output.
+		/// Reads a <see cref="Guid"/> from the input.
 		/// </summary>
 		/// <returns>Value</returns>
 		public Guid ReadGuid()

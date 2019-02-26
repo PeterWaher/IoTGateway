@@ -35,53 +35,18 @@ namespace Waher.Networking.Cluster.Serialization.Properties
 		/// <param name="Value">Value to serialize</param>
 		public override void Serialize(Serializer Output, object Value)
 		{
-			if (Value is null)
-				Output.WriteVarUInt64(0);
-			else
-			{
-				ObjectInfo Info;
-				Type T = Value.GetType();
-
-				if (T == this.objectType)
-				{
-					Info = this.info;
-					Output.WriteString(string.Empty);
-				}
-				else
-				{
-					Info = ClusterEndpoint.GetObjectInfo(T);
-					Output.WriteString(T.FullName);
-				}
-
-				Info.Serialize(Output, Value);
-			}
+			this.info.Serialize(Output, Value);
 		}
 
 		/// <summary>
 		/// Deserializes the property value
 		/// </summary>
 		/// <param name="Input">Binary representation.</param>
+		/// <param name="ExpectedType">Expected Type</param>
 		/// <returns>Deserialized value.</returns>
-		public override object Deserialize(Deserializer Input)
+		public override object Deserialize(Deserializer Input, Type ExpectedType)
 		{
-			string TypeName = Input.ReadString();
-			ObjectInfo Info;
-
-			if (TypeName is null)
-				return null;
-
-			if (string.IsNullOrEmpty(TypeName))
-				Info = this.info;
-			else
-			{
-				Type T = Types.GetType(TypeName);
-				if (T is null)
-					throw new KeyNotFoundException("Type name not recognized: " + TypeName);
-
-				Info = ClusterEndpoint.GetObjectInfo(T);
-			}
-
-			return Info.Deserialize(Input);
+			return this.info.Deserialize(Input, this.objectType);
 		}
 
 	}

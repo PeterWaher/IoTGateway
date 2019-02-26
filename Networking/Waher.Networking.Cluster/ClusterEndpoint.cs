@@ -26,6 +26,7 @@ namespace Waher.Networking.Cluster
 	{
 		private static Dictionary<Type, IProperty> propertyTypes = null;
 		private static Dictionary<Type, ObjectInfo> objectInfo = new Dictionary<Type, ObjectInfo>();
+		private static ObjectInfo rootObject;
 
 		private readonly LinkedList<ClusterUdpClient> clients = new LinkedList<ClusterUdpClient>();
 		internal readonly IPEndPoint destination;
@@ -61,6 +62,12 @@ namespace Waher.Networking.Cluster
 
 			if (MulticastAddress.AddressFamily != AddressFamily.InterNetwork)
 				throw new ArgumentException("Cluster communication must be done using IPv4.", nameof(MulticastAddress));
+
+			if (propertyTypes is null)
+			{
+				Init();
+				rootObject = GetObjectInfo(typeof(object));
+			}
 
 			this.aes = Aes.Create();
 			this.aes.BlockSize = 128;
@@ -229,10 +236,7 @@ namespace Waher.Networking.Cluster
 		{
 			using (Serializer Output = new Serializer())
 			{
-				ObjectInfo Info = GetObjectInfo(Object.GetType());
-
-				Info.Serialize(Output, Object);
-
+				rootObject.Serialize(Output, Object);
 				return Output.ToArray();
 			}
 		}
@@ -247,14 +251,7 @@ namespace Waher.Networking.Cluster
 		{
 			using (Deserializer Input = new Deserializer(Data))
 			{
-				string TypeName = Input.ReadString();
-				Type T = Types.GetType(TypeName);
-				if (T is null)
-					throw new KeyNotFoundException("Type name not recognized: " + TypeName);
-
-				ObjectInfo Info = GetObjectInfo(T);
-
-				return Info.Deserialize(Input);
+				return rootObject.Deserialize(Input, typeof(object));
 			}
 		}
 
@@ -268,10 +265,8 @@ namespace Waher.Networking.Cluster
 
 			try
 			{
-				ObjectInfo Info = GetObjectInfo(Message.GetType());
-
 				Output.WriteByte(0);    // Unacknowledged message.
-				Info.Serialize(Output, Message);
+				rootObject.Serialize(Output, Message);
 				this.Transmit(Output.ToArray());
 			}
 			catch (Exception ex)
@@ -292,13 +287,10 @@ namespace Waher.Networking.Cluster
 					return Result;
 			}
 
-			if (propertyTypes is null)
-				Init();
-
-			List<PropertyReference> Properties = null;
+			List<PropertyReference> Properties = new List<PropertyReference>();
 			TypeInfo TI = T.GetTypeInfo();
 
-			foreach (PropertyInfo PI in TI.DeclaredProperties)
+			foreach (PropertyInfo PI in T.GetRuntimeProperties())
 			{
 				if (PI.GetMethod is null || PI.SetMethod is null)
 					continue;
@@ -308,9 +300,6 @@ namespace Waher.Networking.Cluster
 
 				if (Property is null)
 					continue;
-
-				if (Properties is null)
-					Properties = new List<PropertyReference>();
 
 				Properties.Add(new PropertyReference()
 				{
@@ -323,15 +312,17 @@ namespace Waher.Networking.Cluster
 			return new ObjectInfo()
 			{
 				Type = T,
-				TypeName = T.FullName,
-				Properties = Properties?.ToArray()
+				Properties = Properties.ToArray()
 			};
 		}
 
-		private static IProperty GetProperty(Type PT)
+		internal static IProperty GetProperty(Type PT)
 		{
 			if (PT.IsArray)
-				return new ArrayProperty(PT, PT.GetElementType());
+			{
+				Type ElementType = PT.GetElementType();
+				return new ArrayProperty(PT, ElementType, GetProperty(ElementType));
+			}
 
 			TypeInfo PTI = PT.GetTypeInfo();
 

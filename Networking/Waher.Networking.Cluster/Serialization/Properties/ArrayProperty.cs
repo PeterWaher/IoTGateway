@@ -12,15 +12,17 @@ namespace Waher.Networking.Cluster.Serialization.Properties
 	{
 		private readonly Type arrayType;
 		private readonly Type elementType;
+		private readonly IProperty elementProperty;
 
 		/// <summary>
 		/// Array property
 		/// </summary>
-		internal ArrayProperty(Type ArrayType, Type ElementType)
+		internal ArrayProperty(Type ArrayType, Type ElementType, IProperty ElementProperty)
 			: base()
 		{
 			this.arrayType = ArrayType;
 			this.elementType = ElementType;
+			this.elementProperty = ElementProperty;
 		}
 
 		/// <summary>
@@ -36,8 +38,6 @@ namespace Waher.Networking.Cluster.Serialization.Properties
 		public override void Serialize(Serializer Output, object Value)
 		{
 			Array A = (Array)Value;
-			Type LastType = null;
-			ObjectInfo LastInfo = null;
 
 			if (A is null)
 				Output.WriteVarUInt64(0);
@@ -46,26 +46,7 @@ namespace Waher.Networking.Cluster.Serialization.Properties
 				Output.WriteVarUInt64((ulong)A.Length + 1);
 
 				foreach (object Element in A)
-				{
-					if (Element is null)
-						Output.WriteString(null);
-					else
-					{
-						Type T = Element.GetType();
-
-						if (LastType is null || T != LastType)
-						{
-							LastType = T;
-							LastInfo = ClusterEndpoint.GetObjectInfo(T);
-
-							Output.WriteString(T.FullName);
-						}
-						else
-							Output.WriteString(string.Empty);
-
-						LastInfo.Serialize(Output, Element);
-					}
-				}
+					this.elementProperty.Serialize(Output, Element);
 			}
 		}
 
@@ -73,8 +54,9 @@ namespace Waher.Networking.Cluster.Serialization.Properties
 		/// Deserializes the property value
 		/// </summary>
 		/// <param name="Input">Binary representation.</param>
+		/// <param name="ExpectedType">Expected Type</param>
 		/// <returns>Deserialized value.</returns>
-		public override object Deserialize(Deserializer Input)
+		public override object Deserialize(Deserializer Input, Type ExpectedType)
 		{
 			ulong Len = Input.ReadVarUInt64();
 			if (Len == 0)
@@ -88,32 +70,9 @@ namespace Waher.Networking.Cluster.Serialization.Properties
 			int i, c = (int)Len;
 
 			Array Result = Array.CreateInstance(this.elementType, c);
-			string TypeName;
-			Type LastType = null;
-			ObjectInfo LastInfo = null;
 
 			for (i = 0; i < c; i++)
-			{
-				TypeName = Input.ReadString();
-
-				if (TypeName is null)
-					Result.SetValue(null, i);
-				else
-				{
-					if (!string.IsNullOrEmpty(TypeName))
-					{
-						LastType = Types.GetType(TypeName);
-						if (LastType is null)
-							throw new KeyNotFoundException("Type name not recognized: " + TypeName);
-
-						LastInfo = ClusterEndpoint.GetObjectInfo(LastType);
-					}
-					else if (LastInfo is null)
-						throw new Exception("Invalid array serialization.");
-
-					Result.SetValue(LastInfo.Deserialize(Input), i);
-				}
-			}
+				Result.SetValue(this.elementProperty.Deserialize(Input,this.elementType), i);
 
 			return Result;
 		}

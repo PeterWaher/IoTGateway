@@ -1,8 +1,4 @@
 using System;
-using System.Net;
-using System.Net.Sockets;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Networking.Sniffers;
 using Waher.Networking.Cluster.Test.TestObjects;
@@ -223,6 +219,84 @@ namespace Waher.Networking.Cluster.Test
 			Assert.AreEqual(Obj.Id, Obj2.Id);
 			Assert.AreEqual(Obj.E1, Obj2.E1);
 			Assert.AreEqual(Obj.E2, Obj2.E2);
+		}
+
+		[TestMethod]
+		public void Test_07_Arrays()
+		{
+			Arrays Obj = new Arrays()
+			{
+				Integers = new int[] { 1, 2, 3, 4 },
+				Binary = new byte[] { 5, 6, 7, 8, 9 },
+				Objects = new Parent[]
+				{
+					new Parent()
+					{
+						S = "ABC"
+					},
+					new Child()
+					{
+						S = "DEF",
+						I = 12345
+					},
+					new GrandChild()
+					{
+						S = "GHI",
+						I = 23456,
+						B = true
+					}
+				}
+			};
+
+			byte[] Bin = this.endpoint.Serialize(Obj);
+			Arrays Obj2 = this.endpoint.Deserialize(Bin) as Arrays;
+			int i, c;
+
+			Assert.IsNotNull(Obj2);
+
+			Assert.AreEqual(c = Obj.Integers.Length, Obj2.Integers.Length);
+			for (i = 0; i < c; i++)
+				Assert.AreEqual(Obj.Integers[i], Obj2.Integers[i]);
+
+			Assert.AreEqual(c = Obj.Binary.Length, Obj2.Binary.Length);
+			for (i = 0; i < c; i++)
+				Assert.AreEqual(Obj.Binary[i], Obj2.Binary[i]);
+
+			Assert.AreEqual(c = Obj.Objects.Length, Obj2.Objects.Length);
+			for (i = 0; i < c; i++)
+				Assert.IsTrue(Obj.Objects[i].Equals(Obj2.Objects[i]));
+		}
+
+		[TestMethod]
+		public void Test_08_Objects()
+		{
+			Objects Obj = new Objects()
+			{
+				O1 = new Parent()
+				{
+					S = "ABC"
+				},
+				O2 = new Child()
+				{
+					S = "DEF",
+					I = 12345
+				},
+				O3 = new GrandChild()
+				{
+					S = "GHI",
+					I = 23456,
+					B = true
+				}
+			};
+
+			byte[] Bin = this.endpoint.Serialize(Obj);
+			Objects Obj2 = this.endpoint.Deserialize(Bin) as Objects;
+			int i, c;
+
+			Assert.IsNotNull(Obj2);
+			Assert.IsTrue(Obj.O1.Equals(Obj2.O1));
+			Assert.IsTrue(Obj.O2.Equals(Obj2.O2));
+			Assert.IsTrue(Obj.O3.Equals(Obj2.O3));
 		}
 
 	}

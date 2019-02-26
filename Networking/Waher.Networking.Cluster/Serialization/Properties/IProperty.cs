@@ -24,5 +24,12 @@ namespace Waher.Networking.Cluster.Serialization.Properties
 		/// <param name="Output">Output</param>
 		/// <param name="Value">Value to serialize</param>
 		void Serialize(Serializer Output, object Value);
+
+		/// <summary>
+		/// Deserializes the property value
+		/// </summary>
+		/// <param name="Input">Binary representation.</param>
+		/// <returns>Deserialized value.</returns>
+		object Deserialize(Deserializer Input);
 	}
 }

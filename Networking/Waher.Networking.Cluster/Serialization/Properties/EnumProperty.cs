@@ -16,7 +16,7 @@ namespace Waher.Networking.Cluster.Serialization.Properties
 		/// <summary>
 		/// Enumeration property
 		/// </summary>
-		public EnumProperty(Type EnumType)
+		internal EnumProperty(Type EnumType)
 			: base()
 		{
 			this.enumType = EnumType;
@@ -40,6 +40,19 @@ namespace Waher.Networking.Cluster.Serialization.Properties
 				Output.WriteInt32((int)Value);
 			else
 				Output.WriteString(Value.ToString());
+		}
+
+		/// <summary>
+		/// Deserializes the property value
+		/// </summary>
+		/// <param name="Input">Binary representation.</param>
+		/// <returns>Deserialized value.</returns>
+		public override object Deserialize(Deserializer Input)
+		{
+			if (this.asInt)
+				return Enum.ToObject(this.enumType, Input.ReadInt32());
+			else
+				return Enum.Parse(this.enumType, Input.ReadString());
 		}
 	}
 }

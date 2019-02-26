@@ -23,5 +23,15 @@ namespace Waher.Networking.Cluster.Serialization.Properties
 		{
 			Output.WriteDateTimeOffset((DateTimeOffset)Value);
 		}
+
+		/// <summary>
+		/// Deserializes the property value
+		/// </summary>
+		/// <param name="Input">Binary representation.</param>
+		/// <returns>Deserialized value.</returns>
+		public override object Deserialize(Deserializer Input)
+		{
+			return Input.ReadDateTimeOffset();
+		}
 	}
 }

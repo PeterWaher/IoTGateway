@@ -11,14 +11,14 @@ namespace Waher.Networking.Cluster.Test
 	[TestClass]
 	public class EndpointTests
 	{
-		private static readonly IPAddress clusterAddress = IPAddress.Parse("224.0.0.0");
+		internal static readonly IPAddress clusterAddress = IPAddress.Parse("224.0.0.0");
 		private ClusterEndpoint endpoint1 = null;
 		private ClusterEndpoint endpoint2 = null;
 
 		[AssemblyInitialize]
 		public static void AssemblyInitialize(TestContext Context)
 		{
-			Waher.Runtime.Inventory.Types.Initialize(
+			Runtime.Inventory.Types.Initialize(
 				typeof(EndpointTests).Assembly,
 				typeof(Waher.Networking.Cluster.ClusterEndpoint).Assembly);
 		}
@@ -56,7 +56,7 @@ namespace Waher.Networking.Cluster.Test
 				Done.Set();
 			};
 
-			this.endpoint2.SendMessageUnacknowledged(new Message()
+			this.endpoint2.SendMessageUnacknowledged(new Strings()
 			{
 				S1 = "Hello",
 				S2 = "World",

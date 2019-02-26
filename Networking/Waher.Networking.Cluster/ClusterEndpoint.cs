@@ -221,6 +221,44 @@ namespace Waher.Networking.Cluster
 		}
 
 		/// <summary>
+		/// Serializes an object.
+		/// </summary>
+		/// <param name="Object">Object</param>
+		/// <returns>Binary representation</returns>
+		public byte[] Serialize(object Object)
+		{
+			using (Serializer Output = new Serializer())
+			{
+				ObjectInfo Info = GetObjectInfo(Object.GetType());
+
+				Info.Serialize(Output, Object);
+
+				return Output.ToArray();
+			}
+		}
+
+		/// <summary>
+		/// Deserializes an object.
+		/// </summary>
+		/// <param name="Data">Binary representation of object.</param>
+		/// <returns>Deserialized object</returns>
+		/// <exception cref="KeyNotFoundException">If the corresponding type, or any of the embedded properties, could not be found.</exception>
+		public object Deserialize(byte[] Data)
+		{
+			using (Deserializer Input = new Deserializer(Data))
+			{
+				string TypeName = Input.ReadString();
+				Type T = Types.GetType(TypeName);
+				if (T is null)
+					throw new KeyNotFoundException("Type name not recognized: " + TypeName);
+
+				ObjectInfo Info = GetObjectInfo(T);
+
+				return Info.Deserialize(Input);
+			}
+		}
+
+		/// <summary>
 		/// Sends an unacknowledged message
 		/// </summary>
 		/// <param name="Message">Message object</param>
@@ -284,6 +322,7 @@ namespace Waher.Networking.Cluster
 
 			return new ObjectInfo()
 			{
+				Type = T,
 				TypeName = T.FullName,
 				Properties = Properties?.ToArray()
 			};
@@ -307,6 +346,8 @@ namespace Waher.Networking.Cluster
 			}
 			else if (propertyTypes.TryGetValue(PT, out IProperty Property))
 				return Property;
+			else if (!PTI.IsValueType)
+				return new ObjectProperty(PT, GetObjectInfo(PT));
 			else
 				return null;
 		}

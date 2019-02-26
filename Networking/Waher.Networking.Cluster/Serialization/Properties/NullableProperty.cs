@@ -59,5 +59,18 @@ namespace Waher.Networking.Cluster.Serialization.Properties
 				this.element.Serialize(Output, this.valueProperty.GetMethod.Invoke(Value, null));
 			}
 		}
+
+		/// <summary>
+		/// Deserializes the property value
+		/// </summary>
+		/// <param name="Input">Binary representation.</param>
+		/// <returns>Deserialized value.</returns>
+		public override object Deserialize(Deserializer Input)
+		{
+			if (Input.ReadBoolean())
+				return this.element.Deserialize(Input);
+			else
+				return null;
+		}
 	}
 }

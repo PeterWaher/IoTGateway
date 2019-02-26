@@ -18,16 +18,6 @@
             <param name="SharedSecret">Shared secret. Used to encrypt and decrypt communication. Secret is UTF-8 encoded and then hashed before being fed to AES.</param>
             <param name="Sniffers">Optional set of sniffers to use.</param>
         </member>
-        <member name="M:Waher.Networking.Cluster.ClusterEndpoint.#ctor(System.Net.IPAddress,System.Int32,System.String,System.Boolean,Waher.Networking.Sniffers.ISniffer[])">
-            <summary>
-            Represents one endpoint (or participant) in the network cluster.
-            </summary>
-            <param name="MulticastAddress">UDP Multicast address used for cluster communication.</param>
-            <param name="Port">Port used in cluster communication</param>
-            <param name="SharedSecret">Shared secret. Used to encrypt and decrypt communication. Secret is UTF-8 encoded and then hashed before being fed to AES.</param>
-            <param name="AllowLoopback">If communication over the loopback interface should be permitted. (Default=false)</param>
-            <param name="Sniffers">Optional set of sniffers to use.</param>
-        </member>
         <member name="M:Waher.Networking.Cluster.ClusterEndpoint.#ctor(System.Net.IPAddress,System.Int32,System.Byte[],Waher.Networking.Sniffers.ISniffer[])">
             <summary>
             Represents one endpoint (or participant) in the network cluster.
@@ -35,22 +25,751 @@
             <param name="MulticastAddress">UDP Multicast address used for cluster communication.</param>
             <param name="Port">Port used in cluster communication</param>
             <param name="SharedSecret">Shared secret. Used to encrypt and decrypt communication. Secret is hashed before being fed to AES.</param>
-            <param name="Sniffers">Optional set of sniffers to use.</param>
-        </member>
-        <member name="M:Waher.Networking.Cluster.ClusterEndpoint.#ctor(System.Net.IPAddress,System.Int32,System.Byte[],System.Boolean,Waher.Networking.Sniffers.ISniffer[])">
-            <summary>
-            Represents one endpoint (or participant) in the network cluster.
-            </summary>
-            <param name="MulticastAddress">UDP Multicast address used for cluster communication.</param>
-            <param name="Port">Port used in cluster communication</param>
-            <param name="SharedSecret">Shared secret. Used to encrypt and decrypt communication. Secret is hashed before being fed to AES.</param>
             <param name="AllowLoopback">If communication over the loopback interface should be permitted. (Default=false)</param>
             <param name="Sniffers">Optional set of sniffers to use.</param>
+        </member>
+        <member name="P:Waher.Networking.Cluster.ClusterEndpoint.Endpoints">
+            <summary>
+            IP endpoints listening on.
+            </summary>
         </member>
         <member name="M:Waher.Networking.Cluster.ClusterEndpoint.Dispose">
             <summary>
             <see cref="M:System.IDisposable.Dispose"/>
             </summary>
+        </member>
+        <member name="M:Waher.Networking.Cluster.ClusterEndpoint.Serialize(System.Object)">
+            <summary>
+            Serializes an object.
+            </summary>
+            <param name="Object">Object</param>
+            <returns>Binary representation</returns>
+        </member>
+        <member name="M:Waher.Networking.Cluster.ClusterEndpoint.SendMessageUnacknowledged(Waher.Networking.Cluster.IClusterMessage)">
+            <summary>
+            Sends an unacknowledged message
+            </summary>
+            <param name="Message">Message object</param>
+        </member>
+        <member name="T:Waher.Networking.Cluster.IClusterCommand">
+            <summary>
+            Interface for cluster commands.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.Cluster.IClusterMessage">
+            <summary>
+            Interface for cluster messages.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.Cluster.IClusterObject">
+            <summary>
+            Interface for cluster objects.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.Cluster.Serialization.Deserializer">
+            <summary>
+            Cluster serializer
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Deserializer.#ctor(System.Byte[])">
+            <summary>
+            Cluster serializer
+            </summary>
+            <param name="Data">Binary data</param>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Deserializer.Dispose">
+            <summary>
+            <see cref="M:System.IDisposable.Dispose"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Deserializer.ReadBoolean">
+            <summary>
+            Reads a boolean value to the output.
+            </summary>
+            <returns>Value</returns>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Deserializer.ReadByte">
+            <summary>
+            Reads a byte to the output.
+            </summary>
+            <returns>Value</returns>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Deserializer.ReadVarUInt64">
+            <summary>
+            Reads a variable-length unsigned integer to the output.
+            </summary>
+            <returns>Value</returns>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Deserializer.ReadString">
+            <summary>
+            Reads a string to the output.
+            </summary>
+            <returns>Value</returns>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Deserializer.ReadInt8">
+            <summary>
+            Reads a 8-bit signed integer to the output.
+            </summary>
+            <returns>Value</returns>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Deserializer.ReadInt16">
+            <summary>
+            Reads a 16-bit signed integer to the output.
+            </summary>
+            <returns>Value</returns>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Deserializer.ReadInt32">
+            <summary>
+            Reads a 32-bit signed integer to the output.
+            </summary>
+            <returns>Value</returns>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Deserializer.ReadInt64">
+            <summary>
+            Reads a 64-bit signed integer to the output.
+            </summary>
+            <returns>Value</returns>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Deserializer.ReadUInt8">
+            <summary>
+            Reads a 8-bit unsigned integer to the output.
+            </summary>
+            <returns>Value</returns>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Deserializer.ReadUInt16">
+            <summary>
+            Reads a 16-bit unsigned integer to the output.
+            </summary>
+            <returns>Value</returns>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Deserializer.ReadUInt32">
+            <summary>
+            Reads a 32-bit unsigned integer to the output.
+            </summary>
+            <returns>Value</returns>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Deserializer.ReadUInt64">
+            <summary>
+            Reads a 64-bit unsigned integer to the output.
+            </summary>
+            <returns>Value</returns>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Deserializer.ReadSingle">
+            <summary>
+            Reads a single-precision floating point number to the output.
+            </summary>
+            <returns>Value</returns>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Deserializer.ReadDouble">
+            <summary>
+            Reads a double-precision floating point number to the output.
+            </summary>
+            <returns>Value</returns>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Deserializer.ReadDecimal">
+            <summary>
+            Reads a decimal number to the output.
+            </summary>
+            <returns>Value</returns>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Deserializer.ReadCharacter">
+            <summary>
+            Reads a character to the output.
+            </summary>
+            <returns>Value</returns>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Deserializer.ReadDateTime">
+            <summary>
+            Reads a <see cref="T:System.DateTime"/> to the output.
+            </summary>
+            <returns>Value</returns>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Deserializer.ReadTimeSpan">
+            <summary>
+            Reads a <see cref="T:System.TimeSpan"/> to the output.
+            </summary>
+            <returns>Value</returns>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Deserializer.ReadDateTimeOffset">
+            <summary>
+            Reads a <see cref="T:System.DateTimeOffset"/> to the output.
+            </summary>
+            <returns>Value</returns>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Deserializer.ReadGuid">
+            <summary>
+            Reads a <see cref="T:System.Guid"/> to the output.
+            </summary>
+            <returns>Value</returns>
+        </member>
+        <member name="T:Waher.Networking.Cluster.Serialization.Properties.ArrayProperty">
+            <summary>
+            Array property
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Properties.ArrayProperty.#ctor(System.Type,System.Type)">
+            <summary>
+            Array property
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.Cluster.Serialization.Properties.ArrayProperty.PropertyType">
+            <summary>
+            Property Type
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Properties.ArrayProperty.Serialize(Waher.Networking.Cluster.Serialization.Serializer,System.Object)">
+            <summary>
+            Serializes the property value of an object.
+            </summary>
+            <param name="Output">Output</param>
+            <param name="Value">Value to serialize</param>
+        </member>
+        <member name="T:Waher.Networking.Cluster.Serialization.Properties.BooleanProperty">
+            <summary>
+            Boolean property
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.Cluster.Serialization.Properties.BooleanProperty.PropertyType">
+            <summary>
+            Property Type
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Properties.BooleanProperty.Serialize(Waher.Networking.Cluster.Serialization.Serializer,System.Object)">
+            <summary>
+            Serializes the property value of an object.
+            </summary>
+            <param name="Output">Output</param>
+            <param name="Value">Value to serialize</param>
+        </member>
+        <member name="T:Waher.Networking.Cluster.Serialization.Properties.CharacterProperty">
+            <summary>
+            Character property
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.Cluster.Serialization.Properties.CharacterProperty.PropertyType">
+            <summary>
+            Property Type
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Properties.CharacterProperty.Serialize(Waher.Networking.Cluster.Serialization.Serializer,System.Object)">
+            <summary>
+            Serializes the property value of an object.
+            </summary>
+            <param name="Output">Output</param>
+            <param name="Value">Value to serialize</param>
+        </member>
+        <member name="T:Waher.Networking.Cluster.Serialization.Properties.DateTimeOffsetProperty">
+            <summary>
+            DateTimeOffset property
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.Cluster.Serialization.Properties.DateTimeOffsetProperty.PropertyType">
+            <summary>
+            Property Type
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Properties.DateTimeOffsetProperty.Serialize(Waher.Networking.Cluster.Serialization.Serializer,System.Object)">
+            <summary>
+            Serializes the property value of an object.
+            </summary>
+            <param name="Output">Output</param>
+            <param name="Value">Value to serialize</param>
+        </member>
+        <member name="T:Waher.Networking.Cluster.Serialization.Properties.DateTimeProperty">
+            <summary>
+            DateTime property
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.Cluster.Serialization.Properties.DateTimeProperty.PropertyType">
+            <summary>
+            Property Type
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Properties.DateTimeProperty.Serialize(Waher.Networking.Cluster.Serialization.Serializer,System.Object)">
+            <summary>
+            Serializes the property value of an object.
+            </summary>
+            <param name="Output">Output</param>
+            <param name="Value">Value to serialize</param>
+        </member>
+        <member name="T:Waher.Networking.Cluster.Serialization.Properties.DecimalProperty">
+            <summary>
+            Decimal property
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.Cluster.Serialization.Properties.DecimalProperty.PropertyType">
+            <summary>
+            Property Type
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Properties.DecimalProperty.Serialize(Waher.Networking.Cluster.Serialization.Serializer,System.Object)">
+            <summary>
+            Serializes the property value of an object.
+            </summary>
+            <param name="Output">Output</param>
+            <param name="Value">Value to serialize</param>
+        </member>
+        <member name="T:Waher.Networking.Cluster.Serialization.Properties.DoubleProperty">
+            <summary>
+            Double precision floating-point property
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.Cluster.Serialization.Properties.DoubleProperty.PropertyType">
+            <summary>
+            Property Type
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Properties.DoubleProperty.Serialize(Waher.Networking.Cluster.Serialization.Serializer,System.Object)">
+            <summary>
+            Serializes the property value of an object.
+            </summary>
+            <param name="Output">Output</param>
+            <param name="Object">Object containing property</param>
+        </member>
+        <member name="T:Waher.Networking.Cluster.Serialization.Properties.EnumProperty">
+            <summary>
+            Enumeration property
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Properties.EnumProperty.#ctor(System.Type)">
+            <summary>
+            Enumeration property
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.Cluster.Serialization.Properties.EnumProperty.PropertyType">
+            <summary>
+            Property Type
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Properties.EnumProperty.Serialize(Waher.Networking.Cluster.Serialization.Serializer,System.Object)">
+            <summary>
+            Serializes the property value of an object.
+            </summary>
+            <param name="Output">Output</param>
+            <param name="Value">Value to serialize</param>
+        </member>
+        <member name="T:Waher.Networking.Cluster.Serialization.Properties.GuidProperty">
+            <summary>
+            Guid property
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.Cluster.Serialization.Properties.GuidProperty.PropertyType">
+            <summary>
+            Property Type
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Properties.GuidProperty.Serialize(Waher.Networking.Cluster.Serialization.Serializer,System.Object)">
+            <summary>
+            Serializes the property value of an object.
+            </summary>
+            <param name="Output">Output</param>
+            <param name="Value">Value to serialize</param>
+        </member>
+        <member name="T:Waher.Networking.Cluster.Serialization.Properties.Int16Property">
+            <summary>
+            Int16 property
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.Cluster.Serialization.Properties.Int16Property.PropertyType">
+            <summary>
+            Property Type
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Properties.Int16Property.Serialize(Waher.Networking.Cluster.Serialization.Serializer,System.Object)">
+            <summary>
+            Serializes the property value of an object.
+            </summary>
+            <param name="Output">Output</param>
+            <param name="Value">Value to serialize</param>
+        </member>
+        <member name="T:Waher.Networking.Cluster.Serialization.Properties.Int32Property">
+            <summary>
+            Int32 property
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.Cluster.Serialization.Properties.Int32Property.PropertyType">
+            <summary>
+            Property Type
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Properties.Int32Property.Serialize(Waher.Networking.Cluster.Serialization.Serializer,System.Object)">
+            <summary>
+            Serializes the property value of an object.
+            </summary>
+            <param name="Output">Output</param>
+            <param name="Value">Value to serialize</param>
+        </member>
+        <member name="T:Waher.Networking.Cluster.Serialization.Properties.Int64Property">
+            <summary>
+            Int64 property
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.Cluster.Serialization.Properties.Int64Property.PropertyType">
+            <summary>
+            Property Type
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Properties.Int64Property.Serialize(Waher.Networking.Cluster.Serialization.Serializer,System.Object)">
+            <summary>
+            Serializes the property value of an object.
+            </summary>
+            <param name="Output">Output</param>
+            <param name="Value">Value to serialize</param>
+        </member>
+        <member name="T:Waher.Networking.Cluster.Serialization.Properties.Int8Property">
+            <summary>
+            Int8 property
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.Cluster.Serialization.Properties.Int8Property.PropertyType">
+            <summary>
+            Property Type
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Properties.Int8Property.Serialize(Waher.Networking.Cluster.Serialization.Serializer,System.Object)">
+            <summary>
+            Serializes the property value of an object.
+            </summary>
+            <param name="Output">Output</param>
+            <param name="Value">Value to serialize</param>
+        </member>
+        <member name="T:Waher.Networking.Cluster.Serialization.Properties.IProperty">
+            <summary>
+            Abstract base class for properties
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.Cluster.Serialization.Properties.IProperty.PropertyType">
+            <summary>
+            Property Type
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Properties.IProperty.Serialize(Waher.Networking.Cluster.Serialization.Serializer,System.Object)">
+            <summary>
+            Serializes the property value of an object.
+            </summary>
+            <param name="Output">Output</param>
+            <param name="Value">Value to serialize</param>
+        </member>
+        <member name="T:Waher.Networking.Cluster.Serialization.Properties.NullableProperty">
+            <summary>
+            Nullable property
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Properties.NullableProperty.#ctor(System.Type,System.Type,Waher.Networking.Cluster.Serialization.Properties.IProperty)">
+            <summary>
+            Nullable property
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.Cluster.Serialization.Properties.NullableProperty.PropertyType">
+            <summary>
+            Property Type
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Properties.NullableProperty.Serialize(Waher.Networking.Cluster.Serialization.Serializer,System.Object)">
+            <summary>
+            Serializes the property value of an object.
+            </summary>
+            <param name="Output">Output</param>
+            <param name="Value">Value to serialize</param>
+        </member>
+        <member name="T:Waher.Networking.Cluster.Serialization.Properties.ObjectProperty">
+            <summary>
+            Object property
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Properties.ObjectProperty.#ctor(System.Type,Waher.Networking.Cluster.Serialization.ObjectInfo)">
+            <summary>
+            Object property
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.Cluster.Serialization.Properties.ObjectProperty.PropertyType">
+            <summary>
+            Property Type
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Properties.ObjectProperty.Serialize(Waher.Networking.Cluster.Serialization.Serializer,System.Object)">
+            <summary>
+            Serializes the property value of an object.
+            </summary>
+            <param name="Output">Output</param>
+            <param name="Value">Value to serialize</param>
+        </member>
+        <member name="T:Waher.Networking.Cluster.Serialization.Properties.Property">
+            <summary>
+            Abstract base class for properties
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.Cluster.Serialization.Properties.Property.PropertyType">
+            <summary>
+            Property Type
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Properties.Property.Serialize(Waher.Networking.Cluster.Serialization.Serializer,System.Object)">
+            <summary>
+            Serializes the property value of an object.
+            </summary>
+            <param name="Output">Output</param>
+            <param name="Value">Value to serialize</param>
+        </member>
+        <member name="T:Waher.Networking.Cluster.Serialization.Properties.SingleProperty">
+            <summary>
+            Single precision floating-point property
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.Cluster.Serialization.Properties.SingleProperty.PropertyType">
+            <summary>
+            Property Type
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Properties.SingleProperty.Serialize(Waher.Networking.Cluster.Serialization.Serializer,System.Object)">
+            <summary>
+            Serializes the property value of an object.
+            </summary>
+            <param name="Output">Output</param>
+            <param name="Value">Value to serialize</param>
+        </member>
+        <member name="T:Waher.Networking.Cluster.Serialization.Properties.StringProperty">
+            <summary>
+            String property
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.Cluster.Serialization.Properties.StringProperty.PropertyType">
+            <summary>
+            Property Type
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Properties.StringProperty.Serialize(Waher.Networking.Cluster.Serialization.Serializer,System.Object)">
+            <summary>
+            Serializes the property value of an object.
+            </summary>
+            <param name="Output">Output</param>
+            <param name="Value">Value to serialize</param>
+        </member>
+        <member name="T:Waher.Networking.Cluster.Serialization.Properties.TimeSpanProperty">
+            <summary>
+            TimeSpan property
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.Cluster.Serialization.Properties.TimeSpanProperty.PropertyType">
+            <summary>
+            Property Type
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Properties.TimeSpanProperty.Serialize(Waher.Networking.Cluster.Serialization.Serializer,System.Object)">
+            <summary>
+            Serializes the property value of an object.
+            </summary>
+            <param name="Output">Output</param>
+            <param name="Value">Value to serialize</param>
+        </member>
+        <member name="T:Waher.Networking.Cluster.Serialization.Properties.UInt16Property">
+            <summary>
+            UInt16 property
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.Cluster.Serialization.Properties.UInt16Property.PropertyType">
+            <summary>
+            Property Type
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Properties.UInt16Property.Serialize(Waher.Networking.Cluster.Serialization.Serializer,System.Object)">
+            <summary>
+            Serializes the property value of an object.
+            </summary>
+            <param name="Output">Output</param>
+            <param name="Value">Value to serialize</param>
+        </member>
+        <member name="T:Waher.Networking.Cluster.Serialization.Properties.UInt32Property">
+            <summary>
+            UInt32 property
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.Cluster.Serialization.Properties.UInt32Property.PropertyType">
+            <summary>
+            Property Type
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Properties.UInt32Property.Serialize(Waher.Networking.Cluster.Serialization.Serializer,System.Object)">
+            <summary>
+            Serializes the property value of an object.
+            </summary>
+            <param name="Output">Output</param>
+            <param name="Value">Value to serialize</param>
+        </member>
+        <member name="T:Waher.Networking.Cluster.Serialization.Properties.UInt64Property">
+            <summary>
+            UInt64 property
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.Cluster.Serialization.Properties.UInt64Property.PropertyType">
+            <summary>
+            Property Type
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Properties.UInt64Property.Serialize(Waher.Networking.Cluster.Serialization.Serializer,System.Object)">
+            <summary>
+            Serializes the property value of an object.
+            </summary>
+            <param name="Output">Output</param>
+            <param name="Value">Value to serialize</param>
+        </member>
+        <member name="T:Waher.Networking.Cluster.Serialization.Properties.UInt8Property">
+            <summary>
+            UInt8 property
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.Cluster.Serialization.Properties.UInt8Property.PropertyType">
+            <summary>
+            Property Type
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Properties.UInt8Property.Serialize(Waher.Networking.Cluster.Serialization.Serializer,System.Object)">
+            <summary>
+            Serializes the property value of an object.
+            </summary>
+            <param name="Output">Output</param>
+            <param name="Value">Value to serialize</param>
+        </member>
+        <member name="T:Waher.Networking.Cluster.Serialization.Serializer">
+            <summary>
+            Cluster serializer
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Serializer.#ctor">
+            <summary>
+            Cluster serializer
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Serializer.Dispose">
+            <summary>
+            <see cref="M:System.IDisposable.Dispose"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Serializer.ToArray">
+            <summary>
+            Returns the binary output.
+            </summary>
+            <returns>Binary output.</returns>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Serializer.WriteBoolean(System.Boolean)">
+            <summary>
+            Writes a boolean value to the output.
+            </summary>
+            <param name="Value">Value</param>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Serializer.WriteByte(System.Byte)">
+            <summary>
+            Writes a byte to the output.
+            </summary>
+            <param name="Value">Value</param>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Serializer.WriteVarUInt64(System.UInt64)">
+            <summary>
+            Writes a variable-length unsigned integer to the output.
+            </summary>
+            <param name="Value">Value</param>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Serializer.WriteString(System.String)">
+            <summary>
+            Writes a string to the output.
+            </summary>
+            <param name="Value">Value</param>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Serializer.WriteInt8(System.SByte)">
+            <summary>
+            Writes a 8-bit signed integer to the output.
+            </summary>
+            <param name="Value">Value</param>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Serializer.WriteInt16(System.Int16)">
+            <summary>
+            Writes a 16-bit signed integer to the output.
+            </summary>
+            <param name="Value">Value</param>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Serializer.WriteInt32(System.Int32)">
+            <summary>
+            Writes a 32-bit signed integer to the output.
+            </summary>
+            <param name="Value">Value</param>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Serializer.WriteInt64(System.Int64)">
+            <summary>
+            Writes a 64-bit signed integer to the output.
+            </summary>
+            <param name="Value">Value</param>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Serializer.WriteUInt8(System.Byte)">
+            <summary>
+            Writes a 8-bit unsigned integer to the output.
+            </summary>
+            <param name="Value">Value</param>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Serializer.WriteUInt16(System.UInt16)">
+            <summary>
+            Writes a 16-bit unsigned integer to the output.
+            </summary>
+            <param name="Value">Value</param>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Serializer.WriteUInt32(System.UInt32)">
+            <summary>
+            Writes a 32-bit unsigned integer to the output.
+            </summary>
+            <param name="Value">Value</param>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Serializer.WriteUInt64(System.UInt64)">
+            <summary>
+            Writes a 64-bit unsigned integer to the output.
+            </summary>
+            <param name="Value">Value</param>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Serializer.WriteSingle(System.Single)">
+            <summary>
+            Writes a single-precision floating point number to the output.
+            </summary>
+            <param name="Value">Value</param>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Serializer.WriteDouble(System.Double)">
+            <summary>
+            Writes a double-precision floating point number to the output.
+            </summary>
+            <param name="Value">Value</param>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Serializer.WriteDecimal(System.Decimal)">
+            <summary>
+            Writes a decimal number to the output.
+            </summary>
+            <param name="Value">Value</param>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Serializer.WriteCharacter(System.Char)">
+            <summary>
+            Writes a character to the output.
+            </summary>
+            <param name="Value">Value</param>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Serializer.WriteDateTime(System.DateTime)">
+            <summary>
+            Writes a <see cref="T:System.DateTime"/> to the output.
+            </summary>
+            <param name="Value">Value</param>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Serializer.WriteTimeSpan(System.TimeSpan)">
+            <summary>
+            Writes a <see cref="T:System.TimeSpan"/> to the output.
+            </summary>
+            <param name="Value">Value</param>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Serializer.WriteDateTimeOffset(System.DateTimeOffset)">
+            <summary>
+            Writes a <see cref="T:System.DateTimeOffset"/> to the output.
+            </summary>
+            <param name="Value">Value</param>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Serializer.WriteGuid(System.Guid)">
+            <summary>
+            Writes a <see cref="T:System.Guid"/> to the output.
+            </summary>
+            <param name="Value">Value</param>
         </member>
     </members>
 </doc>

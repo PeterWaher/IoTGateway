@@ -256,7 +256,7 @@ namespace Waher.Networking.Cluster.Serialization
 		public void WriteDateTime(DateTime Value)
 		{
 			this.WriteInt64(Value.Ticks);
-			this.WriteUInt8((byte)Value.Kind);
+			this.ms.WriteByte((byte)Value.Kind);
 		}
 
 		/// <summary>

@@ -5,7 +5,7 @@ using Waher.Networking.Cluster;
 
 namespace Waher.Networking.Cluster.Test.TestObjects
 {
-	public class Objects : IClusterMessage
+	public class Objects
 	{
 		public Objects()
 		{

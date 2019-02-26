@@ -291,7 +291,6 @@ namespace Waher.Networking.Cluster.Test
 
 			byte[] Bin = this.endpoint.Serialize(Obj);
 			Objects Obj2 = this.endpoint.Deserialize(Bin) as Objects;
-			int i, c;
 
 			Assert.IsNotNull(Obj2);
 			Assert.IsTrue(Obj.O1.Equals(Obj2.O1));

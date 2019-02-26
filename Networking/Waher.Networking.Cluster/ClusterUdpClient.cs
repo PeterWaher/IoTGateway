@@ -109,6 +109,7 @@ namespace Waher.Networking.Cluster
 					}
 					catch (Exception ex)
 					{
+						this.endpoint.Error(ex.Message);
 						Log.Critical(ex);
 					}
 				}

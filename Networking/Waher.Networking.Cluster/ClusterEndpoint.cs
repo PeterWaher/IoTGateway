@@ -210,75 +210,6 @@ namespace Waher.Networking.Cluster
 			}
 		}
 
-		internal void DataReceived(byte[] Data, IPEndPoint From)
-		{
-			this.ReceiveBinary(Data);
-
-			this.OnDataReceived?.Invoke(this, new EventArgs());
-		}
-
-		public event EventHandler OnDataReceived = null;
-
-		private void Transmit(byte[] Message)
-		{
-			this.TransmitBinary(Message);
-
-			foreach (ClusterUdpClient Client in this.clients)
-				Client.BeginTransmit(Message);
-		}
-
-		/// <summary>
-		/// Serializes an object.
-		/// </summary>
-		/// <param name="Object">Object</param>
-		/// <returns>Binary representation</returns>
-		public byte[] Serialize(object Object)
-		{
-			using (Serializer Output = new Serializer())
-			{
-				rootObject.Serialize(Output, Object);
-				return Output.ToArray();
-			}
-		}
-
-		/// <summary>
-		/// Deserializes an object.
-		/// </summary>
-		/// <param name="Data">Binary representation of object.</param>
-		/// <returns>Deserialized object</returns>
-		/// <exception cref="KeyNotFoundException">If the corresponding type, or any of the embedded properties, could not be found.</exception>
-		public object Deserialize(byte[] Data)
-		{
-			using (Deserializer Input = new Deserializer(Data))
-			{
-				return rootObject.Deserialize(Input, typeof(object));
-			}
-		}
-
-		/// <summary>
-		/// Sends an unacknowledged message
-		/// </summary>
-		/// <param name="Message">Message object</param>
-		public void SendMessageUnacknowledged(IClusterMessage Message)
-		{
-			Serializer Output = new Serializer();
-
-			try
-			{
-				Output.WriteByte(0);    // Unacknowledged message.
-				rootObject.Serialize(Output, Message);
-				this.Transmit(Output.ToArray());
-			}
-			catch (Exception ex)
-			{
-				Log.Critical(ex);
-			}
-			finally
-			{
-				Output.Dispose();
-			}
-		}
-
 		internal static ObjectInfo GetObjectInfo(Type T)
 		{
 			lock (objectInfo)
@@ -392,6 +323,96 @@ namespace Waher.Networking.Cluster
 				Types.OnInvalidated += (sender, e) => Init();
 
 			propertyTypes = PropertyTypes;
+		}
+
+		/// <summary>
+		/// Serializes an object.
+		/// </summary>
+		/// <param name="Object">Object</param>
+		/// <returns>Binary representation</returns>
+		public byte[] Serialize(object Object)
+		{
+			using (Serializer Output = new Serializer())
+			{
+				rootObject.Serialize(Output, Object);
+				return Output.ToArray();
+			}
+		}
+
+		/// <summary>
+		/// Deserializes an object.
+		/// </summary>
+		/// <param name="Data">Binary representation of object.</param>
+		/// <returns>Deserialized object</returns>
+		/// <exception cref="KeyNotFoundException">If the corresponding type, or any of the embedded properties, could not be found.</exception>
+		public object Deserialize(byte[] Data)
+		{
+			using (Deserializer Input = new Deserializer(Data))
+			{
+				return rootObject.Deserialize(Input, typeof(object));
+			}
+		}
+
+		internal void DataReceived(byte[] Data, IPEndPoint From)
+		{
+			if (Data.Length == 0)
+				return;
+
+			this.ReceiveBinary(Data);
+
+			using (Deserializer Input = new Deserializer(Data))
+			{
+				switch (Input.ReadByte())
+				{
+					case 0: // Unacknowledged message
+						object Object = rootObject.Deserialize(Input, typeof(object));
+						if (Object is IClusterMessage Message)
+						{
+							this.OnMessageReceived?.Invoke(this, new ClusterMessageEventArgs(Message));
+							Message.MessageReceived();
+						}
+						else
+							this.Error("Non-message object received in message: " + Object?.GetType()?.FullName);
+						break;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Event raised when a cluster message has been received.
+		/// </summary>
+		public event ClusterMessageEventHandler OnMessageReceived = null;
+
+		private void Transmit(byte[] Message)
+		{
+			this.TransmitBinary(Message);
+
+			foreach (ClusterUdpClient Client in this.clients)
+				Client.BeginTransmit(Message);
+		}
+
+		/// <summary>
+		/// Sends an unacknowledged message
+		/// </summary>
+		/// <param name="Message">Message object</param>
+		public void SendMessageUnacknowledged(IClusterMessage Message)
+		{
+			Serializer Output = new Serializer();
+
+			try
+			{
+				Output.WriteByte(0);    // Unacknowledged message.
+				rootObject.Serialize(Output, Message);
+				this.Transmit(Output.ToArray());
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+			}
+			finally
+			{
+				Output.Dispose();
+			}
 		}
 
 	}

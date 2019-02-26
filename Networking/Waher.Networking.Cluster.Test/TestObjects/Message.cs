@@ -1,32 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Threading;
 using Waher.Networking.Cluster;
 
 namespace Waher.Networking.Cluster.Test.TestObjects
 {
-	public class FloatingPoints
+	public class Message : IClusterMessage
 	{
-		public FloatingPoints()
+		public Message()
 		{
 		}
 
-		public float S
+		public string Text
 		{
 			get;
 			set;
 		}
 
-		public double D
+		public DateTime Timestamp
 		{
 			get;
 			set;
 		}
 
-		public decimal Dec
+		public void MessageReceived()
 		{
-			get;
-			set;
 		}
 	}
 }

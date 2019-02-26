@@ -22,7 +22,7 @@ namespace Waher.Networking.Cluster.Test.TestObjects
 		D = 8
 	}
 
-	public class MiscTypes : IClusterMessage
+	public class MiscTypes
 	{
 		public MiscTypes()
 		{

@@ -50,20 +50,28 @@ namespace Waher.Networking.Cluster.Test
 		public void Test_01_Send_Unacknowledged_Message()
 		{
 			ManualResetEvent Done = new ManualResetEvent(false);
-
-			this.endpoint1.OnDataReceived += (sender, e) =>
+			ManualResetEvent Error = new ManualResetEvent(false);
+			Message Msg = new Message()
 			{
-				Done.Set();
+				Text = "Hello World!",
+				Timestamp = DateTime.Now
 			};
 
-			this.endpoint2.SendMessageUnacknowledged(new Strings()
+			this.endpoint1.OnMessageReceived += (sender, e) =>
 			{
-				S1 = "Hello",
-				S2 = "World",
-				S3 = "!"
-			});
+				if (e.Message is Message Msg2 &&
+					Msg.Text == Msg2.Text &&
+					Msg.Timestamp == Msg2.Timestamp)
+				{
+					Done.Set();
+				}
+				else
+					Error.Set();
+			};
 
-			Assert.IsTrue(Done.WaitOne(5000));
+			this.endpoint2.SendMessageUnacknowledged(Msg);
+
+			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 5000));
 		}
 
 	}

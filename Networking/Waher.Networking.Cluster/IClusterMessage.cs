@@ -9,5 +9,9 @@ namespace Waher.Networking.Cluster
 	/// </summary>
 	public interface IClusterMessage : IClusterObject
 	{
+		/// <summary>
+		/// Method called when the message has been received.
+		/// </summary>
+		void MessageReceived();
 	}
 }

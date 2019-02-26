@@ -509,7 +509,7 @@ namespace Waher.Networking.Cluster
 		private static Dictionary<Type, IProperty> propertyTypes = null;
 		private static Dictionary<Type, ObjectInfo> objectInfo = new Dictionary<Type, ObjectInfo>();
 
-		public static void Init()
+		private static void Init()
 		{
 			Dictionary<Type, IProperty> PropertyTypes = new Dictionary<Type, IProperty>();
 

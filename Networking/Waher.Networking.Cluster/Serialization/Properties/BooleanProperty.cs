@@ -5,14 +5,14 @@ using System.Reflection;
 namespace Waher.Networking.Cluster.Serialization.Properties
 {
 	/// <summary>
-	/// UInt64 property
+	/// Boolean property
 	/// </summary>
-	public class UInt64Property : Property
+	public class BooleanProperty : Property
 	{
 		/// <summary>
 		/// Property Type
 		/// </summary>
-		public override Type PropertyType => typeof(ulong);
+		public override Type PropertyType => typeof(bool);
 
 		/// <summary>
 		/// Serializes the property value of an object.
@@ -21,7 +21,7 @@ namespace Waher.Networking.Cluster.Serialization.Properties
 		/// <param name="Value">Value to serialize</param>
 		public override void Serialize(Serializer Output, object Value)
 		{
-			Output.WriteUInt64((ulong)Value);
+			Output.WriteBoolean((bool)Value);
 		}
 	}
 }

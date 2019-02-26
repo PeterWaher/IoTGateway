@@ -19,18 +19,10 @@ namespace Waher.Networking.Cluster.Serialization.Properties
 		}
 
 		/// <summary>
-		/// Property name
-		/// </summary>
-		string Name
-		{
-			get;
-		}
-
-		/// <summary>
 		/// Serializes the property value of an object.
 		/// </summary>
 		/// <param name="Output">Output</param>
-		/// <param name="Object">Object containing property</param>
-		void Serialize(Serializer Output, object Object);
+		/// <param name="Value">Value to serialize</param>
+		void Serialize(Serializer Output, object Value);
 	}
 }

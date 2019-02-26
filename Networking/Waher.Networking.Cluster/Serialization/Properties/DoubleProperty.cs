@@ -10,15 +10,6 @@ namespace Waher.Networking.Cluster.Serialization.Properties
 	public class DoubleProperty : Property
 	{
 		/// <summary>
-		/// Double precision floating-point property
-		/// </summary>
-		/// <param name="PI">Property information</param>
-		public DoubleProperty(PropertyInfo PI)
-			: base(PI)
-		{
-		}
-
-		/// <summary>
 		/// Property Type
 		/// </summary>
 		public override Type PropertyType => typeof(double);
@@ -28,9 +19,9 @@ namespace Waher.Networking.Cluster.Serialization.Properties
 		/// </summary>
 		/// <param name="Output">Output</param>
 		/// <param name="Object">Object containing property</param>
-		public override void Serialize(Serializer Output, object Object)
+		public override void Serialize(Serializer Output, object Value)
 		{
-			Output.WriteDouble((double)this.pi.GetValue(Object));
+			Output.WriteDouble((double)Value);
 		}
 	}
 }

@@ -10,15 +10,6 @@ namespace Waher.Networking.Cluster.Serialization.Properties
 	public class UInt8Property : Property
 	{
 		/// <summary>
-		/// UInt8 property
-		/// </summary>
-		/// <param name="PI">Property information</param>
-		public UInt8Property(PropertyInfo PI)
-			: base(PI)
-		{
-		}
-
-		/// <summary>
 		/// Property Type
 		/// </summary>
 		public override Type PropertyType => typeof(byte);
@@ -27,10 +18,10 @@ namespace Waher.Networking.Cluster.Serialization.Properties
 		/// Serializes the property value of an object.
 		/// </summary>
 		/// <param name="Output">Output</param>
-		/// <param name="Object">Object containing property</param>
-		public override void Serialize(Serializer Output, object Object)
+		/// <param name="Value">Value to serialize</param>
+		public override void Serialize(Serializer Output, object Value)
 		{
-			Output.WriteUInt8((byte)this.pi.GetValue(Object));
+			Output.WriteUInt8((byte)Value);
 		}
 	}
 }

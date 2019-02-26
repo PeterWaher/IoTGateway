@@ -39,6 +39,15 @@ namespace Waher.Networking.Cluster.Serialization
 		}
 
 		/// <summary>
+		/// Writes a boolean value to the output.
+		/// </summary>
+		/// <param name="Value">Value</param>
+		public void WriteBoolean(bool Value)
+		{
+			this.ms.WriteByte(Value ? (byte)1 : (byte)0);
+		}
+
+		/// <summary>
 		/// Writes a byte to the output.
 		/// </summary>
 		/// <param name="Value">Value</param>
@@ -68,15 +77,22 @@ namespace Waher.Networking.Cluster.Serialization
 		}
 
 		/// <summary>
-		/// Writes a name to the output.
+		/// Writes a string to the output.
 		/// </summary>
-		/// <param name="Name">Name</param>
-		public void WriteName(string Name)
+		/// <param name="Value">Value</param>
+		public void WriteString(string Value)
 		{
-			byte[] Bin = Encoding.UTF8.GetBytes(Name);
+			if (Value is null)
+				this.ms.WriteByte(0);
+			else if (string.IsNullOrEmpty(Value))
+				this.ms.WriteByte(1);
+			else
+			{
+				byte[] Bin = Encoding.UTF8.GetBytes(Value);
 
-			this.WriteVarUInt64((ulong)Bin.Length);
-			this.ms.Write(Bin, 0, Bin.Length);
+				this.WriteVarUInt64((ulong)Bin.Length + 1);
+				this.ms.Write(Bin, 0, Bin.Length);
+			}
 		}
 
 		/// <summary>

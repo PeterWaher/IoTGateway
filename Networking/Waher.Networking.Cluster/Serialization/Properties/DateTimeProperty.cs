@@ -10,15 +10,6 @@ namespace Waher.Networking.Cluster.Serialization.Properties
 	public class DateTimeProperty : Property
 	{
 		/// <summary>
-		/// DateTime property
-		/// </summary>
-		/// <param name="PI">Property information</param>
-		public DateTimeProperty(PropertyInfo PI)
-			: base(PI)
-		{
-		}
-
-		/// <summary>
 		/// Property Type
 		/// </summary>
 		public override Type PropertyType => typeof(DateTime);
@@ -27,10 +18,10 @@ namespace Waher.Networking.Cluster.Serialization.Properties
 		/// Serializes the property value of an object.
 		/// </summary>
 		/// <param name="Output">Output</param>
-		/// <param name="Object">Object containing property</param>
-		public override void Serialize(Serializer Output, object Object)
+		/// <param name="Value">Value to serialize</param>
+		public override void Serialize(Serializer Output, object Value)
 		{
-			Output.WriteDateTime((DateTime)this.pi.GetValue(Object));
+			Output.WriteDateTime((DateTime)Value);
 		}
 	}
 }

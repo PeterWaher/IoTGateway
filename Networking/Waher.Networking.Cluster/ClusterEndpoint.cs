@@ -24,10 +24,13 @@ namespace Waher.Networking.Cluster
 	/// </summary>
 	public class ClusterEndpoint : Sniffable, IDisposable
 	{
+		private static Dictionary<Type, IProperty> propertyTypes = null;
+		private static Dictionary<Type, ObjectInfo> objectInfo = new Dictionary<Type, ObjectInfo>();
+
 		private readonly LinkedList<ClusterUdpClient> clients = new LinkedList<ClusterUdpClient>();
-		private readonly IPEndPoint destination;
-		private readonly Aes aes;
-		private readonly byte[] key;
+		internal readonly IPEndPoint destination;
+		internal readonly Aes aes;
+		internal readonly byte[] key;
 
 		/// <summary>
 		/// Represents one endpoint (or participant) in the network cluster.
@@ -200,215 +203,7 @@ namespace Waher.Networking.Cluster
 			}
 		}
 
-		private class ClusterUdpClient : IDisposable
-		{
-			private readonly ClusterEndpoint endpoint;
-			private readonly LinkedList<byte[]> outputQueue = new LinkedList<byte[]>();
-			private readonly IPAddress localAddress;
-			private readonly byte[] ivTx = new byte[16];
-			private readonly byte[] ivRx = new byte[16];
-			private HMACSHA1 hmac;
-			private UdpClient client;
-			private bool isWriting = false;
-			private bool disposed = false;
-
-			public ClusterUdpClient(ClusterEndpoint Endpoint, UdpClient Client, IPAddress LocalAddress)
-			{
-				this.endpoint = Endpoint;
-				this.client = Client;
-				this.localAddress = LocalAddress;
-
-				byte[] A = LocalAddress.GetAddressBytes();
-				Array.Copy(A, 0, this.ivTx, 8, 4);
-
-				this.hmac = new HMACSHA1(A);
-			}
-
-			public IPAddress Address => this.localAddress;
-			public IPEndPoint EndPoint => this.client.Client.LocalEndPoint as IPEndPoint;
-
-			public void Dispose()
-			{
-				this.disposed = true;
-
-				this.client?.Dispose();
-				this.client = null;
-
-				this.hmac?.Dispose();
-				this.hmac = null;
-			}
-
-			public async void BeginReceive()
-			{
-				try
-				{
-					while (!this.disposed)
-					{
-						UdpReceiveResult Data = await client.ReceiveAsync();
-						if (this.disposed)
-							return;
-
-						try
-						{
-							byte[] Datagram = Data.Buffer;
-							int i, c = Datagram.Length - 12;
-
-							if (c <= 0 || (c & 15) != 0)
-								continue;
-
-							Array.Copy(Datagram, 0, this.ivRx, 0, 8);
-							Array.Copy(Datagram, 8, this.ivRx, 12, 4);
-
-							byte[] A = Data.RemoteEndPoint.Address.GetAddressBytes();
-							Array.Copy(A, 0, this.ivRx, 8, 4);
-
-							int FragmentNr = this.ivRx[13];
-							bool LastFragment = (FragmentNr & 0x80) != 0;
-							FragmentNr &= 0x7f;
-							FragmentNr <<= 8;
-							FragmentNr |= this.ivRx[12];
-
-							int Padding = this.ivRx[14] >> 4;
-
-							// TODO: Check DateTime
-							// TODO: Fragments
-
-							using (ICryptoTransform Decryptor = this.endpoint.aes.CreateDecryptor(this.endpoint.key, this.ivRx))
-							{
-								byte[] Decrypted = Decryptor.TransformFinalBlock(Datagram, 12, Datagram.Length - 12);
-
-								using (HMACSHA1 HMAC = new HMACSHA1(A))
-								{
-									c = Decrypted.Length - 16 - Padding;
-
-									byte[] MAC = HMAC.ComputeHash(Decrypted, 20, c);
-
-									for (i = 0; i < 20; i++)
-									{
-										if (MAC[i] != Decrypted[i])
-											break;
-									}
-
-									if (i < 20)
-										continue;
-
-									byte[] Received = new byte[c];
-									Array.Copy(Decrypted, 20, Received, 0, c);
-
-									this.endpoint.DataReceived(Received, Data.RemoteEndPoint);
-								}
-							}
-						}
-						catch (Exception ex)
-						{
-							Log.Critical(ex);
-						}
-					}
-				}
-				catch (ObjectDisposedException)
-				{
-					// Closed.
-				}
-				catch (Exception ex)
-				{
-					this.endpoint.Error(ex.Message);
-				}
-			}
-
-			public async void BeginTransmit(byte[] Message)
-			{
-				if (this.disposed)
-					return;
-
-				lock (this.outputQueue)
-				{
-					if (this.isWriting)
-					{
-						this.outputQueue.AddLast(Message);
-						return;
-					}
-					else
-						this.isWriting = true;
-				}
-
-				try
-				{
-					while (Message != null)
-					{
-						int Len = Message.Length;
-						int NrFragments = (Len + 32767) >> 15;
-						int FragmentNr;
-						int Pos = 0;
-
-						if (NrFragments == 0)
-							return;
-
-						if (NrFragments >= 32768)
-							throw new ArgumentOutOfRangeException("Message too big.", nameof(Message));
-
-						byte[] TP = BitConverter.GetBytes(DateTime.UtcNow.Ticks);
-						Array.Copy(TP, 0, this.ivTx, 0, 8);
-
-						for (FragmentNr = 0; FragmentNr < NrFragments; FragmentNr++, Pos += 32768)
-						{
-							int FragmentSize = Math.Min(32768, Len - (FragmentNr << 15));
-							int Padding = (-FragmentSize) & 15;
-							byte[] Datagram = new byte[28 + FragmentSize + Padding];
-
-							this.ivTx[12] = (byte)FragmentNr;
-							this.ivTx[13] = (byte)(FragmentNr >> 8);
-
-							if (FragmentNr == NrFragments - 1)
-								this.ivTx[13] |= 0x80;
-
-							this.ivTx[14] = (byte)((this.ivTx[14] & 0x0f) | (Padding << 4));
-
-							Array.Copy(this.ivTx, 0, Datagram, 0, 8);
-							Array.Copy(this.ivTx, 12, Datagram, 8, 4);
-
-							byte[] MAC = this.hmac.ComputeHash(Message, Pos, FragmentSize);
-
-							Array.Copy(MAC, 0, Datagram, 12, 20);
-							Array.Copy(Message, Pos, Datagram, 32, FragmentSize);
-
-							using (ICryptoTransform Encryptor = this.endpoint.aes.CreateEncryptor(this.endpoint.key, this.ivTx))
-							{
-								byte[] Encrypted = Encryptor.TransformFinalBlock(Datagram, 12, Datagram.Length - 12);
-								Array.Copy(Encrypted, 0, Datagram, 12, Encrypted.Length);
-							}
-
-							if (++this.ivTx[15] == 0)
-								++this.ivTx[14];
-
-							await this.client.SendAsync(Datagram, Datagram.Length, this.endpoint.destination);
-
-							if (this.disposed)
-								return;
-						}
-
-						lock (this.outputQueue)
-						{
-							if (this.outputQueue.First is null)
-							{
-								this.isWriting = false;
-								Message = null;
-							}
-							else
-							{
-								Message = this.outputQueue.First.Value;
-								this.outputQueue.RemoveFirst();
-							}
-						}
-					}
-				}
-				catch (Exception ex)
-				{
-					this.endpoint.Error(ex.Message);
-				}
-			}
-		}
-
-		private void DataReceived(byte[] Data, IPEndPoint From)
+		internal void DataReceived(byte[] Data, IPEndPoint From)
 		{
 			this.ReceiveBinary(Data);
 
@@ -451,7 +246,7 @@ namespace Waher.Networking.Cluster
 			}
 		}
 
-		private static ObjectInfo GetObjectInfo(Type T)
+		internal static ObjectInfo GetObjectInfo(Type T)
 		{
 			lock (objectInfo)
 			{
@@ -462,7 +257,7 @@ namespace Waher.Networking.Cluster
 			if (propertyTypes is null)
 				Init();
 
-			List<IProperty> Properties = null;
+			List<PropertyReference> Properties = null;
 			TypeInfo TI = T.GetTypeInfo();
 
 			foreach (PropertyInfo PI in TI.DeclaredProperties)
@@ -470,44 +265,51 @@ namespace Waher.Networking.Cluster
 				if (PI.GetMethod is null || PI.SetMethod is null)
 					continue;
 
-				if (!propertyTypes.TryGetValue(PI.PropertyType, out IProperty Property))
+				Type PT = PI.PropertyType;
+				IProperty Property = GetProperty(PT);
+
+				if (Property is null)
 					continue;
 
 				if (Properties is null)
-					Properties = new List<IProperty>();
+					Properties = new List<PropertyReference>();
 
-				Properties.Add(Property);
+				Properties.Add(new PropertyReference()
+				{
+					Name = PI.Name,
+					Info = PI,
+					Property = Property
+				});
 			}
 
 			return new ObjectInfo()
 			{
-				Name = T.FullName,
+				TypeName = T.FullName,
 				Properties = Properties?.ToArray()
 			};
 		}
 
-		private class ObjectInfo
+		private static IProperty GetProperty(Type PT)
 		{
-			public IProperty[] Properties;
-			public string Name;
+			if (PT.IsArray)
+				return new ArrayProperty(PT, PT.GetElementType());
 
-			public void Serialize(Serializer Output, object Object)
+			TypeInfo PTI = PT.GetTypeInfo();
+
+			if (PTI.IsEnum)
+				return new EnumProperty(PT);
+			else if (PTI.IsGenericType && PT.GetGenericTypeDefinition() == typeof(Nullable<>))
 			{
-				Output.WriteName(this.Name);
+				Type ElementType = PT.GenericTypeArguments[0];
+				IProperty Element = GetProperty(ElementType);
 
-				if (!(this.Properties is null))
-				{
-					foreach (IProperty Property in this.Properties)
-					{
-						Output.WriteName(Property.Name);
-						Property.Serialize(Output, Object);
-					}
-				}
+				return new NullableProperty(PT, ElementType, Element);
 			}
+			else if (propertyTypes.TryGetValue(PT, out IProperty Property))
+				return Property;
+			else
+				return null;
 		}
-
-		private static Dictionary<Type, IProperty> propertyTypes = null;
-		private static Dictionary<Type, ObjectInfo> objectInfo = new Dictionary<Type, ObjectInfo>();
 
 		private static void Init()
 		{
@@ -519,10 +321,34 @@ namespace Waher.Networking.Cluster
 				if (TI.IsAbstract)
 					continue;
 
+				ConstructorInfo DefaultConstructor = null;
+
+				foreach (ConstructorInfo CI in TI.DeclaredConstructors)
+				{
+					if (CI.GetParameters().Length == 0)
+					{
+						DefaultConstructor = CI;
+						break;
+					}
+				}
+
+				if (DefaultConstructor is null)
+					continue;
+
 				try
 				{
-					IProperty Property = (IProperty)Activator.CreateInstance(T, Types.NoParameters);
-					PropertyTypes[T] = Property;
+					IProperty Property = (IProperty)DefaultConstructor.Invoke(Types.NoParameters);
+					Type PT = Property.PropertyType;
+					if (PT is null)
+						continue;
+
+					if (PropertyTypes.ContainsKey(PT))
+					{
+						Log.Error("Multiple classes available for property type " + PT.FullName + ".");
+						continue;
+					}
+
+					PropertyTypes[PT] = Property;
 				}
 				catch (Exception)
 				{

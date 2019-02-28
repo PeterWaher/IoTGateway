@@ -49,11 +49,16 @@ namespace Waher.Networking.Cluster.Test
 		[TestMethod]
 		public void Test_01_Send_Unacknowledged_Message()
 		{
+			this.TestUnacknowledgedMessage("Hello World!");
+		}
+
+		private void TestUnacknowledgedMessage(string Text)
+		{
 			ManualResetEvent Done = new ManualResetEvent(false);
 			ManualResetEvent Error = new ManualResetEvent(false);
 			Message Msg = new Message()
 			{
-				Text = "Hello World!",
+				Text = Text,
 				Timestamp = DateTime.Now
 			};
 
@@ -77,29 +82,13 @@ namespace Waher.Networking.Cluster.Test
 		[TestMethod]
 		public void Test_02_Fragmentation()
 		{
-			ManualResetEvent Done = new ManualResetEvent(false);
-			ManualResetEvent Error = new ManualResetEvent(false);
-			Message Msg = new Message()
-			{
-				Text = new string('x', 80000),
-				Timestamp = DateTime.Now
-			};
+			this.TestUnacknowledgedMessage(new string('x', 80000));
+		}
 
-			this.endpoint1.OnMessageReceived += (sender, e) =>
-			{
-				if (e.Message is Message Msg2 &&
-					Msg.Text == Msg2.Text &&
-					Msg.Timestamp == Msg2.Timestamp)
-				{
-					Done.Set();
-				}
-				else
-					Error.Set();
-			};
-
-			this.endpoint2.SendMessageUnacknowledged(Msg);
-
-			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 5000));
+		[TestMethod]
+		public void Test_03_LargeMessage()
+		{
+			this.TestUnacknowledgedMessage(new string('x', 1000000));
 		}
 
 	}

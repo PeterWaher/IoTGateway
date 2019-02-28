@@ -64,6 +64,11 @@ namespace Waher.Networking.Cluster
 						if (c <= 0 || (c & 15) != 0)
 							continue;
 
+						long Ticks = BitConverter.ToInt64(Datagram, 0);
+						DateTime TP = new DateTime(Ticks, DateTimeKind.Utc);
+						if ((DateTime.UtcNow - TP).TotalSeconds >= 10)	// Margin for unsynchronized clocks.
+							continue;
+
 						Array.Copy(Datagram, 0, this.ivRx, 0, 8);
 						Array.Copy(Datagram, 8, this.ivRx, 12, 4);
 
@@ -78,7 +83,6 @@ namespace Waher.Networking.Cluster
 
 						int Padding = this.ivRx[14] >> 4;
 
-						// TODO: Check DateTime
 						// TODO: Fragments
 
 						using (ICryptoTransform Decryptor = this.endpoint.aes.CreateDecryptor(this.endpoint.key, this.ivRx))

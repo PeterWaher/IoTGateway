@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Security.Cryptography;
@@ -56,6 +57,8 @@ namespace Waher.Networking.Cluster
 					if (this.disposed)
 						return;
 
+					this.endpoint.Information(Data.Buffer.Length.ToString() + " bytes received. (" + DateTime.Now.TimeOfDay.ToString() + ")");
+
 					try
 					{
 						byte[] Datagram = Data.Buffer;
@@ -111,7 +114,8 @@ namespace Waher.Networking.Cluster
 								{
 									string Key = Data.RemoteEndPoint.ToString() + " " + Ticks.ToString();
 
-									if (!this.endpoint.fragments.TryGetValue(Key, out Fragments Fragments))
+									if (!this.endpoint.currentStatus.TryGetValue(Key, out object Obj) ||
+										!(Obj is Fragments Fragments))
 									{
 										Fragments = new Fragments()
 										{
@@ -119,7 +123,7 @@ namespace Waher.Networking.Cluster
 											Timestamp = Ticks
 										};
 
-										this.endpoint.fragments[Key] = Fragments;
+										this.endpoint.currentStatus[Key] = Fragments;
 									}
 
 									Fragments.Parts[FragmentNr] = Received;
@@ -133,7 +137,7 @@ namespace Waher.Networking.Cluster
 									if (Fragments.Done &&
 										Fragments.NrParts == Fragments.Parts.Count)
 									{
-										this.endpoint.fragments.Remove(Key);
+										this.endpoint.currentStatus.Remove(Key);
 										this.endpoint.DataReceived(Fragments.ToByteArray(), Fragments.Source);
 									}
 								}
@@ -159,22 +163,22 @@ namespace Waher.Networking.Cluster
 
 		internal async void BeginTransmit(byte[] Message)
 		{
-			if (this.disposed)
-				return;
-
-			lock (this.outputQueue)
-			{
-				if (this.isWriting)
-				{
-					this.outputQueue.AddLast(Message);
-					return;
-				}
-				else
-					this.isWriting = true;
-			}
-
 			try
 			{
+				if (this.disposed)
+					return;
+
+				lock (this.outputQueue)
+				{
+					if (this.isWriting)
+					{
+						this.outputQueue.AddLast(Message);
+						return;
+					}
+					else
+						this.isWriting = true;
+				}
+
 				while (Message != null)
 				{
 					int Len = Message.Length;
@@ -246,6 +250,17 @@ namespace Waher.Networking.Cluster
 			catch (Exception ex)
 			{
 				this.endpoint.Error(ex.Message);
+
+				lock (this.outputQueue)
+				{
+					this.outputQueue.Clear();
+					this.isWriting = false;
+				}
+			}
+			finally
+			{
+				if (this.endpoint.shuttingDown)
+					this.endpoint.Dispose2();
 			}
 		}
 	}

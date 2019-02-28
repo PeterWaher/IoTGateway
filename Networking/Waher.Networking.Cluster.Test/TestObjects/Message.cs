@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Threading;
-using Waher.Networking.Cluster;
+using System.Net;
+using System.Threading.Tasks;
 
 namespace Waher.Networking.Cluster.Test.TestObjects
 {
@@ -23,9 +22,9 @@ namespace Waher.Networking.Cluster.Test.TestObjects
 			set;
 		}
 
-		public bool MessageReceived()
+		public Task<bool> MessageReceived(ClusterEndpoint Endpoint, IPEndPoint RemoteEndpoint)
 		{
-			return true;
+			return Task.FromResult<bool>(true);
 		}
 	}
 }

@@ -6,7 +6,9 @@ using System.Net.Sockets;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
 using Waher.Events;
+using Waher.Networking.Cluster.Messages;
 using Waher.Networking.Cluster.Serialization;
 using Waher.Networking.Cluster.Serialization.Properties;
 using Waher.Networking.Sniffers;
@@ -33,7 +35,11 @@ namespace Waher.Networking.Cluster
 		internal readonly IPEndPoint destination;
 		internal readonly Aes aes;
 		internal readonly byte[] key;
-		internal Cache<string, Fragments> fragments;
+		internal Cache<string, object> currentStatus;
+		private readonly Dictionary<IPEndPoint, object> remoteStatus;
+		private object localStatus;
+		private Timer aliveTimer;
+		internal bool shuttingDown = false;
 
 		/// <summary>
 		/// Represents one endpoint (or participant) in the network cluster.
@@ -80,7 +86,10 @@ namespace Waher.Networking.Cluster
 			this.key = Hashes.ComputeSHA256Hash(SharedSecret);
 			this.destination = new IPEndPoint(MulticastAddress, Port);
 
-			this.fragments = new Cache<string, Fragments>(int.MaxValue, TimeSpan.FromSeconds(30), TimeSpan.FromSeconds(30));
+			this.localStatus = null;
+			this.remoteStatus = new Dictionary<IPEndPoint, object>();
+			this.currentStatus = new Cache<string, object>(int.MaxValue, TimeSpan.FromSeconds(30), TimeSpan.FromSeconds(30));
+			this.currentStatus.Removed += CurrentStatus_Removed;
 
 #if WINDOWS_UWP
 			foreach (HostName HostName in NetworkInformation.GetHostNames())
@@ -165,6 +174,8 @@ namespace Waher.Networking.Cluster
 					}
 				}
 			}
+
+			this.aliveTimer = new Timer(this.SendAlive, null, 0, 5000);
 		}
 
 		/// <summary>
@@ -184,6 +195,18 @@ namespace Waher.Networking.Cluster
 		/// </summary>
 		public void Dispose()
 		{
+			if (!this.shuttingDown)
+			{
+				this.shuttingDown = true;
+				this.SendMessageUnacknowledged(new ShuttingDown());
+			}
+		}
+
+		internal void Dispose2()
+		{
+			this.aliveTimer?.Dispose();
+			this.aliveTimer = null;
+
 			foreach (ClusterUdpClient Client in this.clients)
 			{
 				try
@@ -198,8 +221,8 @@ namespace Waher.Networking.Cluster
 
 			this.clients.Clear();
 
-			this.fragments?.Dispose();
-			this.fragments = null;
+			this.currentStatus?.Dispose();
+			this.currentStatus = null;
 
 			foreach (ISniffer Sniffer in this.Sniffers)
 			{
@@ -360,28 +383,35 @@ namespace Waher.Networking.Cluster
 			}
 		}
 
-		internal void DataReceived(byte[] Data, IPEndPoint From)
+		internal async void DataReceived(byte[] Data, IPEndPoint From)
 		{
-			if (Data.Length == 0)
-				return;
-
-			this.ReceiveBinary(Data);
-
-			using (Deserializer Input = new Deserializer(Data))
+			try
 			{
-				switch (Input.ReadByte())
+				if (Data.Length == 0)
+					return;
+
+				this.ReceiveBinary(Data);
+
+				using (Deserializer Input = new Deserializer(Data))
 				{
-					case 0: // Unacknowledged message
-						object Object = rootObject.Deserialize(Input, typeof(object));
-						if (Object is IClusterMessage Message)
-						{
-							this.OnMessageReceived?.Invoke(this, new ClusterMessageEventArgs(Message));
-							Message.MessageReceived();
-						}
-						else
-							this.Error("Non-message object received in message: " + Object?.GetType()?.FullName);
-						break;
+					switch (Input.ReadByte())
+					{
+						case 0: // Unacknowledged message
+							object Object = rootObject.Deserialize(Input, typeof(object));
+							if (Object is IClusterMessage Message)
+							{
+								await Message.MessageReceived(this, From);
+								this.OnMessageReceived?.Invoke(this, new ClusterMessageEventArgs(Message));
+							}
+							else
+								this.Error("Non-message object received in message: " + Object?.GetType()?.FullName);
+							break;
+					}
 				}
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
 			}
 		}
 
@@ -415,10 +445,97 @@ namespace Waher.Networking.Cluster
 			catch (Exception ex)
 			{
 				Log.Critical(ex);
+
+				if (this.shuttingDown)
+					this.Dispose2();
 			}
 			finally
 			{
 				Output.Dispose();
+			}
+		}
+
+		private void SendAlive(object State)
+		{
+			try
+			{
+				ClusterGetStatusEventArgs e = new ClusterGetStatusEventArgs();
+
+				this.GetStatus?.Invoke(this, e);
+				this.localStatus = e.Status;
+
+				this.SendMessageUnacknowledged(new Alive()
+				{
+					Status = this.localStatus
+				});
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+			}
+		}
+
+		/// <summary>
+		/// Event raised when current status is needed.
+		/// </summary>
+		public event ClusterGetStatusEventHandler GetStatus = null;
+
+		/// <summary>
+		/// Local status. For remote endpoint statuses, see <see cref="GetRemoteStatuses"/>
+		/// </summary>
+		public object LocalStatus => this.localStatus;
+
+		/// <summary>
+		/// Gets current remote statuses. For the current local status, see
+		/// <see cref="LocalStatus"/>
+		/// </summary>
+		/// <returns>Current set of remote statuses</returns>
+		public EndpointStatus[] GetRemoteStatuses()
+		{
+			EndpointStatus[] Result;
+			int i, c;
+
+			lock (this.remoteStatus)
+			{
+				Result = new EndpointStatus[c = this.remoteStatus.Count];
+
+				i = 0;
+				foreach (KeyValuePair<IPEndPoint, object> P in this.remoteStatus)
+					Result[i++] = new EndpointStatus(P.Key, P.Value);
+			}
+
+			return Result;
+		}
+
+		internal void StatusReported(object Status, IPEndPoint RemoteEndpoint)
+		{
+			lock (this.remoteStatus)
+			{
+				this.remoteStatus[RemoteEndpoint] = Status;
+			}
+
+			string s = RemoteEndpoint.ToString();
+
+			if (!this.currentStatus.ContainsKey(s))
+				this.currentStatus[s] = RemoteEndpoint;
+		}
+
+		internal void EndpointShutDown(IPEndPoint RemoteEndpoint)
+		{
+			lock (this.remoteStatus)
+			{
+				this.remoteStatus.Remove(RemoteEndpoint);
+			}
+		}
+
+		private void CurrentStatus_Removed(object Sender, CacheItemEventArgs<string, object> e)
+		{
+			if (e.Value is IPEndPoint RemoteEndpoint)
+			{
+				lock (this.remoteStatus)
+				{
+					this.remoteStatus.Remove(RemoteEndpoint);
+				}
 			}
 		}
 

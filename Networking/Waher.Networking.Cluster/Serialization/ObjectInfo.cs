@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Waher.Networking.Cluster.Serialization.Properties;
 using Waher.Runtime.Inventory;
 
 namespace Waher.Networking.Cluster.Serialization
@@ -32,7 +33,15 @@ namespace Waher.Networking.Cluster.Serialization
 				else
 				{
 					Output.WriteString(T.FullName);
-					Info = ClusterEndpoint.GetObjectInfo(T);
+
+					IProperty P = ClusterEndpoint.GetProperty(T);
+					if (P is ObjectProperty OP)
+						Info = ClusterEndpoint.GetObjectInfo(T);
+					else
+					{
+						P.Serialize(Output, Object);
+						return;
+					}
 				}
 
 				foreach (PropertyReference Property in Info.Properties)
@@ -67,7 +76,11 @@ namespace Waher.Networking.Cluster.Serialization
 				if (T is null)
 					throw new KeyNotFoundException("Type name not recognized: " + TypeName);
 
-				Info = ClusterEndpoint.GetObjectInfo(T);
+				IProperty P = ClusterEndpoint.GetProperty(T);
+				if (P is ObjectProperty OP)
+					Info = ClusterEndpoint.GetObjectInfo(T);
+				else
+					return P.Deserialize(Input, T);
 			}
 
 			if (Info.sorted is null)

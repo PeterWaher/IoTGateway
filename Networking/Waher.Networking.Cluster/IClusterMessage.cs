@@ -12,6 +12,8 @@ namespace Waher.Networking.Cluster
 		/// <summary>
 		/// Method called when the message has been received.
 		/// </summary>
-		void MessageReceived();
+		/// <returns>If the message was accepted/processed or not.
+		/// In Acknowledged service, this corresponds to ACK/NACK.</returns>
+		bool MessageReceived();
 	}
 }

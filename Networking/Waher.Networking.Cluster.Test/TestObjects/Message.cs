@@ -23,8 +23,9 @@ namespace Waher.Networking.Cluster.Test.TestObjects
 			set;
 		}
 
-		public void MessageReceived()
+		public bool MessageReceived()
 		{
+			return true;
 		}
 	}
 }

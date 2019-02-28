@@ -92,6 +92,26 @@ namespace Waher.Networking.Cluster.Serialization
 		}
 
 		/// <summary>
+		/// Writes raw binary data to the output.
+		/// </summary>
+		/// <param name="Binary">Binary data</param>
+		public void WriteRaw(byte[] Binary)
+		{
+			this.ms.Write(Binary, 0, Binary.Length);
+		}
+
+		/// <summary>
+		/// Writes raw binary data to the output.
+		/// </summary>
+		/// <param name="Binary">Binary data</param>
+		/// <param name="Offset">Offset into <paramref name="Binary"/>.</param>
+		/// <param name="Count">Number of bytes to write.</param>
+		public void WriteRaw(byte[] Binary, int Offset, int Count)
+		{
+			this.ms.Write(Binary, Offset, Count);
+		}
+
+		/// <summary>
 		/// Writes a string to the output.
 		/// </summary>
 		/// <param name="Value">Value</param>

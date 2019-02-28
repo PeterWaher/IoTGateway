@@ -71,7 +71,7 @@ namespace Waher.Networking.Cluster.Test
 				if (e.Message is Message Msg2)
 				{
 					if (Msg.Text == Msg2.Text &&
-					Msg.Timestamp == Msg2.Timestamp)
+						Msg.Timestamp == Msg2.Timestamp)
 					{
 						Done.Set();
 					}
@@ -115,6 +115,69 @@ namespace Waher.Networking.Cluster.Test
 			EndpointStatus[] RemoteStatus = this.endpoint1.GetRemoteStatuses();
 			Assert.AreEqual(1, RemoteStatus.Length);
 			Assert.AreEqual(2, RemoteStatus[0].Status);
+		}
+
+		[TestMethod]
+		public void Test_05_Send_Acknowledged_Message()
+		{
+			this.TestAcknowledgedMessage("Hello World!");
+		}
+
+		private void TestAcknowledgedMessage(string Text)
+		{
+			ManualResetEvent Done1 = new ManualResetEvent(false);
+			ManualResetEvent Error1 = new ManualResetEvent(false);
+			ManualResetEvent Done2 = new ManualResetEvent(false);
+			ManualResetEvent Error2 = new ManualResetEvent(false);
+
+			Message Msg = new Message()
+			{
+				Text = Text,
+				Timestamp = DateTime.Now
+			};
+
+			this.endpoint1.OnMessageReceived += (sender, e) =>
+			{
+				if (e.Message is Message Msg2)
+				{
+					if (Msg.Text == Msg2.Text &&
+						Msg.Timestamp == Msg2.Timestamp)
+					{
+						Done1.Set();
+					}
+					else
+						Error1.Set();
+				}
+			};
+
+			this.endpoint2.SendMessageAcknowledged(Msg, (sender, e) =>
+			{
+				if (e.Message == Msg &&
+					e.Responses.Length == 1 &&
+					e.Responses[0].ACK.HasValue &&
+					e.Responses[0].ACK.Value &&
+					e.State.Equals(1))
+				{
+					Done2.Set();
+				}
+				else
+					Error2.Set();
+			}, 1);
+
+			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done1, Error1 }, 5000));
+			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done2, Error2 }, 5000));
+		}
+
+		[TestMethod]
+		public void Test_06_Fragmentation_Ack()
+		{
+			this.TestAcknowledgedMessage(new string('x', 80000));
+		}
+
+		[TestMethod]
+		public void Test_07_LargeMessage_Ack()
+		{
+			this.TestAcknowledgedMessage(new string('x', 1000000));
 		}
 
 	}

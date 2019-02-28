@@ -36,6 +36,15 @@ namespace Waher.Networking.Cluster
 		internal IPAddress Address => this.localAddress;
 		internal IPEndPoint EndPoint => this.client.Client.LocalEndPoint as IPEndPoint;
 
+		internal bool IsEndpoint(string AddressString, int Port)
+		{
+			IPEndPoint EndPoint = this.client.Client.LocalEndPoint as IPEndPoint;
+			if (EndPoint is null)
+				return false;
+
+			return (EndPoint.Address.ToString() == AddressString && EndPoint.Port == Port);
+		}
+
 		public void Dispose()
 		{
 			this.disposed = true;
@@ -161,7 +170,7 @@ namespace Waher.Networking.Cluster
 			}
 		}
 
-		internal async void BeginTransmit(byte[] Message)
+		internal async void BeginTransmit(byte[] Message, IPEndPoint Destination)
 		{
 			try
 			{
@@ -226,7 +235,7 @@ namespace Waher.Networking.Cluster
 						if (++this.ivTx[15] == 0)
 							++this.ivTx[14];
 
-						await this.client.SendAsync(Datagram, Datagram.Length, this.endpoint.destination);
+						await this.client.SendAsync(Datagram, Datagram.Length, Destination);
 
 						if (this.disposed)
 							return;

@@ -7,15 +7,15 @@ namespace Waher.Networking.Cluster
 	/// <summary>
 	/// Contains information about one of the endpoints in the cluster.
 	/// </summary>
-	public class EndpointStatus
+	public class EndpointAcknowledgement
 	{
 		private readonly IPEndPoint endpoint;
-		private readonly object status;
+		private readonly bool? ack;
 
-		internal EndpointStatus(IPEndPoint Endpoint, object Status)
+		internal EndpointAcknowledgement(IPEndPoint Endpoint, bool? Ack)
 		{
 			this.endpoint = Endpoint;
-			this.status = Status;
+			this.ack = Ack;
 		}
 
 		/// <summary>
@@ -24,8 +24,12 @@ namespace Waher.Networking.Cluster
 		public IPEndPoint Endpoint => this.endpoint;
 
 		/// <summary>
-		/// Endpoint status.
+		/// Acknowledgement response:
+		/// 
+		/// true = Message actively acknowledged (ACK)
+		/// false = Message actively rejected, or not acknowledged (NACK)
+		/// null = Message not acknowledged or rejected.
 		/// </summary>
-		public object Status => this.status;
+		public bool? ACK => this.ack;
 	}
 }

@@ -11,6 +11,7 @@ using Waher.Networking.Cluster.Serialization;
 using Waher.Networking.Cluster.Serialization.Properties;
 using Waher.Networking.Sniffers;
 using Waher.Runtime.Inventory;
+using Waher.Runtime.Cache;
 using Waher.Security;
 #if WINDOWS_UWP
 using Windows.Networking;
@@ -32,6 +33,7 @@ namespace Waher.Networking.Cluster
 		internal readonly IPEndPoint destination;
 		internal readonly Aes aes;
 		internal readonly byte[] key;
+		internal Cache<string, Fragments> fragments;
 
 		/// <summary>
 		/// Represents one endpoint (or participant) in the network cluster.
@@ -77,6 +79,8 @@ namespace Waher.Networking.Cluster
 
 			this.key = Hashes.ComputeSHA256Hash(SharedSecret);
 			this.destination = new IPEndPoint(MulticastAddress, Port);
+
+			this.fragments = new Cache<string, Fragments>(int.MaxValue, TimeSpan.FromSeconds(30), TimeSpan.FromSeconds(30));
 
 #if WINDOWS_UWP
 			foreach (HostName HostName in NetworkInformation.GetHostNames())
@@ -193,6 +197,9 @@ namespace Waher.Networking.Cluster
 			}
 
 			this.clients.Clear();
+
+			this.fragments?.Dispose();
+			this.fragments = null;
 
 			foreach (ISniffer Sniffer in this.Sniffers)
 			{

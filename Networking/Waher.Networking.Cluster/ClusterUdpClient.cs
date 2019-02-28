@@ -66,7 +66,7 @@ namespace Waher.Networking.Cluster
 
 						long Ticks = BitConverter.ToInt64(Datagram, 0);
 						DateTime TP = new DateTime(Ticks, DateTimeKind.Utc);
-						if ((DateTime.UtcNow - TP).TotalSeconds >= 10)	// Margin for unsynchronized clocks.
+						if ((DateTime.UtcNow - TP).TotalSeconds >= 10)  // Margin for unsynchronized clocks.
 							continue;
 
 						Array.Copy(Datagram, 0, this.ivRx, 0, 8);
@@ -83,15 +83,13 @@ namespace Waher.Networking.Cluster
 
 						int Padding = this.ivRx[14] >> 4;
 
-						// TODO: Fragments
-
 						using (ICryptoTransform Decryptor = this.endpoint.aes.CreateDecryptor(this.endpoint.key, this.ivRx))
 						{
 							byte[] Decrypted = Decryptor.TransformFinalBlock(Datagram, 12, Datagram.Length - 12);
 
 							using (HMACSHA1 HMAC = new HMACSHA1(A))
 							{
-								c = Decrypted.Length - 16 - Padding;
+								c = Decrypted.Length - 20 - Padding;
 
 								byte[] MAC = HMAC.ComputeHash(Decrypted, 20, c);
 
@@ -107,7 +105,38 @@ namespace Waher.Networking.Cluster
 								byte[] Received = new byte[c];
 								Array.Copy(Decrypted, 20, Received, 0, c);
 
-								this.endpoint.DataReceived(Received, Data.RemoteEndPoint);
+								if (LastFragment && FragmentNr == 0)
+									this.endpoint.DataReceived(Received, Data.RemoteEndPoint);
+								else
+								{
+									string Key = Data.RemoteEndPoint.ToString() + " " + Ticks.ToString();
+
+									if (!this.endpoint.fragments.TryGetValue(Key, out Fragments Fragments))
+									{
+										Fragments = new Fragments()
+										{
+											Source = Data.RemoteEndPoint,
+											Timestamp = Ticks
+										};
+
+										this.endpoint.fragments[Key] = Fragments;
+									}
+
+									Fragments.Parts[FragmentNr] = Received;
+
+									if (LastFragment)
+									{
+										Fragments.Done = true;
+										Fragments.NrParts = FragmentNr + 1;
+									}
+
+									if (Fragments.Done &&
+										Fragments.NrParts == Fragments.Parts.Count)
+									{
+										this.endpoint.fragments.Remove(Key);
+										this.endpoint.DataReceived(Fragments.ToByteArray(), Fragments.Source);
+									}
+								}
 							}
 						}
 					}
@@ -165,8 +194,8 @@ namespace Waher.Networking.Cluster
 					for (FragmentNr = 0; FragmentNr < NrFragments; FragmentNr++, Pos += 32768)
 					{
 						int FragmentSize = Math.Min(32768, Len - (FragmentNr << 15));
-						int Padding = (-FragmentSize) & 15;
-						byte[] Datagram = new byte[28 + FragmentSize + Padding];
+						int Padding = (-(20 + FragmentSize)) & 15;
+						byte[] Datagram = new byte[32 + FragmentSize + Padding];
 
 						this.ivTx[12] = (byte)FragmentNr;
 						this.ivTx[13] = (byte)(FragmentNr >> 8);

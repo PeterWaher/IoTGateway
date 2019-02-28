@@ -74,5 +74,33 @@ namespace Waher.Networking.Cluster.Test
 			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 5000));
 		}
 
+		[TestMethod]
+		public void Test_02_Fragmentation()
+		{
+			ManualResetEvent Done = new ManualResetEvent(false);
+			ManualResetEvent Error = new ManualResetEvent(false);
+			Message Msg = new Message()
+			{
+				Text = new string('x', 80000),
+				Timestamp = DateTime.Now
+			};
+
+			this.endpoint1.OnMessageReceived += (sender, e) =>
+			{
+				if (e.Message is Message Msg2 &&
+					Msg.Text == Msg2.Text &&
+					Msg.Timestamp == Msg2.Timestamp)
+				{
+					Done.Set();
+				}
+				else
+					Error.Set();
+			};
+
+			this.endpoint2.SendMessageUnacknowledged(Msg);
+
+			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 5000));
+		}
+
 	}
 }

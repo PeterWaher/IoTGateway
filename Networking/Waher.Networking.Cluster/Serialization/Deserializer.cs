@@ -55,13 +55,14 @@ namespace Waher.Networking.Cluster.Serialization
 		public ulong ReadVarUInt64()
 		{
 			ulong Value = 0;
+			int Offset = 0;
 			byte b;
 
 			do
 			{
-				Value <<= 7;
 				b = (byte)this.ms.ReadByte();
-				Value |= (byte)(b & 0x7f);
+				Value |= ((ulong)(b & 0x7f)) << Offset;
+				Offset += 7;
 			}
 			while ((b & 0x80) != 0);
 

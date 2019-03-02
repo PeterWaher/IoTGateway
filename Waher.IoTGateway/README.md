@@ -5,6 +5,6 @@ This project contains the basic framework for the **IoT Gateway**. There are two
 * The [Waher.IoTGateway.Console](../Waher.IoTGateway.Console) embodies the **IoT Gateway** as a Console Application.
 * The [Waher.IoTGateway.Svc](../Waher.IoTGateway.Svc) embodies the **IoT Gateway** as a Windows Service.
 
-The **IoT Gateway** is &copy; [Waher Data AB](http://waher.se/) 2016-2018. All rights reserved.
+The **IoT Gateway** is &copy; [Waher Data AB](http://waher.se/) 2016-2019. All rights reserved.
  
 [![](../Images/logo-WaherDataAB-300x58.png)](http://waher.se/)

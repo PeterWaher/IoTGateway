@@ -45,11 +45,165 @@
             <param name="Object">Object</param>
             <returns>Binary representation</returns>
         </member>
+        <member name="M:Waher.Networking.Cluster.ClusterEndpoint.Deserialize(System.Byte[])">
+            <summary>
+            Deserializes an object.
+            </summary>
+            <param name="Data">Binary representation of object.</param>
+            <returns>Deserialized object</returns>
+            <exception cref="T:System.Collections.Generic.KeyNotFoundException">If the corresponding type, or any of the embedded properties, could not be found.</exception>
+        </member>
+        <member name="E:Waher.Networking.Cluster.ClusterEndpoint.OnMessageReceived">
+            <summary>
+            Event raised when a cluster message has been received.
+            </summary>
+        </member>
         <member name="M:Waher.Networking.Cluster.ClusterEndpoint.SendMessageUnacknowledged(Waher.Networking.Cluster.IClusterMessage)">
             <summary>
             Sends an unacknowledged message
             </summary>
             <param name="Message">Message object</param>
+        </member>
+        <member name="M:Waher.Networking.Cluster.ClusterEndpoint.SendMessageAcknowledged(Waher.Networking.Cluster.IClusterMessage,Waher.Networking.Cluster.ClusterMessageAckEventHandler,System.Object)">
+            <summary>
+            Sends a message using acknowledged service.
+            </summary>
+            <param name="Message">Message to send using acknowledged service.</param>
+            <param name="Callback">Method to call when responses have been returned.</param>
+            <param name="State">State object to pass on to callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.Cluster.ClusterEndpoint.SendMessageAcknowledgedAsync(Waher.Networking.Cluster.IClusterMessage)">
+            <summary>
+            Sends a message using acknowledged service.
+            </summary>
+            <param name="Message">Message to send using acknowledged service.</param>
+        </member>
+        <member name="E:Waher.Networking.Cluster.ClusterEndpoint.GetStatus">
+            <summary>
+            Event raised when current status is needed.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.Cluster.ClusterEndpoint.LocalStatus">
+            <summary>
+            Local status. For remote endpoint statuses, see <see cref="M:Waher.Networking.Cluster.ClusterEndpoint.GetRemoteStatuses"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Cluster.ClusterEndpoint.GetRemoteStatuses">
+            <summary>
+            Gets current remote statuses. For the current local status, see
+            <see cref="P:Waher.Networking.Cluster.ClusterEndpoint.LocalStatus"/>
+            </summary>
+            <returns>Current set of remote statuses</returns>
+        </member>
+        <member name="T:Waher.Networking.Cluster.ClusterGetStatusEventHandler">
+            <summary>
+            Event arguments for cluster get status events.
+            </summary>
+            <param name="Sender">Sender of event.</param>
+            <param name="e">Event handler.</param>
+        </member>
+        <member name="T:Waher.Networking.Cluster.ClusterGetStatusEventArgs">
+            <summary>
+            Event arguments for cluster get status events.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Cluster.ClusterGetStatusEventArgs.#ctor">
+            <summary>
+            Event arguments for cluster get status events.
+            </summary>
+            <param name="GetStatus">GetStatus object</param>
+        </member>
+        <member name="P:Waher.Networking.Cluster.ClusterGetStatusEventArgs.Status">
+            <summary>
+            Current status of service.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.Cluster.ClusterMessageAckEventHandler">
+            <summary>
+            Event arguments for cluster message acknowledgement events.
+            </summary>
+            <param name="Sender">Sender of event.</param>
+            <param name="e">Event handler.</param>
+        </member>
+        <member name="T:Waher.Networking.Cluster.ClusterMessageAckEventArgs">
+            <summary>
+            Event arguments for cluster message acknowledgement events.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Cluster.ClusterMessageAckEventArgs.#ctor(Waher.Networking.Cluster.IClusterMessage,Waher.Networking.Cluster.EndpointAcknowledgement[],System.Object)">
+            <summary>
+            Event arguments for cluster message acknowledgement events.
+            </summary>
+            <param name="Message">Message object</param>
+            <param name="Responses">Message acknowledgement responses</param>
+            <param name="State">State object passed on to the original request.</param>
+        </member>
+        <member name="P:Waher.Networking.Cluster.ClusterMessageAckEventArgs.Responses">
+            <summary>
+            Message acknowledgement responses.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.Cluster.ClusterMessageAckEventArgs.State">
+            <summary>
+            State object passed on to the original request.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.Cluster.ClusterMessageEventHandler">
+            <summary>
+            Event arguments for cluster message events.
+            </summary>
+            <param name="Sender">Sender of event.</param>
+            <param name="e">Event handler.</param>
+        </member>
+        <member name="T:Waher.Networking.Cluster.ClusterMessageEventArgs">
+            <summary>
+            Event arguments for cluster message events.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Cluster.ClusterMessageEventArgs.#ctor(Waher.Networking.Cluster.IClusterMessage)">
+            <summary>
+            Event arguments for cluster message events.
+            </summary>
+            <param name="Message">Message object</param>
+        </member>
+        <member name="P:Waher.Networking.Cluster.ClusterMessageEventArgs.Message">
+            <summary>
+            Message object
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.Cluster.EndpointAcknowledgement">
+            <summary>
+            Contains information about one of the endpoints in the cluster.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.Cluster.EndpointAcknowledgement.Endpoint">
+            <summary>
+            Remote endpoint
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.Cluster.EndpointAcknowledgement.ACK">
+            <summary>
+            Acknowledgement response:
+            
+            true = Message actively acknowledged (ACK)
+            false = Message actively rejected, or not acknowledged (NACK)
+            null = Message not acknowledged or rejected.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.Cluster.EndpointStatus">
+            <summary>
+            Contains information about one of the endpoints in the cluster.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.Cluster.EndpointStatus.Endpoint">
+            <summary>
+            Remote endpoint
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.Cluster.EndpointStatus.Status">
+            <summary>
+            Endpoint status.
+            </summary>
         </member>
         <member name="T:Waher.Networking.Cluster.IClusterCommand">
             <summary>
@@ -61,10 +215,73 @@
             Interface for cluster messages.
             </summary>
         </member>
+        <member name="M:Waher.Networking.Cluster.IClusterMessage.MessageReceived(Waher.Networking.Cluster.ClusterEndpoint,System.Net.IPEndPoint)">
+            <summary>
+            Method called when the message has been received.
+            </summary>
+            <param name="LocalEndpoint">Cluster endpoint that received the message.</param>
+            <param name="RemoteEndpoint">Endpoint sending the message.</param>
+            <returns>If the message was accepted/processed or not.
+            In Acknowledged service, this corresponds to ACK/NACK.</returns>
+        </member>
         <member name="T:Waher.Networking.Cluster.IClusterObject">
             <summary>
             Interface for cluster objects.
             </summary>
+        </member>
+        <member name="T:Waher.Networking.Cluster.MessageStatus">
+            <summary>
+            Keeps track of outgoing messages.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Cluster.MessageStatus.IsComplete(Waher.Networking.Cluster.EndpointStatus[])">
+            <summary>
+            If all responses have been returned.
+            </summary>
+            <param name="Statuses">Valid statuses.</param>
+            <returns>If all responses have been returned.</returns>
+        </member>
+        <member name="M:Waher.Networking.Cluster.MessageStatus.GetResponses(Waher.Networking.Cluster.EndpointStatus[])">
+            <summary>
+            Compiles available responses.
+            </summary>
+            <returns>Set of responses</returns>
+        </member>
+        <member name="T:Waher.Networking.Cluster.Messages.Alive">
+            <summary>
+            Alive message regularly sent on the network to inform members of the cluster
+            of the status of the current machine.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.Cluster.Messages.Alive.Status">
+            <summary>
+            Machine status.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Messages.Alive.MessageReceived(Waher.Networking.Cluster.ClusterEndpoint,System.Net.IPEndPoint)">
+            <summary>
+            Method called when the message has been received.
+            </summary>
+            <param name="Endpoint">Cluster endpoint that received the message.</param>
+            <param name="RemoteEndpoint">Endpoint sending the message.</param>
+            <returns>If the message was accepted/processed or not.
+            In Acknowledged service, this corresponds to ACK/NACK.</returns>
+        </member>
+        <member name="T:Waher.Networking.Cluster.Messages.ShuttingDown">
+            <summary>
+            Message sent when an endpoint is shut down, to let the other endpoints know
+            the current endpoint is no longer available.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Messages.ShuttingDown.MessageReceived(Waher.Networking.Cluster.ClusterEndpoint,System.Net.IPEndPoint)">
+            <summary>
+            Message sent when an endpoint is shut down, to let the other endpoints know
+            the current endpoint is no longer available.
+            </summary>
+            <param name="Endpoint">Cluster endpoint that received the message.</param>
+            <param name="RemoteEndpoint">Endpoint sending the message.</param>
+            <returns>If the message was accepted/processed or not.
+            In Acknowledged service, this corresponds to ACK/NACK.</returns>
         </member>
         <member name="T:Waher.Networking.Cluster.Serialization.Deserializer">
             <summary>
@@ -84,130 +301,156 @@
         </member>
         <member name="M:Waher.Networking.Cluster.Serialization.Deserializer.ReadBoolean">
             <summary>
-            Reads a boolean value to the output.
+            Reads a boolean value from the input.
             </summary>
             <returns>Value</returns>
         </member>
         <member name="M:Waher.Networking.Cluster.Serialization.Deserializer.ReadByte">
             <summary>
-            Reads a byte to the output.
+            Reads a byte from the input.
             </summary>
             <returns>Value</returns>
         </member>
         <member name="M:Waher.Networking.Cluster.Serialization.Deserializer.ReadVarUInt64">
             <summary>
-            Reads a variable-length unsigned integer to the output.
+            Reads a variable-length unsigned integer from the input.
+            </summary>
+            <returns>Value</returns>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Deserializer.ReadBinary">
+            <summary>
+            Reads binary data from the input.
             </summary>
             <returns>Value</returns>
         </member>
         <member name="M:Waher.Networking.Cluster.Serialization.Deserializer.ReadString">
             <summary>
-            Reads a string to the output.
+            Reads a string from the input.
             </summary>
             <returns>Value</returns>
         </member>
         <member name="M:Waher.Networking.Cluster.Serialization.Deserializer.ReadInt8">
             <summary>
-            Reads a 8-bit signed integer to the output.
+            Reads a 8-bit signed integer from the input.
             </summary>
             <returns>Value</returns>
         </member>
         <member name="M:Waher.Networking.Cluster.Serialization.Deserializer.ReadInt16">
             <summary>
-            Reads a 16-bit signed integer to the output.
+            Reads a 16-bit signed integer from the input.
             </summary>
             <returns>Value</returns>
         </member>
         <member name="M:Waher.Networking.Cluster.Serialization.Deserializer.ReadInt32">
             <summary>
-            Reads a 32-bit signed integer to the output.
+            Reads a 32-bit signed integer from the input.
             </summary>
             <returns>Value</returns>
         </member>
         <member name="M:Waher.Networking.Cluster.Serialization.Deserializer.ReadInt64">
             <summary>
-            Reads a 64-bit signed integer to the output.
+            Reads a 64-bit signed integer from the input.
             </summary>
             <returns>Value</returns>
         </member>
         <member name="M:Waher.Networking.Cluster.Serialization.Deserializer.ReadUInt8">
             <summary>
-            Reads a 8-bit unsigned integer to the output.
+            Reads a 8-bit unsigned integer from the input.
             </summary>
             <returns>Value</returns>
         </member>
         <member name="M:Waher.Networking.Cluster.Serialization.Deserializer.ReadUInt16">
             <summary>
-            Reads a 16-bit unsigned integer to the output.
+            Reads a 16-bit unsigned integer from the input.
             </summary>
             <returns>Value</returns>
         </member>
         <member name="M:Waher.Networking.Cluster.Serialization.Deserializer.ReadUInt32">
             <summary>
-            Reads a 32-bit unsigned integer to the output.
+            Reads a 32-bit unsigned integer from the input.
             </summary>
             <returns>Value</returns>
         </member>
         <member name="M:Waher.Networking.Cluster.Serialization.Deserializer.ReadUInt64">
             <summary>
-            Reads a 64-bit unsigned integer to the output.
+            Reads a 64-bit unsigned integer from the input.
             </summary>
             <returns>Value</returns>
         </member>
         <member name="M:Waher.Networking.Cluster.Serialization.Deserializer.ReadSingle">
             <summary>
-            Reads a single-precision floating point number to the output.
+            Reads a single-precision floating point number from the input.
             </summary>
             <returns>Value</returns>
         </member>
         <member name="M:Waher.Networking.Cluster.Serialization.Deserializer.ReadDouble">
             <summary>
-            Reads a double-precision floating point number to the output.
+            Reads a double-precision floating point number from the input.
             </summary>
             <returns>Value</returns>
         </member>
         <member name="M:Waher.Networking.Cluster.Serialization.Deserializer.ReadDecimal">
             <summary>
-            Reads a decimal number to the output.
+            Reads a decimal number from the input.
             </summary>
             <returns>Value</returns>
         </member>
         <member name="M:Waher.Networking.Cluster.Serialization.Deserializer.ReadCharacter">
             <summary>
-            Reads a character to the output.
+            Reads a character from the input.
             </summary>
             <returns>Value</returns>
         </member>
         <member name="M:Waher.Networking.Cluster.Serialization.Deserializer.ReadDateTime">
             <summary>
-            Reads a <see cref="T:System.DateTime"/> to the output.
+            Reads a <see cref="T:System.DateTime"/> from the input.
             </summary>
             <returns>Value</returns>
         </member>
         <member name="M:Waher.Networking.Cluster.Serialization.Deserializer.ReadTimeSpan">
             <summary>
-            Reads a <see cref="T:System.TimeSpan"/> to the output.
+            Reads a <see cref="T:System.TimeSpan"/> from the input.
             </summary>
             <returns>Value</returns>
         </member>
         <member name="M:Waher.Networking.Cluster.Serialization.Deserializer.ReadDateTimeOffset">
             <summary>
-            Reads a <see cref="T:System.DateTimeOffset"/> to the output.
+            Reads a <see cref="T:System.DateTimeOffset"/> from the input.
             </summary>
             <returns>Value</returns>
         </member>
         <member name="M:Waher.Networking.Cluster.Serialization.Deserializer.ReadGuid">
             <summary>
-            Reads a <see cref="T:System.Guid"/> to the output.
+            Reads a <see cref="T:System.Guid"/> from the input.
             </summary>
             <returns>Value</returns>
+        </member>
+        <member name="T:Waher.Networking.Cluster.Serialization.ObjectInfo">
+            <summary>
+            Class containing information about objects of a specific type.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.ObjectInfo.Serialize(Waher.Networking.Cluster.Serialization.Serializer,System.Object)">
+            <summary>
+            Serializes an object.
+            </summary>
+            <param name="Output">Output</param>
+            <param name="Object">Object to serialize.</param>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.ObjectInfo.Deserialize(Waher.Networking.Cluster.Serialization.Deserializer,System.Type)">
+            <summary>
+            Deserializes an object
+            </summary>
+            <param name="Input">Binary input</param>
+            <returns>Deserialized object.</returns>
+            <exception cref="T:System.Collections.Generic.KeyNotFoundException">If the corresponding type, or any of the embedded properties, could not be found.</exception>
         </member>
         <member name="T:Waher.Networking.Cluster.Serialization.Properties.ArrayProperty">
             <summary>
             Array property
             </summary>
         </member>
-        <member name="M:Waher.Networking.Cluster.Serialization.Properties.ArrayProperty.#ctor(System.Type,System.Type)">
+        <member name="M:Waher.Networking.Cluster.Serialization.Properties.ArrayProperty.#ctor(System.Type,System.Type,Waher.Networking.Cluster.Serialization.Properties.IProperty)">
             <summary>
             Array property
             </summary>
@@ -223,6 +466,39 @@
             </summary>
             <param name="Output">Output</param>
             <param name="Value">Value to serialize</param>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Properties.ArrayProperty.Deserialize(Waher.Networking.Cluster.Serialization.Deserializer,System.Type)">
+            <summary>
+            Deserializes the property value
+            </summary>
+            <param name="Input">Binary representation.</param>
+            <param name="ExpectedType">Expected Type</param>
+            <returns>Deserialized value.</returns>
+        </member>
+        <member name="T:Waher.Networking.Cluster.Serialization.Properties.BinaryProperty">
+            <summary>
+            Binary property
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.Cluster.Serialization.Properties.BinaryProperty.PropertyType">
+            <summary>
+            Property Type
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Properties.BinaryProperty.Serialize(Waher.Networking.Cluster.Serialization.Serializer,System.Object)">
+            <summary>
+            Serializes the property value of an object.
+            </summary>
+            <param name="Output">Output</param>
+            <param name="Value">Value to serialize</param>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Properties.BinaryProperty.Deserialize(Waher.Networking.Cluster.Serialization.Deserializer,System.Type)">
+            <summary>
+            Deserializes the property value
+            </summary>
+            <param name="Input">Binary representation.</param>
+            <param name="ExpectedType">Expected Type</param>
+            <returns>Deserialized value.</returns>
         </member>
         <member name="T:Waher.Networking.Cluster.Serialization.Properties.BooleanProperty">
             <summary>
@@ -241,6 +517,14 @@
             <param name="Output">Output</param>
             <param name="Value">Value to serialize</param>
         </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Properties.BooleanProperty.Deserialize(Waher.Networking.Cluster.Serialization.Deserializer,System.Type)">
+            <summary>
+            Deserializes the property value
+            </summary>
+            <param name="Input">Binary representation.</param>
+            <param name="ExpectedType">Expected Type</param>
+            <returns>Deserialized value.</returns>
+        </member>
         <member name="T:Waher.Networking.Cluster.Serialization.Properties.CharacterProperty">
             <summary>
             Character property
@@ -257,6 +541,14 @@
             </summary>
             <param name="Output">Output</param>
             <param name="Value">Value to serialize</param>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Properties.CharacterProperty.Deserialize(Waher.Networking.Cluster.Serialization.Deserializer,System.Type)">
+            <summary>
+            Deserializes the property value
+            </summary>
+            <param name="Input">Binary representation.</param>
+            <param name="ExpectedType">Expected Type</param>
+            <returns>Deserialized value.</returns>
         </member>
         <member name="T:Waher.Networking.Cluster.Serialization.Properties.DateTimeOffsetProperty">
             <summary>
@@ -275,6 +567,14 @@
             <param name="Output">Output</param>
             <param name="Value">Value to serialize</param>
         </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Properties.DateTimeOffsetProperty.Deserialize(Waher.Networking.Cluster.Serialization.Deserializer,System.Type)">
+            <summary>
+            Deserializes the property value
+            </summary>
+            <param name="Input">Binary representation.</param>
+            <param name="ExpectedType">Expected Type</param>
+            <returns>Deserialized value.</returns>
+        </member>
         <member name="T:Waher.Networking.Cluster.Serialization.Properties.DateTimeProperty">
             <summary>
             DateTime property
@@ -291,6 +591,14 @@
             </summary>
             <param name="Output">Output</param>
             <param name="Value">Value to serialize</param>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Properties.DateTimeProperty.Deserialize(Waher.Networking.Cluster.Serialization.Deserializer,System.Type)">
+            <summary>
+            Deserializes the property value
+            </summary>
+            <param name="Input">Binary representation.</param>
+            <param name="ExpectedType">Expected Type</param>
+            <returns>Deserialized value.</returns>
         </member>
         <member name="T:Waher.Networking.Cluster.Serialization.Properties.DecimalProperty">
             <summary>
@@ -309,6 +617,14 @@
             <param name="Output">Output</param>
             <param name="Value">Value to serialize</param>
         </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Properties.DecimalProperty.Deserialize(Waher.Networking.Cluster.Serialization.Deserializer,System.Type)">
+            <summary>
+            Deserializes the property value
+            </summary>
+            <param name="Input">Binary representation.</param>
+            <param name="ExpectedType">Expected Type</param>
+            <returns>Deserialized value.</returns>
+        </member>
         <member name="T:Waher.Networking.Cluster.Serialization.Properties.DoubleProperty">
             <summary>
             Double precision floating-point property
@@ -325,6 +641,14 @@
             </summary>
             <param name="Output">Output</param>
             <param name="Object">Object containing property</param>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Properties.DoubleProperty.Deserialize(Waher.Networking.Cluster.Serialization.Deserializer,System.Type)">
+            <summary>
+            Deserializes the property value
+            </summary>
+            <param name="Input">Binary representation.</param>
+            <param name="ExpectedType">Expected Type</param>
+            <returns>Deserialized value.</returns>
         </member>
         <member name="T:Waher.Networking.Cluster.Serialization.Properties.EnumProperty">
             <summary>
@@ -348,6 +672,14 @@
             <param name="Output">Output</param>
             <param name="Value">Value to serialize</param>
         </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Properties.EnumProperty.Deserialize(Waher.Networking.Cluster.Serialization.Deserializer,System.Type)">
+            <summary>
+            Deserializes the property value
+            </summary>
+            <param name="Input">Binary representation.</param>
+            <param name="ExpectedType">Expected Type</param>
+            <returns>Deserialized value.</returns>
+        </member>
         <member name="T:Waher.Networking.Cluster.Serialization.Properties.GuidProperty">
             <summary>
             Guid property
@@ -364,6 +696,14 @@
             </summary>
             <param name="Output">Output</param>
             <param name="Value">Value to serialize</param>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Properties.GuidProperty.Deserialize(Waher.Networking.Cluster.Serialization.Deserializer,System.Type)">
+            <summary>
+            Deserializes the property value
+            </summary>
+            <param name="Input">Binary representation.</param>
+            <param name="ExpectedType">Expected Type</param>
+            <returns>Deserialized value.</returns>
         </member>
         <member name="T:Waher.Networking.Cluster.Serialization.Properties.Int16Property">
             <summary>
@@ -382,6 +722,14 @@
             <param name="Output">Output</param>
             <param name="Value">Value to serialize</param>
         </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Properties.Int16Property.Deserialize(Waher.Networking.Cluster.Serialization.Deserializer,System.Type)">
+            <summary>
+            Deserializes the property value
+            </summary>
+            <param name="Input">Binary representation.</param>
+            <param name="ExpectedType">Expected Type</param>
+            <returns>Deserialized value.</returns>
+        </member>
         <member name="T:Waher.Networking.Cluster.Serialization.Properties.Int32Property">
             <summary>
             Int32 property
@@ -398,6 +746,14 @@
             </summary>
             <param name="Output">Output</param>
             <param name="Value">Value to serialize</param>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Properties.Int32Property.Deserialize(Waher.Networking.Cluster.Serialization.Deserializer,System.Type)">
+            <summary>
+            Deserializes the property value
+            </summary>
+            <param name="Input">Binary representation.</param>
+            <param name="ExpectedType">Expected Type</param>
+            <returns>Deserialized value.</returns>
         </member>
         <member name="T:Waher.Networking.Cluster.Serialization.Properties.Int64Property">
             <summary>
@@ -416,6 +772,14 @@
             <param name="Output">Output</param>
             <param name="Value">Value to serialize</param>
         </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Properties.Int64Property.Deserialize(Waher.Networking.Cluster.Serialization.Deserializer,System.Type)">
+            <summary>
+            Deserializes the property value
+            </summary>
+            <param name="Input">Binary representation.</param>
+            <param name="ExpectedType">Expected Type</param>
+            <returns>Deserialized value.</returns>
+        </member>
         <member name="T:Waher.Networking.Cluster.Serialization.Properties.Int8Property">
             <summary>
             Int8 property
@@ -433,6 +797,14 @@
             <param name="Output">Output</param>
             <param name="Value">Value to serialize</param>
         </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Properties.Int8Property.Deserialize(Waher.Networking.Cluster.Serialization.Deserializer,System.Type)">
+            <summary>
+            Deserializes the property value
+            </summary>
+            <param name="Input">Binary representation.</param>
+            <param name="ExpectedType">Expected Type</param>
+            <returns>Deserialized value.</returns>
+        </member>
         <member name="T:Waher.Networking.Cluster.Serialization.Properties.IProperty">
             <summary>
             Abstract base class for properties
@@ -449,6 +821,14 @@
             </summary>
             <param name="Output">Output</param>
             <param name="Value">Value to serialize</param>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Properties.IProperty.Deserialize(Waher.Networking.Cluster.Serialization.Deserializer,System.Type)">
+            <summary>
+            Deserializes the property value
+            </summary>
+            <param name="Input">Binary representation.</param>
+            <param name="ExpectedType">Expected Type</param>
+            <returns>Deserialized value.</returns>
         </member>
         <member name="T:Waher.Networking.Cluster.Serialization.Properties.NullableProperty">
             <summary>
@@ -472,6 +852,14 @@
             <param name="Output">Output</param>
             <param name="Value">Value to serialize</param>
         </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Properties.NullableProperty.Deserialize(Waher.Networking.Cluster.Serialization.Deserializer,System.Type)">
+            <summary>
+            Deserializes the property value
+            </summary>
+            <param name="Input">Binary representation.</param>
+            <param name="ExpectedType">Expected Type</param>
+            <returns>Deserialized value.</returns>
+        </member>
         <member name="T:Waher.Networking.Cluster.Serialization.Properties.ObjectProperty">
             <summary>
             Object property
@@ -494,6 +882,14 @@
             <param name="Output">Output</param>
             <param name="Value">Value to serialize</param>
         </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Properties.ObjectProperty.Deserialize(Waher.Networking.Cluster.Serialization.Deserializer,System.Type)">
+            <summary>
+            Deserializes the property value
+            </summary>
+            <param name="Input">Binary representation.</param>
+            <param name="ExpectedType">Expected Type</param>
+            <returns>Deserialized value.</returns>
+        </member>
         <member name="T:Waher.Networking.Cluster.Serialization.Properties.Property">
             <summary>
             Abstract base class for properties
@@ -510,6 +906,14 @@
             </summary>
             <param name="Output">Output</param>
             <param name="Value">Value to serialize</param>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Properties.Property.Deserialize(Waher.Networking.Cluster.Serialization.Deserializer,System.Type)">
+            <summary>
+            Deserializes the property value
+            </summary>
+            <param name="Input">Binary representation.</param>
+            <param name="ExpectedType">Expected Type</param>
+            <returns>Deserialized value.</returns>
         </member>
         <member name="T:Waher.Networking.Cluster.Serialization.Properties.SingleProperty">
             <summary>
@@ -528,6 +932,14 @@
             <param name="Output">Output</param>
             <param name="Value">Value to serialize</param>
         </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Properties.SingleProperty.Deserialize(Waher.Networking.Cluster.Serialization.Deserializer,System.Type)">
+            <summary>
+            Deserializes the property value
+            </summary>
+            <param name="Input">Binary representation.</param>
+            <param name="ExpectedType">Expected Type</param>
+            <returns>Deserialized value.</returns>
+        </member>
         <member name="T:Waher.Networking.Cluster.Serialization.Properties.StringProperty">
             <summary>
             String property
@@ -544,6 +956,14 @@
             </summary>
             <param name="Output">Output</param>
             <param name="Value">Value to serialize</param>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Properties.StringProperty.Deserialize(Waher.Networking.Cluster.Serialization.Deserializer,System.Type)">
+            <summary>
+            Deserializes the property value
+            </summary>
+            <param name="Input">Binary representation.</param>
+            <param name="ExpectedType">Expected Type</param>
+            <returns>Deserialized value.</returns>
         </member>
         <member name="T:Waher.Networking.Cluster.Serialization.Properties.TimeSpanProperty">
             <summary>
@@ -562,6 +982,14 @@
             <param name="Output">Output</param>
             <param name="Value">Value to serialize</param>
         </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Properties.TimeSpanProperty.Deserialize(Waher.Networking.Cluster.Serialization.Deserializer,System.Type)">
+            <summary>
+            Deserializes the property value
+            </summary>
+            <param name="Input">Binary representation.</param>
+            <param name="ExpectedType">Expected Type</param>
+            <returns>Deserialized value.</returns>
+        </member>
         <member name="T:Waher.Networking.Cluster.Serialization.Properties.UInt16Property">
             <summary>
             UInt16 property
@@ -578,6 +1006,14 @@
             </summary>
             <param name="Output">Output</param>
             <param name="Value">Value to serialize</param>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Properties.UInt16Property.Deserialize(Waher.Networking.Cluster.Serialization.Deserializer,System.Type)">
+            <summary>
+            Deserializes the property value
+            </summary>
+            <param name="Input">Binary representation.</param>
+            <param name="ExpectedType">Expected Type</param>
+            <returns>Deserialized value.</returns>
         </member>
         <member name="T:Waher.Networking.Cluster.Serialization.Properties.UInt32Property">
             <summary>
@@ -596,6 +1032,14 @@
             <param name="Output">Output</param>
             <param name="Value">Value to serialize</param>
         </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Properties.UInt32Property.Deserialize(Waher.Networking.Cluster.Serialization.Deserializer,System.Type)">
+            <summary>
+            Deserializes the property value
+            </summary>
+            <param name="Input">Binary representation.</param>
+            <param name="ExpectedType">Expected Type</param>
+            <returns>Deserialized value.</returns>
+        </member>
         <member name="T:Waher.Networking.Cluster.Serialization.Properties.UInt64Property">
             <summary>
             UInt64 property
@@ -613,6 +1057,14 @@
             <param name="Output">Output</param>
             <param name="Value">Value to serialize</param>
         </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Properties.UInt64Property.Deserialize(Waher.Networking.Cluster.Serialization.Deserializer,System.Type)">
+            <summary>
+            Deserializes the property value
+            </summary>
+            <param name="Input">Binary representation.</param>
+            <param name="ExpectedType">Expected Type</param>
+            <returns>Deserialized value.</returns>
+        </member>
         <member name="T:Waher.Networking.Cluster.Serialization.Properties.UInt8Property">
             <summary>
             UInt8 property
@@ -629,6 +1081,14 @@
             </summary>
             <param name="Output">Output</param>
             <param name="Value">Value to serialize</param>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Properties.UInt8Property.Deserialize(Waher.Networking.Cluster.Serialization.Deserializer,System.Type)">
+            <summary>
+            Deserializes the property value
+            </summary>
+            <param name="Input">Binary representation.</param>
+            <param name="ExpectedType">Expected Type</param>
+            <returns>Deserialized value.</returns>
         </member>
         <member name="T:Waher.Networking.Cluster.Serialization.Serializer">
             <summary>
@@ -668,6 +1128,26 @@
             Writes a variable-length unsigned integer to the output.
             </summary>
             <param name="Value">Value</param>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Serializer.WriteBinary(System.Byte[])">
+            <summary>
+            Writes binary data to the output.
+            </summary>
+            <param name="Value">Value</param>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Serializer.WriteRaw(System.Byte[])">
+            <summary>
+            Writes raw binary data to the output.
+            </summary>
+            <param name="Binary">Binary data</param>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Serialization.Serializer.WriteRaw(System.Byte[],System.Int32,System.Int32)">
+            <summary>
+            Writes raw binary data to the output.
+            </summary>
+            <param name="Binary">Binary data</param>
+            <param name="Offset">Offset into <paramref name="Binary"/>.</param>
+            <param name="Count">Number of bytes to write.</param>
         </member>
         <member name="M:Waher.Networking.Cluster.Serialization.Serializer.WriteString(System.String)">
             <summary>

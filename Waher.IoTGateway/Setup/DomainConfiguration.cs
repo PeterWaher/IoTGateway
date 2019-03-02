@@ -365,7 +365,7 @@ namespace Waher.IoTGateway.Setup
 					HttpResponseMessage Response = await HttpClient.GetAsync("http://" + DomainName + "/Settings/TestDomainName");
 					if (!Response.IsSuccessStatusCode)
 					{
-						ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Domain name does not point to this machine.", false, "User");
+						ClientEvents.PushEvent(new string[] { TabID }, "CertificateError", "Domain name does not point to this machine.", false, "User");
 						return false;
 					}
 
@@ -374,18 +374,18 @@ namespace Waher.IoTGateway.Setup
 
 					if (Token != this.token)
 					{
-						ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Unexpected response returned. Domain name does not point to this machine.", false, "User");
+						ClientEvents.PushEvent(new string[] { TabID }, "CertificateError", "Unexpected response returned. Domain name does not point to this machine.", false, "User");
 						return false;
 					}
 				}
 				catch (TimeoutException)
 				{
-					ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Time-out. Check that the domain name points to this machine.", false, "User");
+					ClientEvents.PushEvent(new string[] { TabID }, "CertificateError", "Time-out. Check that the domain name points to this machine.", false, "User");
 					return false;
 				}
 				catch (Exception ex)
 				{
-					ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Unable to validate domain name: " + ex.Message, false, "User");
+					ClientEvents.PushEvent(new string[] { TabID }, "CertificateError", "Unable to validate domain name: " + ex.Message, false, "User");
 					return false;
 				}
 			}
@@ -876,7 +876,7 @@ namespace Waher.IoTGateway.Setup
 									if (this.pfx is null)
 									{
 										this.openSslPath = string.Empty;
-										ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Unable to convert to PFX using OpenSSL.", false, "User");
+										ClientEvents.PushEvent(new string[] { TabID }, "CertificateError", "Unable to convert to PFX using OpenSSL.", false, "User");
 										return false;
 									}
 								}

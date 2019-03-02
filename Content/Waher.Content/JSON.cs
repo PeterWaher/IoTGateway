@@ -87,7 +87,10 @@ namespace Waher.Content
 								throw new Exception("Unexpected end of JSON.");
 
 							if (ch == ']')
+							{
+								Pos++;
 								return new object[0];
+							}
 
 							List<object> Array = new List<object>();
 

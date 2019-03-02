@@ -164,5 +164,11 @@ namespace Waher.Content.Test
 			object Obj = JSON.Parse(Json);
 		}
 
+		[TestMethod]
+		public void Test_22_Misc2()
+		{
+			string Json = "{\"id\": 8413652,\"key\": {\"kty\": \"RSA\",\"n\": \"sjmhiy0aCAeF7t_6NGYdCZPU0oo6Xf-xCXETkSz2Gx4nZ1K47gwVSrZFdMwOvBoig2IXuI2hxTV57T8W4NWqo9bOPUvr31mm-USN-KT3_CV37PAzog_flUAfTa0C8DSLNaO21dcDFGoQF7taOPtAV9auXDp4_7xOJry9uOr8s_7qM09cxFdEAVl7i3rNB0KOhpLgBlZrhDCVEap-2Oz80medXisIqpqCQxfNJut6qNDHJbqytZ0-y42T2ioc4YrwFCq0WA2C9RTzfXXxUy5-gKO0YK5AIYeK_mbvm7qeY2wHDust55jQPHQpeOkyihVq3SuMJkt3R0i8gFWSaj8F_nmYKv6wOqam52OyKOywElHHZEVG_s8kX6AOJAiVwkv0NaYQBJ6DTqXX2ye-RqKpKFSXa07pUQI2Pu1S5GKVoEmhcyG9RxOtaPB8sPuJiQZKZhuQ2a-1sM_GMeXTTkAX-AtPoiLSZ4cy-JAteVHKuSV3UUsrUsryQ133l7rETATYqnBPUk-ZkSR49ym38IbieShFUxajQaV4SyMruHKAyQ43KUQnt3p4wwD0LuE--502sB0DcRvrFMfefhu8jfrN9JWnSJfB-SDpqsZkv_p3rbDhCzh51RKP9kQcEVd00fZn0ce2IpMkEAlBI0hjbD3eNcGSfvEBEKIHy5CJWATl6lE\",\"e\": \"AQAB\"},\"contact\": [],\"agreement\": \"https://letsencrypt.org/documents/LE-SA-v1.2-November-15-2017.pdf\",\"initialIp\": \"81.229.128.148\",\"createdAt\": \"2019-03-02T17:40:07Z\",\"status\": \"valid\"}";
+			object Obj = JSON.Parse(Json);
+		}
 	}
 }

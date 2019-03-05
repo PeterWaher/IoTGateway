@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Waher.Events;
+using Waher.Networking.Cluster.Commands;
 using Waher.Networking.Cluster.Messages;
 using Waher.Networking.Cluster.Serialization;
 using Waher.Networking.Cluster.Serialization.Properties;
@@ -1004,8 +1005,6 @@ namespace Waher.Networking.Cluster
 		/// <summary>
 		/// Sends an acknowledged ping message to the other servers in the cluster.
 		/// </summary>
-		/// <param name="Callback">Method to call when responses have been returned.</param>
-		/// <param name="State">State object to pass on to callback method.</param>
 		public Task<EndpointAcknowledgement[]> PingAsync()
 		{
 			TaskCompletionSource<EndpointAcknowledgement[]> Result = new TaskCompletionSource<EndpointAcknowledgement[]>();
@@ -1133,6 +1132,36 @@ namespace Waher.Networking.Cluster
 				new TaskCompletionSource<EndpointResponse<ResponseType>[]>();
 
 			this.ExecuteCommand<ResponseType>(Command, (sender, e) =>
+			{
+				Result.TrySetResult(e.Responses);
+			}, null);
+
+			return Result.Task;
+		}
+
+		/// <summary>
+		/// Asks endpoints in the cluster to echo a text string back to the sender.
+		/// </summary>
+		/// <param name="Text">Text to echo.</param>
+		/// <param name="Callback">Method to call when responses have been returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void Echo(string Text, ClusterResponseEventHandler<string> Callback, object State)
+		{
+			this.ExecuteCommand<string>(new Echo()
+			{
+				Text = Text
+			}, Callback, State);
+		}
+
+		/// <summary>
+		/// Asks endpoints in the cluster to echo a text string back to the sender.
+		/// </summary>
+		/// <param name="Text">Text to echo.</param>
+		public Task<EndpointResponse<string>[]> EchoAsync(string Text)
+		{
+			TaskCompletionSource<EndpointResponse<string>[]> Result = new TaskCompletionSource<EndpointResponse<string>[]>();
+
+			this.Echo(Text, (sender, e) =>
 			{
 				Result.TrySetResult(e.Responses);
 			}, null);

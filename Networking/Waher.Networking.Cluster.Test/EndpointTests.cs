@@ -310,5 +310,15 @@ namespace Waher.Networking.Cluster.Test
 			this.TestAssuredMessage(new string('x', 1000000));
 		}
 
+		[TestMethod]
+		public async Task Test_14_Echo()
+		{
+			EndpointResponse<string>[] Response = await this.endpoint2.EchoAsync("Hello World!");
+
+			Assert.AreEqual(1, Response.Length);
+			Assert.AreEqual(true, Response[0].Ok);
+			Assert.AreEqual("Hello World!", Response[0].Response);
+		}
+
 	}
 }

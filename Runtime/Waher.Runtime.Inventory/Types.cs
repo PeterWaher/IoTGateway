@@ -45,9 +45,18 @@ namespace Waher.Runtime.Inventory
 
 				if (types.TryGetValue(FullName, out Type Result))
 					return Result;
-				else
-					return null;
 			}
+
+			if (FullName.EndsWith("[]"))
+			{
+				Type ElementType = GetType(FullName.Substring(0, FullName.Length - 2));
+				if (ElementType is null)
+					return null;
+
+				return ElementType.MakeArrayType();
+			}
+
+			return null;
 		}
 
 		private static Exception NotInitializedException()

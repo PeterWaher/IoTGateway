@@ -320,5 +320,14 @@ namespace Waher.Networking.Cluster.Test
 			Assert.AreEqual("Hello World!", Response[0].Response);
 		}
 
+		[TestMethod]
+		public async Task Test_15_Assemblies()
+		{
+			EndpointResponse<string[]>[] Response = await this.endpoint2.GetAssembliesAsync();
+
+			Assert.AreEqual(1, Response.Length);
+			Assert.AreEqual(true, Response[0].Ok);
+		}
+
 	}
 }

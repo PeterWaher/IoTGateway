@@ -1160,8 +1160,33 @@ namespace Waher.Networking.Cluster
 		public Task<EndpointResponse<string>[]> EchoAsync(string Text)
 		{
 			TaskCompletionSource<EndpointResponse<string>[]> Result = new TaskCompletionSource<EndpointResponse<string>[]>();
-
+			
 			this.Echo(Text, (sender, e) =>
+			{
+				Result.TrySetResult(e.Responses);
+			}, null);
+
+			return Result.Task;
+		}
+
+		/// <summary>
+		/// Asks endpoints in the cluster to return assemblies available in their runtime environment.
+		/// </summary>
+		/// <param name="Callback">Method to call when responses have been returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void GetAssemblies(ClusterResponseEventHandler<string[]> Callback, object State)
+		{
+			this.ExecuteCommand<string[]>(new Assemblies(), Callback, State);
+		}
+
+		/// <summary>
+		/// Asks endpoints in the cluster to return assemblies available in their runtime environment.
+		/// </summary>
+		public Task<EndpointResponse<string[]>[]> GetAssembliesAsync()
+		{
+			TaskCompletionSource<EndpointResponse<string[]>[]> Result = new TaskCompletionSource<EndpointResponse<string[]>[]>();
+
+			this.GetAssemblies((sender, e) =>
 			{
 				Result.TrySetResult(e.Responses);
 			}, null);

@@ -459,14 +459,25 @@ namespace Waher.Networking.Cluster
 							if (Skip)
 								break;
 
-							if (!this.currentStatus.TryGetValue(s, out object Obj) || 
+							if (!this.currentStatus.TryGetValue(s, out object Obj) ||
 								!(Obj is bool Ack))
 							{
 								Object = rootObject.Deserialize(Input, typeof(object));
 								if (!((Message = Object as IClusterMessage) is null))
 								{
-									Ack = await Message.MessageReceived(this, From);
-									this.OnMessageReceived?.Invoke(this, new ClusterMessageEventArgs(Message));
+									try
+									{
+										Ack = await Message.MessageReceived(this, From);
+										this.OnMessageReceived?.Invoke(this, new ClusterMessageEventArgs(Message));
+									}
+									catch (Exception ex)
+									{
+										this.Error(ex.Message);
+										Log.Critical(ex);
+										Ack = false;
+									}
+
+									this.currentStatus[s] = Ack;
 								}
 								else
 								{
@@ -507,6 +518,137 @@ namespace Waher.Networking.Cluster
 									MessageStatus.Callback?.Invoke(this, new ClusterMessageAckEventArgs(
 										MessageStatus.Message, MessageStatus.GetResponses(CurrentStatus),
 										MessageStatus.State));
+								}
+							}
+							break;
+
+						case 4: // Command
+							Id = Input.ReadGuid();
+							s = Id.ToString();
+							Len = Input.ReadVarUInt64();
+							Skip = false;
+
+							while (Len > 0)
+							{
+								string Address = new IPAddress(Input.ReadBinary()).ToString();
+								int Port = Input.ReadUInt16();
+
+								foreach (ClusterUdpClient Client in this.clients)
+								{
+									if (Client.IsEndpoint(Address, Port))
+									{
+										Skip = true;
+										break;
+									}
+								}
+
+								if (Skip)
+									break;
+
+								Len--;
+							}
+
+							if (Skip)
+								break;
+
+							if (!this.currentStatus.TryGetValue(s, out Obj))
+							{
+								Object = rootObject.Deserialize(Input, typeof(object));
+								if (Object is IClusterCommand ClusterCommand)
+								{
+									try
+									{
+										Obj = await ClusterCommand.Execute(this, From);
+										this.currentStatus[s] = Obj;
+									}
+									catch (Exception ex)
+									{
+										Obj = ex;
+									}
+								}
+								else
+									Obj = new Exception("Non-command object received in command: " + Object?.GetType()?.FullName);
+							}
+
+							using (Serializer Output = new Serializer())
+							{
+								if (Obj is Exception ex)
+								{
+									ex = Log.UnnestException(ex);
+
+									Output.WriteByte(6);
+									Output.WriteGuid(Id);
+									Output.WriteString(ex.Message);
+									Output.WriteString(ex.GetType().FullName);
+								}
+								else
+								{
+									Output.WriteByte(5);
+									Output.WriteGuid(Id);
+									rootObject.Serialize(Output, Obj);
+								}
+
+								this.Transmit(Output.ToArray(), From);
+							}
+							break;
+
+						case 5: // Command Response
+							Id = Input.ReadGuid();
+							s = Id.ToString();
+
+							if (this.currentStatus.TryGetValue(s, out Obj) &&
+								Obj is CommandStatusBase CommandStatus)
+							{
+								Object = rootObject.Deserialize(Input, typeof(object));
+
+								CommandStatus.AddResponse(From, Object);
+
+								EndpointStatus[] CurrentStatus = this.GetRemoteStatuses();
+
+								if (CommandStatus.IsComplete(CurrentStatus))
+								{
+									this.currentStatus.Remove(s);
+									this.scheduler.Remove(CommandStatus.Timeout);
+
+									CommandStatus.RaiseResponseEvent(CurrentStatus);
+								}
+							}
+							break;
+
+						case 6: // Command Exception
+							Id = Input.ReadGuid();
+							s = Id.ToString();
+
+							if (this.currentStatus.TryGetValue(s, out Obj) &&
+								Obj is CommandStatusBase CommandStatus2)
+							{
+								string ExceptionMessage = Input.ReadString();
+								string ExceptionType = Input.ReadString();
+								Exception ex;
+
+								try
+								{
+									Type T = Types.GetType(ExceptionType);
+									if (T is null)
+										ex = new Exception(ExceptionMessage);
+									else
+										ex = (Exception)Activator.CreateInstance(T, ExceptionMessage);
+								}
+								catch (Exception)
+								{
+									ex = new Exception(ExceptionMessage);
+								}
+
+								CommandStatus2.AddError(From, ex);
+
+								EndpointStatus[] CurrentStatus = this.GetRemoteStatuses();
+
+								if (CommandStatus2.IsComplete(CurrentStatus))
+								{
+									this.currentStatus.Remove(s);
+									this.scheduler.Remove(CommandStatus2.Timeout);
+
+									CommandStatus2.RaiseResponseEvent(CurrentStatus);
 								}
 							}
 							break;
@@ -576,9 +718,9 @@ namespace Waher.Networking.Cluster
 
 			try
 			{
-				Output.WriteByte(1);		// Acknowledged message.
+				Output.WriteByte(1);        // Acknowledged message.
 				Output.WriteGuid(Id);
-				Output.WriteVarUInt64(0);	// Endpoints to skip
+				Output.WriteVarUInt64(0);   // Endpoints to skip
 				rootObject.Serialize(Output, Message);
 
 				byte[] Bin = Output.ToArray();
@@ -796,6 +938,128 @@ namespace Waher.Networking.Cluster
 			TaskCompletionSource<EndpointAcknowledgement[]> Result = new TaskCompletionSource<EndpointAcknowledgement[]>();
 
 			this.Ping((sender, e) =>
+			{
+				Result.TrySetResult(e.Responses);
+			}, null);
+
+			return Result.Task;
+		}
+
+		/// <summary>
+		/// Execute a command on the other members of the cluster, and waits for 
+		/// responses to be returned. Retries are performed in cases responses are 
+		/// not received.
+		/// </summary>
+		/// <typeparam name="ResponseType">Type of response expected.</typeparam>
+		/// <param name="Command">Command to send.</param>
+		/// <param name="Callback">Method to call when responses have been returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void ExecuteCommand<ResponseType>(IClusterCommand Command,
+			ClusterResponseEventHandler<ResponseType> Callback, object State)
+		{
+			Serializer Output = new Serializer();
+			Guid Id = Guid.NewGuid();
+			string s = Id.ToString();
+			CommandStatus<ResponseType> Rec = null;
+
+			try
+			{
+				Output.WriteByte(4);        // Command.
+				Output.WriteGuid(Id);
+				Output.WriteVarUInt64(0);   // Endpoints to skip
+				rootObject.Serialize(Output, Command);
+
+				byte[] Bin = Output.ToArray();
+
+				Rec = new CommandStatus<ResponseType>()
+				{
+					Id = Id,
+					Command = Command,
+					CommandBinary = Bin,
+					Callback = Callback,
+					State = State
+				};
+
+				this.currentStatus[s] = Rec;
+
+				Rec.Timeout = this.scheduler.Add(DateTime.Now.AddSeconds(2), this.ResendCommand<ResponseType>, Rec);
+
+				this.Transmit(Bin, this.destination);
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+
+				if (this.shuttingDown)
+					this.Dispose2();
+			}
+			finally
+			{
+				Output.Dispose();
+			}
+		}
+
+		private void ResendCommand<ResponseType>(Object P)
+		{
+			CommandStatus<ResponseType> Rec = (CommandStatus<ResponseType>)P;
+
+			try
+			{
+				EndpointStatus[] CurrentStatus = this.GetRemoteStatuses();
+
+				if (Rec.IsComplete(CurrentStatus))
+				{
+					this.currentStatus.Remove(Rec.Id.ToString());
+					this.scheduler.Remove(Rec.Timeout);
+
+					Rec.Callback?.Invoke(this, new ClusterResponseEventArgs<ResponseType>(
+						Rec.Command, Rec.GetResponses(CurrentStatus), Rec.State));
+				}
+				else
+				{
+					using (Serializer Output = new Serializer())
+					{
+						Output.WriteByte(4);        // Command.
+						Output.WriteGuid(Rec.Id);
+
+						lock (Rec.Responses)
+						{
+							Output.WriteVarUInt64((uint)Rec.Responses.Count);   // Endpoints to skip
+
+							foreach (IPEndPoint Endpoint in Rec.Responses.Keys)
+							{
+								Output.WriteBinary(Endpoint.Address.GetAddressBytes());
+								Output.WriteUInt16((ushort)Endpoint.Port);
+							}
+						}
+
+						Output.WriteRaw(Rec.CommandBinary, 18, Rec.CommandBinary.Length - 18);
+
+						Rec.Timeout = this.scheduler.Add(DateTime.Now.AddSeconds(2), this.ResendCommand<ResponseType>, Rec);
+						this.Transmit(Output.ToArray(), this.destination);
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+			}
+		}
+
+		/// <summary>
+		/// Execute a command on the other members of the cluster, and waits for 
+		/// responses to be returned. Retries are performed in cases responses are 
+		/// not received.
+		/// </summary>
+		/// <typeparam name="ResponseType">Type of response expected.</typeparam>
+		/// <param name="Command">Command to send.</param>
+		/// <returns>Responses returned from available endpoints.</returns>
+		public Task<EndpointResponse<ResponseType>[]> ExecuteCommandAsync<ResponseType>(IClusterCommand Command)
+		{
+			TaskCompletionSource<EndpointResponse<ResponseType>[]> Result =
+				new TaskCompletionSource<EndpointResponse<ResponseType>[]>();
+
+			this.ExecuteCommand<ResponseType>(Command, (sender, e) =>
 			{
 				Result.TrySetResult(e.Responses);
 			}, null);

@@ -13,7 +13,7 @@ namespace Waher.Networking.Cluster.Test
 	[TestClass]
 	public class EndpointTests
 	{
-		internal static readonly IPAddress clusterAddress = IPAddress.Parse("224.0.0.0");
+		internal static readonly IPAddress clusterAddress = IPAddress.Parse("239.255.0.0");
 		private ClusterEndpoint endpoint1 = null;
 		private ClusterEndpoint endpoint2 = null;
 
@@ -164,8 +164,8 @@ namespace Waher.Networking.Cluster.Test
 					Error2.Set();
 			}, 1);
 
-			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done1, Error1 }, 5000));
-			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done2, Error2 }, 5000));
+			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done1, Error1 }, 20000));
+			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done2, Error2 }, 20000));
 		}
 
 		[TestMethod]
@@ -188,6 +188,63 @@ namespace Waher.Networking.Cluster.Test
 			Assert.AreEqual(1, Response.Length);
 			Assert.AreEqual(true, Response[0].ACK.HasValue);
 			Assert.AreEqual(true, Response[0].ACK.Value);
+		}
+
+		[TestMethod]
+		public void Test_09_RequestResponse()
+		{
+			ManualResetEvent Done = new ManualResetEvent(false);
+			ManualResetEvent Error = new ManualResetEvent(false);
+			Add Add = new Add()
+			{
+				A = 3,
+				B = 4
+			};
+
+			this.endpoint2.ExecuteCommand<int>(Add, (sender, e) =>
+			{
+				if (e.Ok &&
+					e.Responses.Length == 1 &&
+					e.Responses[0].Ok &&
+					e.Responses[0].Response == 7 &&
+					e.State.Equals(9))
+				{
+					Done.Set();
+				}
+				else
+					Error.Set();
+			}, 9);
+
+			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 5000));
+		}
+
+		[TestMethod]
+		public void Test_10_RequestResponse_Error()
+		{
+			ManualResetEvent Done = new ManualResetEvent(false);
+			ManualResetEvent Error = new ManualResetEvent(false);
+			Error ErrorCommand = new Error()
+			{
+				A = 3,
+				B = 4
+			};
+
+			this.endpoint2.ExecuteCommand<int>(ErrorCommand, (sender, e) =>
+			{
+				if (!e.Ok &&
+					e.Responses.Length == 1 &&
+					!e.Responses[0].Ok &&
+					e.Responses[0].Error is ArgumentException ex &&
+					ex.Message == "7" &&
+					e.State.Equals(10))
+				{
+					Done.Set();
+				}
+				else
+					Error.Set();
+			}, 10);
+
+			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 5000));
 		}
 
 	}

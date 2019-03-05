@@ -5,7 +5,7 @@ using System.Net;
 namespace Waher.Networking.Cluster
 {
 	/// <summary>
-	/// Keeps track of outgoing messages.
+	/// Keeps track of an outgoing message.
 	/// </summary>
 	internal class MessageStatus
 	{

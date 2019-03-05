@@ -776,5 +776,32 @@ namespace Waher.Networking.Cluster
 			}
 		}
 
+		/// <summary>
+		/// Sends an acknowledged ping message to the other servers in the cluster.
+		/// </summary>
+		/// <param name="Callback">Method to call when responses have been returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void Ping(ClusterMessageAckEventHandler Callback, object State)
+		{
+			this.SendMessageAcknowledged(new Ping(), Callback, State);
+		}
+
+		/// <summary>
+		/// Sends an acknowledged ping message to the other servers in the cluster.
+		/// </summary>
+		/// <param name="Callback">Method to call when responses have been returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public Task<EndpointAcknowledgement[]> PingAsync()
+		{
+			TaskCompletionSource<EndpointAcknowledgement[]> Result = new TaskCompletionSource<EndpointAcknowledgement[]>();
+
+			this.Ping((sender, e) =>
+			{
+				Result.TrySetResult(e.Responses);
+			}, null);
+
+			return Result.Task;
+		}
+
 	}
 }

@@ -180,5 +180,15 @@ namespace Waher.Networking.Cluster.Test
 			this.TestAcknowledgedMessage(new string('x', 1000000));
 		}
 
+		[TestMethod]
+		public async Task Test_08_Ping()
+		{
+			EndpointAcknowledgement[] Response = await this.endpoint2.PingAsync();
+
+			Assert.AreEqual(1, Response.Length);
+			Assert.AreEqual(true, Response[0].ACK.HasValue);
+			Assert.AreEqual(true, Response[0].ACK.Value);
+		}
+
 	}
 }

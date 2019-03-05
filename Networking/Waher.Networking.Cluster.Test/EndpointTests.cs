@@ -247,5 +247,68 @@ namespace Waher.Networking.Cluster.Test
 			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 5000));
 		}
 
+		[TestMethod]
+		public void Test_11_Send_Assured_Message()
+		{
+			this.TestAssuredMessage("Hello World!");
+		}
+
+		private void TestAssuredMessage(string Text)
+		{
+			ManualResetEvent Done1 = new ManualResetEvent(false);
+			ManualResetEvent Error1 = new ManualResetEvent(false);
+			ManualResetEvent Done2 = new ManualResetEvent(false);
+			ManualResetEvent Error2 = new ManualResetEvent(false);
+
+			Message Msg = new Message()
+			{
+				Text = Text,
+				Timestamp = DateTime.Now
+			};
+
+			this.endpoint1.OnMessageReceived += (sender, e) =>
+			{
+				if (e.Message is Message Msg2)
+				{
+					if (Msg.Text == Msg2.Text &&
+						Msg.Timestamp == Msg2.Timestamp)
+					{
+						Done1.Set();
+					}
+					else
+						Error1.Set();
+				}
+			};
+
+			this.endpoint2.SendMessageAssured(Msg, (sender, e) =>
+			{
+				if (e.Message == Msg &&
+					e.Responses.Length == 1 &&
+					e.Responses[0].ACK.HasValue &&
+					e.Responses[0].ACK.Value &&
+					e.State.Equals(1))
+				{
+					Done2.Set();
+				}
+				else
+					Error2.Set();
+			}, 1);
+
+			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done1, Error1 }, 20000));
+			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done2, Error2 }, 20000));
+		}
+
+		[TestMethod]
+		public void Test_12_Fragmentation_Assured()
+		{
+			this.TestAssuredMessage(new string('x', 80000));
+		}
+
+		[TestMethod]
+		public void Test_13_LargeMessage_Assured()
+		{
+			this.TestAssuredMessage(new string('x', 1000000));
+		}
+
 	}
 }

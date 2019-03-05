@@ -7,14 +7,14 @@
     <Authors>Peter Waher</Authors>
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
-    <Description>Class library providing a framework for building applications that can cooperate and solve problems in clusters. Communication between endpoints in clusters is performed using AES-256 encrypted datagrams over a predefined UDP Multicast channel. Only participants with access to the shared key can participate in the cluster.</Description>
+    <Description>Class library providing a framework for building applications that can cooperate and solve problems in clusters. Communication between endpoints in clusters is performed using AES-256 encrypted datagrams over a predefined UDP Multicast channel. Only participants with access to the shared key can participate in the cluster. Supports Unacknowledged, Acknowledged and Assured Message transfers in clusters, as well as Request/Response command executions, Locking of singleton resources, serialization of objects, etc.</Description>
     <Copyright>Copyright © Waher Data AB 2019. All rights reserved.</Copyright>
     <PackageLicenseUrl>https://github.com/PeterWaher/IoTGateway#license</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Networking/Waher.Networking.Cluster</PackageProjectUrl>
     <PackageIconUrl>https://github.com/PeterWaher/IoTGateway/blob/master/Images/Icon.ico?raw=true</PackageIconUrl>
     <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
-    <PackageTags>networking communication cluster</PackageTags>
+    <PackageTags>networking communication cluster, messaging, commands, locking, resources</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
     <AssemblyVersion>1.0.0</AssemblyVersion>
     <FileVersion>1.0.0</FileVersion>

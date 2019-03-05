@@ -676,7 +676,7 @@ namespace Waher.Networking.Cluster
 		}
 
 		/// <summary>
-		/// Sends an unacknowledged message
+		/// Sends an unacknowledged message ("at most once")
 		/// </summary>
 		/// <param name="Message">Message object</param>
 		public void SendMessageUnacknowledged(IClusterMessage Message)
@@ -703,7 +703,7 @@ namespace Waher.Networking.Cluster
 		}
 
 		/// <summary>
-		/// Sends a message using acknowledged service.
+		/// Sends a message using acknowledged service. ("at least once")
 		/// </summary>
 		/// <param name="Message">Message to send using acknowledged service.</param>
 		/// <param name="Callback">Method to call when responses have been returned.</param>
@@ -816,6 +816,49 @@ namespace Waher.Networking.Cluster
 			return Result.Task;
 		}
 
+		/// <summary>
+		/// Sends a message using assured service. ("exactly once")
+		/// </summary>
+		/// <param name="Message">Message to send using acknowledged service.</param>
+		/// <param name="Callback">Method to call when responses have been returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void SendMessageAssured(IClusterMessage Message,
+			ClusterMessageAckEventHandler Callback, object State)
+		{
+			Guid MessageId = Guid.NewGuid();
+
+			this.SendMessageAcknowledged(new Transport()
+			{
+				MessageID = MessageId,
+				Message = Message
+			}, (sender, e) =>
+			{
+				this.SendMessageAcknowledged(new Deliver()
+				{
+					MessageID = MessageId
+				}, (sender2, e2) =>
+				{
+					Callback?.Invoke(this, new ClusterMessageAckEventArgs(Message, e2.Responses, State));
+				}, null);
+			}, null);
+		}
+
+		/// <summary>
+		/// Sends a message using assured service. ("exactly once")
+		/// </summary>
+		/// <param name="Message">Message to send using acknowledged service.</param>
+		public Task<EndpointAcknowledgement[]> SendMessageAssuredAsync(IClusterMessage Message)
+		{
+			TaskCompletionSource<EndpointAcknowledgement[]> Result = new TaskCompletionSource<EndpointAcknowledgement[]>();
+
+			this.SendMessageAssured(Message, (sender, e) =>
+			{
+				Result.TrySetResult(e.Responses);
+			}, null);
+
+			return Result.Task;
+		}
+
 		private void SendAlive(object State)
 		{
 			try
@@ -887,6 +930,36 @@ namespace Waher.Networking.Cluster
 			{
 				this.remoteStatus.Remove(RemoteEndpoint);
 			}
+		}
+
+		internal void AssuredTransport(Guid MessageId, IClusterMessage Message)
+		{
+			this.currentStatus[MessageId.ToString()] = Message;
+		}
+
+		internal async Task<bool> AssuredDelivery(Guid MessageId, ClusterEndpoint Endpoint, IPEndPoint RemoteEndpoint)
+		{
+			string s = MessageId.ToString();
+
+			if (this.currentStatus.TryGetValue(s, out object Obj))
+			{
+				if (Obj is bool b)
+					return b;
+				else if (Obj is IClusterMessage Message)
+				{
+					this.currentStatus[s] = false;
+					b = await Message.MessageReceived(Endpoint, RemoteEndpoint);
+					this.currentStatus[s] = b;
+
+					this.OnMessageReceived?.Invoke(this, new ClusterMessageEventArgs(Message));
+
+					return b;
+				}
+				else
+					return false;
+			}
+			else
+				return false;
 		}
 
 		private void CurrentStatus_Removed(object Sender, CacheItemEventArgs<string, object> e)

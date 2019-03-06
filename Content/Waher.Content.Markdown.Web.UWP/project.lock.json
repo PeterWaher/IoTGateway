@@ -29,6 +29,9 @@
           "lib/netcore50/Microsoft.CSharp.dll": {}
         }
       },
+      "Microsoft.DependencyValidation.Analyzers/0.10.0": {
+        "type": "package"
+      },
       "Microsoft.Net.Native.Compiler/1.7.3": {
         "type": "package",
         "dependencies": {
@@ -2543,6 +2546,7 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10586",
         "dependencies": {
+          "Microsoft.DependencyValidation.Analyzers": "0.10.0",
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.1.9",
           "Waher.Content": "1.0.0",
           "Waher.Events": "1.0.0",
@@ -2623,6 +2627,9 @@
         "runtime": {
           "lib/netcore50/Microsoft.CSharp.dll": {}
         }
+      },
+      "Microsoft.DependencyValidation.Analyzers/0.10.0": {
+        "type": "package"
       },
       "Microsoft.Net.Native.Compiler/1.7.3": {
         "type": "package",
@@ -5122,6 +5129,7 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10586",
         "dependencies": {
+          "Microsoft.DependencyValidation.Analyzers": "0.10.0",
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.1.9",
           "Waher.Content": "1.0.0",
           "Waher.Events": "1.0.0",
@@ -5202,6 +5210,9 @@
         "runtime": {
           "lib/netcore50/Microsoft.CSharp.dll": {}
         }
+      },
+      "Microsoft.DependencyValidation.Analyzers/0.10.0": {
+        "type": "package"
       },
       "Microsoft.Net.Native.Compiler/1.7.3": {
         "type": "package",
@@ -7737,6 +7748,7 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10586",
         "dependencies": {
+          "Microsoft.DependencyValidation.Analyzers": "0.10.0",
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.1.9",
           "Waher.Content": "1.0.0",
           "Waher.Events": "1.0.0",
@@ -7817,6 +7829,9 @@
         "runtime": {
           "lib/netcore50/Microsoft.CSharp.dll": {}
         }
+      },
+      "Microsoft.DependencyValidation.Analyzers/0.10.0": {
+        "type": "package"
       },
       "Microsoft.Net.Native.Compiler/1.7.3": {
         "type": "package",
@@ -10325,6 +10340,7 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10586",
         "dependencies": {
+          "Microsoft.DependencyValidation.Analyzers": "0.10.0",
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.1.9",
           "Waher.Content": "1.0.0",
           "Waher.Events": "1.0.0",
@@ -10405,6 +10421,9 @@
         "runtime": {
           "lib/netcore50/Microsoft.CSharp.dll": {}
         }
+      },
+      "Microsoft.DependencyValidation.Analyzers/0.10.0": {
+        "type": "package"
       },
       "Microsoft.Net.Native.Compiler/1.7.3": {
         "type": "package",
@@ -12949,6 +12968,7 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10586",
         "dependencies": {
+          "Microsoft.DependencyValidation.Analyzers": "0.10.0",
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.1.9",
           "Waher.Content": "1.0.0",
           "Waher.Events": "1.0.0",
@@ -13029,6 +13049,9 @@
         "runtime": {
           "lib/netcore50/Microsoft.CSharp.dll": {}
         }
+      },
+      "Microsoft.DependencyValidation.Analyzers/0.10.0": {
+        "type": "package"
       },
       "Microsoft.Net.Native.Compiler/1.7.3": {
         "type": "package",
@@ -15537,6 +15560,7 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10586",
         "dependencies": {
+          "Microsoft.DependencyValidation.Analyzers": "0.10.0",
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.1.9",
           "Waher.Content": "1.0.0",
           "Waher.Events": "1.0.0",
@@ -15617,6 +15641,9 @@
         "runtime": {
           "lib/netcore50/Microsoft.CSharp.dll": {}
         }
+      },
+      "Microsoft.DependencyValidation.Analyzers/0.10.0": {
+        "type": "package"
       },
       "Microsoft.Net.Native.Compiler/1.7.3": {
         "type": "package",
@@ -18161,6 +18188,7 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10586",
         "dependencies": {
+          "Microsoft.DependencyValidation.Analyzers": "0.10.0",
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.1.9",
           "Waher.Content": "1.0.0",
           "Waher.Events": "1.0.0",
@@ -18271,6 +18299,34 @@
         "ref/xamarinmac20/_._",
         "ref/xamarintvos10/_._",
         "ref/xamarinwatchos10/_._"
+      ]
+    },
+    "Microsoft.DependencyValidation.Analyzers/0.10.0": {
+      "sha512": "VXi/pc6FFBhDIhm+WylrAKxN4/CtYVo9fNnD1Hq+XwzqN6KF1gvC3G2bDqETbTLsML/u60c658+0veyQK5M1IQ==",
+      "type": "package",
+      "path": "microsoft.dependencyvalidation.analyzers/0.10.0",
+      "hasTools": true,
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "analyzers/dotnet/Microsoft.DependencyValidation.Analyzers.dll",
+        "analyzers/dotnet/cs/Microsoft.DependencyValidation.Analyzers.resources.dll",
+        "analyzers/dotnet/de/Microsoft.DependencyValidation.Analyzers.resources.dll",
+        "analyzers/dotnet/es/Microsoft.DependencyValidation.Analyzers.resources.dll",
+        "analyzers/dotnet/fr/Microsoft.DependencyValidation.Analyzers.resources.dll",
+        "analyzers/dotnet/it/Microsoft.DependencyValidation.Analyzers.resources.dll",
+        "analyzers/dotnet/ja/Microsoft.DependencyValidation.Analyzers.resources.dll",
+        "analyzers/dotnet/ko/Microsoft.DependencyValidation.Analyzers.resources.dll",
+        "analyzers/dotnet/pl/Microsoft.DependencyValidation.Analyzers.resources.dll",
+        "analyzers/dotnet/pt-BR/Microsoft.DependencyValidation.Analyzers.resources.dll",
+        "analyzers/dotnet/ru/Microsoft.DependencyValidation.Analyzers.resources.dll",
+        "analyzers/dotnet/tr/Microsoft.DependencyValidation.Analyzers.resources.dll",
+        "analyzers/dotnet/zh-HANS/Microsoft.DependencyValidation.Analyzers.resources.dll",
+        "analyzers/dotnet/zh-HANT/Microsoft.DependencyValidation.Analyzers.resources.dll",
+        "microsoft.dependencyvalidation.analyzers.0.10.0.nupkg.sha512",
+        "microsoft.dependencyvalidation.analyzers.nuspec",
+        "tools/install.ps1",
+        "tools/uninstall.ps1"
       ]
     },
     "Microsoft.Net.Native.Compiler/1.7.3": {
@@ -28111,6 +28167,7 @@
   },
   "projectFileDependencyGroups": {
     "": [
+      "Microsoft.DependencyValidation.Analyzers >= 0.10.0",
       "Microsoft.NETCore.UniversalWindowsPlatform >= 6.1.9"
     ],
     "UAP,Version=v10.0.10586": []
@@ -28119,6 +28176,7 @@
     "C:\\Users\\Peter\\.nuget\\packages\\": {}
   },
   "project": {
+    "version": "1.0.0",
     "restore": {
       "projectUniqueName": "C:\\My Projects\\IoTGateway\\Content\\Waher.Content.Markdown.Web.UWP\\Waher.Content.Markdown.Web.UWP.csproj",
       "projectName": "Waher.Content.Markdown.Web.UWP",
@@ -28164,6 +28222,10 @@
       }
     },
     "dependencies": {
+      "Microsoft.DependencyValidation.Analyzers": {
+        "target": "Package",
+        "version": "[0.10.0, )"
+      },
       "Microsoft.NETCore.UniversalWindowsPlatform": "[6.1.9, )"
     },
     "frameworks": {

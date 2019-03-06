@@ -3,6 +3,7 @@
     "Microsoft.ApplicationInsights": "2.8.1",
     "Microsoft.ApplicationInsights.PersistenceChannel": "1.2.3",
     "Microsoft.ApplicationInsights.WindowsApps": "1.1.1",
+    "Microsoft.DependencyValidation.Analyzers": "0.10.0",
     "Microsoft.NETCore.UniversalWindowsPlatform": "6.1.9"
   },
   "frameworks": {

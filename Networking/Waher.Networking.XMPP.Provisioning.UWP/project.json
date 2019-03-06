@@ -1,5 +1,6 @@
 ﻿{
   "dependencies": {
+    "Microsoft.DependencyValidation.Analyzers": "0.10.0",
     "Microsoft.NETCore.UniversalWindowsPlatform": "6.1.9"
   },
   "frameworks": {

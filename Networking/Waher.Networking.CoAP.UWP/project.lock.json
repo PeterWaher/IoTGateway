@@ -27581,7 +27581,6 @@
     "C:\\Users\\Peter\\.nuget\\packages\\": {}
   },
   "project": {
-    "version": "1.0.0",
     "restore": {
       "projectUniqueName": "C:\\My Projects\\IoTGateway\\Networking\\Waher.Networking.CoAP.UWP\\Waher.Networking.CoAP.UWP.csproj",
       "projectName": "Waher.Networking.CoAP.UWP",
@@ -27630,10 +27629,7 @@
       }
     },
     "dependencies": {
-      "Microsoft.DependencyValidation.Analyzers": {
-        "target": "Package",
-        "version": "[0.10.0, )"
-      },
+      "Microsoft.DependencyValidation.Analyzers": "[0.10.0, )",
       "Microsoft.NETCore.UniversalWindowsPlatform": "[6.1.9, )"
     },
     "frameworks": {

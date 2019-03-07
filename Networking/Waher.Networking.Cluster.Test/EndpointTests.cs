@@ -36,6 +36,7 @@ namespace Waher.Networking.Cluster.Test
 			{
 				this.endpoint2 = new ClusterEndpoint(Endpoint.Address, Endpoint.Port, "UnitTest");
 				this.endpoint2.GetStatus += (sender, e) => e.Status = 2;
+				this.endpoint2.AddRemoteStatus(Endpoint, null);
 				break;
 			}
 		}
@@ -327,6 +328,108 @@ namespace Waher.Networking.Cluster.Test
 
 			Assert.AreEqual(1, Response.Length);
 			Assert.AreEqual(true, Response[0].Ok);
+		}
+
+		[TestMethod]
+		public void Test_16_Lock()
+		{
+			ManualResetEvent Done1 = new ManualResetEvent(false);
+			ManualResetEvent Error1 = new ManualResetEvent(false);
+
+			this.endpoint2.Lock("Resource", 2000, (sender, e) =>
+			{
+				if (e.LockSuccessful &&
+					e.Resource == "Resource" &&
+					e.LockedBy is null &&
+					e.State.Equals(16))
+				{
+					Done1.Set();
+				}
+				else
+					Error1.Set();
+			}, 16);
+
+			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done1, Error1 }, 5000));
+		}
+
+		[TestMethod]
+		public void Test_17_Lock_Collision()
+		{
+			ManualResetEvent Done1 = new ManualResetEvent(false);
+			ManualResetEvent Error1 = new ManualResetEvent(false);
+			ManualResetEvent Done2 = new ManualResetEvent(false);
+			ManualResetEvent Error2 = new ManualResetEvent(false);
+
+			this.endpoint2.Lock("Resource", 2000, (sender, e) =>
+			{
+				if (e.LockSuccessful &&
+					e.Resource == "Resource" &&
+					e.LockedBy is null &&
+					e.State.Equals(17.1))
+				{
+					Done1.Set();
+				}
+				else
+					Error1.Set();
+			}, 17.1);
+
+			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done1, Error1 }, 5000));
+
+			this.endpoint2.Lock("Resource", 2000, (sender, e) =>
+			{
+				if (!e.LockSuccessful &&
+					e.Resource == "Resource" &&
+					e.LockedBy is null &&
+					e.State.Equals(17.2))
+				{
+					Done2.Set();
+				}
+				else
+					Error2.Set();
+			}, 17.2);
+
+			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done2, Error2 }, 5000));
+		}
+
+		[TestMethod]
+		public void Test_18_Lock_Collision_Release()
+		{
+			ManualResetEvent Done1 = new ManualResetEvent(false);
+			ManualResetEvent Error1 = new ManualResetEvent(false);
+			ManualResetEvent Done2 = new ManualResetEvent(false);
+			ManualResetEvent Error2 = new ManualResetEvent(false);
+
+			this.endpoint2.Lock("Resource", 2000, (sender, e) =>
+			{
+				if (e.LockSuccessful &&
+					e.Resource == "Resource" &&
+					e.LockedBy is null &&
+					e.State.Equals(18.1))
+				{
+					Done1.Set();
+				}
+				else
+					Error1.Set();
+			}, 18.1);
+
+			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done1, Error1 }, 5000));
+
+			this.endpoint2.Lock("Resource", 2000, (sender, e) =>
+			{
+				if (e.LockSuccessful &&
+					e.Resource == "Resource" &&
+					e.LockedBy is null &&
+					e.State.Equals(18.2))
+				{
+					Done2.Set();
+				}
+				else
+					Error2.Set();
+			}, 18.2);
+
+			this.endpoint2.Release("Resource");
+
+			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done2, Error2 }, 5000));
 		}
 
 	}

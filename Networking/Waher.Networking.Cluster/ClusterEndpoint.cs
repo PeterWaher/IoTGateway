@@ -925,6 +925,34 @@ namespace Waher.Networking.Cluster
 			return Result;
 		}
 
+		/// <summary>
+		/// Explicitly adds a remote endpoint status object.
+		/// In normal operation, calling this method is not necessary, as 
+		/// remote endpoint status is reported over the cluster.
+		/// </summary>
+		/// <param name="Endpoint">Cluster endpoint.</param>
+		/// <param name="Status">Status object.</param>
+		public void AddRemoteStatus(IPEndPoint Endpoint, object Status)
+		{
+			lock (this.remoteStatus)
+			{
+				this.remoteStatus[Endpoint] = Status;
+			}
+		}
+
+		/// <summary>
+		/// Explicitly removes a remote cluster endpoint status object.
+		/// </summary>
+		/// <param name="Endpoint">Cluster endpoint.</param>
+		/// <returns>If the corresponding endpoint status object was found and removed.</returns>
+		public bool RemoteRemoteStatus(IPEndPoint Endpoint)
+		{
+			lock (this.remoteStatus)
+			{
+				return this.remoteStatus.Remove(Endpoint);
+			}
+		}
+
 		internal void StatusReported(object Status, IPEndPoint RemoteEndpoint)
 		{
 			lock (this.remoteStatus)

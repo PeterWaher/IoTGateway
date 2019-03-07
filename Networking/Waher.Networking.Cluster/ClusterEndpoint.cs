@@ -40,7 +40,7 @@ namespace Waher.Networking.Cluster
 		internal readonly byte[] key;
 		internal Cache<string, object> currentStatus;
 		private Scheduler scheduler;
-		private Random rnd = new Random();
+		private readonly Random rnd = new Random();
 		private readonly Dictionary<IPEndPoint, object> remoteStatus;
 		internal readonly Dictionary<string, LockInfo> lockedResources = new Dictionary<string, LockInfo>();
 		private object localStatus;
@@ -934,9 +934,38 @@ namespace Waher.Networking.Cluster
 		/// <param name="Status">Status object.</param>
 		public void AddRemoteStatus(IPEndPoint Endpoint, object Status)
 		{
+			ClusterEndpointEventHandler h;
+			ClusterEndpointStatusEventHandler h2;
+			bool New;
+
 			lock (this.remoteStatus)
 			{
+				New = !this.remoteStatus.ContainsKey(Endpoint);
 				this.remoteStatus[Endpoint] = Status;
+			}
+
+			if (New && !((h = this.EndpointOnline) is null))
+			{
+				try
+				{
+					h(this, new ClusterEndpointEventArgs(Endpoint));
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			}
+
+			if (!((h2 = this.EndpointStatus) is null))
+			{
+				try
+				{
+					h2(this, new ClusterEndpointStatusEventArgs(Endpoint, Status));
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
 			}
 		}
 
@@ -945,20 +974,49 @@ namespace Waher.Networking.Cluster
 		/// </summary>
 		/// <param name="Endpoint">Cluster endpoint.</param>
 		/// <returns>If the corresponding endpoint status object was found and removed.</returns>
-		public bool RemoteRemoteStatus(IPEndPoint Endpoint)
+		public bool RemoveRemoteStatus(IPEndPoint Endpoint)
 		{
+			ClusterEndpointEventHandler h;
+			bool Removed;
+
 			lock (this.remoteStatus)
 			{
-				return this.remoteStatus.Remove(Endpoint);
+				Removed = this.remoteStatus.Remove(Endpoint);
 			}
+
+			if (Removed && !((h = this.EndpointOffline) is null))
+			{
+				try
+				{
+					h(this, new ClusterEndpointEventArgs(Endpoint));
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			}
+
+			return Removed;
 		}
+
+		/// <summary>
+		/// Event raised when a new endpoint is available in the cluster.
+		/// </summary>
+		public event ClusterEndpointEventHandler EndpointOnline = null;
+
+		/// <summary>
+		/// Event raised when an endpoint goes offline.
+		/// </summary>
+		public event ClusterEndpointEventHandler EndpointOffline = null;
+
+		/// <summary>
+		/// Event raised when status has been reported by an endpoint.
+		/// </summary>
+		public event ClusterEndpointStatusEventHandler EndpointStatus = null;
 
 		internal void StatusReported(object Status, IPEndPoint RemoteEndpoint)
 		{
-			lock (this.remoteStatus)
-			{
-				this.remoteStatus[RemoteEndpoint] = Status;
-			}
+			this.AddRemoteStatus(RemoteEndpoint, Status);
 
 			string s = RemoteEndpoint.ToString();
 
@@ -968,10 +1026,7 @@ namespace Waher.Networking.Cluster
 
 		internal void EndpointShutDown(IPEndPoint RemoteEndpoint)
 		{
-			lock (this.remoteStatus)
-			{
-				this.remoteStatus.Remove(RemoteEndpoint);
-			}
+			this.RemoveRemoteStatus(RemoteEndpoint);
 		}
 
 		internal void AssuredTransport(Guid MessageId, IClusterMessage Message)
@@ -1007,12 +1062,7 @@ namespace Waher.Networking.Cluster
 		private void CurrentStatus_Removed(object Sender, CacheItemEventArgs<string, object> e)
 		{
 			if (e.Value is IPEndPoint RemoteEndpoint)
-			{
-				lock (this.remoteStatus)
-				{
-					this.remoteStatus.Remove(RemoteEndpoint);
-				}
-			}
+				this.RemoveRemoteStatus(RemoteEndpoint);
 			else if (e.Value is MessageStatus MessageStatus)
 			{
 				if (e.Reason != RemovedReason.Manual)
@@ -1479,5 +1529,6 @@ namespace Waher.Networking.Cluster
 				this.Lock(Info, InfoRec);
 			}, null);
 		}
+
 	}
 }

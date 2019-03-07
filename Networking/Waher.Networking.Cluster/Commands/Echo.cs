@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace Waher.Networking.Cluster.Commands
 {
+	/// <summary>
+	/// Command echoing incoming text string.
+	/// </summary>
 	public class Echo : IClusterCommand
 	{
 		/// <summary>

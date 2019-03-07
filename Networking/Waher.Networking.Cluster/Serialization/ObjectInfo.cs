@@ -59,6 +59,7 @@ namespace Waher.Networking.Cluster.Serialization
 		/// Deserializes an object
 		/// </summary>
 		/// <param name="Input">Binary input</param>
+		/// <param name="ExpectedType">Expected type of response (or derivative).</param>
 		/// <returns>Deserialized object.</returns>
 		/// <exception cref="KeyNotFoundException">If the corresponding type, or any of the embedded properties, could not be found.</exception>
 		public object Deserialize(Deserializer Input, Type ExpectedType)

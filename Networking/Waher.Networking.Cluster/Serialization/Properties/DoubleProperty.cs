@@ -18,7 +18,7 @@ namespace Waher.Networking.Cluster.Serialization.Properties
 		/// Serializes the property value of an object.
 		/// </summary>
 		/// <param name="Output">Output</param>
-		/// <param name="Object">Object containing property</param>
+		/// <param name="Value">Value to serialize</param>
 		public override void Serialize(Serializer Output, object Value)
 		{
 			Output.WriteDouble((double)Value);

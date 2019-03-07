@@ -21,7 +21,6 @@ namespace Waher.Networking.Cluster
 		/// <summary>
 		/// Event arguments for cluster get status events.
 		/// </summary>
-		/// <param name="GetStatus">GetStatus object</param>
 		public ClusterGetStatusEventArgs()
 		{
 		}

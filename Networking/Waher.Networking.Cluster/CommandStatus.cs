@@ -78,7 +78,7 @@ namespace Waher.Networking.Cluster
 		/// Adds an error from an endpoint.
 		/// </summary>
 		/// <param name="From">Endpoint providing response</param>
-		/// <param name="Response">Response object</param>
+		/// <param name="Error">Exception object describing the error.</param>
 		public override void AddError(IPEndPoint From, Exception Error)
 		{
 			lock (this.Responses)

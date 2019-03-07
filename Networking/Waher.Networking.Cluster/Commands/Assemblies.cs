@@ -7,6 +7,9 @@ using Waher.Runtime.Inventory;
 
 namespace Waher.Networking.Cluster.Commands
 {
+	/// <summary>
+	/// Command to request available assembly names from cluster endpoints.
+	/// </summary>
 	public class Assemblies : IClusterCommand
 	{
 		/// <summary>

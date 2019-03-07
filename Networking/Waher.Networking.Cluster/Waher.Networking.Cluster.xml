@@ -60,13 +60,13 @@
         </member>
         <member name="M:Waher.Networking.Cluster.ClusterEndpoint.SendMessageUnacknowledged(Waher.Networking.Cluster.IClusterMessage)">
             <summary>
-            Sends an unacknowledged message
+            Sends an unacknowledged message ("at most once")
             </summary>
             <param name="Message">Message object</param>
         </member>
         <member name="M:Waher.Networking.Cluster.ClusterEndpoint.SendMessageAcknowledged(Waher.Networking.Cluster.IClusterMessage,Waher.Networking.Cluster.ClusterMessageAckEventHandler,System.Object)">
             <summary>
-            Sends a message using acknowledged service.
+            Sends a message using acknowledged service. ("at least once")
             </summary>
             <param name="Message">Message to send using acknowledged service.</param>
             <param name="Callback">Method to call when responses have been returned.</param>
@@ -75,6 +75,20 @@
         <member name="M:Waher.Networking.Cluster.ClusterEndpoint.SendMessageAcknowledgedAsync(Waher.Networking.Cluster.IClusterMessage)">
             <summary>
             Sends a message using acknowledged service.
+            </summary>
+            <param name="Message">Message to send using acknowledged service.</param>
+        </member>
+        <member name="M:Waher.Networking.Cluster.ClusterEndpoint.SendMessageAssured(Waher.Networking.Cluster.IClusterMessage,Waher.Networking.Cluster.ClusterMessageAckEventHandler,System.Object)">
+            <summary>
+            Sends a message using assured service. ("exactly once")
+            </summary>
+            <param name="Message">Message to send using acknowledged service.</param>
+            <param name="Callback">Method to call when responses have been returned.</param>
+            <param name="State">State object to pass on to callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.Cluster.ClusterEndpoint.SendMessageAssuredAsync(Waher.Networking.Cluster.IClusterMessage)">
+            <summary>
+            Sends a message using assured service. ("exactly once")
             </summary>
             <param name="Message">Message to send using acknowledged service.</param>
         </member>
@@ -94,6 +108,165 @@
             <see cref="P:Waher.Networking.Cluster.ClusterEndpoint.LocalStatus"/>
             </summary>
             <returns>Current set of remote statuses</returns>
+        </member>
+        <member name="M:Waher.Networking.Cluster.ClusterEndpoint.AddRemoteStatus(System.Net.IPEndPoint,System.Object)">
+            <summary>
+            Explicitly adds a remote endpoint status object.
+            In normal operation, calling this method is not necessary, as 
+            remote endpoint status is reported over the cluster.
+            </summary>
+            <param name="Endpoint">Cluster endpoint.</param>
+            <param name="Status">Status object.</param>
+        </member>
+        <member name="M:Waher.Networking.Cluster.ClusterEndpoint.RemoveRemoteStatus(System.Net.IPEndPoint)">
+            <summary>
+            Explicitly removes a remote cluster endpoint status object.
+            </summary>
+            <param name="Endpoint">Cluster endpoint.</param>
+            <returns>If the corresponding endpoint status object was found and removed.</returns>
+        </member>
+        <member name="E:Waher.Networking.Cluster.ClusterEndpoint.EndpointOnline">
+            <summary>
+            Event raised when a new endpoint is available in the cluster.
+            </summary>
+        </member>
+        <member name="E:Waher.Networking.Cluster.ClusterEndpoint.EndpointOffline">
+            <summary>
+            Event raised when an endpoint goes offline.
+            </summary>
+        </member>
+        <member name="E:Waher.Networking.Cluster.ClusterEndpoint.EndpointStatus">
+            <summary>
+            Event raised when status has been reported by an endpoint.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Cluster.ClusterEndpoint.Ping(Waher.Networking.Cluster.ClusterMessageAckEventHandler,System.Object)">
+            <summary>
+            Sends an acknowledged ping message to the other servers in the cluster.
+            </summary>
+            <param name="Callback">Method to call when responses have been returned.</param>
+            <param name="State">State object to pass on to callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.Cluster.ClusterEndpoint.PingAsync">
+            <summary>
+            Sends an acknowledged ping message to the other servers in the cluster.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Cluster.ClusterEndpoint.ExecuteCommand``1(Waher.Networking.Cluster.IClusterCommand,Waher.Networking.Cluster.ClusterResponseEventHandler{``0},System.Object)">
+            <summary>
+            Execute a command on the other members of the cluster, and waits for 
+            responses to be returned. Retries are performed in cases responses are 
+            not received.
+            </summary>
+            <typeparam name="ResponseType">Type of response expected.</typeparam>
+            <param name="Command">Command to send.</param>
+            <param name="Callback">Method to call when responses have been returned.</param>
+            <param name="State">State object to pass on to callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.Cluster.ClusterEndpoint.ExecuteCommandAsync``1(Waher.Networking.Cluster.IClusterCommand)">
+            <summary>
+            Execute a command on the other members of the cluster, and waits for 
+            responses to be returned. Retries are performed in cases responses are 
+            not received.
+            </summary>
+            <typeparam name="ResponseType">Type of response expected.</typeparam>
+            <param name="Command">Command to send.</param>
+            <returns>Responses returned from available endpoints.</returns>
+        </member>
+        <member name="M:Waher.Networking.Cluster.ClusterEndpoint.Echo(System.String,Waher.Networking.Cluster.ClusterResponseEventHandler{System.String},System.Object)">
+            <summary>
+            Asks endpoints in the cluster to echo a text string back to the sender.
+            </summary>
+            <param name="Text">Text to echo.</param>
+            <param name="Callback">Method to call when responses have been returned.</param>
+            <param name="State">State object to pass on to callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.Cluster.ClusterEndpoint.EchoAsync(System.String)">
+            <summary>
+            Asks endpoints in the cluster to echo a text string back to the sender.
+            </summary>
+            <param name="Text">Text to echo.</param>
+        </member>
+        <member name="M:Waher.Networking.Cluster.ClusterEndpoint.GetAssemblies(Waher.Networking.Cluster.ClusterResponseEventHandler{System.String[]},System.Object)">
+            <summary>
+            Asks endpoints in the cluster to return assemblies available in their runtime environment.
+            </summary>
+            <param name="Callback">Method to call when responses have been returned.</param>
+            <param name="State">State object to pass on to callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.Cluster.ClusterEndpoint.GetAssembliesAsync">
+            <summary>
+            Asks endpoints in the cluster to return assemblies available in their runtime environment.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Cluster.ClusterEndpoint.Lock(System.String,System.Int32,Waher.Networking.Cluster.ClusterResourceLockEventHandler,System.Object)">
+            <summary>
+            Locks a singleton resource in the cluster.
+            </summary>
+            <param name="ResourceName">Name of the resource</param>
+            <param name="TimeoutMilliseconds">Timeout, in milliseconds.</param>
+            <param name="Callback">Method to call when operation completes or fails.</param>
+            <param name="State">State object to pass on to callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.Cluster.ClusterEndpoint.LockAsync(System.String,System.Int32)">
+            <summary>
+            Locks a singleton resource in the cluster.
+            </summary>
+            <param name="ResourceName">Name of the resource</param>
+            <param name="TimeoutMilliseconds">Timeout, in milliseconds.</param>
+        </member>
+        <member name="M:Waher.Networking.Cluster.ClusterEndpoint.Release(System.String)">
+            <summary>
+            Releases a resource.
+            </summary>
+            <param name="ResourceName">Name of the resource.</param>
+            <exception cref="T:System.ArgumentException">If the resource is not locked.</exception>
+        </member>
+        <member name="T:Waher.Networking.Cluster.ClusterEndpointEventHandler">
+            <summary>
+            Event arguments for cluster endpoint events.
+            </summary>
+            <param name="Sender">Sender of event.</param>
+            <param name="e">Event handler.</param>
+        </member>
+        <member name="T:Waher.Networking.Cluster.ClusterEndpointEventArgs">
+            <summary>
+            Event arguments for cluster endpoint events.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Cluster.ClusterEndpointEventArgs.#ctor(System.Net.IPEndPoint)">
+            <summary>
+            Event arguments for cluster endpoint events.
+            </summary>
+            <param name="Endpoint">Identity of cluster endpoiunt.</param>
+        </member>
+        <member name="P:Waher.Networking.Cluster.ClusterEndpointEventArgs.Endpoint">
+            <summary>
+            Identity of cluster endpoiunt.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.Cluster.ClusterEndpointStatusEventHandler">
+            <summary>
+            Event arguments for cluster endpoint status events.
+            </summary>
+            <param name="Sender">Sender of event.</param>
+            <param name="e">Event handler.</param>
+        </member>
+        <member name="T:Waher.Networking.Cluster.ClusterEndpointStatusEventArgs">
+            <summary>
+            Event arguments for cluster endpoint status events.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Cluster.ClusterEndpointStatusEventArgs.#ctor(System.Net.IPEndPoint,System.Object)">
+            <summary>
+            Event arguments for cluster endpoint status events.
+            </summary>
+            <param name="Endpoint">Identity of cluster endpoiunt.</param>
+        </member>
+        <member name="P:Waher.Networking.Cluster.ClusterEndpointStatusEventArgs.Status">
+            <summary>
+            Endpoint status.
+            </summary>
         </member>
         <member name="T:Waher.Networking.Cluster.ClusterGetStatusEventHandler">
             <summary>
@@ -171,6 +344,202 @@
             Message object
             </summary>
         </member>
+        <member name="T:Waher.Networking.Cluster.ClusterResourceEventHandler">
+            <summary>
+            Event arguments for cluster resource events.
+            </summary>
+            <param name="Sender">Sender of event.</param>
+            <param name="e">Event handler.</param>
+        </member>
+        <member name="T:Waher.Networking.Cluster.ClusterResourceEventArgs">
+            <summary>
+            Event arguments for cluster resource events.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Cluster.ClusterResourceEventArgs.#ctor(System.String,System.Object)">
+            <summary>
+            Event arguments for cluster resource events.
+            </summary>
+            <param name="Resource">Resource name</param>
+            <param name="State">State object passed on to the original request.</param>
+        </member>
+        <member name="P:Waher.Networking.Cluster.ClusterResourceEventArgs.Resource">
+            <summary>
+            Resource name
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.Cluster.ClusterResourceEventArgs.State">
+            <summary>
+            State object passed on to the original request.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.Cluster.ClusterResourceLockEventHandler">
+            <summary>
+            Event arguments for cluster resource lock events.
+            </summary>
+            <param name="Sender">Sender of event.</param>
+            <param name="e">Event handler.</param>
+        </member>
+        <member name="T:Waher.Networking.Cluster.ClusterResourceLockEventArgs">
+            <summary>
+            Event arguments for cluster resource lock events.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Cluster.ClusterResourceLockEventArgs.#ctor(System.String,System.Boolean,System.Net.IPEndPoint,System.Object)">
+            <summary>
+            Event arguments for cluster resource lock events.
+            </summary>
+            <param name="Resource">Resource name</param>
+            <param name="LockSuccessful">If lock-operation was successful.</param>
+            <param name="LockedBy">Identity of endpoint having the resource locked, if not successful.</param>
+            <param name="State">State object passed on to the original request.</param>
+        </member>
+        <member name="P:Waher.Networking.Cluster.ClusterResourceLockEventArgs.LockSuccessful">
+            <summary>
+            If the lock operation was successful or not. If not, 
+            <see cref="P:Waher.Networking.Cluster.ClusterResourceLockEventArgs.LockedBy"/> contains information about what
+            endpoint has the resource locked.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.Cluster.ClusterResourceLockEventArgs.LockedBy">
+            <summary>
+            If lock was not successful, this is the endpoint that has the
+            resource locked. If null, and <see cref="P:Waher.Networking.Cluster.ClusterResourceLockEventArgs.LockSuccessful"/> is false,
+            it is the same machine that has the resource already locked.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.Cluster.ClusterResponseEventHandler`1">
+            <summary>
+            Event arguments for cluster command response events.
+            </summary>
+            <typeparam name="ResponseType">Type of expected response.</typeparam>
+            <param name="Sender">Sender of event.</param>
+            <param name="e">Event handler.</param>
+        </member>
+        <member name="T:Waher.Networking.Cluster.ClusterResponseEventArgs`1">
+            <summary>
+            Event arguments for cluster message acknowledgement events.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Cluster.ClusterResponseEventArgs`1.#ctor(Waher.Networking.Cluster.IClusterCommand,Waher.Networking.Cluster.EndpointResponse{`0}[],System.Object)">
+            <summary>
+            Event arguments for cluster message acknowledgement events.
+            </summary>
+            <param name="Command">Command object.</param>
+            <param name="Responses">Message acknowledgement responses</param>
+            <param name="State">State object passed on to the original request.</param>
+        </member>
+        <member name="P:Waher.Networking.Cluster.ClusterResponseEventArgs`1.Command">
+            <summary>
+            Cluster command object.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.Cluster.ClusterResponseEventArgs`1.Responses">
+            <summary>
+            Command execution responses.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.Cluster.ClusterResponseEventArgs`1.State">
+            <summary>
+            State object passed on to the original request.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.Cluster.ClusterResponseEventArgs`1.Ok">
+            <summary>
+            If the command was executed without error on all endpoints.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.Cluster.CommandStatus`1">
+            <summary>
+            Keeps track of an outgoing command.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Cluster.CommandStatus`1.IsComplete(Waher.Networking.Cluster.EndpointStatus[])">
+            <summary>
+            If all responses have been returned.
+            </summary>
+            <param name="Statuses">Valid statuses.</param>
+            <returns>If all responses have been returned.</returns>
+        </member>
+        <member name="M:Waher.Networking.Cluster.CommandStatus`1.GetResponses(Waher.Networking.Cluster.EndpointStatus[])">
+            <summary>
+            Compiles available responses.
+            </summary>
+            <returns>Set of responses</returns>
+        </member>
+        <member name="M:Waher.Networking.Cluster.CommandStatus`1.AddResponse(System.Net.IPEndPoint,System.Object)">
+            <summary>
+            Adds a response from an endpoint.
+            </summary>
+            <param name="From">Endpoint providing response</param>
+            <param name="Response">Response object</param>
+        </member>
+        <member name="M:Waher.Networking.Cluster.CommandStatus`1.AddError(System.Net.IPEndPoint,System.Exception)">
+            <summary>
+            Adds an error from an endpoint.
+            </summary>
+            <param name="From">Endpoint providing response</param>
+            <param name="Response">Response object</param>
+        </member>
+        <member name="M:Waher.Networking.Cluster.CommandStatus`1.RaiseResponseEvent(Waher.Networking.Cluster.EndpointStatus[])">
+            <summary>
+            Raises the response event.
+            </summary>
+            <param name="CurrentStatus">Current status of endpoints in cluster.</param>
+        </member>
+        <member name="T:Waher.Networking.Cluster.CommandStatusBase">
+            <summary>
+            Keeps track of an outgoing command.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Cluster.CommandStatusBase.IsComplete(Waher.Networking.Cluster.EndpointStatus[])">
+            <summary>
+            If all responses have been returned.
+            </summary>
+            <param name="Statuses">Valid statuses.</param>
+            <returns>If all responses have been returned.</returns>
+        </member>
+        <member name="M:Waher.Networking.Cluster.CommandStatusBase.AddResponse(System.Net.IPEndPoint,System.Object)">
+            <summary>
+            Adds a response from an endpoint.
+            </summary>
+            <param name="From">Endpoint providing response</param>
+            <param name="Response">Response object</param>
+        </member>
+        <member name="M:Waher.Networking.Cluster.CommandStatusBase.RaiseResponseEvent(Waher.Networking.Cluster.EndpointStatus[])">
+            <summary>
+            Raises the response event.
+            </summary>
+            <param name="CurrentStatus">Current status of endpoints in cluster.</param>
+        </member>
+        <member name="M:Waher.Networking.Cluster.CommandStatusBase.AddError(System.Net.IPEndPoint,System.Exception)">
+            <summary>
+            Adds an error from an endpoint.
+            </summary>
+            <param name="From">Endpoint providing response</param>
+            <param name="Response">Response object</param>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Commands.Assemblies.Execute(Waher.Networking.Cluster.ClusterEndpoint,System.Net.IPEndPoint)">
+            <summary>
+            Method called when the command has been received and is to be executed.
+            </summary>
+            <param name="LocalEndpoint">Cluster endpoint that received the message.</param>
+            <param name="RemoteEndpoint">Endpoint sending the message.</param>
+            <returns>Result of the command.</returns>
+        </member>
+        <member name="P:Waher.Networking.Cluster.Commands.Echo.Text">
+            <summary>
+            Text to echo.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Commands.Echo.Execute(Waher.Networking.Cluster.ClusterEndpoint,System.Net.IPEndPoint)">
+            <summary>
+            Method called when the command has been received and is to be executed.
+            </summary>
+            <param name="LocalEndpoint">Cluster endpoint that received the message.</param>
+            <param name="RemoteEndpoint">Endpoint sending the message.</param>
+            <returns>Result of the command.</returns>
+        </member>
         <member name="T:Waher.Networking.Cluster.EndpointAcknowledgement">
             <summary>
             Contains information about one of the endpoints in the cluster.
@@ -188,6 +557,31 @@
             true = Message actively acknowledged (ACK)
             false = Message actively rejected, or not acknowledged (NACK)
             null = Message not acknowledged or rejected.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.Cluster.EndpointResponse`1">
+            <summary>
+            Contains the response from one of the endpoints in the cluster.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.Cluster.EndpointResponse`1.Endpoint">
+            <summary>
+            Remote endpoint
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.Cluster.EndpointResponse`1.Response">
+            <summary>
+            Response from endpoint
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.Cluster.EndpointResponse`1.Error">
+            <summary>
+            Any error returned from the endpoint.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.Cluster.EndpointResponse`1.Ok">
+            <summary>
+            If the command was executed without error on the endpoint.
             </summary>
         </member>
         <member name="T:Waher.Networking.Cluster.EndpointStatus">
@@ -210,6 +604,14 @@
             Interface for cluster commands.
             </summary>
         </member>
+        <member name="M:Waher.Networking.Cluster.IClusterCommand.Execute(Waher.Networking.Cluster.ClusterEndpoint,System.Net.IPEndPoint)">
+            <summary>
+            Method called when the command has been received and is to be executed.
+            </summary>
+            <param name="LocalEndpoint">Cluster endpoint that received the message.</param>
+            <param name="RemoteEndpoint">Endpoint sending the message.</param>
+            <returns>Result of the command.</returns>
+        </member>
         <member name="T:Waher.Networking.Cluster.IClusterMessage">
             <summary>
             Interface for cluster messages.
@@ -231,7 +633,7 @@
         </member>
         <member name="T:Waher.Networking.Cluster.MessageStatus">
             <summary>
-            Keeps track of outgoing messages.
+            Keeps track of an outgoing message.
             </summary>
         </member>
         <member name="M:Waher.Networking.Cluster.MessageStatus.IsComplete(Waher.Networking.Cluster.EndpointStatus[])">
@@ -267,6 +669,80 @@
             <returns>If the message was accepted/processed or not.
             In Acknowledged service, this corresponds to ACK/NACK.</returns>
         </member>
+        <member name="T:Waher.Networking.Cluster.Messages.Deliver">
+            <summary>
+            Delivers a message, as part of an assured message transfer
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.Cluster.Messages.Deliver.MessageID">
+            <summary>
+            Message ID
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Messages.Deliver.MessageReceived(Waher.Networking.Cluster.ClusterEndpoint,System.Net.IPEndPoint)">
+            <summary>
+            Method called when the message has been received.
+            </summary>
+            <param name="Endpoint">Cluster endpoint that received the message.</param>
+            <param name="RemoteEndpoint">Endpoint sending the message.</param>
+            <returns>If the message was accepted/processed or not.
+            In Acknowledged service, this corresponds to ACK/NACK.</returns>
+        </member>
+        <member name="T:Waher.Networking.Cluster.Messages.Lock">
+            <summary>
+            Message used to inform other members that the sending endpoint is trying
+            to lock a resource. Any recipient already having the resource locked NACKs 
+            the message.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.Cluster.Messages.Lock.Resource">
+            <summary>
+            Resource to lock.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Messages.Lock.MessageReceived(Waher.Networking.Cluster.ClusterEndpoint,System.Net.IPEndPoint)">
+            <summary>
+            Method called when the message has been received.
+            </summary>
+            <param name="Endpoint">Cluster endpoint that received the message.</param>
+            <param name="RemoteEndpoint">Endpoint sending the message.</param>
+            <returns>If the message was accepted/processed or not.
+            In Acknowledged service, this corresponds to ACK/NACK.</returns>
+        </member>
+        <member name="T:Waher.Networking.Cluster.Messages.Ping">
+            <summary>
+            Ping message that can be sent to test endpoints in cluster receive messages.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Messages.Ping.MessageReceived(Waher.Networking.Cluster.ClusterEndpoint,System.Net.IPEndPoint)">
+            <summary>
+            Method called when the message has been received.
+            </summary>
+            <param name="Endpoint">Cluster endpoint that received the message.</param>
+            <param name="RemoteEndpoint">Endpoint sending the message.</param>
+            <returns>If the message was accepted/processed or not.
+            In Acknowledged service, this corresponds to ACK/NACK.</returns>
+        </member>
+        <member name="T:Waher.Networking.Cluster.Messages.Release">
+            <summary>
+            Message used to inform other members that the sending endpoint is releasing
+            a locked resource.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.Cluster.Messages.Release.Resource">
+            <summary>
+            Released resource.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Messages.Release.MessageReceived(Waher.Networking.Cluster.ClusterEndpoint,System.Net.IPEndPoint)">
+            <summary>
+            Method called when the message has been received.
+            </summary>
+            <param name="Endpoint">Cluster endpoint that received the message.</param>
+            <param name="RemoteEndpoint">Endpoint sending the message.</param>
+            <returns>If the message was accepted/processed or not.
+            In Acknowledged service, this corresponds to ACK/NACK.</returns>
+        </member>
         <member name="T:Waher.Networking.Cluster.Messages.ShuttingDown">
             <summary>
             Message sent when an endpoint is shut down, to let the other endpoints know
@@ -277,6 +753,30 @@
             <summary>
             Message sent when an endpoint is shut down, to let the other endpoints know
             the current endpoint is no longer available.
+            </summary>
+            <param name="Endpoint">Cluster endpoint that received the message.</param>
+            <param name="RemoteEndpoint">Endpoint sending the message.</param>
+            <returns>If the message was accepted/processed or not.
+            In Acknowledged service, this corresponds to ACK/NACK.</returns>
+        </member>
+        <member name="T:Waher.Networking.Cluster.Messages.Transport">
+            <summary>
+            Transports a message, as part of an assured message transfer
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.Cluster.Messages.Transport.MessageID">
+            <summary>
+            Message ID
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.Cluster.Messages.Transport.Message">
+            <summary>
+            Message
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Cluster.Messages.Transport.MessageReceived(Waher.Networking.Cluster.ClusterEndpoint,System.Net.IPEndPoint)">
+            <summary>
+            Method called when the message has been received.
             </summary>
             <param name="Endpoint">Cluster endpoint that received the message.</param>
             <param name="RemoteEndpoint">Endpoint sending the message.</param>

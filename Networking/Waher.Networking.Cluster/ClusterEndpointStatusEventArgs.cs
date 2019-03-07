@@ -22,6 +22,7 @@ namespace Waher.Networking.Cluster
 		/// Event arguments for cluster endpoint status events.
 		/// </summary>
 		/// <param name="Endpoint">Identity of cluster endpoiunt.</param>
+		/// <param name="Status">Endpoint status.</param>
 		public ClusterEndpointStatusEventArgs(IPEndPoint Endpoint, object Status)
 			: base(Endpoint)
 		{

@@ -216,6 +216,35 @@ namespace Waher.Networking.Cluster
 		{
 			if (!this.shuttingDown)
 			{
+				LinkedList<string> ToRelease = null;
+
+				lock (this.lockedResources)
+				{
+					foreach (LockInfo Info in this.lockedResources.Values)
+					{
+						if (Info.Locked)
+						{
+							if (ToRelease is null)
+								ToRelease = new LinkedList<string>();
+
+							ToRelease.AddLast(Info.Resource);
+						}
+					}
+
+					this.lockedResources.Clear();
+				}
+
+				if (!(ToRelease is null))
+				{
+					foreach (string Resource in ToRelease)
+					{
+						this.SendMessageAcknowledged(new Release()
+						{
+							Resource = Resource
+						}, null, null);
+					}
+				}
+
 				this.shuttingDown = true;
 				this.SendMessageUnacknowledged(new ShuttingDown());
 			}

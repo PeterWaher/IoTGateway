@@ -262,6 +262,7 @@
             Event arguments for cluster endpoint status events.
             </summary>
             <param name="Endpoint">Identity of cluster endpoiunt.</param>
+            <param name="Status">Endpoint status.</param>
         </member>
         <member name="P:Waher.Networking.Cluster.ClusterEndpointStatusEventArgs.Status">
             <summary>
@@ -284,7 +285,6 @@
             <summary>
             Event arguments for cluster get status events.
             </summary>
-            <param name="GetStatus">GetStatus object</param>
         </member>
         <member name="P:Waher.Networking.Cluster.ClusterGetStatusEventArgs.Status">
             <summary>
@@ -479,7 +479,7 @@
             Adds an error from an endpoint.
             </summary>
             <param name="From">Endpoint providing response</param>
-            <param name="Response">Response object</param>
+            <param name="Error">Exception object describing the error.</param>
         </member>
         <member name="M:Waher.Networking.Cluster.CommandStatus`1.RaiseResponseEvent(Waher.Networking.Cluster.EndpointStatus[])">
             <summary>
@@ -517,7 +517,12 @@
             Adds an error from an endpoint.
             </summary>
             <param name="From">Endpoint providing response</param>
-            <param name="Response">Response object</param>
+            <param name="Error">Exception object describing the error.</param>
+        </member>
+        <member name="T:Waher.Networking.Cluster.Commands.Assemblies">
+            <summary>
+            Command to request available assembly names from cluster endpoints.
+            </summary>
         </member>
         <member name="M:Waher.Networking.Cluster.Commands.Assemblies.Execute(Waher.Networking.Cluster.ClusterEndpoint,System.Net.IPEndPoint)">
             <summary>
@@ -526,6 +531,11 @@
             <param name="LocalEndpoint">Cluster endpoint that received the message.</param>
             <param name="RemoteEndpoint">Endpoint sending the message.</param>
             <returns>Result of the command.</returns>
+        </member>
+        <member name="T:Waher.Networking.Cluster.Commands.Echo">
+            <summary>
+            Command echoing incoming text string.
+            </summary>
         </member>
         <member name="P:Waher.Networking.Cluster.Commands.Echo.Text">
             <summary>
@@ -942,6 +952,7 @@
             Deserializes an object
             </summary>
             <param name="Input">Binary input</param>
+            <param name="ExpectedType">Expected type of response (or derivative).</param>
             <returns>Deserialized object.</returns>
             <exception cref="T:System.Collections.Generic.KeyNotFoundException">If the corresponding type, or any of the embedded properties, could not be found.</exception>
         </member>
@@ -1140,7 +1151,7 @@
             Serializes the property value of an object.
             </summary>
             <param name="Output">Output</param>
-            <param name="Object">Object containing property</param>
+            <param name="Value">Value to serialize</param>
         </member>
         <member name="M:Waher.Networking.Cluster.Serialization.Properties.DoubleProperty.Deserialize(Waher.Networking.Cluster.Serialization.Deserializer,System.Type)">
             <summary>

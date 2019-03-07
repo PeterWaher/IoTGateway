@@ -41,6 +41,7 @@ namespace Waher.Networking.Cluster
 		internal Cache<string, object> currentStatus;
 		private Scheduler scheduler;
 		private readonly Dictionary<IPEndPoint, object> remoteStatus;
+		internal readonly Dictionary<string, LockInfo> lockedResources = new Dictionary<string, LockInfo>();
 		private object localStatus;
 		private Timer aliveTimer;
 		internal bool shuttingDown = false;
@@ -740,6 +741,17 @@ namespace Waher.Networking.Cluster
 				Rec.Timeout = this.scheduler.Add(DateTime.Now.AddSeconds(2), this.ResendAcknowledgedMessage, Rec);
 
 				this.Transmit(Bin, this.destination);
+
+				EndpointStatus[] CurrentStatus = this.GetRemoteStatuses();
+
+				if (Rec.IsComplete(CurrentStatus))
+				{
+					this.currentStatus.Remove(Rec.Id.ToString());
+					this.scheduler.Remove(Rec.Timeout);
+
+					Rec.Callback?.Invoke(this, new ClusterMessageAckEventArgs(
+						Rec.Message, Rec.GetResponses(CurrentStatus), Rec.State));
+				}
 			}
 			catch (Exception ex)
 			{
@@ -1057,6 +1069,17 @@ namespace Waher.Networking.Cluster
 				Rec.Timeout = this.scheduler.Add(DateTime.Now.AddSeconds(2), this.ResendCommand<ResponseType>, Rec);
 
 				this.Transmit(Bin, this.destination);
+
+				EndpointStatus[] CurrentStatus = this.GetRemoteStatuses();
+
+				if (Rec.IsComplete(CurrentStatus))
+				{
+					this.currentStatus.Remove(Rec.Id.ToString());
+					this.scheduler.Remove(Rec.Timeout);
+
+					Rec.Callback?.Invoke(this, new ClusterResponseEventArgs<ResponseType>(
+						Rec.Command, Rec.GetResponses(CurrentStatus), Rec.State));
+				}
 			}
 			catch (Exception ex)
 			{
@@ -1160,7 +1183,7 @@ namespace Waher.Networking.Cluster
 		public Task<EndpointResponse<string>[]> EchoAsync(string Text)
 		{
 			TaskCompletionSource<EndpointResponse<string>[]> Result = new TaskCompletionSource<EndpointResponse<string>[]>();
-			
+
 			this.Echo(Text, (sender, e) =>
 			{
 				Result.TrySetResult(e.Responses);
@@ -1192,6 +1215,143 @@ namespace Waher.Networking.Cluster
 			}, null);
 
 			return Result.Task;
+		}
+
+		/// <summary>
+		/// Locks a singleton resource in the cluster.
+		/// </summary>
+		/// <param name="ResourceName">Name of the resource</param>
+		/// <param name="TimeoutMilliseconds">Timeout, in milliseconds.</param>
+		/// <param name="Callback">Method to call when operation completes or fails.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void Lock(string ResourceName, int TimeoutMilliseconds,
+			ClusterResourceLockEventHandler Callback, object State)
+		{
+			LockInfo Info;
+			LockInfoRec InfoRec;
+
+			lock (this.lockedResources)
+			{
+				if (!this.lockedResources.TryGetValue(ResourceName, out Info))
+				{
+					Info = new LockInfo()
+					{
+						Resource = ResourceName,
+						Locked = false
+					};
+
+					this.lockedResources[ResourceName] = Info;
+				}
+
+				Info.Queue.AddLast(InfoRec = new LockInfoRec()
+				{
+					Info = Info,
+					Timeout = DateTime.Now.AddMilliseconds(TimeoutMilliseconds),
+					Callback = Callback,
+					State = State
+				});
+			}
+
+			if (Info.Locked)
+			{
+				this.LockResult(false, null, InfoRec);
+				return;
+			}
+
+			this.SendMessageAcknowledged(new Lock()
+			{
+				Resource = ResourceName
+			}, (sender, e) =>
+			{
+				IPEndPoint LockedBy = null;
+
+				foreach (EndpointAcknowledgement Response in e.Responses)
+				{
+					if (Response.ACK.HasValue && !Response.ACK.Value)
+					{
+						LockedBy = Response.Endpoint;
+						break;
+					}
+				}
+
+				bool Ok;
+
+				lock (this.lockedResources)
+				{
+					if (Info.Locked)
+						Ok = false;
+					else
+						Ok = LockedBy is null;
+
+					if (Ok)
+					{
+						Info.Locked = true;
+						Info.Queue.Remove(InfoRec);
+					}
+					else if (InfoRec.Timeout <= DateTime.Now)
+					{
+						Info.Queue.Remove(InfoRec);
+
+						if (!Info.Locked && Info.Queue.First is null)
+							this.lockedResources.Remove(Info.Resource);
+					}
+				}
+
+				this.LockResult(Ok, LockedBy, InfoRec);
+
+			}, null);
+		}
+
+		private void LockResult(bool Ok, IPEndPoint LockedBy, LockInfoRec InfoRec)
+		{
+			if (Ok)
+				this.Raise(InfoRec.Info.Resource, true, null, InfoRec);
+			else if (DateTime.Now >= InfoRec.Timeout)
+				this.Raise(InfoRec.Info.Resource, false, LockedBy, InfoRec);
+			else if (!InfoRec.TimeoutScheduled)
+			{
+				InfoRec.LockedBy = LockedBy;
+				InfoRec.Timeout = scheduler.Add(InfoRec.Timeout, this.LockTimeout, InfoRec);
+				InfoRec.TimeoutScheduled = true;
+			}
+		}
+
+		private void LockTimeout(object P)
+		{
+			LockInfoRec InfoRec = (LockInfoRec)P;
+			LockInfo Info = InfoRec.Info;
+
+			InfoRec.TimeoutScheduled = false;
+
+			lock (this.lockedResources)
+			{
+				Info.Queue.Remove(InfoRec);
+
+				if (!Info.Locked && Info.Queue.First is null)
+					this.lockedResources.Remove(Info.Resource);
+			}
+
+			this.Raise(Info.Resource, false, InfoRec.LockedBy, InfoRec);
+		}
+
+		private void Raise(string ResourceName, bool LockSuccessful, IPEndPoint LockedBy,
+			LockInfoRec InfoRec)
+		{
+			try
+			{
+				if (InfoRec.TimeoutScheduled)
+				{
+					scheduler.Remove(InfoRec.Timeout);
+					InfoRec.TimeoutScheduled = false;
+				}
+
+				InfoRec.Callback?.Invoke(this, new ClusterResourceLockEventArgs(ResourceName,
+					LockSuccessful, LockedBy, InfoRec.State));
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+			}
 		}
 
 	}

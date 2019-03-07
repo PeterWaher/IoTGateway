@@ -40,6 +40,7 @@ namespace Waher.Networking.Cluster
 		internal readonly byte[] key;
 		internal Cache<string, object> currentStatus;
 		private Scheduler scheduler;
+		private Random rnd = new Random();
 		private readonly Dictionary<IPEndPoint, object> remoteStatus;
 		internal readonly Dictionary<string, LockInfo> lockedResources = new Dictionary<string, LockInfo>();
 		private object localStatus;
@@ -1258,9 +1259,14 @@ namespace Waher.Networking.Cluster
 				return;
 			}
 
+			this.Lock(Info, InfoRec);
+		}
+
+		private void Lock(LockInfo Info, LockInfoRec InfoRec)
+		{
 			this.SendMessageAcknowledged(new Lock()
 			{
-				Resource = ResourceName
+				Resource = Info.Resource
 			}, (sender, e) =>
 			{
 				IPEndPoint LockedBy = null;
@@ -1345,6 +1351,16 @@ namespace Waher.Networking.Cluster
 					InfoRec.TimeoutScheduled = false;
 				}
 
+				LockInfo Info = InfoRec.Info;
+
+				lock (this.lockedResources)
+				{
+					Info.Queue.Remove(InfoRec);
+
+					if (!Info.Locked && Info.Queue.First is null)
+						this.lockedResources.Remove(Info.Resource);
+				}
+
 				InfoRec.Callback?.Invoke(this, new ClusterResourceLockEventArgs(ResourceName,
 					LockSuccessful, LockedBy, InfoRec.State));
 			}
@@ -1354,5 +1370,86 @@ namespace Waher.Networking.Cluster
 			}
 		}
 
+		/// <summary>
+		/// Locks a singleton resource in the cluster.
+		/// </summary>
+		/// <param name="ResourceName">Name of the resource</param>
+		/// <param name="TimeoutMilliseconds">Timeout, in milliseconds.</param>
+		public Task<ClusterResourceLockEventArgs> LockAsync(string ResourceName, int TimeoutMilliseconds)
+		{
+			TaskCompletionSource<ClusterResourceLockEventArgs> Result = new TaskCompletionSource<ClusterResourceLockEventArgs>();
+
+			this.Lock(ResourceName, TimeoutMilliseconds, (sender, e) =>
+			{
+				Result.TrySetResult(e);
+			}, null);
+
+			return Result.Task;
+		}
+
+		/// <summary>
+		/// Releases a resource.
+		/// </summary>
+		/// <param name="ResourceName">Name of the resource.</param>
+		/// <exception cref="ArgumentException">If the resource is not locked.</exception>
+		public void Release(string ResourceName)
+		{
+			LockInfo Info;
+			LockInfoRec InfoRec;
+
+			lock (this.lockedResources)
+			{
+				if (!this.lockedResources.TryGetValue(ResourceName, out Info) || !Info.Locked)
+					throw new ArgumentException("Resource not locked.", nameof(ResourceName));
+
+				Info.Locked = false;
+
+				if (Info.Queue.First is null)
+				{
+					this.lockedResources.Remove(ResourceName);
+					InfoRec = null;
+				}
+				else
+					InfoRec = Info.Queue.First.Value;
+			}
+
+			this.SendMessageAcknowledged(new Release()
+			{
+				Resource = ResourceName
+			}, null, null);
+
+			if (!(InfoRec is null))
+			{
+				scheduler.Add(DateTime.Now.AddMilliseconds(this.rnd.Next(50) + 1), (P) =>
+				{
+					this.Lock(Info, InfoRec);
+				}, null);
+			}
+		}
+
+		internal void Released(string ResourceName)
+		{
+			LockInfo Info;
+			LockInfoRec InfoRec;
+
+			lock (this.lockedResources)
+			{
+				if (!this.lockedResources.TryGetValue(ResourceName, out Info) || Info.Locked)
+					return;
+
+				if (Info.Queue.First is null)
+				{
+					this.lockedResources.Remove(ResourceName);
+					return;
+				}
+				else
+					InfoRec = Info.Queue.First.Value;
+			}
+
+			scheduler.Add(DateTime.Now.AddMilliseconds(this.rnd.Next(50) + 1), (P) =>
+			{
+				this.Lock(Info, InfoRec);
+			}, null);
+		}
 	}
 }

@@ -27,10 +27,15 @@ namespace Waher.Networking.Cluster
 			this.client = Client;
 			this.localAddress = LocalAddress;
 
-			byte[] A = LocalAddress.GetAddressBytes();
-			Array.Copy(A, 0, this.ivTx, 8, 4);
+			if (LocalAddress is null)
+				this.hmac = null;
+			else
+			{
+				byte[] A = LocalAddress.GetAddressBytes();
+				Array.Copy(A, 0, this.ivTx, 8, 4);
 
-			this.hmac = new HMACSHA1(A);
+				this.hmac = new HMACSHA1(A);
+			}
 		}
 
 		internal IPAddress Address => this.localAddress;

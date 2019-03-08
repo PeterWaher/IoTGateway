@@ -34,7 +34,8 @@ namespace Waher.Networking.Cluster
 		private static Dictionary<Type, ObjectInfo> objectInfo = new Dictionary<Type, ObjectInfo>();
 		private static ObjectInfo rootObject;
 
-		private readonly LinkedList<ClusterUdpClient> clients = new LinkedList<ClusterUdpClient>();
+		private readonly LinkedList<ClusterUdpClient> outgoing = new LinkedList<ClusterUdpClient>();
+		private readonly LinkedList<ClusterUdpClient> incoming = new LinkedList<ClusterUdpClient>();
 		private readonly IPEndPoint destination;
 		internal readonly Aes aes;
 		internal readonly byte[] key;
@@ -47,6 +48,7 @@ namespace Waher.Networking.Cluster
 		private Timer aliveTimer;
 		internal bool shuttingDown = false;
 		private readonly bool internalScheduler;
+		private ManualResetEvent shutDown = new ManualResetEvent(false);
 
 		/// <summary>
 		/// Represents one endpoint (or participant) in the network cluster.
@@ -73,6 +75,7 @@ namespace Waher.Networking.Cluster
 			params ISniffer[] Sniffers)
 			: base(Sniffers)
 		{
+			ClusterUdpClient ClusterUdpClient;
 			UdpClient Client;
 
 			if (MulticastAddress.AddressFamily != AddressFamily.InterNetwork)
@@ -95,7 +98,7 @@ namespace Waher.Networking.Cluster
 
 			this.localStatus = null;
 			this.remoteStatus = new Dictionary<IPEndPoint, object>();
-			this.currentStatus = new Cache<string, object>(int.MaxValue, TimeSpan.FromSeconds(30), TimeSpan.FromSeconds(30));
+			this.currentStatus = new Cache<string, object>(int.MaxValue, TimeSpan.MaxValue, TimeSpan.FromSeconds(30));
 			this.currentStatus.Removed += CurrentStatus_Removed;
 
 			if (Types.TryGetModuleParameter("Scheduler", out object Obj) &&
@@ -186,12 +189,55 @@ namespace Waher.Networking.Cluster
 							continue;
 						}
 
-						ClusterUdpClient ClusterUdpClient = new ClusterUdpClient(this, Client, Address);
+						ClusterUdpClient = new ClusterUdpClient(this, Client, Address);
 						ClusterUdpClient.BeginReceive();
 
-						this.clients.AddLast(ClusterUdpClient);
+						this.outgoing.AddLast(ClusterUdpClient);
+
+						try
+						{
+							Client = new UdpClient(AddressFamily)
+							{
+								ExclusiveAddressUse = false,
+							};
+
+							Client.Client.Bind(new IPEndPoint(Address, Port));
+						}
+						catch (NotSupportedException)
+						{
+							continue;
+						}
+						catch (Exception ex)
+						{
+							Log.Critical(ex);
+							continue;
+						}
+
+						ClusterUdpClient = new ClusterUdpClient(this, Client, Address);
+						ClusterUdpClient.BeginReceive();
+
+						this.incoming.AddLast(ClusterUdpClient);
 					}
 				}
+			}
+
+			try
+			{
+				Client = new UdpClient(Port, MulticastAddress.AddressFamily)
+				{
+					MulticastLoopback = false
+				};
+
+				Client.JoinMulticastGroup(MulticastAddress);
+
+				ClusterUdpClient = new ClusterUdpClient(this, Client, null);
+				ClusterUdpClient.BeginReceive();
+
+				this.incoming.AddLast(ClusterUdpClient);
+			}
+			catch (Exception)
+			{
+				// Ignore
 			}
 
 			this.aliveTimer = new Timer(this.SendAlive, null, 0, 5000);
@@ -204,7 +250,7 @@ namespace Waher.Networking.Cluster
 		{
 			get
 			{
-				foreach (ClusterUdpClient Client in this.clients)
+				foreach (ClusterUdpClient Client in this.incoming)
 					yield return Client.EndPoint;
 			}
 		}
@@ -247,6 +293,10 @@ namespace Waher.Networking.Cluster
 
 				this.shuttingDown = true;
 				this.SendMessageUnacknowledged(new ShuttingDown());
+
+				this.shutDown?.WaitOne(2000);
+				this.shutDown?.Dispose();
+				this.shutDown = null;
 			}
 		}
 
@@ -260,19 +310,8 @@ namespace Waher.Networking.Cluster
 			this.aliveTimer?.Dispose();
 			this.aliveTimer = null;
 
-			foreach (ClusterUdpClient Client in this.clients)
-			{
-				try
-				{
-					Client.Dispose();
-				}
-				catch (Exception)
-				{
-					// Ignore
-				}
-			}
-
-			this.clients.Clear();
+			this.Clear(this.outgoing);
+			this.Clear(this.incoming);
 
 			this.currentStatus?.Dispose();
 			this.currentStatus = null;
@@ -291,6 +330,25 @@ namespace Waher.Networking.Cluster
 					}
 				}
 			}
+
+			this.shutDown?.Set();
+		}
+
+		private void Clear(LinkedList<ClusterUdpClient> Clients)
+		{
+			foreach (ClusterUdpClient Client in Clients)
+			{
+				try
+				{
+					Client.Dispose();
+				}
+				catch (Exception)
+				{
+					// Ignore
+				}
+			}
+
+			Clients.Clear();
 		}
 
 		internal static ObjectInfo GetObjectInfo(Type T)
@@ -473,17 +531,12 @@ namespace Waher.Networking.Cluster
 								string Address = new IPAddress(Input.ReadBinary()).ToString();
 								int Port = Input.ReadUInt16();
 
-								foreach (ClusterUdpClient Client in this.clients)
+								if (this.IsEndpoint(this.outgoing, Address, Port) ||
+									this.IsEndpoint(this.incoming, Address, Port))
 								{
-									if (Client.IsEndpoint(Address, Port))
-									{
-										Skip = true;
-										break;
-									}
-								}
-
-								if (Skip)
+									Skip = true;
 									break;
+								}
 
 								Len--;
 							}
@@ -565,17 +618,12 @@ namespace Waher.Networking.Cluster
 								string Address = new IPAddress(Input.ReadBinary()).ToString();
 								int Port = Input.ReadUInt16();
 
-								foreach (ClusterUdpClient Client in this.clients)
+								if (this.IsEndpoint(this.outgoing, Address, Port) ||
+									this.IsEndpoint(this.incoming, Address, Port))
 								{
-									if (Client.IsEndpoint(Address, Port))
-									{
-										Skip = true;
-										break;
-									}
-								}
-
-								if (Skip)
+									Skip = true;
 									break;
+								}
 
 								Len--;
 							}
@@ -694,6 +742,17 @@ namespace Waher.Networking.Cluster
 			}
 		}
 
+		private bool IsEndpoint(LinkedList<ClusterUdpClient> Clients, string Address, int Port)
+		{
+			foreach (ClusterUdpClient Client in Clients)
+			{
+				if (Client.IsEndpoint(Address, Port))
+					return true;
+			}
+
+			return false;
+		}
+
 		/// <summary>
 		/// Event raised when a cluster message has been received.
 		/// </summary>
@@ -703,7 +762,7 @@ namespace Waher.Networking.Cluster
 		{
 			this.TransmitBinary(Message);
 
-			foreach (ClusterUdpClient Client in this.clients)
+			foreach (ClusterUdpClient Client in this.outgoing)
 				Client.BeginTransmit(Message, Destination);
 		}
 
@@ -756,6 +815,7 @@ namespace Waher.Networking.Cluster
 				rootObject.Serialize(Output, Message);
 
 				byte[] Bin = Output.ToArray();
+				DateTime Now = DateTime.Now;
 
 				Rec = new MessageStatus()
 				{
@@ -763,12 +823,13 @@ namespace Waher.Networking.Cluster
 					Message = Message,
 					MessageBinary = Bin,
 					Callback = Callback,
-					State = State
+					State = State,
+					TimeLimit = Now.AddSeconds(30)
 				};
 
 				this.currentStatus[s] = Rec;
 
-				Rec.Timeout = this.scheduler.Add(DateTime.Now.AddSeconds(2), this.ResendAcknowledgedMessage, Rec);
+				Rec.Timeout = this.scheduler.Add(Now.AddSeconds(2), this.ResendAcknowledgedMessage, Rec);
 
 				this.Transmit(Bin, this.destination);
 
@@ -803,8 +864,9 @@ namespace Waher.Networking.Cluster
 			try
 			{
 				EndpointStatus[] CurrentStatus = this.GetRemoteStatuses();
+				DateTime Now = DateTime.Now;
 
-				if (Rec.IsComplete(CurrentStatus))
+				if (Rec.IsComplete(CurrentStatus) || Now >= Rec.TimeLimit)
 				{
 					this.currentStatus.Remove(Rec.Id.ToString());
 					this.scheduler.Remove(Rec.Timeout);
@@ -832,7 +894,7 @@ namespace Waher.Networking.Cluster
 
 						Output.WriteRaw(Rec.MessageBinary, 18, Rec.MessageBinary.Length - 18);
 
-						Rec.Timeout = this.scheduler.Add(DateTime.Now.AddSeconds(2), this.ResendAcknowledgedMessage, Rec);
+						Rec.Timeout = this.scheduler.Add(Now.AddSeconds(2), this.ResendAcknowledgedMessage, Rec);
 						this.Transmit(Output.ToArray(), this.destination);
 					}
 				}
@@ -1162,19 +1224,21 @@ namespace Waher.Networking.Cluster
 				rootObject.Serialize(Output, Command);
 
 				byte[] Bin = Output.ToArray();
+				DateTime Now = DateTime.Now;
 
 				Rec = new CommandStatus<ResponseType>()
 				{
 					Id = Id,
 					Command = Command,
 					CommandBinary = Bin,
+					TimeLimit = Now.AddSeconds(30),
 					Callback = Callback,
 					State = State
 				};
 
 				this.currentStatus[s] = Rec;
 
-				Rec.Timeout = this.scheduler.Add(DateTime.Now.AddSeconds(2), this.ResendCommand<ResponseType>, Rec);
+				Rec.Timeout = this.scheduler.Add(Now.AddSeconds(2), this.ResendCommand<ResponseType>, Rec);
 
 				this.Transmit(Bin, this.destination);
 
@@ -1205,12 +1269,13 @@ namespace Waher.Networking.Cluster
 		private void ResendCommand<ResponseType>(Object P)
 		{
 			CommandStatus<ResponseType> Rec = (CommandStatus<ResponseType>)P;
+			DateTime Now = DateTime.Now;
 
 			try
 			{
 				EndpointStatus[] CurrentStatus = this.GetRemoteStatuses();
 
-				if (Rec.IsComplete(CurrentStatus))
+				if (Rec.IsComplete(CurrentStatus) || Now >= Rec.TimeLimit)
 				{
 					this.currentStatus.Remove(Rec.Id.ToString());
 					this.scheduler.Remove(Rec.Timeout);
@@ -1238,7 +1303,7 @@ namespace Waher.Networking.Cluster
 
 						Output.WriteRaw(Rec.CommandBinary, 18, Rec.CommandBinary.Length - 18);
 
-						Rec.Timeout = this.scheduler.Add(DateTime.Now.AddSeconds(2), this.ResendCommand<ResponseType>, Rec);
+						Rec.Timeout = this.scheduler.Add(Now.AddSeconds(2), this.ResendCommand<ResponseType>, Rec);
 						this.Transmit(Output.ToArray(), this.destination);
 					}
 				}

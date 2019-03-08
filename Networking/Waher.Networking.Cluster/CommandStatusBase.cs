@@ -13,6 +13,7 @@ namespace Waher.Networking.Cluster
 		public IClusterCommand Command;
 		public byte[] CommandBinary;
 		public DateTime Timeout;
+		public DateTime TimeLimit;
 		public object State;
 
 		/// <summary>

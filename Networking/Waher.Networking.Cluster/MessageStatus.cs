@@ -14,6 +14,7 @@ namespace Waher.Networking.Cluster
 		public IClusterMessage Message;
 		public byte[] MessageBinary;
 		public DateTime Timeout;
+		public DateTime TimeLimit;
 		public ClusterMessageAckEventHandler Callback;
 		public object State;
 

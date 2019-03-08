@@ -43,6 +43,7 @@ namespace Waher.Networking.UPnP
 		public UPnPClient(params ISniffer[] Sniffers)
 			: base(Sniffers)
 		{
+			Dictionary<AddressFamily, bool> GenIncoming = new Dictionary<AddressFamily, bool>();
 			UdpClient Outgoing;
 			UdpClient Incoming;
 
@@ -117,21 +118,26 @@ namespace Waher.Networking.UPnP
 						Incoming = null;
 					}
 
-					try
+					if (!GenIncoming.ContainsKey(Outgoing.Client.AddressFamily))
 					{
-						Incoming = new UdpClient(ssdpPort, Outgoing.Client.AddressFamily)
+						GenIncoming[Outgoing.Client.AddressFamily] = true;
+
+						try
 						{
-							MulticastLoopback = false
-						};
+							Incoming = new UdpClient(ssdpPort, Outgoing.Client.AddressFamily)
+							{
+								MulticastLoopback = false
+							};
 
-						Incoming.JoinMulticastGroup(MulticastAddress);
-						this.BeginReceiveIncoming(Incoming);
+							Incoming.JoinMulticastGroup(MulticastAddress);
+							this.BeginReceiveIncoming(Incoming);
 
-						this.ssdpIncoming.AddLast(Incoming);
-					}
-					catch (Exception)
-					{
-						Incoming = null;
+							this.ssdpIncoming.AddLast(Incoming);
+						}
+						catch (Exception)
+						{
+							Incoming = null;
+						}
 					}
 				}
 			}

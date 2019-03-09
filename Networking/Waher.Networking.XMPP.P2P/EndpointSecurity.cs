@@ -470,9 +470,21 @@ namespace Waher.Networking.XMPP.P2P
 			{
 				if (this.contacts.TryGetValue(FullJid, out IE2eEndpoint[] Endpoints))
 					return Endpoints;
-				else
-					return new E2eEndpoint[0];
 			}
+
+			if (string.Compare(FullJid, this.client.BareJID) == 0)
+			{
+				StringBuilder Xml = new StringBuilder();
+
+				this.AppendE2eInfo(Xml);
+
+				XmlDocument Doc = new XmlDocument();
+				Doc.LoadXml(Xml.ToString());
+
+				return ParseE2eKeys(Doc.DocumentElement)?.ToArray() ?? new IE2eEndpoint[0];
+			}
+
+			return new E2eEndpoint[0];
 		}
 
 		/// <summary>

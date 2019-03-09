@@ -102,7 +102,7 @@ namespace Waher.IoTGateway.Setup
 			{
 				Gateway.AssertUserAuthenticated(Request);
 
-				
+				await Gateway.SimplifiedConfiguration();
 
 				Response.StatusCode = 200;
 				await this.MakeCompleted();

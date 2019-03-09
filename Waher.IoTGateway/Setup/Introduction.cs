@@ -93,7 +93,7 @@ namespace Waher.IoTGateway.Setup
 		{
 			WebServer.Unregister(this.simplified);
 
-			return base.SetupConfiguration(WebServer);
+			return base.CleanupAfterConfiguration(WebServer);
 		}
 
 		private async void Simplified(HttpRequest Request, HttpResponse Response)

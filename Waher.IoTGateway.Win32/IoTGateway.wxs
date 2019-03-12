@@ -896,7 +896,7 @@
 						<Directory Id='Graphics' Name='Graphics'>
 							<Component Id='Emoji1Zip' Guid='8CA3074F-7809-4D73-82EF-B15316E5151F'>
 								<RemoveFolder Id='RemoveEmoji1Folder' On='uninstall' />
-								<File Id='Emoji1.zip' Name='Emoji1.zip' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Graphics\Emoji1.zip' Vital='yes' KeyPath='yes'/>
+								<File Id='Emoji1.zip' Name='Emoji1.zip' DiskId='1' Source='..\..\..\Content\Waher.Content.Emoji.Emoji1\Graphics\Emoji1.zip' Vital='yes' KeyPath='yes'/>
 								<RemoveFile Id='RemoveEmoji1Zip' Name='Emoji1.zip' On='uninstall'/>
 							</Component>
 						</Directory>

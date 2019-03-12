@@ -108,12 +108,11 @@ namespace Waher.IoTGateway
 	/// </summary>
 	public static class Gateway
 	{
-		private const int MaxRecordsPerPeriod = 500;
 		private const int MaxChunkSize = 4096;
 
-		private static LinkedList<KeyValuePair<string, int>> ports = new LinkedList<KeyValuePair<string, int>>();
-		private static Dictionary<int, EventHandler> serviceCommandByNr = new Dictionary<int, EventHandler>();
-		private static Dictionary<EventHandler, int> serviceCommandNrByCallback = new Dictionary<EventHandler, int>();
+		private static readonly LinkedList<KeyValuePair<string, int>> ports = new LinkedList<KeyValuePair<string, int>>();
+		private static readonly Dictionary<int, EventHandler> serviceCommandByNr = new Dictionary<int, EventHandler>();
+		private static readonly Dictionary<EventHandler, int> serviceCommandNrByCallback = new Dictionary<EventHandler, int>();
 		private static IDatabaseProvider internalProvider = null;
 		private static ThingRegistryClient thingRegistryClient = null;
 		private static ProvisioningClient provisioningClient = null;
@@ -132,11 +131,7 @@ namespace Waher.IoTGateway
 		private static HttpxProxy httpxProxy = null;
 		private static HttpxServer httpxServer = null;
 		private static CoapEndpoint coapEndpoint = null;
-		private static ClientEvents clientEvents = null;
-		private static ClientEventsWebSocket clientEventsWs = null;
 		private static SystemConfiguration[] configurations;
-		private static Login login = null;
-		private static Logout logout = null;
 		private static LoggedIn loggedIn = null;
 		private static Scheduler scheduler = null;
 		private static RandomNumberGenerator rnd = null;
@@ -475,10 +470,10 @@ namespace Waher.IoTGateway
 					SetupResources.AddLast(webServer.Register(new HttpFolderResource("/highlight", "Highlight", false, false, true, false)));   // Syntax highlighting library, provided by http://highlightjs.org
 					SetupResources.AddLast(webServer.Register(HttpFolderResource = new HttpFolderResource(string.Empty, rootFolder, false, false, true, true)));    // TODO: Add authentication mechanisms for PUT & DELETE.
 					SetupResources.AddLast(webServer.Register("/", (req, resp) => throw new TemporaryRedirectException(defaultPage)));
-					SetupResources.AddLast(webServer.Register(clientEvents = new ClientEvents()));
-					SetupResources.AddLast(webServer.Register(clientEventsWs = new ClientEventsWebSocket()));
-					SetupResources.AddLast(webServer.Register(login = new Login()));
-					SetupResources.AddLast(webServer.Register(logout = new Logout()));
+					SetupResources.AddLast(webServer.Register(new ClientEvents()));
+					SetupResources.AddLast(webServer.Register(new ClientEventsWebSocket()));
+					SetupResources.AddLast(webServer.Register(new Login()));
+					SetupResources.AddLast(webServer.Register(new Logout()));
 
 					emoji1_24x24 = new Emoji1LocalFiles(Emoji1SourceFileType.Svg, 24, 24, "/Graphics/Emoji1/svg/%FILENAME%",
 						Path.Combine(runtimeFolder, "Graphics", "Emoji1.zip"), Path.Combine(appDataFolder, "Graphics"));
@@ -626,10 +621,10 @@ namespace Waher.IoTGateway
 				webServer.Register(HttpFolderResource = new HttpFolderResource(string.Empty, rootFolder, false, false, true, true));    // TODO: Add authentication mechanisms for PUT & DELETE.
 				webServer.Register(httpxProxy = new HttpxProxy("/HttpxProxy", xmppClient, MaxChunkSize));
 				webServer.Register("/", (req, resp) => throw new TemporaryRedirectException(defaultPage));
-				webServer.Register(clientEvents = new ClientEvents());
-				webServer.Register(clientEventsWs = new ClientEventsWebSocket());
-				webServer.Register(login = new Login());
-				webServer.Register(logout = new Logout());
+				webServer.Register(new ClientEvents());
+				webServer.Register(new ClientEventsWebSocket());
+				webServer.Register(new Login());
+				webServer.Register(new Logout());
 
 				if (emoji1_24x24 is null)
 				{
@@ -1295,10 +1290,6 @@ namespace Waher.IoTGateway
 					webServer = null;
 				}
 
-				clientEvents = null;
-				login = null;
-				logout = null;
-
 				if (exportExceptions)
 				{
 					exportExceptions = false;
@@ -1799,9 +1790,7 @@ namespace Waher.IoTGateway
 		/// <param name="Request">HTTP Request</param>
 		public static void AssertUserAuthenticated(HttpRequest Request)
 		{
-			IUser User;
-
-			if (Request.Session is null || !Request.Session.TryGetVariable("User", out Variable v) || (User = v.ValueObject as IUser) is null)
+			if (Request.Session is null || !Request.Session.TryGetVariable("User", out Variable v) || !(v.ValueObject is IUser))
 				throw new ForbiddenException();
 		}
 

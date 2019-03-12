@@ -329,37 +329,17 @@ namespace Waher.Networking.XMPP.Avatar
 
 								if (LoadAvatar)
 								{
-									this.e2e.SendIqGet(this.client, E2ETransmission.NormalIfNotE2E,
-										FullJID, "<query xmlns='jabber:iq:avatar'/>", async (sender2, e2) =>
-										{
-											try
-											{
-												if (e2.Ok)
-													await this.ParseAvatar(BareJID, Hash, e2.FirstElement);
-												else
-												{
-													this.Client.SendIqGet(BareJID, "<query xmlns='storage:client:avatar'/>",
-														async (sender3, e3) =>
-														{
-															try
-															{
-																if (e3.Ok)
-																	await this.ParseAvatar(BareJID, Hash, e3.FirstElement);
-																else
-																	await this.ParseAvatar(BareJID, Hash, null);
-															}
-															catch (Exception ex3)
-															{
-																Log.Critical(ex3);
-															}
-														}, null);
-												}
-											}
-											catch (Exception ex2)
-											{
-												Log.Critical(ex2);
-											}
-										}, null);
+                                    if (this.e2e is null)
+                                    {
+                                        this.client.SendIqGet(FullJID, "<query xmlns='jabber:iq:avatar'/>", this.AvatarResponse,
+                                            new object[] { BareJID, Hash });
+                                    }
+                                    else
+                                    {
+                                        this.e2e.SendIqGet(this.client, E2ETransmission.NormalIfNotE2E,
+                                            FullJID, "<query xmlns='jabber:iq:avatar'/>", this.AvatarResponse,
+                                            new object[] { BareJID, Hash });
+                                    }
 								}
 							}
 							catch (Exception ex)
@@ -376,7 +356,42 @@ namespace Waher.Networking.XMPP.Avatar
 			}
 		}
 
-		private async Task ParseAvatar(string BareJid, string Hash, XmlElement E)
+        private async void AvatarResponse(object Sender, IqResultEventArgs e2)
+        {
+            try
+            {
+                object[] P = (object[])e2.State;
+                string BareJID = (string)P[0];
+                string Hash = (string)P[1];
+
+                if (e2.Ok)
+                    await this.ParseAvatar(BareJID, Hash, e2.FirstElement);
+                else
+                {
+                    this.Client.SendIqGet(BareJID, "<query xmlns='storage:client:avatar'/>",
+                        async (sender3, e3) =>
+                        {
+                            try
+                            {
+                                if (e3.Ok)
+                                    await this.ParseAvatar(BareJID, Hash, e3.FirstElement);
+                                else
+                                    await this.ParseAvatar(BareJID, Hash, null);
+                            }
+                            catch (Exception ex3)
+                            {
+                                Log.Critical(ex3);
+                            }
+                        }, null);
+                }
+            }
+            catch (Exception ex2)
+            {
+                Log.Critical(ex2);
+            }
+        }
+
+        private async Task ParseAvatar(string BareJid, string Hash, XmlElement E)
 		{
 			if (E != null && E.LocalName == "query" && (E.NamespaceURI == "jabber:iq:avatar" || E.NamespaceURI == "storage:client:avatar"))
 			{

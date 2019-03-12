@@ -15,12 +15,12 @@
     <copyright>Copyright © Waher Data AB 2016-2019. All rights reserved.</copyright>
     <tags>networking communication http uwp</tags>
     <dependencies>
-      <dependency id="Waher.Content" version="1.0.21"/>
+      <dependency id="Waher.Content" version="1.0.22"/>
       <dependency id="Waher.Events" version="1.0.7"/>
       <dependency id="Waher.Events.Statistics" version="1.0.3"/>
       <dependency id="Waher.Networking" version="1.0.12"/>
       <dependency id="Waher.Runtime.Cache" version="1.0.2"/>
-      <dependency id="Waher.Runtime.Inventory" version="1.0.8"/>
+      <dependency id="Waher.Runtime.Inventory" version="1.0.9"/>
       <dependency id="Waher.Script" version="1.0.27"/>
       <dependency id="Waher.Security" version="1.0.2"/>
     </dependencies>

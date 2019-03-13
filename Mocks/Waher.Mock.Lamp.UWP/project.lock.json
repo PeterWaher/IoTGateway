@@ -19988,7 +19988,7 @@
   },
   "libraries": {
     "Microsoft.ApplicationInsights/2.8.1": {
-      "sha512": "p8n64aouzVF06zEyKKOYOB5sbVJd+GFs1A9ykLEVP9XNHTcmAvHbVgtLpUoHuvoWShYOkGW2ato/lIKiUsxIUw==",
+      "sha512": "39k9QFItF5rALCsyCYT9FWZc1XI71qQ10z3mSEEx09/CzohkJHam/V3hG8SV4NV9DfYP8GR6OCErJXRf8vEMUg==",
       "type": "package",
       "path": "microsoft.applicationinsights/2.8.1",
       "files": [
@@ -30044,7 +30044,8 @@
     "UAP,Version=v10.0.10240": []
   },
   "packageFolders": {
-    "C:\\Users\\Peter\\.nuget\\packages\\": {}
+    "C:\\Users\\peter\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Xamarin\\NuGet\\": {}
   },
   "project": {
     "restore": {
@@ -30052,12 +30053,16 @@
       "projectName": "Waher.Mock.Lamp.UWP",
       "projectPath": "C:\\My Projects\\IoTGateway\\Mocks\\Waher.Mock.Lamp.UWP\\Waher.Mock.Lamp.UWP.csproj",
       "projectJsonPath": "C:\\My Projects\\IoTGateway\\Mocks\\Waher.Mock.Lamp.UWP\\project.json",
-      "packagesPath": "C:\\Users\\Peter\\.nuget\\packages\\",
+      "packagesPath": "C:\\Users\\peter\\.nuget\\packages\\",
       "outputPath": "C:\\My Projects\\IoTGateway\\Mocks\\Waher.Mock.Lamp.UWP\\obj\\",
       "projectStyle": "ProjectJson",
+      "fallbackFolders": [
+        "C:\\Program Files (x86)\\Xamarin\\NuGet\\"
+      ],
       "configFilePaths": [
-        "C:\\Users\\Peter\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        "C:\\Users\\peter\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},

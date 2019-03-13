@@ -5,9 +5,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Runtime.ExceptionServices;
-#if NETSTANDARD1_5
 using System.Security.Cryptography;
-#endif
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
@@ -66,15 +64,12 @@ namespace Waher.Persistence.Files
 		private bool isCorrupt = false;
 		private bool emptyRoot = false;
 		private readonly bool debug;
-#if NETSTANDARD1_5
 		private Aes aes;
 		private readonly byte[] aesKey;
 		private readonly byte[] ivSeed;
 		private readonly int ivSeedLen;
 		private readonly bool encrypted;
-#endif
 
-#if NETSTANDARD1_5
 		/// <summary>
 		/// This class manages a binary file where objects are persisted in a B-tree.
 		/// </summary>
@@ -100,34 +95,7 @@ namespace Waher.Persistence.Files
 				  TimeoutMilliseconds, Encrypted, Debug, null)
 		{
 		}
-#else
-		/// <summary>
-		/// This class manages a binary file where objects are persisted in a B-tree.
-		/// </summary>
-		/// <param name="FileName">Name of binary file. File will be created if it does not exist. The class will require
-		/// unique read/write access to the file.</param>
-		/// <param name="CollectionName">Name of collection corresponding to the file.</param>
-		/// <param name="BlobFileName">Name of file in which BLOBs are stored.</param>
-		/// <param name="BlockSize">Size of a block in the B-tree. The size must be a power of two, and should be at least the same
-		/// size as a sector on the storage device. Smaller block sizes (2, 4 kB) are suitable for online transaction processing, where
-		/// a lot of updates to the database occurs. Larger block sizes (8, 16, 32 kB) are suitable for decision support systems.
-		/// The block sizes also limit the size of objects stored directly in the file. Objects larger than
-		/// <see cref="InlineObjectSizeLimit"/> bytes will be stored as BLOBs.</param>
-		/// <param name="BlobBlockSize">Size of a block in the BLOB file. The size must be a power of two. The BLOB file will consist
-		/// of a doubly linked list of blocks of this size.</param>
-		/// <param name="Provider">Reference to the files provider.</param>
-		/// <param name="Encoding">Encoding to use for text properties.</param>
-		/// <param name="TimeoutMilliseconds">Timeout, in milliseconds, to wait for access to the database layer.</param>
-		/// <param name="Debug">If the provider is run in debug mode.</param>
-		internal ObjectBTreeFile(string FileName, string CollectionName, string BlobFileName, int BlockSize, int BlobBlockSize,
-			FilesProvider Provider, Encoding Encoding, int TimeoutMilliseconds, bool Debug)
-			: this(FileName, CollectionName, BlobFileName, BlockSize, BlobBlockSize, Provider, Encoding,
-				  TimeoutMilliseconds, Debug, null)
-		{
-		}
-#endif
 
-#if NETSTANDARD1_5
 		/// <summary>
 		/// This class manages a binary file where objects are persisted in a B-tree.
 		/// </summary>
@@ -151,30 +119,6 @@ namespace Waher.Persistence.Files
 		internal ObjectBTreeFile(string FileName, string CollectionName, string BlobFileName, int BlockSize,
 			int BlobBlockSize, FilesProvider Provider, Encoding Encoding, int TimeoutMilliseconds, bool Encrypted, bool Debug,
 			IRecordHandler RecordHandler)
-#else
-		/// <summary>
-		/// This class manages a binary file where objects are persisted in a B-tree.
-		/// </summary>
-		/// <param name="FileName">Name of binary file. File will be created if it does not exist. The class will require
-		/// unique read/write access to the file.</param>
-		/// <param name="CollectionName">Name of collection corresponding to the file.</param>
-		/// <param name="BlobFileName">Name of file in which BLOBs are stored.</param>
-		/// <param name="BlockSize">Size of a block in the B-tree. The size must be a power of two, and should be at least the same
-		/// size as a sector on the storage device. Smaller block sizes (2, 4 kB) are suitable for online transaction processing, where
-		/// a lot of updates to the database occurs. Larger block sizes (8, 16, 32 kB) are suitable for decision support systems.
-		/// The block sizes also limit the size of objects stored directly in the file. Objects larger than
-		/// <see cref="InlineObjectSizeLimit"/> bytes will be stored as BLOBs.</param>
-		/// <param name="BlobBlockSize">Size of a block in the BLOB file. The size must be a power of two. The BLOB file will consist
-		/// of a doubly linked list of blocks of this size.</param>
-		/// <param name="Provider">Reference to the files provider.</param>
-		/// <param name="Encoding">Encoding to use for text properties.</param>
-		/// <param name="TimeoutMilliseconds">Timeout, in milliseconds, to wait for access to the database layer.</param>
-		/// <param name="Debug">If the provider is run in debug mode.</param>
-		/// <param name="RecordHandler">Record handler to use.</param>
-		internal ObjectBTreeFile(string FileName, string CollectionName, string BlobFileName, int BlockSize,
-			int BlobBlockSize, FilesProvider Provider, Encoding Encoding, int TimeoutMilliseconds, bool Debug,
-			IRecordHandler RecordHandler)
-#endif
 		{
 			CheckBlockSizes(BlockSize, BlobBlockSize);
 
@@ -192,9 +136,7 @@ namespace Waher.Persistence.Files
 			this.encoding = Encoding;
 			this.timeoutMilliseconds = TimeoutMilliseconds;
 			this.genericSerializer = new GenericObjectSerializer(this.provider);
-#if NETSTANDARD1_5
 			this.encrypted = Encrypted;
-#endif
 			this.debug = Debug;
 
 			if (RecordHandler is null)
@@ -204,7 +146,6 @@ namespace Waher.Persistence.Files
 
 			bool FileExists = File.Exists(this.fileName);
 
-#if NETSTANDARD1_5
 			if (this.encrypted)
 			{
 				this.aes = Aes.Create();
@@ -216,8 +157,8 @@ namespace Waher.Persistence.Files
 				this.provider.GetKeys(this.fileName, FileExists, out this.aesKey, out this.ivSeed);
 				this.ivSeedLen = this.ivSeed.Length;
 			}
-#endif
-			string Folder = Path.GetDirectoryName(this.fileName);
+
+            string Folder = Path.GetDirectoryName(this.fileName);
 			if (!string.IsNullOrEmpty(Folder) && !Directory.Exists(Folder))
 				Directory.CreateDirectory(Folder);
 
@@ -372,7 +313,6 @@ namespace Waher.Persistence.Files
 			get { return this.timeoutMilliseconds; }
 		}
 
-#if NETSTANDARD1_5
 		/// <summary>
 		/// If the files should be encrypted or not.
 		/// </summary>
@@ -380,8 +320,8 @@ namespace Waher.Persistence.Files
 		{
 			get { return this.encrypted; }
 		}
-#endif
-		/// <summary>
+	
+        /// <summary>
 		/// If the file has been detected to contain corruptions.
 		/// </summary>
 		public bool IsCorrupt
@@ -649,7 +589,6 @@ namespace Waher.Persistence.Files
 
 			this.nrBlockLoads++;
 
-#if NETSTANDARD1_5
 			if (this.encrypted)
 			{
 				using (ICryptoTransform Aes = this.aes.CreateDecryptor(this.aesKey, this.GetIV(PhysicalPosition)))
@@ -657,8 +596,8 @@ namespace Waher.Persistence.Files
 					Block = Aes.TransformFinalBlock(Block, 0, Block.Length);
 				}
 			}
-#endif
-			if (AddToCache)
+
+            if (AddToCache)
 				this.provider.AddBlockToCache(this.id, (uint)(PhysicalPosition / this.blockSize), Block);
 
 			return Block;
@@ -723,7 +662,6 @@ namespace Waher.Persistence.Files
 		{
 			byte[] EncryptedBlock;
 
-#if NETSTANDARD1_5
 			if (this.encrypted)
 			{
 				using (ICryptoTransform Aes = this.aes.CreateEncryptor(this.aesKey, this.GetIV(PhysicalPosition)))
@@ -732,7 +670,6 @@ namespace Waher.Persistence.Files
 				}
 			}
 			else
-#endif
 				EncryptedBlock = (byte[])Block.Clone();
 
 			if (PhysicalPosition != this.file.Seek(PhysicalPosition, SeekOrigin.Begin))
@@ -743,7 +680,6 @@ namespace Waher.Persistence.Files
 			this.nrBlockSaves++;
 		}
 
-#if NETSTANDARD1_5
 		private byte[] GetIV(long Position)
 		{
 			byte[] Input = new byte[this.ivSeedLen + 8];
@@ -760,8 +696,8 @@ namespace Waher.Persistence.Files
 
 			return Hash;
 		}
-#endif
-		private void RegisterEmptyBlockLocked(uint Block)
+
+        private void RegisterEmptyBlockLocked(uint Block)
 		{
 			if (this.emptyBlocks is null)
 				this.emptyBlocks = new SortedDictionary<uint, bool>(new ReverseOrder());
@@ -917,7 +853,6 @@ namespace Waher.Persistence.Files
 					Pos += Limit;
 				}
 
-#if NETSTANDARD1_5
 				if (this.encrypted)
 				{
 					using (ICryptoTransform Aes = this.aes.CreateEncryptor(this.aesKey, this.GetIV(this.blobFile.Position)))
@@ -926,7 +861,6 @@ namespace Waher.Persistence.Files
 					}
 				}
 				else
-#endif
 					EncryptedBlock = (byte[])Block.Clone();
 
 				await this.blobFile.WriteAsync(EncryptedBlock, 0, this.blobBlockSize);
@@ -977,7 +911,6 @@ namespace Waher.Persistence.Files
 
 				this.nrBlobBlockLoads++;
 
-#if NETSTANDARD1_5
 				if (this.encrypted)
 				{
 					using (ICryptoTransform Aes = this.aes.CreateDecryptor(this.aesKey, this.GetIV(PhysicalPosition)))
@@ -986,7 +919,6 @@ namespace Waher.Persistence.Files
 					}
 				}
 				else
-#endif
 					DecryptedBlock = (byte[])BlobBlock.Clone();
 
 				Reader.Restart(DecryptedBlock, 0);
@@ -1066,7 +998,6 @@ namespace Waher.Persistence.Files
 
 				this.nrBlockLoads++;
 
-#if NETSTANDARD1_5
 				if (this.encrypted)
 				{
 					using (ICryptoTransform Aes = this.aes.CreateDecryptor(this.aesKey, this.GetIV(PhysicalPosition)))
@@ -1075,7 +1006,6 @@ namespace Waher.Persistence.Files
 					}
 				}
 				else
-#endif
 					DecryptedBlock = (byte[])BlobBlock.Clone();
 
 				Reader.Restart(DecryptedBlock, 0);
@@ -1113,7 +1043,6 @@ namespace Waher.Persistence.Files
 
 				this.nrBlockLoads++;
 
-#if NETSTANDARD1_5
 				if (this.encrypted)
 				{
 					using (ICryptoTransform Aes = this.aes.CreateDecryptor(this.aesKey, this.GetIV(PhysicalPosition)))
@@ -1122,7 +1051,6 @@ namespace Waher.Persistence.Files
 					}
 				}
 				else
-#endif
 					DecryptedBlock = (byte[])BlobBlock.Clone();
 
 				Reader.Restart(DecryptedBlock, 0);
@@ -1185,7 +1113,6 @@ namespace Waher.Persistence.Files
 
 					this.nrBlockLoads++;
 
-#if NETSTANDARD1_5
 					if (this.encrypted)
 					{
 						using (ICryptoTransform Aes = this.aes.CreateDecryptor(this.aesKey, this.GetIV(PhysicalPosition2)))
@@ -1194,12 +1121,10 @@ namespace Waher.Persistence.Files
 						}
 					}
 					else
-#endif
 						DecryptedBlock2 = BlobBlock;
 
 					Array.Copy(BitConverter.GetBytes(BlobBlockIndex), 0, DecryptedBlock2, KeySize + 4, 4);
 
-#if NETSTANDARD1_5
 					if (this.encrypted)
 					{
 						using (ICryptoTransform Aes = this.aes.CreateEncryptor(this.aesKey, this.GetIV(PhysicalPosition2)))
@@ -1208,7 +1133,6 @@ namespace Waher.Persistence.Files
 						}
 					}
 					else
-#endif
 						EncryptedBlock = (byte[])DecryptedBlock2.Clone();
 
 					this.blobFile.Position = PhysicalPosition2;
@@ -1229,7 +1153,6 @@ namespace Waher.Persistence.Files
 
 					this.nrBlockLoads++;
 
-#if NETSTANDARD1_5
 					if (this.encrypted)
 					{
 						using (ICryptoTransform Aes = this.aes.CreateDecryptor(this.aesKey, this.GetIV(PhysicalPosition2)))
@@ -1238,12 +1161,10 @@ namespace Waher.Persistence.Files
 						}
 					}
 					else
-#endif
 						DecryptedBlock2 = BlobBlock;
 
 					Array.Copy(BitConverter.GetBytes(BlobBlockIndex), 0, DecryptedBlock2, KeySize, 4);
 
-#if NETSTANDARD1_5
 					if (this.encrypted)
 					{
 						using (ICryptoTransform Aes = this.aes.CreateEncryptor(this.aesKey, this.GetIV(PhysicalPosition2)))
@@ -1252,7 +1173,6 @@ namespace Waher.Persistence.Files
 						}
 					}
 					else
-#endif
 						EncryptedBlock = (byte[])DecryptedBlock2.Clone();
 
 					this.blobFile.Position = PhysicalPosition2;
@@ -1260,7 +1180,6 @@ namespace Waher.Persistence.Files
 					this.nrBlockSaves++;
 				}
 
-#if NETSTANDARD1_5
 				if (this.encrypted)
 				{
 					using (ICryptoTransform Aes = this.aes.CreateEncryptor(this.aesKey, this.GetIV(PhysicalPosition)))
@@ -1269,7 +1188,6 @@ namespace Waher.Persistence.Files
 					}
 				}
 				else
-#endif
 					EncryptedBlock = (byte[])DecryptedBlock.Clone();
 
 				this.blobFile.Position = PhysicalPosition;
@@ -4180,7 +4098,6 @@ namespace Waher.Persistence.Files
 
 					this.nrBlobBlockLoads++;
 
-#if NETSTANDARD1_5
 					if (this.encrypted)
 					{
 						using (ICryptoTransform Aes = this.aes.CreateDecryptor(this.aesKey, this.GetIV(PhysicalPosition)))
@@ -4189,7 +4106,6 @@ namespace Waher.Persistence.Files
 						}
 					}
 					else
-#endif
 						DecryptedBlock = (byte[])BlobBlock.Clone();
 
 					if (Reader is null)

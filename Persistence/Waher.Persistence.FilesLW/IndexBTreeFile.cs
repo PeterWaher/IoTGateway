@@ -44,11 +44,7 @@ namespace Waher.Persistence.Files
 
 			this.indexFile = new ObjectBTreeFile(FileName, string.Empty, string.Empty, this.objectFile.BlockSize,
 				this.objectFile.BlobBlockSize, Provider, this.encoding, this.objectFile.TimeoutMilliseconds,
-#if NETSTANDARD1_5
 				this.objectFile.Encrypted, Provider.Debug, this.recordHandler);
-#else
-				Provider.Debug, this.recordHandler);
-#endif
 			this.recordHandler.Index = this;
 		}
 

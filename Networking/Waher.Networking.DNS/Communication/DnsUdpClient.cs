@@ -19,7 +19,15 @@ namespace Waher.Networking.DNS.Communication
 	/// </summary>
 	public class DnsUdpClient : DnsClient
 	{
-		private readonly IPEndPoint dnsEndpoint;
+        private static readonly IPAddress[] defaultDnsAddresses = new IPAddress[]
+        {
+            IPAddress.Parse("8.8.8.8"),                 // Use Google Public DNS IP addresses as default, if no DNS addresses found.
+            IPAddress.Parse("8.8.4.4"),
+            IPAddress.Parse("2001:4860:4860::8888"),
+            IPAddress.Parse("2001:4860:4860::8844")
+        };
+
+        private readonly IPEndPoint dnsEndpoint;
 		private UdpClient udp = null;
 
 		/// <summary>
@@ -28,60 +36,67 @@ namespace Waher.Networking.DNS.Communication
 		public DnsUdpClient()
 			: base()
 		{
-			foreach (NetworkInterface Interface in NetworkInterface.GetAllNetworkInterfaces())
-			{
-				if (Interface.OperationalStatus != OperationalStatus.Up)
-					continue;
+            int Step;
 
-				if (Interface.NetworkInterfaceType == NetworkInterfaceType.Loopback)
-					continue;
+            for (Step = 0; Step < 2; Step++)
+            {
+                foreach (NetworkInterface Interface in NetworkInterface.GetAllNetworkInterfaces())
+                {
+                    if (Interface.OperationalStatus != OperationalStatus.Up)
+                        continue;
 
-				IPInterfaceProperties Properties = Interface.GetIPProperties();
-				int c;
+                    if (Interface.NetworkInterfaceType == NetworkInterfaceType.Loopback)
+                        continue;
 
-				if ((c = Properties.DnsAddresses.Count) == 0)
-					continue;
+                    IPInterfaceProperties Properties = Interface.GetIPProperties();
+                    int c;
 
-				foreach (UnicastIPAddressInformation UnicastAddress in Properties.UnicastAddresses)
-				{
-					foreach (IPAddress DnsAddress in Properties.DnsAddresses)
-					{
-						this.dnsEndpoint = new IPEndPoint(DnsAddress, DnsResolver.DefaultDnsPort);
+                    if ((c = Properties.DnsAddresses?.Count ?? 0) == 0 && Step == 0)
+                        continue;
 
-						AddressFamily AddressFamily = this.dnsEndpoint.AddressFamily;
-						if (UnicastAddress.Address.AddressFamily != AddressFamily)
-							continue;
+                    foreach (UnicastIPAddressInformation UnicastAddress in Properties.UnicastAddresses)
+                    {
+                        IEnumerable<IPAddress> DnsAddresses = (IEnumerable<IPAddress>)Properties.DnsAddresses ?? defaultDnsAddresses;
 
-						IPAddress Address = UnicastAddress.Address;
+                        foreach (IPAddress DnsAddress in DnsAddresses)
+                        {
+                            this.dnsEndpoint = new IPEndPoint(DnsAddress, DnsResolver.DefaultDnsPort);
 
-						try
-						{
-							this.udp = new UdpClient(AddressFamily)
-							{
-								DontFragment = true,
-								MulticastLoopback = false
-							};
-						}
-						catch (NotSupportedException)
-						{
-							continue;
-						}
-						catch (Exception ex)
-						{
-							Log.Critical(ex);
-							continue;
-						}
+                            AddressFamily AddressFamily = this.dnsEndpoint.AddressFamily;
+                            if (UnicastAddress.Address.AddressFamily != AddressFamily)
+                                continue;
 
-						this.udp.Ttl = 30;
-						this.udp.Client.Bind(new IPEndPoint(Address, 0));
+                            IPAddress Address = UnicastAddress.Address;
 
-						this.BeginReceive();
-						this.Init();
+                            try
+                            {
+                                this.udp = new UdpClient(AddressFamily)
+                                {
+                                    DontFragment = true,
+                                    MulticastLoopback = false
+                                };
+                            }
+                            catch (NotSupportedException)
+                            {
+                                continue;
+                            }
+                            catch (Exception ex)
+                            {
+                                Log.Critical(ex);
+                                continue;
+                            }
 
-						return;
-					}
-				}
-			}
+                            this.udp.Ttl = 30;
+                            this.udp.Client.Bind(new IPEndPoint(Address, 0));
+
+                            this.BeginReceive();
+                            this.Init();
+
+                            return;
+                        }
+                    }
+                }
+            }
 
 			throw new NotSupportedException("No route to DNS server found.");
 		}

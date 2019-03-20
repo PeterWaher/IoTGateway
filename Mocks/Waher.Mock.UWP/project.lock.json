@@ -27614,7 +27614,7 @@
   },
   "packageFolders": {
     "C:\\Users\\peter\\.nuget\\packages\\": {},
-    "C:\\Program Files (x86)\\Xamarin\\NuGet\\": {}
+    "C:\\ProgramData\\Xamarin\\NuGet\\": {}
   },
   "project": {
     "restore": {
@@ -27626,7 +27626,7 @@
       "outputPath": "C:\\My Projects\\IoTGateway\\Mocks\\Waher.Mock.UWP\\obj\\",
       "projectStyle": "ProjectJson",
       "fallbackFolders": [
-        "C:\\Program Files (x86)\\Xamarin\\NuGet\\"
+        "C:\\ProgramData\\Xamarin\\NuGet\\"
       ],
       "configFilePaths": [
         "C:\\Users\\peter\\AppData\\Roaming\\NuGet\\NuGet.Config",

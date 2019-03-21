@@ -26,5 +26,5 @@ namespace Waher.Networking.Sniffers.Model
 		{
 			get { return this.data; }
 		}
-	}
+    }
 }

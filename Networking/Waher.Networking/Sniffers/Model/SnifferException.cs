@@ -24,5 +24,13 @@ namespace Waher.Networking.Sniffers.Model
 		{
 			Sniffer.Exception (this.Text);
 		}
-	}
+
+        /// <summary>
+        /// <see cref="Object.ToString()"/>
+        /// </summary>
+        public override string ToString()
+        {
+            return "EXCEPTION: " + this.Text;
+        }
+    }
 }

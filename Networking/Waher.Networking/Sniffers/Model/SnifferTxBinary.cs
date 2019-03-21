@@ -24,5 +24,18 @@ namespace Waher.Networking.Sniffers.Model
 		{
 			Sniffer.TransmitBinary(this.Data);
 		}
-	}
+
+        /// <summary>
+        /// <see cref="Object.ToString()"/>
+        /// </summary>
+        public override string ToString()
+        {
+            int Len = this.Data?.Length ?? 0;
+
+            if (Len == 1)
+                return "TX: (1 byte)";
+            else
+                return "TX: (" + Len.ToString() + " bytes)";
+        }
+    }
 }

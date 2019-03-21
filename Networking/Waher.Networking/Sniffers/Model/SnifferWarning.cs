@@ -24,5 +24,13 @@ namespace Waher.Networking.Sniffers.Model
 		{
 			Sniffer.Warning(this.Text);
 		}
-	}
+
+        /// <summary>
+        /// <see cref="Object.ToString()"/>
+        /// </summary>
+        public override string ToString()
+        {
+            return "Warning: " + this.Text;
+        }
+    }
 }

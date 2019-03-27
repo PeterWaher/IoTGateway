@@ -14,12 +14,21 @@ namespace Waher.Networking.XMPP.Contracts
 		private readonly byte[] digest;
 		private readonly HashFunction function;
 
-		/// <summary>
-		/// Contains a schema digest
-		/// </summary>
-		/// <param name="Function">Hash function</param>
-		/// <param name="Digest">Digest</param>
-		public SchemaDigest(HashFunction Function, byte[] Digest)
+        /// <summary>
+        /// Contains a schema digest
+        /// </summary>
+        public SchemaDigest()
+        {
+            this.function = HashFunction.SHA1;
+            this.digest = null;
+        }
+
+        /// <summary>
+        /// Contains a schema digest
+        /// </summary>
+        /// <param name="Function">Hash function</param>
+        /// <param name="Digest">Digest</param>
+        public SchemaDigest(HashFunction Function, byte[] Digest)
 		{
 			this.function = Function;
 			this.digest = Digest;

@@ -2429,6 +2429,11 @@
             Contains a network identity related to a legal identity
             </summary>
         </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.NetworkIdentity.#ctor">
+            <summary>
+            Contains a network identity related to a legal identity
+            </summary>
+        </member>
         <member name="M:Waher.Networking.XMPP.Contracts.NetworkIdentity.#ctor(System.String,System.String)">
             <summary>
             Contains a network identity related to a legal identity
@@ -2533,6 +2538,11 @@
             Named property
             </summary>
         </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Property.#ctor">
+            <summary>
+            Named property
+            </summary>
+        </member>
         <member name="M:Waher.Networking.XMPP.Contracts.Property.#ctor(System.String,System.String)">
             <summary>
             Named property
@@ -2595,6 +2605,11 @@
             Contains a schema digest
             </summary>
         </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.SchemaDigest.#ctor">
+            <summary>
+            Contains a schema digest
+            </summary>
+        </member>
         <member name="M:Waher.Networking.XMPP.Contracts.SchemaDigest.#ctor(Waher.Security.HashFunction,System.Byte[])">
             <summary>
             Contains a schema digest
@@ -2613,6 +2628,11 @@
             </summary>
         </member>
         <member name="T:Waher.Networking.XMPP.Contracts.SchemaReference">
+            <summary>
+            References a XML Schema used for validating machine-readable contents in smart contracts.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.SchemaReference.#ctor">
             <summary>
             References a XML Schema used for validating machine-readable contents in smart contracts.
             </summary>

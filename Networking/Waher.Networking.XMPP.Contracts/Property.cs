@@ -12,6 +12,15 @@ namespace Waher.Networking.XMPP.Contracts
 		private string name;
 		private string value;
 
+        /// <summary>
+        /// Named property
+        /// </summary>
+        public Property()
+        {
+            this.name = string.Empty;
+            this.value = string.Empty;
+        }
+
 		/// <summary>
 		/// Named property
 		/// </summary>

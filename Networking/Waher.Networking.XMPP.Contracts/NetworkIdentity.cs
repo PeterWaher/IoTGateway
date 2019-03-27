@@ -14,12 +14,21 @@ namespace Waher.Networking.XMPP.Contracts
 		private readonly string bareJid;
 		private readonly string legalId;
 
-		/// <summary>
-		/// Contains a network identity related to a legal identity
-		/// </summary>
-		/// <param name="BareJid">Bare JID</param>
-		/// <param name="LegalId">Legal ID</param>
-		public NetworkIdentity(string BareJid, string LegalId)
+        /// <summary>
+        /// Contains a network identity related to a legal identity
+        /// </summary>
+        public NetworkIdentity()
+        {
+            this.bareJid = string.Empty;
+            this.legalId = string.Empty;
+        }
+
+        /// <summary>
+        /// Contains a network identity related to a legal identity
+        /// </summary>
+        /// <param name="BareJid">Bare JID</param>
+        /// <param name="LegalId">Legal ID</param>
+        public NetworkIdentity(string BareJid, string LegalId)
 		{
 			this.bareJid = BareJid;
 			this.legalId = LegalId;

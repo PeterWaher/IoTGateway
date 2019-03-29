@@ -504,9 +504,10 @@ namespace Waher.IoTGateway.Setup
 					}
 				}
 				catch (CryptographicException ex)
-				{
-					throw new CryptographicException("Unable to get access to cryptographic key. Was application initially run using another user?", ex);
-				}
+                {
+                    throw new CryptographicException("Unable to get access to cryptographic key for \"IoTGateway:" + URL +
+                        "\". Was the database created using another user?", ex);
+                }
 
 				using (AcmeClient Client = new AcmeClient(new Uri(URL), Parameters))
 				{

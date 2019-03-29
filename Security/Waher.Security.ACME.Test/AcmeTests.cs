@@ -45,7 +45,7 @@ namespace Waher.Security.ACME.Test
 			}
 			catch (CryptographicException ex)
 			{
-				throw new CryptographicException("Unable to get access to cryptographic key. Was application initially run using another user?", ex);
+				throw new CryptographicException("Unable to get access to cryptographic key for " + directory + ". Was application initially run using another user?", ex);
 			}
 
 			this.client = new AcmeClient(new Uri(directory), Parameters);

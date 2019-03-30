@@ -27,6 +27,7 @@
 		<Property name="DropDownColor" value="#E4F0FE"/>
 		<Property name="RestrictionColor" value="#EB9500"/>
 		<Property name="PublishColor" value="#4CAF50"/>
+		<Property name="EditorColor" value="#68217A"/>
 	</CustomProperties>
 	<BackgroundImages>
 		<BackgroundImage width="1600" height="1600">CactusRose1600x1600Dimmed.png</BackgroundImage>

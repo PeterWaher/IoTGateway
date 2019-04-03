@@ -27667,7 +27667,8 @@
     "UAP,Version=v10.0.10586": []
   },
   "packageFolders": {
-    "C:\\Users\\Peter\\.nuget\\packages\\": {}
+    "C:\\Users\\peter\\.nuget\\packages\\": {},
+    "C:\\ProgramData\\Xamarin\\NuGet\\": {}
   },
   "project": {
     "restore": {
@@ -27675,12 +27676,16 @@
       "projectName": "Waher.Security.JWT.UWP",
       "projectPath": "C:\\My Projects\\IoTGateway\\Security\\Waher.Security.JWT.UWP\\Waher.Security.JWT.UWP.csproj",
       "projectJsonPath": "C:\\My Projects\\IoTGateway\\Security\\Waher.Security.JWT.UWP\\project.json",
-      "packagesPath": "C:\\Users\\Peter\\.nuget\\packages\\",
+      "packagesPath": "C:\\Users\\peter\\.nuget\\packages\\",
       "outputPath": "C:\\My Projects\\IoTGateway\\Security\\Waher.Security.JWT.UWP\\obj\\",
       "projectStyle": "ProjectJson",
+      "fallbackFolders": [
+        "C:\\ProgramData\\Xamarin\\NuGet\\"
+      ],
       "configFilePaths": [
-        "C:\\Users\\Peter\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        "C:\\Users\\peter\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},

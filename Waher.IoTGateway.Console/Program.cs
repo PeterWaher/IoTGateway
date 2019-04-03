@@ -26,7 +26,40 @@ namespace Waher.IoTGateway.Console
 		{
 			try
 			{
-				System.Console.ForegroundColor = ConsoleColor.White;
+                string InstanceName = string.Empty;
+                string Arg;
+                bool Error = false;
+                bool Help = false;
+                int i, c = args.Length;
+
+                for (i = 0; i < c; i++)
+                {
+                    Arg = args[i];
+
+                    switch (Arg.ToLower())
+                    {
+                        case "-?":
+                            Help = true;
+                            break;
+
+                        case "-instance":
+                            i++;
+                            if (i >= c)
+                            {
+                                Error = true;
+                                break;
+                            }
+
+                            InstanceName = args[i];
+                            break;
+
+                        default:
+                            Error = true;
+                            break;
+                    }
+                }
+
+                System.Console.ForegroundColor = ConsoleColor.White;
 
 				System.Console.Out.WriteLine("Welcome to the Internet of Things Gateway server application.");
 				System.Console.Out.WriteLine(new string('-', 79));
@@ -36,7 +69,22 @@ namespace Waher.IoTGateway.Console
 				System.Console.Out.WriteLine("to dynamically and securely interact with the devices and the");
 				System.Console.Out.WriteLine("content you publish.");
 
-				Log.Register(new ConsoleEventSink(false));
+                if (Error || Help)
+                {
+                    Log.Informational("Displaying help.");
+
+                    System.Console.Out.WriteLine();
+                    System.Console.Out.WriteLine("Command line switches:");
+                    System.Console.Out.WriteLine();
+                    System.Console.Out.WriteLine("-?                   Brings this help.");
+                    System.Console.Out.WriteLine("-instance INSTANCE   Name of instance. Default is the empty string. Parallel");
+                    System.Console.Out.WriteLine("                     instances of the IoT Gateway can execute, provided they");
+                    System.Console.Out.WriteLine("                     are given separate instance names.");
+
+                    return;
+                }
+
+                Log.Register(new ConsoleEventSink(false));
 				Log.RegisterExceptionToUnnest(typeof(System.Runtime.InteropServices.ExternalException));
 				Log.RegisterExceptionToUnnest(typeof(System.Security.Authentication.AuthenticationException));
 
@@ -96,7 +144,7 @@ namespace Waher.IoTGateway.Console
 				Gateway.GetDatabaseProvider += GetDatabase;
 				Gateway.RegistrationSuccessful += RegistrationSuccessful;
 
-				if (!Gateway.Start(true, true).Result)
+				if (!Gateway.Start(true, true, InstanceName).Result)
 				{
 					System.Console.Out.WriteLine();
 					System.Console.Out.WriteLine("Gateway being started in another process.");

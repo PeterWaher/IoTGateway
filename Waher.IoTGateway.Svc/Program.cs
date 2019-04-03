@@ -37,9 +37,14 @@ namespace Waher.IoTGateway.Svc
 	/// -localsystem         Installed service will run using the Local System account.
 	/// -localservice        Installed service will run using the Local Service account (default).
 	/// -networkservice      Installed service will run using the Network Service account.
+    /// -instance INSTANCE   Name of instance. Default is the empty string. Parallel instances of the IoT Gateway can execute, provided they are given separate instance names.
 	/// </summary>
 	public class Program
 	{
+        private static string instanceName = string.Empty;
+
+        public static string InstanceName => instanceName;
+
 		public static int Main(string[] args)
 		{
 			AppDomain.CurrentDomain.UnhandledException += (sender, e) =>
@@ -111,8 +116,8 @@ namespace Waher.IoTGateway.Svc
 				string ServiceName = "IoT Gateway Service";
 				string DisplayName = ServiceName;
 				string Description = "Windows Service hosting the Waher IoT Gateway.";
-				string Arg;
-				ServiceStartType StartType = ServiceStartType.Disabled;
+                string Arg;
+                ServiceStartType StartType = ServiceStartType.Disabled;
 				Win32ServiceCredentials Credentials = Win32ServiceCredentials.LocalService;
 				bool Install = false;
 				bool Uninstall = false;
@@ -203,7 +208,18 @@ namespace Waher.IoTGateway.Svc
 							Credentials = Win32ServiceCredentials.NetworkService;
 							break;
 
-						default:
+                        case "-instance":
+                            i++;
+                            if (i >= c)
+                            {
+                                Error = true;
+                                break;
+                            }
+
+                            instanceName = args[i];
+                            break;
+
+                        default:
 							Error = true;
 							break;
 					}
@@ -234,8 +250,11 @@ namespace Waher.IoTGateway.Svc
 					Console.Out.WriteLine("                     (default).");
 					Console.Out.WriteLine("-networkservice      Installed service will run using the Network Service");
 					Console.Out.WriteLine("                     account.");
+                    Console.Out.WriteLine("-instance INSTANCE   Name of instance. Default is the empty string. Parallel");
+                    Console.Out.WriteLine("                     instances of the IoT Gateway can execute, provided they");
+                    Console.Out.WriteLine("                     are given separate instance names.");
 
-					return -1;
+                    return -1;
 				}
 
 				if (Install && Uninstall)
@@ -322,7 +341,7 @@ namespace Waher.IoTGateway.Svc
 				Gateway.GetDatabaseProvider += GetDatabase;
 				Gateway.RegistrationSuccessful += RegistrationSuccessful;
 
-				if (!Gateway.Start(true, true).Result)
+				if (!Gateway.Start(true, true, instanceName).Result)
 				{
 					System.Console.Out.WriteLine();
 					System.Console.Out.WriteLine("Gateway being started in another process.");

@@ -92,7 +92,7 @@ namespace Waher.IoTGateway.Svc.ServiceManagement
 				Gateway.GetDatabaseProvider += Program.GetDatabase;
 				Gateway.RegistrationSuccessful += Program.RegistrationSuccessful;
 
-				if (!Gateway.Start(true, true).Result)
+				if (!Gateway.Start(true, true, Program.InstanceName).Result)
 					throw new Exception("Gateway being started in another process.");
 
 				ReportServiceStatus(ServiceState.Running, ServiceAcceptedControlCommandsFlags.Stop, win32ExitCode: 0, waitHint: 0);

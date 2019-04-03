@@ -167,22 +167,35 @@ namespace Waher.IoTGateway
 		/// <returns>If the gateway was successfully started.</returns>
 		public static Task<bool> Start(bool ConsoleOutput)
 		{
-			return Start(ConsoleOutput, true);
+			return Start(ConsoleOutput, true, string.Empty);
 		}
 
-		/// <summary>
-		/// Starts the gateway.
-		/// </summary>
-		/// <param name="ConsoleOutput">If console output is permitted.</param>
-		/// <param name="LoopbackIntefaceAvailable">If the loopback interface is available.</param>
-		/// <returns>If the gateway was successfully started.</returns>
-		public static async Task<bool> Start(bool ConsoleOutput, bool LoopbackIntefaceAvailable)
+        /// <summary>
+        /// Starts the gateway.
+        /// </summary>
+        /// <param name="ConsoleOutput">If console output is permitted.</param>
+        /// <param name="LoopbackIntefaceAvailable">If the loopback interface is available.</param>
+        /// <returns>If the gateway was successfully started.</returns>
+        public static Task<bool> Start(bool ConsoleOutput, bool LoopbackIntefaceAvailable)
+        {
+            return Start(ConsoleOutput, LoopbackIntefaceAvailable, string.Empty);
+        }
+
+        /// <summary>
+        /// Starts the gateway.
+        /// </summary>
+        /// <param name="ConsoleOutput">If console output is permitted.</param>
+        /// <param name="LoopbackIntefaceAvailable">If the loopback interface is available.</param>
+        /// <param name="InstanceName">Name of instance. Default=<see cref="string.Empty"/>.</param>
+        /// <returns>If the gateway was successfully started.</returns>
+        public static async Task<bool> Start(bool ConsoleOutput, bool LoopbackIntefaceAvailable, string InstanceName)
 		{
-			gatewayRunning = new Semaphore(1, 1, "Waher.IoTGateway.Running");
+            string Suffix = string.IsNullOrEmpty(InstanceName) ? string.Empty : "." + InstanceName;
+			gatewayRunning = new Semaphore(1, 1, "Waher.IoTGateway.Running" + Suffix);
 			if (!gatewayRunning.WaitOne(1000))
 				return false; // Is running in another process.
 
-			Semaphore StartingServer = new Semaphore(1, 1, "Waher.IoTGateway.Starting");
+			Semaphore StartingServer = new Semaphore(1, 1, "Waher.IoTGateway.Starting" + Suffix);
 			if (!StartingServer.WaitOne(1000))
 			{
 				gatewayRunning.Release();
@@ -204,7 +217,12 @@ namespace Waher.IoTGateway
 				if (!appDataFolder.EndsWith(new string(Path.DirectorySeparatorChar, 1)))
 					appDataFolder += Path.DirectorySeparatorChar;
 
-				appDataFolder += "IoT Gateway" + Path.DirectorySeparatorChar;
+                appDataFolder += "IoT Gateway";
+
+                if (!string.IsNullOrEmpty(InstanceName))
+                    appDataFolder += " " + InstanceName;
+
+                appDataFolder += Path.DirectorySeparatorChar;
 				rootFolder = appDataFolder + "Root" + Path.DirectorySeparatorChar;
 
 				Log.Register(new AlertNotifier("Alert Notifier"));

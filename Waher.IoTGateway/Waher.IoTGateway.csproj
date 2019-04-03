@@ -224,6 +224,6 @@
     <Exec Command="if not exist &quot;$(SolutionDir)\..\Registration.cs.bak&quot; copy &quot;$(ProjectDir)Setup\Registration.cs&quot; &quot;$(SolutionDir)\..\Registration.cs.bak&quot;&#xD;&#xA;if exist &quot;$(SolutionDir)\..\Registration.cs&quot; copy &quot;$(SolutionDir)\..\Registration.cs&quot; &quot;$(ProjectDir)&quot;Setup&#xD;&#xA;" />
   </Target>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="if exist &quot;$(SolutionDir)\..\Registration.cs.bak&quot; copy &quot;$(SolutionDir)\..\Registration.cs.bak&quot; &quot;$(ProjectDir)Setup\Registration.cs&quot;&#xD;&#xA;&#xD;&#xA;xcopy &quot;$(OutDir)Root\*.*&quot; &quot;C:\ProgramData\IoT Gateway\Root&quot; /S /Y" />
+    <Exec Command="if exist &quot;$(SolutionDir)\..\Registration.cs.bak&quot; copy &quot;$(SolutionDir)\..\Registration.cs.bak&quot; &quot;$(ProjectDir)Setup\Registration.cs&quot;&#xD;&#xA;&#xD;&#xA;xcopy &quot;$(OutDir)Root\*.*&quot; &quot;C:\ProgramData\IoT Gateway Dev\Root&quot; /S /Y" />
   </Target>
 </Project>

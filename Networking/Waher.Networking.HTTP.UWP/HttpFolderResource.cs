@@ -191,29 +191,45 @@ namespace Waher.Networking.HTTP
 			Stream f = CheckAcceptable(Request, Response, ref ContentType, out bool Dynamic, FullPath, Request.Header.Resource);
 			Rec.IsDynamic = Dynamic;
 
-			SendResponse(f, FullPath, ContentType, Rec.IsDynamic, Rec.ETag, LastModified, Response);
+			SendResponse(f, FullPath, ContentType, Rec.IsDynamic, Rec.ETag, LastModified, Response, Request);
 		}
 
-		/// <summary>
-		/// Sends a file-based response back to the client.
-		/// </summary>
-		/// <param name="FullPath">Full path of file.</param>
-		/// <param name="ContentType">Content Type.</param>
-		/// <param name="ETag">ETag of resource.</param>
-		/// <param name="LastModified">When resource was last modified.</param>
-		/// <param name="Response">HTTP response object.</param>
-		public static void SendResponse(string FullPath, string ContentType, string ETag, DateTime LastModified,
-			HttpResponse Response)
+        /// <summary>
+        /// Sends a file-based response back to the client.
+        /// </summary>
+        /// <param name="FullPath">Full path of file.</param>
+        /// <param name="ContentType">Content Type.</param>
+        /// <param name="ETag">ETag of resource.</param>
+        /// <param name="LastModified">When resource was last modified.</param>
+        /// <param name="Response">HTTP response object.</param>
+        public static void SendResponse(string FullPath, string ContentType, string ETag, DateTime LastModified,
+            HttpResponse Response)
+        {
+            SendResponse(null, FullPath, ContentType, false, ETag, LastModified, Response, null);
+        }
+
+        /// <summary>
+        /// Sends a file-based response back to the client.
+        /// </summary>
+        /// <param name="FullPath">Full path of file.</param>
+        /// <param name="ContentType">Content Type.</param>
+        /// <param name="ETag">ETag of resource.</param>
+        /// <param name="LastModified">When resource was last modified.</param>
+        /// <param name="Response">HTTP response object.</param>
+        /// <param name="Request">HTTP request object.</param>
+        public static void SendResponse(string FullPath, string ContentType, string ETag, DateTime LastModified,
+			HttpResponse Response, HttpRequest Request)
 		{
-			SendResponse(null, FullPath, ContentType, false, ETag, LastModified, Response);
+			SendResponse(null, FullPath, ContentType, false, ETag, LastModified, Response, Request);
 		}
 
-		private static void SendResponse(Stream f, string FullPath, string ContentType, bool IsDynamic, string ETag, DateTime LastModified,
-			HttpResponse Response)
+		private static void SendResponse(Stream f, string FullPath, string ContentType, bool IsDynamic, string ETag, 
+            DateTime LastModified, HttpResponse Response, HttpRequest Request)
 		{
 			ReadProgress Progress = new ReadProgress()
 			{
 				Response = Response,
+                Request = Request,
 				f = f ?? File.OpenRead(FullPath),
 				Next = null,
 				Boundary = null,
@@ -511,6 +527,7 @@ namespace Waher.Networking.HTTP
 		{
 			public ByteRangeInterval Next;
 			public HttpResponse Response;
+            public HttpRequest Request;
 			public Stream f;
 			public string Boundary;
 			public string ContentType;
@@ -572,7 +589,19 @@ namespace Waher.Networking.HTTP
 						Response.WriteLine("--" + this.Boundary + "--");
 					}
 
-					this.Dispose();
+                    Variables Session;
+
+                    if (!(this.Request is null) && 
+                        this.Request.Header.Method == "GET" && 
+                        !((Session = this.Request.Session) is null) &&
+                        Session.ContainsVariable(" LastPost "))
+                    {
+                        Session.Remove(" LastPost ");
+                        Session.Remove(" LastPostResource ");
+                        Session.Remove(" LastPostReferer ");
+                    }
+
+                    this.Dispose();
 				}
 				catch (Exception ex)
 				{
@@ -647,6 +676,7 @@ namespace Waher.Networking.HTTP
 			ReadProgress Progress = new ReadProgress()
 			{
 				Response = Response,
+                Request = Request,
 				f = f ?? File.OpenRead(FullPath)
 			};
 

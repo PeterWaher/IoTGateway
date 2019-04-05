@@ -213,7 +213,7 @@ namespace Waher.Networking.XMPP.HTTPX
 						}
 
 						HttpFolderResource.SendResponse(CachedResource.FileName, CachedResource.ContentType, CachedResource.ETag,
-							CachedResource.LastModified.UtcDateTime, Response);
+							CachedResource.LastModified.UtcDateTime, Response, Request);
 
 						return;
 					}

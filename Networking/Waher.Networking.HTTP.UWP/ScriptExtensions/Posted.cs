@@ -47,8 +47,8 @@ namespace Waher.Networking.HTTP.ScriptExtensions
 			if (!Variables.TryGetVariable(" LastPostResource ", out v) ||
 				!(v.ValueObject is string SubPath) ||
 				!Variables.TryGetVariable("Request", out v) ||
-				!(v.ValueObject is string SubPath2) ||
-				string.Compare(SubPath, SubPath2, true) != 0)
+				!(v.ValueObject is HttpRequest Request) ||
+				string.Compare(SubPath, Request.SubPath, true) != 0)
 			{
 				return null;
 			}

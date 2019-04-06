@@ -495,8 +495,6 @@ namespace Waher.Persistence.Files
 					{
 						if (LastSerializer is null || Serializer != LastSerializer)
 						{
-							LastSerializer = Serializer;
-
 							if (Count > 0)
 							{
 								await this.SaveNewObjects(ObjectIds, Objects, LastSerializer);
@@ -504,6 +502,8 @@ namespace Waher.Persistence.Files
 								Objects.Clear();
 								Count = 0;
 							}
+
+							LastSerializer = Serializer;
 						}
 
 						ObjectIds.AddLast((Guid)e.CurrentObjectId);

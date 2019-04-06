@@ -679,7 +679,7 @@ namespace Waher.Networking.XMPP.P2P
 
 					StringBuilder Xml = new StringBuilder();
 
-					Xml.Append("<iq id=\"");
+					Xml.Append("<iq xmlns=\"jabber:client\" id=\"");
 					Xml.Append(e.Id);
 					Xml.Append("\" from=\"");
 					Xml.Append(XML.Encode(e.From));
@@ -773,7 +773,7 @@ namespace Waher.Networking.XMPP.P2P
 		{
 			StringBuilder Xml = new StringBuilder();
 
-			Xml.Append("<iq id=\"");
+			Xml.Append("<iq xmlns=\"jabber:client\" id=\"");
 			Xml.Append(e.Id);
 			Xml.Append("\" from=\"");
 			Xml.Append(XML.Encode(e.From));

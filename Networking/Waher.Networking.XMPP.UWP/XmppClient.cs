@@ -3523,7 +3523,7 @@ namespace Waher.Networking.XMPP
 				Xml.Append("'><");
 				Xml.Append(ex2.ErrorStanzaName);
 				Xml.Append(" xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>");
-				Xml.Append("<text>");
+				Xml.Append("<text xmlns='urn:ietf:params:xml:ns:xmpp-streams'>");
 				Xml.Append(XML.Encode(ex2.Message));
 				Xml.Append("</text>");
 				Xml.Append("</error>");
@@ -3533,7 +3533,7 @@ namespace Waher.Networking.XMPP
 				this.Exception(ex);
 
 				Xml.Append("<error type='cancel'><internal-server-error xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>");
-				Xml.Append("<text>");
+				Xml.Append("<text xmlns='urn:ietf:params:xml:ns:xmpp-streams'>");
 				Xml.Append(XML.Encode(ex.Message));
 				Xml.Append("</text>");
 				Xml.Append("</error>");

@@ -448,13 +448,13 @@ namespace Waher.Networking.XMPP.P2P.E2E
 			return null;
 		}
 
-		/// <summary>
-		/// Signs binary data using the local private key.
-		/// </summary>
-		/// <param name="Data">Binary data</param>
-		/// <param name="HashFunction">Hash function to use.</param>
-		/// <returns>ECDSA Signature</returns>
-		public KeyValuePair<byte[], byte[]> Sign(byte[] Data, HashFunction HashFunction)
+        /// <summary>
+        /// Signs binary data using the local private key.
+        /// </summary>
+        /// <param name="Data">Binary data</param>
+        /// <param name="HashFunction">Hash function to use.</param>
+        /// <returns>Signature (ECDSA) consisting of one or two large integers.</returns>
+        public override KeyValuePair<byte[], byte[]> Sign(byte[] Data, HashFunction HashFunction)
 		{
 			if (!this.hasPrivateKey)
 				throw new InvalidOperationException("Signing requires private key.");
@@ -491,8 +491,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		/// <param name="Signature2">Second integer in ECDSA signature.</param>
 		/// <param name="HashFunction">Hash function used in signature calculation.</param>
 		/// <returns>If signature is valid.</returns>
-		public bool Verify(byte[] Data, PointOnCurve PublicKey, byte[] Signature1,
-			byte[] Signature2, HashFunction HashFunction)
+		public bool Verify(byte[] Data, PointOnCurve PublicKey, byte[] Signature1, byte[] Signature2, HashFunction HashFunction)
 		{
 			KeyValuePair<BigInteger, BigInteger> Signature = new KeyValuePair<BigInteger, BigInteger>(
 				FromNetwork(Signature1), FromNetwork(Signature2));
@@ -500,10 +499,23 @@ namespace Waher.Networking.XMPP.P2P.E2E
 			return this.curve.Verify(Data, PublicKey, HashFunction, Signature);
 		}
 
-		/// <summary>
-		/// <see cref="Object.ToString()"/>
-		/// </summary>
-		public override bool Equals(object obj)
+        /// <summary>
+        /// Verifies a signature.
+        /// </summary>
+        /// <param name="Data">Data that is signed.</param>
+        /// <param name="Signature1">First integer in ECDSA signature.</param>
+        /// <param name="Signature2">Second integer in ECDSA signature.</param>
+        /// <param name="HashFunction">Hash function used in signature calculation.</param>
+        /// <returns>If signature is valid.</returns>
+        public override bool Verify(byte[] Data, byte[] Signature1, byte[] Signature2, HashFunction HashFunction)
+        {
+            return this.Verify(Data, this.publicKey, Signature1, Signature2, HashFunction);
+        }
+
+        /// <summary>
+        /// <see cref="Object.ToString()"/>
+        /// </summary>
+        public override bool Equals(object obj)
 		{
 			return obj is EcAes256 EcAes256 &&
 				this.curve.CurveName.Equals(EcAes256.curve.CurveName) &&

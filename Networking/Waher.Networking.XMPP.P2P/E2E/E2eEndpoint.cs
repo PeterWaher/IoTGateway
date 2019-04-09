@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Xml;
 using Waher.Security;
@@ -128,15 +129,33 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		/// <returns>Decrypted XMLs</returns>
 		public abstract string Decrypt(string Id, string Type, string From, string To, XmlElement AesElement, IE2eEndpoint RemoteEndpoint);
 
-		/// <summary>
-		/// Gets AES Initiation Vector from stanza attributes.s
-		/// </summary>
-		/// <param name="Id">Id attribute</param>
-		/// <param name="Type">Type attribute</param>
-		/// <param name="From">From attribute</param>
-		/// <param name="To">To attribute</param>
-		/// <returns>AES Initiation vector.</returns>
-		protected byte[] GetIV(string Id, string Type, string From, string To)
+        /// <summary>
+        /// Signs binary data using the local private key.
+        /// </summary>
+        /// <param name="Data">Binary data</param>
+        /// <param name="HashFunction">Hash function to use.</param>
+        /// <returns>Signature consisting of one or two large integers.</returns>
+        public abstract KeyValuePair<byte[], byte[]> Sign(byte[] Data, HashFunction HashFunction);
+
+        /// <summary>
+        /// Verifies a signature.
+        /// </summary>
+        /// <param name="Data">Data that is signed.</param>
+        /// <param name="Signature1">First integer in ECDSA signature.</param>
+        /// <param name="Signature2">Second integer in ECDSA signature.</param>
+        /// <param name="HashFunction">Hash function used in signature calculation.</param>
+        /// <returns>If signature is valid.</returns>
+        public abstract bool Verify(byte[] Data, byte[] Signature1, byte[] Signature2, HashFunction HashFunction);
+
+        /// <summary>
+        /// Gets AES Initiation Vector from stanza attributes.s
+        /// </summary>
+        /// <param name="Id">Id attribute</param>
+        /// <param name="Type">Type attribute</param>
+        /// <param name="From">From attribute</param>
+        /// <param name="To">To attribute</param>
+        /// <returns>AES Initiation vector.</returns>
+        protected byte[] GetIV(string Id, string Type, string From, string To)
 		{
 			byte[] IV = Hashes.ComputeSHA256Hash(Encoding.UTF8.GetBytes(Id + Type + From + To));
 			Array.Resize<byte>(ref IV, 16);

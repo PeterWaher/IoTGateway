@@ -223,6 +223,24 @@
             <param name="RemoteEndpoint">Remote endpoint of same type.</param>
             <returns>Decrypted XMLs</returns>
         </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.E2eEndpoint.Sign(System.Byte[],Waher.Security.HashFunction)">
+            <summary>
+            Signs binary data using the local private key.
+            </summary>
+            <param name="Data">Binary data</param>
+            <param name="HashFunction">Hash function to use.</param>
+            <returns>Signature consisting of one or two large integers.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.E2eEndpoint.Verify(System.Byte[],System.Byte[],System.Byte[],Waher.Security.HashFunction)">
+            <summary>
+            Verifies a signature.
+            </summary>
+            <param name="Data">Data that is signed.</param>
+            <param name="Signature1">First integer in ECDSA signature.</param>
+            <param name="Signature2">Second integer in ECDSA signature.</param>
+            <param name="HashFunction">Hash function used in signature calculation.</param>
+            <returns>If signature is valid.</returns>
+        </member>
         <member name="M:Waher.Networking.XMPP.P2P.E2E.E2eEndpoint.GetIV(System.String,System.String,System.String,System.String)">
             <summary>
             Gets AES Initiation Vector from stanza attributes.s
@@ -406,7 +424,7 @@
             </summary>
             <param name="Data">Binary data</param>
             <param name="HashFunction">Hash function to use.</param>
-            <returns>ECDSA Signature</returns>
+            <returns>Signature (ECDSA) consisting of one or two large integers.</returns>
         </member>
         <member name="M:Waher.Networking.XMPP.P2P.E2E.EcAes256.Verify(System.Byte[],System.Byte[],System.Byte[],System.Byte[],System.Byte[],Waher.Security.HashFunction)">
             <summary>
@@ -426,6 +444,16 @@
             </summary>
             <param name="Data">Data that is signed.</param>
             <param name="PublicKey">Public key</param>
+            <param name="Signature1">First integer in ECDSA signature.</param>
+            <param name="Signature2">Second integer in ECDSA signature.</param>
+            <param name="HashFunction">Hash function used in signature calculation.</param>
+            <returns>If signature is valid.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.EcAes256.Verify(System.Byte[],System.Byte[],System.Byte[],Waher.Security.HashFunction)">
+            <summary>
+            Verifies a signature.
+            </summary>
+            <param name="Data">Data that is signed.</param>
             <param name="Signature1">First integer in ECDSA signature.</param>
             <param name="Signature2">Second integer in ECDSA signature.</param>
             <param name="HashFunction">Hash function used in signature calculation.</param>
@@ -541,6 +569,24 @@
             <param name="AesElement">XML element with encrypted data.</param>
             <param name="RemoteEndpoint">Remote endpoint of same type.</param>
             <returns>Decrypted XMLs</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.IE2eEndpoint.Sign(System.Byte[],Waher.Security.HashFunction)">
+            <summary>
+            Signs binary data using the local private key.
+            </summary>
+            <param name="Data">Binary data</param>
+            <param name="HashFunction">Hash function to use.</param>
+            <returns>Signature consisting of one or two large integers.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.IE2eEndpoint.Verify(System.Byte[],System.Byte[],System.Byte[],Waher.Security.HashFunction)">
+            <summary>
+            Verifies a signature.
+            </summary>
+            <param name="Data">Data that is signed.</param>
+            <param name="Signature1">First integer in ECDSA signature.</param>
+            <param name="Signature2">Second integer in ECDSA signature.</param>
+            <param name="HashFunction">Hash function used in signature calculation.</param>
+            <returns>If signature is valid.</returns>
         </member>
         <member name="T:Waher.Networking.XMPP.P2P.E2E.NistP192Aes">
             <summary>
@@ -954,6 +1000,24 @@
             <param name="Data">Binary data</param>
             <returns>Signature</returns>
         </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaAes.Sign(System.Byte[],Waher.Security.HashFunction)">
+            <summary>
+            Signs binary data using the local private key.
+            </summary>
+            <param name="Data">Binary data</param>
+            <param name="HashFunction">Hash function to use.</param>
+            <returns>Signature consisting of one or two large integers.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaAes.Verify(System.Byte[],System.Byte[],System.Byte[],Waher.Security.HashFunction)">
+            <summary>
+            Verifies a signature.
+            </summary>
+            <param name="Data">Data that is signed.</param>
+            <param name="Signature1">First integer in ECDSA signature.</param>
+            <param name="Signature2">Second integer in ECDSA signature.</param>
+            <param name="HashFunction">Hash function used in signature calculation.</param>
+            <returns>If signature is valid.</returns>
+        </member>
         <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaAes.Verify(System.Byte[],System.Byte[],System.Int32,System.Byte[],System.Byte[])">
             <summary>
             Verifies a signature.
@@ -963,6 +1027,18 @@
             <param name="KeySize">RSA key size</param>
             <param name="Modulus">Modulus</param>
             <param name="Exponent">Exponent</param>
+            <returns></returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaAes.Verify(System.Byte[],System.Byte[],System.Int32,System.Byte[],System.Byte[],Waher.Security.HashFunction)">
+            <summary>
+            Verifies a signature.
+            </summary>
+            <param name="Data">Data that is signed.</param>
+            <param name="Signature">Signature</param>
+            <param name="KeySize">RSA key size</param>
+            <param name="Modulus">Modulus</param>
+            <param name="Exponent">Exponent</param>
+            <param name="HashFunction">Hash function</param>
             <returns></returns>
         </member>
         <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaAes.Decrypt(System.Byte[])">

@@ -656,7 +656,8 @@ namespace Waher.Content.Markdown
 				}
 				else if (Block.IsPrefixedBy(s2 = "[ ]", true) || Block.IsPrefixedBy(s2 = "[x]", true) || Block.IsPrefixedBy(s2 = "[X]", true))
 				{
-					LinkedList<KeyValuePair<Block, string>> Segments = null;
+					LinkedList<Tuple<Block, string, int>> Segments = null;
+					int CheckPosition = Block.Positions[0] + 1;
 					string s3;
 					i = 0;
 					c = Block.End;
@@ -667,16 +668,17 @@ namespace Waher.Content.Markdown
 						if (IsPrefixedBy(s, s3 = "[ ]", true) || IsPrefixedBy(s, s3 = "[x]", true) || IsPrefixedBy(s, s3 = "[X]", true))
 						{
 							if (Segments is null)
-								Segments = new LinkedList<KeyValuePair<Block, string>>();
+								Segments = new LinkedList<Tuple<Block, string, int>>();
 
-							Segments.AddLast(new KeyValuePair<Block, string>(new Block(Block.Rows, Block.Positions, 0, i, d - 1), s2));
+							Segments.AddLast(new Tuple<Block, string, int>(new Block(Block.Rows, Block.Positions, 0, i, d - 1), s2, CheckPosition));
 							s2 = s3;
 							i = d;
+							CheckPosition = Block.Positions[d] + 1;
 						}
 					}
 
 					if (Segments != null)
-						Segments.AddLast(new KeyValuePair<Block, string>(new Block(Block.Rows, Block.Positions, 0, i, c), s2));
+						Segments.AddLast(new Tuple<Block, string, int>(new Block(Block.Rows, Block.Positions, 0, i, c), s2, CheckPosition));
 
 					if (Segments is null)
 					{
@@ -696,9 +698,9 @@ namespace Waher.Content.Markdown
 						}
 
 						if (Elements.Last != null && Elements.Last.Value is TaskList TaskList)
-							TaskList.AddChildren(new TaskItem(this, s2 != "[ ]", new NestedBlock(this, Items)));
+							TaskList.AddChildren(new TaskItem(this, s2 != "[ ]", CheckPosition, new NestedBlock(this, Items)));
 						else
-							Elements.AddLast(new TaskList(this, new TaskItem(this, s2 != "[ ]", new NestedBlock(this, Items))));
+							Elements.AddLast(new TaskList(this, new TaskItem(this, s2 != "[ ]", CheckPosition, new NestedBlock(this, Items))));
 
 						continue;
 					}
@@ -706,11 +708,11 @@ namespace Waher.Content.Markdown
 					{
 						LinkedList<MarkdownElement> Items = new LinkedList<MarkdownElement>();
 
-						foreach (KeyValuePair<Block, string> Segment in Segments)
+						foreach (Tuple<Block, string, int> Segment in Segments)
 						{
-							foreach (Block SegmentItem in Segment.Key.RemovePrefix(Segment.Value, 4))
+							foreach (Block SegmentItem in Segment.Item1.RemovePrefix(Segment.Item2, 4))
 							{
-								Items.AddLast(new TaskItem(this, Segment.Value != "[ ]", new NestedBlock(this,
+								Items.AddLast(new TaskItem(this, Segment.Item2 != "[ ]", Segment.Item3, new NestedBlock(this,
 									this.ParseBlock(SegmentItem.Rows, SegmentItem.Positions, SegmentItem.Start, SegmentItem.End))));
 							}
 						}
@@ -1400,6 +1402,8 @@ namespace Waher.Content.Markdown
 
 						if (FirstCharOnLine && (((chs = State.PeekNextChars(3))[0] == ' ' || chs[0] == 'x' || chs[0] == 'X') && chs[1] == ']' && ((chs[2] <= ' ' && chs[2] > 0) || chs[2] == 160)))
 						{
+							int CheckPosition = State.CurrentPosition;
+
 							State.NextChar();
 							State.NextChar();
 							State.NextChar();
@@ -1426,15 +1430,8 @@ namespace Waher.Content.Markdown
 									(chs[1] == ' ' || chs[1] == 'x' || chs[1] == 'X') &&
 									chs[2] == ']' && ((chs[3] <= ' ' && chs[3] > 0) || chs[3] == 160))
 								{
-									State.NextChar();
-									State.NextChar();
-									State.NextChar();
-									State.NextChar();
-
-									while (((ch2 = State.PeekNextCharSameRow()) <= ' ' && ch2 > 0) || ch2 == 160)
-										State.NextCharSameRow();
-
-									Item = new TaskItem(this, Checked, new NestedBlock(this, this.ParseBlock(Rows.ToArray(), Positions.ToArray())));
+									Item = new TaskItem(this, Checked, CheckPosition,
+										new NestedBlock(this, this.ParseBlock(Rows.ToArray(), Positions.ToArray())));
 
 									if (Elements.Last != null && Elements.Last.Value is TaskList TaskList)
 										TaskList.AddChildren(Item);
@@ -1443,6 +1440,17 @@ namespace Waher.Content.Markdown
 
 									Rows.Clear();
 									Positions.Clear();
+
+									State.NextChar();
+
+									CheckPosition = State.CurrentPosition;
+
+									State.NextChar();
+									State.NextChar();
+									State.NextChar();
+
+									while (((ch2 = State.PeekNextCharSameRow()) <= ' ' && ch2 > 0) || ch2 == 160)
+										State.NextCharSameRow();
 
 									Positions.Add(State.CurrentPosition);
 									Rows.Add(State.RestOfRow());
@@ -1459,7 +1467,8 @@ namespace Waher.Content.Markdown
 
 							if (Rows.Count > 0)
 							{
-								Item = new TaskItem(this, Checked, new NestedBlock(this, this.ParseBlock(Rows.ToArray(), Positions.ToArray())));
+								Item = new TaskItem(this, Checked, CheckPosition,
+									new NestedBlock(this, this.ParseBlock(Rows.ToArray(), Positions.ToArray())));
 
 								if (Elements.Last != null && Elements.Last.Value is TaskList TaskList)
 									TaskList.AddChildren(Item);

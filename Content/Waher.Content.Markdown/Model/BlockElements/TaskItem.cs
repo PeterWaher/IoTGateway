@@ -10,18 +10,21 @@ namespace Waher.Content.Markdown.Model.BlockElements
 	/// </summary>
 	public class TaskItem : MarkdownElementSingleChild
 	{
-		private bool isChecked;
+		private readonly int checkPosition;
+		private readonly bool isChecked;
 
 		/// <summary>
 		/// Represents a task item in a task list.
 		/// </summary>
 		/// <param name="Document">Markdown document.</param>
 		/// <param name="IsChecked">If the item is checked or not.</param>
+		/// <param name="CheckPosition">Position of the checkmark in the original markdown text document.</param>
 		/// <param name="Child">Child element.</param>
-		public TaskItem(MarkdownDocument Document, bool IsChecked, MarkdownElement Child)
+		public TaskItem(MarkdownDocument Document, bool IsChecked, int CheckPosition, MarkdownElement Child)
 			: base(Document, Child)
 		{
 			this.isChecked = IsChecked;
+			this.checkPosition = CheckPosition;
 		}
 
 		/// <summary>
@@ -33,12 +36,28 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		}
 
 		/// <summary>
+		/// Position of the checkmark in the original markdown text document.
+		/// </summary>
+		public int CheckPosition
+		{
+			get { return this.checkPosition; }
+		}
+
+		/// <summary>
 		/// Generates HTML for the markdown element.
 		/// </summary>
 		/// <param name="Output">HTML will be output here.</param>
 		public override void GenerateHTML(StringBuilder Output)
 		{
-			Output.Append("<li class=\"taskListItem\"><label class=\"taskListItemLabel\"><input disabled=\"disabled\" type=\"checkbox\"");
+			Output.Append("<li class=\"taskListItem\"><label class=\"taskListItemLabel\"><input disabled=\"disabled");
+			
+			if (this.checkPosition > 0)
+			{
+				Output.Append("\" data-position=\"");
+				Output.Append(this.checkPosition.ToString());
+			}
+
+			Output.Append("\" type=\"checkbox\"");
 
 			if (this.isChecked)
 				Output.Append(" checked=\"checked\"");

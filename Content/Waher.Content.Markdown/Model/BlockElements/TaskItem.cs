@@ -49,10 +49,12 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// <param name="Output">HTML will be output here.</param>
 		public override void GenerateHTML(StringBuilder Output)
 		{
-			Output.Append("<li class=\"taskListItem\"><label class=\"taskListItemLabel\"><input disabled=\"disabled");
+			Output.Append("<li class=\"taskListItem\"><input disabled=\"disabled");
 			
 			if (this.checkPosition > 0)
 			{
+				Output.Append("\" id=\"item");
+				Output.Append(this.checkPosition.ToString());
 				Output.Append("\" data-position=\"");
 				Output.Append(this.checkPosition.ToString());
 			}
@@ -62,11 +64,58 @@ namespace Waher.Content.Markdown.Model.BlockElements
 			if (this.isChecked)
 				Output.Append(" checked=\"checked\"");
 
-			Output.Append("/></label>");
-			
-			this.Child.GenerateHTML(Output);
+			Output.Append("/><span></span><label class=\"taskListItemLabel\"");
 
-			Output.AppendLine("</li>");
+			if (this.checkPosition > 0)
+			{
+				Output.Append(" for=\"item");
+				Output.Append(this.checkPosition.ToString());
+				Output.Append("\"");
+			}
+
+			Output.Append('>');
+
+			if (this.Child is NestedBlock NestedBlock)
+			{
+				bool EndLabel = true;
+				bool First = true;
+
+				foreach (MarkdownElement E in NestedBlock.Children)
+				{
+					if (First)
+					{
+						First = false;
+
+						if (E.InlineSpanElement)
+							E.GenerateHTML(Output);
+						else
+						{
+							NestedBlock.GenerateHTML(Output);
+							break;
+						}
+					}
+					else
+					{
+						if (!E.InlineSpanElement)
+						{
+							Output.Append("</label>");
+							EndLabel = false;
+						}
+
+						E.GenerateHTML(Output);
+					}
+				}
+
+				if (EndLabel)
+					Output.Append("</label>");
+
+				Output.AppendLine("</li>");
+			}
+			else
+			{
+				this.Child.GenerateHTML(Output);
+				Output.AppendLine("</label></li>");
+			}
 		}
 
 		/// <summary>

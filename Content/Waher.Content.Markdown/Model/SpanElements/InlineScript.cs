@@ -15,10 +15,12 @@ namespace Waher.Content.Markdown.Model.SpanElements
 	/// <summary>
 	/// Inline source code.
 	/// </summary>
-	public class InlineScript : MarkdownElement
+	public class InlineScript : MarkdownElement, IContextVariables
 	{
 		private readonly Expression expression;
 		private readonly Variables variables;
+		private readonly int startPosition;
+		private readonly int endPosition;
 		private readonly bool aloneInParagraph;
 
 		/// <summary>
@@ -28,12 +30,17 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="Expression">Expression.</param>
 		/// <param name="Variables">Collection of variables to use when executing the script.</param>
 		/// <param name="AloneInParagraph">If construct stands alone in a paragraph.</param>
-		public InlineScript(MarkdownDocument Document, Expression Expression, Variables Variables, bool AloneInParagraph)
+		/// <param name="StartPosition">Starting position of script.</param>
+		/// <param name="EndPosition">Ending position of script.</param>
+		public InlineScript(MarkdownDocument Document, Expression Expression, Variables Variables, bool AloneInParagraph, 
+			int StartPosition, int EndPosition)
 			: base(Document)
 		{
 			this.expression = Expression;
 			this.variables = Variables;
 			this.aloneInParagraph = AloneInParagraph;
+			this.startPosition = StartPosition;
+			this.endPosition = EndPosition;
 		}
 
 		/// <summary>
@@ -52,10 +59,28 @@ namespace Waher.Content.Markdown.Model.SpanElements
 			get { return this.aloneInParagraph; }
 		}
 
+		/// <summary>
+		/// Starting position of script in markdown document.
+		/// </summary>
+		public int StartPosition
+		{
+			get { return this.startPosition; }
+		}
+
+		/// <summary>
+		/// Ending position of script in markdown document.
+		/// </summary>
+		public int EndPosition
+		{
+			get { return this.endPosition; }
+		}
+
 		private object EvaluateExpression()
 		{
+			IContextVariables Bak = this.variables.ContextVariables;
 			try
 			{
+				this.variables.ContextVariables = this;
 				return this.expression.Evaluate(this.variables);
 			}
 			catch (Exception ex)
@@ -64,6 +89,10 @@ namespace Waher.Content.Markdown.Model.SpanElements
 				this.Document.CheckException(ex);
 
 				return ex;
+			}
+			finally
+			{
+				this.variables.ContextVariables = Bak;
 			}
 		}
 
@@ -390,5 +419,38 @@ namespace Waher.Content.Markdown.Model.SpanElements
 			Output.WriteEndElement();
 		}
 
+		/// <summary>
+		/// Tries to get a variable object, given its name.
+		/// </summary>
+		/// <param name="Name">Variable name.</param>
+		/// <param name="Variable">Variable, if found, or null otherwise.</param>
+		/// <returns>If a variable with the corresponding name was found.</returns>
+		public bool TryGetVariable(string Name, out Variable Variable)
+		{
+			switch (Name)
+			{
+				case "StartPosition":
+					Variable = new Variable(Name, this.startPosition);
+					return true;
+
+				case "EndPosition":
+					Variable = new Variable(Name, this.endPosition);
+					return true;
+
+				default:
+					Variable = null;
+					return false;
+			}
+		}
+
+		/// <summary>
+		/// If the collection contains a variable with a given name.
+		/// </summary>
+		/// <param name="Name">Variable name.</param>
+		/// <returns>If a variable with that name exists.</returns>
+		public bool ContainsVariable(string Name)
+		{
+			return Name == "StartPosition" || Name == "EndPosition";
+		}
 	}
 }

@@ -2016,8 +2016,12 @@ namespace Waher.Content.Markdown
 						this.AppendAnyText(Elements, Text);
 						State.BackupState();
 
+						int StartPosition = State.CurrentPosition - 1;
+
 						while ((ch2 = State.NextChar()) != '}' && ch2 != 0)
 							Text.Append(ch2);
+
+						int EndPosition = State.CurrentPosition;
 
 						if (ch2 == 0)
 						{
@@ -2031,7 +2035,8 @@ namespace Waher.Content.Markdown
 						{
 							Expression Exp = new Expression(Text.ToString());
 							State.DiscardBackup();
-							Elements.AddLast(new InlineScript(this, Exp, this.settings.Variables, Elements.First is null && State.PeekNextChar() == 0));
+							Elements.AddLast(new InlineScript(this, Exp, this.settings.Variables, 
+								Elements.First is null && State.PeekNextChar() == 0, StartPosition, EndPosition));
 							Text.Clear();
 							this.isDynamic = true;
 						}

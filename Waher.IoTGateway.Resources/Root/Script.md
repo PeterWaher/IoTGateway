@@ -1312,6 +1312,12 @@ The following functions are available in the `Waher.Content.Markdown` library.
 | `MarkdownEncode(s)`      | Encodes a string for inclusion in Markdown. | [Example][MarkdownEncodeExample] |
 | `PreprocessMarkdown(MD)` | Preprocesses a markdown string `MD`, and returns it as a string. | [Example][PreprocessMarkdownExample] |
 
+The following predefined context-specific constants (read-only variables) are available in inline script:
+
+| Variable        | Description                                                           |
+|:---------------:|-----------------------------------------------------------------------|
+| `StartPosition` | The starting position of the current script in the markdown document. |
+| `EndPosition`   | The ending position of the script in the markdown document.           |
 
 [LoadMarkdownExample]: Calculator.md?Expression=LoadMarkdown(%22File.md%22)
 [MarkdownEncodeExample]: Calculator.md?Expression=MarkdownEncode(%22test_sister%22)

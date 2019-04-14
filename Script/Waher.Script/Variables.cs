@@ -11,7 +11,7 @@ namespace Waher.Script
 	/// <summary>
 	/// Collection of variables.
 	/// </summary>
-	public class Variables : IEnumerable<Variable>
+	public class Variables : IEnumerable<Variable>, IContextVariables
 	{
 		/// <summary>
 		/// Internal set of variables.
@@ -19,6 +19,7 @@ namespace Waher.Script
 		protected Dictionary<string, Variable> variables = new Dictionary<string, Variable>();
 		private Stack<Dictionary<string, Variable>> stack = null;
 		private TextWriter consoleOut = null;
+		private IContextVariables contextVariables = null;
 		private readonly Mutex mutex = new Mutex();
 
 		/// <summary>
@@ -40,8 +41,14 @@ namespace Waher.Script
 		{
 			lock (this.variables)
 			{
-				return this.variables.TryGetValue(Name, out Variable);
+				if (this.variables.TryGetValue(Name, out Variable))
+					return true;
 			}
+
+			if (!(this.contextVariables is null))
+				return this.contextVariables.TryGetVariable(Name, out Variable);
+
+			return false;
 		}
 
 		/// <summary>
@@ -53,8 +60,14 @@ namespace Waher.Script
 		{
 			lock (this.variables)
 			{
-				return this.variables.ContainsKey(Name);
+				if (this.variables.ContainsKey(Name))
+					return true;
 			}
+
+			if (!(this.contextVariables is null))
+				return this.contextVariables.ContainsVariable(Name);
+
+			return false;
 		}
 
 		/// <summary>
@@ -66,13 +79,18 @@ namespace Waher.Script
 		{
 			get
 			{
+				Variable Variable;
+
 				lock (this.variables)
 				{
-					if (this.variables.TryGetValue(Name, out Variable v))
-						return v.ValueObject;
-					else
-						return null;
+					if (this.variables.TryGetValue(Name, out Variable))
+						return Variable.ValueObject;
 				}
+
+				if (!(this.contextVariables is null) && this.contextVariables.TryGetVariable(Name, out Variable))
+					return Variable.ValueObject;
+
+				return null;
 			}
 
 			set
@@ -146,6 +164,15 @@ namespace Waher.Script
 		{
 			get { return this.consoleOut; }
 			set { this.consoleOut = value; }
+		}
+
+		/// <summary>
+		/// Variables available during the current context.
+		/// </summary>
+		public IContextVariables ContextVariables
+		{
+			get { return this.contextVariables; }
+			set { this.contextVariables = value; }
 		}
 
 		/// <summary>

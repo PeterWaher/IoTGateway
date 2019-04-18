@@ -25,6 +25,11 @@ namespace Waher.Networking.PeerToPeer
 		Created,
 
 		/// <summary>
+		/// Reinitializing after a network change.
+		/// </summary>
+		Reinitializing,
+
+		/// <summary>
 		/// Searching for Internet gateway.
 		/// </summary>
 		SearchingForGateway,
@@ -79,7 +84,7 @@ namespace Waher.Networking.PeerToPeer
 		/// </summary>
 		public const int DefaultBacklog = 10;
 
-		private LinkedList<KeyValuePair<IPEndPoint, byte[]>> writeQueue = new LinkedList<KeyValuePair<IPEndPoint, byte[]>>();
+		private readonly LinkedList<KeyValuePair<IPEndPoint, byte[]>> writeQueue = new LinkedList<KeyValuePair<IPEndPoint, byte[]>>();
 		private Dictionary<IPAddress, bool> ipAddressesFound = new Dictionary<IPAddress, bool>();
 		private TcpListener tcpListener;
 		private UdpClient udpClient;
@@ -93,11 +98,12 @@ namespace Waher.Networking.PeerToPeer
 		private ManualResetEvent ready = new ManualResetEvent(false);
 		private ManualResetEvent error = new ManualResetEvent(false);
 		private Exception exception = null;
-		private ISniffer[] sniffers;
-		private string applicationName;
+		private Timer searchTimer = null;
+		private readonly ISniffer[] sniffers;
+		private readonly string applicationName;
 		private int desiredLocalPort;
 		private int desiredExternalPort;
-		private int backlog;
+		private readonly int backlog;
 		private bool tcpMappingAdded = false;
 		private bool udpMappingAdded = false;
 		private bool encapsulatePackets = true;
@@ -151,6 +157,32 @@ namespace Waher.Networking.PeerToPeer
 			this.tcpListener = null;
 			this.udpClient = null;
 
+			this.Init();
+
+			NetworkChange.NetworkAddressChanged += NetworkChange_NetworkAddressChanged;
+		}
+
+		private void NetworkChange_NetworkAddressChanged(object sender, EventArgs e)
+		{
+			if (State != PeerToPeerNetworkState.SearchingForGateway)	// Multiple events might get fired one after the other. Just start one search.
+			{
+				this.State = PeerToPeerNetworkState.Reinitializing;
+
+				this.tcpListener?.Stop();
+				this.tcpListener = null;
+
+				this.udpClient?.Dispose();
+				this.udpClient = null;
+
+				this.ready?.Reset();
+				this.error?.Reset();
+
+				this.Init();
+			}
+		}
+
+		private void Init()
+		{
 			if (this.OnPublicNetwork())
 			{
 				try
@@ -179,17 +211,11 @@ namespace Waher.Networking.PeerToPeer
 					this.exception = ex;
 					this.State = PeerToPeerNetworkState.Error;
 
-					if (this.tcpListener != null)
-					{
-						this.tcpListener.Stop();
-						this.tcpListener = null;
-					}
+					this.tcpListener?.Stop();
+					this.tcpListener = null;
 
-					if (this.udpClient != null)
-					{
-						this.udpClient.Dispose();
-						this.udpClient = null;
-					}
+					this.udpClient?.Dispose();
+					this.udpClient = null;
 				}
 			}
 			else
@@ -309,6 +335,9 @@ namespace Waher.Networking.PeerToPeer
 		{
 			try
 			{
+				this.searchTimer?.Dispose();
+				this.searchTimer = null;
+
 				if (this.upnpClient is null)
 				{
 					this.upnpClient = new UPnPClient(this.sniffers);
@@ -324,12 +353,22 @@ namespace Waher.Networking.PeerToPeer
 
 				this.upnpClient.StartSearch("urn:schemas-upnp-org:service:WANIPConnection:1", 1);
 				this.upnpClient.StartSearch("urn:schemas-upnp-org:service:WANIPConnection:2", 1);
+
+				this.searchTimer = new Timer(this.SearchTimeout, null, 10000, Timeout.Infinite);
 			}
 			catch (Exception ex)
 			{
 				this.exception = ex;
 				this.State = PeerToPeerNetworkState.Error;
 			}
+		}
+
+		private void SearchTimeout(object State)
+		{
+			this.searchTimer?.Dispose();
+			this.searchTimer = null;
+
+			this.State = PeerToPeerNetworkState.Error;
 		}
 
 		private async void UpnpClient_OnDeviceFound(object Sender, DeviceLocationEventArgs e)
@@ -557,10 +596,14 @@ namespace Waher.Networking.PeerToPeer
 					switch (value)
 					{
 						case PeerToPeerNetworkState.Ready:
+							this.searchTimer?.Dispose();
+							this.searchTimer = null;
 							this.ready.Set();
 							break;
 
 						case PeerToPeerNetworkState.Error:
+							this.searchTimer?.Dispose();
+							this.searchTimer = null;
 							this.error.Set();
 							break;
 					}
@@ -671,11 +714,13 @@ namespace Waher.Networking.PeerToPeer
 			this.disposed = true;
 			this.State = PeerToPeerNetworkState.Closed;
 
-			if (this.tcpListener != null)
-			{
-				this.tcpListener.Stop();
-				this.tcpListener = null;
-			}
+			NetworkChange.NetworkAddressChanged -= NetworkChange_NetworkAddressChanged;
+
+			this.searchTimer?.Dispose();
+			this.searchTimer = null;
+
+			this.tcpListener?.Stop();
+			this.tcpListener = null;
 
 			if (this.tcpMappingAdded)
 			{
@@ -705,29 +750,17 @@ namespace Waher.Networking.PeerToPeer
 
 			this.serviceWANIPConnectionV1 = null;
 
-			if (this.upnpClient != null)
-			{
-				this.upnpClient.Dispose();
-				this.upnpClient = null;
-			}
+			this.upnpClient?.Dispose();
+			this.upnpClient = null;
 
-			if (this.ipAddressesFound != null)
-			{
-				this.ipAddressesFound.Clear();
-				this.ipAddressesFound = null;
-			}
+			this.ipAddressesFound?.Clear();
+			this.ipAddressesFound = null;
 
-			if (this.ready != null)
-			{
-				this.ready.Dispose();
-				this.ready = null;
-			}
+			this.ready?.Dispose();
+			this.ready = null;
 
-			if (this.error != null)
-			{
-				this.error.Dispose();
-				this.error = null;
-			}
+			this.error?.Dispose();
+			this.error = null;
 		}
 
 		/// <summary>

@@ -25,6 +25,11 @@ namespace Waher.Networking.PeerToPeer
 		Created,
 
 		/// <summary>
+		/// Reinitializing after a network change.
+		/// </summary>
+		Reinitializing,
+
+		/// <summary>
 		/// Searching for Internet gateway.
 		/// </summary>
 		SearchingForGateway,
@@ -165,6 +170,10 @@ namespace Waher.Networking.PeerToPeer
 			{
 				case PeerToPeerNetworkState.Created:
 					this.State = MultiPlayerState.Created;
+					break;
+
+				case PeerToPeerNetworkState.Reinitializing:
+					this.State = MultiPlayerState.Reinitializing;
 					break;
 
 				case PeerToPeerNetworkState.SearchingForGateway:

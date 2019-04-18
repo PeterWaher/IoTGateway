@@ -371,6 +371,14 @@ namespace Waher.Networking.PeerToPeer
 			this.State = PeerToPeerNetworkState.Error;
 		}
 
+		private void Reinitialize(object State)
+		{
+			this.searchTimer?.Dispose();
+			this.searchTimer = null;
+
+			this.NetworkChange_NetworkAddressChanged(this, new EventArgs());
+		}
+
 		private async void UpnpClient_OnDeviceFound(object Sender, DeviceLocationEventArgs e)
 		{
 			try
@@ -605,6 +613,8 @@ namespace Waher.Networking.PeerToPeer
 							this.searchTimer?.Dispose();
 							this.searchTimer = null;
 							this.error.Set();
+
+							this.searchTimer = new Timer(this.Reinitialize, null, 60000, Timeout.Infinite);
 							break;
 					}
 

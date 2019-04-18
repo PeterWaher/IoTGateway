@@ -187,6 +187,8 @@ namespace Waher.Networking.PeerToPeer
 				case PeerToPeerNetworkState.Ready:
 					try
 					{
+						this.exception = null;
+
 						this.localPlayer.SetEndpoints(this.p2pNetwork.ExternalEndpoint, this.p2pNetwork.LocalEndpoint);
 
 						this.mqttConnection = new MqttClient(this.mqttServer, this.mqttPort, this.mqttTls, this.mqttUserName, this.mqttPassword);

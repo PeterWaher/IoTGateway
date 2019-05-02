@@ -22,17 +22,22 @@ namespace Waher.Security.EllipticCurves
 		/// </summary>
 		public const string ElementName = "EllipticCurve";
 
-		private static readonly RandomNumberGenerator rnd = RandomNumberGenerator.Create();
-		private static readonly BigInteger Two = new BigInteger(2);
+		/// <summary>
+		/// Random number generator
+		/// </summary>
+		protected static readonly RandomNumberGenerator rnd = RandomNumberGenerator.Create();
+
 		private readonly ModulusP modN;
 		private readonly PointOnCurve g;
 		private readonly BigInteger a;
 		private readonly BigInteger n;
+		private readonly BigInteger maxScalarExclusive;
 		private BigInteger d;
 		private PointOnCurve publicKey;
-		private readonly int orderBits;
-		private readonly int orderBytes;
+		private readonly int scalarBits;
+		private readonly int scalarBytes;
 		private readonly byte msbMask;
+		private readonly byte lsbMask;
 
 		/// <summary>
 		/// Base class of Elliptic curves over a prime field.
@@ -55,10 +60,10 @@ namespace Waher.Security.EllipticCurves
 		/// <param name="BasePoint">Base-point.</param>
 		/// <param name="A">a Coefficient in the definition of the curve E:	y^2=x^3+a*x+b</param>
 		/// <param name="Order">Order of base-point.</param>
-		/// <param name="OrderBits">Number of bits used to encode order.</param>
+		/// <param name="Cofactor">Cofactor of curve.</param>
 		/// <param name="D">Private key.</param>
 		public CurvePrimeField(BigInteger Prime, PointOnCurve BasePoint, BigInteger A,
-			BigInteger Order, int OrderBits, BigInteger? D)
+			BigInteger Order, int Cofactor, BigInteger? D)
 			: base(Prime)
 		{
 			if (Prime <= BigInteger.One)
@@ -67,19 +72,27 @@ namespace Waher.Security.EllipticCurves
 			this.g = BasePoint;
 			this.a = A;
 			this.n = Order;
-			this.orderBits = OrderBits;
-			this.orderBytes = (OrderBits + 7) >> 3;
+			this.maxScalarExclusive = Order * Cofactor;
+			this.scalarBits = CalcBits(this.maxScalarExclusive);
+			this.scalarBytes = (this.scalarBits + 7) >> 3;
 			this.modN = new ModulusP(Order);
 
-			this.msbMask = 0xff;
-			int MaskBits = (8 - OrderBits) & 7;
+			this.msbMask = this.lsbMask = 0xff;
+			int MaskBits = (8 - this.scalarBits) & 7;
 			if (MaskBits == 0)
 			{
-				this.orderBytes++;
+				this.scalarBytes++;
 				this.msbMask = 0;
 			}
 			else
 				this.msbMask >>= MaskBits;
+
+			int i = Cofactor;
+			while (i > 1)
+			{
+				this.lsbMask <<= 1;
+				i >>= 1;
+			}
 
 			if (D.HasValue)
 			{
@@ -119,12 +132,12 @@ namespace Waher.Security.EllipticCurves
 		/// <param name="N">Scalar</param>
 		/// <param name="P">Point</param>
 		/// <returns><paramref name="N"/>*<paramref name="P"/></returns>
-		public PointOnCurve ScalarMultiplication(BigInteger N, PointOnCurve P)
+		public virtual PointOnCurve ScalarMultiplication(BigInteger N, PointOnCurve P)
 		{
 			PointOnCurve Result = PointOnCurve.Zero;
 			byte[] Bin = N.ToByteArray();
 			int i;
-			int c = Math.Min(this.orderBits, Bin.Length << 3);
+			int c = Math.Min(this.scalarBits, Bin.Length << 3);
 
 			for (i = 0; i < c; i++)
 			{
@@ -236,9 +249,9 @@ namespace Waher.Security.EllipticCurves
 		/// Returns the next random number, in the range [1, n-1].
 		/// </summary>
 		/// <returns>Random number.</returns>
-		public BigInteger NextRandomNumber()
+		public virtual BigInteger NextRandomNumber()
 		{
-			byte[] B = new byte[this.orderBytes];
+			byte[] B = new byte[this.scalarBytes];
 			BigInteger D;
 
 			do
@@ -248,35 +261,14 @@ namespace Waher.Security.EllipticCurves
 					rnd.GetBytes(B);
 				}
 
-				B[this.orderBytes - 1] &= this.msbMask;
+				B[this.scalarBytes - 1] &= this.msbMask;
+				B[0] &= this.lsbMask;
 
 				D = new BigInteger(B);
 			}
-			while (D.IsZero || D >= this.n);
+			while (D.IsZero || D >= this.maxScalarExclusive);
 
 			return D;
-		}
-
-		/// <summary>
-		/// Calculates the number of bits used.
-		/// </summary>
-		/// <param name="n">Value</param>
-		/// <returns>Number of bits used by value.</returns>
-		protected static int CalcBits(BigInteger n)
-		{
-			if (n.IsZero)
-				return 0;
-
-			int i = 0;
-
-			do
-			{
-				i++;
-				n /= Two;
-			}
-			while (!n.IsZero);
-
-			return i;
 		}
 
 		/// <summary>
@@ -327,8 +319,8 @@ namespace Waher.Security.EllipticCurves
 			PointOnCurve P = this.ScalarMultiplication(this.d, RemotePublicKey);
 			byte[] B = P.X.ToByteArray();
 
-			if (B.Length != this.orderBytes)
-				Array.Resize<byte>(ref B, this.orderBytes);
+			if (B.Length != this.scalarBytes)
+				Array.Resize<byte>(ref B, this.scalarBytes);
 
 			Array.Reverse(B);   // Most significant byte first.
 
@@ -369,10 +361,10 @@ namespace Waher.Security.EllipticCurves
 			byte[] Hash = Hashes.ComputeHash(HashFunction, Data);
 			int c = Hash.Length;
 
-			if (c != this.orderBytes)
-				Array.Resize<byte>(ref Hash, this.orderBytes);
+			if (c != this.scalarBytes)
+				Array.Resize<byte>(ref Hash, this.scalarBytes);
 
-			Hash[this.orderBytes - 1] &= this.msbMask;
+			Hash[this.scalarBytes - 1] &= this.msbMask;
 
 			return new BigInteger(Hash);
 		}

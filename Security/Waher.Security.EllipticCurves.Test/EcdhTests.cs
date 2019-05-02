@@ -36,6 +36,18 @@ namespace Waher.Security.EllipticCurves.Test
 			this.Test_ECDH(new NistP521(), new NistP521());
 		}
 
+		[TestMethod]
+		public void Test_06_Curve25519()
+		{
+			this.Test_ECDH(new Curve25519(), new Curve25519());
+		}
+
+		[TestMethod]
+		public void Test_07_Curve448()
+		{
+			this.Test_ECDH(new Curve448(), new Curve448());
+		}
+
 		public void Test_ECDH(CurvePrimeField Curve1, CurvePrimeField Curve2)
 		{
 			int n;

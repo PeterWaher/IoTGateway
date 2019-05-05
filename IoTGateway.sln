@@ -364,7 +364,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Networking.Cluster.Te
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Networking.Cluster", "Networking\Waher.Networking.Cluster\Waher.Networking.Cluster.csproj", "{B5C160AF-0897-4FAF-884A-20E2EBCA4DEF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.Cluster.ConsoleSandbox", "Networking\Waher.Networking.Cluster.ConsoleSandbox\Waher.Networking.Cluster.ConsoleSandbox.csproj", "{77AA12FE-8ACC-4515-B399-E9BF90176815}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Networking.Cluster.ConsoleSandbox", "Networking\Waher.Networking.Cluster.ConsoleSandbox\Waher.Networking.Cluster.ConsoleSandbox.csproj", "{77AA12FE-8ACC-4515-B399-E9BF90176815}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Security.SHA3", "Security\Waher.Security.SHA3\Waher.Security.SHA3.csproj", "{F264C147-82EB-45AB-991B-E1FE784D78D9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -3399,6 +3401,26 @@ Global
 		{77AA12FE-8ACC-4515-B399-E9BF90176815}.Release|x64.Build.0 = Release|Any CPU
 		{77AA12FE-8ACC-4515-B399-E9BF90176815}.Release|x86.ActiveCfg = Release|Any CPU
 		{77AA12FE-8ACC-4515-B399-E9BF90176815}.Release|x86.Build.0 = Release|Any CPU
+		{F264C147-82EB-45AB-991B-E1FE784D78D9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F264C147-82EB-45AB-991B-E1FE784D78D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F264C147-82EB-45AB-991B-E1FE784D78D9}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{F264C147-82EB-45AB-991B-E1FE784D78D9}.Debug|ARM.Build.0 = Debug|Any CPU
+		{F264C147-82EB-45AB-991B-E1FE784D78D9}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{F264C147-82EB-45AB-991B-E1FE784D78D9}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{F264C147-82EB-45AB-991B-E1FE784D78D9}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F264C147-82EB-45AB-991B-E1FE784D78D9}.Debug|x64.Build.0 = Debug|Any CPU
+		{F264C147-82EB-45AB-991B-E1FE784D78D9}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F264C147-82EB-45AB-991B-E1FE784D78D9}.Debug|x86.Build.0 = Debug|Any CPU
+		{F264C147-82EB-45AB-991B-E1FE784D78D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F264C147-82EB-45AB-991B-E1FE784D78D9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F264C147-82EB-45AB-991B-E1FE784D78D9}.Release|ARM.ActiveCfg = Release|Any CPU
+		{F264C147-82EB-45AB-991B-E1FE784D78D9}.Release|ARM.Build.0 = Release|Any CPU
+		{F264C147-82EB-45AB-991B-E1FE784D78D9}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{F264C147-82EB-45AB-991B-E1FE784D78D9}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{F264C147-82EB-45AB-991B-E1FE784D78D9}.Release|x64.ActiveCfg = Release|Any CPU
+		{F264C147-82EB-45AB-991B-E1FE784D78D9}.Release|x64.Build.0 = Release|Any CPU
+		{F264C147-82EB-45AB-991B-E1FE784D78D9}.Release|x86.ActiveCfg = Release|Any CPU
+		{F264C147-82EB-45AB-991B-E1FE784D78D9}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -3547,6 +3569,7 @@ Global
 		{5F2453D7-001F-4F33-B0F8-A2E91F009042} = {0EA3132A-669C-4228-8684-3B98AE876BEF}
 		{B5C160AF-0897-4FAF-884A-20E2EBCA4DEF} = {0EA3132A-669C-4228-8684-3B98AE876BEF}
 		{77AA12FE-8ACC-4515-B399-E9BF90176815} = {0EA3132A-669C-4228-8684-3B98AE876BEF}
+		{F264C147-82EB-45AB-991B-E1FE784D78D9} = {D9FE4585-4E25-44EC-8DBA-DA90B012DC67}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {32CF1367-B83E-4CAD-8329-0D1C73AF59F4}

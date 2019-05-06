@@ -48,7 +48,7 @@ namespace Waher.Security.SHA3
 	/// in the NIST FIPS 202: 
 	/// https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.202.pdf
 	/// </summary>
-	public class Keccak
+	public abstract class Keccak
 	{
 		private static readonly bool[] rcs = GetRcs();
 		private static readonly ulong[] RCs = new ulong[] { 0x01, 0x02, 0x08, 0x80, 0x8000, 0x80000000, 0x8000000000000000 };
@@ -58,8 +58,13 @@ namespace Waher.Security.SHA3
 		private readonly int b;
 		private readonly int w;
 		private readonly int l;
+		private readonly int r;
+		private readonly int c;
+		private readonly int d;
 		private readonly int nr;
 		private readonly int byteSize;
+		private readonly byte suffix;
+		private readonly byte suffixBits;
 		private readonly ulong wMask;
 
 		/// <summary>
@@ -68,8 +73,11 @@ namespace Waher.Security.SHA3
 		/// https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.202.pdf
 		/// </summary>
 		/// <param name="BitSize">Bit Size.</param>
-		public Keccak(BitSize BitSize)
-			: this(BitSize, 0)
+		/// <param name="Capacity">Capacity of sponge function.</param>
+		/// <param name="Suffix">Suffix to append to variable-length messages before executing the Sponge function.</param>
+		/// <param name="DigestSize">Size of results of the sponge function.</param>
+		public Keccak(BitSize BitSize, int Capacity, byte Suffix, int DigestSize)
+			: this(BitSize, 0, Capacity, Suffix, DigestSize)
 		{
 			this.nr = 12 + 2 * this.l;
 		}
@@ -81,12 +89,34 @@ namespace Waher.Security.SHA3
 		/// </summary>
 		/// <param name="BitSize">Bit Size.</param>
 		/// <param name="Iterations">Number of iterations</param>
-		public Keccak(BitSize BitSize, int Iterations)
+		/// <param name="Capacity">Capacity of sponge function.</param>
+		/// <param name="Suffix">Suffix to append to variable-length messages before executing the Sponge function.</param>
+		/// <param name="DigestSize">Size of results of the sponge function.</param>
+		public Keccak(BitSize BitSize, int Iterations, int Capacity, byte Suffix, int DigestSize)
 		{
 			this.b = (int)BitSize;
 			this.w = this.b / 25;
 			this.byteSize = this.b / 8;
 			this.nr = Iterations;
+			this.c = Capacity;
+			this.r = this.b - this.c;
+			this.d = DigestSize;
+			this.suffix = Suffix;
+			this.suffixBits = 0;
+
+			if (this.c <= 0 || this.r <= 0 || (Capacity & 7) != 0)
+				throw new ArgumentException("Invalid capacity.", nameof(Capacity));
+
+			while (Suffix > 0)
+			{
+				Suffix >>= 1;
+				this.suffixBits++;
+			}
+
+			if (this.suffixBits > 6)
+				throw new ArgumentException("Invalid suffix.", nameof(Suffix));
+
+			this.suffix |= (byte)(1 << this.suffixBits);	// First bit of pad10*1
 
 			switch (this.b)
 			{
@@ -439,9 +469,9 @@ namespace Waher.Security.SHA3
 		/// <summary>
 		/// Computes the KECCAK-p[b, nr] algorithm, as defined in section 3.3 of NIST FIPS 202.
 		/// </summary>
-		/// <param name="S">Input string</param>
-		/// <returns>Output string</returns>
-		public byte[] Compute(byte[] S)
+		/// <param name="S">Input string of fixed length</param>
+		/// <returns>Output string of fixed length</returns>
+		public byte[] ComputeFixed(byte[] S)
 		{
 			int ir;
 			int to = 12 + 2 * l;
@@ -455,6 +485,51 @@ namespace Waher.Security.SHA3
 			return this.GetState();
 		}
 
+		/// <summary>
+		/// Computes the SPONGE function, as defined in section 4 of NIST FIPS 202.
+		/// </summary>
+		/// <param name="N">Input string of variable length.</param>
+		/// <returns>Output string of fixed length.</returns>
+		public byte[] ComputeVariable(byte[] N)
+		{
+			int m = N.Length;
+			int j = (-m - 2 - this.suffixBits) % r + r;
+			int nm1 = (N.Length + j >> 3) / r - 1;
+			byte[] S = new byte[this.byteSize];
+			int Pos = 0;
+			int i, k;
+
+			for (i = 0; i < nm1; i++)
+			{
+				for (k = 0; k < this.byteSize; k++)
+					S[k] ^= N[Pos++];
+
+				S = this.ComputeFixed(S);
+			}
+
+			k = 0;
+			while (Pos < m)
+				S[k++] ^= N[Pos++];
+
+			S[k] ^= this.suffix;
+			S[this.byteSize - 1] ^= 0x80;   // Last bit of pad10*1
+			S = this.ComputeFixed(S);
+
+			byte[] Z = new byte[d];
+
+			Pos = 0;
+			while (true)
+			{
+				i = Math.Min(r, d - Pos);
+				Array.Copy(S, 0, Z, Pos, i);
+				Pos += i;
+
+				if (Pos >= d)
+					return Z;
+
+				S = this.ComputeFixed(S);
+			}
+		}
 
 	}
 }

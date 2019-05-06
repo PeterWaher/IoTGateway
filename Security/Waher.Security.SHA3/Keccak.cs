@@ -61,6 +61,7 @@ namespace Waher.Security.SHA3
 		private readonly int r;
 		private readonly int c;
 		private readonly int d;
+		private readonly int dByteSize;
 		private readonly int nr;
 		private readonly int byteSize;
 		private readonly byte suffix;
@@ -101,8 +102,12 @@ namespace Waher.Security.SHA3
 			this.c = Capacity;
 			this.r = this.b - this.c;
 			this.d = DigestSize;
+			this.dByteSize = DigestSize / 8;
 			this.suffix = Suffix;
 			this.suffixBits = 0;
+
+			if ((DigestSize & 7) != 0)
+				throw new ArgumentException("Invalid digest size.", nameof(DigestSize));
 
 			if (this.c <= 0 || this.r <= 0 || (Capacity & 7) != 0)
 				throw new ArgumentException("Invalid capacity.", nameof(Capacity));
@@ -492,9 +497,8 @@ namespace Waher.Security.SHA3
 		/// <returns>Output string of fixed length.</returns>
 		public byte[] ComputeVariable(byte[] N)
 		{
-			int m = N.Length;
-			int j = (-m - 2 - this.suffixBits) % r + r;
-			int nm1 = (N.Length + j >> 3) / r - 1;
+			int m = N.Length << 3;
+			int nm1 = m / r;
 			byte[] S = new byte[this.byteSize];
 			int Pos = 0;
 			int i, k;
@@ -515,16 +519,16 @@ namespace Waher.Security.SHA3
 			S[this.byteSize - 1] ^= 0x80;   // Last bit of pad10*1
 			S = this.ComputeFixed(S);
 
-			byte[] Z = new byte[d];
+			byte[] Z = new byte[this.dByteSize];
 
 			Pos = 0;
 			while (true)
 			{
-				i = Math.Min(r, d - Pos);
+				i = Math.Min(r, this.dByteSize - Pos);
 				Array.Copy(S, 0, Z, Pos, i);
 				Pos += i;
 
-				if (Pos >= d)
+				if (Pos >= this.dByteSize)
 					return Z;
 
 				S = this.ComputeFixed(S);

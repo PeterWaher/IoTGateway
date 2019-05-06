@@ -17,7 +17,7 @@ namespace Waher.Security.SHA3
 		/// https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.202.pdf
 		/// </summary>
 		public SHA3_256()
-			: base(BitSize.BitSize1600, 512, 0b01, 256)
+			: base(BitSize.BitSize1600, 512, 0b10, 256)
 		{
 		}
 	}

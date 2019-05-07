@@ -18,7 +18,7 @@ namespace Waher.Security.SHA3
 		/// </summary>
 		/// <param name="DigestSize">Digest size.</param>
 		public SHAKE256(int DigestSize)
-			: base(BitSize.BitSize1600, 256, 0b1111, DigestSize)
+			: base(BitSize.BitSize1600, 512, 0b1111, DigestSize)
 		{
 		}
 	}

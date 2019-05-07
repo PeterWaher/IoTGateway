@@ -27110,7 +27110,7 @@
   },
   "packageFolders": {
     "C:\\Users\\peter\\.nuget\\packages\\": {},
-    "C:\\ProgramData\\Xamarin\\NuGet\\": {}
+    "C:\\Microsoft\\Xamarin\\NuGet\\": {}
   },
   "project": {
     "restore": {
@@ -27122,7 +27122,7 @@
       "outputPath": "C:\\My Projects\\IoTGateway\\Networking\\Waher.Networking.MQTT.UWP\\obj\\",
       "projectStyle": "ProjectJson",
       "fallbackFolders": [
-        "C:\\ProgramData\\Xamarin\\NuGet\\"
+        "C:\\Microsoft\\Xamarin\\NuGet\\"
       ],
       "configFilePaths": [
         "C:\\Users\\peter\\AppData\\Roaming\\NuGet\\NuGet.Config",

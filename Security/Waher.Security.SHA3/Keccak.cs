@@ -60,6 +60,7 @@ namespace Waher.Security.SHA3
 		private readonly int l;
 		private readonly int r;
 		private readonly int c;
+		private readonly int r8;
 		private readonly int r8m1;
 		private readonly int dByteSize;
 		private readonly int nr;
@@ -102,7 +103,8 @@ namespace Waher.Security.SHA3
 			this.nr = Iterations;
 			this.c = Capacity;
 			this.r = this.b - this.c;
-            this.r8m1 = (this.r >> 3) - 1;
+            this.r8 = this.r >> 3;
+            this.r8m1 = this.r8 - 1;
 			this.dByteSize = DigestSize / 8;
 			this.suffix = Suffix;
 			this.suffixBits = 0;
@@ -522,7 +524,8 @@ namespace Waher.Security.SHA3
 		{
             this.reportStates = !(this.NewState is null);
 
-			int m = N.Length << 3;
+            int Len = N.Length;
+			int m = Len << 3;
 			int nm1 = m / r;
 			byte[] S = new byte[this.byteSize];
 			int Pos = 0;
@@ -530,14 +533,14 @@ namespace Waher.Security.SHA3
 
 			for (i = 0; i < nm1; i++)
 			{
-				for (k = 0; k < this.byteSize; k++)
+				for (k = 0; k < this.r8; k++)
 					S[k] ^= N[Pos++];
 
 				S = this.ComputeFixed(S);
 			}
 
 			k = 0;
-			while (Pos < m)
+			while (Pos < Len)
 				S[k++] ^= N[Pos++];
 
 			S[k] ^= this.suffix;

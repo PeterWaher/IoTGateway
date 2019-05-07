@@ -1,7 +1,11 @@
+using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Waher.Security.SHA3.Test
 {
+    /// <summary>
+    /// Tests taken from https://en.wikipedia.org/wiki/SHA-3, retrieved 2019-05-07
+    /// </summary>
 	[TestClass]
 	public class SimpleTests
 	{
@@ -59,6 +63,24 @@ namespace Waher.Security.SHA3.Test
 			Assert.AreEqual("46b9dd2b0ba88d13233b3feb743eeb243fcd52ea62b81b82b50c27646ed5762fd75dc4ddd8c0f200cb05019d67b592f6fc821c49479ab48640292eacb3b7c4be", s);
 		}
 
-		// Test all message sizes from 0 bytes .. c*4 bytes
-	}
+        [TestMethod]
+        public void Test_07_SHAKE128_2()
+        {
+            SHAKE128 H = new SHAKE128(256);
+            byte[] Digest = H.ComputeVariable(Encoding.ASCII.GetBytes("The quick brown fox jumps over the lazy dog"));
+            string s = Hashes.BinaryToString(Digest);
+            Assert.AreEqual("f4202e3c5852f9182a0430fd8144f0a74b95e7417ecae17db0f8cfeed0e3e66e", s);
+        }
+
+        [TestMethod]
+        public void Test_08_SHAKE128_3()
+        {
+            SHAKE128 H = new SHAKE128(256);
+            byte[] Digest = H.ComputeVariable(Encoding.ASCII.GetBytes("The quick brown fox jumps over the lazy dof"));
+            string s = Hashes.BinaryToString(Digest);
+            Assert.AreEqual("853f4538be0db9621a6cea659a06c1107b1f83f02b13d18297bd39d7411cf10c", s);
+        }
+
+        // Test all message sizes from 0 bytes .. c*4 bytes
+    }
 }

@@ -552,7 +552,7 @@ namespace Waher.Security.SHA3
 			Pos = 0;
 			while (true)
 			{
-				i = Math.Min(r, this.dByteSize - Pos);
+				i = Math.Min(r8, this.dByteSize - Pos);
 				Array.Copy(S, 0, Z, Pos, i);
 				Pos += i;
 

@@ -1728,7 +1728,7 @@ namespace Waher.Security.SHA3.Test
 			"F2 45 6D 16 98 87 D1 58 BE 2F A3 13 0B CB 8C C7 " +
 			"BD B1 59 F2 5F 83 D1 BB A0 60 D5 E2 D6 89 39 BE " +
 			"3C 32 45 89 47 97 7C AE",
-			// Xor'd state (in bytes) ",
+			// Xor'd state (in bytes)
 			"F0 F6 7C FF 10 44 5D A6 62 E6 37 E8 D7 AC EC CA " +
 			"71 E3 FC 01 34 75 80 54 D1 12 7F F3 E8 FD DB 6E " +
 			"1C B8 0B 36 27 81 C9 E3 43 17 46 D4 88 9E FB 3A " +
@@ -3446,7 +3446,7 @@ namespace Waher.Security.SHA3.Test
 			"EB A3 16 CF A7 FE 22 27 9A 99 88 9D 22 E7 95 A9 " +
 			"58 DC BA 66 7D 89 CF D8 84 49 58 69 CC 1A E1 FC " +
 			"FD C3 E3 0B 71 37 D8 6C",
-			// Xor'd state (in bytes) ",
+			// Xor'd state (in bytes)
 			"EE A4 41 43 C7 DE 5E 39 91 C9 B9 D8 AA 91 F0 61 " +
 			"8C 43 BB AF 67 3B F7 04 F6 6C 4A 35 CD BF CF 6A " +
 			"3B BC 9F 5A 78 F1 1F 2C 9D 16 F4 5D 31 C2 F4 33 " +

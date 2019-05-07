@@ -1728,7 +1728,7 @@ namespace Waher.Security.SHA3.Test
 			"42 73 23 9C BF 58 3F CC 60 B5 49 A7 27 89 65 B3 " +
 			"19 2C E4 ED AB D2 4F 29 5C D6 F7 AE 48 14 FB B3 " +
 			"04 54 3F D6 49 56 4F 64",
-			// Xor'd state (in bytes) ",
+			// Xor'd state (in bytes)
 			"00 0B 01 AF 30 D2 A9 B5 84 7A F2 61 11 10 7E F2 " +
 			"C7 0E 65 1F 47 03 39 7F 72 FF EA 1E A4 E7 02 5B " +
 			"73 4C 26 EE CC 25 D8 52 BF B1 C9 E4 A7 B4 7B 21 " +

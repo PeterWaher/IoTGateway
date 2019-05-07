@@ -60,13 +60,14 @@ namespace Waher.Security.SHA3
 		private readonly int l;
 		private readonly int r;
 		private readonly int c;
-		private readonly int d;
+		private readonly int r8m1;
 		private readonly int dByteSize;
 		private readonly int nr;
 		private readonly int byteSize;
 		private readonly byte suffix;
 		private readonly byte suffixBits;
 		private readonly ulong wMask;
+        private bool reportStates = false;
 
 		/// <summary>
 		/// Implementation of the KECCAK-f permutations, as defined in section 3.4
@@ -101,7 +102,7 @@ namespace Waher.Security.SHA3
 			this.nr = Iterations;
 			this.c = Capacity;
 			this.r = this.b - this.c;
-			this.d = DigestSize;
+            this.r8m1 = (this.r >> 3) - 1;
 			this.dByteSize = DigestSize / 8;
 			this.suffix = Suffix;
 			this.suffixBits = 0;
@@ -109,7 +110,7 @@ namespace Waher.Security.SHA3
 			if ((DigestSize & 7) != 0)
 				throw new ArgumentException("Invalid digest size.", nameof(DigestSize));
 
-			if (this.c <= 0 || this.r <= 0 || (Capacity & 7) != 0)
+			if (this.c <= 0 || this.r <= 0 || this.r8m1 < 0 || (Capacity & 7) != 0)
 				throw new ArgumentException("Invalid capacity.", nameof(Capacity));
 
 			while (Suffix > 0)
@@ -411,17 +412,17 @@ namespace Waher.Security.SHA3
 			else if (i < 0)
 				i += 255;
 
-			byte R = 0x80;
+            byte R = 1;// 0x80;
 
 			while (i-- > 0)
 			{
 				if ((R & 0x80) != 0)
 				{
-					R >>= 1;
+					R <<= 1;
 					R ^= 0b01110001;
 				}
 				else
-					R >>= 1;
+					R <<= 1;
 			}
 
 			return (R & 1) != 0;
@@ -465,24 +466,46 @@ namespace Waher.Security.SHA3
 		public void Rnd(int ir)
 		{
 			this.θ();
-			this.ρ();
-			this.π();
-			this.χ();
-			this.ι(ir);
-		}
 
-		/// <summary>
-		/// Computes the KECCAK-p[b, nr] algorithm, as defined in section 3.3 of NIST FIPS 202.
-		/// </summary>
-		/// <param name="S">Input string of fixed length</param>
-		/// <returns>Output string of fixed length</returns>
-		public byte[] ComputeFixed(byte[] S)
+            if (this.reportStates)
+                this.NewState?.Invoke(this, new EventArgs());
+
+            this.ρ();
+
+            if (this.reportStates)
+                this.NewState?.Invoke(this, new EventArgs());
+
+            this.π();
+
+            if (this.reportStates)
+                this.NewState?.Invoke(this, new EventArgs());
+
+            this.χ();
+
+            if (this.reportStates)
+                this.NewState?.Invoke(this, new EventArgs());
+
+            this.ι(ir);
+
+            if (this.reportStates)
+                this.NewState?.Invoke(this, new EventArgs());
+        }
+
+        /// <summary>
+        /// Computes the KECCAK-p[b, nr] algorithm, as defined in section 3.3 of NIST FIPS 202.
+        /// </summary>
+        /// <param name="S">Input string of fixed length</param>
+        /// <returns>Output string of fixed length</returns>
+        public byte[] ComputeFixed(byte[] S)
 		{
 			int ir;
 			int to = 12 + 2 * l;
 			int from = to - nr;
 
 			this.InitState(S);
+
+            if (this.reportStates)
+                this.NewState?.Invoke(this, new EventArgs());
 
 			for (ir = from; ir < to; ir++)
 				this.Rnd(ir);
@@ -497,6 +520,8 @@ namespace Waher.Security.SHA3
 		/// <returns>Output string of fixed length.</returns>
 		public byte[] ComputeVariable(byte[] N)
 		{
+            this.reportStates = !(this.NewState is null);
+
 			int m = N.Length << 3;
 			int nm1 = m / r;
 			byte[] S = new byte[this.byteSize];
@@ -516,7 +541,7 @@ namespace Waher.Security.SHA3
 				S[k++] ^= N[Pos++];
 
 			S[k] ^= this.suffix;
-			S[this.byteSize - 1] ^= 0x80;   // Last bit of pad10*1
+			S[this.r8m1] ^= 0x80;   // Last bit of pad10*1
 			S = this.ComputeFixed(S);
 
 			byte[] Z = new byte[this.dByteSize];
@@ -535,5 +560,10 @@ namespace Waher.Security.SHA3
 			}
 		}
 
+        /// <summary>
+        /// Event raised when the internal state has changed. You can use this event in unit tests
+        /// to validate the evaluation of the function.
+        /// </summary>
+        public event EventHandler NewState = null;
 	}
 }

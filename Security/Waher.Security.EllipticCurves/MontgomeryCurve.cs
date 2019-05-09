@@ -146,8 +146,6 @@ namespace Waher.Security.EllipticCurves
 		/// <param name="I3">Second integer.</param>
 		private static void ConditionalSwap(int swap, ref BigInteger I2, ref BigInteger I3)
 		{
-			BigInteger I20 = I2;
-			BigInteger I30 = I3;
 			byte[] x2 = I2.ToByteArray();
 			byte[] x3 = I3.ToByteArray();
 			int i, c = x2.Length, d = x3.Length;
@@ -178,8 +176,8 @@ namespace Waher.Security.EllipticCurves
 					while (d < c)
 						x3[d++] = 0xff;
 				}
-				else
-					d = c;
+				//else
+				//	d = c;
 			}
 
 			Mask = (byte)(0xff * swap);

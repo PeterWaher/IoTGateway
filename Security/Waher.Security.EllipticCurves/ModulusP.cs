@@ -90,7 +90,7 @@ namespace Waher.Security.EllipticCurves
 		/// <returns>x^-1 mod p</returns>
 		public BigInteger Invert(BigInteger x)
 		{
-			if (x < BigInteger.Zero)
+            if (x < BigInteger.Zero)
 			{
 				x = BigInteger.Remainder(x, p);
 				if (x < BigInteger.Zero)

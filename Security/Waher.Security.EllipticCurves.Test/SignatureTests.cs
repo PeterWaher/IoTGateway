@@ -7,46 +7,46 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Waher.Security.EllipticCurves.Test
 {
 	[TestClass]
-	public class EcdsaTests
+	public class SignatureTests
 	{
 		[TestMethod]
-		public void Test_01_NIST_P192()
+		public void Test_01_ECDSA_NIST_P192()
 		{
 			this.Test_Signature(new NistP192(), new NistP192(), HashFunction.SHA256);
 		}
 
 		[TestMethod]
-		public void Test_02_NIST_P224()
+		public void Test_02_ECDSA_NIST_P224()
 		{
 			this.Test_Signature(new NistP224(), new NistP224(), HashFunction.SHA256);
 		}
 
 		[TestMethod]
-		public void Test_03_NIST_P256()
+		public void Test_03_ECDSA_NIST_P256()
 		{
 			this.Test_Signature(new NistP256(), new NistP256(), HashFunction.SHA256);
 		}
 
 		[TestMethod]
-		public void Test_04_NIST_P384()
+		public void Test_04_ECDSA_NIST_P384()
 		{
 			this.Test_Signature(new NistP384(), new NistP384(), HashFunction.SHA512);
 		}
 
 		[TestMethod]
-		public void Test_05_NIST_P521()
+		public void Test_05_ECDSA_NIST_P521()
 		{
 			this.Test_Signature(new NistP521(), new NistP521(), HashFunction.SHA512);
 		}
 
 		[TestMethod]
-		public void Test_06_Curve25519()
+		public void Test_06_EdDSA_Curve25519()
 		{
 			this.Test_Signature(new Curve25519(), new Curve25519(), HashFunction.SHA256);
 		}
 
 		[TestMethod]
-		public void Test_07_Curve448()
+		public void Test_07_EdDSA_Curve448()
 		{
 			this.Test_Signature(new Curve448(), new Curve448(), HashFunction.SHA512);
 		}

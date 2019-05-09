@@ -14,34 +14,34 @@ namespace Waher.Security.EllipticCurves
 		private static readonly BigInteger A = 486662;
 		private static readonly BigInteger A24 = (A - 2) / 4;
 		private static readonly BigInteger n = BigInteger.Pow(2, 252) + BigInteger.Parse("14def9dea2f79cd65812631a5cf5d3ed", NumberStyles.HexNumber);
-		private const int cofactor = 8;
 		private static readonly BigInteger BasePointU = 9;
 		private static readonly BigInteger BasePointV = BigInteger.Parse("43114425171068552920764898935933967039370386198203806730763910166200978582548");
 		private static readonly BigInteger SqrtMinus486664 = ModulusP.SqrtModP(-486664, p0);
+        private const int cofactor = 8;
 
-		/// <summary>
-		/// Curve25519, as defined in RFC 7748:
-		/// https://tools.ietf.org/html/rfc7748
-		/// </summary>
-		public Curve25519()
+        /// <summary>
+        /// Curve25519, as defined in RFC 7748:
+        /// https://tools.ietf.org/html/rfc7748
+        /// </summary>
+        public Curve25519()
 			: base(p0, new PointOnCurve(BasePointU, BasePointV), A, n, cofactor)
 		{
-		}
+        }
 
-		/// <summary>
-		/// Curve25519, as defined in RFC 7748:
-		/// https://tools.ietf.org/html/rfc7748
-		/// </summary>
-		/// <param name="D">Private key.</param>
-		public Curve25519(BigInteger D)
+        /// <summary>
+        /// Curve25519, as defined in RFC 7748:
+        /// https://tools.ietf.org/html/rfc7748
+        /// </summary>
+        /// <param name="D">Private key.</param>
+        public Curve25519(BigInteger D)
 			: base(p0, new PointOnCurve(BasePointU, BasePointV), A, n, cofactor, D)
 		{
-		}
+        }
 
-		/// <summary>
-		/// Name of curve.
-		/// </summary>
-		public override string CurveName => "Curve25519";
+        /// <summary>
+        /// Name of curve.
+        /// </summary>
+        public override string CurveName => "Curve25519";
 
 
 		/// <summary>
@@ -105,5 +105,5 @@ namespace Waher.Security.EllipticCurves
 			return ScalarMultiplication(N, U, A24, this.p, 255);
 		}
 
-	}
+    }
 }

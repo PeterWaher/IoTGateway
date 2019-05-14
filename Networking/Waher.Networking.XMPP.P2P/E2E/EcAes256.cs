@@ -193,37 +193,28 @@ namespace Waher.Networking.XMPP.P2P.E2E
 			byte[] Encrypted;
 			byte[] Key = GetSharedKey(LocalEcAes256, this);
 			byte[] IV = GetIV(Id, Type, From, To);
-			KeyValuePair<BigInteger, BigInteger> Signature;
+			byte[] Signature;
 
 			Encrypted = this.Encrypt(Data, Key, IV);
+			Signature = LocalEcAes256.Curve.Sign(Data);
 
-			Signature = LocalEcAes256.Curve.Sign(Data, HashFunction.SHA256);
-
-			byte[] Signature1 = ToNetwork(Signature.Key);
-			byte[] Signature2 = ToNetwork(Signature.Value);
-
-			byte[] Block = new byte[Signature1.Length + Signature2.Length + Encrypted.Length + 6];
+			byte[] Block = new byte[Signature.Length + Encrypted.Length + 5];
 			int i, j;
 
-			j = 6;
+			j = 5;
 
-			i = Signature1.Length;
-			Array.Copy(Signature1, 0, Block, j, i);
+			i = Signature.Length;
+			Array.Copy(Signature, 0, Block, j, i);
 			j += i;
 			Block[0] = (byte)i;
 
-			i = Signature2.Length;
-			Array.Copy(Signature2, 0, Block, j, i);
-			j += i;
-			Block[1] = (byte)i;
-
 			i = Encrypted.Length;
 			Array.Copy(Encrypted, 0, Block, j, i);
-			j += i;
-			Block[2] = (byte)(i >> 24);
-			Block[3] = (byte)(i >> 16);
-			Block[4] = (byte)(i >> 8);
-			Block[5] = (byte)i;
+
+            Block[1] = (byte)(i >> 24);
+			Block[2] = (byte)(i >> 16);
+			Block[3] = (byte)(i >> 8);
+			Block[4] = (byte)i;
 
 			return Block;
 		}
@@ -243,50 +234,42 @@ namespace Waher.Networking.XMPP.P2P.E2E
 			if (!(RemoteEndpoint is EcAes256 RemoteEcAes256))
 				return null;
 
-			if (Data.Length < 6)
+			if (Data.Length < 5)
 				return null;
 
-			int Signature1Len;
-			int Signature2Len;
+			int SignatureLen;
 			int DataLen;
 
-			Signature1Len = Data[0];
-			Signature2Len = Data[1];
+			SignatureLen = Data[0];
 
-			DataLen = Data[2];
+			DataLen = Data[1];
+			DataLen <<= 8;
+			DataLen |= Data[2];
 			DataLen <<= 8;
 			DataLen |= Data[3];
 			DataLen <<= 8;
 			DataLen |= Data[4];
-			DataLen <<= 8;
-			DataLen |= Data[5];
 
-			if (Data.Length != 6 + Signature1Len + Signature2Len + DataLen)
+			if (Data.Length != 5 + SignatureLen + DataLen)
 				return null;
 
-			byte[] Signature1 = new byte[Signature1Len];
-			byte[] Signature2 = new byte[Signature2Len];
+			byte[] Signature = new byte[SignatureLen];
 			byte[] Encrypted = new byte[DataLen];
 
-			int i = 6;
-			Array.Copy(Data, i, Signature1, 0, Signature1Len);
-			i += Signature1Len;
-			Array.Copy(Data, i, Signature2, 0, Signature2Len);
-			i += Signature2Len;
+			int i = 5;
+			Array.Copy(Data, i, Signature, 0, SignatureLen);
+			i += SignatureLen;
 			Array.Copy(Data, i, Encrypted, 0, DataLen);
-			i += DataLen;
 
 			byte[] Decrypted;
 			byte[] Key = GetSharedKey(this, RemoteEcAes256);
 			byte[] IV = GetIV(Id, Type, From, To);
-			BigInteger r = FromNetwork(Signature1);
-			BigInteger s = FromNetwork(Signature2);
 
 			try
 			{
 				Decrypted = this.Decrypt(Encrypted, Key, IV);
 
-				if (Decrypted != null && RemoteEcAes256.Curve.Verify(Decrypted, RemoteEcAes256.publicKey, HashFunction.SHA256, new KeyValuePair<BigInteger, BigInteger>(r, s)))
+				if (Decrypted != null && RemoteEcAes256.Curve.Verify(Decrypted, RemoteEcAes256.publicKey, Signature))
 					return Decrypted;
 			}
 			catch (Exception)
@@ -303,7 +286,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
 					if (Key != null)
 					{
 						Decrypted = this.Decrypt(Encrypted, Key, IV);
-						if (Decrypted != null && RemoteEcAes256.Curve.Verify(Decrypted, RemoteEcAes256.publicKey, HashFunction.SHA256, new KeyValuePair<BigInteger, BigInteger>(r, s)))
+						if (Decrypted != null && RemoteEcAes256.Curve.Verify(Decrypted, RemoteEcAes256.publicKey, Signature))
 							return Decrypted;
 					}
 				}
@@ -335,23 +318,17 @@ namespace Waher.Networking.XMPP.P2P.E2E
 			byte[] Encrypted;
 			byte[] Key = GetSharedKey(LocalEcAes256, this);
 			byte[] IV = GetIV(Id, Type, From, To);
-			KeyValuePair<BigInteger, BigInteger> Signature;
+			byte[] Signature;
 
 			Encrypted = this.Encrypt(Data, Key, IV);
-
-			Signature = LocalEcAes256.Curve.Sign(Data, HashFunction.SHA256);
-
-			byte[] Signature1 = ToNetwork(Signature.Key);
-			byte[] Signature2 = ToNetwork(Signature.Value);
+			Signature = LocalEcAes256.Curve.Sign(Data);
 
 			Xml.Append("<aes xmlns=\"");
 			Xml.Append(EndpointSecurity.IoTHarmonizationE2E);
 			Xml.Append("\" ec=\"");
 			Xml.Append(this.CurveName);
-			Xml.Append("\" ecdsa1=\"");
-			Xml.Append(Convert.ToBase64String(Signature1));
-			Xml.Append("\" ecdsa2=\"");
-			Xml.Append(Convert.ToBase64String(Signature2));
+			Xml.Append("\" s=\"");
+			Xml.Append(Convert.ToBase64String(Signature));
 			Xml.Append("\">");
 			Xml.Append(Convert.ToBase64String(Encrypted));
 			Xml.Append("</aes>");
@@ -409,16 +386,13 @@ namespace Waher.Networking.XMPP.P2P.E2E
 			byte[] Decrypted;
 			byte[] Key = GetSharedKey(this, RemoteEcAes256);
 			byte[] IV = this.GetIV(Id, Type, From, To);
-			byte[] Signature1 = Convert.FromBase64String(XML.Attribute(AesElement, "ecdsa1"));
-			byte[] Signature2 = Convert.FromBase64String(XML.Attribute(AesElement, "ecdsa2"));
-			BigInteger r = FromNetwork(Signature1);
-			BigInteger s = FromNetwork(Signature2);
+			byte[] Signature = Convert.FromBase64String(XML.Attribute(AesElement, "s"));
 
 			try
 			{
 				Decrypted = this.Decrypt(Encrypted, Key, IV);
 
-				if (Decrypted != null && RemoteEcAes256.Curve.Verify(Decrypted, RemoteEcAes256.publicKey, HashFunction.SHA256, new KeyValuePair<BigInteger, BigInteger>(r, s)))
+				if (Decrypted != null && RemoteEcAes256.Curve.Verify(Decrypted, RemoteEcAes256.publicKey, Signature))
 					return Encoding.UTF8.GetString(Decrypted);
 			}
 			catch (Exception)
@@ -435,7 +409,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
 					if (Key != null)
 					{
 						Decrypted = this.Decrypt(Encrypted, Key, IV);
-						if (Decrypted != null && RemoteEcAes256.Curve.Verify(Decrypted, RemoteEcAes256.publicKey, HashFunction.SHA256, new KeyValuePair<BigInteger, BigInteger>(r, s)))
+						if (Decrypted != null && RemoteEcAes256.Curve.Verify(Decrypted, RemoteEcAes256.publicKey, Signature))
 							return Encoding.UTF8.GetString(Decrypted);
 					}
 				}
@@ -452,18 +426,15 @@ namespace Waher.Networking.XMPP.P2P.E2E
         /// Signs binary data using the local private key.
         /// </summary>
         /// <param name="Data">Binary data</param>
-        /// <param name="HashFunction">Hash function to use.</param>
-        /// <returns>Signature (ECDSA) consisting of one or two large integers.</returns>
-        public override KeyValuePair<byte[], byte[]> Sign(byte[] Data, HashFunction HashFunction)
+        /// <returns>Digital signature.</returns>
+        public override byte[] Sign(byte[] Data)
 		{
 			if (!this.hasPrivateKey)
 				throw new InvalidOperationException("Signing requires private key.");
 
-			KeyValuePair<BigInteger, BigInteger> Signature = this.curve.Sign(Data, HashFunction);
-			byte[] s1 = ToNetwork(Signature.Key);
-			byte[] s2 = ToNetwork(Signature.Value);
+			byte[] Signature = this.curve.Sign(Data);
 
-			return new KeyValuePair<byte[], byte[]>(s1, s2);
+			return Signature;
 		}
 
 		/// <summary>
@@ -472,14 +443,11 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		/// <param name="Data">Data that is signed.</param>
 		/// <param name="X">Public key (X-coordinate)</param>
 		/// <param name="Y">Public key (Y-coordinate)</param>
-		/// <param name="Signature1">First integer in ECDSA signature.</param>
-		/// <param name="Signature2">Second integer in ECDSA signature.</param>
-		/// <param name="HashFunction">Hash function used in signature calculation.</param>
+		/// <param name="Signature">Digital signature.</param>
 		/// <returns>If signature is valid.</returns>
-		public bool Verify(byte[] Data, byte[] X, byte[] Y, byte[] Signature1,
-			byte[] Signature2, HashFunction HashFunction)
+		public bool Verify(byte[] Data, byte[] X, byte[] Y, byte[] Signature)
 		{
-			return this.Verify(Data, new PointOnCurve(FromNetwork(X), FromNetwork(Y)), Signature1, Signature2, HashFunction);
+			return this.Verify(Data, new PointOnCurve(FromNetwork(X), FromNetwork(Y)), Signature);
 		}
 
 		/// <summary>
@@ -487,29 +455,22 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		/// </summary>
 		/// <param name="Data">Data that is signed.</param>
 		/// <param name="PublicKey">Public key</param>
-		/// <param name="Signature1">First integer in ECDSA signature.</param>
-		/// <param name="Signature2">Second integer in ECDSA signature.</param>
-		/// <param name="HashFunction">Hash function used in signature calculation.</param>
+		/// <param name="Signature">Digital signature.</param>
 		/// <returns>If signature is valid.</returns>
-		public bool Verify(byte[] Data, PointOnCurve PublicKey, byte[] Signature1, byte[] Signature2, HashFunction HashFunction)
+		public bool Verify(byte[] Data, PointOnCurve PublicKey, byte[] Signature)
 		{
-			KeyValuePair<BigInteger, BigInteger> Signature = new KeyValuePair<BigInteger, BigInteger>(
-				FromNetwork(Signature1), FromNetwork(Signature2));
-
-			return this.curve.Verify(Data, PublicKey, HashFunction, Signature);
+			return this.curve.Verify(Data, PublicKey, Signature);
 		}
 
         /// <summary>
         /// Verifies a signature.
         /// </summary>
         /// <param name="Data">Data that is signed.</param>
-        /// <param name="Signature1">First integer in ECDSA signature.</param>
-        /// <param name="Signature2">Second integer in ECDSA signature.</param>
-        /// <param name="HashFunction">Hash function used in signature calculation.</param>
+        /// <param name="Signature">Digital signature.</param>
         /// <returns>If signature is valid.</returns>
-        public override bool Verify(byte[] Data, byte[] Signature1, byte[] Signature2, HashFunction HashFunction)
+        public override bool Verify(byte[] Data, byte[] Signature)
         {
-            return this.Verify(Data, this.publicKey, Signature1, Signature2, HashFunction);
+            return this.Verify(Data, this.publicKey, Signature);
         }
 
         /// <summary>

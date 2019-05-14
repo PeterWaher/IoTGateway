@@ -260,7 +260,6 @@ namespace Waher.Networking.XMPP.P2P.E2E
 
 			i = Result.Length;
 			Array.Copy(Result, 0, Block, j, i);
-			j += i;
 			Block[4] = (byte)(i >> 24);
 			Block[5] = (byte)(i >> 16);
 			Block[6] = (byte)(i >> 8);
@@ -320,7 +319,6 @@ namespace Waher.Networking.XMPP.P2P.E2E
 			Array.Copy(Data, i, Signature, 0, SignatureLen);
 			i += SignatureLen;
 			Array.Copy(Data, i, Encrypted, 0, DataLen);
-			i += DataLen;
 
 			byte[] Decrypted;
 			byte[] Key;
@@ -491,51 +489,25 @@ namespace Waher.Networking.XMPP.P2P.E2E
 			return Encoding.UTF8.GetString(Decrypted);
 		}
 
-		/// <summary>
-		/// Signs binary data using the local private key.
-		/// </summary>
-		/// <param name="Data">Binary data</param>
-		/// <returns>Signature</returns>
-		public byte[] Sign(byte[] Data)
-		{
-			return this.rsa.SignData(Data, HashAlgorithmName.SHA256, RSASignaturePadding.Pss);
-		}
-
         /// <summary>
         /// Signs binary data using the local private key.
         /// </summary>
         /// <param name="Data">Binary data</param>
-        /// <param name="HashFunction">Hash function to use.</param>
-        /// <returns>Signature consisting of one or two large integers.</returns>
-        public override KeyValuePair<byte[], byte[]> Sign(byte[] Data, HashFunction HashFunction)
+        /// <returns>Digital signature.</returns>
+        public override byte[] Sign(byte[] Data)
         {
-            return new KeyValuePair<byte[], byte[]>(this.rsa.SignData(Data, ToAlgorithmName(HashFunction), RSASignaturePadding.Pss), null);
-        }
-
-        private static HashAlgorithmName ToAlgorithmName(HashFunction HashFunction)
-        {
-            switch (HashFunction)
-            {
-                case HashFunction.MD5: return HashAlgorithmName.MD5; 
-                case HashFunction.SHA1: return HashAlgorithmName.SHA1; 
-                case HashFunction.SHA256: return HashAlgorithmName.SHA256; 
-                case HashFunction.SHA384: return HashAlgorithmName.SHA384; 
-                case HashFunction.SHA512: return HashAlgorithmName.SHA512; 
-                default: throw new ArgumentException("Unrecognized hash function.", nameof(HashFunction));
-            }
+            return this.rsa.SignData(Data, HashAlgorithmName.SHA256, RSASignaturePadding.Pss);
         }
 
         /// <summary>
         /// Verifies a signature.
         /// </summary>
         /// <param name="Data">Data that is signed.</param>
-        /// <param name="Signature1">First integer in ECDSA signature.</param>
-        /// <param name="Signature2">Second integer in ECDSA signature.</param>
-        /// <param name="HashFunction">Hash function used in signature calculation.</param>
+        /// <param name="Signature">Digital signature.</param>
         /// <returns>If signature is valid.</returns>
-        public override bool Verify(byte[] Data, byte[] Signature1, byte[] Signature2, HashFunction HashFunction)
+        public override bool Verify(byte[] Data, byte[] Signature)
         {
-            return RsaAes.Verify(Data, Signature1, this.keySize, this.modulus, this.exponent, HashFunction);
+            return RsaAes.Verify(Data, Signature, this.keySize, this.modulus, this.exponent);
         }
 
         /// <summary>
@@ -548,21 +520,6 @@ namespace Waher.Networking.XMPP.P2P.E2E
         /// <param name="Exponent">Exponent</param>
         /// <returns></returns>
         public static bool Verify(byte[] Data, byte[] Signature, int KeySize, byte[] Modulus, byte[] Exponent)
-        {
-            return Verify(Data, Signature, KeySize, Modulus, Exponent, HashFunction.SHA256);
-        }
-
-        /// <summary>
-        /// Verifies a signature.
-        /// </summary>
-        /// <param name="Data">Data that is signed.</param>
-        /// <param name="Signature">Signature</param>
-        /// <param name="KeySize">RSA key size</param>
-        /// <param name="Modulus">Modulus</param>
-        /// <param name="Exponent">Exponent</param>
-        /// <param name="HashFunction">Hash function</param>
-        /// <returns></returns>
-        public static bool Verify(byte[] Data, byte[] Signature, int KeySize, byte[] Modulus, byte[] Exponent, HashFunction HashFunction)
 		{
 			using (RSA Rsa = RSA.Create())
 			{
@@ -576,7 +533,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
 
 				Rsa.ImportParameters(P);
 
-				return Rsa.VerifyData(Data, Signature, ToAlgorithmName(HashFunction), RSASignaturePadding.Pss);
+				return Rsa.VerifyData(Data, Signature, HashAlgorithmName.SHA256, RSASignaturePadding.Pss);
 			}
 		}
 

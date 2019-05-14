@@ -41,7 +41,6 @@ namespace Waher.Networking.XMPP.Contracts
 		private readonly Dictionary<string, KeyEventArgs> publicKeys = new Dictionary<string, KeyEventArgs>();
 		private readonly Dictionary<string, KeyEventArgs> matchingKeys = new Dictionary<string, KeyEventArgs>();
 		private EndpointSecurity localEndpoint;
-		private readonly Task<EndpointSecurity> localEndpointTask;
 		private readonly string componentAddress;
 
 		/// <summary>
@@ -57,7 +56,7 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			this.componentAddress = ComponentAddress;
 			this.localEndpoint = null;
-			this.localEndpointTask = this.LoadKeys();
+			Task T = this.LoadKeys();
 
 			this.client.RegisterMessageHandler("identity", NamespaceLegalIdentities, this.IdentityMessageHandler, true);
 			this.client.RegisterMessageHandler("contractSigned", NamespaceSmartContracts, this.ContractSignedMessageHandler, true);
@@ -99,17 +98,6 @@ namespace Waher.Networking.XMPP.Contracts
 			Doc.LoadXml(s);
 			s = Doc.DocumentElement.GetAttribute("d");
 			return BigInteger.Parse(s);
-		}
-
-		private EndpointSecurity LocalEndpoint
-		{
-			get
-			{
-				if (this.localEndpoint is null)
-					return this.localEndpointTask.Result;
-				else
-					return this.localEndpoint;
-			}
 		}
 
 		/// <summary>
@@ -412,27 +400,13 @@ namespace Waher.Networking.XMPP.Contracts
 					s += "</identity>";
 
 					byte[] Bin = Encoding.UTF8.GetBytes(s);
+                    byte[] Signature = e.Key.Sign(Bin);
 
-					if (e.Key is EcAes256 EcAes256)
-					{
-						KeyValuePair<byte[], byte[]> Signature = EcAes256.Sign(Bin, Security.HashFunction.SHA256);
+                    Xml.Append("<clientSignature>");
+                    Xml.Append(Convert.ToBase64String(Signature));
+                    Xml.Append("</clientSignature>");
 
-						Xml.Append("<clientSignature s1=\"");
-						Xml.Append(Convert.ToBase64String(Signature.Key));
-						Xml.Append("\" s2=\"");
-						Xml.Append(Convert.ToBase64String(Signature.Value));
-						Xml.Append("\"/>");
-					}
-					else if (e.Key is RsaAes RsaAes)
-					{
-						byte[] Signature = RsaAes.Sign(Bin);
-
-						Xml.Append("<clientSignature s1=\"");
-						Xml.Append(Convert.ToBase64String(Signature));
-						Xml.Append("\"/>");
-					}
-
-					Xml.Append("</identity></apply>");
+                    Xml.Append("</identity></apply>");
 
 					this.client.SendIqSet(Address, Xml.ToString(), (sender2, e2) =>
 					{
@@ -556,7 +530,7 @@ namespace Waher.Networking.XMPP.Contracts
 				return;
 			}
 
-			if (Identity.ClientSignature1 is null || Identity.ClientSignature1.Length == 0)
+			if (Identity.ClientSignature is null || Identity.ClientSignature.Length == 0)
 			{
 				this.ReturnStatus(IdentityStatus.NoClientSignature, Callback, State);
 				return;
@@ -569,7 +543,7 @@ namespace Waher.Networking.XMPP.Contracts
 			if (Identity.ClientKeyName.StartsWith("RSA") &&
 				int.TryParse(Identity.ClientKeyName.Substring(3), out int KeySize))
 			{
-				if (!RsaAes.Verify(Data, Identity.ClientSignature1, KeySize,
+				if (!RsaAes.Verify(Data, Identity.ClientSignature, KeySize,
 					Identity.ClientPubKey1, Identity.ClientPubKey2))
 				{
 					this.ReturnStatus(IdentityStatus.ClientSignatureInvalid, Callback, State);
@@ -580,15 +554,8 @@ namespace Waher.Networking.XMPP.Contracts
 				EndpointSecurity.IoTHarmonizationE2E, out IE2eEndpoint LocalKey) &&
 				LocalKey is EcAes256 LocalEc)
 			{
-				if (Identity.ClientSignature2 is null ||
-					Identity.ClientSignature2.Length == 0)
-				{
-					this.ReturnStatus(IdentityStatus.NoClientSignature, Callback, State);
-					return;
-				}
-
 				if (!LocalEc.Verify(Data, Identity.ClientPubKey1, Identity.ClientPubKey2,
-					Identity.ClientSignature1, Identity.ClientSignature2, HashFunction.SHA256))
+					Identity.ClientSignature))
 				{
 					this.ReturnStatus(IdentityStatus.ClientSignatureInvalid, Callback, State);
 					return;
@@ -600,8 +567,7 @@ namespace Waher.Networking.XMPP.Contracts
 				return;
 			}
 
-			if (Identity.ServerSignature1 is null ||
-				Identity.ServerSignature1.Length == 0)
+			if (Identity.ServerSignature is null || Identity.ServerSignature.Length == 0)
 			{
 				this.ReturnStatus(IdentityStatus.NoProviderSignature, Callback, State);
 				return;
@@ -622,29 +588,7 @@ namespace Waher.Networking.XMPP.Contracts
 			{
 				if (e.Ok && e.Key != null)
 				{
-					bool Valid = false;
-
-					if (e.Key is RsaAes RsaAes)
-					{
-						if (RsaAes.Verify(Data, Identity.ServerSignature1, RsaAes.KeySize, RsaAes.Modulus, RsaAes.Exponent))
-							Valid = true;
-					}
-					else if (e.Key is EcAes256 RemoteEc)
-					{
-						if (Identity.ServerSignature2 is null || Identity.ServerSignature2.Length == 0)
-						{
-							this.ReturnStatus(IdentityStatus.NoProviderSignature, Callback, State);
-							return;
-						}
-
-						if (RemoteEc.Verify(Data, RemoteEc.PublicKey, Identity.ServerSignature1, Identity.ServerSignature2, HashFunction.SHA256))
-							Valid = true;
-					}
-					else
-					{
-						this.ReturnStatus(IdentityStatus.ProviderKeyNotRecognized, Callback, State);
-						return;
-					}
+					bool Valid = e.Key.Verify(Data, Identity.ServerSignature);
 
 					if (Valid)
 					{
@@ -673,23 +617,7 @@ namespace Waher.Networking.XMPP.Contracts
 								return;
 							}
 
-							Valid = false;
-
-							if (e2.Key is RsaAes RsaAes2)
-							{
-								if (RsaAes.Verify(Data, Identity.ServerSignature1, RsaAes2.KeySize, RsaAes2.Modulus, RsaAes2.Exponent))
-									Valid = true;
-							}
-							else if (e2.Key is EcAes256 RemoteEc2)
-							{
-								if (RemoteEc2.Verify(Data, RemoteEc2.PublicKey, Identity.ServerSignature1, Identity.ServerSignature2, HashFunction.SHA256))
-									Valid = true;
-							}
-							else
-							{
-								this.ReturnStatus(IdentityStatus.ProviderKeyNotRecognized, Callback, State);
-								return;
-							}
+							Valid = e2.Key.Verify(Data, Identity.ServerSignature);
 
 							if (Valid)
 							{
@@ -1155,28 +1083,12 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			this.GetMatchingLocalKey(Address, (sender, e) =>
 			{
-				byte[] s1 = null;
-				byte[] s2 = null;
+				byte[] Signature = null;
 
 				if (e.Ok)
-				{
-					if (e.Key is EcAes256 EcAes256)
-					{
-						KeyValuePair<byte[], byte[]> Signature = EcAes256.Sign(Data, Security.HashFunction.SHA256);
+					Signature = e.Key.Sign(Data);
 
-						s1 = Signature.Key;
-						s2 = Signature.Value;
-					}
-					else if (e.Key is RsaAes RsaAes)
-					{
-						s1 = RsaAes.Sign(Data);
-						s2 = null;
-					}
-					else
-						e.Ok = false;
-				}
-
-				Callback?.Invoke(this, new SignatureEventArgs(e, s1, s2));
+				Callback?.Invoke(this, new SignatureEventArgs(e, Signature));
 
 			}, State);
 		}
@@ -1186,7 +1098,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="Data">Binary data to sign-</param>
 		/// <returns>Digital signature.</returns>
-		public Task<KeyValuePair<byte[], byte[]>> SignAsync(byte[] Data)
+		public Task<byte[]> SignAsync(byte[] Data)
 		{
 			return this.SignAsync(this.componentAddress, Data);
 		}
@@ -1197,14 +1109,14 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Address">Address of entity on which the legal identity are registered.</param>
 		/// <param name="Data">Binary data to sign-</param>
 		/// <returns>Digital signature.</returns>
-		public Task<KeyValuePair<byte[], byte[]>> SignAsync(string Address, byte[] Data)
+		public Task<byte[]> SignAsync(string Address, byte[] Data)
 		{
-			TaskCompletionSource<KeyValuePair<byte[], byte[]>> Result = new TaskCompletionSource<KeyValuePair<byte[], byte[]>>();
+			TaskCompletionSource<byte[]> Result = new TaskCompletionSource<byte[]>();
 
 			this.Sign(Address, Data, (sender, e) =>
 			{
 				if (e.Ok)
-					Result.SetResult(new KeyValuePair<byte[], byte[]>(e.S1, e.S2));
+					Result.SetResult(e.Signature);
 				else
 					Result.SetException(new IOException(string.IsNullOrEmpty(e.ErrorText) ? "Unable to sign data." : e.ErrorText));
 			}, null);
@@ -1814,15 +1726,8 @@ namespace Waher.Networking.XMPP.Contracts
 					if (Transferable)
 						Xml.Append("' transferable='true");
 
-					Xml.Append("' s1='");
-					Xml.Append(Convert.ToBase64String(e.S1));
-
-					if (e.S2 != null)
-					{
-						Xml.Append("' s2='");
-						Xml.Append(Convert.ToBase64String(e.S2));
-					}
-
+					Xml.Append("' s='");
+					Xml.Append(Convert.ToBase64String(e.Signature));
 					Xml.Append("'/>");
 
 					this.client.SendIqSet(Address, Xml.ToString(), this.ContractResponse, new object[] { Callback, State });

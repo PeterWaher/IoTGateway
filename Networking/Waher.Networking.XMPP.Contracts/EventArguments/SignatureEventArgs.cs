@@ -17,30 +17,22 @@ namespace Waher.Networking.XMPP.Contracts
 	/// </summary>
 	public class SignatureEventArgs : IqResultEventArgs
 	{
-		private readonly byte[] s1;
-		private readonly byte[] s2;
+		private readonly byte[] signature;
 
-		/// <summary>
-		/// Event arguments for signature responses
-		/// </summary>
-		/// <param name="e">IQ response event arguments.</param>
-		/// <param name="S1">First signature</param>
-		/// <param name="S2">Second signature, if available</param>
-		public SignatureEventArgs(IqResultEventArgs e, byte[] S1, byte[] S2)
+        /// <summary>
+        /// Event arguments for signature responses
+        /// </summary>
+        /// <param name="e">IQ response event arguments.</param>
+        /// <param name="Signature">Digital signature</param>
+        public SignatureEventArgs(IqResultEventArgs e, byte[] Signature)
 			: base(e)
 		{
-			this.s1 = S1;
-			this.s2 = S2;
+			this.signature = Signature;
 		}
 
 		/// <summary>
-		/// First signature
+		/// Digital signature
 		/// </summary>
-		public byte[] S1 => this.s1;
-
-		/// <summary>
-		/// Second signature, if available
-		/// </summary>
-		public byte[] S2 => this.s2;
+		public byte[] Signature => this.signature;
 	}
 }

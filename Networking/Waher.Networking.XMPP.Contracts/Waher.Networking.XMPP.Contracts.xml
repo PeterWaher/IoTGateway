@@ -1710,22 +1710,16 @@
             Event arguments for signature responses
             </summary>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.SignatureEventArgs.#ctor(Waher.Networking.XMPP.IqResultEventArgs,System.Byte[],System.Byte[])">
+        <member name="M:Waher.Networking.XMPP.Contracts.SignatureEventArgs.#ctor(Waher.Networking.XMPP.IqResultEventArgs,System.Byte[])">
             <summary>
             Event arguments for signature responses
             </summary>
             <param name="e">IQ response event arguments.</param>
-            <param name="S1">First signature</param>
-            <param name="S2">Second signature, if available</param>
+            <param name="Signature">Digital signature</param>
         </member>
-        <member name="P:Waher.Networking.XMPP.Contracts.SignatureEventArgs.S1">
+        <member name="P:Waher.Networking.XMPP.Contracts.SignatureEventArgs.Signature">
             <summary>
-            First signature
-            </summary>
-        </member>
-        <member name="P:Waher.Networking.XMPP.Contracts.SignatureEventArgs.S2">
-            <summary>
-            Second signature, if available
+            Digital signature
             </summary>
         </member>
         <member name="T:Waher.Networking.XMPP.Contracts.SmartContractEventHandler">
@@ -2338,24 +2332,14 @@
             Public key 2
             </summary>
         </member>
-        <member name="P:Waher.Networking.XMPP.Contracts.LegalIdentity.ClientSignature1">
+        <member name="P:Waher.Networking.XMPP.Contracts.LegalIdentity.ClientSignature">
             <summary>
-            Client signature 1
+            Client signature
             </summary>
         </member>
-        <member name="P:Waher.Networking.XMPP.Contracts.LegalIdentity.ClientSignature2">
+        <member name="P:Waher.Networking.XMPP.Contracts.LegalIdentity.ServerSignature">
             <summary>
-            Client signature 2
-            </summary>
-        </member>
-        <member name="P:Waher.Networking.XMPP.Contracts.LegalIdentity.ServerSignature1">
-            <summary>
-            Server signature 1
-            </summary>
-        </member>
-        <member name="P:Waher.Networking.XMPP.Contracts.LegalIdentity.ServerSignature2">
-            <summary>
-            Server signature 2
+            Server signature
             </summary>
         </member>
         <member name="M:Waher.Networking.XMPP.Contracts.LegalIdentity.Parse(System.Xml.XmlElement)">
@@ -2386,13 +2370,12 @@
             <param name="IncludeStatus">If the status should be included</param>
             <param name="IncludeServerSignature">If the server signature should be included</param>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.LegalIdentity.ValidateSignature(System.Byte[],System.Byte[],System.Byte[])">
+        <member name="M:Waher.Networking.XMPP.Contracts.LegalIdentity.ValidateSignature(System.Byte[],System.Byte[])">
             <summary>
             Validates a client signature
             </summary>
             <param name="Data">Binary data being signed.</param>
-            <param name="s1">First signature</param>
-            <param name="s2">Second signature, if available.</param>
+            <param name="Signature">Digital signature</param>
             <returns>If the client signature is correct</returns>
         </member>
         <member name="M:Waher.Networking.XMPP.Contracts.LegalIdentity.ValidateClientSignature">

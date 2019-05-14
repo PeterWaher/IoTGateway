@@ -59,10 +59,8 @@ namespace Waher.Networking.XMPP.Contracts
 		private string clientKeyName = null;
 		private byte[] clientPubKey1 = null;
 		private byte[] clientPubKey2 = null;
-		private byte[] clientSignature1 = null;
-		private byte[] clientSignature2 = null;
-		private byte[] serverSignature1 = null;
-		private byte[] serverSignature2 = null;
+		private byte[] clientSignature = null;
+		private byte[] serverSignature = null;
 
 		/// <summary>
 		/// Legal identity
@@ -171,39 +169,21 @@ namespace Waher.Networking.XMPP.Contracts
 		}
 
 		/// <summary>
-		/// Client signature 1
+		/// Client signature
 		/// </summary>
-		public byte[] ClientSignature1
+		public byte[] ClientSignature
 		{
-			get { return this.clientSignature1; }
-			set { this.clientSignature1 = value; }
+			get { return this.clientSignature; }
+			set { this.clientSignature = value; }
 		}
 
 		/// <summary>
-		/// Client signature 2
+		/// Server signature
 		/// </summary>
-		public byte[] ClientSignature2
+		public byte[] ServerSignature
 		{
-			get { return this.clientSignature2; }
-			set { this.clientSignature2 = value; }
-		}
-
-		/// <summary>
-		/// Server signature 1
-		/// </summary>
-		public byte[] ServerSignature1
-		{
-			get { return this.serverSignature1; }
-			set { this.serverSignature1 = value; }
-		}
-
-		/// <summary>
-		/// Server signature 2
-		/// </summary>
-		public byte[] ServerSignature2
-		{
-			get { return this.serverSignature2; }
-			set { this.serverSignature2 = value; }
+			get { return this.serverSignature; }
+			set { this.serverSignature = value; }
 		}
 
 		/// <summary>
@@ -258,19 +238,7 @@ namespace Waher.Networking.XMPP.Contracts
 							break;
 
 						case "clientSignature":
-							foreach (XmlAttribute Attr in E.Attributes)
-							{
-								switch (Attr.Name)
-								{
-									case "s1":
-										Result.clientSignature1 = Convert.FromBase64String(Attr.Value);
-										break;
-
-									case "s2":
-										Result.clientSignature2 = Convert.FromBase64String(Attr.Value);
-										break;
-								}
-							}
+                            Result.clientSignature = Convert.FromBase64String(E.InnerText);
 							break;
 
 						case "status":
@@ -311,19 +279,7 @@ namespace Waher.Networking.XMPP.Contracts
 							break;
 
 						case "serverSignature":
-							foreach (XmlAttribute Attr in E.Attributes)
-							{
-								switch (Attr.Name)
-								{
-									case "s1":
-										Result.serverSignature1 = Convert.FromBase64String(Attr.Value);
-										break;
-
-									case "s2":
-										Result.serverSignature2 = Convert.FromBase64String(Attr.Value);
-										break;
-								}
-							}
+                            Result.serverSignature = Convert.FromBase64String(E.InnerText);
 							break;
 					}
 				}
@@ -352,10 +308,7 @@ namespace Waher.Networking.XMPP.Contracts
 				if (this.clientKeyName is null)
 					return false;
 
-				if (this.clientKeyName.StartsWith("RSA"))
-					return this.clientSignature1 != null;
-				else
-					return this.clientSignature1 != null && this.clientSignature2 != null;
+                return !(this.clientSignature is null);
 			}
 		}
 
@@ -433,26 +386,15 @@ namespace Waher.Networking.XMPP.Contracts
 
 			if (IncludeClientSignature)
 			{
-				Xml.Append("<clientSignature");
+                Xml.Append("<clientSignature>");
 
-				if (this.clientSignature1 != null)
-				{
-					Xml.Append(" s1=\"");
-					Xml.Append(Convert.ToBase64String(this.clientSignature1));
-					Xml.Append("\"");
-				}
+                if (!(this.clientSignature is null))
+                    Xml.Append(Convert.ToBase64String(this.clientSignature));
 
-				if (this.clientSignature2 != null)
-				{
-					Xml.Append(" s2=\"");
-					Xml.Append(Convert.ToBase64String(this.clientSignature2));
-					Xml.Append("\"");
-				}
+                Xml.Append("</clientSignature>");
+            }
 
-				Xml.Append("/>");
-			}
-
-			if (IncludeStatus)
+            if (IncludeStatus)
 			{
 				Xml.Append("<status created=\"");
 				Xml.Append(XML.Encode(this.created));
@@ -486,36 +428,24 @@ namespace Waher.Networking.XMPP.Contracts
 
 			if (IncludeServerSignature)
 			{
-				Xml.Append("<serverSignature");
+				Xml.Append("<serverSignature>");
 
-				if (this.serverSignature1 != null)
-				{
-					Xml.Append(" s1=\"");
-					Xml.Append(Convert.ToBase64String(this.serverSignature1));
-					Xml.Append("\"");
-				}
+				if (!(this.serverSignature is null))
+					Xml.Append(Convert.ToBase64String(this.serverSignature));
 
-				if (this.serverSignature2 != null)
-				{
-					Xml.Append(" s2=\"");
-					Xml.Append(Convert.ToBase64String(this.serverSignature2));
-					Xml.Append("\"");
-				}
+                Xml.Append("</serverSignature>");
+            }
 
-				Xml.Append("/>");
-			}
-
-			Xml.Append("</identity>");
+            Xml.Append("</identity>");
 		}
 
-		/// <summary>
-		/// Validates a client signature
-		/// </summary>
-		/// <param name="Data">Binary data being signed.</param>
-		/// <param name="s1">First signature</param>
-		/// <param name="s2">Second signature, if available.</param>
-		/// <returns>If the client signature is correct</returns>
-		public bool ValidateSignature(byte[] Data, byte[] s1, byte[] s2)
+        /// <summary>
+        /// Validates a client signature
+        /// </summary>
+        /// <param name="Data">Binary data being signed.</param>
+        /// <param name="Signature">Digital signature</param>
+        /// <returns>If the client signature is correct</returns>
+        public bool ValidateSignature(byte[] Data, byte[] Signature)
 		{
 			if (!this.HasClientPublicKey)
 				return false;
@@ -525,16 +455,13 @@ namespace Waher.Networking.XMPP.Contracts
 				if (!int.TryParse(this.clientKeyName.Substring(3), out int KeySize))
 					return false;
 
-				return RsaAes.Verify(Data, s1, KeySize, this.clientPubKey1, this.clientPubKey2);
+				return RsaAes.Verify(Data, Signature, KeySize, this.clientPubKey1, this.clientPubKey2);
 			}
 			else if (EndpointSecurity.TryCreateEndpoint(this.clientKeyName,
 				EndpointSecurity.IoTHarmonizationE2E, out IE2eEndpoint Endpoint) &&
 				Endpoint is EcAes256 EcAes256)
 			{
-				if (s2 is null)
-					return false;
-
-				return EcAes256.Verify(Data, this.clientPubKey1, this.clientPubKey2, s1, s2, HashFunction.SHA256);
+				return EcAes256.Verify(Data, this.clientPubKey1, this.clientPubKey2, Signature);
 			}
 			else
 				return false;
@@ -553,7 +480,7 @@ namespace Waher.Networking.XMPP.Contracts
 			this.Serialize(Xml, false, false, false, false, false);
 			byte[] Data = Encoding.UTF8.GetBytes(Xml.ToString());
 
-			return this.ValidateSignature(Data, this.clientSignature1, this.clientSignature2);
+			return this.ValidateSignature(Data, this.clientSignature);
 		}
 
 		/// <summary>
@@ -628,10 +555,8 @@ namespace Waher.Networking.XMPP.Contracts
 				!this.clientKeyName.Equals(ID.clientKeyName) ||
 				!AreEqual(this.clientPubKey1, ID.clientPubKey1) ||
 				!AreEqual(this.clientPubKey2, ID.clientPubKey2) ||
-				!AreEqual(this.clientSignature1, ID.clientSignature1) ||
-				!AreEqual(this.clientSignature2, ID.clientSignature2) ||
-				!AreEqual(this.serverSignature1, ID.serverSignature1) ||
-				!AreEqual(this.serverSignature2, ID.serverSignature2))
+				!AreEqual(this.clientSignature, ID.clientSignature) ||
+				!AreEqual(this.serverSignature, ID.serverSignature))
 			{
 				return false;
 			}
@@ -692,10 +617,8 @@ namespace Waher.Networking.XMPP.Contracts
 			Result ^= Result << 5 ^ this.clientKeyName.GetHashCode();
 			Result ^= Result << 5 ^ GetHashCode(this.clientPubKey1);
 			Result ^= Result << 5 ^ GetHashCode(this.clientPubKey2);
-			Result ^= Result << 5 ^ GetHashCode(this.clientSignature1);
-			Result ^= Result << 5 ^ GetHashCode(this.clientSignature2);
-			Result ^= Result << 5 ^ GetHashCode(this.serverSignature1);
-			Result ^= Result << 5 ^ GetHashCode(this.serverSignature2);
+			Result ^= Result << 5 ^ GetHashCode(this.clientSignature);
+			Result ^= Result << 5 ^ GetHashCode(this.serverSignature);
 
 			if (this.properties != null)
 			{

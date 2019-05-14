@@ -124,19 +124,16 @@ namespace Waher.Networking.XMPP.P2P.E2E
         /// Signs binary data using the local private key.
         /// </summary>
         /// <param name="Data">Binary data</param>
-        /// <param name="HashFunction">Hash function to use.</param>
-        /// <returns>Signature consisting of one or two large integers.</returns>
-        KeyValuePair<byte[], byte[]> Sign(byte[] Data, HashFunction HashFunction);
+        /// <returns>Digital signature.</returns>
+        byte[] Sign(byte[] Data);
 
         /// <summary>
         /// Verifies a signature.
         /// </summary>
         /// <param name="Data">Data that is signed.</param>
-        /// <param name="Signature1">First integer in ECDSA signature.</param>
-        /// <param name="Signature2">Second integer in ECDSA signature.</param>
-        /// <param name="HashFunction">Hash function used in signature calculation.</param>
+        /// <param name="Signature">Digital signature.</param>
         /// <returns>If signature is valid.</returns>
-        bool Verify(byte[] Data, byte[] Signature1, byte[] Signature2, HashFunction HashFunction);
+        bool Verify(byte[] Data, byte[] Signature);
 
     }
 }

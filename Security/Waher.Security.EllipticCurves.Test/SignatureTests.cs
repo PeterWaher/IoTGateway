@@ -12,49 +12,50 @@ namespace Waher.Security.EllipticCurves.Test
 		[TestMethod]
 		public void Test_01_ECDSA_NIST_P192()
 		{
-			this.Test_Signature(new NistP192(), new NistP192(), HashFunction.SHA256);
+			this.Test_Signature(new NistP192(), new NistP192());
 		}
 
 		[TestMethod]
 		public void Test_02_ECDSA_NIST_P224()
 		{
-			this.Test_Signature(new NistP224(), new NistP224(), HashFunction.SHA256);
+			this.Test_Signature(new NistP224(), new NistP224());
 		}
 
 		[TestMethod]
 		public void Test_03_ECDSA_NIST_P256()
 		{
-			this.Test_Signature(new NistP256(), new NistP256(), HashFunction.SHA256);
+			this.Test_Signature(new NistP256(), new NistP256());
 		}
 
 		[TestMethod]
 		public void Test_04_ECDSA_NIST_P384()
 		{
-			this.Test_Signature(new NistP384(), new NistP384(), HashFunction.SHA512);
+			this.Test_Signature(new NistP384(), new NistP384());
 		}
 
 		[TestMethod]
 		public void Test_05_ECDSA_NIST_P521()
 		{
-			this.Test_Signature(new NistP521(), new NistP521(), HashFunction.SHA512);
+			this.Test_Signature(new NistP521(), new NistP521());
 		}
 
 		[TestMethod]
 		public void Test_06_EdDSA_Curve25519()
 		{
-			this.Test_Signature(new Curve25519(), new Curve25519(), HashFunction.SHA256);
+			this.Test_Signature(new Curve25519(), new Curve25519());
 		}
 
 		[TestMethod]
 		public void Test_07_EdDSA_Curve448()
 		{
-			this.Test_Signature(new Curve448(), new Curve448(), HashFunction.SHA512);
+			this.Test_Signature(new Curve448(), new Curve448());
 		}
 
-		public void Test_Signature(CurvePrimeField Curve1, CurvePrimeField Curve2,
-			HashFunction HashFunction)
+		public void Test_Signature(CurvePrimeField Curve1, CurvePrimeField Curve2)
 		{
 			int n;
+            int Ok = 0;
+            int Errors = 0;
 
 			using (RandomNumberGenerator rnd = RandomNumberGenerator.Create())
 			{
@@ -64,15 +65,20 @@ namespace Waher.Security.EllipticCurves.Test
 
 					rnd.GetBytes(Data);
 
-					KeyValuePair<BigInteger, BigInteger> Signature = Curve1.Sign(Data, HashFunction);
-					bool Valid = Curve2.Verify(Data, Curve1.PublicKey, HashFunction, Signature);
+					byte[] Signature = Curve1.Sign(Data);
+					bool Valid = Curve2.Verify(Data, Curve1.PublicKey, Signature);
 
-					Assert.IsTrue(Valid);
+                    if (Valid)
+                        Ok++;
+                    else
+                        Errors++;
 
 					Curve1.GenerateKeys();
 					Curve2.GenerateKeys();
 				}
 			}
+
+            Assert.AreEqual(0, Errors);
 		}
 	}
 }

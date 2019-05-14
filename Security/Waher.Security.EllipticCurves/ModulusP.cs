@@ -52,7 +52,7 @@ namespace Waher.Security.EllipticCurves
 		public BigInteger Subtract(BigInteger a, BigInteger b)
 		{
 			BigInteger Diff = a - b;
-			if (Diff < BigInteger.Zero)
+			if (Diff.Sign < 0)
 				return Diff + this.p;
 			else if (Diff >= this.p)
 				return Diff - this.p;
@@ -90,10 +90,10 @@ namespace Waher.Security.EllipticCurves
 		/// <returns>x^-1 mod p</returns>
 		public BigInteger Invert(BigInteger x)
 		{
-            if (x < BigInteger.Zero)
+            if (x.Sign < 0)
 			{
 				x = BigInteger.Remainder(x, p);
-				if (x < BigInteger.Zero)
+				if (x.Sign < 0)
 					x += p;
 			}
 			else if (x >= p)
@@ -120,7 +120,7 @@ namespace Waher.Security.EllipticCurves
 				throw new ArgumentException("Number not invertible.", nameof(x));
 
 			BigInteger Result = BigInteger.Remainder(y2, this.p);
-			if (Result < BigInteger.Zero)
+			if (Result.Sign < 0)
 				Result += this.p;
 
 			return Result;
@@ -146,10 +146,10 @@ namespace Waher.Security.EllipticCurves
 		{
 			// See: https://en.wikipedia.org/wiki/Tonelli–Shanks_algorithm
 
-			if (N < BigInteger.Zero)
+			if (N.Sign < 0)
 			{
 				N = BigInteger.Remainder(N, p);
-				if (N < BigInteger.Zero)
+				if (N.Sign < 0)
 					N += p;
 			}
 			else if (N >= p)

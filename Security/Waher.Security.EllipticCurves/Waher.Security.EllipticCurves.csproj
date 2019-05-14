@@ -12,20 +12,25 @@
 Algorithms supported:
 Elliptic Curve Diffie-Hellman (ECDH)
 Elliptic Curve Digital Signature Algorithm (ECDSA)
+Edwards-Curve Digital Signature Algorithm (EdDSA)
 
 Curves supported:
 NIST P-192
 NIST P-224
 NIST P-256
 NIST P-384
-NIST P-521</Description>
+NIST P-521
+Curve25519
+Curve448
+Edwards25519
+Edwards448</Description>
     <Copyright>Copyright © Waher Data AB 2018-2019. All rights reserved.</Copyright>
     <PackageLicenseUrl>https://github.com/PeterWaher/IoTGateway#license</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Security/Waher.Security.EllipticCurves</PackageProjectUrl>
     <PackageIconUrl>https://github.com/PeterWaher/IoTGateway/blob/master/Images/Icon.ico?raw=true</PackageIconUrl>
     <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
-    <PackageTags>security Elliptic Curve ECC ECDH ECDSA NIST P192 P224 P256 P384 P521</PackageTags>
+    <PackageTags>security Elliptic Curve ECC ECDH ECDSA EDDSA NIST P192 P224 P256 P384 P521 Curve25519 Curve448 Ed25519 Ed448</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
     <AssemblyVersion>1.0.4</AssemblyVersion>
     <FileVersion>1.0.4</FileVersion>

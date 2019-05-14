@@ -40,7 +40,7 @@ namespace Waher.Security.EllipticCurves.Test
 				PointOnCurve Q = P;
 				C.Negate(ref Q);
 				C.AddTo(ref P, Q);
-				Assert.IsTrue(P.IsZero);
+				Assert.IsFalse(P.NonZero);
 			}
 		}
 
@@ -123,7 +123,7 @@ namespace Waher.Security.EllipticCurves.Test
 
 			Assert.AreEqual(P, P1);
 
-			P2 = PointOnCurve.Zero;
+            P2 = new PointOnCurve();
 			k1 += k2;
 			k1 += k3;
 
@@ -142,7 +142,7 @@ namespace Waher.Security.EllipticCurves.Test
 		[TestMethod]
 		public void Test_06_Sqrt_2()
 		{
-			MontgomeryCurve C = new Curve25519();
+			Curve25519 C = new Curve25519();
 			CalcSqrt(-486664, C.Prime);
 		}
 
@@ -316,26 +316,23 @@ namespace Waher.Security.EllipticCurves.Test
 
 			byte[] Key1 = Alice.GetSharedKey(Bob.PublicKey, HashFunction.SHA256);
 			byte[] Key2 = Bob.GetSharedKey(Alice.PublicKey, HashFunction.SHA256);
-			int i, c = Key1.Length;
 
-			Assert.AreEqual(c, Key2.Length);
+            string k1 = Hashes.BinaryToString(Key1);
+            string k2 = Hashes.BinaryToString(Key2);
+            Assert.AreEqual(k1, k2);
 
-			A = Hashes.StringToBinary("4a5d9d5ba4ce2de1728e3bf480350f25e07e21c947d19e3376f09b3c1e161742");
-			if (A.Length != 33)
-				Array.Resize<byte>(ref A, 33);
+            A = Hashes.StringToBinary("4a5d9d5ba4ce2de1728e3bf480350f25e07e21c947d19e3376f09b3c1e161742");
+			if (A.Length != 32)
+				Array.Resize<byte>(ref A, 32);
 
 			Array.Reverse(A);   // Most significant byte first.
 
 			A = Hashes.ComputeHash(HashFunction.SHA256, A);
+            string k3 = Hashes.BinaryToString(A);
+            Assert.AreEqual(k1, k3);
+        }
 
-			for (i = 0; i < c; i++)
-			{
-				Assert.AreEqual(Key1[i], Key2[i]);
-				Assert.AreEqual(A[i], Key1[i]);
-			}
-		}
-
-		[TestMethod]
+        [TestMethod]
 		public void Test_16_X448_TestVector_1()
 		{
 			byte[] A = Hashes.StringToBinary("3d262fddf9ec8e88495266fea19a34d28882acef045104d0d1aae121700a779c984c24f8cdd78fbff44943eba368f54b29259a4f1c600ad3");
@@ -454,24 +451,55 @@ namespace Waher.Security.EllipticCurves.Test
 
 			byte[] Key1 = Alice.GetSharedKey(Bob.PublicKey, HashFunction.SHA256);
 			byte[] Key2 = Bob.GetSharedKey(Alice.PublicKey, HashFunction.SHA256);
-			int i, c = Key1.Length;
+            string k1 = Hashes.BinaryToString(Key1);
+            string k2 = Hashes.BinaryToString(Key2);
+            Assert.AreEqual(k1, k2);
 
-			Assert.AreEqual(c, Key2.Length);
+            A = Hashes.StringToBinary("07fff4181ac6cc95ec1c16a94a0f74d12da232ce40a77552281d282bb60c0b56fd2464c335543936521c24403085d59a449a5037514a879d");
+            if (A.Length != 56)
+                Array.Resize<byte>(ref A, 56);
 
-			A = Hashes.StringToBinary(" 07fff4181ac6cc95ec1c16a94a0f74d12da232ce40a77552281d282bb60c0b56fd2464c335543936521c24403085d59a449a5037514a879d");
-			if (A.Length != 57)
-				Array.Resize<byte>(ref A, 57);
+            Array.Reverse(A);   // Most significant byte first.
 
-			Array.Reverse(A);   // Most significant byte first.
-
-			A = Hashes.ComputeHash(HashFunction.SHA256, A);
-
-			for (i = 0; i < c; i++)
-			{
-				Assert.AreEqual(Key1[i], Key2[i]);
-				Assert.AreEqual(A[i], Key1[i]);
-			}
+            A = Hashes.ComputeHash(HashFunction.SHA256, A);
+            string k3 = Hashes.BinaryToString(A);
+            Assert.AreEqual(k1, k3);
 		}
 
-	}
+        [TestMethod]
+        public void Test_22_TwinCurves()
+        {
+            int Ok = 0;
+            int Error = 0;
+            int i;
+
+            for (i = 0; i < 100; i++)
+            {
+                try
+                {
+                    Console.Out.WriteLine(i);
+
+                    Curve25519 C1 = new Curve25519();
+                    Edwards25519 C2 = C1.Pair as Edwards25519;
+
+                    Assert.IsNotNull(C2);
+
+                    PointOnCurve P1 = C1.PublicKey;
+                    PointOnCurve P1_2 = C1.ToXY(P1);
+                    PointOnCurve P2 = C2.PublicKey;
+
+                    Assert.AreEqual(P1_2.Y, P2.Y);
+
+                    Ok++;
+                }
+                catch (Exception)
+                {
+                    Error++;
+                }
+            }
+
+            Assert.AreEqual(0, Error);
+        }
+
+    }
 }

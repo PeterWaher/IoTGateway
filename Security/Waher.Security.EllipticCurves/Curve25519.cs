@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Numerics;
 
@@ -12,7 +13,7 @@ namespace Waher.Security.EllipticCurves
 	{
 		private static readonly BigInteger p0 = BigInteger.Pow(2, 255) - 19;
 		private static readonly BigInteger A = 486662;
-		private static readonly BigInteger A24 = (A - 2) / 4;
+        private static readonly BigInteger A24 = (A - 2) / 4;
 		private static readonly BigInteger n = BigInteger.Pow(2, 252) + BigInteger.Parse("14def9dea2f79cd65812631a5cf5d3ed", NumberStyles.HexNumber);
 		private static readonly BigInteger BasePointU = 9;
 		private static readonly BigInteger BasePointV = BigInteger.Parse("43114425171068552920764898935933967039370386198203806730763910166200978582548");
@@ -24,7 +25,7 @@ namespace Waher.Security.EllipticCurves
         /// https://tools.ietf.org/html/rfc7748
         /// </summary>
         public Curve25519()
-			: base(p0, new PointOnCurve(BasePointU, BasePointV), A, n, cofactor)
+			: base(p0, A, new PointOnCurve(BasePointU, BasePointV), n, cofactor)
 		{
         }
 
@@ -34,7 +35,7 @@ namespace Waher.Security.EllipticCurves
         /// </summary>
         /// <param name="D">Private key.</param>
         public Curve25519(BigInteger D)
-			: base(p0, new PointOnCurve(BasePointU, BasePointV), A, n, cofactor, D)
+			: base(p0, A, new PointOnCurve(BasePointU, BasePointV), n, cofactor, D)
 		{
         }
 
@@ -71,39 +72,53 @@ namespace Waher.Security.EllipticCurves
 				this.Multiply(SqrtMinus486664, this.Divide(U, XY.X)));
 		}
 
-		/// <summary>
-		/// Returns the next random number, in the range [1, n-1].
-		/// </summary>
-		/// <returns>Random number.</returns>
-		public override BigInteger NextRandomNumber()
+        /// <summary>
+        /// Performs the scalar multiplication of <paramref name="N"/>*<paramref name="U"/>.
+        /// </summary>
+        /// <param name="N">Scalar</param>
+        /// <param name="U">U-coordinate of point</param>
+        /// <returns><paramref name="N"/>*<paramref name="U"/></returns>
+        public override BigInteger ScalarMultiplication(BigInteger N, BigInteger U)
 		{
-			byte[] B = new byte[32];
-			BigInteger D;
-
-			lock (rnd)
-			{
-				rnd.GetBytes(B);
-			}
-
-			B[0] &= 248;
-			B[31] &= 127;
-			B[31] |= 64;
-
-			D = new BigInteger(B);
-
-			return D;
+			return XFunction(N, U, A24, this.p, 255, 0xf8, 0x3f, 0x40);
 		}
 
-		/// <summary>
-		/// Performs the scalar multiplication of <paramref name="N"/>*<paramref name="U"/>.
-		/// </summary>
-		/// <param name="N">Scalar</param>
-		/// <param name="U">U-coordinate of point</param>
-		/// <returns><paramref name="N"/>*<paramref name="U"/></returns>
-		public override BigInteger ScalarMultiplication(BigInteger N, BigInteger U)
-		{
-			return ScalarMultiplication(N, U, A24, this.p, 255);
-		}
+        /// <summary>
+        /// Creates the Edwards Curve pair.
+        /// </summary>
+        /// <returns>Edwards curve.</returns>
+        public override EdwardsCurve CreatePair()
+        {
+            PointOnCurve PublicKeyUV = this.PublicKey;
+            PointOnCurve PublicKeyXY = this.ToXY(PublicKeyUV);
+
+            byte[] Bin = this.privateKey.ToByteArray();
+            if (Bin.Length != 32)
+                Array.Resize<byte>(ref Bin, 32);
+
+            Bin[0] &= 0xf8;
+            Bin[31] &= 0x3f;
+            Bin[31] |= 0x40;
+
+            BigInteger PrivateKey = new BigInteger(Bin);
+            BigInteger PrivateKey2 = BigInteger.Remainder(this.Order - PrivateKey, this.Order);
+            if (PrivateKey2.Sign < 0)
+                PrivateKey2 += this.Order;
+
+            Edwards25519 Candidate = new Edwards25519(PrivateKey2);
+            PointOnCurve PublicKeyXY2 = Candidate.PublicKey;
+
+            if (PublicKeyXY.Y.Equals(PublicKeyXY2.Y))
+                return Candidate;
+
+            Candidate = new Edwards25519(PrivateKey);
+            PublicKeyXY2 = Candidate.PublicKey;
+
+            if (PublicKeyXY.Y.Equals(PublicKeyXY2.Y))
+                return Candidate;
+
+            throw new InvalidOperationException("Unable to create pair curve.");
+        }
 
     }
 }

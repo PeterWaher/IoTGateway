@@ -12,7 +12,7 @@ namespace Waher.Security.EllipticCurves
 	{
 		private static readonly BigInteger p0 = BigInteger.Pow(2, 448) - BigInteger.Pow(2, 224) - 1;
 		private static readonly BigInteger A = 156326;
-		private static readonly BigInteger A24 = (A - 2) / 4;
+        private static readonly BigInteger A24 = (A - 2) / 4;
 		private static readonly BigInteger n = BigInteger.Pow(2, 446) - BigInteger.Parse("8335dc163bb124b65129c96fde933d8d723a70aadc873d6d54a7bb0d", NumberStyles.HexNumber);
 		private const int cofactor = 4;
 		private static readonly BigInteger BasePointU = 5;
@@ -24,7 +24,7 @@ namespace Waher.Security.EllipticCurves
 		/// https://tools.ietf.org/html/rfc7748
 		/// </summary>
 		public Curve448()
-			: base(p0, new PointOnCurve(BasePointU, BasePointV), A, n, cofactor)
+			: base(p0, A, new PointOnCurve(BasePointU, BasePointV), n, cofactor)
 		{
 		}
 
@@ -34,7 +34,7 @@ namespace Waher.Security.EllipticCurves
 		/// </summary>
 		/// <param name="D">Private key.</param>
 		public Curve448(BigInteger D)
-			: base(p0, new PointOnCurve(BasePointU, BasePointV), A, n, cofactor, D)
+			: base(p0, A, new PointOnCurve(BasePointU, BasePointV), n, cofactor, D)
 		{
 		}
 
@@ -71,39 +71,25 @@ namespace Waher.Security.EllipticCurves
 				this.Multiply(Sqrt156324, this.Divide(U, XY.X)));
 		}
 
-		/// <summary>
-		/// Returns the next random number, in the range [1, n-1].
-		/// </summary>
-		/// <returns>Random number.</returns>
-		public override BigInteger NextRandomNumber()
+        /// <summary>
+        /// Performs the scalar multiplication of <paramref name="N"/>*<paramref name="U"/>.
+        /// </summary>
+        /// <param name="N">Scalar</param>
+        /// <param name="U">U-coordinate of point</param>
+        /// <returns><paramref name="N"/>*<paramref name="U"/></returns>
+        public override BigInteger ScalarMultiplication(BigInteger N, BigInteger U)
 		{
-			byte[] B = new byte[57];
-			BigInteger D;
-
-			lock (rnd)
-			{
-				rnd.GetBytes(B);
-			}
-
-			B[0] &= 252;
-			B[55] |= 128;
-			B[56] = 0;
-
-			D = new BigInteger(B);
-
-			return D;
+			return XFunction(N, U, A24, this.p, 448, 0xfc, 0x7f, 0x80);
 		}
 
-		/// <summary>
-		/// Performs the scalar multiplication of <paramref name="N"/>*<paramref name="U"/>.
-		/// </summary>
-		/// <param name="N">Scalar</param>
-		/// <param name="U">U-coordinate of point</param>
-		/// <returns><paramref name="N"/>*<paramref name="U"/></returns>
-		public override BigInteger ScalarMultiplication(BigInteger N, BigInteger U)
-		{
-			return ScalarMultiplication(N, U, A24, this.p, 448);
-		}
+        /// <summary>
+        /// Creates the Edwards Curve pair.
+        /// </summary>
+        /// <returns>Edwards curve.</returns>
+        public override EdwardsCurve CreatePair()
+        {
+            throw new NotImplementedException();
+        }
 
-	}
+    }
 }

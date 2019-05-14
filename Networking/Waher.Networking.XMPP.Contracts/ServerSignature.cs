@@ -17,24 +17,11 @@ namespace Waher.Networking.XMPP.Contracts
 		public override void Serialize(StringBuilder Xml)
 		{
 			Xml.Append("<serverSignature");
-
-			if (this.S1 != null)
-			{
-				Xml.Append(" s1=\"");
-				Xml.Append(Convert.ToBase64String(this.S1));
-				Xml.Append('"');
-			}
-
-			if (this.S2 != null)
-			{
-				Xml.Append(" s2=\"");
-				Xml.Append(Convert.ToBase64String(this.S2));
-				Xml.Append('"');
-			}
-
-			Xml.Append(" timestamp=\"");
+            Xml.Append(" timestamp=\"");
 			Xml.Append(XML.Encode(this.Timestamp));
-			Xml.Append("\"/>");
-		}
-	}
+			Xml.Append("\">");
+            Xml.Append(Convert.ToBase64String(this.DigitalSignature));
+			Xml.Append("</serverSignature>");
+        }
+    }
 }

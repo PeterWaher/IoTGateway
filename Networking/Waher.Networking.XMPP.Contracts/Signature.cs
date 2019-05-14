@@ -10,8 +10,7 @@ namespace Waher.Networking.XMPP.Contracts
 	public abstract class Signature
 	{
 		private DateTime timestamp = DateTime.MinValue;
-		private byte[] s1 = null;
-		private byte[] s2 = null;
+		private byte[] digitalSignature = null;
 
 		/// <summary>
 		/// Timestamp of signature.
@@ -23,21 +22,12 @@ namespace Waher.Networking.XMPP.Contracts
 		}
 
 		/// <summary>
-		/// Signature 1
+		/// Digital Signature
 		/// </summary>
-		public byte[] S1
-		{
-			get => this.s1;
-			set => this.s1 = value;
-		}
-
-		/// <summary>
-		/// Signature 2 (might be required, based on cryptographic algorithm, or null if not required).
-		/// </summary>
-		public byte[] S2
-		{
-			get => this.s2;
-			set => this.s2 = value;
+		public byte[] DigitalSignature
+        {
+			get => this.digitalSignature;
+			set => this.digitalSignature = value;
 		}
 
 		/// <summary>

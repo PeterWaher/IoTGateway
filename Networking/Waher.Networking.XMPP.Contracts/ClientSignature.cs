@@ -64,22 +64,11 @@ namespace Waher.Networking.XMPP.Contracts
 			Xml.Append(XML.Encode(this.legalId));
 			Xml.Append("\" role=\"");
 			Xml.Append(XML.Encode(this.role));
-
-			if (this.S1 != null)
-			{
-				Xml.Append("\" s1=\"");
-				Xml.Append(Convert.ToBase64String(this.S1));
-			}
-
-			if (this.S2 != null)
-			{
-				Xml.Append("\" s2=\"");
-				Xml.Append(Convert.ToBase64String(this.S2));
-			}
-
 			Xml.Append("\" timestamp=\"");
 			Xml.Append(XML.Encode(this.Timestamp));
 			Xml.Append("\"/>");
-		}
-	}
+            Xml.Append(Convert.ToBase64String(this.DigitalSignature));
+            Xml.Append("</signature>");
+        }
+    }
 }

@@ -1124,35 +1124,33 @@ namespace Waher.Networking.XMPP.Contracts
 			return Result.Task;
 		}
 
-		#endregion
+        #endregion
 
-		#region Validating Signatures
+        #region Validating Signatures
 
-		/// <summary>
-		/// Validates a signature of binary data.
-		/// </summary>
-		/// <param name="LegalId">Legal identity used to create the signature. If empty, current approved legal identities will be used to validate the signature.</param>
-		/// <param name="Data">Binary data to sign-</param>
-		/// <param name="S1">First signature of data</param>
-		/// <param name="S2">Second signature of data, if available.</param>
-		/// <param name="Callback">Method to call when response is returned.</param>
-		/// <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
-		public void ValidateSignature(string LegalId, byte[] Data, byte[] S1, byte[] S2, LegalIdentityEventHandler Callback, object State)
+        /// <summary>
+        /// Validates a signature of binary data.
+        /// </summary>
+        /// <param name="LegalId">Legal identity used to create the signature. If empty, current approved legal identities will be used to validate the signature.</param>
+        /// <param name="Data">Binary data to sign-</param>
+        /// <param name="Signature">Digital signature of data</param>
+        /// <param name="Callback">Method to call when response is returned.</param>
+        /// <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
+        public void ValidateSignature(string LegalId, byte[] Data, byte[] Signature, LegalIdentityEventHandler Callback, object State)
 		{
-			this.ValidateSignature(this.componentAddress, LegalId, Data, S1, S2, Callback, State);
+			this.ValidateSignature(this.componentAddress, LegalId, Data, Signature, Callback, State);
 		}
 
-		/// <summary>
-		/// Validates a signature of binary data.
-		/// </summary>
-		/// <param name="Address">Address of entity on which the legal identity are registered.</param>
-		/// <param name="LegalId">Legal identity used to create the signature. If empty, current approved legal identities will be used to validate the signature.</param>
-		/// <param name="Data">Binary data to sign-</param>
-		/// <param name="S1">First signature of data</param>
-		/// <param name="S2">Second signature of data, if available.</param>
-		/// <param name="Callback">Method to call when response is returned.</param>
-		/// <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
-		public void ValidateSignature(string Address, string LegalId, byte[] Data, byte[] S1, byte[] S2, LegalIdentityEventHandler Callback, object State)
+        /// <summary>
+        /// Validates a signature of binary data.
+        /// </summary>
+        /// <param name="Address">Address of entity on which the legal identity are registered.</param>
+        /// <param name="LegalId">Legal identity used to create the signature. If empty, current approved legal identities will be used to validate the signature.</param>
+        /// <param name="Data">Binary data to sign-</param>
+        /// <param name="Signature">Digital signature of data</param>
+        /// <param name="Callback">Method to call when response is returned.</param>
+        /// <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
+        public void ValidateSignature(string Address, string LegalId, byte[] Data, byte[] Signature, LegalIdentityEventHandler Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -1165,14 +1163,8 @@ namespace Waher.Networking.XMPP.Contracts
 				Xml.Append(XML.Encode(LegalId));
 			}
 
-			Xml.Append("\" s1=\"");
-			Xml.Append(Convert.ToBase64String(S1));
-
-			if (S2 != null)
-			{
-				Xml.Append("\" s2=\"");
-				Xml.Append(Convert.ToBase64String(S2));
-			}
+			Xml.Append("\" s=\"");
+			Xml.Append(Convert.ToBase64String(Signature));
 
 			Xml.Append("\" xmlns=\"");
 			Xml.Append(NamespaceLegalIdentities);
@@ -1192,33 +1184,31 @@ namespace Waher.Networking.XMPP.Contracts
 			}, State);
 		}
 
-		/// <summary>
-		/// Validates a signature of binary data.
-		/// </summary>
-		/// <param name="LegalId">Legal identity used to create the signature. If empty, current approved legal identities will be used to validate the signature.</param>
-		/// <param name="Data">Binary data to sign-</param>
-		/// <param name="S1">First signature of data</param>
-		/// <param name="S2">Second signature of data, if available.</param>
-		/// <returns>Legal identity object.</returns>
-		public Task<LegalIdentity> ValidateSignatureAsync(string LegalId, byte[] Data, byte[] S1, byte[] S2)
+        /// <summary>
+        /// Validates a signature of binary data.
+        /// </summary>
+        /// <param name="LegalId">Legal identity used to create the signature. If empty, current approved legal identities will be used to validate the signature.</param>
+        /// <param name="Data">Binary data to sign-</param>
+        /// <param name="Signature">Digital signature of data</param>
+        /// <returns>Legal identity object.</returns>
+        public Task<LegalIdentity> ValidateSignatureAsync(string LegalId, byte[] Data, byte[] Signature)
 		{
-			return this.ValidateSignatureAsync(this.componentAddress, LegalId, Data, S1, S2);
+			return this.ValidateSignatureAsync(this.componentAddress, LegalId, Data, Signature);
 		}
 
-		/// <summary>
-		/// Validates a signature of binary data.
-		/// </summary>
-		/// <param name="Address">Address of entity on which the legal identity are registered.</param>
-		/// <param name="LegalId">Legal identity used to create the signature. If empty, current approved legal identities will be used to validate the signature.</param>
-		/// <param name="Data">Binary data to sign-</param>
-		/// <param name="S1">First signature of data</param>
-		/// <param name="S2">Second signature of data, if available.</param>
-		/// <returns>Legal identity object.</returns>
-		public Task<LegalIdentity> ValidateSignatureAsync(string Address, string LegalId, byte[] Data, byte[] S1, byte[] S2)
+        /// <summary>
+        /// Validates a signature of binary data.
+        /// </summary>
+        /// <param name="Address">Address of entity on which the legal identity are registered.</param>
+        /// <param name="LegalId">Legal identity used to create the signature. If empty, current approved legal identities will be used to validate the signature.</param>
+        /// <param name="Data">Binary data to sign-</param>
+        /// <param name="Signature">Digital signature of data</param>
+        /// <returns>Legal identity object.</returns>
+        public Task<LegalIdentity> ValidateSignatureAsync(string Address, string LegalId, byte[] Data, byte[] Signature)
 		{
 			TaskCompletionSource<LegalIdentity> Result = new TaskCompletionSource<LegalIdentity>();
 
-			this.ValidateSignature(Address, LegalId, Data, S1, S2, (sender, e) =>
+			this.ValidateSignature(Address, LegalId, Data, Signature, (sender, e) =>
 			{
 				if (e.Ok)
 					Result.SetResult(e.Identity);

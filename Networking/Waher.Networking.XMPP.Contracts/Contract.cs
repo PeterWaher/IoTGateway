@@ -693,14 +693,6 @@ namespace Waher.Networking.XMPP.Contracts
 										return null;
 									break;
 
-								case "s1":
-									Signature.S1 = Convert.FromBase64String(Attr.Value);
-									break;
-
-								case "s2":
-									Signature.S2 = Convert.FromBase64String(Attr.Value);
-									break;
-
 								case "xmlns":
 									break;
 
@@ -712,11 +704,12 @@ namespace Waher.Networking.XMPP.Contracts
 							}
 						}
 
-						if (string.IsNullOrEmpty(Signature.LegalId) ||
+                        Signature.DigitalSignature = Convert.FromBase64String(E.InnerText);
+
+                        if (string.IsNullOrEmpty(Signature.LegalId) ||
 							string.IsNullOrEmpty(Signature.BareJid) ||
 							string.IsNullOrEmpty(Signature.Role) ||
-							Signature.Timestamp == DateTime.MinValue ||
-							Signature.S1 is null)
+							Signature.Timestamp == DateTime.MinValue)
 						{
 							return null;
 						}
@@ -800,14 +793,6 @@ namespace Waher.Networking.XMPP.Contracts
 										return null;
 									break;
 
-								case "s1":
-									ServerSignature.S1 = Convert.FromBase64String(Attr.Value);
-									break;
-
-								case "s2":
-									ServerSignature.S2 = Convert.FromBase64String(Attr.Value);
-									break;
-
 								case "xmlns":
 									break;
 
@@ -819,11 +804,10 @@ namespace Waher.Networking.XMPP.Contracts
 							}
 						}
 
-						if (ServerSignature.Timestamp == DateTime.MinValue ||
-							ServerSignature.S1 is null)
-						{
+                        ServerSignature.DigitalSignature = Convert.FromBase64String(E.InnerText);
+
+                        if (ServerSignature.Timestamp == DateTime.MinValue)
 							return null;
-						}
 
 						Result.serverSignature = ServerSignature;
 						break;

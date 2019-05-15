@@ -231,6 +231,7 @@ namespace Waher.Persistence.Files.Searching
 							return false;
 
 						this.point = Value;
+                        this.isPoint = true;
 						this.isRange = false;
 						this.min = null;
 						this.max = null;
@@ -321,6 +322,7 @@ namespace Waher.Persistence.Files.Searching
 							return false;
 
 						this.point = Value;
+                        this.isPoint = true;
 						this.isRange = false;
 						this.min = null;
 						this.max = null;

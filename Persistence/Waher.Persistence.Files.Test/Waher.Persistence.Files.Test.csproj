@@ -14,6 +14,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Content\Waher.Content\Waher.Content.csproj" />
+    <ProjectReference Include="..\..\Script\Waher.Script.Persistence\Waher.Script.Persistence.csproj" />
+    <ProjectReference Include="..\..\Script\Waher.Script\Waher.Script.csproj" />
     <ProjectReference Include="..\Waher.Persistence.Files\Waher.Persistence.Files.csproj" />
     <ProjectReference Include="..\Waher.Persistence\Waher.Persistence.csproj" />
   </ItemGroup>

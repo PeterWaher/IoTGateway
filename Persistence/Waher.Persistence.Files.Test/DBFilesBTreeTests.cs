@@ -62,7 +62,11 @@ namespace Waher.Persistence.FilesLW.Test
 		[AssemblyInitialize]
 		public static void AssemblyInitialize(TestContext Context)
 		{
-			Types.Initialize(typeof(FilesProvider).Assembly, typeof(DBFilesBTreeTests).Assembly, typeof(Expression).Assembly);
+			Types.Initialize(
+                typeof(FilesProvider).Assembly,
+                typeof(DBFilesBTreeTests).Assembly, 
+                typeof(Expression).Assembly,
+                typeof(Waher.Script.Persistence.SQL.Select).Assembly);
 		}
 
 		[TestInitialize]

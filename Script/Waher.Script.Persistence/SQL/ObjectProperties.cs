@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using Waher.Persistence;
 
 namespace Waher.Script.Persistence.SQL
 {
@@ -93,13 +94,13 @@ namespace Waher.Script.Persistence.SQL
 
 			if (string.Compare(Name, "this", true) == 0)
 			{
-				Variable = new Variable("this", this.obj);
+                Variable = this.CreateVariable("this", this.obj);
 				return true;
 			}
 
 			if (this.dictionary != null && this.dictionary.TryGetValue(Name, out Value))
 			{
-				Variable = new Variable(Name, Value);
+				Variable = this.CreateVariable(Name, Value);
 				return true;
 			}
 
@@ -129,7 +130,7 @@ namespace Waher.Script.Persistence.SQL
 				else
 					Value = Rec.Item2.GetValue(this.obj);
 
-				Variable = new Variable(Name, Value);
+				Variable = this.CreateVariable(Name, Value);
 
 				return true;
 			}
@@ -143,5 +144,14 @@ namespace Waher.Script.Persistence.SQL
 			Variable = null;
 			return false;
 		}
-	}
+
+        private Variable CreateVariable(string Name, object Value)
+        {
+            if (Value is CaseInsensitiveString Cis)
+                return new Variable(Name, Cis.Value);
+            else
+                return new Variable(Name, Value);
+        }
+
+    }
 }

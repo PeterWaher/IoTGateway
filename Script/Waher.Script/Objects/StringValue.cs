@@ -13,8 +13,11 @@ namespace Waher.Script.Objects
     public sealed class StringValue : SemiGroupElement
     {
         private static readonly StringValues associatedSemiGroup = new StringValues();
+        private static readonly CaseInsensitiveStringValues associatedSemiGroupCis = new CaseInsensitiveStringValues();
 
         private string value;
+        private string valueLower = null;
+        private bool caseInsensitive;
 
         /// <summary>
         /// String value.
@@ -23,6 +26,18 @@ namespace Waher.Script.Objects
         public StringValue(string Value)
         {
             this.value = Value;
+            this.caseInsensitive = false;
+        }
+
+        /// <summary>
+        /// String value.
+        /// </summary>
+        /// <param name="Value">String value.</param>
+        /// <param name="CaseInsensitive">If the string value is case insensitive or not.</param>
+        public StringValue(string Value, bool CaseInsensitive)
+        {
+            this.value = Value;
+            this.caseInsensitive = CaseInsensitive;
         }
 
         /// <summary>
@@ -34,10 +49,19 @@ namespace Waher.Script.Objects
 			set { this.value = value; }
 		}
 
-		/// <summary>
-		/// <see cref="Object.ToString()"/>
-		/// </summary>
-		public override string ToString()
+        /// <summary>
+        /// If the string value is case insensitive or not.
+        /// </summary>
+        public bool CaseInsensitive
+        {
+            get { return this.caseInsensitive; }
+            set { this.caseInsensitive = value; }
+        }
+
+        /// <summary>
+        /// <see cref="Object.ToString()"/>
+        /// </summary>
+        public override string ToString()
         {
 			return Expression.ToString(this.value);
         }
@@ -47,7 +71,13 @@ namespace Waher.Script.Objects
         /// </summary>
         public override ISemiGroup AssociatedSemiGroup
         {
-            get { return associatedSemiGroup; }
+            get
+            {
+                if (this.caseInsensitive)
+                    return associatedSemiGroupCis;
+                else
+                    return associatedSemiGroup;
+            }
         }
 
         /// <summary>
@@ -66,7 +96,7 @@ namespace Waher.Script.Objects
         public override ISemiGroupElement AddLeft(ISemiGroupElement Element)
         {
             if (Element.IsScalar)
-                return new StringValue(Element.AssociatedObjectValue.ToString() + this.value);
+                return new StringValue(Element.AssociatedObjectValue.ToString() + this.value, this.caseInsensitive);
             else
             {
                 LinkedList<IElement> Elements = new LinkedList<IElement>();
@@ -76,7 +106,7 @@ namespace Waher.Script.Objects
                 {
                     SE = E as ISemiGroupElement;
                     if (SE is null)
-                        Elements.AddLast(new StringValue(E.AssociatedObjectValue.ToString() + this.value));
+                        Elements.AddLast(new StringValue(E.AssociatedObjectValue.ToString() + this.value, this.caseInsensitive));
                     else
                         Elements.AddLast(this.AddLeft(SE));
                 }
@@ -93,7 +123,7 @@ namespace Waher.Script.Objects
         public override ISemiGroupElement AddRight(ISemiGroupElement Element)
         {
             if (Element.IsScalar)
-                return new StringValue(this.value + Element.AssociatedObjectValue.ToString());
+                return new StringValue(this.value + Element.AssociatedObjectValue.ToString(), this.caseInsensitive);
             else
             {
                 LinkedList<IElement> Elements = new LinkedList<IElement>();
@@ -103,7 +133,7 @@ namespace Waher.Script.Objects
                 {
                     SE = E as ISemiGroupElement;
                     if (SE is null)
-                        Elements.AddLast(new StringValue(this.value + E.AssociatedObjectValue.ToString()));
+                        Elements.AddLast(new StringValue(this.value + E.AssociatedObjectValue.ToString(), this.caseInsensitive));
                     else
                         Elements.AddLast(this.AddRight(SE));
                 }
@@ -121,7 +151,7 @@ namespace Waher.Script.Objects
             if (E is null)
                 return false;
             else
-                return this.value == E.value;
+                return string.Compare(this.value, E.value, this.caseInsensitive || E.caseInsensitive) == 0;
         }
 
         /// <summary>
@@ -129,7 +159,15 @@ namespace Waher.Script.Objects
         /// </summary>
         public override int GetHashCode()
         {
-            return this.value.GetHashCode();
+            if (this.caseInsensitive)
+            {
+                if (this.valueLower is null)
+                    this.valueLower = this.value.ToLower();
+
+                return this.valueLower.GetHashCode();
+            }
+            else
+                return this.value.GetHashCode();
         }
 
         /// <summary>

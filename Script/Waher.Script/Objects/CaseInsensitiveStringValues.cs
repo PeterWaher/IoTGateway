@@ -7,23 +7,23 @@ using Waher.Script.Abstraction.Elements;
 namespace Waher.Script.Objects
 {
 	/// <summary>
-	/// Semi-group of string values.
+	/// Semi-group of case-insensitive string values.
 	/// </summary>
-	public sealed class StringValues : SemiGroup, IOrderedSet
+	public sealed class CaseInsensitiveStringValues : SemiGroup, IOrderedSet
 	{
-		private static readonly int hashCode = typeof(StringValues).FullName.GetHashCode();
+		private static readonly int hashCode = typeof(CaseInsensitiveStringValues).FullName.GetHashCode();
 
-		/// <summary>
-		/// Semi-group of string values.
-		/// </summary>
-		public StringValues()
+        /// <summary>
+        /// Semi-group of case-insensitive string values.
+        /// </summary>
+        public CaseInsensitiveStringValues()
 		{
 		}
 
 		/// <summary>
-		/// Instance of the set of string values.
+		/// Instance of the set of case-insensitive string values.
 		/// </summary>
-		public static readonly StringValues Instance = new StringValues();
+		public static readonly CaseInsensitiveStringValues Instance = new CaseInsensitiveStringValues();
 
 		/// <summary>
 		/// Checks if the set contains an element.
@@ -32,7 +32,7 @@ namespace Waher.Script.Objects
 		/// <returns>If the element is contained in the set.</returns>
 		public override bool Contains(IElement Element)
 		{
-			return Element is StringValue S && !S.CaseInsensitive;
+			return Element is StringValue S && S.CaseInsensitive;
 		}
 
 		/// <summary>
@@ -40,7 +40,7 @@ namespace Waher.Script.Objects
 		/// </summary>
 		public override bool Equals(object obj)
 		{
-			return obj is StringValues;
+			return obj is CaseInsensitiveStringValues;
 		}
 
 		/// <summary>
@@ -62,7 +62,7 @@ namespace Waher.Script.Objects
 			StringValue s1 = (StringValue)x;
 			StringValue s2 = (StringValue)y;
 
-			return string.Compare(s1.Value, s2.Value, false);
+			return string.Compare(s1.Value, s2.Value, true);
 		}
 	}
 }

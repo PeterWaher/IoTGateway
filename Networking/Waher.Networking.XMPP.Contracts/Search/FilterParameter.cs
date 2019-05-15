@@ -18,7 +18,7 @@ namespace Waher.Networking.XMPP.Contracts.Search
 		/// <param name="Name">Parameter Name</param>
 		/// <param name="Operands">Operands</param>
 		public FilterParameter(string Name, params SearchFilterOperand[] Operands)
-				: base(Operands)
+			: base(Operands)
 		{
 			this.name = Name;
 		}

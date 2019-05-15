@@ -2489,7 +2489,7 @@ namespace Waher.IoTGateway
 		/// <returns>Array of addresses</returns>
 		public static CaseInsensitiveString[] GetNotificationAddresses()
 		{
-			return NotificationConfiguration.Instance.Addresses;
+			return NotificationConfiguration.Instance?.Addresses ?? new CaseInsensitiveString[0];
 		}
 
 		private static void SendNotification(string To, string Markdown, string Text, string Html, string MessageId, bool Update)

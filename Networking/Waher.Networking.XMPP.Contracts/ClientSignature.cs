@@ -66,7 +66,7 @@ namespace Waher.Networking.XMPP.Contracts
 			Xml.Append(XML.Encode(this.role));
 			Xml.Append("\" timestamp=\"");
 			Xml.Append(XML.Encode(this.Timestamp));
-			Xml.Append("\"/>");
+			Xml.Append("\">");
             Xml.Append(Convert.ToBase64String(this.DigitalSignature));
             Xml.Append("</signature>");
         }

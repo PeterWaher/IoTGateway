@@ -556,8 +556,9 @@
 							<File Id='Waher.Security.JWS.dll' Name='Waher.Security.JWS.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.JWS.dll' Vital='yes'/>
 							<File Id='Waher.Security.JWT.dll' Name='Waher.Security.JWT.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.JWT.dll' Vital='yes'/>
 							<File Id='Waher.Security.PKCS.dll' Name='Waher.Security.PKCS.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.PKCS.dll' Vital='yes'/>
-							<File Id='Waher.Security.SPF.dll' Name='Waher.Security.SPF.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.SPF.dll' Vital='yes'/>
-							<File Id='Waher.Theme.CactusRose.dll' Name='Waher.Theme.CactusRose.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Theme.CactusRose.dll'/>
+              <File Id='Waher.Security.SHA3.dll' Name='Waher.Security.SHA3.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.SHA3.dll' Vital='yes'/>
+              <File Id='Waher.Security.SPF.dll' Name='Waher.Security.SPF.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.SPF.dll' Vital='yes'/>
+              <File Id='Waher.Theme.CactusRose.dll' Name='Waher.Theme.CactusRose.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Theme.CactusRose.dll'/>
 							<File Id='Waher.Theme.GothicPeacock.dll' Name='Waher.Theme.GothicPeacock.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Theme.GothicPeacock.dll'/>
 							<File Id='Waher.Things.dll' Name='Waher.Things.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Things.dll' Vital='yes'/>
               <File Id='Waher.Things.IP.dll' Name='Waher.Things.IP.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Things.IP.dll' Vital='yes'/>
@@ -632,8 +633,9 @@
 							<RemoveFile Id='RemoveWaher.Security.JWS.dll' Name='Waher.Security.JWS.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Security.JWT.dll' Name='Waher.Security.JWT.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Security.PKCS.dll' Name='Waher.Security.PKCS.dll' On='uninstall'/>
-							<RemoveFile Id='RemoveWaher.Security.SPF.dll' Name='Waher.Security.SPF.dll' On='uninstall'/>
-							<RemoveFile Id='RemoveWaher.Theme.CactusRose.dll' Name='Waher.Theme.CactusRose.dll' On='uninstall'/>
+              <RemoveFile Id='RemoveWaher.Security.SHA3.dll' Name='Waher.Security.SHA3.dll' On='uninstall'/>
+              <RemoveFile Id='RemoveWaher.Security.SPF.dll' Name='Waher.Security.SPF.dll' On='uninstall'/>
+              <RemoveFile Id='RemoveWaher.Theme.CactusRose.dll' Name='Waher.Theme.CactusRose.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Theme.GothicPeacock.dll' Name='Waher.Theme.GothicPeacock.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Things.dll' Name='Waher.Things.dll' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Things.IP.dll' Name='Waher.Things.IP.dll' On='uninstall'/>
@@ -705,8 +707,9 @@
 							<File Id='Waher.Security.JWS.pdb' Name='Waher.Security.JWS.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.JWS.pdb' Vital='yes'/>
 							<File Id='Waher.Security.JWT.pdb' Name='Waher.Security.JWT.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.JWT.pdb' Vital='yes'/>
 							<File Id='Waher.Security.PKCS.pdb' Name='Waher.Security.PKCS.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.PKCS.pdb' Vital='yes'/>
-							<File Id='Waher.Security.SPF.pdb' Name='Waher.Security.SPF.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.SPF.pdb' Vital='yes'/>
-							<File Id='Waher.Things.pdb' Name='Waher.Things.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Things.pdb' Vital='yes'/>
+              <File Id='Waher.Security.SHA3.pdb' Name='Waher.Security.SHA3.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.SHA3.pdb' Vital='yes'/>
+              <File Id='Waher.Security.SPF.pdb' Name='Waher.Security.SPF.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.SPF.pdb' Vital='yes'/>
+              <File Id='Waher.Things.pdb' Name='Waher.Things.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Things.pdb' Vital='yes'/>
               <File Id='Waher.Things.IP.pdb' Name='Waher.Things.IP.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Things.IP.pdb' Vital='yes'/>
               <File Id='Waher.Things.Metering.pdb' Name='Waher.Things.Metering.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Things.Metering.pdb' Vital='yes'/>
               <RemoveFile Id='RemoveWaher.Content.pdb' Name='Waher.Content.pdb' On='uninstall'/>
@@ -774,8 +777,9 @@
 							<RemoveFile Id='RemoveWaher.Security.JWS.pdb' Name='Waher.Security.JWS.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Security.JWT.pdb' Name='Waher.Security.JWT.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Security.PKCS.pdb' Name='Waher.Security.PKCS.pdb' On='uninstall'/>
-							<RemoveFile Id='RemoveWaher.Security.SPF.pdb' Name='Waher.Security.SPF.pdb' On='uninstall'/>
-							<RemoveFile Id='RemoveWaher.Things.pdb' Name='Waher.Things.pdb' On='uninstall'/>
+              <RemoveFile Id='RemoveWaher.Security.SHA3.pdb' Name='Waher.Security.SHA3.pdb' On='uninstall'/>
+              <RemoveFile Id='RemoveWaher.Security.SPF.pdb' Name='Waher.Security.SPF.pdb' On='uninstall'/>
+              <RemoveFile Id='RemoveWaher.Things.pdb' Name='Waher.Things.pdb' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Things.IP.pdb' Name='Waher.Things.IP.pdb' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Things.Metering.pdb' Name='Waher.Things.Metering.pdb' On='uninstall'/>
             </Component>

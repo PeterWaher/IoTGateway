@@ -54,14 +54,20 @@ namespace Waher.Security.EllipticCurves.Test
             this.Test_ECDH(new Edwards25519(), new Edwards25519());
         }
 
+        [TestMethod]
+        public void Test_09_Edwards448()
+        {
+            this.Test_ECDH(new Edwards448(), new Edwards448());
+        }
+
         public void Test_ECDH(CurvePrimeField Curve1, CurvePrimeField Curve2)
 		{
 			int n;
 
 			for (n = 0; n < 100; n++)
 			{
-				byte[] Key1 = Curve1.GetSharedKey(Curve2.PublicKey, HashFunction.SHA256);
-				byte[] Key2 = Curve2.GetSharedKey(Curve1.PublicKey, HashFunction.SHA256);
+				byte[] Key1 = Curve1.GetSharedKey(Curve2.PublicKey, Hashes.ComputeSHA256Hash);
+				byte[] Key2 = Curve2.GetSharedKey(Curve1.PublicKey, Hashes.ComputeSHA256Hash);
 
                 Assert.AreEqual(Hashes.BinaryToString(Key1), Hashes.BinaryToString(Key2));
 

@@ -26,7 +26,7 @@ namespace Waher.Security.EllipticCurves
         /// https://tools.ietf.org/html/rfc8032
         /// </summary>
         public Edwards25519()
-            : base(p0, d, new PointOnCurve(BasePointX, BasePointY), n, cofactor)
+            : base(p0, new PointOnCurve(BasePointX, BasePointY), n, cofactor)
         {
         }
 
@@ -37,7 +37,7 @@ namespace Waher.Security.EllipticCurves
         /// </summary>
         /// <param name="D">Private key.</param>
         public Edwards25519(BigInteger D)
-            : base(p0, d, new PointOnCurve(BasePointX, BasePointY), n, cofactor, D)
+            : base(p0, new PointOnCurve(BasePointX, BasePointY), n, cofactor, D)
         {
         }
 
@@ -45,6 +45,16 @@ namespace Waher.Security.EllipticCurves
         /// Name of curve.
         /// </summary>
         public override string CurveName => "Edwards25519";
+
+        /// <summary>
+        /// Number of bits used to encode the y-coordinate.
+        /// </summary>
+        public override int CoordinateBits => 253;
+
+        /// <summary>
+        /// d coefficient of Edwards curve.
+        /// </summary>
+        protected override BigInteger D => d;
 
         /// <summary>
         /// Adds <paramref name="Q"/> to <paramref name="P"/>.
@@ -107,7 +117,7 @@ namespace Waher.Security.EllipticCurves
         /// <returns>Signature.</returns>
         public override byte[] Sign(byte[] Data)
         {
-            return EdDSA.Sign(Data, this.privateKey, HashFunction.SHA512, this.orderBytes, this);
+            return EdDSA.Sign(Data, this.privateKey, Hashes.ComputeSHA512Hash, this.orderBits, this);
         }
 
         /// <summary>
@@ -119,8 +129,57 @@ namespace Waher.Security.EllipticCurves
         /// <returns>If the signature is valid.</returns>
         public override bool Verify(byte[] Data, PointOnCurve PublicKey, byte[] Signature)
         {
-            return EdDSA.Verify(Data, PublicKey, HashFunction.SHA512, this.orderBytes,
+            return EdDSA.Verify(Data, PublicKey, Hashes.ComputeSHA512Hash, this.orderBits,
                 this, Signature);
+        }
+
+        /// <summary>
+        /// Gets the X-coordinate that corresponds to a given Y-coordainte, and the 
+        /// first bit of the X-coordinate.
+        /// </summary>
+        /// <param name="Y">Y-coordinate.</param>
+        /// <param name="X0">First bit of X-coordinate.</param>
+        /// <returns>X-coordinate</returns>
+        public override BigInteger GetX(BigInteger Y, bool X0)
+        {
+            BigInteger y2 = this.Multiply(Y, Y);
+            BigInteger u = y2 - BigInteger.One;
+            if (u.Sign < 0)
+                u += this.p;
+
+            BigInteger v = this.Multiply(this.D, y2) + BigInteger.One;
+            BigInteger v2 = this.Multiply(v, v);
+            BigInteger v3 = this.Multiply(v, v2);
+            BigInteger v4 = this.Multiply(v2, v2);
+            BigInteger v7 = this.Multiply(v3, v4);
+            BigInteger x = this.Multiply(this.Multiply(u, v3),
+                BigInteger.ModPow(this.Multiply(u, v7), this.P58, this.Prime));
+
+            BigInteger x2 = this.Multiply(x, x);
+            BigInteger Test = this.Multiply(v, x2);
+            if (Test.Sign < 0)
+                Test += this.Prime;
+
+            if (Test != u)
+            {
+                if (Test == this.Prime - u)
+                    x = this.Multiply(x, this.TwoP14);
+                else
+                    throw new ArgumentException("Not a valid point.", nameof(Y));
+            }
+
+            if (X0)
+            {
+                if (x.IsZero)
+                    throw new ArgumentException("Not a valid point.", nameof(Y));
+
+                if (x.IsEven)
+                    x = this.Prime - x;
+            }
+            else if (!x.IsEven)
+                x = this.Prime - x;
+
+            return x;
         }
 
     }

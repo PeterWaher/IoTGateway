@@ -49,6 +49,6 @@ namespace Waher.Security.EllipticCurves
         /// <summary>
         /// Hash function to use in signatures.
         /// </summary>
-        public override HashFunction HashFunction => HashFunction.SHA512;
+        public override Security.HashFunction HashFunction => Security.HashFunction.SHA512;
     }
 }

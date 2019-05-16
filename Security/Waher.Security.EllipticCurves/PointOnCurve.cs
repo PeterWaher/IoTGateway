@@ -45,10 +45,43 @@ namespace Waher.Security.EllipticCurves
             this.homogeneous = false;
         }
 
-		/// <summary>
-		/// X-coordinate
-		/// </summary>
-		public BigInteger X
+        /// <summary>
+        /// Represents a point on a curve.
+        /// </summary>
+        /// <param name="X">X-coordinate</param>
+        /// <param name="Y">Y-coordinate</param>
+        /// <param name="Z">Z-coordinate</param>
+        public PointOnCurve(BigInteger X, BigInteger Y, BigInteger Z)
+        {
+            this.x = X;
+            this.y = Y;
+            this.z = Z;
+            this.t = BigInteger.Zero;
+            this.nonzero = !X.IsZero || !Y.IsZero;
+            this.homogeneous = true;
+        }
+
+        /// <summary>
+        /// Represents a point on a curve.
+        /// </summary>
+        /// <param name="X">X-coordinate</param>
+        /// <param name="Y">Y-coordinate</param>
+        /// <param name="Z">Z-coordinate</param>
+        /// <param name="T">T-coordinate</param>
+        public PointOnCurve(BigInteger X, BigInteger Y, BigInteger Z, BigInteger T)
+        {
+            this.x = X;
+            this.y = Y;
+            this.z = Z;
+            this.t = T;
+            this.nonzero = !X.IsZero || !Y.IsZero;
+            this.homogeneous = true;
+        }
+
+        /// <summary>
+        /// X-coordinate
+        /// </summary>
+        public BigInteger X
 		{
 			get => this.x;
 			internal set => this.x = value;

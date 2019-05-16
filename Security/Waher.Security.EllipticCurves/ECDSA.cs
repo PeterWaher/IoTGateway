@@ -65,7 +65,7 @@ namespace Waher.Security.EllipticCurves
         private static BigInteger CalcE(byte[] Data, HashFunction HashFunction,
             int ScalarBytes, byte MsbMask)
         {
-            byte[] Hash = Hashes.ComputeHash(HashFunction, Data);
+            byte[] Hash = HashFunction(Data);
             int c = Hash.Length;
 
             if (c != ScalarBytes)

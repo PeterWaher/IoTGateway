@@ -271,7 +271,7 @@ namespace Waher.Security.EllipticCurves
 
             Array.Reverse(B);   // Most significant byte first.
 
-            return Hashes.ComputeHash(HashFunction, B);
+            return HashFunction(B);
         }
 
         /// <summary>

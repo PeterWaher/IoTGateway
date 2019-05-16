@@ -126,7 +126,7 @@ namespace Waher.Security.EllipticCurves
         /// <summary>
         /// Hash function to use in signatures.
         /// </summary>
-        public virtual HashFunction HashFunction => HashFunction.SHA256;
+        public virtual Security.HashFunction HashFunction => Security.HashFunction.SHA256;
 
         /// <summary>
         /// Creates a signature of <paramref name="Data"/> using the ECDSA algorithm.
@@ -136,7 +136,8 @@ namespace Waher.Security.EllipticCurves
         /// <returns>Signature.</returns>
         public override byte[] Sign(byte[] Data)
         {
-            return ECDSA.Sign(Data, this.privateKey, this.HashFunction,
+            return ECDSA.Sign(Data, this.privateKey, 
+                Bin => Hashes.ComputeHash(this.HashFunction, Bin),
                 this.orderBytes, this.msbOrderMask, this);
         }
 
@@ -149,8 +150,9 @@ namespace Waher.Security.EllipticCurves
         /// <returns>If the signature is valid.</returns>
         public override bool Verify(byte[] Data, PointOnCurve PublicKey, byte[] Signature)
         {
-            return ECDSA.Verify(Data, PublicKey, this.HashFunction, this.orderBytes,
-                this.msbOrderMask, this, Signature);
+            return ECDSA.Verify(Data, PublicKey,
+                Bin => Hashes.ComputeHash(this.HashFunction, Bin),
+                this.orderBytes, this.msbOrderMask, this, Signature);
         }
 
     }

@@ -54,7 +54,7 @@ namespace Waher.Security.EllipticCurves
 		{
 			return new PointOnCurve(
 				this.Multiply(Sqrt156324, this.Divide(UV.X, UV.Y)),
-				this.Divide(UV.X + BigInteger.One, BigInteger.One - UV.X));
+				this.Divide(BigInteger.One + UV.X, BigInteger.One - UV.X));
 		}
 
 		/// <summary>
@@ -88,7 +88,35 @@ namespace Waher.Security.EllipticCurves
         /// <returns>Edwards curve.</returns>
         public override EdwardsCurve CreatePair()
         {
-            throw new NotImplementedException();
+            PointOnCurve PublicKeyUV = this.PublicKey;
+            PointOnCurve PublicKeyXY = this.ToXY(PublicKeyUV);
+
+            byte[] Bin = this.privateKey.ToByteArray();
+            if (Bin.Length != 57)
+                Array.Resize<byte>(ref Bin, 57);
+
+            Bin[0] &= 0xfc;
+            Bin[55] |= 0x80;
+            Bin[56] = 0;
+
+            BigInteger PrivateKey = new BigInteger(Bin);
+            BigInteger PrivateKey2 = BigInteger.Remainder(this.Order - PrivateKey, this.Order);
+            if (PrivateKey2.Sign < 0)
+                PrivateKey2 += this.Order;
+
+            Edwards448 Candidate = new Edwards448(PrivateKey2);
+            PointOnCurve PublicKeyXY2 = Candidate.PublicKey;
+
+            if (PublicKeyXY.Y.Equals(PublicKeyXY2.Y))
+                return Candidate;
+
+            Candidate = new Edwards448(PrivateKey);
+            PublicKeyXY2 = Candidate.PublicKey;
+
+            if (PublicKeyXY.Y.Equals(PublicKeyXY2.Y))
+                return Candidate;
+
+            throw new InvalidOperationException("Unable to create pair curve.");
         }
 
     }

@@ -42,6 +42,7 @@ Edwards448</Description>
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Waher.Security.SHA3\Waher.Security.SHA3.csproj" />
     <ProjectReference Include="..\Waher.Security\Waher.Security.csproj" />
   </ItemGroup>
 

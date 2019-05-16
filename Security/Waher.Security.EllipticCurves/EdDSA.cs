@@ -4,6 +4,13 @@ using System.Numerics;
 namespace Waher.Security.EllipticCurves
 {
     /// <summary>
+    /// Delegate to hash function.
+    /// </summary>
+    /// <param name="Data">Data to be hashed.</param>
+    /// <returns>Hash digest</returns>
+    public delegate byte[] HashFunction(byte[] Data);
+
+    /// <summary>
     /// Implements the EdDSA algorithm, as defined in RFC 8032.
     /// https://tools.ietf.org/html/rfc8032
     /// </summary>
@@ -15,14 +22,16 @@ namespace Waher.Security.EllipticCurves
         /// <param name="Data">Data to be signed.</param>
         /// <param name="PrivateKey">Private key.</param>
         /// <param name="HashFunction">Hash function to use</param>
-        /// <param name="ScalarBytes">Number of bytes to use for scalars.</param>
+        /// <param name="ScalarBits">Number of bits to use for scalars.</param>
         /// <param name="MsbMask">Mask for most significant byte.</param>
         /// <param name="Curve">Elliptic curve</param>
         /// <returns>Signature</returns>
         public static byte[] Sign(byte[] Data, BigInteger PrivateKey, HashFunction HashFunction,
-            int ScalarBytes, EdwardsCurve Curve)
+            int ScalarBits, EdwardsCurve Curve)
         {
             // 5.1.6 of RFC 8032
+
+            int ScalarBytes = (ScalarBits + 8) >> 3;
 
             Console.Out.WriteLine("Signing");
             Console.Out.WriteLine("------------");
@@ -32,7 +41,7 @@ namespace Waher.Security.EllipticCurves
             if (h.Length != ScalarBytes)
                 Array.Resize<byte>(ref h, ScalarBytes);
 
-            h = Hashes.ComputeHash(HashFunction, h);
+            h = HashFunction(h);
 
             Console.Out.WriteLine("Hash: " + Hashes.BinaryToString(h));
 
@@ -52,7 +61,7 @@ namespace Waher.Security.EllipticCurves
             Array.Copy(h, ScalarBytes, Bin, 0, ScalarBytes);    // prefix
             Array.Copy(Data, 0, Bin, ScalarBytes, c);           // PH(M)=M
 
-            h = Hashes.ComputeHash(HashFunction, Bin);
+            h = HashFunction(Bin);
 
             Console.Out.WriteLine("Hash 2: " + PrivateKey.ToString());
 
@@ -69,7 +78,7 @@ namespace Waher.Security.EllipticCurves
             Console.Out.WriteLine("Public Key: " + Curve.PublicKey.ToString());
             Console.Out.WriteLine("A: " + Hashes.BinaryToString(Curve.A));
 
-            byte[] R = Encode(P, ScalarBytes);
+            byte[] R = Encode(P, Curve);
 
             Bin = new byte[(ScalarBytes << 1) + c];             // dom2(F, C) = blank string
             Array.Copy(R, 0, Bin, 0, ScalarBytes);
@@ -77,7 +86,7 @@ namespace Waher.Security.EllipticCurves
             Array.Copy(Data, 0, Bin, ScalarBytes << 1, c);      // PH(M)=M
 
             Console.Out.WriteLine("Data to hash: " + Hashes.BinaryToString(Bin));
-            h = Hashes.ComputeHash(HashFunction, Bin);
+            h = HashFunction(Bin);
 
             Console.Out.WriteLine("Hash 3: " + Hashes.BinaryToString(h));
 
@@ -107,24 +116,25 @@ namespace Waher.Security.EllipticCurves
         /// Encodes a point on the curve in accordance with §5.1.2 of RFC 8032.
         /// </summary>
         /// <param name="P">Point</param>
-        /// <param name="ScalarBytes">Number of bytes to use for scalars.</param>
+        /// <param name="Curve">Edwards curve.</param>
         /// <returns>Encoding</returns>
-        public static byte[] Encode(PointOnCurve P, int ScalarBytes)
+        public static byte[] Encode(PointOnCurve P, EdwardsCurve Curve)
         {
-            Console.Out.WriteLine("Encoding: " + P.ToString());
+            int ScalarBits = Curve.CoordinateBits;
+            int ScalarBytes = (ScalarBits + 9) >> 3;
 
             byte[] y = P.Y.ToByteArray();
             if (y.Length != ScalarBytes)
                 Array.Resize<byte>(ref y, ScalarBytes);
 
             byte[] x = P.X.ToByteArray();
+            int Msb = (ScalarBits + 1) & 7;
+
+            byte Mask = (byte)(0xff >> (8 - Msb));
+            y[ScalarBytes - 1] &= Mask;
 
             if ((x[0] & 1) != 0)
-                y[ScalarBytes - 1] |= 0x80;
-            else
-                y[ScalarBytes - 1] &= 0x7f;
-
-            Console.Out.WriteLine("Encoded: " + Hashes.BinaryToString(y));
+                y[ScalarBytes - 1] |= 0x80;     // Always MSB
 
             return y;
         }
@@ -133,12 +143,12 @@ namespace Waher.Security.EllipticCurves
         /// Decodes a point on the curve in accordance with §5.1.3 of RFC 8032.
         /// </summary>
         /// <param name="Encoded">Encoded point.</param>
-        /// <param name="ScalarBytes">Number of bytes to use for scalars.</param>
         /// <param name="Curve">Elliptic curve</param>
         /// <returns>Point on curve.</returns>
-        public static PointOnCurve Decode(byte[] Encoded, int ScalarBytes, EdwardsCurve Curve)
+        public static PointOnCurve Decode(byte[] Encoded, EdwardsCurve Curve)
         {
-            Console.Out.WriteLine("Decoding: " + Hashes.BinaryToString(Encoded));
+            int ScalarBits = Curve.CoordinateBits;
+            int ScalarBytes = (ScalarBits + 9) >> 3;
 
             if (Encoded.Length != ScalarBytes)
                 throw new ArgumentException("Not encoded properly.", nameof(Encoded));
@@ -147,87 +157,14 @@ namespace Waher.Security.EllipticCurves
             if (x0)
                 Encoded[ScalarBytes - 1] &= 0x7f;
 
-            Console.Out.WriteLine("x0: " + x0.ToString());
-
             BigInteger y = new BigInteger(Encoded);
+            if (y >= Curve.Prime)
+                throw new ArgumentException("Not a valid point.", nameof(Encoded));
 
             if (x0)
                 Encoded[ScalarBytes - 1] |= 0x80;
 
-            Console.Out.WriteLine("y: " + y.ToString());
-
-            if (y >= Curve.Prime)
-                throw new ArgumentException("Not a valid point.", nameof(Encoded));
-
-            BigInteger y2 = Curve.Multiply(y, y);
-
-            Console.Out.WriteLine("y2: " + y2.ToString());
-
-            BigInteger u = y2 - BigInteger.One;
-
-            if (u.Sign < 0)
-                u += Curve.Prime;
-
-            Console.Out.WriteLine("u: " + u.ToString());
-
-            BigInteger v = Curve.Multiply(Curve.D, y2) + BigInteger.One;
-
-            Console.Out.WriteLine("v: " + v.ToString());
-
-            BigInteger v2 = Curve.Multiply(v, v);
-
-            Console.Out.WriteLine("v2: " + v2.ToString());
-
-            BigInteger v3 = Curve.Multiply(v, v2);
-
-            Console.Out.WriteLine("v3: " + v3.ToString());
-
-            BigInteger v4 = Curve.Multiply(v2, v2);
-
-            Console.Out.WriteLine("v4: " + v4.ToString());
-
-            BigInteger v7 = Curve.Multiply(v3, v4);
-
-            Console.Out.WriteLine("v7: " + v7.ToString());
-
-            BigInteger x = Curve.Multiply(Curve.Multiply(u, v3),
-                BigInteger.ModPow(Curve.Multiply(u, v7), Curve.P58, Curve.Prime));
-
-            Console.Out.WriteLine("x: " + x.ToString());
-
-            BigInteger Check = BigInteger.ModPow(Curve.Divide(u, v), (Curve.Prime + 3) / 8, Curve.Prime);   // TODO: Remove
-            Console.Out.WriteLine("Check: " + Check.ToString());
-
-            BigInteger x2 = Curve.Multiply(x, x);
-
-            Console.Out.WriteLine("x2: " + x2.ToString());
-
-            BigInteger Test = Curve.Multiply(v, x2);
-            if (Test.Sign < 0)
-                Test += Curve.Prime;
-
-            Console.Out.WriteLine("Test: " + Test.ToString());
-
-            if (Test != u)
-            {
-                if (Test == Curve.Prime - u)
-                    x = Curve.Multiply(x, Curve.TwoP14);
-                else
-                    throw new ArgumentException("Not a valid point.", nameof(Encoded));
-            }
-
-            if (x0)
-            {
-                if (x.IsZero)
-                    throw new ArgumentException("Not a valid point.", nameof(Encoded));
-
-                if (x.IsEven)
-                    x = Curve.Prime - x;
-            }
-            else if (!x.IsEven)
-                x = Curve.Prime - x;
-
-            Console.Out.WriteLine("x: " + x.ToString());
+            BigInteger x = Curve.GetX(y, x0);
 
             return new PointOnCurve(x, y);
         }
@@ -239,14 +176,16 @@ namespace Waher.Security.EllipticCurves
         /// <param name="PublicKey">Public Key of the entity that generated the signature.</param>
         /// <param name="HashFunction">Hash function to use.</param>
         /// <param name="Curve">Elliptic curve</param>
-        /// <param name="ScalarBytes">Number of bytes to use for scalars.</param>
+        /// <param name="ScalarBits">Number of bits to use for scalars.</param>
         /// <param name="Signature">Signature</param>
         /// <returns>If the signature is valid.</returns>
         public static bool Verify(byte[] Data, PointOnCurve PublicKey, HashFunction HashFunction,
-            int ScalarBytes, EdwardsCurve Curve, byte[] Signature)
+            int ScalarBits, EdwardsCurve Curve, byte[] Signature)
         {
             try
             {
+                int ScalarBytes = (ScalarBits + 8) >> 3;
+
                 Console.Out.WriteLine();
                 Console.Out.WriteLine("Verifying");
                 Console.Out.WriteLine("------------");
@@ -258,7 +197,7 @@ namespace Waher.Security.EllipticCurves
 
                 byte[] R = new byte[ScalarBytes];
                 Array.Copy(Signature, 0, R, 0, ScalarBytes);
-                PointOnCurve r = Decode(R, ScalarBytes, Curve);
+                PointOnCurve r = Decode(R, Curve);
 
                 Console.Out.WriteLine("r: " + r.ToString());
 
@@ -273,7 +212,7 @@ namespace Waher.Security.EllipticCurves
 
                 Console.Out.WriteLine("Public Key: " + PublicKey.ToString());
 
-                byte[] A = Encode(PublicKey, ScalarBytes);
+                byte[] A = Encode(PublicKey, Curve);
 
                 Console.Out.WriteLine("A: " + Hashes.BinaryToString(A));
 
@@ -284,7 +223,7 @@ namespace Waher.Security.EllipticCurves
                 Array.Copy(Data, 0, Bin, ScalarBytes << 1, c);              // PH(M)=M
 
                 Console.Out.WriteLine("Data to hash: " + Hashes.BinaryToString(Bin));
-                byte[] h = Hashes.ComputeHash(HashFunction, Bin);
+                byte[] h = HashFunction(Bin);
                 Console.Out.WriteLine("Hash: " + Hashes.BinaryToString(h));
 
                 BigInteger k = BigInteger.Remainder(ToBigInt(h), Curve.Order);

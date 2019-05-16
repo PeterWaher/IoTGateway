@@ -16,7 +16,7 @@ namespace Waher.Security.SHA3
 		/// section 6.3 in the NIST FIPS 202: 
 		/// https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.202.pdf
 		/// </summary>
-		/// <param name="DigestSize">Digest size.</param>
+		/// <param name="DigestSize">Digest size, in bits.</param>
 		public RawSHAKE256(int DigestSize)
 			: base(BitSize.BitSize1600, 256, 0b11, DigestSize)
 		{

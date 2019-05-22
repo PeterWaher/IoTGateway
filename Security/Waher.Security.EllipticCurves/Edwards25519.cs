@@ -49,7 +49,7 @@ namespace Waher.Security.EllipticCurves
         /// <summary>
         /// Number of bits used to encode the y-coordinate.
         /// </summary>
-        public override int CoordinateBits => 253;
+        public override int CoordinateBits => 254;
 
         /// <summary>
         /// d coefficient of Edwards curve.
@@ -73,7 +73,7 @@ namespace Waher.Security.EllipticCurves
             BigInteger A = this.Multiply(P.Y - P.X, Q.Y - Q.X);
             BigInteger B = this.Multiply(P.Y + P.X, Q.Y + Q.X);
             BigInteger C = this.Multiply(this.Multiply(d2, P.T), Q.T);
-            BigInteger D = this.Multiply(2 * P.Z, Q.Z);
+            BigInteger D = this.Multiply(P.Z << 1, Q.Z);
             BigInteger E = this.Subtract(B, A);
             BigInteger F = this.Subtract(D, C);
             BigInteger G = this.Add(D, C);
@@ -94,14 +94,18 @@ namespace Waher.Security.EllipticCurves
             if (!P.IsHomogeneous)
                 P.T = P.X * P.Y;
 
-            BigInteger A = this.Multiply(P.X, P.X);
-            BigInteger B = this.Multiply(P.Y, P.Y);
-            BigInteger C = this.Multiply(2 * P.Z, P.Z);
+            BigInteger A = P.Y - P.X;
+            A = this.Multiply(A, A);
+
+            BigInteger B = P.Y + P.X;
+            B = this.Multiply(B, B);
+
+            BigInteger C = this.Multiply(this.Multiply(d2, P.T), P.T);
+            BigInteger D = this.Multiply(P.Z << 1, P.Z);
+            BigInteger E = this.Subtract(B, A);
+            BigInteger F = this.Subtract(D, C);
+            BigInteger G = this.Add(D, C);
             BigInteger H = this.Add(B, A);
-            BigInteger E = P.X + P.Y;
-            E = this.Subtract(H, this.Multiply(E, E));
-            BigInteger G = this.Subtract(A, B);
-            BigInteger F = this.Add(C, G);
 
             P.X = this.Multiply(E, F);
             P.Y = this.Multiply(G, H);

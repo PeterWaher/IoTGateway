@@ -117,7 +117,7 @@ namespace Waher.Security.EllipticCurves
             BigInteger D = this.Multiply(P.Y, P.Y);
             BigInteger E = this.Add(C, D);
             BigInteger H = this.Multiply(P.Z, P.Z);
-            BigInteger J = this.Subtract(E, Two * H);
+            BigInteger J = this.Subtract(E, H << 1);
 
             P.X = this.Multiply(B - E, J);
             P.Y = this.Multiply(E, C - D);

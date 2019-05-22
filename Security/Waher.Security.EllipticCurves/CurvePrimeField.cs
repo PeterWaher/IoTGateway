@@ -78,7 +78,7 @@ namespace Waher.Security.EllipticCurves
         /// <param name="Order">Order of base-point.</param>
         /// <param name="Cofactor">Cofactor of curve.</param>
         /// <param name="D">Private key.</param>
-        public CurvePrimeField(BigInteger Prime, PointOnCurve BasePoint, BigInteger Order, 
+        public CurvePrimeField(BigInteger Prime, PointOnCurve BasePoint, BigInteger Order,
             int Cofactor, BigInteger? D)
             : base(Prime)
         {
@@ -158,15 +158,20 @@ namespace Waher.Security.EllipticCurves
         {
             PointOnCurve Result = this.Zero;
             byte[] Bin = N.ToByteArray();
-            int i;
-            int c = Math.Min(this.orderBits, Bin.Length << 3);
+            int i, c = Bin.Length;
+            byte b, Bit;
 
             for (i = 0; i < c; i++)
             {
-                if ((Bin[i >> 3] & (1 << (i & 7))) != 0)
-                    this.AddTo(ref Result, P);
+                b = Bin[i];
 
-                this.Double(ref P);
+                for (Bit = 1; Bit != 0; Bit <<= 1)
+                {
+                    if ((b & Bit) != 0)
+                        this.AddTo(ref Result, P);
+
+                    this.Double(ref P);
+                }
             }
 
             return Result;
@@ -291,37 +296,37 @@ namespace Waher.Security.EllipticCurves
         /// <returns>If the signature is valid.</returns>
         public abstract bool Verify(byte[] Data, PointOnCurve PublicKey, byte[] Signature);
 
-		/// <summary>
-		/// Exports the curve parameters to XML.
-		/// </summary>
-		/// <param name="Output">Output</param>
-		public virtual void Export(XmlWriter Output)
-		{
-			Output.WriteStartElement("EllipticCurve", Namespace);
-			Output.WriteAttributeString("type", this.GetType().FullName);
-			Output.WriteAttributeString("d", this.privateKey.ToString());
-			Output.WriteEndElement();
-		}
+        /// <summary>
+        /// Exports the curve parameters to XML.
+        /// </summary>
+        /// <param name="Output">Output</param>
+        public virtual void Export(XmlWriter Output)
+        {
+            Output.WriteStartElement("EllipticCurve", Namespace);
+            Output.WriteAttributeString("type", this.GetType().FullName);
+            Output.WriteAttributeString("d", this.privateKey.ToString());
+            Output.WriteEndElement();
+        }
 
-		/// <summary>
-		/// Exports the curve parameters to an XML string.
-		/// </summary>
-		public string Export()
-		{
-			XmlWriterSettings Settings = new XmlWriterSettings()
-			{
-				Indent = false,
-				OmitXmlDeclaration = true
-			};
-			StringBuilder sb = new StringBuilder();
-			using (XmlWriter w = XmlWriter.Create(sb, Settings))
-			{
-				this.Export(w);
-				w.Flush();
-			}
+        /// <summary>
+        /// Exports the curve parameters to an XML string.
+        /// </summary>
+        public string Export()
+        {
+            XmlWriterSettings Settings = new XmlWriterSettings()
+            {
+                Indent = false,
+                OmitXmlDeclaration = true
+            };
+            StringBuilder sb = new StringBuilder();
+            using (XmlWriter w = XmlWriter.Create(sb, Settings))
+            {
+                this.Export(w);
+                w.Flush();
+            }
 
-			return sb.ToString();
-		}
+            return sb.ToString();
+        }
 
-	}
+    }
 }

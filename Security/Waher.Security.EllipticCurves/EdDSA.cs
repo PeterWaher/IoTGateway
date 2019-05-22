@@ -35,12 +35,12 @@ namespace Waher.Security.EllipticCurves
 
             Console.Out.WriteLine("Signing");
             Console.Out.WriteLine("------------");
-            Console.Out.WriteLine("Private Key: " + PrivateKey.ToString());
 
             byte[] h = PrivateKey.ToByteArray();
             if (h.Length != ScalarBytes)
                 Array.Resize<byte>(ref h, ScalarBytes);
 
+            Console.Out.WriteLine("Secret: " + Hashes.BinaryToString(h));
             h = HashFunction(h);
 
             Console.Out.WriteLine("Hash: " + Hashes.BinaryToString(h));
@@ -52,9 +52,19 @@ namespace Waher.Security.EllipticCurves
             Bin[31] |= 0x40;
             Bin[0] &= 0xf8;
 
-            BigInteger s = new BigInteger(Bin);
+            BigInteger a = new BigInteger(Bin);
 
-            Console.Out.WriteLine("s: " + s.ToString());
+            Console.Out.WriteLine("a: " + a.ToString());
+
+            PointOnCurve P = Curve.ScalarMultiplication(a, Curve.BasePoint);
+            P.Normalize(Curve);
+
+            Console.Out.WriteLine("P: " + P.ToString());
+            Console.Out.WriteLine("Public Key: " + Curve.PublicKey.ToString());
+
+            byte[] A = Encode(P, Curve);
+
+            Console.Out.WriteLine("A: " + Hashes.BinaryToString(A));
 
             int c = Data.Length;
             Bin = new byte[ScalarBytes + c];                    // dom2(F, C) = blank string
@@ -71,18 +81,18 @@ namespace Waher.Security.EllipticCurves
             Console.Out.WriteLine("r: " + r.ToString());
             Console.Out.WriteLine("Basepoint: " + Curve.BasePoint.ToString());
 
-            PointOnCurve P = Curve.ScalarMultiplication(r, Curve.BasePoint);
-            P.Normalize(Curve);
+            PointOnCurve R = Curve.ScalarMultiplication(r, Curve.BasePoint);
+            Console.Out.WriteLine("R: " + R.ToString());
+            R.Normalize(Curve);
 
-            Console.Out.WriteLine("P: " + P.ToString());
-            Console.Out.WriteLine("Public Key: " + Curve.PublicKey.ToString());
-            Console.Out.WriteLine("A: " + Hashes.BinaryToString(Curve.A));
+            Console.Out.WriteLine("Rnorm: " + R.ToString());
 
-            byte[] R = Encode(P, Curve);
+            byte[] Rs = Encode(R, Curve);
+            Console.Out.WriteLine("Rs: " + Hashes.BinaryToString(Rs));
 
             Bin = new byte[(ScalarBytes << 1) + c];             // dom2(F, C) = blank string
-            Array.Copy(R, 0, Bin, 0, ScalarBytes);
-            Array.Copy(Curve.A, 0, Bin, ScalarBytes, ScalarBytes);
+            Array.Copy(Rs, 0, Bin, 0, ScalarBytes);
+            Array.Copy(A, 0, Bin, ScalarBytes, ScalarBytes);
             Array.Copy(Data, 0, Bin, ScalarBytes << 1, c);      // PH(M)=M
 
             Console.Out.WriteLine("Data to hash: " + Hashes.BinaryToString(Bin));
@@ -95,17 +105,17 @@ namespace Waher.Security.EllipticCurves
 
             Console.Out.WriteLine("k: " + k.ToString());
 
-            BigInteger s2 = Curve.ModulusN.Add(r, Curve.ModulusN.Multiply(k, s));
-            Console.Out.WriteLine("S2: " + s2.ToString());
+            BigInteger s = Curve.ModulusN.Add(r, Curve.ModulusN.Multiply(k, a));
+            Console.Out.WriteLine("s: " + s.ToString());
 
-            byte[] S = s2.ToByteArray();
-            if (S.Length != ScalarBytes)
-                Array.Resize<byte>(ref S, ScalarBytes);
+            Bin = s.ToByteArray();
+            if (Bin.Length != ScalarBytes)
+                Array.Resize<byte>(ref Bin, ScalarBytes);
 
             byte[] Signature = new byte[ScalarBytes << 1];
 
-            Array.Copy(R, 0, Signature, 0, ScalarBytes);
-            Array.Copy(S, 0, Signature, ScalarBytes, ScalarBytes);
+            Array.Copy(Rs, 0, Signature, 0, ScalarBytes);
+            Array.Copy(Bin, 0, Signature, ScalarBytes, ScalarBytes);
 
             Console.Out.WriteLine("Signature: " + Hashes.BinaryToString(Signature));
 

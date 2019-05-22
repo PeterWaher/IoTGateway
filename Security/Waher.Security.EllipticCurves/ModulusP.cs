@@ -37,8 +37,12 @@ namespace Waher.Security.EllipticCurves
         {
             BigInteger Sum = a + b;
 
-            while (Sum >= this.p)
+            if (Sum >= this.p)
+            {
                 Sum -= this.p;
+                if (Sum >= this.p)
+                    Sum %= this.p;
+            }
 
             return Sum;
         }
@@ -53,11 +57,23 @@ namespace Waher.Security.EllipticCurves
         {
             BigInteger Diff = a - b;
             if (Diff.Sign < 0)
-                return Diff + this.p;
+            {
+                Diff += this.p;
+                if (Diff.Sign < 0)
+                {
+                    Diff %= this.p;
+                    if (Diff.Sign < 0)
+                        Diff += this.p;
+                }
+            }
             else if (Diff >= this.p)
-                return Diff - this.p;
-            else
-                return Diff;
+            {
+                Diff -= this.p;
+                if (Diff >= this.p)
+                    Diff %= this.p;
+            }
+
+            return Diff;
         }
 
         /// <summary>
@@ -81,6 +97,16 @@ namespace Waher.Security.EllipticCurves
         {
             b = this.Invert(b);
             return BigInteger.Remainder(a * b, this.p);
+        }
+
+        /// <summary>
+        /// Negates a number in the field Z[p].
+        /// </summary>
+        /// <param name="x">Number to negate.</param>
+        /// <returns>-x mod p</returns>
+        public BigInteger Negate(BigInteger x)
+        {
+            return this.p - x;
         }
 
         /// <summary>

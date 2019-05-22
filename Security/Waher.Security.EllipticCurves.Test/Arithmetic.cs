@@ -2,6 +2,7 @@ using System;
 using System.Globalization;
 using System.Numerics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Waher.Security.SHA3;
 
 namespace Waher.Security.EllipticCurves.Test
 {
@@ -143,13 +144,13 @@ namespace Waher.Security.EllipticCurves.Test
         }
 
         [TestMethod]
-        public void Test_05_Sqrt_1()
+        public void Test_05_Sqrt_83_Mod_673()
         {
             CalcSqrt(83, 673);
         }
 
         [TestMethod]
-        public void Test_06_Sqrt_2()
+        public void Test_06_Sqrt_Minus_486664_Mod_P()
         {
             Curve25519 C = new Curve25519();
             CalcSqrt(-486664, C.Prime);
@@ -174,6 +175,9 @@ namespace Waher.Security.EllipticCurves.Test
 
             Assert.AreEqual(UV.X, UV2.X);
             Assert.AreEqual(UV.Y, UV2.Y);
+
+            Assert.AreEqual("15112221349535400772501151409588531511454012693041857206046113283949847762202", XY.X.ToString());
+            Assert.AreEqual("46316835694926478169428394003475163141307993866256225615783033603165251855960", XY.Y.ToString());
         }
 
         [TestMethod]
@@ -187,6 +191,9 @@ namespace Waher.Security.EllipticCurves.Test
 
             Assert.AreEqual(UV.X, UV2.X);
             Assert.AreEqual(UV.Y, UV2.Y);
+
+            Assert.AreEqual("224580040295924300187604334099896036246789641632564134246125461686950415467406032909029192869357953282578032075146446173674602635247710", XY.X.ToString());
+            Assert.AreEqual("298819210078481492676017930443930673437544040154080242095928241372331506189835876003536878655418784733982303233503462500531545062832660", XY.Y.ToString());
         }
 
         [TestMethod]
@@ -536,7 +543,7 @@ namespace Waher.Security.EllipticCurves.Test
         }
 
         [TestMethod]
-        public void Test_27_Sqrt_3()
+        public void Test_27_Sqrt_156324()
         {
             Curve448 C = new Curve448();
             CalcSqrt(156324, C.Prime);
@@ -571,28 +578,6 @@ namespace Waher.Security.EllipticCurves.Test
             }
 
             Assert.AreEqual(0, NrErrors);
-        }
-
-        [TestMethod]
-        public void Test_30_Ed25519_TestVector_1()
-        {
-            byte[] SecretKey = Hashes.StringToBinary("9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60");
-            SecretKey[0] &= 248;
-            SecretKey[31] &= 127;
-            SecretKey[31] |= 64;
-
-            BigInteger D = new BigInteger(SecretKey);
-            Edwards25519 Curve = new Edwards25519(D);
-
-            //byte[] PublicKey = EdDSA.Encode(Curve.PublicKey, 255);
-            //Assert.AreEqual("d75a980182b10ab7d54bfed3c964073a0ee172f3daa62325af021a68f707511a", 
-            //    Hashes.BinaryToString(PublicKey));
-
-            byte[] Message = new byte[0];
-            byte[] Signature = EdDSA.Sign(Message, D, Hashes.ComputeSHA512Hash, 253, Curve);
-
-            Assert.AreEqual("e5564300c360ac729086e2cc806e828a84877f1eb8e5d974d873e065224901555fb8821590a33bacc61e39701cf9b46bd25bf5f0595bbe24655141438e7a100b",
-                Hashes.BinaryToString(Signature));
         }
 
     }

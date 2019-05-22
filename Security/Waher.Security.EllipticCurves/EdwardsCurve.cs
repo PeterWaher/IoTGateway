@@ -12,7 +12,6 @@ namespace Waher.Security.EllipticCurves
         private BigInteger p58;
         private BigInteger p34;
         private BigInteger twoP14;
-        private byte[] a;
 
         /// <summary>
         /// Base class of Edwards curves over a prime field.
@@ -91,21 +90,6 @@ namespace Waher.Security.EllipticCurves
                 return new PointOnCurve(BigInteger.Zero, BigInteger.One);
             }
         }
-
-        /// <summary>
-        /// Sets the private key (and therefore also the public key) of the curve.
-        /// </summary>
-        /// <param name="D">Private key.</param>
-        public override void SetPrivateKey(BigInteger D)
-        {
-            base.SetPrivateKey(D);
-            this.a = EdDSA.Encode(this.PublicKey, this);
-        }
-
-        /// <summary>
-        /// Encoded public key, for EdDSA.
-        /// </summary>
-        public byte[] A => this.a;
 
         /// <summary>
         /// Gets the X-coordinate that corresponds to a given Y-coordainte, and the 

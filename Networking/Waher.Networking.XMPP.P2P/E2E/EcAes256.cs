@@ -169,7 +169,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
 			if (sharedSecrets.TryGetValue(Key, out byte[] SharedKey))
 				return SharedKey;
 
-			SharedKey = LocalKey.curve.GetSharedKey(RemoteKey.publicKey, HashFunction.SHA256);
+			SharedKey = LocalKey.curve.GetSharedKey(RemoteKey.publicKey, Hashes.ComputeSHA256Hash);
 			sharedSecrets[Key] = SharedKey;
 
 			return SharedKey;

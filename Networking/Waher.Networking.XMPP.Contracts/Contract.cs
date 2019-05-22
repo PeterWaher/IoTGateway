@@ -31,7 +31,7 @@ namespace Waher.Networking.XMPP.Contracts
 		private HumanReadableText[] forHumans = null;
 		private ClientSignature[] clientSignatures = null;
 		private ServerSignature serverSignature = null;
-		private HashFunction contentSchemaHashFunction = HashFunction.SHA256;
+		private Waher.Security.HashFunction contentSchemaHashFunction = Waher.Security.HashFunction.SHA256;
 		private ContractState state = ContractState.Proposed;
 		private ContractVisibility visibility = ContractVisibility.CreatorAndParts;
 		private ContractParts partsMode = ContractParts.ExplicitlyDefined;
@@ -193,7 +193,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// Hash function of the schema used to validate the machine-readable contents (<see cref="ForMachines"/>) of the smart contract,
 		/// if such a schema was used.
 		/// </summary>
-		public HashFunction ContentSchemaHashFunction
+		public Waher.Security.HashFunction ContentSchemaHashFunction
 		{
 			get { return this.contentSchemaHashFunction; }
 			set { this.contentSchemaHashFunction = value; }
@@ -761,7 +761,7 @@ namespace Waher.Networking.XMPP.Contracts
 									break;
 
 								case "schemaHashFunction":
-									if (Enum.TryParse<HashFunction>(Attr.Value, out HashFunction H))
+									if (Enum.TryParse<Waher.Security.HashFunction>(Attr.Value, out Waher.Security.HashFunction H))
 										Result.contentSchemaHashFunction = H;
 									else
 										return null;

@@ -2220,7 +2220,7 @@ namespace Waher.Networking.XMPP.Contracts
 								{
 									if (N2 is XmlElement E3 && E3.LocalName == "digest" && E3.NamespaceURI == NamespaceSmartContracts)
 									{
-										if (!Enum.TryParse<HashFunction>(XML.Attribute(E3, "function"), out HashFunction Function))
+										if (!Enum.TryParse<Waher.Security.HashFunction>(XML.Attribute(E3, "function"), out Security.HashFunction Function))
 											continue;
 
 										byte[] Digest = Convert.FromBase64String(E3.InnerText);

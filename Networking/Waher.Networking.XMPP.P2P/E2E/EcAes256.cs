@@ -22,58 +22,56 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		/// <summary>
 		/// Remote public key.
 		/// </summary>
-		protected readonly PointOnCurve publicKey;
-		private readonly CurvePrimeField curve;
+		protected readonly byte[] publicKey;
+		private readonly EllipticCurve curve;
 		private readonly bool hasPrivateKey;
-		private readonly string keyString;
+		private readonly string publicKeyBase64;
 
 		/// <summary>
 		/// Abstract base class for Elliptic Curve / AES-256 hybrid ciphers.s
 		/// </summary>
 		/// <param name="Curve">Curve instance</param>
-		public EcAes256(CurvePrimeField Curve)
+		public EcAes256(EllipticCurve Curve)
 			: base()
 		{
 			this.curve = Curve;
 			this.publicKey = Curve.PublicKey;
 			this.hasPrivateKey = true;
-			this.keyString = this.publicKey.X.ToString() + "," + this.publicKey.Y.ToString();
-		}
+            this.publicKeyBase64 = Convert.ToBase64String(this.publicKey);
+        }
 
-		/// <summary>
-		/// Abstract base class for Elliptic Curve / AES-256 hybrid ciphers.s
-		/// </summary>
-		/// <param name="X">X-coordinate of remote public key.</param>
-		/// <param name="Y">Y-coordinate of remote public key.</param>
-		/// <param name="ReferenceCurve">Reference curve</param>
-		public EcAes256(byte[] X, byte[] Y, CurvePrimeField ReferenceCurve)
+        /// <summary>
+        /// Abstract base class for Elliptic Curve / AES-256 hybrid ciphers.s
+        /// </summary>
+        /// <param name="PublicKey">Remote public key.</param>
+        /// <param name="ReferenceCurve">Reference curve</param>
+        public EcAes256(byte[] PublicKey, PrimeFieldCurve ReferenceCurve)
 			: base()
 		{
-			this.publicKey = new PointOnCurve(FromNetwork(X), FromNetwork(Y));
+			this.publicKey = PublicKey;
 			this.curve = ReferenceCurve;
 			this.hasPrivateKey = false;
-			this.keyString = this.publicKey.X.ToString() + "," + this.publicKey.Y.ToString();
-		}
+            this.publicKeyBase64 = Convert.ToBase64String(this.publicKey);
+        }
+
+        /// <summary>
+        /// If the key contains a private key.
+        /// </summary>
+        public bool HasPrivateKey => this.hasPrivateKey;
 
 		/// <summary>
-		/// If the key contains a private key.
+		/// Creates a new endpoint given a private key.
 		/// </summary>
-		public bool HasPrivateKey => this.hasPrivateKey;
-
-		/// <summary>
-		/// Creates a new endpoint.
-		/// </summary>
-		/// <param name="D">Private key.</param>
+        /// <param name="Secret">Secret.</param>
 		/// <returns>Endpoint object.</returns>
-		public abstract EcAes256 Create(BigInteger D);
+		public abstract EcAes256 CreatePrivate(byte[] Secret);
 
 		/// <summary>
-		/// Creates a new endpoint.
+		/// Creates a new endpoint given a public key.
 		/// </summary>
-		/// <param name="X">X-coordinate of remote public key.</param>
-		/// <param name="Y">Y-coordinate of remote public key.</param>
+		/// <param name="PublicKey">Remote public key.</param>
 		/// <returns>Endpoint object.</returns>
-		public abstract EcAes256 Create(byte[] X, byte[] Y);
+		public abstract EcAes256 CreatePublic(byte[] PublicKey);
 
 		/// <summary>
 		/// Parses endpoint information from an XML element.
@@ -82,27 +80,22 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		/// <returns>Parsed key information, if possible, null if XML is not well-defined.</returns>
 		public override IE2eEndpoint Parse(XmlElement Xml)
 		{
-			byte[] X = null;
-			byte[] Y = null;
+			byte[] PublicKey = null;
 
 			foreach (XmlAttribute Attr in Xml.Attributes)
 			{
 				switch (Attr.Name)
 				{
-					case "x":
-						X = Convert.FromBase64String(Attr.Value);
-						break;
-
-					case "y":
-						Y = Convert.FromBase64String(Attr.Value);
+					case "pub":
+						PublicKey = Convert.FromBase64String(Attr.Value);
 						break;
 				}
 			}
 
-			if (X != null && Y != null)
-				return this.Create(X, Y);
-			else
+            if (PublicKey is null)
 				return null;
+            else
+				return this.CreatePublic(PublicKey);
 		}
 
 		/// <summary>
@@ -113,36 +106,17 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		{
 			Xml.Append('<');
 			Xml.Append(this.LocalName);
-			Xml.Append(" x=\"");
-			Xml.Append(Convert.ToBase64String(EcAes256.ToNetwork(this.publicKey.X)));
+			Xml.Append(" pub=\"");
+			Xml.Append(this.publicKeyBase64);
 			Xml.Append("\" xmlns=\"");
 			Xml.Append(this.Namespace);
-			Xml.Append("\" y=\"");
-			Xml.Append(Convert.ToBase64String(EcAes256.ToNetwork(this.publicKey.Y)));
 			Xml.Append("\"/>");
 		}
 
 		/// <summary>
 		/// Remote public key.
 		/// </summary>
-		public PointOnCurve PublicKey => this.publicKey;
-
-		/// <summary>
-		/// Converts a <see cref="BigInteger"/> from network binary representation.
-		/// </summary>
-		/// <param name="Bin">Network binary representation</param>
-		/// <returns><see cref="BigInteger"/> representation</returns>
-		public static BigInteger FromNetwork(byte[] Bin)
-		{
-			int c = Bin.Length;
-			bool ExtraZero = Bin[0] >= 0x80;
-			byte[] Bin2 = new byte[ExtraZero ? c + 1 : c];
-
-			Array.Copy(Bin, 0, Bin2, ExtraZero ? 1 : 0, c);
-			Array.Reverse(Bin2);
-
-			return new BigInteger(Bin2);
-		}
+		public byte[] PublicKey => this.publicKey;
 
 		/// <summary>
 		/// Name of elliptic curve
@@ -152,19 +126,19 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		/// <summary>
 		/// Elliptic Curve
 		/// </summary>
-		public CurvePrimeField Curve => this.curve;
+		public EllipticCurve Curve => this.curve;
 
 		/// <summary>
 		/// Previous Elliptic Curve
 		/// </summary>
-		public CurvePrimeField PrevCurve => (this.Previous as EcAes256)?.Curve;
+		public EllipticCurve PrevCurve => (this.Previous as EcAes256)?.Curve;
 
 		/// <summary>
 		/// Shared secret, for underlying AES cipher.
 		/// </summary>
 		public static byte[] GetSharedKey(EcAes256 LocalKey, EcAes256 RemoteKey)
 		{
-			string Key = LocalKey.keyString + ";" + RemoteKey.keyString;
+			string Key = LocalKey.publicKeyBase64 + ";" + RemoteKey.publicKeyBase64;
 
 			if (sharedSecrets.TryGetValue(Key, out byte[] SharedKey))
 				return SharedKey;
@@ -337,24 +311,6 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		}
 
 		/// <summary>
-		/// Converts a <see cref="BigInteger"/> to network binary representation.
-		/// </summary>
-		/// <param name="n"><see cref="BigInteger"/> representation</param>
-		/// <returns>Network binary representation</returns>
-		public static byte[] ToNetwork(BigInteger n)
-		{
-			byte[] Bin = n.ToByteArray();
-			int c = Bin.Length - 1;
-
-			if (Bin[c] == 0)
-				Array.Resize<byte>(ref Bin, c);
-
-			Array.Reverse(Bin);
-
-			return Bin;
-		}
-
-		/// <summary>
 		/// If the scheme can decrypt a given XML element.
 		/// </summary>
 		/// <param name="AesElement">XML element with encrypted data.</param>
@@ -441,26 +397,13 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		/// Verifies a signature.
 		/// </summary>
 		/// <param name="Data">Data that is signed.</param>
-		/// <param name="X">Public key (X-coordinate)</param>
-		/// <param name="Y">Public key (Y-coordinate)</param>
-		/// <param name="Signature">Digital signature.</param>
-		/// <returns>If signature is valid.</returns>
-		public bool Verify(byte[] Data, byte[] X, byte[] Y, byte[] Signature)
-		{
-			return this.Verify(Data, new PointOnCurve(FromNetwork(X), FromNetwork(Y)), Signature);
-		}
-
-		/// <summary>
-		/// Verifies a signature.
-		/// </summary>
-		/// <param name="Data">Data that is signed.</param>
 		/// <param name="PublicKey">Public key</param>
 		/// <param name="Signature">Digital signature.</param>
 		/// <returns>If signature is valid.</returns>
-		public bool Verify(byte[] Data, PointOnCurve PublicKey, byte[] Signature)
+		public bool Verify(byte[] Data, byte[] PublicKey, byte[] Signature)
 		{
-			return this.curve.Verify(Data, PublicKey, Signature);
-		}
+            return this.curve.Verify(Data, PublicKey, Signature);
+        }
 
         /// <summary>
         /// Verifies a signature.
@@ -480,8 +423,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		{
 			return obj is EcAes256 EcAes256 &&
 				this.curve.CurveName.Equals(EcAes256.curve.CurveName) &&
-				this.publicKey.X.Equals(EcAes256.publicKey.X) &&
-				this.publicKey.Y.Equals(EcAes256.publicKey.Y);
+				this.publicKeyBase64.Equals(EcAes256.publicKeyBase64);
 		}
 
 		/// <summary>
@@ -490,8 +432,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		public override int GetHashCode()
 		{
 			int Result = this.curve.CurveName.GetHashCode();
-			Result ^= Result << 5 ^ this.publicKey.X.GetHashCode();
-			Result ^= Result << 5 ^ this.publicKey.Y.GetHashCode();
+			Result ^= Result << 5 ^ this.publicKeyBase64.GetHashCode();
 
 			return Result;
 		}

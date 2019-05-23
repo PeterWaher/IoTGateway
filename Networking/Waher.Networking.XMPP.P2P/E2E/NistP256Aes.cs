@@ -25,15 +25,14 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		{
 		}
 
-		/// <summary>
-		/// NIST P-256 Curve
-		/// </summary>
-		/// <param name="X">X-coordinate of remote public key.</param>
-		/// <param name="Y">Y-coordinate of remote public key.</param>
-		public NistP256Aes(byte[] X, byte[] Y)
-			: base(X, Y, new NistP256())
-		{
-		}
+        /// <summary>
+        /// NIST P-256 Curve
+        /// </summary>
+        /// <param name="PublicKey">Remote public key.</param>
+        public NistP256Aes(byte[] PublicKey)
+            : base(PublicKey, new NistP256())
+        {
+        }
 
 		/// <summary>
 		/// Local name of the E2E encryption scheme
@@ -55,25 +54,24 @@ namespace Waher.Networking.XMPP.P2P.E2E
 			return new NistP256Aes();
 		}
 
-		/// <summary>
-		/// Creates a new endpoint.
-		/// </summary>
-		/// <param name="D">Private key.</param>
-		/// <returns>Endpoint object.</returns>
-		public override EcAes256 Create(BigInteger D)
-		{
-			return new NistP256Aes(new NistP256(D));
-		}
+        /// <summary>
+        /// Creates a new endpoint given a private key.
+        /// </summary>
+        /// <param name="Secret">Secret.</param>
+        /// <returns>Endpoint object.</returns>
+        public override EcAes256 CreatePrivate(byte[] Secret)
+        {
+            return new NistP256Aes(new NistP256(Secret));
+        }
 
-		/// <summary>
-		/// Creates a new endpoint.
-		/// </summary>
-		/// <param name="X">X-coordinate of remote public key.</param>
-		/// <param name="Y">Y-coordinate of remote public key.</param>
-		/// <returns>Endpoint object.</returns>
-		public override EcAes256 Create(byte[] X, byte[] Y)
-		{
-			return new NistP256Aes(X, Y);
-		}
-	}
+        /// <summary>
+        /// Creates a new endpoint given a public key.
+        /// </summary>
+        /// <param name="PublicKey">Remote public key.</param>
+        /// <returns>Endpoint object.</returns>
+        public override EcAes256 CreatePublic(byte[] PublicKey)
+        {
+            return new NistP256Aes(PublicKey);
+        }
+    }
 }

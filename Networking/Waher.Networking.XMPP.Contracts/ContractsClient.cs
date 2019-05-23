@@ -91,7 +91,7 @@ namespace Waher.Networking.XMPP.Contracts
 			return this.localEndpoint;
 		}
 
-		private BigInteger GetKey(CurvePrimeField Curve)
+		private BigInteger GetKey(PrimeFieldCurve Curve)
 		{
 			string s = Curve.Export();
 			XmlDocument Doc = new XmlDocument();

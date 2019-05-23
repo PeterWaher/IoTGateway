@@ -83,7 +83,7 @@ namespace Waher.Client.WPF
 				typeof(Script.Persistence.Functions.FindObjects).Assembly,
 				typeof(Script.Statistics.Functions.Beta).Assembly,
 				typeof(Security.IUser).Assembly,
-				typeof(Security.EllipticCurves.CurvePrimeField).Assembly);
+				typeof(Security.EllipticCurves.PrimeFieldCurve).Assembly);
 
 			appDataFolder = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
 			if (!appDataFolder.EndsWith(new string(Path.DirectorySeparatorChar, 1)))

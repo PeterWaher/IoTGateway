@@ -26,9 +26,8 @@ namespace Waher.Security.EllipticCurves
         /// https://tools.ietf.org/html/rfc8032
         /// </summary>
         public Edwards448()
-            : base(p0, new PointOnCurve(BasePointX, BasePointY), d0, n0, Cofactor: 4)
+            : this(null)
         {
-            this.Init();
         }
 
         /// <summary>
@@ -39,11 +38,6 @@ namespace Waher.Security.EllipticCurves
         /// <param name="Secret">Secret.</param>
         public Edwards448(byte[] Secret)
             : base(p0, new PointOnCurve(BasePointX, BasePointY), d0, n0, Cofactor: 4, Secret)
-        {
-            this.Init();
-        }
-
-        private void Init()
         {
             this.shake256_114 = new SHAKE256(114 << 3);
         }
@@ -90,7 +84,7 @@ namespace Waher.Security.EllipticCurves
         /// <returns>Signature.</returns>
         public override byte[] Sign(byte[] Data)
         {
-            return EdDSA.Sign(Data, this.privateKey, 
+            return EdDSA.Sign(Data, this.PrivateKey, 
                 Bin => this.shake256_114.ComputeVariable(Bin),
                 this.orderBits, this);
         }

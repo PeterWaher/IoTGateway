@@ -42,11 +42,11 @@ namespace Waher.Security.EllipticCurves
             byte[] Bin = new byte[ScalarBits];
             Array.Copy(PrivateKey, 0, Bin, 0, ScalarBytes);
 
-            BigInteger a = EllipticCurve.ToInt(PrivateKey);
+            BigInteger a = EllipticCurve.ToInt(Bin);
 
             Console.Out.WriteLine("a: " + a.ToString());
 
-            PointOnCurve P = Curve.ScalarMultiplication(PrivateKey, Curve.BasePoint, true);
+            PointOnCurve P = Curve.ScalarMultiplication(Bin, Curve.BasePoint, true);
 
             Console.Out.WriteLine("P: " + P.ToString());
             Console.Out.WriteLine("Public Key: " + Curve.PublicKey.ToString());

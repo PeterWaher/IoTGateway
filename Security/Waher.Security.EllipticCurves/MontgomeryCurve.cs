@@ -124,12 +124,9 @@ namespace Waher.Security.EllipticCurves
         /// <param name="A24">(A-2)/4</param>
         /// <param name="p">Prime</param>
         /// <param name="Bits">Number of bits</param>
-        /// <param name="LsbMask">Mask for Least Significant Byte.</param>
-        /// <param name="MsbMask">Mask for Most Significant Byte.</param>
-        /// <param name="MsbBit">Most Significat Bit to set.</param>
         /// <returns><paramref name="N"/>*<paramref name="U"/></returns>
         public static BigInteger XFunction(byte[] N, BigInteger U,
-            BigInteger A24, BigInteger p, int Bits, byte LsbMask, byte MsbMask, byte MsbBit)
+            BigInteger A24, BigInteger p, int Bits)
         {
             BigInteger x1 = U;
             BigInteger x2 = BigInteger.One;
@@ -143,10 +140,6 @@ namespace Waher.Security.EllipticCurves
             kt = (Bits + 7) >> 3;
             if (N.Length < kt)
                 Array.Resize<byte>(ref N, kt);
-
-            //N[0] &= LsbMask;
-            //N[--kt] &= MsbMask;
-            //N[kt] |= MsbBit;
 
             while (--Bits >= 0)
             {
@@ -279,11 +272,12 @@ namespace Waher.Security.EllipticCurves
         {
             get
             {
-                BigInteger V = this.publicKeyPoint.Y;
+                PointOnCurve PublicKey = base.PublicKeyPoint;
+                BigInteger V = PublicKey.Y;
 
                 if (V.IsZero)
                 {
-                    BigInteger U = this.publicKeyPoint.X;
+                    BigInteger U = PublicKey.X;
                     BigInteger U2 = this.modP.Multiply(U, U);
                     BigInteger U3 = this.modP.Multiply(U, U2);
                     BigInteger V2 = BigInteger.Remainder(U3 + this.modP.Multiply(this.A, U2) + U, this.Prime);
@@ -296,10 +290,12 @@ namespace Waher.Security.EllipticCurves
                     if (V1 < V)
                         V = V1;
 
-                    this.publicKeyPoint.Y = V;
+                    PublicKey.Y = V;
+
+                    this.PublicKeyPoint = PublicKey;
                 }
 
-                return this.publicKeyPoint;
+                return PublicKey;
             }
         }
 

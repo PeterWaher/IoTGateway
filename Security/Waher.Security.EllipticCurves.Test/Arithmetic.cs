@@ -225,7 +225,6 @@ namespace Waher.Security.EllipticCurves.Test
             Assert.AreEqual(N, N0);
 
             A = Hashes.StringToBinary("e6db6867583030db3594c1a424b15f7c726624ec26b3353b10a903a6d0ab1c4c");
-            A[31] &= 127;
             BigInteger U0 = new BigInteger(A);
             BigInteger U = BigInteger.Parse("34426434033919594451155107781188821651316167215306631574996226621102155684838");
             Assert.AreEqual(U, U0);

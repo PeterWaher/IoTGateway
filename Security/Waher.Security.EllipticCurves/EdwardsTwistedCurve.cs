@@ -10,7 +10,6 @@ namespace Waher.Security.EllipticCurves
     public abstract class EdwardsTwistedCurve : EdwardsCurveBase
     {
         private BigInteger p58;
-        private BigInteger p34;
         private BigInteger twoP14;
 
         /// <summary>
@@ -23,9 +22,8 @@ namespace Waher.Security.EllipticCurves
         /// <param name="Cofactor">Cofactor of curve.</param>
         public EdwardsTwistedCurve(BigInteger Prime, PointOnCurve BasePoint,
             BigInteger d, BigInteger Order, int Cofactor)
-            : base(Prime, BasePoint, d, Order, Cofactor)
+            : this(Prime, BasePoint, d, Order, Cofactor, null)
         {
-            this.Init();
         }
 
         /// <summary>
@@ -41,30 +39,9 @@ namespace Waher.Security.EllipticCurves
             BigInteger Order, int Cofactor, byte[] Secret)
             : base(Prime, BasePoint, d, Order, Cofactor, Secret)
         {
-            this.Init();
-        }
-
-        private void Init()
-        {
             this.p58 = (this.p - 5) / 8;
-            this.p34 = (this.p - 3) / 4;
             this.twoP14 = BigInteger.ModPow(Two, (this.p - 1) / 4, this.p);
         }
-
-        /// <summary>
-        /// (p-5)/8
-        /// </summary>
-        public BigInteger P58 => this.p58;
-
-        /// <summary>
-        /// (p-3)/4
-        /// </summary>
-        public BigInteger P34 => this.p34;
-
-        /// <summary>
-        /// 2^((p-1)/4) mod p
-        /// </summary>
-        public BigInteger TwoP14 => this.twoP14;
 
         /// <summary>
         /// Adds <paramref name="Q"/> to <paramref name="P"/>.
@@ -143,7 +120,7 @@ namespace Waher.Security.EllipticCurves
             BigInteger v4 = this.modP.Multiply(v2, v2);
             BigInteger v7 = this.modP.Multiply(v3, v4);
             BigInteger x = this.modP.Multiply(this.modP.Multiply(u, v3),
-                BigInteger.ModPow(this.modP.Multiply(u, v7), this.P58, this.Prime));
+                BigInteger.ModPow(this.modP.Multiply(u, v7), this.p58, this.Prime));
 
             BigInteger x2 = this.modP.Multiply(x, x);
             BigInteger Test = this.modP.Multiply(v, x2);
@@ -153,7 +130,7 @@ namespace Waher.Security.EllipticCurves
             if (Test != u)
             {
                 if (Test == this.Prime - u)
-                    x = this.modP.Multiply(x, this.TwoP14);
+                    x = this.modP.Multiply(x, this.twoP14);
                 else
                     throw new ArgumentException("Not a valid point.", nameof(Y));
             }

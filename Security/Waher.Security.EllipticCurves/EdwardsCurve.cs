@@ -9,9 +9,7 @@ namespace Waher.Security.EllipticCurves
     /// </summary>
     public abstract class EdwardsCurve : EdwardsCurveBase
 	{
-        private BigInteger p58;
         private BigInteger p34;
-        private BigInteger twoP14;
 
         /// <summary>
         /// Base class of Edwards curves (x²+y²=1+dx²y²) over a prime field.
@@ -23,9 +21,8 @@ namespace Waher.Security.EllipticCurves
         /// <param name="Cofactor">Cofactor of curve.</param>
         public EdwardsCurve(BigInteger Prime, PointOnCurve BasePoint, BigInteger d,
             BigInteger Order, int Cofactor)
-			: base(Prime, BasePoint, d, Order, Cofactor)
+			: this(Prime, BasePoint, d, Order, Cofactor, null)
 		{
-            this.Init();
         }
 
         /// <summary>
@@ -41,14 +38,7 @@ namespace Waher.Security.EllipticCurves
             BigInteger Order, int Cofactor, byte[] Secret)
 			: base(Prime, BasePoint, d, Order, Cofactor, Secret)
 		{
-            this.Init();
-        }
-
-        private void Init()
-        {
-            this.p58 = (this.p - 5) / 8;
             this.p34 = (this.p - 3) / 4;
-            this.twoP14 = BigInteger.ModPow(Two, (this.p - 1) / 4, this.p);
         }
 
         /// <summary>
@@ -58,21 +48,6 @@ namespace Waher.Security.EllipticCurves
         {
             get;
         }
-
-        /// <summary>
-        /// (p-5)/8
-        /// </summary>
-        public BigInteger P58 => this.p58;
-
-        /// <summary>
-        /// (p-3)/4
-        /// </summary>
-        public BigInteger P34 => this.p34;
-
-        /// <summary>
-        /// 2^((p-1)/4) mod p
-        /// </summary>
-        public BigInteger TwoP14 => this.twoP14;
 
         /// <summary>
         /// Neutral point.
@@ -186,7 +161,7 @@ namespace Waher.Security.EllipticCurves
             BigInteger u3 = this.modP.Multiply(u, u2);
             BigInteger u5 = this.modP.Multiply(u2, u3);
             BigInteger x = this.modP.Multiply(this.modP.Multiply(u3, v),
-                BigInteger.ModPow(this.modP.Multiply(u5, v3), this.P34, this.p));
+                BigInteger.ModPow(this.modP.Multiply(u5, v3), this.p34, this.p));
 
             BigInteger x2 = this.modP.Multiply(x, x);
             BigInteger Test = this.modP.Multiply(v, x2);

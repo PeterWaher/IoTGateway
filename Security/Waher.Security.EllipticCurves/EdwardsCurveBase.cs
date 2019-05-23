@@ -29,9 +29,8 @@ namespace Waher.Security.EllipticCurves
         /// <param name="Cofactor">Cofactor of curve.</param>
         public EdwardsCurveBase(BigInteger Prime, PointOnCurve BasePoint,
             BigInteger d, BigInteger Order, int Cofactor)
-            : base(Prime, BasePoint, Order, Cofactor)
+            : this(Prime, BasePoint, d, Order, Cofactor, null)
         {
-            this.Init(d);
         }
 
         /// <summary>
@@ -46,11 +45,6 @@ namespace Waher.Security.EllipticCurves
         public EdwardsCurveBase(BigInteger Prime, PointOnCurve BasePoint, BigInteger d,
             BigInteger Order, int Cofactor, byte[] Secret)
             : base(Prime, BasePoint, Order, Cofactor, Secret)
-        {
-            this.Init(d);
-        }
-
-        private void Init(BigInteger d)
         {
             this.d = d;
             this.d2 = BigInteger.Remainder(d << 1, this.p);

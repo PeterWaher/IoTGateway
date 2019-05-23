@@ -61,22 +61,10 @@ namespace Waher.Security.EllipticCurves
         /// </summary>
         protected readonly byte msbOrderMask;
 
-        /// <summary>
-        /// Encoded public key
-        /// </summary>
-        protected byte[] publicKey;
-
-        /// <summary>
-        /// Public key, as a point on the elliptic curve.
-        /// </summary>
-        protected PointOnCurve publicKeyPoint;
-
-        /// <summary>
-        /// Private key
-        /// </summary>
-        protected byte[] privateKey;
-
         private byte[] secret;
+        private byte[] privateKey;
+        private byte[] publicKey;
+        private PointOnCurve publicKeyPoint;
 
         /// <summary>
         /// Abstract base class for elliptic curves.
@@ -102,6 +90,9 @@ namespace Waher.Security.EllipticCurves
             this.g = BasePoint;
             this.n = Order;
             this.cofactor = Cofactor;
+            this.secret = Secret;
+            this.privateKey = null;
+            this.publicKey = null;
 
             this.orderBits = ModulusP.CalcBits(this.n);
             this.orderBytes = (this.orderBits + 7) >> 3;
@@ -115,11 +106,64 @@ namespace Waher.Security.EllipticCurves
             }
             else
                 this.msbOrderMask >>= MaskBits;
+        }
 
-            if (Secret is null)
-                Secret = this.GenerateSecret();
+        /// <summary>
+        /// Method initiazing the elliptic curve properties.
+        /// </summary>
+        protected virtual void Init()
+        {
+            if (this.secret is null)
+                this.secret = this.GenerateSecret();
 
-            this.SetPrivateKey(Secret);
+            this.SetPrivateKey(this.secret);
+        }
+
+        /// <summary>
+        /// Private key
+        /// </summary>
+        protected byte[] PrivateKey
+        {
+            get
+            {
+                if (this.privateKey is null)
+                    this.Init();
+
+                return this.privateKey;
+            }
+        }
+
+        /// <summary>
+        /// Encoded public key
+        /// </summary>
+        public virtual byte[] PublicKey
+        {
+            get
+            {
+                if (this.publicKey is null)
+                    this.Init();
+
+                return this.publicKey;
+            }
+        }
+
+        /// <summary>
+        /// Public key, as a point on the elliptic curve.
+        /// </summary>
+        public virtual PointOnCurve PublicKeyPoint
+        {
+            get
+            {
+                if (this.publicKey is null)
+                    this.Init();
+
+                return this.publicKeyPoint;
+            }
+
+            internal set
+            {
+                this.publicKeyPoint = value;
+            }
         }
 
         /// <summary>
@@ -156,22 +200,6 @@ namespace Waher.Security.EllipticCurves
         public PointOnCurve BasePoint => this.g;
 
         /// <summary>
-        /// Encoded Public key.
-        /// </summary>
-        public virtual byte[] PublicKey
-        {
-            get => this.publicKey;
-        }
-
-        /// <summary>
-        /// Public key, as a point on the curve.
-        /// </summary>
-        public virtual PointOnCurve PublicKeyPoint
-        {
-            get => this.publicKeyPoint;
-        }
-
-        /// <summary>
         /// Generates a new secret.
         /// </summary>
         /// <returns>Generated secret.</returns>
@@ -183,7 +211,7 @@ namespace Waher.Security.EllipticCurves
         /// <param name="Secret">Secret</param>
         public virtual void SetPrivateKey(byte[] Secret)
         {
-            byte[] PrivKey = this.CalculatePrivateKey(this.secret);
+            byte[] PrivKey = this.CalculatePrivateKey(Secret);
             PointOnCurve P = this.ScalarMultiplication(PrivKey, this.g, true);
 
             this.publicKey = this.Encode(P);
@@ -338,7 +366,7 @@ namespace Waher.Security.EllipticCurves
         /// <returns>Shared secret.</returns>
         public virtual byte[] GetSharedKey(byte[] RemotePublicKey, HashFunction HashFunction)
         {
-            return ECDH.GetSharedKey(this.privateKey, RemotePublicKey, HashFunction, this);
+            return ECDH.GetSharedKey(this.PrivateKey, RemotePublicKey, HashFunction, this);
         }
 
         /// <summary>

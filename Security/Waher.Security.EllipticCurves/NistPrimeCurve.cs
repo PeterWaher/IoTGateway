@@ -76,7 +76,7 @@ namespace Waher.Security.EllipticCurves
         /// <returns>Signature.</returns>
         public override byte[] Sign(byte[] Data)
         {
-            return ECDSA.Sign(Data, this.privateKey, 
+            return ECDSA.Sign(Data, this.PrivateKey, 
                 Bin => Hashes.ComputeHash(this.HashFunction, Bin),
                 this.orderBytes, this.msbOrderMask, this);
         }

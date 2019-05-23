@@ -96,7 +96,7 @@ namespace Waher.Security.EllipticCurves
         /// <returns><paramref name="N"/>*<paramref name="U"/></returns>
         public override BigInteger ScalarMultiplication(byte[] N, BigInteger U)
         {
-            return XFunction(N, U, A24, this.p, 255, 0xf8, 0x3f, 0x40);
+            return XFunction(N, U, A24, this.p, 255);
         }
 
         /// <summary>
@@ -106,10 +106,10 @@ namespace Waher.Security.EllipticCurves
         /// <returns>Private key</returns>
         public override byte[] CalculatePrivateKey(byte[] Secret)
         {
-            byte[] Bin = Hashes.ComputeSHA256Hash(Secret);
+            byte[] Bin = Secret;
 
             if (Bin.Length != 32)
-                Array.Resize<byte>(ref Bin, 32);
+                Bin = Hashes.ComputeSHA256Hash(Secret);
 
             Bin[0] &= 0xf8;
             Bin[31] &= 0x3f;
@@ -127,7 +127,7 @@ namespace Waher.Security.EllipticCurves
             PointOnCurve PublicKeyUV = this.PublicKeyPoint;
             PointOnCurve PublicKeyXY = this.ToXY(PublicKeyUV);
 
-            BigInteger PrivateKey = ToInt(this.privateKey);
+            BigInteger PrivateKey = ToInt(this.PrivateKey);
             BigInteger PrivateKey2 = BigInteger.Remainder(this.Order - PrivateKey, this.Order);
             if (PrivateKey2.Sign < 0)
                 PrivateKey2 += this.Order;
@@ -138,7 +138,7 @@ namespace Waher.Security.EllipticCurves
             if (PublicKeyXY.Y.Equals(PublicKeyXY2.Y))
                 return Candidate;
 
-            Candidate = new Edwards25519(this.privateKey);
+            Candidate = new Edwards25519(this.PrivateKey);
             PublicKeyXY2 = Candidate.PublicKeyPoint;
 
             if (PublicKeyXY.Y.Equals(PublicKeyXY2.Y))

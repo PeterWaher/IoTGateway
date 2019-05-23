@@ -91,6 +91,17 @@ namespace Waher.Security.EllipticCurves
         /// <param name="N">Scalar</param>
         /// <param name="U">U-coordinate of point</param>
         /// <returns><paramref name="N"/>*<paramref name="U"/></returns>
+        public BigInteger ScalarMultiplication(BigInteger N, BigInteger U)
+        {
+            return this.ScalarMultiplication(N.ToByteArray(), U);
+        }
+
+        /// <summary>
+        /// Performs the scalar multiplication of <paramref name="N"/>*<paramref name="U"/>.
+        /// </summary>
+        /// <param name="N">Scalar</param>
+        /// <param name="U">U-coordinate of point</param>
+        /// <returns><paramref name="N"/>*<paramref name="U"/></returns>
         public abstract BigInteger ScalarMultiplication(byte[] N, BigInteger U);
 
         /// <summary>

@@ -17,12 +17,12 @@ namespace Waher.Security.EllipticCurves.Test
 
             for (i = 0; i < 1000; i++)
             {
-                BigInteger k = C.NextRandomNumber();
-                BigInteger kInv = C.Invert(k);
+                BigInteger k = EllipticCurve.ToInt(C.GenerateSecret());
+                BigInteger kInv = C.ModulusP.Invert(k);
                 Assert.IsTrue(kInv >= BigInteger.One);
                 Assert.IsTrue(kInv < C.Prime);
 
-                BigInteger Mul = C.Multiply(k, kInv);
+                BigInteger Mul = C.ModulusP.Multiply(k, kInv);
 
                 Assert.IsTrue(Mul.IsOne);
             }
@@ -31,13 +31,13 @@ namespace Waher.Security.EllipticCurves.Test
         [TestMethod]
         public void Test_02_Negate()
         {
-            PrimeFieldCurve C = new NistP256();
+            WeierstrassCurve C = new NistP256();
             int i;
 
             for (i = 0; i < 100; i++)
             {
-                BigInteger k = C.NextRandomNumber();
-                PointOnCurve P = C.ScalarMultiplication(k, C.PublicKey);
+                byte[] k = C.GenerateSecret();
+                PointOnCurve P = C.ScalarMultiplication(k, C.PublicKeyPoint, true);
                 PointOnCurve Q = P;
                 C.Negate(ref Q);
                 C.AddTo(ref P, Q);
@@ -49,21 +49,21 @@ namespace Waher.Security.EllipticCurves.Test
         public void Test_03_Addition()
         {
             PrimeFieldCurve C = new NistP256();
-            BigInteger k1, k2, k3;
+            byte[] k1, k2, k3;
             PointOnCurve P1, P2, P3;
             string s1, s2, s3;
             int i;
 
             for (i = 0; i < 100; i++)
             {
-                k1 = C.NextRandomNumber();
-                P1 = C.ScalarMultiplication(k1, C.PublicKey);
+                k1 = C.GenerateSecret();
+                P1 = C.ScalarMultiplication(k1, C.PublicKeyPoint, true);
                 s1 = P1.ToString();
 
                 do
                 {
-                    k2 = C.NextRandomNumber();
-                    P2 = C.ScalarMultiplication(k2, C.PublicKey);
+                    k2 = C.GenerateSecret();
+                    P2 = C.ScalarMultiplication(k2, C.PublicKeyPoint, true);
                     s2 = P2.ToString();
                 }
                 while (k2 == k1);
@@ -73,8 +73,8 @@ namespace Waher.Security.EllipticCurves.Test
 
                 do
                 {
-                    k3 = C.NextRandomNumber();
-                    P3 = C.ScalarMultiplication(k3, C.PublicKey);
+                    k3 = C.GenerateSecret();
+                    P3 = C.ScalarMultiplication(k3, C.PublicKeyPoint, true);
                     s3 = P3.ToString();
                 }
                 while (k3 == k1 || k3 == k2);
@@ -119,10 +119,10 @@ namespace Waher.Security.EllipticCurves.Test
             int k2 = Rnd.Next(1000, 2000);
             int k3 = Rnd.Next(1000, 2000);
 
-            PointOnCurve P1 = C.ScalarMultiplication(k1, C.PublicKey);
-            PointOnCurve P2 = C.ScalarMultiplication(k2, C.PublicKey);
-            PointOnCurve P3 = C.ScalarMultiplication(k3, C.PublicKey);
-            PointOnCurve P = C.ScalarMultiplication(k1 + k2 + k3, C.PublicKey);
+            PointOnCurve P1 = C.ScalarMultiplication(k1, C.PublicKeyPoint, true);
+            PointOnCurve P2 = C.ScalarMultiplication(k2, C.PublicKeyPoint, true);
+            PointOnCurve P3 = C.ScalarMultiplication(k3, C.PublicKeyPoint, true);
+            PointOnCurve P = C.ScalarMultiplication(k1 + k2 + k3, C.PublicKeyPoint, true);
             C.AddTo(ref P1, P2);
             C.AddTo(ref P1, P3);
 
@@ -136,7 +136,7 @@ namespace Waher.Security.EllipticCurves.Test
             k1 += k3;
 
             while (k1-- > 0)
-                C.AddTo(ref P2, C.PublicKey);
+                C.AddTo(ref P2, C.PublicKeyPoint);
 
             P2.Normalize(C);
 
@@ -307,28 +307,16 @@ namespace Waher.Security.EllipticCurves.Test
         public void Test_15_X25519_ECDH()
         {
             byte[] A = Hashes.StringToBinary("77076d0a7318a57d3c16c17251b26645df4c2f87ebc0992ab177fba51db92c2a");
-            A[0] &= 248;
-            A[31] &= 127;
-            A[31] |= 64;
-            BigInteger PrivateKey = new BigInteger(A);
-            Curve25519 Alice = new Curve25519(PrivateKey);
+            Curve25519 Alice = new Curve25519(A);
 
-            A = Hashes.StringToBinary("8520f0098930a754748b7ddcb43ef75a0dbf3a0d26381af4eba4a98eaa9b4e6a");
-            BigInteger PublicKey = new BigInteger(A);
-
-            Assert.AreEqual(PublicKey, Alice.PublicKey.X);
+            Assert.AreEqual("8520f0098930a754748b7ddcb43ef75a0dbf3a0d26381af4eba4a98eaa9b4e6a",
+                Hashes.BinaryToString(Alice.PublicKey));
 
             A = Hashes.StringToBinary("5dab087e624a8a4b79e17f8b83800ee66f3bb1292618b6fd1c2f8b27ff88e0eb");
-            A[0] &= 248;
-            A[31] &= 127;
-            A[31] |= 64;
-            PrivateKey = new BigInteger(A);
-            Curve25519 Bob = new Curve25519(PrivateKey);
+            Curve25519 Bob = new Curve25519(A);
 
-            A = Hashes.StringToBinary("de9edb7d7b7dc1b4d35b61c2ece435373f8343c85b78674dadfc7e146f882b4f");
-            PublicKey = new BigInteger(A);
-
-            Assert.AreEqual(PublicKey, Bob.PublicKey.X);
+            Assert.AreEqual("de9edb7d7b7dc1b4d35b61c2ece435373f8343c85b78674dadfc7e146f882b4f",
+                Hashes.BinaryToString(Bob.PublicKey));
 
             byte[] Key1 = Alice.GetSharedKey(Bob.PublicKey, Hashes.ComputeSHA256Hash);
             byte[] Key2 = Bob.GetSharedKey(Alice.PublicKey, Hashes.ComputeSHA256Hash);
@@ -444,28 +432,16 @@ namespace Waher.Security.EllipticCurves.Test
         public void Test_21_X448_ECDH()
         {
             byte[] A = Hashes.StringToBinary("9a8f4925d1519f5775cf46b04b5800d4ee9ee8bae8bc5565d498c28dd9c9baf574a9419744897391006382a6f127ab1d9ac2d8c0a598726b");
-            Array.Resize<byte>(ref A, 57);
-            A[0] &= 252;
-            A[55] |= 128;
-            BigInteger PrivateKey = new BigInteger(A);
-            Curve448 Alice = new Curve448(PrivateKey);
+            Curve448 Alice = new Curve448(A);
 
-            A = Hashes.StringToBinary("9b08f7cc31b7e3e67d22d5aea121074a273bd2b83de09c63faa73d2c22c5d9bbc836647241d953d40c5b12da88120d53177f80e532c41fa000");
-            BigInteger PublicKey = new BigInteger(A);
-
-            Assert.AreEqual(PublicKey, Alice.PublicKey.X);
+            Assert.AreEqual("9b08f7cc31b7e3e67d22d5aea121074a273bd2b83de09c63faa73d2c22c5d9bbc836647241d953d40c5b12da88120d53177f80e532c41fa000", 
+                Hashes.BinaryToString(Alice.PublicKey));
 
             A = Hashes.StringToBinary("1c306a7ac2a0e2e0990b294470cba339e6453772b075811d8fad0d1d6927c120bb5ee8972b0d3e21374c9c921b09d1b0366f10b65173992d");
-            Array.Resize<byte>(ref A, 57);
-            A[0] &= 252;
-            A[55] |= 128;
-            PrivateKey = new BigInteger(A);
-            Curve448 Bob = new Curve448(PrivateKey);
+            Curve448 Bob = new Curve448(A);
 
-            A = Hashes.StringToBinary("3eb7a829b0cd20f5bcfc0b599b6feccf6da4627107bdb0d4f345b43027d8b972fc3e34fb4232a13ca706dcb57aec3dae07bdc1c67bf33609");
-            PublicKey = new BigInteger(A);
-
-            Assert.AreEqual(PublicKey, Bob.PublicKey.X);
+            Assert.AreEqual("3eb7a829b0cd20f5bcfc0b599b6feccf6da4627107bdb0d4f345b43027d8b972fc3e34fb4232a13ca706dcb57aec3dae07bdc1c67bf33609", 
+                Hashes.BinaryToString(Bob.PublicKey));
 
             byte[] Key1 = Alice.GetSharedKey(Bob.PublicKey, Hashes.ComputeSHA256Hash);
             byte[] Key2 = Bob.GetSharedKey(Alice.PublicKey, Hashes.ComputeSHA256Hash);
@@ -491,7 +467,7 @@ namespace Waher.Security.EllipticCurves.Test
         }
 
         protected void EdwardsTwinTest<CurveType>(MontgomeryCurve C1)
-            where CurveType : EdwardsCurve
+            where CurveType : EdwardsCurveBase
         {
             int Ok = 0;
             int Error = 0;
@@ -507,9 +483,9 @@ namespace Waher.Security.EllipticCurves.Test
 
                     Assert.IsNotNull(C2);
 
-                    PointOnCurve P1 = C1.PublicKey;
+                    PointOnCurve P1 = C1.PublicKeyPoint;
                     PointOnCurve P1_2 = C1.ToXY(P1);
-                    PointOnCurve P2 = C2.PublicKey;
+                    PointOnCurve P2 = C2.PublicKeyPoint;
 
                     Assert.AreEqual(P1_2.Y, P2.Y);
 
@@ -561,14 +537,14 @@ namespace Waher.Security.EllipticCurves.Test
             this.TestEncoding(new Edwards448());
         }
 
-        private void TestEncoding(EdwardsCurve Curve)
+        private void TestEncoding(EdwardsCurveBase Curve)
         { 
             int i;
             int NrErrors = 0;
 
             for (i = 0; i < 100; i++)
             {
-                PointOnCurve P1 = Curve.PublicKey;
+                PointOnCurve P1 = Curve.PublicKeyPoint;
 
                 byte[] Encoded = EdDSA.Encode(P1, Curve);
                 PointOnCurve P2 = EdDSA.Decode(Encoded, Curve);

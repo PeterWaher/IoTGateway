@@ -7,11 +7,8 @@ namespace Waher.Security.EllipticCurves
 	/// <summary>
 	/// Base class of Elliptic curves over a prime field defined by NIST.
 	/// </summary>
-	public abstract class NistPrimeCurve : CurvePrimeField
+	public abstract class NistPrimeCurve : WeierstrassCurve
 	{
-		private static readonly BigInteger a = new BigInteger(-3);  // a Coefficient in the definition of the curve E:	y^2=x^3+a*x+b
-        private const int cofactor = 1;
-
 		/// <summary>
 		/// Base class of Elliptic curves over a prime field defined by NIST.
 		/// </summary>
@@ -19,19 +16,20 @@ namespace Waher.Security.EllipticCurves
 		/// <param name="BasePoint">Base-point.</param>
 		/// <param name="Order">Order of base-point.</param>
 		public NistPrimeCurve(BigInteger Prime, PointOnCurve BasePoint, BigInteger Order)
-			: base(Prime, BasePoint, Order, cofactor)
+			: base(Prime, BasePoint, a: -3, Order, Cofactor: 1)
 		{
 		}
 
-		/// <summary>
-		/// Base class of Elliptic curves over a prime field defined by NIST.
-		/// </summary>
-		/// <param name="Prime">Prime base of field.</param>
-		/// <param name="BasePoint">Base-point.</param>
-		/// <param name="Order">Order of base-point.</param>
-		/// <param name="D">Private key.</param>
-		public NistPrimeCurve(BigInteger Prime, PointOnCurve BasePoint, BigInteger Order, BigInteger D)
-			: base(Prime, BasePoint, Order, cofactor, D)
+        /// <summary>
+        /// Base class of Elliptic curves over a prime field defined by NIST.
+        /// </summary>
+        /// <param name="Prime">Prime base of field.</param>
+        /// <param name="BasePoint">Base-point.</param>
+        /// <param name="Order">Order of base-point.</param>
+        /// <param name="Secret">Secret.</param>
+        public NistPrimeCurve(BigInteger Prime, PointOnCurve BasePoint, BigInteger Order,
+            byte[] Secret)
+			: base(Prime, BasePoint, a: -3, Order, Cofactor: 1, Secret)
 		{
 		}
 
@@ -62,65 +60,7 @@ namespace Waher.Security.EllipticCurves
                 j -= 4;
             }
 
-            return new BigInteger(B);
-        }
-
-        /// <summary>
-        /// Adds <paramref name="Q"/> to <paramref name="P"/>.
-        /// </summary>
-        /// <param name="P">Point 1.</param>
-        /// <param name="Q">Point 2.</param>
-        /// <returns>P+Q</returns>
-        public override void AddTo(ref PointOnCurve P, PointOnCurve Q)
-        {
-            if (P.NonZero)
-            {
-                if (Q.NonZero)
-                {
-                    BigInteger sDividend = this.Subtract(P.Y, Q.Y);
-                    BigInteger sDivisor = this.Subtract(P.X, Q.X);
-                    BigInteger s, xR, yR;
-
-                    if (sDivisor.IsZero)
-                    {
-                        if (sDividend.IsZero)   // P=Q
-                            this.Double(ref P);
-                        else
-                            P = this.Zero;
-                    }
-                    else
-                    {
-                        s = this.Divide(sDividend, sDivisor);
-                        xR = this.Subtract(this.Multiply(s, s), this.Add(P.X, Q.X));
-                        yR = this.Add(P.Y, this.Multiply(s, this.Subtract(xR, P.X)));
-
-                        P.X = xR;
-                        P.Y = this.p - yR;
-                    }
-                }
-            }
-            else
-                P.CopyFrom(Q);
-        }
-
-        /// <summary>
-        /// Doubles a point on the curve.
-        /// </summary>
-        /// <param name="P">Point</param>
-        public override void Double(ref PointOnCurve P)
-        {
-            if (P.NonZero)
-            {
-                BigInteger sDividend = this.Add(3 * this.Multiply(P.X, P.X), a);
-                BigInteger sDivisor = this.Multiply(Two, P.Y);
-
-                BigInteger s = this.Divide(sDividend, sDivisor);
-                BigInteger xR = this.Subtract(this.Multiply(s, s), this.Add(P.X, P.X));
-                BigInteger yR = this.Add(P.Y, this.Multiply(s, this.Subtract(xR, P.X)));
-
-                P.X = xR;
-                P.Y = this.p - yR;
-            }
+            return ToInt(B);
         }
 
         /// <summary>
@@ -148,7 +88,7 @@ namespace Waher.Security.EllipticCurves
         /// <param name="PublicKey">Public Key of the entity that generated the signature.</param>
         /// <param name="Signature">Signature</param>
         /// <returns>If the signature is valid.</returns>
-        public override bool Verify(byte[] Data, PointOnCurve PublicKey, byte[] Signature)
+        public override bool Verify(byte[] Data, byte[] PublicKey, byte[] Signature)
         {
             return ECDSA.Verify(Data, PublicKey,
                 Bin => Hashes.ComputeHash(this.HashFunction, Bin),

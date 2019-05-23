@@ -11,10 +11,9 @@ namespace Waher.Security.EllipticCurves
     public class Curve448 : MontgomeryCurve
     {
         private static readonly BigInteger p0 = BigInteger.Pow(2, 448) - BigInteger.Pow(2, 224) - 1;
-        private static readonly BigInteger A = 156326;
-        private static readonly BigInteger A24 = (A - 2) / 4;
-        private static readonly BigInteger n = BigInteger.Pow(2, 446) - BigInteger.Parse("8335dc163bb124b65129c96fde933d8d723a70aadc873d6d54a7bb0d", NumberStyles.HexNumber);
-        private const int cofactor = 4;
+        private static readonly BigInteger A0 = 156326;
+        private static readonly BigInteger A24 = (A0 - 2) / 4;
+        private static readonly BigInteger n0 = BigInteger.Pow(2, 446) - BigInteger.Parse("8335dc163bb124b65129c96fde933d8d723a70aadc873d6d54a7bb0d", NumberStyles.HexNumber);
         private static readonly BigInteger BasePointU = 5;
         private static readonly BigInteger BasePointV = BigInteger.Parse("355293926785568175264127502063783334808976399387714271831880898435169088786967410002932673765864550910142774147268105838985595290606362");
 
@@ -23,7 +22,7 @@ namespace Waher.Security.EllipticCurves
         /// https://tools.ietf.org/html/rfc7748
         /// </summary>
         public Curve448()
-            : base(p0, A, new PointOnCurve(BasePointU, BasePointV), n, cofactor)
+            : base(p0, new PointOnCurve(BasePointU, BasePointV), n0, Cofactor: 4)
         {
         }
 
@@ -31,9 +30,9 @@ namespace Waher.Security.EllipticCurves
         /// Curve448, as defined in RFC 7748:
         /// https://tools.ietf.org/html/rfc7748
         /// </summary>
-        /// <param name="D">Private key.</param>
-        public Curve448(BigInteger D)
-            : base(p0, A, new PointOnCurve(BasePointU, BasePointV), n, cofactor, D)
+        /// <param name="Secret">Secret.</param>
+        public Curve448(byte[] Secret)
+            : base(p0, new PointOnCurve(BasePointU, BasePointV), n0, Cofactor: 4, Secret)
         {
         }
 
@@ -43,6 +42,11 @@ namespace Waher.Security.EllipticCurves
         public override string CurveName => "Curve448";
 
         /// <summary>
+        /// a Coefficient in the definition of the curve E:	v²=u³+A*u²+u
+        /// </summary>
+        protected override BigInteger A => A0;
+
+        /// <summary>
         /// Converts a pair of (U,V) coordinates to a pair of (X,Y) coordinates
         /// in the birational Edwards curve.
         /// </summary>
@@ -50,14 +54,14 @@ namespace Waher.Security.EllipticCurves
         /// <returns>(X,Y) coordinates.</returns>
         public override PointOnCurve ToXY(PointOnCurve UV)
         {
-            BigInteger U2 = this.Multiply(UV.X, UV.X);
-            BigInteger U3 = this.Multiply(U2, UV.X);
-            BigInteger U4 = this.Multiply(U2, U2);
-            BigInteger U5 = this.Multiply(U3, U2);
-            BigInteger V2 = this.Multiply(UV.Y, UV.Y);
-            BigInteger X = this.Divide(this.Multiply(4 * UV.Y, U2 - 1),
+            BigInteger U2 = this.modP.Multiply(UV.X, UV.X);
+            BigInteger U3 = this.modP.Multiply(U2, UV.X);
+            BigInteger U4 = this.modP.Multiply(U2, U2);
+            BigInteger U5 = this.modP.Multiply(U3, U2);
+            BigInteger V2 = this.modP.Multiply(UV.Y, UV.Y);
+            BigInteger X = this.modP.Divide(this.modP.Multiply(4 * UV.Y, U2 - 1),
                 (U4 - 2 * U2 + 4 * V2 + BigInteger.One));
-            BigInteger Y = this.Divide(-(U5 - 2 * U3 - 4 * UV.X * V2 + UV.X),
+            BigInteger Y = this.modP.Divide(-(U5 - 2 * U3 - 4 * UV.X * V2 + UV.X),
                (U5 - 2 * U2 * V2 - 2 * U3 - 2 * V2 + UV.X));
 
             if (X.Sign < 0)
@@ -77,11 +81,11 @@ namespace Waher.Security.EllipticCurves
         /// <returns>(U,V) coordinates.</returns>
         public override PointOnCurve ToUV(PointOnCurve XY)
         {
-            BigInteger X2 = this.Multiply(XY.X, XY.X);
-            BigInteger Y2 = this.Multiply(XY.Y, XY.Y);
-            BigInteger U = this.Divide(Y2, X2);
-            BigInteger X3 = this.Multiply(XY.X, X2);
-            BigInteger V = this.Divide(this.Multiply(Two - X2 - Y2, XY.Y), X3);
+            BigInteger X2 = this.modP.Multiply(XY.X, XY.X);
+            BigInteger Y2 = this.modP.Multiply(XY.Y, XY.Y);
+            BigInteger U = this.modP.Divide(Y2, X2);
+            BigInteger X3 = this.modP.Multiply(XY.X, X2);
+            BigInteger V = this.modP.Divide(this.modP.Multiply(Two - X2 - Y2, XY.Y), X3);
 
             if (U.Sign < 0)
                 U += this.p;
@@ -98,21 +102,20 @@ namespace Waher.Security.EllipticCurves
         /// <param name="N">Scalar</param>
         /// <param name="U">U-coordinate of point</param>
         /// <returns><paramref name="N"/>*<paramref name="U"/></returns>
-        public override BigInteger ScalarMultiplication(BigInteger N, BigInteger U)
+        public override BigInteger ScalarMultiplication(byte[] N, BigInteger U)
         {
             return XFunction(N, U, A24, this.p, 448, 0xfc, 0x7f, 0x80);
         }
 
         /// <summary>
-        /// Creates the Edwards Curve pair.
+        /// Calculates a private key from a secret.
         /// </summary>
-        /// <returns>Edwards curve.</returns>
-        public override EdwardsCurve CreatePair()
+        /// <param name="Secret">Binary secret.</param>
+        /// <returns>Private key</returns>
+        public override byte[] CalculatePrivateKey(byte[] Secret)
         {
-            PointOnCurve PublicKeyUV = this.PublicKey;
-            PointOnCurve PublicKeyXY = this.ToXY(PublicKeyUV);
+            byte[] Bin = Hashes.ComputeSHA512Hash(Secret);
 
-            byte[] Bin = this.privateKey.ToByteArray();
             if (Bin.Length != 57)
                 Array.Resize<byte>(ref Bin, 57);
 
@@ -120,19 +123,31 @@ namespace Waher.Security.EllipticCurves
             Bin[55] |= 0x80;
             Bin[56] = 0;
 
-            BigInteger PrivateKey = new BigInteger(Bin);
+            return Bin;
+        }
+
+        /// <summary>
+        /// Creates the Edwards Curve pair.
+        /// </summary>
+        /// <returns>Edwards curve.</returns>
+        public override EdwardsCurveBase CreatePair()
+        {
+            PointOnCurve PublicKeyUV = this.PublicKeyPoint;
+            PointOnCurve PublicKeyXY = this.ToXY(PublicKeyUV);
+
+            BigInteger PrivateKey = ToInt(this.privateKey);
             BigInteger PrivateKey2 = BigInteger.Remainder(this.Order - PrivateKey, this.Order);
             if (PrivateKey2.Sign < 0)
                 PrivateKey2 += this.Order;
 
-            Edwards448 Candidate = new Edwards448(PrivateKey2);
-            PointOnCurve PublicKeyXY2 = Candidate.PublicKey;
+            EdwardsCurveBase Candidate = new Edwards448(PrivateKey2.ToByteArray());
+            PointOnCurve PublicKeyXY2 = Candidate.PublicKeyPoint;
 
             if (PublicKeyXY.Y.Equals(PublicKeyXY2.Y))
                 return Candidate;
 
-            Candidate = new Edwards448(PrivateKey);
-            PublicKeyXY2 = Candidate.PublicKey;
+            Candidate = new Edwards448(this.privateKey);
+            PublicKeyXY2 = Candidate.PublicKeyPoint;
 
             if (PublicKeyXY.Y.Equals(PublicKeyXY2.Y))
                 return Candidate;

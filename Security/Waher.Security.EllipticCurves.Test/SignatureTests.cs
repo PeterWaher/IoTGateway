@@ -51,7 +51,7 @@ namespace Waher.Security.EllipticCurves.Test
 			this.Test_Signature(new Curve448(), new Curve448());
 		}
 
-		public void Test_Signature(CurvePrimeField Curve1, CurvePrimeField Curve2)
+		public void Test_Signature(PrimeFieldCurve Curve1, PrimeFieldCurve Curve2)
 		{
 			int n;
             int Ok = 0;

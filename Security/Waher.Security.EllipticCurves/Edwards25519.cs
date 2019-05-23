@@ -10,15 +10,13 @@ namespace Waher.Security.EllipticCurves
     /// https://tools.ietf.org/html/rfc7748
     /// https://tools.ietf.org/html/rfc8032
     /// </summary>
-    public class Edwards25519 : EdwardsCurve
+    public class Edwards25519 : EdwardsTwistedCurve
     {
         private static readonly BigInteger p0 = BigInteger.Pow(2, 255) - 19;
-        private static readonly BigInteger d = BigInteger.Parse("37095705934669439343138083508754565189542113879843219016388785533085940283555");
-        private static readonly BigInteger d2 = BigInteger.Remainder(BigInteger.Multiply(d, 2), p0);
-        private static readonly BigInteger n = BigInteger.Pow(2, 252) + BigInteger.Parse("14def9dea2f79cd65812631a5cf5d3ed", NumberStyles.HexNumber);
+        private static readonly BigInteger d0 = BigInteger.Parse("37095705934669439343138083508754565189542113879843219016388785533085940283555");
+        private static readonly BigInteger n0 = BigInteger.Pow(2, 252) + BigInteger.Parse("14def9dea2f79cd65812631a5cf5d3ed", NumberStyles.HexNumber);
         private static readonly BigInteger BasePointX = BigInteger.Parse("15112221349535400772501151409588531511454012693041857206046113283949847762202");
         private static readonly BigInteger BasePointY = BigInteger.Parse("46316835694926478169428394003475163141307993866256225615783033603165251855960");
-        private const int cofactor = 8;
 
         /// <summary>
         /// Edwards25519 Elliptic Curve, as defined in RFC7748 & RFC8032:
@@ -26,7 +24,7 @@ namespace Waher.Security.EllipticCurves
         /// https://tools.ietf.org/html/rfc8032
         /// </summary>
         public Edwards25519()
-            : base(p0, new PointOnCurve(BasePointX, BasePointY), n, cofactor)
+            : base(p0, new PointOnCurve(BasePointX, BasePointY), d0, n0, Cofactor: 8)
         {
         }
 
@@ -35,9 +33,9 @@ namespace Waher.Security.EllipticCurves
         /// https://tools.ietf.org/html/rfc7748
         /// https://tools.ietf.org/html/rfc8032
         /// </summary>
-        /// <param name="D">Private key.</param>
-        public Edwards25519(BigInteger D)
-            : base(p0, new PointOnCurve(BasePointX, BasePointY), n, cofactor, D)
+        /// <param name="Secret">Secret.</param>
+        public Edwards25519(byte[] Secret)
+            : base(p0, new PointOnCurve(BasePointX, BasePointY), d0, n0, Cofactor: 8, Secret)
         {
         }
 
@@ -52,65 +50,19 @@ namespace Waher.Security.EllipticCurves
         public override int CoordinateBits => 254;
 
         /// <summary>
-        /// d coefficient of Edwards curve.
+        /// Calculates a private key from a secret.
         /// </summary>
-        protected override BigInteger D => d;
-
-        /// <summary>
-        /// Adds <paramref name="Q"/> to <paramref name="P"/>.
-        /// </summary>
-        /// <param name="P">Point 1.</param>
-        /// <param name="Q">Point 2.</param>
-        /// <returns>P+Q</returns>
-        public override void AddTo(ref PointOnCurve P, PointOnCurve Q)
+        /// <param name="Secret">Binary secret.</param>
+        /// <returns>Private key</returns>
+        public override byte[] CalculatePrivateKey(byte[] Secret)
         {
-            if (!P.IsHomogeneous)
-                P.T = P.X * P.Y;
+            byte[] Bin = Hashes.ComputeSHA512Hash(Secret);
 
-            if (!Q.IsHomogeneous)
-                Q.T = Q.X * Q.Y;
+            Bin[0] &= 0xf8;
+            Bin[31] &= 0x3f;
+            Bin[31] |= 0x40;
 
-            BigInteger A = this.Multiply(P.Y - P.X, Q.Y - Q.X);
-            BigInteger B = this.Multiply(P.Y + P.X, Q.Y + Q.X);
-            BigInteger C = this.Multiply(this.Multiply(d2, P.T), Q.T);
-            BigInteger D = this.Multiply(P.Z << 1, Q.Z);
-            BigInteger E = this.Subtract(B, A);
-            BigInteger F = this.Subtract(D, C);
-            BigInteger G = this.Add(D, C);
-            BigInteger H = this.Add(B, A);
-
-            P.X = this.Multiply(E, F);
-            P.Y = this.Multiply(G, H);
-            P.T = this.Multiply(E, H);
-            P.Z = this.Multiply(F, G);
-        }
-
-        /// <summary>
-        /// Doubles a point on the curve.
-        /// </summary>
-        /// <param name="P">Point</param>
-        public override void Double(ref PointOnCurve P)
-        {
-            if (!P.IsHomogeneous)
-                P.T = P.X * P.Y;
-
-            BigInteger A = P.Y - P.X;
-            A = this.Multiply(A, A);
-
-            BigInteger B = P.Y + P.X;
-            B = this.Multiply(B, B);
-
-            BigInteger C = this.Multiply(this.Multiply(d2, P.T), P.T);
-            BigInteger D = this.Multiply(P.Z << 1, P.Z);
-            BigInteger E = this.Subtract(B, A);
-            BigInteger F = this.Subtract(D, C);
-            BigInteger G = this.Add(D, C);
-            BigInteger H = this.Add(B, A);
-
-            P.X = this.Multiply(E, F);
-            P.Y = this.Multiply(G, H);
-            P.T = this.Multiply(E, H);
-            P.Z = this.Multiply(F, G);
+            return Bin;
         }
 
         /// <summary>
@@ -131,59 +83,10 @@ namespace Waher.Security.EllipticCurves
         /// <param name="PublicKey">Public Key of the entity that generated the signature.</param>
         /// <param name="Signature">Signature</param>
         /// <returns>If the signature is valid.</returns>
-        public override bool Verify(byte[] Data, PointOnCurve PublicKey, byte[] Signature)
+        public override bool Verify(byte[] Data, byte[] PublicKey, byte[] Signature)
         {
             return EdDSA.Verify(Data, PublicKey, Hashes.ComputeSHA512Hash, this.orderBits,
                 this, Signature);
-        }
-
-        /// <summary>
-        /// Gets the X-coordinate that corresponds to a given Y-coordainte, and the 
-        /// first bit of the X-coordinate.
-        /// </summary>
-        /// <param name="Y">Y-coordinate.</param>
-        /// <param name="X0">First bit of X-coordinate.</param>
-        /// <returns>X-coordinate</returns>
-        public override BigInteger GetX(BigInteger Y, bool X0)
-        {
-            BigInteger y2 = this.Multiply(Y, Y);
-            BigInteger u = y2 - BigInteger.One;
-            if (u.Sign < 0)
-                u += this.p;
-
-            BigInteger v = this.Multiply(this.D, y2) + BigInteger.One;
-            BigInteger v2 = this.Multiply(v, v);
-            BigInteger v3 = this.Multiply(v, v2);
-            BigInteger v4 = this.Multiply(v2, v2);
-            BigInteger v7 = this.Multiply(v3, v4);
-            BigInteger x = this.Multiply(this.Multiply(u, v3),
-                BigInteger.ModPow(this.Multiply(u, v7), this.P58, this.Prime));
-
-            BigInteger x2 = this.Multiply(x, x);
-            BigInteger Test = this.Multiply(v, x2);
-            if (Test.Sign < 0)
-                Test += this.Prime;
-
-            if (Test != u)
-            {
-                if (Test == this.Prime - u)
-                    x = this.Multiply(x, this.TwoP14);
-                else
-                    throw new ArgumentException("Not a valid point.", nameof(Y));
-            }
-
-            if (X0)
-            {
-                if (x.IsZero)
-                    throw new ArgumentException("Not a valid point.", nameof(Y));
-
-                if (x.IsEven)
-                    x = this.Prime - x;
-            }
-            else if (!x.IsEven)
-                x = this.Prime - x;
-
-            return x;
         }
 
     }

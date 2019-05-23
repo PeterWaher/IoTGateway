@@ -10,7 +10,7 @@ namespace Waher.Security.EllipticCurves
 	public class NistP521 : NistPrimeCurve
 	{
 		private static readonly BigInteger p0 = BigInteger.Pow(2, 521) - 1;
-		private static readonly BigInteger n = BigInteger.Parse("6864797660130609714981900799081393217269435300143305409394463459185543183397655394245057746333217197532963996371363321113864768612440380340372808892707005449");
+		private static readonly BigInteger n0 = BigInteger.Parse("6864797660130609714981900799081393217269435300143305409394463459185543183397655394245057746333217197532963996371363321113864768612440380340372808892707005449");
 		private static readonly BigInteger BasePointX = ToBigInteger(new uint[]
 		{
 			0xc6, 0x858e06b7, 0x0404e9cd, 0x9e3ecb66, 0x2395b442, 0x9c648139, 0x053fb521, 0xf828af60, 0x6b4d3dba,
@@ -27,19 +27,19 @@ namespace Waher.Security.EllipticCurves
 		/// https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.186-4.pdf
 		/// </summary>
 		public NistP521()
-			: base(p0, new PointOnCurve(BasePointX, BasePointY), n)
+			: base(p0, new PointOnCurve(BasePointX, BasePointY), n0)
 		{
 		}
 
-		/// <summary>
-		/// NIST P-521 Elliptic Curve, as defined in NIST FIPS BUB 186-4:
-		/// https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.186-4.pdf
-		/// </summary>
-		/// <param name="D">Private key.</param>
-		public NistP521(BigInteger D)
-			: base(p0, new PointOnCurve(BasePointX, BasePointY), n, D)
-		{
-		}
+        /// <summary>
+        /// NIST P-521 Elliptic Curve, as defined in NIST FIPS BUB 186-4:
+        /// https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.186-4.pdf
+        /// </summary>
+        /// <param name="Secret">Secret.</param>
+        public NistP521(byte[] Secret)
+            : base(p0, new PointOnCurve(BasePointX, BasePointY), n0, Secret)
+        {
+        }
 
 		/// <summary>
 		/// Name of curve.

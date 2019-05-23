@@ -4,7 +4,7 @@ using System.Numerics;
 namespace Waher.Security.EllipticCurves
 {
     /// <summary>
-    /// Implements the ECDSA algorithm.
+    /// Implements the Elliptic Curve Digital Signature Algorithm (ECDSA).
     /// </summary>
     public static class ECDSA
     {
@@ -18,25 +18,26 @@ namespace Waher.Security.EllipticCurves
         /// <param name="MsbMask">Mask for most significant byte.</param>
         /// <param name="Curve">Elliptic curve</param>
         /// <returns>Signature</returns>
-        public static byte[] Sign(byte[] Data, BigInteger PrivateKey, HashFunction HashFunction,
-            int ScalarBytes, byte MsbMask, CurvePrimeField Curve)
+        public static byte[] Sign(byte[] Data, byte[] PrivateKey, HashFunction HashFunction,
+            int ScalarBytes, byte MsbMask, PrimeFieldCurve Curve)
         {
             BigInteger e = CalcE(Data, HashFunction, ScalarBytes, MsbMask);
-            BigInteger r, k, s;
+            BigInteger r, s, PrivateKeyInt = EllipticCurve.ToInt(PrivateKey);
             PointOnCurve P1;
+            byte[] k;
 
             do
             {
                 do
                 {
-                    k = Curve.NextRandomNumber();
-                    P1 = Curve.ScalarMultiplication(k, Curve.BasePoint);
+                    k = Curve.GenerateSecret();
+                    P1 = Curve.ScalarMultiplication(k, Curve.BasePoint, true);
                 }
                 while (P1.IsXZero);
 
                 r = BigInteger.Remainder(P1.X, Curve.Order);
                 s = Curve.ModulusN.Divide(Curve.ModulusN.Add(e,
-                    Curve.ModulusN.Multiply(r, PrivateKey)), k);
+                    Curve.ModulusN.Multiply(r, PrivateKeyInt)), EllipticCurve.ToInt(k));
             }
             while (s.IsZero);
 
@@ -73,7 +74,7 @@ namespace Waher.Security.EllipticCurves
 
             Hash[ScalarBytes - 1] &= MsbMask;
 
-            return new BigInteger(Hash);
+            return EllipticCurve.ToInt(Hash);
         }
 
         /// <summary>
@@ -87,8 +88,8 @@ namespace Waher.Security.EllipticCurves
         /// <param name="MsbMask">Mask for most significant byte.</param>
         /// <param name="Signature">Signature</param>
         /// <returns>If the signature is valid.</returns>
-        public static bool Verify(byte[] Data, PointOnCurve PublicKey, HashFunction HashFunction,
-            int ScalarBytes, byte MsbMask, CurvePrimeField Curve, byte[] Signature)
+        public static bool Verify(byte[] Data, byte[] PublicKey, HashFunction HashFunction,
+            int ScalarBytes, byte MsbMask, PrimeFieldCurve Curve, byte[] Signature)
         {
             int c = Signature.Length;
             if (c != ScalarBytes << 1)
@@ -99,28 +100,23 @@ namespace Waher.Security.EllipticCurves
             byte[] Bin = new byte[c];
             Array.Copy(Signature, 0, Bin, 0, c);
 
-            if ((Bin[c - 1] & 0x80) != 0)
-                Array.Resize<byte>(ref Bin, c + 1);
-
-            BigInteger r = new BigInteger(Bin);
+            BigInteger r = EllipticCurve.ToInt(Bin);
 
             Bin = new byte[c];
             Array.Copy(Signature, c, Bin, 0, c);
 
-            if ((Bin[c - 1] & 0x80) != 0)
-                Array.Resize<byte>(ref Bin, c + 1);
+            BigInteger s = EllipticCurve.ToInt(Bin);
+            PointOnCurve PublicKeyPoint = Curve.Decode(PublicKey);
 
-            BigInteger s = new BigInteger(Bin);
-
-            if (!PublicKey.NonZero || r.IsZero || s.IsZero || r >= Curve.Order || s >= Curve.Order)
+            if (!PublicKeyPoint.NonZero || r.IsZero || s.IsZero || r >= Curve.Order || s >= Curve.Order)
                 return false;
 
             BigInteger e = CalcE(Data, HashFunction, ScalarBytes, MsbMask);
             BigInteger w = Curve.ModulusN.Invert(s);
             BigInteger u1 = Curve.ModulusN.Multiply(e, w);
             BigInteger u2 = Curve.ModulusN.Multiply(r, w);
-            PointOnCurve P2 = Curve.ScalarMultiplication(u1, Curve.BasePoint);
-            PointOnCurve P3 = Curve.ScalarMultiplication(u2, PublicKey);
+            PointOnCurve P2 = Curve.ScalarMultiplication(u1, Curve.BasePoint, true);
+            PointOnCurve P3 = Curve.ScalarMultiplication(u2, PublicKeyPoint, true);
             Curve.AddTo(ref P2, P3);
 
             if (!P2.NonZero)

@@ -5,28 +5,25 @@ using System.Numerics;
 namespace Waher.Security.EllipticCurves
 {
     /// <summary>
-    /// Base class of Montgomery curves, with biratinal Edwards equivalent 
+    /// Base class of Montgomery curves (y²=x³+Ax²+x), with biratinal Edwards equivalent 
     /// over a prime field.
     /// </summary>
-    public abstract class MontgomeryCurve : CurvePrimeField
+    public abstract class MontgomeryCurve : PrimeFieldCurve
     {
-        private readonly BigInteger a;
-        private EdwardsCurve pair = null;
+        private EdwardsCurveBase pair = null;
 
         /// <summary>
-        /// Base class of Montgomery curves, with biratinal Edwards equivalent 
+        /// Base class of Montgomery curves (y²=x³+Ax²+x), with biratinal Edwards equivalent 
         /// over a prime field.
         /// </summary>
         /// <param name="Prime">Prime base of field.</param>
-        /// <param name="A">a Coefficient in the definition of the curve E:	v^2=u^3+A*u^2+u</param>
         /// <param name="BasePoint">Base-point in (U,V) coordinates.</param>
         /// <param name="Order">Order of base-point.</param>
         /// <param name="Cofactor">Cofactor of curve.</param>
-        public MontgomeryCurve(BigInteger Prime, BigInteger A, PointOnCurve BasePoint,
-            BigInteger Order, int Cofactor)
+        public MontgomeryCurve(BigInteger Prime, PointOnCurve BasePoint, BigInteger Order, 
+            int Cofactor)
             : base(Prime, BasePoint, Order, Cofactor)
         {
-            this.a = A;
         }
 
         /// <summary>
@@ -34,27 +31,22 @@ namespace Waher.Security.EllipticCurves
         /// over a prime field.
         /// </summary>
         /// <param name="Prime">Prime base of field.</param>
-        /// <param name="A">a Coefficient in the definition of the curve E:	v^2=u^3+A*u^2+u</param>
         /// <param name="BasePoint">Base-point in (U,V) coordinates.</param>
         /// <param name="Order">Order of base-point.</param>
         /// <param name="Cofactor">Cofactor of curve.</param>
-        /// <param name="D">Private key.</param>
-        public MontgomeryCurve(BigInteger Prime, BigInteger A, PointOnCurve BasePoint,
-            BigInteger Order, int Cofactor, BigInteger D)
-            : base(Prime, BasePoint, Order, Cofactor, D)
+        /// <param name="Secret">Secret.</param>
+        public MontgomeryCurve(BigInteger Prime,  PointOnCurve BasePoint, BigInteger Order, 
+            int Cofactor, byte[] Secret)
+            : base(Prime, BasePoint, Order, Cofactor, Secret)
         {
-            this.a = A;
         }
 
         /// <summary>
-        /// Sets the private key (and therefore also the public key) of the curve.
+        /// a Coefficient in the definition of the curve E:	v²=u³+A*u²+u
         /// </summary>
-        /// <param name="D">Private key.</param>
-        public override void SetPrivateKey(BigInteger D)
+        protected abstract BigInteger A
         {
-            this.publicKey = this.ScalarMultiplication(D, this.BasePoint);
-            this.publicKey.Normalize(this);
-            this.privateKey = D;
+            get;
         }
 
         /// <summary>
@@ -81,7 +73,7 @@ namespace Waher.Security.EllipticCurves
         /// <returns>P+Q</returns>
         public override void AddTo(ref PointOnCurve P, PointOnCurve Q)
         {
-            throw new NotSupportedException("Montgomery curves use optimized scalar multiplication.");
+            this.Double(ref P);
         }
 
         /// <summary>
@@ -90,7 +82,7 @@ namespace Waher.Security.EllipticCurves
         /// <param name="P">Point</param>
         public override void Double(ref PointOnCurve P)
         {
-            throw new NotSupportedException("Montgomery curves use optimized scalar multiplication.");
+            throw new NotSupportedException("Scalar  multiplication is performed using a Montgomery ladder.");
         }
 
         /// <summary>
@@ -99,15 +91,16 @@ namespace Waher.Security.EllipticCurves
         /// <param name="N">Scalar</param>
         /// <param name="U">U-coordinate of point</param>
         /// <returns><paramref name="N"/>*<paramref name="U"/></returns>
-        public abstract BigInteger ScalarMultiplication(BigInteger N, BigInteger U);
+        public abstract BigInteger ScalarMultiplication(byte[] N, BigInteger U);
 
         /// <summary>
         /// Performs the scalar multiplication of <paramref name="N"/>*<paramref name="P"/>.
         /// </summary>
-        /// <param name="N">Scalar</param>
+        /// <param name="N">Scalar, in binary, little-endian form.</param>
         /// <param name="P">Point</param>
+        /// <param name="Normalize">If normalized output is expected.</param>
         /// <returns><paramref name="N"/>*<paramref name="P"/></returns>
-        public override PointOnCurve ScalarMultiplication(BigInteger N, PointOnCurve P)
+        public override PointOnCurve ScalarMultiplication(byte[] N, PointOnCurve P, bool Normalize)
         {
             return new PointOnCurve(this.ScalarMultiplication(N, P.X), BigInteger.Zero);
         }
@@ -124,10 +117,9 @@ namespace Waher.Security.EllipticCurves
         /// <param name="MsbMask">Mask for Most Significant Byte.</param>
         /// <param name="MsbBit">Most Significat Bit to set.</param>
         /// <returns><paramref name="N"/>*<paramref name="U"/></returns>
-        public static BigInteger XFunction(BigInteger N, BigInteger U,
+        public static BigInteger XFunction(byte[] N, BigInteger U,
             BigInteger A24, BigInteger p, int Bits, byte LsbMask, byte MsbMask, byte MsbBit)
         {
-            byte[] k = N.ToByteArray();
             BigInteger x1 = U;
             BigInteger x2 = BigInteger.One;
             BigInteger z2 = BigInteger.Zero;
@@ -138,16 +130,16 @@ namespace Waher.Security.EllipticCurves
             int swap = 0;
 
             kt = (Bits + 7) >> 3;
-            if (k.Length < kt)
-                Array.Resize<byte>(ref k, kt);
+            if (N.Length < kt)
+                Array.Resize<byte>(ref N, kt);
 
-            k[0] &= LsbMask;
-            k[--kt] &= MsbMask;
-            k[kt] |= MsbBit;
+            //N[0] &= LsbMask;
+            //N[--kt] &= MsbMask;
+            //N[kt] |= MsbBit;
 
             while (--Bits >= 0)
             {
-                kt = (k[Bits >> 3] >> (Bits & 7)) & 1;
+                kt = (N[Bits >> 3] >> (Bits & 7)) & 1;
                 swap ^= kt;
                 ConditionalSwap(swap, ref x2, ref x3);
                 ConditionalSwap(swap, ref z2, ref z3);
@@ -235,14 +227,14 @@ namespace Waher.Security.EllipticCurves
                 x3[i] ^= Dummy;
             }
 
-            I2 = new BigInteger(x2);
-            I3 = new BigInteger(x3);
+            I2 = ToInt(x2);
+            I3 = ToInt(x3);
         }
 
         /// <summary>
         /// Edwards Curve pair.
         /// </summary>
-        public EdwardsCurve Pair
+        public EdwardsCurveBase Pair
         {
             get
             {
@@ -257,7 +249,7 @@ namespace Waher.Security.EllipticCurves
         /// Creates the Edwards Curve pair.
         /// </summary>
         /// <returns>Edwards curve.</returns>
-        public abstract EdwardsCurve CreatePair();
+        public abstract EdwardsCurveBase CreatePair();
 
         /// <summary>
         /// Creates a signature of <paramref name="Data"/> using the EdDSA algorithm.
@@ -272,20 +264,20 @@ namespace Waher.Security.EllipticCurves
         /// <summary>
         /// Public key.
         /// </summary>
-        public override PointOnCurve PublicKey
+        public override PointOnCurve PublicKeyPoint
         {
             get
             {
-                BigInteger V = this.publicKey.Y;
+                BigInteger V = this.publicKeyPoint.Y;
 
                 if (V.IsZero)
                 {
-                    BigInteger U = this.publicKey.X;
-                    BigInteger U2 = this.Multiply(U, U);
-                    BigInteger U3 = this.Multiply(U, U2);
-                    BigInteger V2 = BigInteger.Remainder(U3 + this.Multiply(this.a, U2) + U, this.Prime);
+                    BigInteger U = this.publicKeyPoint.X;
+                    BigInteger U2 = this.modP.Multiply(U, U);
+                    BigInteger U3 = this.modP.Multiply(U, U2);
+                    BigInteger V2 = BigInteger.Remainder(U3 + this.modP.Multiply(this.A, U2) + U, this.Prime);
 
-                    BigInteger V1 = this.SqrtModP(V2);
+                    BigInteger V1 = this.modP.Sqrt(V2);
                     if (V1.Sign < 0)
                         V1 += this.Prime;
 
@@ -293,10 +285,10 @@ namespace Waher.Security.EllipticCurves
                     if (V1 < V)
                         V = V1;
 
-                    this.publicKey.Y = V;
+                    this.publicKeyPoint.Y = V;
                 }
 
-                return this.publicKey;
+                return this.publicKeyPoint;
             }
         }
 
@@ -307,10 +299,13 @@ namespace Waher.Security.EllipticCurves
         /// <param name="PublicKey">Public Key of the entity that generated the signature.</param>
         /// <param name="Signature">Signature</param>
         /// <returns>If the signature is valid.</returns>
-        public override bool Verify(byte[] Data, PointOnCurve PublicKey, byte[] Signature)
+        public override bool Verify(byte[] Data, byte[] PublicKey, byte[] Signature)
         {
-            PointOnCurve XY = this.ToXY(PublicKey);
-            return this.Pair.Verify(Data, XY, Signature);
+            PointOnCurve UV = this.Decode(PublicKey);
+            PointOnCurve XY = this.ToXY(UV);
+            EdwardsCurveBase Pair = this.Pair;
+
+            return Pair.Verify(Data, Pair.Encode(XY), Signature);
         }
 
     }

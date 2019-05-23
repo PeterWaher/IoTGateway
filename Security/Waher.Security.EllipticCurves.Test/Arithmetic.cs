@@ -12,7 +12,7 @@ namespace Waher.Security.EllipticCurves.Test
         [TestMethod]
         public void Test_01_Inverse()
         {
-            CurvePrimeField C = new NistP256();
+            PrimeFieldCurve C = new NistP256();
             int i;
 
             for (i = 0; i < 1000; i++)
@@ -31,7 +31,7 @@ namespace Waher.Security.EllipticCurves.Test
         [TestMethod]
         public void Test_02_Negate()
         {
-            CurvePrimeField C = new NistP256();
+            PrimeFieldCurve C = new NistP256();
             int i;
 
             for (i = 0; i < 100; i++)
@@ -48,7 +48,7 @@ namespace Waher.Security.EllipticCurves.Test
         [TestMethod]
         public void Test_03_Addition()
         {
-            CurvePrimeField C = new NistP256();
+            PrimeFieldCurve C = new NistP256();
             BigInteger k1, k2, k3;
             PointOnCurve P1, P2, P3;
             string s1, s2, s3;
@@ -111,7 +111,7 @@ namespace Waher.Security.EllipticCurves.Test
             this.TestScalarMultiplication(new NistP256());
         }
 
-        private void TestScalarMultiplication(CurvePrimeField C)
+        private void TestScalarMultiplication(PrimeFieldCurve C)
         {
             Random Rnd = new Random();
 

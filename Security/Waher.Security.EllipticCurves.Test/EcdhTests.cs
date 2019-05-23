@@ -60,7 +60,7 @@ namespace Waher.Security.EllipticCurves.Test
             this.Test_ECDH(new Edwards448(), new Edwards448());
         }
 
-        public void Test_ECDH(CurvePrimeField Curve1, CurvePrimeField Curve2)
+        public void Test_ECDH(PrimeFieldCurve Curve1, PrimeFieldCurve Curve2)
 		{
 			int n;
 

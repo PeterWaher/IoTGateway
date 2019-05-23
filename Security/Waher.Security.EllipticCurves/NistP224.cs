@@ -10,7 +10,7 @@ namespace Waher.Security.EllipticCurves
 	public class NistP224 : NistPrimeCurve
 	{
 		private static readonly BigInteger p0 = BigInteger.Pow(2, 224) - BigInteger.Pow(2, 96) + 1;
-		private static readonly BigInteger n = BigInteger.Parse("26959946667150639794667015087019625940457807714424391721682722368061");
+		private static readonly BigInteger n0 = BigInteger.Parse("26959946667150639794667015087019625940457807714424391721682722368061");
 		private static readonly BigInteger BasePointX = ToBigInteger(new uint[]
 		{
 			0xb70e0cbd, 0x6bb4bf7f, 0x321390b9, 0x4a03c1d3, 0x56c21122, 0x343280d6, 0x115c1d21
@@ -25,19 +25,19 @@ namespace Waher.Security.EllipticCurves
 		/// https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.186-4.pdf
 		/// </summary>
 		public NistP224()
-			: base(p0, new PointOnCurve(BasePointX, BasePointY), n)
+			: base(p0, new PointOnCurve(BasePointX, BasePointY), n0)
 		{
 		}
 
-		/// <summary>
-		/// NIST P-224 Elliptic Curve, as defined in NIST FIPS BUB 186-4:
-		/// https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.186-4.pdf
-		/// </summary>
-		/// <param name="D">Private key.</param>
-		public NistP224(BigInteger D)
-			: base(p0, new PointOnCurve(BasePointX, BasePointY), n, D)
-		{
-		}
+        /// <summary>
+        /// NIST P-224 Elliptic Curve, as defined in NIST FIPS BUB 186-4:
+        /// https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.186-4.pdf
+        /// </summary>
+        /// <param name="Secret">Secret.</param>
+        public NistP224(byte[] Secret)
+            : base(p0, new PointOnCurve(BasePointX, BasePointY), n0, Secret)
+        {
+        }
 
 		/// <summary>
 		/// Name of curve.

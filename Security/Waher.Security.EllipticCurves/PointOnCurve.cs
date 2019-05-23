@@ -221,12 +221,12 @@ namespace Waher.Security.EllipticCurves
         /// Normalizes a point, if in homogeneous coorinates.
         /// </summary>
         /// <param name="Curve">Curve</param>
-        public void Normalize(CurvePrimeField Curve)
+        public void Normalize(PrimeFieldCurve Curve)
         {
             if (this.homogeneous)
             {
-                this.x = Curve.Divide(this.x, this.z);
-                this.y = Curve.Divide(this.y, this.z);
+                this.x = Curve.ModulusP.Divide(this.x, this.z);
+                this.y = Curve.ModulusP.Divide(this.y, this.z);
                 this.z = BigInteger.One;
                 this.t = BigInteger.Zero;
                 this.homogeneous = false;

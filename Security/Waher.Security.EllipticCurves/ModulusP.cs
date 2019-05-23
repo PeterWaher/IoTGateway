@@ -9,11 +9,6 @@ namespace Waher.Security.EllipticCurves
     public class ModulusP
     {
         /// <summary>
-        /// 2
-        /// </summary>
-        public static readonly BigInteger Two = new BigInteger(2);
-
-        /// <summary>
         /// Base prime.
         /// </summary>
         protected readonly BigInteger p;
@@ -157,7 +152,7 @@ namespace Waher.Security.EllipticCurves
         /// </summary>
         /// <param name="N">Number</param>
         /// <returns>Square root of <paramref name="N"/> mod p.</returns>
-        public BigInteger SqrtModP(BigInteger N)
+        public BigInteger Sqrt(BigInteger N)
         {
             return SqrtModP(N, this.p);
         }

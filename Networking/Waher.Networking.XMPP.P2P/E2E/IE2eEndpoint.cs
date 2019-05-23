@@ -44,12 +44,20 @@ namespace Waher.Networking.XMPP.P2P.E2E
 			set;
 		}
 
-		/// <summary>
-		/// Creates a new key.
-		/// </summary>
-		/// <param name="SecurityStrength">Overall desired security strength, if applicable.</param>
-		/// <returns>New E2E endpoint.</returns>
-		IE2eEndpoint Create(int SecurityStrength);
+        /// <summary>
+        /// Remote public key.
+        /// </summary>
+        byte[] PublicKey
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Creates a new key.
+        /// </summary>
+        /// <param name="SecurityStrength">Overall desired security strength, if applicable.</param>
+        /// <returns>New E2E endpoint.</returns>
+        IE2eEndpoint Create(int SecurityStrength);
 
 		/// <summary>
 		/// Parses endpoint information from an XML element.

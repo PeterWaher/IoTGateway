@@ -116,7 +116,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		/// <summary>
 		/// Remote public key.
 		/// </summary>
-		public byte[] PublicKey => this.publicKey;
+		public override byte[] PublicKey => this.publicKey;
 
 		/// <summary>
 		/// Name of elliptic curve

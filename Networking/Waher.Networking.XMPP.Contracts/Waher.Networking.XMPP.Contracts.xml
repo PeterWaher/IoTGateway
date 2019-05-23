@@ -2318,14 +2318,9 @@
             Type of key used for client signatures
             </summary>
         </member>
-        <member name="P:Waher.Networking.XMPP.Contracts.LegalIdentity.ClientPubKey1">
+        <member name="P:Waher.Networking.XMPP.Contracts.LegalIdentity.ClientPubKey">
             <summary>
-            Public key 1
-            </summary>
-        </member>
-        <member name="P:Waher.Networking.XMPP.Contracts.LegalIdentity.ClientPubKey2">
-            <summary>
-            Public key 2
+            Client Public key
             </summary>
         </member>
         <member name="P:Waher.Networking.XMPP.Contracts.LegalIdentity.ClientSignature">

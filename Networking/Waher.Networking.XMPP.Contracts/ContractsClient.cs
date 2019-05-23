@@ -73,15 +73,29 @@ namespace Waher.Networking.XMPP.Contracts
 				typeof(EcAes256)))
 			{
 				string d = await RuntimeSettings.GetAsync(Name + "." + Curve.LocalName, string.Empty);
-				if (string.IsNullOrEmpty(d) || !BigInteger.TryParse(d, out BigInteger D))
+                byte[] Key;
+
+                try
+                {
+                    if (string.IsNullOrEmpty(d))
+                        Key = null;
+                    else
+                        Key = Convert.FromBase64String(d);
+                }
+                catch (Exception)
+                {
+                    Key = null;
+                }
+
+				if (Key is null)
 				{
-					D = this.GetKey(Curve.Curve);
-					await RuntimeSettings.SetAsync(Name + "." + Curve.LocalName, D.ToString());
+					Key = this.GetKey(Curve.Curve);
+					await RuntimeSettings.SetAsync(Name + "." + Curve.LocalName, Convert.ToBase64String(Key));
 					Keys.Add(Curve);
 				}
 				else
 				{
-					Keys.Add(Curve.Create(D));
+					Keys.Add(Curve.CreatePrivate(Key));
 					Curve.Dispose();
 				}
 			}
@@ -91,13 +105,13 @@ namespace Waher.Networking.XMPP.Contracts
 			return this.localEndpoint;
 		}
 
-		private BigInteger GetKey(PrimeFieldCurve Curve)
+		private byte[] GetKey(EllipticCurve Curve)
 		{
 			string s = Curve.Export();
 			XmlDocument Doc = new XmlDocument();
 			Doc.LoadXml(s);
 			s = Doc.DocumentElement.GetAttribute("d");
-			return BigInteger.Parse(s);
+			return Convert.FromBase64String(s);
 		}
 
 		/// <summary>
@@ -521,10 +535,7 @@ namespace Waher.Networking.XMPP.Contracts
 			}
 
 			if (string.IsNullOrEmpty(Identity.ClientKeyName) ||
-				Identity.ClientPubKey1 is null ||
-				Identity.ClientPubKey1.Length == 0 ||
-				Identity.ClientPubKey2 is null ||
-				Identity.ClientPubKey2.Length == 0)
+				Identity.ClientPubKey is null || Identity.ClientPubKey.Length == 0)
 			{
 				this.ReturnStatus(IdentityStatus.NoClientPublicKey, Callback, State);
 				return;
@@ -543,8 +554,7 @@ namespace Waher.Networking.XMPP.Contracts
 			if (Identity.ClientKeyName.StartsWith("RSA") &&
 				int.TryParse(Identity.ClientKeyName.Substring(3), out int KeySize))
 			{
-				if (!RsaAes.Verify(Data, Identity.ClientSignature, KeySize,
-					Identity.ClientPubKey1, Identity.ClientPubKey2))
+				if (!RsaAes.Verify(Data, Identity.ClientSignature, KeySize, Identity.ClientPubKey))
 				{
 					this.ReturnStatus(IdentityStatus.ClientSignatureInvalid, Callback, State);
 					return;
@@ -554,8 +564,7 @@ namespace Waher.Networking.XMPP.Contracts
 				EndpointSecurity.IoTHarmonizationE2E, out IE2eEndpoint LocalKey) &&
 				LocalKey is EcAes256 LocalEc)
 			{
-				if (!LocalEc.Verify(Data, Identity.ClientPubKey1, Identity.ClientPubKey2,
-					Identity.ClientSignature))
+				if (!LocalEc.Verify(Data, Identity.ClientPubKey, Identity.ClientSignature))
 				{
 					this.ReturnStatus(IdentityStatus.ClientSignatureInvalid, Callback, State);
 					return;

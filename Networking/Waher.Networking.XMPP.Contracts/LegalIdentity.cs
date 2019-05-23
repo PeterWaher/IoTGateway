@@ -57,8 +57,7 @@ namespace Waher.Networking.XMPP.Contracts
 		private DateTime to = DateTime.MaxValue;
 		private Property[] properties = null;
 		private string clientKeyName = null;
-		private byte[] clientPubKey1 = null;
-		private byte[] clientPubKey2 = null;
+		private byte[] clientPubKey = null;
 		private byte[] clientSignature = null;
 		private byte[] serverSignature = null;
 
@@ -151,21 +150,12 @@ namespace Waher.Networking.XMPP.Contracts
 		}
 
 		/// <summary>
-		/// Public key 1
+		/// Client Public key
 		/// </summary>
-		public byte[] ClientPubKey1
+		public byte[] ClientPubKey
 		{
-			get { return this.clientPubKey1; }
-			set { this.clientPubKey1 = value; }
-		}
-
-		/// <summary>
-		/// Public key 2
-		/// </summary>
-		public byte[] ClientPubKey2
-		{
-			get { return this.clientPubKey2; }
-			set { this.clientPubKey2 = value; }
+			get { return this.clientPubKey; }
+			set { this.clientPubKey = value; }
 		}
 
 		/// <summary>
@@ -213,18 +203,12 @@ namespace Waher.Networking.XMPP.Contracts
 									IE2eEndpoint Key = EndpointSecurity.ParseE2eKey(E2);
 									if (Key != null && Key.Namespace == EndpointSecurity.IoTHarmonizationE2E)
 									{
-										if (Key is RsaAes RsaAes)
-										{
+                                        Result.clientPubKey = Key.PublicKey;
+
+                                        if (Key is RsaAes RsaAes)
 											Result.clientKeyName = "RSA" + RsaAes.KeySize.ToString();
-											Result.clientPubKey1 = RsaAes.Modulus;
-											Result.clientPubKey2 = RsaAes.Exponent;
-										}
-										else if (Key is EcAes256 EcAes256)
-										{
+										else 
 											Result.clientKeyName = Key.LocalName;
-											Result.ClientPubKey1 = EcAes256.ToNetwork(EcAes256.PublicKey.X);
-											Result.ClientPubKey2 = EcAes256.ToNetwork(EcAes256.PublicKey.Y);
-										}
 									}
 								}
 							}
@@ -295,7 +279,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		public bool HasClientPublicKey
 		{
-			get { return !string.IsNullOrEmpty(this.clientKeyName) && this.ClientPubKey1 != null && this.clientPubKey2 != null; }
+			get { return !string.IsNullOrEmpty(this.clientKeyName) && !(this.ClientPubKey is null); }
 		}
 
 		/// <summary>
@@ -348,10 +332,8 @@ namespace Waher.Networking.XMPP.Contracts
 
 				if (this.clientKeyName.StartsWith("RSA"))
 				{
-					Xml.Append("<rsa exp=\"");
-					Xml.Append(Convert.ToBase64String(this.clientPubKey1));
-					Xml.Append("\" mod=\"");
-					Xml.Append(Convert.ToBase64String(this.clientPubKey2));
+					Xml.Append("<rsa pub=\"");
+					Xml.Append(Convert.ToBase64String(this.clientPubKey));
 					Xml.Append("\" size=\"");
 					Xml.Append(this.clientKeyName.Substring(3));
 					Xml.Append("\" xmlns=\"");
@@ -361,12 +343,10 @@ namespace Waher.Networking.XMPP.Contracts
 				{
 					Xml.Append('<');
 					Xml.Append(this.clientKeyName);
-					Xml.Append(" x=\"");
-					Xml.Append(Convert.ToBase64String(this.clientPubKey1));
+					Xml.Append(" pub=\"");
+					Xml.Append(Convert.ToBase64String(this.clientPubKey));
 					Xml.Append("\" xmlns=\"");
 					Xml.Append(EndpointSecurity.IoTHarmonizationE2E);
-					Xml.Append("\" y=\"");
-					Xml.Append(Convert.ToBase64String(this.clientPubKey2));
 				}
 
 				Xml.Append("\"/></clientPublicKey>");
@@ -455,13 +435,13 @@ namespace Waher.Networking.XMPP.Contracts
 				if (!int.TryParse(this.clientKeyName.Substring(3), out int KeySize))
 					return false;
 
-				return RsaAes.Verify(Data, Signature, KeySize, this.clientPubKey1, this.clientPubKey2);
+				return RsaAes.Verify(Data, Signature, KeySize, this.clientPubKey);
 			}
 			else if (EndpointSecurity.TryCreateEndpoint(this.clientKeyName,
 				EndpointSecurity.IoTHarmonizationE2E, out IE2eEndpoint Endpoint) &&
 				Endpoint is EcAes256 EcAes256)
 			{
-				return EcAes256.Verify(Data, this.clientPubKey1, this.clientPubKey2, Signature);
+				return EcAes256.Verify(Data, this.clientPubKey, Signature);
 			}
 			else
 				return false;
@@ -553,8 +533,7 @@ namespace Waher.Networking.XMPP.Contracts
 				!this.from.Equals(ID.from) ||
 				!this.to.Equals(ID.to) ||
 				!this.clientKeyName.Equals(ID.clientKeyName) ||
-				!AreEqual(this.clientPubKey1, ID.clientPubKey1) ||
-				!AreEqual(this.clientPubKey2, ID.clientPubKey2) ||
+				!AreEqual(this.clientPubKey, ID.clientPubKey) ||
 				!AreEqual(this.clientSignature, ID.clientSignature) ||
 				!AreEqual(this.serverSignature, ID.serverSignature))
 			{
@@ -615,8 +594,7 @@ namespace Waher.Networking.XMPP.Contracts
 			Result ^= Result << 5 ^ this.from.GetHashCode();
 			Result ^= Result << 5 ^ this.to.GetHashCode();
 			Result ^= Result << 5 ^ this.clientKeyName.GetHashCode();
-			Result ^= Result << 5 ^ GetHashCode(this.clientPubKey1);
-			Result ^= Result << 5 ^ GetHashCode(this.clientPubKey2);
+			Result ^= Result << 5 ^ GetHashCode(this.clientPubKey);
 			Result ^= Result << 5 ^ GetHashCode(this.clientSignature);
 			Result ^= Result << 5 ^ GetHashCode(this.serverSignature);
 

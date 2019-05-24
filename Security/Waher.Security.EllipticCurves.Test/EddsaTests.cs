@@ -14,14 +14,16 @@ namespace Waher.Security.EllipticCurves.Test
             byte[] SecretKey = Hashes.StringToBinary("9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60");
             Edwards25519 Curve = new Edwards25519(SecretKey);
 
+            Assert.AreEqual("d75a980182b10ab7d54bfed3c964073a0ee172f3daa62325af021a68f707511a",
+                Hashes.BinaryToString(Curve.PublicKey));
+
             byte[] Message = new byte[0];
             byte[] Signature = Curve.Sign(Message);
 
             Assert.AreEqual("e5564300c360ac729086e2cc806e828a84877f1eb8e5d974d873e065224901555fb8821590a33bacc61e39701cf9b46bd25bf5f0595bbe24655141438e7a100b",
                 Hashes.BinaryToString(Signature));
 
-            Assert.AreEqual("d75a980182b10ab7d54bfed3c964073a0ee172f3daa62325af021a68f707511a",
-                Hashes.BinaryToString(Curve.PublicKey));
+            Assert.IsTrue(Curve.Verify(Message, Curve.PublicKey, Signature));
         }
 
         [TestMethod]
@@ -38,6 +40,8 @@ namespace Waher.Security.EllipticCurves.Test
 
             Assert.AreEqual("92a009a9f0d4cab8720e820b5f642540a2b27b5416503f8fb3762223ebdb69da085ac1e43e15996e458f3613d0f11d8c387b2eaeb4302aeeb00d291612bb0c00",
                 Hashes.BinaryToString(Signature));
+
+            Assert.IsTrue(Curve.Verify(Message, Curve.PublicKey, Signature));
         }
 
         [TestMethod]
@@ -54,6 +58,8 @@ namespace Waher.Security.EllipticCurves.Test
 
             Assert.AreEqual("6291d657deec24024827e69c3abe01a30ce548a284743a445e3680d7db5ac3ac18ff9b538d16f290ae67f760984dc6594a7c15e9716ed28dc027beceea1ec40a",
                 Hashes.BinaryToString(Signature));
+
+            Assert.IsTrue(Curve.Verify(Message, Curve.PublicKey, Signature));
         }
 
         [TestMethod]
@@ -70,6 +76,8 @@ namespace Waher.Security.EllipticCurves.Test
 
             Assert.AreEqual("0aab4c900501b3e24d7cdf4663326a3a87df5e4843b2cbdb67cbf6e460fec350aa5371b1508f9f4528ecea23c436d94b5e8fcd4f681e30a6ac00a9704a188a03",
                 Hashes.BinaryToString(Signature));
+
+            Assert.IsTrue(Curve.Verify(Message, Curve.PublicKey, Signature));
         }
 
         [TestMethod]
@@ -86,6 +94,8 @@ namespace Waher.Security.EllipticCurves.Test
 
             Assert.AreEqual("dc2a4459e7369633a52b1bf277839a00201009a3efbf3ecb69bea2186c26b58909351fc9ac90b3ecfdfbc7c66431e0303dca179c138ac17ad9bef1177331a704",
                 Hashes.BinaryToString(Signature));
+
+            Assert.IsTrue(Curve.Verify(Message, Curve.PublicKey, Signature));
         }
 
         [TestMethod]
@@ -102,6 +112,8 @@ namespace Waher.Security.EllipticCurves.Test
 
             Assert.AreEqual("533a37f6bbe457251f023c0d88f976ae2dfb504a843e34d2074fd823d41a591f2b233f034f628281f2fd7a22ddd47d7828c59bd0a21bfd3980ff0d2028d4b18a9df63e006c5d1c2d345b925d8dc00b4104852db99ac5c7cdda8530a113a0f4dbb61149f05a7363268c71d95808ff2e652600",
                 Hashes.BinaryToString(Signature));
+
+            Assert.IsTrue(Curve.Verify(Message, Curve.PublicKey, Signature));
         }
 
         [TestMethod]
@@ -118,6 +130,8 @@ namespace Waher.Security.EllipticCurves.Test
 
             Assert.AreEqual("26b8f91727bd62897af15e41eb43c377efb9c610d48f2335cb0bd0087810f4352541b143c4b981b7e18f62de8ccdf633fc1bf037ab7cd779805e0dbcc0aae1cbcee1afb2e027df36bc04dcecbf154336c19f0af7e0a6472905e799f1953d2a0ff3348ab21aa4adafd1d234441cf807c03a00",
                 Hashes.BinaryToString(Signature));
+
+            Assert.IsTrue(Curve.Verify(Message, Curve.PublicKey, Signature));
         }
 
         [TestMethod]
@@ -134,6 +148,8 @@ namespace Waher.Security.EllipticCurves.Test
 
             Assert.AreEqual("1f0a8888ce25e8d458a21130879b840a9089d999aaba039eaf3e3afa090a09d389dba82c4ff2ae8ac5cdfb7c55e94d5d961a29fe0109941e00b8dbdeea6d3b051068df7254c0cdc129cbe62db2dc957dbb47b51fd3f213fb8698f064774250a5028961c9bf8ffd973fe5d5c206492b140e00",
                 Hashes.BinaryToString(Signature));
+
+            Assert.IsTrue(Curve.Verify(Message, Curve.PublicKey, Signature));
         }
 
         [TestMethod]
@@ -150,6 +166,8 @@ namespace Waher.Security.EllipticCurves.Test
 
             Assert.AreEqual("7eeeab7c4e50fb799b418ee5e3197ff6bf15d43a14c34389b59dd1a7b1b85b4ae90438aca634bea45e3a2695f1270f07fdcdf7c62b8efeaf00b45c2c96ba457eb1a8bf075a3db28e5c24f6b923ed4ad747c3c9e03c7079efb87cb110d3a99861e72003cbae6d6b8b827e4e6c143064ff3c00",
                 Hashes.BinaryToString(Signature));
+
+            Assert.IsTrue(Curve.Verify(Message, Curve.PublicKey, Signature));
         }
 
         [TestMethod]
@@ -166,6 +184,8 @@ namespace Waher.Security.EllipticCurves.Test
 
             Assert.AreEqual("6a12066f55331b6c22acd5d5bfc5d71228fbda80ae8dec26bdd306743c5027cb4890810c162c027468675ecf645a83176c0d7323a2ccde2d80efe5a1268e8aca1d6fbc194d3f77c44986eb4ab4177919ad8bec33eb47bbb5fc6e28196fd1caf56b4e7e0ba5519234d047155ac727a1053100",
                 Hashes.BinaryToString(Signature));
+
+            Assert.IsTrue(Curve.Verify(Message, Curve.PublicKey, Signature));
         }
 
         [TestMethod]
@@ -182,6 +202,8 @@ namespace Waher.Security.EllipticCurves.Test
 
             Assert.AreEqual("554bc2480860b49eab8532d2a533b7d578ef473eeb58c98bb2d0e1ce488a98b18dfde9b9b90775e67f47d4a1c3482058efc9f40d2ca033a0801b63d45b3b722ef552bad3b4ccb667da350192b61c508cf7b6b5adadc2c8d9a446ef003fb05cba5f30e88e36ec2703b349ca229c2670833900",
                 Hashes.BinaryToString(Signature));
+
+            Assert.IsTrue(Curve.Verify(Message, Curve.PublicKey, Signature));
         }
 
         [TestMethod]
@@ -198,6 +220,8 @@ namespace Waher.Security.EllipticCurves.Test
 
             Assert.AreEqual("c650ddbb0601c19ca11439e1640dd931f43c518ea5bea70d3dcde5f4191fe53f00cf966546b72bcc7d58be2b9badef28743954e3a44a23f880e8d4f1cfce2d7a61452d26da05896f0a50da66a239a8a188b6d825b3305ad77b73fbac0836ecc60987fd08527c1a8e80d5823e65cafe2a3d00",
                 Hashes.BinaryToString(Signature));
+
+            Assert.IsTrue(Curve.Verify(Message, Curve.PublicKey, Signature));
         }
 
         [TestMethod]
@@ -214,6 +238,8 @@ namespace Waher.Security.EllipticCurves.Test
 
             Assert.AreEqual("e301345a41a39a4d72fff8df69c98075a0cc082b802fc9b2b6bc503f926b65bddf7f4c8f1cb49f6396afc8a70abe6d8aef0db478d4c6b2970076c6a0484fe76d76b3a97625d79f1ce240e7c576750d295528286f719b413de9ada3e8eb78ed573603ce30d8bb761785dc30dbc320869e1a00",
                 Hashes.BinaryToString(Signature));
+
+            Assert.IsTrue(Curve.Verify(Message, Curve.PublicKey, Signature));
         }
     }
 }

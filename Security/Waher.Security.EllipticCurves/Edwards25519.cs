@@ -91,8 +91,7 @@ namespace Waher.Security.EllipticCurves
         /// <returns>If the signature is valid.</returns>
         public override bool Verify(byte[] Data, byte[] PublicKey, byte[] Signature)
         {
-            return EdDSA.Verify(Data, PublicKey, Hashes.ComputeSHA512Hash, this.orderBits,
-                this, Signature);
+            return EdDSA.Verify(Data, PublicKey, Hashes.ComputeSHA512Hash, this, Signature);
         }
 
     }

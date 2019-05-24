@@ -13,7 +13,7 @@ namespace Waher.Security.EllipticCurves
         private static readonly BigInteger p0 = BigInteger.Pow(2, 448) - BigInteger.Pow(2, 224) - 1;
         private static readonly BigInteger A0 = 156326;
         private static readonly BigInteger A24 = (A0 - 2) / 4;
-        private static readonly BigInteger n0 = BigInteger.Pow(2, 446) - BigInteger.Parse("8335dc163bb124b65129c96fde933d8d723a70aadc873d6d54a7bb0d", NumberStyles.HexNumber);
+        private static readonly BigInteger n0 = BigInteger.Pow(2, 446) - BigInteger.Parse("008335dc163bb124b65129c96fde933d8d723a70aadc873d6d54a7bb0d", NumberStyles.HexNumber);
         private static readonly BigInteger BasePointU = 5;
         private static readonly BigInteger BasePointV = BigInteger.Parse("355293926785568175264127502063783334808976399387714271831880898435169088786967410002932673765864550910142774147268105838985595290606362");
 

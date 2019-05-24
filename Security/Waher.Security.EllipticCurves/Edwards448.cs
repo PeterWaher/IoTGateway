@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Numerics;
+using System.Text;
 using Waher.Security.SHA3;
 
 namespace Waher.Security.EllipticCurves
@@ -15,7 +16,7 @@ namespace Waher.Security.EllipticCurves
     {
         private static readonly BigInteger p0 = BigInteger.Pow(2, 448) - BigInteger.Pow(2, 224) - 1;
         private static readonly BigInteger d0 = p0 - 39081;
-        private static readonly BigInteger n0 = BigInteger.Pow(2, 446) - BigInteger.Parse("8335dc163bb124b65129c96fde933d8d723a70aadc873d6d54a7bb0d", NumberStyles.HexNumber);
+        private static readonly BigInteger n0 = BigInteger.Pow(2, 446) - BigInteger.Parse("008335dc163bb124b65129c96fde933d8d723a70aadc873d6d54a7bb0d", NumberStyles.HexNumber);
         private static readonly BigInteger BasePointX = BigInteger.Parse("224580040295924300187604334099896036246789641632564134246125461686950415467406032909029192869357953282578032075146446173674602635247710");
         private static readonly BigInteger BasePointY = BigInteger.Parse("298819210078481492676017930443930673437544040154080242095928241372331506189835876003536878655418784733982303233503462500531545062832660");
         private readonly SHAKE256 shake256_114;
@@ -86,9 +87,7 @@ namespace Waher.Security.EllipticCurves
         /// <returns>Signature.</returns>
         public override byte[] Sign(byte[] Data)
         {
-            return EdDSA.Sign(Data, this.PrivateKey, this.AdditionalInfo, 
-                Bin => this.shake256_114.ComputeVariable(Bin),
-                this.orderBits, this);
+            return EdDSA.Sign(Data, this.PrivateKey, this.AdditionalInfo, this.H_dom4, this);
         }
 
         /// <summary>
@@ -100,10 +99,24 @@ namespace Waher.Security.EllipticCurves
         /// <returns>If the signature is valid.</returns>
         public override bool Verify(byte[] Data, byte[] PublicKey, byte[] Signature)
         {
-            return EdDSA.Verify(Data, PublicKey, 
-                Bin => this.shake256_114.ComputeVariable(Bin), this.orderBits,
-                this, Signature);
+            return EdDSA.Verify(Data, PublicKey, this.H_dom4, this.orderBits, this, 
+                Signature);
         }
+
+        private byte[] H_dom4(byte[] Data)
+        {
+            int c = Data.Length;
+            byte[] Bin = new byte[10 + c];
+
+            Array.Copy(preamble, 0, Bin, 0, 8);
+            Bin[8] = 0;                         // x=phflag=0
+            Bin[9] = 0;                         // y=context=empty string
+            Array.Copy(Data, 0, Bin, 10, c);
+
+            return this.shake256_114.ComputeVariable(Bin);
+        }
+
+        private static readonly byte[] preamble = Encoding.ASCII.GetBytes("SigEd448");
 
     }
 }

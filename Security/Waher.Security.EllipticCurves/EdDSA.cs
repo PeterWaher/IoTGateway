@@ -23,25 +23,24 @@ namespace Waher.Security.EllipticCurves
         /// <param name="PrivateKey">Private key.</param>
         /// <param name="Prefix">Prefix</param>
         /// <param name="HashFunction">Hash function to use</param>
-        /// <param name="ScalarBits">Number of bits to use for scalars.</param>
         /// <param name="MsbMask">Mask for most significant byte.</param>
         /// <param name="Curve">Elliptic curve</param>
         /// <returns>Signature</returns>
         public static byte[] Sign(byte[] Data, byte[] PrivateKey, byte[] Prefix,
-            HashFunction HashFunction, int ScalarBits, EdwardsCurveBase Curve)
+            HashFunction HashFunction, EdwardsCurveBase Curve)
         {
             // 5.1.6 of RFC 8032
 
-            int ScalarBytes = (ScalarBits + 9) >> 3;
-
-            if (PrivateKey.Length != ScalarBytes)
-                throw new ArgumentException("Invalid private key.", nameof(PrivateKey));
+            int ScalarBytes = PrivateKey.Length;
 
             if (Prefix.Length != ScalarBytes)
                 throw new ArgumentException("Invalid prefix.", nameof(Prefix));
 
             Console.Out.WriteLine("Signing");
             Console.Out.WriteLine("------------");
+
+            Console.Out.WriteLine("PrivateKey: " + Hashes.BinaryToString(PrivateKey));
+            Console.Out.WriteLine("Prefix: " + Hashes.BinaryToString(Prefix));
 
             BigInteger a = EllipticCurve.ToInt(PrivateKey);
 
@@ -66,6 +65,8 @@ namespace Waher.Security.EllipticCurves
             Console.Out.WriteLine("Hash: " + Hashes.BinaryToString(h));
 
             BigInteger r = EllipticCurve.ToInt(h);
+            Console.Out.WriteLine("r: " + r.ToString());
+            Console.Out.WriteLine("L: " + Curve.Order.ToString());
             r = BigInteger.Remainder(r, Curve.Order);
 
             Console.Out.WriteLine("r: " + r.ToString());

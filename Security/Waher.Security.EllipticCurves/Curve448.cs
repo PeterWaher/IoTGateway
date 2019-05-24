@@ -5,7 +5,7 @@ using System.Numerics;
 namespace Waher.Security.EllipticCurves
 {
     /// <summary>
-    /// Curve448, as defined in RFC 7748:
+    /// Curve448 (Goldilocks), as defined in RFC 7748:
     /// https://tools.ietf.org/html/rfc7748
     /// </summary>
     public class Curve448 : MontgomeryCurve
@@ -18,7 +18,7 @@ namespace Waher.Security.EllipticCurves
         private static readonly BigInteger BasePointV = BigInteger.Parse("355293926785568175264127502063783334808976399387714271831880898435169088786967410002932673765864550910142774147268105838985595290606362");
 
         /// <summary>
-        /// Curve448, as defined in RFC 7748:
+        /// Curve448 (Goldilocks), as defined in RFC 7748:
         /// https://tools.ietf.org/html/rfc7748
         /// </summary>
         public Curve448()
@@ -27,7 +27,7 @@ namespace Waher.Security.EllipticCurves
         }
 
         /// <summary>
-        /// Curve448, as defined in RFC 7748:
+        /// Curve448 (Goldilocks), as defined in RFC 7748:
         /// https://tools.ietf.org/html/rfc7748
         /// </summary>
         /// <param name="Secret">Secret.</param>
@@ -59,10 +59,16 @@ namespace Waher.Security.EllipticCurves
             BigInteger U4 = this.modP.Multiply(U2, U2);
             BigInteger U5 = this.modP.Multiply(U3, U2);
             BigInteger V2 = this.modP.Multiply(UV.Y, UV.Y);
-            BigInteger X = this.modP.Divide(this.modP.Multiply(4 * UV.Y, U2 - 1),
-                (U4 - 2 * U2 + 4 * V2 + BigInteger.One));
-            BigInteger Y = this.modP.Divide(-(U5 - 2 * U3 - 4 * UV.X * V2 + UV.X),
-               (U5 - 2 * U2 * V2 - 2 * U3 - 2 * V2 + UV.X));
+
+            BigInteger TwoU2 = U2 << 1;
+            BigInteger TwoU3 = U3 << 1;
+
+            BigInteger X = this.modP.Divide(this.modP.Multiply(UV.Y << 2, U2 - 1),
+                (U4 - TwoU2 + (V2 << 2) + BigInteger.One));
+
+            BigInteger Y = this.modP.Divide(-(U5 - TwoU3 -
+                this.modP.Multiply((UV.X << 2), V2) + UV.X),
+               (U5 - this.modP.Multiply(TwoU2, V2) - TwoU3 - (V2 << 1) + UV.X));
 
             if (X.Sign < 0)
                 X += this.p;

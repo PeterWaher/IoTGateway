@@ -171,13 +171,14 @@ namespace Waher.Security.EllipticCurves.Test
 
             PointOnCurve UV = C.BasePoint;
             PointOnCurve XY = C.ToXY(UV);
+
+            Assert.AreEqual("15112221349535400772501151409588531511454012693041857206046113283949847762202", XY.X.ToString());
+            Assert.AreEqual("46316835694926478169428394003475163141307993866256225615783033603165251855960", XY.Y.ToString());
+
             PointOnCurve UV2 = C.ToUV(XY);
 
             Assert.AreEqual(UV.X, UV2.X);
             Assert.AreEqual(UV.Y, UV2.Y);
-
-            Assert.AreEqual("15112221349535400772501151409588531511454012693041857206046113283949847762202", XY.X.ToString());
-            Assert.AreEqual("46316835694926478169428394003475163141307993866256225615783033603165251855960", XY.Y.ToString());
         }
 
         [TestMethod]
@@ -187,13 +188,17 @@ namespace Waher.Security.EllipticCurves.Test
 
             PointOnCurve UV = C.BasePoint;
             PointOnCurve XY = C.ToXY(UV);
+
+            Edwards448 C2 = new Edwards448();
+            PointOnCurve XY4 = C2.ScalarMultiplication(4, C2.BasePoint, true);  // 4-isogeny
+
+            Assert.AreEqual(XY4.X, XY.X);
+            Assert.AreEqual(XY4.Y, XY.Y);
+
             PointOnCurve UV2 = C.ToUV(XY);
+            PointOnCurve UV4 = C.ScalarMultiplication(4, C.BasePoint, true);
 
-            Assert.AreEqual(UV.X, UV2.X);
-            Assert.AreEqual(UV.Y, UV2.Y);
-
-            Assert.AreEqual("224580040295924300187604334099896036246789641632564134246125461686950415467406032909029192869357953282578032075146446173674602635247710", XY.X.ToString());
-            Assert.AreEqual("298819210078481492676017930443930673437544040154080242095928241372331506189835876003536878655418784733982303233503462500531545062832660", XY.Y.ToString());
+            Assert.AreEqual(UV4.X, UV2.X);
         }
 
         [TestMethod]

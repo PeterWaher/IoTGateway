@@ -64,6 +64,7 @@ namespace Waher.Security.EllipticCurves
         private byte[] secret;
         private byte[] privateKey;
         private byte[] publicKey;
+        private byte[] additionalInfo;
         private PointOnCurve publicKeyPoint;
 
         /// <summary>
@@ -93,6 +94,7 @@ namespace Waher.Security.EllipticCurves
             this.secret = Secret;
             this.privateKey = null;
             this.publicKey = null;
+            this.additionalInfo = null;
 
             this.orderBits = ModulusP.CalcBits(this.n);
             this.orderBytes = (this.orderBits + 7) >> 3;
@@ -144,6 +146,20 @@ namespace Waher.Security.EllipticCurves
                     this.Init();
 
                 return this.publicKey;
+            }
+        }
+
+        /// <summary>
+        /// Curve-specific additional information
+        /// </summary>
+        protected byte[] AdditionalInfo
+        {
+            get
+            {
+                if (this.additionalInfo is null)
+                    this.Init();
+
+                return this.additionalInfo;
             }
         }
 
@@ -211,12 +227,13 @@ namespace Waher.Security.EllipticCurves
         /// <param name="Secret">Secret</param>
         public virtual void SetPrivateKey(byte[] Secret)
         {
-            byte[] PrivKey = this.CalculatePrivateKey(Secret);
-            PointOnCurve P = this.ScalarMultiplication(PrivKey, this.g, true);
+            Tuple<byte[], byte[]> Info = this.CalculatePrivateKey(Secret);
+            PointOnCurve P = this.ScalarMultiplication(Info.Item1, this.g, true);
 
             this.publicKey = this.Encode(P);
             this.publicKeyPoint = P;
-            this.privateKey = PrivKey;
+            this.privateKey = Info.Item1;
+            this.additionalInfo = Info.Item2;
             this.secret = Secret;
         }
 
@@ -224,10 +241,10 @@ namespace Waher.Security.EllipticCurves
         /// Calculates a private key from a secret.
         /// </summary>
         /// <param name="Secret">Binary secret.</param>
-        /// <returns>Private key</returns>
-        public virtual byte[] CalculatePrivateKey(byte[] Secret)
+        /// <returns>Private key, and curve-specific information</returns>
+        public virtual Tuple<byte[], byte[]> CalculatePrivateKey(byte[] Secret)
         {
-            return Secret;
+            return new Tuple<byte[], byte[]>(Secret, null);
         }
 
         /// <summary>

@@ -9,7 +9,7 @@ namespace Waher.Security.EllipticCurves
     /// </summary>
     public abstract class EdwardsCurve : EdwardsCurveBase
 	{
-        private BigInteger p34;
+        private readonly BigInteger p34;
 
         /// <summary>
         /// Base class of Edwards curves (x²+y²=1+dx²y²) over a prime field.

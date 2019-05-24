@@ -18,7 +18,7 @@ namespace Waher.Security.EllipticCurves
         private static readonly BigInteger n0 = BigInteger.Pow(2, 446) - BigInteger.Parse("8335dc163bb124b65129c96fde933d8d723a70aadc873d6d54a7bb0d", NumberStyles.HexNumber);
         private static readonly BigInteger BasePointX = BigInteger.Parse("224580040295924300187604334099896036246789641632564134246125461686950415467406032909029192869357953282578032075146446173674602635247710");
         private static readonly BigInteger BasePointY = BigInteger.Parse("298819210078481492676017930443930673437544040154080242095928241372331506189835876003536878655418784733982303233503462500531545062832660");
-        private SHAKE256 shake256_114;
+        private readonly SHAKE256 shake256_114;
 
         /// <summary>
         /// Edwards448 Elliptic Curve, as defined in RFC7748 & RFC8032:
@@ -62,18 +62,20 @@ namespace Waher.Security.EllipticCurves
         /// </summary>
         /// <param name="Secret">Binary secret.</param>
         /// <returns>Private key</returns>
-        public override byte[] CalculatePrivateKey(byte[] Secret)
+        public override Tuple<byte[], byte[]> CalculatePrivateKey(byte[] Secret)
         {
-            byte[] Bin = Hashes.ComputeSHA512Hash(Secret);
+            byte[] Bin = this.shake256_114.ComputeVariable(Secret);
+            byte[] PrivateKey = new byte[57];
+            byte[] AdditionalInfo = new byte[57];
 
-            if (Bin.Length != 57)
-                Array.Resize<byte>(ref Bin, 57);
+            Array.Copy(Bin, 0, PrivateKey, 0, 57);
+            Array.Copy(Bin, 57, AdditionalInfo, 0, 57);
 
-            Bin[0] &= 0xfc;
-            Bin[55] |= 0x80;
-            Bin[56] = 0;
+            PrivateKey[0] &= 0xfc;
+            PrivateKey[56] |= 0x80;
+            PrivateKey[57] = 0;
 
-            return Bin;
+            return new Tuple<byte[], byte[]>(PrivateKey, AdditionalInfo);
         }
 
         /// <summary>
@@ -84,7 +86,7 @@ namespace Waher.Security.EllipticCurves
         /// <returns>Signature.</returns>
         public override byte[] Sign(byte[] Data)
         {
-            return EdDSA.Sign(Data, this.PrivateKey, 
+            return EdDSA.Sign(Data, this.PrivateKey, this.AdditionalInfo, 
                 Bin => this.shake256_114.ComputeVariable(Bin),
                 this.orderBits, this);
         }

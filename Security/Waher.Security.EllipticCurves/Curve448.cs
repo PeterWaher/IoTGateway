@@ -112,7 +112,7 @@ namespace Waher.Security.EllipticCurves
         /// </summary>
         /// <param name="Secret">Binary secret.</param>
         /// <returns>Private key</returns>
-        public override byte[] CalculatePrivateKey(byte[] Secret)
+        public override Tuple<byte[], byte[]> CalculatePrivateKey(byte[] Secret)
         {
             byte[] Bin = Secret;
 
@@ -135,7 +135,7 @@ namespace Waher.Security.EllipticCurves
             Bin[55] |= 0x80;
             Bin[56] |= 0;
 
-            return Bin;
+            return new Tuple<byte[], byte[]>(Bin, null);
         }
 
         /// <summary>

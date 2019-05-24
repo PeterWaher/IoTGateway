@@ -54,15 +54,20 @@ namespace Waher.Security.EllipticCurves
         /// </summary>
         /// <param name="Secret">Binary secret.</param>
         /// <returns>Private key</returns>
-        public override byte[] CalculatePrivateKey(byte[] Secret)
+        public override Tuple<byte[], byte[]> CalculatePrivateKey(byte[] Secret)
         {
             byte[] Bin = Hashes.ComputeSHA512Hash(Secret);
+            byte[] PrivateKey = new byte[32];
+            byte[] AdditionalInfo = new byte[32];
 
-            Bin[0] &= 0xf8;
-            Bin[31] &= 0x3f;
-            Bin[31] |= 0x40;
+            Array.Copy(Bin, 0, PrivateKey, 0, 32);
+            Array.Copy(Bin, 32, AdditionalInfo, 0, 32);
 
-            return Bin;
+            PrivateKey[0] &= 0xf8;
+            PrivateKey[31] &= 0x3f;
+            PrivateKey[31] |= 0x40;
+
+            return new Tuple<byte[], byte[]>(PrivateKey, AdditionalInfo);
         }
 
         /// <summary>
@@ -73,7 +78,8 @@ namespace Waher.Security.EllipticCurves
         /// <returns>Signature.</returns>
         public override byte[] Sign(byte[] Data)
         {
-            return EdDSA.Sign(Data, this.PrivateKey, Hashes.ComputeSHA512Hash, this.orderBits, this);
+            return EdDSA.Sign(Data, this.PrivateKey, this.AdditionalInfo,
+                Hashes.ComputeSHA512Hash, this.orderBits, this);
         }
 
         /// <summary>

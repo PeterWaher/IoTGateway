@@ -21,48 +21,49 @@ namespace Waher.Security.EllipticCurves
         /// </summary>
         /// <param name="Data">Data to be signed.</param>
         /// <param name="PrivateKey">Private key.</param>
+        /// <param name="Prefix">Prefix</param>
         /// <param name="HashFunction">Hash function to use</param>
         /// <param name="ScalarBits">Number of bits to use for scalars.</param>
         /// <param name="MsbMask">Mask for most significant byte.</param>
         /// <param name="Curve">Elliptic curve</param>
         /// <returns>Signature</returns>
-        public static byte[] Sign(byte[] Data, byte[] PrivateKey, HashFunction HashFunction,
-            int ScalarBits, EdwardsCurveBase Curve)
+        public static byte[] Sign(byte[] Data, byte[] PrivateKey, byte[] Prefix,
+            HashFunction HashFunction, int ScalarBits, EdwardsCurveBase Curve)
         {
             // 5.1.6 of RFC 8032
 
             int ScalarBytes = (ScalarBits + 8) >> 3;
 
-            if (PrivateKey.Length != ScalarBytes << 1)
+            if (PrivateKey.Length != ScalarBytes)
                 throw new ArgumentException("Invalid private key.", nameof(PrivateKey));
+
+            if (Prefix.Length != ScalarBytes)
+                throw new ArgumentException("Invalid prefix.", nameof(Prefix));
 
             Console.Out.WriteLine("Signing");
             Console.Out.WriteLine("------------");
 
-            byte[] Bin = new byte[ScalarBits];
-            Array.Copy(PrivateKey, 0, Bin, 0, ScalarBytes);
-
-            BigInteger a = EllipticCurve.ToInt(Bin);
+            BigInteger a = EllipticCurve.ToInt(PrivateKey);
 
             Console.Out.WriteLine("a: " + a.ToString());
 
-            PointOnCurve P = Curve.ScalarMultiplication(Bin, Curve.BasePoint, true);
+            PointOnCurve P = Curve.ScalarMultiplication(PrivateKey, Curve.BasePoint, true);
 
             Console.Out.WriteLine("P: " + P.ToString());
-            Console.Out.WriteLine("Public Key: " + Curve.PublicKey.ToString());
+            Console.Out.WriteLine("Public Key: " + Curve.PublicKeyPoint.ToString());
 
             byte[] A = Encode(P, Curve);
 
             Console.Out.WriteLine("A: " + Hashes.BinaryToString(A));
 
             int c = Data.Length;
-            Bin = new byte[ScalarBytes + c];             // dom2(F, C) = blank string
-            Array.Copy(PrivateKey, ScalarBytes, Bin, 0, ScalarBytes);    // prefix
+            byte[] Bin = new byte[ScalarBytes + c];             // dom2(F, C) = blank string
+            Array.Copy(Prefix, 0, Bin, 0, ScalarBytes);         // prefix
             Array.Copy(Data, 0, Bin, ScalarBytes, c);           // PH(M)=M
 
             byte[] h = HashFunction(Bin);
 
-            Console.Out.WriteLine("Hash 2: " + PrivateKey.ToString());
+            Console.Out.WriteLine("Hash: " + Hashes.BinaryToString(h));
 
             BigInteger r = EllipticCurve.ToInt(h);
             r = BigInteger.Remainder(r, Curve.Order);

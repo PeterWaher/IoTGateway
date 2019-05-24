@@ -9,8 +9,8 @@ namespace Waher.Security.EllipticCurves
     /// </summary>
     public abstract class EdwardsTwistedCurve : EdwardsCurveBase
     {
-        private BigInteger p58;
-        private BigInteger twoP14;
+        private readonly BigInteger p58;
+        private readonly BigInteger twoP14;
 
         /// <summary>
         /// Base class of Twisted Edwards curves (-x²+y²=1+dx²y²) over a prime field.

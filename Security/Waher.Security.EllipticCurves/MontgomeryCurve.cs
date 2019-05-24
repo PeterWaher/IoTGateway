@@ -231,8 +231,8 @@ namespace Waher.Security.EllipticCurves
                 x3[i] ^= Dummy;
             }
 
-            I2 = ToInt(x2);
-            I3 = ToInt(x3);
+            I2 = new BigInteger(x2);
+            I3 = new BigInteger(x3);
         }
 
         /// <summary>
@@ -273,30 +273,64 @@ namespace Waher.Security.EllipticCurves
             get
             {
                 PointOnCurve PublicKey = base.PublicKeyPoint;
-                BigInteger V = PublicKey.Y;
 
-                if (V.IsZero)
+                if (PublicKey.Y.IsZero)
                 {
-                    BigInteger U = PublicKey.X;
-                    BigInteger U2 = this.modP.Multiply(U, U);
-                    BigInteger U3 = this.modP.Multiply(U, U2);
-                    BigInteger V2 = BigInteger.Remainder(U3 + this.modP.Multiply(this.A, U2) + U, this.Prime);
-
-                    BigInteger V1 = this.modP.Sqrt(V2);
-                    if (V1.Sign < 0)
-                        V1 += this.Prime;
-
-                    V = this.Prime - V1;
-                    if (V1 < V)
-                        V = V1;
-
-                    PublicKey.Y = V;
-
+                    this.CalcV(ref PublicKey);
                     this.PublicKeyPoint = PublicKey;
                 }
 
                 return PublicKey;
             }
+        }
+
+        private void CalcV(ref PointOnCurve P)
+        {
+            BigInteger U = P.X;
+            BigInteger U2 = this.modP.Multiply(U, U);
+            BigInteger U3 = this.modP.Multiply(U, U2);
+            BigInteger V2 = BigInteger.Remainder(U3 + this.modP.Multiply(this.A, U2) + U, this.Prime);
+
+            BigInteger V1 = this.modP.Sqrt(V2);
+            if (V1.Sign < 0)
+                V1 += this.Prime;
+
+            BigInteger V = this.Prime - V1;
+            if (V1 < V)
+                V = V1;
+
+            P.Y = V;
+        }
+
+        /// <summary>
+        /// Encodes a point on the curve.
+        /// </summary>
+        /// <param name="Point">Normalized point to encode.</param>
+        /// <returns>Encoded point.</returns>
+        public override byte[] Encode(PointOnCurve Point)
+        {
+            byte[] Bin = Point.X.ToByteArray();
+            int c = this.orderBytes;
+
+            if (Bin.Length < c)
+                Array.Resize<byte>(ref Bin, c);
+
+            return Bin;
+        }
+
+        /// <summary>
+        /// Decodes an encoded point on the curve.
+        /// </summary>
+        /// <param name="Point">Encoded point.</param>
+        /// <returns>Decoded point.</returns>
+        public override PointOnCurve Decode(byte[] Point)
+        {
+            BigInteger U = ToInt(Point);
+            PointOnCurve P = new PointOnCurve(U, BigInteger.Zero);
+
+            this.CalcV(ref P);
+
+            return P;
         }
 
         /// <summary>

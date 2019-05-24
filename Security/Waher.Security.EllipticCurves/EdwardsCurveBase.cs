@@ -78,5 +78,24 @@ namespace Waher.Security.EllipticCurves
         /// <returns>X-coordinate</returns>
         public abstract BigInteger GetX(BigInteger Y, bool X0);
 
+        /// <summary>
+        /// Encodes a point on the curve.
+        /// </summary>
+        /// <param name="Point">Normalized point to encode.</param>
+        /// <returns>Encoded point.</returns>
+        public override byte[] Encode(PointOnCurve Point)
+        {
+            return EdDSA.Encode(Point, this);
+        }
+
+        /// <summary>
+        /// Decodes an encoded point on the curve.
+        /// </summary>
+        /// <param name="Point">Encoded point.</param>
+        /// <returns>Decoded point.</returns>
+        public override PointOnCurve Decode(byte[] Point)
+        {
+            return EdDSA.Decode(Point, this);
+        }
     }
 }

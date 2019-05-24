@@ -32,7 +32,7 @@ namespace Waher.Security.EllipticCurves
         {
             // 5.1.6 of RFC 8032
 
-            int ScalarBytes = (ScalarBits + 8) >> 3;
+            int ScalarBytes = (ScalarBits + 9) >> 3;
 
             if (PrivateKey.Length != ScalarBytes)
                 throw new ArgumentException("Invalid private key.", nameof(PrivateKey));
@@ -184,7 +184,7 @@ namespace Waher.Security.EllipticCurves
         {
             try
             {
-                int ScalarBytes = (ScalarBits + 8) >> 3;
+                int ScalarBytes = (ScalarBits + 9) >> 3;
 
                 Console.Out.WriteLine();
                 Console.Out.WriteLine("Verifying");

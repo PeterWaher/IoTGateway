@@ -72,8 +72,8 @@ namespace Waher.Security.EllipticCurves
             Array.Copy(Bin, 57, AdditionalInfo, 0, 57);
 
             PrivateKey[0] &= 0xfc;
-            PrivateKey[56] |= 0x80;
-            PrivateKey[57] = 0;
+            PrivateKey[55] |= 0x80;
+            PrivateKey[56] = 0;
 
             return new Tuple<byte[], byte[]>(PrivateKey, AdditionalInfo);
         }

@@ -275,7 +275,7 @@ namespace Waher.Security.EllipticCurves.Test
         }
 
         [TestMethod]
-        [Ignore]
+        //[Ignore]
         public void Test_14_X25519_TestVector_3_1000000()
         {
             this.X25519_TestVector_3(1000000, "7c3911e0ab2586fd864497297e575e6f3bc601c0883c30df5f4dd2d24f665424");
@@ -408,7 +408,7 @@ namespace Waher.Security.EllipticCurves.Test
         }
 
         [TestMethod]
-        [Ignore]
+        //[Ignore]
         public void Test_20_X448_TestVector_3_1000000()
         {
             this.X448_TestVector_3(1000000, "077f453681caca3693198420bbe515cae0002472519b3e67661a7e89cab94695c8f4bcd66e61b9b9c946da8d524de3d69bd9d9d66b997e37");

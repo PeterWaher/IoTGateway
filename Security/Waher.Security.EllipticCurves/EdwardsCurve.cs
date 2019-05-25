@@ -97,16 +97,6 @@ namespace Waher.Security.EllipticCurves
             if (!P.IsHomogeneous)
                 P.Z = BigInteger.One;
 
-            /*BigInteger x1s = this.Multiply(P.X, P.X);
-            BigInteger y1s = this.Multiply(P.Y, P.Y);
-            BigInteger z1s = this.Multiply(P.Z, P.Z);
-            BigInteger xys = this.Add(P.X, P.Y);
-            BigInteger F = this.Add(x1s, y1s);
-            BigInteger J2 = this.Subtract(F, this.Add(z1s, z1s));
-            BigInteger X = this.Multiply(this.Subtract(this.Multiply(xys, xys), x1s + y1s), J2);
-            BigInteger Y = this.Multiply(F, x1s - y1s);
-            BigInteger Z = this.Multiply(F, J2);*/
-
             BigInteger A = this.modP.Add(P.X, P.Y);
             BigInteger B = this.modP.Multiply(A, A);
             BigInteger C = this.modP.Multiply(P.X, P.X);
@@ -118,26 +108,6 @@ namespace Waher.Security.EllipticCurves
             P.X = this.modP.Multiply(B - E, J);
             P.Y = this.modP.Multiply(E, C - D);
             P.Z = this.modP.Multiply(E, J);
-
-            /*BigInteger A1 = this.Multiply(X, P.Z);
-            BigInteger A2 = this.Multiply(P.X, Z);
-            BigInteger B1 = this.Multiply(Y, P.Z);
-            BigInteger B2 = this.Multiply(P.Y, Z);
-
-            if (A1.Sign < 0)
-                A1 += this.p;
-
-            if (A2.Sign < 0)
-                A2 += this.p;
-
-            if (B1.Sign < 0)
-                B1 += this.p;
-
-            if (B2.Sign < 0)
-                B2 += this.p;
-
-            if (A1 != A2 || B1 != B2)
-                throw new Exception("Double incorrect");*/
         }
 
         /// <summary>

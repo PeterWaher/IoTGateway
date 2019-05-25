@@ -276,7 +276,7 @@ namespace Waher.Security.EllipticCurves
 
                 if (PublicKey.Y.IsZero)
                 {
-                    this.CalcV(ref PublicKey);
+                    PublicKey.Y = this.CalcV(PublicKey.X);
                     this.PublicKeyPoint = PublicKey;
                 }
 
@@ -284,9 +284,13 @@ namespace Waher.Security.EllipticCurves
             }
         }
 
-        private void CalcV(ref PointOnCurve P)
+        /// <summary>
+        /// Calculates the V-coordinate, given the corresponding U-coordinate.
+        /// </summary>
+        /// <param name="U">U-coordinate.</param>
+        /// <returns>V-coordinate.</returns>
+        public BigInteger CalcV(BigInteger U)
         {
-            BigInteger U = P.X;
             BigInteger U2 = this.modP.Multiply(U, U);
             BigInteger U3 = this.modP.Multiply(U, U2);
             BigInteger V2 = BigInteger.Remainder(U3 + this.modP.Multiply(this.A, U2) + U, this.Prime);
@@ -299,7 +303,7 @@ namespace Waher.Security.EllipticCurves
             if (V1 < V)
                 V = V1;
 
-            P.Y = V;
+            return V;
         }
 
         /// <summary>
@@ -326,9 +330,7 @@ namespace Waher.Security.EllipticCurves
         public override PointOnCurve Decode(byte[] Point)
         {
             BigInteger U = ToInt(Point);
-            PointOnCurve P = new PointOnCurve(U, BigInteger.Zero);
-
-            this.CalcV(ref P);
+            PointOnCurve P = new PointOnCurve(U, this.CalcV(U));
 
             return P;
         }

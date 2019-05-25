@@ -153,24 +153,14 @@ namespace Waher.Security.EllipticCurves
             PointOnCurve PublicKeyUV = this.PublicKeyPoint;
             PointOnCurve PublicKeyXY = this.ToXY(PublicKeyUV);
 
-            BigInteger PrivateKey = ToInt(this.PrivateKey);
-            BigInteger PrivateKey2 = BigInteger.Remainder(this.Order - PrivateKey, this.Order);
-            if (PrivateKey2.Sign < 0)
-                PrivateKey2 += this.Order;
-
-            EdwardsCurveBase Candidate = new Edwards448(PrivateKey2.ToByteArray());
+            Edwards448 Candidate = new Edwards448(this.PrivateKey, false);
             PointOnCurve PublicKeyXY2 = Candidate.PublicKeyPoint;
+            PublicKeyXY2 = Candidate.ScalarMultiplication(4, PublicKeyXY2, true);
 
             if (PublicKeyXY.Y.Equals(PublicKeyXY2.Y))
                 return Candidate;
-
-            Candidate = new Edwards448(this.PrivateKey);
-            PublicKeyXY2 = Candidate.PublicKeyPoint;
-
-            if (PublicKeyXY.Y.Equals(PublicKeyXY2.Y))
-                return Candidate;
-
-            throw new InvalidOperationException("Unable to create pair curve.");
+            else
+                throw new InvalidOperationException("Unable to create pair curve.");
         }
 
     }

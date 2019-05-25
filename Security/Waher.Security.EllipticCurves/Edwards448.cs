@@ -20,6 +20,7 @@ namespace Waher.Security.EllipticCurves
         private static readonly BigInteger BasePointX = BigInteger.Parse("224580040295924300187604334099896036246789641632564134246125461686950415467406032909029192869357953282578032075146446173674602635247710");
         private static readonly BigInteger BasePointY = BigInteger.Parse("298819210078481492676017930443930673437544040154080242095928241372331506189835876003536878655418784733982303233503462500531545062832660");
         private readonly SHAKE256 shake256_114;
+        private readonly bool hashSecret;
 
         /// <summary>
         /// Edwards448 Elliptic Curve, as defined in RFC7748 & RFC8032:
@@ -27,7 +28,7 @@ namespace Waher.Security.EllipticCurves
         /// https://tools.ietf.org/html/rfc8032
         /// </summary>
         public Edwards448()
-            : this(null)
+            : this(null, true)
         {
         }
 
@@ -38,9 +39,22 @@ namespace Waher.Security.EllipticCurves
         /// </summary>
         /// <param name="Secret">Secret.</param>
         public Edwards448(byte[] Secret)
+            : this(Secret, true)
+        {
+        }
+
+        /// <summary>
+        /// Edwards448 Elliptic Curve, as defined in RFC7748 & RFC8032:
+        /// https://tools.ietf.org/html/rfc7748
+        /// https://tools.ietf.org/html/rfc8032
+        /// </summary>
+        /// <param name="Secret">Secret.</param>
+        /// <param name="HashSecret">If the secret should be hashed to create the private key.</param>
+        public Edwards448(byte[] Secret, bool HashSecret)
             : base(p0, new PointOnCurve(BasePointX, BasePointY), d0, n0, Cofactor: 4, Secret)
         {
             this.shake256_114 = new SHAKE256(114 << 3);
+            this.hashSecret = HashSecret;
         }
 
         /// <summary>
@@ -66,10 +80,14 @@ namespace Waher.Security.EllipticCurves
         public override Tuple<byte[], byte[]> CalculatePrivateKey(byte[] Secret)
         {
             byte[] Bin = this.shake256_114.ComputeVariable(Secret);
-            byte[] PrivateKey = new byte[57];
             byte[] AdditionalInfo = new byte[57];
+            byte[] PrivateKey = new byte[57];
 
-            Array.Copy(Bin, 0, PrivateKey, 0, 57);
+            if (this.hashSecret)
+                Array.Copy(Bin, 0, PrivateKey, 0, 57);
+            else
+                Array.Copy(Secret, 0, PrivateKey, 0, Math.Min(57, Secret.Length));
+
             Array.Copy(Bin, 57, AdditionalInfo, 0, 57);
 
             PrivateKey[0] &= 0xfc;

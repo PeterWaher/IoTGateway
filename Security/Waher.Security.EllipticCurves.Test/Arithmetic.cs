@@ -199,6 +199,9 @@ namespace Waher.Security.EllipticCurves.Test
             PointOnCurve UV4 = C.ScalarMultiplication(4, C.BasePoint, true);
 
             Assert.AreEqual(UV4.X, UV2.X);
+
+            BigInteger V4 = C.CalcV(UV4.X);
+            Assert.IsTrue(V4 == UV2.Y || (C.Prime - V4) == UV2.Y);
         }
 
         [TestMethod]
@@ -453,13 +456,13 @@ namespace Waher.Security.EllipticCurves.Test
             byte[] A = Hashes.StringToBinary("9a8f4925d1519f5775cf46b04b5800d4ee9ee8bae8bc5565d498c28dd9c9baf574a9419744897391006382a6f127ab1d9ac2d8c0a598726b");
             Curve448 Alice = new Curve448(A);
 
-            Assert.AreEqual("9b08f7cc31b7e3e67d22d5aea121074a273bd2b83de09c63faa73d2c22c5d9bbc836647241d953d40c5b12da88120d53177f80e532c41fa000", 
+            Assert.AreEqual("9b08f7cc31b7e3e67d22d5aea121074a273bd2b83de09c63faa73d2c22c5d9bbc836647241d953d40c5b12da88120d53177f80e532c41fa000",
                 Hashes.BinaryToString(Alice.PublicKey));
 
             A = Hashes.StringToBinary("1c306a7ac2a0e2e0990b294470cba339e6453772b075811d8fad0d1d6927c120bb5ee8972b0d3e21374c9c921b09d1b0366f10b65173992d");
             Curve448 Bob = new Curve448(A);
 
-            Assert.AreEqual("3eb7a829b0cd20f5bcfc0b599b6feccf6da4627107bdb0d4f345b43027d8b972fc3e34fb4232a13ca706dcb57aec3dae07bdc1c67bf33609", 
+            Assert.AreEqual("3eb7a829b0cd20f5bcfc0b599b6feccf6da4627107bdb0d4f345b43027d8b972fc3e34fb4232a13ca706dcb57aec3dae07bdc1c67bf33609",
                 Hashes.BinaryToString(Bob.PublicKey));
 
             byte[] Key1 = Alice.GetSharedKey(Bob.PublicKey, Hashes.ComputeSHA256Hash);
@@ -505,6 +508,7 @@ namespace Waher.Security.EllipticCurves.Test
                     PointOnCurve P1 = C1.PublicKeyPoint;
                     PointOnCurve P1_2 = C1.ToXY(P1);
                     PointOnCurve P2 = C2.PublicKeyPoint;
+                    P2 = C2.ScalarMultiplication(4, P2, true);  // 4-isogeny
 
                     Assert.AreEqual(P1_2.Y, P2.Y);
 
@@ -557,7 +561,7 @@ namespace Waher.Security.EllipticCurves.Test
         }
 
         private void TestEncoding(EdwardsCurveBase Curve)
-        { 
+        {
             int i;
             int NrErrors = 0;
 

@@ -76,13 +76,20 @@ namespace Waher.Security.EllipticCurves.Test
 
 					rnd.GetBytes(Data);
 
-					byte[] Signature = Curve1.Sign(Data);
-					bool Valid = Curve2.Verify(Data, Curve1.PublicKey, Signature);
+                    try
+                    {
+                        byte[] Signature = Curve1.Sign(Data);
+                        bool Valid = Curve2.Verify(Data, Curve1.PublicKey, Signature);
 
-                    if (Valid)
-                        Ok++;
-                    else
+                        if (Valid)
+                            Ok++;
+                        else
+                            Errors++;
+                    }
+                    catch (Exception)
+                    {
                         Errors++;
+                    }
 
 					Curve1.GenerateKeys();
 					Curve2.GenerateKeys();

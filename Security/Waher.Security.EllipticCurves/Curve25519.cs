@@ -130,10 +130,10 @@ namespace Waher.Security.EllipticCurves
             Edwards25519 Candidate = new Edwards25519(this.PrivateKey, false);
             PointOnCurve PublicKeyXY2 = Candidate.PublicKeyPoint;
 
-            if (PublicKeyXY.Y.Equals(PublicKeyXY2.Y))
-                return Candidate;
-            else
+            if (!PublicKeyXY.Y.Equals(PublicKeyXY2.Y))
                 throw new InvalidOperationException("Unable to create pair curve.");
+
+            return Candidate;
         }
 
     }

@@ -351,5 +351,15 @@ namespace Waher.Security.EllipticCurves
             return Pair.Verify(Data, Pair.Encode(XY), Signature);
         }
 
+        /// <summary>
+        /// Sets the private key (and therefore also the public key) of the curve.
+        /// </summary>
+        /// <param name="Secret">Secret</param>
+        public override void SetPrivateKey(byte[] Secret)
+        {
+            base.SetPrivateKey(Secret);
+            this.pair = null;
+        }
+
     }
 }

@@ -485,10 +485,10 @@ namespace Waher.Security.EllipticCurves.Test
         [TestMethod]
         public void Test_22_TwinCurves_25519()
         {
-            this.EdwardsTwinTest<Edwards25519>(new Curve25519());
+            this.EdwardsTwinTest<Edwards25519>(new Curve25519(), 1);
         }
 
-        protected void EdwardsTwinTest<CurveType>(MontgomeryCurve C1)
+        protected void EdwardsTwinTest<CurveType>(MontgomeryCurve C1, int Isogeny)
             where CurveType : EdwardsCurveBase
         {
             int Ok = 0;
@@ -508,7 +508,9 @@ namespace Waher.Security.EllipticCurves.Test
                     PointOnCurve P1 = C1.PublicKeyPoint;
                     PointOnCurve P1_2 = C1.ToXY(P1);
                     PointOnCurve P2 = C2.PublicKeyPoint;
-                    P2 = C2.ScalarMultiplication(4, P2, true);  // 4-isogeny
+
+                    if (Isogeny != 1)
+                        P2 = C2.ScalarMultiplication(Isogeny, P2, true);
 
                     Assert.AreEqual(P1_2.Y, P2.Y);
 
@@ -526,7 +528,7 @@ namespace Waher.Security.EllipticCurves.Test
         [TestMethod]
         public void Test_23_TwinCurves_448()
         {
-            this.EdwardsTwinTest<Edwards448>(new Curve448());
+            this.EdwardsTwinTest<Edwards448>(new Curve448(), 4);
         }
 
         [TestMethod]

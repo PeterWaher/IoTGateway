@@ -136,5 +136,28 @@ namespace Waher.Security.EllipticCurves
             return Candidate;
         }
 
+        /// <summary>
+        /// Creates a signature of <paramref name="Data"/> using the XEdDSA algorithm.
+        /// </summary>
+        /// <param name="Data">Payload to sign.</param>
+        /// <returns>Signature.</returns>
+        public override byte[] Sign(byte[] Data)
+        {
+            return XEdDSA.Sign(Data, this.PrivateKey, Hashes.ComputeSHA512Hash, this);
+        }
+
+        /// <summary>
+        /// Verifies a signature of <paramref name="Data"/> made by the EdDSA algorithm.
+        /// </summary>
+        /// <param name="Data">Payload to sign.</param>
+        /// <param name="PublicKey">Public Key of the entity that generated the signature.</param>
+        /// <param name="Signature">Signature</param>
+        /// <returns>If the signature is valid.</returns>
+        public override bool Verify(byte[] Data, byte[] PublicKey, byte[] Signature)
+        {
+            return XEdDSA.Verify(Data, PublicKey, Hashes.ComputeSHA512Hash, this, 
+                Signature, 255, 253);
+        }
+
     }
 }

@@ -227,8 +227,16 @@ namespace Waher.Security.EllipticCurves
             if (n.IsZero)
                 return 0;
 
-            byte[] A = n.ToByteArray();
+            return CalcBits(n.ToByteArray());
+        }
 
+        /// <summary>
+        /// Calculates the number of bits used in a binary encoded big integer.
+        /// </summary>
+        /// <param name="n">Value</param>
+        /// <returns>Number of bits used by value.</returns>
+        public static int CalcBits(byte[] A)
+        { 
             int c = A.Length - 1;
             int i = c << 3;
             byte b = A[c];

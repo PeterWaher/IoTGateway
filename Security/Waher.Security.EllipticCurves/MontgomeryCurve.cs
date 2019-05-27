@@ -256,16 +256,6 @@ namespace Waher.Security.EllipticCurves
         public abstract EdwardsCurveBase CreatePair();
 
         /// <summary>
-        /// Creates a signature of <paramref name="Data"/> using the EdDSA algorithm.
-        /// </summary>
-        /// <param name="Data">Payload to sign.</param>
-        /// <returns>Signature.</returns>
-        public override byte[] Sign(byte[] Data)
-        {
-            return this.Pair.Sign(Data);
-        }
-
-        /// <summary>
         /// Public key.
         /// </summary>
         public override PointOnCurve PublicKeyPoint
@@ -333,22 +323,6 @@ namespace Waher.Security.EllipticCurves
             PointOnCurve P = new PointOnCurve(U, this.CalcV(U));
 
             return P;
-        }
-
-        /// <summary>
-        /// Verifies a signature of <paramref name="Data"/> made by the EdDSA algorithm.
-        /// </summary>
-        /// <param name="Data">Payload to sign.</param>
-        /// <param name="PublicKey">Public Key of the entity that generated the signature.</param>
-        /// <param name="Signature">Signature</param>
-        /// <returns>If the signature is valid.</returns>
-        public override bool Verify(byte[] Data, byte[] PublicKey, byte[] Signature)
-        {
-            PointOnCurve UV = this.Decode(PublicKey);
-            PointOnCurve XY = this.ToXY(UV);
-            EdwardsCurveBase Pair = this.Pair;
-
-            return Pair.Verify(Data, Pair.Encode(XY), Signature);
         }
 
         /// <summary>

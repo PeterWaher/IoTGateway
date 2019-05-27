@@ -97,5 +97,14 @@ namespace Waher.Security.EllipticCurves
         {
             return EdDSA.Decode(Point, this);
         }
+
+        /// <summary>
+        /// Negates a point on the curve.
+        /// </summary>
+        /// <param name="P">Point</param>
+        public void Negate(ref PointOnCurve P)
+        {
+            P.X = this.p - P.X;
+        }
     }
 }

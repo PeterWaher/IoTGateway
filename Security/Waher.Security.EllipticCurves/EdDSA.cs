@@ -23,7 +23,6 @@ namespace Waher.Security.EllipticCurves
         /// <param name="PrivateKey">Private key.</param>
         /// <param name="Prefix">Prefix</param>
         /// <param name="HashFunction">Hash function to use</param>
-        /// <param name="MsbMask">Mask for most significant byte.</param>
         /// <param name="Curve">Elliptic curve</param>
         /// <returns>Signature</returns>
         public static byte[] Sign(byte[] Data, byte[] PrivateKey, byte[] Prefix,

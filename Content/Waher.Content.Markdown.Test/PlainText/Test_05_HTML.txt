@@ -6,7 +6,7 @@ Foo
 
 This is an example of bold text.
 
-© Waher Data AB 2016-2018. All rights reserved.
+© Waher Data AB 2016-2019. All rights reserved.
 
 AT&T
 

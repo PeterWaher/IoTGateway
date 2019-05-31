@@ -63,6 +63,6 @@ goods or services; loss of use, data, or profits; or business interruption) howe
 liability, or tort (including negligence or otherwise) arising in any way out of the use of this software, even if advised of the possibility of such 
 damage.
 
-The **IoT Gateway** is &copy; [Waher Data AB](http://waher.se/) 2016-2018. All rights reserved.
+The **IoT Gateway** is &copy; [Waher Data AB](http://waher.se/) 2016-2019. All rights reserved.
  
 [![](../../Images/logo-WaherDataAB-300x58.png)](http://waher.se/)

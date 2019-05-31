@@ -45,26 +45,7 @@ namespace Waher.Security.ChaChaPoly
                 ToUInt32(Nonce, 8)
             };
 
-            this.state = new uint[]
-            {
-                0x61707865,            //  0
-                0x3320646e,            //  1
-                0x79622d32,            //  2
-                0x6b206574,            //  3
-                ToUInt32(Key, 0),      //  4
-                ToUInt32(Key, 4),      //  5
-                ToUInt32(Key, 8),      //  6
-                ToUInt32(Key, 12),     //  7
-                ToUInt32(Key, 16),     //  8
-                ToUInt32(Key, 20),     //  9
-                ToUInt32(Key, 24),     // 10
-                ToUInt32(Key, 28),     // 11
-                BlockCounter,          // 12
-                ToUInt32(Nonce, 0),    // 13
-                ToUInt32(Nonce, 4),    // 14
-                ToUInt32(Nonce, 8),    // 15
-            };
-
+            this.state = new uint[16];
             this.prev = new uint[16];
             this.block = new byte[64];
             this.pos = 64;

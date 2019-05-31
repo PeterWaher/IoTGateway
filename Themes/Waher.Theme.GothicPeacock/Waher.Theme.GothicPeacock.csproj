@@ -9,7 +9,7 @@
     <Product>Waher.IoTGateway</Product>
     <Description>Contains theme files for the Gothic Peacock theme.</Description>
     <Copyright>Copyright © Waher Data AB 2018-2019. All rights reserved.</Copyright>
-    <PackageLicenseUrl>https://github.com/PeterWaher/IoTGateway#license</PackageLicenseUrl>
+    <PackageLicenseUrl></PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Themes/Waher.Theme.GothicPeacock</PackageProjectUrl>
     <PackageIconUrl>https://github.com/PeterWaher/IoTGateway/blob/master/Images/Icon.ico?raw=true</PackageIconUrl>
     <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
@@ -19,6 +19,7 @@
     <AssemblyVersion>1.0.5</AssemblyVersion>
     <FileVersion>1.0.5</FileVersion>
     <Version>1.0.5</Version>
+    <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -33,6 +34,10 @@
     <None Remove="Root\Themes\GothicPeacock\GothicPeacockBanner1900x500.png" />
     <None Remove="Root\Themes\GothicPeacock\GothicPeacockBanner2000x600.png" />
     <None Remove="Waher.Theme.GothicPeacock.manifest" />
+    <None Include="..\..\LICENSE.md">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
   <ItemGroup>

@@ -4,9 +4,10 @@
     <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
   </PropertyGroup>
   <ImportGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
-    <Import Project="$(NuGetPackageRoot)microsoft.net.native.sharedlibrary-x86\1.7.0\build\Microsoft.Net.Native.SharedLibrary-x86.targets" Condition="Exists('$(NuGetPackageRoot)microsoft.net.native.sharedlibrary-x86\1.7.0\build\Microsoft.Net.Native.SharedLibrary-x86.targets')" />
-    <Import Project="$(NuGetPackageRoot)microsoft.net.native.sharedlibrary-x64\1.7.0\build\Microsoft.Net.Native.SharedLibrary-x64.targets" Condition="Exists('$(NuGetPackageRoot)microsoft.net.native.sharedlibrary-x64\1.7.0\build\Microsoft.Net.Native.SharedLibrary-x64.targets')" />
-    <Import Project="$(NuGetPackageRoot)microsoft.net.native.sharedlibrary-arm\1.7.0\build\Microsoft.Net.Native.SharedLibrary-arm.targets" Condition="Exists('$(NuGetPackageRoot)microsoft.net.native.sharedlibrary-arm\1.7.0\build\Microsoft.Net.Native.SharedLibrary-arm.targets')" />
-    <Import Project="$(NuGetPackageRoot)microsoft.net.native.compiler\1.7.3\build\Microsoft.Net.Native.Compiler.targets" Condition="Exists('$(NuGetPackageRoot)microsoft.net.native.compiler\1.7.3\build\Microsoft.Net.Native.Compiler.targets')" />
+    <Import Project="$(NuGetPackageRoot)microsoft.net.native.sharedlibrary-x86\1.7.3\build\Microsoft.Net.Native.SharedLibrary-x86.targets" Condition="Exists('$(NuGetPackageRoot)microsoft.net.native.sharedlibrary-x86\1.7.3\build\Microsoft.Net.Native.SharedLibrary-x86.targets')" />
+    <Import Project="$(NuGetPackageRoot)microsoft.net.native.sharedlibrary-x64\1.7.3\build\Microsoft.Net.Native.SharedLibrary-x64.targets" Condition="Exists('$(NuGetPackageRoot)microsoft.net.native.sharedlibrary-x64\1.7.3\build\Microsoft.Net.Native.SharedLibrary-x64.targets')" />
+    <Import Project="$(NuGetPackageRoot)microsoft.net.native.sharedlibrary-arm\1.7.3\build\Microsoft.Net.Native.SharedLibrary-arm.targets" Condition="Exists('$(NuGetPackageRoot)microsoft.net.native.sharedlibrary-arm\1.7.3\build\Microsoft.Net.Native.SharedLibrary-arm.targets')" />
+    <Import Project="$(NuGetPackageRoot)microsoft.net.native.compiler\1.7.6\build\Microsoft.Net.Native.Compiler.targets" Condition="Exists('$(NuGetPackageRoot)microsoft.net.native.compiler\1.7.6\build\Microsoft.Net.Native.Compiler.targets')" />
+    <Import Project="$(NuGetPackageRoot)microsoft.netcore.universalwindowsplatform\6.2.8\build\Microsoft.NetCore.UniversalWindowsPlatform.targets" Condition="Exists('$(NuGetPackageRoot)microsoft.netcore.universalwindowsplatform\6.2.8\build\Microsoft.NetCore.UniversalWindowsPlatform.targets')" />
   </ImportGroup>
 </Project>

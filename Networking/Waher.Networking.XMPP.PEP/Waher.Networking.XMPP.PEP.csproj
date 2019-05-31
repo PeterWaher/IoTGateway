@@ -25,7 +25,7 @@ XEP-0118: User Tune</Description>
     <PackageTags>networking communication xmpp pep Personal Eventing XEP-0163 XEP-0080 XEP-0084 XEP-0107 XEP-0108 XEP-0118 user location avatar mood activity tune</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
     <Version>1.0.8</Version>
-    <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -48,7 +48,7 @@ XEP-0118: User Tune</Description>
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\..\LICENSE.md">
+    <None Include="..\..\LICENSE.txt">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>

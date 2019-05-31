@@ -21,7 +21,7 @@
     <OldToolsVersion>2.0</OldToolsVersion>
     <AssemblyVersion>1.0.6</AssemblyVersion>
     <FileVersion>1.0.6</FileVersion>
-    <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DocumentationFile>bin\Debug\netstandard1.3\Waher.Security.JWT.xml</DocumentationFile>
@@ -36,7 +36,7 @@
     <ProjectReference Include="..\Waher.Security\Waher.Security.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\LICENSE.md">
+    <None Include="..\..\LICENSE.txt">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>

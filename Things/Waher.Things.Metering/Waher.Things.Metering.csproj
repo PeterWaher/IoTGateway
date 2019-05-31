@@ -21,7 +21,7 @@
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Things\Waher.Things.Metering\</UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>
-    <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DocumentationFile>bin\Debug\netstandard1.3\.xml</DocumentationFile>
@@ -41,7 +41,7 @@
     <ProjectReference Include="..\Waher.Things\Waher.Things.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\LICENSE.md">
+    <None Include="..\..\LICENSE.txt">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>

@@ -23,7 +23,7 @@ Syntax supported: https://waher.se/Markdown.md</Description>
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Content\Waher.Content.Markdown\</UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>
-    <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DocumentationFile>bin\Debug\netstandard1.3\.xml</DocumentationFile>
@@ -40,7 +40,7 @@ Syntax supported: https://waher.se/Markdown.md</Description>
     <ProjectReference Include="..\Waher.Content.Xml\Waher.Content.Xml.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\LICENSE.md">
+    <None Include="..\..\LICENSE.txt">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>

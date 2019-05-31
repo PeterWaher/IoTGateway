@@ -6,6 +6,7 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B9E73330-E0D8-4830-BBCF-9A3C57F672D2}"
 	ProjectSection(SolutionItems) = preProject
 		LICENSE.md = LICENSE.md
+		LICENSE.txt = LICENSE.txt
 		README.md = README.md
 		TODO.txt = TODO.txt
 	EndProjectSection
@@ -371,9 +372,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Security.SHA3", "Secu
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Security.SHA3.Test", "Security\Waher.Security.SHA3.Test\Waher.Security.SHA3.Test.csproj", "{1E0B5FDA-CE18-4F68-9B77-AEA85A079F36}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Security.ChaChaPoly", "Security\Waher.Security.ChaChaPoly\Waher.Security.ChaChaPoly.csproj", "{BECF883F-F807-4451-AE32-10B7F80F96B2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Security.ChaChaPoly", "Security\Waher.Security.ChaChaPoly\Waher.Security.ChaChaPoly.csproj", "{BECF883F-F807-4451-AE32-10B7F80F96B2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Security.ChaChaPoly.Test", "Security\Waher.Security.ChaChaPoly.Test\Waher.Security.ChaChaPoly.Test.csproj", "{F5B84FB8-4440-4FDC-9C48-7AEB8834BD0F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Security.ChaChaPoly.Test", "Security\Waher.Security.ChaChaPoly.Test\Waher.Security.ChaChaPoly.Test.csproj", "{F5B84FB8-4440-4FDC-9C48-7AEB8834BD0F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

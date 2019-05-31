@@ -20,7 +20,7 @@
     <FileVersion>1.0.8</FileVersion>
     <Version>1.0.8</Version>
     <PackageId>Waher.Theme.CactusRose</PackageId>
-    <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -28,7 +28,7 @@
     <None Remove="Root\Themes\CactusRose\CactusRose.xml" />
     <None Remove="Root\Themes\CactusRose\CactusRose800x800Dimmed.png" />
     <None Remove="Waher.Theme.CactusRose.manifest" />
-    <None Include="..\..\LICENSE.md">
+    <None Include="..\..\LICENSE.txt">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>

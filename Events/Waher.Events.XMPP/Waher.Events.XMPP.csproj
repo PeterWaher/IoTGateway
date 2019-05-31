@@ -21,7 +21,7 @@
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Events\Waher.Events.XMPP\</UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>
     <Version>1.0.4</Version>
-    <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DocumentationFile>bin\Debug\netstandard1.3\Waher.Events.XMPP.xml</DocumentationFile>
@@ -37,7 +37,7 @@
     <ProjectReference Include="..\Waher.Events\Waher.Events.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\LICENSE.md">
+    <None Include="..\..\LICENSE.txt">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>

@@ -21,7 +21,7 @@
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Mocks\Waher.Mock\</UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>
-    <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DocumentationFile>bin\Debug\netstandard2.0\Waher.Mock.xml</DocumentationFile>
@@ -32,7 +32,7 @@
   <ItemGroup>
     <None Remove="Schema\SimpleComponentConfiguration.xsd" />
     <None Remove="Schema\SimpleXmppConfiguration.xsd" />
-    <None Include="..\..\LICENSE.md">
+    <None Include="..\..\LICENSE.txt">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>

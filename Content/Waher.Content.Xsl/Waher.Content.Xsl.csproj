@@ -21,7 +21,7 @@
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Content\Waher.Content.Xsl\</UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>
     <Version>1.0.2</Version>
-    <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DocumentationFile>bin\Debug\netstandard2.0\Waher.Content.Xsl.xml</DocumentationFile>
@@ -33,7 +33,7 @@
     <ProjectReference Include="..\Waher.Content\Waher.Content.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\LICENSE.md">
+    <None Include="..\..\LICENSE.txt">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>

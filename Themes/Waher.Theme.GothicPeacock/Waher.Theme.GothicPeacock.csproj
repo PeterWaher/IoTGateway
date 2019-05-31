@@ -19,7 +19,7 @@
     <AssemblyVersion>1.0.5</AssemblyVersion>
     <FileVersion>1.0.5</FileVersion>
     <Version>1.0.5</Version>
-    <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -34,7 +34,7 @@
     <None Remove="Root\Themes\GothicPeacock\GothicPeacockBanner1900x500.png" />
     <None Remove="Root\Themes\GothicPeacock\GothicPeacockBanner2000x600.png" />
     <None Remove="Waher.Theme.GothicPeacock.manifest" />
-    <None Include="..\..\LICENSE.md">
+    <None Include="..\..\LICENSE.txt">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>

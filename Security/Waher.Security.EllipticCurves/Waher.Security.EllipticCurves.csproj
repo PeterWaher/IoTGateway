@@ -36,7 +36,7 @@ Edwards448 (Goldilocks)</Description>
     <AssemblyVersion>1.0.4</AssemblyVersion>
     <FileVersion>1.0.4</FileVersion>
     <Version>1.0.4</Version>
-    <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -49,7 +49,7 @@ Edwards448 (Goldilocks)</Description>
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\..\LICENSE.md">
+    <None Include="..\..\LICENSE.txt">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>

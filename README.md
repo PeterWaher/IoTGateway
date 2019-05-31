@@ -63,7 +63,7 @@ goods or services; loss of use, data, or profits; or business interruption) howe
 liability, or tort (including negligence or otherwise) arising in any way out of the use of this software, even if advised of the possibility of such 
 damage.
 
-The **IoT Gateway** is &copy; [Waher Data AB](http://waher.se/) 2016-2018. All rights reserved.
+The **IoT Gateway** is &copy; [Waher Data AB](http://waher.se/) 2016-2019. All rights reserved.
  
 [![](/Images/logo-WaherDataAB-300x58.png)](http://waher.se/)
 
@@ -305,6 +305,7 @@ authorization and encryption.
 |-----------------------------------|--------------|------------------------------------------------------------------------|---------------------|
 | **Waher.Security**                | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Security/)                | The [Waher.Security](Security/Waher.Security) project provides a basic security model based on users, roles and privileges. It's not based on operating system features, to allow code to be platform independent. |
 | **Waher.Security.ACME**           | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Security.ACME/)           | The [Waher.Security.ACME](Security/Waher.Security.ACME) project contains a class library implementing the ACME v2 protocol for the generation of certificates using ACME-compliant certificate servers, as defined in the [ACME draft](https://tools.ietf.org/html/draft-ietf-acme-acme-13). |
+| **Waher.Security.ChaChaPoly**     | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Security.ChaChaPoly/)     | The [Waher.Security.ChaChaPoly](Security/Waher.Security.ChaChaPoly) project implements the ChaCha and Poly algorithms, as defined in [RFC 8439](https://tools.ietf.org/html/rfc8439). |
 | **Waher.Security.DTLS**           | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Security.DTLS/)           | The [Waher.Security.DTLS](Security/Waher.Security.DTLS) project contains a class library implementing the Datagram Transport Layer Security (DTLS) Version 1.2, as defined in [RFC 6347](https://tools.ietf.org/html/rfc6347). |
 | **Waher.Security.EllipticCurves** | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Security.EllipticCurves/) | The [Waher.Security.EllipticCurves](Security/Waher.Security.EllipticCurves) project contains a class library implementing algorithms for Elliptic Curve Cryptography, such as ECDH, ECDSA, EdDSA, NIST P-192, NIST P-224, NIST P-256, NIST P-384, NIST P-521, Curve25519, Curve448, Edwards25519 and Edwards448. |
 | **Waher.Security.JWS**            | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Security.JWS/)            | The [Waher.Security.JWS](Security/Waher.Security.JWS) project implements a framework for JSON Web Signatures (JWS), as defined in [RFC 7515](https://tools.ietf.org/html/rfc7515). |
@@ -319,6 +320,7 @@ The folder also contains the following unit test projects:
 | Project                                | Type          | Project description |
 |----------------------------------------|---------------|---------------------|
 | **Waher.Security.ACME.Test**           | .NET 4.6.2    | The [Waher.Security.ACME.Test](Security/Waher.Security.ACME.Test) project contains unit tests for the  [Waher.Security.ACME](Security/Waher.Security.ACME) project.                                         |
+| **Waher.Security.ChaChaPoly.Test**     | .NET Core 2.0 | The [Waher.Security.ChaChaPoly.Test](Security/Waher.Security.ChaChaPoly.Test) project contains unit tests for the  [Waher.Security.ChaChaPoly](Security/Waher.Security.ChaChaPoly) project. |
 | **Waher.Security.DTLS.Test**           | .NET 4.6.2    | The [Waher.Security.DTLS.Test](Security/Waher.Security.DTLS.Test) project contains unit tests for the  [Waher.Security.DTLS](Security/Waher.Security.DTLS) project.                                         |
 | **Waher.Security.EllipticCurves.Test** | .NET Core 2.0 | The [Waher.Security.EllipticCurves.Test](Security/Waher.Security.EllipticCurves.Test) project contains unit tests for the  [Waher.Security.EllipticCurves](Security/Waher.Security.EllipticCurves) project. |
 | **Waher.Security.JWT.Test**            | .NET 4.6.2    | The [Waher.Security.JWT.Test](Security/Waher.Security.JWT.Test) project contains unit tests for the  [Waher.Security.JWT](Security/Waher.Security.JWT) project.                                             |

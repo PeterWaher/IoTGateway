@@ -40,13 +40,13 @@ namespace Waher.Security.EllipticCurves.Test
 		}
 
 		[TestMethod]
-		public void Test_06_EdDSA_Curve25519()
+		public void Test_06_XEdDSA_Curve25519()
 		{
 			this.Test_Signature(new Curve25519(), new Curve25519());
 		}
 
 		[TestMethod]
-		public void Test_07_EdDSA_Curve448()
+		public void Test_07_XEdDSA_Curve448()
 		{
 			this.Test_Signature(new Curve448(), new Curve448());
 		}

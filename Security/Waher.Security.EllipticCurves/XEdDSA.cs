@@ -3,7 +3,13 @@ using System.Numerics;
 using System.Security.Cryptography;
 
 namespace Waher.Security.EllipticCurves
-{
+{/*
+    /// <summary>
+    /// Delegate to fill a byte array with random bytes.
+    /// </summary>
+    /// <param name="Bytes">Array to be filled with random bytes.</param>
+    public delegate void GetRandomBytesHandler(byte[] Bytes);
+
     /// <summary>
     /// Implements the XEdDSA signature algorithm for Montgomery curves, as specified by
     /// the Signal Protocol:
@@ -11,7 +17,19 @@ namespace Waher.Security.EllipticCurves
     /// </summary>
     public static class XEdDSA
     {
-        private readonly static RandomNumberGenerator rnd;
+        private readonly static RandomNumberGenerator rnd = RandomNumberGenerator.Create();
+
+        /// <summary>
+        /// Fills <paramref name="Bytes"/> with random bytes.
+        /// </summary>
+        /// <param name="Bytes">Byte array.</param>
+        public static void GetBytes(byte[] Bytes)
+        {
+            lock (rnd)
+            {
+                rnd.GetBytes(Bytes);
+            }
+        }
 
         /// <summary>
         /// Signs data using the XEdDSA algorithm.
@@ -23,6 +41,22 @@ namespace Waher.Security.EllipticCurves
         /// <returns>Signature</returns>
         public static byte[] Sign(byte[] Data, byte[] PrivateKey,
             HashFunction HashFunction, MontgomeryCurve Curve)
+        {
+            return Sign(Data, PrivateKey, HashFunction, Curve, GetBytes);
+        }
+
+        /// <summary>
+        /// Signs data using the XEdDSA algorithm.
+        /// </summary>
+        /// <param name="Data">Data to be signed.</param>
+        /// <param name="PrivateKey">Private key.</param>
+        /// <param name="HashFunction">Hash function to use</param>
+        /// <param name="Curve">Elliptic curve</param>
+        /// <param name="GetRandomBytes">Method used to generate random bytes.</param>
+        /// <returns>Signature</returns>
+        public static byte[] Sign(byte[] Data, byte[] PrivateKey,
+            HashFunction HashFunction, MontgomeryCurve Curve,
+            GetRandomBytesHandler GetRandomBytes)
         {
             int ScalarBytes = PrivateKey.Length;
 
@@ -48,10 +82,7 @@ namespace Waher.Security.EllipticCurves
             byte[] Z = new byte[64];
             byte[] Bin = new byte[ScalarBytes + DataLen + 64];
 
-            lock (rnd)
-            {
-                rnd.GetBytes(Z);
-            }
+            GetRandomBytes?.Invoke(Z);
 
             Array.Copy(a, 0, Bin, 0, ScalarBytes);
             Array.Copy(Data, 0, Bin, ScalarBytes, DataLen);
@@ -120,63 +151,75 @@ namespace Waher.Security.EllipticCurves
                 if ((ScalarBytes & 1) != 0)
                     return false;
 
+                byte[] Signature2 = (byte[])Signature.Clone();
+                byte[] PublicKey2 = (byte[])PublicKey.Clone();
+                byte SignBit = (byte)(Signature2[ScalarBytes - 1] & 0x80);
+                Signature2[ScalarBytes - 1] &= 0x7f;
+
                 ScalarBytes >>= 1;
 
-                PointOnCurve P = Curve.Decode(PublicKey);
-                BigInteger U = P.X;
-                if (U >= Curve.Prime)
+                if (PublicKey2.Length != ScalarBytes)
                     return false;
 
-                byte[] Rs = new byte[ScalarBytes];
-                Array.Copy(Signature, 0, Rs, 0, ScalarBytes);
-                EdwardsCurveBase Pair = Curve.Pair;
-                PointOnCurve R = EdDSA.Decode(Rs, Pair);
+                PublicKey2[ScalarBytes - 1] |= SignBit;
 
-                byte[] ss = new byte[ScalarBytes];
-                Array.Copy(Signature, ScalarBytes, ss, 0, ScalarBytes);
-                BigInteger s = EllipticCurve.ToInt(ss);
+                return EdDSA.Verify(Data, PublicKey2, HashFunction, Curve.Pair, Signature2);
 
-                if (ModulusP.CalcBits(R.Y) >= PBits)
-                    return false;
-
-                if (ModulusP.CalcBits(ss) >= QBits)
-                    return false;
-
-                byte[] Bin = U.ToByteArray();
-                if (Bin.Length != ScalarBytes)
-                    Array.Resize<byte>(ref Bin, ScalarBytes);
-
-                int MaskBits = PBits & 7;
-                if (MaskBits != 0)
-                    Bin[ScalarBytes - 1] &= (byte)(0xff >> (8 - MaskBits));
-
-                BigInteger UMasked = EllipticCurve.ToInt(Bin);
-                PointOnCurve AP = Curve.ToXY(new PointOnCurve(U, Curve.CalcV(U)));
-
-                byte[] A = EdDSA.Encode(AP, Pair);
-                A[ScalarBytes - 1] &= 0x7f; // A.s=0
-
-                int DataLen = Data.Length;
-
-                Bin = new byte[(ScalarBytes << 1) + DataLen];
-                Array.Copy(Rs, 0, Bin, 0, ScalarBytes);
-                Array.Copy(A, 0, Bin, ScalarBytes, ScalarBytes);
-                Array.Copy(Data, 0, Bin, ScalarBytes << 1, DataLen);
-
-                BigInteger h = EllipticCurve.ToInt(HashFunction(Bin));
-                h = BigInteger.Remainder(h, Pair.Order);
-
-                PointOnCurve Rcheck = Pair.ScalarMultiplication(h, AP, true);
-                Pair.Negate(ref Rcheck);
-                Pair.AddTo(ref Rcheck, Pair.ScalarMultiplication(s, Pair.BasePoint, true));
-
-                if (!Rcheck.Y.Equals(R.Y))
-                    return false;
-
-                if (!Rcheck.X.IsEven.Equals(R.X.IsEven))
-                    return false;
-
-                return true;
+                // PointOnCurve P = Curve.Decode(PublicKey);
+                // BigInteger U = P.X;
+                // if (U >= Curve.Prime)
+                //     return false;
+                // 
+                // byte[] Rs = new byte[ScalarBytes];
+                // Array.Copy(Signature, 0, Rs, 0, ScalarBytes);
+                // EdwardsCurveBase Pair = Curve.Pair;
+                // PointOnCurve R = EdDSA.Decode(Rs, Pair);
+                // 
+                // byte[] ss = new byte[ScalarBytes];
+                // Array.Copy(Signature, ScalarBytes, ss, 0, ScalarBytes);
+                // BigInteger s = EllipticCurve.ToInt(ss);
+                // 
+                // if (ModulusP.CalcBits(R.Y) >= PBits)
+                //     return false;
+                // 
+                // if (ModulusP.CalcBits(ss) >= QBits)
+                //     return false;
+                // 
+                // byte[] Bin = U.ToByteArray();
+                // if (Bin.Length != ScalarBytes)
+                //     Array.Resize<byte>(ref Bin, ScalarBytes);
+                // 
+                // int MaskBits = PBits & 7;
+                // if (MaskBits != 0)
+                //     Bin[ScalarBytes - 1] &= (byte)(0xff >> (8 - MaskBits));
+                // 
+                // BigInteger UMasked = EllipticCurve.ToInt(Bin);
+                // PointOnCurve AP = Curve.ToXY(new PointOnCurve(U, Curve.CalcV(U)));
+                // 
+                // byte[] A = EdDSA.Encode(AP, Pair);
+                // A[ScalarBytes - 1] &= 0x7f; // A.s=0
+                // 
+                // int DataLen = Data.Length;
+                // 
+                // Bin = new byte[(ScalarBytes << 1) + DataLen];
+                // Array.Copy(Rs, 0, Bin, 0, ScalarBytes);
+                // Array.Copy(A, 0, Bin, ScalarBytes, ScalarBytes);
+                // Array.Copy(Data, 0, Bin, ScalarBytes << 1, DataLen);
+                // 
+                // BigInteger h = EllipticCurve.ToInt(HashFunction(Bin));
+                // h = BigInteger.Remainder(h, Pair.Order);
+                // 
+                // PointOnCurve Rcheck = Pair.ScalarMultiplication(h, AP, true);
+                // Pair.Negate(ref Rcheck);
+                // Pair.AddTo(ref Rcheck, Pair.ScalarMultiplication(s, Pair.BasePoint, true));
+                // 
+                // if (!Rcheck.Y.Equals(R.Y))
+                //     return false;
+                // 
+                // if (!Rcheck.X.IsEven.Equals(R.X.IsEven))
+                //     return false;
+                // 
+                // return true;
             }
             catch (ArgumentException)
             {
@@ -184,5 +227,5 @@ namespace Waher.Security.EllipticCurves
             }
         }
 
-    }
+    }*/
 }

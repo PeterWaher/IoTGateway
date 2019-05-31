@@ -143,8 +143,21 @@ namespace Waher.Security.EllipticCurves
         /// <returns>Signature.</returns>
         public override byte[] Sign(byte[] Data)
         {
-            return XEdDSA.Sign(Data, this.PrivateKey, Hashes.ComputeSHA512Hash, this);
+            throw new NotSupportedException("Signatures not supported.");
+            // return XEdDSA.Sign(Data, this.PrivateKey, Hashes.ComputeSHA512Hash, this);
         }
+
+        /*/// <summary>
+        /// Creates a signature of <paramref name="Data"/> using the XEdDSA algorithm.
+        /// </summary>
+        /// <param name="Data">Payload to sign.</param>
+        /// <param name="GetRandomBytes">Method used to generate random bytes.</param>
+        /// <returns>Signature.</returns>
+        public byte[] Sign(byte[] Data, GetRandomBytesHandler GetRandomBytes)
+        {
+            return XEdDSA.Sign(Data, this.PrivateKey, Hashes.ComputeSHA512Hash, this, 
+                GetRandomBytes);
+        }*/
 
         /// <summary>
         /// Verifies a signature of <paramref name="Data"/> made by the EdDSA algorithm.
@@ -155,8 +168,9 @@ namespace Waher.Security.EllipticCurves
         /// <returns>If the signature is valid.</returns>
         public override bool Verify(byte[] Data, byte[] PublicKey, byte[] Signature)
         {
-            return XEdDSA.Verify(Data, PublicKey, Hashes.ComputeSHA512Hash, this, 
-                Signature, 255, 253);
+            throw new NotSupportedException("Signatures not supported.");
+            //return XEdDSA.Verify(Data, PublicKey, Hashes.ComputeSHA512Hash, this, 
+            //    Signature, 255, 253);
         }
 
     }

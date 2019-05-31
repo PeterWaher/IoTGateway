@@ -7,13 +7,13 @@
     <Authors>Peter Waher</Authors>
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
-    <Description>Implements the ChaCha20 and Poly1305 algorithms, as defined in RFC 8439</Description>
+    <Description>Implements the ChaCha20, Poly1305 and AEAD_CHACHA20_POLY1305 algorithms, as defined in RFC 8439</Description>
     <Copyright>Copyright © Waher Data AB 2019. All rights reserved.</Copyright>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Security/Waher.Security.ChaChaPoly</PackageProjectUrl>
     <PackageIconUrl>https://github.com/PeterWaher/IoTGateway/blob/master/Images/Icon.ico?raw=true</PackageIconUrl>
     <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
-    <PackageTags>Security Encryption Authentication ChaCha20 Poly1305</PackageTags>
+    <PackageTags>Security Encryption Authentication ChaCha20 Poly1305 AEAD_CHACHA20_POLY1305</PackageTags>
     <AssemblyVersion>1.0.0</AssemblyVersion>
     <FileVersion>1.0.0</FileVersion>
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>

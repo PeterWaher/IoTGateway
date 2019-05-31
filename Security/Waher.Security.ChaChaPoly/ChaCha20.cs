@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Waher.Security.ChaChaPoly
 {
@@ -18,6 +16,13 @@ namespace Waher.Security.ChaChaPoly
         private readonly uint[] nonce;
         private readonly uint[] key;
 
+        /// <summary>
+        /// ChaCha20 encryptor, as defined in RFC 8439:
+        /// https://tools.ietf.org/html/rfc8439
+        /// </summary>
+        /// <param name="Key">Key</param>
+        /// <param name="BlockCounter">Block counter</param>
+        /// <param name="Nonce">Nonce value</param>
         public ChaCha20(byte[] Key, uint BlockCounter, byte[] Nonce)
         {
             if (Key.Length != 32)
@@ -89,7 +94,10 @@ namespace Waher.Security.ChaChaPoly
             b = (i << 7) | (i >> 25);
         }
 
-        private void NextBlock()
+        /// <summary>
+        /// Generates a new block.
+        /// </summary>
+        public void NextBlock()
         {
             int i, j;
             uint k;
@@ -158,7 +166,7 @@ namespace Waher.Security.ChaChaPoly
                 if (this.pos >= 64)
                     this.NextBlock();
 
-                j = Math.Min(NrBytes - i, 64);
+                j = Math.Min(NrBytes - i, 64 - this.pos);
                 Array.Copy(this.block, this.pos, Result, i, j);
                 this.pos += j;
                 i += j;
@@ -168,11 +176,11 @@ namespace Waher.Security.ChaChaPoly
         }
 
         /// <summary>
-        /// Encrypts data.
+        /// Encrypts or decrypts data.
         /// </summary>
-        /// <param name="Data">Data to be encrypted.</param>
-        /// <returns>Encrypted data.</returns>
-        public byte[] Encrypt(byte[] Data)
+        /// <param name="Data">Data to be encrypted or decrypted.</param>
+        /// <returns>Encrypted or decrypted data.</returns>
+        public byte[] EncryptOrDecrypt(byte[] Data)
         {
             int i, c = Data.Length;
             byte[] Result = this.GetBytes(c);

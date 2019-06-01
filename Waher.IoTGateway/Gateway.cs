@@ -2494,7 +2494,7 @@ namespace Waher.IoTGateway
 
 		private static void SendNotification(string To, string Markdown, string Text, string Html, string MessageId, bool Update)
 		{
-			if (Gateway.XmppClient != null && Gateway.XmppClient.State == Networking.XMPP.XmppState.Connected)
+			if (Gateway.XmppClient != null && Gateway.XmppClient.State == XmppState.Connected)
 			{
 				RosterItem Item = Gateway.XmppClient.GetRosterItem(To);
 				if (Item is null || (Item.State != SubscriptionState.To && Item.State != SubscriptionState.Both))
@@ -2509,7 +2509,12 @@ namespace Waher.IoTGateway
 					Xml.Append("<content xmlns=\"urn:xmpp:content\" type=\"text/markdown\">");
 					Xml.Append(XML.Encode(Markdown));
 					Xml.Append("</content><html xmlns='http://jabber.org/protocol/xhtml-im'><body xmlns='http://www.w3.org/1999/xhtml'>");
-					Xml.Append(Html);
+
+                    HtmlDocument Doc = new HtmlDocument("<root>" + Html + "</root>");
+
+                    foreach (HtmlNode N in (Doc.Body ?? Doc.Root).Children)
+                        N.Export(Xml);
+
 					Xml.Append("</body></html>");
 
 					if (Update && !string.IsNullOrEmpty(MessageId))

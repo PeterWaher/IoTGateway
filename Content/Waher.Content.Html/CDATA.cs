@@ -10,7 +10,7 @@ namespace Waher.Content.Html
 	/// </summary>
 	public class CDATA : HtmlNode
     {
-		private string content;
+		private readonly string content;
 
 		/// <summary>
 		/// CDATA content.
@@ -44,10 +44,21 @@ namespace Waher.Content.Html
 			Output.WriteCData(this.content);
 		}
 
-		/// <summary>
-		/// <see cref="Object.ToString()"/>
-		/// </summary>
-		public override string ToString()
+        /// <summary>
+        /// Exports the HTML document to XML.
+        /// </summary>
+        /// <param name="Output">XML Output</param>
+        public override void Export(StringBuilder Output)
+        {
+            Output.Append("<![CDATA[");
+            Output.Append(this.content);
+            Output.Append("]]>");
+        }
+
+        /// <summary>
+        /// <see cref="Object.ToString()"/>
+        /// </summary>
+        public override string ToString()
 		{
 			return this.content;
 		}

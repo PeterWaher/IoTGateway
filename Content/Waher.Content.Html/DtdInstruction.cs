@@ -10,7 +10,7 @@ namespace Waher.Content.Html
 	/// </summary>
     public class DtdInstruction : HtmlNode
     {
-		private string instruction;
+		private readonly string instruction;
 
 		/// <summary>
 		/// Represents a DTD instruction inside the document.
@@ -45,5 +45,16 @@ namespace Waher.Content.Html
 			Output.WriteRaw(this.instruction);
 			Output.WriteRaw(">");
 		}
-	}
+
+        /// <summary>
+        /// Exports the HTML document to XML.
+        /// </summary>
+        /// <param name="Output">XML Output</param>
+        public override void Export(StringBuilder Output)
+        {
+            Output.Append("<!");
+            Output.Append(this.instruction);
+            Output.Append(">");
+        }
+    }
 }

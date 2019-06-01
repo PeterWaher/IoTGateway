@@ -442,7 +442,6 @@ namespace Waher.Content.Html
 
 		private void Parse()
 		{
-			LinkedList<HtmlElement> Stack = new LinkedList<HtmlElement>();
 			StringBuilder sb = new StringBuilder();
 			HtmlElement CurrentElement = null;
 			HtmlElement EmptyElement;
@@ -2036,11 +2035,20 @@ namespace Waher.Content.Html
 			this.root?.Export(Output);
 		}
 
-		/// <summary>
-		/// Gets meta-data about the page.
-		/// </summary>
-		/// <returns>Meta-data</returns>
-		public PageMetaData GetMetaData()
+        /// <summary>
+        /// Exports the HTML document to XML.
+        /// </summary>
+        /// <param name="Output">XML Output</param>
+        public void Export(StringBuilder Output)
+        {
+            this.root?.Export(Output);
+        }
+
+        /// <summary>
+        /// Gets meta-data about the page.
+        /// </summary>
+        /// <returns>Meta-data</returns>
+        public PageMetaData GetMetaData()
 		{
 			return new PageMetaData(this);
 		}

@@ -10,7 +10,7 @@ namespace Waher.Content.Html
 	/// </summary>
 	public class Comment : HtmlNode
     {
-		private string comment;
+		private readonly string comment;
 
 		/// <summary>
 		/// Inline comment found in the document.
@@ -43,5 +43,16 @@ namespace Waher.Content.Html
 		{
 			Output.WriteComment(this.comment);
 		}
-	}
+
+        /// <summary>
+        /// Exports the HTML document to XML.
+        /// </summary>
+        /// <param name="Output">XML Output</param>
+        public override void Export(StringBuilder Output)
+        {
+            Output.Append("<!--");
+            Output.Append(this.comment);
+            Output.Append("-->");
+        }
+    }
 }

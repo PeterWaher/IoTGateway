@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Text;
 using System.Xml;
 using Waher.Content.Xml;
 
@@ -66,5 +66,14 @@ namespace Waher.Content.Html
 			Output.Flush();
 			Output.WriteRaw(XML.Encode(this.text));
 		}
-	}
+
+        /// <summary>
+        /// Exports the HTML document to XML.
+        /// </summary>
+        /// <param name="Output">XML Output</param>
+        public override void Export(StringBuilder Output)
+        {
+            Output.Append(XML.Encode(this.text));
+        }
+    }
 }

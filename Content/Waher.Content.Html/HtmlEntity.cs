@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Text;
 using System.Xml;
 using Waher.Content.Xml;
 
@@ -56,15 +56,24 @@ namespace Waher.Content.Html
 			Output.WriteRaw(XML.Encode(this.ToString()));
 		}
 
-		/// <summary>
-		/// Converts an HTML entity into a character.
-		/// 
-		/// Reference:
-		/// http://dev.w3.org/html5/html-author/charref
-		/// </summary>
-		/// <param name="Entity">HTML entity (without the &amp; and the ;)</param>
-		/// <returns>Character, if entity recognized, or null if not.</returns>
-		public static string EntityToCharacter(string Entity)
+        /// <summary>
+        /// Exports the HTML document to XML.
+        /// </summary>
+        /// <param name="Output">XML Output</param>
+        public override void Export(StringBuilder Output)
+        {
+            Output.Append(XML.Encode(this.ToString()));
+        }
+
+        /// <summary>
+        /// Converts an HTML entity into a character.
+        /// 
+        /// Reference:
+        /// http://dev.w3.org/html5/html-author/charref
+        /// </summary>
+        /// <param name="Entity">HTML entity (without the &amp; and the ;)</param>
+        /// <returns>Character, if entity recognized, or null if not.</returns>
+        public static string EntityToCharacter(string Entity)
 		{
 			// Assumed to be compiled into a dictionary.
 			switch (Entity)

@@ -11,7 +11,7 @@ namespace Waher.Content.Html
 	public class HtmlAttribute : HtmlNode
 	{
 		private LinkedList<HtmlNode> segments = null;
-		private string name;
+		private readonly string name;
 		private string value;
 
 		/// <summary>
@@ -150,5 +150,18 @@ namespace Waher.Content.Html
 		{
 			Output.WriteAttributeString(this.name, this.value);
 		}
-	}
+
+        /// <summary>
+        /// Exports the HTML document to XML.
+        /// </summary>
+        /// <param name="Output">XML Output</param>
+        public override void Export(StringBuilder Output)
+        {
+            Output.Append(' ');
+            Output.Append(this.name);
+            Output.Append("=\"");
+            Output.Append(Xml.XML.Encode(this.value));
+            Output.Append('"');
+        }
+    }
 }

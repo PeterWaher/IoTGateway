@@ -189,13 +189,13 @@ namespace Waher.Content.Html
 		{
 			Output.WriteStartElement(this.name);
 
-			if (this.attributes != null)
+			if (!(this.attributes is null))
 			{
 				foreach (HtmlAttribute Attr in this.attributes)
 					Attr.Export(Output);
 			}
 
-			if (this.children != null)
+			if (!(this.children is null))
 			{
 				foreach (HtmlNode Child in this.children)
 					Child.Export(Output);
@@ -204,10 +204,40 @@ namespace Waher.Content.Html
 			Output.WriteEndElement();
 		}
 
-		/// <summary>
-		/// If the element is an empty element.
-		/// </summary>
-		public virtual bool IsEmptyElement
+        /// <summary>
+        /// Exports the HTML document to XML.
+        /// </summary>
+        /// <param name="Output">XML Output</param>
+        public override void Export(StringBuilder Output)
+        {
+            Output.Append('<');
+            Output.Append(this.name);
+
+            if (!(this.attributes is null))
+            {
+                foreach (HtmlAttribute Attr in this.attributes)
+                    Attr.Export(Output);
+            }
+
+            if (this.children is null)
+                Output.Append("/>");
+            else
+            {
+                Output.Append('>');
+
+                foreach (HtmlNode Child in this.children)
+                    Child.Export(Output);
+
+                Output.Append("</");
+                Output.Append(this.name);
+                Output.Append('>');
+            }
+        }
+
+        /// <summary>
+        /// If the element is an empty element.
+        /// </summary>
+        public virtual bool IsEmptyElement
 		{
 			get { return false; }
 		}

@@ -1113,7 +1113,6 @@ namespace Waher.Networking.XMPP.P2P
 		public void SendIqError(XmppClient Client, E2ETransmission E2ETransmission, string Id, string To,
 			Exception ex)
 		{
-			StanzaExceptionException ex2 = ex as StanzaExceptionException;
 			this.SendIqError(Client, E2ETransmission, Id, To, Client.ExceptionToXmppXml(ex));
 		}
 
@@ -1168,7 +1167,7 @@ namespace Waher.Networking.XMPP.P2P
 			Xml.Append("\">");
 
 			foreach (IE2eEndpoint E2e in this.keys)
-				E2e.ToXml(Xml);
+				E2e.ToXml(Xml, IoTHarmonizationE2E);
 
 			Xml.Append("</e2e>");
 		}

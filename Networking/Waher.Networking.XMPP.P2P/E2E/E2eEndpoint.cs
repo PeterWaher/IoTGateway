@@ -75,11 +75,12 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		/// <returns>Parsed key information, if possible, null if XML is not well-defined.</returns>
 		public abstract IE2eEndpoint Parse(XmlElement Xml);
 
-		/// <summary>
-		/// Exports the public key information to XML.
-		/// </summary>
-		/// <param name="Xml">XML output</param>
-		public abstract void ToXml(StringBuilder Xml);
+        /// <summary>
+        /// Exports the public key information to XML.
+        /// </summary>
+        /// <param name="Xml">XML output</param>
+        /// <param name="ParentNamespace">Namespace of parent element.</param>
+        public abstract void ToXml(StringBuilder Xml, string ParentNamespace);
 
 		/// <summary>
 		/// Encrypts binary data
@@ -174,7 +175,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		public override string ToString()
 		{
 			StringBuilder Xml = new StringBuilder();
-			this.ToXml(Xml);
+			this.ToXml(Xml, string.Empty);
 			return Xml.ToString();
 		}
 

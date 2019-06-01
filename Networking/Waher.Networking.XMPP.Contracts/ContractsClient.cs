@@ -396,7 +396,7 @@ namespace Waher.Networking.XMPP.Contracts
 					StringBuilder Identity = new StringBuilder();
 
 					Identity.Append("<identity><clientPublicKey>");
-					e.Key.ToXml(Identity);
+					e.Key.ToXml(Identity, NamespaceLegalIdentities);
 					Identity.Append("</clientPublicKey>");
 
 					foreach (Property Property in Properties)

@@ -204,18 +204,25 @@ namespace Waher.Networking.XMPP.P2P.E2E
         /// Exports the public key information to XML.
         /// </summary>
         /// <param name="Xml">XML output</param>
-        public override void ToXml(StringBuilder Xml)
+        /// <param name="ParentNamespace">Namespace of parent element.</param>
+        public override void ToXml(StringBuilder Xml, string ParentNamespace)
         {
             Xml.Append('<');
             Xml.Append(this.LocalName);
-            Xml.Append(" xmlns=\"");
-            Xml.Append(this.Namespace);
-            Xml.Append("\" size=\"");
+            Xml.Append(" size=\"");
             Xml.Append(this.keySize.ToString());
             Xml.Append("\" mod=\"");
             Xml.Append(this.modulusBase64);
             Xml.Append("\" exp=\"");
             Xml.Append(this.exponentBase64);
+
+            string ns = this.Namespace;
+            if (ns != ParentNamespace)
+            {
+                Xml.Append("\" xmlns=\"");
+                Xml.Append(ns);
+            }
+
             Xml.Append("\"/>");
         }
 

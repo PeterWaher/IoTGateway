@@ -70,7 +70,8 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		/// Exports the public key information to XML.
 		/// </summary>
 		/// <param name="Xml">XML output</param>
-		void ToXml(StringBuilder Xml);
+        /// <param name="ParentNamespace">Namespace of parent element.</param>
+		void ToXml(StringBuilder Xml, string ParentNamespace);
 
 		/// <summary>
 		/// Encrypts binary data

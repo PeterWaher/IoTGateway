@@ -972,7 +972,7 @@ namespace Waher.IoTGateway
 		{
 			domain = Configuration.Domain;
 
-			if (Configuration.UseEncryption && Configuration.Certificate != null && Configuration.PrivateKey != null)
+			if (Configuration.UseDomainName && Configuration.UseEncryption && Configuration.Certificate != null && Configuration.PrivateKey != null)
 			{
 				UpdateCertificate(Configuration);
 				scheduler.Add(DateTime.Now.AddHours(0.5 + NextDouble()), CheckCertificate, Configuration);

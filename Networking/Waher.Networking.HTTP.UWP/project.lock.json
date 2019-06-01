@@ -2429,7 +2429,7 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Runtime.Inventory": "1.0.9",
-          "Waher.Script": "1.0.28"
+          "Waher.Script": "1.0.29"
         }
       },
       "Waher.Events/1.0.7": {
@@ -2471,7 +2471,7 @@
           "Waher.Events": "1.0.7"
         }
       },
-      "Waher.Script/1.0.28": {
+      "Waher.Script/1.0.29": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -4937,7 +4937,7 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Runtime.Inventory": "1.0.9",
-          "Waher.Script": "1.0.28"
+          "Waher.Script": "1.0.29"
         }
       },
       "Waher.Events/1.0.7": {
@@ -4979,7 +4979,7 @@
           "Waher.Events": "1.0.7"
         }
       },
-      "Waher.Script/1.0.28": {
+      "Waher.Script/1.0.29": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -7481,7 +7481,7 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Runtime.Inventory": "1.0.9",
-          "Waher.Script": "1.0.28"
+          "Waher.Script": "1.0.29"
         }
       },
       "Waher.Events/1.0.7": {
@@ -7523,7 +7523,7 @@
           "Waher.Events": "1.0.7"
         }
       },
-      "Waher.Script/1.0.28": {
+      "Waher.Script/1.0.29": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -9998,7 +9998,7 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Runtime.Inventory": "1.0.9",
-          "Waher.Script": "1.0.28"
+          "Waher.Script": "1.0.29"
         }
       },
       "Waher.Events/1.0.7": {
@@ -10040,7 +10040,7 @@
           "Waher.Events": "1.0.7"
         }
       },
-      "Waher.Script/1.0.28": {
+      "Waher.Script/1.0.29": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -12551,7 +12551,7 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Runtime.Inventory": "1.0.9",
-          "Waher.Script": "1.0.28"
+          "Waher.Script": "1.0.29"
         }
       },
       "Waher.Events/1.0.7": {
@@ -12593,7 +12593,7 @@
           "Waher.Events": "1.0.7"
         }
       },
-      "Waher.Script/1.0.28": {
+      "Waher.Script/1.0.29": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -15068,7 +15068,7 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Runtime.Inventory": "1.0.9",
-          "Waher.Script": "1.0.28"
+          "Waher.Script": "1.0.29"
         }
       },
       "Waher.Events/1.0.7": {
@@ -15110,7 +15110,7 @@
           "Waher.Events": "1.0.7"
         }
       },
-      "Waher.Script/1.0.28": {
+      "Waher.Script/1.0.29": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -17621,7 +17621,7 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Runtime.Inventory": "1.0.9",
-          "Waher.Script": "1.0.28"
+          "Waher.Script": "1.0.29"
         }
       },
       "Waher.Events/1.0.7": {
@@ -17663,7 +17663,7 @@
           "Waher.Events": "1.0.7"
         }
       },
-      "Waher.Script/1.0.28": {
+      "Waher.Script/1.0.29": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -27572,7 +27572,7 @@
       "path": "../../Runtime/Waher.Runtime.Inventory/Waher.Runtime.Inventory.csproj",
       "msbuildProject": "../../Runtime/Waher.Runtime.Inventory/Waher.Runtime.Inventory.csproj"
     },
-    "Waher.Script/1.0.28": {
+    "Waher.Script/1.0.29": {
       "type": "project",
       "path": "../../Script/Waher.Script/Waher.Script.csproj",
       "msbuildProject": "../../Script/Waher.Script/Waher.Script.csproj"
@@ -27595,7 +27595,6 @@
     "C:\\Microsoft\\Xamarin\\NuGet\\": {}
   },
   "project": {
-    "version": "1.0.0",
     "restore": {
       "projectUniqueName": "C:\\My Projects\\IoTGateway\\Networking\\Waher.Networking.HTTP.UWP\\Waher.Networking.HTTP.UWP.csproj",
       "projectName": "Waher.Networking.HTTP.UWP",

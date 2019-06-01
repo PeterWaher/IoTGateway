@@ -20,7 +20,7 @@
       <dependency id="Waher.Content.Markdown" version="1.0.37"/>
       <dependency id="Waher.Networking.HTTP.UWP" version="1.0.33"/>
       <dependency id="Waher.Runtime.Inventory" version="1.0.9"/>
-      <dependency id="Waher.Script" version="1.0.28"/>
+      <dependency id="Waher.Script" version="1.0.29"/>
       <dependency id="Waher.Security" version="1.0.2"/>
     </dependencies>
   </metadata>

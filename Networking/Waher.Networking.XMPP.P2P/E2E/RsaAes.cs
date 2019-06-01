@@ -324,7 +324,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
             DataLen <<= 8;
             DataLen |= Data[7];
 
-            if (Data.Length != 8 + KeyLen + SignatureLen + DataLen)
+            if (Data.Length != 10 + KeyLen + SignatureLen + DataLen)
                 return null;
 
             byte[] KeyEncrypted = new byte[KeyLen];

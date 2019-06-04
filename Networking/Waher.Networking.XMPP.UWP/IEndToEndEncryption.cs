@@ -51,11 +51,9 @@ namespace Waher.Networking.XMPP
         /// <param name="Type">Type Attribute.</param>
         /// <param name="From">From attribute.</param>
         /// <param name="To">To attribute.</param>
-        /// <param name="Counter">Counter. Can be reset every time a new key is generated.
-        /// A new key must be generated before the counter wraps.</param>
         /// <param name="Data">Data to decrypt.</param>
         /// <returns>Decrypted data, if decryption was possible from the recipient, or null if not.</returns>
-        byte[] Decrypt(string EndpointReference, string Id, string Type, string From, string To, uint Counter, byte[] Data);
+        byte[] Decrypt(string EndpointReference, string Id, string Type, string From, string To, byte[] Data);
 
 		/// <summary>
 		/// Encrypts data into XML that can be sent over XMPP.
@@ -70,17 +68,19 @@ namespace Waher.Networking.XMPP
 		/// <returns>If encryption was possible to the recipient, or not.</returns>
 		bool Encrypt(XmppClient Client, string Id, string Type, string From, string To, string DataXml, StringBuilder Xml);
 
-		/// <summary>
-		/// Decrypts data from XML that has been received over XMPP.
-		/// </summary>
-		/// <param name="Client">XMPP client to send the end-to-end encrypted stanza through.</param>
-		/// <param name="Id">ID Attribute.</param>
-		/// <param name="Type">Type Attribute.</param>
-		/// <param name="From">From attribute.</param>
-		/// <param name="To">To attribute.</param>
-		/// <param name="E2eElement">XML element containing the encrypted data.</param>
-		/// <returns>Decrypted data.</returns>
-		string Decrypt(XmppClient Client, string Id, string Type, string From, string To, XmlElement E2eElement);
+        /// <summary>
+        /// Decrypts data from XML that has been received over XMPP.
+        /// </summary>
+        /// <param name="Client">XMPP client to send the end-to-end encrypted stanza through.</param>
+        /// <param name="Id">ID Attribute.</param>
+        /// <param name="Type">Type Attribute.</param>
+        /// <param name="From">From attribute.</param>
+        /// <param name="To">To attribute.</param>
+        /// <param name="E2eElement">XML element containing the encrypted data.</param>
+        /// <param name="EndpointReference">Endpoint reference</param>
+        /// <returns>Decrypted data.</returns>
+        string Decrypt(XmppClient Client, string Id, string Type, string From, string To, XmlElement E2eElement,
+            out string EndpointReference);
 
 		/// <summary>
 		/// Sends an end-to-end encrypted message, if possible. If recipient does not support end-to-end

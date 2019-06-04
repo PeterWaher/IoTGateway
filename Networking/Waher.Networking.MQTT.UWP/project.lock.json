@@ -27222,7 +27222,6 @@
     "C:\\Microsoft\\Xamarin\\NuGet\\": {}
   },
   "project": {
-    "version": "1.0.0",
     "restore": {
       "projectUniqueName": "C:\\My Projects\\IoTGateway\\Networking\\Waher.Networking.MQTT.UWP\\Waher.Networking.MQTT.UWP.csproj",
       "projectName": "Waher.Networking.MQTT.UWP",

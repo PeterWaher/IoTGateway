@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Xml;
+using Waher.Networking.XMPP.P2P.SymmetricCiphers;
 using Waher.Security;
 
 namespace Waher.Networking.XMPP.P2P.E2E
@@ -20,17 +21,17 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		}
 
 		/// <summary>
-		/// Local name of the E2E encryption scheme
+		/// Local name of the E2E endpoint
 		/// </summary>
 		string LocalName
 		{
 			get;
 		}
 
-		/// <summary>
-		/// Namespace of the E2E encryption scheme
-		/// </summary>
-		string Namespace
+        /// <summary>
+        /// Namespace of the E2E endpoint
+        /// </summary>
+        string Namespace
 		{
 			get;
 		}
@@ -53,18 +54,40 @@ namespace Waher.Networking.XMPP.P2P.E2E
         }
 
         /// <summary>
+        /// Remote public key, as a Base64 string.
+        /// </summary>
+        string PublicKeyBase64
+        {
+            get;
+        }
+
+        /// <summary>
         /// Creates a new key.
         /// </summary>
         /// <param name="SecurityStrength">Overall desired security strength, if applicable.</param>
         /// <returns>New E2E endpoint.</returns>
         IE2eEndpoint Create(int SecurityStrength);
 
-		/// <summary>
-		/// Parses endpoint information from an XML element.
-		/// </summary>
-		/// <param name="Xml">XML element.</param>
-		/// <returns>Parsed key information, if possible, null if XML is not well-defined.</returns>
-		IE2eEndpoint Parse(XmlElement Xml);
+        /// <summary>
+        /// Creates a new endpoint given a private key.
+        /// </summary>
+        /// <param name="Secret">Secret.</param>
+        /// <returns>Endpoint object.</returns>
+        IE2eEndpoint CreatePrivate(byte[] Secret);
+
+        /// <summary>
+        /// Creates a new endpoint given a public key.
+        /// </summary>
+        /// <param name="PublicKey">Remote public key.</param>
+        /// <returns>Endpoint object.</returns>
+        IE2eEndpoint CreatePublic(byte[] PublicKey);
+
+        /// <summary>
+        /// Parses endpoint information from an XML element.
+        /// </summary>
+        /// <param name="Xml">XML element.</param>
+        /// <returns>Parsed key information, if possible, null if XML is not well-defined.</returns>
+        IE2eEndpoint Parse(XmlElement Xml);
 
 		/// <summary>
 		/// Exports the public key information to XML.
@@ -73,61 +96,42 @@ namespace Waher.Networking.XMPP.P2P.E2E
         /// <param name="ParentNamespace">Namespace of parent element.</param>
 		void ToXml(StringBuilder Xml, string ParentNamespace);
 
-		/// <summary>
-		/// Encrypts binary data
-		/// </summary>
-		/// <param name="Id">Id attribute</param>
-		/// <param name="Type">Type attribute</param>
-		/// <param name="From">From attribute</param>
-		/// <param name="To">To attribute</param>
-		/// <param name="Data">Binary data to encrypt</param>
-		/// <param name="LocalEndpoint">Local endpoint of same type.</param>
-		/// <returns>Encrypted data</returns>
-		byte[] Encrypt(string Id, string Type, string From, string To, byte[] Data, IE2eEndpoint LocalEndpoint);
+        /// <summary>
+        /// If shared secrets can be calculated from the endpoints keys.
+        /// </summary>
+        bool SupportsSharedSecrets
+        {
+            get;
+        }
 
-		/// <summary>
-		/// Decrypts binary data
-		/// </summary>
-		/// <param name="Id">Id attribute</param>
-		/// <param name="Type">Type attribute</param>
-		/// <param name="From">From attribute</param>
-		/// <param name="To">To attribute</param>
-		/// <param name="Data">Binary data to decrypt</param>
-		/// <param name="RemoteEndpoint">Remote endpoint of same type.</param>
-		/// <returns>Decrypted data</returns>
-		byte[] Decrypt(string Id, string Type, string From, string To, byte[] Data, IE2eEndpoint RemoteEndpoint);
+        /// <summary>
+        /// Encrypts a secret. Used if shared secrets cannot be calculated.
+        /// </summary>
+        /// <param name="Secret">Secret</param>
+        /// <returns>Encrypted secret.</returns>
+        byte[] EncryptSecret(byte[] Secret);
 
-		/// <summary>
-		/// Encrypts Binary data
-		/// </summary>
-		/// <param name="Id">Id attribute</param>
-		/// <param name="Type">Type attribute</param>
-		/// <param name="From">From attribute</param>
-		/// <param name="To">To attribute</param>
-		/// <param name="Data">Binary data to encrypt</param>
-		/// <param name="Xml">XML output</param>
-		/// <param name="LocalEndpoint">Local endpoint of same type.</param>
-		/// <returns>If encryption was possible</returns>
-		bool Encrypt(string Id, string Type, string From, string To, byte[] Data, StringBuilder Xml, IE2eEndpoint LocalEndpoint);
+        /// <summary>
+        /// Decrypts a secret. Used if shared secrets cannot be calculated.
+        /// </summary>
+        /// <param name="Secret">Encrypted secret</param>
+        /// <returns>Decrypted secret.</returns>
+        byte[] DecryptSecret(byte[] Secret);
 
-		/// <summary>
-		/// If the scheme can decrypt a given XML element.
-		/// </summary>
-		/// <param name="AesElement">XML element with encrypted data.</param>
-		/// <returns>If the scheme can decrypt the data.</returns>
-		bool CanDecrypt(XmlElement AesElement);
+        /// <summary>
+        /// Gets a shared secret
+        /// </summary>
+        /// <param name="RemoteEndpoint">Remote endpoint</param>
+        /// <returns>Shared secret.</returns>
+        byte[] GetSharedSecret(IE2eEndpoint RemoteEndpoint);
 
-		/// <summary>
-		/// Decrypts XML data
-		/// </summary>
-		/// <param name="Id">Id attribute</param>
-		/// <param name="Type">Type attribute</param>
-		/// <param name="From">From attribute</param>
-		/// <param name="To">To attribute</param>
-		/// <param name="AesElement">XML element with encrypted data.</param>
-		/// <param name="RemoteEndpoint">Remote endpoint of same type.</param>
-		/// <returns>Decrypted XMLs</returns>
-		string Decrypt(string Id, string Type, string From, string To, XmlElement AesElement, IE2eEndpoint RemoteEndpoint);
+        /// <summary>
+        /// If signatures are supported.
+        /// </summary>
+        bool SupportsSignatures
+        {
+            get;
+        }
 
         /// <summary>
         /// Signs binary data using the local private key.
@@ -144,5 +148,41 @@ namespace Waher.Networking.XMPP.P2P.E2E
         /// <returns>If signature is valid.</returns>
         bool Verify(byte[] Data, byte[] Signature);
 
+        /// <summary>
+        /// If endpoint is considered safe (i.e. there are no suspected backdoors)
+        /// </summary>
+        bool Safe
+        {
+            get;
+        }
+
+        /// <summary>
+        /// If implementation is slow, compared to other options.
+        /// </summary>
+        bool Slow
+        {
+            get;
+        }
+        /// <summary>
+        /// Provides a score for the endpoint. More features, higher score (comparable to alternatives with the same security strength).
+        /// </summary>
+        int Score
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Default symmetric cipher.
+        /// </summary>
+        IE2eSymmetricCipher DefaultSymmetricCipher
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Gets the next counter value.
+        /// </summary>
+        /// <returns>Counter value.</returns>
+        uint GetNextCounter();
     }
 }

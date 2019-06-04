@@ -58,28 +58,29 @@ namespace Waher.Networking.XMPP
 	/// </summary>
 	public class MessageEventArgs : EventArgs
 	{
-		private KeyValuePair<string, string>[] bodies;
-		private KeyValuePair<string, string>[] subjects;
+		private readonly KeyValuePair<string, string>[] bodies;
+		private readonly KeyValuePair<string, string>[] subjects;
 		private IEndToEndEncryption e2eEncryption = null;
-		private XmlElement message;
+		private readonly XmlElement message;
 		private XmlElement content;
-		private XmlElement errorElement = null;
-		private ErrorType errorType = ErrorType.None;
-		private XmppException stanzaError = null;
-		private string errorText = string.Empty;
-		private XmppClient client;
-		private XmppComponent component;
-		private MessageType type;
-		private string threadId;
-		private string parentThreadId;
+		private readonly XmlElement errorElement = null;
+		private readonly ErrorType errorType = ErrorType.None;
+		private readonly XmppException stanzaError = null;
+		private readonly string errorText = string.Empty;
+		private readonly XmppClient client;
+		private readonly XmppComponent component;
+		private readonly MessageType type;
+		private readonly string threadId;
+		private readonly string parentThreadId;
 		private string from;
 		private string fromBareJid;
 		private string to;
 		private string id;
-		private string body;
-		private string subject;
-		private int errorCode;
-		private bool ok;
+		private readonly string body;
+		private readonly string subject;
+        private string e2eReference = null;
+        private readonly int errorCode;
+		private readonly bool ok;
 
 		/// <summary>
 		/// Event arguments for message events.
@@ -108,14 +109,16 @@ namespace Waher.Networking.XMPP
 			this.subject = e.subject;
 			this.errorCode = e.errorCode;
 			this.ok = e.ok;
-		}
+            this.e2eEncryption = e.e2eEncryption;
+            this.e2eReference = e.e2eReference;
+        }
 
-		/// <summary>
-		/// Event arguments for message events.
-		/// </summary>
-		/// <param name="Client">Client</param>
-		/// <param name="Message">Message element.</param>
-		public MessageEventArgs(XmppClient Client, XmlElement Message)
+        /// <summary>
+        /// Event arguments for message events.
+        /// </summary>
+        /// <param name="Client">Client</param>
+        /// <param name="Message">Message element.</param>
+        public MessageEventArgs(XmppClient Client, XmlElement Message)
 			: this(Client, null, Message)
 		{
 		}
@@ -389,5 +392,14 @@ namespace Waher.Networking.XMPP
 			set { this.e2eEncryption = value; }
 		}
 
-	}
+        /// <summary>
+        /// Reference to End-to-end encryption endpoint used.
+        /// </summary>
+        public string E2eReference
+        {
+            get { return this.e2eReference; }
+            set { this.e2eReference = value; }
+        }
+
+    }
 }

@@ -51,17 +51,19 @@ namespace Waher.Networking.XMPP
 	/// </summary>
 	public class IqResultEventArgs : EventArgs
 	{
-		private XmlElement response;
+		private readonly XmlElement response;
 		private XmlElement element = null;
-		private XmlElement errorElement = null;
-		private ErrorType errorType = ErrorType.None;
-		private XmppException stanzaError = null;
-		private string errorText = string.Empty;
+		private readonly XmlElement errorElement = null;
+		private readonly ErrorType errorType = ErrorType.None;
+		private readonly XmppException stanzaError = null;
+        private readonly IEndToEndEncryption e2eEncryption = null;
+        private readonly string e2eReference = null;
+        private readonly string errorText = string.Empty;
 		private object state;
-		private string id;
-		private string to;
-		private string from;
-		private int errorCode;
+		private readonly string id;
+		private readonly string to;
+		private readonly string from;
+		private readonly int errorCode;
 		private bool ok;
 
 		/// <summary>
@@ -81,18 +83,38 @@ namespace Waher.Networking.XMPP
 			this.from = e.from;
 			this.errorCode = e.errorCode;
 			this.ok = e.ok;
-		}
+            this.e2eEncryption = e.e2eEncryption;
+            this.e2eReference = e.e2eReference;
+        }
 
-		/// <summary>
-		/// Event arguments for responses to IQ queries.
-		/// </summary>
-		/// <param name="Response">Response element.</param>
-		/// <param name="Id">ID attribute.</param>
-		/// <param name="To">To attribute.</param>
-		/// <param name="From">From attribute.</param>
-		/// <param name="Ok">If response is a proper response (true), or an error response (false).</param>
-		/// <param name="State">State object passed in the original request.</param>
-		public IqResultEventArgs(XmlElement Response, string Id, string To, string From, bool Ok, object State)
+        /// <summary>
+        /// Event arguments for responses to IQ queries.
+        /// </summary>
+        /// <param name="E2eEncryption">End-to-end encryption algorithm used.</param>
+        /// <param name="E2eReference">Reference to End-to-end encryption endpoint used.</param>
+        /// <param name="Response">Response element.</param>
+        /// <param name="Id">ID attribute.</param>
+        /// <param name="To">To attribute.</param>
+        /// <param name="From">From attribute.</param>
+        /// <param name="Ok">If response is a proper response (true), or an error response (false).</param>
+        /// <param name="State">State object passed in the original request.</param>
+        public IqResultEventArgs(IEndToEndEncryption E2eEncryption, string E2eReference, XmlElement Response, string Id, string To, string From, bool Ok, object State)
+            : this(Response, Id, To, From, Ok, State)
+        {
+            this.e2eEncryption = E2eEncryption;
+            this.e2eReference = E2eReference;
+        }
+
+        /// <summary>
+        /// Event arguments for responses to IQ queries.
+        /// </summary>
+        /// <param name="Response">Response element.</param>
+        /// <param name="Id">ID attribute.</param>
+        /// <param name="To">To attribute.</param>
+        /// <param name="From">From attribute.</param>
+        /// <param name="Ok">If response is a proper response (true), or an error response (false).</param>
+        /// <param name="State">State object passed in the original request.</param>
+        public IqResultEventArgs(XmlElement Response, string Id, string To, string From, bool Ok, object State)
 		{
 			XmlElement E;
 
@@ -233,5 +255,21 @@ namespace Waher.Networking.XMPP
 		/// Any stanza error returned.
 		/// </summary>
 		public XmppException StanzaError { get { return this.stanzaError; } }
-	}
+
+        /// <summary>
+        /// End-to-end encryption interface, if used in the request.
+        /// </summary>
+        public IEndToEndEncryption E2eEncryption
+        {
+            get { return this.e2eEncryption; }
+        }
+
+        /// <summary>
+        /// Reference to End-to-end encryption endpoint used.
+        /// </summary>
+        public string E2eReference
+        {
+            get { return this.e2eReference; }
+        }
+    }
 }

@@ -4,45 +4,45 @@ using Waher.Security.EllipticCurves;
 namespace Waher.Networking.XMPP.P2P.E2E
 {
 	/// <summary>
-	/// Edwards25519 Twisted Edwards Curve
+	/// NIST P-192 Curve
 	/// </summary>
-	public class Edwards25519Aes : EcAes256
+	public class NistP192Endpoint : NistEndpoint
     {
-        /// <summary>
-        /// Edwards25519 Twisted Edwards Curve
-        /// </summary>
-        public Edwards25519Aes()
-			: this(new Edwards25519())
+		/// <summary>
+		/// NIST P-192 Curve
+		/// </summary>
+		public NistP192Endpoint()
+			: this(new NistP192())
 		{
 		}
 
-        /// <summary>
-        /// Edwards25519 Twisted Edwards Curve
-        /// </summary>
-        /// <param name="Curve">Curve instance</param>
-        public Edwards25519Aes(Edwards25519 Curve)
+		/// <summary>
+		/// NIST P-192 Curve
+		/// </summary>
+		/// <param name="Curve">Curve instance</param>
+		public NistP192Endpoint(NistP192 Curve)
 			: base(Curve)
 		{
 		}
 
         /// <summary>
-        /// Edwards25519 Twisted Edwards Curve
+        /// NIST P-192 Curve
         /// </summary>
         /// <param name="PublicKey">Remote public key.</param>
-        public Edwards25519Aes(byte[] PublicKey)
-			: base(PublicKey, new Edwards25519())
+        public NistP192Endpoint(byte[] PublicKey)
+			: base(PublicKey, new NistP192())
 		{
 		}
 
 		/// <summary>
 		/// Local name of the E2E encryption scheme
 		/// </summary>
-		public override string LocalName => "ed25519";
+		public override string LocalName => "p192";
 
 		/// <summary>
 		/// Security strength of End-to-End encryption scheme.
 		/// </summary>
-		public override int SecurityStrength => 128;
+		public override int SecurityStrength => 96;
 
 		/// <summary>
 		/// Creates a new key.
@@ -51,7 +51,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		/// <returns>New E2E endpoint.</returns>
 		public override IE2eEndpoint Create(int SecurityStrength)
 		{
-			return new Edwards25519Aes();
+			return new NistP192Endpoint();
 		}
 
         /// <summary>
@@ -59,9 +59,9 @@ namespace Waher.Networking.XMPP.P2P.E2E
         /// </summary>
         /// <param name="Secret">Secret.</param>
         /// <returns>Endpoint object.</returns>
-        public override EcAes256 CreatePrivate(byte[] Secret)
+        public override IE2eEndpoint CreatePrivate(byte[] Secret)
 		{
-			return new Edwards25519Aes(new Edwards25519(Secret));
+			return new NistP192Endpoint(new NistP192(Secret));
 		}
 
         /// <summary>
@@ -69,9 +69,9 @@ namespace Waher.Networking.XMPP.P2P.E2E
         /// </summary>
         /// <param name="PublicKey">Remote public key.</param>
         /// <returns>Endpoint object.</returns>
-        public override EcAes256 CreatePublic(byte[] PublicKey)
+        public override IE2eEndpoint CreatePublic(byte[] PublicKey)
 		{
-			return new Edwards25519Aes(PublicKey);
+			return new NistP192Endpoint(PublicKey);
 		}
 	}
 }

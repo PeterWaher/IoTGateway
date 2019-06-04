@@ -205,8 +205,8 @@ namespace Waher.Networking.XMPP.Contracts
 									{
                                         Result.clientPubKey = Key.PublicKey;
 
-                                        if (Key is RsaAes RsaAes)
-											Result.clientKeyName = "RSA" + RsaAes.KeySize.ToString();
+                                        if (Key is RsaEndpoint RsaEndpoint)
+											Result.clientKeyName = "RSA" + RsaEndpoint.KeySize.ToString();
 										else 
 											Result.clientKeyName = Key.LocalName;
 									}
@@ -435,13 +435,13 @@ namespace Waher.Networking.XMPP.Contracts
 				if (!int.TryParse(this.clientKeyName.Substring(3), out int KeySize))
 					return false;
 
-				return RsaAes.Verify(Data, Signature, KeySize, this.clientPubKey);
+				return RsaEndpoint.Verify(Data, Signature, KeySize, this.clientPubKey);
 			}
 			else if (EndpointSecurity.TryCreateEndpoint(this.clientKeyName,
 				EndpointSecurity.IoTHarmonizationE2E, out IE2eEndpoint Endpoint) &&
-				Endpoint is EcAes256 EcAes256)
+                Endpoint is EllipticCurveEndpoint LocalEc)
 			{
-				return EcAes256.Verify(Data, this.clientPubKey, Signature);
+				return LocalEc.Verify(Data, this.clientPubKey, Signature);
 			}
 			else
 				return false;

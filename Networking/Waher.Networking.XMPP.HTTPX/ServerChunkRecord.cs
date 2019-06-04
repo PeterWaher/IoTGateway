@@ -19,6 +19,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		internal string id;
 		internal string from;
 		internal string to;
+        internal string e2eReference;
 		internal int nextChunk = 0;
 		internal int maxChunkSize;
 		internal bool sipub;
@@ -27,7 +28,8 @@ namespace Waher.Networking.XMPP.HTTPX
 		internal bool jingle;
 
 		internal ServerChunkRecord(HttpxServer Server, string Id, string From, string To, HttpRequest Request, 
-			IEndToEndEncryption E2e, TemporaryFile File, int MaxChunkSize, bool Sipub, bool Ibb, bool Socks5, bool Jingle)
+			IEndToEndEncryption E2e, string EndpointReference, TemporaryFile File, int MaxChunkSize, bool Sipub, bool Ibb, 
+            bool Socks5, bool Jingle)
 			: base()
 		{
 			this.server = Server;
@@ -36,6 +38,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			this.to = To;
 			this.request = Request;
 			this.e2e = E2e;
+            this.e2eReference = EndpointReference;
 			this.file = File;
 			this.maxChunkSize = MaxChunkSize;
 			this.sipub = Sipub;
@@ -97,7 +100,7 @@ namespace Waher.Networking.XMPP.HTTPX
 
 		private void Done()
 		{
-			this.server.Process(this.id, this.from, this.to, this.request, this.e2e, this.maxChunkSize, 
+			this.server.Process(this.id, this.from, this.to, this.request, this.e2e, this.e2eReference, this.maxChunkSize, 
 				this.sipub, this.ibb, this.s5, this.jingle);
 		}
 

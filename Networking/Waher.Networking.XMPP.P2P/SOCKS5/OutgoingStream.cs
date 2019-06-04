@@ -11,11 +11,11 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 	/// </summary>
 	public class OutgoingStream : IDisposable
 	{
-		private readonly XmppClient xmppClient;
 		private Socks5Client client;
 		private TemporaryFile tempFile;
 		private readonly IEndToEndEncryption e2e;
-		private readonly string sid;
+        private readonly string e2eReference;
+        private readonly string sid;
 		private readonly string from;
 		private readonly string to;
 		private object state = null;
@@ -26,24 +26,24 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		private bool done;
 		private bool aborted = false;
 
-		/// <summary>
-		/// Class managing the transmission of a SOCKS5 bytestream.
-		/// </summary>
-		/// <param name="Client">XMPP client.</param>
-		/// <param name="StreamId">Stream ID.</param>
-		/// <param name="From">From</param>
-		/// <param name="To">To</param>
-		/// <param name="BlockSize">Block size</param>
-		/// <param name="E2E">End-to-end encryption, if used.</param>
-		public OutgoingStream(XmppClient Client, string StreamId, string From, string To, int BlockSize, IEndToEndEncryption E2E)
+        /// <summary>
+        /// Class managing the transmission of a SOCKS5 bytestream.
+        /// </summary>
+        /// <param name="StreamId">Stream ID.</param>
+        /// <param name="From">From</param>
+        /// <param name="To">To</param>
+        /// <param name="BlockSize">Block size</param>
+        /// <param name="E2E">End-to-end encryption, if used.</param>
+        /// <param name="EndpointReference">Reference to End-to-end encryption endpoint used.</param>
+        public OutgoingStream(string StreamId, string From, string To, int BlockSize, IEndToEndEncryption E2E, string EndpointReference)
 		{
-			this.xmppClient = Client;
 			this.client = null;
 			this.sid = StreamId;
 			this.from = From;
 			this.to = To;
 			this.blockSize = BlockSize;
 			this.e2e = E2E;
+            this.e2eReference = EndpointReference;
 			this.isWriting = false;
 			this.done = false;
 			this.tempFile = new TemporaryFile();

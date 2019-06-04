@@ -508,7 +508,7 @@ namespace Waher.Networking.XMPP.HTTPX
 				if (ClientRec != null)
 				{
 					//this.client.Information("Accepting SOCKS5 stream from " + e.From);
-					e.AcceptStream(this.Socks5DataReceived, this.Socks5StreamClosed, new Socks5Receiver(Key, e.StreamId, ClientRec.from, ClientRec.to, ClientRec.e2e));
+					e.AcceptStream(this.Socks5DataReceived, this.Socks5StreamClosed, new Socks5Receiver(Key, e.StreamId, ClientRec.from, ClientRec.to, ClientRec.e2e, null));
 				}
 			}
 		}
@@ -519,6 +519,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			public string StreamId;
 			public string From;
 			public string To;
+			public string EndpointReference;
 			public int State = 0;
 			public int BlockSize;
 			public int BlockPos;
@@ -526,14 +527,15 @@ namespace Waher.Networking.XMPP.HTTPX
 			public byte[] Block;
 			public bool E2e;
 
-			public Socks5Receiver(string Key, string StreamId, string From, string To, bool E2e)
+			public Socks5Receiver(string Key, string StreamId, string From, string To, bool E2e, string EndpointReference)
 			{
 				this.Key = Key;
 				this.StreamId = StreamId;
 				this.From = From;
 				this.To = To;
 				this.E2e = E2e;
-			}
+                this.EndpointReference = EndpointReference;
+            }
 		}
 
 		private void Socks5DataReceived(object Sender, P2P.SOCKS5.DataReceivedEventArgs e)
@@ -591,7 +593,7 @@ namespace Waher.Networking.XMPP.HTTPX
 								if (Rx.E2e)
 								{
 									string Id = Rec.NextId().ToString();
-									Rx.Block = this.e2e.Decrypt(Id, Rx.StreamId, Rx.From, Rx.To, Rx.Block);
+									Rx.Block = this.e2e.Decrypt(Rx.EndpointReference, Id, Rx.StreamId, Rx.From, Rx.To, Rx.Block);
 									if (Rx.Block is null)
 									{
 										e.Stream.Dispose();

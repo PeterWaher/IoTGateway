@@ -69,8 +69,7 @@ namespace Waher.Networking.XMPP.Contracts
 			List<IE2eEndpoint> Keys = new List<IE2eEndpoint>();
 			string Name = typeof(ContractsClient).FullName;
 
-			foreach (EcAes256 Curve in EndpointSecurity.CreateEndpoints(256, 192, int.MaxValue,
-				typeof(EcAes256)))
+			foreach (EllipticCurveEndpoint Curve in EndpointSecurity.CreateEndpoints(256, 192, int.MaxValue, typeof(EllipticCurveEndpoint)))
 			{
 				string d = await RuntimeSettings.GetAsync(Name + "." + Curve.LocalName, string.Empty);
                 byte[] Key;
@@ -554,7 +553,7 @@ namespace Waher.Networking.XMPP.Contracts
 			if (Identity.ClientKeyName.StartsWith("RSA") &&
 				int.TryParse(Identity.ClientKeyName.Substring(3), out int KeySize))
 			{
-				if (!RsaAes.Verify(Data, Identity.ClientSignature, KeySize, Identity.ClientPubKey))
+				if (!RsaEndpoint.Verify(Data, Identity.ClientSignature, KeySize, Identity.ClientPubKey))
 				{
 					this.ReturnStatus(IdentityStatus.ClientSignatureInvalid, Callback, State);
 					return;
@@ -562,7 +561,7 @@ namespace Waher.Networking.XMPP.Contracts
 			}
 			else if (EndpointSecurity.TryGetEndpoint(Identity.ClientKeyName,
 				EndpointSecurity.IoTHarmonizationE2E, out IE2eEndpoint LocalKey) &&
-				LocalKey is EcAes256 LocalEc)
+				LocalKey is EllipticCurveEndpoint LocalEc)
 			{
 				if (!LocalEc.Verify(Data, Identity.ClientPubKey, Identity.ClientSignature))
 				{

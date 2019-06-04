@@ -101,7 +101,7 @@ namespace Waher.Networking.XMPP
 		private string streamFooter;
 		private uint seqnr = 0;
 		private readonly int port;
-		private int keepAliveSeconds = 30;
+		private int keepAliveSeconds = KeepAliveTimeSeconds;
 		private int inputState = 0;
 		private int inputDepth = 0;
 		private int defaultRetryTimeout = 5000;

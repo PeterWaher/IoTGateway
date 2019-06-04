@@ -237,7 +237,7 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public static readonly Regex BareJidRegEx = new Regex("^(?:([^@/<>'\\\"\\s]+)@)([^@/<>'\\\"\\s]+)$", RegexOptions.Singleline | RegexOptions.Compiled);
 
-		private static RandomNumberGenerator rnd = RandomNumberGenerator.Create();
+		private readonly static RandomNumberGenerator rnd = RandomNumberGenerator.Create();
 
 		private const int BufferSize = 65536;
 		private const int KeepAliveTimeSeconds = 30;
@@ -248,16 +248,16 @@ namespace Waher.Networking.XMPP
 		private readonly Dictionary<string, bool> compressionMethods = new Dictionary<string, bool>();
 		private readonly Dictionary<uint, PendingRequest> pendingRequestsBySeqNr = new Dictionary<uint, PendingRequest>();
 		private readonly SortedDictionary<DateTime, PendingRequest> pendingRequestsByTimeout = new SortedDictionary<DateTime, PendingRequest>();
-		private Dictionary<string, IqEventHandler> iqGetHandlers = new Dictionary<string, IqEventHandler>();
-		private Dictionary<string, IqEventHandler> iqSetHandlers = new Dictionary<string, IqEventHandler>();
-		private Dictionary<string, MessageEventHandler> messageHandlers = new Dictionary<string, MessageEventHandler>();
+		private readonly Dictionary<string, IqEventHandler> iqGetHandlers = new Dictionary<string, IqEventHandler>();
+		private readonly Dictionary<string, IqEventHandler> iqSetHandlers = new Dictionary<string, IqEventHandler>();
+		private readonly Dictionary<string, MessageEventHandler> messageHandlers = new Dictionary<string, MessageEventHandler>();
 		private readonly Dictionary<string, MessageFormEventHandler> messageFormHandlers = new Dictionary<string, MessageFormEventHandler>();
-		private Dictionary<string, PresenceEventHandler> presenceHandlers = new Dictionary<string, PresenceEventHandler>();
+		private readonly Dictionary<string, PresenceEventHandler> presenceHandlers = new Dictionary<string, PresenceEventHandler>();
 		private readonly Dictionary<string, MessageEventArgs> receivedMessages = new Dictionary<string, MessageEventArgs>();
-		private SortedDictionary<string, bool> clientFeatures = new SortedDictionary<string, bool>();
+		private readonly SortedDictionary<string, bool> clientFeatures = new SortedDictionary<string, bool>();
 		private ServiceDiscoveryEventArgs serverFeatures = null;
 		private ServiceItemsDiscoveryEventArgs serverComponents = null;
-		private SortedDictionary<string, DataForm> extendedServiceDiscoveryInformation = new SortedDictionary<string, DataForm>();
+		private readonly SortedDictionary<string, DataForm> extendedServiceDiscoveryInformation = new SortedDictionary<string, DataForm>();
 		private readonly Dictionary<string, RosterItem> roster = new Dictionary<string, RosterItem>(StringComparer.CurrentCultureIgnoreCase);
 		private readonly Dictionary<string, int> pendingAssuredMessagesPerSource = new Dictionary<string, int>();
 		private readonly Dictionary<string, object> tags = new Dictionary<string, object>();
@@ -285,7 +285,7 @@ namespace Waher.Networking.XMPP
 		private int fragmentLength = 0;
 		private XmppState state;
 		private readonly Random gen = new Random();
-		private object synchObject = new object();
+		private readonly object synchObject = new object();
 		private Availability currentAvailability = Availability.Online;
 		private KeyValuePair<string, string>[] customPresenceStatus = new KeyValuePair<string, string>[0];
 		private DateTime writeStarted = DateTime.MinValue;
@@ -314,7 +314,7 @@ namespace Waher.Networking.XMPP
 		private double version;
 		private uint seqnr = 0;
 		private readonly int port;
-		private int keepAliveSeconds = 30;
+		private int keepAliveSeconds = KeepAliveTimeSeconds;
 		private int inputState = 0;
 		private int inputDepth = 0;
 		private int defaultRetryTimeout = 5000;
@@ -466,6 +466,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="AppAssembly">Application assembly.</param>
 		/// <param name="Sniffers">Sniffers.</param>
 		public XmppClient(XmppCredentials Credentials, string Language, Assembly AppAssembly, params ISniffer[] Sniffers)
+            : base(Sniffers)
 		{
 			this.host = this.domain = Credentials.Host;
 			this.port = Credentials.Port;
@@ -996,7 +997,7 @@ namespace Waher.Networking.XMPP
 						PresenceEventArgs[] Resources;
 						List<PresenceEventArgs> ToUnavail = null;
 
-						foreach (RosterItem Item in this.roster.Values)
+						foreach (RosterItem Item in Roster)
 						{
 							Resources = Item.UnavailAllResources();
 							if (Resources is null)
@@ -2439,7 +2440,7 @@ namespace Waher.Networking.XMPP
 
 		internal void ProcessPresence(PresenceEventArgs e)
 		{
-			PresenceEventHandler h = null;
+			PresenceEventHandler h;
 			RosterItem Item;
 			string Key;
 
@@ -2464,7 +2465,6 @@ namespace Waher.Networking.XMPP
 				}
 			}
 
-			h = null;
 			switch (e.Type)
 			{
 				case PresenceType.Available:
@@ -3294,10 +3294,18 @@ namespace Waher.Networking.XMPP
 			get { return this.domain; }
 		}
 
-		/// <summary>
-		/// Bare JID
-		/// </summary>
-		public string BareJID
+        /// <summary>
+        /// Current Stream ID
+        /// </summary>
+        public string StreamId
+        {
+            get { return this.streamId; }
+        }
+
+        /// <summary>
+        /// Bare JID
+        /// </summary>
+        public string BareJID
 		{
 			get { return this.bareJid; }
 		}
@@ -3502,7 +3510,6 @@ namespace Waher.Networking.XMPP
 		/// <param name="ex">Internal exception object.</param>
 		public void SendIqError(string Id, string To, Exception ex)
 		{
-			StanzaExceptionException ex2 = ex as StanzaExceptionException;
 			this.SendIqError(Id, To, this.ExceptionToXmppXml(ex));
 		}
 
@@ -4718,7 +4725,6 @@ namespace Waher.Networking.XMPP
 			if (!string.IsNullOrEmpty(e.From))
 				return;
 
-			RosterItem Prev = null;
 			RosterItem Item = null;
 
 			foreach (XmlElement E in e.Query.ChildNodes)
@@ -4751,7 +4757,7 @@ namespace Waher.Networking.XMPP
 				}
 				else
 				{
-					if (this.roster.TryGetValue(Item.BareJid, out Prev))
+					if (this.roster.TryGetValue(Item.BareJid, out RosterItem Prev))
 					{
 						if (Item.Equals(Prev))
 						{
@@ -6462,7 +6468,7 @@ namespace Waher.Networking.XMPP
 					{
 						try
 						{
-							this.nextPing = DateTime.Now.AddSeconds(30);
+							this.nextPing = DateTime.Now.AddSeconds(this.keepAliveSeconds);
 							this.Warning("Reconnecting.");
 							this.Reconnect();
 						}

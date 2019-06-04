@@ -4,45 +4,45 @@ using Waher.Security.EllipticCurves;
 namespace Waher.Networking.XMPP.P2P.E2E
 {
 	/// <summary>
-	/// NIST P-256 Curve
+	/// Edwards448 Edwards Curve
 	/// </summary>
-	public class NistP256Aes : EcAes256
-	{
-		/// <summary>
-		/// NIST P-256 Curve
-		/// </summary>
-		public NistP256Aes()
-			: this(new NistP256())
+	public class Edwards448Endpoint : EllipticCurveEndpoint
+    {
+        /// <summary>
+        /// Edwards448 Edwards Curve
+        /// </summary>
+        public Edwards448Endpoint()
+			: this(new Edwards448())
 		{
 		}
 
-		/// <summary>
-		/// NIST P-256 Curve
-		/// </summary>
-		/// <param name="Curve">Curve instance</param>
-		public NistP256Aes(NistP256 Curve)
+        /// <summary>
+        /// Edwards448 Edwards Curve
+        /// </summary>
+        /// <param name="Curve">Curve instance</param>
+        public Edwards448Endpoint(Edwards448 Curve)
 			: base(Curve)
 		{
 		}
 
         /// <summary>
-        /// NIST P-256 Curve
+        /// Edwards448 Edwards Curve
         /// </summary>
         /// <param name="PublicKey">Remote public key.</param>
-        public NistP256Aes(byte[] PublicKey)
-            : base(PublicKey, new NistP256())
-        {
-        }
+        public Edwards448Endpoint(byte[] PublicKey)
+			: base(PublicKey, new Edwards448())
+		{
+		}
 
 		/// <summary>
 		/// Local name of the E2E encryption scheme
 		/// </summary>
-		public override string LocalName => "p256";
+		public override string LocalName => "ed448";
 
 		/// <summary>
 		/// Security strength of End-to-End encryption scheme.
 		/// </summary>
-		public override int SecurityStrength => 128;
+		public override int SecurityStrength => 224;
 
 		/// <summary>
 		/// Creates a new key.
@@ -51,7 +51,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		/// <returns>New E2E endpoint.</returns>
 		public override IE2eEndpoint Create(int SecurityStrength)
 		{
-			return new NistP256Aes();
+			return new Edwards448Endpoint();
 		}
 
         /// <summary>
@@ -59,19 +59,19 @@ namespace Waher.Networking.XMPP.P2P.E2E
         /// </summary>
         /// <param name="Secret">Secret.</param>
         /// <returns>Endpoint object.</returns>
-        public override EcAes256 CreatePrivate(byte[] Secret)
-        {
-            return new NistP256Aes(new NistP256(Secret));
-        }
+        public override IE2eEndpoint CreatePrivate(byte[] Secret)
+		{
+			return new Edwards448Endpoint(new Edwards448(Secret));
+		}
 
         /// <summary>
         /// Creates a new endpoint given a public key.
         /// </summary>
         /// <param name="PublicKey">Remote public key.</param>
         /// <returns>Endpoint object.</returns>
-        public override EcAes256 CreatePublic(byte[] PublicKey)
-        {
-            return new NistP256Aes(PublicKey);
-        }
-    }
+        public override IE2eEndpoint CreatePublic(byte[] PublicKey)
+		{
+			return new Edwards448Endpoint(PublicKey);
+		}
+	}
 }

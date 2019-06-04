@@ -43,16 +43,19 @@ namespace Waher.Networking.XMPP
 		/// <returns>Encrypted data, if encryption was possible to the recipient, or null if not.</returns>
 		byte[] Encrypt(string Id, string Type, string From, string To, byte[] Data);
 
-		/// <summary>
-		/// Decrypts binary data received from an XMPP client out of band.
-		/// </summary>
-		/// <param name="Id">ID Attribute.</param>
-		/// <param name="Type">Type Attribute.</param>
-		/// <param name="From">From attribute.</param>
-		/// <param name="To">To attribute.</param>
-		/// <param name="Data">Data to decrypt.</param>
-		/// <returns>Decrypted data, if decryption was possible from the recipient, or null if not.</returns>
-		byte[] Decrypt(string Id, string Type, string From, string To, byte[] Data);
+        /// <summary>
+        /// Decrypts binary data received from an XMPP client out of band.
+        /// </summary>
+        /// <param name="EndpointReference">Endpoint reference.</param>
+        /// <param name="Id">ID Attribute.</param>
+        /// <param name="Type">Type Attribute.</param>
+        /// <param name="From">From attribute.</param>
+        /// <param name="To">To attribute.</param>
+        /// <param name="Counter">Counter. Can be reset every time a new key is generated.
+        /// A new key must be generated before the counter wraps.</param>
+        /// <param name="Data">Data to decrypt.</param>
+        /// <returns>Decrypted data, if decryption was possible from the recipient, or null if not.</returns>
+        byte[] Decrypt(string EndpointReference, string Id, string Type, string From, string To, uint Counter, byte[] Data);
 
 		/// <summary>
 		/// Encrypts data into XML that can be sent over XMPP.

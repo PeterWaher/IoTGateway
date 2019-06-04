@@ -11,7 +11,7 @@ namespace Waher.Networking.XMPP.HTTPX
 {
 	internal class HttpxResponse : TransferEncoding
 	{
-		private static Dictionary<string, HttpxResponse> activeStreams = new Dictionary<string, HttpxResponse>();
+		private readonly static Dictionary<string, HttpxResponse> activeStreams = new Dictionary<string, HttpxResponse>();
 
 		private StringBuilder response = new StringBuilder();
 		private readonly XmppClient client;
@@ -21,6 +21,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		private readonly string id;
 		private readonly string to;
 		private readonly string from;
+        private readonly string e2eReference;
 		private readonly int maxChunkSize;
 		private bool? chunked = null;
 		private int nr = 0;
@@ -31,12 +32,13 @@ namespace Waher.Networking.XMPP.HTTPX
 		private int pos;
 		private bool cancelled = false;
 
-		public HttpxResponse(XmppClient Client, IEndToEndEncryption E2e, string Id, string To, string From, int MaxChunkSize,
+		public HttpxResponse(XmppClient Client, IEndToEndEncryption E2e, string EndpointReference, string Id, string To, string From, int MaxChunkSize,
 			InBandBytestreams.IbbClient IbbClient, P2P.SOCKS5.Socks5Proxy Socks5Proxy) : base()
 		{
 			this.client = Client;
 			this.e2e = E2e;
-			this.ibbClient = IbbClient;
+            this.e2eReference = EndpointReference;
+            this.ibbClient = IbbClient;
 			this.socks5Proxy = Socks5Proxy;
 			this.id = Id;
 			this.to = To;
@@ -97,8 +99,9 @@ namespace Waher.Networking.XMPP.HTTPX
 						this.response.Append(CommonTypes.Encode(this.e2e != null));
 						this.response.Append("'/></data>");
 						this.ReturnResponse();
+                        
+						this.socks5Output = new P2P.SOCKS5.OutgoingStream(this.streamId, this.from, this.to, 49152, this.e2e, this.e2eReference);
 
-						this.socks5Output = new P2P.SOCKS5.OutgoingStream(this.client, this.streamId, this.from, this.to, 49152, this.e2e);
 						this.socks5Output.OnAbort += this.IbbOutput_OnAbort;
 
 						this.socks5Proxy.InitiateSession(this.to, this.streamId, this.InitiationCallback, null);

@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Xml;
-using Waher.Networking.XMPP.P2P.SymmetricCiphers;
 using Waher.Security;
 
-namespace Waher.Networking.XMPP.P2P.E2E
+namespace Waher.Networking.XMPP
 {
 	/// <summary>
 	/// Abstract base class for End-to-End encryption schemes.

@@ -7,6 +7,7 @@ using System.Xml;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Runtime.Cache;
+using Waher.Networking.XMPP.P2P.SymmetricCiphers;
 using Waher.Security;
 using Waher.Security.EllipticCurves;
 
@@ -27,12 +28,13 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		private readonly bool hasPrivateKey;
 		private readonly string publicKeyBase64;
 
-		/// <summary>
-		/// Abstract base class for Elliptic Curve / AES-256 hybrid ciphers.s
-		/// </summary>
-		/// <param name="Curve">Curve instance</param>
-		public EllipticCurveEndpoint(EllipticCurve Curve)
-			: base()
+        /// <summary>
+        /// Abstract base class for Elliptic Curve / AES-256 hybrid ciphers.s
+        /// </summary>
+        /// <param name="Curve">Curve instance</param>
+        /// <param name="DefaultSymmetricCipher">Default symmetric cipher.</param>
+        public EllipticCurveEndpoint(EllipticCurve Curve, IE2eSymmetricCipher DefaultSymmetricCipher)
+			: base(DefaultSymmetricCipher)
 		{
 			this.curve = Curve;
 			this.publicKey = Curve.PublicKey;
@@ -45,8 +47,9 @@ namespace Waher.Networking.XMPP.P2P.E2E
         /// </summary>
         /// <param name="PublicKey">Remote public key.</param>
         /// <param name="ReferenceCurve">Reference curve</param>
-        public EllipticCurveEndpoint(byte[] PublicKey, EllipticCurve ReferenceCurve)
-			: base()
+        /// <param name="DefaultSymmetricCipher">Default symmetric cipher.</param>
+        public EllipticCurveEndpoint(byte[] PublicKey, EllipticCurve ReferenceCurve, IE2eSymmetricCipher DefaultSymmetricCipher)
+			: base(DefaultSymmetricCipher)
 		{
 			this.publicKey = PublicKey;
 			this.curve = ReferenceCurve;

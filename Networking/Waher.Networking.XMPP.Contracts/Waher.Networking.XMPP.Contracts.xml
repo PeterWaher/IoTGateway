@@ -1592,7 +1592,7 @@
             Event arguments for key responses
             </summary>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.KeyEventArgs.#ctor(Waher.Networking.XMPP.IqResultEventArgs,Waher.Networking.XMPP.P2P.E2E.IE2eEndpoint)">
+        <member name="M:Waher.Networking.XMPP.Contracts.KeyEventArgs.#ctor(Waher.Networking.XMPP.IqResultEventArgs,Waher.Networking.XMPP.IE2eEndpoint)">
             <summary>
             Event arguments for key responses
             </summary>

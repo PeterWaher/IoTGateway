@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Text;
 using System.Xml;
-using Waher.Networking.XMPP.P2P.E2E;
 
-namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
+namespace Waher.Networking.XMPP
 {
     /// <summary>
     /// Interface for symmetric ciphers.
@@ -22,6 +21,14 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
         /// Namespace of the E2E symmetric cipher
         /// </summary>
         string Namespace
+        {
+            get;
+        }
+
+        /// <summary>
+        /// If Authenticated Encryption with Associated Data is used
+        /// </summary>
+        bool AuthenticatedEncryption
         {
             get;
         }

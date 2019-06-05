@@ -16,15 +16,18 @@ namespace Waher.Networking.XMPP.HTTPX
 		internal SortedDictionary<int, Chunk> chunks = null;
 		internal HttpResponse response;
 		internal HttpxResponseDataEventHandler dataCallback;
-		internal object state;
+        internal IE2eSymmetricCipher symmetricCipher;
+        internal object state;
 		internal string streamId;
 		internal string from;
 		internal string to;
+        internal string endpointReference;
 		internal int nextChunk = 0;
-		internal bool e2e;
+        internal bool e2e;
 
 		internal ClientChunkRecord(HttpxClient Client, HttpxResponseEventArgs e, HttpResponse Response, 
-			HttpxResponseDataEventHandler DataCallback, object State, string StreamId, string From, string To, bool E2e)
+			HttpxResponseDataEventHandler DataCallback, object State, string StreamId, string From, string To, bool E2e, 
+            string EndpointReference, IE2eSymmetricCipher SymmetricCipher)
 			: base()
 		{
 			this.client = Client;
@@ -36,6 +39,8 @@ namespace Waher.Networking.XMPP.HTTPX
 			this.from = From;
 			this.to = To;
 			this.e2e = E2e;
+            this.endpointReference = EndpointReference;
+            this.symmetricCipher = SymmetricCipher;
 		}
 
 		internal override bool ChunkReceived(int Nr, bool Last, byte[] Data)

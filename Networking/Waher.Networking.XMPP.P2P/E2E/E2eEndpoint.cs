@@ -15,10 +15,19 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		private IE2eEndpoint prev = null;
         private uint counter = 0;
 
-		/// <summary>
-		/// <see cref="IDisposable.Dispose"/>
-		/// </summary>
-		public virtual void Dispose()
+        /// <summary>
+        /// Abstract base class for End-to-End encryption schemes.
+        /// </summary>
+        /// <param name="DefaultSymmetricCipher">Default symmetric cipher.</param>
+        public E2eEndpoint(IE2eSymmetricCipher DefaultSymmetricCipher)
+        {
+            this.defaultSymmetricCipher = DefaultSymmetricCipher;
+        }
+
+        /// <summary>
+        /// <see cref="IDisposable.Dispose"/>
+        /// </summary>
+        public virtual void Dispose()
 		{
             this.defaultSymmetricCipher?.Dispose();
             this.defaultSymmetricCipher = null;

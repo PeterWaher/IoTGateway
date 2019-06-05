@@ -52,8 +52,10 @@ namespace Waher.Networking.XMPP
         /// <param name="From">From attribute.</param>
         /// <param name="To">To attribute.</param>
         /// <param name="Data">Data to decrypt.</param>
+        /// <param name="SymmetricCipher">Type of symmetric cipher to use to decrypt content.</param>
         /// <returns>Decrypted data, if decryption was possible from the recipient, or null if not.</returns>
-        byte[] Decrypt(string EndpointReference, string Id, string Type, string From, string To, byte[] Data);
+        byte[] Decrypt(string EndpointReference, string Id, string Type, string From, string To, byte[] Data,
+            IE2eSymmetricCipher SymmetricCipher);
 
 		/// <summary>
 		/// Encrypts data into XML that can be sent over XMPP.
@@ -77,10 +79,11 @@ namespace Waher.Networking.XMPP
         /// <param name="From">From attribute.</param>
         /// <param name="To">To attribute.</param>
         /// <param name="E2eElement">XML element containing the encrypted data.</param>
+        /// <param name="SymmetricCipher">Type of symmetric cipher to use to decrypt content.</param>
         /// <param name="EndpointReference">Endpoint reference</param>
         /// <returns>Decrypted data.</returns>
         string Decrypt(XmppClient Client, string Id, string Type, string From, string To, XmlElement E2eElement,
-            out string EndpointReference);
+            IE2eSymmetricCipher SymmetricCipher, out string EndpointReference);
 
 		/// <summary>
 		/// Sends an end-to-end encrypted message, if possible. If recipient does not support end-to-end

@@ -353,7 +353,7 @@ namespace Waher.Networking.XMPP.HTTPX
 
 										HttpxChunks.chunkedStreams.Add(e.From + " " + StreamId, new ClientChunkRecord(this,
 											new HttpxResponseEventArgs(e, Response, State, Version, StatusCode, StatusMessage, true, null),
-											Response, DataCallback, State, StreamId, e.From, e.To, false));
+											Response, DataCallback, State, StreamId, e.From, e.To, false, null, null));
 
 										DisposeResponse = false;
 										HasData = true;
@@ -364,7 +364,7 @@ namespace Waher.Networking.XMPP.HTTPX
 
 										HttpxChunks.chunkedStreams.Add(e.From + " " + StreamId, new ClientChunkRecord(this,
 											new HttpxResponseEventArgs(e, Response, State, Version, StatusCode, StatusMessage, true, null),
-											Response, DataCallback, State, StreamId, e.From, e.To, false));
+											Response, DataCallback, State, StreamId, e.From, e.To, false, null, null));
 
 										DisposeResponse = false;
 										HasData = true;
@@ -376,7 +376,7 @@ namespace Waher.Networking.XMPP.HTTPX
 
 										HttpxChunks.chunkedStreams.Add(e.From + " " + StreamId, new ClientChunkRecord(this,
 											new HttpxResponseEventArgs(e, Response, State, Version, StatusCode, StatusMessage, true, null),
-											Response, DataCallback, State, StreamId, e.From, e.To, E2e));
+											Response, DataCallback, State, StreamId, e.From, e.To, E2e, e.E2eReference, e.E2eSymmetricCipher));
 
 										DisposeResponse = false;
 										HasData = true;
@@ -508,7 +508,8 @@ namespace Waher.Networking.XMPP.HTTPX
 				if (ClientRec != null)
 				{
 					//this.client.Information("Accepting SOCKS5 stream from " + e.From);
-					e.AcceptStream(this.Socks5DataReceived, this.Socks5StreamClosed, new Socks5Receiver(Key, e.StreamId, ClientRec.from, ClientRec.to, ClientRec.e2e, null));
+					e.AcceptStream(this.Socks5DataReceived, this.Socks5StreamClosed, new Socks5Receiver(Key, e.StreamId, 
+                        ClientRec.from, ClientRec.to, ClientRec.e2e, ClientRec.endpointReference, ClientRec.symmetricCipher));
 				}
 			}
 		}
@@ -520,14 +521,16 @@ namespace Waher.Networking.XMPP.HTTPX
 			public string From;
 			public string To;
 			public string EndpointReference;
-			public int State = 0;
+            public IE2eSymmetricCipher SymmetricCipher;
+            public int State = 0;
 			public int BlockSize;
 			public int BlockPos;
 			public int Nr = 0;
 			public byte[] Block;
 			public bool E2e;
 
-			public Socks5Receiver(string Key, string StreamId, string From, string To, bool E2e, string EndpointReference)
+			public Socks5Receiver(string Key, string StreamId, string From, string To, bool E2e, string EndpointReference, 
+                IE2eSymmetricCipher SymmetricCipher)
 			{
 				this.Key = Key;
 				this.StreamId = StreamId;
@@ -535,6 +538,7 @@ namespace Waher.Networking.XMPP.HTTPX
 				this.To = To;
 				this.E2e = E2e;
                 this.EndpointReference = EndpointReference;
+                this.SymmetricCipher = SymmetricCipher;
             }
 		}
 
@@ -593,7 +597,7 @@ namespace Waher.Networking.XMPP.HTTPX
 								if (Rx.E2e)
 								{
 									string Id = Rec.NextId().ToString();
-									Rx.Block = this.e2e.Decrypt(Rx.EndpointReference, Id, Rx.StreamId, Rx.From, Rx.To, Rx.Block);
+									Rx.Block = this.e2e.Decrypt(Rx.EndpointReference, Id, Rx.StreamId, Rx.From, Rx.To, Rx.Block, Rx.SymmetricCipher);
 									if (Rx.Block is null)
 									{
 										e.Stream.Dispose();

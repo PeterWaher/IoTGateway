@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using Waher.Networking.XMPP.P2P.SymmetricCiphers;
 using Waher.Security.EllipticCurves;
 
 namespace Waher.Networking.XMPP.P2P.E2E
@@ -21,7 +22,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
         /// </summary>
         /// <param name="Curve">Curve instance</param>
         public Edwards448Endpoint(Edwards448 Curve)
-			: base(Curve)
+			: base(Curve, new Aes256())
 		{
 		}
 
@@ -30,7 +31,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
         /// </summary>
         /// <param name="PublicKey">Remote public key.</param>
         public Edwards448Endpoint(byte[] PublicKey)
-			: base(PublicKey, new Edwards448())
+			: base(PublicKey, new Edwards448(), new Aes256())
 		{
 		}
 

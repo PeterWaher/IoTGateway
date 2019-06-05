@@ -2,35 +2,26 @@
 using System.Security.Cryptography;
 using System.Text;
 using Waher.Security;
+using Waher.Security.ChaChaPoly;
 
 namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
 {
     /// <summary>
-    /// Implements support for the AES-256 cipher in hybrid End-to-End encryption schemes.
+    /// Implements support for the AEAD-ChaCha20-Poly1305 cipher in hybrid End-to-End encryption schemes.
     /// </summary>
-    public class Aes256 : E2eSymmetricCipher
+    public class AeadChaCha20Poly1305 : E2eSymmetricCipher
     {
         /// <summary>
-        /// AES encryption object
+        /// Implements support for the AEAD-ChaCha20-Poly1305 cipher in hybrid End-to-End encryption schemes.
         /// </summary>
-        protected Aes aes;
-
-        /// <summary>
-        /// Implements support for the AES-256 cipher in hybrid End-to-End encryption schemes.
-        /// </summary>
-        public Aes256()
+        public AeadChaCha20Poly1305()
         {
-            this.aes = Aes.Create();
-            this.aes.BlockSize = 128;
-            this.aes.KeySize = 256;
-            this.aes.Mode = CipherMode.CBC;
-            this.aes.Padding = PaddingMode.None;
         }
 
         /// <summary>
         /// Local name of the E2E symmetric cipher
         /// </summary>
-        public override string LocalName => "aes";
+        public override string LocalName => "acp";
 
         /// <summary>
         /// Namespace of the E2E symmetric cipher
@@ -38,15 +29,9 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
         public override string Namespace => EndpointSecurity.IoTHarmonizationE2E;
 
         /// <summary>
-        /// <see cref="IDisposable.Dispose"/>
+        /// If Authenticated Encryption with Associated Data is used
         /// </summary>
-        public override void Dispose()
-        {
-            base.Dispose();
-
-            this.aes?.Dispose();
-            this.aes = null;
-        }
+        public override bool AuthenticatedEncryption => true;
 
         /// <summary>
         /// Gets an Initiation Vector from stanza attributes.
@@ -61,27 +46,17 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
         protected override byte[] GetIV(string Id, string Type, string From, string To, uint Counter)
         {
             byte[] IV = Hashes.ComputeSHA256Hash(Encoding.UTF8.GetBytes(Id + Type + From + To));
-            Array.Resize<byte>(ref IV, 16);
+            Array.Resize<byte>(ref IV, 12);
 
-            IV[12] = (byte)Counter;
+            IV[8] = (byte)Counter;
             Counter >>= 8;
-            IV[13] = (byte)Counter;
+            IV[9] = (byte)Counter;
             Counter >>= 8;
-            IV[14] = (byte)Counter;
+            IV[10] = (byte)Counter;
             Counter >>= 8;
-            IV[15] = (byte)Counter;
+            IV[11] = (byte)Counter;
 
             return IV;
-        }
-
-        /// <summary>
-        /// Calculates the minimum size of encrypted data, given the size of the content.
-        /// </summary>
-        /// <param name="ContentLength">Size of content.</param>
-        /// <returns>Minimum size of encrypted data.</returns>
-        protected override int GetEncryptedLength(int ContentLength)
-        {
-            return (ContentLength + 15) & ~0xf;
         }
 
         /// <summary>
@@ -94,15 +69,13 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
         /// <returns>Encrypted Data</returns>
         public override byte[] Encrypt(byte[] Data, byte[] Key, byte[] IV, byte[] AssociatedData)
         {
-            byte[] Encrypted = base.Encrypt(Data, Key, IV, AssociatedData);
+            Security.ChaChaPoly.AeadChaCha20Poly1305 Acp = new Security.ChaChaPoly.AeadChaCha20Poly1305(Key, IV);
 
-            lock (this.aes)
-            {
-                using (ICryptoTransform Aes = this.aes.CreateEncryptor(Key, IV))
-                {
-                    Encrypted = Aes.TransformFinalBlock(Encrypted, 0, Encrypted.Length);
-                }
-            }
+            byte[] Encrypted = Acp.Encrypt(Data, AssociatedData, out byte[] Mac);
+            int c = Encrypted.Length;
+            
+            Array.Resize<byte>(ref Encrypted, c + 16);
+            Array.Copy(Mac, 0, Encrypted, c, 16);
 
             return Encrypted;
         }
@@ -117,15 +90,17 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
         /// <returns>Decrypted Data</returns>
         public override byte[] Decrypt(byte[] Data, byte[] Key, byte[] IV, byte[] AssociatedData)
         {
-            lock (this.aes)
-            {
-                using (ICryptoTransform Aes = this.aes.CreateDecryptor(Key, IV))
-                {
-                    Data = Aes.TransformFinalBlock(Data, 0, Data.Length);
-                }
-            }
+            int c = Data.Length;
+            if (c < 16)
+                return null;
 
-            return base.Decrypt(Data, Key, IV, AssociatedData);
+            Security.ChaChaPoly.AeadChaCha20Poly1305 Acp = new Security.ChaChaPoly.AeadChaCha20Poly1305(Key, IV);
+            byte[] Mac = new byte[16];
+            Array.Copy(Data, 0, Mac, 0, 16);
+
+            Array.Resize<byte>(ref Data, c - 16);
+
+            return Acp.Decrypt(Data, AssociatedData, Mac);
         }
 
 
@@ -135,11 +110,14 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
         /// <returns>New key</returns>
         public override byte[] GenerateKey()
         {
-            lock (this.aes)
+            byte[] Key = new byte[32];
+
+            lock (rnd)
             {
-                this.aes.GenerateKey();
-                return this.aes.Key;
+                rnd.GetBytes(Key);
             }
+
+            return Key;
         }
 
     }

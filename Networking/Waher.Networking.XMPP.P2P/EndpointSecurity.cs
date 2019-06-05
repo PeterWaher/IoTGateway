@@ -6,12 +6,10 @@ using System.Text;
 using System.Xml;
 using Waher.Content.Xml;
 using Waher.Events;
-using Waher.Networking.PeerToPeer;
 using Waher.Networking.XMPP.P2P.E2E;
+using Waher.Networking.XMPP.P2P.SymmetricCiphers;
 using Waher.Networking.XMPP.StanzaErrors;
 using Waher.Runtime.Inventory;
-using Waher.Security;
-using Waher.Security.EllipticCurves;
 
 namespace Waher.Networking.XMPP.P2P
 {
@@ -41,6 +39,8 @@ namespace Waher.Networking.XMPP.P2P
         private readonly UTF8Encoding encoding = new UTF8Encoding(false, false);
         private readonly object synchObject = new object();
         private readonly int securityStrength;
+        private Aes256 aes = new Aes256();
+        private AeadChaCha20Poly1305 acp = new AeadChaCha20Poly1305();
 
         /// <summary>
         /// Class managing end-to-end encryption.
@@ -253,6 +253,12 @@ namespace Waher.Networking.XMPP.P2P
 
                 this.contacts.Clear();
             }
+
+            this.aes?.Dispose();
+            this.aes = null;
+
+            this.acp?.Dispose();
+            this.acp = null;
         }
 
         private void Client_OnStateChanged(object Sender, XmppState NewState)
@@ -301,6 +307,9 @@ namespace Waher.Networking.XMPP.P2P
             Client?.RegisterMessageHandler("aes", EndpointSecurity.IoTHarmonizationE2E, this.AesMessageHandler, false);
             Client?.RegisterIqGetHandler("aes", EndpointSecurity.IoTHarmonizationE2E, this.AesIqGetHandler, false);
             Client?.RegisterIqSetHandler("aes", EndpointSecurity.IoTHarmonizationE2E, this.AesIqSetHandler, false);
+            Client?.RegisterMessageHandler("acp", EndpointSecurity.IoTHarmonizationE2E, this.AcpMessageHandler, false);
+            Client?.RegisterIqGetHandler("acp", EndpointSecurity.IoTHarmonizationE2E, this.AcpIqGetHandler, false);
+            Client?.RegisterIqSetHandler("acp", EndpointSecurity.IoTHarmonizationE2E, this.AcpIqSetHandler, false);
             Client?.RegisterIqSetHandler("synchE2e", EndpointSecurity.IoTHarmonizationE2E, this.SynchE2eHandler, false);
         }
 
@@ -313,6 +322,9 @@ namespace Waher.Networking.XMPP.P2P
             Client?.UnregisterMessageHandler("aes", EndpointSecurity.IoTHarmonizationE2E, this.AesMessageHandler, false);
             Client?.UnregisterIqGetHandler("aes", EndpointSecurity.IoTHarmonizationE2E, this.AesIqGetHandler, false);
             Client?.UnregisterIqSetHandler("aes", EndpointSecurity.IoTHarmonizationE2E, this.AesIqSetHandler, false);
+            Client?.UnregisterMessageHandler("acp", EndpointSecurity.IoTHarmonizationE2E, this.AcpMessageHandler, false);
+            Client?.UnregisterIqGetHandler("acp", EndpointSecurity.IoTHarmonizationE2E, this.AcpIqGetHandler, false);
+            Client?.UnregisterIqSetHandler("acp", EndpointSecurity.IoTHarmonizationE2E, this.AcpIqSetHandler, false);
             Client?.UnregisterIqSetHandler("synchE2e", EndpointSecurity.IoTHarmonizationE2E, this.SynchE2eHandler, false);
         }
 
@@ -526,8 +538,10 @@ namespace Waher.Networking.XMPP.P2P
         /// <param name="From">From attribute</param>
         /// <param name="To">To attribute</param>
         /// <param name="Data">Binary data</param>
+        /// <param name="SymmetricCipher">Type of symmetric cipher to use to decrypt content.</param>
         /// <returns>Decrypted data, or null if no E2E information is found for endpoint.</returns>
-        public virtual byte[] Decrypt(string EndpointReference, string Id, string Type, string From, string To, byte[] Data)
+        public virtual byte[] Decrypt(string EndpointReference, string Id, string Type, string From, string To, byte[] Data,
+            IE2eSymmetricCipher SymmetricCipher)
         {
             IE2eEndpoint RemoteEndpoint = this.FindRemoteEndpoint(From, EndpointReference);
             if (RemoteEndpoint is null)
@@ -537,7 +551,11 @@ namespace Waher.Networking.XMPP.P2P
             if (LocalEndpoint is null)
                 return null;
 
-            return LocalEndpoint.DefaultSymmetricCipher.Decrypt(Id, Type, From, To, Data, RemoteEndpoint, LocalEndpoint);
+            IE2eSymmetricCipher Cipher = LocalEndpoint.DefaultSymmetricCipher;
+            if (!(SymmetricCipher is null) && Cipher.GetType() != SymmetricCipher.GetType())
+                Cipher = SymmetricCipher;
+
+            return Cipher.Decrypt(Id, Type, From, To, Data, RemoteEndpoint, LocalEndpoint);
         }
 
         private IE2eEndpoint FindRemoteEndpoint(string RemoteJid, string EndpointReference)
@@ -634,10 +652,11 @@ namespace Waher.Networking.XMPP.P2P
         /// <param name="From">From attribute</param>
         /// <param name="To">To attribute</param>
         /// <param name="E2eElement">Encrypted XML data</param>
+        /// <param name="SymmetricCipher">Type of symmetric cipher to use to decrypt content.</param>
         /// <param name="EndpointReference">Endpoint reference</param>
         /// <returns>Decrypted XML.</returns>
         public virtual string Decrypt(XmppClient Client, string Id, string Type, string From, string To, XmlElement E2eElement,
-            out string EndpointReference)
+            IE2eSymmetricCipher SymmetricCipher, out string EndpointReference)
         {
             EndpointReference = XML.Attribute(E2eElement, "r");
             IE2eEndpoint RemoteEndpoint = this.FindRemoteEndpoint(From, EndpointReference);
@@ -648,7 +667,11 @@ namespace Waher.Networking.XMPP.P2P
             if (LocalEndpoint is null)
                 return null;
 
-            string Xml = LocalEndpoint.DefaultSymmetricCipher.Decrypt(Id, Type, From, To, E2eElement, RemoteEndpoint, LocalEndpoint);
+            IE2eSymmetricCipher Cipher = LocalEndpoint.DefaultSymmetricCipher;
+            if (!(SymmetricCipher is null) && Cipher.GetType() != SymmetricCipher.GetType())
+                Cipher = SymmetricCipher;
+
+            string Xml = Cipher.Decrypt(Id, Type, From, To, E2eElement, RemoteEndpoint, LocalEndpoint);
 
             if (Xml != null && Client.HasSniffers && Client.TryGetTag("ShowE2E", out object Obj) && Obj is bool && (bool)Obj)
                 Client.Information(Xml);
@@ -658,8 +681,18 @@ namespace Waher.Networking.XMPP.P2P
 
         private void AesMessageHandler(object Sender, MessageEventArgs e)
         {
+            this.E2eMessageHandler(Sender, e, this.aes);
+        }
+
+        private void AcpMessageHandler(object Sender, MessageEventArgs e)
+        {
+            this.E2eMessageHandler(Sender, e, this.acp);
+        }
+
+        private void E2eMessageHandler(object Sender, MessageEventArgs e, IE2eSymmetricCipher Cipher)
+        {
             XmppClient Client = Sender as XmppClient;
-            string Xml = this.Decrypt(Client, e.Id, e.Message.GetAttribute("type"), e.From, e.To, e.Content, out string EndpointReference);
+            string Xml = this.Decrypt(Client, e.Id, e.Message.GetAttribute("type"), e.From, e.To, e.Content, Cipher, out string EndpointReference);
             if (Xml is null)
             {
                 Client.Error("Unable to decrypt or verify message.");
@@ -693,12 +726,22 @@ namespace Waher.Networking.XMPP.P2P
             object[] P = (object[])e.State;
             IqResultEventHandler Callback = (IqResultEventHandler)P[0];
             object State = P[1];
+            IE2eSymmetricCipher Cipher = null;
 
-            if (E != null && E.LocalName == "aes" && E.NamespaceURI == IoTHarmonizationE2E)
+            if (!(E is null) && E.NamespaceURI == IoTHarmonizationE2E)
+            {
+                switch (E.LocalName)
+                {
+                    case "aes": Cipher = this.aes; break;
+                    case "acp": Cipher = this.acp; break;
+                }
+            }
+
+            if (!(Cipher is null))
             {
                 if (Callback != null)
                 {
-                    string Content = this.Decrypt(Client, e.Id, e.Response.GetAttribute("type"), e.From, e.To, E, out string EndpointReference);
+                    string Content = this.Decrypt(Client, e.Id, e.Response.GetAttribute("type"), e.From, e.To, E, Cipher, out string EndpointReference);
                     if (Content is null)
                     {
                         Client.Error("Unable to decrypt or verify response.");
@@ -818,8 +861,18 @@ namespace Waher.Networking.XMPP.P2P
 
         private void AesIqGetHandler(object Sender, IqEventArgs e)
         {
+            this.E2eIqGetHandler(Sender, e, this.aes);
+        }
+
+        private void AcpIqGetHandler(object Sender, IqEventArgs e)
+        {
+            this.E2eIqGetHandler(Sender, e, this.acp);
+        }
+
+        private void E2eIqGetHandler(object Sender, IqEventArgs e, IE2eSymmetricCipher Cipher)
+        {
             XmppClient Client = Sender as XmppClient;
-            string Content = this.Decrypt(Client, e.Id, e.IQ.GetAttribute("type"), e.From, e.To, e.Query, out string EndpointReference);
+            string Content = this.Decrypt(Client, e.Id, e.IQ.GetAttribute("type"), e.From, e.To, e.Query, Cipher, out string EndpointReference);
             if (Content is null)
             {
                 Client.Error("Unable to decrypt or verify request.");
@@ -836,8 +889,18 @@ namespace Waher.Networking.XMPP.P2P
 
         private void AesIqSetHandler(object Sender, IqEventArgs e)
         {
+            this.E2eIqSetHandler(Sender, e, this.aes);
+        }
+
+        private void AcpIqSetHandler(object Sender, IqEventArgs e)
+        {
+            this.E2eIqSetHandler(Sender, e, this.acp);
+        }
+
+        private void E2eIqSetHandler(object Sender, IqEventArgs e, IE2eSymmetricCipher Cipher)
+        {
             XmppClient Client = Sender as XmppClient;
-            string Content = this.Decrypt(Client, e.Id, e.IQ.GetAttribute("type"), e.From, e.To, e.Query, out string EndpointReference);
+            string Content = this.Decrypt(Client, e.Id, e.IQ.GetAttribute("type"), e.From, e.To, e.Query, Cipher, out string EndpointReference);
             if (Content is null)
             {
                 Client.Error("Unable to decrypt or verify request.");

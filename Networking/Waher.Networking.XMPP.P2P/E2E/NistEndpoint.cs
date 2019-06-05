@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using Waher.Networking.XMPP.P2P.SymmetricCiphers;
 using Waher.Security.EllipticCurves;
 
 namespace Waher.Networking.XMPP.P2P.E2E
@@ -21,7 +22,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
         /// </summary>
         /// <param name="Curve">Curve instance</param>
         public NistEndpoint(EllipticCurve Curve)
-			: base(Curve)
+			: base(Curve, new Aes256())
 		{
 		}
 
@@ -31,7 +32,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
         /// <param name="PublicKey">Remote public key.</param>
         /// <param name="ReferenceCurve">Reference curve</param>
         public NistEndpoint(byte[] PublicKey, EllipticCurve ReferenceCurve)
-			: base(PublicKey, ReferenceCurve)
+			: base(PublicKey, ReferenceCurve, new Aes256())
 		{
 		}
 

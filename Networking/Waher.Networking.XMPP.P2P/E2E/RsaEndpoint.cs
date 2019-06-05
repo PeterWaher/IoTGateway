@@ -2,9 +2,7 @@
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
-using System.Xml;
-using Waher.Content.Xml;
-using Waher.Security;
+using Waher.Networking.XMPP.P2P.SymmetricCiphers;
 
 namespace Waher.Networking.XMPP.P2P.E2E
 {
@@ -35,7 +33,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
         /// </summary>
         /// <param name="Rsa">RSA</param>
         public RsaEndpoint(RSA Rsa)
-            : base()
+            : base(new Aes256())
         {
             this.rsa = Rsa;
 
@@ -55,7 +53,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
         /// <param name="Modulus">Modulus of RSA public key.</param>
         /// <param name="Exponent">Exponent of RSA public key.</param>
         public RsaEndpoint(int KeySize, byte[] Modulus, byte[] Exponent)
-            : base()
+            : base(new Aes256())
         {
             this.rsa = RSA.Create();
             this.rsa.KeySize = KeySize;

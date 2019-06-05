@@ -187,6 +187,8 @@
     <Compile Include="HttpFileUpload\HttpFileUploadClient.cs" />
     <Compile Include="HttpFileUpload\HttpFileUploadEventArgs.cs" />
     <Compile Include="IAlternativeTransport.cs" />
+    <Compile Include="IE2eEndpoint.cs" />
+    <Compile Include="IE2eSymmetricCipher.cs" />
     <Compile Include="IEndToEndEncryption.cs" />
     <Compile Include="InBandBytestreams\DataReceivedEventArgs.cs" />
     <Compile Include="InBandBytestreams\IbbClient.cs" />

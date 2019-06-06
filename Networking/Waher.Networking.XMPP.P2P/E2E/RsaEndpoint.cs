@@ -31,9 +31,28 @@ namespace Waher.Networking.XMPP.P2P.E2E
         /// <summary>
         /// RSA / AES-256 hybrid cipher.
         /// </summary>
+        /// <param name="SymmetricCipher">Symmetric cipher to use by default.</param>
+        public RsaEndpoint(IE2eSymmetricCipher SymmetricCipher)
+            : this(RSA.Create(), SymmetricCipher)
+        {
+        }
+
+        /// <summary>
+        /// RSA / AES-256 hybrid cipher.
+        /// </summary>
         /// <param name="Rsa">RSA</param>
         public RsaEndpoint(RSA Rsa)
-            : base(new Aes256())
+            : this(Rsa, new Aes256())
+        {
+        }
+
+        /// <summary>
+        /// RSA / AES-256 hybrid cipher.
+        /// </summary>
+        /// <param name="Rsa">RSA</param>
+        /// <param name="SymmetricCipher">Symmetric cipher to use by default.</param>
+        public RsaEndpoint(RSA Rsa, IE2eSymmetricCipher SymmetricCipher)
+            : base(SymmetricCipher)
         {
             this.rsa = Rsa;
 
@@ -53,7 +72,20 @@ namespace Waher.Networking.XMPP.P2P.E2E
         /// <param name="Modulus">Modulus of RSA public key.</param>
         /// <param name="Exponent">Exponent of RSA public key.</param>
         public RsaEndpoint(int KeySize, byte[] Modulus, byte[] Exponent)
-            : base(new Aes256())
+            : this(KeySize, Modulus, Exponent, new Aes256())
+        {
+        }
+
+        /// <summary>
+        /// RSA / AES-256 hybrid cipher.
+        /// </summary>
+        /// <param name="KeySize">Size of key</param>
+        /// <param name="Modulus">Modulus of RSA public key.</param>
+        /// <param name="Exponent">Exponent of RSA public key.</param>
+        /// <param name="SymmetricCipher">Symmetric cipher to use by default.</param>
+        public RsaEndpoint(int KeySize, byte[] Modulus, byte[] Exponent,
+            IE2eSymmetricCipher SymmetricCipher)
+            : base(SymmetricCipher)
         {
             this.rsa = RSA.Create();
             this.rsa.KeySize = KeySize;
@@ -168,7 +200,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
             RSA Rsa = RSA.Create();
             Rsa.KeySize = KeySize;
 
-            return new RsaEndpoint(Rsa);
+            return new RsaEndpoint(Rsa, this.DefaultSymmetricCipher);
         }
 
         /// <summary>
@@ -210,7 +242,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
             RSA Rsa = RSA.Create();
             Rsa.ImportParameters(P);
 
-            return new RsaEndpoint(Rsa);
+            return new RsaEndpoint(Rsa, this.DefaultSymmetricCipher);
         }
 
         /// <summary>
@@ -241,7 +273,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
             Array.Copy(PublicKey, 2, Modulus, 0, ModSize);
             Array.Copy(PublicKey, 2 + ModSize, Exponent, 0, ExpSize);
 
-            return new RsaEndpoint(KeySize, Modulus, Exponent);
+            return new RsaEndpoint(KeySize, Modulus, Exponent, this.DefaultSymmetricCipher);
         }
 
         /// <summary>

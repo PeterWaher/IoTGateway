@@ -13,27 +13,56 @@ namespace Waher.Networking.XMPP.P2P.E2E
         /// Edwards25519 Twisted Edwards Curve
         /// </summary>
         public Edwards25519Endpoint()
-			: this(new Edwards25519())
-		{
-		}
+            : this(new Edwards25519())
+        {
+        }
 
         /// <summary>
         /// Edwards25519 Twisted Edwards Curve
         /// </summary>
-        /// <param name="Curve">Curve instance</param>
-        public Edwards25519Endpoint(Edwards25519 Curve)
-			: base(Curve, new Aes256())
-		{
-		}
+        /// <param name="SymmetricCipher">Symmetric cipher to use by default.</param>
+        public Edwards25519Endpoint(IE2eSymmetricCipher SymmetricCipher)
+            : this(new Edwards25519(), SymmetricCipher)
+        {
+        }
+
+        /// <summary>
+        /// Edwards25519 Twisted Edwards Curve
+        /// </summary>
+        /// <param name="Edwards">Edwards instance</param>
+        public Edwards25519Endpoint(Edwards25519 Edwards)
+            : this(Edwards, new Aes256())
+        {
+        }
+
+        /// <summary>
+        /// Edwards25519 Twisted Edwards Curve
+        /// </summary>
+        /// <param name="Edwards">Edwards instance</param>
+        /// <param name="SymmetricCipher">Symmetric cipher to use by default.</param>
+        public Edwards25519Endpoint(Edwards25519 Edwards, IE2eSymmetricCipher SymmetricCipher)
+            : base(Edwards, SymmetricCipher)
+        {
+        }
 
         /// <summary>
         /// Edwards25519 Twisted Edwards Curve
         /// </summary>
         /// <param name="PublicKey">Remote public key.</param>
         public Edwards25519Endpoint(byte[] PublicKey)
-			: base(PublicKey, new Edwards25519(), new Aes256())
-		{
-		}
+            : this(PublicKey, new Aes256())
+        {
+        }
+
+        /// <summary>
+        /// Edwards25519 Twisted Edwards Curve
+        /// </summary>
+        /// <param name="PublicKey">Remote public key.</param>
+        /// <param name="SymmetricCipher">Symmetric cipher to use by default.</param>
+        public Edwards25519Endpoint(byte[] PublicKey, IE2eSymmetricCipher SymmetricCipher)
+            : base(PublicKey, new Edwards25519(), SymmetricCipher)
+        {
+        }
 
 		/// <summary>
 		/// Local name of the E2E encryption scheme
@@ -52,7 +81,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		/// <returns>New E2E endpoint.</returns>
 		public override IE2eEndpoint Create(int SecurityStrength)
 		{
-			return new Edwards25519Endpoint();
+			return new Edwards25519Endpoint(this.DefaultSymmetricCipher);
 		}
 
         /// <summary>
@@ -62,7 +91,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
         /// <returns>Endpoint object.</returns>
         public override IE2eEndpoint CreatePrivate(byte[] Secret)
 		{
-			return new Edwards25519Endpoint(new Edwards25519(Secret));
+			return new Edwards25519Endpoint(new Edwards25519(Secret), this.DefaultSymmetricCipher);
 		}
 
         /// <summary>
@@ -72,7 +101,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
         /// <returns>Endpoint object.</returns>
         public override IE2eEndpoint CreatePublic(byte[] PublicKey)
 		{
-			return new Edwards25519Endpoint(PublicKey);
+			return new Edwards25519Endpoint(PublicKey, this.DefaultSymmetricCipher);
 		}
 	}
 }

@@ -13,7 +13,25 @@ namespace Waher.Networking.XMPP.P2P.E2E
         /// Curve25519 Montgomery Curve
         /// </summary>
         public Curve25519Endpoint()
-			: this(new Curve25519())
+            : this(new Curve25519())
+        {
+        }
+
+        /// <summary>
+        /// Curve25519 Montgomery Curve
+        /// </summary>
+        /// <param name="SymmetricCipher">Symmetric cipher to use by default.</param>
+        public Curve25519Endpoint(IE2eSymmetricCipher SymmetricCipher)
+            : this(new Curve25519(), SymmetricCipher)
+        {
+        }
+
+        /// <summary>
+        /// Curve25519 Montgomery Curve
+        /// </summary>
+        /// <param name="Curve">Curve instance</param>
+        public Curve25519Endpoint(Curve25519 Curve)
+			: this(Curve, new AeadChaCha20Poly1305())
 		{
 		}
 
@@ -21,8 +39,18 @@ namespace Waher.Networking.XMPP.P2P.E2E
         /// Curve25519 Montgomery Curve
         /// </summary>
         /// <param name="Curve">Curve instance</param>
-        public Curve25519Endpoint(Curve25519 Curve)
-			: base(Curve, new AeadChaCha20Poly1305())
+        /// <param name="SymmetricCipher">Symmetric cipher to use by default.</param>
+        public Curve25519Endpoint(Curve25519 Curve, IE2eSymmetricCipher SymmetricCipher)
+            : base(Curve, SymmetricCipher)
+        {
+        }
+
+        /// <summary>
+        /// Curve25519 Montgomery Curve
+        /// </summary>
+        /// <param name="PublicKey">Remote public key.</param>
+        public Curve25519Endpoint(byte[] PublicKey)
+			: this(PublicKey, new AeadChaCha20Poly1305())
 		{
 		}
 
@@ -30,15 +58,16 @@ namespace Waher.Networking.XMPP.P2P.E2E
         /// Curve25519 Montgomery Curve
         /// </summary>
         /// <param name="PublicKey">Remote public key.</param>
-        public Curve25519Endpoint(byte[] PublicKey)
-			: base(PublicKey, new Curve25519(), new AeadChaCha20Poly1305())
-		{
-		}
+        /// <param name="SymmetricCipher">Symmetric cipher to use by default.</param>
+        public Curve25519Endpoint(byte[] PublicKey, IE2eSymmetricCipher SymmetricCipher)
+            : base(PublicKey, new Curve25519(), SymmetricCipher)
+        {
+        }
 
-		/// <summary>
-		/// Local name of the E2E encryption scheme
-		/// </summary>
-		public override string LocalName => "x25519";
+        /// <summary>
+        /// Local name of the E2E encryption scheme
+        /// </summary>
+        public override string LocalName => "x25519";
 
 		/// <summary>
 		/// Security strength of End-to-End encryption scheme.
@@ -57,7 +86,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
         /// <returns>New E2E endpoint.</returns>
         public override IE2eEndpoint Create(int SecurityStrength)
 		{
-			return new Curve25519Endpoint();
+			return new Curve25519Endpoint(this.DefaultSymmetricCipher);
 		}
 
         /// <summary>
@@ -67,7 +96,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
         /// <returns>Endpoint object.</returns>
         public override IE2eEndpoint CreatePrivate(byte[] Secret)
 		{
-			return new Curve25519Endpoint(new Curve25519(Secret));
+			return new Curve25519Endpoint(new Curve25519(Secret), this.DefaultSymmetricCipher);
 		}
 
         /// <summary>
@@ -77,7 +106,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
         /// <returns>Endpoint object.</returns>
         public override IE2eEndpoint CreatePublic(byte[] PublicKey)
 		{
-			return new Curve25519Endpoint(PublicKey);
+			return new Curve25519Endpoint(PublicKey, this.DefaultSymmetricCipher);
 		}
 	}
 }

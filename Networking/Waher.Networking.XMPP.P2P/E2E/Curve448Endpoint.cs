@@ -13,32 +13,61 @@ namespace Waher.Networking.XMPP.P2P.E2E
         /// Curve448 Montgomery Curve
         /// </summary>
         public Curve448Endpoint()
-			: this(new Curve448())
-		{
-		}
+            : this(new Curve448())
+        {
+        }
+
+        /// <summary>
+        /// Curve448 Montgomery Curve
+        /// </summary>
+        /// <param name="SymmetricCipher">Symmetric cipher to use by default.</param>
+        public Curve448Endpoint(IE2eSymmetricCipher SymmetricCipher)
+            : this(new Curve448(), SymmetricCipher)
+        {
+        }
 
         /// <summary>
         /// Curve448 Montgomery Curve
         /// </summary>
         /// <param name="Curve">Curve instance</param>
         public Curve448Endpoint(Curve448 Curve)
-			: base(Curve, new AeadChaCha20Poly1305())
-		{
-		}
+            : this(Curve, new AeadChaCha20Poly1305())
+        {
+        }
+
+        /// <summary>
+        /// Curve448 Montgomery Curve
+        /// </summary>
+        /// <param name="Curve">Curve instance</param>
+        /// <param name="SymmetricCipher">Symmetric cipher to use by default.</param>
+        public Curve448Endpoint(Curve448 Curve, IE2eSymmetricCipher SymmetricCipher)
+            : base(Curve, SymmetricCipher)
+        {
+        }
 
         /// <summary>
         /// Curve448 Montgomery Curve
         /// </summary>
         /// <param name="PublicKey">Remote public key.</param>
         public Curve448Endpoint(byte[] PublicKey)
-			: base(PublicKey, new Curve448(), new AeadChaCha20Poly1305())
-		{
-		}
+            : this(PublicKey, new AeadChaCha20Poly1305())
+        {
+        }
 
-		/// <summary>
-		/// Local name of the E2E encryption scheme
-		/// </summary>
-		public override string LocalName => "x448";
+        /// <summary>
+        /// Curve448 Montgomery Curve
+        /// </summary>
+        /// <param name="PublicKey">Remote public key.</param>
+        /// <param name="SymmetricCipher">Symmetric cipher to use by default.</param>
+        public Curve448Endpoint(byte[] PublicKey, IE2eSymmetricCipher SymmetricCipher)
+            : base(PublicKey, new Curve448(), SymmetricCipher)
+        {
+        }
+
+        /// <summary>
+        /// Local name of the E2E encryption scheme
+        /// </summary>
+        public override string LocalName => "x448";
 
 		/// <summary>
 		/// Security strength of End-to-End encryption scheme.
@@ -57,7 +86,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
         /// <returns>New E2E endpoint.</returns>
         public override IE2eEndpoint Create(int SecurityStrength)
 		{
-			return new Curve448Endpoint();
+			return new Curve448Endpoint(this.DefaultSymmetricCipher);
 		}
 
         /// <summary>
@@ -67,7 +96,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
         /// <returns>Endpoint object.</returns>
         public override IE2eEndpoint CreatePrivate(byte[] Secret)
 		{
-			return new Curve448Endpoint(new Curve448(Secret));
+			return new Curve448Endpoint(new Curve448(Secret), this.DefaultSymmetricCipher);
 		}
 
         /// <summary>
@@ -77,7 +106,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
         /// <returns>Endpoint object.</returns>
         public override IE2eEndpoint CreatePublic(byte[] PublicKey)
 		{
-			return new Curve448Endpoint(PublicKey);
+			return new Curve448Endpoint(PublicKey, this.DefaultSymmetricCipher);
 		}
 	}
 }

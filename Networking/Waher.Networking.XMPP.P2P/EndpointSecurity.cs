@@ -41,6 +41,7 @@ namespace Waher.Networking.XMPP.P2P
         private readonly int securityStrength;
         private Aes256 aes = new Aes256();
         private AeadChaCha20Poly1305 acp = new AeadChaCha20Poly1305();
+        private ChaCha20 cha = new ChaCha20();
 
         /// <summary>
         /// Class managing end-to-end encryption.
@@ -70,7 +71,7 @@ namespace Waher.Networking.XMPP.P2P
         /// <param name="SecurityStrength">Desired security strength.</param>
         /// <param name="LocalEndpoints">Local endpoints to use</param>
         public EndpointSecurity(XmppClient Client, int SecurityStrength,
-            IE2eEndpoint[] LocalEndpoints)
+            params IE2eEndpoint[] LocalEndpoints)
             : this(Client, null, SecurityStrength, LocalEndpoints)
         {
         }
@@ -83,7 +84,7 @@ namespace Waher.Networking.XMPP.P2P
         /// <param name="SecurityStrength">Desired security strength.</param>
         /// <param name="LocalEndpoints">Local endpoints to use</param>
         public EndpointSecurity(XmppClient Client, XmppServerlessMessaging ServerlessMessaging,
-            int SecurityStrength, IE2eEndpoint[] LocalEndpoints)
+            int SecurityStrength, params IE2eEndpoint[] LocalEndpoints)
             : base()
         {
             this.securityStrength = SecurityStrength;
@@ -107,7 +108,14 @@ namespace Waher.Networking.XMPP.P2P
 
                 this.client.OnStateChanged += Client_OnStateChanged;
                 this.client.OnPresence += Client_OnPresence;
+                this.client.CustomPresenceXml += Client_CustomPresenceXml;
             }
+        }
+
+        private void Client_CustomPresenceXml(object Sender, CustomPresenceEventArgs e)
+        {
+            this.AppendE2eInfo(e.Stanza);
+			this.serverlessMessaging?.AppendP2pInfo(e.Stanza);
         }
 
         /// <summary>
@@ -225,6 +233,7 @@ namespace Waher.Networking.XMPP.P2P
             {
                 this.client.OnStateChanged -= Client_OnStateChanged;
                 this.client.OnPresence -= Client_OnPresence;
+                this.client.CustomPresenceXml -= Client_CustomPresenceXml;
 
                 this.UnregisterHandlers(this.client);
                 this.client = null;
@@ -259,6 +268,9 @@ namespace Waher.Networking.XMPP.P2P
 
             this.acp?.Dispose();
             this.acp = null;
+
+            this.cha?.Dispose();
+            this.cha = null;
         }
 
         private void Client_OnStateChanged(object Sender, XmppState NewState)
@@ -310,6 +322,9 @@ namespace Waher.Networking.XMPP.P2P
             Client?.RegisterMessageHandler("acp", EndpointSecurity.IoTHarmonizationE2E, this.AcpMessageHandler, false);
             Client?.RegisterIqGetHandler("acp", EndpointSecurity.IoTHarmonizationE2E, this.AcpIqGetHandler, false);
             Client?.RegisterIqSetHandler("acp", EndpointSecurity.IoTHarmonizationE2E, this.AcpIqSetHandler, false);
+            Client?.RegisterMessageHandler("cha", EndpointSecurity.IoTHarmonizationE2E, this.ChaMessageHandler, false);
+            Client?.RegisterIqGetHandler("cha", EndpointSecurity.IoTHarmonizationE2E, this.ChaIqGetHandler, false);
+            Client?.RegisterIqSetHandler("cha", EndpointSecurity.IoTHarmonizationE2E, this.ChaIqSetHandler, false);
             Client?.RegisterIqSetHandler("synchE2e", EndpointSecurity.IoTHarmonizationE2E, this.SynchE2eHandler, false);
         }
 
@@ -325,6 +340,9 @@ namespace Waher.Networking.XMPP.P2P
             Client?.UnregisterMessageHandler("acp", EndpointSecurity.IoTHarmonizationE2E, this.AcpMessageHandler, false);
             Client?.UnregisterIqGetHandler("acp", EndpointSecurity.IoTHarmonizationE2E, this.AcpIqGetHandler, false);
             Client?.UnregisterIqSetHandler("acp", EndpointSecurity.IoTHarmonizationE2E, this.AcpIqSetHandler, false);
+            Client?.UnregisterMessageHandler("cha", EndpointSecurity.IoTHarmonizationE2E, this.ChaMessageHandler, false);
+            Client?.UnregisterIqGetHandler("cha", EndpointSecurity.IoTHarmonizationE2E, this.ChaIqGetHandler, false);
+            Client?.UnregisterIqSetHandler("cha", EndpointSecurity.IoTHarmonizationE2E, this.ChaIqSetHandler, false);
             Client?.UnregisterIqSetHandler("synchE2e", EndpointSecurity.IoTHarmonizationE2E, this.SynchE2eHandler, false);
         }
 
@@ -517,7 +535,7 @@ namespace Waher.Networking.XMPP.P2P
         /// <returns>Encrypted data, or null if no E2E information is found for endpoint.</returns>
         public virtual byte[] Encrypt(string Id, string Type, string From, string To, byte[] Data)
         {
-            IE2eEndpoint RemoteEndpoint = this.FindRemoteEndpoint(From, null);
+            IE2eEndpoint RemoteEndpoint = this.FindRemoteEndpoint(To, null);
             if (RemoteEndpoint is null)
                 return null;
 
@@ -609,7 +627,7 @@ namespace Waher.Networking.XMPP.P2P
         /// <returns>If E2E information was available and encryption was possible.</returns>
         public virtual bool Encrypt(XmppClient Client, string Id, string Type, string From, string To, string DataXml, StringBuilder Xml)
         {
-            IE2eEndpoint RemoteEndpoint = this.FindRemoteEndpoint(From, null);
+            IE2eEndpoint RemoteEndpoint = this.FindRemoteEndpoint(To, null);
             if (RemoteEndpoint is null)
                 return false;
 
@@ -687,6 +705,11 @@ namespace Waher.Networking.XMPP.P2P
         private void AcpMessageHandler(object Sender, MessageEventArgs e)
         {
             this.E2eMessageHandler(Sender, e, this.acp);
+        }
+
+        private void ChaMessageHandler(object Sender, MessageEventArgs e)
+        {
+            this.E2eMessageHandler(Sender, e, this.cha);
         }
 
         private void E2eMessageHandler(object Sender, MessageEventArgs e, IE2eSymmetricCipher Cipher)
@@ -869,6 +892,11 @@ namespace Waher.Networking.XMPP.P2P
             this.E2eIqGetHandler(Sender, e, this.acp);
         }
 
+        private void ChaIqGetHandler(object Sender, IqEventArgs e)
+        {
+            this.E2eIqGetHandler(Sender, e, this.cha);
+        }
+
         private void E2eIqGetHandler(object Sender, IqEventArgs e, IE2eSymmetricCipher Cipher)
         {
             XmppClient Client = Sender as XmppClient;
@@ -895,6 +923,11 @@ namespace Waher.Networking.XMPP.P2P
         private void AcpIqSetHandler(object Sender, IqEventArgs e)
         {
             this.E2eIqSetHandler(Sender, e, this.acp);
+        }
+
+        private void ChaIqSetHandler(object Sender, IqEventArgs e)
+        {
+            this.E2eIqSetHandler(Sender, e, this.cha);
         }
 
         private void E2eIqSetHandler(object Sender, IqEventArgs e, IE2eSymmetricCipher Cipher)

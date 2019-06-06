@@ -12,7 +12,7 @@ using Waher.Networking.XMPP.P2P.SymmetricCiphers;
 namespace Waher.Networking.XMPP.Test.E2eTests
 {
     [TestClass]
-    public class RtsaTests : XmppE2eTests 
+    public class RsaTests : XmppE2eTests 
     {
         public override IE2eEndpoint GenerateEndpoint(IE2eSymmetricCipher Cipher)
         {

@@ -6,7 +6,7 @@ using System.Numerics;
 namespace Waher.Security.EllipticCurves
 {
     /// <summary>
-    /// Edwards25519 Elliptic Curve, as defined in RFC7748 & RFC8032:
+    /// Edwards25519 Elliptic Curve, as defined in RFC7748 and RFC8032:
     /// https://tools.ietf.org/html/rfc7748
     /// https://tools.ietf.org/html/rfc8032
     /// </summary>
@@ -20,7 +20,7 @@ namespace Waher.Security.EllipticCurves
         private readonly bool hashSecret;
 
         /// <summary>
-        /// Edwards25519 Elliptic Curve, as defined in RFC7748 & RFC8032:
+        /// Edwards25519 Elliptic Curve, as defined in RFC7748 and RFC8032:
         /// https://tools.ietf.org/html/rfc7748
         /// https://tools.ietf.org/html/rfc8032
         /// </summary>
@@ -30,7 +30,7 @@ namespace Waher.Security.EllipticCurves
         }
 
         /// <summary>
-        /// Edwards25519 Elliptic Curve, as defined in RFC7748 & RFC8032:
+        /// Edwards25519 Elliptic Curve, as defined in RFC7748 and RFC8032:
         /// https://tools.ietf.org/html/rfc7748
         /// https://tools.ietf.org/html/rfc8032
         /// </summary>
@@ -41,7 +41,7 @@ namespace Waher.Security.EllipticCurves
         }
 
         /// <summary>
-        /// Edwards25519 Elliptic Curve, as defined in RFC7748 & RFC8032:
+        /// Edwards25519 Elliptic Curve, as defined in RFC7748 and RFC8032:
         /// https://tools.ietf.org/html/rfc7748
         /// https://tools.ietf.org/html/rfc8032
         /// </summary>
@@ -92,7 +92,6 @@ namespace Waher.Security.EllipticCurves
         /// Creates a signature of <paramref name="Data"/> using the EdDSA algorithm.
         /// </summary>
         /// <param name="Data">Payload to sign.</param>
-        /// <param name="HashFunction">Hash function to use.</param>
         /// <returns>Signature.</returns>
         public override byte[] Sign(byte[] Data)
         {

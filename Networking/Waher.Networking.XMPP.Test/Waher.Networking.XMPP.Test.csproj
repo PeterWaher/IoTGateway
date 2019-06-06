@@ -107,9 +107,20 @@
   <ItemGroup>
     <Compile Include="BoshStanzaTests.cs" />
     <Compile Include="CommunicationTests.cs" />
+    <Compile Include="E2eTests\NistP521Tests.cs" />
+    <Compile Include="E2eTests\NistP384Tests.cs" />
+    <Compile Include="E2eTests\NistP256Tests.cs" />
+    <Compile Include="E2eTests\NistP224Tests.cs" />
+    <Compile Include="E2eTests\NistP192Tests.cs" />
+    <Compile Include="E2eTests\RsaTests.cs" />
+    <Compile Include="E2eTests\Edwards25519Tests.cs" />
+    <Compile Include="E2eTests\Edwards448Tests.cs" />
+    <Compile Include="E2eTests\Curve448Tests.cs" />
+    <Compile Include="E2eTests\Curve25519Tests.cs" />
     <Compile Include="XmppComponentTests.cs" />
     <Compile Include="BoshConnectionTests.cs" />
     <Compile Include="XmppConnectionTests.cs" />
+    <Compile Include="E2eTests\XmppE2eTests.cs" />
     <Compile Include="XmppSynchronizationTests.cs" />
     <Compile Include="XmppEventsTests.cs" />
     <Compile Include="XmppBitsOfBinaryTests.cs" />
@@ -159,6 +170,10 @@
     <ProjectReference Include="..\..\Script\Waher.Script\Waher.Script.csproj">
       <Project>{c39e8f9b-1386-4cd3-bfa7-3481181d3ba1}</Project>
       <Name>Waher.Script</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Security\Waher.Security.EllipticCurves\Waher.Security.EllipticCurves.csproj">
+      <Project>{1c6cf422-5565-43e1-842b-9fd610bd9a67}</Project>
+      <Name>Waher.Security.EllipticCurves</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Things\Waher.Things\Waher.Things.csproj">
       <Project>{1659833d-9a9a-4147-9237-2ba8d96086bc}</Project>

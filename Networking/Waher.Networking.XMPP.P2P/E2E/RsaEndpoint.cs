@@ -24,17 +24,37 @@ namespace Waher.Networking.XMPP.P2P.E2E
         /// RSA / AES-256 hybrid cipher.
         /// </summary>
         public RsaEndpoint()
-            : this(RSA.Create())
+            : this(4096)
         {
         }
 
         /// <summary>
         /// RSA / AES-256 hybrid cipher.
         /// </summary>
-        /// <param name="SymmetricCipher">Symmetric cipher to use by default.</param>
-        public RsaEndpoint(IE2eSymmetricCipher SymmetricCipher)
-            : this(RSA.Create(), SymmetricCipher)
+        /// <param name="KeySize">Size of key</param>
+        public RsaEndpoint(int KeySize)
+            : this(CreateRSA(KeySize))
         {
+        }
+
+        /// <summary>
+        /// RSA / AES-256 hybrid cipher.
+        /// </summary>
+        /// <param name="KeySize">Size of key</param>
+        /// <param name="SymmetricCipher">Symmetric cipher to use by default.</param>
+        public RsaEndpoint(int KeySize, IE2eSymmetricCipher SymmetricCipher)
+            : this(CreateRSA(KeySize), SymmetricCipher)
+        {
+        }
+
+        private static RSA CreateRSA(int KeySize)
+        {
+            RSA Result = RSA.Create();
+
+            if (Result.KeySize != KeySize)
+                Result.KeySize = KeySize;
+
+            return Result;
         }
 
         /// <summary>
@@ -87,8 +107,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
             IE2eSymmetricCipher SymmetricCipher)
             : base(SymmetricCipher)
         {
-            this.rsa = RSA.Create();
-            this.rsa.KeySize = KeySize;
+            this.rsa = CreateRSA(KeySize);
 
             this.keySize = KeySize;
             this.modulus = Modulus;
@@ -197,8 +216,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
             else
                 throw new ArgumentException("Key strength too high.", nameof(SecurityStrength));
 
-            RSA Rsa = RSA.Create();
-            Rsa.KeySize = KeySize;
+            RSA Rsa = CreateRSA(KeySize);
 
             return new RsaEndpoint(Rsa, this.DefaultSymmetricCipher);
         }
@@ -259,7 +277,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
             KeySize <<= 8;
             KeySize |= PublicKey[0];
 
-            int ModSize = KeySize >> 8;
+            int ModSize = KeySize >> 3;
             if (PublicKey.Length < 2 + ModSize)
                 throw new ArgumentException("Invalid public key.", nameof(PublicKey));
 
@@ -384,10 +402,8 @@ namespace Waher.Networking.XMPP.P2P.E2E
         /// <returns></returns>
         public static bool Verify(byte[] Data, byte[] Signature, int KeySize, byte[] Modulus, byte[] Exponent)
         {
-            using (RSA Rsa = RSA.Create())
+            using (RSA Rsa = CreateRSA(KeySize))
             {
-                Rsa.KeySize = KeySize;
-
                 RSAParameters P = new RSAParameters()
                 {
                     Modulus = Modulus,
@@ -398,16 +414,6 @@ namespace Waher.Networking.XMPP.P2P.E2E
 
                 return Rsa.VerifyData(Data, Signature, HashAlgorithmName.SHA256, RSASignaturePadding.Pss);
             }
-        }
-
-        /// <summary>
-        /// Decrypts a key using the local private RSA key.
-        /// </summary>
-        /// <param name="Key">Encrypted key</param>
-        /// <returns>Decrypted key</returns>
-        public byte[] Decrypt(byte[] Key)
-        {
-            return this.rsa.Decrypt(Key, RSAEncryptionPadding.OaepSHA256);
         }
 
         /// <summary>

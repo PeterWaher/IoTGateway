@@ -45,6 +45,12 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
         }
 
         /// <summary>
+        /// Creates a new symmetric cipher object with the same settings as the current object.
+        /// </summary>
+        /// <returns>New instance</returns>
+        public abstract IE2eSymmetricCipher CreteNew();
+
+        /// <summary>
         /// Gets an Initiation Vector from stanza attributes.
         /// </summary>
         /// <param name="Id">Id attribute</param>

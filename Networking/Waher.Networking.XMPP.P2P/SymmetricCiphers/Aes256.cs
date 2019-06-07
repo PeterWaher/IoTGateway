@@ -38,6 +38,15 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
         public override string Namespace => EndpointSecurity.IoTHarmonizationE2E;
 
         /// <summary>
+        /// Creates a new symmetric cipher object with the same settings as the current object.
+        /// </summary>
+        /// <returns>New instance</returns>
+        public override IE2eSymmetricCipher CreteNew()
+        {
+            return new Aes256();
+        }
+
+        /// <summary>
         /// <see cref="IDisposable.Dispose"/>
         /// </summary>
         public override void Dispose()

@@ -218,7 +218,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
 
             RSA Rsa = CreateRSA(KeySize);
 
-            return new RsaEndpoint(Rsa, this.DefaultSymmetricCipher);
+            return new RsaEndpoint(Rsa, this.DefaultSymmetricCipher.CreteNew());
         }
 
         /// <summary>
@@ -260,7 +260,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
             RSA Rsa = RSA.Create();
             Rsa.ImportParameters(P);
 
-            return new RsaEndpoint(Rsa, this.DefaultSymmetricCipher);
+            return new RsaEndpoint(Rsa, this.DefaultSymmetricCipher.CreteNew());
         }
 
         /// <summary>
@@ -291,7 +291,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
             Array.Copy(PublicKey, 2, Modulus, 0, ModSize);
             Array.Copy(PublicKey, 2 + ModSize, Exponent, 0, ExpSize);
 
-            return new RsaEndpoint(KeySize, Modulus, Exponent, this.DefaultSymmetricCipher);
+            return new RsaEndpoint(KeySize, Modulus, Exponent, this.DefaultSymmetricCipher.CreteNew());
         }
 
         /// <summary>

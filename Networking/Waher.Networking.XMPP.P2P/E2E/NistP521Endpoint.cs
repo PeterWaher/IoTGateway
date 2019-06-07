@@ -81,7 +81,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		/// <returns>New E2E endpoint.</returns>
 		public override IE2eEndpoint Create(int SecurityStrength)
 		{
-			return new NistP521Endpoint(this.DefaultSymmetricCipher);
+			return new NistP521Endpoint(this.DefaultSymmetricCipher.CreteNew());
 		}
 
         /// <summary>
@@ -91,7 +91,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
         /// <returns>Endpoint object.</returns>
         public override IE2eEndpoint CreatePrivate(byte[] Secret)
         {
-            return new NistP521Endpoint(new NistP521(Secret), this.DefaultSymmetricCipher);
+            return new NistP521Endpoint(new NistP521(Secret), this.DefaultSymmetricCipher.CreteNew());
         }
 
         /// <summary>
@@ -101,7 +101,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
         /// <returns>Endpoint object.</returns>
         public override IE2eEndpoint CreatePublic(byte[] PublicKey)
         {
-            return new NistP521Endpoint(PublicKey, this.DefaultSymmetricCipher);
+            return new NistP521Endpoint(PublicKey, this.DefaultSymmetricCipher.CreteNew());
         }
     }
 }

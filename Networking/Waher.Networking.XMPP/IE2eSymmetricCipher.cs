@@ -34,6 +34,12 @@ namespace Waher.Networking.XMPP
         }
 
         /// <summary>
+        /// Creates a new symmetric cipher object with the same settings as the current object.
+        /// </summary>
+        /// <returns>New instance</returns>
+        IE2eSymmetricCipher CreteNew();
+
+        /// <summary>
         /// Encrypts binary data
         /// </summary>
         /// <param name="Id">Id attribute</param>

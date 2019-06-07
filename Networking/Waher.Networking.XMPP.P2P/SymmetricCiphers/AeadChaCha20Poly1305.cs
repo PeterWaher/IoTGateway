@@ -29,6 +29,15 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
         public override bool AuthenticatedEncryption => true;
 
         /// <summary>
+        /// Creates a new symmetric cipher object with the same settings as the current object.
+        /// </summary>
+        /// <returns>New instance</returns>
+        public override IE2eSymmetricCipher CreteNew()
+        {
+            return new AeadChaCha20Poly1305();
+        }
+
+        /// <summary>
         /// Encrypts binary data
         /// </summary>
         /// <param name="Data">Binary Data</param>

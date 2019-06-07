@@ -1068,10 +1068,17 @@
             RSA / AES-256 hybrid cipher.
             </summary>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaEndpoint.#ctor(Waher.Networking.XMPP.IE2eSymmetricCipher)">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaEndpoint.#ctor(System.Int32)">
             <summary>
             RSA / AES-256 hybrid cipher.
             </summary>
+            <param name="KeySize">Size of key</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaEndpoint.#ctor(System.Int32,Waher.Networking.XMPP.IE2eSymmetricCipher)">
+            <summary>
+            RSA / AES-256 hybrid cipher.
+            </summary>
+            <param name="KeySize">Size of key</param>
             <param name="SymmetricCipher">Symmetric cipher to use by default.</param>
         </member>
         <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaEndpoint.#ctor(System.Security.Cryptography.RSA)">
@@ -1226,13 +1233,6 @@
             <param name="Modulus">Modulus</param>
             <param name="Exponent">Exponent</param>
             <returns></returns>
-        </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaEndpoint.Decrypt(System.Byte[])">
-            <summary>
-            Decrypts a key using the local private RSA key.
-            </summary>
-            <param name="Key">Encrypted key</param>
-            <returns>Decrypted key</returns>
         </member>
         <member name="P:Waher.Networking.XMPP.P2P.E2E.RsaEndpoint.Slow">
             <summary>

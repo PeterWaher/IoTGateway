@@ -57,6 +57,7 @@ namespace Waher.Networking.XMPP
 		private readonly ErrorType errorType = ErrorType.None;
 		private readonly XmppException stanzaError = null;
         private readonly IEndToEndEncryption e2eEncryption = null;
+        private readonly IE2eSymmetricCipher e2eSymmetricCipher = null;
         private readonly string e2eReference = null;
         private readonly string errorText = string.Empty;
 		private object state;
@@ -85,6 +86,7 @@ namespace Waher.Networking.XMPP
 			this.ok = e.ok;
             this.e2eEncryption = e.e2eEncryption;
             this.e2eReference = e.e2eReference;
+            this.e2eSymmetricCipher = e.e2eSymmetricCipher;
         }
 
         /// <summary>
@@ -92,17 +94,20 @@ namespace Waher.Networking.XMPP
         /// </summary>
         /// <param name="E2eEncryption">End-to-end encryption algorithm used.</param>
         /// <param name="E2eReference">Reference to End-to-end encryption endpoint used.</param>
+        /// <param name="E2eSymmetricCipher">Type of symmetric cipher used in E2E encryption.</param>
         /// <param name="Response">Response element.</param>
         /// <param name="Id">ID attribute.</param>
         /// <param name="To">To attribute.</param>
         /// <param name="From">From attribute.</param>
         /// <param name="Ok">If response is a proper response (true), or an error response (false).</param>
         /// <param name="State">State object passed in the original request.</param>
-        public IqResultEventArgs(IEndToEndEncryption E2eEncryption, string E2eReference, XmlElement Response, string Id, string To, string From, bool Ok, object State)
+        public IqResultEventArgs(IEndToEndEncryption E2eEncryption, string E2eReference, IE2eSymmetricCipher E2eSymmetricCipher,
+            XmlElement Response, string Id, string To, string From, bool Ok, object State)
             : this(Response, Id, To, From, Ok, State)
         {
             this.e2eEncryption = E2eEncryption;
             this.e2eReference = E2eReference;
+            this.e2eSymmetricCipher = E2eSymmetricCipher;
         }
 
         /// <summary>
@@ -270,6 +275,14 @@ namespace Waher.Networking.XMPP
         public string E2eReference
         {
             get { return this.e2eReference; }
+        }
+
+        /// <summary>
+        /// Type of symmetric cipher used in E2E encryption.
+        /// </summary>
+        public IE2eSymmetricCipher E2eSymmetricCipher
+        {
+            get { return this.e2eSymmetricCipher; }
         }
     }
 }

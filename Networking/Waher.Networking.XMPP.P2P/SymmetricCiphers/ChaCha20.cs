@@ -77,7 +77,7 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
         /// <returns>Decrypted Data</returns>
         public override byte[] Decrypt(byte[] Data, byte[] Key, byte[] IV, byte[] AssociatedData)
         {
-            return this.Decrypt(Data, Key, IV, AssociatedData);
+            return this.Encrypt(Data, Key, IV, AssociatedData);
         }
 
         /// <summary>

@@ -33,17 +33,23 @@ namespace Waher.Networking.XMPP.Test.E2eTests
         {
             base.ConnectClients();
 
-            RosterItem Item1 = this.client1.GetRosterItem(this.client2.BareJID);
-            RosterItem Item2 = this.client2.GetRosterItem(this.client1.BareJID);
+            this.SubscribedTo(this.client1, this.client2);
+            this.SubscribedTo(this.client2, this.client1);
+        }
+
+        private void SubscribedTo(XmppClient From, XmppClient To)
+        {
+            RosterItem Item1 = From.GetRosterItem(To.BareJID);
+            RosterItem Item2 = To.GetRosterItem(From.BareJID);
             if (Item1 is null || (Item1.State != SubscriptionState.Both && Item1.State != SubscriptionState.To) ||
                 Item2 is null || (Item2.State != SubscriptionState.Both && Item2.State != SubscriptionState.From))
             {
                 ManualResetEvent Done2 = new ManualResetEvent(false);
                 ManualResetEvent Error2 = new ManualResetEvent(false);
 
-                this.client2.OnPresenceSubscribe += (sender, e) =>
+                To.OnPresenceSubscribe += (sender, e) =>
                 {
-                    if (e.FromBareJID == this.client1.BareJID)
+                    if (e.FromBareJID == From.BareJID)
                     {
                         e.Accept();
                         Done2.Set();
@@ -55,7 +61,7 @@ namespace Waher.Networking.XMPP.Test.E2eTests
                     }
                 };
 
-                this.client1.RequestPresenceSubscription(this.client2.BareJID);
+                From.RequestPresenceSubscription(To.BareJID);
 
                 Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done2, Error2 }, 10000));
             }

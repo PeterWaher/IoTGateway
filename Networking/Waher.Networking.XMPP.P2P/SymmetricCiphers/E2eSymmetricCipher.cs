@@ -494,9 +494,9 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
             byte[] Key;
 
             if (EncryptedKey is null)
-                Key = Receiver.DecryptSecret(EncryptedKey);
-            else
                 Key = Receiver.GetSharedSecret(Sender);
+            else
+                Key = Receiver.DecryptSecret(EncryptedKey);
 
             byte[] IV = this.GetIV(Id, Type, From, To, Counter.Value);
             byte[] AssociatedData = this.AuthenticatedEncryption ? Encoding.UTF8.GetBytes(From) : null;
@@ -522,9 +522,9 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
                 try
                 {
                     if (EncryptedKey is null)
-                        Key = Receiver.Previous.DecryptSecret(EncryptedKey);
-                    else
                         Key = Receiver.Previous.GetSharedSecret(Sender);
+                    else
+                        Key = Receiver.Previous.DecryptSecret(EncryptedKey);
 
                     if (Key != null)
                     {

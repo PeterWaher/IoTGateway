@@ -2425,6 +2425,12 @@
             If Authenticated Encryption with Associated Data is used
             </summary>
         </member>
+        <member name="M:Waher.Networking.XMPP.P2P.SymmetricCiphers.AeadChaCha20Poly1305.CreteNew">
+            <summary>
+            Creates a new symmetric cipher object with the same settings as the current object.
+            </summary>
+            <returns>New instance</returns>
+        </member>
         <member name="M:Waher.Networking.XMPP.P2P.SymmetricCiphers.AeadChaCha20Poly1305.Encrypt(System.Byte[],System.Byte[],System.Byte[],System.Byte[])">
             <summary>
             Encrypts binary data
@@ -2469,6 +2475,12 @@
             <summary>
             Namespace of the E2E symmetric cipher
             </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.SymmetricCiphers.Aes256.CreteNew">
+            <summary>
+            Creates a new symmetric cipher object with the same settings as the current object.
+            </summary>
+            <returns>New instance</returns>
         </member>
         <member name="M:Waher.Networking.XMPP.P2P.SymmetricCiphers.Aes256.Dispose">
             <summary>
@@ -2540,6 +2552,12 @@
             Namespace of the E2E symmetric cipher
             </summary>
         </member>
+        <member name="M:Waher.Networking.XMPP.P2P.SymmetricCiphers.ChaCha20.CreteNew">
+            <summary>
+            Creates a new symmetric cipher object with the same settings as the current object.
+            </summary>
+            <returns>New instance</returns>
+        </member>
         <member name="M:Waher.Networking.XMPP.P2P.SymmetricCiphers.ChaCha20.GetIV(System.String,System.String,System.String,System.String,System.UInt32)">
             <summary>
             Gets an Initiation Vector from stanza attributes.
@@ -2607,6 +2625,12 @@
             <summary>
             <see cref="M:System.IDisposable.Dispose"/>
             </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.SymmetricCiphers.E2eSymmetricCipher.CreteNew">
+            <summary>
+            Creates a new symmetric cipher object with the same settings as the current object.
+            </summary>
+            <returns>New instance</returns>
         </member>
         <member name="M:Waher.Networking.XMPP.P2P.SymmetricCiphers.E2eSymmetricCipher.GetIV(System.String,System.String,System.String,System.String,System.UInt32)">
             <summary>

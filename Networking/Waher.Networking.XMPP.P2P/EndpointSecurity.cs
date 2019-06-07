@@ -115,7 +115,7 @@ namespace Waher.Networking.XMPP.P2P
         private void Client_CustomPresenceXml(object Sender, CustomPresenceEventArgs e)
         {
             this.AppendE2eInfo(e.Stanza);
-			this.serverlessMessaging?.AppendP2pInfo(e.Stanza);
+            this.serverlessMessaging?.AppendP2pInfo(e.Stanza);
         }
 
         /// <summary>
@@ -791,7 +791,8 @@ namespace Waher.Networking.XMPP.P2P
                     XmlDocument Doc = new XmlDocument();
                     Doc.LoadXml(Xml.ToString());
 
-                    IqResultEventArgs e2 = new IqResultEventArgs(Doc.DocumentElement, e.Id, e.To, e.From, e.Ok, State);
+                    IqResultEventArgs e2 = new IqResultEventArgs(this, EndpointReference, Cipher,
+                        Doc.DocumentElement, e.Id, e.To, e.From, e.Ok, State);
                     Callback(Sender, e2);
                 }
             }
@@ -911,7 +912,7 @@ namespace Waher.Networking.XMPP.P2P
             XmlDocument Doc = new XmlDocument();
             Doc.LoadXml(this.EmbedIq(e, "get", Content));
 
-            IqEventArgs e2 = new IqEventArgs(Client, this, EndpointReference, Doc.DocumentElement, e.Id, e.To, e.From);
+            IqEventArgs e2 = new IqEventArgs(Client, this, EndpointReference, Cipher, Doc.DocumentElement, e.Id, e.To, e.From);
             Client.ProcessIqGet(e2);
         }
 
@@ -944,7 +945,7 @@ namespace Waher.Networking.XMPP.P2P
             XmlDocument Doc = new XmlDocument();
             Doc.LoadXml(this.EmbedIq(e, "set", Content));
 
-            IqEventArgs e2 = new IqEventArgs(Client, this, EndpointReference, Doc.DocumentElement, e.Id, e.To, e.From);
+            IqEventArgs e2 = new IqEventArgs(Client, this, EndpointReference, Cipher, Doc.DocumentElement, e.Id, e.To, e.From);
             Client.ProcessIqSet(e2);
         }
 

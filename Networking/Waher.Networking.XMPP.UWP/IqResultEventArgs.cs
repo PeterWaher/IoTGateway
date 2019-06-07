@@ -262,6 +262,14 @@ namespace Waher.Networking.XMPP
 		public XmppException StanzaError { get { return this.stanzaError; } }
 
         /// <summary>
+        /// If end-to-end encryption was used in the response.
+        /// </summary>
+        public bool UsesE2eEncryption
+        {
+            get { return this.e2eEncryption != null; }
+        }
+
+        /// <summary>
         /// End-to-end encryption interface, if used in the request.
         /// </summary>
         public IEndToEndEncryption E2eEncryption

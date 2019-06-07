@@ -14,6 +14,7 @@ namespace Waher.Networking.XMPP
         private readonly XmppClient client;
         private readonly XmppComponent component;
         private readonly IEndToEndEncryption e2eEncryption;
+        private readonly IE2eSymmetricCipher e2eSymmetricCipher;
         private readonly XmlElement iq;
         private XmlElement query = null;
         private readonly string id;
@@ -36,6 +37,7 @@ namespace Waher.Networking.XMPP
             this.from = e.from;
             this.e2eEncryption = e.e2eEncryption;
             this.e2eReference = e.e2eReference;
+            this.e2eSymmetricCipher = e.e2eSymmetricCipher;
         }
 
         /// <summary>
@@ -52,6 +54,7 @@ namespace Waher.Networking.XMPP
             this.component = null;
             this.e2eEncryption = null;
             this.e2eReference = null;
+            this.e2eSymmetricCipher = null;
             this.iq = Iq;
             this.id = Id;
             this.to = To;
@@ -76,6 +79,7 @@ namespace Waher.Networking.XMPP
             this.from = From;
             this.e2eEncryption = null;
             this.e2eReference = null;
+            this.e2eSymmetricCipher = null;
         }
 
         /// <summary>
@@ -84,17 +88,20 @@ namespace Waher.Networking.XMPP
         /// <param name="Client">XMPP Client.</param>
         /// <param name="E2eEncryption">End-to-end encryption algorithm used.</param>
         /// <param name="E2eReference">Reference to End-to-end encryption endpoint used.</param>
+        /// <param name="E2eSymmetricCipher">Type of symmetric cipher used in E2E encryption.</param>
         /// <param name="Iq">IQ element.</param>
         /// <param name="Id">Id attribute of IQ stanza.</param>
         /// <param name="To">To attribute of IQ stanza.</param>
         /// <param name="From">From attribute of IQ stanza.</param>
-        public IqEventArgs(XmppClient Client, IEndToEndEncryption E2eEncryption, string E2eReference, XmlElement Iq, string Id,
-            string To, string From)
+        public IqEventArgs(XmppClient Client, IEndToEndEncryption E2eEncryption, 
+            string E2eReference, IE2eSymmetricCipher E2eSymmetricCipher, XmlElement Iq,
+            string Id, string To, string From)
         {
             this.client = Client;
             this.component = null;
             this.e2eEncryption = E2eEncryption;
             this.e2eReference = E2eReference;
+            this.e2eSymmetricCipher = E2eSymmetricCipher;
             this.iq = Iq;
             this.id = Id;
             this.to = To;
@@ -180,6 +187,14 @@ namespace Waher.Networking.XMPP
         public string E2eReference
         {
             get { return this.e2eReference; }
+        }
+
+        /// <summary>
+        /// Type of symmetric cipher used in E2E encryption.
+        /// </summary>
+        public IE2eSymmetricCipher E2eSymmetricCipher
+        {
+            get { return this.e2eSymmetricCipher; }
         }
 
         /// <summary>

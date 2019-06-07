@@ -2552,8 +2552,18 @@ namespace Waher.Networking.XMPP
 			}
 
 			if (h is null)
-				this.SendIqError(e.Id, e.From, "<error type='cancel'><feature-not-implemented xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/></error>");
-			else
+            {
+                string Xml = "<error type='cancel'><feature-not-implemented xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/></error>";
+
+                if (e.UsesE2eEncryption)
+                {
+                    e.E2eEncryption.SendIqError(this, E2ETransmission.NormalIfNotE2E,
+                        e.Id, e.From, Xml);
+                }
+                else
+                    this.SendIqError(e.Id, e.From, Xml);
+            }
+            else
 			{
 				try
 				{
@@ -2561,7 +2571,13 @@ namespace Waher.Networking.XMPP
 				}
 				catch (Exception ex)
 				{
-					this.SendIqError(e.Id, e.From, ex);
+                    if (e.UsesE2eEncryption)
+                    {
+                        e.E2eEncryption.SendIqError(this, E2ETransmission.NormalIfNotE2E,
+                            e.Id, e.From, ExceptionToXmppXml(ex));
+                    }
+                    else
+					    this.SendIqError(e.Id, e.From, ex);
 				}
 			}
 		}
@@ -3585,7 +3601,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="MaxRetryTimeout">Maximum retry timeout. Used if <paramref name="DropOff"/> is true.</param>
 		/// <returns>ID of IQ stanza, if none provided in <paramref name="Id"/>.</returns>
 		public uint SendIq(string Id, string To, string Xml, string Type, IqResultEventHandler Callback, object State,
-		int RetryTimeout, int NrRetries, bool DropOff, int MaxRetryTimeout)
+		    int RetryTimeout, int NrRetries, bool DropOff, int MaxRetryTimeout)
 		{
 			PendingRequest PendingRequest = null;
 			DateTime TP;

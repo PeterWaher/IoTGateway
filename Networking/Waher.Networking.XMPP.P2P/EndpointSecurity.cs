@@ -757,6 +757,7 @@ namespace Waher.Networking.XMPP.P2P
                 {
                     case "aes": Cipher = this.aes; break;
                     case "acp": Cipher = this.acp; break;
+                    case "cha": Cipher = this.cha; break;
                 }
             }
 

@@ -65,7 +65,7 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
 
             Security.ChaChaPoly.AeadChaCha20Poly1305 Acp = new Security.ChaChaPoly.AeadChaCha20Poly1305(Key, IV);
             byte[] Mac = new byte[16];
-            Array.Copy(Data, 0, Mac, 0, 16);
+            Array.Copy(Data, c - 16, Mac, 0, 16);
 
             Array.Resize<byte>(ref Data, c - 16);
 

@@ -134,8 +134,8 @@ namespace Waher.IoTGateway
 		private static SystemConfiguration[] configurations;
 		private static LoggedIn loggedIn = null;
 		private static Scheduler scheduler = null;
-		private static RandomNumberGenerator rnd = null;
-		private static Semaphore gatewayRunning = null;
+		private static RandomNumberGenerator rnd = RandomNumberGenerator.Create();
+        private static Semaphore gatewayRunning = null;
 		private static Emoji1LocalFiles emoji1_24x24 = null;
 		private static StreamWriter exceptionFile = null;
 		private static CaseInsensitiveString domain = null;
@@ -258,7 +258,6 @@ namespace Waher.IoTGateway
 				Types.SetModuleParameter("Root", rootFolder);
 
 				scheduler = new Scheduler();
-				rnd = RandomNumberGenerator.Create();
 
 				Task T = Task.Run(() =>
 				{

@@ -79,48 +79,172 @@
             If Peer-to-peer address information was found in presence stanza.
             </summary>
         </member>
-        <member name="T:Waher.Networking.XMPP.P2P.E2E.Aes256">
+        <member name="T:Waher.Networking.XMPP.P2P.E2E.Curve25519Endpoint">
             <summary>
-            Abstract base class for AES-256 based End-to-End encryption schemes.
+            Curve25519 Montgomery Curve
             </summary>
         </member>
-        <member name="F:Waher.Networking.XMPP.P2P.E2E.Aes256.aes">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.Curve25519Endpoint.#ctor">
             <summary>
-            AES encryption object
+            Curve25519 Montgomery Curve
             </summary>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.Aes256.#ctor">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.Curve25519Endpoint.#ctor(Waher.Networking.XMPP.IE2eSymmetricCipher)">
             <summary>
-            Abstract base class for AES-256 based End-to-End encryption schemes.
+            Curve25519 Montgomery Curve
+            </summary>
+            <param name="SymmetricCipher">Symmetric cipher to use by default.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.Curve25519Endpoint.#ctor(Waher.Security.EllipticCurves.Curve25519)">
+            <summary>
+            Curve25519 Montgomery Curve
+            </summary>
+            <param name="Curve">Curve instance</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.Curve25519Endpoint.#ctor(Waher.Security.EllipticCurves.Curve25519,Waher.Networking.XMPP.IE2eSymmetricCipher)">
+            <summary>
+            Curve25519 Montgomery Curve
+            </summary>
+            <param name="Curve">Curve instance</param>
+            <param name="SymmetricCipher">Symmetric cipher to use by default.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.Curve25519Endpoint.#ctor(System.Byte[])">
+            <summary>
+            Curve25519 Montgomery Curve
+            </summary>
+            <param name="PublicKey">Remote public key.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.Curve25519Endpoint.#ctor(System.Byte[],Waher.Networking.XMPP.IE2eSymmetricCipher)">
+            <summary>
+            Curve25519 Montgomery Curve
+            </summary>
+            <param name="PublicKey">Remote public key.</param>
+            <param name="SymmetricCipher">Symmetric cipher to use by default.</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.Curve25519Endpoint.LocalName">
+            <summary>
+            Local name of the E2E encryption scheme
             </summary>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.Aes256.Dispose">
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.Curve25519Endpoint.SecurityStrength">
             <summary>
-            <see cref="M:System.IDisposable.Dispose"/>
+            Security strength of End-to-End encryption scheme.
             </summary>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.Aes256.Encrypt(System.Byte[],System.Byte[],System.Byte[])">
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.Curve25519Endpoint.SupportsSignatures">
             <summary>
-            Encrypts binary data
+            If signatures are supported.
             </summary>
-            <param name="Data">Binary Data</param>
-            <param name="Key">Encryption Key</param>
-            <param name="IV">Initiation Vector</param>
-            <returns>Encrypted Data</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.Aes256.Decrypt(System.Byte[],System.Byte[],System.Byte[])">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.Curve25519Endpoint.Create(System.Int32)">
             <summary>
-            Decrypts binary data
+            Creates a new key.
             </summary>
-            <param name="Data">Binary Data</param>
-            <param name="Key">Encryption Key</param>
-            <param name="IV">Initiation Vector</param>
-            <returns>Decrypted Data</returns>
+            <param name="SecurityStrength">Overall desired security strength, if applicable.</param>
+            <returns>New E2E endpoint.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.Curve25519Endpoint.CreatePrivate(System.Byte[])">
+            <summary>
+            Creates a new endpoint given a private key.
+            </summary>
+            <param name="Secret">Secret.</param>
+            <returns>Endpoint object.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.Curve25519Endpoint.CreatePublic(System.Byte[])">
+            <summary>
+            Creates a new endpoint given a public key.
+            </summary>
+            <param name="PublicKey">Remote public key.</param>
+            <returns>Endpoint object.</returns>
+        </member>
+        <member name="T:Waher.Networking.XMPP.P2P.E2E.Curve448Endpoint">
+            <summary>
+            Curve448 Montgomery Curve
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.Curve448Endpoint.#ctor">
+            <summary>
+            Curve448 Montgomery Curve
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.Curve448Endpoint.#ctor(Waher.Networking.XMPP.IE2eSymmetricCipher)">
+            <summary>
+            Curve448 Montgomery Curve
+            </summary>
+            <param name="SymmetricCipher">Symmetric cipher to use by default.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.Curve448Endpoint.#ctor(Waher.Security.EllipticCurves.Curve448)">
+            <summary>
+            Curve448 Montgomery Curve
+            </summary>
+            <param name="Curve">Curve instance</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.Curve448Endpoint.#ctor(Waher.Security.EllipticCurves.Curve448,Waher.Networking.XMPP.IE2eSymmetricCipher)">
+            <summary>
+            Curve448 Montgomery Curve
+            </summary>
+            <param name="Curve">Curve instance</param>
+            <param name="SymmetricCipher">Symmetric cipher to use by default.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.Curve448Endpoint.#ctor(System.Byte[])">
+            <summary>
+            Curve448 Montgomery Curve
+            </summary>
+            <param name="PublicKey">Remote public key.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.Curve448Endpoint.#ctor(System.Byte[],Waher.Networking.XMPP.IE2eSymmetricCipher)">
+            <summary>
+            Curve448 Montgomery Curve
+            </summary>
+            <param name="PublicKey">Remote public key.</param>
+            <param name="SymmetricCipher">Symmetric cipher to use by default.</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.Curve448Endpoint.LocalName">
+            <summary>
+            Local name of the E2E encryption scheme
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.Curve448Endpoint.SecurityStrength">
+            <summary>
+            Security strength of End-to-End encryption scheme.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.Curve448Endpoint.SupportsSignatures">
+            <summary>
+            If signatures are supported.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.Curve448Endpoint.Create(System.Int32)">
+            <summary>
+            Creates a new key.
+            </summary>
+            <param name="SecurityStrength">Overall desired security strength, if applicable.</param>
+            <returns>New E2E endpoint.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.Curve448Endpoint.CreatePrivate(System.Byte[])">
+            <summary>
+            Creates a new endpoint given a private key.
+            </summary>
+            <param name="Secret">Secret.</param>
+            <returns>Endpoint object.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.Curve448Endpoint.CreatePublic(System.Byte[])">
+            <summary>
+            Creates a new endpoint given a public key.
+            </summary>
+            <param name="PublicKey">Remote public key.</param>
+            <returns>Endpoint object.</returns>
         </member>
         <member name="T:Waher.Networking.XMPP.P2P.E2E.E2eEndpoint">
             <summary>
             Abstract base class for End-to-End encryption schemes.
             </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.E2eEndpoint.#ctor(Waher.Networking.XMPP.IE2eSymmetricCipher)">
+            <summary>
+            Abstract base class for End-to-End encryption schemes.
+            </summary>
+            <param name="DefaultSymmetricCipher">Default symmetric cipher.</param>
         </member>
         <member name="M:Waher.Networking.XMPP.P2P.E2E.E2eEndpoint.Dispose">
             <summary>
@@ -147,12 +271,36 @@
             Namespace of the E2E encryption scheme
             </summary>
         </member>
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.E2eEndpoint.PublicKey">
+            <summary>
+            Remote public key.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.E2eEndpoint.PublicKeyBase64">
+            <summary>
+            Remote public key, as a Base64 string.
+            </summary>
+        </member>
         <member name="M:Waher.Networking.XMPP.P2P.E2E.E2eEndpoint.Create(System.Int32)">
             <summary>
             Creates a new key.
             </summary>
             <param name="SecurityStrength">Overall desired security strength, if applicable.</param>
             <returns>New E2E endpoint.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.E2eEndpoint.CreatePrivate(System.Byte[])">
+            <summary>
+            Creates a new endpoint given a private key.
+            </summary>
+            <param name="Secret">Secret.</param>
+            <returns>Endpoint object.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.E2eEndpoint.CreatePublic(System.Byte[])">
+            <summary>
+            Creates a new endpoint given a public key.
+            </summary>
+            <param name="PublicKey">Remote public key.</param>
+            <returns>Endpoint object.</returns>
         </member>
         <member name="M:Waher.Networking.XMPP.P2P.E2E.E2eEndpoint.Parse(System.Xml.XmlElement)">
             <summary>
@@ -161,95 +309,68 @@
             <param name="Xml">XML element.</param>
             <returns>Parsed key information, if possible, null if XML is not well-defined.</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.E2eEndpoint.ToXml(System.Text.StringBuilder)">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.E2eEndpoint.ToXml(System.Text.StringBuilder,System.String)">
             <summary>
             Exports the public key information to XML.
             </summary>
             <param name="Xml">XML output</param>
+            <param name="ParentNamespace">Namespace of parent element.</param>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.E2eEndpoint.Encrypt(System.String,System.String,System.String,System.String,System.Byte[],Waher.Networking.XMPP.P2P.E2E.IE2eEndpoint)">
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.E2eEndpoint.SupportsSharedSecrets">
             <summary>
-            Encrypts binary data
+            If shared secrets can be calculated from the endpoints keys.
             </summary>
-            <param name="Id">Id attribute</param>
-            <param name="Type">Type attribute</param>
-            <param name="From">From attribute</param>
-            <param name="To">To attribute</param>
-            <param name="Data">Binary data to encrypt</param>
-            <param name="LocalEndpoint">Local endpoint of same type.</param>
-            <returns>Encrypted data</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.E2eEndpoint.Decrypt(System.String,System.String,System.String,System.String,System.Byte[],Waher.Networking.XMPP.P2P.E2E.IE2eEndpoint)">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.E2eEndpoint.EncryptSecret(System.Byte[])">
             <summary>
-            Decrypts binary data
+            Encrypts a secret. Used if shared secrets cannot be calculated.
             </summary>
-            <param name="Id">Id attribute</param>
-            <param name="Type">Type attribute</param>
-            <param name="From">From attribute</param>
-            <param name="To">To attribute</param>
-            <param name="Data">Binary data to decrypt</param>
-            <param name="RemoteEndpoint">Remote endpoint of same type.</param>
-            <returns>Decrypted data</returns>
+            <param name="Secret">Secret</param>
+            <returns>Encrypted secret.</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.E2eEndpoint.Encrypt(System.String,System.String,System.String,System.String,System.Byte[],System.Text.StringBuilder,Waher.Networking.XMPP.P2P.E2E.IE2eEndpoint)">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.E2eEndpoint.DecryptSecret(System.Byte[])">
             <summary>
-            Encrypts Binary data
+            Decrypts a secret. Used if shared secrets cannot be calculated.
             </summary>
-            <param name="Id">Id attribute</param>
-            <param name="Type">Type attribute</param>
-            <param name="From">From attribute</param>
-            <param name="To">To attribute</param>
-            <param name="Data">Binary data to encrypt</param>
-            <param name="Xml">XML output</param>
-            <param name="LocalEndpoint">Local endpoint of same type.</param>
-            <returns>If encryption was possible</returns>
+            <param name="Secret">Encrypted secret</param>
+            <returns>Decrypted secret.</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.E2eEndpoint.CanDecrypt(System.Xml.XmlElement)">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.E2eEndpoint.GetSharedSecret(Waher.Networking.XMPP.IE2eEndpoint)">
             <summary>
-            If the scheme can decrypt a given XML element.
+            Gets a shared secret
             </summary>
-            <param name="AesElement">XML element with encrypted data.</param>
-            <returns>If the scheme can decrypt the data.</returns>
+            <param name="RemoteEndpoint">Remote endpoint</param>
+            <returns>Shared secret.</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.E2eEndpoint.Decrypt(System.String,System.String,System.String,System.String,System.Xml.XmlElement,Waher.Networking.XMPP.P2P.E2E.IE2eEndpoint)">
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.E2eEndpoint.SupportsSignatures">
             <summary>
-            Decrypts XML data
+            If signatures are supported.
             </summary>
-            <param name="Id">Id attribute</param>
-            <param name="Type">Type attribute</param>
-            <param name="From">From attribute</param>
-            <param name="To">To attribute</param>
-            <param name="AesElement">XML element with encrypted data.</param>
-            <param name="RemoteEndpoint">Remote endpoint of same type.</param>
-            <returns>Decrypted XMLs</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.E2eEndpoint.Sign(System.Byte[],Waher.Security.HashFunction)">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.E2eEndpoint.Sign(System.Byte[])">
             <summary>
             Signs binary data using the local private key.
             </summary>
             <param name="Data">Binary data</param>
-            <param name="HashFunction">Hash function to use.</param>
-            <returns>Signature consisting of one or two large integers.</returns>
+            <returns>Digital signature.</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.E2eEndpoint.Verify(System.Byte[],System.Byte[],System.Byte[],Waher.Security.HashFunction)">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.E2eEndpoint.Verify(System.Byte[],System.Byte[])">
             <summary>
             Verifies a signature.
             </summary>
             <param name="Data">Data that is signed.</param>
-            <param name="Signature1">First integer in ECDSA signature.</param>
-            <param name="Signature2">Second integer in ECDSA signature.</param>
-            <param name="HashFunction">Hash function used in signature calculation.</param>
+            <param name="Signature">Digital signature.</param>
             <returns>If signature is valid.</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.E2eEndpoint.GetIV(System.String,System.String,System.String,System.String)">
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.E2eEndpoint.Safe">
             <summary>
-            Gets AES Initiation Vector from stanza attributes.s
+            If endpoint is considered safe (i.e. there are no suspected backdoors)
             </summary>
-            <param name="Id">Id attribute</param>
-            <param name="Type">Type attribute</param>
-            <param name="From">From attribute</param>
-            <param name="To">To attribute</param>
-            <returns>AES Initiation vector.</returns>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.E2eEndpoint.Slow">
+            <summary>
+            If implementation is slow, compared to other options.
+            </summary>
         </member>
         <member name="M:Waher.Networking.XMPP.P2P.E2E.E2eEndpoint.ToString">
             <summary>
@@ -266,620 +387,707 @@
             <see cref="M:System.Object.GetHashCode"/>
             </summary>
         </member>
-        <member name="T:Waher.Networking.XMPP.P2P.E2E.EcAes256">
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.E2eEndpoint.Score">
             <summary>
-            Abstract base class for Elliptic Curve / AES-256 hybrid ciphers.
+            Provides a score for the endpoint. More features, higher score.
             </summary>
         </member>
-        <member name="F:Waher.Networking.XMPP.P2P.E2E.EcAes256.publicKey">
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.E2eEndpoint.DefaultSymmetricCipher">
+            <summary>
+            Default symmetric cipher.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.E2eEndpoint.GetNextCounter">
+            <summary>
+            Gets the next counter value.
+            </summary>
+            <returns>Counter value.</returns>
+        </member>
+        <member name="T:Waher.Networking.XMPP.P2P.E2E.Edwards25519Endpoint">
+            <summary>
+            Edwards25519 Twisted Edwards Curve
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.Edwards25519Endpoint.#ctor">
+            <summary>
+            Edwards25519 Twisted Edwards Curve
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.Edwards25519Endpoint.#ctor(Waher.Networking.XMPP.IE2eSymmetricCipher)">
+            <summary>
+            Edwards25519 Twisted Edwards Curve
+            </summary>
+            <param name="SymmetricCipher">Symmetric cipher to use by default.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.Edwards25519Endpoint.#ctor(Waher.Security.EllipticCurves.Edwards25519)">
+            <summary>
+            Edwards25519 Twisted Edwards Curve
+            </summary>
+            <param name="Edwards">Edwards instance</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.Edwards25519Endpoint.#ctor(Waher.Security.EllipticCurves.Edwards25519,Waher.Networking.XMPP.IE2eSymmetricCipher)">
+            <summary>
+            Edwards25519 Twisted Edwards Curve
+            </summary>
+            <param name="Edwards">Edwards instance</param>
+            <param name="SymmetricCipher">Symmetric cipher to use by default.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.Edwards25519Endpoint.#ctor(System.Byte[])">
+            <summary>
+            Edwards25519 Twisted Edwards Curve
+            </summary>
+            <param name="PublicKey">Remote public key.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.Edwards25519Endpoint.#ctor(System.Byte[],Waher.Networking.XMPP.IE2eSymmetricCipher)">
+            <summary>
+            Edwards25519 Twisted Edwards Curve
+            </summary>
+            <param name="PublicKey">Remote public key.</param>
+            <param name="SymmetricCipher">Symmetric cipher to use by default.</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.Edwards25519Endpoint.LocalName">
+            <summary>
+            Local name of the E2E encryption scheme
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.Edwards25519Endpoint.SecurityStrength">
+            <summary>
+            Security strength of End-to-End encryption scheme.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.Edwards25519Endpoint.Create(System.Int32)">
+            <summary>
+            Creates a new key.
+            </summary>
+            <param name="SecurityStrength">Overall desired security strength, if applicable.</param>
+            <returns>New E2E endpoint.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.Edwards25519Endpoint.CreatePrivate(System.Byte[])">
+            <summary>
+            Creates a new endpoint given a private key.
+            </summary>
+            <param name="Secret">Secret.</param>
+            <returns>Endpoint object.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.Edwards25519Endpoint.CreatePublic(System.Byte[])">
+            <summary>
+            Creates a new endpoint given a public key.
+            </summary>
+            <param name="PublicKey">Remote public key.</param>
+            <returns>Endpoint object.</returns>
+        </member>
+        <member name="T:Waher.Networking.XMPP.P2P.E2E.Edwards448Endpoint">
+            <summary>
+            Edwards448 Edwards Curve
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.Edwards448Endpoint.#ctor">
+            <summary>
+            Edwards448 Edwards Curve
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.Edwards448Endpoint.#ctor(Waher.Networking.XMPP.IE2eSymmetricCipher)">
+            <summary>
+            Edwards448 Edwards Curve
+            </summary>
+            <param name="SymmetricCipher">Symmetric cipher to use by default.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.Edwards448Endpoint.#ctor(Waher.Security.EllipticCurves.Edwards448)">
+            <summary>
+            Edwards448 Edwards Curve
+            </summary>
+            <param name="Edwards">Edwards instance</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.Edwards448Endpoint.#ctor(Waher.Security.EllipticCurves.Edwards448,Waher.Networking.XMPP.IE2eSymmetricCipher)">
+            <summary>
+            Edwards448 Edwards Curve
+            </summary>
+            <param name="Edwards">Edwards instance</param>
+            <param name="SymmetricCipher">Symmetric cipher to use by default.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.Edwards448Endpoint.#ctor(System.Byte[])">
+            <summary>
+            Edwards448 Edwards Curve
+            </summary>
+            <param name="PublicKey">Remote public key.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.Edwards448Endpoint.#ctor(System.Byte[],Waher.Networking.XMPP.IE2eSymmetricCipher)">
+            <summary>
+            Edwards448 Edwards Curve
+            </summary>
+            <param name="PublicKey">Remote public key.</param>
+            <param name="SymmetricCipher">Symmetric cipher to use by default.</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.Edwards448Endpoint.LocalName">
+            <summary>
+            Local name of the E2E encryption scheme
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.Edwards448Endpoint.SecurityStrength">
+            <summary>
+            Security strength of End-to-End encryption scheme.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.Edwards448Endpoint.Create(System.Int32)">
+            <summary>
+            Creates a new key.
+            </summary>
+            <param name="SecurityStrength">Overall desired security strength, if applicable.</param>
+            <returns>New E2E endpoint.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.Edwards448Endpoint.CreatePrivate(System.Byte[])">
+            <summary>
+            Creates a new endpoint given a private key.
+            </summary>
+            <param name="Secret">Secret.</param>
+            <returns>Endpoint object.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.Edwards448Endpoint.CreatePublic(System.Byte[])">
+            <summary>
+            Creates a new endpoint given a public key.
+            </summary>
+            <param name="PublicKey">Remote public key.</param>
+            <returns>Endpoint object.</returns>
+        </member>
+        <member name="T:Waher.Networking.XMPP.P2P.E2E.EllipticCurveEndpoint">
+            <summary>
+            Abstract base class for Elliptic Curve endpoints.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.P2P.E2E.EllipticCurveEndpoint.publicKey">
             <summary>
             Remote public key.
             </summary>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.EcAes256.#ctor(Waher.Security.EllipticCurves.CurvePrimeField)">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.EllipticCurveEndpoint.#ctor(Waher.Security.EllipticCurves.EllipticCurve,Waher.Networking.XMPP.IE2eSymmetricCipher)">
             <summary>
             Abstract base class for Elliptic Curve / AES-256 hybrid ciphers.s
             </summary>
             <param name="Curve">Curve instance</param>
+            <param name="DefaultSymmetricCipher">Default symmetric cipher.</param>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.EcAes256.#ctor(System.Byte[],System.Byte[],Waher.Security.EllipticCurves.CurvePrimeField)">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.EllipticCurveEndpoint.#ctor(System.Byte[],Waher.Security.EllipticCurves.EllipticCurve,Waher.Networking.XMPP.IE2eSymmetricCipher)">
             <summary>
             Abstract base class for Elliptic Curve / AES-256 hybrid ciphers.s
             </summary>
-            <param name="X">X-coordinate of remote public key.</param>
-            <param name="Y">Y-coordinate of remote public key.</param>
+            <param name="PublicKey">Remote public key.</param>
             <param name="ReferenceCurve">Reference curve</param>
+            <param name="DefaultSymmetricCipher">Default symmetric cipher.</param>
         </member>
-        <member name="P:Waher.Networking.XMPP.P2P.E2E.EcAes256.HasPrivateKey">
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.EllipticCurveEndpoint.HasPrivateKey">
             <summary>
             If the key contains a private key.
             </summary>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.EcAes256.Create(System.Numerics.BigInteger)">
-            <summary>
-            Creates a new endpoint.
-            </summary>
-            <param name="D">Private key.</param>
-            <returns>Endpoint object.</returns>
-        </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.EcAes256.Create(System.Byte[],System.Byte[])">
-            <summary>
-            Creates a new endpoint.
-            </summary>
-            <param name="X">X-coordinate of remote public key.</param>
-            <param name="Y">Y-coordinate of remote public key.</param>
-            <returns>Endpoint object.</returns>
-        </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.EcAes256.Parse(System.Xml.XmlElement)">
-            <summary>
-            Parses endpoint information from an XML element.
-            </summary>
-            <param name="Xml">XML element.</param>
-            <returns>Parsed key information, if possible, null if XML is not well-defined.</returns>
-        </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.EcAes256.ToXml(System.Text.StringBuilder)">
-            <summary>
-            Exports the public key information to XML.
-            </summary>
-            <param name="Xml">XML output</param>
-        </member>
-        <member name="P:Waher.Networking.XMPP.P2P.E2E.EcAes256.PublicKey">
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.EllipticCurveEndpoint.PublicKey">
             <summary>
             Remote public key.
             </summary>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.EcAes256.FromNetwork(System.Byte[])">
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.EllipticCurveEndpoint.PublicKeyBase64">
             <summary>
-            Converts a <see cref="T:System.Numerics.BigInteger"/> from network binary representation.
+            Remote public key, as a Base64 string.
             </summary>
-            <param name="Bin">Network binary representation</param>
-            <returns><see cref="T:System.Numerics.BigInteger"/> representation</returns>
         </member>
-        <member name="P:Waher.Networking.XMPP.P2P.E2E.EcAes256.CurveName">
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.EllipticCurveEndpoint.CurveName">
             <summary>
             Name of elliptic curve
             </summary>
         </member>
-        <member name="P:Waher.Networking.XMPP.P2P.E2E.EcAes256.Curve">
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.EllipticCurveEndpoint.Curve">
             <summary>
             Elliptic Curve
             </summary>
         </member>
-        <member name="P:Waher.Networking.XMPP.P2P.E2E.EcAes256.PrevCurve">
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.EllipticCurveEndpoint.PrevCurve">
             <summary>
             Previous Elliptic Curve
             </summary>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.EcAes256.GetSharedKey(Waher.Networking.XMPP.P2P.E2E.EcAes256,Waher.Networking.XMPP.P2P.E2E.EcAes256)">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.EllipticCurveEndpoint.GetSharedSecret(Waher.Networking.XMPP.IE2eEndpoint)">
+            <summary>
+            Gets a shared secret
+            </summary>
+            <param name="RemoteEndpoint">Remote endpoint</param>
+            <returns>Shared secret.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.EllipticCurveEndpoint.GetSharedKey(Waher.Networking.XMPP.P2P.E2E.EllipticCurveEndpoint,Waher.Networking.XMPP.IE2eEndpoint)">
             <summary>
             Shared secret, for underlying AES cipher.
             </summary>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.EcAes256.Encrypt(System.String,System.String,System.String,System.String,System.Byte[],Waher.Networking.XMPP.P2P.E2E.IE2eEndpoint)">
-            <summary>
-            Encrypts binary data
-            </summary>
-            <param name="Id">Id attribute</param>
-            <param name="Type">Type attribute</param>
-            <param name="From">From attribute</param>
-            <param name="To">To attribute</param>
-            <param name="Data">Binary data to encrypt</param>
-            <param name="LocalEndpoint">Local endpoint of same type.</param>
-            <returns>Encrypted data</returns>
-        </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.EcAes256.Decrypt(System.String,System.String,System.String,System.String,System.Byte[],Waher.Networking.XMPP.P2P.E2E.IE2eEndpoint)">
-            <summary>
-            Decrypts binary data
-            </summary>
-            <param name="Id">Id attribute</param>
-            <param name="Type">Type attribute</param>
-            <param name="From">From attribute</param>
-            <param name="To">To attribute</param>
-            <param name="Data">Binary data to decrypt</param>
-            <param name="RemoteEndpoint">Remote endpoint of same type.</param>
-            <returns>Decrypted data</returns>
-        </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.EcAes256.Encrypt(System.String,System.String,System.String,System.String,System.Byte[],System.Text.StringBuilder,Waher.Networking.XMPP.P2P.E2E.IE2eEndpoint)">
-            <summary>
-            Encrypts Binary data
-            </summary>
-            <param name="Id">Id attribute</param>
-            <param name="Type">Type attribute</param>
-            <param name="From">From attribute</param>
-            <param name="To">To attribute</param>
-            <param name="Data">Binary data to encrypt</param>
-            <param name="Xml">XML output</param>
-            <param name="LocalEndpoint">Local endpoint of same type.</param>
-            <returns>If encryption was possible</returns>
-        </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.EcAes256.ToNetwork(System.Numerics.BigInteger)">
-            <summary>
-            Converts a <see cref="T:System.Numerics.BigInteger"/> to network binary representation.
-            </summary>
-            <param name="n"><see cref="T:System.Numerics.BigInteger"/> representation</param>
-            <returns>Network binary representation</returns>
-        </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.EcAes256.CanDecrypt(System.Xml.XmlElement)">
-            <summary>
-            If the scheme can decrypt a given XML element.
-            </summary>
-            <param name="AesElement">XML element with encrypted data.</param>
-            <returns>If the scheme can decrypt the data.</returns>
-        </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.EcAes256.Decrypt(System.String,System.String,System.String,System.String,System.Xml.XmlElement,Waher.Networking.XMPP.P2P.E2E.IE2eEndpoint)">
-            <summary>
-            Decrypts XML data
-            </summary>
-            <param name="Id">Id attribute</param>
-            <param name="Type">Type attribute</param>
-            <param name="From">From attribute</param>
-            <param name="To">To attribute</param>
-            <param name="AesElement">XML element with encrypted data.</param>
-            <param name="RemoteEndpoint">Remote endpoint of same type.</param>
-            <returns>Decrypted XMLs</returns>
-        </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.EcAes256.Sign(System.Byte[],Waher.Security.HashFunction)">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.EllipticCurveEndpoint.Sign(System.Byte[])">
             <summary>
             Signs binary data using the local private key.
             </summary>
             <param name="Data">Binary data</param>
-            <param name="HashFunction">Hash function to use.</param>
-            <returns>Signature (ECDSA) consisting of one or two large integers.</returns>
+            <returns>Digital signature.</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.EcAes256.Verify(System.Byte[],System.Byte[],System.Byte[],System.Byte[],System.Byte[],Waher.Security.HashFunction)">
-            <summary>
-            Verifies a signature.
-            </summary>
-            <param name="Data">Data that is signed.</param>
-            <param name="X">Public key (X-coordinate)</param>
-            <param name="Y">Public key (Y-coordinate)</param>
-            <param name="Signature1">First integer in ECDSA signature.</param>
-            <param name="Signature2">Second integer in ECDSA signature.</param>
-            <param name="HashFunction">Hash function used in signature calculation.</param>
-            <returns>If signature is valid.</returns>
-        </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.EcAes256.Verify(System.Byte[],Waher.Security.EllipticCurves.PointOnCurve,System.Byte[],System.Byte[],Waher.Security.HashFunction)">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.EllipticCurveEndpoint.Verify(System.Byte[],System.Byte[],System.Byte[])">
             <summary>
             Verifies a signature.
             </summary>
             <param name="Data">Data that is signed.</param>
             <param name="PublicKey">Public key</param>
-            <param name="Signature1">First integer in ECDSA signature.</param>
-            <param name="Signature2">Second integer in ECDSA signature.</param>
-            <param name="HashFunction">Hash function used in signature calculation.</param>
+            <param name="Signature">Digital signature.</param>
             <returns>If signature is valid.</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.EcAes256.Verify(System.Byte[],System.Byte[],System.Byte[],Waher.Security.HashFunction)">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.EllipticCurveEndpoint.Verify(System.Byte[],System.Byte[])">
             <summary>
             Verifies a signature.
             </summary>
             <param name="Data">Data that is signed.</param>
-            <param name="Signature1">First integer in ECDSA signature.</param>
-            <param name="Signature2">Second integer in ECDSA signature.</param>
-            <param name="HashFunction">Hash function used in signature calculation.</param>
+            <param name="Signature">Digital signature.</param>
             <returns>If signature is valid.</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.EcAes256.Equals(System.Object)">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.EllipticCurveEndpoint.Equals(System.Object)">
             <summary>
             <see cref="M:System.Object.ToString"/>
             </summary>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.EcAes256.GetHashCode">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.EllipticCurveEndpoint.GetHashCode">
             <summary>
             <see cref="M:System.Object.GetHashCode"/>
             </summary>
         </member>
-        <member name="T:Waher.Networking.XMPP.P2P.E2E.IE2eEndpoint">
+        <member name="T:Waher.Networking.XMPP.P2P.E2E.NistEndpoint">
             <summary>
-            Abstract base class for End-to-End encryption schemes.
+            Abstract base class for NIST Curve endpoints
             </summary>
         </member>
-        <member name="P:Waher.Networking.XMPP.P2P.E2E.IE2eEndpoint.SecurityStrength">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistEndpoint.#ctor(Waher.Security.EllipticCurves.EllipticCurve)">
             <summary>
-            Security strength of End-to-End encryption scheme.
+            Abstract base class for NIST Curve endpoints
+            </summary>
+            <param name="Curve">Curve instance</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistEndpoint.#ctor(Waher.Security.EllipticCurves.EllipticCurve,Waher.Networking.XMPP.IE2eSymmetricCipher)">
+            <summary>
+            Abstract base class for NIST Curve endpoints
+            </summary>
+            <param name="Curve">Curve instance</param>
+            <param name="SymmetricCipher">Symmetric cipher to use by default.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistEndpoint.#ctor(System.Byte[],Waher.Security.EllipticCurves.EllipticCurve)">
+            <summary>
+            Abstract base class for NIST Curve endpoints
+            </summary>
+            <param name="PublicKey">Remote public key.</param>
+            <param name="ReferenceCurve">Reference curve</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistEndpoint.#ctor(System.Byte[],Waher.Security.EllipticCurves.EllipticCurve,Waher.Networking.XMPP.IE2eSymmetricCipher)">
+            <summary>
+            Abstract base class for NIST Curve endpoints
+            </summary>
+            <param name="PublicKey">Remote public key.</param>
+            <param name="ReferenceCurve">Reference curve</param>
+            <param name="SymmetricCipher">Symmetric cipher to use by default.</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.NistEndpoint.Safe">
+            <summary>
+            If endpoint is considered safe (i.e. there are no suspected backdoors)
             </summary>
         </member>
-        <member name="P:Waher.Networking.XMPP.P2P.E2E.IE2eEndpoint.LocalName">
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.NistEndpoint.Slow">
             <summary>
-            Local name of the E2E encryption scheme
+            If implementation is slow, compared to other options.
             </summary>
         </member>
-        <member name="P:Waher.Networking.XMPP.P2P.E2E.IE2eEndpoint.Namespace">
-            <summary>
-            Namespace of the E2E encryption scheme
-            </summary>
-        </member>
-        <member name="P:Waher.Networking.XMPP.P2P.E2E.IE2eEndpoint.Previous">
-            <summary>
-            Previous keys.
-            </summary>
-        </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.IE2eEndpoint.Create(System.Int32)">
-            <summary>
-            Creates a new key.
-            </summary>
-            <param name="SecurityStrength">Overall desired security strength, if applicable.</param>
-            <returns>New E2E endpoint.</returns>
-        </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.IE2eEndpoint.Parse(System.Xml.XmlElement)">
-            <summary>
-            Parses endpoint information from an XML element.
-            </summary>
-            <param name="Xml">XML element.</param>
-            <returns>Parsed key information, if possible, null if XML is not well-defined.</returns>
-        </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.IE2eEndpoint.ToXml(System.Text.StringBuilder)">
-            <summary>
-            Exports the public key information to XML.
-            </summary>
-            <param name="Xml">XML output</param>
-        </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.IE2eEndpoint.Encrypt(System.String,System.String,System.String,System.String,System.Byte[],Waher.Networking.XMPP.P2P.E2E.IE2eEndpoint)">
-            <summary>
-            Encrypts binary data
-            </summary>
-            <param name="Id">Id attribute</param>
-            <param name="Type">Type attribute</param>
-            <param name="From">From attribute</param>
-            <param name="To">To attribute</param>
-            <param name="Data">Binary data to encrypt</param>
-            <param name="LocalEndpoint">Local endpoint of same type.</param>
-            <returns>Encrypted data</returns>
-        </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.IE2eEndpoint.Decrypt(System.String,System.String,System.String,System.String,System.Byte[],Waher.Networking.XMPP.P2P.E2E.IE2eEndpoint)">
-            <summary>
-            Decrypts binary data
-            </summary>
-            <param name="Id">Id attribute</param>
-            <param name="Type">Type attribute</param>
-            <param name="From">From attribute</param>
-            <param name="To">To attribute</param>
-            <param name="Data">Binary data to decrypt</param>
-            <param name="RemoteEndpoint">Remote endpoint of same type.</param>
-            <returns>Decrypted data</returns>
-        </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.IE2eEndpoint.Encrypt(System.String,System.String,System.String,System.String,System.Byte[],System.Text.StringBuilder,Waher.Networking.XMPP.P2P.E2E.IE2eEndpoint)">
-            <summary>
-            Encrypts Binary data
-            </summary>
-            <param name="Id">Id attribute</param>
-            <param name="Type">Type attribute</param>
-            <param name="From">From attribute</param>
-            <param name="To">To attribute</param>
-            <param name="Data">Binary data to encrypt</param>
-            <param name="Xml">XML output</param>
-            <param name="LocalEndpoint">Local endpoint of same type.</param>
-            <returns>If encryption was possible</returns>
-        </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.IE2eEndpoint.CanDecrypt(System.Xml.XmlElement)">
-            <summary>
-            If the scheme can decrypt a given XML element.
-            </summary>
-            <param name="AesElement">XML element with encrypted data.</param>
-            <returns>If the scheme can decrypt the data.</returns>
-        </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.IE2eEndpoint.Decrypt(System.String,System.String,System.String,System.String,System.Xml.XmlElement,Waher.Networking.XMPP.P2P.E2E.IE2eEndpoint)">
-            <summary>
-            Decrypts XML data
-            </summary>
-            <param name="Id">Id attribute</param>
-            <param name="Type">Type attribute</param>
-            <param name="From">From attribute</param>
-            <param name="To">To attribute</param>
-            <param name="AesElement">XML element with encrypted data.</param>
-            <param name="RemoteEndpoint">Remote endpoint of same type.</param>
-            <returns>Decrypted XMLs</returns>
-        </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.IE2eEndpoint.Sign(System.Byte[],Waher.Security.HashFunction)">
-            <summary>
-            Signs binary data using the local private key.
-            </summary>
-            <param name="Data">Binary data</param>
-            <param name="HashFunction">Hash function to use.</param>
-            <returns>Signature consisting of one or two large integers.</returns>
-        </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.IE2eEndpoint.Verify(System.Byte[],System.Byte[],System.Byte[],Waher.Security.HashFunction)">
-            <summary>
-            Verifies a signature.
-            </summary>
-            <param name="Data">Data that is signed.</param>
-            <param name="Signature1">First integer in ECDSA signature.</param>
-            <param name="Signature2">Second integer in ECDSA signature.</param>
-            <param name="HashFunction">Hash function used in signature calculation.</param>
-            <returns>If signature is valid.</returns>
-        </member>
-        <member name="T:Waher.Networking.XMPP.P2P.E2E.NistP192Aes">
+        <member name="T:Waher.Networking.XMPP.P2P.E2E.NistP192Endpoint">
             <summary>
             NIST P-192 Curve
             </summary>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP192Aes.#ctor">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP192Endpoint.#ctor">
             <summary>
             NIST P-192 Curve
             </summary>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP192Aes.#ctor(Waher.Security.EllipticCurves.NistP192)">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP192Endpoint.#ctor(Waher.Networking.XMPP.IE2eSymmetricCipher)">
+            <summary>
+            NIST P-192 Curve
+            </summary>
+            <param name="SymmetricCipher">Symmetric cipher to use by default.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP192Endpoint.#ctor(Waher.Security.EllipticCurves.NistP192)">
             <summary>
             NIST P-192 Curve
             </summary>
             <param name="Curve">Curve instance</param>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP192Aes.#ctor(System.Byte[],System.Byte[])">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP192Endpoint.#ctor(Waher.Security.EllipticCurves.NistP192,Waher.Networking.XMPP.IE2eSymmetricCipher)">
             <summary>
             NIST P-192 Curve
             </summary>
-            <param name="X">X-coordinate of remote public key.</param>
-            <param name="Y">Y-coordinate of remote public key.</param>
+            <param name="Curve">Curve instance</param>
+            <param name="SymmetricCipher">Symmetric cipher to use by default.</param>
         </member>
-        <member name="P:Waher.Networking.XMPP.P2P.E2E.NistP192Aes.LocalName">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP192Endpoint.#ctor(System.Byte[])">
+            <summary>
+            NIST P-192 Curve
+            </summary>
+            <param name="PublicKey">Remote public key.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP192Endpoint.#ctor(System.Byte[],Waher.Networking.XMPP.IE2eSymmetricCipher)">
+            <summary>
+            NIST P-192 Curve
+            </summary>
+            <param name="PublicKey">Remote public key.</param>
+            <param name="SymmetricCipher">Symmetric cipher to use by default.</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.NistP192Endpoint.LocalName">
             <summary>
             Local name of the E2E encryption scheme
             </summary>
         </member>
-        <member name="P:Waher.Networking.XMPP.P2P.E2E.NistP192Aes.SecurityStrength">
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.NistP192Endpoint.SecurityStrength">
             <summary>
             Security strength of End-to-End encryption scheme.
             </summary>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP192Aes.Create(System.Int32)">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP192Endpoint.Create(System.Int32)">
             <summary>
             Creates a new key.
             </summary>
             <param name="SecurityStrength">Overall desired security strength, if applicable.</param>
             <returns>New E2E endpoint.</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP192Aes.Create(System.Numerics.BigInteger)">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP192Endpoint.CreatePrivate(System.Byte[])">
             <summary>
-            Creates a new endpoint.
+            Creates a new endpoint given a private key.
             </summary>
-            <param name="D">Private key.</param>
+            <param name="Secret">Secret.</param>
             <returns>Endpoint object.</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP192Aes.Create(System.Byte[],System.Byte[])">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP192Endpoint.CreatePublic(System.Byte[])">
             <summary>
-            Creates a new endpoint.
+            Creates a new endpoint given a public key.
             </summary>
-            <param name="X">X-coordinate of remote public key.</param>
-            <param name="Y">Y-coordinate of remote public key.</param>
+            <param name="PublicKey">Remote public key.</param>
             <returns>Endpoint object.</returns>
         </member>
-        <member name="T:Waher.Networking.XMPP.P2P.E2E.NistP224Aes">
+        <member name="T:Waher.Networking.XMPP.P2P.E2E.NistP224Endpoint">
             <summary>
             NIST P-224 Curve
             </summary>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP224Aes.#ctor">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP224Endpoint.#ctor">
             <summary>
             NIST P-224 Curve
             </summary>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP224Aes.#ctor(Waher.Security.EllipticCurves.NistP224)">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP224Endpoint.#ctor(Waher.Networking.XMPP.IE2eSymmetricCipher)">
+            <summary>
+            NIST P-224 Curve
+            </summary>
+            <param name="SymmetricCipher">Symmetric cipher to use by default.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP224Endpoint.#ctor(Waher.Security.EllipticCurves.NistP224)">
             <summary>
             NIST P-224 Curve
             </summary>
             <param name="Curve">Curve instance</param>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP224Aes.#ctor(System.Byte[],System.Byte[])">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP224Endpoint.#ctor(Waher.Security.EllipticCurves.NistP224,Waher.Networking.XMPP.IE2eSymmetricCipher)">
             <summary>
             NIST P-224 Curve
             </summary>
-            <param name="X">X-coordinate of remote public key.</param>
-            <param name="Y">Y-coordinate of remote public key.</param>
+            <param name="Curve">Curve instance</param>
+            <param name="SymmetricCipher">Symmetric cipher to use by default.</param>
         </member>
-        <member name="P:Waher.Networking.XMPP.P2P.E2E.NistP224Aes.LocalName">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP224Endpoint.#ctor(System.Byte[])">
+            <summary>
+            NIST P-224 Curve
+            </summary>
+            <param name="PublicKey">Remote public key.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP224Endpoint.#ctor(System.Byte[],Waher.Networking.XMPP.IE2eSymmetricCipher)">
+            <summary>
+            NIST P-224 Curve
+            </summary>
+            <param name="PublicKey">Remote public key.</param>
+            <param name="SymmetricCipher">Symmetric cipher to use by default.</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.NistP224Endpoint.LocalName">
             <summary>
             Local name of the E2E encryption scheme
             </summary>
         </member>
-        <member name="P:Waher.Networking.XMPP.P2P.E2E.NistP224Aes.SecurityStrength">
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.NistP224Endpoint.SecurityStrength">
             <summary>
             Security strength of End-to-End encryption scheme.
             </summary>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP224Aes.Create(System.Int32)">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP224Endpoint.Create(System.Int32)">
             <summary>
             Creates a new key.
             </summary>
             <param name="SecurityStrength">Overall desired security strength, if applicable.</param>
             <returns>New E2E endpoint.</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP224Aes.Create(System.Numerics.BigInteger)">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP224Endpoint.CreatePrivate(System.Byte[])">
             <summary>
-            Creates a new endpoint.
+            Creates a new endpoint given a private key.
             </summary>
-            <param name="D">Private key.</param>
+            <param name="Secret">Secret.</param>
             <returns>Endpoint object.</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP224Aes.Create(System.Byte[],System.Byte[])">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP224Endpoint.CreatePublic(System.Byte[])">
             <summary>
-            Creates a new endpoint.
+            Creates a new endpoint given a public key.
             </summary>
-            <param name="X">X-coordinate of remote public key.</param>
-            <param name="Y">Y-coordinate of remote public key.</param>
+            <param name="PublicKey">Remote public key.</param>
             <returns>Endpoint object.</returns>
         </member>
-        <member name="T:Waher.Networking.XMPP.P2P.E2E.NistP256Aes">
+        <member name="T:Waher.Networking.XMPP.P2P.E2E.NistP256Endpoint">
             <summary>
             NIST P-256 Curve
             </summary>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP256Aes.#ctor">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP256Endpoint.#ctor">
             <summary>
             NIST P-256 Curve
             </summary>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP256Aes.#ctor(Waher.Security.EllipticCurves.NistP256)">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP256Endpoint.#ctor(Waher.Networking.XMPP.IE2eSymmetricCipher)">
+            <summary>
+            NIST P-256 Curve
+            </summary>
+            <param name="SymmetricCipher">Symmetric cipher to use by default.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP256Endpoint.#ctor(Waher.Security.EllipticCurves.NistP256)">
             <summary>
             NIST P-256 Curve
             </summary>
             <param name="Curve">Curve instance</param>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP256Aes.#ctor(System.Byte[],System.Byte[])">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP256Endpoint.#ctor(Waher.Security.EllipticCurves.NistP256,Waher.Networking.XMPP.IE2eSymmetricCipher)">
             <summary>
             NIST P-256 Curve
             </summary>
-            <param name="X">X-coordinate of remote public key.</param>
-            <param name="Y">Y-coordinate of remote public key.</param>
+            <param name="Curve">Curve instance</param>
+            <param name="SymmetricCipher">Symmetric cipher to use by default.</param>
         </member>
-        <member name="P:Waher.Networking.XMPP.P2P.E2E.NistP256Aes.LocalName">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP256Endpoint.#ctor(System.Byte[])">
+            <summary>
+            NIST P-256 Curve
+            </summary>
+            <param name="PublicKey">Remote public key.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP256Endpoint.#ctor(System.Byte[],Waher.Networking.XMPP.IE2eSymmetricCipher)">
+            <summary>
+            NIST P-256 Curve
+            </summary>
+            <param name="PublicKey">Remote public key.</param>
+            <param name="SymmetricCipher">Symmetric cipher to use by default.</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.NistP256Endpoint.LocalName">
             <summary>
             Local name of the E2E encryption scheme
             </summary>
         </member>
-        <member name="P:Waher.Networking.XMPP.P2P.E2E.NistP256Aes.SecurityStrength">
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.NistP256Endpoint.SecurityStrength">
             <summary>
             Security strength of End-to-End encryption scheme.
             </summary>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP256Aes.Create(System.Int32)">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP256Endpoint.Create(System.Int32)">
             <summary>
             Creates a new key.
             </summary>
             <param name="SecurityStrength">Overall desired security strength, if applicable.</param>
             <returns>New E2E endpoint.</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP256Aes.Create(System.Numerics.BigInteger)">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP256Endpoint.CreatePrivate(System.Byte[])">
             <summary>
-            Creates a new endpoint.
+            Creates a new endpoint given a private key.
             </summary>
-            <param name="D">Private key.</param>
+            <param name="Secret">Secret.</param>
             <returns>Endpoint object.</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP256Aes.Create(System.Byte[],System.Byte[])">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP256Endpoint.CreatePublic(System.Byte[])">
             <summary>
-            Creates a new endpoint.
+            Creates a new endpoint given a public key.
             </summary>
-            <param name="X">X-coordinate of remote public key.</param>
-            <param name="Y">Y-coordinate of remote public key.</param>
+            <param name="PublicKey">Remote public key.</param>
             <returns>Endpoint object.</returns>
         </member>
-        <member name="T:Waher.Networking.XMPP.P2P.E2E.NistP384Aes">
+        <member name="T:Waher.Networking.XMPP.P2P.E2E.NistP384Endpoint">
             <summary>
             NIST P-384 Curve
             </summary>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP384Aes.#ctor">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP384Endpoint.#ctor">
             <summary>
             NIST P-384 Curve
             </summary>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP384Aes.#ctor(Waher.Security.EllipticCurves.NistP384)">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP384Endpoint.#ctor(Waher.Networking.XMPP.IE2eSymmetricCipher)">
+            <summary>
+            NIST P-384 Curve
+            </summary>
+            <param name="SymmetricCipher">Symmetric cipher to use by default.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP384Endpoint.#ctor(Waher.Security.EllipticCurves.NistP384)">
             <summary>
             NIST P-384 Curve
             </summary>
             <param name="Curve">Curve instance</param>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP384Aes.#ctor(System.Byte[],System.Byte[])">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP384Endpoint.#ctor(Waher.Security.EllipticCurves.NistP384,Waher.Networking.XMPP.IE2eSymmetricCipher)">
             <summary>
             NIST P-384 Curve
             </summary>
-            <param name="X">X-coordinate of remote public key.</param>
-            <param name="Y">Y-coordinate of remote public key.</param>
+            <param name="Curve">Curve instance</param>
+            <param name="SymmetricCipher">Symmetric cipher to use by default.</param>
         </member>
-        <member name="P:Waher.Networking.XMPP.P2P.E2E.NistP384Aes.LocalName">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP384Endpoint.#ctor(System.Byte[])">
+            <summary>
+            NIST P-384 Curve
+            </summary>
+            <param name="PublicKey">Remote public key.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP384Endpoint.#ctor(System.Byte[],Waher.Networking.XMPP.IE2eSymmetricCipher)">
+            <summary>
+            NIST P-384 Curve
+            </summary>
+            <param name="PublicKey">Remote public key.</param>
+            <param name="SymmetricCipher">Symmetric cipher to use by default.</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.NistP384Endpoint.LocalName">
             <summary>
             Local name of the E2E encryption scheme
             </summary>
         </member>
-        <member name="P:Waher.Networking.XMPP.P2P.E2E.NistP384Aes.SecurityStrength">
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.NistP384Endpoint.SecurityStrength">
             <summary>
             Security strength of End-to-End encryption scheme.
             </summary>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP384Aes.Create(System.Int32)">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP384Endpoint.Create(System.Int32)">
             <summary>
             Creates a new key.
             </summary>
             <param name="SecurityStrength">Overall desired security strength, if applicable.</param>
             <returns>New E2E endpoint.</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP384Aes.Create(System.Numerics.BigInteger)">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP384Endpoint.CreatePrivate(System.Byte[])">
             <summary>
-            Creates a new endpoint.
+            Creates a new endpoint given a private key.
             </summary>
-            <param name="D">Private key.</param>
+            <param name="Secret">Secret.</param>
             <returns>Endpoint object.</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP384Aes.Create(System.Byte[],System.Byte[])">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP384Endpoint.CreatePublic(System.Byte[])">
             <summary>
-            Creates a new endpoint.
+            Creates a new endpoint given a public key.
             </summary>
-            <param name="X">X-coordinate of remote public key.</param>
-            <param name="Y">Y-coordinate of remote public key.</param>
+            <param name="PublicKey">Remote public key.</param>
             <returns>Endpoint object.</returns>
         </member>
-        <member name="T:Waher.Networking.XMPP.P2P.E2E.NistP521Aes">
+        <member name="T:Waher.Networking.XMPP.P2P.E2E.NistP521Endpoint">
             <summary>
             NIST P-521 Curve
             </summary>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP521Aes.#ctor">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP521Endpoint.#ctor">
             <summary>
             NIST P-521 Curve
             </summary>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP521Aes.#ctor(Waher.Security.EllipticCurves.NistP521)">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP521Endpoint.#ctor(Waher.Networking.XMPP.IE2eSymmetricCipher)">
+            <summary>
+            NIST P-521 Curve
+            </summary>
+            <param name="SymmetricCipher">Symmetric cipher to use by default.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP521Endpoint.#ctor(Waher.Security.EllipticCurves.NistP521)">
             <summary>
             NIST P-521 Curve
             </summary>
             <param name="Curve">Curve instance</param>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP521Aes.#ctor(System.Byte[],System.Byte[])">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP521Endpoint.#ctor(Waher.Security.EllipticCurves.NistP521,Waher.Networking.XMPP.IE2eSymmetricCipher)">
             <summary>
             NIST P-521 Curve
             </summary>
-            <param name="X">X-coordinate of remote public key.</param>
-            <param name="Y">Y-coordinate of remote public key.</param>
+            <param name="Curve">Curve instance</param>
+            <param name="SymmetricCipher">Symmetric cipher to use by default.</param>
         </member>
-        <member name="P:Waher.Networking.XMPP.P2P.E2E.NistP521Aes.LocalName">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP521Endpoint.#ctor(System.Byte[])">
+            <summary>
+            NIST P-521 Curve
+            </summary>
+            <param name="PublicKey">Remote public key.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP521Endpoint.#ctor(System.Byte[],Waher.Networking.XMPP.IE2eSymmetricCipher)">
+            <summary>
+            NIST P-521 Curve
+            </summary>
+            <param name="PublicKey">Remote public key.</param>
+            <param name="SymmetricCipher">Symmetric cipher to use by default.</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.NistP521Endpoint.LocalName">
             <summary>
             Local name of the E2E encryption scheme
             </summary>
         </member>
-        <member name="P:Waher.Networking.XMPP.P2P.E2E.NistP521Aes.SecurityStrength">
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.NistP521Endpoint.SecurityStrength">
             <summary>
             Security strength of End-to-End encryption scheme.
             </summary>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP521Aes.Create(System.Int32)">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP521Endpoint.Create(System.Int32)">
             <summary>
             Creates a new key.
             </summary>
             <param name="SecurityStrength">Overall desired security strength, if applicable.</param>
             <returns>New E2E endpoint.</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP521Aes.Create(System.Numerics.BigInteger)">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP521Endpoint.CreatePrivate(System.Byte[])">
             <summary>
-            Creates a new endpoint.
+            Creates a new endpoint given a private key.
             </summary>
-            <param name="D">Private key.</param>
+            <param name="Secret">Secret.</param>
             <returns>Endpoint object.</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP521Aes.Create(System.Byte[],System.Byte[])">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.NistP521Endpoint.CreatePublic(System.Byte[])">
             <summary>
-            Creates a new endpoint.
+            Creates a new endpoint given a public key.
             </summary>
-            <param name="X">X-coordinate of remote public key.</param>
-            <param name="Y">Y-coordinate of remote public key.</param>
+            <param name="PublicKey">Remote public key.</param>
             <returns>Endpoint object.</returns>
         </member>
-        <member name="T:Waher.Networking.XMPP.P2P.E2E.RsaAes">
+        <member name="T:Waher.Networking.XMPP.P2P.E2E.RsaEndpoint">
             <summary>
             RSA / AES-256 hybrid cipher.
             </summary>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaAes.#ctor">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaEndpoint.#ctor">
             <summary>
             RSA / AES-256 hybrid cipher.
             </summary>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaAes.#ctor(System.Security.Cryptography.RSA)">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaEndpoint.#ctor(Waher.Networking.XMPP.IE2eSymmetricCipher)">
+            <summary>
+            RSA / AES-256 hybrid cipher.
+            </summary>
+            <param name="SymmetricCipher">Symmetric cipher to use by default.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaEndpoint.#ctor(System.Security.Cryptography.RSA)">
             <summary>
             RSA / AES-256 hybrid cipher.
             </summary>
             <param name="Rsa">RSA</param>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaAes.#ctor(System.Int32,System.Byte[],System.Byte[])">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaEndpoint.#ctor(System.Security.Cryptography.RSA,Waher.Networking.XMPP.IE2eSymmetricCipher)">
+            <summary>
+            RSA / AES-256 hybrid cipher.
+            </summary>
+            <param name="Rsa">RSA</param>
+            <param name="SymmetricCipher">Symmetric cipher to use by default.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaEndpoint.#ctor(System.Int32,System.Byte[],System.Byte[])">
             <summary>
             RSA / AES-256 hybrid cipher.
             </summary>
@@ -887,138 +1095,128 @@
             <param name="Modulus">Modulus of RSA public key.</param>
             <param name="Exponent">Exponent of RSA public key.</param>
         </member>
-        <member name="P:Waher.Networking.XMPP.P2P.E2E.RsaAes.LocalName">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaEndpoint.#ctor(System.Int32,System.Byte[],System.Byte[],Waher.Networking.XMPP.IE2eSymmetricCipher)">
+            <summary>
+            RSA / AES-256 hybrid cipher.
+            </summary>
+            <param name="KeySize">Size of key</param>
+            <param name="Modulus">Modulus of RSA public key.</param>
+            <param name="Exponent">Exponent of RSA public key.</param>
+            <param name="SymmetricCipher">Symmetric cipher to use by default.</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.RsaEndpoint.LocalName">
             <summary>
             Local name of the E2E encryption scheme
             </summary>
         </member>
-        <member name="P:Waher.Networking.XMPP.P2P.E2E.RsaAes.KeySize">
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.RsaEndpoint.KeySize">
             <summary>
             Size of key
             </summary>
         </member>
-        <member name="P:Waher.Networking.XMPP.P2P.E2E.RsaAes.Modulus">
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.RsaEndpoint.PublicKey">
+            <summary>
+            Remote public key.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.RsaEndpoint.PublicKeyBase64">
+            <summary>
+            Remote public key, as a Base64 string.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.RsaEndpoint.Modulus">
             <summary>
             Modulus of RSA public key.
             </summary>
         </member>
-        <member name="P:Waher.Networking.XMPP.P2P.E2E.RsaAes.Exponent">
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.RsaEndpoint.Exponent">
             <summary>
             Exponent of RSA public key.
             </summary>
         </member>
-        <member name="P:Waher.Networking.XMPP.P2P.E2E.RsaAes.SecurityStrength">
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.RsaEndpoint.SecurityStrength">
             <summary>
             Security strength of End-to-End encryption scheme.
             </summary>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaAes.Create(System.Int32)">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaEndpoint.Create(System.Int32)">
             <summary>
             Creates a new key.
             </summary>
             <param name="SecurityStrength">Overall desired security strength, if applicable.</param>
             <returns>New E2E endpoint.</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaAes.Parse(System.Xml.XmlElement)">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaEndpoint.CreatePrivate(System.Byte[])">
             <summary>
-            Parses endpoint information from an XML element.
+            Creates a new endpoint given a private key.
             </summary>
-            <param name="Xml">XML element.</param>
-            <returns>Parsed key information, if possible, null if XML is not well-defined.</returns>
+            <param name="Secret">Secret.</param>
+            <returns>Endpoint object.</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaAes.ToXml(System.Text.StringBuilder)">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaEndpoint.CreatePublic(System.Byte[])">
             <summary>
-            Exports the public key information to XML.
+            Creates a new endpoint given a public key.
             </summary>
-            <param name="Xml">XML output</param>
+            <param name="PublicKey">Remote public key.</param>
+            <returns>Endpoint object.</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaAes.Dispose">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaEndpoint.Dispose">
             <summary>
             <see cref="M:System.IDisposable.Dispose"/>
             </summary>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaAes.Encrypt(System.String,System.String,System.String,System.String,System.Byte[],Waher.Networking.XMPP.P2P.E2E.IE2eEndpoint)">
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.RsaEndpoint.SupportsSharedSecrets">
             <summary>
-            Encrypts binary data
+            If shared secrets can be calculated from the endpoints keys.
             </summary>
-            <param name="Id">Id attribute</param>
-            <param name="Type">Type attribute</param>
-            <param name="From">From attribute</param>
-            <param name="To">To attribute</param>
-            <param name="Data">Binary data to encrypt</param>
-            <param name="LocalEndpoint">Local endpoint of same type.</param>
-            <returns>Encrypted data</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaAes.Decrypt(System.String,System.String,System.String,System.String,System.Byte[],Waher.Networking.XMPP.P2P.E2E.IE2eEndpoint)">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaEndpoint.GetSharedSecret(Waher.Networking.XMPP.IE2eEndpoint)">
             <summary>
-            Decrypts binary data
+            Gets a shared secret
             </summary>
-            <param name="Id">Id attribute</param>
-            <param name="Type">Type attribute</param>
-            <param name="From">From attribute</param>
-            <param name="To">To attribute</param>
-            <param name="Data">Binary data to decrypt</param>
-            <param name="RemoteEndpoint">Remote endpoint of same type.</param>
-            <returns>Decrypted data</returns>
+            <param name="RemoteEndpoint">Remote endpoint</param>
+            <returns>Shared secret.</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaAes.Encrypt(System.String,System.String,System.String,System.String,System.Byte[],System.Text.StringBuilder,Waher.Networking.XMPP.P2P.E2E.IE2eEndpoint)">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaEndpoint.EncryptSecret(System.Byte[])">
             <summary>
-            Encrypts Binary data
+            Encrypts a secret. Used if shared secrets cannot be calculated.
             </summary>
-            <param name="Id">Id attribute</param>
-            <param name="Type">Type attribute</param>
-            <param name="From">From attribute</param>
-            <param name="To">To attribute</param>
-            <param name="Data">Binary data to encrypt</param>
-            <param name="Xml">XML output</param>
-            <param name="LocalEndpoint">Local endpoint of same type.</param>
-            <returns>If encryption was possible</returns>
+            <param name="Secret">Secret</param>
+            <returns>Encrypted secret.</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaAes.CanDecrypt(System.Xml.XmlElement)">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaEndpoint.DecryptSecret(System.Byte[])">
             <summary>
-            If the scheme can decrypt a given XML element.
+            Decrypts a secret. Used if shared secrets cannot be calculated.
             </summary>
-            <param name="AesElement">XML element with encrypted data.</param>
-            <returns>If the scheme can decrypt the data.</returns>
+            <param name="Secret">Encrypted secret</param>
+            <returns>Decrypted secret.</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaAes.Decrypt(System.String,System.String,System.String,System.String,System.Xml.XmlElement,Waher.Networking.XMPP.P2P.E2E.IE2eEndpoint)">
-            <summary>
-            Decrypts XML data
-            </summary>
-            <param name="Id">Id attribute</param>
-            <param name="Type">Type attribute</param>
-            <param name="From">From attribute</param>
-            <param name="To">To attribute</param>
-            <param name="AesElement">XML element with encrypted data.</param>
-            <param name="RemoteEndpoint">Remote endpoint of same type.</param>
-            <returns>Decrypted XMLs</returns>
-        </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaAes.Sign(System.Byte[])">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaEndpoint.Sign(System.Byte[])">
             <summary>
             Signs binary data using the local private key.
             </summary>
             <param name="Data">Binary data</param>
-            <returns>Signature</returns>
+            <returns>Digital signature.</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaAes.Sign(System.Byte[],Waher.Security.HashFunction)">
-            <summary>
-            Signs binary data using the local private key.
-            </summary>
-            <param name="Data">Binary data</param>
-            <param name="HashFunction">Hash function to use.</param>
-            <returns>Signature consisting of one or two large integers.</returns>
-        </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaAes.Verify(System.Byte[],System.Byte[],System.Byte[],Waher.Security.HashFunction)">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaEndpoint.Verify(System.Byte[],System.Byte[])">
             <summary>
             Verifies a signature.
             </summary>
             <param name="Data">Data that is signed.</param>
-            <param name="Signature1">First integer in ECDSA signature.</param>
-            <param name="Signature2">Second integer in ECDSA signature.</param>
-            <param name="HashFunction">Hash function used in signature calculation.</param>
+            <param name="Signature">Digital signature.</param>
             <returns>If signature is valid.</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaAes.Verify(System.Byte[],System.Byte[],System.Int32,System.Byte[],System.Byte[])">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaEndpoint.Verify(System.Byte[],System.Byte[],System.Int32,System.Byte[])">
+            <summary>
+            Verifies a signature.
+            </summary>
+            <param name="Data">Data that is signed.</param>
+            <param name="Signature">Signature</param>
+            <param name="KeySize">RSA key size</param>
+            <param name="PublicKey">Public key.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaEndpoint.Verify(System.Byte[],System.Byte[],System.Int32,System.Byte[],System.Byte[])">
             <summary>
             Verifies a signature.
             </summary>
@@ -1029,31 +1227,24 @@
             <param name="Exponent">Exponent</param>
             <returns></returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaAes.Verify(System.Byte[],System.Byte[],System.Int32,System.Byte[],System.Byte[],Waher.Security.HashFunction)">
-            <summary>
-            Verifies a signature.
-            </summary>
-            <param name="Data">Data that is signed.</param>
-            <param name="Signature">Signature</param>
-            <param name="KeySize">RSA key size</param>
-            <param name="Modulus">Modulus</param>
-            <param name="Exponent">Exponent</param>
-            <param name="HashFunction">Hash function</param>
-            <returns></returns>
-        </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaAes.Decrypt(System.Byte[])">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaEndpoint.Decrypt(System.Byte[])">
             <summary>
             Decrypts a key using the local private RSA key.
             </summary>
             <param name="Key">Encrypted key</param>
             <returns>Decrypted key</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaAes.Equals(System.Object)">
+        <member name="P:Waher.Networking.XMPP.P2P.E2E.RsaEndpoint.Slow">
+            <summary>
+            If implementation is slow, compared to other options.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaEndpoint.Equals(System.Object)">
             <summary>
             <see cref="M:System.Object.ToString"/>
             </summary>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaAes.GetHashCode">
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaEndpoint.GetHashCode">
             <summary>
             <see cref="M:System.Object.GetHashCode"/>
             </summary>
@@ -1088,7 +1279,7 @@
             <param name="ServerlessMessaging">Reference to serverless messaging object.</param>
             <param name="SecurityStrength">Desired security strength.</param>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.#ctor(Waher.Networking.XMPP.XmppClient,System.Int32,Waher.Networking.XMPP.P2P.E2E.IE2eEndpoint[])">
+        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.#ctor(Waher.Networking.XMPP.XmppClient,System.Int32,Waher.Networking.XMPP.IE2eEndpoint[])">
             <summary>
             Class managing end-to-end encryption.
             </summary>
@@ -1096,7 +1287,7 @@
             <param name="SecurityStrength">Desired security strength.</param>
             <param name="LocalEndpoints">Local endpoints to use</param>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.#ctor(Waher.Networking.XMPP.XmppClient,Waher.Networking.XMPP.P2P.XmppServerlessMessaging,System.Int32,Waher.Networking.XMPP.P2P.E2E.IE2eEndpoint[])">
+        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.#ctor(Waher.Networking.XMPP.XmppClient,Waher.Networking.XMPP.P2P.XmppServerlessMessaging,System.Int32,Waher.Networking.XMPP.IE2eEndpoint[])">
             <summary>
             Class managing end-to-end encryption.
             </summary>
@@ -1124,7 +1315,7 @@
             <param name="OnlyIfDerivedFrom">Only return endpoints derived from this type.</param>
             <returns>Array of local endpoint keys.</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.TryGetEndpoint(System.String,System.String,Waher.Networking.XMPP.P2P.E2E.IE2eEndpoint@)">
+        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.TryGetEndpoint(System.String,System.String,Waher.Networking.XMPP.IE2eEndpoint@)">
             <summary>
             Tries to get an existing endpoint, given its qualified name.
             </summary>
@@ -1133,7 +1324,7 @@
             <param name="Endpoint">Endpoint, or null if not found.</param>
             <returns>If an endpoint was found with the given name.</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.TryCreateEndpoint(System.String,System.String,Waher.Networking.XMPP.P2P.E2E.IE2eEndpoint@)">
+        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.TryCreateEndpoint(System.String,System.String,Waher.Networking.XMPP.IE2eEndpoint@)">
             <summary>
             Tries to create a new endpoint, given its qualified name.
             </summary>
@@ -1218,15 +1409,17 @@
             <param name="Data">Binary data</param>
             <returns>Encrypted data, or null if no E2E information is found for endpoint.</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.Decrypt(System.String,System.String,System.String,System.String,System.Byte[])">
+        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.Decrypt(System.String,System.String,System.String,System.String,System.String,System.Byte[],Waher.Networking.XMPP.IE2eSymmetricCipher)">
             <summary>
             Decrypts binary data from an endpoint.
             </summary>
+            <param name="EndpointReference">Endpoint reference.</param>
             <param name="Id">Id attribute</param>
             <param name="Type">Type attribute</param>
             <param name="From">From attribute</param>
             <param name="To">To attribute</param>
             <param name="Data">Binary data</param>
+            <param name="SymmetricCipher">Type of symmetric cipher to use to decrypt content.</param>
             <returns>Decrypted data, or null if no E2E information is found for endpoint.</returns>
         </member>
         <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.Encrypt(Waher.Networking.XMPP.XmppClient,System.String,System.String,System.String,System.String,System.String,System.Text.StringBuilder)">
@@ -1242,7 +1435,7 @@
             <param name="Xml">Output</param>
             <returns>If E2E information was available and encryption was possible.</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.Decrypt(Waher.Networking.XMPP.XmppClient,System.String,System.String,System.String,System.String,System.Xml.XmlElement)">
+        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.Decrypt(Waher.Networking.XMPP.XmppClient,System.String,System.String,System.String,System.String,System.Xml.XmlElement,Waher.Networking.XMPP.IE2eSymmetricCipher,System.String@)">
             <summary>
             Decrypts XML data from an endpoint.
             </summary>
@@ -1252,6 +1445,8 @@
             <param name="From">From attribute</param>
             <param name="To">To attribute</param>
             <param name="E2eElement">Encrypted XML data</param>
+            <param name="SymmetricCipher">Type of symmetric cipher to use to decrypt content.</param>
+            <param name="EndpointReference">Endpoint reference</param>
             <returns>Decrypted XML.</returns>
         </member>
         <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.IqResult(System.Object,Waher.Networking.XMPP.IqResultEventArgs)">
@@ -1445,7 +1640,7 @@
             Event raised whenever information about a peer has been updated.
             </summary>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.GetLocalKey(Waher.Networking.XMPP.P2P.E2E.IE2eEndpoint)">
+        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.GetLocalKey(Waher.Networking.XMPP.IE2eEndpoint)">
             <summary>
             Gets the local key of a given type.
             </summary>
@@ -1747,16 +1942,16 @@
             Class managing the transmission of a SOCKS5 bytestream.
             </summary>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.SOCKS5.OutgoingStream.#ctor(Waher.Networking.XMPP.XmppClient,System.String,System.String,System.String,System.Int32,Waher.Networking.XMPP.IEndToEndEncryption)">
+        <member name="M:Waher.Networking.XMPP.P2P.SOCKS5.OutgoingStream.#ctor(System.String,System.String,System.String,System.Int32,Waher.Networking.XMPP.IEndToEndEncryption,System.String)">
             <summary>
             Class managing the transmission of a SOCKS5 bytestream.
             </summary>
-            <param name="Client">XMPP client.</param>
             <param name="StreamId">Stream ID.</param>
             <param name="From">From</param>
             <param name="To">To</param>
             <param name="BlockSize">Block size</param>
             <param name="E2E">End-to-end encryption, if used.</param>
+            <param name="EndpointReference">Reference to End-to-end encryption endpoint used.</param>
         </member>
         <member name="P:Waher.Networking.XMPP.P2P.SOCKS5.OutgoingStream.StreamId">
             <summary>
@@ -2209,6 +2404,311 @@
             <param name="CloseCallback">Method called when stream has been closed.</param>
             <param name="State">State object to pass on to the callback method.</param>
             <returns>If the stream acceptance was completed (true), or if somebody else accepted the stream beforehand (false).</returns>
+        </member>
+        <member name="T:Waher.Networking.XMPP.P2P.SymmetricCiphers.AeadChaCha20Poly1305">
+            <summary>
+            Implements support for the AEAD-ChaCha20-Poly1305 cipher in hybrid End-to-End encryption schemes.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.SymmetricCiphers.AeadChaCha20Poly1305.#ctor">
+            <summary>
+            Implements support for the AEAD-ChaCha20-Poly1305 cipher in hybrid End-to-End encryption schemes.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.SymmetricCiphers.AeadChaCha20Poly1305.LocalName">
+            <summary>
+            Local name of the E2E symmetric cipher
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.SymmetricCiphers.AeadChaCha20Poly1305.AuthenticatedEncryption">
+            <summary>
+            If Authenticated Encryption with Associated Data is used
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.SymmetricCiphers.AeadChaCha20Poly1305.Encrypt(System.Byte[],System.Byte[],System.Byte[],System.Byte[])">
+            <summary>
+            Encrypts binary data
+            </summary>
+            <param name="Data">Binary Data</param>
+            <param name="Key">Encryption Key</param>
+            <param name="IV">Initiation Vector</param>
+            <param name="AssociatedData">Any associated data used for authenticated encryption (AEAD).</param>
+            <returns>Encrypted Data</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.SymmetricCiphers.AeadChaCha20Poly1305.Decrypt(System.Byte[],System.Byte[],System.Byte[],System.Byte[])">
+            <summary>
+            Decrypts binary data
+            </summary>
+            <param name="Data">Binary Data</param>
+            <param name="Key">Encryption Key</param>
+            <param name="IV">Initiation Vector</param>
+            <param name="AssociatedData">Any associated data used for authenticated encryption (AEAD).</param>
+            <returns>Decrypted Data</returns>
+        </member>
+        <member name="T:Waher.Networking.XMPP.P2P.SymmetricCiphers.Aes256">
+            <summary>
+            Implements support for the AES-256 cipher in hybrid End-to-End encryption schemes.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.P2P.SymmetricCiphers.Aes256.aes">
+            <summary>
+            AES encryption object
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.SymmetricCiphers.Aes256.#ctor">
+            <summary>
+            Implements support for the AES-256 cipher in hybrid End-to-End encryption schemes.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.SymmetricCiphers.Aes256.LocalName">
+            <summary>
+            Local name of the E2E symmetric cipher
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.SymmetricCiphers.Aes256.Namespace">
+            <summary>
+            Namespace of the E2E symmetric cipher
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.SymmetricCiphers.Aes256.Dispose">
+            <summary>
+            <see cref="M:System.IDisposable.Dispose"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.SymmetricCiphers.Aes256.GetIV(System.String,System.String,System.String,System.String,System.UInt32)">
+            <summary>
+            Gets an Initiation Vector from stanza attributes.
+            </summary>
+            <param name="Id">Id attribute</param>
+            <param name="Type">Type attribute</param>
+            <param name="From">From attribute</param>
+            <param name="To">To attribute</param>
+            <param name="Counter">Counter. Can be reset every time a new key is generated.
+            A new key must be generated before the counter wraps.</param>
+            <returns>Initiation vector.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.SymmetricCiphers.Aes256.GetEncryptedLength(System.Int32)">
+            <summary>
+            Calculates the minimum size of encrypted data, given the size of the content.
+            </summary>
+            <param name="ContentLength">Size of content.</param>
+            <returns>Minimum size of encrypted data.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.SymmetricCiphers.Aes256.Encrypt(System.Byte[],System.Byte[],System.Byte[],System.Byte[])">
+            <summary>
+            Encrypts binary data
+            </summary>
+            <param name="Data">Binary Data</param>
+            <param name="Key">Encryption Key</param>
+            <param name="IV">Initiation Vector</param>
+            <param name="AssociatedData">Any associated data used for authenticated encryption (AEAD).</param>
+            <returns>Encrypted Data</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.SymmetricCiphers.Aes256.Decrypt(System.Byte[],System.Byte[],System.Byte[],System.Byte[])">
+            <summary>
+            Decrypts binary data
+            </summary>
+            <param name="Data">Binary Data</param>
+            <param name="Key">Encryption Key</param>
+            <param name="IV">Initiation Vector</param>
+            <param name="AssociatedData">Any associated data used for authenticated encryption (AEAD).</param>
+            <returns>Decrypted Data</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.SymmetricCiphers.Aes256.GenerateKey">
+            <summary>
+            Generates a new key. Used when the asymmetric cipher cannot calculate a shared secret.
+            </summary>
+            <returns>New key</returns>
+        </member>
+        <member name="T:Waher.Networking.XMPP.P2P.SymmetricCiphers.ChaCha20">
+            <summary>
+            Implements support for the ChaCha20 cipher in hybrid End-to-End encryption schemes.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.SymmetricCiphers.ChaCha20.#ctor">
+            <summary>
+            Implements support for the ChaCha20 cipher in hybrid End-to-End encryption schemes.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.SymmetricCiphers.ChaCha20.LocalName">
+            <summary>
+            Local name of the E2E symmetric cipher
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.SymmetricCiphers.ChaCha20.Namespace">
+            <summary>
+            Namespace of the E2E symmetric cipher
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.SymmetricCiphers.ChaCha20.GetIV(System.String,System.String,System.String,System.String,System.UInt32)">
+            <summary>
+            Gets an Initiation Vector from stanza attributes.
+            </summary>
+            <param name="Id">Id attribute</param>
+            <param name="Type">Type attribute</param>
+            <param name="From">From attribute</param>
+            <param name="To">To attribute</param>
+            <param name="Counter">Counter. Can be reset every time a new key is generated.
+            A new key must be generated before the counter wraps.</param>
+            <returns>Initiation vector.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.SymmetricCiphers.ChaCha20.Encrypt(System.Byte[],System.Byte[],System.Byte[],System.Byte[])">
+            <summary>
+            Encrypts binary data
+            </summary>
+            <param name="Data">Binary Data</param>
+            <param name="Key">Encryption Key</param>
+            <param name="IV">Initiation Vector</param>
+            <param name="AssociatedData">Any associated data used for authenticated encryption (AEAD).</param>
+            <returns>Encrypted Data</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.SymmetricCiphers.ChaCha20.Decrypt(System.Byte[],System.Byte[],System.Byte[],System.Byte[])">
+            <summary>
+            Decrypts binary data
+            </summary>
+            <param name="Data">Binary Data</param>
+            <param name="Key">Encryption Key</param>
+            <param name="IV">Initiation Vector</param>
+            <param name="AssociatedData">Any associated data used for authenticated encryption (AEAD).</param>
+            <returns>Decrypted Data</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.SymmetricCiphers.ChaCha20.GenerateKey">
+            <summary>
+            Generates a new key. Used when the asymmetric cipher cannot calculate a shared secret.
+            </summary>
+            <returns>New key</returns>
+        </member>
+        <member name="T:Waher.Networking.XMPP.P2P.SymmetricCiphers.E2eSymmetricCipher">
+            <summary>
+            Abstract base class for symmetric ciphers.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.P2P.SymmetricCiphers.E2eSymmetricCipher.rnd">
+            <summary>
+            Random number generator.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.SymmetricCiphers.E2eSymmetricCipher.LocalName">
+            <summary>
+            Local name of the E2E symmetric cipher
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.SymmetricCiphers.E2eSymmetricCipher.Namespace">
+            <summary>
+            Namespace of the E2E symmetric cipher
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.SymmetricCiphers.E2eSymmetricCipher.AuthenticatedEncryption">
+            <summary>
+            If Authenticated Encryption with Associated Data is used
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.SymmetricCiphers.E2eSymmetricCipher.Dispose">
+            <summary>
+            <see cref="M:System.IDisposable.Dispose"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.SymmetricCiphers.E2eSymmetricCipher.GetIV(System.String,System.String,System.String,System.String,System.UInt32)">
+            <summary>
+            Gets an Initiation Vector from stanza attributes.
+            </summary>
+            <param name="Id">Id attribute</param>
+            <param name="Type">Type attribute</param>
+            <param name="From">From attribute</param>
+            <param name="To">To attribute</param>
+            <param name="Counter">Counter. Can be reset every time a new key is generated.
+            A new key must be generated before the counter wraps.</param>
+            <returns>Initiation vector.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.SymmetricCiphers.E2eSymmetricCipher.GetEncryptedLength(System.Int32)">
+            <summary>
+            Calculates the minimum size of encrypted data, given the size of the content.
+            </summary>
+            <param name="ContentLength">Size of content.</param>
+            <returns>Minimum size of encrypted data.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.SymmetricCiphers.E2eSymmetricCipher.Encrypt(System.Byte[],System.Byte[],System.Byte[],System.Byte[])">
+            <summary>
+            Encrypts binary data
+            </summary>
+            <param name="Data">Binary Data</param>
+            <param name="Key">Encryption Key</param>
+            <param name="IV">Initiation Vector</param>
+            <param name="AssociatedData">Any associated data used for authenticated encryption (AEAD).</param>
+            <returns>Encrypted Data</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.SymmetricCiphers.E2eSymmetricCipher.Decrypt(System.Byte[],System.Byte[],System.Byte[],System.Byte[])">
+            <summary>
+            Decrypts binary data
+            </summary>
+            <param name="Data">Binary Data</param>
+            <param name="Key">Encryption Key</param>
+            <param name="IV">Initiation Vector</param>
+            <param name="AssociatedData">Any associated data used for authenticated encryption (AEAD).</param>
+            <returns>Decrypted Data</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.SymmetricCiphers.E2eSymmetricCipher.GenerateKey">
+            <summary>
+            Generates a new key. Used when the asymmetric cipher cannot calculate a shared secret.
+            </summary>
+            <returns>New key</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.SymmetricCiphers.E2eSymmetricCipher.Encrypt(System.String,System.String,System.String,System.String,System.UInt32,System.Byte[],Waher.Networking.XMPP.IE2eEndpoint,Waher.Networking.XMPP.IE2eEndpoint)">
+            <summary>
+            Encrypts binary data
+            </summary>
+            <param name="Id">Id attribute</param>
+            <param name="Type">Type attribute</param>
+            <param name="From">From attribute</param>
+            <param name="To">To attribute</param>
+            <param name="Counter">Counter. Can be reset every time a new key is generated.
+            A new key must be generated before the counter wraps.</param>
+            <param name="Data">Binary data to encrypt</param>
+            <param name="Sender">Local endpoint performing the encryption.</param>
+            <param name="Receiver">Remote endpoint performing the decryption.</param>
+            <returns>Encrypted data</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.SymmetricCiphers.E2eSymmetricCipher.Decrypt(System.String,System.String,System.String,System.String,System.Byte[],Waher.Networking.XMPP.IE2eEndpoint,Waher.Networking.XMPP.IE2eEndpoint)">
+            <summary>
+            Decrypts binary data
+            </summary>
+            <param name="Id">Id attribute</param>
+            <param name="Type">Type attribute</param>
+            <param name="From">From attribute</param>
+            <param name="To">To attribute</param>
+            <param name="Data">Binary data to decrypt</param>
+            <param name="Sender">Remote endpoint performing the encryption.</param>
+            <param name="Receiver">Local endpoint performing the decryption.</param>
+            <returns>Decrypted data</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.SymmetricCiphers.E2eSymmetricCipher.Encrypt(System.String,System.String,System.String,System.String,System.UInt32,System.Byte[],System.Text.StringBuilder,Waher.Networking.XMPP.IE2eEndpoint,Waher.Networking.XMPP.IE2eEndpoint)">
+            <summary>
+            Encrypts Binary data
+            </summary>
+            <param name="Id">Id attribute</param>
+            <param name="Type">Type attribute</param>
+            <param name="From">From attribute</param>
+            <param name="To">To attribute</param>
+            <param name="Counter">Counter. Can be reset every time a new key is generated.
+            A new key must be generated before the counter wraps.</param>
+            <param name="Data">Binary data to encrypt</param>
+            <param name="Xml">XML output</param>
+            <param name="Sender">Local endpoint performing the encryption.</param>
+            <param name="Receiver">Remote endpoint performing the decryption.</param>
+            <returns>If encryption was possible</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.SymmetricCiphers.E2eSymmetricCipher.Decrypt(System.String,System.String,System.String,System.String,System.Xml.XmlElement,Waher.Networking.XMPP.IE2eEndpoint,Waher.Networking.XMPP.IE2eEndpoint)">
+            <summary>
+            Decrypts XML data
+            </summary>
+            <param name="Id">Id attribute</param>
+            <param name="Type">Type attribute</param>
+            <param name="From">From attribute</param>
+            <param name="To">To attribute</param>
+            <param name="Xml">XML element with encrypted data.</param>
+            <param name="Sender">Remote endpoint performing the encryption.</param>
+            <param name="Receiver">Local endpoint performing the decryption.</param>
+            <returns>Decrypted XMLs</returns>
         </member>
         <member name="T:Waher.Networking.XMPP.P2P.PeerConnectionEventHandler">
             <summary>

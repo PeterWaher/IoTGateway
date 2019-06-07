@@ -16,7 +16,7 @@ namespace Waher.Security.EllipticCurves
 		/// <param name="BasePoint">Base-point.</param>
 		/// <param name="Order">Order of base-point.</param>
 		public NistPrimeCurve(BigInteger Prime, PointOnCurve BasePoint, BigInteger Order)
-			: base(Prime, BasePoint, a: -3, Order, Cofactor: 1)
+			: base(Prime, BasePoint, -3, Order, 1)
 		{
 		}
 
@@ -29,7 +29,7 @@ namespace Waher.Security.EllipticCurves
         /// <param name="Secret">Secret.</param>
         public NistPrimeCurve(BigInteger Prime, PointOnCurve BasePoint, BigInteger Order,
             byte[] Secret)
-			: base(Prime, BasePoint, a: -3, Order, Cofactor: 1, Secret)
+			: base(Prime, BasePoint, -3, Order, 1, Secret)
 		{
 		}
 
@@ -72,7 +72,6 @@ namespace Waher.Security.EllipticCurves
         /// Creates a signature of <paramref name="Data"/> using the ECDSA algorithm.
         /// </summary>
         /// <param name="Data">Payload to sign.</param>
-        /// <param name="HashFunction">Hash function to use.</param>
         /// <returns>Signature.</returns>
         public override byte[] Sign(byte[] Data)
         {

@@ -51,7 +51,7 @@ namespace Waher.Security.EllipticCurves
         /// <param name="Secret">Secret.</param>
         /// <param name="HashSecret">If the secret should be hashed to create the private key.</param>
         public Edwards448(byte[] Secret, bool HashSecret)
-            : base(p0, new PointOnCurve(BasePointX, BasePointY), d0, n0, Cofactor: 4, Secret)
+            : base(p0, new PointOnCurve(BasePointX, BasePointY), d0, n0, 4, Secret)
         {
             this.shake256_114 = new SHAKE256(114 << 3);
             this.hashSecret = HashSecret;

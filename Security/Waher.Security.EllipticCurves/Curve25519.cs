@@ -24,7 +24,7 @@ namespace Waher.Security.EllipticCurves
         /// https://tools.ietf.org/html/rfc7748
         /// </summary>
         public Curve25519()
-            : base(p0, new PointOnCurve(BasePointU, BasePointV), n0, Cofactor: 8)
+            : base(p0, new PointOnCurve(BasePointU, BasePointV), n0, 8)
         {
         }
 
@@ -34,7 +34,7 @@ namespace Waher.Security.EllipticCurves
         /// </summary>
         /// <param name="Secret">Secret.</param>
         public Curve25519(byte[] Secret)
-            : base(p0, new PointOnCurve(BasePointU, BasePointV), n0, Cofactor: 8, Secret)
+            : base(p0, new PointOnCurve(BasePointU, BasePointV), n0, 8, Secret)
         {
         }
 

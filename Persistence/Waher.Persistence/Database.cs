@@ -164,7 +164,7 @@ namespace Waher.Persistence
 
 		private static async Task<T> FirstDeleteRest<T>(IEnumerable<T> Set)
 		{
-			T Result = default;
+			T Result = default(T);
 			bool First = true;
 
 			foreach (T Obj in Set)
@@ -213,7 +213,7 @@ namespace Waher.Persistence
 			foreach (T Obj in Set)
 				return Obj;
 
-			return default;
+			return default(T);
 		}
 
 		/// <summary>

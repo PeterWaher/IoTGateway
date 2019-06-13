@@ -827,7 +827,21 @@
               <File Id='Waher.Utility.RegEx.pdb' Name='Waher.Utility.RegEx.pdb' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.RegEx\bin\$(var.Configuration)\netcoreapp2.0\Waher.Utility.RegEx.pdb' Vital='yes' KeyPath='yes'/>
               <RemoveFile Id='RemoveWaher.Utility.RegEx.pdb' Name='Waher.Utility.RegEx.pdb' On='uninstall'/>
             </Component>
-						<Component Id='UtilityAnalyzeClock' Guid='807AB87A-C605-4CCE-9992-D61DC009F780'>
+            <Component Id='UtilitySign' Guid='BDCBEC7E-CC62-46D0-8652-16AB8C0C4009'>
+              <File Id='Waher.Utility.Sign.exe' Name='Waher.Utility.Sign.exe' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Sign\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.Sign.exe' Vital='yes' KeyPath='yes'/>
+              <File Id='Waher.Utility.Sign.dll' Name='Waher.Utility.Sign.dll' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Sign\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.Sign.dll' Vital='yes'/>
+              <File Id='Waher.Utility.Sign.deps.json' Name='Waher.Utility.Sign.deps.json' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Sign\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.Sign.deps.json' Vital='yes'/>
+              <File Id='Waher.Utility.Sign.runtimeconfig.json' Name='Waher.Utility.Sign.runtimeconfig.json' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Sign\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.Sign.runtimeconfig.json' Vital='yes'/>
+              <RemoveFile Id='RemoveWaher.Utility.Sign.exe' Name='Waher.Utility.Sign.exe' On='uninstall'/>
+              <RemoveFile Id='RemoveWaher.Utility.Sign.dll' Name='Waher.Utility.Sign.dll' On='uninstall'/>
+              <RemoveFile Id='RemoveWaher.Utility.Sign.deps.json' Name='Waher.Utility.Sign.deps.json' On='uninstall'/>
+              <RemoveFile Id='RemoveWaher.Utility.Sign.runtimeconfig.json' Name='Waher.Utility.Sign.runtimeconfig.json' On='uninstall'/>
+            </Component>
+            <Component Id='UtilitySignDebugFiles' Guid='53B02B7E-98F0-491D-8951-59C1F59EF4EF'>
+              <File Id='Waher.Utility.Sign.pdb' Name='Waher.Utility.Sign.pdb' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Sign\bin\$(var.Configuration)\netcoreapp2.0\Waher.Utility.Sign.pdb' Vital='yes' KeyPath='yes'/>
+              <RemoveFile Id='RemoveWaher.Utility.Sign.pdb' Name='Waher.Utility.Sign.pdb' On='uninstall'/>
+            </Component>
+            <Component Id='UtilityAnalyzeClock' Guid='807AB87A-C605-4CCE-9992-D61DC009F780'>
 							<File Id='Waher.Utility.AnalyzeClock.exe' Name='Waher.Utility.AnalyzeClock.exe' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.AnalyzeClock\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.AnalyzeClock.exe' Vital='yes' KeyPath='yes'/>
 							<File Id='Waher.Utility.AnalyzeClock.dll' Name='Waher.Utility.AnalyzeClock.dll' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.AnalyzeClock\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.AnalyzeClock.dll' Vital='yes'/>
 							<File Id='Waher.Utility.AnalyzeClock.deps.json' Name='Waher.Utility.AnalyzeClock.deps.json' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.AnalyzeClock\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.AnalyzeClock.deps.json' Vital='yes'/>
@@ -1413,8 +1427,9 @@
 				<ComponentRef Id='UtilityCsp' />
 				<ComponentRef Id='UtilityDeleteDB' />
 				<ComponentRef Id='UtilityInstall' />
-				<ComponentRef Id='UtilityRegEx' />
-				<ComponentRef Id='UtilityTransform' />
+        <ComponentRef Id='UtilityRegEx' />
+        <ComponentRef Id='UtilitySign' />
+        <ComponentRef Id='UtilityTransform' />
 			</Feature>
       <Feature Id='DebugFiles' Title='Debug Files' Description='Provides debug files. This will help debugging, since it provides more information in case something goes wrong.' Level='1000'>
         <ComponentRef Id='MainDebugFiles'/>
@@ -1425,8 +1440,9 @@
 				<ComponentRef Id='UtilityCspDebugFiles' />
 				<ComponentRef Id='UtilityDeleteDBDebugFiles' />
 				<ComponentRef Id='UtilityInstallDebugFiles' />
-				<ComponentRef Id='UtilityRegExDebugFiles' />
-				<ComponentRef Id='UtilityTransformDebugFiles' />
+        <ComponentRef Id='UtilityRegExDebugFiles' />
+        <ComponentRef Id='UtilitySignDebugFiles' />
+        <ComponentRef Id='UtilityTransformDebugFiles' />
 			</Feature>
     </Feature>
     <WixVariable Id="WixUIBannerBmp" Value="..\..\banner.bmp" />

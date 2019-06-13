@@ -264,6 +264,39 @@ namespace Waher.Networking.XMPP.P2P.E2E
         }
 
         /// <summary>
+        /// Exports information from the encryption object.
+        /// </summary>
+        /// <param name="Private">If private key is to be included.</param>
+        /// <returns>Key information.</returns>
+        public byte[] Export(bool Private)
+        {
+            RSAParameters P = this.rsa.ExportParameters(Private);
+            StringBuilder sb = new StringBuilder();
+
+            sb.Append("Exponent=");
+            sb.Append(Convert.ToBase64String(P.Exponent));
+            sb.Append(",Modulus=");
+            sb.Append(Convert.ToBase64String(P.Modulus));
+            if (Private)
+            {
+                sb.Append(",D=");
+                sb.Append(Convert.ToBase64String(P.D));
+                sb.Append(",DP=");
+                sb.Append(Convert.ToBase64String(P.DP));
+                sb.Append(",DQ=");
+                sb.Append(Convert.ToBase64String(P.DQ));
+                sb.Append(",InverseQ=");
+                sb.Append(Convert.ToBase64String(P.InverseQ));
+                sb.Append(",P=");
+                sb.Append(Convert.ToBase64String(P.P));
+                sb.Append(",Q=");
+                sb.Append(Convert.ToBase64String(P.P));
+            }
+
+            return Encoding.ASCII.GetBytes(sb.ToString());
+        }
+
+        /// <summary>
         /// Creates a new endpoint given a public key.
         /// </summary>
         /// <param name="PublicKey">Remote public key.</param>

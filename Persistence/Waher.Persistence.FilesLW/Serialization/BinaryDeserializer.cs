@@ -983,12 +983,10 @@ namespace Waher.Persistence.Files.Serialization
 		public void SkipBits(int NrBits)
 		{
 			int c;
-			byte b;
 
 			while (NrBits > 0)
 			{
 				c = Math.Min(NrBits, 8 - this.bitOffset);
-				b = (byte)(this.data[this.pos] >> this.bitOffset);
 
 				this.bitOffset += (byte)c;
 				NrBits -= c;
@@ -998,8 +996,6 @@ namespace Waher.Persistence.Files.Serialization
 					this.bitOffset = 0;
 					this.pos++;
 				}
-				else
-					b &= (byte)(0xff >> (8 - c));
 			}
 		}
 

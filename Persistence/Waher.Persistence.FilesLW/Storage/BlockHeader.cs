@@ -20,5 +20,13 @@ namespace Waher.Persistence.Files.Storage
 			this.LastBlockIndex = Reader.ReadBlockLink();	// 6: Last block link.
 			this.ParentBlockIndex = Reader.ReadBlockLink();	// 10: Parent block link.
 		}
-	}
+
+        public static void SkipHeader(BinaryDeserializer Reader)
+        {
+            Reader.SkipUInt16();
+            Reader.SkipUInt32();
+            Reader.SkipUInt32();
+            Reader.SkipUInt32();
+        }
+    }
 }

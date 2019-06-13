@@ -32,6 +32,9 @@ namespace Waher.Utility.Sign
         ///                        cipher can be used to create signatures.
         /// -o FILENAME            Directs output to the XML file FILENAME.
         /// -s FILENAME            Signs a file with the given filename.
+        ///                        FILENAME can contain wildcards. This will
+        ///                        generate one signature per file.
+        /// -r                     If recursive search for files is to be used.
         /// -v FILENAME SIGNATURE  Validates a signature for the selected file.
         /// -?                     Help.
         /// </summary>
@@ -39,18 +42,21 @@ namespace Waher.Utility.Sign
         {
             IE2eEndpoint Endpoint = null;
             string OutputFileName = null;
+            string CurrentDirectory = Directory.GetCurrentDirectory();
             string s;
             byte[] Bin, Bin2;
             XmlWriter Output = null;
             int i = 0;
             int c = args.Length;
             bool Help = false;
+            bool Recursive = false;
 
             try
             {
                 Types.Initialize(
                     typeof(Program).Assembly,
                     typeof(IE2eEndpoint).Assembly,
+                    typeof(EndpointSecurity).Assembly,
                     typeof(Security.EllipticCurves.EllipticCurve).Assembly);
 
                 while (i < c)
@@ -81,12 +87,12 @@ namespace Waher.Utility.Sign
                                 {
                                     using (IE2eEndpoint Endpoint2 = (IE2eEndpoint)Activator.CreateInstance(T))
                                     {
-                                        if (Endpoint.Namespace == EndpointSecurity.IoTHarmonizationE2E)
+                                        if (Endpoint2.Namespace == EndpointSecurity.IoTHarmonizationE2E)
                                         {
                                             if (Output is null)
-                                                Console.Out.WriteLine(Endpoint.LocalName);
+                                                Console.Out.WriteLine(Endpoint2.LocalName);
                                             else
-                                                Output.WriteElementString("Cipher", Namespace, Endpoint.LocalName);
+                                                Output.WriteElementString("Cipher", Namespace, Endpoint2.LocalName);
                                         }
                                     }
                                 }
@@ -208,18 +214,35 @@ namespace Waher.Utility.Sign
 
                             s = args[i++];
 
-                            Bin = File.ReadAllBytes(s);
-                            Bin = Endpoint.Sign(Bin);
-                            s = Convert.ToBase64String(Bin);
+                            string[] FileNames;
 
-                            if (Output is null)
-                                Console.Out.WriteLine("Signature: " + s);
-                            else
+                            if (s.Contains("*") || s.Contains("?"))
                             {
-                                Output.WriteStartElement("Signature");
-                                Output.WriteAttributeString("fileName", s);
-                                Output.WriteValue(s);
-                                Output.WriteEndElement();
+                                s = Path.Combine(CurrentDirectory, s);
+
+                                string FileName = Path.GetFileName(s);
+                                string Folder = Path.GetDirectoryName(s);
+
+                                FileNames = Directory.GetFiles(Folder, FileName, Recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
+                            }
+                            else
+                                FileNames = new string[] { s };
+
+                            foreach (string FileName in FileNames)
+                            {
+                                Bin = File.ReadAllBytes(FileName);
+                                Bin = Endpoint.Sign(Bin);
+                                s = Convert.ToBase64String(Bin);
+
+                                if (Output is null)
+                                    Console.Out.WriteLine("Signature: " + s);
+                                else
+                                {
+                                    Output.WriteStartElement("Signature");
+                                    Output.WriteAttributeString("fileName", Path.GetRelativePath(CurrentDirectory, FileName));
+                                    Output.WriteValue(s);
+                                    Output.WriteEndElement();
+                                }
                             }
                             break;
 
@@ -253,7 +276,7 @@ namespace Waher.Utility.Sign
                             else
                             {
                                 Output.WriteStartElement("Valid");
-                                Output.WriteAttributeString("fileName", s);
+                                Output.WriteAttributeString("fileName", Path.GetRelativePath(CurrentDirectory, s));
                                 Output.WriteValue(Valid ? "true" : "false");
                                 Output.WriteEndElement();
                             }
@@ -261,6 +284,10 @@ namespace Waher.Utility.Sign
 
                         case "-?":
                             Help = true;
+                            break;
+
+                        case "-r":
+                            Recursive = true;
                             break;
 
                         default:
@@ -287,6 +314,9 @@ namespace Waher.Utility.Sign
                     Console.Out.WriteLine("                       cipher can be used to create signatures.");
                     Console.Out.WriteLine("-o FILENAME            Directs output to the XML file FILENAME.");
                     Console.Out.WriteLine("-s FILENAME            Signs a file with the given filename.");
+                    Console.Out.WriteLine("                       FILENAME can contain wildcards. This will");
+                    Console.Out.WriteLine("                       generate one signature per file.");
+                    Console.Out.WriteLine("-r                     If recursive search for files is to be used.");
                     Console.Out.WriteLine("-v FILENAME SIGNATURE  Validates a signature for the selected file.");
                     Console.Out.WriteLine("-?                     Help.");
                 }

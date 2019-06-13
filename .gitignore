@@ -27,6 +27,7 @@ TestResults/
 # User files
 *.suo
 *.csproj.user
+*.pubxml.user
 
 # Windows shortcuts
 *.lnk

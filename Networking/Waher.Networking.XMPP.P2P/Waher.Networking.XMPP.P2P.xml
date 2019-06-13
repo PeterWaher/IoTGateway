@@ -1160,6 +1160,13 @@
             <param name="Secret">Secret.</param>
             <returns>Endpoint object.</returns>
         </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaEndpoint.Export(System.Boolean)">
+            <summary>
+            Exports information from the encryption object.
+            </summary>
+            <param name="Private">If private key is to be included.</param>
+            <returns>Key information.</returns>
+        </member>
         <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaEndpoint.CreatePublic(System.Byte[])">
             <summary>
             Creates a new endpoint given a public key.

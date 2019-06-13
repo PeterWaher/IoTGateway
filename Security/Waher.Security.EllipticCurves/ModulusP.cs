@@ -233,7 +233,7 @@ namespace Waher.Security.EllipticCurves
         /// <summary>
         /// Calculates the number of bits used in a binary encoded big integer.
         /// </summary>
-        /// <param name="n">Value</param>
+        /// <param name="A">Value</param>
         /// <returns>Number of bits used by value.</returns>
         public static int CalcBits(byte[] A)
         { 

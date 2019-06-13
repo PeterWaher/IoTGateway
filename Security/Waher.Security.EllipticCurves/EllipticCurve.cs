@@ -390,7 +390,6 @@ namespace Waher.Security.EllipticCurves
         /// Creates a signature of <paramref name="Data"/> using the ECDSA algorithm.
         /// </summary>
         /// <param name="Data">Payload to sign.</param>
-        /// <param name="HashFunction">Hash function to use.</param>
         /// <returns>Signature.</returns>
         public abstract byte[] Sign(byte[] Data);
 

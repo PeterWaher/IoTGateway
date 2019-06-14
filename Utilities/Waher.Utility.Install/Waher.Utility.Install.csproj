@@ -37,6 +37,7 @@
     <ProjectReference Include="..\..\Content\Waher.Content.Xsl\Waher.Content.Xsl.csproj" />
     <ProjectReference Include="..\..\Content\Waher.Content\Waher.Content.csproj" />
     <ProjectReference Include="..\..\Events\Waher.Events.Console\Waher.Events.Console.csproj" />
+    <ProjectReference Include="..\..\Security\Waher.Security.SHA3\Waher.Security.SHA3.csproj" />
   </ItemGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="if not exist &quot;$(ProjectDir)obj\$(ConfigurationName)\netcoreapp2.0\win-x86&quot; md &quot;$(ProjectDir)obj\$(ConfigurationName)\netcoreapp2.0\win-x86&quot;&#xD;&#xA;copy &quot;$(TargetPath)&quot; &quot;$(ProjectDir)obj\$(ConfigurationName)\netcoreapp2.0\win-x86&quot;&#xD;&#xA;" />

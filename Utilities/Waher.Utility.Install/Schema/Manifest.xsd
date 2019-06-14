@@ -17,19 +17,40 @@
     </xs:complexType>
   </xs:element>
 
+  <xs:complexType name="File" abstract="true">
+    <xs:annotation>
+      <xs:documentation>Defines an assembly to be registered.</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="fileName" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>File name in current folder.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="altFolder" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>If the file can be retrieved from an alternative folder.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
   <xs:complexType name="Assembly">
     <xs:annotation>
       <xs:documentation>Defines an assembly to be registered.</xs:documentation>
     </xs:annotation>
-    <xs:attribute name="fileName" type="xs:string" use="required"/>
+    <xs:complexContent>
+      <xs:extension base="File"/>
+    </xs:complexContent>
   </xs:complexType>
 
   <xs:complexType name="Content">
     <xs:annotation>
       <xs:documentation>Defines content to be placed in the application data folder.</xs:documentation>
     </xs:annotation>
-		<xs:attribute name="fileName" type="xs:string" use="required"/>
-		<xs:attribute name="copy" type="CopyOptions" use="optional" default="IfNewer"/>
+    <xs:complexContent>
+      <xs:extension base="File">
+        <xs:attribute name="copy" type="CopyOptions" use="optional" default="IfNewer"/>
+      </xs:extension>
+    </xs:complexContent>
 	</xs:complexType>
 
 	<xs:simpleType name="CopyOptions">

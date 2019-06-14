@@ -24,6 +24,14 @@
     <OldToolsVersion>2.0</OldToolsVersion>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="Waher.IoTGateway.Svc.manifest" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Waher.IoTGateway.Svc.manifest">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="SkiaSharp" Version="1.68.0" />
   </ItemGroup>
   <ItemGroup>

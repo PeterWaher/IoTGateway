@@ -16,20 +16,23 @@ using Waher.Security.SHA3;
 namespace Waher.Utility.Install
 {
     /// <summary>
-    /// Installs a module in an IoT Gateway.
+    /// Installs a module in an IoT Gateway, or generates a module package file.
     /// 
     /// Command line switches:
     /// 
-    /// -m MANIFEST_FILE     Points to the manifest file describing the files in the module.
-    /// -d APP_DATA_FOLDER   Points to the application data folder.
-    /// -s SERVER_EXE        Points to the executable file of the IoT Gateway.
-    /// -p PACKAGE_FILE      If provided, files will be packed into a package file that can
-    ///                      be easily distributed, instead of being installed on the local
-    ///                      machine.
-    /// -k KEY               Encrypts the package file with the KEY, if provided.
-    ///                      Secret used in encryption is based on the local package file
-    ///                      name and the KEY parameter, if provided. You cannot rename
-    ///                      a package file.
+    /// -m MANIFEST_FILE     Points to a manifest file describing the files in the module.
+    /// -p PACKAGE_FILE      If provided together with a manifest file, files will be
+    ///                      packed into a package file that can be easily distributed,
+    ///                      instead of being installed on the local machine.
+    ///                      If a manifest file is not specified, the package file will
+    ///                      be used instead.
+    /// -d APP_DATA_FOLDER   Points to the application data folder. Required if
+    ///                      installing a module.
+    /// -s SERVER_EXE        Points to the executable file of the IoT Gateway. Required
+    ///                      if installing a module.
+    /// -k KEY               Encryption key used for the package file. Secret used in
+    ///                      encryption is based on the local package file name and the
+    ///                      KEY parameter, if provided. You cannot rename a package file.
     /// -v                   Verbose mode.
     /// -i                   Install. This is the default. Switch not required.
     /// -u                   Uninstall. Add this switch if the module is being uninstalled.
@@ -139,16 +142,19 @@ namespace Waher.Utility.Install
 
                 if (Help || c == 0)
                 {
-                    Console.Out.WriteLine("-m MANIFEST_FILE     Points to the manifest file describing the files in the module.");
-                    Console.Out.WriteLine("-d APP_DATA_FOLDER   Points to the application data folder.");
-                    Console.Out.WriteLine("-s SERVER_EXE        Points to the executable file of the IoT Gateway.");
-                    Console.Out.WriteLine("-p PACKAGE_FILE      If provided, files will be packed into a package file that can");
-                    Console.Out.WriteLine("                     be easily distributed, instead of being installed on the local");
-                    Console.Out.WriteLine("                     machine.");
-                    Console.Out.WriteLine("-k KEY               Encrypts the package file with the KEY, if provided.");
-                    Console.Out.WriteLine("                     Secret used in encryption is based on the local package file");
-                    Console.Out.WriteLine("                     name and the KEY parameter, if provided. You cannot rename");
-                    Console.Out.WriteLine("                     a package file.");
+                    Console.Out.WriteLine("-m MANIFEST_FILE     Points to a manifest file describing the files in the module.");
+                    Console.Out.WriteLine("-p PACKAGE_FILE      If provided together with a manifest file, files will be");
+                    Console.Out.WriteLine("                     packed into a package file that can be easily distributed,");
+                    Console.Out.WriteLine("                     instead of being installed on the local machine.");
+                    Console.Out.WriteLine("                     If a manifest file is not specified, the package file will");
+                    Console.Out.WriteLine("                     be used instead.");
+                    Console.Out.WriteLine("-d APP_DATA_FOLDER   Points to the application data folder. Required if");
+                    Console.Out.WriteLine("                     installing a module.");
+                    Console.Out.WriteLine("-s SERVER_EXE        Points to the executable file of the IoT Gateway. Required");
+                    Console.Out.WriteLine("                     if installing a module.");
+                    Console.Out.WriteLine("-k KEY               Encryption key used for the package file. Secret used in");
+                    Console.Out.WriteLine("                     encryption is based on the local package file name and the");
+                    Console.Out.WriteLine("                     KEY parameter, if provided. You cannot rename a package file.");
                     Console.Out.WriteLine("-v                   Verbose mode.");
                     Console.Out.WriteLine("-i                   Install. This the default. Switch not required.");
                     Console.Out.WriteLine("-u                   Uninstall. Add this switch if the module is being uninstalled.");
@@ -162,7 +168,17 @@ namespace Waher.Utility.Install
                     Log.Register(new Events.Console.ConsoleEventSink());
 
                 if (!string.IsNullOrEmpty(PackageFile))
-                    GeneratePackage(ManifestFile, PackageFile, Key);
+                {
+                    if (string.IsNullOrEmpty(ManifestFile))
+                    {
+                        if (UninstallService)
+                            UninstallPackage(PackageFile, Key, ServerApplication, ProgramDataFolder, RemoveFiles);
+                        else
+                            InstallPackage(PackageFile, Key, ServerApplication, ProgramDataFolder);
+                    }
+                    else
+                        GeneratePackage(ManifestFile, PackageFile, Key);
+                }
                 else if (UninstallService)
                     Uninstall(ManifestFile, ServerApplication, ProgramDataFolder, RemoveFiles);
                 else
@@ -263,7 +279,7 @@ namespace Waher.Utility.Install
                         {
                             string PdbFileName = FileName.Substring(0, FileName.Length - 4) + ".pdb";
                             if (File.Exists(PdbFileName))
-                                CopyFileIfNewer(Path.Combine(SourceFolder, PdbFileName), Path.Combine(AppFolder, PdbFileName), null, false);
+                                CopyFileIfNewer(Path.Combine(SourceFolder, PdbFileName), Path.Combine(AppFolder, PdbFileName), null, true);
                         }
                     }
 
@@ -456,7 +472,7 @@ namespace Waher.Utility.Install
 
         private static void Uninstall(string ManifestFile, string ServerApplication, string ProgramDataFolder, bool Remove)
         {
-            // Same code as for custom action InstallManifest in Waher.IoTGateway.Installers
+            // Same code as for custom action UninstallManifest in Waher.IoTGateway.Installers
 
             if (string.IsNullOrEmpty(ManifestFile))
                 throw new Exception("Missing manifest file.");
@@ -662,7 +678,11 @@ namespace Waher.Utility.Install
 
                     rnd.GetBytes(Bin);
                     Compressed.Write(Bin, 0, Bin.Length);
+
+                    WriteBin(Encoding.ASCII.GetBytes("IoTGatewayPackage"), Compressed);
                 }
+
+                CopyFile(1, ManifestFile, Path.GetFileName(ManifestFile), Compressed);
 
                 foreach (XmlNode N in Module.ChildNodes)
                 {
@@ -705,6 +725,11 @@ namespace Waher.Utility.Install
 
             WriteBin(Encoding.UTF8.GetBytes(RelativeName), Output);
 
+            WriteVarLenUInt((uint)File.GetAttributes(SourceFileName), Output);
+            WriteVarLenUInt((ulong)File.GetCreationTimeUtc(SourceFileName).Ticks, Output);
+            WriteVarLenUInt((ulong)File.GetLastAccessTimeUtc(SourceFileName).Ticks, Output);
+            WriteVarLenUInt((ulong)File.GetLastWriteTimeUtc(SourceFileName).Ticks, Output);
+
             using (FileStream f = File.OpenRead(SourceFileName))
             {
                 WriteVarLenUInt((ulong)f.Length, Output);
@@ -732,6 +757,38 @@ namespace Waher.Utility.Install
                 Output.WriteByte(b);
             }
             while (Len > 0);
+        }
+
+        private static byte[] ReadBin(Stream Input)
+        {
+            ulong Len = ReadVarLenUInt(Input);
+            if (Len > int.MaxValue)
+                throw new Exception("Invalid package.");
+
+            int c = (int)Len;
+            byte[] Result = new byte[c];
+            Input.Read(Result, 0, c);
+
+            return Result;
+        }
+
+        private static ulong ReadVarLenUInt(Stream Input)
+        {
+            ulong Len = 0;
+            int Offset = 0;
+            byte b;
+
+            do
+            {
+                Len <<= 7;
+                b = (byte)Input.ReadByte();
+
+                Len |= ((ulong)(b & 127)) << Offset;
+                Offset += 7;
+            }
+            while ((b & 0x80) != 0);
+
+            return Len;
         }
 
         private static void CopyContent(string SourceFolder, Stream Output, string PackageFolder, XmlElement Parent)
@@ -782,6 +839,453 @@ namespace Waher.Utility.Install
                 return (FileName, AbsFileName);
 
             throw new Exception("File not found: " + AbsFileName);
+        }
+
+        private static void InstallPackage(string PackageFile, string Key, string ServerApplication, string ProgramDataFolder)
+        {
+            // Same code as for custom action InstallManifest in Waher.IoTGateway.Installers
+
+            if (string.IsNullOrEmpty(PackageFile))
+                throw new Exception("Missing package file.");
+
+            if (string.IsNullOrEmpty(ServerApplication))
+                throw new Exception("Missing server application.");
+
+            if (string.IsNullOrEmpty(ProgramDataFolder))
+            {
+                ProgramDataFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "IoT Gateway");
+                Log.Informational("Using default program data folder: " + ProgramDataFolder);
+            }
+
+            if (!File.Exists(ServerApplication))
+                throw new Exception("Server application not found: " + ServerApplication);
+
+            Log.Informational("Getting assembly name of server.");
+            AssemblyName ServerName = AssemblyName.GetAssemblyName(ServerApplication);
+            Log.Informational("Server assembly name: " + ServerName.ToString());
+
+            string DepsJsonFileName;
+
+            int i = ServerApplication.LastIndexOf('.');
+            if (i < 0)
+                DepsJsonFileName = ServerApplication;
+            else
+                DepsJsonFileName = ServerApplication.Substring(0, i);
+
+            DepsJsonFileName += ".deps.json";
+
+            Log.Informational("deps.json file name: " + DepsJsonFileName);
+
+            if (!File.Exists(DepsJsonFileName))
+                throw new Exception("Invalid server executable. No corresponding deps.json file found.");
+
+            Log.Informational("Opening " + DepsJsonFileName);
+
+            string s = File.ReadAllText(DepsJsonFileName);
+
+            Log.Informational("Parsing " + DepsJsonFileName);
+
+            Dictionary<string, object> Deps = JSON.Parse(s) as Dictionary<string, object>;
+            if (Deps is null)
+                throw new Exception("Invalid deps.json file. Unable to install.");
+
+            Log.Informational("Loading package file.");
+
+            string LocalName = Path.GetFileName(PackageFile);
+            SHAKE256 H = new SHAKE256(384);
+            byte[] Digest = H.ComputeVariable(Encoding.UTF8.GetBytes(LocalName + ":" + Key + ":" + typeof(Program).Namespace));
+            byte[] AesKey = new byte[32];
+            byte[] IV = new byte[16];
+            Aes Aes = null;
+            FileStream fs = null;
+            ICryptoTransform AesTransform = null;
+            CryptoStream Decrypted = null;
+            GZipStream Decompressed = null;
+
+            Array.Copy(Digest, 0, AesKey, 0, 32);
+            Array.Copy(Digest, 32, IV, 0, 16);
+
+            try
+            {
+                Aes = Aes.Create();
+                Aes.BlockSize = 128;
+                Aes.KeySize = 256;
+                Aes.Mode = CipherMode.CBC;
+                Aes.Padding = PaddingMode.ISO10126;
+
+                fs = File.Create(PackageFile);
+                AesTransform = Aes.CreateDecryptor(AesKey, IV);
+                Decrypted = new CryptoStream(fs, AesTransform, CryptoStreamMode.Read);
+                Decompressed = new GZipStream(Decrypted, CompressionMode.Decompress);
+
+                byte b = (byte)Decompressed.ReadByte();
+                byte[] Bin;
+
+                if (b > 0)
+                {
+                    Bin = new byte[b];
+                    Decompressed.Read(Bin, 0, b);
+                }
+
+                Bin = ReadBin(Decompressed);
+                if (Encoding.ASCII.GetString(Bin) != "IoTGatewayPackage")
+                    throw new Exception("Invalid package file.");
+
+                string SourceFolder = Path.GetDirectoryName(PackageFile);
+                string AppFolder = Path.GetDirectoryName(ServerApplication);
+
+                Log.Informational("Source folder: " + SourceFolder);
+                Log.Informational("App folder: " + AppFolder);
+
+                while ((b = (byte)Decrypted.ReadByte()) != 0)
+                {
+                    string RelativeName = Encoding.UTF8.GetString(ReadBin(Decrypted));
+                    FileAttributes Attr = (FileAttributes)ReadVarLenUInt(Decrypted);
+                    DateTime CreationTimeUtc = new DateTime((long)ReadVarLenUInt(Decrypted));
+                    DateTime LastAccessTimeUtc = new DateTime((long)ReadVarLenUInt(Decrypted));
+                    DateTime LastWriteTimeUtc = new DateTime((long)ReadVarLenUInt(Decrypted));
+                    ulong Bytes = ReadVarLenUInt(Decrypted);
+                    string FileName;
+
+                    switch (b)
+                    {
+                        case 1: // Assembly file
+                            FileName = Path.Combine(AppFolder, RelativeName);
+                            CopyFile(Decrypted, FileName, false, Bytes, Attr, CreationTimeUtc, LastAccessTimeUtc, LastWriteTimeUtc);
+
+                            Assembly A = Assembly.LoadFrom(FileName);
+                            AssemblyName AN = A.GetName();
+
+                            if (Deps != null && Deps.TryGetValue("targets", out object Obj) && Obj is Dictionary<string, object> Targets)
+                            {
+                                foreach (KeyValuePair<string, object> P in Targets)
+                                {
+                                    if (P.Value is Dictionary<string, object> Target)
+                                    {
+                                        foreach (KeyValuePair<string, object> P2 in Target)
+                                        {
+                                            if (P2.Key.StartsWith(ServerName.Name + "/") &&
+                                                P2.Value is Dictionary<string, object> App &&
+                                                App.TryGetValue("dependencies", out object Obj2) &&
+                                                Obj2 is Dictionary<string, object> Dependencies)
+                                            {
+                                                Dependencies[AN.Name] = AN.Version.ToString();
+                                                break;
+                                            }
+                                        }
+
+                                        Dictionary<string, object> Dependencies2 = new Dictionary<string, object>();
+
+                                        foreach (AssemblyName Dependency in A.GetReferencedAssemblies())
+                                            Dependencies2[Dependency.Name] = Dependency.Version.ToString();
+
+                                        Dictionary<string, object> Runtime = new Dictionary<string, object>()
+                                        {
+                                            { Path.GetFileName(FileName), new Dictionary<string,object>() }
+                                        };
+
+                                        Target[AN.Name + "/" + AN.Version.ToString()] = new Dictionary<string, object>()
+                                        {
+                                            { "dependencies", Dependencies2 },
+                                            { "runtime", Runtime }
+                                        };
+                                    }
+                                }
+                            }
+
+                            if (Deps != null && Deps.TryGetValue("libraries", out object Obj3) && Obj3 is Dictionary<string, object> Libraries)
+                            {
+                                foreach (KeyValuePair<string, object> P in Libraries)
+                                {
+                                    if (P.Key.StartsWith(AN.Name + "/"))
+                                    {
+                                        Libraries.Remove(P.Key);
+                                        break;
+                                    }
+                                }
+
+                                Libraries[AN.Name + "/" + AN.Version.ToString()] = new Dictionary<string, object>()
+                                {
+                                    { "type", "project" },
+                                    { "serviceable", false },
+                                    { "sha512", string.Empty }
+                                };
+                            }
+
+                            break;
+
+                        case 2: // Content file (copy if newer)
+                        case 3: // Content file (always copy)
+                            bool OnlyIfNewer = b == 2;
+                            string TempFileName = Path.GetTempFileName();
+                            CopyFile(Decrypted, TempFileName, false, Bytes, Attr, CreationTimeUtc, LastAccessTimeUtc, LastWriteTimeUtc);
+                            try
+                            {
+                                using (FileStream TempFile = File.OpenRead(TempFileName))
+                                {
+                                    FileName = Path.Combine(ProgramDataFolder, RelativeName);
+                                    CopyFile(TempFile, FileName, OnlyIfNewer, Bytes, Attr, CreationTimeUtc, LastAccessTimeUtc, LastWriteTimeUtc);
+
+                                    FileName = Path.Combine(AppFolder, RelativeName);
+                                    TempFile.Position = 0;
+                                    CopyFile(TempFile, FileName, OnlyIfNewer, Bytes, Attr, CreationTimeUtc, LastAccessTimeUtc, LastWriteTimeUtc);
+                                }
+                            }
+                            finally
+                            {
+                                File.Delete(TempFileName);
+                            }
+                            break;
+
+                        default:
+                            throw new Exception("Invalid package file.");
+                    }
+                }
+
+                Log.Informational("Encoding JSON");
+                s = JSON.Encode(Deps, true);
+
+                Log.Informational("Writing " + DepsJsonFileName);
+                File.WriteAllText(DepsJsonFileName, s, Encoding.UTF8);
+            }
+            finally
+            {
+                Decompressed?.Dispose();
+                Decrypted?.Dispose();
+                AesTransform?.Dispose();
+                Aes?.Dispose();
+                fs?.Dispose();
+            }
+        }
+
+        private static void CopyFile(Stream Input, string OutputFileName, bool OnlyIfNewer, ulong Bytes, FileAttributes Attr,
+            DateTime CreationTimeUtc, DateTime LastAccessTimeUtc, DateTime LastWriteTimeUtc)
+        {
+            Log.Informational("Content file: " + OutputFileName);
+
+            string Folder = Path.GetDirectoryName(OutputFileName);
+
+            if (!string.IsNullOrEmpty(Folder) && !Directory.Exists(Folder))
+            {
+                Log.Informational("Creating folder " + Folder + ".");
+                Directory.CreateDirectory(Folder);
+            }
+
+            int c = Math.Min(65536, Bytes > int.MaxValue ? int.MaxValue : (int)Bytes);
+            byte[] Buffer = new byte[c];
+
+            if (OnlyIfNewer && File.Exists(OutputFileName) && File.GetLastWriteTimeUtc(OutputFileName) >= LastWriteTimeUtc)
+                return;
+
+            using (FileStream f = File.Create(OutputFileName))
+            {
+                while (Bytes > 0)
+                {
+                    Input.Read(Buffer, 0, c);
+                    f.Write(Buffer, 0, c);
+                    Bytes -= (uint)c;
+                }
+            }
+
+            File.SetAttributes(OutputFileName, Attr);
+            File.SetCreationTimeUtc(OutputFileName, CreationTimeUtc);
+            File.SetLastAccessTimeUtc(OutputFileName, LastAccessTimeUtc);
+            File.SetLastWriteTimeUtc(OutputFileName, LastWriteTimeUtc);
+        }
+
+        private static void UninstallPackage(string PackageFile, string Key, string ServerApplication, string ProgramDataFolder, bool Remove)
+        {
+            // Same code as for custom action InstallManifest in Waher.IoTGateway.Installers
+
+            if (string.IsNullOrEmpty(PackageFile))
+                throw new Exception("Missing package file.");
+
+            if (string.IsNullOrEmpty(ServerApplication))
+                throw new Exception("Missing server application.");
+
+            if (string.IsNullOrEmpty(ProgramDataFolder))
+            {
+                ProgramDataFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "IoT Gateway");
+                Log.Informational("Using default program data folder: " + ProgramDataFolder);
+            }
+
+            if (!File.Exists(ServerApplication))
+                throw new Exception("Server application not found: " + ServerApplication);
+
+            Log.Informational("Getting assembly name of server.");
+            AssemblyName ServerName = AssemblyName.GetAssemblyName(ServerApplication);
+            Log.Informational("Server assembly name: " + ServerName.ToString());
+
+            string DepsJsonFileName;
+
+            int i = ServerApplication.LastIndexOf('.');
+            if (i < 0)
+                DepsJsonFileName = ServerApplication;
+            else
+                DepsJsonFileName = ServerApplication.Substring(0, i);
+
+            DepsJsonFileName += ".deps.json";
+
+            Log.Informational("deps.json file name: " + DepsJsonFileName);
+
+            if (!File.Exists(DepsJsonFileName))
+                throw new Exception("Invalid server executable. No corresponding deps.json file found.");
+
+            Log.Informational("Opening " + DepsJsonFileName);
+
+            string s = File.ReadAllText(DepsJsonFileName);
+
+            Log.Informational("Parsing " + DepsJsonFileName);
+
+            Dictionary<string, object> Deps = JSON.Parse(s) as Dictionary<string, object>;
+            if (Deps is null)
+                throw new Exception("Invalid deps.json file. Unable to install.");
+
+            Log.Informational("Loading package file.");
+
+            string LocalName = Path.GetFileName(PackageFile);
+            SHAKE256 H = new SHAKE256(384);
+            byte[] Digest = H.ComputeVariable(Encoding.UTF8.GetBytes(LocalName + ":" + Key + ":" + typeof(Program).Namespace));
+            byte[] AesKey = new byte[32];
+            byte[] IV = new byte[16];
+            Aes Aes = null;
+            FileStream fs = null;
+            ICryptoTransform AesTransform = null;
+            CryptoStream Decrypted = null;
+            GZipStream Decompressed = null;
+
+            Array.Copy(Digest, 0, AesKey, 0, 32);
+            Array.Copy(Digest, 32, IV, 0, 16);
+
+            try
+            {
+                Aes = Aes.Create();
+                Aes.BlockSize = 128;
+                Aes.KeySize = 256;
+                Aes.Mode = CipherMode.CBC;
+                Aes.Padding = PaddingMode.ISO10126;
+
+                fs = File.Create(PackageFile);
+                AesTransform = Aes.CreateDecryptor(AesKey, IV);
+                Decrypted = new CryptoStream(fs, AesTransform, CryptoStreamMode.Read);
+                Decompressed = new GZipStream(Decrypted, CompressionMode.Decompress);
+
+                byte b = (byte)Decompressed.ReadByte();
+                byte[] Bin;
+
+                if (b > 0)
+                {
+                    Bin = new byte[b];
+                    Decompressed.Read(Bin, 0, b);
+                }
+
+                Bin = ReadBin(Decompressed);
+                if (Encoding.ASCII.GetString(Bin) != "IoTGatewayPackage")
+                    throw new Exception("Invalid package file.");
+
+                string AppFolder = Path.GetDirectoryName(ServerApplication);
+
+                Log.Informational("App folder: " + AppFolder);
+
+
+                while ((b = (byte)Decrypted.ReadByte()) != 0)
+                {
+                    string RelativeName = Encoding.UTF8.GetString(ReadBin(Decrypted));
+                    ReadVarLenUInt(Decrypted);
+                    ReadVarLenUInt(Decrypted);
+                    ReadVarLenUInt(Decrypted);
+                    ReadVarLenUInt(Decrypted);
+                    ulong Bytes = ReadVarLenUInt(Decrypted);
+                    string FileName;
+
+                    int c = Math.Min(65536, Bytes > int.MaxValue ? int.MaxValue : (int)Bytes);
+                    byte[] Buffer = new byte[c];
+
+                    while (Bytes > 0)
+                    {
+                        Decrypted.Read(Buffer, 0, c);
+                        Bytes -= (uint)c;
+                    }
+
+                    switch (b)
+                    {
+                        case 1: // Assembly file
+                            FileName = Path.Combine(AppFolder, RelativeName);
+
+                            Assembly A = Assembly.LoadFrom(FileName);
+                            AssemblyName AN = A.GetName();
+                            Key = AN.Name + "/" + AN.Version.ToString();
+
+                            if (Deps != null && Deps.TryGetValue("targets", out object Obj) && Obj is Dictionary<string, object> Targets)
+                            {
+                                Targets.Remove(Key);
+
+                                foreach (KeyValuePair<string, object> P in Targets)
+                                {
+                                    if (P.Value is Dictionary<string, object> Target)
+                                    {
+                                        foreach (KeyValuePair<string, object> P2 in Target)
+                                        {
+                                            if (P2.Key.StartsWith(ServerName.Name + "/") &&
+                                                P2.Value is Dictionary<string, object> App &&
+                                                App.TryGetValue("dependencies", out object Obj2) &&
+                                                Obj2 is Dictionary<string, object> Dependencies)
+                                            {
+                                                Dependencies.Remove(AN.Name);
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            if (Deps != null && Deps.TryGetValue("libraries", out object Obj3) && Obj3 is Dictionary<string, object> Libraries)
+                            {
+                                foreach (KeyValuePair<string, object> P in Libraries)
+                                {
+                                    if (P.Key.StartsWith(AN.Name + "/"))
+                                    {
+                                        Libraries.Remove(P.Key);
+                                        break;
+                                    }
+                                }
+                            }
+
+                            if (Remove)
+                            {
+                                RemoveFile(FileName);
+                                if (FileName.EndsWith(".dll", StringComparison.CurrentCultureIgnoreCase))
+                                {
+                                    string PdbFileName = FileName.Substring(0, FileName.Length - 4) + ".pdb";
+                                    RemoveFile(PdbFileName);
+                                }
+                            }
+                            break;
+
+                        case 2: // Content file (copy if newer)
+                        case 3: // Content file (always copy)
+                            break;
+
+                        default:
+                            throw new Exception("Invalid package file.");
+                    }
+                }
+
+            }
+            finally
+            {
+                Decompressed?.Dispose();
+                Decrypted?.Dispose();
+                AesTransform?.Dispose();
+                Aes?.Dispose();
+                fs?.Dispose();
+            }
+
+            Log.Informational("Encoding JSON");
+            s = JSON.Encode(Deps, true);
+
+            Log.Informational("Writing " + DepsJsonFileName);
+            File.WriteAllText(DepsJsonFileName, s, Encoding.UTF8);
         }
 
     }

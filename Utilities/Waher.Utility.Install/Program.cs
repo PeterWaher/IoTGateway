@@ -40,6 +40,16 @@ namespace Waher.Utility.Install
     ///                      uninstallation. Default is to not remove files.
     /// -?                   Help.
     /// </summary>
+    /// <example>
+    /// Packs assembly and content files defined in a manifest file into an encrypted package file:
+    /// 
+    /// Waher.Utility.Install.exe -m Waher.IoTGateway.Svc.manifest -p Waher.IoTGateway.Svc.package -k Testing -v
+    /// </example>
+    /// <example>
+    /// Unpacks and installs files from an encrypted package file:
+    /// 
+    /// Waher.Utility.Install.exe -i -p Waher.IoTGateway.Svc.package -k Testing -v -d "\ProgramData\IoT Gateway Dev" -s Waher.IoTGateway.Svc.exe
+    /// </example>
     class Program
     {
         static int Main(string[] args)
@@ -199,6 +209,14 @@ namespace Waher.Utility.Install
             }
         }
 
+        private static AssemblyName GetAssemblyName(string ServerApplication)
+        {
+            if (ServerApplication.EndsWith(".exe", StringComparison.CurrentCultureIgnoreCase))
+                ServerApplication = ServerApplication.Substring(0, ServerApplication.Length - 4) + ".dll";
+
+            return AssemblyName.GetAssemblyName(ServerApplication);
+        }
+
         private static void Install(string ManifestFile, string ServerApplication, string ProgramDataFolder)
         {
             // Same code as for custom action InstallManifest in Waher.IoTGateway.Installers
@@ -219,7 +237,7 @@ namespace Waher.Utility.Install
                 throw new Exception("Server application not found: " + ServerApplication);
 
             Log.Informational("Getting assembly name of server.");
-            AssemblyName ServerName = AssemblyName.GetAssemblyName(ServerApplication);
+            AssemblyName ServerName = GetAssemblyName(ServerApplication);
             Log.Informational("Server assembly name: " + ServerName.ToString());
 
             string DepsJsonFileName;
@@ -415,8 +433,8 @@ namespace Waher.Utility.Install
 
         private enum CopyOptions
         {
-            IfNewer = 2,
-            Always = 3
+            IfNewer = 3,
+            Always = 4
         }
 
         private static void CopyContent(string SourceFolder, string AppFolder, string DataFolder, XmlElement Parent)
@@ -490,7 +508,7 @@ namespace Waher.Utility.Install
                 throw new Exception("Server application not found: " + ServerApplication);
 
             Log.Informational("Getting assembly name of server.");
-            AssemblyName ServerName = AssemblyName.GetAssemblyName(ServerApplication);
+            AssemblyName ServerName = GetAssemblyName(ServerApplication);
             Log.Informational("Server assembly name: " + ServerName.ToString());
 
             string DepsJsonFileName;
@@ -660,7 +678,7 @@ namespace Waher.Utility.Install
                 Aes.BlockSize = 128;
                 Aes.KeySize = 256;
                 Aes.Mode = CipherMode.CBC;
-                Aes.Padding = PaddingMode.ISO10126;
+                Aes.Padding = PaddingMode.Zeros;
 
                 fs = File.Create(PackageFile);
                 AesTransform = Aes.CreateEncryptor(AesKey, IV);
@@ -690,7 +708,7 @@ namespace Waher.Utility.Install
                     {
                         (string FileName, string SourceFileName) = GetFileName(E, SourceFolder);
 
-                        CopyFile(1, SourceFileName, Path.GetRelativePath(PackageFolder, SourceFileName), Compressed);
+                        CopyFile(2, SourceFileName, Path.GetRelativePath(PackageFolder, SourceFileName), Compressed);
 
                         if (FileName.EndsWith(".dll", StringComparison.CurrentCultureIgnoreCase))
                         {
@@ -749,7 +767,7 @@ namespace Waher.Utility.Install
 
             do
             {
-                b = (byte)(Len & 127);
+                b = (byte)(Len & 0x7f);
                 Len >>= 7;
                 if (Len > 0)
                     b |= 0x80;
@@ -767,7 +785,8 @@ namespace Waher.Utility.Install
 
             int c = (int)Len;
             byte[] Result = new byte[c];
-            Input.Read(Result, 0, c);
+            if (Input.Read(Result, 0, c) != c)
+                throw new EndOfStreamException("Reading past end-of-file.");
 
             return Result;
         }
@@ -780,8 +799,7 @@ namespace Waher.Utility.Install
 
             do
             {
-                Len <<= 7;
-                b = (byte)Input.ReadByte();
+                b = ReadByte(Input);
 
                 Len |= ((ulong)(b & 127)) << Offset;
                 Offset += 7;
@@ -789,6 +807,15 @@ namespace Waher.Utility.Install
             while ((b & 0x80) != 0);
 
             return Len;
+        }
+
+        private static byte ReadByte(Stream Input)
+        {
+            int i = Input.ReadByte();
+            if (i < 0)
+                throw new EndOfStreamException("Reading past end-of-file.");
+
+            return (byte)i;
         }
 
         private static void CopyContent(string SourceFolder, Stream Output, string PackageFolder, XmlElement Parent)
@@ -861,7 +888,7 @@ namespace Waher.Utility.Install
                 throw new Exception("Server application not found: " + ServerApplication);
 
             Log.Informational("Getting assembly name of server.");
-            AssemblyName ServerName = AssemblyName.GetAssemblyName(ServerApplication);
+            AssemblyName ServerName = GetAssemblyName(ServerApplication);
             Log.Informational("Server assembly name: " + ServerName.ToString());
 
             string DepsJsonFileName;
@@ -911,14 +938,14 @@ namespace Waher.Utility.Install
                 Aes.BlockSize = 128;
                 Aes.KeySize = 256;
                 Aes.Mode = CipherMode.CBC;
-                Aes.Padding = PaddingMode.ISO10126;
+                Aes.Padding = PaddingMode.Zeros;
 
-                fs = File.Create(PackageFile);
+                fs = File.OpenRead(PackageFile);
                 AesTransform = Aes.CreateDecryptor(AesKey, IV);
                 Decrypted = new CryptoStream(fs, AesTransform, CryptoStreamMode.Read);
                 Decompressed = new GZipStream(Decrypted, CompressionMode.Decompress);
 
-                byte b = (byte)Decompressed.ReadByte();
+                byte b = ReadByte(Decompressed);
                 byte[] Bin;
 
                 if (b > 0)
@@ -937,88 +964,101 @@ namespace Waher.Utility.Install
                 Log.Informational("Source folder: " + SourceFolder);
                 Log.Informational("App folder: " + AppFolder);
 
-                while ((b = (byte)Decrypted.ReadByte()) != 0)
+                while ((b = ReadByte(Decompressed)) != 0)
                 {
-                    string RelativeName = Encoding.UTF8.GetString(ReadBin(Decrypted));
-                    FileAttributes Attr = (FileAttributes)ReadVarLenUInt(Decrypted);
-                    DateTime CreationTimeUtc = new DateTime((long)ReadVarLenUInt(Decrypted));
-                    DateTime LastAccessTimeUtc = new DateTime((long)ReadVarLenUInt(Decrypted));
-                    DateTime LastWriteTimeUtc = new DateTime((long)ReadVarLenUInt(Decrypted));
-                    ulong Bytes = ReadVarLenUInt(Decrypted);
+                    string RelativeName = Encoding.UTF8.GetString(ReadBin(Decompressed));
+                    FileAttributes Attr = (FileAttributes)ReadVarLenUInt(Decompressed);
+                    DateTime CreationTimeUtc = new DateTime((long)ReadVarLenUInt(Decompressed));
+                    DateTime LastAccessTimeUtc = new DateTime((long)ReadVarLenUInt(Decompressed));
+                    DateTime LastWriteTimeUtc = new DateTime((long)ReadVarLenUInt(Decompressed));
+                    ulong Bytes = ReadVarLenUInt(Decompressed);
                     string FileName;
 
                     switch (b)
                     {
-                        case 1: // Assembly file
+                        case 1: // Program file in installation folder, not assembly file
+                        case 2: // Assembly file
                             FileName = Path.Combine(AppFolder, RelativeName);
-                            CopyFile(Decrypted, FileName, false, Bytes, Attr, CreationTimeUtc, LastAccessTimeUtc, LastWriteTimeUtc);
+                            CopyFile(Decompressed, FileName, false, Bytes, Attr, CreationTimeUtc, LastAccessTimeUtc, LastWriteTimeUtc);
 
-                            Assembly A = Assembly.LoadFrom(FileName);
-                            AssemblyName AN = A.GetName();
-
-                            if (Deps != null && Deps.TryGetValue("targets", out object Obj) && Obj is Dictionary<string, object> Targets)
+                            if (b == 2)
                             {
-                                foreach (KeyValuePair<string, object> P in Targets)
+                                Assembly A;
+
+                                try
                                 {
-                                    if (P.Value is Dictionary<string, object> Target)
+                                    A = Assembly.LoadFrom(FileName);
+                                }
+                                catch (Exception)
+                                {
+                                    break;  // Ignore. Not a valid assembly that needs to be registered in the deps.json file.
+                                }
+
+                                AssemblyName AN = A.GetName();
+
+                                if (Deps != null && Deps.TryGetValue("targets", out object Obj) && Obj is Dictionary<string, object> Targets)
+                                {
+                                    foreach (KeyValuePair<string, object> P in Targets)
                                     {
-                                        foreach (KeyValuePair<string, object> P2 in Target)
+                                        if (P.Value is Dictionary<string, object> Target)
                                         {
-                                            if (P2.Key.StartsWith(ServerName.Name + "/") &&
-                                                P2.Value is Dictionary<string, object> App &&
-                                                App.TryGetValue("dependencies", out object Obj2) &&
-                                                Obj2 is Dictionary<string, object> Dependencies)
+                                            foreach (KeyValuePair<string, object> P2 in Target)
                                             {
-                                                Dependencies[AN.Name] = AN.Version.ToString();
-                                                break;
+                                                if (P2.Key.StartsWith(ServerName.Name + "/") &&
+                                                    P2.Value is Dictionary<string, object> App &&
+                                                    App.TryGetValue("dependencies", out object Obj2) &&
+                                                    Obj2 is Dictionary<string, object> Dependencies)
+                                                {
+                                                    Dependencies[AN.Name] = AN.Version.ToString();
+                                                    break;
+                                                }
                                             }
-                                        }
 
-                                        Dictionary<string, object> Dependencies2 = new Dictionary<string, object>();
+                                            Dictionary<string, object> Dependencies2 = new Dictionary<string, object>();
 
-                                        foreach (AssemblyName Dependency in A.GetReferencedAssemblies())
-                                            Dependencies2[Dependency.Name] = Dependency.Version.ToString();
+                                            foreach (AssemblyName Dependency in A.GetReferencedAssemblies())
+                                                Dependencies2[Dependency.Name] = Dependency.Version.ToString();
 
-                                        Dictionary<string, object> Runtime = new Dictionary<string, object>()
+                                            Dictionary<string, object> Runtime = new Dictionary<string, object>()
                                         {
                                             { Path.GetFileName(FileName), new Dictionary<string,object>() }
                                         };
 
-                                        Target[AN.Name + "/" + AN.Version.ToString()] = new Dictionary<string, object>()
+                                            Target[AN.Name + "/" + AN.Version.ToString()] = new Dictionary<string, object>()
                                         {
                                             { "dependencies", Dependencies2 },
                                             { "runtime", Runtime }
                                         };
+                                        }
                                     }
                                 }
-                            }
 
-                            if (Deps != null && Deps.TryGetValue("libraries", out object Obj3) && Obj3 is Dictionary<string, object> Libraries)
-                            {
-                                foreach (KeyValuePair<string, object> P in Libraries)
+                                if (Deps != null && Deps.TryGetValue("libraries", out object Obj3) && Obj3 is Dictionary<string, object> Libraries)
                                 {
-                                    if (P.Key.StartsWith(AN.Name + "/"))
+                                    foreach (KeyValuePair<string, object> P in Libraries)
                                     {
-                                        Libraries.Remove(P.Key);
-                                        break;
+                                        if (P.Key.StartsWith(AN.Name + "/"))
+                                        {
+                                            Libraries.Remove(P.Key);
+                                            break;
+                                        }
                                     }
+
+                                    Libraries[AN.Name + "/" + AN.Version.ToString()] = new Dictionary<string, object>()
+                                    {
+                                        { "type", "project" },
+                                        { "serviceable", false },
+                                        { "sha512", string.Empty }
+                                    };
                                 }
-
-                                Libraries[AN.Name + "/" + AN.Version.ToString()] = new Dictionary<string, object>()
-                                {
-                                    { "type", "project" },
-                                    { "serviceable", false },
-                                    { "sha512", string.Empty }
-                                };
                             }
-
                             break;
 
-                        case 2: // Content file (copy if newer)
-                        case 3: // Content file (always copy)
-                            bool OnlyIfNewer = b == 2;
+                        case 3: // Content file (copy if newer)
+                        case 4: // Content file (always copy)
+                            bool OnlyIfNewer = b == 3;
                             string TempFileName = Path.GetTempFileName();
-                            CopyFile(Decrypted, TempFileName, false, Bytes, Attr, CreationTimeUtc, LastAccessTimeUtc, LastWriteTimeUtc);
+                            CopyFile(Decompressed, TempFileName, false, Bytes, Attr, CreationTimeUtc, LastAccessTimeUtc, LastWriteTimeUtc);
                             try
                             {
                                 using (FileStream TempFile = File.OpenRead(TempFileName))
@@ -1081,9 +1121,13 @@ namespace Waher.Utility.Install
             {
                 while (Bytes > 0)
                 {
-                    Input.Read(Buffer, 0, c);
-                    f.Write(Buffer, 0, c);
-                    Bytes -= (uint)c;
+                    int d = (int)Math.Min(Bytes, (ulong)c);
+
+                    if (Input.Read(Buffer, 0, d) != d)
+                        throw new EndOfStreamException("Reading past end-of-file.");
+
+                    f.Write(Buffer, 0, d);
+                    Bytes -= (uint)d;
                 }
             }
 
@@ -1113,7 +1157,7 @@ namespace Waher.Utility.Install
                 throw new Exception("Server application not found: " + ServerApplication);
 
             Log.Informational("Getting assembly name of server.");
-            AssemblyName ServerName = AssemblyName.GetAssemblyName(ServerApplication);
+            AssemblyName ServerName = GetAssemblyName(ServerApplication);
             Log.Informational("Server assembly name: " + ServerName.ToString());
 
             string DepsJsonFileName;
@@ -1163,14 +1207,14 @@ namespace Waher.Utility.Install
                 Aes.BlockSize = 128;
                 Aes.KeySize = 256;
                 Aes.Mode = CipherMode.CBC;
-                Aes.Padding = PaddingMode.ISO10126;
+                Aes.Padding = PaddingMode.Zeros;
 
-                fs = File.Create(PackageFile);
+                fs = File.OpenRead(PackageFile);
                 AesTransform = Aes.CreateDecryptor(AesKey, IV);
                 Decrypted = new CryptoStream(fs, AesTransform, CryptoStreamMode.Read);
                 Decompressed = new GZipStream(Decrypted, CompressionMode.Decompress);
 
-                byte b = (byte)Decompressed.ReadByte();
+                byte b = ReadByte(Decompressed);
                 byte[] Bin;
 
                 if (b > 0)
@@ -1188,14 +1232,14 @@ namespace Waher.Utility.Install
                 Log.Informational("App folder: " + AppFolder);
 
 
-                while ((b = (byte)Decrypted.ReadByte()) != 0)
+                while ((b = ReadByte(Decompressed)) != 0)
                 {
-                    string RelativeName = Encoding.UTF8.GetString(ReadBin(Decrypted));
-                    ReadVarLenUInt(Decrypted);
-                    ReadVarLenUInt(Decrypted);
-                    ReadVarLenUInt(Decrypted);
-                    ReadVarLenUInt(Decrypted);
-                    ulong Bytes = ReadVarLenUInt(Decrypted);
+                    string RelativeName = Encoding.UTF8.GetString(ReadBin(Decompressed));
+                    ReadVarLenUInt(Decompressed);
+                    ReadVarLenUInt(Decompressed);
+                    ReadVarLenUInt(Decompressed);
+                    ReadVarLenUInt(Decompressed);
+                    ulong Bytes = ReadVarLenUInt(Decompressed);
                     string FileName;
 
                     int c = Math.Min(65536, Bytes > int.MaxValue ? int.MaxValue : (int)Bytes);
@@ -1203,50 +1247,54 @@ namespace Waher.Utility.Install
 
                     while (Bytes > 0)
                     {
-                        Decrypted.Read(Buffer, 0, c);
+                        Decompressed.Read(Buffer, 0, c);
                         Bytes -= (uint)c;
                     }
 
                     switch (b)
                     {
-                        case 1: // Assembly file
+                        case 1: // Program file in installation folder, not assembly file
+                        case 2: // Assembly file
                             FileName = Path.Combine(AppFolder, RelativeName);
 
-                            Assembly A = Assembly.LoadFrom(FileName);
-                            AssemblyName AN = A.GetName();
-                            Key = AN.Name + "/" + AN.Version.ToString();
-
-                            if (Deps != null && Deps.TryGetValue("targets", out object Obj) && Obj is Dictionary<string, object> Targets)
+                            if (b == 2)
                             {
-                                Targets.Remove(Key);
+                                Assembly A = Assembly.LoadFrom(FileName);
+                                AssemblyName AN = A.GetName();
+                                Key = AN.Name + "/" + AN.Version.ToString();
 
-                                foreach (KeyValuePair<string, object> P in Targets)
+                                if (Deps != null && Deps.TryGetValue("targets", out object Obj) && Obj is Dictionary<string, object> Targets)
                                 {
-                                    if (P.Value is Dictionary<string, object> Target)
+                                    Targets.Remove(Key);
+
+                                    foreach (KeyValuePair<string, object> P in Targets)
                                     {
-                                        foreach (KeyValuePair<string, object> P2 in Target)
+                                        if (P.Value is Dictionary<string, object> Target)
                                         {
-                                            if (P2.Key.StartsWith(ServerName.Name + "/") &&
-                                                P2.Value is Dictionary<string, object> App &&
-                                                App.TryGetValue("dependencies", out object Obj2) &&
-                                                Obj2 is Dictionary<string, object> Dependencies)
+                                            foreach (KeyValuePair<string, object> P2 in Target)
                                             {
-                                                Dependencies.Remove(AN.Name);
-                                                break;
+                                                if (P2.Key.StartsWith(ServerName.Name + "/") &&
+                                                    P2.Value is Dictionary<string, object> App &&
+                                                    App.TryGetValue("dependencies", out object Obj2) &&
+                                                    Obj2 is Dictionary<string, object> Dependencies)
+                                                {
+                                                    Dependencies.Remove(AN.Name);
+                                                    break;
+                                                }
                                             }
                                         }
                                     }
                                 }
-                            }
 
-                            if (Deps != null && Deps.TryGetValue("libraries", out object Obj3) && Obj3 is Dictionary<string, object> Libraries)
-                            {
-                                foreach (KeyValuePair<string, object> P in Libraries)
+                                if (Deps != null && Deps.TryGetValue("libraries", out object Obj3) && Obj3 is Dictionary<string, object> Libraries)
                                 {
-                                    if (P.Key.StartsWith(AN.Name + "/"))
+                                    foreach (KeyValuePair<string, object> P in Libraries)
                                     {
-                                        Libraries.Remove(P.Key);
-                                        break;
+                                        if (P.Key.StartsWith(AN.Name + "/"))
+                                        {
+                                            Libraries.Remove(P.Key);
+                                            break;
+                                        }
                                     }
                                 }
                             }
@@ -1262,15 +1310,14 @@ namespace Waher.Utility.Install
                             }
                             break;
 
-                        case 2: // Content file (copy if newer)
-                        case 3: // Content file (always copy)
+                        case 3: // Content file (copy if newer)
+                        case 4: // Content file (always copy)
                             break;
 
                         default:
                             throw new Exception("Invalid package file.");
                     }
                 }
-
             }
             finally
             {

@@ -788,6 +788,14 @@ namespace Waher.IoTGateway.Installers
 
         #region From Waher.Utility.Install
 
+        private static AssemblyName GetAssemblyName(string ServerApplication)
+        {
+            if (ServerApplication.EndsWith(".exe", StringComparison.CurrentCultureIgnoreCase))
+                ServerApplication = ServerApplication.Substring(0, ServerApplication.Length - 4) + ".dll";
+
+            return AssemblyName.GetAssemblyName(ServerApplication);
+        }
+
         private static void Install(Session Session, string ManifestFile, string ServerApplication, string ProgramDataFolder)
         {
             // Same code as for custom action InstallManifest in Waher.IoTGateway.Installers
@@ -808,7 +816,7 @@ namespace Waher.IoTGateway.Installers
                 throw new Exception("Server application not found: " + ServerApplication);
 
             Session.Log("Getting assembly name of server.");
-            AssemblyName ServerName = AssemblyName.GetAssemblyName(ServerApplication);
+            AssemblyName ServerName = GetAssemblyName(ServerApplication);
             Session.Log("Server assembly name: " + ServerName.ToString());
 
             string DepsJsonFileName;
@@ -1070,7 +1078,7 @@ namespace Waher.IoTGateway.Installers
                 throw new Exception("Server application not found: " + ServerApplication);
 
             Session.Log("Getting assembly name of server.");
-            AssemblyName ServerName = AssemblyName.GetAssemblyName(ServerApplication);
+            AssemblyName ServerName = GetAssemblyName(ServerApplication);
             Session.Log("Server assembly name: " + ServerName.ToString());
 
             string DepsJsonFileName;

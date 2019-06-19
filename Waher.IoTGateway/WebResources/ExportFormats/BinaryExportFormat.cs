@@ -201,10 +201,9 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 				{
 					Type T = typeof(CryptoStream);
 					int i;
-					PropertyInfo PI = null;
 					FieldInfo FI = null;
 
-					PI = T.GetProperty("_inputBufferIndex", BindingFlags.Instance | BindingFlags.NonPublic);
+                    PropertyInfo PI = T.GetProperty("_inputBufferIndex", BindingFlags.Instance | BindingFlags.NonPublic);
 					if (PI is null)
 					{
 						FI = T.GetField("_inputBufferIndex", BindingFlags.Instance | BindingFlags.NonPublic);

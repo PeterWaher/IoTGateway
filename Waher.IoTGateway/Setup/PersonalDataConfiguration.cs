@@ -142,7 +142,9 @@ namespace Waher.IoTGateway.Setup
 
 			processingActivities = Activities.ToArray();
 
-			StringBuilder sb = new StringBuilder();
+			/* Removed since it might affect remote updates.
+             
+            StringBuilder sb = new StringBuilder();
 
 			foreach (IProcessingActivity A in processingActivities)
 			{
@@ -171,7 +173,7 @@ namespace Waher.IoTGateway.Setup
 				this.Updated = DateTime.Now;
 
 				await Database.Update(this);
-			}
+			}*/
 		}
 
 		/// <summary>

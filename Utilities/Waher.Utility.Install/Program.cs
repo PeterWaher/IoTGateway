@@ -868,6 +868,10 @@ namespace Waher.Utility.Install
             if (string.IsNullOrEmpty(AltFolder))
                 throw new Exception("File not found: " + AbsFileName);
 
+            AltFolder = Path.Combine(ReferenceFolder, AltFolder);
+            if (!Directory.Exists(AltFolder))
+                throw new Exception("Folder not found: " + AltFolder);
+
             AbsFileName = Path.Combine(AltFolder, FileName);
             if (File.Exists(AbsFileName))
                 return (FileName, AbsFileName);

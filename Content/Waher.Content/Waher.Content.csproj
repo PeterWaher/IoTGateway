@@ -17,7 +17,7 @@
     <AssemblyVersion>1.0.22</AssemblyVersion>
     <FileVersion>1.0.22</FileVersion>
     <Version>1.0.22</Version>
-    <PackageIconUrl>https://github.com/PeterWaher/IoTGateway/blob/master/Images/Icon.ico?raw=true</PackageIconUrl>
+    <PackageIconUrl>https://github.com/PeterWaher/IoTGateway/raw/master/Images/Icon.ico</PackageIconUrl>
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Content\Waher.Content\</UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>

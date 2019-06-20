@@ -8,7 +8,7 @@
     <owners>Waher Data AB</owners>
     <licenseUrl>https://github.com/PeterWaher/IoTGateway#license</licenseUrl>
     <projectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Networking/Waher.Events.XMPP.UWP</projectUrl>
-    <iconUrl>https://github.com/PeterWaher/IoTGateway/blob/master/Images/Icon.ico?raw=true</iconUrl>
+    <iconUrl>https://github.com/PeterWaher/IoTGateway/raw/master/Images/Icon.ico</iconUrl>
     <repository type="GitHub" url="https://github.com/PeterWaher/IoTGateway"/>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <description>Outputs events to the XMPP network using XEP-0337, for UWP.</description>

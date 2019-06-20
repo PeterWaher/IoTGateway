@@ -8,7 +8,7 @@
     <owners>Waher Data AB</owners>
     <licenseUrl>https://github.com/PeterWaher/IoTGateway#license</licenseUrl>
     <projectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Networking/Waher.Networking.LWM2M.UWP</projectUrl>
-    <iconUrl>https://github.com/PeterWaher/IoTGateway/blob/master/Images/Icon.ico?raw=true</iconUrl>
+    <iconUrl>https://github.com/PeterWaher/IoTGateway/raw/master/Images/Icon.ico</iconUrl>
     <repository type="GitHub" url="https://github.com/PeterWaher/IoTGateway"/>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <description>UWP class library that provides LWM2M interfaces for your application, using the CoAP library defined in Waher.Networking.CoAP.UWP.</description>

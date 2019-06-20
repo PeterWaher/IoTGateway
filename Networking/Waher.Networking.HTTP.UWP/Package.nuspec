@@ -8,7 +8,7 @@
     <owners>Waher Data AB</owners>
     <licenseUrl>https://github.com/PeterWaher/IoTGateway#license</licenseUrl>
     <projectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Networking/Waher.Networking.HTTP.UWP</projectUrl>
-    <iconUrl>https://github.com/PeterWaher/IoTGateway/blob/master/Images/Icon.ico?raw=true</iconUrl>
+    <iconUrl>https://github.com/PeterWaher/IoTGateway/raw/master/Images/Icon.ico</iconUrl>
     <repository type="GitHub" url="https://github.com/PeterWaher/IoTGateway"/>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <description>UWP class library providing a simple HTTP(S) server for publishing dynamic content and services, managing user authentication based on a customizable set of users and privileges. Supports the WebSocket protocol.</description>

@@ -8,7 +8,7 @@
     <owners>Waher Data AB</owners>
     <licenseUrl>https://github.com/PeterWaher/IoTGateway#license</licenseUrl>
     <projectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Security/Waher.Security.JWT.UWP</projectUrl>
-    <iconUrl>https://github.com/PeterWaher/IoTGateway/blob/master/Images/Icon.ico?raw=true</iconUrl>
+    <iconUrl>https://github.com/PeterWaher/IoTGateway/raw/master/Images/Icon.ico</iconUrl>
     <repository type="GitHub" url="https://github.com/PeterWaher/IoTGateway"/>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <description>Helps UWP applications with the creation and validation of Java Web Tokens (JWT), as defined in RFC 7519.</description>

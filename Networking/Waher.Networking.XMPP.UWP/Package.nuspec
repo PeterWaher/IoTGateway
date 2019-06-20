@@ -8,7 +8,7 @@
     <owners>Waher Data AB</owners>
     <licenseUrl>https://github.com/PeterWaher/IoTGateway#license</licenseUrl>
     <projectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Networking/Waher.Networking.XMPP.UWP</projectUrl>
-    <iconUrl>https://github.com/PeterWaher/IoTGateway/blob/master/Images/Icon.ico?raw=true</iconUrl>
+    <iconUrl>https://github.com/PeterWaher/IoTGateway/raw/master/Images/Icon.ico</iconUrl>
     <repository type="GitHub" url="https://github.com/PeterWaher/IoTGateway"/>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <description>Class library for communication using the XMPP protocol. Library contains both client-to-server and component-to-server communication classes. Classes can be extended freely by external modules.</description>

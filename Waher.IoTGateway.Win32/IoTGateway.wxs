@@ -803,10 +803,12 @@
               <File Id='Waher.Utility.Install.exe' Name='Waher.Utility.Install.exe' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Install\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.Install.exe' Vital='yes' KeyPath='yes'/>
               <File Id='Waher.Utility.Install.dll' Name='Waher.Utility.Install.dll' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Install\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.Install.dll' Vital='yes'/>
               <File Id='Waher.Utility.Install.deps.json' Name='Waher.Utility.Install.deps.json' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Install\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.Install.deps.json' Vital='yes'/>
+              <File Id='Waher.Utility.Install.manifest' Name='Waher.Utility.Install.manifest' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Install\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.Install.manifest' Vital='yes'/>
               <File Id='Waher.Utility.Install.runtimeconfig.json' Name='Waher.Utility.Install.runtimeconfig.json' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Install\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.Install.runtimeconfig.json' Vital='yes'/>
               <RemoveFile Id='RemoveWaher.Utility.Install.exe' Name='Waher.Utility.Install.exe' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Utility.Install.dll' Name='Waher.Utility.Install.dll' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Utility.Install.deps.json' Name='Waher.Utility.Install.deps.json' On='uninstall'/>
+              <RemoveFile Id='RemoveWaher.Utility.Install.manifest' Name='Waher.Utility.Install.manifest' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Utility.Install.runtimeconfig.json' Name='Waher.Utility.Install.runtimeconfig.json' On='uninstall'/>
             </Component>
             <Component Id='UtilityInstallDebugFiles' Guid='1DC3539C-A6C7-4351-B899-761A3A506B4A'>
@@ -1076,65 +1078,67 @@
                 <RemoveFile Id='RemoveHighlight.js_README.ru.md' Name='README.ru.md' On='uninstall'/>
               </Component>
             </Directory>
+            <Directory Id='AcmeUtility' Name='AcmeUtility'>
+              <Component Id='UtilityAcme' Guid='24AA0371-FFB4-4EF6-B288-593BFBCDBC07'>
+                <File Id='Waher.Utility.Acme.exe' Name='Waher.Utility.Acme.exe' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Acme\bin\$(var.Configuration)\Waher.Utility.Acme.exe' Vital='yes' KeyPath='yes'/>
+                <File Id='Waher.Utility.Acme.exe.config' Name='Waher.Utility.Acme.exe.config' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Acme\bin\$(var.Configuration)\Waher.Utility.Acme.exe.config' Vital='yes'/>
+                <File Id='Acme_System.Net.Http.dll' Name='System.Net.Http.dll' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Acme\bin\$(var.Configuration)\System.Net.Http.dll' Vital='yes'/>
+                <File Id='Acme_System.Security.Cryptography.Algorithms.dll' Name='System.Security.Cryptography.Algorithms.dll' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Acme\bin\$(var.Configuration)\System.Security.Cryptography.Algorithms.dll' Vital='yes'/>
+                <File Id='Acme_System.Security.Cryptography.Csp.dll' Name='System.Security.Cryptography.Csp.dll' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Acme\bin\$(var.Configuration)\System.Security.Cryptography.Csp.dll' Vital='yes'/>
+                <File Id='Acme_System.Security.Cryptography.Encoding.dll' Name='System.Security.Cryptography.Encoding.dll' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Acme\bin\$(var.Configuration)\System.Security.Cryptography.Encoding.dll' Vital='yes'/>
+                <File Id='Acme_System.Security.Cryptography.Primitives.dll' Name='System.Security.Cryptography.Primitives.dll' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Acme\bin\$(var.Configuration)\System.Security.Cryptography.Primitives.dll' Vital='yes'/>
+                <File Id='Acme_System.Security.Cryptography.X509Certificates.dll' Name='System.Security.Cryptography.X509Certificates.dll' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Acme\bin\$(var.Configuration)\System.Security.Cryptography.X509Certificates.dll' Vital='yes'/>
+                <File Id='Acme_Waher.Content.dll' Name='Waher.Content.dll' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Acme\bin\$(var.Configuration)\Waher.Content.dll' Vital='yes'/>
+                <File Id='Acme_Waher.Content.pdb' Name='Waher.Content.pdb' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Acme\bin\$(var.Configuration)\Waher.Content.pdb' Vital='yes'/>
+                <File Id='Acme_Waher.Content.Xml.dll' Name='Waher.Content.Xml.dll' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Acme\bin\$(var.Configuration)\Waher.Content.Xml.dll' Vital='yes'/>
+                <File Id='Acme_Waher.Content.Xml.pdb' Name='Waher.Content.Xml.pdb' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Acme\bin\$(var.Configuration)\Waher.Content.Xml.pdb' Vital='yes'/>
+                <File Id='Acme_Waher.Events.dll' Name='Waher.Events.dll' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Acme\bin\$(var.Configuration)\Waher.Events.dll' Vital='yes'/>
+                <File Id='Acme_Waher.Events.pdb' Name='Waher.Events.pdb' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Acme\bin\$(var.Configuration)\Waher.Events.pdb' Vital='yes'/>
+                <File Id='Acme_Waher.Runtime.Inventory.dll' Name='Waher.Runtime.Inventory.dll' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Acme\bin\$(var.Configuration)\Waher.Runtime.Inventory.dll' Vital='yes'/>
+                <File Id='Acme_Waher.Runtime.Inventory.pdb' Name='Waher.Runtime.Inventory.pdb' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Acme\bin\$(var.Configuration)\Waher.Runtime.Inventory.pdb' Vital='yes'/>
+                <File Id='Acme_Waher.Script.dll' Name='Waher.Script.dll' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Acme\bin\$(var.Configuration)\Waher.Script.dll' Vital='yes'/>
+                <File Id='Acme_Waher.Script.pdb' Name='Waher.Script.pdb' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Acme\bin\$(var.Configuration)\Waher.Script.pdb' Vital='yes'/>
+                <File Id='Acme_Waher.Security.dll' Name='Waher.Security.dll' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Acme\bin\$(var.Configuration)\Waher.Security.dll' Vital='yes'/>
+                <File Id='Acme_Waher.Security.pdb' Name='Waher.Security.pdb' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Acme\bin\$(var.Configuration)\Waher.Security.pdb' Vital='yes'/>
+                <File Id='Acme_Waher.Security.ACME.dll' Name='Waher.Security.ACME.dll' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Acme\bin\$(var.Configuration)\Waher.Security.ACME.dll' Vital='yes'/>
+                <File Id='Acme_Waher.Security.ACME.pdb' Name='Waher.Security.ACME.pdb' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Acme\bin\$(var.Configuration)\Waher.Security.ACME.pdb' Vital='yes'/>
+                <File Id='Acme_Waher.Security.JWS.dll' Name='Waher.Security.JWS.dll' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Acme\bin\$(var.Configuration)\Waher.Security.JWS.dll' Vital='yes'/>
+                <File Id='Acme_Waher.Security.JWS.pdb' Name='Waher.Security.JWS.pdb' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Acme\bin\$(var.Configuration)\Waher.Security.JWS.pdb' Vital='yes'/>
+                <File Id='Acme_Waher.Security.PKCS.dll' Name='Waher.Security.PKCS.dll' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Acme\bin\$(var.Configuration)\Waher.Security.PKCS.dll' Vital='yes'/>
+                <RemoveFile Id='RemoveWaher.Utility.Acme.exe' Name='Waher.Utility.Acme.exe' On='uninstall'/>
+                <RemoveFile Id='RemoveWaher.Utility.Acme.exe.config' Name='Waher.Utility.Acme.exe.config' On='uninstall'/>
+                <RemoveFile Id='RemoveAcme_System.Net.Http.dll' Name='System.Net.Http.dll' On='uninstall'/>
+                <RemoveFile Id='RemoveAcme_System.Security.Cryptography.Algorithms.dll' Name='System.Security.Cryptography.Algorithms.dll' On='uninstall'/>
+                <RemoveFile Id='RemoveAcme_System.Security.Cryptography.Csp.dll' Name='System.Security.Cryptography.Csp.dll' On='uninstall'/>
+                <RemoveFile Id='RemoveAcme_System.Security.Cryptography.Encoding.dll' Name='System.Security.Cryptography.Encoding.dll' On='uninstall'/>
+                <RemoveFile Id='RemoveAcme_System.Security.Cryptography.Primitives.dll' Name='System.Security.Cryptography.Primitives.dll' On='uninstall'/>
+                <RemoveFile Id='RemoveAcme_System.Security.Cryptography.X509Certificates.dll' Name='System.Security.Cryptography.X509Certificates.dll' On='uninstall'/>
+                <RemoveFile Id='RemoveAcme_Waher.Content.dll' Name='Waher.Content.dll' On='uninstall'/>
+                <RemoveFile Id='RemoveAcme_Waher.Content.pdb' Name='Waher.Content.pdb' On='uninstall'/>
+                <RemoveFile Id='RemoveAcme_Waher.Content.Xml.dll' Name='Waher.Content.Xml.dll' On='uninstall'/>
+                <RemoveFile Id='RemoveAcme_Waher.Content.Xml.pdb' Name='Waher.Content.Xml.pdb' On='uninstall'/>
+                <RemoveFile Id='RemoveAcme_Waher.Events.dll' Name='Waher.Events.dll' On='uninstall'/>
+                <RemoveFile Id='RemoveAcme_Waher.Events.pdb' Name='Waher.Events.pdb' On='uninstall'/>
+                <RemoveFile Id='RemoveAcme_Waher.Runtime.Inventory.dll' Name='Waher.Runtime.Inventory.dll' On='uninstall'/>
+                <RemoveFile Id='RemoveAcme_Waher.Runtime.Inventory.pdb' Name='Waher.Runtime.Inventory.pdb' On='uninstall'/>
+                <RemoveFile Id='RemoveAcme_Waher.Script.dll' Name='Waher.Script.dll' On='uninstall'/>
+                <RemoveFile Id='RemoveAcme_Waher.Script.pdb' Name='Waher.Script.pdb' On='uninstall'/>
+                <RemoveFile Id='RemoveAcme_Waher.Security.dll' Name='Waher.Security.dll' On='uninstall'/>
+                <RemoveFile Id='RemoveAcme_Waher.Security.pdb' Name='Waher.Security.pdb' On='uninstall'/>
+                <RemoveFile Id='RemoveAcme_Waher.Security.ACME.dll' Name='Waher.Security.ACME.dll' On='uninstall'/>
+                <RemoveFile Id='RemoveAcme_Waher.Security.ACME.pdb' Name='Waher.Security.ACME.pdb' On='uninstall'/>
+                <RemoveFile Id='RemoveAcme_Waher.Security.JWS.dll' Name='Waher.Security.JWS.dll' On='uninstall'/>
+                <RemoveFile Id='RemoveAcme_Waher.Security.JWS.pdb' Name='Waher.Security.JWS.pdb' On='uninstall'/>
+                <RemoveFile Id='RemoveAcme_Waher.Security.PKCS.dll' Name='Waher.Security.PKCS.dll' On='uninstall'/>
+              </Component>
+              <Component Id='UtilityAcmeDebugFiles' Guid='9AF24263-A6A4-40B6-9CC1-EE03E0B69E88'>
+                <File Id='Waher.Utility.Acme.pdb' Name='Waher.Utility.Acme.pdb' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Acme\bin\$(var.Configuration)\Waher.Utility.Acme.pdb' Vital='yes' KeyPath='yes'/>
+                <RemoveFile Id='RemoveWaher.Utility.Acme.pdb' Name='Waher.Utility.Acme.pdb' On='uninstall'/>
+              </Component>
+            </Directory>
+            <Directory Id='InstallUtility' Name='InstallUtility'>
+            </Directory>
           </Directory>
-					<Directory Id='AcmeUtility' Name='AcmeUtility'>
-						<Component Id='UtilityAcme' Guid='24AA0371-FFB4-4EF6-B288-593BFBCDBC07'>
-							<File Id='Waher.Utility.Acme.exe' Name='Waher.Utility.Acme.exe' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Acme\bin\$(var.Configuration)\Waher.Utility.Acme.exe' Vital='yes' KeyPath='yes'/>
-							<File Id='Waher.Utility.Acme.exe.config' Name='Waher.Utility.Acme.exe.config' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Acme\bin\$(var.Configuration)\Waher.Utility.Acme.exe.config' Vital='yes'/>
-							<File Id='Acme_System.Net.Http.dll' Name='System.Net.Http.dll' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Acme\bin\$(var.Configuration)\System.Net.Http.dll' Vital='yes'/>
-							<File Id='Acme_System.Security.Cryptography.Algorithms.dll' Name='System.Security.Cryptography.Algorithms.dll' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Acme\bin\$(var.Configuration)\System.Security.Cryptography.Algorithms.dll' Vital='yes'/>
-							<File Id='Acme_System.Security.Cryptography.Csp.dll' Name='System.Security.Cryptography.Csp.dll' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Acme\bin\$(var.Configuration)\System.Security.Cryptography.Csp.dll' Vital='yes'/>
-							<File Id='Acme_System.Security.Cryptography.Encoding.dll' Name='System.Security.Cryptography.Encoding.dll' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Acme\bin\$(var.Configuration)\System.Security.Cryptography.Encoding.dll' Vital='yes'/>
-							<File Id='Acme_System.Security.Cryptography.Primitives.dll' Name='System.Security.Cryptography.Primitives.dll' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Acme\bin\$(var.Configuration)\System.Security.Cryptography.Primitives.dll' Vital='yes'/>
-							<File Id='Acme_System.Security.Cryptography.X509Certificates.dll' Name='System.Security.Cryptography.X509Certificates.dll' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Acme\bin\$(var.Configuration)\System.Security.Cryptography.X509Certificates.dll' Vital='yes'/>
-							<File Id='Acme_Waher.Content.dll' Name='Waher.Content.dll' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Acme\bin\$(var.Configuration)\Waher.Content.dll' Vital='yes'/>
-							<File Id='Acme_Waher.Content.pdb' Name='Waher.Content.pdb' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Acme\bin\$(var.Configuration)\Waher.Content.pdb' Vital='yes'/>
-							<File Id='Acme_Waher.Content.Xml.dll' Name='Waher.Content.Xml.dll' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Acme\bin\$(var.Configuration)\Waher.Content.Xml.dll' Vital='yes'/>
-							<File Id='Acme_Waher.Content.Xml.pdb' Name='Waher.Content.Xml.pdb' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Acme\bin\$(var.Configuration)\Waher.Content.Xml.pdb' Vital='yes'/>
-							<File Id='Acme_Waher.Events.dll' Name='Waher.Events.dll' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Acme\bin\$(var.Configuration)\Waher.Events.dll' Vital='yes'/>
-							<File Id='Acme_Waher.Events.pdb' Name='Waher.Events.pdb' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Acme\bin\$(var.Configuration)\Waher.Events.pdb' Vital='yes'/>
-							<File Id='Acme_Waher.Runtime.Inventory.dll' Name='Waher.Runtime.Inventory.dll' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Acme\bin\$(var.Configuration)\Waher.Runtime.Inventory.dll' Vital='yes'/>
-							<File Id='Acme_Waher.Runtime.Inventory.pdb' Name='Waher.Runtime.Inventory.pdb' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Acme\bin\$(var.Configuration)\Waher.Runtime.Inventory.pdb' Vital='yes'/>
-							<File Id='Acme_Waher.Script.dll' Name='Waher.Script.dll' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Acme\bin\$(var.Configuration)\Waher.Script.dll' Vital='yes'/>
-							<File Id='Acme_Waher.Script.pdb' Name='Waher.Script.pdb' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Acme\bin\$(var.Configuration)\Waher.Script.pdb' Vital='yes'/>
-							<File Id='Acme_Waher.Security.dll' Name='Waher.Security.dll' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Acme\bin\$(var.Configuration)\Waher.Security.dll' Vital='yes'/>
-							<File Id='Acme_Waher.Security.pdb' Name='Waher.Security.pdb' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Acme\bin\$(var.Configuration)\Waher.Security.pdb' Vital='yes'/>
-							<File Id='Acme_Waher.Security.ACME.dll' Name='Waher.Security.ACME.dll' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Acme\bin\$(var.Configuration)\Waher.Security.ACME.dll' Vital='yes'/>
-							<File Id='Acme_Waher.Security.ACME.pdb' Name='Waher.Security.ACME.pdb' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Acme\bin\$(var.Configuration)\Waher.Security.ACME.pdb' Vital='yes'/>
-							<File Id='Acme_Waher.Security.JWS.dll' Name='Waher.Security.JWS.dll' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Acme\bin\$(var.Configuration)\Waher.Security.JWS.dll' Vital='yes'/>
-							<File Id='Acme_Waher.Security.JWS.pdb' Name='Waher.Security.JWS.pdb' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Acme\bin\$(var.Configuration)\Waher.Security.JWS.pdb' Vital='yes'/>
-							<File Id='Acme_Waher.Security.PKCS.dll' Name='Waher.Security.PKCS.dll' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Acme\bin\$(var.Configuration)\Waher.Security.PKCS.dll' Vital='yes'/>
-							<RemoveFile Id='RemoveWaher.Utility.Acme.exe' Name='Waher.Utility.Acme.exe' On='uninstall'/>
-							<RemoveFile Id='RemoveWaher.Utility.Acme.exe.config' Name='Waher.Utility.Acme.exe.config' On='uninstall'/>
-							<RemoveFile Id='RemoveAcme_System.Net.Http.dll' Name='System.Net.Http.dll' On='uninstall'/>
-							<RemoveFile Id='RemoveAcme_System.Security.Cryptography.Algorithms.dll' Name='System.Security.Cryptography.Algorithms.dll' On='uninstall'/>
-							<RemoveFile Id='RemoveAcme_System.Security.Cryptography.Csp.dll' Name='System.Security.Cryptography.Csp.dll' On='uninstall'/>
-							<RemoveFile Id='RemoveAcme_System.Security.Cryptography.Encoding.dll' Name='System.Security.Cryptography.Encoding.dll' On='uninstall'/>
-							<RemoveFile Id='RemoveAcme_System.Security.Cryptography.Primitives.dll' Name='System.Security.Cryptography.Primitives.dll' On='uninstall'/>
-							<RemoveFile Id='RemoveAcme_System.Security.Cryptography.X509Certificates.dll' Name='System.Security.Cryptography.X509Certificates.dll' On='uninstall'/>
-							<RemoveFile Id='RemoveAcme_Waher.Content.dll' Name='Waher.Content.dll' On='uninstall'/>
-							<RemoveFile Id='RemoveAcme_Waher.Content.pdb' Name='Waher.Content.pdb' On='uninstall'/>
-							<RemoveFile Id='RemoveAcme_Waher.Content.Xml.dll' Name='Waher.Content.Xml.dll' On='uninstall'/>
-							<RemoveFile Id='RemoveAcme_Waher.Content.Xml.pdb' Name='Waher.Content.Xml.pdb' On='uninstall'/>
-							<RemoveFile Id='RemoveAcme_Waher.Events.dll' Name='Waher.Events.dll' On='uninstall'/>
-							<RemoveFile Id='RemoveAcme_Waher.Events.pdb' Name='Waher.Events.pdb' On='uninstall'/>
-							<RemoveFile Id='RemoveAcme_Waher.Runtime.Inventory.dll' Name='Waher.Runtime.Inventory.dll' On='uninstall'/>
-							<RemoveFile Id='RemoveAcme_Waher.Runtime.Inventory.pdb' Name='Waher.Runtime.Inventory.pdb' On='uninstall'/>
-							<RemoveFile Id='RemoveAcme_Waher.Script.dll' Name='Waher.Script.dll' On='uninstall'/>
-							<RemoveFile Id='RemoveAcme_Waher.Script.pdb' Name='Waher.Script.pdb' On='uninstall'/>
-							<RemoveFile Id='RemoveAcme_Waher.Security.dll' Name='Waher.Security.dll' On='uninstall'/>
-							<RemoveFile Id='RemoveAcme_Waher.Security.pdb' Name='Waher.Security.pdb' On='uninstall'/>
-							<RemoveFile Id='RemoveAcme_Waher.Security.ACME.dll' Name='Waher.Security.ACME.dll' On='uninstall'/>
-							<RemoveFile Id='RemoveAcme_Waher.Security.ACME.pdb' Name='Waher.Security.ACME.pdb' On='uninstall'/>
-							<RemoveFile Id='RemoveAcme_Waher.Security.JWS.dll' Name='Waher.Security.JWS.dll' On='uninstall'/>
-							<RemoveFile Id='RemoveAcme_Waher.Security.JWS.pdb' Name='Waher.Security.JWS.pdb' On='uninstall'/>
-							<RemoveFile Id='RemoveAcme_Waher.Security.PKCS.dll' Name='Waher.Security.PKCS.dll' On='uninstall'/>
-						</Component>
-						<Component Id='UtilityAcmeDebugFiles' Guid='9AF24263-A6A4-40B6-9CC1-EE03E0B69E88'>
-							<File Id='Waher.Utility.Acme.pdb' Name='Waher.Utility.Acme.pdb' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Acme\bin\$(var.Configuration)\Waher.Utility.Acme.pdb' Vital='yes' KeyPath='yes'/>
-							<RemoveFile Id='RemoveWaher.Utility.Acme.pdb' Name='Waher.Utility.Acme.pdb' On='uninstall'/>
-						</Component>
-					</Directory>
         </Directory>
       </Directory>
       <Directory Id='CommonAppDataFolder' Name='CommonAppData'>

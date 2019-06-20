@@ -24,6 +24,10 @@
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Schema\Manifest.xsd" />
+    <None Remove="Waher.Utility.Install.manifest" />
+    <Content Include="Waher.Utility.Install.manifest">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="..\..\LICENSE.txt">
       <Pack>True</Pack>
       <PackagePath></PackagePath>

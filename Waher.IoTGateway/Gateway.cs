@@ -251,10 +251,15 @@ namespace Waher.IoTGateway
 				string[] ManifestFiles = Directory.GetFiles(runtimeFolder, "*.manifest", SearchOption.TopDirectoryOnly);
 				Dictionary<string, CopyOptions> ContentOptions = new Dictionary<string, CopyOptions>();
 
-				foreach (string ManifestFile in ManifestFiles)
-					CheckContentFiles(ManifestFile, ContentOptions);
+                foreach (string ManifestFile in ManifestFiles)
+                {
+                    CheckContentFiles(ManifestFile, ContentOptions);
 
-				Types.SetModuleParameter("AppData", appDataFolder);
+                    if (ManifestFile.EndsWith("Waher.Utility.Install.manifest"))
+                        CheckInstallUtilityFiles(ManifestFile);
+                }
+
+                Types.SetModuleParameter("AppData", appDataFolder);
 				Types.SetModuleParameter("Root", rootFolder);
 
 				scheduler = new Scheduler();
@@ -896,7 +901,66 @@ namespace Waher.IoTGateway
 			}
 		}
 
-		internal static bool ConsoleOutput => consoleOutput;
+        private static void CheckInstallUtilityFiles(string ManifestFileName)
+        {
+            try
+            {
+                XmlDocument Doc = new XmlDocument();
+                Doc.Load(ManifestFileName);
+
+                if (Doc.DocumentElement != null && Doc.DocumentElement.LocalName == "Module" && Doc.DocumentElement.NamespaceURI == "http://waher.se/Schema/ModuleManifest.xsd")
+                {
+                    string InstallUtilityFolder = Path.Combine(runtimeFolder, "InstallUtility");
+                    bool NoticeLogged = false;
+
+                    if (!Directory.Exists(InstallUtilityFolder))
+                        Directory.CreateDirectory(InstallUtilityFolder);
+
+                    foreach (XmlNode N in Doc.DocumentElement.ChildNodes)
+                    {
+                        if (N is XmlElement E)
+                        {
+                            switch (E.LocalName)
+                            {
+                                case "Assembly":
+                                    string Name = XML.Attribute(E, "fileName");
+                                    CopyOptions CopyOptions = (CopyOptions)XML.Attribute(E, "copy", CopyOptions.IfNewer);
+
+                                    string s = Path.Combine(runtimeFolder, Name);
+                                    if (!File.Exists(s))
+                                        break;
+
+                                    string s2 = Path.Combine(InstallUtilityFolder, Name);
+
+                                    if (CopyOptions == CopyOptions.IfNewer && File.Exists(s2))
+                                    {
+                                        DateTime TP = File.GetLastWriteTime(s);
+                                        DateTime TP2 = File.GetLastWriteTime(s2);
+
+                                        if (TP <= TP2)
+                                            break;
+                                    }
+
+                                    if (!NoticeLogged)
+                                    {
+                                        NoticeLogged = true;
+                                        Log.Notice("Copying Installation Utility executable files to InstallUtility subfolder.");
+                                    }
+
+                                    File.Copy(s, s2, true);
+                                    break;
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Critical(ex, ManifestFileName);
+            }
+        }
+
+        internal static bool ConsoleOutput => consoleOutput;
 
 		internal static Task ConfigureXmpp(XmppConfiguration Configuration)
 		{

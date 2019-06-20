@@ -21,6 +21,8 @@ namespace Waher.Utility.Install
     /// Command line switches:
     /// 
     /// -m MANIFEST_FILE     Points to a manifest file describing the files in the module.
+    ///                      If multiple manifest files are referened, they are processed
+    ///                      in the order they are listed.
     /// -p PACKAGE_FILE      If provided together with a manifest file, files will be
     ///                      packed into a package file that can be easily distributed,
     ///                      instead of being installed on the local machine.
@@ -56,7 +58,7 @@ namespace Waher.Utility.Install
         {
             try
             {
-                string ManifestFile = null;
+                List<string> ManifestFiles = new List<string>();
                 string ProgramDataFolder = null;
                 string ServerApplication = null;
                 string PackageFile = null;
@@ -79,10 +81,7 @@ namespace Waher.Utility.Install
                             if (i >= c)
                                 throw new Exception("Missing manifest file.");
 
-                            if (string.IsNullOrEmpty(ManifestFile))
-                                ManifestFile = args[i++];
-                            else
-                                throw new Exception("Only one manifest file allowed.");
+                            ManifestFiles.Add(args[i++]);
                             break;
 
                         case "-d":
@@ -153,6 +152,8 @@ namespace Waher.Utility.Install
                 if (Help || c == 0)
                 {
                     Console.Out.WriteLine("-m MANIFEST_FILE     Points to a manifest file describing the files in the module.");
+                    Console.Out.WriteLine("                     If multiple manifest files are referened, they are processed");
+                    Console.Out.WriteLine("                     in the order they are listed.");
                     Console.Out.WriteLine("-p PACKAGE_FILE      If provided together with a manifest file, files will be");
                     Console.Out.WriteLine("                     packed into a package file that can be easily distributed,");
                     Console.Out.WriteLine("                     instead of being installed on the local machine.");
@@ -179,7 +180,7 @@ namespace Waher.Utility.Install
 
                 if (!string.IsNullOrEmpty(PackageFile))
                 {
-                    if (string.IsNullOrEmpty(ManifestFile))
+                    if (ManifestFiles.Count == 0)
                     {
                         if (UninstallService)
                             UninstallPackage(PackageFile, Key, ServerApplication, ProgramDataFolder, RemoveFiles);
@@ -187,12 +188,18 @@ namespace Waher.Utility.Install
                             InstallPackage(PackageFile, Key, ServerApplication, ProgramDataFolder);
                     }
                     else
-                        GeneratePackage(ManifestFile, PackageFile, Key);
+                        GeneratePackage(ManifestFiles.ToArray(), PackageFile, Key);
                 }
-                else if (UninstallService)
-                    Uninstall(ManifestFile, ServerApplication, ProgramDataFolder, RemoveFiles);
                 else
-                    Install(ManifestFile, ServerApplication, ProgramDataFolder);
+                {
+                    foreach (string ManifestFile in ManifestFiles)
+                    {
+                        if (UninstallService)
+                            Uninstall(ManifestFile, ServerApplication, ProgramDataFolder, RemoveFiles);
+                        else
+                            Install(ManifestFile, ServerApplication, ProgramDataFolder);
+                    }
+                }
 
                 return 0;
             }
@@ -629,30 +636,12 @@ namespace Waher.Utility.Install
             return true;
         }
 
-        private static void GeneratePackage(string ManifestFile, string PackageFile, string Key)
+        private static void GeneratePackage(string[] ManifestFiles, string PackageFile, string Key)
         {
             // Same code as for custom action InstallManifest in Waher.IoTGateway.Installers
 
-            if (string.IsNullOrEmpty(ManifestFile))
-                throw new Exception("Missing manifest file.");
-
             if (string.IsNullOrEmpty(PackageFile))
                 throw new Exception("Missing package file.");
-
-            Log.Informational("Loading manifest file.");
-
-            XmlDocument Manifest = new XmlDocument();
-            Manifest.Load(ManifestFile);
-
-            Log.Informational("Validating manifest file.");
-
-            XmlSchema Schema = XSL.LoadSchema(typeof(Program).Namespace + ".Schema.Manifest.xsd", Assembly.GetExecutingAssembly());
-            XSL.Validate(ManifestFile, Manifest, "Module", "http://waher.se/Schema/ModuleManifest.xsd", Schema);
-
-            XmlElement Module = Manifest["Module"];
-            string SourceFolder = Path.GetDirectoryName(ManifestFile);
-
-            Log.Informational("Source folder: " + SourceFolder);
 
             string LocalName = Path.GetFileName(PackageFile);
             string PackageFolder = Path.GetDirectoryName(PackageFile);
@@ -700,26 +689,44 @@ namespace Waher.Utility.Install
                     WriteBin(Encoding.ASCII.GetBytes("IoTGatewayPackage"), Compressed);
                 }
 
-                CopyFile(1, ManifestFile, Path.GetFileName(ManifestFile), Compressed);
-
-                foreach (XmlNode N in Module.ChildNodes)
+                foreach (string ManifestFile in ManifestFiles)
                 {
-                    if (N is XmlElement E && E.LocalName == "Assembly")
+                    Log.Informational("Loading manifest file.");
+
+                    XmlDocument Manifest = new XmlDocument();
+                    Manifest.Load(ManifestFile);
+
+                    Log.Informational("Validating manifest file.");
+
+                    XmlSchema Schema = XSL.LoadSchema(typeof(Program).Namespace + ".Schema.Manifest.xsd", Assembly.GetExecutingAssembly());
+                    XSL.Validate(ManifestFile, Manifest, "Module", "http://waher.se/Schema/ModuleManifest.xsd", Schema);
+
+                    XmlElement Module = Manifest["Module"];
+                    string SourceFolder = Path.GetDirectoryName(ManifestFile);
+
+                    Log.Informational("Source folder: " + SourceFolder);
+
+                    CopyFile(1, ManifestFile, Path.GetFileName(ManifestFile), Compressed);
+
+                    foreach (XmlNode N in Module.ChildNodes)
                     {
-                        (string FileName, string SourceFileName) = GetFileName(E, SourceFolder);
-
-                        CopyFile(2, SourceFileName, Path.GetRelativePath(PackageFolder, SourceFileName), Compressed);
-
-                        if (FileName.EndsWith(".dll", StringComparison.CurrentCultureIgnoreCase))
+                        if (N is XmlElement E && E.LocalName == "Assembly")
                         {
-                            string PdbFileName = FileName.Substring(0, FileName.Length - 4) + ".pdb";
-                            if (File.Exists(PdbFileName))
-                                CopyFile(1, PdbFileName, Path.GetRelativePath(PackageFolder, PdbFileName), Compressed);
+                            (string FileName, string SourceFileName) = GetFileName(E, SourceFolder);
+
+                            CopyFile(2, SourceFileName, Path.GetRelativePath(PackageFolder, SourceFileName), Compressed);
+
+                            if (FileName.EndsWith(".dll", StringComparison.CurrentCultureIgnoreCase))
+                            {
+                                string PdbFileName = FileName.Substring(0, FileName.Length - 4) + ".pdb";
+                                if (File.Exists(PdbFileName))
+                                    CopyFile(1, PdbFileName, Path.GetRelativePath(PackageFolder, PdbFileName), Compressed);
+                            }
                         }
                     }
-                }
 
-                CopyContent(SourceFolder, Compressed, PackageFolder, Module);
+                    CopyContent(SourceFolder, Compressed, PackageFolder, Module);
+                }
 
                 Compressed.WriteByte(0);
             }

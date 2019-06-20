@@ -1570,7 +1570,6 @@ namespace Waher.Persistence.Files
             BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Block, this.blockLimit);
             object ObjectId;
             int Len;
-            int Pos;
             uint ChildLink;
 
             BlockHeader.SkipHeader(Reader);
@@ -4506,8 +4505,6 @@ namespace Waher.Persistence.Files
             BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Info.Block, this.blockLimit, BlockHeaderSize);
             ulong Rank = 0;
             int Len;
-            int Pos;
-            int c;
             uint BlockLink;
             object ObjectId2;
             bool IsEmpty;

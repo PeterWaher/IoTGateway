@@ -2,7 +2,7 @@
 Description: List of emojis supported by IoT Gateway Markdown.
 Date: 2016-02-05
 Author: Peter Waher
-Copyright: Copyright.md
+Copyright: /Copyright.md
 Master: /Master.md
 
 =========================================================================================================================================

@@ -2,7 +2,7 @@
 Description: Script syntax reference, as understood by the IoT Gateway.
 Date: 2016-02-26
 Author: Peter Waher
-Copyright: Copyright.md
+Copyright: /Copyright.md
 Master: /Master.md
 
 Script syntax reference

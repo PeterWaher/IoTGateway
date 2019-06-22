@@ -2,7 +2,7 @@
 Description: List of HTML entities understood by IoT Gateway Markdown.
 Date: 2016-08-22
 Author: Peter Waher
-Copyright: Copyright.md
+Copyright: /Copyright.md
 Master: /Master.md
 
 =========================================================================================================================================

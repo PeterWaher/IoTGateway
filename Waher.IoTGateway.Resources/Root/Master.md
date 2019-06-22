@@ -2,7 +2,7 @@ Title: IoT Gateway Menu
 Description: Main menu of the IoT Gateway
 Date: 2016-02-08
 Author: Peter Waher
-Copyright: Copyright.md
+Copyright: /Copyright.md
 CSS: {{Theme.CSSX}}
 
 <header>

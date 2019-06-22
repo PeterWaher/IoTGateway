@@ -2,7 +2,7 @@
 Description: This page allows you to configure backups and perform manual exports of your data.
 Date: 2017-01-27
 Author: Peter Waher
-Copyright: Copyright.md
+Copyright: /Copyright.md
 Master: {{(Configuring:=Waher.IoTGateway.Gateway.Configuring) ? "Master.md" : "/Master.md"}}
 UserVariable: User
 Login: /Login.md

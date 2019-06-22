@@ -191,6 +191,9 @@ namespace Waher.IoTGateway.Setup
 
 			Request.DataStream.CopyTo(File);
 
+            if (!More)
+                File.Flush();
+
 			ShowStatus(TabID, Name + "Bytes", Export.FormatBytes(File.Length) + " received of " + Name + " file.");
 
 			Response.StatusCode = 200;
@@ -239,7 +242,7 @@ namespace Waher.IoTGateway.Setup
 			BackupFile = GetAndRemoveFile(HttpSessionID, this.backupFilePerSession);
 			KeyFile = GetAndRemoveFile(HttpSessionID, this.keyFilePerSession);
 
-			this.Restore(BackupFile, KeyFile, TabID, Request.Session["backupFileName"]?.ToString(), Request.Session["keyFileName"]?.ToString(), Overwrite);
+			this.Restore(BackupFile, KeyFile, TabID, Request.Session["backupFileName"]?.ToString(), Overwrite);
 
 			Response.StatusCode = 200;
 		}
@@ -281,8 +284,7 @@ namespace Waher.IoTGateway.Setup
 			}
 		}
 
-		private async void Restore(TemporaryFile BackupFile, TemporaryFile KeyFile, string TabID, string BackupFileName, string KeyFileName,
-			bool Overwrite)
+		private async void Restore(TemporaryFile BackupFile, TemporaryFile KeyFile, string TabID, string BackupFileName, bool Overwrite)
 		{
 			ICryptoTransform AesTransform1 = null;
 			ICryptoTransform AesTransform2 = null;
@@ -520,10 +522,7 @@ namespace Waher.IoTGateway.Setup
 							}
 
 							if (CollectonStarted)
-							{
 								await Import.EndCollection();
-								CollectonStarted = false;
-							}
 
 							await Import.StartCollection(CollectionName);
 							CollectonStarted = true;
@@ -737,34 +736,19 @@ namespace Waher.IoTGateway.Setup
 			}
 
 			if (ObjectStarted)
-			{
 				await Import.EndObject();
-				ObjectStarted = false;
-			}
 
 			if (IndexStarted)
-			{
 				await Import.EndIndex();
-				IndexStarted = false;
-			}
 
 			if (CollectonStarted)
-			{
 				await Import.EndCollection();
-				CollectonStarted = false;
-			}
 
 			if (DatabaseStarted)
-			{
 				await Import.EndExport();
-				DatabaseStarted = false;
-			}
 
 			if (FilesStarted)
-			{
 				await Import.EndFiles();
-				FilesStarted = false;
-			}
 
 			await Import.End();
 			ShowReport(TabID, Import, Overwrite);
@@ -1108,14 +1092,9 @@ namespace Waher.IoTGateway.Setup
 
 			if (ElementType != null)
 			{
-				Type T = Types.GetType(ElementType);
-
 				switch (PropertyType)
 				{
 					case "Array":
-						if (T is null)
-							T = typeof(object);
-
 						List<object> List = new List<object>();
 
 						while (await r.ReadAsync())
@@ -1141,9 +1120,6 @@ namespace Waher.IoTGateway.Setup
 						break;
 
 					case "Obj":
-						if (T is null)
-							T = typeof(GenericObject);
-
 						GenericObject GenObj = new GenericObject(string.Empty, ElementType, Guid.Empty);
 						Value = GenObj;
 
@@ -1452,7 +1428,7 @@ namespace Waher.IoTGateway.Setup
 					return new CaseInsensitiveString(r.ReadString());
 
 				case BinaryExportFormat.TYPE_ARRAY:
-					string TypeName = r.ReadString();
+                    r.ReadString(); // Type name
 					long NrElements = r.ReadInt64();
 
 					List<object> List = new List<object>();
@@ -1467,7 +1443,7 @@ namespace Waher.IoTGateway.Setup
 					return List.ToArray();
 
 				case BinaryExportFormat.TYPE_OBJECT:
-					TypeName = r.ReadString();
+					string TypeName = r.ReadString();
 					GenericObject Object = new GenericObject(string.Empty, TypeName, Guid.Empty);
 
 					PropertyType = r.ReadByte();

@@ -263,6 +263,7 @@
   <Assembly fileName='Waher.Networking.XMPP.Provisioning.dll'/>
   <Assembly fileName='Waher.Networking.XMPP.PubSub.dll'/>
   <Assembly fileName='Waher.Networking.XMPP.Sensor.dll'/>
+  <Assembly fileName='Waher.Networking.XMPP.Software.dll'/>
   <Assembly fileName='Waher.Networking.XMPP.Synchronization.dll'/>
   <Assembly fileName='Waher.Networking.XMPP.WebSocket.dll'/>
   <Assembly fileName='Waher.Persistence.dll'/>

@@ -195,6 +195,7 @@
     <ProjectReference Include="..\Networking\Waher.Networking.XMPP.Provisioning\Waher.Networking.XMPP.Provisioning.csproj" />
     <ProjectReference Include="..\Networking\Waher.Networking.XMPP.PubSub\Waher.Networking.XMPP.PubSub.csproj" />
     <ProjectReference Include="..\Networking\Waher.Networking.XMPP.Sensor\Waher.Networking.XMPP.Sensor.csproj" />
+    <ProjectReference Include="..\Networking\Waher.Networking.XMPP.Software\Waher.Networking.XMPP.Software.csproj" />
     <ProjectReference Include="..\Networking\Waher.Networking.XMPP.Synchronization\Waher.Networking.XMPP.Synchronization.csproj" />
     <ProjectReference Include="..\Networking\Waher.Networking.XMPP.WebSocket\Waher.Networking.XMPP.WebSocket.csproj" />
     <ProjectReference Include="..\Networking\Waher.Networking.XMPP\Waher.Networking.XMPP.csproj" />

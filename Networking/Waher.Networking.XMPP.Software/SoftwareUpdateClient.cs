@@ -42,6 +42,7 @@ namespace Waher.Networking.XMPP.Software
             this.componentAddress = ComponentAddress;
 
             Client.RegisterMessageHandler("packageInfo", NamespaceSoftwareUpdates, this.PackageNotificationHandler, true);
+            Client.RegisterMessageHandler("packageDeleted", NamespaceSoftwareUpdates, this.PackageDeletedNotificationHandler, false);
         }
 
         /// <summary>
@@ -52,6 +53,7 @@ namespace Waher.Networking.XMPP.Software
             base.Dispose();
 
             Client.UnregisterMessageHandler("packageInfo", NamespaceSoftwareUpdates, this.PackageNotificationHandler, true);
+            Client.UnregisterMessageHandler("packageDeleted", NamespaceSoftwareUpdates, this.PackageDeletedNotificationHandler, false);
         }
 
         /// <summary>
@@ -372,9 +374,32 @@ namespace Waher.Networking.XMPP.Software
         }
 
         /// <summary>
-        /// Event raised when new software has been made available. Only events from 
+        /// Event raised when new software has been made available. Only events from the software package component
+        /// will be raised.
         /// </summary>
         public event PackageNotificationEventHandler OnSoftwareUpdated = null;
+
+        private void PackageDeletedNotificationHandler(object Sender, MessageEventArgs e)
+        {
+            if (string.Compare(e.From, this.componentAddress, true) != 0)
+                return;
+
+            Package PackageInfo = Package.Parse(e.Content);
+            try
+            {
+                this.OnSoftwareDeleted?.Invoke(this, new PackageNotificationEventArgs(PackageInfo, e));
+            }
+            catch (Exception ex)
+            {
+                Log.Critical(ex);
+            }
+        }
+
+        /// <summary>
+        /// Event raised when a software package has been deleted. Only events from the software package component
+        /// will be raised.
+        /// </summary>
+        public event PackageNotificationEventHandler OnSoftwareDeleted = null;
 
     }
 }

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
@@ -22,6 +24,7 @@ namespace Waher.Networking.XMPP.Software
         public const string Wildcard = "*";
 
         private readonly string componentAddress;
+        private readonly string packageFolder;
 
         /// <summary>
         /// urn:ieee:iot:swu:1.0
@@ -36,10 +39,14 @@ namespace Waher.Networking.XMPP.Software
         /// </summary>
         /// <param name="Client">XMPP Client</param>
         /// <param name="ComponentAddress">Component XMPP Address.</param>
-        public SoftwareUpdateClient(XmppClient Client, string ComponentAddress)
+        public SoftwareUpdateClient(XmppClient Client, string ComponentAddress, string PackageFolder)
             : base(Client)
         {
             this.componentAddress = ComponentAddress;
+            this.packageFolder = PackageFolder;
+
+            if (!Directory.Exists(PackageFolder))
+                Directory.CreateDirectory(PackageFolder);
 
             Client.RegisterMessageHandler("packageInfo", NamespaceSoftwareUpdates, this.PackageNotificationHandler, true);
             Client.RegisterMessageHandler("packageDeleted", NamespaceSoftwareUpdates, this.PackageDeletedNotificationHandler, false);
@@ -357,27 +364,61 @@ namespace Waher.Networking.XMPP.Software
             return Result.Task;
         }
 
-        private void PackageNotificationHandler(object Sender, MessageEventArgs e)
+        private async void PackageNotificationHandler(object Sender, MessageEventArgs e)
         {
             if (string.Compare(e.From, this.componentAddress, true) != 0)
                 return;
 
             Package PackageInfo = Package.Parse(e.Content);
+            PackageUpdatedEventArgs e2 = new PackageUpdatedEventArgs(PackageInfo, e);
             try
             {
-                this.OnSoftwareUpdated?.Invoke(this, new PackageNotificationEventArgs(PackageInfo, e));
+                this.OnSoftwareUpdated?.Invoke(this, e2);
             }
             catch (Exception ex)
             {
                 Log.Critical(ex);
             }
+
+            if (e2.Download)
+            {
+                try
+                {
+                    string FileName = Path.Combine(this.packageFolder, PackageInfo.FileName);
+
+                    using (HttpClient WebClient = new HttpClient())
+                    {
+                        using (HttpResponseMessage Response = await WebClient.GetAsync(PackageInfo.Url, HttpCompletionOption.ResponseHeadersRead))
+                        {
+                            using (Stream Input = await Response.Content.ReadAsStreamAsync())
+                            {
+                                using (Stream Output = File.Create(FileName))
+                                {
+                                    await Input.CopyToAsync(Output);
+                                }
+                            }
+                        }
+                    }
+
+                    this.OnSoftwareDownloaded?.Invoke(this, new PackageFileEventArgs(PackageInfo, FileName, e));
+                }
+                catch (Exception ex)
+                {
+                    Log.Critical(ex);
+                }
+            }
         }
 
         /// <summary>
-        /// Event raised when new software has been made available. Only events from the software package component
-        /// will be raised.
+        /// Event raised when new software has been made available on the server. Only events from the software package component
+        /// will be raised. The event arguments contains a property to control if the software package is to be downloaded or not.
         /// </summary>
-        public event PackageNotificationEventHandler OnSoftwareUpdated = null;
+        public event PackageUpdatedEventHandler OnSoftwareUpdated = null;
+
+        /// <summary>
+        /// Event raised when new software has been downloaded.
+        /// </summary>
+        public event PackageFileEventHandler OnSoftwareDownloaded = null;
 
         private void PackageDeletedNotificationHandler(object Sender, MessageEventArgs e)
         {
@@ -385,21 +426,45 @@ namespace Waher.Networking.XMPP.Software
                 return;
 
             Package PackageInfo = Package.Parse(e.Content);
+            PackageDeletedEventArgs e2 = new PackageDeletedEventArgs(PackageInfo, e);
             try
             {
-                this.OnSoftwareDeleted?.Invoke(this, new PackageNotificationEventArgs(PackageInfo, e));
+                this.OnSoftwareDeleted?.Invoke(this, e2);
             }
             catch (Exception ex)
             {
                 Log.Critical(ex);
             }
+
+            if (e2.Delete)
+            {
+                try
+                {
+                    string FileName = Path.Combine(this.packageFolder, PackageInfo.FileName);
+
+                    if (File.Exists(FileName))
+                    {
+                        File.Delete(FileName);
+                        this.OnDownloadedSoftwareDeleted?.Invoke(this, new PackageFileEventArgs(PackageInfo, FileName, e));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log.Critical(ex);
+                }
+            }
         }
 
         /// <summary>
-        /// Event raised when a software package has been deleted. Only events from the software package component
-        /// will be raised.
+        /// Event raised when a software package has been deleted on the server. Only events from the software package component
+        /// will be raised. The event arguments contains a property to control if the software package is to be deleted or not.
         /// </summary>
-        public event PackageNotificationEventHandler OnSoftwareDeleted = null;
+        public event PackageDeletedEventHandler OnSoftwareDeleted = null;
+
+        /// <summary>
+        /// Event raised when a local software package file has been deleted.
+        /// </summary>
+        public event PackageFileEventHandler OnDownloadedSoftwareDeleted = null;
 
     }
 }

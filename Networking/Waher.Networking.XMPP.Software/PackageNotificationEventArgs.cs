@@ -5,16 +5,9 @@ using Waher.Networking.XMPP;
 namespace Waher.Networking.XMPP.Software
 {
     /// <summary>
-    /// Delegate for package notification event handlers.
-    /// </summary>
-    /// <param name="Sender">Sender of event.</param>
-    /// <param name="e">Event arguments.</param>
-    public delegate void PackageNotificationEventHandler(object Sender, PackageNotificationEventArgs e);
-
-    /// <summary>
     /// Event arguments for software package notification events.
     /// </summary>
-    public class PackageNotificationEventArgs : MessageEventArgs
+    public abstract class PackageNotificationEventArgs : MessageEventArgs
     {
         private Package package;
 

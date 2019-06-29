@@ -253,7 +253,8 @@ function ConnectionOK1(data)
         data.thingRegistry &&
         data.provisioning &&
         data.pubSub &&
-        data.legal;
+        data.legal &&
+        data.software;
 
     ShowStatus(data.msg);
     document.getElementById("NextButton").style.display = "inline";
@@ -277,6 +278,8 @@ function ConnectionOK1(data)
     document.getElementById("PubSubJID").innerText = data.pubSub;
     document.getElementById("Legal").innerText = data.legal ? "✓" : "✗";
     document.getElementById("LegalJID").innerText = data.legal;
+    document.getElementById("Software").innerText = data.software ? "✓" : "✗";
+    document.getElementById("SoftwareJID").innerText = data.software;
     document.getElementById("ServerFeatures").style.display = "block";
 }
 

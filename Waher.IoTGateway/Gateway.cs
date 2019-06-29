@@ -39,6 +39,7 @@ using Waher.Networking.XMPP.Mail;
 using Waher.Networking.XMPP.PEP;
 using Waher.Networking.XMPP.Provisioning;
 using Waher.Networking.XMPP.PubSub;
+using Waher.Networking.XMPP.Software;
 using Waher.Networking.XMPP.Synchronization;
 using Waher.Runtime.Language;
 using Waher.Runtime.Inventory;
@@ -125,6 +126,7 @@ namespace Waher.IoTGateway
 		private static SynchronizationClient synchronizationClient = null;
 		private static PepClient pepClient = null;
 		private static ContractsClient contractsClient = null;
+        private static SoftwareUpdateClient softwareUpdateClient = null;
 		private static MailClient mailClient = null;
 		private static X509Certificate2 certificate = null;
 		private static HttpServer webServer = null;
@@ -134,7 +136,7 @@ namespace Waher.IoTGateway
 		private static SystemConfiguration[] configurations;
 		private static LoggedIn loggedIn = null;
 		private static Scheduler scheduler = null;
-		private static RandomNumberGenerator rnd = RandomNumberGenerator.Create();
+		private readonly static RandomNumberGenerator rnd = RandomNumberGenerator.Create();
         private static Semaphore gatewayRunning = null;
 		private static Emoji1LocalFiles emoji1_24x24 = null;
 		private static StreamWriter exceptionFile = null;
@@ -1025,7 +1027,18 @@ namespace Waher.IoTGateway
 			else
 				contractsClient = null;
 
-			mailClient = new MailClient(xmppClient);
+            if (!string.IsNullOrEmpty(XmppConfiguration.Instance.SoftwareUpdates))
+            {
+                string PackagesFolder = Path.Combine(Gateway.appDataFolder, "Packages");
+                if (!Directory.Exists(PackagesFolder))
+                    Directory.CreateDirectory(PackagesFolder);
+
+                softwareUpdateClient = new SoftwareUpdateClient(xmppClient, XmppConfiguration.Instance.SoftwareUpdates, PackagesFolder);
+            }
+            else
+                softwareUpdateClient = null;
+
+            mailClient = new MailClient(xmppClient);
 			mailClient.MailReceived += MailClient_MailReceived;
 
 			return Task.CompletedTask;
@@ -2020,10 +2033,18 @@ namespace Waher.IoTGateway
 			get { return contractsClient; }
 		}
 
-		/// <summary>
-		/// XMPP Mail Client, if support for mail-extensions is available on the XMPP broker.
-		/// </summary>
-		public static MailClient MailClient
+        /// <summary>
+        /// XMPP Software Updates Client, if such a compoent is available on the XMPP broker.
+        /// </summary>
+        public static SoftwareUpdateClient SoftwareUpdateClient
+        {
+            get { return softwareUpdateClient; }
+        }
+
+        /// <summary>
+        /// XMPP Mail Client, if support for mail-extensions is available on the XMPP broker.
+        /// </summary>
+        public static MailClient MailClient
 		{
 			get { return mailClient; }
 		}

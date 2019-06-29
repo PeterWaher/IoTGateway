@@ -67,6 +67,7 @@ namespace Waher.IoTGateway.Setup
 		private string events = string.Empty;
 		private string pubSub = string.Empty;
 		private string legal = string.Empty;
+		private string software = string.Empty;
 		private string bareJid = string.Empty;
 		private bool sniffer = false;
 		private bool trustServer = false;
@@ -228,10 +229,20 @@ namespace Waher.IoTGateway.Setup
 			set { this.legal = value; }
 		}
 
-		/// <summary>
-		/// Bare JID
-		/// </summary>
-		[DefaultValueStringEmpty]
+        /// <summary>
+        /// JID of software updates component.
+        /// </summary>
+        [DefaultValueStringEmpty]
+        public string SoftwareUpdates
+        {
+            get { return this.software; }
+            set { this.software = value; }
+        }
+
+        /// <summary>
+        /// Bare JID
+        /// </summary>
+        [DefaultValueStringEmpty]
 		public string BareJid
 		{
 			get { return this.bareJid; }
@@ -687,9 +698,10 @@ namespace Waher.IoTGateway.Setup
 						this.provisioning = string.Empty;
 						this.events = string.Empty;
 						this.pubSub = string.Empty;
-						this.legal = string.Empty;
+                        this.legal = string.Empty;
+                        this.software = string.Empty;
 
-						if (e2.Ok)
+                        if (e2.Ok)
 						{
 							foreach (Item Item in e2.Items)
 							{
@@ -711,8 +723,11 @@ namespace Waher.IoTGateway.Setup
 
 								if (e.HasFeature(Networking.XMPP.Contracts.ContractsClient.NamespaceLegalIdentities))
 									this.legal = Item.JID;
-							}
-						}
+
+                                if (e.HasFeature(Networking.XMPP.Software.SoftwareUpdateClient.NamespaceSoftwareUpdates))
+                                    this.software = Item.JID;
+                            }
+                        }
 
 						Dictionary<string, object> ConnectionInfo = new Dictionary<string, object>()
 						{
@@ -728,10 +743,11 @@ namespace Waher.IoTGateway.Setup
 							{ "provisioning", this.provisioning },
 							{ "eventLog", this.events },
 							{ "pubSub", this.pubSub },
-							{ "legal", this.legal }
+							{ "legal", this.legal },
+							{ "software", this.software }
 						};
 
-						ClientEvents.PushEvent(new string[] { TabID }, "ConnectionOK1", JSON.Encode(ConnectionInfo, false), true, "User");
+                        ClientEvents.PushEvent(new string[] { TabID }, "ConnectionOK1", JSON.Encode(ConnectionInfo, false), true, "User");
 
 						this.client.Dispose();
 						this.client = null;

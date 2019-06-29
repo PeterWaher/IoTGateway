@@ -184,6 +184,7 @@ limit applications using the server to interoperate accordingly.
 | Provisioning | <span id="Provisioning">{{empty(Config.Provisioning) ? "✗" : "✓"}}</span> | <span id="ProvisioningJID">{{Config.Provisioning}}</span> |
 | Publish/Subscribe | <span id="PubSub">{{empty(Config.PubSub) ? "✗" : "✓"}}</span> | <span id="PubSubJID">{{Config.PubSub}}</span> |
 | Legal Identities | <span id="Legal">{{empty(Config.LegalIdentities) ? "✗" : "✓"}}</span> | <span id="LegalJID">{{Config.LegalIdentities}}</span> |
+| Software Updates | <span id="Software">{{empty(Config.SoftwareUpdates) ? "✗" : "✓"}}</span> | <span id="SoftwareJID">{{Config.SoftwareUpdates}}</span> |
 
 </fieldset>
 

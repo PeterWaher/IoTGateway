@@ -798,7 +798,8 @@ namespace Waher.IoTGateway.Installers
 
         private static void Install(Session Session, string ManifestFile, string ServerApplication, string ProgramDataFolder)
         {
-            // Same code as for custom action InstallManifest in Waher.IoTGateway.Installers
+            // Same code as for custom action InstallManifest in Waher.IoTGateway.Installers, except:
+            // * Content files can already be installed in the corresponding application data folder.
 
             if (string.IsNullOrEmpty(ManifestFile))
                 throw new Exception("Missing manifest file.");
@@ -951,7 +952,7 @@ namespace Waher.IoTGateway.Installers
         private static bool CopyFileIfNewer(Session Session, string From, string To, string To2, bool OnlyIfNewer)
         {
             if (!File.Exists(From))
-                throw new Exception("File not found: " + From);
+                throw new FileNotFoundException("File not found: " + From);
 
             bool Copy1 = From != To;
 
@@ -1014,7 +1015,18 @@ namespace Waher.IoTGateway.Installers
                     switch (E.LocalName)
                     {
                         case "Content":
-                            KeyValuePair<string, string> FileNames = GetFileName(E, SourceFolder);
+                            KeyValuePair<string, string> FileNames;
+
+                            try
+                            {
+                                FileNames = GetFileName(E, SourceFolder);
+                            }
+                            catch (FileNotFoundException)
+                            {
+                                // Already installed.
+                                break;
+                            }
+
                             string FileName = FileNames.Key;
                             string SourceFileName = FileNames.Value;
                             CopyOptions CopyOptions = (CopyOptions)XML.Attribute(E, "copy", CopyOptions.IfNewer);
@@ -1033,10 +1045,17 @@ namespace Waher.IoTGateway.Installers
                                 Directory.CreateDirectory(AppFolder);
                             }
 
-                            CopyFileIfNewer(Session, SourceFileName,
-                                Path.Combine(DataFolder, FileName),
-                                Path.Combine(AppFolder, FileName),
-                                CopyOptions == CopyOptions.IfNewer);
+                            try
+                            {
+                                CopyFileIfNewer(Session, SourceFileName,
+                                    Path.Combine(DataFolder, FileName),
+                                    Path.Combine(AppFolder, FileName),
+                                    CopyOptions == CopyOptions.IfNewer);
+                            }
+                            catch (FileNotFoundException)
+                            {
+                                // Already installed by installer.
+                            }
                             break;
 
                         case "Folder":
@@ -1060,7 +1079,8 @@ namespace Waher.IoTGateway.Installers
 
         private static void Uninstall(Session Session, string ManifestFile, string ServerApplication, string ProgramDataFolder, bool Remove)
         {
-            // Same code as for custom action UninstallManifest in Waher.IoTGateway.Installers
+            // Same code as for custom action UninstallManifest in Waher.IoTGateway.Installers, except:
+            // * Content files can already be installed in the corresponding application data folder.
 
             if (string.IsNullOrEmpty(ManifestFile))
                 throw new Exception("Missing manifest file.");
@@ -1205,13 +1225,13 @@ namespace Waher.IoTGateway.Installers
 
             string AltFolder = XML.Attribute(E, "altFolder");
             if (string.IsNullOrEmpty(AltFolder))
-                throw new Exception("File not found: " + AbsFileName);
+                throw new FileNotFoundException("File not found: " + AbsFileName);
 
             AbsFileName = Path.Combine(AltFolder, FileName);
             if (File.Exists(AbsFileName))
                 return new KeyValuePair<string, string>(FileName, AbsFileName);
 
-            throw new Exception("File not found: " + AbsFileName);
+            throw new FileNotFoundException("File not found: " + AbsFileName);
         }
 
         #endregion

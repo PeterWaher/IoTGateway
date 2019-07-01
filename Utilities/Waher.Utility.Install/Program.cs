@@ -382,7 +382,7 @@ namespace Waher.Utility.Install
         private static bool CopyFileIfNewer(string From, string To, string To2, bool OnlyIfNewer)
         {
             if (!File.Exists(From))
-                throw new Exception("File not found: " + From);
+                throw new FileNotFoundException("File not found: " + From);
 
             bool Copy1 = From != To;
 
@@ -866,7 +866,7 @@ namespace Waher.Utility.Install
 
             string AltFolder = XML.Attribute(E, "altFolder");
             if (string.IsNullOrEmpty(AltFolder))
-                throw new Exception("File not found: " + AbsFileName);
+                throw new FileNotFoundException("File not found: " + AbsFileName);
 
             AltFolder = Path.Combine(ReferenceFolder, AltFolder);
             if (!Directory.Exists(AltFolder))
@@ -876,7 +876,7 @@ namespace Waher.Utility.Install
             if (File.Exists(AbsFileName))
                 return (FileName, AbsFileName);
 
-            throw new Exception("File not found: " + AbsFileName);
+            throw new FileNotFoundException("File not found: " + AbsFileName);
         }
 
         private static void InstallPackage(string PackageFile, string Key, string ServerApplication, string ProgramDataFolder)

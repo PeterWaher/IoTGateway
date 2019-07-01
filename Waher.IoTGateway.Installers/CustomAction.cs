@@ -1081,6 +1081,7 @@ namespace Waher.IoTGateway.Installers
         {
             // Same code as for custom action UninstallManifest in Waher.IoTGateway.Installers, except:
             // * Content files can already be installed in the corresponding application data folder.
+            // * Assembly files can be removed by uninstaller.
 
             if (string.IsNullOrEmpty(ManifestFile))
                 throw new Exception("Missing manifest file.");
@@ -1211,7 +1212,14 @@ namespace Waher.IoTGateway.Installers
                 return false;
 
             Session.Log("Deleting " + FileName);
-            File.Delete(FileName);
+            try
+            {
+                File.Delete(FileName);
+            }
+            catch (Exception ex)
+            {
+                Session.Log("Unable to delete file. Error reported: " + ex.Message);
+            }
 
             return true;
         }

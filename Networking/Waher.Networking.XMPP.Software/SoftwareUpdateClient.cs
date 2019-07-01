@@ -77,6 +77,14 @@ namespace Waher.Networking.XMPP.Software
         }
 
         /// <summary>
+        /// Folder of downloaded packages.
+        /// </summary>
+        public string PackageFolder
+        {
+            get { return this.packageFolder; }
+        }
+
+        /// <summary>
         /// Gets information about a software package.
         /// </summary>
         /// <param name="FileName">Filename of software package.</param>
@@ -384,21 +392,7 @@ namespace Waher.Networking.XMPP.Software
             {
                 try
                 {
-                    string FileName = Path.Combine(this.packageFolder, PackageInfo.FileName);
-
-                    using (HttpClient WebClient = new HttpClient())
-                    {
-                        using (HttpResponseMessage Response = await WebClient.GetAsync(PackageInfo.Url, HttpCompletionOption.ResponseHeadersRead))
-                        {
-                            using (Stream Input = await Response.Content.ReadAsStreamAsync())
-                            {
-                                using (Stream Output = File.Create(FileName))
-                                {
-                                    await Input.CopyToAsync(Output);
-                                }
-                            }
-                        }
-                    }
+                    string FileName = await this.DownloadPackageAsync(PackageInfo);
 
                     this.OnSoftwareDownloaded?.Invoke(this, new PackageFileEventArgs(PackageInfo, FileName, e));
                 }
@@ -407,6 +401,32 @@ namespace Waher.Networking.XMPP.Software
                     Log.Critical(ex);
                 }
             }
+        }
+
+        /// <summary>
+        /// Downloads a software package.
+        /// </summary>
+        /// <param name="PackageInfo">Information about the software package.</param>
+        /// <returns>Filename of downloaded file.</returns>
+        public async Task<string> DownloadPackageAsync(Package PackageInfo)
+        {
+            string FileName = Path.Combine(this.packageFolder, PackageInfo.FileName);
+
+            using (HttpClient WebClient = new HttpClient())
+            {
+                using (HttpResponseMessage Response = await WebClient.GetAsync(PackageInfo.Url, HttpCompletionOption.ResponseHeadersRead))
+                {
+                    using (Stream Input = await Response.Content.ReadAsStreamAsync())
+                    {
+                        using (Stream Output = File.Create(FileName))
+                        {
+                            await Input.CopyToAsync(Output);
+                        }
+                    }
+                }
+            }
+
+            return FileName;
         }
 
         /// <summary>

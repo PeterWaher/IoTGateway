@@ -393,8 +393,20 @@ namespace Waher.Networking.XMPP.Software
                 try
                 {
                     string FileName = await this.DownloadPackageAsync(PackageInfo);
+                    PackageFileEventArgs e3 = new PackageFileEventArgs(PackageInfo, FileName, e);
 
-                    this.OnSoftwareDownloaded?.Invoke(this, new PackageFileEventArgs(PackageInfo, FileName, e));
+                    try
+                    {
+                        this.OnSoftwareValidation?.Invoke(this, e3);
+                    }
+                    catch (Exception ex)
+                    {
+                        File.Delete(FileName);
+                        Log.Warning("Package with invalid signature downloaded and deleted.\r\n\r\n" + ex.Message);
+                        return;
+                    }
+
+                    this.OnSoftwareDownloaded?.Invoke(this, e3);
                 }
                 catch (Exception ex)
                 {
@@ -434,6 +446,18 @@ namespace Waher.Networking.XMPP.Software
         /// will be raised. The event arguments contains a property to control if the software package is to be downloaded or not.
         /// </summary>
         public event PackageUpdatedEventHandler OnSoftwareUpdated = null;
+
+        /// <summary>
+        /// Event raised just after physically downloading a file, but before raising the 
+        /// <see cref="OnSoftwareDownloaded"/> event. Can be used by clients to validate
+        /// the signature of the file. If the signature is found to be invalid, an exception
+        /// must be thrown by the event handler.
+        /// 
+        /// Note that the software client does not know how to validate files. It only provides 
+        /// information about the signature used by the packet creator. How to interpret the 
+        /// signature, is packet/manufacturer-specific.
+        /// </summary>
+        public event PackageFileEventHandler OnSoftwareValidation = null;
 
         /// <summary>
         /// Event raised when new software has been downloaded.

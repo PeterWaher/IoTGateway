@@ -125,7 +125,7 @@ namespace Waher.Security.SHA3
         /// </summary>
         /// <param name="t">Integer input</param>
         /// <returns>Boolean output</returns>
-        private static bool rc(int t)
+        private static bool Rc(int t)
         {
             int i = t % 255;
             if (i == 0)
@@ -155,7 +155,7 @@ namespace Waher.Security.SHA3
             int t;
 
             for (t = 0; t < 255; t++)
-                Result[t] = rc(t);
+                Result[t] = Rc(t);
 
             return Result;
         }

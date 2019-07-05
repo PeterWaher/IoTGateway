@@ -955,7 +955,7 @@ namespace Waher.Persistence.MongoDB
 
 			ObjectSerializer S = this.GetObjectSerializerEx(typeof(T));
 			IEnumerable<T> ReferencedObjects = await this.Find<T>(0, 2, new FilterFieldEqualTo(S.ObjectIdMemberName, ObjectId));
-			T First = default(T);
+			T First = default;
 
 			foreach (T Item in ReferencedObjects)
 			{

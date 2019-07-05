@@ -913,7 +913,7 @@ namespace Waher.Persistence.Files.Serialization
 						if (S.Deserialize(Reader, ElementDataTypeN, true) is T Item)
 							Elements.Add(Item);
 						else
-							Elements.Add(default(T));
+							Elements.Add(default);
 
 						NrElements--;
 					}

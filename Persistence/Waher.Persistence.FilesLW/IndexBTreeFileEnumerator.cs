@@ -35,7 +35,7 @@ namespace Waher.Persistence.Files
 			this.provider = this.file.ObjectFile.Provider;
 			this.hasCurrent = false;
 			this.currentObjectId = Guid.Empty;
-			this.current = default(T);
+			this.current = default;
 			this.currentSerializer = null;
 			this.timeoutMilliseconds = File.IndexFile.TimeoutMilliseconds;
 
@@ -219,7 +219,7 @@ namespace Waher.Persistence.Files
 
 				if (Obj is null)
 				{
-					this.current = default(T);
+					this.current = default;
 					this.currentTypeCompatible = false;
 
 					// TODO: Delete records pointing to objects that do not exist, after lock has been released.
@@ -231,13 +231,13 @@ namespace Waher.Persistence.Files
 				}
 				else
 				{
-					this.current = default(T);
+					this.current = default;
 					this.currentTypeCompatible = false;
 				}
 			}
 			catch (Exception)
 			{
-				this.current = default(T);
+				this.current = default;
 				this.currentTypeCompatible = false;
 			}
 
@@ -320,7 +320,7 @@ namespace Waher.Persistence.Files
 		{
 			this.hasCurrent = false;
 			this.currentObjectId = Guid.Empty;
-			this.current = default(T);
+			this.current = default;
 			this.currentSerializer = null;
 
 			this.e.Reset();
@@ -334,7 +334,7 @@ namespace Waher.Persistence.Files
 		{
 			this.hasCurrent = false;
 			this.currentObjectId = Guid.Empty;
-			this.current = default(T);
+			this.current = default;
 			this.currentSerializer = null;
 
 			this.e.Reset(StartingPoint);

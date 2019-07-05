@@ -4435,7 +4435,7 @@ namespace Waher.Script
 		{
 			if (!TryConvert(Value, typeof(T), out object Obj) || !(Obj is T Result2))
 			{
-				Result = default(T);
+				Result = default;
 				return false;
 			}
 

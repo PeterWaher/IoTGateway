@@ -736,7 +736,7 @@ namespace Waher.Persistence.Files
 			int PosBak = this.currentReader.Position;
 
 			if (Len == 0)
-				this.current = default(T);
+				this.current = default;
 			else
 			{
 				try
@@ -778,14 +778,14 @@ namespace Waher.Persistence.Files
 					}
 					else
 					{
-						this.current = default(T);
+						this.current = default;
 						this.currentTypeCompatible = false;
 						this.currentReader.Position = PosBak + Len;
 					}
 				}
 				catch (Exception)
 				{
-					this.current = default(T);
+					this.current = default;
 					this.currentTypeCompatible = false;
 					this.currentReader.Position = PosBak + Len;
 				}
@@ -1000,7 +1000,7 @@ namespace Waher.Persistence.Files
 			this.currentTypeCompatible = false;
 			this.currentRank = null;
 			this.currentObjectId = null;
-			this.current = default(T);
+			this.current = default;
 			this.currentSerializer = null;
 		}
 

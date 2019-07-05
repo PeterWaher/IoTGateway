@@ -1685,7 +1685,7 @@ namespace Waher.Persistence.Files
                 else
                 {
                     File.QueueForLoad(ObjectId, Serializer, EmbeddedSetter);
-                    return default(T);
+                    return default;
                 }
             }
             else

@@ -166,16 +166,25 @@ namespace Waher.Networking.DNS
 					{
 						LastName = Name;
 
-						Response = await Database.FindFirstDeleteRest<DnsResponse>(new FilterAnd(
-							new FilterFieldEqualTo("Name", Name),
-							new FilterFieldEqualTo("Type", TYPE),
-							new FilterFieldEqualTo("Class", CLASS)));
+                        try
+                        {
+                            Response = await Database.FindFirstDeleteRest<DnsResponse>(new FilterAnd(
+                                new FilterFieldEqualTo("Name", Name),
+                                new FilterFieldEqualTo("Type", TYPE),
+                                new FilterFieldEqualTo("Class", CLASS)));
 
-						if (!(Response is null) && Response.Expires <= DateTime.Now)
-						{
-							await Database.Delete(Response);
-							Response = null;
-						}
+                            if (!(Response is null) && Response.Expires <= DateTime.Now)
+                            {
+                                await Database.Delete(Response);
+                                Response = null;
+                            }
+                        }
+                        catch (Exception)
+                        {
+                            // Some inconsistency in database. Clear collection to get fresh set of DNS entries.
+                            await Database.Clear("DnsCache");
+                            Response = null;
+                        }
 					}
 
 					if (Response is null)

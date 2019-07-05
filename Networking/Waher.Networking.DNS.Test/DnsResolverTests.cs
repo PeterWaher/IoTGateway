@@ -140,7 +140,7 @@ namespace Waher.Networking.DNS.Test
 		[TestMethod]
 		public async Task Test_13_Resolve_Mail_Exchange_4()
 		{
-			await this.TestExchange("extas.is");
+			await this.TestExchange("cybercity.online");
 		}
 
 		[TestMethod]
@@ -193,7 +193,7 @@ namespace Waher.Networking.DNS.Test
 		[TestMethod]
 		public async Task Test_20_Resolve_TXT_3()
 		{
-			string[] Text = await DnsResolver.LookupText("extas.is");
+			string[] Text = await DnsResolver.LookupText("cybercity.online");
 			foreach (string Row in Text)
 				Console.Out.WriteLine(Row);
 		}

@@ -45,7 +45,7 @@ namespace Waher.Security.SPF.Test
 		{
 			KeyValuePair<SpfResult, string> Result = await SpfResolver.CheckHost(
 				IPAddress.Parse("194.9.95.112"), "littlesister.se",
-				"testaccount@littlesister.se", "smtp.outgoing.loopia.se", "extas.is");
+				"testaccount@littlesister.se", "smtp.outgoing.loopia.se", "cybercity.online");
 			Assert.AreEqual(SpfResult.Pass, Result.Key, Result.Value);
 		}
 
@@ -55,7 +55,7 @@ namespace Waher.Security.SPF.Test
 			await this.TestSpfString("v=spf1 include:_spf.google.com ~all",
 				"mobilgirot.com", "testaccount@mobilgirot.com",
 				IPAddress.Parse("209.85.221.49"), "mail-wr1-f49.google.com",
-				"extas.is");
+                "cybercity.online");
 		}
 
 		[TestMethod]
@@ -64,7 +64,7 @@ namespace Waher.Security.SPF.Test
 			await this.TestSpfString("v=spf1 ptr:yahoo.com ~all",
 				"att.net", "testaccount@att.net",
 				IPAddress.Parse("74.6.128.85"), "sonic312-23.consmr.mail.bf2.yahoo.com",
-				"extas.is");
+                "cybercity.online");
 		}
 
 		private async Task TestSpfString(string SpfString, string Domain,

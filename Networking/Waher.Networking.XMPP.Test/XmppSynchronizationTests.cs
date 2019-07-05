@@ -256,28 +256,28 @@ namespace Waher.Networking.XMPP.Test
 		public async Task Control_Test_10_Measure_Federated_Server()
 		{
 			this.ConnectClients();
-			await this.Measure("extas.is");
+			await this.Measure("cybercity.online");
 		}
 
 		[TestMethod]
 		public void Control_Test_11_Monitor_30_Federated_Server()
 		{
 			this.ConnectClients();
-			this.Monitor("extas.is", 30, 1000, "Monitor30FederatedServer.tsv");
+			this.Monitor("cybercity.online", 30, 1000, "Monitor30FederatedServer.tsv");
 		}
 
 		[TestMethod]
 		public void Control_Test_12_Monitor_200_Federated_Server()
 		{
 			this.ConnectClients();
-			this.Monitor("extas.is", 200, 1000, "Monitor200FederatedServer.tsv");
+			this.Monitor("cybercity.online", 200, 1000, "Monitor200FederatedServer.tsv");
 		}
 
 		[TestMethod]
 		public void Control_Test_13_Monitor_1000_Federated_Server()
 		{
 			this.ConnectClients();
-			this.Monitor("extas.is", 1000, 1000, "Monitor1000FederatedServer.tsv");
+			this.Monitor("cybercity.online", 1000, 1000, "Monitor1000FederatedServer.tsv");
 		}
 
 	}

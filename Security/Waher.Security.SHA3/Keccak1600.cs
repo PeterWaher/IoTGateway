@@ -3,106 +3,54 @@
 namespace Waher.Security.SHA3
 {
     /// <summary>
-    /// Acceptable bit sizes for the SHA-3 and KECCAK algorithms.
-    /// </summary>
-    public enum BitSize
-    {
-        /// <summary>
-        /// 25 bits
-        /// </summary>
-        BitSize25 = 25,
-
-        /// <summary>
-        /// 50 bits
-        /// </summary>
-        BitSize50 = 50,
-
-        /// <summary>
-        /// 100 bits
-        /// </summary>
-        BitSize100 = 100,
-
-        /// <summary>
-        /// 200 bits
-        /// </summary>
-        BitSize200 = 200,
-
-        /// <summary>
-        /// 400 bits
-        /// </summary>
-        BitSize400 = 400,
-
-        /// <summary>
-        /// 800 bits
-        /// </summary>
-        BitSize800 = 800,
-
-        /// <summary>
-        /// 1600 bits
-        /// </summary>
-        BitSize1600 = 1600,
-    }
-
-    /// <summary>
-    /// Implementation of the KECCAK-p permutations, as defined in section 3
-    /// in the NIST FIPS 202: 
+    /// Implementation of the KECCAK-p permutations, with a bitsize of 1600 bits, 
+    /// as defined in section 3 in the NIST FIPS 202: 
     /// https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.202.pdf
     /// </summary>
-    public abstract class Keccak
+    public abstract class Keccak1600
     {
         private static readonly bool[] rcs = GetRcs();
         private static readonly ulong[] RCs = new ulong[] { 0x01, 0x02, 0x08, 0x80, 0x8000, 0x80000000, 0x8000000000000000 };
         private ulong[,] A = new ulong[5, 5];
         private ulong[,] A2 = new ulong[5, 5];
         private readonly ulong[] C = new ulong[5];
-        private readonly int b;
-        private readonly int w;
-        private readonly int l;
         private readonly int r;
         private readonly int c;
         private readonly int r8;
         private readonly int r8m1;
         private readonly int dByteSize;
         private readonly int nr;
-        private readonly int byteSize;
         private readonly byte suffix;
         private readonly byte suffixBits;
-        private readonly ulong wMask;
         private bool reportStates = false;
 
         /// <summary>
-        /// Implementation of the KECCAK-f permutations, as defined in section 3.4
-        /// in the NIST FIPS 202: 
+        /// Implementation of the KECCAK-p permutations, with a bitsize of 1600 bits, 
+        /// as defined in section 3 in the NIST FIPS 202: 
         /// https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.202.pdf
         /// </summary>
-        /// <param name="BitSize">Bit Size.</param>
         /// <param name="Capacity">Capacity of sponge function.</param>
         /// <param name="Suffix">Suffix to append to variable-length messages before executing the Sponge function.</param>
         /// <param name="DigestSize">Size of results of the sponge function.</param>
-        public Keccak(BitSize BitSize, int Capacity, byte Suffix, int DigestSize)
-            : this(BitSize, 0, Capacity, Suffix, DigestSize)
+        public Keccak1600(int Capacity, byte Suffix, int DigestSize)
+            : this(24, Capacity, Suffix, DigestSize)
         {
-            this.nr = 12 + 2 * this.l;
         }
 
         /// <summary>
-        /// Implementation of the KECCAK-p permutations, as defined in section 3.3
-        /// in the NIST FIPS 202: 
+        /// Implementation of the KECCAK-p permutations, with a bitsize of 1600 bits, 
+        /// as defined in section 3 in the NIST FIPS 202: 
         /// https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.202.pdf
         /// </summary>
-        /// <param name="BitSize">Bit Size.</param>
         /// <param name="Iterations">Number of iterations</param>
         /// <param name="Capacity">Capacity of sponge function.</param>
         /// <param name="Suffix">Suffix to append to variable-length messages before executing the Sponge function.</param>
         /// <param name="DigestSize">Size of results of the sponge function.</param>
-        public Keccak(BitSize BitSize, int Iterations, int Capacity, byte Suffix, int DigestSize)
+        public Keccak1600(int Iterations, int Capacity, byte Suffix, int DigestSize)
         {
-            this.b = (int)BitSize;
-            this.w = this.b / 25;
-            this.byteSize = this.b / 8;
             this.nr = Iterations;
             this.c = Capacity;
-            this.r = this.b - this.c;
+            this.r = 1600 - this.c;
             this.r8 = this.r >> 3;
             this.r8m1 = this.r8 - 1;
             this.dByteSize = DigestSize / 8;
@@ -125,47 +73,6 @@ namespace Waher.Security.SHA3
                 throw new ArgumentException("Invalid suffix.", nameof(Suffix));
 
             this.suffix |= (byte)(1 << this.suffixBits);    // First bit of pad10*1
-
-            switch (this.b)
-            {
-                case 25:
-                    this.l = 0;
-                    this.wMask = 0x01;
-                    break;
-
-                case 50:
-                    this.l = 1;
-                    this.wMask = 0x03;
-                    break;
-
-                case 100:
-                    this.l = 2;
-                    this.wMask = 0x0f;
-                    break;
-
-                case 200:
-                    this.l = 3;
-                    this.wMask = 0xff;
-                    break;
-
-                case 400:
-                    this.l = 4;
-                    this.wMask = 0xffff;
-                    break;
-
-                case 800:
-                    this.l = 5;
-                    this.wMask = 0xffffffff;
-                    break;
-
-                case 1600:
-                    this.l = 6;
-                    this.wMask = 0xffffffffffffffff;
-                    break;
-
-                default:
-                    throw new ArgumentException("Invalid bit size.", nameof(BitSize));
-            }
         }
 
         /// <summary>
@@ -174,68 +81,18 @@ namespace Waher.Security.SHA3
         /// <param name="Data">Binary data</param>
         public void InitState(byte[] Data)
         {
-            if (Data.Length != this.byteSize)
-                throw new ArgumentException("Expected array of " + this.byteSize.ToString() + " bytes.", nameof(Data));
+            if (Data.Length != 200)
+                throw new ArgumentException("Expected array of 200 bytes.", nameof(Data));
 
             int i = 0;
             int x, y;
-            int Offset = 0;
 
             for (y = 0; y < 5; y++)
             {
                 for (x = 0; x < 5; x++)
                 {
-                    switch (this.l)
-                    {
-                        case 0:
-                            this.A[x, y] = (byte)((Data[i] >> Offset) & 0x01);
-                            Offset++;
-                            if (Offset >= 8)
-                            {
-                                i++;
-                                Offset = 0;
-                            }
-                            break;
-
-                        case 1:
-                            this.A[x, y] = (byte)((Data[i] >> Offset) & 0x03);
-                            Offset += 2;
-                            if (Offset >= 8)
-                            {
-                                i++;
-                                Offset = 0;
-                            }
-                            break;
-
-                        case 2:
-                            this.A[x, y] = (byte)((Data[i] >> Offset) & 0x0f);
-                            Offset += 4;
-                            if (Offset >= 8)
-                            {
-                                i++;
-                                Offset = 0;
-                            }
-                            break;
-
-                        case 3:
-                            this.A[x, y] = Data[i++];
-                            break;
-
-                        case 4:
-                            this.A[x, y] = BitConverter.ToUInt16(Data, i);
-                            i += 2;
-                            break;
-
-                        case 5:
-                            this.A[x, y] = BitConverter.ToUInt32(Data, i);
-                            i += 4;
-                            break;
-
-                        case 6:
-                            this.A[x, y] = BitConverter.ToUInt64(Data, i);
-                            i += 8;
-                            break;
-                    }
+                    this.A[x, y] = BitConverter.ToUInt64(Data, i);
+                    i += 8;
                 }
             }
         }
@@ -246,67 +103,17 @@ namespace Waher.Security.SHA3
         /// <returns>Binary data</returns>
         public byte[] GetState()
         {
-            byte[] Data = new byte[this.byteSize];
+            byte[] Data = new byte[200];    // this.byteSize
 
             int i = 0;
             int x, y;
-            int Offset = 0;
 
             for (y = 0; y < 5; y++)
             {
                 for (x = 0; x < 5; x++)
                 {
-                    switch (this.l)
-                    {
-                        case 0:
-                            Data[i] |= (byte)((this.A[x, y] & 0x01) << Offset);
-                            Offset++;
-                            if (Offset >= 8)
-                            {
-                                i++;
-                                Offset = 0;
-                            }
-                            break;
-
-                        case 1:
-                            Data[i] |= (byte)((this.A[x, y] & 0x03) << Offset);
-                            Offset += 2;
-                            if (Offset >= 8)
-                            {
-                                i++;
-                                Offset = 0;
-                            }
-                            break;
-
-                        case 2:
-                            Data[i] |= (byte)((this.A[x, y] & 0x0f) << Offset);
-                            Offset += 4;
-                            if (Offset >= 8)
-                            {
-                                i++;
-                                Offset = 0;
-                            }
-                            break;
-
-                        case 3:
-                            Data[i++] = (byte)this.A[x, y];
-                            break;
-
-                        case 4:
-                            Array.Copy(BitConverter.GetBytes((ushort)A[x, y]), 0, Data, i, 2);
-                            i += 2;
-                            break;
-
-                        case 5:
-                            Array.Copy(BitConverter.GetBytes((uint)A[x, y]), 0, Data, i, 4);
-                            i += 4;
-                            break;
-
-                        case 6:
-                            Array.Copy(BitConverter.GetBytes(A[x, y]), 0, Data, i, 8);
-                            i += 8;
-                            break;
-                    }
+                    Array.Copy(BitConverter.GetBytes(A[x, y]), 0, Data, i, 8);
+                    i += 8;
                 }
             }
 
@@ -326,7 +133,7 @@ namespace Waher.Security.SHA3
             else if (i < 0)
                 i += 255;
 
-            byte R = 1;// 0x80;
+            byte R = 1;
 
             while (i-- > 0)
             {
@@ -369,35 +176,35 @@ namespace Waher.Security.SHA3
             C[3] = A[3, 0] ^ A[3, 1] ^ A[3, 2] ^ A[3, 3] ^ A[3, 4];
             C[4] = A[4, 0] ^ A[4, 1] ^ A[4, 2] ^ A[4, 3] ^ A[4, 4];
 
-            D = C[4] ^ ((C[1] << 1) | ((C[1] >> (this.w - 1)) & 1));
+            D = C[4] ^ ((C[1] << 1) | ((C[1] >> 63) & 1));
             A[0, 0] ^= D;
             A[0, 1] ^= D;
             A[0, 2] ^= D;
             A[0, 3] ^= D;
             A[0, 4] ^= D;
 
-            D = C[0] ^ ((C[2] << 1) | ((C[2] >> (this.w - 1)) & 1));
+            D = C[0] ^ ((C[2] << 1) | ((C[2] >> 63) & 1));
             A[1, 0] ^= D;
             A[1, 1] ^= D;
             A[1, 2] ^= D;
             A[1, 3] ^= D;
             A[1, 4] ^= D;
 
-            D = C[1] ^ ((C[3] << 1) | ((C[3] >> (this.w - 1)) & 1));
+            D = C[1] ^ ((C[3] << 1) | ((C[3] >> 63) & 1));
             A[2, 0] ^= D;
             A[2, 1] ^= D;
             A[2, 2] ^= D;
             A[2, 3] ^= D;
             A[2, 4] ^= D;
 
-            D = C[2] ^ ((C[4] << 1) | ((C[4] >> (this.w - 1)) & 1));
+            D = C[2] ^ ((C[4] << 1) | ((C[4] >> 63) & 1));
             A[3, 0] ^= D;
             A[3, 1] ^= D;
             A[3, 2] ^= D;
             A[3, 3] ^= D;
             A[3, 4] ^= D;
 
-            D = C[3] ^ ((C[0] << 1) | ((C[0] >> (this.w - 1)) & 1));
+            D = C[3] ^ ((C[0] << 1) | ((C[0] >> 63) & 1));
             A[4, 0] ^= D;
             A[4, 1] ^= D;
             A[4, 2] ^= D;
@@ -417,10 +224,10 @@ namespace Waher.Security.SHA3
 
             for (t = 0; t <= 23; t++)
             {
-                i = ((t + 1) * (t + 2) / 2) % this.w;
-                j = this.w - i;
+                i = ((t + 1) * (t + 2) / 2) & 63;
+                j = 64 - i;
                 v = A[x, y];
-                A[x, y] = (v << i) | ((v >> j) & this.wMask);
+                A[x, y] = (v << i) | (v >> j);
 
                 i = (2 * x + 3 * y) % 5;
                 x = y;
@@ -512,7 +319,7 @@ namespace Waher.Security.SHA3
 
             ulong RC = 0;
 
-            for (j = 0; j <= l; j++)
+            for (j = 0; j <= 6; j++)    // l
             {
                 i = (j + 7 * ir) % 255;
                 if (i < 0)
@@ -536,15 +343,13 @@ namespace Waher.Security.SHA3
         public byte[] ComputeFixed(byte[] S)
         {
             int ir;
-            int to = 12 + 2 * l;
-            int from = to - nr;
 
             this.InitState(S);
 
             if (this.reportStates)
                 this.NewState?.Invoke(this, new EventArgs());
 
-            for (ir = from; ir < to; ir++)
+            for (ir = 24 - nr; ir < 24; ir++)
                 this.Rnd(ir);
 
             return this.GetState();
@@ -562,7 +367,7 @@ namespace Waher.Security.SHA3
             int Len = N.Length;
             int m = Len << 3;
             int nm1 = m / r;
-            byte[] S = new byte[this.byteSize];
+            byte[] S = new byte[200];
             int Pos = 0;
             int i, k;
 

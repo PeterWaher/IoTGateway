@@ -164,7 +164,7 @@ namespace Waher.Persistence
 
 		private static async Task<T> FirstDeleteRest<T>(IEnumerable<T> Set)
 		{
-			T Result = default(T);
+			T Result = default;
 			bool First = true;
 
 			foreach (T Obj in Set)
@@ -175,8 +175,17 @@ namespace Waher.Persistence
 					Result = Obj;
 				}
 				else
-					await Database.Delete(Obj);
-			}
+                {
+                    try
+                    {
+                        await Database.Delete(Obj);
+                    }
+                    catch (KeyNotFoundException)
+                    {
+                        // TODO: Inconsistency should flag collection for repairing
+                    }
+                }
+            }
 
 			return Result;
 		}
@@ -213,7 +222,7 @@ namespace Waher.Persistence
 			foreach (T Obj in Set)
 				return Obj;
 
-			return default(T);
+			return default;
 		}
 
 		/// <summary>

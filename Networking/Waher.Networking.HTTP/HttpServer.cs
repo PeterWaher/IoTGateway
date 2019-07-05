@@ -1151,7 +1151,7 @@ namespace Waher.Networking.HTTP
 		/// <returns>If request found among current requests.</returns>
 		public bool PingRequest(HttpRequest Request)
 		{
-			return this.currentRequests?.TryGetValue(Request, out RequestInfo Info) == false;
+			return this.currentRequests?.TryGetValue(Request, out RequestInfo _) == false;
 		}
 
 		private void CurrentRequests_Removed(object Sender, CacheItemEventArgs<HttpRequest, RequestInfo> e)
@@ -1202,7 +1202,7 @@ namespace Waher.Networking.HTTP
 			if (i >= 0)
 				ResourceName = ResourceName.Substring(0, i);
 
-			if (this.TryGetResource(LocalUrl, out HttpResource Resource, out string SubPath) &&
+			if (this.TryGetResource(ResourceName, out HttpResource Resource, out string SubPath) &&
 				Resource is IHttpGetMethod GetMethod)
 			{
 				using (MemoryStream ms = new MemoryStream())

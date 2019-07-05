@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Net;
 using Waher.Content;
+using Waher.Events;
 using Waher.Networking.HTTP.HeaderFields;
 using Waher.Script;
 
@@ -124,9 +125,6 @@ namespace Waher.Networking.HTTP
 		{
 			base.Validate(Request);
 
-			if (Request.SubPath.Contains(".."))
-				throw new ForbiddenException();
-
 			HttpRequestHeader Header = Request.Header;
 			DateTimeOffset? Limit;
 
@@ -160,7 +158,12 @@ namespace Waher.Networking.HTTP
 
 		private string GetFullPath(HttpRequest Request)
 		{
-			return this.folderPath + WebUtility.UrlDecode(Request.SubPath).Replace('/', Path.DirectorySeparatorChar);
+            string s = WebUtility.UrlDecode(Request.SubPath).Replace('/', Path.DirectorySeparatorChar);
+
+            if (s.Contains("..") || s.Contains("\\"))
+                throw new ForbiddenException();
+
+            return this.folderPath + s;
 		}
 
 		private class CacheRec
@@ -180,9 +183,12 @@ namespace Waher.Networking.HTTP
 		{
 			string FullPath = this.GetFullPath(Request);
 			if (!File.Exists(FullPath))
-				throw new NotFoundException();
+            {
+                Log.Warning("File not found.", FullPath, Request.RemoteEndPoint);
+                throw new NotFoundException("File not found: " + FullPath.Substring(this.folderPath.Length));
+            }
 
-			DateTime LastModified = File.GetLastWriteTime(FullPath).ToUniversalTime();
+            DateTime LastModified = File.GetLastWriteTime(FullPath).ToUniversalTime();
 			CacheRec Rec;
 
 			Rec = this.CheckCacheHeaders(FullPath, LastModified, Request);
@@ -651,10 +657,13 @@ namespace Waher.Networking.HTTP
 		public void GET(HttpRequest Request, HttpResponse Response, ByteRangeInterval FirstInterval)
 		{
 			string FullPath = this.GetFullPath(Request);
-			if (!File.Exists(FullPath))
-				throw new NotFoundException();
+            if (!File.Exists(FullPath))
+            {
+                Log.Warning("File not found.", FullPath, Request.RemoteEndPoint);
+                throw new NotFoundException("File not found: " + FullPath.Substring(this.folderPath.Length));
+            }
 
-			HttpRequestHeader Header = Request.Header;
+            HttpRequestHeader Header = Request.Header;
 			DateTime LastModified = File.GetLastWriteTime(FullPath).ToUniversalTime();
 			DateTimeOffset? Limit;
 			CacheRec Rec;
@@ -840,9 +849,9 @@ namespace Waher.Networking.HTTP
 			else if (Directory.Exists(FullPath))
 				Directory.Delete(FullPath, true);
 			else
-				throw new NotFoundException();
+                throw new NotFoundException("File not found: " + FullPath.Substring(this.folderPath.Length));
 
-			Response.SendResponse();
+            Response.SendResponse();
 		}
 
 		/// <summary>

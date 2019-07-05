@@ -103,17 +103,17 @@ namespace Waher.WebService.Script
 					!string.IsNullOrEmpty(s = Request.Header["X-Y"]) && int.TryParse(s, out int y))
 				{
 					if (!(Variables["Graphs"] is Dictionary<string, KeyValuePair<Graph, object[]>> Graphs))
-						throw new NotFoundException();
+						throw new NotFoundException("Graphs not found.");
 
 					KeyValuePair<Graph, object[]> Rec;
 
 					lock (Graphs)
 					{
 						if (!Graphs.TryGetValue(Tag, out Rec))
-							throw new NotFoundException();
-					}
+                            throw new NotFoundException("Graph not found.");
+                    }
 
-					s = Rec.Key.GetBitmapClickScript(x, y, Rec.Value);
+                    s = Rec.Key.GetBitmapClickScript(x, y, Rec.Value);
 
 					Response.ContentType = "text/plain";
 					Response.Write(s);
@@ -124,7 +124,7 @@ namespace Waher.WebService.Script
 					lock (this.expressions)
 					{
 						if (!this.expressions.TryGetValue(Tag, out Exp))
-							throw new NotFoundException();
+							throw new NotFoundException("Expression not found.");
 					}
 
 					Exp.Tag = Response;

@@ -200,7 +200,7 @@ namespace Waher.IoTGateway.Setup
 			if (themeDefinitions.TryGetValue(ThemeId, out ThemeDefinition Def))
 				Theme.CurrerntTheme = Def;
 			else
-				throw new NotFoundException();
+				throw new NotFoundException("Theme not found: " + ThemeId);
 
 			Response.StatusCode = 200;
 

@@ -1,10 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
-using System.Collections.Generic;
-using System.Text;
 using Waher.Content;
-using Waher.Security;
+using Waher.Events;
 
 namespace Waher.Networking.HTTP
 {
@@ -107,8 +105,8 @@ namespace Waher.Networking.HTTP
 		{
 			using (Stream f = this.assembly.GetManifestResourceStream(this.embeddedResourceName))
 			{
-				if (f is null)
-					throw new NotFoundException();
+                if (f is null)
+                    throw new NotFoundException("Resource not found: " + this.embeddedResourceName);
 
 				if (this.etag is null)
 					this.etag = this.ComputeETag(f);

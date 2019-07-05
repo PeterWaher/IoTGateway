@@ -958,7 +958,7 @@ namespace Waher.IoTGateway.Setup
 		private void AcmeChallenge(HttpRequest Request, HttpResponse Response)
 		{
 			if (Request.SubPath != this.challenge)
-				throw new NotFoundException();
+				throw new NotFoundException("ACME Challenge not found.");
 
 			Response.StatusCode = 200;
 			Response.ContentType = "application/octet-stream";

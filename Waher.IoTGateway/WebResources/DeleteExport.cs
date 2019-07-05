@@ -85,11 +85,11 @@ namespace Waher.IoTGateway.WebResources
 				Dir = Export.FullExportFolder;
 
 			if (!Directory.Exists(Dir))
-				throw new NotFoundException();
+				throw new NotFoundException("Folder not found: " + Dir);
 
 			string FullFileName = Dir + Path.DirectorySeparatorChar + FileName;
 			if (!File.Exists(FullFileName))
-				throw new NotFoundException();
+				throw new NotFoundException("File not found: " + FullFileName);
 
 			File.Delete(FullFileName);
 

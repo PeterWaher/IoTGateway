@@ -9,8 +9,8 @@ namespace Waher.Networking.HTTP
 	/// </summary>
 	public class NotFoundException : HttpException
 	{
-		private const int Code = 404;
-		private const string Msg = "Not Found";
+		internal const int Code = 404;
+		internal const string Msg = "Not Found";
 
 		/// <summary>
 		/// The server has not found anything matching the Request-URI. No indication is given of whether the condition is temporary or permanent.

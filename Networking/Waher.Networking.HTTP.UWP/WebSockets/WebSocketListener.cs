@@ -147,7 +147,7 @@ namespace Waher.Networking.HTTP.WebSockets
 			}
 
 			if (Request.clientConnection is null)
-				throw new ForbiddenException();
+				throw new ForbiddenException("Invalid connection.");
 
 			WebSocket Socket = new WebSocket(this, Request, Response);
 			

@@ -903,14 +903,25 @@ namespace Waher.Networking.HTTP
 			return false;
 		}
 
-		#endregion
+        internal string CheckResourceOverride(string ResourceName)
+        {
+            if (!string.IsNullOrEmpty(this.resourceOverride))
+            {
+                if (this.resourceOverrideFilter is null || this.resourceOverrideFilter.IsMatch(ResourceName))
+                    return this.resourceOverride;
+            }
 
-		#region Sessions
+            return ResourceName;
+        }
 
-		/// <summary>
-		/// Session timeout. Default is 20 minutes.
-		/// </summary>
-		public TimeSpan SessionTimeout
+        #endregion
+
+        #region Sessions
+
+        /// <summary>
+        /// Session timeout. Default is 20 minutes.
+        /// </summary>
+        public TimeSpan SessionTimeout
 		{
 			get { return this.sessionTimeout; }
 
@@ -1227,7 +1238,7 @@ namespace Waher.Networking.HTTP
 				}
 			}
 			else
-				return new Tuple<int, string, byte[]>(404, string.Empty, null);
+				return new Tuple<int, string, byte[]>(NotFoundException.Code, NotFoundException.Msg, null);
 		}
 
 		#endregion

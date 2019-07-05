@@ -48,5 +48,13 @@ namespace Waher.Security.SHA3.Test
             Assert.AreEqual("79f38adec5c20307a98ef76e8324afbfd46cfd81b22e3973c65fa1bd9de31787", s);
             Assert.AreEqual(States1600Bits.Length, i);
         }
+
+        [TestMethod]
+        public void Test_03_Performance()
+        {
+            byte[] Data = new byte[80 * 1024 * 1024];
+            SHA3_256 H = new SHA3_256();
+            H.ComputeVariable(Data);
+        }
     }
 }

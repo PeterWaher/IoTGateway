@@ -1885,7 +1885,7 @@ namespace Waher.IoTGateway
 		public static void AssertUserAuthenticated(HttpRequest Request)
 		{
 			if (Request.Session is null || !Request.Session.TryGetVariable("User", out Variable v) || !(v.ValueObject is IUser))
-				throw new ForbiddenException();
+				throw new ForbiddenException("Access denied.");
 		}
 
 		#endregion

@@ -272,7 +272,7 @@ namespace Waher.Content.Markdown.Web
 						}
 					}
 
-					throw new ForbiddenException();
+					throw new ForbiddenException("Access denied.");
 				}
 			}
 

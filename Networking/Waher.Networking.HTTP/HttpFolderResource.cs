@@ -160,11 +160,13 @@ namespace Waher.Networking.HTTP
 		{
             string s = WebUtility.UrlDecode(Request.SubPath).Replace('/', Path.DirectorySeparatorChar);
 
-            if (s.Contains("..") || s.Contains("\\"))
-                throw new ForbiddenException();
+            if (s.Contains("..") || s.Contains(doubleBackslash) || s.Contains(":"))
+                throw new ForbiddenException("Path control characters not permitted.");
 
             return this.folderPath + s;
 		}
+
+        private readonly static string doubleBackslash = new string(Path.DirectorySeparatorChar, 2);
 
 		private class CacheRec
 		{
@@ -261,7 +263,7 @@ namespace Waher.Networking.HTTP
 			}
 			else
 			{
-				Task T = Progress.BeginRead();
+				Task _ = Progress.BeginRead();
 			}
 		}
 
@@ -513,7 +515,6 @@ namespace Waher.Networking.HTTP
 							{
 								f.Dispose();
 								f = f2;
-								f2 = null;
 								f.Position = 0;
 							}
 						}
@@ -757,7 +758,7 @@ namespace Waher.Networking.HTTP
 					Response.WriteLine();
 				}
 
-				Task T = Progress.BeginRead();
+				Task _ = Progress.BeginRead();
 			}
 		}
 

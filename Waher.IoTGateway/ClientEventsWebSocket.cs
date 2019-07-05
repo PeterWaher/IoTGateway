@@ -101,7 +101,7 @@ namespace Waher.IoTGateway
 			if ((Cookie = e.Socket.HttpRequest.Header.Cookie) is null ||
 				string.IsNullOrEmpty(Cookie["HttpSessionID"]))
 			{
-				throw new ForbiddenException();
+				throw new ForbiddenException("HTTP Session required.");
 			}
 		}
 

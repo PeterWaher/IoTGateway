@@ -28,7 +28,7 @@ namespace Waher.IoTGateway.WebResources
 		/// <returns>Challenge string.</returns>
 		public override string GetChallenge()
 		{
-			throw new ForbiddenException();
+			throw new ForbiddenException("Access denied.");
 		}
 
 		/// <summary>

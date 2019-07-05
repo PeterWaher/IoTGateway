@@ -237,7 +237,6 @@ namespace Waher.Security.SHA3
 
                 // ρ function, as defined in section 3.2.2 of NIST FIPS 202.
 
-                int i, j;
                 ulong v;
 
                 A[1, 0] = ((v = A[1, 0]) << 1) | (v >> 63);

@@ -393,20 +393,31 @@ namespace Waher.Networking.XMPP.Software
                 try
                 {
                     string FileName = await this.DownloadPackageAsync(PackageInfo);
-                    PackageFileEventArgs e3 = new PackageFileEventArgs(PackageInfo, FileName, e);
 
-                    try
+                    await Task.Run(() =>
                     {
-                        this.OnSoftwareValidation?.Invoke(this, e3);
-                    }
-                    catch (Exception ex)
-                    {
-                        File.Delete(FileName);
-                        Log.Warning("Package with invalid signature downloaded and deleted.\r\n\r\n" + ex.Message);
-                        return;
-                    }
+                        try
+                        {
+                            PackageFileEventArgs e3 = new PackageFileEventArgs(PackageInfo, FileName, e);
 
-                    this.OnSoftwareDownloaded?.Invoke(this, e3);
+                            try
+                            {
+                                this.OnSoftwareValidation?.Invoke(this, e3);
+                            }
+                            catch (Exception ex)
+                            {
+                                File.Delete(FileName);
+                                Log.Warning("Package with invalid signature downloaded and deleted.\r\n\r\n" + ex.Message);
+                                return;
+                            }
+
+                            this.OnSoftwareDownloaded?.Invoke(this, e3);
+                        }
+                        catch (Exception ex)
+                        {
+                            Log.Critical(ex);
+                        }
+                    });
                 }
                 catch (Exception ex)
                 {

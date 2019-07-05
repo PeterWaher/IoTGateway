@@ -16,9 +16,10 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>Security Hash SHA-3 KECCAK SHAKE128 SHAKE256 RawSHAKE128 RawSHAKE256</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.0.0</AssemblyVersion>
-    <FileVersion>1.0.0</FileVersion>
+    <AssemblyVersion>1.0.1</AssemblyVersion>
+    <FileVersion>1.0.1</FileVersion>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+    <Version>1.0.1</Version>
   </PropertyGroup>
 
   <ItemGroup>

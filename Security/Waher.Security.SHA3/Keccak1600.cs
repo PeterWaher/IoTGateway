@@ -12,8 +12,8 @@ namespace Waher.Security.SHA3
         private static readonly bool[] rcs = GetRcs();
         private static readonly ulong[] RCs = new ulong[] { 0x01, 0x02, 0x08, 0x80, 0x8000, 0x80000000, 0x8000000000000000 };
         private static readonly ulong[] RC_ir = GetRcIr();
-        private ulong[,] A = new ulong[5, 5];
-        private ulong[,] A2 = new ulong[5, 5];
+        private readonly ulong[,] A = new ulong[5, 5];
+        private readonly ulong[,] A2 = new ulong[5, 5];
         private readonly ulong[] C = new ulong[5];
         private readonly int r;
         private readonly int c;
@@ -23,6 +23,7 @@ namespace Waher.Security.SHA3
         private readonly byte suffix;
         private readonly byte suffixBits;
         private bool reportStates = false;
+        private bool inA2 = false;
 
         /// <summary>
         /// Implementation of the KECCAK-p permutations, with a bitsize of 1600 bits, 
@@ -97,7 +98,7 @@ namespace Waher.Security.SHA3
             {
                 for (x = 0; x < 5; x++)
                 {
-                    Array.Copy(BitConverter.GetBytes(A[x, y]), 0, Data, i, 8);
+                    Array.Copy(BitConverter.GetBytes(this.inA2 ? A2[x, y] : A[x, y]), 0, Data, i, 8);
                     i += 8;
                 }
             }
@@ -177,6 +178,7 @@ namespace Waher.Security.SHA3
         /// <returns>Output string of fixed length</returns>
         public byte[] ComputeFixed(byte[] S)
         {
+            ulong v;
             int ir;
 
             this.InitState(S);
@@ -189,55 +191,51 @@ namespace Waher.Security.SHA3
                 // Rnd function, as defined in section 3.3 of NIST FIPS 202.
                 // θ function, as defined in section 3.2.1 of NIST FIPS 202.
 
-                ulong D;
-
                 C[0] = A[0, 0] ^ A[0, 1] ^ A[0, 2] ^ A[0, 3] ^ A[0, 4];
                 C[1] = A[1, 0] ^ A[1, 1] ^ A[1, 2] ^ A[1, 3] ^ A[1, 4];
                 C[2] = A[2, 0] ^ A[2, 1] ^ A[2, 2] ^ A[2, 3] ^ A[2, 4];
                 C[3] = A[3, 0] ^ A[3, 1] ^ A[3, 2] ^ A[3, 3] ^ A[3, 4];
                 C[4] = A[4, 0] ^ A[4, 1] ^ A[4, 2] ^ A[4, 3] ^ A[4, 4];
 
-                D = C[4] ^ ((C[1] << 1) | ((C[1] >> 63) & 1));
-                A[0, 0] ^= D;
-                A[0, 1] ^= D;
-                A[0, 2] ^= D;
-                A[0, 3] ^= D;
-                A[0, 4] ^= D;
+                v = C[4] ^ ((C[1] << 1) | ((C[1] >> 63) & 1));
+                A[0, 0] ^= v;
+                A[0, 1] ^= v;
+                A[0, 2] ^= v;
+                A[0, 3] ^= v;
+                A[0, 4] ^= v;
 
-                D = C[0] ^ ((C[2] << 1) | ((C[2] >> 63) & 1));
-                A[1, 0] ^= D;
-                A[1, 1] ^= D;
-                A[1, 2] ^= D;
-                A[1, 3] ^= D;
-                A[1, 4] ^= D;
+                v = C[0] ^ ((C[2] << 1) | ((C[2] >> 63) & 1));
+                A[1, 0] ^= v;
+                A[1, 1] ^= v;
+                A[1, 2] ^= v;
+                A[1, 3] ^= v;
+                A[1, 4] ^= v;
 
-                D = C[1] ^ ((C[3] << 1) | ((C[3] >> 63) & 1));
-                A[2, 0] ^= D;
-                A[2, 1] ^= D;
-                A[2, 2] ^= D;
-                A[2, 3] ^= D;
-                A[2, 4] ^= D;
+                v = C[1] ^ ((C[3] << 1) | ((C[3] >> 63) & 1));
+                A[2, 0] ^= v;
+                A[2, 1] ^= v;
+                A[2, 2] ^= v;
+                A[2, 3] ^= v;
+                A[2, 4] ^= v;
 
-                D = C[2] ^ ((C[4] << 1) | ((C[4] >> 63) & 1));
-                A[3, 0] ^= D;
-                A[3, 1] ^= D;
-                A[3, 2] ^= D;
-                A[3, 3] ^= D;
-                A[3, 4] ^= D;
+                v = C[2] ^ ((C[4] << 1) | ((C[4] >> 63) & 1));
+                A[3, 0] ^= v;
+                A[3, 1] ^= v;
+                A[3, 2] ^= v;
+                A[3, 3] ^= v;
+                A[3, 4] ^= v;
 
-                D = C[3] ^ ((C[0] << 1) | ((C[0] >> 63) & 1));
-                A[4, 0] ^= D;
-                A[4, 1] ^= D;
-                A[4, 2] ^= D;
-                A[4, 3] ^= D;
-                A[4, 4] ^= D;
+                v = C[3] ^ ((C[0] << 1) | ((C[0] >> 63) & 1));
+                A[4, 0] ^= v;
+                A[4, 1] ^= v;
+                A[4, 2] ^= v;
+                A[4, 3] ^= v;
+                A[4, 4] ^= v;
 
                 if (this.reportStates)
                     this.NewState?.Invoke(this, new EventArgs());
 
                 // ρ function, as defined in section 3.2.2 of NIST FIPS 202.
-
-                ulong v;
 
                 A[1, 0] = ((v = A[1, 0]) << 1) | (v >> 63);
                 A[0, 2] = ((v = A[0, 2]) << 3) | (v >> 61);
@@ -299,51 +297,49 @@ namespace Waher.Security.SHA3
                 A2[4, 3] = A[3, 4];
                 A2[4, 4] = A[1, 4];
 
-                ulong[,] Temp = A;
-                A = A2;
-                A2 = Temp;
-
                 if (this.reportStates)
+                {
+                    this.inA2 = true;
                     this.NewState?.Invoke(this, new EventArgs());
+                }
 
                 // χ function, as defined in section 3.2.4 of NIST FIPS 202.
 
-                A2[0, 0] = A[0, 0] ^ ((~A[1, 0]) & A[2, 0]);
-                A2[0, 1] = A[0, 1] ^ ((~A[1, 1]) & A[2, 1]);
-                A2[0, 2] = A[0, 2] ^ ((~A[1, 2]) & A[2, 2]);
-                A2[0, 3] = A[0, 3] ^ ((~A[1, 3]) & A[2, 3]);
-                A2[0, 4] = A[0, 4] ^ ((~A[1, 4]) & A[2, 4]);
+                A[0, 0] = A2[0, 0] ^ ((~A2[1, 0]) & A2[2, 0]);
+                A[0, 1] = A2[0, 1] ^ ((~A2[1, 1]) & A2[2, 1]);
+                A[0, 2] = A2[0, 2] ^ ((~A2[1, 2]) & A2[2, 2]);
+                A[0, 3] = A2[0, 3] ^ ((~A2[1, 3]) & A2[2, 3]);
+                A[0, 4] = A2[0, 4] ^ ((~A2[1, 4]) & A2[2, 4]);
 
-                A2[1, 0] = A[1, 0] ^ ((~A[2, 0]) & A[3, 0]);
-                A2[1, 1] = A[1, 1] ^ ((~A[2, 1]) & A[3, 1]);
-                A2[1, 2] = A[1, 2] ^ ((~A[2, 2]) & A[3, 2]);
-                A2[1, 3] = A[1, 3] ^ ((~A[2, 3]) & A[3, 3]);
-                A2[1, 4] = A[1, 4] ^ ((~A[2, 4]) & A[3, 4]);
+                A[1, 0] = A2[1, 0] ^ ((~A2[2, 0]) & A2[3, 0]);
+                A[1, 1] = A2[1, 1] ^ ((~A2[2, 1]) & A2[3, 1]);
+                A[1, 2] = A2[1, 2] ^ ((~A2[2, 2]) & A2[3, 2]);
+                A[1, 3] = A2[1, 3] ^ ((~A2[2, 3]) & A2[3, 3]);
+                A[1, 4] = A2[1, 4] ^ ((~A2[2, 4]) & A2[3, 4]);
 
-                A2[2, 0] = A[2, 0] ^ ((~A[3, 0]) & A[4, 0]);
-                A2[2, 1] = A[2, 1] ^ ((~A[3, 1]) & A[4, 1]);
-                A2[2, 2] = A[2, 2] ^ ((~A[3, 2]) & A[4, 2]);
-                A2[2, 3] = A[2, 3] ^ ((~A[3, 3]) & A[4, 3]);
-                A2[2, 4] = A[2, 4] ^ ((~A[3, 4]) & A[4, 4]);
+                A[2, 0] = A2[2, 0] ^ ((~A2[3, 0]) & A2[4, 0]);
+                A[2, 1] = A2[2, 1] ^ ((~A2[3, 1]) & A2[4, 1]);
+                A[2, 2] = A2[2, 2] ^ ((~A2[3, 2]) & A2[4, 2]);
+                A[2, 3] = A2[2, 3] ^ ((~A2[3, 3]) & A2[4, 3]);
+                A[2, 4] = A2[2, 4] ^ ((~A2[3, 4]) & A2[4, 4]);
 
-                A2[3, 0] = A[3, 0] ^ ((~A[4, 0]) & A[0, 0]);
-                A2[3, 1] = A[3, 1] ^ ((~A[4, 1]) & A[0, 1]);
-                A2[3, 2] = A[3, 2] ^ ((~A[4, 2]) & A[0, 2]);
-                A2[3, 3] = A[3, 3] ^ ((~A[4, 3]) & A[0, 3]);
-                A2[3, 4] = A[3, 4] ^ ((~A[4, 4]) & A[0, 4]);
+                A[3, 0] = A2[3, 0] ^ ((~A2[4, 0]) & A2[0, 0]);
+                A[3, 1] = A2[3, 1] ^ ((~A2[4, 1]) & A2[0, 1]);
+                A[3, 2] = A2[3, 2] ^ ((~A2[4, 2]) & A2[0, 2]);
+                A[3, 3] = A2[3, 3] ^ ((~A2[4, 3]) & A2[0, 3]);
+                A[3, 4] = A2[3, 4] ^ ((~A2[4, 4]) & A2[0, 4]);
 
-                A2[4, 0] = A[4, 0] ^ ((~A[0, 0]) & A[1, 0]);
-                A2[4, 1] = A[4, 1] ^ ((~A[0, 1]) & A[1, 1]);
-                A2[4, 2] = A[4, 2] ^ ((~A[0, 2]) & A[1, 2]);
-                A2[4, 3] = A[4, 3] ^ ((~A[0, 3]) & A[1, 3]);
-                A2[4, 4] = A[4, 4] ^ ((~A[0, 4]) & A[1, 4]);
-
-                Temp = A;
-                A = A2;
-                A2 = Temp;
+                A[4, 0] = A2[4, 0] ^ ((~A2[0, 0]) & A2[1, 0]);
+                A[4, 1] = A2[4, 1] ^ ((~A2[0, 1]) & A2[1, 1]);
+                A[4, 2] = A2[4, 2] ^ ((~A2[0, 2]) & A2[1, 2]);
+                A[4, 3] = A2[4, 3] ^ ((~A2[0, 3]) & A2[1, 3]);
+                A[4, 4] = A2[4, 4] ^ ((~A2[0, 4]) & A2[1, 4]);
 
                 if (this.reportStates)
+                {
+                    this.inA2 = false;
                     this.NewState?.Invoke(this, new EventArgs());
+                }
 
                 // ι function, as defined in section 3.2.5 of NIST FIPS 202.
 

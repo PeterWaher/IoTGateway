@@ -11,6 +11,7 @@ namespace Waher.Security.SHA3
     {
         private static readonly bool[] rcs = GetRcs();
         private static readonly ulong[] RCs = new ulong[] { 0x01, 0x02, 0x08, 0x80, 0x8000, 0x80000000, 0x8000000000000000 };
+        private static readonly ulong[] RC_ir = GetRcIr();
         private ulong[,] A = new ulong[5, 5];
         private ulong[,] A2 = new ulong[5, 5];
         private readonly ulong[] C = new ulong[5];
@@ -19,7 +20,6 @@ namespace Waher.Security.SHA3
         private readonly int r8;
         private readonly int r8m1;
         private readonly int dByteSize;
-        private readonly int nr;
         private readonly byte suffix;
         private readonly byte suffixBits;
         private bool reportStates = false;
@@ -33,22 +33,7 @@ namespace Waher.Security.SHA3
         /// <param name="Suffix">Suffix to append to variable-length messages before executing the Sponge function.</param>
         /// <param name="DigestSize">Size of results of the sponge function.</param>
         public Keccak1600(int Capacity, byte Suffix, int DigestSize)
-            : this(24, Capacity, Suffix, DigestSize)
         {
-        }
-
-        /// <summary>
-        /// Implementation of the KECCAK-p permutations, with a bitsize of 1600 bits, 
-        /// as defined in section 3 in the NIST FIPS 202: 
-        /// https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.202.pdf
-        /// </summary>
-        /// <param name="Iterations">Number of iterations</param>
-        /// <param name="Capacity">Capacity of sponge function.</param>
-        /// <param name="Suffix">Suffix to append to variable-length messages before executing the Sponge function.</param>
-        /// <param name="DigestSize">Size of results of the sponge function.</param>
-        public Keccak1600(int Iterations, int Capacity, byte Suffix, int DigestSize)
-        {
-            this.nr = Iterations;
             this.c = Capacity;
             this.r = 1600 - this.c;
             this.r8 = this.r >> 3;
@@ -156,6 +141,31 @@ namespace Waher.Security.SHA3
 
             for (t = 0; t < 255; t++)
                 Result[t] = Rc(t);
+
+            return Result;
+        }
+
+        private static ulong[] GetRcIr()
+        {
+            ulong[] Result = new ulong[24];
+            int ir, i, j;
+
+            for (ir = 0; ir < 24; ir++)
+            {
+                ulong RC = 0;
+
+                for (j = 0; j <= 6; j++)
+                {
+                    i = (j + 7 * ir) % 255;
+                    if (i < 0)
+                        i += 255;
+
+                    if (rcs[i])
+                        RC |= RCs[j];
+                }
+
+                Result[ir] = RC;
+            }
 
             return Result;
         }
@@ -326,26 +336,14 @@ namespace Waher.Security.SHA3
 
             // ι function, as defined in section 3.2.5 of NIST FIPS 202.
 
-            ulong RC = 0;
-
-            for (j = 0; j <= 6; j++)    // l
-            {
-                i = (j + 7 * ir) % 255;
-                if (i < 0)
-                    i += 255;
-
-                if (rcs[i])
-                    RC |= RCs[j];
-            }
-
-            A[0, 0] ^= RC;
+            A[0, 0] ^= RC_ir[ir];
 
             if (this.reportStates)
                 this.NewState?.Invoke(this, new EventArgs());
         }
 
         /// <summary>
-        /// Computes the KECCAK-p[b, nr] algorithm, as defined in section 3.3 of NIST FIPS 202.
+        /// Computes the KECCAK-p[b, nr=24] algorithm, as defined in section 3.3 of NIST FIPS 202.
         /// </summary>
         /// <param name="S">Input string of fixed length</param>
         /// <returns>Output string of fixed length</returns>
@@ -358,7 +356,7 @@ namespace Waher.Security.SHA3
             if (this.reportStates)
                 this.NewState?.Invoke(this, new EventArgs());
 
-            for (ir = 24 - nr; ir < 24; ir++)
+            for (ir = 0; ir < 24; ir++)
                 this.Rnd(ir);
 
             return this.GetState();

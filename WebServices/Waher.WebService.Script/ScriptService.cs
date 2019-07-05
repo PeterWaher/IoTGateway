@@ -10,11 +10,13 @@ using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Networking.HTTP;
 using Waher.Script;
-using Waher.Script.Graphs;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
+using Waher.Script.Graphs;
+using Waher.Script.Model;
 using Waher.Script.Objects;
 using Waher.Script.Objects.Matrices;
+using Waher.Security;
 
 namespace Waher.WebService.Script
 {
@@ -75,10 +77,10 @@ namespace Waher.WebService.Script
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public void POST(HttpRequest Request, HttpResponse Response)
 		{
-			if (Request.Session is null)
-				throw new BadRequestException();
+            if (Request.Session is null || !Request.Session.TryGetVariable("User", out Variable v) || !(v.ValueObject is IUser User))
+                throw new ForbiddenException("Access denied.");
 
-			object Obj = Request.HasData ? Request.DecodeData() : null;
+            object Obj = Request.HasData ? Request.DecodeData() : null;
 			string s = Obj as string;
 			string Tag = Request.Header["X-TAG"];
 
@@ -135,7 +137,10 @@ namespace Waher.WebService.Script
 				try
 				{
 					Exp = new Expression(s);
-				}
+
+                    if (!Exp.ForAll(this.IsAuthorized, User, false))
+                        throw new ForbiddenException("Unauthorized to execute expression.");
+                }
 				catch (Exception ex)
 				{
 					this.SendResponse(Variables, new ObjectValue(ex), null, Response, false);
@@ -192,14 +197,21 @@ namespace Waher.WebService.Script
 			}
 		}
 
-		private void SendResponse(Variables Variables, IElement Result, StringBuilder sb, HttpResponse Response,
+        private bool IsAuthorized(ref ScriptNode Node, object State)
+        {
+            if (State is IUser User)
+                return User.HasPrivilege(Node.GetType().FullName);
+            else
+                return false;
+        }
+
+        private void SendResponse(Variables Variables, IElement Result, StringBuilder sb, HttpResponse Response,
 			bool More)
 		{
 			Variables["Ans"] = Result;
 
-			SKImage Img;
-			object Obj;
-			string s;
+            object Obj;
+            string s;
 
 			if (Result is Graph G)
 			{
@@ -264,7 +276,7 @@ namespace Waher.WebService.Script
 					}
 				}
 			}
-			else if ((Img = Result.AssociatedObjectValue as SKImage) != null)
+			else if (Result.AssociatedObjectValue is SKImage Img)
 			{
 				SKData Data = Img.Encode(SKEncodedImageFormat.Png, 100);
 				byte[] Bin = Data.ToArray();

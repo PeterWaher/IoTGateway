@@ -646,7 +646,7 @@ namespace Waher.IoTGateway.Setup
 						do
 						{
 							ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Waiting to poll authorization status.", false, "User");
-							System.Threading.Thread.Sleep(5000);
+                            await Task.Delay(5000);
 
 							ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Polling authorization.", false, "User");
 							Authorization2 = await Authorization2.Poll();

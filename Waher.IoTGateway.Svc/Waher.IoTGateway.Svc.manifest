@@ -332,6 +332,10 @@
   <Assembly fileName='Waher.Utility.Transform.dll' altFolder='..\..\..\..\Utilities\Waher.Utility.Transform\bin\Release\PublishOutput\win-x86\'/>
   <Assembly fileName='Waher.Utility.Transform.deps.json' altFolder='..\..\..\..\Utilities\Waher.Utility.Transform\bin\Release\PublishOutput\win-x86\'/>
   <Assembly fileName='Waher.Utility.Transform.runtimeconfig.json' altFolder='..\..\..\..\Utilities\Waher.Utility.Transform\bin\Release\PublishOutput\win-x86\'/>
+  <Assembly fileName='Waher.Utility.ExStat.exe' altFolder='..\..\..\..\Utilities\Waher.Utility.ExStat\bin\Release\PublishOutput\win-x86\'/>
+  <Assembly fileName='Waher.Utility.ExStat.dll' altFolder='..\..\..\..\Utilities\Waher.Utility.ExStat\bin\Release\PublishOutput\win-x86\'/>
+  <Assembly fileName='Waher.Utility.ExStat.deps.json' altFolder='..\..\..\..\Utilities\Waher.Utility.ExStat\bin\Release\PublishOutput\win-x86\'/>
+  <Assembly fileName='Waher.Utility.ExStat.runtimeconfig.json' altFolder='..\..\..\..\Utilities\Waher.Utility.ExStat\bin\Release\PublishOutput\win-x86\'/>
   <Folder name="Graphics">
     <Content fileName='Emoji1.zip'/>
   </Folder>

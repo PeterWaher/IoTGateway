@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Waher.Utility.ExStat": {
+      "commandName": "Project",
+      "commandLineArgs": "-p C:\\Temp\\waher.se\\*.txt -x C:\\Temp\\waher.se\\ExStat.xml"
+    }
+  }
+}

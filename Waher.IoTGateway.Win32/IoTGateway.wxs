@@ -915,7 +915,21 @@
 							<File Id='Waher.Utility.Transform.pdb' Name='Waher.Utility.Transform.pdb' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Transform\bin\$(var.Configuration)\netcoreapp2.0\Waher.Utility.Transform.pdb' Vital='yes' KeyPath='yes'/>
 							<RemoveFile Id='RemoveWaher.Utility.Transform.pdb' Name='Waher.Utility.Transform.pdb' On='uninstall'/>
 						</Component>
-						<Directory Id='Graphics' Name='Graphics'>
+            <Component Id='UtilityExStat' Guid='AB60319A-BD68-4D51-AA67-4788815C6B28'>
+              <File Id='Waher.Utility.ExStat.exe' Name='Waher.Utility.ExStat.exe' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.ExStat\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.ExStat.exe' Vital='yes' KeyPath='yes'/>
+              <File Id='Waher.Utility.ExStat.dll' Name='Waher.Utility.ExStat.dll' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.ExStat\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.ExStat.dll' Vital='yes'/>
+              <File Id='Waher.Utility.ExStat.deps.json' Name='Waher.Utility.ExStat.deps.json' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.ExStat\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.ExStat.deps.json' Vital='yes'/>
+              <File Id='Waher.Utility.ExStat.runtimeconfig.json' Name='Waher.Utility.ExStat.runtimeconfig.json' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.ExStat\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.ExStat.runtimeconfig.json' Vital='yes'/>
+              <RemoveFile Id='RemoveWaher.Utility.ExStat.exe' Name='Waher.Utility.ExStat.exe' On='uninstall'/>
+              <RemoveFile Id='RemoveWaher.Utility.ExStat.dll' Name='Waher.Utility.ExStat.dll' On='uninstall'/>
+              <RemoveFile Id='RemoveWaher.Utility.ExStat.deps.json' Name='Waher.Utility.ExStat.deps.json' On='uninstall'/>
+              <RemoveFile Id='RemoveWaher.Utility.ExStat.runtimeconfig.json' Name='Waher.Utility.ExStat.runtimeconfig.json' On='uninstall'/>
+            </Component>
+            <Component Id='UtilityExStatDebugFiles' Guid='CD1F82EC-9ADF-4C76-BBA9-971EE0B32EE2'>
+              <File Id='Waher.Utility.ExStat.pdb' Name='Waher.Utility.ExStat.pdb' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.ExStat\bin\$(var.Configuration)\netcoreapp2.0\Waher.Utility.ExStat.pdb' Vital='yes' KeyPath='yes'/>
+              <RemoveFile Id='RemoveWaher.Utility.ExStat.pdb' Name='Waher.Utility.ExStat.pdb' On='uninstall'/>
+            </Component>
+            <Directory Id='Graphics' Name='Graphics'>
 							<Component Id='Emoji1Zip' Guid='8CA3074F-7809-4D73-82EF-B15316E5151F'>
 								<RemoveFolder Id='RemoveEmoji1Folder' On='uninstall' />
 								<File Id='Emoji1.zip' Name='Emoji1.zip' DiskId='1' Source='..\..\..\Content\Waher.Content.Emoji.Emoji1\Graphics\Emoji1.zip' Vital='yes' KeyPath='yes'/>

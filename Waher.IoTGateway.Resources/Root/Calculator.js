@@ -15,7 +15,7 @@
 	var Code = document.createElement("code");
 	var TextNode = document.createTextNode(Script.value);
 	var s = TextNode.nodeValue;
-	s = s.replace(/(?:\r\n|\r|\n)/g, "<br/>").replace(/ /g, '&nbsp;').replace(/\t/g, '&nbsp;&nbsp;&nbsp;');
+    s = s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/(?:\r\n|\r|\n)/g, "<br/>").replace(/ /g, '&nbsp;').replace(/\t/g, '&nbsp;&nbsp;&nbsp;');
 	Code.innerHTML = s;
 	var P = document.createElement('p');
 	P.appendChild(Code);

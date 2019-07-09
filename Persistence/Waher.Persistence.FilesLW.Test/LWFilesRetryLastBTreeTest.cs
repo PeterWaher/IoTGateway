@@ -27,7 +27,6 @@ namespace Waher.Persistence.FilesLW.Test
 	{
 		private ObjectBTreeFile file;
 		private FilesProvider provider;
-		private readonly Random gen = new Random();
 		private DateTime start;
 
 		[TestInitialize]
@@ -36,7 +35,7 @@ namespace Waher.Persistence.FilesLW.Test
 			if (!File.Exists(DBFilesBTreeTests.MasterFileName + ".bak") ||
 				!File.Exists(DBFilesBTreeTests.DefaultFileName + ".bak") ||
 				!File.Exists(DBFilesBTreeTests.DefaultBlobFileName + ".bak") ||
-				!File.Exists(DBFilesBTreeTests.DefaultNamesFileName + ".bak"))
+				!File.Exists(DBFilesBTreeTests.DefaultLabelsFileName + ".bak"))
 			{
 				Assert.Inconclusive("No backup files to test against.");
 			}
@@ -50,13 +49,13 @@ namespace Waher.Persistence.FilesLW.Test
 			if (File.Exists(DBFilesBTreeTests.DefaultBlobFileName))
 				File.Delete(DBFilesBTreeTests.DefaultBlobFileName);
 
-			if (File.Exists(DBFilesBTreeTests.DefaultNamesFileName))
-				File.Delete(DBFilesBTreeTests.DefaultNamesFileName);
+			if (File.Exists(DBFilesBTreeTests.DefaultLabelsFileName))
+				File.Delete(DBFilesBTreeTests.DefaultLabelsFileName);
 
 			File.Copy(DBFilesBTreeTests.MasterFileName + ".bak", DBFilesBTreeTests.MasterFileName);
 			File.Copy(DBFilesBTreeTests.DefaultFileName + ".bak", DBFilesBTreeTests.DefaultFileName);
 			File.Copy(DBFilesBTreeTests.DefaultBlobFileName + ".bak", DBFilesBTreeTests.DefaultBlobFileName);
-			File.Copy(DBFilesBTreeTests.DefaultNamesFileName + ".bak", DBFilesBTreeTests.DefaultNamesFileName);
+			File.Copy(DBFilesBTreeTests.DefaultLabelsFileName + ".bak", DBFilesBTreeTests.DefaultLabelsFileName);
 
 			int BlockSize = this.LoadBlockSize();
 

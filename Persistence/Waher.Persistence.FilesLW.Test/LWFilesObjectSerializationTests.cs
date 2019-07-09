@@ -21,10 +21,6 @@ namespace Waher.Persistence.FilesLW.Test
 	[TestClass]
 	public class DBFilesObjectSerializationTests
 	{
-		internal const string FileName = "Data\\Test.btree";
-		internal const string BlobFileName = "Data\\Test.blob";
-		internal const string NamesFileName = "Data\\Test.names";
-
 		private static FilesProvider provider;
 		private static ObjectBTreeFile file1;
 		private static ObjectBTreeFile file2;
@@ -245,7 +241,7 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			Reader.Restart(Data, 0);
 
-			Guid ObjectId = Reader.ReadGuid();
+			Reader.ReadGuid();
 			ulong Len = Reader.ReadVariableLengthUInt64();
 
 			AssertEx.Same(Data.Length - 16 - this.VariableULongLen(Len), Len);

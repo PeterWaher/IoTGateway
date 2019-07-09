@@ -63,7 +63,6 @@ namespace Waher.Persistence.Files
         private uint blobBlockLimit;
         private bool isCorrupt = false;
         private bool emptyRoot = false;
-        private readonly bool debug;
         private readonly Aes aes;
         private readonly byte[] aesKey;
         private readonly byte[] ivSeed;
@@ -88,11 +87,10 @@ namespace Waher.Persistence.Files
         /// <param name="Encoding">Encoding to use for text properties.</param>
         /// <param name="TimeoutMilliseconds">Timeout, in milliseconds, to wait for access to the database layer.</param>
         /// <param name="Encrypted">If the files should be encrypted or not.</param>
-        /// <param name="Debug">If the provider is run in debug mode.</param>
         internal ObjectBTreeFile(string FileName, string CollectionName, string BlobFileName, int BlockSize, int BlobBlockSize,
-            FilesProvider Provider, Encoding Encoding, int TimeoutMilliseconds, bool Encrypted, bool Debug)
+            FilesProvider Provider, Encoding Encoding, int TimeoutMilliseconds, bool Encrypted)
             : this(FileName, CollectionName, BlobFileName, BlockSize, BlobBlockSize, Provider, Encoding,
-                  TimeoutMilliseconds, Encrypted, Debug, null)
+                  TimeoutMilliseconds, Encrypted, null)
         {
         }
 
@@ -114,10 +112,9 @@ namespace Waher.Persistence.Files
         /// <param name="Encoding">Encoding to use for text properties.</param>
         /// <param name="TimeoutMilliseconds">Timeout, in milliseconds, to wait for access to the database layer.</param>
         /// <param name="Encrypted">If the files should be encrypted or not.</param>
-        /// <param name="Debug">If the provider is run in debug mode.</param>
         /// <param name="RecordHandler">Record handler to use.</param>
         internal ObjectBTreeFile(string FileName, string CollectionName, string BlobFileName, int BlockSize,
-            int BlobBlockSize, FilesProvider Provider, Encoding Encoding, int TimeoutMilliseconds, bool Encrypted, bool Debug,
+            int BlobBlockSize, FilesProvider Provider, Encoding Encoding, int TimeoutMilliseconds, bool Encrypted, 
             IRecordHandler RecordHandler)
         {
             CheckBlockSizes(BlockSize, BlobBlockSize);
@@ -137,7 +134,6 @@ namespace Waher.Persistence.Files
             this.timeoutMilliseconds = TimeoutMilliseconds;
             this.genericSerializer = new GenericObjectSerializer(this.provider);
             this.encrypted = Encrypted;
-            this.debug = Debug;
 
             if (RecordHandler is null)
                 this.recordHandler = new PrimaryRecords(this.inlineObjectSizeLimit);
@@ -165,11 +161,9 @@ namespace Waher.Persistence.Files
             if (FileExists)
                 this.file = File.Open(this.fileName, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
             else
-
             {
                 this.file = File.Open(this.fileName, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.None);
-                Task Task = this.CreateFirstBlock();
-                //Task.Wait();
+                Task _ = this.CreateFirstBlock();
             }
 
             this.blockLimit = (uint)(this.file.Length / this.blockSize);
@@ -3579,9 +3573,7 @@ namespace Waher.Persistence.Files
         /// <returns>Report</returns>
         public string GetCurrentStateReport(bool WriteStat, bool Properties)
         {
-            Task<string> Result = this.GetCurrentStateReportAsync(WriteStat, Properties);
-            FilesProvider.Wait(Result, this.timeoutMilliseconds);
-            return Result.Result;
+            return this.GetCurrentStateReportAsync(WriteStat, Properties).Result;
         }
 
         /// <summary>
@@ -4925,7 +4917,7 @@ namespace Waher.Persistence.Files
         /// <returns>Best index to use for the search. If no index is found matching the properties, null is returned.</returns>
         internal IndexBTreeFile FindBestIndex(params string[] Properties)
         {
-            return this.FindBestIndex(out int BestNrFields, Properties);
+            return this.FindBestIndex(out int _, Properties);
         }
 
         /// <summary>
@@ -5367,7 +5359,7 @@ namespace Waher.Persistence.Files
             else if (Filter is FilterFieldValue FilterFieldValue)
             {
                 object Value = FilterFieldValue.Value;
-                IndexBTreeFile Index = this.FindBestIndex(out int NrFields, FilterFieldValue.FieldName, SortOrder);
+                IndexBTreeFile Index = this.FindBestIndex(out int _, FilterFieldValue.FieldName, SortOrder);
                 ICursor<T> Cursor;
 
                 if (Index is null)
@@ -5511,7 +5503,7 @@ namespace Waher.Persistence.Files
                 if (Filter is FilterFieldLikeRegEx FilterFieldLikeRegEx)
                 {
                     Searching.FilterFieldLikeRegEx FilterFieldLikeRegEx2 = (Searching.FilterFieldLikeRegEx)this.ConvertFilter(Filter);
-                    IndexBTreeFile Index = this.FindBestIndex(out int NrFields, FilterFieldLikeRegEx.FieldName, SortOrder);
+                    IndexBTreeFile Index = this.FindBestIndex(out int _, FilterFieldLikeRegEx.FieldName, SortOrder);
 
                     string ConstantPrefix = Index is null ? string.Empty : this.GetRegExConstantPrefix(FilterFieldLikeRegEx.RegularExpression, FilterFieldLikeRegEx2.Regex);
 
@@ -5589,7 +5581,7 @@ namespace Waher.Persistence.Files
                         }
                     }
 
-                    IndexBTreeFile Index = Properties is null ? null : this.FindBestIndex(out int NrFields, Properties.ToArray());
+                    IndexBTreeFile Index = Properties is null ? null : this.FindBestIndex(out int _, Properties.ToArray());
                     return !(Index is null);
                 }
                 else if (Filter is FilterOr)

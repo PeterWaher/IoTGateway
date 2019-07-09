@@ -68,10 +68,8 @@ namespace Waher.Persistence.Files
     public class FilesProvider : IDisposable, IDatabaseProvider
     {
         private Dictionary<Type, IObjectSerializer> serializers;
-        private readonly Dictionary<string, Dictionary<string, ulong>> codeByFieldByCollection = new Dictionary<string, Dictionary<string, ulong>>();
-        private readonly Dictionary<string, Dictionary<ulong, string>> fieldByCodeByCollection = new Dictionary<string, Dictionary<ulong, string>>();
         private readonly Dictionary<string, ObjectBTreeFile> files = new Dictionary<string, ObjectBTreeFile>();
-        private readonly Dictionary<string, StringDictionary> nameFiles = new Dictionary<string, StringDictionary>();
+        private readonly Dictionary<string, LabelFile> labelFiles = new Dictionary<string, LabelFile>();
         private readonly Dictionary<ObjectBTreeFile, bool> hasUnsavedData = new Dictionary<ObjectBTreeFile, bool>();
         private readonly AutoResetEvent serializerAdded = new AutoResetEvent(false);
         private StringDictionary master;
@@ -503,17 +501,17 @@ namespace Waher.Persistence.Files
             if (!(this.files is null))
             {
                 foreach (ObjectBTreeFile File in this.files.Values)
-                    File.Dispose();
+                    File?.Dispose();
 
                 this.files.Clear();
             }
 
-            if (!(this.nameFiles is null))
+            if (!(this.labelFiles is null))
             {
-                foreach (StringDictionary File in this.nameFiles.Values)
+                foreach (LabelFile File in this.labelFiles.Values)
                     File.Dispose();
 
-                this.nameFiles.Clear();
+                this.labelFiles.Clear();
             }
 
             this.blocks?.Dispose();
@@ -825,52 +823,7 @@ namespace Waher.Persistence.Files
         /// <returns>Field code.</returns>
         public ulong GetFieldCode(string Collection, string FieldName)
         {
-            if (string.IsNullOrEmpty(Collection))
-                Collection = this.defaultCollectionName;
-
-            Dictionary<string, ulong> List;
-            Dictionary<ulong, string> List2;
-            StringDictionary Names;
-            ulong Result;
-
-            lock (this.synchObj)
-            {
-                if (this.codeByFieldByCollection.TryGetValue(Collection, out List))
-                {
-                    if (List.TryGetValue(FieldName, out Result))
-                        return Result;
-
-                    List2 = this.fieldByCodeByCollection[Collection];
-
-                    Result = (uint)List.Count + 1;
-
-                    List[FieldName] = Result;
-                    List2[Result] = FieldName;
-                }
-                else
-                {
-                    Result = 0;
-                    List = null;
-                    List2 = null;
-                }
-            }
-
-            if (List is null)
-            {
-                Task<ulong> Task = this.GetFieldCodeAsync(Collection, FieldName);
-                FilesProvider.Wait(Task, this.timeoutMilliseconds);
-                return Task.Result;
-            }
-            else
-            {
-                lock (this.files)
-                {
-                    Names = this.nameFiles[Collection];
-                }
-
-                Task Task = Names.AddAsync(FieldName, Result, true);    // Add asynchronously
-                return Result;
-            }
+            return this.GetFieldCodeAsync(Collection, FieldName).Result;
         }
 
         /// <summary>
@@ -884,64 +837,25 @@ namespace Waher.Persistence.Files
             if (string.IsNullOrEmpty(Collection))
                 Collection = this.defaultCollectionName;
 
-            Dictionary<string, ulong> List;
-            Dictionary<ulong, string> List2;
-            StringDictionary Names;
-            ulong Result;
-
-            lock (this.synchObj)
-            {
-                if (this.codeByFieldByCollection.TryGetValue(Collection, out List))
-                {
-                    if (List.TryGetValue(FieldName, out Result))
-                        return Result;
-
-                    List2 = this.fieldByCodeByCollection[Collection];
-
-                    Result = (uint)List.Count + 1;
-
-                    List[FieldName] = Result;
-                    List2[Result] = FieldName;
-                }
-                else
-                {
-                    Result = 0;
-                    List = null;
-                    List2 = null;
-                }
-            }
-
-            if (List is null)
-            {
-                await this.GetFile(Collection);     // Generates structures.
-
-                lock (this.synchObj)
-                {
-                    if (this.codeByFieldByCollection.TryGetValue(Collection, out List))
-                    {
-                        if (List.TryGetValue(FieldName, out Result))
-                            return Result;
-
-                        List2 = this.fieldByCodeByCollection[Collection];
-
-                        Result = (uint)List.Count + 1;
-
-                        List[FieldName] = Result;
-                        List2[Result] = FieldName;
-                    }
-                    else
-                        throw new Exception("Internal structures not generated properly.");
-                }
-            }
+            LabelFile Labels;
 
             lock (this.files)
             {
-                Names = this.nameFiles[Collection];
+                if (!this.labelFiles.TryGetValue(Collection, out Labels))
+                    Labels = null;
             }
 
-            Task Task = Names.AddAsync(FieldName, Result, true);    // Add asynchronously
+            if (Labels is null)
+            {
+                await this.GetFile(Collection);     // Generates structures.
 
-            return Result;
+                lock (this.files)
+                {
+                    Labels = this.labelFiles[Collection];
+                }
+            }
+
+            return await Labels.GetFieldCodeAsync(FieldName);
         }
 
         /// <summary>
@@ -953,9 +867,7 @@ namespace Waher.Persistence.Files
         /// <exception cref="ArgumentException">If the collection or field code are not known.</exception>
         public string GetFieldName(string Collection, ulong FieldCode)
         {
-            Task<string> Result = this.GetFieldNameAsync(Collection, FieldCode);
-            FilesProvider.Wait(Result, this.timeoutMilliseconds);
-            return Result.Result;
+            return this.GetFieldNameAsync(Collection, FieldCode).Result;
         }
 
         /// <summary>
@@ -967,35 +879,31 @@ namespace Waher.Persistence.Files
         /// <exception cref="ArgumentException">If the collection or field code are not known.</exception>
         public async Task<string> GetFieldNameAsync(string Collection, ulong FieldCode)
         {
+            if (FieldCode > uint.MaxValue)
+                throw new ArgumentOutOfRangeException("Field code too large.", nameof(FieldCode));
+
             if (string.IsNullOrEmpty(Collection))
                 Collection = this.defaultCollectionName;
 
-            Dictionary<ulong, string> List2;
-            string Result;
+            LabelFile Labels;
 
-            lock (this.synchObj)
+            lock (this.files)
             {
-                if (this.fieldByCodeByCollection.TryGetValue(Collection, out List2))
+                if (!this.labelFiles.TryGetValue(Collection, out Labels))
+                    Labels = null;
+            }
+
+            if (Labels is null)
+            {
+                await this.GetFile(Collection);     // Generates structures.
+
+                lock (this.files)
                 {
-                    if (List2.TryGetValue(FieldCode, out Result))
-                        return Result;
-                    else
-                        throw new ArgumentException("Field code unknown: " + FieldCode.ToString(), nameof(FieldCode));
-                }
-                else
-                {
-                    Result = null;
-                    List2 = null;
+                    Labels = this.labelFiles[Collection];
                 }
             }
 
-            if (List2 is null)
-            {
-                await this.GetFile(Collection);
-                Result = await this.GetFieldNameAsync(Collection, FieldCode);
-            }
-
-            return Result;
+            return await Labels.GetFieldNameAsync((uint)FieldCode);
         }
 
         #endregion
@@ -1281,62 +1189,43 @@ namespace Waher.Persistence.Files
                 CollectionName = this.defaultCollectionName;
 
             string s = this.GetFileName(CollectionName);
-            KeyValuePair<string, object>[] Strings;
-            StringDictionary Names;
 
             if (!CreateIfNotExists && !System.IO.File.Exists(Path.GetFullPath(s + ".btree")))
                 return null;
 
-            lock (this.files)
-            {
-                if (this.files.TryGetValue(CollectionName, out File))
-                    return File;
+            bool Wait;
 
-                if (!this.nameFiles.TryGetValue(CollectionName, out Names))
+            do
+            {
+                Wait = false;
+
+                lock (this.files)
                 {
-                    Names = new StringDictionary(s + ".names", string.Empty, CollectionName, this, false);
-                    this.nameFiles[CollectionName] = Names;
-                }
-            }
-
-            try
-            {
-                Strings = await Names.ToArrayAsync();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Names database file '" + Names.DictionaryFile.FileName +
-                    "' has been corrupted.", ex);
-            }
-
-            lock (this.synchObj)
-            {
-                if (!this.codeByFieldByCollection.TryGetValue(CollectionName, out Dictionary<string, ulong> List) ||
-                    !this.fieldByCodeByCollection.TryGetValue(CollectionName, out Dictionary<ulong, string> List2))
-                {
-                    List = new Dictionary<string, ulong>();
-                    this.codeByFieldByCollection[CollectionName] = List;
-
-                    List2 = new Dictionary<ulong, string>();
-                    this.fieldByCodeByCollection[CollectionName] = List2;
-
-                    foreach (KeyValuePair<string, object> P in Strings)
+                    if (this.files.TryGetValue(CollectionName, out File))
                     {
-                        List[P.Key] = (ulong)P.Value;
-                        List2[(ulong)P.Value] = P.Key;
+                        if (File is null)
+                            Wait = true;
+                        else
+                            return File;
                     }
+                    else
+                        this.files[CollectionName] = null;
                 }
+
+                if (Wait)
+                    await Task.Delay(100);
             }
+            while (Wait);
+
+            LabelFile Labels = await LabelFile.Create(CollectionName, this.timeoutMilliseconds, this.encrypted, this);
+
+            File = new ObjectBTreeFile(s + ".btree", CollectionName, s + ".blob", this.blockSize, this.blobBlockSize,
+                this, this.encoding, this.timeoutMilliseconds, this.encrypted);
 
             lock (this.files)
             {
-                if (this.files.TryGetValue(CollectionName, out File))
-                    return File;
-
-                File = new ObjectBTreeFile(s + ".btree", CollectionName, s + ".blob", this.blockSize, this.blobBlockSize,
-                    this, this.encoding, this.timeoutMilliseconds, this.encrypted, this.debug);
-
                 this.files[CollectionName] = File;
+                this.labelFiles[CollectionName] = Labels;
             }
 
             StringBuilder sb = new StringBuilder();
@@ -1356,16 +1245,16 @@ namespace Waher.Persistence.Files
         }
 
         /// <summary>
-        /// Tries to get the names dictionary for a given collection.
+        /// Tries to get the labels file for a given collection.
         /// </summary>
         /// <param name="CollectionName">Collection name.</param>
-        /// <param name="Names">Names dictionary, if found.</param>
-        /// <returns>If a names dictionary was found for the given collection.</returns>
-        public bool TryGetNamesFile(string CollectionName, out StringDictionary Names)
+        /// <param name="Labels">Labels file, if found.</param>
+        /// <returns>If a labels dictionary was found for the given collection.</returns>
+        public bool TryGetLabelsFile(string CollectionName, out LabelFile Labels)
         {
             lock (this.files)
             {
-                return this.nameFiles.TryGetValue(CollectionName, out Names);
+                return this.labelFiles.TryGetValue(CollectionName, out Labels);
             }
         }
 
@@ -1494,7 +1383,7 @@ namespace Waher.Persistence.Files
         public bool CloseFile(string CollectionName)
         {
             ObjectBTreeFile File;
-            StringDictionary Names;
+            LabelFile Labels;
 
             if (string.IsNullOrEmpty(CollectionName))
                 CollectionName = this.defaultCollectionName;
@@ -1506,24 +1395,16 @@ namespace Waher.Persistence.Files
 
                 this.files.Remove(CollectionName);
 
-                Names = this.nameFiles[CollectionName];
-                this.nameFiles.Remove(CollectionName);
+                Labels = this.labelFiles[CollectionName];
+                this.labelFiles.Remove(CollectionName);
             }
 
             int FileId = File.Id;
-            int NamesId = Names.DictionaryFile.Id;
 
             File.Dispose();
-            Names.Dispose();
-
-            lock (this.synchObj)
-            {
-                this.codeByFieldByCollection.Remove(CollectionName);
-                this.fieldByCodeByCollection.Remove(CollectionName);
-            }
+            Labels.Dispose();
 
             this.RemoveBlocks(FileId);
-            this.RemoveBlocks(NamesId);
 
             return true;
         }
@@ -2074,17 +1955,18 @@ namespace Waher.Persistence.Files
         {
             get
             {
-                ObjectBTreeFile[] Files;
-                int c;
+                List<ObjectBTreeFile> Files = new List<ObjectBTreeFile>();
 
                 lock (this.files)
                 {
-                    c = this.files.Count;
-                    Files = new ObjectBTreeFile[c];
-                    this.files.Values.CopyTo(Files, 0);
+                    foreach (ObjectBTreeFile File in this.files.Values)
+                    {
+                        if (!(File is null))
+                            Files.Add(File);
+                    }
                 }
 
-                return Files;
+                return Files.ToArray();
             }
         }
 
@@ -2095,13 +1977,7 @@ namespace Waher.Persistence.Files
         /// <returns>Task object for synchronization purposes.</returns>
         public async Task Export(IDatabaseExport Output)
         {
-            ObjectBTreeFile[] Files;
-
-            lock (this.files)
-            {
-                Files = new ObjectBTreeFile[this.files.Count];
-                this.files.Values.CopyTo(Files, 0);
-            }
+            ObjectBTreeFile[] Files = this.Files;
 
             await Output.StartExport();
             try
@@ -2258,7 +2134,7 @@ namespace Waher.Persistence.Files
                     string TempBlobFileName = TempFileName + ".blob";
 
                     using (ObjectBTreeFile TempFile = new ObjectBTreeFile(TempBtreeFileName, File.CollectionName, TempBlobFileName,
-                        File.BlockSize, File.BlobBlockSize, this, File.Encoding, File.TimeoutMilliseconds, File.Encrypted, false))
+                        File.BlockSize, File.BlobBlockSize, this, File.Encoding, File.TimeoutMilliseconds, File.Encrypted))
                     {
                         int c = 0;
 
@@ -2500,7 +2376,7 @@ namespace Waher.Persistence.Files
                 Output.WriteAttributeString("isReadOnly", Encode(File.IsReadOnly));
                 Output.WriteAttributeString("timeoutMs", File.TimeoutMilliseconds.ToString());
 
-                WriteStat(Output, File, Stat);
+                WriteStat(Output, Stat);
 
                 foreach (IndexBTreeFile Index in File.Indices)
                 {
@@ -2530,7 +2406,7 @@ namespace Waher.Persistence.Files
                         Stat.LogComment("Index was regenerated due to errors found.");
                     }
 
-                    WriteStat(Output, Index.IndexFile, Stat);
+                    WriteStat(Output, Stat);
 
                     Output.WriteEndElement();
                 }
@@ -2577,7 +2453,7 @@ namespace Waher.Persistence.Files
             return Path;
         }
 
-        private static void WriteStat(XmlWriter w, ObjectBTreeFile File, FileStatistics Stat)
+        private static void WriteStat(XmlWriter w, FileStatistics Stat)
         {
             w.WriteStartElement("Stat");
 

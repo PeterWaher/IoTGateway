@@ -46,7 +46,7 @@ namespace Waher.Persistence.Files
 
 			this.dictionaryFile = new ObjectBTreeFile(FileName, this.collectionName, BlobFileName,
 				this.provider.BlockSize, this.provider.BlobBlockSize, this.provider, this.encoding, this.timeoutMilliseconds,
-				this.provider.Encrypted, Provider.Debug, this.recordHandler);
+				this.provider.Encrypted, this.recordHandler);
 
             if (RetainInMemory)
 				this.inMemory = new Dictionary<string, object>();

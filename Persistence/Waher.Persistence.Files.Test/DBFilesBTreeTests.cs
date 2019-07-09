@@ -30,10 +30,7 @@ namespace Waher.Persistence.FilesLW.Test
 		internal const string MasterFileName = "Data\\Files.master";
 		internal const string DefaultFileName = "Data\\Default.btree";
 		internal const string DefaultBlobFileName = "Data\\Default.blob";
-		internal const string DefaultNamesFileName = "Data\\Default.names";
-		internal const string TestFileName = "Data\\Test.btree";
-		internal const string TestBlobFileName = "Data\\Test.blob";
-		internal const string TestNamesFileName = "Data\\Test.names";
+		internal const string DefaultLabelsFileName = "Data\\Default.labels";
 		internal const string CollectionName = "Default";
 		internal const string ObjFileName = "Data\\LastObject.bin";
 		internal const string ObjIdFileName = "Data\\LastObjectId.bin";
@@ -60,7 +57,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[AssemblyInitialize]
-		public static void AssemblyInitialize(TestContext Context)
+		public static void AssemblyInitialize(TestContext _)
 		{
 			Types.Initialize(
                 typeof(FilesProvider).Assembly,
@@ -108,13 +105,13 @@ namespace Waher.Persistence.FilesLW.Test
 				File.Delete(DefaultBlobFileName);
 			}
 
-			if (File.Exists(DefaultNamesFileName + ".bak"))
-				File.Delete(DefaultNamesFileName + ".bak");
+			if (File.Exists(DefaultLabelsFileName + ".bak"))
+				File.Delete(DefaultLabelsFileName + ".bak");
 
-			if (File.Exists(DefaultNamesFileName))
+			if (File.Exists(DefaultLabelsFileName))
 			{
-				File.Copy(DefaultNamesFileName, DefaultNamesFileName + ".bak");
-				File.Delete(DefaultNamesFileName);
+				File.Copy(DefaultLabelsFileName, DefaultLabelsFileName + ".bak");
+				File.Delete(DefaultLabelsFileName);
 			}
 
 			if (File.Exists(Index1FileName + ".bak"))
@@ -836,7 +833,7 @@ namespace Waher.Persistence.FilesLW.Test
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(c);
 			Simple[] Ordered = new Simple[c];
 			Objects.Values.CopyTo(Ordered, 0);
-			Guid? Prev = null;
+			Guid? Prev;
 			Simple Obj;
 			Random gen = new Random();
 			int i, j;
@@ -1133,7 +1130,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 						File.Copy(DefaultFileName, DefaultFileName + ".bak", true);
 						File.Copy(DefaultBlobFileName, DefaultBlobFileName + ".bak", true);
-						File.Copy(DefaultNamesFileName, DefaultNamesFileName + ".bak", true);
+						File.Copy(DefaultLabelsFileName, DefaultLabelsFileName + ".bak", true);
 
 						this.file = await this.provider.GetFile(CollectionName);
 

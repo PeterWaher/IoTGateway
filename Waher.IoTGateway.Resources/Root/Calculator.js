@@ -22,7 +22,7 @@
 	var Div2 = document.createElement('div');
 	Div2.appendChild(P);
 	Div2.setAttribute("class", "clickable");
-	Div2.setAttribute("onclick", "SetScript(\"" + Script.value.replace(/"/g, '\\"').replace(/'/g, '\\\'').replace(/\r/g, '\\r').replace(/\n/g, '\\n').replace(/\t/g, '\\t') + "\");");
+    Div2.setAttribute("onclick", "SetScript(\"" + Script.value.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/'/g, '\\\'').replace(/\r/g, '\\r').replace(/\n/g, '\\n').replace(/\t/g, '\\t') + "\");");
 
 	Div.insertBefore(Div2, Div.firstChild);
 

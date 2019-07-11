@@ -126,7 +126,7 @@ namespace Waher.IoTGateway
 		private static SynchronizationClient synchronizationClient = null;
 		private static PepClient pepClient = null;
 		private static ContractsClient contractsClient = null;
-        private static SoftwareUpdateClient softwareUpdateClient = null;
+		private static SoftwareUpdateClient softwareUpdateClient = null;
 		private static MailClient mailClient = null;
 		private static X509Certificate2 certificate = null;
 		private static HttpServer webServer = null;
@@ -137,7 +137,7 @@ namespace Waher.IoTGateway
 		private static LoggedIn loggedIn = null;
 		private static Scheduler scheduler = null;
 		private readonly static RandomNumberGenerator rnd = RandomNumberGenerator.Create();
-        private static Semaphore gatewayRunning = null;
+		private static Semaphore gatewayRunning = null;
 		private static Emoji1LocalFiles emoji1_24x24 = null;
 		private static StreamWriter exceptionFile = null;
 		private static CaseInsensitiveString domain = null;
@@ -172,27 +172,27 @@ namespace Waher.IoTGateway
 			return Start(ConsoleOutput, true, string.Empty);
 		}
 
-        /// <summary>
-        /// Starts the gateway.
-        /// </summary>
-        /// <param name="ConsoleOutput">If console output is permitted.</param>
-        /// <param name="LoopbackIntefaceAvailable">If the loopback interface is available.</param>
-        /// <returns>If the gateway was successfully started.</returns>
-        public static Task<bool> Start(bool ConsoleOutput, bool LoopbackIntefaceAvailable)
-        {
-            return Start(ConsoleOutput, LoopbackIntefaceAvailable, string.Empty);
-        }
-
-        /// <summary>
-        /// Starts the gateway.
-        /// </summary>
-        /// <param name="ConsoleOutput">If console output is permitted.</param>
-        /// <param name="LoopbackIntefaceAvailable">If the loopback interface is available.</param>
-        /// <param name="InstanceName">Name of instance. Default=<see cref="string.Empty"/>.</param>
-        /// <returns>If the gateway was successfully started.</returns>
-        public static async Task<bool> Start(bool ConsoleOutput, bool LoopbackIntefaceAvailable, string InstanceName)
+		/// <summary>
+		/// Starts the gateway.
+		/// </summary>
+		/// <param name="ConsoleOutput">If console output is permitted.</param>
+		/// <param name="LoopbackIntefaceAvailable">If the loopback interface is available.</param>
+		/// <returns>If the gateway was successfully started.</returns>
+		public static Task<bool> Start(bool ConsoleOutput, bool LoopbackIntefaceAvailable)
 		{
-            string Suffix = string.IsNullOrEmpty(InstanceName) ? string.Empty : "." + InstanceName;
+			return Start(ConsoleOutput, LoopbackIntefaceAvailable, string.Empty);
+		}
+
+		/// <summary>
+		/// Starts the gateway.
+		/// </summary>
+		/// <param name="ConsoleOutput">If console output is permitted.</param>
+		/// <param name="LoopbackIntefaceAvailable">If the loopback interface is available.</param>
+		/// <param name="InstanceName">Name of instance. Default=<see cref="string.Empty"/>.</param>
+		/// <returns>If the gateway was successfully started.</returns>
+		public static async Task<bool> Start(bool ConsoleOutput, bool LoopbackIntefaceAvailable, string InstanceName)
+		{
+			string Suffix = string.IsNullOrEmpty(InstanceName) ? string.Empty : "." + InstanceName;
 			gatewayRunning = new Semaphore(1, 1, "Waher.IoTGateway.Running" + Suffix);
 			if (!gatewayRunning.WaitOne(1000))
 				return false; // Is running in another process.
@@ -219,12 +219,12 @@ namespace Waher.IoTGateway
 				if (!appDataFolder.EndsWith(new string(Path.DirectorySeparatorChar, 1)))
 					appDataFolder += Path.DirectorySeparatorChar;
 
-                appDataFolder += "IoT Gateway";
+				appDataFolder += "IoT Gateway";
 
-                if (!string.IsNullOrEmpty(InstanceName))
-                    appDataFolder += " " + InstanceName;
+				if (!string.IsNullOrEmpty(InstanceName))
+					appDataFolder += " " + InstanceName;
 
-                appDataFolder += Path.DirectorySeparatorChar;
+				appDataFolder += Path.DirectorySeparatorChar;
 				rootFolder = appDataFolder + "Root" + Path.DirectorySeparatorChar;
 
 				Log.Register(new AlertNotifier("Alert Notifier"));
@@ -253,15 +253,15 @@ namespace Waher.IoTGateway
 				string[] ManifestFiles = Directory.GetFiles(runtimeFolder, "*.manifest", SearchOption.TopDirectoryOnly);
 				Dictionary<string, CopyOptions> ContentOptions = new Dictionary<string, CopyOptions>();
 
-                foreach (string ManifestFile in ManifestFiles)
-                {
-                    CheckContentFiles(ManifestFile, ContentOptions);
+				foreach (string ManifestFile in ManifestFiles)
+				{
+					CheckContentFiles(ManifestFile, ContentOptions);
 
-                    if (ManifestFile.EndsWith("Waher.Utility.Install.manifest"))
-                        CheckInstallUtilityFiles(ManifestFile);
-                }
+					if (ManifestFile.EndsWith("Waher.Utility.Install.manifest"))
+						CheckInstallUtilityFiles(ManifestFile);
+				}
 
-                Types.SetModuleParameter("AppData", appDataFolder);
+				Types.SetModuleParameter("AppData", appDataFolder);
 				Types.SetModuleParameter("Root", rootFolder);
 
 				scheduler = new Scheduler();
@@ -903,66 +903,66 @@ namespace Waher.IoTGateway
 			}
 		}
 
-        private static void CheckInstallUtilityFiles(string ManifestFileName)
-        {
-            try
-            {
-                XmlDocument Doc = new XmlDocument();
-                Doc.Load(ManifestFileName);
+		private static void CheckInstallUtilityFiles(string ManifestFileName)
+		{
+			try
+			{
+				XmlDocument Doc = new XmlDocument();
+				Doc.Load(ManifestFileName);
 
-                if (Doc.DocumentElement != null && Doc.DocumentElement.LocalName == "Module" && Doc.DocumentElement.NamespaceURI == "http://waher.se/Schema/ModuleManifest.xsd")
-                {
-                    string InstallUtilityFolder = Path.Combine(runtimeFolder, "InstallUtility");
-                    bool NoticeLogged = false;
+				if (Doc.DocumentElement != null && Doc.DocumentElement.LocalName == "Module" && Doc.DocumentElement.NamespaceURI == "http://waher.se/Schema/ModuleManifest.xsd")
+				{
+					string InstallUtilityFolder = Path.Combine(runtimeFolder, "InstallUtility");
+					bool NoticeLogged = false;
 
-                    if (!Directory.Exists(InstallUtilityFolder))
-                        Directory.CreateDirectory(InstallUtilityFolder);
+					if (!Directory.Exists(InstallUtilityFolder))
+						Directory.CreateDirectory(InstallUtilityFolder);
 
-                    foreach (XmlNode N in Doc.DocumentElement.ChildNodes)
-                    {
-                        if (N is XmlElement E)
-                        {
-                            switch (E.LocalName)
-                            {
-                                case "Assembly":
-                                    string Name = XML.Attribute(E, "fileName");
-                                    CopyOptions CopyOptions = (CopyOptions)XML.Attribute(E, "copy", CopyOptions.IfNewer);
+					foreach (XmlNode N in Doc.DocumentElement.ChildNodes)
+					{
+						if (N is XmlElement E)
+						{
+							switch (E.LocalName)
+							{
+								case "Assembly":
+									string Name = XML.Attribute(E, "fileName");
+									CopyOptions CopyOptions = (CopyOptions)XML.Attribute(E, "copy", CopyOptions.IfNewer);
 
-                                    string s = Path.Combine(runtimeFolder, Name);
-                                    if (!File.Exists(s))
-                                        break;
+									string s = Path.Combine(runtimeFolder, Name);
+									if (!File.Exists(s))
+										break;
 
-                                    string s2 = Path.Combine(InstallUtilityFolder, Name);
+									string s2 = Path.Combine(InstallUtilityFolder, Name);
 
-                                    if (CopyOptions == CopyOptions.IfNewer && File.Exists(s2))
-                                    {
-                                        DateTime TP = File.GetLastWriteTime(s);
-                                        DateTime TP2 = File.GetLastWriteTime(s2);
+									if (CopyOptions == CopyOptions.IfNewer && File.Exists(s2))
+									{
+										DateTime TP = File.GetLastWriteTime(s);
+										DateTime TP2 = File.GetLastWriteTime(s2);
 
-                                        if (TP <= TP2)
-                                            break;
-                                    }
+										if (TP <= TP2)
+											break;
+									}
 
-                                    if (!NoticeLogged)
-                                    {
-                                        NoticeLogged = true;
-                                        Log.Notice("Copying Installation Utility executable files to InstallUtility subfolder.");
-                                    }
+									if (!NoticeLogged)
+									{
+										NoticeLogged = true;
+										Log.Notice("Copying Installation Utility executable files to InstallUtility subfolder.");
+									}
 
-                                    File.Copy(s, s2, true);
-                                    break;
-                            }
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.Critical(ex, ManifestFileName);
-            }
-        }
+									File.Copy(s, s2, true);
+									break;
+							}
+						}
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex, ManifestFileName);
+			}
+		}
 
-        internal static bool ConsoleOutput => consoleOutput;
+		internal static bool ConsoleOutput => consoleOutput;
 
 		internal static Task ConfigureXmpp(XmppConfiguration Configuration)
 		{
@@ -1027,18 +1027,18 @@ namespace Waher.IoTGateway
 			else
 				contractsClient = null;
 
-            if (!string.IsNullOrEmpty(XmppConfiguration.Instance.SoftwareUpdates))
-            {
-                string PackagesFolder = Path.Combine(Gateway.appDataFolder, "Packages");
-                if (!Directory.Exists(PackagesFolder))
-                    Directory.CreateDirectory(PackagesFolder);
+			if (!string.IsNullOrEmpty(XmppConfiguration.Instance.SoftwareUpdates))
+			{
+				string PackagesFolder = Path.Combine(Gateway.appDataFolder, "Packages");
+				if (!Directory.Exists(PackagesFolder))
+					Directory.CreateDirectory(PackagesFolder);
 
-                softwareUpdateClient = new SoftwareUpdateClient(xmppClient, XmppConfiguration.Instance.SoftwareUpdates, PackagesFolder);
-            }
-            else
-                softwareUpdateClient = null;
+				softwareUpdateClient = new SoftwareUpdateClient(xmppClient, XmppConfiguration.Instance.SoftwareUpdates, PackagesFolder);
+			}
+			else
+				softwareUpdateClient = null;
 
-            mailClient = new MailClient(xmppClient);
+			mailClient = new MailClient(xmppClient);
 			mailClient.MailReceived += MailClient_MailReceived;
 
 			return Task.CompletedTask;
@@ -2033,18 +2033,18 @@ namespace Waher.IoTGateway
 			get { return contractsClient; }
 		}
 
-        /// <summary>
-        /// XMPP Software Updates Client, if such a compoent is available on the XMPP broker.
-        /// </summary>
-        public static SoftwareUpdateClient SoftwareUpdateClient
-        {
-            get { return softwareUpdateClient; }
-        }
+		/// <summary>
+		/// XMPP Software Updates Client, if such a compoent is available on the XMPP broker.
+		/// </summary>
+		public static SoftwareUpdateClient SoftwareUpdateClient
+		{
+			get { return softwareUpdateClient; }
+		}
 
-        /// <summary>
-        /// XMPP Mail Client, if support for mail-extensions is available on the XMPP broker.
-        /// </summary>
-        public static MailClient MailClient
+		/// <summary>
+		/// XMPP Mail Client, if support for mail-extensions is available on the XMPP broker.
+		/// </summary>
+		public static MailClient MailClient
 		{
 			get { return mailClient; }
 		}
@@ -2550,13 +2550,7 @@ namespace Waher.IoTGateway
 			try
 			{
 				CaseInsensitiveString[] Addresses = GetNotificationAddresses();
-				MarkdownSettings Settings = new MarkdownSettings()
-				{
-					ParseMetaData = false
-				};
-				MarkdownDocument Doc = new MarkdownDocument(Markdown, Settings);
-				string Text = Doc.GeneratePlainText();
-				string Html = HtmlDocument.GetBody(Doc.GenerateHTML());
+				(string Text, string Html) = ConvertMarkdown(Markdown);
 
 				foreach (CaseInsensitiveString Admin in Addresses)
 					SendNotification(Admin, Markdown, Text, Html, MessageId, Update);
@@ -2565,6 +2559,19 @@ namespace Waher.IoTGateway
 			{
 				Log.Critical(ex);
 			}
+		}
+
+		private static (string, string) ConvertMarkdown(string Markdown)
+		{
+			MarkdownSettings Settings = new MarkdownSettings()
+			{
+				ParseMetaData = false
+			};
+			MarkdownDocument Doc = new MarkdownDocument(Markdown, Settings);
+			string Text = Doc.GeneratePlainText();
+			string Html = HtmlDocument.GetBody(Doc.GenerateHTML());
+
+			return (Text, Html);
 		}
 
 		/// <summary>
@@ -2587,35 +2594,114 @@ namespace Waher.IoTGateway
 					ScheduleEvent(Resend, DateTime.Now.AddMinutes(15), new object[] { To, Markdown, Text, Html, MessageId, Update });
 				}
 				else
-				{
-					StringBuilder Xml = new StringBuilder();
-
-					Xml.Append("<content xmlns=\"urn:xmpp:content\" type=\"text/markdown\">");
-					Xml.Append(XML.Encode(Markdown));
-					Xml.Append("</content><html xmlns='http://jabber.org/protocol/xhtml-im'><body xmlns='http://www.w3.org/1999/xhtml'>");
-
-                    HtmlDocument Doc = new HtmlDocument("<root>" + Html + "</root>");
-
-                    foreach (HtmlNode N in (Doc.Body ?? Doc.Root).Children)
-                        N.Export(Xml);
-
-					Xml.Append("</body></html>");
-
-					if (Update && !string.IsNullOrEmpty(MessageId))
-					{
-						Xml.Append("<replace id='");
-						Xml.Append(MessageId);
-						Xml.Append("' xmlns='urn:xmpp:message-correct:0'/>");
-
-						MessageId = string.Empty;
-					}
-
-					xmppClient.SendMessage(QoSLevel.Unacknowledged, MessageType.Chat, MessageId, To, Xml.ToString(), Text,
-						string.Empty, string.Empty, string.Empty, string.Empty, null, null);
-				}
+					SendChatMessage(Markdown, Text, Html, To, MessageId, Update);
 			}
 			else
 				ScheduleEvent(Resend, DateTime.Now.AddSeconds(30), new object[] { To, Markdown, Text, Html, MessageId, Update });
+		}
+
+		/// <summary>
+		/// Sends a chat message to a recipient.
+		/// </summary>
+		/// <param name="Markdown">Markdown containing text to send.</param>
+		/// <param name="To">Recipient of chat message.</param>
+		public static void SendChatMessage(string Markdown, string To)
+		{
+			SendChatMessage(Markdown, To, string.Empty);
+		}
+
+		/// <summary>
+		/// Sends a chat message to a recipient.
+		/// </summary>
+		/// <param name="Markdown">Markdown containing text to send.</param>
+		/// <param name="To">Recipient of chat message.</param>
+		/// <param name="MessageId">Message ID to use.</param>
+		public static void SendChatMessage(string Markdown, string To, string MessageId)
+		{
+			(string Text, string Html) = ConvertMarkdown(Markdown);
+			SendChatMessage(Markdown, Text, Html, To, MessageId, false);
+		}
+
+		/// <summary>
+		/// Sends a chat message update to a recipient.
+		/// </summary>
+		/// <param name="Markdown">Markdown containing text to send.</param>
+		/// <param name="To">Recipient of chat message.</param>
+		/// <param name="MessageId">Message ID of message to update.</param>
+		public static void SendChatMessageUpdate(string Markdown, string To, string MessageId)
+		{
+			(string Text, string Html) = ConvertMarkdown(Markdown);
+			SendChatMessage(Markdown, Text, Html, To, MessageId, true);
+		}
+
+		private static void SendChatMessage(string Markdown, string Text, string Html, string To, string MessageId, bool Update)
+		{
+			if (Gateway.XmppClient != null && Gateway.XmppClient.State == XmppState.Connected)
+			{
+				StringBuilder Xml = new StringBuilder();
+
+				Xml.Append("<content xmlns=\"urn:xmpp:content\" type=\"text/markdown\">");
+				Xml.Append(XML.Encode(Markdown));
+				Xml.Append("</content><html xmlns='http://jabber.org/protocol/xhtml-im'><body xmlns='http://www.w3.org/1999/xhtml'>");
+
+				HtmlDocument Doc = new HtmlDocument("<root>" + Html + "</root>");
+
+				foreach (HtmlNode N in (Doc.Body ?? Doc.Root).Children)
+					N.Export(Xml);
+
+				Xml.Append("</body></html>");
+
+				if (Update && !string.IsNullOrEmpty(MessageId))
+				{
+					Xml.Append("<replace id='");
+					Xml.Append(MessageId);
+					Xml.Append("' xmlns='urn:xmpp:message-correct:0'/>");
+
+					MessageId = string.Empty;
+				}
+
+				xmppClient.SendMessage(QoSLevel.Unacknowledged, MessageType.Chat, MessageId, To, Xml.ToString(), Text,
+					string.Empty, string.Empty, string.Empty, string.Empty, null, null);
+			}
+		}
+
+		/// <summary>
+		/// Gets a URL for a resource.
+		/// </summary>
+		/// <param name="LocalResource">Local resource.</param>
+		/// <returns>URL</returns>
+		public static string GetUrl(string LocalResource)
+		{
+			StringBuilder sb = new StringBuilder();
+			int DefaultPort;
+			int[] Ports;
+
+			sb.Append("http");
+
+			if (certificate is null)
+			{
+				Ports = GetConfigPorts("HTTP");
+				DefaultPort = 80;
+			}
+			else
+			{
+				sb.Append('s');
+				Ports = GetConfigPorts("HTTPS");
+				DefaultPort = 443;
+			}
+
+			sb.Append("://");
+			sb.Append(domain);
+
+			if (Array.IndexOf<int>(Ports, DefaultPort) < 0 && Ports.Length > 0)
+			{
+				sb.Append(":");
+				sb.Append(Ports[0].ToString());
+			}
+
+			sb.Append(LocalResource);
+
+			return sb.ToString();
 		}
 
 		private static void Resend(object P)

@@ -110,7 +110,7 @@ namespace Waher.Utility.ExStat
                     Encoding = Encoding.UTF8,
                     Indent = true,
                     IndentChars = "\t",
-                    NewLineChars = "\r\n",
+                    NewLineChars = "\n",
                     NewLineHandling = NewLineHandling.Entitize,
                     NewLineOnAttributes = false,
                     OmitXmlDeclaration = false,
@@ -305,7 +305,7 @@ namespace Waher.Utility.ExStat
             {
                 Output.WriteStartElement("Stat");
                 Output.WriteAttributeString("count", Rec.Value.Count.ToString());
-                Output.WriteValue(Rec.Key);
+                Output.WriteValue(Rec.Key.Replace("\r\n", "\n").Replace('\r', '\n'));
                 Output.WriteEndElement();
             }
 

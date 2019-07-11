@@ -22,6 +22,7 @@ using Waher.Runtime.Cache;
 using Waher.Runtime.Inventory;
 using Waher.Script;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Exceptions;
 using Waher.Script.Graphs;
 using Waher.Script.Model;
 using Waher.Script.Objects;
@@ -1376,8 +1377,22 @@ namespace Waher.Networking.XMPP.Chat
                     throw new Exception("Unauthorized to execute expression.");
                 }
 
-                IElement Result = Exp.Root.Evaluate(Variables);
-                Variables["Ans"] = Result;
+				IElement Result;
+
+				try
+				{
+					Result = Exp.Root.Evaluate(Variables);
+				}
+				catch (ScriptReturnValueException ex)
+				{
+					Result = ex.ReturnValue;
+				}
+				catch (Exception ex)
+				{
+					Result = new ObjectValue(ex);
+				}
+
+				Variables["Ans"] = Result;
 
                 if (Result is Graph G)
                 {
@@ -1392,7 +1407,19 @@ namespace Waher.Networking.XMPP.Chat
                     ImageResult(From, Img, Support, Variables, true, OrgSubject, OrgCommand, Last);
                     return;
                 }
-                else if (Result.AssociatedObjectValue is ObjectMatrix M && M.ColumnNames != null)
+				else if (Result.AssociatedObjectValue is Exception ex)
+				{
+					ex = Log.UnnestException(ex);
+
+					if (ex is AggregateException ex2)
+					{
+						foreach (Exception ex3 in ex2.InnerExceptions)
+							this.Error(From, ex3.Message, Support, OrgSubject, OrgCommand, false);
+					}
+					else
+						this.Error(From, ex.Message, Support, OrgSubject, OrgCommand, false);
+				}
+				else if (Result.AssociatedObjectValue is ObjectMatrix M && M.ColumnNames != null)
                 {
                     StringBuilder Markdown = new StringBuilder();
 
@@ -1441,7 +1468,9 @@ namespace Waher.Networking.XMPP.Chat
             }
             catch (Exception ex)
             {
-                this.Error(From, ex.Message, Support, OrgSubject, OrgCommand, false);
+				ex = Log.UnnestException(ex);
+
+				this.Error(From, ex.Message, Support, OrgSubject, OrgCommand, false);
                 this.Que(From, Support, OrgSubject, string.Empty, Last);
             }
             finally

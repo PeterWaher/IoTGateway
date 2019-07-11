@@ -522,6 +522,7 @@ namespace Waher.Networking.HTTP
 						}
 
 						this.SendResponse();
+						return;
 					}
 					else if (ex is System.NotImplementedException)
 					{
@@ -529,8 +530,6 @@ namespace Waher.Networking.HTTP
 
 						this.StatusCode = 501;
 						this.StatusMessage = "Not Implemented";
-						this.SetHeader("Connection", "close");
-						this.SendResponse();
 					}
 					else if (ex is IOException)
 					{
@@ -547,9 +546,6 @@ namespace Waher.Networking.HTTP
 							this.StatusCode = 500;
 							this.StatusMessage = "Internal Server Error";
 						}
-
-						this.SetHeader("Connection", "close");
-						this.SendResponse();
 					}
 					else
 					{
@@ -557,9 +553,12 @@ namespace Waher.Networking.HTTP
 
 						this.StatusCode = 500;
 						this.StatusMessage = "Internal Server Error";
-						this.SetHeader("Connection", "close");
-						this.SendResponse();
 					}
+
+					this.SetHeader("Connection", "close");
+					this.SetHeader("Content-Type", "text/plain");
+					this.Write(ex.Message);
+					this.SendResponse();
 				}
 				catch (Exception)
 				{

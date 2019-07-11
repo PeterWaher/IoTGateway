@@ -454,7 +454,7 @@ namespace Waher.IoTGateway.Setup
 			if (!this.inProgress)
 			{
 				this.inProgress = true;
-				Task T = this.CreateCertificate(TabID);
+				Task _ = this.CreateCertificate(TabID);
 			}
 		}
 

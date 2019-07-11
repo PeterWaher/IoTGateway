@@ -164,7 +164,7 @@ namespace Waher.Networking.PeerToPeer
 
 		private void NetworkChange_NetworkAddressChanged(object sender, EventArgs e)
 		{
-			if (State != PeerToPeerNetworkState.SearchingForGateway)	// Multiple events might get fired one after the other. Just start one search.
+			if (State != PeerToPeerNetworkState.SearchingForGateway)    // Multiple events might get fired one after the other. Just start one search.
 			{
 				this.State = PeerToPeerNetworkState.Reinitializing;
 
@@ -228,30 +228,56 @@ namespace Waher.Networking.PeerToPeer
 			{
 				while (!this.disposed)
 				{
-					TcpClient Client = await this.tcpListener.AcceptTcpClientAsync();
-					if (Client != null)
+					try
 					{
-						try
+						TcpClient Client = await this.tcpListener.AcceptTcpClientAsync();
+						if (this.disposed)
+							return;
+
+						if (!(Client is null))
 						{
-							PeerConnection Connection = new PeerConnection(Client, this,
-								(IPEndPoint)Client.Client.RemoteEndPoint, this.encapsulatePackets);
+							PeerConnection Connection = null;
 
-							this.State = PeerToPeerNetworkState.Ready;
+							try
+							{
+								Connection = new PeerConnection(Client, this,
+									(IPEndPoint)Client.Client.RemoteEndPoint, this.encapsulatePackets);
 
-							this.PeerConnected(Connection);
+								this.State = PeerToPeerNetworkState.Ready;
 
-							Connection.Start();
+								this.PeerConnected(Connection);
+
+								Connection.Start();
+							}
+							catch (Exception)
+							{
+								Connection?.Dispose();
+							}
 						}
-						catch (Exception)
-						{
-							if (this.state != PeerToPeerNetworkState.Closed)
-								this.State = PeerToPeerNetworkState.Error;
-						}
+					}
+					catch (SocketException)
+					{
+						// Ignore
+					}
+					catch (ObjectDisposedException)
+					{
+						// Ignore
+					}
+					catch (NullReferenceException)
+					{
+						// Ignore
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
 					}
 				}
 			}
 			catch (Exception ex)
 			{
+				if (this.disposed)
+					return;
+
 				Log.Critical(ex);
 			}
 		}

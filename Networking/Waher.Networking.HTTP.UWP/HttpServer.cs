@@ -571,22 +571,25 @@ namespace Waher.Networking.HTTP
 			{
 				while (!this.closed)
 				{
-					TcpClient Client = await Listener.AcceptTcpClientAsync();
-					if (this.closed)
-						return;
-
 					try
 					{
-						this.Information("Connection accepted from " + Client.Client.RemoteEndPoint.ToString() + ".");
+						TcpClient Client = await Listener.AcceptTcpClientAsync();
+						if (this.closed)
+							return;
 
-						if (Tls)
+						if (!(Client is null))
 						{
-							Task T = this.SwitchToTls(Client);
-						}
-						else
-						{
-							NetworkStream Stream = Client.GetStream();
-							HttpClientConnection Connection = new HttpClientConnection(this, Client, Stream, Stream, DefaultBufferSize, false, this.Sniffers);
+							this.Information("Connection accepted from " + Client.Client.RemoteEndPoint.ToString() + ".");
+
+							if (Tls)
+							{
+								Task T = this.SwitchToTls(Client);
+							}
+							else
+							{
+								NetworkStream Stream = Client.GetStream();
+								HttpClientConnection Connection = new HttpClientConnection(this, Client, Stream, Stream, DefaultBufferSize, false, this.Sniffers);
+							}
 						}
 					}
 					catch (SocketException)
@@ -903,25 +906,25 @@ namespace Waher.Networking.HTTP
 			return false;
 		}
 
-        internal string CheckResourceOverride(string ResourceName)
-        {
-            if (!string.IsNullOrEmpty(this.resourceOverride))
-            {
-                if (this.resourceOverrideFilter is null || this.resourceOverrideFilter.IsMatch(ResourceName))
-                    return this.resourceOverride;
-            }
+		internal string CheckResourceOverride(string ResourceName)
+		{
+			if (!string.IsNullOrEmpty(this.resourceOverride))
+			{
+				if (this.resourceOverrideFilter is null || this.resourceOverrideFilter.IsMatch(ResourceName))
+					return this.resourceOverride;
+			}
 
-            return ResourceName;
-        }
+			return ResourceName;
+		}
 
-        #endregion
+		#endregion
 
-        #region Sessions
+		#region Sessions
 
-        /// <summary>
-        /// Session timeout. Default is 20 minutes.
-        /// </summary>
-        public TimeSpan SessionTimeout
+		/// <summary>
+		/// Session timeout. Default is 20 minutes.
+		/// </summary>
+		public TimeSpan SessionTimeout
 		{
 			get { return this.sessionTimeout; }
 

@@ -109,11 +109,8 @@ namespace Waher.Networking.PeerToPeer
 		{
 			this.disposed = true;
 
-			if (this.idleTimer != null)
-			{
-				this.idleTimer.Dispose();
-				this.idleTimer = null;
-			}
+			this.idleTimer?.Dispose();
+			this.idleTimer = null;
 
 			if (this.tcpConnection != null)
 			{

@@ -8,7 +8,7 @@ namespace Waher.Utility.ExStat
     {
         public SortedDictionary<T, Bucket> Buckets = new SortedDictionary<T, Bucket>();
 
-        public void Inc(T Key)
+        public void Inc(T Key, params string[] SubKeys)
         {
             if (!this.Buckets.TryGetValue(Key,out Bucket Bucket))
             {
@@ -16,7 +16,7 @@ namespace Waher.Utility.ExStat
                 this.Buckets[Key] = Bucket;
             }
 
-            Bucket.Count++;
+			Bucket.Inc(SubKeys);
         }
     }
 }

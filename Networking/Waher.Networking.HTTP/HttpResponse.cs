@@ -450,6 +450,14 @@ namespace Waher.Networking.HTTP
 		}
 
 		/// <summary>
+		/// If the response has been sent.
+		/// </summary>
+		public bool ResponseSent
+		{
+			get { return this.responseSent; }
+		}
+
+		/// <summary>
 		/// Sends the response back to the client. If the resource is synchronous, there's no need to call this method. Only asynchronous
 		/// resources need to call this method explicitly.
 		/// </summary>

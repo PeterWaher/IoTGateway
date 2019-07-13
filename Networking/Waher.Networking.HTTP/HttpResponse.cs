@@ -34,6 +34,7 @@ namespace Waher.Networking.HTTP
 		private long? contentLength = null;
 		private int statusCode = 200;
 		private bool responseSent = false;
+		private bool disposed = false;
 		private bool onlyHeader = false;
 		private bool closeAfterResponse = false;
 
@@ -381,6 +382,8 @@ namespace Waher.Networking.HTTP
 		/// <exception cref="System.Text.EncoderFallbackException">The current encoding does not support displaying half of a Unicode surrogate pair.</exception>
 		protected override void Dispose(bool disposing)
 		{
+			this.disposed = true;
+
 			if (this.clientConnection != null)
 				this.clientConnection.Flush();
 			else if (this.responseStream != null)
@@ -455,6 +458,14 @@ namespace Waher.Networking.HTTP
 		public bool ResponseSent
 		{
 			get { return this.responseSent; }
+		}
+
+		/// <summary>
+		/// If the response has been disposed.
+		/// </summary>
+		public bool Disposed
+		{
+			get { return this.disposed; }
 		}
 
 		/// <summary>

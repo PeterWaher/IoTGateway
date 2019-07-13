@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Net;
 using System.Reflection;
 using System.Runtime.ExceptionServices;
 using System.Runtime.InteropServices;
@@ -2691,7 +2692,39 @@ namespace Waher.IoTGateway
 			}
 
 			sb.Append("://");
-			sb.Append(domain);
+			if (DomainConfiguration.Instance.UseDomainName)
+				sb.Append(domain);
+			else
+			{
+				IPAddress IP4 = null;
+				IPAddress IP6 = null;
+
+				foreach (IPAddress Addr in webServer.LocalIpAddresses)
+				{
+					if (IPAddress.IsLoopback(Addr))
+						continue;
+
+					switch (Addr.AddressFamily)
+					{
+						case System.Net.Sockets.AddressFamily.InterNetwork:
+							if (IP4 is null)
+								IP4 = Addr;
+							break;
+
+						case System.Net.Sockets.AddressFamily.InterNetworkV6:
+							if (IP6 is null)
+								IP6 = Addr;
+							break;
+					}
+				}
+
+				if (!(IP4 is null))
+					sb.Append(IP4.ToString());
+				else if (!(IP6 is null))
+					sb.Append(IP6.ToString());
+				else
+					sb.Append(Dns.GetHostName());
+			}
 
 			if (Array.IndexOf<int>(Ports, DefaultPort) < 0 && Ports.Length > 0)
 			{

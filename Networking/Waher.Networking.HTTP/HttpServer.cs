@@ -411,6 +411,38 @@ namespace Waher.Networking.HTTP
 		}
 
 		/// <summary>
+		/// IP Addresses receiving requests on.
+		/// </summary>
+		public IPAddress[] LocalIpAddresses
+		{
+			get
+			{
+				Dictionary<IPAddress, bool> Addresses = new Dictionary<IPAddress, bool>();
+
+#if WINDOWS_UWP
+				foreach (HostName HostName in NetworkInformation.GetHostNames())
+				{
+					if ((HostName.Type == HostNameType.Ipv4 || HostName.Type == HostNameType.Ipv6) &&
+						!(HostName.IPInformation?.NetworkAdapter is null) &&
+						IPAddress.TryParse(HostName.CanonicalName, out IPAddress Addr))
+					{
+						Addresses[Addr] = true;
+					}
+				}
+#else
+				foreach (KeyValuePair<TcpListener, bool> P in this.listeners)
+				{
+					if (P.Key.LocalEndpoint is IPEndPoint Endpoint)
+						Addresses[Endpoint.Address] = true;
+				}
+#endif
+				IPAddress[] Result = new IPAddress[Addresses.Count];
+				Addresses.Keys.CopyTo(Result, 0);
+				return Result;
+			}
+		}
+
+		/// <summary>
 		/// Salt value used when calculating ETag values.
 		/// </summary>
 		public string ETagSalt
@@ -534,9 +566,9 @@ namespace Waher.Networking.HTTP
 		}
 #endif
 
-		#endregion
+#endregion
 
-		#region Connections
+#region Connections
 
 #if WINDOWS_UWP
 
@@ -658,9 +690,9 @@ namespace Waher.Networking.HTTP
 
 #endif
 
-		#endregion
+#endregion
 
-		#region Resources
+#region Resources
 
 		/// <summary>
 		/// By default, this property is null. If not null, or empty, every request made to the web server will
@@ -917,9 +949,9 @@ namespace Waher.Networking.HTTP
 			return ResourceName;
 		}
 
-		#endregion
+#endregion
 
-		#region Sessions
+#region Sessions
 
 		/// <summary>
 		/// Session timeout. Default is 20 minutes.
@@ -995,9 +1027,9 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		public event CacheItemEventHandler<string, Variables> SessionRemoved = null;
 
-		#endregion
+#endregion
 
-		#region Statistics
+#region Statistics
 
 		/// <summary>
 		/// Call this method when data has been received.
@@ -1199,9 +1231,9 @@ namespace Waher.Networking.HTTP
 			}
 		}
 
-		#endregion
+#endregion
 
-		#region GET
+#region GET
 
 		/// <summary>
 		/// Performs an internal GET operation.
@@ -1244,7 +1276,7 @@ namespace Waher.Networking.HTTP
 				return new Tuple<int, string, byte[]>(NotFoundException.Code, NotFoundException.Msg, null);
 		}
 
-		#endregion
+#endregion
 
 		// TODO: Web Service resources
 	}

@@ -13,11 +13,11 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>networking communication peer-to-peer p2p multi-player</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.0.4</AssemblyVersion>
-    <FileVersion>1.0.4</FileVersion>
+    <AssemblyVersion>1.0.5</AssemblyVersion>
+    <FileVersion>1.0.5</FileVersion>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <Version>1.0.4</Version>
+    <Version>1.0.5</Version>
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Networking\Waher.Networking.PeerToPeer\</UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>

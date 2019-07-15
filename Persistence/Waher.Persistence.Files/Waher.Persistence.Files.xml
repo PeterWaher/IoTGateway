@@ -458,13 +458,13 @@
             <returns>BTree file corresponding to the given collection. 
             If file did not exist, and <paramref name="CreateIfNotExists"/> is false, null is returned.</returns>
         </member>
-        <member name="M:Waher.Persistence.Files.FilesProvider.TryGetNamesFile(System.String,Waher.Persistence.Files.StringDictionary@)">
+        <member name="M:Waher.Persistence.Files.FilesProvider.TryGetLabelsFile(System.String,Waher.Persistence.Files.LabelFile@)">
             <summary>
-            Tries to get the names dictionary for a given collection.
+            Tries to get the labels file for a given collection.
             </summary>
             <param name="CollectionName">Collection name.</param>
-            <param name="Names">Names dictionary, if found.</param>
-            <returns>If a names dictionary was found for the given collection.</returns>
+            <param name="Labels">Labels file, if found.</param>
+            <returns>If a labels dictionary was found for the given collection.</returns>
         </member>
         <member name="M:Waher.Persistence.Files.FilesProvider.GetIndexFile(Waher.Persistence.Files.ObjectBTreeFile,Waher.Persistence.Files.RegenerationOptions,System.String[])">
             <summary>
@@ -1273,12 +1273,78 @@
             If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
             <returns>If the index matches the sort order. (The index ordering is allowed to be more specific.)</returns>
         </member>
+        <member name="T:Waher.Persistence.Files.LabelFile">
+            <summary>
+            Maintains an enumerated set of labels for an Object B-Tree File.
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.Files.LabelFile.ReadLabel(System.Int64)">
+            <summary>
+            Reads a label from the file.
+            </summary>
+            <param name="Position">Position of label.</param>
+            <returns>Label, and the position of the following label.</returns>
+        </member>
+        <member name="M:Waher.Persistence.Files.LabelFile.WriteLabel(System.String)">
+            <summary>
+            Writes a label to the end of the file.
+            </summary>
+            <param name="Label">New label to save to the file.</param>
+            <returns>Position of label.</returns>
+        </member>
+        <member name="M:Waher.Persistence.Files.LabelFile.WriteLabelLocked(System.String)">
+            <summary>
+            Writes a label to the end of the file.
+            </summary>
+            <param name="Label">New label to save to the file.</param>
+            <returns>Position of label.</returns>
+        </member>
+        <member name="M:Waher.Persistence.Files.LabelFile.Create(System.String,System.Int32,System.Boolean,Waher.Persistence.Files.FilesProvider)">
+            <summary>
+            Creates a LabelFile object.
+            </summary>
+            <param name="CollectionName">Name of collection.</param>
+            <param name="TimeoutMilliseconds">Timeout, in milliseconds, to wait for access to the database layer.</param>
+            <param name="Encrypted">If the files should be encrypted or not.</param>
+            <param name="Provider">Reference to the files provider.</param>
+            <returns>LabelFile object.</returns>
+        </member>
+        <member name="M:Waher.Persistence.Files.LabelFile.GetFieldCode(System.String)">
+            <summary>
+            Gets the code for a specific field in a collection.
+            </summary>
+            <param name="FieldName">Name of field.</param>
+            <returns>Field code.</returns>
+        </member>
+        <member name="M:Waher.Persistence.Files.LabelFile.GetFieldCodeAsync(System.String)">
+            <summary>
+            Gets the code for a specific field in a collection.
+            </summary>
+            <param name="FieldName">Name of field.</param>
+            <returns>Field code.</returns>
+        </member>
+        <member name="M:Waher.Persistence.Files.LabelFile.GetFieldName(System.UInt32)">
+            <summary>
+            Gets the name of a field in a collection, given its code.
+            </summary>
+            <param name="FieldCode">Field code.</param>
+            <returns>Field name.</returns>
+            <exception cref="T:System.ArgumentException">If the collection or field code are not known.</exception>
+        </member>
+        <member name="M:Waher.Persistence.Files.LabelFile.GetFieldNameAsync(System.UInt32)">
+            <summary>
+            Gets the name of a field in a collection, given its code.
+            </summary>
+            <param name="FieldCode">Field code.</param>
+            <returns>Field name.</returns>
+            <exception cref="T:System.ArgumentException">If the collection or field code are not known.</exception>
+        </member>
         <member name="T:Waher.Persistence.Files.ObjectBTreeFile">
             <summary>
             This class manages a binary file where objects are persisted in a B-tree.
             </summary>
         </member>
-        <member name="M:Waher.Persistence.Files.ObjectBTreeFile.#ctor(System.String,System.String,System.String,System.Int32,System.Int32,Waher.Persistence.Files.FilesProvider,System.Text.Encoding,System.Int32,System.Boolean,System.Boolean)">
+        <member name="M:Waher.Persistence.Files.ObjectBTreeFile.#ctor(System.String,System.String,System.String,System.Int32,System.Int32,Waher.Persistence.Files.FilesProvider,System.Text.Encoding,System.Int32,System.Boolean)">
             <summary>
             This class manages a binary file where objects are persisted in a B-tree.
             </summary>
@@ -1297,9 +1363,8 @@
             <param name="Encoding">Encoding to use for text properties.</param>
             <param name="TimeoutMilliseconds">Timeout, in milliseconds, to wait for access to the database layer.</param>
             <param name="Encrypted">If the files should be encrypted or not.</param>
-            <param name="Debug">If the provider is run in debug mode.</param>
         </member>
-        <member name="M:Waher.Persistence.Files.ObjectBTreeFile.#ctor(System.String,System.String,System.String,System.Int32,System.Int32,Waher.Persistence.Files.FilesProvider,System.Text.Encoding,System.Int32,System.Boolean,System.Boolean,Waher.Persistence.Files.Storage.IRecordHandler)">
+        <member name="M:Waher.Persistence.Files.ObjectBTreeFile.#ctor(System.String,System.String,System.String,System.Int32,System.Int32,Waher.Persistence.Files.FilesProvider,System.Text.Encoding,System.Int32,System.Boolean,Waher.Persistence.Files.Storage.IRecordHandler)">
             <summary>
             This class manages a binary file where objects are persisted in a B-tree.
             </summary>
@@ -1318,7 +1383,6 @@
             <param name="Encoding">Encoding to use for text properties.</param>
             <param name="TimeoutMilliseconds">Timeout, in milliseconds, to wait for access to the database layer.</param>
             <param name="Encrypted">If the files should be encrypted or not.</param>
-            <param name="Debug">If the provider is run in debug mode.</param>
             <param name="RecordHandler">Record handler to use.</param>
         </member>
         <member name="M:Waher.Persistence.Files.ObjectBTreeFile.Dispose">
@@ -3171,6 +3235,71 @@
             <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
             If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
             <returns>If the index matches the sort order. (The index ordering is allowed to be more specific.)</returns>
+        </member>
+        <member name="T:Waher.Persistence.Files.SerialFile">
+            <summary>
+            Serializes binary blocks into a file, possibly encrypted. Blocks are accessed in the order they were persisted.
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.Files.SerialFile.#ctor(System.String,System.Int32,System.Boolean,Waher.Persistence.Files.FilesProvider)">
+            <summary>
+            Serializes binary blocks into a file, possibly encrypted. Blocks are accessed in the order they were persisted.
+            </summary>
+        </member>
+        <member name="P:Waher.Persistence.Files.SerialFile.FileName">
+            <summary>
+            File name.
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.Files.SerialFile.GetLength">
+            <summary>
+            Gets the length of the file, in bytes.
+            </summary>
+            <returns>Length of file.</returns>
+        </member>
+        <member name="M:Waher.Persistence.Files.SerialFile.LockRead">
+            <summary>
+            Locks the file for reading.
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.Files.SerialFile.LockWrite">
+            <summary>
+            Locks the file for writing.
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.Files.SerialFile.ReadBlock(System.Int64,System.Int32)">
+            <summary>
+            Reads a binary block.
+            </summary>
+            <param name="Position">Position in file.</param>
+            <param name="NrBytes">Block size, in bytes. (Can be smaller than persisted block.)</param>
+            <returns>Block</returns>
+        </member>
+        <member name="M:Waher.Persistence.Files.SerialFile.ReadBlock(System.Int64)">
+            <summary>
+            Reads a binary block from the file, starting at a given position.
+            </summary>
+            <param name="Position">Position of block.</param>
+            <returns>Binary block (decrypted if file is encrypted), and the position of the following block.</returns>
+        </member>
+        <member name="M:Waher.Persistence.Files.SerialFile.WriteBlock(System.Byte[])">
+            <summary>
+            Writes a binary block to the end of the file.
+            </summary>
+            <param name="Data">Binary data to write.</param>
+            <returns>Position of data block.</returns>
+        </member>
+        <member name="M:Waher.Persistence.Files.SerialFile.WriteBlockLocked(System.Byte[])">
+            <summary>
+            Writes a binary block to the end of the file.
+            </summary>
+            <param name="Data">Binary data to write.</param>
+            <returns>Position of data block.</returns>
+        </member>
+        <member name="M:Waher.Persistence.Files.SerialFile.Dispose">
+            <summary>
+            <see cref="M:System.IDisposable.Dispose"/>
+            </summary>
         </member>
         <member name="T:Waher.Persistence.Files.Serialization.BinaryDeserializer">
             <summary>

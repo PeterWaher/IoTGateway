@@ -238,7 +238,7 @@ namespace Waher.Networking.HTTP
 			{
 				Response = Response,
                 Request = Request,
-				f = f ?? File.OpenRead(FullPath),
+				f = f ?? File.Open(FullPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite),
 				Next = null,
 				Boundary = null,
 				ContentType = null
@@ -294,7 +294,7 @@ namespace Waher.Networking.HTTP
 					IsDynamic = false
 				};
 
-				using (FileStream fs = File.OpenRead(FullPath))
+				using (FileStream fs = File.Open(FullPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
 				{
 					Rec.ETag = this.ComputeETag(fs);
 				}
@@ -480,7 +480,7 @@ namespace Waher.Networking.HTTP
 					if (Acceptable && Converter != null)
 					{
 						Stream f2 = null;
-						Stream f = File.OpenRead(FullPath);
+						Stream f = File.Open(FullPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
 						bool Ok = false;
 
 						try
@@ -633,17 +633,17 @@ namespace Waher.Networking.HTTP
 
 			public void Dispose()
 			{
-				if (this.Response != null)
-				{
-					this.Response.SendResponse();
-					this.Response = null;
-				}
-
 				if (this.f != null)
 				{
 					this.f.Flush();
 					this.f.Dispose();
 					this.f = null;
+				}
+
+				if (this.Response != null)
+				{
+					this.Response.SendResponse();
+					this.Response = null;
 				}
 			}
 		}
@@ -687,7 +687,7 @@ namespace Waher.Networking.HTTP
 			{
 				Response = Response,
                 Request = Request,
-				f = f ?? File.OpenRead(FullPath)
+				f = f ?? File.Open(FullPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
 			};
 
 			ByteRangeInterval Interval = FirstInterval;

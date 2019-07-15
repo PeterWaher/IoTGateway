@@ -1450,7 +1450,8 @@
         <ComponentRef Id='UtilityRegEx' />
         <ComponentRef Id='UtilitySign' />
         <ComponentRef Id='UtilityTransform' />
-			</Feature>
+        <ComponentRef Id='UtilityExStat' />
+      </Feature>
       <Feature Id='DebugFiles' Title='Debug Files' Description='Provides debug files. This will help debugging, since it provides more information in case something goes wrong.' Level='1000'>
         <ComponentRef Id='MainDebugFiles'/>
         <ComponentRef Id='ScriptWebServiceDebugFiles'/>
@@ -1463,7 +1464,8 @@
         <ComponentRef Id='UtilityRegExDebugFiles' />
         <ComponentRef Id='UtilitySignDebugFiles' />
         <ComponentRef Id='UtilityTransformDebugFiles' />
-			</Feature>
+        <ComponentRef Id='UtilityExStatDebugFiles' />
+      </Feature>
     </Feature>
     <WixVariable Id="WixUIBannerBmp" Value="..\..\banner.bmp" />
     <WixVariable Id="WixUIDialogBmp" Value="..\..\dialog.bmp" />

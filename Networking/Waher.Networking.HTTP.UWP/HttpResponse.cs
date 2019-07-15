@@ -485,6 +485,19 @@ namespace Waher.Networking.HTTP
 					this.StartSendResponse(false);
 				else
 					this.transferEncoding.ContentSent();
+
+				EventHandler h = this.OnResponseSent;
+				if (!(h is null))
+				{
+					try
+					{
+						h(this, new EventArgs());
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
+				}
 			}
 		}
 
@@ -945,5 +958,9 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		public Stream Stream => this.clientConnection?.Stream;
 
+		/// <summary>
+		/// Event raised when the response has been sent.
+		/// </summary>
+		public EventHandler OnResponseSent = null;
 	}
 }

@@ -127,7 +127,7 @@ namespace Waher.IoTGateway.WebResources
 				}
 			}
 
-			Task Task = DoExport(Exporter.Value, Database, WebContent, Folders.ToArray());
+			Task _ = DoExport(Exporter.Value, Database, WebContent, Folders.ToArray());
 
 			Response.StatusCode = 200;
 			Response.ContentType = "text/plain";

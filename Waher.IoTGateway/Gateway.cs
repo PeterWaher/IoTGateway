@@ -2404,33 +2404,9 @@ namespace Waher.IoTGateway
 						LastBackup.AddDays(1) < EstimatedTime)
 					{
 						lastBackupTimeCheck = Now;
-						await Export.SetLastBackupAsync(Now);
-
-						KeyValuePair<string, IExportFormat> Exporter = StartExport.GetExporter("Encrypted");
-						string FileName = Exporter.Key;
-
-						ExportFormat.UpdateClientsFileUpdated(FileName, -1, Now);
-
-						List<string> Folders = new List<string>();
-
-						foreach (Export.FolderCategory FolderCategory in Export.GetRegisteredFolders())
-							Folders.AddRange(FolderCategory.Folders);
-
-						await StartExport.DoExport(Exporter.Value, true, true, Folders.ToArray());
-
-						long KeepDays = await Export.GetKeepDaysAsync();
-						long KeepMonths = await Export.GetKeepMonthsAsync();
-						long KeepYears = await Export.GetKeepYearsAsync();
-						string ExportFolder = Export.FullExportFolder;
-						string KeyFolder = Export.FullKeyExportFolder;
-
-						DeleteOldFiles(ExportFolder, KeepDays, KeepMonths, KeepYears, Now);
-						if (ExportFolder != KeyFolder)
-							DeleteOldFiles(KeyFolder, KeepDays, KeepMonths, KeepYears, Now);
+						await DoBackup();
 
 						Result = true;
-
-						OnAfterBackup?.Invoke(typeof(Gateway), new EventArgs());
 					}
 				}
 			}
@@ -2440,6 +2416,41 @@ namespace Waher.IoTGateway
 			}
 
 			return Result;
+		}
+
+		/// <summary>
+		/// Performs a backup of the system.
+		/// </summary>
+		/// <returns></returns>
+		public static async Task DoBackup()
+		{
+			DateTime Now = DateTime.Now;
+
+			await Export.SetLastBackupAsync(Now);
+
+			KeyValuePair<string, IExportFormat> Exporter = StartExport.GetExporter("Encrypted");
+			string FileName = Exporter.Key;
+
+			ExportFormat.UpdateClientsFileUpdated(FileName, -1, Now);
+
+			List<string> Folders = new List<string>();
+
+			foreach (Export.FolderCategory FolderCategory in Export.GetRegisteredFolders())
+				Folders.AddRange(FolderCategory.Folders);
+
+			await StartExport.DoExport(Exporter.Value, true, true, Folders.ToArray());
+
+			long KeepDays = await Export.GetKeepDaysAsync();
+			long KeepMonths = await Export.GetKeepMonthsAsync();
+			long KeepYears = await Export.GetKeepYearsAsync();
+			string ExportFolder = Export.FullExportFolder;
+			string KeyFolder = Export.FullKeyExportFolder;
+
+			DeleteOldFiles(ExportFolder, KeepDays, KeepMonths, KeepYears, Now);
+			if (ExportFolder != KeyFolder)
+				DeleteOldFiles(KeyFolder, KeepDays, KeepMonths, KeepYears, Now);
+
+			OnAfterBackup?.Invoke(typeof(Gateway), new EventArgs());
 		}
 
 		private static DateTime? lastBackupTimeCheck = null;

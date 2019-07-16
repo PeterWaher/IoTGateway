@@ -194,8 +194,10 @@ namespace Waher.Client.WPF
 
 			Log.Terminate();
 
-			databaseProvider.Stop();
-			databaseProvider.Flush();
+			databaseProvider?.Stop()?.Wait();
+			databaseProvider?.Flush()?.Wait();
+			databaseProvider?.Dispose();
+			databaseProvider = null;
 		}
 		private void ConnectTo_Executed(object sender, ExecutedRoutedEventArgs e)
 		{

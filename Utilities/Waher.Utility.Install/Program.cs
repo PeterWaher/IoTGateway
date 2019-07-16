@@ -226,6 +226,9 @@ namespace Waher.Utility.Install
 				{
 					if (Timeout.HasValue)
 					{
+						if (Verbose)
+							Console.Out.WriteLine("Making sure server is closed...");
+
 						GatewayRunning = new Semaphore(1, 1, "Waher.IoTGateway.Running" + Suffix);
 						if (!GatewayRunning.WaitOne(Timeout.Value))
 							throw new Exception("The IoT Gateway did not stop within the given time period.");
@@ -237,6 +240,9 @@ namespace Waher.Utility.Install
 							throw new Exception("The IoT Gateway is starting in another process, and is unable to stop within the given time period.");
 
 						StartingServerLocked = true;
+
+						if (Verbose)
+							Console.Out.WriteLine("Server is closed. Proceeding...");
 					}
 
 					if (!string.IsNullOrEmpty(PackageFile))

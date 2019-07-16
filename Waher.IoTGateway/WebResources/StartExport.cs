@@ -248,7 +248,13 @@ namespace Waher.IoTGateway.WebResources
 			return new KeyValuePair<string, IExportFormat>(FullFileName, Output);
 		}
 
-		internal static string GetUniqueFileName(string Base, string Extension)
+		/// <summary>
+		/// Gets a unique filename.
+		/// </summary>
+		/// <param name="Base">Filename base</param>
+		/// <param name="Extension">Extension</param>
+		/// <returns>Unique file name.</returns>
+		public static string GetUniqueFileName(string Base, string Extension)
 		{
 			string Suffix = string.Empty;
 			string s;
@@ -293,7 +299,8 @@ namespace Waher.IoTGateway.WebResources
 					StringBuilder Temp = new StringBuilder();
 					using (XmlWriter w = XmlWriter.Create(Temp, XML.WriterSettings(false, true)))
 					{
-						await Persistence.Database.Analyze(w, string.Empty, Path.Combine(Gateway.RootFolder, "Data"), false, true);
+						await Persistence.Database.Analyze(w, Path.Combine(Gateway.AppDataFolder, "Transforms", "DbStatXmlToHtml.xslt"), 
+							Path.Combine(Gateway.RootFolder, "Data"), false, true);
 					}
 
 					await Persistence.Database.Export(Output);

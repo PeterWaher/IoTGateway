@@ -74,8 +74,16 @@ namespace Waher.IoTGateway.WebResources
 			if (!Parameters.TryGetValue("repair", out Obj) || !(Obj is bool Repair))
 				throw new BadRequestException();
 
-			string BasePath = Export.FullExportFolder;
+			if (!CanStartAnalyzeDB())
+			{
+				Response.StatusCode = 409;
+				Response.StatusMessage = "Conflict";
+				Response.ContentType = "text/plain";
+				Response.Write("Analysis is underway.");
+				return;
+			}
 
+			string BasePath = Export.FullExportFolder;
 			if (!Directory.Exists(BasePath))
 				Directory.CreateDirectory(BasePath);
 
@@ -83,31 +91,49 @@ namespace Waher.IoTGateway.WebResources
 
 			string FullFileName = Path.Combine(BasePath, "DBReport " + DateTime.Now.ToString("yyyy-MM-dd HH_mm_ss"));
 			FullFileName = StartExport.GetUniqueFileName(FullFileName, ".xml");
+			FileStream fs = null;
 
-			FileStream fs = new FileStream(FullFileName, FileMode.Create, FileAccess.Write);
-			DateTime Created = File.GetCreationTime(FullFileName);
-			XmlWriter XmlOutput = XmlWriter.Create(fs, XML.WriterSettings(true, false));
-			string FileName = FullFileName.Substring(BasePath.Length);
+			try
+			{
+				fs = new FileStream(FullFileName, FileMode.Create, FileAccess.Write);
+				DateTime Created = File.GetCreationTime(FullFileName);
+				XmlWriter XmlOutput = XmlWriter.Create(fs, XML.WriterSettings(true, false));
+				string FileName = FullFileName.Substring(BasePath.Length);
 
+				Task.Run(() => DoAnalyze(FullFileName, FileName, Created, XmlOutput, fs, Repair));
+
+				Response.StatusCode = 200;
+				Response.ContentType = "text/plain";
+				Response.Write(FileName);
+				Response.SendResponse();
+			}
+			catch (Exception ex)
+			{
+				if (!(fs is null))
+				{
+					fs.Dispose();
+					File.Delete(FullFileName);
+				}
+
+				Response.SendResponse(ex);
+			}
+		}
+
+		/// <summary>
+		/// Checks to see if analyzing the database can start.
+		/// </summary>
+		/// <returns>If analyzing the DB can start.</returns>
+		public static bool CanStartAnalyzeDB()
+		{
 			lock (synchObject)
 			{
 				if (analyzing)
-				{
-					Response.StatusCode = 409;
-					Response.StatusMessage = "Conflict";
-					Response.ContentType = "text/plain";
-					Response.Write("Analysis is underway.");
-					return;
-				}
-				else
-					analyzing = true;
+					return false;
+
+				analyzing = true;
 			}
 
-			Task.Run(() => DoAnalyze(FullFileName, FileName, Created, XmlOutput, fs, Repair));
-
-			Response.StatusCode = 200;
-			Response.ContentType = "text/plain";
-			Response.Write(FileName);
+			return true;
 		}
 
 		private static bool analyzing = false;
@@ -132,7 +158,8 @@ namespace Waher.IoTGateway.WebResources
 
 				ExportFormats.ExportFormat.UpdateClientsFileUpdated(FileName, 0, Created);
 
-				await Database.Analyze(XmlOutput, null, Gateway.AppDataFolder, false, Repair);
+				await Database.Analyze(XmlOutput, Path.Combine(Gateway.AppDataFolder, "Transforms", "DbStatXmlToHtml.xslt"), 
+					Gateway.AppDataFolder, false, Repair);
 
 				XmlOutput.Flush();
 				fs.Flush();
@@ -147,7 +174,7 @@ namespace Waher.IoTGateway.WebResources
 
 				if (xslt is null)
 					xslt = XSL.LoadTransform(typeof(Gateway).Namespace + ".Transforms.DbStatXmlToHtml.xslt");
-				
+
 				string s = File.ReadAllText(FullPath);
 				s = XSL.Transform(s, xslt);
 				byte[] Bin = utf8Bom.GetBytes(s);

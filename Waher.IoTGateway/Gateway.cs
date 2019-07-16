@@ -143,6 +143,7 @@ namespace Waher.IoTGateway
 		private static StreamWriter exceptionFile = null;
 		private static CaseInsensitiveString domain = null;
 		private static CaseInsensitiveString ownerJid = null;
+		private static string instance;
 		private static string appDataFolder;
 		private static string runtimeFolder;
 		private static string rootFolder;
@@ -193,6 +194,8 @@ namespace Waher.IoTGateway
 		/// <returns>If the gateway was successfully started.</returns>
 		public static async Task<bool> Start(bool ConsoleOutput, bool LoopbackIntefaceAvailable, string InstanceName)
 		{
+			instance = InstanceName;
+
 			string Suffix = string.IsNullOrEmpty(InstanceName) ? string.Empty : "." + InstanceName;
 			gatewayRunning = new Semaphore(1, 1, "Waher.IoTGateway.Running" + Suffix);
 			if (!gatewayRunning.WaitOne(1000))
@@ -1428,6 +1431,14 @@ namespace Waher.IoTGateway
 		}
 
 		/// <summary>
+		/// Name of the current instance. Default instance=<see cref="string.Empty"/>
+		/// </summary>
+		public static string InstanceName
+		{
+			get { return instance; }
+		}
+
+		/// <summary>
 		/// Application data folder.
 		/// </summary>
 		public static string AppDataFolder
@@ -1510,6 +1521,33 @@ namespace Waher.IoTGateway
 
 			return Result.ToArray();
 		}
+
+		/// <summary>
+		/// Raises the <see cref="OnTerminate"/> event handler, letting the container executable know the application
+		/// needs to close.
+		/// </summary>
+		/// <exception cref="InvalidOperationException">If no <see cref="OnTerminate"/> event handler has been set.</exception>
+		public static void Terminate()
+		{
+			EventHandler h = OnTerminate;
+			if (h is null)
+				throw new InvalidOperationException("No OnTerminate event handler set.");
+
+			try
+			{
+				h(instance, new EventArgs());
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+			}
+		}
+
+		/// <summary>
+		/// Event raised when the <see cref="Terminate"/> method has been called, letting the container exceutable know
+		/// the application needs to close.
+		/// </summary>
+		public static event EventHandler OnTerminate = null;
 
 		#endregion
 

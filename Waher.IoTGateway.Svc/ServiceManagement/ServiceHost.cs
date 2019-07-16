@@ -91,6 +91,7 @@ namespace Waher.IoTGateway.Svc.ServiceManagement
 
 				Gateway.GetDatabaseProvider += Program.GetDatabase;
 				Gateway.RegistrationSuccessful += Program.RegistrationSuccessful;
+				Gateway.OnTerminate += (sender, e) => this.StopService();
 
 				if (!Gateway.Start(true, true, Program.InstanceName).Result)
 					throw new Exception("Gateway being started in another process.");
@@ -131,6 +132,28 @@ namespace Waher.IoTGateway.Svc.ServiceManagement
 				stopTaskCompletionSource.TrySetResult(win32ExitCode);
 		}
 
+		private void StopService()
+		{
+			ReportServiceStatus(ServiceState.StopPending, ServiceAcceptedControlCommandsFlags.None, win32ExitCode: 0, waitHint: 3000);
+
+			int win32ExitCode = 0;
+
+			try
+			{
+				Gateway.Stop();
+				Log.Terminate();
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+				win32ExitCode = -1;
+			}
+			finally
+			{
+				ReportServiceStatus(ServiceState.Stopped, ServiceAcceptedControlCommandsFlags.None, win32ExitCode, waitHint: 0);
+			}
+		}
+
 		private void HandleServiceControlCommand(ServiceControlCommand command, uint eventType, IntPtr eventData, IntPtr eventContext)
 		{
 			try
@@ -140,24 +163,7 @@ namespace Waher.IoTGateway.Svc.ServiceManagement
 				switch (command)
 				{
 					case ServiceControlCommand.Stop:
-						ReportServiceStatus(ServiceState.StopPending, ServiceAcceptedControlCommandsFlags.None, win32ExitCode: 0, waitHint: 3000);
-
-						int win32ExitCode = 0;
-
-						try
-						{
-							Gateway.Stop();
-							Log.Terminate();
-						}
-						catch (Exception ex)
-						{
-							Log.Critical(ex);
-							win32ExitCode = -1;
-						}
-						finally
-						{
-							ReportServiceStatus(ServiceState.Stopped, ServiceAcceptedControlCommandsFlags.None, win32ExitCode, waitHint: 0);
-						}
+						this.StopService();
 						break;
 
 					case ServiceControlCommand.Continue:

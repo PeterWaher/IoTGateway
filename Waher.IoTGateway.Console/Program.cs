@@ -152,6 +152,7 @@ namespace Waher.IoTGateway.Console
 				}
 
 				ManualResetEvent Done = new ManualResetEvent(false);
+				Gateway.OnTerminate += (sender, e) => Done.Set();
 				System.Console.CancelKeyPress += (sender, e) => Done.Set();
 
 				try

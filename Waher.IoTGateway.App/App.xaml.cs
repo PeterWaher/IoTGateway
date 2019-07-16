@@ -151,6 +151,7 @@ namespace Waher.IoTGateway.App
 				Gateway.GetDatabaseProvider += GetDatabase;
 				Gateway.RegistrationSuccessful += RegistrationSuccessful;
 				Gateway.GetMetaData += GetMetaData;
+				Gateway.OnTerminate += Gateway_OnTerminate;
 
 				if (!await Gateway.Start(false, false, string.Empty))
 					throw new Exception("Gateway being started in another process.");
@@ -163,6 +164,11 @@ namespace Waher.IoTGateway.App
 				await MainPage.Instance.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
 					async () => await Dialog.ShowAsync());
 			}
+		}
+
+		private void Gateway_OnTerminate(object sender, EventArgs e)
+		{
+			Window.Current.Close();
 		}
 
 		private static Task<IDatabaseProvider> GetDatabase(XmlElement DatabaseConfig)

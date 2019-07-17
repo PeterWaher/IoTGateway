@@ -802,18 +802,19 @@ namespace Waher.Utility.Install
 						{
 							(string FileName, string SourceFileName) = GetFileName(E, SourceFolder);
 
-							CopyFile(2, SourceFileName, Path.GetRelativePath(PackageFolder, SourceFileName), Compressed);
+							CopyFile(2, SourceFileName, FileName, Compressed);
 
 							if (FileName.EndsWith(".dll", StringComparison.CurrentCultureIgnoreCase))
 							{
+								string PdbSourceFileName = SourceFileName.Substring(0, SourceFileName.Length - 4) + ".pdb";
 								string PdbFileName = FileName.Substring(0, FileName.Length - 4) + ".pdb";
-								if (File.Exists(PdbFileName))
-									CopyFile(1, PdbFileName, Path.GetRelativePath(PackageFolder, PdbFileName), Compressed);
+								if (File.Exists(PdbSourceFileName))
+									CopyFile(1, PdbSourceFileName, PdbFileName, Compressed);
 							}
 						}
 					}
 
-					CopyContent(SourceFolder, Compressed, PackageFolder, Module);
+					CopyContent(SourceFolder, Compressed, PackageFolder, string.Empty, Module);
 				}
 
 				Compressed.WriteByte(0);
@@ -913,7 +914,7 @@ namespace Waher.Utility.Install
 			return (byte)i;
 		}
 
-		private static void CopyContent(string SourceFolder, Stream Output, string PackageFolder, XmlElement Parent)
+		private static void CopyContent(string SourceFolder, Stream Output, string PackageFolder, string RelativeFolder, XmlElement Parent)
 		{
 			foreach (XmlNode N in Parent.ChildNodes)
 			{
@@ -927,18 +928,21 @@ namespace Waher.Utility.Install
 
 							Log.Informational("Content file: " + FileName);
 
-							CopyFile((byte)CopyOptions, SourceFileName, Path.GetRelativePath(PackageFolder, SourceFileName), Output);
+							string RelativePath = Path.Combine(RelativeFolder, FileName);
+							CopyFile((byte)CopyOptions, SourceFileName, RelativePath, Output);
 							break;
 
 						case "Folder":
 							string Name = XML.Attribute(E, "name");
 
 							string SourceFolder2 = Path.Combine(SourceFolder, Name);
+							string RelativeFolder2 = string.IsNullOrEmpty(RelativeFolder) ? Name : RelativeFolder + Path.DirectorySeparatorChar + Name;
 
 							Log.Informational("Folder: " + Name,
-								new KeyValuePair<string, object>("Source", SourceFolder2));
+								new KeyValuePair<string, object>("Source", SourceFolder2),
+								new KeyValuePair<string, object>("Relative", RelativeFolder2));
 
-							CopyContent(SourceFolder2, Output, PackageFolder, E);
+							CopyContent(SourceFolder2, Output, PackageFolder, RelativeFolder2, E);
 							break;
 					}
 				}
@@ -950,7 +954,7 @@ namespace Waher.Utility.Install
 			string FileName = XML.Attribute(E, "fileName");
 			string AbsFileName = Path.Combine(ReferenceFolder, FileName);
 			if (File.Exists(AbsFileName))
-				return (FileName, AbsFileName);
+				return (FileName, Path.GetFullPath(AbsFileName));
 
 			string AltFolder = XML.Attribute(E, "altFolder");
 			if (string.IsNullOrEmpty(AltFolder))
@@ -962,7 +966,7 @@ namespace Waher.Utility.Install
 
 			AbsFileName = Path.Combine(AltFolder, FileName);
 			if (File.Exists(AbsFileName))
-				return (FileName, AbsFileName);
+				return (FileName, Path.GetFullPath(AbsFileName));
 
 			throw new FileNotFoundException("File not found: " + AbsFileName);
 		}
@@ -1156,23 +1160,14 @@ namespace Waher.Utility.Install
 						case 3: // Content file (copy if newer)
 						case 4: // Content file (always copy)
 							bool OnlyIfNewer = b == 3;
-							string TempFileName = Path.GetTempFileName();
-							CopyFile(Decompressed, TempFileName, false, Bytes, Attr, CreationTimeUtc, LastAccessTimeUtc, LastWriteTimeUtc);
-							try
-							{
-								using (FileStream TempFile = File.OpenRead(TempFileName))
-								{
-									FileName = Path.Combine(ProgramDataFolder, RelativeName);
-									CopyFile(TempFile, FileName, OnlyIfNewer, Bytes, Attr, CreationTimeUtc, LastAccessTimeUtc, LastWriteTimeUtc);
 
-									FileName = Path.Combine(AppFolder, RelativeName);
-									TempFile.Position = 0;
-									CopyFile(TempFile, FileName, OnlyIfNewer, Bytes, Attr, CreationTimeUtc, LastAccessTimeUtc, LastWriteTimeUtc);
-								}
-							}
-							finally
+							FileName = Path.Combine(AppFolder, RelativeName);
+							CopyFile(Decompressed, FileName, false, Bytes, Attr, CreationTimeUtc, LastAccessTimeUtc, LastWriteTimeUtc);
+
+							using (FileStream TempFile = File.OpenRead(FileName))
 							{
-								File.Delete(TempFileName);
+								FileName = Path.Combine(ProgramDataFolder, RelativeName);
+								CopyFile(TempFile, FileName, OnlyIfNewer, Bytes, Attr, CreationTimeUtc, LastAccessTimeUtc, LastWriteTimeUtc);
 							}
 							break;
 

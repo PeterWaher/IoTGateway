@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
-		 xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension">
+		 xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension"
+     xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
   <Product Name="IoT Gateway" Version="1.0" Manufacturer="Waher Data AB" Language="1033" Codepage="1252"
 					 Id="544085A3-0819-4968-A4EC-537570AC3649" UpgradeCode="DA42DB5D-4E79-4AF9-AB56-06C31B06143C">
     <Package Id='*' Keywords='Installer' InstallScope='perMachine'
@@ -32,6 +33,11 @@
       <Directory Id='ProgramFilesFolder' Name='ProgramFiles'>
         <Directory Id='WaherDataAB' Name='Waher Data AB'>
           <Directory Id='INSTALLDIR' Name='IoT Gateway 1.0'>
+            <Component Id='InstallFolder' Guid='7853CEA7-FF91-4090-8F64-CCAC390BAD9C'>
+              <CreateFolder>
+                <util:PermissionEx GenericAll='yes' User='NT AUTHORITY\LocalService'/>
+              </CreateFolder>
+            </Component>
             <Component Id='NetCore' Guid='F8A15022-C2F1-4F00-8649-D23FDD89DA1D'>
               <File Id='api_ms_win_crt_utility_l1_1_0.dll' Name='api-ms-win-crt-utility-l1-1-0.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\api-ms-win-crt-utility-l1-1-0.dll' Vital='yes' KeyPath='yes'/>
               <File Id='api_ms_win_core_console_l1_1_0.dll' Name='api-ms-win-core-console-l1-1-0.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\api-ms-win-core-console-l1-1-0.dll' Vital='yes'/>
@@ -1153,6 +1159,11 @@
               </Component>
             </Directory>
             <Directory Id='InstallUtility' Name='InstallUtility'>
+              <Component Id='InstallUtilityFolder' Guid='C4400475-1681-4971-A5A1-AA30667F939C'>
+                <CreateFolder>
+                  <util:PermissionEx GenericAll='yes' User='NT AUTHORITY\LocalService'/>
+                </CreateFolder>
+              </Component>
             </Directory>
           </Directory>
         </Directory>
@@ -1404,6 +1415,7 @@
     <Feature Id='Complete' Title='IoT Gateway' Description='The IoT Gateway together with a set of content files.'
 						 Display='expand' Level='1' ConfigurableDirectory='INSTALLDIR'>
       <Feature Id='IoTGateway' Title='IoT Gateway' Description='Contains the required software to run the IoT Gateway.' Level='1'>
+        <ComponentRef Id='InstallFolder'/>
         <ComponentRef Id='NetCore' />
         <ComponentRef Id='SystemLibraries'/>
         <ComponentRef Id='MicrosoftLibraries'/>
@@ -1412,6 +1424,7 @@
         <ComponentRef Id='ExternalLibraries' />
         <ComponentRef Id='ProgramMenuDir' />
         <ComponentRef Id='AppDataFolder' />
+        <ComponentRef Id='InstallUtilityFolder' />
       </Feature>
       <Feature Id="VCRedist" Title="Visual C++ 14.0 Runtime" AllowAdvertise="no" Display="hidden" Level="1">
         <MergeRef Id="VCRedist"/>

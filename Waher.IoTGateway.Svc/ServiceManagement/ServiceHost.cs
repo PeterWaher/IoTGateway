@@ -29,7 +29,7 @@ namespace Waher.IoTGateway.Svc.ServiceManagement
 	{
 		private ServiceStatus serviceStatus;
 		private ServiceStatusHandle serviceStatusHandle;
-		private TaskCompletionSource<int> stopTaskCompletionSource;
+		private readonly TaskCompletionSource<int> stopTaskCompletionSource;
 		private readonly string serviceName;
 		private uint checkpointCounter = 1;
 
@@ -91,7 +91,7 @@ namespace Waher.IoTGateway.Svc.ServiceManagement
 
 				Gateway.GetDatabaseProvider += Program.GetDatabase;
 				Gateway.RegistrationSuccessful += Program.RegistrationSuccessful;
-				Gateway.OnTerminate += (sender, e) => this.StopService();
+				Gateway.OnTerminate += (sender, e) => this.StopService(true);
 
 				if (!Gateway.Start(true, true, Program.InstanceName).Result)
 					throw new Exception("Gateway being started in another process.");
@@ -102,7 +102,7 @@ namespace Waher.IoTGateway.Svc.ServiceManagement
 			{
 				Log.Critical(ex);
 
-				ReportServiceStatus(ServiceState.Stopped, ServiceAcceptedControlCommandsFlags.None, win32ExitCode: -1, waitHint: 0);
+				ReportServiceStatus(ServiceState.Stopped, ServiceAcceptedControlCommandsFlags.None, win32ExitCode: 1, waitHint: 0);
 			}
 		}
 
@@ -118,11 +118,11 @@ namespace Waher.IoTGateway.Svc.ServiceManagement
 			serviceStatus.Win32ExitCode = win32ExitCode;
 			serviceStatus.WaitHint = waitHint;
 
-			serviceStatus.AcceptedControlCommands = state == ServiceState.Stopped
+			serviceStatus.AcceptedControlCommands = (state == ServiceState.Stopped)
 				? ServiceAcceptedControlCommandsFlags.None // since we enforce "Stopped" as final state, no longer accept control messages
 				: acceptedControlCommands;
 
-			serviceStatus.CheckPoint = state == ServiceState.Running || state == ServiceState.Stopped || state == ServiceState.Paused
+			serviceStatus.CheckPoint = (state == ServiceState.Running) || (state == ServiceState.Stopped) || (state == ServiceState.Paused)
 				? 0 // MSDN: This value is not valid and should be zero when the service does not have a start, stop, pause, or continue operation pending.
 				: checkpointCounter++;
 
@@ -132,11 +132,11 @@ namespace Waher.IoTGateway.Svc.ServiceManagement
 				stopTaskCompletionSource.TrySetResult(win32ExitCode);
 		}
 
-		private void StopService()
+		private void StopService(bool NeedsRestart)
 		{
 			ReportServiceStatus(ServiceState.StopPending, ServiceAcceptedControlCommandsFlags.None, win32ExitCode: 0, waitHint: 3000);
 
-			int win32ExitCode = 0;
+			int win32ExitCode = NeedsRestart ? 1 : 0;
 
 			try
 			{
@@ -146,7 +146,7 @@ namespace Waher.IoTGateway.Svc.ServiceManagement
 			catch (Exception ex)
 			{
 				Log.Critical(ex);
-				win32ExitCode = -1;
+				win32ExitCode = 1;
 			}
 			finally
 			{
@@ -163,7 +163,7 @@ namespace Waher.IoTGateway.Svc.ServiceManagement
 				switch (command)
 				{
 					case ServiceControlCommand.Stop:
-						this.StopService();
+						this.StopService(false);
 						break;
 
 					case ServiceControlCommand.Continue:
@@ -201,7 +201,7 @@ namespace Waher.IoTGateway.Svc.ServiceManagement
 			{
 				Log.Critical(ex);
 
-				ReportServiceStatus(ServiceState.Stopped, ServiceAcceptedControlCommandsFlags.None, win32ExitCode: -1, waitHint: 0);
+				ReportServiceStatus(ServiceState.Stopped, ServiceAcceptedControlCommandsFlags.None, win32ExitCode: 1, waitHint: 0);
 			}
 		}
 

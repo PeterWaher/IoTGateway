@@ -275,30 +275,37 @@ namespace Waher.IoTGateway.Svc
 							new ScAction() { Type = ScActionType.ScActionRestart, Delay = TimeSpan.FromMinutes(1) },
 							new ScAction() { Type = ScActionType.ScActionRestart, Delay = TimeSpan.FromMinutes(1) }
 						}), Credentials);
+
+					return 0;
 				}
 				else if (Uninstall)
 				{
 					Log.Informational("Uninstalling service.");
 					UninstallService(ServiceName);
-				}
-				else if (AsConsole)
-				{
-					Log.Informational("Running as console application.");
-					RunAsConsole();
+
+					return 0;
 				}
 				else
 				{
-					Log.Informational("Running as service application.");
-					RunAsService(ServiceName);
-				}
+					if (AsConsole)
+					{
+						Log.Informational("Running as console application.");
+						RunAsConsole();
+					}
+					else
+					{
+						Log.Informational("Running as service application.");
+						RunAsService(ServiceName);
+					}
 
-				return 0;
+					return 1;	// Allows the service to be restarted.
+				}
 			}
 			catch (Exception ex)
 			{
 				Log.Critical(ex);
 				Console.Out.WriteLine(ex.Message);
-				return -1;
+				return 1;
 			}
 		}
 

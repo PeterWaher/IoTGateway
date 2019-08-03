@@ -635,20 +635,20 @@ namespace Waher.Script
 
 						if (!(Ref is null))
 							return new Assignment(Ref.VariableName, Right, Start, this.pos - Start, this);
-						else if (Left is NamedMember)
-							return new NamedMemberAssignment((NamedMember)Left, Right, Start, this.pos - Start, this);
-						else if (Left is DynamicMember)
-							return new DynamicMemberAssignment((DynamicMember)Left, Right, Start, this.pos - Start, this);
-						else if (Left is VectorIndex)
-							return new VectorIndexAssignment((VectorIndex)Left, Right, Start, this.pos - Start, this);
-						else if (Left is MatrixIndex)
-							return new MatrixIndexAssignment((MatrixIndex)Left, Right, Start, this.pos - Start, this);
-						else if (Left is ColumnVector)
-							return new MatrixColumnAssignment((ColumnVector)Left, Right, Start, this.pos - Start, this);
-						else if (Left is RowVector)
-							return new MatrixRowAssignment((RowVector)Left, Right, Start, this.pos - Start, this);
-						else if (Left is DynamicIndex)
-							return new DynamicIndexAssignment((DynamicIndex)Left, Right, Start, this.pos - Start, this);
+						else if (Left is NamedMember NamedMember)
+							return new NamedMemberAssignment(NamedMember, Right, Start, this.pos - Start, this);
+						else if (Left is DynamicMember DynamicMember)
+							return new DynamicMemberAssignment(DynamicMember, Right, Start, this.pos - Start, this);
+						else if (Left is VectorIndex VectorIndex)
+							return new VectorIndexAssignment(VectorIndex, Right, Start, this.pos - Start, this);
+						else if (Left is MatrixIndex MatrixIndex)
+							return new MatrixIndexAssignment(MatrixIndex, Right, Start, this.pos - Start, this);
+						else if (Left is ColumnVector ColumnVector)
+							return new MatrixColumnAssignment(ColumnVector, Right, Start, this.pos - Start, this);
+						else if (Left is RowVector RowVector)
+							return new MatrixRowAssignment(RowVector, Right, Start, this.pos - Start, this);
+						else if (Left is DynamicIndex DynamicIndex)
+							return new DynamicIndexAssignment(DynamicIndex, Right, Start, this.pos - Start, this);
 						else if (Left is NamedFunctionCall f)
 						{
 							List<string> ArgumentNames = new List<string>();
@@ -657,41 +657,40 @@ namespace Waher.Script
 
 							foreach (ScriptNode Argument in f.Arguments)
 							{
-								if (Argument is ToVector)
+								if (Argument is ToVector ToVector)
 								{
 									ArgumentType = ArgumentType.Vector;
 
-									if ((Ref = ((ToVector)Argument).Operand as VariableReference) is null)
+									if ((Ref = ToVector.Operand as VariableReference) is null)
 									{
 										throw new SyntaxException("Expected variable reference, with optional scalar, vector, set or matrix attribute types.",
 											Argument.Start, this.script);
 									}
 								}
-								else if (Argument is ToMatrix)
+								else if (Argument is ToMatrix ToMatrix)
 								{
 									ArgumentType = ArgumentType.Matrix;
 
-									if ((Ref = ((ToMatrix)Argument).Operand as VariableReference) is null)
+									if ((Ref = ToMatrix.Operand as VariableReference) is null)
 									{
 										throw new SyntaxException("Expected variable reference, with optional scalar, vector, set or matrix attribute types.",
 											Argument.Start, this.script);
 									}
 								}
-								else if (Argument is ToSet)
+								else if (Argument is ToSet ToSet)
 								{
 									ArgumentType = ArgumentType.Set;
 
-									if ((Ref = ((ToSet)Argument).Operand as VariableReference) is null)
+									if ((Ref = ToSet.Operand as VariableReference) is null)
 									{
 										throw new SyntaxException("Expected variable reference, with optional scalar, vector, set or matrix attribute types.",
 											Argument.Start, this.script);
 									}
 								}
-								else if (Argument is VectorDefinition)
+								else if (Argument is VectorDefinition Def)
 								{
 									ArgumentType = ArgumentType.Scalar;
 
-									VectorDefinition Def = (VectorDefinition)Argument;
 									if (Def.Elements.Length != 1 || (Ref = Def.Elements[0] as VariableReference) is null)
 									{
 										throw new SyntaxException("Expected variable reference, with optional scalar, vector, set or matrix attribute types.",
@@ -972,9 +971,9 @@ namespace Waher.Script
 						ArgumentNames = new string[] { Ref.VariableName };
 						ArgumentTypes = new ArgumentType[] { ArgumentType.Normal };
 					}
-					else if (Left is ToVector)
+					else if (Left is ToVector ToVector)
 					{
-						Ref = ((ToVector)Left).Operand as VariableReference;
+						Ref = ToVector.Operand as VariableReference;
 						if (Ref is null)
 						{
 							throw new SyntaxException("Expected variable reference, with optional scalar, vector, set or matrix attribute types.",
@@ -984,9 +983,9 @@ namespace Waher.Script
 						ArgumentNames = new string[] { Ref.VariableName };
 						ArgumentTypes = new ArgumentType[] { ArgumentType.Vector };
 					}
-					else if (Left is ToMatrix)
+					else if (Left is ToMatrix ToMatrix)
 					{
-						Ref = ((ToMatrix)Left).Operand as VariableReference;
+						Ref = ToMatrix.Operand as VariableReference;
 						if (Ref is null)
 						{
 							throw new SyntaxException("Expected variable reference, with optional scalar, vector, set or matrix attribute types.",
@@ -996,9 +995,9 @@ namespace Waher.Script
 						ArgumentNames = new string[] { Ref.VariableName };
 						ArgumentTypes = new ArgumentType[] { ArgumentType.Matrix };
 					}
-					else if (Left is ToSet)
+					else if (Left is ToSet ToSet)
 					{
-						Ref = ((ToSet)Left).Operand as VariableReference;
+						Ref = ToSet.Operand as VariableReference;
 						if (Ref is null)
 						{
 							throw new SyntaxException("Expected variable reference, with optional scalar, vector, set or matrix attribute types.",
@@ -1034,9 +1033,9 @@ namespace Waher.Script
 
 							if (!((Ref = Argument as VariableReference) is null))
 								ArgumentTypes[i] = ArgumentType.Normal;
-							else if (Argument is ToVector)
+							else if (Argument is ToVector ToVector2)
 							{
-								Ref = ((ToVector)Argument).Operand as VariableReference;
+								Ref = ToVector2.Operand as VariableReference;
 								if (Ref is null)
 								{
 									throw new SyntaxException("Expected variable reference, with optional scalar, vector, set or matrix attribute types.",
@@ -1045,9 +1044,9 @@ namespace Waher.Script
 
 								ArgumentTypes[i] = ArgumentType.Vector;
 							}
-							else if (Argument is ToMatrix)
+							else if (Argument is ToMatrix ToMatrix2)
 							{
-								Ref = ((ToMatrix)Argument).Operand as VariableReference;
+								Ref = ToMatrix2.Operand as VariableReference;
 								if (Ref is null)
 								{
 									throw new SyntaxException("Expected variable reference, with optional scalar, vector, set or matrix attribute types.",
@@ -1056,9 +1055,9 @@ namespace Waher.Script
 
 								ArgumentTypes[i] = ArgumentType.Matrix;
 							}
-							else if (Argument is ToSet)
+							else if (Argument is ToSet ToSet2)
 							{
-								Ref = ((ToSet)Argument).Operand as VariableReference;
+								Ref = ToSet2.Operand as VariableReference;
 								if (Ref is null)
 								{
 									throw new SyntaxException("Expected variable reference, with optional scalar, vector, set or matrix attribute types.",
@@ -3379,8 +3378,8 @@ namespace Waher.Script
 						StringValue StringValue;
 						string s;
 
-						if (Node is VariableReference)
-							s = ((VariableReference)Node).VariableName;
+						if (Node is VariableReference VariableReference)
+							s = VariableReference.VariableName;
 						else if (!((ConstantElement = Node as ConstantElement) is null) &&
 							!((StringValue = ConstantElement.Constant as StringValue) is null))
 						{
@@ -3402,8 +3401,8 @@ namespace Waher.Script
 							if (this.PeekNextChar() != ':')
 								throw new SyntaxException("Expected :.", this.pos, this.script);
 
-							if (Node is VariableReference)
-								s = ((VariableReference)Node).VariableName;
+							if (Node is VariableReference VariableReference2)
+								s = VariableReference2.VariableName;
 							else if (!((ConstantElement = Node as ConstantElement) is null) &&
 								!((StringValue = ConstantElement.Constant as StringValue) is null))
 							{
@@ -3460,14 +3459,14 @@ namespace Waher.Script
 
 				this.pos++;
 
-				if (Node is For)
-					return new SetForDefinition((For)Node, Start, this.pos - Start, this);
-				else if (Node is ForEach)
-					return new SetForEachDefinition((ForEach)Node, Start, this.pos - Start, this);
-				else if (Node is DoWhile)
-					return new SetDoWhileDefinition((DoWhile)Node, Start, this.pos - Start, this);
-				else if (Node is WhileDo)
-					return new SetWhileDoDefinition((WhileDo)Node, Start, this.pos - Start, this);
+				if (Node is For For)
+					return new SetForDefinition(For, Start, this.pos - Start, this);
+				else if (Node is ForEach ForEach)
+					return new SetForEachDefinition(ForEach, Start, this.pos - Start, this);
+				else if (Node is DoWhile DoWhile)
+					return new SetDoWhileDefinition(DoWhile, Start, this.pos - Start, this);
+				else if (Node is WhileDo WhileDo)
+					return new SetWhileDoDefinition(WhileDo, Start, this.pos - Start, this);
 				else if (Node.GetType() == typeof(ElementList))
 					return new SetDefinition(((ElementList)Node).Elements, Start, this.pos - Start, this);
 				else

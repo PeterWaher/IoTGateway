@@ -14,6 +14,7 @@ namespace Waher.Events.Persistence
 	[Index("Actor", "Timestamp")]
 	[Index("EventId", "Timestamp")]
 	[Index("Facility", "Timestamp")]
+	[Index("Type", "Timestamp")]
 	public class PersistedEvent
 	{
 		private Guid objectId = Guid.Empty;

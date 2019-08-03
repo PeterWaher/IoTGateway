@@ -1479,9 +1479,36 @@ order by
 	Hour
 ```
 
+#### UPDATE
+
+Simplified SQL `UPDATE` statements can be executed against the object database. The number of objects deleted is returned.
+
+Syntax:
+
+```
+UPDATE
+	type
+SET
+	property=value[,
+	property2=value2[,...]]
+[WHERE
+	conditions]
+```
+
+Example:
+
+```
+update
+	PersistedEvent
+set
+	Message="Kilroy "+Message
+where 
+	Type=EventType.Notice
+```
+
 #### DELETE
 
-Simplified SQL `DELETE` statements can be executed against the object database. The number of objects deleted is returned.
+Simplified SQL `DELETE` statements can be executed against the object database. The number of objects updated is returned.
 
 Syntax:
 

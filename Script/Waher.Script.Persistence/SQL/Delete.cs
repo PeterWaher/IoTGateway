@@ -43,9 +43,7 @@ namespace Waher.Script.Persistence.SQL
 		/// <returns>Result.</returns>
 		public override IElement Evaluate(Variables Variables)
 		{
-			IElement E;
-
-			E = this.source.Evaluate(Variables);
+			IElement E = this.source.Evaluate(Variables);
 			if (!(E.AssociatedObjectValue is Type T))
 				throw new ScriptRuntimeException("Type expected.", this.source);
 

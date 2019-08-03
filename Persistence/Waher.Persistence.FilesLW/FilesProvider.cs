@@ -1812,6 +1812,7 @@ namespace Waher.Persistence.Files
                     File = await this.GetFile(CollectionName);
                 }
 
+				ObjectIds.AddLast(await Serializer.GetObjectId(Object, false));
                 List.AddLast(Object);
             }
 

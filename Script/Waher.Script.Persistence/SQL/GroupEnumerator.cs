@@ -126,9 +126,19 @@ namespace Waher.Script.Persistence.SQL
 				return false;
 
 			Dictionary<string, object> Result = new Dictionary<string, object>();
+			bool First = true;
 
 			foreach (KeyValuePair<string, List<object>> Rec in Aggregated)
-				Result[Rec.Key] = Rec.Value.ToArray();
+			{
+				object[] A = Rec.Value.ToArray();
+				Result[Rec.Key] = A;
+
+				if (First)
+				{
+					First = false;
+					Result[" First "] = A;
+				}
+			}
 
 			if (this.groupNames != null)
 			{

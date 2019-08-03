@@ -79,29 +79,15 @@ namespace Waher.Script
 		{
 			get
 			{
-				Variable Variable;
-
-				lock (this.variables)
-				{
-					if (this.variables.TryGetValue(Name, out Variable))
-						return Variable.ValueObject;
-				}
-
-				if (!(this.contextVariables is null) && this.contextVariables.TryGetVariable(Name, out Variable))
-					return Variable.ValueObject;
-
-				return null;
+				if (this.TryGetVariable(Name, out Variable v))
+					return v.ValueObject;
+				else
+					return null;
 			}
 
 			set
 			{
-				lock (this.variables)
-				{
-					if (this.variables.TryGetValue(Name, out Variable v))
-						v.SetValue(value);
-					else
-						this.variables[Name] = new Variable(Name, value);
-				}
+				this.Add(Name, value);
 			}
 		}
 
@@ -110,9 +96,15 @@ namespace Waher.Script
 		/// </summary>
 		/// <param name="Name">Variable name.</param>
 		/// <param name="Value">Associated variable object value.</param>
-		public void Add(string Name, object Value)
+		public virtual void Add(string Name, object Value)
 		{
-			this[Name] = Value;
+			lock (this.variables)
+			{
+				if (this.variables.TryGetValue(Name, out Variable v))
+					v.SetValue(Value);
+				else
+					this.variables[Name] = new Variable(Name, Value);
+			}
 		}
 
 		/// <summary>
@@ -120,7 +112,7 @@ namespace Waher.Script
 		/// </summary>
 		/// <param name="VariableName">Name of variable.</param>
 		/// <returns>If the variable was found and removed.</returns>
-		public bool Remove(string VariableName)
+		public virtual bool Remove(string VariableName)
 		{
 			lock (this.variables)
 			{
@@ -132,7 +124,7 @@ namespace Waher.Script
 		/// Pushes the current set of variables to the stack. This state is restored by calling <see cref="Pop"/>.
 		/// Each call to this method must be followed by exactly one call to <see cref="Pop"/>.
 		/// </summary>
-		public void Push()
+		public virtual void Push()
 		{
 			if (this.stack is null)
 				this.stack = new Stack<Dictionary<string, Variable>>();
@@ -149,7 +141,7 @@ namespace Waher.Script
 		/// <summary>
 		/// Pops a previously stored set of variables from the stack. Variables are stored on the stack by calling <see cref="Push"/>.
 		/// </summary>
-		public void Pop()
+		public virtual void Pop()
 		{
 			if (this.stack is null)
 				throw new ScriptException("Stack is empty.");

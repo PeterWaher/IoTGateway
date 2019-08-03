@@ -43,7 +43,7 @@ namespace Waher.Script
 		private static readonly Dictionary<string, bool> keywords = GetKeywords();
 
 		private ScriptNode root;
-		private string script;
+		private readonly string script;
 		private object tag;
 		private int pos;
 		private readonly int len;
@@ -1131,7 +1131,7 @@ namespace Waher.Script
 				int Bak = this.pos;
 
 				this.pos++;
-				if ((ch = this.PeekNextChar()) == '=')
+				if (this.PeekNextChar() == '=')
 				{
 					this.pos++;
 					if (this.PeekNextChar() == '>')
@@ -2708,12 +2708,12 @@ namespace Waher.Script
 					else if (ch == '²')
 					{
 						Exponent = 2;
-						ch = this.NextChar();
+						this.NextChar();
 					}
 					else if (ch == '³')
 					{
 						Exponent = 3;
-						ch = this.NextChar();
+						this.NextChar();
 					}
 					else
 						Exponent = 1;
@@ -3446,7 +3446,7 @@ namespace Waher.Script
 						SuperSet = null;
 
 					this.SkipWhiteSpace();
-					if (this.PeekNextChar()!='}')
+					if (this.PeekNextChar() != '}')
 						throw new SyntaxException("Expected }.", this.pos, this.script);
 
 					this.pos++;
@@ -3642,25 +3642,11 @@ namespace Waher.Script
 						return new ConstantElement(ObjectValue.Null, Start, this.pos - Start, this);
 
 					default:
-						if (customKeyWords is null)
-							Search();
-
-						if (customKeyWords.TryGetValue(s, out IKeyWord KeyWord))
-						{
-							ScriptParser Parser = new ScriptParser(this);
-							int PosBak = this.pos;
-							bool CanParseWhitespace = this.canSkipWhitespace;
-							bool Result = KeyWord.TryParse(Parser, out Node);
-
-							this.canSkipWhitespace = CanParseWhitespace;
-
-							if (Result)
-								return Node;
-							else
-								this.pos = PosBak;
-						}
-
-						return new VariableReference(s, Start, this.pos - Start, this);
+						Node = this.ParseCustomNode(s, false);
+						if (Node is null)
+							return new VariableReference(s, Start, this.pos - Start, this);
+						else
+							return Node;
 				}
 			}
 			else
@@ -3681,8 +3667,35 @@ namespace Waher.Script
 						return new ConstantElement(BooleanValue.False, Start, this.pos - Start, this);
 				}
 
-				return null;
+				return this.ParseCustomNode(new string(ch, 1), true);
 			}
+		}
+
+		private ScriptNode ParseCustomNode(string KeyWord, bool IncPosIfKeyword)
+		{
+			if (customKeyWords is null)
+				Search();
+
+			if (customKeyWords.TryGetValue(KeyWord, out IKeyWord KeyWordParser))
+			{
+				ScriptParser Parser = new ScriptParser(this);
+				int PosBak = this.pos;
+
+				if (IncPosIfKeyword)
+					this.pos += KeyWord.Length;
+
+				bool CanParseWhitespace = this.canSkipWhitespace;
+				bool Result = KeyWordParser.TryParse(Parser, out ScriptNode Node);
+
+				this.canSkipWhitespace = CanParseWhitespace;
+
+				if (Result)
+					return Node;
+				else
+					this.pos = PosBak;
+			}
+
+			return null;
 		}
 
 		private static bool IsVectorDefinition(ScriptNode Node)

@@ -285,6 +285,7 @@
   <Assembly fileName='Waher.Script.Statistics.dll'/>
   <Assembly fileName='Waher.Security.dll'/>
   <Assembly fileName='Waher.Security.ACME.dll'/>
+  <Assembly fileName='Waher.Security.CallStack.dll'/>
   <Assembly fileName='Waher.Security.ChaChaPoly.dll'/>
   <Assembly fileName='Waher.Security.DTLS.dll'/>
   <Assembly fileName='Waher.Security.EllipticCurves.dll'/>

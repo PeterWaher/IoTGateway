@@ -558,6 +558,7 @@
               <File Id='Waher.Script.Statistics.dll' Name='Waher.Script.Statistics.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Script.Statistics.dll' Vital='yes'/>
               <File Id='Waher.Security.dll' Name='Waher.Security.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.dll' Vital='yes'/>
 							<File Id='Waher.Security.ACME.dll' Name='Waher.Security.ACME.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.ACME.dll' Vital='yes'/>
+              <File Id='Waher.Security.CallStack.dll' Name='Waher.Security.CallStack.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.CallStack.dll' Vital='yes'/>
               <File Id='Waher.Security.ChaChaPoly.dll' Name='Waher.Security.ChaChaPoly.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.ChaChaPoly.dll' Vital='yes'/>
               <File Id='Waher.Security.DTLS.dll' Name='Waher.Security.DTLS.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.DTLS.dll' Vital='yes'/>
 							<File Id='Waher.Security.EllipticCurves.dll' Name='Waher.Security.EllipticCurves.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.EllipticCurves.dll' Vital='yes'/>
@@ -637,6 +638,7 @@
 							<RemoveFile Id='RemoveWaher.Script.Persistence.dll' Name='Waher.Script.Persistence.dll' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Security.dll' Name='Waher.Security.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Security.ACME.dll' Name='Waher.Security.ACME.dll' On='uninstall'/>
+              <RemoveFile Id='RemoveWaher.Security.CallStack.dll' Name='Waher.Security.CallStack.dll' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Security.ChaChaPoly.dll' Name='Waher.Security.ChaChaPoly.dll' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Security.DTLS.dll' Name='Waher.Security.DTLS.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Security.EllipticCurves.dll' Name='Waher.Security.EllipticCurves.dll' On='uninstall'/>
@@ -712,6 +714,7 @@
 							<File Id='Waher.Script.Persistence.pdb' Name='Waher.Script.Persistence.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Script.Persistence.pdb' Vital='yes'/>
               <File Id='Waher.Security.pdb' Name='Waher.Security.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.pdb' Vital='yes'/>
 							<File Id='Waher.Security.ACME.pdb' Name='Waher.Security.ACME.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.ACME.pdb' Vital='yes'/>
+              <File Id='Waher.Security.CallStack.pdb' Name='Waher.Security.CallStack.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.CallStack.pdb' Vital='yes'/>
               <File Id='Waher.Security.ChaChaPoly.pdb' Name='Waher.Security.ChaChaPoly.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.ChaChaPoly.pdb' Vital='yes'/>
               <File Id='Waher.Security.DTLS.pdb' Name='Waher.Security.DTLS.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.DTLS.pdb' Vital='yes'/>
 							<File Id='Waher.Security.EllipticCurves.pdb' Name='Waher.Security.EllipticCurves.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.EllipticCurves.pdb' Vital='yes'/>
@@ -783,6 +786,7 @@
 							<RemoveFile Id='RemoveWaher.Script.Persistence.pdb' Name='Waher.Script.Persistence.pdb' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Security.pdb' Name='Waher.Security.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Security.ACME.pdb' Name='Waher.Security.ACME.pdb' On='uninstall'/>
+              <RemoveFile Id='RemoveWaher.Security.CallStack.pdb' Name='Waher.Security.CallStack.pdb' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Security.ChaChaPoly.pdb' Name='Waher.Security.ChaChaPoly.pdb' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Security.DTLS.pdb' Name='Waher.Security.DTLS.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Security.EllipticCurves.pdb' Name='Waher.Security.EllipticCurves.pdb' On='uninstall'/>

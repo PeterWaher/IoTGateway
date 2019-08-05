@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Events;
 using Waher.Persistence;
 using Waher.Persistence.Filters;
 using Waher.Script.Abstraction.Elements;
@@ -232,6 +233,7 @@ namespace Waher.Script.Persistence.SQL
 						}
 						catch (Exception ex)
 						{
+							ex = Log.UnnestException(ex);
 							Rec[i] = Expression.Encapsulate(ex);
 						}
 					}

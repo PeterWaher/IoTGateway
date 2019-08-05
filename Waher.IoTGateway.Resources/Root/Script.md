@@ -1479,6 +1479,46 @@ order by
 	Hour
 ```
 
+##### Implicit groups
+
+By using aggregate functions in the column definitions, the parser assumes these to be calculated over the entire result set, 
+if no group specification says otherwise. This implicit grouping is used, if any of the following functions are used:
+
+* `Average`
+* `Count`
+* `Max`
+* `Median`
+* `Min`
+* `Product`
+* `StandardDeviation`
+* `Sum`
+* `Variance`
+
+Example:
+
+```
+select
+	min(Timestamp) "From",
+	max(Timestamp) To
+from
+	PersistedEvent
+```
+
+##### Wildcards
+
+You can also use wildcards (`*`) to represent any of the columns in a group. The wildcard also works in implicit groups.
+
+Example:
+
+```
+select
+	count(*) Nr
+from
+	PersistedEvent
+where
+	Type=EventType.Notice
+```
+
 #### UPDATE
 
 Simplified SQL `UPDATE` statements can be executed against the object database. The number of objects deleted is returned.

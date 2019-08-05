@@ -9,8 +9,6 @@
     <Copyright>Copyright © Waher Data AB 2016-2019. All rights reserved.</Copyright>
     <Description>Class library that defines a script language and an object abstraction of computable elements. The library helps application parse and execute script. Script is extensible, and it is easy for modules to extend the script engine.
 
-Script reference: https://waher.se/Script.md
-
 Script Syntax: https://waher.se/Script.md</Description>
     <PackageLicenseUrl></PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Script/Waher.Script</PackageProjectUrl>

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Waher.Script.Model;
 using Waher.Script.Objects;
+using Waher.Script.Functions.Vectors;
 
 namespace Waher.Script.Persistence.SQL.Parsers
 {
@@ -188,6 +189,25 @@ namespace Waher.Script.Persistence.SQL.Parsers
 						s = Parser.PeekNextToken().ToUpper();
 					}
 				}
+				else if (!(Columns is null))
+				{
+					bool ImplicitGrouping = false;
+
+					foreach (ScriptNode Column in Columns)
+					{
+						if (this.ContainsVectorFunction(Column))
+						{
+							ImplicitGrouping = true;
+							break;
+						}
+					}
+
+					if (ImplicitGrouping)
+					{
+						GroupBy = new List<ScriptNode>();
+						GroupByNames = new List<ScriptNode>();
+					}
+				}
 
 				List<KeyValuePair<ScriptNode, bool>> OrderBy = null;
 
@@ -244,6 +264,32 @@ namespace Waher.Script.Persistence.SQL.Parsers
 			{
 				return false;
 			}
+		}
+
+		private bool ContainsVectorFunction(ScriptNode Node)
+		{
+			if (!this.SearchForVectorFunction(ref Node, null))
+				return true;
+
+			return !Node.ForAllChildNodes(this.SearchForVectorFunction, null, false);
+		}
+
+		private bool SearchForVectorFunction(ref ScriptNode Node, object State)
+		{
+			if (Node is Function)
+			{
+				return !(Node is Average ||
+					Node is Count ||
+					Node is Max ||
+					Node is Median ||
+					Node is Min ||
+					Node is Product ||
+					Node is StandardDeviation ||
+					Node is Sum ||
+					Node is Variance);
+			}
+
+			return true;
 		}
 
 	}

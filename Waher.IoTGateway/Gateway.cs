@@ -50,6 +50,7 @@ using Waher.Runtime.Timing;
 using Waher.Persistence;
 using Waher.Script;
 using Waher.Security;
+using Waher.Security.CallStack;
 using Waher.Things;
 using Waher.Things.Metering;
 using Waher.Things.SensorData;
@@ -115,6 +116,7 @@ namespace Waher.IoTGateway
 		private static readonly LinkedList<KeyValuePair<string, int>> ports = new LinkedList<KeyValuePair<string, int>>();
 		private static readonly Dictionary<int, EventHandler> serviceCommandByNr = new Dictionary<int, EventHandler>();
 		private static readonly Dictionary<EventHandler, int> serviceCommandNrByCallback = new Dictionary<EventHandler, int>();
+		private static readonly Dictionary<string, DateTime> lastUnauthorizedAccess = new Dictionary<string, DateTime>();
 		private static IDatabaseProvider internalProvider = null;
 		private static ThingRegistryClient thingRegistryClient = null;
 		private static ProvisioningClient provisioningClient = null;
@@ -235,6 +237,8 @@ namespace Waher.IoTGateway
 				Log.Register(new XmlFileEventSink("XML File Event Sink",
 					appDataFolder + "Events" + Path.DirectorySeparatorChar + "Event Log %YEAR%-%MONTH%-%DAY%T%HOUR%.xml",
 					appDataFolder + "Transforms" + Path.DirectorySeparatorChar + "EventXmlToHtml.xslt", 7));
+
+				Assert.UnauthorizedAccess += Assert_UnauthorizedAccess;
 
 				Log.Informational("Server starting up.");
 
@@ -822,6 +826,45 @@ namespace Waher.IoTGateway
 			});
 
 			return true;
+		}
+
+		private static void Assert_UnauthorizedAccess(object Sender, UnauthorizedAccessEventArgs e)
+		{
+			DateTime Now = DateTime.Now;
+			string Key = e.Trace.ToString();
+
+			lock (lastUnauthorizedAccess)
+			{
+				if (lastUnauthorizedAccess.TryGetValue(Key, out DateTime TP) && (Now - TP).TotalHours < 1)
+					return;
+
+				lastUnauthorizedAccess[Key] = Now;
+			}
+
+			StringBuilder Markdown = new StringBuilder();
+
+			Markdown.AppendLine("Unauthorized access detected and prevented.");
+			Markdown.AppendLine("===============================================");
+			Markdown.AppendLine();
+			Markdown.AppendLine("| Details ||");
+			Markdown.AppendLine("|:---|:---|");
+			Markdown.Append("| Method | `");
+			Markdown.Append(e.Method.Name);
+			Markdown.AppendLine("` |");
+			Markdown.Append("| Type | `");
+			Markdown.Append(e.Type.FullName);
+			Markdown.AppendLine("` |");
+			Markdown.Append("| Assembly | `");
+			Markdown.Append(e.Assembly.GetName().Name);
+			Markdown.AppendLine("` |");
+			Markdown.AppendLine();
+			Markdown.AppendLine("Stack Trace:");
+			Markdown.AppendLine();
+			Markdown.AppendLine("```");
+			Markdown.AppendLine(e.Trace.ToString().TrimEnd());
+			Markdown.AppendLine("```");
+
+			Gateway.SendNotification(Markdown.ToString());
 		}
 
 		private static void CheckContentFiles(string ManifestFileName, Dictionary<string, CopyOptions> ContentOptions)

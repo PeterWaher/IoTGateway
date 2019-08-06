@@ -1082,6 +1082,12 @@ namespace Waher.Utility.Install
 						case 1: // Program file in installation folder, not assembly file
 						case 2: // Assembly file
 							FileName = Path.Combine(AppFolder, RelativeName);
+
+							if (b == 1)
+								Log.Informational("Application file: " + FileName);
+							else
+								Log.Informational("Assembly file: " + FileName);
+
 							CopyFile(Decompressed, FileName, false, Bytes, Attr, CreationTimeUtc, LastAccessTimeUtc, LastWriteTimeUtc);
 
 							if (b == 2)
@@ -1099,7 +1105,9 @@ namespace Waher.Utility.Install
 
 								AssemblyName AN = A.GetName();
 
-								if (Deps != null && Deps.TryGetValue("targets", out object Obj) && Obj is Dictionary<string, object> Targets)
+								if (Deps != null &&
+									Deps.TryGetValue("targets", out object Obj) &&
+									Obj is Dictionary<string, object> Targets)
 								{
 									foreach (KeyValuePair<string, object> P in Targets)
 									{
@@ -1123,20 +1131,22 @@ namespace Waher.Utility.Install
 												Dependencies2[Dependency.Name] = Dependency.Version.ToString();
 
 											Dictionary<string, object> Runtime = new Dictionary<string, object>()
-										{
-											{ Path.GetFileName(FileName), new Dictionary<string,object>() }
-										};
+											{
+												{ Path.GetFileName(FileName), new Dictionary<string,object>() }
+											};
 
 											Target[AN.Name + "/" + AN.Version.ToString()] = new Dictionary<string, object>()
-										{
-											{ "dependencies", Dependencies2 },
-											{ "runtime", Runtime }
-										};
+											{
+												{ "dependencies", Dependencies2 },
+												{ "runtime", Runtime }
+											};
 										}
 									}
 								}
 
-								if (Deps != null && Deps.TryGetValue("libraries", out object Obj3) && Obj3 is Dictionary<string, object> Libraries)
+								if (Deps != null &&
+									Deps.TryGetValue("libraries", out object Obj3) &&
+									Obj3 is Dictionary<string, object> Libraries)
 								{
 									foreach (KeyValuePair<string, object> P in Libraries)
 									{
@@ -1162,11 +1172,15 @@ namespace Waher.Utility.Install
 							bool OnlyIfNewer = b == 3;
 
 							FileName = Path.Combine(AppFolder, RelativeName);
+							Log.Informational("Content file: " + FileName);
+
 							CopyFile(Decompressed, FileName, false, Bytes, Attr, CreationTimeUtc, LastAccessTimeUtc, LastWriteTimeUtc);
 
 							using (FileStream TempFile = File.OpenRead(FileName))
 							{
 								FileName = Path.Combine(ProgramDataFolder, RelativeName);
+								Log.Informational("Content file: " + FileName);
+
 								CopyFile(TempFile, FileName, OnlyIfNewer, Bytes, Attr, CreationTimeUtc, LastAccessTimeUtc, LastWriteTimeUtc);
 							}
 							break;
@@ -1195,40 +1209,45 @@ namespace Waher.Utility.Install
 		private static void CopyFile(Stream Input, string OutputFileName, bool OnlyIfNewer, ulong Bytes, FileAttributes Attr,
 			DateTime CreationTimeUtc, DateTime LastAccessTimeUtc, DateTime LastWriteTimeUtc)
 		{
-			Log.Informational("Content file: " + OutputFileName);
-
-			string Folder = Path.GetDirectoryName(OutputFileName);
-
-			if (!string.IsNullOrEmpty(Folder) && !Directory.Exists(Folder))
+			try
 			{
-				Log.Informational("Creating folder " + Folder + ".");
-				Directory.CreateDirectory(Folder);
-			}
+				string Folder = Path.GetDirectoryName(OutputFileName);
 
-			int c = Math.Min(65536, Bytes > int.MaxValue ? int.MaxValue : (int)Bytes);
-			byte[] Buffer = new byte[c];
-
-			if (OnlyIfNewer && File.Exists(OutputFileName) && File.GetLastWriteTimeUtc(OutputFileName) >= LastWriteTimeUtc)
-				return;
-
-			using (FileStream f = File.Create(OutputFileName))
-			{
-				while (Bytes > 0)
+				if (!string.IsNullOrEmpty(Folder) && !Directory.Exists(Folder))
 				{
-					int d = (int)Math.Min(Bytes, (ulong)c);
-
-					if (Input.Read(Buffer, 0, d) != d)
-						throw new EndOfStreamException("Reading past end-of-file.");
-
-					f.Write(Buffer, 0, d);
-					Bytes -= (uint)d;
+					Log.Informational("Creating folder " + Folder + ".");
+					Directory.CreateDirectory(Folder);
 				}
-			}
 
-			File.SetAttributes(OutputFileName, Attr);
-			File.SetCreationTimeUtc(OutputFileName, CreationTimeUtc);
-			File.SetLastAccessTimeUtc(OutputFileName, LastAccessTimeUtc);
-			File.SetLastWriteTimeUtc(OutputFileName, LastWriteTimeUtc);
+				int c = Math.Min(65536, Bytes > int.MaxValue ? int.MaxValue : (int)Bytes);
+				byte[] Buffer = new byte[c];
+
+				if (OnlyIfNewer && File.Exists(OutputFileName) && File.GetLastWriteTimeUtc(OutputFileName) >= LastWriteTimeUtc)
+					return;
+
+				using (FileStream f = File.Create(OutputFileName))
+				{
+					while (Bytes > 0)
+					{
+						int d = (int)Math.Min(Bytes, (ulong)c);
+
+						if (Input.Read(Buffer, 0, d) != d)
+							throw new EndOfStreamException("Reading past end-of-file.");
+
+						f.Write(Buffer, 0, d);
+						Bytes -= (uint)d;
+					}
+				}
+
+				File.SetAttributes(OutputFileName, Attr);
+				File.SetCreationTimeUtc(OutputFileName, CreationTimeUtc);
+				File.SetLastAccessTimeUtc(OutputFileName, LastAccessTimeUtc);
+				File.SetLastWriteTimeUtc(OutputFileName, LastWriteTimeUtc);
+			}
+			catch (Exception ex)
+			{
+				Log.Error(ex);
+			}
 		}
 
 		private static void UninstallPackage(string PackageFile, string Key, string ServerApplication, string ProgramDataFolder, bool Remove)

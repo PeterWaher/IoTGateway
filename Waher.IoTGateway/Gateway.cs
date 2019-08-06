@@ -141,6 +141,7 @@ namespace Waher.IoTGateway
 		private static Scheduler scheduler = null;
 		private readonly static RandomNumberGenerator rnd = RandomNumberGenerator.Create();
 		private static Semaphore gatewayRunning = null;
+		private static Semaphore startingServer = null;
 		private static Emoji1LocalFiles emoji1_24x24 = null;
 		private static StreamWriter exceptionFile = null;
 		private static CaseInsensitiveString domain = null;
@@ -203,15 +204,15 @@ namespace Waher.IoTGateway
 			if (!gatewayRunning.WaitOne(1000))
 				return false; // Is running in another process.
 
-			Semaphore StartingServer = new Semaphore(1, 1, "Waher.IoTGateway.Starting" + Suffix);
-			if (!StartingServer.WaitOne(1000))
+			startingServer = new Semaphore(1, 1, "Waher.IoTGateway.Starting" + Suffix);
+			if (!startingServer.WaitOne(1000))
 			{
 				gatewayRunning.Release();
 				gatewayRunning.Dispose();
 				gatewayRunning = null;
 
-				StartingServer.Dispose();
-				StartingServer = null;
+				startingServer.Dispose();
+				startingServer = null;
 				return false; // Being started in another process.
 			}
 
@@ -540,12 +541,9 @@ namespace Waher.IoTGateway
 							webServer.ResourceOverride = Configuration.Resource;
 							Configuration.SetStaticInstance(Configuration);
 
-							if (StartingServer != null)
-							{
-								StartingServer.Release();
-								StartingServer.Dispose();
-								StartingServer = null;
-							}
+							startingServer?.Release();
+							startingServer?.Dispose();
+							startingServer = null;
 
 							ClientEvents.PushEvent(ClientEvents.GetTabIDs(), "Reload", string.Empty);
 
@@ -736,19 +734,13 @@ namespace Waher.IoTGateway
 			{
 				Log.Critical(ex);
 
-				if (gatewayRunning != null)
-				{
-					gatewayRunning.Release();
-					gatewayRunning.Dispose();
-					gatewayRunning = null;
-				}
+				startingServer?.Release();
+				startingServer?.Dispose();
+				startingServer = null;
 
-				if (StartingServer != null)
-				{
-					StartingServer.Release();
-					StartingServer.Dispose();
-					StartingServer = null;
-				}
+				gatewayRunning?.Release();
+				gatewayRunning?.Dispose();
+				gatewayRunning = null;
 
 				ExceptionDispatchInfo.Capture(ex).Throw();
 			}
@@ -757,63 +749,51 @@ namespace Waher.IoTGateway
 			{
 				try
 				{
-					try
+					string BinaryFolder = AppDomain.CurrentDomain.BaseDirectory;
+					string[] LanguageFiles = Directory.GetFiles(BinaryFolder, "*.lng", SearchOption.AllDirectories);
+					string FileName;
+
+					if (LanguageFiles.Length > 0)
 					{
-						string BinaryFolder = AppDomain.CurrentDomain.BaseDirectory;
-						string[] LanguageFiles = Directory.GetFiles(BinaryFolder, "*.lng", SearchOption.AllDirectories);
-						string FileName;
+						XmlSchema Schema = XSL.LoadSchema(Translator.SchemaResource, typeof(Translator).Assembly);
 
-						if (LanguageFiles.Length > 0)
+						foreach (string LanguageFile in LanguageFiles)
 						{
-							XmlSchema Schema = XSL.LoadSchema(Translator.SchemaResource, typeof(Translator).Assembly);
-
-							foreach (string LanguageFile in LanguageFiles)
+							try
 							{
-								try
+								FileName = LanguageFile;
+								if (FileName.StartsWith(BinaryFolder))
+									FileName = FileName.Substring(BinaryFolder.Length);
+
+								DateTime LastWriteTime = File.GetLastWriteTime(LanguageFile);
+								DateTime LastImportedTime = await RuntimeSettings.GetAsync(FileName, DateTime.MinValue);
+
+								if (LastWriteTime > LastImportedTime)
 								{
-									FileName = LanguageFile;
-									if (FileName.StartsWith(BinaryFolder))
-										FileName = FileName.Substring(BinaryFolder.Length);
+									Log.Informational("Importing language file.", FileName);
 
-									DateTime LastWriteTime = File.GetLastWriteTime(LanguageFile);
-									DateTime LastImportedTime = await RuntimeSettings.GetAsync(FileName, DateTime.MinValue);
+									string Xml = File.ReadAllText(LanguageFile);
+									XmlDocument Doc = new XmlDocument();
+									Doc.LoadXml(Xml);
 
-									if (LastWriteTime > LastImportedTime)
+									XSL.Validate(FileName, Doc, Translator.SchemaRoot, Translator.SchemaNamespace, Schema);
+
+									using (XmlReader r = new XmlNodeReader(Doc))
 									{
-										Log.Informational("Importing language file.", FileName);
-
-										string Xml = File.ReadAllText(LanguageFile);
-										XmlDocument Doc = new XmlDocument();
-										Doc.LoadXml(Xml);
-
-										XSL.Validate(FileName, Doc, Translator.SchemaRoot, Translator.SchemaNamespace, Schema);
-
-										using (XmlReader r = new XmlNodeReader(Doc))
-										{
-											await Translator.ImportAsync(r);
-										}
-
-										RuntimeSettings.Set(FileName, LastWriteTime);
+										await Translator.ImportAsync(r);
 									}
-								}
-								catch (Exception ex)
-								{
-									Log.Critical(ex, LanguageFile);
+
+									RuntimeSettings.Set(FileName, LastWriteTime);
 								}
 							}
+							catch (Exception ex)
+							{
+								Log.Critical(ex, LanguageFile);
+							}
 						}
+					}
 
-						Types.StartAllModules(int.MaxValue);
-					}
-					finally
-					{
-						if (StartingServer != null)
-						{
-							StartingServer.Release();
-							StartingServer.Dispose();
-							StartingServer = null;
-						}
-					}
+					Types.StartAllModules(int.MaxValue);
 				}
 				catch (Exception ex)
 				{
@@ -821,6 +801,10 @@ namespace Waher.IoTGateway
 				}
 				finally
 				{
+					startingServer?.Release();
+					startingServer?.Dispose();
+					startingServer = null;
+
 					xmppClient.Connect();
 				}
 			});
@@ -1359,6 +1343,10 @@ namespace Waher.IoTGateway
 
 				scheduler?.Dispose();
 				scheduler = null;
+
+				startingServer?.Release();
+				startingServer?.Dispose();
+				startingServer = null;
 
 				gatewayRunning?.Release();
 				gatewayRunning?.Dispose();

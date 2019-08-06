@@ -1,0 +1,83 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Waher.Security.CallStack</name>
+    </assembly>
+    <members>
+        <member name="T:Waher.Security.CallStack.Assert">
+            <summary>
+            Static class containing methods that can be used to make sure calls are made from appropriate locations.
+            </summary>
+        </member>
+        <member name="M:Waher.Security.CallStack.Assert.CallFromAssembly(System.Reflection.Assembly[])">
+            <summary>
+            Makes sure the call is made from one of the listed assemblies.
+            </summary>
+            <param name="Assemblies">Original call must be made from one of these assemblies.</param>
+        </member>
+        <member name="M:Waher.Security.CallStack.Assert.CallFromClass(System.Type[])">
+            <summary>
+            Makes sure the call is made from one of the listed classes.
+            </summary>
+            <param name="Classes">Original call must be made from one of these classes.</param>
+        </member>
+        <member name="M:Waher.Security.CallStack.Assert.CallFromSource(System.Object[])">
+            <summary>
+            Makes sure the call is made from one of the listed sources.
+            </summary>
+            <param name="Sources">Original call must be made from one of these sources.</param>
+        </member>
+        <member name="M:Waher.Security.CallStack.Assert.AssertSource(System.Object[])">
+            <summary>
+            Makes sure the call is made from one of the listed sources.
+            </summary>
+            <param name="Sources">Original call must be made from one of these sources.</param>
+        </member>
+        <member name="E:Waher.Security.CallStack.Assert.UnauthorizedAccess">
+            <summary>
+            Event raised when an unauthorized access has been detected.
+            </summary>
+        </member>
+        <member name="T:Waher.Security.CallStack.UnauthorizedAccessEventHandler">
+            <summary>
+            Delegate for unauthorized access event handlers.
+            </summary>
+            <param name="Sender">Sender of event. Might be null.</param>
+            <param name="e">Event arguments.</param>
+        </member>
+        <member name="T:Waher.Security.CallStack.UnauthorizedAccessEventArgs">
+            <summary>
+            Event arguments for the <see cref="E:Waher.Security.CallStack.Assert.UnauthorizedAccess"/> event.
+            </summary>
+        </member>
+        <member name="M:Waher.Security.CallStack.UnauthorizedAccessEventArgs.#ctor(System.Reflection.MethodBase,System.Type,System.Reflection.Assembly,System.Diagnostics.StackTrace)">
+            <summary>
+            Event arguments for the <see cref="E:Waher.Security.CallStack.Assert.UnauthorizedAccess"/> event.
+            </summary>
+            <param name="Method">Method being accessed.</param>
+            <param name="Type">Type on which the method is defined.</param>
+            <param name="Assembly">Assembly in which the type is defined.</param>
+            <param name="Trace">StackTrace Trace</param>
+        </member>
+        <member name="P:Waher.Security.CallStack.UnauthorizedAccessEventArgs.Method">
+            <summary>
+            Method being accessed.
+            </summary>
+        </member>
+        <member name="P:Waher.Security.CallStack.UnauthorizedAccessEventArgs.Type">
+            <summary>
+            Type on which the method is defined.
+            </summary>
+        </member>
+        <member name="P:Waher.Security.CallStack.UnauthorizedAccessEventArgs.Assembly">
+            <summary>
+            Assembly in which the type is defined.
+            </summary>
+        </member>
+        <member name="P:Waher.Security.CallStack.UnauthorizedAccessEventArgs.Trace">
+            <summary>
+            StackTrace Trace
+            </summary>
+        </member>
+    </members>
+</doc>

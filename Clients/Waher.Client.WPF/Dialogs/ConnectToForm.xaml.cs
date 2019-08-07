@@ -68,7 +68,7 @@ namespace Waher.Client.WPF.Dialogs
 				case TransportMethod.TraditionalSocket:
 					if (!int.TryParse(this.XmppPort.Text, out int Port) || Port <= 0 || Port > 65535)
 					{
-						MessageBox.Show(this, "Invalid port number. Valid port numbers are positive integers between 1 and 65535. The default port number is " + 
+						MessageBox.Show(this, "Invalid port number. Valid port numbers are positive integers between 1 and 65535. The default port number is " +
 							XmppCredentials.DefaultPort.ToString() + ".", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
 						this.XmppPort.Focus();
 						return;
@@ -183,7 +183,7 @@ namespace Waher.Client.WPF.Dialogs
 
 			if (Create)
 			{
-				this.client.AllowRegistration();
+				this.client.AllowRegistration(this.ApiKey.Text, this.Secret.Password);
 				this.client.OnRegistrationForm += Client_OnRegistrationForm;
 			}
 
@@ -321,7 +321,9 @@ namespace Waher.Client.WPF.Dialogs
 
 		private void CreateAccount_Click(object sender, RoutedEventArgs e)
 		{
-			this.RetypePassword.IsEnabled = this.CreateAccount.IsChecked.HasValue && this.CreateAccount.IsChecked.Value;
+			bool Create = this.CreateAccount.IsChecked.HasValue && this.CreateAccount.IsChecked.Value;
+			this.CreateParameters.Visibility = Create ? Visibility.Visible : Visibility.Collapsed;
+			this.RetypePassword.IsEnabled = Create;
 		}
 
 		private void ConnectionMethod_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -334,14 +336,14 @@ namespace Waher.Client.WPF.Dialogs
 				case TransportMethod.TraditionalSocket:
 					this.PortLabel.Visibility = Visibility.Visible;
 					this.XmppPort.Visibility = Visibility.Visible;
-					this.UrlEndpointLabel.Visibility = Visibility.Hidden;
-					this.UrlEndpoint.Visibility = Visibility.Hidden;
+					this.UrlEndpointLabel.Visibility = Visibility.Collapsed;
+					this.UrlEndpoint.Visibility = Visibility.Collapsed;
 					break;
 
 				case TransportMethod.BOSH:
 				case TransportMethod.WS:
-					this.PortLabel.Visibility = Visibility.Hidden;
-					this.XmppPort.Visibility = Visibility.Hidden;
+					this.PortLabel.Visibility = Visibility.Collapsed;
+					this.XmppPort.Visibility = Visibility.Collapsed;
 					this.UrlEndpointLabel.Visibility = Visibility.Visible;
 					this.UrlEndpoint.Visibility = Visibility.Visible;
 					break;

@@ -21,17 +21,33 @@
             </summary>
             <param name="Classes">Original call must be made from one of these classes.</param>
         </member>
+        <member name="M:Waher.Security.CallStack.Assert.CallFromSource(System.String[])">
+            <summary>
+            Makes sure the call is made from one of the listed sources.
+            </summary>
+            <param name="Sources">Original call must be made from one of these sources. Source strings are checked against
+            Assemblies, classes and method names.</param>
+        </member>
+        <member name="M:Waher.Security.CallStack.Assert.CallFromSource(System.Text.RegularExpressions.Regex[])">
+            <summary>
+            Makes sure the call is made from one of the listed sources.
+            </summary>
+            <param name="Sources">Original call must be made from one of these sources. Source strings are checked against
+            Assemblies, classes and method names.</param>
+        </member>
         <member name="M:Waher.Security.CallStack.Assert.CallFromSource(System.Object[])">
             <summary>
             Makes sure the call is made from one of the listed sources.
             </summary>
-            <param name="Sources">Original call must be made from one of these sources.</param>
+            <param name="Sources">Original call must be made from one of these sources. Can be a mix of
+            <see cref="T:System.Reflection.Assembly"/>, <see cref="T:System.Type"/>, <see cref="T:System.String"/> and <see cref="T:System.Text.RegularExpressions.Regex"/> objects.</param>
         </member>
         <member name="M:Waher.Security.CallStack.Assert.AssertSource(System.Object[])">
             <summary>
             Makes sure the call is made from one of the listed sources.
             </summary>
-            <param name="Sources">Original call must be made from one of these sources.</param>
+            <param name="Sources">Original call must be made from one of these sources. Can be a mix of
+            <see cref="T:System.Reflection.Assembly"/>, <see cref="T:System.Type"/>, <see cref="T:System.String"/> and <see cref="T:System.Text.RegularExpressions.Regex"/> objects.</param>
         </member>
         <member name="E:Waher.Security.CallStack.Assert.UnauthorizedAccess">
             <summary>

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using Waher.Events;
 
 namespace Waher.Security.CallStack
@@ -32,7 +33,28 @@ namespace Waher.Security.CallStack
 		/// <summary>
 		/// Makes sure the call is made from one of the listed sources.
 		/// </summary>
-		/// <param name="Sources">Original call must be made from one of these sources.</param>
+		/// <param name="Sources">Original call must be made from one of these sources. Source strings are checked against
+		/// Assemblies, classes and method names.</param>
+		public static void CallFromSource(params string[] Sources)
+		{
+			AssertSource(Sources);
+		}
+
+		/// <summary>
+		/// Makes sure the call is made from one of the listed sources.
+		/// </summary>
+		/// <param name="Sources">Original call must be made from one of these sources. Source strings are checked against
+		/// Assemblies, classes and method names.</param>
+		public static void CallFromSource(params Regex[] Sources)
+		{
+			AssertSource(Sources);
+		}
+
+		/// <summary>
+		/// Makes sure the call is made from one of the listed sources.
+		/// </summary>
+		/// <param name="Sources">Original call must be made from one of these sources. Can be a mix of
+		/// <see cref="Assembly"/>, <see cref="Type"/>, <see cref="string"/> and <see cref="Regex"/> objects.</param>
 		public static void CallFromSource(params object[] Sources)
 		{
 			AssertSource(Sources);
@@ -41,7 +63,8 @@ namespace Waher.Security.CallStack
 		/// <summary>
 		/// Makes sure the call is made from one of the listed sources.
 		/// </summary>
-		/// <param name="Sources">Original call must be made from one of these sources.</param>
+		/// <param name="Sources">Original call must be made from one of these sources. Can be a mix of
+		/// <see cref="Assembly"/>, <see cref="Type"/>, <see cref="string"/> and <see cref="Regex"/> objects.</param>
 		private static void AssertSource(params object[] Sources)
 		{
 			StackTrace Trace = new StackTrace(2, false);
@@ -69,6 +92,24 @@ namespace Waher.Security.CallStack
 					{
 						if (T == Type)
 							return;
+					}
+					else if (Source is Regex Regex)
+					{
+						if (IsMatch(Regex, Type.FullName + "." + Method.Name) ||
+							IsMatch(Regex, Type.FullName) ||
+							IsMatch(Regex, Assembly.GetName().Name))
+						{
+							return;
+						}
+					}
+					else if (Source is string s)
+					{
+						if (Type.FullName + "." + Method.Name == s ||
+							Type.FullName == s ||
+							Assembly.GetName().Name == s)
+						{
+							return;
+						}
 					}
 				}
 			}
@@ -103,9 +144,16 @@ namespace Waher.Security.CallStack
 			throw new UnauthorizedAccessException("Unauthorized access.");
 		}
 
+		private static bool IsMatch(Regex Regex, string s)
+		{
+			Match M = Regex.Match(s);
+			return M.Success && M.Index == 0 && M.Length == s.Length;
+		}
+
 		/// <summary>
 		/// Event raised when an unauthorized access has been detected.
 		/// </summary>
 		public static event UnauthorizedAccessEventHandler UnauthorizedAccess = null;
+
 	}
 }

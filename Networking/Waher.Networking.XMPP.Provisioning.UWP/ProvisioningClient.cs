@@ -424,7 +424,7 @@ namespace Waher.Networking.XMPP.Provisioning
 							Log.Critical(ex);
 						}
 					}
-				}, null);
+				}, State);
 		}
 
 		#endregion
@@ -832,7 +832,7 @@ namespace Waher.Networking.XMPP.Provisioning
 					Log.Critical(ex);
 				}
 
-			}, null);
+			}, State);
 		}
 
 		private void AppendNode(StringBuilder Xml, IThingReference Node)
@@ -1060,7 +1060,7 @@ namespace Waher.Networking.XMPP.Provisioning
 					Log.Critical(ex);
 				}
 
-			}, null);
+			}, State);
 		}
 
 		#endregion
@@ -1758,7 +1758,7 @@ namespace Waher.Networking.XMPP.Provisioning
 			this.client.SendIqGet(this.provisioningServerAddress, Request.ToString(), (sender, e) =>
 			{
 				ThingRegistryClient.ParseResultSet(Offset, MaxCount, this, e, Callback, State);
-			}, null);
+			}, State);
 		}
 
 		/// <summary>

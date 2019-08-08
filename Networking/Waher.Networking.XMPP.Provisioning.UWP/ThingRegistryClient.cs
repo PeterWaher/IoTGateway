@@ -63,12 +63,12 @@ namespace Waher.Networking.XMPP.Provisioning
 	/// </summary>
 	public class ThingRegistryClient : XmppExtension
 	{
-		private string thingRegistryAddress;
+		private readonly string thingRegistryAddress;
 
 		/// <summary>
-		/// urn:xmpp:iot:discovery
+		/// urn:ieee:iot:disco:1.0
 		/// </summary>
-		public const string NamespaceDiscovery = "urn:xmpp:iot:discovery";
+		public const string NamespaceDiscovery = "urn:ieee:iot:disco:1.0";
 
 		/// <summary>
 		/// Implements an XMPP provisioning client interface.
@@ -283,7 +283,7 @@ namespace Waher.Networking.XMPP.Provisioning
 						Log.Critical(ex);
 					}
 				}
-			}, null);
+			}, State);
 		}
 
 		private void AddNodeInfo(StringBuilder Request, string NodeId, string SourceId, string Partition)
@@ -399,7 +399,7 @@ namespace Waher.Networking.XMPP.Provisioning
 						Log.Critical(ex);
 					}
 				}
-			}, null);
+			}, State);
 		}
 
 		private void ClaimedHandler(object Sender, IqEventArgs e)
@@ -519,7 +519,7 @@ namespace Waher.Networking.XMPP.Provisioning
 						Log.Critical(ex);
 					}
 				}
-			}, null);
+			}, State);
 		}
 
 		private void RemovedHandler(object Sender, IqEventArgs e)
@@ -694,7 +694,7 @@ namespace Waher.Networking.XMPP.Provisioning
 						Log.Critical(ex);
 					}
 				}
-			}, null);
+			}, State);
 		}
 
 		/// <summary>
@@ -762,7 +762,7 @@ namespace Waher.Networking.XMPP.Provisioning
 						Log.Critical(ex);
 					}
 				}
-			}, null);
+			}, State);
 		}
 
 		/// <summary>
@@ -837,7 +837,7 @@ namespace Waher.Networking.XMPP.Provisioning
 						Log.Critical(ex);
 					}
 				}
-			}, null);
+			}, State);
 		}
 
 		private void DisownedHandler(object Sender, IqEventArgs e)
@@ -911,7 +911,7 @@ namespace Waher.Networking.XMPP.Provisioning
 			this.client.SendIqGet(this.thingRegistryAddress, Request.ToString(), (sender, e) =>
 			{
 				ParseResultSet(Offset, MaxCount, this, e, Callback, State);
-			}, null);
+			}, State);
 		}
 
 		internal static void ParseResultSet(int Offset, int MaxCount, object Sender, IqResultEventArgs e, SearchResultEventHandler Callback, object State)

@@ -29,7 +29,8 @@ namespace Waher.Client.WPF.Dialogs
 		LesserThanOrEqualTo = 5,
 		InRange = 6,
 		NotInRange = 7,
-		Wildcard = 8
+		Wildcard = 8,
+		RegularExpression = 9
 	}
 
 	public class Rule
@@ -134,6 +135,7 @@ namespace Waher.Client.WPF.Dialogs
 			Operator.Items.Add(new ComboBoxItem() { Tag = "InRange", Content = "In range" });
 			Operator.Items.Add(new ComboBoxItem() { Tag = "NotInRange", Content = "Not in range" });
 			Operator.Items.Add(new ComboBoxItem() { Tag = "Wildcard", Content = "Wildcard" });
+			Operator.Items.Add(new ComboBoxItem() { Tag = "RegularExpression", Content = "Regular Expression" });
 
 			Operator.SelectionChanged += this.Operator_SelectionChanged;
 
@@ -236,7 +238,6 @@ namespace Waher.Client.WPF.Dialogs
 			}
 
 			Button Button = (Button)sender;
-			int RuleNr = int.Parse(Button.Tag.ToString());
 			StackPanel Rule = (StackPanel)(((StackPanel)Button.Parent).Parent);
 			((StackPanel)Rule.Parent).Children.Remove(Rule);
 
@@ -298,7 +299,6 @@ namespace Waher.Client.WPF.Dialogs
 			StackPanel Value2Panel = (StackPanel)(Values.Children[1]);
 			Label Value1Label = (Label)(Value1Panel.Children[0]);
 			TextBox Value1 = (TextBox)(Value1Panel.Children[1]);
-			TextBox Value2 = (TextBox)(Value2Panel.Children[1]);
 
 			if (Op2 == Operator.InRange || Op2 == Operator.NotInRange)
 			{
@@ -313,10 +313,20 @@ namespace Waher.Client.WPF.Dialogs
 				Value1.Width = 184;
 				Value2Panel.Visibility = Visibility.Hidden;
 
-				if (Op2 == Operator.Wildcard)
-					Value1.ToolTip = "Select value to search on. Use asterisks (*) as wildcards.";
-				else
-					Value1.ToolTip = "Select value to search on.";
+				switch (Op2)
+				{
+					case Operator.Wildcard:
+						Value1.ToolTip = "Select value to search on. Use asterisks (*) as wildcards.";
+						break;
+
+					case Operator.RegularExpression:
+						Value1.ToolTip = "Select regular expression to search on.";
+						break;
+
+					default:
+						Value1.ToolTip = "Select value to search on.";
+						break;
+				}
 			}
 		}
 	}

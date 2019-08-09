@@ -302,7 +302,11 @@ namespace Waher.Client.WPF.Model.Provisioning
 							break;
 
 						case Operator.Wildcard:
-							Operators.Add(new StringTagLike(Rule.Tag, Rule.Value1, "*"));
+							Operators.Add(new StringTagMask(Rule.Tag, Rule.Value1, "*"));
+							break;
+
+						case Operator.RegularExpression:
+							Operators.Add(new StringTagRegEx(Rule.Tag, Rule.Value1));
 							break;
 					}
 				}

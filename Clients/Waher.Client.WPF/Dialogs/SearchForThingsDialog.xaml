@@ -52,6 +52,7 @@
                             <ComboBoxItem Tag="InRange">In range</ComboBoxItem>
                             <ComboBoxItem Tag="NotInRange">Not in range</ComboBoxItem>
                             <ComboBoxItem Tag="Wildcard">Wildcard</ComboBoxItem>
+                            <ComboBoxItem Tag="RegularExpression">Regular Expression</ComboBoxItem>
                         </ComboBox>
                     </StackPanel>
                     <StackPanel Orientation="Vertical" Margin="16,0,0,0">

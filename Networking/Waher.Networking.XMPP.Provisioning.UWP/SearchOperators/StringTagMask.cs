@@ -10,9 +10,9 @@ namespace Waher.Networking.XMPP.Provisioning.SearchOperators
 	/// <summary>
 	/// Filters things with a named string-valued tag like a given value.
 	/// </summary>
-	public class StringTagLike : SearchOperatorString
+	public class StringTagMask : SearchOperatorString
 	{
-		private string wildcard;
+		private readonly string wildcard;
 
 		/// <summary>
 		/// Filters things with a named string-valued tag like a given value.
@@ -20,7 +20,7 @@ namespace Waher.Networking.XMPP.Provisioning.SearchOperators
 		/// <param name="Name">Tag name.</param>
 		/// <param name="Value">Tag value.</param>
 		/// <param name="Wildcard">Wildcard string used.</param>
-		public StringTagLike(string Name, string Value, string Wildcard)
+		public StringTagMask(string Name, string Value, string Wildcard)
 			: base(Name, Value)
 		{
 			this.wildcard = Wildcard;

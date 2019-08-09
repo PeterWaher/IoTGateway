@@ -12,7 +12,7 @@ namespace Waher.Networking.XMPP.Provisioning.SearchOperators
 	/// </summary>
 	public abstract class SearchOperator
 	{
-		private string name;
+		private readonly string name;
 
 		/// <summary>
 		/// Abstract base class for all search operators.

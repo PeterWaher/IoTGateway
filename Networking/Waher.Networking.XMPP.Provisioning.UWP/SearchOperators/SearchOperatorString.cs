@@ -12,7 +12,7 @@ namespace Waher.Networking.XMPP.Provisioning.SearchOperators
 	/// </summary>
 	public abstract class SearchOperatorString : SearchOperator
 	{
-		private string value;
+		private readonly string value;
 
 		/// <summary>
 		/// Meta-data string tag.

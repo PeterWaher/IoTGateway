@@ -12,10 +12,10 @@ namespace Waher.Networking.XMPP.Provisioning.SearchOperators
 	/// </summary>
 	public abstract class NumericTagRange : SearchOperator
 	{
-		private double min;
-		private double max;
-		private bool minIncluded;
-		private bool maxIncluded;
+		private readonly double min;
+		private readonly double max;
+		private readonly bool minIncluded;
+		private readonly bool maxIncluded;
 
 		/// <summary>
 		/// Abstract base class for ranged numeric operators.

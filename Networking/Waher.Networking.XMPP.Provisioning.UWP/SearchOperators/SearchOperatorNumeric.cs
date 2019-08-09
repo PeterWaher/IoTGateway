@@ -12,7 +12,7 @@ namespace Waher.Networking.XMPP.Provisioning.SearchOperators
 	/// </summary>
 	public abstract class SearchOperatorNumeric : SearchOperator
 	{
-		private double value;
+		private readonly double value;
 
 		/// <summary>
 		/// Numeric search operator.

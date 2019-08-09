@@ -13,10 +13,10 @@ namespace Waher.Networking.XMPP.Provisioning.SearchOperators
 	/// </summary>
 	public abstract class StringTagRange : SearchOperator
 	{
-		private string min;
-		private string max;
-		private bool minIncluded;
-		private bool maxIncluded;
+		private readonly string min;
+		private readonly string max;
+		private readonly bool minIncluded;
+		private readonly bool maxIncluded;
 
 		/// <summary>
 		/// Abstract base class for ranged string operators.

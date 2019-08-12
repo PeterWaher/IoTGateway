@@ -371,9 +371,8 @@ namespace Waher.Persistence.Files
 
             this.master = new StringDictionary(this.folder + "Files.master", string.Empty, string.Empty, this, false);
 
-            this.GetFile(this.defaultCollectionName).Wait();
-
-            this.LoadConfiguration().Wait();
+			Wait(this.GetFile(this.defaultCollectionName), this.timeoutMilliseconds);
+			Wait(this.LoadConfiguration(), this.timeoutMilliseconds);
         }
 
         private static readonly char[] CRLF = new char[] { '\r', '\n' };
@@ -823,7 +822,9 @@ namespace Waher.Persistence.Files
         /// <returns>Field code.</returns>
         public ulong GetFieldCode(string Collection, string FieldName)
         {
-            return this.GetFieldCodeAsync(Collection, FieldName).Result;
+            Task<ulong> T = this.GetFieldCodeAsync(Collection, FieldName);
+			FilesProvider.Wait(T, this.timeoutMilliseconds);
+			return T.Result;
         }
 
         /// <summary>
@@ -867,7 +868,9 @@ namespace Waher.Persistence.Files
         /// <exception cref="ArgumentException">If the collection or field code are not known.</exception>
         public string GetFieldName(string Collection, ulong FieldCode)
         {
-            return this.GetFieldNameAsync(Collection, FieldCode).Result;
+            Task<string> T = this.GetFieldNameAsync(Collection, FieldCode);
+			FilesProvider.Wait(T, this.timeoutMilliseconds);
+			return T.Result;
         }
 
         /// <summary>

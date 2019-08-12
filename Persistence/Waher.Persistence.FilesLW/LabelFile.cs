@@ -134,7 +134,9 @@ namespace Waher.Persistence.Files
         /// <returns>Field code.</returns>
         public uint GetFieldCode(string FieldName)
         {
-            return this.GetFieldCodeAsync(FieldName).Result;
+            Task<uint> T = this.GetFieldCodeAsync(FieldName);
+			FilesProvider.Wait(T, this.timeoutMilliseconds);
+			return T.Result;
         }
 
         /// <summary>
@@ -190,7 +192,9 @@ namespace Waher.Persistence.Files
         /// <exception cref="ArgumentException">If the collection or field code are not known.</exception>
         public string GetFieldName(uint FieldCode)
         {
-            return this.GetFieldNameAsync(FieldCode).Result;
+            Task<string> T = this.GetFieldNameAsync(FieldCode);
+			FilesProvider.Wait(T, this.timeoutMilliseconds);
+			return T.Result;
         }
 
         /// <summary>

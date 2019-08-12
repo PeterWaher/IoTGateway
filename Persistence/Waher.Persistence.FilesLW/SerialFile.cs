@@ -22,9 +22,13 @@ namespace Waher.Persistence.Files
 		private readonly byte[] aesKey;
 		private readonly byte[] ivSeed;
 		private readonly int ivSeedLen;
-		private readonly int timeoutMilliseconds;
 		private readonly bool encrypted;
 		private bool disposed = false;
+
+		/// <summary>
+		/// Maximum time to wait for access to underlying database (ms)
+		/// </summary>
+		protected readonly int timeoutMilliseconds;
 
 		/// <summary>
 		/// Serializes binary blocks into a file, possibly encrypted. Blocks are accessed in the order they were persisted.

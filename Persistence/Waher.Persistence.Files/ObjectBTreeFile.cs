@@ -3573,7 +3573,9 @@ namespace Waher.Persistence.Files
         /// <returns>Report</returns>
         public string GetCurrentStateReport(bool WriteStat, bool Properties)
         {
-            return this.GetCurrentStateReportAsync(WriteStat, Properties).Result;
+			Task<string> T = this.GetCurrentStateReportAsync(WriteStat, Properties);
+			FilesProvider.Wait(T, this.timeoutMilliseconds);
+			return T.Result;
         }
 
         /// <summary>
@@ -4784,7 +4786,9 @@ namespace Waher.Persistence.Files
         {
             try
             {
-                return this.DeleteObject(item).Wait(this.timeoutMilliseconds);
+				Task<object> T = this.DeleteObject(item);
+				FilesProvider.Wait(T, this.timeoutMilliseconds);
+				return true;
             }
             catch (Exception)
             {

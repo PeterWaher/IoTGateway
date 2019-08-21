@@ -922,7 +922,6 @@ namespace Waher.Networking.XMPP.Provisioning
 			XmlElement E = e.FirstElement;
 			XmlElement E2, E3;
 			string Jid;
-			string OwnerJid;
 			string NodeId;
 			string SourceId;
 			string Partition;
@@ -939,7 +938,6 @@ namespace Waher.Networking.XMPP.Provisioning
 					if (E2.LocalName == "thing" && E2.NamespaceURI == NamespaceDiscovery)
 					{
 						Jid = XML.Attribute(E2, "jid");
-						OwnerJid = XML.Attribute(E2, "owner");
 						NodeId = XML.Attribute(E2, "id");
 						SourceId = XML.Attribute(E2, "src");
 						Partition = XML.Attribute(E2, "pt");
@@ -970,7 +968,7 @@ namespace Waher.Networking.XMPP.Provisioning
 							}
 						}
 
-						Things.Add(new SearchResultThing(Jid, OwnerJid, Node, MetaData.ToArray()));
+						Things.Add(new SearchResultThing(Jid, Node, MetaData.ToArray()));
 					}
 				}
 			}

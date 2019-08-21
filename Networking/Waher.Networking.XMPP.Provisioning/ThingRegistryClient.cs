@@ -1240,7 +1240,10 @@ namespace Waher.Networking.XMPP.Provisioning
 						{
 							case ';':
 								if (AddOperator(Name, sb.ToString(), Numeric, Operator, Wildcard, Operators))
+								{
+									sb.Clear();
 									State -= 6;
+								}
 								else
 									State = -1;
 								break;
@@ -1261,7 +1264,10 @@ namespace Waher.Networking.XMPP.Provisioning
 						{
 							case ';':
 								if (AddOperator(Name, sb.ToString(), Numeric, Operator, Wildcard, Operators))
+								{
+									sb.Clear();
 									State -= 7;
+								}
 								else
 									State = -1;
 								break;
@@ -1286,7 +1292,24 @@ namespace Waher.Networking.XMPP.Provisioning
 					break;
 			}
 
-			if (State != 16 || !AddOperator(Name, sb.ToString(), Numeric, Operator, Wildcard, Operators))
+			switch (State)
+			{
+				case 15:
+					if (!AddOperator(sb.ToString(), string.Empty, Numeric, Operator, Wildcard, Operators))
+						State = -1;
+					break;
+
+				case 16:
+					if (!AddOperator(Name, sb.ToString(), Numeric, Operator, Wildcard, Operators))
+						State = -1;
+					break;
+
+				default:
+					State = -1;
+					break;
+			}
+
+			if (State < 0)
 				throw new ArgumentException("URI does not conform to the iotdisco URI scheme.", nameof(DiscoUri));
 
 			return Operators.Values;

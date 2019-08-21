@@ -999,6 +999,8 @@ namespace Waher.Networking.XMPP.Provisioning
 		{
 			StringBuilder Result = new StringBuilder("iotdisco:");
 			bool First = true;
+			bool ContainsR = false;
+
 
 			foreach (MetaDataTag Tag in MetaData)
 			{
@@ -1013,48 +1015,544 @@ namespace Waher.Networking.XMPP.Provisioning
 				Result.Append(Uri.EscapeDataString(Tag.Name));
 				Result.Append('=');
 				Result.Append(Uri.EscapeDataString(Tag.StringValue));
+
+				if (!ContainsR && Tag.Name == "R")
+					ContainsR = true;
 			}
 
 			if (!First)
 				Result.Append(';');
 
-			Result.Append("R=");
-			Result.Append(Uri.EscapeDataString(this.thingRegistryAddress));
+			if (!ContainsR)
+			{
+				Result.Append("R=");
+				Result.Append(Uri.EscapeDataString(this.thingRegistryAddress));
+			}
 
 			return Result.ToString();
+		}
+
+		/// <summary>
+		/// Decodes an IoTDisco Claim URI (subset of all possible IoTDisco URIs).
+		/// </summary>
+		/// <param name="DiscoUri">IoTDisco URI</param>
+		/// <returns>Meta data tags.</returns>
+		public static MetaDataTag[] DecodeIoTDiscoClaimURI(string DiscoUri)
+		{
+			List<MetaDataTag> Result = new List<MetaDataTag>();
+
+			foreach (SearchOperator Op in DecodeIoTDiscoURI(DiscoUri))
+			{
+				if (Op is StringTagEqualTo S)
+					Result.Add(new MetaDataStringTag(S.Name, S.Value));
+				else if (Op is NumericTagEqualTo N)
+					Result.Add(new MetaDataNumericTag(N.Name, N.Value));
+				else
+					throw new ArgumentException("URI does not conform to the iotdisco URI scheme for claiming things.", nameof(DiscoUri));
+			}
+
+			return Result.ToArray();
 		}
 
 		/// <summary>
 		/// Decodes an IoTDisco URI.
 		/// </summary>
 		/// <param name="DiscoUri">IoTDisco URI</param>
-		/// <returns>Meta data tags.</returns>
-		public static MetaDataTag[] DecodeIoTDiscoURI(string DiscoUri)
+		/// <returns>Search operators.</returns>
+		public static IEnumerable<SearchOperator> DecodeIoTDiscoURI(string DiscoUri)
 		{
-			if (!DiscoUri.StartsWith("iotdisco:", StringComparison.CurrentCultureIgnoreCase))
-				throw new ArgumentException("URI does not conform to the iotdisco URI scheme.", nameof(DiscoUri));
+			Dictionary<string, SearchOperator> Operators = new Dictionary<string, SearchOperator>(StringComparer.CurrentCultureIgnoreCase);
+			StringBuilder sb = new StringBuilder();
+			Operator Operator = Operator.Equals;
+			string Name = null;
+			bool Numeric = false;
+			char Wildcard = (char)0;
+			int State = 0;
 
-			List<MetaDataTag> Tags = new List<MetaDataTag>();
-
-			foreach (string Part in DiscoUri.Substring(9).Split(';'))
+			foreach (char ch in DiscoUri)
 			{
-				int i = Part.IndexOf('=');
-				if (i < 0)
-					continue;
-
-				string TagName = Uri.UnescapeDataString(Part.Substring(0, i));
-				string StringValue = Uri.UnescapeDataString(Part.Substring(i + 1));
-
-				if (TagName.StartsWith("#") && CommonTypes.TryParse(StringValue, out double NumericValue))
+				switch (State)
 				{
-					TagName = TagName.Substring(1);
-					Tags.Add(new MetaDataNumericTag(TagName, NumericValue));
+					case 0:
+						if (ch == 'i' || ch == 'I')
+							State++;
+						else
+							State = -1;
+						break;
+
+					case 1:
+						if (ch == 'o' || ch == 'O')
+							State++;
+						else
+							State = -1;
+						break;
+
+					case 2:
+						if (ch == 't' || ch == 'T')
+							State++;
+						else
+							State = -1;
+						break;
+
+					case 3:
+						if (ch == 'd' || ch == 'D')
+							State++;
+						else
+							State = -1;
+						break;
+
+					case 4:
+						if (ch == 'i' || ch == 'I')
+							State++;
+						else
+							State = -1;
+						break;
+
+					case 5:
+						if (ch == 's' || ch == 'S')
+							State++;
+						else
+							State = -1;
+						break;
+
+					case 6:
+						if (ch == 'c' || ch == 'C')
+							State++;
+						else
+							State = -1;
+						break;
+
+					case 7:
+						if (ch == 'o' || ch == 'O')
+							State++;
+						else
+							State = -1;
+						break;
+
+					case 8:
+						if (ch == ':')
+							State++;
+						else
+							State = -1;
+						break;
+
+					case 9:     // Tag Name, first character
+						if (ch == '#')
+						{
+							Numeric = true;
+							State++;
+						}
+						else if (ch == ';')
+							State = -1;
+						else
+						{
+							sb.Append(ch);
+							Numeric = false;
+							State++;
+						}
+						break;
+
+					case 10:     // Tag Name, not first character
+						switch (ch)
+						{
+							case '=':
+								Operator = Operator.Equals;
+								State += 5;
+								break;
+
+							case '<':
+								State++;
+								break;
+
+							case '>':
+								State += 2;
+								break;
+
+							case '~':
+								Operator = Operator.Mask;
+								State += 3;
+								break;
+
+							case '\\':
+								State += 4;
+								break;
+
+							default:
+								sb.Append(ch);
+								break;
+						}
+						break;
+
+					case 11:    // <
+						switch (ch)
+						{
+							case '=':
+								Operator = Operator.LessOrEqual;
+								State += 4;
+								break;
+
+							case '>':
+								Operator = Operator.NotEquals;
+								State += 4;
+								break;
+
+							default:
+								Operator = Operator.Less;
+								Name = sb.ToString();
+								sb.Clear();
+								sb.Append(ch);
+								State += 5;
+								break;
+						}
+						break;
+
+					case 12:    // >
+						if (ch == '=')
+						{
+							Operator = Operator.GreaterOrEqual;
+							State += 3;
+						}
+						else
+						{
+							Operator = Operator.Greater;
+							Name = sb.ToString();
+							sb.Clear();
+							sb.Append(ch);
+							State += 4;
+						}
+						break;
+
+					case 13:    // ~
+						Wildcard = ch;
+						State += 2;
+						break;
+
+					case 14:    // \
+						sb.Append(ch);
+						State -= 4;
+						break;
+
+					case 15:    // First character of value
+						Name = sb.ToString();
+						sb.Clear();
+
+						switch (ch)
+						{
+							case ';':
+								if (AddOperator(Name, sb.ToString(), Numeric, Operator, Wildcard, Operators))
+									State -= 6;
+								else
+									State = -1;
+								break;
+
+							case '\\':
+								State += 2;
+								break;
+
+							default:
+								sb.Append(ch);
+								State++;
+								break;
+						}
+						break;
+
+					case 16:    // Rest of characters of value
+						switch (ch)
+						{
+							case ';':
+								if (AddOperator(Name, sb.ToString(), Numeric, Operator, Wildcard, Operators))
+									State -= 7;
+								else
+									State = -1;
+								break;
+
+							case '\\':
+								State++;
+								break;
+
+							default:
+								sb.Append(ch);
+								break;
+						}
+						break;
+
+					case 17:    // \
+						sb.Append(ch);
+						State--;
+						break;
 				}
-				else
-					Tags.Add(new MetaDataStringTag(TagName, StringValue));
+
+				if (State < 0)
+					break;
 			}
 
-			return Tags.ToArray();
+			if (State != 16 || !AddOperator(Name, sb.ToString(), Numeric, Operator, Wildcard, Operators))
+				throw new ArgumentException("URI does not conform to the iotdisco URI scheme.", nameof(DiscoUri));
+
+			return Operators.Values;
+		}
+
+		private static bool AddOperator(string Name, string Value, bool Numeric, Operator Operator, char Wildcard, Dictionary<string, SearchOperator> Operators)
+		{
+			if (Numeric)
+			{
+				if (!CommonTypes.TryParse(Value, out double NumericValue))
+					return false;
+
+				switch (Operator)
+				{
+					case Operator.Equals:
+						if (Operators.ContainsKey(Name))
+							return false;
+						else
+							Operators[Name] = new NumericTagEqualTo(Name, NumericValue);
+						break;
+
+					case Operator.NotEquals:
+						if (Operators.ContainsKey(Name))
+							return false;
+						else
+							Operators[Name] = new NumericTagNotEqualTo(Name, NumericValue);
+						break;
+
+					case Operator.Less:
+						if (Operators.TryGetValue(Name, out SearchOperator Op))
+						{
+							if (Op is NumericTagGreaterThan Gt)
+							{
+								if (NumericValue < Gt.Value)
+									Operators[Name] = new NumericTagNotInRange(Name, NumericValue, true, Gt.Value, true);
+								else
+									Operators[Name] = new NumericTagInRange(Name, Gt.Value, false, NumericValue, false);
+							}
+							else if (Op is NumericTagGreaterThanOrEqualTo GtE)
+							{
+								if (NumericValue < GtE.Value)
+									Operators[Name] = new NumericTagNotInRange(Name, NumericValue, true, GtE.Value, false);
+								else
+									Operators[Name] = new NumericTagInRange(Name, GtE.Value, true, NumericValue, false);
+							}
+							else
+								return false;
+						}
+						else
+							Operators[Name] = new NumericTagLesserThan(Name, NumericValue);
+						break;
+
+					case Operator.LessOrEqual:
+						if (Operators.TryGetValue(Name, out Op))
+						{
+							if (Op is NumericTagGreaterThan Gt)
+							{
+								if (NumericValue < Gt.Value)
+									Operators[Name] = new NumericTagNotInRange(Name, NumericValue, false, Gt.Value, true);
+								else
+									Operators[Name] = new NumericTagInRange(Name, Gt.Value, false, NumericValue, true);
+							}
+							else if (Op is NumericTagGreaterThanOrEqualTo GtE)
+							{
+								if (NumericValue < GtE.Value)
+									Operators[Name] = new NumericTagNotInRange(Name, NumericValue, false, GtE.Value, false);
+								else
+									Operators[Name] = new NumericTagInRange(Name, GtE.Value, true, NumericValue, true);
+							}
+							else
+								return false;
+						}
+						else
+							Operators[Name] = new NumericTagLesserThanOrEqualTo(Name, NumericValue);
+						break;
+
+					case Operator.Greater:
+						if (Operators.TryGetValue(Name, out Op))
+						{
+							if (Op is NumericTagLesserThan Lt)
+							{
+								if (NumericValue < Lt.Value)
+									Operators[Name] = new NumericTagInRange(Name, NumericValue, false, Lt.Value, false);
+								else
+									Operators[Name] = new NumericTagNotInRange(Name, Lt.Value, true, NumericValue, true);
+							}
+							else if (Op is NumericTagLesserThanOrEqualTo LtE)
+							{
+								if (NumericValue < LtE.Value)
+									Operators[Name] = new NumericTagInRange(Name, NumericValue, false, LtE.Value, true);
+								else
+									Operators[Name] = new NumericTagNotInRange(Name, LtE.Value, false, NumericValue, true);
+							}
+							else
+								return false;
+						}
+						else
+							Operators[Name] = new NumericTagGreaterThan(Name, NumericValue);
+						break;
+
+					case Operator.GreaterOrEqual:
+						if (Operators.TryGetValue(Name, out Op))
+						{
+							if (Op is NumericTagLesserThan Lt)
+							{
+								if (NumericValue < Lt.Value)
+									Operators[Name] = new NumericTagInRange(Name, NumericValue, true, Lt.Value, false);
+								else
+									Operators[Name] = new NumericTagNotInRange(Name, Lt.Value, true, NumericValue, false);
+							}
+							else if (Op is NumericTagLesserThanOrEqualTo LtE)
+							{
+								if (NumericValue < LtE.Value)
+									Operators[Name] = new NumericTagInRange(Name, NumericValue, true, LtE.Value, true);
+								else
+									Operators[Name] = new NumericTagNotInRange(Name, LtE.Value, false, NumericValue, false);
+							}
+							else
+								return false;
+						}
+						else
+							Operators[Name] = new NumericTagGreaterThanOrEqualTo(Name, NumericValue);
+						break;
+
+					default:
+						return false;
+				}
+			}
+			else
+			{
+				switch (Operator)
+				{
+					case Operator.Equals:
+						if (Operators.ContainsKey(Name))
+							return false;
+						else
+							Operators[Name] = new StringTagEqualTo(Name, Value);
+						break;
+
+					case Operator.NotEquals:
+						if (Operators.ContainsKey(Name))
+							return false;
+						else
+							Operators[Name] = new StringTagNotEqualTo(Name, Value);
+						break;
+
+					case Operator.Less:
+						if (Operators.TryGetValue(Name, out SearchOperator Op))
+						{
+							if (Op is StringTagGreaterThan Gt)
+							{
+								if (string.Compare(Value, Gt.Value) < 0)
+									Operators[Name] = new StringTagNotInRange(Name, Value, true, Gt.Value, true);
+								else
+									Operators[Name] = new StringTagInRange(Name, Gt.Value, false, Value, false);
+							}
+							else if (Op is StringTagGreaterThanOrEqualTo GtE)
+							{
+								if (string.Compare(Value, GtE.Value) < 0)
+									Operators[Name] = new StringTagNotInRange(Name, Value, true, GtE.Value, false);
+								else
+									Operators[Name] = new StringTagInRange(Name, GtE.Value, true, Value, false);
+							}
+							else
+								return false;
+						}
+						else
+							Operators[Name] = new StringTagLesserThan(Name, Value);
+						break;
+
+					case Operator.LessOrEqual:
+						if (Operators.TryGetValue(Name, out Op))
+						{
+							if (Op is StringTagGreaterThan Gt)
+							{
+								if (string.Compare(Value, Gt.Value) < 0)
+									Operators[Name] = new StringTagNotInRange(Name, Value, false, Gt.Value, true);
+								else
+									Operators[Name] = new StringTagInRange(Name, Gt.Value, false, Value, true);
+							}
+							else if (Op is StringTagGreaterThanOrEqualTo GtE)
+							{
+								if (string.Compare(Value, GtE.Value) < 0)
+									Operators[Name] = new StringTagNotInRange(Name, Value, false, GtE.Value, false);
+								else
+									Operators[Name] = new StringTagInRange(Name, GtE.Value, true, Value, true);
+							}
+							else
+								return false;
+						}
+						else
+							Operators[Name] = new StringTagLesserThanOrEqualTo(Name, Value);
+						break;
+
+					case Operator.Greater:
+						if (Operators.TryGetValue(Name, out Op))
+						{
+							if (Op is StringTagLesserThan Lt)
+							{
+								if (string.Compare(Value, Lt.Value) < 0)
+									Operators[Name] = new StringTagInRange(Name, Value, false, Lt.Value, false);
+								else
+									Operators[Name] = new StringTagNotInRange(Name, Lt.Value, true, Value, true);
+							}
+							else if (Op is StringTagLesserThanOrEqualTo LtE)
+							{
+								if (string.Compare(Value, LtE.Value) < 0)
+									Operators[Name] = new StringTagInRange(Name, Value, false, LtE.Value, true);
+								else
+									Operators[Name] = new StringTagNotInRange(Name, LtE.Value, false, Value, true);
+							}
+							else
+								return false;
+						}
+						else
+							Operators[Name] = new StringTagGreaterThan(Name, Value);
+						break;
+
+					case Operator.GreaterOrEqual:
+						if (Operators.TryGetValue(Name, out Op))
+						{
+							if (Op is StringTagLesserThan Lt)
+							{
+								if (string.Compare(Value, Lt.Value) < 0)
+									Operators[Name] = new StringTagInRange(Name, Value, true, Lt.Value, false);
+								else
+									Operators[Name] = new StringTagNotInRange(Name, Lt.Value, true, Value, false);
+							}
+							else if (Op is StringTagLesserThanOrEqualTo LtE)
+							{
+								if (string.Compare(Value, LtE.Value) < 0)
+									Operators[Name] = new StringTagInRange(Name, Value, true, LtE.Value, true);
+								else
+									Operators[Name] = new StringTagNotInRange(Name, LtE.Value, false, Value, false);
+							}
+							else
+								return false;
+						}
+						else
+							Operators[Name] = new StringTagGreaterThanOrEqualTo(Name, Value);
+						break;
+
+					case Operator.Mask:
+						if (Operators.ContainsKey(Name))
+							return false;
+						else
+							Operators[Name] = new StringTagMask(Name, Value, new string(Wildcard, 1));
+						break;
+
+					default:
+						return false;
+				}
+			}
+
+			return true;
+		}
+
+		private enum Operator
+		{
+			Equals,
+			NotEquals,
+			Less,
+			LessOrEqual,
+			Greater,
+			GreaterOrEqual,
+			Mask
 		}
 
 	}

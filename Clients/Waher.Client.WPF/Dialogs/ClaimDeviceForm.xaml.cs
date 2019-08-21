@@ -42,7 +42,7 @@ namespace Waher.Client.WPF.Dialogs
 		{
 			try
 			{
-				this.tags = ThingRegistryClient.DecodeIoTDiscoURI(this.ClaimUri.Text);
+				this.tags = ThingRegistryClient.DecodeIoTDiscoClaimURI(this.ClaimUri.Text);
 
 				this.TagsListView.Items.Clear();
 

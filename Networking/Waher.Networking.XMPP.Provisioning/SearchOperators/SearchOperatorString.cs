@@ -25,6 +25,11 @@ namespace Waher.Networking.XMPP.Provisioning.SearchOperators
 			this.value = Value;
 		}
 
+		/// <summary>
+		/// Operator value.
+		/// </summary>
+		public string Value => this.value;
+
 		internal override void SerializeValue(StringBuilder Request)
 		{
 			Request.Append("' value='");

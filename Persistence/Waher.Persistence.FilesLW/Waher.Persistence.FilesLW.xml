@@ -3169,6 +3169,11 @@
             Serializes binary blocks into a file, possibly encrypted. Blocks are accessed in the order they were persisted.
             </summary>
         </member>
+        <member name="F:Waher.Persistence.Files.SerialFile.timeoutMilliseconds">
+            <summary>
+            Maximum time to wait for access to underlying database (ms)
+            </summary>
+        </member>
         <member name="M:Waher.Persistence.Files.SerialFile.#ctor(System.String,System.Int32,System.Boolean,Waher.Persistence.Files.FilesProvider)">
             <summary>
             Serializes binary blocks into a file, possibly encrypted. Blocks are accessed in the order they were persisted.

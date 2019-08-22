@@ -1039,6 +1039,19 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <returns>Meta data tags.</returns>
 		public static MetaDataTag[] DecodeIoTDiscoClaimURI(string DiscoUri)
 		{
+			if (TryDecodeIoTDiscoClaimURI(DiscoUri, out MetaDataTag[] Tags))
+				return Tags;
+			else
+				throw new ArgumentException("URI does not conform to the iotdisco URI scheme for claiming things.", nameof(DiscoUri));
+		}
+
+		/// <summary>
+		/// Decodes an IoTDisco Claim URI (subset of all possible IoTDisco URIs).
+		/// </summary>
+		/// <param name="DiscoUri">IoTDisco URI</param>
+		/// <returns>Meta data tags.</returns>
+		public static bool TryDecodeIoTDiscoClaimURI(string DiscoUri, out MetaDataTag[] Tags)
+		{
 			List<MetaDataTag> Result = new List<MetaDataTag>();
 
 			foreach (SearchOperator Op in DecodeIoTDiscoURI(DiscoUri))
@@ -1048,10 +1061,15 @@ namespace Waher.Networking.XMPP.Provisioning
 				else if (Op is NumericTagEqualTo N)
 					Result.Add(new MetaDataNumericTag(N.Name, N.Value));
 				else
-					throw new ArgumentException("URI does not conform to the iotdisco URI scheme for claiming things.", nameof(DiscoUri));
+				{
+					Tags = null;
+					return false;
+				}
 			}
 
-			return Result.ToArray();
+			Tags = Result.ToArray();
+
+			return true;
 		}
 
 		/// <summary>
@@ -1061,13 +1079,29 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <returns>Search operators.</returns>
 		public static IEnumerable<SearchOperator> DecodeIoTDiscoURI(string DiscoUri)
 		{
-			Dictionary<string, SearchOperator> Operators = new Dictionary<string, SearchOperator>(StringComparer.CurrentCultureIgnoreCase);
+			if (TryDecodeIoTDiscoURI(DiscoUri, out IEnumerable<SearchOperator> Result))
+				return Result;
+			else
+				throw new ArgumentException("URI does not conform to the iotdisco URI scheme.", nameof(DiscoUri));
+		}
+
+		/// <summary>
+		/// Decodes an IoTDisco URI.
+		/// </summary>
+		/// <param name="DiscoUri">IoTDisco URI</param>
+		/// <param name="Operators">Search operators.</param>
+		/// <returns>If the URI could be parsed.</returns>
+		public static bool TryDecodeIoTDiscoURI(string DiscoUri, out IEnumerable<SearchOperator> Operators)
+		{
+			Dictionary<string, SearchOperator> OperatorsByName = new Dictionary<string, SearchOperator>(StringComparer.CurrentCultureIgnoreCase);
 			StringBuilder sb = new StringBuilder();
 			Operator Operator = Operator.Equals;
 			string Name = null;
 			bool Numeric = false;
 			char Wildcard = (char)0;
 			int State = 0;
+
+			Operators = null;
 
 			foreach (char ch in DiscoUri)
 			{
@@ -1077,63 +1111,63 @@ namespace Waher.Networking.XMPP.Provisioning
 						if (ch == 'i' || ch == 'I')
 							State++;
 						else
-							State = -1;
+							return false;
 						break;
 
 					case 1:
 						if (ch == 'o' || ch == 'O')
 							State++;
 						else
-							State = -1;
+							return false;
 						break;
 
 					case 2:
 						if (ch == 't' || ch == 'T')
 							State++;
 						else
-							State = -1;
+							return false;
 						break;
 
 					case 3:
 						if (ch == 'd' || ch == 'D')
 							State++;
 						else
-							State = -1;
+							return false;
 						break;
 
 					case 4:
 						if (ch == 'i' || ch == 'I')
 							State++;
 						else
-							State = -1;
+							return false;
 						break;
 
 					case 5:
 						if (ch == 's' || ch == 'S')
 							State++;
 						else
-							State = -1;
+							return false;
 						break;
 
 					case 6:
 						if (ch == 'c' || ch == 'C')
 							State++;
 						else
-							State = -1;
+							return false;
 						break;
 
 					case 7:
 						if (ch == 'o' || ch == 'O')
 							State++;
 						else
-							State = -1;
+							return false;
 						break;
 
 					case 8:
 						if (ch == ':')
 							State++;
 						else
-							State = -1;
+							return false;
 						break;
 
 					case 9:     // Tag Name, first character
@@ -1143,7 +1177,7 @@ namespace Waher.Networking.XMPP.Provisioning
 							State++;
 						}
 						else if (ch == ';')
-							State = -1;
+							return false;
 						else
 						{
 							sb.Append(ch);
@@ -1239,13 +1273,13 @@ namespace Waher.Networking.XMPP.Provisioning
 						switch (ch)
 						{
 							case ';':
-								if (AddOperator(Name, sb.ToString(), Numeric, Operator, Wildcard, Operators))
+								if (AddOperator(Name, sb.ToString(), Numeric, Operator, Wildcard, OperatorsByName))
 								{
 									sb.Clear();
 									State -= 6;
 								}
 								else
-									State = -1;
+									return false;
 								break;
 
 							case '\\':
@@ -1263,13 +1297,13 @@ namespace Waher.Networking.XMPP.Provisioning
 						switch (ch)
 						{
 							case ';':
-								if (AddOperator(Name, sb.ToString(), Numeric, Operator, Wildcard, Operators))
+								if (AddOperator(Name, sb.ToString(), Numeric, Operator, Wildcard, OperatorsByName))
 								{
 									sb.Clear();
 									State -= 7;
 								}
 								else
-									State = -1;
+									return false;
 								break;
 
 							case '\\':
@@ -1295,24 +1329,22 @@ namespace Waher.Networking.XMPP.Provisioning
 			switch (State)
 			{
 				case 15:
-					if (!AddOperator(sb.ToString(), string.Empty, Numeric, Operator, Wildcard, Operators))
-						State = -1;
+					if (!AddOperator(sb.ToString(), string.Empty, Numeric, Operator, Wildcard, OperatorsByName))
+						return false;
 					break;
 
 				case 16:
-					if (!AddOperator(Name, sb.ToString(), Numeric, Operator, Wildcard, Operators))
-						State = -1;
+					if (!AddOperator(Name, sb.ToString(), Numeric, Operator, Wildcard, OperatorsByName))
+						return false;
 					break;
 
 				default:
-					State = -1;
-					break;
+					return false;
 			}
 
-			if (State < 0)
-				throw new ArgumentException("URI does not conform to the iotdisco URI scheme.", nameof(DiscoUri));
+			Operators = OperatorsByName.Values;
 
-			return Operators.Values;
+			return true;
 		}
 
 		private static bool AddOperator(string Name, string Value, bool Numeric, Operator Operator, char Wildcard, Dictionary<string, SearchOperator> Operators)
@@ -1576,6 +1608,55 @@ namespace Waher.Networking.XMPP.Provisioning
 			Greater,
 			GreaterOrEqual,
 			Mask
+		}
+
+		/// <summary>
+		/// Checks if a URI is a claim URI.
+		/// </summary>
+		/// <param name="DiscoUri">IoTDisco URI</param>
+		/// <returns>If <paramref name="DiscoUri"/> is a claim URI.</returns>
+		public static bool IsIoTDiscoClaimURI(string DiscoUri)
+		{
+			if (!TryDecodeIoTDiscoURI(DiscoUri, out IEnumerable<SearchOperator> Operators))
+				return false;
+			else
+				return IsIoTDiscoClaimURI(Operators);
+		}
+
+		/// <summary>
+		/// Checks if a URI is a claim URI.
+		/// </summary>
+		/// <param name="Operators">Tag operators in URI</param>
+		/// <returns>If <paramref name="Operators"/> is a claim URI.</returns>
+		public static bool IsIoTDiscoClaimURI(IEnumerable<SearchOperator> Operators)
+		{
+			bool HasKey = false;
+
+			foreach (SearchOperator Op in Operators)
+			{
+				if (Op is StringTagEqualTo S)
+				{
+					if (!HasKey && S.Name.ToUpper() == "KEY")
+						HasKey = true;
+				}
+				else if (!(Op is NumericTagEqualTo))
+					return false;
+			}
+
+			return HasKey;
+		}
+
+		/// <summary>
+		/// Checks if a URI is a search URI.
+		/// </summary>
+		/// <param name="DiscoUri">IoTDisco URI</param>
+		/// <returns>If <paramref name="DiscoUri"/> is a search URI.</returns>
+		public static bool IsIoTDiscoSearchURI(string DiscoUri)
+		{
+			if (!TryDecodeIoTDiscoURI(DiscoUri, out IEnumerable<SearchOperator> Operators))
+				return false;
+			else
+				return !IsIoTDiscoClaimURI(Operators);
 		}
 
 	}

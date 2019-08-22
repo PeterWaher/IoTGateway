@@ -15,7 +15,10 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public void Test_01_ClaimUri()
 		{
-			MetaDataTag[] Tags = ThingRegistryClient.DecodeIoTDiscoClaimURI("iotdisco:SN=98734238472634;MAN=www.example.org;MODEL=Device;#V=1.0;KEY=3453485763440213840928;R=discovery.example.org");
+			string Uri = "iotdisco:SN=98734238472634;MAN=www.example.org;MODEL=Device;#V=1.0;KEY=3453485763440213840928;R=discovery.example.org";
+			Assert.IsTrue(ThingRegistryClient.IsIoTDiscoClaimURI(Uri));
+			Assert.IsFalse(ThingRegistryClient.IsIoTDiscoSearchURI(Uri));
+			MetaDataTag[] Tags = ThingRegistryClient.DecodeIoTDiscoClaimURI(Uri);
 
 			Assert.AreEqual(6, Tags.Length);
 
@@ -41,7 +44,10 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public void Test_02_ClaimUriEscape()
 		{
-			MetaDataTag[] Tags = ThingRegistryClient.DecodeIoTDiscoClaimURI("iotdisco:SN=98734238472634;MAN=www.example.org;MODEL=Device;#V=1.0;KEY=3453485763440213840928;R=\\discovery\\.example\\;.org");
+			string Uri = "iotdisco:SN=98734238472634;MAN=www.example.org;MODEL=Device;#V=1.0;KEY=3453485763440213840928;R=\\discovery\\.example\\;.org";
+			Assert.IsTrue(ThingRegistryClient.IsIoTDiscoClaimURI(Uri));
+			Assert.IsFalse(ThingRegistryClient.IsIoTDiscoSearchURI(Uri));
+			MetaDataTag[] Tags = ThingRegistryClient.DecodeIoTDiscoClaimURI(Uri);
 
 			Assert.AreEqual(6, Tags.Length);
 
@@ -67,7 +73,10 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public void Test_03_ClaimUriEmptyValues()
 		{
-			MetaDataTag[] Tags = ThingRegistryClient.DecodeIoTDiscoClaimURI("iotdisco:SN=98734238472634;MAN=www.example.org;MODEL=Device;#V=1.0;KEY=;R=");
+			string Uri = "iotdisco:SN=98734238472634;MAN=www.example.org;MODEL=Device;#V=1.0;KEY=;R=";
+			Assert.IsTrue(ThingRegistryClient.IsIoTDiscoClaimURI(Uri));
+			Assert.IsFalse(ThingRegistryClient.IsIoTDiscoSearchURI(Uri));
+			MetaDataTag[] Tags = ThingRegistryClient.DecodeIoTDiscoClaimURI(Uri);
 
 			Assert.AreEqual(6, Tags.Length);
 
@@ -93,14 +102,20 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public void Test_04_SearchUri_1()
 		{
-			IEnumerable<SearchOperator> Operators = ThingRegistryClient.DecodeIoTDiscoURI("iotdisco:MAN=www.example.org;MODEL=Device;SN~*9873*;#V>=1.0;#V<2;#LON>=-72;#LON<=-70;#LAT>=-34;#LAT<=-33");
+			string Uri = "iotdisco:MAN=www.example.org;MODEL=Device;SN~*9873*;#V>=1.0;#V<2;#LON>=-72;#LON<=-70;#LAT>=-34;#LAT<=-33";
+			Assert.IsFalse(ThingRegistryClient.IsIoTDiscoClaimURI(Uri));
+			Assert.IsTrue(ThingRegistryClient.IsIoTDiscoSearchURI(Uri));
+			IEnumerable<SearchOperator> Operators = ThingRegistryClient.DecodeIoTDiscoURI(Uri);
 			this.Test_SearchUri_1(Operators);
 		}
 
 		[TestMethod]
 		public void Test_05_SearchUri_1_ReverseRangeOrder()
 		{
-			IEnumerable<SearchOperator> Operators = ThingRegistryClient.DecodeIoTDiscoURI("iotdisco:MAN=www.example.org;MODEL=Device;SN~*9873*;#V<2;#V>=1.0;#LON<=-70;#LON>=-72;#LAT<=-33;#LAT>=-34");
+			string Uri = "iotdisco:MAN=www.example.org;MODEL=Device;SN~*9873*;#V<2;#V>=1.0;#LON<=-70;#LON>=-72;#LAT<=-33;#LAT>=-34";
+			Assert.IsFalse(ThingRegistryClient.IsIoTDiscoClaimURI(Uri));
+			Assert.IsTrue(ThingRegistryClient.IsIoTDiscoSearchURI(Uri));
+			IEnumerable<SearchOperator> Operators = ThingRegistryClient.DecodeIoTDiscoURI(Uri);
 			this.Test_SearchUri_1(Operators);
 		}
 
@@ -166,14 +181,20 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public void Test_06_SearchUri_2()
 		{
-			IEnumerable<SearchOperator> Operators = ThingRegistryClient.DecodeIoTDiscoURI("iotdisco:#A=1;#B>1;#C<1;#D>=1;#E<=1;#F<>1;#G>1;#G<2;#H>=1;#H<2;#I>1;#I<=2;#J>=1;#J<=2;#K>3;#K<2;#L>=3;#L<2;#M>3;#M<=2;#N>=3;#N<=2");
+			string Uri = "iotdisco:#A=1;#B>1;#C<1;#D>=1;#E<=1;#F<>1;#G>1;#G<2;#H>=1;#H<2;#I>1;#I<=2;#J>=1;#J<=2;#K>3;#K<2;#L>=3;#L<2;#M>3;#M<=2;#N>=3;#N<=2";
+			Assert.IsFalse(ThingRegistryClient.IsIoTDiscoClaimURI(Uri));
+			Assert.IsTrue(ThingRegistryClient.IsIoTDiscoSearchURI(Uri));
+			IEnumerable<SearchOperator> Operators = ThingRegistryClient.DecodeIoTDiscoURI(Uri);
 			this.Test_SearchUri_2(Operators);
 		}
 
 		[TestMethod]
 		public void Test_07_SearchUri_2_ReverseRangeOrder()
 		{
-			IEnumerable<SearchOperator> Operators = ThingRegistryClient.DecodeIoTDiscoURI("iotdisco:#A=1;#B>1;#C<1;#D>=1;#E<=1;#F<>1;#G<2;#G>1;#H<2;#H>=1;#I<=2;#I>1;#J<=2;#J>=1;#K<2;#K>3;#L<2;#L>=3;#M<=2;#M>3;#N<=2;#N>=3");
+			string Uri = "iotdisco:#A=1;#B>1;#C<1;#D>=1;#E<=1;#F<>1;#G<2;#G>1;#H<2;#H>=1;#I<=2;#I>1;#J<=2;#J>=1;#K<2;#K>3;#L<2;#L>=3;#M<=2;#M>3;#N<=2;#N>=3";
+			Assert.IsFalse(ThingRegistryClient.IsIoTDiscoClaimURI(Uri));
+			Assert.IsTrue(ThingRegistryClient.IsIoTDiscoSearchURI(Uri));
+			IEnumerable<SearchOperator> Operators = ThingRegistryClient.DecodeIoTDiscoURI(Uri);
 			this.Test_SearchUri_2(Operators);
 		}
 
@@ -293,14 +314,20 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public void Test_08_SearchUri_3()
 		{
-			IEnumerable<SearchOperator> Operators = ThingRegistryClient.DecodeIoTDiscoURI("iotdisco:A=1;B>1;C<1;D>=1;E<=1;F<>1;G>1;G<2;H>=1;H<2;I>1;I<=2;J>=1;J<=2;K>3;K<2;L>=3;L<2;M>3;M<=2;N>=3;N<=2;O~+1+2");
+			string Uri = "iotdisco:A=1;B>1;C<1;D>=1;E<=1;F<>1;G>1;G<2;H>=1;H<2;I>1;I<=2;J>=1;J<=2;K>3;K<2;L>=3;L<2;M>3;M<=2;N>=3;N<=2;O~+1+2";
+			Assert.IsFalse(ThingRegistryClient.IsIoTDiscoClaimURI(Uri));
+			Assert.IsTrue(ThingRegistryClient.IsIoTDiscoSearchURI(Uri));
+			IEnumerable<SearchOperator> Operators = ThingRegistryClient.DecodeIoTDiscoURI(Uri);
 			this.Test_SearchUri_3(Operators);
 		}
 
 		[TestMethod]
 		public void Test_09_SearchUri_3_ReverseRangeOrder()
 		{
-			IEnumerable<SearchOperator> Operators = ThingRegistryClient.DecodeIoTDiscoURI("iotdisco:A=1;B>1;C<1;D>=1;E<=1;F<>1;G<2;G>1;H<2;H>=1;I<=2;I>1;J<=2;J>=1;K<2;K>3;L<2;L>=3;M<=2;M>3;N<=2;N>=3;O~+1+2");
+			string Uri = "iotdisco:A=1;B>1;C<1;D>=1;E<=1;F<>1;G<2;G>1;H<2;H>=1;I<=2;I>1;J<=2;J>=1;K<2;K>3;L<2;L>=3;M<=2;M>3;N<=2;N>=3;O~+1+2";
+			Assert.IsFalse(ThingRegistryClient.IsIoTDiscoClaimURI(Uri));
+			Assert.IsTrue(ThingRegistryClient.IsIoTDiscoSearchURI(Uri));
+			IEnumerable<SearchOperator> Operators = ThingRegistryClient.DecodeIoTDiscoURI(Uri);
 			this.Test_SearchUri_3(Operators);
 		}
 
@@ -422,7 +449,6 @@ namespace Waher.Networking.XMPP.Test
 
 			Assert.AreEqual(15, Tags.Count);
 		}
-
 
 	}
 }

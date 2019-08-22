@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
+﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
   <PropertyGroup>
     <TargetFramework>netstandard1.3</TargetFramework>
     <Description>Implements the XMPP IoT provisioning extesion as defined by the IEEE XMPP IoT Interface working group.</Description>
@@ -15,9 +15,9 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>networking communication xmpp iot provisioning xep-0324</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.0.21</AssemblyVersion>
-    <FileVersion>1.0.21</FileVersion>
-    <Version>1.0.21</Version>
+    <AssemblyVersion>1.0.22</AssemblyVersion>
+    <FileVersion>1.0.22</FileVersion>
+    <Version>1.0.22</Version>
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Networking\Waher.Networking.XMPP.Provisioning\</UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>

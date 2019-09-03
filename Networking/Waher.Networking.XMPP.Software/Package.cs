@@ -13,7 +13,7 @@ namespace Waher.Networking.XMPP.Software
         private byte[] signature = null;
         private string url = null;
         private DateTime published = DateTime.MinValue;
-        private DateTime supercedes = DateTime.MinValue;
+        private DateTime supersedes = DateTime.MinValue;
         private DateTime created = DateTime.MinValue;
         private long bytes = 0;
 
@@ -62,13 +62,13 @@ namespace Waher.Networking.XMPP.Software
         }
 
         /// <summary>
-        /// If the package supercedes an earlier version of the same software package. If no such package,
+        /// If the package supersedes an earlier version of the same software package. If no such package,
         /// this property returns <see cref="DateTime.MinValue"/>.
         /// </summary>
-        public DateTime Supercedes
+        public DateTime Supersedes
         {
-            get { return this.supercedes; }
-            set { this.supercedes = value; }
+            get { return this.supersedes; }
+            set { this.supersedes = value; }
         }
 
         /// <summary>
@@ -119,9 +119,9 @@ namespace Waher.Networking.XMPP.Software
                             Package.published = TP;
                         break;
 
-                    case "supercedes":
+                    case "supersedes":
                         if (XML.TryParse(Attr.Value, out TP))
-                            Package.supercedes = TP;
+                            Package.supersedes = TP;
                         break;
 
                     case "created":

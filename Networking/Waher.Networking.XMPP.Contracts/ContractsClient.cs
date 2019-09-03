@@ -994,29 +994,29 @@ namespace Waher.Networking.XMPP.Contracts
 
         #endregion
 
-        #region Compromized Legal Identity
+        #region Compromised Legal Identity
 
         /// <summary>
-        /// Reports as Compromized one of the legal identities of the account, given its ID.
+        /// Reports as Compromised one of the legal identities of the account, given its ID.
         /// </summary>
-        /// <param name="LegalIdentityId">ID of the legal identity to compromize.</param>
+        /// <param name="LegalIdentityId">ID of the legal identity to compromise.</param>
         /// <param name="Callback">Method to call when response is returned.</param>
         /// <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
-        public void CompromizedLegalIdentity(string LegalIdentityId, LegalIdentityEventHandler Callback, object State)
+        public void CompromisedLegalIdentity(string LegalIdentityId, LegalIdentityEventHandler Callback, object State)
         {
-            this.CompromizedLegalIdentity(this.componentAddress, LegalIdentityId, Callback, State);
+            this.CompromisedLegalIdentity(this.componentAddress, LegalIdentityId, Callback, State);
         }
 
         /// <summary>
-        /// Reports as Compromized one of the legal identities of the account, given its ID.
+        /// Reports as Compromised one of the legal identities of the account, given its ID.
         /// </summary>
         /// <param name="Address">Address of entity on which the legal identity are registered.</param>
-        /// <param name="LegalIdentityId">ID of the legal identity to compromize.</param>
+        /// <param name="LegalIdentityId">ID of the legal identity to compromise.</param>
         /// <param name="Callback">Method to call when response is returned.</param>
         /// <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
-        public void CompromizedLegalIdentity(string Address, string LegalIdentityId, LegalIdentityEventHandler Callback, object State)
+        public void CompromisedLegalIdentity(string Address, string LegalIdentityId, LegalIdentityEventHandler Callback, object State)
         {
-            this.client.SendIqSet(Address, "<compromizedLegalIdentity id=\"" + XML.Encode(LegalIdentityId) + "\" xmlns=\"" +
+            this.client.SendIqSet(Address, "<compromisedLegalIdentity id=\"" + XML.Encode(LegalIdentityId) + "\" xmlns=\"" +
                 NamespaceLegalIdentities + "\"/>", (sender, e) =>
                 {
                     LegalIdentity Identity = null;
@@ -1032,33 +1032,33 @@ namespace Waher.Networking.XMPP.Contracts
         }
 
         /// <summary>
-        /// Reports as Compromized one of the legal identities of the account, given its ID.
+        /// Reports as Compromised one of the legal identities of the account, given its ID.
         /// </summary>
-        /// <param name="LegalIdentityId">ID of the legal identity to compromize.</param>
+        /// <param name="LegalIdentityId">ID of the legal identity to compromise.</param>
         /// <returns>Legal identity object corresponding to <paramref name="LegalIdentityId"/>.</returns>
-        public Task<LegalIdentity> CompromizedLegalIdentityAsync(string LegalIdentityId)
+        public Task<LegalIdentity> CompromisedLegalIdentityAsync(string LegalIdentityId)
         {
-            return this.CompromizedLegalIdentityAsync(this.componentAddress, LegalIdentityId);
+            return this.CompromisedLegalIdentityAsync(this.componentAddress, LegalIdentityId);
         }
 
         /// <summary>
-        /// Reports as Compromized one of the legal identities of the account, given its ID.
+        /// Reports as Compromised one of the legal identities of the account, given its ID.
         /// </summary>
         /// <param name="Address">Address of entity on which the legal identity are registered.</param>
-        /// <param name="LegalIdentityId">ID of the legal identity to compromize.</param>
+        /// <param name="LegalIdentityId">ID of the legal identity to compromise.</param>
         /// <returns>Legal identity object corresponding to <paramref name="LegalIdentityId"/>.</returns>
-        public Task<LegalIdentity> CompromizedLegalIdentityAsync(string Address, string LegalIdentityId)
+        public Task<LegalIdentity> CompromisedLegalIdentityAsync(string Address, string LegalIdentityId)
         {
             TaskCompletionSource<LegalIdentity> Result = new TaskCompletionSource<LegalIdentity>();
 
-            this.CompromizedLegalIdentity(Address, LegalIdentityId, (sender, e) =>
+            this.CompromisedLegalIdentity(Address, LegalIdentityId, (sender, e) =>
             {
                 if (e.Ok)
                     Result.SetResult(e.Identity);
                 else
                 {
                     Result.SetException(new IOException(string.IsNullOrEmpty(e.ErrorText) ?
-                        "Unable to compromize legal identity." : e.ErrorText));
+                        "Unable to compromise legal identity." : e.ErrorText));
                 }
             }, null);
 

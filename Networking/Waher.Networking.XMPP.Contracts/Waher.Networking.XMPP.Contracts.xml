@@ -486,36 +486,36 @@
             <param name="LegalIdentityId">ID of the legal identity to obsolete.</param>
             <returns>Legal identity object corresponding to <paramref name="LegalIdentityId"/>.</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.CompromizedLegalIdentity(System.String,Waher.Networking.XMPP.Contracts.LegalIdentityEventHandler,System.Object)">
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.CompromisedLegalIdentity(System.String,Waher.Networking.XMPP.Contracts.LegalIdentityEventHandler,System.Object)">
             <summary>
-            Reports as Compromized one of the legal identities of the account, given its ID.
+            Reports as Compromised one of the legal identities of the account, given its ID.
             </summary>
-            <param name="LegalIdentityId">ID of the legal identity to compromize.</param>
+            <param name="LegalIdentityId">ID of the legal identity to compromise.</param>
             <param name="Callback">Method to call when response is returned.</param>
             <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.CompromizedLegalIdentity(System.String,System.String,Waher.Networking.XMPP.Contracts.LegalIdentityEventHandler,System.Object)">
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.CompromisedLegalIdentity(System.String,System.String,Waher.Networking.XMPP.Contracts.LegalIdentityEventHandler,System.Object)">
             <summary>
-            Reports as Compromized one of the legal identities of the account, given its ID.
+            Reports as Compromised one of the legal identities of the account, given its ID.
             </summary>
             <param name="Address">Address of entity on which the legal identity are registered.</param>
-            <param name="LegalIdentityId">ID of the legal identity to compromize.</param>
+            <param name="LegalIdentityId">ID of the legal identity to compromise.</param>
             <param name="Callback">Method to call when response is returned.</param>
             <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.CompromizedLegalIdentityAsync(System.String)">
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.CompromisedLegalIdentityAsync(System.String)">
             <summary>
-            Reports as Compromized one of the legal identities of the account, given its ID.
+            Reports as Compromised one of the legal identities of the account, given its ID.
             </summary>
-            <param name="LegalIdentityId">ID of the legal identity to compromize.</param>
+            <param name="LegalIdentityId">ID of the legal identity to compromise.</param>
             <returns>Legal identity object corresponding to <paramref name="LegalIdentityId"/>.</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.CompromizedLegalIdentityAsync(System.String,System.String)">
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.CompromisedLegalIdentityAsync(System.String,System.String)">
             <summary>
-            Reports as Compromized one of the legal identities of the account, given its ID.
+            Reports as Compromised one of the legal identities of the account, given its ID.
             </summary>
             <param name="Address">Address of entity on which the legal identity are registered.</param>
-            <param name="LegalIdentityId">ID of the legal identity to compromize.</param>
+            <param name="LegalIdentityId">ID of the legal identity to compromise.</param>
             <returns>Legal identity object corresponding to <paramref name="LegalIdentityId"/>.</returns>
         </member>
         <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.Sign(System.Byte[],Waher.Networking.XMPP.Contracts.SignatureEventHandler,System.Object)">
@@ -2258,9 +2258,9 @@
             The legal identity has been explicitly obsoleted by its owner, or by the Trust Provider.
             </summary>
         </member>
-        <member name="F:Waher.Networking.XMPP.Contracts.IdentityState.Compromized">
+        <member name="F:Waher.Networking.XMPP.Contracts.IdentityState.Compromised">
             <summary>
-            The legal identity has been reported compromized by its owner, or by the Trust Provider.
+            The legal identity has been reported compromised by its owner, or by the Trust Provider.
             </summary>
         </member>
         <member name="T:Waher.Networking.XMPP.Contracts.LegalIdentity">

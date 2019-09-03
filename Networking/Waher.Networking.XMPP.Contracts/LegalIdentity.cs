@@ -38,9 +38,9 @@ namespace Waher.Networking.XMPP.Contracts
 		Obsoleted,
 
 		/// <summary>
-		/// The legal identity has been reported compromized by its owner, or by the Trust Provider.
+		/// The legal identity has been reported compromised by its owner, or by the Trust Provider.
 		/// </summary>
-		Compromized
+		Compromised
 	}
 
 	/// <summary>

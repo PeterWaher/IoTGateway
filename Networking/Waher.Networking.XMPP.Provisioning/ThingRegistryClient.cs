@@ -1046,10 +1046,11 @@ namespace Waher.Networking.XMPP.Provisioning
 		}
 
 		/// <summary>
-		/// Decodes an IoTDisco Claim URI (subset of all possible IoTDisco URIs).
+		/// Tries to decode an IoTDisco Claim URI (subset of all possible IoTDisco URIs).
 		/// </summary>
 		/// <param name="DiscoUri">IoTDisco URI</param>
-		/// <returns>Meta data tags.</returns>
+		/// <param name="Tags">Decoded meta data tags.</param>
+		/// <returns>If <paramref name="DiscoUri"/> was successfully decoded.</returns>
 		public static bool TryDecodeIoTDiscoClaimURI(string DiscoUri, out MetaDataTag[] Tags)
 		{
 			List<MetaDataTag> Result = new List<MetaDataTag>();

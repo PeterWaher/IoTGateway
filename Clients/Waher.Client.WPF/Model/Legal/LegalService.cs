@@ -291,7 +291,7 @@ namespace Waher.Client.WPF.Model.Legal
 								Identity.State == IdentityState.Created || 
 								Identity.State == IdentityState.Obsoleted)
 							{
-								this.contractsClient.CompromizedLegalIdentity(Identity.Id, null, null);
+								this.contractsClient.CompromisedLegalIdentity(Identity.Id, null, null);
 								Nr++;
 							}
 						}

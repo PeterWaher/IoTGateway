@@ -1099,5 +1099,14 @@ namespace Waher.Persistence.Files
 			return false;
 		}
 
+		/// <summary>
+		/// Index of current block
+		/// </summary>
+		public uint CurrentBlockIndex => currentBlockIndex;
+
+		/// <summary>
+		/// Current object position, within block.
+		/// </summary>
+		public int CurrentObjectPosition => currentObjPos;
 	}
 }

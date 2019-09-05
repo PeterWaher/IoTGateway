@@ -2004,6 +2004,16 @@
             If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
             <returns>If the index matches the sort order. (The index ordering is allowed to be more specific.)</returns>
         </member>
+        <member name="P:Waher.Persistence.Files.ObjectBTreeFileEnumerator`1.CurrentBlockIndex">
+            <summary>
+            Index of current block
+            </summary>
+        </member>
+        <member name="P:Waher.Persistence.Files.ObjectBTreeFileEnumerator`1.CurrentObjectPosition">
+            <summary>
+            Current object position, within block.
+            </summary>
+        </member>
         <member name="T:Waher.Persistence.Files.Searching.Comparison">
             <summary>
             Static class that performs comparisons of property values.

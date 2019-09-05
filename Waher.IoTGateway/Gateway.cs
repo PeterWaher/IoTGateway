@@ -291,6 +291,8 @@ namespace Waher.IoTGateway
 				XSL.Validate("Gateway.config", Config, "GatewayConfiguration", "http://waher.se/Schema/GatewayConfiguration.xsd",
 					XSL.LoadSchema(typeof(Gateway).Namespace + ".Schema.GatewayConfiguration.xsd", typeof(Gateway).Assembly));
 
+				IDatabaseProvider DatabaseProvider = null;
+
 				foreach (XmlNode N in Config.DocumentElement.ChildNodes)
 				{
 					if (N is XmlElement E)
@@ -372,7 +374,8 @@ namespace Waher.IoTGateway
 								break;
 
 							case "Database":
-								IDatabaseProvider DatabaseProvider;
+								if (!(DatabaseProvider is null))
+									throw new Exception("Database provider already initiated.");
 
 								if (GetDatabaseProvider != null)
 									DatabaseProvider = await GetDatabaseProvider(E);
@@ -384,12 +387,6 @@ namespace Waher.IoTGateway
 
 								internalProvider = DatabaseProvider;
 								Database.Register(DatabaseProvider, false);
-
-								if (DatabaseProvider is Persistence.Files.FilesProvider FilesProvider)
-								{
-									FilesProvider.AutoRepairReportFolder = Path.Combine(AppDataFolder, "Backup");
-									await FilesProvider.RepairIfInproperShutdown(Gateway.AppDataFolder + "Transforms" + Path.DirectorySeparatorChar + "DbStatXmlToHtml.xslt");
-								}
 								break;
 
 							case "Ports":
@@ -406,6 +403,15 @@ namespace Waher.IoTGateway
 								break;
 						}
 					}
+				}
+
+				if (DatabaseProvider is null)
+					throw new Exception("Database provider not defined in Gateway.config.");
+
+				if (DatabaseProvider is Persistence.Files.FilesProvider FilesProvider)
+				{
+					FilesProvider.AutoRepairReportFolder = Path.Combine(AppDataFolder, "Backup");
+					await FilesProvider.RepairIfInproperShutdown(Gateway.AppDataFolder + "Transforms" + Path.DirectorySeparatorChar + "DbStatXmlToHtml.xslt");
 				}
 
 				PersistedEventLog PersistedEventLog = new PersistedEventLog(7, new TimeSpan(4, 15, 0));

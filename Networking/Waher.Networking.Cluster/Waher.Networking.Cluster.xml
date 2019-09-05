@@ -25,7 +25,6 @@
             <param name="MulticastAddress">UDP Multicast address used for cluster communication.</param>
             <param name="Port">Port used in cluster communication</param>
             <param name="SharedSecret">Shared secret. Used to encrypt and decrypt communication. Secret is hashed before being fed to AES.</param>
-            <param name="AllowLoopback">If communication over the loopback interface should be permitted. (Default=false)</param>
             <param name="Sniffers">Optional set of sniffers to use.</param>
         </member>
         <member name="P:Waher.Networking.Cluster.ClusterEndpoint.Endpoints">

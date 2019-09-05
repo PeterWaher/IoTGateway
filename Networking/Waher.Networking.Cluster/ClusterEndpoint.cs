@@ -30,15 +30,15 @@ namespace Waher.Networking.Cluster
 	/// </summary>
 	public class ClusterEndpoint : Sniffable, IDisposable
 	{
+		private static readonly Dictionary<Type, ObjectInfo> objectInfo = new Dictionary<Type, ObjectInfo>();
 		private static Dictionary<Type, IProperty> propertyTypes = null;
-		private static Dictionary<Type, ObjectInfo> objectInfo = new Dictionary<Type, ObjectInfo>();
 		private static ObjectInfo rootObject;
 
 		private readonly LinkedList<ClusterUdpClient> outgoing = new LinkedList<ClusterUdpClient>();
 		private readonly LinkedList<ClusterUdpClient> incoming = new LinkedList<ClusterUdpClient>();
 		private readonly IPEndPoint destination;
-		internal readonly Aes aes;
 		internal readonly byte[] key;
+		internal Aes aes;
 		internal Cache<string, object> currentStatus;
 		private Scheduler scheduler;
 		private readonly Random rnd = new Random();
@@ -69,10 +69,8 @@ namespace Waher.Networking.Cluster
 		/// <param name="MulticastAddress">UDP Multicast address used for cluster communication.</param>
 		/// <param name="Port">Port used in cluster communication</param>
 		/// <param name="SharedSecret">Shared secret. Used to encrypt and decrypt communication. Secret is hashed before being fed to AES.</param>
-		/// <param name="AllowLoopback">If communication over the loopback interface should be permitted. (Default=false)</param>
 		/// <param name="Sniffers">Optional set of sniffers to use.</param>
-		public ClusterEndpoint(IPAddress MulticastAddress, int Port, byte[] SharedSecret,
-			params ISniffer[] Sniffers)
+		public ClusterEndpoint(IPAddress MulticastAddress, int Port, byte[] SharedSecret, params ISniffer[] Sniffers)
 			: base(Sniffers)
 		{
 			ClusterUdpClient ClusterUdpClient;
@@ -157,6 +155,8 @@ namespace Waher.Networking.Cluster
 
 					if (!IsLoopback)
 					{
+						Client = null;
+
 						try
 						{
 							Client = new UdpClient(AddressFamily)
@@ -181,10 +181,12 @@ namespace Waher.Networking.Cluster
 						}
 						catch (NotSupportedException)
 						{
+							Client?.Dispose();
 							continue;
 						}
 						catch (Exception ex)
 						{
+							Client?.Dispose();
 							Log.Critical(ex);
 							continue;
 						}
@@ -193,6 +195,8 @@ namespace Waher.Networking.Cluster
 						ClusterUdpClient.BeginReceive();
 
 						this.outgoing.AddLast(ClusterUdpClient);
+
+						Client = null;
 
 						try
 						{
@@ -205,10 +209,12 @@ namespace Waher.Networking.Cluster
 						}
 						catch (NotSupportedException)
 						{
+							Client?.Dispose();
 							continue;
 						}
 						catch (Exception ex)
 						{
+							Client?.Dispose();
 							Log.Critical(ex);
 							continue;
 						}
@@ -297,6 +303,9 @@ namespace Waher.Networking.Cluster
 				this.shutDown?.WaitOne(2000);
 				this.shutDown?.Dispose();
 				this.shutDown = null;
+
+				this.aes?.Dispose();
+				this.aes = null;
 			}
 		}
 
@@ -360,7 +369,6 @@ namespace Waher.Networking.Cluster
 			}
 
 			List<PropertyReference> Properties = new List<PropertyReference>();
-			TypeInfo TI = T.GetTypeInfo();
 
 			foreach (PropertyInfo PI in T.GetRuntimeProperties())
 			{

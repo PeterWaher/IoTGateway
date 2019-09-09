@@ -1,8 +1,7 @@
 {
   "profiles": {
     "Waher.Utility.Sign": {
-      "commandName": "Project",
-      "commandLineArgs": "-o Test.xml -c ed448 -priv UdMluzRCEdHeIeB1IWjEsWQ/5Tyq1CHTt5czTDE+VWH3dRFLIo8QHcCbg5U4iOojntcQobVKZwo= -s *.dll -pub pc+bw3oukzkcOKOOw2z/Pyp8I2b1VtWQFR/XTy4rRh4TbU7CHtqGNPM6daEVpOxdPHVSZ3NLsquA -v Waher.Content.dll mzaXARSJqxKA+iyejSzKm/zukvMNk9VwkwgX+P3AICRVkWryxAqfcBhcZkR7ywn2pDWBrhd8NeSAVO+hDM8vlWE+OEfqtFJmEYJzlfk6IFlbeArYrR8F9vS0zwyJLvj+SjFDZYV1RWp/TfvuAJFiWTAA"
+      "commandName": "Project"
     }
   }
 }

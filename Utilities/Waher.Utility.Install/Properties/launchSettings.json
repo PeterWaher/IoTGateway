@@ -2,7 +2,6 @@
   "profiles": {
     "Waher.Utility.Install": {
       "commandName": "Project",
-      "commandLineArgs": "-i -p Waher.IoTGateway.Svc.package -k Testing -v -d \"\\ProgramData\\IoT Gateway Dev\" -s Waher.IoTGateway.Svc.exe",
       "workingDirectory": "$(SolutionDir)Waher.IoTGateway.Svc\\bin\\Release\\PublishOutput"
     }
   }

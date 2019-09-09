@@ -960,7 +960,7 @@ namespace Waher.Persistence.Files
 					if (FileExists)
 					{
 						throw new CryptographicException("Unable to get access to cryptographic key for database file " + FileName +
-							". Was the database created using another user?", ex);
+							". (" + ex.Message + ") Was the database created using another user?", ex);
 					}
 				}
 
@@ -985,7 +985,7 @@ namespace Waher.Persistence.Files
 						catch (CryptographicException ex)
 						{
 							throw new CryptographicException("Unable to get access to cryptographic key for database file " + FileName +
-								". Was the database created using another user?", ex);
+								". (" + ex.Message + ") Was the database created using another user?", ex);
 						}
 					}
 

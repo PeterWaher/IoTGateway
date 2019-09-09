@@ -101,14 +101,15 @@ namespace Waher.Utility.DeleteDB
 
 							try
 							{
-								RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(CspParameters);
-
-								RSA.PersistKeyInCsp = false;    // Deletes key.
-								RSA.Clear();
+								using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(CspParameters))
+								{
+									RSA.PersistKeyInCsp = false;    // Deletes key.
+									RSA.Clear();
+								}
 							}
-							catch (CryptographicException)
+							catch (CryptographicException ex)
 							{
-								Console.Out.WriteLine("Unable to delete cryptographic key.");
+								Console.Out.WriteLine("Unable to delete cryptographic key: " + ex.Message);
 								continue;
 							}
 						}

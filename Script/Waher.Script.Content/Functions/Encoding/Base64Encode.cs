@@ -1,0 +1,56 @@
+﻿using System;
+using System.Collections.Generic;
+using Waher.Content;
+using Waher.Content.Xml;
+using Waher.Script.Abstraction.Elements;
+using Waher.Script.Model;
+using Waher.Script.Objects;
+
+namespace Waher.Script.Content.Functions.Encoding
+{
+	/// <summary>
+	/// Base64Encode(Data)
+	/// </summary>
+	public class Base64Encode : FunctionOneScalarVariable
+	{
+		/// <summary>
+		/// Base64Encode(Data)
+		/// </summary>
+		/// <param name="Data">Binary data</param>
+		/// <param name="Start">Start position in script expression.</param>
+		/// <param name="Length">Length of expression covered by node.</param>
+		/// <param name="Expression">Expression containing script.</param>
+		public Base64Encode(ScriptNode Data, int Start, int Length, Expression Expression)
+			: base(Data, Start, Length, Expression)
+		{
+		}
+
+		/// <summary>
+		/// Name of the function
+		/// </summary>
+		public override string FunctionName
+		{
+			get { return "base64encode"; }
+		}
+
+		/// <summary>
+		/// Evaluates the function on a scalar argument.
+		/// </summary>
+		/// <param name="Argument">Function argument.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Function result.</returns>
+		public override IElement EvaluateScalar(IElement Argument, Variables Variables)
+		{
+			System.Text.Encoding Encoding = System.Text.Encoding.UTF8;
+
+			if (!(Argument.AssociatedObjectValue is byte[] Bin))
+			{
+				string s = Argument is StringValue S ? S.Value : Expression.ToString(Argument.AssociatedObjectValue);
+				Bin = Encoding.GetBytes(s);
+			}
+
+			return new StringValue(Convert.ToBase64String(Bin));
+		}
+
+	}
+}

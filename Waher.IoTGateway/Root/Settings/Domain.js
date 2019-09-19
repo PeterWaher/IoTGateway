@@ -133,10 +133,16 @@ function TestNames()
 function GetDomainNamesReq()
 {
     var Req =
-        {
-            "domainName": document.getElementById("DomainName").value,
-            "altDomainName": document.getElementById("AltDomainName").value
-        };
+	{
+		"dynamicDns": document.getElementById("DynamicDns").checked,
+		"checkIpScript": document.getElementById("CheckIpScript").value,
+		"updateIpScript": document.getElementById("UpdateIpScript").value,
+		"dynDnsAccount": document.getElementById("DynDnsAccount").value,
+		"dynDnsPassword": document.getElementById("DynDnsPassword").value,
+		"dynDnsInterval": parseInt(document.getElementById("DynDnsInterval").value),
+        "domainName": document.getElementById("DomainName").value,
+        "altDomainName": document.getElementById("AltDomainName").value
+    };
 
     var Index = 0;
     var Control;
@@ -257,4 +263,41 @@ function CertificateOk(Data)
     document.getElementById("CertificateError").style.display = "none";
     document.getElementById("NextMessage2").style.display = "block";
     document.getElementById("NextButton").style.display = "inline-block";
+}
+
+function ToggleDynamicDnsProperties()
+{
+	var CheckBox = document.getElementById("DynamicDns");
+	var Checked = CheckBox.checked;
+
+	var Div = document.getElementById("DynDnsProperties");
+	Div.style.display = Checked ? "block" : "none";
+}
+
+function TemplateChanged(Control)
+{
+	var IpScript;
+	var UpdateScript;
+
+	switch (Control.value)
+	{
+		case "LoopiaSe":
+			IpScript = "Html:=HttpGet(\"https://dyndns.loopia.se/checkip\",{\"Accept\":\"text/html\",\"User-Agent\":\"Waher.IoTGateway\"});\r\n" +
+				"s:=Html.Body.InnerHtml;\r\n" +
+				"s like \"[^0-9]*(?'IP'\\\\d+[.]\\\\d+[.]\\\\d+[.]\\\\d+)\" ? IP : \"\"";
+			UpdateScript = "Html:=HttpGet(\"https://dyndns.loopia.se/?system=custom&hostname=\"+Domain+\"&myip=\"+IP,{\"Accept\":\"text/html\",\"User-Agent\":\"Waher.IoTGateway\",\"Authorization\":\"Basic \"+Base64Encode(Encode(UserName+\":\"+Password)[0])})";
+			break;
+
+		default:
+			return;
+	}
+
+	document.getElementById("CheckIpScript").value = IpScript;
+	document.getElementById("UpdateIpScript").value = UpdateScript;
+}
+
+function DynamicDnsScriptUpdated(Control,Event)
+{
+	document.getElementById("DynDnsTemplate").value = "";
+	return ScriptKeyDown(Control, Event);
 }

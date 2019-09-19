@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Net;
 using System.Net.Http;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
@@ -13,6 +14,8 @@ using Waher.Networking.HTTP;
 using Waher.Persistence;
 using Waher.Persistence.Attributes;
 using Waher.Runtime.Language;
+using Waher.Runtime.Settings;
+using Waher.Script;
 using Waher.Security;
 using Waher.Security.ACME;
 using Waher.Security.PKCS;
@@ -41,7 +44,13 @@ namespace Waher.IoTGateway.Setup
 		private string urlToS = string.Empty;
 		private string password = string.Empty;
 		private string openSslPath = string.Empty;
+		private string checkIpScript = string.Empty;
+		private string updateIpScript = string.Empty;
+		private string dynDnsAccount = string.Empty;
+		private string dynDnsPassword = string.Empty;
+		private int dynDnsInterval = 300;
 		private bool useDomainName = false;
+		private bool dynamicDns = false;
 		private bool useEncryption = true;
 		private bool customCA = false;
 		private bool acceptToS = false;
@@ -82,6 +91,16 @@ namespace Waher.IoTGateway.Setup
 		{
 			get { return this.useDomainName; }
 			set { this.useDomainName = value; }
+		}
+
+		/// <summary>
+		/// If the server uses a dynamic DNS service.
+		/// </summary>
+		[DefaultValue(false)]
+		public bool DynamicDns
+		{
+			get { return this.dynamicDns; }
+			set { this.dynamicDns = value; }
 		}
 
 		/// <summary>
@@ -195,6 +214,56 @@ namespace Waher.IoTGateway.Setup
 		}
 
 		/// <summary>
+		/// Script to use to evaluate the current IP Address.
+		/// </summary>
+		[DefaultValueStringEmpty]
+		public string CheckIpScript
+		{
+			get { return this.checkIpScript; }
+			set { this.checkIpScript = value; }
+		}
+
+		/// <summary>
+		/// Script to use to update the current IP Address.
+		/// </summary>
+		[DefaultValueStringEmpty]
+		public string UpdateIpScript
+		{
+			get { return this.updateIpScript; }
+			set { this.updateIpScript = value; }
+		}
+
+		/// <summary>
+		/// Account Name for the Dynamic DNS service
+		/// </summary>
+		[DefaultValueStringEmpty]
+		public string DynDnsAccount
+		{
+			get { return this.dynDnsAccount; }
+			set { this.dynDnsAccount = value; }
+		}
+
+		/// <summary>
+		/// Interval (in seconds) for checking if the IP address has changed.
+		/// </summary>
+		[DefaultValue(300)]
+		public int DynDnsInterval
+		{
+			get { return this.dynDnsInterval; }
+			set { this.dynDnsInterval = value; }
+		}
+
+		/// <summary>
+		/// Password for the Dynamic DNS service
+		/// </summary>
+		[DefaultValueStringEmpty]
+		public string DynDnsPassword
+		{
+			get { return this.dynDnsPassword; }
+			set { this.dynDnsPassword = value; }
+		}
+
+		/// <summary>
 		/// If the CA has a Terms of Service.
 		/// </summary>
 		public bool HasToS => !string.IsNullOrEmpty(this.urlToS);
@@ -275,8 +344,16 @@ namespace Waher.IoTGateway.Setup
 			if (!(Obj is Dictionary<string, object> Parameters))
 				throw new BadRequestException();
 
-			if (!Parameters.TryGetValue("domainName", out Obj) || !(Obj is string DomainName))
+			if (!Parameters.TryGetValue("domainName", out Obj) || !(Obj is string DomainName) ||
+				!Parameters.TryGetValue("dynamicDns", out Obj) || !(Obj is bool DynamicDns) ||
+				!Parameters.TryGetValue("checkIpScript", out Obj) || !(Obj is string CheckIpScript) ||
+				!Parameters.TryGetValue("updateIpScript", out Obj) || !(Obj is string UpdateIpScript) ||
+				!Parameters.TryGetValue("dynDnsAccount", out Obj) || !(Obj is string DynDnsAccount) ||
+				!Parameters.TryGetValue("dynDnsPassword", out Obj) || !(Obj is string DynDnsPassword) ||
+				!Parameters.TryGetValue("dynDnsInterval", out Obj) || !(Obj is int DynDnsInterval))
+			{
 				throw new BadRequestException();
+			}
 
 			List<string> AlternativeNames = new List<string>();
 			int Index = 0;
@@ -294,6 +371,12 @@ namespace Waher.IoTGateway.Setup
 			if (string.IsNullOrEmpty(TabID))
 				throw new BadRequestException();
 
+			this.dynamicDns = DynamicDns;
+			this.checkIpScript = CheckIpScript;
+			this.updateIpScript = UpdateIpScript;
+			this.dynDnsAccount = DynDnsAccount;
+			this.dynDnsPassword = DynDnsPassword;
+			this.dynDnsInterval = DynDnsInterval;
 			this.domain = DomainName;
 			this.alternativeDomains = AlternativeNames.Count == 0 ? null : AlternativeNames.ToArray();
 			this.useDomainName = true;
@@ -349,9 +432,111 @@ namespace Waher.IoTGateway.Setup
 			}
 		}
 
+		internal async Task<bool> CheckDynamicIp()
+		{
+			try
+			{
+				if (!this.useDomainName || !this.dynamicDns)
+					return true;
+
+				await this.CheckDynamicIp(null, this.domain);
+
+				foreach (string AlternativeDomain in this.alternativeDomains)
+					await this.CheckDynamicIp(null, AlternativeDomain);
+
+				return true;
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+				return false;
+			}
+		}
+
+		internal async Task<bool> CheckDynamicIp(string TabID, string DomainName)
+		{
+			if (!this.dynamicDns)
+				return true;
+
+			Expression CheckIpScript;
+			Expression UpdateIpScript;
+
+			try
+			{
+				CheckIpScript = new Expression(this.checkIpScript);
+			}
+			catch (Exception ex)
+			{
+				ClientEvents.PushEvent(new string[] { TabID }, "CertificateError", "Unable to parse script checking current IP Address: " + ex.Message, false, "User");
+				return false;
+			}
+
+			try
+			{
+				UpdateIpScript = new Expression(this.updateIpScript);
+			}
+			catch (Exception ex)
+			{
+				ClientEvents.PushEvent(new string[] { TabID }, "CertificateError", "Unable to parse script updating the dynamic DNS server: " + ex.Message, false, "User");
+				return false;
+			}
+
+			ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Checking current IP Address.", false, "User");
+
+			Variables Variables = new Variables();
+			object Result;
+
+			try
+			{
+				Result = CheckIpScript.Evaluate(Variables);
+			}
+			catch (Exception ex)
+			{
+				ClientEvents.PushEvent(new string[] { TabID }, "CertificateError", "Unable to get current IP Address: " + ex.Message, false, "User");
+				return false;
+			}
+
+			if (!(Result is string CurrentIP) || !IPAddress.TryParse(CurrentIP, out IPAddress _))
+			{
+				ClientEvents.PushEvent(new string[] { TabID }, "CertificateError", "Unable to get current IP Address. Unexpected response.", false, "User");
+				return false;
+			}
+
+			ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Current IP Address: " + CurrentIP, false, "User");
+
+			string LastIP = await RuntimeSettings.GetAsync("Last.IP", string.Empty);
+
+			if (LastIP == CurrentIP)
+				ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "IP Address has not changed.", false, "User");
+			else
+			{
+				try
+				{
+					Variables["Account"] = this.dynDnsAccount;
+					Variables["Password"] = this.dynDnsPassword;
+					Variables["IP"] = CurrentIP;
+					Variables["Domain"] = DomainName;
+
+					Result = CheckIpScript.Evaluate(Variables);
+
+					await RuntimeSettings.SetAsync("Last.IP", CurrentIP);
+				}
+				catch (Exception ex)
+				{
+					ClientEvents.PushEvent(new string[] { TabID }, "CertificateError", "Unable to register new dynamic IP Address: " + ex.Message, false, "User");
+					return false;
+				}
+			}
+
+			return true;
+		}
+
 		private async Task<bool> Test(string TabID, string DomainName)
 		{
 			ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Testing " + DomainName + "...", false, "User");
+
+			if (!await this.CheckDynamicIp(TabID, DomainName))
+				return false;
 
 			this.token = Hashes.BinaryToString(Gateway.NextBytes(32));
 
@@ -421,7 +606,13 @@ namespace Waher.IoTGateway.Setup
 			if (!Parameters.TryGetValue("acceptToS", out Obj) || !(Obj is bool AcceptToS))
 				throw new BadRequestException();
 
-			if (!Parameters.TryGetValue("domainName", out Obj) || !(Obj is string DomainName))
+			if (!Parameters.TryGetValue("domainName", out Obj) || !(Obj is string DomainName) ||
+				!Parameters.TryGetValue("dynamicDns", out Obj) || !(Obj is bool DynamicDns) ||
+				!Parameters.TryGetValue("checkIpScript", out Obj) || !(Obj is string CheckIpScript) ||
+				!Parameters.TryGetValue("updateIpScript", out Obj) || !(Obj is string UpdateIpScript) ||
+				!Parameters.TryGetValue("dynDnsAccount", out Obj) || !(Obj is string DynDnsAccount) ||
+				!Parameters.TryGetValue("dynDnsPassword", out Obj) || !(Obj is string DynDnsPassword) ||
+				!Parameters.TryGetValue("dynDnsInterval", out Obj) || !(Obj is int DynDnsInterval))
 				throw new BadRequestException();
 
 			List<string> AlternativeNames = new List<string>();
@@ -440,6 +631,12 @@ namespace Waher.IoTGateway.Setup
 			if (string.IsNullOrEmpty(TabID))
 				throw new BadRequestException();
 
+			this.dynamicDns = DynamicDns;
+			this.checkIpScript = CheckIpScript;
+			this.updateIpScript = UpdateIpScript;
+			this.dynDnsAccount = DynDnsAccount;
+			this.dynDnsPassword = DynDnsPassword;
+			this.dynDnsInterval = DynDnsInterval;
 			this.domain = DomainName;
 			this.alternativeDomains = AlternativeNames.Count == 0 ? null : AlternativeNames.ToArray();
 			this.useDomainName = true;
@@ -504,10 +701,10 @@ namespace Waher.IoTGateway.Setup
 					}
 				}
 				catch (CryptographicException ex)
-                {
-                    throw new CryptographicException("Unable to get access to cryptographic key for \"IoTGateway:" + URL +
-                        "\". Was the database created using another user?", ex);
-                }
+				{
+					throw new CryptographicException("Unable to get access to cryptographic key for \"IoTGateway:" + URL +
+						"\". Was the database created using another user?", ex);
+				}
 
 				using (AcmeClient Client = new AcmeClient(new Uri(URL), Parameters))
 				{
@@ -628,10 +825,13 @@ namespace Waher.IoTGateway.Setup
 								this.token = HttpChallenge.KeyAuthorization;
 
 								ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Acknowleding challenge.", false, "User");
-								Challenge = await HttpChallenge.AcknowledgeChallenge();
-								ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Challenge acknowledged: " + Challenge.Status.ToString(), false, "User");
+								if (await this.CheckDynamicIp(TabID, Authorization.Value))
+								{
+									Challenge = await HttpChallenge.AcknowledgeChallenge();
+									ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Challenge acknowledged: " + Challenge.Status.ToString(), false, "User");
 
-								Acknowledged = true;
+									Acknowledged = true;
+								}
 							}
 						}
 
@@ -646,7 +846,7 @@ namespace Waher.IoTGateway.Setup
 						do
 						{
 							ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Waiting to poll authorization status.", false, "User");
-                            await Task.Delay(5000);
+							await Task.Delay(5000);
 
 							ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Polling authorization.", false, "User");
 							Authorization2 = await Authorization2.Poll();

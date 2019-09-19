@@ -5,6 +5,7 @@ Author: Peter Waher
 Copyright: /Copyright.md
 Master: {{(Configuring:=Waher.IoTGateway.Gateway.Configuring) ? "Master.md" : "/Master.md"}}
 JavaScript: /Events.js
+JavaScript: /Calculator.js
 JavaScript: /Settings/Domain.js
 JavaScript: /Settings/XMPP.js
 JavaScript: /Settings/Next.js
@@ -54,6 +55,54 @@ machine where the application is running. If you don't use a domain name, you ca
 <input id="AltDomainName" name="AltDomainName" type="text" style="width:20em" title="Alternative domain name used to identify the machine."/>
 <button type="button" class="posButtonSm" onclick="AddAltDomainName()">Add</button>
 </p>
+
+If your network provider does not provide you with a stable public IP address, you need to dynamically update your IP address entries in the
+DNS every time you get a new IP address. This can be automated if the network provider supports a Dynamic DNS service.
+
+<p>
+<input type="checkbox" name="DynamicDns" id="DynamicDns" {{Config.DynamicDns ? "checked" : ""}} onclick="ToggleDynamicDnsProperties()"/>
+<label for="DynamicDns" title="If a Dynamic DNS service should be used.">Enable Dynamic DNS.</label>
+</p>
+
+<div id="DynDnsProperties" style="display:{{Config.DynamicDns ? "block" : "none"}}">
+
+<p>
+<label for="DynDnsTemplate">DynDNS Service Template:</label>  
+<select id="DynDnsTemplate" name="DynDnsTemplate" style="width:auto" onchange="TemplateChanged(this)">
+<option value=""></option>
+<option value="LoopiaSe">Loopia.se</option>
+</select>
+</p>
+
+<label for="CheckIpScript">[Script](https://waher.se/Script.md) returning the current IP Address:</label>  
+<textarea id="CheckIpScript" autofocus="autofocus" wrap="hard" onkeydown="return DynamicDnsScriptUpdated(this,event);">{Config.CheckIpScript}</textarea>
+
+<label for="UpdateIpScript">[Script](https://waher.se/Script.md) updating an IP Address in the DNS:</label>  
+<textarea id="UpdateIpScript" autofocus="autofocus" wrap="hard" onkeydown="return DynamicDnsScriptUpdated(this,event);">{Config.UpdateIpScript}</textarea>
+
+**Note**: During the execution of the update script, the following variables are available: `Account` and `Password` contain the account
+name and password parameters provided below. The `IP` variable contains the current IP address, as a string. The `Domain` variable
+contains the domain name that is to be updated.
+
+<p>
+<label for="DynDnsAccount">Dynamic DNS Account:</label>  
+<input id="DynDnsAccount" name="DynDnsAccount" type="text" style="width:20em" title="Account Name in the Dynamic DNS service." 
+	value="{{Config.DynDnsAccount}}"/>
+</p>
+
+<p>
+<label for="DynDnsPassword">Dynamic DNS Password:</label>  
+<input id="DynDnsPassword" name="DynDnsPassword" type="password" style="width:20em" title="Password for the Dynamic DNS account." 
+	value="{{Config.DynDnsPassword}}"/>
+</p>
+
+<p>
+<label for="DynDnsInterval">Dynamic DNS Interval (seconds):</label>  
+<input id="DynDnsInterval" name="DynDnsInterval" type="number" style="width:10em" title="Interval (in seconds) for checking if the IP address has changed. Make sure to keep the interval within the span recommended by the provider." 
+	min="60" max="86400" step="1" value="{{Config.DynDnsInterval}}"/>
+</p>
+
+</div>
 
 <p>Press the Test button to test the domain name.</p>
 <p id="TestError" class="error" style="display:none">Unable to connect to and validate domain name <b id="InvalidDomainName"></b>. Please verify it is correct, and try again.</p>

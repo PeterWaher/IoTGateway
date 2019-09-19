@@ -132,6 +132,8 @@ namespace Waher.IoTGateway
 		private static SoftwareUpdateClient softwareUpdateClient = null;
 		private static MailClient mailClient = null;
 		private static X509Certificate2 certificate = null;
+		private static DateTime checkCertificate = DateTime.MinValue;
+		private static DateTime checkIp = DateTime.MinValue;
 		private static HttpServer webServer = null;
 		private static HttpxProxy httpxProxy = null;
 		private static HttpxServer httpxServer = null;
@@ -1083,19 +1085,47 @@ namespace Waher.IoTGateway
 			return Task.CompletedTask;
 		}
 
-		internal static Task ConfigureDomain(DomainConfiguration Configuration)
+		internal static async Task ConfigureDomain(DomainConfiguration Configuration)
 		{
 			domain = Configuration.Domain;
 
-			if (Configuration.UseDomainName && Configuration.UseEncryption && Configuration.Certificate != null && Configuration.PrivateKey != null)
+			if (Configuration.UseDomainName)
 			{
-				UpdateCertificate(Configuration);
-				scheduler.Add(DateTime.Now.AddHours(0.5 + NextDouble()), CheckCertificate, Configuration);
+				if (Configuration.DynamicDns)
+				{
+					await Configuration.CheckDynamicIp();
+
+					if (Configuration.DynDnsInterval > 0)
+					{
+						if (checkIp > DateTime.MinValue)
+						{
+							scheduler.Remove(checkIp);
+							checkIp = DateTime.MinValue;
+						}
+
+						checkIp = scheduler.Add(DateTime.Now.AddSeconds(Configuration.DynDnsInterval), CheckIp, Configuration);
+					}
+				}
+
+				if (Configuration.UseEncryption &&
+					Configuration.Certificate != null &&
+					Configuration.PrivateKey != null)
+				{
+					UpdateCertificate(Configuration);
+
+					if (checkCertificate > DateTime.MinValue)
+					{
+						scheduler.Remove(checkCertificate);
+						checkCertificate = DateTime.MinValue;
+					}
+
+					checkCertificate = scheduler.Add(DateTime.Now.AddHours(0.5 + NextDouble()), CheckCertificate, Configuration);
+				}
+				else
+					certificate = null;
 			}
 			else
 				certificate = null;
-
-			return Task.CompletedTask;
 		}
 
 		internal static bool UpdateCertificate(DomainConfiguration Configuration)
@@ -1182,7 +1212,7 @@ namespace Waher.IoTGateway
 			}
 			finally
 			{
-				scheduler.Add(DateTime.Now.AddDays(0.5 + NextDouble()), CheckCertificate, Configuration);
+				checkCertificate = scheduler.Add(DateTime.Now.AddDays(0.5 + NextDouble()), CheckCertificate, Configuration);
 			}
 		}
 
@@ -1190,6 +1220,24 @@ namespace Waher.IoTGateway
 		/// Event raised when a new server certificate has been generated.
 		/// </summary>
 		public static event CertificateEventHandler OnNewCertificate = null;
+
+		private static async void CheckIp(object P)
+		{
+			DomainConfiguration Configuration = (DomainConfiguration)P;
+
+			try
+			{
+				await Configuration.CheckDynamicIp();
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+			}
+			finally
+			{
+				checkIp = scheduler.Add(DateTime.Now.AddSeconds(Configuration.DynDnsInterval), CheckIp, Configuration);
+			}
+		}
 
 		private static async void DeleteOldDataSourceEvents(object P)
 		{

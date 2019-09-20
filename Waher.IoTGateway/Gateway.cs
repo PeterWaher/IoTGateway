@@ -1406,6 +1406,26 @@ namespace Waher.IoTGateway
 				gatewayRunning?.Dispose();
 				gatewayRunning = null;
 
+				if (!(configurations is null))
+				{
+					foreach (SystemConfiguration Configuration in configurations)
+					{
+						if (Configuration is IDisposable D)
+						{
+							try
+							{
+								D.Dispose();
+							}
+							catch (Exception ex)
+							{
+								Log.Critical(ex);
+							}
+						}
+					}
+
+					configurations = null;
+				}
+
 				ibbClient?.Dispose();
 				ibbClient = null;
 

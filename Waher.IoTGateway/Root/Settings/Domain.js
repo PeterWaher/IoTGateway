@@ -282,6 +282,13 @@ function TemplateChanged(Control)
 
 	switch (Control.value)
 	{
+		case "DynDnsOrg":
+			IpScript = "Html:=HttpGet(\"https://checkip.dyndns.com/\",{\"Accept\":\"text/html\",\"User-Agent\":\"Waher.IoTGateway\"});\r\n" +
+				"s:=Html.Body.InnerHtml;\r\n" +
+				"s like \"[^0-9]*(?'IP'\\\\d+[.]\\\\d+[.]\\\\d+[.]\\\\d+)\" ? IP : \"\"";
+			UpdateScript = "Html:=HttpGet(\"https://members.dyndns.org/nic/update?hostname=\"+Domain+\"&myip=\"+IP,{\"Accept\":\"text/html\",\"User-Agent\":\"Waher.IoTGateway\",\"Authorization\":\"Basic \"+Base64Encode(Encode(Account+\":\"+Password)[0])})";
+			break;
+
 		case "LoopiaSe":
 			IpScript = "Html:=HttpGet(\"https://dyndns.loopia.se/checkip\",{\"Accept\":\"text/html\",\"User-Agent\":\"Waher.IoTGateway\"});\r\n" +
 				"s:=Html.Body.InnerHtml;\r\n" +

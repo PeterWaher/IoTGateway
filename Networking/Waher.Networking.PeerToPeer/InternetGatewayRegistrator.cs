@@ -236,33 +236,38 @@ namespace Waher.Networking.PeerToPeer
 
 				try
 				{
+					string LocalAddress = LocalEndPoint.Address.ToString();
+
 					while (true)
 					{
 						this.serviceWANIPConnectionV1.GetGenericPortMappingEntry(PortMappingIndex, out string NewRemoteHost,
 							out ushort NewExternalPort, out string NewProtocol, out ushort NewInternalPort, out string NewInternalClient,
 							out bool NewEnabled, out string NewPortMappingDescription, out uint NewLeaseDuration);
 
+						if (NewInternalClient != LocalAddress)
+						{
+							PortMappingIndex++;
+							continue;
+						}
+
 						bool Found = false;
 
 						foreach (InternetGatewayRegistration Registration in this.ports)
 						{
-							if (NewPortMappingDescription == Registration.ApplicationName &&
-								NewInternalClient == LocalEndPoint.Address.ToString())
+							if ((Registration.ExternalPort != 0 && NewExternalPort == Registration.ExternalPort) ||
+								(Registration.ExternalPort == 0 && NewPortMappingDescription == Registration.ApplicationName))
 							{
-								if (NewExternalPort == Registration.ExternalPort && Registration.ExternalPort != 0)
+								if (NewProtocol == "TCP")
 								{
-									if (NewProtocol == "TCP")
-									{
-										Found = true;
-										Registration.TcpRegistered = true;
-										break;
-									}
-									else if (NewProtocol == "UDP")
-									{
-										Found = true;
-										Registration.UdpRegistered = true;
-										break;
-									}
+									Found = true;
+									Registration.TcpRegistered = true;
+									break;
+								}
+								else if (NewProtocol == "UDP")
+								{
+									Found = true;
+									Registration.UdpRegistered = true;
+									break;
 								}
 
 								Log.Notice("Deleting Internet Gateway port mapping.",
@@ -331,10 +336,22 @@ namespace Waher.Networking.PeerToPeer
 							new KeyValuePair<string, object>("Local Address", LocalAddress.ToString()),
 							new KeyValuePair<string, object>("Application", Registration.ApplicationName));
 
-						this.serviceWANIPConnectionV1.AddPortMapping(string.Empty, Registration.ExternalPort,
-							"TCP", Registration.LocalPort, LocalAddress.ToString(), true, Registration.ApplicationName, 0);
+						try
+						{
+							this.serviceWANIPConnectionV1.AddPortMapping(string.Empty, Registration.ExternalPort,
+								"TCP", Registration.LocalPort, LocalAddress.ToString(), true, Registration.ApplicationName, 0);
 
-						Registration.TcpRegistered = true;
+							Registration.TcpRegistered = true;
+						}
+						catch (Exception ex)
+						{
+							Log.Error("Unable to register port in Internet Gateway: " + ex.Message,
+								new KeyValuePair<string, object>("External Port", Registration.ExternalPort),
+								new KeyValuePair<string, object>("Protocol", "TCP"),
+								new KeyValuePair<string, object>("Local Port", Registration.LocalPort),
+								new KeyValuePair<string, object>("Local Address", LocalAddress.ToString()),
+								new KeyValuePair<string, object>("Application", Registration.ApplicationName));
+						}
 					}
 
 					if (Registration.Udp && !Registration.UdpRegistered)
@@ -347,10 +364,22 @@ namespace Waher.Networking.PeerToPeer
 							new KeyValuePair<string, object>("Local Address", LocalAddress.ToString()),
 							new KeyValuePair<string, object>("Application", Registration.ApplicationName));
 
-						this.serviceWANIPConnectionV1.AddPortMapping(string.Empty, Registration.ExternalPort,
-							"UDP", Registration.LocalPort, LocalAddress.ToString(), true, Registration.ApplicationName, 0);
+						try
+						{
+							this.serviceWANIPConnectionV1.AddPortMapping(string.Empty, Registration.ExternalPort,
+								"UDP", Registration.LocalPort, LocalAddress.ToString(), true, Registration.ApplicationName, 0);
 
-						Registration.UdpRegistered = true;
+							Registration.UdpRegistered = true;
+						}
+						catch (Exception ex)
+						{
+							Log.Error("Unable to register port in Internet Gateway: " + ex.Message,
+								new KeyValuePair<string, object>("External Port", Registration.ExternalPort),
+								new KeyValuePair<string, object>("Protocol", "UDP"),
+								new KeyValuePair<string, object>("Local Port", Registration.LocalPort),
+								new KeyValuePair<string, object>("Local Address", LocalAddress.ToString()),
+								new KeyValuePair<string, object>("Application", Registration.ApplicationName));
+						}
 					}
 				}
 
@@ -358,6 +387,8 @@ namespace Waher.Networking.PeerToPeer
 			}
 			catch (Exception ex)
 			{
+				Log.Error(ex.Message);
+
 				this.exception = ex;
 				this.State = PeerToPeerNetworkState.Error;
 			}

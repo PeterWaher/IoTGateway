@@ -1776,9 +1776,7 @@ namespace Waher.IoTGateway
 				return LoginResult.InvalidLogin;
 			}
 
-			ManualResetEvent Done = new ManualResetEvent(false);
-			ManualResetEvent Error = new ManualResetEvent(false);
-			int Result = -1;
+			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
 			string PasswordHash;
 			string PasswordHashMethod;
 			bool Connected = false;
@@ -1801,51 +1799,53 @@ namespace Waher.IoTGateway
 							break;
 
 						case XmppState.Binding:
-							Done.Set();
+							Result.TrySetResult(true);
 							break;
 
 						case XmppState.Error:
-							Error.Set();
+							Result.TrySetResult(false);
 							break;
 					}
 				};
 
+				scheduler.Add(DateTime.Now.AddSeconds(10), (P) => Result.TrySetResult(false), null);
+
 				Client.Connect();
 
-				await Task.Run(() => Result = WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 10000));
-
-				if (XmppConfiguration.Instance.StorePasswordInsteadOfHash)
+				if (await Result.Task)
 				{
-					PasswordHash = Password;
-					PasswordHashMethod = string.Empty;
-				}
-				else
-				{
-					PasswordHash = Client.PasswordHash;
-					PasswordHashMethod = Client.PasswordHashMethod;
-				}
-			}
-
-			if (Result != 0)
-			{
-				if (Connected)
-				{
-					Log.Notice("Invalid login.", UserName, RemoteEndPoint, "LoginFailure", EventLevel.Minor);
-					return LoginResult.InvalidLogin;
-				}
-				else
-				{
-					if ((RemoteEndPoint.StartsWith("[::1]:") || RemoteEndPoint.StartsWith("127.0.0.1:")) &&
-						UserName == xmppCredentials.Account && Password == xmppCredentials.Password &&
-						string.IsNullOrEmpty(xmppCredentials.PasswordType))
+					if (XmppConfiguration.Instance.StorePasswordInsteadOfHash)
 					{
-						Log.Notice("Successful login. Connection to XMPP broker down. Credentials matched configuration and connection made from same machine.", UserName, RemoteEndPoint, "Login", EventLevel.Minor);
-						return LoginResult.Successful;
+						PasswordHash = Password;
+						PasswordHashMethod = string.Empty;
 					}
 					else
 					{
-						Log.Notice("Unable to connect to XMPP broker.", UserName, RemoteEndPoint, "LoginFailure", EventLevel.Minor);
-						return LoginResult.UnableToConnect;
+						PasswordHash = Client.PasswordHash;
+						PasswordHashMethod = Client.PasswordHashMethod;
+					}
+				}
+				else
+				{
+					if (Connected)
+					{
+						Log.Notice("Invalid login.", UserName, RemoteEndPoint, "LoginFailure", EventLevel.Minor);
+						return LoginResult.InvalidLogin;
+					}
+					else
+					{
+						if ((RemoteEndPoint.StartsWith("[::1]:") || RemoteEndPoint.StartsWith("127.0.0.1:")) &&
+							UserName == xmppCredentials.Account && Password == xmppCredentials.Password &&
+							string.IsNullOrEmpty(xmppCredentials.PasswordType))
+						{
+							Log.Notice("Successful login. Connection to XMPP broker down. Credentials matched configuration and connection made from same machine.", UserName, RemoteEndPoint, "Login", EventLevel.Minor);
+							return LoginResult.Successful;
+						}
+						else
+						{
+							Log.Notice("Unable to connect to XMPP broker.", UserName, RemoteEndPoint, "LoginFailure", EventLevel.Minor);
+							return LoginResult.UnableToConnect;
+						}
 					}
 				}
 			}

@@ -44,6 +44,7 @@ namespace Waher.IoTGateway.Setup
 		private string urlToS = string.Empty;
 		private string password = string.Empty;
 		private string openSslPath = string.Empty;
+		private string dynDnsTemplate = string.Empty;
 		private string checkIpScript = string.Empty;
 		private string updateIpScript = string.Empty;
 		private string dynDnsAccount = string.Empty;
@@ -214,6 +215,16 @@ namespace Waher.IoTGateway.Setup
 		}
 
 		/// <summary>
+		/// Dynamic DNS Template
+		/// </summary>
+		[DefaultValueStringEmpty]
+		public string DynDnsTemplate
+		{
+			get { return this.dynDnsTemplate; }
+			set { this.dynDnsTemplate = value; }
+		}
+
+		/// <summary>
 		/// Script to use to evaluate the current IP Address.
 		/// </summary>
 		[DefaultValueStringEmpty]
@@ -346,6 +357,7 @@ namespace Waher.IoTGateway.Setup
 
 			if (!Parameters.TryGetValue("domainName", out Obj) || !(Obj is string DomainName) ||
 				!Parameters.TryGetValue("dynamicDns", out Obj) || !(Obj is bool DynamicDns) ||
+				!Parameters.TryGetValue("dynDnsTemplate", out Obj) || !(Obj is string DynDnsTemplate) ||
 				!Parameters.TryGetValue("checkIpScript", out Obj) || !(Obj is string CheckIpScript) ||
 				!Parameters.TryGetValue("updateIpScript", out Obj) || !(Obj is string UpdateIpScript) ||
 				!Parameters.TryGetValue("dynDnsAccount", out Obj) || !(Obj is string DynDnsAccount) ||
@@ -372,6 +384,7 @@ namespace Waher.IoTGateway.Setup
 				throw new BadRequestException();
 
 			this.dynamicDns = DynamicDns;
+			this.dynDnsTemplate = DynDnsTemplate;
 			this.checkIpScript = CheckIpScript;
 			this.updateIpScript = UpdateIpScript;
 			this.dynDnsAccount = DynDnsAccount;
@@ -504,22 +517,24 @@ namespace Waher.IoTGateway.Setup
 
 			ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Current IP Address: " + CurrentIP, false, "User");
 
-			string LastIP = await RuntimeSettings.GetAsync("Last.IP", string.Empty);
+			string LastIP = await RuntimeSettings.GetAsync("Last.IP." + DomainName, string.Empty);
 
 			if (LastIP == CurrentIP)
-				ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "IP Address has not changed.", false, "User");
+				ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "IP Address has not changed for " + DomainName + ".", false, "User");
 			else
 			{
 				try
 				{
+					ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Updating IP address for " + DomainName + " to " + CurrentIP + ".", false, "User");
+
 					Variables["Account"] = this.dynDnsAccount;
 					Variables["Password"] = this.dynDnsPassword;
 					Variables["IP"] = CurrentIP;
 					Variables["Domain"] = DomainName;
 
-					Result = CheckIpScript.Evaluate(Variables);
+					Result = UpdateIpScript.Evaluate(Variables);
 
-					await RuntimeSettings.SetAsync("Last.IP", CurrentIP);
+					await RuntimeSettings.SetAsync("Last.IP." + DomainName, CurrentIP);
 				}
 				catch (Exception ex)
 				{
@@ -608,6 +623,7 @@ namespace Waher.IoTGateway.Setup
 
 			if (!Parameters.TryGetValue("domainName", out Obj) || !(Obj is string DomainName) ||
 				!Parameters.TryGetValue("dynamicDns", out Obj) || !(Obj is bool DynamicDns) ||
+				!Parameters.TryGetValue("dynDnsTemplate", out Obj) || !(Obj is string DynDnsTemplate) ||
 				!Parameters.TryGetValue("checkIpScript", out Obj) || !(Obj is string CheckIpScript) ||
 				!Parameters.TryGetValue("updateIpScript", out Obj) || !(Obj is string UpdateIpScript) ||
 				!Parameters.TryGetValue("dynDnsAccount", out Obj) || !(Obj is string DynDnsAccount) ||
@@ -632,6 +648,7 @@ namespace Waher.IoTGateway.Setup
 				throw new BadRequestException();
 
 			this.dynamicDns = DynamicDns;
+			this.dynDnsTemplate = DynDnsTemplate;
 			this.checkIpScript = CheckIpScript;
 			this.updateIpScript = UpdateIpScript;
 			this.dynDnsAccount = DynDnsAccount;

@@ -135,6 +135,7 @@ function GetDomainNamesReq()
     var Req =
 	{
 		"dynamicDns": document.getElementById("DynamicDns").checked,
+		"dynDnsTemplate": document.getElementById("DynDnsTemplate").value,
 		"checkIpScript": document.getElementById("CheckIpScript").value,
 		"updateIpScript": document.getElementById("UpdateIpScript").value,
 		"dynDnsAccount": document.getElementById("DynDnsAccount").value,
@@ -285,7 +286,7 @@ function TemplateChanged(Control)
 			IpScript = "Html:=HttpGet(\"https://dyndns.loopia.se/checkip\",{\"Accept\":\"text/html\",\"User-Agent\":\"Waher.IoTGateway\"});\r\n" +
 				"s:=Html.Body.InnerHtml;\r\n" +
 				"s like \"[^0-9]*(?'IP'\\\\d+[.]\\\\d+[.]\\\\d+[.]\\\\d+)\" ? IP : \"\"";
-			UpdateScript = "Html:=HttpGet(\"https://dyndns.loopia.se/?system=custom&hostname=\"+Domain+\"&myip=\"+IP,{\"Accept\":\"text/html\",\"User-Agent\":\"Waher.IoTGateway\",\"Authorization\":\"Basic \"+Base64Encode(Encode(UserName+\":\"+Password)[0])})";
+			UpdateScript = "Html:=HttpGet(\"https://dyndns.loopia.se/?system=custom&hostname=\"+Domain+\"&myip=\"+IP,{\"Accept\":\"text/html\",\"User-Agent\":\"Waher.IoTGateway\",\"Authorization\":\"Basic \"+Base64Encode(Encode(Account+\":\"+Password)[0])})";
 			break;
 
 		default:

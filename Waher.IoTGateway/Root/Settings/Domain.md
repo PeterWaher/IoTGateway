@@ -70,7 +70,7 @@ DNS every time you get a new IP address. This can be automated if the network pr
 <label for="DynDnsTemplate">DynDNS Service Template:</label>  
 <select id="DynDnsTemplate" name="DynDnsTemplate" style="width:auto" onchange="TemplateChanged(this)">
 <option value=""></option>
-<option value="LoopiaSe">Loopia.se</option>
+<option value="LoopiaSe"{{(Template:=Config.DynDnsTemplate)="LoopiaSe"?" selected":""}}>Loopia.se</option>
 </select>
 </p>
 

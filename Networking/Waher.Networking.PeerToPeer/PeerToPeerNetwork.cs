@@ -306,8 +306,10 @@ namespace Waher.Networking.PeerToPeer
 		/// is called before performing a registration.
 		/// </summary>
 		/// <param name="Registration">Registration to be performed.</param>
-		protected override void BeforeRegistration(InternetGatewayRegistration Registration, Dictionary<ushort, bool> TcpPortMapped, 
-			Dictionary<ushort, bool> UdpPortMapped)
+		/// <param name="TcpPortMapped">What TCP Ports are already mapped.</param>
+		/// <param name="UdpPortMapped">What UDP Ports are already mapped.</param>
+		protected override void BeforeRegistration(InternetGatewayRegistration Registration, 
+			Dictionary<ushort, bool> TcpPortMapped, Dictionary<ushort, bool> UdpPortMapped)
 		{
 			try
 			{

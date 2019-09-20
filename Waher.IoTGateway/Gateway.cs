@@ -1608,6 +1608,23 @@ namespace Waher.IoTGateway
 		}
 
 		/// <summary>
+		/// Gets the protocol names defined in the configuration file.
+		/// </summary>
+		/// <returns>Defined protocol names.</returns>
+		public static string[] GetProtocols()
+		{
+			SortedDictionary<string, bool> Protocols = new SortedDictionary<string, bool>();
+
+			foreach (KeyValuePair<string, int> P in ports)
+				Protocols[P.Key] = true;
+
+			string[] Result = new string[Protocols.Count];
+			Protocols.Keys.CopyTo(Result, 0);
+
+			return Result;
+		}
+
+		/// <summary>
 		/// Raises the <see cref="OnTerminate"/> event handler, letting the container executable know the application
 		/// needs to close.
 		/// </summary>

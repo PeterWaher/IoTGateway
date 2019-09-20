@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Text;
 
 namespace Waher.Networking.PeerToPeer
 {
@@ -43,5 +41,27 @@ namespace Waher.Networking.PeerToPeer
 		/// If UDP has been registered.
 		/// </summary>
 		internal bool UdpRegistered = false;
+
+		/// <summary>
+		/// <see cref="object.ToString()"/>
+		/// </summary>
+		public override string ToString()
+		{
+			StringBuilder sb = new StringBuilder();
+
+			sb.Append(this.ApplicationName);
+			sb.Append(", Local: ");
+			sb.Append(this.LocalPort);
+			sb.Append(", External: ");
+			sb.Append(this.ExternalPort);
+
+			if (this.Tcp)
+				sb.Append(", TCP");
+
+			if (this.Udp)
+				sb.Append(", UDP");
+
+			return sb.ToString();
+		}
 	}
 }

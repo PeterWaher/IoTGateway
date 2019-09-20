@@ -562,6 +562,20 @@ namespace Waher.IoTGateway.Setup
 			{
 				try
 				{
+					StringBuilder Url = new StringBuilder();
+					int[] HttpPorts = Gateway.GetConfigPorts("HTTP");
+
+					Url.Append("http://");
+					Url.Append(DomainName);
+
+					if (Array.IndexOf<int>(HttpPorts, 80) < 0 && HttpPorts.Length > 0)
+					{
+						Url.Append(':');
+						Url.Append(HttpPorts[0].ToString());
+					}
+
+					Url.Append("/Settings/TestDomainName");
+
 					HttpResponseMessage Response = await HttpClient.GetAsync("http://" + DomainName + "/Settings/TestDomainName");
 					if (!Response.IsSuccessStatusCode)
 					{

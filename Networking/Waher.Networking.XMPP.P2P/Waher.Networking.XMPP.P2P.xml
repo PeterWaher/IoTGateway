@@ -2761,7 +2761,7 @@
             <param name="FullJid">Bare JID of local end-point.</param>
             <param name="Sniffers">Sniffers</param>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.XmppServerlessMessaging.#ctor(System.String,System.String,System.Int32,System.Int32,Waher.Networking.Sniffers.ISniffer[])">
+        <member name="M:Waher.Networking.XMPP.P2P.XmppServerlessMessaging.#ctor(System.String,System.String,System.UInt16,System.UInt16,Waher.Networking.Sniffers.ISniffer[])">
             <summary>
             Class managing peer-to-peer serveless XMPP communication.
             </summary>
@@ -2771,7 +2771,7 @@
             <param name="ExternalPort">Desired external port number. If 0, a dynamic port number will be assigned.</param>
             <param name="Sniffers">Sniffers</param>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.XmppServerlessMessaging.#ctor(System.String,System.String,System.Int32,System.Int32,System.Int32,Waher.Networking.Sniffers.ISniffer[])">
+        <member name="M:Waher.Networking.XMPP.P2P.XmppServerlessMessaging.#ctor(System.String,System.String,System.UInt16,System.UInt16,System.Int32,Waher.Networking.Sniffers.ISniffer[])">
             <summary>
             Class managing peer-to-peer serveless XMPP communication.
             </summary>

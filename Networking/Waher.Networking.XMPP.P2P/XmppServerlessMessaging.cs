@@ -49,7 +49,7 @@ namespace Waher.Networking.XMPP.P2P
 		/// <param name="LocalPort">Desired local port number. If 0, a dynamic port number will be assigned.</param>
 		/// <param name="ExternalPort">Desired external port number. If 0, a dynamic port number will be assigned.</param>
 		/// <param name="Sniffers">Sniffers</param>
-		public XmppServerlessMessaging(string ApplicationName, string FullJid, int LocalPort, int ExternalPort, params ISniffer[] Sniffers)
+		public XmppServerlessMessaging(string ApplicationName, string FullJid, ushort LocalPort, ushort ExternalPort, params ISniffer[] Sniffers)
 			: this(ApplicationName, FullJid, LocalPort, ExternalPort, PeerToPeerNetwork.DefaultBacklog, Sniffers)
 		{
 		}
@@ -63,7 +63,7 @@ namespace Waher.Networking.XMPP.P2P
 		/// <param name="ExternalPort">Desired external port number. If 0, a dynamic port number will be assigned.</param>
 		/// <param name="Backlog">Connection backlog.</param>
 		/// <param name="Sniffers">Sniffers</param>
-		public XmppServerlessMessaging(string ApplicationName, string FullJid, int LocalPort, int ExternalPort, int Backlog,
+		public XmppServerlessMessaging(string ApplicationName, string FullJid, ushort LocalPort, ushort ExternalPort, int Backlog,
 			params ISniffer[] Sniffers)
 			: base(Sniffers)
 		{

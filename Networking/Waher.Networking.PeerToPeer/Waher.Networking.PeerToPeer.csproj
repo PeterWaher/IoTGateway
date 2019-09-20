@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
+﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
   <PropertyGroup>
     <TargetFramework>netstandard1.3</TargetFramework>
     <Authors>Peter Waher</Authors>
@@ -13,11 +13,11 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>networking communication peer-to-peer p2p multi-player</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.0.5</AssemblyVersion>
-    <FileVersion>1.0.5</FileVersion>
+    <AssemblyVersion>1.0.6</AssemblyVersion>
+    <FileVersion>1.0.6</FileVersion>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <Version>1.0.5</Version>
+    <Version>1.0.6</Version>
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Networking\Waher.Networking.PeerToPeer\</UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>

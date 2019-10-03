@@ -18,7 +18,7 @@
 			<dependency id="System.Net.WebSockets.Client" version="4.3.2"/>
 			<dependency id="Waher.Content" version="1.0.22"/>
 			<dependency id="Waher.Content.Xml" version="1.0.7"/>
-			<dependency id="Waher.Events" version="1.0.7"/>
+			<dependency id="Waher.Events" version="1.0.8"/>
 			<dependency id="Waher.Networking" version="1.0.13"/>
 			<dependency id="Waher.Networking.XMPP.UWP" version="1.0.42"/>
 			<dependency id="Waher.Runtime.Inventory" version="1.0.10"/>

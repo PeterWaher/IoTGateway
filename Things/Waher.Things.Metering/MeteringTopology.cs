@@ -33,7 +33,7 @@ namespace Waher.Things.Metering
 		/// </summary>
 		public const string SourceID = "MeteringTopology";
 
-		private static Dictionary<string, MeteringNode> nodes = new Dictionary<string, MeteringNode>();
+		private static readonly Dictionary<string, MeteringNode> nodes = new Dictionary<string, MeteringNode>();
 		private static Root root = null;
 		private static MeteringTopology instance = null;
 
@@ -86,7 +86,7 @@ namespace Waher.Things.Metering
 				if (lastChanged != value)
 				{
 					lastChanged = value;
-					Task T = RuntimeSettings.SetAsync("MeteringTopology.LastChanged", value);
+					Task _ = RuntimeSettings.SetAsync("MeteringTopology.LastChanged", value);
 				}
 			}
 		}

@@ -34,7 +34,7 @@ namespace Waher.Things.Metering
 		private NodeState state = NodeState.None;
 		private List<MeteringNode> children = null;
 		private bool childrenLoaded = false;
-		private object synchObject = new object();
+		private readonly object synchObject = new object();
 		private DateTime created = DateTime.Now;
 		private DateTime updated = DateTime.MinValue;
 		private ThingReference thingReference = null;
@@ -166,7 +166,6 @@ namespace Waher.Things.Metering
 		{
 			StringBuilder sb = new StringBuilder();
 			Language Language = Translator.GetDefaultLanguageAsync().Result;
-			string[] NoStrings = new string[0];
 
 			sb.Append(this.nodeId);
 			sb.Append(" (");

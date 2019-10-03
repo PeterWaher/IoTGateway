@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Translation xmlns="http://waher.se/Schema/Translation.xsd">
+	<Language code="en" name="English">
+		<Namespace name="Waher.Things.Mqtt">
+      <String id="1">MQTT Broker</String>
+			<String id="2">MQTT</String>
+			<String id="3">User Name:</String>
+			<String id="4">User name used during authentication process.</String>
+			<String id="5">Password:</String>
+			<String id="6">Password used during authentication process. NOTE: Will be sent in clear text. Don't reuse passwords.</String>
+			<String id="7">IP</String>
+			<String id="8">Encrypted (TLS)</String>
+			<String id="9">Check if Transpotrt Layer Encryption (TLS) should be used.</String>
+			<String id="10">Last Will and Testament</String>
+			<String id="11">Will Topic:</String>
+			<String id="12">When the connection is lost, a Last Will and Testament can be published on this topic to alert subscribers you've lost connection.</String>
+			<String id="13">Will Data:</String>
+			<String id="14">When the connection is lost, this content will be published on the topic defined above.</String>
+			<String id="15">Retain Will on topic.</String>
+			<String id="16">If the content published on the will should be retained on the topic.</String>
+			<String id="17">Quality of Service:</String>
+			<String id="18">The quality of service used when sending the last will and testament.</String>
+			<String id="19">At most once</String>
+			<String id="20">At least once</String>
+			<String id="21">Exactly once</String>
+			<String id="22">Local Topic:</String>
+			<String id="23">Local topic, unique among siblings.</String>
+			<String id="24">Topic</String>
+			<String id="25">Type</String>
+			<String id="26">Data Count</String>
+			<String id="27">Unable to reconnect to broker.</String>
+			<String id="28">Reconneting to broker.</String>
+			<String id="29">Reconnect</String>
+			<String id="30">State</String>
+			<String id="31">Binary</String>
+			<String id="32">Boolean</String>
+			<String id="33">Date and Time</String>
+			<String id="34">Time span</String>
+			<String id="35">Floating-point</String>
+			<String id="36">GUID</String>
+			<String id="37">Integer</String>
+			<String id="38">JSON</String>
+			<String id="39">Quantity</String>
+			<String id="40">String</String>
+			<String id="41">XML</String>
+			<String id="42">BASE-64</String>
+			<String id="43">HEX</String>
+			<String id="44"></String>
+			<String id="45"></String>
+			<String id="46"></String>
+			<String id="47"></String>
+			<String id="48"></String>
+			<String id="49"></String>
+			<String id="50"></String>
+			<String id="51"></String>
+			<String id="52"></String>
+			<String id="53"></String>
+			<String id="54"></String>
+			<String id="55"></String>
+			<String id="56"></String>
+			<String id="57"></String>
+			<String id="58"></String>
+			<String id="59"></String>
+		</Namespace>
+	</Language>
+</Translation>

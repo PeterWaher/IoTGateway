@@ -1,0 +1,177 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Waher.Things.Mqtt</name>
+    </assembly>
+    <members>
+        <member name="T:Waher.Things.Mqtt.Model.Encapsulations.Base64Data">
+            <summary>
+            Represents an MQTT topic with base64-encoded binary data.
+            </summary>
+        </member>
+        <member name="M:Waher.Things.Mqtt.Model.Encapsulations.Base64Data.#ctor(Waher.Things.Mqtt.Model.MqttTopic,System.Byte[])">
+            <summary>
+            Represents an MQTT topic with base64-encoded binary data.
+            </summary>
+        </member>
+        <member name="T:Waher.Things.Mqtt.Model.Encapsulations.BinaryData">
+            <summary>
+            Represents an MQTT topic with binary data.
+            </summary>
+        </member>
+        <member name="M:Waher.Things.Mqtt.Model.Encapsulations.BinaryData.#ctor(Waher.Things.Mqtt.Model.MqttTopic,System.Byte[])">
+            <summary>
+            Represents an MQTT topic with binary data.
+            </summary>
+        </member>
+        <member name="T:Waher.Things.Mqtt.Model.Encapsulations.BooleanData">
+            <summary>
+            Represents an MQTT topic with boolean data.
+            </summary>
+        </member>
+        <member name="M:Waher.Things.Mqtt.Model.Encapsulations.BooleanData.#ctor(Waher.Things.Mqtt.Model.MqttTopic,System.Boolean)">
+            <summary>
+            Represents an MQTT topic with boolean data.
+            </summary>
+        </member>
+        <!-- Badly formed XML comment ignored for member "T:Waher.Things.Mqtt.Model.Encapsulations.DateTimeData" -->
+        <!-- Badly formed XML comment ignored for member "M:Waher.Things.Mqtt.Model.Encapsulations.DateTimeData.#ctor(Waher.Things.Mqtt.Model.MqttTopic,System.DateTime)" -->
+        <!-- Badly formed XML comment ignored for member "T:Waher.Things.Mqtt.Model.Encapsulations.DateTimeOffsetData" -->
+        <!-- Badly formed XML comment ignored for member "M:Waher.Things.Mqtt.Model.Encapsulations.DateTimeOffsetData.#ctor(Waher.Things.Mqtt.Model.MqttTopic,System.DateTimeOffset)" -->
+        <member name="T:Waher.Things.Mqtt.Model.Encapsulations.DurationData">
+            <summary>
+            Represents an MQTT topic with Duration data.
+            </summary>
+        </member>
+        <member name="M:Waher.Things.Mqtt.Model.Encapsulations.DurationData.#ctor(Waher.Things.Mqtt.Model.MqttTopic,Waher.Content.Duration)">
+            <summary>
+            Represents an MQTT topic with Duration data.
+            </summary>
+        </member>
+        <member name="T:Waher.Things.Mqtt.Model.Encapsulations.FloatingPointData">
+            <summary>
+            Represents an MQTT topic with Floating-point data.
+            </summary>
+        </member>
+        <member name="M:Waher.Things.Mqtt.Model.Encapsulations.FloatingPointData.#ctor(Waher.Things.Mqtt.Model.MqttTopic,System.Double,System.Byte)">
+            <summary>
+            Represents an MQTT topic with Floating-point data.
+            </summary>
+        </member>
+        <member name="T:Waher.Things.Mqtt.Model.Encapsulations.GuidData">
+            <summary>
+            Represents an MQTT topic with GUID data.
+            </summary>
+        </member>
+        <member name="M:Waher.Things.Mqtt.Model.Encapsulations.GuidData.#ctor(Waher.Things.Mqtt.Model.MqttTopic,System.Guid)">
+            <summary>
+            Represents an MQTT topic with GUID data.
+            </summary>
+        </member>
+        <member name="T:Waher.Things.Mqtt.Model.Encapsulations.HexStringData">
+            <summary>
+            Represents an MQTT topic with binary data encoded as decimal strings.
+            </summary>
+        </member>
+        <member name="M:Waher.Things.Mqtt.Model.Encapsulations.HexStringData.#ctor(Waher.Things.Mqtt.Model.MqttTopic,System.Byte[])">
+            <summary>
+            Represents an MQTT topic with binary data encoded as decimal strings.
+            </summary>
+        </member>
+        <member name="T:Waher.Things.Mqtt.Model.Encapsulations.IntegerData">
+            <summary>
+            Represents an MQTT topic with integer data.
+            </summary>
+        </member>
+        <member name="M:Waher.Things.Mqtt.Model.Encapsulations.IntegerData.#ctor(Waher.Things.Mqtt.Model.MqttTopic,System.Int64)">
+            <summary>
+            Represents an MQTT topic with integer data.
+            </summary>
+        </member>
+        <member name="T:Waher.Things.Mqtt.Model.Encapsulations.JsonData">
+            <summary>
+            Represents an MQTT topic with JSON-encoded data.
+            </summary>
+        </member>
+        <member name="M:Waher.Things.Mqtt.Model.Encapsulations.JsonData.#ctor(Waher.Things.Mqtt.Model.MqttTopic,System.String,System.Object)">
+            <summary>
+            Represents an MQTT topic with JSON-encoded data.
+            </summary>
+        </member>
+        <member name="T:Waher.Things.Mqtt.Model.Encapsulations.QuantityData">
+            <summary>
+            Represents an MQTT topic with Physical Quantity data.
+            </summary>
+        </member>
+        <member name="M:Waher.Things.Mqtt.Model.Encapsulations.QuantityData.#ctor(Waher.Things.Mqtt.Model.MqttTopic,System.Double,System.Byte,System.String)">
+            <summary>
+            Represents an MQTT topic with Physical Quantity data.
+            </summary>
+        </member>
+        <member name="T:Waher.Things.Mqtt.Model.Encapsulations.StringData">
+            <summary>
+            Represents an MQTT topic with string data.
+            </summary>
+        </member>
+        <member name="M:Waher.Things.Mqtt.Model.Encapsulations.StringData.#ctor(Waher.Things.Mqtt.Model.MqttTopic,System.String)">
+            <summary>
+            Represents an MQTT topic with string data.
+            </summary>
+        </member>
+        <member name="T:Waher.Things.Mqtt.Model.Encapsulations.TimeSpanData">
+            <summary>
+            Represents an MQTT topic with time span data.
+            </summary>
+        </member>
+        <member name="M:Waher.Things.Mqtt.Model.Encapsulations.TimeSpanData.#ctor(Waher.Things.Mqtt.Model.MqttTopic,System.TimeSpan)">
+            <summary>
+            Represents an MQTT topic with time span data.
+            </summary>
+        </member>
+        <member name="T:Waher.Things.Mqtt.Model.Encapsulations.XmlData">
+            <summary>
+            Represents an MQTT topic with XML data.
+            </summary>
+        </member>
+        <member name="M:Waher.Things.Mqtt.Model.Encapsulations.XmlData.#ctor(Waher.Things.Mqtt.Model.MqttTopic,System.String,System.Xml.XmlDocument)">
+            <summary>
+            Represents an MQTT topic with XML data.
+            </summary>
+        </member>
+        <member name="P:Waher.Things.Mqtt.Model.MqttBroker.Scheduler">
+            <summary>
+            Scheduler for asynchronous tasks.
+            </summary>
+        </member>
+        <member name="M:Waher.Things.Mqtt.MqttBrokerNode.Add(Waher.Networking.Sniffers.ISniffer)">
+            <summary>
+            <see cref="M:Waher.Networking.Sniffers.ISniffable.Add(Waher.Networking.Sniffers.ISniffer)"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Things.Mqtt.MqttBrokerNode.AddRange(System.Collections.Generic.IEnumerable{Waher.Networking.Sniffers.ISniffer})">
+            <summary>
+            <see cref="M:Waher.Networking.Sniffers.ISniffable.AddRange(System.Collections.Generic.IEnumerable{Waher.Networking.Sniffers.ISniffer})"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Things.Mqtt.MqttBrokerNode.Remove(Waher.Networking.Sniffers.ISniffer)">
+            <summary>
+            <see cref="M:Waher.Networking.Sniffers.ISniffable.Remove(Waher.Networking.Sniffers.ISniffer)"/>
+            </summary>
+        </member>
+        <member name="P:Waher.Things.Mqtt.MqttBrokerNode.Sniffers">
+            <summary>
+            Registered sniffers.
+            </summary>
+        </member>
+        <member name="P:Waher.Things.Mqtt.MqttBrokerNode.HasSniffers">
+            <summary>
+            If there are sniffers registered on the object.
+            </summary>
+        </member>
+        <member name="M:Waher.Things.Mqtt.MqttBrokerNode.GetEnumerator">
+            <summary>
+            <see cref="!:ISniffable.GetEnumerator"/>
+            </summary>
+        </member>
+    </members>
+</doc>

@@ -1,27 +1,7 @@
 ﻿using System;
 using System.Reflection;
-using System.Collections.Generic;
-using System.IO;
-using System.IO.Compression;
-using System.Text;
-using System.Xml;
-using System.Xml.Xsl;
-using System.Security.Cryptography;
 using System.Threading.Tasks;
-using Waher.IoTGateway.WebResources.ExportFormats;
-using Waher.Content;
-using Waher.Content.Xml;
-using Waher.Content.Xsl;
-using Waher.Events;
-using Waher.IoTGateway;
-using Waher.IoTGateway.Setup;
 using Waher.Networking.HTTP;
-using Waher.Networking.HTTP.HeaderFields;
-using Waher.Persistence;
-using Waher.Persistence.Files;
-using Waher.Persistence.Serialization;
-using Waher.Runtime.Inventory;
-using Waher.Script;
 using Waher.Runtime.Language;
 using Waher.IoTGateway.WebResources;
 
@@ -75,9 +55,6 @@ namespace Waher.IoTGateway.Setup
 			this.UpdateExportFolder(Export.FullExportFolder);
 			this.UpdateExportKeyFolder(Export.FullKeyExportFolder);
 
-			if (Gateway.InternalDatabase is FilesProvider FilesProvider)
-				FilesProvider.AutoRepairReportFolder = Export.FullExportFolder;
-
 			return Task.CompletedTask;
 		}
 
@@ -118,8 +95,8 @@ namespace Waher.IoTGateway.Setup
 			WebServer.Unregister(this.startExport);
 			WebServer.Unregister(this.startAnalyze);
 			WebServer.Unregister(this.deleteExport);
-			WebServer.Unregister(this.updateBackupSettings = new UpdateBackupSettings());
-			WebServer.Unregister(this.updateBackupFolderSettings = new UpdateBackupFolderSettings());
+			WebServer.Unregister(this.updateBackupSettings);
+			WebServer.Unregister(this.updateBackupFolderSettings);
 
 			return base.UnregisterSetup(WebServer);
 		}
@@ -129,8 +106,14 @@ namespace Waher.IoTGateway.Setup
 			if (this.exportFolder != null)
 				this.exportFolder.FolderPath = Folder;
 
-			if (Gateway.InternalDatabase is FilesProvider FilesProvider)
-				FilesProvider.AutoRepairReportFolder = Folder;
+			if (!(Gateway.InternalDatabase is null))
+			{
+				Type T = Gateway.InternalDatabase.GetType();
+				PropertyInfo PI = T.GetProperty("AutoRepairReportFolder");
+
+				if (!(PI is null) && PI.PropertyType == typeof(string))
+					PI.SetValue(Gateway.InternalDatabase, Export.FullExportFolder, null);
+			}
 		}
 
 		internal void UpdateExportKeyFolder(string Folder)

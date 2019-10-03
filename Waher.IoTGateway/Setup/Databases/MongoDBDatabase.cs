@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Reflection;
 using System.Threading.Tasks;
-using MongoDB.Driver;
 using Waher.Networking.HTTP;
 using Waher.Persistence;
-using Waher.Persistence.MongoDB;
+using Waher.Runtime.Inventory;
 using Waher.Runtime.Language;
 
 namespace Waher.IoTGateway.Setup.Databases
@@ -49,26 +48,33 @@ namespace Waher.IoTGateway.Setup.Databases
 		{
 			if (Settings is MongoDBSettings MongoDBSettings)
 			{
-				MongoClientSettings MongoClientSettings = new MongoClientSettings()
-				{
-					ApplicationName = Gateway.ApplicationName
-				};
+				object MongoClientSettings = Types.CreateObject("MongoDB.Driver.MongoClientSettings");
+				Types.SetProperty(MongoClientSettings, "ApplicationName", Gateway.ApplicationName);
 
 				if (!string.IsNullOrEmpty(MongoDBSettings.Host))
 				{
+					object MongoServerAddress;
+
 					if (MongoDBSettings.Port.HasValue)
-						MongoClientSettings.Server = new MongoServerAddress(MongoDBSettings.Host, MongoDBSettings.Port.Value);
+						MongoServerAddress = Types.CreateObject("MongoDB.Driver.MongoServerAddress", MongoDBSettings.Host, MongoDBSettings.Port.Value);
 					else
-						MongoClientSettings.Server = new MongoServerAddress(MongoDBSettings.Host);
+						MongoServerAddress = Types.CreateObject("MongoDB.Driver.MongoServerAddress", MongoDBSettings.Host);
+
+					Types.SetProperty(MongoClientSettings, "Server", MongoServerAddress);
 				}
 
 				if (!string.IsNullOrEmpty(MongoDBSettings.UserName))
 				{
-					MongoClientSettings.Credential = MongoCredential.CreateCredential(MongoDBSettings.Database,
+					object MongoCredential = Types.CallStatic("MongoDB.Driver.MongoCredential", "CreateCredential", MongoDBSettings.Database,
 						MongoDBSettings.UserName, MongoDBSettings.Password);
+
+					Types.SetProperty(MongoClientSettings, "Credential", MongoCredential);
 				}
 
-				Database.Register(new MongoDBProvider(MongoClientSettings, MongoDBSettings.Database, MongoDBSettings.DefaultCollection), true);
+				IDatabaseProvider MongoDBProvider = Types.CreateObject("Waher.Persistence.MongoDB.MongoDBProvider", MongoClientSettings, 
+					MongoDBSettings.Database, MongoDBSettings.DefaultCollection) as IDatabaseProvider;
+
+				Database.Register(MongoDBProvider, true);
 			}
 
 			return Task.CompletedTask;
@@ -114,27 +120,37 @@ namespace Waher.IoTGateway.Setup.Databases
 			else
 				PortNumber = i;
 
-			MongoClientSettings MongoClientSettings = new MongoClientSettings()
-			{
-				ApplicationName = Gateway.ApplicationName,
-				ConnectTimeout = TimeSpan.FromSeconds(5)
-			};
+
+			object MongoClientSettings = Types.CreateObject("MongoDB.Driver.MongoClientSettings");
+			Types.SetProperty(MongoClientSettings, "ApplicationName", Gateway.ApplicationName);
+			Types.SetProperty(MongoClientSettings, "ConnectTimeout", TimeSpan.FromSeconds(5));
 
 			if (!string.IsNullOrEmpty(HostName))
 			{
+				object MongoServerAddress;
+
 				if (PortNumber.HasValue)
-					MongoClientSettings.Server = new MongoServerAddress(HostName, PortNumber.Value);
+					MongoServerAddress = Types.CreateObject("MongoDB.Driver.MongoServerAddress", HostName, PortNumber.Value);
 				else
-					MongoClientSettings.Server = new MongoServerAddress(HostName);
+					MongoServerAddress = Types.CreateObject("MongoDB.Driver.MongoServerAddress", HostName);
+
+				Types.SetProperty(MongoClientSettings, "Server", MongoServerAddress);
 			}
 
-			if (!string.IsNullOrEmpty(UserName))
-				MongoClientSettings.Credential = MongoCredential.CreateCredential(DatabaseName, UserName, Password);
+			if (!string.IsNullOrEmpty(MongoDBSettings.UserName))
+			{
+				object MongoCredential = Types.CallStatic("MongoDB.Driver.MongoCredential", "CreateCredential", 
+					DatabaseName, UserName, Password);
 
-			MongoClient Client = new MongoClient(MongoClientSettings);
+				Types.SetProperty(MongoClientSettings, "Credential", MongoCredential);
+			}
 
-			await Client.StartSessionAsync();
-			IMongoDatabase Database = Client.GetDatabase(DatabaseName);
+			object Client = Types.CreateObject("MongoDB.Driver.MongoClient", MongoClientSettings);
+
+			Task Task = Types.Call(Client, "StartSessionAsync") as Task;
+			await Task;
+
+			Types.Call(Client, "GetDatabase", DatabaseName);
 
 			if (Save)
 			{

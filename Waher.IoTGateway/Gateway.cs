@@ -410,10 +410,17 @@ namespace Waher.IoTGateway
 				if (DatabaseProvider is null)
 					throw new Exception("Database provider not defined in Gateway.config.");
 
-				if (DatabaseProvider is Persistence.Files.FilesProvider FilesProvider)
+				Type ProviderType = DatabaseProvider.GetType();
+				PropertyInfo AutoRepairReportFolder = ProviderType.GetProperty("AutoRepairReportFolder");
+				if (!(AutoRepairReportFolder is null))
+					AutoRepairReportFolder.SetValue(DatabaseProvider, Path.Combine(AppDataFolder, "Backup"));
+
+				MethodInfo MI = ProviderType.GetMethod("RepairIfInproperShutdown", new Type[] { typeof(string) });
+				if (!(MI is null))
 				{
-					FilesProvider.AutoRepairReportFolder = Path.Combine(AppDataFolder, "Backup");
-					await FilesProvider.RepairIfInproperShutdown(Gateway.AppDataFolder + "Transforms" + Path.DirectorySeparatorChar + "DbStatXmlToHtml.xslt");
+					T = MI.Invoke(DatabaseProvider, new object[] { Gateway.AppDataFolder + "Transforms" + Path.DirectorySeparatorChar + "DbStatXmlToHtml.xslt" }) as Task;
+					if (!(T is null))
+						await T;
 				}
 
 				PersistedEventLog PersistedEventLog = new PersistedEventLog(7, new TimeSpan(4, 15, 0));

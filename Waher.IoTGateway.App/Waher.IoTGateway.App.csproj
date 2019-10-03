@@ -368,6 +368,14 @@
       <Project>{47d09596-eb38-40a6-b233-e465e3152e44}</Project>
       <Name>Waher.Things.Metering</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Things\Waher.Things.Mqtt\Waher.Things.Mqtt.csproj">
+      <Project>{9e87e210-c942-4c80-b9c4-7a02c9bd3866}</Project>
+      <Name>Waher.Things.Mqtt</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Things\Waher.Things.Snmp\Waher.Things.Snmp.csproj">
+      <Project>{06182e88-8a31-4200-aa07-960c82e33133}</Project>
+      <Name>Waher.Things.Snmp</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Things\Waher.Things\Waher.Things.csproj">
       <Project>{1659833d-9a9a-4147-9237-2ba8d96086bc}</Project>
       <Name>Waher.Things</Name>

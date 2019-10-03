@@ -572,6 +572,8 @@
 							<File Id='Waher.Things.dll' Name='Waher.Things.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Things.dll' Vital='yes'/>
               <File Id='Waher.Things.IP.dll' Name='Waher.Things.IP.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Things.IP.dll' Vital='yes'/>
               <File Id='Waher.Things.Metering.dll' Name='Waher.Things.Metering.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Things.Metering.dll' Vital='yes'/>
+              <File Id='Waher.Things.Mqtt.dll' Name='Waher.Things.Mqtt.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Things.Mqtt.dll' Vital='yes'/>
+              <File Id='Waher.Things.Snmp.dll' Name='Waher.Things.Snmp.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Things.Snmp.dll' Vital='yes'/>
               <RemoveFile Id='RemoveWaher.Content.dll' Name='Waher.Content.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.Dsn.dll' Name='Waher.Content.Dsn.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.Html.dll' Name='Waher.Content.Html.dll' On='uninstall'/>
@@ -652,6 +654,8 @@
 							<RemoveFile Id='RemoveWaher.Things.dll' Name='Waher.Things.dll' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Things.IP.dll' Name='Waher.Things.IP.dll' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Things.Metering.dll' Name='Waher.Things.Metering.dll' On='uninstall'/>
+              <RemoveFile Id='RemoveWaher.Things.Mqtt.dll' Name='Waher.Things.Mqtt.dll' On='uninstall'/>
+              <RemoveFile Id='RemoveWaher.Things.Snmp.dll' Name='Waher.Things.Snmp.dll' On='uninstall'/>
             </Component>
             <Component Id='MainDebugFiles' Guid='C4322EF9-99EE-44E1-9CD3-B310719D3661'>
               <File Id='Waher.Content.pdb' Name='Waher.Content.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.pdb' Vital='yes'/>
@@ -726,6 +730,8 @@
               <File Id='Waher.Things.pdb' Name='Waher.Things.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Things.pdb' Vital='yes'/>
               <File Id='Waher.Things.IP.pdb' Name='Waher.Things.IP.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Things.IP.pdb' Vital='yes'/>
               <File Id='Waher.Things.Metering.pdb' Name='Waher.Things.Metering.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Things.Metering.pdb' Vital='yes'/>
+              <File Id='Waher.Things.Mqtt.pdb' Name='Waher.Things.Mqtt.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Things.Mqtt.pdb' Vital='yes'/>
+              <File Id='Waher.Things.Snmp.pdb' Name='Waher.Things.Snmp.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Things.Snmp.pdb' Vital='yes'/>
               <RemoveFile Id='RemoveWaher.Content.pdb' Name='Waher.Content.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.Dsn.pdb' Name='Waher.Content.Dsn.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.Html.pdb' Name='Waher.Content.Html.pdb' On='uninstall'/>
@@ -798,6 +804,8 @@
               <RemoveFile Id='RemoveWaher.Things.pdb' Name='Waher.Things.pdb' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Things.IP.pdb' Name='Waher.Things.IP.pdb' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Things.Metering.pdb' Name='Waher.Things.Metering.pdb' On='uninstall'/>
+              <RemoveFile Id='RemoveWaher.Things.Mqtt.pdb' Name='Waher.Things.Mqtt.pdb' On='uninstall'/>
+              <RemoveFile Id='RemoveWaher.Things.Snmp.pdb' Name='Waher.Things.Snmp.pdb' On='uninstall'/>
             </Component>
             <Component Id='ServerConfiguration' Guid='61FE76A1-088C-41F5-AF6A-EAB2DE5B13CE'>
               <File Id='Gateway.config' Name='Gateway.config' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Gateway.config' Vital='yes' KeyPath='yes'/>
@@ -1397,9 +1405,13 @@
               <File Id='Waher.Networking.XMPP.Concentrator.en.lng' Name='Waher.Networking.XMPP.Concentrator.en.lng' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Language\Waher.Networking.XMPP.Concentrator.en.lng' KeyPath='yes'/>
               <File Id='Waher.Things.IP.en.lng' Name='Waher.Things.IP.en.lng' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Language\Waher.Things.IP.en.lng'/>
               <File Id='Waher.Things.Metering.en.lng' Name='Waher.Things.Metering.en.lng' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Language\Waher.Things.Metering.en.lng'/>
+              <File Id='Waher.Things.Mqtt.en.lng' Name='Waher.Things.Mqtt.en.lng' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Language\Waher.Things.Mqtt.en.lng'/>
+              <File Id='Waher.Things.Snmp.en.lng' Name='Waher.Things.Snmp.en.lng' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Language\Waher.Things.Snmp.en.lng'/>
               <RemoveFile Id='RemoveWaher.Networking.XMPP.Concentrator.en.lng' Name='Waher.Networking.XMPP.Concentrator.en.lng' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Things.IP.en.lng' Name='Waher.Things.IP.en.lng' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Things.Metering.en.lng' Name='Waher.Things.Metering.en.lng' On='uninstall'/>
+              <RemoveFile Id='RemoveWaher.Things.Mqtt.en.lng' Name='Waher.Things.Mqtt.en.lng' On='uninstall'/>
+              <RemoveFile Id='RemoveWaher.Things.Snmp.en.lng' Name='Waher.Things.Snmp.en.lng' On='uninstall'/>
             </Component>
           </Directory>
         </Directory>

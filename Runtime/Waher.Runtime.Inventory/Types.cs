@@ -12,12 +12,13 @@ namespace Waher.Runtime.Inventory
 	/// </summary>
 	public static class Types
 	{
-		private static SortedDictionary<string, Type> types = new SortedDictionary<string, Type>();
-		private static SortedDictionary<string, SortedDictionary<string, Type>> typesPerInterface = new SortedDictionary<string, SortedDictionary<string, Type>>();
-		private static SortedDictionary<string, SortedDictionary<string, Type>> typesPerNamespace = new SortedDictionary<string, SortedDictionary<string, Type>>();
-		private static SortedDictionary<string, SortedDictionary<string, bool>> namespacesPerNamespace = new SortedDictionary<string, SortedDictionary<string, bool>>();
-		private static SortedDictionary<string, bool> rootNamespaces = new SortedDictionary<string, bool>();
-		private static SortedDictionary<string, object> qualifiedNames = new SortedDictionary<string, object>();
+		private static readonly SortedDictionary<string, Type> types = new SortedDictionary<string, Type>();
+		private static readonly SortedDictionary<string, SortedDictionary<string, Type>> typesPerInterface = new SortedDictionary<string, SortedDictionary<string, Type>>();
+		private static readonly SortedDictionary<string, SortedDictionary<string, Type>> typesPerNamespace = new SortedDictionary<string, SortedDictionary<string, Type>>();
+		private static readonly SortedDictionary<string, SortedDictionary<string, bool>> namespacesPerNamespace = new SortedDictionary<string, SortedDictionary<string, bool>>();
+		private static readonly SortedDictionary<string, bool> rootNamespaces = new SortedDictionary<string, bool>();
+		private static readonly SortedDictionary<string, object> qualifiedNames = new SortedDictionary<string, object>();
+		private static readonly Dictionary<string, object> moduleParameters = new Dictionary<string, object>();
 		private static Assembly[] assemblies = null;
 		private static IModule[] modules = null;
 		private static WaitHandle[] startWaitHandles = null;
@@ -451,8 +452,6 @@ namespace Waher.Runtime.Inventory
 			}
 		}
 
-		private static Dictionary<string, object> moduleParameters = new Dictionary<string, object>();
-
 		/// <summary>
 		/// If the inventory has been initialized.
 		/// </summary>
@@ -651,6 +650,161 @@ namespace Waher.Runtime.Inventory
 		/// Assemblies in the inventory.
 		/// </summary>
 		public static Assembly[] Assemblies => assemblies;
+
+		/// <summary>
+		/// Creates an object of a given type, given its full name.
+		/// </summary>
+		/// <param name="TypeName">Full type name.</param>
+		/// <param name="Parameters">Parameters to pass on to the constructor.</param>
+		/// <returns>Created object.</returns>
+		/// <exception cref="ArgumentException">If no type with the given name exists.</exception>
+		public static object CreateObject(string TypeName, params object[] Parameters)
+		{
+			Type T = GetType(TypeName);
+			if (T is null)
+				throw new ArgumentException("Type not loaded: " + TypeName, nameof(TypeName));
+
+			return Activator.CreateInstance(T, Parameters);
+		}
+
+		/// <summary>
+		/// Gets a property value (or field value) from an object.
+		/// </summary>
+		/// <param name="Object">Object instance.</param>
+		/// <param name="PropertyName">Name of property (or field).</param>
+		/// <returns>Property (or field) value.</returns>
+		/// <exception cref="ArgumentNullException">If <paramref name="Object"/> is null.</exception>
+		/// <exception cref="ArgumentException">If there is no property or field with the given name.</exception>
+		public static object GetProperty(object Object, string PropertyName)
+		{
+			if (Object is null)
+				throw new ArgumentNullException(nameof(Object));
+
+			Type T = Object.GetType();
+			PropertyInfo PI = T.GetRuntimeProperty(PropertyName);
+			if (!(PI is null))
+				return PI.GetValue(Object);
+
+			FieldInfo FI = T.GetRuntimeField(PropertyName);
+			if (!(FI is null))
+				return FI.GetValue(Object);
+
+			throw new ArgumentException("Property (or field) not found: " + PropertyName, nameof(PropertyName));
+		}
+
+		/// <summary>
+		/// Sets a property value (or field value) in an object.
+		/// </summary>
+		/// <param name="Object">Object instance.</param>
+		/// <param name="PropertyName">Name of property (or field).</param>
+		/// <param name="Value">Value to set.</param>
+		/// <exception cref="ArgumentNullException">If <paramref name="Object"/> is null.</exception>
+		/// <exception cref="ArgumentException">If there is no property or field with the given name.</exception>
+		public static void SetProperty(object Object, string PropertyName, object Value)
+		{
+			if (Object is null)
+				throw new ArgumentNullException(nameof(Object));
+
+			Type T = Object.GetType();
+			PropertyInfo PI = T.GetRuntimeProperty(PropertyName);
+			if (!(PI is null))
+				PI.SetValue(Object, Value);
+			else
+			{
+				FieldInfo FI = T.GetRuntimeField(PropertyName);
+				if (!(FI is null))
+					FI.SetValue(Object, Value);
+				else
+					throw new ArgumentException("Property (or field) not found: " + PropertyName, nameof(PropertyName));
+			}
+		}
+
+		/// <summary>
+		/// Calls a method on an object.
+		/// </summary>
+		/// <param name="Object">Object instance.</param>
+		/// <param name="MethodName">Name of method.</param>
+		/// <param name="Arguments">Arguments to pass on to method.</param>
+		/// <returns>Result</returns>
+		/// <exception cref="ArgumentNullException">If <paramref name="Object"/> is null.</exception>
+		/// <exception cref="ArgumentException">If there is no method with the given name and argument types.</exception>
+		public static object Call(object Object, string MethodName, params object[] Arguments)
+		{
+			if (Object is null)
+				throw new ArgumentNullException(nameof(Object));
+
+			Type T = Object.GetType();
+
+			return Call(Object, T, MethodName, Arguments);
+		}
+
+		private static object Call(object Object, Type T, string MethodName, params object[] Arguments)
+		{
+			int i, c = Arguments.Length;
+			Type[] ArgumentTypes = new Type[c];
+			bool HasNull = false;
+			object Arg;
+
+			for (i = 0; i < c; i++)
+			{
+				Arg = Arguments[i];
+				if (Arg is null)
+				{
+					HasNull = true;
+					break;
+				}
+				else
+					ArgumentTypes[i] = Arg.GetType();
+			}
+
+			if (HasNull)
+			{
+				foreach (MethodInfo MI in T.GetRuntimeMethods())
+				{
+					ParameterInfo[] P = MI.GetParameters();
+					if (P.Length != c)
+						continue;
+
+					bool Found = true;
+
+					for (i = 0; i < c; i++)
+					{
+						Arg = Arguments[i];
+
+						if (!(Arg is null) && !P[i].ParameterType.GetTypeInfo().IsAssignableFrom(Arg.GetType().GetTypeInfo()))
+						{
+							Found = false;
+							break;
+						}
+					}
+
+					if (Found)
+						return MI.Invoke(Object, Arguments);
+				}
+			}
+			else
+			{
+				MethodInfo MI = T.GetRuntimeMethod(MethodName, ArgumentTypes);
+				if (!(MI is null))
+					return MI.Invoke(Object, Arguments);
+			}
+
+			throw new ArgumentException("Method with corresponding arguments not found: " + MethodName, nameof(MethodName));
+		}
+
+		/// <summary>
+		/// Calls a static method on a class.
+		/// </summary>
+		/// <param name="TypeName">Name of class (or type).</param>
+		/// <param name="MethodName">Name of method.</param>
+		/// <param name="Arguments">Arguments to pass on to method.</param>
+		/// <returns>Result</returns>
+		/// <exception cref="ArgumentException">If there is no method with the given name and argument types.</exception>
+		public static object CallStatic(string TypeName, string MethodName, params object[] Arguments)
+		{
+			Type T = GetType(TypeName);
+			return Call(null, T, MethodName, Arguments);
+		}
 
 	}
 }

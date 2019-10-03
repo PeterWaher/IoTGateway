@@ -107,7 +107,7 @@ namespace Waher.Script.Operators
 
 			for (i = 0; i < c; i++)
 			{
-				if (!Callback(ref this.arguments[i], State))
+				if (!(this.arguments[i] is null) && !Callback(ref this.arguments[i], State))
 					return false;
 			}
 

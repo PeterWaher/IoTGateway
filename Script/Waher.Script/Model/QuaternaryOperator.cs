@@ -49,43 +49,43 @@ namespace Waher.Script.Model
 		{
 			if (DepthFirst)
 			{
-				if (!this.left.ForAllChildNodes(Callback, State, DepthFirst))
+				if (!(this.left?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
 					return false;
 
-				if (!this.middle.ForAllChildNodes(Callback, State, DepthFirst))
+				if (!(this.middle?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
 					return false;
 
-				if (!this.middle2.ForAllChildNodes(Callback, State, DepthFirst))
+				if (!(this.middle2?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
 					return false;
 
-				if (!this.right.ForAllChildNodes(Callback, State, DepthFirst))
+				if (!(this.right?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
 					return false;
 			}
 
-			if (!Callback(ref this.left, State))
+			if (!(this.left is null) && !Callback(ref this.left, State))
 				return false;
 
-			if (!Callback(ref this.middle, State))
+			if (!(this.middle is null) && !Callback(ref this.middle, State))
 				return false;
 
-			if (!Callback(ref this.middle2, State))
+			if (!(this.middle2 is null) && !Callback(ref this.middle2, State))
 				return false;
 
-			if (!Callback(ref this.right, State))
+			if (!(this.right is null) && !Callback(ref this.right, State))
 				return false;
 
 			if (!DepthFirst)
 			{
-				if (!this.left.ForAllChildNodes(Callback, State, DepthFirst))
+				if (!(this.left?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
 					return false;
 
-				if (!this.middle.ForAllChildNodes(Callback, State, DepthFirst))
+				if (!(this.middle?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
 					return false;
 
-				if (!this.middle2.ForAllChildNodes(Callback, State, DepthFirst))
+				if (!(this.middle2?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
 					return false;
 
-				if (!this.right.ForAllChildNodes(Callback, State, DepthFirst))
+				if (!(this.right?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
 					return false;
 			}
 

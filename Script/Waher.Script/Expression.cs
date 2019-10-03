@@ -2235,12 +2235,11 @@ namespace Waher.Script
 						}
 
 						ScriptNode Right = this.AssertRightOperandNotNull(this.ParseObject());
-						VariableReference Ref = Right as VariableReference;
 
-						if (Ref is null)
-							Node = new DynamicMember(Node, Right, NullCheck, Start, this.pos - Start, this);
-						else
+						if (Right is VariableReference Ref)
 							Node = new NamedMember(Node, Ref.VariableName, NullCheck, Start, this.pos - Start, this);
+						else
+							Node = new DynamicMember(Node, Right, NullCheck, Start, this.pos - Start, this);
 
 						break;
 
@@ -4420,7 +4419,7 @@ namespace Waher.Script
 		{
 			if (DepthFirst)
 			{
-				if (!this.root.ForAllChildNodes(Callback, State, DepthFirst))
+				if (!(this.root?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
 					return false;
 			}
 
@@ -4429,7 +4428,7 @@ namespace Waher.Script
 
 			if (!DepthFirst)
 			{
-				if (!this.root.ForAllChildNodes(Callback, State, DepthFirst))
+				if (!(this.root?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
 					return false;
 			}
 

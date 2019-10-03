@@ -60,16 +60,16 @@ namespace Waher.Script.Model
 		{
 			if (DepthFirst)
 			{
-				if (!this.op.ForAllChildNodes(Callback, State, DepthFirst))
+				if (!(this.op?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
 					return false;
 			}
 
-			if (!Callback(ref this.op, State))
+			if (!(this.op is null) && !Callback(ref this.op, State))
 				return false;
 
 			if (!DepthFirst)
 			{
-				if (!this.op.ForAllChildNodes(Callback, State, DepthFirst))
+				if (!(this.op?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
 					return false;
 			}
 

@@ -271,7 +271,7 @@ namespace Waher.Script.Persistence.SQL.Parsers
 			if (!this.SearchForVectorFunction(ref Node, null))
 				return true;
 
-			return !Node.ForAllChildNodes(this.SearchForVectorFunction, null, false);
+			return !(Node?.ForAllChildNodes(this.SearchForVectorFunction, null, false) ?? true);
 		}
 
 		private bool SearchForVectorFunction(ref ScriptNode Node, object State)

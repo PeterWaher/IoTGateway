@@ -141,23 +141,22 @@ namespace Waher.Script.Model
 				if (Differentiation is Invert Invert)
 				{
 					if (Invert.Operand is Negate Negate)
-						return new Negate(new Divide(ChainFactor, Negate.Operand, Start, Len, Expression), Start, Len, Expression);
+						return new Negate(new Divide(ChainFactor, Negate.Operand, Start, Len, Expression), Start, Len, Exp);
 					else
-						return new Divide(ChainFactor, Invert.Operand, Start, Len, Expression);
+						return new Divide(ChainFactor, Invert.Operand, Start, Len, Exp);
 				}
 				else if (Differentiation is Negate Negate)
 				{
 					if (Negate.Operand is Invert Invert2)
-						return new Negate(new Divide(ChainFactor, Invert2.Operand, Start, Len, Expression), Start, Len, Expression);
+						return new Negate(new Divide(ChainFactor, Invert2.Operand, Start, Len, Expression), Start, Len, Exp);
 					else
-						return new Negate(new Multiply(Negate.Operand, ChainFactor, Start, Len, Expression), Start, Len, Expression);
+						return new Negate(new Multiply(Negate.Operand, ChainFactor, Start, Len, Expression), Start, Len, Exp);
 				}
 				else
-					return new Multiply(Differentiation, ChainFactor, Start, Len, Expression);
+					return new Multiply(Differentiation, ChainFactor, Start, Len, Exp);
 			}
 			else
 				throw new ScriptRuntimeException("Argument not differentiable.", this);
-
 		}
 
 		/// <summary>
@@ -185,12 +184,8 @@ namespace Waher.Script.Model
 
 				for (i = 0; i < c; i++)
 				{
-					ScriptNode Node = Nodes[i];
-					if (!(Node is null))
-					{
-						if (!Node.ForAllChildNodes(Callback, State, DepthFirst))
-							return false;
-					}
+					if (!(Nodes[i]?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
+						return false;
 				}
 			}
 

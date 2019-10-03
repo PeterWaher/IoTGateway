@@ -65,10 +65,8 @@ namespace Waher.Script.Operators
 					return List.First.Value;
 
 				case 2:
-					DoubleNumber Re, Im;
-
-					if (!((Re = List.First.Value as DoubleNumber) is null) &&
-						!((Im = List.First.Next.Value as DoubleNumber) is null))
+					if (!(!(List.First.Value is DoubleNumber Re)) &&
+						!(!(List.First.Next.Value is DoubleNumber Im)))
 					{
 						return new ComplexNumber(new Complex(Re.Value, Im.Value));
 					}
@@ -97,7 +95,7 @@ namespace Waher.Script.Operators
 
 			for (i = 0; i < c; i++)
 			{
-				if (!Callback(ref this.elements[i], State))
+				if (!(this.elements[i] is null) && !Callback(ref this.elements[i], State))
 					return false;
 			}
 

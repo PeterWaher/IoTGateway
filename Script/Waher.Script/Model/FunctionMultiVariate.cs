@@ -336,7 +336,7 @@ namespace Waher.Script.Model
 
 			for (i = 0; i < this.nrArguments; i++)
 			{
-				if (!Callback(ref this.arguments[i], State))
+				if (!(this.arguments[i] is null) && !Callback(ref this.arguments[i], State))
 					return false;
 			}
 

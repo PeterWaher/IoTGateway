@@ -65,7 +65,7 @@ namespace Waher.Script.Operators
 
 				while (!(Loop is null))
 				{
-					if (!Loop.Value.Value.ForAllChildNodes(Callback, State, DepthFirst))
+					if (!(Loop.Value.Value?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
 						return false;
 
 					Loop = Loop.Next;
@@ -77,12 +77,15 @@ namespace Waher.Script.Operators
 			while (!(Loop is null))
 			{
 				ScriptNode Node = Loop.Value.Value;
-				bool Result = Callback(ref Node, State);
-				if (Loop.Value.Value != Node)
-					Loop.Value = new KeyValuePair<string, ScriptNode>(Loop.Value.Key, Node);
+				if (!(Node is null))
+				{
+					bool Result = Callback(ref Node, State);
+					if (Loop.Value.Value != Node)
+						Loop.Value = new KeyValuePair<string, ScriptNode>(Loop.Value.Key, Node);
 
-				if (!Result)
-					return false;
+					if (!Result)
+						return false;
+				}
 
 				Loop = Loop.Next;
 			}
@@ -93,7 +96,7 @@ namespace Waher.Script.Operators
 
 				while (!(Loop is null))
 				{
-					if (!Loop.Value.Value.ForAllChildNodes(Callback, State, DepthFirst))
+					if (!(Loop.Value.Value?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
 						return false;
 
 					Loop = Loop.Next;

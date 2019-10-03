@@ -19,7 +19,7 @@ namespace Waher.Script.Persistence.SQL
 	/// </summary>
 	public class Update : ScriptNode
 	{
-		private Assignment[] setOperations;
+		private readonly Assignment[] setOperations;
 		private ScriptNode source;
 		private ScriptNode where;
 
@@ -82,23 +82,20 @@ namespace Waher.Script.Persistence.SQL
 		{
 			if (DepthFirst)
 			{
-				if (!this.source.ForAllChildNodes(Callback, State, DepthFirst))
+				if (!(this.source?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
 					return false;
 
 				foreach (Assignment SetOperation in this.setOperations)
 				{
-					if (!SetOperation.ForAllChildNodes(Callback, State, DepthFirst))
+					if (!(SetOperation?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
 						return false;
 				}
 
-				if (this.where != null)
-				{
-					if (!this.where.ForAllChildNodes(Callback, State, DepthFirst))
-						return false;
-				}
+				if (!(this.where?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
+					return false;
 			}
 
-			if (!Callback(ref this.source, State))
+			if (!(this.source is null) && !Callback(ref this.source, State))
 				return false;
 
 			int i, c = this.setOperations.Length;
@@ -106,37 +103,34 @@ namespace Waher.Script.Persistence.SQL
 			{
 				ScriptNode SetOperation = this.setOperations[i];
 
-				if (!Callback(ref SetOperation, State))
-					return false;
+				if (!(SetOperation is null))
+				{
+					if (!Callback(ref SetOperation, State))
+						return false;
 
-				if (SetOperation is Assignment Assignment)
-					this.setOperations[i] = Assignment;
-				else
-					return false;
+					if (SetOperation is Assignment Assignment)
+						this.setOperations[i] = Assignment;
+					else
+						return false;
+				}
 			}
 
-			if (this.where != null)
-			{
-				if (!Callback(ref this.where, State))
-					return false;
-			}
+			if (!(this.where is null) && !Callback(ref this.where, State))
+				return false;
 
 			if (!DepthFirst)
 			{
-				if (!this.source.ForAllChildNodes(Callback, State, DepthFirst))
+				if (!(this.source?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
 					return false;
 
 				foreach (Assignment SetOperation in this.setOperations)
 				{
-					if (!SetOperation.ForAllChildNodes(Callback, State, DepthFirst))
+					if (!(SetOperation?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
 						return false;
 				}
 
-				if (this.where != null)
-				{
-					if (!this.where.ForAllChildNodes(Callback, State, DepthFirst))
-						return false;
-				}
+				if (!(this.where?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
+					return false;
 			}
 
 			return true;

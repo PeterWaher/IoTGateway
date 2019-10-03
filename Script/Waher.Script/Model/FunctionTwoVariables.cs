@@ -85,25 +85,25 @@ namespace Waher.Script.Model
 		{
 			if (DepthFirst)
 			{
-				if (!this.argument1.ForAllChildNodes(Callback, State, DepthFirst))
+				if (!(this.argument1?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
 					return false;
 
-				if (!this.argument2.ForAllChildNodes(Callback, State, DepthFirst))
+				if (!(this.argument2?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
 					return false;
 			}
 
-			if (!Callback(ref this.argument1, State))
+			if (!(this.argument1 is null) && !Callback(ref this.argument1, State))
 				return false;
 
-			if (!Callback(ref this.argument2, State))
+			if (!(this.argument2 is null) && !Callback(ref this.argument2, State))
 				return false;
 
 			if (!DepthFirst)
 			{
-				if (!this.argument1.ForAllChildNodes(Callback, State, DepthFirst))
+				if (!(this.argument1?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
 					return false;
 
-				if (!this.argument2.ForAllChildNodes(Callback, State, DepthFirst))
+				if (!(this.argument2?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
 					return false;
 			}
 

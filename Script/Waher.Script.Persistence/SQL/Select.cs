@@ -563,7 +563,7 @@ namespace Waher.Script.Persistence.SQL
 					c = this.orderBy.Length;
 					for (i = 0; i < c; i++)
 					{
-						if (!this.orderBy[i].Key.ForAllChildNodes(Callback, State, DepthFirst))
+						if (!(this.orderBy[i].Key?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
 							return false;
 					}
 				}
@@ -579,17 +579,17 @@ namespace Waher.Script.Persistence.SQL
 				return false;
 			}
 
-			if (this.top != null)
-				Callback(ref this.top, State);
+			if (!(this.top is null) && !Callback(ref this.top, State))
+				return false;
 
-			if (this.where != null)
-				Callback(ref this.where, State);
+			if (!(this.where is null) && !Callback(ref this.where, State))
+				return false;
 
-			if (this.having != null)
-				Callback(ref this.having, State);
+			if (!(this.having is null) && !Callback(ref this.having, State))
+				return false;
 
-			if (this.offset != null)
-				Callback(ref this.offset, State);
+			if (!(this.offset is null) && !Callback(ref this.offset, State))
+				return false;
 
 			if (this.orderBy != null)
 			{
@@ -597,13 +597,16 @@ namespace Waher.Script.Persistence.SQL
 				for (i = 0; i < c; i++)
 				{
 					ScriptNode Node = this.orderBy[i].Key;
-					ScriptNode Node0 = Node;
+					if (!(Node is null))
+					{
+						ScriptNode Node0 = Node;
 
-					if (!Callback(ref Node, State))
-						return false;
+						if (!Callback(ref Node, State))
+							return false;
 
-					if (Node != Node0)
-						this.orderBy[i] = new KeyValuePair<ScriptNode, bool>(Node, this.orderBy[i].Value);
+						if (Node != Node0)
+							this.orderBy[i] = new KeyValuePair<ScriptNode, bool>(Node, this.orderBy[i].Value);
+					}
 				}
 			}
 
@@ -628,7 +631,7 @@ namespace Waher.Script.Persistence.SQL
 					c = this.orderBy.Length;
 					for (i = 0; i < c; i++)
 					{
-						if (!this.orderBy[i].Key.ForAllChildNodes(Callback, State, DepthFirst))
+						if (!(this.orderBy[i].Key?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
 							return false;
 					}
 				}

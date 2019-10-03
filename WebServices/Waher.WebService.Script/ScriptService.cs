@@ -199,7 +199,9 @@ namespace Waher.WebService.Script
 
         private bool IsAuthorized(ref ScriptNode Node, object State)
         {
-            if (State is IUser User)
+			if (Node is null)
+				return true;
+			else if (State is IUser User)
                 return User.HasPrivilege(Node.GetType().FullName);
             else
                 return false;

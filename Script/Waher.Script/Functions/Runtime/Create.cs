@@ -421,25 +421,25 @@ namespace Waher.Script.Functions.Runtime
 
 			if (DepthFirst)
 			{
-				if (!this.type.ForAllChildNodes(Callback, State, DepthFirst))
+				if (!(this.type?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
 					return false;
 
 				if (!ForAllChildNodes(Callback, this.parameters, State, DepthFirst))
 					return false;
 			}
 
-			if (!Callback(ref this.type, State))
+			if (!(this.type is null) && !Callback(ref this.type, State))
 				return false;
 
 			for (i = 0; i < this.nrParameters; i++)
 			{
-				if (!Callback(ref this.parameters[i], State))
+				if (!(this.parameters[i] is null) && !Callback(ref this.parameters[i], State))
 					return false;
 			}
 
 			if (!DepthFirst)
 			{
-				if (!this.type.ForAllChildNodes(Callback, State, DepthFirst))
+				if (!(this.type?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
 					return false;
 
 				if (!ForAllChildNodes(Callback, this.parameters, State, DepthFirst))

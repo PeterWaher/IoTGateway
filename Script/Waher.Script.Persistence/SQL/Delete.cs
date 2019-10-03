@@ -73,35 +73,26 @@ namespace Waher.Script.Persistence.SQL
 		{
 			if (DepthFirst)
 			{
-				if (!this.source.ForAllChildNodes(Callback, State, DepthFirst))
+				if (!(this.source?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
 					return false;
 
-				if (this.where != null)
-				{
-					if (!this.where.ForAllChildNodes(Callback, State, DepthFirst))
-						return false;
-				}
+				if (!(this.where?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
+					return false;
 			}
 
-			if (!Callback(ref this.source, State))
+			if (!(this.source is null) && !Callback(ref this.source, State))
 				return false;
 
-			if (this.where != null)
-			{
-				if (!Callback(ref this.where, State))
-					return false;
-			}
+			if (!(this.where is null) && !Callback(ref this.where, State))
+				return false;
 
 			if (!DepthFirst)
 			{
-				if (!this.source.ForAllChildNodes(Callback, State, DepthFirst))
+				if (!(this.source?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
 					return false;
 
-				if (this.where != null)
-				{
-					if (!this.where.ForAllChildNodes(Callback, State, DepthFirst))
-						return false;
-				}
+				if (!(this.where?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
+					return false;
 			}
 
 			return true;

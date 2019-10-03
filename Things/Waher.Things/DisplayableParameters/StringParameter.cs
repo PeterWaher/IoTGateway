@@ -17,6 +17,15 @@ namespace Waher.Things.DisplayableParameters
 		/// <summary>
 		/// String-valued parameter.
 		/// </summary>
+		public StringParameter()
+			: base()
+		{
+			this.value = null;
+		}
+
+		/// <summary>
+		/// String-valued parameter.
+		/// </summary>
 		/// <param name="Id">Parameter ID.</param>
 		/// <param name="Name">Parameter Name.</param>
 		/// <param name="Value">Parameter Value</param>
@@ -32,6 +41,7 @@ namespace Waher.Things.DisplayableParameters
 		public string Value
 		{
 			get { return this.value; }
+			set { this.value = value; }
 		}
 
 		/// <summary>

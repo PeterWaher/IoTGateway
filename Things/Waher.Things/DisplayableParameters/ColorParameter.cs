@@ -17,13 +17,22 @@ namespace Waher.Things.DisplayableParameters
 		/// <summary>
 		/// Color-valued parameter.
 		/// </summary>
+		public ColorParameter()
+			: base()
+		{
+			this.value = SKColor.Empty;
+		}
+
+		/// <summary>
+		/// Color-valued parameter.
+		/// </summary>
 		/// <param name="Id">Parameter ID.</param>
 		/// <param name="Name">Parameter Name.</param>
 		/// <param name="Color">Parameter Value</param>
 		public ColorParameter(string Id, string Name, SKColor Color)
 			: base(Id, Name)
 		{
-			this.value = Value;
+			this.value = Color;
 		}
 
 		/// <summary>
@@ -32,6 +41,7 @@ namespace Waher.Things.DisplayableParameters
 		public SKColor Value
 		{
 			get { return this.value; }
+			set { this.value = value; }
 		}
 
 		/// <summary>

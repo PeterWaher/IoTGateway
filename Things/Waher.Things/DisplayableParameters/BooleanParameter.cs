@@ -17,6 +17,15 @@ namespace Waher.Things.DisplayableParameters
 		/// <summary>
 		/// Boolean-valued parameter.
 		/// </summary>
+		public BooleanParameter()
+			: base()
+		{
+			this.value = false;
+		}
+
+		/// <summary>
+		/// Boolean-valued parameter.
+		/// </summary>
 		/// <param name="Id">Parameter ID.</param>
 		/// <param name="Name">Parameter Name.</param>
 		/// <param name="Value">Parameter Value</param>
@@ -32,6 +41,7 @@ namespace Waher.Things.DisplayableParameters
 		public bool Value
 		{
 			get { return this.value; }
+			set { this.value = value; }
 		}
 
 		/// <summary>

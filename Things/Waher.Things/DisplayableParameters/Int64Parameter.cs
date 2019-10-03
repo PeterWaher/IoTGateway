@@ -17,6 +17,15 @@ namespace Waher.Things.DisplayableParameters
 		/// <summary>
 		/// Int64-valued parameter.
 		/// </summary>
+		public Int64Parameter()
+			: base()
+		{
+			this.value = 0;
+		}
+
+		/// <summary>
+		/// Int64-valued parameter.
+		/// </summary>
 		/// <param name="Id">Parameter ID.</param>
 		/// <param name="Name">Parameter Name.</param>
 		/// <param name="Value">Parameter Value</param>
@@ -32,6 +41,7 @@ namespace Waher.Things.DisplayableParameters
 		public long Value
 		{
 			get { return this.value; }
+			set { this.value = value; }
 		}
 
 		/// <summary>

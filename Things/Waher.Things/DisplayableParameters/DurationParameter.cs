@@ -17,6 +17,15 @@ namespace Waher.Things.DisplayableParameters
 		/// <summary>
 		/// Duration-valued parameter.
 		/// </summary>
+		public DurationParameter()
+			: base()
+		{
+			this.value = Duration.Zero;
+		}
+
+		/// <summary>
+		/// Duration-valued parameter.
+		/// </summary>
 		/// <param name="Id">Parameter ID.</param>
 		/// <param name="Name">Parameter Name.</param>
 		/// <param name="Value">Parameter Value</param>
@@ -32,6 +41,7 @@ namespace Waher.Things.DisplayableParameters
 		public Duration Value
 		{
 			get { return this.value; }
+			set { this.value = value; }
 		}
 
 		/// <summary>

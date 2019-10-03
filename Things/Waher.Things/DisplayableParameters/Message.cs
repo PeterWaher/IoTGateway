@@ -43,6 +43,17 @@ namespace Waher.Things.DisplayableParameters
 		/// <summary>
 		/// Contains information about a message logged on a node.
 		/// </summary>
+		public Message()
+		{
+			this.timestamp = DateTime.MinValue;
+			this.type = MessageType.Information;
+			this.eventId = null;
+			this.body = null;
+		}
+
+		/// <summary>
+		/// Contains information about a message logged on a node.
+		/// </summary>
 		/// <param name="Timestamp">Message Timestamp.</param>
 		/// <param name="Type">Type of message.</param>
 		/// <param name="EventId">Optional Event ID.</param>
@@ -61,6 +72,7 @@ namespace Waher.Things.DisplayableParameters
 		public DateTime Timestamp
 		{
 			get { return this.timestamp; }
+			set { this.timestamp = value; }
 		}
 
 		/// <summary>
@@ -69,6 +81,7 @@ namespace Waher.Things.DisplayableParameters
 		public MessageType Type
 		{
 			get { return this.type; }
+			set { this.type = value; }
 		}
 
 		/// <summary>
@@ -77,6 +90,7 @@ namespace Waher.Things.DisplayableParameters
 		public string EventId
 		{
 			get { return this.eventId; }
+			set { this.eventId = value; }
 		}
 
 		/// <summary>
@@ -85,8 +99,9 @@ namespace Waher.Things.DisplayableParameters
 		public string Body
 		{
 			get { return this.body; }
+			set { this.body = value; }
 		}
-		
+
 		/// <summary>
 		/// Exports the message to XML.
 		/// </summary>

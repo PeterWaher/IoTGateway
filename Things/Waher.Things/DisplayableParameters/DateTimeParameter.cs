@@ -17,6 +17,15 @@ namespace Waher.Things.DisplayableParameters
 		/// <summary>
 		/// DateTime-valued parameter.
 		/// </summary>
+		public DateTimeParameter()
+			: base()
+		{
+			this.value = DateTime.MinValue;
+		}
+
+		/// <summary>
+		/// DateTime-valued parameter.
+		/// </summary>
 		/// <param name="Id">Parameter ID.</param>
 		/// <param name="Name">Parameter Name.</param>
 		/// <param name="Value">Parameter Value</param>
@@ -32,6 +41,7 @@ namespace Waher.Things.DisplayableParameters
 		public DateTime Value
 		{
 			get { return this.value; }
+			set { this.value = value; }
 		}
 
 		/// <summary>

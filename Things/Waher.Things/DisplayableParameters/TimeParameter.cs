@@ -17,6 +17,15 @@ namespace Waher.Things.DisplayableParameters
 		/// <summary>
 		/// TimeSpan-valued parameter.
 		/// </summary>
+		public TimeSpanParameter()
+			: base()
+		{
+			this.value = TimeSpan.Zero;
+		}
+
+		/// <summary>
+		/// TimeSpan-valued parameter.
+		/// </summary>
 		/// <param name="Id">Parameter ID.</param>
 		/// <param name="Name">Parameter Name.</param>
 		/// <param name="Value">Parameter Value</param>
@@ -32,6 +41,7 @@ namespace Waher.Things.DisplayableParameters
 		public TimeSpan Value
 		{
 			get { return this.value; }
+			set { this.value = TimeSpan.Zero; }
 		}
 
 		/// <summary>

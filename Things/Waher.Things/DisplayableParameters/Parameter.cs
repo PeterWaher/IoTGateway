@@ -18,6 +18,15 @@ namespace Waher.Things.DisplayableParameters
 		/// <summary>
 		/// Base class for all node parameters.
 		/// </summary>
+		public Parameter()
+		{
+			this.id = string.Empty;
+			this.name = string.Empty;
+		}
+
+		/// <summary>
+		/// Base class for all node parameters.
+		/// </summary>
 		/// <param name="Id">Parameter ID.</param>
 		/// <param name="Name">Parameter Name.</param>
 		public Parameter(string Id, string Name)
@@ -32,6 +41,7 @@ namespace Waher.Things.DisplayableParameters
 		public string Id
 		{
 			get { return this.id; }
+			set { this.id = value; }
 		}
 
 		/// <summary>
@@ -40,6 +50,7 @@ namespace Waher.Things.DisplayableParameters
 		public string Name
 		{
 			get { return this.name; }
+			set { this.name = value; }
 		}
 
 		/// <summary>

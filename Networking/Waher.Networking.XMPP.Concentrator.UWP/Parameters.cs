@@ -59,14 +59,9 @@ namespace Waher.Networking.XMPP.Concentrator
 			bool DateOnly;
 			bool Nullable;
 			HeaderAttribute HeaderAttribute;
-			ToolTipAttribute ToolTipAttribute;
 			PageAttribute PageAttribute;
-			SectionAttribute SectionAttribute;
-			OptionAttribute OptionAttribute;
 			TextAttribute TextAttribute;
-			RegularExpressionAttribute RegularExpressionAttribute;
 			LinkedList<TextAttribute> TextAttributes;
-			RangeAttribute RangeAttribute;
 			ValidationMethod ValidationMethod;
 			Type PropertyType;
 			Field Field;
@@ -118,7 +113,7 @@ namespace Waher.Networking.XMPP.Concentrator
 						if (StringId > 0)
 							Header = await Namespace.GetStringAsync(StringId, Header);
 					}
-					else if ((ToolTipAttribute = Attr as ToolTipAttribute) != null)
+					else if (Attr is ToolTipAttribute ToolTipAttribute)
 					{
 						ToolTip = ToolTipAttribute.ToolTip;
 						StringId = ToolTipAttribute.StringId;
@@ -133,7 +128,7 @@ namespace Waher.Networking.XMPP.Concentrator
 						if (StringId > 0)
 							PageLabel = await Namespace.GetStringAsync(StringId, PageLabel);
 					}
-					else if ((SectionAttribute = Attr as SectionAttribute) != null)
+					else if (Attr is SectionAttribute SectionAttribute)
 					{
 						SectionLabel = SectionAttribute.Label;
 						StringId = SectionAttribute.StringId;
@@ -147,7 +142,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 						TextAttributes.AddLast(TextAttribute);
 					}
-					else if ((OptionAttribute = Attr as OptionAttribute) != null)
+					else if (Attr is OptionAttribute OptionAttribute)
 					{
 						if (Options is null)
 							Options = new List<KeyValuePair<string, string>>();
@@ -161,9 +156,9 @@ namespace Waher.Networking.XMPP.Concentrator
 						else
 							Options.Add(new KeyValuePair<string, string>(OptionAttribute.Option.ToString(), OptionAttribute.Label));
 					}
-					else if ((RegularExpressionAttribute = Attr as RegularExpressionAttribute) != null)
+					else if (Attr is RegularExpressionAttribute RegularExpressionAttribute)
 						ValidationMethod = new RegexValidation(RegularExpressionAttribute.Pattern);
-					else if ((RangeAttribute = Attr as RangeAttribute) != null)
+					else if (Attr is RangeAttribute RangeAttribute)
 						ValidationMethod = new RangeValidation(RangeAttribute.Min, RangeAttribute.Max);
 					else if (Attr is OpenAttribute)
 						ValidationMethod = new OpenValidation();
@@ -197,7 +192,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				}
 
 				string PropertyName = PropertyInfo?.Name ?? FieldInfo.Name;
-				object PropertyValue = (PropertyInfo?.GetValue(EditableObject) ?? FieldInfo.GetValue(EditableObject));
+				object PropertyValue = (PropertyInfo?.GetValue(EditableObject) ?? FieldInfo?.GetValue(EditableObject));
 
 				if (PropertyType == typeof(string[]))
 				{
@@ -576,9 +571,6 @@ namespace Waher.Networking.XMPP.Concentrator
 			Namespace ConcentratorNamespace = await Language.GetNamespaceAsync(typeof(ConcentratorServer).Namespace);
 			LinkedList<Tuple<PropertyInfo, FieldInfo, object>> ToSet = null;
 			ValidationMethod ValidationMethod;
-			OptionAttribute OptionAttribute;
-			RegularExpressionAttribute RegularExpressionAttribute;
-			RangeAttribute RangeAttribute;
 			DataType DataType;
 			Type PropertyType;
 			string NamespaceStr;
@@ -631,15 +623,15 @@ namespace Waher.Networking.XMPP.Concentrator
 				{
 					if (Attr is HeaderAttribute)
 						HasHeader = true;
-					else if ((OptionAttribute = Attr as OptionAttribute) != null)
+					else if (Attr is OptionAttribute OptionAttribute)
 					{
 						HasOptions = true;
 						if (Field.ValueString == OptionAttribute.Option.ToString())
 							ValidOption = true;
 					}
-					else if ((RegularExpressionAttribute = Attr as RegularExpressionAttribute) != null)
+					else if (Attr is RegularExpressionAttribute RegularExpressionAttribute)
 						ValidationMethod = new RegexValidation(RegularExpressionAttribute.Pattern);
-					else if ((RangeAttribute = Attr as RangeAttribute) != null)
+					else if (Attr is RangeAttribute RangeAttribute)
 						ValidationMethod = new RangeValidation(RangeAttribute.Min, RangeAttribute.Max);
 					else if (Attr is OpenAttribute)
 						ValidationMethod = new OpenValidation();

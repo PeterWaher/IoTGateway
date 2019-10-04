@@ -25,6 +25,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Language\Waher.Things.Snmp.en.lng" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Language\Waher.Things.Snmp.en.lng">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="..\..\LICENSE.txt">
       <Pack>True</Pack>
       <PackagePath></PackagePath>

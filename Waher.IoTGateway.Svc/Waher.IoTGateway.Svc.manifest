@@ -299,6 +299,8 @@
   <Assembly fileName='Waher.Things.dll'/>
   <Assembly fileName='Waher.Things.IP.dll'/>
   <Assembly fileName='Waher.Things.Metering.dll'/>
+  <Assembly fileName='Waher.Things.Mqtt.dll'/>
+  <Assembly fileName='Waher.Things.Snmp.dll'/>
   <Assembly fileName='Gateway.config'/>
   <Assembly fileName='Waher.WebService.Script.dll'/>
   <Assembly fileName='Waher.Utility.Install.exe' altFolder='..\..\..\..\Utilities\Waher.Utility.Install\bin\Release\PublishOutput\win-x86\'/>
@@ -522,5 +524,7 @@
     <Content fileName='Waher.Networking.XMPP.Concentrator.en.lng'/>
     <Content fileName='Waher.Things.IP.en.lng'/>
     <Content fileName='Waher.Things.Metering.en.lng'/>
+    <Content fileName='Waher.Things.Mqtt.en.lng'/>
+    <Content fileName='Waher.Things.Snmp.en.lng'/>
   </Folder>
 </Module>

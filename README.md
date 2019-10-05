@@ -107,6 +107,7 @@ corresponding Internet Content Type encodings and decodings.
 | Project                            | Type         | Link                                                                    | Project description |
 |------------------------------------|--------------|-------------------------------------------------------------------------|---------------------|
 | **Waher.Content**                  | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Content/)                  | The [Waher.Content](Content/Waher.Content) project is a class library that provides basic abstraction for Internet Content Type, and basic encodings and decodings. This includes handling and parsing of common data types. |
+| **Waher.Content.Asn1**             | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Content.Asn1/)             | The [Waher.Content.Asn1](Content/Waher.Content.Asn1) project implements a simple ASN.1 (Abstract Syntax Notation One) parser. |
 | **Waher.Content.Dsn**              | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Content.Dsn/)              | The [Waher.Content.Dsn](Content/Waher.Content.Dsn) project provides encoding and decoding of Delivery Status Notification (DSN) messages and message reports, as defined in RFC 3462 and 3464. |
 | **Waher.Content.Emoji**            | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Content.Emoji/)            | The [Waher.Content.Emoji](Content/Waher.Content.Emoji) project contains utilities for working with emojis. |
 | **Waher.Content.Emoji.Emoji1**     | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Content.Emoji.Emoji1/)     | The [Waher.Content.Emoji.Emoji1](Content/Waher.Content.Emoji.Emoji1) project provide free emojis from [Emoji One](http://emojione.com/) to content applications. |
@@ -122,6 +123,7 @@ The folder also contains the following unit test projects:
 
 | Project                            | Type          | Project description |
 |------------------------------------|---------------|---------------------|
+| **Waher.Content.Asn1.Test**        | .NET Core 2.0 | The [Waher.Content.Asn1.Test](Content/Waher.Content.Asn1.Test) project contains unit tests for the **Waher.Content.Asn1** project. |
 | **Waher.Content.Html.Test**        | .NET 4.6.2    | The [Waher.Content.Html.Test](Content/Waher.Content.Html.Test) project contains unit tests for the **Waher.Content.Html** project. |
 | **Waher.Content.Markdown.Test**    | .NET Core 2.0 | The [Waher.Content.Markdown.Test](Content/Waher.Content.Markdown.Test) project contains unit tests for the **Waher.Content.Markdown** project. |
 | **Waher.Content.Test**             | .NET Core 2.0 | The [Waher.Content.Test](Content/Waher.Content.Test) project contains unit tests for the **Waher.Content** project. |

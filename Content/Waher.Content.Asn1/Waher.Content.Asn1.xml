@@ -1,0 +1,862 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Waher.Content.Asn1</name>
+    </assembly>
+    <members>
+        <member name="T:Waher.Content.Asn1.Asn1Document">
+            <summary>
+            Represents an ASN.1 document.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Asn1Document.#ctor(System.String)">
+            <summary>
+            Represents an ASN.1 document.
+            </summary>
+            <param name="Text">ASN.1 text to parse.</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Asn1Document.Root">
+            <summary>
+            ASN.1 Root node
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Asn1Document.Text">
+            <summary>
+            ASN.1 text
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Exceptions.Asn1Exception">
+            <summary>
+            Base class from ASN.1 exceptions.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Exceptions.Asn1Exception.#ctor(System.String)">
+            <summary>
+            Base class from ASN.1 exceptions.
+            </summary>
+            <param name="Message">Exception message.</param>
+        </member>
+        <member name="T:Waher.Content.Asn1.Exceptions.Asn1SyntaxException">
+            <summary>
+            ASN.1 syntax exceptions.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Exceptions.Asn1SyntaxException.#ctor(System.String,System.String,System.Int32)">
+            <summary>
+            ASN.1 syntax exceptions.
+            </summary>
+            <param name="Message">Exception message.</param>
+            <param name="Text">ASN.1 text</param>
+            <param name="Position">Position where exception was raised.</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Exceptions.Asn1SyntaxException.Text">
+            <summary>
+            ASN.1 text
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Exceptions.Asn1SyntaxException.Position">
+            <summary>
+            Position into text where exception was raised.
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Asn1Choice">
+            <summary>
+            Represents a ASN.1 CHOICE construct.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Asn1Choice.#ctor(Waher.Content.Asn1.Model.Asn1Node[])">
+            <summary>
+            Represents a ASN.1 CHOICE construct.
+            </summary>
+            <param name="Nodes">Nodes</param>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Asn1Tags">
+            <summary>
+            How ASN.1 tags are managed.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Asn1.Model.Asn1Tags.Automatic">
+            <summary>
+            Automatically
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Asn1.Model.Asn1Tags.Implicit">
+            <summary>
+            Implicitly
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Asn1.Model.Asn1Tags.Explicit">
+            <summary>
+            Explicitly
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Asn1Definitions">
+            <summary>
+            Represents a collection of ASN.1 definitions.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Asn1Definitions.#ctor(System.String,Waher.Content.Asn1.Model.Asn1Oid,System.Nullable{Waher.Content.Asn1.Model.Asn1Tags},System.Boolean,Waher.Content.Asn1.Model.Asn1Node)">
+            <summary>
+            Represents a collection of ASN.1 definitions.
+            </summary>
+            <param name="Identifier">Identifier</param>
+            <param name="Oid">Optional Object ID</param>
+            <param name="Tags">How tags are handled.</param>
+            <param name="Abstract">If abstract syntax is used.</param>
+            <param name="Body">Definition body.</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1Definitions.Identifier">
+            <summary>
+            Identifier
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1Definitions.Oid">
+            <summary>
+            Optional Object ID
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1Definitions.Tags">
+            <summary>
+            How tags are handled.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1Definitions.Abstract">
+            <summary>
+            If abstract syntax is used.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1Definitions.Body">
+            <summary>
+            Definition body.
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Asn1Enumeration">
+            <summary>
+            ENUMERATED
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Asn1Enumeration.#ctor(Waher.Content.Asn1.Model.Asn1Node[])">
+            <summary>
+            ENUMERATED
+            </summary>
+            <param name="Nodes">Nodes</param>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Asn1Extension">
+            <summary>
+            Extensions follow.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Asn1Extension.#ctor">
+            <summary>
+            Extensions follow.
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Asn1Field">
+            <summary>
+            Represents an ASN.1 named field.
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Asn1FieldDefinition">
+            <summary>
+            Represents an ASN.1 field definition.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Asn1FieldDefinition.#ctor(System.String,System.String,Waher.Content.Asn1.Model.Asn1Restriction[],System.Boolean,System.Boolean,Waher.Content.Asn1.Model.Asn1Node,Waher.Content.Asn1.Model.Values.Asn1NamedValue[])">
+            <summary>
+            Represents an ASN.1 field definition.
+            </summary>
+            <param name="FieldName">Field name.</param>
+            <param name="TypeName">Type name.</param>
+            <param name="Restrictions">Optional restrictions.</param>
+            <param name="Optional">If field is optional.</param>
+            <param name="Unique">If field value is unique.</param>
+            <param name="Default">Default value if field not provided.</param>
+            <param name="NamedOptions">Named options.</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1FieldDefinition.FieldName">
+            <summary>
+            Field Name
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1FieldDefinition.TypeName">
+            <summary>
+            Type Name
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1FieldDefinition.Restrictions">
+            <summary>
+            Optional restrictions.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1FieldDefinition.Optional">
+            <summary>
+            If field is optional.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1FieldDefinition.Unique">
+            <summary>
+            If field value is unique.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1FieldDefinition.Default">
+            <summary>
+            Default value if field not provided.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1FieldDefinition.NamedOptions">
+            <summary>
+            Named options.
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Asn1FieldValueDefinition">
+            <summary>
+            Represents an ASN.1 field value definition.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Asn1FieldValueDefinition.#ctor(System.String,System.String,Waher.Content.Asn1.Model.Asn1Node)">
+            <summary>
+            Represents an ASN.1 field value definition.
+            </summary>
+            <param name="FieldName">Field name.</param>
+            <param name="TypeName">Type name.</param>
+            <param name="Value">Value</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1FieldValueDefinition.FieldName">
+            <summary>
+            Field Name
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1FieldValueDefinition.TypeName">
+            <summary>
+            Type Name
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1FieldValueDefinition.Value">
+            <summary>
+            Type definition
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Asn1Import">
+            <summary>
+            Represents one import instruction.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Asn1Import.#ctor(System.String,System.String)">
+            <summary>
+            Represents one import instruction.
+            </summary>
+            <param name="Identifier">Identifier to import.</param>
+            <param name="Module">Optional module reference.</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1Import.Identifier">
+            <summary>
+            Identifier to import.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1Import.Module">
+            <summary>
+            Optional module reference.
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Asn1List">
+            <summary>
+            Abstract base class for list constructs.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Asn1List.#ctor(Waher.Content.Asn1.Model.Asn1Node[])">
+            <summary>
+            Abstract base class for list constructs.
+            </summary>
+            <param name="Nodes">Nodes</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1List.Nodes">
+            <summary>
+            Nodes
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Asn1Module">
+            <summary>
+            Represents an ASN.1 module.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Asn1Module.#ctor(Waher.Content.Asn1.Model.Asn1Import[],System.String[],Waher.Content.Asn1.Model.Asn1Node[])">
+            <summary>
+            Represents an ASN.1 module.
+            </summary>
+            <param name="Imports">Optional Import instructions.</param>
+            <param name="Exports">Optional Export instructions.</param>
+            <param name="Items">Items in module.</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1Module.Imports">
+            <summary>
+            Optional Import instructions.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1Module.Exports">
+            <summary>
+            Optional Export instructions.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1Module.Items">
+            <summary>
+            Items in module.
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Asn1Node">
+            <summary>
+            Base class for all ASN.1 nodes.
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Asn1Oid">
+            <summary>
+            Represents an ASN.1 Object ID
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Asn1Oid.#ctor(Waher.Content.Asn1.Model.Asn1Node[])">
+            <summary>
+            Represents an ASN.1 Object ID
+            </summary>
+            <param name="Values">OID values.</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1Oid.Values">
+            <summary>
+            OID values.
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Asn1Restriction">
+            <summary>
+            Abstract base class for ASN.1 restrictions.
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Asn1Sequence">
+            <summary>
+            Represents a ASN.1 SEQUENCE construct.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Asn1Sequence.#ctor(Waher.Content.Asn1.Model.Asn1Node[])">
+            <summary>
+            Represents a ASN.1 SEQUENCE construct.
+            </summary>
+            <param name="Nodes">Nodes</param>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Asn1SequenceOf">
+            <summary>
+            Represents a ASN.1 SEQUENCE OF construct.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Asn1SequenceOf.#ctor(Waher.Content.Asn1.Model.Asn1Set,System.String)">
+            <summary>
+            Represents a ASN.1 SEQUENCE OF construct.
+            </summary>
+            <param name="Size">SIZE</param>
+            <param name="TypeName">Type name</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1SequenceOf.Size">
+            <summary>
+            SIZE
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1SequenceOf.TypeName">
+            <summary>
+            Type name.
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Asn1Set">
+            <summary>
+            Abstract base class for sets of nodes
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Asn1Set.#ctor">
+            <summary>
+            Abstract base class for sets of nodes
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Asn1Type">
+            <summary>
+            Abstract base class for ASN.1 types.
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Asn1TypeDefinition">
+            <summary>
+            Represents an ASN.1 Type definition.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Asn1TypeDefinition.#ctor(System.String,Waher.Content.Asn1.Model.Asn1Type)">
+            <summary>
+            Represents an ASN.1 Type definition.
+            </summary>
+            <param name="TypeName">Type name.</param>
+            <param name="Definition">Definition</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1TypeDefinition.TypeName">
+            <summary>
+            Type Name
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1TypeDefinition.Definition">
+            <summary>
+            Type definition
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Asn1Value">
+            <summary>
+            Abstract base class for values.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Asn1Value.#ctor">
+            <summary>
+            Abstract base class for values.
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Restrictions.Asn1Except">
+            <summary>
+            ALL EXCEPT
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Restrictions.Asn1Except.#ctor(Waher.Content.Asn1.Model.Asn1Node)">
+            <summary>
+            ALL EXCEPT
+            </summary>
+            <param name="Exception">Exception</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Restrictions.Asn1Except.Exception">
+            <summary>
+            Exception
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Restrictions.Asn1From">
+            <summary>
+            FROM()
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Restrictions.Asn1From.#ctor(Waher.Content.Asn1.Model.Asn1Set)">
+            <summary>
+            FROM()
+            </summary>
+            <param name="Set">Set</param>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Restrictions.Asn1InSet">
+            <summary>
+            Restricted to elements in set.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Restrictions.Asn1InSet.#ctor(Waher.Content.Asn1.Model.Asn1Set)">
+            <summary>
+            Restricted to elements in set.
+            </summary>
+            <param name="Set">Set</param>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Restrictions.Asn1Pattern">
+            <summary>
+            PATTERN
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Restrictions.Asn1Pattern.#ctor(Waher.Content.Asn1.Model.Asn1Node)">
+            <summary>
+            PATTERN
+            </summary>
+            <param name="RegularExpression">Regular Expression</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Restrictions.Asn1Pattern.RegularExpression">
+            <summary>
+            Regular Expression
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Restrictions.Asn1SetRestriction">
+            <summary>
+            Abstract base class for set-based restrictions
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Restrictions.Asn1SetRestriction.#ctor(Waher.Content.Asn1.Model.Asn1Set)">
+            <summary>
+            Abstract base class for set-based restrictions
+            </summary>
+            <param name="Set">Set</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Restrictions.Asn1SetRestriction.Set">
+            <summary>
+            Set
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Restrictions.Asn1Size">
+            <summary>
+            SIZE()
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Restrictions.Asn1Size.#ctor(Waher.Content.Asn1.Model.Asn1Set)">
+            <summary>
+            SIZE()
+            </summary>
+            <param name="Set">Set</param>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Sets.Asn1All">
+            <summary>
+            All elements (in current context).
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Sets.Asn1All.#ctor">
+            <summary>
+            All elements (in current context).
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Sets.Asn1BinaryOperator">
+            <summary>
+            Abstract base class of binary set operators
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Sets.Asn1BinaryOperator.#ctor(Waher.Content.Asn1.Model.Asn1Set,Waher.Content.Asn1.Model.Asn1Set)">
+            <summary>
+            Abstract base class of binary set operators
+            </summary>
+            <param name="Left">Left set</param>
+            <param name="Right">Right set</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Sets.Asn1BinaryOperator.Left">
+            <summary>
+            Left set
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Sets.Asn1BinaryOperator.Right">
+            <summary>
+            Right set
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Sets.Asn1Element">
+            <summary>
+            Set of one element.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Sets.Asn1Element.#ctor(Waher.Content.Asn1.Model.Asn1Value)">
+            <summary>
+            Set of one element.
+            </summary>
+            <param name="Element">Element</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Sets.Asn1Element.Element">
+            <summary>
+            Element
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Sets.Asn1Exclusion">
+            <summary>
+            Exclusion of sets.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Sets.Asn1Exclusion.#ctor(Waher.Content.Asn1.Model.Asn1Set,Waher.Content.Asn1.Model.Asn1Set)">
+            <summary>
+            Union of sets.
+            </summary>
+            <param name="Left">Left set</param>
+            <param name="Right">Right set</param>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Sets.Asn1Intersection">
+            <summary>
+            Intersection of sets.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Sets.Asn1Intersection.#ctor(Waher.Content.Asn1.Model.Asn1Set,Waher.Content.Asn1.Model.Asn1Set)">
+            <summary>
+            Union of sets.
+            </summary>
+            <param name="Left">Left set</param>
+            <param name="Right">Right set</param>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Sets.Asn1Interval">
+            <summary>
+            Interval of elements.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Sets.Asn1Interval.#ctor(Waher.Content.Asn1.Model.Asn1Value,Waher.Content.Asn1.Model.Asn1Value)">
+            <summary>
+            Interval of elements.
+            </summary>
+            <param name="From">From</param>
+            <param name="To">To</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Sets.Asn1Interval.From">
+            <summary>
+            From
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Sets.Asn1Interval.To">
+            <summary>
+            To
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Sets.Asn1Union">
+            <summary>
+            Union of sets.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Sets.Asn1Union.#ctor(Waher.Content.Asn1.Model.Asn1Set,Waher.Content.Asn1.Model.Asn1Set)">
+            <summary>
+            Union of sets.
+            </summary>
+            <param name="Left">Left set</param>
+            <param name="Right">Right set</param>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Types.Asn1BitString">
+            <summary>
+            BIT STRING
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Types.Asn1BmpString">
+            <summary>
+            BmpString
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Types.Asn1Boolean">
+            <summary>
+            BOOLEAN
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Types.Asn1Character">
+            <summary>
+            CHARACTER
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Types.Asn1Date">
+            <summary>
+            DATE
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Types.Asn1DateTime">
+            <summary>
+            DATE-TIME
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Types.Asn1GeneralizedTime">
+            <summary>
+            GeneralizedTime
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Types.Asn1GeneralString">
+            <summary>
+            GeneralString
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Types.Asn1GraphicString">
+            <summary>
+            GraphicString
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Types.Asn1Ia5String">
+            <summary>
+            IA5String
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Types.Asn1Integer">
+            <summary>
+            INTEGER
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Types.Asn1Iso646String">
+            <summary>
+            Iso646String
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Types.Asn1Null">
+            <summary>
+            NULL
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Types.Asn1NumericString">
+            <summary>
+            NumericString
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Types.Asn1ObjectIdentifier">
+            <summary>
+            OBJECT IDENTIFIER
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Types.Asn1OctetString">
+            <summary>
+            OCTET STRING
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Types.Asn1PrintableString">
+            <summary>
+            PrintableString
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Types.Asn1Real">
+            <summary>
+            REAL
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Types.Asn1T61String">
+            <summary>
+            T61String
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Types.Asn1TeletexString">
+            <summary>
+            TeletexString
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Types.Asn1TimeOfDay">
+            <summary>
+            TIME-OF-DAY
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Types.Asn1UniversalString">
+            <summary>
+            UniversalString
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Types.Asn1UtcTime">
+            <summary>
+            UTCTime
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Types.Asn1Utf8String">
+            <summary>
+            UTF8String
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Types.Asn1VideotexString">
+            <summary>
+            VideotexString
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Types.Asn1VisibleString">
+            <summary>
+            VisibleString
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Values.Asn1BooleanValue">
+            <summary>
+            Boolean value
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Values.Asn1BooleanValue.#ctor(System.Boolean)">
+            <summary>
+            Boolean value
+            </summary>
+            <param name="Value">Value</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Values.Asn1BooleanValue.Value">
+            <summary>
+            Value
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Values.Asn1FloatingPointValue">
+            <summary>
+            Floating-point value
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Values.Asn1FloatingPointValue.#ctor(System.Double)">
+            <summary>
+            Floating-point value
+            </summary>
+            <param name="Value">Value</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Values.Asn1FloatingPointValue.Value">
+            <summary>
+            Value
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Values.Asn1Identifier">
+            <summary>
+            Represents an ASN.1 identifier.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Values.Asn1Identifier.#ctor(System.String)">
+            <summary>
+            Represents an ASN.1 identifier.
+            </summary>
+            <param name="Identifier">Identifier</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Values.Asn1Identifier.Identifier">
+            <summary>
+            Identifier
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Values.Asn1IntegerValue">
+            <summary>
+            Integer value
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Values.Asn1IntegerValue.#ctor(System.Int64)">
+            <summary>
+            Integer value
+            </summary>
+            <param name="Value">Value</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Values.Asn1IntegerValue.Value">
+            <summary>
+            Value
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Values.Asn1Max">
+            <summary>
+            MAX
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Values.Asn1Max.#ctor">
+            <summary>
+            MAX
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Values.Asn1Min">
+            <summary>
+            MIN
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Values.Asn1Min.#ctor">
+            <summary>
+            MIN
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Values.Asn1NamedValue">
+            <summary>
+            Represents a named value.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Values.Asn1NamedValue.#ctor(System.String,Waher.Content.Asn1.Model.Asn1Value)">
+            <summary>
+            Represents a named value.
+            </summary>
+            <param name="Identifier">Identifier</param>
+            <param name="Value">Value</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Values.Asn1NamedValue.Value">
+            <summary>
+            Value
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Values.Asn1StringValue">
+            <summary>
+            String value
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Values.Asn1StringValue.#ctor(System.String)">
+            <summary>
+            String value
+            </summary>
+            <param name="Value">Value</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Values.Asn1StringValue.Value">
+            <summary>
+            Value
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Values.Asn1Values">
+            <summary>
+            Set of values
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Values.Asn1Values.#ctor(Waher.Content.Asn1.Model.Asn1Value[])">
+            <summary>
+            Set of values
+            </summary>
+            <param name="Values">Values</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Values.Asn1Values.Values">
+            <summary>
+            Value
+            </summary>
+        </member>
+    </members>
+</doc>

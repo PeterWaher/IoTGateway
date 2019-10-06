@@ -7,7 +7,7 @@ namespace Waher.Content.Asn1.Model.Values
 	/// <summary>
 	/// Represents a named value.
 	/// </summary>
-	public class Asn1NamedValue : Asn1Identifier 
+	public class Asn1NamedValue : Asn1ValueReference
 	{
 		private readonly Asn1Value value;
 
@@ -15,7 +15,7 @@ namespace Waher.Content.Asn1.Model.Values
 		/// Represents a named value.
 		/// </summary>
 		/// <param name="Identifier">Identifier</param>
-		/// <param name="Value">Value</param>
+		/// <param name="Value">Optional Value</param>
 		public Asn1NamedValue(string Identifier, Asn1Value Value)
 			: base(Identifier)
 		{
@@ -23,7 +23,7 @@ namespace Waher.Content.Asn1.Model.Values
 		}
 
 		/// <summary>
-		/// Value
+		/// Optional Value
 		/// </summary>
 		public Asn1Value Value => this.value;
 	}

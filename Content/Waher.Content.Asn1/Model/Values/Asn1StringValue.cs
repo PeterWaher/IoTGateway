@@ -24,5 +24,22 @@ namespace Waher.Content.Asn1.Model.Values
 		/// Value
 		/// </summary>
 		public string Value => this.value;
+
+		/// <summary>
+		/// Exports to C#
+		/// </summary>
+		/// <param name="Output">C# Output.</param>
+		/// <param name="Settings">C# export settings.</param>
+		/// <param name="Indent">Indentation</param>
+		public override void ExportCSharp(StringBuilder Output, CSharpExportSettings Settings,
+			int Indent)
+		{
+			Output.Append('"');
+			Output.Append(this.value.Replace("\\", "\\\\").Replace("\r", "\\r").
+				Replace("\n", "\\n").Replace("\t", "\\t").Replace("\a", "\\a").
+				Replace("\b", "\\b").Replace("\f", "\\f").Replace("\"", "\\\"").
+				Replace("'", "\\'"));
+			Output.Append('"');
+		}
 	}
 }

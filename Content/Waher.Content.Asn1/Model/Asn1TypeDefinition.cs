@@ -32,5 +32,16 @@ namespace Waher.Content.Asn1.Model
 		/// Type definition
 		/// </summary>
 		public Asn1Type Definition => this.definition;
+
+		/// <summary>
+		/// Exports to C#
+		/// </summary>
+		/// <param name="Output">C# Output.</param>
+		/// <param name="Settings">C# export settings.</param>
+		/// <param name="Indent">Indentation</param>
+		public override void ExportCSharp(StringBuilder Output, CSharpExportSettings Settings, int Indent)
+		{
+			this.definition.ExportCSharpTypeDefinition(Output, Settings, Indent, this.typeName);
+		}
 	}
 }

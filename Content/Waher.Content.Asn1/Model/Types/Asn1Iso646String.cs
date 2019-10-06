@@ -7,7 +7,7 @@ namespace Waher.Content.Asn1.Model.Types
 	/// <summary>
 	/// Iso646String
 	/// </summary>
-	public class Asn1Iso646String : Asn1Type
+	public class Asn1Iso646String : Asn1StringType
 	{
 	}
 }

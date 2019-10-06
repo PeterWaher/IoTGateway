@@ -2,20 +2,20 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Waher.Content.Asn1.Model.Values
+namespace Waher.Content.Asn1.Model.Types
 {
 	/// <summary>
-	/// Represents an ASN.1 identifier.
+	/// Represents an ASN.1 type reference.
 	/// </summary>
-	public class Asn1Identifier : Asn1Value
+	public class Asn1TypeReference : Asn1Type
 	{
 		private readonly string identifier;
 
 		/// <summary>
-		/// Represents an ASN.1 identifier.
+		/// Represents an ASN.1 type reference.
 		/// </summary>
 		/// <param name="Identifier">Identifier</param>
-		public Asn1Identifier(string Identifier)
+		public Asn1TypeReference(string Identifier)
 		{
 			this.identifier = Identifier;
 		}

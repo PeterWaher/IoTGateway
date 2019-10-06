@@ -6,8 +6,9 @@ namespace Waher.Content.Asn1.Model.Types
 {
 	/// <summary>
 	/// VideotexString
+	/// CCITT's T.100 and T.101 character sets 
 	/// </summary>
-	public class Asn1VideotexString : Asn1Type
+	public class Asn1VideotexString : Asn1StringType
 	{
 	}
 }

@@ -9,5 +9,14 @@ namespace Waher.Content.Asn1.Model.Types
 	/// </summary>
 	public class Asn1Integer : Asn1Type
 	{
+		/// <summary>
+		/// C# type reference.
+		/// </summary>
+		public override string CSharpTypeReference => "long";
+
+		/// <summary>
+		/// If type is nullable.
+		/// </summary>
+		public override bool CSharpTypeNullable => false;
 	}
 }

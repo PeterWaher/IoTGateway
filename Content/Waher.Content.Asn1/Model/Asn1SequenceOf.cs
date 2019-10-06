@@ -15,7 +15,7 @@ namespace Waher.Content.Asn1.Model
 		/// <summary>
 		/// Represents a ASN.1 SEQUENCE OF construct.
 		/// </summary>
-		/// <param name="Size">SIZE</param>
+		/// <param name="Size">Optional SIZE</param>
 		/// <param name="TypeName">Type name</param>
 		public Asn1SequenceOf(Asn1Values Size, string TypeName)
 		{
@@ -24,7 +24,7 @@ namespace Waher.Content.Asn1.Model
 		}
 
 		/// <summary>
-		/// SIZE
+		/// Optional SIZE
 		/// </summary>
 		public Asn1Values Size => this.size;
 
@@ -32,5 +32,15 @@ namespace Waher.Content.Asn1.Model
 		/// Type name.
 		/// </summary>
 		public string TypeName => this.typeName;
+
+		/// <summary>
+		/// C# type reference.
+		/// </summary>
+		public override string CSharpTypeReference => this.typeName + "[]";
+
+		/// <summary>
+		/// If type is nullable.
+		/// </summary>
+		public override bool CSharpTypeNullable => base.CSharpTypeNullable;
 	}
 }

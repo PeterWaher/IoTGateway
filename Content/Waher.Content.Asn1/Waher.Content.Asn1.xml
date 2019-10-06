@@ -25,6 +25,47 @@
             ASN.1 text
             </summary>
         </member>
+        <member name="M:Waher.Content.Asn1.Asn1Document.ExportCSharp(System.String,Waher.Content.Asn1.CSharpExportSettings)">
+            <summary>
+            Exports ASN.1 schemas to C#
+            </summary>
+            <param name="Namespace">What namespace to generate classes in.</param>
+            <param name="Settings">C# export settings.</param>
+            <returns>C# code</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.Asn1Document.ExportCSharp(System.Text.StringBuilder,System.String,Waher.Content.Asn1.CSharpExportSettings)">
+            <summary>
+            Exports ASN.1 schemas to C#
+            </summary>
+            <param name="Output">C# Output.</param>
+            <param name="Namespace">What namespace to generate classes in.</param>
+            <param name="Settings">C# export settings.</param>
+        </member>
+        <member name="T:Waher.Content.Asn1.CSharpExportSettings">
+            <summary>
+            C# export settings
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Asn1.CSharpExportSettings.Codecs">
+            <summary>
+            What encoders and decoders to include in the generation of C# code.
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.EncodingSchemes">
+            <summary>
+            Available ASN.1 encoding schemes.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Asn1.EncodingSchemes.BER">
+            <summary>
+            Basic Encoding Rules (BER)
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Asn1.EncodingSchemes.All">
+            <summary>
+            All supported encoding schemes.
+            </summary>
+        </member>
         <member name="T:Waher.Content.Asn1.Exceptions.Asn1Exception">
             <summary>
             Base class from ASN.1 exceptions.
@@ -64,11 +105,30 @@
             Represents a ASN.1 CHOICE construct.
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Asn1Choice.#ctor(Waher.Content.Asn1.Model.Asn1Node[])">
+        <member name="M:Waher.Content.Asn1.Model.Asn1Choice.#ctor(System.String,Waher.Content.Asn1.Model.Asn1Node[])">
             <summary>
             Represents a ASN.1 CHOICE construct.
             </summary>
+            <param name="FieldName">Optional field name.</param>
             <param name="Nodes">Nodes</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1Choice.CSharpTypeReference">
+            <summary>
+            C# type reference.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1Choice.CSharpTypeNullable">
+            <summary>
+            If type is nullable.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Asn1Choice.ExportImplicitCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportSettings,System.Int32)">
+            <summary>
+            Exports implicit definitions to C#
+            </summary>
+            <param name="Output">C# Output.</param>
+            <param name="Settings">C# export settings.</param>
+            <param name="Indent">Indentation</param>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Asn1Tags">
             <summary>
@@ -130,16 +190,43 @@
             Definition body.
             </summary>
         </member>
+        <member name="M:Waher.Content.Asn1.Model.Asn1Definitions.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportSettings,System.Int32)">
+            <summary>
+            Exports to C#
+            </summary>
+            <param name="Output">C# Output.</param>
+            <param name="Settings">C# export settings.</param>
+            <param name="Indent">Indentation</param>
+        </member>
         <member name="T:Waher.Content.Asn1.Model.Asn1Enumeration">
             <summary>
             ENUMERATED
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Asn1Enumeration.#ctor(Waher.Content.Asn1.Model.Asn1Node[])">
+        <member name="M:Waher.Content.Asn1.Model.Asn1Enumeration.#ctor(System.String,Waher.Content.Asn1.Model.Asn1Node[])">
             <summary>
             ENUMERATED
             </summary>
+            <param name="FieldName">Optional field name.</param>
             <param name="Nodes">Nodes</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1Enumeration.CSharpTypeReference">
+            <summary>
+            C# type reference.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1Enumeration.CSharpTypeNullable">
+            <summary>
+            If type is nullable.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Asn1Enumeration.ExportImplicitCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportSettings,System.Int32)">
+            <summary>
+            Exports implicit definitions to C#
+            </summary>
+            <param name="Output">C# Output.</param>
+            <param name="Settings">C# export settings.</param>
+            <param name="Indent">Indentation</param>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Asn1Extension">
             <summary>
@@ -161,12 +248,12 @@
             Represents an ASN.1 field definition.
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Asn1FieldDefinition.#ctor(System.String,System.Nullable{System.Int32},System.String,Waher.Content.Asn1.Model.Asn1Restriction,System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},Waher.Content.Asn1.Model.Asn1Node,Waher.Content.Asn1.Model.Values.Asn1NamedValue[])">
+        <member name="M:Waher.Content.Asn1.Model.Asn1FieldDefinition.#ctor(System.String,System.Nullable{System.Int32},Waher.Content.Asn1.Model.Asn1Type,Waher.Content.Asn1.Model.Asn1Restriction,System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},Waher.Content.Asn1.Model.Asn1Node,Waher.Content.Asn1.Model.Values.Asn1NamedValue[])">
             <summary>
             Represents an ASN.1 field definition.
             </summary>
             <param name="FieldName">Field name.</param>
-            <param name="TypeName">Type name.</param>
+            <param name="Type">Type.</param>
             <param name="Restriction">Optional restrictions.</param>
             <param name="Optional">If field is optional.</param>
             <param name="Unique">If field value is unique.</param>
@@ -180,9 +267,9 @@
             Field Name
             </summary>
         </member>
-        <member name="P:Waher.Content.Asn1.Model.Asn1FieldDefinition.TypeName">
+        <member name="P:Waher.Content.Asn1.Model.Asn1FieldDefinition.Type">
             <summary>
-            Type Name
+            Type
             </summary>
         </member>
         <member name="P:Waher.Content.Asn1.Model.Asn1FieldDefinition.Restriction">
@@ -224,6 +311,22 @@
             <summary>
             Tag
             </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Asn1FieldDefinition.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportSettings,System.Int32)">
+            <summary>
+            Exports to C#
+            </summary>
+            <param name="Output">C# Output.</param>
+            <param name="Settings">C# export settings.</param>
+            <param name="Indent">Indentation</param>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Asn1FieldDefinition.ExportImplicitCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportSettings,System.Int32)">
+            <summary>
+            Exports implicit definitions to C#
+            </summary>
+            <param name="Output">C# Output.</param>
+            <param name="Settings">C# export settings.</param>
+            <param name="Indent">Indentation</param>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Asn1FieldValueDefinition">
             <summary>
@@ -280,15 +383,21 @@
             Abstract base class for list constructs.
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Asn1List.#ctor(Waher.Content.Asn1.Model.Asn1Node[])">
+        <member name="M:Waher.Content.Asn1.Model.Asn1List.#ctor(System.String,Waher.Content.Asn1.Model.Asn1Node[])">
             <summary>
             Abstract base class for list constructs.
             </summary>
+            <param name="FieldName">Optional field name.</param>
             <param name="Nodes">Nodes</param>
         </member>
         <member name="P:Waher.Content.Asn1.Model.Asn1List.Nodes">
             <summary>
             Nodes
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1List.FieldName">
+            <summary>
+            Optional field name.
             </summary>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Asn1Module">
@@ -319,10 +428,34 @@
             Items in module.
             </summary>
         </member>
+        <member name="M:Waher.Content.Asn1.Model.Asn1Module.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportSettings,System.Int32)">
+            <summary>
+            Exports to C#
+            </summary>
+            <param name="Output">C# Output.</param>
+            <param name="Settings">C# export settings.</param>
+            <param name="Indent">Indentation</param>
+        </member>
         <member name="T:Waher.Content.Asn1.Model.Asn1Node">
             <summary>
             Base class for all ASN.1 nodes.
             </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Asn1Node.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportSettings,System.Int32)">
+            <summary>
+            Exports to C#
+            </summary>
+            <param name="Output">C# Output.</param>
+            <param name="Settings">C# export settings.</param>
+            <param name="Indent">Indentation</param>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Asn1Node.ExportImplicitCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportSettings,System.Int32)">
+            <summary>
+            Exports implicit definitions to C#
+            </summary>
+            <param name="Output">C# Output.</param>
+            <param name="Settings">C# export settings.</param>
+            <param name="Indent">Indentation</param>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Asn1Oid">
             <summary>
@@ -350,11 +483,39 @@
             Represents a ASN.1 SEQUENCE construct.
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Asn1Sequence.#ctor(Waher.Content.Asn1.Model.Asn1Node[])">
+        <member name="M:Waher.Content.Asn1.Model.Asn1Sequence.#ctor(System.String,Waher.Content.Asn1.Model.Asn1Node[])">
             <summary>
             Represents a ASN.1 SEQUENCE construct.
             </summary>
+            <param name="FieldName">Optional field name.</param>
             <param name="Nodes">Nodes</param>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Asn1Sequence.ExportCSharpTypeDefinition(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportSettings,System.Int32,System.String)">
+            <summary>
+            Exports to C#
+            </summary>
+            <param name="Output">C# Output.</param>
+            <param name="Settings">C# export settings.</param>
+            <param name="Indent">Indentation</param>
+            <param name="TypeName">Type name.</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1Sequence.CSharpTypeReference">
+            <summary>
+            C# type reference.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1Sequence.CSharpTypeNullable">
+            <summary>
+            If type is nullable.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Asn1Sequence.ExportImplicitCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportSettings,System.Int32)">
+            <summary>
+            Exports implicit definitions to C#
+            </summary>
+            <param name="Output">C# Output.</param>
+            <param name="Settings">C# export settings.</param>
+            <param name="Indent">Indentation</param>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Asn1SequenceOf">
             <summary>
@@ -365,12 +526,12 @@
             <summary>
             Represents a ASN.1 SEQUENCE OF construct.
             </summary>
-            <param name="Size">SIZE</param>
+            <param name="Size">Optional SIZE</param>
             <param name="TypeName">Type name</param>
         </member>
         <member name="P:Waher.Content.Asn1.Model.Asn1SequenceOf.Size">
             <summary>
-            SIZE
+            Optional SIZE
             </summary>
         </member>
         <member name="P:Waher.Content.Asn1.Model.Asn1SequenceOf.TypeName">
@@ -378,16 +539,45 @@
             Type name.
             </summary>
         </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1SequenceOf.CSharpTypeReference">
+            <summary>
+            C# type reference.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1SequenceOf.CSharpTypeNullable">
+            <summary>
+            If type is nullable.
+            </summary>
+        </member>
         <member name="T:Waher.Content.Asn1.Model.Asn1Set">
             <summary>
             Represents a ASN.1 SET construct.
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Asn1Set.#ctor(Waher.Content.Asn1.Model.Asn1Node[])">
+        <member name="M:Waher.Content.Asn1.Model.Asn1Set.#ctor(System.String,Waher.Content.Asn1.Model.Asn1Node[])">
             <summary>
             Represents a ASN.1 SET construct.
             </summary>
+            <param name="FieldName">Optional field name.</param>
             <param name="Nodes">Nodes</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1Set.CSharpTypeReference">
+            <summary>
+            C# type reference.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1Set.CSharpTypeNullable">
+            <summary>
+            If type is nullable.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Asn1Set.ExportImplicitCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportSettings,System.Int32)">
+            <summary>
+            Exports implicit definitions to C#
+            </summary>
+            <param name="Output">C# Output.</param>
+            <param name="Settings">C# export settings.</param>
+            <param name="Indent">Indentation</param>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Asn1SetOf">
             <summary>
@@ -416,6 +606,25 @@
             Abstract base class for ASN.1 types.
             </summary>
         </member>
+        <member name="M:Waher.Content.Asn1.Model.Asn1Type.ExportCSharpTypeDefinition(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportSettings,System.Int32,System.String)">
+            <summary>
+            Exports to C#
+            </summary>
+            <param name="Output">C# Output.</param>
+            <param name="Settings">C# export settings.</param>
+            <param name="Indent">Indentation</param>
+            <param name="TypeName">Type name.</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1Type.CSharpTypeReference">
+            <summary>
+            C# type reference.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1Type.CSharpTypeNullable">
+            <summary>
+            If type is nullable.
+            </summary>
+        </member>
         <member name="T:Waher.Content.Asn1.Model.Asn1TypeDefinition">
             <summary>
             Represents an ASN.1 Type definition.
@@ -437,6 +646,14 @@
             <summary>
             Type definition
             </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Asn1TypeDefinition.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportSettings,System.Int32)">
+            <summary>
+            Exports to C#
+            </summary>
+            <param name="Output">C# Output.</param>
+            <param name="Settings">C# export settings.</param>
+            <param name="Indent">Indentation</param>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Asn1Value">
             <summary>
@@ -724,9 +941,20 @@
             BIT STRING
             </summary>
         </member>
+        <member name="P:Waher.Content.Asn1.Model.Types.Asn1BitString.CSharpTypeReference">
+            <summary>
+            C# type reference.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Types.Asn1BitString.CSharpTypeNullable">
+            <summary>
+            If type is nullable.
+            </summary>
+        </member>
         <member name="T:Waher.Content.Asn1.Model.Types.Asn1BmpString">
             <summary>
-            BmpString
+            BmpString (utf-16-be encoded string)
+            Basic Multilingual Plane of ISO/IEC/ITU 10646-1
             </summary>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Types.Asn1Boolean">
@@ -734,9 +962,29 @@
             BOOLEAN
             </summary>
         </member>
+        <member name="P:Waher.Content.Asn1.Model.Types.Asn1Boolean.CSharpTypeReference">
+            <summary>
+            C# type reference.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Types.Asn1Boolean.CSharpTypeNullable">
+            <summary>
+            If type is nullable.
+            </summary>
+        </member>
         <member name="T:Waher.Content.Asn1.Model.Types.Asn1Character">
             <summary>
             CHARACTER
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Types.Asn1Character.CSharpTypeReference">
+            <summary>
+            C# type reference.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Types.Asn1Character.CSharpTypeNullable">
+            <summary>
+            If type is nullable.
             </summary>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Types.Asn1Date">
@@ -744,9 +992,29 @@
             DATE
             </summary>
         </member>
+        <member name="P:Waher.Content.Asn1.Model.Types.Asn1Date.CSharpTypeReference">
+            <summary>
+            C# type reference.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Types.Asn1Date.CSharpTypeNullable">
+            <summary>
+            If type is nullable.
+            </summary>
+        </member>
         <member name="T:Waher.Content.Asn1.Model.Types.Asn1DateTime">
             <summary>
             DATE-TIME
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Types.Asn1DateTime.CSharpTypeReference">
+            <summary>
+            C# type reference.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Types.Asn1DateTime.CSharpTypeNullable">
+            <summary>
+            If type is nullable.
             </summary>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Types.Asn1GeneralizedTime">
@@ -754,24 +1022,47 @@
             GeneralizedTime
             </summary>
         </member>
+        <member name="P:Waher.Content.Asn1.Model.Types.Asn1GeneralizedTime.CSharpTypeReference">
+            <summary>
+            C# type reference.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Types.Asn1GeneralizedTime.CSharpTypeNullable">
+            <summary>
+            If type is nullable.
+            </summary>
+        </member>
         <member name="T:Waher.Content.Asn1.Model.Types.Asn1GeneralString">
             <summary>
             GeneralString
+            all registered graphic and character sets plus SPACE and DELETE
             </summary>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Types.Asn1GraphicString">
             <summary>
             GraphicString
+            all registered G sets and SPACE
             </summary>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Types.Asn1Ia5String">
             <summary>
             IA5String
+            International ASCII characters (International Alphabet 5)
             </summary>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Types.Asn1Integer">
             <summary>
             INTEGER
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Types.Asn1Integer.CSharpTypeReference">
+            <summary>
+            C# type reference.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Types.Asn1Integer.CSharpTypeNullable">
+            <summary>
+            If type is nullable.
             </summary>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Types.Asn1Iso646String">
@@ -787,6 +1078,7 @@
         <member name="T:Waher.Content.Asn1.Model.Types.Asn1NumericString">
             <summary>
             NumericString
+            1, 2, 3, 4, 5, 6, 7, 8, 9, 0, and SPACE 
             </summary>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Types.Asn1ObjectIdentifier">
@@ -799,14 +1091,50 @@
             OCTET STRING
             </summary>
         </member>
+        <member name="P:Waher.Content.Asn1.Model.Types.Asn1OctetString.CSharpTypeReference">
+            <summary>
+            C# type reference.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Types.Asn1OctetString.CSharpTypeNullable">
+            <summary>
+            If type is nullable.
+            </summary>
+        </member>
         <member name="T:Waher.Content.Asn1.Model.Types.Asn1PrintableString">
             <summary>
             PrintableString
+            a-z, A-Z, ' () +,-.?:/= and SPACE
             </summary>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Types.Asn1Real">
             <summary>
             REAL
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Types.Asn1Real.CSharpTypeReference">
+            <summary>
+            C# type reference.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Types.Asn1Real.CSharpTypeNullable">
+            <summary>
+            If type is nullable.
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Types.Asn1StringType">
+            <summary>
+            Abstract base class for string types
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Types.Asn1StringType.CSharpTypeReference">
+            <summary>
+            C# type reference.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Types.Asn1StringType.CSharpTypeNullable">
+            <summary>
+            If type is nullable.
             </summary>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Types.Asn1T61String">
@@ -817,6 +1145,7 @@
         <member name="T:Waher.Content.Asn1.Model.Types.Asn1TeletexString">
             <summary>
             TeletexString
+            CCITT and T.101 character sets
             </summary>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Types.Asn1TimeOfDay">
@@ -824,9 +1153,36 @@
             TIME-OF-DAY
             </summary>
         </member>
+        <member name="P:Waher.Content.Asn1.Model.Types.Asn1TimeOfDay.CSharpTypeReference">
+            <summary>
+            C# type reference.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Types.Asn1TimeOfDay.CSharpTypeNullable">
+            <summary>
+            If type is nullable.
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Types.Asn1TypeReference">
+            <summary>
+            Represents an ASN.1 type reference.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1TypeReference.#ctor(System.String)">
+            <summary>
+            Represents an ASN.1 type reference.
+            </summary>
+            <param name="Identifier">Identifier</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Types.Asn1TypeReference.Identifier">
+            <summary>
+            Identifier
+            </summary>
+        </member>
         <member name="T:Waher.Content.Asn1.Model.Types.Asn1UniversalString">
             <summary>
             UniversalString
+            ISO10646 character set
             </summary>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Types.Asn1UtcTime">
@@ -834,19 +1190,32 @@
             UTCTime
             </summary>
         </member>
+        <member name="P:Waher.Content.Asn1.Model.Types.Asn1UtcTime.CSharpTypeReference">
+            <summary>
+            C# type reference.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Types.Asn1UtcTime.CSharpTypeNullable">
+            <summary>
+            If type is nullable.
+            </summary>
+        </member>
         <member name="T:Waher.Content.Asn1.Model.Types.Asn1Utf8String">
             <summary>
             UTF8String
+            any character from a recognized alphabet (including ASCII control characters)
             </summary>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Types.Asn1VideotexString">
             <summary>
             VideotexString
+            CCITT's T.100 and T.101 character sets 
             </summary>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Types.Asn1VisibleString">
             <summary>
             VisibleString
+            International ASCII printing character sets 
             </summary>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Values.Asn1Array">
@@ -881,6 +1250,14 @@
             Value
             </summary>
         </member>
+        <member name="M:Waher.Content.Asn1.Model.Values.Asn1BooleanValue.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportSettings,System.Int32)">
+            <summary>
+            Exports to C#
+            </summary>
+            <param name="Output">C# Output.</param>
+            <param name="Settings">C# export settings.</param>
+            <param name="Indent">Indentation</param>
+        </member>
         <member name="T:Waher.Content.Asn1.Model.Values.Asn1FloatingPointValue">
             <summary>
             Floating-point value
@@ -897,21 +1274,13 @@
             Value
             </summary>
         </member>
-        <member name="T:Waher.Content.Asn1.Model.Values.Asn1Identifier">
+        <member name="M:Waher.Content.Asn1.Model.Values.Asn1FloatingPointValue.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportSettings,System.Int32)">
             <summary>
-            Represents an ASN.1 identifier.
+            Exports to C#
             </summary>
-        </member>
-        <member name="M:Waher.Content.Asn1.Model.Values.Asn1Identifier.#ctor(System.String)">
-            <summary>
-            Represents an ASN.1 identifier.
-            </summary>
-            <param name="Identifier">Identifier</param>
-        </member>
-        <member name="P:Waher.Content.Asn1.Model.Values.Asn1Identifier.Identifier">
-            <summary>
-            Identifier
-            </summary>
+            <param name="Output">C# Output.</param>
+            <param name="Settings">C# export settings.</param>
+            <param name="Indent">Indentation</param>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Values.Asn1IntegerValue">
             <summary>
@@ -928,6 +1297,14 @@
             <summary>
             Value
             </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Values.Asn1IntegerValue.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportSettings,System.Int32)">
+            <summary>
+            Exports to C#
+            </summary>
+            <param name="Output">C# Output.</param>
+            <param name="Settings">C# export settings.</param>
+            <param name="Indent">Indentation</param>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Values.Asn1Max">
             <summary>
@@ -959,11 +1336,11 @@
             Represents a named value.
             </summary>
             <param name="Identifier">Identifier</param>
-            <param name="Value">Value</param>
+            <param name="Value">Optional Value</param>
         </member>
         <member name="P:Waher.Content.Asn1.Model.Values.Asn1NamedValue.Value">
             <summary>
-            Value
+            Optional Value
             </summary>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Values.Asn1StringValue">
@@ -981,6 +1358,38 @@
             <summary>
             Value
             </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Values.Asn1StringValue.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportSettings,System.Int32)">
+            <summary>
+            Exports to C#
+            </summary>
+            <param name="Output">C# Output.</param>
+            <param name="Settings">C# export settings.</param>
+            <param name="Indent">Indentation</param>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Values.Asn1ValueReference">
+            <summary>
+            Represents an ASN.1 value reference.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Values.Asn1ValueReference.#ctor(System.String)">
+            <summary>
+            Represents an ASN.1 value reference.
+            </summary>
+            <param name="Identifier">Identifier</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Values.Asn1ValueReference.Identifier">
+            <summary>
+            Identifier
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Values.Asn1ValueReference.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportSettings,System.Int32)">
+            <summary>
+            Exports to C#
+            </summary>
+            <param name="Output">C# Output.</param>
+            <param name="Settings">C# export settings.</param>
+            <param name="Indent">Indentation</param>
         </member>
     </members>
 </doc>

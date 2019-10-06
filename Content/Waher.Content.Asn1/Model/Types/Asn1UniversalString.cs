@@ -6,8 +6,9 @@ namespace Waher.Content.Asn1.Model.Types
 {
 	/// <summary>
 	/// UniversalString
+	/// ISO10646 character set
 	/// </summary>
-	public class Asn1UniversalString : Asn1Type
+	public class Asn1UniversalString : Asn1StringType
 	{
 	}
 }

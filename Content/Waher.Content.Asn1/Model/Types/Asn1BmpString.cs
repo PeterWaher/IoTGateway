@@ -5,9 +5,10 @@ using System.Text;
 namespace Waher.Content.Asn1.Model.Types
 {
 	/// <summary>
-	/// BmpString
+	/// BmpString (utf-16-be encoded string)
+	/// Basic Multilingual Plane of ISO/IEC/ITU 10646-1
 	/// </summary>
-	public class Asn1BmpString : Asn1Type
+	public class Asn1BmpString : Asn1StringType
 	{
 	}
 }

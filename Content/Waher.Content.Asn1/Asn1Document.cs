@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using System.Collections.Generic;
 using System.Globalization;
 using Waher.Content.Asn1.Exceptions;
@@ -170,7 +171,7 @@ namespace Waher.Content.Asn1
 				if (!(Oid is null))
 					throw this.SyntaxError("DEFINITIONS expected.");
 
-				return new Asn1Identifier(Identifier);
+				return new Asn1TypeReference(Identifier);
 			}
 
 			this.pos += 11;
@@ -358,7 +359,7 @@ namespace Waher.Content.Asn1
 						throw this.SyntaxError("::= expected.");
 
 					this.pos += s2.Length;
-					Asn1Type TypeDefinition = this.ParseType();
+					Asn1Type TypeDefinition = this.ParseType(string.Empty);
 
 					return new Asn1TypeDefinition(s, TypeDefinition);
 				}
@@ -387,8 +388,7 @@ namespace Waher.Content.Asn1
 					if (!IsTypeIdentifier(s2))
 						throw this.SyntaxError("Type name expected.");
 
-					this.pos += s2.Length;
-
+					Asn1Type Type = this.ParseType(s);
 					Asn1Restriction Restriction = null;
 					List<Asn1NamedValue> NamedOptions = null;
 					bool? Optional = false;
@@ -399,9 +399,9 @@ namespace Waher.Content.Asn1
 
 					while (true)
 					{
-						string s3 = this.PeekNextToken();
+						s2 = this.PeekNextToken();
 
-						switch (s3)
+						switch (s2)
 						{
 							case "::=":
 								this.pos += 3;
@@ -419,23 +419,27 @@ namespace Waher.Content.Asn1
 
 								while (true)
 								{
-									s3 = this.NextToken();
-									if (!IsFieldIdentifier(s3))
+									s2 = this.NextToken();
+									if (!IsFieldIdentifier(s2))
 										throw this.SyntaxError("Value name expected.");
 
-									if (this.NextToken() != "(")
-										throw this.SyntaxError("( expected");
+									if (this.PeekNextToken() == "(")
+									{
+										this.pos++;
 
-									NamedOptions.Add(new Asn1NamedValue(s3, this.ParseValue()));
+										NamedOptions.Add(new Asn1NamedValue(s2, this.ParseValue()));
 
-									if (this.NextToken() != ")")
-										throw this.SyntaxError(") expected");
+										if (this.NextToken() != ")")
+											throw this.SyntaxError(") expected");
+									}
+									else
+										NamedOptions.Add(new Asn1NamedValue(s2, null));
 
-									s3 = this.NextToken();
+									s2 = this.NextToken();
 
-									if (s3 == ",")
+									if (s2 == ",")
 										continue;
-									else if (s3 == "}")
+									else if (s2 == "}")
 										break;
 									else
 										throw this.SyntaxError("Unexpected token.");
@@ -469,7 +473,7 @@ namespace Waher.Content.Asn1
 								break;
 
 							default:
-								return new Asn1FieldDefinition(s, Tag, s2, Restriction, 
+								return new Asn1FieldDefinition(s, Tag, Type, Restriction,
 									Optional, Unique, Present, Absent, Default,
 									NamedOptions?.ToArray());
 						}
@@ -692,7 +696,7 @@ namespace Waher.Content.Asn1
 			return new Asn1Oid(Values);
 		}
 
-		private Asn1Type ParseType()
+		private Asn1Type ParseType(string FieldName)
 		{
 			string s = this.NextToken();
 			if (string.IsNullOrEmpty(s))
@@ -723,7 +727,7 @@ namespace Waher.Content.Asn1
 					if (s == "{")
 					{
 						Asn1Node[] Nodes = this.ParseList();
-						return new Asn1Choice(Nodes);
+						return new Asn1Choice(FieldName, Nodes);
 					}
 					else
 						throw this.SyntaxError("{ expected.");
@@ -733,6 +737,17 @@ namespace Waher.Content.Asn1
 
 				case "DATE-TIME":
 					return new Asn1DateTime();
+
+				case "ENUMERATED":
+					s = this.PeekNextToken();
+
+					if (s == "{")
+					{
+						Asn1Node[] Nodes = this.ParseValues();
+						return new Asn1Enumeration(FieldName, Nodes);
+					}
+					else
+						throw this.SyntaxError("{ expected.");
 
 				case "GeneralizedTime":
 					return new Asn1GeneralizedTime();
@@ -786,7 +801,7 @@ namespace Waher.Content.Asn1
 					if (s == "{")
 					{
 						Asn1Node[] Nodes = this.ParseList();
-						return new Asn1Set(Nodes);
+						return new Asn1Set(FieldName, Nodes);
 					}
 					else if (s == "(")
 					{
@@ -834,47 +849,45 @@ namespace Waher.Content.Asn1
 					if (s == "{")
 					{
 						Asn1Node[] Nodes = this.ParseList();
-						return new Asn1Sequence(Nodes);
+						return new Asn1Sequence(FieldName, Nodes);
 					}
-					else if (s == "(")
+					else
 					{
-						this.pos++;
-
 						Asn1Values Size = null;
 
-						while (true)
+						if (s == "(")
 						{
-							s = this.PeekNextToken();
+							this.pos++;
 
-							if (s == "SIZE")
+							while (true)
 							{
-								if (!(Size is null))
-									throw this.SyntaxError("SIZE already specified.");
+								s = this.PeekNextToken();
 
-								this.pos += 4;
-								Size = this.ParseSet();
+								if (s == "SIZE")
+								{
+									if (!(Size is null))
+										throw this.SyntaxError("SIZE already specified.");
+
+									this.pos += 4;
+									Size = this.ParseSet();
+								}
+								else if (s == ")")
+								{
+									this.pos++;
+									break;
+								}
+								else
+									throw this.SyntaxError("Unexpected token.");
 							}
-							else if (s == ")")
-							{
-								this.pos++;
-								break;
-							}
-							else
-								throw this.SyntaxError("Unexpected token.");
 						}
 
 						if (this.NextToken() != "OF")
-							throw this.SyntaxError("OF expected.");
-
-						if (Size is null)
-							throw this.SyntaxError("SIZE expected.");
+							throw this.SyntaxError("Unexpected token.");
 
 						s = this.ParseTypeNameIdentifier();
 
 						return new Asn1SequenceOf(Size, s);
 					}
-					else
-						throw this.SyntaxError("{ expected.");
 
 				case "T61String":
 					return new Asn1T61String();
@@ -900,17 +913,6 @@ namespace Waher.Content.Asn1
 				case "VisibleString":
 					return new Asn1VisibleString();
 
-				case "ENUMERATED":
-					s = this.PeekNextToken();
-
-					if (s == "{")
-					{
-						Asn1Node[] Nodes = this.ParseValues();
-						return new Asn1Enumeration(Nodes);
-					}
-					else
-						throw this.SyntaxError("{ expected.");
-
 				case "ObjectDescriptor":
 				case "EXTERNAL":
 				case "EMBEDDED":
@@ -921,7 +923,10 @@ namespace Waher.Content.Asn1
 					throw this.SyntaxError("Token not implemented.");
 
 				default:
-					throw this.SyntaxError("Unrecognized token.");
+					if (char.IsUpper(s[0]))
+						return new Asn1TypeReference(s);
+					else
+						throw this.SyntaxError("Type name expected.");
 			}
 		}
 
@@ -1099,7 +1104,7 @@ namespace Waher.Content.Asn1
 								return new Asn1Array(Items.ToArray());
 
 							default:
-								if (Value is Asn1Identifier Identifier)
+								if (Value is Asn1ValueReference Identifier)
 								{
 									Value = this.ParseValue();
 									Items.Add(new Asn1NamedValue(Identifier.Identifier, Value));
@@ -1113,6 +1118,8 @@ namespace Waher.Content.Asn1
 				default:
 					if (char.IsLetter(s[0]))
 					{
+						this.pos += s.Length;
+
 						if (this.PeekNextToken() == ":")
 						{
 							if (!AllowNamed)
@@ -1122,8 +1129,10 @@ namespace Waher.Content.Asn1
 							Asn1Value Value = this.ParseValue(false);
 							return new Asn1NamedValue(s, Value);
 						}
+						else if (!char.IsUpper(s[0]))
+							return new Asn1ValueReference(s);
 						else
-							return new Asn1Identifier(s);
+							throw this.SyntaxError("Type references not permitted here.");
 					}
 					else if (long.TryParse(s, out long l))
 					{
@@ -1215,5 +1224,39 @@ namespace Waher.Content.Asn1
 			return true;
 		}
 
+		/// <summary>
+		/// Exports ASN.1 schemas to C#
+		/// </summary>
+		/// <param name="Namespace">What namespace to generate classes in.</param>
+		/// <param name="Settings">C# export settings.</param>
+		/// <returns>C# code</returns>
+		public string ExportCSharp(string Namespace, CSharpExportSettings Settings)
+		{
+			StringBuilder Output = new StringBuilder();
+			this.ExportCSharp(Output, Namespace, Settings);
+			return Output.ToString();
+		}
+
+		/// <summary>
+		/// Exports ASN.1 schemas to C#
+		/// </summary>
+		/// <param name="Output">C# Output.</param>
+		/// <param name="Namespace">What namespace to generate classes in.</param>
+		/// <param name="Settings">C# export settings.</param>
+		public void ExportCSharp(StringBuilder Output, string Namespace, CSharpExportSettings Settings)
+		{
+			Output.AppendLine("using System;");
+			Output.AppendLine("using System.Text;");
+			Output.AppendLine("using System.Collections.Generic;");
+			Output.AppendLine("using Waher.Content.Asn1;");
+			Output.AppendLine();
+			Output.Append("namespace ");
+			Output.AppendLine(Namespace);
+			Output.AppendLine("{");
+
+			this.root?.ExportCSharp(Output, Settings, 1);
+
+			Output.AppendLine("}");
+		}
 	}
 }

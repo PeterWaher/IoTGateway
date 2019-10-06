@@ -6,8 +6,9 @@ namespace Waher.Content.Asn1.Model.Types
 {
 	/// <summary>
 	/// GeneralString
+	/// all registered graphic and character sets plus SPACE and DELETE
 	/// </summary>
-	public class Asn1GeneralString : Asn1Type
+	public class Asn1GeneralString : Asn1StringType
 	{
 	}
 }

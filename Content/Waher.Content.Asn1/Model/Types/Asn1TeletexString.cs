@@ -6,8 +6,9 @@ namespace Waher.Content.Asn1.Model.Types
 {
 	/// <summary>
 	/// TeletexString
+	/// CCITT and T.101 character sets
 	/// </summary>
-	public class Asn1TeletexString : Asn1Type
+	public class Asn1TeletexString : Asn1StringType
 	{
 	}
 }

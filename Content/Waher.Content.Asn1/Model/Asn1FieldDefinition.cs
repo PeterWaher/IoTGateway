@@ -11,7 +11,7 @@ namespace Waher.Content.Asn1.Model
 	public class Asn1FieldDefinition : Asn1Node
 	{
 		private readonly string fieldName;
-		private readonly string typeName;
+		private readonly Asn1Type type;
 		private readonly Asn1Restriction restriction;
 		private readonly Asn1NamedValue[] namedOptions;
 		private readonly bool? optional;
@@ -25,7 +25,7 @@ namespace Waher.Content.Asn1.Model
 		/// Represents an ASN.1 field definition.
 		/// </summary>
 		/// <param name="FieldName">Field name.</param>
-		/// <param name="TypeName">Type name.</param>
+		/// <param name="Type">Type.</param>
 		/// <param name="Restriction">Optional restrictions.</param>
 		/// <param name="Optional">If field is optional.</param>
 		/// <param name="Unique">If field value is unique.</param>
@@ -33,13 +33,13 @@ namespace Waher.Content.Asn1.Model
 		/// <param name="Absent">If an optional field must be absent.</param>
 		/// <param name="Default">Default value if field not provided.</param>
 		/// <param name="NamedOptions">Named options.</param>
-		public Asn1FieldDefinition(string FieldName, int? Tag, string TypeName, 
+		public Asn1FieldDefinition(string FieldName, int? Tag, Asn1Type Type, 
 			Asn1Restriction Restriction, bool? Optional, bool? Unique, bool? Present,
 			bool? Absent, Asn1Node Default, Asn1NamedValue[] NamedOptions)
 			: base()
 		{
 			this.fieldName = FieldName;
-			this.typeName = TypeName;
+			this.type = Type;
 			this.restriction = Restriction;
 			this.optional = Optional;
 			this.unique = Unique;
@@ -56,9 +56,9 @@ namespace Waher.Content.Asn1.Model
 		public string FieldName => this.fieldName;
 
 		/// <summary>
-		/// Type Name
+		/// Type
 		/// </summary>
-		public string TypeName => this.typeName;
+		public Asn1Type Type => this.type;
 
 		/// <summary>
 		/// Optional restrictions.
@@ -102,6 +102,43 @@ namespace Waher.Content.Asn1.Model
 		{
 			get => this.tag;
 			internal set => this.tag = value;
+		}
+		/// <summary>
+		/// Exports to C#
+		/// </summary>
+		/// <param name="Output">C# Output.</param>
+		/// <param name="Settings">C# export settings.</param>
+		/// <param name="Indent">Indentation</param>
+		public override void ExportCSharp(StringBuilder Output, CSharpExportSettings Settings, int Indent)
+		{
+			Output.Append(Tabs(Indent));
+			Output.Append("public ");
+			Output.Append(this.type.CSharpTypeReference);
+
+			if (this.optional.HasValue && this.optional.Value && !this.type.CSharpTypeNullable)
+				Output.Append('?');
+
+			Output.Append(' ');
+			Output.Append(this.fieldName);
+
+			if (!(this._default is null))
+			{
+				Output.Append(" = ");
+				this._default.ExportCSharp(Output, Settings, Indent);
+			}
+
+			Output.AppendLine(";");
+		}
+
+		/// <summary>
+		/// Exports implicit definitions to C#
+		/// </summary>
+		/// <param name="Output">C# Output.</param>
+		/// <param name="Settings">C# export settings.</param>
+		/// <param name="Indent">Indentation</param>
+		public override void ExportImplicitCSharp(StringBuilder Output, CSharpExportSettings Settings, int Indent)
+		{
+			this.type.ExportImplicitCSharp(Output, Settings, Indent);
 		}
 	}
 }

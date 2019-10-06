@@ -77,5 +77,16 @@ namespace Waher.Content.Asn1.Model
 		/// Definition body.
 		/// </summary>
 		public Asn1Node Body => this.body;
+
+		/// <summary>
+		/// Exports to C#
+		/// </summary>
+		/// <param name="Output">C# Output.</param>
+		/// <param name="Settings">C# export settings.</param>
+		/// <param name="Indent">Indentation</param>
+		public override void ExportCSharp(StringBuilder Output, CSharpExportSettings Settings, int Indent)
+		{
+			this.body?.ExportCSharp(Output, Settings, Indent);
+		}
 	}
 }

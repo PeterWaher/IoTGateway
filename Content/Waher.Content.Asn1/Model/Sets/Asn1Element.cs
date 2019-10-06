@@ -7,7 +7,7 @@ namespace Waher.Content.Asn1.Model.Sets
 	/// <summary>
 	/// Set of one element.
 	/// </summary>
-	public class Asn1Element : Asn1Set
+	public class Asn1Element : Asn1Values
 	{
 		private readonly Asn1Value element;
 

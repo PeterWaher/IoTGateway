@@ -7,17 +7,17 @@ namespace Waher.Content.Asn1.Model.Sets
 	/// <summary>
 	/// Abstract base class of binary set operators
 	/// </summary>
-	public abstract class Asn1BinaryOperator : Asn1Set
+	public abstract class Asn1BinarySetOperator : Asn1Values
 	{
-		private readonly Asn1Set left;
-		private readonly Asn1Set right;
+		private readonly Asn1Values left;
+		private readonly Asn1Values right;
 
 		/// <summary>
 		/// Abstract base class of binary set operators
 		/// </summary>
 		/// <param name="Left">Left set</param>
 		/// <param name="Right">Right set</param>
-		public Asn1BinaryOperator(Asn1Set Left, Asn1Set Right)
+		public Asn1BinarySetOperator(Asn1Values Left, Asn1Values Right)
 		{
 			this.left = Left;
 			this.right = Right;
@@ -26,11 +26,11 @@ namespace Waher.Content.Asn1.Model.Sets
 		/// <summary>
 		/// Left set
 		/// </summary>
-		public Asn1Set Left => this.left;
+		public Asn1Values Left => this.left;
 
 		/// <summary>
 		/// Right set
 		/// </summary>
-		public Asn1Set Right => this.right;
+		public Asn1Values Right => this.right;
 	}
 }

@@ -14,7 +14,7 @@ namespace Waher.Content.Asn1.Model.Restrictions
 		/// FROM()
 		/// </summary>
 		/// <param name="Set">Set</param>
-		public Asn1From(Asn1Set Set)
+		public Asn1From(Asn1Values Set)
 			: base(Set)
 		{
 		}

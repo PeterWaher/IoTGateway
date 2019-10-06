@@ -5,16 +5,16 @@ using System.Text;
 namespace Waher.Content.Asn1.Model.Restrictions
 {
 	/// <summary>
-	/// SIZE()
+	/// CONTAINING
 	/// </summary>
-	public class Asn1Size : Asn1SetRestriction
+	public class Asn1Containing : Asn1ValueRestriction
 	{
 		/// <summary>
-		/// SIZE()
+		/// CONTAINING
 		/// </summary>
-		/// <param name="Set">Set</param>
-		public Asn1Size(Asn1Values Set)
-			: base(Set)
+		/// <param name="Value">Value</param>
+		public Asn1Containing(Asn1Value Value)
+			: base(Value)
 		{
 		}
 	}

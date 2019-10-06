@@ -2,19 +2,19 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Waher.Content.Asn1.Model.Sets
+namespace Waher.Content.Asn1.Model.Restrictions
 {
 	/// <summary>
-	/// Exclusion of sets.
+	/// Both restrictions apply
 	/// </summary>
-	public class Asn1Exclusion : Asn1BinarySetOperator
+	public class Asn1And : Asn1BinaryRestrictionOperator
 	{
 		/// <summary>
-		/// Exclusion of sets.
+		/// Both restrictions apply
 		/// </summary>
 		/// <param name="Left">Left set</param>
 		/// <param name="Right">Right set</param>
-		public Asn1Exclusion(Asn1Values Left, Asn1Values Right)
+		public Asn1And(Asn1Restriction Left, Asn1Restriction Right)
 			: base(Left, Right)
 		{
 		}

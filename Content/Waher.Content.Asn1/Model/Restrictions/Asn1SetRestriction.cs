@@ -7,15 +7,15 @@ namespace Waher.Content.Asn1.Model.Restrictions
 	/// <summary>
 	/// Abstract base class for set-based restrictions
 	/// </summary>
-	public class Asn1SetRestriction : Asn1Restriction
+	public abstract class Asn1SetRestriction : Asn1Restriction
 	{
-		private readonly Asn1Set set;
+		private readonly Asn1Values set;
 
 		/// <summary>
 		/// Abstract base class for set-based restrictions
 		/// </summary>
 		/// <param name="Set">Set</param>
-		public Asn1SetRestriction(Asn1Set Set)
+		public Asn1SetRestriction(Asn1Values Set)
 		{
 			this.set = Set;
 		}
@@ -23,6 +23,6 @@ namespace Waher.Content.Asn1.Model.Restrictions
 		/// <summary>
 		/// Set
 		/// </summary>
-		public Asn1Set Set => this.set;
+		public Asn1Values Set => this.set;
 	}
 }

@@ -366,15 +366,35 @@ namespace Waher.Content.Asn1
 				{
 					if (s2 == "::=")    // XML notation
 						throw this.SyntaxError("XML notation not supported.");
-					else if (!IsTypeIdentifier(s2))
+
+					int? Tag = null;
+
+					if (s2 == "[")
+					{
+						this.pos++;
+						s2 = this.NextToken();
+						if (!int.TryParse(s2, out int i))
+							throw this.SyntaxError("Tag expected.");
+
+						Tag = i;
+
+						if (this.NextToken() != "]")
+							throw this.SyntaxError("] expected.");
+
+						s2 = this.PeekNextToken();
+					}
+
+					if (!IsTypeIdentifier(s2))
 						throw this.SyntaxError("Type name expected.");
 
 					this.pos += s2.Length;
 
-					List<Asn1Restriction> Restrictions = null;
+					Asn1Restriction Restriction = null;
 					List<Asn1NamedValue> NamedOptions = null;
-					bool Optional = false;
-					bool Unique = false;
+					bool? Optional = false;
+					bool? Unique = false;
+					bool? Present = false;
+					bool? Absent = false;
 					Asn1Node Default = null;
 
 					while (true)
@@ -389,53 +409,7 @@ namespace Waher.Content.Asn1
 								return new Asn1FieldValueDefinition(s, s2, Value);
 
 							case "(":
-								this.pos++;
-								Restrictions = new List<Asn1Restriction>();
-								while (true)
-								{
-									s3 = this.PeekNextToken();
-
-									switch (s3)
-									{
-										case "SIZE":
-											this.pos += 4;
-											Asn1Set Set = this.ParseSet();
-											Restrictions.Add(new Asn1Size(Set));
-											break;
-
-										case "PATTERN":
-											this.pos += 7;
-											Asn1Node Node = this.ParseValue();
-											Restrictions.Add(new Asn1Pattern(Node));
-											break;
-
-										case "FROM":
-											this.pos += 4;
-											Set = this.ParseSet();
-											Restrictions.Add(new Asn1From(Set));
-											break;
-
-										default:
-											Set = this.ParseUnions();
-											Restrictions.Add(new Asn1InSet(Set));
-											break;
-									}
-
-									s3 = this.PeekNextToken();
-
-									if (s3 == "^")
-									{
-										this.pos++;
-										continue;
-									}
-									else if (s3 == ")")
-									{
-										this.pos++;
-										break;
-									}
-									else
-										throw this.SyntaxError("Unexpected token.");
-								}
+								Restriction = this.ParseRestriction();
 								break;
 
 							case "{":
@@ -473,6 +447,16 @@ namespace Waher.Content.Asn1
 								Optional = true;
 								break;
 
+							case "PRESENT":
+								this.pos += 7;
+								Present = true;
+								break;
+
+							case "ABSENT":
+								this.pos += 6;
+								Absent = true;
+								break;
+
 							case "DEFAULT":
 								this.pos += 7;
 								Optional = true;
@@ -485,7 +469,8 @@ namespace Waher.Content.Asn1
 								break;
 
 							default:
-								return new Asn1FieldDefinition(s, s2, Restrictions?.ToArray(), Optional, Unique, Default,
+								return new Asn1FieldDefinition(s, Tag, s2, Restriction, 
+									Optional, Unique, Present, Absent, Default,
 									NamedOptions?.ToArray());
 						}
 					}
@@ -501,12 +486,13 @@ namespace Waher.Content.Asn1
 				throw this.SyntaxError("Identifier expected.");
 		}
 
-		private Asn1Set ParseSet()
+
+		private Asn1Restriction ParseRestriction()
 		{
 			if (this.NextToken() != "(")
 				throw this.SyntaxError("( expected.");
 
-			Asn1Set Result = this.ParseUnions();
+			Asn1Restriction Result = this.ParseOrs();
 
 			if (this.NextToken() != ")")
 				throw this.SyntaxError(") expected.");
@@ -514,9 +500,105 @@ namespace Waher.Content.Asn1
 			return Result;
 		}
 
-		private Asn1Set ParseUnions()
+		private Asn1Restriction ParseOrs()
 		{
-			Asn1Set Result = this.ParseIntersections();
+			Asn1Restriction Result = this.ParseAnds();
+
+			string s = this.PeekNextToken();
+
+			while (s == "|")
+			{
+				this.pos++;
+				Result = new Asn1Or(Result, this.ParseAnds());
+				s = this.PeekNextToken();
+			}
+
+			return Result;
+		}
+
+		private Asn1Restriction ParseAnds()
+		{
+			Asn1Restriction Result = this.ParseRestrictionRule();
+
+			string s = this.PeekNextToken();
+
+			while (s == "^")
+			{
+				this.pos++;
+				Result = new Asn1And(Result, this.ParseRestrictionRule());
+				s = this.PeekNextToken();
+			}
+
+			return Result;
+		}
+
+		private Asn1Restriction ParseRestrictionRule()
+		{
+			string s = this.PeekNextToken();
+
+			switch (s)
+			{
+				case "(":
+					this.pos++;
+
+					Asn1Restriction Result = this.ParseOrs();
+
+					if (this.NextToken() != ")")
+						throw this.SyntaxError(") expected.");
+
+					return Result;
+
+				case "SIZE":
+					this.pos += 4;
+					return new Asn1Size(this.ParseSet());
+
+				case "PATTERN":
+					this.pos += 7;
+					return new Asn1Pattern(this.ParseValue());
+
+				case "FROM":
+					this.pos += 4;
+					return new Asn1From(this.ParseSet());
+
+				case "CONTAINING":
+					this.pos += 10;
+					return new Asn1Containing(this.ParseValue());
+
+				case "ENCODED":
+					this.pos += 7;
+					if (this.NextToken() != "BY")
+						throw this.SyntaxError("BY expected.");
+
+					return new Asn1EncodedBy(this.ParseValue());
+
+				case "WITH":
+					this.pos += 4;
+					if (this.NextToken() != "COMPONENTS")
+						throw this.SyntaxError("COMPONENTS expected.");
+
+					return new Asn1WithComponents(this.ParseValue());
+
+				default:
+					return new Asn1InSet(this.ParseUnions());
+			}
+		}
+
+		private Asn1Values ParseSet()
+		{
+			if (this.NextToken() != "(")
+				throw this.SyntaxError("( expected.");
+
+			Asn1Values Result = this.ParseUnions();
+
+			if (this.NextToken() != ")")
+				throw this.SyntaxError(") expected.");
+
+			return Result;
+		}
+
+		private Asn1Values ParseUnions()
+		{
+			Asn1Values Result = this.ParseIntersections();
 
 			string s = this.PeekNextToken();
 
@@ -530,9 +612,9 @@ namespace Waher.Content.Asn1
 			return Result;
 		}
 
-		private Asn1Set ParseIntersections()
+		private Asn1Values ParseIntersections()
 		{
-			Asn1Set Result = this.ParseIntervals();
+			Asn1Values Result = this.ParseIntervals();
 
 			string s = this.PeekNextToken();
 
@@ -546,7 +628,7 @@ namespace Waher.Content.Asn1
 			return Result;
 		}
 
-		private Asn1Set ParseIntervals()
+		private Asn1Values ParseIntervals()
 		{
 			string s = this.PeekNextToken();
 
@@ -554,7 +636,7 @@ namespace Waher.Content.Asn1
 			{
 				this.pos++;
 
-				Asn1Set Result = this.ParseUnions();
+				Asn1Values Result = this.ParseUnions();
 
 				if (this.NextToken() != ")")
 					throw this.SyntaxError(") expected.");
@@ -698,6 +780,54 @@ namespace Waher.Content.Asn1
 				case "REAL":
 					return new Asn1Real();
 
+				case "SET":
+					s = this.PeekNextToken();
+
+					if (s == "{")
+					{
+						Asn1Node[] Nodes = this.ParseList();
+						return new Asn1Set(Nodes);
+					}
+					else if (s == "(")
+					{
+						this.pos++;
+
+						Asn1Values Size = null;
+
+						while (true)
+						{
+							s = this.PeekNextToken();
+
+							if (s == "SIZE")
+							{
+								if (!(Size is null))
+									throw this.SyntaxError("SIZE already specified.");
+
+								this.pos += 4;
+								Size = this.ParseSet();
+							}
+							else if (s == ")")
+							{
+								this.pos++;
+								break;
+							}
+							else
+								throw this.SyntaxError("Unexpected token.");
+						}
+
+						if (this.NextToken() != "OF")
+							throw this.SyntaxError("OF expected.");
+
+						if (Size is null)
+							throw this.SyntaxError("SIZE expected.");
+
+						s = this.ParseTypeNameIdentifier();
+
+						return new Asn1SetOf(Size, s);
+					}
+					else
+						throw this.SyntaxError("{ expected.");
+
 				case "SEQUENCE":
 					s = this.PeekNextToken();
 
@@ -710,7 +840,7 @@ namespace Waher.Content.Asn1
 					{
 						this.pos++;
 
-						Asn1Set Size = null;
+						Asn1Values Size = null;
 
 						while (true)
 						{
@@ -785,7 +915,6 @@ namespace Waher.Content.Asn1
 				case "EXTERNAL":
 				case "EMBEDDED":
 				case "RELATIVE-OID":
-				case "SET":
 				case "CLASS":
 				case "COMPONENTS":
 				case "INSTANCE":
@@ -967,7 +1096,7 @@ namespace Waher.Content.Asn1
 							case "}":
 								this.pos++;
 								Items.Add(Value);
-								return new Asn1Values(Items.ToArray());
+								return new Asn1Array(Items.ToArray());
 
 							default:
 								if (Value is Asn1Identifier Identifier)

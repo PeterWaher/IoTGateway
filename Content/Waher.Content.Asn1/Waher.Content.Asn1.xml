@@ -161,15 +161,17 @@
             Represents an ASN.1 field definition.
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Asn1FieldDefinition.#ctor(System.String,System.String,Waher.Content.Asn1.Model.Asn1Restriction[],System.Boolean,System.Boolean,Waher.Content.Asn1.Model.Asn1Node,Waher.Content.Asn1.Model.Values.Asn1NamedValue[])">
+        <member name="M:Waher.Content.Asn1.Model.Asn1FieldDefinition.#ctor(System.String,System.Nullable{System.Int32},System.String,Waher.Content.Asn1.Model.Asn1Restriction,System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},Waher.Content.Asn1.Model.Asn1Node,Waher.Content.Asn1.Model.Values.Asn1NamedValue[])">
             <summary>
             Represents an ASN.1 field definition.
             </summary>
             <param name="FieldName">Field name.</param>
             <param name="TypeName">Type name.</param>
-            <param name="Restrictions">Optional restrictions.</param>
+            <param name="Restriction">Optional restrictions.</param>
             <param name="Optional">If field is optional.</param>
             <param name="Unique">If field value is unique.</param>
+            <param name="Present">If an optional field must be present.</param>
+            <param name="Absent">If an optional field must be absent.</param>
             <param name="Default">Default value if field not provided.</param>
             <param name="NamedOptions">Named options.</param>
         </member>
@@ -183,7 +185,7 @@
             Type Name
             </summary>
         </member>
-        <member name="P:Waher.Content.Asn1.Model.Asn1FieldDefinition.Restrictions">
+        <member name="P:Waher.Content.Asn1.Model.Asn1FieldDefinition.Restriction">
             <summary>
             Optional restrictions.
             </summary>
@@ -198,6 +200,16 @@
             If field value is unique.
             </summary>
         </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1FieldDefinition.Present">
+            <summary>
+            If an optional field must be present.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1FieldDefinition.Absent">
+            <summary>
+            If an optional field must be absent.
+            </summary>
+        </member>
         <member name="P:Waher.Content.Asn1.Model.Asn1FieldDefinition.Default">
             <summary>
             Default value if field not provided.
@@ -206,6 +218,11 @@
         <member name="P:Waher.Content.Asn1.Model.Asn1FieldDefinition.NamedOptions">
             <summary>
             Named options.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1FieldDefinition.Tag">
+            <summary>
+            Tag
             </summary>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Asn1FieldValueDefinition">
@@ -344,7 +361,7 @@
             Represents a ASN.1 SEQUENCE OF construct.
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Asn1SequenceOf.#ctor(Waher.Content.Asn1.Model.Asn1Set,System.String)">
+        <member name="M:Waher.Content.Asn1.Model.Asn1SequenceOf.#ctor(Waher.Content.Asn1.Model.Asn1Values,System.String)">
             <summary>
             Represents a ASN.1 SEQUENCE OF construct.
             </summary>
@@ -363,12 +380,35 @@
         </member>
         <member name="T:Waher.Content.Asn1.Model.Asn1Set">
             <summary>
-            Abstract base class for sets of nodes
+            Represents a ASN.1 SET construct.
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Asn1Set.#ctor">
+        <member name="M:Waher.Content.Asn1.Model.Asn1Set.#ctor(Waher.Content.Asn1.Model.Asn1Node[])">
             <summary>
-            Abstract base class for sets of nodes
+            Represents a ASN.1 SET construct.
+            </summary>
+            <param name="Nodes">Nodes</param>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Asn1SetOf">
+            <summary>
+            Represents a ASN.1 SET OF construct.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Asn1SetOf.#ctor(Waher.Content.Asn1.Model.Asn1Values,System.String)">
+            <summary>
+            Represents a ASN.1 SET OF construct.
+            </summary>
+            <param name="Size">SIZE</param>
+            <param name="TypeName">Type name</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1SetOf.Size">
+            <summary>
+            SIZE
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1SetOf.TypeName">
+            <summary>
+            Type name.
             </summary>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Asn1Type">
@@ -408,28 +448,78 @@
             Abstract base class for values.
             </summary>
         </member>
-        <member name="T:Waher.Content.Asn1.Model.Restrictions.Asn1Except">
+        <member name="T:Waher.Content.Asn1.Model.Asn1Values">
             <summary>
-            ALL EXCEPT
+            Abstract base class for sets of values
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Restrictions.Asn1Except.#ctor(Waher.Content.Asn1.Model.Asn1Node)">
+        <member name="M:Waher.Content.Asn1.Model.Asn1Values.#ctor">
             <summary>
-            ALL EXCEPT
+            Abstract base class for sets of values
             </summary>
-            <param name="Exception">Exception</param>
         </member>
-        <member name="P:Waher.Content.Asn1.Model.Restrictions.Asn1Except.Exception">
+        <member name="T:Waher.Content.Asn1.Model.Restrictions.Asn1And">
             <summary>
-            Exception
+            Both restrictions apply
             </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Restrictions.Asn1And.#ctor(Waher.Content.Asn1.Model.Asn1Restriction,Waher.Content.Asn1.Model.Asn1Restriction)">
+            <summary>
+            Both restrictions apply
+            </summary>
+            <param name="Left">Left set</param>
+            <param name="Right">Right set</param>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Restrictions.Asn1BinaryRestrictionOperator">
+            <summary>
+            Abstract base class of binary restriction operators
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Restrictions.Asn1BinaryRestrictionOperator.#ctor(Waher.Content.Asn1.Model.Asn1Restriction,Waher.Content.Asn1.Model.Asn1Restriction)">
+            <summary>
+            Abstract base class of binary restriction operators
+            </summary>
+            <param name="Left">Left set</param>
+            <param name="Right">Right set</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Restrictions.Asn1BinaryRestrictionOperator.Left">
+            <summary>
+            Left restriction
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Restrictions.Asn1BinaryRestrictionOperator.Right">
+            <summary>
+            Right restriction
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Restrictions.Asn1Containing">
+            <summary>
+            CONTAINING
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Restrictions.Asn1Containing.#ctor(Waher.Content.Asn1.Model.Asn1Value)">
+            <summary>
+            CONTAINING
+            </summary>
+            <param name="Value">Value</param>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Restrictions.Asn1EncodedBy">
+            <summary>
+            ENCODED BY
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Restrictions.Asn1EncodedBy.#ctor(Waher.Content.Asn1.Model.Asn1Value)">
+            <summary>
+            ENCODED BY
+            </summary>
+            <param name="Value">Value</param>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Restrictions.Asn1From">
             <summary>
             FROM()
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Restrictions.Asn1From.#ctor(Waher.Content.Asn1.Model.Asn1Set)">
+        <member name="M:Waher.Content.Asn1.Model.Restrictions.Asn1From.#ctor(Waher.Content.Asn1.Model.Asn1Values)">
             <summary>
             FROM()
             </summary>
@@ -440,34 +530,41 @@
             Restricted to elements in set.
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Restrictions.Asn1InSet.#ctor(Waher.Content.Asn1.Model.Asn1Set)">
+        <member name="M:Waher.Content.Asn1.Model.Restrictions.Asn1InSet.#ctor(Waher.Content.Asn1.Model.Asn1Values)">
             <summary>
             Restricted to elements in set.
             </summary>
             <param name="Set">Set</param>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Restrictions.Asn1Or">
+            <summary>
+            Either restriction applies
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Restrictions.Asn1Or.#ctor(Waher.Content.Asn1.Model.Asn1Restriction,Waher.Content.Asn1.Model.Asn1Restriction)">
+            <summary>
+            Either restriction applies
+            </summary>
+            <param name="Left">Left set</param>
+            <param name="Right">Right set</param>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Restrictions.Asn1Pattern">
             <summary>
             PATTERN
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Restrictions.Asn1Pattern.#ctor(Waher.Content.Asn1.Model.Asn1Node)">
+        <member name="M:Waher.Content.Asn1.Model.Restrictions.Asn1Pattern.#ctor(Waher.Content.Asn1.Model.Asn1Value)">
             <summary>
             PATTERN
             </summary>
             <param name="RegularExpression">Regular Expression</param>
-        </member>
-        <member name="P:Waher.Content.Asn1.Model.Restrictions.Asn1Pattern.RegularExpression">
-            <summary>
-            Regular Expression
-            </summary>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Restrictions.Asn1SetRestriction">
             <summary>
             Abstract base class for set-based restrictions
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Restrictions.Asn1SetRestriction.#ctor(Waher.Content.Asn1.Model.Asn1Set)">
+        <member name="M:Waher.Content.Asn1.Model.Restrictions.Asn1SetRestriction.#ctor(Waher.Content.Asn1.Model.Asn1Values)">
             <summary>
             Abstract base class for set-based restrictions
             </summary>
@@ -483,11 +580,38 @@
             SIZE()
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Restrictions.Asn1Size.#ctor(Waher.Content.Asn1.Model.Asn1Set)">
+        <member name="M:Waher.Content.Asn1.Model.Restrictions.Asn1Size.#ctor(Waher.Content.Asn1.Model.Asn1Values)">
             <summary>
             SIZE()
             </summary>
             <param name="Set">Set</param>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Restrictions.Asn1ValueRestriction">
+            <summary>
+            Abstract base class for value-based restrictions
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Restrictions.Asn1ValueRestriction.#ctor(Waher.Content.Asn1.Model.Asn1Value)">
+            <summary>
+            Abstract base class for set-based restrictions
+            </summary>
+            <param name="Value">Item</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Restrictions.Asn1ValueRestriction.Value">
+            <summary>
+            Item
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Restrictions.Asn1WithComponents">
+            <summary>
+            WITH COMPONENTS
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Restrictions.Asn1WithComponents.#ctor(Waher.Content.Asn1.Model.Asn1Value)">
+            <summary>
+            WITH COMPONENTS
+            </summary>
+            <param name="Value">Value</param>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Sets.Asn1All">
             <summary>
@@ -499,24 +623,24 @@
             All elements (in current context).
             </summary>
         </member>
-        <member name="T:Waher.Content.Asn1.Model.Sets.Asn1BinaryOperator">
+        <member name="T:Waher.Content.Asn1.Model.Sets.Asn1BinarySetOperator">
             <summary>
             Abstract base class of binary set operators
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Sets.Asn1BinaryOperator.#ctor(Waher.Content.Asn1.Model.Asn1Set,Waher.Content.Asn1.Model.Asn1Set)">
+        <member name="M:Waher.Content.Asn1.Model.Sets.Asn1BinarySetOperator.#ctor(Waher.Content.Asn1.Model.Asn1Values,Waher.Content.Asn1.Model.Asn1Values)">
             <summary>
             Abstract base class of binary set operators
             </summary>
             <param name="Left">Left set</param>
             <param name="Right">Right set</param>
         </member>
-        <member name="P:Waher.Content.Asn1.Model.Sets.Asn1BinaryOperator.Left">
+        <member name="P:Waher.Content.Asn1.Model.Sets.Asn1BinarySetOperator.Left">
             <summary>
             Left set
             </summary>
         </member>
-        <member name="P:Waher.Content.Asn1.Model.Sets.Asn1BinaryOperator.Right">
+        <member name="P:Waher.Content.Asn1.Model.Sets.Asn1BinarySetOperator.Right">
             <summary>
             Right set
             </summary>
@@ -542,9 +666,9 @@
             Exclusion of sets.
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Sets.Asn1Exclusion.#ctor(Waher.Content.Asn1.Model.Asn1Set,Waher.Content.Asn1.Model.Asn1Set)">
+        <member name="M:Waher.Content.Asn1.Model.Sets.Asn1Exclusion.#ctor(Waher.Content.Asn1.Model.Asn1Values,Waher.Content.Asn1.Model.Asn1Values)">
             <summary>
-            Union of sets.
+            Exclusion of sets.
             </summary>
             <param name="Left">Left set</param>
             <param name="Right">Right set</param>
@@ -554,9 +678,9 @@
             Intersection of sets.
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Sets.Asn1Intersection.#ctor(Waher.Content.Asn1.Model.Asn1Set,Waher.Content.Asn1.Model.Asn1Set)">
+        <member name="M:Waher.Content.Asn1.Model.Sets.Asn1Intersection.#ctor(Waher.Content.Asn1.Model.Asn1Values,Waher.Content.Asn1.Model.Asn1Values)">
             <summary>
-            Union of sets.
+            Intersection of sets.
             </summary>
             <param name="Left">Left set</param>
             <param name="Right">Right set</param>
@@ -588,7 +712,7 @@
             Union of sets.
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Sets.Asn1Union.#ctor(Waher.Content.Asn1.Model.Asn1Set,Waher.Content.Asn1.Model.Asn1Set)">
+        <member name="M:Waher.Content.Asn1.Model.Sets.Asn1Union.#ctor(Waher.Content.Asn1.Model.Asn1Values,Waher.Content.Asn1.Model.Asn1Values)">
             <summary>
             Union of sets.
             </summary>
@@ -725,6 +849,22 @@
             VisibleString
             </summary>
         </member>
+        <member name="T:Waher.Content.Asn1.Model.Values.Asn1Array">
+            <summary>
+            Array of values
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Values.Asn1Array.#ctor(Waher.Content.Asn1.Model.Asn1Value[])">
+            <summary>
+            Array of values
+            </summary>
+            <param name="Values">Values</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Values.Asn1Array.Values">
+            <summary>
+            Value
+            </summary>
+        </member>
         <member name="T:Waher.Content.Asn1.Model.Values.Asn1BooleanValue">
             <summary>
             Boolean value
@@ -838,22 +978,6 @@
             <param name="Value">Value</param>
         </member>
         <member name="P:Waher.Content.Asn1.Model.Values.Asn1StringValue.Value">
-            <summary>
-            Value
-            </summary>
-        </member>
-        <member name="T:Waher.Content.Asn1.Model.Values.Asn1Values">
-            <summary>
-            Set of values
-            </summary>
-        </member>
-        <member name="M:Waher.Content.Asn1.Model.Values.Asn1Values.#ctor(Waher.Content.Asn1.Model.Asn1Value[])">
-            <summary>
-            Set of values
-            </summary>
-            <param name="Values">Values</param>
-        </member>
-        <member name="P:Waher.Content.Asn1.Model.Values.Asn1Values.Values">
             <summary>
             Value
             </summary>

@@ -5,14 +5,16 @@ using System.Text;
 namespace Waher.Content.Asn1.Model
 {
 	/// <summary>
-	/// Abstract base class for sets of nodes
+	/// Represents a ASN.1 SET construct.
 	/// </summary>
-	public abstract class Asn1Set : Asn1Node
+	public class Asn1Set : Asn1List
 	{
 		/// <summary>
-		/// Abstract base class for sets of nodes
+		/// Represents a ASN.1 SET construct.
 		/// </summary>
-		public Asn1Set()
+		/// <param name="Nodes">Nodes</param>
+		public Asn1Set(Asn1Node[] Nodes)
+			: base(Nodes)
 		{
 		}
 	}

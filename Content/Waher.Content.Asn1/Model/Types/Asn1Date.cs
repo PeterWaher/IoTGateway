@@ -10,6 +10,15 @@ namespace Waher.Content.Asn1.Model.Types
 	public class Asn1Date : Asn1Type
 	{
 		/// <summary>
+		/// DATE
+		/// </summary>
+		/// <param name="Implicit">Implicit type definition</param>
+		public Asn1Date(bool Implicit)
+			: base(Implicit)
+		{
+		}
+
+		/// <summary>
 		/// C# type reference.
 		/// </summary>
 		public override string CSharpTypeReference => "DateTime";

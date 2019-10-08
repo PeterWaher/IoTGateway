@@ -10,6 +10,15 @@ namespace Waher.Content.Asn1.Model.Types
 	public abstract class Asn1StringType : Asn1Type
 	{
 		/// <summary>
+		/// Abstract base class for string types
+		/// </summary>
+		/// <param name="Implicit">Implicit type definition</param>
+		public Asn1StringType(bool Implicit)
+			: base(Implicit)
+		{
+		}
+
+		/// <summary>
 		/// C# type reference.
 		/// </summary>
 		public override string CSharpTypeReference => "string";

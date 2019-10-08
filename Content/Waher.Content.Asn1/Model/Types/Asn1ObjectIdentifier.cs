@@ -15,7 +15,9 @@ namespace Waher.Content.Asn1.Model.Types
 		/// OBJECT IDENTIFIER, or RELATIVE-OID
 		/// </summary>
 		/// <param name="Relative">If it is a relative object ID.</param>
-		public Asn1ObjectIdentifier(bool Relative)
+		/// <param name="Implicit">Implicit type definition</param>
+		public Asn1ObjectIdentifier(bool Relative, bool Implicit)
+			: base(Implicit)
 		{
 			this.relative = Relative;
 		}

@@ -10,6 +10,14 @@ namespace Waher.Content.Asn1.Model.Types
 	public class Asn1OctetString : Asn1Type
 	{
 		/// <summary>
+		/// OCTET STRING
+		/// </summary>
+		public Asn1OctetString(bool Implicit)
+			: base(Implicit)
+		{
+		}
+
+		/// <summary>
 		/// C# type reference.
 		/// </summary>
 		public override string CSharpTypeReference => "byte[]";

@@ -10,6 +10,15 @@ namespace Waher.Content.Asn1.Model.Types
 	public class Asn1TimeOfDay : Asn1Type
 	{
 		/// <summary>
+		/// TIME-OF-DAY
+		/// </summary>
+		/// <param name="Implicit">Implicit type definition</param>
+		public Asn1TimeOfDay(bool Implicit)
+			: base(Implicit)
+		{
+		}
+
+		/// <summary>
 		/// C# type reference.
 		/// </summary>
 		public override string CSharpTypeReference => "TimeSpan";

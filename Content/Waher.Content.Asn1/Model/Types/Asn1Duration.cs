@@ -10,6 +10,15 @@ namespace Waher.Content.Asn1.Model.Types
 	public class Asn1Duration : Asn1Type
 	{
 		/// <summary>
+		/// DURATION
+		/// </summary>
+		/// <param name="Implicit">Implicit type definition</param>
+		public Asn1Duration(bool Implicit)
+			: base(Implicit)
+		{
+		}
+
+		/// <summary>
 		/// C# type reference.
 		/// </summary>
 		public override string CSharpTypeReference => "Duration";

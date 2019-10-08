@@ -15,7 +15,9 @@ namespace Waher.Content.Asn1.Model.Types
 		/// Represents an ASN.1 type reference.
 		/// </summary>
 		/// <param name="Identifier">Identifier</param>
-		public Asn1TypeReference(string Identifier)
+		/// <param name="Implicit">Implicit type definition</param>
+		public Asn1TypeReference(string Identifier, bool Implicit)
+			: base(Implicit)
 		{
 			this.identifier = Identifier;
 		}

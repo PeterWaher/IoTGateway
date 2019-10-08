@@ -10,5 +10,14 @@ namespace Waher.Content.Asn1.Model.Types
 	/// </summary>
 	public class Asn1GraphicString : Asn1StringType
 	{
+		/// <summary>
+		/// GraphicString
+		/// all registered G sets and SPACE
+		/// </summary>
+		/// <param name="Implicit">Implicit type definition</param>
+		public Asn1GraphicString(bool Implicit)
+			: base(Implicit)
+		{
+		}
 	}
 }

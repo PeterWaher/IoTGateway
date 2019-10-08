@@ -10,6 +10,15 @@ namespace Waher.Content.Asn1.Model.Types
 	public class Asn1Boolean : Asn1Type
 	{
 		/// <summary>
+		/// BOOLEAN
+		/// </summary>
+		/// <param name="Implicit">Implicit type definition</param>
+		public Asn1Boolean(bool Implicit)
+			: base(Implicit)
+		{
+		}
+
+		/// <summary>
 		/// C# type reference.
 		/// </summary>
 		public override string CSharpTypeReference => "bool";

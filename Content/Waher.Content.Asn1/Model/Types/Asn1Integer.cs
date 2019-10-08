@@ -10,6 +10,15 @@ namespace Waher.Content.Asn1.Model.Types
 	public class Asn1Integer : Asn1Type
 	{
 		/// <summary>
+		/// INTEGER
+		/// </summary>
+		/// <param name="Implicit">Implicit type definition</param>
+		public Asn1Integer(bool Implicit)
+			: base(Implicit)
+		{
+		}
+
+		/// <summary>
 		/// C# type reference.
 		/// </summary>
 		public override string CSharpTypeReference => "long";

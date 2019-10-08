@@ -17,7 +17,9 @@ namespace Waher.Content.Asn1.Model
 		/// </summary>
 		/// <param name="Size">SIZE</param>
 		/// <param name="TypeName">Type name</param>
-		public Asn1SetOf(Asn1Values Size, string TypeName)
+		/// <param name="Implicit">Implicit type definition</param>
+		public Asn1SetOf(Asn1Values Size, string TypeName, bool Implicit)
+			: base(Implicit)
 		{
 			this.size = Size;
 			this.typeName = TypeName;

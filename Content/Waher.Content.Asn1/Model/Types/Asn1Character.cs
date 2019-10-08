@@ -10,6 +10,15 @@ namespace Waher.Content.Asn1.Model.Types
 	public class Asn1Character : Asn1Type
 	{
 		/// <summary>
+		/// CHARACTER
+		/// </summary>
+		/// <param name="Implicit">Implicit type definition</param>
+		public Asn1Character(bool Implicit)
+			: base(Implicit)
+		{
+		}
+
+		/// <summary>
 		/// C# type reference.
 		/// </summary>
 		public override string CSharpTypeReference => "char";

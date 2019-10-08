@@ -10,5 +10,14 @@ namespace Waher.Content.Asn1.Model.Types
 	/// </summary>
 	public class Asn1PrintableString : Asn1StringType
 	{
+		/// <summary>
+		/// PrintableString
+		/// a-z, A-Z, ' () +,-.?:/= and SPACE
+		/// </summary>
+		/// <param name="Implicit">Implicit type definition</param>
+		public Asn1PrintableString(bool Implicit)
+			: base(Implicit)
+		{
+		}
 	}
 }

@@ -11,22 +11,30 @@ namespace Waher.Content.Asn1.Model
 	{
 		private readonly string typeName;
 		private readonly Asn1Type definition;
-
+		private readonly int? tag;
 		/// <summary>
 		/// Represents an ASN.1 Type definition.
 		/// </summary>
 		/// <param name="TypeName">Type name.</param>
+		/// <param name="Tag">Tag</param>
 		/// <param name="Definition">Definition</param>
-		public Asn1TypeDefinition(string TypeName, Asn1Type Definition)
+		public Asn1TypeDefinition(string TypeName, int? Tag, Asn1Type Definition)
+			: base(Definition.Implicit)
 		{
 			this.typeName = TypeName;
 			this.definition = Definition;
+			this.tag = Tag;
 		}
 
 		/// <summary>
 		/// Type Name
 		/// </summary>
 		public string TypeName => this.typeName;
+
+		/// <summary>
+		/// Tag
+		/// </summary>
+		public int? Tag => this.tag;
 
 		/// <summary>
 		/// Type definition

@@ -9,6 +9,22 @@ namespace Waher.Content.Asn1.Model
 	/// </summary>
 	public abstract class Asn1Type : Asn1Node
 	{
+		private readonly bool _implicit;
+
+		/// <summary>
+		/// Abstract base class for ASN.1 types.
+		/// </summary>
+		/// <param name="Implicit">Implicit type definition</param>
+		public Asn1Type(bool Implicit)
+		{
+			this._implicit = Implicit;
+		}
+
+		/// <summary>
+		/// Implicit type definition
+		/// </summary>
+		public bool Implicit => this._implicit;
+
 		/// <summary>
 		/// C# type reference.
 		/// </summary>

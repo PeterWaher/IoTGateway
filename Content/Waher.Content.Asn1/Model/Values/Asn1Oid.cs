@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Waher.Content.Asn1.Model
+namespace Waher.Content.Asn1.Model.Values
 {
 	/// <summary>
 	/// Represents an ASN.1 Object ID
 	/// </summary>
-	public class Asn1Oid : Asn1Node
+	public class Asn1Oid : Asn1Value
 	{
 		private readonly Asn1Node[] values;
 

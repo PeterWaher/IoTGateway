@@ -24,5 +24,17 @@ namespace Waher.Content.Asn1.Test
 		{
 			ParseAsn1Document("MyShopPurchaseOrders.asn1");
 		}
+
+		[TestMethod]
+		public void Test_03_RFC1155()
+		{
+			ParseAsn1Document("SNMPv1\\RFC1155-SMI.asn1");
+		}
+
+		[TestMethod]
+		public void Test_04_RFC1157()
+		{
+			ParseAsn1Document("SNMPv1\\RFC1157-SNMP.asn1");
+		}
 	}
 }

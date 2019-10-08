@@ -8,10 +8,18 @@
 
   <ItemGroup>
     <None Remove="Examples\MyShopPurchaseOrders.asn1" />
+    <None Remove="Examples\RFC1157-SNMP.asn1" />
+    <None Remove="Examples\SNMPv1\RFC1155-SMI.asn1" />
     <None Remove="Examples\World-Schema.asn1" />
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="Examples\SNMPv1\RFC1155-SMI.asn1">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Examples\SNMPv1\RFC1157-SNMP.asn1">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Examples\World-Schema.asn1">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

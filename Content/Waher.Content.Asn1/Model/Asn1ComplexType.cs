@@ -17,8 +17,9 @@ namespace Waher.Content.Asn1.Model
 		/// </summary>
 		/// <param name="Name">Optional field or type name.</param>
 		/// <param name="TypeDef">If construct is part of a type definition.</param>
-		public Asn1ComplexType(string Name, bool TypeDef)
-			: base()
+		/// <param name="Implicit">Implicit type definition</param>
+		public Asn1ComplexType(string Name, bool TypeDef, bool Implicit)
+			: base(Implicit)
 		{
 			this.name = Name;
 			this.typeDef = TypeDef;

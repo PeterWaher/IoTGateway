@@ -20,8 +20,10 @@ namespace Waher.Content.Asn1.Model
 		/// <param name="TypeDef">If construct is part of a type definition.</param>
 		/// <param name="Size">Optional SIZE</param>
 		/// <param name="ElementType">Element type.</param>
-		public Asn1SequenceOf(string Name, bool TypeDef, Asn1Values Size, Asn1Type ElementType)
-			: base(Name, TypeDef)
+		/// <param name="Implicit">Implicit type definition</param>
+		public Asn1SequenceOf(string Name, bool TypeDef, Asn1Values Size, 
+			Asn1Type ElementType, bool Implicit)
+			: base(Name, TypeDef, Implicit)
 		{
 			this.size = Size;
 			this.elementType = ElementType;

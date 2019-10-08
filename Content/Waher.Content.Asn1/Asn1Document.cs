@@ -738,6 +738,9 @@ namespace Waher.Content.Asn1
 				case "DATE-TIME":
 					return new Asn1DateTime();
 
+				case "DURATION":
+					return new Asn1Duration();
+
 				case "ENUMERATED":
 					s = this.PeekNextToken();
 
@@ -779,7 +782,7 @@ namespace Waher.Content.Asn1
 					else
 						throw this.SyntaxError("IDENTIFIER expected.");
 
-					return new Asn1ObjectIdentifier();
+					return new Asn1ObjectIdentifier(false);
 
 				case "OCTET":
 					if (this.PeekNextToken() == "STRING")
@@ -794,6 +797,9 @@ namespace Waher.Content.Asn1
 
 				case "REAL":
 					return new Asn1Real();
+
+				case "RELATIVE-OID":
+					return new Asn1ObjectIdentifier(true);
 
 				case "SET":
 					s = this.PeekNextToken();
@@ -914,7 +920,6 @@ namespace Waher.Content.Asn1
 				case "ObjectDescriptor":
 				case "EXTERNAL":
 				case "EMBEDDED":
-				case "RELATIVE-OID":
 				case "CLASS":
 				case "COMPONENTS":
 				case "INSTANCE":
@@ -1244,6 +1249,7 @@ namespace Waher.Content.Asn1
 			Output.AppendLine("using System;");
 			Output.AppendLine("using System.Text;");
 			Output.AppendLine("using System.Collections.Generic;");
+			Output.AppendLine("using Waher.Content;");
 			Output.AppendLine("using Waher.Content.Asn1;");
 			Output.AppendLine();
 			Output.Append("namespace ");

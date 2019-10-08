@@ -276,6 +276,207 @@
             index is outside the range of valid indexes for the current System.Array.
             </exception>
         </member>
+        <member name="T:Waher.Content.Asn1.Asn1DecoderBer">
+            <summary>
+            Basic Encoding Rules (BER), as defined in X.690
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Asn1DecoderBer.#ctor(System.IO.Stream)">
+            <summary>
+            Basic Encoding Rules (BER), as defined in X.690
+            </summary>
+            <param name="Input">Input stream.</param>
+        </member>
+        <member name="M:Waher.Content.Asn1.Asn1DecoderBer.DecodeIdentifier(System.Boolean@,Waher.Content.Asn1.TagClass@)">
+            <summary>
+            Decodes an identifier from the stream.
+            </summary>
+            <param name="Constructed">If the identifier is constructed (true) or primitive (false)</param>
+            <param name="Class">Class of tag.</param>
+            <returns>TAG</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.Asn1DecoderBer.DecodeLength(System.IO.Stream)">
+            <summary>
+            Decodes the length of a contents section.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>Length of contents (if definite), or -1 (if indefinite, and determined by an end-of-contents section).</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.Asn1DecoderBer.DecodeBOOLEAN(System.IO.Stream)">
+            <summary>
+            Decodes a BOOLEAN value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>BOOLEAN value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.Asn1DecoderBer.DecodeINTEGER(System.IO.Stream)">
+            <summary>
+            Decodes an INTEGER value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>INTEGER value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.Asn1DecoderBer.DecodeEnum``1(System.IO.Stream)">
+            <summary>
+            Decodes an enumerated value.
+            </summary>
+            <typeparam name="T">Enumeration type.</typeparam>
+            <param name="Input">Input stream.</param>
+            <returns>Enumeration value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.Asn1DecoderBer.DecodeREAL(System.IO.Stream)">
+            <summary>
+            Decodes a REAL value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>REAL value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.Asn1DecoderBer.DecodeBitString(System.IO.Stream,System.Int32@)">
+            <summary>
+            Decodes a BIT STRING value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <param name="NrUnusedBits">Number of unused bits.</param>
+            <returns>BIT STRING value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.Asn1DecoderBer.DecodeOctetString(System.IO.Stream)">
+            <summary>
+            Decodes a OCTET STRING value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>OCTET STRING value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.Asn1DecoderBer.DecodeNull(System.IO.Stream)">
+            <summary>
+            Decodes a NULL value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>NULL value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.Asn1DecoderBer.DecodeObjectId(System.IO.Stream)">
+            <summary>
+            Decodes an OBJECT IDENTIFIER value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>OBJECT IDENTIFIER value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.Asn1DecoderBer.DecodeRelativeObjectId(System.IO.Stream)">
+            <summary>
+            Decodes a RELATIVE-OID value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>RELATIVE-OID value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.Asn1DecoderBer.DecodeBmpString(System.IO.Stream)">
+            <summary>
+            Decodes a BmpString value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>BmpString value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.Asn1DecoderBer.DecodeIa5String(System.IO.Stream)">
+            <summary>
+            Decodes a IA5String value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>IA5String value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.Asn1DecoderBer.DecodeVisibleString(System.IO.Stream)">
+            <summary>
+            Decodes a VisibleString value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>VisibleString value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.Asn1DecoderBer.DecodeUtf8String(System.IO.Stream)">
+            <summary>
+            Decodes a Utf8String value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>Utf8String value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.Asn1DecoderBer.DecodeUniversalString(System.IO.Stream)">
+            <summary>
+            Decodes a UniversalString value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>UniversalString value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.Asn1DecoderBer.DecodePrintableString(System.IO.Stream)">
+            <summary>
+            Decodes a PrintableString value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>PrintableString value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.Asn1DecoderBer.DecodeNumericString(System.IO.Stream)">
+            <summary>
+            Decodes a NumericString value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>NumericString value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.Asn1DecoderBer.DecodeTime(System.IO.Stream)">
+            <summary>
+            Decodes a TIME value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>TIME value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.Asn1DecoderBer.DecodeDate(System.IO.Stream)">
+            <summary>
+            Decodes a DATE value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>DATE value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.Asn1DecoderBer.DecodeTimeOfDay(System.IO.Stream)">
+            <summary>
+            Decodes a TIME-OF-DAY value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>TIME-OF-DAY value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.Asn1DecoderBer.DecodeDateTime(System.IO.Stream)">
+            <summary>
+            Decodes a DATE-TIME value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>DATE-TIME value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.Asn1DecoderBer.DecodeDuration(System.IO.Stream)">
+            <summary>
+            Decodes a DURATION value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>DURATION value</returns>
+        </member>
+        <member name="T:Waher.Content.Asn1.Asn1DecoderCer">
+            <summary>
+            Constrained Encoding Rules (CER), as defined in X.690
+            (Subset of BER)
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Asn1DecoderCer.#ctor(System.IO.Stream)">
+            <summary>
+            Constrained Encoding Rules (CER), as defined in X.690
+            (Subset of BER)
+            </summary>
+            <param name="Input">Input stream.</param>
+        </member>
+        <member name="T:Waher.Content.Asn1.Asn1DecoderDer">
+            <summary>
+            Distinguished Encoding Rules (DER), as defined in X.690
+            (Subset of BER)
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Asn1DecoderDer.#ctor(System.IO.Stream)">
+            <summary>
+            Distinguished Encoding Rules (DER), as defined in X.690
+            (Subset of BER)
+            </summary>
+            <param name="Input">Input stream.</param>
+        </member>
         <member name="T:Waher.Content.Asn1.Asn1Document">
             <summary>
             Represents an ASN.1 document.
@@ -311,6 +512,176 @@
             <param name="Output">C# Output.</param>
             <param name="Settings">C# export settings.</param>
         </member>
+        <member name="T:Waher.Content.Asn1.BER">
+            <summary>
+            Implements static methods for Basic Encoding Rules (BER), as defined in X.690
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.BER.DecodeIdentifier(System.IO.Stream,System.Boolean@,Waher.Content.Asn1.TagClass@)">
+            <summary>
+            Decodes an identifier from the stream.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <param name="Constructed">If the identifier is constructed (true) or primitive (false)</param>
+            <param name="Class">Class of tag.</param>
+            <returns>TAG</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.BER.DecodeLength(System.IO.Stream)">
+            <summary>
+            Decodes the length of a contents section.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>Length of contents (if definite), or -1 (if indefinite, and determined by an end-of-contents section).</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.BER.DecodeBOOLEAN(System.IO.Stream)">
+            <summary>
+            Decodes a BOOLEAN value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>BOOLEAN value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.BER.DecodeINTEGER(System.IO.Stream)">
+            <summary>
+            Decodes an INTEGER value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>INTEGER value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.BER.DecodeEnum``1(System.IO.Stream)">
+            <summary>
+            Decodes an enumerated value.
+            </summary>
+            <typeparam name="T">Enumeration type.</typeparam>
+            <param name="Input">Input stream.</param>
+            <returns>Enumeration value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.BER.DecodeREAL(System.IO.Stream)">
+            <summary>
+            Decodes a REAL value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>REAL value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.BER.DecodeBitString(System.IO.Stream,System.Int32@)">
+            <summary>
+            Decodes a BIT STRING value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <param name="NrUnusedBits">Number of unused bits.</param>
+            <returns>BIT STRING value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.BER.DecodeOctetString(System.IO.Stream)">
+            <summary>
+            Decodes a OCTET STRING value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>OCTET STRING value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.BER.DecodeNull(System.IO.Stream)">
+            <summary>
+            Decodes a NULL value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>NULL value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.BER.DecodeObjectId(System.IO.Stream)">
+            <summary>
+            Decodes an OBJECT IDENTIFIER value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>OBJECT IDENTIFIER value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.BER.DecodeRelativeObjectId(System.IO.Stream)">
+            <summary>
+            Decodes a RELATIVE-OID value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>RELATIVE-OID value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.BER.DecodeBmpString(System.IO.Stream)">
+            <summary>
+            Decodes a BmpString value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>BmpString value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.BER.DecodeIa5String(System.IO.Stream)">
+            <summary>
+            Decodes a IA5String value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>IA5String value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.BER.DecodeVisibleString(System.IO.Stream)">
+            <summary>
+            Decodes a VisibleString value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>VisibleString value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.BER.DecodeUtf8String(System.IO.Stream)">
+            <summary>
+            Decodes a Utf8String value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>Utf8String value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.BER.DecodeUniversalString(System.IO.Stream)">
+            <summary>
+            Decodes a UniversalString value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>UniversalString value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.BER.DecodePrintableString(System.IO.Stream)">
+            <summary>
+            Decodes a PrintableString value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>PrintableString value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.BER.DecodeNumericString(System.IO.Stream)">
+            <summary>
+            Decodes a NumericString value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>NumericString value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.BER.DecodeTime(System.IO.Stream)">
+            <summary>
+            Decodes a TIME value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>TIME value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.BER.DecodeDate(System.IO.Stream)">
+            <summary>
+            Decodes a DATE value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>DATE value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.BER.DecodeTimeOfDay(System.IO.Stream)">
+            <summary>
+            Decodes a TIME-OF-DAY value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>TIME-OF-DAY value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.BER.DecodeDateTime(System.IO.Stream)">
+            <summary>
+            Decodes a DATE-TIME value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>DATE-TIME value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.BER.DecodeDuration(System.IO.Stream)">
+            <summary>
+            Decodes a DURATION value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>DURATION value</returns>
+        </member>
         <member name="T:Waher.Content.Asn1.CSharpExportSettings">
             <summary>
             C# export settings
@@ -339,7 +710,17 @@
         </member>
         <member name="F:Waher.Content.Asn1.EncodingSchemes.BER">
             <summary>
-            Basic Encoding Rules (BER)
+            Basic Encoding Rules (BER), as defined in X.690
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Asn1.EncodingSchemes.CER">
+            <summary>
+            Canonical Encoding Rules (CER), as defined in X.690
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Asn1.EncodingSchemes.DER">
+            <summary>
+            Distinguished Encoding Rules (DER), as defined in X.690
             </summary>
         </member>
         <member name="F:Waher.Content.Asn1.EncodingSchemes.All">
@@ -380,6 +761,175 @@
             <summary>
             Position into text where exception was raised.
             </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.IAsn1Decoder">
+            <summary>
+            Interface for ASN.1 decoders
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.IAsn1Decoder.DecodeIdentifier(System.Boolean@,Waher.Content.Asn1.TagClass@)">
+            <summary>
+            Decodes an identifier from the stream.
+            </summary>
+            <param name="Constructed">If the identifier is constructed (true) or primitive (false)</param>
+            <param name="Class">Class of tag.</param>
+            <returns>TAG</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.IAsn1Decoder.DecodeLength(System.IO.Stream)">
+            <summary>
+            Decodes the length of a contents section.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>Length of contents (if definite), or -1 (if indefinite, and determined by an end-of-contents section).</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.IAsn1Decoder.DecodeBOOLEAN(System.IO.Stream)">
+            <summary>
+            Decodes a BOOLEAN value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>BOOLEAN value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.IAsn1Decoder.DecodeINTEGER(System.IO.Stream)">
+            <summary>
+            Decodes an INTEGER value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>INTEGER value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.IAsn1Decoder.DecodeEnum``1(System.IO.Stream)">
+            <summary>
+            Decodes an enumerated value.
+            </summary>
+            <typeparam name="T">Enumeration type.</typeparam>
+            <param name="Input">Input stream.</param>
+            <returns>Enumeration value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.IAsn1Decoder.DecodeREAL(System.IO.Stream)">
+            <summary>
+            Decodes a REAL value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>REAL value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.IAsn1Decoder.DecodeBitString(System.IO.Stream,System.Int32@)">
+            <summary>
+            Decodes a BIT STRING value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <param name="NrUnusedBits">Number of unused bits.</param>
+            <returns>BIT STRING value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.IAsn1Decoder.DecodeOctetString(System.IO.Stream)">
+            <summary>
+            Decodes a OCTET STRING value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>OCTET STRING value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.IAsn1Decoder.DecodeNull(System.IO.Stream)">
+            <summary>
+            Decodes a NULL value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>NULL value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.IAsn1Decoder.DecodeObjectId(System.IO.Stream)">
+            <summary>
+            Decodes an OBJECT IDENTIFIER value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>OBJECT IDENTIFIER value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.IAsn1Decoder.DecodeRelativeObjectId(System.IO.Stream)">
+            <summary>
+            Decodes a RELATIVE-OID value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>RELATIVE-OID value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.IAsn1Decoder.DecodeBmpString(System.IO.Stream)">
+            <summary>
+            Decodes a BmpString value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>BmpString value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.IAsn1Decoder.DecodeIa5String(System.IO.Stream)">
+            <summary>
+            Decodes a IA5String value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>IA5String value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.IAsn1Decoder.DecodeVisibleString(System.IO.Stream)">
+            <summary>
+            Decodes a VisibleString value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>VisibleString value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.IAsn1Decoder.DecodeUtf8String(System.IO.Stream)">
+            <summary>
+            Decodes a Utf8String value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>Utf8String value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.IAsn1Decoder.DecodeUniversalString(System.IO.Stream)">
+            <summary>
+            Decodes a UniversalString value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>UniversalString value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.IAsn1Decoder.DecodePrintableString(System.IO.Stream)">
+            <summary>
+            Decodes a PrintableString value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>PrintableString value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.IAsn1Decoder.DecodeNumericString(System.IO.Stream)">
+            <summary>
+            Decodes a NumericString value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>NumericString value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.IAsn1Decoder.DecodeTime(System.IO.Stream)">
+            <summary>
+            Decodes a TIME value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>TIME value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.IAsn1Decoder.DecodeDate(System.IO.Stream)">
+            <summary>
+            Decodes a DATE value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>DATE value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.IAsn1Decoder.DecodeTimeOfDay(System.IO.Stream)">
+            <summary>
+            Decodes a TIME-OF-DAY value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>TIME-OF-DAY value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.IAsn1Decoder.DecodeDateTime(System.IO.Stream)">
+            <summary>
+            Decodes a DATE-TIME value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>DATE-TIME value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.IAsn1Decoder.DecodeDuration(System.IO.Stream)">
+            <summary>
+            Decodes a DURATION value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>DURATION value</returns>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Asn1Choice">
             <summary>
@@ -1327,6 +1877,21 @@
             If type is nullable.
             </summary>
         </member>
+        <member name="T:Waher.Content.Asn1.Model.Types.Asn1Duration">
+            <summary>
+            DURATION
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Types.Asn1Duration.CSharpTypeReference">
+            <summary>
+            C# type reference.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Types.Asn1Duration.CSharpTypeNullable">
+            <summary>
+            If type is nullable.
+            </summary>
+        </member>
         <member name="T:Waher.Content.Asn1.Model.Types.Asn1GeneralizedTime">
             <summary>
             GeneralizedTime
@@ -1393,7 +1958,28 @@
         </member>
         <member name="T:Waher.Content.Asn1.Model.Types.Asn1ObjectIdentifier">
             <summary>
-            OBJECT IDENTIFIER
+            OBJECT IDENTIFIER, or RELATIVE-OID
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1ObjectIdentifier.#ctor(System.Boolean)">
+            <summary>
+            OBJECT IDENTIFIER, or RELATIVE-OID
+            </summary>
+            <param name="Relative">If it is a relative object ID.</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Types.Asn1ObjectIdentifier.Relative">
+            <summary>
+            If it is a relative object ID.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Types.Asn1ObjectIdentifier.CSharpTypeReference">
+            <summary>
+            C# type reference.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Types.Asn1ObjectIdentifier.CSharpTypeNullable">
+            <summary>
+            If type is nullable.
             </summary>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Types.Asn1OctetString">
@@ -1710,6 +2296,31 @@
             <param name="Settings">C# export settings.</param>
             <param name="Indent">Indentation</param>
             <param name="Pass">Export pass</param>
+        </member>
+        <member name="T:Waher.Content.Asn1.TagClass">
+            <summary>
+            TAG class
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Asn1.TagClass.Universal">
+            <summary>
+            Universal
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Asn1.TagClass.Application">
+            <summary>
+            Application
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Asn1.TagClass.ContextSpecific">
+            <summary>
+            Context-specific
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Asn1.TagClass.Private">
+            <summary>
+            Private
+            </summary>
         </member>
     </members>
 </doc>

@@ -7,14 +7,14 @@
     <Authors>Peter Waher</Authors>
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
-    <Description>Implements a simple ASN.1 (Abstract Syntax Notation One) parser. The library supports generation of C# code from ASN.1 schemas. Encoding schemes supported: BER.</Description>
+    <Description>Implements a simple ASN.1 (Abstract Syntax Notation One) parser. The library supports generation of C# code from ASN.1 schemas. Encoding/Decoding schemes supported: BER, CER, DER.</Description>
     <Copyright>Copyright © Waher Data AB 2019. All rights reserved.</Copyright>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Content/Waher.Content.Asn1</PackageProjectUrl>
     <PackageIconUrl>https://github.com/PeterWaher/IoTGateway/blob/master/Images/Icon.ico?raw=true</PackageIconUrl>
     <RepositoryType>GitHub</RepositoryType>
     <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
-    <PackageTags>ASN.1 parser code generation C# BER</PackageTags>
+    <PackageTags>ASN.1 parser code generation C# BER CER DER X.690</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
     <AssemblyVersion>1.0.0</AssemblyVersion>
     <FileVersion>1.0.0</FileVersion>
@@ -29,6 +29,11 @@
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Waher.Content.Xml\Waher.Content.Xml.csproj" />
+    <ProjectReference Include="..\Waher.Content\Waher.Content.csproj" />
   </ItemGroup>
 
 </Project>

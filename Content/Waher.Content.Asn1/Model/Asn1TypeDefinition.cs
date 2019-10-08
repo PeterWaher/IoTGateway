@@ -39,9 +39,11 @@ namespace Waher.Content.Asn1.Model
 		/// <param name="Output">C# Output.</param>
 		/// <param name="Settings">C# export settings.</param>
 		/// <param name="Indent">Indentation</param>
-		public override void ExportCSharp(StringBuilder Output, CSharpExportSettings Settings, int Indent)
+		/// <param name="Pass">Export pass</param>
+		public override void ExportCSharp(StringBuilder Output, CSharpExportSettings Settings,
+			int Indent, CSharpExportPass Pass)
 		{
-			this.definition.ExportCSharpTypeDefinition(Output, Settings, Indent, this.typeName);
+			this.definition.ExportCSharp(Output, Settings, Indent, Pass);
 		}
 	}
 }

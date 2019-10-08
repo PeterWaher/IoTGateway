@@ -31,35 +31,40 @@ namespace Waher.Content.Asn1.Model
 		public override bool CSharpTypeNullable => true;
 
 		/// <summary>
-		/// Exports implicit definitions to C#
+		/// Exports to C#
 		/// </summary>
 		/// <param name="Output">C# Output.</param>
 		/// <param name="Settings">C# export settings.</param>
 		/// <param name="Indent">Indentation</param>
-		public override void ExportImplicitCSharp(StringBuilder Output, CSharpExportSettings Settings, int Indent)
+		/// <param name="Pass">Export pass</param>
+		public override void ExportCSharp(StringBuilder Output, CSharpExportSettings Settings, 
+			int Indent, CSharpExportPass Pass)
 		{
-			foreach (Asn1Node Node in this.Nodes)
-				Node.ExportImplicitCSharp(Output, Settings, Indent);
+			if (Pass == CSharpExportPass.Implicit)
+			{
+				foreach (Asn1Node Node in this.Nodes)
+					Node.ExportCSharp(Output, Settings, Indent, Pass);
 
-			Output.Append(Tabs(Indent));
-			Output.Append("public class ");
-			Output.Append(this.Name);
-			if (!this.TypeDefinition)
-				Output.AppendLine("Set");
+				Output.Append(Tabs(Indent));
+				Output.Append("public class ");
+				Output.Append(this.Name);
+				if (!this.TypeDefinition)
+					Output.AppendLine("Set");
 
-			Output.Append(Tabs(Indent));
-			Output.AppendLine("{");
+				Output.Append(Tabs(Indent));
+				Output.AppendLine("{");
 
-			Indent++;
+				Indent++;
 
-			foreach (Asn1Node Node in this.Nodes)
-				Node.ExportCSharp(Output, Settings, Indent);
+				foreach (Asn1Node Node in this.Nodes)
+					Node.ExportCSharp(Output, Settings, Indent, CSharpExportPass.Explicit);
 
-			Indent--;
+				Indent--;
 
-			Output.Append(Tabs(Indent));
-			Output.AppendLine("}");
-			Output.AppendLine();
+				Output.Append(Tabs(Indent));
+				Output.AppendLine("}");
+				Output.AppendLine();
+			}
 		}
 	}
 }

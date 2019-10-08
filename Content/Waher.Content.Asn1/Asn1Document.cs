@@ -1225,13 +1225,12 @@ namespace Waher.Content.Asn1
 		/// <summary>
 		/// Exports ASN.1 schemas to C#
 		/// </summary>
-		/// <param name="Namespace">What namespace to generate classes in.</param>
 		/// <param name="Settings">C# export settings.</param>
 		/// <returns>C# code</returns>
-		public string ExportCSharp(string Namespace, CSharpExportSettings Settings)
+		public string ExportCSharp(CSharpExportSettings Settings)
 		{
 			StringBuilder Output = new StringBuilder();
-			this.ExportCSharp(Output, Namespace, Settings);
+			this.ExportCSharp(Output, Settings);
 			return Output.ToString();
 		}
 
@@ -1239,9 +1238,8 @@ namespace Waher.Content.Asn1
 		/// Exports ASN.1 schemas to C#
 		/// </summary>
 		/// <param name="Output">C# Output.</param>
-		/// <param name="Namespace">What namespace to generate classes in.</param>
 		/// <param name="Settings">C# export settings.</param>
-		public void ExportCSharp(StringBuilder Output, string Namespace, CSharpExportSettings Settings)
+		public void ExportCSharp(StringBuilder Output, CSharpExportSettings Settings)
 		{
 			Output.AppendLine("using System;");
 			Output.AppendLine("using System.Text;");
@@ -1249,10 +1247,11 @@ namespace Waher.Content.Asn1
 			Output.AppendLine("using Waher.Content.Asn1;");
 			Output.AppendLine();
 			Output.Append("namespace ");
-			Output.AppendLine(Namespace);
+			Output.AppendLine(Settings.Namespace);
 			Output.AppendLine("{");
 
-			this.root?.ExportCSharp(Output, Settings, 1);
+			this.root?.ExportCSharp(Output, Settings, 1, CSharpExportPass.Preprocess);
+			this.root?.ExportCSharp(Output, Settings, 1, CSharpExportPass.Explicit);
 
 			Output.AppendLine("}");
 		}

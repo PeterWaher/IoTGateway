@@ -297,20 +297,18 @@
             ASN.1 text
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Asn1Document.ExportCSharp(System.String,Waher.Content.Asn1.CSharpExportSettings)">
+        <member name="M:Waher.Content.Asn1.Asn1Document.ExportCSharp(Waher.Content.Asn1.CSharpExportSettings)">
             <summary>
             Exports ASN.1 schemas to C#
             </summary>
-            <param name="Namespace">What namespace to generate classes in.</param>
             <param name="Settings">C# export settings.</param>
             <returns>C# code</returns>
         </member>
-        <member name="M:Waher.Content.Asn1.Asn1Document.ExportCSharp(System.Text.StringBuilder,System.String,Waher.Content.Asn1.CSharpExportSettings)">
+        <member name="M:Waher.Content.Asn1.Asn1Document.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportSettings)">
             <summary>
             Exports ASN.1 schemas to C#
             </summary>
             <param name="Output">C# Output.</param>
-            <param name="Namespace">What namespace to generate classes in.</param>
             <param name="Settings">C# export settings.</param>
         </member>
         <member name="T:Waher.Content.Asn1.CSharpExportSettings">
@@ -322,6 +320,17 @@
             <summary>
             What encoders and decoders to include in the generation of C# code.
             </summary>
+        </member>
+        <member name="F:Waher.Content.Asn1.CSharpExportSettings.Namespace">
+            <summary>
+            Namespace
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.CSharpExportSettings.#ctor(System.String)">
+            <summary>
+            What encoders and decoders to include in the generation of C# code.
+            </summary>
+            <param name="Namespace">What namespace to generate classes in.</param>
         </member>
         <member name="T:Waher.Content.Asn1.EncodingSchemes">
             <summary>
@@ -395,13 +404,14 @@
             If type is nullable.
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Asn1Choice.ExportImplicitCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportSettings,System.Int32)">
+        <member name="M:Waher.Content.Asn1.Model.Asn1Choice.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportSettings,System.Int32,Waher.Content.Asn1.Model.CSharpExportPass)">
             <summary>
-            Exports implicit definitions to C#
+            Exports to C#
             </summary>
             <param name="Output">C# Output.</param>
             <param name="Settings">C# export settings.</param>
             <param name="Indent">Indentation</param>
+            <param name="Pass">Export pass</param>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Asn1ComplexType">
             <summary>
@@ -485,13 +495,14 @@
             Definition body.
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Asn1Definitions.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportSettings,System.Int32)">
+        <member name="M:Waher.Content.Asn1.Model.Asn1Definitions.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportSettings,System.Int32,Waher.Content.Asn1.Model.CSharpExportPass)">
             <summary>
             Exports to C#
             </summary>
             <param name="Output">C# Output.</param>
             <param name="Settings">C# export settings.</param>
             <param name="Indent">Indentation</param>
+            <param name="Pass">Export pass</param>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Asn1Enumeration">
             <summary>
@@ -516,13 +527,14 @@
             If type is nullable.
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Asn1Enumeration.ExportImplicitCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportSettings,System.Int32)">
+        <member name="M:Waher.Content.Asn1.Model.Asn1Enumeration.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportSettings,System.Int32,Waher.Content.Asn1.Model.CSharpExportPass)">
             <summary>
-            Exports implicit definitions to C#
+            Exports to C#
             </summary>
             <param name="Output">C# Output.</param>
             <param name="Settings">C# export settings.</param>
             <param name="Indent">Indentation</param>
+            <param name="Pass">Export pass</param>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Asn1Extension">
             <summary>
@@ -609,21 +621,14 @@
             Tag
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Asn1FieldDefinition.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportSettings,System.Int32)">
+        <member name="M:Waher.Content.Asn1.Model.Asn1FieldDefinition.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportSettings,System.Int32,Waher.Content.Asn1.Model.CSharpExportPass)">
             <summary>
             Exports to C#
             </summary>
             <param name="Output">C# Output.</param>
             <param name="Settings">C# export settings.</param>
             <param name="Indent">Indentation</param>
-        </member>
-        <member name="M:Waher.Content.Asn1.Model.Asn1FieldDefinition.ExportImplicitCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportSettings,System.Int32)">
-            <summary>
-            Exports implicit definitions to C#
-            </summary>
-            <param name="Output">C# Output.</param>
-            <param name="Settings">C# export settings.</param>
-            <param name="Indent">Indentation</param>
+            <param name="Pass">Export pass</param>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Asn1FieldValueDefinition">
             <summary>
@@ -721,34 +726,48 @@
             Items in module.
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Asn1Module.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportSettings,System.Int32)">
+        <member name="M:Waher.Content.Asn1.Model.Asn1Module.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportSettings,System.Int32,Waher.Content.Asn1.Model.CSharpExportPass)">
             <summary>
             Exports to C#
             </summary>
             <param name="Output">C# Output.</param>
             <param name="Settings">C# export settings.</param>
             <param name="Indent">Indentation</param>
+            <param name="Pass">Export pass</param>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.CSharpExportPass">
+            <summary>
+            Defines different C# export passes.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Asn1.Model.CSharpExportPass.Preprocess">
+            <summary>
+            Preprocessing
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Asn1.Model.CSharpExportPass.Implicit">
+            <summary>
+            Implicit definitions
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Asn1.Model.CSharpExportPass.Explicit">
+            <summary>
+            Explicit definitions
+            </summary>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Asn1Node">
             <summary>
             Base class for all ASN.1 nodes.
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Asn1Node.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportSettings,System.Int32)">
+        <member name="M:Waher.Content.Asn1.Model.Asn1Node.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportSettings,System.Int32,Waher.Content.Asn1.Model.CSharpExportPass)">
             <summary>
             Exports to C#
             </summary>
             <param name="Output">C# Output.</param>
             <param name="Settings">C# export settings.</param>
             <param name="Indent">Indentation</param>
-        </member>
-        <member name="M:Waher.Content.Asn1.Model.Asn1Node.ExportImplicitCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportSettings,System.Int32)">
-            <summary>
-            Exports implicit definitions to C#
-            </summary>
-            <param name="Output">C# Output.</param>
-            <param name="Settings">C# export settings.</param>
-            <param name="Indent">Indentation</param>
+            <param name="Pass">Export pass</param>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Asn1Oid">
             <summary>
@@ -784,15 +803,6 @@
             <param name="TypeDef">If construct is part of a type definition.</param>
             <param name="Nodes">Nodes</param>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Asn1Sequence.ExportCSharpTypeDefinition(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportSettings,System.Int32,System.String)">
-            <summary>
-            Exports to C#
-            </summary>
-            <param name="Output">C# Output.</param>
-            <param name="Settings">C# export settings.</param>
-            <param name="Indent">Indentation</param>
-            <param name="TypeName">Type name.</param>
-        </member>
         <member name="P:Waher.Content.Asn1.Model.Asn1Sequence.CSharpTypeReference">
             <summary>
             C# type reference.
@@ -803,13 +813,14 @@
             If type is nullable.
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Asn1Sequence.ExportImplicitCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportSettings,System.Int32)">
+        <member name="M:Waher.Content.Asn1.Model.Asn1Sequence.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportSettings,System.Int32,Waher.Content.Asn1.Model.CSharpExportPass)">
             <summary>
-            Exports implicit definitions to C#
+            Exports to C#
             </summary>
             <param name="Output">C# Output.</param>
             <param name="Settings">C# export settings.</param>
             <param name="Indent">Indentation</param>
+            <param name="Pass">Export pass</param>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Asn1SequenceOf">
             <summary>
@@ -845,14 +856,14 @@
             If type is nullable.
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Asn1SequenceOf.ExportCSharpTypeDefinition(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportSettings,System.Int32,System.String)">
+        <member name="M:Waher.Content.Asn1.Model.Asn1SequenceOf.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportSettings,System.Int32,Waher.Content.Asn1.Model.CSharpExportPass)">
             <summary>
             Exports to C#
             </summary>
             <param name="Output">C# Output.</param>
             <param name="Settings">C# export settings.</param>
             <param name="Indent">Indentation</param>
-            <param name="TypeName">Type name.</param>
+            <param name="Pass">Export pass</param>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Asn1Set">
             <summary>
@@ -877,13 +888,14 @@
             If type is nullable.
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Asn1Set.ExportImplicitCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportSettings,System.Int32)">
+        <member name="M:Waher.Content.Asn1.Model.Asn1Set.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportSettings,System.Int32,Waher.Content.Asn1.Model.CSharpExportPass)">
             <summary>
-            Exports implicit definitions to C#
+            Exports to C#
             </summary>
             <param name="Output">C# Output.</param>
             <param name="Settings">C# export settings.</param>
             <param name="Indent">Indentation</param>
+            <param name="Pass">Export pass</param>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Asn1SetOf">
             <summary>
@@ -911,15 +923,6 @@
             <summary>
             Abstract base class for ASN.1 types.
             </summary>
-        </member>
-        <member name="M:Waher.Content.Asn1.Model.Asn1Type.ExportCSharpTypeDefinition(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportSettings,System.Int32,System.String)">
-            <summary>
-            Exports to C#
-            </summary>
-            <param name="Output">C# Output.</param>
-            <param name="Settings">C# export settings.</param>
-            <param name="Indent">Indentation</param>
-            <param name="TypeName">Type name.</param>
         </member>
         <member name="P:Waher.Content.Asn1.Model.Asn1Type.CSharpTypeReference">
             <summary>
@@ -953,13 +956,14 @@
             Type definition
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Asn1TypeDefinition.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportSettings,System.Int32)">
+        <member name="M:Waher.Content.Asn1.Model.Asn1TypeDefinition.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportSettings,System.Int32,Waher.Content.Asn1.Model.CSharpExportPass)">
             <summary>
             Exports to C#
             </summary>
             <param name="Output">C# Output.</param>
             <param name="Settings">C# export settings.</param>
             <param name="Indent">Indentation</param>
+            <param name="Pass">Export pass</param>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Asn1Value">
             <summary>
@@ -1561,13 +1565,14 @@
             Value
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Values.Asn1BooleanValue.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportSettings,System.Int32)">
+        <member name="M:Waher.Content.Asn1.Model.Values.Asn1BooleanValue.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportSettings,System.Int32,Waher.Content.Asn1.Model.CSharpExportPass)">
             <summary>
             Exports to C#
             </summary>
             <param name="Output">C# Output.</param>
             <param name="Settings">C# export settings.</param>
             <param name="Indent">Indentation</param>
+            <param name="Pass">Export pass</param>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Values.Asn1FloatingPointValue">
             <summary>
@@ -1585,13 +1590,14 @@
             Value
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Values.Asn1FloatingPointValue.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportSettings,System.Int32)">
+        <member name="M:Waher.Content.Asn1.Model.Values.Asn1FloatingPointValue.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportSettings,System.Int32,Waher.Content.Asn1.Model.CSharpExportPass)">
             <summary>
             Exports to C#
             </summary>
             <param name="Output">C# Output.</param>
             <param name="Settings">C# export settings.</param>
             <param name="Indent">Indentation</param>
+            <param name="Pass">Export pass</param>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Values.Asn1IntegerValue">
             <summary>
@@ -1609,13 +1615,14 @@
             Value
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Values.Asn1IntegerValue.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportSettings,System.Int32)">
+        <member name="M:Waher.Content.Asn1.Model.Values.Asn1IntegerValue.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportSettings,System.Int32,Waher.Content.Asn1.Model.CSharpExportPass)">
             <summary>
             Exports to C#
             </summary>
             <param name="Output">C# Output.</param>
             <param name="Settings">C# export settings.</param>
             <param name="Indent">Indentation</param>
+            <param name="Pass">Export pass</param>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Values.Asn1Max">
             <summary>
@@ -1670,13 +1677,14 @@
             Value
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Values.Asn1StringValue.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportSettings,System.Int32)">
+        <member name="M:Waher.Content.Asn1.Model.Values.Asn1StringValue.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportSettings,System.Int32,Waher.Content.Asn1.Model.CSharpExportPass)">
             <summary>
             Exports to C#
             </summary>
             <param name="Output">C# Output.</param>
             <param name="Settings">C# export settings.</param>
             <param name="Indent">Indentation</param>
+            <param name="Pass">Export pass</param>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Values.Asn1ValueReference">
             <summary>
@@ -1694,13 +1702,14 @@
             Identifier
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Values.Asn1ValueReference.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportSettings,System.Int32)">
+        <member name="M:Waher.Content.Asn1.Model.Values.Asn1ValueReference.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportSettings,System.Int32,Waher.Content.Asn1.Model.CSharpExportPass)">
             <summary>
             Exports to C#
             </summary>
             <param name="Output">C# Output.</param>
             <param name="Settings">C# export settings.</param>
             <param name="Indent">Indentation</param>
+            <param name="Pass">Export pass</param>
         </member>
     </members>
 </doc>

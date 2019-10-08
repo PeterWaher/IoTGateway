@@ -53,11 +53,11 @@ namespace Waher.Content.Asn1.Model
 		/// <param name="Output">C# Output.</param>
 		/// <param name="Settings">C# export settings.</param>
 		/// <param name="Indent">Indentation</param>
-		/// <param name="TypeName">Type name.</param>
-		public override void ExportCSharpTypeDefinition(StringBuilder Output, 
-			CSharpExportSettings Settings, int Indent, string TypeName)
+		/// <param name="Pass">Export pass</param>
+		public override void ExportCSharp(StringBuilder Output, CSharpExportSettings Settings,
+			int Indent, CSharpExportPass Pass)
 		{
-			if (this.TypeDefinition)
+			if (Pass == CSharpExportPass.Preprocess && this.TypeDefinition)
 			{
 				Output.Append(Tabs(Indent));
 				Output.Append("using ");
@@ -68,5 +68,6 @@ namespace Waher.Content.Asn1.Model
 				Output.AppendLine();
 			}
 		}
+
 	}
 }

@@ -34,7 +34,7 @@ namespace Waher.Content.Asn1.Model
 		/// <param name="Absent">If an optional field must be absent.</param>
 		/// <param name="Default">Default value if field not provided.</param>
 		/// <param name="NamedOptions">Named options.</param>
-		public Asn1FieldDefinition(string FieldName, int? Tag, Asn1Type Type, 
+		public Asn1FieldDefinition(string FieldName, int? Tag, Asn1Type Type,
 			Asn1Restriction Restriction, bool? Optional, bool? Unique, bool? Present,
 			bool? Absent, Asn1Node Default, Asn1NamedValue[] NamedOptions)
 			: base()
@@ -104,42 +104,39 @@ namespace Waher.Content.Asn1.Model
 			get => this.tag;
 			internal set => this.tag = value;
 		}
+
 		/// <summary>
 		/// Exports to C#
 		/// </summary>
 		/// <param name="Output">C# Output.</param>
 		/// <param name="Settings">C# export settings.</param>
 		/// <param name="Indent">Indentation</param>
-		public override void ExportCSharp(StringBuilder Output, CSharpExportSettings Settings, int Indent)
+		/// <param name="Pass">Export pass</param>
+		public override void ExportCSharp(StringBuilder Output, CSharpExportSettings Settings,
+			int Indent, CSharpExportPass Pass)
 		{
-			Output.Append(Tabs(Indent));
-			Output.Append("public ");
-			Output.Append(this.type.CSharpTypeReference);
-
-			if (this.optional.HasValue && this.optional.Value && !this.type.CSharpTypeNullable)
-				Output.Append('?');
-
-			Output.Append(' ');
-			Output.Append(this.fieldName);
-
-			if (!(this._default is null))
+			if (Pass == CSharpExportPass.Explicit)
 			{
-				Output.Append(" = ");
-				this._default.ExportCSharp(Output, Settings, Indent);
+				Output.Append(Tabs(Indent));
+				Output.Append("public ");
+				Output.Append(this.type.CSharpTypeReference);
+
+				if (this.optional.HasValue && this.optional.Value && !this.type.CSharpTypeNullable)
+					Output.Append('?');
+
+				Output.Append(' ');
+				Output.Append(this.fieldName);
+
+				if (!(this._default is null))
+				{
+					Output.Append(" = ");
+					this._default.ExportCSharp(Output, Settings, Indent, Pass);
+				}
+
+				Output.AppendLine(";");
 			}
-
-			Output.AppendLine(";");
-		}
-
-		/// <summary>
-		/// Exports implicit definitions to C#
-		/// </summary>
-		/// <param name="Output">C# Output.</param>
-		/// <param name="Settings">C# export settings.</param>
-		/// <param name="Indent">Indentation</param>
-		public override void ExportImplicitCSharp(StringBuilder Output, CSharpExportSettings Settings, int Indent)
-		{
-			this.type.ExportImplicitCSharp(Output, Settings, Indent);
+			else
+				this.type.ExportCSharp(Output, Settings, Indent, Pass);
 		}
 	}
 }

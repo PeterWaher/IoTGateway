@@ -25,15 +25,15 @@ namespace Waher.Content.Asn1.Model.Values
 		/// </summary>
 		public bool Value => this.value;
 
-
 		/// <summary>
 		/// Exports to C#
 		/// </summary>
 		/// <param name="Output">C# Output.</param>
 		/// <param name="Settings">C# export settings.</param>
 		/// <param name="Indent">Indentation</param>
+		/// <param name="Pass">Export pass</param>
 		public override void ExportCSharp(StringBuilder Output, CSharpExportSettings Settings,
-			int Indent)
+			int Indent, CSharpExportPass Pass)
 		{
 			Output.Append(this.value ? "true" : "false");
 		}

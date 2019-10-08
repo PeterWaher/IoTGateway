@@ -359,7 +359,7 @@ namespace Waher.Content.Asn1
 						throw this.SyntaxError("::= expected.");
 
 					this.pos += s2.Length;
-					Asn1Type TypeDefinition = this.ParseType(string.Empty);
+					Asn1Type TypeDefinition = this.ParseType(s, true);
 
 					return new Asn1TypeDefinition(s, TypeDefinition);
 				}
@@ -388,7 +388,7 @@ namespace Waher.Content.Asn1
 					if (!IsTypeIdentifier(s2))
 						throw this.SyntaxError("Type name expected.");
 
-					Asn1Type Type = this.ParseType(s);
+					Asn1Type Type = this.ParseType(s, false);
 					Asn1Restriction Restriction = null;
 					List<Asn1NamedValue> NamedOptions = null;
 					bool? Optional = false;
@@ -696,7 +696,7 @@ namespace Waher.Content.Asn1
 			return new Asn1Oid(Values);
 		}
 
-		private Asn1Type ParseType(string FieldName)
+		private Asn1Type ParseType(string Name, bool TypeDef)
 		{
 			string s = this.NextToken();
 			if (string.IsNullOrEmpty(s))
@@ -727,7 +727,7 @@ namespace Waher.Content.Asn1
 					if (s == "{")
 					{
 						Asn1Node[] Nodes = this.ParseList();
-						return new Asn1Choice(FieldName, Nodes);
+						return new Asn1Choice(Name, TypeDef, Nodes);
 					}
 					else
 						throw this.SyntaxError("{ expected.");
@@ -744,7 +744,7 @@ namespace Waher.Content.Asn1
 					if (s == "{")
 					{
 						Asn1Node[] Nodes = this.ParseValues();
-						return new Asn1Enumeration(FieldName, Nodes);
+						return new Asn1Enumeration(Name, TypeDef, Nodes);
 					}
 					else
 						throw this.SyntaxError("{ expected.");
@@ -801,7 +801,7 @@ namespace Waher.Content.Asn1
 					if (s == "{")
 					{
 						Asn1Node[] Nodes = this.ParseList();
-						return new Asn1Set(FieldName, Nodes);
+						return new Asn1Set(Name, TypeDef, Nodes);
 					}
 					else if (s == "(")
 					{
@@ -849,7 +849,7 @@ namespace Waher.Content.Asn1
 					if (s == "{")
 					{
 						Asn1Node[] Nodes = this.ParseList();
-						return new Asn1Sequence(FieldName, Nodes);
+						return new Asn1Sequence(Name, TypeDef, Nodes);
 					}
 					else
 					{
@@ -884,9 +884,7 @@ namespace Waher.Content.Asn1
 						if (this.NextToken() != "OF")
 							throw this.SyntaxError("Unexpected token.");
 
-						s = this.ParseTypeNameIdentifier();
-
-						return new Asn1SequenceOf(Size, s);
+						return new Asn1SequenceOf(Name, TypeDef, Size, this.ParseType(Name, TypeDef));
 					}
 
 				case "T61String":

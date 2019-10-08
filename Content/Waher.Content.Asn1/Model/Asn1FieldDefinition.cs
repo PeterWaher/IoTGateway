@@ -25,6 +25,7 @@ namespace Waher.Content.Asn1.Model
 		/// Represents an ASN.1 field definition.
 		/// </summary>
 		/// <param name="FieldName">Field name.</param>
+		/// <param name="Tag">Tag</param>
 		/// <param name="Type">Type.</param>
 		/// <param name="Restriction">Optional restrictions.</param>
 		/// <param name="Optional">If field is optional.</param>

@@ -7,22 +7,23 @@ namespace Waher.Content.Asn1.Model
 	/// <summary>
 	/// ENUMERATED
 	/// </summary>
-	public class Asn1Enumeration : Asn1List 
+	public class Asn1Enumeration : Asn1List
 	{
 		/// <summary>
 		/// ENUMERATED
 		/// </summary>
-		/// <param name="FieldName">Optional field name.</param>
+		/// <param name="Name">Optional field or type name.</param>
+		/// <param name="TypeDef">If construct is part of a type definition.</param>
 		/// <param name="Nodes">Nodes</param>
-		public Asn1Enumeration(string FieldName, Asn1Node[] Nodes)
-			: base(FieldName, Nodes)
+		public Asn1Enumeration(string Name, bool TypeDef, Asn1Node[] Nodes)
+			: base(Name, TypeDef, Nodes)
 		{
 		}
 
 		/// <summary>
 		/// C# type reference.
 		/// </summary>
-		public override string CSharpTypeReference => this.FieldName + "Enum";
+		public override string CSharpTypeReference => this.TypeDefinition ? this.Name : this.Name + "Enum";
 
 		/// <summary>
 		/// If type is nullable.
@@ -39,12 +40,13 @@ namespace Waher.Content.Asn1.Model
 		{
 			Output.Append(Tabs(Indent));
 			Output.Append("public enum ");
-			Output.Append(this.FieldName);
-			Output.AppendLine("Enum");
+			Output.Append(this.Name);
+			if (!this.TypeDefinition)
+				Output.AppendLine("Enum");
 
 			Output.Append(Tabs(Indent));
 			Output.Append("{");
-			
+
 			Indent++;
 
 			bool First = true;

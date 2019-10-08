@@ -1,26 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Waher.Content.Asn1;
 
 namespace Waher.Content.Asn1.Model
 {
 	/// <summary>
 	/// Represents a ASN.1 SEQUENCE OF construct.
 	/// </summary>
-	public class Asn1SequenceOf : Asn1Type
+	public class Asn1SequenceOf : Asn1ComplexType
 	{
 		private readonly Asn1Values size;
-		private readonly string typeName;
+		private readonly Asn1Type elementType;
 
 		/// <summary>
 		/// Represents a ASN.1 SEQUENCE OF construct.
 		/// </summary>
+		/// <param name="Name">Optional field or type name.</param>
+		/// <param name="TypeDef">If construct is part of a type definition.</param>
 		/// <param name="Size">Optional SIZE</param>
-		/// <param name="TypeName">Type name</param>
-		public Asn1SequenceOf(Asn1Values Size, string TypeName)
+		/// <param name="ElementType">Element type.</param>
+		public Asn1SequenceOf(string Name, bool TypeDef, Asn1Values Size, Asn1Type ElementType)
+			: base(Name, TypeDef)
 		{
 			this.size = Size;
-			this.typeName = TypeName;
+			this.elementType = ElementType;
 		}
 
 		/// <summary>
@@ -29,18 +33,40 @@ namespace Waher.Content.Asn1.Model
 		public Asn1Values Size => this.size;
 
 		/// <summary>
-		/// Type name.
+		/// Element Type
 		/// </summary>
-		public string TypeName => this.typeName;
+		public Asn1Type ElementType => this.elementType;
 
 		/// <summary>
 		/// C# type reference.
 		/// </summary>
-		public override string CSharpTypeReference => this.typeName + "[]";
+		public override string CSharpTypeReference => this.elementType.CSharpTypeReference + "[]";
 
 		/// <summary>
 		/// If type is nullable.
 		/// </summary>
-		public override bool CSharpTypeNullable => base.CSharpTypeNullable;
+		public override bool CSharpTypeNullable => true;
+
+		/// <summary>
+		/// Exports to C#
+		/// </summary>
+		/// <param name="Output">C# Output.</param>
+		/// <param name="Settings">C# export settings.</param>
+		/// <param name="Indent">Indentation</param>
+		/// <param name="TypeName">Type name.</param>
+		public override void ExportCSharpTypeDefinition(StringBuilder Output, 
+			CSharpExportSettings Settings, int Indent, string TypeName)
+		{
+			if (this.TypeDefinition)
+			{
+				Output.Append(Tabs(Indent));
+				Output.Append("using ");
+				Output.Append(this.Name);
+				Output.Append(" = Array<");
+				Output.Append(this.elementType.CSharpTypeReference);
+				Output.AppendLine(">;");
+				Output.AppendLine();
+			}
+		}
 	}
 }

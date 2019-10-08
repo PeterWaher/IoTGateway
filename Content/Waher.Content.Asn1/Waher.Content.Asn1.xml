@@ -4,6 +4,278 @@
         <name>Waher.Content.Asn1</name>
     </assembly>
     <members>
+        <member name="T:Waher.Content.Asn1.Array`1">
+            <summary>
+            Generic array.
+            </summary>
+            <typeparam name="T">Element type.</typeparam>
+        </member>
+        <member name="M:Waher.Content.Asn1.Array`1.op_Implicit(Waher.Content.Asn1.Array{`0})~`0[]">
+            <summary>
+            Implicit type converter to a typed array.
+            </summary>
+            <param name="A">Object instance</param>
+        </member>
+        <member name="M:Waher.Content.Asn1.Array`1.op_Implicit(Waher.Content.Asn1.Array{`0})~System.Array">
+            <summary>
+            Implicit type converter to an untyped array.
+            </summary>
+            <param name="A">Object instance</param>
+        </member>
+        <member name="M:Waher.Content.Asn1.Array`1.op_Implicit(`0[])~Waher.Content.Asn1.Array{`0}">
+            <summary>
+            Implicit type converter to a typed array.
+            </summary>
+            <param name="A">Array</param>
+        </member>
+        <member name="M:Waher.Content.Asn1.Array`1.#ctor(System.Int32)">
+            <summary>
+            Generic array.
+            </summary>
+            <param name="Length">Length of array.</param>
+        </member>
+        <member name="M:Waher.Content.Asn1.Array`1.#ctor(`0[])">
+            <summary>
+            Generic array.
+            </summary>
+            <param name="Elements">Elements</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Array`1.Rank">
+            <summary>
+            Gets the rank (number of dimensions) of the System.Array. For example, a one-dimensional
+            array returns 1, a two-dimensional array returns 2, and so on.
+            </summary>
+            <returns>
+            The rank (number of dimensions) of the System.Array.
+            </returns>
+        </member>
+        <member name="P:Waher.Content.Asn1.Array`1.Length">
+            <summary>
+            Gets a 32-bit integer that represents the total number of elements in all the
+            dimensions of the System.Array.
+            </summary>
+            <returns>
+            A 32-bit integer that represents the total number of elements in all the dimensions
+            of the System.Array; zero if there are no elements in the array.
+            </returns>
+            <exception cref="T:System.OverflowException">
+            The array is multidimensional and contains more than System.Int32.MaxValue elements.
+            </exception>
+        </member>
+        <member name="P:Waher.Content.Asn1.Array`1.Elements">
+            <summary>
+            Internal array of elements.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Array`1.Item(System.Int32)">
+            <summary>
+            Gets or sets elements of the array.
+            </summary>
+            <param name="Index">Zero-based index into the array.</param>
+            <returns>Element of array.</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.Array`1.Clone">
+            <summary>
+            Creates a shallow copy of the System.Array.
+            </summary>
+            <returns>
+            A shallow copy of the System.Array.
+            </returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.Array`1.CopyTo(Waher.Content.Asn1.Array{`0},System.Int32)">
+            <summary>
+            Copies all the elements of the current one-dimensional array to the specified
+            one-dimensional array starting at the specified destination array index. The
+            index is specified as a 32-bit integer.
+            </summary>
+            <param name="array">
+            The one-dimensional array that is the destination of the elements copied from
+            the current array.
+            </param>
+            <param name="index">
+            A 32-bit integer that represents the index in array at which copying begins.
+            </param>
+            <exception cref="T:System.ArgumentNullException">
+            array is null.
+            </exception>
+            <exception cref="T:System.ArgumentOutOfRangeException">
+            index is less than the lower bound of array.
+            </exception>
+            <exception cref="T:System.ArgumentException">
+            array is multidimensional.-or-The number of elements in the source array is greater
+            than the available number of elements from index to the end of the destination
+            array.
+            </exception>
+            <exception cref="T:System.ArrayTypeMismatchException">
+            The type of the source System.Array cannot be cast automatically to the type
+            of the destination array.
+            </exception>
+            <exception cref="T:System.RankException">
+            The source array is multidimensional.
+            </exception>
+            <exception cref="T:System.InvalidCastException">
+            At least one element in the source System.Array cannot be cast to the type of
+            destination array.
+            </exception>
+        </member>
+        <member name="M:Waher.Content.Asn1.Array`1.System#Collections#IEnumerable#GetEnumerator">
+            <summary>
+            Returns an System.Collections.IEnumerator for the System.Array.
+            </summary>
+            <returns>
+            An System.Collections.IEnumerator for the System.Array.
+            </returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.Array`1.GetEnumerator">
+            <summary>
+            Returns an System.Collections.IEnumerator for the System.Array.
+            </summary>
+            <returns>
+            An System.Collections.IEnumerator for the System.Array.
+            </returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.Array`1.GetLength(System.Int32)">
+            <summary>
+            Gets a 32-bit integer that represents the number of elements in the specified
+            dimension of the System.Array.
+            </summary>
+            <param name="dimension">
+            A zero-based dimension of the System.Array whose length needs to be determined.
+            </param>
+            <returns>
+            A 32-bit integer that represents the number of elements in the specified dimension.
+            </returns>
+            <exception cref="T:System.IndexOutOfRangeException">
+            dimension is less than zero.-or-dimension is equal to or greater than System.Array.Rank.
+            </exception>
+        </member>
+        <member name="M:Waher.Content.Asn1.Array`1.GetLowerBound(System.Int32)">
+            <summary>
+            Gets the index of the first element of the specified dimension in the array.
+            </summary>
+            <param name="dimension">
+            A zero-based dimension of the array whose starting index needs to be determined.
+            </param>
+            <returns>
+            The index of the first element of the specified dimension in the array.
+            </returns>
+            <exception cref="T:System.IndexOutOfRangeException">
+            dimension is less than zero.-or-dimension is equal to or greater than System.Array.Rank.
+            </exception>
+        </member>
+        <member name="M:Waher.Content.Asn1.Array`1.GetUpperBound(System.Int32)">
+            <summary>
+            Gets the index of the last element of the specified dimension in the array.
+            </summary>
+            <param name="dimension">
+            A zero-based dimension of the array whose upper bound needs to be determined.
+            </param>
+            <returns>
+            The index of the last element of the specified dimension in the array, or -1
+            if the specified dimension is empty.
+            </returns>
+            <exception cref="T:System.IndexOutOfRangeException">
+            dimension is less than zero.-or-dimension is equal to or greater than System.Array.Rank.
+            </exception>
+        </member>
+        <member name="M:Waher.Content.Asn1.Array`1.GetValue(System.Int32)">
+            <summary>
+            Gets the value at the specified position in the one-dimensional System.Array.
+            The index is specified as a 32-bit integer.
+            </summary>
+            <param name="index">
+            A 32-bit integer that represents the position of the System.Array element to
+            get.
+            </param>
+            <returns>
+            The value at the specified position in the one-dimensional System.Array.
+            </returns>
+            <exception cref="T:System.ArgumentException">
+            The current System.Array does not have exactly one dimension.
+            </exception>
+            <exception cref="T:System.IndexOutOfRangeException">
+            index is outside the range of valid indexes for the current System.Array.
+            </exception>
+        </member>
+        <member name="M:Waher.Content.Asn1.Array`1.GetValue(System.Int32[])">
+            <summary>
+            Gets the value at the specified position in the multidimensional System.Array.
+            The indexes are specified as an array of 32-bit integers.
+            </summary>
+            <param name="indices">
+            A one-dimensional array of 32-bit integers that represent the indexes specifying
+            the position of the System.Array element to get.
+            </param>
+            <returns>
+            The value at the specified position in the multidimensional System.Array.
+            </returns>
+            <exception cref="T:System.ArgumentNullException">
+            indices is null.
+            </exception>
+            <exception cref="T:System.ArgumentException">
+            The number of dimensions in the current System.Array is not equal to the number
+            of elements in indices.
+            </exception>
+            <exception cref="T:System.IndexOutOfRangeException">
+            Any element in indices is outside the range of valid indexes for the corresponding
+            dimension of the current System.Array.
+            </exception>
+        </member>
+        <member name="M:Waher.Content.Asn1.Array`1.Initialize">
+            <summary>
+            Initializes every element of the value-type System.Array by calling the default
+            constructor of the value type.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Array`1.SetValue(System.Object,System.Int32[])">
+            <summary>
+            Sets a value to the element at the specified position in the multidimensional
+            System.Array. The indexes are specified as an array of 32-bit integers.
+            </summary>
+            <param name="value">
+            The new value for the specified element.
+            </param>
+            <param name="indices">
+            A one-dimensional array of 32-bit integers that represent the indexes specifying
+            the position of the element to set.
+            </param>
+            <exception cref="T:System.ArgumentNullException">
+            indices is null.
+            </exception>
+            <exception cref="T:System.ArgumentException">
+            The number of dimensions in the current System.Array is not equal to the number
+            of elements in indices.
+            </exception>
+            <exception cref="T:System.InvalidCastException">
+            value cannot be cast to the element type of the current System.Array.
+            </exception>
+            <exception cref="T:System.IndexOutOfRangeException">
+            Any element in indices is outside the range of valid indexes for the corresponding
+            dimension of the current System.Array.
+            </exception>
+        </member>
+        <member name="M:Waher.Content.Asn1.Array`1.SetValue(System.Object,System.Int32)">
+            <summary>
+            Sets a value to the element at the specified position in the one-dimensional
+            System.Array. The index is specified as a 32-bit integer.
+            </summary>
+            <param name="value">
+            The new value for the specified element.
+            </param>
+            <param name="index">
+            A 32-bit integer that represents the position of the System.Array element to
+            set.
+            </param>
+            <exception cref="T:System.ArgumentException">
+            The current System.Array does not have exactly one dimension.
+            </exception>
+            <exception cref="T:System.InvalidCastException">
+            value cannot be cast to the element type of the current System.Array.
+            </exception>
+            <exception cref="T:System.IndexOutOfRangeException">
+            index is outside the range of valid indexes for the current System.Array.
+            </exception>
+        </member>
         <member name="T:Waher.Content.Asn1.Asn1Document">
             <summary>
             Represents an ASN.1 document.
@@ -105,11 +377,12 @@
             Represents a ASN.1 CHOICE construct.
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Asn1Choice.#ctor(System.String,Waher.Content.Asn1.Model.Asn1Node[])">
+        <member name="M:Waher.Content.Asn1.Model.Asn1Choice.#ctor(System.String,System.Boolean,Waher.Content.Asn1.Model.Asn1Node[])">
             <summary>
             Represents a ASN.1 CHOICE construct.
             </summary>
-            <param name="FieldName">Optional field name.</param>
+            <param name="Name">Optional field or type name.</param>
+            <param name="TypeDef">If construct is part of a type definition.</param>
             <param name="Nodes">Nodes</param>
         </member>
         <member name="P:Waher.Content.Asn1.Model.Asn1Choice.CSharpTypeReference">
@@ -129,6 +402,28 @@
             <param name="Output">C# Output.</param>
             <param name="Settings">C# export settings.</param>
             <param name="Indent">Indentation</param>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Asn1ComplexType">
+            <summary>
+            Abstract base class for complex types.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Asn1ComplexType.#ctor(System.String,System.Boolean)">
+            <summary>
+            Abstract base class for complex types.
+            </summary>
+            <param name="Name">Optional field or type name.</param>
+            <param name="TypeDef">If construct is part of a type definition.</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1ComplexType.Name">
+            <summary>
+            Optional field or type name.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1ComplexType.TypeDefinition">
+            <summary>
+            If construct is part of a type definition.
+            </summary>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Asn1Tags">
             <summary>
@@ -203,11 +498,12 @@
             ENUMERATED
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Asn1Enumeration.#ctor(System.String,Waher.Content.Asn1.Model.Asn1Node[])">
+        <member name="M:Waher.Content.Asn1.Model.Asn1Enumeration.#ctor(System.String,System.Boolean,Waher.Content.Asn1.Model.Asn1Node[])">
             <summary>
             ENUMERATED
             </summary>
-            <param name="FieldName">Optional field name.</param>
+            <param name="Name">Optional field or type name.</param>
+            <param name="TypeDef">If construct is part of a type definition.</param>
             <param name="Nodes">Nodes</param>
         </member>
         <member name="P:Waher.Content.Asn1.Model.Asn1Enumeration.CSharpTypeReference">
@@ -253,6 +549,7 @@
             Represents an ASN.1 field definition.
             </summary>
             <param name="FieldName">Field name.</param>
+            <param name="Tag">Tag</param>
             <param name="Type">Type.</param>
             <param name="Restriction">Optional restrictions.</param>
             <param name="Optional">If field is optional.</param>
@@ -383,21 +680,17 @@
             Abstract base class for list constructs.
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Asn1List.#ctor(System.String,Waher.Content.Asn1.Model.Asn1Node[])">
+        <member name="M:Waher.Content.Asn1.Model.Asn1List.#ctor(System.String,System.Boolean,Waher.Content.Asn1.Model.Asn1Node[])">
             <summary>
             Abstract base class for list constructs.
             </summary>
-            <param name="FieldName">Optional field name.</param>
+            <param name="Name">Optional field or type name.</param>
+            <param name="TypeDef">If construct is part of a type definition.</param>
             <param name="Nodes">Nodes</param>
         </member>
         <member name="P:Waher.Content.Asn1.Model.Asn1List.Nodes">
             <summary>
             Nodes
-            </summary>
-        </member>
-        <member name="P:Waher.Content.Asn1.Model.Asn1List.FieldName">
-            <summary>
-            Optional field name.
             </summary>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Asn1Module">
@@ -483,11 +776,12 @@
             Represents a ASN.1 SEQUENCE construct.
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Asn1Sequence.#ctor(System.String,Waher.Content.Asn1.Model.Asn1Node[])">
+        <member name="M:Waher.Content.Asn1.Model.Asn1Sequence.#ctor(System.String,System.Boolean,Waher.Content.Asn1.Model.Asn1Node[])">
             <summary>
             Represents a ASN.1 SEQUENCE construct.
             </summary>
-            <param name="FieldName">Optional field name.</param>
+            <param name="Name">Optional field or type name.</param>
+            <param name="TypeDef">If construct is part of a type definition.</param>
             <param name="Nodes">Nodes</param>
         </member>
         <member name="M:Waher.Content.Asn1.Model.Asn1Sequence.ExportCSharpTypeDefinition(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportSettings,System.Int32,System.String)">
@@ -522,21 +816,23 @@
             Represents a ASN.1 SEQUENCE OF construct.
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Asn1SequenceOf.#ctor(Waher.Content.Asn1.Model.Asn1Values,System.String)">
+        <member name="M:Waher.Content.Asn1.Model.Asn1SequenceOf.#ctor(System.String,System.Boolean,Waher.Content.Asn1.Model.Asn1Values,Waher.Content.Asn1.Model.Asn1Type)">
             <summary>
             Represents a ASN.1 SEQUENCE OF construct.
             </summary>
+            <param name="Name">Optional field or type name.</param>
+            <param name="TypeDef">If construct is part of a type definition.</param>
             <param name="Size">Optional SIZE</param>
-            <param name="TypeName">Type name</param>
+            <param name="ElementType">Element type.</param>
         </member>
         <member name="P:Waher.Content.Asn1.Model.Asn1SequenceOf.Size">
             <summary>
             Optional SIZE
             </summary>
         </member>
-        <member name="P:Waher.Content.Asn1.Model.Asn1SequenceOf.TypeName">
+        <member name="P:Waher.Content.Asn1.Model.Asn1SequenceOf.ElementType">
             <summary>
-            Type name.
+            Element Type
             </summary>
         </member>
         <member name="P:Waher.Content.Asn1.Model.Asn1SequenceOf.CSharpTypeReference">
@@ -549,16 +845,26 @@
             If type is nullable.
             </summary>
         </member>
+        <member name="M:Waher.Content.Asn1.Model.Asn1SequenceOf.ExportCSharpTypeDefinition(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportSettings,System.Int32,System.String)">
+            <summary>
+            Exports to C#
+            </summary>
+            <param name="Output">C# Output.</param>
+            <param name="Settings">C# export settings.</param>
+            <param name="Indent">Indentation</param>
+            <param name="TypeName">Type name.</param>
+        </member>
         <member name="T:Waher.Content.Asn1.Model.Asn1Set">
             <summary>
             Represents a ASN.1 SET construct.
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Asn1Set.#ctor(System.String,Waher.Content.Asn1.Model.Asn1Node[])">
+        <member name="M:Waher.Content.Asn1.Model.Asn1Set.#ctor(System.String,System.Boolean,Waher.Content.Asn1.Model.Asn1Node[])">
             <summary>
             Represents a ASN.1 SET construct.
             </summary>
-            <param name="FieldName">Optional field name.</param>
+            <param name="Name">Optional field or type name.</param>
+            <param name="TypeDef">If construct is part of a type definition.</param>
             <param name="Nodes">Nodes</param>
         </member>
         <member name="P:Waher.Content.Asn1.Model.Asn1Set.CSharpTypeReference">
@@ -1177,6 +1483,11 @@
         <member name="P:Waher.Content.Asn1.Model.Types.Asn1TypeReference.Identifier">
             <summary>
             Identifier
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Types.Asn1TypeReference.CSharpTypeReference">
+            <summary>
+            C# type reference.
             </summary>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Types.Asn1UniversalString">

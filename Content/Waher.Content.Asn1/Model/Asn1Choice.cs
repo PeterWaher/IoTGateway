@@ -12,17 +12,18 @@ namespace Waher.Content.Asn1.Model
 		/// <summary>
 		/// Represents a ASN.1 CHOICE construct.
 		/// </summary>
-		/// <param name="FieldName">Optional field name.</param>
+		/// <param name="Name">Optional field or type name.</param>
+		/// <param name="TypeDef">If construct is part of a type definition.</param>
 		/// <param name="Nodes">Nodes</param>
-		public Asn1Choice(string FieldName, Asn1Node[] Nodes)
-			: base(FieldName, Nodes)
+		public Asn1Choice(string Name, bool TypeDef, Asn1Node[] Nodes)
+			: base(Name, TypeDef, Nodes)
 		{
 		}
 
 		/// <summary>
 		/// C# type reference.
 		/// </summary>
-		public override string CSharpTypeReference => this.FieldName + "Choice";
+		public override string CSharpTypeReference => this.TypeDefinition ? this.Name : this.Name + "Choice";
 
 		/// <summary>
 		/// If type is nullable.
@@ -43,7 +44,7 @@ namespace Waher.Content.Asn1.Model
 
 			Output.Append(Tabs(Indent));
 			Output.Append("public enum ");
-			Output.Append(this.FieldName);
+			Output.Append(this.Name);
 			Output.AppendLine("Enum");
 
 			Output.Append(Tabs(Indent));
@@ -78,8 +79,9 @@ namespace Waher.Content.Asn1.Model
 
 			Output.Append(Tabs(Indent));
 			Output.Append("public class ");
-			Output.Append(this.FieldName);
-			Output.AppendLine("Choice");
+			Output.Append(this.Name);
+			if (!this.TypeDefinition)
+				Output.AppendLine("Choice");
 
 			Output.Append(Tabs(Indent));
 			Output.AppendLine("{");
@@ -87,8 +89,10 @@ namespace Waher.Content.Asn1.Model
 			Indent++;
 
 			Output.Append(Tabs(Indent));
-			Output.Append(this.FieldName);
-			Output.AppendLine("Enum _choice;");
+			Output.Append(this.Name);
+			if (!this.TypeDefinition)
+				Output.Append("Enum");
+			Output.AppendLine(" _choice;");
 
 			foreach (Asn1Node Node in this.Nodes)
 				Node.ExportCSharp(Output, Settings, Indent);

@@ -24,5 +24,10 @@ namespace Waher.Content.Asn1.Model.Types
 		/// Identifier
 		/// </summary>
 		public string Identifier => identifier;
+
+		/// <summary>
+		/// C# type reference.
+		/// </summary>
+		public override string CSharpTypeReference => this.identifier;
 	}
 }

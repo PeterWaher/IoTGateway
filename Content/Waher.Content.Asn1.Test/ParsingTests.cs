@@ -14,7 +14,13 @@ namespace Waher.Content.Asn1.Test
 		}
 
 		[TestMethod]
-		public void Test_01_MyShopPurchaseOrders()
+		public void Test_01_WorldSchema()
+		{
+			ParseAsn1Document("World-Schema.asn1");
+		}
+
+		[TestMethod]
+		public void Test_02_MyShopPurchaseOrders()
 		{
 			ParseAsn1Document("MyShopPurchaseOrders.asn1");
 		}

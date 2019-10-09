@@ -14,9 +14,8 @@ namespace Waher.Content.Asn1.Model.Types
 		/// UTF8String
 		/// any character from a recognized alphabet (including ASCII control characters)
 		/// </summary>
-		/// <param name="Implicit">Implicit type definition</param>
-		public Asn1Utf8String(bool Implicit)
-			: base(Implicit)
+		public Asn1Utf8String()
+			: base()
 		{
 		}
 	}

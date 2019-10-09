@@ -12,9 +12,8 @@ namespace Waher.Content.Asn1.Model.Types
 		/// <summary>
 		/// T61String
 		/// </summary>
-		/// <param name="Implicit">Implicit type definition</param>
-		public Asn1T61String(bool Implicit)
-			: base(Implicit)
+		public Asn1T61String()
+			: base()
 		{
 		}
 	}

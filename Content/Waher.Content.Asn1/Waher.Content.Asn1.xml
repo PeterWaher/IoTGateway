@@ -936,14 +936,13 @@
             Represents a ASN.1 CHOICE construct.
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Asn1Choice.#ctor(System.String,System.Boolean,Waher.Content.Asn1.Model.Asn1Node[],System.Boolean)">
+        <member name="M:Waher.Content.Asn1.Model.Asn1Choice.#ctor(System.String,System.Boolean,Waher.Content.Asn1.Model.Asn1Node[])">
             <summary>
             Represents a ASN.1 CHOICE construct.
             </summary>
             <param name="Name">Optional field or type name.</param>
             <param name="TypeDef">If construct is part of a type definition.</param>
             <param name="Nodes">Nodes</param>
-            <param name="Implicit">Implicit type definition</param>
         </member>
         <member name="P:Waher.Content.Asn1.Model.Asn1Choice.CSharpTypeReference">
             <summary>
@@ -969,13 +968,12 @@
             Abstract base class for complex types.
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Asn1ComplexType.#ctor(System.String,System.Boolean,System.Boolean)">
+        <member name="M:Waher.Content.Asn1.Model.Asn1ComplexType.#ctor(System.String,System.Boolean)">
             <summary>
             Abstract base class for complex types.
             </summary>
             <param name="Name">Optional field or type name.</param>
             <param name="TypeDef">If construct is part of a type definition.</param>
-            <param name="Implicit">Implicit type definition</param>
         </member>
         <member name="P:Waher.Content.Asn1.Model.Asn1ComplexType.Name">
             <summary>
@@ -1061,14 +1059,13 @@
             ENUMERATED
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Asn1Enumeration.#ctor(System.String,System.Boolean,Waher.Content.Asn1.Model.Asn1Node[],System.Boolean)">
+        <member name="M:Waher.Content.Asn1.Model.Asn1Enumeration.#ctor(System.String,System.Boolean,Waher.Content.Asn1.Model.Asn1Node[])">
             <summary>
             ENUMERATED
             </summary>
             <param name="Name">Optional field or type name.</param>
             <param name="TypeDef">If construct is part of a type definition.</param>
             <param name="Nodes">Nodes</param>
-            <param name="Implicit">Implicit type definition</param>
         </member>
         <member name="P:Waher.Content.Asn1.Model.Asn1Enumeration.CSharpTypeReference">
             <summary>
@@ -1109,20 +1106,13 @@
             Represents an ASN.1 field definition.
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Asn1FieldDefinition.#ctor(System.String,System.Nullable{System.Int32},Waher.Content.Asn1.Model.Asn1Type,Waher.Content.Asn1.Model.Asn1Restriction,System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},Waher.Content.Asn1.Model.Asn1Node,Waher.Content.Asn1.Model.Values.Asn1NamedValue[])">
+        <member name="M:Waher.Content.Asn1.Model.Asn1FieldDefinition.#ctor(System.String,System.Nullable{System.Int32},Waher.Content.Asn1.Model.Asn1Type)">
             <summary>
             Represents an ASN.1 field definition.
             </summary>
             <param name="FieldName">Field name.</param>
             <param name="Tag">Tag</param>
             <param name="Type">Type.</param>
-            <param name="Restriction">Optional restrictions.</param>
-            <param name="Optional">If field is optional.</param>
-            <param name="Unique">If field value is unique.</param>
-            <param name="Present">If an optional field must be present.</param>
-            <param name="Absent">If an optional field must be absent.</param>
-            <param name="Default">Default value if field not provided.</param>
-            <param name="NamedOptions">Named options.</param>
         </member>
         <member name="P:Waher.Content.Asn1.Model.Asn1FieldDefinition.FieldName">
             <summary>
@@ -1132,41 +1122,6 @@
         <member name="P:Waher.Content.Asn1.Model.Asn1FieldDefinition.Type">
             <summary>
             Type
-            </summary>
-        </member>
-        <member name="P:Waher.Content.Asn1.Model.Asn1FieldDefinition.Restriction">
-            <summary>
-            Optional restrictions.
-            </summary>
-        </member>
-        <member name="P:Waher.Content.Asn1.Model.Asn1FieldDefinition.Optional">
-            <summary>
-            If field is optional.
-            </summary>
-        </member>
-        <member name="P:Waher.Content.Asn1.Model.Asn1FieldDefinition.Unique">
-            <summary>
-            If field value is unique.
-            </summary>
-        </member>
-        <member name="P:Waher.Content.Asn1.Model.Asn1FieldDefinition.Present">
-            <summary>
-            If an optional field must be present.
-            </summary>
-        </member>
-        <member name="P:Waher.Content.Asn1.Model.Asn1FieldDefinition.Absent">
-            <summary>
-            If an optional field must be absent.
-            </summary>
-        </member>
-        <member name="P:Waher.Content.Asn1.Model.Asn1FieldDefinition.Default">
-            <summary>
-            Default value if field not provided.
-            </summary>
-        </member>
-        <member name="P:Waher.Content.Asn1.Model.Asn1FieldDefinition.NamedOptions">
-            <summary>
-            Named options.
             </summary>
         </member>
         <member name="P:Waher.Content.Asn1.Model.Asn1FieldDefinition.Tag">
@@ -1238,14 +1193,13 @@
             Abstract base class for list constructs.
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Asn1List.#ctor(System.String,System.Boolean,Waher.Content.Asn1.Model.Asn1Node[],System.Boolean)">
+        <member name="M:Waher.Content.Asn1.Model.Asn1List.#ctor(System.String,System.Boolean,Waher.Content.Asn1.Model.Asn1Node[])">
             <summary>
             Abstract base class for list constructs.
             </summary>
             <param name="Name">Optional field or type name.</param>
             <param name="TypeDef">If construct is part of a type definition.</param>
             <param name="Nodes">Nodes</param>
-            <param name="Implicit">Implicit type definition</param>
         </member>
         <member name="P:Waher.Content.Asn1.Model.Asn1List.Nodes">
             <summary>
@@ -1333,14 +1287,13 @@
             Represents a ASN.1 SEQUENCE construct.
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Asn1Sequence.#ctor(System.String,System.Boolean,Waher.Content.Asn1.Model.Asn1Node[],System.Boolean)">
+        <member name="M:Waher.Content.Asn1.Model.Asn1Sequence.#ctor(System.String,System.Boolean,Waher.Content.Asn1.Model.Asn1Node[])">
             <summary>
             Represents a ASN.1 SEQUENCE construct.
             </summary>
             <param name="Name">Optional field or type name.</param>
             <param name="TypeDef">If construct is part of a type definition.</param>
             <param name="Nodes">Nodes</param>
-            <param name="Implicit">Implicit type definition</param>
         </member>
         <member name="P:Waher.Content.Asn1.Model.Asn1Sequence.CSharpTypeReference">
             <summary>
@@ -1366,7 +1319,7 @@
             Represents a ASN.1 SEQUENCE OF construct.
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Asn1SequenceOf.#ctor(System.String,System.Boolean,Waher.Content.Asn1.Model.Asn1Values,Waher.Content.Asn1.Model.Asn1Type,System.Boolean)">
+        <member name="M:Waher.Content.Asn1.Model.Asn1SequenceOf.#ctor(System.String,System.Boolean,Waher.Content.Asn1.Model.Asn1Values,Waher.Content.Asn1.Model.Asn1Type)">
             <summary>
             Represents a ASN.1 SEQUENCE OF construct.
             </summary>
@@ -1374,7 +1327,6 @@
             <param name="TypeDef">If construct is part of a type definition.</param>
             <param name="Size">Optional SIZE</param>
             <param name="ElementType">Element type.</param>
-            <param name="Implicit">Implicit type definition</param>
         </member>
         <member name="P:Waher.Content.Asn1.Model.Asn1SequenceOf.Size">
             <summary>
@@ -1410,14 +1362,13 @@
             Represents a ASN.1 SET construct.
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Asn1Set.#ctor(System.String,System.Boolean,Waher.Content.Asn1.Model.Asn1Node[],System.Boolean)">
+        <member name="M:Waher.Content.Asn1.Model.Asn1Set.#ctor(System.String,System.Boolean,Waher.Content.Asn1.Model.Asn1Node[])">
             <summary>
             Represents a ASN.1 SET construct.
             </summary>
             <param name="Name">Optional field or type name.</param>
             <param name="TypeDef">If construct is part of a type definition.</param>
             <param name="Nodes">Nodes</param>
-            <param name="Implicit">Implicit type definition</param>
         </member>
         <member name="P:Waher.Content.Asn1.Model.Asn1Set.CSharpTypeReference">
             <summary>
@@ -1443,13 +1394,12 @@
             Represents a ASN.1 SET OF construct.
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Asn1SetOf.#ctor(Waher.Content.Asn1.Model.Asn1Values,System.String,System.Boolean)">
+        <member name="M:Waher.Content.Asn1.Model.Asn1SetOf.#ctor(Waher.Content.Asn1.Model.Asn1Values,System.String)">
             <summary>
             Represents a ASN.1 SET OF construct.
             </summary>
             <param name="Size">SIZE</param>
             <param name="TypeName">Type name</param>
-            <param name="Implicit">Implicit type definition</param>
         </member>
         <member name="P:Waher.Content.Asn1.Model.Asn1SetOf.Size">
             <summary>
@@ -1466,15 +1416,49 @@
             Abstract base class for ASN.1 types.
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Asn1Type.#ctor(System.Boolean)">
+        <member name="M:Waher.Content.Asn1.Model.Asn1Type.#ctor">
             <summary>
             Abstract base class for ASN.1 types.
             </summary>
-            <param name="Implicit">Implicit type definition</param>
         </member>
         <member name="P:Waher.Content.Asn1.Model.Asn1Type.Implicit">
             <summary>
             Implicit type definition
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1Type.Restriction">
+            <summary>
+            Any restrictions placed on the type.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1Type.Optional">
+            <summary>
+            If the type is optional
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1Type.Unique">
+            <summary>
+            If values must be unique.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1Type.Present">
+            <summary>
+            If the type must be present
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1Type.Absent">
+            <summary>
+            If the type must be absent
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1Type.Default">
+            <summary>
+            Default value for type
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1Type.NamedOptions">
+            <summary>
+            Any named options.
             </summary>
         </member>
         <member name="P:Waher.Content.Asn1.Model.Asn1Type.CSharpTypeReference">
@@ -1810,11 +1794,10 @@
             BIT STRING
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Types.Asn1BitString.#ctor(System.Boolean)">
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1BitString.#ctor">
             <summary>
             BIT STRING
             </summary>
-            <param name="Implicit">Implicit type definition</param>
         </member>
         <member name="P:Waher.Content.Asn1.Model.Types.Asn1BitString.CSharpTypeReference">
             <summary>
@@ -1832,23 +1815,21 @@
             Basic Multilingual Plane of ISO/IEC/ITU 10646-1
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Types.Asn1BmpString.#ctor(System.Boolean)">
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1BmpString.#ctor">
             <summary>
             BmpString (utf-16-be encoded string)
             Basic Multilingual Plane of ISO/IEC/ITU 10646-1
             </summary>
-            <param name="Implicit">Implicit type definition</param>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Types.Asn1Boolean">
             <summary>
             BOOLEAN
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Types.Asn1Boolean.#ctor(System.Boolean)">
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1Boolean.#ctor">
             <summary>
             BOOLEAN
             </summary>
-            <param name="Implicit">Implicit type definition</param>
         </member>
         <member name="P:Waher.Content.Asn1.Model.Types.Asn1Boolean.CSharpTypeReference">
             <summary>
@@ -1865,11 +1846,10 @@
             CHARACTER
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Types.Asn1Character.#ctor(System.Boolean)">
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1Character.#ctor">
             <summary>
             CHARACTER
             </summary>
-            <param name="Implicit">Implicit type definition</param>
         </member>
         <member name="P:Waher.Content.Asn1.Model.Types.Asn1Character.CSharpTypeReference">
             <summary>
@@ -1886,11 +1866,10 @@
             DATE
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Types.Asn1Date.#ctor(System.Boolean)">
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1Date.#ctor">
             <summary>
             DATE
             </summary>
-            <param name="Implicit">Implicit type definition</param>
         </member>
         <member name="P:Waher.Content.Asn1.Model.Types.Asn1Date.CSharpTypeReference">
             <summary>
@@ -1907,11 +1886,10 @@
             DATE-TIME
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Types.Asn1DateTime.#ctor(System.Boolean)">
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1DateTime.#ctor">
             <summary>
             DATE-TIME
             </summary>
-            <param name="Implicit">Implicit type definition</param>
         </member>
         <member name="P:Waher.Content.Asn1.Model.Types.Asn1DateTime.CSharpTypeReference">
             <summary>
@@ -1928,11 +1906,10 @@
             DURATION
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Types.Asn1Duration.#ctor(System.Boolean)">
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1Duration.#ctor">
             <summary>
             DURATION
             </summary>
-            <param name="Implicit">Implicit type definition</param>
         </member>
         <member name="P:Waher.Content.Asn1.Model.Types.Asn1Duration.CSharpTypeReference">
             <summary>
@@ -1949,11 +1926,10 @@
             GeneralizedTime
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Types.Asn1GeneralizedTime.#ctor(System.Boolean)">
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1GeneralizedTime.#ctor">
             <summary>
             GeneralizedTime
             </summary>
-            <param name="Implicit">Implicit type definition</param>
         </member>
         <member name="P:Waher.Content.Asn1.Model.Types.Asn1GeneralizedTime.CSharpTypeReference">
             <summary>
@@ -1971,12 +1947,11 @@
             all registered graphic and character sets plus SPACE and DELETE
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Types.Asn1GeneralString.#ctor(System.Boolean)">
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1GeneralString.#ctor">
             <summary>
             GeneralString
             all registered graphic and character sets plus SPACE and DELETE
             </summary>
-            <param name="Implicit">Implicit type definition</param>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Types.Asn1GraphicString">
             <summary>
@@ -1984,12 +1959,11 @@
             all registered G sets and SPACE
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Types.Asn1GraphicString.#ctor(System.Boolean)">
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1GraphicString.#ctor">
             <summary>
             GraphicString
             all registered G sets and SPACE
             </summary>
-            <param name="Implicit">Implicit type definition</param>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Types.Asn1Ia5String">
             <summary>
@@ -1997,23 +1971,21 @@
             International ASCII characters (International Alphabet 5)
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Types.Asn1Ia5String.#ctor(System.Boolean)">
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1Ia5String.#ctor">
             <summary>
             IA5String
             International ASCII characters (International Alphabet 5)
             </summary>
-            <param name="Implicit">Implicit type definition</param>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Types.Asn1Integer">
             <summary>
             INTEGER
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Types.Asn1Integer.#ctor(System.Boolean)">
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1Integer.#ctor">
             <summary>
             INTEGER
             </summary>
-            <param name="Implicit">Implicit type definition</param>
         </member>
         <member name="P:Waher.Content.Asn1.Model.Types.Asn1Integer.CSharpTypeReference">
             <summary>
@@ -2030,22 +2002,20 @@
             Iso646String
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Types.Asn1Iso646String.#ctor(System.Boolean)">
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1Iso646String.#ctor">
             <summary>
             Iso646String
             </summary>
-            <param name="Implicit">Implicit type definition</param>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Types.Asn1Null">
             <summary>
             NULL
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Types.Asn1Null.#ctor(System.Boolean)">
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1Null.#ctor">
             <summary>
             NULL
             </summary>
-            <param name="Implicit">Implicit type definition</param>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Types.Asn1NumericString">
             <summary>
@@ -2053,24 +2023,22 @@
             1, 2, 3, 4, 5, 6, 7, 8, 9, 0, and SPACE 
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Types.Asn1NumericString.#ctor(System.Boolean)">
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1NumericString.#ctor">
             <summary>
             NumericString
             1, 2, 3, 4, 5, 6, 7, 8, 9, 0, and SPACE 
             </summary>
-            <param name="Implicit">Implicit type definition</param>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Types.Asn1ObjectIdentifier">
             <summary>
             OBJECT IDENTIFIER, or RELATIVE-OID
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Types.Asn1ObjectIdentifier.#ctor(System.Boolean,System.Boolean)">
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1ObjectIdentifier.#ctor(System.Boolean)">
             <summary>
             OBJECT IDENTIFIER, or RELATIVE-OID
             </summary>
             <param name="Relative">If it is a relative object ID.</param>
-            <param name="Implicit">Implicit type definition</param>
         </member>
         <member name="P:Waher.Content.Asn1.Model.Types.Asn1ObjectIdentifier.Relative">
             <summary>
@@ -2092,7 +2060,7 @@
             OCTET STRING
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Types.Asn1OctetString.#ctor(System.Boolean)">
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1OctetString.#ctor">
             <summary>
             OCTET STRING
             </summary>
@@ -2113,23 +2081,21 @@
             a-z, A-Z, ' () +,-.?:/= and SPACE
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Types.Asn1PrintableString.#ctor(System.Boolean)">
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1PrintableString.#ctor">
             <summary>
             PrintableString
             a-z, A-Z, ' () +,-.?:/= and SPACE
             </summary>
-            <param name="Implicit">Implicit type definition</param>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Types.Asn1Real">
             <summary>
             REAL
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Types.Asn1Real.#ctor(System.Boolean)">
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1Real.#ctor">
             <summary>
             REAL
             </summary>
-            <param name="Implicit">Implicit type definition</param>
         </member>
         <member name="P:Waher.Content.Asn1.Model.Types.Asn1Real.CSharpTypeReference">
             <summary>
@@ -2146,11 +2112,10 @@
             Abstract base class for string types
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Types.Asn1StringType.#ctor(System.Boolean)">
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1StringType.#ctor">
             <summary>
             Abstract base class for string types
             </summary>
-            <param name="Implicit">Implicit type definition</param>
         </member>
         <member name="P:Waher.Content.Asn1.Model.Types.Asn1StringType.CSharpTypeReference">
             <summary>
@@ -2167,11 +2132,10 @@
             T61String
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Types.Asn1T61String.#ctor(System.Boolean)">
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1T61String.#ctor">
             <summary>
             T61String
             </summary>
-            <param name="Implicit">Implicit type definition</param>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Types.Asn1TeletexString">
             <summary>
@@ -2179,23 +2143,21 @@
             CCITT and T.101 character sets
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Types.Asn1TeletexString.#ctor(System.Boolean)">
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1TeletexString.#ctor">
             <summary>
             TeletexString
             CCITT and T.101 character sets
             </summary>
-            <param name="Implicit">Implicit type definition</param>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Types.Asn1TimeOfDay">
             <summary>
             TIME-OF-DAY
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Types.Asn1TimeOfDay.#ctor(System.Boolean)">
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1TimeOfDay.#ctor">
             <summary>
             TIME-OF-DAY
             </summary>
-            <param name="Implicit">Implicit type definition</param>
         </member>
         <member name="P:Waher.Content.Asn1.Model.Types.Asn1TimeOfDay.CSharpTypeReference">
             <summary>
@@ -2212,12 +2174,11 @@
             Represents an ASN.1 type reference.
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Types.Asn1TypeReference.#ctor(System.String,System.Boolean)">
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1TypeReference.#ctor(System.String)">
             <summary>
             Represents an ASN.1 type reference.
             </summary>
             <param name="Identifier">Identifier</param>
-            <param name="Implicit">Implicit type definition</param>
         </member>
         <member name="P:Waher.Content.Asn1.Model.Types.Asn1TypeReference.Identifier">
             <summary>
@@ -2235,23 +2196,21 @@
             ISO10646 character set
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Types.Asn1UniversalString.#ctor(System.Boolean)">
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1UniversalString.#ctor">
             <summary>
             UniversalString
             ISO10646 character set
             </summary>
-            <param name="Implicit">Implicit type definition</param>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Types.Asn1UtcTime">
             <summary>
             UTCTime
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Types.Asn1UtcTime.#ctor(System.Boolean)">
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1UtcTime.#ctor">
             <summary>
             UTCTime
             </summary>
-            <param name="Implicit">Implicit type definition</param>
         </member>
         <member name="P:Waher.Content.Asn1.Model.Types.Asn1UtcTime.CSharpTypeReference">
             <summary>
@@ -2269,12 +2228,11 @@
             any character from a recognized alphabet (including ASCII control characters)
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Types.Asn1Utf8String.#ctor(System.Boolean)">
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1Utf8String.#ctor">
             <summary>
             UTF8String
             any character from a recognized alphabet (including ASCII control characters)
             </summary>
-            <param name="Implicit">Implicit type definition</param>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Types.Asn1VideotexString">
             <summary>
@@ -2282,12 +2240,11 @@
             CCITT's T.100 and T.101 character sets 
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Types.Asn1VideotexString.#ctor(System.Boolean)">
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1VideotexString.#ctor">
             <summary>
             VideotexString
             CCITT's T.100 and T.101 character sets 
             </summary>
-            <param name="Implicit">Implicit type definition</param>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Types.Asn1VisibleString">
             <summary>
@@ -2295,12 +2252,11 @@
             International ASCII printing character sets 
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Types.Asn1VisibleString.#ctor(System.Boolean)">
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1VisibleString.#ctor">
             <summary>
             VisibleString
             International ASCII printing character sets 
             </summary>
-            <param name="Implicit">Implicit type definition</param>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Values.Asn1Array">
             <summary>

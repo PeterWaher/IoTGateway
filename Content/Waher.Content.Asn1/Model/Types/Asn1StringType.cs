@@ -12,9 +12,8 @@ namespace Waher.Content.Asn1.Model.Types
 		/// <summary>
 		/// Abstract base class for string types
 		/// </summary>
-		/// <param name="Implicit">Implicit type definition</param>
-		public Asn1StringType(bool Implicit)
-			: base(Implicit)
+		public Asn1StringType()
+			: base()
 		{
 		}
 

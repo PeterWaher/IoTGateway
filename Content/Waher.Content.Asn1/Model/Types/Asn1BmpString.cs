@@ -14,9 +14,8 @@ namespace Waher.Content.Asn1.Model.Types
 		/// BmpString (utf-16-be encoded string)
 		/// Basic Multilingual Plane of ISO/IEC/ITU 10646-1
 		/// </summary>
-		/// <param name="Implicit">Implicit type definition</param>
-		public Asn1BmpString(bool Implicit)
-			: base(Implicit)
+		public Asn1BmpString()
+			: base()
 		{
 		}
 	}

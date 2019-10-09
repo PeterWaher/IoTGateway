@@ -14,9 +14,8 @@ namespace Waher.Content.Asn1.Model.Types
 		/// IA5String
 		/// International ASCII characters (International Alphabet 5)
 		/// </summary>
-		/// <param name="Implicit">Implicit type definition</param>
-		public Asn1Ia5String(bool Implicit)
-			: base(Implicit)
+		public Asn1Ia5String()
+			: base()
 		{
 		}
 	}

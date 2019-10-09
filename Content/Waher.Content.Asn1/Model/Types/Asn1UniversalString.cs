@@ -14,9 +14,8 @@ namespace Waher.Content.Asn1.Model.Types
 		/// UniversalString
 		/// ISO10646 character set
 		/// </summary>
-		/// <param name="Implicit">Implicit type definition</param>
-		public Asn1UniversalString(bool Implicit)
-			: base(Implicit)
+		public Asn1UniversalString()
+			: base()
 		{
 		}
 	}

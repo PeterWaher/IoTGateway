@@ -14,9 +14,8 @@ namespace Waher.Content.Asn1.Model.Types
 		/// VisibleString
 		/// International ASCII printing character sets 
 		/// </summary>
-		/// <param name="Implicit">Implicit type definition</param>
-		public Asn1VisibleString(bool Implicit)
-			: base(Implicit)
+		public Asn1VisibleString()
+			: base()
 		{
 		}
 	}

@@ -12,9 +12,8 @@ namespace Waher.Content.Asn1.Model.Types
 		/// <summary>
 		/// BIT STRING
 		/// </summary>
-		/// <param name="Implicit">Implicit type definition</param>
-		public Asn1BitString(bool Implicit)
-			: base(Implicit)
+		public Asn1BitString()
+			: base()
 		{
 		}
 

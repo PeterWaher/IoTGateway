@@ -17,9 +17,8 @@ namespace Waher.Content.Asn1.Model
 		/// <param name="Name">Optional field or type name.</param>
 		/// <param name="TypeDef">If construct is part of a type definition.</param>
 		/// <param name="Nodes">Nodes</param>
-		/// <param name="Implicit">Implicit type definition</param>
-		public Asn1List(string Name, bool TypeDef, Asn1Node[] Nodes, bool Implicit)
-			: base(Name, TypeDef, Implicit)
+		public Asn1List(string Name, bool TypeDef, Asn1Node[] Nodes)
+			: base(Name, TypeDef)
 		{
 			this.nodes = Nodes;
 		}

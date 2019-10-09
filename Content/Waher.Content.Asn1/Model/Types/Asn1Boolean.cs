@@ -12,9 +12,8 @@ namespace Waher.Content.Asn1.Model.Types
 		/// <summary>
 		/// BOOLEAN
 		/// </summary>
-		/// <param name="Implicit">Implicit type definition</param>
-		public Asn1Boolean(bool Implicit)
-			: base(Implicit)
+		public Asn1Boolean()
+			: base()
 		{
 		}
 

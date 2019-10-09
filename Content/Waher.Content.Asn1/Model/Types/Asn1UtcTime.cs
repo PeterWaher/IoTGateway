@@ -12,9 +12,8 @@ namespace Waher.Content.Asn1.Model.Types
 		/// <summary>
 		/// UTCTime
 		/// </summary>
-		/// <param name="Implicit">Implicit type definition</param>
-		public Asn1UtcTime(bool Implicit)
-			: base(Implicit)
+		public Asn1UtcTime()
+			: base()
 		{
 		}
 

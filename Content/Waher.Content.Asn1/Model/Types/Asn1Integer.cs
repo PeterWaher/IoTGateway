@@ -12,9 +12,8 @@ namespace Waher.Content.Asn1.Model.Types
 		/// <summary>
 		/// INTEGER
 		/// </summary>
-		/// <param name="Implicit">Implicit type definition</param>
-		public Asn1Integer(bool Implicit)
-			: base(Implicit)
+		public Asn1Integer()
+			: base()
 		{
 		}
 

@@ -14,9 +14,8 @@ namespace Waher.Content.Asn1.Model.Types
 		/// GeneralString
 		/// all registered graphic and character sets plus SPACE and DELETE
 		/// </summary>
-		/// <param name="Implicit">Implicit type definition</param>
-		public Asn1GeneralString(bool Implicit)
-			: base(Implicit)
+		public Asn1GeneralString()
+			: base()
 		{
 		}
 	}

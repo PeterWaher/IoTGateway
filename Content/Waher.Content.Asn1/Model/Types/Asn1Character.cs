@@ -12,9 +12,8 @@ namespace Waher.Content.Asn1.Model.Types
 		/// <summary>
 		/// CHARACTER
 		/// </summary>
-		/// <param name="Implicit">Implicit type definition</param>
-		public Asn1Character(bool Implicit)
-			: base(Implicit)
+		public Asn1Character()
+			: base()
 		{
 		}
 

@@ -14,9 +14,8 @@ namespace Waher.Content.Asn1.Model.Types
 		/// NumericString
 		/// 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, and SPACE 
 		/// </summary>
-		/// <param name="Implicit">Implicit type definition</param>
-		public Asn1NumericString(bool Implicit)
-			: base(Implicit)
+		public Asn1NumericString()
+			: base()
 		{
 		}
 	}

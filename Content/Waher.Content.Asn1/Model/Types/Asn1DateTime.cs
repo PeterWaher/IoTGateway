@@ -12,9 +12,8 @@ namespace Waher.Content.Asn1.Model.Types
 		/// <summary>
 		/// DATE-TIME
 		/// </summary>
-		/// <param name="Implicit">Implicit type definition</param>
-		public Asn1DateTime(bool Implicit)
-			: base(Implicit)
+		public Asn1DateTime()
+			: base()
 		{
 		}
 

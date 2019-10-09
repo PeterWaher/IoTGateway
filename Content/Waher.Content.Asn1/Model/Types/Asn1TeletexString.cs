@@ -14,9 +14,8 @@ namespace Waher.Content.Asn1.Model.Types
 		/// TeletexString
 		/// CCITT and T.101 character sets
 		/// </summary>
-		/// <param name="Implicit">Implicit type definition</param>
-		public Asn1TeletexString(bool Implicit)
-			: base(Implicit)
+		public Asn1TeletexString()
+			: base()
 		{
 		}
 	}

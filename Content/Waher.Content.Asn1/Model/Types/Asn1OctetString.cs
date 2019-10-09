@@ -12,8 +12,8 @@ namespace Waher.Content.Asn1.Model.Types
 		/// <summary>
 		/// OCTET STRING
 		/// </summary>
-		public Asn1OctetString(bool Implicit)
-			: base(Implicit)
+		public Asn1OctetString()
+			: base()
 		{
 		}
 

@@ -14,9 +14,8 @@ namespace Waher.Content.Asn1.Model.Types
 		/// VideotexString
 		/// CCITT's T.100 and T.101 character sets 
 		/// </summary>
-		/// <param name="Implicit">Implicit type definition</param>
-		public Asn1VideotexString(bool Implicit)
-			: base(Implicit)
+		public Asn1VideotexString()
+			: base()
 		{
 		}
 	}

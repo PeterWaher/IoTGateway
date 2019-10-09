@@ -19,7 +19,7 @@ namespace Waher.Content.Asn1.Model
 		/// <param name="Tag">Tag</param>
 		/// <param name="Definition">Definition</param>
 		public Asn1TypeDefinition(string TypeName, int? Tag, Asn1Type Definition)
-			: base(Definition.Implicit)
+			: base()
 		{
 			this.typeName = TypeName;
 			this.definition = Definition;

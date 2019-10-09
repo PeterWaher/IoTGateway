@@ -19,6 +19,7 @@ namespace Waher.Content.Asn1
 		private readonly Asn1Node root;
 		private readonly string text;
 		private readonly int len;
+		private readonly int lenm1;
 		private int pos = 0;
 
 		/// <summary>
@@ -29,6 +30,7 @@ namespace Waher.Content.Asn1
 		{
 			this.text = Text;
 			this.len = this.text.Length;
+			this.lenm1 = this.len - 1;
 			this.root = this.ParseDefinitions();
 		}
 
@@ -52,12 +54,22 @@ namespace Waher.Content.Asn1
 
 				if (ch <= ' ' || ch == (char)160)
 					this.pos++;
-				else if (ch == '-' && this.pos < this.len - 1 && this.text[this.pos + 1] == '-')
+				else if (ch == '-' && this.pos < this.lenm1 && this.text[this.pos + 1] == '-')
 				{
 					this.pos += 2;
 
 					while (this.pos < this.len && (ch = this.text[this.pos]) != '\r' && ch != '\n')
 						this.pos++;
+				}
+				else if (ch == '/' && this.pos < this.lenm1 && this.text[this.pos + 1] == '*')
+				{
+					this.pos += 2;
+
+					while ((this.pos < this.len && this.text[this.pos] != '*') ||
+						(this.pos < this.lenm1 && this.text[this.pos + 1] != '/'))
+					{
+						this.pos++;
+					}
 				}
 				else
 					break;
@@ -132,6 +144,24 @@ namespace Waher.Content.Asn1
 						}
 						else
 							return ".";
+
+					case '[':
+						if (this.PeekNextChar() == '[')
+						{
+							this.pos++;
+							return "[[";
+						}
+						else
+							return "[";
+
+					case ']':
+						if (this.PeekNextChar() == ']')
+						{
+							this.pos++;
+							return "]]";
+						}
+						else
+							return "]";
 
 					default:
 						return new string(ch, 1);
@@ -369,13 +399,44 @@ namespace Waher.Content.Asn1
 				}
 
 				int? Tag = null;
+				TagClass? Class = null;
 
 				if (s2 == "[")
 				{
 					this.pos++;
 					s2 = this.NextToken();
+
+					if (s2 == "TAG")
+					{
+						if (this.NextToken() != ":")
+							throw this.SyntaxError(": expected.");
+
+						s2 = this.NextToken();
+					}
+
+					switch (s2)
+					{
+						case "APPLICATION":
+							Class = TagClass.Application;
+							s2 = this.NextToken();
+							break;
+
+						case "PRIVATE":
+							Class = TagClass.Private;
+							s2 = this.NextToken();
+							break;
+
+						case "UNIVERSAL":
+							Class = TagClass.Universal;
+							s2 = this.NextToken();
+							break;
+					}
+
 					if (!int.TryParse(s2, out int i))
 						throw this.SyntaxError("Tag expected.");
+
+					if (Class.HasValue)
+						i |= ((int)Class) << 6;
 
 					Tag = i;
 
@@ -486,7 +547,6 @@ namespace Waher.Content.Asn1
 									NamedOptions?.ToArray());
 						}
 					}
-
 				}
 			}
 			else if (s == "...")
@@ -832,6 +892,14 @@ namespace Waher.Content.Asn1
 				case "REAL":
 					return new Asn1Real(Implicit);
 
+				case "RELATIVE":
+					if (this.PeekNextToken() == "OID")
+						this.pos += 3;
+					else
+						throw this.SyntaxError("OID expected.");
+
+					return new Asn1ObjectIdentifier(true, Implicit);
+
 				case "RELATIVE-OID":
 					return new Asn1ObjectIdentifier(true, Implicit);
 
@@ -924,7 +992,8 @@ namespace Waher.Content.Asn1
 						if (this.NextToken() != "OF")
 							throw this.SyntaxError("Unexpected token.");
 
-						return new Asn1SequenceOf(Name, TypeDef, Size, this.ParseType(Name, TypeDef), Implicit);
+						return new Asn1SequenceOf(Name, TypeDef, Size, 
+							this.ParseType(Name, TypeDef), Implicit);
 					}
 
 				case "T61String":
@@ -957,6 +1026,7 @@ namespace Waher.Content.Asn1
 				case "CLASS":
 				case "COMPONENTS":
 				case "INSTANCE":
+				case "OID-IRI":
 					throw this.SyntaxError("Token not implemented.");
 
 				default:
@@ -1063,6 +1133,14 @@ namespace Waher.Content.Asn1
 				case "TRUE":
 					this.pos += 4;
 					return new Asn1BooleanValue(true);
+
+				case "INF":
+					this.pos += 3;
+					return new Asn1FloatingPointValue(double.PositiveInfinity);
+
+				case "NaN":
+					this.pos += 3;
+					return new Asn1FloatingPointValue(double.NaN);
 
 				case "...":
 					this.pos += 3;
@@ -1212,7 +1290,7 @@ namespace Waher.Content.Asn1
 
 						ch = this.PeekNextChar();
 
-						if ((ch == '.' && this.pos < this.len - 1 && this.text[this.pos + 1] != '.') ||
+						if ((ch == '.' && this.pos < this.lenm1 && this.text[this.pos + 1] != '.') ||
 							ch == 'e' || ch == 'E')
 						{
 							int? DecPos = null;

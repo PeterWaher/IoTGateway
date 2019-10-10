@@ -45,13 +45,25 @@ namespace Waher.Content.Asn1.Model
 		/// Exports to C#
 		/// </summary>
 		/// <param name="Output">C# Output.</param>
-		/// <param name="Settings">C# export settings.</param>
+		/// <param name="State">C# export state.</param>
 		/// <param name="Indent">Indentation</param>
 		/// <param name="Pass">Export pass</param>
-		public override void ExportCSharp(StringBuilder Output, CSharpExportSettings Settings,
+		public override void ExportCSharp(StringBuilder Output, CSharpExportState State,
 			int Indent, CSharpExportPass Pass)
 		{
-			this.definition.ExportCSharp(Output, Settings, Indent, Pass);
+			if (this.definition.ConstructedType)
+				this.definition.ExportCSharp(Output, State, Indent, Pass);
+			else if (Pass == CSharpExportPass.Preprocess)
+			{
+				State.ClosePending(Output);
+
+				Output.Append(Tabs(Indent));
+				Output.Append("using ");
+				Output.Append(this.typeName);
+				Output.Append(" = ");
+				this.definition.ExportCSharp(Output, State, Indent, CSharpExportPass.Explicit);
+				Output.AppendLine(";");
+			}
 		}
 	}
 }

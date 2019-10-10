@@ -21,29 +21,26 @@ namespace Waher.Content.Asn1.Model
 		}
 
 		/// <summary>
-		/// C# type reference.
+		/// If the type is a constructed type.
 		/// </summary>
-		public override string CSharpTypeReference => this.TypeDefinition ? this.Name : this.Name + "Seq";
-
-		/// <summary>
-		/// If type is nullable.
-		/// </summary>
-		public override bool CSharpTypeNullable => true;
+		public override bool ConstructedType => true;
 
 		/// <summary>
 		/// Exports to C#
 		/// </summary>
 		/// <param name="Output">C# Output.</param>
-		/// <param name="Settings">C# export settings.</param>
+		/// <param name="State">C# export state.</param>
 		/// <param name="Indent">Indentation</param>
 		/// <param name="Pass">Export pass</param>
-		public override void ExportCSharp(StringBuilder Output, CSharpExportSettings Settings, 
+		public override void ExportCSharp(StringBuilder Output, CSharpExportState State, 
 			int Indent, CSharpExportPass Pass)
 		{
 			if (Pass == CSharpExportPass.Implicit)
 			{
+				State.ClosePending(Output);
+
 				foreach (Asn1Node Node in this.Nodes)
-					Node.ExportCSharp(Output, Settings, Indent, Pass);
+					Node.ExportCSharp(Output, State, Indent, Pass);
 
 				Output.Append(Tabs(Indent));
 				Output.Append("public class ");
@@ -57,7 +54,7 @@ namespace Waher.Content.Asn1.Model
 				Indent++;
 
 				foreach (Asn1Node Node in this.Nodes)
-					Node.ExportCSharp(Output, Settings, Indent, CSharpExportPass.Explicit);
+					Node.ExportCSharp(Output, State, Indent, CSharpExportPass.Explicit);
 
 				Indent--;
 
@@ -66,28 +63,38 @@ namespace Waher.Content.Asn1.Model
 				Output.AppendLine("}");
 				Output.AppendLine();
 			}
-			else if (Pass == CSharpExportPass.Explicit && this.TypeDefinition)
+			else if (Pass == CSharpExportPass.Explicit)
 			{
-				Output.Append(Tabs(Indent));
-				Output.Append("public class ");
-				Output.AppendLine(this.Name);
+				if (this.TypeDefinition)
+				{
+					State.ClosePending(Output);
 
-				Output.Append(Tabs(Indent));
-				Output.AppendLine("{");
+					Output.Append(Tabs(Indent));
+					Output.Append("public class ");
+					Output.AppendLine(this.Name);
 
-				Indent++;
+					Output.Append(Tabs(Indent));
+					Output.AppendLine("{");
 
-				foreach (Asn1Node Node in this.Nodes)
-					Node.ExportCSharp(Output, Settings, Indent, CSharpExportPass.Implicit);
+					Indent++;
 
-				foreach (Asn1Node Node in this.Nodes)
-					Node.ExportCSharp(Output, Settings, Indent, CSharpExportPass.Explicit);
+					foreach (Asn1Node Node in this.Nodes)
+						Node.ExportCSharp(Output, State, Indent, CSharpExportPass.Implicit);
 
-				Indent--;
+					foreach (Asn1Node Node in this.Nodes)
+						Node.ExportCSharp(Output, State, Indent, CSharpExportPass.Explicit);
 
-				Output.Append(Tabs(Indent));
-				Output.AppendLine("}");
-				Output.AppendLine();
+					Indent--;
+
+					Output.Append(Tabs(Indent));
+					Output.AppendLine("}");
+					Output.AppendLine();
+				}
+				else
+				{
+					Output.Append(this.Name);
+					Output.Append("Seq");
+				}
 			}
 		}
 

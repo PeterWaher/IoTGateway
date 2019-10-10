@@ -27,8 +27,16 @@ namespace Waher.Content.Asn1.Model.Types
 		public string Identifier => identifier;
 
 		/// <summary>
-		/// C# type reference.
+		/// Exports to C#
 		/// </summary>
-		public override string CSharpTypeReference => this.identifier;
+		/// <param name="Output">C# Output.</param>
+		/// <param name="State">C# export state.</param>
+		/// <param name="Indent">Indentation</param>
+		/// <param name="Pass">Export pass</param>
+		public override void ExportCSharp(StringBuilder Output, CSharpExportState State, int Indent, CSharpExportPass Pass)
+		{
+			if (Pass == CSharpExportPass.Explicit)
+				Output.Append(this.identifier);
+		}
 	}
 }

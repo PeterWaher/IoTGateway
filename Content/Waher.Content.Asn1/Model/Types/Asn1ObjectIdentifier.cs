@@ -27,13 +27,16 @@ namespace Waher.Content.Asn1.Model.Types
 		public bool Relative => this.relative;
 
 		/// <summary>
-		/// C# type reference.
+		/// Exports to C#
 		/// </summary>
-		public override string CSharpTypeReference => "int[]";
-
-		/// <summary>
-		/// If type is nullable.
-		/// </summary>
-		public override bool CSharpTypeNullable => true;
+		/// <param name="Output">C# Output.</param>
+		/// <param name="State">C# export state.</param>
+		/// <param name="Indent">Indentation</param>
+		/// <param name="Pass">Export pass</param>
+		public override void ExportCSharp(StringBuilder Output, CSharpExportState State, int Indent, CSharpExportPass Pass)
+		{
+			if (Pass == CSharpExportPass.Explicit)
+				Output.Append("Array<Int32>");
+		}
 	}
 }

@@ -462,8 +462,8 @@ namespace Waher.Content.Asn1
 					if (this.PeekNextToken() == "::=")
 					{
 						this.pos += 3;
-						Asn1Node Value = this.ParseValue();
-						return new Asn1FieldValueDefinition(s, s2, Value);
+						Asn1Value Value = this.ParseValue();
+						return new Asn1FieldValueDefinition(s, Type, Value);
 					}
 					else
 						return new Asn1FieldDefinition(s, Tag, Type);
@@ -1396,6 +1396,8 @@ namespace Waher.Content.Asn1
 		/// <param name="Settings">C# export settings.</param>
 		public void ExportCSharp(StringBuilder Output, CSharpExportSettings Settings)
 		{
+			CSharpExportState State = new CSharpExportState(Settings);
+
 			Output.AppendLine("using System;");
 			Output.AppendLine("using System.Text;");
 			Output.AppendLine("using System.Collections.Generic;");
@@ -1406,8 +1408,14 @@ namespace Waher.Content.Asn1
 			Output.AppendLine(Settings.Namespace);
 			Output.AppendLine("{");
 
-			this.root?.ExportCSharp(Output, Settings, 1, CSharpExportPass.Preprocess);
-			this.root?.ExportCSharp(Output, Settings, 1, CSharpExportPass.Explicit);
+			this.root?.ExportCSharp(Output, State, 1, CSharpExportPass.Preprocess);
+			State.ClosePending(Output);
+
+			this.root?.ExportCSharp(Output, State, 1, CSharpExportPass.Variables);
+			State.ClosePending(Output);
+
+			this.root?.ExportCSharp(Output, State, 1, CSharpExportPass.Explicit);
+			State.ClosePending(Output);
 
 			Output.AppendLine("}");
 		}

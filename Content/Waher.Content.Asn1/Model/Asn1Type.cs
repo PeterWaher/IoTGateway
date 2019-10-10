@@ -99,27 +99,8 @@ namespace Waher.Content.Asn1.Model
 		}
 
 		/// <summary>
-		/// C# type reference.
+		/// If the type is a constructed type.
 		/// </summary>
-		public virtual string CSharpTypeReference
-		{
-			get
-			{
-				throw new NotImplementedException("Support for exporting type references of type " +
-					this.GetType().FullName + " not implemented.");
-			}
-		}
-
-		/// <summary>
-		/// If type is nullable.
-		/// </summary>
-		public virtual bool CSharpTypeNullable
-		{
-			get
-			{
-				throw new NotImplementedException("Nullable information for type " +
-					this.GetType().FullName + " not implemented.");
-			}
-		}
+		public virtual bool ConstructedType => false;
 	}
 }

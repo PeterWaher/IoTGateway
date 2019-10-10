@@ -15,6 +15,11 @@ namespace Waher.Content.Asn1.Model
 		Preprocess,
 
 		/// <summary>
+		/// Preprocessing
+		/// </summary>
+		Variables,
+
+		/// <summary>
 		/// Implicit definitions
 		/// </summary>
 		Implicit,
@@ -34,10 +39,10 @@ namespace Waher.Content.Asn1.Model
 		/// Exports to C#
 		/// </summary>
 		/// <param name="Output">C# Output.</param>
-		/// <param name="Settings">C# export settings.</param>
+		/// <param name="State">C# export state.</param>
 		/// <param name="Indent">Indentation</param>
 		/// <param name="Pass">Export pass</param>
-		public virtual void ExportCSharp(StringBuilder Output, CSharpExportSettings Settings, 
+		public virtual void ExportCSharp(StringBuilder Output, CSharpExportState State, 
 			int Indent, CSharpExportPass Pass)
 		{
 			if (Pass == CSharpExportPass.Explicit)

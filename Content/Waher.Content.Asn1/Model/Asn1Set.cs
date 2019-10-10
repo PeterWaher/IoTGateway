@@ -21,29 +21,33 @@ namespace Waher.Content.Asn1.Model
 		}
 
 		/// <summary>
-		/// C# type reference.
+		/// If the type is a constructed type.
 		/// </summary>
-		public override string CSharpTypeReference => this.TypeDefinition ? this.Name : this.Name + "Set";
-
-		/// <summary>
-		/// If type is nullable.
-		/// </summary>
-		public override bool CSharpTypeNullable => true;
+		public override bool ConstructedType => true;
 
 		/// <summary>
 		/// Exports to C#
 		/// </summary>
 		/// <param name="Output">C# Output.</param>
-		/// <param name="Settings">C# export settings.</param>
+		/// <param name="State">C# export state.</param>
 		/// <param name="Indent">Indentation</param>
 		/// <param name="Pass">Export pass</param>
-		public override void ExportCSharp(StringBuilder Output, CSharpExportSettings Settings, 
+		public override void ExportCSharp(StringBuilder Output, CSharpExportState State, 
 			int Indent, CSharpExportPass Pass)
 		{
-			if (Pass == CSharpExportPass.Implicit)
+			if (Pass == CSharpExportPass.Explicit)
 			{
+				Output.Append(this.Name);
+
+				if (!this.TypeDefinition)
+					Output.Append("Set");
+			}
+			else if (Pass == CSharpExportPass.Implicit)
+			{
+				State.ClosePending(Output);
+
 				foreach (Asn1Node Node in this.Nodes)
-					Node.ExportCSharp(Output, Settings, Indent, Pass);
+					Node.ExportCSharp(Output, State, Indent, Pass);
 
 				Output.Append(Tabs(Indent));
 				Output.Append("public class ");
@@ -57,7 +61,7 @@ namespace Waher.Content.Asn1.Model
 				Indent++;
 
 				foreach (Asn1Node Node in this.Nodes)
-					Node.ExportCSharp(Output, Settings, Indent, CSharpExportPass.Explicit);
+					Node.ExportCSharp(Output, State, Indent, CSharpExportPass.Explicit);
 
 				Indent--;
 

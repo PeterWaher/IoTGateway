@@ -18,13 +18,20 @@ namespace Waher.Content.Asn1.Model.Types
 		}
 
 		/// <summary>
-		/// C# type reference.
+		/// Exports to C#
 		/// </summary>
-		public override string CSharpTypeReference => "TimeSpan";
-
-		/// <summary>
-		/// If type is nullable.
-		/// </summary>
-		public override bool CSharpTypeNullable => false;
+		/// <param name="Output">C# Output.</param>
+		/// <param name="State">C# export state.</param>
+		/// <param name="Indent">Indentation</param>
+		/// <param name="Pass">Export pass</param>
+		public override void ExportCSharp(StringBuilder Output, CSharpExportState State, int Indent, CSharpExportPass Pass)
+		{
+			if (Pass == CSharpExportPass.Explicit)
+			{
+				Output.Append("TimeSpan");
+				if (this.Optional.HasValue && this.Optional.Value)
+					Output.Append('?');
+			}
+		}
 	}
 }

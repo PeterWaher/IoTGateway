@@ -46,42 +46,35 @@ namespace Waher.Content.Asn1.Model
 			get => this.tag;
 			internal set => this.tag = value;
 		}
-
+		
 		/// <summary>
 		/// Exports to C#
 		/// </summary>
 		/// <param name="Output">C# Output.</param>
-		/// <param name="Settings">C# export settings.</param>
+		/// <param name="State">C# export state.</param>
 		/// <param name="Indent">Indentation</param>
 		/// <param name="Pass">Export pass</param>
-		public override void ExportCSharp(StringBuilder Output, CSharpExportSettings Settings,
+		public override void ExportCSharp(StringBuilder Output, CSharpExportState State,
 			int Indent, CSharpExportPass Pass)
 		{
 			if (Pass == CSharpExportPass.Explicit)
 			{
 				Output.Append(Tabs(Indent));
 				Output.Append("public ");
-				Output.Append(this.type.CSharpTypeReference);
-
-				if (this.type.Optional.HasValue && this.type.Optional.Value &&
-					!this.type.CSharpTypeNullable)
-				{
-					Output.Append('?');
-				}
-
+				this.type.ExportCSharp(Output, State, Indent, Pass);
 				Output.Append(' ');
 				Output.Append(this.fieldName);
 
 				if (!(this.type.Default is null))
 				{
 					Output.Append(" = ");
-					this.type.Default.ExportCSharp(Output, Settings, Indent, Pass);
+					this.type.Default.ExportCSharp(Output, State, Indent, Pass);
 				}
 
 				Output.AppendLine(";");
 			}
 			else
-				this.type.ExportCSharp(Output, Settings, Indent, Pass);
+				this.type.ExportCSharp(Output, State, Indent, Pass);
 		}
 	}
 }

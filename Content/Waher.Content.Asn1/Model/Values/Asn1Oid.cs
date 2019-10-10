@@ -24,5 +24,38 @@ namespace Waher.Content.Asn1.Model.Values
 		/// OID values.
 		/// </summary>
 		public Asn1Node[] Values => this.values;
+
+		/// <summary>
+		/// Exports to C#
+		/// </summary>
+		/// <param name="Output">C# Output.</param>
+		/// <param name="State">C# export state.</param>
+		/// <param name="Indent">Indentation</param>
+		/// <param name="Pass">Export pass</param>
+		public override void ExportCSharp(StringBuilder Output, CSharpExportState State,
+			int Indent, CSharpExportPass Pass)
+		{
+			if (Pass == CSharpExportPass.Explicit)
+			{
+				bool First = true;
+
+				Output.Append("new int[] { ");
+
+				foreach (Asn1Node Node in this.values)
+				{
+					if (First)
+						First = false;
+					else
+						Output.Append(", ");
+
+					Node.ExportCSharp(Output, State, Indent, Pass);
+				}
+
+				if (!First)
+					Output.Append(' ');
+
+				Output.Append('}');
+			}
+		}
 	}
 }

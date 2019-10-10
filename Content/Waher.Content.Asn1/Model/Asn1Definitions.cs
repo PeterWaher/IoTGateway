@@ -83,13 +83,13 @@ namespace Waher.Content.Asn1.Model
 		/// Exports to C#
 		/// </summary>
 		/// <param name="Output">C# Output.</param>
-		/// <param name="Settings">C# export settings.</param>
+		/// <param name="State">C# export state.</param>
 		/// <param name="Indent">Indentation</param>
 		/// <param name="Pass">Export pass</param>
-		public override void ExportCSharp(StringBuilder Output, CSharpExportSettings Settings, 
+		public override void ExportCSharp(StringBuilder Output, CSharpExportState State, 
 			int Indent, CSharpExportPass Pass)
 		{
-			this.body?.ExportCSharp(Output, Settings, Indent, Pass);
+			this.body?.ExportCSharp(Output, State, Indent, Pass);
 		}
 	}
 }

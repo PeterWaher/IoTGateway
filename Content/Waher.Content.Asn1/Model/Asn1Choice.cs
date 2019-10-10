@@ -21,90 +21,97 @@ namespace Waher.Content.Asn1.Model
 		}
 
 		/// <summary>
-		/// C# type reference.
+		/// If the type is a constructed type.
 		/// </summary>
-		public override string CSharpTypeReference => this.TypeDefinition ? this.Name : this.Name + "Choice";
-
-		/// <summary>
-		/// If type is nullable.
-		/// </summary>
-		public override bool CSharpTypeNullable => true;
+		public override bool ConstructedType => true;
 
 		/// <summary>
 		/// Exports to C#
 		/// </summary>
 		/// <param name="Output">C# Output.</param>
-		/// <param name="Settings">C# export settings.</param>
+		/// <param name="State">C# export state.</param>
 		/// <param name="Indent">Indentation</param>
 		/// <param name="Pass">Export pass</param>
-		public override void ExportCSharp(StringBuilder Output, CSharpExportSettings Settings,
+		public override void ExportCSharp(StringBuilder Output, CSharpExportState State,
 			int Indent, CSharpExportPass Pass)
 		{
-			if (Pass == CSharpExportPass.Implicit)
+			if (Pass == CSharpExportPass.Explicit && !this.TypeDefinition)
 			{
-				foreach (Asn1Node Node in this.Nodes)
-					Node.ExportCSharp(Output, Settings, Indent, Pass);
-
-				Output.Append(Tabs(Indent));
-				Output.Append("public enum ");
 				Output.Append(this.Name);
-				Output.AppendLine("Enum");
-
-				Output.Append(Tabs(Indent));
-				Output.Append("{");
-
-				Indent++;
-
-				bool First = true;
-
-				foreach (Asn1Node Node in this.Nodes)
+				Output.Append("Choice");
+			}
+			else
+			{
+				if (Pass == CSharpExportPass.Implicit)
 				{
-					if (Node is Asn1FieldDefinition Field)
-					{
-						if (First)
-							First = false;
-						else
-							Output.Append(',');
+					State.ClosePending(Output);
 
-						Output.AppendLine();
-						Output.Append(Tabs(Indent));
-						Output.Append(Field.FieldName);
+					foreach (Asn1Node Node in this.Nodes)
+						Node.ExportCSharp(Output, State, Indent, Pass);
+
+					Output.Append(Tabs(Indent));
+					Output.Append("public enum ");
+					Output.Append(this.Name);
+					Output.AppendLine("Enum");
+
+					Output.Append(Tabs(Indent));
+					Output.Append("{");
+
+					Indent++;
+
+					bool First = true;
+
+					foreach (Asn1Node Node in this.Nodes)
+					{
+						if (Node is Asn1FieldDefinition Field)
+						{
+							if (First)
+								First = false;
+							else
+								Output.Append(',');
+
+							Output.AppendLine();
+							Output.Append(Tabs(Indent));
+							Output.Append(Field.FieldName);
+						}
 					}
+
+					Indent--;
+
+					Output.AppendLine();
+					Output.Append(Tabs(Indent));
+					Output.AppendLine("}");
+					Output.AppendLine();
 				}
 
-				Indent--;
+				if (Pass == CSharpExportPass.Implicit || Pass == CSharpExportPass.Explicit)
+				{
+					Output.Append(Tabs(Indent));
+					Output.Append("public class ");
+					Output.Append(this.Name);
+					if (!this.TypeDefinition)
+						Output.AppendLine("Choice");
 
-				Output.AppendLine();
-				Output.Append(Tabs(Indent));
-				Output.AppendLine("}");
-				Output.AppendLine();
+					Output.Append(Tabs(Indent));
+					Output.AppendLine("{");
 
+					Indent++;
 
-				Output.Append(Tabs(Indent));
-				Output.Append("public class ");
-				Output.Append(this.Name);
-				if (!this.TypeDefinition)
-					Output.AppendLine("Choice");
+					Output.Append(Tabs(Indent));
+					Output.Append(this.Name);
+					if (!this.TypeDefinition)
+						Output.Append("Enum");
+					Output.AppendLine(" _choice;");
 
-				Output.Append(Tabs(Indent));
-				Output.AppendLine("{");
+					foreach (Asn1Node Node in this.Nodes)
+						Node.ExportCSharp(Output, State, Indent, CSharpExportPass.Explicit);
 
-				Indent++;
+					Indent--;
 
-				Output.Append(Tabs(Indent));
-				Output.Append(this.Name);
-				if (!this.TypeDefinition)
-					Output.Append("Enum");
-				Output.AppendLine(" _choice;");
-
-				foreach (Asn1Node Node in this.Nodes)
-					Node.ExportCSharp(Output, Settings, Indent, Pass);
-
-				Indent--;
-
-				Output.Append(Tabs(Indent));
-				Output.AppendLine("}");
-				Output.AppendLine();
+					Output.Append(Tabs(Indent));
+					Output.AppendLine("}");
+					Output.AppendLine();
+				}
 			}
 		}
 	}

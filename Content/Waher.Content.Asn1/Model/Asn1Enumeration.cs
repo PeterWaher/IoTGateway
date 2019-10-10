@@ -21,26 +21,31 @@ namespace Waher.Content.Asn1.Model
 		}
 
 		/// <summary>
-		/// C# type reference.
+		/// If the type is a constructed type.
 		/// </summary>
-		public override string CSharpTypeReference => this.TypeDefinition ? this.Name : this.Name + "Enum";
-
-		/// <summary>
-		/// If type is nullable.
-		/// </summary>
-		public override bool CSharpTypeNullable => false;
+		public override bool ConstructedType => true;
 
 		/// <summary>
 		/// Exports to C#
 		/// </summary>
 		/// <param name="Output">C# Output.</param>
-		/// <param name="Settings">C# export settings.</param>
+		/// <param name="State">C# export state.</param>
 		/// <param name="Indent">Indentation</param>
 		/// <param name="Pass">Export pass</param>
-		public override void ExportCSharp(StringBuilder Output, CSharpExportSettings Settings, 
+		public override void ExportCSharp(StringBuilder Output, CSharpExportState State, 
 			int Indent, CSharpExportPass Pass)
 		{
-			if (Pass == CSharpExportPass.Implicit)
+			if (Pass == CSharpExportPass.Explicit)
+			{
+				Output.Append(this.Name);
+
+				if (!this.TypeDefinition)
+					Output.Append("Enum");
+
+				if (this.Optional.HasValue && this.Optional.Value)
+					Output.Append('?');
+			}
+			else if (Pass == CSharpExportPass.Implicit)
 			{
 				Output.Append(Tabs(Indent));
 				Output.Append("public enum ");
@@ -64,7 +69,7 @@ namespace Waher.Content.Asn1.Model
 
 					Output.AppendLine();
 					Output.Append(Tabs(Indent));
-					Node.ExportCSharp(Output, Settings, Indent, Pass);
+					Node.ExportCSharp(Output, State, Indent, CSharpExportPass.Explicit);
 				}
 
 				Indent--;

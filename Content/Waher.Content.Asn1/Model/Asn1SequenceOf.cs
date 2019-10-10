@@ -20,7 +20,7 @@ namespace Waher.Content.Asn1.Model
 		/// <param name="TypeDef">If construct is part of a type definition.</param>
 		/// <param name="Size">Optional SIZE</param>
 		/// <param name="ElementType">Element type.</param>
-		public Asn1SequenceOf(string Name, bool TypeDef, Asn1Values Size, 
+		public Asn1SequenceOf(string Name, bool TypeDef, Asn1Values Size,
 			Asn1Type ElementType)
 			: base(Name, TypeDef)
 		{
@@ -39,34 +39,20 @@ namespace Waher.Content.Asn1.Model
 		public Asn1Type ElementType => this.elementType;
 
 		/// <summary>
-		/// C# type reference.
-		/// </summary>
-		public override string CSharpTypeReference => this.elementType.CSharpTypeReference + "[]";
-
-		/// <summary>
-		/// If type is nullable.
-		/// </summary>
-		public override bool CSharpTypeNullable => true;
-
-		/// <summary>
 		/// Exports to C#
 		/// </summary>
 		/// <param name="Output">C# Output.</param>
-		/// <param name="Settings">C# export settings.</param>
+		/// <param name="State">C# export state.</param>
 		/// <param name="Indent">Indentation</param>
 		/// <param name="Pass">Export pass</param>
-		public override void ExportCSharp(StringBuilder Output, CSharpExportSettings Settings,
+		public override void ExportCSharp(StringBuilder Output, CSharpExportState State,
 			int Indent, CSharpExportPass Pass)
 		{
-			if (Pass == CSharpExportPass.Preprocess && this.TypeDefinition)
+			if (Pass == CSharpExportPass.Explicit)
 			{
-				Output.Append(Tabs(Indent));
-				Output.Append("using ");
-				Output.Append(this.Name);
-				Output.Append(" = Array<");
-				Output.Append(this.elementType.CSharpTypeReference);
-				Output.AppendLine(">;");
-				Output.AppendLine();
+				Output.Append("Array<");
+				this.elementType.ExportCSharp(Output, State, Indent, Pass);
+				Output.Append(">");
 			}
 		}
 

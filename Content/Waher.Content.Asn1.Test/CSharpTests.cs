@@ -96,5 +96,17 @@ namespace Waher.Content.Asn1.Test
 			GenerateCSharp("MyShopPurchaseOrders.asn1", "Test.MyShopPurchaseOrders");
 		}
 
+		[TestMethod]
+		public void Test_03_RFC1155()
+		{
+			GenerateCSharp("SNMPv1\\RFC1155-SMI.asn1", "Test.SNMP");
+		}
+
+		[TestMethod]
+		public void Test_04_RFC1157()
+		{
+			GenerateCSharp("SNMPv1\\RFC1157-SNMP.asn1", "Test.SNMP");
+		}
+
 	}
 }

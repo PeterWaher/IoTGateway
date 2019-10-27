@@ -16,6 +16,8 @@ namespace Waher.Content.Asn1
 
 		internal int ExportingValuesIndent = 0;
 		internal bool ExportingValues = false;
+		internal bool ExportingUsing = false;
+		internal string CurrentNamespace = null;
 
 		/// <summary>
 		/// C# export state
@@ -47,6 +49,12 @@ namespace Waher.Content.Asn1
 
 				Output.Append(Model.Asn1Node.Tabs(this.ExportingValuesIndent - 1));
 				Output.AppendLine("}");
+				Output.AppendLine();
+			}
+
+			if (this.ExportingUsing)
+			{
+				this.ExportingUsing = false;
 				Output.AppendLine();
 			}
 		}

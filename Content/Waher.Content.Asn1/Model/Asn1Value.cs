@@ -15,5 +15,17 @@ namespace Waher.Content.Asn1.Model
 		public Asn1Value()
 		{
 		}
+
+		/// <summary>
+		/// Corresponding C# type.
+		/// </summary>
+		public virtual string CSharpType
+		{
+			get
+			{
+				throw new NotImplementedException("Support for value type " +
+					this.GetType().FullName + " not implemented.");
+			}
+		}
 	}
 }

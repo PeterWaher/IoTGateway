@@ -7,6 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Examples\IEEE1451\P21451-N1-T1-MIB.asn1" />
+    <None Remove="Examples\IEEE1451\P21451-N1-T2-MIB.asn1" />
+    <None Remove="Examples\IEEE1451\P21451-N1-T3-MIB.asn1" />
     <None Remove="Examples\MyShopPurchaseOrders.asn1" />
     <None Remove="Examples\RFC1157-SNMP.asn1" />
     <None Remove="Examples\SNMPv1\RFC1155-SMI.asn1" />
@@ -14,6 +17,15 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="Examples\IEEE1451\P21451-N1-T1-MIB.asn1">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Examples\IEEE1451\P21451-N1-T2-MIB.asn1">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Examples\IEEE1451\P21451-N1-T3-MIB.asn1">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Examples\SNMPv1\RFC1155-SMI.asn1">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

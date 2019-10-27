@@ -37,7 +37,7 @@ namespace Waher.Content.Asn1.Model
 		{
 			if (Pass == CSharpExportPass.Explicit && !this.TypeDefinition)
 			{
-				Output.Append(this.Name);
+				Output.Append(ToCSharp(this.Name));
 				Output.Append("Choice");
 			}
 			else
@@ -51,7 +51,7 @@ namespace Waher.Content.Asn1.Model
 
 					Output.Append(Tabs(Indent));
 					Output.Append("public enum ");
-					Output.Append(this.Name);
+					Output.Append(ToCSharp(this.Name));
 					Output.AppendLine("Enum");
 
 					Output.Append(Tabs(Indent));
@@ -88,9 +88,10 @@ namespace Waher.Content.Asn1.Model
 				{
 					Output.Append(Tabs(Indent));
 					Output.Append("public class ");
-					Output.Append(this.Name);
+					Output.Append(ToCSharp(this.Name));
 					if (!this.TypeDefinition)
-						Output.AppendLine("Choice");
+						Output.Append("Choice");
+					Output.AppendLine();
 
 					Output.Append(Tabs(Indent));
 					Output.AppendLine("{");
@@ -98,7 +99,7 @@ namespace Waher.Content.Asn1.Model
 					Indent++;
 
 					Output.Append(Tabs(Indent));
-					Output.Append(this.Name);
+					Output.Append(ToCSharp(this.Name));
 					if (!this.TypeDefinition)
 						Output.Append("Enum");
 					Output.AppendLine(" _choice;");

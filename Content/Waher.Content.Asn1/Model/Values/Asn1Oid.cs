@@ -39,7 +39,7 @@ namespace Waher.Content.Asn1.Model.Values
 			{
 				bool First = true;
 
-				Output.Append("new int[] { ");
+				Output.Append("new ObjectId(");
 
 				foreach (Asn1Node Node in this.values)
 				{
@@ -51,11 +51,13 @@ namespace Waher.Content.Asn1.Model.Values
 					Node.ExportCSharp(Output, State, Indent, Pass);
 				}
 
-				if (!First)
-					Output.Append(' ');
-
-				Output.Append('}');
+				Output.Append(')');
 			}
 		}
+
+		/// <summary>
+		/// Corresponding C# type.
+		/// </summary>
+		public override string CSharpType => "ObjectId";
 	}
 }

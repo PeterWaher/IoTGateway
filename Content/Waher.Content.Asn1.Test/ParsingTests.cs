@@ -8,9 +8,7 @@ namespace Waher.Content.Asn1.Test
 	{
 		public static Asn1Document ParseAsn1Document(string FileName)
 		{
-			string Text = File.ReadAllText(Path.Combine("Examples", FileName));
-			Asn1Document Doc = new Asn1Document(Text);
-			return Doc;
+			return Asn1Document.FromFile(Path.Combine("Examples", FileName));
 		}
 
 		[TestMethod]
@@ -35,6 +33,24 @@ namespace Waher.Content.Asn1.Test
 		public void Test_04_RFC1157()
 		{
 			ParseAsn1Document("SNMPv1\\RFC1157-SNMP.asn1");
+		}
+
+		[TestMethod]
+		public void Test_05_1451_1()
+		{
+			ParseAsn1Document("IEEE1451\\P21451-N1-T1-MIB.asn1");
+		}
+
+		[TestMethod]
+		public void Test_06_1451_2()
+		{
+			ParseAsn1Document("IEEE1451\\P21451-N1-T2-MIB.asn1");
+		}
+
+		[TestMethod]
+		public void Test_07_1451_3()
+		{
+			ParseAsn1Document("IEEE1451\\P21451-N1-T3-MIB.asn1");
 		}
 	}
 }

@@ -14,10 +14,20 @@ namespace Waher.Content.Asn1.Test
 	[TestClass]
 	public class CSharpTests
 	{
-		public static string GenerateCSharp(string FileName, string Namespace)
+		public static string GenerateCSharp(string FileName)
 		{
+			string BaseNamespace = "Test";
 			Asn1Document Doc = ParsingTests.ParseAsn1Document(FileName);
-			string CSharp = Doc.ExportCSharp(new CSharpExportSettings(Namespace));
+			CSharpExportSettings Settings = new CSharpExportSettings(BaseNamespace,
+				"Examples\\SNMPv1", "Examples\\IEEE1451");
+			string CSharp = Doc.ExportCSharp(Settings);
+			List<SyntaxTree> Modules = new List<SyntaxTree>() { CSharpSyntaxTree.ParseText(CSharp) };
+
+			foreach (string ImportedModule in Settings.Modules)
+			{
+				string CSharp2 = Settings.GetCode(ImportedModule);
+				Modules.Add(CSharpSyntaxTree.ParseText(CSharp2));
+			}
 
 			Dictionary<string, bool> Dependencies = new Dictionary<string, bool>()
 			{
@@ -38,9 +48,9 @@ namespace Waher.Content.Asn1.Test
 					References.Add(MetadataReference.CreateFromFile(Location));
 			}
 
-			CSharpCompilation Compilation = CSharpCompilation.Create(Namespace,
-				new SyntaxTree[] { CSharpSyntaxTree.ParseText(CSharp) },
-				References, new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+			CSharpCompilation Compilation = CSharpCompilation.Create(
+				BaseNamespace, Modules.ToArray(), References, 
+				new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 
 			MemoryStream Output = new MemoryStream();
 			MemoryStream PdbOutput = new MemoryStream();
@@ -65,6 +75,16 @@ namespace Waher.Content.Asn1.Test
 				sb.AppendLine();
 				sb.AppendLine(CSharp);
 
+				foreach (string ImportedModule in Settings.Modules)
+				{
+					string CSharp2 = Settings.GetCode(ImportedModule);
+
+					sb.AppendLine();
+					sb.AppendLine(new string('-', 80));
+					sb.AppendLine();
+					sb.AppendLine(CSharp2);
+				}
+
 				throw new Exception(sb.ToString());
 			}
 
@@ -87,25 +107,43 @@ namespace Waher.Content.Asn1.Test
 		[TestMethod]
 		public void Test_01_WorldSchema()
 		{
-			GenerateCSharp("World-Schema.asn1", "Test.WorldSchema");
+			GenerateCSharp("World-Schema.asn1");
 		}
 
 		[TestMethod]
 		public void Test_02_MyShopPurchaseOrders()
 		{
-			GenerateCSharp("MyShopPurchaseOrders.asn1", "Test.MyShopPurchaseOrders");
+			GenerateCSharp("MyShopPurchaseOrders.asn1");
 		}
 
 		[TestMethod]
 		public void Test_03_RFC1155()
 		{
-			GenerateCSharp("SNMPv1\\RFC1155-SMI.asn1", "Test.SNMP");
+			GenerateCSharp("SNMPv1\\RFC1155-SMI.asn1");
 		}
 
 		[TestMethod]
 		public void Test_04_RFC1157()
 		{
-			GenerateCSharp("SNMPv1\\RFC1157-SNMP.asn1", "Test.SNMP");
+			GenerateCSharp("SNMPv1\\RFC1157-SNMP.asn1");
+		}
+
+		[TestMethod]
+		public void Test_05_1451_1()
+		{
+			GenerateCSharp("IEEE1451\\P21451-N1-T1-MIB.txt.asn1");
+		}
+
+		[TestMethod]
+		public void Test_06_1451_2()
+		{
+			GenerateCSharp("IEEE1451\\P21451-N1-T2-MIB.txt.asn1");
+		}
+
+		[TestMethod]
+		public void Test_07_1451_3()
+		{
+			GenerateCSharp("IEEE1451\\P21451-N1-T3-MIB.txt.asn1");
 		}
 
 	}

@@ -44,7 +44,7 @@ namespace Waher.Content.Asn1.Model
 
 				Output.Append(Tabs(Indent));
 				Output.Append("public class ");
-				Output.Append(this.Name);
+				Output.Append(ToCSharp(this.Name));
 				if (!this.TypeDefinition)
 					Output.AppendLine("Seq");
 
@@ -71,7 +71,7 @@ namespace Waher.Content.Asn1.Model
 
 					Output.Append(Tabs(Indent));
 					Output.Append("public class ");
-					Output.AppendLine(this.Name);
+					Output.AppendLine(ToCSharp(this.Name));
 
 					Output.Append(Tabs(Indent));
 					Output.AppendLine("{");
@@ -92,7 +92,7 @@ namespace Waher.Content.Asn1.Model
 				}
 				else
 				{
-					Output.Append(this.Name);
+					Output.Append(ToCSharp(this.Name));
 					Output.Append("Seq");
 				}
 			}

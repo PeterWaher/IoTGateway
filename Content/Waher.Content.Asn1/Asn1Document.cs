@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Text;
 using System.Collections.Generic;
 using System.Globalization;
@@ -16,8 +17,9 @@ namespace Waher.Content.Asn1
 	/// </summary>
 	public class Asn1Document
 	{
-		private readonly Asn1Node root;
+		private readonly Asn1Definitions root;
 		private readonly string text;
+		private readonly string location;
 		private readonly int len;
 		private readonly int lenm1;
 		private int pos = 0;
@@ -26,9 +28,11 @@ namespace Waher.Content.Asn1
 		/// Represents an ASN.1 document.
 		/// </summary>
 		/// <param name="Text">ASN.1 text to parse.</param>
-		public Asn1Document(string Text)
+		/// <param name="Location">Location of file.</param>
+		public Asn1Document(string Text, string Location)
 		{
 			this.text = Text;
+			this.location = Location;
 			this.len = this.text.Length;
 			this.lenm1 = this.len - 1;
 			this.root = this.ParseDefinitions();
@@ -37,12 +41,28 @@ namespace Waher.Content.Asn1
 		/// <summary>
 		/// ASN.1 Root node
 		/// </summary>
-		public Asn1Node Root => this.root;
+		public Asn1Definitions Root => this.root;
 
 		/// <summary>
 		/// ASN.1 text
 		/// </summary>
 		public string Text => this.text;
+
+		/// <summary>
+		/// Location of document.
+		/// </summary>
+		public string Location => this.location;
+
+		/// <summary>
+		/// Read from file.
+		/// </summary>
+		/// <param name="FileName">Filename.</param>
+		/// <returns>ASN.1 document</returns>
+		public static Asn1Document FromFile(string FileName)
+		{
+			string Text = File.ReadAllText(FileName);
+			return new Asn1Document(Text, FileName);
+		}
 
 		private void SkipWhiteSpace()
 		{
@@ -184,7 +204,7 @@ namespace Waher.Content.Asn1
 			return new Asn1SyntaxException(Message, this.text, this.pos);
 		}
 
-		private Asn1Node ParseDefinitions()
+		private Asn1Definitions ParseDefinitions()
 		{
 			string Identifier = this.ParseTypeNameIdentifier();
 			string s = this.PeekNextToken();
@@ -197,12 +217,7 @@ namespace Waher.Content.Asn1
 			}
 
 			if (s != "DEFINITIONS")
-			{
-				if (!(Oid is null))
-					throw this.SyntaxError("DEFINITIONS expected.");
-
-				return new Asn1TypeReference(Identifier);
-			}
+				throw this.SyntaxError("DEFINITIONS expected.");
 
 			this.pos += 11;
 
@@ -255,16 +270,16 @@ namespace Waher.Content.Asn1
 					break;
 			}
 
-			Asn1Node Body = this.ParseModule();
+			Asn1Module Body = this.ParseModule();
 
-			return new Asn1Definitions(Identifier, Oid, Tags, Abstract, Body);
+			return new Asn1Definitions(Identifier, Oid, Tags, Abstract, Body, this);
 		}
 
-		private Asn1Node ParseModule()
+		private Asn1Module ParseModule()
 		{
 			string s = this.PeekNextToken();
 			if (s != "BEGIN")
-				return this.ParseStatement();
+				throw this.SyntaxError("BEGIN expected.");
 
 			this.pos += 5;
 
@@ -282,28 +297,38 @@ namespace Waher.Content.Asn1
 					if (Imports is null)
 						Imports = new List<Asn1Import>();
 
+					List<string> Identifiers = new List<string>();
+
 					do
 					{
-						string Identifier = this.ParseTypeNameIdentifier();
-						string ModuleRef = null;
+						string Identifier = this.ParseIdentifier();
+						string ModuleRef;
 
 						s = this.PeekNextToken();
 
 						if (s == "FROM")
 						{
 							this.pos += 4;
+							Identifiers.Add(Identifier);
 							ModuleRef = this.ParseTypeNameIdentifier();
+
+							Imports.Add(new Asn1Import(Identifiers.ToArray(), ModuleRef, this));
+							Identifiers.Clear();
+
 							s = this.PeekNextToken();
+							if (s != ";")
+								continue;
 						}
 						else if (s == ".")
 						{
 							this.pos++;
 							ModuleRef = Identifier;
-							Identifier = this.ParseTypeNameIdentifier();
+							Identifier = this.ParseIdentifier();
+							Imports.Add(new Asn1Import(new string[] { ModuleRef }, Identifier, this));
 							s = this.PeekNextToken();
 						}
-
-						Imports.Add(new Asn1Import(Identifier, ModuleRef));
+						else
+							Identifiers.Add(Identifier);
 
 						if (s == ",")
 						{
@@ -316,9 +341,12 @@ namespace Waher.Content.Asn1
 							break;
 						}
 						else
-							throw this.SyntaxError("; expected");
+							throw this.SyntaxError("Unexpected token.");
 					}
 					while (true);
+
+					if (Identifiers.Count > 0)
+						Imports.Add(new Asn1Import(Identifiers.ToArray(), string.Empty, this));
 				}
 				else if (s == "EXPORTS")
 				{
@@ -803,6 +831,9 @@ namespace Waher.Content.Asn1
 
 			switch (s)
 			{
+				case "ANY":
+					return new Asn1Any();
+
 				case "BIT":
 					if (this.PeekNextToken() == "STRING")
 						this.pos += 6;
@@ -1403,21 +1434,8 @@ namespace Waher.Content.Asn1
 			Output.AppendLine("using System.Collections.Generic;");
 			Output.AppendLine("using Waher.Content;");
 			Output.AppendLine("using Waher.Content.Asn1;");
-			Output.AppendLine();
-			Output.Append("namespace ");
-			Output.AppendLine(Settings.Namespace);
-			Output.AppendLine("{");
 
-			this.root?.ExportCSharp(Output, State, 1, CSharpExportPass.Preprocess);
-			State.ClosePending(Output);
-
-			this.root?.ExportCSharp(Output, State, 1, CSharpExportPass.Variables);
-			State.ClosePending(Output);
-
-			this.root?.ExportCSharp(Output, State, 1, CSharpExportPass.Explicit);
-			State.ClosePending(Output);
-
-			Output.AppendLine("}");
-		}
+			this.root?.ExportCSharp(Output, State, 0, CSharpExportPass.Explicit);
+   		}
 	}
 }

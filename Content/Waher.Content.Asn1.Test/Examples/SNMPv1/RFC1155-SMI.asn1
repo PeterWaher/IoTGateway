@@ -9,6 +9,8 @@ EXPORTS -- EVERYTHING
 
 -- the path to the root
 
+iso           OBJECT IDENTIFIER ::= { 1 }
+
 internet      OBJECT IDENTIFIER ::= { iso org(3) dod(6) 1 }
 
 directory     OBJECT IDENTIFIER ::= { internet 1 }

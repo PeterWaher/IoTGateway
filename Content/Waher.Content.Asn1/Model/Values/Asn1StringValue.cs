@@ -45,5 +45,10 @@ namespace Waher.Content.Asn1.Model.Values
 				Output.Append('"');
 			}
 		}
+
+		/// <summary>
+		/// Corresponding C# type.
+		/// </summary>
+		public override string CSharpType => "String";
 	}
 }

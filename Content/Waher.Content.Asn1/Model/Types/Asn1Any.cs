@@ -5,26 +5,17 @@ using System.Text;
 namespace Waher.Content.Asn1.Model.Types
 {
 	/// <summary>
-	/// Represents an ASN.1 type reference.
+	/// ANY
 	/// </summary>
-	public class Asn1TypeReference : Asn1Type
+	public class Asn1Any : Asn1Type
 	{
-		private readonly string identifier;
-
 		/// <summary>
-		/// Represents an ASN.1 type reference.
+		/// ANY
 		/// </summary>
-		/// <param name="Identifier">Identifier</param>
-		public Asn1TypeReference(string Identifier)
+		public Asn1Any()
 			: base()
 		{
-			this.identifier = Identifier;
 		}
-
-		/// <summary>
-		/// Identifier
-		/// </summary>
-		public string Identifier => identifier;
 
 		/// <summary>
 		/// Exports to C#
@@ -36,7 +27,7 @@ namespace Waher.Content.Asn1.Model.Types
 		public override void ExportCSharp(StringBuilder Output, CSharpExportState State, int Indent, CSharpExportPass Pass)
 		{
 			if (Pass == CSharpExportPass.Explicit)
-				Output.Append(ToCSharp(this.identifier));
+				Output.Append("Object");
 		}
 	}
 }

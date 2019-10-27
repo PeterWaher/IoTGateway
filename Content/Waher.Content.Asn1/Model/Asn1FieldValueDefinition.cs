@@ -73,7 +73,7 @@ namespace Waher.Content.Asn1.Model
 				this.type.ExportCSharp(Output, State, Indent, CSharpExportPass.Explicit);
 
 				Output.Append(' ');
-				Output.Append(this.fieldName);
+				Output.Append(ToCSharp(this.fieldName));
 				Output.Append(" = ");
 				this.value.ExportCSharp(Output, State, State.ExportingValuesIndent, CSharpExportPass.Explicit);
 				Output.AppendLine(";");

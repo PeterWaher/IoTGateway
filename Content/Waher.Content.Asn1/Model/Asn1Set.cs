@@ -37,7 +37,7 @@ namespace Waher.Content.Asn1.Model
 		{
 			if (Pass == CSharpExportPass.Explicit)
 			{
-				Output.Append(this.Name);
+				Output.Append(ToCSharp(this.Name));
 
 				if (!this.TypeDefinition)
 					Output.Append("Set");
@@ -51,7 +51,7 @@ namespace Waher.Content.Asn1.Model
 
 				Output.Append(Tabs(Indent));
 				Output.Append("public class ");
-				Output.Append(this.Name);
+				Output.Append(ToCSharp(this.Name));
 				if (!this.TypeDefinition)
 					Output.AppendLine("Set");
 

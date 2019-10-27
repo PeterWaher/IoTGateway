@@ -37,7 +37,7 @@ namespace Waher.Content.Asn1.Model
 		{
 			if (Pass == CSharpExportPass.Explicit)
 			{
-				Output.Append(this.Name);
+				Output.Append(ToCSharp(this.Name));
 
 				if (!this.TypeDefinition)
 					Output.Append("Enum");
@@ -49,7 +49,7 @@ namespace Waher.Content.Asn1.Model
 			{
 				Output.Append(Tabs(Indent));
 				Output.Append("public enum ");
-				Output.Append(this.Name);
+				Output.Append(ToCSharp(this.Name));
 				if (!this.TypeDefinition)
 					Output.AppendLine("Enum");
 

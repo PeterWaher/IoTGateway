@@ -36,7 +36,7 @@ namespace Waher.Content.Asn1.Model.Values
 			int Indent, CSharpExportPass Pass)
 		{
 			if (Pass == CSharpExportPass.Explicit)
-				Output.Append(this.identifier);
+				Output.Append(ToCSharp(this.identifier));
 		}
 	}
 }

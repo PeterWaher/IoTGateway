@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Waher.Content.Asn1.Model.Values;
 
 namespace Waher.Content.Asn1.Model.Types
 {
@@ -36,7 +37,7 @@ namespace Waher.Content.Asn1.Model.Types
 		public override void ExportCSharp(StringBuilder Output, CSharpExportState State, int Indent, CSharpExportPass Pass)
 		{
 			if (Pass == CSharpExportPass.Explicit)
-				Output.Append("Array<Int32>");
+				Output.Append("ObjectId");
 		}
 	}
 }

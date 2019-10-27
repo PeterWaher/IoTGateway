@@ -38,5 +38,10 @@ namespace Waher.Content.Asn1.Model.Values
 			if (Pass == CSharpExportPass.Explicit)
 				Output.Append(this.value.ToString().Replace(NumberFormatInfo.CurrentInfo.NumberDecimalSeparator, "."));
 		}
+
+		/// <summary>
+		/// Corresponding C# type.
+		/// </summary>
+		public override string CSharpType => "Double";
 	}
 }

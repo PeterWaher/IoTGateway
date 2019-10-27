@@ -63,7 +63,7 @@ namespace Waher.Content.Asn1.Model
 				Output.Append("public ");
 				this.type.ExportCSharp(Output, State, Indent, Pass);
 				Output.Append(' ');
-				Output.Append(this.fieldName);
+				Output.Append(ToCSharp(this.fieldName));
 
 				if (!(this.type.Default is null))
 				{

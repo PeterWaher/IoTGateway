@@ -25,21 +25,21 @@ enterprises   OBJECT IDENTIFIER ::= { private 1 }
 
 -- definition of object types
 
---OBJECT-TYPE MACRO ::=
---BEGIN
---    TYPE NOTATION ::= "SYNTAX" type (TYPE ObjectSyntax)
---                        "ACCESS" Access
---                        "STATUS" Status
---    VALUE NOTATION ::= value (VALUE ObjectName)
---
---    Access ::= "read-only"
---                    | "read-write"
---                    | "write-only"
---                    | "not-accessible"
---    Status ::= "mandatory"
---                    | "optional"
---                    | "obsolete"
---END
+OBJECT-TYPE MACRO ::=
+BEGIN
+    TYPE NOTATION ::= "SYNTAX" type (TYPE ObjectSyntax)
+                        "ACCESS" Access
+                        "STATUS" Status
+    VALUE NOTATION ::= value (VALUE ObjectName)
+
+    Access ::= "read-only"
+                    | "read-write"
+                    | "write-only"
+                    | "not-accessible"
+    Status ::= "mandatory"
+                    | "optional"
+                    | "obsolete"
+END
 
     -- names of objects in the MIB
 

@@ -1614,6 +1614,148 @@
             Abstract base class for sets of values
             </summary>
         </member>
+        <member name="T:Waher.Content.Asn1.Model.Macro.Asn1Macro">
+            <summary>
+            ASN.1 Macro
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Macro.Asn1Macro.#ctor(Waher.Content.Asn1.Model.Macro.UserDefinedItem,Waher.Content.Asn1.Model.Macro.UserDefinedItem,Waher.Content.Asn1.Model.Macro.SupportingSyntax[])">
+            <summary>
+            ASN.1 Macro
+            </summary>
+            <param name="TypeNotation">Type Notation</param>
+            <param name="ValueNotation">Value Notation</param>
+            <param name="SupportingSyntax">Supporting Syntax</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Macro.Asn1Macro.TypeNotation">
+            <summary>
+            Type notation
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Macro.Asn1Macro.ValueNotation">
+            <summary>
+            Value notation
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Macro.Asn1Macro.SupportingSyntax">
+            <summary>
+            Supporting syntax
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Macro.SupportingSyntax">
+            <summary>
+            Supporting syntax in a macro
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Macro.SupportingSyntax.#ctor(System.String,Waher.Content.Asn1.Model.Macro.UserDefinedItem)">
+            <summary>
+            Type notation declaration
+            </summary>
+            <param name="Name">Name</param>
+            <param name="Notation">Notation</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Macro.SupportingSyntax.Name">
+            <summary>
+            Name
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Macro.SupportingSyntax.Notation">
+            <summary>
+            Notation
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Macro.UserDefinedItem">
+            <summary>
+            Abstract base class for user-defined parts in macros
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Macro.UserDefinedLiteral">
+            <summary>
+            String literal
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Macro.UserDefinedLiteral.#ctor(System.String)">
+            <summary>
+            String literal
+            </summary>
+            <param name="Value">Literal value.</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Macro.UserDefinedLiteral.Value">
+            <summary>
+            String literal
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Macro.UserDefinedOption">
+            <summary>
+            One option of many
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Macro.UserDefinedOption.#ctor(Waher.Content.Asn1.Model.Macro.UserDefinedItem[])">
+            <summary>
+            One option of many
+            </summary>
+            <param name="Items">Items comprising option</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Macro.UserDefinedOption.Items">
+            <summary>
+            Items comprising option
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Macro.UserDefinedOptions">
+            <summary>
+            Set of options
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Macro.UserDefinedOptions.#ctor(Waher.Content.Asn1.Model.Macro.UserDefinedItem[])">
+            <summary>
+            Set of options
+            </summary>
+            <param name="Options">Options</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Macro.UserDefinedOptions.Options">
+            <summary>
+            Options
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Macro.UserDefinedPart">
+            <summary>
+            Un-typed user-defined part.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Macro.UserDefinedPart.#ctor(System.String)">
+            <summary>
+            Un-typed user-defined part.
+            </summary>
+            <param name="Identifier">Identifier</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Macro.UserDefinedPart.Identifier">
+            <summary>
+            Identifier
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Macro.UserDefinedSpecifiedPart">
+            <summary>
+            Typed user-defined part.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Macro.UserDefinedSpecifiedPart.#ctor(System.String,System.String,Waher.Content.Asn1.Model.Asn1Type)">
+            <summary>
+            Typed user-defined part.
+            </summary>
+            <param name="Identifier">Identifier</param>
+            <param name="Name">Name</param>
+            <param name="Type">Type</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Macro.UserDefinedSpecifiedPart.Name">
+            <summary>
+            Name
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Macro.UserDefinedSpecifiedPart.Type">
+            <summary>
+            Type
+            </summary>
+        </member>
         <member name="T:Waher.Content.Asn1.Model.Restrictions.Asn1And">
             <summary>
             Both restrictions apply

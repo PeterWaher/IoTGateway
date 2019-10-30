@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using Waher.Content.Asn1.Exceptions;
 using Waher.Content.Asn1.Model;
+using Waher.Content.Asn1.Model.Macro;
 using Waher.Content.Asn1.Model.Restrictions;
 using Waher.Content.Asn1.Model.Sets;
 using Waher.Content.Asn1.Model.Types;
@@ -441,6 +442,35 @@ namespace Waher.Content.Asn1
 
 					s2 = this.PeekNextToken();
 				}
+				else if (s2 == "MACRO")
+				{
+					this.pos += 5;
+					this.AssertNextToken("::=");
+					this.AssertNextToken("BEGIN");
+					this.AssertNextToken("TYPE");
+					this.AssertNextToken("NOTATION");
+					this.AssertNextToken("::=");
+
+					UserDefinedItem TypeNotation = this.ParseUserDefinedOptions("VALUE");
+
+					this.AssertNextToken("VALUE");
+					this.AssertNextToken("NOTATION");
+					this.AssertNextToken("::=");
+
+					UserDefinedItem ValueNotation = this.ParseUserDefinedOptions("END");
+					List<SupportingSyntax> SupportingSyntax = new List<SupportingSyntax>();
+
+					while (this.PeekNextToken() != "END")
+					{
+						string Name = this.ParseIdentifier();
+						this.AssertNextToken("::=");
+						SupportingSyntax.Add(new SupportingSyntax(Name, this.ParseUserDefinedOptions("END")));
+					}
+
+					this.AssertNextToken("END");
+
+					return new Asn1Macro(TypeNotation, ValueNotation, SupportingSyntax.ToArray());
+				}
 				else
 				{
 					if (char.IsUpper(ch))   // Type
@@ -524,6 +554,103 @@ namespace Waher.Content.Asn1
 				throw this.SyntaxError("Identifier expected.");
 		}
 
+		private UserDefinedItem ParseUserDefinedOptions(string EndKeyWord)
+		{
+			UserDefinedItem Item = this.ParseUserDefinedOption(EndKeyWord);
+			List<UserDefinedItem> Options = null;
+
+			while (this.PeekNextToken() == "|")
+			{
+				this.pos++;
+
+				if (Options is null)
+					Options = new List<UserDefinedItem>();
+
+				Options.Add(Item);
+				Item = this.ParseUserDefinedOption(EndKeyWord);
+			}
+
+			if (Options is null)
+				return Item;
+			else
+			{
+				Options.Add(Item);
+				return new UserDefinedOptions(Options.ToArray());
+			}
+		}
+
+		private UserDefinedItem ParseUserDefinedOption(string EndKeyWord)
+		{
+			UserDefinedItem Item = null;
+			List<UserDefinedItem> Items = new List<UserDefinedItem>();
+			string s;
+			int PosBak = this.pos;
+
+			while ((s = this.PeekNextToken()) != EndKeyWord && s != "::=" && s != "|")
+			{
+				if (!(Item is null))
+				{
+					if (Items is null)
+						Items = new List<UserDefinedItem>();
+
+					Items.Add(Item);
+				}
+
+				PosBak = this.pos;
+				Item = this.ParseUserDefinedItem();
+			}
+
+			if (Item is null)
+				throw this.SyntaxError("Items expected.");
+
+			if (s == "::=")
+			{
+				if (Items is null)
+					throw this.SyntaxError("Items expected.");
+
+				this.pos = PosBak;
+				if (Items.Count == 1)
+					return Items[0];
+			}
+			else if (Items is null)
+				return Item;
+			else
+				Items.Add(Item);
+
+			return new UserDefinedOption(Items.ToArray());
+		}
+
+		private UserDefinedItem ParseUserDefinedItem()
+		{
+			string s = this.PeekNextToken();
+
+			if (s == "\"")
+			{
+				if (!(this.ParseValue() is Asn1StringValue Label))
+					throw this.SyntaxError("String label expected.");
+
+				return new UserDefinedLiteral(Label.Value);
+			}
+
+			if (!IsIdentifier(s))
+				throw this.SyntaxError("Identifier or literal expected.");
+
+			this.pos += s.Length;
+
+			if (this.PeekNextToken() == "(")
+			{
+				this.pos++;
+
+				string Name = this.ParseIdentifier();
+				Asn1Type Type = this.ParseType(Name, false);
+
+				this.AssertNextToken(")");
+
+				return new UserDefinedSpecifiedPart(s, Name, Type);
+			}
+			else
+				return new UserDefinedPart(s);
+		}
 
 		private Asn1Restriction ParseRestriction()
 		{

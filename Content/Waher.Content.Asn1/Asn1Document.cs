@@ -183,6 +183,24 @@ namespace Waher.Content.Asn1
 						else
 							return "]";
 
+					case '\'':
+						if (this.PeekNextChar() == '\'')
+						{
+							this.pos++;
+							return "\"";
+						}
+						else
+							return "'";
+
+					case '`':
+						if (this.PeekNextChar() == '`')
+						{
+							this.pos++;
+							return "\"";
+						}
+						else
+							return "`";
+
 					default:
 						return new string(ch, 1);
 				}
@@ -197,6 +215,13 @@ namespace Waher.Content.Asn1
 			string s = this.NextToken();
 			this.pos = Bak;
 			return s;
+		}
+
+		private void AssertNextToken(string ExpectedToken)
+		{
+			string s = this.NextToken();
+			if (s != ExpectedToken)
+				throw this.SyntaxError(ExpectedToken + " expected.");
 		}
 
 		private Asn1SyntaxException SyntaxError(string Message)
@@ -249,9 +274,7 @@ namespace Waher.Content.Asn1
 								break;
 						}
 
-						s = this.NextToken();
-						if (s != "TAGS")
-							throw this.SyntaxError("TAGS expected.");
+						this.AssertNextToken("TAGS");
 						break;
 
 					case "ABSTRACT-SYNTAX":
@@ -277,11 +300,9 @@ namespace Waher.Content.Asn1
 
 		private Asn1Module ParseModule()
 		{
-			string s = this.PeekNextToken();
-			if (s != "BEGIN")
-				throw this.SyntaxError("BEGIN expected.");
+			string s;
 
-			this.pos += 5;
+			this.AssertNextToken("BEGIN");
 
 			List<Asn1Import> Imports = null;
 			List<string> Exports = null;
@@ -423,7 +444,7 @@ namespace Waher.Content.Asn1
 				else
 				{
 					if (char.IsUpper(ch))   // Type
-						throw this.SyntaxError("::= expected.");
+						throw this.SyntaxError("::= or MACRO expected.");
 				}
 
 				int? Tag = null;
@@ -436,9 +457,7 @@ namespace Waher.Content.Asn1
 
 					if (s2 == "TAG")
 					{
-						if (this.NextToken() != ":")
-							throw this.SyntaxError(": expected.");
-
+						this.AssertNextToken(":");
 						s2 = this.NextToken();
 					}
 
@@ -468,8 +487,7 @@ namespace Waher.Content.Asn1
 
 					Tag = i;
 
-					if (this.NextToken() != "]")
-						throw this.SyntaxError("] expected.");
+					this.AssertNextToken("]");
 
 					s2 = this.PeekNextToken();
 				}
@@ -509,13 +527,9 @@ namespace Waher.Content.Asn1
 
 		private Asn1Restriction ParseRestriction()
 		{
-			if (this.NextToken() != "(")
-				throw this.SyntaxError("( expected.");
-
+			this.AssertNextToken("(");
 			Asn1Restriction Result = this.ParseOrs();
-
-			if (this.NextToken() != ")")
-				throw this.SyntaxError(") expected.");
+			this.AssertNextToken(")");
 
 			return Result;
 		}
@@ -562,9 +576,7 @@ namespace Waher.Content.Asn1
 					this.pos++;
 
 					Asn1Restriction Result = this.ParseOrs();
-
-					if (this.NextToken() != ")")
-						throw this.SyntaxError(") expected.");
+					this.AssertNextToken(")");
 
 					return Result;
 
@@ -586,15 +598,13 @@ namespace Waher.Content.Asn1
 
 				case "ENCODED":
 					this.pos += 7;
-					if (this.NextToken() != "BY")
-						throw this.SyntaxError("BY expected.");
+					this.AssertNextToken("BY");
 
 					return new Asn1EncodedBy(this.ParseValue());
 
 				case "WITH":
 					this.pos += 4;
-					if (this.NextToken() != "COMPONENTS")
-						throw this.SyntaxError("COMPONENTS expected.");
+					this.AssertNextToken("COMPONENTS");
 
 					return new Asn1WithComponents(this.ParseValue());
 
@@ -605,13 +615,9 @@ namespace Waher.Content.Asn1
 
 		private Asn1Values ParseSet()
 		{
-			if (this.NextToken() != "(")
-				throw this.SyntaxError("( expected.");
-
+			this.AssertNextToken("(");
 			Asn1Values Result = this.ParseUnions();
-
-			if (this.NextToken() != ")")
-				throw this.SyntaxError(") expected.");
+			this.AssertNextToken(")");
 
 			return Result;
 		}
@@ -657,9 +663,7 @@ namespace Waher.Content.Asn1
 				this.pos++;
 
 				Asn1Values Result = this.ParseUnions();
-
-				if (this.NextToken() != ")")
-					throw this.SyntaxError(") expected.");
+				this.AssertNextToken(")");
 
 				return Result;
 			}
@@ -835,11 +839,7 @@ namespace Waher.Content.Asn1
 					return new Asn1Any();
 
 				case "BIT":
-					if (this.PeekNextToken() == "STRING")
-						this.pos += 6;
-					else
-						throw this.SyntaxError("STRING expected.");
-
+					this.AssertNextToken("STRING");
 					return new Asn1BitString();
 
 				case "BMPString":
@@ -907,19 +907,11 @@ namespace Waher.Content.Asn1
 					return new Asn1NumericString();
 
 				case "OBJECT":
-					if (this.PeekNextToken() == "IDENTIFIER")
-						this.pos += 10;
-					else
-						throw this.SyntaxError("IDENTIFIER expected.");
-
+					this.AssertNextToken("IDENTIFIER");
 					return new Asn1ObjectIdentifier(false);
 
 				case "OCTET":
-					if (this.PeekNextToken() == "STRING")
-						this.pos += 6;
-					else
-						throw this.SyntaxError("STRING expected.");
-
+					this.AssertNextToken("STRING");
 					return new Asn1OctetString();
 
 				case "PrintableString":
@@ -929,11 +921,7 @@ namespace Waher.Content.Asn1
 					return new Asn1Real();
 
 				case "RELATIVE":
-					if (this.PeekNextToken() == "OID")
-						this.pos += 3;
-					else
-						throw this.SyntaxError("OID expected.");
-
+					this.AssertNextToken("OID");
 					return new Asn1ObjectIdentifier(true);
 
 				case "RELATIVE-OID":
@@ -974,8 +962,7 @@ namespace Waher.Content.Asn1
 								throw this.SyntaxError("Unexpected token.");
 						}
 
-						if (this.NextToken() != "OF")
-							throw this.SyntaxError("OF expected.");
+						this.AssertNextToken("OF");
 
 						if (Size is null)
 							throw this.SyntaxError("SIZE expected.");
@@ -1074,8 +1061,7 @@ namespace Waher.Content.Asn1
 
 		private Asn1Node[] ParseList()
 		{
-			if (this.NextToken() != "{")
-				throw this.SyntaxError("{ expected.");
+			this.AssertNextToken("{");
 
 			List<Asn1Node> Items = new List<Asn1Node>();
 
@@ -1101,8 +1087,7 @@ namespace Waher.Content.Asn1
 
 		private Asn1Node[] ParseValues()
 		{
-			if (this.NextToken() != "{")
-				throw this.SyntaxError("{ expected.");
+			this.AssertNextToken("{");
 
 			List<Asn1Node> Items = new List<Asn1Node>();
 
@@ -1123,8 +1108,7 @@ namespace Waher.Content.Asn1
 					case "(":
 						this.pos++;
 						Asn1Value Value = this.ParseValue();
-						if (this.NextToken() != ")")
-							throw this.SyntaxError(") expected.");
+						this.AssertNextToken(")");
 
 						int LastIndex = Items.Count - 1;
 
@@ -1305,9 +1289,7 @@ namespace Waher.Content.Asn1
 								this.pos++;
 
 								Value = this.ParseValue();
-
-								if (this.NextToken() != ")")
-									throw this.SyntaxError(") expected.");
+								this.AssertNextToken(")");
 
 								return new Asn1NamedValue(s, Value);
 
@@ -1436,6 +1418,6 @@ namespace Waher.Content.Asn1
 			Output.AppendLine("using Waher.Content.Asn1;");
 
 			this.root?.ExportCSharp(Output, State, 0, CSharpExportPass.Explicit);
-   		}
+		}
 	}
 }

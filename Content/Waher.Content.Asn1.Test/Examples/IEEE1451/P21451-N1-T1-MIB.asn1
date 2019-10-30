@@ -14,273 +14,281 @@ IMPORTS
  
 
 --enterprises  1.3.6.1.4
-NCAP  OBJECT IDENTIFIER ::= { enterprises 21451 }
+ncap  OBJECT IDENTIFIER ::= { enterprises 21451 }
  
-NCAPone OBJECT IDENTIFIER ::= {NCAP  1}
+ncapone OBJECT IDENTIFIER ::= {ncap  1}
 
-TIMone  OBJECT IDENTIFIER ::= {NCAPone  1}
-TIMdescrption  OBJECT IDENTIFIER ::={TIMone 0}
+timone  OBJECT IDENTIFIER ::= {ncapone  1}
+timdescrption  OBJECT IDENTIFIER ::={timone 0}
 
-Sensors  OBJECT IDENTIFIER ::= {TIMone  1}
-TIMcpu OBJECT IDENTIFIER ::={TIMdescrption 1}
-
-
-Slope OBJECT IDENTIFIER ::={Sensors 1}
-
-SlopeSwitch OBJECT-TYPE
-SYNTAX      DisplayString
-MAX-ACCESS  read-write
-STATUS      current
-DESCRIPTION
-"Slope Switch"
-::= {Slope 1}
-
-SlopeOut OBJECT-TYPE
-SYNTAX      DisplayString
-MAX-ACCESS  read-only
-STATUS      current
-DESCRIPTION
-"Slpoe Out"
-::= {Slope 2}
-
-Temperature OBJECT IDENTIFIER ::={Sensors 2}
-
-TemperatureSwitch OBJECT-TYPE
-SYNTAX      DisplayString
-MAX-ACCESS  read-write
-STATUS      current
-DESCRIPTION
-"TemperatureSwitch"
-::= {Temperature 1}
-
-TemperatureOut OBJECT-TYPE
-SYNTAX      DisplayString
-MAX-ACCESS  read-only
-STATUS      current
-DESCRIPTION 
-"TemperatureOut"
-::= {Temperature 2}
-
-Pressure OBJECT IDENTIFIER ::={Sensors 3}
-
-PressureSwitch OBJECT-TYPE
-SYNTAX      DisplayString
-MAX-ACCESS  read-write
-STATUS      current
-DESCRIPTION
-"PressureSwitch"
-::= {Pressure 1}
-
-PressureOut OBJECT-TYPE
-SYNTAX      DisplayString
-MAX-ACCESS  read-only
-STATUS      current
-DESCRIPTION
-"PressureOut"
-::= {Pressure 2}
-
-Light OBJECT IDENTIFIER ::={Sensors 4}
-
-LightSwitch OBJECT-TYPE
-SYNTAX      DisplayString
-MAX-ACCESS  read-write
-STATUS      current
-DESCRIPTION 
-"light switch"
-::= {Light 1}
-
-LightIn OBJECT-TYPE
-SYNTAX      DisplayString
-MAX-ACCESS  read-write
-STATUS      current
-DESCRIPTION
-"PressureOut"
-::= {Light 2}
+sensors  OBJECT IDENTIFIER ::= {timone  1}
+timcpu OBJECT IDENTIFIER ::={timdescrption 1}
 
 
-LCD OBJECT IDENTIFIER ::={Sensors 5}
+slope OBJECT IDENTIFIER ::={sensors 1}
 
-LCDdisplay OBJECT-TYPE
-SYNTAX      DisplayString
-MAX-ACCESS  read-write
-STATUS      current
-DESCRIPTION
-"LCD dispaly"
-::= {LCD 1}
+--SlopeSwitch OBJECT-TYPE
+--SYNTAX      DisplayString
+--MAX-ACCESS  read-write
+--STATUS      current
+--DESCRIPTION
+--"Slope Switch"
+--::= {slope 1}
+--
+--SlopeOut OBJECT-TYPE
+--SYNTAX      DisplayString
+--MAX-ACCESS  read-only
+--STATUS      current
+--DESCRIPTION
+--"Slpoe Out"
+--::= {slope 2}
 
-LCDIn OBJECT-TYPE
-SYNTAX      DisplayString
-MAX-ACCESS  read-write
-STATUS      current
-DESCRIPTION
-"PressureOut"
-::= {LCD 2}
+temperature OBJECT IDENTIFIER ::={sensors 2}
 
-Buzzer OBJECT IDENTIFIER ::={Sensors 6}
-BuzzerSwitch OBJECT-TYPE
-SYNTAX      DisplayString
-MAX-ACCESS  read-write
-STATUS      current
-DESCRIPTION
-"Buzzer Switch"
-::= {Buzzer 1}
+--TemperatureSwitch OBJECT-TYPE
+--SYNTAX      DisplayString
+--MAX-ACCESS  read-write
+--STATUS      current
+--DESCRIPTION
+--"TemperatureSwitch"
+--::= {Temperature 1}
+--
+--TemperatureOut OBJECT-TYPE
+--SYNTAX      DisplayString
+--MAX-ACCESS  read-only
+--STATUS      current
+--DESCRIPTION 
+--"TemperatureOut"
+--::= {Temperature 2}
 
-BuzzerIn OBJECT-TYPE
-SYNTAX      DisplayString
-MAX-ACCESS  read-write
-STATUS      current
-DESCRIPTION
-"Buzzer Output"
-::= {Buzzer 2}
+pressure OBJECT IDENTIFIER ::={sensors 3}
 
-AnaOne OBJECT IDENTIFIER ::={Sensors 7}
-AnaOneSwitch OBJECT-TYPE
-SYNTAX      DisplayString
-MAX-ACCESS  read-write
-STATUS      current
-DESCRIPTION
-"Analogue One Switch"
-::= {AnaOne 1}
+--PressureSwitch OBJECT-TYPE
+--SYNTAX      DisplayString
+--MAX-ACCESS  read-write
+--STATUS      current
+--DESCRIPTION
+--"PressureSwitch"
+--::= {Pressure 1}
+--
+--PressureOut OBJECT-TYPE
+--SYNTAX      DisplayString
+--MAX-ACCESS  read-only
+--STATUS      current
+--DESCRIPTION
+--"PressureOut"
+--::= {Pressure 2}
 
-AnaOneOut OBJECT-TYPE
-SYNTAX      DisplayString
-MAX-ACCESS  read-only
-STATUS      current
-DESCRIPTION
-"Analogue One Out"
-::= {AnaOne 2}
+light OBJECT IDENTIFIER ::={sensors 4}
 
-
-AnaTwo OBJECT IDENTIFIER ::={Sensors 8}
-AnaTwoSwitch OBJECT-TYPE
-SYNTAX      DisplayString
-MAX-ACCESS  read-write
-STATUS      current
-DESCRIPTION
-"Analogue Two Switch"
-::= {AnaTwo 1}
-
-AnaTwoOut OBJECT-TYPE
-SYNTAX      DisplayString
-MAX-ACCESS  read-only
-STATUS      current
-DESCRIPTION
-"Analogue Two Out"
-::= {AnaTwo 2}
-
-AnaThree OBJECT IDENTIFIER ::={Sensors 9}
-AnThreeSwitch OBJECT-TYPE
-SYNTAX      DisplayString
-MAX-ACCESS  read-write
-STATUS      current
-DESCRIPTION
-"Analogue Three Switch"
-::= {AnaThree 1}
-
-AnaThreeOut OBJECT-TYPE
-SYNTAX      DisplayString
-MAX-ACCESS  read-only
-STATUS      current
-DESCRIPTION
-"Analogue Three Out"
-::= {AnaThree 2}
-
-AnaFour OBJECT IDENTIFIER ::={Sensors 10}
-AnaFourSwitch OBJECT-TYPE
-SYNTAX      DisplayString
-MAX-ACCESS  read-write
-STATUS      current
-DESCRIPTION
-"Analogue Four Switch"
-::= {AnaFour 1}
-
-AnaFourOut OBJECT-TYPE
-SYNTAX      DisplayString
-MAX-ACCESS  read-only
-STATUS      current
-DESCRIPTION
-"Analogue Four Out"
-::= {AnaFour 2}
+--LightSwitch OBJECT-TYPE
+--SYNTAX      DisplayString
+--MAX-ACCESS  read-write
+--STATUS      current
+--DESCRIPTION 
+--"light switch"
+--::= {Light 1}
+--
+--LightIn OBJECT-TYPE
+--SYNTAX      DisplayString
+--MAX-ACCESS  read-write
+--STATUS      current
+--DESCRIPTION
+--"PressureOut"
+--::= {light 2}
 
 
-DigOne OBJECT IDENTIFIER ::={Sensors 11}
-DigOneSwitch OBJECT-TYPE
-SYNTAX      DisplayString
-MAX-ACCESS  read-write
-STATUS      current
-DESCRIPTION
-"Digital One Switch"
-::= {DigOne 1}
+lcd OBJECT IDENTIFIER ::={sensors 5}
 
-DigOneOut OBJECT-TYPE
-SYNTAX      DisplayString
-MAX-ACCESS  read-only
-STATUS      current
-DESCRIPTION
-"Digital One Out"
-::= {DigOne 2}
+--LCDdisplay OBJECT-TYPE
+--SYNTAX      DisplayString
+--MAX-ACCESS  read-write
+--STATUS      current
+--DESCRIPTION
+--"LCD dispaly"
+--::= {lcd 1}
+--
+--LCDIn OBJECT-TYPE
+--SYNTAX      DisplayString
+--MAX-ACCESS  read-write
+--STATUS      current
+--DESCRIPTION
+--"PressureOut"
+--::= {lcd 2}
 
-DigTwo OBJECT IDENTIFIER ::={Sensors 12}
-DigTwoSwitch OBJECT-TYPE
-SYNTAX      DisplayString
-MAX-ACCESS  read-write
-STATUS      current
-DESCRIPTION
-"Digital Two Switch"
-::= {DigTwo 1}
+buzzer OBJECT IDENTIFIER ::={sensors 6}
 
-DigTwoOut OBJECT-TYPE
-SYNTAX      DisplayString
-MAX-ACCESS  read-only
-STATUS      current
-DESCRIPTION
-"Digital Two Out"
-::= {DigTwo 2}
+--BuzzerSwitch OBJECT-TYPE
+--SYNTAX      DisplayString
+--MAX-ACCESS  read-write
+--STATUS      current
+--DESCRIPTION
+--"Buzzer Switch"
+--::= {buzzer 1}
+--
+--BuzzerIn OBJECT-TYPE
+--SYNTAX      DisplayString
+--MAX-ACCESS  read-write
+--STATUS      current
+--DESCRIPTION
+--"Buzzer Output"
+--::= {buzzer 2}
 
-DigThree OBJECT IDENTIFIER ::={Sensors 13}
-DigThreeSwitch OBJECT-TYPE
-SYNTAX      DisplayString
-MAX-ACCESS  read-write
-STATUS      current
-DESCRIPTION
-"Digital Three Switch"
-::= {DigThree 1}
+anaone OBJECT IDENTIFIER ::={sensors 7}
 
-DigThreeOut OBJECT-TYPE
-SYNTAX      DisplayString
-MAX-ACCESS  read-only
-STATUS      current
-DESCRIPTION
-"Digital Three Out"
-::= {DigThree 2}
-
-
-
+--AnaOneSwitch OBJECT-TYPE
+--SYNTAX      DisplayString
+--MAX-ACCESS  read-write
+--STATUS      current
+--DESCRIPTION
+--"Analogue One Switch"
+--::= {anaone 1}
+--
+--AnaOneOut OBJECT-TYPE
+--SYNTAX      DisplayString
+--MAX-ACCESS  read-only
+--STATUS      current
+--DESCRIPTION
+--"Analogue One Out"
+--::= {anaone 2}
 
 
-MainFrequency OBJECT-TYPE
-SYNTAX      DisplayString
-MAX-ACCESS  read-only
-STATUS      current
-DESCRIPTION
-"the main frequency of TIM CPU"
-::= {TIMcpu 1}
+anatwo OBJECT IDENTIFIER ::={sensors 8}
 
-Temperature OBJECT-TYPE
-SYNTAX      DisplayString
-MAX-ACCESS  read-only
-STATUS      current
-DESCRIPTION
-"the temperature of TIM CPU"
-::= {TIMcpu 2}
+--AnaTwoSwitch OBJECT-TYPE
+--SYNTAX      DisplayString
+--MAX-ACCESS  read-write
+--STATUS      current
+--DESCRIPTION
+--"Analogue Two Switch"
+--::= {anatwo 1}
+--
+--anatwoout OBJECT-TYPE
+--SYNTAX      DisplayString
+--MAX-ACCESS  read-only
+--STATUS      current
+--DESCRIPTION
+--"Analogue Two Out"
+--::= {anatwo 2}
 
-Usage OBJECT-TYPE
-SYNTAX      DisplayString
-MAX-ACCESS  read-only
-STATUS      current
-DESCRIPTION
-"the usage of TIM CPU"
-::= {TIMcpu 3}
+anaThree OBJECT IDENTIFIER ::={sensors 9}
+
+--AnThreeSwitch OBJECT-TYPE
+--SYNTAX      DisplayString
+--MAX-ACCESS  read-write
+--STATUS      current
+--DESCRIPTION
+--"Analogue Three Switch"
+--::= {anathree 1}
+--
+--AnaThreeOut OBJECT-TYPE
+--SYNTAX      DisplayString
+--MAX-ACCESS  read-only
+--STATUS      current
+--DESCRIPTION
+--"Analogue Three Out"
+--::= {anathree 2}
+
+anaFour OBJECT IDENTIFIER ::={sensors 10}
+
+--AnaFourSwitch OBJECT-TYPE
+--SYNTAX      DisplayString
+--MAX-ACCESS  read-write
+--STATUS      current
+--DESCRIPTION
+--"Analogue Four Switch"
+--::= {anafour 1}
+--
+--AnaFourOut OBJECT-TYPE
+--SYNTAX      DisplayString
+--MAX-ACCESS  read-only
+--STATUS      current
+--DESCRIPTION
+--"Analogue Four Out"
+--::= {anafour 2}
+
+
+digOne OBJECT IDENTIFIER ::={sensors 11}
+
+--DigOneSwitch OBJECT-TYPE
+--SYNTAX      DisplayString
+--MAX-ACCESS  read-write
+--STATUS      current
+--DESCRIPTION
+--"Digital One Switch"
+--::= {digone 1}
+--
+--DigOneOut OBJECT-TYPE
+--SYNTAX      DisplayString
+--MAX-ACCESS  read-only
+--STATUS      current
+--DESCRIPTION
+--"Digital One Out"
+--::= {digone 2}
+
+digTwo OBJECT IDENTIFIER ::={sensors 12}
+
+--DigTwoSwitch OBJECT-TYPE
+--SYNTAX      DisplayString
+--MAX-ACCESS  read-write
+--STATUS      current
+--DESCRIPTION
+--"Digital Two Switch"
+--::= {digtwo 1}
+--
+--DigTwoOut OBJECT-TYPE
+--SYNTAX      DisplayString
+--MAX-ACCESS  read-only
+--STATUS      current
+--DESCRIPTION
+--"Digital Two Out"
+--::= {digtwo 2}
+
+digThree OBJECT IDENTIFIER ::={sensors 13}
+
+--DigThreeSwitch OBJECT-TYPE
+--SYNTAX      DisplayString
+--MAX-ACCESS  read-write
+--STATUS      current
+--DESCRIPTION
+--"Digital Three Switch"
+--::= {digthree 1}
+--
+--DigThreeOut OBJECT-TYPE
+--SYNTAX      DisplayString
+--MAX-ACCESS  read-only
+--STATUS      current
+--DESCRIPTION
+--"Digital Three Out"
+--::= {digthree 2}
+
+
+
+
+
+--MainFrequency OBJECT-TYPE
+--SYNTAX      DisplayString
+--MAX-ACCESS  read-only
+--STATUS      current
+--DESCRIPTION
+--"the main frequency of TIM CPU"
+--::= {timcpu 1}
+--
+--Temperature OBJECT-TYPE
+--SYNTAX      DisplayString
+--MAX-ACCESS  read-only
+--STATUS      current
+--DESCRIPTION
+--"the temperature of TIM CPU"
+--::= {timcpu 2}
+--
+--Usage OBJECT-TYPE
+--SYNTAX      DisplayString
+--MAX-ACCESS  read-only
+--STATUS      current
+--DESCRIPTION
+--"the usage of TIM CPU"
+--::= {timcpu 3}
 
 
 END

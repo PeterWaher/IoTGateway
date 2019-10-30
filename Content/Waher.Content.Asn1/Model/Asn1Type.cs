@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Waher.Content.Asn1.Model.Values;
+using Waher.Content.Asn1.Model.Macro;
 
 namespace Waher.Content.Asn1.Model
 {
@@ -102,5 +103,16 @@ namespace Waher.Content.Asn1.Model
 		/// If the type is a constructed type.
 		/// </summary>
 		public virtual bool ConstructedType => false;
+
+		/// <summary>
+		/// Parses the portion of the document at the current position, according to the type.
+		/// </summary>
+		/// <param name="Document">ASN.1 document being parsed.</param>
+		/// <param name="Macro">Macro performing parsing.</param>
+		/// <returns>Parsed ASN.1 node.</returns>
+		public virtual Asn1Node Parse(Asn1Document Document, Asn1Macro Macro)
+		{
+			throw Document.SyntaxError("Type not supported: " + this.GetType().FullName);
+		}
 	}
 }

@@ -7,7 +7,7 @@ namespace Waher.Content.Asn1.Model
 	/// <summary>
 	/// Represents an ASN.1 field value definition.
 	/// </summary>
-	public class Asn1FieldValueDefinition : Asn1Node
+	public class Asn1FieldValueDefinition : Asn1Node, INamedNode
 	{
 		private readonly string fieldName;
 		private readonly Asn1Type type;
@@ -30,7 +30,7 @@ namespace Waher.Content.Asn1.Model
 		/// <summary>
 		/// Field Name
 		/// </summary>
-		public string FieldName => this.fieldName;
+		public string Name => this.fieldName;
 
 		/// <summary>
 		/// Type

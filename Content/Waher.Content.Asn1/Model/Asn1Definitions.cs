@@ -113,7 +113,7 @@ namespace Waher.Content.Asn1.Model
 							ImportedDocument = State.Settings.GetDocument(Import.Module);
 						else
 						{
-							ImportedDocument = Import.LoadDocument(State.Settings);
+							ImportedDocument = Import.LoadDocument();
 							string CSharp = ImportedDocument.ExportCSharp(State.Settings);
 							State.Settings.AddCode(Import.Module, CSharp, ImportedDocument);
 						}
@@ -153,7 +153,7 @@ namespace Waher.Content.Asn1.Model
 							{
 								if (Node is Asn1TypeDefinition TypeDef &&
 									!TypeDef.ConstructedType &&
-									Array.IndexOf<string>(Import.Identifiers, TypeDef.TypeName) >= 0)
+									Array.IndexOf<string>(Import.Identifiers, TypeDef.Name) >= 0)
 								{
 									TypeDef.ExportCSharp(Output, State, Indent, CSharpExportPass.Preprocess);
 								}

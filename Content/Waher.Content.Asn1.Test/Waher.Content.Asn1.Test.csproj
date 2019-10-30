@@ -14,6 +14,7 @@
     <None Remove="Examples\RFC1157-SNMP.asn1" />
     <None Remove="Examples\SNMPv1\RFC1155-SMI.asn1" />
     <None Remove="Examples\SNMPv1\RFC1158-MIB.asn1" />
+    <None Remove="Examples\SNMPv1\RFC1212.asn1" />
     <None Remove="Examples\SNMPv1\RFC1213-MIB.asn1" />
     <None Remove="Examples\World-Schema.asn1" />
   </ItemGroup>
@@ -35,6 +36,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Examples\SNMPv1\RFC1158-MIB.asn1">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Examples\SNMPv1\RFC1212.asn1">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Examples\SNMPv1\RFC1213-MIB.asn1">

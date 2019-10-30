@@ -25,6 +25,9 @@
 
                -- object types
 
+          DisplayString ::=
+              OCTET STRING
+
                -- the System group
 
                sysDescr OBJECT-TYPE

@@ -482,12 +482,13 @@
             Represents an ASN.1 document.
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Asn1Document.#ctor(System.String,System.String)">
+        <member name="M:Waher.Content.Asn1.Asn1Document.#ctor(System.String,System.String,System.String[])">
             <summary>
             Represents an ASN.1 document.
             </summary>
             <param name="Text">ASN.1 text to parse.</param>
             <param name="Location">Location of file.</param>
+            <param name="ImportFolders">Import Folders.</param>
         </member>
         <member name="P:Waher.Content.Asn1.Asn1Document.Root">
             <summary>
@@ -504,11 +505,17 @@
             Location of document.
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Asn1Document.FromFile(System.String)">
+        <member name="P:Waher.Content.Asn1.Asn1Document.ImportFolders">
+            <summary>
+            Import folders.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Asn1Document.FromFile(System.String,System.String[])">
             <summary>
             Read from file.
             </summary>
             <param name="FileName">Filename.</param>
+            <param name="ImportFolders">Import folders.</param>
             <returns>ASN.1 document</returns>
         </member>
         <member name="M:Waher.Content.Asn1.Asn1Document.ExportCSharp(Waher.Content.Asn1.CSharpExportSettings)">
@@ -710,17 +717,11 @@
             Base Namespace
             </summary>
         </member>
-        <member name="F:Waher.Content.Asn1.CSharpExportSettings.ImportFolders">
-            <summary>
-            Import folders.
-            </summary>
-        </member>
-        <member name="M:Waher.Content.Asn1.CSharpExportSettings.#ctor(System.String,System.String[])">
+        <member name="M:Waher.Content.Asn1.CSharpExportSettings.#ctor(System.String)">
             <summary>
             What encoders and decoders to include in the generation of C# code.
             </summary>
             <param name="BaseNamespace">Base namespace of generated code.</param>
-            <param name="ImportFolders">Import folders.</param>
         </member>
         <member name="M:Waher.Content.Asn1.CSharpExportSettings.Namespace(System.String)">
             <summary>
@@ -1046,6 +1047,14 @@
             <param name="Indent">Indentation</param>
             <param name="Pass">Export pass</param>
         </member>
+        <member name="M:Waher.Content.Asn1.Model.Asn1Choice.Parse(Waher.Content.Asn1.Asn1Document,Waher.Content.Asn1.Model.Macro.Asn1Macro)">
+            <summary>
+            Parses the portion of the document at the current position, according to the type.
+            </summary>
+            <param name="Document">ASN.1 document being parsed.</param>
+            <param name="Macro">Macro performing parsing.</param>
+            <returns>Parsed ASN.1 node.</returns>
+        </member>
         <member name="T:Waher.Content.Asn1.Model.Asn1ComplexType">
             <summary>
             Abstract base class for complex types.
@@ -1198,7 +1207,7 @@
             <param name="Tag">Tag</param>
             <param name="Type">Type.</param>
         </member>
-        <member name="P:Waher.Content.Asn1.Model.Asn1FieldDefinition.FieldName">
+        <member name="P:Waher.Content.Asn1.Model.Asn1FieldDefinition.Name">
             <summary>
             Field Name
             </summary>
@@ -1235,7 +1244,7 @@
             <param name="Type">Type</param>
             <param name="Value">Value</param>
         </member>
-        <member name="P:Waher.Content.Asn1.Model.Asn1FieldValueDefinition.FieldName">
+        <member name="P:Waher.Content.Asn1.Model.Asn1FieldValueDefinition.Name">
             <summary>
             Field Name
             </summary>
@@ -1282,11 +1291,10 @@
             Module reference.
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Asn1Import.LoadDocument(Waher.Content.Asn1.CSharpExportSettings)">
+        <member name="M:Waher.Content.Asn1.Model.Asn1Import.LoadDocument">
             <summary>
             Loads the ASN.1 document to import.
             </summary>
-            <param name="Settings">Export settings.</param>
             <exception cref="T:System.IO.FileNotFoundException">If the import file is not found.</exception>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Asn1List">
@@ -1552,6 +1560,14 @@
             If the type is a constructed type.
             </summary>
         </member>
+        <member name="M:Waher.Content.Asn1.Model.Asn1Type.Parse(Waher.Content.Asn1.Asn1Document,Waher.Content.Asn1.Model.Macro.Asn1Macro)">
+            <summary>
+            Parses the portion of the document at the current position, according to the type.
+            </summary>
+            <param name="Document">ASN.1 document being parsed.</param>
+            <param name="Macro">Macro performing parsing.</param>
+            <returns>Parsed ASN.1 node.</returns>
+        </member>
         <member name="T:Waher.Content.Asn1.Model.Asn1TypeDefinition">
             <summary>
             Represents an ASN.1 Type definition.
@@ -1565,7 +1581,7 @@
             <param name="Tag">Tag</param>
             <param name="Definition">Definition</param>
         </member>
-        <member name="P:Waher.Content.Asn1.Model.Asn1TypeDefinition.TypeName">
+        <member name="P:Waher.Content.Asn1.Model.Asn1TypeDefinition.Name">
             <summary>
             Type Name
             </summary>
@@ -1579,6 +1595,14 @@
             <summary>
             Type definition
             </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Asn1TypeDefinition.Parse(Waher.Content.Asn1.Asn1Document,Waher.Content.Asn1.Model.Macro.Asn1Macro)">
+            <summary>
+            Parses the portion of the document at the current position, according to the type.
+            </summary>
+            <param name="Document">ASN.1 document being parsed.</param>
+            <param name="Macro">Macro performing parsing.</param>
+            <returns>Parsed ASN.1 node.</returns>
         </member>
         <member name="M:Waher.Content.Asn1.Model.Asn1TypeDefinition.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportState,System.Int32,Waher.Content.Asn1.Model.CSharpExportPass)">
             <summary>
@@ -1614,18 +1638,35 @@
             Abstract base class for sets of values
             </summary>
         </member>
+        <member name="T:Waher.Content.Asn1.Model.INamedNode">
+            <summary>
+            Named ASN.1 node.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.INamedNode.Name">
+            <summary>
+            Name of node.
+            </summary>
+        </member>
         <member name="T:Waher.Content.Asn1.Model.Macro.Asn1Macro">
             <summary>
             ASN.1 Macro
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Macro.Asn1Macro.#ctor(Waher.Content.Asn1.Model.Macro.UserDefinedItem,Waher.Content.Asn1.Model.Macro.UserDefinedItem,Waher.Content.Asn1.Model.Macro.SupportingSyntax[])">
+        <member name="M:Waher.Content.Asn1.Model.Macro.Asn1Macro.#ctor(System.String,Waher.Content.Asn1.Model.Macro.UserDefinedItem,Waher.Content.Asn1.Model.Macro.UserDefinedItem,Waher.Content.Asn1.Model.Macro.SupportingSyntax[],Waher.Content.Asn1.Asn1Document)">
             <summary>
             ASN.1 Macro
             </summary>
+            <param name="Name">Name of macro.</param>
             <param name="TypeNotation">Type Notation</param>
             <param name="ValueNotation">Value Notation</param>
             <param name="SupportingSyntax">Supporting Syntax</param>
+            <param name="Document">Document defining macro.</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Macro.Asn1Macro.Name">
+            <summary>
+            Name of macro.
+            </summary>
         </member>
         <member name="P:Waher.Content.Asn1.Model.Macro.Asn1Macro.TypeNotation">
             <summary>
@@ -1641,6 +1682,19 @@
             <summary>
             Supporting syntax
             </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Macro.Asn1Macro.Document">
+            <summary>
+            ASN.1 document defining macro.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Macro.Asn1Macro.Parse(Waher.Content.Asn1.Asn1Document)">
+            <summary>
+            Parses the portion of the document at the current position, according to the
+            instructions available in the macro.
+            </summary>
+            <param name="Document">ASN.1 document being parsed.</param>
+            <returns>Parsed ASN.1 node.</returns>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Macro.SupportingSyntax">
             <summary>
@@ -1664,10 +1718,28 @@
             Notation
             </summary>
         </member>
+        <member name="M:Waher.Content.Asn1.Model.Macro.SupportingSyntax.Parse(Waher.Content.Asn1.Asn1Document,Waher.Content.Asn1.Model.Macro.Asn1Macro)">
+            <summary>
+            Parses the portion of the document at the current position, according to the
+            instructions available in the macro.
+            </summary>
+            <param name="Document">ASN.1 document being parsed.</param>
+            <param name="Macro">Macro being executed.</param>
+            <returns>Parsed ASN.1 node.</returns>
+        </member>
         <member name="T:Waher.Content.Asn1.Model.Macro.UserDefinedItem">
             <summary>
             Abstract base class for user-defined parts in macros
             </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Macro.UserDefinedItem.Parse(Waher.Content.Asn1.Asn1Document,Waher.Content.Asn1.Model.Macro.Asn1Macro)">
+            <summary>
+            Parses the portion of the document at the current position, according to the
+            instructions available in the macro.
+            </summary>
+            <param name="Document">ASN.1 document being parsed.</param>
+            <param name="Macro">Macro being executed.</param>
+            <returns>Parsed ASN.1 node.</returns>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Macro.UserDefinedLiteral">
             <summary>
@@ -1685,6 +1757,15 @@
             String literal
             </summary>
         </member>
+        <member name="M:Waher.Content.Asn1.Model.Macro.UserDefinedLiteral.Parse(Waher.Content.Asn1.Asn1Document,Waher.Content.Asn1.Model.Macro.Asn1Macro)">
+            <summary>
+            Parses the portion of the document at the current position, according to the
+            instructions available in the macro.
+            </summary>
+            <param name="Document">ASN.1 document being parsed.</param>
+            <param name="Macro">Macro being executed.</param>
+            <returns>Parsed ASN.1 node.</returns>
+        </member>
         <member name="T:Waher.Content.Asn1.Model.Macro.UserDefinedOption">
             <summary>
             One option of many
@@ -1700,6 +1781,15 @@
             <summary>
             Items comprising option
             </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Macro.UserDefinedOption.Parse(Waher.Content.Asn1.Asn1Document,Waher.Content.Asn1.Model.Macro.Asn1Macro)">
+            <summary>
+            Parses the portion of the document at the current position, according to the
+            instructions available in the macro.
+            </summary>
+            <param name="Document">ASN.1 document being parsed.</param>
+            <param name="Macro">Macro being executed.</param>
+            <returns>Parsed ASN.1 node.</returns>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Macro.UserDefinedOptions">
             <summary>
@@ -1717,6 +1807,15 @@
             Options
             </summary>
         </member>
+        <member name="M:Waher.Content.Asn1.Model.Macro.UserDefinedOptions.Parse(Waher.Content.Asn1.Asn1Document,Waher.Content.Asn1.Model.Macro.Asn1Macro)">
+            <summary>
+            Parses the portion of the document at the current position, according to the
+            instructions available in the macro.
+            </summary>
+            <param name="Document">ASN.1 document being parsed.</param>
+            <param name="Macro">Macro being executed.</param>
+            <returns>Parsed ASN.1 node.</returns>
+        </member>
         <member name="T:Waher.Content.Asn1.Model.Macro.UserDefinedPart">
             <summary>
             Un-typed user-defined part.
@@ -1732,6 +1831,15 @@
             <summary>
             Identifier
             </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Macro.UserDefinedPart.Parse(Waher.Content.Asn1.Asn1Document,Waher.Content.Asn1.Model.Macro.Asn1Macro)">
+            <summary>
+            Parses the portion of the document at the current position, according to the
+            instructions available in the macro.
+            </summary>
+            <param name="Document">ASN.1 document being parsed.</param>
+            <param name="Macro">Macro being executed.</param>
+            <returns>Parsed ASN.1 node.</returns>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Macro.UserDefinedSpecifiedPart">
             <summary>
@@ -1755,6 +1863,15 @@
             <summary>
             Type
             </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Macro.UserDefinedSpecifiedPart.Parse(Waher.Content.Asn1.Asn1Document,Waher.Content.Asn1.Model.Macro.Asn1Macro)">
+            <summary>
+            Parses the portion of the document at the current position, according to the
+            instructions available in the macro.
+            </summary>
+            <param name="Document">ASN.1 document being parsed.</param>
+            <param name="Macro">Macro being executed.</param>
+            <returns>Parsed ASN.1 node.</returns>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Restrictions.Asn1And">
             <summary>
@@ -2027,6 +2144,14 @@
             ANY
             </summary>
         </member>
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1Any.Parse(Waher.Content.Asn1.Asn1Document,Waher.Content.Asn1.Model.Macro.Asn1Macro)">
+            <summary>
+            Parses the portion of the document at the current position, according to the type.
+            </summary>
+            <param name="Document">ASN.1 document being parsed.</param>
+            <param name="Macro">Macro performing parsing.</param>
+            <returns>Parsed ASN.1 node.</returns>
+        </member>
         <member name="M:Waher.Content.Asn1.Model.Types.Asn1Any.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportState,System.Int32,Waher.Content.Asn1.Model.CSharpExportPass)">
             <summary>
             Exports to C#
@@ -2076,6 +2201,14 @@
             <summary>
             BOOLEAN
             </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1Boolean.Parse(Waher.Content.Asn1.Asn1Document,Waher.Content.Asn1.Model.Macro.Asn1Macro)">
+            <summary>
+            Parses the portion of the document at the current position, according to the type.
+            </summary>
+            <param name="Document">ASN.1 document being parsed.</param>
+            <param name="Macro">Macro performing parsing.</param>
+            <returns>Parsed ASN.1 node.</returns>
         </member>
         <member name="M:Waher.Content.Asn1.Model.Types.Asn1Boolean.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportState,System.Int32,Waher.Content.Asn1.Model.CSharpExportPass)">
             <summary>
@@ -2227,6 +2360,14 @@
             INTEGER
             </summary>
         </member>
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1Integer.Parse(Waher.Content.Asn1.Asn1Document,Waher.Content.Asn1.Model.Macro.Asn1Macro)">
+            <summary>
+            Parses the portion of the document at the current position, according to the type.
+            </summary>
+            <param name="Document">ASN.1 document being parsed.</param>
+            <param name="Macro">Macro performing parsing.</param>
+            <returns>Parsed ASN.1 node.</returns>
+        </member>
         <member name="M:Waher.Content.Asn1.Model.Types.Asn1Integer.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportState,System.Int32,Waher.Content.Asn1.Model.CSharpExportPass)">
             <summary>
             Exports to C#
@@ -2293,6 +2434,14 @@
             If it is a relative object ID.
             </summary>
         </member>
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1ObjectIdentifier.Parse(Waher.Content.Asn1.Asn1Document,Waher.Content.Asn1.Model.Macro.Asn1Macro)">
+            <summary>
+            Parses the portion of the document at the current position, according to the type.
+            </summary>
+            <param name="Document">ASN.1 document being parsed.</param>
+            <param name="Macro">Macro performing parsing.</param>
+            <returns>Parsed ASN.1 node.</returns>
+        </member>
         <member name="M:Waher.Content.Asn1.Model.Types.Asn1ObjectIdentifier.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportState,System.Int32,Waher.Content.Asn1.Model.CSharpExportPass)">
             <summary>
             Exports to C#
@@ -2343,6 +2492,14 @@
             REAL
             </summary>
         </member>
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1Real.Parse(Waher.Content.Asn1.Asn1Document,Waher.Content.Asn1.Model.Macro.Asn1Macro)">
+            <summary>
+            Parses the portion of the document at the current position, according to the type.
+            </summary>
+            <param name="Document">ASN.1 document being parsed.</param>
+            <param name="Macro">Macro performing parsing.</param>
+            <returns>Parsed ASN.1 node.</returns>
+        </member>
         <member name="M:Waher.Content.Asn1.Model.Types.Asn1Real.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportState,System.Int32,Waher.Content.Asn1.Model.CSharpExportPass)">
             <summary>
             Exports to C#
@@ -2361,6 +2518,14 @@
             <summary>
             Abstract base class for string types
             </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1StringType.Parse(Waher.Content.Asn1.Asn1Document,Waher.Content.Asn1.Model.Macro.Asn1Macro)">
+            <summary>
+            Parses the portion of the document at the current position, according to the type.
+            </summary>
+            <param name="Document">ASN.1 document being parsed.</param>
+            <param name="Macro">Macro performing parsing.</param>
+            <returns>Parsed ASN.1 node.</returns>
         </member>
         <member name="M:Waher.Content.Asn1.Model.Types.Asn1StringType.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportState,System.Int32,Waher.Content.Asn1.Model.CSharpExportPass)">
             <summary>
@@ -2436,6 +2601,14 @@
             <param name="State">C# export state.</param>
             <param name="Indent">Indentation</param>
             <param name="Pass">Export pass</param>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1TypeReference.Parse(Waher.Content.Asn1.Asn1Document,Waher.Content.Asn1.Model.Macro.Asn1Macro)">
+            <summary>
+            Parses the portion of the document at the current position, according to the type.
+            </summary>
+            <param name="Document">ASN.1 document being parsed.</param>
+            <param name="Macro">Macro performing parsing.</param>
+            <returns>Parsed ASN.1 node.</returns>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Types.Asn1UniversalString">
             <summary>

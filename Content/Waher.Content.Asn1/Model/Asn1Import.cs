@@ -14,6 +14,7 @@ namespace Waher.Content.Asn1.Model
 		private readonly string[] identifiers;
 		private readonly string module;
 		private readonly Asn1Document document;
+		private Asn1Document importedDocument;
 
 		/// <summary>
 		/// Represents one import instruction.
@@ -26,6 +27,7 @@ namespace Waher.Content.Asn1.Model
 			this.identifiers = Identifiers;
 			this.module = Module;
 			this.document = Document;
+			this.importedDocument = null;
 		}
 
 		/// <summary>
@@ -41,10 +43,12 @@ namespace Waher.Content.Asn1.Model
 		/// <summary>
 		/// Loads the ASN.1 document to import.
 		/// </summary>
-		/// <param name="Settings">Export settings.</param>
 		/// <exception cref="FileNotFoundException">If the import file is not found.</exception>
-		public Asn1Document LoadDocument(CSharpExportSettings Settings)
+		public Asn1Document LoadDocument()
 		{
+			if (!(this.importedDocument is null))
+				return this.importedDocument;
+
 			string Folder = Path.GetDirectoryName(this.document.Location);
 			string FileName = Path.Combine(Folder, this.module);
 			string Extension = Path.GetExtension(this.document.Location);
@@ -53,7 +57,7 @@ namespace Waher.Content.Asn1.Model
 			{
 				FileName = null;
 
-				foreach (string ImportFolder in Settings.ImportFolders)
+				foreach (string ImportFolder in this.document.ImportFolders)
 				{
 					FileName = Path.Combine(ImportFolder, this.module) + Extension;
 					if (File.Exists(FileName))
@@ -66,7 +70,9 @@ namespace Waher.Content.Asn1.Model
 					throw new FileNotFoundException("Unable to find import file for module " + this.module);
 			}
 
-			return Asn1Document.FromFile(FileName);
+			this.importedDocument = Asn1Document.FromFile(FileName, this.document.ImportFolders);
+
+			return this.importedDocument;
 		}
 
 	}

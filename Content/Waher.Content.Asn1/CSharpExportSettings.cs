@@ -23,19 +23,12 @@ namespace Waher.Content.Asn1
 		public string BaseNamespace;
 
 		/// <summary>
-		/// Import folders.
-		/// </summary>
-		public string[] ImportFolders;
-
-		/// <summary>
 		/// What encoders and decoders to include in the generation of C# code.
 		/// </summary>
 		/// <param name="BaseNamespace">Base namespace of generated code.</param>
-		/// <param name="ImportFolders">Import folders.</param>
-		public CSharpExportSettings(string BaseNamespace, params string[] ImportFolders)
+		public CSharpExportSettings(string BaseNamespace)
 		{
 			this.BaseNamespace = BaseNamespace;
-			this.ImportFolders = ImportFolders;
 		}
 
 		/// <summary>

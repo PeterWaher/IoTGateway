@@ -24,5 +24,22 @@ namespace Waher.Content.Asn1.Model.Macro
 		/// Items comprising option
 		/// </summary>
 		public UserDefinedItem[] Items => this.items;
+
+		/// <summary>
+		/// Parses the portion of the document at the current position, according to the
+		/// instructions available in the macro.
+		/// </summary>
+		/// <param name="Document">ASN.1 document being parsed.</param>
+		/// <param name="Macro">Macro being executed.</param>
+		/// <returns>Parsed ASN.1 node.</returns>
+		public override Asn1Node Parse(Asn1Document Document, Asn1Macro Macro)
+		{
+			Asn1Node Result = null;
+
+			foreach (UserDefinedItem Item in this.items)
+				Result = Item.Parse(Document, Macro);
+
+			return Result;
+		}
 	}
 }

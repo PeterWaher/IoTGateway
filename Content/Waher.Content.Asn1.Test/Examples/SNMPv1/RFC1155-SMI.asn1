@@ -39,6 +39,7 @@ BEGIN
     Status ::= "mandatory"
                     | "optional"
                     | "obsolete"
+                    | "deprecated"
 END
 
     -- names of objects in the MIB

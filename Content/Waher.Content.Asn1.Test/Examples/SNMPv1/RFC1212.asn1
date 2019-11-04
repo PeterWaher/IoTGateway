@@ -2,7 +2,7 @@
 
 
           IMPORTS
-              ObjectName
+              ObjectName, ObjectSyntax, empty
                   FROM RFC1155-SMI;
 
           DisplayString ::=

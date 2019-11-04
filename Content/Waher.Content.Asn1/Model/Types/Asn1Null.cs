@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Waher.Content.Asn1.Model.Macro;
 
 namespace Waher.Content.Asn1.Model.Types
 {
@@ -28,6 +29,17 @@ namespace Waher.Content.Asn1.Model.Types
 		{
 			if (Pass == CSharpExportPass.Explicit)
 				Output.Append("Object");
+		}
+
+		/// <summary>
+		/// Parses the portion of the document at the current position, according to the type.
+		/// </summary>
+		/// <param name="Document">ASN.1 document being parsed.</param>
+		/// <param name="Macro">Macro performing parsing.</param>
+		/// <returns>Parsed ASN.1 node.</returns>
+		public override Asn1Node Parse(Asn1Document Document, Asn1Macro Macro)
+		{
+			return null;
 		}
 
 	}

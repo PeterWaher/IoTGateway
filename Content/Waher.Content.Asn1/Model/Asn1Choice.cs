@@ -27,6 +27,35 @@ namespace Waher.Content.Asn1.Model
 		public override bool ConstructedType => true;
 
 		/// <summary>
+		/// Parses the portion of the document at the current position, according to the type.
+		/// </summary>
+		/// <param name="Document">ASN.1 document being parsed.</param>
+		/// <param name="Macro">Macro performing parsing.</param>
+		/// <returns>Parsed ASN.1 node.</returns>
+		public override Asn1Node Parse(Asn1Document Document, Asn1Macro Macro)
+		{
+			int Bak = Document.pos;
+
+			foreach (Asn1Node Choice in this.Nodes)
+			{
+				if (Choice is Asn1Type Type)
+				{
+					try
+					{
+						Document.pos = Bak;
+						return Type.Parse(Document, Macro);
+					}
+					catch (Exception)
+					{
+						// Ignore
+					}
+				}
+			}
+
+			throw Document.SyntaxError("Unable to parse choices.");
+		}
+
+		/// <summary>
 		/// Exports to C#
 		/// </summary>
 		/// <param name="Output">C# Output.</param>
@@ -116,19 +145,5 @@ namespace Waher.Content.Asn1.Model
 				}
 			}
 		}
-
-		/// <summary>
-		/// Parses the portion of the document at the current position, according to the type.
-		/// </summary>
-		/// <param name="Document">ASN.1 document being parsed.</param>
-		/// <param name="Macro">Macro performing parsing.</param>
-		/// <returns>Parsed ASN.1 node.</returns>
-		public override Asn1Node Parse(Asn1Document Document, Asn1Macro Macro)
-		{
-			Asn1Value Value = Document.ParseValue();
-
-			return Value;
-		}
-
 	}
 }

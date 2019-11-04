@@ -1038,6 +1038,14 @@
             If the type is a constructed type.
             </summary>
         </member>
+        <member name="M:Waher.Content.Asn1.Model.Asn1Choice.Parse(Waher.Content.Asn1.Asn1Document,Waher.Content.Asn1.Model.Macro.Asn1Macro)">
+            <summary>
+            Parses the portion of the document at the current position, according to the type.
+            </summary>
+            <param name="Document">ASN.1 document being parsed.</param>
+            <param name="Macro">Macro performing parsing.</param>
+            <returns>Parsed ASN.1 node.</returns>
+        </member>
         <member name="M:Waher.Content.Asn1.Model.Asn1Choice.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportState,System.Int32,Waher.Content.Asn1.Model.CSharpExportPass)">
             <summary>
             Exports to C#
@@ -1046,14 +1054,6 @@
             <param name="State">C# export state.</param>
             <param name="Indent">Indentation</param>
             <param name="Pass">Export pass</param>
-        </member>
-        <member name="M:Waher.Content.Asn1.Model.Asn1Choice.Parse(Waher.Content.Asn1.Asn1Document,Waher.Content.Asn1.Model.Macro.Asn1Macro)">
-            <summary>
-            Parses the portion of the document at the current position, according to the type.
-            </summary>
-            <param name="Document">ASN.1 document being parsed.</param>
-            <param name="Macro">Macro performing parsing.</param>
-            <returns>Parsed ASN.1 node.</returns>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Asn1ComplexType">
             <summary>
@@ -2406,6 +2406,14 @@
             <param name="Indent">Indentation</param>
             <param name="Pass">Export pass</param>
         </member>
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1Null.Parse(Waher.Content.Asn1.Asn1Document,Waher.Content.Asn1.Model.Macro.Asn1Macro)">
+            <summary>
+            Parses the portion of the document at the current position, according to the type.
+            </summary>
+            <param name="Document">ASN.1 document being parsed.</param>
+            <param name="Macro">Macro performing parsing.</param>
+            <returns>Parsed ASN.1 node.</returns>
+        </member>
         <member name="T:Waher.Content.Asn1.Model.Types.Asn1NumericString">
             <summary>
             NumericString
@@ -2871,6 +2879,23 @@
         <member name="P:Waher.Content.Asn1.Model.Values.Asn1Oid.CSharpType">
             <summary>
             Corresponding C# type.
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Values.Asn1RestrictedValueReference">
+            <summary>
+            Represents a restricted ASN.1 value reference.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Values.Asn1RestrictedValueReference.#ctor(System.String,Waher.Content.Asn1.Model.Asn1Restriction)">
+            <summary>
+            Represents an ASN.1 value reference.
+            </summary>
+            <param name="Identifier">Identifier</param>
+            <param name="Restriction">Restriction</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Values.Asn1RestrictedValueReference.Restriction">
+            <summary>
+            Restriction
             </summary>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Values.Asn1StringValue">

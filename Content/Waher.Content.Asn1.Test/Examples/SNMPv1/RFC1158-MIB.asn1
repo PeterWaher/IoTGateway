@@ -662,7 +662,7 @@
                                    es-is(10),
                                    ciscoIgrp(11),
                                    bbnSpfIgp(12),
-                                   ospf(13)
+                                   ospf(13),
                                    bgp(14)
                            }
                        ACCESS  read-only

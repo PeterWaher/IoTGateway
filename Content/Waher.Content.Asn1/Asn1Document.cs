@@ -902,7 +902,7 @@ namespace Waher.Content.Asn1
 			return new Asn1Oid(Values);
 		}
 
-		private Asn1Type ParseType(string Name, bool TypeDef)
+		internal Asn1Type ParseType(string Name, bool TypeDef)
 		{
 			bool Implicit = false;
 
@@ -1028,6 +1028,13 @@ namespace Waher.Content.Asn1
 					if (s == "{")
 					{
 						Asn1Node[] Nodes = this.ParseList();
+
+						foreach (Asn1Node Node in Nodes)
+						{
+							if (Node is Asn1FieldDefinition FieldDef && !this.namedNodes.ContainsKey(FieldDef.Name))
+								this.namedNodes[FieldDef.Name] = FieldDef;
+						}
+
 						return new Asn1Choice(Name, TypeDef, Nodes);
 					}
 					else
@@ -1457,12 +1464,12 @@ namespace Waher.Content.Asn1
 								return new Asn1NamedValue(s, Value);
 
 							case "(":
-								this.pos++;
+								Asn1Restriction Restriction = this.ParseRestriction();
 
-								Value = this.ParseValue();
-								this.AssertNextToken(")");
-
-								return new Asn1NamedValue(s, Value);
+								if (Restriction is Asn1InSet Set && Set.Set is Asn1Element Element)
+									return new Asn1NamedValue(s, Element.Element);
+								else
+									return new Asn1RestrictedValueReference(s, Restriction);
 
 							default:
 								if (!char.IsUpper(s[0]))

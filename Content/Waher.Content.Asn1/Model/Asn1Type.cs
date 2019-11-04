@@ -112,7 +112,7 @@ namespace Waher.Content.Asn1.Model
 		/// <returns>Parsed ASN.1 node.</returns>
 		public virtual Asn1Node Parse(Asn1Document Document, Asn1Macro Macro)
 		{
-			throw Document.SyntaxError("Type not supported: " + this.GetType().FullName);
+			return Document.ParseValue();
 		}
 	}
 }

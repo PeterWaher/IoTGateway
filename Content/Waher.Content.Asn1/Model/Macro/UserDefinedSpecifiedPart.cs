@@ -7,7 +7,7 @@ namespace Waher.Content.Asn1.Model.Macro
 	/// <summary>
 	/// Typed user-defined part.
 	/// </summary>
-	public class UserDefinedSpecifiedPart : UserDefinedPart 
+	public class UserDefinedSpecifiedPart : UserDefinedPart
 	{
 		private readonly string name;
 		private readonly Asn1Type type;
@@ -44,7 +44,16 @@ namespace Waher.Content.Asn1.Model.Macro
 		/// <returns>Parsed ASN.1 node.</returns>
 		public override Asn1Node Parse(Asn1Document Document, Asn1Macro Macro)
 		{
-			return this.type.Parse(Document, Macro);
+			switch (this.name)
+			{
+				case "TYPE": return Document.ParseType(this.Identifier, false);
+				case "VALUE": return Document.ParseValue();
+				default:
+					if (this.Identifier == "type")
+						return Document.ParseType(this.Identifier, false);
+					else
+						return this.type.Parse(Document, Macro);
+			}
 		}
 	}
 }

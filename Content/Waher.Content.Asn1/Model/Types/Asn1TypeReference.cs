@@ -51,10 +51,12 @@ namespace Waher.Content.Asn1.Model.Types
 			if (!(Macro.Document.namedNodes.TryGetValue(this.identifier, out Asn1Node Node)))
 				throw Document.SyntaxError("Type named " + this.identifier + " not found.");
 
-			if (!(Node is Asn1Type Type))
-				throw Document.SyntaxError("Type expected.");
-
-			return Type.Parse(Document, Macro);
+			if (Node is Asn1Type Type)
+				return Type.Parse(Document, Macro);
+			else if (Node is Asn1FieldDefinition FieldDef)
+				return FieldDef.Type.Parse(Document, Macro);
+		
+			throw Document.SyntaxError("Type expected.");
 		}
 	}
 }

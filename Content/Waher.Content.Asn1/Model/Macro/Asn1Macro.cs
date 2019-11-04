@@ -68,6 +68,8 @@ namespace Waher.Content.Asn1.Model.Macro
 		{
 			this.typeNotation.Parse(Document, this);
 
+			Document.AssertNextToken("::=");
+
 			Asn1Node Node = this.valueNotation.Parse(Document, this);
 
 			if (!(Node is Asn1Value Value))

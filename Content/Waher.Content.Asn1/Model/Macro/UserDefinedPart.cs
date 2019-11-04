@@ -34,12 +34,14 @@ namespace Waher.Content.Asn1.Model.Macro
 		/// <returns>Parsed ASN.1 node.</returns>
 		public override Asn1Node Parse(Asn1Document Document, Asn1Macro Macro)
 		{
-			if (Document.namedNodes.TryGetValue(this.identifier, out Asn1Node Node))
+			if (Macro.Document.namedNodes.TryGetValue(this.identifier, out Asn1Node Node))
 			{
 				if (Node is Asn1TypeDefinition TypeDef)
 					return TypeDef.Definition.Parse(Document, Macro);
 				else if (Node is Asn1Type Type)
 					return Type.Parse(Document, Macro);
+				else if (Node is Asn1FieldDefinition FieldDef)
+					return FieldDef.Type.Parse(Document, Macro);
 				else
 					throw Document.SyntaxError("Type reference expected: " + this.identifier);
 			}

@@ -61,7 +61,7 @@ namespace Waher.Networking.HTTP
 		private static readonly Variables globalVariables = new Variables();
 
 #if WINDOWS_UWP
-		private LinkedList<KeyValuePair<StreamSocketListener, bool>> listeners = new LinkedList<KeyValuePair<StreamSocketListener, bool>>();
+		private LinkedList<KeyValuePair<StreamSocketListener, Guid>> listeners = new LinkedList<KeyValuePair<StreamSocketListener, Guid>>();
 #else
 		private LinkedList<KeyValuePair<TcpListener, bool>> listeners = new LinkedList<KeyValuePair<TcpListener, bool>>();
 		private X509Certificate serverCertificate;
@@ -82,10 +82,12 @@ namespace Waher.Networking.HTTP
 		private DateTime lastStat = DateTime.MinValue;
 		private string eTagSalt = string.Empty;
 		private string name = typeof(HttpServer).Namespace;
+		private int[] httpPorts;
 		private long nrBytesRx = 0;
 		private long nrBytesTx = 0;
 		private long nrCalls = 0;
 #if !WINDOWS_UWP
+		private int[] httpsPorts;
 		private int? upgradePort = null;
 		private bool closed = false;
 #endif
@@ -171,10 +173,52 @@ namespace Waher.Networking.HTTP
 			this.currentRequests.Removed += CurrentRequests_Removed;
 			this.lastStat = DateTime.Now;
 
+			this.httpPorts = new int[0];
 			this.AddHttpPorts(HttpPorts);
+
 #if !WINDOWS_UWP
+			this.httpsPorts = new int[0];
 			this.AddHttpsPorts(HttpsPorts);
 #endif
+			NetworkChange.NetworkAddressChanged += NetworkChange_NetworkAddressChanged;
+		}
+
+#if WINDOWS_UWP
+		private async void NetworkChange_NetworkAddressChanged(object sender, EventArgs e)
+#else
+		private void NetworkChange_NetworkAddressChanged(object sender, EventArgs e)
+#endif
+		{
+			try
+			{
+				int[] HttpPorts = this.httpPorts;
+				this.httpPorts = new int[0];
+
+#if WINDOWS_UWP
+				LinkedList<KeyValuePair<StreamSocketListener, Guid>> Listeners = this.listeners;
+				this.listeners = new LinkedList<KeyValuePair<StreamSocketListener, Guid>>();
+
+				await this.AddHttpPorts(HttpPorts, Listeners);
+
+				foreach (KeyValuePair<StreamSocketListener, Guid> P in Listeners)
+					P.Key.Dispose();
+#else
+				int[] HttpsPorts = this.httpsPorts;
+				this.httpsPorts = new int[0];
+				LinkedList<KeyValuePair<TcpListener, bool>> Listeners = this.listeners;
+				this.listeners = new LinkedList<KeyValuePair<TcpListener, bool>>();
+
+				this.AddHttpPorts(HttpPorts, Listeners);
+				this.AddHttpsPorts(HttpsPorts, Listeners);
+
+				foreach (KeyValuePair<TcpListener, bool> P in Listeners)
+					P.Key.Stop();
+#endif
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+			}
 		}
 
 #if WINDOWS_UWP
@@ -182,13 +226,25 @@ namespace Waher.Networking.HTTP
 		/// Opens additional HTTP ports, if not already open.
 		/// </summary>
 		/// <param name="HttpPorts">HTTP ports</param>
-		public async void AddHttpPorts(params int[] HttpPorts)
+		public async Task AddHttpPorts(params int[] HttpPorts)
+		{
+			this.AddHttpPorts(HttpPorts, null);
+		}
 #else
 		/// <summary>
 		/// Opens additional HTTP ports, if not already open.
 		/// </summary>
 		/// <param name="HttpPorts">HTTP ports</param>
 		public void AddHttpPorts(params int[] HttpPorts)
+		{
+			this.AddHttpPorts(HttpPorts, null);
+		}
+#endif
+
+#if WINDOWS_UWP
+		private async Task AddHttpPorts(int[] HttpPorts, LinkedList<KeyValuePair<StreamSocketListener, Guid>> Listeners)
+#else
+		private void AddHttpPorts(int[] HttpPorts, LinkedList<KeyValuePair<TcpListener, bool>> Listeners)
 #endif
 		{
 			if (HttpPorts is null)
@@ -196,8 +252,6 @@ namespace Waher.Networking.HTTP
 
 			try
 			{
-				int[] OldPorts = this.GetPorts(true, false);
-
 #if WINDOWS_UWP
 				StreamSocketListener Listener;
 
@@ -208,22 +262,47 @@ namespace Waher.Networking.HTTP
 
 					foreach (int HttpPort in HttpPorts)
 					{
-						if (Array.IndexOf<int>(OldPorts, HttpPort) >= 0)
+						if (Array.IndexOf<int>(this.httpPorts, HttpPort) >= 0)
 							continue;
 
-						try
-						{
-							Listener = new StreamSocketListener();
-							await Listener.BindServiceNameAsync(HttpPort.ToString(), SocketProtectionLevel.PlainSocket, Profile.NetworkAdapter);
-							Listener.ConnectionReceived += Listener_ConnectionReceived;
+						Listener = null;
 
-							this.listeners.AddLast(new KeyValuePair<StreamSocketListener, bool>(Listener, false));
-						}
-						catch (Exception ex)
+						LinkedListNode<KeyValuePair<StreamSocketListener, Guid>> Node;
+
+						Node = Listeners?.First;
+						while (!(Node is null))
 						{
-							this.failedPorts[HttpPort] = true;
-							Log.Critical(ex, Profile.ProfileName);
+							StreamSocketListener L = Node.Value.Key;
+							Guid AdapterId = Node.Value.Value;
+
+							if (AdapterId == Profile.NetworkAdapter.NetworkAdapterId)
+							{
+								Listener = L;
+								Listeners.Remove(Node);
+								break;
+							}
+
+							Node = Node.Next;
 						}
+
+						if (Listener is null)
+						{
+							try
+							{
+								Listener = new StreamSocketListener();
+								await Listener.BindServiceNameAsync(HttpPort.ToString(), SocketProtectionLevel.PlainSocket, Profile.NetworkAdapter);
+								Listener.ConnectionReceived += Listener_ConnectionReceived;
+
+								this.listeners.AddLast(new KeyValuePair<StreamSocketListener, Guid>(Listener, Profile.NetworkAdapter.NetworkAdapterId));
+							}
+							catch (Exception ex)
+							{
+								this.failedPorts[HttpPort] = true;
+								Log.Critical(ex, Profile.ProfileName);
+							}
+						}
+						else
+							this.listeners.AddLast(new KeyValuePair<StreamSocketListener, Guid>(Listener, Profile.NetworkAdapter.NetworkAdapterId));
 					}
 				}
 #else
@@ -243,34 +322,69 @@ namespace Waher.Networking.HTTP
 						{
 							foreach (int HttpPort in HttpPorts)
 							{
-								if (Array.IndexOf<int>(OldPorts, HttpPort) >= 0)
+								if (Array.IndexOf<int>(this.httpPorts, HttpPort) >= 0)
 									continue;
 
-								try
-								{
-									Listener = new TcpListener(UnicastAddress.Address, HttpPort);
-									Listener.Start(DefaultConnectionBacklog);
-									Task T = this.ListenForIncomingConnections(Listener, false);
+								Listener = null;
 
+								LinkedListNode<KeyValuePair<TcpListener, bool>> Node;
+								IPEndPoint DesiredEndpoint = new IPEndPoint(UnicastAddress.Address, HttpPort);
+
+								Node = Listeners?.First;
+								while (!(Node is null))
+								{
+									TcpListener L = Node.Value.Key;
+									bool Tls = Node.Value.Value;
+
+									if ((!Tls) && L.LocalEndpoint == DesiredEndpoint)
+									{
+										Listener = L;
+										Listeners.Remove(Node);
+										break;
+									}
+
+									Node = Node.Next;
+								}
+
+								if (Listener is null)
+								{
+									try
+									{
+										Listener = new TcpListener(UnicastAddress.Address, HttpPort);
+										Listener.Start(DefaultConnectionBacklog);
+										Task T = this.ListenForIncomingConnections(Listener, false);
+
+										this.listeners.AddLast(new KeyValuePair<TcpListener, bool>(Listener, false));
+									}
+									catch (SocketException)
+									{
+										this.failedPorts[HttpPort] = true;
+										Log.Error("Unable to open port for listening.",
+											new KeyValuePair<string, object>("Address", UnicastAddress.Address.ToString()),
+											new KeyValuePair<string, object>("Port", HttpPort));
+									}
+									catch (Exception ex)
+									{
+										this.failedPorts[HttpPort] = true;
+										Log.Critical(ex, UnicastAddress.Address.ToString() + ":" + HttpPort);
+									}
+								}
+								else
 									this.listeners.AddLast(new KeyValuePair<TcpListener, bool>(Listener, false));
-								}
-								catch (SocketException)
-								{
-									this.failedPorts[HttpPort] = true;
-									Log.Error("Unable to open port for listening.",
-										new KeyValuePair<string, object>("Address", UnicastAddress.Address.ToString()),
-										new KeyValuePair<string, object>("Port", HttpPort));
-								}
-								catch (Exception ex)
-								{
-									this.failedPorts[HttpPort] = true;
-									Log.Critical(ex, UnicastAddress.Address.ToString() + ":" + HttpPort);
-								}
 							}
 						}
 					}
 				}
 #endif
+				foreach (int HttpPort in HttpPorts)
+				{
+					if (Array.IndexOf<int>(this.httpPorts, HttpPort) < 0)
+					{
+						int c = this.httpPorts.Length;
+						Array.Resize<int>(ref this.httpPorts, c + 1);
+						this.httpPorts[c] = HttpPort;
+					}
+				}
 			}
 			catch (Exception ex)
 			{
@@ -285,12 +399,16 @@ namespace Waher.Networking.HTTP
 		/// <param name="HttpsPorts">HTTP ports</param>
 		public void AddHttpsPorts(params int[] HttpsPorts)
 		{
+			this.AddHttpsPorts(HttpsPorts, null);
+		}
+
+		private void AddHttpsPorts(int[] HttpsPorts, LinkedList<KeyValuePair<TcpListener, bool>> Listeners)
+		{
 			if (HttpsPorts is null)
 				return;
 
 			try
 			{
-				int[] OldPorts = this.GetPorts(false, true);
 				TcpListener Listener;
 
 				foreach (NetworkInterface Interface in NetworkInterface.GetAllNetworkInterfaces())
@@ -307,31 +425,67 @@ namespace Waher.Networking.HTTP
 						{
 							foreach (int HttpsPort in HttpsPorts)
 							{
-								if (Array.IndexOf<int>(OldPorts, HttpsPort) >= 0)
+								if (Array.IndexOf<int>(this.httpsPorts, HttpsPort) >= 0)
 									continue;
 
-								try
-								{
-									Listener = new TcpListener(UnicastAddress.Address, HttpsPort);
-									Listener.Start(DefaultConnectionBacklog);
-									Task T = this.ListenForIncomingConnections(Listener, true);
+								Listener = null;
 
+								LinkedListNode<KeyValuePair<TcpListener, bool>> Node;
+								IPEndPoint DesiredEndpoint = new IPEndPoint(UnicastAddress.Address, HttpsPort);
+
+								Node = Listeners?.First;
+								while (!(Node is null))
+								{
+									TcpListener L = Node.Value.Key;
+									bool Tls = Node.Value.Value;
+
+									if (Tls && L.LocalEndpoint == DesiredEndpoint)
+									{
+										Listener = L;
+										Listeners.Remove(Node);
+										break;
+									}
+
+									Node = Node.Next;
+								}
+
+								if (Listener is null)
+								{
+									try
+									{
+										Listener = new TcpListener(DesiredEndpoint);
+										Listener.Start(DefaultConnectionBacklog);
+										Task T = this.ListenForIncomingConnections(Listener, true);
+
+										this.listeners.AddLast(new KeyValuePair<TcpListener, bool>(Listener, true));
+									}
+									catch (SocketException)
+									{
+										this.failedPorts[HttpsPort] = true;
+										Log.Error("Unable to open port for listening.",
+											new KeyValuePair<string, object>("Address", UnicastAddress.Address.ToString()),
+											new KeyValuePair<string, object>("Port", HttpsPort));
+									}
+									catch (Exception ex)
+									{
+										this.failedPorts[HttpsPort] = true;
+										Log.Critical(ex, UnicastAddress.Address.ToString() + ":" + HttpsPort);
+									}
+								}
+								else
 									this.listeners.AddLast(new KeyValuePair<TcpListener, bool>(Listener, true));
-								}
-								catch (SocketException)
-								{
-									this.failedPorts[HttpsPort] = true;
-									Log.Error("Unable to open port for listening.",
-										new KeyValuePair<string, object>("Address", UnicastAddress.Address.ToString()),
-										new KeyValuePair<string, object>("Port", HttpsPort));
-								}
-								catch (Exception ex)
-								{
-									this.failedPorts[HttpsPort] = true;
-									Log.Critical(ex, UnicastAddress.Address.ToString() + ":" + HttpsPort);
-								}
 							}
 						}
+					}
+				}
+
+				foreach (int HttpsPort in HttpsPorts)
+				{
+					if (Array.IndexOf<int>(this.httpsPorts, HttpsPort) < 0)
+					{
+						int c = this.httpsPorts.Length;
+						Array.Resize<int>(ref this.httpsPorts, c + 1);
+						this.httpsPorts[c] = HttpsPort;
 					}
 				}
 			}
@@ -353,13 +507,13 @@ namespace Waher.Networking.HTTP
 			this.closed = true;
 #endif
 
-			if (this.listeners != null)
+			if (!(this.listeners is null))
 			{
 #if WINDOWS_UWP
-				LinkedList<KeyValuePair<StreamSocketListener, bool>> Listeners = this.listeners;
+				LinkedList<KeyValuePair<StreamSocketListener, Guid>> Listeners = this.listeners;
 				this.listeners = null;
 
-				foreach (KeyValuePair<StreamSocketListener, bool> Listener in Listeners)
+				foreach (KeyValuePair<StreamSocketListener, Guid> Listener in Listeners)
 					Listener.Key.Dispose();
 #else
 				LinkedList<KeyValuePair<TcpListener, bool>> Listeners = this.listeners;
@@ -488,9 +642,9 @@ namespace Waher.Networking.HTTP
 			if (this.listeners != null)
 			{
 #if WINDOWS_UWP
-				foreach (KeyValuePair<StreamSocketListener, bool> Listener in this.listeners)
+				foreach (KeyValuePair<StreamSocketListener, Guid> Listener in this.listeners)
 				{
-					if ((Listener.Value && Https) || ((!Listener.Value) && Http))
+					if (Http)
 					{
 						if (int.TryParse(Listener.Key.Information.LocalPort, out int i) && !this.failedPorts.ContainsKey(i))
 							Open[i] = true;
@@ -566,9 +720,9 @@ namespace Waher.Networking.HTTP
 		}
 #endif
 
-#endregion
+		#endregion
 
-#region Connections
+		#region Connections
 
 #if WINDOWS_UWP
 
@@ -638,7 +792,24 @@ namespace Waher.Networking.HTTP
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						if (this.closed || this.listeners is null)
+							break;
+
+						bool Found = false;
+
+						foreach (KeyValuePair<TcpListener, bool> P in this.listeners)
+						{
+							if (P.Key == Listener)
+							{
+								Found = true;
+								break;
+							}
+						}
+
+						if (Found)
+							Log.Critical(ex);
+						else
+							break;	// Removed, for instance due to network change
 					}
 				}
 			}
@@ -690,9 +861,9 @@ namespace Waher.Networking.HTTP
 
 #endif
 
-#endregion
+		#endregion
 
-#region Resources
+		#region Resources
 
 		/// <summary>
 		/// By default, this property is null. If not null, or empty, every request made to the web server will
@@ -949,9 +1120,9 @@ namespace Waher.Networking.HTTP
 			return ResourceName;
 		}
 
-#endregion
+		#endregion
 
-#region Sessions
+		#region Sessions
 
 		/// <summary>
 		/// Session timeout. Default is 20 minutes.
@@ -1027,9 +1198,9 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		public event CacheItemEventHandler<string, Variables> SessionRemoved = null;
 
-#endregion
+		#endregion
 
-#region Statistics
+		#region Statistics
 
 		/// <summary>
 		/// Call this method when data has been received.
@@ -1231,9 +1402,9 @@ namespace Waher.Networking.HTTP
 			}
 		}
 
-#endregion
+		#endregion
 
-#region GET
+		#region GET
 
 		/// <summary>
 		/// Performs an internal GET operation.
@@ -1276,7 +1447,7 @@ namespace Waher.Networking.HTTP
 				return new Tuple<int, string, byte[]>(NotFoundException.Code, NotFoundException.Msg, null);
 		}
 
-#endregion
+		#endregion
 
 		// TODO: Web Service resources
 	}

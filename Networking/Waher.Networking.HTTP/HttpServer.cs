@@ -174,13 +174,15 @@ namespace Waher.Networking.HTTP
 			this.lastStat = DateTime.Now;
 
 			this.httpPorts = new int[0];
-			this.AddHttpPorts(HttpPorts);
 
-#if !WINDOWS_UWP
+#if WINDOWS_UWP
+			Task _ = this.AddHttpPorts(HttpPorts);
+#else
+			this.AddHttpPorts(HttpPorts);
 			this.httpsPorts = new int[0];
 			this.AddHttpsPorts(HttpsPorts);
 #endif
-			NetworkChange.NetworkAddressChanged += NetworkChange_NetworkAddressChanged;
+			NetworkChange.NetworkAddressChanged += this.NetworkChange_NetworkAddressChanged;
 		}
 
 #if WINDOWS_UWP
@@ -228,13 +230,13 @@ namespace Waher.Networking.HTTP
 		/// <param name="HttpPorts">HTTP ports</param>
 		public async Task AddHttpPorts(params int[] HttpPorts)
 		{
-			this.AddHttpPorts(HttpPorts, null);
+			await this.AddHttpPorts(HttpPorts, null);
 		}
 #else
 		/// <summary>
 		/// Opens additional HTTP ports, if not already open.
 		/// </summary>
-		/// <param name="HttpPorts">HTTP ports</param>
+		/// <param name="HttpPorts">HTTP ports</param>33
 		public void AddHttpPorts(params int[] HttpPorts)
 		{
 			this.AddHttpPorts(HttpPorts, null);
@@ -506,6 +508,7 @@ namespace Waher.Networking.HTTP
 #if !WINDOWS_UWP
 			this.closed = true;
 #endif
+			NetworkChange.NetworkAddressChanged -= this.NetworkChange_NetworkAddressChanged;
 
 			if (!(this.listeners is null))
 			{

@@ -89,8 +89,20 @@ namespace Waher.Content.Asn1
 				{
 					this.pos += 2;
 
-					while (this.pos < this.len && (ch = this.text[this.pos]) != '\r' && ch != '\n')
+					while (this.pos < this.len)
+					{
+						ch = this.text[this.pos];
+						if (ch == '\r' || ch == '\n')
+							break;
+
+						if (ch == '-' && this.pos < this.len - 1 && this.text[this.pos + 1] == '-')
+						{
+							this.pos += 2;
+							break;
+						}
+
 						this.pos++;
+					}
 				}
 				else if (ch == '/' && this.pos < this.lenm1 && this.text[this.pos + 1] == '*')
 				{
@@ -503,7 +515,7 @@ namespace Waher.Content.Asn1
 				{
 					this.pos += s2.Length;
 
-					KeyValuePair<Asn1Type,Asn1Value> P = Macro.Parse(this);
+					KeyValuePair<Asn1Type, Asn1Value> P = Macro.Parse(this);
 
 					return new Asn1FieldValueDefinition(s, P.Key, P.Value);
 				}

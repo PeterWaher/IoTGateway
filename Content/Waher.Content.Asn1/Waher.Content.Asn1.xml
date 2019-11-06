@@ -2958,13 +2958,13 @@
             ASN.1 Object identifier
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.ObjectId.#ctor(System.Int32[])">
+        <member name="M:Waher.Content.Asn1.ObjectId.#ctor(System.UInt32[])">
             <summary>
             ASN.1 Object identifier
             </summary>
             <param name="Segments">Segments</param>
         </member>
-        <member name="M:Waher.Content.Asn1.ObjectId.#ctor(Waher.Content.Asn1.ObjectId,System.Int32[])">
+        <member name="M:Waher.Content.Asn1.ObjectId.#ctor(Waher.Content.Asn1.ObjectId,System.UInt32[])">
             <summary>
             ASN.1 Object identifier
             </summary>
@@ -2976,11 +2976,17 @@
             Segments of Object Identifier
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.ObjectId.op_Implicit(Waher.Content.Asn1.ObjectId)~System.Int32[]">
+        <member name="M:Waher.Content.Asn1.ObjectId.op_Implicit(Waher.Content.Asn1.ObjectId)~System.UInt32[]">
             <summary>
             Implicit converter to an integer array
             </summary>
             <param name="Id">Identity</param>
+        </member>
+        <member name="M:Waher.Content.Asn1.ObjectId.op_Implicit(System.UInt32[])~Waher.Content.Asn1.ObjectId">
+            <summary>
+            Implicit converter from an integer array
+            </summary>
+            <param name="Segments">Segments</param>
         </member>
         <member name="M:Waher.Content.Asn1.ObjectId.op_Implicit(System.Int32[])~Waher.Content.Asn1.ObjectId">
             <summary>

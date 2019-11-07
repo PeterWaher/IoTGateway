@@ -45,4 +45,8 @@
     <PackageReference Include="Lextm.SharpSnmpLib" Version="11.2.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\Content\Waher.Content.Asn1\Waher.Content.Asn1.csproj" />
+  </ItemGroup>
+
 </Project>

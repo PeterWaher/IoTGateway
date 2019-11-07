@@ -12,6 +12,7 @@ namespace Waher.Content.Asn1.Model
 		private readonly string fieldName;
 		private readonly Asn1Type type;
 		private readonly Asn1Value value;
+		private readonly Asn1Document document;
 
 		/// <summary>
 		/// Represents an ASN.1 field value definition.
@@ -19,12 +20,15 @@ namespace Waher.Content.Asn1.Model
 		/// <param name="FieldName">Field name.</param>
 		/// <param name="Type">Type</param>
 		/// <param name="Value">Value</param>
-		public Asn1FieldValueDefinition(string FieldName, Asn1Type Type, Asn1Value Value)
+		/// <param name="Document">ASN.1 Document in where the value is defined.</param>
+		public Asn1FieldValueDefinition(string FieldName, Asn1Type Type, Asn1Value Value, 
+			Asn1Document Document)
 			: base()
 		{
 			this.fieldName = FieldName;
 			this.type= Type;
 			this.value = Value;
+			this.document = Document;
 		}
 
 		/// <summary>
@@ -41,6 +45,11 @@ namespace Waher.Content.Asn1.Model
 		/// Type definition
 		/// </summary>
 		public Asn1Value Value => this.value;
+
+		/// <summary>
+		/// ASN.1 Document in where the value is defined.
+		/// </summary>
+		public Asn1Document Document => this.document;
 
 		/// <summary>
 		/// Exports to C#

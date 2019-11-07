@@ -132,7 +132,7 @@ namespace Waher.Content.Asn1.Model
 				Output.Append("namespace ");
 				Output.Append(State.Settings.BaseNamespace);
 				Output.Append('.');
-				Output.AppendLine(Asn1Node.ToCSharp(this.identifier));
+				Output.AppendLine(ToCSharp(this.identifier));
 				Output.Append(Tabs(Indent));
 				Output.AppendLine("{");
 				Indent++;

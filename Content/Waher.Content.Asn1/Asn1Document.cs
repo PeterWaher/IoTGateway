@@ -19,6 +19,8 @@ namespace Waher.Content.Asn1
 	public class Asn1Document
 	{
 		internal readonly Dictionary<string, Asn1Node> namedNodes = new Dictionary<string, Asn1Node>();
+		internal readonly Dictionary<string, Asn1TypeDefinition> aliases = new Dictionary<string, Asn1TypeDefinition>();
+		internal readonly Dictionary<string, Asn1FieldValueDefinition> values = new Dictionary<string, Asn1FieldValueDefinition>();
 		internal int pos = 0;
 		private readonly Asn1Definitions root;
 		private readonly string text;
@@ -402,6 +404,12 @@ namespace Waher.Content.Asn1
 								throw this.SyntaxError(Identifier + " not found in " + Import.Module);
 
 							this.namedNodes[Identifier] = ImportedNode;
+
+							if (Doc.aliases.TryGetValue(Identifier, out Asn1TypeDefinition TypeDef))
+								this.aliases[Identifier] = TypeDef;
+
+							if (Doc.values.TryGetValue(Identifier, out Asn1FieldValueDefinition ValueDef))
+								this.values[Identifier] = ValueDef;
 						}
 					}
 				}
@@ -516,8 +524,11 @@ namespace Waher.Content.Asn1
 					this.pos += s2.Length;
 
 					Asn1Value Value = Macro.Parse(this);
+					Asn1FieldValueDefinition ValueDef = new Asn1FieldValueDefinition(s, Macro.GetValueType(), Value, this);
 
-					return new Asn1FieldValueDefinition(s, Macro.GetValueType(), Value);
+					this.values[s] = ValueDef;
+
+					return ValueDef;
 				}
 				else
 				{
@@ -572,9 +583,13 @@ namespace Waher.Content.Asn1
 
 				if (char.IsUpper(ch))   // Type
 				{
-					Asn1Type TypeDefinition = this.ParseType(s, true);
+					Asn1Type Definition = this.ParseType(s, true);
+					Asn1TypeDefinition TypeDef = new Asn1TypeDefinition(s, Tag, Definition);
 
-					return new Asn1TypeDefinition(s, Tag, TypeDefinition);
+					if (!Definition.ConstructedType)
+						this.aliases[s] = TypeDef;
+
+					return TypeDef;
 				}
 				else                    // name
 				{
@@ -587,7 +602,11 @@ namespace Waher.Content.Asn1
 					{
 						this.pos += 3;
 						Asn1Value Value = this.ParseValue();
-						return new Asn1FieldValueDefinition(s, Type, Value);
+						Asn1FieldValueDefinition ValueDef = new Asn1FieldValueDefinition(s, Type, Value, this);
+
+						this.values[s] = ValueDef;
+
+						return ValueDef;
 					}
 					else
 						return new Asn1FieldDefinition(s, Tag, Type);
@@ -693,7 +712,7 @@ namespace Waher.Content.Asn1
 				if (this.PeekNextToken() == ")")
 				{
 					this.pos++;
-					return new UserDefinedSpecifiedPart(s, string.Empty, new Asn1TypeReference(Name));
+					return new UserDefinedSpecifiedPart(s, string.Empty, new Asn1TypeReference(Name, this));
 				}
 				else
 				{
@@ -956,13 +975,13 @@ namespace Waher.Content.Asn1
 							{
 								this.pos++;
 
-								NamedOptions.Add(new Asn1NamedValue(s2, this.ParseValue()));
+								NamedOptions.Add(new Asn1NamedValue(s2, this.ParseValue(), this));
 
 								if (this.NextToken() != ")")
 									throw this.SyntaxError(") expected");
 							}
 							else
-								NamedOptions.Add(new Asn1NamedValue(s2, null));
+								NamedOptions.Add(new Asn1NamedValue(s2, null, this));
 
 							s2 = this.NextToken();
 
@@ -1243,7 +1262,7 @@ namespace Waher.Content.Asn1
 
 				default:
 					if (char.IsUpper(s[0]))
-						return new Asn1TypeReference(s);
+						return new Asn1TypeReference(s, this);
 					else
 						throw this.SyntaxError("Type name expected.");
 			}
@@ -1303,7 +1322,7 @@ namespace Waher.Content.Asn1
 						int LastIndex = Items.Count - 1;
 
 						if (Items[LastIndex] is Asn1ValueReference Ref)
-							Items[LastIndex] = new Asn1NamedValue(Ref.Identifier, Value);
+							Items[LastIndex] = new Asn1NamedValue(Ref.Identifier, Value, this);
 						else
 							throw this.SyntaxError("Invalid value reference.");
 						break;
@@ -1473,19 +1492,19 @@ namespace Waher.Content.Asn1
 
 								this.pos++;
 								Asn1Value Value = this.ParseValue(false);
-								return new Asn1NamedValue(s, Value);
+								return new Asn1NamedValue(s, Value, this);
 
 							case "(":
 								Asn1Restriction Restriction = this.ParseRestriction();
 
 								if (Restriction is Asn1InSet Set && Set.Set is Asn1Element Element)
-									return new Asn1NamedValue(s, Element.Element);
+									return new Asn1NamedValue(s, Element.Element, this);
 								else
-									return new Asn1RestrictedValueReference(s, Restriction);
+									return new Asn1RestrictedValueReference(s, Restriction, this);
 
 							default:
 								if (!char.IsUpper(s[0]))
-									return new Asn1ValueReference(s);
+									return new Asn1ValueReference(s, this);
 								else
 									throw this.SyntaxError("Type references not permitted here.");
 						}

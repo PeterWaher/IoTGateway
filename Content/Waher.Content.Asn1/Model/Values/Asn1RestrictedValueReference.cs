@@ -16,8 +16,10 @@ namespace Waher.Content.Asn1.Model.Values
 		/// </summary>
 		/// <param name="Identifier">Identifier</param>
 		/// <param name="Restriction">Restriction</param>
-		public Asn1RestrictedValueReference(string Identifier, Asn1Restriction Restriction)
-			: base(Identifier)
+		/// <param name="Document">ASN.1 Document containing the reference</param>
+		public Asn1RestrictedValueReference(string Identifier, Asn1Restriction Restriction, 
+			Asn1Document Document)
+			: base(Identifier, Document)
 		{
 			this.restriction = Restriction;
 		}

@@ -16,8 +16,9 @@ namespace Waher.Content.Asn1.Model.Values
 		/// </summary>
 		/// <param name="Identifier">Identifier</param>
 		/// <param name="Value">Optional Value</param>
-		public Asn1NamedValue(string Identifier, Asn1Value Value)
-			: base(Identifier)
+		/// <param name="Document">ASN.1 Document containing the reference</param>
+		public Asn1NamedValue(string Identifier, Asn1Value Value, Asn1Document Document)
+			: base(Identifier, Document)
 		{
 			this.value = Value;
 		}

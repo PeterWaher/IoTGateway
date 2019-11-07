@@ -66,21 +66,6 @@ namespace Waher.Content.Asn1.Model
 		{
 			if (this.definition.ConstructedType)
 				this.definition.ExportCSharp(Output, State, Indent, Pass);
-			else if (Pass == CSharpExportPass.Preprocess)
-			{
-				if (!State.ExportingUsing)
-				{
-					State.ClosePending(Output);
-					State.ExportingUsing = true;
-				}
-
-				Output.Append(Tabs(Indent));
-				Output.Append("using ");
-				Output.Append(ToCSharp(this.typeName));
-				Output.Append(" = ");
-				this.definition.ExportCSharp(Output, State, Indent, CSharpExportPass.Explicit);
-				Output.AppendLine(";");
-			}
 		}
 	}
 }

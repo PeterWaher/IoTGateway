@@ -10,22 +10,30 @@ namespace Waher.Content.Asn1.Model.Types
 	/// </summary>
 	public class Asn1TypeReference : Asn1Type
 	{
+		private readonly Asn1Document document;
 		private readonly string identifier;
 
 		/// <summary>
 		/// Represents an ASN.1 type reference.
 		/// </summary>
 		/// <param name="Identifier">Identifier</param>
-		public Asn1TypeReference(string Identifier)
+		/// <param name="Document">ASN.1 Document containing the reference</param>
+		public Asn1TypeReference(string Identifier, Asn1Document Document)
 			: base()
 		{
 			this.identifier = Identifier;
+			this.document = Document;
 		}
 
 		/// <summary>
 		/// Identifier
 		/// </summary>
 		public string Identifier => identifier;
+
+		/// <summary>
+		/// ASN.1 Document in where the value is defined.
+		/// </summary>
+		public Asn1Document Document => this.document;
 
 		/// <summary>
 		/// Exports to C#
@@ -37,7 +45,12 @@ namespace Waher.Content.Asn1.Model.Types
 		public override void ExportCSharp(StringBuilder Output, CSharpExportState State, int Indent, CSharpExportPass Pass)
 		{
 			if (Pass == CSharpExportPass.Explicit)
-				Output.Append(ToCSharp(this.identifier));
+			{
+				if (this.document.aliases.TryGetValue(this.identifier, out Asn1TypeDefinition TypeDef))
+					TypeDef.Definition.ExportCSharp(Output, State, Indent, Pass);
+				else
+					Output.Append(ToCSharp(this.identifier));
+			}
 		}
 
 		/// <summary>
@@ -55,7 +68,7 @@ namespace Waher.Content.Asn1.Model.Types
 				return Type.Parse(Document, Macro);
 			else if (Node is Asn1FieldDefinition FieldDef)
 				return FieldDef.Type.Parse(Document, Macro);
-		
+
 			throw Document.SyntaxError("Type expected.");
 		}
 	}

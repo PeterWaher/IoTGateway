@@ -152,19 +152,49 @@ namespace Waher.Content.Asn1.Test
 		}
 
 		[TestMethod]
-		public void Test_09_1451_1()
+		public void Test_09_RFC1901_COMMUNITY_BASED_SNMPv2()
+		{
+			GenerateCSharp("SNMPv2\\COMMUNITY-BASED-SNMPv2.asn1");
+		}
+
+		[TestMethod]
+		public void Test_10_RFC2578_SNMPV2_SMI()
+		{
+			GenerateCSharp("SNMPv2\\SNMPV2-SMI.asn1");
+		}
+
+		[TestMethod]
+		public void Test_11_RFC2579_SNMPV2_TC()
+		{
+			GenerateCSharp("SNMPv2\\SNMPV2-TC.asn1");
+		}
+
+		[TestMethod]
+		public void Test_12_RFC2580_SNMPV2_CONF()
+		{
+			GenerateCSharp("SNMPv2\\SNMPV2-CONF.asn1");
+		}
+
+		[TestMethod]
+		public void Test_13_RFC3416_SNMPV2_PDU()
+		{
+			GenerateCSharp("SNMPv2\\SNMPV2-PDU.asn1");
+		}
+
+		[TestMethod]
+		public void Test_14_1451_1()
 		{
 			GenerateCSharp("IEEE1451\\P21451-N1-T1-MIB.asn1");
 		}
 
 		[TestMethod]
-		public void Test_10_1451_2()
+		public void Test_15_1451_2()
 		{
 			GenerateCSharp("IEEE1451\\P21451-N1-T2-MIB.asn1");
 		}
 
 		[TestMethod]
-		public void Test_11_1451_3()
+		public void Test_16_1451_3()
 		{
 			GenerateCSharp("IEEE1451\\P21451-N1-T3-MIB.asn1");
 		}

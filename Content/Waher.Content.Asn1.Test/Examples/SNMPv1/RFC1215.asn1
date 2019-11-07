@@ -1,7 +1,7 @@
           RFC1215 DEFINITIONS ::= BEGIN
 
           IMPORTS
-              ObjectName, empty
+              ObjectName
                   FROM RFC1155-SMI
               mib-2
                   FROM RFC1213-MIB;

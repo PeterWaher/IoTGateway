@@ -28,6 +28,7 @@ namespace Waher.Content.Asn1
 		private readonly string[] importFolders;
 		private readonly int len;
 		private readonly int lenm1;
+		private int unnamedIndex = 1;
 
 		/// <summary>
 		/// Represents an ASN.1 document.
@@ -459,6 +460,8 @@ namespace Waher.Content.Asn1
 
 			if (char.IsLetter(ch))
 			{
+				int PosBak = this.pos;
+
 				this.pos += s.Length;
 				s2 = this.PeekNextToken();
 
@@ -505,7 +508,7 @@ namespace Waher.Content.Asn1
 				{
 					this.pos += s2.Length;
 
-					Asn1Value Value = Macro.Parse(this);
+					Asn1Value Value = Macro.ParseValue(this);
 					Asn1FieldValueDefinition ValueDef = new Asn1FieldValueDefinition(s, Macro.GetValueType(), Value, this);
 
 					this.values[s] = ValueDef;
@@ -515,7 +518,12 @@ namespace Waher.Content.Asn1
 				else
 				{
 					if (char.IsUpper(ch))   // Type or macro
-						throw this.SyntaxError("Unexpected identifier.");
+					{
+						s2 = s;
+						s = "unnamed" + (this.unnamedIndex++).ToString();
+						ch = 'u';
+						this.pos = PosBak;
+					}
 				}
 
 				int? Tag = null;
@@ -565,7 +573,17 @@ namespace Waher.Content.Asn1
 
 				if (char.IsUpper(ch))   // Type
 				{
-					Asn1Type Definition = this.ParseType(s, true);
+					Asn1Type Definition;
+
+					if (this.namedNodes.TryGetValue(s2, out Asn1Node Node) &&
+						Node is Asn1Macro Macro)
+					{
+						this.pos += s2.Length;
+						Definition = Macro.ParseType(this);
+					}
+					else
+						Definition = this.ParseType(s, true);
+
 					Asn1TypeDefinition TypeDef = new Asn1TypeDefinition(s, Tag, Definition);
 
 					if (!Definition.ConstructedType)
@@ -1491,49 +1509,65 @@ namespace Waher.Content.Asn1
 									throw this.SyntaxError("Type references not permitted here.");
 						}
 					}
-					else if (long.TryParse(s, out long l))
+					else
 					{
 						Start = this.pos;
-						this.pos += s.Length;
 
-						ch = this.PeekNextChar();
-
-						if ((ch == '.' && this.pos < this.lenm1 && this.text[this.pos + 1] != '.') ||
-							ch == 'e' || ch == 'E')
+						bool Sign = s.StartsWith("-");
+						if (Sign)
 						{
-							int? DecPos = null;
-
-							if (ch == '.')
-							{
-								DecPos = this.pos++;
-								while (this.pos < this.len && char.IsDigit(ch = this.text[this.pos]))
-									this.pos++;
-							}
-
-							if (ch == 'e' || ch == 'E')
-							{
-								this.pos++;
-
-								if ((ch = this.PeekNextChar()) == '-' || ch == '+')
-									this.pos++;
-
-								while (this.pos < this.len && char.IsDigit(this.text[this.pos]))
-									this.pos++;
-							}
-
-							s = this.text.Substring(Start, this.pos - Start);
-
-							string s2 = NumberFormatInfo.CurrentInfo.CurrencyDecimalSeparator;
-							if (DecPos.HasValue && s2 != ".")
-								s = s.Replace(".", s2);
-
-							if (!double.TryParse(s, out double d))
-								throw this.SyntaxError("Invalid floating-point number.");
-
-							return new Asn1FloatingPointValue(d);
+							s = s.Substring(1);
+							this.pos++;
 						}
 
-						return new Asn1IntegerValue(l);
+						if (ulong.TryParse(s, out ulong l))
+						{
+							this.pos += s.Length;
+
+							ch = this.PeekNextChar();
+
+							if ((ch == '.' && this.pos < this.lenm1 && this.text[this.pos + 1] != '.') ||
+								ch == 'e' || ch == 'E')
+							{
+								int? DecPos = null;
+
+								if (ch == '.')
+								{
+									DecPos = this.pos++;
+									while (this.pos < this.len && char.IsDigit(ch = this.text[this.pos]))
+										this.pos++;
+								}
+
+								if (ch == 'e' || ch == 'E')
+								{
+									this.pos++;
+
+									if ((ch = this.PeekNextChar()) == '-' || ch == '+')
+										this.pos++;
+
+									while (this.pos < this.len && char.IsDigit(this.text[this.pos]))
+										this.pos++;
+								}
+
+								s = this.text.Substring(Start, this.pos - Start);
+
+								string s2 = NumberFormatInfo.CurrentInfo.CurrencyDecimalSeparator;
+								if (DecPos.HasValue && s2 != ".")
+									s = s.Replace(".", s2);
+
+								if (!double.TryParse(s, out double d))
+									throw this.SyntaxError("Invalid floating-point number.");
+
+								return new Asn1FloatingPointValue(d);
+							}
+
+							if (l <= long.MaxValue)
+								return new Asn1IntegerValue(Sign ? -(long)l : (long)l);
+							else if (Sign)
+								throw this.SyntaxError("Number does not fit into a 64-bit signed integer.");
+							else
+								return new Asn1UnsignedIntegerValue(l);
+						}
 					}
 					break;
 			}

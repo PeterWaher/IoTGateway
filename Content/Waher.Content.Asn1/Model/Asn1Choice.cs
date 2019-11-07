@@ -129,6 +129,7 @@ namespace Waher.Content.Asn1.Model
 					Indent++;
 
 					Output.Append(Tabs(Indent));
+					Output.Append("public ");
 					Output.Append(ToCSharp(this.Name));
 					if (!this.TypeDefinition)
 						Output.Append("Enum");

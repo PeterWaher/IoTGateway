@@ -1694,13 +1694,21 @@
             ASN.1 document defining macro.
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Model.Macro.Asn1Macro.Parse(Waher.Content.Asn1.Asn1Document)">
+        <member name="M:Waher.Content.Asn1.Model.Macro.Asn1Macro.ParseValue(Waher.Content.Asn1.Asn1Document)">
             <summary>
-            Parses the portion of the document at the current position, according to the
-            instructions available in the macro.
+            Parses a value from the portion of the document at the current position, 
+            according to the instructions available in the macro.
             </summary>
             <param name="Document">ASN.1 document being parsed.</param>
-            <returns>Parsed ASN.1 node.</returns>
+            <returns>Parsed ASN.1 value node.</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Macro.Asn1Macro.ParseType(Waher.Content.Asn1.Asn1Document)">
+            <summary>
+            Parses a type from the portion of the document at the current position, 
+            according to the instructions available in the macro.
+            </summary>
+            <param name="Document">ASN.1 document being parsed.</param>
+            <returns>Parsed ASN.1 type node.</returns>
         </member>
         <member name="M:Waher.Content.Asn1.Model.Macro.Asn1Macro.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportState,System.Int32,Waher.Content.Asn1.Model.CSharpExportPass)">
             <summary>
@@ -2968,6 +2976,36 @@
             <param name="Pass">Export pass</param>
         </member>
         <member name="P:Waher.Content.Asn1.Model.Values.Asn1StringValue.CSharpType">
+            <summary>
+            Corresponding C# type.
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Values.Asn1UnsignedIntegerValue">
+            <summary>
+            Unsigned Integer value
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Values.Asn1UnsignedIntegerValue.#ctor(System.UInt64)">
+            <summary>
+            Integer value
+            </summary>
+            <param name="Value">Value</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Values.Asn1UnsignedIntegerValue.Value">
+            <summary>
+            Value
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Values.Asn1UnsignedIntegerValue.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportState,System.Int32,Waher.Content.Asn1.Model.CSharpExportPass)">
+            <summary>
+            Exports to C#
+            </summary>
+            <param name="Output">C# Output.</param>
+            <param name="State">C# export state.</param>
+            <param name="Indent">Indentation</param>
+            <param name="Pass">Export pass</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Values.Asn1UnsignedIntegerValue.CSharpType">
             <summary>
             Corresponding C# type.
             </summary>

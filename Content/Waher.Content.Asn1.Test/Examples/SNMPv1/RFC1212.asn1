@@ -2,7 +2,7 @@
 
 
           IMPORTS
-              ObjectName, ObjectSyntax, empty, IpAddress
+              ObjectName, ObjectSyntax, IpAddress
                   FROM RFC1155-SMI;
 
           DisplayString ::=

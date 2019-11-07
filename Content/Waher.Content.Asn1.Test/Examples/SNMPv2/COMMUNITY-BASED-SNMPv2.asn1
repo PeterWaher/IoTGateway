@@ -1,0 +1,19 @@
+    COMMUNITY-BASED-SNMPv2 DEFINITIONS ::= BEGIN
+
+    -- top-level message
+
+        Message ::=
+                SEQUENCE {
+                     version
+                        INTEGER {
+                            version(1)  -- modified from RFC 1157
+                        },
+
+                    community           -- community name
+                        OCTET STRING,
+
+                    data                -- PDUs as defined in [4]
+                        ANY
+                }
+
+    END

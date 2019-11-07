@@ -65,12 +65,12 @@ namespace Waher.Content.Asn1.Model.Macro
 		public Asn1Document Document => this.document;
 
 		/// <summary>
-		/// Parses the portion of the document at the current position, according to the
-		/// instructions available in the macro.
+		/// Parses a value from the portion of the document at the current position, 
+		/// according to the instructions available in the macro.
 		/// </summary>
 		/// <param name="Document">ASN.1 document being parsed.</param>
-		/// <returns>Parsed ASN.1 node.</returns>
-		public Asn1Value Parse(Asn1Document Document)
+		/// <returns>Parsed ASN.1 value node.</returns>
+		public Asn1Value ParseValue(Asn1Document Document)
 		{
 			this.typeNotation.Parse(Document, this);
 
@@ -82,6 +82,20 @@ namespace Waher.Content.Asn1.Model.Macro
 				throw Document.SyntaxError("Value expected.");
 
 			return Value;
+		}
+
+		/// <summary>
+		/// Parses a type from the portion of the document at the current position, 
+		/// according to the instructions available in the macro.
+		/// </summary>
+		/// <param name="Document">ASN.1 document being parsed.</param>
+		/// <returns>Parsed ASN.1 type node.</returns>
+		public Asn1Type ParseType(Asn1Document Document)
+		{
+			if (this.typeNotation.Parse(Document, this) is Asn1Type Type)
+				return Type;
+			else
+				throw Document.SyntaxError("Unable to evaluate type.");
 		}
 
 		/// <summary>

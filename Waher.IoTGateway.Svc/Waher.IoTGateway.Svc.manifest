@@ -323,6 +323,10 @@
   <Assembly fileName='Waher.Utility.AnalyzeDB.dll' altFolder='..\..\..\..\Utilities\Waher.Utility.AnalyzeDB\bin\Release\PublishOutput\win-x86\'/>
   <Assembly fileName='Waher.Utility.AnalyzeDB.deps.json' altFolder='..\..\..\..\Utilities\Waher.Utility.AnalyzeDB\bin\Release\PublishOutput\win-x86\'/>
   <Assembly fileName='Waher.Utility.AnalyzeDB.runtimeconfig.json' altFolder='..\..\..\..\Utilities\Waher.Utility.AnalyzeDB\bin\Release\PublishOutput\win-x86\'/>
+  <Assembly fileName='Waher.Utility.Asn1ToCSharp.exe' altFolder='..\..\..\..\Utilities\Waher.Utility.Asn1ToCSharp\bin\Release\PublishOutput\win-x86\'/>
+  <Assembly fileName='Waher.Utility.Asn1ToCSharp.dll' altFolder='..\..\..\..\Utilities\Waher.Utility.Asn1ToCSharp\bin\Release\PublishOutput\win-x86\'/>
+  <Assembly fileName='Waher.Utility.Asn1ToCSharp.deps.json' altFolder='..\..\..\..\Utilities\Waher.Utility.Asn1ToCSharp\bin\Release\PublishOutput\win-x86\'/>
+  <Assembly fileName='Waher.Utility.Asn1ToCSharp.runtimeconfig.json' altFolder='..\..\..\..\Utilities\Waher.Utility.Asn1ToCSharp\bin\Release\PublishOutput\win-x86\'/>
   <Assembly fileName='Waher.Utility.Csp.exe' altFolder='..\..\..\..\Utilities\Waher.Utility.Csp\bin\Release\PublishOutput\win-x86\'/>
   <Assembly fileName='Waher.Utility.Csp.dll' altFolder='..\..\..\..\Utilities\Waher.Utility.Csp\bin\Release\PublishOutput\win-x86\'/>
   <Assembly fileName='Waher.Utility.Csp.deps.json' altFolder='..\..\..\..\Utilities\Waher.Utility.Csp\bin\Release\PublishOutput\win-x86\'/>

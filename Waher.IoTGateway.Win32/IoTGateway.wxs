@@ -895,7 +895,21 @@
               <File Id='Waher.Utility.AnalyzeDB.pdb' Name='Waher.Utility.AnalyzeDB.pdb' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.AnalyzeDB\bin\$(var.Configuration)\netcoreapp2.0\Waher.Utility.AnalyzeDB.pdb' Vital='yes' KeyPath='yes'/>
               <RemoveFile Id='RemoveWaher.Utility.AnalyzeDB.pdb' Name='Waher.Utility.AnalyzeDB.pdb' On='uninstall'/>
             </Component>
-						<Component Id='UtilityCsp' Guid='B423EE8C-0A9D-4F54-8633-8F6F2271F388'>
+            <Component Id='UtilityAsn1ToCSharp' Guid='17B26FD3-DB71-4FB4-86BC-DF8DED4DDC18'>
+              <File Id='Waher.Utility.Asn1ToCSharp.exe' Name='Waher.Utility.Asn1ToCSharp.exe' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Asn1ToCSharp\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.Asn1ToCSharp.exe' Vital='yes' KeyPath='yes'/>
+              <File Id='Waher.Utility.Asn1ToCSharp.dll' Name='Waher.Utility.Asn1ToCSharp.dll' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Asn1ToCSharp\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.Asn1ToCSharp.dll' Vital='yes'/>
+              <File Id='Waher.Utility.Asn1ToCSharp.deps.json' Name='Waher.Utility.Asn1ToCSharp.deps.json' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Asn1ToCSharp\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.Asn1ToCSharp.deps.json' Vital='yes'/>
+              <File Id='Waher.Utility.Asn1ToCSharp.runtimeconfig.json' Name='Waher.Utility.Asn1ToCSharp.runtimeconfig.json' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Asn1ToCSharp\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.Asn1ToCSharp.runtimeconfig.json' Vital='yes'/>
+              <RemoveFile Id='RemoveWaher.Utility.Asn1ToCSharp.exe' Name='Waher.Utility.Asn1ToCSharp.exe' On='uninstall'/>
+              <RemoveFile Id='RemoveWaher.Utility.Asn1ToCSharp.dll' Name='Waher.Utility.Asn1ToCSharp.dll' On='uninstall'/>
+              <RemoveFile Id='RemoveWaher.Utility.Asn1ToCSharp.deps.json' Name='Waher.Utility.Asn1ToCSharp.deps.json' On='uninstall'/>
+              <RemoveFile Id='RemoveWaher.Utility.Asn1ToCSharp.runtimeconfig.json' Name='Waher.Utility.Asn1ToCSharp.runtimeconfig.json' On='uninstall'/>
+            </Component>
+            <Component Id='UtilityAsn1ToCSharpDebugFiles' Guid='F40DE9B1-B431-4B9C-8E9B-954C6E5B054A'>
+              <File Id='Waher.Utility.Asn1ToCSharp.pdb' Name='Waher.Utility.Asn1ToCSharp.pdb' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Asn1ToCSharp\bin\$(var.Configuration)\netcoreapp2.0\Waher.Utility.Asn1ToCSharp.pdb' Vital='yes' KeyPath='yes'/>
+              <RemoveFile Id='RemoveWaher.Utility.Asn1ToCSharp.pdb' Name='Waher.Utility.Asn1ToCSharp.pdb' On='uninstall'/>
+            </Component>
+            <Component Id='UtilityCsp' Guid='B423EE8C-0A9D-4F54-8633-8F6F2271F388'>
 							<File Id='Waher.Utility.Csp.exe' Name='Waher.Utility.Csp.exe' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Csp\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.Csp.exe' Vital='yes' KeyPath='yes'/>
 							<File Id='Waher.Utility.Csp.dll' Name='Waher.Utility.Csp.dll' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Csp\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.Csp.dll' Vital='yes'/>
 							<File Id='Waher.Utility.Csp.deps.json' Name='Waher.Utility.Csp.deps.json' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Csp\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.Csp.deps.json' Vital='yes'/>
@@ -1476,8 +1490,9 @@
       <Feature Id='Utilities' Title='Utilities' Description='Contains command-line utilities for management of the gateway.' Level='1'>
 				<ComponentRef Id='UtilityAcme' />
 				<ComponentRef Id='UtilityAnalyzeClock' />
-				<ComponentRef Id='UtilityAnalyzeDB' />
-				<ComponentRef Id='UtilityCsp' />
+        <ComponentRef Id='UtilityAnalyzeDB' />
+        <ComponentRef Id='UtilityAsn1ToCSharp' />
+        <ComponentRef Id='UtilityCsp' />
 				<ComponentRef Id='UtilityDeleteDB' />
 				<ComponentRef Id='UtilityInstall' />
         <ComponentRef Id='UtilityRegEx' />
@@ -1490,8 +1505,9 @@
         <ComponentRef Id='ScriptWebServiceDebugFiles'/>
 				<ComponentRef Id='UtilityAcmeDebugFiles' />
 				<ComponentRef Id='UtilityAnalyzeClockDebugFiles' />
-				<ComponentRef Id='UtilityAnalyzeDBDebugFiles' />
-				<ComponentRef Id='UtilityCspDebugFiles' />
+        <ComponentRef Id='UtilityAnalyzeDBDebugFiles' />
+        <ComponentRef Id='UtilityAsn1ToCSharpDebugFiles' />
+        <ComponentRef Id='UtilityCspDebugFiles' />
 				<ComponentRef Id='UtilityDeleteDBDebugFiles' />
 				<ComponentRef Id='UtilityInstallDebugFiles' />
         <ComponentRef Id='UtilityRegExDebugFiles' />

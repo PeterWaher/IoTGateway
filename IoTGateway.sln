@@ -388,9 +388,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Things.Snmp", "Things
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Things.Mqtt", "Things\Waher.Things.Mqtt\Waher.Things.Mqtt.csproj", "{9E87E210-C942-4C80-B9C4-7A02C9BD3866}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Content.Asn1", "Content\Waher.Content.Asn1\Waher.Content.Asn1.csproj", "{1416B106-0293-481C-8C4B-A41687B64C91}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Content.Asn1", "Content\Waher.Content.Asn1\Waher.Content.Asn1.csproj", "{1416B106-0293-481C-8C4B-A41687B64C91}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Content.Asn1.Test", "Content\Waher.Content.Asn1.Test\Waher.Content.Asn1.Test.csproj", "{E799CA24-652B-4A42-BC19-E27FEA076F35}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Content.Asn1.Test", "Content\Waher.Content.Asn1.Test\Waher.Content.Asn1.Test.csproj", "{E799CA24-652B-4A42-BC19-E27FEA076F35}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Utility.Asn1ToCSharp", "Utilities\Waher.Utility.Asn1ToCSharp\Waher.Utility.Asn1ToCSharp.csproj", "{4F09431B-CF6D-4617-9D91-DE32E5298F89}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -3665,6 +3667,26 @@ Global
 		{E799CA24-652B-4A42-BC19-E27FEA076F35}.Release|x64.Build.0 = Release|Any CPU
 		{E799CA24-652B-4A42-BC19-E27FEA076F35}.Release|x86.ActiveCfg = Release|Any CPU
 		{E799CA24-652B-4A42-BC19-E27FEA076F35}.Release|x86.Build.0 = Release|Any CPU
+		{4F09431B-CF6D-4617-9D91-DE32E5298F89}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4F09431B-CF6D-4617-9D91-DE32E5298F89}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4F09431B-CF6D-4617-9D91-DE32E5298F89}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{4F09431B-CF6D-4617-9D91-DE32E5298F89}.Debug|ARM.Build.0 = Debug|Any CPU
+		{4F09431B-CF6D-4617-9D91-DE32E5298F89}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{4F09431B-CF6D-4617-9D91-DE32E5298F89}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{4F09431B-CF6D-4617-9D91-DE32E5298F89}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{4F09431B-CF6D-4617-9D91-DE32E5298F89}.Debug|x64.Build.0 = Debug|Any CPU
+		{4F09431B-CF6D-4617-9D91-DE32E5298F89}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{4F09431B-CF6D-4617-9D91-DE32E5298F89}.Debug|x86.Build.0 = Debug|Any CPU
+		{4F09431B-CF6D-4617-9D91-DE32E5298F89}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4F09431B-CF6D-4617-9D91-DE32E5298F89}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4F09431B-CF6D-4617-9D91-DE32E5298F89}.Release|ARM.ActiveCfg = Release|Any CPU
+		{4F09431B-CF6D-4617-9D91-DE32E5298F89}.Release|ARM.Build.0 = Release|Any CPU
+		{4F09431B-CF6D-4617-9D91-DE32E5298F89}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{4F09431B-CF6D-4617-9D91-DE32E5298F89}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{4F09431B-CF6D-4617-9D91-DE32E5298F89}.Release|x64.ActiveCfg = Release|Any CPU
+		{4F09431B-CF6D-4617-9D91-DE32E5298F89}.Release|x64.Build.0 = Release|Any CPU
+		{4F09431B-CF6D-4617-9D91-DE32E5298F89}.Release|x86.ActiveCfg = Release|Any CPU
+		{4F09431B-CF6D-4617-9D91-DE32E5298F89}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -3825,6 +3847,7 @@ Global
 		{9E87E210-C942-4C80-B9C4-7A02C9BD3866} = {F3F09E8E-51C5-4F8B-A4F4-E17F8FC204C1}
 		{1416B106-0293-481C-8C4B-A41687B64C91} = {E2EEE209-6C34-4FDD-9ADA-89A2CAC5E78F}
 		{E799CA24-652B-4A42-BC19-E27FEA076F35} = {E2EEE209-6C34-4FDD-9ADA-89A2CAC5E78F}
+		{4F09431B-CF6D-4617-9D91-DE32E5298F89} = {5DB13D03-2513-4181-B5BF-891A6974B4A6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {32CF1367-B83E-4CAD-8329-0D1C73AF59F4}

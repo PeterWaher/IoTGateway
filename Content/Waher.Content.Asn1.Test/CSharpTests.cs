@@ -146,19 +146,25 @@ namespace Waher.Content.Asn1.Test
 		}
 
 		[TestMethod]
-		public void Test_08_1451_1()
+		public void Test_08_RFC1215()
+		{
+			GenerateCSharp("SNMPv1\\RFC1215.asn1");
+		}
+
+		[TestMethod]
+		public void Test_09_1451_1()
 		{
 			GenerateCSharp("IEEE1451\\P21451-N1-T1-MIB.asn1");
 		}
 
 		[TestMethod]
-		public void Test_09_1451_2()
+		public void Test_10_1451_2()
 		{
 			GenerateCSharp("IEEE1451\\P21451-N1-T2-MIB.asn1");
 		}
 
 		[TestMethod]
-		public void Test_10_1451_3()
+		public void Test_11_1451_3()
 		{
 			GenerateCSharp("IEEE1451\\P21451-N1-T3-MIB.asn1");
 		}

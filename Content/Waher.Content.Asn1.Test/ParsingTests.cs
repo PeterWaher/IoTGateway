@@ -60,19 +60,25 @@ namespace Waher.Content.Asn1.Test
 		}
 
 		[TestMethod]
-		public void Test_08_1451_1()
+		public void Test_08_RFC1215()
+		{
+			ParseAsn1Document("SNMPv1\\RFC1215.asn1");
+		}
+
+		[TestMethod]
+		public void Test_09_1451_1()
 		{
 			ParseAsn1Document("IEEE1451\\P21451-N1-T1-MIB.asn1");
 		}
 
 		[TestMethod]
-		public void Test_09_1451_2()
+		public void Test_10_1451_2()
 		{
 			ParseAsn1Document("IEEE1451\\P21451-N1-T2-MIB.asn1");
 		}
 
 		[TestMethod]
-		public void Test_10_1451_3()
+		public void Test_11_1451_3()
 		{
 			ParseAsn1Document("IEEE1451\\P21451-N1-T3-MIB.asn1");
 		}

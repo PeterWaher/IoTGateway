@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Waher.Utility.Asn1ToCSharp": {
+      "commandName": "Project",
+      "commandLineArgs": "-BER -CER -DER -n Waher.Things.Snmp.Snmp1 -t -o ..\\..\\..\\..\\..\\Things\\Waher.Things.Snmp\\Snmp1 -i ..\\..\\..\\..\\..\\Content\\Waher.Content.Asn1.Test\\Examples\\SNMPv1\\*.asn1 -o ..\\..\\..\\..\\..\\Things\\Waher.Things.Snmp\\Snmp2 -i ..\\..\\..\\..\\..\\Content\\Waher.Content.Asn1.Test\\Examples\\SNMPv2\\*.asn1"
+    }
+  }
+}

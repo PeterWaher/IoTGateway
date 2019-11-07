@@ -6,26 +6,24 @@ IMPORTS
         FROM RFC1155-SMI
     Integer32,OBJECT-TYPE
         FROM SNMPv2-SMI
-    DisplayString
-        FROM SNMPv2-TC
-    TEXTUAL-CONVENTION
+    DisplayString, TEXTUAL-CONVENTION
         FROM SNMPv2-TC;
  
  
 
 --enterprises  1.3.6.1.4
-NCAP  OBJECT IDENTIFIER ::= { enterprises 21451 }
+ncap  OBJECT IDENTIFIER ::= { enterprises 21451 }
  
-NCAPone OBJECT IDENTIFIER ::= {NCAP  1}
+ncapone OBJECT IDENTIFIER ::= {ncap  1}
 
-TIMtwo  OBJECT IDENTIFIER ::= {NCAPone  2}
-TIMdescrptiontwo  OBJECT IDENTIFIER ::={TIMtwo 0}
+timtwo  OBJECT IDENTIFIER ::= {ncapone  2}
+timdescrptiontwo  OBJECT IDENTIFIER ::={timtwo 0}
 
-Sensorstwo  OBJECT IDENTIFIER ::= {TIMtwo  1}
-TIMcpu2 OBJECT IDENTIFIER ::={TIMdescrptiontwo 1}
+sensorstwo  OBJECT IDENTIFIER ::= {timtwo  1}
+timcpu2 OBJECT IDENTIFIER ::={timdescrptiontwo 1}
 
 
-Slope2 OBJECT IDENTIFIER ::={Sensorstwo 1}
+slope2 OBJECT IDENTIFIER ::={sensorstwo 1}
 
 SlopeSwitch2 OBJECT-TYPE
 SYNTAX      DisplayString
@@ -33,7 +31,7 @@ MAX-ACCESS  read-write
 STATUS      current
 DESCRIPTION
 "Slope Switch"
-::= {Slope2 1}
+::= {slope2 1}
 
 SlopeOut2 OBJECT-TYPE
 SYNTAX      DisplayString
@@ -41,9 +39,9 @@ MAX-ACCESS  read-only
 STATUS      current
 DESCRIPTION
 "Slpoe Out"
-::= {Slope2 2}
+::= {slope2 2}
 
-Temperature2 OBJECT IDENTIFIER ::={Sensorstwo 2}
+temperature2 OBJECT IDENTIFIER ::={sensorstwo 2}
 
 TemperatureSwitch OBJECT-TYPE
 SYNTAX      DisplayString
@@ -51,7 +49,7 @@ MAX-ACCESS  read-write
 STATUS      current
 DESCRIPTION
 "TemperatureSwitch"
-::= {Temperature2 1}
+::= {temperature2 1}
 
 TemperatureOut OBJECT-TYPE
 SYNTAX      DisplayString
@@ -59,9 +57,9 @@ MAX-ACCESS  read-only
 STATUS      current
 DESCRIPTION 
 "TemperatureOut"
-::= {Temperature2 2}
+::= {temperature2 2}
 
-Pressure2 OBJECT IDENTIFIER ::={Sensorstwo 3}
+pressure2 OBJECT IDENTIFIER ::={sensorstwo 3}
 
 PressureSwitch2 OBJECT-TYPE
 SYNTAX      DisplayString
@@ -69,7 +67,7 @@ MAX-ACCESS  read-write
 STATUS      current
 DESCRIPTION
 "PressureSwitch"
-::= {Pressure2 1}
+::= {pressure2 1}
 
 PressureOut2 OBJECT-TYPE
 SYNTAX      DisplayString
@@ -77,9 +75,9 @@ MAX-ACCESS  read-only
 STATUS      current
 DESCRIPTION
 "PressureOut"
-::= {Pressure2 2}
+::= {pressure2 2}
 
-Light2 OBJECT IDENTIFIER ::={Sensorstwo 4}
+light2 OBJECT IDENTIFIER ::={sensorstwo 4}
 
 LightSwitch2 OBJECT-TYPE
 SYNTAX      DisplayString
@@ -87,7 +85,7 @@ MAX-ACCESS  read-write
 STATUS      current
 DESCRIPTION 
 "light switch"
-::= {Light2 1}
+::= {light2 1}
 
 LightIn2 OBJECT-TYPE
 SYNTAX      DisplayString
@@ -95,35 +93,35 @@ MAX-ACCESS  read-write
 STATUS      current
 DESCRIPTION
 "PressureOut"
-::= {Light2 2}
+::= {light2 2}
 
 
-LCD2 OBJECT IDENTIFIER ::={Sensorstwo 5}
+lcd2 OBJECT IDENTIFIER ::={sensorstwo 5}
 
-LCDdisplay2 OBJECT-TYPE
+lcddisplay2 OBJECT-TYPE
 SYNTAX      DisplayString
 MAX-ACCESS  read-write
 STATUS      current
 DESCRIPTION
 "LCD dispaly"
-::= {LCD2 1}
+::= {lcd2 1}
 
-LCDIn2 OBJECT-TYPE
+lcdin2 OBJECT-TYPE
 SYNTAX      DisplayString
 MAX-ACCESS  read-write
 STATUS      current
 DESCRIPTION
 "PressureOut"
-::= {LCD2 2}
+::= {lcd2 2}
 
-Buzzer2 OBJECT IDENTIFIER ::={Sensorstwo 6}
+buzzer2 OBJECT IDENTIFIER ::={sensorstwo 6}
 BuzzerSwitch2 OBJECT-TYPE
 SYNTAX      DisplayString
 MAX-ACCESS  read-write
 STATUS      current
 DESCRIPTION
 "Buzzer2 Switch"
-::= {Buzzer2 1}
+::= {buzzer2 1}
 
 BuzzerIn2 OBJECT-TYPE
 SYNTAX      DisplayString
@@ -131,16 +129,16 @@ MAX-ACCESS  read-write
 STATUS      current
 DESCRIPTION
 "Buzzer Output"
-::= {Buzzer2 2}
+::= {buzzer2 2}
 
-AnaOne2 OBJECT IDENTIFIER ::={Sensorstwo 7}
+anaone2 OBJECT IDENTIFIER ::={sensorstwo 7}
 AnaOneSwitch2 OBJECT-TYPE
 SYNTAX      DisplayString
 MAX-ACCESS  read-write
 STATUS      current
 DESCRIPTION
 "Analogue One Switch"
-::= {AnaOne2 1}
+::= {anaone2 1}
 
 AnaOneOut2 OBJECT-TYPE
 SYNTAX      DisplayString
@@ -148,17 +146,17 @@ MAX-ACCESS  read-only
 STATUS      current
 DESCRIPTION
 "Analogue One Out"
-::= {AnaOne2 2}
+::= {anaone2 2}
 
 
-AnaTwo2 OBJECT IDENTIFIER ::={Sensorstwo 8}
+anatwo2 OBJECT IDENTIFIER ::={sensorstwo 8}
 AnaTwoSwitch2 OBJECT-TYPE
 SYNTAX      DisplayString
 MAX-ACCESS  read-write
 STATUS      current
 DESCRIPTION
 "Analogue Two Switch"
-::= {AnaTwo2 1}
+::= {anatwo2 1}
 
 AnaTwoOut2 OBJECT-TYPE
 SYNTAX      DisplayString
@@ -166,16 +164,16 @@ MAX-ACCESS  read-only
 STATUS      current
 DESCRIPTION
 "Analogue Two Out"
-::= {AnaTwo2 2}
+::= {anatwo2 2}
 
-AnaThree2 OBJECT IDENTIFIER ::={Sensorstwo 9}
+anathree2 OBJECT IDENTIFIER ::={sensorstwo 9}
 AnThreeSwitch2 OBJECT-TYPE
 SYNTAX      DisplayString
 MAX-ACCESS  read-write
 STATUS      current
 DESCRIPTION
 "Analogue Three Switch"
-::= {AnaThree2 1}
+::= {anathree2 1}
 
 AnaThreeOut2 OBJECT-TYPE
 SYNTAX      DisplayString
@@ -183,51 +181,51 @@ MAX-ACCESS  read-only
 STATUS      current
 DESCRIPTION
 "Analogue Three Out"
-::= {AnaThree2 2}
+::= {anathree2 2}
 
-AnaFour2 OBJECT IDENTIFIER ::={Sensorstwo 10}
+anafour2 OBJECT IDENTIFIER ::={sensorstwo 10}
 AnaFourSwitch2 OBJECT-TYPE
 SYNTAX      DisplayString
 MAX-ACCESS  read-write
 STATUS      current
 DESCRIPTION
 "Analogue Four Switch"
-::= {AnaFour2 1}
+::= {anafour2 1}
 
-AnaFourOut2 OBJECT-TYPE
+anafourout2 OBJECT-TYPE
 SYNTAX      DisplayString
 MAX-ACCESS  read-only
 STATUS      current
 DESCRIPTION
 "Analogue Four Out"
-::= {AnaFour2 2}
+::= {anafour2 2}
 
 
-DigOne2 OBJECT IDENTIFIER ::={Sensorstwo 11}
+digone2 OBJECT IDENTIFIER ::={sensorstwo 11}
 DigOneSwitch2 OBJECT-TYPE
 SYNTAX      DisplayString
 MAX-ACCESS  read-write
 STATUS      current
 DESCRIPTION
 "Digital One Switch"
-::= {DigOne2 1}
+::= {digone2 1}
 
-DigOneOut2 OBJECT-TYPE
+digoneout2 OBJECT-TYPE
 SYNTAX      DisplayString
 MAX-ACCESS  read-only
 STATUS      current
 DESCRIPTION
 "Digital One Out"
-::= {DigOne2 2}
+::= {digone2 2}
 
-DigTwo2 OBJECT IDENTIFIER ::={Sensorstwo 12}
+digtwo2 OBJECT IDENTIFIER ::={sensorstwo 12}
 DigTwoSwitch2 OBJECT-TYPE
 SYNTAX      DisplayString
 MAX-ACCESS  read-write
 STATUS      current
 DESCRIPTION
 "Digital Two Switch"
-::= {DigTwo2 1}
+::= {digtwo2 1}
 
 DigTwoOut2 OBJECT-TYPE
 SYNTAX      DisplayString
@@ -235,16 +233,16 @@ MAX-ACCESS  read-only
 STATUS      current
 DESCRIPTION
 "Digital Two Out"
-::= {DigTwo2 2}
+::= {digtwo2 2}
 
-DigThree2 OBJECT IDENTIFIER ::={Sensorstwo 13}
+digthree2 OBJECT IDENTIFIER ::={sensorstwo 13}
 DigThreeSwitch2 OBJECT-TYPE
 SYNTAX      DisplayString
 MAX-ACCESS  read-write
 STATUS      current
 DESCRIPTION
 "Digital Three Switch"
-::= {DigThree2 1}
+::= {digthree2 1}
 
 DigThreeOut2 OBJECT-TYPE
 SYNTAX      DisplayString
@@ -252,7 +250,7 @@ MAX-ACCESS  read-only
 STATUS      current
 DESCRIPTION
 "Digital Three Out"
-::= {DigThree2 2}
+::= {digthree2 2}
 
 
 
@@ -264,7 +262,7 @@ MAX-ACCESS  read-only
 STATUS      current
 DESCRIPTION
 "the main frequency of TIM CPU"
-::= {TIMcpu2 1}
+::= {timcpu2 1}
 
 Temperature2 OBJECT-TYPE
 SYNTAX      DisplayString
@@ -272,7 +270,7 @@ MAX-ACCESS  read-only
 STATUS      current
 DESCRIPTION
 "the temperature of TIM CPU"
-::= {TIMcpu2 2}
+::= {timcpu2 2}
 
 Usage2 OBJECT-TYPE
 SYNTAX      DisplayString
@@ -280,7 +278,7 @@ MAX-ACCESS  read-only
 STATUS      current
 DESCRIPTION
 "the usage of TIM CPU"
-::= {TIMcpu2 3}
+::= {timcpu2 3}
 
 
 END

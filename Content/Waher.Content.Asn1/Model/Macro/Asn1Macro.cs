@@ -9,9 +9,10 @@ namespace Waher.Content.Asn1.Model.Macro
 	/// </summary>
 	public class Asn1Macro : Asn1Node, INamedNode
 	{
+		internal readonly Dictionary<string, SupportingSyntax> supportingSyntax;
+		internal readonly SupportingSyntax[] supportingSyntaxArray;
 		private readonly UserDefinedItem typeNotation;
 		private readonly UserDefinedItem valueNotation;
-		private readonly SupportingSyntax[] supportingSyntax;
 		private readonly Asn1Document document;
 		private readonly string name;
 
@@ -29,8 +30,13 @@ namespace Waher.Content.Asn1.Model.Macro
 			this.name = Name;
 			this.typeNotation = TypeNotation;
 			this.valueNotation = ValueNotation;
-			this.supportingSyntax = SupportingSyntax;
+			this.supportingSyntaxArray = SupportingSyntax;
 			this.document = Document;
+
+			this.supportingSyntax = new Dictionary<string, SupportingSyntax>();
+
+			foreach (SupportingSyntax Syntax in SupportingSyntax)
+				this.supportingSyntax[Syntax.Name] = Syntax;
 		}
 
 		/// <summary>
@@ -51,7 +57,7 @@ namespace Waher.Content.Asn1.Model.Macro
 		/// <summary>
 		/// Supporting syntax
 		/// </summary>
-		public SupportingSyntax[] SupportingSyntax => this.supportingSyntax;
+		public SupportingSyntax[] SupportingSyntax => this.supportingSyntaxArray;
 
 		/// <summary>
 		/// ASN.1 document defining macro.

@@ -208,24 +208,6 @@ namespace Waher.Content.Asn1
 						else
 							return "]";
 
-					case '\'':
-						if (this.PeekNextChar() == '\'')
-						{
-							this.pos++;
-							return "\"";
-						}
-						else
-							return "'";
-
-					case '`':
-						if (this.PeekNextChar() == '`')
-						{
-							this.pos++;
-							return "\"";
-						}
-						else
-							return "`";
-
 					default:
 						return new string(ch, 1);
 				}

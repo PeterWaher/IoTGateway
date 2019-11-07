@@ -43,7 +43,7 @@
                          "INDEX" "{" IndexTypes "}"
                               | empty
               IndexTypes ::=
-                         IndexType | IndexTypes "," IndexType
+                         IndexType | IndexType "," IndexTypes
               IndexType ::=
                                   -- if indexobject, use the SYNTAX
                                   -- value of the correspondent

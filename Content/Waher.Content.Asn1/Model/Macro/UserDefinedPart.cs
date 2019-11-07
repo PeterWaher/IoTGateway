@@ -46,13 +46,18 @@ namespace Waher.Content.Asn1.Model.Macro
 					throw Document.SyntaxError("Type reference expected: " + this.identifier);
 			}
 
-			foreach (SupportingSyntax Syntax in Macro.SupportingSyntax)
-			{
-				if (Syntax.Name == this.identifier)
-					return Syntax.Parse(Document, Macro);
-			}
+			if (Macro.supportingSyntax.TryGetValue(this.identifier, out SupportingSyntax Syntax))
+				return Syntax.Parse(Document, Macro);
 
 			throw Document.SyntaxError("Supporting syntax for " + this.identifier + " not found.");
+		}
+
+		/// <summary>
+		/// <see cref="Object.ToString()"/>
+		/// </summary>
+		public override string ToString()
+		{
+			return this.identifier;
 		}
 	}
 }

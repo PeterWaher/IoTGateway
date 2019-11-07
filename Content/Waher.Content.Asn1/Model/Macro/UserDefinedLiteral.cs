@@ -37,5 +37,13 @@ namespace Waher.Content.Asn1.Model.Macro
 			Document.AssertNextToken(this.value);
 			return new Values.Asn1StringValue(this.value);
 		}
+
+		/// <summary>
+		/// <see cref="Object.ToString()"/>
+		/// </summary>
+		public override string ToString()
+		{
+			return "\"" + this.value + "\"";
+		}
 	}
 }

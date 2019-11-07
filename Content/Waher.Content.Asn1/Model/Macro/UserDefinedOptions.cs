@@ -35,6 +35,9 @@ namespace Waher.Content.Asn1.Model.Macro
 		public override Asn1Node Parse(Asn1Document Document, Asn1Macro Macro)
 		{
 			int Bak = Document.pos;
+			int BestPos = -1;
+			Asn1Node Best = null;
+			Asn1Node Option;
 
 			foreach (UserDefinedItem Item in this.options)
 			{
@@ -42,7 +45,12 @@ namespace Waher.Content.Asn1.Model.Macro
 
 				try
 				{
-					return Item.Parse(Document, Macro);
+					Option = Item.Parse(Document, Macro);
+					if (Best is null || Document.pos > BestPos)
+					{
+						BestPos = Document.pos;
+						Best = Option;
+					}
 				}
 				catch (Exception)
 				{
@@ -50,7 +58,12 @@ namespace Waher.Content.Asn1.Model.Macro
 				}
 			}
 
-			throw Document.SyntaxError("Invalid option.");
+			if (BestPos < 0)
+				throw Document.SyntaxError("Invalid option.");
+
+			Document.pos = BestPos;
+
+			return Best;
 		}
 	}
 }

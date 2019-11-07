@@ -64,7 +64,7 @@ namespace Waher.Content.Asn1.Model.Macro
 		/// </summary>
 		/// <param name="Document">ASN.1 document being parsed.</param>
 		/// <returns>Parsed ASN.1 node.</returns>
-		public KeyValuePair<Asn1Type, Asn1Value> Parse(Asn1Document Document)
+		public Asn1Value Parse(Asn1Document Document)
 		{
 			this.typeNotation.Parse(Document, this);
 
@@ -75,7 +75,31 @@ namespace Waher.Content.Asn1.Model.Macro
 			if (!(Node is Asn1Value Value))
 				throw Document.SyntaxError("Value expected.");
 
-			return new KeyValuePair<Asn1Type, Asn1Value>(null, Value);
+			return Value;
+		}
+
+		/// <summary>
+		/// Exports to C#
+		/// </summary>
+		/// <param name="Output">C# Output.</param>
+		/// <param name="State">C# export state.</param>
+		/// <param name="Indent">Indentation</param>
+		/// <param name="Pass">Export pass</param>
+		public override void ExportCSharp(StringBuilder Output, CSharpExportState State, int Indent, CSharpExportPass Pass)
+		{
+			// Don't export macro.
+		}
+
+		/// <summary>
+		/// Gets the ASN.1 type corresponding to the value.
+		/// </summary>
+		/// <returns>ASN.1 type.</returns>
+		public Asn1Type GetValueType()
+		{
+			if (this.valueNotation is UserDefinedSpecifiedPart Part)
+				return Part.Type;
+			else
+				return new Types.Asn1Any();
 		}
 
 	}

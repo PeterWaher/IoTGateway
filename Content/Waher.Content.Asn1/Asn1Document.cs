@@ -515,9 +515,9 @@ namespace Waher.Content.Asn1
 				{
 					this.pos += s2.Length;
 
-					KeyValuePair<Asn1Type, Asn1Value> P = Macro.Parse(this);
+					Asn1Value Value = Macro.Parse(this);
 
-					return new Asn1FieldValueDefinition(s, P.Key, P.Value);
+					return new Asn1FieldValueDefinition(s, Macro.GetValueType(), Value);
 				}
 				else
 				{

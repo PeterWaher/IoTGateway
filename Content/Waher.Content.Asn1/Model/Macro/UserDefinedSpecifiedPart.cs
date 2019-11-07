@@ -44,15 +44,11 @@ namespace Waher.Content.Asn1.Model.Macro
 		/// <returns>Parsed ASN.1 node.</returns>
 		public override Asn1Node Parse(Asn1Document Document, Asn1Macro Macro)
 		{
-			switch (this.name)
+			switch (this.Identifier.ToUpper())
 			{
 				case "TYPE": return Document.ParseType(this.Identifier, false);
 				case "VALUE": return Document.ParseValue();
-				default:
-					if (this.Identifier == "type")
-						return Document.ParseType(this.Identifier, false);
-					else
-						return this.type.Parse(Document, Macro);
+				default: return this.type.Parse(Document, Macro);
 			}
 		}
 	}

@@ -1696,6 +1696,21 @@
             <param name="Document">ASN.1 document being parsed.</param>
             <returns>Parsed ASN.1 node.</returns>
         </member>
+        <member name="M:Waher.Content.Asn1.Model.Macro.Asn1Macro.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportState,System.Int32,Waher.Content.Asn1.Model.CSharpExportPass)">
+            <summary>
+            Exports to C#
+            </summary>
+            <param name="Output">C# Output.</param>
+            <param name="State">C# export state.</param>
+            <param name="Indent">Indentation</param>
+            <param name="Pass">Export pass</param>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Macro.Asn1Macro.GetValueType">
+            <summary>
+            Gets the ASN.1 type corresponding to the value.
+            </summary>
+            <returns>ASN.1 type.</returns>
+        </member>
         <member name="T:Waher.Content.Asn1.Model.Macro.SupportingSyntax">
             <summary>
             Supporting syntax in a macro

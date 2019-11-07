@@ -723,6 +723,13 @@
             </summary>
             <param name="BaseNamespace">Base namespace of generated code.</param>
         </member>
+        <member name="M:Waher.Content.Asn1.CSharpExportSettings.#ctor(System.String,Waher.Content.Asn1.EncodingSchemes)">
+            <summary>
+            What encoders and decoders to include in the generation of C# code.
+            </summary>
+            <param name="BaseNamespace">Base namespace of generated code.</param>
+            <param name="Codecs">Encoding schemes to support.</param>
+        </member>
         <member name="M:Waher.Content.Asn1.CSharpExportSettings.Namespace(System.String)">
             <summary>
             Namespace for a given identifier.
@@ -815,6 +822,11 @@
         <member name="F:Waher.Content.Asn1.EncodingSchemes.All">
             <summary>
             All supported encoding schemes.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Asn1.EncodingSchemes.None">
+            <summary>
+            None of the supported encoding schemes.
             </summary>
         </member>
         <member name="T:Waher.Content.Asn1.Exceptions.Asn1Exception">

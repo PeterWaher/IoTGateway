@@ -13,21 +13,26 @@ namespace Waher.Content.Asn1
 		/// <summary>
 		/// Basic Encoding Rules (BER), as defined in X.690
 		/// </summary>
-		BER,
+		BER = 1,
 
 		/// <summary>
 		/// Canonical Encoding Rules (CER), as defined in X.690
 		/// </summary>
-		CER,
+		CER = 2,
 
 		/// <summary>
 		/// Distinguished Encoding Rules (DER), as defined in X.690
 		/// </summary>
-		DER,
+		DER = 4,
 
 		/// <summary>
 		/// All supported encoding schemes.
 		/// </summary>
-		All = BER
+		All = BER | CER | DER,
+
+		/// <summary>
+		/// None of the supported encoding schemes.
+		/// </summary>
+		None = 0
 	}
 }

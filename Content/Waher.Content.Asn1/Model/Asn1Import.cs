@@ -50,8 +50,8 @@ namespace Waher.Content.Asn1.Model
 				return this.importedDocument;
 
 			string Folder = Path.GetDirectoryName(this.document.Location);
-			string FileName = Path.Combine(Folder, this.module);
 			string Extension = Path.GetExtension(this.document.Location);
+			string FileName = Path.Combine(Folder, this.module) + Extension;
 
 			if (!File.Exists(FileName))
 			{

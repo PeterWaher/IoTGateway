@@ -18,7 +18,7 @@ namespace Waher.Content.Asn1.Test
 		{
 			string BaseNamespace = "Test";
 			Asn1Document Doc = ParsingTests.ParseAsn1Document(FileName);
-			CSharpExportSettings Settings = new CSharpExportSettings(BaseNamespace);
+			CSharpExportSettings Settings = new CSharpExportSettings(BaseNamespace, EncodingSchemes.All);
 			string CSharp = Doc.ExportCSharp(Settings);
 			List<SyntaxTree> Modules = new List<SyntaxTree>() { CSharpSyntaxTree.ParseText(CSharp) };
 

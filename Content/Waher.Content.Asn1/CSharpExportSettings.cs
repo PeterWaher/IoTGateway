@@ -15,7 +15,7 @@ namespace Waher.Content.Asn1
 		/// <summary>
 		/// What encoders and decoders to include in the generation of C# code.
 		/// </summary>
-		public EncodingSchemes Codecs = EncodingSchemes.All;
+		public EncodingSchemes Codecs;
 
 		/// <summary>
 		/// Base Namespace
@@ -27,8 +27,19 @@ namespace Waher.Content.Asn1
 		/// </summary>
 		/// <param name="BaseNamespace">Base namespace of generated code.</param>
 		public CSharpExportSettings(string BaseNamespace)
+			: this(BaseNamespace, EncodingSchemes.None)
+		{
+		}
+
+		/// <summary>
+		/// What encoders and decoders to include in the generation of C# code.
+		/// </summary>
+		/// <param name="BaseNamespace">Base namespace of generated code.</param>
+		/// <param name="Codecs">Encoding schemes to support.</param>
+		public CSharpExportSettings(string BaseNamespace, EncodingSchemes Codecs)
 		{
 			this.BaseNamespace = BaseNamespace;
+			this.Codecs = Codecs;
 		}
 
 		/// <summary>

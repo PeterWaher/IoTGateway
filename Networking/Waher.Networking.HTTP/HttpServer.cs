@@ -177,16 +177,17 @@ namespace Waher.Networking.HTTP
 
 #if WINDOWS_UWP
 			Task _ = this.AddHttpPorts(HttpPorts);
+			NetworkInformation.NetworkStatusChanged += NetworkChange_NetworkAddressChanged;
 #else
 			this.AddHttpPorts(HttpPorts);
 			this.httpsPorts = new int[0];
 			this.AddHttpsPorts(HttpsPorts);
-#endif
 			NetworkChange.NetworkAddressChanged += this.NetworkChange_NetworkAddressChanged;
+#endif
 		}
 
 #if WINDOWS_UWP
-		private async void NetworkChange_NetworkAddressChanged(object sender, EventArgs e)
+		private async void NetworkChange_NetworkAddressChanged(object sender)
 #else
 		private void NetworkChange_NetworkAddressChanged(object sender, EventArgs e)
 #endif
@@ -505,10 +506,12 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		public void Dispose()
 		{
-#if !WINDOWS_UWP
+#if WINDOWS_UWP
+			NetworkInformation.NetworkStatusChanged -= NetworkChange_NetworkAddressChanged;
+#else
 			this.closed = true;
-#endif
 			NetworkChange.NetworkAddressChanged -= this.NetworkChange_NetworkAddressChanged;
+#endif
 
 			if (!(this.listeners is null))
 			{

@@ -20,7 +20,7 @@
       <dependency id="Waher.Networking" version="1.0.13"/>
       <dependency id="Waher.Networking.CoAP.UWP" version="1.0.6"/>
       <dependency id="Waher.Persistence" version="1.0.12"/>
-      <dependency id="Waher.Runtime.Inventory" version="1.0.10"/>
+      <dependency id="Waher.Runtime.Inventory" version="1.0.11"/>
       <dependency id="Waher.Runtime.Timing" version="1.0.2"/>
       <dependency id="Waher.Security" version="1.0.2"/>
       <dependency id="Waher.Security.DTLS" version="1.0.3"/>

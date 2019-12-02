@@ -38,9 +38,11 @@ namespace Waher.Persistence.FilesLW.Test
 #if LW
 		internal const string Index1FileName = "Data\\Default.btree.Byte.-DateTime.index";
 		internal const string Index2FileName = "Data\\Default.btree.ShortString.index";
+		internal const string Index3FileName = "Data\\Default.btree.CIString.index";
 #else
 		internal const string Index1FileName = "Data\\Default.btree.50104c1cdc9b0754886b272fc1aaa550747dadf4.index";
 		internal const string Index2FileName = "Data\\Default.btree.40059d366b589d4071aba631a3aa4fc1dc03e357.index";
+		internal const string Index3FileName = "Data\\Default.btree.f1c0be1209b1cdc095103cf364d416abeb3fdf2f.index";
 #endif
 		internal const string Folder = "Data";
 		internal const int BlocksInCache = 10000;
@@ -130,6 +132,15 @@ namespace Waher.Persistence.FilesLW.Test
 			{
 				File.Copy(Index2FileName, Index2FileName + ".bak");
 				File.Delete(Index2FileName);
+			}
+
+			if (File.Exists(Index3FileName + ".bak"))
+				File.Delete(Index3FileName + ".bak");
+
+			if (File.Exists(Index3FileName))
+			{
+				File.Copy(Index3FileName, Index3FileName + ".bak");
+				File.Delete(Index3FileName);
 			}
 		}
 
@@ -987,21 +998,21 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public void DBFiles_BTree_Test_28_UpdateObjects_1000()
+		public async Task DBFiles_BTree_Test_28_UpdateObjects_1000()
 		{
-			this.DBFiles_BTree_Test_UpdateObjects(1000).Wait();
+			await this.DBFiles_BTree_Test_UpdateObjects(1000);
 		}
 
 		[TestMethod]
-		public void DBFiles_BTree_Test_29_UpdateObjects_10000()
+		public async Task DBFiles_BTree_Test_29_UpdateObjects_10000()
 		{
-			this.DBFiles_BTree_Test_UpdateObjects(10000).Wait();
+			await this.DBFiles_BTree_Test_UpdateObjects(10000);
 		}
 
 		[TestMethod]
-		public void DBFiles_BTree_Test_30_UpdateObjects_100000()
+		public async Task DBFiles_BTree_Test_30_UpdateObjects_100000()
 		{
-			this.DBFiles_BTree_Test_UpdateObjects(100000).Wait();
+			await this.DBFiles_BTree_Test_UpdateObjects(100000);
 		}
 
 		private async Task DBFiles_BTree_Test_UpdateObjects(int c)

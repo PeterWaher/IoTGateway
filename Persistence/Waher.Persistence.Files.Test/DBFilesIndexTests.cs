@@ -486,22 +486,22 @@ namespace Waher.Persistence.FilesLW.Test
         }
 
         [TestMethod]
-        public void DBFiles_Index_Test_09_UpdateObjects_1000()
+        public async Task DBFiles_Index_Test_09_UpdateObjects_1000()
         {
-            this.DBFiles_Index_Test_UpdateObjects(1000).Wait();
+            await this.DBFiles_Index_Test_UpdateObjects(1000);
         }
 
         [TestMethod]
-        public void DBFiles_Index_Test_10_UpdateObjects_10000()
+        public async Task DBFiles_Index_Test_10_UpdateObjects_10000()
         {
-            this.DBFiles_Index_Test_UpdateObjects(10000).Wait();
+            await this.DBFiles_Index_Test_UpdateObjects(10000);
         }
 
         [TestMethod]
         [Ignore]
-        public void DBFiles_Index_Test_11_UpdateObjects_100000()
+        public async Task DBFiles_Index_Test_11_UpdateObjects_100000()
         {
-            this.DBFiles_Index_Test_UpdateObjects(100000).Wait();
+            await this.DBFiles_Index_Test_UpdateObjects(100000);
         }
 
         private async Task DBFiles_Index_Test_UpdateObjects(int c)

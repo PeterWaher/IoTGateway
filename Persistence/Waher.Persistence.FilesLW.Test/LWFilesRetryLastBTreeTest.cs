@@ -63,7 +63,7 @@ namespace Waher.Persistence.FilesLW.Test
 			this.file = await this.provider.GetFile(DBFilesBTreeTests.CollectionName);
 			this.start = DateTime.Now;
 
-			DBFilesBTreeTests.ExportXML(this.file, "Data\\BTreeBefore.xml").Wait();
+			await DBFilesBTreeTests.ExportXML(this.file, "Data\\BTreeBefore.xml");
 		}
 
 		[TestCleanup]

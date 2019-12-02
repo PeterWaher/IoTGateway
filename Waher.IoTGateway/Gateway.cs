@@ -856,6 +856,12 @@ namespace Waher.IoTGateway
 			Markdown.Append("| Assembly | `");
 			Markdown.Append(e.Assembly.GetName().Name);
 			Markdown.AppendLine("` |");
+			Markdown.Append("| Date | ");
+			Markdown.Append(MarkdownDocument.Encode(Now.ToShortDateString()));
+			Markdown.AppendLine(" |");
+			Markdown.Append("| Time | ");
+			Markdown.Append(MarkdownDocument.Encode(Now.ToLongTimeString()));
+			Markdown.AppendLine(" |");
 			Markdown.AppendLine();
 			Markdown.AppendLine("Stack Trace:");
 			Markdown.AppendLine();

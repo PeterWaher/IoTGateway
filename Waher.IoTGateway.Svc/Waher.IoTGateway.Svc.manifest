@@ -222,6 +222,7 @@
   <Assembly fileName='Waher.Content.dll'/>
   <Assembly fileName='Waher.Content.Emoji.dll'/>
   <Assembly fileName='Waher.Content.Emoji.Emoji1.dll'/>
+  <Assembly fileName='Waher.Content.Asn1.dll'/>
   <Assembly fileName='Waher.Content.Dsn.dll'/>
   <Assembly fileName='Waher.Content.Html.dll'/>
   <Assembly fileName='Waher.Content.Images.dll'/>

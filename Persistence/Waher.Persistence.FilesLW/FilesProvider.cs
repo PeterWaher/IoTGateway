@@ -67,6 +67,8 @@ namespace Waher.Persistence.Files
 	/// </summary>
 	public class FilesProvider : IDisposable, IDatabaseProvider
 	{
+		private static RandomNumberGenerator rnd = RandomNumberGenerator.Create();
+
 		private Dictionary<Type, IObjectSerializer> serializers;
 		private readonly Dictionary<string, ObjectBTreeFile> files = new Dictionary<string, ObjectBTreeFile>();
 		private readonly Dictionary<string, LabelFile> labelFiles = new Dictionary<string, LabelFile>();
@@ -927,7 +929,7 @@ namespace Waher.Persistence.Files
 				using (SHA256 Sha256 = SHA256.Create())
 				{
 					Key = Sha256.ComputeHash(Key);
-					IV = Sha256.ComputeHash(Key);
+					IV = Sha256.ComputeHash(IV);
 				}
 #if NETSTANDARD1_5
 			}
@@ -936,12 +938,14 @@ namespace Waher.Persistence.Files
 				RSACryptoServiceProvider rsa = null;
 				CspParameters CspParams = new CspParameters()
 				{
-					Flags = CspProviderFlags.UseMachineKeyStore |
+					Flags =
+						CspProviderFlags.UseMachineKeyStore |
 						CspProviderFlags.NoPrompt |
 						CspProviderFlags.UseExistingKey,
 					KeyContainerName = FileName
 				};
 
+				RSAParameters Parameters;
 				int KeyGenMode = 0;
 
 				try
@@ -953,7 +957,9 @@ namespace Waher.Persistence.Files
 							rsa.PersistKeyInCsp = false;    // Deletes key.
 					}
 					else if (rsa.KeySize > 1024)
-						KeyGenMode++;
+						KeyGenMode |= 1;
+					else if (rsa.KeySize == 768)
+						KeyGenMode |= 2;
 				}
 				catch (CryptographicException ex)
 				{
@@ -969,53 +975,101 @@ namespace Waher.Persistence.Files
 					rsa?.Dispose();
 					rsa = null;
 
-					CspParams.Flags = CspProviderFlags.UseMachineKeyStore |
+					CspParams.Flags =
+						CspProviderFlags.UseMachineKeyStore |
 						CspProviderFlags.NoPrompt;
 
 					try
 					{
-						rsa = new RSACryptoServiceProvider(4096, CspParams);
+						rsa = new RSACryptoServiceProvider(768, CspParams);
+
+						if ((KeyGenMode & 2) == 0)
+						{
+							Parameters = rsa.ExportParameters(true);
+
+							byte[] P, Q;
+
+							lock (rnd)
+							{
+								P = new byte[48];
+								rnd.GetBytes(P);
+
+								Q = new byte[48];
+								rnd.GetBytes(Q);
+							}
+
+							P[47] = 1;
+							Q[47] = 1;
+
+							Parameters.P = P;
+							Parameters.Q = Q;
+
+							rsa.ImportParameters(Parameters);
+
+							Console.Out.WriteLine(FileName);
+
+							KeyGenMode |= 2;
+						}
 					}
 					catch (CryptographicException)
 					{
 						try
 						{
-							rsa = new RSACryptoServiceProvider(CspParams);
+							rsa = new RSACryptoServiceProvider(4096, CspParams);
 						}
-						catch (CryptographicException ex)
+						catch (CryptographicException)
 						{
-							throw new CryptographicException("Unable to get access to cryptographic key for database file " + FileName +
-								". (" + ex.Message + ") Was the database created using another user?", ex);
+							try
+							{
+								rsa = new RSACryptoServiceProvider(CspParams);
+							}
+							catch (CryptographicException ex2)
+							{
+								throw new CryptographicException("Unable to get access to cryptographic key for database file " + FileName +
+									". (" + ex2.Message + ") Was the database created using another user?", ex2);
+							}
 						}
-					}
 
-					if (rsa.KeySize > 1024)
-						KeyGenMode++;
+						if (rsa.KeySize > 1024)
+							KeyGenMode |= 1;
+					}
 				}
 
-				RSAParameters Parameters = rsa.ExportParameters(true);
+				Parameters = rsa.ExportParameters(true);
 
 				rsa.Dispose();
 				rsa = null;
 
-				using (SHA256 Sha256 = SHA256.Create())
+
+				if ((KeyGenMode & 2) != 0)
 				{
-					if (KeyGenMode == 0)
-					{
-						IV = Parameters.P;
-						Key = Sha256.ComputeHash(Parameters.Q);
-					}
-					else
-					{
-						int pLen = Parameters.P.Length;
-						int qLen = Parameters.Q.Length;
-						byte[] Bin = new byte[pLen + qLen];
+					Key = Parameters.P;
+					IV = Parameters.Q;
 
-						Array.Copy(Parameters.P, 0, Bin, 0, pLen);
-						Array.Copy(Parameters.Q, 0, Bin, pLen, qLen);
+					Array.Resize<byte>(ref Key, 32);
+					Array.Resize<byte>(ref IV, 32);
+				}
+				else
+				{
+					using (SHA256 Sha256 = SHA256.Create())
+					{
+						if ((KeyGenMode & 1) != 0)
+						{
+							int pLen = Parameters.P.Length;
+							int qLen = Parameters.Q.Length;
+							byte[] Bin = new byte[pLen + qLen];
 
-						Key = Sha256.ComputeHash(Bin);
-						IV = Sha256.ComputeHash(Parameters.Modulus);
+							Array.Copy(Parameters.P, 0, Bin, 0, pLen);
+							Array.Copy(Parameters.Q, 0, Bin, pLen, qLen);
+
+							Key = Sha256.ComputeHash(Bin);
+							IV = Sha256.ComputeHash(Parameters.Modulus);
+						}
+						else
+						{
+							IV = Sha256.ComputeHash(Parameters.P);
+							Key = Sha256.ComputeHash(Parameters.Q);
+						}
 					}
 				}
 			}

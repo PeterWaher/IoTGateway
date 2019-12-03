@@ -513,7 +513,7 @@ namespace Waher.Persistence.Files
 			{
 				do
 				{
-					this.currentReader.ReadBlockLink();
+					this.currentReader.SkipBlockLink();
 					Pos = this.currentReader.Position;
 
 					ObjectId = this.recordHandler.GetKey(this.currentReader);
@@ -555,7 +555,7 @@ namespace Waher.Persistence.Files
 					LastObjectId = null;
 					do
 					{
-						this.currentReader.ReadBlockLink();
+						this.currentReader.SkipBlockLink();
 						Pos = this.currentReader.Position;
 
 						ObjectId = this.recordHandler.GetKey(this.currentReader);
@@ -660,7 +660,7 @@ namespace Waher.Persistence.Files
 			{
 				Pos = this.currentReader.Position;
 
-				this.currentReader.ReadBlockLink();
+				this.currentReader.SkipBlockLink();
 				ObjectId = this.recordHandler.GetKey(this.currentReader);
 				IsEmpty = (ObjectId is null);
 				if (IsEmpty)
@@ -673,7 +673,7 @@ namespace Waher.Persistence.Files
 			while (this.currentReader.BytesLeft >= 4);
 
 			this.currentReader.Position = LastPos;
-			this.currentReader.ReadBlockLink();
+			this.currentReader.SkipBlockLink();
 			ObjectId = this.recordHandler.GetKey(this.currentReader);
 			IsEmpty = (ObjectId is null);
 
@@ -691,7 +691,7 @@ namespace Waher.Persistence.Files
 					{
 						Pos = this.currentReader.Position;
 
-						this.currentReader.ReadBlockLink();
+						this.currentReader.SkipBlockLink();
 						ObjectId = this.recordHandler.GetKey(this.currentReader);
 						IsEmpty = (ObjectId is null);
 						if (IsEmpty)
@@ -704,7 +704,7 @@ namespace Waher.Persistence.Files
 					while (this.currentReader.BytesLeft >= 4);
 
 					this.currentReader.Position = LastPos;
-					this.currentReader.ReadBlockLink();
+					this.currentReader.SkipBlockLink();
 					ObjectId = this.recordHandler.GetKey(this.currentReader);
 					IsEmpty = (ObjectId is null);
 				}

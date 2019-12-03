@@ -2990,7 +2990,7 @@ namespace Waher.Persistence.Files
                     do
                     {
                         Pos = Reader.Position;
-                        Reader.ReadBlockLink();
+                        Reader.SkipBlockLink();
                         ObjectId = this.recordHandler.GetKey(Reader);
                         if (ObjectId is null)
                             break;

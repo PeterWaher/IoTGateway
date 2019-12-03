@@ -833,6 +833,14 @@ namespace Waher.Persistence.Files.Serialization
 		}
 
 		/// <summary>
+		/// Skips a block link.
+		/// </summary>
+		public void SkipBlockLink()
+		{
+			this.SkipUInt32();
+		}
+
+		/// <summary>
 		/// Skips a value.
 		/// </summary>
 		public void SkipDecimal()

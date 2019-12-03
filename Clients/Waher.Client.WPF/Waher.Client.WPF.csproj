@@ -61,10 +61,10 @@
     <ApplicationIcon>Configure.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>3A0AC2A115570DFAA4B97E83176C47E3F1D7136D</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>489A1520AE68C3C2EEA4966514C807E40DC68BC2</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestKeyFile>Waher.Client.WPF_1_TemporaryKey.pfx</ManifestKeyFile>
+    <ManifestKeyFile>Waher.Client.WPF_2_TemporaryKey.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
     <GenerateManifests>true</GenerateManifests>
@@ -330,6 +330,7 @@
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <None Include="Waher.Client.WPF_1_TemporaryKey.pfx" />
+    <None Include="Waher.Client.WPF_2_TemporaryKey.pfx" />
     <None Include="Waher.Client.WPF_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>

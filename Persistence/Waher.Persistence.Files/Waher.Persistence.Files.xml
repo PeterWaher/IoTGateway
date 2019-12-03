@@ -3601,6 +3601,11 @@
             Skips a value.
             </summary>
         </member>
+        <member name="M:Waher.Persistence.Files.Serialization.BinaryDeserializer.SkipBlockLink">
+            <summary>
+            Skips a block link.
+            </summary>
+        </member>
         <member name="M:Waher.Persistence.Files.Serialization.BinaryDeserializer.SkipDecimal">
             <summary>
             Skips a value.

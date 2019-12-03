@@ -2188,7 +2188,7 @@ namespace Waher.Persistence.Files
 			{
 				KeyValuePair<FileStatistics, Dictionary<Guid, bool>> P = await File.ComputeStatistics();
 				FileStatistics Stat = P.Key;
-				Dictionary<Guid, bool> ObjectIds = P.Value;
+				Dictionary<Guid, bool> ObjectIds;
 
 				if (Repair && Stat.IsCorrupt)
 				{
@@ -2202,13 +2202,15 @@ namespace Waher.Persistence.Files
 					{
 						int c = 0;
 
+						ObjectIds = new Dictionary<Guid, bool>();
+
 						await this.StartBulk();
 						try
 						{
 							for (uint BlockIndex = 0; BlockIndex < Stat.NrBlocks; BlockIndex++)
 							{
 								long PhysicalPosition = BlockIndex;
-								PhysicalPosition *= this.blockSize;
+								PhysicalPosition *= File.BlockSize;
 
 								byte[] Block = await File.LoadBlockLocked(PhysicalPosition, false);
 								BinaryDeserializer Reader = new BinaryDeserializer(File.CollectionName, this.encoding, Block, File.BlockLimit);
@@ -2218,7 +2220,7 @@ namespace Waher.Persistence.Files
 
 								while (Reader.BytesLeft >= 4)
 								{
-									Reader.ReadBlockLink();                    // Block link.
+									Reader.SkipBlockLink();
 									object ObjectId = File.RecordHandler.GetKey(Reader);
 									if (ObjectId is null)
 										break;
@@ -2280,15 +2282,16 @@ namespace Waher.Persistence.Files
 											if (Len2 != 0)
 												break;
 
-											if (ObjectId is Guid Guid && !ObjectIds.ContainsKey(Guid))
+											if (ObjectId is Guid Guid && !(Obj is null))
 											{
-												ObjectIds[Guid] = true;
-
-												if (!(Obj is null))
+												if (ObjectIds.ContainsKey(Guid))
+													Stat.LogError("Object with Object ID " + Guid.ToString() + " occurred multiple times.");
+												else
 												{
 													try
 													{
 														await TempFile.SaveNewObject(Obj);
+														ObjectIds[Guid] = true;
 													}
 													catch (Exception ex)
 													{
@@ -2343,6 +2346,12 @@ namespace Waher.Persistence.Files
 						finally
 						{
 							await this.EndBulk();
+						}
+
+						foreach (Guid Guid in P.Value.Keys)
+						{
+							if (!ObjectIds.ContainsKey(Guid))
+								Stat.LogError("Unable to recover object with Object ID " + Guid.ToString());
 						}
 					}
 
@@ -2401,6 +2410,8 @@ namespace Waher.Persistence.Files
 						}
 					}
 				}
+				else
+					ObjectIds = P.Value;
 
 				Output.WriteStartElement("File");
 				Output.WriteAttributeString("id", File.Id.ToString());

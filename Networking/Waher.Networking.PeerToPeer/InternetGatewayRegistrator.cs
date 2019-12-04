@@ -318,13 +318,13 @@ namespace Waher.Networking.PeerToPeer
 
 				foreach (InternetGatewayRegistration Registration in this.ports)
 				{
+					this.BeforeRegistration(Registration, TcpPortMapped, UdpPortMapped);
+
 					if ((Registration.TcpRegistered || !Registration.Tcp) &&
 						(Registration.UdpRegistered || !Registration.Udp))
 					{
 						continue;
 					}
-
-					this.BeforeRegistration(Registration, TcpPortMapped, UdpPortMapped);
 
 					if (Registration.Tcp && !Registration.TcpRegistered)
 					{

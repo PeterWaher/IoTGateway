@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using Waher.Events;
@@ -67,19 +68,28 @@ namespace Waher.Security.CallStack
 		/// <see cref="Assembly"/>, <see cref="Type"/>, <see cref="string"/> and <see cref="Regex"/> objects.</param>
 		private static void AssertSource(params object[] Sources)
 		{
-			StackTrace Trace = new StackTrace(2, false);
-			int i, c = Trace.FrameCount;
+			int i = 3;
 			StackFrame Frame;
 			MethodBase Method;
 			Type Type;
 			Assembly Assembly;
+			string TypeName;
+			string AssemblyName;
+			bool WaherPersistence = false;
+			bool AsynchTask = false;
+			bool Other = false;
 
-			for (i = 1; i < c; i++)
+			while (true)
 			{
-				Frame = Trace.GetFrame(i);
+				Frame = new StackFrame(i++);
 				Method = Frame.GetMethod();
+				if (Method is null)
+					break;
+
 				Type = Method.DeclaringType;
+				TypeName = Type.FullName;
 				Assembly = Type.Assembly;
+				AssemblyName = Assembly.GetName().Name;
 
 				foreach (object Source in Sources)
 				{
@@ -95,30 +105,61 @@ namespace Waher.Security.CallStack
 					}
 					else if (Source is Regex Regex)
 					{
-						if (IsMatch(Regex, Type.FullName + "." + Method.Name) ||
-							IsMatch(Regex, Type.FullName) ||
-							IsMatch(Regex, Assembly.GetName().Name))
+						if (IsMatch(Regex, TypeName + "." + Method.Name) ||
+							IsMatch(Regex, TypeName) ||
+							IsMatch(Regex, AssemblyName))
 						{
 							return;
 						}
 					}
 					else if (Source is string s)
 					{
-						if (Type.FullName + "." + Method.Name == s ||
-							Type.FullName == s ||
-							Assembly.GetName().Name == s)
+						if (TypeName + "." + Method.Name == s ||
+							TypeName == s ||
+							AssemblyName == s)
 						{
 							return;
 						}
 					}
 				}
+
+				if (!Other || !AsynchTask || !WaherPersistence)
+				{
+					if (string.IsNullOrEmpty(Assembly.Location))
+					{
+						if (AssemblyName.StartsWith("WPFA."))
+							WaherPersistence = true;
+						else
+							Other = true;
+					}
+					else
+					{
+						if (Type == typeof(System.Threading.Tasks.Task))
+							AsynchTask = true;
+						else if (TypeName.StartsWith(AssemblyName) &&
+							AssemblyName + "." == Path.ChangeExtension(Path.GetFileName(Assembly.Location), string.Empty))
+						{
+							if (AssemblyName.StartsWith("Waher.Persistence."))
+								WaherPersistence = true;
+							else if (!AssemblyName.StartsWith("Waher.") && !AssemblyName.StartsWith("System."))
+								Other = true;
+						}
+						else if (!Path.GetFileName(Assembly.Location).StartsWith("System."))
+							Other = true;
+					}
+				}
 			}
 
-			Frame = Trace.GetFrame(0);
+			if (AsynchTask && WaherPersistence && !Other)
+				return;	// In asynch call - stack trace not showing asynchronous call stack. If loading from database, i.e. populating object asynchronously, (possibly, check is vulnerable), give check a pass. Access will be restricted at a later stage, when accessing properties synchronously.
+
+			Frame = new StackFrame(2);
 			Method = Frame.GetMethod();
 			Type = Method.DeclaringType;
 			Assembly = Type.Assembly;
 
+			StackTrace Trace = new StackTrace(2, false);
+			
 			Log.Warning("Unauthorized access detected and prevented.", Type.FullName + "." + Method.Name, string.Empty,
 				"UnauthorizedAccess", EventLevel.Major, string.Empty, Assembly.FullName, Trace.ToString(),
 				new KeyValuePair<string, object>[]

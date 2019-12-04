@@ -881,8 +881,10 @@ The following functions operate on vectors:
 | `Count(v)`    | Number of elements in the vector `v`. | `Count([1,2,3,4,5])` |
 | `Count(v,x)`  | Number of elements in the vector `v` that are equal to `x`. | `Count([1,2,3,2,1],2)` |
 | `Join(v1,v2[,v3[,v4[,v5[,v6[,v7[,v8[,v9]]]]]]])` | Joins a sequence of vectors, into a larger vector. | `Join(v1,v2)` |
+| `Left(v,N)`   | Returns a vector with the left-most `N` elements. If the vector `v` is shorter, the entire vector is returned. | `Left(v,3)` |
 | `Max(v)`      | The largest element in the vector `v`. | `Max([1,2,3,4,5])` |
 | `Median(v)`   | The median element in the vector `v`. | `Median([1,2,3,4,5])` |
+| `Mid(v,Pos,Len)` | Returns a vector containing elements from `v`, starting a element `Pos` and continuing `Len` elements. The `Pos` index is zero-based. If the requested vector goes beyond the scope of `v`, the resulting vector gets truncated accordingly. | `Mid(v,5,2)` |
 | `Min(v)`      | The smallest element in the vector `v`. | `Min([1,2,3,4,5])` |
 | `Nand(v)`     | Logical or binary NAND of all elements in vector | `Nand([1,2,3,4,5])`, `Nand([true,false,true])` |
 | `Nor(v)`      | Logical or binary NOR of all elements in vector | `Nor([1,2,3,4,5])`, `Nor([true,false,true])` |
@@ -891,6 +893,7 @@ The following functions operate on vectors:
 | `Prod(v)`     | Alias for `Product(v)` | `Prod([1,2,3,4,5])` |
 | `Product(v)`  | Product of elements in the vector `v`. | `Product([1,2,3,4,5])` |
 | `Reverse(v)`  | Returns a vector with the elements of the original vector `v` in reverse order. | `Reverse([1,2,3,4,5])` |
+| `Right(v,N)`  | Returns a vector with the right-most `N` elements. If the vector `v` is shorter, the entire vector is returned. | `Right(v,3)` |
 | `StdDev(v)`   | Alias for `StandardDeviation(v)` | `StdDev([1,2,3,4,5])` |
 | `StandardDeviation(v)` | Standard deviation of elements in the vector `v`. | `StandardDeviation([1,2,3,4,5])` |
 | `Sum(v)`      | Sum of elements in the vector `v`. | `Sum([1,2,3,4,5])` |

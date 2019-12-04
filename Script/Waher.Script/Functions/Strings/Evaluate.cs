@@ -4,7 +4,7 @@ using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
 
-namespace Waher.Script.Functions.Scalar
+namespace Waher.Script.Functions.Strings
 {
     /// <summary>
     /// Evaluate(s)

@@ -5,7 +5,7 @@ using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 
-namespace Waher.Script.Functions.Scalar
+namespace Waher.Script.Functions.Strings
 {
     /// <summary>
     /// IsNotEmpty(s)

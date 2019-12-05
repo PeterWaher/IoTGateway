@@ -101,11 +101,10 @@ namespace Waher.Script.Abstraction.Sets
 		/// <returns>Set, or null if not possible to convert.</returns>
 		public static ISet ToSet(IElement E)
 		{
-			ISet Result = E as ISet;
-			if (Result is null)
+			if (!(E is ISet Result))
 			{
 				if (E is IVector Vector)
-					Result = new FiniteSet(Vector.ChildElements);
+					Result = new FiniteSet(Vector.VectorElements);
 				else
 				{
 					object Obj = E.AssociatedObjectValue;

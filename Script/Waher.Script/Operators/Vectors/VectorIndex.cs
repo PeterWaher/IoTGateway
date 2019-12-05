@@ -48,8 +48,8 @@ namespace Waher.Script.Operators.Vectors
 		/// Evaluates the vector index operator.
 		/// </summary>
 		/// <param name="Vector">Vector</param>
-		/// <param name="NullCheck">If null should be returned if left operand is null.</param>
 		/// <param name="Index">Index</param>
+		/// <param name="NullCheck">If null should be returned if left operand is null.</param>
 		/// <param name="Node">Node performing the operation.</param>
 		/// <returns>Result</returns>
 		public static IElement EvaluateIndex(IElement Vector, IElement Index, bool NullCheck, ScriptNode Node)

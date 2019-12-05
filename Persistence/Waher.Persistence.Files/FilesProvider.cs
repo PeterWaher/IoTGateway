@@ -1006,8 +1006,6 @@ namespace Waher.Persistence.Files
 
 							rsa.ImportParameters(Parameters);
 
-							Console.Out.WriteLine(FileName);
-
 							KeyGenMode |= 2;
 						}
 					}

@@ -77,7 +77,7 @@ namespace Waher.Script.Operators.Matrices
                     else
                         Columns = i;
 
-                    foreach (IElement Element in Vector.ChildElements)
+                    foreach (IElement Element in Vector.VectorElements)
                         Elements.AddLast(Element);
                 }
             }
@@ -103,6 +103,21 @@ namespace Waher.Script.Operators.Matrices
             ISet CommonSuperSet = null;
             ISet Set;
             bool Upgraded = false;
+
+			if (Elements.Count == Rows && Columns > 1)
+			{
+				List<IElement> Temp = new List<IElement>();
+
+				foreach (IElement E in Elements)
+				{
+					if (E is IVector V)
+						Temp.AddRange(V.VectorElements);
+					else
+						throw new ScriptRuntimeException("Invalid number of elements.", Node);
+				}
+
+				Elements = Temp;
+			}
 
             foreach (IElement Element in Elements)
             {
@@ -192,10 +207,9 @@ namespace Waher.Script.Operators.Matrices
         public override PatternMatchResult PatternMatch(IElement CheckAgainst, Dictionary<string, IElement> AlreadyFound)
         {
             ScriptNode[] Elements = this.Elements;
-            IMatrix Matrix = CheckAgainst as IMatrix;
-            int c = Elements.Length;
+			int c = Elements.Length;
 
-			if (Matrix is null || Matrix.Rows != c)
+			if (!(CheckAgainst is IMatrix Matrix) || Matrix.Rows != c)
 				return PatternMatchResult.NoMatch;
 
 			PatternMatchResult Result;

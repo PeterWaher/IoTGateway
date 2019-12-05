@@ -114,7 +114,7 @@ namespace Waher.Script.Functions.Vectors
             ISemiGroupElement SE;
             ISemiGroupElement Sum;
 
-            foreach (IElement E in Vector.ChildElements)
+            foreach (IElement E in Vector.VectorElements)
             {
                 SE = E as ISemiGroupElement;
                 if (SE is null)

@@ -180,7 +180,7 @@ namespace Waher.Script.Operators.Vectors
 			PatternMatchResult Result;
 			int i = 0;
 
-            foreach (IElement E in Vector.ChildElements)
+            foreach (IElement E in Vector.VectorElements)
 			{
 				Result = Elements[i++].PatternMatch(E, AlreadyFound);
 				if (Result != PatternMatchResult.Match)

@@ -749,7 +749,7 @@ namespace Waher.Script.Objects.Matrices
 			this.elements = null;
 			int i = 0;
 
-			foreach (IElement E in Vector.ChildElements)
+			foreach (IElement E in Vector.VectorElements)
 				M[Row, i++] = E;
 		}
 
@@ -770,7 +770,7 @@ namespace Waher.Script.Objects.Matrices
 			this.elements = null;
 			int i = 0;
 
-			foreach (IElement E in Vector.ChildElements)
+			foreach (IElement E in Vector.VectorElements)
 				M[i++, Column] = E;
 		}
 	}

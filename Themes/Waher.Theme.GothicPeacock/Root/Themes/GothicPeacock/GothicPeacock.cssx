@@ -614,6 +614,34 @@ th, td
     padding: 0.2em 0.6em 0.2em 0.6em;
 }
 
+th > a:only-child
+{
+    color: ¤ButtonTextColor¤;
+    text-decoration: none;
+}
+
+th > a:only-child:link
+{
+    color: ¤ButtonTextColor¤;
+}
+
+th > a:only-child:visited
+{
+    color: ¤ButtonTextColor¤;
+}
+
+th > a:only-child:hover
+{
+    color: ¤ButtonTextColor¤;
+    text-shadow: 0.3em 0.3em 0.3em rgba(0,0,0,0.5);
+}
+
+th > a:only-child:active
+{
+    color: ¤ButtonTextColor¤;
+    text-shadow: 0.1em 0.1em 0.1em rgba(0,0,0,0.5);
+}
+
 .toc
 {
     margin:1em 0 1em 0;

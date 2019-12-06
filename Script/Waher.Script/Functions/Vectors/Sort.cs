@@ -258,7 +258,7 @@ namespace Waher.Script.Functions.Vectors
 				Array.Sort<IElement>(Elements, new ElementOrder(this));
 			else
 			{
-				IComparer<IElement>[] Comparers = new IComparer<IElement>[c - 1];
+				IComparer<IElement>[] Comparers = new IComparer<IElement>[c];
 				IElement Element;
 
 				for (i = 1; i < c; i++)
@@ -307,6 +307,8 @@ namespace Waher.Script.Functions.Vectors
 							"string values representing field names or numeric index values.", this);
 					}
 				}
+
+				Comparers[c - 1] = new ElementOrder(this);
 
 				Array.Sort(Elements, new CompoundOrder(Comparers));
 			}

@@ -121,6 +121,17 @@ namespace Waher.Script
 		}
 
 		/// <summary>
+		/// Removes all variables from the collection.
+		/// </summary>
+		public virtual void Clear()
+		{
+			lock (this.variables)
+			{
+				this.variables.Clear();
+			}
+		}
+
+		/// <summary>
 		/// Pushes the current set of variables to the stack. This state is restored by calling <see cref="Pop"/>.
 		/// Each call to this method must be followed by exactly one call to <see cref="Pop"/>.
 		/// </summary>

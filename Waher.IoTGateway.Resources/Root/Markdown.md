@@ -1327,14 +1327,28 @@ for all script on the server, if accessed through the `Global` variables collect
 
 Example:
 
-	This page has been generated {Global.NrTimesMarkdownLoaded:=try Global.NrTimesMarkdownLoaded+1 catch 1} times since the start of the server.
+	This page has been viewed {Global.NrTimesMarkdownLoaded:=try Global.NrTimesMarkdownLoaded+1 catch 1} times since the server was last restarted.
 
 This becomes:
 
-This page has been generated {Global.NrTimesMarkdownLoaded:=try Global.NrTimesMarkdownLoaded+1 catch 1} times since the start of the server.
+This page has been viewed {Global.NrTimesMarkdownLoaded:=try Global.NrTimesMarkdownLoaded+1 catch 1} times since the server was last restarted.
 
 **Note**: If the count does not increment when the page is loaded or refreshed, it means you're receiving a cached result. You can control
 page cache rules using [Metadata tags](#metadata).
+
+### Page-local variables
+
+When navigating on Markdown pages, a page-local collection of variables is available, by referencing the session variable named `Page`. 
+Every time a new page is viewed by the same session, the Page-collection is cleared. The `Page` collection can be a good place to store
+temporary information related to the current page.
+
+Example:
+
+	This page has been viewed {Page.NrTimesMarkdownLoaded:=try Page.NrTimesMarkdownLoaded+1 catch 1} times since you last navigated to this page.
+
+This becomes:
+
+This page has been viewed {Page.NrTimesMarkdownLoaded:=try Page.NrTimesMarkdownLoaded+1 catch 1} times since you last navigated to this page.
 
 ### Current request
 
@@ -1345,6 +1359,12 @@ contain an object of type `Waher.Networking.HTTP.HttpRequest`.
 
 The session state will contain a variable named `Response` where the response is being built. The variable will contain an object of type 
 `Waher.Networking.HTTP.HttpResponse`. It can be used to set custom header information, etc.
+
+### Posted data
+
+Data posted to a page can be accessed, in decoded form, by accessing the `Posted` variable, defined in the `Waher.Networking.HTTP` module.
+This makes it possible to implement a form into a Markdown page, and process posted information from script embedded in the document itself,
+or linked to it in the meta-data headers.
 
 
 =========================================================================================================================================================

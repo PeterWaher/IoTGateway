@@ -33,6 +33,7 @@ namespace Waher.Networking.HTTP
 		private HttpFieldUpgradeInsecureRequests upgradeInsequreRequests = null;
 		private string method = string.Empty;
 		private string resource = string.Empty;
+		private string resourcePart = string.Empty;
 		private string queryString = string.Empty;
 		private string fragment = string.Empty;
 		private readonly string uriScheme = string.Empty;
@@ -77,7 +78,7 @@ namespace Waher.Networking.HTTP
 				int j = Row.LastIndexOf(' ');
 				if (j > 0 && j < Row.Length - 5 && Row.Substring(j + 1, 5) == "HTTP/")
 				{
-					this.resource = Row.Substring(i + 1, j - i - 1).Trim();
+					this.resource = this.resourcePart = Row.Substring(i + 1, j - i - 1).Trim();
 					if (CommonTypes.TryParse(Row.Substring(j + 6), out this.httpVersion))
 					{
 						i = this.resource.IndexOf('?');
@@ -129,6 +130,11 @@ namespace Waher.Networking.HTTP
 		/// Resource
 		/// </summary>
 		public string Resource { get { return this.resource; } }
+
+		/// <summary>
+		/// Contains original resource part of request.
+		/// </summary>
+		public string ResourcePart { get { return this.resourcePart; } }
 
 		/// <summary>
 		/// HTTP Version.

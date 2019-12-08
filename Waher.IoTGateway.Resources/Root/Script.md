@@ -1415,6 +1415,8 @@ The following predefined variables are available in such web content files:
 | `Request`      | The current HttpRequest object.                          |
 | `Response`     | The current HttpResponse object.                         |
 | `Posted`       | Any decoded data posted to the resource.                 |
+| `Gloabl`       | Global variables.                                        |
+| `Page`         | Page-local variables.                                    |
 
 #### Gateway Extensions (Waher.IoTGateway)
 

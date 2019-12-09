@@ -618,6 +618,7 @@ th > a:only-child
 {
     color: ¤ButtonTextColor¤;
     text-decoration: none;
+	cursor: pointer;
 }
 
 th > a:only-child:link

@@ -117,12 +117,28 @@ namespace Waher.Content.Markdown.Web
 				Markdown = rd.ReadToEnd();
 			}
 
-			if (Session != null && Session.TryGetVariable("Request", out Variable v))
+			if (!(Session is null) && Session.TryGetVariable("Request", out Variable v))
 			{
 				Request = v.ValueObject as HttpRequest;
 
-				if (Request != null)
+				if (!(Request is null))
 				{
+					string Url = Request.Header.ResourcePart;
+
+					if (!Session.TryGetVariable(" PageVariables ", out v) ||
+						!(v.ValueObject is Variables PageVariables))
+					{
+						Session[" LastPage "] = Url;
+						Session[" PageVariables "] = new Variables();
+					}
+					else if (!Session.TryGetVariable(" LastPage ", out v) ||
+						!(v.ValueObject is string LastPageUrl) ||
+						LastPageUrl != Url)
+					{
+						Session[" LastPage "] = Url;
+						PageVariables.Clear();
+					}
+
 					int i = Markdown.IndexOf("\r\n\r\n");
 					if (i < 0)
 						i = Markdown.IndexOf("\n\n");
@@ -193,7 +209,7 @@ namespace Waher.Content.Markdown.Web
 						string LoginFileName = null;
 						string FromFolder = Path.GetDirectoryName(FromFileName);
 
-						if (Login != null)
+						if (!(Login is null))
 						{
 							foreach (KeyValuePair<string, bool> P2 in Login)
 							{
@@ -207,7 +223,7 @@ namespace Waher.Content.Markdown.Web
 							}
 						}
 
-						if (LoginFileName != null)
+						if (!(LoginFileName is null))
 						{
 							string LoginMarkdown = File.ReadAllText(LoginFileName);
 							MarkdownDocument LoginDoc = new MarkdownDocument(LoginMarkdown, Settings, LoginFileName, LoginUrl.AbsolutePath,
@@ -233,7 +249,7 @@ namespace Waher.Content.Markdown.Web
 						break;
 					}
 
-					if (Privilege != null)
+					if (!(Privilege is null))
 					{
 						foreach (KeyValuePair<string, bool> P2 in Privilege)
 						{
@@ -251,7 +267,7 @@ namespace Waher.Content.Markdown.Web
 
 				if (!Authorized)
 				{
-					if (Login != null)
+					if (!(Login is null))
 					{
 						foreach (KeyValuePair<string, bool> P in Login)
 						{
@@ -263,7 +279,7 @@ namespace Waher.Content.Markdown.Web
 
 							Location.Append("from=");
 
-							if (Request != null)
+							if (!(Request is null))
 								Location.Append(System.Net.WebUtility.UrlEncode(Request.Header.GetURL(true, true)));
 							else
 								Location.Append(System.Net.WebUtility.UrlEncode(URL));
@@ -312,7 +328,7 @@ namespace Waher.Content.Markdown.Web
 				}
 			}
 
-			if (Session != null && Session.TryGetVariable("Response", out v))
+			if (!(Session is null) && Session.TryGetVariable("Response", out v))
 			{
 				if (v.ValueObject is HttpResponse Response)
 				{

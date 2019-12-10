@@ -2,6 +2,7 @@
 using Waher.Script;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
+using Waher.Script.Objects;
 
 namespace Waher.Networking.HTTP.ScriptExtensions
 {
@@ -40,7 +41,7 @@ namespace Waher.Networking.HTTP.ScriptExtensions
 		public IElement GetValueElement(Variables Variables)
 		{
 			if (!Variables.TryGetVariable(" LastPost ", out Variable v))
-				return null;
+				return new ObjectValue(null);
 
 			IElement Result = v.ValueElement;
 
@@ -50,7 +51,7 @@ namespace Waher.Networking.HTTP.ScriptExtensions
 				!(v.ValueObject is HttpRequest Request) ||
 				string.Compare(SubPath, Request.SubPath, true) != 0)
 			{
-				return null;
+				return new ObjectValue(null);
 			}
 
 			return Result;

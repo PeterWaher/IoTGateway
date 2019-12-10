@@ -124,7 +124,7 @@ namespace Waher.Persistence.Files
 
 				int NrRead = await this.file.ReadAsync(Result, 0, NrBytes);
 				if (NrRead < NrBytes)
-					throw new EndOfStreamException("Unexpected end of file.");
+					throw new EndOfStreamException("Unexpected end of file " + this.fileName + ".");
 			}
 			finally
 			{

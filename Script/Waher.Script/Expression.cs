@@ -3239,8 +3239,31 @@ namespace Waher.Script
 
 				this.pos++;
 
-				Node.Start = Start;
-				return Node;
+				if (Node is null)
+				{
+					this.SkipWhiteSpace();
+					if (this.PeekNextChar() == '-')
+					{
+						this.pos++;
+						if (this.PeekNextChar() == '>')
+						{
+							this.pos++;
+
+							ScriptNode Operand = this.ParseEquivalence();
+							if (Operand is null)
+								throw new SyntaxException("Lambda function body missing.", this.pos, this.script);
+
+							return new LambdaDefinition(new string[0], new ArgumentType[0], Operand, Start, this.pos - Start, this);
+						}
+					}
+						
+					throw new SyntaxException("Expected argument-less Lambda expression", this.pos, this.script);
+				}
+				else
+				{
+					Node.Start = Start;
+					return Node;
+				}
 			}
 			else if (ch == '[')
 			{

@@ -579,9 +579,9 @@ namespace Waher.Persistence.Files
 
             int NrRead = await this.file.ReadAsync(Block, 0, this.blockSize);
             if (this.blockSize != NrRead)
-                throw new IOException("Read past end of file.");
+				throw new IOException("Read past end of file " + this.fileName + ".");
 
-            this.nrBlockLoads++;
+			this.nrBlockLoads++;
 
             if (this.encrypted)
             {
@@ -901,9 +901,9 @@ namespace Waher.Persistence.Files
 
                 NrRead = await this.blobFile.ReadAsync(BlobBlock, 0, this.blobBlockSize);
                 if (NrRead != this.blobBlockSize)
-                    throw new IOException("Read past end of file.");
+					throw new IOException("Read past end of file " + this.fileName + ".");
 
-                this.nrBlobBlockLoads++;
+				this.nrBlobBlockLoads++;
 
                 if (this.encrypted)
                 {
@@ -988,9 +988,9 @@ namespace Waher.Persistence.Files
 
                 NrRead = await this.blobFile.ReadAsync(BlobBlock, 0, this.blobBlockSize);
                 if (NrRead != this.blobBlockSize)
-                    throw new IOException("Read past end of file.");
+					throw new IOException("Read past end of file " + this.fileName + ".");
 
-                this.nrBlockLoads++;
+				this.nrBlockLoads++;
 
                 if (this.encrypted)
                 {
@@ -1031,9 +1031,9 @@ namespace Waher.Persistence.Files
 
                 NrRead = await this.blobFile.ReadAsync(BlobBlock, 0, this.blobBlockSize);
                 if (NrRead != this.blobBlockSize)
-                    throw new IOException("Read past end of file.");
+					throw new IOException("Read past end of file " + this.fileName + ".");
 
-                this.nrBlockLoads++;
+				this.nrBlockLoads++;
 
                 if (this.encrypted)
                 {
@@ -1101,9 +1101,9 @@ namespace Waher.Persistence.Files
 
                     NrRead = await this.blobFile.ReadAsync(BlobBlock, 0, this.blobBlockSize);
                     if (NrRead != this.blobBlockSize)
-                        throw new IOException("Read past end of file.");
+						throw new IOException("Read past end of file " + this.fileName + ".");
 
-                    this.nrBlockLoads++;
+					this.nrBlockLoads++;
 
                     if (this.encrypted)
                     {
@@ -1141,9 +1141,9 @@ namespace Waher.Persistence.Files
 
                     NrRead = await this.blobFile.ReadAsync(BlobBlock, 0, this.blobBlockSize);
                     if (NrRead != this.blobBlockSize)
-                        throw new IOException("Read past end of file.");
+						throw new IOException("Read past end of file " + this.fileName + ".");
 
-                    this.nrBlockLoads++;
+					this.nrBlockLoads++;
 
                     if (this.encrypted)
                     {
@@ -4079,9 +4079,9 @@ namespace Waher.Persistence.Files
                 {
                     NrRead = await this.blobFile.ReadAsync(BlobBlock, 0, this.blobBlockSize);
                     if (NrRead != this.blobBlockSize)
-                        throw new IOException("Read past end of file.");
+						throw new IOException("Read past end of file " + this.fileName + ".");
 
-                    this.nrBlobBlockLoads++;
+					this.nrBlobBlockLoads++;
 
                     if (this.encrypted)
                     {

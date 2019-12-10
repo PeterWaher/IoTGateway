@@ -9,7 +9,7 @@ namespace Waher.Script.Objects
 	/// <summary>
 	/// The field Z_2 of boolean numbers ([0]_2, 0 or false, and [1]_2, 1 or true).
 	/// </summary>
-	public sealed class BooleanValues : Field
+	public sealed class BooleanValues : Field, IOrderedSet
 	{
 		private static readonly int hashCode = typeof(BooleanValues).FullName.GetHashCode();
 
@@ -60,6 +60,20 @@ namespace Waher.Script.Objects
 		public override int GetHashCode()
 		{
 			return hashCode;
+		}
+
+		/// <summary>
+		/// Compares two double values.
+		/// </summary>
+		/// <param name="x">Value 1</param>
+		/// <param name="y">Value 2</param>
+		/// <returns>Result</returns>
+		public int Compare(IElement x, IElement y)
+		{
+			BooleanValue b1 = (BooleanValue)x;
+			BooleanValue b2 = (BooleanValue)y;
+
+			return b1.Value.CompareTo(b2.Value);
 		}
 	}
 }

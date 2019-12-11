@@ -63,8 +63,7 @@ namespace Waher.Script.Objects
 		/// </summary>
 		public override bool Equals(object obj)
 		{
-			TypeValue E = obj as TypeValue;
-			if (E is null)
+			if (!(obj is TypeValue E))
 				return false;
 			else
 				return this.value.Equals(E.value);

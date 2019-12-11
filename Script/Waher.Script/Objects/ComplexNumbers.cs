@@ -62,10 +62,10 @@ namespace Waher.Script.Objects
 			return hashCode;
 		}
 
-        /// <summary>
-        /// Instance of the set of complex numbers.
-        /// </summary>
-        public static readonly ComplexNumbers Instance = new ComplexNumbers();
+		/// <summary>
+		/// Instance of the set of complex numbers.
+		/// </summary>
+		public static readonly ComplexNumbers Instance = new ComplexNumbers();
 
 		/// <summary>
 		/// <see cref="object.ToString"/>

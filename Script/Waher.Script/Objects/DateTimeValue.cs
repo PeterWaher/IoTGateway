@@ -61,8 +61,7 @@ namespace Waher.Script.Objects
 		/// </summary>
 		public override bool Equals(object obj)
 		{
-			DateTimeValue E = obj as DateTimeValue;
-			if (E is null)
+			if (!(obj is DateTimeValue E))
 				return false;
 			else
 				return this.value == E.value;

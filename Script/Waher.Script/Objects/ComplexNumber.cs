@@ -74,11 +74,9 @@ namespace Waher.Script.Objects
 		/// <returns>Result, if understood, null otherwise.</returns>
 		public override ICommutativeRingElement Multiply(ICommutativeRingElement Element)
 		{
-			ComplexNumber E = Element as ComplexNumber;
-			if (E is null)
+			if (!(Element is ComplexNumber E))
 			{
-				DoubleNumber D = Element as DoubleNumber;
-				if (D is null)
+				if (!(Element is DoubleNumber D))
 					return null;
 				else
 					return new ComplexNumber(this.value * D.Value);
@@ -103,11 +101,9 @@ namespace Waher.Script.Objects
 		/// <returns>Result, if understood, null otherwise.</returns>
 		public override IAbelianGroupElement Add(IAbelianGroupElement Element)
 		{
-			ComplexNumber E = Element as ComplexNumber;
-			if (E is null)
+			if (!(Element is ComplexNumber E))
 			{
-				DoubleNumber D = Element as DoubleNumber;
-				if (D is null)
+				if (!(Element is DoubleNumber D))
 					return null;
 				else
 					return new ComplexNumber(this.value + D.Value);
@@ -130,11 +126,9 @@ namespace Waher.Script.Objects
 		/// </summary>
 		public override bool Equals(object obj)
 		{
-			ComplexNumber E = obj as ComplexNumber;
-			if (E is null)
+			if (!(obj is ComplexNumber E))
 			{
-				DoubleNumber D = obj as DoubleNumber;
-				if (D is null)
+				if (!(obj is DoubleNumber D))
 					return false;
 				else
 					return this.value == D.Value;

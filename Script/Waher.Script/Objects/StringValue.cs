@@ -147,8 +147,7 @@ namespace Waher.Script.Objects
         /// </summary>
         public override bool Equals(object obj)
         {
-            StringValue E = obj as StringValue;
-            if (E is null)
+            if (!(obj is StringValue E))
                 return false;
             else
                 return string.Compare(this.value, E.value, this.caseInsensitive || E.caseInsensitive) == 0;

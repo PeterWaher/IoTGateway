@@ -58,10 +58,7 @@ namespace Waher.Script.Objects
 			TypeValue o1 = (TypeValue)x;
 			TypeValue o2 = (TypeValue)y;
 
-			IComparable c1 = o1.Value as IComparable;
-			IComparable c2 = o2.Value as IComparable;
-
-			if (c1 is null || c2 is null)
+			if (!(o1.Value is IComparable c1) || !(o2.Value is IComparable c2))
 				throw new ScriptException("Values not comparable.");
 
 			return c1.CompareTo(c2);

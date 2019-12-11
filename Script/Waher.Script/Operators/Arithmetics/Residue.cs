@@ -49,10 +49,7 @@ namespace Waher.Script.Operators.Arithmetics
 		/// <returns>Result</returns>
 		public static IElement EvaluateResidue(IElement Left, IElement Right, ScriptNode Node)
 		{
-			DoubleNumber DL = Left as DoubleNumber;
-			DoubleNumber DR = Right as DoubleNumber;
-
-			if (!(DL is null) && !(DR is null))
+			if (!(!(Left is DoubleNumber DL)) && !(!(Right is DoubleNumber DR)))
 			{
 				double dl = DL.Value;
 				if (dl < long.MinValue || dl > long.MaxValue || dl != Math.Truncate(dl))
@@ -80,10 +77,7 @@ namespace Waher.Script.Operators.Arithmetics
 						if (!Expression.UpgradeField(ref Left, ref LeftSet, ref Right, ref RightSet, Node))
 							throw new ScriptRuntimeException("Incompatible operands.", Node);
 
-						IEuclidianDomainElement LE = Left as IEuclidianDomainElement;
-						IEuclidianDomainElement RE = Right as IEuclidianDomainElement;
-
-						if (!(LE is null) && !(RE is null))
+						if (!(!(Left is IEuclidianDomainElement LE)) && !(!(Right is IEuclidianDomainElement RE)))
 						{
 							((IEuclidianDomain)LeftSet).Divide(LE, RE, out IEuclidianDomainElement Result);
 							return Result;

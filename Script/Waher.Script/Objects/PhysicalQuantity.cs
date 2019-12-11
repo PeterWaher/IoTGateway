@@ -92,8 +92,7 @@ namespace Waher.Script.Objects
 		/// <returns>Result, if understood, null otherwise.</returns>
 		public override ICommutativeRingElement Multiply(ICommutativeRingElement Element)
 		{
-			PhysicalQuantity E = Element as PhysicalQuantity;
-			if (E is null)
+			if (!(Element is PhysicalQuantity E))
 			{
 				if (Element is DoubleNumber n)
 					return new PhysicalQuantity(this.magnitude * n.Value, this.unit);
@@ -132,9 +131,7 @@ namespace Waher.Script.Objects
 		/// <returns>Result, if understood, null otherwise.</returns>
 		public override IAbelianGroupElement Add(IAbelianGroupElement Element)
 		{
-			PhysicalQuantity E = Element as PhysicalQuantity;
-
-			if (E is null)
+			if (!(Element is PhysicalQuantity E))
 			{
 				if (Element is DoubleNumber n)
 					return new PhysicalQuantity(this.magnitude + n.Value, this.unit);
@@ -161,18 +158,18 @@ namespace Waher.Script.Objects
 		/// </summary>
 		public override bool Equals(object obj)
 		{
-			PhysicalQuantity E = obj as PhysicalQuantity;
-			if (E is null)
+			if (!(obj is PhysicalQuantity E))
 				return false;
+
 			if (this.unit.Equals(E.unit))
 				return this.magnitude == E.magnitude;
 			else
 			{
 				double m1 = this.magnitude;
-				Unit U1 = this.unit.ToReferenceUnits(ref m1);
+				this.unit.ToReferenceUnits(ref m1);
 
 				double m2 = E.magnitude;
-				Unit U2 = E.unit.ToReferenceUnits(ref m2);
+				E.unit.ToReferenceUnits(ref m2);
 
 				return m1 == m2;
 			}
@@ -303,8 +300,7 @@ namespace Waher.Script.Objects
 		/// </summary>
 		public int CompareTo(object obj)
 		{
-			PhysicalQuantity Q = obj as PhysicalQuantity;
-			if (Q is null)
+			if (!(obj is PhysicalQuantity Q))
 				throw new ScriptException("Values not comparable.");
 
 			if (this.unit.Equals(Q.unit))

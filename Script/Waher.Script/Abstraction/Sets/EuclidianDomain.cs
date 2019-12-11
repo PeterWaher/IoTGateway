@@ -26,15 +26,11 @@ namespace Waher.Script.Abstraction.Sets
 		/// <returns>Result, if understood, null otherwise.</returns>
 		public override ICommutativeRingElement Divide(ICommutativeRingElement Left, ICommutativeRingElement Right)
 		{
-			IEuclidianDomainElement L = Left as IEuclidianDomainElement;
-			IEuclidianDomainElement R = Right as IEuclidianDomainElement;
-
-			if (L is null || R is null)
+			if (!(Left is IEuclidianDomainElement L) || !(Right is IEuclidianDomainElement R))
 				return base.Divide(Left, Right);
 			else
 			{
-				IEuclidianDomainElement Remainder;
-				IEuclidianDomainElement Result = this.Divide(L, R, out Remainder);
+				IEuclidianDomainElement Result = this.Divide(L, R, out IEuclidianDomainElement Remainder);
 				if (Result is null || !Remainder.Equals(Remainder.AssociatedAbelianGroup.Zero))
 					return null;
 				else

@@ -13,7 +13,7 @@ namespace Waher.Script.Objects
     {
         private static readonly Namespaces associatedSet = new Namespaces();
 
-        private string value;
+        private readonly string value;
 
         /// <summary>
         /// Namespace value.

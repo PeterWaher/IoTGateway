@@ -134,7 +134,7 @@ namespace Waher.IoTGateway
 		/// <returns>Formatted file size.</returns>
 		public static string FormatBytes(double Bytes)
 		{
-			var i = 0;
+			int i = 0;
 
 			while (Bytes >= 1024 && i < 4)
 			{

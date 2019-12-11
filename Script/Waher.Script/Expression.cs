@@ -3256,7 +3256,7 @@ namespace Waher.Script
 							return new LambdaDefinition(new string[0], new ArgumentType[0], Operand, Start, this.pos - Start, this);
 						}
 					}
-						
+
 					throw new SyntaxException("Expected argument-less Lambda expression", this.pos, this.script);
 				}
 				else
@@ -3553,6 +3553,81 @@ namespace Waher.Script
 				}
 
 				return new ConstantElement(new DoubleNumber(d), Start, this.pos - Start, this);
+			}
+			else if (ch == '#')
+			{
+				char Base;
+				int Start2 = ++this.pos;
+
+				ch = char.ToLower(this.PeekNextChar());
+				if (ch >= '0' && ch <= '9')
+					Base = 'd';
+				else if (ch == 'd' || ch == 'x' || ch == 'o' || ch == 'b')
+				{
+					Base = ch;
+					Start2 = ++this.pos;
+				}
+				else
+					throw new SyntaxException("Invalid numberical base.", this.pos, this.script);
+
+				BigInteger n;
+
+				switch (Base)
+				{
+					case 'd':
+						while (this.pos < this.len && (ch = this.script[this.pos]) >= '0' && ch <= '9')
+							this.pos++;
+
+						if (Start2 == this.pos)
+							throw new SyntaxException("Invalid integer.", this.pos, this.script);
+
+						n = BigInteger.Parse(this.script.Substring(Start2, this.pos - Start2));
+						break;
+
+					case 'x':
+						n = 0;
+						while (this.pos < this.len)
+						{
+							ch = this.script[this.pos];
+
+							if (ch >= '0' && ch <= '9')
+								ch -= '0';
+							else if (ch >= 'a' && ch <= 'f')
+								ch -= (char)('a' - 10);
+							else if (ch >= 'A' && ch <= 'F')
+								ch -= (char)('A' - 10);
+							else
+								break;
+
+							this.pos++;
+							n <<= 4;
+							n += ch;
+						}
+						break;
+
+					case 'o':
+						while (this.pos < this.len && (ch = this.script[this.pos]) >= '0' && ch <= '7')
+						{
+							this.pos++;
+							n <<= 3;
+							n += ch - '0';
+						}
+						break;
+
+					case 'b':
+						while (this.pos < this.len && (ch = this.script[this.pos]) >= '0' && ch <= '1')
+						{
+							this.pos++;
+							n <<= 1;
+							n += ch - '0';
+						}
+						break;
+				}
+
+				if (Start2 == this.pos)
+					throw new SyntaxException("Invalid integer.", this.pos, this.script);
+
+				return new ConstantElement(new Integer(n), Start, this.pos - Start, this);
 			}
 			else if (ch == '"' || ch == '\'')
 			{
@@ -3863,6 +3938,16 @@ namespace Waher.Script
 		/// </summary>
 		/// <param name="Value">Value</param>
 		/// <returns>String representation of value.</returns>
+		public static string ToString(BigInteger Value)
+		{
+			return "#" + Value.ToString();
+		}
+
+		/// <summary>
+		/// Converts a value to a string, that can be parsed as part of an expression.
+		/// </summary>
+		/// <param name="Value">Value</param>
+		/// <returns>String representation of value.</returns>
 		public static string ToString(bool Value)
 		{
 			return Value ? "⊤" : "⊥";
@@ -4044,6 +4129,8 @@ namespace Waher.Script
 				return ToString(dec);
 			else if (Value is Complex z)
 				return ToString(z);
+			else if (Value is BigInteger i)
+				return ToString(i);
 			else if (Value is bool b)
 				return ToString(b);
 			else if (Value is double[] dblA)
@@ -4147,6 +4234,15 @@ namespace Waher.Script
 					return ui;
 				else if (Object is ulong ul)
 					return ul;
+				else if (Object is BigInteger i2)
+					return (double)i2;
+				else if (Object is Complex z)
+				{
+					if (z.Imaginary == 0)
+						return z.Real;
+					else
+						throw new ScriptException("Expected a double value.");
+				}
 				else
 				{
 					string s = Object.ToString();
@@ -4217,6 +4313,12 @@ namespace Waher.Script
 				return new DoubleNumber(ui);
 			else if (Value is ulong ul)
 				return new DoubleNumber(ul);
+			else if (Value is Complex c)
+				return new ComplexNumber(c);
+			else if (Value is BigInteger i2)
+				return new Integer(i2);
+			else if (Value is Type t)
+				return new TypeValue(t);
 			else
 			{
 				if (Value is IElement e)
@@ -4227,8 +4329,6 @@ namespace Waher.Script
 				else if (Value is double[,] dm)
 					return new DoubleMatrix(dm);
 
-				else if (Value is Complex c)
-					return new ComplexNumber(c);
 				else if (Value is Complex[] cv)
 					return new ComplexVector(cv);
 				else if (Value is Complex[,] cm)
@@ -4251,8 +4351,6 @@ namespace Waher.Script
 				else if (Value is object[,] om)
 					return new ObjectMatrix(om);
 
-				else if (Value is Type t)
-					return new TypeValue(t);
 				else
 					return new ObjectValue(Value);
 			}

@@ -68,6 +68,25 @@ special control characters in strings, accordig to the following table.
 | `\v`     | Vertical tab character. | 
 | `\xHH`   | Inlude a hexadecimally encoded byte. | 
 
+### Big Integers
+
+Big Integers can be provided by prefixing them with the `#` character. You can optionally provide
+a numeric base for the number, by specifying `d` for decimal, `x` for hexadecimal, `o` for octal
+and `b` for binary, between the `#` sign and the digits. If no base is provided, decimal base is
+assumed.
+
+	#((d?[0-9]+)|(x[0-9a-fA-F]+)|(o[0-7]+)|(b[0-1]+))
+	
+Examples:
+
+	#908340580348630802345239423850823402938409234
+	#x123ac40958023bc9890098ef098a098094
+	#o123476253765213476523746512736512735
+	#d234324238402983409810483057239057091250750
+	#b0110101001001111010101010111101010101010
+	#908340580348630802345239423850823402938409234*#x123ac40958023bc9890098ef098a098094
+	#o123476253765213476523746512736512735^100
+
 ### Null
 
 The **null** object reference value is written `null`.

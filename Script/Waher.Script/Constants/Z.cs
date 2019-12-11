@@ -4,7 +4,6 @@ using System.Text;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Objects;
-using Waher.Script.Objects.Sets;
 
 namespace Waher.Script.Constants
 {

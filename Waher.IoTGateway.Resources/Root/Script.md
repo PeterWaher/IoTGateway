@@ -72,20 +72,28 @@ special control characters in strings, accordig to the following table.
 
 Big Integers can be provided by prefixing them with the `#` character. You can optionally provide
 a numeric base for the number, by specifying `d` for decimal, `x` for hexadecimal, `o` for octal
-and `b` for binary, between the `#` sign and the digits. If no base is provided, decimal base is
-assumed.
+and `b` for binary, between the `#` sign and the sign or digits. If no base is provided, decimal base is
+assumed. A `+` or `-` sign can be optionally placed after the `#`.
 
-	#((d?[0-9]+)|(x[0-9a-fA-F]+)|(o[0-7]+)|(b[0-1]+))
+	#[+-]?((d?[0-9]+)|(x[0-9a-fA-F]+)|(o[0-7]+)|(b[0-1]+))
 	
 Examples:
 
 	#908340580348630802345239423850823402938409234
 	#x123ac40958023bc9890098ef098a098094
-	#o123476253765213476523746512736512735
+	#-o123476253765213476523746512736512735
 	#d234324238402983409810483057239057091250750
 	#b0110101001001111010101010111101010101010
-	#908340580348630802345239423850823402938409234*#x123ac40958023bc9890098ef098a098094
+	#-908340580348630802345239423850823402938409234*#x123ac40958023bc9890098ef098a098094
 	#o123476253765213476523746512736512735^100
+
+### Rational Numbers
+
+Rational numbers can be provided by dividing one big integer with another.
+
+Example:
+
+	#908340580348630802345239423850823402938409234/#x123ac40958023bc9890098ef098a098094
 
 ### Null
 
@@ -117,6 +125,7 @@ corresponding libraries.
 | `C`                    | Set of complex numbers                                    |
 | `R`                    | Set of real numbers                                       |
 | `Z`                    | Set of integer numbers                                    |
+| `Q`                    | Set of rational numbers                                   |
 | `∅`, `EmptySet`        | The empty set                                             |
 
 There are also a set of predefined variables:

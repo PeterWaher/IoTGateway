@@ -9,7 +9,7 @@ namespace Waher.Script.Objects
 	/// <summary>
 	/// Integer-valued number.
 	/// </summary>
-	public sealed class Integer : EuclidianDomainElement
+	public sealed class Integer : EuclidianDomainElement, IOrderedSet
 	{
 		private static readonly Integers associatedEuclidianDomain = new Integers();
 
@@ -118,12 +118,10 @@ namespace Waher.Script.Objects
 		/// <returns>Inverted element, or null if not possible.</returns>
 		public override IRingElement Invert()
 		{
-			if (this.value.IsOne)
-				return new Integer(this.value);
-			else if (this.value == -1)
+			if (this.value.IsOne || this.value == BigInteger.MinusOne)
 				return new Integer(this.value);
 			else
-				return new DoubleNumber(1.0 / (double)this.value);  // TODO: Rational numbers
+				return new RationalNumber(BigInteger.One, this.value);
 		}
 
 		/// <summary>
@@ -294,6 +292,17 @@ namespace Waher.Script.Objects
 			}
 
 			return Expression.TryConvert(this.value, DesiredType, out Value);
+		}
+
+		/// <summary>
+		/// Compares two rational numbers.
+		/// </summary>
+		/// <param name="x">Value 1</param>
+		/// <param name="y">Value 2</param>
+		/// <returns>Result</returns>
+		public int Compare(IElement x, IElement y)
+		{
+			return RationalNumbers.CompareNumbers(x, y);
 		}
 	}
 }

@@ -183,8 +183,12 @@ namespace Waher.Script.Model
 				return this.EvaluateScalar(b1, b2, Variables);
 			else if (Expression.TryConvert<Complex>(v1, out Complex z1) && Expression.TryConvert<Complex>(v2, out Complex z2))
 				return this.EvaluateScalar(z1, z2, Variables);
-			else
-				throw new ScriptRuntimeException("Type of scalar not supported.", this);
+            else if (Expression.TryConvert<Integer>(v1, out Integer i1) && Expression.TryConvert<Integer>(v2, out Integer i2))
+                return this.EvaluateScalar((double)i1.Value, (double)i2.Value, Variables);
+            else if (Expression.TryConvert<RationalNumber>(v1, out RationalNumber q1) && Expression.TryConvert<RationalNumber>(v2, out RationalNumber q2))
+                return this.EvaluateScalar(q1.ToDouble(), q2.ToDouble(), Variables);
+            else
+                throw new ScriptRuntimeException("Type of scalar not supported.", this);
 		}
 
 		/// <summary>

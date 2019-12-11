@@ -3557,9 +3557,26 @@ namespace Waher.Script
 			else if (ch == '#')
 			{
 				char Base;
-				int Start2 = ++this.pos;
+				bool Sign = false;
 
-				ch = char.ToLower(this.PeekNextChar());
+				this.pos++;
+				ch = this.PeekNextChar();
+
+				if (ch == '-')
+				{
+					Sign = true;
+					this.pos++;
+					ch = this.PeekNextChar();
+				}
+				else if (ch == '+')
+				{
+					this.pos++;
+					ch = this.PeekNextChar();
+				}
+
+				ch = char.ToLower(ch);
+				int Start2 = this.pos;
+
 				if (ch >= '0' && ch <= '9')
 					Base = 'd';
 				else if (ch == 'd' || ch == 'x' || ch == 'o' || ch == 'b')
@@ -3626,6 +3643,9 @@ namespace Waher.Script
 
 				if (Start2 == this.pos)
 					throw new SyntaxException("Invalid integer.", this.pos, this.script);
+
+				if (Sign)
+					n = -n;
 
 				return new ConstantElement(new Integer(n), Start, this.pos - Start, this);
 			}

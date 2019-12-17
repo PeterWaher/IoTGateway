@@ -284,6 +284,7 @@
   <Assembly fileName='Waher.Script.Graphs.dll'/>
   <Assembly fileName='Waher.Script.Persistence.dll'/>
   <Assembly fileName='Waher.Script.Statistics.dll'/>
+  <Assembly fileName='Waher.Script.Xml.dll'/>
   <Assembly fileName='Waher.Security.dll'/>
   <Assembly fileName='Waher.Security.ACME.dll'/>
   <Assembly fileName='Waher.Security.CallStack.dll'/>

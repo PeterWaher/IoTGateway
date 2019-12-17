@@ -462,6 +462,10 @@
       <Project>{8850d7c6-da07-4bcb-b39a-7090eb39f581}</Project>
       <Name>Waher.Script.Statistics</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Script\Waher.Script.Xml\Waher.Script.Xml.csproj">
+      <Project>{68152abc-72bc-450f-8e08-da9638f8dee4}</Project>
+      <Name>Waher.Script.Xml</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Script\Waher.Script\Waher.Script.csproj">
       <Project>{c39e8f9b-1386-4cd3-bfa7-3481181d3ba1}</Project>
       <Name>Waher.Script</Name>

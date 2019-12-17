@@ -267,8 +267,9 @@
 							<File Id='Waher.Script.Fractals.dll' Name='Waher.Script.Fractals.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.Fractals.dll' Vital='yes'/>
 							<File Id='Waher.Script.Graphs.dll' Name='Waher.Script.Graphs.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.Graphs.dll' Vital='yes'/>
 							<File Id='Waher.Script.Persistence.dll' Name='Waher.Script.Persistence.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.Persistence.dll' Vital='yes'/>
-							<File Id='Waher.Script.Statistics.dll' Name='Waher.Script.Statistics.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.Statistics.dll' Vital='yes'/>
-							<File Id='Waher.Security.dll' Name='Waher.Security.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Security.dll' Vital='yes'/>
+              <File Id='Waher.Script.Statistics.dll' Name='Waher.Script.Statistics.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.Statistics.dll' Vital='yes'/>
+              <File Id='Waher.Script.Xml.dll' Name='Waher.Script.Xml.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.Xml.dll' Vital='yes'/>
+              <File Id='Waher.Security.dll' Name='Waher.Security.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Security.dll' Vital='yes'/>
 							<File Id='Waher.Security.EllipticCurves.dll' Name='Waher.Security.EllipticCurves.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Security.EllipticCurves.dll' Vital='yes'/>
 							<File Id='Waher.Things.dll' Name='Waher.Things.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Things.dll' Vital='yes'/>
               <RemoveFile Id='RemoveWaher.Client.WPF.application' Name='Waher.Client.WPF.application' On='uninstall'/>
@@ -309,8 +310,9 @@
 							<RemoveFile Id='RemoveWaher.Script.Fractals.dll' Name='Waher.Script.Fractals.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Script.Graphs.dll' Name='Waher.Script.Graphs.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Script.Persistence.dll' Name='Waher.Script.Persistence.dll' On='uninstall'/>
-							<RemoveFile Id='RemoveWaher.Script.Statistics.dll' Name='Waher.Script.Statistics.dll' On='uninstall'/>
-							<RemoveFile Id='RemoveWaher.Security.dll' Name='Waher.Security.dll' On='uninstall'/>
+              <RemoveFile Id='RemoveWaher.Script.Statistics.dll' Name='Waher.Script.Statistics.dll' On='uninstall'/>
+              <RemoveFile Id='RemoveWaher.Script.Xml.dll' Name='Waher.Script.Xml.dll' On='uninstall'/>
+              <RemoveFile Id='RemoveWaher.Security.dll' Name='Waher.Security.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Security.EllipticCurves.dll' Name='Waher.Security.EllipticCurves.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Things.dll' Name='Waher.Things.dll' On='uninstall'/>
             </Component>
@@ -360,8 +362,9 @@
 							<File Id='Waher.Script.Fractals.pdb' Name='Waher.Script.Fractals.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.Fractals.pdb' Vital='yes'/>
 							<File Id='Waher.Script.Graphs.pdb' Name='Waher.Script.Graphs.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.Graphs.pdb' Vital='yes'/>
 							<File Id='Waher.Script.Persistence.pdb' Name='Waher.Script.Persistence.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.Persistence.pdb' Vital='yes'/>
-							<File Id='Waher.Script.Statistics.pdb' Name='Waher.Script.Statistics.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.Statistics.pdb' Vital='yes'/>
-							<File Id='Waher.Security.pdb' Name='Waher.Security.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Security.pdb' Vital='yes'/>
+              <File Id='Waher.Script.Statistics.pdb' Name='Waher.Script.Statistics.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.Statistics.pdb' Vital='yes'/>
+              <File Id='Waher.Script.Xml.pdb' Name='Waher.Script.Xml.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.Xml.pdb' Vital='yes'/>
+              <File Id='Waher.Security.pdb' Name='Waher.Security.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Security.pdb' Vital='yes'/>
 							<File Id='Waher.Security.EllipticCurves.pdb' Name='Waher.Security.EllipticCurves.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Security.EllipticCurves.pdb' Vital='yes'/>
 							<File Id='Waher.Things.pdb' Name='Waher.Things.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Things.pdb' Vital='yes'/>
               <RemoveFile Id='RemoveWaher.Client.WPF.pdb' Name='Waher.Client.WPF.pdb' On='uninstall'/>
@@ -409,8 +412,9 @@
 							<RemoveFile Id='RemoveWaher.Script.Fractals.pdb' Name='Waher.Script.Fractals.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Script.Graphs.pdb' Name='Waher.Script.Graphs.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Script.Persistence.pdb' Name='Waher.Script.Persistence.pdb' On='uninstall'/>
-							<RemoveFile Id='RemoveWaher.Script.Statistics.pdb' Name='Waher.Script.Statistics.pdb' On='uninstall'/>
-							<RemoveFile Id='RemoveWaher.Security.pdb' Name='Waher.Security.pdb' On='uninstall'/>
+              <RemoveFile Id='RemoveWaher.Script.Statistics.pdb' Name='Waher.Script.Statistics.pdb' On='uninstall'/>
+              <RemoveFile Id='RemoveWaher.Script.Xml.pdb' Name='Waher.Script.Xml.pdb' On='uninstall'/>
+              <RemoveFile Id='RemoveWaher.Security.pdb' Name='Waher.Security.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Security.EllipticCurves.pdb' Name='Waher.Security.EllipticCurves.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Things.pdb' Name='Waher.Things.pdb' On='uninstall'/>
             </Component>

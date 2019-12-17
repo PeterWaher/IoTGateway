@@ -3587,7 +3587,7 @@ namespace Waher.Script
 				else
 					throw new SyntaxException("Invalid numberical base.", this.pos, this.script);
 
-				BigInteger n;
+				BigInteger n = BigInteger.Zero;
 
 				switch (Base)
 				{

@@ -97,6 +97,11 @@ namespace Waher.Script.Objects
 				n1 = i1.Value;
 				d1 = BigInteger.One;
 			}
+			else
+			{
+				n1 = BigInteger.Zero;
+				d1 = BigInteger.One;
+			}
 
 			if (y is RationalNumber q2)
 			{
@@ -106,6 +111,11 @@ namespace Waher.Script.Objects
 			else if (y is Integer i2)
 			{
 				n2 = i2.Value;
+				d2 = BigInteger.One;
+			}
+			else
+			{
+				n2 = BigInteger.Zero;
 				d2 = BigInteger.One;
 			}
 

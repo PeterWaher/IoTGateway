@@ -10,7 +10,7 @@
     <Copyright>Copyright © Waher Data AB 2019. All rights reserved.</Copyright>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Networking/Waher.Networking.XMPP.Software</PackageProjectUrl>
-    <PackageIconUrl>https://github.com/PeterWaher/IoTGateway/blob/master/Images/Icon.ico?raw=true</PackageIconUrl>
+    <PackageIconUrl></PackageIconUrl>
     <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>networking communication xmpp iot iiot remote software updates</PackageTags>
@@ -19,6 +19,7 @@
     <FileVersion>1.0.2</FileVersion>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Version>1.0.2</Version>
+    <PackageIcon>Icon.ico</PackageIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -27,6 +28,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="..\..\Images\Icon.ico">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
     <None Include="..\..\LICENSE.txt">
       <Pack>True</Pack>
       <PackagePath></PackagePath>

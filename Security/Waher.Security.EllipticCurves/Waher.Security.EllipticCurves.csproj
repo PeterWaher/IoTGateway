@@ -27,7 +27,7 @@ Edwards448 (Goldilocks)</Description>
     <Copyright>Copyright © Waher Data AB 2018-2019. All rights reserved.</Copyright>
     <PackageLicenseUrl></PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Security/Waher.Security.EllipticCurves</PackageProjectUrl>
-    <PackageIconUrl>https://github.com/PeterWaher/IoTGateway/blob/master/Images/Icon.ico?raw=true</PackageIconUrl>
+    <PackageIconUrl></PackageIconUrl>
     <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>security Elliptic Curve ECC ECDH ECDSA EdDSA NIST P192 P224 P256 P384 P521 Curve25519 Curve448 Ed25519 Ed448 Edwards25519 Edwards448 Goldilocks</PackageTags>
@@ -36,6 +36,7 @@ Edwards448 (Goldilocks)</Description>
     <FileVersion>1.0.6</FileVersion>
     <Version>1.0.6</Version>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+    <PackageIcon>Icon.ico</PackageIcon>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -48,6 +49,10 @@ Edwards448 (Goldilocks)</Description>
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="..\..\Images\Icon.ico">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
     <None Include="..\..\LICENSE.txt">
       <Pack>True</Pack>
       <PackagePath></PackagePath>

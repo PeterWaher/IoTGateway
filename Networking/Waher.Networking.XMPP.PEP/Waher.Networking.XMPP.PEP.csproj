@@ -19,13 +19,14 @@ XEP-0118: User Tune</Description>
     <Copyright>Copyright © Waher Data AB 2018-2019. All rights reserved.</Copyright>
     <PackageLicenseUrl></PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Networking/Waher.Networking.XMPP.Pep</PackageProjectUrl>
-    <PackageIconUrl>https://github.com/PeterWaher/IoTGateway/blob/master/Images/Icon.ico?raw=true</PackageIconUrl>
+    <PackageIconUrl></PackageIconUrl>
     <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>networking communication xmpp pep Personal Eventing XEP-0163 XEP-0080 XEP-0084 XEP-0107 XEP-0108 XEP-0118 user location avatar mood activity tune</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
     <Version>1.0.8</Version>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+    <PackageIcon>Icon.ico</PackageIcon>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -48,6 +49,10 @@ XEP-0118: User Tune</Description>
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="..\..\Images\Icon.ico">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
     <None Include="..\..\LICENSE.txt">
       <Pack>True</Pack>
       <PackagePath></PackagePath>

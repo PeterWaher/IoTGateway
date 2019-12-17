@@ -10,12 +10,13 @@
     <Copyright>Copyright © Waher Data AB 2019. All rights reserved.</Copyright>
     <PackageLicenseUrl></PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Utilities/Waher.Utility.Sign</PackageProjectUrl>
-    <PackageIconUrl>https://github.com/PeterWaher/IoTGateway/blob/master/Images/Icon.ico?raw=true</PackageIconUrl>
+    <PackageIconUrl></PackageIconUrl>
     <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <NeutralLanguage>English</NeutralLanguage>
     <AssemblyVersion>1.0.0</AssemblyVersion>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+    <PackageIcon>Icon.ico</PackageIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -26,6 +27,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="..\..\Images\Icon.ico">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
     <None Include="..\..\LICENSE.txt">
       <Pack>True</Pack>
       <PackagePath></PackagePath>

@@ -18,16 +18,21 @@
     <FileVersion>1.0.8</FileVersion>
     <PackageReleaseNotes>The Waher.Events library uses a static class Log as a hub for all type of event logging in applications. To this hub you can register any number of Event Sinks that receive events and distribute them according to implementation details in each one. By logging all events to Log you have a configurable environment where you can change logging according to specific needs of the project.</PackageReleaseNotes>
     <Version>1.0.8</Version>
-    <PackageIconUrl>https://github.com/PeterWaher/IoTGateway/blob/master/Images/Icon.ico?raw=true</PackageIconUrl>
+    <PackageIconUrl></PackageIconUrl>
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Events\Waher.Events\</UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+    <PackageIcon>Icon.ico</PackageIcon>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DocumentationFile>bin\Debug\netstandard1.3\.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <None Include="..\..\Images\Icon.ico">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
     <None Include="..\..\LICENSE.txt">
       <Pack>True</Pack>
       <PackagePath></PackagePath>

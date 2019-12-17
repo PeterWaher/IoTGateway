@@ -17,11 +17,12 @@
     <AssemblyVersion>1.0.22</AssemblyVersion>
     <FileVersion>1.0.22</FileVersion>
     <Version>1.0.22</Version>
-    <PackageIconUrl>https://github.com/PeterWaher/IoTGateway/raw/master/Images/Icon.ico</PackageIconUrl>
+    <PackageIconUrl></PackageIconUrl>
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Content\Waher.Content\</UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+    <PackageIcon>Icon.ico</PackageIcon>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DocumentationFile>bin\Debug\netstandard1.3\.xml</DocumentationFile>
@@ -31,6 +32,10 @@
     <ProjectReference Include="..\..\Script\Waher.Script\Waher.Script.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\Images\Icon.ico">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
     <None Include="..\..\LICENSE.txt">
       <Pack>True</Pack>
       <PackagePath></PackagePath>

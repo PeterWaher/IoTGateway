@@ -19,12 +19,13 @@ Script Syntax: https://waher.se/Script.md</Description>
     <AssemblyVersion>1.0.33</AssemblyVersion>
     <FileVersion>1.0.33</FileVersion>
     <Version>1.0.33</Version>
-    <PackageIconUrl>https://github.com/PeterWaher/IoTGateway/blob/master/Images/Icon.ico?raw=true</PackageIconUrl>
+    <PackageIconUrl></PackageIconUrl>
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Script\Waher.Script\</UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>
     <PackageId>Waher.Script</PackageId>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+    <PackageIcon>Icon.ico</PackageIcon>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DocumentationFile>bin\Debug\netstandard1.3\.xml</DocumentationFile>
@@ -34,6 +35,10 @@ Script Syntax: https://waher.se/Script.md</Description>
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\Images\Icon.ico">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
     <None Include="..\..\LICENSE.txt">
       <Pack>True</Pack>
       <PackagePath></PackagePath>

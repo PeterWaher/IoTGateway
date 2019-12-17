@@ -11,7 +11,7 @@
     <Copyright>Copyright © Waher Data AB 2018-2019. All rights reserved.</Copyright>
     <PackageLicenseUrl></PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Themes/Waher.Theme.GothicPeacock</PackageProjectUrl>
-    <PackageIconUrl>https://github.com/PeterWaher/IoTGateway/blob/master/Images/Icon.ico?raw=true</PackageIconUrl>
+    <PackageIconUrl></PackageIconUrl>
     <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>IoT Gateway Theme</PackageTags>
@@ -20,6 +20,7 @@
     <FileVersion>1.0.6</FileVersion>
     <Version>1.0.6</Version>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+    <PackageIcon>Icon.ico</PackageIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -34,6 +35,10 @@
     <None Remove="Root\Themes\GothicPeacock\GothicPeacockBanner1900x500.png" />
     <None Remove="Root\Themes\GothicPeacock\GothicPeacockBanner2000x600.png" />
     <None Remove="Waher.Theme.GothicPeacock.manifest" />
+    <None Include="..\..\Images\Icon.ico">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
     <None Include="..\..\LICENSE.txt">
       <Pack>True</Pack>
       <PackagePath></PackagePath>

@@ -16,12 +16,13 @@
     <NeutralLanguage>English</NeutralLanguage>
     <AssemblyVersion>1.0.7</AssemblyVersion>
     <FileVersion>1.0.7</FileVersion>
-    <PackageIconUrl>https://github.com/PeterWaher/IoTGateway/blob/master/Images/Icon.ico?raw=true</PackageIconUrl>
+    <PackageIconUrl></PackageIconUrl>
     <Version>1.0.7</Version>
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Content\Waher.Content.Emoji.Emoji1\</UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+    <PackageIcon>Icon.ico</PackageIcon>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DocumentationFile>bin\Debug\netstandard1.3\.xml</DocumentationFile>
@@ -30,6 +31,10 @@
     <Compile Remove="Graphics\Emoji1\**" />
     <EmbeddedResource Remove="Graphics\Emoji1\**" />
     <None Remove="Graphics\Emoji1\**" />
+    <None Include="..\..\Images\Icon.ico">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
     <None Include="..\..\LICENSE.txt">
       <Pack>True</Pack>
       <PackagePath></PackagePath>

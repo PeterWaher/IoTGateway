@@ -10,7 +10,7 @@
     <Product>Waher.IoTGateway</Product>
     <PackageLicenseUrl></PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Events/Waher.Events.WindowsEventLog</PackageProjectUrl>
-    <PackageIconUrl>https://github.com/PeterWaher/IoTGateway/blob/master/Images/Icon.ico?raw=true</PackageIconUrl>
+    <PackageIconUrl></PackageIconUrl>
     <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>logger logging logs events eventlogging eventlogs windows event log</PackageTags>
@@ -22,6 +22,7 @@
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Events\Waher.Events.WindowsEventLog\</UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+    <PackageIcon>Icon.ico</PackageIcon>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DocumentationFile>bin\Debug\netstandard1.3\Waher.Events.WindowsEventLog.xml</DocumentationFile>
@@ -30,6 +31,10 @@
     <ProjectReference Include="..\Waher.Events\Waher.Events.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\Images\Icon.ico">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
     <None Include="..\..\LICENSE.txt">
       <Pack>True</Pack>
       <PackagePath></PackagePath>

@@ -10,7 +10,7 @@
     <Product>Waher.IoTGateway</Product>
     <PackageLicenseUrl></PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Waher.IoTGateway</PackageProjectUrl>
-    <PackageIconUrl>https://github.com/PeterWaher/IoTGateway/blob/master/Images/Icon.ico?raw=true</PackageIconUrl>
+    <PackageIconUrl></PackageIconUrl>
     <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>IoT Gateway HTTP CoAP MQTT XMPP LWM2M DNS</PackageTags>
@@ -22,6 +22,7 @@
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Waher.IoTGateway\</UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+    <PackageIcon>Icon.ico</PackageIcon>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DocumentationFile>bin\Debug\netstandard2.0\Waher.IoTGateway.xml</DocumentationFile>
@@ -60,6 +61,10 @@
     <None Remove="Schema\Theme.xsd" />
     <None Remove="Transforms\DbStatXmlToHtml.xslt" />
     <None Remove="Waher.IoTGateway.manifest" />
+    <None Include="..\Images\Icon.ico">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
     <None Include="..\LICENSE.txt">
       <Pack>True</Pack>
       <PackagePath></PackagePath>

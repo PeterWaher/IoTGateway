@@ -11,7 +11,7 @@
     <Copyright>Copyright © Waher Data AB 2016-2019. All rights reserved.</Copyright>
     <PackageLicenseUrl></PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Themes/Waher.Theme.CactusRose</PackageProjectUrl>
-    <PackageIconUrl>https://github.com/PeterWaher/IoTGateway/blob/master/Images/Icon.ico?raw=true</PackageIconUrl>
+    <PackageIconUrl></PackageIconUrl>
     <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>IoT Gateway Theme</PackageTags>
@@ -21,6 +21,7 @@
     <Version>1.0.9</Version>
     <PackageId>Waher.Theme.CactusRose</PackageId>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+    <PackageIcon>Icon.ico</PackageIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -28,6 +29,10 @@
     <None Remove="Root\Themes\CactusRose\CactusRose.xml" />
     <None Remove="Root\Themes\CactusRose\CactusRose800x800Dimmed.png" />
     <None Remove="Waher.Theme.CactusRose.manifest" />
+    <None Include="..\..\Images\Icon.ico">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
     <None Include="..\..\LICENSE.txt">
       <Pack>True</Pack>
       <PackagePath></PackagePath>

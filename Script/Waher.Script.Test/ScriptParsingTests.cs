@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Runtime.Inventory;
+using Waher.Script.Xml;
 
 namespace Waher.Script.Test
 {
@@ -14,6 +14,7 @@ namespace Waher.Script.Test
 		{
 			Types.Initialize(typeof(Expression).Assembly,
 				typeof(Graphs.Graph).Assembly,
+				typeof(XmlParser).Assembly,
 				typeof(System.Text.RegularExpressions.Regex).Assembly);
 		}
 

@@ -166,12 +166,34 @@ namespace Waher.Script
 				return (char)0;
 		}
 
+		internal void UndoChar()
+		{
+			if (this.pos > 0)
+				this.pos--;
+		}
+
 		internal char PeekNextChar()
 		{
 			if (this.pos < this.len)
 				return this.script[this.pos];
 			else
 				return (char)0;
+		}
+
+		internal string PeekNextChars(int NrChars)
+		{
+			if (this.pos + NrChars > this.len)
+				NrChars = this.len - this.pos;
+
+			if (NrChars <= 0)
+				return string.Empty;
+
+			return this.script.Substring(this.pos, NrChars);
+		}
+
+		internal void SkipChars(int NrChars)
+		{
+			this.pos += NrChars;
 		}
 
 		internal string NextToken()

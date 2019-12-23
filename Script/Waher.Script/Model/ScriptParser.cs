@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Waher.Script.Exceptions;
 using Waher.Script.Units;
 
 namespace Waher.Script.Model
@@ -34,6 +35,11 @@ namespace Waher.Script.Model
 		public int Length => this.expression.Position - this.pos;
 
 		/// <summary>
+		/// Current parsing position.
+		/// </summary>
+		public int Position => this.expression.Position;
+
+		/// <summary>
 		/// Expression being parsed.
 		/// </summary>
 		public Expression Expression => this.expression;
@@ -53,6 +59,32 @@ namespace Waher.Script.Model
 		/// </summary>
 		/// <returns>Character</returns>
 		public char NextChar() => this.expression.NextChar();
+
+		/// <summary>
+		/// Undoes a character in the parsing of an expression.
+		/// </summary>
+		public void UndoChar()
+		{
+			this.expression.UndoChar();
+		}
+
+		/// <summary>
+		/// Returns the next given number of characters to be parsed, without moving the position 
+		/// forward one character. If no character is available, the string is truncated.
+		/// </summary>
+		/// <returns>Characters</returns>
+		public string PeekNextChars(int NrChars)
+		{
+			return this.expression.PeekNextChars(NrChars);
+		}
+
+		/// <summary>
+		/// Skips a predefined number of characters.
+		/// </summary>
+		public void SkipChars(int NrChars)
+		{
+			this.expression.SkipChars(NrChars);
+		}
 
 		/// <summary>
 		/// Returns the next character to be parsed, without moving the position forward one character.
@@ -233,5 +265,14 @@ namespace Waher.Script.Model
 		/// <returns>Script node.</returns>
 		public ScriptNode ParseObject() => this.expression.ParseObject();
 
+		/// <summary>
+		/// Returns a Syntax Error Exception object.
+		/// </summary>
+		/// <param name="Message">Exception message.</param>
+		/// <returns>Exception object.</returns>
+		public SyntaxException SyntaxError(string Message)
+		{
+			return new SyntaxException(Message, this.Position, this.expression.Script);
+		}
 	}
 }

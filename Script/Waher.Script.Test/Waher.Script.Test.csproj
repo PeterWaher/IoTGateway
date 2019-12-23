@@ -53,8 +53,13 @@
     <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\..\packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
     </Reference>
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.XmlDocument, Version=4.0.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.Xml.XmlDocument.4.3.0\lib\net46\System.Xml.XmlDocument.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ScriptXmlTests.cs" />
     <Compile Include="ScriptEvaluationTests.cs" />
     <Compile Include="Canvas3DTests.cs" />
     <Compile Include="ScriptDifferentiationTests.cs" />
@@ -74,6 +79,10 @@
     <ProjectReference Include="..\Waher.Script.Graphs\Waher.Script.Graphs.csproj">
       <Project>{9c55559b-0f46-4799-9b0a-b175389d25b0}</Project>
       <Name>Waher.Script.Graphs</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Waher.Script.Xml\Waher.Script.Xml.csproj">
+      <Project>{68152abc-72bc-450f-8e08-da9638f8dee4}</Project>
+      <Name>Waher.Script.Xml</Name>
     </ProjectReference>
     <ProjectReference Include="..\Waher.Script\Waher.Script.csproj">
       <Project>{c39e8f9b-1386-4cd3-bfa7-3481181d3ba1}</Project>

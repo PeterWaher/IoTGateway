@@ -1340,6 +1340,14 @@ The following functions are available in the `Waher.Script.Content` library.
 [XmlDecodeExample]: Calculator.md?Expression=XmlDecode(%22%26lt%3Btag%26gt%3B%22)
 [XmlEncodeExample]: Calculator.md?Expression=XmlEncode(%22%3Ctag%3E%22)
 
+#### XML-related functions (Waher.Script.Xml)
+
+The following functions are available in the `Waher.Script.Xml` library.
+
+| Function                        | Description | Example |
+|---------------------------------|-------------|---------|
+| `Xml(s)`                        | Converts the string `s` to an XML Document. | `Xml("<a>Hello</a>")` |
+
 #### Markdown-related functions (Waher.Content.Markdown)
 
 The following functions are available in the `Waher.Content.Markdown` library.
@@ -1610,6 +1618,70 @@ where
 	Timestamp>=Now.AddDays(-1) and
 	Type=EventType.Informational
 ```
+
+### XML
+
+The `Waher.Script.Xml` library extends the script engine to understand XML embedded in the script.
+Attribute values are always considered to be script. You can provide constant strings, as usual,
+but also provide script to dynamically populate your XML document with contents and calculations
+based on current variable values. In element text values, you can also embed script between the
+special `<[` and `]>` operators, or the corresponding `<(` and `)>` operators. Element names and
+attribute names are always interpreted literally. If you need to create dynamic XML, you can build
+a string, and use the `Xml()` function to convert it to an XML document.
+
+#### XML Document
+
+To create a simple XML document in script, simply enter:
+
+	Doc:=<Root>Hello</Root>
+
+You can add an XML declaration and processing instructions in the beginning of the document, if you
+want:
+
+	Doc:=<?xml version="1.0" encoding="UTF-8"?>
+		<?xml-stylesheet type="text/xsl" href="style.xsl"?>
+		<Root>Hello</Root>
+
+You can also specify CDATA and comment sections in the code:
+
+	Doc:=<a>
+		<![CDATA[Hello World.]]>
+		<!-- This is a comment -->
+	</a>
+
+#### Embedded expressions
+
+To embed expressions in element text values, use the `<[` and `]>` operators, or the corresponding 
+`<(` and `)>` operators:
+
+	a:=2;
+	b:=3;
+	Doc:=<Root>
+		<p>a=<[a]></p>
+		<p>b=<[b]></p>
+		<p>a+b=<[a+b]></p>
+	</Root>
+
+#### Attribute values
+
+You can add attributes to elements just as in normal XML:
+
+	Doc:=<a>
+		<b value="1"/>
+		<b value="2"/>
+	</a>
+
+By default, attribute values are considered script, so you don't need to embed script using special
+operators. Script priority for attribute values is the same as for powers. This means that if you
+use operators with a lower priority than for powers, you need to use the parenthesis operators 
+`(` and `)` to encapsulate the script expression. Example:
+
+	x:=7;
+	Doc:=<a>
+		<b value=1/>
+		<b value=(2+x)/>
+	</a>
+
 
 =========================================================================================================================================================
 

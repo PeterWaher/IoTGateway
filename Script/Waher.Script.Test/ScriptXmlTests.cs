@@ -39,13 +39,13 @@ namespace Waher.Script.Test
 		[TestMethod]
 		public void XML_Test_03_Attributes()
 		{
-			this.Test("<a><b value=\"1\" /><b value=\"2\" /></a>", "<a><b value=\"1\" /><b value=\"2\" /></a>");
+			this.Test("<a><b value=\"1\"/><b value=\"2\"/></a>", "<a><b value=\"1\" /><b value=\"2\" /></a>");
 		}
 
 		[TestMethod]
 		public void XML_Test_04_Attributes_Expression()
 		{
-			this.Test("x:=7;<a><b value=1 /><b value=2+x /></a>", "<a><b value=\"1\" /><b value=\"9\" /></a>");
+			this.Test("x:=7;<a><b value=1/><b value=(2+x)/></a>", "<a><b value=\"1\" /><b value=\"9\" /></a>");
 		}
 
 		[TestMethod]
@@ -61,21 +61,27 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public void XML_Test_07_Mixed()
+		public void XML_Test_07_Mixed_1()
 		{
 			this.Test("<a>2+3=<[2+3]>.</a>", "<a>2+3=5.</a>");
 		}
 
 		[TestMethod]
-		public void XML_Test_08_XML_Declaration()
+		public void XML_Test_08_Mixed_2()
 		{
-			this.Test("<?xml version=\"1.0\" encoding=\"UTF-8\" ?><a>Hello</a>", null);
+			this.Test("<a>2+3=<(2+3)>.</a>", "<a>2+3=5.</a>");
 		}
 
 		[TestMethod]
-		public void XML_Test_09_ProcessingInstruction()
+		public void XML_Test_09_XML_Declaration()
 		{
-			this.Test("<?xml version=\"1.0\" encoding=\"UTF-8\" ?><?xml-stylesheet type=\"text/xsl\" href=\"style.xsl\"?><a>Hello</a>", null);
+			this.Test("<?xml version=\"1.0\" encoding=\"UTF-8\"?><a>Hello</a>", null);
+		}
+
+		[TestMethod]
+		public void XML_Test_10_ProcessingInstruction()
+		{
+			this.Test("<?xml version=\"1.0\" encoding=\"UTF-8\"?><?xml-stylesheet type=\"text/xsl\" href=\"style.xsl\"?><a>Hello</a>", null);
 		}
 
 	}

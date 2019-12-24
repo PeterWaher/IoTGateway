@@ -42,7 +42,7 @@ namespace Waher.Script.Xml.Model
 			{
 				Match M = xmlDeclaration.Match(this.text);
 
-				if (M.Success)
+				if (M.Success && M.Index == 0 && M.Length == this.text.Length)
 				{
 					string Version = M.Groups["Version"].Value;
 					string Encoding = M.Groups["Encoding"].Value;

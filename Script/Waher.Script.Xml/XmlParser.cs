@@ -68,7 +68,7 @@ namespace Waher.Script.Xml
 				if (ProcessingInstructions is null)
 					ProcessingInstructions = new List<XmlScriptProcessingInstruction>();
 
-				string Text = Parser.Expression.Script.Substring(Pos, Parser.Position - Pos);
+				string Text = Parser.Expression.Script.Substring(Pos, Parser.Position - Pos - 1);
 
 				if (Parser.NextChar() != '>')
 					throw Parser.SyntaxError("> expected.");
@@ -199,6 +199,20 @@ namespace Waher.Script.Xml
 								Element.Add(new XmlScriptValue(Node, Node.Start, Node.Length, Node.Expression));
 								break;
 
+							case "<(":
+								Parser.SkipChars(2);
+
+								Node = Parser.ParseSequence();
+								Parser.SkipWhiteSpace();
+
+								if (Parser.PeekNextChars(2) != ")>")
+									throw Parser.SyntaxError(")> expected.");
+
+								Parser.SkipChars(2);
+
+								Element.Add(new XmlScriptValue(Node, Node.Start, Node.Length, Node.Expression));
+								break;
+
 							default:
 								Element.Add(this.ParseElement(Parser));
 								break;
@@ -223,15 +237,7 @@ namespace Waher.Script.Xml
 					if (Parser.NextChar() != '=')
 						throw Parser.SyntaxError("= expected.");
 
-					bool Bak = Parser.CanSkipWhitespace;
-					if (Bak)
-						Parser.SkipWhiteSpace();
-					
-					Parser.CanSkipWhitespace = false;
-					
-					ScriptNode Node = Parser.ParseStatement();
-					
-					Parser.CanSkipWhitespace = Bak;
+					ScriptNode Node = Parser.ParsePowers();
 
 					if (Attributes is null)
 						Attributes = new List<XmlScriptAttribute>();

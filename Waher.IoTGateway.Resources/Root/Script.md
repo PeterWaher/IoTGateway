@@ -1682,7 +1682,6 @@ use operators with a lower priority than for powers, you need to use the parenth
 		<b value=(2+x)/>
 	</a>
 
-
 =========================================================================================================================================================
 
 Interaction with .NET Code Behind classes

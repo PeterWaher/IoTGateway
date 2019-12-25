@@ -25,6 +25,7 @@ using Waher.Script.Operators.Matrices;
 using Waher.Script.Operators.Membership;
 using Waher.Script.Operators.Sets;
 using Waher.Script.Operators.Vectors;
+using Waher.Script.Output;
 using Waher.Script.TypeConversion;
 using Waher.Script.Units;
 
@@ -40,6 +41,7 @@ namespace Waher.Script
 		private static Dictionary<string, FunctionRef> functions = null;
 		private static Dictionary<string, IConstant> constants = null;
 		private static Dictionary<string, IKeyWord> customKeyWords = null;
+		private static Dictionary<Type, ICustomStringOutput> output = null;
 		private static readonly Dictionary<string, bool> keywords = GetKeywords();
 
 		private ScriptNode root;
@@ -74,6 +76,7 @@ namespace Waher.Script
 		{
 			functions = null;
 			constants = null;
+			output = null;
 		}
 
 		private static Dictionary<string, bool> GetKeywords()
@@ -3232,6 +3235,40 @@ namespace Waher.Script
 
 					customKeyWords = Found;
 				}
+
+				if (output is null)
+				{
+					Dictionary<Type, ICustomStringOutput> Found = new Dictionary<Type, ICustomStringOutput>();
+					Type T2;
+					TypeInfo TI;
+
+					foreach (Type T in Types.GetTypesImplementingInterface(typeof(ICustomStringOutput)))
+					{
+						TI = T.GetTypeInfo();
+						if (TI.IsAbstract || TI.IsGenericTypeDefinition)
+							continue;
+
+						try
+						{
+							ICustomStringOutput Output = (ICustomStringOutput)Activator.CreateInstance(T);
+
+							T2 = Output.Type;
+							if (Found.ContainsKey(T2))
+							{
+								Log.Warning("Custom string output class with name " + T2.FullName + " previously registered. Class ignored.",
+									T.FullName, new KeyValuePair<string, object>("Previous", Output.GetType().FullName));
+							}
+							else
+								Found[T2] = Output;
+						}
+						catch (Exception ex)
+						{
+							Log.Critical(ex);
+						}
+					}
+
+					output = Found;
+				}
 			}
 		}
 
@@ -4165,76 +4202,39 @@ namespace Waher.Script
 		/// <returns>String representation of value.</returns>
 		public static string ToString(object Value)
 		{
-			if (Value is double dbl)
-				return ToString(dbl);
-			else if (Value is decimal dec)
-				return ToString(dec);
-			else if (Value is Complex z)
-				return ToString(z);
-			else if (Value is BigInteger i)
-				return ToString(i);
-			else if (Value is bool b)
-				return ToString(b);
-			else if (Value is double[] dblA)
-				return ToString(dblA);
-			else if (Value is Complex[] zA)
-				return ToString(zA);
-			else if (Value is TimeSpan TS)
-				return ToString(TS);
-			else if (Value is DateTime DT)
-				return ToString(DT);
-			else if (Value is string s)
-				return ToString(s);
-			else if (Value is Exception ex)
-				return ToString(ex.Message);
-			else if (Value is Dictionary<string, IElement> ObjExNihilo)
-			{
-				StringBuilder sb = new StringBuilder();
-				bool First = true;
-
-				sb.Append('{');
-
-				foreach (KeyValuePair<string, IElement> P in ObjExNihilo)
-				{
-					if (First)
-						First = false;
-					else
-						sb.Append(',');
-
-					sb.Append(P.Key);
-					sb.Append(':');
-					sb.Append(P.Value.ToString());
-				}
-
-				sb.Append('}');
-
-				return sb.ToString();
-			}
-			else if (Value is IEnumerable Enumerable)
-			{
-				StringBuilder sb = new StringBuilder();
-				bool First = true;
-
-				sb.Append('[');
-
-				foreach (object Element in Enumerable)
-				{
-					if (First)
-						First = false;
-					else
-						sb.Append(',');
-
-					sb.Append(ToString(Element));
-				}
-
-				sb.Append(']');
-
-				return sb.ToString();
-			}
-			else if (Value is null)
+			if (Value is null)
 				return "null";
 			else
-				return Value.ToString();
+			{
+				if (output is null)
+					Search();
+
+				if (output.TryGetValue(Value.GetType(), out ICustomStringOutput Output))
+					return Output.GetString(Value);
+				else if (Value is IEnumerable Enumerable)
+				{
+					StringBuilder sb = new StringBuilder();
+					bool First = true;
+
+					sb.Append('[');
+
+					foreach (object Element in Enumerable)
+					{
+						if (First)
+							First = false;
+						else
+							sb.Append(',');
+
+						sb.Append(ToString(Element));
+					}
+
+					sb.Append(']');
+
+					return sb.ToString();
+				}
+				else
+					return Value.ToString();
+			}
 		}
 
 		/// <summary>

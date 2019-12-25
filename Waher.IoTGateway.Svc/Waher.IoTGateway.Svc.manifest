@@ -270,6 +270,7 @@
   <Assembly fileName='Waher.Persistence.dll'/>
   <Assembly fileName='Waher.Persistence.Files.dll'/>
   <Assembly fileName='Waher.Persistence.MongoDB.dll'/>
+  <Assembly fileName='Waher.Persistence.Serialization.Compiled.dll'/>
   <Assembly fileName='Waher.Runtime.Cache.dll'/>
   <Assembly fileName='Waher.Runtime.Inventory.dll'/>
   <Assembly fileName='Waher.Runtime.Inventory.Loader.dll'/>

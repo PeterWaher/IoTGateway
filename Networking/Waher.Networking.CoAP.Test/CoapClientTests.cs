@@ -13,6 +13,7 @@ using Waher.Networking.LWM2M;
 using Waher.Networking.CoAP.Options;
 using Waher.Persistence;
 using Waher.Persistence.Files;
+using Waher.Persistence.Serialization;
 using Waher.Runtime.Inventory;
 using Waher.Security.DTLS;
 
@@ -36,6 +37,7 @@ namespace Waher.Networking.CoAP.Test
 				typeof(Lwm2mClient).Assembly,
 				typeof(Database).Assembly,
 				typeof(FilesProvider).Assembly,
+				typeof(ObjectSerializer).Assembly,
 				typeof(ICipher).Assembly);
 
 			Log.Register(consoleEventSink = new ConsoleEventSink());

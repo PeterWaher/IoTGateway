@@ -23,6 +23,7 @@ using Waher.Runtime.Inventory;
 using Waher.Persistence;
 using Waher.Persistence.Files;
 using Waher.Persistence.Filters;
+using Waher.Persistence.Serialization;
 using Waher.Client.WPF.Controls;
 using Waher.Client.WPF.Controls.Questions;
 using Waher.Client.WPF.Controls.Chat;
@@ -76,6 +77,7 @@ namespace Waher.Client.WPF
 				typeof(Networking.XMPP.WebSocket.WebSocketBinding).Assembly,
 				typeof(Database).Assembly,
 				typeof(FilesProvider).Assembly,
+				typeof(ObjectSerializer).Assembly,
 				typeof(Script.Expression).Assembly,
 				typeof(Script.Content.Functions.Encoding.Decode).Assembly,
 				typeof(Script.Graphs.Graph).Assembly,

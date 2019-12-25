@@ -8,8 +8,8 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Content;
 using Waher.Persistence.Serialization;
-using Waher.Persistence.Files.Serialization;
 using Waher.Persistence.Files.Statistics;
+using Waher.Persistence.Serialization;
 using Waher.Runtime.Inventory;
 using Waher.Script;
 
@@ -63,9 +63,10 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			Types.Initialize(
                 typeof(FilesProvider).Assembly,
+                typeof(ObjectSerializer).Assembly,
                 typeof(DBFilesBTreeTests).Assembly, 
                 typeof(Expression).Assembly,
-                typeof(Waher.Script.Persistence.SQL.Select).Assembly);
+                typeof(Script.Persistence.SQL.Select).Assembly);
 		}
 
 		[TestInitialize]

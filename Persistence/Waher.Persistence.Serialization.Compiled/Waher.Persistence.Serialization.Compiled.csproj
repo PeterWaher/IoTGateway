@@ -32,4 +32,10 @@
     </None>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj" />
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Threading\Waher.Runtime.Threading.csproj" />
+    <ProjectReference Include="..\Waher.Persistence\Waher.Persistence.csproj" />
+  </ItemGroup>
+
 </Project>

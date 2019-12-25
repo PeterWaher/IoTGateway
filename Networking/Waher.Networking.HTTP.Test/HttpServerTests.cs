@@ -27,10 +27,10 @@ namespace Waher.Networking.HTTP.Test
 		[AssemblyInitialize]
 		public static void AssemblyInitialize(TestContext Context)
 		{
-			Waher.Runtime.Inventory.Types.Initialize(
+			Runtime.Inventory.Types.Initialize(
 				typeof(HttpServerTests).Assembly,
-				typeof(Waher.Script.Expression).Assembly,
-				typeof(Waher.Content.Images.ImageCodec).Assembly,
+				typeof(Script.Expression).Assembly,
+				typeof(Content.Images.ImageCodec).Assembly,
 				typeof(CommonTypes).Assembly);
 		}
 

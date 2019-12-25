@@ -127,7 +127,7 @@ namespace Waher.Security.CallStack
 				{
 					if (string.IsNullOrEmpty(Assembly.Location))
 					{
-						if (AssemblyName.StartsWith("WPFA."))
+						if (AssemblyName.StartsWith("WPSA."))
 							WaherPersistence = true;
 						else
 							Other = true;

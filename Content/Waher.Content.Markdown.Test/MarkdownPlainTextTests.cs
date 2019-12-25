@@ -8,6 +8,7 @@ using Waher.Content.Images;
 using Waher.Content.Emoji.Emoji1;
 using Waher.Persistence;
 using Waher.Persistence.Files;
+using Waher.Persistence.Serialization;
 using Waher.Script;
 using Waher.Script.Graphs;
 
@@ -29,6 +30,7 @@ namespace Waher.Content.Markdown.Test
 				typeof(CommonTypes).Assembly,
 				typeof(Database).Assembly,
 				typeof(FilesProvider).Assembly,
+				typeof(ObjectSerializer).Assembly,
 				typeof(ImageCodec).Assembly);
 
 			filesProvider = new FilesProvider("Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000, true);

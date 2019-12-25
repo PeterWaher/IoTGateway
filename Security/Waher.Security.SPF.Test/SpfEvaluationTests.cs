@@ -12,6 +12,7 @@ using Waher.Networking.DNS.ResourceRecords;
 using Waher.Persistence;
 using Waher.Persistence.Files;
 using Waher.Persistence.Filters;
+using Waher.Persistence.Serialization;
 using Waher.Runtime.Inventory;
 
 namespace Waher.Security.SPF.Test
@@ -27,6 +28,7 @@ namespace Waher.Security.SPF.Test
 			Types.Initialize(
 				typeof(Database).Assembly,
 				typeof(FilesProvider).Assembly,
+				typeof(ObjectSerializer).Assembly,
 				typeof(DnsResolver).Assembly);
 
 			filesProvider = new FilesProvider("Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000, true);

@@ -5,6 +5,7 @@ using Waher.Events;
 using Waher.Events.Console;
 using Waher.Persistence;
 using Waher.Persistence.Files;
+using Waher.Persistence.Serialization;
 using Waher.Runtime.Inventory;
 using Waher.Script;
 
@@ -19,7 +20,11 @@ namespace Waher.Runtime.Language.Test
 		[AssemblyInitialize]
 		public static void AssemblyInitialize(TestContext Context)
 		{
-			Types.Initialize(typeof(FilesProvider).Assembly, typeof(LanguageTests).Assembly, typeof(Expression).Assembly);
+			Types.Initialize(
+				typeof(FilesProvider).Assembly, 
+				typeof(ObjectSerializer).Assembly, 
+				typeof(LanguageTests).Assembly, 
+				typeof(Expression).Assembly);
 
 			Log.Register(consoleEventSink = new ConsoleEventSink());
 

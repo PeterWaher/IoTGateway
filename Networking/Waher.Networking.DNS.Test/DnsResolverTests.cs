@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Waher.Networking.DNS.ResourceRecords;
 using Waher.Persistence;
 using Waher.Persistence.Files;
+using Waher.Persistence.Serialization;
 using Waher.Runtime.Inventory;
 
 namespace Waher.Networking.DNS.Test
@@ -22,6 +23,7 @@ namespace Waher.Networking.DNS.Test
 			Types.Initialize(
 				typeof(Database).Assembly,
 				typeof(FilesProvider).Assembly,
+				typeof(ObjectSerializer).Assembly,
 				typeof(DnsResolver).Assembly);
 
 			filesProvider = new FilesProvider("Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000, true);

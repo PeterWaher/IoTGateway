@@ -49,6 +49,9 @@ namespace Waher.Persistence.Serialization
 			string FieldName;
 			string CollectionName;
 
+			if (!Embedded)
+				Reader.SkipVariableLengthUInt64();  // Content length.
+
 			if (!DataType.HasValue)
 			{
 				DataType = Reader.ReadBits(6);

@@ -2018,7 +2018,7 @@ namespace Waher.Persistence.Serialization
 			else
 			{
 #endif
-			Member Member;
+				Member Member;
 				MethodInfo MI;
 				object DefaultValue;
 				int NrDefault = 0;

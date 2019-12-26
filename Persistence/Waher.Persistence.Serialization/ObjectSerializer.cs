@@ -3,6 +3,7 @@ using System.IO;
 using System.Reflection;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.ExceptionServices;
 using System.Text;
 using System.Threading.Tasks;
 #if NETSTANDARD1_5
@@ -12,6 +13,9 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Emit;
 #endif
 using Waher.Persistence.Serialization.Model;
+using Waher.Persistence.Serialization.ValueTypes;
+using Waher.Persistence.Serialization.ReferenceTypes;
+using Waher.Persistence.Serialization.NullableTypes;
 using Waher.Persistence.Serialization;
 using Waher.Persistence.Attributes;
 using Waher.Runtime.Inventory;
@@ -155,14 +159,13 @@ namespace Waher.Persistence.Serialization
 		public const uint TYPE_OBJECT = 31;
 
 		/// <summary>
-		/// Files provider reference.
+		/// Serialization context.
 		/// </summary>
-		protected readonly FilesProvider provider;
+		protected readonly ISerializerContext context;
 
 		private readonly Type type;
 		private readonly System.Reflection.TypeInfo typeInfo;
 		private readonly string collectionName;
-		private readonly string typeFieldName;
 		private readonly string[][] indices;
 		private readonly TypeNameSerialization typeNameSerialization;
 #if NETSTANDARD1_5
@@ -182,11 +185,11 @@ namespace Waher.Persistence.Serialization
 		private readonly bool debug;
 		private bool indicesCreated = false;
 
-		internal ObjectSerializer(Type Type, FilesProvider Provider)
+		internal ObjectSerializer(Type Type, ISerializerContext Context)
 		{
 			this.type = Type;
 			this.typeInfo = Type.GetTypeInfo();
-			this.provider = Provider;
+			this.context = Context;
 			this.debug = false;
 #if NETSTANDARD1_5
 			this.compiled = false;
@@ -202,25 +205,25 @@ namespace Waher.Persistence.Serialization
 		/// Serializes a class, taking into account attributes defined in <see cref="Waher.Persistence.Attributes"/>.
 		/// </summary>
 		/// <param name="Type">Type to serialize.</param>
-		/// <param name="Provider">Database provider.</param>
+		/// <param name="Context">Serialization context.</param>
 		/// <param name="Debug">If debug information is to be included for generated code.</param>
 		/// <param name="Compiled">If object serializers should be compiled or not.</param>
-		public ObjectSerializer(Type Type, FilesProvider Provider, bool Debug, bool Compiled)
+		public ObjectSerializer(Type Type, ISerializerContext Context, bool Debug, bool Compiled)
 #else
 		/// <summary>
 		/// Serializes a class, taking into account attributes defined in <see cref="Waher.Persistence.Attributes"/>.
 		/// </summary>
 		/// <param name="Type">Type to serialize.</param>
-		/// <param name="Provider">Database provider.</param>
+		/// <param name="Context">Serialization context.</param>
 		/// <param name="Debug">If debug information is to be included for generated code.</param>
-		public ObjectSerializer(Type Type, FilesProvider Provider, bool Debug)
+		public ObjectSerializer(Type Type, ISerializerContext Context, bool Debug)
 #endif
 		{
 			string TypeName = Type.Name;
 
 			this.type = Type;
 			this.typeInfo = Type.GetTypeInfo();
-			this.provider = Provider;
+			this.context = Context;
 			this.debug = Debug;
 
 #if NETSTANDARD1_5
@@ -257,15 +260,9 @@ namespace Waher.Persistence.Serialization
 
 			TypeNameAttribute TypeNameAttribute = this.typeInfo.GetCustomAttribute<TypeNameAttribute>(true);
 			if (TypeNameAttribute is null)
-			{
-				this.typeFieldName = "_type";
 				this.typeNameSerialization = TypeNameSerialization.FullName;
-			}
 			else
-			{
-				this.typeFieldName = TypeNameAttribute.FieldName;
 				this.typeNameSerialization = TypeNameAttribute.TypeNameSerialization;
-			}
 
 			if (this.typeInfo.IsAbstract && this.typeNameSerialization == TypeNameSerialization.None)
 				throw new Exception("Serializers for abstract classes require type names to be serialized.");
@@ -312,9 +309,9 @@ namespace Waher.Persistence.Serialization
 				CSharp.AppendLine();
 				CSharp.AppendLine("namespace " + Type.Namespace + ".Binary");
 				CSharp.AppendLine("{");
-				CSharp.AppendLine("\tpublic class BinarySerializer" + TypeName + this.provider.Id + " : GeneratedObjectSerializerBase");
+				CSharp.AppendLine("\tpublic class BinarySerializer" + TypeName + this.context.Id + " : GeneratedObjectSerializerBase");
 				CSharp.AppendLine("\t{");
-				CSharp.AppendLine("\t\tprivate FilesProvider provider;");
+				CSharp.AppendLine("\t\tprivate ISerializationContext context;");
 
 				foreach (MemberInfo Member in Members)
 				{
@@ -529,7 +526,7 @@ namespace Waher.Persistence.Serialization
 					if (Ignore)
 						continue;
 
-					if (FilesProvider.GetFieldDataTypeCode(Type) == TYPE_OBJECT)
+					if (GetFieldDataTypeCode(Type) == TYPE_OBJECT)
 					{
 						CSharp.Append("\t\tprivate IObjectSerializer serializer");
 						CSharp.Append(Member.Name);
@@ -541,9 +538,9 @@ namespace Waher.Persistence.Serialization
 					CSharp.AppendLine();
 
 				CSharp.AppendLine();
-				CSharp.AppendLine("\t\tpublic BinarySerializer" + TypeName + this.provider.Id + "(FilesProvider Provider)");
+				CSharp.AppendLine("\t\tpublic BinarySerializer" + TypeName + this.context.Id + "(ISerializationContext Context)");
 				CSharp.AppendLine("\t\t{");
-				CSharp.AppendLine("\t\t\tthis.provider = Provider;");
+				CSharp.AppendLine("\t\t\tthis.context = Context;");
 
 				MemberInfo ObjectIdMember = null;
 				Type ObjectIdMemberType = null;
@@ -615,11 +612,11 @@ namespace Waher.Persistence.Serialization
 					if (Ignore || HasObjectId)
 						continue;
 
-					if (FilesProvider.GetFieldDataTypeCode(Type) == TYPE_OBJECT)
+					if (GetFieldDataTypeCode(Type) == TYPE_OBJECT)
 					{
 						CSharp.Append("\t\t\tthis.serializer");
 						CSharp.Append(Member.Name);
-						CSharp.Append(" = this.provider.GetObjectSerializer(typeof(");
+						CSharp.Append(" = this.context.GetObjectSerializer(typeof(");
 						this.AppendType(MemberType, CSharp);
 						CSharp.AppendLine("));");
 					}
@@ -653,7 +650,7 @@ namespace Waher.Persistence.Serialization
 
 				if (this.typeNameSerialization != TypeNameSerialization.None)
 				{
-					CSharp.AppendLine("\t\t\tstring TypeName = this.provider.GetFieldName(\"" + Escape(this.collectionName) + "\", FieldCode);");
+					CSharp.AppendLine("\t\t\tstring TypeName = this.context.GetFieldName(\"" + Escape(this.collectionName) + "\", FieldCode);");
 
 					if (this.typeNameSerialization == TypeNameSerialization.LocalName)
 						CSharp.AppendLine("\t\t\tTypeName = \"" + Type.Namespace + ".\" + TypeName;");
@@ -665,7 +662,7 @@ namespace Waher.Persistence.Serialization
 					CSharp.AppendLine();
 					CSharp.AppendLine("\t\t\tif (DesiredType != typeof(" + Type.FullName + "))");
 					CSharp.AppendLine("\t\t\t{");
-					CSharp.AppendLine("\t\t\t\tIObjectSerializer Serializer2 = this.provider.GetObjectSerializer(DesiredType);");
+					CSharp.AppendLine("\t\t\t\tIObjectSerializer Serializer2 = this.context.GetObjectSerializer(DesiredType);");
 					CSharp.AppendLine("\t\t\t\tReader.SetBookmark(Bookmark);");
 					CSharp.AppendLine("\t\t\t\treturn Serializer2.Deserialize(Reader, DataTypeBak, Embedded);");
 					CSharp.AppendLine("\t\t\t}");
@@ -772,9 +769,9 @@ namespace Waher.Persistence.Serialization
 							continue;
 
 						//if (!string.IsNullOrEmpty(ShortName) && ShortName != Member.Name)
-						//	CSharp.AppendLine("\t\t\t\t\tcase " + this.provider.GetFieldCode(this.collectionName, ShortName) + ":");
+						//	CSharp.AppendLine("\t\t\t\t\tcase " + this.context.GetFieldCode(this.collectionName, ShortName) + ":");
 
-						CSharp.AppendLine("\t\t\t\t\tcase " + this.provider.GetFieldCode(this.collectionName, Member.Name) + ":");
+						CSharp.AppendLine("\t\t\t\t\tcase " + this.context.GetFieldCode(this.collectionName, Member.Name) + ":");
 
 						if (MemberTypeInfo.IsEnum)
 						{
@@ -847,7 +844,7 @@ namespace Waher.Persistence.Serialization
 
 							CSharp.AppendLine();
 							CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
-							CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected an enumeration value, but was a \" + FilesProvider.GetFieldDataTypeName(FieldDataType) + \".\");");
+							CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected an enumeration value, but was a \" + ObjectSerializer.GetFieldDataTypeName(FieldDataType) + \".\");");
 							CSharp.AppendLine("\t\t\t\t\t\t}");
 						}
 						else
@@ -968,7 +965,7 @@ namespace Waher.Persistence.Serialization
 										else
 										{
 											MemberType = MemberType.GetElementType();
-											CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = ReadArray<" + GenericParameterName(MemberType) + ">(this.provider, Reader, FieldDataType);");
+											CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = ReadArray<" + GenericParameterName(MemberType) + ">(this.context, Reader, FieldDataType);");
 										}
 									}
 									else if (ByReference)
@@ -977,7 +974,7 @@ namespace Waher.Persistence.Serialization
 										CSharp.AppendLine("\t\t\t\t\t\t{");
 										CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_GUID + ":");
 										CSharp.AppendLine("\t\t\t\t\t\t\t\tGuid " + Member.Name + "ObjectId = Reader.ReadGuid();");
-										CSharp.AppendLine("\t\t\t\t\t\t\t\tTask<" + MemberType.FullName + "> " + Member.Name + "Task = this.provider.LoadObject<" + GenericParameterName(MemberType) + ">(" + Member.Name + "ObjectId, (EmbeddedValue) => Result." + Member.Name + " = (" + MemberType.FullName + ")EmbeddedValue);");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tTask<" + MemberType.FullName + "> " + Member.Name + "Task = this.context.LoadObject<" + GenericParameterName(MemberType) + ">(" + Member.Name + "ObjectId, (EmbeddedValue) => Result." + Member.Name + " = (" + MemberType.FullName + ")EmbeddedValue);");
 										CSharp.AppendLine("\t\t\t\t\t\t\t\tif (!" + Member.Name + "Task.Wait(10000))");
 										CSharp.AppendLine("\t\t\t\t\t\t\t\t\tthrow new TimeoutException(\"Unable to load referenced object. Database timed out.\");");
 										CSharp.AppendLine();
@@ -1191,13 +1188,13 @@ namespace Waher.Persistence.Serialization
 										{
 											CSharp.AppendLine();
 											CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_ARRAY + ":");
-											CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (" + MemberType.FullName + ")ReadArray<Waher.Persistence.Serialization.GenericObject>(this.provider, Reader, FieldDataType);");
+											CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (" + MemberType.FullName + ")ReadArray<Waher.Persistence.Serialization.GenericObject>(this.context, Reader, FieldDataType);");
 											CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
 										}
 
 										CSharp.AppendLine();
 										CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
-										CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Object expected for " + Member.Name + ". Data Type read: \" + FilesProvider.GetFieldDataTypeName(FieldDataType));");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Object expected for " + Member.Name + ". Data Type read: \" + ObjectSerializer.GetFieldDataTypeName(FieldDataType));");
 										CSharp.AppendLine("\t\t\t\t\t\t}");
 									}
 									break;
@@ -1209,7 +1206,7 @@ namespace Waher.Persistence.Serialization
 					}
 
 					CSharp.AppendLine("\t\t\t\t\tdefault:");
-					CSharp.Append("\t\t\t\t\t\tthrow new Exception(\"Field name not recognized: \" + this.provider.GetFieldName(\"");
+					CSharp.Append("\t\t\t\t\t\tthrow new Exception(\"Field name not recognized: \" + this.context.GetFieldName(\"");
 					if (!string.IsNullOrEmpty(this.collectionName))
 						CSharp.Append(Escape(this.collectionName));
 					CSharp.AppendLine("\", FieldCode));");
@@ -1269,16 +1266,16 @@ namespace Waher.Persistence.Serialization
 					CSharp.Append("\t\t\tWriter.WriteVariableLengthUInt64(");
 
 					if (this.typeNameSerialization == TypeNameSerialization.LocalName)
-						CSharp.Append(this.provider.GetFieldCode(this.collectionName, this.type.Name));
+						CSharp.Append(this.context.GetFieldCode(this.collectionName, this.type.Name));
 					else
-						CSharp.Append(this.provider.GetFieldCode(this.collectionName, this.type.FullName));
+						CSharp.Append(this.context.GetFieldCode(this.collectionName, this.type.FullName));
 
 					CSharp.AppendLine(");");
 				}
 
 				CSharp.AppendLine("\t\t\tif (Embedded)");
 				CSharp.Append("\t\t\t\tWriter.WriteVariableLengthUInt64(");
-				CSharp.Append(this.provider.GetFieldCode(null, string.IsNullOrEmpty(this.collectionName) ? this.provider.DefaultCollectionName : this.collectionName));
+				CSharp.Append(this.context.GetFieldCode(null, string.IsNullOrEmpty(this.collectionName) ? this.context.DefaultCollectionName : this.collectionName));
 				CSharp.AppendLine(");");
 
 				foreach (MemberInfo Member in Members)
@@ -1392,9 +1389,9 @@ namespace Waher.Persistence.Serialization
 
 						CSharp.Append("Writer.WriteVariableLengthUInt64(");
 						//if (string.IsNullOrEmpty(ShortName))
-						CSharp.Append(this.provider.GetFieldCode(this.collectionName, Member.Name));
+						CSharp.Append(this.context.GetFieldCode(this.collectionName, Member.Name));
 						//else
-						//	CSharp.Append(this.provider.GetFieldCode(this.collectionName, ShortName));
+						//	CSharp.Append(this.context.GetFieldCode(this.collectionName, ShortName));
 						CSharp.AppendLine(");");
 
 						if (Nullable)
@@ -1706,7 +1703,7 @@ namespace Waher.Persistence.Serialization
 											CSharp.Append(Indent2);
 											CSharp.Append("WriteArray<");
 											CSharp.Append(GenericParameterName(MemberType));
-											CSharp.Append(">(this.provider, Writer, Value.");
+											CSharp.Append(">(this.context, Writer, Value.");
 											CSharp.Append(Member.Name);
 											CSharp.AppendLine(");");
 										}
@@ -1724,11 +1721,11 @@ namespace Waher.Persistence.Serialization
 										CSharp.Append(Indent2);
 										CSharp.AppendLine("\tWriter.WriteBits(" + TYPE_GUID + ", 6);");
 										CSharp.Append(Indent2);
-										CSharp.AppendLine("\tObjectSerializer Serializer" + Member.Name + " = this.provider.GetObjectSerializerEx(typeof(" + MemberType.FullName + "));");
+										CSharp.AppendLine("\tObjectSerializer Serializer" + Member.Name + " = ObjectSerializer.GetObjectSerializerEx(typeof(" + MemberType.FullName + "), this.context);");
 										CSharp.Append(Indent2);
 										CSharp.AppendLine("\tTask<Guid> " + Member.Name + "Task = Serializer" + Member.Name + ".GetObjectId(Value." + Member.Name + ", true);");
 										CSharp.Append(Indent2);
-										CSharp.AppendLine("\tif (!" + Member.Name + "Task.Wait(" + this.provider.TimeoutMilliseconds.ToString() + "))");
+										CSharp.AppendLine("\tif (!" + Member.Name + "Task.Wait(" + this.context.TimeoutMilliseconds.ToString() + "))");
 										CSharp.Append(Indent2);
 										CSharp.AppendLine("\t\tthrow new TimeoutException(\"Unable to load referenced object. Database timed out.\");");
 										CSharp.Append(Indent2);
@@ -1847,7 +1844,7 @@ namespace Waher.Persistence.Serialization
 					CSharp.AppendLine("\t\t\t\tConsole.Out.WriteLine();");
 
 				if (ObjectIdMemberType is null)
-					CSharp.AppendLine("\t\t\t\tWriterBak.Write(Waher.Persistence.Files.ObjectBTreeFile.CreateDatabaseGUID());");
+					CSharp.AppendLine("\t\t\t\tWriterBak.Write(this.context.CreateGuid());");
 				else
 				{
 					if (ObjectIdMemberType == typeof(Guid))
@@ -1870,7 +1867,7 @@ namespace Waher.Persistence.Serialization
 
 					CSharp.AppendLine("\t\t\t\telse");
 					CSharp.AppendLine("\t\t\t\t{");
-					CSharp.AppendLine("\t\t\t\t\tGuid NewObjectId = Waher.Persistence.Files.ObjectBTreeFile.CreateDatabaseGUID();");
+					CSharp.AppendLine("\t\t\t\t\tGuid NewObjectId = this.context.CreateGuid();");
 					CSharp.AppendLine("\t\t\t\t\tWriterBak.Write(NewObjectId);");
 
 					if (ObjectIdMemberType == typeof(Guid))
@@ -2014,20 +2011,18 @@ namespace Waher.Persistence.Serialization
 				try
 				{
 					A = AssemblyLoadContext.Default.LoadFromStream(Output, PdbOutput);
-					Type T = A.GetType(Type.Namespace + ".Binary.BinarySerializer" + TypeName + this.provider.Id);
-					this.customSerializer = (IObjectSerializer)Activator.CreateInstance(T, this.provider);
+					Type T = A.GetType(Type.Namespace + ".Binary.BinarySerializer" + TypeName + this.context.Id);
+					this.customSerializer = (IObjectSerializer)Activator.CreateInstance(T, this.context);
 				}
 				catch (FileLoadException)
 				{
-					this.customSerializer = new ObjectSerializer(Type, Provider, Debug, false);
+					this.customSerializer = new ObjectSerializer(Type, Context, Debug, false);
 				}
 			}
 			else
 			{
 #endif
 				Member Member;
-				FieldInfo FI;
-				PropertyInfo PI;
 				MethodInfo MI;
 				object DefaultValue;
 				int NrDefault = 0;
@@ -2035,15 +2030,14 @@ namespace Waher.Persistence.Serialization
 
 				foreach (MemberInfo MemberInfo in GetMembers(this.typeInfo))
 				{
-					if (!((FI = MemberInfo as FieldInfo) is null))
+					if (MemberInfo is FieldInfo FI)
 					{
 						if (!FI.IsPublic || FI.IsStatic)
 							continue;
 
-						PI = null;
-						Member = new FieldMember(FI, this.provider.GetFieldCode(this.collectionName, FI.Name));
+						Member = new FieldMember(FI, this.context.GetFieldCode(this.collectionName, FI.Name));
 					}
-					else if (!((PI = MemberInfo as PropertyInfo) is null))
+					else if (MemberInfo is PropertyInfo PI)
 					{
 						if ((MI = PI.GetMethod) is null || !MI.IsPublic || MI.IsStatic)
 							continue;
@@ -2054,7 +2048,7 @@ namespace Waher.Persistence.Serialization
 						if (PI.GetIndexParameters().Length > 0)
 							continue;
 
-						Member = new PropertyMember(PI, this.provider.GetFieldCode(this.collectionName, PI.Name));
+						Member = new PropertyMember(PI, this.context.GetFieldCode(this.collectionName, PI.Name));
 					}
 					else
 						continue;
@@ -2098,7 +2092,7 @@ namespace Waher.Persistence.Serialization
 					this.membersOrdered.AddLast(Member);
 
 					if (Member.IsNestedObject)
-						Member.NestedSerializer = this.provider.GetObjectSerializer(Member.MemberType);
+						Member.NestedSerializer = this.context.GetObjectSerializer(Member.MemberType);
 				}
 #if NETSTANDARD1_5
 			}
@@ -2236,7 +2230,7 @@ namespace Waher.Persistence.Serialization
 				FieldCode = Reader.ReadVariableLengthUInt64();
 				if (this.typeNameSerialization != TypeNameSerialization.None)
 				{
-					string TypeName = this.provider.GetFieldName(this.collectionName, FieldCode);
+					string TypeName = this.context.GetFieldName(this.collectionName, FieldCode);
 					if (this.typeNameSerialization == TypeNameSerialization.LocalName)
 						TypeName = this.type.Namespace + "." + TypeName;
 
@@ -2246,7 +2240,7 @@ namespace Waher.Persistence.Serialization
 
 					if (DesiredType != this.type)
 					{
-						IObjectSerializer Serializer2 = this.provider.GetObjectSerializer(DesiredType);
+						IObjectSerializer Serializer2 = this.context.GetObjectSerializer(DesiredType);
 						Reader.SetBookmark(Bookmark);
 						return Serializer2.Deserialize(Reader, DataTypeBak, Embedded);
 					}
@@ -2433,7 +2427,7 @@ namespace Waher.Persistence.Serialization
 								throw new Exception("Invalid member type: " + Member.MemberType.FullName);
 
 							case TYPE_ARRAY:
-								Member.Set(Result, GeneratedObjectSerializerBase.ReadArray(Member.MemberType.GetElementType(), this.provider, Reader, FieldDataType));
+								Member.Set(Result, GeneratedObjectSerializerBase.ReadArray(Member.MemberType.GetElementType(), this.context, Reader, FieldDataType));
 								break;
 
 							case TYPE_BYTEARRAY:
@@ -2506,7 +2500,7 @@ namespace Waher.Persistence.Serialization
 
 									default:
 										throw new Exception("Unable to set " + Member.Name + ". Expected an enumeration value, but was a " +
-											FilesProvider.GetFieldDataTypeName(FieldDataType) + ".");
+											GetFieldDataTypeName(FieldDataType) + ".");
 								}
 								break;
 
@@ -2517,7 +2511,7 @@ namespace Waher.Persistence.Serialization
 									{
 										case TYPE_GUID:
 											Guid RefObjectId = Reader.ReadGuid();
-											Task<object> SetTask = this.provider.LoadObject(Member.MemberType, RefObjectId,
+											Task<object> SetTask = this.context.LoadObject(Member.MemberType, RefObjectId,
 												(EmbeddedValue) => Member.Set(Result, EmbeddedValue));
 
 											if (!SetTask.Wait(10000))
@@ -2631,18 +2625,18 @@ namespace Waher.Persistence.Serialization
 											break;
 
 										case TYPE_ARRAY:
-											Member.Set(Result, GeneratedObjectSerializerBase.ReadArray(typeof(Waher.Persistence.Serialization.GenericObject), this.provider, Reader, FieldDataType));
+											Member.Set(Result, GeneratedObjectSerializerBase.ReadArray(typeof(GenericObject), this.context, Reader, FieldDataType));
 											break;
 
 										default:
-											throw new Exception("Object expected for " + Member.Name + ". Data Type read: " + FilesProvider.GetFieldDataTypeName(FieldDataType));
+											throw new Exception("Object expected for " + Member.Name + ". Data Type read: " + GetFieldDataTypeName(FieldDataType));
 									}
 								}
 								break;
 						}
 					}
 					else
-						throw new Exception("Field name not recognized: " + this.provider.GetFieldName(this.collectionName, FieldCode));
+						throw new Exception("Field name not recognized: " + this.context.GetFieldName(this.collectionName, FieldCode));
 				}
 
 				return Result;
@@ -2689,17 +2683,17 @@ namespace Waher.Persistence.Serialization
 				else
 				{
 					if (this.typeNameSerialization == TypeNameSerialization.LocalName)
-						Writer.WriteVariableLengthUInt64(this.provider.GetFieldCode(this.collectionName, this.type.Name));
+						Writer.WriteVariableLengthUInt64(this.context.GetFieldCode(this.collectionName, this.type.Name));
 					else
-						Writer.WriteVariableLengthUInt64(this.provider.GetFieldCode(this.collectionName, this.type.FullName));
+						Writer.WriteVariableLengthUInt64(this.context.GetFieldCode(this.collectionName, this.type.FullName));
 				}
 
 				if (Embedded)
 				{
 					if (string.IsNullOrEmpty(this.collectionName))
-						Writer.WriteVariableLengthUInt64(this.provider.GetFieldCode(null, this.provider.DefaultCollectionName));
+						Writer.WriteVariableLengthUInt64(this.context.GetFieldCode(null, this.context.DefaultCollectionName));
 					else
-						Writer.WriteVariableLengthUInt64(this.provider.GetFieldCode(null, this.collectionName));
+						Writer.WriteVariableLengthUInt64(this.context.GetFieldCode(null, this.collectionName));
 				}
 
 				foreach (Member Member in this.membersOrdered)
@@ -2816,7 +2810,7 @@ namespace Waher.Persistence.Serialization
 								throw new Exception("Invalid member type: " + Member.MemberType.FullName);
 
 							case TYPE_ARRAY:
-								GeneratedObjectSerializerBase.WriteArray(Member.MemberType.GetElementType(), this.provider, Writer, (Array)MemberValue);
+								GeneratedObjectSerializerBase.WriteArray(Member.MemberType.GetElementType(), this.context, Writer, (Array)MemberValue);
 								break;
 
 							case TYPE_BYTEARRAY:
@@ -2845,7 +2839,9 @@ namespace Waher.Persistence.Serialization
 										Writer.WriteBits(TYPE_GUID, 6);
 
 										Task<Guid> WriteTask = ObjectSerializer.GetObjectId(MemberValue, true);
-										FilesProvider.Wait(WriteTask, this.provider.TimeoutMilliseconds);
+										if (!WriteTask.Wait(this.context.TimeoutMilliseconds))
+											throw new TimeoutException("Unable to get access to object ID within given time.");
+
 										Writer.Write(WriteTask.Result);
 									}
 									else
@@ -2863,7 +2859,7 @@ namespace Waher.Persistence.Serialization
 				if (!Embedded)
 				{
 					if (this.objectIdMember is null)
-						WriterBak.Write(Waher.Persistence.Files.ObjectBTreeFile.CreateDatabaseGUID());
+						WriterBak.Write(this.context.CreateGuid());
 					else
 					{
 						object ObjectId = this.objectIdMember.Get(Value);
@@ -2904,7 +2900,7 @@ namespace Waher.Persistence.Serialization
 
 						if (!HasGuid)
 						{
-							Guid NewObjectId = Waher.Persistence.Files.ObjectBTreeFile.CreateDatabaseGUID();
+							Guid NewObjectId = this.context.CreateGuid();
 							WriterBak.Write(NewObjectId);
 
 							switch (ObjectIdType)
@@ -3112,34 +3108,8 @@ namespace Waher.Persistence.Serialization
 				if (!InsertIfNotFound)
 					throw new Exception("Object has no Object ID defined.");
 
-				Type ValueType = Value.GetType();
-				ObjectSerializer Serializer = this.provider.GetObjectSerializerEx(ValueType);
-
-				ObjectBTreeFile File = await this.provider.GetFile(this.collectionName);
-				Guid ObjectId;
+				Guid ObjectId = await this.context.SaveNewObject(Value);
 				Type T;
-
-				if (await File.TryBeginWrite(0))
-				{
-					try
-					{
-						ObjectId = await File.SaveNewObjectLocked(Value, Serializer);
-					}
-					finally
-					{
-						await File.EndWrite();
-					}
-
-					foreach (IndexBTreeFile Index in File.Indices)
-						await Index.SaveNewObject(ObjectId, Value, Serializer);
-				}
-				else
-				{
-					Tuple<Guid, Storage.BlockInfo> Rec = await File.PrepareObjectIdForSaveLocked(Value, Serializer);
-
-					ObjectId = Rec.Item1;
-					File.QueueForSave(Value, Serializer);
-				}
 
 #if NETSTANDARD1_5
 				if (this.compiled)
@@ -3316,6 +3286,160 @@ namespace Waher.Persistence.Serialization
 			else
 				sb.Append(T.FullName);
 		}
+
+		#region Static interface
+
+		/// <summary>
+		/// Returns the type name corresponding to a given field data type code.
+		/// </summary>
+		/// <param name="FieldDataType">Field data type code.</param>
+		/// <returns>Corresponding data type name.</returns>
+		public static string GetFieldDataTypeName(uint FieldDataType)
+		{
+			return GetFieldDataType(FieldDataType).FullName;
+		}
+
+		/// <summary>
+		/// Returns the type corresponding to a given field data type code.
+		/// </summary>
+		/// <param name="FieldDataTypeCode">Field data type code.</param>
+		/// <returns>Corresponding data type.</returns>
+		public static Type GetFieldDataType(uint FieldDataTypeCode)
+		{
+			switch (FieldDataTypeCode)
+			{
+				case ObjectSerializer.TYPE_BOOLEAN: return typeof(bool);
+				case ObjectSerializer.TYPE_BYTE: return typeof(byte);
+				case ObjectSerializer.TYPE_INT16: return typeof(short);
+				case ObjectSerializer.TYPE_INT32: return typeof(int);
+				case ObjectSerializer.TYPE_INT64: return typeof(long);
+				case ObjectSerializer.TYPE_SBYTE: return typeof(sbyte);
+				case ObjectSerializer.TYPE_UINT16: return typeof(ushort);
+				case ObjectSerializer.TYPE_UINT32: return typeof(uint);
+				case ObjectSerializer.TYPE_UINT64: return typeof(ulong);
+				case ObjectSerializer.TYPE_DECIMAL: return typeof(decimal);
+				case ObjectSerializer.TYPE_DOUBLE: return typeof(double);
+				case ObjectSerializer.TYPE_SINGLE: return typeof(float);
+				case ObjectSerializer.TYPE_DATETIME: return typeof(DateTime);
+				case ObjectSerializer.TYPE_DATETIMEOFFSET: return typeof(DateTimeOffset);
+				case ObjectSerializer.TYPE_TIMESPAN: return typeof(TimeSpan);
+				case ObjectSerializer.TYPE_CHAR: return typeof(char);
+				case ObjectSerializer.TYPE_STRING: return typeof(string);
+				case ObjectSerializer.TYPE_CI_STRING: return typeof(CaseInsensitiveString);
+				case ObjectSerializer.TYPE_ENUM: return typeof(Enum);
+				case ObjectSerializer.TYPE_BYTEARRAY: return typeof(byte[]);
+				case ObjectSerializer.TYPE_GUID: return typeof(Guid);
+				case ObjectSerializer.TYPE_ARRAY: return typeof(Array);
+				case ObjectSerializer.TYPE_OBJECT: return typeof(object);
+				default: throw new Exception("Unrecognized field code: " + FieldDataTypeCode.ToString());
+			}
+		}
+
+		/// <summary>
+		/// Returns the type code corresponding to a given field data type.
+		/// </summary>
+		/// <param name="Value">Field data value.</param>
+		/// <returns>Corresponding data type code.</returns>
+		public static uint GetFieldDataTypeCode(object Value)
+		{
+			if (Value is null)
+				return ObjectSerializer.TYPE_NULL;
+			else
+				return GetFieldDataTypeCode(Value.GetType());
+		}
+
+		/// <summary>
+		/// Returns the type code corresponding to a given field data type.
+		/// </summary>
+		/// <param name="FieldDataType">Field data type.</param>
+		/// <returns>Corresponding data type code.</returns>
+		public static uint GetFieldDataTypeCode(Type FieldDataType)
+		{
+			System.Reflection.TypeInfo TI = FieldDataType.GetTypeInfo();
+			if (TI.IsEnum)
+			{
+				if (TI.IsDefined(typeof(FlagsAttribute), false))
+					return ObjectSerializer.TYPE_INT32;
+				else
+					return ObjectSerializer.TYPE_ENUM;
+			}
+
+			if (FieldDataType == typeof(bool))
+				return ObjectSerializer.TYPE_BOOLEAN;
+			else if (FieldDataType == typeof(byte))
+				return ObjectSerializer.TYPE_BYTE;
+			else if (FieldDataType == typeof(short))
+				return ObjectSerializer.TYPE_INT16;
+			else if (FieldDataType == typeof(int))
+				return ObjectSerializer.TYPE_INT32;
+			else if (FieldDataType == typeof(long))
+				return ObjectSerializer.TYPE_INT64;
+			else if (FieldDataType == typeof(sbyte))
+				return ObjectSerializer.TYPE_SBYTE;
+			else if (FieldDataType == typeof(ushort))
+				return ObjectSerializer.TYPE_UINT16;
+			else if (FieldDataType == typeof(uint))
+				return ObjectSerializer.TYPE_UINT32;
+			else if (FieldDataType == typeof(ulong))
+				return ObjectSerializer.TYPE_UINT64;
+			else if (FieldDataType == typeof(decimal))
+				return ObjectSerializer.TYPE_DECIMAL;
+			else if (FieldDataType == typeof(double))
+				return ObjectSerializer.TYPE_DOUBLE;
+			else if (FieldDataType == typeof(float))
+				return ObjectSerializer.TYPE_SINGLE;
+			else if (FieldDataType == typeof(DateTime))
+				return ObjectSerializer.TYPE_DATETIME;
+			else if (FieldDataType == typeof(DateTimeOffset))
+				return ObjectSerializer.TYPE_DATETIMEOFFSET;
+			else if (FieldDataType == typeof(char))
+				return ObjectSerializer.TYPE_CHAR;
+			else if (FieldDataType == typeof(string))
+				return ObjectSerializer.TYPE_STRING;
+			else if (FieldDataType == typeof(CaseInsensitiveString))
+				return ObjectSerializer.TYPE_CI_STRING;
+			else if (FieldDataType == typeof(TimeSpan))
+				return ObjectSerializer.TYPE_TIMESPAN;
+			else if (FieldDataType == typeof(byte[]))
+				return ObjectSerializer.TYPE_BYTEARRAY;
+			else if (FieldDataType == typeof(Guid))
+				return ObjectSerializer.TYPE_GUID;
+			else if (FieldDataType == typeof(CaseInsensitiveString))
+				return ObjectSerializer.TYPE_CI_STRING;
+			else if (TI.IsArray)
+				return ObjectSerializer.TYPE_ARRAY;
+			else if (FieldDataType == typeof(void))
+				return ObjectSerializer.TYPE_NULL;
+			else
+				return ObjectSerializer.TYPE_OBJECT;
+		}
+
+		/// <summary>
+		/// Gets the object serializer corresponding to a specific object.
+		/// </summary>
+		/// <param name="Object">Object to serialize</param>
+		/// <param name="Context">Serialization context.</param>
+		/// <returns>Object Serializer</returns>
+		public static ObjectSerializer GetObjectSerializerEx(object Object, ISerializerContext Context)
+		{
+			return GetObjectSerializerEx(Object.GetType(), Context);
+		}
+
+		/// <summary>
+		/// Gets the object serializer corresponding to a specific object.
+		/// </summary>
+		/// <param name="Type">Type of object to serialize.</param>
+		/// <param name="Context">Serialization context.</param>
+		/// <returns>Object Serializer</returns>
+		public static ObjectSerializer GetObjectSerializerEx(Type Type, ISerializerContext Context)
+		{
+			if (!(Context.GetObjectSerializer(Type) is ObjectSerializer Serializer))
+				throw new Exception("Objects of type " + Type.FullName + " must be embedded.");
+
+			return Serializer;
+		}
+
+		#endregion
 
 	}
 }

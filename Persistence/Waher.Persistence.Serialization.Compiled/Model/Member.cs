@@ -49,7 +49,7 @@ namespace Waher.Persistence.Serialization.Model
 				}
 			}
 
-			this.memberFieldDataTypeCode = FilesProvider.GetFieldDataTypeCode(this.memberType);
+			this.memberFieldDataTypeCode = ObjectSerializer.GetFieldDataTypeCode(this.memberType);
 			this.isNestedObject = this.memberFieldDataTypeCode == ObjectSerializer.TYPE_OBJECT;
 
 			switch (this.memberFieldDataTypeCode)

@@ -11,15 +11,15 @@ namespace Waher.Persistence.Serialization
 	/// </summary>
 	public class KeyValueSerializer : IObjectSerializer
 	{
-		private readonly FilesProvider provider;
+		private readonly ISerializerContext context;
 		private readonly GenericObjectSerializer genericSerializer;
 
 		/// <summary>
 		/// Serializer for objects of type KeyValuePair&lt;string, object&gt;.
 		/// </summary>
-		public KeyValueSerializer(FilesProvider Provider, GenericObjectSerializer GenericSerializer)
+		public KeyValueSerializer(ISerializerContext Context, GenericObjectSerializer GenericSerializer)
 		{
-			this.provider = Provider;
+			this.context = Context;
 			this.genericSerializer = GenericSerializer;
 		}
 
@@ -82,7 +82,7 @@ namespace Waher.Persistence.Serialization
 					{
 						Type T = Types.GetType(TypeName);
 						if (!(T is null))
-							Serializer = this.provider.GetObjectSerializer(T);
+							Serializer = this.context.GetObjectSerializer(T);
 						else
 							Serializer = this.genericSerializer;
 					}

@@ -14,8 +14,8 @@ namespace Waher.Persistence.Serialization
 		/// <summary>
 		/// Provides a generic object serializer.
 		/// </summary>
-		public GenericObjectSerializer(FilesProvider Provider)
-			: base(typeof(GenericObject), Provider)
+		public GenericObjectSerializer(ISerializerContext Context)
+			: base(typeof(GenericObject), Context)
 		{
 		}
 
@@ -44,10 +44,7 @@ namespace Waher.Persistence.Serialization
 			uint FieldDataType;
 			ulong FieldCode;
 			ulong CollectionCode;
-			StreamBookmark Bookmark = Reader.GetBookmark();
-			uint? DataTypeBak = DataType;
 			Guid ObjectId = Embedded ? Guid.Empty : Reader.ReadGuid();
-			ulong ContentLen = Embedded ? 0 : Reader.ReadVariableLengthUInt64();
 			string TypeName;
 			string FieldName;
 			string CollectionName;
@@ -139,7 +136,7 @@ namespace Waher.Persistence.Serialization
 			if (Embedded)
 			{
 				CollectionCode = Reader.ReadVariableLengthUInt64();
-				CollectionName = this.provider.GetFieldName(null, CollectionCode);
+				CollectionName = this.context.GetFieldName(null, CollectionCode);
 			}
 			else
 				CollectionName = Reader.CollectionName;
@@ -147,7 +144,7 @@ namespace Waher.Persistence.Serialization
 			if (FieldCode == 0)
 				TypeName = string.Empty;
 			else if (CheckFieldNames)
-				TypeName = this.provider.GetFieldName(CollectionName, FieldCode);
+				TypeName = this.context.GetFieldName(CollectionName, FieldCode);
 			else
 				TypeName = CollectionName + "." + FieldCode.ToString();
 
@@ -156,7 +153,7 @@ namespace Waher.Persistence.Serialization
 			while ((FieldCode = Reader.ReadVariableLengthUInt64()) != 0)
 			{
 				if (CheckFieldNames)
-					FieldName = this.provider.GetFieldName(CollectionName, FieldCode);
+					FieldName = this.context.GetFieldName(CollectionName, FieldCode);
 				else
 					FieldName = CollectionName + "." + FieldCode.ToString();
 
@@ -303,7 +300,7 @@ namespace Waher.Persistence.Serialization
 		private T[] ReadArray<T>(BinaryDeserializer Reader, ulong NrElements, uint ElementDataType)
 		{
 			List<T> Elements = new List<T>();
-			IObjectSerializer S = this.provider.GetObjectSerializer(typeof(T));
+			IObjectSerializer S = this.context.GetObjectSerializer(typeof(T));
 
 			while (NrElements > 0)
 			{
@@ -465,7 +462,7 @@ namespace Waher.Persistence.Serialization
 				object Obj;
 
 				if (!Embedded)
-					Writer = new BinarySerializer(Writer.CollectionName, Writer.Encoding, this.provider.Debug);
+					Writer = new BinarySerializer(Writer.CollectionName, Writer.Encoding, this.context.Debug);
 
 				if (WriteTypeCode)
 				{
@@ -483,14 +480,14 @@ namespace Waher.Persistence.Serialization
 				if (string.IsNullOrEmpty(TypedValue.TypeName))
 					Writer.WriteVariableLengthUInt64(0);
 				else
-					Writer.WriteVariableLengthUInt64(this.provider.GetFieldCode(TypedValue.CollectionName, TypedValue.TypeName));
+					Writer.WriteVariableLengthUInt64(this.context.GetFieldCode(TypedValue.CollectionName, TypedValue.TypeName));
 
 				if (Embedded)
-					Writer.WriteVariableLengthUInt64(this.provider.GetFieldCode(null, string.IsNullOrEmpty(TypedValue.CollectionName) ? this.provider.DefaultCollectionName : TypedValue.CollectionName));
+					Writer.WriteVariableLengthUInt64(this.context.GetFieldCode(null, string.IsNullOrEmpty(TypedValue.CollectionName) ? this.context.DefaultCollectionName : TypedValue.CollectionName));
 
 				foreach (KeyValuePair<string, object> Property in TypedValue)
 				{
-					Writer.WriteVariableLengthUInt64(this.provider.GetFieldCode(TypedValue.CollectionName, Property.Key));
+					Writer.WriteVariableLengthUInt64(this.context.GetFieldCode(TypedValue.CollectionName, Property.Key));
 
 					Obj = Property.Value;
 					if (Obj is null)
@@ -501,7 +498,7 @@ namespace Waher.Persistence.Serialization
 							this.Serialize(Writer, true, true, Obj);
 						else
 						{
-							Serializer = this.provider.GetObjectSerializer(Obj.GetType());
+							Serializer = this.context.GetObjectSerializer(Obj.GetType());
 							Serializer.Serialize(Writer, true, true, Obj);
 						}
 					}
@@ -515,7 +512,7 @@ namespace Waher.Persistence.Serialization
 						WriterBak.Write(TypedValue.ObjectId);
 					else
 					{
-						Guid NewObjectId = ObjectBTreeFile.CreateDatabaseGUID();
+						Guid NewObjectId = this.context.CreateGuid();
 						WriterBak.Write(NewObjectId);
 						TypedValue.ObjectId = NewObjectId;
 					}
@@ -528,7 +525,7 @@ namespace Waher.Persistence.Serialization
 			}
 			else
 			{
-				IObjectSerializer Serializer = this.provider.GetObjectSerializer(Value.GetType());
+				IObjectSerializer Serializer = this.context.GetObjectSerializer(Value.GetType());
 				Serializer.Serialize(Writer, WriteTypeCode, Embedded, Value);
 			}
 		}
@@ -603,30 +600,7 @@ namespace Waher.Persistence.Serialization
 				if (!InsertIfNotFound)
 					throw new Exception("Object has no Object ID defined.");
 
-				ObjectBTreeFile File = await this.provider.GetFile(Obj.CollectionName);
-				Guid ObjectId;
-
-				if (await File.TryBeginWrite(0))
-				{
-					try
-					{
-						ObjectId = await File.SaveNewObjectLocked(Value, this);
-					}
-					finally
-					{
-						await File.EndWrite();
-					}
-
-					foreach (IndexBTreeFile Index in File.Indices)
-						await Index.SaveNewObject(ObjectId, Value, this);
-				}
-				else
-				{
-					Tuple<Guid, Storage.BlockInfo> Rec = await File.PrepareObjectIdForSaveLocked(Value, this);
-
-					ObjectId = Rec.Item1;
-					File.QueueForSave(Value, this);
-				}
+				Guid ObjectId = await this.context.SaveNewObject(Obj);
 
 				Obj.ObjectId = ObjectId;
 

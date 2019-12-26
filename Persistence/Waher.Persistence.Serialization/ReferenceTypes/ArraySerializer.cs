@@ -11,15 +11,15 @@ namespace Waher.Persistence.Serialization.ReferenceTypes
 	/// <typeparam name="T">Element type.</typeparam>
 	public class ArraySerializer<T> : GeneratedObjectSerializerBase
 	{
-		private readonly FilesProvider provider;
+		private readonly ISerializerContext context;
 
 		/// <summary>
 		/// Generic serializer of array types.
 		/// </summary>
-		/// <param name="Provider">Files provider.</param>
-		public ArraySerializer(FilesProvider Provider)
+		/// <param name="Context">Serialization context.</param>
+		public ArraySerializer(ISerializerContext Context)
 		{
-			this.provider = Provider;
+			this.context = Context;
 		}
 
 		/// <summary>
@@ -53,7 +53,7 @@ namespace Waher.Persistence.Serialization.ReferenceTypes
 			if (!DataType.HasValue)
 				DataType = Reader.ReadBits(6);
 
-			return ReadArray<T>(this.provider, Reader, DataType.Value);
+			return ReadArray<T>(this.context, Reader, DataType.Value);
 		}
 
 		/// <summary>
@@ -76,7 +76,7 @@ namespace Waher.Persistence.Serialization.ReferenceTypes
 			{
 				T[] Array = (T[])Value;
 				Type LastType = typeof(T);
-				IObjectSerializer S = this.provider.GetObjectSerializer(LastType);
+				IObjectSerializer S = this.context.GetObjectSerializer(LastType);
 				Type ItemType;
 				bool Nullable;
 
@@ -86,7 +86,7 @@ namespace Waher.Persistence.Serialization.ReferenceTypes
 				if (Nullable = S.IsNullable)
 					Writer.WriteBits(ObjectSerializer.TYPE_NULL, 6);
 				else
-					Writer.WriteBits(FilesProvider.GetFieldDataTypeCode(LastType), 6);
+					Writer.WriteBits(ObjectSerializer.GetFieldDataTypeCode(LastType), 6);
 
 				foreach (T Item in Array)
 				{
@@ -102,7 +102,7 @@ namespace Waher.Persistence.Serialization.ReferenceTypes
 						ItemType = Item.GetType();
 						if (ItemType != LastType)
 						{
-							S = this.provider.GetObjectSerializer(ItemType);
+							S = this.context.GetObjectSerializer(ItemType);
 							LastType = ItemType;
 						}
 

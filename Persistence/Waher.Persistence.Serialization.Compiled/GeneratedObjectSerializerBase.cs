@@ -78,7 +78,7 @@ namespace Waher.Persistence.Serialization
 				case ObjectSerializer.TYPE_DOUBLE: return Reader.ReadDouble() != 0;
 				case ObjectSerializer.TYPE_SINGLE: return Reader.ReadSingle() != 0;
 				default:
-					throw new ArgumentException("Expected a boolean value, but was a " + FilesProvider.GetFieldDataTypeName(FieldDataType) + ".",
+					throw new ArgumentException("Expected a boolean value, but was a " + ObjectSerializer.GetFieldDataTypeName(FieldDataType) + ".",
 						nameof(FieldDataType));
 			}
 		}
@@ -125,7 +125,7 @@ namespace Waher.Persistence.Serialization
 				case ObjectSerializer.TYPE_CI_STRING: return byte.Parse(Reader.ReadString());
 				default:
 					throw new ArgumentException("Expected a byte value, but was a " +
-						FilesProvider.GetFieldDataTypeName(FieldDataType) + ".", nameof(FieldDataType));
+						ObjectSerializer.GetFieldDataTypeName(FieldDataType) + ".", nameof(FieldDataType));
 			}
 		}
 
@@ -171,7 +171,7 @@ namespace Waher.Persistence.Serialization
 				case ObjectSerializer.TYPE_CI_STRING: return sbyte.Parse(Reader.ReadString());
 				default:
 					throw new ArgumentException("Expected a signed byte value, but was a " +
-						FilesProvider.GetFieldDataTypeName(FieldDataType) + ".", nameof(FieldDataType));
+						ObjectSerializer.GetFieldDataTypeName(FieldDataType) + ".", nameof(FieldDataType));
 			}
 		}
 
@@ -217,7 +217,7 @@ namespace Waher.Persistence.Serialization
 				case ObjectSerializer.TYPE_CI_STRING: return short.Parse(Reader.ReadString());
 				default:
 					throw new ArgumentException("Expected a 16-bit integer value, but was a " +
-						FilesProvider.GetFieldDataTypeName(FieldDataType) + ".", nameof(FieldDataType));
+						ObjectSerializer.GetFieldDataTypeName(FieldDataType) + ".", nameof(FieldDataType));
 			}
 		}
 
@@ -263,7 +263,7 @@ namespace Waher.Persistence.Serialization
 				case ObjectSerializer.TYPE_CI_STRING: return int.Parse(Reader.ReadString());
 				default:
 					throw new ArgumentException("Expected a 32-bit integer value, but was a " +
-						FilesProvider.GetFieldDataTypeName(FieldDataType) + ".", nameof(FieldDataType));
+						ObjectSerializer.GetFieldDataTypeName(FieldDataType) + ".", nameof(FieldDataType));
 			}
 		}
 
@@ -306,7 +306,7 @@ namespace Waher.Persistence.Serialization
 				case ObjectSerializer.TYPE_NULL: return null;
 				default:
 					throw new ArgumentException("Expected an enumerated value, but was a " +
-						FilesProvider.GetFieldDataTypeName(FieldDataType) + ".", nameof(FieldDataType));
+						ObjectSerializer.GetFieldDataTypeName(FieldDataType) + ".", nameof(FieldDataType));
 			}
 		}
 
@@ -337,7 +337,7 @@ namespace Waher.Persistence.Serialization
 				case ObjectSerializer.TYPE_CI_STRING: return long.Parse(Reader.ReadString());
 				default:
 					throw new ArgumentException("Expected a 64-bit integer value, but was a " +
-						FilesProvider.GetFieldDataTypeName(FieldDataType) + ".", nameof(FieldDataType));
+						ObjectSerializer.GetFieldDataTypeName(FieldDataType) + ".", nameof(FieldDataType));
 			}
 		}
 
@@ -383,7 +383,7 @@ namespace Waher.Persistence.Serialization
 				case ObjectSerializer.TYPE_CI_STRING: return ushort.Parse(Reader.ReadString());
 				default:
 					throw new ArgumentException("Expected a 16-bit unsigned integer value, but was a " +
-						FilesProvider.GetFieldDataTypeName(FieldDataType) + ".", nameof(FieldDataType));
+						ObjectSerializer.GetFieldDataTypeName(FieldDataType) + ".", nameof(FieldDataType));
 			}
 		}
 
@@ -429,7 +429,7 @@ namespace Waher.Persistence.Serialization
 				case ObjectSerializer.TYPE_CI_STRING: return uint.Parse(Reader.ReadString());
 				default:
 					throw new ArgumentException("Expected a 32-bit unsigned integer value, but was a " +
-						FilesProvider.GetFieldDataTypeName(FieldDataType) + ".", nameof(FieldDataType));
+						ObjectSerializer.GetFieldDataTypeName(FieldDataType) + ".", nameof(FieldDataType));
 			}
 		}
 
@@ -475,7 +475,7 @@ namespace Waher.Persistence.Serialization
 				case ObjectSerializer.TYPE_CI_STRING: return ulong.Parse(Reader.ReadString());
 				default:
 					throw new ArgumentException("Expected a 64-bit unsigned integer value, but was a " +
-						FilesProvider.GetFieldDataTypeName(FieldDataType) + ".", nameof(FieldDataType));
+						ObjectSerializer.GetFieldDataTypeName(FieldDataType) + ".", nameof(FieldDataType));
 			}
 		}
 
@@ -521,7 +521,7 @@ namespace Waher.Persistence.Serialization
 				case ObjectSerializer.TYPE_CI_STRING: return decimal.Parse(Reader.ReadString());
 				default:
 					throw new ArgumentException("Expected a decimal value, but was a " +
-						FilesProvider.GetFieldDataTypeName(FieldDataType) + ".", nameof(FieldDataType));
+						ObjectSerializer.GetFieldDataTypeName(FieldDataType) + ".", nameof(FieldDataType));
 			}
 		}
 
@@ -567,7 +567,7 @@ namespace Waher.Persistence.Serialization
 				case ObjectSerializer.TYPE_CI_STRING: return double.Parse(Reader.ReadString());
 				default:
 					throw new ArgumentException("Expected a double value, but was a " +
-						FilesProvider.GetFieldDataTypeName(FieldDataType) + ".", nameof(FieldDataType));
+						ObjectSerializer.GetFieldDataTypeName(FieldDataType) + ".", nameof(FieldDataType));
 			}
 		}
 
@@ -613,7 +613,7 @@ namespace Waher.Persistence.Serialization
 				case ObjectSerializer.TYPE_CI_STRING: return float.Parse(Reader.ReadString());
 				default:
 					throw new ArgumentException("Expected a single value, but was a " +
-						FilesProvider.GetFieldDataTypeName(FieldDataType) + ".", nameof(FieldDataType));
+						ObjectSerializer.GetFieldDataTypeName(FieldDataType) + ".", nameof(FieldDataType));
 			}
 		}
 
@@ -667,7 +667,7 @@ namespace Waher.Persistence.Serialization
 
 				default:
 					throw new ArgumentException("Expected a char value, but was a " +
-						FilesProvider.GetFieldDataTypeName(FieldDataType) + ".", nameof(FieldDataType));
+						ObjectSerializer.GetFieldDataTypeName(FieldDataType) + ".", nameof(FieldDataType));
 			}
 		}
 
@@ -704,7 +704,7 @@ namespace Waher.Persistence.Serialization
 
 				default:
 					throw new ArgumentException("Expected a date & time value, but was a " +
-						FilesProvider.GetFieldDataTypeName(FieldDataType) + ".", nameof(FieldDataType));
+						ObjectSerializer.GetFieldDataTypeName(FieldDataType) + ".", nameof(FieldDataType));
 			}
 		}
 
@@ -741,7 +741,7 @@ namespace Waher.Persistence.Serialization
 
 				default:
 					throw new ArgumentException("Expected a date & time value with offset, but was a " +
-						FilesProvider.GetFieldDataTypeName(FieldDataType) + ".", nameof(FieldDataType));
+						ObjectSerializer.GetFieldDataTypeName(FieldDataType) + ".", nameof(FieldDataType));
 			}
 		}
 
@@ -777,7 +777,7 @@ namespace Waher.Persistence.Serialization
 
 				default:
 					throw new ArgumentException("Expected a time span value, but was a " +
-						FilesProvider.GetFieldDataTypeName(FieldDataType) + ".", nameof(FieldDataType));
+						ObjectSerializer.GetFieldDataTypeName(FieldDataType) + ".", nameof(FieldDataType));
 			}
 		}
 
@@ -813,7 +813,7 @@ namespace Waher.Persistence.Serialization
 
 				default:
 					throw new ArgumentException("Expected a GUID value, but was a " +
-						FilesProvider.GetFieldDataTypeName(FieldDataType) + ".", nameof(FieldDataType));
+						ObjectSerializer.GetFieldDataTypeName(FieldDataType) + ".", nameof(FieldDataType));
 			}
 		}
 
@@ -866,7 +866,7 @@ namespace Waher.Persistence.Serialization
 				case ObjectSerializer.TYPE_TIMESPAN: return Reader.ReadSingle().ToString();
 				default:
 					throw new ArgumentException("Expected a char value, but was a " +
-						FilesProvider.GetFieldDataTypeName(FieldDataType) + ".", nameof(FieldDataType));
+						ObjectSerializer.GetFieldDataTypeName(FieldDataType) + ".", nameof(FieldDataType));
 			}
 		}
 
@@ -884,7 +884,7 @@ namespace Waher.Persistence.Serialization
 				case ObjectSerializer.TYPE_BYTEARRAY: return Reader.ReadByteArray();
 				default:
 					throw new ArgumentException("Expected a byte array value, but was a " +
-						FilesProvider.GetFieldDataTypeName(FieldDataType) + ".", nameof(FieldDataType));
+						ObjectSerializer.GetFieldDataTypeName(FieldDataType) + ".", nameof(FieldDataType));
 			}
 		}
 
@@ -892,18 +892,17 @@ namespace Waher.Persistence.Serialization
 		/// Reads a typed array.
 		/// </summary>
 		/// <typeparam name="T">Element type.</typeparam>
-		/// <param name="Provider">Database provider object.</param>
 		/// <param name="Reader">Binary reader.</param>
 		/// <param name="FieldDataType">Field data type.</param>
 		/// <returns>String value.</returns>
 		/// <exception cref="ArgumentException">If the <paramref name="FieldDataType"/> was invalid.</exception>
-		public static T[] ReadArray<T>(FilesProvider Provider, BinaryDeserializer Reader, uint FieldDataType)
+		public static T[] ReadArray<T>(ISerializerContext Context, BinaryDeserializer Reader, uint FieldDataType)
 		{
 			switch (FieldDataType)
 			{
 				case ObjectSerializer.TYPE_ARRAY:
 					List<T> Elements = new List<T>();
-					IObjectSerializer S = Provider.GetObjectSerializer(typeof(T));
+					IObjectSerializer S = Context.GetObjectSerializer(typeof(T));
 					ulong NrElements = Reader.ReadVariableLengthUInt64();
 					uint ElementDataType = Reader.ReadBits(6);
 					uint? ElementDataTypeN = ElementDataType == ObjectSerializer.TYPE_NULL ? (uint?)null : (uint?)ElementDataType;
@@ -932,17 +931,17 @@ namespace Waher.Persistence.Serialization
 		/// Reads a typed array.
 		/// </summary>
 		/// <param name="T">Element type.</param>
-		/// <param name="Provider">Database provider object.</param>
+		/// <param name="Context">Serialization context.</param>
 		/// <param name="Reader">Binary reader.</param>
 		/// <param name="FieldDataType">Field data type.</param>
 		/// <returns>String value.</returns>
 		/// <exception cref="ArgumentException">If the <paramref name="FieldDataType"/> was invalid.</exception>
-		public static Array ReadArray(Type T, FilesProvider Provider, BinaryDeserializer Reader, uint FieldDataType)
+		public static Array ReadArray(Type T, ISerializerContext Context, BinaryDeserializer Reader, uint FieldDataType)
 		{
 			switch (FieldDataType)
 			{
 				case ObjectSerializer.TYPE_ARRAY:
-					IObjectSerializer S = Provider.GetObjectSerializer(T);
+					IObjectSerializer S = Context.GetObjectSerializer(T);
 					ulong NrElements = Reader.ReadVariableLengthUInt64();
 					if (NrElements > int.MaxValue)
 						throw new Exception("Array too long.");
@@ -970,17 +969,17 @@ namespace Waher.Persistence.Serialization
 		/// Writes a typed array.
 		/// </summary>
 		/// <typeparam name="T">Element type.</typeparam>
-		/// <param name="Provider">Database provider object.</param>
+		/// <param name="Context">Serialization context.</param>
 		/// <param name="Writer">Binary writer.</param>
 		/// <param name="Value">Value to serialize.</param>
-		public static void WriteArray<T>(FilesProvider Provider, BinarySerializer Writer, T[] Value)
+		public static void WriteArray<T>(ISerializerContext Context, BinarySerializer Writer, T[] Value)
 		{
 			if (Value is null)
 				Writer.WriteBits(ObjectSerializer.TYPE_NULL, 6);
 			else
 			{
 				Type LastType = typeof(T);
-				IObjectSerializer S = Provider.GetObjectSerializer(LastType);
+				IObjectSerializer S = Context.GetObjectSerializer(LastType);
 				Type ItemType;
 				bool Nullable;
 
@@ -990,7 +989,7 @@ namespace Waher.Persistence.Serialization
 				if (Nullable = S.IsNullable)
 					Writer.WriteBits(ObjectSerializer.TYPE_NULL, 6);
 				else
-					Writer.WriteBits(FilesProvider.GetFieldDataTypeCode(LastType), 6);
+					Writer.WriteBits(ObjectSerializer.GetFieldDataTypeCode(LastType), 6);
 
 				foreach (T Item in Value)
 				{
@@ -1006,7 +1005,7 @@ namespace Waher.Persistence.Serialization
 						ItemType = Item.GetType();
 						if (ItemType != LastType)
 						{
-							S = Provider.GetObjectSerializer(ItemType);
+							S = Context.GetObjectSerializer(ItemType);
 							LastType = ItemType;
 						}
 
@@ -1020,17 +1019,17 @@ namespace Waher.Persistence.Serialization
 		/// Writes an array.
 		/// </summary>
 		/// <param name="T">Element type.</param>
-		/// <param name="Provider">Database provider object.</param>
+		/// <param name="Context">Serialization context.</param>
 		/// <param name="Writer">Binary writer.</param>
 		/// <param name="Value">Value to serialize.</param>
-		public static void WriteArray(Type T, FilesProvider Provider, BinarySerializer Writer, Array Value)
+		public static void WriteArray(Type T, ISerializerContext Context, BinarySerializer Writer, Array Value)
 		{
 			if (Value is null)
 				Writer.WriteBits(ObjectSerializer.TYPE_NULL, 6);
 			else
 			{
 				Type LastType = T;
-				IObjectSerializer S = Provider.GetObjectSerializer(LastType);
+				IObjectSerializer S = Context.GetObjectSerializer(LastType);
 				Type ItemType;
 				bool Nullable;
 
@@ -1040,7 +1039,7 @@ namespace Waher.Persistence.Serialization
 				if (Nullable = S.IsNullable)
 					Writer.WriteBits(ObjectSerializer.TYPE_NULL, 6);
 				else
-					Writer.WriteBits(FilesProvider.GetFieldDataTypeCode(LastType), 6);
+					Writer.WriteBits(ObjectSerializer.GetFieldDataTypeCode(LastType), 6);
 
 				foreach (object Item in Value)
 				{
@@ -1056,7 +1055,7 @@ namespace Waher.Persistence.Serialization
 						ItemType = Item.GetType();
 						if (ItemType != LastType)
 						{
-							S = Provider.GetObjectSerializer(ItemType);
+							S = Context.GetObjectSerializer(ItemType);
 							LastType = ItemType;
 						}
 

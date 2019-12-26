@@ -292,6 +292,10 @@
       <Project>{d077d587-072a-431e-8dc7-7d7dda62a048}</Project>
       <Name>Waher.Persistence.MongoDB</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Persistence\Waher.Persistence.Serialization\Waher.Persistence.Serialization.csproj">
+      <Project>{d096df31-9837-4267-bd65-7c48f1d788d2}</Project>
+      <Name>Waher.Persistence.Serialization</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Persistence\Waher.Persistence\Waher.Persistence.csproj">
       <Project>{0286288f-4af3-4e64-a398-24c8957ceb04}</Project>
       <Name>Waher.Persistence</Name>

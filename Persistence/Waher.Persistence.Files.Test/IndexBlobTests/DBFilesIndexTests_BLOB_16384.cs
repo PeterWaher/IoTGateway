@@ -7,7 +7,7 @@ using System.Xml;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Content;
-using Waher.Persistence.Files.Serialization;
+using Waher.Persistence.Serialization;
 using Waher.Persistence.Files.Statistics;
 using Waher.Runtime.Inventory;
 

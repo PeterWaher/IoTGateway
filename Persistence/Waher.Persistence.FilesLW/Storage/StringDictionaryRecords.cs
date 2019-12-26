@@ -4,7 +4,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
-using Waher.Persistence.Files.Serialization;
+using Waher.Persistence.Serialization;
 using Waher.Runtime.Inventory;
 
 namespace Waher.Persistence.Files.Storage

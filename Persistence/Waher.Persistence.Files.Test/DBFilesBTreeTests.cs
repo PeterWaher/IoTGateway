@@ -538,7 +538,7 @@ namespace Waher.Persistence.FilesLW.Test
 			Simple[] Objects = new Simple[NrObjects];
 			Simple[] Block = new Simple[ArraySize];
 			Simple Obj2;
-			ObjectSerializer Serializer = this.provider.GetObjectSerializerEx(typeof(Simple));
+			ObjectSerializer Serializer = ObjectSerializer.GetObjectSerializerEx(typeof(Simple), this.provider);
 
 			if (BulkSize > 1)
 				await this.provider.StartBulk();

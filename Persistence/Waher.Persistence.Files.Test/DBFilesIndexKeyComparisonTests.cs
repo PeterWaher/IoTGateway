@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Waher.Persistence.Files.Serialization;
+using Waher.Persistence.Serialization;
 using Waher.Persistence.Files.Storage;
 
 #if !LW

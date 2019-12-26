@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Persistence.Serialization;
 using Waher.Persistence.Filters;
-using Waher.Persistence.Files.Serialization;
+using Waher.Persistence.Serialization;
 using Waher.Persistence.Files.Statistics;
 using Waher.Script;
 using Waher.Script.Objects.Matrices;

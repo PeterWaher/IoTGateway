@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using F = Waher.Persistence.Filters;
-using Waher.Persistence.Files.Serialization;
+using Waher.Persistence.Serialization;
 
 namespace Waher.Persistence.Files.Searching
 {

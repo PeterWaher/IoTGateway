@@ -183,7 +183,6 @@ namespace Waher.Persistence.Serialization
 		private readonly LinkedList<Member> membersOrdered = new LinkedList<Member>();
 		private readonly bool isNullable;
 		private readonly bool debug;
-		private bool indicesCreated = false;
 
 		internal ObjectSerializer(Type Type, ISerializerContext Context)
 		{
@@ -2178,15 +2177,6 @@ namespace Waher.Persistence.Serialization
 		public string[][] Indices
 		{
 			get { return this.indices; }
-		}
-
-		/// <summary>
-		/// If index files have been checked and created.
-		/// </summary>
-		internal bool IndicesCreated
-		{
-			get { return this.indicesCreated; }
-			set { this.indicesCreated = value; }
 		}
 
 		/// <summary>

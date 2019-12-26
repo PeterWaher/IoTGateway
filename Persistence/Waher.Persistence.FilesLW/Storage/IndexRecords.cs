@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using Waher.Events;
-using Waher.Persistence.Files.Serialization;
+using Waher.Persistence.Serialization;
 
 namespace Waher.Persistence.Files.Storage
 {
@@ -172,18 +172,11 @@ namespace Waher.Persistence.Files.Storage
 		public bool Serialize(BinarySerializer Writer, object Value)
 		{
 			uint TypeCode;
-			Type T;
 
 			if (Value is null)
-			{
-				T = null;
 				TypeCode = ObjectSerializer.TYPE_NULL;
-			}
 			else
-			{
-				T = Value.GetType();
-				TypeCode = FilesProvider.GetFieldDataTypeCode(T);
-			}
+				TypeCode = ObjectSerializer.GetFieldDataTypeCode(Value.GetType());
 
 			Writer.WriteBits((byte)TypeCode, 6);
 

@@ -12,11 +12,10 @@ using System.Xml;
 using System.Threading;
 using System.Threading.Tasks;
 using Waher.Events;
-using Waher.Persistence.Serialization;
 using Waher.Persistence.Filters;
-using Waher.Persistence.Files.Serialization;
 using Waher.Persistence.Files.Statistics;
 using Waher.Persistence.Files.Storage;
+using Waher.Persistence.Serialization;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Threading;
 
@@ -68,6 +67,7 @@ namespace Waher.Persistence.Files
         private readonly byte[] ivSeed;
         private readonly int ivSeedLen;
         private readonly bool encrypted;
+        private bool indicesCreated = false;
 
         /// <summary>
         /// This class manages a binary file where objects are persisted in a B-tree.
@@ -1202,7 +1202,7 @@ namespace Waher.Persistence.Files
         public Task<Guid> SaveNewObject(object Object)
         {
             Type ObjectType = Object.GetType();
-            ObjectSerializer Serializer = this.provider.GetObjectSerializerEx(ObjectType);
+            ObjectSerializer Serializer = ObjectSerializer.GetObjectSerializerEx(ObjectType, this.provider);
 
             return this.SaveNewObject(Object, Serializer);
         }
@@ -1877,7 +1877,7 @@ namespace Waher.Persistence.Files
         public Task UpdateObject(object Object)
         {
             Type ObjectType = Object.GetType();
-            ObjectSerializer Serializer = this.provider.GetObjectSerializerEx(ObjectType);
+            ObjectSerializer Serializer = ObjectSerializer.GetObjectSerializerEx(ObjectType, this.provider);
             return this.UpdateObject(Object, Serializer);
         }
 
@@ -2193,7 +2193,7 @@ namespace Waher.Persistence.Files
         public Task<object> DeleteObject(object Object)
         {
             Type ObjectType = Object.GetType();
-            ObjectSerializer Serializer = this.provider.GetObjectSerializerEx(ObjectType);
+            ObjectSerializer Serializer = ObjectSerializer.GetObjectSerializerEx(ObjectType, this.provider);
 
             return this.DeleteObject(Object, Serializer);
         }
@@ -4223,7 +4223,7 @@ namespace Waher.Persistence.Files
             {
                 s = Property.Key;
                 Value = Property.Value;
-                TypeCode = FilesProvider.GetFieldDataTypeCode(Value);
+                TypeCode = ObjectSerializer.GetFieldDataTypeCode(Value);
 
                 if (s == "pos" || s == "len" || s == "blob" || s == "blobLink" || s == "objectId" || s == "type")
                     s = "obj-" + s;
@@ -4276,7 +4276,7 @@ namespace Waher.Persistence.Files
 
         private void ExportGraphXMLLocked(XmlWriter XmlOutput, object Item)
         {
-            uint TypeCode = FilesProvider.GetFieldDataTypeCode(Item);
+            uint TypeCode = ObjectSerializer.GetFieldDataTypeCode(Item);
 
             switch (TypeCode)
             {
@@ -5007,9 +5007,9 @@ namespace Waher.Persistence.Files
         {
             this.nrSearches++;
 
-            ObjectSerializer Serializer = this.provider.GetObjectSerializerEx(typeof(T));
-            if (!Serializer.IndicesCreated)
+            if (!this.indicesCreated)
             {
+                ObjectSerializer Serializer = ObjectSerializer.GetObjectSerializerEx(typeof(T), this.provider);
                 string CollectionName = Serializer.CollectionName(null);
                 ObjectBTreeFile File = await this.provider.GetFile(CollectionName);
                 if (File != this)
@@ -5021,7 +5021,7 @@ namespace Waher.Persistence.Files
                 foreach (string[] Index in Serializer.Indices)
                     await this.provider.GetIndexFile(File, RegenerationOptions.RegenerateIfIndexNotInstantiated, Index);
 
-                Serializer.IndicesCreated = true;
+                this.indicesCreated = true;
             }
 
             ICursor<T> Result = null;
@@ -5123,7 +5123,6 @@ namespace Waher.Persistence.Files
             finally
             {
                 Result.Dispose();
-                Result = null;
             }
 
             return new Searching.SortedCursor<T>(SortedObjects, Records, this.timeoutMilliseconds);

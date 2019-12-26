@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Waher.Persistence.Files.Serialization;
+using Waher.Persistence.Serialization;
 
 namespace Waher.Persistence.Files.Searching
 {

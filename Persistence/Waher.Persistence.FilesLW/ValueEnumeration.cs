@@ -4,22 +4,22 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Waher.Persistence.Serialization
+namespace Waher.Persistence.Files
 {
-	internal class KeyEnumeration : IEnumerator<string>
+	internal class ValueEnumeration : IEnumerator<object>
 	{
 		private IEnumerator<KeyValuePair<string, object>> e;
 
-		public KeyEnumeration(IEnumerator<KeyValuePair<string, object>> Enumerator)
+		public ValueEnumeration(IEnumerator<KeyValuePair<string, object>> Enumerator)
 		{
 			this.e = Enumerator;
 		}
 
-		public string Current
+		public object Current
 		{
 			get
 			{
-				return this.e.Current.Key;
+				return this.e.Current.Value;
 			}
 		}
 
@@ -27,7 +27,7 @@ namespace Waher.Persistence.Serialization
 		{
 			get
 			{
-				return this.e.Current.Key;
+				return this.e.Current.Value;
 			}
 		}
 

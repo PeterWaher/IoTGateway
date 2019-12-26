@@ -106,6 +106,10 @@
       <Project>{8b1029cc-299f-4325-baf7-782b06f53c94}</Project>
       <Name>Waher.Persistence.FilesLW</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Persistence\Waher.Persistence.Serialization\Waher.Persistence.Serialization.csproj">
+      <Project>{d096df31-9837-4267-bd65-7c48f1d788d2}</Project>
+      <Name>Waher.Persistence.Serialization</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Persistence\Waher.Persistence\Waher.Persistence.csproj">
       <Project>{0286288f-4af3-4e64-a398-24c8957ceb04}</Project>
       <Name>Waher.Persistence</Name>

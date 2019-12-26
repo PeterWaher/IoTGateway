@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using Waher.Persistence.Files.Serialization;
+using Waher.Persistence.Serialization;
 
 namespace Waher.Persistence.Files.Searching
 {
@@ -25,8 +25,8 @@ namespace Waher.Persistence.Files.Searching
 			if (xType == yType)
 				return true;
 
-			uint xTypeCode = FilesProvider.GetFieldDataTypeCode(xType);
-			uint yTypeCode = FilesProvider.GetFieldDataTypeCode(yType);
+			uint xTypeCode = ObjectSerializer.GetFieldDataTypeCode(xType);
+			uint yTypeCode = ObjectSerializer.GetFieldDataTypeCode(yType);
 
 			Upgrade(ref x, ref xTypeCode);
 			Upgrade(ref y, ref yTypeCode);
@@ -84,7 +84,7 @@ namespace Waher.Persistence.Files.Searching
 			if (Value is null)
 				return string.Empty;
 			else
-				return ToString(Value, FilesProvider.GetFieldDataTypeCode(Value.GetType()));
+				return ToString(Value, ObjectSerializer.GetFieldDataTypeCode(Value.GetType()));
 		}
 
 		internal static string ToString(object Value, uint TypeCode)
@@ -236,7 +236,7 @@ namespace Waher.Persistence.Files.Searching
 				return false;
 
 			Type T = Value.GetType();
-			uint TypeCode = FilesProvider.GetFieldDataTypeCode(T);
+			uint TypeCode = ObjectSerializer.GetFieldDataTypeCode(T);
 
 			switch (TypeCode)
 			{
@@ -656,7 +656,7 @@ namespace Waher.Persistence.Files.Searching
 				return false;
 
 			Type T = Value.GetType();
-			uint TypeCode = FilesProvider.GetFieldDataTypeCode(T);
+			uint TypeCode = ObjectSerializer.GetFieldDataTypeCode(T);
 
 			switch (TypeCode)
 			{

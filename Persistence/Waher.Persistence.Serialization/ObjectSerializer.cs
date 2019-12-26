@@ -16,7 +16,6 @@ using Waher.Persistence.Serialization.Model;
 using Waher.Persistence.Serialization.ValueTypes;
 using Waher.Persistence.Serialization.ReferenceTypes;
 using Waher.Persistence.Serialization.NullableTypes;
-using Waher.Persistence.Serialization;
 using Waher.Persistence.Attributes;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Threading;
@@ -300,8 +299,6 @@ namespace Waher.Persistence.Serialization
 				CSharp.AppendLine("using System.Text;");
 				CSharp.AppendLine("using System.Threading.Tasks;");
 				CSharp.AppendLine("using Waher.Persistence;");
-				CSharp.AppendLine("using Waher.Persistence.Files;");
-				CSharp.AppendLine("using Waher.Persistence.Serialization;");
 				CSharp.AppendLine("using Waher.Persistence.Filters;");
 				CSharp.AppendLine("using Waher.Persistence.Serialization;");
 				CSharp.AppendLine("using Waher.Runtime.Inventory;");
@@ -310,7 +307,7 @@ namespace Waher.Persistence.Serialization
 				CSharp.AppendLine("{");
 				CSharp.AppendLine("\tpublic class BinarySerializer" + TypeName + this.context.Id + " : GeneratedObjectSerializerBase");
 				CSharp.AppendLine("\t{");
-				CSharp.AppendLine("\t\tprivate ISerializationContext context;");
+				CSharp.AppendLine("\t\tprivate ISerializerContext context;");
 
 				foreach (MemberInfo Member in Members)
 				{
@@ -537,7 +534,7 @@ namespace Waher.Persistence.Serialization
 					CSharp.AppendLine();
 
 				CSharp.AppendLine();
-				CSharp.AppendLine("\t\tpublic BinarySerializer" + TypeName + this.context.Id + "(ISerializationContext Context)");
+				CSharp.AppendLine("\t\tpublic BinarySerializer" + TypeName + this.context.Id + "(ISerializerContext Context)");
 				CSharp.AppendLine("\t\t{");
 				CSharp.AppendLine("\t\t\tthis.context = Context;");
 
@@ -2021,7 +2018,7 @@ namespace Waher.Persistence.Serialization
 			else
 			{
 #endif
-				Member Member;
+			Member Member;
 				MethodInfo MI;
 				object DefaultValue;
 				int NrDefault = 0;

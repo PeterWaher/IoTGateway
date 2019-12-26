@@ -13,21 +13,14 @@ using Waher.Events;
 using Waher.Runtime.Cache;
 using Waher.Runtime.Inventory;
 using Waher.Persistence.Serialization;
-using Waher.Persistence.Files.Serialization;
-using Waher.Persistence.Files.Serialization.ReferenceTypes;
-using Waher.Persistence.Files.Serialization.ValueTypes;
+using Waher.Persistence.Serialization.ReferenceTypes;
+using Waher.Persistence.Serialization.ValueTypes;
 using Waher.Persistence.Filters;
 using Waher.Persistence.Files.Statistics;
 using Waher.Persistence.Files.Storage;
 
 namespace Waher.Persistence.Files
 {
-	/// <summary>
-	/// Delegate for embedded object value setter methods. Is used when loading embedded objects.
-	/// </summary>
-	/// <param name="EmbeddedObject">Embedded object.</param>
-	public delegate void EmbeddedObjectSetter(object EmbeddedObject);
-
 	/// <summary>
 	/// Delegate for custom key callback methods.
 	/// </summary>
@@ -65,9 +58,9 @@ namespace Waher.Persistence.Files
 	/// <summary>
 	/// Persists objects into binary files.
 	/// </summary>
-	public class FilesProvider : IDisposable, IDatabaseProvider
+	public class FilesProvider : IDisposable, IDatabaseProvider, ISerializerContext
 	{
-		private static RandomNumberGenerator rnd = RandomNumberGenerator.Create();
+		private static readonly RandomNumberGenerator rnd = RandomNumberGenerator.Create();
 
 		private Dictionary<Type, IObjectSerializer> serializers;
 		private readonly Dictionary<string, ObjectBTreeFile> files = new Dictionary<string, ObjectBTreeFile>();
@@ -548,132 +541,44 @@ namespace Waher.Persistence.Files
 
 		#endregion
 
-		#region Types
+		#region Timing
 
-		/// <summary>
-		/// Returns the type name corresponding to a given field data type code.
-		/// </summary>
-		/// <param name="FieldDataType">Field data type code.</param>
-		/// <returns>Corresponding data type name.</returns>
-		public static string GetFieldDataTypeName(uint FieldDataType)
+		internal static void Wait(Task Task, int TimeoutMilliseconds)
 		{
-			return GetFieldDataType(FieldDataType).FullName;
+			if (!Task.Wait(TimeoutMilliseconds))
+				throw TimeoutException(null);
 		}
 
-		/// <summary>
-		/// Returns the type corresponding to a given field data type code.
-		/// </summary>
-		/// <param name="FieldDataTypeCode">Field data type code.</param>
-		/// <returns>Corresponding data type.</returns>
-		public static Type GetFieldDataType(uint FieldDataTypeCode)
+		internal static TimeoutException TimeoutException(string Trace)
 		{
-			switch (FieldDataTypeCode)
+			StringBuilder sb = new StringBuilder();
+			string s;
+
+			sb.Append("Unable to get access to underlying database.");
+
+			if (!(Trace is null))
 			{
-				case ObjectSerializer.TYPE_BOOLEAN: return typeof(bool);
-				case ObjectSerializer.TYPE_BYTE: return typeof(byte);
-				case ObjectSerializer.TYPE_INT16: return typeof(short);
-				case ObjectSerializer.TYPE_INT32: return typeof(int);
-				case ObjectSerializer.TYPE_INT64: return typeof(long);
-				case ObjectSerializer.TYPE_SBYTE: return typeof(sbyte);
-				case ObjectSerializer.TYPE_UINT16: return typeof(ushort);
-				case ObjectSerializer.TYPE_UINT32: return typeof(uint);
-				case ObjectSerializer.TYPE_UINT64: return typeof(ulong);
-				case ObjectSerializer.TYPE_DECIMAL: return typeof(decimal);
-				case ObjectSerializer.TYPE_DOUBLE: return typeof(double);
-				case ObjectSerializer.TYPE_SINGLE: return typeof(float);
-				case ObjectSerializer.TYPE_DATETIME: return typeof(DateTime);
-				case ObjectSerializer.TYPE_DATETIMEOFFSET: return typeof(DateTimeOffset);
-				case ObjectSerializer.TYPE_TIMESPAN: return typeof(TimeSpan);
-				case ObjectSerializer.TYPE_CHAR: return typeof(char);
-				case ObjectSerializer.TYPE_STRING: return typeof(string);
-				case ObjectSerializer.TYPE_CI_STRING: return typeof(CaseInsensitiveString);
-				case ObjectSerializer.TYPE_ENUM: return typeof(Enum);
-				case ObjectSerializer.TYPE_BYTEARRAY: return typeof(byte[]);
-				case ObjectSerializer.TYPE_GUID: return typeof(Guid);
-				case ObjectSerializer.TYPE_ARRAY: return typeof(Array);
-				case ObjectSerializer.TYPE_OBJECT: return typeof(object);
-				default: throw new Exception("Unrecognized field code: " + FieldDataTypeCode.ToString());
-			}
-		}
+				sb.AppendLine();
+				sb.AppendLine();
+				sb.AppendLine("Database locked from:");
+				sb.AppendLine();
 
-		/// <summary>
-		/// Returns the type code corresponding to a given field data type.
-		/// </summary>
-		/// <param name="Value">Field data value.</param>
-		/// <returns>Corresponding data type code.</returns>
-		public static uint GetFieldDataTypeCode(object Value)
-		{
-			if (Value is null)
-				return ObjectSerializer.TYPE_NULL;
-			else
-				return GetFieldDataTypeCode(Value.GetType());
-		}
+				foreach (string Frame in Trace.Split(CRLF, StringSplitOptions.RemoveEmptyEntries))
+				{
+					s = Frame.TrimStart();
+					if (s.Contains(" System.Runtime.CompilerServices") || s.Contains(" System.Threading"))
+						continue;
 
-		/// <summary>
-		/// Returns the type code corresponding to a given field data type.
-		/// </summary>
-		/// <param name="FieldDataType">Field data type.</param>
-		/// <returns>Corresponding data type code.</returns>
-		public static uint GetFieldDataTypeCode(Type FieldDataType)
-		{
-			TypeInfo TI = FieldDataType.GetTypeInfo();
-			if (TI.IsEnum)
-			{
-				if (TI.IsDefined(typeof(FlagsAttribute), false))
-					return ObjectSerializer.TYPE_INT32;
-				else
-					return ObjectSerializer.TYPE_ENUM;
+					sb.AppendLine(s);
+				}
 			}
 
-			if (FieldDataType == typeof(bool))
-				return ObjectSerializer.TYPE_BOOLEAN;
-			else if (FieldDataType == typeof(byte))
-				return ObjectSerializer.TYPE_BYTE;
-			else if (FieldDataType == typeof(short))
-				return ObjectSerializer.TYPE_INT16;
-			else if (FieldDataType == typeof(int))
-				return ObjectSerializer.TYPE_INT32;
-			else if (FieldDataType == typeof(long))
-				return ObjectSerializer.TYPE_INT64;
-			else if (FieldDataType == typeof(sbyte))
-				return ObjectSerializer.TYPE_SBYTE;
-			else if (FieldDataType == typeof(ushort))
-				return ObjectSerializer.TYPE_UINT16;
-			else if (FieldDataType == typeof(uint))
-				return ObjectSerializer.TYPE_UINT32;
-			else if (FieldDataType == typeof(ulong))
-				return ObjectSerializer.TYPE_UINT64;
-			else if (FieldDataType == typeof(decimal))
-				return ObjectSerializer.TYPE_DECIMAL;
-			else if (FieldDataType == typeof(double))
-				return ObjectSerializer.TYPE_DOUBLE;
-			else if (FieldDataType == typeof(float))
-				return ObjectSerializer.TYPE_SINGLE;
-			else if (FieldDataType == typeof(DateTime))
-				return ObjectSerializer.TYPE_DATETIME;
-			else if (FieldDataType == typeof(DateTimeOffset))
-				return ObjectSerializer.TYPE_DATETIMEOFFSET;
-			else if (FieldDataType == typeof(char))
-				return ObjectSerializer.TYPE_CHAR;
-			else if (FieldDataType == typeof(string))
-				return ObjectSerializer.TYPE_STRING;
-			else if (FieldDataType == typeof(CaseInsensitiveString))
-				return ObjectSerializer.TYPE_CI_STRING;
-			else if (FieldDataType == typeof(TimeSpan))
-				return ObjectSerializer.TYPE_TIMESPAN;
-			else if (FieldDataType == typeof(byte[]))
-				return ObjectSerializer.TYPE_BYTEARRAY;
-			else if (FieldDataType == typeof(Guid))
-				return ObjectSerializer.TYPE_GUID;
-			else if (FieldDataType == typeof(CaseInsensitiveString))
-				return ObjectSerializer.TYPE_CI_STRING;
-			else if (TI.IsArray)
-				return ObjectSerializer.TYPE_ARRAY;
-			else if (FieldDataType == typeof(void))
-				return ObjectSerializer.TYPE_NULL;
-			else
-				return ObjectSerializer.TYPE_OBJECT;
+			return new TimeoutException(sb.ToString());
 		}
+
+		#endregion
+
+		#region Serialization
 
 		/// <summary>
 		/// Gets the object serializer corresponding to a specific type.
@@ -683,7 +588,7 @@ namespace Waher.Persistence.Files
 		public IObjectSerializer GetObjectSerializer(Type Type)
 		{
 			IObjectSerializer Result;
-			TypeInfo TI = Type.GetTypeInfo();
+			System.Reflection.TypeInfo TI = Type.GetTypeInfo();
 
 			lock (this.synchObj)
 			{
@@ -757,62 +662,6 @@ namespace Waher.Persistence.Files
 			}
 
 			return Result;
-		}
-
-		/// <summary>
-		/// Gets the object serializer corresponding to a specific object.
-		/// </summary>
-		/// <param name="Object">Object to serialize</param>
-		/// <returns>Object Serializer</returns>
-		public ObjectSerializer GetObjectSerializerEx(object Object)
-		{
-			return this.GetObjectSerializerEx(Object.GetType());
-		}
-
-		/// <summary>
-		/// Gets the object serializer corresponding to a specific object.
-		/// </summary>
-		/// <param name="Type">Type of object to serialize.</param>
-		/// <returns>Object Serializer</returns>
-		public ObjectSerializer GetObjectSerializerEx(Type Type)
-		{
-			if (!(this.GetObjectSerializer(Type) is ObjectSerializer Serializer))
-				throw new Exception("Objects of type " + Type.FullName + " must be embedded.");
-
-			return Serializer;
-		}
-
-		internal static void Wait(Task Task, int TimeoutMilliseconds)
-		{
-			if (!Task.Wait(TimeoutMilliseconds))
-				throw TimeoutException(null);
-		}
-
-		internal static TimeoutException TimeoutException(string Trace)
-		{
-			StringBuilder sb = new StringBuilder();
-			string s;
-
-			sb.Append("Unable to get access to underlying database.");
-
-			if (!(Trace is null))
-			{
-				sb.AppendLine();
-				sb.AppendLine();
-				sb.AppendLine("Database locked from:");
-				sb.AppendLine();
-
-				foreach (string Frame in Trace.Split(CRLF, StringSplitOptions.RemoveEmptyEntries))
-				{
-					s = Frame.TrimStart();
-					if (s.Contains(" System.Runtime.CompilerServices") || s.Contains(" System.Threading"))
-						continue;
-
-					sb.AppendLine(s);
-				}
-			}
-
-			return new TimeoutException(sb.ToString());
 		}
 
 		#endregion
@@ -1548,9 +1397,7 @@ namespace Waher.Persistence.Files
 							break;
 						}
 
-						IndexBTreeFile Index = await this.GetIndexFile(File,
-							RegenerationOptions.RegenerateIfFileNotFound, FieldNames);
-
+						await this.GetIndexFile(File, RegenerationOptions.RegenerateIfFileNotFound, FieldNames);
 						break;
 				}
 			}
@@ -1608,7 +1455,7 @@ namespace Waher.Persistence.Files
 		/// <returns>Loaded object.</returns>
 		public async Task<T> LoadObject<T>(Guid ObjectId, EmbeddedObjectSetter EmbeddedSetter)
 		{
-			ObjectSerializer Serializer = this.GetObjectSerializerEx(typeof(T));
+			ObjectSerializer Serializer = ObjectSerializer.GetObjectSerializerEx(typeof(T), this);
 			ObjectBTreeFile File = await this.GetFile(Serializer.CollectionName(null));
 
 			if (!(EmbeddedSetter is null))
@@ -1643,7 +1490,7 @@ namespace Waher.Persistence.Files
 		/// <returns>Loaded object.</returns>
 		public async Task<object> LoadObject(Type T, Guid ObjectId, EmbeddedObjectSetter EmbeddedSetter)
 		{
-			ObjectSerializer Serializer = this.GetObjectSerializerEx(T);
+			ObjectSerializer Serializer = ObjectSerializer.GetObjectSerializerEx(T, this);
 			ObjectBTreeFile File = await this.GetFile(Serializer.CollectionName(null));
 
 			if (!(EmbeddedSetter is null))
@@ -1679,8 +1526,46 @@ namespace Waher.Persistence.Files
 		/// or if the corresponding property type is not supported.</exception>
 		public Task<Guid> GetObjectId(object Value, bool InsertIfNotFound)
 		{
-			ObjectSerializer Serializer = this.GetObjectSerializerEx(Value);
+			ObjectSerializer Serializer = ObjectSerializer.GetObjectSerializerEx(Value, this);
 			return Serializer.GetObjectId(Value, InsertIfNotFound);
+		}
+
+		/// <summary>
+		/// Saves an unsaved object, and returns a new GUID identifying the saved object.
+		/// </summary>
+		/// <param name="Value">Object to save.</param>
+		/// <returns>GUID identifying the saved object.</returns>
+		public async Task<Guid> SaveNewObject(object Value)
+		{
+			Type ValueType = Value.GetType();
+			ObjectSerializer Serializer = ObjectSerializer.GetObjectSerializerEx(ValueType, this);
+
+			ObjectBTreeFile File = await this.GetFile(Serializer.CollectionName(Value));
+			Guid ObjectId;
+
+			if (await File.TryBeginWrite(0))
+			{
+				try
+				{
+					ObjectId = await File.SaveNewObjectLocked(Value, Serializer);
+				}
+				finally
+				{
+					await File.EndWrite();
+				}
+
+				foreach (IndexBTreeFile Index in File.Indices)
+					await Index.SaveNewObject(ObjectId, Value, Serializer);
+			}
+			else
+			{
+				Tuple<Guid, Storage.BlockInfo> Rec = await File.PrepareObjectIdForSaveLocked(Value, Serializer);
+
+				ObjectId = Rec.Item1;
+				File.QueueForSave(Value, Serializer);
+			}
+
+			return ObjectId;
 		}
 
 		#endregion
@@ -1693,7 +1578,7 @@ namespace Waher.Persistence.Files
 		/// <param name="Object">Object to insert.</param>
 		public async Task Insert(object Object)
 		{
-			ObjectSerializer Serializer = this.GetObjectSerializerEx(Object);
+			ObjectSerializer Serializer = ObjectSerializer.GetObjectSerializerEx(Object, this);
 			ObjectBTreeFile File = await this.GetFile(Serializer.CollectionName(Object));
 			await File.SaveNewObject(Object, Serializer);
 		}
@@ -1733,7 +1618,7 @@ namespace Waher.Persistence.Files
 					}
 
 					T = T2;
-					Serializer = this.GetObjectSerializerEx(Object);
+					Serializer = ObjectSerializer.GetObjectSerializerEx(Object, this);
 				}
 
 				CollectionName2 = Serializer.CollectionName(Object);
@@ -1767,7 +1652,7 @@ namespace Waher.Persistence.Files
 		/// <returns>Objects found.</returns>
 		public async Task<IEnumerable<T>> Find<T>(int Offset, int MaxCount, params string[] SortOrder)
 		{
-			ObjectSerializer Serializer = this.GetObjectSerializerEx(typeof(T));
+			ObjectSerializer Serializer = ObjectSerializer.GetObjectSerializerEx(typeof(T), this);
 			ObjectBTreeFile File = await this.GetFile(Serializer.CollectionName(null));
 			using (ICursor<T> ResultSet = await File.Find<T>(Offset, MaxCount, null, true, SortOrder))
 			{
@@ -1800,7 +1685,7 @@ namespace Waher.Persistence.Files
 		/// <returns>Objects found.</returns>
 		public async Task<IEnumerable<T>> Find<T>(int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
 		{
-			ObjectSerializer Serializer = this.GetObjectSerializerEx(typeof(T));
+			ObjectSerializer Serializer = ObjectSerializer.GetObjectSerializerEx(typeof(T), this);
 			ObjectBTreeFile File = await this.GetFile(Serializer.CollectionName(null));
 			using (ICursor<T> ResultSet = await File.Find<T>(Offset, MaxCount, Filter, true, SortOrder))
 			{
@@ -1814,7 +1699,7 @@ namespace Waher.Persistence.Files
 		/// <param name="Object">Object to insert.</param>
 		public async Task Update(object Object)
 		{
-			ObjectSerializer Serializer = this.GetObjectSerializerEx(Object.GetType());
+			ObjectSerializer Serializer = ObjectSerializer.GetObjectSerializerEx(Object.GetType(), this);
 			ObjectBTreeFile File = await this.GetFile(Serializer.CollectionName(Object));
 			await File.UpdateObject(Object, Serializer);
 		}
@@ -1856,7 +1741,7 @@ namespace Waher.Persistence.Files
 					}
 
 					T = T2;
-					Serializer = this.GetObjectSerializerEx(Object);
+					Serializer = ObjectSerializer.GetObjectSerializerEx(Object, this);
 				}
 
 				CollectionName2 = Serializer.CollectionName(Object);
@@ -1887,7 +1772,7 @@ namespace Waher.Persistence.Files
 		/// <param name="Object">Object to insert.</param>
 		public async Task Delete(object Object)
 		{
-			ObjectSerializer Serializer = this.GetObjectSerializerEx(Object.GetType());
+			ObjectSerializer Serializer = ObjectSerializer.GetObjectSerializerEx(Object.GetType(), this);
 			ObjectBTreeFile File = await this.GetFile(Serializer.CollectionName(Object));
 			await File.DeleteObject(Object, Serializer);
 		}
@@ -1927,7 +1812,7 @@ namespace Waher.Persistence.Files
 					}
 
 					T = T2;
-					Serializer = this.GetObjectSerializerEx(Object);
+					Serializer = ObjectSerializer.GetObjectSerializerEx(Object, this);
 				}
 
 				CollectionName2 = Serializer.CollectionName(Object);
@@ -2622,6 +2507,15 @@ namespace Waher.Persistence.Files
 			}
 		}
 
+		/// <summary>
+		/// Creates a new GUID.
+		/// </summary>
+		/// <returns>New GUID.</returns>
+		public Guid CreateGuid()
+		{
+			return ObjectBTreeFile.CreateDatabaseGUID();
+		}
+
 		#endregion
 
 		#region Indices
@@ -2682,5 +2576,6 @@ namespace Waher.Persistence.Files
 		}
 
 		#endregion
+
 	}
 }

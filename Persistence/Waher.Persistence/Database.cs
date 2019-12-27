@@ -36,7 +36,7 @@ namespace Waher.Persistence
 		/// Note: Only one database provider can be registered.
 		/// </summary>
 		/// <param name="DatabaseProvider">Database provider to use.</param>
-		/// <param name="Lock">If the database provider should be locked for the restof the running time of the application.</param>
+		/// <param name="Lock">If the database provider should be locked for the rest of the running time of the application.</param>
 		public static void Register(IDatabaseProvider DatabaseProvider, bool Lock)
 		{
 			if (provider != null && locked)
@@ -58,6 +58,14 @@ namespace Waher.Persistence
 				else
 					throw new Exception("A database provider has not been registered.");
 			}
+		}
+
+		/// <summary>
+		/// If a database provider is registered.
+		/// </summary>
+		public static bool HasProvider
+		{
+			get => !(provider is null);
 		}
 
 		/// <summary>

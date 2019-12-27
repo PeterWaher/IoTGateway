@@ -26,7 +26,16 @@ namespace Waher.Persistence.LifeCycle
 		/// operation has been started, null can be returned.</returns>
 		public WaitHandle Start()
 		{
-			return ToWaitHandle(Database.Provider.Start());
+			return ToWaitHandle(DoStart());
+		}
+
+		private async Task DoStart()
+		{
+			if (Database.HasProvider)
+				await Database.Provider.Start();
+
+			if (Ledger.HasProvider)
+				await Ledger.Provider.Start();
 		}
 
 		private static WaitHandle ToWaitHandle(Task T)
@@ -35,7 +44,7 @@ namespace Waher.Persistence.LifeCycle
 				return null;
 
 			ManualResetEvent Done = new ManualResetEvent(false);
-			Task T2 = Wait(T, Done);
+			Task _ = Wait(T, Done);
 
 			return Done;
 		}
@@ -57,15 +66,28 @@ namespace Waher.Persistence.LifeCycle
 		/// </summary>
 		public void Stop()
 		{
-			Database.Provider.Stop()?.Wait();
+			DoStop()?.Wait();
+		}
+
+		private async Task DoStop()
+		{
+			if (Database.HasProvider)
+				await Database.Provider.Stop();
+
+			if (Ledger.HasProvider)
+				await Ledger.Provider.Stop();
 		}
 
 		/// <summary>
 		/// Flushes any remaining data to disk.
 		/// </summary>
-		public static Task Flush()
+		public static async Task Flush()
 		{
-			return Database.Provider.Flush();
+			if (Database.HasProvider)
+				await Database.Provider.Flush();
+
+			if (Ledger.HasProvider)
+				await Ledger.Provider.Flush();
 		}
 
 	}

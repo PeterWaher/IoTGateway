@@ -1092,7 +1092,7 @@ namespace Waher.Persistence.MongoDB
 		/// <param name="XsltPath">Optional XSLT to use to view the output.</param>
 		/// <param name="ProgramDataFolder">Program data folder. Can be removed from filenames used, when referencing them in the report.</param>
 		/// <param name="ExportData">If data in database is to be exported in output.</param>
-		public Task Analyze(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData)
+		public Task<string[]> Analyze(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData)
 		{
 			return this.Analyze(Output, XsltPath, ProgramDataFolder, ExportData, false);
 		}
@@ -1104,7 +1104,7 @@ namespace Waher.Persistence.MongoDB
 		/// <param name="XsltPath">Optional XSLT to use to view the output.</param>
 		/// <param name="ProgramDataFolder">Program data folder. Can be removed from filenames used, when referencing them in the report.</param>
 		/// <param name="ExportData">If data in database is to be exported in output.</param>
-		public Task Repair(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData)
+		public Task<string[]> Repair(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData)
 		{
 			return this.Analyze(Output, XsltPath, ProgramDataFolder, ExportData, true);
 		}
@@ -1117,7 +1117,7 @@ namespace Waher.Persistence.MongoDB
 		/// <param name="ProgramDataFolder">Program data folder. Can be removed from filenames used, when referencing them in the report.</param>
 		/// <param name="ExportData">If data in database is to be exported in output.</param>
 		/// <param name="Repair">If files should be repaired if corruptions are detected.</param>
-		public async Task Analyze(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData, bool Repair)
+		public async Task<string[]> Analyze(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData, bool Repair)
 		{
 			Output.WriteStartDocument();
 
@@ -1178,6 +1178,8 @@ namespace Waher.Persistence.MongoDB
 
 			Output.WriteEndElement();
 			Output.WriteEndDocument();
+
+			return new string[0];
 		}
 
 		private static string Encode(string s)

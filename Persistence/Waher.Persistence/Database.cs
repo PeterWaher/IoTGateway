@@ -72,27 +72,77 @@ namespace Waher.Persistence
 		/// Inserts an object into the default collection of the database.
 		/// </summary>
 		/// <param name="Object">Object to insert.</param>
-		public static Task Insert(object Object)
+		public async static Task Insert(object Object)
 		{
-			return Provider.Insert(Object);
+			await Provider.Insert(Object);
+
+			ObjectEventHandler h = ObjectInserted;
+			if (!(h is null))
+			{
+				try
+				{
+					h(Provider, new ObjectEventArgs(Object));
+				}
+				catch (Exception)
+				{
+					// Ignore
+				}
+			}
+		}
+
+		/// <summary>
+		/// Event raised when an object has been inserted.
+		/// </summary>
+		public static event ObjectEventHandler ObjectInserted = null;
+
+		/// <summary>
+		/// Inserts a set of objects into the default collection of the database.
+		/// </summary>
+		/// <param name="Objects">Objects to insert.</param>
+		public async static Task Insert(params object[] Objects)
+		{
+			await Provider.Insert(Objects);
+
+			ObjectEventHandler h = ObjectInserted;
+			if (!(h is null))
+			{
+				foreach (object Object in Objects)
+				{
+					try
+					{
+						h(Provider, new ObjectEventArgs(Object));
+					}
+					catch (Exception)
+					{
+						// Ignore
+					}
+				}
+			}
 		}
 
 		/// <summary>
 		/// Inserts a set of objects into the default collection of the database.
 		/// </summary>
 		/// <param name="Objects">Objects to insert.</param>
-		public static Task Insert(params object[] Objects)
+		public async static Task Insert(IEnumerable<object> Objects)
 		{
-			return Provider.Insert(Objects);
-		}
+			await Provider.Insert(Objects);
 
-		/// <summary>
-		/// Inserts a set of objects into the default collection of the database.
-		/// </summary>
-		/// <param name="Objects">Objects to insert.</param>
-		public static Task Insert(IEnumerable<object> Objects)
-		{
-			return Provider.Insert(Objects);
+			ObjectEventHandler h = ObjectInserted;
+			if (!(h is null))
+			{
+				foreach (object Object in Objects)
+				{
+					try
+					{
+						h(Provider, new ObjectEventArgs(Object));
+					}
+					catch (Exception)
+					{
+						// Ignore
+					}
+				}
+			}
 		}
 
 		/// <summary>
@@ -175,17 +225,17 @@ namespace Waher.Persistence
 					Result = Obj;
 				}
 				else
-                {
-                    try
-                    {
-                        await Database.Delete(Obj);
-                    }
-                    catch (KeyNotFoundException)
-                    {
-                        // TODO: Inconsistency should flag collection for repairing
-                    }
-                }
-            }
+				{
+					try
+					{
+						await Database.Delete(Obj);
+					}
+					catch (KeyNotFoundException)
+					{
+						// TODO: Inconsistency should flag collection for repairing
+					}
+				}
+			}
 
 			return Result;
 		}
@@ -243,57 +293,157 @@ namespace Waher.Persistence
 		/// Updates an object in the database.
 		/// </summary>
 		/// <param name="Object">Object to insert.</param>
-		public static Task Update(object Object)
+		public async static Task Update(object Object)
 		{
-			return Provider.Update(Object);
+			await Provider.Update(Object);
+
+			ObjectEventHandler h = ObjectUpdated;
+			if (!(h is null))
+			{
+				try
+				{
+					h(Provider, new ObjectEventArgs(Object));
+				}
+				catch (Exception)
+				{
+					// Ignore
+				}
+			}
+		}
+
+		/// <summary>
+		/// Event raised when an object has been updated.
+		/// </summary>
+		public static event ObjectEventHandler ObjectUpdated = null;
+
+		/// <summary>
+		/// Updates a collection of objects in the database.
+		/// </summary>
+		/// <param name="Objects">Objects to insert.</param>
+		public async static Task Update(params object[] Objects)
+		{
+			await Provider.Update(Objects);
+
+			ObjectEventHandler h = ObjectUpdated;
+			if (!(h is null))
+			{
+				foreach (object Object in Objects)
+				{
+					try
+					{
+						h(Provider, new ObjectEventArgs(Object));
+					}
+					catch (Exception)
+					{
+						// Ignore
+					}
+				}
+			}
 		}
 
 		/// <summary>
 		/// Updates a collection of objects in the database.
 		/// </summary>
 		/// <param name="Objects">Objects to insert.</param>
-		public static Task Update(params object[] Objects)
+		public async static Task Update(IEnumerable<object> Objects)
 		{
-			return Provider.Update(Objects);
-		}
+			await Provider.Update(Objects);
 
-		/// <summary>
-		/// Updates a collection of objects in the database.
-		/// </summary>
-		/// <param name="Objects">Objects to insert.</param>
-		public static Task Update(IEnumerable<object> Objects)
-		{
-			return Provider.Update(Objects);
+			ObjectEventHandler h = ObjectUpdated;
+			if (!(h is null))
+			{
+				foreach (object Object in Objects)
+				{
+					try
+					{
+						h(Provider, new ObjectEventArgs(Object));
+					}
+					catch (Exception)
+					{
+						// Ignore
+					}
+				}
+			}
 		}
 
 		/// <summary>
 		/// Deletes an object in the database.
 		/// </summary>
 		/// <param name="Object">Object to insert.</param>
-		public static Task Delete(object Object)
+		public async static Task Delete(object Object)
 		{
-			return Provider.Delete(Object);
+			await Provider.Delete(Object);
+
+			ObjectEventHandler h = ObjectDeleted;
+			if (!(h is null))
+			{
+				try
+				{
+					h(Provider, new ObjectEventArgs(Object));
+				}
+				catch (Exception)
+				{
+					// Ignore
+				}
+			}
 		}
+
+		/// <summary>
+		/// Event raised when an object has been deleted.
+		/// </summary>
+		public static event ObjectEventHandler ObjectDeleted = null;
 
 		/// <summary>
 		/// Deletes a collection of objects in the database.
 		/// </summary>
 		/// <param name="Objects">Objects to insert.</param>
-		public static Task Delete(params object[] Objects)
+		public async static Task Delete(params object[] Objects)
 		{
 			if (Objects.Length == 1)
-				return Provider.Delete(Objects[0]);
+				await Provider.Delete(Objects[0]);
 			else
-				return Provider.Delete(Objects);
+				await Provider.Delete(Objects);
+
+			ObjectEventHandler h = ObjectDeleted;
+			if (!(h is null))
+			{
+				foreach (object Object in Objects)
+				{
+					try
+					{
+						h(Provider, new ObjectEventArgs(Object));
+					}
+					catch (Exception)
+					{
+						// Ignore
+					}
+				}
+			}
 		}
 
 		/// <summary>
 		/// Deletes a collection of objects in the database.
 		/// </summary>
 		/// <param name="Objects">Objects to insert.</param>
-		public static Task Delete(IEnumerable<object> Objects)
+		public async static Task Delete(IEnumerable<object> Objects)
 		{
-			return Provider.Delete(Objects);
+			await Provider.Delete(Objects);
+
+			ObjectEventHandler h = ObjectDeleted;
+			if (!(h is null))
+			{
+				foreach (object Object in Objects)
+				{
+					try
+					{
+						h(Provider, new ObjectEventArgs(Object));
+					}
+					catch (Exception)
+					{
+						// Ignore
+					}
+				}
+			}
 		}
 
 		/// <summary>
@@ -322,11 +472,28 @@ namespace Waher.Persistence
 		/// </summary>
 		/// <param name="CollectionName">Name of collection to clear.</param>
 		/// <returns>Task object for synchronization purposes.</returns>
-		public static Task Clear(string CollectionName)
+		public async static Task Clear(string CollectionName)
 		{
-			return Provider.Clear(CollectionName);
+			await Provider.Clear(CollectionName);
+
+			CollectionEventHandler h = CollectionCleared;
+			if (!(h is null))
+			{
+				try
+				{
+					h(Provider, new CollectionEventArgs(CollectionName));
+				}
+				catch (Exception)
+				{
+					// Ignore
+				}
+			}
 		}
 
+		/// <summary>
+		/// Event raised when a collection has been cleared.
+		/// </summary>
+		public static event CollectionEventHandler CollectionCleared = null;
 
 		/// <summary>
 		/// Analyzes the database and exports findings to XML.
@@ -335,7 +502,8 @@ namespace Waher.Persistence
 		/// <param name="XsltPath">Optional XSLT to use to view the output.</param>
 		/// <param name="ProgramDataFolder">Program data folder. Can be removed from filenames used, when referencing them in the report.</param>
 		/// <param name="ExportData">If data in database is to be exported in output.</param>
-		public static Task Analyze(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData)
+		/// <returns>Collections with errors found.</returns>
+		public static Task<string[]> Analyze(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData)
 		{
 			return Provider.Analyze(Output, XsltPath, ProgramDataFolder, ExportData);
 		}
@@ -347,10 +515,40 @@ namespace Waher.Persistence
 		/// <param name="XsltPath">Optional XSLT to use to view the output.</param>
 		/// <param name="ProgramDataFolder">Program data folder. Can be removed from filenames used, when referencing them in the report.</param>
 		/// <param name="ExportData">If data in database is to be exported in output.</param>
-		public static Task Repair(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData)
+		/// <returns>Collections with errors found and repaired.</returns>
+		public async static Task<string[]> Repair(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData)
 		{
-			return Provider.Repair(Output, XsltPath, ProgramDataFolder, ExportData);
+			string[] Result = await Provider.Repair(Output, XsltPath, ProgramDataFolder, ExportData);
+
+			if (Result.Length > 0)
+				RaiseRepaired(Result);
+
+			return Result;
 		}
+
+		private static void RaiseRepaired(string[] Collections)
+		{
+			CollectionEventHandler h = CollectionRepaired;
+			if (!(h is null))
+			{
+				foreach (string Collection in Collections)
+				{
+					try
+					{
+						h(Provider, new CollectionEventArgs(Collection));
+					}
+					catch (Exception)
+					{
+						// Ignore
+					}
+				}
+			}
+		}
+
+		/// <summary>
+		/// Event raised when a collection has been repaired.
+		/// </summary>
+		public static event CollectionEventHandler CollectionRepaired = null;
 
 		/// <summary>
 		/// Analyzes the database and exports findings to XML.
@@ -360,9 +558,15 @@ namespace Waher.Persistence
 		/// <param name="ProgramDataFolder">Program data folder. Can be removed from filenames used, when referencing them in the report.</param>
 		/// <param name="ExportData">If data in database is to be exported in output.</param>
 		/// <param name="Repair">If files should be repaired if corruptions are detected.</param>
-		public static Task Analyze(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData, bool Repair)
+		/// <returns>Collections with errors found, and repaired if <paramref name="Repair"/>=true.</returns>
+		public async static Task<string[]> Analyze(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData, bool Repair)
 		{
-			return Provider.Analyze(Output, XsltPath, ProgramDataFolder, ExportData, Repair);
+			string[] Result = await Provider.Analyze(Output, XsltPath, ProgramDataFolder, ExportData, Repair);
+
+			if (Repair && Result.Length > 0)
+				RaiseRepaired(Result);
+
+			return Result;
 		}
 
 		/// <summary>

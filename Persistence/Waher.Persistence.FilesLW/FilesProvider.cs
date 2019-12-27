@@ -2033,7 +2033,7 @@ namespace Waher.Persistence.Files
 		/// <param name="XsltPath">Optional XSLT to use to view the output.</param>
 		/// <param name="ProgramDataFolder">Program data folder. Can be removed from filenames used, when referencing them in the report.</param>
 		/// <param name="ExportData">If data in database is to be exported in output.</param>
-		public Task Analyze(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData)
+		public Task<string[]> Analyze(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData)
 		{
 			return this.Analyze(Output, XsltPath, ProgramDataFolder, ExportData, false);
 		}
@@ -2045,7 +2045,7 @@ namespace Waher.Persistence.Files
 		/// <param name="XsltPath">Optional XSLT to use to view the output.</param>
 		/// <param name="ProgramDataFolder">Program data folder. Can be removed from filenames used, when referencing them in the report.</param>
 		/// <param name="ExportData">If data in database is to be exported in output.</param>
-		public Task Repair(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData)
+		public Task<string[]> Repair(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData)
 		{
 			return this.Analyze(Output, XsltPath, ProgramDataFolder, ExportData, true);
 		}
@@ -2058,8 +2058,10 @@ namespace Waher.Persistence.Files
 		/// <param name="ProgramDataFolder">Program data folder. Can be removed from filenames used, when referencing them in the report.</param>
 		/// <param name="ExportData">If data in database is to be exported in output.</param>
 		/// <param name="Repair">If files should be repaired if corruptions are detected.</param>
-		public async Task Analyze(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData, bool Repair)
+		public async Task<string[]> Analyze(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData, bool Repair)
 		{
+			SortedDictionary<string, bool> CollectionsWithErrors = new SortedDictionary<string, bool>();
+
 			Output.WriteStartDocument();
 
 			if (!string.IsNullOrEmpty(XsltPath))
@@ -2072,6 +2074,9 @@ namespace Waher.Persistence.Files
 				KeyValuePair<FileStatistics, Dictionary<Guid, bool>> P = await File.ComputeStatistics();
 				FileStatistics Stat = P.Key;
 				Dictionary<Guid, bool> ObjectIds;
+
+				if (Stat.IsCorrupt)
+					CollectionsWithErrors[File.CollectionName] = true;
 
 				if (Repair && Stat.IsCorrupt)
 				{
@@ -2353,6 +2358,11 @@ namespace Waher.Persistence.Files
 
 			Output.WriteEndElement();
 			Output.WriteEndDocument();
+
+			string[] Result = new string[CollectionsWithErrors.Count];
+			CollectionsWithErrors.Keys.CopyTo(Result, 0);
+
+			return Result;
 		}
 
 		private static string Encode(bool b)

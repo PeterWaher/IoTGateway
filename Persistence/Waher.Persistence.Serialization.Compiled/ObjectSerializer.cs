@@ -180,6 +180,7 @@ namespace Waher.Persistence.Serialization
 		private readonly Dictionary<string, Member> membersByName = new Dictionary<string, Member>();
 		private readonly Dictionary<ulong, Member> membersByFieldCode = new Dictionary<ulong, Member>();
 		private readonly LinkedList<Member> membersOrdered = new LinkedList<Member>();
+		private readonly int? archivingTimeDays = null;
 		private readonly bool isNullable;
 		private readonly bool debug;
 
@@ -261,6 +262,12 @@ namespace Waher.Persistence.Serialization
 				this.typeNameSerialization = TypeNameSerialization.FullName;
 			else
 				this.typeNameSerialization = TypeNameAttribute.TypeNameSerialization;
+
+			ArchivingTimeAttribute ArchivingTimeAttribute = this.typeInfo.GetCustomAttribute<ArchivingTimeAttribute>(true);
+			if (ArchivingTimeAttribute is null)
+				this.archivingTimeDays = null;
+			else
+				this.archivingTimeDays = ArchivingTimeAttribute.Days;
 
 			if (this.typeInfo.IsAbstract && this.typeNameSerialization == TypeNameSerialization.None)
 				throw new Exception("Serializers for abstract classes require type names to be serialized.");
@@ -2182,6 +2189,22 @@ namespace Waher.Persistence.Serialization
 		public bool IsNullable
 		{
 			get { return this.isNullable; }
+		}
+
+		/// <summary>
+		/// Number of days to archive objects of this type. If equal to <see cref="int.MaxValue"/>, no limit is defined.
+		/// </summary>
+		public int? ArchivingTimeDays
+		{
+			get { return this.archivingTimeDays; }
+		}
+
+		/// <summary>
+		/// If objects of this type can be archived.
+		/// </summary>
+		public bool ArchiveObjects
+		{
+			get { return this.archivingTimeDays.HasValue && this.archivingTimeDays.Value > 0; }
 		}
 
 		/// <summary>

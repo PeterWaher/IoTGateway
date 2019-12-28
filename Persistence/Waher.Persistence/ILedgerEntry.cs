@@ -12,22 +12,22 @@ namespace Waher.Persistence
 		/// <summary>
 		/// New entry
 		/// </summary>
-		New,
+		New = 1,
 
 		/// <summary>
 		/// Update entry
 		/// </summary>
-		Update,
+		Update = 2,
 
 		/// <summary>
 		/// Delete entry
 		/// </summary>
-		Delete,
+		Delete = 3,
 
 		/// <summary>
 		/// Collection cleared
 		/// </summary>
-		Clear
+		Clear = 4
 	}
 
 	/// <summary>

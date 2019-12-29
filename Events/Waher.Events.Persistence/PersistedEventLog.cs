@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Waher.Persistence;
 using Waher.Persistence.Filters;
+using Waher.Security;
 
 namespace Waher.Events.Persistence
 {
@@ -15,6 +17,8 @@ namespace Waher.Events.Persistence
 	{
 		private Timer timer;
 		private int eventLifetimeDays;
+		private string defaultFacility;
+		private string defaultFacilityDigest = null;
 
 		/// <summary>
 		/// Creates an even sink that stores incoming (logged) events in the local object database, as defined by <see cref="Waher.Persistence.Database"/>. 
@@ -22,7 +26,7 @@ namespace Waher.Events.Persistence
 		/// </summary>
 		/// <param name="EventLifetimeDays">Number of days to store events in the database.</param>
 		public PersistedEventLog(int EventLifetimeDays)
-			: this(EventLifetimeDays, null)
+			: this(EventLifetimeDays, null, string.Empty, string.Empty)
 		{
 		}
 
@@ -33,12 +37,27 @@ namespace Waher.Events.Persistence
 		/// <param name="EventLifetimeDays">Number of days to store events in the database.</param>
 		/// <param name="CleanupTime">Optional time of day when event log cleaning is to occur.</param>
 		public PersistedEventLog(int EventLifetimeDays, TimeSpan? CleanupTime)
+			: this(EventLifetimeDays, CleanupTime, string.Empty, string.Empty)
+		{
+		}
+
+		/// <summary>
+		/// Creates an even sink that stores incoming (logged) events in the local object database, as defined by <see cref="Waher.Persistence.Database"/>. 
+		/// Event life time in the database is defined in the constructor. Searches can be made for historical events.
+		/// </summary>
+		/// <param name="EventLifetimeDays">Number of days to store events in the database.</param>
+		/// <param name="CleanupTime">Optional time of day when event log cleaning is to occur.</param>
+		/// <param name="DefaultFacility">Facility to use, if none is explicitly used in events being logged.</param>
+		/// <param name="DefaultFacilityKey">Key necessary to update the default facility using <see cref="SetDefaultFacility(string, string)"/>.</param>
+		public PersistedEventLog(int EventLifetimeDays, TimeSpan? CleanupTime, string DefaultFacility, string DefaultFacilityKey)
 			: base("Persisted Event Log")
 		{
 			if (EventLifetimeDays <= 0)
 				throw new ArgumentOutOfRangeException("The lifetime must be a positive number of days.", nameof(EventLifetimeDays));
 
 			this.eventLifetimeDays = EventLifetimeDays;
+			this.defaultFacility = DefaultFacility;
+			this.defaultFacilityDigest = this.ComputeDigest(DefaultFacilityKey);
 
 			if (CleanupTime.HasValue)
 				this.TurnOnDailyPurge(EventLifetimeDays, CleanupTime.Value);
@@ -259,7 +278,63 @@ namespace Waher.Events.Persistence
 		public override async Task Queue(Event Event)
 		{
 			PersistedEvent PersistedEvent = new PersistedEvent(Event);
+
+			if (string.IsNullOrEmpty(PersistedEvent.Facility))
+				PersistedEvent.Facility = this.defaultFacility;
+
 			await Database.Insert(PersistedEvent);
 		}
+
+		/// <summary>
+		/// Sets the default facility. The default facility can only be reset by a caller presenting the same key as the first time
+		/// the default facility was set.
+		/// </summary>
+		/// <param name="DefaultFacility">Default facility.</param>
+		/// <param name="DefaultFacilityKey">Key necessary to update the default facility.</param>
+		/// <exception cref="UnauthorizedAccessException">If trying to change the default facility.</exception>
+		public void SetDefaultFacility(string DefaultFacility, string DefaultFacilityKey)
+		{
+			if (this.defaultFacility != DefaultFacility)
+			{
+				if (!string.IsNullOrEmpty(this.defaultFacility))
+				{
+					if (this.ComputeDigest(DefaultFacilityKey) != this.defaultFacilityDigest)
+						throw new UnauthorizedAccessException("Unauthorized to change the default facility.");
+				}
+
+				this.defaultFacility = DefaultFacility;
+				this.defaultFacilityDigest = this.ComputeDigest(DefaultFacilityKey);
+			}
+		}
+
+		private string ComputeDigest(string Key)
+		{
+			return Hashes.ComputeSHA256HashString(Encoding.UTF8.GetBytes(Key + ":" + this.defaultFacility));
+		}
+
+		internal static int ArchiveDays
+		{
+			get
+			{
+				if (registeredLog is null)
+				{
+					foreach (IEventSink Sink in Log.Sinks)
+					{
+						if (Sink is PersistedEventLog PersistedEventLog)
+						{
+							registeredLog = PersistedEventLog;
+							break;
+						}
+					}
+
+					if (registeredLog is null)
+						return 730;
+				}
+
+				return registeredLog.eventLifetimeDays;
+			}
+		}
+
+		private static PersistedEventLog registeredLog = null;
 	}
 }

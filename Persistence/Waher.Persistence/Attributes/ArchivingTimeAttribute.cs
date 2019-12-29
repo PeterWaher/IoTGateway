@@ -13,6 +13,7 @@ namespace Waher.Persistence.Attributes
 	public class ArchivingTimeAttribute : Attribute
 	{
 		private readonly int days;
+		private readonly string propertyName;
 
 		/// <summary>
 		/// This attribute defines objects of this type can be archived, and that there is no time limit for how long
@@ -31,6 +32,18 @@ namespace Waher.Persistence.Attributes
 		public ArchivingTimeAttribute(int Days)
 		{
 			this.days = Days;
+			this.propertyName = null;
+		}
+
+		/// <summary>
+		/// This attribute defines that objects of this type can be archived, and that there is a time limit for how long
+		/// objects of this type can be archived.
+		/// </summary>
+		/// <param name="PropertyName">A property on the object with this name defines the number of days to archive the object. (Default=<see cref="int.MaxValue"/>, meaning no limit defined.)</param>
+		public ArchivingTimeAttribute(string PropertyName)
+		{
+			this.days = int.MaxValue;
+			this.propertyName = PropertyName;
 		}
 
 		/// <summary>
@@ -39,6 +52,14 @@ namespace Waher.Persistence.Attributes
 		public int Days
 		{
 			get { return this.days; }
+		}
+
+		/// <summary>
+		/// A property on the object with this name defines the number of days to archive the object. (Default=<see cref="int.MaxValue"/>, meaning no limit defined.)
+		/// </summary>
+		public string PropertyName
+		{
+			get { return this.propertyName; }
 		}
 	}
 }

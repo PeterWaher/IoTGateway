@@ -9,6 +9,7 @@ namespace Waher.Events.Persistence
 	/// </summary>
 	[CollectionName("EventLog")]
 	[TypeName(TypeNameSerialization.None)]
+	[ArchivingTime("ArchiveDays")]
 	[Index("Timestamp")]
 	[Index("Object", "Timestamp")]
 	[Index("Actor", "Timestamp")]
@@ -222,6 +223,14 @@ namespace Waher.Events.Persistence
 		public override string ToString()
 		{
 			return this.message;
+		}
+
+		/// <summary>
+		/// Number of days to archive event.
+		/// </summary>
+		public int ArchiveDays
+		{
+			get => PersistedEventLog.ArchiveDays;
 		}
 	}
 }

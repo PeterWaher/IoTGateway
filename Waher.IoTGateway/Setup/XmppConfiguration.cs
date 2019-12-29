@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Events;
+using Waher.Events.Persistence;
 using Waher.Networking.HTTP;
 using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP;
@@ -49,6 +50,8 @@ namespace Waher.IoTGateway.Setup
 	public partial class XmppConfiguration : SystemMultiStepConfiguration
 	{
 		private static XmppConfiguration instance = null;
+		private static string defaultFacility = string.Empty;
+		private static string defaultFacilityKey = string.Empty;
 
 		private HttpResource connectToHost = null;
 		private HttpResource randomizePassword = null;
@@ -645,6 +648,31 @@ namespace Waher.IoTGateway.Setup
 
 					case XmppState.Connected:
 						this.bareJid = Client.BareJID;
+
+						if (this.bareJid != defaultFacility)
+						{
+							defaultFacility = this.bareJid;
+
+							if (string.IsNullOrEmpty(defaultFacilityKey))
+								defaultFacilityKey = Hashes.BinaryToString(Gateway.NextBytes(32));
+
+							foreach (IEventSink Sink in Log.Sinks)
+							{
+								if (Sink is PersistedEventLog PersistedEventLog)
+								{
+									try
+									{
+										PersistedEventLog.SetDefaultFacility(defaultFacility, defaultFacilityKey);
+									}
+									catch (Exception ex)
+									{
+										Log.Critical(ex);
+									}
+
+									break;
+								}
+							}
+						}
 
 						if (this.createAccount && !string.IsNullOrEmpty(this.accountHumanReadableName))
 						{

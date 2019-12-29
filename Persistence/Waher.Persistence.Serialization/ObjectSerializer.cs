@@ -176,7 +176,10 @@ namespace Waher.Persistence.Serialization
 		private readonly Dictionary<string, Member> membersByName = new Dictionary<string, Member>();
 		private readonly Dictionary<ulong, Member> membersByFieldCode = new Dictionary<ulong, Member>();
 		private readonly LinkedList<Member> membersOrdered = new LinkedList<Member>();
-		private readonly int? archivingTimeDays = null;
+		private readonly PropertyInfo archiveProperty = null;
+		private readonly FieldInfo archiveField = null;
+		private readonly int archiveDays = 0;
+		private readonly bool archive = false;
 		private readonly bool isNullable;
 		private readonly bool debug;
 		private readonly bool normalized;
@@ -262,9 +265,32 @@ namespace Waher.Persistence.Serialization
 
 			ArchivingTimeAttribute ArchivingTimeAttribute = this.typeInfo.GetCustomAttribute<ArchivingTimeAttribute>(true);
 			if (ArchivingTimeAttribute is null)
-				this.archivingTimeDays = null;
+				this.archive = false;
 			else
-				this.archivingTimeDays = ArchivingTimeAttribute.Days;
+			{
+				this.archive = true;
+				if (!string.IsNullOrEmpty(ArchivingTimeAttribute.PropertyName))
+				{
+					this.archiveProperty = this.type.GetRuntimeProperty(ArchivingTimeAttribute.PropertyName);
+
+					if (this.archiveProperty is null)
+					{
+						this.archiveField = this.type.GetRuntimeField(ArchivingTimeAttribute.PropertyName);
+						this.archiveProperty = null;
+
+						if (this.archiveField is null)
+							throw new Exception("Archiving time property or field not found: " + ArchivingTimeAttribute.PropertyName);
+						else if (this.archiveField.FieldType != typeof(int))
+							throw new Exception("Invalid field type for the archiving time: " + this.archiveField.Name);
+					}
+					else if (this.archiveProperty.PropertyType != typeof(int))
+						throw new Exception("Invalid property type for the archiving time: " + this.archiveProperty.Name);
+					else
+						this.archiveField = null;
+				}
+				else
+					this.archiveDays = ArchivingTimeAttribute.Days;
+			}
 
 			if (this.typeInfo.IsAbstract && this.typeNameSerialization == TypeNameSerialization.None)
 				throw new Exception("Serializers for abstract classes require type names to be serialized.");
@@ -2274,9 +2300,18 @@ namespace Waher.Persistence.Serialization
 		/// <summary>
 		/// Number of days to archive objects of this type. If equal to <see cref="int.MaxValue"/>, no limit is defined.
 		/// </summary>
-		public int? ArchivingTimeDays
+		public int GetArchivingTimeDays(object Object)
 		{
-			get { return this.archivingTimeDays; }
+			if (!this.archive)
+				return 0;
+
+			if (!(this.archiveProperty is null))
+				return (int)this.archiveProperty.GetValue(Object);
+
+			if (!(this.archiveField is null))
+				return (int)this.archiveField.GetValue(Object);
+
+			return this.archiveDays;
 		}
 
 		/// <summary>
@@ -2284,7 +2319,7 @@ namespace Waher.Persistence.Serialization
 		/// </summary>
 		public bool ArchiveObjects
 		{
-			get { return this.archivingTimeDays.HasValue && this.archivingTimeDays.Value > 0; }
+			get { return this.archive; }
 		}
 
 		/// <summary>

@@ -13,7 +13,7 @@ namespace Waher.Events
 	public static class Log
 	{
 		private static IEventSink[] staticSinks = new IEventSink[0];
-		private static List<IEventSink> dynamicSinks = new List<IEventSink>();
+		private readonly static List<IEventSink> dynamicSinks = new List<IEventSink>();
 		private static Type[] nestedExceptionTypes = new Type[] 
 		{
 			typeof(TargetInvocationException),
@@ -172,7 +172,7 @@ namespace Waher.Events
 			}
 		}
 
-		private static Dictionary<IEventSink, bool> reportedErrors = new Dictionary<IEventSink, bool>();
+		private readonly static Dictionary<IEventSink, bool> reportedErrors = new Dictionary<IEventSink, bool>();
 		private static bool hasReportedErrors = false;
 
 		#region Debug
@@ -485,7 +485,7 @@ namespace Waher.Events
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
 		public static void Notice(string Message, string Object, string Actor, string EventId, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Notice, Message, Object, Actor, string.Empty, EventLevel.Minor, string.Empty, string.Empty, string.Empty, Tags));
+			Event(new Event(EventType.Notice, Message, Object, Actor, EventId, EventLevel.Minor, string.Empty, string.Empty, string.Empty, Tags));
 		}
 
 		/// <summary>
@@ -601,7 +601,7 @@ namespace Waher.Events
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
 		public static void Warning(string Message, string Object, string Actor, string EventId, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Warning, Message, Object, Actor, string.Empty, EventLevel.Minor, string.Empty, string.Empty, string.Empty, Tags));
+			Event(new Event(EventType.Warning, Message, Object, Actor, EventId, EventLevel.Minor, string.Empty, string.Empty, string.Empty, Tags));
 		}
 
 		/// <summary>
@@ -717,7 +717,7 @@ namespace Waher.Events
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
 		public static void Error(string Message, string Object, string Actor, string EventId, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Error, Message, Object, Actor, string.Empty, EventLevel.Minor, string.Empty, string.Empty, string.Empty, Tags));
+			Event(new Event(EventType.Error, Message, Object, Actor, EventId, EventLevel.Minor, string.Empty, string.Empty, string.Empty, Tags));
 		}
 
 		/// <summary>
@@ -1051,7 +1051,7 @@ namespace Waher.Events
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
 		public static void Critical(string Message, string Object, string Actor, string EventId, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Critical, Message, Object, Actor, string.Empty, EventLevel.Minor, string.Empty, string.Empty, string.Empty, Tags));
+			Event(new Event(EventType.Critical, Message, Object, Actor, EventId, EventLevel.Minor, string.Empty, string.Empty, string.Empty, Tags));
 		}
 
 		/// <summary>
@@ -1261,7 +1261,7 @@ namespace Waher.Events
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
 		public static void Alert(string Message, string Object, string Actor, string EventId, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Alert, Message, Object, Actor, string.Empty, EventLevel.Minor, string.Empty, string.Empty, string.Empty, Tags));
+			Event(new Event(EventType.Alert, Message, Object, Actor, EventId, EventLevel.Minor, string.Empty, string.Empty, string.Empty, Tags));
 		}
 
 		/// <summary>
@@ -1471,7 +1471,7 @@ namespace Waher.Events
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
 		public static void Emergency(string Message, string Object, string Actor, string EventId, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Emergency, Message, Object, Actor, string.Empty, EventLevel.Minor, string.Empty, string.Empty, string.Empty, Tags));
+			Event(new Event(EventType.Emergency, Message, Object, Actor, EventId, EventLevel.Minor, string.Empty, string.Empty, string.Empty, Tags));
 		}
 
 		/// <summary>

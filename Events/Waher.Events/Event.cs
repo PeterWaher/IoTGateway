@@ -11,17 +11,17 @@ namespace Waher.Events
 	public class Event
 	{
 		private LinkedList<IEventSink> toAvoid = null;
-		private DateTime timestamp;
-		private EventType type;
-		private EventLevel level;
-		private string message;
-		private string obj;
-		private string actor;
-		private string eventId;
-		private string module;
-		private string facility;
-		private string stackTrace;
-		private KeyValuePair<string, object>[] tags;
+		private readonly DateTime timestamp;
+		private readonly EventType type;
+		private readonly EventLevel level;
+		private readonly string message;
+		private readonly string obj;
+		private readonly string actor;
+		private readonly string eventId;
+		private readonly string module;
+		private readonly string facility;
+		private readonly string stackTrace;
+		private readonly KeyValuePair<string, object>[] tags;
 
 		/// <summary>
 		/// Class representing an event.

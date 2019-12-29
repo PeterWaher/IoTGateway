@@ -1722,7 +1722,7 @@ namespace Waher.Persistence.Serialization
 										CSharp.Append(Indent2);
 										CSharp.AppendLine("\tWriter.WriteBits(" + TYPE_GUID + ", 6);");
 										CSharp.Append(Indent2);
-										CSharp.AppendLine("\tObjectSerializer Serializer" + Member.Name + " = ObjectSerializer.GetObjectSerializerEx(typeof(" + MemberType.FullName + "), this.context);");
+										CSharp.AppendLine("\tObjectSerializer Serializer" + Member.Name + " = (ObjectSerializer)this.context.GetObjectSerializerEx(typeof(" + MemberType.FullName + "));");
 										CSharp.Append(Indent2);
 										CSharp.AppendLine("\tTask<Guid> " + Member.Name + "Task = Serializer" + Member.Name + ".GetObjectId(Value." + Member.Name + ", true);");
 										CSharp.Append(Indent2);
@@ -3420,31 +3420,6 @@ namespace Waher.Persistence.Serialization
 				return ObjectSerializer.TYPE_NULL;
 			else
 				return ObjectSerializer.TYPE_OBJECT;
-		}
-
-		/// <summary>
-		/// Gets the object serializer corresponding to a specific object.
-		/// </summary>
-		/// <param name="Object">Object to serialize</param>
-		/// <param name="Context">Serialization context.</param>
-		/// <returns>Object Serializer</returns>
-		public static ObjectSerializer GetObjectSerializerEx(object Object, ISerializerContext Context)
-		{
-			return GetObjectSerializerEx(Object.GetType(), Context);
-		}
-
-		/// <summary>
-		/// Gets the object serializer corresponding to a specific object.
-		/// </summary>
-		/// <param name="Type">Type of object to serialize.</param>
-		/// <param name="Context">Serialization context.</param>
-		/// <returns>Object Serializer</returns>
-		public static ObjectSerializer GetObjectSerializerEx(Type Type, ISerializerContext Context)
-		{
-			if (!(Context.GetObjectSerializer(Type) is ObjectSerializer Serializer))
-				throw new Exception("Objects of type " + Type.FullName + " must be embedded.");
-
-			return Serializer;
 		}
 
 		#endregion

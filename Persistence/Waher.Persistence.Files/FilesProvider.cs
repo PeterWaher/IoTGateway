@@ -524,6 +524,29 @@ namespace Waher.Persistence.Files
 			return this.serializers.GetObjectSerializer(Type);
 		}
 
+		/// <summary>
+		/// Gets the object serializer corresponding to a specific object.
+		/// </summary>
+		/// <param name="Object">Object to serialize</param>
+		/// <returns>Object Serializer</returns>
+		public ObjectSerializer GetObjectSerializerEx(object Object)
+		{
+			return this.GetObjectSerializerEx(Object.GetType());
+		}
+
+		/// <summary>
+		/// Gets the object serializer corresponding to a specific object.
+		/// </summary>
+		/// <param name="Type">Type of object to serialize.</param>
+		/// <returns>Object Serializer</returns>
+		public ObjectSerializer GetObjectSerializerEx(Type Type)
+		{
+			if (!(this.GetObjectSerializer(Type) is ObjectSerializer Serializer))
+				throw new Exception("Objects of type " + Type.FullName + " must be embedded.");
+
+			return Serializer;
+		}
+
 		#endregion
 
 		#region Fields
@@ -1315,7 +1338,7 @@ namespace Waher.Persistence.Files
 		/// <returns>Loaded object.</returns>
 		public async Task<T> LoadObject<T>(Guid ObjectId, EmbeddedObjectSetter EmbeddedSetter)
 		{
-			ObjectSerializer Serializer = ObjectSerializer.GetObjectSerializerEx(typeof(T), this);
+			ObjectSerializer Serializer = this.GetObjectSerializerEx(typeof(T));
 			ObjectBTreeFile File = await this.GetFile(Serializer.CollectionName(null));
 
 			if (!(EmbeddedSetter is null))
@@ -1350,7 +1373,7 @@ namespace Waher.Persistence.Files
 		/// <returns>Loaded object.</returns>
 		public async Task<object> LoadObject(Type T, Guid ObjectId, EmbeddedObjectSetter EmbeddedSetter)
 		{
-			ObjectSerializer Serializer = ObjectSerializer.GetObjectSerializerEx(T, this);
+			ObjectSerializer Serializer = this.GetObjectSerializerEx(T);
 			ObjectBTreeFile File = await this.GetFile(Serializer.CollectionName(null));
 
 			if (!(EmbeddedSetter is null))
@@ -1386,7 +1409,7 @@ namespace Waher.Persistence.Files
 		/// or if the corresponding property type is not supported.</exception>
 		public Task<Guid> GetObjectId(object Value, bool InsertIfNotFound)
 		{
-			ObjectSerializer Serializer = ObjectSerializer.GetObjectSerializerEx(Value, this);
+			ObjectSerializer Serializer = this.GetObjectSerializerEx(Value);
 			return Serializer.GetObjectId(Value, InsertIfNotFound);
 		}
 
@@ -1398,7 +1421,7 @@ namespace Waher.Persistence.Files
 		public async Task<Guid> SaveNewObject(object Value)
 		{
 			Type ValueType = Value.GetType();
-			ObjectSerializer Serializer = ObjectSerializer.GetObjectSerializerEx(ValueType, this);
+			ObjectSerializer Serializer = this.GetObjectSerializerEx(ValueType);
 
 			ObjectBTreeFile File = await this.GetFile(Serializer.CollectionName(Value));
 			Guid ObjectId;
@@ -1438,7 +1461,7 @@ namespace Waher.Persistence.Files
 		/// <param name="Object">Object to insert.</param>
 		public async Task Insert(object Object)
 		{
-			ObjectSerializer Serializer = ObjectSerializer.GetObjectSerializerEx(Object, this);
+			ObjectSerializer Serializer = this.GetObjectSerializerEx(Object);
 			ObjectBTreeFile File = await this.GetFile(Serializer.CollectionName(Object));
 			await File.SaveNewObject(Object, Serializer);
 		}
@@ -1478,7 +1501,7 @@ namespace Waher.Persistence.Files
 					}
 
 					T = T2;
-					Serializer = ObjectSerializer.GetObjectSerializerEx(Object, this);
+					Serializer = this.GetObjectSerializerEx(Object);
 				}
 
 				CollectionName2 = Serializer.CollectionName(Object);
@@ -1512,7 +1535,7 @@ namespace Waher.Persistence.Files
 		/// <returns>Objects found.</returns>
 		public async Task<IEnumerable<T>> Find<T>(int Offset, int MaxCount, params string[] SortOrder)
 		{
-			ObjectSerializer Serializer = ObjectSerializer.GetObjectSerializerEx(typeof(T), this);
+			ObjectSerializer Serializer = this.GetObjectSerializerEx(typeof(T));
 			ObjectBTreeFile File = await this.GetFile(Serializer.CollectionName(null));
 			using (ICursor<T> ResultSet = await File.Find<T>(Offset, MaxCount, null, true, SortOrder))
 			{
@@ -1545,7 +1568,7 @@ namespace Waher.Persistence.Files
 		/// <returns>Objects found.</returns>
 		public async Task<IEnumerable<T>> Find<T>(int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
 		{
-			ObjectSerializer Serializer = ObjectSerializer.GetObjectSerializerEx(typeof(T), this);
+			ObjectSerializer Serializer = this.GetObjectSerializerEx(typeof(T));
 			ObjectBTreeFile File = await this.GetFile(Serializer.CollectionName(null));
 			using (ICursor<T> ResultSet = await File.Find<T>(Offset, MaxCount, Filter, true, SortOrder))
 			{
@@ -1559,7 +1582,7 @@ namespace Waher.Persistence.Files
 		/// <param name="Object">Object to insert.</param>
 		public async Task Update(object Object)
 		{
-			ObjectSerializer Serializer = ObjectSerializer.GetObjectSerializerEx(Object.GetType(), this);
+			ObjectSerializer Serializer = this.GetObjectSerializerEx(Object.GetType());
 			ObjectBTreeFile File = await this.GetFile(Serializer.CollectionName(Object));
 			await File.UpdateObject(Object, Serializer);
 		}
@@ -1601,7 +1624,7 @@ namespace Waher.Persistence.Files
 					}
 
 					T = T2;
-					Serializer = ObjectSerializer.GetObjectSerializerEx(Object, this);
+					Serializer = this.GetObjectSerializerEx(Object);
 				}
 
 				CollectionName2 = Serializer.CollectionName(Object);
@@ -1632,7 +1655,7 @@ namespace Waher.Persistence.Files
 		/// <param name="Object">Object to insert.</param>
 		public async Task Delete(object Object)
 		{
-			ObjectSerializer Serializer = ObjectSerializer.GetObjectSerializerEx(Object.GetType(), this);
+			ObjectSerializer Serializer = this.GetObjectSerializerEx(Object.GetType());
 			ObjectBTreeFile File = await this.GetFile(Serializer.CollectionName(Object));
 			await File.DeleteObject(Object, Serializer);
 		}
@@ -1672,7 +1695,7 @@ namespace Waher.Persistence.Files
 					}
 
 					T = T2;
-					Serializer = ObjectSerializer.GetObjectSerializerEx(Object, this);
+					Serializer = this.GetObjectSerializerEx(Object);
 				}
 
 				CollectionName2 = Serializer.CollectionName(Object);

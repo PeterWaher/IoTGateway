@@ -1202,7 +1202,7 @@ namespace Waher.Persistence.Files
         public Task<Guid> SaveNewObject(object Object)
         {
             Type ObjectType = Object.GetType();
-            ObjectSerializer Serializer = ObjectSerializer.GetObjectSerializerEx(ObjectType, this.provider);
+            ObjectSerializer Serializer = this.provider.GetObjectSerializerEx(ObjectType);
 
             return this.SaveNewObject(Object, Serializer);
         }
@@ -1877,7 +1877,7 @@ namespace Waher.Persistence.Files
         public Task UpdateObject(object Object)
         {
             Type ObjectType = Object.GetType();
-            ObjectSerializer Serializer = ObjectSerializer.GetObjectSerializerEx(ObjectType, this.provider);
+            ObjectSerializer Serializer = this.provider.GetObjectSerializerEx(ObjectType);
             return this.UpdateObject(Object, Serializer);
         }
 
@@ -2193,7 +2193,7 @@ namespace Waher.Persistence.Files
         public Task<object> DeleteObject(object Object)
         {
             Type ObjectType = Object.GetType();
-            ObjectSerializer Serializer = ObjectSerializer.GetObjectSerializerEx(ObjectType, this.provider);
+            ObjectSerializer Serializer = this.provider.GetObjectSerializerEx(ObjectType);
 
             return this.DeleteObject(Object, Serializer);
         }
@@ -5009,7 +5009,7 @@ namespace Waher.Persistence.Files
 
             if (!this.indicesCreated)
             {
-                ObjectSerializer Serializer = ObjectSerializer.GetObjectSerializerEx(typeof(T), this.provider);
+                ObjectSerializer Serializer = this.provider.GetObjectSerializerEx(typeof(T));
                 string CollectionName = Serializer.CollectionName(null);
                 ObjectBTreeFile File = await this.provider.GetFile(CollectionName);
                 if (File != this)

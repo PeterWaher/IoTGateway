@@ -9,7 +9,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Content;
 using Waher.Persistence.Serialization;
 using Waher.Persistence.Files.Statistics;
-using Waher.Persistence.Serialization;
 using Waher.Runtime.Inventory;
 using Waher.Script;
 

@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Persistence.Serialization;
-using Waher.Persistence.Serialization;
 
 #if !LW
 using Waher.Persistence.Files.Test.Classes;

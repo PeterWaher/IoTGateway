@@ -328,7 +328,7 @@ namespace Waher.Events.Persistence
 					}
 
 					if (registeredLog is null)
-						return 730;
+						return 90;
 				}
 
 				return registeredLog.eventLifetimeDays;

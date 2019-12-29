@@ -423,7 +423,7 @@ namespace Waher.IoTGateway
 						await T;
 				}
 
-				PersistedEventLog PersistedEventLog = new PersistedEventLog(730, new TimeSpan(4, 15, 0));
+				PersistedEventLog PersistedEventLog = new PersistedEventLog(90, new TimeSpan(4, 15, 0));
 				Log.Register(PersistedEventLog);
 				try
 				{

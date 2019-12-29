@@ -48,6 +48,16 @@ namespace Waher.Persistence.Serialization
 		}
 
 		/// <summary>
+		/// If normalized names are to be used or not. Normalized names reduces the number
+		/// of bytes required to serialize objects, but do not work in a decentralized
+		/// architecture.
+		/// </summary>
+		bool NormalizedNames
+		{
+			get;
+		}
+
+		/// <summary>
 		/// Gets the code for a specific field in a collection.
 		/// </summary>
 		/// <param name="Collection">Name of collection.</param>

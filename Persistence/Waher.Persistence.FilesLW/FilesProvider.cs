@@ -438,6 +438,16 @@ namespace Waher.Persistence.Files
 			get { return this.debug; }
 		}
 
+		/// <summary>
+		/// If normalized names are to be used or not. Normalized names reduces the number
+		/// of bytes required to serialize objects, but do not work in a decentralized
+		/// architecture.
+		/// </summary>
+		public bool NormalizedNames
+		{
+			get { return true; }
+		}
+
 		#endregion
 
 		#region IDisposable

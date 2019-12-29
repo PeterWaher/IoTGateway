@@ -43,7 +43,6 @@ namespace Waher.Persistence.Serialization
 		{
 			uint FieldDataType;
 			ulong FieldCode;
-			ulong CollectionCode;
 			Guid ObjectId = Embedded ? Guid.Empty : Reader.ReadGuid();
 			string TypeName;
 			string FieldName;
@@ -134,31 +133,63 @@ namespace Waher.Persistence.Serialization
 					throw new Exception("Object or value expected.");
 			}
 
-			FieldCode = Reader.ReadVariableLengthUInt64();
+			bool Normalized = this.NormalizedNames;
+
+			if (Normalized)
+			{
+				FieldCode = Reader.ReadVariableLengthUInt64();
+				TypeName = null;
+			}
+			else
+			{
+				FieldCode = 0;
+				TypeName = Reader.ReadString();
+			}
 
 			if (Embedded)
 			{
-				CollectionCode = Reader.ReadVariableLengthUInt64();
-				CollectionName = this.context.GetFieldName(null, CollectionCode);
+				if (Normalized)
+				{
+					ulong CollectionCode = Reader.ReadVariableLengthUInt64();
+					CollectionName = this.context.GetFieldName(null, CollectionCode);
+				}
+				else
+					CollectionName = Reader.ReadString();
 			}
 			else
 				CollectionName = Reader.CollectionName;
 
-			if (FieldCode == 0)
-				TypeName = string.Empty;
-			else if (CheckFieldNames)
-				TypeName = this.context.GetFieldName(CollectionName, FieldCode);
-			else
-				TypeName = CollectionName + "." + FieldCode.ToString();
+			if (Normalized)
+			{
+				if (FieldCode == 0)
+					TypeName = string.Empty;
+				else if (CheckFieldNames)
+					TypeName = this.context.GetFieldName(CollectionName, FieldCode);
+				else
+					TypeName = CollectionName + "." + FieldCode.ToString();
+			}
 
 			LinkedList<KeyValuePair<string, object>> Properties = new LinkedList<KeyValuePair<string, object>>();
 
-			while ((FieldCode = Reader.ReadVariableLengthUInt64()) != 0)
+			while (true)
 			{
-				if (CheckFieldNames)
-					FieldName = this.context.GetFieldName(CollectionName, FieldCode);
+				if (Normalized)
+				{
+					FieldCode = Reader.ReadVariableLengthUInt64();
+					if (FieldCode == 0)
+						break;
+
+					if (CheckFieldNames)
+						FieldName = this.context.GetFieldName(CollectionName, FieldCode);
+					else
+						FieldName = CollectionName + "." + FieldCode.ToString();
+				}
 				else
-					FieldName = CollectionName + "." + FieldCode.ToString();
+				{
+					FieldName = Reader.ReadString();
+					if (string.IsNullOrEmpty(FieldName))
+						break;
+				}
 
 				FieldDataType = Reader.ReadBits(6);
 
@@ -480,17 +511,32 @@ namespace Waher.Persistence.Serialization
 				else if (TypedValue is null)
 					throw new NullReferenceException("Value cannot be null.");
 
-				if (string.IsNullOrEmpty(TypedValue.TypeName))
-					Writer.WriteVariableLengthUInt64(0);
-				else
-					Writer.WriteVariableLengthUInt64(this.context.GetFieldCode(TypedValue.CollectionName, TypedValue.TypeName));
+				bool Normalized = this.NormalizedNames;
 
-				if (Embedded)
-					Writer.WriteVariableLengthUInt64(this.context.GetFieldCode(null, string.IsNullOrEmpty(TypedValue.CollectionName) ? this.context.DefaultCollectionName : TypedValue.CollectionName));
+				if (Normalized)
+				{
+					if (string.IsNullOrEmpty(TypedValue.TypeName))
+						Writer.WriteVariableLengthUInt64(0);
+					else
+						Writer.WriteVariableLengthUInt64(this.context.GetFieldCode(TypedValue.CollectionName, TypedValue.TypeName));
+
+					if (Embedded)
+						Writer.WriteVariableLengthUInt64(this.context.GetFieldCode(null, string.IsNullOrEmpty(TypedValue.CollectionName) ? this.context.DefaultCollectionName : TypedValue.CollectionName));
+				}
+				else
+				{
+					Writer.Write(TypedValue.TypeName);
+
+					if (Embedded)
+						Writer.Write(string.IsNullOrEmpty(TypedValue.CollectionName) ? this.context.DefaultCollectionName : TypedValue.CollectionName);
+				}
 
 				foreach (KeyValuePair<string, object> Property in TypedValue)
 				{
-					Writer.WriteVariableLengthUInt64(this.context.GetFieldCode(TypedValue.CollectionName, Property.Key));
+					if (Normalized)
+						Writer.WriteVariableLengthUInt64(this.context.GetFieldCode(TypedValue.CollectionName, Property.Key));
+					else
+						Writer.Write(Property.Key);
 
 					Obj = Property.Value;
 					if (Obj is null)

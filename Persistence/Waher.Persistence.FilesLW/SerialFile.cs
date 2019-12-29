@@ -33,6 +33,20 @@ namespace Waher.Persistence.Files
 		/// <summary>
 		/// Serializes binary blocks into a file, possibly encrypted. Blocks are accessed in the order they were persisted.
 		/// </summary>
+		/// <param name="FileName">Name of file</param>
+		/// <param name="TimeoutMilliseconds">Timeout, in milliseconds.</param>
+		public SerialFile(string FileName, int TimeoutMilliseconds)
+			: this(FileName, TimeoutMilliseconds, false, null)
+		{
+		}
+
+		/// <summary>
+		/// Serializes binary blocks into a file, possibly encrypted. Blocks are accessed in the order they were persisted.
+		/// </summary>
+		/// <param name="FileName">Name of file</param>
+		/// <param name="TimeoutMilliseconds">Timeout, in milliseconds.</param>
+		/// <param name="Encrypted">If file is encrypted.</param>
+		/// <param name="Provider">Provider of encryption keys.</param>
 		public SerialFile(string FileName, int TimeoutMilliseconds, bool Encrypted, FilesProvider Provider)
 		{
 			if (TimeoutMilliseconds <= 0)

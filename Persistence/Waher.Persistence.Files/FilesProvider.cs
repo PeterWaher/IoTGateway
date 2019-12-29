@@ -62,11 +62,10 @@ namespace Waher.Persistence.Files
 	{
 		private static readonly RandomNumberGenerator rnd = RandomNumberGenerator.Create();
 
-		private Dictionary<Type, IObjectSerializer> serializers;
+		private SerializerCollection serializers;
 		private readonly Dictionary<string, ObjectBTreeFile> files = new Dictionary<string, ObjectBTreeFile>();
 		private readonly Dictionary<string, LabelFile> labelFiles = new Dictionary<string, LabelFile>();
 		private readonly Dictionary<ObjectBTreeFile, bool> hasUnsavedData = new Dictionary<ObjectBTreeFile, bool>();
-		private AutoResetEvent serializerAdded = new AutoResetEvent(false);
 		private StringDictionary master;
 		private Cache<long, byte[]> blocks;
 		private readonly object synchObj = new object();
@@ -309,58 +308,17 @@ namespace Waher.Persistence.Files
 			this.blobBlockSize = BlobBlockSize;
 			this.encoding = Encoding;
 			this.timeoutMilliseconds = TimeoutMilliseconds;
-			this.serializers = new Dictionary<Type, Serialization.IObjectSerializer>();
 			this.encrypted = Encrypted;
 			this.customKeyMethod = CustomKeyMethod;
 #if NETSTANDARD1_5
 			this.compiled = Compiled;
+			this.serializers = new SerializerCollection(this, this.compiled);
+#else
+			this.serializers = new SerializerCollection(this);
 #endif
 
 			if (!string.IsNullOrEmpty(this.folder) && this.folder[this.folder.Length - 1] != Path.DirectorySeparatorChar)
 				this.folder += Path.DirectorySeparatorChar;
-
-			ConstructorInfo DefaultConstructor;
-			IObjectSerializer S;
-			TypeInfo TI;
-
-			foreach (Type T in Types.GetTypesImplementingInterface(typeof(IObjectSerializer)))
-			{
-				TI = T.GetTypeInfo();
-				if (TI.IsAbstract || TI.IsGenericTypeDefinition)
-					continue;
-
-				DefaultConstructor = null;
-
-				try
-				{
-					foreach (ConstructorInfo CI in TI.DeclaredConstructors)
-					{
-						if (CI.IsPublic && CI.GetParameters().Length == 0)
-						{
-							DefaultConstructor = CI;
-							break;
-						}
-					}
-
-					if (DefaultConstructor is null)
-						continue;
-
-					S = DefaultConstructor.Invoke(Types.NoParameters) as IObjectSerializer;
-					if (S is null)
-						continue;
-				}
-				catch (Exception)
-				{
-					continue;
-				}
-
-				this.serializers[S.ValueType] = S;
-			}
-
-			GenericObjectSerializer GenericObjectSerializer = new GenericObjectSerializer(this);
-
-			this.serializers[typeof(GenericObject)] = GenericObjectSerializer;
-			this.serializers[typeof(object)] = GenericObjectSerializer;
 
 			this.blocks = new Cache<long, byte[]>(BlocksInCache, TimeSpan.MaxValue, TimeSpan.FromHours(1));
 
@@ -511,32 +469,8 @@ namespace Waher.Persistence.Files
 			this.blocks?.Dispose();
 			this.blocks = null;
 
-			if (!(this.serializers is null))
-			{
-				IDisposable d;
-
-				foreach (IObjectSerializer Serializer in this.serializers.Values)
-				{
-					d = Serializer as IDisposable;
-					if (!(d is null))
-					{
-						try
-						{
-							d.Dispose();
-						}
-						catch (Exception)
-						{
-							// Ignore
-						}
-					}
-				}
-
-				this.serializers.Clear();
-				this.serializers = null;
-			}
-
-			this.serializerAdded?.Dispose();
-			this.serializerAdded = null;
+			this.serializers?.Dispose();
+			this.serializers = null;
 		}
 
 		#endregion
@@ -587,81 +521,7 @@ namespace Waher.Persistence.Files
 		/// <returns>Object Serializer</returns>
 		public IObjectSerializer GetObjectSerializer(Type Type)
 		{
-			IObjectSerializer Result;
-			System.Reflection.TypeInfo TI = Type.GetTypeInfo();
-
-			lock (this.synchObj)
-			{
-				if (this.serializers.TryGetValue(Type, out Result))
-					return Result;
-
-				if (TI.IsEnum)
-					Result = new EnumSerializer(Type);
-				else if (Type.IsArray)
-				{
-					Type ElementType = Type.GetElementType();
-					Type T = Types.GetType(typeof(ByteArraySerializer).FullName.Replace("ByteArray", "Array"));
-					Type SerializerType = T.MakeGenericType(new Type[] { ElementType });
-					Result = (IObjectSerializer)Activator.CreateInstance(SerializerType, this);
-				}
-				else if (TI.IsGenericType)
-				{
-					Type GT = Type.GetGenericTypeDefinition();
-					if (GT == typeof(Nullable<>))
-					{
-						Type NullableType = Type.GenericTypeArguments[0];
-
-						if (NullableType.GetTypeInfo().IsEnum)
-							Result = new Serialization.NullableTypes.NullableEnumSerializer(NullableType);
-						else
-							Result = null;
-					}
-					else
-						Result = null;
-				}
-				else
-					Result = null;
-
-				if (!(Result is null))
-				{
-					this.serializers[Type] = Result;
-					this.serializerAdded.Set();
-
-					return Result;
-				}
-			}
-
-			try
-			{
-#if NETSTANDARD1_5
-				Result = new ObjectSerializer(Type, this, this.debug, this.compiled);
-#else
-				Result = new ObjectSerializer(Type, this, this.debug);
-#endif
-				lock (this.synchObj)
-				{
-					this.serializers[Type] = Result;
-					this.serializerAdded.Set();
-				}
-			}
-			catch (FileLoadException ex)
-			{
-				// Serializer in the process of being generated from another task or thread.
-
-				while (true)
-				{
-					if (!this.serializerAdded.WaitOne(1000))
-						ExceptionDispatchInfo.Capture(ex).Throw();
-
-					lock (this.synchObj)
-					{
-						if (this.serializers.TryGetValue(Type, out Result))
-							return Result;
-					}
-				}
-			}
-
-			return Result;
+			return this.serializers.GetObjectSerializer(Type);
 		}
 
 		#endregion

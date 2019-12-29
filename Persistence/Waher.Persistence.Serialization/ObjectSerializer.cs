@@ -180,10 +180,11 @@ namespace Waher.Persistence.Serialization
 		private readonly Dictionary<string, Member> membersByName = new Dictionary<string, Member>();
 		private readonly Dictionary<ulong, Member> membersByFieldCode = new Dictionary<ulong, Member>();
 		private readonly LinkedList<Member> membersOrdered = new LinkedList<Member>();
+		private readonly int? archivingTimeDays = null;
 		private readonly bool isNullable;
 		private readonly bool debug;
 
-		internal ObjectSerializer(Type Type, ISerializerContext Context)
+		internal ObjectSerializer(ISerializerContext Context, Type Type)	// Note order.
 		{
 			this.type = Type;
 			this.typeInfo = Type.GetTypeInfo();
@@ -204,17 +205,15 @@ namespace Waher.Persistence.Serialization
 		/// </summary>
 		/// <param name="Type">Type to serialize.</param>
 		/// <param name="Context">Serialization context.</param>
-		/// <param name="Debug">If debug information is to be included for generated code.</param>
 		/// <param name="Compiled">If object serializers should be compiled or not.</param>
-		public ObjectSerializer(Type Type, ISerializerContext Context, bool Debug, bool Compiled)
+		public ObjectSerializer(Type Type, ISerializerContext Context, bool Compiled)
 #else
 		/// <summary>
 		/// Serializes a class, taking into account attributes defined in <see cref="Waher.Persistence.Attributes"/>.
 		/// </summary>
 		/// <param name="Type">Type to serialize.</param>
 		/// <param name="Context">Serialization context.</param>
-		/// <param name="Debug">If debug information is to be included for generated code.</param>
-		public ObjectSerializer(Type Type, ISerializerContext Context, bool Debug)
+		public ObjectSerializer(Type Type, ISerializerContext Context)
 #endif
 		{
 			string TypeName = Type.Name;
@@ -222,7 +221,7 @@ namespace Waher.Persistence.Serialization
 			this.type = Type;
 			this.typeInfo = Type.GetTypeInfo();
 			this.context = Context;
-			this.debug = Debug;
+			this.debug = Context.Debug;
 
 #if NETSTANDARD1_5
 			this.compiled = Compiled;
@@ -261,6 +260,12 @@ namespace Waher.Persistence.Serialization
 				this.typeNameSerialization = TypeNameSerialization.FullName;
 			else
 				this.typeNameSerialization = TypeNameAttribute.TypeNameSerialization;
+
+			ArchivingTimeAttribute ArchivingTimeAttribute = this.typeInfo.GetCustomAttribute<ArchivingTimeAttribute>(true);
+			if (ArchivingTimeAttribute is null)
+				this.archivingTimeDays = null;
+			else
+				this.archivingTimeDays = ArchivingTimeAttribute.Days;
 
 			if (this.typeInfo.IsAbstract && this.typeNameSerialization == TypeNameSerialization.None)
 				throw new Exception("Serializers for abstract classes require type names to be serialized.");
@@ -2012,7 +2017,7 @@ namespace Waher.Persistence.Serialization
 				}
 				catch (FileLoadException)
 				{
-					this.customSerializer = new ObjectSerializer(Type, Context, Debug, false);
+					this.customSerializer = new ObjectSerializer(Type, Context, false);
 				}
 			}
 			else
@@ -2182,6 +2187,22 @@ namespace Waher.Persistence.Serialization
 		public bool IsNullable
 		{
 			get { return this.isNullable; }
+		}
+
+		/// <summary>
+		/// Number of days to archive objects of this type. If equal to <see cref="int.MaxValue"/>, no limit is defined.
+		/// </summary>
+		public int? ArchivingTimeDays
+		{
+			get { return this.archivingTimeDays; }
+		}
+
+		/// <summary>
+		/// If objects of this type can be archived.
+		/// </summary>
+		public bool ArchiveObjects
+		{
+			get { return this.archivingTimeDays.HasValue && this.archivingTimeDays.Value > 0; }
 		}
 
 		/// <summary>

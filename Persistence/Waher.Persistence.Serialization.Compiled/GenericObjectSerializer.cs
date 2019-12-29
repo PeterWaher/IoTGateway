@@ -15,7 +15,7 @@ namespace Waher.Persistence.Serialization
 		/// Provides a generic object serializer.
 		/// </summary>
 		public GenericObjectSerializer(ISerializerContext Context)
-			: base(typeof(GenericObject), Context)
+			: base(Context, typeof(GenericObject))
 		{
 		}
 

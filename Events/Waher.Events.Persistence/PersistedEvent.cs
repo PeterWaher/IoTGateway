@@ -132,8 +132,8 @@ namespace Waher.Events.Persistence
 			get
 			{
 				string s = this.message.Trim();
-				int i = this.message.IndexOf('\n');
-				int j = this.message.IndexOf('\r');
+				int i = s.IndexOf('\n');
+				int j = s.IndexOf('\r');
 
 				if (i < 0)
 					i = j;
@@ -141,9 +141,9 @@ namespace Waher.Events.Persistence
 					i = j;
 
 				if (i < 0)
-					return this.message;
+					return s;
 				else
-					return this.message.Substring(0, i).TrimEnd();
+					return s.Substring(0, i).TrimEnd();
 			}
 		}
 

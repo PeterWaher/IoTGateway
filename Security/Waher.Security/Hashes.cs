@@ -8,6 +8,20 @@ using System.Security.Cryptography;
 namespace Waher.Security
 {
 	/// <summary>
+	/// Delegate to hash function.
+	/// </summary>
+	/// <param name="Data">Data to be hashed.</param>
+	/// <returns>Hash digest</returns>
+	public delegate byte[] HashFunctionArray(byte[] Data);
+
+	/// <summary>
+	/// Delegate to hash function.
+	/// </summary>
+	/// <param name="Data">Data to be hashed.</param>
+	/// <returns>Hash digest</returns>
+	public delegate byte[] HashFunctionStream(Stream Data);
+
+	/// <summary>
 	/// Hash method enumeration.
 	/// </summary>
 	public enum HashFunction

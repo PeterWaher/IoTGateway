@@ -5,20 +5,6 @@ using System.Numerics;
 namespace Waher.Security.EllipticCurves
 {
     /// <summary>
-    /// Delegate to hash function.
-    /// </summary>
-    /// <param name="Data">Data to be hashed.</param>
-    /// <returns>Hash digest</returns>
-    public delegate byte[] HashFunctionArray(byte[] Data);
-
-    /// <summary>
-    /// Delegate to hash function.
-    /// </summary>
-    /// <param name="Data">Data to be hashed.</param>
-    /// <returns>Hash digest</returns>
-    public delegate byte[] HashFunctionStream(Stream Data);
-
-    /// <summary>
     /// Implements the Edwards curve Digital Signature Algorithm (EdDSA), as defined in RFC 8032.
     /// https://tools.ietf.org/html/rfc8032
     /// </summary>

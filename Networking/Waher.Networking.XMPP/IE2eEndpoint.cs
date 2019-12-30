@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Xml;
-using Waher.Security;
 
 namespace Waher.Networking.XMPP
 {
@@ -140,12 +139,27 @@ namespace Waher.Networking.XMPP
         byte[] Sign(byte[] Data);
 
         /// <summary>
+        /// Signs binary data using the local private key.
+        /// </summary>
+        /// <param name="Data">Binary data</param>
+        /// <returns>Digital signature.</returns>
+        byte[] Sign(Stream Data);
+
+        /// <summary>
         /// Verifies a signature.
         /// </summary>
         /// <param name="Data">Data that is signed.</param>
         /// <param name="Signature">Digital signature.</param>
         /// <returns>If signature is valid.</returns>
         bool Verify(byte[] Data, byte[] Signature);
+
+        /// <summary>
+        /// Verifies a signature.
+        /// </summary>
+        /// <param name="Data">Data that is signed.</param>
+        /// <param name="Signature">Digital signature.</param>
+        /// <returns>If signature is valid.</returns>
+        bool Verify(Stream Data, byte[] Signature);
 
         /// <summary>
         /// If endpoint is considered safe (i.e. there are no suspected backdoors)

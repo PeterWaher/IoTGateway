@@ -1132,6 +1132,69 @@ namespace Waher.Networking.XMPP.Contracts
             return Result.Task;
         }
 
+        /// <summary>
+        /// Signs binary data with the corresponding private key.
+        /// </summary>
+        /// <param name="Data">Binary data to sign-</param>
+        /// <param name="Callback">Method to call when response is returned.</param>
+        /// <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
+        public void Sign(Stream Data, SignatureEventHandler Callback, object State)
+        {
+            this.Sign(this.componentAddress, Data, Callback, State);
+        }
+
+        /// <summary>
+        /// Signs binary data with the corresponding private key.
+        /// </summary>
+        /// <param name="Address">Address of entity on which the legal identity are registered.</param>
+        /// <param name="Data">Binary data to sign-</param>
+        /// <param name="Callback">Method to call when response is returned.</param>
+        /// <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
+        public void Sign(string Address, Stream Data, SignatureEventHandler Callback, object State)
+        {
+            this.GetMatchingLocalKey(Address, (sender, e) =>
+            {
+                byte[] Signature = null;
+
+                if (e.Ok)
+                    Signature = e.Key.Sign(Data);
+
+                Callback?.Invoke(this, new SignatureEventArgs(e, Signature));
+
+            }, State);
+        }
+
+        /// <summary>
+        /// Signs binary data with the corresponding private key.
+        /// </summary>
+        /// <param name="Data">Binary data to sign-</param>
+        /// <returns>Digital signature.</returns>
+        public Task<byte[]> SignAsync(Stream Data)
+        {
+            return this.SignAsync(this.componentAddress, Data);
+        }
+
+        /// <summary>
+        /// Signs binary data with the corresponding private key.
+        /// </summary>
+        /// <param name="Address">Address of entity on which the legal identity are registered.</param>
+        /// <param name="Data">Binary data to sign-</param>
+        /// <returns>Digital signature.</returns>
+        public Task<byte[]> SignAsync(string Address, Stream Data)
+        {
+            TaskCompletionSource<byte[]> Result = new TaskCompletionSource<byte[]>();
+
+            this.Sign(Address, Data, (sender, e) =>
+            {
+                if (e.Ok)
+                    Result.SetResult(e.Signature);
+                else
+                    Result.SetException(new IOException(string.IsNullOrEmpty(e.ErrorText) ? "Unable to sign data." : e.ErrorText));
+            }, null);
+
+            return Result.Task;
+        }
+
         #endregion
 
         #region Validating Signatures
@@ -1325,7 +1388,7 @@ namespace Waher.Networking.XMPP.Contracts
                 E.LocalName == "contract" &&
                 E.NamespaceURI == NamespaceSmartContracts)
             {
-                Contract = Contract.Parse(E, out bool HasStatus);
+                Contract = Contract.Parse(E, out bool _);
             }
             else
                 e.Ok = false;

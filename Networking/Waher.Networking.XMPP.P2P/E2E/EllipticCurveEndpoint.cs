@@ -1,13 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Numerics;
-using System.Security.Cryptography;
-using System.Text;
-using System.Xml;
-using Waher.Content.Xml;
-using Waher.Events;
+using System.IO;
 using Waher.Runtime.Cache;
-using Waher.Networking.XMPP.P2P.SymmetricCiphers;
 using Waher.Security;
 using Waher.Security.EllipticCurves;
 
@@ -129,6 +122,21 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		}
 
 		/// <summary>
+		/// Signs binary data using the local private key.
+		/// </summary>
+		/// <param name="Data">Binary data</param>
+		/// <returns>Digital signature.</returns>
+		public override byte[] Sign(Stream Data)
+		{
+			if (!this.hasPrivateKey)
+				throw new InvalidOperationException("Signing requires private key.");
+
+			byte[] Signature = this.curve.Sign(Data);
+
+			return Signature;
+		}
+
+		/// <summary>
 		/// Verifies a signature.
 		/// </summary>
 		/// <param name="Data">Data that is signed.</param>
@@ -140,21 +148,44 @@ namespace Waher.Networking.XMPP.P2P.E2E
             return this.curve.Verify(Data, PublicKey, Signature);
         }
 
-        /// <summary>
-        /// Verifies a signature.
-        /// </summary>
-        /// <param name="Data">Data that is signed.</param>
-        /// <param name="Signature">Digital signature.</param>
-        /// <returns>If signature is valid.</returns>
-        public override bool Verify(byte[] Data, byte[] Signature)
+		/// <summary>
+		/// Verifies a signature.
+		/// </summary>
+		/// <param name="Data">Data that is signed.</param>
+		/// <param name="PublicKey">Public key</param>
+		/// <param name="Signature">Digital signature.</param>
+		/// <returns>If signature is valid.</returns>
+		public bool Verify(Stream Data, byte[] PublicKey, byte[] Signature)
+		{
+			return this.curve.Verify(Data, PublicKey, Signature);
+		}
+
+		/// <summary>
+		/// Verifies a signature.
+		/// </summary>
+		/// <param name="Data">Data that is signed.</param>
+		/// <param name="Signature">Digital signature.</param>
+		/// <returns>If signature is valid.</returns>
+		public override bool Verify(byte[] Data, byte[] Signature)
         {
             return this.Verify(Data, this.publicKey, Signature);
         }
 
-        /// <summary>
-        /// <see cref="Object.ToString()"/>
-        /// </summary>
-        public override bool Equals(object obj)
+		/// <summary>
+		/// Verifies a signature.
+		/// </summary>
+		/// <param name="Data">Data that is signed.</param>
+		/// <param name="Signature">Digital signature.</param>
+		/// <returns>If signature is valid.</returns>
+		public override bool Verify(Stream Data, byte[] Signature)
+		{
+			return this.Verify(Data, this.publicKey, Signature);
+		}
+
+		/// <summary>
+		/// <see cref="Object.ToString()"/>
+		/// </summary>
+		public override bool Equals(object obj)
 		{
 			return obj is EllipticCurveEndpoint EcEndpoint &&
 				this.curve.CurveName.Equals(EcEndpoint.curve.CurveName) &&

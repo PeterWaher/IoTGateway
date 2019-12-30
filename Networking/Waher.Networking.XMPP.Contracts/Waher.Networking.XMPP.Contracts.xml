@@ -550,6 +550,38 @@
             <param name="Data">Binary data to sign-</param>
             <returns>Digital signature.</returns>
         </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.Sign(System.IO.Stream,Waher.Networking.XMPP.Contracts.SignatureEventHandler,System.Object)">
+            <summary>
+            Signs binary data with the corresponding private key.
+            </summary>
+            <param name="Data">Binary data to sign-</param>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.Sign(System.String,System.IO.Stream,Waher.Networking.XMPP.Contracts.SignatureEventHandler,System.Object)">
+            <summary>
+            Signs binary data with the corresponding private key.
+            </summary>
+            <param name="Address">Address of entity on which the legal identity are registered.</param>
+            <param name="Data">Binary data to sign-</param>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.SignAsync(System.IO.Stream)">
+            <summary>
+            Signs binary data with the corresponding private key.
+            </summary>
+            <param name="Data">Binary data to sign-</param>
+            <returns>Digital signature.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.SignAsync(System.String,System.IO.Stream)">
+            <summary>
+            Signs binary data with the corresponding private key.
+            </summary>
+            <param name="Address">Address of entity on which the legal identity are registered.</param>
+            <param name="Data">Binary data to sign-</param>
+            <returns>Digital signature.</returns>
+        </member>
         <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.ValidateSignature(System.String,System.Byte[],System.Byte[],Waher.Networking.XMPP.Contracts.LegalIdentityEventHandler,System.Object)">
             <summary>
             Validates a signature of binary data.

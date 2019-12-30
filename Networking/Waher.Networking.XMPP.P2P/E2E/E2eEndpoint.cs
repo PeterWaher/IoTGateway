@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Xml;
-using Waher.Networking.XMPP.P2P.SymmetricCiphers;
 
 namespace Waher.Networking.XMPP.P2P.E2E
 {
@@ -195,12 +194,27 @@ namespace Waher.Networking.XMPP.P2P.E2E
         public abstract byte[] Sign(byte[] Data);
 
         /// <summary>
+        /// Signs binary data using the local private key.
+        /// </summary>
+        /// <param name="Data">Binary data</param>
+        /// <returns>Digital signature.</returns>
+        public abstract byte[] Sign(Stream Data);
+
+        /// <summary>
         /// Verifies a signature.
         /// </summary>
         /// <param name="Data">Data that is signed.</param>
         /// <param name="Signature">Digital signature.</param>
         /// <returns>If signature is valid.</returns>
         public abstract bool Verify(byte[] Data, byte[] Signature);
+
+        /// <summary>
+        /// Verifies a signature.
+        /// </summary>
+        /// <param name="Data">Data that is signed.</param>
+        /// <param name="Signature">Digital signature.</param>
+        /// <returns>If signature is valid.</returns>
+        public abstract bool Verify(Stream Data, byte[] Signature);
 
         /// <summary>
         /// If endpoint is considered safe (i.e. there are no suspected backdoors)

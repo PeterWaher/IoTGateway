@@ -390,12 +390,33 @@ namespace Waher.Networking.XMPP.P2P.E2E
         }
 
         /// <summary>
+        /// Signs binary data using the local private key.
+        /// </summary>
+        /// <param name="Data">Binary data</param>
+        /// <returns>Digital signature.</returns>
+        public override byte[] Sign(Stream Data)
+        {
+            return this.rsa.SignData(Data, HashAlgorithmName.SHA256, RSASignaturePadding.Pss);
+        }
+
+        /// <summary>
         /// Verifies a signature.
         /// </summary>
         /// <param name="Data">Data that is signed.</param>
         /// <param name="Signature">Digital signature.</param>
         /// <returns>If signature is valid.</returns>
         public override bool Verify(byte[] Data, byte[] Signature)
+        {
+            return RsaEndpoint.Verify(Data, Signature, this.keySize, this.modulus, this.exponent);
+        }
+
+        /// <summary>
+        /// Verifies a signature.
+        /// </summary>
+        /// <param name="Data">Data that is signed.</param>
+        /// <param name="Signature">Digital signature.</param>
+        /// <returns>If signature is valid.</returns>
+        public override bool Verify(Stream Data, byte[] Signature)
         {
             return RsaEndpoint.Verify(Data, Signature, this.keySize, this.modulus, this.exponent);
         }
@@ -430,10 +451,59 @@ namespace Waher.Networking.XMPP.P2P.E2E
         /// <param name="Data">Data that is signed.</param>
         /// <param name="Signature">Signature</param>
         /// <param name="KeySize">RSA key size</param>
+        /// <param name="PublicKey">Public key.</param>
+        /// <returns></returns>
+        public static bool Verify(Stream Data, byte[] Signature, int KeySize, byte[] PublicKey)
+        {
+            int c = KeySize >> 3;
+            int d = PublicKey.Length - c;
+            if (d <= 0)
+                throw new ArgumentException("Invalid public key.", nameof(PublicKey));
+
+            byte[] Modulus = new byte[c];
+            byte[] Exponent = new byte[d];
+
+            Array.Copy(PublicKey, 0, Modulus, 0, c);
+            Array.Copy(PublicKey, c, Exponent, 0, d);
+
+            return Verify(Data, Signature, KeySize, Modulus, Exponent);
+        }
+
+        /// <summary>
+        /// Verifies a signature.
+        /// </summary>
+        /// <param name="Data">Data that is signed.</param>
+        /// <param name="Signature">Signature</param>
+        /// <param name="KeySize">RSA key size</param>
         /// <param name="Modulus">Modulus</param>
         /// <param name="Exponent">Exponent</param>
         /// <returns></returns>
         public static bool Verify(byte[] Data, byte[] Signature, int KeySize, byte[] Modulus, byte[] Exponent)
+        {
+            using (RSA Rsa = CreateRSA(KeySize))
+            {
+                RSAParameters P = new RSAParameters()
+                {
+                    Modulus = Modulus,
+                    Exponent = Exponent
+                };
+
+                Rsa.ImportParameters(P);
+
+                return Rsa.VerifyData(Data, Signature, HashAlgorithmName.SHA256, RSASignaturePadding.Pss);
+            }
+        }
+
+        /// <summary>
+        /// Verifies a signature.
+        /// </summary>
+        /// <param name="Data">Data that is signed.</param>
+        /// <param name="Signature">Signature</param>
+        /// <param name="KeySize">RSA key size</param>
+        /// <param name="Modulus">Modulus</param>
+        /// <param name="Exponent">Exponent</param>
+        /// <returns></returns>
+        public static bool Verify(Stream Data, byte[] Signature, int KeySize, byte[] Modulus, byte[] Exponent)
         {
             using (RSA Rsa = CreateRSA(KeySize))
             {

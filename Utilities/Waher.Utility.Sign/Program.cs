@@ -230,8 +230,10 @@ namespace Waher.Utility.Sign
 
                             foreach (string FileName in FileNames)
                             {
-                                Bin = File.ReadAllBytes(FileName);
-                                Bin = Endpoint.Sign(Bin);
+                                using (FileStream f = File.OpenRead(FileName))
+                                {
+                                    Bin = Endpoint.Sign(f);
+                                }
                                 s = Convert.ToBase64String(Bin);
 
                                 if (Output is null)

@@ -2323,6 +2323,14 @@ namespace Waher.Persistence.Serialization
 		}
 
 		/// <summary>
+		/// If archiving time is dynamic.
+		/// </summary>
+		public bool ArchiveTimeDynamic
+		{
+			get { return !(this.archiveProperty is null && this.archiveField is null); }
+		}
+
+		/// <summary>
 		/// If names are normalized or not.
 		/// </summary>
 		public bool NormalizedNames

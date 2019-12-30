@@ -1,3 +1,4 @@
+using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Waher.Security.SHA3.Test
@@ -50,7 +51,22 @@ namespace Waher.Security.SHA3.Test
         }
 
         [TestMethod]
-        public void Test_03_Performance()
+        public void Test_03_1600_bits_Stream()
+        {
+            SHAKE256 H = new SHAKE256(4096);
+            byte[] Input = new byte[200];
+            int j;
+
+            for (j = 0; j < 200; j++)
+                Input[j] = 0xa3;
+
+            byte[] Digest = H.ComputeVariable(new MemoryStream(Input));
+            string s = Hashes.BinaryToString(Digest);
+            Assert.AreEqual("cd8a920ed141aa0407a22d59288652e9d9f1a7ee0c1e7c1ca699424da84a904d2d700caae7396ece96604440577da4f3aa22aeb8857f961c4cd8e06f0ae6610b1048a7f64e1074cd629e85ad7566048efc4fb500b486a3309a8f26724c0ed628001a1099422468de726f1061d99eb9e93604d5aa7467d4b1bd6484582a384317d7f47d750b8f5499512bb85a226c4243556e696f6bd072c5aa2d9b69730244b56853d16970ad817e213e470618178001c9fb56c54fefa5fee67d2da524bb3b0b61ef0e9114a92cdbb6cccb98615cfe76e3510dd88d1cc28ff99287512f24bfafa1a76877b6f37198e3a641c68a7c42d45fa7acc10dae5f3cefb7b735f12d4e589f7a456e78c0f5e4c4471fffa5e4fa0514ae974d8c2648513b5db494cea847156d277ad0e141c24c7839064cd08851bc2e7ca109fd4e251c35bb0a04fb05b364ff8c4d8b59bc303e25328c09a882e952518e1a8ae0ff265d61c465896973d7490499dc639fb8502b39456791b1b6ec5bcc5d9ac36a6df622a070d43fed781f5f149f7b62675e7d1a4d6dec48c1c7164586eae06a51208c0b791244d307726505c3ad4b26b6822377257aa152037560a739714a3ca79bd605547c9b78dd1f596f2d4f1791bc689a0e9b799a37339c04275733740143ef5d2b58b96a363d4e08076a1a9d7846436e4dca5728b6f760eef0ca92bf0be5615e96959d767197a0beeb", s);
+        }
+
+        [TestMethod]
+        public void Test_04_Performance()
         {
             byte[] Data = new byte[80 * 1024 * 1024];
             SHAKE256 H = new SHAKE256(1024);

@@ -7,7 +7,7 @@ namespace Waher.Security.SHA3.Test
     /// Tests taken from https://en.wikipedia.org/wiki/SHA-3, retrieved 2019-05-07
     /// </summary>
 	[TestClass]
-	public class SimpleTests
+	public class ArrayTests
 	{
 		[TestMethod]
 		public void Test_01_SHA3_224()

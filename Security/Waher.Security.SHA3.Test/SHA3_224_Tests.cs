@@ -1,3 +1,4 @@
+using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Waher.Security.SHA3.Test
@@ -50,7 +51,22 @@ namespace Waher.Security.SHA3.Test
         }
 
         [TestMethod]
-        public void Test_03_Performance()
+        public void Test_03_1600_bits_Stream()
+        {
+            SHA3_224 H = new SHA3_224();
+            byte[] Input = new byte[200];
+            int j;
+
+            for (j = 0; j < 200; j++)
+                Input[j] = 0xa3;
+
+            byte[] Digest = H.ComputeVariable(new MemoryStream(Input));
+            string s = Hashes.BinaryToString(Digest);
+            Assert.AreEqual("9376816aba503f72f96ce7eb65ac095deee3be4bf9bbc2a1cb7e11e0", s);
+        }
+
+        [TestMethod]
+        public void Test_04_Performance()
         {
             byte[] Data = new byte[80 * 1024 * 1024];
             SHA3_224 H = new SHA3_224();

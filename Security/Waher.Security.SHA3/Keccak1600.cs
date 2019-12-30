@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 
 namespace Waher.Security.SHA3
 {
@@ -415,6 +416,67 @@ namespace Waher.Security.SHA3
             byte[] Z = new byte[this.dByteSize];
 
             Pos = 0;
+            while (true)
+            {
+                i = Math.Min(r8, this.dByteSize - Pos);
+                Array.Copy(S, 0, Z, Pos, i);
+                Pos += i;
+
+                if (Pos >= this.dByteSize)
+                    return Z;
+
+                S = this.ComputeFixed(S);
+            }
+        }
+
+        /// <summary>
+        /// Computes the SPONGE function, as defined in section 4 of NIST FIPS 202.
+        /// </summary>
+        /// <param name="N">Input string of variable length.</param>
+        /// <returns>Output string of fixed length.</returns>
+        public byte[] ComputeVariable(Stream N)
+        {
+            this.reportStates = !(this.NewState is null);
+
+            long Len = N.Length;
+            long m = Len << 3;
+            long nm1 = m / r;
+            byte[] S = new byte[200];
+            byte[] r8Buf = new byte[this.r8];
+            int i, k;
+
+            N.Position = 0;
+
+            for (i = 0; i < nm1; i++)
+            {
+                if (N.Read(r8Buf, 0, this.r8) != this.r8)
+                    throw new IOException("Unable to read from stream.");
+
+                for (k = 0; k < this.r8; k++)
+                    S[k] ^= r8Buf[k];
+
+                S = this.ComputeFixed(S);
+            }
+
+            int Rest = (int)(Len - N.Position);
+            if (Len > 0)
+            {
+                if (N.Read(r8Buf, 0, Rest) != Rest)
+                    throw new IOException("Unable to read from stream.");
+
+                for (k = 0; k < Rest; k++)
+                    S[k] ^= r8Buf[k];
+            }
+            else
+                k = 0;
+
+            S[k] ^= this.suffix;
+            S[this.r8m1] ^= 0x80;   // Last bit of pad10*1
+            S = this.ComputeFixed(S);
+
+            byte[] Z = new byte[this.dByteSize];
+
+            int Pos = 0;
             while (true)
             {
                 i = Math.Min(r8, this.dByteSize - Pos);

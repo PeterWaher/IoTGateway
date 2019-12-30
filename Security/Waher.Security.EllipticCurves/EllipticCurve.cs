@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Numerics;
 using System.Security.Cryptography;
 using System.Text;
@@ -9,7 +10,7 @@ namespace Waher.Security.EllipticCurves
 	/// <summary>
 	/// Abstract base class for elliptic curves.
 	/// </summary>
-	public abstract class EllipticCurve
+	public abstract class EllipticCurve : ISignatureAlgorithm
 	{
 		/// <summary>
 		/// http://waher.se/Schema/EllipticCurves.xsd
@@ -381,7 +382,7 @@ namespace Waher.Security.EllipticCurves
 		/// The derived key, as a byte array of equal size as the order of the prime field, ordered by most significant byte first,
 		/// is passed on to the hash function before being returned as the shared key.</param>
 		/// <returns>Shared secret.</returns>
-		public virtual byte[] GetSharedKey(byte[] RemotePublicKey, HashFunction HashFunction)
+		public virtual byte[] GetSharedKey(byte[] RemotePublicKey, HashFunctionArray HashFunction)
 		{
 			return ECDH.GetSharedKey(this.PrivateKey, RemotePublicKey, HashFunction, this);
 		}
@@ -394,6 +395,13 @@ namespace Waher.Security.EllipticCurves
 		public abstract byte[] Sign(byte[] Data);
 
 		/// <summary>
+		/// Creates a signature of <paramref name="Data"/> using the ECDSA algorithm.
+		/// </summary>
+		/// <param name="Data">Payload to sign.</param>
+		/// <returns>Signature.</returns>
+		public abstract byte[] Sign(Stream Data);
+
+		/// <summary>
 		/// Verifies a signature of <paramref name="Data"/> made by the ECDSA algorithm.
 		/// </summary>
 		/// <param name="Data">Payload to sign.</param>
@@ -401,6 +409,15 @@ namespace Waher.Security.EllipticCurves
 		/// <param name="Signature">Signature</param>
 		/// <returns>If the signature is valid.</returns>
 		public abstract bool Verify(byte[] Data, byte[] PublicKey, byte[] Signature);
+
+		/// <summary>
+		/// Verifies a signature of <paramref name="Data"/> made by the ECDSA algorithm.
+		/// </summary>
+		/// <param name="Data">Payload to sign.</param>
+		/// <param name="PublicKey">Public Key of the entity that generated the signature.</param>
+		/// <param name="Signature">Signature</param>
+		/// <returns>If the signature is valid.</returns>
+		public abstract bool Verify(Stream Data, byte[] PublicKey, byte[] Signature);
 
 		/// <summary>
 		/// Exports the curve parameters to XML.

@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Security.Cryptography;
+using System.IO;
 using System.Numerics;
 
 namespace Waher.Security.EllipticCurves
@@ -66,7 +66,7 @@ namespace Waher.Security.EllipticCurves
         /// <summary>
         /// Hash function to use in signatures.
         /// </summary>
-        public virtual Security.HashFunction HashFunction => Security.HashFunction.SHA256;
+        public virtual HashFunction HashFunction => HashFunction.SHA256;
 
         /// <summary>
         /// Creates a signature of <paramref name="Data"/> using the ECDSA algorithm.
@@ -81,6 +81,18 @@ namespace Waher.Security.EllipticCurves
         }
 
         /// <summary>
+        /// Creates a signature of <paramref name="Data"/> using the ECDSA algorithm.
+        /// </summary>
+        /// <param name="Data">Payload to sign.</param>
+        /// <returns>Signature.</returns>
+        public override byte[] Sign(Stream Data)
+        {
+            return ECDSA.Sign(Data, this.PrivateKey,
+                Bin => Hashes.ComputeHash(this.HashFunction, Bin),
+                this.orderBytes, this.msbOrderMask, this);
+        }
+
+        /// <summary>
         /// Verifies a signature of <paramref name="Data"/> made by the ECDSA algorithm.
         /// </summary>
         /// <param name="Data">Payload to sign.</param>
@@ -88,6 +100,20 @@ namespace Waher.Security.EllipticCurves
         /// <param name="Signature">Signature</param>
         /// <returns>If the signature is valid.</returns>
         public override bool Verify(byte[] Data, byte[] PublicKey, byte[] Signature)
+        {
+            return ECDSA.Verify(Data, PublicKey,
+                Bin => Hashes.ComputeHash(this.HashFunction, Bin),
+                this.orderBytes, this.msbOrderMask, this, Signature);
+        }
+
+        /// <summary>
+        /// Verifies a signature of <paramref name="Data"/> made by the ECDSA algorithm.
+        /// </summary>
+        /// <param name="Data">Payload to sign.</param>
+        /// <param name="PublicKey">Public Key of the entity that generated the signature.</param>
+        /// <param name="Signature">Signature</param>
+        /// <returns>If the signature is valid.</returns>
+        public override bool Verify(Stream Data, byte[] PublicKey, byte[] Signature)
         {
             return ECDSA.Verify(Data, PublicKey,
                 Bin => Hashes.ComputeHash(this.HashFunction, Bin),

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.IO;
 using System.Numerics;
 
 namespace Waher.Security.EllipticCurves
@@ -175,6 +176,17 @@ namespace Waher.Security.EllipticCurves
         }
 
         /// <summary>
+        /// Creates a signature of <paramref name="Data"/> using the XEdDSA algorithm.
+        /// </summary>
+        /// <param name="Data">Payload to sign.</param>
+        /// <returns>Signature.</returns>
+        public override byte[] Sign(Stream Data)
+        {
+            throw new NotSupportedException("Signatures not supported.");
+            //return XEdDSA.Sign(Data, this.PrivateKey, Hashes.ComputeSHA512Hash, this);
+        }
+
+        /// <summary>
         /// Verifies a signature of <paramref name="Data"/> made by the EdDSA algorithm.
         /// </summary>
         /// <param name="Data">Payload to sign.</param>
@@ -182,6 +194,20 @@ namespace Waher.Security.EllipticCurves
         /// <param name="Signature">Signature</param>
         /// <returns>If the signature is valid.</returns>
         public override bool Verify(byte[] Data, byte[] PublicKey, byte[] Signature)
+        {
+            throw new NotSupportedException("Signatures not supported.");
+            //return XEdDSA.Verify(Data, PublicKey, Hashes.ComputeSHA512Hash, this,
+            //    Signature, 448, 446);
+        }
+
+        /// <summary>
+        /// Verifies a signature of <paramref name="Data"/> made by the EdDSA algorithm.
+        /// </summary>
+        /// <param name="Data">Payload to sign.</param>
+        /// <param name="PublicKey">Public Key of the entity that generated the signature.</param>
+        /// <param name="Signature">Signature</param>
+        /// <returns>If the signature is valid.</returns>
+        public override bool Verify(Stream Data, byte[] PublicKey, byte[] Signature)
         {
             throw new NotSupportedException("Signatures not supported.");
             //return XEdDSA.Verify(Data, PublicKey, Hashes.ComputeSHA512Hash, this,

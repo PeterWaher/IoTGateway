@@ -20,7 +20,7 @@ namespace Waher.Security.EllipticCurves
         /// <param name="Curve">Elliptic curve used.</param>
         /// <returns>Shared secret.</returns>
         public static byte[] GetSharedKey(byte[] LocalPrivateKey, byte[] RemotePublicKey, 
-            HashFunction HashFunction, EllipticCurve Curve)
+            HashFunctionArray HashFunction, EllipticCurve Curve)
         {
             PointOnCurve PublicKey = Curve.Decode(RemotePublicKey);
             PointOnCurve P = Curve.ScalarMultiplication(LocalPrivateKey, PublicKey, true);

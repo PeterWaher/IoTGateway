@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Numerics;
 using System.Text;
 using Waher.Security.SHA3;
@@ -107,6 +107,17 @@ namespace Waher.Security.EllipticCurves
             return EdDSA.Sign(Data, this.PrivateKey, this.AdditionalInfo, this.H_dom4, this);
         }
 
+
+        /// <summary>
+        /// Creates a signature of <paramref name="Data"/> using the EdDSA algorithm.
+        /// </summary>
+        /// <param name="Data">Payload to sign.</param>
+        /// <returns>Signature.</returns>
+        public override byte[] Sign(Stream Data)
+        {
+            return EdDSA.Sign(Data, this.PrivateKey, this.AdditionalInfo, this.H_dom4, this);
+        }
+
         /// <summary>
         /// Verifies a signature of <paramref name="Data"/> made by the EdDSA algorithm.
         /// </summary>
@@ -115,6 +126,18 @@ namespace Waher.Security.EllipticCurves
         /// <param name="Signature">Signature</param>
         /// <returns>If the signature is valid.</returns>
         public override bool Verify(byte[] Data, byte[] PublicKey, byte[] Signature)
+        {
+            return EdDSA.Verify(Data, PublicKey, this.H_dom4, this, Signature);
+        }
+
+        /// <summary>
+        /// Verifies a signature of <paramref name="Data"/> made by the EdDSA algorithm.
+        /// </summary>
+        /// <param name="Data">Payload to sign.</param>
+        /// <param name="PublicKey">Public Key of the entity that generated the signature.</param>
+        /// <param name="Signature">Signature</param>
+        /// <returns>If the signature is valid.</returns>
+        public override bool Verify(Stream Data, byte[] PublicKey, byte[] Signature)
         {
             return EdDSA.Verify(Data, PublicKey, this.H_dom4, this, Signature);
         }
@@ -130,6 +153,22 @@ namespace Waher.Security.EllipticCurves
             Array.Copy(Data, 0, Bin, 10, c);
 
             return this.shake256_114.ComputeVariable(Bin);
+        }
+
+        private byte[] H_dom4(Stream Data)
+        {
+            using (TemporaryFile TempFile = new TemporaryFile())
+            {
+                TempFile.Write(preamble, 0, 8);
+                TempFile.WriteByte(0);              // x=phflag=0
+                TempFile.WriteByte(0);              // y=context=empty string
+
+                Data.Position = 0;
+                Data.CopyTo(TempFile);
+
+                TempFile.Position = 0;
+                return this.shake256_114.ComputeVariable(TempFile);
+            }
         }
 
         private static readonly byte[] preamble = Encoding.ASCII.GetBytes("SigEd448");

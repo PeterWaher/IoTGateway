@@ -2590,7 +2590,7 @@
           "Waher.Runtime.Inventory": "1.0.11"
         }
       },
-      "Waher.Security/1.0.2": {
+      "Waher.Security/1.0.3": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -5167,7 +5167,7 @@
           "Waher.Runtime.Inventory": "1.0.11"
         }
       },
-      "Waher.Security/1.0.2": {
+      "Waher.Security/1.0.3": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -7780,7 +7780,7 @@
           "Waher.Runtime.Inventory": "1.0.11"
         }
       },
-      "Waher.Security/1.0.2": {
+      "Waher.Security/1.0.3": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -10366,7 +10366,7 @@
           "Waher.Runtime.Inventory": "1.0.11"
         }
       },
-      "Waher.Security/1.0.2": {
+      "Waher.Security/1.0.3": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -12988,7 +12988,7 @@
           "Waher.Runtime.Inventory": "1.0.11"
         }
       },
-      "Waher.Security/1.0.2": {
+      "Waher.Security/1.0.3": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -15574,7 +15574,7 @@
           "Waher.Runtime.Inventory": "1.0.11"
         }
       },
-      "Waher.Security/1.0.2": {
+      "Waher.Security/1.0.3": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -18196,7 +18196,7 @@
           "Waher.Runtime.Inventory": "1.0.11"
         }
       },
-      "Waher.Security/1.0.2": {
+      "Waher.Security/1.0.3": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -28181,7 +28181,7 @@
       "path": "../../Script/Waher.Script/Waher.Script.csproj",
       "msbuildProject": "../../Script/Waher.Script/Waher.Script.csproj"
     },
-    "Waher.Security/1.0.2": {
+    "Waher.Security/1.0.3": {
       "type": "project",
       "path": "../../Security/Waher.Security/Waher.Security.csproj",
       "msbuildProject": "../../Security/Waher.Security/Waher.Security.csproj"

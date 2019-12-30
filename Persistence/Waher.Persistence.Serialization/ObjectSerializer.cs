@@ -2323,7 +2323,7 @@ namespace Waher.Persistence.Serialization
 		}
 
 		/// <summary>
-		/// If archiving time is dynamic.
+		/// If each object contains the information for how long time it can be archived.
 		/// </summary>
 		public bool ArchiveTimeDynamic
 		{

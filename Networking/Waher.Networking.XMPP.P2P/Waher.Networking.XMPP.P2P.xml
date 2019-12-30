@@ -354,7 +354,22 @@
             <param name="Data">Binary data</param>
             <returns>Digital signature.</returns>
         </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.E2eEndpoint.Sign(System.IO.Stream)">
+            <summary>
+            Signs binary data using the local private key.
+            </summary>
+            <param name="Data">Binary data</param>
+            <returns>Digital signature.</returns>
+        </member>
         <member name="M:Waher.Networking.XMPP.P2P.E2E.E2eEndpoint.Verify(System.Byte[],System.Byte[])">
+            <summary>
+            Verifies a signature.
+            </summary>
+            <param name="Data">Data that is signed.</param>
+            <param name="Signature">Digital signature.</param>
+            <returns>If signature is valid.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.E2eEndpoint.Verify(System.IO.Stream,System.Byte[])">
             <summary>
             Verifies a signature.
             </summary>
@@ -623,6 +638,13 @@
             <param name="Data">Binary data</param>
             <returns>Digital signature.</returns>
         </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.EllipticCurveEndpoint.Sign(System.IO.Stream)">
+            <summary>
+            Signs binary data using the local private key.
+            </summary>
+            <param name="Data">Binary data</param>
+            <returns>Digital signature.</returns>
+        </member>
         <member name="M:Waher.Networking.XMPP.P2P.E2E.EllipticCurveEndpoint.Verify(System.Byte[],System.Byte[],System.Byte[])">
             <summary>
             Verifies a signature.
@@ -632,7 +654,24 @@
             <param name="Signature">Digital signature.</param>
             <returns>If signature is valid.</returns>
         </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.EllipticCurveEndpoint.Verify(System.IO.Stream,System.Byte[],System.Byte[])">
+            <summary>
+            Verifies a signature.
+            </summary>
+            <param name="Data">Data that is signed.</param>
+            <param name="PublicKey">Public key</param>
+            <param name="Signature">Digital signature.</param>
+            <returns>If signature is valid.</returns>
+        </member>
         <member name="M:Waher.Networking.XMPP.P2P.E2E.EllipticCurveEndpoint.Verify(System.Byte[],System.Byte[])">
+            <summary>
+            Verifies a signature.
+            </summary>
+            <param name="Data">Data that is signed.</param>
+            <param name="Signature">Digital signature.</param>
+            <returns>If signature is valid.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.EllipticCurveEndpoint.Verify(System.IO.Stream,System.Byte[])">
             <summary>
             Verifies a signature.
             </summary>
@@ -1212,7 +1251,22 @@
             <param name="Data">Binary data</param>
             <returns>Digital signature.</returns>
         </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaEndpoint.Sign(System.IO.Stream)">
+            <summary>
+            Signs binary data using the local private key.
+            </summary>
+            <param name="Data">Binary data</param>
+            <returns>Digital signature.</returns>
+        </member>
         <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaEndpoint.Verify(System.Byte[],System.Byte[])">
+            <summary>
+            Verifies a signature.
+            </summary>
+            <param name="Data">Data that is signed.</param>
+            <param name="Signature">Digital signature.</param>
+            <returns>If signature is valid.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaEndpoint.Verify(System.IO.Stream,System.Byte[])">
             <summary>
             Verifies a signature.
             </summary>
@@ -1230,7 +1284,28 @@
             <param name="PublicKey">Public key.</param>
             <returns></returns>
         </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaEndpoint.Verify(System.IO.Stream,System.Byte[],System.Int32,System.Byte[])">
+            <summary>
+            Verifies a signature.
+            </summary>
+            <param name="Data">Data that is signed.</param>
+            <param name="Signature">Signature</param>
+            <param name="KeySize">RSA key size</param>
+            <param name="PublicKey">Public key.</param>
+            <returns></returns>
+        </member>
         <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaEndpoint.Verify(System.Byte[],System.Byte[],System.Int32,System.Byte[],System.Byte[])">
+            <summary>
+            Verifies a signature.
+            </summary>
+            <param name="Data">Data that is signed.</param>
+            <param name="Signature">Signature</param>
+            <param name="KeySize">RSA key size</param>
+            <param name="Modulus">Modulus</param>
+            <param name="Exponent">Exponent</param>
+            <returns></returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaEndpoint.Verify(System.IO.Stream,System.Byte[],System.Int32,System.Byte[],System.Byte[])">
             <summary>
             Verifies a signature.
             </summary>

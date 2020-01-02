@@ -91,6 +91,7 @@ namespace Waher.Networking.HTTP
 		private int? upgradePort = null;
 		private bool closed = false;
 #endif
+		private bool adaptToNetworkChanges;
 
 		#region Constructors
 
@@ -100,9 +101,9 @@ namespace Waher.Networking.HTTP
 		/// <param name="Sniffers">Sniffers.</param>
 		public HttpServer(params ISniffer[] Sniffers)
 #if WINDOWS_UWP
-			: this(new int[] { DefaultHttpPort }, Sniffers)
+			: this(new int[] { DefaultHttpPort }, false, Sniffers)
 #else
-			: this(new int[] { DefaultHttpPort }, null, null, Sniffers)
+			: this(new int[] { DefaultHttpPort }, null, null, false, Sniffers)
 #endif
 		{
 		}
@@ -114,9 +115,9 @@ namespace Waher.Networking.HTTP
 		/// <param name="Sniffers">Sniffers.</param>
 		public HttpServer(int HttpPort, params ISniffer[] Sniffers)
 #if WINDOWS_UWP
-			: this(new int[] { HttpPort }, Sniffers)
+			: this(new int[] { HttpPort }, false, Sniffers)
 #else
-			: this(new int[] { HttpPort }, null, null, Sniffers)
+			: this(new int[] { HttpPort }, null, null, false, Sniffers)
 #endif
 		{
 		}
@@ -128,7 +129,7 @@ namespace Waher.Networking.HTTP
 		/// <param name="ServerCertificate">Server certificate identifying the domain of the server.</param>
 		/// <param name="Sniffers">Sniffers.</param>
 		public HttpServer(X509Certificate ServerCertificate, params ISniffer[] Sniffers)
-			: this(new int[] { DefaultHttpPort }, new int[] { DefaultHttpsPort }, ServerCertificate, Sniffers)
+			: this(new int[] { DefaultHttpPort }, new int[] { DefaultHttpsPort }, ServerCertificate, false, Sniffers)
 		{
 		}
 
@@ -140,7 +141,7 @@ namespace Waher.Networking.HTTP
 		/// <param name="ServerCertificate">Server certificate identifying the domain of the server.</param>
 		/// <param name="Sniffers">Sniffers.</param>
 		public HttpServer(int HttpPort, int HttpsPort, X509Certificate ServerCertificate, params ISniffer[] Sniffers)
-			: this(new int[] { HttpPort }, new int[] { HttpsPort }, ServerCertificate, Sniffers)
+			: this(new int[] { HttpPort }, new int[] { HttpsPort }, ServerCertificate, false, Sniffers)
 		{
 		}
 #endif
@@ -152,6 +153,17 @@ namespace Waher.Networking.HTTP
 		/// <param name="HttpPorts">HTTP Ports</param>
 		/// <param name="Sniffers">Sniffers.</param>
 		public HttpServer(int[] HttpPorts, params ISniffer[] Sniffers)
+			: this(HttpPorts, false, Sniffers)
+		{
+		}
+
+		/// <summary>
+		/// Implements an HTTPS server.
+		/// </summary>
+		/// <param name="HttpPorts">HTTP Ports</param>
+		/// <param name="AdaptToNetworkChanges">If the server is to adapt to network changes automatically.</param>
+		/// <param name="Sniffers">Sniffers.</param>
+		public HttpServer(int[] HttpPorts, bool AdaptToNetworkChanges, params ISniffer[] Sniffers)
 #else
 		/// <summary>
 		/// Implements an HTTPS server.
@@ -161,6 +173,20 @@ namespace Waher.Networking.HTTP
 		/// <param name="HttpsPorts">HTTPS Ports</param>
 		/// <param name="ServerCertificate">Server certificate identifying the domain of the server.</param>
 		public HttpServer(int[] HttpPorts, int[] HttpsPorts, X509Certificate ServerCertificate, params ISniffer[] Sniffers)
+			: this(HttpPorts, HttpsPorts, ServerCertificate, false, Sniffers)
+		{
+		}
+
+		/// <summary>
+		/// Implements an HTTPS server.
+		/// </summary>
+		/// <param name="HttpPorts">HTTP Ports</param>
+		/// <param name="HttpsPorts">HTTPS Ports</param>
+		/// <param name="ServerCertificate">Server certificate identifying the domain of the server.</param>
+		/// <param name="AdaptToNetworkChanges">If the server is to adapt to network changes automatically.</param>
+		/// <param name="Sniffers">Sniffers.</param>
+		public HttpServer(int[] HttpPorts, int[] HttpsPorts, X509Certificate ServerCertificate, bool AdaptToNetworkChanges, 
+			params ISniffer[] Sniffers)
 #endif
 			: base(Sniffers)
 		{
@@ -172,24 +198,78 @@ namespace Waher.Networking.HTTP
 			this.currentRequests = new Cache<HttpRequest, RequestInfo>(int.MaxValue, TimeSpan.MaxValue, this.requestTimeout);
 			this.currentRequests.Removed += CurrentRequests_Removed;
 			this.lastStat = DateTime.Now;
+			this.adaptToNetworkChanges = AdaptToNetworkChanges;
 
 			this.httpPorts = new int[0];
 
 #if WINDOWS_UWP
 			Task _ = this.AddHttpPorts(HttpPorts);
-			NetworkInformation.NetworkStatusChanged += NetworkChange_NetworkAddressChanged;
+
+			if (this.adaptToNetworkChanges)
+				NetworkInformation.NetworkStatusChanged += NetworkChange_NetworkAddressChanged;
 #else
 			this.AddHttpPorts(HttpPorts);
 			this.httpsPorts = new int[0];
 			this.AddHttpsPorts(HttpsPorts);
-			NetworkChange.NetworkAddressChanged += this.NetworkChange_NetworkAddressChanged;
+
+			if (this.adaptToNetworkChanges)
+				NetworkChange.NetworkAddressChanged += this.NetworkChange_NetworkAddressChanged;
 #endif
 		}
 
 #if WINDOWS_UWP
-		private async void NetworkChange_NetworkAddressChanged(object sender)
+		private void NetworkChange_NetworkAddressChanged(object sender)
+		{
+			Task _ = this.NetworkChanged();
+		}
+
+		/// <summary>
+		/// Adapts the server to changes in the network. This method can be called automatically by calling the constructor accordingly.
+		/// </summary>
+		public async Task NetworkChanged()
 #else
 		private void NetworkChange_NetworkAddressChanged(object sender, EventArgs e)
+		{
+			this.NetworkChanged();
+		}
+
+		/// <summary>
+		/// If the server is to adapt to network changes automatically.
+		/// </summary>
+		public bool AdaptToNetworkChanges
+		{
+			get => this.adaptToNetworkChanges;
+
+			set
+			{
+				if (value != this.adaptToNetworkChanges)
+				{
+					this.adaptToNetworkChanges = value;
+
+					if (value)
+					{
+#if WINDOWS_UWP
+						NetworkInformation.NetworkStatusChanged += NetworkChange_NetworkAddressChanged;
+#else
+						NetworkChange.NetworkAddressChanged += this.NetworkChange_NetworkAddressChanged;
+#endif
+					}
+					else
+					{
+#if WINDOWS_UWP
+						NetworkInformation.NetworkStatusChanged -= NetworkChange_NetworkAddressChanged;
+#else
+						NetworkChange.NetworkAddressChanged -= this.NetworkChange_NetworkAddressChanged;
+#endif
+					}
+				}
+			}
+		}
+
+		/// <summary>
+		/// Adapts the server to changes in the network. This method can be called automatically by calling the constructor accordingly.
+		/// </summary>
+		public void NetworkChanged()
 #endif
 		{
 			try
@@ -362,7 +442,7 @@ namespace Waher.Networking.HTTP
 									catch (SocketException)
 									{
 										this.failedPorts[HttpPort] = true;
-										Log.Error("Unable to open port for listening.",
+										Log.Error("Unable to open HTTP port for listening.",
 											new KeyValuePair<string, object>("Address", UnicastAddress.Address.ToString()),
 											new KeyValuePair<string, object>("Port", HttpPort));
 									}
@@ -465,7 +545,7 @@ namespace Waher.Networking.HTTP
 									catch (SocketException)
 									{
 										this.failedPorts[HttpsPort] = true;
-										Log.Error("Unable to open port for listening.",
+										Log.Error("Unable to open HTTPS port for listening.",
 											new KeyValuePair<string, object>("Address", UnicastAddress.Address.ToString()),
 											new KeyValuePair<string, object>("Port", HttpsPort));
 									}

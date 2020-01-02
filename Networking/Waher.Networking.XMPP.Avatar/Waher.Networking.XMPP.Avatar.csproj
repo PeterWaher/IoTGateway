@@ -20,7 +20,7 @@
     <FileVersion>1.0.2</FileVersion>
     <Version>1.0.2</Version>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
-    <PackageIcon>Icon.ico</PackageIcon>
+    <PackageIcon>Icon_64x64.png</PackageIcon>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -29,7 +29,7 @@
 
   <ItemGroup>
     <None Remove="Images\DefaultAvatar.png" />
-    <None Include="..\..\Images\Icon.ico">
+    <None Include="..\..\Images\Icon_64x64.png">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>

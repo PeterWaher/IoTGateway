@@ -20,7 +20,7 @@
     <FileVersion>1.0.6</FileVersion>
     <Version>1.0.6</Version>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
-    <PackageIcon>Icon.ico</PackageIcon>
+    <PackageIcon>Icon_64x64.png</PackageIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -35,7 +35,7 @@
     <None Remove="Root\Themes\GothicPeacock\GothicPeacockBanner1900x500.png" />
     <None Remove="Root\Themes\GothicPeacock\GothicPeacockBanner2000x600.png" />
     <None Remove="Waher.Theme.GothicPeacock.manifest" />
-    <None Include="..\..\Images\Icon.ico">
+    <None Include="..\..\Images\Icon_64x64.png">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>

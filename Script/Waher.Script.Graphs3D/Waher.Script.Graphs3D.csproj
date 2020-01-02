@@ -21,7 +21,7 @@
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Script\Waher.Script.Graphs3D\</UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
-    <PackageIcon>Icon.ico</PackageIcon>
+    <PackageIcon>Icon_64x64.png</PackageIcon>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DocumentationFile>bin\Release\netstandard1.3\Waher.Script.Graphs3D.xml</DocumentationFile>
@@ -37,7 +37,7 @@
     <ProjectReference Include="..\Waher.Script\Waher.Script.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\Images\Icon.ico">
+    <None Include="..\..\Images\Icon_64x64.png">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>

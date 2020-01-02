@@ -18,7 +18,7 @@
     <NeutralLanguage>English</NeutralLanguage>
     <AssemblyVersion>1.0.0</AssemblyVersion>
     <FileVersion>1.0.0</FileVersion>
-    <PackageIcon>Icon.ico</PackageIcon>
+    <PackageIcon>Icon_64x64.png</PackageIcon>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -27,7 +27,7 @@
 
   <ItemGroup>
     <None Remove="Language\Waher.Things.Mqtt.en.lng" />
-    <None Include="..\..\Images\Icon.ico">
+    <None Include="..\..\Images\Icon_64x64.png">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>

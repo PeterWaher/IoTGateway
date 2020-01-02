@@ -20,11 +20,11 @@
     <FileVersion>1.0.2</FileVersion>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <Version>1.0.2</Version>
-    <PackageIcon>Icon.ico</PackageIcon>
+    <PackageIcon>Icon_64x64.png</PackageIcon>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\..\Images\Icon.ico">
+    <None Include="..\..\Images\Icon_64x64.png">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>

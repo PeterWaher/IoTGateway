@@ -6,9 +6,9 @@
     <title>Waher.Networking.XMPP.Chat.UWP</title>
     <authors>Peter Waher</authors>
     <owners>Waher Data AB</owners>
-    <licenseUrl>https://github.com/PeterWaher/IoTGateway#license</licenseUrl>
+    <license type="file">Meta\LICENSE.txt</license>
     <projectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Networking/Waher.Networking.XMPP.Chat.UWP</projectUrl>
-    <iconUrl>https://github.com/PeterWaher/IoTGateway/raw/master/Images/Icon.ico</iconUrl>
+    <icon>Meta\Icon_64x64.png</icon>
     <repository type="GitHub" url="https://github.com/PeterWaher/IoTGateway"/>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <description>Implements the XMPP IoT chat extesion.</description>
@@ -34,6 +34,9 @@
     </dependencies>
   </metadata>
   <files>
+    <file src="..\..\Images\Icon_64x64.png" target="Meta" />
+    <file src="..\..\LICENSE.txt" target="Meta" />
+
     <!-- Architecture-independent reference library for use at compile-time. -->
     <file src="bin\Release\Waher.Networking.XMPP.Chat.UWP.dll" target="ref\uap10.0" />
     <file src="bin\Release\Waher.Networking.XMPP.Chat.UWP.pdb" target="ref\uap10.0" />

@@ -22,7 +22,7 @@
     <OldToolsVersion>2.0</OldToolsVersion>
     <Version>1.0.4</Version>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
-    <PackageIcon>Icon.ico</PackageIcon>
+    <PackageIcon>Icon_64x64.png</PackageIcon>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DocumentationFile>bin\Debug\netstandard1.3\Waher.Events.XMPP.xml</DocumentationFile>
@@ -38,7 +38,7 @@
     <ProjectReference Include="..\Waher.Events\Waher.Events.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\Images\Icon.ico">
+    <None Include="..\..\Images\Icon_64x64.png">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>

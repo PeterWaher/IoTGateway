@@ -36,7 +36,7 @@ Edwards448 (Goldilocks)</Description>
     <FileVersion>1.0.7</FileVersion>
     <Version>1.0.7</Version>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
-    <PackageIcon>Icon.ico</PackageIcon>
+    <PackageIcon>Icon_64x64.png</PackageIcon>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -49,7 +49,7 @@ Edwards448 (Goldilocks)</Description>
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\..\Images\Icon.ico">
+    <None Include="..\..\Images\Icon_64x64.png">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>

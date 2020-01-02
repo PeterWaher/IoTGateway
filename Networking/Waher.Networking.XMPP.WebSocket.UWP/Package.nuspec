@@ -6,9 +6,9 @@
     <title>Waher.Networking.XMPP.WebSocket.UWP</title>
     <authors>Peter Waher</authors>
     <owners>Waher Data AB</owners>
-    <licenseUrl>https://github.com/PeterWaher/IoTGateway#license</licenseUrl>
+    <license type="file">Meta\LICENSE.txt</license>
     <projectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Networking/Waher.Networking.XMPP.WebSocket.UWP</projectUrl>
-    <iconUrl>https://github.com/PeterWaher/IoTGateway/raw/master/Images/Icon.ico</iconUrl>
+    <icon>Meta\Icon_64x64.png</icon>
     <repository type="GitHub" url="https://github.com/PeterWaher/IoTGateway"/>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <description>Class library adding the XMPP WebSocket protocol alternative binding mechanism to the XMPP client defined in Waher.Networking.XMPP, as defined in RFC 7395: An Extensible Messaging and Presence Protocol (XMPP) Subprotocol for WebSocket.</description>
@@ -26,6 +26,9 @@
     </dependencies>
   </metadata>
   <files>
+    <file src="..\..\Images\Icon_64x64.png" target="Meta" />
+    <file src="..\..\LICENSE.txt" target="Meta" />
+
     <!-- Architecture-independent reference library for use at compile-time. -->
     <file src="bin\Release\Waher.Networking.XMPP.WebSocket.UWP.dll" target="ref\uap10.0" />
     <file src="bin\Release\Waher.Networking.XMPP.WebSocket.UWP.pdb" target="ref\uap10.0" />

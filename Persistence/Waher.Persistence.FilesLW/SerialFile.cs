@@ -188,12 +188,10 @@ namespace Waher.Persistence.Files
 			int Tail = BlockSize % MinBlockSize;
 
 			if (Tail > 0)
-			{
 				BlockSize += MinBlockSize - Tail;
 
-				if (BlockSize > MinBlockSize)
-					Block = await this.ReadBlock(Position, BlockSize);
-			}
+			if (BlockSize > MinBlockSize)
+				Block = await this.ReadBlock(Position, BlockSize);
 
 			byte[] Data = new byte[c];
 			Array.Copy(Block, Pos, Data, 0, c);
@@ -296,6 +294,24 @@ namespace Waher.Persistence.Files
 			Array.Resize<byte>(ref Hash, 16);
 
 			return Hash;
+		}
+
+		/// <summary>
+		/// Truncates the file.
+		/// </summary>
+		/// <param name="Length">Length at which the file will be truncated.</param>
+		protected async Task Truncate(long Length)
+		{
+			await this.BeginWrite();
+			try
+			{
+				this.file.SetLength(Length);
+				this.file.Position = Length;
+			}
+			finally
+			{
+				await this.EndWrite();
+			}
 		}
 
 		/// <summary>

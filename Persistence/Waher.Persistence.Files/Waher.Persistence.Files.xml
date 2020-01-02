@@ -3308,6 +3308,12 @@
             <param name="Data">Binary data to write.</param>
             <returns>Position of data block.</returns>
         </member>
+        <member name="M:Waher.Persistence.Files.SerialFile.Truncate(System.Int64)">
+            <summary>
+            Truncates the file.
+            </summary>
+            <param name="Length">Length at which the file will be truncated.</param>
+        </member>
         <member name="M:Waher.Persistence.Files.SerialFile.Dispose">
             <summary>
             <see cref="M:System.IDisposable.Dispose"/>

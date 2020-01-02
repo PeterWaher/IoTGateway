@@ -143,7 +143,7 @@ namespace Waher.Persistence.Serialization
 					Type ElementType = Type.GetElementType();
 					Type T = Types.GetType(typeof(ByteArraySerializer).FullName.Replace("ByteArray", "Array"));
 					Type SerializerType = T.MakeGenericType(new Type[] { ElementType });
-					Result = (IObjectSerializer)Activator.CreateInstance(SerializerType, this);
+					Result = (IObjectSerializer)Activator.CreateInstance(SerializerType, this.context);
 				}
 				else if (TI.IsGenericType)
 				{

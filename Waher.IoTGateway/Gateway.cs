@@ -1937,9 +1937,18 @@ namespace Waher.IoTGateway
 			string From;
 			int Port;
 			int i;
+			bool DoLog = false;
+
+			if (Request.Header.TryGetQueryParameter("debug", out string s) && CommonTypes.TryParse(s, out bool b))
+				DoLog = b;
 
 			if (Request.Session is null)
+			{
+				if (DoLog)
+					Log.Debug("No local login: No session.");
+		
 				return;
+			}
 
 			if (!Request.Session.TryGetVariable("from", out Variable v) || string.IsNullOrEmpty(From = v.ValueObject as string))
 				From = string.Empty;
@@ -1951,19 +1960,37 @@ namespace Waher.IoTGateway
 				return;
 			}
 
+			if (DoLog)
+				Log.Debug("Checking for local login from: " + RemoteEndpoint);
+
 			if (RemoteEndpoint.StartsWith("[::1]:"))
 			{
 				if (!int.TryParse(RemoteEndpoint.Substring(6), out Port))
+				{
+					if (DoLog)
+						Log.Debug("Invalid port number: " + RemoteEndpoint);
+
 					return;
+				}
 			}
 			else if (RemoteEndpoint.StartsWith("127."))
 			{
 				i = RemoteEndpoint.IndexOf(':');
 				if (i < 0 || !int.TryParse(RemoteEndpoint.Substring(i + 1), out Port))
+				{
+					if (DoLog)
+						Log.Debug("Invalid port number: " + RemoteEndpoint);
+
 					return;
+				}
 			}
 			else
+			{
+				if (DoLog)
+					Log.Debug("Request not received on loopback interface: " + RemoteEndpoint);
+
 				return;
+			}
 
 #if !MONO
 			if (XmppConfiguration.Instance is null || !XmppConfiguration.Instance.Complete || configuring)
@@ -1994,8 +2021,16 @@ namespace Waher.IoTGateway
 					Proc.Start();
 
 					string Output = Proc.StandardOutput.ReadToEnd();
+					if (DoLog)
+						Log.Debug("Netstat output:\r\n\r\n" + Output);
+
 					if (Proc.ExitCode != 0)
+					{
+						if (DoLog)
+							Log.Debug("Netstat exit code: " + Proc.ExitCode.ToString());
+
 						return;
+					}
 
 					string[] Rows = Output.Split(CommonTypes.CRLF, StringSplitOptions.RemoveEmptyEntries);
 
@@ -2030,12 +2065,18 @@ namespace Waher.IoTGateway
 					}
 				}
 			}
-			catch (HttpException)
+			catch (HttpException ex)
 			{
+				if (DoLog)
+					Log.Critical(ex);
+
 				throw;
 			}
-			catch (Exception)
+			catch (Exception ex)
 			{
+				if (DoLog)
+					Log.Critical(ex);
+
 				return;
 			}
 #endif

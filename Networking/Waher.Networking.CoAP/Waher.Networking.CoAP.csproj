@@ -7,7 +7,7 @@
     <Company>Waher Data AB</Company>
     <Description>Class library for communication using the CoAP protocol. DTLS encryption available through the use of the Waher.Security.DTLS library.</Description>
     <Product>Waher.IoTGateway</Product>
-    <Copyright>Copyright © Waher Data AB 2017-2019. All rights reserved.</Copyright>
+    <Copyright>Copyright © Waher Data AB 2017-2020. All rights reserved.</Copyright>
     <PackageLicenseUrl></PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Networking/Waher.Networking.CoAP</PackageProjectUrl>
     <PackageIconUrl></PackageIconUrl>

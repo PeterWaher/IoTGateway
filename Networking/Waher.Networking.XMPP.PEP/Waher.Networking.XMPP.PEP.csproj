@@ -16,7 +16,7 @@ XEP-0108: User Activity
 XEP-0118: User Tune</Description>
     <AssemblyVersion>1.0.8</AssemblyVersion>
     <FileVersion>1.0.8</FileVersion>
-    <Copyright>Copyright © Waher Data AB 2018-2019. All rights reserved.</Copyright>
+    <Copyright>Copyright © Waher Data AB 2018-2020. All rights reserved.</Copyright>
     <PackageLicenseUrl></PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Networking/Waher.Networking.XMPP.Pep</PackageProjectUrl>
     <PackageIconUrl></PackageIconUrl>

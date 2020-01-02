@@ -7,7 +7,7 @@
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
     <Description>Command-line tool that helps you analyze the difference in clocks between machines compatible with the IEEE XMPP IoT extensions.</Description>
-    <Copyright>Copyright © Waher Data AB 2018-2019. All rights reserved.</Copyright>
+    <Copyright>Copyright © Waher Data AB 2018-2020. All rights reserved.</Copyright>
     <PackageLicenseUrl></PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Utilities/Waher.Utility.AnalyzeClock</PackageProjectUrl>
     <PackageIconUrl></PackageIconUrl>

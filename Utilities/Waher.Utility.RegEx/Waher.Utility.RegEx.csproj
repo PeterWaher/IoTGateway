@@ -7,7 +7,7 @@
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
     <Description>Command-line tool that helps you find content in files using regular expressions, and optionally either export the findings or replace them with something else.</Description>
-    <Copyright>Copyright © Waher Data AB 2019. All rights reserved.</Copyright>
+    <Copyright>Copyright © Waher Data AB 2019-2020. All rights reserved.</Copyright>
     <PackageLicenseUrl></PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Utilities/Waher.Utility.RegEx</PackageProjectUrl>
     <PackageIconUrl></PackageIconUrl>

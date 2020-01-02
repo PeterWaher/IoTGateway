@@ -31,7 +31,7 @@ XEP-0363: HTTP File Upload
 XEP-0377: Spam Reporting
 
 Support for other extensions is provided by separate nuget packages. See: https://waher.se/IoTGateway/Libraries.md#networking</Description>
-    <Copyright>Copyright © Waher Data AB 2015-2019. All rights reserved.</Copyright>
+    <Copyright>Copyright © Waher Data AB 2015-2020. All rights reserved.</Copyright>
     <Authors>Peter Waher</Authors>
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>

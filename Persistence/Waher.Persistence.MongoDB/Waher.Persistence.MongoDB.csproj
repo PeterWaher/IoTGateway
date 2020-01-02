@@ -6,7 +6,7 @@
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <Description>Allows applications using the object database abstraction layer defined in Waher.Persistence, to use MongoDB object databases in a seamless manner.</Description>
     <Company>Waher Data AB</Company>
-    <Copyright>Copyright © Waher Data AB 2016-2019. All rights reserved.</Copyright>
+    <Copyright>Copyright © Waher Data AB 2016-2020. All rights reserved.</Copyright>
     <NeutralLanguage>English</NeutralLanguage>
     <AssemblyVersion>1.0.1</AssemblyVersion>
     <FileVersion>1.0.1</FileVersion>

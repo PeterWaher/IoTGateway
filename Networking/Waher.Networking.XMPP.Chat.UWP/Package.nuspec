@@ -12,7 +12,7 @@
     <repository type="GitHub" url="https://github.com/PeterWaher/IoTGateway"/>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <description>Implements the XMPP IoT chat extesion.</description>
-    <copyright>Copyright © Waher Data AB 2015-2019. All rights reserved.</copyright>
+    <copyright>Copyright © Waher Data AB 2015-2020. All rights reserved.</copyright>
     <tags>networking communication xmpp iot chat</tags>
     <dependencies>
       <dependency id="Waher.Content" version="1.0.22"/>

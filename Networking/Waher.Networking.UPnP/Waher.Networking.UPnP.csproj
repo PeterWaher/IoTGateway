@@ -6,7 +6,7 @@
     <Authors>Peter Waher</Authors>
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
-    <Copyright>Copyright © Waher Data AB 2015-2019. All rights reserved.</Copyright>
+    <Copyright>Copyright © Waher Data AB 2015-2020. All rights reserved.</Copyright>
     <Description>Class library for searching and interacting with devices in the local area network using the UPnP protocol.</Description>
     <PackageLicenseUrl></PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Networking/Waher.Networking.UPnP</PackageProjectUrl>

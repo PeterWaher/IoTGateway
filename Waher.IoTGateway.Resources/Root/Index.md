@@ -32,6 +32,6 @@ modules defined in these modules will be found and started automatically.
 
 To use this server software, you need to accept the [License agreement](Copyright.md). Check out the [License page](Copyright.md) for details.
 
-The **IoT Gateway** is (c) [Waher Data AB](http://waher.se/) 2016-2019. All rights reserved.
+The **IoT Gateway** is (c) [Waher Data AB](http://waher.se/) 2016-2020. All rights reserved.
  
 [![](/Images/logo-WaherDataAB-400x77.png)](http://waher.se/)

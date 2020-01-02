@@ -2,7 +2,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <Description>Contains tools for simple XML validation using embedded XML schemas and transformation using embedded XSL transformations.</Description>
-    <Copyright>Copyright © Waher Data AB 2017-2019. All rights reserved.</Copyright>
+    <Copyright>Copyright © Waher Data AB 2017-2020. All rights reserved.</Copyright>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <Authors>Peter Waher</Authors>

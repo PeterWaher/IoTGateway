@@ -8,7 +8,7 @@
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
     <Description>Provides the XMPP client defined in Waher.Networking.XMPP with mail-extension support. The IoT Broker XMPP server supports mail extensions:: https://waher.se/Broker.md</Description>
-    <Copyright>Copyright © Waher Data AB 2019. All rights reserved.</Copyright>
+    <Copyright>Copyright © Waher Data AB 2019-2020. All rights reserved.</Copyright>
     <PackageLicenseUrl></PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Networking/Waher.Networking.XMPP.Mail</PackageProjectUrl>
     <PackageIconUrl></PackageIconUrl>

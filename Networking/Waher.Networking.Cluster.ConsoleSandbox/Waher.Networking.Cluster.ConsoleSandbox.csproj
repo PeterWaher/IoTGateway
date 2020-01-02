@@ -7,7 +7,7 @@
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
     <Description>Simple console application that allows you to interactively test the cluster protocol in the network.</Description>
-    <Copyright>Copyright © Waher Data AB 2019. All rights reserved.</Copyright>
+    <Copyright>Copyright © Waher Data AB 2019-2020. All rights reserved.</Copyright>
     <PackageLicenseUrl>https://github.com/PeterWaher/IoTGateway#license</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Networking/Waher.Networking.Cluster.ConsoleSandbox</PackageProjectUrl>
     <PackageIconUrl>https://github.com/PeterWaher/IoTGateway/blob/master/Images/Icon.ico?raw=true</PackageIconUrl>

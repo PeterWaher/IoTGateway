@@ -6,7 +6,7 @@
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
     <Description>Runs the IoT Gateway as a Windows service.</Description>
-    <Copyright>Copyright © Waher Data AB 2016-2019. All rights reserved.</Copyright>
+    <Copyright>Copyright © Waher Data AB 2016-2020. All rights reserved.</Copyright>
     <PackageLicenseUrl>https://github.com/PeterWaher/IoTGateway#license</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Waher.IoTGateway.Svc</PackageProjectUrl>
     <PackageIconUrl>https://github.com/PeterWaher/IoTGateway/blob/master/Images/Icon.ico?raw=true</PackageIconUrl>

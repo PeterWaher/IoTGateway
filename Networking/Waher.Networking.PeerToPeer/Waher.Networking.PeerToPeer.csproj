@@ -5,7 +5,7 @@
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
     <Description>Class library for peer-to-peer and multi-player communication.</Description>
-    <Copyright>Copyright © Waher Data AB 2015-2019. All rights reserved.</Copyright>
+    <Copyright>Copyright © Waher Data AB 2015-2020. All rights reserved.</Copyright>
     <PackageLicenseUrl></PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Networking/Waher.Networking.PeerToPeer</PackageProjectUrl>
     <PackageIconUrl></PackageIconUrl>

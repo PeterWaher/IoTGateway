@@ -8,7 +8,7 @@
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
     <Description>Implements the ChaCha20, Poly1305 and AEAD_CHACHA20_POLY1305 algorithms, as defined in RFC 8439</Description>
-    <Copyright>Copyright © Waher Data AB 2019. All rights reserved.</Copyright>
+    <Copyright>Copyright © Waher Data AB 2019-2020. All rights reserved.</Copyright>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Security/Waher.Security.ChaChaPoly</PackageProjectUrl>
     <PackageIconUrl></PackageIconUrl>
     <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>

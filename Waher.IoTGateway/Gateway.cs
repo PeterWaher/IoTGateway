@@ -808,7 +808,10 @@ namespace Waher.IoTGateway
 						}
 					}
 
-					Types.StartAllModules(int.MaxValue);
+					if (Types.StartAllModules(int.MaxValue))
+						Log.Informational("Server started.");
+					else
+						Log.Critical("Unable to start all modules.");
 				}
 				catch (Exception ex)
 				{

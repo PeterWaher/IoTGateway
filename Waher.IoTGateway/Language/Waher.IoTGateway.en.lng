@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Translation xmlns="http://waher.se/Schema/Translation.xsd">
+	<Language code="en" name="English">
+		<Namespace name="Waher.IoTGateway">
+      <String id="1">Database</String>
+      <String id="2">Notification</String>
+      <String id="3">Domain</String>
+      <String id="4">Personal Data</String>
+      <String id="5">Theme</String>
+      <String id="6">XMPP</String>
+      <String id="7">Backup</String>
+      <String id="8">Introduction</String>
+      <String id="9">Restore</String>
+    </Namespace>
+	</Language>
+</Translation>

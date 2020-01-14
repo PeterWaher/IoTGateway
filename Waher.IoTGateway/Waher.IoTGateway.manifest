@@ -4,7 +4,10 @@
 		<Content fileName="Copyright.md"/>
 		<Content fileName="Events.js"/>
 		<Content fileName="Login.md"/>
-		<Folder name="Settings">
+    <Folder name="Language">
+      <Content fileName="Waher.IoTGateway.en.lng"/>
+    </Folder>
+    <Folder name="Settings">
 			<Content fileName="Backup.md"/>
 			<Content fileName="Backup.js"/>
 			<Content fileName="Config.cssx"/>

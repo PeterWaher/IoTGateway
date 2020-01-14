@@ -974,7 +974,7 @@
             </Component>
             <Directory Id='Graphics' Name='Graphics'>
 							<Component Id='Emoji1Zip' Guid='8CA3074F-7809-4D73-82EF-B15316E5151F'>
-								<RemoveFolder Id='RemoveEmoji1Folder' On='uninstall' />
+								<RemoveFolder Id='RemoveGraphicsFolder' On='uninstall' />
 								<File Id='Emoji1.zip' Name='Emoji1.zip' DiskId='1' Source='..\..\..\Content\Waher.Content.Emoji.Emoji1\Graphics\Emoji1.zip' Vital='yes' KeyPath='yes'/>
 								<RemoveFile Id='RemoveEmoji1Zip' Name='Emoji1.zip' On='uninstall'/>
 							</Component>
@@ -1427,11 +1427,13 @@
           <Directory Id='Language' Name='Language'>
             <Component Id='English' Guid='531257BB-A840-4D96-85CA-F7A5C77AD546'>
               <RemoveFolder Id='RemoveEnglish' On='uninstall' />
-              <File Id='Waher.Networking.XMPP.Concentrator.en.lng' Name='Waher.Networking.XMPP.Concentrator.en.lng' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Language\Waher.Networking.XMPP.Concentrator.en.lng' KeyPath='yes'/>
+              <File Id='Waher.IoTGateway.en.lng' Name='Waher.IoTGateway.en.lng' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Language\Waher.IoTGateway.en.lng' Vital='yes' KeyPath='yes'/>
+              <File Id='Waher.Networking.XMPP.Concentrator.en.lng' Name='Waher.Networking.XMPP.Concentrator.en.lng' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Language\Waher.Networking.XMPP.Concentrator.en.lng'/>
               <File Id='Waher.Things.IP.en.lng' Name='Waher.Things.IP.en.lng' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Language\Waher.Things.IP.en.lng'/>
               <File Id='Waher.Things.Metering.en.lng' Name='Waher.Things.Metering.en.lng' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Language\Waher.Things.Metering.en.lng'/>
               <File Id='Waher.Things.Mqtt.en.lng' Name='Waher.Things.Mqtt.en.lng' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Language\Waher.Things.Mqtt.en.lng'/>
               <File Id='Waher.Things.Snmp.en.lng' Name='Waher.Things.Snmp.en.lng' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Language\Waher.Things.Snmp.en.lng'/>
+              <RemoveFile Id='RemoveWaher.IoTGateway.en.lng' Name='Waher.IoTGateway.en.lng' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Networking.XMPP.Concentrator.en.lng' Name='Waher.Networking.XMPP.Concentrator.en.lng' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Things.IP.en.lng' Name='Waher.Things.IP.en.lng' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Things.Metering.en.lng' Name='Waher.Things.Metering.en.lng' On='uninstall'/>

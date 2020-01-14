@@ -28,6 +28,7 @@
     <DocumentationFile>bin\Debug\netstandard2.0\Waher.IoTGateway.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="Language\Waher.IoTGateway.en.lng" />
     <None Remove="Root\Backup.js" />
     <None Remove="Root\Backup.md" />
     <None Remove="Root\Copyright.md" />
@@ -75,6 +76,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Language\Waher.IoTGateway.en.lng">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Root\Settings\Backup.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

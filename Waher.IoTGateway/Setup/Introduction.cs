@@ -51,9 +51,9 @@ namespace Waher.IoTGateway.Setup
 		/// </summary>
 		/// <param name="Language">Current language.</param>
 		/// <returns>Title string</returns>
-		public override string Title(Language Language)
+		public override Task<string> Title(Language Language)
 		{
-			return "Introduction";
+			return Language.GetStringAsync(typeof(Gateway), 8, "Introduction");
 		}
 
 		/// <summary>

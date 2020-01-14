@@ -94,7 +94,7 @@ namespace Waher.IoTGateway.Setup
 		/// </summary>
 		/// <param name="Language">Current language.</param>
 		/// <returns>Title string</returns>
-		public abstract string Title(Language Language);
+		public abstract Task<string> Title(Language Language);
 
 		/// <summary>
 		/// Is called during startup to configure the system.

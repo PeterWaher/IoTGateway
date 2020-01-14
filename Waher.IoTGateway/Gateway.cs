@@ -1528,10 +1528,10 @@ namespace Waher.IoTGateway
 			}
 			finally
 			{
-				Persistence.LifeCycle.DatabaseModule.Flush();
+				Persistence.LifeCycle.DatabaseModule.Flush().Wait(60000);
 
 				if (!(internalProvider is null) && Database.Provider != internalProvider)
-					internalProvider.Flush();
+					internalProvider.Flush().Wait(60000);
 			}
 		}
 
@@ -3020,7 +3020,7 @@ namespace Waher.IoTGateway
 					foreach (SystemConfiguration Configuration in configurations)
 					{
 						if (User.HasPrivilege(Configuration.GetType().FullName))
-							Result.Add(new WebMenuItem(Configuration.Title(Language), Configuration.Resource));
+							Result.Add(new WebMenuItem(Configuration.Title(Language).Result, Configuration.Resource));
 					}
 				}
 

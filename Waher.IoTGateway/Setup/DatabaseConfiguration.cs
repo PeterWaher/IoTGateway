@@ -153,8 +153,7 @@ namespace Waher.IoTGateway.Setup
             if (PluginType is null)
                 throw new NotFoundException("Database plugin not found: " + PluginName);
 
-            IDatabasePlugin Plugin = Activator.CreateInstance(PluginType) as IDatabasePlugin;
-            if (Plugin is null)
+            if (!(Activator.CreateInstance(PluginType) is IDatabasePlugin Plugin))
                 throw new BadRequestException();
 
             if (this.databasePluginName != PluginName)

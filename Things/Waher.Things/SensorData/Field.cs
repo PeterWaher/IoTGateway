@@ -228,8 +228,8 @@ namespace Waher.Things.SensorData
 				TimeSpan Span = this.expires - DateTime.Now;
 				double Days = Math.Ceiling(Span.TotalDays);
 
-				if (Days < 1)
-					return 1;
+				if (Days < 0)
+					return 0;
 				else if (Days > int.MaxValue)
 					return int.MaxValue;
 				else

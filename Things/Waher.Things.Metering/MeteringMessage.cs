@@ -9,6 +9,7 @@ namespace Waher.Things.Metering
 	/// </summary>
 	[CollectionName("MeteringMessages")]
 	[TypeName(TypeNameSerialization.None)]
+	[ArchivingTime(731)]	// 2 years
 	[Index("NodeId", "Timestamp")]
 	public class MeteringMessage
 	{

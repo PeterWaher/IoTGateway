@@ -10,6 +10,7 @@ namespace Waher.Things.SensorData
 	/// </summary>
 	[CollectionName("SensorData")]
 	[TypeName(TypeNameSerialization.LocalName)]
+	[ArchivingTime("ArchiveDays")]
 	[Index("Thing", "Name", "Timestamp")]
 	[Index("Thing", "Timestamp", "Name")]
 	[Index("Name", "Timestamp", "Thing")]
@@ -21,6 +22,7 @@ namespace Waher.Things.SensorData
 		private string objectId = null;
 		private ThingReference thing;
 		private DateTime timestamp;
+		private DateTime expires = DateTime.MaxValue;
 		private LocalizationStep[] stringIdSteps;
 		private FieldType type;
 		private FieldQoS qos;
@@ -39,7 +41,7 @@ namespace Waher.Things.SensorData
 		/// <param name="Writable">If the field is writable, i.e. corresponds to a control parameter.</param>
 		/// <param name="Module">Language Module for localization purposes.</param>
 		/// <param name="StringIdSteps">String ID steps.</param>
-		public Field(ThingReference Thing, DateTime Timestamp, string Name, FieldType Type, FieldQoS QoS, bool Writable, string Module, 
+		public Field(ThingReference Thing, DateTime Timestamp, string Name, FieldType Type, FieldQoS QoS, bool Writable, string Module,
 			params LocalizationStep[] StringIdSteps)
 		{
 			this.thing = Thing;
@@ -63,7 +65,7 @@ namespace Waher.Things.SensorData
 		/// <param name="Writable">If the field is writable, i.e. corresponds to a control parameter.</param>
 		/// <param name="Module">Language Module for localization purposes.</param>
 		/// <param name="StringIds">String ID steps.</param>
-		public Field(ThingReference Thing, DateTime Timestamp, string Name, FieldType Type, FieldQoS QoS, bool Writable, string Module, 
+		public Field(ThingReference Thing, DateTime Timestamp, string Name, FieldType Type, FieldQoS QoS, bool Writable, string Module,
 			params int[] StringIds)
 		{
 			this.thing = Thing;
@@ -108,7 +110,7 @@ namespace Waher.Things.SensorData
 		/// <param name="QoS">Quality of Service flags.</param>
 		/// <param name="Module">Language Module for localization purposes.</param>
 		/// <param name="StringIds">String IDs.</param>
-		public Field(ThingReference Thing, DateTime Timestamp, string Name, FieldType Type, FieldQoS QoS, string Module, 
+		public Field(ThingReference Thing, DateTime Timestamp, string Name, FieldType Type, FieldQoS QoS, string Module,
 			params int[] StringIds)
 		{
 			this.thing = Thing;
@@ -188,10 +190,10 @@ namespace Waher.Things.SensorData
 		/// </summary>
 		[ByReference]
 		[DefaultValueNull]
-		public ThingReference Thing 
+		public ThingReference Thing
 		{
 			get { return this.thing; }
-			set { this.thing = value; } 
+			set { this.thing = value; }
 		}
 
 		/// <summary>
@@ -199,10 +201,40 @@ namespace Waher.Things.SensorData
 		/// </summary>
 		[ShortName("ts")]
 		[DefaultValueDateTimeMinValue]
-		public DateTime Timestamp 
+		public DateTime Timestamp
 		{
 			get { return this.timestamp; }
-			set { this.timestamp = value; } 
+			set { this.timestamp = value; }
+		}
+
+		/// <summary>
+		/// Timestamp of field value.
+		/// </summary>
+		[ShortName("x")]
+		[DefaultValueDateTimeMaxValue]
+		public DateTime Expires
+		{
+			get { return this.expires; }
+			set { this.expires = value; }
+		}
+
+		/// <summary>
+		/// Number of days to archive field.
+		/// </summary>
+		public int ArchiveDays
+		{
+			get
+			{
+				TimeSpan Span = this.expires - DateTime.Now;
+				double Days = Math.Ceiling(Span.TotalDays);
+
+				if (Days < 1)
+					return 1;
+				else if (Days > int.MaxValue)
+					return int.MaxValue;
+				else
+					return (int)Days;
+			}
 		}
 
 		/// <summary>
@@ -213,10 +245,10 @@ namespace Waher.Things.SensorData
 		/// </summary>
 		[ShortName("sid")]
 		[DefaultValueNull]
-		public LocalizationStep[] StringIdSteps 
+		public LocalizationStep[] StringIdSteps
 		{
 			get { return this.stringIdSteps; }
-			set { this.stringIdSteps = value; } 
+			set { this.stringIdSteps = value; }
 		}
 
 		/// <summary>
@@ -226,17 +258,17 @@ namespace Waher.Things.SensorData
 		public FieldType Type
 		{
 			get { return this.type; }
-			set { this.type = value; } 
+			set { this.type = value; }
 		}
 
 		/// <summary>
 		/// Field Quality of Service flags.
 		/// </summary>
 		[ShortName("q")]
-		public FieldQoS QoS 
+		public FieldQoS QoS
 		{
 			get { return this.qos; }
-			set { this.qos = value; } 
+			set { this.qos = value; }
 		}
 
 		/// <summary>
@@ -244,10 +276,10 @@ namespace Waher.Things.SensorData
 		/// </summary>
 		[ShortName("n")]
 		[DefaultValueStringEmpty]
-		public string Name 
+		public string Name
 		{
 			get { return this.name; }
-			set { this.name = value; } 
+			set { this.name = value; }
 		}
 
 		/// <summary>
@@ -255,10 +287,10 @@ namespace Waher.Things.SensorData
 		/// </summary>
 		[ShortName("m")]
 		[DefaultValueStringEmpty]
-		public string Module 
+		public string Module
 		{
 			get { return this.module; }
-			set { this.module = value; } 
+			set { this.module = value; }
 		}
 
 		/// <summary>
@@ -266,10 +298,10 @@ namespace Waher.Things.SensorData
 		/// </summary>
 		[ShortName("w")]
 		[DefaultValue(false)]
-		public bool Writable 
+		public bool Writable
 		{
 			get { return this.writable; }
-			set { this.writable = value; } 
+			set { this.writable = value; }
 		}
 
 		/// <summary>

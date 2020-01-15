@@ -16,6 +16,7 @@ namespace Waher.Things.SourceEvents
 	/// Abstract base class for all data source events.
 	/// </summary>
 	[CollectionName("DataSourceEvents")]
+	[ArchivingTime(90)]
 	[Index("SourceId", "Timestamp")]
 	public abstract class SourceEvent
     {

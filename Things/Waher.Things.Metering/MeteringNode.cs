@@ -22,6 +22,7 @@ namespace Waher.Things.Metering
 	/// </summary>
 	[CollectionName("MeteringTopology")]
 	[TypeName(TypeNameSerialization.FullName)]
+	[ArchivingTime]
 	[Index("NodeId")]
 	[Index("ParentId", "NodeId")]
 	public abstract class MeteringNode : INode, ILifeCycleManagement

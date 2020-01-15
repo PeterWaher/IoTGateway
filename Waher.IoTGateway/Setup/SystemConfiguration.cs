@@ -12,6 +12,7 @@ namespace Waher.IoTGateway.Setup
 	/// Abstract base class for system configurations.
 	/// </summary>
 	[CollectionName("SystemConfigurations")]
+	[ArchivingTime]
 	public abstract class SystemConfiguration : ISystemConfiguration
 	{
 		private TaskCompletionSource<bool> completionSource = null;

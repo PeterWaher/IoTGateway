@@ -10,6 +10,7 @@ namespace Waher.Things
 	/// Contains a reference to a thing
 	/// </summary>
 	[CollectionName("ThingReferences")]
+	[ArchivingTime]
 	[Index("NodeId", "SourceId", "Partition")]
 	public class ThingReference : IThingReference
 	{

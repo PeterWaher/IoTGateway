@@ -13,6 +13,7 @@ namespace Waher.Runtime.Settings.SettingObjects
 	/// </summary>
 	[TypeName(TypeNameSerialization.LocalName)]
 	[CollectionName("Settings")]
+	[ArchivingTime]		// No Limit
 	[Index("Key")]
 	public abstract class Setting
 	{

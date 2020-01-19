@@ -647,6 +647,7 @@
             <param name="XsltPath">Optional XSLT to use to view the output.</param>
             <param name="ProgramDataFolder">Program data folder. Can be removed from filenames used, when referencing them in the report.</param>
             <param name="ExportData">If data in database is to be exported in output.</param>
+            <returns>Collections with errors.</returns>
         </member>
         <member name="M:Waher.Persistence.Files.FilesProvider.Repair(System.Xml.XmlWriter,System.String,System.String,System.Boolean)">
             <summary>
@@ -656,6 +657,7 @@
             <param name="XsltPath">Optional XSLT to use to view the output.</param>
             <param name="ProgramDataFolder">Program data folder. Can be removed from filenames used, when referencing them in the report.</param>
             <param name="ExportData">If data in database is to be exported in output.</param>
+            <returns>Collections with errors.</returns>
         </member>
         <member name="M:Waher.Persistence.Files.FilesProvider.Analyze(System.Xml.XmlWriter,System.String,System.String,System.Boolean,System.Boolean)">
             <summary>
@@ -666,6 +668,7 @@
             <param name="ProgramDataFolder">Program data folder. Can be removed from filenames used, when referencing them in the report.</param>
             <param name="ExportData">If data in database is to be exported in output.</param>
             <param name="Repair">If files should be repaired if corruptions are detected.</param>
+            <returns>Collections with errors.</returns>
         </member>
         <member name="M:Waher.Persistence.Files.FilesProvider.RepairIfInproperShutdown(System.String)">
             <summary>
@@ -673,6 +676,7 @@
             inproper shutdowns.
             </summary>
             <param name="XsltPath">Path to optional XSLT file for the resulting report.</param>
+            <returns>Collections with errors.</returns>
         </member>
         <member name="M:Waher.Persistence.Files.FilesProvider.CreateGuid">
             <summary>

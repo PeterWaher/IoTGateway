@@ -1926,6 +1926,7 @@ namespace Waher.Persistence.Files
 		/// <param name="XsltPath">Optional XSLT to use to view the output.</param>
 		/// <param name="ProgramDataFolder">Program data folder. Can be removed from filenames used, when referencing them in the report.</param>
 		/// <param name="ExportData">If data in database is to be exported in output.</param>
+		/// <returns>Collections with errors.</returns>
 		public Task<string[]> Analyze(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData)
 		{
 			return this.Analyze(Output, XsltPath, ProgramDataFolder, ExportData, false);
@@ -1938,6 +1939,7 @@ namespace Waher.Persistence.Files
 		/// <param name="XsltPath">Optional XSLT to use to view the output.</param>
 		/// <param name="ProgramDataFolder">Program data folder. Can be removed from filenames used, when referencing them in the report.</param>
 		/// <param name="ExportData">If data in database is to be exported in output.</param>
+		/// <returns>Collections with errors.</returns>
 		public Task<string[]> Repair(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData)
 		{
 			return this.Analyze(Output, XsltPath, ProgramDataFolder, ExportData, true);
@@ -1951,6 +1953,7 @@ namespace Waher.Persistence.Files
 		/// <param name="ProgramDataFolder">Program data folder. Can be removed from filenames used, when referencing them in the report.</param>
 		/// <param name="ExportData">If data in database is to be exported in output.</param>
 		/// <param name="Repair">If files should be repaired if corruptions are detected.</param>
+		/// <returns>Collections with errors.</returns>
 		public async Task<string[]> Analyze(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData, bool Repair)
 		{
 			SortedDictionary<string, bool> CollectionsWithErrors = new SortedDictionary<string, bool>();
@@ -2342,6 +2345,7 @@ namespace Waher.Persistence.Files
 		/// inproper shutdowns.
 		/// </summary>
 		/// <param name="XsltPath">Path to optional XSLT file for the resulting report.</param>
+		/// <returns>Collections with errors.</returns>
 		public async Task RepairIfInproperShutdown(string XsltPath)
 		{
 			string StartFileName = this.folder + "Start.txt";

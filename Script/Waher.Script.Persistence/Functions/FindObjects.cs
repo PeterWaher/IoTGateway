@@ -18,11 +18,11 @@ using Waher.Script.Operators.Logical;
 namespace Waher.Script.Persistence.Functions
 {
 	/// <summary>
-	/// Finds object in the object database.
+	/// Finds objects in the object database.
 	/// </summary>
 	public class FindObjects : FunctionMultiVariate
 	{
-		private static MethodInfo findMethodGeneric = GetFindMethod();
+		private static readonly MethodInfo findMethodGeneric = GetFindMethod();
 
 		/// <summary>
 		/// Finds object in the object database.

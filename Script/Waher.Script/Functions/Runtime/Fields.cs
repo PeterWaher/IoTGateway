@@ -47,7 +47,7 @@ namespace Waher.Script.Functions.Runtime
 
 			if (Obj is Type T)
 			{
-				foreach (FieldInfo FI in T.GetTypeInfo().DeclaredFields)
+				foreach (FieldInfo FI in T.GetRuntimeFields())
 					Elements.Add(new StringValue(FI.Name));
 
 				return new ObjectVector(Elements);
@@ -56,7 +56,7 @@ namespace Waher.Script.Functions.Runtime
 			{
 				T = Obj.GetType();
 
-				foreach (FieldInfo FI in T.GetTypeInfo().DeclaredFields)
+				foreach (FieldInfo FI in T.GetRuntimeFields())
 				{
 					Elements.Add(new StringValue(FI.Name));
 					Elements.Add(Expression.Encapsulate(FI.GetValue(Obj)));

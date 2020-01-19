@@ -49,7 +49,7 @@ namespace Waher.Script.Functions.Runtime
 
 			if (Obj is Type T)
 			{
-				foreach (MethodInfo MI in T.GetTypeInfo().DeclaredMethods)
+				foreach (MethodInfo MI in T.GetRuntimeMethods())
 					Elements.Add(new StringValue(ToString(MI)));
 
 				return new ObjectVector(Elements);
@@ -58,7 +58,7 @@ namespace Waher.Script.Functions.Runtime
 			{
 				T = Obj.GetType();
 
-				foreach (MethodInfo MI in T.GetTypeInfo().DeclaredMethods)
+				foreach (MethodInfo MI in T.GetRuntimeMethods())
 				{
 					Elements.Add(new StringValue(MI.Name));
 					Elements.Add(new ObjectValue(new MethodLambda(Obj, MI)));

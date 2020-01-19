@@ -47,7 +47,7 @@ namespace Waher.Script.Functions.Runtime
 
 			if (Obj is Type T)
 			{
-				foreach (PropertyInfo PI in T.GetTypeInfo().DeclaredProperties)
+				foreach (PropertyInfo PI in T.GetRuntimeProperties())
 					Elements.Add(new StringValue(PI.Name));
 
 				return new ObjectVector(Elements);
@@ -56,7 +56,7 @@ namespace Waher.Script.Functions.Runtime
 			{
 				T = Obj.GetType();
 
-				foreach (PropertyInfo PI in T.GetTypeInfo().DeclaredProperties)
+				foreach (PropertyInfo PI in T.GetRuntimeProperties())
 				{
 					Elements.Add(new StringValue(PI.Name));
 					Elements.Add(Expression.Encapsulate(PI.GetValue(Obj)));

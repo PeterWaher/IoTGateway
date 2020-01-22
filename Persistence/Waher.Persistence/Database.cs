@@ -272,7 +272,7 @@ namespace Waher.Persistence
 		///	<exception cref="TimeoutException">Thrown if a response is not returned from the database within the given number of milliseconds.</exception>
 		public async static Task<T> FindFirstIgnoreRest<T>(params string[] SortOrder)
 		{
-			return FirstIgnoreRest<T>(await Provider.Find<T>(0, int.MaxValue, SortOrder));
+			return FirstIgnoreRest<T>(await Provider.Find<T>(0, 1, SortOrder));
 		}
 
 		private static T FirstIgnoreRest<T>(IEnumerable<T> Set)
@@ -294,7 +294,7 @@ namespace Waher.Persistence
 		///	<exception cref="TimeoutException">Thrown if a response is not returned from the database within the given number of milliseconds.</exception>
 		public static async Task<T> FindFirstIgnoreRest<T>(Filter Filter, params string[] SortOrder)
 		{
-			return FirstIgnoreRest<T>(await Provider.Find<T>(0, int.MaxValue, Filter, SortOrder));
+			return FirstIgnoreRest<T>(await Provider.Find<T>(0, 1, Filter, SortOrder));
 		}
 
 		/// <summary>

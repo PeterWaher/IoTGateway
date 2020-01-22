@@ -219,10 +219,12 @@ namespace Waher.Persistence.Files.Searching
 			if (!TryMakeSameType(ref Value1, ref Value2))
 				return null;
 
-			if (!(Value1 is IComparable Comparable))
+			if (Value1 is IComparable Comparable)
+				return Comparable.CompareTo(Value2);
+			else if (Value1 is byte[] b1 && Value2 is byte[] b2)
+				return Storage.IndexRecords.BinaryCompare(b1, b1);
+			else
 				return null;
-
-			return Comparable.CompareTo(Value2);
 		}
 
 		/// <summary>
@@ -514,6 +516,22 @@ namespace Waher.Persistence.Files.Searching
 
 					Value = new Guid(A);
 					return true;
+
+				case ObjectSerializer.TYPE_BYTEARRAY:
+					byte[] Bin = (byte[])((byte[])Value).Clone();
+					int c = Bin.Length;
+
+					while (--c >= 0)
+					{
+						b = ++Bin[c];
+						if (b!=0)
+						{
+							Value = Bin;
+							return true;
+						}
+					}
+
+					return false;
 
 				default:
 					return false;
@@ -935,6 +953,22 @@ namespace Waher.Persistence.Files.Searching
 
 					Value = new Guid(A);
 					return true;
+
+				case ObjectSerializer.TYPE_BYTEARRAY:
+					byte[] Bin = (byte[])((byte[])Value).Clone();
+					int c = Bin.Length;
+
+					while (--c >= 0)
+					{
+						b = --Bin[c];
+						if (b != 0xff)
+						{
+							Value = Bin;
+							return true;
+						}
+					}
+
+					return false;
 
 				default:
 					return false;

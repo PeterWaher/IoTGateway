@@ -5015,7 +5015,7 @@ namespace Waher.Persistence.Files
                 if (File != this)
                 {
                     throw new ArgumentException("Objects of type " + typeof(T).FullName + " are stored in collection " + CollectionName +
-                          ",  not " + this.collectionName + ".", nameof(T));
+                        ",  not " + this.collectionName + ".", nameof(T));
                 }
 
                 foreach (string[] Index in Serializer.Indices)

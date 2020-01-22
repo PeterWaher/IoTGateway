@@ -286,5 +286,31 @@ namespace Waher.Persistence.FilesLW.Test
 			Assert.IsTrue(Comparison.Increment(ref Value));
 			Assert.AreNotEqual(Value, Org);
 		}
+
+		[TestMethod]
+		public void DBFiles_Dec_Test_32_ByteArray()
+		{
+			byte[] Org = new byte[] { 1, 2, 3, 4 };
+			object Value = Org;
+			Assert.IsTrue(Comparison.Increment(ref Value));
+			byte[] A = (byte[])Value;
+			Assert.AreEqual(A[0], 1);
+			Assert.AreEqual(A[1], 2);
+			Assert.AreEqual(A[2], 3);
+			Assert.AreEqual(A[3], 5);
+		}
+
+		[TestMethod]
+		public void DBFiles_Dec_Test_33_ByteArray_2()
+		{
+			byte[] Org = new byte[] { 1, 2, 3, 255 };
+			object Value = Org;
+			Assert.IsTrue(Comparison.Increment(ref Value));
+			byte[] A = (byte[])Value;
+			Assert.AreEqual(A[0], 1);
+			Assert.AreEqual(A[1], 2);
+			Assert.AreEqual(A[2], 4);
+			Assert.AreEqual(A[3], 0);
+		}
 	}
 }

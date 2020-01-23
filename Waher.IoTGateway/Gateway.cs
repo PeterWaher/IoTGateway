@@ -415,14 +415,13 @@ namespace Waher.IoTGateway
 				if (!(AutoRepairReportFolder is null))
 					AutoRepairReportFolder.SetValue(DatabaseProvider, Path.Combine(AppDataFolder, "Backup"));
 
-				string[] RepairedCollections = null;
 				MethodInfo MI = ProviderType.GetMethod("RepairIfInproperShutdown", new Type[] { typeof(string) });
 				
 				if (!(MI is null))
 				{
 					T = MI.Invoke(DatabaseProvider, new object[] { Gateway.AppDataFolder + "Transforms" + Path.DirectorySeparatorChar + "DbStatXmlToHtml.xslt" }) as Task;
 					if (T is Task<string[]> StringArrayTask)
-						RepairedCollections = await StringArrayTask;
+						DatabaseConfiguration.RepairedCollections = await StringArrayTask;
 					else if (!(T is null))
 						await T;
 				}
@@ -613,23 +612,6 @@ namespace Waher.IoTGateway
 					}
 				}
 				while (ReloadConfigurations);
-
-				if (!(RepairedCollections is null))
-				{
-					if (Ledger.HasProvider)
-					{
-						MI = Ledger.Provider.GetType().GetMethod("RepairCollections", new Type[] { typeof(string[]) });
-
-						if (!(MI is null))
-						{
-							T = MI.Invoke(Ledger.Provider, new object[] { RepairedCollections }) as Task;
-							if (!(T is null))
-								await T;
-						}
-					}
-					else
-						Log.Warning("No ledger registered. Repaired collections might be incomplete.");
-				}
 
 				configuring = false;
 

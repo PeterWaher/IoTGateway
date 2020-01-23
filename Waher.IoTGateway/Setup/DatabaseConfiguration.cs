@@ -22,6 +22,7 @@ namespace Waher.IoTGateway.Setup
     public class DatabaseConfiguration : SystemMultiStepConfiguration
     {
         private static DatabaseConfiguration instance = null;
+        private static string[] repairedCollections = null;
 
         private HttpResource selectDatabase = null;
         private HttpResource testDatabase = null;
@@ -75,6 +76,15 @@ namespace Waher.IoTGateway.Setup
         /// Current instance of configuration.
         /// </summary>
         public static DatabaseConfiguration Instance => instance;
+
+        /// <summary>
+        /// Collections repaired during startup.
+        /// </summary>
+        public static string[] RepairedCollections
+        {
+            get => repairedCollections;
+            internal set => repairedCollections = value;
+        }
 
         /// <summary>
         /// Resource to be redirected to, to perform the configuration.

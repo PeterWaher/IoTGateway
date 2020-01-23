@@ -1728,6 +1728,22 @@ namespace Waher.Persistence.Files
 				await File.DeleteObjects(List, Serializer);
 		}
 
+		/// <summary>
+		/// Gets a persistent dictionary containing objects in a collection.
+		/// </summary>
+		/// <param name="Collection">Collection Name</param>
+		/// <returns>Persistent dictionary</returns>
+		public IPersistentDictionary GetDictionary(string Collection)
+		{
+			string FileName = Path.Combine(this.folder, "Dictionaries");
+			if (!Directory.Exists(FileName))
+				Directory.CreateDirectory(FileName);
+
+			FileName = Path.Combine(FileName, Collection);
+
+			return new StringDictionary(FileName + ".dict", FileName + ".blob", Collection, this, false);
+		}
+
 		#endregion
 
 		#region Export

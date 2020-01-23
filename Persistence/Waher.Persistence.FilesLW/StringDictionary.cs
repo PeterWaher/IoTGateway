@@ -12,7 +12,7 @@ namespace Waher.Persistence.Files
 	/// <summary>
 	/// This class manages a string dictionary in a persisted file.
 	/// </summary>
-	public class StringDictionary : IDisposable, IDictionary<string, object>
+	public class StringDictionary : IPersistentDictionary
 	{
 		private readonly Dictionary<string, object> inMemory;
 		private ObjectBTreeFile dictionaryFile;
@@ -555,6 +555,23 @@ namespace Waher.Persistence.Files
 			set
 			{
 				FilesProvider.Wait(this.AddAsync(key, value, true), this.timeoutMilliseconds);
+			}
+		}
+
+		/// <summary>
+		/// Deletes the dictionary and disposes the object.
+		/// </summary>
+		public void DeleteAndDispose()
+		{
+			if (!(this.dictionaryFile is null))
+			{
+				string FileName = this.dictionaryFile.FileName;
+				string BlobFileName = this.dictionaryFile.BlobFileName;
+
+				this.Dispose();
+
+				File.Delete(FileName);
+				File.Delete(BlobFileName);
 			}
 		}
 	}

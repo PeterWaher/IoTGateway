@@ -1,57 +1,32 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
-using System.Text;
 using System.Threading.Tasks;
-using Waher.Persistence.Serialization;
-using Waher.Persistence.Files.Storage;
+using MongoDB.Bson;
+using MongoDB.Driver;
+using Waher.Events;
+using Waher.Persistence.Filters;
+using Waher.Persistence.MongoDB.Serialization;
 
-namespace Waher.Persistence.Files
+namespace Waher.Persistence.MongoDB
 {
 	/// <summary>
-	/// This class manages a string dictionary in a persisted file.
+	/// This class manages a string dictionary in a persisted storage.
 	/// </summary>
 	public class StringDictionary : IPersistentDictionary
 	{
-		private readonly Dictionary<string, object> inMemory;
-		private ObjectBTreeFile dictionaryFile;
-		private StringDictionaryRecords recordHandler;
-		private readonly KeyValueSerializer keyValueSerializer;
-		private readonly GenericObjectSerializer genericSerializer;
-		private readonly FilesProvider provider;
-		private readonly Encoding encoding;
+		private readonly MongoDBProvider provider;
 		private readonly string collectionName;
-		private readonly int timeoutMilliseconds;
 
 		/// <summary>
-		/// This class manages a string dictionary in a persisted file.
+		/// This class manages a string dictionary in a persisted storage.
 		/// </summary>
-		/// <param name="FileName">File name of index file.</param>
-		/// <param name="BlobFileName">Name of file in which BLOBs are stored.</param>
 		/// <param name="CollectionName">Collection Name.</param>
 		/// <param name="Provider">Files provider.</param>
-		/// <param name="RetainInMemory">Retain the dictionary in memory.</param>
-		public StringDictionary(string FileName, string BlobFileName, string CollectionName, FilesProvider Provider, bool RetainInMemory)
+		public StringDictionary(string CollectionName, MongoDBProvider Provider)
 		{
 			this.provider = Provider;
 			this.collectionName = CollectionName;
-			this.encoding = this.provider.Encoding;
-			this.timeoutMilliseconds = this.provider.TimeoutMilliseconds;
-			this.genericSerializer = new GenericObjectSerializer(this.provider);
-			this.keyValueSerializer = new KeyValueSerializer(this.provider, this.genericSerializer);
-
-			this.recordHandler = new StringDictionaryRecords(this.collectionName, this.encoding,
-				(this.provider.BlockSize - ObjectBTreeFile.BlockHeaderSize) / 2 - 4, this.genericSerializer, this.provider);
-
-			this.dictionaryFile = new ObjectBTreeFile(FileName, this.collectionName, BlobFileName,
-				this.provider.BlockSize, this.provider.BlobBlockSize, this.provider, this.encoding, this.timeoutMilliseconds,
-				this.provider.Encrypted, this.recordHandler);
-
-            if (RetainInMemory)
-				this.inMemory = new Dictionary<string, object>();
-			else
-				this.inMemory = null;
 		}
 
 		/// <summary>
@@ -59,10 +34,6 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		public void Dispose()
 		{
-			this.dictionaryFile?.Dispose();
-			this.dictionaryFile = null;
-
-			this.recordHandler = null;
 		}
 
 		/// <summary>
@@ -72,9 +43,7 @@ namespace Waher.Persistence.Files
 		/// <returns>true if the System.Collections.Generic.IDictionary{string,object} contains an element with the key; otherwise, false.</returns>
 		public bool ContainsKey(string key)
 		{
-			Task<bool> Task = this.ContainsKeyAsync(key);
-			FilesProvider.Wait(Task, this.timeoutMilliseconds);
-			return Task.Result;
+			return this.ContainsKeyAsync(key).Result;
 		}
 
 		/// <summary>
@@ -84,25 +53,11 @@ namespace Waher.Persistence.Files
 		/// <returns>true if the System.Collections.Generic.IDictionary{string,object} contains an element with the key; otherwise, false.</returns>
 		public async Task<bool> ContainsKeyAsync(string key)
 		{
-			if (!(this.inMemory is null))
-			{
-				lock (this.inMemory)
-				{
-					if (this.inMemory.ContainsKey(key))
-						return true;
-				}
-			}
+			DictionaryEntry Entry = await Database.FindFirstIgnoreRest<DictionaryEntry>(new FilterAnd(
+				new FilterFieldEqualTo("Collection", this.collectionName),
+				new FilterFieldEqualTo("Key", key)));
 
-			await this.dictionaryFile.LockRead();
-			try
-			{
-				BlockInfo Info = await this.dictionaryFile.FindNodeLocked(key);
-				return !(Info is null);
-			}
-			finally
-			{
-				await this.dictionaryFile.EndRead();
-			}
+			return !(Entry is null);
 		}
 
 		/// <summary>
@@ -114,7 +69,7 @@ namespace Waher.Persistence.Files
 		/// <exception cref="ArgumentException">An element with the same key already exists in the System.Collections.Generic.IDictionary{string,object}.</exception>
 		public void Add(string key, object value)
 		{
-			FilesProvider.Wait(this.AddAsync(key, value, false), this.timeoutMilliseconds);
+			this.AddAsync(key, value, false).Wait();
 		}
 
 		/// <summary>
@@ -139,55 +94,32 @@ namespace Waher.Persistence.Files
 		/// <exception cref="ArgumentException">An element with the same key already exists in the System.Collections.Generic.IDictionary{string,object}.</exception>
 		public async Task AddAsync(string key, object value, bool ReplaceIfExists)
 		{
-			//Console.Out.WriteLine(key + ":=" + value.ToString() + " <" + value.GetType().FullName + ">");
-
 			if (key is null)
-				throw new ArgumentNullException("key is null.", "key");
+				throw new ArgumentNullException("key is null.", nameof(key));
 
-			Type Type = value.GetType();
-			IObjectSerializer Serializer = this.provider.GetObjectSerializer(Type);
-			byte[] Bin = this.recordHandler.Serialize(key, value, Serializer);
+			DictionaryEntry Entry = await Database.FindFirstIgnoreRest<DictionaryEntry>(new FilterAnd(
+				new FilterFieldEqualTo("Collection", this.collectionName),
+				new FilterFieldEqualTo("Key", key)));
 
-			if (Bin.Length > this.dictionaryFile.InlineObjectSizeLimit)
-				throw new ArgumentException("BLOBs not supported.", nameof(value));
-
-			await this.dictionaryFile.LockWrite();
-			try
+			if (Entry is null)
 			{
-				BlockInfo Info = await this.dictionaryFile.FindLeafNodeLocked(key);
-				if (!(Info is null))
-					await this.dictionaryFile.InsertObjectLocked(Info.BlockIndex, Info.Header, Info.Block, Bin, Info.InternalPosition, 0, 0, true, Info.LastObject);
-				else
+				Entry = new DictionaryEntry()
 				{
-					if (!ReplaceIfExists)
-						throw new ArgumentException("A key with that value already exists.", nameof(key));
+					Collection = this.collectionName,
+					Key = key,
+					Value = value
+				};
 
-					Info = await this.dictionaryFile.FindNodeLocked(key);
+				await this.provider.Insert(Entry);
+			}
+			else if (ReplaceIfExists)
+			{
+				Entry.Value = value;
 
-					await this.dictionaryFile.ReplaceObjectLocked(Bin, Info, true);
-				}
+				await this.provider.Update(Entry);
 			}
-			finally
-			{
-				await this.dictionaryFile.EndWrite();
-			}
-
-			/*try
-			{
-				Console.Out.WriteLine((await this.ToArrayAsync()).Length.ToString());
-			}
-			catch (Exception ex)
-			{
-				Console.Out.WriteLine(ex.StackTrace);
-			}*/
-
-			if (!(this.inMemory is null))
-			{
-				lock (this.inMemory)
-				{
-					this.inMemory[key] = value;
-				}
-			}
+			else
+				throw new ArgumentException("Key already exists.", nameof(key));
 		}
 
 		/// <summary>
@@ -198,9 +130,7 @@ namespace Waher.Persistence.Files
 		/// <exception cref="ArgumentNullException">key is null.</exception>
 		public bool Remove(string key)
 		{
-			Task<bool> Task = this.RemoveAsync(key);
-			FilesProvider.Wait(Task, this.timeoutMilliseconds);
-			return Task.Result;
+			return this.RemoveAsync(key).Result;
 		}
 
 		/// <summary>
@@ -211,34 +141,16 @@ namespace Waher.Persistence.Files
 		/// <exception cref="ArgumentNullException">key is null.</exception>
 		public async Task<bool> RemoveAsync(string key)
 		{
-			if (key is null)
-				throw new ArgumentNullException("key is null.", "key");
+			DictionaryEntry Entry = await Database.FindFirstDeleteRest<DictionaryEntry>(new FilterAnd(
+				new FilterFieldEqualTo("Collection", this.collectionName),
+				new FilterFieldEqualTo("Key", key)));
 
-			if (!(this.inMemory is null))
-			{
-				lock (this.inMemory)
-				{
-					this.inMemory.Remove(key);
-				}
-			}
-
-			object DeletedObject;
-
-			await this.dictionaryFile.LockWrite();
-			try
-			{
-				DeletedObject = await this.dictionaryFile.DeleteObjectLocked(key, false, true, this.keyValueSerializer, null);
-			}
-			catch (KeyNotFoundException)
-			{
+			if (Entry is null)
 				return false;
-			}
-			finally
-			{
-				await this.dictionaryFile.EndWrite();
-			}
 
-			return !(DeletedObject is null);
+			await this.provider.Delete(Entry);
+
+			return true;
 		}
 
 		/// <summary>
@@ -252,10 +164,9 @@ namespace Waher.Persistence.Files
 		/// <exception cref="ArgumentNullException">key is null.</exception>
 		public bool TryGetValue(string key, out object value)
 		{
-			Task<KeyValuePair<bool, KeyValuePair<string, object>>> Task = this.TryGetValueAsync(key);
-			FilesProvider.Wait(Task, this.timeoutMilliseconds);
-			value = Task.Result.Value;
-			return Task.Result.Key;
+			KeyValuePair<bool, KeyValuePair<string, object>> Result = this.TryGetValueAsync(key).Result;
+			value = Result.Value.Value;
+			return Result.Key;
 		}
 
 		/// <summary>
@@ -272,30 +183,13 @@ namespace Waher.Persistence.Files
 		public async Task<KeyValuePair<bool, KeyValuePair<string, object>>> TryGetValueAsync(string key)
 		{
 			if (key is null)
-				throw new ArgumentNullException("key is null.", "key");
+				throw new ArgumentNullException("key is null.", nameof(key));
 
-			if (!(this.inMemory is null))
-			{
-				lock (this.inMemory)
-				{
-					if (this.inMemory.TryGetValue(key, out object value))
-						return new KeyValuePair<bool, KeyValuePair<string, object>>(true, new KeyValuePair<string, object>(key, value));
-				}
-			}
+			DictionaryEntry Entry = await Database.FindFirstIgnoreRest<DictionaryEntry>(new FilterAnd(
+				new FilterFieldEqualTo("Collection", this.collectionName),
+				new FilterFieldEqualTo("Key", key)));
 
-			await this.dictionaryFile.LockRead();
-			try
-			{
-				object Result = await this.dictionaryFile.TryLoadObjectLocked(key, this.keyValueSerializer);
-				if (Result is null)
-					return new KeyValuePair<bool, KeyValuePair<string, object>>(false, new KeyValuePair<string, object>(key, null));
-				else
-					return new KeyValuePair<bool, KeyValuePair<string, object>>(true, (KeyValuePair<string, object>)Result);
-			}
-			finally
-			{
-				await this.dictionaryFile.EndRead();
-			}
+			return new KeyValuePair<bool, KeyValuePair<string, object>>(!(Entry is null), new KeyValuePair<string, object>(key, Entry?.Value));
 		}
 
 		/// <summary>
@@ -308,26 +202,16 @@ namespace Waher.Persistence.Files
 		public async Task<KeyValuePair<string, object>> GetValueAsync(string key)
 		{
 			if (key is null)
-				throw new ArgumentNullException("key is null.", "key");
+				throw new ArgumentNullException("key is null.", nameof(key));
 
-			if (!(this.inMemory is null))
-			{
-				lock (this.inMemory)
-				{
-					if (this.inMemory.TryGetValue(key, out object value))
-						return new KeyValuePair<string, object>(key, value);
-				}
-			}
+			if (key is null)
+				throw new ArgumentNullException("key is null.", nameof(key));
 
-			await this.dictionaryFile.LockRead();
-			try
-			{
-				return (KeyValuePair<string, object>)await this.dictionaryFile.LoadObjectLocked(key, this.keyValueSerializer);
-			}
-			finally
-			{
-				await this.dictionaryFile.EndRead();
-			}
+			DictionaryEntry Entry = await Database.FindFirstIgnoreRest<DictionaryEntry>(new FilterAnd(
+				new FilterFieldEqualTo("Collection", this.collectionName),
+				new FilterFieldEqualTo("Key", key)));
+
+			return new KeyValuePair<string, object>(key, Entry?.Value);
 		}
 
 		/// <summary>
@@ -341,16 +225,30 @@ namespace Waher.Persistence.Files
 		/// <summary>
 		/// <see cref="ICollection{T}.Clear()"/>
 		/// </summary>
-		public void Clear()
+		public async void Clear()
 		{
-			this.dictionaryFile.Clear();
-
-			if (!(this.inMemory is null))
+			try
 			{
-				lock (this.inMemory)
+				while (true)
 				{
-					this.inMemory.Clear();
+					IEnumerable<DictionaryEntry> Entries = await this.provider.Find<DictionaryEntry>(0, 1000, new FilterFieldEqualTo("Collection", this.collectionName));
+					bool Empty = true;
+
+					foreach (DictionaryEntry Entry in Entries)
+					{
+						Empty = false;
+						break;
+					}
+
+					if (Empty)
+						break;
+
+					await this.provider.Delete(Entries);
 				}
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
 			}
 		}
 
@@ -370,14 +268,10 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		public void CopyTo(KeyValuePair<string, object>[] array, int arrayIndex)
 		{
-			Task<ObjectBTreeFileEnumerator<KeyValuePair<string, object>>> Task = this.GetEnumerator(true);
-			FilesProvider.Wait(Task, this.timeoutMilliseconds);
+			IEnumerable<DictionaryEntry> Entries = this.provider.Find<DictionaryEntry>(0, int.MaxValue, new FilterFieldEqualTo("Collection", this.collectionName)).Result;
 
-			using (ObjectBTreeFileEnumerator<KeyValuePair<string, object>> e = Task.Result)
-			{
-				while (e.MoveNext())
-					array[arrayIndex++] = e.Current;
-			}
+			foreach (DictionaryEntry Entry in Entries)
+				array[arrayIndex++] = new KeyValuePair<string, object>(Entry.Key, Entry.Value);
 		}
 
 		/// <summary>
@@ -386,9 +280,7 @@ namespace Waher.Persistence.Files
 		/// <returns>Array of key-value pairs.</returns>
 		public KeyValuePair<string, object>[] ToArray()
 		{
-			Task<KeyValuePair<string, object>[]> Task = this.ToArrayAsync();
-			FilesProvider.Wait(Task, this.timeoutMilliseconds);
-			return Task.Result;
+			return this.ToArrayAsync().Result;
 		}
 
 		/// <summary>
@@ -398,11 +290,11 @@ namespace Waher.Persistence.Files
 		public async Task<KeyValuePair<string, object>[]> ToArrayAsync()
 		{
 			List<KeyValuePair<string, object>> Result = new List<KeyValuePair<string, object>>();
-			using (ObjectBTreeFileEnumerator<KeyValuePair<string, object>> e = await this.GetEnumerator(true))
-			{
-				while (await e.MoveNextAsync())
-					Result.Add(e.Current);
-			}
+
+			IEnumerable<DictionaryEntry> Entries = await this.provider.Find<DictionaryEntry>(0, int.MaxValue, new FilterFieldEqualTo("Collection", this.collectionName));
+
+			foreach (DictionaryEntry Entry in Entries)
+				Result.Add(new KeyValuePair<string, object>(Entry.Key, Entry.Value));
 
 			return Result.ToArray();
 		}
@@ -423,9 +315,7 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		public IEnumerator<KeyValuePair<string, object>> GetEnumerator()
 		{
-			Task<ObjectBTreeFileEnumerator<KeyValuePair<string, object>>> Task = this.GetEnumerator(false);
-			FilesProvider.Wait(Task, this.timeoutMilliseconds);
-			return Task.Result;
+			return this.GetEnumeratorAsync().Result;
 		}
 
 		/// <summary>
@@ -433,9 +323,7 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		IEnumerator IEnumerable.GetEnumerator()
 		{
-			Task<ObjectBTreeFileEnumerator<KeyValuePair<string, object>>> Task = this.GetEnumerator(false);
-			FilesProvider.Wait(Task, this.timeoutMilliseconds);
-			return Task.Result;
+			return this.GetEnumeratorAsync().Result;
 		}
 
 		/// <summary>
@@ -443,44 +331,16 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		/// <param name="Locked">If the file should be locked.</param>
 		/// <returns>Enumerator</returns>
-		public async Task<ObjectBTreeFileEnumerator<KeyValuePair<string, object>>> GetEnumerator(bool Locked)
+		public async Task<IEnumerator<KeyValuePair<string, object>>> GetEnumeratorAsync()
 		{
-			ObjectBTreeFileEnumerator<KeyValuePair<string, object>> Result = null;
-
-			try
-			{
-				Result = new ObjectBTreeFileEnumerator<KeyValuePair<string, object>>(this.dictionaryFile, this.recordHandler, this.keyValueSerializer);
-				if (Locked)
-					await Result.LockRead();
-			}
-			catch (Exception ex)
-			{
-				Result?.Dispose();
-				Result = null;
-
-				System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex).Throw();
-			}
-
-			return Result;
-		}
-
-		/// <summary>
-		/// Index file.
-		/// </summary>
-		public ObjectBTreeFile DictionaryFile
-		{
-			get { return this.dictionaryFile; }
+			IEnumerable<DictionaryEntry> Entries = await this.provider.Find<DictionaryEntry>(0, int.MaxValue, new FilterFieldEqualTo("Collection", this.collectionName));
+			return new DictionaryEnumerator(Entries);
 		}
 
 		/// <summary>
 		/// Name of corresponding collection name.
 		/// </summary>
 		public string CollectionName { get { return this.collectionName; } }
-
-		/// <summary>
-		/// Encoding to use for text properties.
-		/// </summary>
-		public Encoding Encoding { get { return this.encoding; } }
 
 		/// <summary>
 		/// <see cref="IDictionary{TKey, TValue}.Keys"/>
@@ -521,7 +381,18 @@ namespace Waher.Persistence.Files
 		{
 			get
 			{
-				return this.dictionaryFile.Count;
+				ObjectSerializer Serializer = this.provider.GetObjectSerializerEx(typeof(DictionaryEntry));
+				IMongoCollection<BsonDocument> Collection = this.provider.GetCollection(DictionaryEntry.CollectionName);
+				FilterDefinition<BsonDocument> BsonFilter = this.provider.Convert(new FilterFieldEqualTo("Collection", this.collectionName), Serializer);
+
+				long Result = Collection.CountDocuments(BsonFilter);
+
+				if (Result > int.MaxValue)
+					return int.MaxValue;
+				else if (Result < int.MinValue)
+					return int.MinValue;
+				else
+					return (int)Result;
 			}
 		}
 
@@ -547,14 +418,12 @@ namespace Waher.Persistence.Files
 		{
 			get
 			{
-				Task<KeyValuePair<string, object>> Task = this.GetValueAsync(key);
-				FilesProvider.Wait(Task, this.timeoutMilliseconds);
-				return Task.Result.Value;
+				return this.GetValueAsync(key).Result;
 			}
 
 			set
 			{
-				FilesProvider.Wait(this.AddAsync(key, value, true), this.timeoutMilliseconds);
+				this.AddAsync(key, value, true).Wait();
 			}
 		}
 
@@ -563,16 +432,8 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		public void DeleteAndDispose()
 		{
-			if (!(this.dictionaryFile is null))
-			{
-				string FileName = this.dictionaryFile.FileName;
-				string BlobFileName = this.dictionaryFile.BlobFileName;
-
-				this.Dispose();
-
-				File.Delete(FileName);
-				File.Delete(BlobFileName);
-			}
+			this.Clear();
+			this.Dispose();
 		}
 	}
 }

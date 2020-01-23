@@ -183,5 +183,12 @@ namespace Waher.Persistence
 		{
 			get;
 		}
+
+		/// <summary>
+		/// Gets a persistent dictionary containing objects in a collection.
+		/// </summary>
+		/// <param name="Collection">Collection Name</param>
+		/// <returns>Persistent dictionary</returns>
+		IPersistentDictionary GetDictionary(string Collection);
 	}
 }

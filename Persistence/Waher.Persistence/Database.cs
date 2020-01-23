@@ -642,5 +642,15 @@ namespace Waher.Persistence
 			return B;
 		}
 
+		/// <summary>
+		/// Gets a persistent dictionary containing objects in a collection.
+		/// </summary>
+		/// <param name="Collection">Collection Name</param>
+		/// <returns>Persistent dictionary</returns>
+		public static IPersistentDictionary GetDictionary(string Collection)
+		{
+			return Provider.GetDictionary(Collection);
+		}
+
 	}
 }

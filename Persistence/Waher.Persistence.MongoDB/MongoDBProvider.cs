@@ -189,11 +189,6 @@ namespace Waher.Persistence.MongoDB
 			return Result;
 		}
 
-		private IObjectSerializer GetObjectSerializer(object Object)
-		{
-			return this.GetObjectSerializer(Object.GetType());
-		}
-
 		/// <summary>
 		/// Underlying MongoDB client.
 		/// </summary>
@@ -546,7 +541,7 @@ namespace Waher.Persistence.MongoDB
 			return Result;
 		}
 
-		private FilterDefinition<BsonDocument> Convert(Filter Filter, ObjectSerializer Serializer)
+		internal FilterDefinition<BsonDocument> Convert(Filter Filter, ObjectSerializer Serializer)
 		{
 			if (Filter is FilterChildren FilterChildren)
 			{
@@ -1337,6 +1332,16 @@ namespace Waher.Persistence.MongoDB
 		public Task Flush()
 		{
 			return Task.CompletedTask;
+		}
+
+		/// <summary>
+		/// Gets a persistent dictionary containing objects in a collection.
+		/// </summary>
+		/// <param name="Collection">Collection Name</param>
+		/// <returns>Persistent dictionary</returns>
+		public IPersistentDictionary GetDictionary(string Collection)
+		{
+			return new StringDictionary(Collection, this);
 		}
 
 		// TODO:

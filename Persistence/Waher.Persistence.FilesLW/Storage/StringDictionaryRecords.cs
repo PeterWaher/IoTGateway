@@ -52,7 +52,7 @@ namespace Waher.Persistence.Files.Storage
 
 			Writer.WriteBit(true);
 			Writer.Write(Key);
-			Serializer.Serialize(Writer, true, false, Value);
+			Serializer.Serialize(Writer, true, true, Value);
 
 			return Writer.GetSerialization();
 		}
@@ -142,7 +142,10 @@ namespace Waher.Persistence.Files.Storage
 			switch (DataType)
 			{
 				case ObjectSerializer.TYPE_OBJECT:
-					string TypeName = Reader.ReadString();
+					ulong TypeCode = Reader.ReadVariableLengthUInt64();
+					ulong CollectionCode = Reader.ReadVariableLengthUInt64();
+					string CollectionName = this.provider.GetFieldName(null, CollectionCode);
+					string TypeName = this.provider.GetFieldName(CollectionName, TypeCode);
 					IObjectSerializer Serializer;
 
 					if (string.IsNullOrEmpty(TypeName))
@@ -150,15 +153,14 @@ namespace Waher.Persistence.Files.Storage
 					else
 					{
 						Type T = Types.GetType(TypeName);
-						if (!(T is null))
-							Serializer = this.provider.GetObjectSerializer(T);
-						else
+						if (T is null)
 							Serializer = this.genericSerializer;
+						else
+							Serializer = this.provider.GetObjectSerializer(T);
 					}
 
-					Reader.Position = Pos;
-
-					Serializer.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+					Reader.Position = Pos + 1;
+					Serializer.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, true);
 					break;
 
 				case ObjectSerializer.TYPE_BOOLEAN:
@@ -241,6 +243,9 @@ namespace Waher.Persistence.Files.Storage
 
 				case ObjectSerializer.TYPE_NULL:
 					break;
+
+				case ObjectSerializer.TYPE_ARRAY:
+					throw new Exception("Arrays must be embedded in objects.");
 
 				default:
 					throw new Exception("Object or value expected.");

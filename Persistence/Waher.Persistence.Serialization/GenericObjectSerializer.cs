@@ -129,6 +129,9 @@ namespace Waher.Persistence.Serialization
 				case ObjectSerializer.TYPE_NULL:
 					return null;
 
+				case ObjectSerializer.TYPE_ARRAY:
+					throw new Exception("Arrays must be embedded in objects.");
+
 				default:
 					throw new Exception("Object or value expected.");
 			}
@@ -489,7 +492,14 @@ namespace Waher.Persistence.Serialization
 		/// <param name="Value">The actual object to serialize.</param>
 		public override void Serialize(BinarySerializer Writer, bool WriteTypeCode, bool Embedded, object Value)
 		{
-			if (Value is GenericObject TypedValue)
+			if (Value is null)
+			{
+				if (WriteTypeCode)
+					Writer.WriteBits(ObjectSerializer.TYPE_NULL, 6);
+				else
+					throw new NullReferenceException("Value cannot be null.");
+			}
+			else if (Value is GenericObject TypedValue)
 			{
 				BinarySerializer WriterBak = Writer;
 				IObjectSerializer Serializer;
@@ -574,7 +584,7 @@ namespace Waher.Persistence.Serialization
 			}
 			else
 			{
-				IObjectSerializer Serializer = this.context.GetObjectSerializer(Value.GetType());
+				IObjectSerializer Serializer = this.context.GetObjectSerializer(Value?.GetType() ?? typeof(object));
 				Serializer.Serialize(Writer, WriteTypeCode, Embedded, Value);
 			}
 		}

@@ -164,8 +164,8 @@ namespace Waher.Persistence.MongoDB
 		/// <exception cref="ArgumentNullException">key is null.</exception>
 		public bool TryGetValue(string key, out object value)
 		{
-			KeyValuePair<bool, KeyValuePair<string, object>> Result = this.TryGetValueAsync(key).Result;
-			value = Result.Value.Value;
+			KeyValuePair<bool, object> Result = this.TryGetValueAsync(key).Result;
+			value = Result.Value;
 			return Result.Key;
 		}
 
@@ -177,10 +177,10 @@ namespace Waher.Persistence.MongoDB
 		/// 
 		/// First value is true if the object that implements System.Collections.Generic.IDictionary{string,object} contains an element 
 		/// with the specified key; otherwise, false.
-		/// When this method returns, the second value associated with the specified key, if the key is found; otherwise, 
-		/// the default value for the type of the value parameter. This parameter is passed uninitialized.</returns>
+		/// When this method returns, the second value contains the value associated with the key, if the key is found; otherwise, 
+		/// the default value for the type of the value parameter.</returns>
 		/// <exception cref="ArgumentNullException">key is null.</exception>
-		public async Task<KeyValuePair<bool, KeyValuePair<string, object>>> TryGetValueAsync(string key)
+		public async Task<KeyValuePair<bool, object>> TryGetValueAsync(string key)
 		{
 			if (key is null)
 				throw new ArgumentNullException("key is null.", nameof(key));
@@ -189,7 +189,7 @@ namespace Waher.Persistence.MongoDB
 				new FilterFieldEqualTo("Collection", this.collectionName),
 				new FilterFieldEqualTo("Key", key)));
 
-			return new KeyValuePair<bool, KeyValuePair<string, object>>(!(Entry is null), new KeyValuePair<string, object>(key, Entry?.Value));
+			return new KeyValuePair<bool, object>(!(Entry is null), Entry?.Value);
 		}
 
 		/// <summary>
@@ -225,30 +225,31 @@ namespace Waher.Persistence.MongoDB
 		/// <summary>
 		/// <see cref="ICollection{T}.Clear()"/>
 		/// </summary>
-		public async void Clear()
+		public void Clear()
 		{
-			try
+			this.ClearAsync().Wait();
+		}
+
+		/// <summary>
+		/// Clears the dictionary.
+		/// </summary>
+		public async Task ClearAsync()
+		{
+			while (true)
 			{
-				while (true)
+				IEnumerable<DictionaryEntry> Entries = await this.provider.Find<DictionaryEntry>(0, 1000, new FilterFieldEqualTo("Collection", this.collectionName));
+				bool Empty = true;
+
+				foreach (DictionaryEntry Entry in Entries)
 				{
-					IEnumerable<DictionaryEntry> Entries = await this.provider.Find<DictionaryEntry>(0, 1000, new FilterFieldEqualTo("Collection", this.collectionName));
-					bool Empty = true;
-
-					foreach (DictionaryEntry Entry in Entries)
-					{
-						Empty = false;
-						break;
-					}
-
-					if (Empty)
-						break;
-
-					await this.provider.Delete(Entries);
+					Empty = false;
+					break;
 				}
-			}
-			catch (Exception ex)
-			{
-				Log.Critical(ex);
+
+				if (Empty)
+					break;
+
+				await this.provider.Delete(Entries);
 			}
 		}
 

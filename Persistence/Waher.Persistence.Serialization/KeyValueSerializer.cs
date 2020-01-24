@@ -72,8 +72,13 @@ namespace Waher.Persistence.Serialization
 			switch (DataType.Value)
 			{
 				case ObjectSerializer.TYPE_OBJECT:
+					Reader.FlushBits();
+
 					int Pos = Reader.Position;
-					string TypeName = Reader.ReadString();
+					ulong TypeCode = Reader.ReadVariableLengthUInt64();
+					ulong CollectionCode = Reader.ReadVariableLengthUInt64();
+					string CollectionName = this.context.GetFieldName(null, CollectionCode);
+					string TypeName = this.context.GetFieldName(CollectionName, TypeCode);
 					IObjectSerializer Serializer;
 
 					if (string.IsNullOrEmpty(TypeName))
@@ -81,15 +86,15 @@ namespace Waher.Persistence.Serialization
 					else
 					{
 						Type T = Types.GetType(TypeName);
-						if (!(T is null))
-							Serializer = this.context.GetObjectSerializer(T);
-						else
+						if (T is null)
 							Serializer = this.genericSerializer;
+						else
+							Serializer = this.context.GetObjectSerializer(T);
 					}
 
 					Reader.Position = Pos;
 
-					Value = Serializer.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+					Value = Serializer.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, true);
 					break;
 
 				case ObjectSerializer.TYPE_BOOLEAN:
@@ -179,6 +184,9 @@ namespace Waher.Persistence.Serialization
 				case ObjectSerializer.TYPE_NULL:
 					Value = null;
 					break;
+
+				case ObjectSerializer.TYPE_ARRAY:
+					throw new Exception("Arrays must be embedded in objects.");
 
 				default:
 					throw new Exception("Object or value expected.");

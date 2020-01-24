@@ -139,12 +139,10 @@ namespace Waher.Persistence.Files
 		/// <exception cref="ArgumentException">An element with the same key already exists in the System.Collections.Generic.IDictionary{string,object}.</exception>
 		public async Task AddAsync(string key, object value, bool ReplaceIfExists)
 		{
-			//Console.Out.WriteLine(key + ":=" + value.ToString() + " <" + value.GetType().FullName + ">");
-
 			if (key is null)
 				throw new ArgumentNullException("key is null.", "key");
 
-			Type Type = value.GetType();
+			Type Type = value?.GetType() ?? typeof(object);
 			IObjectSerializer Serializer = this.provider.GetObjectSerializer(Type);
 			byte[] Bin = this.recordHandler.Serialize(key, value, Serializer);
 
@@ -171,15 +169,6 @@ namespace Waher.Persistence.Files
 			{
 				await this.dictionaryFile.EndWrite();
 			}
-
-			/*try
-			{
-				Console.Out.WriteLine((await this.ToArrayAsync()).Length.ToString());
-			}
-			catch (Exception ex)
-			{
-				Console.Out.WriteLine(ex.StackTrace);
-			}*/
 
 			if (!(this.inMemory is null))
 			{
@@ -252,7 +241,7 @@ namespace Waher.Persistence.Files
 		/// <exception cref="ArgumentNullException">key is null.</exception>
 		public bool TryGetValue(string key, out object value)
 		{
-			Task<KeyValuePair<bool, KeyValuePair<string, object>>> Task = this.TryGetValueAsync(key);
+			Task<KeyValuePair<bool, object>> Task = this.TryGetValueAsync(key);
 			FilesProvider.Wait(Task, this.timeoutMilliseconds);
 			value = Task.Result.Value;
 			return Task.Result.Key;
@@ -269,7 +258,7 @@ namespace Waher.Persistence.Files
 		/// When this method returns, the second value associated with the specified key, if the key is found; otherwise, 
 		/// the default value for the type of the value parameter. This parameter is passed uninitialized.</returns>
 		/// <exception cref="ArgumentNullException">key is null.</exception>
-		public async Task<KeyValuePair<bool, KeyValuePair<string, object>>> TryGetValueAsync(string key)
+		public async Task<KeyValuePair<bool, object>> TryGetValueAsync(string key)
 		{
 			if (key is null)
 				throw new ArgumentNullException("key is null.", "key");
@@ -279,7 +268,7 @@ namespace Waher.Persistence.Files
 				lock (this.inMemory)
 				{
 					if (this.inMemory.TryGetValue(key, out object value))
-						return new KeyValuePair<bool, KeyValuePair<string, object>>(true, new KeyValuePair<string, object>(key, value));
+						return new KeyValuePair<bool, object>(true, value);
 				}
 			}
 
@@ -288,9 +277,9 @@ namespace Waher.Persistence.Files
 			{
 				object Result = await this.dictionaryFile.TryLoadObjectLocked(key, this.keyValueSerializer);
 				if (Result is null)
-					return new KeyValuePair<bool, KeyValuePair<string, object>>(false, new KeyValuePair<string, object>(key, null));
+					return new KeyValuePair<bool, object>(false, null);
 				else
-					return new KeyValuePair<bool, KeyValuePair<string, object>>(true, (KeyValuePair<string, object>)Result);
+					return new KeyValuePair<bool, object>(true, Result);
 			}
 			finally
 			{
@@ -343,7 +332,15 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		public void Clear()
 		{
-			this.dictionaryFile.Clear();
+			FilesProvider.Wait(this.ClearAsync(), this.timeoutMilliseconds);
+		}
+
+		/// <summary>
+		/// Clears the dictionary.
+		/// </summary>
+		public async Task ClearAsync()
+		{
+			await this.dictionaryFile.ClearAsync();
 
 			if (!(this.inMemory is null))
 			{
@@ -362,7 +359,10 @@ namespace Waher.Persistence.Files
 			if (!this.TryGetValue(item.Key, out object Value))
 				return false;
 
-			return Value.Equals(item.Value);
+			if (Value is null)
+				return item.Value is null;
+			else
+				return Value.Equals(item.Value);
 		}
 
 		/// <summary>

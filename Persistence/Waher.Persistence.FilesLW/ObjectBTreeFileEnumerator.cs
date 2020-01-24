@@ -13,7 +13,7 @@ namespace Waher.Persistence.Files
 	/// Enumerates object in a <see cref="ObjectBTreeFile"/> in GUID order. You can use the enumerator to enumerate objects
 	/// forwards and backwards, as well as skip a given number of objects.
 	/// </summary>
-	public class ObjectBTreeFileEnumerator<T> : IEnumerator<T>, ICursor<T>
+	public class ObjectBTreeFileEnumerator<T> : IEnumerator<T>, ICursor<T>, IAsyncEnumerator
 	{
 		private readonly ObjectBTreeFile file;
 		private BlockHeader currentHeader;

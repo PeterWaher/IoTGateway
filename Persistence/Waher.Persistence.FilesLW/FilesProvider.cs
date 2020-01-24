@@ -1036,15 +1036,32 @@ namespace Waher.Persistence.Files
 			sb.AppendLine("Collection");
 			sb.AppendLine(CollectionName);
 
-			KeyValuePair<bool, KeyValuePair<string, object>> P2 = await this.master.TryGetValueAsync(File.FileName);
+			KeyValuePair<bool, object> P2 = await this.master.TryGetValueAsync(File.FileName);
 			string s2 = sb.ToString();
 
-			if (!P2.Key || !(P2.Value.Value is string) || ((string)P2.Value.Value) != s2)
+			if (this.NeedsMasterRegistryUpdate(P2, File.FileName, s2))
 				await this.master.AddAsync(File.FileName, s2, true);
 
 			await this.GetFieldCodeAsync(null, CollectionName);
 
 			return File;
+		}
+
+		private bool NeedsMasterRegistryUpdate(KeyValuePair<bool, object> Record, string Key, string ExpectedValue)
+		{
+			if (!Record.Key)
+				return true;
+
+			if (Record.Value is string s)
+			{
+				return s != ExpectedValue;
+			}
+			else if (Record.Value is KeyValuePair<string, object> P3)
+			{
+				return P3.Key != Key || !(P3.Value is string s2) || s2 != ExpectedValue;
+			}
+			else
+				return true;
 		}
 
 		/// <summary>
@@ -1169,10 +1186,10 @@ namespace Waher.Persistence.Files
 			if (s.StartsWith(this.folder))
 				s = s.Substring(this.folder.Length);
 
-			KeyValuePair<bool, KeyValuePair<string, object>> P = await this.master.TryGetValueAsync(s);
+			KeyValuePair<bool, object> P = await this.master.TryGetValueAsync(s);
 			string s2 = sb.ToString();
 
-			if (!P.Key || !(P.Value.Value is string) || ((string)P.Value.Value) != s2)
+			if (this.NeedsMasterRegistryUpdate(P, s, s2))
 				await this.master.AddAsync(s, s2, true);
 
 			return IndexFile;
@@ -1248,10 +1265,21 @@ namespace Waher.Persistence.Files
 		private async Task LoadConfiguration()
 		{
 			LinkedList<string> ToRemove = null;
+			List<KeyValuePair<string, object>> Items = new List<KeyValuePair<string, object>>();
 
 			foreach (KeyValuePair<string, object> P in this.master)
+				Items.Add(P);
+
+			foreach (KeyValuePair<string, object> P in Items)
 			{
-				string s = P.Value.ToString();
+				if (!(P.Value is string s))
+				{
+					if (P.Value is KeyValuePair<string, object> P2)
+						s = P2.Value.ToString();
+					else
+						s = P.Value.ToString();
+				}
+
 				string[] Rows = s.Split(CRLF, StringSplitOptions.RemoveEmptyEntries);
 
 				switch (Rows[0])
@@ -1741,7 +1769,7 @@ namespace Waher.Persistence.Files
 
 			FileName = Path.Combine(FileName, Collection);
 
-			return new StringDictionary(FileName + ".dict", FileName + ".blob", Collection, this, false);
+			return new StringDictionary(FileName + ".dict", FileName + ".dblob", Collection, this, false);
 		}
 
 		#endregion

@@ -4,9 +4,6 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Waher.Persistence.Filters;
-using Waher.Persistence.Serialization;
-using Waher.Persistence.Files.Statistics;
 
 #if !LW
 using Waher.Persistence.Files.Test.Classes;
@@ -90,53 +87,100 @@ namespace Waher.Persistence.FilesLW.Test
 		[TestMethod]
 		public async Task DBFiles_StringDictionary_01_Set()
 		{
+			byte[] ByteArray = new byte[] { 1, 2, 3, 4, 5 };
+			Simple Obj = DBFilesBTreeTests.CreateSimple(100);
+
 			this.file["Key1"] = "Value1";
 			this.file["Key2"] = "Value2";
 			this.file["Key3"] = "Value3";
+			this.file["Key4"] = null;
+			this.file["Key5"] = Obj;
+			this.file["Key6"] = ByteArray;
 			Assert.IsTrue(await this.file.ContainsKeyAsync("Key1"));
 			Assert.IsTrue(await this.file.ContainsKeyAsync("Key2"));
 			Assert.IsTrue(await this.file.ContainsKeyAsync("Key3"));
+			Assert.IsTrue(await this.file.ContainsKeyAsync("Key4"));
+			Assert.IsTrue(await this.file.ContainsKeyAsync("Key5"));
+			Assert.IsTrue(await this.file.ContainsKeyAsync("Key6"));
 			AssertEx.Same(this.file["Key1"], "Value1");
 			AssertEx.Same(this.file["Key2"], "Value2");
 			AssertEx.Same(this.file["Key3"], "Value3");
+			Assert.IsNull(this.file["Key4"]);
+			DBFilesObjectSerializationTests.AssertEqual(this.file["Key5"] as Simple, Obj);
+			AssertEx.Same(this.file["Key6"], ByteArray);
 		}
 
 		[TestMethod]
 		public async Task DBFiles_StringDictionary_02_Add()
 		{
+			byte[] ByteArray = new byte[] { 1, 2, 3, 4, 5 };
+			Simple Obj = DBFilesBTreeTests.CreateSimple(100);
+
 			await this.file.AddAsync("Key1", "Value1");
 			await this.file.AddAsync("Key2", "Value2");
 			await this.file.AddAsync("Key3", "Value3");
+			await this.file.AddAsync("Key4", null);
+			await this.file.AddAsync("Key5", Obj);
+			await this.file.AddAsync("Key6", ByteArray);
 			Assert.IsTrue(await this.file.ContainsKeyAsync("Key1"));
 			Assert.IsTrue(await this.file.ContainsKeyAsync("Key2"));
 			Assert.IsTrue(await this.file.ContainsKeyAsync("Key3"));
+			Assert.IsTrue(await this.file.ContainsKeyAsync("Key4"));
+			Assert.IsTrue(await this.file.ContainsKeyAsync("Key5"));
+			Assert.IsTrue(await this.file.ContainsKeyAsync("Key6"));
 			AssertEx.Same(this.file["Key1"], "Value1");
 			AssertEx.Same(this.file["Key2"], "Value2");
 			AssertEx.Same(this.file["Key3"], "Value3");
+			Assert.IsNull(this.file["Key4"]);
+			DBFilesObjectSerializationTests.AssertEqual(this.file["Key5"] as Simple, Obj);
+			AssertEx.Same(this.file["Key6"], ByteArray);
 		}
 
 		[TestMethod]
 		public async Task DBFiles_StringDictionary_03_Reset()
 		{
+			byte[] ByteArray1 = new byte[] { 1, 2, 3, 4, 5 };
+			byte[] ByteArray2 = new byte[] { 6, 7, 8, 9, 0 };
+			Simple Obj1 = DBFilesBTreeTests.CreateSimple(100);
+			Simple Obj2 = DBFilesBTreeTests.CreateSimple(100);
+
 			this.file["Key1"] = "Value1_1";
 			this.file["Key2"] = "Value2_1";
 			this.file["Key3"] = "Value3_1";
+			this.file["Key4"] = null;
+			this.file["Key5"] = Obj1;
+			this.file["Key6"] = ByteArray1;
 			Assert.IsTrue(await this.file.ContainsKeyAsync("Key1"));
 			Assert.IsTrue(await this.file.ContainsKeyAsync("Key2"));
 			Assert.IsTrue(await this.file.ContainsKeyAsync("Key3"));
+			Assert.IsTrue(await this.file.ContainsKeyAsync("Key4"));
+			Assert.IsTrue(await this.file.ContainsKeyAsync("Key5"));
+			Assert.IsTrue(await this.file.ContainsKeyAsync("Key6"));
 			AssertEx.Same(this.file["Key1"], "Value1_1");
 			AssertEx.Same(this.file["Key2"], "Value2_1");
 			AssertEx.Same(this.file["Key3"], "Value3_1");
+			Assert.IsNull(this.file["Key4"]);
+			DBFilesObjectSerializationTests.AssertEqual(this.file["Key5"] as Simple, Obj1);
+			AssertEx.Same(this.file["Key6"], ByteArray1);
 
 			this.file["Key1"] = "Value1_2";
 			this.file["Key2"] = "Value2_2";
 			this.file["Key3"] = "Value3_2";
+			this.file["Key4"] = null;
+			this.file["Key5"] = Obj2;
+			this.file["Key6"] = ByteArray2;
 			Assert.IsTrue(await this.file.ContainsKeyAsync("Key1"));
 			Assert.IsTrue(await this.file.ContainsKeyAsync("Key2"));
 			Assert.IsTrue(await this.file.ContainsKeyAsync("Key3"));
+			Assert.IsTrue(await this.file.ContainsKeyAsync("Key4"));
+			Assert.IsTrue(await this.file.ContainsKeyAsync("Key5"));
+			Assert.IsTrue(await this.file.ContainsKeyAsync("Key6"));
 			AssertEx.Same(this.file["Key1"], "Value1_2");
 			AssertEx.Same(this.file["Key2"], "Value2_2");
 			AssertEx.Same(this.file["Key3"], "Value3_2");
+			Assert.IsNull(this.file["Key4"]);
+			DBFilesObjectSerializationTests.AssertEqual(this.file["Key5"] as Simple, Obj2);
+			AssertEx.Same(this.file["Key6"], ByteArray2);
 		}
 
 		[TestMethod]
@@ -158,39 +202,95 @@ namespace Waher.Persistence.FilesLW.Test
 		[TestMethod]
 		public async Task DBFiles_StringDictionary_05_Remove()
 		{
-			await this.file.AddAsync("Key1", "Value1_1");
-			await this.file.AddAsync("Key2", "Value2_1");
-			await this.file.AddAsync("Key3", "Value3_1");
+			byte[] ByteArray = new byte[] { 1, 2, 3, 4, 5 };
+			Simple Obj = DBFilesBTreeTests.CreateSimple(100);
+
+			await this.file.AddAsync("Key1", "Value1");
+			await this.file.AddAsync("Key2", "Value2");
+			await this.file.AddAsync("Key3", "Value3");
+			await this.file.AddAsync("Key4", null);
+			await this.file.AddAsync("Key5", Obj);
+			await this.file.AddAsync("Key6", ByteArray);
 			Assert.IsTrue(await this.file.ContainsKeyAsync("Key1"));
 			Assert.IsTrue(await this.file.ContainsKeyAsync("Key2"));
 			Assert.IsTrue(await this.file.ContainsKeyAsync("Key3"));
-			AssertEx.Same(this.file["Key1"], "Value1_1");
-			AssertEx.Same(this.file["Key2"], "Value2_1");
-			AssertEx.Same(this.file["Key3"], "Value3_1");
+			Assert.IsTrue(await this.file.ContainsKeyAsync("Key4"));
+			Assert.IsTrue(await this.file.ContainsKeyAsync("Key5"));
+			Assert.IsTrue(await this.file.ContainsKeyAsync("Key6"));
+			AssertEx.Same(this.file["Key1"], "Value1");
+			AssertEx.Same(this.file["Key2"], "Value2");
+			AssertEx.Same(this.file["Key3"], "Value3");
+			Assert.IsNull(this.file["Key4"]);
+			DBFilesObjectSerializationTests.AssertEqual(this.file["Key5"] as Simple, Obj);
+			AssertEx.Same(this.file["Key6"], ByteArray);
 
 			Assert.IsTrue(await this.file.RemoveAsync("Key2"));
 			Assert.IsFalse(await this.file.ContainsKeyAsync("Key2"));
 			Assert.IsFalse(await this.file.RemoveAsync("Key2"));
-			AssertEx.Same(this.file["Key1"], "Value1_1");
-			AssertEx.Same(this.file["Key3"], "Value3_1");
+			AssertEx.Same(this.file["Key1"], "Value1");
+			AssertEx.Same(this.file["Key3"], "Value3");
+			Assert.IsNull(this.file["Key4"]);
+			DBFilesObjectSerializationTests.AssertEqual(this.file["Key5"] as Simple, Obj);
+			AssertEx.Same(this.file["Key6"], ByteArray);
 
 			Assert.IsTrue(await this.file.RemoveAsync("Key1"));
 			Assert.IsFalse(await this.file.ContainsKeyAsync("Key1"));
 			Assert.IsFalse(await this.file.RemoveAsync("Key1"));
-			AssertEx.Same(this.file["Key3"], "Value3_1");
+			AssertEx.Same(this.file["Key3"], "Value3");
+			Assert.IsNull(this.file["Key4"]);
+			DBFilesObjectSerializationTests.AssertEqual(this.file["Key5"] as Simple, Obj);
+			AssertEx.Same(this.file["Key6"], ByteArray);
 
 			Assert.IsTrue(await this.file.RemoveAsync("Key3"));
 			Assert.IsFalse(await this.file.ContainsKeyAsync("Key3"));
 			Assert.IsFalse(await this.file.RemoveAsync("Key3"));
+			Assert.IsNull(this.file["Key4"]);
+			DBFilesObjectSerializationTests.AssertEqual(this.file["Key5"] as Simple, Obj);
+			AssertEx.Same(this.file["Key6"], ByteArray);
+
+			Assert.IsTrue(await this.file.RemoveAsync("Key4"));
+			Assert.IsFalse(await this.file.ContainsKeyAsync("Key4"));
+			Assert.IsFalse(await this.file.RemoveAsync("Key4"));
+			DBFilesObjectSerializationTests.AssertEqual(this.file["Key5"] as Simple, Obj);
+			AssertEx.Same(this.file["Key6"], ByteArray);
+
+			Assert.IsTrue(await this.file.RemoveAsync("Key5"));
+			Assert.IsFalse(await this.file.ContainsKeyAsync("Key5"));
+			Assert.IsFalse(await this.file.RemoveAsync("Key5"));
+			AssertEx.Same(this.file["Key6"], ByteArray);
+
+			Assert.IsTrue(await this.file.RemoveAsync("Key6"));
+			Assert.IsFalse(await this.file.ContainsKeyAsync("Key6"));
+			Assert.IsFalse(await this.file.RemoveAsync("Key6"));
 		}
 
 		[TestMethod]
 		public async Task DBFiles_StringDictionary_06_CopyTo()
 		{
-			await this.DBFiles_StringDictionary_01_Set();
+			byte[] ByteArray = new byte[] { 1, 2, 3, 4, 5 };
+			Simple Obj = DBFilesBTreeTests.CreateSimple(100);
+
+			this.file["Key1"] = "Value1";
+			this.file["Key2"] = "Value2";
+			this.file["Key3"] = "Value3";
+			this.file["Key4"] = null;
+			this.file["Key5"] = Obj;
+			this.file["Key6"] = ByteArray;
+			Assert.IsTrue(await this.file.ContainsKeyAsync("Key1"));
+			Assert.IsTrue(await this.file.ContainsKeyAsync("Key2"));
+			Assert.IsTrue(await this.file.ContainsKeyAsync("Key3"));
+			Assert.IsTrue(await this.file.ContainsKeyAsync("Key4"));
+			Assert.IsTrue(await this.file.ContainsKeyAsync("Key5"));
+			Assert.IsTrue(await this.file.ContainsKeyAsync("Key6"));
+			AssertEx.Same(this.file["Key1"], "Value1");
+			AssertEx.Same(this.file["Key2"], "Value2");
+			AssertEx.Same(this.file["Key3"], "Value3");
+			Assert.IsNull(this.file["Key4"]);
+			DBFilesObjectSerializationTests.AssertEqual(this.file["Key5"] as Simple, Obj);
+			AssertEx.Same(this.file["Key6"], ByteArray);
 
 			int c = this.file.Count;
-			AssertEx.Same(3, c);
+			AssertEx.Same(6, c);
 
 			KeyValuePair<string, object>[] A = new KeyValuePair<string, object>[c];
 			this.file.CopyTo(A, 0);
@@ -198,16 +298,23 @@ namespace Waher.Persistence.FilesLW.Test
 			AssertEx.Same(A[0].Key, "Key1");
 			AssertEx.Same(A[1].Key, "Key2");
 			AssertEx.Same(A[2].Key, "Key3");
+			AssertEx.Same(A[3].Key, "Key4");
+			AssertEx.Same(A[4].Key, "Key5");
+			AssertEx.Same(A[5].Key, "Key6");
 
 			AssertEx.Same(A[0].Value, "Value1");
 			AssertEx.Same(A[1].Value, "Value2");
 			AssertEx.Same(A[2].Value, "Value3");
+			Assert.IsNull(A[3].Value);
+			DBFilesObjectSerializationTests.AssertEqual(A[4].Value as Simple, Obj);
+			AssertEx.Same(A[5].Value, ByteArray);
 		}
 
 		[TestMethod]
 		public void DBFiles_StringDictionary_07_DataTypes()
 		{
-			Simple Obj = DBFilesBTreeTests.CreateSimple(100);
+			DateTime DT = DateTime.Now;
+			DateTimeOffset DTO = DateTimeOffset.Now;
 
 			this.file["Key1"] = true;
 			this.file["Key2"] = (byte)1;
@@ -221,12 +328,16 @@ namespace Waher.Persistence.FilesLW.Test
 			this.file["Key10"] = (decimal)9;
 			this.file["Key11"] = (double)10;
 			this.file["Key12"] = (float)11;
-			this.file["Key13"] = (DateTime)DateTime.Today;
+			this.file["Key13"] = DT;
 			this.file["Key14"] = TimeSpan.Zero;
 			this.file["Key15"] = 'a';
 			this.file["Key16"] = "Hello";
 			this.file["Key17"] = NormalEnum.Option2;
 			this.file["Key18"] = Guid.Empty.ToByteArray();
+			this.file["Key19"] = Guid.Empty;
+			this.file["Key20"] = DTO;
+			this.file["Key21"] = new CaseInsensitiveString("Hello");
+			this.file["Key22"] = null;
 
 			AssertEx.Same(this.file["Key1"], true);
 			AssertEx.Same(this.file["Key2"], (byte)1);
@@ -240,12 +351,16 @@ namespace Waher.Persistence.FilesLW.Test
 			AssertEx.Same(this.file["Key10"], (decimal)9);
 			AssertEx.Same(this.file["Key11"], (double)10);
 			AssertEx.Same(this.file["Key12"], (float)11);
-			AssertEx.Same(this.file["Key13"], (DateTime)DateTime.Today);
+			AssertEx.Same(this.file["Key13"], DT);
 			AssertEx.Same(this.file["Key14"], TimeSpan.Zero);
 			AssertEx.Same(this.file["Key15"], 'a');
 			AssertEx.Same(this.file["Key16"], "Hello");
 			AssertEx.Same(this.file["Key17"], "Option2");
 			AssertEx.Same(this.file["Key18"], Guid.Empty.ToByteArray());
+			AssertEx.Same(this.file["Key19"], Guid.Empty);
+			AssertEx.Same(this.file["Key20"], DTO);
+			AssertEx.Same(this.file["Key21"], new CaseInsensitiveString("Hello"));
+			Assert.IsNull(this.file["Key22"]);
 		}
 
 		[TestMethod]
@@ -281,8 +396,20 @@ namespace Waher.Persistence.FilesLW.Test
 			AssertEx.Same(24, Records.Length);
 		}
 
-		// TODO: BLOB values.
-		// TODO: Object values.
-		// TODO: null values.
+		[TestMethod]
+		public void DBFiles_StringDictionary_09_10000_Items()
+		{
+			int i;
+
+			for (i = 1; i <= 10000; i++)
+				this.file["Key" + i.ToString()] = i;
+
+			Assert.AreEqual(10000, this.file.Count);
+
+			for (i = 1; i <= 10000; i++)
+				AssertEx.Same(this.file["Key" + i.ToString()], i);
+		}
+
+		// TODO: BLOBs
 	}
 }

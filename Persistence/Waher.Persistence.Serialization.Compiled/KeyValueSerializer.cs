@@ -204,7 +204,12 @@ namespace Waher.Persistence.Serialization
 		/// <param name="Value">The actual object to serialize.</param>
 		public void Serialize(BinarySerializer Writer, bool WriteTypeCode, bool Embedded, object Value)
 		{
-			throw new NotImplementedException();    // TODO
+			KeyValuePair<string, object> TypedValue = (KeyValuePair<string, object>)Value;
+			IObjectSerializer Serializer = this.context.GetObjectSerializer(TypedValue.Value?.GetType() ?? typeof(object));
+
+			Writer.WriteBit(true);
+			Writer.Write(TypedValue.Key);
+			Serializer.Serialize(Writer, true, true, TypedValue.Value);
 		}
 
 		/// <summary>
@@ -216,7 +221,22 @@ namespace Waher.Persistence.Serialization
 		/// <returns>If the corresponding field or property was found.</returns>
 		public bool TryGetFieldValue(string FieldName, object Object, out object Value)
 		{
-			throw new NotImplementedException();    // TODO
+			KeyValuePair<string, object> TypedValue = (KeyValuePair<string, object>)Object;
+
+			switch (FieldName)
+			{
+				case "Key":
+					Value = TypedValue.Key;
+					return true;
+
+				case "Value":
+					Value = TypedValue.Value;
+					return true;
+
+				default:
+					Value = null;
+					return false;
+			}
 		}
 	}
 }
